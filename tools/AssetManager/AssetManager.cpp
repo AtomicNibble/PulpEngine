@@ -312,23 +312,23 @@ void AssetManager::createActions(void)
 	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
 
 	// Edit
-	pUndoAct_ = new QAction(QIcon(":/misc/img/Undo.png"), "Undo", this);
+	pUndoAct_ = new QAction(QIcon(":/misc/img/Undo.png"), tr("Undo"), this);
 	pUndoAct_->setStatusTip(tr("Undo the last editing action"));
 	pUndoAct_->setEnabled(false);
 
-	pRedoAct_ = new QAction(QIcon(":/misc/img/Redo.png"), "Redo", this);
+	pRedoAct_ = new QAction(QIcon(":/misc/img/Redo.png"), tr("Redo"), this);
 	pRedoAct_->setStatusTip("Redo");
 	pRedoAct_->setEnabled(false);
 
-	pCutAct_ = new QAction(QIcon(":/misc/img/Cut.png"), "Cut", this);
+	pCutAct_ = new QAction(QIcon(":/misc/img/Redo.png"), tr("Cut1"), this);
 	pCutAct_->setStatusTip("Cut");
 //	pCutAct_->setEnabled(false);
 
-	pCopyAct_ = new QAction(QIcon(":/misc/img/Copy.png"), "Copy", this);
+	pCopyAct_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy"), this);
 	pCopyAct_->setStatusTip("Copy");
 //	pCopyAct_->setEnabled(false);
 
-	pPasteAct_ = new QAction(QIcon(":/misc/img/Paste.png"), "Paste", this);
+	pPasteAct_ = new QAction(QIcon(":/misc/img/Paste.png"), tr("Paste"), this);
 	pPasteAct_->setStatusTip("Paste");
 //	pPasteAct_->setEnabled(false);
 
