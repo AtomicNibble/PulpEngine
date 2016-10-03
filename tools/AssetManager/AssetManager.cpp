@@ -6,6 +6,7 @@
 #include "ActionContainer.h"
 #include "VersionDialog.h"
 #include "AddAssetDialog.h"
+#include "AddModDialog.h"
 #include "StatusBar.h"
 #include "OutputPaneManagerWidget.h"
 #include "OutputWindowWidget.h"
@@ -656,7 +657,9 @@ void AssetManager::newFile(void)
 
 void AssetManager::newMod(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	AddModDialog dialog(ICore::mainWindow(), *pDb_);
+
+	dialog.exec();
 }
 
 void AssetManager::save(void)
