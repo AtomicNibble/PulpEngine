@@ -662,6 +662,14 @@ void AssetDBModel::recursiveAddFileNodes(FolderNode* pStartNode, QList<Node*>* p
     }
 }
 
+void AssetDBModel::addFileNodes(FolderNode* pStartNode, QList<Node*>* pList) const
+{
+	for (Node* pNode : pStartNode->fileNodes()) {
+		if (!filter(pNode)) {
+			pList->append(pNode);
+		}
+	}
+}
 
 QList<Node*> AssetDBModel::childNodes(FolderNode *parentNode) const
 {
@@ -678,7 +686,10 @@ QList<Node*> AssetDBModel::childNodes(FolderNode *parentNode) const
     else
     {
         recursiveAddFolderNodes(parentNode, &nodeList);
-        recursiveAddFileNodes(parentNode, &nodeList);
+		// can't use this since it will add folder below.
+		// this is only useful if we are filtering out hidden nodes.
+	//	recursiveAddFileNodes(parentNode, &nodeList);
+		addFileNodes(parentNode, &nodeList);
     }
 
     qSort(nodeList.begin(), nodeList.end(), sortNodes);

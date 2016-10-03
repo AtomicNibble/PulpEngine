@@ -63,6 +63,7 @@ namespace AssetExplorer
 		void recursiveAddFolderNodes(FolderNode* pStartNode, QList<Node*>* pList) const;
 		void recursiveAddFolderNodesImpl(FolderNode* pStartNode, QList<Node*>* pList) const;
 		void recursiveAddFileNodes(FolderNode* pStartNode, QList<Node*>* pList) const;
+		void addFileNodes(FolderNode* pStartNode, QList<Node*>* pList) const;
 		QList<Node*> childNodes(FolderNode *parentNode) const;
 
 		FolderNode* visibleFolderNode(FolderNode *node) const;
