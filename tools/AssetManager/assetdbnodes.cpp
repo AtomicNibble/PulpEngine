@@ -13,14 +13,12 @@ namespace AssetExplorer
 {
 
 
-Node::Node(NodeType nodeType,
-           const QString &name, int32_t line) :
+Node::Node(NodeType nodeType, const QString &name) :
     QObject(),
     nodeType_(nodeType),
-    pProjectNode_(0),
-	pFolderNode_(0),
-    name_(name),
-    line_(line)
+    pProjectNode_(nullptr),
+	pFolderNode_(nullptr),
+    name_(name)
 {
 
 }
@@ -61,30 +59,6 @@ void Node::setName(const QString& name)
     emitNodeUpdated();
 }
 
-void Node::setLine(int32_t line)
-{
-    if (line_ == line) {
-        return;
-    }
-
-    emitNodeSortKeyAboutToChange();
-    line_ = line;
-    emitNodeSortKeyChanged();
-    emitNodeUpdated();
-}
-
-void Node::setNameAndLine(const QString& name, int32_t line)
-{
-    if (name_ == name && line_ == line) {
-        return;
-    }
-
-    emitNodeSortKeyAboutToChange();
-    name_ = name;
-    line_ = line;
-    emitNodeSortKeyChanged();
-    emitNodeUpdated();
-}
 
 NodeType Node::nodeType(void) const
 {
@@ -108,11 +82,6 @@ FolderNode* Node::parentFolderNode(void) const
 QString Node::name(void) const
 {
     return name_;
-}
-
-int32_t Node::line(void) const
-{
-    return -1;
 }
 
 QIcon Node::icon(void) const
@@ -176,9 +145,8 @@ void Node::setParentFolderNode(FolderNode* parentFolder)
 // ------------------------------------------------------------------
 
 FileNode::FileNode(const QString& name,
-                   const FileType fileType,
-                   int32_t line) :
-    Node(NodeType::FileNodeType, name, line),
+                   const FileType fileType) :
+    Node(NodeType::FileNodeType, name),
     fileType_(fileType)
 {
 }

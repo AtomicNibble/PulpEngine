@@ -58,7 +58,6 @@ namespace AssetExplorer
 		ProjectNode* projectNode(void) const;     // managing project
 		FolderNode* parentFolderNode(void) const; // parent folder or project
 		QString name(void) const;                 // name
-		int32_t line(void) const;
 		QIcon icon(void) const;
 		virtual QString displayName(void) const;
 		virtual QString tooltip(void) const;
@@ -67,13 +66,11 @@ namespace AssetExplorer
 		virtual QList<ProjectAction> supportedActions(Node *node) const;
 
 		void setName(const QString& name);
-		void setLine(int32_t line);
-		void setNameAndLine(const QString& name, int32_t line);
 		void setIcon(const QIcon& icon);
 		void emitNodeUpdated(void);
 
 	protected:
-		Node(NodeType nodeType, const QString& name, int32_t line = -1);
+		Node(NodeType nodeType, const QString& name);
 
 		void setNodeType(NodeType type);
 		void setProjectNode(ProjectNode* pProject);
@@ -88,7 +85,6 @@ namespace AssetExplorer
 		FolderNode* pFolderNode_;
 		QString name_;
 		mutable QIcon icon_;
-		int32_t line_;
 	};
 
 
@@ -97,7 +93,7 @@ namespace AssetExplorer
 	{
 		Q_OBJECT
 	public:
-		FileNode(const QString& name, const FileType fileType, int32_t line = -1);
+		FileNode(const QString& name, const FileType fileType);
 
 		FileType fileType(void) const;
 
