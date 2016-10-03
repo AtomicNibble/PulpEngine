@@ -101,9 +101,10 @@ AssetDbFilterOptionsWidget::AssetDbFilterOptionsWidget(QWidget* parent) :
 
 	pNameFilterEnabled_ = new QCheckBox();
 	pNameFilterEnabled_->setText("Name");
+	pNameFilterEnabled_->setChecked(true);
 	pTypeFilterEnabled_ = new QCheckBox();
 	pTypeFilterEnabled_->setText("Types");
-
+	pTypeFilterEnabled_->setChecked(true);
 
 	pNameFilter_ = new QLineEdit();
 	pNameFilter_->setPlaceholderText("Search..");
