@@ -144,6 +144,9 @@ public:
 	int32_t GetValueInt(void) const;
 	bool GetValueBool(void) const;
 
+private:
+	void setModifiedStyle(bool modified);
+
 private slots:
 	void valueChanged(const std::string& value);
 

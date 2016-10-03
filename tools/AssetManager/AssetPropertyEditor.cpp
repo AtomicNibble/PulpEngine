@@ -194,6 +194,10 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 	if (!settings_.IsSet(Setting::VISIBLE)) {
 		show(false);
 	}
+	// re refreshing ui, re apply modified style if set.
+	if (settings_.IsSet(Setting::MODIFIED)) {
+		setModifiedStyle(true);
+	}
 }
 
 void AssetProperty::valueChanged(const std::string& value)
@@ -375,6 +379,11 @@ void AssetProperty::SetModified(bool modified)
 		settings_.Set(Setting::MODIFIED);
 	}
 
+	setModifiedStyle(modified);
+}
+
+void AssetProperty::setModifiedStyle(bool modified)
+{
 	if (type_ == PropertyType::CHECKBOX)
 	{
 		if (modified) {
