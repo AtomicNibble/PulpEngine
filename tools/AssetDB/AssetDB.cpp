@@ -222,8 +222,8 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 {
 	// adds a load of junk data for testing.
 
-	core::StackString512 modName("testMod_");
-	core::Path<char> outDir("testMod_");
+	core::StackString512 modName("testmod_");
+	core::Path<char> outDir("testmod_");
 
 	const uint32_t assetNameLenMin = 4;
 	const uint32_t assetNameLenMax = 16;
