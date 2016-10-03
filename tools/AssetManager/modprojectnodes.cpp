@@ -204,4 +204,16 @@ ModFolderNode::ModFolderNode(const QString &name) :
 }
 
 
+// -------------------------------------------------------------------
+
+
+ModFileNode::ModFileNode(const QString& displayName, const QString& name, AssetType::Enum type) :
+	FileNode(displayName, AssetExplorer::FileType::SourceType),
+	name_(name),
+	type_(type)
+{
+
+}
+
+
 X_NAMESPACE_END

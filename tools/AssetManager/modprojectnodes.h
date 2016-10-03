@@ -60,6 +60,20 @@ private:
 };
 
 
+class ModFileNode : public AssetExplorer::FileNode
+{
+	typedef assetDb::AssetType AssetType;
+
+public:
+	explicit ModFileNode(const QString& displayName, const QString& name, AssetType::Enum type);
+
+private:
+	QString name_;
+	AssetType::Enum type_;
+};
+
+
+
 X_NAMESPACE_END
 
 #endif // MODPROJECTNODES_H
