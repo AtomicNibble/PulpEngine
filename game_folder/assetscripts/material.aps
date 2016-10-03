@@ -1,0 +1,33 @@
+
+
+void GenerateUI( asset& Asset )
+{
+    string cats = "Geo | Decal | Effect | UI | Tool";
+    string surTypes = "<none> | Brick | Concrete | Cloth | Flesh | Glass | Gravel | Ice | Metal | Mud | Plastic | Paper | Rock | Snow | Sand | Wood | Water";
+    // for grouping in editor
+    string usage = "<none> | Door | Floor | Celing | Roof | Window | Sky";
+
+    Asset.AddCombo( "cat", cats ).SetTitle( "Category:" );
+    Asset.AddCombo( "surface_type", surTypes ).SetTitle( "Surface Type:" );
+    Asset.AddCombo( "usage", usage ).SetTitle( "Edtior Group:" );
+
+    Asset.BeginGroup("Properties");
+    {
+        Asset.AddCheckBox( "f_nodraw", false ).SetTitle( "NoDraw" );
+        Asset.AddCheckBox( "f_solid", true ).SetTitle( "solid" );
+        Asset.AddCheckBox( "f_structual", false ).SetTitle( "Structual" );
+        Asset.AddCheckBox( "f_detail", false ).SetTitle( "Detail" );
+        Asset.AddCheckBox( "f_portal", false ).SetTitle( "Portal" );
+        Asset.AddCheckBox( "f_player_clip", false ).SetTitle( "Player Clip" ).SetToolTip("Blocks players");
+        Asset.AddCheckBox( "f_ai_clip", false ).SetTitle( "AI Clip" ).SetToolTip("Blocks AI (not inc players)");
+        Asset.AddCheckBox( "f_no_fall_dmg", false ).SetTitle( "No Fall Dmg" ).SetToolTip("No fall dmg no matter the height!");
+        Asset.AddCheckBox( "f_no_impact", false ).SetTitle( "No Impact" ).SetToolTip("No impact marks");
+        Asset.AddCheckBox( "f_no_pennetrate", false ).SetTitle( "No Pennetrate" ).SetToolTip("projectiles and bullets can't penatrate");
+        Asset.AddCheckBox( "f_no_steps", false ).SetTitle( "No Steps" ).SetToolTip("Disable footstep marks");
+
+    }
+}
+
+
+
+

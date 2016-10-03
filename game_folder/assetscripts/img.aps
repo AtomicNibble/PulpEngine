@@ -17,7 +17,7 @@ void GenerateUI( asset& Asset )
     Asset.AddColor("color", 1, 0, 0, 0.5).SetTitle("color1");
     Asset.AddPath("path", "goat.text").SetTitle("path");
 
-    Asset.BeginGroup("Properties");
+    Asset.BeginGroup("Options");
     {
         Asset.AddCombo( "mipMapAlgo", "Box | Triangle | Kaiser" ).SetTitle( "Mip Method" );
         Asset.AddCombo( "mipWrapMode", "Mirror | Clamp | Repeat" ).SetTitle( "Mip Wrap Mode" );
