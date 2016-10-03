@@ -25,7 +25,13 @@ QString IAssetEntry::name(void) const
 
 QString IAssetEntry::displayName(void) const
 {
-	return assetName_;
+	QString name = assetName_;
+
+	if (isModified()) {
+		name += "*";
+	}
+
+	return name;
 }
 
 
@@ -72,7 +78,7 @@ bool IAssetEntry::autoSave(QString* pErrorString)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 	X_UNUSED(pErrorString);
-
+	 
 	// save to db or sumen?
 	return false;
 }

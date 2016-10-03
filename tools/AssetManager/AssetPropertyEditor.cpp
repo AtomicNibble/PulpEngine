@@ -1411,10 +1411,7 @@ IEditor* AssetPropertyEditor::duplicate(void)
 void AssetPropertyEditor::modificationChanged(bool modified)
 {
 	QString title = assetEntry()->displayName();
-
-	if (modified) {
-		title += "*";
-	}
+	X_UNUSED(modified);
 
 	emit titleChanged(title);
 }
