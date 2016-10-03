@@ -234,7 +234,9 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 
 		AddMod(core::string(modName.c_str()), outDir);
 
-		SetMod(core::string(modName.c_str()));
+		if (!SetMod(core::string(modName.c_str()))) {
+			return false;
+		}
 
 		sql::SqlLiteTransaction trans(db_);
 
