@@ -92,6 +92,7 @@ public:
 	void addRef(void);
 	void release(void);
 	void clear(void);
+	void clearUI(void);
 	void show(bool vis);
 	void enable(bool val);
 	void SetModified(bool modified);

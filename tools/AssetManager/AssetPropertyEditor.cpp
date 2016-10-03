@@ -229,10 +229,38 @@ void AssetProperty::release(void)
 void AssetProperty::clear(void)
 {
 	if (type_ == PropertyType::GROUPBOX) {
-		//	pGroupWidget_->clear();
+		pGroupWidget_->clear();
 	}
+
+	if (pWidget_) {
+		delete pWidget_;
+	}
+	if (pLabel_) {
+		delete pLabel_;
+	}
+
+	pWidget_ = nullptr;
+	pLabel_ = nullptr;
 }
 
+
+void AssetProperty::clearUI(void)
+{
+	if (type_ == PropertyType::GROUPBOX) {
+		pGroupWidget_->clearUI();
+		return;
+	}
+
+	if (pWidget_) {
+		delete pWidget_;
+	}
+	if (pLabel_) {
+		delete pLabel_;
+	}
+
+	pWidget_ = nullptr;
+	pLabel_ = nullptr;
+}
 
 void AssetProperty::show(bool vis)
 {

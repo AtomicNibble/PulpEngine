@@ -52,7 +52,17 @@ void AssetGroupWidget::clear(void)
 {
 	for (auto& pChild : children_)
 	{
-		delete pChild;
+		pChild->clear();
+	}
+
+	children_.clear();
+}
+
+void AssetGroupWidget::clearUI(void)
+{
+	for (auto& pChild : children_)
+	{
+		pChild->clearUI();
 	}
 
 	children_.clear();

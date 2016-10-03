@@ -22,6 +22,7 @@ public:
 	void appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void clear(void);
+	void clearUI(void);
 	void show(bool visible);
 
 	void collapseAll(void);
