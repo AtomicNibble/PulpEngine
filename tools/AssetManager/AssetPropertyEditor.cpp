@@ -232,7 +232,7 @@ void AssetProperty::release(void)
 
 void AssetProperty::clear(void)
 {
-	if (type_ == PropertyType::GROUPBOX) {
+	if (type_ == PropertyType::GROUPBOX && pGroupWidget_) {
 		pGroupWidget_->clear();
 	}
 
