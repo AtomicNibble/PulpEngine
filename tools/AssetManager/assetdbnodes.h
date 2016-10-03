@@ -20,8 +20,7 @@ namespace AssetExplorer
 	enum class FileType {
 		UnknownFileType = 0,
 		SourceType,
-		ProjectFileType,
-		FileTypeSize
+		ProjectFileType
 	};
 
 	enum class ProjectAction {
