@@ -99,6 +99,8 @@ namespace AssetExplorer {
 		QAction* addNewAssetAction_;
 		QAction* addNewAssetTypeAction_;
 		QAction* projectTreeCollapseAllAction_;
+		QAction* projectTreeExpandAllAction_;
+		QAction* projectTreeExpandBelowAction_;
 		QAction* buildAction_;
 
 

@@ -89,6 +89,8 @@ bool AssetExplorer::init(void)
 	addNewAssetTypeAction_->setStatusTip(tr("Create new asset"));
 
 	projectTreeCollapseAllAction_ = new QAction(tr("Collapse All"), this);
+	projectTreeExpandAllAction_ = new QAction(tr("Expand All"), this);
+	projectTreeExpandBelowAction_ = new QAction(tr("Expand Below"), this);
 
 	buildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Build"), this);
 	buildAction_->setStatusTip(tr("Build selected"));
@@ -143,6 +145,30 @@ bool AssetExplorer::init(void)
         mfileContextMenu->addSeparator(globalcontext, treeGroup);
         mfileContextMenu->addAction(pCmd, treeGroup);
     }
+
+	// Expand All.
+	{
+		const Id treeGroup = Constants::G_PROJECT_TREE;
+
+		pCmd = ActionManager::registerAction(projectTreeExpandAllAction_,
+			Constants::PROJECTTREE_EXPAND_ALL, projecTreeContext);
+
+		mprojectContextMenu->addAction(pCmd, treeGroup);
+		mfolderContextMenu->addAction(pCmd, treeGroup);
+		mfileContextMenu->addAction(pCmd, treeGroup);
+	}
+
+	// Expand Below.
+	{
+		const Id treeGroup = Constants::G_PROJECT_TREE;
+
+		pCmd = ActionManager::registerAction(projectTreeExpandBelowAction_,
+			Constants::PROJECTTREE_EXPAND_BELOW, projecTreeContext);
+
+		mprojectContextMenu->addAction(pCmd, treeGroup);
+		mfolderContextMenu->addAction(pCmd, treeGroup);
+		mfileContextMenu->addAction(pCmd, treeGroup);
+	}
 
 	// Shieeeeeeeeet for the file.
 
@@ -343,7 +369,11 @@ void AssetExplorer::showContextMenu(QWidget* pView, const QPoint& globalPos, Nod
 	updateContextMenuActions();
 
 	projectTreeCollapseAllAction_->disconnect(SIGNAL(triggered()));
+	projectTreeExpandAllAction_->disconnect(SIGNAL(triggered()));
+	projectTreeExpandBelowAction_->disconnect(SIGNAL(triggered()));
 	connect(projectTreeCollapseAllAction_, SIGNAL(triggered()), pView, SLOT(collapseAll()));
+	connect(projectTreeExpandAllAction_, SIGNAL(triggered()), pView, SLOT(expandAll()));
+	connect(projectTreeExpandBelowAction_, SIGNAL(triggered()), pView, SLOT(expandBelow()));
 
 	if (pContextMenu && pContextMenu->actions().count() > 0) {
 		pContextMenu->popup(globalPos);

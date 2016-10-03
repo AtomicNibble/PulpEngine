@@ -377,6 +377,16 @@ void AssetDbViewWidget::collapseAll(void)
     view_->collapseAll();
 }
 
+void AssetDbViewWidget::expandAll(void)
+{
+	view_->expandAll();
+}
+
+void AssetDbViewWidget::expandBelow(void)
+{
+
+}
+
 void AssetDbViewWidget::editCurrentItem(void)
 {
     if (view_->selectionModel()->currentIndex().isValid()) {

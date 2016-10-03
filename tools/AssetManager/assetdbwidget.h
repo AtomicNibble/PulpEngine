@@ -80,6 +80,8 @@ namespace AssetExplorer
 
 	public slots :
 		void collapseAll(void);
+		void expandAll(void);
+		void expandBelow(void);
 		void editCurrentItem(void);
 
 	private slots:

@@ -22,6 +22,8 @@ namespace AssetExplorer
 		const char PASTE_ASSET[] = "AssetDB.PasteAsset";
 		const char BUILD[] = "AssetDB.Build";
 		const char PROJECTTREE_COLLAPSE_ALL[] = "AssetDB.CollapseAll";
+		const char PROJECTTREE_EXPAND_ALL[] = "AssetDB.ExpandAll";
+		const char PROJECTTREE_EXPAND_BELOW[] = "AssetDB.ExpandBelow";
 
 
 
