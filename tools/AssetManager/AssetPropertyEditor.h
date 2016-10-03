@@ -267,7 +267,8 @@ private:
 	assetDb::AssetDB& db_;
 	AssetPropsScriptManager* pPropScriptMan_;
 	AssetPropertyEditorWidget* pWidget_;
-
+	QWidget* pCon_;
+	QGridLayout* pLayout_;
 private:
 	AssetProperty root_;
 	AssetProperty* pCur_;

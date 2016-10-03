@@ -703,6 +703,12 @@ AssetProperties::AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* 
 {
 	root_.SetType(AssetProperty::PropertyType::GROUPBOX);
 		
+	pLayout_ = new QGridLayout();
+	pCon_ = new QWidget();
+
+	pCon_->setLayout(pLayout_);
+	pWidget_->setWidget(pCon_);
+	pWidget_->setWidgetResizable(true);
 }
 
 AssetProperties::~AssetProperties()
@@ -850,15 +856,12 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 		return false;
 	}
 
-	QWidget* pCon = new QWidget();
-	QGridLayout* pLayout = new QGridLayout();
+	// QWidget* pCon = new QWidget();
+	// QGridLayout* pLayout = new QGridLayout();
+	pCon_->setUpdatesEnabled(false);
+	appendGui(pCon_, pLayout_);
+	pCon_->setUpdatesEnabled(true);
 
-	appendGui(pWidget_, pLayout);
-
-	pCon->setLayout(pLayout);
-
-	pWidget_->setWidget(pCon);	
-	pWidget_->setWidgetResizable(true);
 
 	return true;
 }
