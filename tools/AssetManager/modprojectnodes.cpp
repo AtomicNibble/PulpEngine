@@ -33,12 +33,14 @@ bool ModProjectNode::canAddSubProject(const QString& projectName) const
 bool ModProjectNode::addSubProjects(const QStringList& projectNames)
 {
     Q_UNUSED(projectNames);
+	X_ASSERT_UNREACHABLE();
     return false;
 }
 
 bool ModProjectNode::removeSubProjects(const QStringList& projectNames)
 {
     Q_UNUSED(projectNames);
+	X_ASSERT_UNREACHABLE();
     return false;
 }
 
