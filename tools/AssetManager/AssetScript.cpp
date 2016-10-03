@@ -270,10 +270,22 @@ bool AssetPropsScriptManager::loadScript(assetDb::AssetType::Enum type, std::str
 bool AssetPropsScriptManager::loadScript(const core::Path<char>& path, std::string& out)
 {
 	FILE* f = nullptr;
-	fopen_s(&f, path.c_str(), "rb");
+	int32_t retryCount = 0;
+
+retry:
+	auto err = fopen_s(&f, path.c_str(), "rb");
 
 	if (!f) {
-		X_ERROR("AssetScript", "Failed to load file: \"%s\"", path.c_str());
+
+		// text editor not fully closed handle.
+		// give it upto 100ms to.
+		if (err == EACCES && retryCount < 10) {
+			retryCount++;
+			core::Thread::Sleep(10);
+			goto retry;
+		}
+
+		X_ERROR("AssetScript", "Failed to load file(%" PRIi32 "): \"%s\"", err, path.c_str());
 		return false;
 	}
 
