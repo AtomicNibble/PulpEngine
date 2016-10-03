@@ -27,7 +27,6 @@ namespace
 		static const char charSet[] =
 			"0123456789"
 			"_"
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			"abcdefghijklmnopqrstuvwxyz";
 
 		const size_t charSetNum = sizeof(charSet) - 1;
