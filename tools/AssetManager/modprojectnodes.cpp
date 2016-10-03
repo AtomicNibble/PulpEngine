@@ -5,6 +5,298 @@
 X_NAMESPACE_BEGIN(assman)
 
 
+namespace
+{
+	class SortByName
+	{
+	public:
+		bool operator()(AssetExplorer::Node *a, AssetExplorer::Node *b)
+		{
+			return operator()(a->name(), b->name());
+		}
+		bool operator()(AssetExplorer::Node *a, const QString &b)
+		{
+			return operator()(a->name(), b);
+		}
+		bool operator()(const QString &a, AssetExplorer::Node *b)
+		{
+			return operator()(a, b->name());
+		}
+		bool operator()(const QString &a, const QString &b)
+		{
+			return a < b;
+		}
+	};
+
+	struct InternalNode
+	{
+		InternalNode()
+		{
+			priority = 0;
+		}
+
+		~InternalNode()
+		{
+			qDeleteAll(subnodes);
+			qDeleteAll(virtualfolders);
+		}
+
+		void create(const core::Array<ModProject::AssetInfo>& assets)
+		{
+			QChar separator(assetDb::ASSET_NAME_SLASH);
+
+			for (const ModProject::AssetInfo& asset : assets)
+			{
+				// for now just add file nodes.
+				const auto& name = asset.name;
+				const QString qName = QString::fromUtf8(name.c_str());
+
+				InternalNode* pCurrentNode = this;
+
+				if (name.find(assetDb::ASSET_NAME_SLASH))
+				{
+					auto parts = qName.split(separator);
+					QStringListIterator it(parts);
+
+					QString path;
+
+					while (it.hasNext())
+					{
+						const QString& key = it.next();
+
+						if (it.hasNext()) // directory
+						{
+							path += key;
+
+							if (!pCurrentNode->subnodes.contains(path))
+							{
+								InternalNode* pFolder = new InternalNode;
+								pFolder->fullPath = path;
+								pFolder->displayName = key;
+								pCurrentNode->subnodes.insert(path, pFolder);
+								pCurrentNode = pFolder;
+							}
+							else
+							{
+								pCurrentNode = pCurrentNode->subnodes.value(path);
+							}
+
+							path += separator;
+						}
+						else
+						{
+							pCurrentNode->files.append(key);
+						}
+					}
+				}
+				else
+				{
+					pCurrentNode->files.append(qName);
+				}
+			}
+		}
+
+		// Removes folder nodes with only a single sub folder in it
+		void compress(void)
+		{
+			QMap<QString, InternalNode*> newSubnodes;
+			QMapIterator<QString, InternalNode*> i(subnodes);
+
+			while (i.hasNext())
+			{
+				i.next();
+				i.value()->compress();
+
+				// single sub folder?
+				if (i.value()->files.isEmpty() && i.value()->subnodes.size() == 1)
+				{
+					QLatin1Char separator(assetDb::ASSET_NAME_SLASH);
+
+					QString key = i.value()->subnodes.begin().key();
+					InternalNode* pKeep = i.value()->subnodes.value(key);
+					pKeep->displayName = i.value()->displayName + separator + pKeep->displayName;
+					newSubnodes.insert(key, pKeep);
+					i.value()->subnodes.clear();
+					delete i.value();
+				}
+				else
+				{
+					newSubnodes.insert(i.key(), i.value());
+				}
+			}
+
+			subnodes = newSubnodes;
+		}
+
+
+		X_INLINE AssetExplorer::FolderNode *createFolderNode(InternalNode *node)
+		{
+			AssetExplorer::FolderNode* newNode = nullptr;
+
+			static QIcon folderIcon(":/assetDb/img/Folder.Closed.png");
+			static QIcon folderIconExpanded(":/assetDb/img/Folder.Open.png");
+
+			newNode = new ModFolderNode(node->fullPath);
+			newNode->setIcon(folderIcon);
+			newNode->setIconExpanded(folderIconExpanded);
+			newNode->setDisplayName(node->displayName);
+
+			return newNode;
+		}
+
+
+		void updateSubFolders(AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		{
+			updateFiles(pFolder, type);
+
+			// updateFolders
+			QMultiMap<QString, AssetExplorer::FolderNode*> existingFolderNodes;
+			{
+				const auto subfolderNodes = pFolder->subFolderNodes();
+
+				foreach(AssetExplorer::FolderNode* pNode, subfolderNodes) {
+					if (pNode->nodeType() != AssetExplorer::NodeType::ProjectNodeType) {
+						existingFolderNodes.insert(pNode->name(), pNode);
+					}
+				}
+			}
+
+			QList<AssetExplorer::FolderNode*> foldersToRemove;
+			QList<AssetExplorer::FolderNode*> foldersToAdd;
+			typedef QPair<InternalNode*, AssetExplorer::FolderNode*> NodePair;
+			QList<NodePair> nodesToUpdate;
+
+			// Check virtual
+			{
+				auto it = virtualfolders.constBegin();
+				auto end = virtualfolders.constEnd();
+				for (; it != end; ++it)
+				{
+					bool found = false;
+					const QString& path = (*it)->fullPath;
+					auto oldit = existingFolderNodes.constFind(path);
+
+					while (oldit != existingFolderNodes.constEnd() && oldit.key() == path)
+					{
+						if (oldit.value()->nodeType() == AssetExplorer::NodeType::VirtualFolderNodeType) {
+							AssetExplorer::VirtualFolderNode* vfn = qobject_cast<AssetExplorer::VirtualFolderNode *>(oldit.value());
+							if (vfn->priority() == (*it)->priority) {
+								found = true;
+								break;
+							}
+						}
+						++oldit;
+					}
+
+					if (found)
+					{
+						nodesToUpdate.append(NodePair(*it, *oldit));
+					}
+					else
+					{
+						AssetExplorer::FolderNode* pNewNode = createFolderNode(*it);
+						foldersToAdd.append(pNewNode);
+						nodesToUpdate.append(NodePair(*it, pNewNode));
+					}
+				}
+			}
+
+			// Check subnodes
+			{
+				auto it = subnodes.constBegin();
+				auto end = subnodes.constEnd();
+
+				for (; it != end; ++it)
+				{
+					bool found = false;
+					QString path = it.value()->fullPath;
+
+					auto oldit = existingFolderNodes.constFind(path);
+
+					while (oldit != existingFolderNodes.constEnd() && oldit.key() == path)
+					{
+						if (oldit.value()->nodeType() == AssetExplorer::NodeType::FolderNodeType) {
+							found = true;
+							break;
+						}
+						++oldit;
+					}
+
+					if (found)
+					{
+						nodesToUpdate << NodePair(it.value(), *oldit);
+					}
+					else
+					{
+						AssetExplorer::FolderNode *newNode = createFolderNode(it.value());
+						foldersToAdd << newNode;
+						nodesToUpdate << NodePair(it.value(), newNode);
+					}
+				}
+			}
+
+			QSet<AssetExplorer::FolderNode*> toKeep;
+			toKeep.reserve(nodesToUpdate.size());
+
+			foreach(const NodePair& np, nodesToUpdate) {
+				toKeep.insert(np.second);
+			}
+
+			auto jit = existingFolderNodes.constBegin();
+			auto jend = existingFolderNodes.constEnd();
+			for (; jit != jend; ++jit) {
+				if (!toKeep.contains(jit.value())) {
+					foldersToRemove << jit.value();
+				}
+			}
+
+			if (!foldersToRemove.isEmpty()) {
+				pFolder->removeFolderNodes(foldersToRemove);
+			}
+			if (!foldersToAdd.isEmpty()) {
+				pFolder->addFolderNodes(foldersToAdd);
+			}
+
+			foreach(const NodePair &np, nodesToUpdate) {
+				np.first->updateSubFolders(np.second, type);
+			}
+		}
+
+		void updateFiles(AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		{
+			QList<AssetExplorer::FileNode*> existingFileNodes = pFolder->fileNodes();
+			QList<AssetExplorer::FileNode*> filesToRemove;
+			QStringList filesToAdd;
+
+			SortByName sortByName;
+			qSort(files.begin(), files.end(), sortByName);
+			qSort(existingFileNodes.begin(), existingFileNodes.end(), sortByName);
+
+			compareSortedLists(existingFileNodes, files, filesToRemove, filesToAdd, sortByName);
+
+			QList<AssetExplorer::FileNode *> nodesToAdd;
+			nodesToAdd.reserve(filesToAdd.size());
+			foreach(const QString& file, filesToAdd) {
+				nodesToAdd.append(new ModFileNode(file, file, type));
+			}
+
+			pFolder->removeFileNodes(filesToRemove);
+			pFolder->addFileNodes(nodesToAdd);
+		}
+
+	private:
+		QList<InternalNode *> virtualfolders;
+		QMap<QString, InternalNode *> subnodes;
+		QStringList files;
+		int32_t priority;
+		QString displayName;
+		QString fullPath;
+	};
+
+
+} // namespace
+
+
 ModProjectNode::ModProjectNode(ModProject* pProject) :
     ProjectNode(""),
     pProject_(pProject)
@@ -92,6 +384,8 @@ bool ModVirtualFolderNode::hasUnLoadedChildren(void) const
     return numAssets_ > (fileNodes_.size() + subFolderNodes_.size());
 }
 
+
+
 bool ModVirtualFolderNode::loadChildren(void)
 {
     ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
@@ -102,94 +396,17 @@ bool ModVirtualFolderNode::loadChildren(void)
       // we basically need to make a fileNodes list and foldersNode list.
       ModProject* pProject = pProjectNode->getModProject();
 
-	  QList<AssetExplorer::FileNode*> files;
-	//  QList<AssetExplorer::FolderNode*> folders;
 
-      QList<ModProject::AssetInfo> assetsOut;
-	  {
-		  core::Array<ModProject::AssetInfo> assetsOutTmp(g_arena);
-		  pProject->getAssetList(assetType_, assetsOutTmp);
-
-
+	  core::Array<ModProject::AssetInfo> assetsOutTmp(g_arena);
+	  if (!pProject->getAssetList(assetType_, assetsOutTmp)) {
+		  return false;
 	  }
-	  
-	  // we need to break this down into files and folders.
-	  // we do it based on slashes :D
-	  QChar slash(assetDb::ASSET_NAME_SLASH);
 
+	  InternalNode contents;
+	  contents.create(assetsOutTmp);
+	  contents.compress(); // this actually makes adding nodes faster when we have a lot of folder with one node.
+	  contents.updateSubFolders(this, assetType_);
 
-	  QIcon folderIcon(":/assetDb/img/Folder.Closed.png");
-	  QIcon folderIconExpanded(":/assetDb/img/Folder.Open.png");
-
-      for (const ModProject::AssetInfo& asset : assetsOut)
-      {
-          // for now just add file nodes.
-		  const auto& name =  asset.name;
-		  const QString qName = QString::fromUtf8(name.c_str());
-
-		  if (name.find(assetDb::ASSET_NAME_SLASH))
-		  {
-#if 1
-			  // make it a folder.
-			 auto parts = qName.split(slash);
-			 QStringListIterator it(parts);
-
-			 AssetExplorer::FolderNode* pCurrentNode = this;
-
-			 // we want to just populate the whole tree.
-			 // when we reach a folder we need to build all the nodes.
-			 // whats a good way to add the folders tho?
-			 // we only expose the methods for adding nodes, as it performs parenting logic.
-
-			 while (it.hasNext())
-			 {
-				 const QString& key = it.next();
-
-				 if (it.hasNext()) // directory
-				 {
-					 auto pFolder = new ModFolderNode(key);
-					 pFolder->setIcon(folderIcon);
-					 pFolder->setIconExpanded(folderIconExpanded);
-
-
-					 QList<AssetExplorer::FolderNode*> foldersChild;
-					 foldersChild.append(pFolder);
-
-					 // i want to add all these folder nodes at once.
-					 // but then you can't add the children.
-					 // untill they are added to parent.
-					 // as they fail to get a project node.
-
-
-					// pCurrentNode->addFolderNodes(foldersChild);
-					// pCurrentNode = pFolder;
-				 }
-				 else
-				 {
-					 // file.
-					 auto pFile = new AssetExplorer::FileNode(key, AssetExplorer::FileType::SourceType);
-					 pFile->setIcon(pProject->getIconForAssetType(assetType_));
-
-					 QList<AssetExplorer::FileNode*> filesChild;
-					 filesChild.append(pFile);
-
-					 pCurrentNode->addFileNodes(filesChild);
-				 }
-			 }
-
-#endif
-		  }
-		  else
-		  {
-			  auto pFile = new AssetExplorer::FileNode(qName, AssetExplorer::FileType::SourceType);
-			  pFile->setIcon(pProject->getIconForAssetType(assetType_));
-
-			  files.append(pFile);
-		  }
-      }
-
-	 this->addFileNodes(files);
-	//  this->addFolderNodes(folders);
     }
 
     return true;
