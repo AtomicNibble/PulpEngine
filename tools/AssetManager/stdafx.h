@@ -99,4 +99,17 @@ X_LINK_LIB("angelscript");
 #include "id.h"
 #include "IAssManCore.h"
 
+
+X_INLINE QString capitalize(const QString& str)
+{
+	if (str.isEmpty()) {
+		return str;
+	}
+
+	QString tmp = str.toLower();
+	tmp[0] = str[0].toUpper();
+	return tmp;
+}
+
+
 #endif // PCH_H
