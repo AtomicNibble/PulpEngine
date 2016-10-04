@@ -26,8 +26,7 @@ public:
 		DoNotChangeCurrentEditor = 1,
 		IgnoreNavigationHistory = 2,
 		DoNotMakeVisible = 4,
-		CanContainLineNumber = 8,
-		OpenInOtherSplit = 16
+		OpenInOtherSplit = 8
 	};
 
 	Q_DECLARE_FLAGS(OpenEditorFlags, OpenEditorFlag)

@@ -677,7 +677,6 @@ IEditor *EditorManager::placeEditor(EditorView *view, IEditor *editor)
 		return e;
 	}
 
-
 	// try duplication or pull editor over to new view
 	bool duplicateSupported = editor->duplicateSupported();
 	if (EditorView *sourceView = viewForEditor(editor)) 
@@ -689,6 +688,7 @@ IEditor *EditorManager::placeEditor(EditorView *view, IEditor *editor)
 			view->addEditor(editor);
 			view->setCurrentEditor(editor);
 			if (!sourceView->currentEditor()) {
+				X_ASSERT_NOT_IMPLEMENTED();
 				//        EditorView *replacementView = 0;
 				//        if (IEditor *replacement = pickUnusedEditor(&replacementView)) {
 				//            if (replacementView)
@@ -827,8 +827,9 @@ void EditorManager::rootDestroyed(QObject *root)
 		}
 	}
 	// check if the destroyed root had the current view or current editor
-	if (d->currentEditor_ || (d->currentView_ && d->currentView_->parentSplitterOrView() != root))
+	if (d->currentEditor_ || (d->currentView_ && d->currentView_->parentSplitterOrView() != root)) {
 		return;
+	}
 	// we need to set a new current editor or view
 	if (!newActiveRoot) {
 		// some window managers behave weird and don't activate another window
@@ -840,30 +841,37 @@ void EditorManager::rootDestroyed(QObject *root)
 	SplitterOrView *focusSplitterOrView = 0;
 	QWidget *candidate = newActiveRoot->focusWidget();
 	while (candidate && candidate != newActiveRoot) {
-		if ((focusSplitterOrView = qobject_cast<SplitterOrView *>(candidate)))
+		if ((focusSplitterOrView = qobject_cast<SplitterOrView *>(candidate))) {
 			break;
+		}
 		candidate = candidate->parentWidget();
 	}
 	// focusWidget might have been 0
-	if (!focusSplitterOrView)
+	if (!focusSplitterOrView) {
 		focusSplitterOrView = newActiveRoot->findFirstView()->parentSplitterOrView();
+	}
+
 	BUG_ASSERT(focusSplitterOrView, focusSplitterOrView = newActiveRoot);
 	EditorView *focusView = focusSplitterOrView->findFirstView(); // can be just focusSplitterOrView
 	BUG_ASSERT(focusView, focusView = newActiveRoot->findFirstView());
 	BUG_ASSERT(focusView, return);
-	if (focusView->currentEditor())
+
+	if (focusView->currentEditor()) {
 		setCurrentEditor(focusView->currentEditor());
-	else
+	}
+	else {
 		setCurrentView(focusView);
+	}
 }
 
 
 
-void EditorManager::closeEditor(IEditor *editor, bool askAboutModifiedEditors)
-{
-	if (!editor)
+void EditorManager::closeEditor(IEditor* pEditor, bool askAboutModifiedEditors)
+{ 
+	if (!pEditor) {
 		return;
-	closeEditors(QList<IEditor *>() << editor, askAboutModifiedEditors);
+	}
+	closeEditors(QList<IEditor *>() << pEditor, askAboutModifiedEditors);
 }
 
 //void EditorManager::closeEditor(DocumentModel::Entry *entry)
