@@ -574,9 +574,7 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, 
 		qDebug() << Q_FUNC_INFO << assetName << editorId.name();
 	}
 
-	const QString fn = assetName;
-
-	if (fn.isEmpty()) {
+	if (assetName.isEmpty()) {
 		X_WARNING("Editor", "Can't open editor for empty name");
 		return nullptr;
 	}
@@ -593,10 +591,10 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, 
 	}
 
 
-	IEditor* pEditor = createEditor(editorId, fn);
+	IEditor* pEditor = createEditor(editorId, assetName);
 	if (!pEditor)
 	{
-		X_ERROR("Editor", "Failed to createEditor for: \"%s\"", qPrintable(fn));
+		X_ERROR("Editor", "Failed to createEditor for: \"%s\"", qPrintable(assetName));
 		return nullptr;
 	}
 
@@ -605,7 +603,7 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, 
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	{
 		QString errorString;
-		if (!pEditor->open(&errorString, fn, type))
+		if (!pEditor->open(&errorString, assetName, type))
 		{
 			QApplication::restoreOverrideCursor();
 			QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
