@@ -17,6 +17,8 @@ public:
 	AddAssetDialog(QWidget *parent, assetDb::AssetDB& db);
 	~AddAssetDialog();
 
+	void setAssetType(assetDb::AssetType::Enum type);
+
 private slots:
 	void accept(void);
 	void reject(void);

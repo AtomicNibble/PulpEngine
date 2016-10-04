@@ -91,6 +91,19 @@ AddAssetDialog::~AddAssetDialog()
 {
 }
 
+void AddAssetDialog::setAssetType(assetDb::AssetType::Enum type)
+{
+	const int32_t typeIndex = static_cast<int32_t>(type);
+
+	BUG_ASSERT(typeIndex >=0 && typeIndex < pAssetType_->count(), return);
+
+	pAssetType_->setCurrentIndex(typeIndex);
+	pAssetType_->setDisabled(true);
+
+	QString typeStr(assetDb::AssetType::ToString(type));
+	setWindowTitle(QString("Add '%1' Asset").arg(capitalize(typeStr)));
+}
+
 void AddAssetDialog::accept(void)
 {
 	assetDb::AssetType::Enum type;
