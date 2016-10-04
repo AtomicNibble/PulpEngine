@@ -401,13 +401,13 @@ void AssetExplorer::updateContextMenuActions(void)
 {
     qDebug() << "AssetExplorer::updateContextMenuActions";
 
-//	addNewFileAction_->setEnabled(false);
-//	deleteFileAction_->setEnabled(false);
-//	renameFileAction_->setEnabled(false);
-
 	if (currentNode_ && currentNode_->projectNode())
 	{
 		auto actions = currentNode_->supportedActions(currentNode_);
+
+		const bool enableAddNew = actions.contains(ProjectAction::AddNewFile);
+		const bool enableDelete = actions.contains(ProjectAction::EraseFile);
+		const bool enableRename = actions.contains(ProjectAction::Rename);
 
 		if (ProjectNode* pn = qobject_cast<ProjectNode*>(currentNode_))
 		{
@@ -415,34 +415,54 @@ void AssetExplorer::updateContextMenuActions(void)
 			{
 				buildAction_->setVisible(true);
 				buildAction_->setEnabled(true);
-
 			}
 			else
 			{
 
 			}
 		}
-		if (FolderNode* pFolderName = qobject_cast<FolderNode*>(currentNode_))
+		if (FolderNode* pFolderNode = qobject_cast<FolderNode*>(currentNode_))
 		{
 			// i want to know asset type.
 			// and update the name.
 
-			// Also handles ProjectNode
-			addNewAssetAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
-			addNewAssetTypeAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
-			renameAssetAction_->setEnabled(actions.contains(ProjectAction::Rename));
+			// Also handles 
+			if(AssetTypeVirtualFolderNode* pAssetFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_))
+			{
+				const char* pType = assetDb::AssetType::ToString(pAssetFolder->assetType());
+				QString typeStr(pType);
+				QString newText = tr("New '%1'...").arg(capitalize(typeStr));
+
+				addNewAssetTypeAction_->setText(newText);
+				addNewAssetTypeAction_->setEnabled(enableAddNew);
+			}
+			else
+			{
+				addNewAssetTypeAction_->setEnabled(false);
+			}
+
+			addNewAssetAction_->setEnabled(enableAddNew);
+			addNewAssetTypeAction_->setEnabled(enableAddNew);
+			renameAssetAction_->setEnabled(enableRename);
 		}
-		else if (qobject_cast<FileNode*>(currentNode_))
+		else if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_))
 		{
 			// Enable and show remove / delete in magic ways:
 			// If both are disabled show Remove
 			// If both are enabled show both (can't happen atm)
 			// If only removeFile is enabled only show it
 			// If only deleteFile is enable only show it
-			bool enableDelete = actions.contains(ProjectAction::EraseFile);
 
+			const char* pType = assetDb::AssetType::ToString(pFileNode->assetType());
+			QString typeStr(pType);
+			QString newText = tr("New '%1'...").arg(capitalize(typeStr));
+
+			addNewAssetTypeAction_->setText(newText);
+
+			addNewAssetAction_->setEnabled(enableAddNew);
+			addNewAssetTypeAction_->setEnabled(enableAddNew);
 			deleteAssetAction_->setEnabled(enableDelete);
-			renameAssetAction_->setEnabled(actions.contains(ProjectAction::Rename));
+			renameAssetAction_->setEnabled(enableRename);
 		}
 	}
 }
