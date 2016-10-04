@@ -5,6 +5,8 @@
 #include "assetdbexplorer.h"
 #include "assetdbconstants.h"
 
+#include "EditorManager.h"
+
 #include "session.h"
 #include "project.h"
 
@@ -439,12 +441,17 @@ void AssetDbViewWidget::startupProjectChanged(Project* pProject)
 
 void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
 {
-    Node *node = model_->nodeForIndex(mainIndex);
-    if (node->nodeType() != NodeType::FileNodeType) {
+    Node* pNode = model_->nodeForIndex(mainIndex);
+    if (pNode->nodeType() != NodeType::FileNodeType) {
         return;
     }
 
-    qDebug() << "Open file: " << node->name();
+    qDebug() << "Open file: " << pNode->name();
+
+	if (FileNode* pFileNode = qobject_cast<FileNode*>(pNode))
+	{
+		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), assman::Constants::ASSETPROP_EDITOR_ID);
+	}
 }
 
 
