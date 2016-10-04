@@ -12,6 +12,8 @@
 #include "Constants.h"
 #include "assetdbconstants.h"
 
+#include "EditorManager.h"
+
 #include "AddAssetDialog.h"
 
 #include <../AssetDB/AssetDB.h>
@@ -543,8 +545,12 @@ void AssetExplorer::setStartupProject(Project* pProject)
 
 void AssetExplorer::openAsset(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	BUG_ASSERT(currentNode_, return);
 
+	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_))
+	{
+		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), assman::Constants::ASSETPROP_EDITOR_ID);
+	}
 }
 
 void AssetExplorer::renameAsset(void)
