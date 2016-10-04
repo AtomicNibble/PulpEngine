@@ -145,9 +145,9 @@ namespace
 		}
 
 
-		void updateSubFolders(AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		void updateSubFolders(ModProject* pProject, AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
 		{
-			updateFiles(pFolder, type);
+			updateFiles(pProject, pFolder, type);
 
 			// updateFolders
 			QMultiMap<QString, AssetExplorer::FolderNode*> existingFolderNodes;
@@ -258,11 +258,11 @@ namespace
 			}
 
 			foreach(const NodePair &np, nodesToUpdate) {
-				np.first->updateSubFolders(np.second, type);
+				np.first->updateSubFolders(pProject, np.second, type);
 			}
 		}
 
-		void updateFiles(AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		void updateFiles(ModProject* pProject, AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
 		{
 			QList<AssetExplorer::FileNode*> existingFileNodes = pFolder->fileNodes();
 			QList<AssetExplorer::FileNode*> filesToRemove;
@@ -277,7 +277,11 @@ namespace
 			QList<AssetExplorer::FileNode *> nodesToAdd;
 			nodesToAdd.reserve(filesToAdd.size());
 			foreach(const QString& file, filesToAdd) {
-				nodesToAdd.append(new ModFileNode(file, file, type));
+
+				ModFileNode* pFileNode = new ModFileNode(file, file, type);
+				pFileNode->setIcon(pProject->getIconForAssetType(type));
+
+				nodesToAdd.append(pFileNode);
 			}
 
 			pFolder->removeFileNodes(filesToRemove);
@@ -404,7 +408,7 @@ bool ModVirtualFolderNode::loadChildren(void)
 	  InternalNode contents;
 	  contents.create(assetsOutTmp);
 	  contents.compress(); // this actually makes adding nodes faster when we have a lot of folder with one node.
-	  contents.updateSubFolders(this, assetType());
+	  contents.updateSubFolders(pProject, this, assetType());
 
     }
 
