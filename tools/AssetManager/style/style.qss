@@ -21,7 +21,8 @@ QToolButton
 
 }
 
-QLabel{
+/*
+QLabel {
 	color: #909090;
 }
 
@@ -32,26 +33,44 @@ QWidget:item:hover {
 QWidget:item:selected {
 	background-color:QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #9b9b9b, stop: 1 #636262);
 }
-
+*/
 
 #EditorView
 {
 	border: none;
+
 }
 
 #EditorViewLayout
 {
 	border: none;
+
 }
 
 #EditorViewContainer
 {
 	border: none;
+
 }
 
+#AssetProperyEditor
+{
+	border: 1px solid #111;
+	background-color:#232326;
+}
+
+#AssetProperyEditor QLabel{
+	background-color:#232326;
+}
+
+#AssetProperyEditor QCheckBox{
+	background-color:#232326;
+}
+
+
 #assEntryBar::tab {
-	background-color:#323232;
-	color: #aaa;
+	background-color:#393939;
+	color: #999;
 	padding: 0px 5px 0px 5px;
 	border-top-left-radius: 0px;
 	border-top-right-radius: 0px;
@@ -60,12 +79,12 @@ QWidget:item:selected {
 }
 
 #assEntryBar::tab:selected {
-	background-color:#2074DB;
+	background-color:#C11523;
 	color: #eee;
 }
 
 #assEntryBar::tab:!selected:hover {
-	background-color:#1B61B7;
+	background-color:#91323C;
 }
 
 #assEntryBar::close-button {
@@ -246,7 +265,6 @@ QProgressBar::chunk {
 QComboBox {
 	background-color:#333337;
 	border: 1px solid #434346;
-
 }
 
 QComboBox::drop-down {
@@ -276,7 +294,6 @@ QComboBox::item:selected {
 QComboBox QAbstractItemView {
     outline:none;
 }
-
 
 
 
@@ -510,7 +527,7 @@ QPushButton:pressed {
 }
 
 QStatusBar{
-	background: #1A5DAF;
+	background: #AF1320;
 	color:#f0f0f0;
 }
 
