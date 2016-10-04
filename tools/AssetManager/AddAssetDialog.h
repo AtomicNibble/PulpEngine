@@ -18,6 +18,7 @@ public:
 	~AddAssetDialog();
 
 	void setAssetType(assetDb::AssetType::Enum type);
+	void setPrefredMod(const QString& modName);
 
 private slots:
 	void accept(void);

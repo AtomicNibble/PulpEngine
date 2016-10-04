@@ -104,6 +104,14 @@ void AddAssetDialog::setAssetType(assetDb::AssetType::Enum type)
 	setWindowTitle(QString("Add '%1' Asset").arg(capitalize(typeStr)));
 }
 
+void AddAssetDialog::setPrefredMod(const QString& modName)
+{
+	const int32_t idx = pMod_->findText(modName, Qt::MatchExactly);
+	if (idx >= 0) {
+		pMod_->setCurrentIndex(idx);
+	}
+}
+
 void AddAssetDialog::accept(void)
 {
 	assetDb::AssetType::Enum type;
