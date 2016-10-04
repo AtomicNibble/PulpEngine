@@ -236,17 +236,19 @@ void BaseWindow::handleMouseMoveEvent(QMouseEvent* event)
 	// and do a dock check baby!
 	// rekt.
 	// the central widget is a view if it's floating.
-	if (!mousePos_.onEdges && centralWidget_)
-	{
-		SplitterOrView *Splitter = qobject_cast<SplitterOrView *>(centralWidget_);
-		if (Splitter) {
-			EditorManager::floatDockCheck(Splitter, event->globalPos());
-		}
-	}
 
 	if (leftButtonPressed_)
 	{
-		if (mousePos_.onEdges)
+		if (!mousePos_.onEdges)
+		{
+			if (centralWidget_) {
+				SplitterOrView* pSplitter = qobject_cast<SplitterOrView*>(centralWidget_);
+				if (pSplitter) {
+					EditorManager::floatDockCheck(pSplitter, event->globalPos());
+				}
+			}
+		}
+		else // if (mousePos_.onEdges)
 		{
 			resizeWidget(event->globalPos());
 		}
