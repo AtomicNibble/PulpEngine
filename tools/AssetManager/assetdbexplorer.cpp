@@ -590,7 +590,9 @@ void AssetExplorer::copyAssetName(void)
 void AssetExplorer::addNewAsset(void)
 {
 	AddAssetDialog dialog(ICore::mainWindow(), db_);
-
+	if (currentProject_) {
+		dialog.setPrefredMod(currentProject_->displayName());
+	}
 	dialog.exec();
 }
 
@@ -603,6 +605,9 @@ void AssetExplorer::addNewAssetType(void)
 	AssetTypeVirtualFolderNode* pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_);
 	if (pAssetTypeFolder) {
 		dialog.setAssetType(pAssetTypeFolder->assetType());
+	}
+	if (currentProject_) {
+		dialog.setPrefredMod(currentProject_->displayName());
 	}
 
 	dialog.exec();
