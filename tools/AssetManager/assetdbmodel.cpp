@@ -33,27 +33,6 @@ namespace
 		const NodeType n1Type = n1->nodeType();
 		const NodeType n2Type = n2->nodeType();
 
-		// project files
-		FileNode *file1 = qobject_cast<FileNode*>(n1);
-		FileNode *file2 = qobject_cast<FileNode*>(n2);
-		if (file1 && file1->fileType() == FileType::ProjectFileType) {
-			if (file2 && file2->fileType() == FileType::ProjectFileType) {
-				const QString fileName1 = file1->name();
-				const QString fileName2 = file2->name();
-
-				int result = caseFriendlyCompare(fileName1, fileName2);
-				if (result != 0)
-					return result < 0;
-				else
-					return file1 < file2;
-			} else {
-				return true; // project file is before everything else
-			}
-		} else {
-			if (file2 && file2->fileType() == FileType::ProjectFileType)
-				return false;
-		}
-
 		// projects
 		if (n1Type == NodeType::ProjectNodeType) {
 			if (n2Type == NodeType::ProjectNodeType) {

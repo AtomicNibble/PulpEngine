@@ -144,16 +144,15 @@ void Node::setParentFolderNode(FolderNode* parentFolder)
 
 // ------------------------------------------------------------------
 
-FileNode::FileNode(const QString& name,
-                   const FileType fileType) :
+FileNode::FileNode(const QString& name, const assetDb::AssetType::Enum assetType) :
     Node(NodeType::FileNodeType, name),
-    fileType_(fileType)
+	assetType_(assetType)
 {
 }
 
-FileType FileNode::fileType(void) const
+assetDb::AssetType::Enum FileNode::assetType(void) const
 {
-    return fileType_;
+    return assetType_;
 }
 
 

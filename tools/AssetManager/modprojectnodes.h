@@ -69,7 +69,6 @@ public:
 
 private:
 	QString name_;
-	AssetType::Enum type_;
 };
 
 

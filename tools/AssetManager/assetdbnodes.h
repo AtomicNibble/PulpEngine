@@ -16,13 +16,6 @@ namespace AssetExplorer
 		SessionNodeType
 	};
 
-	// File types common for projects
-	enum class FileType {
-		UnknownFileType = 0,
-		SourceType,
-		ProjectFileType
-	};
-
 	enum class ProjectAction {
 		// Special value to indicate that the actions are handled by the parent
 		InheritedFromParent,
@@ -93,16 +86,16 @@ namespace AssetExplorer
 	{
 		Q_OBJECT
 	public:
-		FileNode(const QString& name, const FileType fileType);
+		FileNode(const QString& name, const assetDb::AssetType::Enum assetType);
 
-		FileType fileType(void) const;
+		assetDb::AssetType::Enum assetType(void) const;
 
 	private:
 		// managed by ProjectNode
 		friend class FolderNode;
 		friend class ProjectNode;
 
-		FileType fileType_;
+		assetDb::AssetType::Enum assetType_;
 	};
 
 
