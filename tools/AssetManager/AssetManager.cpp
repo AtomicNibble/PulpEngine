@@ -107,6 +107,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	OutputPaneManager::instance()->addPane(new OutputWindowPane(pOutputWindow_));
 	OutputPaneManager::instance()->init();
 
+	pDockArea_->setDockNestingEnabled(true);
 	pDockArea_->setCentralWidget(pEditorManager_);
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 0, 1, 1); // left
 	pLayout_->addWidget(pDockArea_, 0, 1, 1, 1); // center`
