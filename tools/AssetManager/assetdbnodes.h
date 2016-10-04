@@ -85,17 +85,20 @@ namespace AssetExplorer
 	class FileNode : public Node
 	{
 		Q_OBJECT
+
+		typedef assetDb::AssetType AssetType;
+
 	public:
 		FileNode(const QString& name, const assetDb::AssetType::Enum assetType);
 
-		assetDb::AssetType::Enum assetType(void) const;
+		AssetType::Enum assetType(void) const;
 
 	private:
 		// managed by ProjectNode
 		friend class FolderNode;
 		friend class ProjectNode;
 
-		assetDb::AssetType::Enum assetType_;
+		AssetType::Enum assetType_;
 	};
 
 
