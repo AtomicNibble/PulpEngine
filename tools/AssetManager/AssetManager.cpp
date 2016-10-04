@@ -170,6 +170,9 @@ AssetManager::~AssetManager()
 		delete pEditorManager_;
 	}
 
+	if (pSettings_) {
+		delete pSettings_;
+	}
 
 	 // needs to be after editorman.
 	if (pCoreImpl_) {
