@@ -43,6 +43,7 @@ private:
 
 private slots:
 	void updateActions(void);
+	void updateUndoAction(void);
 	void updateCopyAction(bool);
 	void modificationChanged(bool);
 

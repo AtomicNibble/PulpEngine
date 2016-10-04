@@ -79,6 +79,13 @@ void AssetPropsEditorActionHandler::updateActions(void)
 	updateUndoRedo();
 }
 
+void AssetPropsEditorActionHandler::updateUndoAction(void)
+{
+	BUG_ASSERT(currentEditorWidget_, return);
+
+	updateUndoRedo();
+}
+
 
 void AssetPropsEditorActionHandler::updateCopyAction(bool e)
 {
