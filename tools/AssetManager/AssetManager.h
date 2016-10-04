@@ -42,7 +42,11 @@ namespace AssetExplorer {
 
 class AssetManager : public BaseWindow
 {
-    Q_OBJECT
+	Q_OBJECT
+
+	static const char* SETTINGS_GROUP;
+	static const char* WINDOW_GEOMETRY_KEY;
+	static const char* WINDOW_STATE_KEY;
 
 public:
     explicit AssetManager(QWidget* pParent = nullptr);
@@ -52,6 +56,8 @@ public:
 	IContext* contextObject(QWidget* pWidget);
 	void addContextObject(IContext* pContex);
 	void removeContextObject(IContext* pContex);
+
+	QSettings* settings(QSettings::Scope scope = QSettings::Scope::UserScope) const;
 
 private:
 	void createActions(void);
@@ -102,6 +108,10 @@ protected:
 	bool event(QEvent *e) X_OVERRIDE;
 
 private:
+	void readSettings(void);
+	void saveSettings(void);
+	void saveWindowState(void);
+	void restoreWindowState(void);
 	void reloadStyle(const QString& path);
 
 private:
@@ -131,6 +141,8 @@ private:
 	QAction* pAboutAct_;
 	QAction* pAboutQtAct_;
 
+private:
+	QSettings* pSettings_;
 
 private:
 	VersionDialog* pVersionDialog_;

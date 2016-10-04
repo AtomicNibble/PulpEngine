@@ -28,6 +28,11 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+const char* AssetManager::SETTINGS_GROUP = "MainWindow";
+const char* AssetManager::WINDOW_GEOMETRY_KEY = "WindowGeometry";
+const char* AssetManager::WINDOW_STATE_KEY = "WindowState";
+
+
 AssetManager::AssetManager(QWidget* pParent) :
 	BaseWindow(pParent),
 	pVersionDialog_(nullptr),
@@ -40,6 +45,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pAssetDbexplorer_(nullptr),
 	additionalContexts_(Constants::C_GLOBAL) // always have global contex
 {
+	pSettings_ = new QSettings(),
 	pStatusBar_ = new MyStatusBar();
 	pWatcher_ = new QFileSystemWatcher(this);
 	pCoreImpl_ = new ICore(this);
@@ -124,6 +130,10 @@ AssetManager::AssetManager(QWidget* pParent) :
 	EditorManager::openEditor("test1", Constants::ASSETPROP_EDITOR_ID);
 	EditorManager::openEditor("test2", Constants::ASSETPROP_EDITOR_ID);
 
+
+	readSettings();
+
+	QTimer::singleShot(0, this, &AssetManager::restoreWindowState);
 }
 
 AssetManager::~AssetManager()
@@ -209,6 +219,12 @@ void AssetManager::removeContextObject(IContext* pContex)
 	if (activeContext_.removeAll(pContex) > 0) {
 		updateContextObject(activeContext_);
 	}
+}
+
+QSettings* AssetManager::settings(QSettings::Scope scope) const
+{
+	X_UNUSED(scope);
+	return pSettings_;
 }
 
 void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
@@ -819,6 +835,8 @@ void AssetManager::fileChanged(const QString& path)
 
 void AssetManager::closeEvent(QCloseEvent *event)
 {
+	ICore::saveSettings();
+
 	if (!AssetEntryManager::saveAllModifiedAssetEntrys()) {
 		event->ignore();
 		return;
@@ -831,6 +849,8 @@ void AssetManager::closeEvent(QCloseEvent *event)
 	}
 
 	emit pCoreImpl_->coreAboutToClose();
+
+	saveWindowState();
 
 	event->accept();
 }
@@ -851,6 +871,37 @@ bool AssetManager::event(QEvent *e)
 
 	return BaseWindow::event(e);
 }
+
+void AssetManager::readSettings(void)
+{
+
+
+}
+
+void AssetManager::saveWindowState(void)
+{
+	QSettings* pSettings = settings(QSettings::UserScope);
+	pSettings->beginGroup(QLatin1String(SETTINGS_GROUP));
+		pSettings->setValue(QLatin1String(WINDOW_STATE_KEY), pDockArea_->saveState());
+		pSettings->setValue(QLatin1String(WINDOW_GEOMETRY_KEY), saveGeometry());
+	pSettings->endGroup();
+}
+
+
+void AssetManager::restoreWindowState(void)
+{
+	QSettings* pSettings = settings(QSettings::UserScope);
+	pSettings->beginGroup(QLatin1String(SETTINGS_GROUP));
+
+		if (!restoreGeometry(pSettings->value(QLatin1String(WINDOW_GEOMETRY_KEY)).toByteArray())) {
+			resize(1000, 700); 
+		}
+
+		pDockArea_->restoreState(pSettings->value(QLatin1String(WINDOW_STATE_KEY)).toByteArray());
+
+	pSettings->endGroup();
+}
+
 
 
 // ----------------------------------------------------

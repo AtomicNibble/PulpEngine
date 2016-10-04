@@ -88,14 +88,9 @@ void ICore::registerListner(ICoreListener* listener)
 	pInstance->listeners_.push_back(listener);
 }
 
-const QList<ICoreListener *> ICore::getCoreListners(void)
-{
-	return pInstance->listeners_;
-}
-
 bool ICore::callCoreCloseListners(QCloseEvent* event)
 {
-	for(ICoreListener* pListener : pInstance->listeners_) {
+	for (ICoreListener* pListener : pInstance->listeners_) {
 		if (!pListener->coreAboutToClose()) {
 			event->ignore();
 			return false;
@@ -104,7 +99,24 @@ bool ICore::callCoreCloseListners(QCloseEvent* event)
 	return true;
 }
 
+const QList<ICoreListener *> ICore::getCoreListners(void)
+{
+	return pInstance->listeners_;
+}
 
+
+QSettings* ICore::settings(QSettings::Scope scope)
+{
+	return pMainwindow->settings(scope);
+}
+
+void ICore::saveSettings(void)
+{
+	emit pInstance->saveSettingsRequested();
+
+	ICore::settings(QSettings::SystemScope)->sync();
+	ICore::settings(QSettings::UserScope)->sync();
+}
 
 
 

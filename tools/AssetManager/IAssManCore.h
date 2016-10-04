@@ -48,6 +48,9 @@ public:
 	static const QList<ICoreListener*> getCoreListners(void);
 
 
+	static QSettings* settings(QSettings::Scope scope = QSettings::UserScope);
+	static void saveSettings(void);
+
 signals:
 	void coreAboutToClose(void);
 	void optionsDialogRequested(void);
