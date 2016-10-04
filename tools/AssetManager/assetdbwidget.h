@@ -22,6 +22,8 @@ namespace AssetExplorer
 	public:
 		explicit AssetDbTreeView(QWidget *parent = 0);
 
+		void expandRecursive(const QModelIndex &index);
+
 	protected:
 		void focusInEvent(QFocusEvent *event);
 		void focusOutEvent(QFocusEvent *event);

@@ -62,6 +62,23 @@ AssetDbTreeView::AssetDbTreeView(QWidget *parent)
     head->setStretchLastSection(false);
 }
 
+void AssetDbTreeView::expandRecursive(const QModelIndex &index)
+{
+	if (!index.isValid()) {
+		return;
+	}
+
+	const int32_t childCount = index.model()->rowCount(index);
+	for (int32_t i = 0; i < childCount; i++) {
+		const QModelIndex &child = index.child(i, 0);
+		expandRecursive(child);
+	}
+
+	if (!isExpanded(index)) {
+		expand(index);
+	}
+}
+
 void AssetDbTreeView::focusInEvent(QFocusEvent *event)
 {
     if (event->reason() != Qt::PopupFocusReason) {
@@ -384,7 +401,9 @@ void AssetDbViewWidget::expandAll(void)
 
 void AssetDbViewWidget::expandBelow(void)
 {
-
+	if (view_->selectionModel()->currentIndex().isValid()) {
+		view_->expandRecursive(view_->selectionModel()->currentIndex());
+	}
 }
 
 void AssetDbViewWidget::editCurrentItem(void)
