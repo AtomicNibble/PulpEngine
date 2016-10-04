@@ -58,7 +58,8 @@ bool AssetExplorer::init(void)
             this, SLOT(projectRemoved(Project*)));
     connect(pSessionManager, SIGNAL(projectDisplayNameChanged(Project*)),
             this, SLOT(projectDisplayNameChanged(Project*)));
-
+	connect(pSessionManager, SIGNAL(startupProjectChanged(Project*)),
+		this, SLOT(startupProjectChanged()));
 
     Context globalcontext(assman::Constants::C_GLOBAL);
     Context projecTreeContext(Constants::C_ASSETDB_EXPLORER);
