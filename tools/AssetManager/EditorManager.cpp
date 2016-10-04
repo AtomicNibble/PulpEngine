@@ -584,6 +584,14 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, 
 		*pNewEditor = false;
 	}
 
+	// see if edtiro already open for this
+	const QList<IEditor*> editors = d->pAssetEntryModel_->editorsForAsset(assetName, type);
+	if (!editors.isEmpty()) {
+		IEditor* pEditor = editors.first();
+		pEditor = activateEditor(pView, pEditor, flags);
+		return pEditor;
+	}
+
 
 	IEditor* pEditor = createEditor(editorId, fn);
 	if (!pEditor)
