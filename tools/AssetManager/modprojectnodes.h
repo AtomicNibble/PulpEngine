@@ -28,7 +28,7 @@ private:
 };
 
 
-class ModVirtualFolderNode : public AssetExplorer::VirtualFolderNode
+class ModVirtualFolderNode : public AssetExplorer::AssetTypeVirtualFolderNode
 {
 	typedef assetDb::AssetType AssetType;
 
@@ -45,7 +45,6 @@ public:
 
 private:
 	QString displayName_;
-	AssetType::Enum assetType_;
 	int32_t numAssets_;
 };
 

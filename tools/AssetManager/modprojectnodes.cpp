@@ -349,9 +349,8 @@ ModProject* ModProjectNode::getModProject(void)
 
 ModVirtualFolderNode::ModVirtualFolderNode(const QString& name, int32_t priority, const QString& displayName,
                               AssetType::Enum assType, int32_t numAssets) :
-    VirtualFolderNode(name, priority),
+	AssetTypeVirtualFolderNode(name, priority, assType),
     displayName_(displayName),
-    assetType_(assType),
     numAssets_(numAssets)
 {
 
@@ -398,14 +397,14 @@ bool ModVirtualFolderNode::loadChildren(void)
 
 
 	  core::Array<ModProject::AssetInfo> assetsOutTmp(g_arena);
-	  if (!pProject->getAssetList(assetType_, assetsOutTmp)) {
+	  if (!pProject->getAssetList(assetType(), assetsOutTmp)) {
 		  return false;
 	  }
 
 	  InternalNode contents;
 	  contents.create(assetsOutTmp);
 	  contents.compress(); // this actually makes adding nodes faster when we have a lot of folder with one node.
-	  contents.updateSubFolders(this, assetType_);
+	  contents.updateSubFolders(this, assetType());
 
     }
 
