@@ -12,6 +12,8 @@
 #include "OutputWindowWidget.h"
 #include "OutputWindowPane.h"
 
+#include "project.h"
+
 #include "AssetEntryManager.h"
 #include "AssetPropertyEditorFactory.h"
 #include "AssetScript.h"
@@ -652,6 +654,11 @@ void AssetManager::aboutToShowViewMenu(void)
 void AssetManager::newFile(void)
 {
 	AddAssetDialog dialog(ICore::mainWindow(), *pDb_);
+
+	AssetExplorer::Project* pCurProj = AssetExplorer::AssetExplorer::currentProject();
+	if (pCurProj) {
+		dialog.setPrefredMod(pCurProj->displayName());
+	}
 
 	dialog.exec();
 }
