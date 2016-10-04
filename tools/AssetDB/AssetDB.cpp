@@ -39,7 +39,8 @@ namespace
 
 		for (size_t i = 0; i < len; i++)
 		{
-			if (addSlash && i < (len - 2) && name.length() > 2 && (core::random::MultiplyWithCarry() % 20) == 1) {
+			if (addSlash && i < (len - 2) && name.length() > 2 && (core::random::MultiplyWithCarry() % 5) == 1 &&
+				name[i-1] != ASSET_NAME_SLASH) {
 				name += ASSET_NAME_SLASH;
 			}
 			else {
