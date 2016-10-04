@@ -148,7 +148,6 @@ namespace AssetExplorer
 		Q_OBJECT
 	public:
 		explicit VirtualFolderNode(const QString& name, int32_t priority);
-		virtual ~VirtualFolderNode(void);
 
 		int32_t priority(void) const;
 	private:

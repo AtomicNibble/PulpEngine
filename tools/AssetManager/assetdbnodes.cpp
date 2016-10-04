@@ -422,10 +422,6 @@ VirtualFolderNode::VirtualFolderNode(const QString& name, int32_t priority)
 {
 }
 
-VirtualFolderNode::~VirtualFolderNode(void)
-{
-}
-
 int32_t VirtualFolderNode::priority(void) const
 {
     return priority_;
