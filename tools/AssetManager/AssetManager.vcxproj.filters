@@ -1248,6 +1248,24 @@
     <ClCompile Include="AddModDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="ParameterAction.cpp">
+      <Filter>Source Files\Actions</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_ParameterAction.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_ParameterAction.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ParameterAction.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_ParameterAction.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ParameterAction.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1411,6 +1429,9 @@
     </CustomBuild>
     <CustomBuild Include="AddModDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ParameterAction.h">
+      <Filter>Header Files\Actions</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
