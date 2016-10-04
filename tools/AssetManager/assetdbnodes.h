@@ -154,6 +154,21 @@ namespace AssetExplorer
 		int32_t priority_;
 	};
 
+	// virtual folder node for a asset type.
+	class AssetTypeVirtualFolderNode : public VirtualFolderNode
+	{
+		Q_OBJECT
+
+		typedef assetDb::AssetType AssetType;
+
+	public:
+		explicit AssetTypeVirtualFolderNode(const QString &name, int32_t priority, AssetType::Enum assType);
+
+		AssetType::Enum assetType(void) const;
+
+	private:
+		AssetType::Enum assetType_;
+	};
 
 
 	class ProjectNode : public FolderNode
@@ -199,6 +214,7 @@ namespace AssetExplorer
 		// let SessionNode call setParentFolderNode
 		friend class SessionNode;
 	};
+
 
 
 	class SessionNode : public FolderNode

@@ -431,6 +431,21 @@ int32_t VirtualFolderNode::priority(void) const
 // ------------------------------------------------------------------
 
 
+AssetTypeVirtualFolderNode::AssetTypeVirtualFolderNode(const QString& name, int32_t priority, AssetType::Enum assType) :
+	VirtualFolderNode(name, priority),
+	assetType_(assType)
+{
+}
+
+AssetTypeVirtualFolderNode::AssetType::Enum AssetTypeVirtualFolderNode::assetType(void) const
+{
+	return assetType_;
+}
+
+
+// ------------------------------------------------------------------
+
+
 ProjectNode::ProjectNode(const QString& projectName)
         : FolderNode(projectName, NodeType::ProjectNodeType)
 {
