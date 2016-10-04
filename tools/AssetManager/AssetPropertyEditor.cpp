@@ -713,7 +713,8 @@ AssetProperties::AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* 
 	root_.SetType(AssetProperty::PropertyType::GROUPBOX);
 		
 	pLayout_ = new QGridLayout();
-	pCon_ = new QWidget();
+	pCon_ = new QWidget(widget);
+	pCon_->setObjectName("AssetProperyEditor");
 
 	pCon_->setLayout(pLayout_);
 	pWidget_->setWidget(pCon_);
@@ -1206,8 +1207,9 @@ AssetPropertyEditorWidget::~AssetPropertyEditorWidget()
 
 void AssetPropertyEditorWidget::ctor(const QSharedPointer<AssetProperties>& props)
 {
-	assetProps_ = props;
+	setObjectName("AssetProperyEditor");
 
+	assetProps_ = props;
 
 	connect(assetProps_.data(), SIGNAL(modificationChanged(bool)),
 		this, SIGNAL(modificationChanged(bool)));
