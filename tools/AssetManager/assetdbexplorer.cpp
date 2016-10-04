@@ -118,17 +118,23 @@ bool AssetExplorer::init(void)
     mprojectContextMenu->appendGroup(Constants::G_PROJECT_TREE);
 
     mfolderContextMenu->appendGroup(Constants::G_FOLDER_FILES);
-    mfolderContextMenu->appendGroup(Constants::G_FOLDER_OTHER);
+    mfolderContextMenu->appendGroup(Constants::G_FOLDER_COMPILE);
     mfolderContextMenu->appendGroup(Constants::G_FOLDER_CONFIG);
     mfolderContextMenu->appendGroup(Constants::G_PROJECT_TREE);
+	mfolderContextMenu->addSeparator(globalcontext, Constants::G_FOLDER_COMPILE);
+
 
     mfileContextMenu->appendGroup(Constants::G_FILE_OPEN);
-    mfileContextMenu->appendGroup(Constants::G_FILE_OTHER);
+	mfileContextMenu->appendGroup(Constants::G_FILE_NEW);
+	mfileContextMenu->appendGroup(Constants::G_FILE_COMPILE);
+	mfileContextMenu->appendGroup(Constants::G_FILE_OTHER);
     mfileContextMenu->appendGroup(Constants::G_PROJECT_TREE);
 
     // Separators
     mprojectContextMenu->addSeparator(globalcontext, Constants::G_PROJECT_FILES);
 	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OPEN);
+	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_NEW);
+	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_COMPILE);
 	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OTHER);
 
     // Collapse All.
@@ -174,48 +180,49 @@ bool AssetExplorer::init(void)
 
 	pCmd = ActionManager::registerAction(openAssetAction_, assman::AssetExplorer::Constants::OPEN_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Open);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OPEN);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OPEN);
 
 
 	pCmd = ActionManager::registerAction(renameAssetAction_, assman::AssetExplorer::Constants::RENAME_ASSET, projecTreeContext);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
 
 	pCmd = ActionManager::registerAction(deleteAssetAction_, assman::AssetExplorer::Constants::DELETE_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Delete);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
 
 	pCmd = ActionManager::registerAction(cutAssetAction_, assman::AssetExplorer::Constants::CUT_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Cut);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
 
 	pCmd = ActionManager::registerAction(copyAssetAction_, assman::AssetExplorer::Constants::COPY_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Copy);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
 
 	pCmd = ActionManager::registerAction(pasteAssetAction_, assman::AssetExplorer::Constants::PASTE_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Paste);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
 
 	pCmd = ActionManager::registerAction(copyAssetNameAction_, assman::AssetExplorer::Constants::COPY_ASSET_NAME, projecTreeContext);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
 
 
 	// add new
 	pCmd = ActionManager::registerAction(addNewAssetAction_, assman::AssetExplorer::Constants::NEW_ASSET, projecTreeContext);
-	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FIRST);
-	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FIRST);
+	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_FILES);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_NEW);
 
 	// add new Type
 	pCmd = ActionManager::registerAction(addNewAssetTypeAction_, assman::AssetExplorer::Constants::NEW_ASSET_TYPE, projecTreeContext);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
-	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+	pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_FILES);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_NEW);
 
-	
 	// build action
 	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
-	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
-	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_CONFIG);
-	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FILES);
+	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
+	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
 
 
 

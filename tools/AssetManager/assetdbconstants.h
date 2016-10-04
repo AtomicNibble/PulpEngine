@@ -39,10 +39,13 @@ namespace AssetExplorer
 		const char G_PROJECT_TREE[] = "Project.Group.Tree";
 
 		const char G_FOLDER_FILES[] = "ProjectFolder.Group.Files";
-		const char G_FOLDER_OTHER[] = "ProjectFolder.Group.Other";
+		const char G_FOLDER_COMPILE[] = "ProjectFolder.Group.Compile";
 		const char G_FOLDER_CONFIG[] = "ProjectFolder.Group.Config";
 
+
 		const char G_FILE_OPEN[] = "ProjectFile.Group.Open";
+		const char G_FILE_NEW[] = "ProjectFile.Group.New";
+		const char G_FILE_COMPILE[] = "ProjectFile.Group.Compile";
 		const char G_FILE_OTHER[] = "ProjectFile.Group.Other";
 
 
