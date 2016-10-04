@@ -41,7 +41,7 @@ public:
 	static QList<IEditor*> openEditorsList(void);
 	static QList<EditorView*> visibleViews(void);
 
-	static IEditor* openEditor(const QString& assetName, assetDb::AssetType::Enum type, const Id& editorId = Id(),
+	static IEditor* openEditor(const QString& assetName, assetDb::AssetType::Enum type, const Id& editorId,
 		OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
 
 
