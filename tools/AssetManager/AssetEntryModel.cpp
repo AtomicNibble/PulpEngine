@@ -7,9 +7,14 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetEntryModel::Entry::Entry() :
-	pAssetEntry_(nullptr),
-	pEditorWidget_(nullptr)
+AssetEntryModel::Entry::Entry(IAssetEntry* pAssetEntry, QWidget* pEditorWidget,
+	const QString& displayName, const QString& assetName, assetDb::AssetType::Enum type, Id id) :
+	pAssetEntry_(pAssetEntry),
+	pEditorWidget_(pEditorWidget),
+	displayName_(displayName),
+	assetName_(assetName),
+	type_(type),
+	id_(id)
 {
 
 }
@@ -142,7 +147,7 @@ IAssetEntry* AssetEntryModel::assetEntryForAsset(const QString& assetName, asset
 
 QList<IEditor*> AssetEntryModel::editorsForAsset(const QString& assetName, assetDb::AssetType::Enum type) const
 {
-	IAssetEntry *pAssetEntry = assetEntryForAsset(assetName, type);
+	IAssetEntry* pAssetEntry = assetEntryForAsset(assetName, type);
 	if (pAssetEntry) {
 		return editorsForAssetEntry(pAssetEntry);
 	}
@@ -181,11 +186,11 @@ void AssetEntryModel::addEditor(IEditor* pEditor, bool* pIsNewDocument)
 
 	editorList << pEditor;
 	if (isNew) {
-		Entry *entry = new Entry;
-		entry->pAssetEntry_ = pEditor->assetEntry();
-		entry->id_ = pEditor->id();
-		entry->pEditorWidget_ = pEditor->widget();
-		addEntry(entry);
+		IAssetEntry* pAssetEntry = pEditor->assetEntry();
+
+		Entry* pEntry = new Entry(pEditor->assetEntry(), pEditor->widget(), pAssetEntry->displayName(),
+			pAssetEntry->name(), pAssetEntry->type(), pEditor->id());
+		addEntry(pEntry);
 	}
 }
 

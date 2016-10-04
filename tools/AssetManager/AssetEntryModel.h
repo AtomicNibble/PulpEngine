@@ -16,7 +16,8 @@ public:
 
 	struct Entry 
 	{
-		Entry();
+		Entry(IAssetEntry* pAssetEntry, QWidget* pEditorWidget,
+			const QString& displayName, const QString& assetName, assetDb::AssetType::Enum type, Id id);
 
 		QString assetName(void) const;
 		QString displayName(void) const;
