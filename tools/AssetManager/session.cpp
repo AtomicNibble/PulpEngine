@@ -83,6 +83,9 @@ void SessionManager::setStartupProject(Project* pStartupProject)
     }
 
     d->pStartupProject_ = pStartupProject;
+
+	// used by assetDb widget and shit :D
+	emit instance_->startupProjectChanged(pStartupProject);
 }
 
 Project* SessionManager::startupProject(void)
