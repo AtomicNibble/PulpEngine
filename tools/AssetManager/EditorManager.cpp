@@ -109,12 +109,12 @@ namespace
 		saveAction_(new QAction(parent)),
 		saveAsAction_(new QAction(parent)),
 		closeCurrentEditorAction_(new QAction(EditorManager::tr("Close"), parent)),
-		closeAllEditorsAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
+		closeAllEditorsAction_(new QAction(EditorManager::tr("Close All Editors"), parent)),
 		closeOtherEditorsAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
 
 		saveCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Savea.png"), EditorManager::tr("&Save"), parent)),
 		closeCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/quit.png"), EditorManager::tr("Close"), parent)),
-		closeAllEditorsContextAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
+		closeAllEditorsContextAction_(new QAction(EditorManager::tr("Close All Editors"), parent)),
 		closeOtherEditorsContextAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
 		copyFullPathContextAction_(new QAction(EditorManager::tr("Copy Full Path"), parent)),
 
@@ -196,7 +196,7 @@ EditorManager::EditorManager(QWidget *parent) :
 	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
 	connect(d->splitSideBySideAction_, SIGNAL(triggered()), this, SLOT(splitSideBySide()));
 
-	d->splitNewWindowAction_ = new QAction(tr("Open in New Window"), this);
+	d->splitNewWindowAction_ = new QAction(tr("Float to New Window"), this);
 	cmd = ActionManager::registerAction(d->splitNewWindowAction_, Constants::SPLIT_NEW_WINDOW, editManagerContext);
 	cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+E,4")));
 	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
@@ -453,9 +453,9 @@ void EditorManager::addEditor(IEditor *editor)
 
 	ICore::addContextObject(editor);
 
-	bool isNewDocument = false;
-	d->pAssetEntryModel_->addEditor(editor, &isNewDocument);
-	if (isNewDocument) 
+	bool isNewAssetEntry = false;
+	d->pAssetEntryModel_->addEditor(editor, &isNewAssetEntry);
+	if (isNewAssetEntry)
 	{
 		const bool isTemporary = editor->assetEntry()->isTemporary();
 		AssetEntryManager::addAssetEntry(editor->assetEntry());
@@ -899,11 +899,9 @@ bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool ask
 		return true;
 	}
 
-	// EditorView *currentView = currentEditorView();
-
 	bool closingFailed = false;
 	QSet<IEditor*> acceptedEditors;
-	QSet<IAssetEntry*> acceptedDocuments;
+	QSet<IAssetEntry*> acceptedAssetEntry;
 	//ask all core listeners to check whether the editor can be closed
 	const QList<ICoreListener*> listeners = ICore::getCoreListners();
 
@@ -925,7 +923,7 @@ bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool ask
 
 			// i only want to kill the pAssetEntry if it's the last view.
 			if (goats.size() == 0) {
-				acceptedDocuments.insert(editor->assetEntry());
+				acceptedAssetEntry.insert(editor->assetEntry());
 				qDebug() << "removing pAssetEntry: " << editor->assetEntry()->displayName();
 			}
 			else
@@ -952,12 +950,12 @@ bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool ask
 	{
 		bool cancelled = false;
 		QList<IAssetEntry *> list;
-		AssetEntryManager::saveModifiedAssetEntrys(acceptedDocuments.toList(), QString(), &cancelled, QString(), 0, &list);
+		AssetEntryManager::saveModifiedAssetEntrys(acceptedAssetEntry.toList(), QString(), &cancelled, QString(), 0, &list);
 		if (cancelled)
 			return false;
 		if (!list.isEmpty()) {
 			closingFailed = true;
-			acceptedDocuments.subtract(list.toSet());
+			acceptedAssetEntry.subtract(list.toSet());
 			QSet<IEditor*> skipSet = d->pAssetEntryModel_->editorsForAssetEntrys(list).toSet();
 			acceptedEditors = acceptedEditors.subtract(skipSet);
 		}
@@ -1427,7 +1425,7 @@ void EditorManager::emptyView(EditorView *view)
 
 void EditorManager::updateActions(void)
 {
-	IAssetEntry *curDocument = currentAssetEntry();
+	IAssetEntry* pCurAssEntry = currentAssetEntry();
 	int32_t openedCount = d->pAssetEntryModel_->assetEntryCount();
 
 	foreach(SplitterOrView *root, d->root_) {
@@ -1435,13 +1433,13 @@ void EditorManager::updateActions(void)
 	}
 
 	QString quotedName;
-	if (curDocument) {
-		quotedName = QLatin1Char('"') + curDocument->displayName() + QLatin1Char('"');
+	if (pCurAssEntry) {
+		quotedName = QLatin1Char('"') + pCurAssEntry->displayName() + QLatin1Char('"');
 	}
-	setupSaveActions(curDocument, d->saveAction_, nullptr);
+	setupSaveActions(pCurAssEntry, d->saveAction_, nullptr);
 
 
-	d->closeCurrentEditorAction_->setEnabled(curDocument);
+	d->closeCurrentEditorAction_->setEnabled(pCurAssEntry);
 	d->closeCurrentEditorAction_->setText(tr("Close %1").arg(quotedName));
 	d->closeAllEditorsAction_->setEnabled(openedCount > 0);
 	d->closeOtherEditorsAction_->setEnabled(openedCount > 1);
