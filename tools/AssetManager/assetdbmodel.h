@@ -70,7 +70,7 @@ namespace AssetExplorer
 		bool filter(Node *node) const;
 
 
-		private slots:
+	private slots:
 
 		void foldersAboutToBeAdded(FolderNode* pParentFolder, const QList<FolderNode*>& newFolders);
 		void foldersAdded(void);
