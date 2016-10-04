@@ -40,7 +40,7 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :
 			pLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
 			QLineEdit* pLineEdit = pRGBAValueWidgets_[i] = new QLineEdit();
-			pLineEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+			pLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 			pLineEdit->setMaximumWidth(64);
 			pLineEdit->setValidator(new QIntValidator(0, 255));
 
