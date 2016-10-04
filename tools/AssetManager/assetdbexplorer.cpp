@@ -547,8 +547,7 @@ void AssetExplorer::openAsset(void)
 {
 	BUG_ASSERT(currentNode_, return);
 
-	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_))
-	{
+	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_)) {
 		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), assman::Constants::ASSETPROP_EDITOR_ID);
 	}
 }
