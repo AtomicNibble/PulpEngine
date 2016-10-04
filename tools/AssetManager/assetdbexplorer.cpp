@@ -11,6 +11,8 @@
 #include "Constants.h"
 #include "assetdbconstants.h"
 
+#include "AddAssetDialog.h"
+
 #include <../AssetDB/AssetDB.h>
 
 
@@ -570,14 +572,23 @@ void AssetExplorer::copyAssetName(void)
 
 void AssetExplorer::addNewAsset(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	AddAssetDialog dialog(ICore::mainWindow(), db_);
 
+	dialog.exec();
 }
 
 void AssetExplorer::addNewAssetType(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	BUG_ASSERT(currentNode_ && currentNode_->nodeType() == NodeType::VirtualFolderNodeType, return);
 
+	AddAssetDialog dialog(ICore::mainWindow(), db_);
+
+	AssetTypeVirtualFolderNode* pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_);
+	if (pAssetTypeFolder) {
+		dialog.setAssetType(pAssetTypeFolder->assetType());
+	}
+
+	dialog.exec();
 }
 
 
