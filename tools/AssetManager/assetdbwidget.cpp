@@ -444,11 +444,6 @@ void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
         return;
     }
 
-    /*
-    IEditor *editor = EditorManager::openEditor(node->path());
-    if (editor && node->line() >= 0)
-        editor->gotoLine(node->line());
-*/
     qDebug() << "Open file: " << node->name();
 }
 
