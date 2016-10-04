@@ -444,7 +444,7 @@ void AssetExplorer::updateContextMenuActions(void)
 			{
 				const char* pType = assetDb::AssetType::ToString(pAssetFolder->assetType());
 				QString typeStr(pType);
-				QString newText = tr("New '%1'...").arg(capitalize(typeStr));
+				QString newText = tr("New '%1'...").arg(Utils::capitalize(typeStr));
 
 				addNewAssetTypeAction_->setText(newText);
 				addNewAssetTypeAction_->setEnabled(enableAddNew);
@@ -468,7 +468,7 @@ void AssetExplorer::updateContextMenuActions(void)
 
 			const char* pType = assetDb::AssetType::ToString(pFileNode->assetType());
 			QString typeStr(pType);
-			QString newText = tr("New '%1'...").arg(capitalize(typeStr));
+			QString newText = tr("New '%1'...").arg(Utils::capitalize(typeStr));
 
 			addNewAssetTypeAction_->setText(newText);
 

@@ -374,7 +374,7 @@ QString ModVirtualFolderNode::displayName(void) const
 
 QString ModVirtualFolderNode::tooltip(void) const
 {
-    return QString("%1s (%2)").arg(capitalize(AssetType::ToString(assetType())), QString::number(numAssets_));
+    return QString("%1s (%2)").arg(Utils::capitalize(AssetType::ToString(assetType())), QString::number(numAssets_));
 }
 
 

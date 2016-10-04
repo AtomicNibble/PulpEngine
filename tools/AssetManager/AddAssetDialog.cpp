@@ -101,7 +101,7 @@ void AddAssetDialog::setAssetType(assetDb::AssetType::Enum type)
 	pAssetType_->setDisabled(true);
 
 	QString typeStr(assetDb::AssetType::ToString(type));
-	setWindowTitle(QString("Add '%1' Asset").arg(capitalize(typeStr)));
+	setWindowTitle(QString("Add '%1' Asset").arg(Utils::capitalize(typeStr)));
 }
 
 void AddAssetDialog::setPrefredMod(const QString& modName)

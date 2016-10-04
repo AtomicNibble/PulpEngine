@@ -2582,6 +2582,7 @@
     <ClCompile Include="session.cpp" />
     <ClCompile Include="ShowRefsDialog.cpp" />
     <ClCompile Include="StatusBar.cpp" />
+    <ClCompile Include="StrUtil.cpp" />
     <ClCompile Include="StyleUtilWidgets.cpp" />
     <ClCompile Include="Super Dynamic\moc_ActionContainer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
@@ -3788,6 +3789,7 @@
     <ClCompile Include="WindowTileBar.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="StrUtil.h" />
     <CustomBuild Include="SaveItemsDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Moc%27ing SaveItemsDialog.h...</Message>
