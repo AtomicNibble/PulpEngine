@@ -4,6 +4,7 @@
 #include "project.h"
 #include "modproject.h"
 #include "assetdbnodes.h"
+#include "ParameterAction.h"
 #include "ActionManager.h"
 #include "ActionContainer.h"
 #include "Command.h"
@@ -97,9 +98,14 @@ bool AssetExplorer::init(void)
 	buildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Build"), this);
 	buildAction_->setStatusTip(tr("Build selected"));
 
+	setStartupModAction_ = new ParameterAction(tr("Set as Active Mod"),
+		tr("Set \"%1\" as Active Mod"),
+		ParameterAction::EnablingMode::AlwaysEnabled, this);
+
 	connect(addNewAssetAction_, SIGNAL(triggered()), this, SLOT(addNewAsset()));
 	connect(addNewAssetTypeAction_, SIGNAL(triggered()), this, SLOT(addNewAssetType()));
 	connect(buildAction_, SIGNAL(triggered()), this, SLOT(build()));
+	connect(setStartupModAction_, SIGNAL(triggered()), this, SLOT(setStartupProject()));
 
     ICommand* pCmd = nullptr;
 
@@ -226,7 +232,11 @@ bool AssetExplorer::init(void)
 	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
 	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
 
-
+	// Set start up project
+	pCmd = ActionManager::registerAction(setStartupModAction_, Constants::SETSTARTUP, projecTreeContext);
+	pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+	pCmd->setDescription(setStartupModAction_->text());
+	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FIRST);
 
     updateActions();
     return true;
@@ -496,6 +506,12 @@ void AssetExplorer::projectDisplayNameChanged(Project* pPro)
     updateActions();
 }
 
+void AssetExplorer::startupProjectChanged(void)
+{
+
+	updateActions();
+}
+
 
 void AssetExplorer::newProject(void)
 {
@@ -603,6 +619,8 @@ void AssetExplorer::updateActions(void)
 	QString projectName = pProject ? pProject->displayName() : QString();
 	QString projectNameContextMenu = currentProject_ ? currentProject_->displayName() : QString();
 
+
+	setStartupModAction_->setParameter(projectNameContextMenu);
 
 	qDebug() << "Project name: " << projectName;
 	qDebug() << "Contex name: " << projectNameContextMenu;

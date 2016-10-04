@@ -8,11 +8,14 @@ class QPoint;
 class QMenu;
 class QAction;
 
+
 X_NAMESPACE_DECLARE(assetDb,
 	class AssetDB;
 );
 
 X_NAMESPACE_BEGIN(assman)
+
+class ParameterAction;
 
 namespace AssetExplorer {
 
@@ -63,6 +66,7 @@ namespace AssetExplorer {
 		void projectAdded(Project* pProject);
 		void projectRemoved(Project* pProject);
 		void projectDisplayNameChanged(Project* pProject);
+		void startupProjectChanged(void);
 
 		void openAsset(void);
 		void renameAsset(void);
@@ -103,6 +107,7 @@ namespace AssetExplorer {
 		QAction* projectTreeExpandBelowAction_;
 		QAction* buildAction_;
 
+		ParameterAction* setStartupModAction_;
 
 	private:
 		assetDb::AssetDB& db_;
