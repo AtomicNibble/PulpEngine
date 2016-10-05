@@ -3,7 +3,7 @@
 
 #include "project.h"
 #include "assetdbexplorer.h"
-
+#include "EditorManager.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -45,6 +45,10 @@ SessionManager::SessionManager(QObject* pParent)
     instance_ = this;
     d = new SessionManagerPrivate;
     d->pSessionNode_ = new SessionNode(this);
+
+
+	connect(AssetExplorer::AssetExplorer::instance(), SIGNAL(currentProjectChanged(AssetExplorer::Project*)),
+		this, SLOT(updateWindowTitle()));
 }
 
 
@@ -57,6 +61,38 @@ QObject* SessionManager::instance(void)
 {
 	X_ASSERT_NOT_NULL(instance_);
 	return instance_;
+}
+
+bool SessionManager::loadSession(void)
+{
+
+	restoreStartupProject();
+	restoreValues();
+
+	emit instance_->sessionLoaded();
+	return true;
+}
+
+bool SessionManager::save(void)
+{
+	emit instance_->aboutToSaveSession();
+
+	QSettings* pSettings = ICore::settings();
+
+	if (d->pStartupProject_) {
+		pSettings->setValue(QLatin1String("StartupProject"), d->pStartupProject_->displayName());
+	}
+
+	auto end = d->values_.constEnd();
+	QStringList keys;
+	for (auto it = d->values_.constBegin(); it != end; ++it) {
+		pSettings->setValue(QLatin1String("value-") + it.key(), it.value());
+		keys << it.key();
+	}
+
+	pSettings->setValue(QLatin1String("valueKeys"), keys);
+
+	return true;
 }
 
 void SessionManager::setValue(const QString& name, const QVariant& value)
@@ -194,6 +230,25 @@ void SessionManager::projectDisplayNameChanged(void)
     }
 }
 
+void SessionManager::updateWindowTitle(void)
+{
+	if (isDefaultSession(d->sessionName_)) {
+		if (Project *currentProject = AssetExplorer::AssetExplorer::currentProject()) {
+			EditorManager::setWindowTitleAddition(currentProject->displayName());
+		}
+		else {
+			EditorManager::setWindowTitleAddition(QString());
+		}
+	}
+	else {
+		QString sessionName = d->sessionName_;
+		if (sessionName.isEmpty()) {
+			sessionName = tr("Untitled");
+		}
+		EditorManager::setWindowTitleAddition(sessionName);
+	}
+}
+
 
 Project* SessionManager::projectForNode(Node* pNode)
 {
@@ -222,6 +277,44 @@ Project* SessionManager::projectForNode(Node* pNode)
 }
 
 
+
+void SessionManager::restoreStartupProject(void)
+{
+	QSettings* pSettings = ICore::settings();
+
+	const QString startupProject = pSettings->value(QLatin1String("StartupProject")).toString();
+
+	if (!startupProject.isEmpty())
+	{
+		foreach(Project *pro, d->projects_) {
+			if (pro->displayName() == startupProject) {
+				instance_->setStartupProject(pro);
+				break;
+			}
+		}
+	}
+	if (!d->pStartupProject_) {
+		if (!startupProject.isEmpty()) {
+			qWarning() << "Could not find startup project" << startupProject;
+		} 
+		if (!d->projects_.isEmpty()) {
+			instance_->setStartupProject(d->projects_.first());
+		}
+	}
+}
+
+void SessionManager::restoreValues(void)
+{
+	QSettings* pSettings = ICore::settings();
+
+	const QStringList keys = pSettings->value(QLatin1String("valueKeys")).toStringList();
+
+	foreach(const QString &key, keys) {
+		QVariant value = pSettings->value(QLatin1String("value-") + key);
+		d->values_.insert(key, value);
+	}
+
+}
 
 } // namespace AssetExplorer
 

@@ -25,6 +25,9 @@ namespace AssetExplorer
 
 		static QObject* instance(void);
 
+		static bool loadSession(void);
+
+		static bool save(void);
 
 		static void setValue(const QString& name, const QVariant& value);
 		static QVariant value(const QString& name);
@@ -53,6 +56,10 @@ namespace AssetExplorer
 
 		static Project* projectForNode(Node* pNode);
 
+	private:
+		static void restoreStartupProject(void);
+		static void restoreValues(void);
+
 	signals:
 		void projectAdded(Project* pProject);
 		void singleProjectAdded(Project* pProject);
@@ -61,8 +68,12 @@ namespace AssetExplorer
 		void projectRemoved(Project* pProject);
 		void startupProjectChanged(Project* pProject);
 
+		void sessionLoaded(void);
+		void aboutToSaveSession(void);
+
 	private slots:
 		static void projectDisplayNameChanged(void);
+		static void updateWindowTitle(void);
 	};
 
 } // namespace AssetExplorer
