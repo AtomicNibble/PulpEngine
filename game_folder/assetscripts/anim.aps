@@ -3,22 +3,17 @@
 
 void GenerateUI( asset& Asset )
 {
-    Asset.AddPath( "src", "" ).SetTitle("Src").SetToolTip( "Src Model" );
-    Asset.AddFloat( "lod0_dis", 0, 0, 100000 ).SetTitle("LOD0 Distance").SetToolTip( "Distance lod is used (0 always)" );
+    Asset.AddPath( "src", "" ).SetTitle("Src").SetToolTip( "Src Animation" );
+    Asset.AddPath( "model", "" ).SetTitle("Model").SetToolTip( "Model to use skelton from" );
+
+    string types = "relative | absolute | additive | delta";
+    Asset.AddCombo( "type", types ).SetTitle( "Type:" );
 
     Asset.BeginGroup("Options");
     {
-        Asset.AddFloat( "scale", 1, 0.0001, 1000 ).SetTitle("Scale").SetToolTip( "Scale source model including bones" );
-        Asset.AddFloat( "weight_thresh", 0.005, 0.00001, 10 ).SetTitle("Scale source model including bones").SetToolTip( "Vertex weights lower than threshold are dropped" );
-        Asset.AddFloat( "uv_merge_thresh", 0.02, 0.00001, 10 ).SetTitle("Scale source model including bones").SetToolTip( "Vertex that have a uv diffrent less than the threshold are considered for merging" );
-        Asset.AddFloat( "vert_merge_thresh", 0.05, 0.00001, 10 ).SetTitle("Scale source model including bones").SetToolTip( "Vertex that have a position diffrent less than the threshold are considered for merging" );
-
-        Asset.AddCheckBox( "zero_origin", false).SetTitle( "Zero Origin" );
-        Asset.AddCheckBox( "white_vert_col", false).SetTitle( "Force white vertex col" ).SetToolTip("Sets all vertex colors to white");
-        Asset.AddCheckBox( "merge_mesh", true).SetTitle( "Merge Mesh" ).SetToolTip("Merge meshes in the same LOD with matching materials");
-        Asset.AddCheckBox( "merge_verts", true).SetTitle( "Merge Verts" ).SetToolTip("Merge verts that are below the vert and uv thresholds");
-        Asset.AddCheckBox( "ext_weights", false).SetTitle( "Ext Weights" ).SetToolTip("Enable extended vertex weights (use for face meshes)");
-
+        Asset.AddFloat( "posError", 0.05, 0.00001, 10 ).SetTitle("Pos Error").SetToolTip( "Drop position data lower than this threshold" );
+        Asset.AddFloat( "angError", 0.005, 0.00001, 10 ).SetTitle("ang Error").SetToolTip( "Drop angle data lower than this threshold" );
+        Asset.AddCheckBox( "looping", false).SetTitle( "Looping" );
     }
 }
 
