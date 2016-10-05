@@ -117,6 +117,11 @@ Id Id::fromSetting(const QVariant& variant)
 	return Id(theId(ba));
 }
 
+Id Id::fromName(const QByteArray &name)
+{
+	return Id(theId(name));
+}
+
 
 Id Id::withSuffix(int32_t suffix) const
 {
@@ -171,6 +176,20 @@ QString Id::suffixAfter(Id baseId) const
 	const QByteArray b = baseId.name();
 	const QByteArray n = name();
 	return n.startsWith(b) ? QString::fromUtf8(n.mid(b.size())) : QString();
+}
+
+
+QDataStream &operator<<(QDataStream &ds, const Id& id)
+{
+	return ds << id.name();
+}
+
+QDataStream &operator >> (QDataStream &ds, Id &id)
+{
+	QByteArray ba;
+	ds >> ba;
+	id = Id::fromName(ba);
+	return ds;
 }
 
 

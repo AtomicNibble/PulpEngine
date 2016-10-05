@@ -34,6 +34,7 @@ public:
 
 	static X_INLINE Id fromUniqueIdentifier(int32_t uid);
 	static Id fromSetting(const QVariant& variant); // Good to use.
+	static Id fromName(const QByteArray &ba);
 	static void registerId(int32_t uid, const char* pName);
 
 private:
@@ -47,8 +48,11 @@ static X_INLINE uint qHash(const Id& id)
 	return id.uniqueIdentifier();
 }
 
+QDataStream &operator<<(QDataStream &ds, const Id &id);
+QDataStream &operator >> (QDataStream &ds, Id &id);
 
 X_NAMESPACE_END
+
 
 
 #include "Id.inl"
