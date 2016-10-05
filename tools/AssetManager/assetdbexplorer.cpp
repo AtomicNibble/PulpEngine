@@ -241,7 +241,12 @@ bool AssetExplorer::init(void)
 	pCmd->setDescription(setStartupModAction_->text());
 	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FIRST);
 
+
+	connect(ICore::instance(), SIGNAL(saveSettingsRequested()),
+		this, SLOT(savePersistentSettings()));
+
     updateActions();
+
     return true;
 }
 
@@ -637,6 +642,13 @@ void AssetExplorer::updateActions(void)
 	qDebug() << "Contex name: " << projectNameContextMenu;
 }
 
+
+void AssetExplorer::savePersistentSettings(void)
+{
+
+	SessionManager::save();
+
+}
 
 
 } // namespace AssetExplorer

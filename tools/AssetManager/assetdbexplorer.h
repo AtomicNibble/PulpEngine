@@ -81,6 +81,8 @@ namespace AssetExplorer {
 
 		void updateActions(void);
 
+		void savePersistentSettings(void);
+
 	private:
 		void setCurrent(Project* pProject, const QString& filePath, Node* pNode);
 		void updateContextMenuActions(void);
