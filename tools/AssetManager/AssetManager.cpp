@@ -106,11 +106,16 @@ AssetManager::AssetManager(QWidget* pParent) :
 		pAssetDbexplorer_->loadMods();
 	}
 
+	createDockWindows();
+
+	if (!pAssetDbexplorer_->loadSession()) {
+
+	}
+
+
 	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
 		this, SLOT(updateFocusWidget(QWidget*, QWidget*)));
 
-
-	createDockWindows();
 
 	OutputPaneManager::instance()->addPane(new OutputWindowPane(pOutputWindow_));
 	OutputPaneManager::instance()->init();
