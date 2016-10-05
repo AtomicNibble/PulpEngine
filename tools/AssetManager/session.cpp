@@ -31,6 +31,7 @@ public:
 
     Project* pStartupProject_;
     QList<Project*> projects_;
+	QMap<QString, QVariant> values_;
 };
 
 
@@ -56,6 +57,20 @@ QObject* SessionManager::instance(void)
 {
 	X_ASSERT_NOT_NULL(instance_);
 	return instance_;
+}
+
+void SessionManager::setValue(const QString& name, const QVariant& value)
+{
+	if (d->values_.value(name) == value) {
+		return;
+	}
+	d->values_.insert(name, value);
+}
+
+QVariant SessionManager::value(const QString& name)
+{
+	auto it = d->values_.constFind(name);
+	return (it == d->values_.constEnd()) ? QVariant() : *it;
 }
 
 

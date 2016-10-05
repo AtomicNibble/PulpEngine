@@ -25,6 +25,10 @@ namespace AssetExplorer
 
 		static QObject* instance(void);
 
+
+		static void setValue(const QString& name, const QVariant& value);
+		static QVariant value(const QString& name);
+
 		// higher level session management
 		static QString activeSession(void);
 		static QString lastSession(void);
