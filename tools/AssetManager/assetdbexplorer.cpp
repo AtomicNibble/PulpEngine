@@ -263,6 +263,14 @@ bool AssetExplorer::loadMods(void)
 	return true;
 }
 
+
+bool AssetExplorer::loadSession(void)
+{
+	return SessionManager::loadSession();
+}
+
+
+
 bool AssetExplorer::addMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
 {
 	X_UNUSED(outDir);

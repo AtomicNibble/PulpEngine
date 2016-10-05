@@ -35,6 +35,7 @@ namespace AssetExplorer {
 
 		bool init(void);
 		bool loadMods(void);
+		bool loadSession(void);
 		bool addMod(int32_t modId, const core::string& name, core::Path<char>& outDir);
 
 		static Project* currentProject(void);
