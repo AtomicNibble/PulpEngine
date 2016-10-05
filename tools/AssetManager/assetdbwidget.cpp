@@ -304,6 +304,12 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
 	connect(pSessionManager, SIGNAL(startupProjectChanged(Project*)),
 		this, SLOT(startupProjectChanged(Project*)));
 
+	connect(pSessionManager, SIGNAL(sessionLoaded()),
+		this, SLOT(loadExpandData()));
+	connect(pSessionManager, SIGNAL(aboutToSaveSession()),
+		this, SLOT(saveExpandData()));
+
+
     view_ = new AssetDbTreeView(this);
     view_->setModel(model_);
   //  view_->setItemDelegate(new AssetDbTreeItemDelegate(this));
@@ -438,7 +444,6 @@ void AssetDbViewWidget::startupProjectChanged(Project* pProject)
 }
 
 
-
 void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
 {
     Node* pNode = model_->nodeForIndex(mainIndex);
@@ -481,11 +486,68 @@ void AssetDbViewWidget::filesAboutToBeRemoved(FolderNode *, const QList<FileNode
 }
 
 
-void AssetDbViewWidget::disableAutoExpand()
+void AssetDbViewWidget::disableAutoExpand(void)
 {
     autoExpand_ = false;
 }
 
+
+void AssetDbViewWidget::saveExpandData(void)
+{
+	QList<QVariant> data;
+	recursiveSaveExpandData(view_->rootIndex(), &data);
+
+	SessionManager::setValue(QLatin1String("AssetDbTree.ExpandData"), data);
+}
+
+
+void AssetDbViewWidget::loadExpandData(void)
+{
+	QList<QVariant> data = SessionManager::value(QLatin1String("AssetDbTree.ExpandData")).value<QList<QVariant>>();
+
+	QSet<QString> set;
+
+	for (const auto& v : data) {
+		set.insert(v.toString());
+	}
+
+	recursiveLoadExpandData(view_->rootIndex(), set);
+}
+
+
+void AssetDbViewWidget::recursiveSaveExpandData(const QModelIndex &index, QList<QVariant> *data)
+{
+	Q_ASSERT(data);
+
+	if (view_->isExpanded(index) || index == view_->rootIndex())
+	{
+		Node* pNode = model_->nodeForIndex(index);
+		const QString list = QString(pNode->displayName());
+		data->append(QVariant::fromValue(list));
+		const int32_t count = model_->rowCount(index);
+		for (int32_t i = 0; i < count; ++i) {
+			recursiveSaveExpandData(index.child(i, 0), data);
+		}
+	}
+}
+
+void AssetDbViewWidget::recursiveLoadExpandData(const QModelIndex& index, QSet<QString> &data)
+{
+	Node *node = model_->nodeForIndex(index);
+	const QString path = node->displayName();
+	const QString displayName = node->displayName();
+	auto it = data.find(displayName);
+
+	if (it != data.end())
+	{
+		view_->expand(index);
+		data.erase(it);
+		const int32_t count = model_->rowCount(index);
+		for (int32_t i = 0; i < count; ++i) {
+			recursiveLoadExpandData(index.child(i, 0), data);
+		}
+	}
+}
 
 
 } // namespace AssetExplorer

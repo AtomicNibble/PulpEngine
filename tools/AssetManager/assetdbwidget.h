@@ -101,6 +101,14 @@ namespace AssetExplorer
 
 		void disableAutoExpand(void);
 
+
+		void saveExpandData(void);
+		void loadExpandData(void);
+
+	private:
+		void recursiveSaveExpandData(const QModelIndex &index, QList<QVariant> *data);
+		void recursiveLoadExpandData(const QModelIndex &index, QSet<QString>& data);
+
 	private:
 		IContext* pContext_;
 		AssetExplorer* explorer_;
