@@ -34,6 +34,9 @@ public:
 public:
 	static EditorManager* instance(void);
 
+	static QByteArray saveState(void);
+	static bool restoreState(const QByteArray& state);
+
 	static IAssetEntry* currentAssetEntry(void);
 	static IEditor* currentEditor(void);
 	static QList<IEditor*> visibleEditors(void);

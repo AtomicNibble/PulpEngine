@@ -339,6 +339,71 @@ SplitterOrView *EditorManager::findRoot(const EditorView* pView, int32_t* pRootI
 }
 
 
+QByteArray EditorManager::saveState(void)
+{
+	QByteArray bytes;
+	QDataStream stream(&bytes, QIODevice::WriteOnly);
+
+	stream << QByteArray("EditorManager");
+
+	auto entries = d->pAssetEntryModel_->assetEntrys();
+	int entriesCount = 0;
+	foreach(AssetEntryModel::Entry* entry, entries) {
+		// The editor may be 0 if it was not loaded yet: In that case it is not temporary
+		if (!entry->pAssetEntry_->isTemporary()) {
+			++entriesCount;
+		}
+	}
+
+	stream << entriesCount;
+
+	foreach(AssetEntryModel::Entry* entry, entries) {
+		if (!entry->pAssetEntry_->isTemporary()) {
+			stream << entry->assetName() << entry->type() << entry->id();
+		}
+	}
+
+
+	return bytes;
+}
+
+bool EditorManager::restoreState(const QByteArray& state)
+{
+	closeAllEditors(true);
+
+
+	QDataStream stream(state);
+
+	QByteArray version;
+	stream >> version;
+
+	if (version != "EditorManager") {
+		return false;
+	}
+
+	QApplication::setOverrideCursor(Qt::WaitCursor);
+
+	int32_t editorCount = 0;
+	stream >> editorCount;
+	while (--editorCount >= 0) 
+	{
+		QString name;
+		stream >> name;
+		int type;
+		stream >> type;
+		Id id;
+		stream >> id;
+
+		if (!name.isEmpty())
+		{
+			openEditor(name, static_cast<assetDb::AssetType::Enum>(type), id, DoNotMakeVisible);
+		}
+	}
+
+	QApplication::restoreOverrideCursor();
+	return true;
+}
+
 
 IAssetEntry* EditorManager::currentAssetEntry(void)
 {
