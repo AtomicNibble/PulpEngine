@@ -58,6 +58,7 @@ namespace AssetExplorer
 
 	private:
 		static void restoreStartupProject(void);
+		static void restoreEditors(void);
 		static void restoreValues(void);
 
 	signals:

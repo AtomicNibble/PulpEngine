@@ -68,6 +68,7 @@ bool SessionManager::loadSession(void)
 
 	restoreStartupProject();
 	restoreValues();
+	restoreEditors();
 
 	emit instance_->sessionLoaded();
 	return true;
@@ -82,6 +83,9 @@ bool SessionManager::save(void)
 	if (d->pStartupProject_) {
 		pSettings->setValue(QLatin1String("StartupProject"), d->pStartupProject_->displayName());
 	}
+
+
+	pSettings->setValue(QLatin1String("EditorSettings"), EditorManager::saveState().toBase64());
 
 	auto end = d->values_.constEnd();
 	QStringList keys;
@@ -302,6 +306,17 @@ void SessionManager::restoreStartupProject(void)
 		}
 	}
 }
+
+void SessionManager::restoreEditors(void)
+{
+	QSettings* pSettings = ICore::settings();
+
+	const QVariant editorsettings = pSettings->value(QLatin1String("EditorSettings"));
+	if (editorsettings.isValid()) {
+		EditorManager::restoreState(QByteArray::fromBase64(editorsettings.toByteArray()));
+	}
+}
+
 
 void SessionManager::restoreValues(void)
 {
