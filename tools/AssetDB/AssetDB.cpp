@@ -1432,8 +1432,8 @@ bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
 	}
 
 	infoOut.name = (*it).get<const char*>(0);
-	infoOut.id = static_cast<AssetType::Enum>((*it).get<int32_t>(1));
-	infoOut.parentId = static_cast<AssetType::Enum>((*it).get<int32_t>(2));
+	infoOut.id = (*it).get<int32_t>(1);
+	infoOut.parentId = (*it).get<int32_t>(2);
 	return true;
 }
 
