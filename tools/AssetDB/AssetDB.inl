@@ -31,17 +31,19 @@ X_INLINE AssetDB::AssetInfo::AssetInfo() :
 
 }
 
-X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const char* pName) :
+X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const char* pName, AssetType::Enum type_) :
 	id(id_),
 	parentId(parentId_),
+	type(type_),
 	name(pName)
 {
 
 }
 
-X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const core::string& name_) :
+X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const core::string& name_, AssetType::Enum type_) :
 	id(id_),
 	parentId(parentId_),
+	type(type_),
 	name(name_)
 {
 

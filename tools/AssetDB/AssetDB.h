@@ -43,11 +43,12 @@ public:
 	struct AssetInfo
 	{
 		X_INLINE AssetInfo();
-		X_INLINE AssetInfo(int32_t id, int32_t parentId, const char* pName);
-		X_INLINE AssetInfo(int32_t id, int32_t parentId, const core::string& name);
+		X_INLINE AssetInfo(int32_t id, int32_t parentId, const char* pName, AssetType::Enum type);
+		X_INLINE AssetInfo(int32_t id, int32_t parentId, const core::string& name, AssetType::Enum type);
 
 		int32_t id;
 		int32_t parentId;
+		AssetType::Enum type;
 		core::string name;
 	};
 
