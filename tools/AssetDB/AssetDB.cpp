@@ -904,7 +904,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
-	core::Array<uint8_t>& data, const core::string& argsOpt)
+	const core::Array<uint8_t>& data, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
 

@@ -121,7 +121,7 @@ public:
 		const core::string& newName);
 
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
-		core::Array<uint8_t>& data, const core::string& argsOpt);
+		const core::Array<uint8_t>& data, const core::string& argsOpt);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
 
 	// if you want to get a assets id use this.
