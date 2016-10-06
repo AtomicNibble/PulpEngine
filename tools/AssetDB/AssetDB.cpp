@@ -494,7 +494,7 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& asse
 	// could resize if so.
 	assetsOut.reserve(count);
 
-	sql::SqlLiteQuery qry(db_, "SELECT file_id, name, parent_id FROM file_ids WHERE mod_id = ? AND type = ?");
+	sql::SqlLiteQuery qry(db_, "SELECT file_id, parent_id, type, name FROM file_ids WHERE mod_id = ? AND type = ?");
 	qry.bind(1, modId);
 	qry.bind(2, type);
 
@@ -504,10 +504,11 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& asse
 		auto row = *it;
 
 		const int32_t id = row.get<int32_t>(0);
-		const int32_t parentId = row.get<int32_t>(0);
-		const char* pName = row.get<const char*>(1);
+		const int32_t parentId = row.get<int32_t>(1);
+		const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
+		const char* pName = row.get<const char*>(3);
 
-		assetsOut.emplace_back(id, parentId, pName);
+		assetsOut.emplace_back(id, parentId, pName, type);
 	}
 
 	return true;
