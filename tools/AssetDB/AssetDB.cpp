@@ -1043,7 +1043,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			cmd.bind(1, path.c_str());
 			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
 			cmd.bind(3, static_cast<int32_t>(dataCrc));
-			cmd.bind(5, rawId);
+			cmd.bind(4, rawId);
 
 			sql::Result::Enum res = cmd.execute();
 			if (res != sql::Result::OK) {
