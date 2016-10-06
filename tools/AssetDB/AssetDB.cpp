@@ -1072,6 +1072,145 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const core::string& name,
+	const core::Array<uint8_t>& data)
+{
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Can't update asset with empty name");
+		return Result::ERROR;
+	}
+
+	int32_t assetId, rawId;
+
+#if X_ENABLE_ASSERTIONS
+	assetId = std::numeric_limits<int32_t>::max();
+#endif // !X_ENABLE_ASSERTIONS
+
+	if (!AssetExsists(type, name, &assetId)) {
+		// add it?
+		if (AddAsset(type, name, &assetId) != Result::OK) {
+			X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
+			return Result::NOT_FOUND;
+		}
+
+		X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
+	}
+
+	X_ASSERT(assetId != std::numeric_limits<int32_t>::max(), "AssetId is invalid")();
+
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
+
+	bool dataChanged = true;
+
+	rawId = std::numeric_limits<uint32_t>::max();
+	if (data.isNotEmpty())
+	{
+		RawFile rawData;
+
+		if (GetRawfileForId(assetId, rawData, &rawId))
+		{
+			if (rawData.hash == dataCrc)
+			{
+				dataChanged = false;
+
+				X_LOG0("AssetDB", "Skipping raw file update file unchanged");
+				return Result::UNCHANGED;
+			}
+		}
+	}
+
+	// start the transaction.
+	sql::SqlLiteTransaction trans(db_);
+	core::string stmt;
+
+	if (data.isNotEmpty() && dataChanged)
+	{
+		// save the file.
+		core::Path<char> path;
+
+		{
+			core::XFileScoped file;
+			core::fileModeFlags mode;
+			core::Path<char> filePath;
+
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::RECREATE);
+
+			AssetPathForName(type, name, filePath);
+
+			// path include folder, so don't need type to load it.
+			path = AssetTypeRawFolder(type);
+			path.toLower();
+			path.ensureSlash();
+			path /= name;
+
+			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
+				return Result::ERROR;
+			}
+
+			if (!file.openFile(filePath.c_str(), mode)) {
+				X_ERROR("AssetDB", "Failed to write raw asset");
+				return Result::ERROR;
+			}
+
+			if (file.write(data.ptr(), data.size()) != data.size()) {
+				X_ERROR("AssetDB", "Failed to write raw asset data");
+				return Result::ERROR;
+			}
+		}
+
+		if (rawId == std::numeric_limits<uint32_t>::max())
+		{
+			sql::SqlLiteDb::RowId lastRowId;
+
+			// insert entry
+			{
+				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
+				cmd.bind(1, path.c_str());
+				cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
+				cmd.bind(3, static_cast<int32_t>(dataCrc));
+
+				sql::Result::Enum res = cmd.execute();
+				if (res != sql::Result::OK) {
+					return Result::ERROR;
+				}
+
+				lastRowId = db_.lastInsertRowid();
+			}
+
+			// update asset row.
+			{
+				sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
+				cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
+				cmd.bind(2, assetId);
+
+				sql::Result::Enum res = cmd.execute();
+				if (res != sql::Result::OK) {
+					return Result::ERROR;
+				}
+			}
+		}
+		else
+		{
+			// just update.
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+			cmd.bind(1, path.c_str());
+			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(3, static_cast<int32_t>(dataCrc));
+			cmd.bind(4, rawId);
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				return Result::ERROR;
+			}
+		}
+	}
+
+	trans.commit();
+	return Result::OK;
+}
 
 AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt)
 {
