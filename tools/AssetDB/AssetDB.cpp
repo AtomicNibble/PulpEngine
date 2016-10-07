@@ -1702,6 +1702,40 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFi
 	return true;
 }
 
+bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, thumbs.size, thumbs.hash FROM thumbs "
+	"INNER JOIN file_ids on thumbs.thumb_id = file_ids.thumb_id WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+
+	dataOut.id = (*it).get<int32_t>(0);
+	dataOut.dimension.x = (*it).get<int32_t>(1);
+	dataOut.dimension.y = (*it).get<int32_t>(2);
+	dataOut.fileSize = (*it).get<int32_t>(3);
+
+	if (pThumbId) {
+		*pThumbId = dataOut.id;
+	}
+
+	const void* pHash = (*it).get<void const*>(4);
+	const size_t hashBlobSize = (*it).columnBytes(4);
+	// u fucking pineapple.
+	if (hashBlobSize != sizeof(dataOut.hash.bytes)) {
+		X_ERROR("AssetDB", "THumb hash blob incorrect size: %" PRIuS, hashBlobSize);
+		return false;
+	}
+
+	std::memcpy(dataOut.hash.bytes, pHash, sizeof(dataOut.hash.bytes));
+	return true;
+}
+
 bool AssetDB::MergeArgs(int32_t assetId, core::string& argsInOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");

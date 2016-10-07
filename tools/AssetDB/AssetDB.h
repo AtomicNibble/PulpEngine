@@ -166,6 +166,7 @@ public:
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
+	bool GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId = nullptr);
 	bool MergeArgs(int32_t assetId, core::string& argsInOut);
 	bool isModSet(void) const;
 
