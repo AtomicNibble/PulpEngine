@@ -3,6 +3,7 @@
 
 #include <Containers\Array.h>
 #include <Hashing\crc32.h>
+#include <Hashing\MD5.h>
 
 #include <IFileSys.h>
 #include <ICompression.h>
@@ -62,6 +63,7 @@ namespace
 const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
+const char* AssetDB::THUMBS_FOLDER = "thumbs";
 
 
 AssetDB::AssetDB() :
