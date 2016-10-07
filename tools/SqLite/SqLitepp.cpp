@@ -62,7 +62,7 @@ const char* ColumType::ToString(Enum type)
 		X_ASSERT_UNREACHABLE();
 		break;
 #else
-		X_NO_SWITCH_DEFAULT
+		X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
 
 	}
