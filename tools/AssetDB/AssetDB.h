@@ -29,6 +29,8 @@ class DLL_EXPORT AssetDB
 		uint32_t hash;
 	};
 
+
+public:
 	struct ThumbInfo
 	{
 		int32_t id;
@@ -37,8 +39,6 @@ class DLL_EXPORT AssetDB
 		core::Hash::MD5Digest hash;
 	};
 
-
-public:
 	struct Mod
 	{
 		X_INLINE Mod() = default;
