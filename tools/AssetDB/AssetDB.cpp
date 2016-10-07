@@ -1090,6 +1090,19 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
+
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const core::Array<uint8_t>& data)
+{
+	// we make use of the asset name and type, so the main logic is in that one.
+	AssetInfo info;
+
+	if (GetAssetInfoForAsset(assetId, info)) {
+		return Result::ERROR;
+	}
+
+	return UpdateAssetRawFile(info.type, info.name, data);
+}
+
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const core::string& name,
 	const core::Array<uint8_t>& data)
 {
