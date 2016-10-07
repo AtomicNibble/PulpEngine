@@ -132,6 +132,20 @@ void AssetDB::CloseDB(void)
 
 bool AssetDB::CreateTables(void)
 {
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS thumbs ("
+		"thumb_id INTEGER PRIMARY KEY,"
+		"width INTEGER NOT NULL,"
+		"height INTEGER NOT NULL,"
+		"size INTEGER NOT NULL,"
+		// do i want to store thumbs with name of hash or asset name? I guess benfit of hash i don't have to know asset name, 
+		// and care if asset is renamed.
+		"hash TEXT NOT NULL," 
+		"lastUpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'refs' table");
+		return false;
+	}
+
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS mods ("
 		"mod_id INTEGER PRIMARY KEY,"
 		"name TEXT COLLATE NOCASE UNIQUE NOT NULL,"
@@ -200,6 +214,9 @@ bool AssetDB::DropTables(void)
 		return false;
 	}
 	if (!db_.execute("DROP TABLE IF EXISTS mods;")) {
+		return false;
+	}
+	if (!db_.execute("DROP TABLE IF EXISTS thumbs;")) {
 		return false;
 	}
 
