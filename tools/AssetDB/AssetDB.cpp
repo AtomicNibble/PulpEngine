@@ -1345,11 +1345,13 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 	else
 	{
 		const auto elapsed = timer.GetMilliSeconds();
+		const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
 
 		core::HumanSize::Str sizeStr, sizeStr2;
-		X_LOG2("AssetDB", "Defalated thumb %s -> %s %gms",
+		X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2g%%) %gms",
 			core::HumanSize::toString(sizeStr, data.size()),
 			core::HumanSize::toString(sizeStr2, compressed.size()),
+			percentageSize,
 			elapsed);
 	}
 
