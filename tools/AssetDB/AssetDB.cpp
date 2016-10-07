@@ -1352,19 +1352,13 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 			elapsed);
 	}
 
-
-	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
+
 
 	// write new data.
 	{
-		core::XFileScoped file;
-		core::fileModeFlags mode;
 		core::Path<char> filePath;
 		core::Hash::MD5Digest::String strBuf;
-
-		mode.Set(core::fileMode::WRITE);
-		mode.Set(core::fileMode::RECREATE);
 
 		filePath = ASSET_DB_FOLDER;
 		filePath.ensureSlash();
@@ -1373,19 +1367,30 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 		filePath.ensureSlash();
 		filePath /= hash.ToString(strBuf);
 
-		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
-			X_ERROR("AssetDB", "Failed to create dir to save thumb");
-			return Result::ERROR;
-		}
+		// if a thumb with same md5 exsists don't update.
+		// now we wait for a collsion, (that we notice) before this code needs updating :D
+		if (!gEnv->pFileSys->fileExists(filePath.c_str()))
+		{
+			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to create dir to save thumb");
+				return Result::ERROR;
+			}
 
-		if (!file.openFile(filePath.c_str(), mode)) {
-			X_ERROR("AssetDB", "Failed to write thumb");
-			return Result::ERROR;
-		}
+			core::fileModeFlags mode;
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::SHARE);
 
-		if (file.write(compressed.ptr(), compressed.size()) != compressed.size()) {
-			X_ERROR("AssetDB", "Failed to write thumb data");
-			return Result::ERROR;
+			core::XFileScoped file;
+
+			if (!file.openFile(filePath.c_str(), mode)) {
+				X_ERROR("AssetDB", "Failed to write thumb");
+				return Result::ERROR;
+			}
+
+			if (file.write(compressed.ptr(), compressed.size()) != compressed.size()) {
+				X_ERROR("AssetDB", "Failed to write thumb data");
+				return Result::ERROR;
+			}
 		}
 	}
 
