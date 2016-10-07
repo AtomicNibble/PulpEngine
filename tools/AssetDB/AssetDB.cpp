@@ -525,9 +525,13 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& asse
 		auto row = *it;
 
 		const int32_t id = row.get<int32_t>(0);
-		const int32_t parentId = row.get<int32_t>(1);
 		const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
 		const char* pName = row.get<const char*>(3);
+
+		int32_t parentId = INVALID_ASSET_ID;
+		if (row.columnType(1) != sql::ColumType::SNULL) {
+			parentId = row.get<int32_t>(1);
+		}
 
 		assetsOut.emplace_back(id, parentId, pName, type);
 	}
