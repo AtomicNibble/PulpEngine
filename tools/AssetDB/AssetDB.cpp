@@ -1655,7 +1655,7 @@ AssetDB::Result::Enum AssetDB::RemoveAssetParent(int32_t assetId)
 	return Result::OK;
 }
 
-bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
+bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFileId)
 {
 	// we get the raw_id from the asset.
 	// and get the data.
@@ -1669,8 +1669,8 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 		return false;
 	}
 
-	if (pId) {
-		*pId = (*it).get<int32_t>(0);
+	if (pRawFileId) {
+		*pRawFileId = (*it).get<int32_t>(0);
 	}
 
 	if ((*it).columnType(1) != sql::ColumType::SNULL) {
