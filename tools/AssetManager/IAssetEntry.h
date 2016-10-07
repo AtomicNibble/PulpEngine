@@ -16,6 +16,9 @@ public:
 	~IAssetEntry();
 
 	virtual bool save(QString& errorString) X_ABSTRACT;
+	virtual bool updateRawFile(const core::Array<uint8_t>& data) X_ABSTRACT;
+	virtual bool updateThumb(const core::Array<uint8_t>& data, Vec2i dim) X_ABSTRACT;
+	virtual bool getThumb(core::Array<uint8_t>& data, Vec2i& dim) X_ABSTRACT;
 	virtual bool reloadUi(void) X_ABSTRACT;
 
 	QString name(void) const;

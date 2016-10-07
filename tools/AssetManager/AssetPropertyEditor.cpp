@@ -793,6 +793,66 @@ bool AssetProperties::save(QString& errorString)
 	return true;
 }
 
+
+bool AssetProperties::updateRawFile(const core::Array<uint8_t>& data)
+{
+	const core::string& assetName = nameNarrow();
+
+	auto res = db_.UpdateAssetRawFile(type(), assetName, data);
+	if (res != assetDb::AssetDB::Result::OK && res != assetDb::AssetDB::Result::UNCHANGED) {
+		X_ERROR("AssetProp", "Failed to update raw file for asset. Err: %s", assetDb::AssetDB::Result::ToString(res));
+		return false;
+	}
+	else {
+		X_LOG2("AssetProp", "Updated raw file for \"%s\" props", assetName.c_str());
+	}
+
+	return true;
+}
+
+
+bool AssetProperties::updateThumb(const core::Array<uint8_t>& data, Vec2i dim)
+{
+	const core::string& assetName = nameNarrow();
+
+	auto res = db_.UpdateAssetThumb(type(), assetName, dim, data);
+	if (res != assetDb::AssetDB::Result::OK && res != assetDb::AssetDB::Result::UNCHANGED) {
+		X_ERROR("AssetProp", "Failed to update thumb for asset. Err: %s", assetDb::AssetDB::Result::ToString(res));
+		return false;
+	}
+	else 
+	{
+		X_LOG2("AssetProp", "Updated thumb for \"%s\" props", assetName.c_str());
+	}
+	
+	return true;
+}
+
+bool AssetProperties::getThumb(core::Array<uint8_t>& data, Vec2i& dim)
+{
+	const core::string& assetName = nameNarrow();
+
+	int32_t assetId;
+	if (!db_.AssetExsists(type(), assetName, &assetId)) {
+		X_ERROR("AssetProp", "Asset `%s` does not exsist", assetName.c_str());
+		return false;
+	}
+
+	assetDb::AssetDB::ThumbInfo info;
+	auto res = db_.GetThumbForAsset(assetId, info, data);
+	if (!res) {
+		X_WARNING("AssetProp", "Failed to get thumb for asset. Err: %s", assetDb::AssetDB::Result::ToString(res));
+		return false;
+	}
+	else {
+		X_LOG2("AssetProp", "Found thumb for \"%s\" props", assetName.c_str());
+	}
+
+	dim = info.dimension;
+	return true;
+}
+
+
 bool AssetProperties::reloadUi(void)
 {
 	const std::string str = name().toStdString();
