@@ -1960,6 +1960,17 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 	pathOut /= raw.path;
 }
 
+void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOut)
+{
+	core::Hash::MD5Digest::String hashStr;
+
+	pathOut = ASSET_DB_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= THUMBS_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= thumb.hash.ToString(hashStr);
+}
+
 
 bool AssetDB::ValidName(const core::string& name)
 {
