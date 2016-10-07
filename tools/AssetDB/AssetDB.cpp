@@ -1290,6 +1290,133 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 	return Result::OK;
 }
  
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const core::Array<uint8_t>& data)
+{
+	int32_t assetId;
+
+	if (!AssetExsists(type, name, &assetId)) {
+		return Result::NOT_FOUND;
+	}
+
+	return UpdateAssetThumb(assetId, dimensions, data);
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const core::Array<uint8_t>& data)
+{
+	// so my little floating goat, we gonna store the thumbs with hash names.
+	// that way i don't need to rename the fuckers if i rename the asset.
+	// might do same for raw assets at somepoint...
+
+	core::Hash::MD5 hasher;
+	hasher.update(data.data(), data.size());
+	const auto hash = hasher.finalize();
+
+	int32_t thumbId = INVALID_THUMB_ID;
+	if (data.isNotEmpty())
+	{
+		ThumbInfo thumb;
+
+		if (GetThumbInfoForId(assetId, thumb, &thumbId))
+		{
+			if (thumb.hash == hash)
+			{
+				X_LOG0("AssetDB", "Skipping thumb update file unchanged");
+				return Result::UNCHANGED;
+			}
+		}
+	}
+
+
+	// start the transaction.
+	sql::SqlLiteTransaction trans(db_);
+
+	// write new data.
+	{
+		core::XFileScoped file;
+		core::fileModeFlags mode;
+		core::Path<char> filePath;
+		core::Hash::MD5Digest::String strBuf;
+
+		mode.Set(core::fileMode::WRITE);
+		mode.Set(core::fileMode::RECREATE);
+
+		filePath = ASSET_DB_FOLDER;
+		filePath.ensureSlash();
+		filePath = THUMBS_FOLDER;
+		filePath.toLower();
+		filePath.ensureSlash();
+		filePath /= hash.ToString(strBuf);
+
+		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+			X_ERROR("AssetDB", "Failed to create dir to save thumb");
+			return Result::ERROR;
+		}
+
+		if (!file.openFile(filePath.c_str(), mode)) {
+			X_ERROR("AssetDB", "Failed to write thumb");
+			return Result::ERROR;
+		}
+
+		if (file.write(data.ptr(), data.size()) != data.size()) {
+			X_ERROR("AssetDB", "Failed to write thumb data");
+			return Result::ERROR;
+		}
+	}
+
+	// so we want to insert or update.
+
+	if (thumbId == INVALID_THUMB_ID)
+	{
+		sql::SqlLiteDb::RowId lastRowId;
+
+		// insert.
+		{
+			sql::SqlLiteCmd cmd(db_, "INSERT INTO thumbs (width, height, size, hash) VALUES(?,?,?,?)");
+			cmd.bind(1, dimensions.x);
+			cmd.bind(2, dimensions.y);
+			cmd.bind(3, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(4, &hash, sizeof(hash));
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				return Result::ERROR;
+			}
+
+			lastRowId = db_.lastInsertRowid();
+		}
+
+		// set thumb id..
+		{
+			sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET thumb_id = ? WHERE file_id = ?");
+			cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
+			cmd.bind(2, assetId);
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				return Result::ERROR;
+			}
+		}
+	}
+	else
+	{
+		// just update.
+		sql::SqlLiteCmd cmd(db_, "UPDATE thumbs SET width = ?, height = ?, size = ?, hash = ?, lastUpdateTime = DateTime('now') WHERE thumb_id = ?");
+		cmd.bind(1, dimensions.x);
+		cmd.bind(2, dimensions.y);
+		cmd.bind(3, safe_static_cast<int32_t, size_t>(data.size()));
+		cmd.bind(4, &hash, sizeof(hash));
+		cmd.bind(5, thumbId);
+
+		sql::Result::Enum res = cmd.execute();
+		if (res != sql::Result::OK) {
+			return Result::ERROR;
+		}
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
 
 bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut, ModId* pModIdOut)
 {
