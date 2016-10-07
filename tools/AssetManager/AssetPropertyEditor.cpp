@@ -759,12 +759,10 @@ void AssetProperties::setWidget(QWidget* widget)
 
 bool AssetProperties::save(QString& errorString)
 {
-	const QString& assetName = assetName_;
-	const auto narrowName = assetName.toLocal8Bit();
-	const core::string name(narrowName.data());
+	const core::string& assetName = nameNarrow();
 	const auto& type = type_;
 
-	if (name.isEmpty()) {
+	if (assetName.isEmpty()) {
 		errorString = "Error saving asset props, name is invalid";
 		return false;
 	}
@@ -779,13 +777,13 @@ bool AssetProperties::save(QString& errorString)
 		return false;
 	}
 
-	auto res = db_.UpdateAssetArgs(type, name, args);
+	auto res = db_.UpdateAssetArgs(type, assetName, args);
 	if (res != assetDb::AssetDB::Result::OK) {
 		errorString = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
 		return false;
 	}
 	else {
-		X_LOG2("AssetProp", "Saved \"%s\" props", name.c_str());
+		X_LOG2("AssetProp", "Saved \"%s\" props", assetName.c_str());
 	}
 
 	// meow meow meow.
@@ -855,8 +853,8 @@ bool AssetProperties::getThumb(core::Array<uint8_t>& data, Vec2i& dim)
 
 bool AssetProperties::reloadUi(void)
 {
-	const std::string str = name().toStdString();
-	X_LOG0("AssetProperties", "UI script refresh request for: \"%s\" type: %s", str.c_str(), assetDb::AssetType::ToString(type()));
+	const core::string& assetName = nameNarrow();
+	X_LOG0("AssetProperties", "UI script refresh request for: \"%s\" type: %s", assetName.c_str(), assetDb::AssetType::ToString(type()));
 
 	pCon_->setUpdatesEnabled(false);
 
