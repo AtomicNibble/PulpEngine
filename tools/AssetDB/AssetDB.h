@@ -134,10 +134,8 @@ public:
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
 
-	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
-		const core::Array<uint8_t>& data, const core::string& argsOpt);
-	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name,
-		const core::Array<uint8_t>& data);
+	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const core::Array<uint8_t>& data, const core::string& argsOpt);
+	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const core::Array<uint8_t>& data);
 	Result::Enum UpdateAssetRawFile(int32_t assetId, const core::Array<uint8_t>& data);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
 
