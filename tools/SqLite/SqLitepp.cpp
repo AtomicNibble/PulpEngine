@@ -42,6 +42,38 @@ namespace
 } // namespace
 
 
+const char* ColumType::ToString(Enum type)
+{
+	switch (type)
+	{
+	case INTEGER:
+		return "Int";
+	case FLOAT:
+		return "Float";
+	case TEXT:
+		return "Text";
+	case BLOB:
+		return "Blob";
+	case SNULL:
+		return "NULL";
+
+#if X_DEBUG
+	default:
+		X_ASSERT_UNREACHABLE();
+		break;
+#else
+		X_NO_SWITCH_DEFAULT
+#endif // X_DEBUG
+
+	}
+
+	return "<ukn>";
+}
+
+
+
+// --------------------------------------
+
 SqlLiteDb::SqlLiteDb() :
 	db_(nullptr),
 	bh_(nullptr),

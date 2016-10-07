@@ -68,6 +68,8 @@ struct ColumType
 		BLOB = 4, // SQLITE_BLOB,
 		SNULL = 5, // SQLITE_NULL
 	};
+
+	static const char* ToString(Enum type);
 };
 
 
