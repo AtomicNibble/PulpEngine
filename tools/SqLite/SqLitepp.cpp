@@ -631,11 +631,11 @@ int SqlLiteQuery::rows::columnBytes(int idx) const
 
 int SqlLiteQuery::rows::get(int idx, int) const
 {
-	int res =  sqlite3_column_int(pStmt_, idx);
+	const int res =  sqlite3_column_int(pStmt_, idx);
 	if (res == 0) {
-		int type = columnType(idx);
-		if (type != SQLITE_INTEGER) {
-			X_ERROR("SqlDb", "Index is is not a int: %i type: %i", idx, type);
+		ColumType::Enum type = static_cast<ColumType::Enum>(columnType(idx));
+		if (type != ColumType::INTEGER) {
+			X_ERROR("SqlDb", "Index is is not a int: %i type: %s(%i)", idx, ColumType::ToString(type), type);
 		}
 	}
 	return res;
