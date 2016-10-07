@@ -936,7 +936,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	}
 
 #if X_ENABLE_ASSERTIONS
-	assetId = std::numeric_limits<int32_t>::max();
+	assetId = INVALID_ASSET_ID;
 #endif // !X_ENABLE_ASSERTIONS
 
 	if (!AssetExsists(type, name, &assetId)) {
@@ -949,7 +949,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
 	}
 
-	X_ASSERT(assetId != std::numeric_limits<int32_t>::max(), "AssetId is invalid")();
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")();
 
 	core::string args(argsOpt);
 
@@ -1111,10 +1111,10 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 		return Result::ERROR;
 	}
 
-	int32_t assetId, rawId;
+	int32_t assetId;
 
 #if X_ENABLE_ASSERTIONS
-	assetId = std::numeric_limits<int32_t>::max();
+	assetId = INVALID_ASSET_ID;
 #endif // !X_ENABLE_ASSERTIONS
 
 	if (!AssetExsists(type, name, &assetId)) {
@@ -1127,14 +1127,12 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 		X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
 	}
 
-	X_ASSERT(assetId != std::numeric_limits<int32_t>::max(), "AssetId is invalid")();
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")();
 
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
 
-	bool dataChanged = true;
-
-	rawId = std::numeric_limits<uint32_t>::max();
+	int32_t rawId = INVALID_RAWFILE_ID;
 	if (data.isNotEmpty())
 	{
 		RawFile rawData;
@@ -1143,8 +1141,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 		{
 			if (rawData.hash == dataCrc)
 			{
-				dataChanged = false;
-
 				X_LOG0("AssetDB", "Skipping raw file update file unchanged");
 				return Result::UNCHANGED;
 			}
@@ -1155,7 +1151,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
 
-	if (data.isNotEmpty() && dataChanged)
+	if (data.isNotEmpty())
 	{
 		// save the file.
 		core::Path<char> path;
@@ -1192,7 +1188,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 			}
 		}
 
-		if (rawId == std::numeric_limits<uint32_t>::max())
+		if (rawId == INVALID_RAWFILE_ID)
 		{
 			sql::SqlLiteDb::RowId lastRowId;
 
