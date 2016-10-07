@@ -1330,13 +1330,14 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 		}
 	}
 
+
 	core::StopWatch timer;
 
 	// compress the thumb with a quick pass.
-	core::Array<uint8_t> compressed(g_AssetDBArena);
+	core::Array<uint8_t> compressed(data.getArena());
 	core::Compression::Compressor<core::Compression::LZ4> comp;
 
-	if (!comp.deflate(g_AssetDBArena, data, compressed, core::Compression::CompressLevel::NORMAL))
+	if (!comp.deflate(data.getArena(), data, compressed, core::Compression::CompressLevel::NORMAL))
 	{
 		X_ERROR("AssetDB", "Failed to defalte thumb data");
 		return Result::ERROR;
