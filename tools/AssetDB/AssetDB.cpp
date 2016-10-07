@@ -1582,6 +1582,64 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 	return false;
 }
 
+bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, core::Array<uint8_t>& thumbDataOut)
+{
+	using namespace core::Compression;
+
+	if (!GetThumbInfoForId(assetId, info)) {
+		X_ERROR("AssetDB", "Failed to get thumb info for data reterival");
+		return false;
+	}
+
+	// load the file.
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+	core::Path<char> filePath;
+
+	mode.Set(core::fileMode::READ);
+	mode.Set(core::fileMode::SHARE);
+
+	ThumbPathForThumb(info, filePath);
+
+	if (!file.openFile(filePath.c_str(), mode)) {
+		X_ERROR("AssetDB", "Failed to open thumb");
+		return false;
+	}
+
+	const size_t size = info.fileSize;
+
+	core::Array<uint8_t> compressedData(g_AssetDBArena);
+	compressedData.resize(size);
+
+	if (file.read(compressedData.ptr(), size) != size) {
+		X_ERROR("AssetDB", "Failed to read thumb contents");
+		return false;
+	}
+
+	// decompress it.
+	Algo::Enum algo = ICompressor::getAlgo(compressedData);
+
+	if (algo == Algo::LZ4) {
+		Compressor<LZ4> def;
+		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
+	}
+	else if (algo == Algo::LZMA) {
+		Compressor<LZMA> def;
+		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
+	}
+	else if (algo == Algo::ZLIB) {
+		Compressor<Zlib> def;
+		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
+	}
+
+	X_ERROR("AssetDB", "Failed to read thumb, unkown compression algo");
+	return false;
+
+
+
+}
+
+
 bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT type FROM file_ids WHERE file_ids.file_id = ?");

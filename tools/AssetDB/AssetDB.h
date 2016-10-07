@@ -148,6 +148,7 @@ public:
 	bool GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut);
 	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
+	bool GetThumbForAsset(int32_t assetId, ThumbInfo& info, core::Array<uint8_t>& thumbDataOut);
 	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut);
 	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
 
