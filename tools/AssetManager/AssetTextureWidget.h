@@ -4,12 +4,14 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+class IAssetEntry;
+
 class AssetTextureWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	AssetTextureWidget(QWidget *parent, const std::string& value);
+	AssetTextureWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value);
 	~AssetTextureWidget();
 
 
@@ -25,8 +27,11 @@ private:
 	void showPreviewWidgets(bool vis);
 	void setPath(const QString& filePath);
 	QString makeDialogTitle(const QString& title);
-	bool getPixMapCurPath(QPixmap& pixOut);
 	static bool fileExtensionValid(const QString& paht);
+	bool getPixMapCurPath(QPixmap& pixOut);
+	bool loadImage(void);
+	void setErrorTip(const QString& tip);
+	void removeErrorTip(void);
 
 protected:
 	bool eventFilter(QObject* pObject, QEvent* pEvent) X_OVERRIDE;
@@ -40,9 +45,11 @@ private slots:
 	void setValue(const std::string& value);
 	void editingFinished(void);
 	void validatePath(void);
-	void loadPreview(void);
 	void showTextureDialog(void);
 	void browseClicked(void);
+
+private:
+	IAssetEntry* pAssEntry_;
 
 private:
 	QLabel* pPreview_;

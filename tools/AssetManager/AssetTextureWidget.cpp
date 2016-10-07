@@ -3,10 +3,17 @@
 
 #include "DisplayPixDialog.h"
 
+#include "IAssetEntry.h"
+
+#include <String\HumanSize.h>
+#include <Compression\LZ4.h>
+#include <Time\StopWatch.h>
+
 X_NAMESPACE_BEGIN(assman)
 
-AssetTextureWidget::AssetTextureWidget(QWidget *parent, const std::string& value)
-	: QWidget(parent),
+AssetTextureWidget::AssetTextureWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value) :
+	QWidget(parent),
+	pAssEntry_(pAssEntry),
 	pWarningAction_(nullptr)
 {
 	QHBoxLayout* pLayout = new QHBoxLayout();
@@ -24,7 +31,7 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, const std::string& value
 	pVertLayout->setContentsMargins(0, 0, 0, 0);
 	{
 		pEditPathPad_ = new QLabel();
-		pEditPathPad_->setVisible(false);
+	//	pEditPathPad_->setVisible(false);
 
 		pEditPath_ = new QLineEdit(this);
 	//	pEditPath_->setAcceptDrops(true); 
@@ -33,7 +40,7 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, const std::string& value
 		connect(pEditPath_, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
 
 		pEditDimensions_ = new QLabel();
-		pEditDimensions_->setVisible(false);
+	//	pEditDimensions_->setVisible(false);
 
 		pVertLayout->addWidget(pEditPathPad_);
 		pVertLayout->addWidget(pEditPath_);
@@ -93,9 +100,10 @@ void AssetTextureWidget::setPath(const QString& filePath)
 {
 	if (filePath == curPath_) {
 		return;
-	}
+	} 
 
-	showPreviewWidgets(false);
+	// always clear dims i think.
+	// leave previews they get hidden in validatePath.
 	pEditDimensions_->setText("");
 
 	curPath_ = QDir::toNativeSeparators(filePath);
@@ -114,6 +122,19 @@ QString AssetTextureWidget::makeDialogTitle(const QString& title)
 	}
 
 	return dialogTitleOverride_;
+}
+
+bool AssetTextureWidget::fileExtensionValid(const QString& path)
+{
+	if (path.endsWith(".png", Qt::CaseInsensitive) ||
+		path.endsWith(".jpg", Qt::CaseInsensitive) ||
+		path.endsWith(".tga", Qt::CaseInsensitive) ||
+		path.endsWith(".dds", Qt::CaseInsensitive))
+	{
+		return true;
+	}
+	
+	return false;
 }
 
 bool AssetTextureWidget::getPixMapCurPath(QPixmap& pixOut)
@@ -136,19 +157,100 @@ bool AssetTextureWidget::getPixMapCurPath(QPixmap& pixOut)
 	return false;
 }
 
-bool AssetTextureWidget::fileExtensionValid(const QString& path)
+bool AssetTextureWidget::loadImage(void)
 {
-	if (path.endsWith(".png", Qt::CaseInsensitive) ||
-		path.endsWith(".jpg", Qt::CaseInsensitive) ||
-		path.endsWith(".tga", Qt::CaseInsensitive) ||
-		path.endsWith(".dds", Qt::CaseInsensitive))
-	{
-		return true;
-	}
-	
-	return false;
-}
+	// so we want to load the image for both making a preview thumb.
+	// and for saving to assetDB.
+	const QString& curPath = curPath_;
+	QFileInfo fi(curPath);
 
+	if (curPath.isEmpty() || !fi.exists()) {
+		X_ERROR("Img", "Failed to load image, src file missing");
+		return false;
+	}
+
+	if (!fileExtensionValid(curPath)) {
+		X_ERROR("Img", "Failed to load image, invalid extension");
+		return false;
+	}
+
+	QFile f(curPath_);
+	if (!f.open(QFile::ReadOnly)) {
+		X_ERROR("Img", "Failed to load image, error opening file. Err: %s", qPrintable(f.errorString()));
+		return false;
+	}
+
+	const auto fileSize = f.size();
+
+	core::Array<uint8_t> imgData(g_arena);
+	imgData.resize(fileSize);
+	if (f.read(reinterpret_cast<char*>(imgData.data()), imgData.size()) != fileSize) {
+		X_ERROR("Img", "Error reading img file data");
+		return false;
+	}
+
+	core::Array<uint8_t> compressed(g_arena);
+	core::Compression::Compressor<core::Compression::LZ4> comp;
+
+	{
+		core::StopWatch timer;
+
+		if (!comp.deflate(g_arena, imgData, compressed, core::Compression::CompressLevel::NORMAL))
+		{
+			X_ERROR("Img", "Failed to defalte img src");
+			return false;
+		}
+		else
+		{
+			const auto elapsed = timer.GetMilliSeconds();
+			const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(imgData.size())) * 100;
+
+			core::HumanSize::Str sizeStr, sizeStr2;
+			X_LOG0("Img", "Defalated src img %s -> %s(%.2g%%) %gms",
+				core::HumanSize::toString(sizeStr, imgData.size()),
+				core::HumanSize::toString(sizeStr2, compressed.size()),
+				percentageSize,
+				elapsed);
+		}
+
+	}
+
+	pAssEntry_->updateRawFile(compressed);
+
+	// preview creation
+	QPixmap pix;
+
+	if (!pix.loadFromData(imgData.data(), static_cast<uint32_t>(imgData.size()))) {
+		X_ERROR("Img", "Error creating pixmap for preview");
+		return false;
+	}
+
+	auto scaledPix = pix.scaled(64, 64);
+
+	// extract scaled image.
+	{
+		QByteArray bytes;
+		QBuffer buffer(&bytes);
+		buffer.open(QIODevice::WriteOnly);
+		if (!scaledPix.save(&buffer, "BMP")) {
+			X_ERROR("Texture", "Failed to save thumb");
+		}
+		else
+		{
+			core::Array<uint8_t> data(g_arena, bytes.count());
+			std::memcpy(data.data(), bytes.constData(), data.size());
+
+			pAssEntry_->updateThumb(data, Vec2i(64, 64));
+		}
+	}
+
+	// set and show dims
+	pEditDimensions_->setText(QString("%1x%2").arg(QString::number(pix.width()), QString::number(pix.height())));
+
+	// set preivew pix
+	pPreview_->setPixmap(scaledPix);
+	return true;
+}
 
 bool AssetTextureWidget::eventFilter(QObject* pObject, QEvent* pEvent)
 {
@@ -228,7 +330,31 @@ void AssetTextureWidget::setValue(const std::string& value)
 {
 	blockSignals(true);
 	pEditPath_->blockSignals(true);
-	setPath(QString::fromStdString(value));
+
+	// can't use set path as it will try load the image.
+	// what we want todo instead is get preview.
+	// this wil be the path of the saved file.
+	// put what if we revert so preivew actually changes.
+	// technically you can't revert a rawfile update.
+	// as it's saved.
+	// for now just get preview.
+	core::Array<uint8_t> thumbData(g_arena);
+	Vec2i dim;
+
+	if (pAssEntry_->getThumb(thumbData, dim))
+	{
+		QPixmap pix;
+
+		pix.loadFromData(thumbData.data(), static_cast<int32_t>(thumbData.size()));
+
+		pPreview_->setPixmap(pix);
+		pEditDimensions_->setText(QString("%1x%2").arg(QString::number(dim.x), QString::number(dim.y)));
+		showPreviewWidgets(true);
+	}
+
+	curPath_ = QDir::toNativeSeparators(QString::fromStdString(value));
+	pEditPath_->setText(curPath_);
+
 	pEditPath_->blockSignals(false);
 	blockSignals(false);
 }
@@ -238,68 +364,73 @@ void AssetTextureWidget::editingFinished(void)
 	setPath(pEditPath_->text());
 }
 
+
+void AssetTextureWidget::setErrorTip(const QString& tip)
+{
+	showPreviewWidgets(false);
+
+	if (!pWarningAction_) {
+		QIcon icon(":/misc/img/warning_32.png");
+		pWarningAction_ = pEditPath_->addAction(icon, QLineEdit::ActionPosition::LeadingPosition);
+		pWarningAction_->setToolTip(tip);
+	}
+}
+
+void AssetTextureWidget::removeErrorTip(void)
+{
+	if (pWarningAction_) {
+		delete pWarningAction_;
+		pWarningAction_ = nullptr;
+	}
+}
+
 void AssetTextureWidget::validatePath(void)
 {
 	const QString& curPath = curPath_;
-	QString tip;
 
-	if (!curPath.isEmpty())
-	{
-		// do some stuff like validate extensions.
-		// check it's valid etc..
-		QFileInfo fi(curPath);
-		if (!fi.exists())
-		{
-			tip = "File does not exist";
-		}
-		else if (!fi.isFile())
-		{
-			tip = "Path is not a file";
-		}
-		else if (!fileExtensionValid(curPath_))
-		{
-			tip = "Invalid file extension";
-		}
-		else
-		{
-			if (pWarningAction_) {
-				delete pWarningAction_;
-			}
-
-			// ok
-			loadPreview();
-			return;
-		}
-
-		if (!pWarningAction_)
-		{
-			QIcon icon(":/misc/img/warning_32.png");
-			pWarningAction_ = pEditPath_->addAction(icon, QLineEdit::ActionPosition::LeadingPosition);
-			pWarningAction_->setToolTip(tip);
-		}
+	// if path not empty try load it.
+	if (curPath.isEmpty()){
+		return;
 	}
+
+	// do some stuff like validate extensions.
+	// check it's valid etc..
+	QFileInfo fi(curPath);
+	if (!fi.exists())
+	{
+		setErrorTip("File does not exist");
+		return;
+	}
+	else if (!fi.isFile())
+	{
+		setErrorTip("Path is not a file");
+		return;
+	}
+	else if (!fileExtensionValid(curPath_))
+	{
+		setErrorTip("Invalid file extension");
+		return;
+	}
+
+	// file exsists and has correct extension.
+	removeErrorTip();
+
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+	if (!loadImage()) {
+		showPreviewWidgets(false);
+	}
+	else {
+		showPreviewWidgets(true);
+	}
+
+	QApplication::restoreOverrideCursor();
 }
 
 void AssetTextureWidget::showPreviewWidgets(bool vis)
 {
 	pPreview_->setVisible(vis);
 	pZoom_->setVisible(vis);
-}
-
-void AssetTextureWidget::loadPreview(void)
-{
-	QPixmap pix;
-
-	if (!getPixMapCurPath(pix)) {
-		showPreviewWidgets(false);
-		return;
-	}
-
-	auto scaledPix = pix.scaled(64, 64);
-
-	pPreview_->setPixmap(scaledPix);
-	pEditDimensions_->setText(QString("%1x%2").arg(QString::number(pix.width()), QString::number(pix.height())));
-	showPreviewWidgets(true);
 }
 
 void AssetTextureWidget::showTextureDialog(void)

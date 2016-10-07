@@ -94,7 +94,7 @@ void AssetProperty::appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLay
 		pLineEditWidget_ = new AssetLineEditWidget(pParent, val);
 		break;
 	case PropertyType::IMAGE:
-		pTextureWidget_ = new AssetTextureWidget(pParent, val);
+		pTextureWidget_ = new AssetTextureWidget(pParent, pAssEntry, val);
 		break;
 	case PropertyType::STRING:
 		pStringWidget_ = new AssetStringWidget(pParent, val);
