@@ -17,6 +17,8 @@
 
 #include <Random\MultiplyWithCarry.h>
 
+#include <Time\StopWatch.h>
+
 X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
@@ -1329,21 +1331,26 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 		}
 	}
 
+	core::StopWatch timer;
+
 	// compress the thumb with a quick pass.
 	core::Array<uint8_t> compressed(g_AssetDBArena);
 	core::Compression::Compressor<core::Compression::LZ4> comp;
 
-	if (!comp.deflate(g_AssetDBArena, data, compressed, core::Compression::CompressLevel::LOW))
+	if (!comp.deflate(g_AssetDBArena, data, compressed, core::Compression::CompressLevel::NORMAL))
 	{
 		X_ERROR("AssetDB", "Failed to defalte thumb data");
 		return Result::ERROR;
 	}
 	else
 	{
+		const auto elapsed = timer.GetMilliSeconds();
+
 		core::HumanSize::Str sizeStr, sizeStr2;
-		X_LOG2("AssetDB", "Defalated thumb %s -> %s",
+		X_LOG2("AssetDB", "Defalated thumb %s -> %s %gms",
 			core::HumanSize::toString(sizeStr, data.size()),
-			core::HumanSize::toString(sizeStr2, compressed.size()));
+			core::HumanSize::toString(sizeStr2, compressed.size()),
+			elapsed);
 	}
 
 
