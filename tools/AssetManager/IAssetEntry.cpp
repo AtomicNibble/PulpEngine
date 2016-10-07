@@ -23,6 +23,12 @@ QString IAssetEntry::name(void) const
 	return assetName_;
 }
 
+core::string IAssetEntry::nameNarrow(void) const
+{
+	const auto narrowName = assetName_.toLocal8Bit();
+	return core::string(narrowName.data());
+}
+
 QString IAssetEntry::displayName(void) const
 {
 	QString name = assetName_;

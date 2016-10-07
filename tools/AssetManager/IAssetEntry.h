@@ -19,6 +19,7 @@ public:
 	virtual bool reloadUi(void) X_ABSTRACT;
 
 	QString name(void) const;
+	core::string nameNarrow(void) const;
 	QString displayName(void) const;
 	void setAssetName(const QString& name);
 	assetDb::AssetType::Enum type(void) const;
