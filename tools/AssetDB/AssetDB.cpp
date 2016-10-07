@@ -13,6 +13,7 @@
 #include <Compression\Zlib.h>
 
 #include <String\Json.h>
+#include <String\HumanSize.h>
 
 #include <Random\MultiplyWithCarry.h>
 
@@ -1328,6 +1329,23 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 		}
 	}
 
+	// compress the thumb with a quick pass.
+	core::Array<uint8_t> compressed(g_AssetDBArena);
+	core::Compression::Compressor<core::Compression::LZ4> comp;
+
+	if (!comp.deflate(g_AssetDBArena, data, compressed, core::Compression::CompressLevel::LOW))
+	{
+		X_ERROR("AssetDB", "Failed to defalte thumb data");
+		return Result::ERROR;
+	}
+	else
+	{
+		core::HumanSize::Str sizeStr, sizeStr2;
+		X_LOG2("AssetDB", "Defalated thumb %s -> %s",
+			core::HumanSize::toString(sizeStr, data.size()),
+			core::HumanSize::toString(sizeStr2, compressed.size()));
+	}
+
 
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
@@ -1359,7 +1377,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 			return Result::ERROR;
 		}
 
-		if (file.write(data.ptr(), data.size()) != data.size()) {
+		if (file.write(compressed.ptr(), compressed.size()) != compressed.size()) {
 			X_ERROR("AssetDB", "Failed to write thumb data");
 			return Result::ERROR;
 		}
@@ -1376,7 +1394,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 			sql::SqlLiteCmd cmd(db_, "INSERT INTO thumbs (width, height, size, hash) VALUES(?,?,?,?)");
 			cmd.bind(1, dimensions.x);
 			cmd.bind(2, dimensions.y);
-			cmd.bind(3, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(3, safe_static_cast<int32_t, size_t>(compressed.size()));
 			cmd.bind(4, &hash, sizeof(hash));
 
 			sql::Result::Enum res = cmd.execute();
@@ -1405,7 +1423,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 		sql::SqlLiteCmd cmd(db_, "UPDATE thumbs SET width = ?, height = ?, size = ?, hash = ?, lastUpdateTime = DateTime('now') WHERE thumb_id = ?");
 		cmd.bind(1, dimensions.x);
 		cmd.bind(2, dimensions.y);
-		cmd.bind(3, safe_static_cast<int32_t, size_t>(data.size()));
+		cmd.bind(3, safe_static_cast<int32_t, size_t>(compressed.size()));
 		cmd.bind(4, &hash, sizeof(hash));
 		cmd.bind(5, thumbId);
 
