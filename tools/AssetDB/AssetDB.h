@@ -3,6 +3,7 @@
 #include "../SqLite/SqlLib.h"
 
 #include <Util\Delegate.h>
+#include <Hashing\MD5.h>
 
 #include <IAssetDb.h>
 
@@ -26,6 +27,15 @@ class DLL_EXPORT AssetDB
 		core::string path;
 		uint32_t hash;
 	};
+
+	struct ThumbInfo
+	{
+		int32_t id;
+		int32_t fileSize;
+		Vec2i dimension;
+		core::Hash::MD5Digest hash;
+	};
+
 
 public:
 	struct Mod
