@@ -1167,6 +1167,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 			AssetPathForName(type, name, filePath);
 
 			// path include folder, so don't need type to load it.
+			// We need this in addition to AssetPathForName
+			// so that the raw_files path works without needing asset type
 			path = AssetTypeRawFolder(type);
 			path.toLower();
 			path.ensureSlash();
