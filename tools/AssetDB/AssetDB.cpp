@@ -162,12 +162,14 @@ bool AssetDB::CreateTables(void)
 		"args TEXT,"
 		"argsHash INTEGER,"
 		"raw_file INTEGER,"
+		"thumb_id INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP,"
 		"parent_id INTEGER NULL,"
 		"mod_id INTEGER NOT NULL,"
 		"FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),"
 		"FOREIGN KEY(mod_id) REFERENCES mods(mod_id),"
+		"FOREIGN KEY(thumb_id) REFERENCES thumbs(thumb_id),"
 		"unique(name, type)"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
