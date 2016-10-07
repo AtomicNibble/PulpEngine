@@ -1344,7 +1344,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 
 		filePath = ASSET_DB_FOLDER;
 		filePath.ensureSlash();
-		filePath = THUMBS_FOLDER;
+		filePath /= THUMBS_FOLDER;
 		filePath.toLower();
 		filePath.ensureSlash();
 		filePath /= hash.ToString(strBuf);
