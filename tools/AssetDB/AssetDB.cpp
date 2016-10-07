@@ -962,9 +962,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
 	const uint32_t argsCrc = pCrc32->GetCRC32(args.c_str(), args.length());
 
-	bool dataChanged = true;
-
-	rawId = std::numeric_limits<uint32_t>::max();
+	rawId = INVALID_RAWFILE_ID;
 	if (data.isNotEmpty())
 	{
 		RawFile rawData;
@@ -973,8 +971,6 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		{
 			if (rawData.hash == dataCrc) 
 			{
-				dataChanged = false;
-
 				uint32_t argsHash;
 				if (GetArgsHashForAsset(assetId, argsHash) && argsHash == argsCrc)
 				{
@@ -989,7 +985,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
 
-	if (data.isNotEmpty() && dataChanged)
+	if (data.isNotEmpty())
 	{
 		// save the file.
 		core::Path<char> path;
@@ -1027,7 +1023,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		}
 
 
-		if (rawId == std::numeric_limits<uint32_t>::max())
+		if (rawId == INVALID_RAWFILE_ID)
 		{
 			sql::SqlLiteDb::RowId lastRowId;
 
