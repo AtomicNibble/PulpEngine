@@ -39,11 +39,11 @@ AssetGroupWidget::~AssetGroupWidget()
 {
 }
 
-void AssetGroupWidget::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
+void AssetGroupWidget::appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
 	for (auto& pChild : children_)
 	{
-		pChild->appendGui(pParent, pLayout, row, depth + 1);
+		pChild->appendGui(pAssEntry, pParent, pLayout, row, depth + 1);
 		row += 1;
 	}
 }

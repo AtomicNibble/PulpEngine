@@ -4,6 +4,7 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+class IAssetEntry;
 class AssetProperty;
 
 class AssetGroupWidget : public QToolButton
@@ -19,7 +20,7 @@ public:
 	AssetGroupWidget(QWidget *parent = nullptr);
 	~AssetGroupWidget();
 
-	void appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void clear(void);
 	void clearUI(void);

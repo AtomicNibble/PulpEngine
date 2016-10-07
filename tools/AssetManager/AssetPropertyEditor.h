@@ -87,7 +87,7 @@ public:
 	~AssetProperty();
 
 
-	void appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void addRef(void);
 	void release(void);
@@ -272,6 +272,8 @@ private:
 
 private:
 	assetDb::AssetDB& db_;
+
+private:
 	AssetPropsScriptManager* pPropScriptMan_;
 	AssetPropertyEditorWidget* pWidget_;
 	QWidget* pCon_;
