@@ -1156,7 +1156,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
-	core::string stmt;
 
 	if (data.isNotEmpty())
 	{
