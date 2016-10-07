@@ -1534,7 +1534,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 		return false;
 	}
 
-	size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
+	const size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
 	core::Array<uint8_t> compressedData(g_AssetDBArena);
 	compressedData.resize(size);
@@ -1545,7 +1545,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 	}
 
 	// decompress it.
-	Algo::Enum algo = ICompressor::getAlgo(compressedData);
+	const Algo::Enum algo = ICompressor::getAlgo(compressedData);
 
 	if (algo == Algo::LZ4) {
 		Compressor<LZ4> def;
