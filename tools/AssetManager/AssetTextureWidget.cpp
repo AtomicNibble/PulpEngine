@@ -446,7 +446,7 @@ void AssetTextureWidget::showTextureDialog(void)
 	if (pix.width() > rect.width() || pix.height() > rect.height())
 	{
 		// pleb.. where you're 16k monitor at?
-		pix = pix.scaled(rect.width() - 128, rect.width() - 128, Qt::KeepAspectRatio);
+		pix = pix.scaled(rect.width() - 128, rect.height() - 192, Qt::KeepAspectRatio);
 	}
 
 	QFileInfo fi(path());
