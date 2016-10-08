@@ -216,6 +216,81 @@ namespace Converter
 		return res;
 	}
 
+	bool ImgConveter::addAlphachannel(bool keepMips)
+	{
+		// expand the src img to have a alpha channel.
+		// needed for converting even if we don't use it :(
+		if (srcImg_.getFormat() != Texturefmt::R8G8B8 && srcImg_.getFormat() != Texturefmt::B8G8R8)
+		{
+			X_ERROR("Img", "Generating alpha channels for format \"%s\" not currently supported",
+				Texturefmt::ToString(srcImg_.getFormat()));
+			return false;
+		}
+
+		// OK my fat little goat.
+		// we need to allocate new buffer and copy data into it ;(
+		XTextureFile tmp(swapArena_);
+		
+		tmp.setFormat(Texturefmt::R8G8B8A8);
+		tmp.setType(TextureType::T2D);
+		tmp.setHeigth(srcImg_.getHeight());
+		tmp.setWidth(srcImg_.getWidth());
+		tmp.setDepth(1);
+		tmp.setNumFaces(1);
+		tmp.setNumMips(1);
+
+		if (keepMips) {
+			tmp.setNumMips(srcImg_.getNumMips());
+		}
+
+		tmp.resize();
+
+		for (size_t mip = 0; mip < tmp.getNumMips(); mip++)
+		{
+			uint8_t* pDest = tmp.getLevel(0, mip);
+			const uint8_t* pSrc = srcImg_.getLevel(0, mip);
+
+			// 3 bytes per pixel.
+			const size_t numPixel = srcImg_.getLevelSize(mip) / 3;
+
+			if (srcImg_.getFormat() == Texturefmt::R8G8B8)
+			{
+				for (size_t i = 0; i < numPixel; i++)
+				{
+					pDest[0] = pSrc[0];
+					pDest[1] = pSrc[1];
+					pDest[2] = pSrc[2];
+					pDest[3] = 0xFF;
+
+					pSrc += 3;
+					pDest += 4;
+				}
+			}
+			else if (srcImg_.getFormat() == Texturefmt::B8G8R8)
+			{
+				for (size_t i = 0; i < numPixel; i++)
+				{
+					// swap the channels
+					pDest[0] = pSrc[2];
+					pDest[1] = pSrc[1];
+					pDest[2] = pSrc[0];
+					pDest[3] = 0xFF;
+
+					pSrc += 3;
+					pDest += 4;
+				}
+			}
+			else
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+				return false;
+			}
+		}
+
+		// swap.
+		srcImg_.swap(tmp);
+		return true;
+	}
 
 	bool ImgConveter::CreateMips(MipFilter::Enum filter, const MipMapFilterParams& params, 
 		WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips)
