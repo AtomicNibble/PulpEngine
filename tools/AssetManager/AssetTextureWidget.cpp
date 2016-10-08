@@ -235,7 +235,7 @@ bool AssetTextureWidget::loadImage(void)
 			core::Array<uint8_t> data(g_arena, bytes.count());
 			std::memcpy(data.data(), bytes.constData(), data.size());
 
-			pAssEntry_->updateThumb(data, Vec2i(64, 64));
+			pAssEntry_->updateThumb(data, Vec2i(64,64), Vec2i(pix.width(), pix.height()));
 		}
 	}
 
