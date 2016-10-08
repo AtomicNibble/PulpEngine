@@ -933,7 +933,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
-	const core::Array<uint8_t>& data, const core::string& argsOpt)
+	const DataArr& data, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
 
@@ -1098,7 +1098,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 }
 
 
-AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const core::Array<uint8_t>& data)
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& data)
 {
 	// we make use of the asset name and type, so the main logic is in that one.
 	AssetInfo info;
@@ -1111,7 +1111,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const core::A
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const core::string& name,
-	const core::Array<uint8_t>& data)
+	const DataArr& data)
 {
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Can't update asset with empty name");
@@ -1294,7 +1294,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 	return Result::OK;
 }
  
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const core::Array<uint8_t>& data)
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const DataArr& data)
 {
 	int32_t assetId;
 
@@ -1305,7 +1305,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 	return UpdateAssetThumb(assetId, dimensions, data);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const core::Array<uint8_t>& data)
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const DataArr& data)
 {
 	// so my little floating goat, we gonna store the thumbs with hash names.
 	// that way i don't need to rename the fuckers if i rename the asset.
@@ -1334,7 +1334,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 	core::StopWatch timer;
 
 	// compress the thumb with a quick pass.
-	core::Array<uint8_t> compressed(data.getArena());
+	DataArr compressed(data.getArena());
 	core::Compression::Compressor<core::Compression::LZ4> comp;
 
 	if (!comp.deflate(data.getArena(), data, compressed, core::Compression::CompressLevel::NORMAL))
@@ -1540,7 +1540,7 @@ bool AssetDB::GetModIdForAsset(int32_t assetId, ModId& modIdOut)
 	return true;
 }
 
-bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut)
+bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 {
 	using namespace core::Compression;
 
@@ -1568,7 +1568,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 
 	const size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
-	core::Array<uint8_t> compressedData(g_AssetDBArena);
+	DataArr compressedData(g_AssetDBArena);
 	compressedData.resize(size);
 
 	if (file.read(compressedData.ptr(), size) != size) {
@@ -1596,7 +1596,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 	return false;
 }
 
-bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, core::Array<uint8_t>& thumbDataOut)
+bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut)
 {
 	using namespace core::Compression;
 
@@ -1623,7 +1623,7 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, core::Array<uin
 
 	const size_t size = info.fileSize;
 
-	core::Array<uint8_t> compressedData(g_AssetDBArena);
+	DataArr compressedData(g_AssetDBArena);
 	compressedData.resize(size);
 
 	if (file.read(compressedData.ptr(), size) != size) {

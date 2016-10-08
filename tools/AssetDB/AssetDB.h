@@ -86,6 +86,7 @@ public:
 	typedef core::Array<Mod> ModsArr;
 	typedef core::Array<AssetInfo> AssetInfoArr;
 	typedef core::Array<int32_t> AssetIdArr;
+	typedef core::Array<uint8_t> DataArr;
 
 public:
 	AssetDB();
@@ -134,12 +135,12 @@ public:
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
 
-	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const core::Array<uint8_t>& data, const core::string& argsOpt);
-	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const core::Array<uint8_t>& data);
-	Result::Enum UpdateAssetRawFile(int32_t assetId, const core::Array<uint8_t>& data);
+	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const DataArr& data, const core::string& argsOpt);
+	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data);
+	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
-	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const core::Array<uint8_t>& data);
-	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const core::Array<uint8_t>& data);
+	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const DataArr& data);
+	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const DataArr& data);
 
 	// if you want to get a assets id use this.
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
@@ -147,8 +148,8 @@ public:
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
 	bool GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut);
 	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
-	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
-	bool GetThumbForAsset(int32_t assetId, ThumbInfo& info, core::Array<uint8_t>& thumbDataOut);
+	bool GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut);
+	bool GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut);
 	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut);
 	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
 
