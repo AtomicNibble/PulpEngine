@@ -11,6 +11,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace Util
 {
 
+	IMGLIB_EXPORT bool hasAlpha(Texturefmt::Enum fmt);
 	IMGLIB_EXPORT bool isDxt(Texturefmt::Enum fmt);
 	IMGLIB_EXPORT uint32_t maxMipsForSize(uint32_t Width, uint32_t Height);
 	IMGLIB_EXPORT uint32_t bitsPerPixel(Texturefmt::Enum fmt);

@@ -18,6 +18,37 @@ namespace Util
 		return mips;
 	}
 
+	bool hasAlpha(Texturefmt::Enum fmt)
+	{
+		switch (fmt)
+		{
+		case Texturefmt::BC3:
+		case Texturefmt::BC3_SRGB:
+		case Texturefmt::BC3_TYPELESS:
+		case Texturefmt::BC7:
+		case Texturefmt::BC7_TYPELESS:
+		case Texturefmt::BC7_SRGB:
+		case Texturefmt::R8G8B8A8:
+		case Texturefmt::R8G8B8A8_SRGB:
+		case Texturefmt::R8G8B8A8_SNORM:
+		case Texturefmt::R8G8B8A8_TYPELESS:
+		case Texturefmt::R8G8B8A8_SINT:
+		case Texturefmt::R8G8B8A8_UINT:
+		case Texturefmt::A8R8G8B8:
+		case Texturefmt::B8G8R8A8:
+		case Texturefmt::B8G8R8A8_SRGB:
+		case Texturefmt::B8G8R8A8_TYPELESS:
+		case Texturefmt::R10G10B10A2:
+		case Texturefmt::R16G16B16A16_FLOAT:
+			return true;
+
+		default: 
+			break;
+		}
+
+		return false;
+	}
+
 	bool isDxt(Texturefmt::Enum fmt)
 	{
 		switch (fmt)
