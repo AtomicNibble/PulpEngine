@@ -106,8 +106,6 @@ build_edtior:x64_super:
    expire_in: 1 week
    paths:
     - build/x64/Super/*.exe
-  dependencies:
-    - build:x64_super
   tags:
     - windows, qt
 
