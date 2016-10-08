@@ -305,9 +305,17 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 				flags.Set(CompileFlag::ALPHA);
 				break;
 			}
-		}		
-	}
+		}	
 
+		// we need alpha channel
+		if (!Util::hasAlpha(src.getFormat()))
+		{
+			if (!con.addAlphachannel(flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
+				X_WARNING("Img", "Failed to add alpha channel to src fmt: \"%s\"", Texturefmt::ToString(src.getFormat()));
+				return false;
+			}
+		}
+	}
 
 	// now what :(
 	// the main things that is going to be a pain is taking N formats and allow converting to N formats.
