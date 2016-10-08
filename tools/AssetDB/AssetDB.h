@@ -33,6 +33,9 @@ class DLL_EXPORT AssetDB
 public:
 	struct ThumbInfo
 	{
+		X_INLINE ThumbInfo();
+		X_INLINE ThumbInfo(int32_t id, int32_t fileSize, Vec2i dimension, core::Hash::MD5Digest& hash);
+
 		int32_t id;
 		int32_t fileSize;
 		Vec2i dimension;

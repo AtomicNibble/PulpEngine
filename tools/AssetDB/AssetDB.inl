@@ -1,6 +1,21 @@
 
 X_NAMESPACE_BEGIN(assetDb)
 
+X_INLINE AssetDB::ThumbInfo::ThumbInfo() :
+	id(INVALID_THUMB_ID),
+	fileSize(0)
+{
+
+}
+
+X_INLINE AssetDB::ThumbInfo::ThumbInfo(int32_t id_, int32_t fileSize_, Vec2i dimension_, core::Hash::MD5Digest& hash_) :
+	id(id_),
+	fileSize(fileSize_),
+	dimension(dimension_),
+	hash(hash_)
+{
+
+}
 
 // -----------------------------------------------------
 
