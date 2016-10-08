@@ -135,10 +135,10 @@ namespace Converter
 		{
 			free();
 
-			width_ = width;
-			height_ = height;
-			depth_ = depth;
-			componentCount_ = channels;
+			width_ = safe_static_cast<uint16_t, uint32_t>(width);
+			height_ = safe_static_cast<uint16_t, uint32_t>(height);
+			depth_ = safe_static_cast<uint16_t, uint32_t>(depth);
+			componentCount_ = safe_static_cast<uint16_t, uint32_t>(channels);
 			pixelCount_ = width * height * depth;
 			data_.resize(getAllocationSize(channels, width, height, depth));
 		}
