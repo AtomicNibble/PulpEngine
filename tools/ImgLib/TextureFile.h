@@ -56,6 +56,8 @@ public:
 	X_INLINE void setDepth(const int32_t depth);
 	X_INLINE void setNumMips(const int32_t num);
 
+	X_INLINE void swap(XTextureFile& oth);
+
 	X_NO_COPY(XTextureFile);
 	X_NO_ASSIGN(XTextureFile);
 

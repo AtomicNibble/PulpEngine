@@ -285,6 +285,21 @@ X_INLINE void XTextureFile::setNumMips(const int32_t numMips)
 	numMips_ = safe_static_cast<uint8_t, int32_t>(numMips);
 }
 
+X_INLINE void XTextureFile::swap(XTextureFile& oth)
+{
+	core::Swap(mipOffsets_, oth.mipOffsets_);
+	core::Swap(faceOffsets_, oth.faceOffsets_);
+	core::Swap(size_, oth.size_);
+	core::Swap(flags_, oth.flags_);
+	core::Swap(type_, oth.type_);
+	core::Swap(format_, oth.format_);
+	core::Swap(numMips_, oth.numMips_);
+	core::Swap(depth_, oth.depth_);
+	core::Swap(numFaces_, oth.numFaces_);
+	core::Swap(sizeValid_, oth.sizeValid_);
+
+	data_.swap(oth.data_);
+}
 
 
 X_NAMESPACE_END
