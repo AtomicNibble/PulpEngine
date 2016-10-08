@@ -92,6 +92,7 @@ public:
 	AssetDB();
 	~AssetDB();
 
+	// Startup / shutdown api
 	bool OpenDB(void);
 	void CloseDB(void);
 	bool CreateTables(void);
@@ -99,42 +100,49 @@ public:
 	bool AddDefaultMods(void);
 	bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
-	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);
-	// must exsists.
-	bool SetMod(const core::string& name);
+	// Mod api
+	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);	
+	bool SetMod(const core::string& name); // must exsists.
 	bool SetMod(ModId id);
 	bool ModExsists(const core::string& name, ModId* pModId = nullptr);
 	bool SetModPath(const core::string& name, const core::Path<char>& outDir);
 	bool SetModPath(ModId modId, const core::Path<char>& outDir);
 	ModId GetModId(const core::string& name);
 	ModId GetcurrentModId(void) const;
-
 	bool GetModInfo(ModId id, Mod& modOut);
 
+	// mod specific counts
 	bool GetAssetTypeCounts(ModId modId, AssetTypeCountsArr& countsOut);
 	bool GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& countOut);
 	bool GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut);
 
-public:
+	// global counts
+	bool GetNumAssets(int32_t* pNumOut);
+	bool GetNumAssets(AssetType::Enum type, int32_t* pNumOut);
+
+	// global listing (to engine log)
+	bool ListAssets(void);
+	bool ListAssets(AssetType::Enum type);
+
+	// get list of mods
 	bool GetModsList(ModsArr& arrOut);
+
+	// asset iteration
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
 	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 	bool IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 	bool IterateAssets(AssetType::Enum type, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 
-	bool ListAssets(void);
-	bool ListAssets(AssetType::Enum type);
-	bool GetNumAssets(int32_t* pNumOut);
-	bool GetNumAssets(AssetType::Enum type, int32_t* pNumOut);
-
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
 	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+
+	// none batched Add/delete/rename api
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
-	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
-		const core::string& newName);
+	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name, const core::string& newName);
 
+	// Updating api
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const DataArr& data, const core::string& argsOpt);
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data);
 	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data);
@@ -145,12 +153,13 @@ public:
 	// if you want to get a assets id use this.
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
 
+	// Misc data / info retrival
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
 	bool GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut);
 	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
 	bool GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut);
 	bool GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut);
-	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut);
+	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
 	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
 
 	// some assetRef stuff.
