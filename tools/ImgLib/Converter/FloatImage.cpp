@@ -43,6 +43,11 @@ namespace Converter
 	
 	
 	FloatImage::FloatImage(core::MemoryArenaBase* arena) :
+		componentCount_(0),
+		width_(0),
+		height_(0),
+		depth_(0),
+		pixelCount_(0),
 		data_(arena)
 	{
 
