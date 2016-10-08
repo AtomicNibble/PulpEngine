@@ -108,10 +108,6 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 	createDockWindows();
 
-	if (!pAssetDbexplorer_->loadSession()) {
-
-	}
-
 
 	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
 		this, SLOT(updateFocusWidget(QWidget*, QWidget*)));
