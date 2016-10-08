@@ -531,6 +531,8 @@ namespace Converter
 	{
 		ITextureFmt* pFmt = nullptr;
 
+		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img fmts? this code needs updating.");
+
 		switch (inputFileFmt)
 		{
 		case ImgFileFormat::DDS:
@@ -550,6 +552,10 @@ namespace Converter
 			break;
 		case ImgFileFormat::PNG:
 			pFmt = core::Mem::Construct<PNG::XTexLoaderPNG>(pAllocator->allocate(sizeof(PNG::XTexLoaderPNG), X_ALIGN_OF(PNG::XTexLoaderPNG), 0));
+			break;
+
+		default:
+			X_ASSERT_UNREACHABLE();
 			break;
 		}
 
