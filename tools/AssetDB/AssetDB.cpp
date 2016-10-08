@@ -1467,11 +1467,13 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 
 		// insert.
 		{
-			sql::SqlLiteCmd cmd(db_, "INSERT INTO thumbs (width, height, size, hash) VALUES(?,?,?,?)");
+			sql::SqlLiteCmd cmd(db_, "INSERT INTO thumbs (width, height, srcWidth, srcHeight, size, hash) VALUES(?,?,?,?,?,?)");
 			cmd.bind(1, thumbDim.x);
 			cmd.bind(2, thumbDim.y);
-			cmd.bind(3, safe_static_cast<int32_t, size_t>(compressed.size()));
-			cmd.bind(4, &hash, sizeof(hash));
+			cmd.bind(3, srcDim.x);
+			cmd.bind(4, srcDim.y);
+			cmd.bind(5, safe_static_cast<int32_t, size_t>(compressed.size()));
+			cmd.bind(6, &hash, sizeof(hash));
 
 			sql::Result::Enum res = cmd.execute();
 			if (res != sql::Result::OK) {
@@ -1496,12 +1498,15 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 	else
 	{
 		// just update.
-		sql::SqlLiteCmd cmd(db_, "UPDATE thumbs SET width = ?, height = ?, size = ?, hash = ?, lastUpdateTime = DateTime('now') WHERE thumb_id = ?");
+		sql::SqlLiteCmd cmd(db_, "UPDATE thumbs SET width = ?, height = ?, srcWidth = ?, srcHeight = ?, size = ?, hash = ?, "
+			"lastUpdateTime = DateTime('now') WHERE thumb_id = ?");
 		cmd.bind(1, thumbDim.x);
 		cmd.bind(2, thumbDim.y);
-		cmd.bind(3, safe_static_cast<int32_t, size_t>(compressed.size()));
-		cmd.bind(4, &hash, sizeof(hash));
-		cmd.bind(5, thumbId);
+		cmd.bind(3, srcDim.x);
+		cmd.bind(4, srcDim.y);
+		cmd.bind(5, safe_static_cast<int32_t, size_t>(compressed.size()));
+		cmd.bind(6, &hash, sizeof(hash));
+		cmd.bind(7, thumbId);
 
 		sql::Result::Enum res = cmd.execute();
 		if (res != sql::Result::OK) {
