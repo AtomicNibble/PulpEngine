@@ -2023,10 +2023,10 @@ bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pT
 
 	dataOut.srcDim = Vec2i::zero();
 	if (row.columnType(3) == sql::ColumType::INTEGER) {
-		dataOut.thumbDim.x = row.get<int32_t>(3);
+		dataOut.srcDim.x = row.get<int32_t>(3);
 	}
 	if (row.columnType(4) == sql::ColumType::INTEGER) {
-		dataOut.thumbDim.y = row.get<int32_t>(4);
+		dataOut.srcDim.y = row.get<int32_t>(4);
 	}
 
 	dataOut.fileSize = row.get<int32_t>(5);
