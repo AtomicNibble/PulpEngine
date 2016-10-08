@@ -127,10 +127,6 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 	pStatusBar_->showMessage("Ready");
 
-	EditorManager::openEditor("test", Constants::ASSETPROP_EDITOR_ID);
-	EditorManager::openEditor("test1", Constants::ASSETPROP_EDITOR_ID);
-	EditorManager::openEditor("test2", Constants::ASSETPROP_EDITOR_ID);
-
 
 	readSettings();
 
