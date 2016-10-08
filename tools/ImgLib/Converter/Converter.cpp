@@ -440,7 +440,7 @@ namespace Converter
 		return true;
 	}
 
-	bool ImgConveter::Convert(Texturefmt::Enum targetFmt)
+	bool ImgConveter::Convert(Texturefmt::Enum targetFmt, bool keepAlpha)
 	{
 		if (targetFmt == srcImg_.getFormat()) {
 			X_LOG1("Img", "Skipping texture conversion, src format matches target fmt of: %s",
@@ -497,9 +497,18 @@ namespace Converter
 		// we will need some sort of profile selection.
 		// i guess that should be a arg, as to the quality level.
 		ispc::bc7_enc_settings settingsbc7;
-		ispc::GetProfile_veryfast(&settingsbc7);
 		ispc::bc6h_enc_settings settingsbc6;
-		ispc::GetProfile_bc6h_veryfast(&settingsbc6);
+
+		if (keepAlpha) {
+			// this does not result in smaller BC7, just makes it a little quicker to make BC7 as alpha channel is ignore during processing.
+			ispc::GetProfile_alpha_veryfast(&settingsbc7);
+			// no alpha specific.
+			ispc::GetProfile_bc6h_veryfast(&settingsbc6);
+		}
+		else {
+			ispc::GetProfile_veryfast(&settingsbc7);
+			ispc::GetProfile_bc6h_veryfast(&settingsbc6);
+		}
 
 		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{
