@@ -357,7 +357,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 		X_LOG1("Img", "Mipmap creation took: ^6%gms", timer.GetMilliSeconds());
 	}
 
-	if (!con.Convert(dstImgFmt)) {
+	if (!con.Convert(dstImgFmt, flags.IsSet(CompileFlag::ALPHA))) {
 		X_ERROR("Img", "Failed to convert image");
 		return false;
 	}
