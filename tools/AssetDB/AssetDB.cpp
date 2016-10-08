@@ -2085,7 +2085,7 @@ bool AssetDB::ValidName(const core::string& name)
 	for (size_t i = 0; i < name.length(); i++)
 	{
 		// are you valid!?
-		char ch = name[i];
+		const char ch = name[i];
 
 		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_' || ch == ASSET_NAME_SLASH;
 		if (!valid) {
