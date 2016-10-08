@@ -561,7 +561,7 @@ bool AssetDB::GetModsList(ModsArr& arrOut)
 	return true;
 }
 
-bool AssetDB::IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func)
+bool AssetDB::IterateMods(ModDelegate func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir FROM mods");
 
@@ -582,7 +582,7 @@ bool AssetDB::IterateMods(core::Delegate<bool(ModId id, const core::string& name
 }
 
 
-bool AssetDB::IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
+bool AssetDB::IterateAssets(AssetDelegate func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT name, type, lastUpdateTime FROM file_ids");
 
@@ -600,7 +600,7 @@ bool AssetDB::IterateAssets(core::Delegate<bool(AssetType::Enum, const core::str
 	return true;
 }
 
-bool AssetDB::IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
+bool AssetDB::IterateAssets(ModId modId, AssetDelegate func)
 {
 	if (modId == INVALID_MOD_ID) {
 		return false;
@@ -623,7 +623,7 @@ bool AssetDB::IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, co
 	return true;
 }
 
-bool AssetDB::IterateAssets(AssetType::Enum type, core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
+bool AssetDB::IterateAssets(AssetType::Enum type, AssetDelegate func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT name, lastUpdateTime FROM file_ids WHERE type = ?");
 	qry.bind(1, type);

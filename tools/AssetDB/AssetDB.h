@@ -88,6 +88,10 @@ public:
 	typedef core::Array<int32_t> AssetIdArr;
 	typedef core::Array<uint8_t> DataArr;
 
+	// callbacks.
+	typedef core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> ModDelegate;
+	typedef core::Delegate<bool(AssetType::Enum, const core::string& name)> AssetDelegate;
+
 public:
 	AssetDB();
 	~AssetDB();
@@ -128,10 +132,10 @@ public:
 	bool GetModsList(ModsArr& arrOut);
 
 	// asset iteration
-	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
-	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
-	bool IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
-	bool IterateAssets(AssetType::Enum type, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
+	bool IterateMods(ModDelegate func);
+	bool IterateAssets(AssetDelegate func);
+	bool IterateAssets(ModId modId, AssetDelegate func);
+	bool IterateAssets(AssetType::Enum type, AssetDelegate func);
 
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
 	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
