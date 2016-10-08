@@ -93,6 +93,21 @@ build:x64_super:
     - windows
 
 
+editor:x64_super:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Super;Platform=x64
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/x64/Super/*.exe
+  dependencies:
+    - build:x64_super
+  tags:
+    - windows, qt
+
 
 
 test:win32_debug:
