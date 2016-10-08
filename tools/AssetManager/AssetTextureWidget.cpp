@@ -31,16 +31,13 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, IAssetEntry* pAssEntry, 
 	pVertLayout->setContentsMargins(0, 0, 0, 0);
 	{
 		pEditPathPad_ = new QLabel();
-	//	pEditPathPad_->setVisible(false);
 
-		pEditPath_ = new QLineEdit(this);
-	//	pEditPath_->setAcceptDrops(true); 
+		pEditPath_ = new QLineEdit();
 		pEditPath_->installEventFilter(this);
 
 		connect(pEditPath_, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
 
 		pEditDimensions_ = new QLabel();
-	//	pEditDimensions_->setVisible(false);
 
 		pVertLayout->addWidget(pEditPathPad_);
 		pVertLayout->addWidget(pEditPath_);
