@@ -81,7 +81,6 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
 	const uint32_t faceSize1 = Util::dataSize(size_.x, size_.y, 1, format_);
 	const uint32_t requiredBytes = faceSize * numFaces_;
 
-
 	core::Array<uint8_t> newBuf(data_.getArena());
 	newBuf.resize(requiredBytes);
 
@@ -89,7 +88,23 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
 	std::memcpy(newBuf.data(), data_.data(), getLevelSize(0));
 
 	data_.swap(newBuf);
+
+	// fill in the mip counts.
 	numMips_ = mipCnt;
+	{
+		uint32_t width = core::Max<uint32_t>(1u, size_.x);
+		uint32_t height = core::Max<uint32_t>(1u, size_.y);
+
+		for (uint32_t i = 1; i < numMips_; i++)
+		{
+			mipOffsets_[i] = (mipOffsets_[i - 1] + Util::dataSize(width, height, depth_, format_));
+			width >>= 1;
+			height >>= 1;
+
+			X_ASSERT(width > 0, "zero width")(width);
+			X_ASSERT(height > 0, "zero height")(height);
+		}
+	}
 }
 
 
