@@ -92,6 +92,25 @@ X_INLINE void SafeReleaseDX(T*& pVal)
 	}
 }
 
+template<class _FwdIt1, class _FwdIt2>
+X_INLINE void iter_swap(_FwdIt1 _Left, _FwdIt2 _Right)
+{	
+	Swap(*_Left, *_Right);
+}
+
+template<class T, size_t Size>
+X_INLINE void Swap(T(&_Left)[Size], T(&_Right)[Size])
+{
+	if (&_Left != &_Right)
+	{	
+		T* _First1 = _Left;
+		T* _Last1 = _First1 + Size;
+		T* _First2 = _Right;
+		for (; _First1 != _Last1; ++_First1, ++_First2) {
+			iter_swap(_First1, _First2);
+		}
+	}
+}
 
 template<class T>
 X_INLINE void Swap(T& left, T& right)
