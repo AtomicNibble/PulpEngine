@@ -253,7 +253,10 @@ namespace Converter
 			FloatImage halfImg(swapArena_);
 
 			// create from first mip and level
-			fltImg.initFrom(srcImg_, 0, 0);
+			if (!fltImg.initFrom(srcImg_, 0, 0)) {
+				X_ERROR("Img", "Error loading src for mip generation");
+				return false;
+			}
 
 			for(uint32_t mip = 1; mip < requiredMips; mip++)
 			{
