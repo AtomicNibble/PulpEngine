@@ -394,6 +394,7 @@ namespace Converter
 				const float* pBlueChannel = halfImg.channel(2);
 				const float* pAlphaChannel = halfImg.channel(3);
 
+				// we copy the data back to src img.
 				{
 					const size_t dstSize = srcImg_.getLevelSize(mip);
 					uint8_t* pMipDst = srcImg_.getLevel(0, mip);
@@ -415,7 +416,7 @@ namespace Converter
 							pPixel[3] = XHalfCompressor::compress(math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
 						}
 					}
-					else
+					else if(srcImg_.getFormat() == Texturefmt::R8G8B8A8)
 					{
 						const size_t expectedSize = (numPixels * 4);
 						X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
@@ -428,6 +429,37 @@ namespace Converter
 							pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
 							pPixel[3] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
 						}
+					}
+					else if (srcImg_.getFormat() == Texturefmt::R8G8B8)
+					{
+						const size_t expectedSize = (numPixels * 3);
+						X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
+
+						for (uint32_t i = 0; i < numPixels; i++)
+						{
+							uint8_t* pPixel = &pMipDst[i * 3];
+							pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+							pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+							pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+						}
+					}
+					else if (srcImg_.getFormat() == Texturefmt::B8G8R8)
+					{
+						const size_t expectedSize = (numPixels * 3);
+						X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
+
+						for (uint32_t i = 0; i < numPixels; i++)
+						{
+							uint8_t* pPixel = &pMipDst[i * 3];
+							pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+							pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+							pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+						}
+					}
+					else
+					{
+						X_ASSERT_NOT_IMPLEMENTED();
+						return false;
 					}
 				}
 
