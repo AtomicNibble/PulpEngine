@@ -263,8 +263,15 @@ bool AssetExplorer::loadMods(void)
 	return true;
 }
 
+bool AssetExplorer::delayedInit(void)
+{
 
-bool AssetExplorer::loadSession(void)
+	QTimer::singleShot(10, this, &AssetExplorer::restoreSession);
+	return true;
+}
+
+
+bool AssetExplorer::restoreSession(void)
 {
 	return SessionManager::loadSession();
 }

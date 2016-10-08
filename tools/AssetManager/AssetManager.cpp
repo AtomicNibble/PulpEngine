@@ -139,6 +139,10 @@ AssetManager::AssetManager(QWidget* pParent) :
 	readSettings();
 
 	QTimer::singleShot(0, this, &AssetManager::restoreWindowState);
+
+	if (!pAssetDbexplorer_->delayedInit()) {
+
+	}
 }
 
 AssetManager::~AssetManager()
