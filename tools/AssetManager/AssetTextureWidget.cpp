@@ -56,11 +56,9 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, IAssetEntry* pAssEntry, 
 	pLayout->addLayout(pVertLayout);
 	pLayout->addWidget(pBrowse);
 
-	showPreviewWidgets(false);
+	setLayout(pLayout);
 
 	setValue(value);
-
-	setLayout(pLayout);
 }
 
 AssetTextureWidget::~AssetTextureWidget()
