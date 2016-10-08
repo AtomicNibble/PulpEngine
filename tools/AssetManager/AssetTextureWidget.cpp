@@ -335,18 +335,21 @@ void AssetTextureWidget::setValue(const std::string& value)
 	// technically you can't revert a rawfile update.
 	// as it's saved.
 	// for now just get preview.
-	core::Array<uint8_t> thumbData(g_arena);
-	Vec2i dim;
-
-	if (pAssEntry_->getThumb(thumbData, dim))
+	if (!value.empty())
 	{
-		QPixmap pix;
+		core::Array<uint8_t> thumbData(g_arena);
+		Vec2i dim;
 
-		pix.loadFromData(thumbData.data(), static_cast<int32_t>(thumbData.size()));
+		if (pAssEntry_->getThumb(thumbData, dim))
+		{
+			QPixmap pix;
 
-		pPreview_->setPixmap(pix);
-		pEditDimensions_->setText(QString("%1x%2").arg(QString::number(dim.x), QString::number(dim.y)));
-		showPreviewWidgets(true);
+			pix.loadFromData(thumbData.data(), static_cast<int32_t>(thumbData.size()));
+
+			pPreview_->setPixmap(pix);
+			pEditDimensions_->setText(QString("%1x%2").arg(QString::number(dim.x), QString::number(dim.y)));
+			showPreviewWidgets(true);
+		}
 	}
 
 	curPath_ = QDir::toNativeSeparators(QString::fromStdString(value));
