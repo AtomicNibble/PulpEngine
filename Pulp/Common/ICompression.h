@@ -5,6 +5,8 @@
 #define _X_COMPRESSION_I_H_
 
 
+#include <Containers\Array.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Compression
