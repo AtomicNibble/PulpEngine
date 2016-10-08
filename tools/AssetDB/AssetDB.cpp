@@ -1601,7 +1601,8 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, core::Array<uin
 	using namespace core::Compression;
 
 	if (!GetThumbInfoForId(assetId, info)) {
-		X_ERROR("AssetDB", "Failed to get thumb info for data reterival");
+	// just treat it as no thumb.
+	//	X_ERROR("AssetDB", "Failed to get thumb info for data reterival");
 		return false;
 	}
 
