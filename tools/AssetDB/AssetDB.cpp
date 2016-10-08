@@ -151,6 +151,8 @@ bool AssetDB::CreateTables(void)
 		"thumb_id INTEGER PRIMARY KEY,"
 		"width INTEGER NOT NULL,"
 		"height INTEGER NOT NULL,"
+		"srcWidth INTEGER,"
+		"srcheight INTEGER,"
 		"size INTEGER NOT NULL,"
 		// do i want to store thumbs with name of hash or asset name? I guess benfit of hash i don't have to know asset name, 
 		// and care if asset is renamed.
@@ -1354,7 +1356,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 	return Result::OK;
 }
  
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const DataArr& data)
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& data)
 {
 	int32_t assetId;
 
@@ -1362,10 +1364,10 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 		return Result::NOT_FOUND;
 	}
 
-	return UpdateAssetThumb(assetId, dimensions, data);
+	return UpdateAssetThumb(assetId, thumbDim, srcDim, data);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const DataArr& data)
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data)
 {
 	// so my little floating goat, we gonna store the thumbs with hash names.
 	// that way i don't need to rename the fuckers if i rename the asset.
@@ -1466,8 +1468,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 		// insert.
 		{
 			sql::SqlLiteCmd cmd(db_, "INSERT INTO thumbs (width, height, size, hash) VALUES(?,?,?,?)");
-			cmd.bind(1, dimensions.x);
-			cmd.bind(2, dimensions.y);
+			cmd.bind(1, thumbDim.x);
+			cmd.bind(2, thumbDim.y);
 			cmd.bind(3, safe_static_cast<int32_t, size_t>(compressed.size()));
 			cmd.bind(4, &hash, sizeof(hash));
 
@@ -1495,8 +1497,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i dimension
 	{
 		// just update.
 		sql::SqlLiteCmd cmd(db_, "UPDATE thumbs SET width = ?, height = ?, size = ?, hash = ?, lastUpdateTime = DateTime('now') WHERE thumb_id = ?");
-		cmd.bind(1, dimensions.x);
-		cmd.bind(2, dimensions.y);
+		cmd.bind(1, thumbDim.x);
+		cmd.bind(2, thumbDim.y);
 		cmd.bind(3, safe_static_cast<int32_t, size_t>(compressed.size()));
 		cmd.bind(4, &hash, sizeof(hash));
 		cmd.bind(5, thumbId);
@@ -1997,7 +1999,8 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFi
 
 bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId)
 {
-	sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, thumbs.size, thumbs.hash FROM thumbs "
+	sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, "
+	" thumbs.srcWidth, thumbs.srcHeight, thumbs.size, thumbs.hash FROM thumbs "
 	"INNER JOIN file_ids on thumbs.thumb_id = file_ids.thumb_id WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
 
@@ -2007,18 +2010,28 @@ bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pT
 		return false;
 	}
 
+	const auto& row = (*it);
 
-	dataOut.id = (*it).get<int32_t>(0);
-	dataOut.dimension.x = (*it).get<int32_t>(1);
-	dataOut.dimension.y = (*it).get<int32_t>(2);
-	dataOut.fileSize = (*it).get<int32_t>(3);
+	dataOut.id = row.get<int32_t>(0);
+	dataOut.thumbDim.x = row.get<int32_t>(1);
+	dataOut.thumbDim.y = row.get<int32_t>(2);
+
+	dataOut.srcDim = Vec2i::zero();
+	if (row.columnType(3) == sql::ColumType::INTEGER) {
+		dataOut.thumbDim.x = row.get<int32_t>(3);
+	}
+	if (row.columnType(4) == sql::ColumType::INTEGER) {
+		dataOut.thumbDim.y = row.get<int32_t>(4);
+	}
+
+	dataOut.fileSize = row.get<int32_t>(5);
 
 	if (pThumbId) {
 		*pThumbId = dataOut.id;
 	}
 
-	const void* pHash = (*it).get<void const*>(4);
-	const size_t hashBlobSize = (*it).columnBytes(4);
+	const void* pHash = row.get<void const*>(6);
+	const size_t hashBlobSize = row.columnBytes(6);
 	// u fucking pineapple.
 	if (hashBlobSize != sizeof(dataOut.hash.bytes)) {
 		X_ERROR("AssetDB", "THumb hash blob incorrect size: %" PRIuS, hashBlobSize);

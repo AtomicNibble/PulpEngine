@@ -39,11 +39,12 @@ public:
 	struct ThumbInfo
 	{
 		X_INLINE ThumbInfo();
-		X_INLINE ThumbInfo(int32_t id, int32_t fileSize, Vec2i dimension, core::Hash::MD5Digest& hash);
+		X_INLINE ThumbInfo(int32_t id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, core::Hash::MD5Digest& hash);
 
 		int32_t id;
 		int32_t fileSize;
-		Vec2i dimension;
+		Vec2i thumbDim;	// thumb dim
+		Vec2i srcDim;		// dim of src, might be zero
 		core::Hash::MD5Digest hash;
 	};
 
@@ -163,8 +164,8 @@ public:
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data);
 	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
-	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i dimensions, const DataArr& data);
-	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i dimensions, const DataArr& data);
+	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& data);
+	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data);
 
 	// if you want to get a assets id use this.
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
