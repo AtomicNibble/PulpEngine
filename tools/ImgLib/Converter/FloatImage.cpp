@@ -53,14 +53,15 @@ namespace Converter
 
 	}
 
-	void FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip)
+	bool FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip)
 	{
 		// init from rgb8 for now.
 		if (img.getFormat() != Texturefmt::R8G8B8A8 && 
 			img.getFormat() != Texturefmt::B8G8R8A8 &&
 			img.getFormat() != Texturefmt::R8G8B8 &&
 			img.getFormat() != Texturefmt::B8G8R8) {
-			return;
+			X_ERROR("FloatImg", "Contruction from fromat \"%s\" not currently supported", Texturefmt::ToString(img.getFormat()));
+			return false;
 		}
 
 		// need to get width of the mip.
@@ -120,6 +121,7 @@ namespace Converter
 			}
 		}
 
+		return true;
 	}
 
 	void FloatImage::allocate(uint32_t channels, uint32_t width, uint32_t height, uint32_t depth)
