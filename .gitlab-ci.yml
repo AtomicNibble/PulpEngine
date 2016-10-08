@@ -98,6 +98,8 @@ build_edtior:x64_super:
   stage: build_edtior
   script:
     - echo building...
+    - 'set QTDIR=D:\QT\Qt5.5.0_64_VS2015\qtbase'
+    - 'set PATH=%QTDIR%\bin;%PATH%'
     - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Super;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
