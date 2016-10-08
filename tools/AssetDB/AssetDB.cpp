@@ -19,6 +19,8 @@
 
 #include <Time\StopWatch.h>
 
+#include <Memory/AllocationPolicies/LinearAllocator.h>
+
 X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
@@ -67,6 +69,16 @@ const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 const char* AssetDB::THUMBS_FOLDER = "thumbs";
+
+const size_t AssetDB::MAX_COMPRESSOR_SIZE = core::Max<size_t>(
+	core::Max(
+		core::Max(
+			core::Max(
+				sizeof(core::Compression::Compressor<core::Compression::LZ4>),
+				sizeof(core::Compression::Compressor<core::Compression::LZ4HC>)),
+			sizeof(core::Compression::Compressor<core::Compression::LZMA>)),
+		sizeof(core::Compression::Compressor<core::Compression::Zlib>)),
+	16) + 256;
 
 
 AssetDB::AssetDB() :
@@ -1098,6 +1110,54 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 }
 
 
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& data, core::Compression::Algo::Enum algo,
+	core::Compression::CompressLevel::Enum lvl)
+{
+	AssetInfo info;
+
+	if (GetAssetInfoForAsset(assetId, info)) {
+		return Result::ERROR;
+	}
+
+	return UpdateAssetRawFile(info.type, info.name, data, algo, lvl);
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data,
+	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
+{
+	// compress it.
+	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
+	core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+	auto* pCompressor = AllocCompressor(&allocator, algo);
+
+	core::StopWatch timer;
+
+	DataArr compressed(data.getArena());
+	if (!pCompressor->deflate(data.getArena(), data, compressed, lvl))
+	{
+		X_ERROR("AssetDB", "Failed to defalte raw file data");
+		return Result::ERROR;
+	}
+	else
+	{
+		const auto elapsed = timer.GetMilliSeconds();
+		const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
+
+		core::HumanSize::Str sizeStr, sizeStr2;
+		X_LOG2("AssetDB", "Defalated raw file %s -> %s(%.2g%%) %gms",
+			core::HumanSize::toString(sizeStr, data.size()),
+			core::HumanSize::toString(sizeStr2, compressed.size()),
+			percentageSize,
+			elapsed);
+	}
+
+	core::Mem::Destruct(pCompressor);
+
+	return UpdateAssetRawFile(type, name, compressed);
+}
+
+
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& data)
 {
 	// we make use of the asset name and type, so the main logic is in that one.
@@ -2103,5 +2163,35 @@ bool AssetDB::ValidName(const core::string& name)
 
 	return true;
 }
+
+core::Compression::ICompressor* AssetDB::AllocCompressor(core::LinearAllocator* pAllocator, core::Compression::Algo::Enum algo)
+{
+	core::Compression::ICompressor* pCom = nullptr;
+
+	static_assert(core::Compression::Algo::ENUM_COUNT == 4, "Added additional compression algos? this code needs updating.");
+
+	switch (algo)
+	{
+	case core::Compression::Algo::LZ4:
+		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
+		break;
+	case core::Compression::Algo::LZ4HC:
+		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
+		break;
+	case core::Compression::Algo::LZMA:
+		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
+		break;
+	case core::Compression::Algo::ZLIB:
+		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
+		break;
+
+	default:
+		X_ASSERT_UNREACHABLE();
+		break;
+	}
+
+	return pCom;
+}
+
 
 X_NAMESPACE_END

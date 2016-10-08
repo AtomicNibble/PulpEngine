@@ -6,10 +6,13 @@
 #include <Hashing\MD5.h>
 
 #include <IAssetDb.h>
+#include <ICompression.h>
 
 X_NAMESPACE_DECLARE(core,
 	template<typename T>
 	class Array;
+
+	class LinearAllocator;
 );
 
 X_NAMESPACE_BEGIN(assetDb)
@@ -21,6 +24,8 @@ class DLL_EXPORT AssetDB
 	static const char* DB_NAME;
 	static const char* RAW_FILES_FOLDER;
 	static const char* THUMBS_FOLDER;
+
+	static const size_t MAX_COMPRESSOR_SIZE;
 
 	struct RawFile
 	{
@@ -151,6 +156,10 @@ public:
 
 	// Updating api
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const DataArr& data, const core::string& argsOpt);
+	// will do the compression for you, saves losts of places duplicating same compressino logic in code base if they don't already have the 
+	// data in a compressed form.
+	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
+	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data);
 	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
@@ -194,6 +203,8 @@ private:
 	static void AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut);
 	static void ThumbPathForThumb(const ThumbInfo& info, core::Path<char>& pathOut);
 	static bool ValidName(const core::string& name);
+
+	static core::Compression::ICompressor* AllocCompressor(core::LinearAllocator* pAllocator, core::Compression::Algo::Enum algo);
 
 private:
 	sql::SqlLiteDb db_;
