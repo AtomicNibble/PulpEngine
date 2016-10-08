@@ -25,8 +25,8 @@ X_INLINE AssetDB::Mod::Mod(int32_t modId, const char* pName, const char* pOutDir
 
 
 X_INLINE AssetDB::AssetInfo::AssetInfo() :
-	id(-1),
-	parentId(-1)
+	id(INVALID_ASSET_ID),
+	parentId(INVALID_ASSET_ID)
 {
 
 }
