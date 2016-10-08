@@ -70,7 +70,7 @@ const char* AssetDB::THUMBS_FOLDER = "thumbs";
 
 
 AssetDB::AssetDB() :
-	modId_(-1),
+	modId_(INVALID_MOD_ID),
 	open_(false)
 {
 
@@ -1828,7 +1828,7 @@ bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
 
 		}
 		else {
-			*pParentId = -1;
+			*pParentId = INVALID_ASSET_ID;
 		}
 	}
 
