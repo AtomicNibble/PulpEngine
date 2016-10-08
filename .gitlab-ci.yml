@@ -8,6 +8,7 @@ before_script:
 
 stages:
  - build
+ - build_edtior
  - test
 
 
@@ -93,8 +94,8 @@ build:x64_super:
     - windows
 
 
-editor:x64_super:
-  stage: build
+build_edtior:x64_super:
+  stage: build_edtior
   script:
     - echo building...
     - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Super;Platform=x64
