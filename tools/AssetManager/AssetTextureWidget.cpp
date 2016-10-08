@@ -443,10 +443,13 @@ void AssetTextureWidget::showTextureDialog(void)
 
 	// make sure it fits on the fucking screen twat!
 	const auto rect = QApplication::desktop()->screenGeometry();
-	if (pix.width() > rect.width() || pix.height() > rect.height())
+	if (pix.width() > (rect.width() - 96) || pix.height() > (rect.height() - 96))
 	{
 		// pleb.. where you're 16k monitor at?
-		pix = pix.scaled(rect.width() - 128, rect.height() - 192, Qt::KeepAspectRatio);
+		const auto scaledWidth = core::Max(64, rect.width() - 128);
+		const auto scaledHeight = core::Max(64, rect.height() - 192);
+
+		pix = pix.scaled(scaledWidth, scaledHeight, Qt::KeepAspectRatio);
 	}
 
 	QFileInfo fi(path());
