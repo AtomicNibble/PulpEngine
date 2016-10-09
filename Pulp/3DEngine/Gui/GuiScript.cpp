@@ -165,7 +165,7 @@ bool XGuiScript::Parse(core::XParser& lex)
 	}
 
 	if (handler == nullptr) {
-		X_ERROR("Gui", "unkown function '%s'", name.c_str());
+		X_ERROR("Gui", "unknown function '%s'", name.c_str());
 		return false;
 	}
 

@@ -67,7 +67,7 @@ bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args,
 			type = AnimType::DELTA;
 		}
 		else {
-			X_ERROR("AnimLib", "Unkown anim type: \"%s\"", pType);
+			X_ERROR("AnimLib", "Unknown anim type: \"%s\"", pType);
 			return false;
 		}
 	}

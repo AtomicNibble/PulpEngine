@@ -44,7 +44,7 @@ namespace
 				break;
 		}
 		X_ASSERT_UNREACHABLE();
-		return "<unkown>";
+		return "<unknown>";
 	}
 }
 

@@ -451,7 +451,7 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		}
 		else {
 			core::StackString512 msg;
-			msg.appendFmt("unkown action: '%s' valid action's: add, remove, rename", actionStr.asChar());
+			msg.appendFmt("unknown action: '%s' valid action's: add, remove, rename", actionStr.asChar());
 			setResult(msg.c_str());
 			return MS::kSuccess;
 		}
@@ -484,7 +484,7 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		}
 		else {
 			core::StackString512 msg;
-			msg.appendFmt("unkown type: '%s' valid type's: model, anim, material", typeStr.asChar());
+			msg.appendFmt("unknown type: '%s' valid type's: model, anim, material", typeStr.asChar());
 			setResult(msg.c_str());
 			return MS::kSuccess;
 		}

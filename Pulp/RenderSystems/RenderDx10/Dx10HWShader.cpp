@@ -795,7 +795,7 @@ bool XHWShader_Dx10::reflectShader(void)
 			constBuftype = ConstbufType::PER_INSTANCE;
 
 		if (constBuftype == ConstbufType::Num) {
-			X_WARNING("Shader", "Unkown cbuffer name, ignoring.");
+			X_WARNING("Shader", "Unknown cbuffer name, ignoring.");
 			continue;
 		}
 

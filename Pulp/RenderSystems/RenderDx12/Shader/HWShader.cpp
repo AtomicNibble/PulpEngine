@@ -513,7 +513,7 @@ namespace shader
 				constBuftype = ConstbufType::PER_INSTANCE;
 			}
 			else {
-				X_WARNING("Shader", "Unkown cbuffer name, ignoring.");
+				X_WARNING("Shader", "Unknown cbuffer name, ignoring.");
 				continue;
 			}
 

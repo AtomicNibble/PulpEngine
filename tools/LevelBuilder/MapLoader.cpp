@@ -599,7 +599,7 @@ bool XMapFile::Parse(const char* pData, size_t length)
 					layer.flags.Set(LayerFlag::IGNORE);
 				}
 				else {
-					X_WARNING("Map", "Unkown layer flag: '%s'",
+					X_WARNING("Map", "Unknown layer flag: '%s'",
 						flag.c_str());
 				}
 			}

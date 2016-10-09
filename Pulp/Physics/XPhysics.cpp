@@ -16,7 +16,7 @@
 #elif X_SUPER
 #define PHYS_LIB_SUFFIX "" // no suffix.
 #else
-#error "Unkown config"
+#error "Unknown config"
 #endif
 
 

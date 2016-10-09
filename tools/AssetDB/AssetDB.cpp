@@ -1659,7 +1659,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 		return def.inflate(g_AssetDBArena, compressedData, dataOut);
 	}
 
-	X_ERROR("AssetDB", "Failed to read rawfile, unkown compression algo");
+	X_ERROR("AssetDB", "Failed to read rawfile, unknown compression algo");
 	return false;
 }
 
@@ -1714,11 +1714,8 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbD
 		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
 	}
 
-	X_ERROR("AssetDB", "Failed to read thumb, unkown compression algo");
+	X_ERROR("AssetDB", "Failed to read thumb, unknown compression algo");
 	return false;
-
-
-
 }
 
 

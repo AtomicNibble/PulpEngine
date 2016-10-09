@@ -304,7 +304,7 @@ MStatus SettingsCmd::doIt(const MArgList & args)
 			idx = args.flagIndex("s", "set");
 			if (idx == MArgList::kInvalidArgIndex)
 			{
-				MayaUtil::MayaPrintError("unkown mode valid modes: set, get");
+				MayaUtil::MayaPrintError("unknown mode valid modes: set, get");
 				return MS::kFailure;
 			}
 
@@ -340,7 +340,7 @@ MStatus SettingsCmd::doIt(const MArgList & args)
 		}
 		else
 		{
-			MayaUtil::MayaPrintError("unkown set_id: '%s' valid id's: animOut, modelOut, exportMode", 
+			MayaUtil::MayaPrintError("unknown set_id: '%s' valid id's: animOut, modelOut, exportMode", 
 				setIdStr.asChar());
 			return MS::kFailure;
 		}

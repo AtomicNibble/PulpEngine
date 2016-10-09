@@ -1014,7 +1014,7 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		}
 		else
 		{
-			X_ERROR("Shader", "unkown technique param: %s", key.c_str());
+			X_ERROR("Shader", "unknown technique param: %s", key.c_str());
 		}
 	}
 

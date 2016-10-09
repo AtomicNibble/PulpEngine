@@ -303,7 +303,7 @@ const char *XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
 			return punctuations_[i].pCharacter;
 		}
 	}
-	return "unkown punctuation";
+	return "unknown punctuation";
 }
 
 void XLexer::CreatePunctuationTable(const PunctuationPair* punctuations)

@@ -228,7 +228,7 @@ bool AssetServer::Client::listen(void)
 		}
 			break;
 		default:
-			err = "Unkown request msg type";
+			err = "Unknown request msg type";
 			X_ERROR("AssetServer", "Unknown request msg type");
 			break;
 		}

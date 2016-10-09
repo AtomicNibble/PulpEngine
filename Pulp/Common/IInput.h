@@ -98,7 +98,7 @@ struct InputState
 			case Enum::CHAR:
 				return "char";
 			case Enum::UNKNOWN:
-				return "unkown";
+				return "unknown";
 #if X_DEBUG
 			default:
 				X_ASSERT_UNREACHABLE();

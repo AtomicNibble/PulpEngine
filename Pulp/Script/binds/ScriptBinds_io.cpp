@@ -195,14 +195,14 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 							total += readLine(pH, pFile, true);
 							break;
 						default:
-							pScriptSys_->OnScriptError("Unkown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
+							pScriptSys_->OnScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
 							break;
 						}
 
 					}
 					else
 					{
-						pScriptSys_->OnScriptError("Unkown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
+						pScriptSys_->OnScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
 					}
 				}
 			}
@@ -257,7 +257,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 
 		if (i == numModes)
 		{ 
-			pScriptSys_->OnScriptError("Unkown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
+			pScriptSys_->OnScriptError("Unknown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
 			return pH->EndFunction();
 		}
 	}
@@ -456,7 +456,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 		if (i == numModes)
 		{
-			pScriptSys_->OnScriptError("Unkown fileopen mode: \"%s\" valid modes: r,w,a,r+,w+", mode);
+			pScriptSys_->OnScriptError("Unknown fileopen mode: \"%s\" valid modes: r,w,a,r+,w+", mode);
 		}
 	}
 

@@ -219,7 +219,7 @@ namespace {
 			}
 			else
 			{
-				X_WARNING("Mtl", "unkown attribute: %s on material node", begin);
+				X_WARNING("Mtl", "unknown attribute: %s on material node", begin);
 			}
 		}
 
