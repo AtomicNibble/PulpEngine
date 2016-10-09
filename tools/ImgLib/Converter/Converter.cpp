@@ -167,7 +167,7 @@ namespace Converter
 
 	}
 
-	bool ImgConveter::enableMultiThreaded(bool enable)
+	void ImgConveter::enableMultiThreaded(bool enable)
 	{
 		multiThread_ = enable;
 	}
