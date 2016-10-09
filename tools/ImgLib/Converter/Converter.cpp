@@ -614,6 +614,10 @@ namespace Converter
 							y_end = inputImg.height;
 						}
 
+						if ((y_end - y_start) == 0) {
+							continue;
+						}
+
 						JobData data;
 						data.pCompressFunc = pFunc;
 						data.surface.ptr = inputImg.ptr + y_start * inputImg.stride;
