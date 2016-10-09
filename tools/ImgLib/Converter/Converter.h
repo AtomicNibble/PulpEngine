@@ -39,7 +39,7 @@ namespace Converter
 		ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena);
 		~ImgConveter();
 
-		bool enableMultiThreaded(bool enable);
+		void enableMultiThreaded(bool enable);
 
 		bool LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
 		bool LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
