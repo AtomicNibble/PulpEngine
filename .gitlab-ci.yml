@@ -100,8 +100,6 @@ build_edtior:x64_debug:
   stage: build_edtior
   script:
     - echo building...
-    - 'set QTDIR=$QT_DIR_64'
-    - 'set PATH=%QTDIR%\bin;%PATH%'
     - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Debug;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
