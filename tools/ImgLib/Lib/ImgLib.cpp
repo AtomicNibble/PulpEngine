@@ -87,6 +87,11 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 		return false;
 	}
 
+	if (d.HasMember("ignoreSrcMips")) {
+		if (d["ignoreSrcMips"].GetBool()) {
+			flags.Set(CompileFlag::IGNORE_SRC_MIPS);
+		}
+	}
 	if (d.HasMember("noMips")) {
 		if (d["noMips"].GetBool()) {
 			flags.Set(CompileFlag::NOMIPS);
