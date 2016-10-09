@@ -5,7 +5,7 @@ void GenerateUI( asset& Asset )
 {
     string semantics = "2d | diffuseMap | normalMap | specularMask | specularMap";
     string autoCompMethod = "Best color compression[compressHighCol]|Better alpha compression[compressHighAlpha]|Low quality color compression with no Alpha[compressCol]|Uncompressed[noCompress]|Custom";
-    string dstFmts = "R8|R16|R16F|R32F|R8G8|R16G16|R16G16F|R32G32F|R8G8B8A8|R8G8B8A8_SRGB|R10G10B10A2|BC1|BC1_SRGB|BC2|BC2_SRGB|BC3|BC3_SRGB|BC4|BC5|BC6|BC7|BC7_SRGB";
+    string dstFmts = "A8|BC1|BC1_SRGB|BC2|BC2_SRGB|BC3|BC3_SRGB|BC4|BC5|BC6|BC7|BC7_SRGB";
 
     Asset.AddTexture( "srcFile", "" ).SetTitle( "Src image" );
 
@@ -13,7 +13,7 @@ void GenerateUI( asset& Asset )
 
     Asset.AddCombo( "semantic", semantics ).SetTitle( "Image Usage:" );
     Asset.AddCombo( "compressionMethod", autoCompMethod ).SetTitle("Auto Compression");
-    Asset.AddCombo( "imgFmt", dstFmts ).SetTitle("Force Compression algo").SetVisible( false );
+    Asset.AddCombo( "imgFmt", dstFmts ).SetTitle("Force Compression algo").SetVisible( true );
     Asset.AddCombo( "imageType", "Texture | Cube | Volume" ).SetTitle( "Image Type" );
 
     Asset.AddString( "customTemplate", "" ).SetTitle( "Template" );
@@ -22,9 +22,9 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("Options");
     {
-        Asset.AddCombo( "mipMapAlgo", "Box | Triangle | Kaiser" ).SetTitle( "Mip Method" );
-        Asset.AddCombo( "mipWrapMode", "Mirror | Clamp | Repeat" ).SetTitle( "Mip Wrap Mode" );
-        Asset.AddCombo( "baseSize", "1/1 | 1/2 | 1/4 | 1/8" ).SetTitle( "Base Size" ).SetToolTip("Downscales src image when compiling.");
+        Asset.AddCombo( "mipFilter", "Box | Triangle | Kaiser" ).SetTitle( "Mip Method" );
+        Asset.AddCombo( "wrap", "Mirror | Clamp | Repeat" ).SetTitle( "Mip Wrap Mode" );
+        Asset.AddCombo( "scale", "1/1 | 1/2 | 1/4 | 1/8" ).SetTitle( "Base Size" ).SetToolTip("Downscales src image when compiling.");
         Asset.AddCheckBox( "ignoreSrcMips", false ).SetTitle( "Ignore src mips" );
         Asset.AddCheckBox( "noMips",  false ).SetTitle( "ForceNoMips" );
         Asset.AddCheckBox( "preMulAlpha",  false ).SetTitle( "PreMultiply Alpha" );
