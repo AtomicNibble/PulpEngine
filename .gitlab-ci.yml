@@ -1,12 +1,11 @@
-variables:
-  QT_DIR_64: 'D:\QT\Qt5.5.0_64_VS2015\qtbase'
-  QT_DIR_32: 'D:\QT\Qt5.5.0_32_VS2015\qtbase'
 
 before_script:
   - git submodule update --init --recursive
   - "echo off"
   - 'call "%VS140COMNTOOLS%\vsvars32.bat"'
   - echo.
+  - 'set QTDIR=D:\QT\Qt5.5.0_64_VS2015\qtbase'
+  - 'set PATH=%QTDIR%\bin;%PATH%'
   - set
   - echo.
 
@@ -117,8 +116,6 @@ build_edtior:x64_release:
   stage: build_edtior
   script:
     - echo building...
-    - 'set QTDIR=$QT_DIR_64'
-    - 'set PATH=%QTDIR%\bin;%PATH%'
     - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Release;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
@@ -133,8 +130,6 @@ build_edtior:x64_super:
   stage: build_edtior
   script:
     - echo building...
-    - 'set QTDIR=$QT_DIR_64'
-    - 'set PATH=%QTDIR%\bin;%PATH%'
     - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Super;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
