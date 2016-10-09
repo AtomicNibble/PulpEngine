@@ -50,8 +50,8 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	// * imgFmt (for now)
 	// 
 
-	if (d.HasMember("imgPath")) {
-		const char* pImgPath = d["imgPath"].GetString();
+	if (d.HasMember("srcFile")) {
+		const char* pImgPath = d["srcFile"].GetString();
 		const char* pFileExt = core::strUtil::FileExtension(pImgPath);
 
 		// currently i think best way to detect img format is based on ext.
