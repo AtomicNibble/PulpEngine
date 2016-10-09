@@ -584,7 +584,7 @@ namespace Converter
 			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob);
 		}
 
-		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, Profile::Fast, keepAlpha);
+		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, Profile::Slow, keepAlpha);
 
 		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{
