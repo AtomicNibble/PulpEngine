@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Converter.h"
 
+#include <Threading\JobSystem2.h>
 
 #include <String\StringHash.h>
 
@@ -87,6 +88,51 @@ namespace Converter
 			{ Texturefmt::R10G10B10A2, core::StrHash("R10G10B10A2"), "R10G10B10A2" },
 		};
 
+		#define declareBC7_profile_helper(profile) \
+		void CompressBlocksBC7_ ## profile(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut) \
+		{ \
+			ispc::bc7_enc_settings settingsbc7; \
+			ispc::GetProfile_ ## profile(&settingsbc7); \
+			ispc::CompressBlocksBC7(pSrcSurface, pOut, &settingsbc7); \
+		}
+
+		#define declareBC6H_profile_helper(profile) \
+		void CompressBlocksBC6_ ## profile(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut) \
+		{ \
+			ispc::bc6h_enc_settings settingsbc6; \
+			ispc::GetProfile_bc6h_ ## profile(&settingsbc6); \
+			ispc::CompressBlocksBC6H(pSrcSurface, pOut, &settingsbc6); \
+		}
+
+		// bc7
+		declareBC7_profile_helper(ultrafast);
+		declareBC7_profile_helper(veryfast);
+		declareBC7_profile_helper(fast);
+		declareBC7_profile_helper(basic);
+		declareBC7_profile_helper(slow);
+		declareBC7_profile_helper(alpha_ultrafast);
+		declareBC7_profile_helper(alpha_veryfast);
+		declareBC7_profile_helper(alpha_fast);
+		declareBC7_profile_helper(alpha_basic);
+		declareBC7_profile_helper(alpha_slow);
+
+		// bc6
+		declareBC6H_profile_helper(veryfast);
+		declareBC6H_profile_helper(fast);
+		declareBC6H_profile_helper(basic);
+		declareBC6H_profile_helper(slow);
+		declareBC6H_profile_helper(veryslow);
+
+		void CompressBlocksBC3(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut)
+		{
+			ispc::CompressBlocksBC3(pSrcSurface, pOut);
+		}
+
+		void CompressBlocksBC1(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut)
+		{
+			ispc::CompressBlocksBC1(pSrcSurface, pOut);
+		}
+
 
 	} // namespace
 
@@ -110,7 +156,8 @@ namespace Converter
 		swapArena_(swapArena),
 		srcImg_(imgArena),
 		dstImg_(imgArena),
-		useSrc_(false)
+		useSrc_(false),
+		multiThread_(true)
 	{
 
 	}
@@ -120,6 +167,10 @@ namespace Converter
 
 	}
 
+	bool ImgConveter::enableMultiThreaded(bool enable)
+	{
+		multiThread_ = enable;
+	}
 
 	bool ImgConveter::LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt)
 	{
@@ -525,22 +576,15 @@ namespace Converter
 
 		Vec2<uint16_t> size = srcImg_.getSize();
 
-		// time to convert a pickle.
-		// we will need some sort of profile selection.
-		// i guess that should be a arg, as to the quality level.
-		ispc::bc7_enc_settings settingsbc7;
-		ispc::bc6h_enc_settings settingsbc6;
+		core::V2::JobSystem& jobSys = *gEnv->pJobSys;
+		core::V2::Job* pRootJob = nullptr;
 
-		if (keepAlpha) {
-			// this does not result in smaller BC7, just makes it a little quicker to make BC7 as alpha channel is ignore during processing.
-			ispc::GetProfile_alpha_veryfast(&settingsbc7);
-			// no alpha specific.
-			ispc::GetProfile_bc6h_veryfast(&settingsbc6);
+		if (multiThread_) 
+		{
+			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob);
 		}
-		else {
-			ispc::GetProfile_veryfast(&settingsbc7);
-			ispc::GetProfile_bc6h_veryfast(&settingsbc6);
-		}
+
+		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, Profile::Fast, keepAlpha);
 
 		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{
@@ -555,26 +599,36 @@ namespace Converter
 
 				uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
 
-				if (targetFmt == Texturefmt::BC7)
+				if (pRootJob)
 				{
-					ispc::CompressBlocksBC7(&inputImg, pOut, &settingsbc7);
-				}
-				else if (targetFmt == Texturefmt::BC6)
-				{
-					ispc::CompressBlocksBC6H(&inputImg, pOut, &settingsbc6);
-				}
-				else if (targetFmt == Texturefmt::BC3)
-				{
-					ispc::CompressBlocksBC3(&inputImg, pOut);
-				}
-				else if (targetFmt == Texturefmt::BC1)
-				{
-					ispc::CompressBlocksBC1(&inputImg, pOut);
+					const int32_t numJobs = 32;
+					const int32_t linesPerJob = (inputImg.height + numJobs - 1) / numJobs;
+					const int32_t bytesPerBlock = Util::dxtBytesPerBlock(targetFmt);
+
+					// add job for each row?
+					for(int32_t jobIdx = 0; jobIdx < numJobs; jobIdx++)
+					{
+						const int32_t y_start = (linesPerJob*jobIdx) / 4 * 4;
+						int32_t y_end = (linesPerJob*(jobIdx + 1)) / 4 * 4;
+						if (y_end > inputImg.height) {
+							y_end = inputImg.height;
+						}
+
+						JobData data;
+						data.pCompressFunc = pFunc;
+						data.surface.ptr = inputImg.ptr + y_start * inputImg.stride;
+						data.surface.width = inputImg.width;
+						data.surface.height = y_end - y_start;
+						data.surface.stride = inputImg.stride;
+						data.pOut = pOut + (y_start / 4) * (inputImg.width / 4) * bytesPerBlock;
+
+						core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data);
+						jobSys.Run(pJob);
+					}
 				}
 				else
 				{
-					// you twat!
-					X_ASSERT_NOT_IMPLEMENTED();
+					pFunc(&inputImg, pOut);
 				}
 
 				size.x >>= 1;
@@ -582,7 +636,103 @@ namespace Converter
 			}
 		}
 
+		if (pRootJob)
+		{
+			// wait for every mip to complete.
+			jobSys.Run(pRootJob);
+			jobSys.Wait(pRootJob);
+		}
+
 		return true;
+	}
+
+
+	void ImgConveter::compressJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+	{
+		X_UNUSED(jobSys);
+		X_UNUSED(threadIdx);
+		X_UNUSED(pJob);
+
+		JobData* pJobData = reinterpret_cast<JobData*>(pData);
+
+		pJobData->pCompressFunc(&pJobData->surface, pJobData->pOut);
+	}
+
+	ImgConveter::CompressionFunc::Pointer ImgConveter::getCompressionFunc(Texturefmt::Enum fmt, Profile::Enum profile, bool keepAlpha)
+	{
+		X_UNUSED(keepAlpha);
+
+		if (fmt == Texturefmt::BC7)
+		{
+			if (keepAlpha)
+			{
+				switch (profile)
+				{
+				case Profile::UltraFast:
+					return CompressBlocksBC7_alpha_ultrafast;
+				case Profile::VeryFast:
+					return CompressBlocksBC7_alpha_veryfast;
+				case Profile::Fast:
+					return CompressBlocksBC7_alpha_fast;
+				case Profile::Basic:
+					return CompressBlocksBC7_alpha_basic;
+				case Profile::Slow:
+					return CompressBlocksBC7_alpha_slow;
+				default:
+					X_ASSERT_UNREACHABLE();
+					return nullptr;
+				}
+			}
+
+			switch (profile)
+			{
+			case Profile::UltraFast:
+				return CompressBlocksBC7_ultrafast;
+			case Profile::VeryFast:
+				return CompressBlocksBC7_veryfast;
+			case Profile::Fast:
+				return CompressBlocksBC7_fast;
+			case Profile::Basic:
+				return CompressBlocksBC7_basic;
+			case Profile::Slow:
+				return CompressBlocksBC7_slow;
+			default:
+				X_ASSERT_UNREACHABLE();
+				return nullptr;
+			}
+		}
+		else if (fmt == Texturefmt::BC6)
+		{
+			// the bc6 ones have diffrent naming but same count so i've shiffted them up.
+			// veryslow is now slow and slow is basic etc.
+			switch (profile)
+			{
+			case Profile::UltraFast:
+				return CompressBlocksBC6_veryfast; 
+			case Profile::VeryFast:
+				return CompressBlocksBC6_fast;
+			case Profile::Fast:
+				return CompressBlocksBC6_basic;
+			case Profile::Basic:
+				return CompressBlocksBC6_slow;
+			case Profile::Slow:
+				return CompressBlocksBC6_veryslow;
+			default:
+				X_ASSERT_UNREACHABLE();
+				return nullptr;
+			}
+		}
+		else if (fmt == Texturefmt::BC3)
+		{
+			return CompressBlocksBC3;
+		}
+		else if (fmt == Texturefmt::BC1)
+		{
+			return CompressBlocksBC1;
+		}
+
+		X_ASSERT_UNREACHABLE();
+		return nullptr;
 	}
 
 	const XTextureFile& ImgConveter::getTextFile(void) const
