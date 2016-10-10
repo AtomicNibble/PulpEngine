@@ -283,11 +283,11 @@ namespace Converter
 		XTextureFile tmp(swapArena_);
 		
 		tmp.setFormat(Texturefmt::R8G8B8A8);
-		tmp.setType(TextureType::T2D);
+		tmp.setType(srcImg_.getType());
 		tmp.setHeigth(srcImg_.getHeight());
 		tmp.setWidth(srcImg_.getWidth());
+		tmp.setNumFaces(srcImg_.getNumFaces());
 		tmp.setDepth(1);
-		tmp.setNumFaces(1);
 		tmp.setNumMips(1);
 
 		if (keepMips) {
@@ -296,45 +296,48 @@ namespace Converter
 
 		tmp.resize();
 
-		for (size_t mip = 0; mip < tmp.getNumMips(); mip++)
+		for (size_t face = 0; face < tmp.getNumFaces(); face++)
 		{
-			uint8_t* pDest = tmp.getLevel(0, mip);
-			const uint8_t* pSrc = srcImg_.getLevel(0, mip);
-
-			// 3 bytes per pixel.
-			const size_t numPixel = srcImg_.getLevelSize(mip) / 3;
-
-			if (srcImg_.getFormat() == Texturefmt::R8G8B8)
+			for (size_t mip = 0; mip < tmp.getNumMips(); mip++)
 			{
-				for (size_t i = 0; i < numPixel; i++)
+				uint8_t* pDest = tmp.getLevel(face, mip);
+				const uint8_t* pSrc = srcImg_.getLevel(face, mip);
+
+				// 3 bytes per pixel.
+				const size_t numPixel = srcImg_.getLevelSize(mip) / 3;
+
+				if (srcImg_.getFormat() == Texturefmt::R8G8B8)
 				{
-					pDest[0] = pSrc[0];
-					pDest[1] = pSrc[1];
-					pDest[2] = pSrc[2];
-					pDest[3] = 0xFF;
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						pDest[0] = pSrc[0];
+						pDest[1] = pSrc[1];
+						pDest[2] = pSrc[2];
+						pDest[3] = 0xFF;
 
-					pSrc += 3;
-					pDest += 4;
+						pSrc += 3;
+						pDest += 4;
+					}
 				}
-			}
-			else if (srcImg_.getFormat() == Texturefmt::B8G8R8)
-			{
-				for (size_t i = 0; i < numPixel; i++)
+				else if (srcImg_.getFormat() == Texturefmt::B8G8R8)
 				{
-					// swap the channels
-					pDest[0] = pSrc[2];
-					pDest[1] = pSrc[1];
-					pDest[2] = pSrc[0];
-					pDest[3] = 0xFF;
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						// swap the channels
+						pDest[0] = pSrc[2];
+						pDest[1] = pSrc[1];
+						pDest[2] = pSrc[0];
+						pDest[3] = 0xFF;
 
-					pSrc += 3;
-					pDest += 4;
+						pSrc += 3;
+						pDest += 4;
+					}
 				}
-			}
-			else
-			{
-				X_ASSERT_NOT_IMPLEMENTED();
-				return false;
+				else
+				{
+					X_ASSERT_NOT_IMPLEMENTED();
+					return false;
+				}
 			}
 		}
 
