@@ -60,6 +60,8 @@ namespace Converter
 
 	bool FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip)
 	{
+		clear();
+
 		// init from rgb8 for now.
 		if (img.getFormat() != Texturefmt::R8G8B8A8 && 
 			img.getFormat() != Texturefmt::B8G8R8A8 &&
@@ -144,8 +146,20 @@ namespace Converter
 		}
 	}
 
+	void FloatImage::clear(void)
+	{
+		componentCount_ = 0;
+		width_ = 0;
+		height_ = 0;
+		depth_ = 0;
+		pixelCount_ = 0;
+
+		data_.clear();
+	}
+
 	void FloatImage::free(void)
 	{
+		clear();
 		data_.free();
 	}
 
