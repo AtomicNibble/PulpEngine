@@ -42,7 +42,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	ImgFileFormat::Enum inputFileFmt = ImgFileFormat::UNKNOWN;
 	ImgFileFormat::Enum outputFileFmt = ImgFileFormat::CI;
 	MipFilter::Enum mipFilter = MipFilter::Box;
-	WrapMode::Enum wrapMode = WrapMode::Mirror;
+	WrapMode::Enum wrapMode = WrapMode::Clamp;
 	Texturefmt::Enum dstImgFmt = Texturefmt::UNKNOWN;
 
 	// Required args:
