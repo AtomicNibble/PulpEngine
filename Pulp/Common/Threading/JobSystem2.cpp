@@ -154,6 +154,10 @@ namespace V2
 		uint32_t numCores = pCpu->GetCoreCount();
 		numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
 
+		// main and IO job list space.
+		if ((numThreads_ + 2) >= HW_THREAD_MAX) {
+			numThreads_ = HW_THREAD_MAX - 2;
+		}
 
 		if (!StartThreads()) {
 			X_ERROR("Scheduler", "Failed to start worker threads");
