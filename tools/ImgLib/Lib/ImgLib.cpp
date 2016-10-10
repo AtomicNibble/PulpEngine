@@ -361,6 +361,18 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 
 		X_LOG1("Img", "Mipmap creation took: ^6%gms", timer.GetMilliSeconds());
 	}
+	else {
+		// this weould be kind easy to support tbh.
+		// just generate the mips 
+		// drop the top mips
+		// and trim the lower mips after.
+		if (scale != ScaleFactor::ORIGINAL) {
+			X_ERROR("Img", "Scaling is not currently supported when mips are disbled");
+			return false;
+		}
+	}
+
+	con.scale(scale);
 
 	{
 		core::StopWatch timer;
