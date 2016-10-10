@@ -100,7 +100,7 @@ void RawFileLoader::run()
 	emit setProgressLabel("Deflating src", numChunks);
 
 	// defalte it.
-	core::Compression::Compressor<core::Compression::LZ4HC> comp;
+	core::Compression::Compressor<core::Compression::LZ4> comp;
 
 	{
 		core::StopWatch timer;
