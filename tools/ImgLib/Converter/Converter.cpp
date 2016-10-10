@@ -583,12 +583,9 @@ namespace Converter
 		dstImg_.setFormat(targetFmt);
 		dstImg_.setType(srcImg_.getType());
 		dstImg_.setNumMips(srcImg_.getNumMips());
-		// no cube or vol at no.
 		dstImg_.setNumFaces(srcImg_.getNumFaces());
 		dstImg_.setDepth(1);
 		dstImg_.resize();
-
-		Vec2<uint16_t> size = srcImg_.getSize();
 
 		core::V2::JobSystem& jobSys = *gEnv->pJobSys;
 		core::V2::Job* pRootJob = nullptr;
@@ -602,6 +599,8 @@ namespace Converter
 
 		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{
+			Vec2<uint16_t> size = srcImg_.getSize();
+
 			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
 			{
 				// for each mip
