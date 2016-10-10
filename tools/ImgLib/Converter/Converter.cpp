@@ -267,6 +267,26 @@ namespace Converter
 		return res;
 	}
 
+	void ImgConveter::scale(ScaleFactor::Enum scale)
+	{
+		if (scale == ScaleFactor::ORIGINAL) {
+			return;
+		}
+
+		// I intentially fall through.
+		// so scale Eight results in dropTop mipb been called 3 times.
+		switch (scale)
+		{
+		case ScaleFactor::EIGHTH:
+			srcImg_.dropTopMip();
+		case ScaleFactor::QUARTER:
+			srcImg_.dropTopMip();
+		case ScaleFactor::HALF:
+			srcImg_.dropTopMip();
+			break;
+		}
+	}
+
 	bool ImgConveter::addAlphachannel(bool keepMips)
 	{
 		// expand the src img to have a alpha channel.
@@ -595,7 +615,7 @@ namespace Converter
 			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob);
 		}
 
-		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, Profile::Slow, keepAlpha);
+		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, Profile::Fast, keepAlpha);
 
 		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{
