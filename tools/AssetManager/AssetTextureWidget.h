@@ -6,6 +6,45 @@ X_NAMESPACE_BEGIN(assman)
 
 class IAssetEntry;
 
+
+class RawFileLoader : public QThread
+{
+	Q_OBJECT
+
+public:
+	typedef core::Array<uint8_t> DataArr;
+
+public:
+	RawFileLoader(core::MemoryArenaBase* arena);
+	~RawFileLoader();
+
+	void loadFile(const QString& path);
+
+	Vec2i getSrcDim(void) const;
+	const DataArr& getCompressedSrc(void) const;
+	const DataArr& getThumbData(void) const;
+
+signals:
+	void setProgress(int32_t pro);
+	void setProgressLabel(const QString& label, int32_t pro);
+
+public slots:
+	void stopProcess();
+
+protected:
+	void run();
+
+private:
+	QString path_;
+
+	Vec2i srcDim_;
+	DataArr compressed_;
+	DataArr thumbData_;
+
+	QMutex mutex_;
+	bool abort_;
+};
+
 class AssetTextureWidget : public QWidget
 {
 	Q_OBJECT
@@ -48,8 +87,16 @@ private slots:
 	void showTextureDialog(void);
 	void browseClicked(void);
 
+	void setProgress(int32_t pro);
+	void setProgressLabel(const QString& label, int32_t pro);
+	void rawFileLoaded(void);
+
 private:
 	IAssetEntry* pAssEntry_;
+
+private:
+	RawFileLoader loader_;
+	QProgressDialog* pProgress_;
 
 private:
 	QLabel* pPreview_;
