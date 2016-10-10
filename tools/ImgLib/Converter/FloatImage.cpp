@@ -925,16 +925,24 @@ namespace Converter
 		data_.swap(oth.data_);
 	}
 
+
 	uint32_t FloatImage::index(int32_t x, int32_t y, int32_t z, WrapMode::Enum wm) const
 	{
-		if (wm == WrapMode::Clamp) {
+		switch (wm)
+		{
+		case WrapMode::Clamp:
 			return indexClamp(x, y, z);
-		}
-		if (wm == WrapMode::Repeat) {
+		case WrapMode::Repeat:
 			return indexRepeat(x, y, z);
-		}
-		if (wm != WrapMode::Mirror) {
+		case WrapMode::Mirror:
+			return indexMirror(x, y, z);
+#if X_DEBUG
+		default:
 			X_ASSERT_UNREACHABLE();
+			break;
+#else
+			X_NO_SWITCH_DEFAULT;
+#endif // X_DEBUG
 		}
 
 		return indexMirror(x, y, z);
