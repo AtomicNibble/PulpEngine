@@ -21,9 +21,11 @@ public:
 	// allocatos memory to hold (N mips) * N faces
 	X_INLINE void resize(void);
 	X_INLINE void allocMipBuffers(void); // resizes the buffer to have space for all mip lvl's, keeping data from top mip.
+	X_INLINE void dropTopMip(void);
 	X_INLINE void clear(void);
 	X_INLINE void free(void);
 	X_INLINE const bool isValid(void) const;
+
 
 	X_INLINE const Vec2<uint16_t>& getSize(void) const;
 	X_INLINE int32_t getWidth(void) const;
@@ -60,6 +62,9 @@ public:
 
 	X_NO_COPY(XTextureFile);
 	X_NO_ASSIGN(XTextureFile);
+
+private:
+	X_INLINE void updateOffsets(void);
 
 private:
 	uint32_t mipOffsets_[TEX_MAX_MIPS];

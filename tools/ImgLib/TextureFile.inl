@@ -41,29 +41,7 @@ X_INLINE void XTextureFile::resize(void)
 	mipOffsets_[0] = 0;
 	faceOffsets_[0] = 0;
 
-
-	{
-		uint32_t width = core::Max<uint32_t>(1u, size_.x);
-		uint32_t height = core::Max<uint32_t>(1u, size_.y);
-
-		// 0 is higest.
-		for (uint32_t i = 1; i < numMips_; i++)
-		{
-			mipOffsets_[i] = (mipOffsets_[i - 1] + Util::dataSize(width, height, depth_, format_));
-
-			width >>= 1;
-			height >>= 1;
-
-			X_ASSERT(width > 0, "zero width")(width);
-			X_ASSERT(height > 0, "zero height")(height);
-		}
-	}
-
-	const uint32_t facesize = safe_static_cast<uint32_t, size_t>(getFaceSize());
-	for (uint32_t i = 1; i < numFaces_; i++)
-	{
-		faceOffsets_[i] = faceOffsets_[i - 1] + facesize;
-	}
+	updateOffsets();
 }
 
 X_INLINE void XTextureFile::allocMipBuffers(void)
@@ -94,30 +72,62 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
 
 	// fill in the mip counts.
 	numMips_ = mipCnt;
-	{
-		uint32_t width = core::Max<uint32_t>(1u, size_.x);
-		uint32_t height = core::Max<uint32_t>(1u, size_.y);
+	
+	updateOffsets();
+}
 
-		for (uint32_t i = 1; i < numMips_; i++)
-		{
-			mipOffsets_[i] = (mipOffsets_[i - 1] + Util::dataSize(width, height, depth_, format_));
-			width >>= 1;
-			height >>= 1;
-
-			X_ASSERT(width > 0, "zero width")(width);
-			X_ASSERT(height > 0, "zero height")(height);
-		}
+X_INLINE void XTextureFile::dropTopMip(void)
+{
+	if (numMips_ < 2) {
+		return;
 	}
 
-	// update face offsets.
-	// if we had no mips before they need updating.
+	// move all the mips up
+	for (uint32_t i = 0; i < numFaces_; i++)
+	{
+		const size_t bytesToMove = getFaceSize() - getLevelSize(0);
+		std::memmove(data_.data() + faceOffsets_[i], getLevel(i, 1), bytesToMove);
+	}
+
+	// shrink size and mip cnt.
+	numMips_--;
+	size_.x >>= 1;
+	size_.y >>= 1;
+
+	// shrink the data
+	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, numMips_, format_);
+	const uint32_t requiredBytes = faceSize * numFaces_;
+	data_.resize(requiredBytes);
+
+	// now to update offsets.
+	// zero first to get rid of the trailing offset.
+	core::zero_object(mipOffsets_);
+	core::zero_object(faceOffsets_);
+
+	updateOffsets();
+}
+
+X_INLINE void XTextureFile::updateOffsets(void)
+{
+	uint32_t width = core::Max<uint32_t>(1u, size_.x);
+	uint32_t height = core::Max<uint32_t>(1u, size_.y);
+
+	for (uint32_t i = 1; i < numMips_; i++)
+	{
+		mipOffsets_[i] = (mipOffsets_[i - 1] + Util::dataSize(width, height, depth_, format_));
+		width >>= 1;
+		height >>= 1;
+
+		X_ASSERT(width > 0, "zero width")(width);
+		X_ASSERT(height > 0, "zero height")(height);
+	}
+
 	const uint32_t facesize = safe_static_cast<uint32_t, size_t>(getFaceSize());
 	for (uint32_t i = 1; i < numFaces_; i++)
 	{
 		faceOffsets_[i] = faceOffsets_[i - 1] + facesize;
 	}
 }
-
 
 X_INLINE void XTextureFile::clear(void)
 {
