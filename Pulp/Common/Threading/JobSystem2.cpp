@@ -285,6 +285,9 @@ namespace V2
 	void JobSystem::CreateThreadObjects(uint32_t threadId)
 	{
 		uint32_t idx = safe_static_cast<uint32_t, size_t>(threadIdToIndex_.size());
+
+		X_ASSERT(idx < HW_THREAD_MAX, "No room for thread que")(idx, HW_THREAD_MAX);
+
 		pThreadQues_[idx] = X_NEW(ThreadQue, gEnv->pArena, "JobThreadQue");
 		pJobAllocators_[idx] = X_NEW(ThreadJobAllocator, gEnv->pArena, "JobThreadAllocator");
 		threadIdToIndex_.push_back(std::make_pair(threadId, idx));
