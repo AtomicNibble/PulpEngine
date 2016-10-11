@@ -31,7 +31,7 @@ class OutputWindow;
 
 typedef core::Logger<
 	core::LoggerNoFilterPolicy,
-	core::LoggerSimpleFormatPolicy,
+	core::LoggerSimpleFormatPolicyStripColors,
 	assman::LoggerOutputWindowWritePolicy>
 	OutputWindowWrtiePolicy;
 
