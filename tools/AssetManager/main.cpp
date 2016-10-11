@@ -27,6 +27,7 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_SqLite@@0V12@A")
 
 
 X_LINK_LIB("engine_AssetDb")
+X_LINK_LIB("engine_ConverterLib")
 
 
 typedef core::MemoryArena<
