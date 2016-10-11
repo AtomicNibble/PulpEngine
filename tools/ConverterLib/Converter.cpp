@@ -19,8 +19,9 @@ X_LINK_LIB("engine_AssetDb")
 X_NAMESPACE_BEGIN(converter)
 
 
-Converter::Converter(core::MemoryArenaBase* scratchArea) :
-	scratchArea_(scratchArea)
+Converter::Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
+	scratchArea_(scratchArea),
+	db_(db)
 {
 	core::zero_object(converters_);
 }

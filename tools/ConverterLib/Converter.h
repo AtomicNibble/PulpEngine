@@ -29,7 +29,7 @@ public:
 	typedef IConverter::OutPath OutPath;
 
 public:
-	CONVERTERLIB_EXPORT Converter(core::MemoryArenaBase* scratchArea);
+	CONVERTERLIB_EXPORT Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea);
 	CONVERTERLIB_EXPORT ~Converter();
 
 	CONVERTERLIB_EXPORT void PrintBanner(void);
@@ -64,7 +64,7 @@ private:
 private:
 	core::MemoryArenaBase* scratchArea_;
 	IConverter* converters_[AssetType::ENUM_COUNT];
-	assetDb::AssetDB db_;
+	assetDb::AssetDB& db_;
 };
 
 
