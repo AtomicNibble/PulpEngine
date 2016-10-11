@@ -1633,7 +1633,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 		return false;
 	}
 
-	const size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
+	const size_t size = static_cast<size_t>(raw.size);
 
 	DataArr compressedData(g_AssetDBArena);
 	compressedData.resize(size);
