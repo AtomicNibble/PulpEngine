@@ -67,9 +67,10 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pLayout_ = new QGridLayout();
 	pDockArea_ = new QMainWindow();
 
+
 	{
 		pDb_ = new assetDb::AssetDB();
-		if (!pDb_->OpenDB()) {
+		if (!pDb_->OpenDB(assetDb::AssetDB::ThreadMode::SERIALIZED)) {
 			QMessageBox::critical(this, tr("Error"), "Failed to open AssetDB");
 		}
 	}
