@@ -1616,7 +1616,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 	RawFile raw;
 
 	if (!GetRawfileForId(assetId, raw)) {
-		X_ERROR("AssetDB", "Failed to get rawfile info for data reterival");
+		X_ERROR("AssetDB", "Failed to get rawfile info for data retrieval");
 		return false;
 	}
 
@@ -1671,7 +1671,7 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbD
 
 	if (!GetThumbInfoForId(assetId, info)) {
 	// just treat it as no thumb.
-	//	X_ERROR("AssetDB", "Failed to get thumb info for data reterival");
+	//	X_ERROR("AssetDB", "Failed to get thumb info for data retrieval");
 		return false;
 	}
 
