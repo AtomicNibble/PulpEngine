@@ -23,6 +23,7 @@
 #include "IAssetEntry.h"
 
 #include <../AssetDB/AssetDB.h>
+#include "ConverterHost.h"
 
 #include <qfilesystemwatcher.h>
 
@@ -42,6 +43,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pActionManager_(nullptr),
 	pEditorManager_(nullptr),
 	pDb_(nullptr),
+	pConHost_(nullptr),
 	pAssetDbexplorer_(nullptr),
 	additionalContexts_(Constants::C_GLOBAL) // always have global contex
 {
@@ -73,6 +75,9 @@ AssetManager::AssetManager(QWidget* pParent) :
 			QMessageBox::critical(this, tr("Error"), "Failed to open AssetDB");
 		}
 	}
+
+	pConHost_ = new ConverterHost(*pDb_, g_arena);
+	pConHost_->init();
 
 	connect(pWatcher_, SIGNAL(fileChanged(const QString &)),
 		this, SLOT(fileChanged(const QString &)));

@@ -18,6 +18,7 @@ X_NAMESPACE_DECLARE(assetDb,
 
 X_NAMESPACE_BEGIN(assman)
 
+class ConverterHost;
 class ActionManager;
 class AssetEntryManager;
 class EditorManager;
@@ -170,6 +171,7 @@ private:
 	QMap<QWidget*, IContext*> contextWidgets_;
 
 	assetDb::AssetDB* pDb_;
+	ConverterHost* pConHost_;
 	AssetExplorer::AssetDbViewWidget* pAssetViewWidget_;
     AssetExplorer::AssetExplorer* pAssetDbexplorer_;
 };
