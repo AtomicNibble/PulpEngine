@@ -191,11 +191,10 @@ void OutputWindow::setWordWrapEnabled(bool wrap)
 
 void OutputWindow::scrollToBottom(void)
 {
-	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
-	// QPlainTextEdit destroys the first calls value in case of multiline
-	// text, so make sure that the scroll bar actually gets the value set.
-	// Is a noop if the first call succeeded.
-	verticalScrollBar()->setValue(verticalScrollBar()->maximum());
+	const auto max = verticalScrollBar()->maximum();
+
+	verticalScrollBar()->setValue(max);
+	verticalScrollBar()->setValue(max);
 }
 
 bool OutputWindow::isScrollbarAtBottom(void) const
