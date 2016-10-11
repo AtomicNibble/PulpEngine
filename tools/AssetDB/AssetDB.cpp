@@ -1973,7 +1973,7 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFi
 {
 	// we get the raw_id from the asset.
 	// and get the data.
-	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash FROM raw_files "
+	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.size, raw_files.hash FROM raw_files "
 		"INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
 
@@ -1995,7 +1995,8 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFi
 	}
 
 	dataOut.file_id = (*it).get<int32_t>(0);
-	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
+	dataOut.size = (*it).get<int32_t>(2);
+	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(3));
 	return true;
 }
 

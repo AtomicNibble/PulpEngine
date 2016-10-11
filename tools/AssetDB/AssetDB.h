@@ -30,6 +30,7 @@ class DLL_EXPORT AssetDB
 	struct RawFile
 	{
 		int32_t file_id;
+		int32_t size;
 		core::string path;
 		uint32_t hash;
 	};
