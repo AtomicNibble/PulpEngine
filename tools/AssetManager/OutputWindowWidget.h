@@ -50,6 +50,8 @@ private:
 	bool linksActive_;
 	bool mousePressed_;
 	int32_t maxLineCount_;
+
+	QTextCursor cursor_;
 };
 
 

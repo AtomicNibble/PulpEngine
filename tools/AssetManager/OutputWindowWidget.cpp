@@ -15,7 +15,8 @@ OutputWindow::OutputWindow(Context context, QWidget *parent) :
 	scrollToBottom_(false),
 	linksActive_(true),
 	mousePressed_(false),
-	maxLineCount_(10000)
+	maxLineCount_(10000),
+	cursor_(document())
 {
 	setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 	setFrameShape(QFrame::NoFrame);
@@ -99,11 +100,10 @@ void OutputWindow::appendMessage(const char* pLine, int32_t length)
 	// provide default format.
 	QTextCharFormat format;
 
-	QTextCursor cursor = QTextCursor(document());
-	cursor.movePosition(QTextCursor::End);
-	cursor.beginEditBlock();
-	cursor.insertText(tmp, format);
-	cursor.endEditBlock();
+	cursor_.movePosition(QTextCursor::End);
+	cursor_.beginEditBlock();
+	cursor_.insertText(tmp, format);
+	cursor_.endEditBlock();
 
 	if (atBottom) {
 		scrollToBottom();
@@ -118,11 +118,10 @@ void OutputWindow::appendMessage(const char* pLine, int32_t length, const QTextC
 	QLatin1String tmpLatin(pLine, length);
 	QString tmp(tmpLatin);
 
-	QTextCursor cursor = QTextCursor(document());
-	cursor.movePosition(QTextCursor::End);
-	cursor.beginEditBlock();
-	cursor.insertText(tmp, format);
-	cursor.endEditBlock();
+	cursor_.movePosition(QTextCursor::End);
+	cursor_.beginEditBlock();
+	cursor_.insertText(tmp, format);
+	cursor_.endEditBlock();
 
 	if (atBottom) {
 		scrollToBottom();
