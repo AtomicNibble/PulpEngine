@@ -14,6 +14,7 @@
 
 #include <../ConverterLib/ConverterLib.h>
 X_LINK_LIB("engine_ConverterLib")
+X_LINK_LIB("engine_assetDB")
 
 
 HINSTANCE g_hInstance = 0;
@@ -154,7 +155,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (app.Init(lpCmdLine, Console))
 		{
-			converter::Converter con(g_arena);
+			assetDb::AssetDB db;
+
+			converter::Converter con(db, g_arena);
 			converter::AssetType::Enum assType;
 			ConvertMode::Enum mode;
 			core::string assName;
