@@ -18,6 +18,7 @@
 
 #include <../AssetDB/AssetDB.h>
 
+#include "ConverterHost.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -32,8 +33,9 @@ AssetExplorer *AssetExplorer::instance()
 }
 
 
-AssetExplorer::AssetExplorer(assetDb::AssetDB& db)  :
+AssetExplorer::AssetExplorer(assetDb::AssetDB& db, ConverterHost& conHost)  :
 	db_(db),
+	conHost_(conHost),
     currentProject_(nullptr),
     currentNode_(nullptr)
 {
@@ -638,8 +640,23 @@ void AssetExplorer::addNewAssetType(void)
 	dialog.exec();
 }
 
+void AssetExplorer::build(void)
+{
+	BUG_ASSERT(currentNode_, return);
 
+	if (currentNode_->nodeType() != NodeType::FileNodeType) {
+		return;
+	}
 
+	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_))
+	{
+		const QString& name = pFileNode->name();
+		const auto array = name.toLocal8Bit();
+		core::string nameNarrow(array.data());
+
+		conHost_.convertAsset(nameNarrow, pFileNode->assetType());
+	}
+}
 
 
 void AssetExplorer::updateActions(void)

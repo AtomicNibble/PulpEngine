@@ -104,7 +104,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(*pDb_, pAssetScripts_, this));
 
 	{
-		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
+		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_, *pConHost_);
 		if (!pAssetDbexplorer_->init()) {
 			QMessageBox::critical(this, tr("Error"), "Failed to init AssetExpolrer");
 		}

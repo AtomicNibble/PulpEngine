@@ -15,6 +15,7 @@ X_NAMESPACE_DECLARE(assetDb,
 
 X_NAMESPACE_BEGIN(assman)
 
+class ConverterHost;
 class ParameterAction;
 
 namespace AssetExplorer {
@@ -28,7 +29,7 @@ namespace AssetExplorer {
 	{
 		Q_OBJECT
 	public:
-		AssetExplorer(assetDb::AssetDB& db);
+		AssetExplorer(assetDb::AssetDB& db, ConverterHost& conHost);
 		~AssetExplorer();
 
 		static AssetExplorer* instance(void);
@@ -81,6 +82,8 @@ namespace AssetExplorer {
 		void addNewAsset(void);
 		void addNewAssetType(void);
 
+		void build(void);
+
 		void updateActions(void);
 
 		void savePersistentSettings(void);
@@ -115,6 +118,7 @@ namespace AssetExplorer {
 
 	private:
 		assetDb::AssetDB& db_;
+		ConverterHost& conHost_;
 		Project* currentProject_;
 		Node* currentNode_;
 
