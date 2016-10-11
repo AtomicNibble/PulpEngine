@@ -135,7 +135,11 @@ bool SqlLiteDb::connect(const char* pDb, ThreadMode::Enum threadMode)
 		}
 		else if (threadMode == ThreadMode::SERIALIZED) {
 			// why are you using this mode you twat.
-			X_WARNING("SqlLiteDb", "Enabling multi threading for single db connection, are you sure you want this? (answer is no.)");
+			/// I actually use this mode now :(
+			/// but I don't use it for performance reasons.
+			/// I use it so the DB can be accssed from the UI thread and background thread that performs converting in AssetManager.
+			/// the standalone converter still uses single threaded mode.
+			//X_WARNING("SqlLiteDb", "Enabling multi threading for single db connection, are you sure you want this? (answer is no.)");
 			res = setConfig(SQLITE_CONFIG_SERIALIZED);
 		}
 		else {
