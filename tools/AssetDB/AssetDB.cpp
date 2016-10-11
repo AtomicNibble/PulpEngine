@@ -94,7 +94,7 @@ AssetDB::~AssetDB()
 }
 
 
-bool AssetDB::OpenDB(void)
+bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 {
 	if (open_) {
 		return true;
@@ -115,8 +115,10 @@ bool AssetDB::OpenDB(void)
 		X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
 	}
 
-
-	if (!db_.connect(dbPath.c_str())) {
+	// I need multi threaded mode when asset db is inside AssetManager
+	// as the conversion needs to be run in a background thread.
+	// and some actions are done on the UI thread.
+	if (!db_.connect(dbPath.c_str(), threadMode)) {
 		return false;
 	}
 

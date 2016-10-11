@@ -102,12 +102,14 @@ public:
 	typedef core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> ModDelegate;
 	typedef core::Delegate<bool(AssetType::Enum, const core::string& name)> AssetDelegate;
 
+	typedef sql::SqlLiteDb::ThreadMode ThreadMode;
+
 public:
 	AssetDB();
 	~AssetDB();
 
 	// Startup / shutdown api
-	bool OpenDB(void);
+	bool OpenDB(ThreadMode::Enum threadMode = ThreadMode::SINGLE);
 	void CloseDB(void);
 	bool CreateTables(void);
 	bool DropTables(void);
