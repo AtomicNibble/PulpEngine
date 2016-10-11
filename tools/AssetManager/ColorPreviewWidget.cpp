@@ -138,6 +138,10 @@ void ColorPreview::resizeEvent(QResizeEvent* )
 
 void ColorPreview::mouseReleaseEvent(QMouseEvent* ev)
 {
+	if (ev->button() != Qt::MouseButton::LeftButton) {
+		return;
+	}
+
 	if (QRect(QPoint(0, 0), size()).contains(ev->pos())) {
 		emit clicked();
 	}
