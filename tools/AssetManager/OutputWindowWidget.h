@@ -13,6 +13,10 @@ public:
 	OutputWindow(Context context, QWidget *parent = 0);
 	~OutputWindow();
 
+	void appendBlockBegin(bool& atBottomOut);
+	void appendMessage(const QString& out, const QTextCharFormat& format);
+	void appendBlockEnd(bool atBottom);
+
 
 	void appendMessage(const QString& out);
 	void appendMessage(const char* pLine, int32_t legnth);

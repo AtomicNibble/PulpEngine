@@ -72,6 +72,26 @@ OutputWindow::~OutputWindow()
 }
 
 
+void OutputWindow::appendBlockBegin(bool& atBottomOut)
+{
+	atBottomOut = isScrollbarAtBottom();
+}
+
+void OutputWindow::appendMessage(const QString& out, const QTextCharFormat& format)
+{
+	cursor_.movePosition(QTextCursor::End);
+	cursor_.beginEditBlock();
+	cursor_.insertText(out, format);
+	cursor_.endEditBlock();
+}
+
+void OutputWindow::appendBlockEnd(bool atBottom)
+{
+	if (atBottom) {
+		scrollToBottom();
+	}
+}
+
 
 void OutputWindow::appendMessage(const QString& output)
 {
