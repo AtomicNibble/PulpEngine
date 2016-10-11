@@ -57,11 +57,9 @@ AssetManager::AssetManager(QWidget* pParent) :
 	// Logging.
 	pOutputWindow_ = new OutputWindow(Context(Constants::C_GENERAL_OUTPUT_PANE));
 	pOutputWindow_->setWordWrapEnabled(false);
-	pLoggerPolicy_ = new OutputWindowWrtiePolicy(
-		OutputWindowWrtiePolicy::FilterPolicy(),
-		OutputWindowWrtiePolicy::FormatPolicy(),
-		OutputWindowWrtiePolicy::WritePolicy(pOutputWindow_)
-	);
+	pOutputWindow_->setReadOnly(true);
+	pLoggerPolicy_ = new OutputWindowWrtiePolicy();
+	pLoggerPolicy_->GetWritePolicy().setOutputWindow(pOutputWindow_);
 	gEnv->pLog->AddLogger(pLoggerPolicy_);
 
 	OutputPaneManager::create();

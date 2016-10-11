@@ -4,19 +4,36 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-LoggerOutputWindowWritePolicy::LoggerOutputWindowWritePolicy(OutputWindow* pOutWindow) :
-	pOutWindow_(pOutWindow),
-	cs_(10)
+LoggerOutputWindowWritePolicy::LogData::LogData(const QLatin1String& latin, const QTextCharFormat& fmt) :
+	msg_(latin),
+	fmt_(fmt)
 {
 
 }
 
-void LoggerOutputWindowWritePolicy::Init(void)
+// -------------------------------------------------------
+
+LoggerOutputWindowWritePolicy::LoggerOutputWindowWritePolicy() :
+	pOutWindow_(nullptr),
+	cs_(10),
+	logVec_(g_arena)
+{
+}
+
+void LoggerOutputWindowWritePolicy::Init()
 {
 	warningFmt_.setForeground(QBrush(QColor("yellow")));
 	errorFmt_.setForeground(QBrush(QColor("red")));
 
+	uiThreadId_ = core::Thread::GetCurrentID();
+}
 
+void LoggerOutputWindowWritePolicy::setOutputWindow(OutputWindow* pOutWindow)
+{
+	pOutWindow_ = pOutWindow;
+
+	connect(this, &LoggerOutputWindowWritePolicy::msgsAdded, this, &LoggerOutputWindowWritePolicy::submitMsgs, 
+		Qt::ConnectionType::QueuedConnection);
 }
 
 void LoggerOutputWindowWritePolicy::Exit(void)
@@ -26,51 +43,64 @@ void LoggerOutputWindowWritePolicy::Exit(void)
 
 void LoggerOutputWindowWritePolicy::WriteLog(const core::LoggerBase::Line& line, uint32_t length)
 {
-	// i don't think this will ever really get any contention,
-	// but the engine expects all write polices to be safe to call from multiple threads.
-	// so we make this writer conformant, using locks with low contention is cheap anyway.
-	// this might actually need moving into the Output window...
-	// if we allow logging calls not made by engine logger to go to output window.
-	core::CriticalSection::ScopedLock lock(cs_); 
-
-	pOutWindow_->appendMessage(line, length);
+	WriteInternal(line, length, msgFmt_);
 }
 
 void LoggerOutputWindowWritePolicy::WriteWarning(const core::LoggerBase::Line& line, uint32_t length)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	pOutWindow_->appendMessage(line, length, warningFmt_);
+	WriteInternal(line, length, warningFmt_);
 }
 
 void LoggerOutputWindowWritePolicy::WriteError(const core::LoggerBase::Line& line, uint32_t length)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	pOutWindow_->appendMessage(line, length, errorFmt_);
+	WriteInternal(line, length, errorFmt_);
 }
 
 void LoggerOutputWindowWritePolicy::WriteFatal(const core::LoggerBase::Line& line, uint32_t length)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	pOutWindow_->appendMessage(line, length, errorFmt_);
+	WriteInternal(line, length, errorFmt_);
 }
 
 void LoggerOutputWindowWritePolicy::WriteAssert(const core::LoggerBase::Line& line, uint32_t length)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	pOutWindow_->appendMessage(line, length, errorFmt_);
+	WriteInternal(line, length, errorFmt_);
 }
 
 void LoggerOutputWindowWritePolicy::WriteAssertVariable(const core::LoggerBase::Line& line, uint32_t length)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	pOutWindow_->appendMessage(line, length, errorFmt_);
+	WriteInternal(line, length, errorFmt_);
 }
 
+void LoggerOutputWindowWritePolicy::WriteInternal(const core::LoggerBase::Line& line, uint32_t length, const QTextCharFormat& fmt)
+{
+	QLatin1String tmpLatin(line, length);
 
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	logVec_.emplace_back(tmpLatin, fmt);
+
+	if (logVec_.size() == 1) {
+		emit msgsAdded();
+	}
+}
+
+void LoggerOutputWindowWritePolicy::submitMsgs(void)
+{
+	X_ASSERT(core::Thread::GetCurrentID() == uiThreadId_, "Can only submit msg's from the ui thread")();
+
+	// could swap vec to reduce contention.
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	bool atBottom;
+	pOutWindow_->appendBlockBegin(atBottom);
+
+	for (const auto& msg : logVec_) {
+		pOutWindow_->appendMessage(msg.msg_, msg.fmt_);
+	}
+
+	pOutWindow_->appendBlockEnd(atBottom);
+
+	logVec_.clear();
+}
 
 X_NAMESPACE_END
