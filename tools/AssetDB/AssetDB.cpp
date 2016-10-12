@@ -504,7 +504,7 @@ bool AssetDB::GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& coun
 	countOut = -1; // meow
 
 	sql::SqlLiteTransaction trans(db_, true);
-	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE mod_id = ? AND TYPE = ?");
+	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE mod_id = ? AND type = ?");
 	qry.bind(1, modId);
 	qry.bind(2, type);
 
