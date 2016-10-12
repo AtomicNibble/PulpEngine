@@ -18,7 +18,7 @@ class ModProject : public AssetExplorer::Project
 {
 	Q_OBJECT
 
-		struct AssetTypeInfo
+	struct AssetTypeInfo
 	{
 		const char* pNickName;
 		int priority; // for sorting.
