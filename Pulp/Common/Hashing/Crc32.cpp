@@ -34,7 +34,7 @@ X_NAMESPACE_BEGIN(core)
 
 
 uint32_t Crc32::Combine(const uint32_t lhs, const uint32_t rhs,
-	const uint32_t rhs_length) const
+	const uint32_t rhs_length)
 {
 	int n;
 	uint32_t row;

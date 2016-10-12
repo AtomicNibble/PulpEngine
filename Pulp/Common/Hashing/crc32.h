@@ -15,7 +15,7 @@ X_ALIGNED_SYMBOL(class Crc32, 128)
 public:
 	Crc32();
 
-	uint32_t Combine(const uint32_t lhs, const uint32_t rhs, const uint32_t rhs_length) const;
+	static uint32_t Combine(const uint32_t lhs, const uint32_t rhs, const uint32_t rhs_length);
 
 	uint32_t GetCRC32(const char* text) const;
 	uint32_t GetCRC32(const char* data, size_t size) const;
