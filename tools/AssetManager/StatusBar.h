@@ -15,10 +15,15 @@ public:
 	MyStatusBar(QWidget* parent);
 
 
+
+public slots:
+	void showBusyBar(bool show);
+
 private:
 	void Create();
 
 protected:
+	QProgressBar* pProgress_;
 };
 
 
