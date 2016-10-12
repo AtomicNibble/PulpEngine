@@ -60,6 +60,9 @@ public:
 
 	QSettings* settings(QSettings::Scope scope = QSettings::Scope::UserScope) const;
 
+	MyStatusBar* statusBar(void);
+
+
 private:
 	void createActions(void);
 	void createMenus(void);

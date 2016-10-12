@@ -7,6 +7,8 @@ X_NAMESPACE_BEGIN(assman)
 
 class IEditor;
 
+class MyStatusBar;
+
 class ICoreListener : public QObject
 {
 	Q_OBJECT
@@ -36,6 +38,7 @@ public:
 
 	static QWidget* mainWindow(void);
 	static QWidget* dialogParent(void);
+	static MyStatusBar* statusBar(void);
 
 	static void raiseWindow(QWidget* pWidget);
 

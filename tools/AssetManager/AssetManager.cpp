@@ -235,6 +235,11 @@ QSettings* AssetManager::settings(QSettings::Scope scope) const
 	return pSettings_;
 }
 
+MyStatusBar* AssetManager::statusBar(void)
+{
+	return pStatusBar_;
+}
+
 void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
 {
 	X_UNUSED(old);

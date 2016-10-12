@@ -43,6 +43,11 @@ QWidget* ICore::mainWindow(void)
 	return pMainwindow;
 }
 
+MyStatusBar* ICore::statusBar(void)
+{
+	return pMainwindow->statusBar();
+}
+
 QWidget* ICore::dialogParent(void)
 {
 	QWidget *active = QApplication::activeModalWidget();
