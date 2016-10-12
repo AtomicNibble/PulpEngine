@@ -21,8 +21,11 @@ class ConverterHost : public QThread
 
 private:
 	enum class ConversionType {
-		ALL,
 		SINGLE,
+		MOD,
+		MOD_TYPE,
+		ALL,
+
 		EXIT
 	};
 
@@ -31,6 +34,7 @@ private:
 		ConversionType conType;
 		core::string name;
 		assetDb::AssetType::Enum type;
+		int32_t modId;
 	};
 
 public:
@@ -41,6 +45,8 @@ public:
 	void shutdown();
 
 	void convertAsset(const core::string& name, assetDb::AssetType::Enum type);
+	void convertMod(int32_t modId);
+	void convertMod(int32_t modId, assetDb::AssetType::Enum type);
 
 private:
 	void postQuitJob(void);
