@@ -1,6 +1,7 @@
 #include "modprojectnodes.h"
 #include "modproject.h"
 
+#include "ConverterHost.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -347,6 +348,13 @@ ModProject* ModProjectNode::getModProject(void)
     return pProject_;
 }
 
+bool ModProjectNode::build(ConverterHost& conHost) const
+{
+	int32_t modId = pProject_->modId();
+
+	conHost.convertMod(modId);
+	return true;
+}
 
 // -------------------------------------------------------------------
 
@@ -388,7 +396,6 @@ bool ModVirtualFolderNode::hasUnLoadedChildren(void) const
 }
 
 
-
 bool ModVirtualFolderNode::loadChildren(void)
 {
     ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
@@ -415,6 +422,19 @@ bool ModVirtualFolderNode::loadChildren(void)
     return true;
 }
 
+bool ModVirtualFolderNode::build(ConverterHost& conHost) const
+{
+	ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
+	if (!pProjectNode) {
+		return false;
+	}
+
+	ModProject* pProject = pProjectNode->getModProject();
+	int32_t modId = pProject->modId();
+
+	conHost.convertMod(modId, assetType());
+	return true;
+}
 
 // -------------------------------------------------------------------
 
@@ -425,6 +445,22 @@ ModFolderNode::ModFolderNode(const QString &name) :
 
 }
 
+bool ModFolderNode::build(ConverterHost& conHost) const
+{
+	const auto folders = subFolderNodes();
+	for (const auto& f : folders)
+	{
+		f->build(conHost);
+	}
+
+	const auto files = fileNodes();
+	for (const auto& f : files)
+	{
+		f->build(conHost);
+	}
+
+	return true;
+}
 
 // -------------------------------------------------------------------
 
@@ -436,5 +472,13 @@ ModFileNode::ModFileNode(const QString& displayName, const QString& name, AssetT
 
 }
 
+bool ModFileNode::build(ConverterHost& conHost) const
+{
+	const auto array = name().toLocal8Bit();
+	core::string nameNarrow(array.data());
+
+	conHost.convertAsset(nameNarrow, assetType());
+	return true;
+}
 
 X_NAMESPACE_END

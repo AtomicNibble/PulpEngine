@@ -24,6 +24,9 @@ public:
 	ModProject* getModProject(void);
 
 private:
+	bool build(ConverterHost& conHost) const X_OVERRIDE;
+
+private:
 	ModProject* pProject_;
 };
 
@@ -44,6 +47,9 @@ public:
 	bool loadChildren(void) X_OVERRIDE;
 
 private:
+	bool build(ConverterHost& conHost) const X_OVERRIDE;
+
+private:
 	QString displayName_;
 	int32_t numAssets_;
 };
@@ -56,6 +62,9 @@ public:
 	explicit ModFolderNode(const QString& name);
 
 private:
+	bool build(ConverterHost& conHost) const X_OVERRIDE;
+
+private:
 };
 
 
@@ -65,6 +74,10 @@ class ModFileNode : public AssetExplorer::FileNode
 
 public:
 	explicit ModFileNode(const QString& displayName, const QString& name, AssetType::Enum type);
+
+private:
+	bool build(ConverterHost& conHost) const X_OVERRIDE;
+
 
 private:
 	QString name_;

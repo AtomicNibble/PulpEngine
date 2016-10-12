@@ -648,6 +648,15 @@ bool SessionNode::isEnabled(void) const
 	return true;
 }
 
+bool SessionNode::build(ConverterHost& conHost) const
+{
+	for(ProjectNode* pProject : projectNodes_) {
+		pProject->build(conHost);
+	}
+
+	return true;
+}
+
 
 QList<ProjectNode*> SessionNode::projectNodes(void) const
 {
