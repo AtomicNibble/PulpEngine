@@ -53,19 +53,32 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 		return false;
 	}
 
-	core::string argsStr;
-	if (!db_.GetArgsForAsset(assetId, argsStr)) {
-		X_ERROR("Converter", "Failed to get conversion args");
-		return false;
-	}
-
 	assetDb::AssetDB::Mod modInfo;
 	if (!db_.GetModInfo(modId, modInfo)) {
 		X_ERROR("Converter", "Failed to get mod info");
 		return false;
 	}
 
+	core::Path<char> pathOut;
+	GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
+
+	// file exist already?
+//	if (gEnv->pFileSys->fileExists(pathOut.c_str()))
+	{
+		// se if stale.
+		if (db_.IsAssetStale(assetId)) {
+			X_LOG1("Converter", "Skipping compiled asset is not stale");
+			return true;
+		}
+	}
+
 	core::StopWatch timer;
+
+	core::string argsStr;
+	if (!db_.GetArgsForAsset(assetId, argsStr)) {
+		X_ERROR("Converter", "Failed to get conversion args");
+		return false;
+	}
 
 	core::Array<uint8_t> data(scratchArea_);
 	if (!db_.GetRawFileDataForAsset(assetId, data)) {
@@ -74,14 +87,14 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
 	X_LOG1("Converter", "Loaded rawfile in: ^6%gms", timer.GetMilliSeconds());
 
-	core::Path<char> pathOut;
-	GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
 
 	timer.Start();
 
 	bool res = Convert_int(assType, argsStr, data, pathOut);
 	if (res) {
 		X_LOG1("Converter", "processing took: ^6%gms", timer.GetMilliSeconds());
+
+		db_.OnAssetCompiled(assetId);
 	}
 	return res;
 }
