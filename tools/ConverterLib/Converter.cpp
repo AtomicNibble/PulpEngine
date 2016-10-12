@@ -86,6 +86,83 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	return res;
 }
 
+
+bool Converter::Convert(int32_t modId)
+{
+	X_LOG0("Converter", "Converting all assets...");
+
+	if (!db_.OpenDB()) {
+		X_ERROR("Converter", "Failed to open AssetDb");
+		return false;
+	}
+
+	int32_t numAssets = 0;
+	if (db_.GetNumAssets(modId, numAssets)) {
+		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	}
+
+	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	func.Bind<Converter, &Converter::Convert>(this);
+
+	if (!db_.IterateAssets(modId, func)) {
+		X_ERROR("Converter", "Failed to convert all assets");
+		return false;
+	}
+
+	return true;
+}
+
+bool Converter::Convert(int32_t modId, AssetType::Enum assType)
+{
+	X_LOG0("Converter", "Converting all \"%s\" assets ...", AssetType::ToString(assType));
+
+	if (!db_.OpenDB()) {
+		X_ERROR("Converter", "Failed to open AssetDb");
+		return false;
+	}
+
+	int32_t numAssets = 0;
+	if (db_.GetAssetTypeCount(modId, assType, numAssets)) {
+		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	}
+
+	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	func.Bind<Converter, &Converter::Convert>(this);
+
+	if (!db_.IterateAssets(modId, assType, func)) {
+		X_ERROR("Converter", "Failed to convert \"%s\" assets", AssetType::ToString(assType));
+		return false;
+	}
+
+	return true;
+}
+
+bool Converter::Convert(AssetType::Enum assType)
+{
+	X_LOG0("Converter", "Converting all \"%s\" assets ...", AssetType::ToString(assType));
+
+	if (!db_.OpenDB()) {
+		X_ERROR("Converter", "Failed to open AssetDb");
+		return false;
+	}
+
+	int32_t numAssets = 0;
+	if (db_.GetNumAssets(assType, &numAssets)) {
+		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	}
+
+	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	func.Bind<Converter, &Converter::Convert>(this);
+
+	if (!db_.IterateAssets(assType, func)) {
+		X_ERROR("Converter", "Failed to convert \"%s\" assets", AssetType::ToString(assType));
+		return false;
+	}
+
+	return true;
+}
+
+
 bool Converter::ConvertAll(void)
 {
 	X_LOG0("Converter", "Converting all assets...");
@@ -105,31 +182,6 @@ bool Converter::ConvertAll(void)
 
 	if (!db_.IterateAssets(func)) {
 		X_ERROR("Converter", "Failed to convert all assets");
-		return false;
-	}
-
-	return true;
-}
-
-bool Converter::ConvertAll(AssetType::Enum assType)
-{
-	X_LOG0("Converter", "Converting all \"%s\" assets ...", AssetType::ToString(assType));
-
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
-		return false;
-	}
-
-	int32_t numAssets = 0;
-	if (db_.GetNumAssets(assType, &numAssets)) {
-		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
-	}
-
-	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
-	func.Bind<Converter, &Converter::Convert>(this);
-
-	if (!db_.IterateAssets(assType, func)) {
-		X_ERROR("Converter", "Failed to convert \"%s\" assets", AssetType::ToString(assType));
 		return false;
 	}
 

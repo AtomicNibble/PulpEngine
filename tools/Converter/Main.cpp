@@ -180,7 +180,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			{
 				// optionaly convert all asset of Type X
 				if (GetAssetType(assType, true)) {
-					if (!con.ConvertAll(assType)) {
+					if (!con.Convert(assType)) {
 						X_ERROR("Convert", "Conversion failed..");
 					}
 					else {

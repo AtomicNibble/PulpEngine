@@ -35,8 +35,10 @@ public:
 	CONVERTERLIB_EXPORT void PrintBanner(void);
 
 	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType, const core::string& name);
+	CONVERTERLIB_EXPORT bool Convert(int32_t modId);
+	CONVERTERLIB_EXPORT bool Convert(int32_t modId, AssetType::Enum assType);
+	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType);
 	CONVERTERLIB_EXPORT bool ConvertAll(void);
-	CONVERTERLIB_EXPORT bool ConvertAll(AssetType::Enum assType);
 	CONVERTERLIB_EXPORT bool CleanAll(const char* pMod = nullptr);
 
 	// IConverterHost
