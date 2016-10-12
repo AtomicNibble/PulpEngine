@@ -591,7 +591,7 @@ bool AssetDB::IterateMods(ModDelegate func)
 		const char* pOutdir = row.get<const char*>(2);
 
 
-		func.Invoke(static_cast<ModId>(modId), X_CONST_STRING(pName), core::Path<char>(pOutdir));
+		func.Invoke(static_cast<ModId>(modId), core::string(pName), core::Path<char>(pOutdir));
 	}
 
 	return true;
@@ -610,7 +610,7 @@ bool AssetDB::IterateAssets(AssetDelegate func)
 		const char* pName = row.get<const char*>(0);
 		const int32_t type = row.get<int32_t>(1);
 
-		func.Invoke(static_cast<AssetType::Enum>(type), X_CONST_STRING(pName));
+		func.Invoke(static_cast<AssetType::Enum>(type), core::string(pName));
 	}
 
 	return true;
@@ -633,7 +633,7 @@ bool AssetDB::IterateAssets(ModId modId, AssetDelegate func)
 		const char* pName = row.get<const char*>(0);
 		const int32_t type = row.get<int32_t>(1);
 
-		func.Invoke(static_cast<AssetType::Enum>(type), X_CONST_STRING(pName));
+		func.Invoke(static_cast<AssetType::Enum>(type), core::string(pName));
 	}
 
 	return true;
@@ -651,7 +651,7 @@ bool AssetDB::IterateAssets(AssetType::Enum type, AssetDelegate func)
 
 		const char* pName = row.get<const char*>(0);
 
-		func.Invoke(type, X_CONST_STRING(pName));
+		func.Invoke(type, core::string(pName));
 	}
 
 	return true;
