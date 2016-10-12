@@ -733,6 +733,23 @@ bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t* pNumOut)
 	return false;
 }
 
+bool AssetDB::GetNumAssets(ModId modId, int32_t& numOut)
+{
+	AssetTypeCountsArr counts;
+
+	if (!GetAssetTypeCounts(modId, counts)) {
+		return false;
+	}
+
+	numOut = 0;
+
+	// could std::accumulate this, but aint no body got time for dat.
+	for (const auto& c : counts) {
+		numOut += c;
+	}
+	return true;
+}
+
 
 AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId)
 {

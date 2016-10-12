@@ -135,6 +135,7 @@ public:
 	// global counts
 	bool GetNumAssets(int32_t* pNumOut);
 	bool GetNumAssets(AssetType::Enum type, int32_t* pNumOut);
+	bool GetNumAssets(ModId modId, int32_t& numOut);
 
 	// global listing (to engine log)
 	bool ListAssets(void);
