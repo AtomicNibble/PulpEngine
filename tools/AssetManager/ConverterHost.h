@@ -51,6 +51,9 @@ public:
 private:
 	void postQuitJob(void);
 
+signals:
+	void showBusyBar(bool);
+
 protected:
 	void run();
 

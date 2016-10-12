@@ -1,4 +1,5 @@
 #include "ConverterHost.h"
+#include "StatusBar.h"
 
 #include <Threading\JobSystem2.h>
 
@@ -11,6 +12,7 @@ ConverterHost::ConverterHost(assetDb::AssetDB& db, core::MemoryArenaBase* arena)
 	con_(db, arena)
 {
 
+	connect(this, &ConverterHost::showBusyBar, ICore::statusBar(), &MyStatusBar::showBusyBar, Qt::ConnectionType::QueuedConnection);
 }
 
 ConverterHost::~ConverterHost()
@@ -76,6 +78,8 @@ void ConverterHost::run()
 		ConversionJob job;
 		que_.pop(job);
 
+		emit showBusyBar(true);
+
 		if (job.conType == ConversionType::SINGLE)
 		{
 			con_.Convert(job.type, job.name);
@@ -97,8 +101,10 @@ void ConverterHost::run()
 			break;
 		}
 
-		int goat = 0;
-		goat = 2;
+
+		if (que_.isEmpty()) {
+			emit showBusyBar(false);
+		}
 	}
 }
 
