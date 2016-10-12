@@ -251,10 +251,11 @@ QProgressBar {
 	border: 2px solid grey;
 	border-radius: 5px;
 	text-align: center;
+	color:white;
 }
 
 QProgressBar::chunk {
-	background-color: #d7801a;
+	background-color: #C11523;
 	width: 2.15px;
 	margin: 0.5px;
 }
@@ -527,7 +528,13 @@ QPushButton:pressed {
 }
 
 QStatusBar{
-	background: #AF1320;
+	background: #822; /* #AF1320; */
+	color:#f0f0f0;
+}
+
+
+QStatusBar[building="true"] {
+	background: #666;
 	color:#f0f0f0;
 }
 
@@ -539,6 +546,20 @@ QStatusBar QLabel{
 	color:#f0f0f0;
 	width:60px;
 }
+
+QStatusBar QProgressBar {
+	border: 0px solid grey;
+	border-radius: 0px;
+	text-align: center;
+	color:#999;
+	margin: 2px;
+}
+QStatusBar QProgressBar::chunk {
+	background-color: #008910;
+	width: 2px;
+	margin: 1px;
+}
+
 
 QSizeGrip {
 	background-color: none;
