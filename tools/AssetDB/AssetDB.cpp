@@ -639,6 +639,31 @@ bool AssetDB::IterateAssets(ModId modId, AssetDelegate func)
 	return true;
 }
 
+bool AssetDB::IterateAssets(ModId modId, AssetType::Enum type, AssetDelegate func)
+{
+	if (modId == INVALID_MOD_ID) {
+		return false;
+	}
+
+	sql::SqlLiteQuery qry(db_, "SELECT name, type, lastUpdateTime FROM file_ids WHERE type = ? AND mod_id = ?");
+	qry.bind(1, type);
+	qry.bind(2, modId);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const char* pName = row.get<const char*>(0);
+		const int32_t type = row.get<int32_t>(1);
+
+		func.Invoke(static_cast<AssetType::Enum>(type), core::string(pName));
+	}
+
+	return true;
+}
+
+
 bool AssetDB::IterateAssets(AssetType::Enum type, AssetDelegate func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT name, lastUpdateTime FROM file_ids WHERE type = ?");

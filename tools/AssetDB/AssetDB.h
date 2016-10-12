@@ -148,6 +148,7 @@ public:
 	bool IterateMods(ModDelegate func);
 	bool IterateAssets(AssetDelegate func);
 	bool IterateAssets(ModId modId, AssetDelegate func);
+	bool IterateAssets(ModId modId, AssetType::Enum type, AssetDelegate func);
 	bool IterateAssets(AssetType::Enum type, AssetDelegate func);
 
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
