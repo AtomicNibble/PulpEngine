@@ -645,31 +645,13 @@ void AssetExplorer::build(void)
 	BUG_ASSERT(currentNode_, return);
 
 	if (currentNode_->nodeType() != NodeType::FileNodeType &&
-		currentNode_->nodeType() != NodeType::VirtualFolderNodeType) {
+		currentNode_->nodeType() != NodeType::VirtualFolderNodeType && 
+		currentNode_->nodeType() != NodeType::ProjectNodeType) {
 		return;
 	}
 
-	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_))
-	{
-		buildAsset(pFileNode);
-	}
-	else if (VirtualFolderNode* pVirtualFolder = qobject_cast<VirtualFolderNode*>(currentNode_))
-	{
-		const auto files = pVirtualFolder->fileNodes();
-		for (const auto& f : files)
-		{
-			buildAsset(f);
-		}
-	}
-}
 
-void AssetExplorer::buildAsset(const FileNode* pFileNode)
-{
-	const QString& name = pFileNode->name();
-	const auto array = name.toLocal8Bit();
-	core::string nameNarrow(array.data());
-
-	conHost_.convertAsset(nameNarrow, pFileNode->assetType());
+	currentNode_->build(conHost_);
 }
 
 

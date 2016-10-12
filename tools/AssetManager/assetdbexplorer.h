@@ -22,9 +22,8 @@ namespace AssetExplorer {
 
 	class Project;
 	class Node;
-	class FolderNode;
 	class FileNode;
-
+	class FolderNode;
 
 	class AssetExplorer : public QObject
 	{
@@ -90,8 +89,6 @@ namespace AssetExplorer {
 		void savePersistentSettings(void);
 
 	private:
-		void buildAsset(const FileNode* pFileNode);
-
 		void setCurrent(Project* pProject, const QString& filePath, Node* pNode);
 		void updateContextMenuActions(void);
 
