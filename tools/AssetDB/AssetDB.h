@@ -183,6 +183,9 @@ public:
 	bool GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut);
 	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
 	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
+	
+	bool IsAssetStale(int32_t assetId);
+	bool OnAssetCompiled(int32_t assetId);
 
 	// some assetRef stuff.
 	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);

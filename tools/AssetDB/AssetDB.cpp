@@ -1799,6 +1799,69 @@ bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
 }
 
 
+bool AssetDB::IsAssetStale(int32_t assetId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT file_ids.compiledHash, file_ids.argsHash, raw_files.hash, raw_files.size FROM file_ids "
+		"INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	auto row = *it;
+
+	// ever compiled?
+	if (row.columnType(0) == sql::ColumType::SNULL) {
+		return false;
+	}
+
+	const int32_t compiledHash = row.get<int32_t>(0);
+	const int32_t argsHash = row.get<int32_t>(1);
+	const int32_t rawFileHash = row.get<int32_t>(2);
+	const int32_t rawFileSize = row.get<int32_t>(3);
+
+	// work out if somethings changed.
+	const int32_t mergedHash = core::Crc32::Combine(argsHash, rawFileHash, rawFileSize);
+	
+	return mergedHash == compiledHash;
+}
+
+bool AssetDB::OnAssetCompiled(int32_t assetId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash, raw_files.size FROM file_ids "
+		"INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+	if (it == qry.end()) {
+		return false;
+	}
+
+	auto row = *it;
+	const int32_t argsHash = row.get<int32_t>(0);
+	const int32_t rawFileHash = row.get<int32_t>(1);
+	const int32_t rawFileSize = row.get<int32_t>(2);
+
+	const int32_t mergedHash = core::Crc32::Combine(argsHash, rawFileHash, rawFileSize);
+
+	sql::SqlLiteTransaction trans(db_);
+
+	sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = ?, lastUpdateTime = DateTime('now') WHERE file_id = ?");
+	cmd.bind(1, mergedHash);
+	cmd.bind(2, assetId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return false;
+	}
+
+	trans.commit();
+	return true;
+}
+
 bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) from refs WHERE toId = ?");
