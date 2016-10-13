@@ -19,7 +19,7 @@ MatLibrena* g_MatLibArena = nullptr;
 
 class XConverterLib_Material : public IConverterModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Material, "Engine_MateriaLib");
+	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Material, "Engine_MaterialLib");
 
 	virtual const char* GetName(void) X_OVERRIDE
 	{
