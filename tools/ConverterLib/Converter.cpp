@@ -280,14 +280,46 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 
 	X_LOG0("Converter", "Cleaning all compiled assets for mod: \"%s\"", name.c_str());
 
+	core::IFileSys* pFileSys = gEnv->pFileSys;
+
 	// nuke the output directory. BOOM!
 	// if they put files in here that are custom. RIP.
-	if (gEnv->pFileSys->directoryExists(outDir.c_str())) 
+	if (pFileSys->directoryExists(outDir.c_str())) 
 	{
-		if (!gEnv->pFileSys->deleteDirectory(outDir.c_str(), true)) {
+#if 1 // this just deletes the contents not the actually mod folder, which i like better. this code tho i don't like so much :(
+		core::Path<char> searchPath (outDir);
+		searchPath.ensureSlash();
+		searchPath.append("*");
+
+		core::IFileSys::findData fd;
+		uintptr_t handle = pFileSys->findFirst(searchPath.c_str(), &fd);
+		if (handle != core::IFileSys::INVALID_HANDLE)
+		{
+			do
+			{
+				char narrowName[core::Path<char>::BUF_SIZE] = { 0 };
+				core::strUtil::Convert(fd.name, narrowName);
+
+				if (core::strUtil::Find(narrowName, ".") || core::strUtil::Find(narrowName, "..")) {
+					continue;
+				}
+
+				if (!gEnv->pFileSys->deleteDirectory(narrowName, true)) {
+					X_ERROR("Converter", "Failed to clear mod \"%s\" assets directory", name.c_str());
+					return false;
+				}
+
+			}
+			while (pFileSys->findnext(handle, &fd));
+
+			pFileSys->findClose(handle);
+		}
+#else
+		if (!pFileSys->deleteDirectory(outDir.c_str(), true)) {
 			X_ERROR("Converter", "Failed to clear mod \"%s\" assets directory", name.c_str());
 			return false;
 		}
+#endif
 	}
 	
 	X_LOG0("Converter", "Cleaning complete");
