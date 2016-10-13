@@ -21,7 +21,8 @@ X_NAMESPACE_BEGIN(converter)
 
 Converter::Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
 	scratchArea_(scratchArea),
-	db_(db)
+	db_(db),
+	forceConvert_(false)
 {
 	core::zero_object(converters_);
 }
@@ -35,6 +36,11 @@ void Converter::PrintBanner(void)
 {
 	X_LOG0("Converter", "=================== V0.1 ===================");
 
+}
+
+void Converter::forceConvert(bool force)
+{
+	forceConvert_ = force;
 }
 
 bool Converter::Convert(AssetType::Enum assType, const core::string& name)
@@ -63,7 +69,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
 
 	// file exist already?
-	if (gEnv->pFileSys->fileExists(pathOut.c_str()))
+	if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str()))
 	{
 		// se if stale.
 		if (db_.IsAssetStale(assetId)) {

@@ -34,6 +34,9 @@ public:
 
 	CONVERTERLIB_EXPORT void PrintBanner(void);
 
+	// enables force conversion so assets are rebuilt even if not stale.
+	CONVERTERLIB_EXPORT void forceConvert(bool force);
+
 	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType, const core::string& name);
 	CONVERTERLIB_EXPORT bool Convert(int32_t modId);
 	CONVERTERLIB_EXPORT bool Convert(int32_t modId, AssetType::Enum assType);
@@ -67,6 +70,9 @@ private:
 	core::MemoryArenaBase* scratchArea_;
 	IConverter* converters_[AssetType::ENUM_COUNT];
 	assetDb::AssetDB& db_;
+
+	bool forceConvert_;
+	bool _pad[3];
 };
 
 
