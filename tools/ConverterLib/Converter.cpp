@@ -282,8 +282,12 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 
 	// nuke the output directory. BOOM!
 	// if they put files in here that are custom. RIP.
-	if (!gEnv->pFileSys->deleteDirectory(outDir.c_str(), true)) {
-		X_ERROR("Converter", "Failed to clear mod \"%s\" assets directory", name.c_str());
+	if (gEnv->pFileSys->directoryExists(outDir.c_str())) 
+	{
+		if (!gEnv->pFileSys->deleteDirectory(outDir.c_str(), true)) {
+			X_ERROR("Converter", "Failed to clear mod \"%s\" assets directory", name.c_str());
+			return false;
+		}
 	}
 	
 	X_LOG0("Converter", "Cleaning complete");
