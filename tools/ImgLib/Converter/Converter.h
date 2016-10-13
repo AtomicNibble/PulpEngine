@@ -27,6 +27,22 @@ namespace Converter
 			uint8_t* pOut;
 		};
 
+		struct MipFaceJobData
+		{
+			core::MemoryArenaBase* swapArena;
+
+			XTextureFile& srcImg;
+
+			const MipMapFilterParams& params;
+			//  makes these enums 8bit if need smaller struct.
+			MipFilter::Enum filter;
+			WrapMode::Enum wrap;
+			bool alpha;
+			bool& result;
+
+			int32_t faceIdx;
+		};
+
 		X_DECLARE_ENUM(Profile)(
 			UltraFast,
 			VeryFast,
@@ -56,6 +72,8 @@ namespace Converter
 		static void getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params);
 
 	private:
+		static void generateMipsForFace(MipFaceJobData& jobdata);
+		static void generateMipsJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 		static void compressJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 		static CompressionFunc::Pointer getCompressionFunc(Texturefmt::Enum fmt, Profile::Enum profile, bool keepAlpha);
