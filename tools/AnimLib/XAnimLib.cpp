@@ -61,13 +61,13 @@ bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args,
 		if (core::strUtil::IsEqualCaseInsen(pType, "relative")) {
 			type = AnimType::RELATIVE;
 		}
-		if (core::strUtil::IsEqualCaseInsen(pType, "absolute")) {
+		else if (core::strUtil::IsEqualCaseInsen(pType, "absolute")) {
 			type = AnimType::ABSOLUTE;
 		}
-		if (core::strUtil::IsEqualCaseInsen(pType, "additive")) {
+		else if (core::strUtil::IsEqualCaseInsen(pType, "additive")) {
 			type = AnimType::ADDITIVE;
 		}
-		if (core::strUtil::IsEqualCaseInsen(pType, "delta")) {
+		else if (core::strUtil::IsEqualCaseInsen(pType, "delta")) {
 			type = AnimType::DELTA;
 		}
 		else {
