@@ -26,6 +26,11 @@ template <size_t N, typename TChar = char>
 class StackString
 {
 public:
+	typedef TChar char_type;
+
+	static const size_t BUF_SIZE = N;
+
+public:
 	/// Constructs an empty string.
 	inline StackString(void);
 
