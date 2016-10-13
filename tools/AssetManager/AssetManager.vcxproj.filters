@@ -1344,6 +1344,24 @@
     <ClCompile Include="Release\moc_RawFileLoader.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="AssetAnimWidget.cpp">
+      <Filter>Source Files\Widgets\AssetScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetAnimWidget.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetAnimWidget.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetAnimWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetAnimWidget.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetAnimWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1522,6 +1540,9 @@
     </CustomBuild>
     <CustomBuild Include="RawFileLoader.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetAnimWidget.h">
+      <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
