@@ -17,6 +17,12 @@ XModelLib::~XModelLib()
 
 }
 
+const char* XModelLib::getOutExtension(void) const
+{
+	return model::MODEL_FILE_EXTENSION;
+}
+
+
 bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args, 
 	const core::Array<uint8_t>& fileData, const OutPath& destPath)
 {

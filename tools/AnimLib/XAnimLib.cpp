@@ -18,6 +18,10 @@ XAnimLib::~XAnimLib()
 
 }
 
+const char* XAnimLib::getOutExtension(void) const
+{
+	return anim::ANIM_FILE_EXTENSION;
+}
 
 bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args, 
 	const core::Array<uint8_t>& fileData, const OutPath& destPath)

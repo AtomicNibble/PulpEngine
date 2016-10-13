@@ -6,6 +6,8 @@
 #include <String\StringHash.h>
 #include "Converter\Converter.h"
 
+#include <ICi.h>
+
 X_NAMESPACE_BEGIN(texture)
 
 using namespace Converter;
@@ -20,6 +22,10 @@ ImgLib::~ImgLib()
 
 }
 
+const char* ImgLib::getOutExtension(void) const
+{
+	return texture::CI_FILE_EXTENSION;
+}
 
 bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 	const OutPath& destPath)

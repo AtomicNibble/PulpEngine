@@ -16,6 +16,12 @@ MaterialLib ::~MaterialLib()
 }
 
 
+
+const char* MaterialLib::getOutExtension(void) const
+{
+	return engine::MTL_B_FILE_EXTENSION;
+}
+
 bool MaterialLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 	const OutPath& destPath)
 {

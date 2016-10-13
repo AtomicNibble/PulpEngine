@@ -11,6 +11,8 @@ public:
 	XModelLib();
 	~XModelLib() X_OVERRIDE;
 
+	virtual const char* getOutExtension(void) const X_OVERRIDE;
+
 	bool Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		const OutPath& destPath) X_OVERRIDE;
 

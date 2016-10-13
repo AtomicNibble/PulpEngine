@@ -42,6 +42,9 @@ struct IConverter
 
 	virtual ~IConverter() {}
 
+	// gets the file extension this converter outputs with.
+	virtual const char* getOutExtension(void) const X_ABSTRACT;
+
 	virtual bool Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		const OutPath& destPath) X_ABSTRACT;
 };
