@@ -382,8 +382,36 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType)
 	else if (assType == AssetType::IMG) {
 		pAssTypeStr = "Img";
 	}
+	else if (assType == AssetType::WEAPON) {
+		pAssTypeStr = "Weapon";
+	}
+	else if (assType == AssetType::TURRET) {
+		pAssTypeStr = "Turret";
+	}
+	else if (assType == AssetType::LIGHT) {
+		pAssTypeStr = "Light";
+	}
+	else if (assType == AssetType::FX) {
+		pAssTypeStr = "Fx";
+	}
+	else if (assType == AssetType::RUMBLE) {
+		pAssTypeStr = "Rumble";
+	}
+	else if (assType == AssetType::SHELLSHOCK) {
+		pAssTypeStr = "Shellshock";
+	}
+	else if (assType == AssetType::CHARACTER) {
+		pAssTypeStr = "Character";
+	}
+	else if (assType == AssetType::VEHICLE) {
+		pAssTypeStr = "Vehicle";
+	}
+	else if (assType == AssetType::CAMERA) {
+		pAssTypeStr = "Camera";
+	}
 	else {
 		X_ASSERT_UNREACHABLE();
+		return false;
 	}
 
 	core::StackString<64> dllName("Engine_");
