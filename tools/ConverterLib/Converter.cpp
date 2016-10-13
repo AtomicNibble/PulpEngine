@@ -47,6 +47,12 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 {
 	X_LOG0("Converter", "Converting \"%s\" type: \"%s\"", name.c_str(), AssetType::ToString(assType));
 
+	// early out if we dont have the con lib for this ass type.
+	if (!EnsureLibLoaded(assType)) {
+		X_ERROR("Converter", "Failed to convert, converter missing for asset type.");
+		return false;
+	}
+
 	if (!db_.OpenDB()) {
 		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
@@ -135,6 +141,12 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 {
 	X_LOG0("Converter", "Converting all \"%s\" assets ...", AssetType::ToString(assType));
 
+	// early out.
+	if (!EnsureLibLoaded(assType)) {
+		X_ERROR("Converter", "Failed to convert, converter missing for asset type.");
+		return false;
+	}
+
 	if (!db_.OpenDB()) {
 		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
@@ -159,6 +171,11 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 bool Converter::Convert(AssetType::Enum assType)
 {
 	X_LOG0("Converter", "Converting all \"%s\" assets ...", AssetType::ToString(assType));
+
+	if (!EnsureLibLoaded(assType)) {
+		X_ERROR("Converter", "Failed to convert, converter missing for asset type.");
+		return false;
+	}
 
 	if (!db_.OpenDB()) {
 		X_ERROR("Converter", "Failed to open AssetDb");
