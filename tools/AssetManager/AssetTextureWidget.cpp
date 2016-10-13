@@ -234,8 +234,13 @@ void AssetTextureWidget::dragEnterEvent(QDragEnterEvent *event)
 			const auto& url = urls[0];
 			if (url.isLocalFile())
 			{
-				event->setDropAction(Qt::DropAction::LinkAction);
-				event->accept();
+				QString filePath = url.toLocalFile();
+
+				if (fileExtensionValid(filePath))
+				{
+					event->setDropAction(Qt::DropAction::LinkAction);
+					event->accept();
+				}
 			}
 		}
 	}
