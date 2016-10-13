@@ -53,7 +53,7 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, IAssetEntry* pAssEntry, 
 	// browse button
 	QToolButton* pBrowse = new QToolButton();
 	pBrowse->setText("...");
-	setPromptDialogFilter("DDS (*.dds);;PNG (*.png);;TGA (*.tga);;JPG(*.jpg)");
+	setPromptDialogFilter("Texture (*.dds *.png *.tga *.jpg);;DDS (*.dds);;PNG (*.png);;TGA (*.tga);;JPG (*.jpg)");
 
 	connect(pBrowse, SIGNAL(clicked()), this, SLOT(browseClicked()));
 
