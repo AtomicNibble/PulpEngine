@@ -63,7 +63,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
 
 	// file exist already?
-//	if (gEnv->pFileSys->fileExists(pathOut.c_str()))
+	if (gEnv->pFileSys->fileExists(pathOut.c_str()))
 	{
 		// se if stale.
 		if (db_.IsAssetStale(assetId)) {
