@@ -28,6 +28,7 @@ class AssetPathWidget;
 class AssetTextWidget;
 class AssetTextureWidget;
 class AssetModelWidget;
+class AssetAnimWidget;
 class AssetStringWidget;
 class AssetColorWidget;
 class AssetComboBoxWidget;
@@ -59,6 +60,7 @@ public:
 
 		IMAGE,
 		MODEL,
+		ANIM,
 		PATH,
 
 		GROUPBOX // used to start a group box.
@@ -199,6 +201,7 @@ private:
 		AssetTextWidget* pTextWidget_;
 		AssetTextureWidget* pTextureWidget_;
 		AssetModelWidget* pModelWidget_;
+		AssetAnimWidget* pAnimWidget_;
 		AssetStringWidget* pStringWidget_;
 		AssetColorWidget* pColorWidget_;
 		AssetComboBoxWidget* pComboBoxWidget_;

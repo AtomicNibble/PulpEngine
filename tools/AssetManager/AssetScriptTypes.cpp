@@ -287,6 +287,14 @@ AssetScriptProperty* AssetScriptProps::AddModel(const std::string& key, const st
 	return pProp;
 }
 
+AssetScriptProperty* AssetScriptProps::AddAnim(const std::string& key, const std::string& default)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::ANIM);
+	pProp->prop().SetDefaultValue(default);
+	return pProp;
+}
+
+
 AssetScriptProperty* AssetScriptProps::AddCombo(const std::string& key, const std::string& valuesStr, bool editiable)
 {
 	auto pProp = getProperty(key, AssetProperty::PropertyType::COMBOBOX);
