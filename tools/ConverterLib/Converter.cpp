@@ -244,11 +244,18 @@ bool Converter::CleanAll(const char* pMod)
 
 bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
 {
-	// should we just get all the assets build a hash and then check all file names
-	// have a valid entry.
-	// OR we can iterate the files on disk and check the DB.
+	// mark all the assets for this mod stale.
+	if (!db_.MarkAssetsStale(modId)) {
+		X_ERROR("Converter", "Failed to mark mod \"%s\" assets as state", name.c_str());
+		return false;
+	}
 
-	X_ASSERT_NOT_IMPLEMENTED();
+	// nuke the output directory. BOOM!
+	// if they put files in here that are custom. RIP.
+	if (!gEnv->pFileSys->deleteDirectory(outDir.c_str(), true)) {
+		X_ERROR("Converter", "Failed to clear mod \"%s\" assets directory", name.c_str());
+	}
+
 	return true;
 }
 
