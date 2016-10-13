@@ -43,6 +43,7 @@ public:
 	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType);
 	CONVERTERLIB_EXPORT bool ConvertAll(void);
 	CONVERTERLIB_EXPORT bool CleanAll(const char* pMod = nullptr);
+	CONVERTERLIB_EXPORT bool CleanAll(int32_t modId);
 
 	// IConverterHost
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, core::Array<uint8_t>& dataOut) X_OVERRIDE;

@@ -241,6 +241,17 @@ bool Converter::CleanAll(const char* pMod)
 	return db_.IterateMods(func);
 }
 
+bool Converter::CleanAll(int32_t modId)
+{
+	assetDb::AssetDB::Mod mod;
+
+	if (!db_.GetModInfo(modId, mod)) {
+		X_ERROR("Converter", "Failed to get mod info");
+		return false;
+	}
+
+	return CleanMod(modId, mod.name, mod.outDir);
+}
 
 bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
 {
