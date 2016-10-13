@@ -874,7 +874,7 @@ bool AssetManager::event(QEvent *e)
 	{
 		QStatusTipEvent* ev = static_cast<QStatusTipEvent*>(e);
 		if (ev->tip().length() > 0) {
-			pStatusBar_->showMessage(ev->tip());
+			pStatusBar_->showMessage(ev->tip(), 3000);
 		}
 		else {
 			pStatusBar_->showMessage("Ready");
