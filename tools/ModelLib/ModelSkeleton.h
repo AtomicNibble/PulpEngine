@@ -7,6 +7,10 @@
 
 #include <IModel.h>
 
+X_NAMESPACE_DECLARE(core,
+	class XLexer;
+);
+
 X_NAMESPACE_BEGIN(model)
 
 
@@ -30,7 +34,7 @@ public:
 	const Vec3f getBonePos(size_t idx) const;
 
 private:
-	bool LoadRawModelSkelton_int(core::XFile* pFile);
+	bool LoadRawModelSkelton_int(core::XLexer& lex);
 
 	bool ReadBones(core::XLexer& lex, int32_t numBones);
 	bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);

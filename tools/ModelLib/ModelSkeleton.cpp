@@ -188,29 +188,16 @@ bool ModelSkeleton::LoadRawModelSkelton(const core::Path<wchar_t>& filePath)
 		return false;
 	}
 
-
-	return LoadRawModelSkelton_int(file.GetFile());
-}
-
-bool ModelSkeleton::LoadRawModelSkelton(const core::Array<uint8_t>& data)
-{
-	core::XFileBuf file(data.begin(), data.end());
-
-	return LoadRawModelSkelton_int(&file);
-}
-
-bool ModelSkeleton::LoadRawModelSkelton_int(core::XFile* pFile)
-{
 	core::Array<char> fileData(arena_);
 	{
-		size_t fileSize = safe_static_cast<size_t, uint64_t>(pFile->remainingBytes());
+		size_t fileSize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
-		// lets limit it to 10kb
-		fileSize = core::Min<size_t>(fileSize, 1024 * 10);
+		// lets limit it to 16kb
+		fileSize = core::Min<size_t>(fileSize, 1024 * 16);
 
 		fileData.resize(fileSize);
 
-		size_t bytesRead = pFile->read(fileData.ptr(), fileSize);
+		const size_t bytesRead = file.read(fileData.ptr(), fileSize);
 		if (bytesRead != fileSize) {
 			X_ERROR("RawModel", "failed to read file data. got: %" PRIuS " requested: %" PRIuS, bytesRead, fileSize);
 			return false;
@@ -220,6 +207,21 @@ bool ModelSkeleton::LoadRawModelSkelton_int(core::XFile* pFile)
 	core::XLexer lex(fileData.begin(), fileData.end());
 
 
+	return LoadRawModelSkelton_int(lex);
+}
+
+bool ModelSkeleton::LoadRawModelSkelton(const core::Array<uint8_t>& data)
+{
+	const char* pBegin = reinterpret_cast<const char*>(data.begin());
+	const char* pEnd = reinterpret_cast<const char*>(data.end());
+
+	core::XLexer lex(pBegin, pEnd);
+
+	return LoadRawModelSkelton_int(lex);
+}
+
+bool ModelSkeleton::LoadRawModelSkelton_int(core::XLexer& lex)
+{
 	int32_t version, numLods, numBones;
 
 	if (!ReadheaderToken(lex, "VERSION", version)) {
