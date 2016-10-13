@@ -1308,6 +1308,42 @@
     <ClCompile Include="Release\moc_LoggerOutputWindowWritePolicy.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="AssetModelWidget.cpp">
+      <Filter>Source Files\Widgets\AssetScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetModelWidget.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetModelWidget.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetModelWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetModelWidget.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetModelWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_RawFileLoader.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="RawFileLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_RawFileLoader.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RawFileLoader.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_RawFileLoader.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RawFileLoader.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1480,6 +1516,12 @@
     </CustomBuild>
     <CustomBuild Include="LoggerOutputWindowWritePolicy.h">
       <Filter>Header Files\Logger</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetModelWidget.h">
+      <Filter>Header Files\Widgets\AssetScript</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RawFileLoader.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
