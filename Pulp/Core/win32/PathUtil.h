@@ -21,8 +21,8 @@ namespace PathUtil
 	bool DeleteFile(const core::Path<wchar_t>& filePath);
 	bool DeleteFile(const wchar_t* pFilePath);
 
-	bool DeleteDirectory(const core::Path<wchar_t>& dir);
-	bool DeleteDirectory(const wchar_t* pDir);
+	bool DeleteDirectory(const core::Path<wchar_t>& dir, bool resursive);
+	bool DeleteDirectory(const wchar_t* pDir, bool resursive);
 
 	bool CreateDirectory(const core::Path<wchar_t>& dir);
 	bool CreateDirectory(const wchar_t* pDir);

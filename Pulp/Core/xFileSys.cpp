@@ -715,19 +715,17 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 {
 	Path<wchar_t> temp;
+
+	// this needs replacing with more robost logic.
 	core::zero_object(temp); // ensure 2 null bytes at end.
 
 	createOSPath(gameDir_, path, temp);
-
-	if (recursive) {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
 
 	if (isDebug()) {
 		X_LOG0("FileSys", "deleteDirectory: \"%ls\"", temp.c_str());
 	}
 
-	return PathUtil::DeleteDirectory(temp);
+	return PathUtil::DeleteDirectory(temp, recursive);
 }
 
 

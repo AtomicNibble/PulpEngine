@@ -48,21 +48,30 @@ namespace PathUtil
 	// ------------------------------------------------
 
 
-	bool DeleteDirectory(const core::Path<wchar_t>& dir)
+	bool DeleteDirectory(const core::Path<wchar_t>& dir, bool resursive)
 	{
-		return DeleteDirectory(dir.c_str());
+		return DeleteDirectory(dir.c_str(), resursive);
 	}
 
-	bool DeleteDirectory(const wchar_t* pDir)
+	bool DeleteDirectory(const wchar_t* pDir, bool resursive)
 	{
+		FILEOP_FLAGS flags = FOF_NOCONFIRMATION |
+			FOF_NOERRORUI |
+			FOF_SILENT;
+
+		if (!resursive) {
+			// not sure if this logic works or how id even want / expect it to work.
+			X_ASSERT_NOT_IMPLEMENTED();
+
+			flags |= FOF_NORECURSION;
+		}
+
 		SHFILEOPSTRUCTW file_op = {
 			NULL,
 			FO_DELETE,
 			pDir,
 			L"",
-			FOF_NOCONFIRMATION |
-			FOF_NOERRORUI |
-			FOF_SILENT,
+			flags,
 			false,
 			0,
 			L"" };
