@@ -280,6 +280,13 @@ AssetScriptProperty* AssetScriptProps::AddTexture(const std::string& key, const 
 	return pProp;
 }
 
+AssetScriptProperty* AssetScriptProps::AddModel(const std::string& key, const std::string& default)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::MODEL);
+	pProp->prop().SetDefaultValue(default);
+	return pProp;
+}
+
 AssetScriptProperty* AssetScriptProps::AddCombo(const std::string& key, const std::string& valuesStr, bool editiable)
 {
 	auto pProp = getProperty(key, AssetProperty::PropertyType::COMBOBOX);

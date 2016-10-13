@@ -12,6 +12,7 @@
 #include "AssetLineEditWidget.h"
 #include "AssetTextWidget.h"
 #include "AssetTextureWidget.h"
+#include "AssetModelWidget.h"
 #include "AssetGroupWidget.h"
 #include "AssetPathWidget.h"
 
@@ -96,6 +97,9 @@ void AssetProperty::appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLay
 	case PropertyType::IMAGE:
 		pTextureWidget_ = new AssetTextureWidget(pParent, pAssEntry, val);
 		break;
+	case PropertyType::MODEL:
+		pModelWidget_ = new AssetModelWidget(pParent, pAssEntry, val);
+		break;
 	case PropertyType::STRING:
 		pStringWidget_ = new AssetStringWidget(pParent, val);
 		break;
@@ -124,6 +128,7 @@ void AssetProperty::appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLay
 	case PropertyType::FLOAT:
 	case PropertyType::PATH:
 	case PropertyType::IMAGE:
+	case PropertyType::MODEL:
 	case PropertyType::LINEEDIT:
 		connect(pWidget_, SIGNAL(valueChanged(const std::string&)), this, SLOT(valueChanged(const std::string&)));
 		break;
@@ -293,6 +298,9 @@ void AssetProperty::show(bool vis)
 	case PropertyType::IMAGE:
 		pTextureWidget_->setVisible(vis);
 		break;
+	case PropertyType::MODEL:
+		pModelWidget_->setVisible(vis);
+		break;
 	case PropertyType::STRING:
 		pStringWidget_->setVisible(vis);
 		break;
@@ -337,6 +345,9 @@ void AssetProperty::enable(bool val)
 		break;
 	case PropertyType::IMAGE:
 		pTextureWidget_->setEnabled(val);
+		break;
+	case PropertyType::MODEL:
+		pModelWidget_->setEnabled(val);
 		break;
 	case PropertyType::STRING:
 		pStringWidget_->setEnabled(val);
@@ -579,7 +590,12 @@ void AssetProperty::SetDefaultValue(const std::string& val)
 	defaultValue_ = val;
 
 	if (isNewProp()) {
-		SetValue(val);
+		// set the saved value to the default?
+		// this kinda depends how we want to handle new data
+		// since args are complelty empty untill props are saved.
+		// maybe mark everything that's not blank as modified intially?
+		SetSavedValue(val);
+		settings_.Remove(Setting::NEW_PROP);
 	}
 }
 
@@ -1053,6 +1069,7 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		case AssetProperty::PropertyType::PATH:
 		case AssetProperty::PropertyType::LINEEDIT:
 		case AssetProperty::PropertyType::IMAGE:
+		case AssetProperty::PropertyType::MODEL:
 		case AssetProperty::PropertyType::COMBOBOX:
 		case AssetProperty::PropertyType::COLOR:
 		case AssetProperty::PropertyType::VEC2:
@@ -1183,6 +1200,7 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 			pItem->SetType(type);
 
 			connect(pItem, SIGNAL(modified(void)), this, SLOT(propModified(void)));
+
 		}
 		else if (pItem->GetType() != type) {
 			X_WARNING("AssetProps", "Prop request with diffrent types for key \"%s\" initialType: \"%s\" requestedType: \"%s\"",

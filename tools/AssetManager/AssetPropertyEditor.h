@@ -27,6 +27,7 @@ class AssetDoubleSpinBoxWidget;
 class AssetPathWidget;
 class AssetTextWidget;
 class AssetTextureWidget;
+class AssetModelWidget;
 class AssetStringWidget;
 class AssetColorWidget;
 class AssetComboBoxWidget;
@@ -57,6 +58,7 @@ public:
 		VEC4,
 
 		IMAGE,
+		MODEL,
 		PATH,
 
 		GROUPBOX // used to start a group box.
@@ -196,6 +198,7 @@ private:
 		AssetPathWidget* pPathWidget_;
 		AssetTextWidget* pTextWidget_;
 		AssetTextureWidget* pTextureWidget_;
+		AssetModelWidget* pModelWidget_;
 		AssetStringWidget* pStringWidget_;
 		AssetColorWidget* pColorWidget_;
 		AssetComboBoxWidget* pComboBoxWidget_;

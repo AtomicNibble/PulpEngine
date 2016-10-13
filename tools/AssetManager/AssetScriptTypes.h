@@ -73,6 +73,7 @@ public:
 
 
 	AssetScriptProperty* AddTexture(const std::string& key, const std::string& default);
+	AssetScriptProperty* AddModel(const std::string& key, const std::string& default);
 	AssetScriptProperty* AddCombo(const std::string& key, const std::string& values, bool editiable = false);
 	AssetScriptProperty* AddCheckBox(const std::string& key, bool default);
 	AssetScriptProperty* AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
