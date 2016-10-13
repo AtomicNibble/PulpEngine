@@ -648,10 +648,10 @@ bool SessionNode::isEnabled(void) const
 	return true;
 }
 
-bool SessionNode::build(ConverterHost& conHost) const
+bool SessionNode::build(ConverterHost& conHost, bool force) const
 {
 	for(ProjectNode* pProject : projectNodes_) {
-		pProject->build(conHost);
+		pProject->build(conHost, force);
 	}
 
 	return true;

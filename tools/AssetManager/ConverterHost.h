@@ -35,6 +35,9 @@ private:
 		core::string name;
 		assetDb::AssetType::Enum type;
 		int32_t modId;
+
+		bool force;
+		bool _pad[3];
 	};
 
 public:
@@ -44,9 +47,9 @@ public:
 	void init();
 	void shutdown();
 
-	void convertAsset(const core::string& name, assetDb::AssetType::Enum type);
-	void convertMod(int32_t modId);
-	void convertMod(int32_t modId, assetDb::AssetType::Enum type);
+	void convertAsset(const core::string& name, assetDb::AssetType::Enum type, bool force);
+	void convertMod(int32_t modId, bool force);
+	void convertMod(int32_t modId, assetDb::AssetType::Enum type, bool force);
 
 private:
 	void postQuitJob(void);

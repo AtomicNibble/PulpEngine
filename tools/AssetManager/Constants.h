@@ -101,6 +101,7 @@ namespace Constants
 	const char EDIT_CUT[] = "Edit.Cut";
 	const char EDIT_CUTDELETE[] = "Edit.Delete";
 	const char EDIT_SELECTALL[] = "Edit.SelectAll";
+	const char EDIT_CLEARALL[] = "Edit.ClearAll";
 
 	// View Actions
 	const char VIEW_CODE[] = "View.Code";

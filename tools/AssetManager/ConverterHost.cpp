@@ -31,31 +31,34 @@ void ConverterHost::shutdown()
 	wait();
 }
 
-void ConverterHost::convertAsset(const core::string& name, assetDb::AssetType::Enum type)
+void ConverterHost::convertAsset(const core::string& name, assetDb::AssetType::Enum type, bool force)
 {
 	ConversionJob job;
 	job.conType = ConversionType::SINGLE;
 	job.name = name;
 	job.type = type;
+	job.force = force;
 
 	que_.push(job);
 }
 
-void ConverterHost::convertMod(int32_t modId)
+void ConverterHost::convertMod(int32_t modId, bool force)
 {
 	ConversionJob job;
 	job.conType = ConversionType::MOD;
 	job.modId = modId;
+	job.force = force;
 
 	que_.push(job);
 }
 
-void ConverterHost::convertMod(int32_t modId, assetDb::AssetType::Enum type)
+void ConverterHost::convertMod(int32_t modId, assetDb::AssetType::Enum type, bool force)
 {
 	ConversionJob job;
 	job.conType = ConversionType::MOD_TYPE;
 	job.modId = modId;
 	job.type = type;
+	job.force = force;
 
 	que_.push(job);
 }
@@ -79,6 +82,8 @@ void ConverterHost::run()
 		que_.pop(job);
 
 		emit showBusyBar(true);
+
+		con_.forceConvert(job.force);
 
 		if (job.conType == ConversionType::SINGLE)
 		{

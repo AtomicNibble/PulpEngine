@@ -103,6 +103,10 @@ bool AssetExplorer::init(void)
 	buildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Build"), this);
 	buildAction_->setStatusTip(tr("Build selected"));
 
+	reBuildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Re-Build"), this);
+	reBuildAction_->setStatusTip(tr("ReBuild selected"));
+
+
 	setStartupModAction_ = new ParameterAction(tr("Set as Active Mod"),
 		tr("Set \"%1\" as Active Mod"),
 		ParameterAction::EnablingMode::AlwaysEnabled, this);
@@ -110,6 +114,7 @@ bool AssetExplorer::init(void)
 	connect(addNewAssetAction_, SIGNAL(triggered()), this, SLOT(addNewAsset()));
 	connect(addNewAssetTypeAction_, SIGNAL(triggered()), this, SLOT(addNewAssetType()));
 	connect(buildAction_, SIGNAL(triggered()), this, SLOT(build()));
+	connect(reBuildAction_, SIGNAL(triggered()), this, SLOT(buildForce()));
 	connect(setStartupModAction_, SIGNAL(triggered()), this, SLOT(setStartupProject()));
 
     ICommand* pCmd = nullptr;
@@ -233,6 +238,12 @@ bool AssetExplorer::init(void)
 
 	// build action
 	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
+	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
+	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
+	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
+
+	// re-build action
+	pCmd = ActionManager::registerAction(reBuildAction_, assman::AssetExplorer::Constants::REBUILD, projecTreeContext);
 	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
 	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
 	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
@@ -654,6 +665,20 @@ void AssetExplorer::build(void)
 	currentNode_->build(conHost_);
 }
 
+
+void AssetExplorer::buildForce(void)
+{
+	BUG_ASSERT(currentNode_, return);
+
+	if (currentNode_->nodeType() != NodeType::FileNodeType &&
+		currentNode_->nodeType() != NodeType::VirtualFolderNodeType &&
+		currentNode_->nodeType() != NodeType::ProjectNodeType) {
+		return;
+	}
+
+
+	currentNode_->build(conHost_, true);
+}
 
 void AssetExplorer::updateActions(void)
 {

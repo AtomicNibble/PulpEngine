@@ -83,6 +83,7 @@ namespace AssetExplorer {
 		void addNewAssetType(void);
 
 		void build(void);
+		void buildForce(void);
 
 		void updateActions(void);
 
@@ -113,6 +114,7 @@ namespace AssetExplorer {
 		QAction* projectTreeExpandAllAction_;
 		QAction* projectTreeExpandBelowAction_;
 		QAction* buildAction_;
+		QAction* reBuildAction_;
 
 		ParameterAction* setStartupModAction_;
 

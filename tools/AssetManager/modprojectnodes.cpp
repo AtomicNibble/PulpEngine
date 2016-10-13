@@ -348,11 +348,11 @@ ModProject* ModProjectNode::getModProject(void)
     return pProject_;
 }
 
-bool ModProjectNode::build(ConverterHost& conHost) const
+bool ModProjectNode::build(ConverterHost& conHost, bool force) const
 {
 	int32_t modId = pProject_->modId();
 
-	conHost.convertMod(modId);
+	conHost.convertMod(modId, force);
 	return true;
 }
 
@@ -422,7 +422,7 @@ bool ModVirtualFolderNode::loadChildren(void)
     return true;
 }
 
-bool ModVirtualFolderNode::build(ConverterHost& conHost) const
+bool ModVirtualFolderNode::build(ConverterHost& conHost, bool force) const
 {
 	ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
 	if (!pProjectNode) {
@@ -432,7 +432,7 @@ bool ModVirtualFolderNode::build(ConverterHost& conHost) const
 	ModProject* pProject = pProjectNode->getModProject();
 	int32_t modId = pProject->modId();
 
-	conHost.convertMod(modId, assetType());
+	conHost.convertMod(modId, assetType(), force);
 	return true;
 }
 
@@ -445,18 +445,18 @@ ModFolderNode::ModFolderNode(const QString &name) :
 
 }
 
-bool ModFolderNode::build(ConverterHost& conHost) const
+bool ModFolderNode::build(ConverterHost& conHost, bool force) const
 {
 	const auto folders = subFolderNodes();
 	for (const auto& f : folders)
 	{
-		f->build(conHost);
+		f->build(conHost, force);
 	}
 
 	const auto files = fileNodes();
 	for (const auto& f : files)
 	{
-		f->build(conHost);
+		f->build(conHost, force);
 	}
 
 	return true;
@@ -472,12 +472,12 @@ ModFileNode::ModFileNode(const QString& displayName, const QString& name, AssetT
 
 }
 
-bool ModFileNode::build(ConverterHost& conHost) const
+bool ModFileNode::build(ConverterHost& conHost, bool force) const
 {
 	const auto array = name().toLocal8Bit();
 	core::string nameNarrow(array.data());
 
-	conHost.convertAsset(nameNarrow, assetType());
+	conHost.convertAsset(nameNarrow, assetType(), force);
 	return true;
 }
 
