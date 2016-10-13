@@ -341,7 +341,13 @@ bool ModProjectNode::removeSubProjects(const QStringList& projectNames)
     return false;
 }
 
+bool ModProjectNode::clean(ConverterHost& conHost) const
+{
+	int32_t modId = pProject_->modId();
 
+	conHost.cleanMod(modId);
+	return true;
+}
 
 ModProject* ModProjectNode::getModProject(void)
 {

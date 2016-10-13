@@ -191,6 +191,8 @@ namespace AssetExplorer
 		virtual bool addSubProjects(const QStringList& projectNames) X_ABSTRACT;
 		virtual bool removeSubProjects(const QStringList& projectNames) X_ABSTRACT;
 
+		virtual bool clean(ConverterHost& conHost) const X_ABSTRACT;
+
 
 		QList<NodesWatcher*> watchers(void) const;
 		void registerWatcher(NodesWatcher* pWatcher);

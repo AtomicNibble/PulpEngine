@@ -84,6 +84,7 @@ namespace AssetExplorer {
 
 		void build(void);
 		void buildForce(void);
+		void cleanMod(void);
 
 		void updateActions(void);
 
@@ -115,6 +116,7 @@ namespace AssetExplorer {
 		QAction* projectTreeExpandBelowAction_;
 		QAction* buildAction_;
 		QAction* reBuildAction_;
+		QAction* cleanModAction_;
 
 		ParameterAction* setStartupModAction_;
 

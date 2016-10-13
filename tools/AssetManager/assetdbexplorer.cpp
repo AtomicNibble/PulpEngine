@@ -106,6 +106,8 @@ bool AssetExplorer::init(void)
 	reBuildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Re-Build"), this);
 	reBuildAction_->setStatusTip(tr("ReBuild selected"));
 
+	cleanModAction_ = new QAction(QIcon(":/misc/img/clean.png"), tr("Clean"), this);
+	cleanModAction_->setStatusTip(tr("Clean selected"));
 
 	setStartupModAction_ = new ParameterAction(tr("Set as Active Mod"),
 		tr("Set \"%1\" as Active Mod"),
@@ -115,6 +117,7 @@ bool AssetExplorer::init(void)
 	connect(addNewAssetTypeAction_, SIGNAL(triggered()), this, SLOT(addNewAssetType()));
 	connect(buildAction_, SIGNAL(triggered()), this, SLOT(build()));
 	connect(reBuildAction_, SIGNAL(triggered()), this, SLOT(buildForce()));
+	connect(cleanModAction_, SIGNAL(triggered()), this, SLOT(cleanMod()));
 	connect(setStartupModAction_, SIGNAL(triggered()), this, SLOT(setStartupProject()));
 
     ICommand* pCmd = nullptr;
@@ -247,6 +250,10 @@ bool AssetExplorer::init(void)
 	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
 	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
 	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
+
+	// clean action
+	pCmd = ActionManager::registerAction(cleanModAction_, assman::AssetExplorer::Constants::CLEAN, projecTreeContext);
+	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
 
 	// Set start up project
 	pCmd = ActionManager::registerAction(setStartupModAction_, Constants::SETSTARTUP, projecTreeContext);
@@ -679,6 +686,21 @@ void AssetExplorer::buildForce(void)
 
 	currentNode_->build(conHost_, true);
 }
+
+
+void AssetExplorer::cleanMod(void)
+{
+	BUG_ASSERT(currentNode_, return);
+
+	if (currentNode_->nodeType() != NodeType::ProjectNodeType) {
+		return;
+	}
+
+	if (ProjectNode* pProjectNode = qobject_cast<ProjectNode*>(currentNode_)) {
+		pProjectNode->clean(conHost_);
+	}
+}
+
 
 void AssetExplorer::updateActions(void)
 {

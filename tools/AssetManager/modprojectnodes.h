@@ -21,6 +21,8 @@ public:
 	bool addSubProjects(const QStringList& projectNames) X_OVERRIDE;
 	bool removeSubProjects(const QStringList& projectNames) X_OVERRIDE;
 
+	bool clean(ConverterHost& conHost) const X_OVERRIDE;
+
 	ModProject* getModProject(void);
 
 private:

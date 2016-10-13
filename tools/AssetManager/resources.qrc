@@ -55,6 +55,7 @@
         <file>img/ZoomOut.png</file>
         <file>img/Redo.png</file>
         <file>img/Undo.png</file>
+        <file>img/clean.png</file>
     </qresource>
     <qresource prefix="/dock">
         <file>img/box_center.png</file>
