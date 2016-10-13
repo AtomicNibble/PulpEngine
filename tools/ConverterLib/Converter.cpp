@@ -368,57 +368,21 @@ bool Converter::EnsureLibLoaded(AssetType::Enum assType)
 
 bool Converter::IntializeConverterModule(AssetType::Enum assType)
 {
-	const char* pAssTypeStr = nullptr;
+	core::StackString<128> dllName("Engine_");
 
-	if (assType == AssetType::ANIM) {
-		pAssTypeStr = "Anim";
-	}
-	else if (assType == AssetType::MODEL) {
-		pAssTypeStr = "Model";
-	}
-	else if (assType == AssetType::MATERIAL) {
-		pAssTypeStr = "Material";
-	}
-	else if (assType == AssetType::IMG) {
-		pAssTypeStr = "Img";
-	}
-	else if (assType == AssetType::WEAPON) {
-		pAssTypeStr = "Weapon";
-	}
-	else if (assType == AssetType::TURRET) {
-		pAssTypeStr = "Turret";
-	}
-	else if (assType == AssetType::LIGHT) {
-		pAssTypeStr = "Light";
-	}
-	else if (assType == AssetType::FX) {
-		pAssTypeStr = "Fx";
-	}
-	else if (assType == AssetType::RUMBLE) {
-		pAssTypeStr = "Rumble";
-	}
-	else if (assType == AssetType::SHELLSHOCK) {
-		pAssTypeStr = "Shellshock";
-	}
-	else if (assType == AssetType::CHARACTER) {
-		pAssTypeStr = "Character";
-	}
-	else if (assType == AssetType::VEHICLE) {
-		pAssTypeStr = "Vehicle";
-	}
-	else if (assType == AssetType::CAMERA) {
-		pAssTypeStr = "Camera";
-	}
-	else {
-		X_ASSERT_UNREACHABLE();
-		return false;
+	{
+		core::StackString<64> typeName(AssetType::ToString(assType));
+		typeName.toLower();
+		if (typeName.isNotEmpty()) {
+			typeName[0] = ::toupper(typeName[0]);
+		}
+
+		dllName.append(typeName.c_str());
 	}
 
-	core::StackString<64> dllName("Engine_");
-	dllName.append(pAssTypeStr);
 	dllName.append("Lib");
 
-	core::StackString<64> className(dllName);
+	core::StackString<128> className(dllName);
 
 	return IntializeConverterModule(assType, dllName.c_str(), className.c_str());
 }
