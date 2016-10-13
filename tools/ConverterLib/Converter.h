@@ -60,7 +60,7 @@ private:
 	bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
 
 private:
-	static void GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
+	void GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
 		const core::Path<char>& modPath, core::Path<char>& pathOut);
 
 private:

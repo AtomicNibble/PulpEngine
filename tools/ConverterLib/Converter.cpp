@@ -402,6 +402,11 @@ void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::strin
 	gEnv->pFileSys->createDirectoryTree(pathOut.c_str());
 
 	pathOut /= name;
+
+	// get the extension that will be used.
+	// so we can actually find the output file on disk if we want.
+	IConverter* pCon = GetConverter(assType);
+	pathOut.setExtension(pCon->getOutExtension());
 }
 
 X_NAMESPACE_END
