@@ -1798,6 +1798,22 @@ bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
 	return true;
 }
 
+bool AssetDB::MarkAssetsStale(int32_t modId)
+{
+	// basically set NULL for all compiledHashes on file_ids that match this mod.
+	sql::SqlLiteTransaction trans(db_);
+
+	sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = NULL, lastUpdateTime = DateTime('now') WHERE mod_id = ?");
+	cmd.bind(1, modId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return false;
+	}
+
+	trans.commit();
+	return true;
+}
 
 bool AssetDB::IsAssetStale(int32_t assetId)
 {

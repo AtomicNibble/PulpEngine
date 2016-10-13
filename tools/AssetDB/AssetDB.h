@@ -184,6 +184,7 @@ public:
 	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
 	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
 	
+	bool MarkAssetsStale(int32_t modId);
 	bool IsAssetStale(int32_t assetId);
 	bool OnAssetCompiled(int32_t assetId);
 
