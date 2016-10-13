@@ -45,6 +45,7 @@ public:
 	CONVERTERLIB_EXPORT bool CleanAll(const char* pMod = nullptr);
 
 	// IConverterHost
+	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, core::Array<uint8_t>& dataOut) X_OVERRIDE;
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
 	CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_OVERRIDE;
 	// ~IConverterHost
