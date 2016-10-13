@@ -47,6 +47,11 @@ bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args,
 	if (d.HasMember("model")) {
 		modelName = d["model"].GetString();
 	}
+	else {	
+		X_ERROR("AnimLib", "Missing 'model' option");
+		return false;
+	}
+
 	if (d.HasMember("posError")) {
 		posError = d["posError"].GetFloat();
 	}
@@ -77,7 +82,7 @@ bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args,
 	}
 
 	if (modelName.isEmpty()) {
-		X_ERROR("AnimLib", "Missing 'model' option");
+		X_ERROR("AnimLib", "Src 'model' asset name is empty");
 		return false;
 	}
 
