@@ -63,6 +63,14 @@ void ConverterHost::convertMod(int32_t modId, assetDb::AssetType::Enum type, boo
 	que_.push(job);
 }
 
+void ConverterHost::cleanMod(int32_t modId)
+{
+	ConversionJob job;
+	job.conType = ConversionType::CLEAN;
+	job.modId = modId;
+
+	que_.push(job);
+}
 
 void ConverterHost::postQuitJob()
 {
@@ -100,6 +108,10 @@ void ConverterHost::run()
 		else if (job.conType == ConversionType::ALL)
 		{
 			con_.ConvertAll();
+		}
+		else if (job.conType == ConversionType::CLEAN)
+		{
+			con_.CleanAll(job.modId);
 		}
 		else if (job.conType == ConversionType::EXIT)
 		{

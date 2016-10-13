@@ -26,6 +26,7 @@ private:
 		MOD_TYPE,
 		ALL,
 
+		CLEAN,
 		EXIT
 	};
 
@@ -50,6 +51,7 @@ public:
 	void convertAsset(const core::string& name, assetDb::AssetType::Enum type, bool force);
 	void convertMod(int32_t modId, bool force);
 	void convertMod(int32_t modId, assetDb::AssetType::Enum type, bool force);
+	void cleanMod(int32_t modId);
 
 private:
 	void postQuitJob(void);
