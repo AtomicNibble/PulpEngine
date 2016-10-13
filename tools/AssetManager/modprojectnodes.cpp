@@ -345,7 +345,16 @@ bool ModProjectNode::clean(ConverterHost& conHost) const
 {
 	int32_t modId = pProject_->modId();
 
-	conHost.cleanMod(modId);
+	// les warn, might be miss click.
+	const auto result = QMessageBox::warning(ICore::mainWindow(), "Clean Mod", 
+		"Confirm Clean mod.\n\nThis will delete all coverted assets for the selected mod",
+		QMessageBox::Ok | QMessageBox::Cancel,
+		QMessageBox::Cancel);
+	
+	if (result == QMessageBox::Ok) {
+		conHost.cleanMod(modId);
+	}
+
 	return true;
 }
 
