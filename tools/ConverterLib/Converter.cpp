@@ -210,10 +210,10 @@ bool Converter::ConvertAll(void)
 bool Converter::CleanAll(const char* pMod)
 {
 	if (pMod) {
-		X_LOG0("Converter", "Cleaning all untracked assets for mod: \"%s\"", pMod);
+		X_LOG0("Converter", "Cleaning all compiled assets for mod: \"%s\"", pMod);
 	}
 	else {
-		X_LOG0("Converter", "Cleaning all untracked assets");
+		X_LOG0("Converter", "Cleaning all compiled assets");
 	}
 
 	// this is for cleaning all asset that don't have a entry.
