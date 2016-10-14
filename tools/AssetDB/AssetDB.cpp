@@ -559,6 +559,41 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& asse
 	return true;
 }
 
+bool AssetDB::GetAssetList(AssetType::Enum type, AssetInfoArr& assetsOut)
+{
+	int32_t count;
+	if (!GetNumAssets(type, count)) {
+		return false;
+	}
+
+	// how confident are we count always be correct..
+	// could resize if so.
+	assetsOut.reserve(count);
+
+	sql::SqlLiteQuery qry(db_, "SELECT file_id, parent_id, type, name FROM file_ids WHERE type = ?");
+	qry.bind(1, type);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t id = row.get<int32_t>(0);
+		const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
+		const char* pName = row.get<const char*>(3);
+
+		int32_t parentId = INVALID_ASSET_ID;
+		if (row.columnType(1) != sql::ColumType::SNULL) {
+			parentId = row.get<int32_t>(1);
+		}
+
+		assetsOut.emplace_back(id, parentId, pName, type);
+	}
+
+	return true;
+}
+
+
 bool AssetDB::GetModsList(ModsArr& arrOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir FROM mods");

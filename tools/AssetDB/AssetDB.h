@@ -132,6 +132,9 @@ public:
 	bool GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& countOut);
 	bool GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut);
 
+	// all asset of type in every mod.
+	bool GetAssetList(AssetType::Enum type, AssetInfoArr& assetsOut);
+
 	// global counts
 	bool GetNumAssets(int32_t& numOut);
 	bool GetNumAssets(AssetType::Enum type, int32_t& numOut);
