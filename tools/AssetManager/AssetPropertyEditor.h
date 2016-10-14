@@ -91,7 +91,7 @@ public:
 	~AssetProperty();
 
 
-	void appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void addRef(void);
 	void release(void);

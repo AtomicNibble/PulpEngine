@@ -2,6 +2,11 @@
 
 #include <QObject>
 
+X_NAMESPACE_DECLARE(assetDb,
+	class AssetDB;
+);
+
+
 X_NAMESPACE_BEGIN(assman)
 
 class IAssetEntry;
@@ -20,7 +25,8 @@ public:
 	AssetGroupWidget(QWidget *parent = nullptr);
 	~AssetGroupWidget();
 
-	void appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWidget* pParent, 
+		QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void clear(void);
 	void clearUI(void);

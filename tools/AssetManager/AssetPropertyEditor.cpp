@@ -71,7 +71,8 @@ AssetProperty::~AssetProperty()
 	clear();
 }
 
-void AssetProperty::appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
+void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWidget* pParent, 
+	QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
 	const std::string& val = strValue_;
 
@@ -186,7 +187,7 @@ void AssetProperty::appendGui(IAssetEntry* pAssEntry, QWidget* pParent, QGridLay
 		pLayout->addWidget(pGroupWidget_, row++, depth, 1, -1);
 
 
-		pGroupWidget_->appendGui(pAssEntry, pParent, pLayout, row, depth);
+		pGroupWidget_->appendGui(db, pAssEntry, pParent, pLayout, row, depth);
 	}
 	else
 	{	// add label.
@@ -1114,7 +1115,7 @@ bool AssetProperties::appendGui(QWidget* pParent, QGridLayout* pLayout)
 
 	for (const auto& pChild : root_)
 	{
-		pChild->appendGui(this, pParent, pLayout, row, depth);
+		pChild->appendGui(db_, this, pParent, pLayout, row, depth);
 		row += 1;
 	}
 
