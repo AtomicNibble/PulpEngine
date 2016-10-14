@@ -1362,6 +1362,24 @@
     <ClCompile Include="Release\moc_AssetAnimWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="SelectAssetDialog.cpp">
+      <Filter>Source Files\Widgets\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_SelectAssetDialog.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_SelectAssetDialog.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_SelectAssetDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_SelectAssetDialog.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_SelectAssetDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1543,6 +1561,9 @@
     </CustomBuild>
     <CustomBuild Include="AssetAnimWidget.h">
       <Filter>Header Files\Widgets\AssetScript</Filter>
+    </CustomBuild>
+    <CustomBuild Include="SelectAssetDialog.h">
+      <Filter>Header Files\Widgets\Dialogs</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
