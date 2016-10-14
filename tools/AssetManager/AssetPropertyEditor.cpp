@@ -14,6 +14,7 @@
 #include "AssetTextureWidget.h"
 #include "AssetModelWidget.h"
 #include "AssetAnimWidget.h"
+#include "AssetAssetRefWidget.h"
 #include "AssetGroupWidget.h"
 #include "AssetPathWidget.h"
 
@@ -105,6 +106,9 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::ANIM:
 		pAnimWidget_ = new AssetAnimWidget(pParent, pAssEntry, val);
 		break;
+	case PropertyType::ASSET_REF:
+		pAssetRefWidget_ = new AssetAssetRefWidget(pParent, db, assetDb::AssetType::MODEL, val);
+		break;
 	case PropertyType::STRING:
 		pStringWidget_ = new AssetStringWidget(pParent, val);
 		break;
@@ -135,6 +139,7 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
+	case PropertyType::ASSET_REF:
 	case PropertyType::LINEEDIT:
 		connect(pWidget_, SIGNAL(valueChanged(const std::string&)), this, SLOT(valueChanged(const std::string&)));
 		break;
@@ -310,6 +315,9 @@ void AssetProperty::show(bool vis)
 	case PropertyType::ANIM:
 		pAnimWidget_->setVisible(vis);
 		break;
+	case PropertyType::ASSET_REF:
+		pAssetRefWidget_->setVisible(vis);
+		break;
 	case PropertyType::STRING:
 		pStringWidget_->setVisible(vis);
 		break;
@@ -360,6 +368,9 @@ void AssetProperty::enable(bool val)
 		break;
 	case PropertyType::ANIM:
 		pAnimWidget_->setEnabled(val);
+		break;
+	case PropertyType::ASSET_REF:
+		pAssetRefWidget_->setEnabled(val);
 		break;
 	case PropertyType::STRING:
 		pStringWidget_->setEnabled(val);
@@ -1083,6 +1094,7 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::MODEL:
 		case AssetProperty::PropertyType::ANIM:
+		case AssetProperty::PropertyType::ASSET_REF:
 		case AssetProperty::PropertyType::COMBOBOX:
 		case AssetProperty::PropertyType::COLOR:
 		case AssetProperty::PropertyType::VEC2:
