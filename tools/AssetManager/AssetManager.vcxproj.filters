@@ -1362,6 +1362,24 @@
     <ClCompile Include="Release\moc_AssetAnimWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="AssetAssetRefWidget.cpp">
+      <Filter>Source Files\Widgets\AssetScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetAssetRefWidget.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetAssetRefWidget.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetAssetRefWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetAssetRefWidget.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetAssetRefWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
     <ClCompile Include="SelectAssetDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
@@ -1481,9 +1499,6 @@
     <CustomBuild Include="AssetPathWidget.h">
       <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetTextWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
     <CustomBuild Include="AssetTextureWidget.h">
       <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
@@ -1562,8 +1577,14 @@
     <CustomBuild Include="AssetAnimWidget.h">
       <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
+    <CustomBuild Include="AssetAssetRefWidget.h">
+      <Filter>Header Files\Widgets\AssetScript</Filter>
+    </CustomBuild>
     <CustomBuild Include="SelectAssetDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetTextWidget.h">
+      <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
