@@ -183,7 +183,7 @@ bool Converter::Convert(AssetType::Enum assType)
 	}
 
 	int32_t numAssets = 0;
-	if (db_.GetNumAssets(assType, &numAssets)) {
+	if (db_.GetNumAssets(assType, numAssets)) {
 		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 	}
 
@@ -209,7 +209,7 @@ bool Converter::ConvertAll(void)
 	}
 
 	int32_t numAssets = 0;
-	if (db_.GetNumAssets(&numAssets)) {
+	if (db_.GetNumAssets(numAssets)) {
 		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 	}
 

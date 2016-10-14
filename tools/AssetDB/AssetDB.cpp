@@ -720,9 +720,8 @@ bool AssetDB::ListAssets(AssetType::Enum type)
 }
 
 
-bool AssetDB::GetNumAssets(int32_t* pNumOut)
+bool AssetDB::GetNumAssets(int32_t& numOut)
 {
-	X_ASSERT_NOT_NULL(pNumOut);
 	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids");
 
 	auto it = qry.begin();
@@ -732,16 +731,15 @@ bool AssetDB::GetNumAssets(int32_t* pNumOut)
 
 		const int32_t count = row.get<int32_t>(0);
 
-		*pNumOut = count;
+		numOut = count;
 		return true;
 	}
 
 	return false;
 }
 
-bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t* pNumOut)
+bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t& numOut)
 {
-	X_ASSERT_NOT_NULL(pNumOut);
 	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE type = ?");
 	qry.bind(1, type);
 
@@ -752,7 +750,7 @@ bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t* pNumOut)
 
 		const int32_t count = row.get<int32_t>(0);
 
-		*pNumOut = count;
+		numOut = count;
 		return true;
 	}
 

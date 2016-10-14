@@ -133,8 +133,8 @@ public:
 	bool GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut);
 
 	// global counts
-	bool GetNumAssets(int32_t* pNumOut);
-	bool GetNumAssets(AssetType::Enum type, int32_t* pNumOut);
+	bool GetNumAssets(int32_t& numOut);
+	bool GetNumAssets(AssetType::Enum type, int32_t& numOut);
 	bool GetNumAssets(ModId modId, int32_t& numOut);
 
 	// global listing (to engine log)
