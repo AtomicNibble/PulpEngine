@@ -129,11 +129,14 @@ bool Converter::Convert(int32_t modId)
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
+	core::StopWatch timer;
+
 	if (!db_.IterateAssets(modId, func)) {
 		X_ERROR("Converter", "Failed to convert all assets");
 		return false;
 	}
 
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
 	return true;
 }
 
@@ -157,14 +160,18 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 	}
 
+
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
+
+	core::StopWatch timer;
 
 	if (!db_.IterateAssets(modId, assType, func)) {
 		X_ERROR("Converter", "Failed to convert \"%s\" assets", AssetType::ToString(assType));
 		return false;
 	}
 
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
 	return true;
 }
 
@@ -190,11 +197,14 @@ bool Converter::Convert(AssetType::Enum assType)
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
+	core::StopWatch timer;
+
 	if (!db_.IterateAssets(assType, func)) {
 		X_ERROR("Converter", "Failed to convert \"%s\" assets", AssetType::ToString(assType));
 		return false;
 	}
 
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
 	return true;
 }
 
@@ -216,11 +226,14 @@ bool Converter::ConvertAll(void)
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
+	core::StopWatch timer;
+
 	if (!db_.IterateAssets(func)) {
 		X_ERROR("Converter", "Failed to convert all assets");
 		return false;
 	}
 
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
 	return true;
 }
 
