@@ -119,7 +119,7 @@ namespace
 		if (pAssetName)
 		{
 			char buf[512];	
-			name = core::strUtil::Convert(pAssetName, buf);;
+			name = core::strUtil::Convert(pAssetName, buf);
 			return true;
 		}
 
