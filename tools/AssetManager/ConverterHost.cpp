@@ -27,6 +27,8 @@ void ConverterHost::init()
 
 void ConverterHost::shutdown()
 {
+	que_.clear(); // clear any pending.
+
 	postQuitJob();
 	wait();
 }
