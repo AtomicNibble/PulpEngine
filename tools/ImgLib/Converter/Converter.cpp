@@ -624,7 +624,7 @@ namespace Converter
 		jobdata.result = true;		
 	}
 
-	bool ImgConveter::Convert(Texturefmt::Enum targetFmt, bool keepAlpha)
+	bool ImgConveter::Convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha)
 	{
 		if (targetFmt == srcImg_.getFormat()) {
 			X_LOG1("Img", "Skipping texture conversion, src format matches target fmt of: %s",
@@ -682,7 +682,7 @@ namespace Converter
 			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob);
 		}
 
-		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, Profile::Fast, keepAlpha);
+		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, profile, keepAlpha);
 
 		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{

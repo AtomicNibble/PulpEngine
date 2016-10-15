@@ -43,6 +43,7 @@ namespace Converter
 			int32_t faceIdx;
 		};
 
+	public:
 		X_DECLARE_ENUM(Profile)(
 			UltraFast,
 			VeryFast,
@@ -64,7 +65,7 @@ namespace Converter
 
 		bool addAlphachannel(bool keepMips = false);
 		bool CreateMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
-		bool Convert(Texturefmt::Enum targetFmt, bool keepAlpha = true);
+		bool Convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
 
 		const XTextureFile& getTextFile(void) const;
 

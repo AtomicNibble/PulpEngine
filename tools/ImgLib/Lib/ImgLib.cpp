@@ -222,6 +222,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	X_ASSERT(outputFileFmt != ImgFileFormat::UNKNOWN, "OutputFile Fmt is invalid")(outputFileFmt);
 
 
+	ImgConveter::Profile::Enum qualityProfile = ImgConveter::Profile::VeryFast;
 	ImgConveter con(g_ImgLibArena, g_ImgLibArena);
 
 	// load it :D
@@ -383,7 +384,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	{
 		core::StopWatch timer;
 
-		if (!con.Convert(dstImgFmt, flags.IsSet(CompileFlag::ALPHA))) {
+		if (!con.Convert(dstImgFmt, qualityProfile, flags.IsSet(CompileFlag::ALPHA))) {
 			X_ERROR("Img", "Failed to convert image");
 			return false;
 		}
