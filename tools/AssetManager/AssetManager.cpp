@@ -150,6 +150,10 @@ AssetManager::~AssetManager()
 
 	OutputPaneManager::destroy();
 
+	if (pConHost_) {
+		delete pConHost_;
+	}
+
 	if (pAssetScripts_) {
 		delete pAssetScripts_;
 	}
