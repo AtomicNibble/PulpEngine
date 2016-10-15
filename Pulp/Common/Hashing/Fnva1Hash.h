@@ -52,7 +52,16 @@ namespace Hash
 			return (strLen == 0) ? default_offset_basis : Internal::Hash(pStr, strLen, default_offset_basis);
 		}
 
+
 	} // namespace Fnv1aConst
+
+	namespace Fnva1Literals
+	{
+		inline constexpr uint32_t operator"" _fnv1a(const char* pStr, const size_t strLen)
+		{
+			return Fnv1aConst::Internal::Hash(pStr, strLen, Fnv1aConst::default_offset_basis);
+		}
+	}
 }
 
 X_NAMESPACE_END

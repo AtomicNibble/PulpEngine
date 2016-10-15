@@ -46,7 +46,6 @@ TEST(Hash, Fnva) {
 	EXPECT_FALSE(hash == Fnv1aHash("readme.txt.", 11));
 }
 
-
 TEST(Hash, FnvaConst) {
 
 	const uint32 hash = Fnv1aConst::Hash("readme.txt", 10);
@@ -62,6 +61,14 @@ TEST(Hash, FnvaConst) {
 	// compile time.
 	static_assert(Fnv1aConst::Hash("readme.txt") == 0x966dcb41, "FnvaConst hash failure");
 	static_assert(Fnv1aConst::Hash("fat goat") == 0xCC731FDF, "FnvaConst hash failure");
+
+	using namespace core::Hash::Fnva1Literals;
+
+	static_assert(Fnv1aConst::Hash("readme.txt") == "readme.txt"_fnv1a, "FnvaConst hash failure");
+	static_assert(Fnv1aConst::Hash("fat goat") == "fat goat"_fnv1a, "FnvaConst hash failure");
+
+	EXPECT_TRUE(Fnv1aHash("readme.txt", 10) == "readme.txt"_fnv1a);
+	EXPECT_TRUE(Fnv1aHash("fat goat", 8) == "fat goat"_fnv1a);
 }
 
 
