@@ -11,6 +11,7 @@
 #include <Containers\Array.h>
 #include <Platform\Module.h>
 
+#include <String\HumanDuration.h>
 #include <Time\StopWatch.h>
 
 // need assetDB.
@@ -136,7 +137,9 @@ bool Converter::Convert(int32_t modId)
 		return false;
 	}
 
-	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
+	core::HumanDuration::Str timeStr;
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%s", numAssets,
+		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 	return true;
 }
 
@@ -171,7 +174,9 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 		return false;
 	}
 
-	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
+	core::HumanDuration::Str timeStr;
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%s", numAssets, 
+		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 	return true;
 }
 
@@ -204,7 +209,9 @@ bool Converter::Convert(AssetType::Enum assType)
 		return false;
 	}
 
-	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
+	core::HumanDuration::Str timeStr;
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%s", numAssets,
+		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 	return true;
 }
 
@@ -233,7 +240,9 @@ bool Converter::ConvertAll(void)
 		return false;
 	}
 
-	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%gms", numAssets, timer.GetMilliSeconds());
+	core::HumanDuration::Str timeStr;
+	X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%s", numAssets,
+		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 	return true;
 }
 
