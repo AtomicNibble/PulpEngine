@@ -8,6 +8,10 @@
 
 #include <ICi.h>
 
+
+
+
+
 X_NAMESPACE_BEGIN(texture)
 
 using namespace Converter;
@@ -224,6 +228,70 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 
 	ImgConveter::Profile::Enum qualityProfile = ImgConveter::Profile::VeryFast;
 	ImgConveter con(g_ImgLibArena, g_ImgLibArena);
+
+
+	// we support global overrides.
+	core::string conProfile;
+	if (host.getConversionProfileData(assetDb::AssetType::IMG, conProfile))
+	{
+		core::json::Document pd;
+		pd.Parse(conProfile.c_str());
+
+		for (auto it = pd.MemberBegin(); it != pd.MemberEnd(); ++it)
+		{
+			const auto& name = it->name;
+			const auto& val = it->value;
+
+			using namespace core::Hash::Fnva1Literals;
+
+			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
+			{
+				case "qualityProfile"_fnv1a:
+					switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength()))
+					{
+						case "UltraFast"_fnv1a:
+							qualityProfile = ImgConveter::Profile::UltraFast;
+							break;
+						case "VeryFast"_fnv1a:
+							qualityProfile = ImgConveter::Profile::VeryFast;
+							break;
+						case "Fast"_fnv1a:
+							qualityProfile = ImgConveter::Profile::Fast;
+							break;
+						case "Basic"_fnv1a:
+							qualityProfile = ImgConveter::Profile::Basic;
+							break;
+						case "Slow"_fnv1a:
+							qualityProfile = ImgConveter::Profile::Slow;
+							break;
+						default:
+							X_WARNING("Img", "Unknown qualityProfile profile: %.*s", val.GetStringLength(), val.GetString());
+							break;
+					}
+					break;
+
+				case "scaleShift"_fnv1a:
+					if (val.GetType() == core::json::Type::kNumberType)
+					{
+						auto shift = val.GetInt();
+
+						// we support negative and positive shifts.
+						// we flip the shift tho so -2 results in more downshifting.
+						shift = -shift;
+
+						// shift the scale and clamp to valid enum range.
+						const int32_t scaleNumeric = math<int32_t>::clamp(static_cast<int32_t>(scale) + shift, 0, ScaleFactor::ENUM_COUNT - 1);
+
+						scale = static_cast<ScaleFactor::Enum>(scaleNumeric);
+					}
+					break;
+
+				default:
+					X_WARNING("Img", "Unknown conversion option: %.*s", name.GetStringLength(), name.GetString());
+					break;
+			}
+		}
+	}
 
 	// load it :D
 	if (!con.LoadImg(fileData, inputFileFmt)) {
