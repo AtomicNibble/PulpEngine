@@ -397,6 +397,13 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
 }
 
 
+bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
+{
+	X_UNUSED(type);
+	strOut.clear();
+	return true;
+}
+
 IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
 	if (!EnsureLibLoaded(assType)) {

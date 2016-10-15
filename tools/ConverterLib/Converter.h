@@ -49,6 +49,8 @@ public:
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, core::Array<uint8_t>& dataOut) X_OVERRIDE;
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
 	CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_OVERRIDE;
+
+	CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_OVERRIDE;
 	// ~IConverterHost
 
 private:
