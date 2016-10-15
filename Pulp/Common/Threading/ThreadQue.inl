@@ -26,7 +26,7 @@ ThreadQue<T, SynchronizationPrimitive>::~ThreadQue()
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQue<T, SynchronizationPrimitive>::reserve(size_t num)
 {
-	que_.reserve(num)
+	que_.reserve(num);
 }
 
 
