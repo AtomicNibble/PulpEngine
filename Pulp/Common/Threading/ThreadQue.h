@@ -26,6 +26,7 @@ public:
 	~ThreadQue();
 
 	void reserve(size_type num);
+	void clear(void);
 
 	void push(T const& value);
 	bool tryPop(T& value);
