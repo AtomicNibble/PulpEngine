@@ -127,6 +127,19 @@ namespace
 		return false;
 	}
 
+	bool ForceModeEnabled(void)
+	{
+		const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
+		if (pForce)
+		{
+			if (core::strUtil::IsEqual(pForce, L"0")) {
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
 }// namespace 
 
 
@@ -163,6 +176,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			core::string assName;
 
 			con.PrintBanner();
+			con.forceConvert(ForceModeEnabled());
 
 			if (!GetMode(mode)) {
 				mode = ConvertMode::SINGLE;
@@ -170,11 +184,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			core::StopWatch timer;
 
-
 			if (mode == ConvertMode::CLEAN)
 			{
 				con.CleanAll();
-
 			}
 			else if (mode == ConvertMode::ALL)
 			{
