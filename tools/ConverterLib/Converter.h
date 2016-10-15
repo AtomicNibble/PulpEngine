@@ -75,6 +75,8 @@ private:
 	IConverter* converters_[AssetType::ENUM_COUNT];
 	assetDb::AssetDB& db_;
 
+	core::string conversionProfiles_[AssetType::ENUM_COUNT];
+
 	bool forceConvert_;
 	bool _pad[3];
 };

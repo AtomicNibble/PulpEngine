@@ -396,11 +396,13 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
 	return true;
 }
 
-
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
-	X_UNUSED(type);
-	strOut.clear();
+	if (conversionProfiles_[type].isEmpty()) {
+		return false;
+	}
+
+	strOut = conversionProfiles_[type];
 	return true;
 }
 
