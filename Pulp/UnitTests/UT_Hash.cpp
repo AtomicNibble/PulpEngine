@@ -46,6 +46,26 @@ TEST(Hash, Fnva) {
 	EXPECT_FALSE(hash == Fnv1aHash("readme.txt.", 11));
 }
 
+
+TEST(Hash, FnvaConst) {
+
+	const uint32 hash = Fnv1aConst::Hash("readme.txt", 10);
+	const uint32 hash1 = Fnv1aConst::Hash("fat goat", 8);
+
+	EXPECT_TRUE(hash == 0x966dcb41);
+	EXPECT_TRUE(hash == Fnv1aHash("readme.txt", 10)); // check againstt runtime version.
+	EXPECT_FALSE(hash == Fnv1aConst::Hash("readme.txt.", 11));
+
+	EXPECT_TRUE(hash1 == 0xCC731FDF);
+	EXPECT_TRUE(hash1 == Fnv1aHash("fat goat", 8)); // check againstt runtime version.
+
+	// compile time.
+	static_assert(Fnv1aConst::Hash("readme.txt") == 0x966dcb41, "FnvaConst hash failure");
+	static_assert(Fnv1aConst::Hash("fat goat") == 0xCC731FDF, "FnvaConst hash failure");
+}
+
+
+
 TEST(Hash, Murmur) {
 
 
