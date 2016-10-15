@@ -279,6 +279,7 @@
     <ClInclude Include="String\CmdArgs.h" />
     <ClInclude Include="String\FormatMacros.h" />
     <ClInclude Include="String\GrowingStringTable.h" />
+    <ClInclude Include="String\HumanDuration.h" />
     <ClInclude Include="String\HumanSize.h" />
     <ClInclude Include="String\Json.h" />
     <ClInclude Include="String\Lexer.h" />
@@ -493,6 +494,7 @@
     <ClCompile Include="Platform\win32\TrayIcon.cpp" />
     <ClCompile Include="IPrimativeContext.cpp" />
     <ClCompile Include="Sorting\RadixSort.cpp" />
+    <ClCompile Include="String\HumanDuration.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

@@ -1141,6 +1141,9 @@
     <ClInclude Include="IPrimativeContext.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
+    <ClInclude Include="String\HumanDuration.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1751,6 +1754,9 @@
     </ClCompile>
     <ClCompile Include="IPrimativeContext.cpp">
       <Filter>Interfaces_h\3DEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="String\HumanDuration.cpp">
+      <Filter>SourceFiles\String</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
