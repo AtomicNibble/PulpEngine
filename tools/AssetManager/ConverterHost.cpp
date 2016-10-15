@@ -17,7 +17,7 @@ ConverterHost::ConverterHost(assetDb::AssetDB& db, core::MemoryArenaBase* arena)
 
 ConverterHost::~ConverterHost()
 {
-
+	shutdown();
 }
 
 void ConverterHost::init()
