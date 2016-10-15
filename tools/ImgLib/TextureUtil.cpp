@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "TextureUtil.h"
 
+#include <Hashing\Fnva1Hash.h>
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -454,136 +455,134 @@ namespace Util
 	{
 		X_ASSERT_NOT_NULL(pStr);
 
-		if (core::strUtil::IsEqualCaseInsen("A8", pStr))
-			return Texturefmt::A8;
+		// force input to upper case.
+		core::StackString<64, char> strUpper(pStr);
+		strUpper.toUpper();
 
-		if (core::strUtil::IsEqualCaseInsen("R8G8", pStr))
-			return Texturefmt::R8G8;
-		if (core::strUtil::IsEqualCaseInsen("R8G8_TYPELESS", pStr))
-			return Texturefmt::R8G8_TYPELESS;
-		if (core::strUtil::IsEqualCaseInsen("R8G8_SNORM", pStr))
-			return Texturefmt::R8G8_SNORM;
-		if (core::strUtil::IsEqualCaseInsen("R8G8_UNIT", pStr))
-			return Texturefmt::R8G8_UNIT;
-		if (core::strUtil::IsEqualCaseInsen("R8G8_SINT", pStr))
-			return Texturefmt::R8G8_SINT;
+		using namespace core::Hash::Fnva1Literals;
 
-		if (core::strUtil::IsEqualCaseInsen("R16G16_FLOAT", pStr))
-			return Texturefmt::R16G16_FLOAT;
-		if (core::strUtil::IsEqualCaseInsen("R16G16", pStr))
-			return Texturefmt::R16G16;
-		if (core::strUtil::IsEqualCaseInsen("R16G16_SRGB", pStr))
-			return Texturefmt::R16G16_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("R16G16_SNORM", pStr))
-			return Texturefmt::R16G16_SNORM;
-		if (core::strUtil::IsEqualCaseInsen("R16G16_SINT", pStr))
-			return Texturefmt::R16G16_SINT;
-		if (core::strUtil::IsEqualCaseInsen("R16G16_UINT", pStr))
-			return Texturefmt::R16G16_UINT;
-		if (core::strUtil::IsEqualCaseInsen("R16G16_TYPELESS", pStr))
-			return Texturefmt::R16G16_TYPELESS;
+		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
+		{
+			case "A8"_fnv1a:
+				return Texturefmt::A8;
 
+			case "R8G8"_fnv1a:
+				return Texturefmt::R8G8;
+			case "R8G8_TYPELESS"_fnv1a:
+				return Texturefmt::R8G8_TYPELESS;
+			case "R8G8_SNORM"_fnv1a:
+				return Texturefmt::R8G8_SNORM;
+			case "R8G8_UNIT"_fnv1a:
+				return Texturefmt::R8G8_UNIT;
+			case "R8G8_SINT"_fnv1a:
+				return Texturefmt::R8G8_SINT;
 
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8", pStr))
-			return Texturefmt::R8G8B8;
-		if (core::strUtil::IsEqualCaseInsen("B8G8R8", pStr))
-			return Texturefmt::B8G8R8;
+			case "R16G16_FLOAT"_fnv1a:
+				return Texturefmt::R16G16_FLOAT;
+			case "R16G16"_fnv1a:
+				return Texturefmt::R16G16;
+			case "R16G16_SRGB"_fnv1a:
+				return Texturefmt::R16G16_SRGB;
+			case "R16G16_SNORM"_fnv1a:
+				return Texturefmt::R16G16_SNORM;
+			case "R16G16_SINT"_fnv1a:
+				return Texturefmt::R16G16_SINT;
+			case "R16G16_UINT"_fnv1a:
+				return Texturefmt::R16G16_UINT;
+			case "R16G16_TYPELESS"_fnv1a:
+				return Texturefmt::R16G16_TYPELESS;
 
+			case "R8G8B8"_fnv1a:
+				return Texturefmt::R8G8B8;
+			case "B8G8R8"_fnv1a:
+				return Texturefmt::B8G8R8;
 
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8A8", pStr))
-			return Texturefmt::R8G8B8A8;
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8A8_SRGB", pStr))
-			return Texturefmt::R8G8B8A8_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8A8_SNORM", pStr))
-			return Texturefmt::R8G8B8A8_SNORM;
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8A8_TYPELESS", pStr))
-			return Texturefmt::R8G8B8A8_TYPELESS;
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8A8_SINT", pStr))
-			return Texturefmt::R8G8B8A8_SINT;
-		if (core::strUtil::IsEqualCaseInsen("R8G8B8A8_UINT", pStr))
-			return Texturefmt::R8G8B8A8_UINT;
+			case "R8G8B8A8"_fnv1a:
+				return Texturefmt::R8G8B8A8;
+			case "R8G8B8A8_SRGB"_fnv1a:
+				return Texturefmt::R8G8B8A8_SRGB;
+			case "R8G8B8A8_SNORM"_fnv1a:
+				return Texturefmt::R8G8B8A8_SNORM;
+			case "R8G8B8A8_TYPELESS"_fnv1a:
+				return Texturefmt::R8G8B8A8_TYPELESS;
+			case "R8G8B8A8_SINT"_fnv1a:
+				return Texturefmt::R8G8B8A8_SINT;
+			case "R8G8B8A8_UINT"_fnv1a:
+				return Texturefmt::R8G8B8A8_UINT;
 
+			case "B8G8R8A8"_fnv1a:
+				return Texturefmt::B8G8R8A8;
+			case "B8G8R8A8_SRGB"_fnv1a:
+				return Texturefmt::B8G8R8A8_SRGB;
+			case "B8G8R8A8_TYPELESS"_fnv1a:
+				return Texturefmt::B8G8R8A8_TYPELESS;
 
-		if (core::strUtil::IsEqualCaseInsen("B8G8R8A8", pStr))
-			return Texturefmt::B8G8R8A8;
-		if (core::strUtil::IsEqualCaseInsen("B8G8R8A8_SRGB", pStr))
-			return Texturefmt::B8G8R8A8_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("B8G8R8A8_TYPELESS", pStr))
-			return Texturefmt::B8G8R8A8_TYPELESS;
+			case "ATI2"_fnv1a:
+				return Texturefmt::ATI2;
+			case "ATI2_XY"_fnv1a:
+				return Texturefmt::ATI2_XY;
 
+			case "BC1"_fnv1a:
+				return Texturefmt::BC1;
+			case "BC1_SRGB"_fnv1a:
+				return Texturefmt::BC1_SRGB;
+			case "BC1_TYPELESS"_fnv1a:
+				return Texturefmt::BC1_TYPELESS;
 
-		if (core::strUtil::IsEqualCaseInsen("ATI2", pStr))
-			return Texturefmt::ATI2;
-		if (core::strUtil::IsEqualCaseInsen("ATI2_XY", pStr))
-			return Texturefmt::ATI2_XY;
+			case "BC2"_fnv1a:
+				return Texturefmt::BC2;
+			case "BC2_SRGB"_fnv1a:
+				return Texturefmt::BC2_SRGB;
+			case "BC2_TYPELESS"_fnv1a:
+				return Texturefmt::BC2_TYPELESS;
 
+			case "BC3"_fnv1a:
+				return Texturefmt::BC3;
+			case "BC3_SRGB"_fnv1a:
+				return Texturefmt::BC3_SRGB;
+			case "BC3_TYPELESS"_fnv1a:
+				return Texturefmt::BC3_TYPELESS;
 
-		if (core::strUtil::IsEqualCaseInsen("BC1", pStr))
-			return Texturefmt::BC1;
-		if (core::strUtil::IsEqualCaseInsen("BC1_SRGB", pStr))
-			return Texturefmt::BC1_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("BC1_TYPELESS", pStr))
-			return Texturefmt::BC1_TYPELESS;
+			case "BC4"_fnv1a:
+				return Texturefmt::BC4;
+			case "BC4_SNORM"_fnv1a:
+				return Texturefmt::BC4_SNORM;
+			case "BC4_TYPELESS"_fnv1a:
+				return Texturefmt::BC4_TYPELESS;
 
+			case "BC5"_fnv1a:
+				return Texturefmt::BC5;
+			case "BC5_SNORM"_fnv1a:
+				return Texturefmt::BC5_SNORM;
+			case "BC5_TYPELESS"_fnv1a:
+				return Texturefmt::BC5_TYPELESS;
+		
+			case "BC6"_fnv1a:
+				return Texturefmt::BC6;
+			case "BC6_SF16"_fnv1a:
+				return Texturefmt::BC6_SF16;
+			case "BC6_TYPELESS"_fnv1a:
+				return Texturefmt::BC6_TYPELESS;
 
-		if (core::strUtil::IsEqualCaseInsen("BC2", pStr))
-			return Texturefmt::BC2;
-		if (core::strUtil::IsEqualCaseInsen("BC2_SRGB", pStr))
-			return Texturefmt::BC2_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("BC2_TYPELESS", pStr))
-			return Texturefmt::BC2_TYPELESS;
+			case "BC7"_fnv1a:
+				return Texturefmt::BC7;
+			case "BC7_SRGB"_fnv1a:
+				return Texturefmt::BC7_SRGB;
+			case "BC7_TYPELESS"_fnv1a:
+				return Texturefmt::BC7_TYPELESS;
 
+			case "R10G10B10A2"_fnv1a:
+				return Texturefmt::R10G10B10A2;
 
-		if (core::strUtil::IsEqualCaseInsen("BC3", pStr))
-			return Texturefmt::BC3;
-		if (core::strUtil::IsEqualCaseInsen("BC3_SRGB", pStr))
-			return Texturefmt::BC3_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("BC3_TYPELESS", pStr))
-			return Texturefmt::BC3_TYPELESS;
+			case "R16G16B16A16_FLOAT"_fnv1a:
+				return Texturefmt::R16G16B16A16_FLOAT;
 
-
-		if (core::strUtil::IsEqualCaseInsen("BC4", pStr))
-			return Texturefmt::BC4;
-		if (core::strUtil::IsEqualCaseInsen("BC4_SNORM", pStr))
-			return Texturefmt::BC4_SNORM;
-		if (core::strUtil::IsEqualCaseInsen("BC4_TYPELESS", pStr))
-			return Texturefmt::BC4_TYPELESS;
-
-		if (core::strUtil::IsEqualCaseInsen("BC5", pStr))
-			return Texturefmt::BC5;
-		if (core::strUtil::IsEqualCaseInsen("BC5_SNORM", pStr))
-			return Texturefmt::BC5_SNORM;
-		if (core::strUtil::IsEqualCaseInsen("BC5_TYPELESS", pStr))
-			return Texturefmt::BC5_TYPELESS;
-
-		if (core::strUtil::IsEqualCaseInsen("BC6", pStr))
-			return Texturefmt::BC6;
-		if (core::strUtil::IsEqualCaseInsen("BC6_SF16", pStr))
-			return Texturefmt::BC6_SF16;
-		if (core::strUtil::IsEqualCaseInsen("BC6_TYPELESS", pStr))
-			return Texturefmt::BC6_TYPELESS;
-
-
-		if (core::strUtil::IsEqualCaseInsen("BC7", pStr))
-			return Texturefmt::BC7;
-		if (core::strUtil::IsEqualCaseInsen("BC7_SRGB", pStr))
-			return Texturefmt::BC7_SRGB;
-		if (core::strUtil::IsEqualCaseInsen("BC7_TYPELESS", pStr))
-			return Texturefmt::BC7_TYPELESS;
-
-
-		if (core::strUtil::IsEqualCaseInsen("R10G10B10A2", pStr))
-			return Texturefmt::R10G10B10A2;
-
-		if (core::strUtil::IsEqualCaseInsen("R16G16B16A16_FLOAT", pStr))
-			return Texturefmt::R16G16B16A16_FLOAT;
-
-
-
-		// this is here incase i've forgot to add a new format
-		// into this function.
-		X_ASSERT_UNREACHABLE();
-		return Texturefmt::UNKNOWN;
+			default:
+				// this is here incase i've forgot to add a new format
+				// into this function.
+				X_ASSERT_UNREACHABLE();
+				return Texturefmt::UNKNOWN;
+		}
 	}
 
 
