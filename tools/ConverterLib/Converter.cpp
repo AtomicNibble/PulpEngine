@@ -50,7 +50,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
 	// early out if we dont have the con lib for this ass type.
 	if (!EnsureLibLoaded(assType)) {
-		X_ERROR("Converter", "Failed to convert, converter missing for asset type.");
+		X_ERROR("Converter", "Failed to convert, converter module missing for asset type.");
 		return false;
 	}
 
@@ -80,7 +80,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	{
 		// se if stale.
 		if (db_.IsAssetStale(assetId)) {
-			X_LOG1("Converter", "Skipping compiled asset is not stale");
+			X_LOG1("Converter", "Skipping conversion, asset is not stale");
 			return true;
 		}
 	}
