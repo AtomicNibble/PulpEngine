@@ -54,6 +54,9 @@ public:
 	// ~IConverterHost
 
 private:
+	bool loadConversionProfiles(const core::string& profileName);
+	void clearConversionProfiles(void);
+
 	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir);
 
 	bool Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,

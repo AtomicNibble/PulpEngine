@@ -12,6 +12,7 @@
 #include <Platform\Module.h>
 
 #include <String\HumanDuration.h>
+#include <String\Json.h>
 #include <Time\StopWatch.h>
 
 // need assetDB.
@@ -384,6 +385,74 @@ bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::st
 
 	strOut = conversionProfiles_[type];
 	return true;
+}
+
+bool Converter::loadConversionProfiles(const core::string& profileName)
+{
+	core::string profileData;
+
+	if (!db_.GetProfileData(profileName, profileData)) {
+		return false;
+	}
+
+	clearConversionProfiles();
+
+	// we have a json doc with objects for each asset type.
+	core::json::Document d;
+	d.ParseInsitu(const_cast<char*>(profileData.c_str()));
+
+	for (auto it = d.MemberBegin(); it != d.MemberEnd(); ++it)
+	{
+		const auto& name = it->name;
+		const auto& val = it->value;
+
+		if (val.GetType() != core::json::kObjectType) {
+			X_ERROR("Converter", "Conversion profile contains invalid data, expected object got: %" PRIu32, val.GetType());
+			return false;
+		}
+
+		// now try match the name to a type.
+		core::StackString<64, char> nameStr(name.GetString(), name.GetString() + name.GetStringLength());
+		nameStr.toUpper();
+
+		assetDb::AssetType::Enum type;
+		int32_t i;
+		for (i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+		{
+			const char* pTypeStr = assetDb::AssetType::ToString(i);
+			if (nameStr.isEqual(pTypeStr))
+			{
+				type = static_cast<assetDb::AssetType::Enum>(i);
+				break;
+			}
+		}
+
+		if (i == assetDb::AssetType::ENUM_COUNT) {
+			X_ERROR("Converter", "Conversion profile contains unkown asset type \"%s\"", nameStr.c_str());
+			return false;
+		}
+
+		X_ASSERT(type >= 0 && static_cast<uint32_t>(type) < assetDb::AssetType::ENUM_COUNT, "Invalid type")(type);
+
+		// now we want to split this into a seperate doc.
+		core::json::StringBuffer s;
+		core::json::Writer<core::json::StringBuffer> writer(s);
+
+		val.Accept(writer);
+
+		conversionProfiles_[type] = core::string(s.GetString(), s.GetSize());
+	}
+
+	return true;
+}
+
+
+void Converter::clearConversionProfiles(void)
+{
+	for (auto& p : conversionProfiles_)
+	{
+		p.clear();
+	}
 }
 
 IConverter* Converter::GetConverter(AssetType::Enum assType)
