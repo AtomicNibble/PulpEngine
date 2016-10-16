@@ -357,7 +357,7 @@ void AssetManager::createActions(void)
 	pRedoAct_->setStatusTip("Redo");
 	pRedoAct_->setEnabled(false);
 
-	pCutAct_ = new QAction(QIcon(":/misc/img/Redo.png"), tr("Cut1"), this);
+	pCutAct_ = new QAction(QIcon(":/misc/img/Redo.png"), tr("Cut"), this);
 	pCutAct_->setStatusTip("Cut");
 //	pCutAct_->setEnabled(false);
 
