@@ -324,6 +324,16 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 					}
 					break;
 
+				case "scaleForce"_fnv1a:
+					if (val.GetType() == core::json::Type::kNumberType)
+					{
+						const auto force = val.GetInt();
+						const int32_t scaleNumeric = math<int32_t>::clamp(force, 0, ScaleFactor::ENUM_COUNT - 1);
+
+						scale = static_cast<ScaleFactor::Enum>(scaleNumeric);
+					}
+					break;
+
 				default:
 					X_WARNING("Img", "Unknown conversion option: %.*s", name.GetStringLength(), name.GetString());
 					break;
