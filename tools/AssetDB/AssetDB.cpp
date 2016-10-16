@@ -446,7 +446,6 @@ AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>
 
 bool AssetDB::SetMod(const core::string& name)
 {
-	sql::SqlLiteTransaction trans(db_, true);
 	sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
 	qry.bind(1, name.c_str());
 
@@ -466,7 +465,6 @@ bool AssetDB::SetMod(const core::string& name)
 
 bool AssetDB::SetMod(ModId id)
 {
-	sql::SqlLiteTransaction trans(db_, true);
 	sql::SqlLiteQuery qry(db_, "SELECT name FROM mods WHERE mod_id = ?");
 	qry.bind(1, id);
 
@@ -551,7 +549,6 @@ AssetDB::ModId AssetDB::GetcurrentModId(void) const
 
 bool AssetDB::GetModInfo(ModId id, Mod& modOut)
 {
-	sql::SqlLiteTransaction trans(db_, true);
 	sql::SqlLiteQuery qry(db_, "SELECT out_dir, name FROM mods WHERE mod_id = ?");
 	qry.bind(1, id);
 
@@ -610,7 +607,6 @@ bool AssetDB::GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& coun
 {
 	countOut = -1; // meow
 
-	sql::SqlLiteTransaction trans(db_, true);
 	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE mod_id = ? AND type = ?");
 	qry.bind(1, modId);
 	qry.bind(2, type);
