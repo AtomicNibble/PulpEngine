@@ -434,7 +434,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 			return false;
 		}
 
-		X_LOG1("Img", "Mipmap creation took: ^6%gms", timer.GetMilliSeconds());
+		X_LOG1("Img", "Mipmap creation took: ^6%g ms", timer.GetMilliSeconds());
 	}
 	else {
 		// this weould be kind easy to support tbh.
@@ -457,7 +457,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 			return false;
 		}
 
-		X_LOG1("Img", "Conversion took: ^6%gms", timer.GetMilliSeconds());
+		X_LOG1("Img", "Conversion took: ^6%g ms", timer.GetMilliSeconds());
 	}
 
 	if (!con.SaveImg(destPath, flags, outputFileFmt)) {
