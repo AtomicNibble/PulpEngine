@@ -222,9 +222,9 @@ bool AssetDB::CreateTables(void)
 	}
 
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS conversion_profiles ("
-		"id INTEGER PRIMARY KEY,"
-		"nick TEXT NOT NULL,"
-		"profileData TEXT NOT NULL DEFAULT '{}'"
+		"profile_id INTEGER PRIMARY KEY,"
+		"name TEXT COLLATE NOCASE NOT NULL,"
+		"data TEXT NOT NULL DEFAULT '{}'"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'conversion_profiles' table");
 		return false;
