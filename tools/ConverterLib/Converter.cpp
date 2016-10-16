@@ -47,11 +47,6 @@ bool Converter::Init(void)
 		return false;
 	}
 
-	if (loadConversionProfiles(core::string("dev"))) {
-		X_ERROR("Converter", "Failed to load conversion profile");
-		return false;
-	}
-
 	return true;
 }
 
