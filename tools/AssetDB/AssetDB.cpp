@@ -455,7 +455,7 @@ bool AssetDB::SetMod(const core::string& name)
 	{
 		modId_ = (*it).get<int32_t>(0);
 
-		X_LOG0("AssetDB", "Mod set: \"%s\" id: %i", name.c_str(), modId_);
+		X_LOG0("AssetDB", "Mod set: \"%s\" id: %" PRIi32, name.c_str(), modId_);
 		return true;
 	}
 
@@ -475,7 +475,7 @@ bool AssetDB::SetMod(ModId id)
 		const char* pName = (*it).get<const char*>(0);
 
 		modId_ = id;
-		X_LOG0("AssetDB", "Mod set: \"%s\" id: %i", pName, modId_);
+		X_LOG0("AssetDB", "Mod set: \"%s\" id: %" PRIi32, pName, modId_);
 		return true;
 	}
 
@@ -621,7 +621,7 @@ bool AssetDB::GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& coun
 		return true;
 	}
 
-	X_ERROR("AssetDB", "Failed to get asset count for mod: %" PRIu32 " Asset type: %s", modId, AssetType::ToString(type));
+	X_ERROR("AssetDB", "Failed to get asset count for mod: %" PRIi32 " Asset type: %s", modId, AssetType::ToString(type));
 	return false;
 }
 
