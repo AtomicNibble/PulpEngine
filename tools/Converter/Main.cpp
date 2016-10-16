@@ -177,49 +177,56 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			con.PrintBanner();
 			con.forceConvert(ForceModeEnabled());
-
-			if (!GetMode(mode)) {
-				mode = ConvertMode::SINGLE;
-			}
-
-			core::StopWatch timer;
-
-			if (mode == ConvertMode::CLEAN)
+			
+			if (con.Init())
 			{
-				con.CleanAll();
-			}
-			else if (mode == ConvertMode::ALL)
-			{
-				// optionaly convert all asset of Type X
-				if (GetAssetType(assType, true)) {
-					if (!con.Convert(assType)) {
-						X_ERROR("Convert", "Conversion failed..");
-					}
-					else {
-						res = true;
-					}
+				if (!GetMode(mode)) {
+					mode = ConvertMode::SINGLE;
 				}
-				else
+
+				core::StopWatch timer;
+
+				if (mode == ConvertMode::CLEAN)
 				{
-					if (!con.ConvertAll()) {
+					con.CleanAll();
+				}
+				else if (mode == ConvertMode::ALL)
+				{
+					// optionaly convert all asset of Type X
+					if (GetAssetType(assType, true)) {
+						if (!con.Convert(assType)) {
+							X_ERROR("Convert", "Conversion failed..");
+						}
+						else {
+							res = true;
+						}
+					}
+					else
+					{
+						if (!con.ConvertAll()) {
+							X_ERROR("Convert", "Conversion failed..");
+						}
+						else {
+							res = true;
+						}
+					}
+				}
+				else if (GetAssetType(assType) && GetAssetName(assName))
+				{
+					if (!con.Convert(assType, assName)) {
 						X_ERROR("Convert", "Conversion failed..");
 					}
 					else {
 						res = true;
 					}
 				}
-			}
-			else if (GetAssetType(assType) && GetAssetName(assName)) 
-			{
-				if (!con.Convert(assType, assName)) {
-					X_ERROR("Convert", "Conversion failed..");
-				}
-				else {
-					res = true;
-				}
-			}
 
-			X_LOG0("Convert", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+				X_LOG0("Convert", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+			}
+			else
+			{
+				X_ERROR("Convert", "Failed to init converter");
+			}
 
 			Console.PressToContinue();
 		}
