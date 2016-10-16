@@ -27,11 +27,6 @@ Converter::Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
 	forceConvert_(false)
 {
 	core::zero_object(converters_);
-
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
-	}
-
 }
 
 Converter::~Converter()
@@ -44,6 +39,22 @@ void Converter::PrintBanner(void)
 	X_LOG0("Converter", "=================== V0.1 ===================");
 
 }
+
+bool Converter::Init(void)
+{
+	if (!db_.OpenDB()) {
+		X_ERROR("Converter", "Failed to open AssetDb");
+		return false;
+	}
+
+	if (loadConversionProfiles(core::string("dev"))) {
+		X_ERROR("Converter", "Failed to load conversion profile");
+		return false;
+	}
+
+	return true;
+}
+
 
 void Converter::forceConvert(bool force)
 {
