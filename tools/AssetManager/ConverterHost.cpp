@@ -22,7 +22,14 @@ ConverterHost::~ConverterHost()
 
 void ConverterHost::init()
 {
-	start();
+	if (!con_.Init()) {
+		// shit.
+		QMessageBox::critical(ICore::mainWindow(), "Converter", "Failed to init converter");
+	}
+	else {
+		// if the converter fails to init, just don't process any jobs.
+		start();
+	}
 }
 
 void ConverterHost::shutdown()
