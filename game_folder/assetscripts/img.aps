@@ -16,10 +16,6 @@ void GenerateUI( asset& Asset )
     Asset.AddCombo( "imgFmt", dstFmts ).SetTitle("Force Compression algo").SetVisible( true );
     Asset.AddCombo( "imageType", "Texture | Cube | Volume" ).SetTitle( "Image Type" );
 
-    Asset.AddString( "customTemplate", "" ).SetTitle( "Template" );
-    Asset.AddColor("color", 1, 0, 0, 0.5).SetTitle("color1");
-    Asset.AddPath("path", "goat.text").SetTitle("path");
-
     Asset.BeginGroup("Options");
     {
         Asset.AddCombo( "mipFilter", "Box | Triangle | Kaiser" ).SetTitle( "Mip Method" );
