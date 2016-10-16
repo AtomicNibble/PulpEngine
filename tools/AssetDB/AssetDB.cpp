@@ -505,7 +505,7 @@ bool AssetDB::SetModPath(const core::string& name, const core::Path<char>& outDi
 {
 	ModId id;
 	if (!ModExsists(name, &id)) {
-		X_ERROR("AssetDB", "Failed to set mod id, mod \"%s\" don't exsist");
+		X_ERROR("AssetDB", "Failed to set mod id, mod \"%s\" don't exsist", name.c_str());
 		return false;
 	}
 
