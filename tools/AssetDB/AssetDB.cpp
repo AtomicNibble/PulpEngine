@@ -221,6 +221,15 @@ bool AssetDB::CreateTables(void)
 		return false;
 	}
 
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS conversion_profiles ("
+		"id INTEGER PRIMARY KEY,"
+		"nick TEXT NOT NULL,"
+		"profileData TEXT NOT NULL DEFAULT '{}'"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'conversion_profiles' table");
+		return false;
+	}
+
 	return true;
 }
 
@@ -239,6 +248,9 @@ bool AssetDB::DropTables(void)
 		return false;
 	}
 	if (!db_.execute("DROP TABLE IF EXISTS thumbs;")) {
+		return false;
+	}
+	if (!db_.execute("DROP TABLE IF EXISTS conversion_profiles;")) {
 		return false;
 	}
 
