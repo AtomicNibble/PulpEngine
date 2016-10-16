@@ -26,6 +26,11 @@ Converter::Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
 	forceConvert_(false)
 {
 	core::zero_object(converters_);
+
+	if (!db_.OpenDB()) {
+		X_ERROR("Converter", "Failed to open AssetDb");
+	}
+
 }
 
 Converter::~Converter()
@@ -51,11 +56,6 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	// early out if we dont have the con lib for this ass type.
 	if (!EnsureLibLoaded(assType)) {
 		X_ERROR("Converter", "Failed to convert, converter module missing for asset type.");
-		return false;
-	}
-
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
 	}
 
@@ -117,11 +117,6 @@ bool Converter::Convert(int32_t modId)
 {
 	X_LOG0("Converter", "Converting all assets...");
 
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
-		return false;
-	}
-
 	int32_t numAssets = 0;
 	if (db_.GetNumAssets(modId, numAssets)) {
 		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
@@ -150,11 +145,6 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 	// early out.
 	if (!EnsureLibLoaded(assType)) {
 		X_ERROR("Converter", "Failed to convert, converter missing for asset type.");
-		return false;
-	}
-
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
 	}
 
@@ -189,11 +179,6 @@ bool Converter::Convert(AssetType::Enum assType)
 		return false;
 	}
 
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
-		return false;
-	}
-
 	int32_t numAssets = 0;
 	if (db_.GetNumAssets(assType, numAssets)) {
 		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
@@ -219,11 +204,6 @@ bool Converter::Convert(AssetType::Enum assType)
 bool Converter::ConvertAll(void)
 {
 	X_LOG0("Converter", "Converting all assets...");
-
-	if (!db_.OpenDB()) {
-		X_ERROR("Converter", "Failed to open AssetDb");
-		return false;
-	}
 
 	int32_t numAssets = 0;
 	if (db_.GetNumAssets(numAssets)) {
