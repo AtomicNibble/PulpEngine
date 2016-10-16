@@ -32,6 +32,19 @@ void ConverterHost::init()
 	}
 }
 
+void ConverterHost::setConversionProfile(const core::string& name)
+{
+	if (isRunning()) {
+		ConversionJob job;
+		job.conType = ConversionType::SET_PROFILE;
+		job.name = name;
+		que_.push(job);
+	}
+	else {
+		con_.setConversionProfiles(name);
+	}
+}
+
 void ConverterHost::shutdown()
 {
 	que_.clear(); // clear any pending.
@@ -117,6 +130,10 @@ void ConverterHost::run()
 		else if (job.conType == ConversionType::ALL)
 		{
 			con_.ConvertAll();
+		}
+		else if (job.conType == ConversionType::SET_PROFILE)
+		{
+			con_.setConversionProfiles(job.name);
 		}
 		else if (job.conType == ConversionType::CLEAN)
 		{

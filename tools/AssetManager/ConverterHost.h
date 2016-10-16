@@ -26,6 +26,7 @@ private:
 		MOD_TYPE,
 		ALL,
 
+		SET_PROFILE,
 		CLEAN,
 		EXIT
 	};
@@ -46,6 +47,7 @@ public:
 	~ConverterHost();
 
 	void init();
+	void setConversionProfile(const core::string& name);
 	void shutdown();
 
 	void convertAsset(const core::string& name, assetDb::AssetType::Enum type, bool force);
