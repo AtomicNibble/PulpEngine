@@ -98,14 +98,14 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 		return false;
 	}
 
-	X_LOG1("Converter", "Loaded rawfile in: ^6%gms", timer.GetMilliSeconds());
+	X_LOG1("Converter", "Loaded rawfile in: ^6%g ms", timer.GetMilliSeconds());
 
 
 	timer.Start();
 
 	bool res = Convert_int(assType, argsStr, data, pathOut);
 	if (res) {
-		X_LOG1("Converter", "processing took: ^6%gms", timer.GetMilliSeconds());
+		X_LOG1("Converter", "processing took: ^6%g ms", timer.GetMilliSeconds());
 
 		db_.OnAssetCompiled(assetId);
 	}
