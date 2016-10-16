@@ -324,7 +324,9 @@ class DLL_EXPORT SqlLiteTransaction
 
 
 public:
-	explicit SqlLiteTransaction(SqlLiteDb& db, bool fcommit = false, bool freserve = false);
+	explicit SqlLiteTransaction(SqlLiteDb& db, 
+		bool fcommit = false,		// if true COMMIT's on decon otherwise ROLLBACK
+		bool freserve = false);		// if true BEGIN IMMEDIATE else BEGIN
 	~SqlLiteTransaction();
 
 	Result::Enum commit(void);
