@@ -127,6 +127,20 @@ namespace
 		return false;
 	}
 
+	bool GetConversionProfile(core::string& name, bool slient = false)
+	{
+		const wchar_t* pProfileName = gEnv->pCore->GetCommandLineArgForVarW(L"profile");
+		if (pProfileName)
+		{
+			char buf[512];
+			name = core::strUtil::Convert(pProfileName, buf);
+			return true;
+		}
+
+		return false;
+	}
+
+
 	bool ForceModeEnabled(void)
 	{
 		const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
@@ -180,6 +194,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			
 			if (con.Init())
 			{
+				core::string profile;
+				if (GetConversionProfile(profile)) {
+					con.setConversionProfiles(profile);
+				}
+
 				if (!GetMode(mode)) {
 					mode = ConvertMode::SINGLE;
 				}
