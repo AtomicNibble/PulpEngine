@@ -76,6 +76,7 @@ public:
 
 public:
 	typedef int32_t ModId;
+	typedef int32_t ProfileId;
 
 	static const ModId INVALID_MOD_ID = -1;
 	static const ModId INVALID_ASSET_ID = -1;
@@ -115,6 +116,14 @@ public:
 	bool DropTables(void);
 	bool AddDefaultMods(void);
 	bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
+
+	// Conversion Profile api.
+	Result::Enum AddProfile(const core::string& name);
+	Result::Enum AddProfile(const core::string& name, const core::string& data);
+	bool ProfileExsists(const core::string& name, ProfileId* pProfileId = nullptr);
+	bool SetProfileData(const core::string& name, const core::string& data);
+	bool GetProfileData(const core::string& name, core::string& dataOut);
+
 
 	// Mod api
 	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);	

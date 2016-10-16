@@ -319,6 +319,100 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 	return true;
 }
 
+// -----------------------------------
+AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name)
+{
+	return AddProfile(name, core::string("{}"));
+}
+
+AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::string& data)
+{
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Profile with empty name not allowed");
+		return Result::ERROR;
+	}
+	if (!ValidName(name)) {
+		X_ERROR("AssetDB", "Profile name \"%s\" has invalid characters", name.c_str());
+		return Result::ERROR;
+	}
+
+	if (ProfileExsists(name)) {
+		X_ERROR("AssetDB", "Profile with name \"%s\" already exists", name.c_str());
+		return Result::NAME_TAKEN;
+	}
+
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "INSERT INTO conversion_profiles (name, data) VALUES(?,?)");
+	cmd.bind(1, name.c_str());
+	cmd.bind(2, data.c_str());
+
+	int32_t res = cmd.execute();
+	if (res != 0) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
+bool AssetDB::ProfileExsists(const core::string& name, ProfileId* pProfileId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT profile_id FROM conversion_profiles WHERE name = ?");
+	qry.bind(1, name.c_str());
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+	if (pProfileId) {
+		*pProfileId = (*it).get<int32_t>(0);
+	}
+
+	return true;
+}
+
+bool AssetDB::SetProfileData(const core::string& name, const core::string& data)
+{
+	if (!ProfileExsists(name)) {
+		X_ERROR("AssetDB", "Failed to set profile data, profile \"%s\" don't exsist", name.c_str());
+		return false;
+	}
+
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "UPDATE conversion_profiles SET data = ? WHERE name = ?");
+	cmd.bind(1, data.c_str());
+	cmd.bind(2, name.c_str());
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return false;
+	}
+
+	trans.commit();
+	return true;
+}
+
+bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT data, name FROM conversion_profiles WHERE nane = ?");
+	qry.bind(1, name.c_str());
+
+	sql::SqlLiteQuery::iterator it = qry.begin();
+
+	if (it != qry.end())
+	{
+		auto row = *it;
+
+		dataOut = row.get<const char*>(0);
+		return true;
+	}
+
+	X_ERROR("AssetDB", "Failed to get profile data, profile \"%s\" don't exsist", name.c_str());
+	return false;
+}
+
+// --------------------------------------------------------
 
 AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>& outDir)
 {
