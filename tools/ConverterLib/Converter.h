@@ -37,6 +37,8 @@ public:
 
 	// enables force conversion so assets are rebuilt even if not stale.
 	CONVERTERLIB_EXPORT void forceConvert(bool force);
+	CONVERTERLIB_EXPORT bool setConversionProfiles(const core::string& profileName);
+
 
 	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType, const core::string& name);
 	CONVERTERLIB_EXPORT bool Convert(int32_t modId);

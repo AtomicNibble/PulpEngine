@@ -56,6 +56,18 @@ void Converter::forceConvert(bool force)
 	forceConvert_ = force;
 }
 
+bool Converter::setConversionProfiles(const core::string& profileName)
+{
+	X_LOG0("Converter", "Applying conversion profile: \"%s\"", profileName.c_str());
+
+	if (!loadConversionProfiles(profileName)) {
+		X_ERROR("Converter", "Failed to apply conversion profile");
+		return false;
+	}
+
+	return true;
+}
+
 bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 {
 	X_LOG0("Converter", "Converting \"%s\" type: \"%s\"", name.c_str(), AssetType::ToString(assType));
