@@ -189,37 +189,75 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	// we want to support converting to all the supported image formats.
 	// which is basically the Texturefmt enum.
 	// which I really can't be botherd to fully support for conversion.
-	if(d.HasMember("imgFmt"))
+	bool autoFmt = true;
+
+	if (d.HasMember("compressionMethod"))
 	{
+		const auto& val = d["compressionMethod"];
+		using namespace core::Hash::Fnva1Literals;
+
+		/*
+			Best color compression[compressHighCol]
+			Better alpha compression[compressHighAlpha]
+			Low quality color compression with no Alpha[compressCol]
+			Uncompressed[noCompress]
+			Custom[custom]
+		*/
+
+		switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength()))
+		{
+			case "compressHighCol"_fnv1a:
+				dstImgFmt = Texturefmt::BC7;
+				break;
+			case "compressHighAlpha"_fnv1a:
+				dstImgFmt = Texturefmt::BC3;
+				break;
+			case "compressCol"_fnv1a:
+				dstImgFmt = Texturefmt::BC1;
+				break;
+			case "noCompress"_fnv1a:
+				dstImgFmt = Texturefmt::R8G8B8A8;
+				break;
+			case "custom"_fnv1a:
+				autoFmt = false;
+				break;
+
+			default:
+				X_ERROR("Img", "Unknown compressionMethod: \"%.*s\"", val.GetStringLength(), val.GetString());
+				return false;
+		}
+	}
+
+	if (!autoFmt)
+	{
+		if (!d.HasMember("imgFmt")) {
+			X_ERROR("Img", "imgFmt option required for custom compressionMethod");
+			return false;
+		}
+
 		const char* pImgFmt = d["imgFmt"].GetString();
 
 		if (!ImgConveter::ParseImgFmt(pImgFmt, dstImgFmt)) {
 			X_ERROR("Img", "Unknown img fmt: \"%s\"", pImgFmt);
 			return false;
 		}
+	}
 
-		// now we check it's one we support converting as well as loading :(
-		switch (dstImgFmt)
-		{
+
+	// now we check i support creating the target format.
+	switch (dstImgFmt)
+	{
 		case Texturefmt::BC1:
 		case Texturefmt::BC3:
 		case Texturefmt::BC6:
 		case Texturefmt::BC7:
+		case Texturefmt::R8G8B8A8:
 			break;
 
 		default:
-			X_ERROR("Img", "Format not implemented for conversion: \"%s\"", pImgFmt);
+			X_ERROR("Img", "Format not implemented for conversion: \"%s\"", Texturefmt::ToString(dstImgFmt));
 			return false;
-		}
 	}
-	else
-	{
-		// for certain types of images we could auto select..
-		// but we don't currently.
-		X_ASSERT_NOT_IMPLEMENTED();
-		return false;
-	}
-
 
 	// check we only got here with valid shit!
 	X_ASSERT(inputFileFmt != ImgFileFormat::UNKNOWN, "InputFile Fmt is invalid")(inputFileFmt);
