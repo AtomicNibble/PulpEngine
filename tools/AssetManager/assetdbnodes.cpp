@@ -214,10 +214,10 @@ void FolderNode::setDisplayName(const QString& name)
     emitNodeUpdated();
 }
 
-FileNode* FolderNode::findFile(const QString& name)
+FileNode* FolderNode::findFile(const QString& name, assetDb::AssetType::Enum type)
 {
     for (FileNode* pNode : fileNodes()) {
-        if (pNode->name() == name) {
+        if (pNode->assetType() == type && pNode->name() == name) {
             return pNode;
         }
     }

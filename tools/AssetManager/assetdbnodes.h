@@ -123,7 +123,7 @@ namespace AssetExplorer
 		void setIconExpanded(const QIcon& icon);
 		void setDisplayName(const QString& name);
 
-		FileNode* findFile(const QString& path);
+		FileNode* findFile(const QString& path, assetDb::AssetType::Enum type);
 		FolderNode* findSubFolder(const QString& path);
 
 		virtual bool hasUnLoadedChildren(void) const;
