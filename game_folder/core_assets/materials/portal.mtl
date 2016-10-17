@@ -1,9 +1,9 @@
 <material name="" flags="35" SurfaceType="none">
 	<textures>
-		<texture type="albedo" image_name="Textures/portal.dds" />
+		<texture type="albedo" image_name="tool/editor/portal" />
 	</textures>
 
-	<Params 
+	<Params
 		diffuse="1,1,1,1"
 		specular="1,1,1,1"
 		emissive="1,1,1,1"

@@ -1,10 +1,10 @@
 <material name="" flags="8" SurfaceType="none" MaterialType="world">
 	<textures>
-		<texture type="albedo" image_name="textures/default.dds" />
-		<texture type="bump" image_name="textures/$identitynormal.dds" />
+		<texture type="albedo" image_name="default/default_col" />
+		<texture type="bump" image_name="default/identitynormal" />
 	</textures>
 
-	<Params 
+	<Params
 		diffuse="1,1,1,1"
 		specular="1,1,1,1"
 		emissive="1,1,1,1"
