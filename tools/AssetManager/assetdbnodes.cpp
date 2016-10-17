@@ -91,7 +91,7 @@ QIcon Node::icon(void) const
 
 QString Node::displayName(void) const
 {
-    return name();
+	return QFileInfo(name()).fileName();
 }
 
 QString Node::tooltip(void) const
