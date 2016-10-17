@@ -115,6 +115,7 @@ public:
 	bool CreateTables(void);
 	bool DropTables(void);
 	bool AddDefaultMods(void);
+	bool AddDefaultProfiles(void);
 	bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
 	// Conversion Profile api.

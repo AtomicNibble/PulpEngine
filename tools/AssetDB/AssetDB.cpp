@@ -134,6 +134,10 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 		return false;
 	}
 
+	if (!AddDefaultProfiles()) {
+		return false;
+	}
+
 	// set the mod to base
 	SetMod(core::string("base"));
 
@@ -271,6 +275,36 @@ bool AssetDB::AddDefaultMods(void)
 
 	return true;
 }
+
+
+bool AssetDB::AddDefaultProfiles(void)
+{
+	core::string dev("dev");
+	core::string release("release");
+
+	if (!ProfileExsists(dev)) {
+		AddProfile(dev, core::string(R"(
+{
+    "img": {
+        "qualityProfile":"UltraFast"
+    }
+}
+)"));
+	}
+
+	if (!ProfileExsists(release)) {
+		AddProfile(release, core::string(R"(
+{
+    "img": {
+        "qualityProfile":"Slow"
+    }
+}
+)"));
+	}
+
+	return true;
+}
+
 
 bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 {
