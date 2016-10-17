@@ -263,10 +263,10 @@ bool AssetDB::AddDefaultMods(void)
 	core::string base("base");
 
 	if (!ModExsists(core)) {
-		AddMod(core, core::Path<char>(R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\mod)"));
+		AddMod(core, core::Path<char>("mod"));
 	}
 	if (!ModExsists(base)) {
-		AddMod(base, core::Path<char>(R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\core_assets)"));
+		AddMod(base, core::Path<char>("core_assets"));
 	}
 
 	return true;
