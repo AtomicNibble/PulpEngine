@@ -267,10 +267,10 @@ bool AssetDB::AddDefaultMods(void)
 	core::string base("base");
 
 	if (!ModExsists(core)) {
-		AddMod(core, core::Path<char>("mod"));
+		AddMod(core, core::Path<char>("core_assets"));
 	}
 	if (!ModExsists(base)) {
-		AddMod(base, core::Path<char>("core_assets"));
+		AddMod(base, core::Path<char>("base"));
 	}
 
 	return true;
