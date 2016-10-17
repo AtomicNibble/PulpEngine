@@ -86,7 +86,7 @@ namespace
 						}
 						else
 						{
-							pCurrentNode->files.append(key);
+							pCurrentNode->files.append(qName);
 						}
 					}
 				}
