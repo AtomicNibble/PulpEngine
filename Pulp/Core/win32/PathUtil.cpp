@@ -315,6 +315,37 @@ namespace PathUtil
 		return res != 0;
 	}
 
+	// ------------------------------------------------
+
+	findhandle findFirst(const wchar_t* path, _wfinddatai64_t& findInfo)
+	{
+		intptr_t handle = _wfindfirst64(path, &findInfo);
+		if (handle == -1) {
+			return INVALID_FIND_HANDLE;
+		}
+
+		return handle;
+	}
+
+	bool findNext(findhandle handle, _wfinddatai64_t& findInfo)
+	{
+		if (_wfindnext64(handle, &findInfo) == 0) {
+			return true;
+		}
+
+		return false;
+	}
+
+	bool findClose(findhandle handle)
+	{
+		if (handle != INVALID_FIND_HANDLE) {
+			return _findclose(handle) == 0;
+		}
+
+		return false;
+	}
+
+
 } // namespace PathUtil
 
 

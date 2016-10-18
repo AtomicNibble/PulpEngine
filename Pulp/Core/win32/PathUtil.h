@@ -14,7 +14,10 @@ X_NAMESPACE_BEGIN(core)
 #endif // !MoveFile
 
 namespace PathUtil
-{
+{	
+	typedef _wfinddatai64_t findData;
+	typedef intptr_t findhandle;
+	static const findhandle INVALID_FIND_HANDLE = -1;
 
 	core::Path<wchar_t> GetCurrentDirectory(void);
 
@@ -48,6 +51,12 @@ namespace PathUtil
 
 	bool MoveFile(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew);
 	bool MoveFile(const wchar_t* pFullPath, const wchar_t* pFullPathNew);
+
+
+	findhandle findFirst(const wchar_t* path, findData& findInfo);
+	bool findNext(findhandle handle, findData& findInfo);
+	bool findClose(findhandle handle);
+
 
 
 } // namespace PathUtil
