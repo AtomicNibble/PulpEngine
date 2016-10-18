@@ -321,9 +321,26 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 	// if they put files in here that are custom. RIP.
 	if (pFileSys->directoryExists(outDir.c_str())) 
 	{
-		if (!pFileSys->deleteDirectoryContents(outDir.c_str())) {
-			X_ERROR("Converter", "Failed to clear mod \"%s\" assets directory", name.c_str());
-			return false;
+		// lets be nice and only clear dir's we actually populate.
+		for (int32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+		{
+			AssetType::Enum assType = static_cast<AssetType::Enum>(i);
+
+			core::Path<char> assetPath;
+			assetPath.clear();
+			assetPath /= outDir;
+			assetPath.ensureSlash();
+			assetPath /= AssetType::ToString(assType);
+			assetPath /= "s";
+			assetPath.toLower();
+
+			if (pFileSys->directoryExists(assetPath.c_str()))
+			{
+				if (!pFileSys->deleteDirectoryContents(assetPath.c_str())) {
+					X_ERROR("Converter", "Failed to clear mod \"%s\" \"%s\" assets directory", assetPath.c_str(), AssetType::ToString(assType));
+					return false;
+				}
+			}
 		}
 	}
 	
