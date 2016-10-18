@@ -119,6 +119,20 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
 	X_LOG1("Converter", "Loaded rawfile in: ^6%g ms", timer.GetMilliSeconds());
 
+	// make sure out dir is valid.
+	{
+		core::Path<char> dir(pathOut);
+		dir.removeFileName();
+		if (!gEnv->pFileSys->directoryExists(dir.c_str()))
+		{
+			if (!gEnv->pFileSys->createDirectoryTree(dir.c_str()))
+			{
+				X_ERROR("Converter", "Failed to create output directory for asset");
+				return false;
+			}
+		}
+	}
+
 
 	timer.Start();
 
