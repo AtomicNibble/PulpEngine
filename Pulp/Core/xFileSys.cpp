@@ -721,7 +721,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 
 	createOSPath(gameDir_, path, buf);
 
-	if (buf.fileName()) {
+	if (!core::strUtil::IsEqual(buf.fileName(), L"")) {
 		X_WARNING("FileSys", "deleteDirectory called on file path: \"%ls\"", buf.c_str());
 	}
 	if (isDebug()) {
@@ -742,9 +742,8 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 	Path<wchar_t> buf;
 	createOSPath(gameDir_, path, buf);
 
-	if (buf.fileName()) {
-		X_WARNING("FileSys", "createDirectory called on file path: \"%ls\"", buf.c_str());
-	}
+	buf.removeFileName();
+
 	if (isDebug()) {
 		X_LOG0("FileSys", "createDirectory: \"%ls\"", buf.c_str());
 	}
@@ -759,12 +758,10 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 
 	// we want to just loop and create like a goat.
 	Path<wchar_t> buf;
-
 	createOSPath(gameDir_, _path, buf);
 
-	if (buf.fileName()) {
-		X_WARNING("FileSys", "createDirectoryTree called on file path: \"%ls\"", buf.c_str());
-	}
+	buf.removeFileName();
+
 	if (isDebug()) {
 		X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
 	}
@@ -818,10 +815,6 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	if (buf.fileName()) {
-		X_WARNING("FileSys", "directoryExists called on file path: \"%ls\"", buf.c_str());
-	}
-
 	return directoryExistsOS(buf);
 }
 
@@ -835,10 +828,6 @@ bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) 
 	}
 	else {
 		X_ASSERT_NOT_IMPLEMENTED();
-	}
-
-	if (buf.fileName()) {
-		X_WARNING("FileSys", "directoryExists called on file path: \"%ls\"", buf.c_str());
 	}
 
 	return directoryExistsOS(buf);
