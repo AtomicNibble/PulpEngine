@@ -66,6 +66,11 @@ namespace PathUtil
 			flags |= FOF_NORECURSION;
 		}
 
+		if (!IsDirectory(pDir)) {
+			X_ERROR("FileSys", "DeleteDirectory was ran on a File: \"%ls\"", pDir);
+			return false;
+		}
+
 		SHFILEOPSTRUCTW file_op = {
 			NULL,
 			FO_DELETE,
