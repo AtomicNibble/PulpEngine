@@ -56,6 +56,7 @@
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
     <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\Lzma2.h" />
+    <ClInclude Include="Compression\Store.h" />
     <ClInclude Include="Compression\Zlib.h" />
     <ClInclude Include="Containers\AlignedArray.h" />
     <ClInclude Include="Containers\BitStream.h" />
@@ -483,6 +484,7 @@
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SmallerTypeCheck>
     </ClCompile>
     <ClCompile Include="CmdBucket.cpp" />
+    <ClCompile Include="Compression\Store.cpp" />
     <ClCompile Include="Hashing\xxHash.cpp" />
     <ClCompile Include="Math\MatrixStack.cpp" />
     <ClCompile Include="Math\XAabb.cpp" />

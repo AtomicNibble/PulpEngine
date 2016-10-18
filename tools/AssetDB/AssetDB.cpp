@@ -11,6 +11,7 @@
 #include <Compression\LZ4.h>
 #include <Compression\Lzma2.h>
 #include <Compression\Zlib.h>
+#include <Compression\Store.h>
 
 #include <String\Json.h>
 #include <String\HumanSize.h>
@@ -70,14 +71,18 @@ const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 const char* AssetDB::THUMBS_FOLDER = "thumbs";
 
+static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
+
 const size_t AssetDB::MAX_COMPRESSOR_SIZE = core::Max<size_t>(
 	core::Max(
 		core::Max(
 			core::Max(
-				sizeof(core::Compression::Compressor<core::Compression::LZ4>),
-				sizeof(core::Compression::Compressor<core::Compression::LZ4HC>)),
-			sizeof(core::Compression::Compressor<core::Compression::LZMA>)),
-		sizeof(core::Compression::Compressor<core::Compression::Zlib>)),
+				core::Max(
+					sizeof(core::Compression::Compressor<core::Compression::LZ4>),
+					sizeof(core::Compression::Compressor<core::Compression::LZ4HC>)),
+				sizeof(core::Compression::Compressor<core::Compression::LZMA>)),
+			sizeof(core::Compression::Compressor<core::Compression::Zlib>)),
+		sizeof(core::Compression::Compressor<core::Compression::Store>)),
 	16) + 256;
 
 
@@ -2477,7 +2482,7 @@ core::Compression::ICompressor* AssetDB::AllocCompressor(core::LinearAllocator* 
 {
 	core::Compression::ICompressor* pCom = nullptr;
 
-	static_assert(core::Compression::Algo::ENUM_COUNT == 4, "Added additional compression algos? this code needs updating.");
+	static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
 
 	switch (algo)
 	{
@@ -2492,6 +2497,9 @@ core::Compression::ICompressor* AssetDB::AllocCompressor(core::LinearAllocator* 
 		break;
 	case core::Compression::Algo::ZLIB:
 		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
+		break;
+	case core::Compression::Algo::STORE:
+		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::Store>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::Store>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::Store>), 0));
 		break;
 
 	default:

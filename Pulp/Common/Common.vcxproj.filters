@@ -1144,6 +1144,9 @@
     <ClInclude Include="String\HumanDuration.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Compression\Store.h">
+      <Filter>Headers\Compression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1757,6 +1760,9 @@
     </ClCompile>
     <ClCompile Include="String\HumanDuration.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\Store.cpp">
+      <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
