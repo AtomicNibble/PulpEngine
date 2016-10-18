@@ -47,7 +47,7 @@ namespace PathUtil
 
 	bool IsDirectory(const core::Path<wchar_t>& path);
 	bool IsDirectory(const wchar_t* pDir);
-
+	bool IsDirectory(const findData& fd);
 
 	bool MoveFile(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew);
 	bool MoveFile(const wchar_t* pFullPath, const wchar_t* pFullPathNew);

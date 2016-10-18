@@ -290,6 +290,11 @@ namespace PathUtil
 		return false;
 	}
 
+	bool IsDirectory(const findData& fd)
+	{
+		return (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0;
+	}
+
 	// ------------------------------------------------
 
 
