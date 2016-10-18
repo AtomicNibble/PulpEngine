@@ -54,6 +54,10 @@ const TChar* Path<TChar>::fileName(void) const
 	}
 
 	const TChar* noneNative = findLast(NON_NATIVE_SLASH);
+	// folder\ 
+	if (noneNative == end() - 1) {
+		return noneNative + 1;
+	}
 
 	if (!native && !noneNative)
 		return str_;
