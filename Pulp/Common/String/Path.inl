@@ -230,6 +230,16 @@ inline void Path<TChar>::removeTrailingSlash(void)
 }
 
 template<typename TChar>
+inline size_t Path<TChar>::fillSpaceWithNullTerm(void)
+{
+	const size_t space = capacity() - length();
+
+	std::memset(&str_[len_], '\0', space);
+
+	return space;
+}
+
+template<typename TChar>
 inline bool Path<TChar>::isAbsolute(void) const
 {
 	return	str_[0] == NATIVE_SLASH ||

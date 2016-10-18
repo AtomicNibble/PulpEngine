@@ -60,6 +60,9 @@ public:
 	inline void removeFileName(void);
 	inline void removeExtension(void);
 	inline void removeTrailingSlash(void);
+	// this is here so I can pass a path to win32 which requires 2 null terms.
+	// so this makes it a little less hackey than memset the path instance 1st.
+	inline size_t fillSpaceWithNullTerm(void);
 
 	inline bool isAbsolute(void) const;
 
