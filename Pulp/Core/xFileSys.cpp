@@ -715,15 +715,13 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 {
 	Path<wchar_t> buf;
-
-	// this needs replacing with more robost logic.
-	core::zero_object(buf); // ensure 2 null bytes at end.
-
 	createOSPath(gameDir_, path, buf);
 
-	if (!core::strUtil::IsEqual(buf.fileName(), L"")) {
-		X_WARNING("FileSys", "deleteDirectory called on file path: \"%ls\"", buf.c_str());
+	if (buf.fillSpaceWithNullTerm() < 1) {
+		X_ERROR("FileSys", "Failed to pad puffer for OS operation");
+		return false;
 	}
+
 	if (isDebug()) {
 		X_LOG0("FileSys", "deleteDirectory: \"%ls\"", buf.c_str());
 	}
