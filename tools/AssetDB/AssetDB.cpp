@@ -103,13 +103,13 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 	core::Path<char> dbPath;
 	dbPath.append(ASSET_DB_FOLDER);
 	dbPath.ensureSlash();
-	dbPath.append(DB_NAME);
-
 
 	if (!gEnv->pFileSys->createDirectoryTree(dbPath.c_str())) {
 		X_ERROR("AssetDB", "Failed to create dir for asset_db");
 		return false;
 	}
+
+	dbPath.append(DB_NAME);
 
 	if (!gEnv->pFileSys->fileExists(dbPath.c_str())) {
 		X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
