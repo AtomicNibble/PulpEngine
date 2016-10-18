@@ -714,18 +714,21 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 {
-	Path<wchar_t> temp;
+	Path<wchar_t> buf;
 
 	// this needs replacing with more robost logic.
-	core::zero_object(temp); // ensure 2 null bytes at end.
+	core::zero_object(buf); // ensure 2 null bytes at end.
 
-	createOSPath(gameDir_, path, temp);
+	createOSPath(gameDir_, path, buf);
 
+	if (buf.fileName()) {
+		X_WARNING("FileSys", "deleteDirectory called on file path: \"%ls\"", buf.c_str());
+	}
 	if (isDebug()) {
-		X_LOG0("FileSys", "deleteDirectory: \"%ls\"", temp.c_str());
+		X_LOG0("FileSys", "deleteDirectory: \"%ls\"", buf.c_str());
 	}
 
-	return PathUtil::DeleteDirectory(temp, recursive);
+	return PathUtil::DeleteDirectory(buf, recursive);
 }
 
 
@@ -739,6 +742,9 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 	Path<wchar_t> buf;
 	createOSPath(gameDir_, path, buf);
 
+	if (buf.fileName()) {
+		X_WARNING("FileSys", "createDirectory called on file path: \"%ls\"", buf.c_str());
+	}
 	if (isDebug()) {
 		X_LOG0("FileSys", "createDirectory: \"%ls\"", buf.c_str());
 	}
@@ -756,8 +762,9 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 
 	createOSPath(gameDir_, _path, buf);
 
-	buf.removeFileName();
-
+	if (buf.fileName()) {
+		X_WARNING("FileSys", "createDirectoryTree called on file path: \"%ls\"", buf.c_str());
+	}
 	if (isDebug()) {
 		X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
 	}
@@ -811,6 +818,10 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
+	if (buf.fileName()) {
+		X_WARNING("FileSys", "directoryExists called on file path: \"%ls\"", buf.c_str());
+	}
+
 	return directoryExistsOS(buf);
 }
 
@@ -824,6 +835,10 @@ bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) 
 	}
 	else {
 		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	if (buf.fileName()) {
+		X_WARNING("FileSys", "directoryExists called on file path: \"%ls\"", buf.c_str());
 	}
 
 	return directoryExistsOS(buf);
