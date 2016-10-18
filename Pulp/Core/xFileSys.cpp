@@ -730,6 +730,71 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 }
 
 
+bool xFileSys::deleteDirectoryContents(pathType path)
+{
+	Path<wchar_t> buf;
+	createOSPath(gameDir_, path, buf);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "deleteDirectoryContents: \"%s\"", path);
+	}
+
+	// check if the dir exsists.
+	if (!directoryExistsOS(buf)) {
+		return false;
+	}
+
+	// we build a relative search path.
+	// as findFirst works on game dir's
+	core::Path<wchar_t> searchPath(buf);
+	searchPath.ensureSlash();
+	searchPath.append(L"*");
+
+
+	PathUtil::findData fd;
+	uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
+	if (handle != PathUtil::INVALID_FIND_HANDLE)
+	{
+		do
+		{
+			if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
+				continue;
+			}
+
+			// build a OS Path.
+			core::Path<wchar_t> dirItem(buf);
+			dirItem.ensureSlash();
+			dirItem.append(fd.name);
+
+			if (PathUtil::IsDirectory(fd))
+			{
+				if (dirItem.fillSpaceWithNullTerm() < 1) {
+					X_ERROR("FileSys", "Failed to pad puffer for OS operation");
+					return false;
+				}
+
+				if (!PathUtil::DeleteDirectory(dirItem, true)) {
+					return false;
+				}
+			}
+			else
+			{
+				if (!PathUtil::DeleteFile(dirItem)) {
+					return false;
+				}
+			}
+
+
+		} while (PathUtil::findNext(handle, fd));
+
+		PathUtil::findClose(handle);
+	}
+
+	return true;
+}
+
+
+
 // --------------------- Create ---------------------
 
 bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) const

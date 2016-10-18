@@ -121,6 +121,7 @@ public:
 	// Delete
 	bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 	bool deleteDirectory(pathType path, bool recursive = true) const X_FINAL;
+	bool deleteDirectoryContents(pathType path) X_FINAL;
 
 	// Create
 	bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;

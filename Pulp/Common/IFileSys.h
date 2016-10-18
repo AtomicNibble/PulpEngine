@@ -566,6 +566,7 @@ struct IFileSys
 	// Delete
 	virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 	virtual bool deleteDirectory(pathType path, bool recursive = true) const X_ABSTRACT;
+	virtual bool deleteDirectoryContents(pathType path) X_ABSTRACT;
 
 	// Create
 	virtual bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
