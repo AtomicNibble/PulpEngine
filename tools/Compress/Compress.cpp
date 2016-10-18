@@ -10,6 +10,7 @@
 #include <Compression\LZ4.h>
 #include <Compression\Lzma2.h>
 #include <Compression\Zlib.h>
+#include <Compression\Store.h>
 
 #include <Time\StopWatch.h>
 
@@ -174,6 +175,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			int32_t iAlgo = core::strUtil::StringToInt<int32_t>(pAlgo);
 			iAlgo = constrain<int32_t>(iAlgo, 1, 3);
 
+			static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
+
 			if (iAlgo == 1) {
 				algo = Algo::LZ4;
 			}
@@ -185,6 +188,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			}
 			else if (iAlgo == 4) {
 				algo = Algo::ZLIB;
+			}
+			else if (iAlgo == 5) {
+				algo = Algo::STORE;
 			}
 			else {
 				X_ASSERT_UNREACHABLE();
@@ -226,6 +232,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	ICompressor* pCompressor = nullptr;
 
+	static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
+
 	if (algo == Algo::LZ4) {
 		pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
 		if (defalte && outFile.empty()) {
@@ -248,6 +256,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		pCompressor = X_NEW(Compressor<core::Compression::Zlib>, g_arena, "ZLIB");
 		if (defalte && outFile.empty()) {
 			outFile = inFile + L".zlib";
+		}
+	}
+	else if (algo == Algo::ZLIB) {
+		pCompressor = X_NEW(Compressor<core::Compression::Store>, g_arena, "Store");
+		if (defalte && outFile.empty()) {
+			outFile = inFile + L".store";
 		}
 	}
 	else {
