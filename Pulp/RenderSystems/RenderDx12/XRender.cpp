@@ -206,6 +206,11 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	}
 
 	pBuffMan_ = X_NEW(BufferManager, arena_, "BufferManager")(arena_, pDevice_);
+	if (!pBuffMan_->init()) {
+		X_ERROR("Render", "failed to init buffer manager");
+		return false;
+	}
+	
 	pDescriptorAllocator_ = X_NEW(DescriptorAllocator, arena_, "DescriptorAllocator")(arena_, pDevice_);
 	pDescriptorAllocatorPool_ = X_NEW(DescriptorAllocatorPool, arena_, "DescriptorAllocatorPool")(arena_, pDevice_, cmdListManager_);
 
