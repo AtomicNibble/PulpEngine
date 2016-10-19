@@ -11,11 +11,27 @@ DisplayPixDialog::DisplayPixDialog(QWidget *parent, QPixmap& pix)
 	// take me to the getto, where we can have some pickles
 	QVBoxLayout* pLayout = new QVBoxLayout();
 
-
 	QLabel* pImageLabel = new QLabel();
 	pImageLabel->setFrameStyle(QFrame::NoFrame);
 	pImageLabel->setAlignment(Qt::AlignCenter);
-	pImageLabel->setPixmap(pix);
+
+	if (pix.hasAlpha())
+	{
+		QPixmap alphaPix(pix.width(), pix.height());
+		QPainter painter(&alphaPix);
+
+		painter.setBackgroundMode(Qt::TransparentMode);
+		painter.drawPixmap(0, 0, pix.width(), pix.height(), QPixmap(":/misc/img/checkerd.png"));
+		painter.drawPixmap(0, 0, pix.width(), pix.height(), pix);
+		painter.end();
+
+		pImageLabel->setPixmap(alphaPix);
+	}
+	else
+	{
+		pImageLabel->setPixmap(pix);
+
+	}
 
 	QDialogButtonBox* pButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
 	pButtonBox->button(QDialogButtonBox::Ok)->setDefault(true);
