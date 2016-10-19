@@ -127,7 +127,11 @@ X_NAMESPACE_BEGIN(texture)
 				stream(pTex);
 			}
 			else {
-				load(pTex);
+				if (!load(pTex)) {
+					pTex->flags_.Set(TexFlag::LOAD_FAILED);
+
+					X_WARNING("Texture", "Failed to load: \"%s\"", pTex->fileName_.c_str());
+				}
 			}
 		}
 
