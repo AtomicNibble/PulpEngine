@@ -31,6 +31,7 @@ private:
 	QString makeDialogTitle(const QString& title);
 	static bool fileExtensionValid(const QString& paht);
 	bool getPixMapCurPath(QPixmap& pixOut);
+	void setPreviewPix(QPixmap& pix);
 	bool loadImage(void);
 	void setErrorTip(const QString& tip);
 	void removeErrorTip(void);

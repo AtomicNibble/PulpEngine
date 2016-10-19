@@ -162,6 +162,26 @@ bool AssetTextureWidget::getPixMapCurPath(QPixmap& pixOut)
 	return false;
 }
 
+void AssetTextureWidget::setPreviewPix(QPixmap& pix)
+{
+	if (pix.hasAlpha())
+	{
+		QPixmap alphaPix(pix.width(), pix.height());
+		QPainter painter(&alphaPix);
+
+		painter.setBackgroundMode(Qt::TransparentMode);
+		painter.drawPixmap(0, 0, pix.width(), pix.height(), QPixmap(":/misc/img/checkerd.png"));
+		painter.drawPixmap(0, 0, pix.width(), pix.height(), pix);
+		painter.end();
+
+		pPreview_->setPixmap(alphaPix);
+	}
+	else
+	{
+		pPreview_->setPixmap(pix);
+	}
+}
+
 bool AssetTextureWidget::loadImage(void)
 {
 	// so we want to load the image for both making a preview thumb.
@@ -295,7 +315,8 @@ void AssetTextureWidget::setValue(const std::string& value)
 
 			pix.loadFromData(thumbData.data(), static_cast<int32_t>(thumbData.size()));
 
-			pPreview_->setPixmap(pix);
+			setPreviewPix(pix);
+
 			pEditDimensions_->setText(QString("%1x%2").arg(QString::number(dim.x), QString::number(dim.y)));
 			showPreviewWidgets(true);
 		}
@@ -484,9 +505,9 @@ void AssetTextureWidget::rawFileLoaded(void)
 
 	// set preivew pix
 	QPixmap thumbPix;
-	thumbPix.loadFromData(thumbData.data(), static_cast<int32_t>(thumbData.size()), "BMP");
+	thumbPix.loadFromData(thumbData.data(), static_cast<int32_t>(thumbData.size()));
 
-	pPreview_->setPixmap(thumbPix);
+	setPreviewPix(thumbPix);
 }
 
 X_NAMESPACE_END
