@@ -443,7 +443,7 @@ X_NAMESPACE_BEGIN(texture)
 			if (file.openFile(path.c_str(), mode))
 			{
 				if (!pCILoader_->loadTexture(file.GetFile(), imgFile, arena_)) {
-					X_WARNING("Texture", "Failed to load: \"%s\"", pPath);
+					X_ERROR("Texture", "Error loading: \"%s\"", pPath);
 					return false;
 				}
 
@@ -467,7 +467,7 @@ X_NAMESPACE_BEGIN(texture)
 				if (file.openFile(path.c_str(), mode))
 				{
 					if (!pLoader->loadTexture(file.GetFile(), imgFile, arena_)) {
-						X_WARNING("Texture", "Failed to load: \"%s\"", pPath);
+						X_ERROR("Texture", "Error loading: \"%s\"", pPath);
 						return false;
 					}
 				}
