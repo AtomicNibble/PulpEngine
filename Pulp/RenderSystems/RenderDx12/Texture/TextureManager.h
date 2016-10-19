@@ -49,6 +49,7 @@ private:
 
 	bool loadDefaultTextures(void);
 	void releaseDefaultTextures(void);
+	void releaseDanglingTextures(void);
 
 	bool stream(Texture* pTex);
 	bool load(Texture* pTex);

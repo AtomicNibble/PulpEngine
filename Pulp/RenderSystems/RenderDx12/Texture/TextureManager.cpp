@@ -84,6 +84,7 @@ X_NAMESPACE_BEGIN(texture)
 		hotReload->addfileType(nullptr, "tga");
 
 		releaseDefaultTextures();
+		releaseDanglingTextures();
 
 		for (auto tl : textureLoaders_) {
 			X_DELETE(tl, arena_);
@@ -221,6 +222,15 @@ X_NAMESPACE_BEGIN(texture)
 		core::SafeRelease(pTexDefault_);
 		core::SafeRelease(pTexDefaultBump_);
 		core::SafeRelease(ptexMipMapDebug_);
+	void TextureManager::releaseDanglingTextures(void)
+	{
+		TextureMap::iterator it = textures_.begin();;
+		for (; it != textures_.end(); ++it) {
+			X_WARNING("Texture", "\"%s\" was not deleted", it->second->getName());
+			X_DELETE(it->second, arena_);
+		}
+
+		textures_.free();
 	}
 
 	bool TextureManager::stream(Texture* pTex)
