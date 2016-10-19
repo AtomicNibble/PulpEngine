@@ -316,7 +316,7 @@ AssetScriptProperty* AssetScriptProps::AddCombo(const std::string& key, const st
 		{
 			const auto& first = values.first();
 
-			pProp->prop().SetDefaultValue(first.title.toStdString());
+			pProp->prop().SetDefaultValue(first.value.toStdString());
 		}
 	}
 
