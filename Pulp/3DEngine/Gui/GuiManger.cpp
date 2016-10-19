@@ -79,7 +79,7 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = gEnv->pRender->getTexture("Textures/cursor_arrow.dds",
+	pCursorArrow_ = gEnv->pRender->getTexture("imgs/ui/cursor",
 		texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
