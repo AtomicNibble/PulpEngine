@@ -174,6 +174,7 @@ namespace shader
 
 		freeCoreShaders();
 		freeSourcebin();
+		freeSourceHwShaders();
 
 		return true;
 	}
@@ -954,6 +955,18 @@ namespace shader
 		sourcebin_.free();
 		return true;
 	}
+
+	bool XShaderManager::freeSourceHwShaders(void)
+	{
+		HWShaderMap::iterator it = hwShaders_.begin();;
+		for (; it != hwShaders_.end(); ++it) {
+			X_DELETE(it->second, g_rendererArena);
+		}
+
+		hwShaders_.free();
+		return true;
+	}
+
 
 	void XShaderManager::listShaders(const char* pSarchPatten)
 	{

@@ -73,6 +73,7 @@ namespace shader
 
 	private:
 		bool freeSourcebin(void);
+		bool freeSourceHwShaders(void);
 		void listShaders(const char* pSarchPatten = nullptr);
 		void listShaderSources(const char* pSarchPatten = nullptr);
 
