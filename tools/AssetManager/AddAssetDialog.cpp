@@ -112,6 +112,11 @@ void AddAssetDialog::setPrefredMod(const QString& modName)
 	}
 }
 
+void AddAssetDialog::setNameHint(const QString& hint)
+{
+	pAssetName_->setText(hint);
+}
+
 core::string AddAssetDialog::getName(void) const
 {
 	return assetName_;

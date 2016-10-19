@@ -19,6 +19,7 @@ public:
 
 	void setAssetType(assetDb::AssetType::Enum type);
 	void setPrefredMod(const QString& modName);
+	void setNameHint(const QString& hint);
 
 	core::string getName(void) const;
 	assetDb::AssetType::Enum getType(void) const;
