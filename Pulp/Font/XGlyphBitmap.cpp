@@ -24,6 +24,7 @@ height_(0)
 
 XGlyphBitmap::~XGlyphBitmap()
 {
+	Release();
 }
 
 
@@ -45,9 +46,11 @@ bool XGlyphBitmap::Create(int32_t width, int32_t height)
 
 void XGlyphBitmap::Release(void)
 {
-	X_DELETE_ARRAY(pBuffer_, g_fontArena);
-	
-	pBuffer_ = nullptr;
+	if (pBuffer_) {
+		X_DELETE_ARRAY(pBuffer_, g_fontArena);
+		pBuffer_ = nullptr;
+	}
+
 	width_ = height_ = 0;
 }
 
