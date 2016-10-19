@@ -494,10 +494,27 @@ void AssetExplorer::updateContextMenuActions(void)
 			else
 			{
 				addNewAssetTypeAction_->setEnabled(false);
+
+				// need parent type.
+				FolderNode* pParent;
+				while ((pParent = pFolderNode->parentFolderNode()) != nullptr)
+				{
+					if (AssetTypeVirtualFolderNode* pParType = qobject_cast<AssetTypeVirtualFolderNode*>(pParent))
+					{
+						const char* pType = assetDb::AssetType::ToString(pParType->assetType());
+						QString typeStr(pType);
+						QString newText = tr("New '%1'...").arg(Utils::capitalize(typeStr));
+
+						addNewAssetTypeAction_->setText(newText);
+						addNewAssetTypeAction_->setEnabled(enableAddNew);
+						break;
+					}
+
+					pFolderNode = pParent;
+				}
 			}
 
 			addNewAssetAction_->setEnabled(enableAddNew);
-			addNewAssetTypeAction_->setEnabled(enableAddNew);
 			renameAssetAction_->setEnabled(enableRename);
 		}
 		else if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_))
@@ -643,11 +660,44 @@ void AssetExplorer::addNewAsset(void)
 
 void AssetExplorer::addNewAssetType(void)
 {
-	BUG_ASSERT(currentNode_ && currentNode_->nodeType() == NodeType::VirtualFolderNodeType, return);
+	BUG_ASSERT(currentNode_, return);
+
+	if (currentNode_->nodeType() != NodeType::FileNodeType &&
+		currentNode_->nodeType() != NodeType::VirtualFolderNodeType &&
+		currentNode_->nodeType() != NodeType::FolderNodeType) {
+		return;
+	}
 
 	AddAssetDialog dialog(ICore::mainWindow(), db_);
 
-	AssetTypeVirtualFolderNode* pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_);
+	AssetTypeVirtualFolderNode* pAssetTypeFolder = nullptr;
+	
+	
+	if (currentNode_->nodeType() == NodeType::VirtualFolderNodeType)
+	{
+		pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_);
+	}
+	else if (currentNode_->nodeType() == NodeType::FolderNodeType)
+	{
+		FolderNode* pCurFolder = qobject_cast<FolderNode*>(currentNode_);
+
+		dialog.setNameHint(pCurFolder->name() + "/");
+
+		FolderNode* pParent;
+		while ((pParent = pCurFolder->parentFolderNode()) != nullptr)
+		{
+			if (pParent->nodeType() == NodeType::VirtualFolderNodeType)
+			{
+				if (pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(pParent))
+				{
+					break;
+				}
+			}
+
+			pCurFolder = pParent;
+		}
+	}
+	
 	if (pAssetTypeFolder) {
 		dialog.setAssetType(pAssetTypeFolder->assetType());
 	}
@@ -655,7 +705,10 @@ void AssetExplorer::addNewAssetType(void)
 		dialog.setPrefredMod(currentProject_->displayName());
 	}
 
-	dialog.exec();
+	if (dialog.exec() == QDialog::Accepted) 
+	{
+		pAssetTypeFolder->addFile(dialog.getName(), dialog.getType());
+	}
 }
 
 void AssetExplorer::build(void)
