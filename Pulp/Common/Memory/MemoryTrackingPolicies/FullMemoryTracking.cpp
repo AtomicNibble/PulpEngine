@@ -52,10 +52,23 @@ FullMemoryTracking::~FullMemoryTracking(void)
 
 		X_ASSERT(numAllocations_ == 0, "Memory leaks detected.")(numAllocations_);
 
-		if (!gEnv) {
-			return;
-		}
-		if (!gEnv->pLog) {
+		if (!gEnv || !gEnv->pLog) 
+		{
+			// allow stepping over.
+
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
+			{
+				if (it == end) {
+					break;
+				}
+
+				const AllocationData& info = it->second; 
+
+				X_UNUSED(info);
+			}
+
 			return;
 		}
 
