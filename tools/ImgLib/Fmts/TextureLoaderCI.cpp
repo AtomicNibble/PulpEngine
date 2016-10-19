@@ -56,7 +56,7 @@ namespace CI
 			return false;
 		}
 		
-		if (hdr.isValid()) {
+		if (!hdr.isValid()) {
 			X_ERROR("TextureCI", "header is not valid");
 			return false;
 		}
