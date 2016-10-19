@@ -17,16 +17,6 @@ giving much faster text rendering at the cost of some memory.
 
 struct XCacheSlot
 {
-	uint32			usage;
-	int32_t			cacheSlot;
-	wchar_t			currentChar;
-
-	uint8_t			charWidth;					// size in pixel
-	uint8_t			charHeight;				// size in pixel
-	int8_t			charOffsetX;
-	int8_t			charOffsetY;
-
-	XGlyphBitmap	pGlyphBitmap;
 
 	void reset(void)
 	{
@@ -38,8 +28,20 @@ struct XCacheSlot
 		charOffsetX = 0;
 		charOffsetY = 0;
 
-		pGlyphBitmap.Clear();
+		glyphBitmap.Clear();
 	}
+
+public:
+	uint32			usage;
+	int32_t			cacheSlot;
+	wchar_t			currentChar;
+
+	uint8_t			charWidth;					// size in pixel
+	uint8_t			charHeight;				// size in pixel
+	int8_t			charOffsetX;
+	int8_t			charOffsetY;
+
+	XGlyphBitmap	glyphBitmap;
 };
 
 

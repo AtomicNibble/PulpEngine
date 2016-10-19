@@ -194,19 +194,19 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		pSlot->charHeight >>= offsetMult >> 1;
 
 		pScaleBitmap_->BlitScaledTo8(
-			pSlot->pGlyphBitmap.GetBuffer(),
+			pSlot->glyphBitmap.GetBuffer(),
 			0, 0, 
 			pScaleBitmap_->GetWidth(), 
 			pScaleBitmap_->GetHeight(),
 			0, 0, 
-			pSlot->pGlyphBitmap.GetWidth(), 
-			pSlot->pGlyphBitmap.GetHeight(), 
-			pSlot->pGlyphBitmap.GetWidth()
+			pSlot->glyphBitmap.GetWidth(),
+			pSlot->glyphBitmap.GetHeight(),
+			pSlot->glyphBitmap.GetWidth()
 		);
 	}
 	else
 	{
-		if (!fontRenderer_.GetGlyph(&pSlot->pGlyphBitmap, &pSlot->charWidth, &pSlot->charHeight,
+		if (!fontRenderer_.GetGlyph(&pSlot->glyphBitmap, &pSlot->charWidth, &pSlot->charHeight,
 			pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
 		{
 			// failed to render
@@ -217,7 +217,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	// Blur it baby!
 	if (smoothMethod_ == FontSmooth::BLUR)
 	{
-		pSlot->pGlyphBitmap.Blur(smoothAmount_);
+		pSlot->glyphBitmap.Blur(smoothAmount_);
 	}
 
 	pSlot->usage = usage_;
@@ -326,7 +326,7 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* pWidth, int32_t* pHei
 	X_ASSERT_NOT_NULL(pItor->second);
 
 	pItor->second->usage = usage_++;
-	(*pGlyph) = &pItor->second->pGlyphBitmap;
+	(*pGlyph) = &pItor->second->glyphBitmap;
 
 	if (pWidth) {
 		*pWidth = pItor->second->charWidth;
@@ -354,7 +354,7 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 			return false;
 		}
 
-		if (!pCacheSlot->pGlyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
+		if (!pCacheSlot->glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
 		{
 			X_DELETE(pCacheSlot, arena_);
 			return false;
@@ -381,9 +381,7 @@ void XGlyphCache::ReleaseSlotList(void)
 		++pItor;
 
 		X_ASSERT_NOT_NULL(pSlot);
-
-		pSlot->pGlyphBitmap.Release();
-		X_DELETE((*pItor), arena_);
+		X_DELETE(pSlot, arena_);
 	}
 
 	slotList_.free();
