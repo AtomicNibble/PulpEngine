@@ -45,6 +45,7 @@ public:
 private:
 	Texture* findTexture(const char* pName);
 	Texture* findTexture(const core::string& name);
+	void removeTexture(Texture* pTex);
 	bool reloadForName(const char* pName);
 
 	bool loadDefaultTextures(void);

@@ -174,6 +174,16 @@ X_NAMESPACE_BEGIN(texture)
 		return nullptr;
 	}
 
+	void TextureManager::removeTexture(Texture* pTex)
+	{
+		if (pTex && pTex->release() == 0)
+		{
+			core::string name(pTex->getName());
+			X_DELETE(pTex, arena_);
+			textures_.erase(name);
+		}
+	}
+
 	bool TextureManager::reloadForName(const char* pName)
 	{
 		X_ASSERT_NOT_NULL(pName);
@@ -219,9 +229,11 @@ X_NAMESPACE_BEGIN(texture)
 	void TextureManager::releaseDefaultTextures(void)
 	{
 
-		core::SafeRelease(pTexDefault_);
-		core::SafeRelease(pTexDefaultBump_);
-		core::SafeRelease(ptexMipMapDebug_);
+		removeTexture(pTexDefault_);
+		removeTexture(pTexDefaultBump_);
+		removeTexture(ptexMipMapDebug_);
+	}
+
 	void TextureManager::releaseDanglingTextures(void)
 	{
 		TextureMap::iterator it = textures_.begin();;
