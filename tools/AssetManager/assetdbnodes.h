@@ -135,6 +135,7 @@ namespace AssetExplorer
 		void addFolderNodes(const QList<FolderNode*>& subFolders);
 		void removeFolderNodes(const QList<FolderNode*>& subFolders);
 
+		virtual bool addFile(const core::string& name, assetDb::AssetType::Enum type);
 	protected:
 		QList<FolderNode*> subFolderNodes_;
 		QList<FileNode*> fileNodes_;

@@ -413,6 +413,15 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*>& subFolders)
     }
 }
 
+bool FolderNode::addFile(const core::string& name, assetDb::AssetType::Enum type)
+{
+	if (projectNode()) {
+		return projectNode()->addFile(name, type);
+	}
+	return false;
+}
+
+
 // ------------------------------------------------------------------
 
 

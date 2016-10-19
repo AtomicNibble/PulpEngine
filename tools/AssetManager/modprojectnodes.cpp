@@ -341,6 +341,15 @@ bool ModProjectNode::removeSubProjects(const QStringList& projectNames)
     return false;
 }
 
+bool ModProjectNode::addFile(const core::string& name, assetDb::AssetType::Enum type)
+{
+	Q_UNUSED(name);
+	Q_UNUSED(type);
+
+	return true;
+}
+
+
 bool ModProjectNode::clean(ConverterHost& conHost) const
 {
 	int32_t modId = pProject_->modId();
