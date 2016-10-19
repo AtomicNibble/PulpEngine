@@ -2418,6 +2418,7 @@ void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, c
 	pathOut.toLower();
 	pathOut.ensureSlash();
 	pathOut /= name;
+	pathOut.replaceSeprators();
 }
 
 void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
@@ -2427,6 +2428,7 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 	pathOut /= RAW_FILES_FOLDER;
 	pathOut.ensureSlash();
 	pathOut /= raw.path;
+	pathOut.replaceSeprators();
 }
 
 void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOut)
@@ -2438,6 +2440,7 @@ void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOu
 	pathOut /= THUMBS_FOLDER;
 	pathOut.ensureSlash();
 	pathOut /= thumb.hash.ToString(hashStr);
+	pathOut.replaceSeprators();
 }
 
 
