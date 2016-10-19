@@ -112,10 +112,18 @@ void AddAssetDialog::setPrefredMod(const QString& modName)
 	}
 }
 
+core::string AddAssetDialog::getName(void) const
+{
+	return assetName_;
+}
+
+assetDb::AssetType::Enum AddAssetDialog::getType(void) const
+{
+	return type_;
+}
+
 void AddAssetDialog::accept(void)
 {
-	assetDb::AssetType::Enum type;
-	core::string assName;
 	int32_t modId = assetDb::AssetDB::INVALID_MOD_ID;
 
 	// name
@@ -136,7 +144,7 @@ void AddAssetDialog::accept(void)
 
 		const auto latinStr = name.toLatin1();
 
-		assName = latinStr;
+		assetName_ = latinStr;
 	}
 
 	// type
@@ -148,7 +156,7 @@ void AddAssetDialog::accept(void)
 			return;
 		}
 
-		type = static_cast<assetDb::AssetType::Enum>(index);
+		type_ = static_cast<assetDb::AssetType::Enum>(index);
 	}
 
 	// mod  
@@ -173,7 +181,7 @@ void AddAssetDialog::accept(void)
 
 
 	// o baby!
-	auto res = db_.AddAsset(modId, type, assName);
+	auto res = db_.AddAsset(modId, type_, assetName_);
 	if (res == assetDb::AssetDB::Result::OK) {
 		done(QDialog::Accepted);
 		return;

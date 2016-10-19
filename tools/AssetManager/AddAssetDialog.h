@@ -20,6 +20,9 @@ public:
 	void setAssetType(assetDb::AssetType::Enum type);
 	void setPrefredMod(const QString& modName);
 
+	core::string getName(void) const;
+	assetDb::AssetType::Enum getType(void) const;
+
 private slots:
 	void accept(void);
 	void reject(void);
@@ -32,6 +35,10 @@ private:
 	QLineEdit* pAssetName_;
 	QComboBox* pAssetType_;
 	QComboBox* pMod_;
+
+private:
+	core::string assetName_;
+	assetDb::AssetType::Enum type_;
 };
 
 
