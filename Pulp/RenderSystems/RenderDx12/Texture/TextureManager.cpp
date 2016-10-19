@@ -63,7 +63,10 @@ X_NAMESPACE_BEGIN(texture)
 			textureLoaders_.append(X_NEW(TGA::XTexLoaderTGA, arena_, "TGALoader"));
 		}
 
-		loadDefaultTextures();
+		if (!loadDefaultTextures()) {
+			X_ERROR("TextureManager", "Failed to load default textures");
+			return false;
+		}
 
 		return true;
 	}
