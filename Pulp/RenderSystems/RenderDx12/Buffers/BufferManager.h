@@ -95,6 +95,9 @@ public:
 	BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
 	~BufferManager();
 
+	bool init(void);
+	void shutDown(void);
+
 	VertexBufferHandle createVertexBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 	IndexBufferHandle createIndexBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 

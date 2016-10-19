@@ -50,6 +50,18 @@ BufferManager::~BufferManager()
 
 }
 
+
+bool BufferManager::init(void)
+{
+
+	return true;
+}
+
+void BufferManager::shutDown(void)
+{
+
+}
+
 BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t size, const void* pInitialData,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
