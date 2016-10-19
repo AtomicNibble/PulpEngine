@@ -352,6 +352,11 @@ void XRender::shutDown(void)
 {
 	presentRS_.free();
 
+	if (pBuffMan_) {
+		pBuffMan_->shutDown();
+		X_DELETE_AND_NULL(pBuffMan_, arena_);
+	}
+
 	if (pTextureMan_) {
 		pTextureMan_->shutDown();
 		X_DELETE_AND_NULL(pTextureMan_, arena_);
