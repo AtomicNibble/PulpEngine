@@ -672,14 +672,8 @@ void AssetExplorer::addNewAssetType(void)
 
 	AssetTypeVirtualFolderNode* pAssetTypeFolder = nullptr;
 	
-	
-	if (currentNode_->nodeType() == NodeType::VirtualFolderNodeType)
-	{
-		pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_);
-	}
-	else if (currentNode_->nodeType() == NodeType::FolderNodeType)
-	{
-		FolderNode* pCurFolder = qobject_cast<FolderNode*>(currentNode_);
+
+	auto findVF = [&](FolderNode* pCurFolder) {
 
 		dialog.setNameHint(pCurFolder->name() + "/");
 
@@ -696,8 +690,30 @@ void AssetExplorer::addNewAssetType(void)
 
 			pCurFolder = pParent;
 		}
-	}
+	};
 	
+	if (currentNode_->nodeType() == NodeType::VirtualFolderNodeType)
+	{
+		pAssetTypeFolder = qobject_cast<AssetTypeVirtualFolderNode*>(currentNode_);
+	}
+	else if (currentNode_->nodeType() == NodeType::FolderNodeType)
+	{
+		FolderNode* pCurFolder = qobject_cast<FolderNode*>(currentNode_);
+		findVF(pCurFolder);
+	}
+	else if (currentNode_->nodeType() == NodeType::FileNodeType)
+	{
+		FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_);
+		if (pFileNode)
+		{
+			FolderNode* pFolder = pFileNode->parentFolderNode();
+			if (pFolder)
+			{
+				findVF(pFolder);
+			}
+		}
+	}
+
 	if (pAssetTypeFolder) {
 		dialog.setAssetType(pAssetTypeFolder->assetType());
 	}
