@@ -137,7 +137,6 @@ X_DECLARE_FLAGS(TexFlag)(
 	ALPHA,
 	NORMAL, 
 
-//	DONT_STREAM,
 	STREAMING,			// streaming in progress
 	STREAMABLE,			// can be streamed
 	HI_MIP_STREAMING,	// only high mips can be streamed.
@@ -147,7 +146,12 @@ X_DECLARE_FLAGS(TexFlag)(
 	TEX_FONT, 
 	FILTER_POINT, FILTER_LINEAR, FILTER_BILINEAR, FILTER_TRILINEAR, 
 	RENDER_TARGET, 
-	CI_IMG
+	CI_IMG,
+
+
+	// can be used to force a img that would normaly be stream to be sync loaded.
+	// useful for enforcing sync loads for required assets.
+	DONT_STREAM
 );
 
 typedef Flags<TexFlag> TextureFlags;

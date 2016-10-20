@@ -127,7 +127,7 @@ X_NAMESPACE_BEGIN(texture)
 			pTex = X_NEW(Texture, arena_, "Texture")(pName, flags);
 			textures_.insert(std::make_pair(name, pTex));
 
-			if (pTex->IsStreamable()) {
+			if (pTex->IsStreamable() && flags.IsSet(TexFlag::DONT_STREAM)) {
 				stream(pTex);
 			}
 			else {
