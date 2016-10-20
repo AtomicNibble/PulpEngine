@@ -406,6 +406,11 @@ bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::st
 	return true;
 }
 
+core::MemoryArenaBase* Converter::getScratchArena(void)
+{
+	return scratchArea_;
+}
+
 bool Converter::loadConversionProfiles(const core::string& profileName)
 {
 	core::string profileData;
