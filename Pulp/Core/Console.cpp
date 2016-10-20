@@ -469,7 +469,7 @@ void XConsole::LoadRenderResources(void)
 	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
 
 	// load a texture baby!
-	pBackground_ = pRender_->getTexture("Textures/white.dds", 0);
+	pBackground_ = pRender_->getTexture(texture::TEX_DEFAULT_WHITE, texture::TexFlag::DONT_STREAM);
 }
 
 void XConsole::RegisterInputListener(void)
