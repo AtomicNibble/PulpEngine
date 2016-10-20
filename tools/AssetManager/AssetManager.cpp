@@ -77,6 +77,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 	pConHost_ = new ConverterHost(*pDb_, g_arena);
 	pConHost_->init();
+	pConHost_->setConversionProfile(core::string("dev"));
 
 	connect(pWatcher_, SIGNAL(fileChanged(const QString &)),
 		this, SLOT(fileChanged(const QString &)));
