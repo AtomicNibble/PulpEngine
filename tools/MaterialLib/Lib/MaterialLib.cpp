@@ -22,8 +22,7 @@ const char* MaterialLib::getOutExtension(void) const
 	return engine::MTL_B_FILE_EXTENSION;
 }
 
-bool MaterialLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
-	const OutPath& destPath)
+bool MaterialLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
 	X_UNUSED(host);
 	X_ASSERT_NOT_NULL(gEnv);
@@ -33,11 +32,6 @@ bool MaterialLib::Convert(IConverterHost& host, ConvertArgs& args, const core::A
 	core::json::Document d;
 	d.Parse(args.c_str());
 
-
-	if (fileData.isEmpty()) {
-		X_ERROR("MaterialLib", "File data is empty");
-		return false;
-	}
 
 
 

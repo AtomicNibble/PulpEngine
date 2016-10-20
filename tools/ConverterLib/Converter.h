@@ -64,8 +64,7 @@ private:
 
 	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir);
 
-	bool Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,
-		const OutPath& pathOut);
+	bool Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut);
 
 	IConverter* GetConverter(AssetType::Enum assType);
 	bool EnsureLibLoaded(AssetType::Enum assType);

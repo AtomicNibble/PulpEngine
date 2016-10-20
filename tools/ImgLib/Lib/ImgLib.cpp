@@ -31,8 +31,7 @@ const char* ImgLib::getOutExtension(void) const
 	return texture::CI_FILE_EXTENSION;
 }
 
-bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
-	const OutPath& destPath)
+bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
 	X_UNUSED(host);
 	X_ASSERT_NOT_NULL(gEnv);
@@ -40,12 +39,6 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 
 	core::json::Document d;
 	d.Parse(args.c_str());
-
-
-	if (fileData.isEmpty()) {
-		X_ERROR("ImgLib", "File data is empty");
-		return false;
-	}
 
 	CompileFlags flags;
 	ScaleFactor::Enum scale = ScaleFactor::ORIGINAL;
@@ -339,6 +332,18 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 					break;
 			}
 		}
+	}
+
+	// load file data
+	core::Array<uint8_t> fileData(host.getScratchArena());
+	if (!host.GetAssetData(assetId, fileData)) {
+		X_ERROR("Img", "Failed to get asset data");
+		return false;
+	}
+
+	if (fileData.isEmpty()) {
+		X_ERROR("Img", "File data is empty");
+		return false;
 	}
 
 	// load it :D

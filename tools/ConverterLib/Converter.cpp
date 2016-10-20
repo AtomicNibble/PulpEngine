@@ -112,13 +112,6 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 		return false;
 	}
 
-	core::Array<uint8_t> data(scratchArea_);
-	if (!db_.GetRawFileDataForAsset(assetId, data)) {
-		return false;
-	}
-
-	X_LOG1("Converter", "Loaded rawfile in: ^6%g ms", timer.GetMilliSeconds());
-
 	// make sure out dir is valid.
 	{
 		core::Path<char> dir(pathOut);
@@ -136,7 +129,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
 	timer.Start();
 
-	bool res = Convert_int(assType, argsStr, data, pathOut);
+	bool res = Convert_int(assType, assetId, argsStr, pathOut);
 	if (res) {
 		X_LOG1("Converter", "processing took: ^6%g ms", timer.GetMilliSeconds());
 
@@ -348,13 +341,12 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 	return true;
 }
 
-bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,
-	const OutPath& pathOut)
+bool Converter::Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut)
 {
 	IConverter* pCon = GetConverter(assType);
 
 	if (pCon) {
-		return pCon->Convert(*this, args, fileData, pathOut);
+		return pCon->Convert(*this, assetId, args, pathOut);
 	}
 
 	return false;

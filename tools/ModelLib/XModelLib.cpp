@@ -23,8 +23,8 @@ const char* XModelLib::getOutExtension(void) const
 }
 
 
-bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args, 
-	const core::Array<uint8_t>& fileData, const OutPath& destPath)
+
+bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
 	X_UNUSED(host);
 	X_ASSERT_NOT_NULL(gEnv);
@@ -35,11 +35,6 @@ bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args,
 	core::json::Document d;
 	d.Parse(args.c_str());
 
-
-	if (fileData.isEmpty()) {
-		X_ERROR("ModelLib", "File data is empty");
-		return false;
-	}
 
 	if (d.HasMember("zero_origin")) {
 		if (d["zero_origin"].GetBool()) {
@@ -84,7 +79,22 @@ bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args,
 		model.SetScale(d["vert_merge_thresh"].GetFloat());
 	}
 
+
+	// load file data
+	core::Array<uint8_t> fileData(host.getScratchArena());
+	if (!host.GetAssetData(assetId, fileData)) {
+		X_ERROR("Model", "Failed to get asset data");
+		return false;
+	}
+
+	if (fileData.isEmpty()) {
+		X_ERROR("Model", "File data is empty");
+		return false;
+	}
+
+
 	if (!model.LoadRawModel(fileData)) {
+		X_ERROR("Model", "Failed to load rawModel");
 		return false;
 	}
 

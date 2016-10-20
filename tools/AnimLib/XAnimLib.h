@@ -13,8 +13,7 @@ public:
 
 	virtual const char* getOutExtension(void) const X_OVERRIDE;
 
-	virtual bool Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
-		const OutPath& destPath) X_OVERRIDE;
+	virtual bool Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath) X_OVERRIDE;
 
 
 private:

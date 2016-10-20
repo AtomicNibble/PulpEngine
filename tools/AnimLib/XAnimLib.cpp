@@ -23,13 +23,8 @@ const char* XAnimLib::getOutExtension(void) const
 	return anim::ANIM_FILE_EXTENSION;
 }
 
-bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args, 
-	const core::Array<uint8_t>& fileData, const OutPath& destPath)
+bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
-	if (fileData.isEmpty()) {
-		X_ERROR("AnimLib", "File data is empty");
-		return false;
-	}
 	if (destPath.isEmpty()) {
 		X_ERROR("AnimLib", "Missing 'dest' option");
 		return false;
@@ -86,8 +81,20 @@ bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args,
 		return false;
 	}
 
-	InterAnim inter(g_AnimLibArena);
 
+	// load file data
+	core::Array<uint8_t> fileData(host.getScratchArena());
+	if (!host.GetAssetData(assetId, fileData)) {
+		X_ERROR("AnimLib", "Failed to get asset data");
+		return false;
+	}
+
+	if (fileData.isEmpty()) {
+		X_ERROR("AnimLib", "File data is empty");
+		return false;
+	}
+
+	InterAnim inter(g_AnimLibArena);
 	if (!inter.LoadFile(fileData)) {
 		X_ERROR("AnimLib", "Failed to load inter anim");
 		return false;
