@@ -29,10 +29,12 @@ struct IConverterModule : public IPotatoClass
 
 struct IConverterHost
 {
+	typedef core::Array<uint8_t> DataArr;
+
 	virtual ~IConverterHost() {}
 
-	virtual bool GetAssetData(int32_t assetId, core::Array<uint8_t>& dataOut) X_ABSTRACT;
-	virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_ABSTRACT;
+	virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_ABSTRACT;
+	virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, DataArr& dataOut) X_ABSTRACT;
 	virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_ABSTRACT;
 
 	// get global conversion settings data.
