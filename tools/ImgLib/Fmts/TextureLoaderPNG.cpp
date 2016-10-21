@@ -25,7 +25,8 @@ namespace PNG
 		static const int32_t PNG_TAG_IHDR = X_TAG('I', 'H', 'D', 'R');
 		static const int32_t PNG_TAG_IDAT = X_TAG('I', 'D', 'A', 'T');
 		static const int32_t PNG_TAG_IEND = X_TAG('I', 'E', 'N', 'D');
-
+		static const int32_t PNG_TAG_TEXT = X_TAG('t', 'E', 'X', 't');
+		
 
 		struct PngColorType
 		{
@@ -90,6 +91,12 @@ namespace PNG
 			static const int32_t TAG_ID = PNG_TAG_IEND;
 			static const int32_t TAG_SIZE = 0;
 		};
+
+		struct tEXt
+		{
+			static const int32_t TAG_ID = PNG_TAG_TEXT;
+		};
+
 		X_PACK_POP
 
 		X_ENSURE_SIZE(IHDR, IHDR::TAG_SIZE + 4);
@@ -448,6 +455,22 @@ namespace PNG
 		file->writeObj(ihdr);
 		file->writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(ihdr)));
 		
+		// complete my ego.
+		{
+			core::StackString<96> str;
+			str.appendFmt("%s - %s - %s - %s", X_ENGINE_NAME, X_ENGINE_VERSION_STR, X_CPUSTRING, X_PLATFORM_STR);
+
+			uint32_t crc = pCrc->Begin();
+			pCrc->Update(&tEXt::TAG_ID, sizeof(tEXt::TAG_ID), crc);
+			pCrc->Update(str.c_str(), str.length(), crc);
+			crc = pCrc->Finish(crc);
+
+			file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(str.length())));
+			file->writeObj(tEXt::TAG_ID);
+			file->write(str.c_str(), str.length());
+			file->writeObj(core::Endian::swap(crc));
+		}
+
 		// now we write the data.
 		const int32_t srcSize = safe_static_cast<int32_t>(imgFile.getFaceSize());
 		const uint8_t* pSrc = imgFile.getFace(0);
