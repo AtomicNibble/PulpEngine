@@ -56,6 +56,18 @@ namespace PNG
 			};
 		};
 
+		struct FilterMethodType
+		{
+			enum Enum : int8_t
+			{
+				None,
+				Sub,
+				Up,
+				Average,
+				Paeth
+			};
+		};
+
 		struct InterlaceMethod
 		{
 			enum Enum : int8_t
@@ -493,11 +505,32 @@ namespace PNG
 
 		zlib.setBufferSize(BLOCK_SIZE);
 
-		const auto res = zlib.Deflate(pSrc, srcSize, true);
-		if (res != ZlibDefalte::DeflateResult::OK) {
-			X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::DeflateResult::ToString(res));
-			return false;
+		// right png has fucking lost it's lemons.
+		// and requires a filter byte at start of each row.
+		const int32_t rowBytes = Util::dataSize(imgFile.getWidth(), 1, imgFile.getFormat());
+		const int32_t rows = imgFile.getHeight();
+		for (int32_t row = 0; row < rows; row++)
+		{
+			// stupid filter byte.
+			const FilterMethodType::Enum filterType = FilterMethodType::None;
+
+			auto res = zlib.Deflate(&filterType, sizeof(filterType), false);
+			if (res != ZlibDefalte::DeflateResult::OK) {
+				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::DeflateResult::ToString(res));
+				return false;
+			}
+
+			// deflate row.
+			const bool lastRow = (row + 1) == rows;
+			res = zlib.Deflate(pSrc, rowBytes, lastRow);
+			if (res != ZlibDefalte::DeflateResult::OK) {
+				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::DeflateResult::ToString(res));
+				return false;
+			}
+
+			pSrc += rowBytes;
 		}
+
 
 		file->writeObj(core::Endian::swap<int32_t>(IEND::TAG_SIZE));
 		file->writeObj(IEND::TAG_ID);
