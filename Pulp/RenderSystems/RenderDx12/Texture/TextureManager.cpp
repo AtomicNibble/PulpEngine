@@ -4,6 +4,7 @@
 
 #include <ICi.h>
 #include <IConsole.h>
+#include <IFileSys.h>
 
 #include "Allocators\DescriptorAllocator.h"
 #include "CommandContex.h"

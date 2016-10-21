@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "AnimCompiler.h"
 
+#include <IFileSys.h>
+
 X_NAMESPACE_BEGIN(anim)
 
 const float AnimCompiler::DEFAULT_POS_ERRR = 0.05f;

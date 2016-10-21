@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "anim_inter.h"
 
+#include <IFileSys.h>
 #include <IModel.h>
 #include <String\Lexer.h>
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-
+#include <IFileSys.h>
 
 #include <Containers\AlignedArray.h>
 

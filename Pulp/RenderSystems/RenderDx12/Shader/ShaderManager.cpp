@@ -10,6 +10,7 @@
 #include <String\StringHash.h>
 
 #include <IConsole.h>
+#include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(render)
 

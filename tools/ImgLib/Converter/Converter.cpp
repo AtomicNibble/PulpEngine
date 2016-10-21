@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Converter.h"
 
+#include <IFileSys.h>
+
 #include <Threading\JobSystem2.h>
 
 #include <String\StringHash.h>

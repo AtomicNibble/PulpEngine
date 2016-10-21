@@ -16,6 +16,9 @@ X_NAMESPACE_DECLARE(core,
 		struct Job;
 		class JobSystem;
 	}
+
+class IoRequestData;
+struct XFileAsync;
 )
 
 X_NAMESPACE_BEGIN(model)

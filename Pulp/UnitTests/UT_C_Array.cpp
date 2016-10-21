@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 
+#include <IFileSys.h>
 
 #include <Containers\Array.h>
-
 
 #include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>

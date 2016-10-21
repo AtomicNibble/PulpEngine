@@ -1,6 +1,7 @@
 #include "EngineCommon.h"
 #include "XWinding.h"
 
+#include <IFileSys.h>
 #include <Util\FloatIEEEUtil.h>
 
 #define	EDGE_LENGTH		0.2f

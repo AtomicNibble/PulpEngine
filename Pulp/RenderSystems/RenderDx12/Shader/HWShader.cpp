@@ -6,6 +6,7 @@
 #include "ShaderSourceTypes.h"
 
 #include <IConsole.h>
+#include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 
 #include <D3Dcompiler.h>

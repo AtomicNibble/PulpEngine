@@ -7,10 +7,7 @@
 #include "Converter\Converter.h"
 
 #include <ICi.h>
-
-
-
-
+#include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(texture)
 

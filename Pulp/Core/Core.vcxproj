@@ -427,6 +427,7 @@
     <ClCompile Include="win32\PathUtil.cpp" />
     <ClCompile Include="win32\SystemTimer.cpp" />
     <ClCompile Include="xFileSys.cpp" />
+    <ClCompile Include="XFindData.cpp" />
     <ClCompile Include="XProfile.cpp" />
     <ClCompile Include="XProfileRender.cpp" />
   </ItemGroup>

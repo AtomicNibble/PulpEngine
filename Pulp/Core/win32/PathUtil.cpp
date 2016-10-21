@@ -4,6 +4,8 @@
 #include <String\StringTokenizer.h>
 #include <Shellapi.h>
 
+#include <io.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace PathUtil

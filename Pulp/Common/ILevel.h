@@ -10,6 +10,7 @@
 #include <Util\Pointer64.h>
 
 #include <IRenderMesh.h>
+#include <IFileSys.h>
 
 
 // forward Decs.

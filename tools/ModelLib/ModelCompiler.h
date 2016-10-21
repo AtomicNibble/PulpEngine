@@ -1,5 +1,7 @@
 #pragma once
 
+#include <IFileSys.h>
+
 #include <String\Path.h>
 #include <Containers\Array.h>
 #include <Time\TimeVal.h>

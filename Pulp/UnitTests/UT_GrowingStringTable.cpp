@@ -1,11 +1,10 @@
 #include "stdafx.h"
 
+#include <IFileSys.h>
 
 
 #include <String\GrowingStringTable.h>
 #include <Memory/AllocationPolicies/StackAllocator.h>
-
-
 
 
 X_USING_NAMESPACE;

@@ -4,7 +4,9 @@
 #ifndef _X_FILE_SYSTEM_I_H_
 #define _X_FILE_SYSTEM_I_H_
 
-#include <io.h>
+// why the fuck is this here?
+// #include <io.h>
+
 #include <Util\Delegate.h>
 
 // i need the definition :|

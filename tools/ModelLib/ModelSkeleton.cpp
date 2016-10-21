@@ -2,6 +2,7 @@
 #include "ModelSkeleton.h"
 
 #include <IModel.h>
+#include <IFileSys.h>
 
 #include <Memory\MemCursor.h>
 

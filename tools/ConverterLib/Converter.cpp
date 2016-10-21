@@ -4,6 +4,7 @@
 #include <IModel.h>
 #include <IAnimation.h>
 #include <IConverterModule.h>
+#include <IFileSys.h>
 
 #include <Extension\IPotatoFactory.h>
 #include <Extension\PotatoCreateClass.h>

@@ -193,6 +193,9 @@
     <ClCompile Include="NullImplementation\ConsoleNULL.cpp">
       <Filter>NullImplementation</Filter>
     </ClCompile>
+    <ClCompile Include="XFindData.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\SystemTimer.inl">

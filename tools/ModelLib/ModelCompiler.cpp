@@ -7,6 +7,8 @@
 
 #include <IModel.h>
 #include <IMaterial.h>
+#include <IFileSys.h>
+
 
 #include "FaceOptermize.h"
 
