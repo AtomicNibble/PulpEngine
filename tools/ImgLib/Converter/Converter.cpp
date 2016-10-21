@@ -213,11 +213,20 @@ namespace Converter
 
 	bool ImgConveter::SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
 	{
-		core::XFileScoped file;
 		core::fileModeFlags mode;
 		mode.Set(core::fileMode::WRITE);
 		mode.Set(core::fileMode::RECREATE);
 
+		core::XFileScoped file;
+		if (!file.openFile(outPath.c_str(), mode)) {
+			return false;
+		}
+
+		return SaveImg(file.GetFile(), flags, dstFileFmt);
+	}
+
+	bool ImgConveter::SaveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
+	{
 		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
 		core::LinearAllocator allocator(buf, buf + sizeof(buf));
 		ITextureFmt* pFmt = Allocfmt(&allocator, dstFileFmt);
@@ -228,18 +237,10 @@ namespace Converter
 			return false;
 		}
 
-		std::remove_const_t<std::remove_reference_t<decltype(outPath)>> path(outPath);
-		path.setExtension(pFmt->getExtension());
-
-		if (!file.openFile(path.c_str(), mode)) {
-			core::Mem::Destruct<ITextureFmt>(pFmt);
-			return false;
-		}
-
-		// add in flags.
 		auto& img = useSrc_ ? srcImg_ : dstImg_;
 
 		if (!img.isValid()) {
+			core::Mem::Destruct<ITextureFmt>(pFmt);
 			X_ERROR("Img", "Failed to save img it's invalid");
 			return false;
 		}
@@ -278,11 +279,12 @@ namespace Converter
 		}
 
 
-		bool res = pFmt->saveTexture(file.GetFile(), img);
+		bool res = pFmt->saveTexture(pFile, img);
 
 		core::Mem::Destruct<ITextureFmt>(pFmt);
 		return res;
 	}
+
 
 	void ImgConveter::scale(ScaleFactor::Enum scale)
 	{
