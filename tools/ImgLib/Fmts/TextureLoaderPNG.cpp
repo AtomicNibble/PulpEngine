@@ -432,7 +432,7 @@ namespace PNG
 		// some validation.
 		if (imgFile.getFormat() != Texturefmt::R8G8B8A8 && imgFile.getFormat() != Texturefmt::R8G8B8) {
 			X_ERROR("TexturePNG", "Saving fmt \"%s\" is not supported", Texturefmt::ToString(imgFile.getFormat()));
-//			return false;
+			return false;
 		}
 		if (imgFile.getNumMips() > 1) {
 			X_ERROR("TexturePNG", "Can't save image with mips");
