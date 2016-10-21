@@ -16,6 +16,7 @@ public:
 	Crc32();
 
 	static uint32_t Combine(const uint32_t lhs, const uint32_t rhs, const uint32_t rhs_length);
+	static uint32_t zeroLengthCrc32(void);
 
 	uint32_t GetCRC32(const char* text) const;
 	uint32_t GetCRC32(const char* data, size_t size) const;
