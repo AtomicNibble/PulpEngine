@@ -1,6 +1,13 @@
 #include "stdafx.h"
 #include "TextureUtil.h"
 
+#include "Fmts\TextureLoaderCI.h"
+#include "Fmts\TextureLoaderDDS.h"
+#include "Fmts\TextureLoaderJPG.h"
+#include "Fmts\TextureLoaderPNG.h"
+#include "Fmts\TextureLoaderPSD.h"
+#include "Fmts\TextureLoaderTGA.h"
+
 #include <Hashing\Fnva1Hash.h>
 
 X_NAMESPACE_BEGIN(texture)
@@ -585,6 +592,31 @@ namespace Util
 		}
 	}
 
+	ImgFileFormat::Enum resolveSrcfmt(const core::Array<uint8_t>& fileData)
+	{
+		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
+
+		if (CI::XTexLoaderCI::isValidData(fileData)) {
+			return ImgFileFormat::CI;
+		}
+		if (DDS::XTexLoaderDDS::isValidData(fileData)) {
+			return ImgFileFormat::DDS;
+		}
+		if (PNG::XTexLoaderPNG::isValidData(fileData)) {
+			return ImgFileFormat::PNG;
+		}
+		if (TGA::XTexLoaderTGA::isValidData(fileData)) {
+			return ImgFileFormat::TGA;
+		}
+		if (JPG::XTexLoaderJPG::isValidData(fileData)) {
+			return ImgFileFormat::JPG;
+		}
+		if (PSD::XTexLoaderPSD::isValidData(fileData)) {
+			return ImgFileFormat::PSD;
+		}
+
+		return ImgFileFormat::UNKNOWN;
+	}
 
 } // namespace Util
 

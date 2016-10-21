@@ -23,6 +23,8 @@ namespace Util
 		size_t* pOutNumBytes, size_t* pOutRowBytes, size_t* pOutNumRows);
 
 	IMGLIB_EXPORT Texturefmt::Enum TexFmtFromStr(const char* pStr);
+	IMGLIB_EXPORT ImgFileFormat::Enum resolveSrcfmt(const core::Array<uint8_t>& fileData);
+
 
 
 } // namespace Util
