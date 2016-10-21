@@ -291,6 +291,96 @@ namespace Compression
 	}
 
 
+	// --------------------------------------
+
+
+	ZlibDefalte::ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback defalteCallBack, CompressLevel::Enum lvl) :
+		callback_(defalteCallBack),
+		arena_(arena),
+		buffer_(arena)
+	{
+		stream_ = X_NEW(z_stream, arena_, "ZlibDelateStream");
+		core::zero_this(stream_);
+
+		X_ASSERT_NOT_NULL(stream_);
+
+		stream_->zalloc = StaticAlloc;
+		stream_->zfree = StaticFree;
+		stream_->opaque = arena_;
+
+		::deflateInit(stream_, CompLvlToZliblvl(lvl));
+	}
+
+	ZlibDefalte::~ZlibDefalte()
+	{
+		::deflateEnd(stream_);
+		X_DELETE_AND_NULL(stream_, arena_);
+	}
+
+	void ZlibDefalte::setBufferSize(size_t size)
+	{
+		if (size < 1) {
+			X_ERROR("Zlib", "Zero buffer size: %" PRIuS " reverting to default", size);
+			size = DEFAULT_BUF_SIZE;
+		}
+
+		buffer_.resize(size);
+	}
+
+	ZlibDefalte::DeflateResult::Enum ZlibDefalte::Deflate(const void* pSrcData, size_t len, bool finish)
+	{
+		if (buffer_.isEmpty()) {
+			buffer_.resize(DEFAULT_BUF_SIZE);
+		}
+
+		stream_->next_in = reinterpret_cast<uint8_t*>(const_cast<void*>(pSrcData));
+		stream_->avail_in = safe_static_cast<uint32_t>(len);
+		stream_->next_out = buffer_.data();
+		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
+
+		for(;;)
+		{
+			const int32_t res = ::deflate(stream_, finish ? Z_FINISH : Z_NO_FLUSH);
+
+			// do we have a finished block?
+			if (stream_->avail_out == 0)
+			{
+				callback_(buffer_.data(), buffer_.size());
+
+				stream_->next_out = buffer_.data();
+				stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
+			}
+			
+			if (res == Z_OK)
+			{
+				if (stream_->avail_in == 0)
+				{
+					return DeflateResult::OK;
+				}
+
+				// continue.
+			}
+			else if (res == Z_STREAM_END && finish)
+			{
+				const size_t bytesInBuf = (buffer_.size() - stream_->avail_out);
+
+				callback_(buffer_.data(), bytesInBuf);
+
+				stream_->next_out = nullptr;
+				stream_->avail_out = 0;
+				return DeflateResult::OK;
+			}
+			else
+			{
+				stream_->next_out = nullptr;
+				stream_->avail_out = 0;
+				X_ERROR("Zlib", "Deflate error % -> %s" PRIi32, res, ZlibErrToStr(res));
+				return DeflateResult::ERROR;
+			}
+		}
+	}
+
+
 } // namespace Compression
 
 X_NAMESPACE_END

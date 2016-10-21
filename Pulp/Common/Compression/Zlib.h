@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 
 #ifndef X_COMPRESSION_ZLIB_H_
 #define X_COMPRESSION_ZLIB_H_
@@ -87,8 +88,6 @@ namespace Compression
 	class ZlibInflate
 	{
 	public:
-		typedef CompressLevel CompressLevel;
-
 		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
 
 	public:
@@ -108,6 +107,38 @@ namespace Compression
 		size_t destLen_;
 	};
 
+	// can compress into blocks.
+	class ZlibDefalte
+	{
+	public:
+		X_DECLARE_ENUM(DeflateResult)(ERROR, OK);
+
+		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
+
+		typedef std::function<void(const uint8_t* pData, size_t len)> DeflateCallback;
+
+	public:
+		ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback defalteCallBack, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+		~ZlibDefalte();
+
+		void setBufferSize(size_t size);
+
+		// this will accept N input blocks and call the deflate callback everytime the buffer is full or we are flusing (finish == true)
+		// you can just pass a huge src block with finish == true and the callback will keep been called with blocks untill it's finished.
+		DeflateResult::Enum Deflate(const void* pSrcData, size_t len, bool finish);
+
+	private:
+		X_NO_COPY(ZlibDefalte);
+		X_NO_ASSIGN(ZlibDefalte);
+
+	private:
+		DeflateCallback callback_;
+
+	private:
+		core::MemoryArenaBase* arena_;
+		core::Array<uint8_t> buffer_;
+		z_stream_s* stream_;
+	};
 
 } // namespace Compression
 
