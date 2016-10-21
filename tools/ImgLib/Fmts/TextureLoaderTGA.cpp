@@ -100,6 +100,11 @@ namespace TGA
 		return TGA_FILE_EXTENSION;
 	}
 
+	ImgFileFormat::Enum XTexLoaderTGA::getSrcFmt(void) const
+	{
+		return ImgFileFormat::TGA;
+	}
+
 	bool XTexLoaderTGA::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());

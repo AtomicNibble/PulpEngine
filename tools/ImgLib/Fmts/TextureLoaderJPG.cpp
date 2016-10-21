@@ -165,6 +165,11 @@ namespace JPG
 		return JPG_FILE_EXTENSION;
 	}
 
+	ImgFileFormat::Enum XTexLoaderJPG::getSrcFmt(void) const
+	{
+		return ImgFileFormat::JPG;
+	}
+
 	bool XTexLoaderJPG::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());

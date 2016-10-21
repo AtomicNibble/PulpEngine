@@ -195,6 +195,11 @@ namespace PNG
 		return PNG_FILE_EXTENSION;
 	}
 
+	ImgFileFormat::Enum XTexLoaderPNG::getSrcFmt(void) const
+	{
+		return ImgFileFormat::PNG;
+	}
+
 	bool XTexLoaderPNG::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(PNG_FILE_EXTENSION, path.extension());

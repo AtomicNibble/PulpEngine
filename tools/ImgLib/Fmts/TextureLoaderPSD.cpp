@@ -296,6 +296,11 @@ namespace PSD
 		return PSD_FILE_EXTENSION;
 	}
 
+	ImgFileFormat::Enum XTexLoaderPSD::getSrcFmt(void) const
+	{
+		return ImgFileFormat::PSD;
+	}
+
 	bool XTexLoaderPSD::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(PSD_FILE_EXTENSION, path.extension());

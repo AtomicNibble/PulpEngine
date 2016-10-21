@@ -47,6 +47,11 @@ namespace CI
 		return CI_FILE_EXTENSION;
 	}
 
+	ImgFileFormat::Enum XTexLoaderCI::getSrcFmt(void) const
+	{
+		return ImgFileFormat::CI;
+	}
+
 	bool XTexLoaderCI::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(CI_FILE_EXTENSION, path.extension());

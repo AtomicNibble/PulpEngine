@@ -591,6 +591,11 @@ namespace DDS
 		return DDS_FILE_EXTENSION;
 	}
 
+	ImgFileFormat::Enum XTexLoaderDDS::getSrcFmt(void) const
+	{
+		return ImgFileFormat::CI;
+	}
+
 	bool XTexLoaderDDS::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(DDS_FILE_EXTENSION, path.extension());
