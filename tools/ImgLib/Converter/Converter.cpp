@@ -174,6 +174,12 @@ namespace Converter
 
 	bool ImgConveter::LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt)
 	{
+		// check in here also even thos it's checked again, logic might change later to not use function below.
+		if (inputFileFmt == ImgFileFormat::UNKNOWN) {
+			X_ERROR("Img", "Failed to load img srcFmt unkNown");
+			return false;
+		}
+
 		core::XFileBuf file(fileData.begin(), fileData.end());
 
 		return LoadImg(&file, inputFileFmt);
@@ -181,6 +187,11 @@ namespace Converter
 
 	bool ImgConveter::LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt)
 	{
+		if (inputFileFmt == ImgFileFormat::UNKNOWN) {
+			X_ERROR("Img", "Failed to load img srcFmt unkNown");
+			return false;
+		}
+
 		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
 		core::LinearAllocator allocator(buf, buf + sizeof(buf));
 
