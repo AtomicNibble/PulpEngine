@@ -597,22 +597,22 @@ namespace Util
 		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
 
 		if (CI::XTexLoaderCI::isValidData(fileData)) {
-			return ImgFileFormat::CI;
+			return CI::XTexLoaderCI::SRC_FMT;
 		}
 		if (DDS::XTexLoaderDDS::isValidData(fileData)) {
-			return ImgFileFormat::DDS;
+			return DDS::XTexLoaderDDS::SRC_FMT;
 		}
 		if (PNG::XTexLoaderPNG::isValidData(fileData)) {
-			return ImgFileFormat::PNG;
+			return PNG::XTexLoaderPNG::SRC_FMT;
 		}
 		if (TGA::XTexLoaderTGA::isValidData(fileData)) {
-			return ImgFileFormat::TGA;
+			return TGA::XTexLoaderTGA::SRC_FMT;
 		}
 		if (JPG::XTexLoaderJPG::isValidData(fileData)) {
-			return ImgFileFormat::JPG;
+			return JPG::XTexLoaderJPG::SRC_FMT;
 		}
 		if (PSD::XTexLoaderPSD::isValidData(fileData)) {
-			return ImgFileFormat::PSD;
+			return PSD::XTexLoaderPSD::SRC_FMT;
 		}
 
 		return ImgFileFormat::UNKNOWN;
