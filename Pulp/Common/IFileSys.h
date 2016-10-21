@@ -8,6 +8,7 @@
 // #include <io.h>
 
 #include <Util\Delegate.h>
+#include <Containers\Array.h>
 
 // i need the definition :|
 #include X_INCLUDE(../Core/X_PLATFORM/OsFileAsyncOperation.h)
@@ -205,6 +206,9 @@ struct XFile
 	virtual void setSize(int64_t numBytes) X_ABSTRACT;
 };
 
+// I don't like this.
+// as it's taking ownership of buffer.
+// and is simular functionaloty to XFileFixedBuf otherwise.
 struct XFileMem : public XFile
 {
 	XFileMem(char* begin, char* end, core::MemoryArenaBase* arena) : 
@@ -292,6 +296,65 @@ private:
 	char* begin_;
 	char* current_;
 	char* end_;
+};
+
+struct XFileStream : public XFile
+{
+	XFileStream(core::MemoryArenaBase* arena) :
+		buf_(arena)
+	{
+		X_ASSERT_NOT_NULL(arena);
+
+		buf_.setGranularity(1024 * 16);
+	}
+	~XFileStream() X_OVERRIDE {
+	}
+
+	virtual size_t read(void* pBuf, size_t len) X_FINAL
+	{
+		X_UNUSED(pBuf);
+		X_UNUSED(len);
+		X_ASSERT_NOT_IMPLEMENTED();
+		return 0;
+	}
+
+	virtual size_t write(const void* pBuf, size_t len) X_FINAL
+	{
+		buf_.resize(buf_.size() + len);
+
+		std::memcpy(buf_.data(), pBuf, len);
+		return len;
+	}
+
+	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL 
+	{
+		X_UNUSED(position);
+		X_UNUSED(origin);
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	virtual uint64_t remainingBytes(void) const X_FINAL {
+		return 0;
+	}
+	virtual uint64_t tell(void) const X_FINAL {
+		return buf_.size();
+	}
+	virtual void setSize(int64_t numBytes) X_FINAL {
+		X_UNUSED(numBytes);
+		X_ASSERT_UNREACHABLE();
+	}
+
+	inline uint64_t getSize(void) const {
+		return buf_.size();
+	}
+
+	inline bool isEof(void) const X_FINAL {
+		return remainingBytes() == 0;
+	}
+
+
+private:
+	core::Array<char> buf_;
 };
 
 
