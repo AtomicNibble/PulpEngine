@@ -1882,6 +1882,17 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 	return false;
 }
 
+bool AssetDB::AssetHasThumb(int32_t assetId)
+{
+	ThumbInfo info;
+
+	if (!GetThumbInfoForId(assetId, info)) {
+		return false;
+	}
+
+	return info.fileSize > 0;
+}
+
 bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut)
 {
 	using namespace core::Compression;
