@@ -47,7 +47,7 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 namespace
 {
-	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL, CLEAN);
+	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL, CLEAN, GEN_THUMBS);
 
 
 	bool GetMode(ConvertMode::Enum& mode)
@@ -66,6 +66,10 @@ namespace
 			else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean"))
 			{
 				mode = ConvertMode::CLEAN;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"gen_thumbs"))
+			{
+				mode = ConvertMode::GEN_THUMBS;
 			}
 			else
 			{
@@ -208,6 +212,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				if (mode == ConvertMode::CLEAN)
 				{
 					con.CleanAll();
+				}
+				if (mode == ConvertMode::GEN_THUMBS)
+				{
+					con.GenerateThumbs();
 				}
 				else if (mode == ConvertMode::ALL)
 				{
