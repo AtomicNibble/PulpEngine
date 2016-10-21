@@ -43,11 +43,11 @@ inline uint32_t Crc32::GetCRC32Lowercase(const char *data, size_t size) const
 	return Finish(crc);
 }
 
-inline uint32_t Crc32::Begin(void) const {
+inline uint32_t Crc32::Begin(void) {
 	return CRC32_INIT_VALUE;
 }
 
-inline uint32_t Crc32::Finish(uint32_t crcvalue) const {
+inline uint32_t Crc32::Finish(uint32_t crcvalue) {
 	return crcvalue ^ CRC32_XOR_VALUE;
 }
 

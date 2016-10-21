@@ -29,8 +29,8 @@ public:
 	uint32_t GetCRC32Lowercase(const char* text, size_t len) const;
 
 	// api for making a crc out of multiple buffers.
-	uint32_t Begin(void) const;
-	uint32_t Finish(uint32_t crc) const;
+	static uint32_t Begin(void);
+	static uint32_t Finish(uint32_t crc);
 	uint32_t Update(const void* data, size_t size, uint32_t& crcvalue) const;
 	uint32_t UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalue) const;
 
