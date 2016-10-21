@@ -138,15 +138,17 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	return res;
 }
 
-
 bool Converter::Convert(int32_t modId)
 {
 	X_LOG0("Converter", "Converting all assets...");
 
 	int32_t numAssets = 0;
-	if (db_.GetNumAssets(modId, numAssets)) {
-		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	if (!db_.GetNumAssets(modId, numAssets)) {
+		X_ERROR("Converter", "Failed to get asset count");
+		return false;
 	}
+	
+	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
@@ -175,9 +177,12 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 	}
 
 	int32_t numAssets = 0;
-	if (db_.GetAssetTypeCount(modId, assType, numAssets)) {
-		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	if (!db_.GetAssetTypeCount(modId, assType, numAssets)) {
+		X_ERROR("Converter", "Failed to get asset count");
+		return false;
 	}
+	
+	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
 
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
@@ -206,9 +211,12 @@ bool Converter::Convert(AssetType::Enum assType)
 	}
 
 	int32_t numAssets = 0;
-	if (db_.GetNumAssets(assType, numAssets)) {
-		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	if (!db_.GetNumAssets(assType, numAssets)) {
+		X_ERROR("Converter", "Failed to get asset count");
+		return false;
 	}
+	
+	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
@@ -233,8 +241,11 @@ bool Converter::ConvertAll(void)
 
 	int32_t numAssets = 0;
 	if (db_.GetNumAssets(numAssets)) {
-		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+		X_ERROR("Converter", "Failed to get asset count");
+		return false;
 	}
+
+	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
@@ -366,6 +377,7 @@ bool Converter::GenerateThumbs(void)
 
 		int32_t numAssets = 0;
 		if (!db_.GetNumAssets(assType, numAssets)) {
+			X_ERROR("Converter", "Failed to get asset count");
 			return false;
 		}
 
