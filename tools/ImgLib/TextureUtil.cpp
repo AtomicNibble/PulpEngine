@@ -283,6 +283,12 @@ namespace Util
 		return size;
 	}
 
+	uint32_t dataSize(uint32_t width, uint32_t height,
+		uint32_t mips, uint32_t faces, Texturefmt::Enum fmt)
+	{
+		return dataSize(width, height, mips, fmt) * faces;
+	}
+
 	size_t rowBytes(uint32_t width, uint32_t height, Texturefmt::Enum fmt)
 	{
 		size_t rowBytes = 0;
