@@ -24,6 +24,8 @@ namespace {
 	PSD::XTexLoaderPSD psd;
 	TGA::XTexLoaderTGA tga;
 
+	static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
+
 	static ITextureFmt* image_file_loaders[] =
 	{
 		&ci,

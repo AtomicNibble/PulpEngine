@@ -137,6 +137,10 @@ namespace Converter
 	} // namespace
 
 
+
+	static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
+
+
 	const size_t ImgConveter::MAX_FMT_CLASS_SIZE = core::Max<size_t>(
 		core::Max(
 			core::Max(

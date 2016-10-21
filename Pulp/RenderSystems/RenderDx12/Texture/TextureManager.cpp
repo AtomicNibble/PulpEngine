@@ -46,6 +46,8 @@ X_NAMESPACE_BEGIN(texture)
 
 		pCILoader_ = X_NEW(CI::XTexLoaderCI, arena_, "CILoader");
 		
+		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
+
 		textureLoaders_.append(pCILoader_);
 		if (vars_.allowFmtDDS()) {
 			textureLoaders_.append(X_NEW(DDS::XTexLoaderDDS, arena_, "DDSLoader"));
