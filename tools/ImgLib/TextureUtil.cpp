@@ -217,7 +217,6 @@ namespace Util
 
 	uint32_t dataSize(uint32_t width, uint32_t height, Texturefmt::Enum fmt)
 	{
-
 		const uint32_t bits_per_pixel = bitsPerPixel(fmt);
 		const bool isDXT = isDxt(fmt);
 
@@ -248,13 +247,13 @@ namespace Util
 	uint32_t dataSize(uint32_t width, uint32_t height,
 		uint32_t mips, Texturefmt::Enum fmt)
 	{
-		unsigned size = 0;
-		unsigned i;
+		uint32_t size = 0;
+		uint32_t i;
 
-		const unsigned bits_per_pixel = bitsPerPixel(fmt);
+		const uint32_t bits_per_pixel = bitsPerPixel(fmt);
 		const bool isDXT = isDxt(fmt);
 
-		unsigned bytes_per_block = 0;
+		uint32_t bytes_per_block = 0;
 
 		if (isDXT) {
 			bytes_per_block = dxtBytesPerBlock(fmt);
