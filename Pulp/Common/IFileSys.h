@@ -344,12 +344,21 @@ struct XFileStream : public XFile
 		X_ASSERT_UNREACHABLE();
 	}
 
+	// none overriding.
+	inline void setGranularity(size_t gran) {
+		buf_.setGranularity(gran);
+	}
+
 	inline uint64_t getSize(void) const {
 		return buf_.size();
 	}
 
 	inline bool isEof(void) const X_FINAL {
 		return remainingBytes() == 0;
+	}
+
+	inline const core::Array<char>& buffer(void) const {
+		return buf_;
 	}
 
 
