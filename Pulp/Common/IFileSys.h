@@ -320,9 +320,11 @@ struct XFileStream : public XFile
 
 	virtual size_t write(const void* pBuf, size_t len) X_FINAL
 	{
-		buf_.resize(buf_.size() + len);
+		const size_t offset = buf_.size();
 
-		std::memcpy(buf_.data(), pBuf, len);
+		buf_.resize(offset + len);
+
+		std::memcpy(&buf_[offset], pBuf, len);
 		return len;
 	}
 
