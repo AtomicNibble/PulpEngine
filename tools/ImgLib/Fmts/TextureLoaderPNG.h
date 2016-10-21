@@ -13,6 +13,8 @@ namespace PNG
 
 	class IMGLIB_EXPORT XTexLoaderPNG : public ITextureFmt
 	{
+		static const int32_t BLOCK_SIZE = 1024 * 32; // save as 32kb chunks.
+
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::PNG;
 
@@ -29,6 +31,8 @@ namespace PNG
 		virtual bool canLoadFile(const DataVec& fileData) const X_OVERRIDE;
 		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 
+		virtual bool canWrite(void) const X_OVERRIDE { return true; }
+		virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 		// ~ITextureFmt
 
 	private:

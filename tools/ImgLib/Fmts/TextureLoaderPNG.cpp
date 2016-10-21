@@ -7,8 +7,9 @@
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 
 #include <Containers\Array.h>
-
 #include <Compression\Zlib.h>
+
+#include <Hashing\crc32.h>
 
 #include "TextureFile.h"
 
@@ -25,10 +26,10 @@ namespace PNG
 		static const int32_t PNG_TAG_IDAT = X_TAG('I', 'D', 'A', 'T');
 		static const int32_t PNG_TAG_IEND = X_TAG('I', 'E', 'N', 'D');
 
-		
+
 		struct PngColorType
 		{
-			enum Enum
+			enum Enum : int8_t
 			{
 				GREYSCALE = 0,
 				TRUECOLOR = 2,
@@ -37,6 +38,56 @@ namespace PNG
 				TRUECOLOR_ALPHA = 6
 			};
 		};
+
+		struct CompressionMethod
+		{
+			enum Enum : int8_t
+			{
+				Deflate
+			};
+		};
+
+		struct FilterMethod
+		{
+			enum Enum : int8_t
+			{
+				Adaptivee
+			};
+		};
+
+		struct InterlaceMethod
+		{
+			enum Enum : int8_t
+			{
+				None,
+				Adam7
+			};
+		};
+
+		X_PACK_PUSH(1)
+		struct IHDR
+		{
+			static const int32_t TAG_ID = PNG_TAG_IHDR;
+			static const int32_t TAG_SIZE = 13;
+
+			int32_t width;
+			int32_t height;
+			int8_t bitDepth;
+			PngColorType::Enum colType;
+			CompressionMethod::Enum compression;
+			FilterMethod::Enum filter;
+			InterlaceMethod::Enum interLace;
+		};
+
+		struct IEND
+		{
+			static const int32_t TAG_ID = PNG_TAG_IHDR;
+			static const int32_t TAG_SIZE = 0;
+		};
+		X_PACK_POP
+
+		X_ENSURE_SIZE(IHDR, IHDR::TAG_SIZE);
+
 
 		static uint32_t png_get_bpp(uint32_t depth, uint32_t color_type)
 		{
@@ -348,6 +399,75 @@ namespace PNG
 			return false;
 		}
 
+		return true;
+	}
+
+	bool XTexLoaderPNG::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
+	{
+		// some validation.
+		if (imgFile.getFormat() != Texturefmt::R8G8B8A8 && imgFile.getFormat() != Texturefmt::R8G8B8) {
+			X_ERROR("TexturePNG", "Saving fmt \"%s\" is not supported", Texturefmt::ToString(imgFile.getFormat()));
+			return false;
+		}
+		if (imgFile.getNumMips() > 1) {
+			X_ERROR("TexturePNG", "Can't save image with mips");
+			return false;
+		}
+		if (imgFile.getNumFaces() > 1) {
+			X_ERROR("TexturePNG", "Can't save image with multiple faces");
+			return false;
+		}
+
+		core::Crc32* pCrc = gEnv->pCore->GetCrc32();
+
+		PngColorType::Enum colType = PngColorType::TRUECOLOR;
+		if (imgFile.getFormat() == Texturefmt::R8G8B8A8) {
+			colType = PngColorType::TRUECOLOR_ALPHA;
+		}
+
+		file->writeObj(PNG_FILE_MAGIC);
+
+		// write a IHDR
+		IHDR ihdr;
+		ihdr.width = imgFile.getWidth();
+		ihdr.height = imgFile.getHeight();
+		ihdr.bitDepth = 8; // bit depth
+		ihdr.colType = colType; // color type
+		ihdr.compression = CompressionMethod::Deflate; // compression method
+		ihdr.filter = FilterMethod::Adaptivee; // filter method
+		ihdr.interLace = InterlaceMethod::None; // interlace method
+
+		file->writeObj(core::Endian::swap<int32_t>(IHDR::TAG_SIZE));
+		file->writeObj(IHDR::TAG_ID);
+		file->writeObj(ihdr);
+		file->writeObj(pCrc->GetCRC32OfObject(ihdr));
+		
+		// now we write the data.
+		const int32_t srcSize = safe_static_cast<int32_t>(imgFile.getFaceSize());
+		const uint8_t* pSrc = imgFile.getFace(0);
+
+		using namespace core::Compression;
+
+		ZlibDefalte zlib(swapArena, [&] (const uint8_t* pData, size_t len) {
+			// get crc of block.
+			const uint32_t blockcrc = pCrc->GetCRC32(pData, len);
+			// write it.
+			file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(len)));
+			file->write(pData, len);
+			file->writeObj(blockcrc);
+		});
+
+		zlib.setBufferSize(BLOCK_SIZE);
+
+		const auto res = zlib.Deflate(pSrc, srcSize, true);
+		if (res != ZlibDefalte::DeflateResult::OK) {
+			X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::DeflateResult::ToString(res));
+			return false;
+		}
+
+		file->writeObj(core::Endian::swap<int32_t>(IEND::TAG_SIZE));
+		file->writeObj(IEND::TAG_ID);
+		file->writeObj(pCrc->zeroLengthCrc32());
 		return true;
 	}
 
