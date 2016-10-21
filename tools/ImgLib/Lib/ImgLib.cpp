@@ -42,7 +42,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
 	CompileFlags flags;
 	ScaleFactor::Enum scale = ScaleFactor::ORIGINAL;
-	ImgFileFormat::Enum inputFileFmt = ImgFileFormat::UNKNOWN;
 	ImgFileFormat::Enum outputFileFmt = ImgFileFormat::CI;
 	MipFilter::Enum mipFilter = MipFilter::Box;
 	WrapMode::Enum wrapMode = WrapMode::Clamp;
@@ -52,43 +51,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	// * imgPath
 	// * imgFmt (for now)
 	// 
-
-	if (d.HasMember("srcFile")) {
-		const char* pImgPath = d["srcFile"].GetString();
-		const char* pFileExt = core::strUtil::FileExtension(pImgPath);
-
-		// currently i think best way to detect img format is based on ext.
-		// should handle all cases fine, other than some retard saving shit without extensions.
-		// are you that retard?
-		if (!pFileExt) {
-			X_ERROR("ImgLib", "Input file missing file extension: \"%s\"", pImgPath);
-			return false;
-		}
-
-		if (core::strUtil::IsEqualCaseInsen(pFileExt, "dds")) {
-			inputFileFmt = ImgFileFormat::DDS;
-		} else if (core::strUtil::IsEqualCaseInsen(pFileExt, "png")) {
-			inputFileFmt = ImgFileFormat::PNG;
-		} else if (core::strUtil::IsEqualCaseInsen(pFileExt, "jpg")) {
-			inputFileFmt = ImgFileFormat::JPG;
-		} else if (core::strUtil::IsEqualCaseInsen(pFileExt, "psd")) {
-			inputFileFmt = ImgFileFormat::PSD;
-		} else if (core::strUtil::IsEqualCaseInsen(pFileExt, "tga")) {
-			inputFileFmt = ImgFileFormat::TGA;
-		} else if (core::strUtil::IsEqualCaseInsen(pFileExt, "ci")) {
-			// you can't convert from a CI it's not allowed!
-			X_ERROR("ImgLib", "Input format of type CI is not allowed");
-			return false;
-		}
-		else {
-			X_ERROR("ImgLib", "Unkown input image extension: \"%s\"", pFileExt);
-			return false;
-		}
-	}
-	else {
-		X_ERROR("ImgLib", "Missing requited argument: imgPath");
-		return false;
-	}
 
 	if (d.HasMember("ignoreSrcMips")) {
 		if (d["ignoreSrcMips"].GetBool()) {
@@ -253,7 +215,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	}
 
 	// check we only got here with valid shit!
-	X_ASSERT(inputFileFmt != ImgFileFormat::UNKNOWN, "InputFile Fmt is invalid")(inputFileFmt);
 	X_ASSERT(outputFileFmt != ImgFileFormat::UNKNOWN, "OutputFile Fmt is invalid")(outputFileFmt);
 
 
@@ -343,6 +304,17 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
 	if (fileData.isEmpty()) {
 		X_ERROR("Img", "File data is empty");
+		return false;
+	}
+
+	// work out the fmt.
+	ImgFileFormat::Enum inputFileFmt = Util::resolveSrcfmt(fileData);
+	if (inputFileFmt == ImgFileFormat::UNKNOWN) {
+		X_ERROR("Img", "Unknown img src format");
+		return false;
+	}
+	if (inputFileFmt == ImgFileFormat::CI) {
+		X_ERROR("Img", "Input format of type CI is not allowed");
 		return false;
 	}
 
