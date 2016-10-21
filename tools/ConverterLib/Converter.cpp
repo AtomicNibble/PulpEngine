@@ -411,6 +411,10 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 		return false;
 	}
 
+	if (db_.AssetHasThumb(assetId)) {
+		return true;
+	}
+
 	IConverter* pCon = GetConverter(assType);
 	// this is a private member which should have this stuff validated
 	// before calling this.
