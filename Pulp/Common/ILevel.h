@@ -496,10 +496,10 @@ struct FileHeader
 		return fourCC == LVL_FOURCC;
 	}
 
-	core::XFileBuf FileBufForNode(uint8_t* pData, FileNodes::Enum node) const
+	core::XFileFixedBuf FileBufForNode(uint8_t* pData, FileNodes::Enum node) const
 	{
 		uint8_t* pBegin = pData + nodes[node].offset;
-		return core::XFileBuf(pBegin, pBegin + nodes[node].size);
+		return core::XFileFixedBuf(pBegin, pBegin + nodes[node].size);
 	}
 };
 

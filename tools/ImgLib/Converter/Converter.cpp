@@ -184,7 +184,7 @@ namespace Converter
 			return false;
 		}
 
-		core::XFileBuf file(fileData.begin(), fileData.end());
+		core::XFileFixedBuf file(fileData.begin(), fileData.end());
 
 		return LoadImg(&file, inputFileFmt);
 	}

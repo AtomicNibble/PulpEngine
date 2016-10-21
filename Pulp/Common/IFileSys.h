@@ -294,16 +294,16 @@ private:
 
 
 
-struct XFileBuf : public XFile
+struct XFileFixedBuf : public XFile
 {
-	XFileBuf(const uint8_t* begin, const uint8_t* end) :
+	XFileFixedBuf(const uint8_t* begin, const uint8_t* end) :
 	begin_(begin), current_(begin), end_(end)
 	{
 		X_ASSERT_NOT_NULL(begin);
 		X_ASSERT_NOT_NULL(end);
 		X_ASSERT(end >= begin, "invalid buffer")(begin, end);
 	}
-	~XFileBuf() X_OVERRIDE {
+	~XFileFixedBuf() X_OVERRIDE {
 	}
 
 	virtual size_t read(void* pBuf, size_t Len) X_FINAL{

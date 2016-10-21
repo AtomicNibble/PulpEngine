@@ -187,7 +187,7 @@ bool Level::ProcessHeader(void)
 }
 
 
-bool ProcessIAP(core::XFileBuf& file, Area& area, int32_t areaTo)
+bool ProcessIAP(core::XFileFixedBuf& file, Area& area, int32_t areaTo)
 {
 	AreaPortal& p = area.portals.AddOne();
 	p.pWinding = X_NEW(XWinding, g_3dEngineArena, "AreaPortalWinding");
@@ -223,7 +223,7 @@ bool Level::ProcessData(void)
 {
 	// read string table.
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STRING_TABLE);
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STRING_TABLE);
 
 		if (!stringTable_.SLoad(&file))
 		{
@@ -324,7 +324,7 @@ bool Level::ProcessData(void)
 	// area Portals
 	if (fileHdr_.flags.IsSet(LevelFileFlags::INTER_AREA_INFO))
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_PORTALS);
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_PORTALS);
 
 		// 2 ints for the area numbers followed by a winding.
 		uint32_t i, numIaps = fileHdr_.numinterAreaPortals;
@@ -384,7 +384,7 @@ bool Level::ProcessData(void)
 	
 	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_ENT_REF_LISTS))
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
 
 		AreaRefInfo& entRefs = entRefs_;
 		entRefs.areaRefHdrs.resize(fileHdr_.numAreas);
@@ -409,7 +409,7 @@ bool Level::ProcessData(void)
 
 	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_MODEL_REF_LISTS))
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_MODEL_REFS);
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_MODEL_REFS);
 
 		AreaRefInfo& modelRefs = modelRefs_;
 		modelRefs.areaRefHdrs.resize(fileHdr_.numAreas);
@@ -441,7 +441,7 @@ bool Level::ProcessData(void)
 	}
 
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
 
 		staticModels_.resize(fileHdr_.numStaticModels);
 		if (staticModels_.isNotEmpty())
@@ -477,7 +477,7 @@ bool Level::ProcessData(void)
 	// nodes
 	if (fileHdr_.flags.IsSet(LevelFileFlags::BSP_TREE))
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::BSP_TREE);
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::BSP_TREE);
 
 		areaNodes_.resize(fileHdr_.numNodes);
 
