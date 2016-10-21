@@ -17,6 +17,7 @@ namespace JPG
 		XTexLoaderJPG();
 		~XTexLoaderJPG();
 
+		static bool isValidData(const DataVec& fileData);
 
 		// ITextureFmt
 		virtual const char* getExtension(void) const X_OVERRIDE;

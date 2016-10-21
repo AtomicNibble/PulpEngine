@@ -574,6 +574,17 @@ namespace DDS
 
 	}
 
+	bool XTexLoaderDDS::isValidData(const DataVec& fileData)
+	{
+		if (fileData.size() < sizeof(DDS_header)) {
+			return false;
+		}
+
+		const DDS_header* pHdr = reinterpret_cast<const DDS_header*>(fileData.data());
+
+		return pHdr->dwMagic == DDS_MAGIC;
+	}
+
 	// ITextureFmt
 	const char* XTexLoaderDDS::getExtension(void) const
 	{
@@ -587,13 +598,7 @@ namespace DDS
 
 	bool XTexLoaderDDS::canLoadFile(const DataVec& fileData) const
 	{
-		if (fileData.size() < sizeof(DDS_header)) {
-			return false;
-		}
-
-		const DDS_header* pHdr = reinterpret_cast<const DDS_header*>(fileData.data());
-
-		return pHdr->dwMagic == DDS_MAGIC;
+		return isValidData(fileData);
 	}
 
 	bool XTexLoaderDDS::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

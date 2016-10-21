@@ -178,6 +178,17 @@ namespace PNG
 
 	}
 
+	bool XTexLoaderPNG::isValidData(const DataVec& fileData)
+	{
+		if (fileData.size() < sizeof(Png_Header)) {
+			return false;
+		}
+
+		const Png_Header* pHdr = reinterpret_cast<const Png_Header*>(fileData.data());
+
+		return pHdr->magic == PNG_FILE_MAGIC;
+	}
+
 	// ITextureFmt
 	const char* XTexLoaderPNG::getExtension(void) const
 	{
@@ -191,13 +202,7 @@ namespace PNG
 
 	bool XTexLoaderPNG::canLoadFile(const DataVec& fileData) const
 	{
-		if (fileData.size() < sizeof(Png_Header)) {
-			return false;
-		}
-
-		const Png_Header* pHdr = reinterpret_cast<const Png_Header*>(fileData.data());
-
-		return pHdr->magic == PNG_FILE_MAGIC;
+		return isValidData(fileData);
 	}
 
 	bool XTexLoaderPNG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

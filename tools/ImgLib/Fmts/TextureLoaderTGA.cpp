@@ -61,18 +61,7 @@ namespace TGA
 
 	}
 
-	// ITextureFmt
-	const char* XTexLoaderTGA::getExtension(void) const
-	{
-		return TGA_FILE_EXTENSION;
-	}
-
-	bool XTexLoaderTGA::canLoadFile(const core::Path<char>& path) const
-	{
-		return core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());
-	}
-
-	bool XTexLoaderTGA::canLoadFile(const DataVec& fileData) const
+	bool XTexLoaderTGA::isValidData(const DataVec& fileData)
 	{
 		if (fileData.size() < 18) {
 			return false;
@@ -103,6 +92,22 @@ namespace TGA
 		}
 
 		return true;
+	}
+
+	// ITextureFmt
+	const char* XTexLoaderTGA::getExtension(void) const
+	{
+		return TGA_FILE_EXTENSION;
+	}
+
+	bool XTexLoaderTGA::canLoadFile(const core::Path<char>& path) const
+	{
+		return core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());
+	}
+
+	bool XTexLoaderTGA::canLoadFile(const DataVec& fileData) const
+	{
+		return isValidData(fileData);
 	}
 
 	bool XTexLoaderTGA::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

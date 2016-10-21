@@ -18,6 +18,8 @@ namespace CI
 		~XTexLoaderCI();
 
 
+		static bool isValidData(const DataVec& fileData);
+
 		// ITextureFmt
 		virtual const char* getExtension(void) const X_OVERRIDE;
 		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;

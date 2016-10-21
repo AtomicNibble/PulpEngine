@@ -30,6 +30,17 @@ namespace CI
 
 	}
 
+	bool XTexLoaderCI::isValidData(const DataVec& fileData)
+	{
+		if (fileData.size() < sizeof(CITexureHeader)) {
+			return false;
+		}
+
+		const CITexureHeader* pHdr = reinterpret_cast<const CITexureHeader*>(fileData.data());
+
+		return pHdr->fourCC == CI_FOURCC;
+	}
+
 	// ITextureFmt
 	const char* XTexLoaderCI::getExtension(void) const
 	{
@@ -43,13 +54,7 @@ namespace CI
 
 	bool XTexLoaderCI::canLoadFile(const DataVec& fileData) const
 	{
-		if (fileData.size() < sizeof(CITexureHeader)) {
-			return false;
-		}
-
-		const CITexureHeader* pHdr = reinterpret_cast<const CITexureHeader*>(fileData.data());
-
-		return pHdr->fourCC == CI_FOURCC;
+		return isValidData(fileData);
 	}
 
 	bool XTexLoaderCI::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

@@ -279,6 +279,17 @@ namespace PSD
 
 	}
 
+	bool XTexLoaderPSD::isValidData(const DataVec& fileData)
+	{
+		if (fileData.size() < sizeof(PsdHeader)) {
+			return false;
+		}
+
+		const PsdHeader* pHdr = reinterpret_cast<const PsdHeader*>(fileData.data());
+
+		return pHdr->fourCC == PSD_FILE_FOURCC;
+	}
+
 	// ITextureFmt
 	const char* XTexLoaderPSD::getExtension(void) const
 	{
@@ -292,13 +303,7 @@ namespace PSD
 
 	bool XTexLoaderPSD::canLoadFile(const DataVec& fileData) const
 	{
-		if (fileData.size() < sizeof(PsdHeader)) {
-			return false;
-		}
-
-		const PsdHeader* pHdr = reinterpret_cast<const PsdHeader*>(fileData.data());
-
-		return pHdr->fourCC == PSD_FILE_FOURCC;
+		return isValidData(fileData);
 	}
 
 	bool XTexLoaderPSD::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

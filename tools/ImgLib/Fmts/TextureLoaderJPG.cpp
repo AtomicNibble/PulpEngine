@@ -148,6 +148,17 @@ namespace JPG
 		
 	}
 
+	bool XTexLoaderJPG::isValidData(const DataVec& fileData)
+	{
+		if (fileData.size() < 4) {
+			return false;
+		}
+
+		const uint16_t* pData = reinterpret_cast<const uint16_t*>(fileData.data());
+
+		return pData[0] == 0xd8ff && pData[1] == 0x0eff;
+	}
+
 	// ITextureFmt
 	const char* XTexLoaderJPG::getExtension(void) const
 	{
@@ -161,13 +172,7 @@ namespace JPG
 
 	bool XTexLoaderJPG::canLoadFile(const DataVec& fileData) const
 	{
-		if (fileData.size() < 4) {
-			return false;
-		}
-
-		const uint16_t* pData = reinterpret_cast<const uint16_t*>(fileData.data());
-
-		return pData[0] == 0xd8ff && pData[1] == 0x0eff;
+		return isValidData(fileData);
 	}
 
 	bool XTexLoaderJPG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
