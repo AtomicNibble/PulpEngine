@@ -158,6 +158,17 @@ X_DECLARE_FLAGS(TexFlag)(
 typedef Flags<TexFlag> TextureFlags;
 
 
+X_DECLARE_ENUM(ImgFileFormat) (
+	CI,
+	DDS,
+	PNG,
+	JPG,
+	PSD,
+	TGA,
+
+	UNKNOWN
+);
+
 /*
 We can request a texture and one is always returned.
 it may point to the deafault texture.

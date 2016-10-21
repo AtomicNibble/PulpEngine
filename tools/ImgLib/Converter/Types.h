@@ -33,17 +33,6 @@ namespace Converter
 		EIGHTH
 	);
 
-	X_DECLARE_ENUM(ImgFileFormat) (
-		CI,
-		DDS,
-		PNG,
-		JPG,
-		PSD,
-		TGA,
-
-		UNKNOWN
-	);
-
 	X_DECLARE_ENUM(MipFilter) (
 		Box,
 		Triangle,
