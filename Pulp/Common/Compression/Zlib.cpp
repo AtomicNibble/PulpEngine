@@ -161,7 +161,7 @@ namespace Compression
 
 		::deflateInit(&stream, CompLvlToZliblvl(lvl));
 
-		int res = ::deflate(&stream, Z_FINISH);
+		const int32_t res = ::deflate(&stream, Z_FINISH);
 
 		uint32_t deflatedSize = safe_static_cast<uint32_t>(destBufLen)-stream.avail_out;
 
@@ -205,7 +205,7 @@ namespace Compression
 
 		::inflateInit(&stream);
 
-		int res = ::inflate(&stream, Z_SYNC_FLUSH);
+		const int32_t res = ::inflate(&stream, Z_SYNC_FLUSH);
 
 		::inflateEnd(&stream);
 
@@ -270,7 +270,7 @@ namespace Compression
 		stream_->avail_in = safe_static_cast<uint32_t>(len);
 
 		// inflate it baby.
-		int res = ::inflate(stream_, Z_SYNC_FLUSH);
+		const int32_t res = ::inflate(stream_, Z_SYNC_FLUSH);
 
 		uint32_t left = stream_->avail_out;
 
@@ -283,7 +283,7 @@ namespace Compression
 		}
 		
 		if (res != Z_OK) {
-			X_ERROR("Zlib", "inflate error: %i -> %s", res, ZlibErrToStr(res));
+			X_ERROR("Zlib", "inflate error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
 			return InflateResult::ERROR;
 		}
 
