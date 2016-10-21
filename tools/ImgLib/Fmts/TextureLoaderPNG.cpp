@@ -70,6 +70,7 @@ namespace PNG
 			static const int32_t TAG_ID = PNG_TAG_IHDR;
 			static const int32_t TAG_SIZE = 13;
 
+			int32_t tag; // makes crc32 more easy to calculate, can do as single block.
 			int32_t width;
 			int32_t height;
 			int8_t bitDepth;
@@ -79,14 +80,19 @@ namespace PNG
 			InterlaceMethod::Enum interLace;
 		};
 
+		struct IDAT
+		{
+			static const int32_t TAG_ID = PNG_TAG_IDAT;
+		};
+
 		struct IEND
 		{
-			static const int32_t TAG_ID = PNG_TAG_IHDR;
+			static const int32_t TAG_ID = PNG_TAG_IEND;
 			static const int32_t TAG_SIZE = 0;
 		};
 		X_PACK_POP
 
-		X_ENSURE_SIZE(IHDR, IHDR::TAG_SIZE);
+		X_ENSURE_SIZE(IHDR, IHDR::TAG_SIZE + 4);
 
 
 		static uint32_t png_get_bpp(uint32_t depth, uint32_t color_type)
@@ -407,7 +413,7 @@ namespace PNG
 		// some validation.
 		if (imgFile.getFormat() != Texturefmt::R8G8B8A8 && imgFile.getFormat() != Texturefmt::R8G8B8) {
 			X_ERROR("TexturePNG", "Saving fmt \"%s\" is not supported", Texturefmt::ToString(imgFile.getFormat()));
-			return false;
+//			return false;
 		}
 		if (imgFile.getNumMips() > 1) {
 			X_ERROR("TexturePNG", "Can't save image with mips");
@@ -429,8 +435,9 @@ namespace PNG
 
 		// write a IHDR
 		IHDR ihdr;
-		ihdr.width = imgFile.getWidth();
-		ihdr.height = imgFile.getHeight();
+		ihdr.tag = IHDR::TAG_ID;
+		ihdr.width = core::Endian::swap(imgFile.getWidth());
+		ihdr.height = core::Endian::swap(imgFile.getHeight());
 		ihdr.bitDepth = 8; // bit depth
 		ihdr.colType = colType; // color type
 		ihdr.compression = CompressionMethod::Deflate; // compression method
@@ -438,9 +445,8 @@ namespace PNG
 		ihdr.interLace = InterlaceMethod::None; // interlace method
 
 		file->writeObj(core::Endian::swap<int32_t>(IHDR::TAG_SIZE));
-		file->writeObj(IHDR::TAG_ID);
 		file->writeObj(ihdr);
-		file->writeObj(pCrc->GetCRC32OfObject(ihdr));
+		file->writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(ihdr)));
 		
 		// now we write the data.
 		const int32_t srcSize = safe_static_cast<int32_t>(imgFile.getFaceSize());
@@ -450,11 +456,16 @@ namespace PNG
 
 		ZlibDefalte zlib(swapArena, [&] (const uint8_t* pData, size_t len) {
 			// get crc of block.
-			const uint32_t blockcrc = pCrc->GetCRC32(pData, len);
+			uint32_t crc = pCrc->Begin();
+			pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), crc);
+			pCrc->Update(pData, len, crc);
+			crc = pCrc->Finish(crc);
+
 			// write it.
 			file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(len)));
+			file->writeObj(IDAT::TAG_ID);
 			file->write(pData, len);
-			file->writeObj(blockcrc);
+			file->writeObj(core::Endian::swap(crc));
 		});
 
 		zlib.setBufferSize(BLOCK_SIZE);
@@ -467,7 +478,7 @@ namespace PNG
 
 		file->writeObj(core::Endian::swap<int32_t>(IEND::TAG_SIZE));
 		file->writeObj(IEND::TAG_ID);
-		file->writeObj(pCrc->zeroLengthCrc32());
+		file->writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(IEND::TAG_ID)));
 		return true;
 	}
 
