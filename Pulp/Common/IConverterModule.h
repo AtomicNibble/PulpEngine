@@ -52,6 +52,15 @@ struct IConverter
 	virtual const char* getOutExtension(void) const X_ABSTRACT;
 
 	virtual bool Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath) X_ABSTRACT;
+
+	// thumbs disabled for all types by default.
+	virtual bool thumbGenerationSupported(void) const { return false; }
+	virtual bool CreateThumb(IConverterHost& host, int32_t assetId) { 
+		X_UNUSED(host);
+		X_UNUSED(assetId);
+		X_ASSERT_UNREACHABLE();
+		return false;
+	};
 };
 
 
