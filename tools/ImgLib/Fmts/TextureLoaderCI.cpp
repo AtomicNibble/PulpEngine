@@ -41,6 +41,17 @@ namespace CI
 		return core::strUtil::IsEqual(CI_FILE_EXTENSION, path.extension());
 	}
 
+	bool XTexLoaderCI::canLoadFile(const DataVec& fileData) const
+	{
+		if (fileData.size() < sizeof(CITexureHeader)) {
+			return false;
+		}
+
+		const CITexureHeader* pHdr = reinterpret_cast<const CITexureHeader*>(fileData.data());
+
+		return pHdr->fourCC == CI_FOURCC;
+	}
+
 	bool XTexLoaderCI::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(gEnv);

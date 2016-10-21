@@ -358,10 +358,13 @@ class XTextureFile;
 
 struct ITextureFmt
 {
+	typedef core::Array<uint8_t> DataVec;
+
 	virtual ~ITextureFmt() {}
 
 	virtual const char* getExtension(void) const X_ABSTRACT;
 	virtual bool canLoadFile(const core::Path<char>& path) const X_ABSTRACT;
+	virtual bool canLoadFile(const DataVec& fileData) const X_ABSTRACT;
 	virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_ABSTRACT;
 
 	virtual bool canWrite(void) const { return false; }

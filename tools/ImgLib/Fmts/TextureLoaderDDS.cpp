@@ -585,6 +585,17 @@ namespace DDS
 		return core::strUtil::IsEqual(DDS_FILE_EXTENSION, path.extension());
 	}
 
+	bool XTexLoaderDDS::canLoadFile(const DataVec& fileData) const
+	{
+		if (fileData.size() < sizeof(DDS_header)) {
+			return false;
+		}
+
+		const DDS_header* pHdr = reinterpret_cast<const DDS_header*>(fileData.data());
+
+		return pHdr->dwMagic == DDS_MAGIC;
+	}
+
 	bool XTexLoaderDDS::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);

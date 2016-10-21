@@ -159,6 +159,17 @@ namespace JPG
 		return core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
 	}
 
+	bool XTexLoaderJPG::canLoadFile(const DataVec& fileData) const
+	{
+		if (fileData.size() < 4) {
+			return false;
+		}
+
+		const uint16_t* pData = reinterpret_cast<const uint16_t*>(fileData.data());
+
+		return pData[0] == 0xd8ff && pData[1] == 0x0eff;
+	}
+
 	bool XTexLoaderJPG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);

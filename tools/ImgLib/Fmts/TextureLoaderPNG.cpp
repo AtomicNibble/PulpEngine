@@ -189,6 +189,17 @@ namespace PNG
 		return core::strUtil::IsEqual(PNG_FILE_EXTENSION, path.extension());
 	}
 
+	bool XTexLoaderPNG::canLoadFile(const DataVec& fileData) const
+	{
+		if (fileData.size() < sizeof(Png_Header)) {
+			return false;
+		}
+
+		const Png_Header* pHdr = reinterpret_cast<const Png_Header*>(fileData.data());
+
+		return pHdr->magic == PNG_FILE_MAGIC;
+	}
+
 	bool XTexLoaderPNG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);

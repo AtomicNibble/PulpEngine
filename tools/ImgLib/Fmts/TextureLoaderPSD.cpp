@@ -290,6 +290,17 @@ namespace PSD
 		return  core::strUtil::IsEqual(PSD_FILE_EXTENSION, path.extension());
 	}
 
+	bool XTexLoaderPSD::canLoadFile(const DataVec& fileData) const
+	{
+		if (fileData.size() < sizeof(PsdHeader)) {
+			return false;
+		}
+
+		const PsdHeader* pHdr = reinterpret_cast<const PsdHeader*>(fileData.data());
+
+		return pHdr->fourCC == PSD_FILE_FOURCC;
+	}
+
 	bool XTexLoaderPSD::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);

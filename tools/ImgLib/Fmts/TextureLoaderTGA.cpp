@@ -72,6 +72,39 @@ bool XTexLoaderTGA::canLoadFile(const core::Path<char>& path) const
 	return core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());
 }
 
+bool XTexLoaderTGA::canLoadFile(const DataVec& fileData) const
+{
+	if (fileData.size() < 18) {
+		return false;
+	}
+
+	Tga_Header hdr;
+	hdr.IDLength = static_cast<uint32_t>(fileData[0]);
+	hdr.ColorMapType = static_cast<uint32_t>(fileData[1]);
+	hdr.ImageType = static_cast<uint32_t>(fileData[2]);
+	hdr.CMapStart = static_cast<uint32_t>(fileData[3]) | static_cast<uint32_t>((fileData[4]) << 8);
+	hdr.CMapLength = static_cast<uint32_t>(fileData[5]) | static_cast<uint32_t>((fileData[6]) << 8);
+	hdr.CMapDepth = static_cast<uint32_t>(fileData[7]);
+	hdr.XOffset = static_cast<uint32_t>(fileData[8]) | static_cast<uint32_t>((fileData[9]) << 8);
+	hdr.YOffset = static_cast<uint32_t>(fileData[10]) | static_cast<uint32_t>((fileData[11]) << 8);
+	hdr.Width = static_cast<uint32_t>(fileData[12]) | static_cast<uint32_t>((fileData[13]) << 8);
+	hdr.Height = static_cast<uint32_t>(fileData[14]) | static_cast<uint32_t>((fileData[15]) << 8);
+	hdr.PixelDepth = static_cast<uint32_t>(fileData[16]);
+	hdr.ImageDescriptor = static_cast<uint32_t>(fileData[17]);
+
+	if (hdr.ColorMapType != 0 && hdr.ColorMapType != 1) {
+		return false;
+	}
+	if (!isValidImageType(hdr.ImageType)) {
+		return false;
+	}	
+	if (!(hdr.PixelDepth == 8 || hdr.PixelDepth == 24 || hdr.PixelDepth == 32)) {
+		return false;
+	}
+
+	return true;
+}
+
 bool XTexLoaderTGA::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 {
 	X_ASSERT_NOT_NULL(file);

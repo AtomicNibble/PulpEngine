@@ -21,6 +21,7 @@ namespace CI
 		// ITextureFmt
 		virtual const char* getExtension(void) const X_OVERRIDE;
 		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
+		virtual bool canLoadFile(const DataVec& fileData) const X_OVERRIDE;
 		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 
 		virtual bool canWrite(void) const X_OVERRIDE { return true; }
