@@ -388,6 +388,17 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
 	return true;
 }
 
+bool Converter::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data)
+{
+	auto res = db_.UpdateAssetThumb(assetId, thumbDim, srcDim, data);
+	if (res != assetDb::AssetDB::Result::OK) {
+		return false;
+	}
+	
+	return true;
+}
+
+
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
 	if (conversionProfiles_[type].isEmpty()) {
