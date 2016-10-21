@@ -15,8 +15,10 @@ X_NAMESPACE_BEGIN(texture)
 namespace CI
 {
 
-	bool XTexLoaderCI::saveTexture(core::XFile* file, const XTextureFile& imgFile)
+	bool XTexLoaderCI::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
+		X_UNUSED(swapArena);
+
 		core::Crc32* pCrc = gEnv->pCore->GetCrc32();
 
 		X_ASSERT_NOT_NULL(pCrc);

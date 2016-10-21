@@ -279,7 +279,7 @@ namespace Converter
 		}
 
 
-		bool res = pFmt->saveTexture(pFile, img);
+		bool res = pFmt->saveTexture(pFile, img, swapArena_);
 
 		core::Mem::Destruct<ITextureFmt>(pFmt);
 		return res;

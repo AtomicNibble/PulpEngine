@@ -369,9 +369,10 @@ struct ITextureFmt
 	virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_ABSTRACT;
 
 	virtual bool canWrite(void) const { return false; }
-	virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile) {
+	virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena) {
 		X_UNUSED(file);
 		X_UNUSED(imgFile);
+		X_UNUSED(swapArena);
 		X_ASSERT_UNREACHABLE();
 		return false;
 	};
