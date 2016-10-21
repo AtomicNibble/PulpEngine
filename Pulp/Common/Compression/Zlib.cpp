@@ -212,7 +212,7 @@ namespace Compression
 		// If res == Z_OK that means we ran out of dest buffer beffore infalte all of src buffer.
 		if (res != Z_STREAM_END)
 		{
-			X_ERROR("Zlib", "inflate error: %i -> %s", res, ZlibErrToStr(res));
+			X_ERROR("Zlib", "inflate error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
 			if (res == Z_OK) {
 				X_ERROR("Zlib", "dest buffer is too small %i bytes left in src.", stream.avail_in);
 			}
@@ -374,7 +374,7 @@ namespace Compression
 			{
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;
-				X_ERROR("Zlib", "Deflate error % -> %s" PRIi32, res, ZlibErrToStr(res));
+				X_ERROR("Zlib", "Deflate error %" PRIi32 " -> %s", res, ZlibErrToStr(res));
 				return DeflateResult::ERROR;
 			}
 		}
