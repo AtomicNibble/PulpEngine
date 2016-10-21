@@ -14,6 +14,9 @@ namespace PNG
 	class IMGLIB_EXPORT XTexLoaderPNG : public ITextureFmt
 	{
 	public:
+		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::PNG;
+
+	public:
 		XTexLoaderPNG();
 		~XTexLoaderPNG();
 

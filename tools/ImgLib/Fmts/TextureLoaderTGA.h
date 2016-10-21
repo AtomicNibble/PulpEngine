@@ -14,6 +14,9 @@ namespace TGA
 	class IMGLIB_EXPORT XTexLoaderTGA : public ITextureFmt
 	{
 	public:
+		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::TGA;
+
+	public:
 		XTexLoaderTGA();
 		~XTexLoaderTGA();
 

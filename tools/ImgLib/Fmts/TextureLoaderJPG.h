@@ -14,6 +14,9 @@ namespace JPG
 	class IMGLIB_EXPORT XTexLoaderJPG : public ITextureFmt
 	{
 	public:
+		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::JPG;
+
+	public:
 		XTexLoaderJPG();
 		~XTexLoaderJPG();
 

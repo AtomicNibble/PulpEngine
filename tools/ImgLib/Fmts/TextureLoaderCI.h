@@ -14,6 +14,9 @@ namespace CI
 	class IMGLIB_EXPORT XTexLoaderCI : public ITextureFmt
 	{
 	public:
+		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::CI;
+
+	public:
 		XTexLoaderCI();
 		~XTexLoaderCI();
 

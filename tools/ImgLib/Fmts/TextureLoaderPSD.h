@@ -14,6 +14,9 @@ namespace PSD
 	class IMGLIB_EXPORT XTexLoaderPSD : public ITextureFmt
 	{
 	public:
+		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::PSD;
+
+	public:
 		XTexLoaderPSD();
 		~XTexLoaderPSD();
 

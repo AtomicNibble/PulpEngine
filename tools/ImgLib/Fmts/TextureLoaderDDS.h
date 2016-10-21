@@ -14,6 +14,9 @@ namespace DDS
 	class IMGLIB_EXPORT XTexLoaderDDS : public ITextureFmt
 	{
 	public:
+		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::DDS;
+
+	public:
 		XTexLoaderDDS();
 		~XTexLoaderDDS();
 
