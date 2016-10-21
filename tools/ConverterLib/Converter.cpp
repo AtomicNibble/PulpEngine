@@ -341,6 +341,78 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 	return true;
 }
 
+
+bool Converter::GenerateThumbs(void)
+{
+	X_LOG0("Converter", "Generating thumbs");
+
+	for (int32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+	{
+		AssetType::Enum assType = static_cast<AssetType::Enum>(i);
+
+		if (!EnsureLibLoaded(assType)) {
+			X_LOG0("Converter", "Skipping \"%s\" thumb generation, no converter module found", AssetType::ToString(assType));
+			continue;
+		}
+
+		IConverter* pCon = GetConverter(assType);
+		X_ASSERT_NOT_NULL(pCon);
+
+		if (!pCon->thumbGenerationSupported()) {
+			X_LOG0("Converter", "Skipping \"%s\" thumb generation, not supported", AssetType::ToString(assType));
+			continue;
+		}
+
+
+		int32_t numAssets = 0;
+		if (!db_.GetNumAssets(assType, numAssets)) {
+			return false;
+		}
+
+		X_LOG0("Converter", "Generating %" PRIi32 " thumb(s)", numAssets);
+
+		core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+		func.Bind<Converter, &Converter::GenerateThumb>(this);
+
+		core::StopWatch timer;
+
+		if (!db_.IterateAssets(assType, func)) {
+			X_ERROR("Converter", "Failed to generate thumbs for assetType \"%s\"", AssetType::ToString(assType));
+			return false;
+		}
+
+		core::HumanDuration::Str timeStr;
+		X_LOG0("Converter", "Generated thumbs for %" PRIi32 " asset(s) in ^6%s", numAssets,
+			core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
+		
+	}
+
+	return true;
+}
+
+
+bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
+{
+	int32_t assetId = -1;
+	if (!db_.AssetExsists(assType, name, &assetId)) {
+		X_ERROR("Converter", "Asset does not exists");
+		return false;
+	}
+
+	IConverter* pCon = GetConverter(assType);
+	// this is a private member which should have this stuff validated
+	// before calling this.
+	X_ASSERT_NOT_NULL(pCon);
+	X_ASSERT(pCon->thumbGenerationSupported(), "thumb generatino not supported")();
+
+	if (!pCon->CreateThumb(*this, assetId)) {
+		X_ERROR("Converter", "Failed to generate thumbs for \"%s\" \"%s\"", name.c_str(), AssetType::ToString(assType));
+		return false;
+	}
+
+	return true;
+}
+
 bool Converter::Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut)
 {
 	IConverter* pCon = GetConverter(assType);

@@ -48,6 +48,9 @@ public:
 	CONVERTERLIB_EXPORT bool CleanAll(const char* pMod = nullptr);
 	CONVERTERLIB_EXPORT bool CleanAll(int32_t modId);
 
+	// generates thumbs for assets that don't have thumbs already and we support auto thumb generation.
+	CONVERTERLIB_EXPORT bool GenerateThumbs(void);
+
 	// IConverterHost
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_OVERRIDE;
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut) X_OVERRIDE;
@@ -65,6 +68,7 @@ private:
 
 	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir);
 
+	bool GenerateThumb(AssetType::Enum assType, const core::string& name);
 	bool Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut);
 
 	IConverter* GetConverter(AssetType::Enum assType);
