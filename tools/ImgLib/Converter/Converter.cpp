@@ -22,66 +22,6 @@ namespace Converter
 
 	namespace
 	{
-		struct FmtStr
-		{
-			Texturefmt::Enum fmt;
-			core::StrHash nameHash;
-			const char* pName;
-		};
-
-		FmtStr formats[] =
-		{
-			{ Texturefmt::A8, core::StrHash("A8"), "A8" },
-			{ Texturefmt::R8G8, core::StrHash("R8G8"), "R8G8" },
-			{ Texturefmt::R8G8_TYPELESS, core::StrHash("R8G8_TYPELESS"), "R8G8_TYPELESS" },
-			{ Texturefmt::R8G8_SNORM, core::StrHash("R8G8_SNORM"), "R8G8_SNORM" },
-			{ Texturefmt::R8G8_UNIT, core::StrHash("R8G8_UNIT"), "R8G8_UNIT" },
-			{ Texturefmt::R8G8_SINT, core::StrHash("R8G8_SINT"), "R8G8_SINT" },
-			{ Texturefmt::R16G16_FLOAT, core::StrHash("R16G16_FLOAT"), "R16G16_FLOAT" },
-			{ Texturefmt::R16G16, core::StrHash("R16G16"), "R16G16" },
-			{ Texturefmt::R16G16_SRGB, core::StrHash("R16G16_SRGB"), "R16G16_SRGB" },
-			{ Texturefmt::R16G16_SNORM, core::StrHash("R16G16_SNORM"), "R16G16_SNORM" },
-			{ Texturefmt::R16G16_SINT, core::StrHash("R16G16_SINT"), "R16G16_SINT" },
-			{ Texturefmt::R16G16_UINT, core::StrHash("R16G16_UINT"), "R16G16_UINT" },
-			{ Texturefmt::R16G16_TYPELESS, core::StrHash("R16G16_TYPELESS"), "R16G16_TYPELESS" },
-			{ Texturefmt::R8G8B8, core::StrHash("R8G8B8"), "R8G8B8" },
-			{ Texturefmt::B8G8R8, core::StrHash("B8G8R8"), "B8G8R8" },
-			{ Texturefmt::R8G8B8A8, core::StrHash("R8G8B8A8"), "R8G8B8A8" },
-			{ Texturefmt::R8G8B8A8_SRGB, core::StrHash("R8G8B8A8_SRGB"), "R8G8B8A8_SRGB" },
-			{ Texturefmt::R8G8B8A8_SNORM, core::StrHash("R8G8B8A8_SNORM"), "R8G8B8A8_SNORM" },
-			{ Texturefmt::R8G8B8A8_TYPELESS, core::StrHash("R8G8B8A8_TYPELESS"), "R8G8B8A8_TYPELESS" },
-			{ Texturefmt::R8G8B8A8_TYPELESS, core::StrHash("R8G8B8A8_TYPELESS"), "R8G8B8A8_TYPELESS" },
-			{ Texturefmt::R8G8B8A8_SINT, core::StrHash("R8G8B8A8_SINT"), "R8G8B8A8_SINT" },
-			{ Texturefmt::R8G8B8A8_UINT, core::StrHash("R8G8B8A8_UINT"), "R8G8B8A8_UINT" },
-			{ Texturefmt::A8R8G8B8, core::StrHash("A8R8G8B8"), "A8R8G8B8" },
-			{ Texturefmt::B8G8R8A8, core::StrHash("B8G8R8A8"), "B8G8R8A8" },
-			{ Texturefmt::B8G8R8A8_SRGB, core::StrHash("B8G8R8A8_SRGB"), "B8G8R8A8_SRGB" },
-			{ Texturefmt::B8G8R8A8_TYPELESS, core::StrHash("B8G8R8A8_TYPELESS"), "B8G8R8A8_TYPELESS" },
-			{ Texturefmt::ATI2, core::StrHash("ATI2"), "ATI2" },
-			{ Texturefmt::ATI2_XY, core::StrHash("ATI2_XY"), "ATI2_XY" },
-			{ Texturefmt::BC1, core::StrHash("BC1"), "BC1" },
-			{ Texturefmt::BC1_SRGB, core::StrHash("BC1_SRGB"), "BC1_SRGB" },
-			{ Texturefmt::BC1_TYPELESS, core::StrHash("BC1_TYPELESS"), "BC1_TYPELESS" },
-			{ Texturefmt::BC2, core::StrHash("BC2"), "BC2" },
-			{ Texturefmt::BC2_SRGB, core::StrHash("BC2_SRGB"), "BC2_SRGB" },
-			{ Texturefmt::BC2_TYPELESS, core::StrHash("BC2_TYPELESS"), "BC2_TYPELESS" },
-			{ Texturefmt::BC3, core::StrHash("BC3"), "BC3" },
-			{ Texturefmt::BC3_SRGB, core::StrHash("BC3_SRGB"), "BC3_SRGB" },
-			{ Texturefmt::BC3_TYPELESS, core::StrHash("BC3_TYPELESS"), "BC3_TYPELESS" },
-			{ Texturefmt::BC4, core::StrHash("BC4"), "BC4" },
-			{ Texturefmt::BC4_SNORM, core::StrHash("BC4_SNORM"), "BC4_SNORM" },
-			{ Texturefmt::BC4_TYPELESS, core::StrHash("BC4_TYPELESS"), "BC4_TYPELESS" },
-			{ Texturefmt::BC5, core::StrHash("BC5"), "BC5" },
-			{ Texturefmt::BC5_SNORM, core::StrHash("BC5_SNORM"), "BC5_SNORM" },
-			{ Texturefmt::BC5_TYPELESS, core::StrHash("BC5_TYPELESS"), "BC5_TYPELESS" },
-			{ Texturefmt::BC6, core::StrHash("BC6"), "BC6" },
-			{ Texturefmt::BC6_SF16, core::StrHash("BC6_SF16"), "BC6_SF16" },
-			{ Texturefmt::BC6_TYPELESS, core::StrHash("BC6_TYPELESS"), "BC6_TYPELESS" },
-			{ Texturefmt::BC7, core::StrHash("BC7"), "BC7" },
-			{ Texturefmt::BC7_SRGB, core::StrHash("BC7_SRGB"), "BC7_SRGB" },
-			{ Texturefmt::BC7_TYPELESS, core::StrHash("BC7_TYPELESS"), "BC7_TYPELESS" },
-			{ Texturefmt::R10G10B10A2, core::StrHash("R10G10B10A2"), "R10G10B10A2" },
-		};
 
 		#define declareBC7_profile_helper(profile) \
 		void CompressBlocksBC7_ ## profile(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut) \
@@ -821,38 +761,6 @@ namespace Converter
 	const XTextureFile& ImgConveter::getTextFile(void) const
 	{
 		return srcImg_;
-	}
-
-	bool ImgConveter::ParseImgFmt(const char* pImgFmt, Texturefmt::Enum& fmtOut)
-	{
-		fmtOut = Texturefmt::UNKNOWN;
-
-		core::StackString<128> imgFmt(pImgFmt);
-		imgFmt.toUpper();
-
-		// everything is 2 or mroe currently.
-		if (imgFmt.length() < 2) {
-			return false;
-		}
-
-		const core::StrHash nameHash(imgFmt.begin(), imgFmt.length());
-		const size_t numFmts = sizeof(formats) / sizeof(FmtStr);
-
-		for (size_t i = 0; i < numFmts; i++)
-		{
-			const auto& fmt = formats[i];
-
-			if (fmt.nameHash == nameHash)
-			{
-				if (imgFmt.isEqual(fmt.pName))
-				{
-					fmtOut = fmt.fmt;
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	void ImgConveter::getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params)

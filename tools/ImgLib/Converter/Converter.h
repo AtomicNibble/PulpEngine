@@ -69,7 +69,6 @@ namespace Converter
 
 		const XTextureFile& getTextFile(void) const;
 
-		static bool ParseImgFmt(const char* pImgFmt, Texturefmt::Enum& fmtOut);
 		static void getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params);
 
 	private:

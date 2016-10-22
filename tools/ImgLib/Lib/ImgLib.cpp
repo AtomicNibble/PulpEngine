@@ -189,7 +189,8 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
 		const char* pImgFmt = d["imgFmt"].GetString();
 
-		if (!ImgConveter::ParseImgFmt(pImgFmt, dstImgFmt)) {
+		dstImgFmt = Util::TexFmtFromStr(pImgFmt);
+		if (dstImgFmt == Texturefmt::UNKNOWN) {
 			X_ERROR("Img", "Unknown img fmt: \"%s\"", pImgFmt);
 			return false;
 		}
