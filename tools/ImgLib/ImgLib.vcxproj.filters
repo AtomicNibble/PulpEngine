@@ -18,9 +18,6 @@
     <Filter Include="Header Files\Lib">
       <UniqueIdentifier>{48127ffc-e9ee-4429-97a2-b27fa56be898}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ConverterModule">
-      <UniqueIdentifier>{a899a0df-906f-4e85-bd62-5a7450c01360}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{2ca87345-2aef-4ac2-827b-96fb595e9213}</UniqueIdentifier>
     </Filter>
@@ -29,6 +26,15 @@
     </Filter>
     <Filter Include="Source Files\Converter">
       <UniqueIdentifier>{eefba1b1-a45b-43b0-95dc-c1684d120519}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ConverterModule">
+      <UniqueIdentifier>{a899a0df-906f-4e85-bd62-5a7450c01360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{bc5fb240-e74a-4f57-89d5-ac2cd1e653ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{3e009286-c8d1-4143-80d6-c79dd754b8a4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -56,9 +62,6 @@
     <ClInclude Include="TextureFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TextureUtil.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Fmts\CI_Img.h">
       <Filter>Header Files\Fmts</Filter>
     </ClInclude>
@@ -79,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="Converter\Types.h">
       <Filter>Header Files\Converter</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\TextureUtil.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -106,9 +112,6 @@
     <ClCompile Include="TextureFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextureUtil.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Fmts\CIWritter.cpp">
       <Filter>Source Files\Fmts</Filter>
     </ClCompile>
@@ -126,6 +129,9 @@
     </ClCompile>
     <ClCompile Include="Converter\FloatImage.cpp">
       <Filter>Source Files\Converter</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\TextureUtil.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

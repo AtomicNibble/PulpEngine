@@ -348,7 +348,7 @@
     <ClInclude Include="Lib\ImgLib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TextureFile.h" />
-    <ClInclude Include="TextureUtil.h" />
+    <ClInclude Include="Util\TextureUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Converter\Converter.cpp" />
@@ -376,7 +376,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TextureFile.cpp" />
-    <ClCompile Include="TextureUtil.cpp" />
+    <ClCompile Include="Util\TextureUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Converter\Filters.inl" />
