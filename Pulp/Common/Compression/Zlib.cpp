@@ -225,13 +225,13 @@ namespace Compression
 
 	// --------------------------------------
 
-	ZlibInflate::ZlibInflate(core::MemoryArenaBase* arena, void* pDst, size_t destLen) :
+	ZlibInflate::ZlibInflate(core::MemoryArenaBase* arena, InflateCallback inflateCallback) :
+		callback_(inflateCallback),
 		arena_(arena),
-		stream_(nullptr),
-		pDst_(pDst), 
-		destLen_(destLen)
+		buffer_(arena),
+		stream_(nullptr)
 	{
-		stream_ = X_NEW(z_stream, arena_, "ZlibStream");
+		stream_ = X_NEW(z_stream, arena_, "ZlibInflateStream");
 		core::zero_this(stream_);
 
 		X_ASSERT_NOT_NULL(stream_);
@@ -242,8 +242,10 @@ namespace Compression
 	
 		::inflateInit(stream_);
 
-		stream_->next_out = reinterpret_cast<uint8_t*>(pDst);
-		stream_->avail_out = safe_static_cast<uint32_t>(destLen);
+		stream_->next_out = nullptr;
+		stream_->avail_out = 0;
+	//	stream_->next_out = reinterpret_cast<uint8_t*>(pDst);
+	//	stream_->avail_out = safe_static_cast<uint32_t>(destLen);
 
 	}
 
@@ -253,41 +255,75 @@ namespace Compression
 		X_DELETE_AND_NULL(stream_, arena_);
 	}
 
+	void ZlibInflate::setBufferSize(size_t size)
+	{
+		if (size < 1) {
+			X_ERROR("Zlib", "Zero buffer size: %" PRIuS " reverting to default", size);
+			size = DEFAULT_BUF_SIZE;
+		}
+
+		buffer_.resize(size);
+		stream_->next_out = buffer_.data();
+		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
+	}
 
 	ZlibInflate::InflateResult::Enum ZlibInflate::Inflate(const void* pCompessedData, size_t len)
 	{
 		X_ASSERT_NOT_NULL(pCompessedData);
 
-		if (len == 0)
+		if (len == 0) {
 			return InflateResult::OK;
+		}
 
-		if (stream_->avail_out == 0) {
-			X_ERROR("Zlib", "can't infalte any more dest buffer is full");
-			return InflateResult::ERROR;
+		if (buffer_.isEmpty()) {
+			setBufferSize(DEFAULT_BUF_SIZE);
 		}
 
 		stream_->next_in = reinterpret_cast<uint8_t*>(const_cast<void*>(pCompessedData));
 		stream_->avail_in = safe_static_cast<uint32_t>(len);
 
-		// inflate it baby.
-		const int32_t res = ::inflate(stream_, Z_SYNC_FLUSH);
+		for (;;)
+		{
+			const int32_t res = ::inflate(stream_, Z_NO_FLUSH);
 
-		uint32_t left = stream_->avail_out;
+			// do we have a finished block?
+			if (stream_->avail_out == 0)
+			{
+				callback_(buffer_.data(), buffer_.size());
 
-		if (res == Z_STREAM_END || (left == 0 && res == Z_OK)) {
-			if (left > 0) {
-				X_WARNING("Zlib", "buffer inflate reached stream end"
-					", yet %s spare bytes left in dst buffer", left);
+				stream_->next_out = buffer_.data();
+				stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 			}
-			return InflateResult::DONE;
-		}
-		
-		if (res != Z_OK) {
-			X_ERROR("Zlib", "inflate error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
-			return InflateResult::ERROR;
-		}
 
-		return InflateResult::OK;
+			if (res == Z_OK)
+			{
+				if (stream_->avail_in == 0)
+				{
+					return InflateResult::OK;
+				}
+
+				// continue.
+			}
+			else if (res == Z_STREAM_END)
+			{
+				const size_t bytesInBuf = (buffer_.size() - stream_->avail_out);
+				if (bytesInBuf > 0) {
+					callback_(buffer_.data(), bytesInBuf);
+				}
+
+				stream_->next_out = nullptr;
+				stream_->avail_out = 0;
+				return InflateResult::DONE;
+			}
+			else
+			{
+				stream_->next_out = nullptr;
+				stream_->avail_out = 0;
+				X_ERROR("Zlib", "Inflate error %" PRIi32 " -> %s", res, ZlibErrToStr(res));
+				return InflateResult::ERROR;
+			}
+
+		}
 	}
 
 

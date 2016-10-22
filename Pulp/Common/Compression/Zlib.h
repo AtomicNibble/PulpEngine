@@ -87,24 +87,31 @@ namespace Compression
 	// can take one or many inputs and inflate them into dest.
 	class ZlibInflate
 	{
+		X_NO_COPY(ZlibInflate);
+		X_NO_ASSIGN(ZlibInflate);
+
 	public:
 		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
 
+		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
+
+		typedef std::function<void(const uint8_t* pData, size_t len)> InflateCallback;
+
 	public:
-		ZlibInflate(core::MemoryArenaBase* arena, void* pDst, size_t destLen);
+		ZlibInflate(core::MemoryArenaBase* arena, InflateCallback inflateCallback);
 		~ZlibInflate();
+
+		void setBufferSize(size_t size);
 
 		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
 
 	private:
-		X_NO_COPY(ZlibInflate);
-		X_NO_ASSIGN(ZlibInflate);
+		InflateCallback callback_;
+
 	private:
 		core::MemoryArenaBase* arena_;
+		core::Array<uint8_t> buffer_;
 		z_stream_s* stream_;
-
-		const void* pDst_;
-		size_t destLen_;
 	};
 
 	// can compress into blocks.

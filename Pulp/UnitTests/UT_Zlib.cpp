@@ -73,7 +73,7 @@ TEST(Zlib, Unbuffered)
 	X_DELETE_ARRAY(pCompressed, g_arena);
 }
 
-
+#if 0
 TEST(Zlib, buffered)
 {
 	const size_t srcBufSize = 4096;
@@ -128,7 +128,7 @@ TEST(Zlib, buffered)
 		X_DELETE_ARRAY(pUncompressed2, g_arena);
 	}
 }
-
+#endif
 
 TEST(Zlib, Array)
 {
