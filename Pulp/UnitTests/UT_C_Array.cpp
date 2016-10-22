@@ -242,6 +242,39 @@ TYPED_TEST(ArrayTest, Free)
 	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
 }
 
+TYPED_TEST(ArrayTest, ShrinkToFit)
+{
+	CustomType::CONSRUCTION_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
+
+	{
+		Array<TypeParam> list(g_arena);
+
+		list.setGranularity(128);
+
+		EXPECT_EQ(0, list.size());
+		EXPECT_EQ(0, list.capacity());
+		EXPECT_EQ(128, list.granularity());
+
+		// insert some items
+		for (int i = 0; i < 64; i++)
+		{
+			EXPECT_EQ(i, list.insert(i, i * 2));
+		}
+
+		EXPECT_EQ(64, list.size());
+		EXPECT_EQ(128, list.capacity());
+
+		list.shrinkToFit();
+
+		EXPECT_EQ(64, list.size());
+		EXPECT_EQ(64, list.capacity());
+		EXPECT_EQ(128, list.granularity());
+	}
+
+	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+}
+
 TYPED_TEST(ArrayTest, Move)
 {
 	// make a stack based arena that can't allocate multiple buffers.
