@@ -359,13 +359,13 @@ struct XFileStream : public XFile
 		return remainingBytes() == 0;
 	}
 
-	inline const core::Array<char>& buffer(void) const {
+	inline const core::Array<uint8_t>& buffer(void) const {
 		return buf_;
 	}
 
 
 private:
-	core::Array<char> buf_;
+	core::Array<uint8_t> buf_;
 };
 
 
