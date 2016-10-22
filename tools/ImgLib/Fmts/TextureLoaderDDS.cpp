@@ -973,12 +973,17 @@ namespace DDS
 						// this is BGR
 						mapped_format = Texturefmt::B8G8R8;
 					}
-					else if (mask_ofs[0] != 0 || mask_ofs[1] == 8 || mask_ofs[2] == 16
-						|| mask_ofs[3] != 24)
+					else if (mask_ofs[0] != 0 || mask_ofs[1] != 8 || mask_ofs[2] != 16
+						|| mask_ofs[3] != core::bitUtil::NO_BIT_SET)
 					{
+						// make it zero for log
+						if (mask_ofs[3] == core::bitUtil::NO_BIT_SET) {
+							mask_ofs[3] = 0;
+						}
+
 						// this is not a valid RGB
-						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16) provided(%i,%i,%i)",
-							mask_ofs[0], mask_ofs[1], mask_ofs[2]);
+						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16,0) provided(%i,%i,%i,%i)",
+							mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
 						return false;
 					}
 				}
