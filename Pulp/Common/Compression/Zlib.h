@@ -121,7 +121,7 @@ namespace Compression
 		X_NO_ASSIGN(ZlibDefalte);
 
 	public:
-		X_DECLARE_ENUM(DeflateResult)(ERROR, OK);
+		X_DECLARE_ENUM(DeflateResult)(ERROR, OK, DONE);
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 

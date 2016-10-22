@@ -384,12 +384,22 @@ namespace Compression
 
 				stream_->next_out = buffer_.data();
 				stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
+
+				if (res == Z_OK && finish) {
+					continue;
+				}
 			}
 			
 			if (res == Z_OK)
 			{
 				if (stream_->avail_in == 0)
 				{
+					// we should not reach here with finish,
+					if (finish) {
+						X_ASSERT_UNREACHABLE();
+						return DeflateResult::ERROR;
+					}
+
 					return DeflateResult::OK;
 				}
 
@@ -404,7 +414,7 @@ namespace Compression
 
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;
-				return DeflateResult::OK;
+				return DeflateResult::DONE;
 			}
 			else
 			{
