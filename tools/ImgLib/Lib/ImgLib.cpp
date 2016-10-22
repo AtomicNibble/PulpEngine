@@ -5,6 +5,8 @@
 
 #include <String\StringHash.h>
 #include "Converter\Converter.h"
+#include "Util\FloatImage.h"
+#include "Util\Filters.h"
 
 #include <ICi.h>
 #include <IFileSys.h>
@@ -26,6 +28,11 @@ ImgLib::~ImgLib()
 const char* ImgLib::getOutExtension(void) const
 {
 	return texture::CI_FILE_EXTENSION;
+}
+
+bool ImgLib::thumbGenerationSupported(void) const
+{
+	return true;
 }
 
 bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
@@ -492,6 +499,95 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	return true;
 }
 
+
+bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId)
+{
+	// load file data
+	core::Array<uint8_t> fileData(host.getScratchArena());
+	if (!host.GetAssetData(assetId, fileData)) {
+		X_ERROR("Img", "Failed to get asset data");
+		return false;
+	}
+
+	if (fileData.isEmpty()) {
+		X_ERROR("Img", "File data is empty");
+		return false;
+	}
+
+	ImgFileFormat::Enum inputFileFmt = Util::resolveSrcfmt(fileData);
+	if (inputFileFmt == ImgFileFormat::UNKNOWN) {
+		X_ERROR("Img", "Unknown img src format");
+		return false;
+	}
+
+	// load it :D
+	XTextureFile srcImg(host.getScratchArena());
+	if (!Util::loadImage(host.getScratchArena(), fileData, inputFileFmt, srcImg)) {
+		X_WARNING("Img", "Failed to load src image");
+		return false;
+	}
+
+	if (srcImg.getDepth() > 1 || srcImg.getNumFaces() > 1) {
+		X_WARNING("Img", "Thumb generation for multi face images not currenlty supported");
+		return false;
+	}
+
+	Vec2i srcDim(srcImg.getWidth(), srcImg.getHeight());
+	const Vec2i thumbDim(64, 64);
+
+	// remove mips
+	srcImg.dropMips();
+
+	// we want to shrink it down.
+	FloatImage fltImg(host.getScratchArena());
+	FloatImage fltThumb(host.getScratchArena());
+	if (!fltImg.initFrom(srcImg, 0, 0)) {
+		X_ERROR("Img", "Failed to load src image into FltImage");
+		return false;
+	}
+
+	BoxFilter filter;
+	fltImg.resize(fltThumb, host.getScratchArena(), filter, thumbDim.x, thumbDim.y, WrapMode::Clamp);
+
+	// now we want a textureFile.
+	XTextureFile thumb(host.getScratchArena());
+	thumb.setDepth(1);
+	thumb.setNumFaces(1);
+	thumb.setNumMips(1);
+	thumb.setWidth(thumbDim.x);
+	thumb.setHeigth(thumbDim.y);
+	thumb.setType(TextureType::T2D);
+	if (Util::hasAlpha(srcImg.getFormat())) {
+		thumb.setFormat(Texturefmt::R8G8B8A8);
+	}
+	else {
+		thumb.setFormat(Texturefmt::R8G8B8);
+	}
+	thumb.resize();
+
+	// save the float image to it.
+	if (!fltThumb.saveToImg(thumb, 0, 0)) {
+		X_ERROR("Img", "Failed to save thumb image");
+		return false;
+	}
+
+	// now save this image as PNG to a memory buffer.
+	core::XFileStream file(host.getScratchArena());
+	if (!Util::saveImage(host.getScratchArena(), &file, ImgFileFormat::PNG, thumb)) {
+		X_ERROR("Img", "Failed to save thumb image");
+		return false;
+	}
+	
+	// sanity.
+	const auto buf = file.buffer();
+	if (buf.isEmpty()) {
+		X_ERROR("Img", "Thumb data is empty");
+		return false;
+	}
+
+	host.UpdateAssetThumb(assetId, thumbDim, srcDim, buf);
+	return true;
+}
 
 
 X_NAMESPACE_END
