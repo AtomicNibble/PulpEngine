@@ -570,10 +570,13 @@ namespace PNG
 
 		using namespace core::Compression;
 
+		// micro optermisation, don't bother calculating tag crc each time lol.
+		uint32_t idataCrc = pCrc->Begin();
+		pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), idataCrc);
+
 		ZlibDefalte zlib(swapArena, [&] (const uint8_t* pData, size_t len) {
 			// get crc of block.
-			uint32_t crc = pCrc->Begin();
-			pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), crc);
+			uint32_t crc = idataCrc;
 			pCrc->Update(pData, len, crc);
 			crc = pCrc->Finish(crc);
 
