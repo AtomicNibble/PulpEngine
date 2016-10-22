@@ -107,7 +107,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	LinkModule(pICore_, "UnitTest");
 
 	if (!pICore_->IntializeLoadedEngineModule("Engine_ImgLib", "Engine_ImgLib")) {
-		X_ERROR("Render", "Failed to init imgLib");
+		Error("Failed to init imgLib");
 		return false;
 	}
 
