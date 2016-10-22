@@ -6,6 +6,10 @@
 
 #include <ITexture.h>
 
+X_NAMESPACE_DECLARE(core,
+	struct XFile;
+)
+
 X_NAMESPACE_BEGIN(texture)
 
 namespace Util
@@ -25,8 +29,13 @@ namespace Util
 
 	IMGLIB_EXPORT Texturefmt::Enum TexFmtFromStr(const char* pStr);
 	IMGLIB_EXPORT ImgFileFormat::Enum resolveSrcfmt(const core::Array<uint8_t>& fileData);
+	IMGLIB_EXPORT bool writeSupported(ImgFileFormat::Enum fmt);
 
+	// not exported currently.
+	bool loadImage(core::MemoryArenaBase* swap, const core::Array<uint8_t>& fileData, ImgFileFormat::Enum fmt, XTextureFile& img);
+	bool loadImage(core::MemoryArenaBase* swap, core::XFile* pFile, ImgFileFormat::Enum fmt, XTextureFile& img);
 
+	bool saveImage(core::MemoryArenaBase* swap, core::XFile* pFile, ImgFileFormat::Enum fmt, const XTextureFile& img);
 
 } // namespace Util
 

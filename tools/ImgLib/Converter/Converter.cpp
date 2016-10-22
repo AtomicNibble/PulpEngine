@@ -7,13 +7,6 @@
 
 #include <String\StringHash.h>
 
-#include "Fmts\TextureLoaderCI.h"
-#include "Fmts\TextureLoaderDDS.h"
-#include "Fmts\TextureLoaderJPG.h"
-#include "Fmts\TextureLoaderPNG.h"
-#include "Fmts\TextureLoaderPSD.h"
-#include "Fmts\TextureLoaderTGA.h"
-
 #include <Memory/AllocationPolicies/LinearAllocator.h>
 
 #include "Filters.h"
@@ -139,30 +132,11 @@ namespace Converter
 	} // namespace
 
 
-
-	static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
-
-
-	const size_t ImgConveter::MAX_FMT_CLASS_SIZE = core::Max<size_t>(
-		core::Max(
-			core::Max(
-				core::Max(
-					core::Max(
-						core::Max(
-							sizeof(DDS::XTexLoaderDDS),
-							sizeof(CI::XTexLoaderCI)),
-						sizeof(JPG::XTexLoaderJPG)),
-					sizeof(TGA::XTexLoaderTGA)),
-				sizeof(PSD::XTexLoaderPSD)),
-			sizeof(PNG::XTexLoaderPNG)),
-		16) + 256;
-
-
 	ImgConveter::ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena) :
 		swapArena_(swapArena),
 		srcImg_(imgArena),
 		dstImg_(imgArena),
-		useSrc_(false),
+		useSrc_(true),
 		multiThread_(true)
 	{
 
@@ -186,9 +160,7 @@ namespace Converter
 			return false;
 		}
 
-		core::XFileFixedBuf file(fileData.begin(), fileData.end());
-
-		return LoadImg(&file, inputFileFmt);
+		return Util::loadImage(swapArena_, fileData, inputFileFmt, srcImg_);
 	}
 
 	bool ImgConveter::LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt)
@@ -198,17 +170,9 @@ namespace Converter
 			return false;
 		}
 
-		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
-		core::LinearAllocator allocator(buf, buf + sizeof(buf));
+		useSrc_ = true;
 
-		useSrc_ = false;
-
-		ITextureFmt* pFmt = Allocfmt(&allocator, inputFileFmt);
-
-		bool res = pFmt->loadTexture(pFile, srcImg_, swapArena_);
-
-		core::Mem::Destruct<ITextureFmt>(pFmt);
-		return res;
+		return Util::loadImage(swapArena_, pFile, inputFileFmt, srcImg_);
 	}
 
 	bool ImgConveter::SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
@@ -227,12 +191,7 @@ namespace Converter
 
 	bool ImgConveter::SaveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
 	{
-		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
-		core::LinearAllocator allocator(buf, buf + sizeof(buf));
-		ITextureFmt* pFmt = Allocfmt(&allocator, dstFileFmt);
-
-		if (!pFmt->canWrite()) {
-			core::Mem::Destruct<ITextureFmt>(pFmt);
+		if (!Util::writeSupported(dstFileFmt)) {
 			X_ERROR("Img", "Writing to fmt: %s is not supported", ImgFileFormat::ToString(dstFileFmt));
 			return false;
 		}
@@ -240,7 +199,6 @@ namespace Converter
 		auto& img = useSrc_ ? srcImg_ : dstImg_;
 
 		if (!img.isValid()) {
-			core::Mem::Destruct<ITextureFmt>(pFmt);
 			X_ERROR("Img", "Failed to save img it's invalid");
 			return false;
 		}
@@ -279,9 +237,8 @@ namespace Converter
 		}
 
 
-		bool res = pFmt->saveTexture(pFile, img, swapArena_);
+		const bool res = Util::saveImage(swapArena_, pFile, dstFileFmt, img);
 
-		core::Mem::Destruct<ITextureFmt>(pFmt);
 		return res;
 	}
 
@@ -651,6 +608,9 @@ namespace Converter
 			useSrc_ = true;
 			return true;
 		}
+		else {
+			useSrc_ = false;
+		}
 
 		// input must be 32bit/pixel sRGB
 		// for HDR is 64bit/pixel half floats.
@@ -918,41 +878,6 @@ namespace Converter
 		}
 	}
 
-
-	ITextureFmt* ImgConveter::Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt)
-	{
-		ITextureFmt* pFmt = nullptr;
-
-		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img fmts? this code needs updating.");
-
-		switch (inputFileFmt)
-		{
-		case ImgFileFormat::DDS:
-			pFmt = core::Mem::Construct<DDS::XTexLoaderDDS>(pAllocator->allocate(sizeof(DDS::XTexLoaderDDS), X_ALIGN_OF(DDS::XTexLoaderDDS), 0));
-			break;
-		case ImgFileFormat::CI:
-			pFmt = core::Mem::Construct<CI::XTexLoaderCI>(pAllocator->allocate(sizeof(CI::XTexLoaderCI), X_ALIGN_OF(CI::XTexLoaderCI), 0));
-			break;
-		case ImgFileFormat::JPG:
-			pFmt = core::Mem::Construct<JPG::XTexLoaderJPG>(pAllocator->allocate(sizeof(JPG::XTexLoaderJPG), X_ALIGN_OF(JPG::XTexLoaderJPG), 0));
-			break;
-		case ImgFileFormat::TGA:
-			pFmt = core::Mem::Construct<TGA::XTexLoaderTGA>(pAllocator->allocate(sizeof(TGA::XTexLoaderTGA), X_ALIGN_OF(TGA::XTexLoaderTGA), 0));
-			break;
-		case ImgFileFormat::PSD:
-			pFmt = core::Mem::Construct<PSD::XTexLoaderPSD>(pAllocator->allocate(sizeof(PSD::XTexLoaderPSD), X_ALIGN_OF(PSD::XTexLoaderPSD), 0));
-			break;
-		case ImgFileFormat::PNG:
-			pFmt = core::Mem::Construct<PNG::XTexLoaderPNG>(pAllocator->allocate(sizeof(PNG::XTexLoaderPNG), X_ALIGN_OF(PNG::XTexLoaderPNG), 0));
-			break;
-
-		default:
-			X_ASSERT_UNREACHABLE();
-			break;
-		}
-
-		return pFmt;
-	}
 
 } // namespace Converter
 

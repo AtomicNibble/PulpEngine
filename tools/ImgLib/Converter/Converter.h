@@ -16,7 +16,6 @@ namespace Converter
 	
 	class ImgConveter
 	{
-		static const size_t MAX_FMT_CLASS_SIZE;
 		typedef core::traits::Function<void(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut)> CompressionFunc;
 
 		struct JobData
@@ -79,7 +78,6 @@ namespace Converter
 		static void compressJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 		static CompressionFunc::Pointer getCompressionFunc(Texturefmt::Enum fmt, Profile::Enum profile, bool keepAlpha);
-		static ITextureFmt* Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt);
 
 	private:
 		core::MemoryArenaBase* swapArena_;

@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "TextureUtil.h"
 
+#include <IFileSys.h>
+
 #include "Fmts\TextureLoaderCI.h"
 #include "Fmts\TextureLoaderDDS.h"
 #include "Fmts\TextureLoaderJPG.h"
@@ -10,10 +12,74 @@
 
 #include <Hashing\Fnva1Hash.h>
 
+#include <Memory/AllocationPolicies/LinearAllocator.h>
+
 X_NAMESPACE_BEGIN(texture)
 
 namespace Util
 {
+	namespace
+	{
+
+		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
+
+		const size_t MAX_FMT_CLASS_SIZE = core::Max<size_t>(
+			core::Max(
+				core::Max(
+					core::Max(
+						core::Max(
+							core::Max(
+								sizeof(DDS::XTexLoaderDDS),
+								sizeof(CI::XTexLoaderCI)),
+							sizeof(JPG::XTexLoaderJPG)),
+						sizeof(TGA::XTexLoaderTGA)),
+					sizeof(PSD::XTexLoaderPSD)),
+				sizeof(PNG::XTexLoaderPNG)),
+			8) + 64;
+
+		ITextureFmt* Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt)
+		{
+			ITextureFmt* pFmt = nullptr;
+
+			static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img fmts? this code needs updating.");
+
+			switch (inputFileFmt)
+			{
+				case ImgFileFormat::DDS:
+					pFmt = core::Mem::Construct<DDS::XTexLoaderDDS>(pAllocator->allocate(sizeof(DDS::XTexLoaderDDS), X_ALIGN_OF(DDS::XTexLoaderDDS), 0));
+					break;
+				case ImgFileFormat::CI:
+					pFmt = core::Mem::Construct<CI::XTexLoaderCI>(pAllocator->allocate(sizeof(CI::XTexLoaderCI), X_ALIGN_OF(CI::XTexLoaderCI), 0));
+					break;
+				case ImgFileFormat::JPG:
+					pFmt = core::Mem::Construct<JPG::XTexLoaderJPG>(pAllocator->allocate(sizeof(JPG::XTexLoaderJPG), X_ALIGN_OF(JPG::XTexLoaderJPG), 0));
+					break;
+				case ImgFileFormat::TGA:
+					pFmt = core::Mem::Construct<TGA::XTexLoaderTGA>(pAllocator->allocate(sizeof(TGA::XTexLoaderTGA), X_ALIGN_OF(TGA::XTexLoaderTGA), 0));
+					break;
+				case ImgFileFormat::PSD:
+					pFmt = core::Mem::Construct<PSD::XTexLoaderPSD>(pAllocator->allocate(sizeof(PSD::XTexLoaderPSD), X_ALIGN_OF(PSD::XTexLoaderPSD), 0));
+					break;
+				case ImgFileFormat::PNG:
+					pFmt = core::Mem::Construct<PNG::XTexLoaderPNG>(pAllocator->allocate(sizeof(PNG::XTexLoaderPNG), X_ALIGN_OF(PNG::XTexLoaderPNG), 0));
+					break;
+
+				default:
+					X_ASSERT_UNREACHABLE();
+					break;
+			}
+
+			return pFmt;
+		}
+
+		void FreeFmt(ITextureFmt* pFmt)
+		{
+			core::Mem::Destruct<ITextureFmt>(pFmt);
+		}
+
+
+	} // namespace
+
 
 	uint32_t maxMipsForSize(uint32_t Width, uint32_t Height)
 	{
@@ -30,28 +96,28 @@ namespace Util
 	{
 		switch (fmt)
 		{
-		case Texturefmt::BC3:
-		case Texturefmt::BC3_SRGB:
-		case Texturefmt::BC3_TYPELESS:
-		case Texturefmt::BC7:
-		case Texturefmt::BC7_TYPELESS:
-		case Texturefmt::BC7_SRGB:
-		case Texturefmt::R8G8B8A8:
-		case Texturefmt::R8G8B8A8_SRGB:
-		case Texturefmt::R8G8B8A8_SNORM:
-		case Texturefmt::R8G8B8A8_TYPELESS:
-		case Texturefmt::R8G8B8A8_SINT:
-		case Texturefmt::R8G8B8A8_UINT:
-		case Texturefmt::A8R8G8B8:
-		case Texturefmt::B8G8R8A8:
-		case Texturefmt::B8G8R8A8_SRGB:
-		case Texturefmt::B8G8R8A8_TYPELESS:
-		case Texturefmt::R10G10B10A2:
-		case Texturefmt::R16G16B16A16_FLOAT:
-			return true;
+			case Texturefmt::BC3:
+			case Texturefmt::BC3_SRGB:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC7:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::BC7_SRGB:
+			case Texturefmt::R8G8B8A8:
+			case Texturefmt::R8G8B8A8_SRGB:
+			case Texturefmt::R8G8B8A8_SNORM:
+			case Texturefmt::R8G8B8A8_TYPELESS:
+			case Texturefmt::R8G8B8A8_SINT:
+			case Texturefmt::R8G8B8A8_UINT:
+			case Texturefmt::A8R8G8B8:
+			case Texturefmt::B8G8R8A8:
+			case Texturefmt::B8G8R8A8_SRGB:
+			case Texturefmt::B8G8R8A8_TYPELESS:
+			case Texturefmt::R10G10B10A2:
+			case Texturefmt::R16G16B16A16_FLOAT:
+				return true;
 
-		default: 
-			break;
+			default:
+				break;
 		}
 
 		return false;
@@ -61,31 +127,31 @@ namespace Util
 	{
 		switch (fmt)
 		{
-		case Texturefmt::BC1:
-		case Texturefmt::BC1_SRGB:
-		case Texturefmt::BC1_TYPELESS:
-		case Texturefmt::BC4:
-		case Texturefmt::BC4_SNORM:
-		case Texturefmt::BC4_TYPELESS:
-		case Texturefmt::BC2:
-		case Texturefmt::BC2_SRGB:
-		case Texturefmt::BC2_TYPELESS:
-		case Texturefmt::BC3:
-		case Texturefmt::BC3_SRGB:
-		case Texturefmt::BC3_TYPELESS:
-		case Texturefmt::BC5:
-		case Texturefmt::BC5_SNORM:
-		case Texturefmt::BC5_TYPELESS:
-		case Texturefmt::BC6:
-		case Texturefmt::BC6_TYPELESS:
-		case Texturefmt::BC6_SF16:
-		case Texturefmt::BC7:
-		case Texturefmt::BC7_TYPELESS:
-		case Texturefmt::BC7_SRGB:
-		case Texturefmt::ATI2:
-		case Texturefmt::ATI2_XY:
-			return true;
-		default: break;
+			case Texturefmt::BC1:
+			case Texturefmt::BC1_SRGB:
+			case Texturefmt::BC1_TYPELESS:
+			case Texturefmt::BC4:
+			case Texturefmt::BC4_SNORM:
+			case Texturefmt::BC4_TYPELESS:
+			case Texturefmt::BC2:
+			case Texturefmt::BC2_SRGB:
+			case Texturefmt::BC2_TYPELESS:
+			case Texturefmt::BC3:
+			case Texturefmt::BC3_SRGB:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC5:
+			case Texturefmt::BC5_SNORM:
+			case Texturefmt::BC5_TYPELESS:
+			case Texturefmt::BC6:
+			case Texturefmt::BC6_TYPELESS:
+			case Texturefmt::BC6_SF16:
+			case Texturefmt::BC7:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::BC7_SRGB:
+			case Texturefmt::ATI2:
+			case Texturefmt::ATI2_XY:
+				return true;
+			default: break;
 		}
 		return false;
 	}
@@ -94,80 +160,80 @@ namespace Util
 	{
 		switch (fmt)
 		{
-		case Texturefmt::BC1:
-		case Texturefmt::BC1_SRGB:
-		case Texturefmt::BC1_TYPELESS:
-		case Texturefmt::BC4:
-		case Texturefmt::BC4_SNORM:
-		case Texturefmt::BC4_TYPELESS:
-			return 4;
+			case Texturefmt::BC1:
+			case Texturefmt::BC1_SRGB:
+			case Texturefmt::BC1_TYPELESS:
+			case Texturefmt::BC4:
+			case Texturefmt::BC4_SNORM:
+			case Texturefmt::BC4_TYPELESS:
+				return 4;
 
-		case Texturefmt::A8:
-			return 8;
+			case Texturefmt::A8:
+				return 8;
 
-		case Texturefmt::BC2:
-		case Texturefmt::BC2_SRGB:
-		case Texturefmt::BC2_TYPELESS:
-		case Texturefmt::BC3:
-		case Texturefmt::BC3_SRGB:
-		case Texturefmt::BC3_TYPELESS:
-		case Texturefmt::BC5:
-		case Texturefmt::BC5_SNORM:
-		case Texturefmt::BC5_TYPELESS:
-		case Texturefmt::BC6:
-		case Texturefmt::BC6_TYPELESS:
-		case Texturefmt::BC6_SF16:
-		case Texturefmt::BC7:
-		case Texturefmt::BC7_TYPELESS:
-		case Texturefmt::BC7_SRGB:
-			return 8;
+			case Texturefmt::BC2:
+			case Texturefmt::BC2_SRGB:
+			case Texturefmt::BC2_TYPELESS:
+			case Texturefmt::BC3:
+			case Texturefmt::BC3_SRGB:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC5:
+			case Texturefmt::BC5_SNORM:
+			case Texturefmt::BC5_TYPELESS:
+			case Texturefmt::BC6:
+			case Texturefmt::BC6_TYPELESS:
+			case Texturefmt::BC6_SF16:
+			case Texturefmt::BC7:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::BC7_SRGB:
+				return 8;
 
-		case Texturefmt::ATI2:
-		case Texturefmt::ATI2_XY:
-			return 8;
+			case Texturefmt::ATI2:
+			case Texturefmt::ATI2_XY:
+				return 8;
 
-		case Texturefmt::R8G8:
-		case Texturefmt::R8G8_TYPELESS:
-		case Texturefmt::R8G8_SNORM:
-		case Texturefmt::R8G8_UNIT:
-		case Texturefmt::R8G8_SINT:
-			return 16;
+			case Texturefmt::R8G8:
+			case Texturefmt::R8G8_TYPELESS:
+			case Texturefmt::R8G8_SNORM:
+			case Texturefmt::R8G8_UNIT:
+			case Texturefmt::R8G8_SINT:
+				return 16;
 
-		case Texturefmt::R8G8B8:		
-		case Texturefmt::B8G8R8:		
-			return 24;
+			case Texturefmt::R8G8B8:
+			case Texturefmt::B8G8R8:
+				return 24;
 
 
-		case Texturefmt::R16G16_FLOAT:
-		case Texturefmt::R16G16:
-		case Texturefmt::R16G16_SRGB:
-		case Texturefmt::R16G16_SNORM:
-		case Texturefmt::R16G16_SINT:
-		case Texturefmt::R16G16_UINT:
-		case Texturefmt::R16G16_TYPELESS:
+			case Texturefmt::R16G16_FLOAT:
+			case Texturefmt::R16G16:
+			case Texturefmt::R16G16_SRGB:
+			case Texturefmt::R16G16_SNORM:
+			case Texturefmt::R16G16_SINT:
+			case Texturefmt::R16G16_UINT:
+			case Texturefmt::R16G16_TYPELESS:
 
-		case Texturefmt::R8G8B8A8:	
-		case Texturefmt::R8G8B8A8_SRGB:
-		case Texturefmt::R8G8B8A8_SNORM:
-		case Texturefmt::R8G8B8A8_TYPELESS:
-		case Texturefmt::R8G8B8A8_SINT:
-		case Texturefmt::R8G8B8A8_UINT:
+			case Texturefmt::R8G8B8A8:
+			case Texturefmt::R8G8B8A8_SRGB:
+			case Texturefmt::R8G8B8A8_SNORM:
+			case Texturefmt::R8G8B8A8_TYPELESS:
+			case Texturefmt::R8G8B8A8_SINT:
+			case Texturefmt::R8G8B8A8_UINT:
 
-		case Texturefmt::A8R8G8B8:
+			case Texturefmt::A8R8G8B8:
 
-		case Texturefmt::B8G8R8A8:
-		case Texturefmt::B8G8R8A8_SRGB:
-		case Texturefmt::B8G8R8A8_TYPELESS:
-			return 32;
+			case Texturefmt::B8G8R8A8:
+			case Texturefmt::B8G8R8A8_SRGB:
+			case Texturefmt::B8G8R8A8_TYPELESS:
+				return 32;
 
-		case Texturefmt::R10G10B10A2:	
-			return 32;
+			case Texturefmt::R10G10B10A2:
+				return 32;
 
-		case Texturefmt::R16G16B16A16_FLOAT:
-			return 64;
+			case Texturefmt::R16G16B16A16_FLOAT:
+				return 64;
 
-		default:
-			break;
+			default:
+				break;
 		}
 		X_ASSERT_UNREACHABLE();
 		return 0;
@@ -178,37 +244,37 @@ namespace Util
 	{
 		switch (fmt)
 		{
-		case Texturefmt::BC1:
-		case Texturefmt::BC1_SRGB:
-		case Texturefmt::BC1_TYPELESS:
-		case Texturefmt::BC4:
-		case Texturefmt::BC4_SNORM:
-		case Texturefmt::BC4_TYPELESS:
-			return 8;
+			case Texturefmt::BC1:
+			case Texturefmt::BC1_SRGB:
+			case Texturefmt::BC1_TYPELESS:
+			case Texturefmt::BC4:
+			case Texturefmt::BC4_SNORM:
+			case Texturefmt::BC4_TYPELESS:
+				return 8;
 
-		case Texturefmt::BC2:
-		case Texturefmt::BC2_SRGB:
-		case Texturefmt::BC2_TYPELESS:
-		case Texturefmt::BC3:
-		case Texturefmt::BC3_SRGB:
-		case Texturefmt::BC3_TYPELESS:
-		case Texturefmt::BC5:
-		case Texturefmt::BC5_SNORM:
-		case Texturefmt::BC5_TYPELESS:
-		case Texturefmt::BC6:
-		case Texturefmt::BC6_TYPELESS:
-		case Texturefmt::BC6_SF16:
-		case Texturefmt::BC7:
-		case Texturefmt::BC7_TYPELESS:
-		case Texturefmt::BC7_SRGB:
-			return 16;
+			case Texturefmt::BC2:
+			case Texturefmt::BC2_SRGB:
+			case Texturefmt::BC2_TYPELESS:
+			case Texturefmt::BC3:
+			case Texturefmt::BC3_SRGB:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC5:
+			case Texturefmt::BC5_SNORM:
+			case Texturefmt::BC5_TYPELESS:
+			case Texturefmt::BC6:
+			case Texturefmt::BC6_TYPELESS:
+			case Texturefmt::BC6_SF16:
+			case Texturefmt::BC7:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::BC7_SRGB:
+				return 16;
 
-		case Texturefmt::ATI2:			
-		case Texturefmt::ATI2_XY:       
-			return 16;
+			case Texturefmt::ATI2:
+			case Texturefmt::ATI2_XY:
+				return 16;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		X_ASSERT_UNREACHABLE();
@@ -299,40 +365,40 @@ namespace Util
 
 		switch (fmt)
 		{
-		case Texturefmt::BC1:
-		case Texturefmt::BC1_SRGB:
-		case Texturefmt::BC1_TYPELESS:
-		case Texturefmt::BC4:
-		case Texturefmt::BC4_SNORM:
-		case Texturefmt::BC4_TYPELESS:
-			blockComp = true;
-			bytesPerElem = 8;
-			break;
+			case Texturefmt::BC1:
+			case Texturefmt::BC1_SRGB:
+			case Texturefmt::BC1_TYPELESS:
+			case Texturefmt::BC4:
+			case Texturefmt::BC4_SNORM:
+			case Texturefmt::BC4_TYPELESS:
+				blockComp = true;
+				bytesPerElem = 8;
+				break;
 
-		case Texturefmt::BC2:
-		case Texturefmt::BC2_SRGB:
-		case Texturefmt::BC2_TYPELESS:
-		case Texturefmt::BC3:
-		case Texturefmt::BC3_SRGB:
-		case Texturefmt::BC3_TYPELESS:
-		case Texturefmt::BC5:
-		case Texturefmt::BC5_SNORM:
-		case Texturefmt::BC5_TYPELESS:
-		case Texturefmt::BC6:
-		case Texturefmt::BC6_TYPELESS:
-		case Texturefmt::BC6_SF16:
-		case Texturefmt::BC7:
-		case Texturefmt::BC7_TYPELESS:
-		case Texturefmt::BC7_SRGB:
+			case Texturefmt::BC2:
+			case Texturefmt::BC2_SRGB:
+			case Texturefmt::BC2_TYPELESS:
+			case Texturefmt::BC3:
+			case Texturefmt::BC3_SRGB:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC5:
+			case Texturefmt::BC5_SNORM:
+			case Texturefmt::BC5_TYPELESS:
+			case Texturefmt::BC6:
+			case Texturefmt::BC6_TYPELESS:
+			case Texturefmt::BC6_SF16:
+			case Texturefmt::BC7:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::BC7_SRGB:
 
-		case Texturefmt::ATI2:
-		case Texturefmt::ATI2_XY:
-			blockComp = true;
-			bytesPerElem = 16;
-			break;
+			case Texturefmt::ATI2:
+			case Texturefmt::ATI2_XY:
+				blockComp = true;
+				bytesPerElem = 16;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		if (blockComp)
@@ -386,40 +452,40 @@ namespace Util
 
 		switch (fmt)
 		{
-		case Texturefmt::BC1:
-		case Texturefmt::BC1_SRGB:
-		case Texturefmt::BC1_TYPELESS:
-		case Texturefmt::BC4:
-		case Texturefmt::BC4_SNORM:
-		case Texturefmt::BC4_TYPELESS:
-			blockComp = true;
-			bytesPerElem = 8;
-			break;
+			case Texturefmt::BC1:
+			case Texturefmt::BC1_SRGB:
+			case Texturefmt::BC1_TYPELESS:
+			case Texturefmt::BC4:
+			case Texturefmt::BC4_SNORM:
+			case Texturefmt::BC4_TYPELESS:
+				blockComp = true;
+				bytesPerElem = 8;
+				break;
 
-		case Texturefmt::BC2:
-		case Texturefmt::BC2_SRGB:
-		case Texturefmt::BC2_TYPELESS:
-		case Texturefmt::BC3:
-		case Texturefmt::BC3_SRGB:
-		case Texturefmt::BC3_TYPELESS:
-		case Texturefmt::BC5:
-		case Texturefmt::BC5_SNORM:
-		case Texturefmt::BC5_TYPELESS:
-		case Texturefmt::BC6:
-		case Texturefmt::BC6_TYPELESS:
-		case Texturefmt::BC6_SF16:
-		case Texturefmt::BC7:
-		case Texturefmt::BC7_TYPELESS:
-		case Texturefmt::BC7_SRGB:
+			case Texturefmt::BC2:
+			case Texturefmt::BC2_SRGB:
+			case Texturefmt::BC2_TYPELESS:
+			case Texturefmt::BC3:
+			case Texturefmt::BC3_SRGB:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC5:
+			case Texturefmt::BC5_SNORM:
+			case Texturefmt::BC5_TYPELESS:
+			case Texturefmt::BC6:
+			case Texturefmt::BC6_TYPELESS:
+			case Texturefmt::BC6_SF16:
+			case Texturefmt::BC7:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::BC7_SRGB:
 
-		case Texturefmt::ATI2:
-		case Texturefmt::ATI2_XY:
-			blockComp = true;
-			bytesPerElem = 16;
-			break;
+			case Texturefmt::ATI2:
+			case Texturefmt::ATI2_XY:
+				blockComp = true;
+				bytesPerElem = 16;
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		if (blockComp)
@@ -568,7 +634,7 @@ namespace Util
 				return Texturefmt::BC5_SNORM;
 			case "BC5_TYPELESS"_fnv1a:
 				return Texturefmt::BC5_TYPELESS;
-		
+
 			case "BC6"_fnv1a:
 				return Texturefmt::BC6;
 			case "BC6_SF16"_fnv1a:
@@ -621,6 +687,57 @@ namespace Util
 		}
 
 		return ImgFileFormat::UNKNOWN;
+	}
+
+	bool writeSupported(ImgFileFormat::Enum fmt)
+	{
+		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
+		core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+		ITextureFmt* pFmt = Allocfmt(&allocator, fmt);
+
+		const bool res = pFmt->canWrite();
+
+		FreeFmt(pFmt);
+
+		return res;
+	}
+
+	// ==================================================================
+
+	bool loadImage(core::MemoryArenaBase* swap, const core::Array<uint8_t>& fileData, ImgFileFormat::Enum fmt, XTextureFile& img)
+	{
+		core::XFileFixedBuf file(fileData.begin(), fileData.end());
+
+		return loadImage(swap, &file, fmt, img);
+	}
+
+	bool loadImage(core::MemoryArenaBase* swap, core::XFile* pFile, ImgFileFormat::Enum fmt, XTextureFile& img)
+	{
+		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
+		core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+		ITextureFmt* pFmt = Allocfmt(&allocator, fmt);
+
+		const bool res = pFmt->loadTexture(pFile, img, swap);
+
+		FreeFmt(pFmt);
+
+		return res;
+	}
+
+	bool saveImage(core::MemoryArenaBase* swap, core::XFile* pFile, ImgFileFormat::Enum fmt, const XTextureFile& img)
+	{
+		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
+		core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+		ITextureFmt* pFmt = Allocfmt(&allocator, fmt);
+
+		const bool res = pFmt->saveTexture(pFile, img, swap);
+
+		FreeFmt(pFmt);
+
+		return res;
 	}
 
 } // namespace Util
