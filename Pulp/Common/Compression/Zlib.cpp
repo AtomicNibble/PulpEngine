@@ -170,7 +170,7 @@ namespace Compression
 
 		if (res != Z_STREAM_END)
 		{
-			X_ERROR("Zlib", "defalte error: %i -> %s", res, ZlibErrToStr(res));
+			X_ERROR("Zlib", "defalte error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
 			return false;
 		}
 		else
@@ -214,7 +214,7 @@ namespace Compression
 		{
 			X_ERROR("Zlib", "inflate error: %" PRIi32 " -> %s", res, ZlibErrToStr(res));
 			if (res == Z_OK) {
-				X_ERROR("Zlib", "dest buffer is too small %i bytes left in src.", stream.avail_in);
+				X_ERROR("Zlib", "dest buffer is too small %" PRIu32 " bytes left in src.", stream.avail_in);
 			}
 			return false;
 		}

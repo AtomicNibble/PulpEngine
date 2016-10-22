@@ -67,14 +67,14 @@ namespace Compression
 		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
 		char* pDst = reinterpret_cast<char*>(pDstBuf);
 
-		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
-		int detSize = safe_static_cast<int, size_t>(destBufLen);
+		const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
+		const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		int res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
+		const int32_t res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
 				compressLevelToAcceleration(lvl));
 
 		if (res <= 0) {
-			X_ERROR("LZ4", "Failed to compress buffer: %i", res);
+			X_ERROR("LZ4", "Failed to compress buffer: %" PRIi32, res);
 			destLenOut = 0;
 			return false;
 		}
@@ -91,13 +91,12 @@ namespace Compression
 
 		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
 		char* pDst = reinterpret_cast<char*>(pDstBuf);
+		const int32_t size = safe_static_cast<int, size_t>(destBufLen);
 
-		int size = safe_static_cast<int, size_t>(destBufLen);
-
-		int res = LZ4_decompress_fast(pSrc, pDst, size);
+		const int32_t res = LZ4_decompress_fast(pSrc, pDst, size);
 
 		if (res <= 0) {
-			X_ERROR("LZ4", "Failed to decompress buffer: %i", res);
+			X_ERROR("LZ4", "Failed to decompress buffer: %" PRIi32, res);
 			return false;
 		}
 		return true;
@@ -114,15 +113,13 @@ namespace Compression
 		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
 		char* pDst = reinterpret_cast<char*>(pDstBuf);
 
-		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
-		int detSize = safe_static_cast<int, size_t>(destBufLen);
+		const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
+		const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
 
-
-		int res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, compressLevelToAccelerationHC(lvl));
+		const int32_t res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, compressLevelToAccelerationHC(lvl));
 	
-
 		if (res <= 0) {
-			X_ERROR("LZ4", "Failed to compress buffer: %i", res);
+			X_ERROR("LZ4", "Failed to compress buffer: %" PRIi32, res);
 			destLenOut = 0;
 			return false;
 		}
