@@ -423,7 +423,7 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 	X_ASSERT(pCon->thumbGenerationSupported(), "thumb generatino not supported")();
 
 	if (!pCon->CreateThumb(*this, assetId)) {
-		X_ERROR("Converter", "Failed to generate thumbs for \"%s\" \"%s\"", name.c_str(), AssetType::ToString(assType));
+		X_ERROR("Converter", "Failed to generate thumb for \"%s\" \"%s\"", name.c_str(), AssetType::ToString(assType));
 		return false;
 	}
 
