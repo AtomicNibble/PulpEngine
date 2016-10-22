@@ -607,9 +607,18 @@ namespace PNG
 			// deflate row.
 			const bool lastRow = (row + 1) == rows;
 			res = zlib.Deflate(pSrc, rowBytes, lastRow);
-			if (res != ZlibDefalte::Result::OK) {
-				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::Result::ToString(res));
-				return false;
+
+			if (lastRow) {
+				if (res != ZlibDefalte::Result::DONE) {
+					X_ERROR("TexturePNG", "Failed to deflate(flush) image \"%s\"", ZlibDefalte::Result::ToString(res));
+					return false;
+				}
+			}
+			else {
+				if (res != ZlibDefalte::Result::OK) {
+					X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::Result::ToString(res));
+					return false;
+				}
 			}
 
 			pSrc += rowBytes;
