@@ -23,7 +23,7 @@ namespace Converter
 		FloatImage(core::MemoryArenaBase* arena);
 		~FloatImage();
 
-		bool initFrom(const XTextureFile& img, int32_t face, int32_t mip);
+		bool initFrom(const XTextureFile& img, int32_t face, int32_t mip, bool forceAlphaChannel = false);
 		bool saveToImg(XTextureFile& img, int32_t face, int32_t mip);
 
 

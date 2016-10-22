@@ -58,7 +58,7 @@ namespace Converter
 
 	}
 
-	bool FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip)
+	bool FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip, bool forceAlphaChannel)
 	{
 		clear();
 
@@ -71,24 +71,27 @@ namespace Converter
 			return false;
 		}
 
+		const bool hasAlpha = !(img.getFormat() == Texturefmt::R8G8B8 || img.getFormat() == Texturefmt::B8G8R8);
+
 		// need to get width of the mip.
 		{
+			const uint32_t channels = (hasAlpha || forceAlphaChannel) ? 4 : 3;
+
 			const uint32_t mipWidth = core::Max<uint32_t>(1u, img.getWidth() >> mip);
 			const uint32_t mipHeight = core::Max<uint32_t>(1u, img.getHeight() >> mip);
-			allocate(4, mipWidth, mipHeight, 1);
+			allocate(channels, mipWidth, mipHeight, 1);
 		}
 
 		float* pRed_channel = channel(0);
 		float* pGreen_channel = channel(1);
 		float* pBlue_channel = channel(2);
-		float* pAlpha_channel = channel(3);
+		float* pAlpha_channel = nullptr;
 
-		uint32_t pixelStride = 4;
+		uint32_t pixelStride = 3;
 
-		if (img.getFormat() == Texturefmt::R8G8B8 ||
-			img.getFormat() == Texturefmt::B8G8R8)
-		{
-			pixelStride = 3;
+		if (hasAlpha) {
+			// don't set this if only forceAlphaChannel, as this is input stride.
+			pixelStride = 4;
 		}
 
 		// lets do each channel one by one.
@@ -111,16 +114,29 @@ namespace Converter
 			pBlue_channel[i] = static_cast<float>(blue) / 255.f;
 		}
 
-		if (img.getFormat() != Texturefmt::R8G8B8 ||
-			img.getFormat() != Texturefmt::B8G8R8)
+		if (hasAlpha || forceAlphaChannel)
 		{
-			for (uint32_t i = 0; i < count; i++)
+			pAlpha_channel = channel(3);
+
+			if (hasAlpha)
 			{
-				uint8_t alpha = pData[(i * pixelStride) + 3];
-				pAlpha_channel[i] = static_cast<float>(alpha) / 255.f;
+				for (uint32_t i = 0; i < count; i++) {
+					uint8_t alpha = pData[(i * pixelStride) + 3];
+					pAlpha_channel[i] = static_cast<float>(alpha) / 255.f;
+				}
+			}
+			else // forceAlphaChannel
+			{
+				X_ASSERT(forceAlphaChannel, "Invalid logic")(forceAlphaChannel);
+
+				for (uint32_t i = 0; i < count; i++) {
+					pAlpha_channel[i] = 1.f;
+				}
 			}
 		}
-		else
+
+		return true;
+	}
 
 	bool FloatImage::saveToImg(XTextureFile& img, int32_t face, int32_t mip)
 	{
