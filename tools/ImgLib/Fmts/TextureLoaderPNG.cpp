@@ -398,7 +398,7 @@ namespace PNG
 		uint32_t tagName;
 		uint32_t blockCrc;
 
-		ZlibInflate::InflateResult::Enum zRes;
+		ZlibInflate::Result::Enum zRes;
 
 		// going to just load the block in chuncks so even if a png is saved as single large block.
 		// my memory usage will stay low.
@@ -430,7 +430,7 @@ namespace PNG
 				// infalte it baby.
 				zRes = inflater.Inflate(deflatedData.ptr(), readSize);
 
-				if (zRes == ZlibInflate::InflateResult::ERROR) {
+				if (zRes == ZlibInflate::Result::ERROR) {
 					X_ERROR("TexturePNG", "Zlib error");
 					return false;
 				}
@@ -472,7 +472,7 @@ namespace PNG
 
 		} while (tagName == PNG_TAG_IDAT);
 
-		if (zRes != ZlibInflate::InflateResult::DONE) {
+		if (zRes != ZlibInflate::Result::DONE) {
 			X_ERROR("TexturePNG", "Potential zlib error, did not inflate expected amount");
 			return false;
 		}
@@ -599,16 +599,16 @@ namespace PNG
 			const FilterMethodType::Enum filterType = FilterMethodType::None;
 
 			auto res = zlib.Deflate(&filterType, sizeof(filterType), false);
-			if (res != ZlibDefalte::DeflateResult::OK) {
-				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::DeflateResult::ToString(res));
+			if (res != ZlibDefalte::Result::OK) {
+				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::Result::ToString(res));
 				return false;
 			}
 
 			// deflate row.
 			const bool lastRow = (row + 1) == rows;
 			res = zlib.Deflate(pSrc, rowBytes, lastRow);
-			if (res != ZlibDefalte::DeflateResult::OK) {
-				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::DeflateResult::ToString(res));
+			if (res != ZlibDefalte::Result::OK) {
+				X_ERROR("TexturePNG", "Failed to deflate image \"%s\"", ZlibDefalte::Result::ToString(res));
 				return false;
 			}
 

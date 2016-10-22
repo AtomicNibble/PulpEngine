@@ -91,7 +91,7 @@ namespace Compression
 		X_NO_ASSIGN(ZlibInflate);
 
 	public:
-		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
+		X_DECLARE_ENUM(Result)(ERROR,OK,DONE);
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 
@@ -103,7 +103,7 @@ namespace Compression
 
 		void setBufferSize(size_t size);
 
-		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
+		Result::Enum Inflate(const void* pCompessedData, size_t len);
 
 	private:
 		InflateCallback callback_;
@@ -121,7 +121,7 @@ namespace Compression
 		X_NO_ASSIGN(ZlibDefalte);
 
 	public:
-		X_DECLARE_ENUM(DeflateResult)(ERROR, OK, DONE);
+		typedef ZlibInflate::Result Result;
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 
@@ -135,7 +135,7 @@ namespace Compression
 
 		// this will accept N input blocks and call the deflate callback everytime the buffer is full or we are flusing (finish == true)
 		// you can just pass a huge src block with finish == true and the callback will keep been called with blocks untill it's finished.
-		DeflateResult::Enum Deflate(const void* pSrcData, size_t len, bool finish);
+		Result::Enum Deflate(const void* pSrcData, size_t len, bool finish);
 
 	private:
 		DeflateCallback callback_;

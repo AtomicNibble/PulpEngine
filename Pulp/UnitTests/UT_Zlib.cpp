@@ -104,7 +104,7 @@ TEST(Zlib, bufferedInflate)
 			pDst += len;
 		});
 
-		ZlibInflate::InflateResult::Enum res;
+		ZlibInflate::Result::Enum res;
 
 		const size_t bufSize = 256;
 		size_t bufLeft = deflatedSize;
@@ -119,13 +119,13 @@ TEST(Zlib, bufferedInflate)
 			bufLeft -= srcSize;
 
 			i++;
-		} while (res == ZlibInflate::InflateResult::OK);
+		} while (res == ZlibInflate::Result::OK);
 
 
 		EXPECT_EQ(0, bufLeft);
-		EXPECT_EQ(ZlibInflate::InflateResult::DONE, res);
+		EXPECT_EQ(ZlibInflate::Result::DONE, res);
 
-		if (ZlibInflate::InflateResult::DONE == res)
+		if (ZlibInflate::Result::DONE == res)
 		{
 			EXPECT_EQ(0, memcmp(pUncompressed, pUncompressed2, srcBufSize));
 		}
@@ -168,7 +168,7 @@ TEST(Zlib, bufferedInflate2)
 
 		inflater.setBufferSize(1);
 
-		ZlibInflate::InflateResult::Enum res;
+		ZlibInflate::Result::Enum res;
 
 		const size_t bufSize = 256;
 		size_t bufLeft = deflatedSize;
@@ -183,13 +183,13 @@ TEST(Zlib, bufferedInflate2)
 			bufLeft -= srcSize;
 
 			i++;
-		} while (res == ZlibInflate::InflateResult::OK);
+		} while (res == ZlibInflate::Result::OK);
 
 
 		EXPECT_EQ(0, bufLeft);
-		EXPECT_EQ(ZlibInflate::InflateResult::DONE, res);
+		EXPECT_EQ(ZlibInflate::Result::DONE, res);
 
-		if (ZlibInflate::InflateResult::DONE == res)
+		if (ZlibInflate::Result::DONE == res)
 		{
 			EXPECT_EQ(0, memcmp(pUncompressed, pUncompressed2, srcBufSize));
 		}
@@ -216,7 +216,7 @@ TEST(Zlib, bufferedDeflate)
 	});
 
 	deflater.setBufferSize(1);
-	ZlibDefalte::DeflateResult::Enum res;
+	ZlibDefalte::Result::Enum res;
 
 	{
 		const size_t bufSize = 256;
@@ -233,10 +233,10 @@ TEST(Zlib, bufferedDeflate)
 			res = deflater.Deflate(&pUncompressed[bufSize * i], srcSize, last);
 
 			i++;
-		} while (res == ZlibDefalte::DeflateResult::OK && bufLeft > 0);
+		} while (res == ZlibDefalte::Result::OK && bufLeft > 0);
 
 		EXPECT_EQ(0, bufLeft);
-		EXPECT_EQ(ZlibDefalte::DeflateResult::DONE, res);
+		EXPECT_EQ(ZlibDefalte::Result::DONE, res);
 	}
 
 	// now deflate normal and compare.
@@ -244,7 +244,7 @@ TEST(Zlib, bufferedDeflate)
 	bool inflateOk = Zlib::inflate(g_arena, pDeflated, deflatedSize, pUncompressed2, srcBufSize);
 	EXPECT_TRUE(inflateOk);
 
-	if (ZlibDefalte::DeflateResult::DONE == res)
+	if (ZlibDefalte::Result::DONE == res)
 	{
 		EXPECT_EQ(0, memcmp(pUncompressed, pUncompressed2, srcBufSize));
 	}

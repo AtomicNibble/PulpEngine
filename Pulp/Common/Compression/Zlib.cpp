@@ -266,12 +266,12 @@ namespace Compression
 		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 	}
 
-	ZlibInflate::InflateResult::Enum ZlibInflate::Inflate(const void* pCompessedData, size_t len)
+	ZlibInflate::Result::Enum ZlibInflate::Inflate(const void* pCompessedData, size_t len)
 	{
 		X_ASSERT_NOT_NULL(pCompessedData);
 
 		if (len == 0) {
-			return InflateResult::OK;
+			return Result::OK;
 		}
 
 		if (buffer_.isEmpty()) {
@@ -298,7 +298,7 @@ namespace Compression
 			{
 				if (stream_->avail_in == 0)
 				{
-					return InflateResult::OK;
+					return Result::OK;
 				}
 
 				// continue.
@@ -312,14 +312,14 @@ namespace Compression
 
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;
-				return InflateResult::DONE;
+				return Result::DONE;
 			}
 			else
 			{
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;
 				X_ERROR("Zlib", "Inflate error %" PRIi32 " -> %s", res, ZlibErrToStr(res));
-				return InflateResult::ERROR;
+				return Result::ERROR;
 			}
 
 		}
@@ -364,7 +364,7 @@ namespace Compression
 		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 	}
 
-	ZlibDefalte::DeflateResult::Enum ZlibDefalte::Deflate(const void* pSrcData, size_t len, bool finish)
+	ZlibDefalte::Result::Enum ZlibDefalte::Deflate(const void* pSrcData, size_t len, bool finish)
 	{
 		if (buffer_.isEmpty()) {
 			setBufferSize(DEFAULT_BUF_SIZE);
@@ -397,10 +397,10 @@ namespace Compression
 					// we should not reach here with finish,
 					if (finish) {
 						X_ASSERT_UNREACHABLE();
-						return DeflateResult::ERROR;
+						return Result::ERROR;
 					}
 
-					return DeflateResult::OK;
+					return Result::OK;
 				}
 
 				// continue.
@@ -414,14 +414,14 @@ namespace Compression
 
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;
-				return DeflateResult::DONE;
+				return Result::DONE;
 			}
 			else
 			{
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;
 				X_ERROR("Zlib", "Deflate error %" PRIi32 " -> %s", res, ZlibErrToStr(res));
-				return DeflateResult::ERROR;
+				return Result::ERROR;
 			}
 		}
 	}
