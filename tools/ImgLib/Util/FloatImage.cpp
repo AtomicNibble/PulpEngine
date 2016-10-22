@@ -157,6 +157,12 @@ namespace Converter
 		const float* pBlueChannel = channel(2);
 		const float* pAlphaChannel = nullptr;
 
+		const auto mipDim = img.getMipDim(mip);
+		if (mipDim.x != width() || mipDim.y != height()) {
+			X_ERROR("FloatImg", "Failed to save img to target mip, dimension mismatch");
+			return false;
+		}
+
 		if (componentCount() >= 4) {
 			pAlphaChannel = channel(3);
 		}
