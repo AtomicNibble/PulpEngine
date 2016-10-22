@@ -361,18 +361,18 @@ namespace Compression
 		}
 
 		buffer_.resize(size);
+		stream_->next_out = buffer_.data();
+		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 	}
 
 	ZlibDefalte::DeflateResult::Enum ZlibDefalte::Deflate(const void* pSrcData, size_t len, bool finish)
 	{
 		if (buffer_.isEmpty()) {
-			buffer_.resize(DEFAULT_BUF_SIZE);
+			setBufferSize(DEFAULT_BUF_SIZE);
 		}
 
 		stream_->next_in = reinterpret_cast<uint8_t*>(const_cast<void*>(pSrcData));
 		stream_->avail_in = safe_static_cast<uint32_t>(len);
-		stream_->next_out = buffer_.data();
-		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 
 		for(;;)
 		{
@@ -399,8 +399,9 @@ namespace Compression
 			else if (res == Z_STREAM_END && finish)
 			{
 				const size_t bytesInBuf = (buffer_.size() - stream_->avail_out);
-
-				callback_(buffer_.data(), bytesInBuf);
+				if (bytesInBuf > 0) {
+					callback_(buffer_.data(), bytesInBuf);
+				}
 
 				stream_->next_out = nullptr;
 				stream_->avail_out = 0;

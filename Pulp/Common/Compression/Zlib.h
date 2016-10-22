@@ -117,6 +117,9 @@ namespace Compression
 	// can compress into blocks.
 	class ZlibDefalte
 	{
+		X_NO_COPY(ZlibDefalte);
+		X_NO_ASSIGN(ZlibDefalte);
+
 	public:
 		X_DECLARE_ENUM(DeflateResult)(ERROR, OK);
 
@@ -133,10 +136,6 @@ namespace Compression
 		// this will accept N input blocks and call the deflate callback everytime the buffer is full or we are flusing (finish == true)
 		// you can just pass a huge src block with finish == true and the callback will keep been called with blocks untill it's finished.
 		DeflateResult::Enum Deflate(const void* pSrcData, size_t len, bool finish);
-
-	private:
-		X_NO_COPY(ZlibDefalte);
-		X_NO_ASSIGN(ZlibDefalte);
 
 	private:
 		DeflateCallback callback_;
