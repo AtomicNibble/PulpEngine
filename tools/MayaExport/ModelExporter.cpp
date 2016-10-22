@@ -199,7 +199,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 	// name length check
 	if (fileName_.length() > model::MODEL_MAX_NAME_LENGTH)
 	{
-		MayaUtil::MayaPrintError("Model name is too long. MAX: %i, provided: %i",
+		MayaUtil::MayaPrintError("Model name is too long. MAX: %" PRIu32 ", provided: %" PRIuS,
 			model::MODEL_MAX_NAME_LENGTH, fileName_.length());
 		return MS::kFailure;;
 	}
@@ -355,12 +355,12 @@ void ModelExporter::printStats(void) const
 
 	info.append("\nModel Info:\n");
 	info.appendFmt("> Compile Time: %fms", stats_.compileTime.GetMilliSeconds());
-	info.appendFmt("\n> Total Lods: %i", stats_.totalLods);
-	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
-	info.appendFmt("\n> Total Mesh merged: %i", stats_.totalMeshMerged);
-	info.appendFmt("\n> Total Col Mesh: %i", stats_.totalColMesh);
-	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
-	info.appendFmt("\n> Total Joints dropped: %i", stats_.totalJointsDropped);
+	info.appendFmt("\n> Total Lods: %" PRIu32, stats_.totalLods);
+	info.appendFmt("\n> Total Mesh: %" PRIu32, stats_.totalMesh);
+	info.appendFmt("\n> Total Mesh merged: %" PRIu32, stats_.totalMeshMerged);
+	info.appendFmt("\n> Total Col Mesh: %" PRIu32, stats_.totalColMesh);
+	info.appendFmt("\n> Total Joints: %" PRIu32, stats_.totalJoints);
+	info.appendFmt("\n> Total Joints dropped: %" PRIu32, stats_.totalJointsDropped);
 
 
 	if (stats_.droppedBoneNames.size() > 0) {
@@ -383,10 +383,10 @@ void ModelExporter::printStats(void) const
 	}
 
 
-	info.appendFmt("\n> Total Verts: %i", stats_.totalVerts);
-	info.appendFmt("\n> Total Verts Merged: %i", stats_.totalVertsMerged);
-	info.appendFmt("\n> Total Faces: %i", stats_.totalFaces);
-	info.appendFmt("\n> Total Weights dropped: %i", stats_.totalWeightsDropped);
+	info.appendFmt("\n> Total Verts: %" PRIu32, stats_.totalVerts);
+	info.appendFmt("\n> Total Verts Merged: %" PRIu32, stats_.totalVertsMerged);
+	info.appendFmt("\n> Total Faces: %" PRIu32, stats_.totalFaces);
+	info.appendFmt("\n> Total Weights dropped: %" PRIu32, stats_.totalWeightsDropped);
 	info.append("\n");
 
 	if (stats_.totalWeightsDropped > 0) {
@@ -395,7 +395,7 @@ void ModelExporter::printStats(void) const
 			maxWeights = model::MODEL_MAX_VERT_BINDS;
 		}
 
-		info.appendFmt("!> bind weights where dropped, consider binding with max influences: %i\n", maxWeights);
+		info.appendFmt("!> bind weights where dropped, consider binding with max influences: %" PRIu32 "\n", maxWeights);
 	}
 
 	{
@@ -755,11 +755,11 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 				info.idx = currentLod;
 				if (!args.get(++idx, temp) ||
 					!args.get(++idx, info.objects)) {
-					MayaUtil::MayaPrintError("failed to parse LOD%i info", currentLod);
+					MayaUtil::MayaPrintError("failed to parse LOD%" PRIu32 " info", currentLod);
 					continue;
 				}
 				if (lodExpoInfo_.size() == model::MODEL_MAX_LODS) {
-					MayaUtil::MayaPrintError("Exceeded max load count: %i", model::MODEL_MAX_LODS);
+					MayaUtil::MayaPrintError("Exceeded max load count: %" PRIu32 , model::MODEL_MAX_LODS);
 					return MS::kFailure;
 				}
 
@@ -770,7 +770,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 			}
 		}
 
-		//	MayaPrintMsg("Total LOD: %i", currentLod);
+		//	MayaPrintMsg("Total LOD: %" PRIu32, currentLod);
 		if (currentLod == 0) {
 			MayaUtil::MayaPrintError("Failed to parse and LOD info");
 			return MS::kFailure;
@@ -805,7 +805,7 @@ MStatus ModelExporter::loadLODs(void)
 		uint32_t numMesh = info.exportObjects.length();
 
 		if (numMesh == 0) {
-			MayaUtil::MayaPrintError("LOD%i failed to load meshes for lod no meshes found.", i);
+			MayaUtil::MayaPrintError("LOD%" PRIuS " failed to load meshes for lod no meshes found.", i);
 			return MS::kFailure;
 		}
 		
@@ -865,8 +865,8 @@ MStatus ModelExporter::loadLODs(void)
 				return status;
 			}
 
-			MayaUtil::MayaPrintVerbose("NumVerts: %i", numVerts);
-			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
+			MayaUtil::MayaPrintVerbose("NumVerts: %" PRIi32, numVerts);
+			MayaUtil::MayaPrintVerbose("NumPoly: %" PRIi32, numPoly);
 
 			// resize baby.
 			mesh.verts_.resize(numVerts);
@@ -884,9 +884,9 @@ MStatus ModelExporter::loadLODs(void)
 			}
 
 			// print how many :Z
-			MayaUtil::MayaPrintVerbose("NumUvSets: %i", UVSets.length());
+			MayaUtil::MayaPrintVerbose("NumUvSets: %" PRIu32, UVSets.length());
 			for (uint32_t x = 0; x < UVSets.length(); x++) {
-				MayaUtil::MayaPrintVerbose("-> Set(%i): %s", x, UVSets[static_cast<uint32_t>(i)].asChar());
+				MayaUtil::MayaPrintVerbose("-> Set(%" PRIu32 "): %s", x, UVSets[static_cast<uint32_t>(i)].asChar());
 			}
 
 			MString uvSet;
@@ -940,12 +940,12 @@ MStatus ModelExporter::loadLODs(void)
 				}
 			}
 			
-			MayaUtil::MayaPrintVerbose("u: %i v: %i", u.length(), v.length());
-			MayaUtil::MayaPrintVerbose("VertexArray: %i", vertexArray.length());
-			MayaUtil::MayaPrintVerbose("NormalsArray: %i", normalsArray.length());
-			MayaUtil::MayaPrintVerbose("TangentsArray: %i", tangentsArray.length());
-			MayaUtil::MayaPrintVerbose("BinormalsArray: %i", binormalsArray.length());
-			MayaUtil::MayaPrintVerbose("ColorsArray: %i", colorsArray.length());
+			MayaUtil::MayaPrintVerbose("u: %" PRIu32 " v: %" PRIu32, u.length(), v.length());
+			MayaUtil::MayaPrintVerbose("VertexArray: %" PRIu32, vertexArray.length());
+			MayaUtil::MayaPrintVerbose("NormalsArray: %" PRIu32, normalsArray.length());
+			MayaUtil::MayaPrintVerbose("TangentsArray: %" PRIu32, tangentsArray.length());
+			MayaUtil::MayaPrintVerbose("BinormalsArray: %" PRIu32, binormalsArray.length());
+			MayaUtil::MayaPrintVerbose("ColorsArray: %" PRIu32, colorsArray.length());
 
 			// verts
 			for (int32_t x = 0; x < numVerts; x++) {
@@ -1198,13 +1198,13 @@ MStatus ModelExporter::loadBones(void)
 		new_bone.name.append(new_bone.dagnode->name().asChar());
 
 		if (mayaBones_.size() == model::MODEL_MAX_BONES) {
-			MayaUtil::MayaPrintError("Joints: max bones reached: %i", model::MODEL_MAX_BONES);
+			MayaUtil::MayaPrintError("Joints: max bones reached: %" PRIu32, model::MODEL_MAX_BONES);
 			return MStatus::kFailure;
 		}
 
 		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
 		{
-			MayaUtil::MayaPrintError("Joints: max pMayaBone name length exceeded, MAX: %i '%' -> %i",
+			MayaUtil::MayaPrintError("Joints: max pMayaBone name length exceeded, MAX: %" PRIu32 " '%s' -> %" PRIuS,
 				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
 			return MStatus::kFailure;
 		}
