@@ -259,7 +259,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 					&& getPriority() != JobListPriority::NONE)
 				{				
 					X_WARNING("jobListRunner", "a single job took more than: %ims elapsed: %gms "
-						"pFunc: %p pData: %p batchOffset: %i batchNum: %i", 
+						"pFunc: %p pData: %p batchOffset: %" PRIu32 " batchNum: %" PRIu32,
 						jobListRunner::var_LongJobMs,
 						elapsed.GetMilliSeconds(),
 						job.pJobRun,
@@ -568,13 +568,13 @@ void jobListRunner::StartUp(void)
 
 void jobListRunner::StartThreads(void)
 {
-	X_LOG0("jobListRunner", "Creating %i threads", numThreads_);
+	X_LOG0("jobListRunner", "Creating %" PRIi32 " threads", numThreads_);
 
 	int32_t i;
 	for (i = 0; i < numThreads_; i++)
 	{
 		core::StackString<64> name;
-		name.appendFmt("Worker_%i", i);
+		name.appendFmt("Worker_%" PRIi32, i);
 		threads_[i].setThreadIdx(i);
 		threads_[i].Create(name.c_str()); // default stack size.
 		threads_[i].Start();
