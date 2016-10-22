@@ -107,6 +107,39 @@ X_INLINE void XTextureFile::dropTopMip(void)
 	updateOffsets();
 }
 
+X_INLINE void XTextureFile::dropMips(bool shrinkMem)
+{
+	if (numMips_ == 1) {
+		return;
+	}
+
+	// drop all the mips.
+	numMips_ = 1;
+
+	// if we have faces we need to shift them to the new locations before shrinking buf.
+	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, numMips_, format_);
+	for (uint32_t i = 1; i < numFaces_; i++)
+	{
+		const size_t newOffset = faceSize * i;
+		std::memmove(data_.data() + newOffset, getLevel(i, 0), faceSize);
+	}
+
+	// shrink the data
+	const uint32_t requiredBytes = faceSize * numFaces_;
+	data_.resize(requiredBytes);
+
+	if (shrinkMem) {
+		data_.shrinkToFit();
+	}
+
+	// now to update offsets.
+	// zero first to get rid of the trailing offset.
+	core::zero_object(mipOffsets_);
+	core::zero_object(faceOffsets_);
+
+	updateOffsets();
+}
+
 X_INLINE void XTextureFile::updateOffsets(void)
 {
 	uint32_t width = core::Max<uint32_t>(1u, size_.x);
