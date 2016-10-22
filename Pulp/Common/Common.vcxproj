@@ -271,6 +271,7 @@
     <ClInclude Include="Prepro\PreproToBool.h" />
     <ClInclude Include="Prepro\PreproUniqueName.h" />
     <ClInclude Include="IPrimativeContext.h" />
+    <ClInclude Include="Prepro\PreproWiden.h" />
     <ClInclude Include="Profile\ProfilerTypes.h" />
     <ClInclude Include="Random\MultiplyWithCarry.h" />
     <ClInclude Include="Random\XorShift.h" />

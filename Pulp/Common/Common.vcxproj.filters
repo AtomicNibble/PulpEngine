@@ -1147,6 +1147,9 @@
     <ClInclude Include="Compression\Store.h">
       <Filter>Headers\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="Prepro\PreproWiden.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
