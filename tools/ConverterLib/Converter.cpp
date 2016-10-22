@@ -422,11 +422,16 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 	X_ASSERT_NOT_NULL(pCon);
 	X_ASSERT(pCon->thumbGenerationSupported(), "thumb generatino not supported")();
 
+	core::StopWatch timer;
+
 	if (!pCon->CreateThumb(*this, assetId)) {
 		X_ERROR("Converter", "Failed to generate thumb for \"%s\" \"%s\"", name.c_str(), AssetType::ToString(assType));
 		return false;
 	}
 
+	core::HumanDuration::Str timeStr;
+	X_LOG0("Converter", "generated thumb for \"%s\" in ^6%s", name.c_str(),
+		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 	return true;
 }
 
