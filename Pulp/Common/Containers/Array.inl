@@ -288,6 +288,8 @@ X_INLINE void Array<T>::shrinkToFit(void)
 			Mem::CopyArrayUninitialized(list_, pOldList, pOldList + num_);
 
 			// delete old.
+			Mem::DestructArray(pOldList, num_);
+
 			DeleteArr(pOldList);
 		}
 
