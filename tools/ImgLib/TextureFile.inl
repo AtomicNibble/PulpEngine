@@ -196,6 +196,16 @@ X_INLINE const Vec2<uint16_t>& XTextureFile::getSize(void) const
 	return size_; 
 }
 
+X_INLINE Vec2<uint16_t> XTextureFile::getMipDim(int32_t mipIdx) const
+{
+	Vec2<uint16_t> size = size_;
+
+	size.x = core::Max(size.x >> mipIdx, 1);
+	size.y = core::Max(size.y >> mipIdx, 1);
+
+	return size;
+}
+
 X_INLINE int32_t XTextureFile::getWidth(void) const
 { 
 	return size_.x; 
