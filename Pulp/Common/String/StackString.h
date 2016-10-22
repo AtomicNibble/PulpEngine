@@ -3,6 +3,8 @@
 #ifndef X_FIXEDSIZESTRING_H_
 #define X_FIXEDSIZESTRING_H_
 
+#include "String\FormatMacros.h"
+
 #include "String/StringUtil.h"
 #include "String/StringRange.h"
 

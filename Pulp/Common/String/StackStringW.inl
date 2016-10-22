@@ -102,7 +102,7 @@ StackString<N, wchar_t>::StackString(const int i)
 {
 	X_ASSERT(len_ < N, "int val does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = swprintf_s(str_, L"%d", i);
+	len_ = swprintf_s(str_, L"%" X_WIDEN(PRIi32), i);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ StackString<N, wchar_t>::StackString(const unsigned u)
 {
 	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = swprintf_s(str_, L"%u", u);
+	len_ = swprintf_s(str_, L"%" X_WIDEN(PRIu32), u);
 }
 
 
@@ -146,7 +146,7 @@ StackString<N, wchar_t>::StackString(const unsigned __int64 u)
 {
 	X_ASSERT(len_ < N, "unsigned __int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = swprintf_s(str_, L"%I64u", u);
+	len_ = swprintf_s(str_, L"%" X_WIDEN(PRIu64), u);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -157,7 +157,7 @@ StackString<N, wchar_t>::StackString(const __int64 u)
 {
 	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = swprintf_s(str_, L"%I64d", u);
+	len_ = swprintf_s(str_, L"%I" X_WIDEN(PRIi64), u);
 }
 
 

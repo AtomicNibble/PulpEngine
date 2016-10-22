@@ -109,7 +109,7 @@ StackString<N, TChar>::StackString(const int i)
 {
 	X_ASSERT(len_ < N, "int val does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = sprintf_s(str_, "%d", i);
+	len_ = sprintf_s(str_, "%" PRIi32, i);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -120,7 +120,7 @@ StackString<N, TChar>::StackString(const unsigned u)
 {
 	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = sprintf_s(str_, "%u", u);
+	len_ = sprintf_s(str_, "%" PRIu32, u);
 }
 
 
@@ -153,7 +153,7 @@ StackString<N, TChar>::StackString(const unsigned __int64 u)
 {
 	X_ASSERT(len_ < N, "unsigned __int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = sprintf_s(str_, "%I64u", u);
+	len_ = sprintf_s(str_, "%" PRIu64, u);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -164,7 +164,7 @@ StackString<N, TChar>::StackString(const __int64 u)
 {
 	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = sprintf_s(str_, "%I64d", u);
+	len_ = sprintf_s(str_, "%" PRIi64, u);
 }
 
 
