@@ -73,7 +73,7 @@ TEST(Zlib, Unbuffered)
 	X_DELETE_ARRAY(pCompressed, g_arena);
 }
 
-TEST(Zlib, buffered)
+TEST(Zlib, bufferedInflate)
 {
 	const size_t srcBufSize = 4096;
 	size_t deflatedSize, DestbufSize;
@@ -134,8 +134,129 @@ TEST(Zlib, buffered)
 	}
 }
 
-TEST(Zlib, Array)
+
+TEST(Zlib, bufferedInflate2)
 {
+	const size_t srcBufSize = 4096;
+	size_t deflatedSize, DestbufSize;
+
+	// create a buffer.
+	uint8_t* pUncompressed = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed");
+
+	FillBufRand(pUncompressed, srcBufSize);
+
+	DestbufSize = Zlib::requiredDeflateDestBuf(srcBufSize);
+
+	uint8_t* pCompressed = X_NEW_ARRAY(uint8_t, DestbufSize, g_arena, "ZlibCompressed");
+	memset(pCompressed, 0, DestbufSize);
+
+	bool deflateOk = Zlib::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
+	EXPECT_TRUE(deflateOk);
+
+	if (deflateOk)
+	{
+		uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed2");
+		memset(pUncompressed2, 0, srcBufSize);
+
+		// do it in steps.
+		uint8_t* pDst = pUncompressed2;
+
+		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len) {
+			std::memcpy(pDst, pData, len);
+			pDst += len;
+		});
+
+		inflater.setBufferSize(1);
+
+		ZlibInflate::InflateResult::Enum res;
+
+		const size_t bufSize = 256;
+		size_t bufLeft = deflatedSize;
+		size_t i = 0;
+
+		do
+		{
+			size_t srcSize = core::Min(bufLeft, bufSize);
+
+			res = inflater.Inflate(&pCompressed[bufSize * i], srcSize);
+
+			bufLeft -= srcSize;
+
+			i++;
+		} while (res == ZlibInflate::InflateResult::OK);
+
+
+		EXPECT_EQ(0, bufLeft);
+		EXPECT_EQ(ZlibInflate::InflateResult::DONE, res);
+
+		if (ZlibInflate::InflateResult::DONE == res)
+		{
+			EXPECT_EQ(0, memcmp(pUncompressed, pUncompressed2, srcBufSize));
+		}
+
+		X_DELETE_ARRAY(pUncompressed2, g_arena);
+	}
+}
+
+TEST(Zlib, bufferedDeflate)
+{
+	const size_t srcBufSize = 4096;
+
+	uint8_t* pUncompressed = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed");
+	uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed");
+	FillBufRand(pUncompressed, srcBufSize);
+
+	size_t comrpessedBufSize = Zlib::requiredDeflateDestBuf(srcBufSize);
+	uint8_t* pDeflated = X_NEW_ARRAY(uint8_t, comrpessedBufSize, g_arena, "ZlibCompressed");
+
+	uint8_t* pDst = pDeflated;
+	ZlibDefalte deflater(g_arena, [&](const uint8_t* pData, size_t len) {
+		std::memcpy(pDst, pData, len);
+		pDst += len;
+	});
+
+	deflater.setBufferSize(1);
+	ZlibDefalte::DeflateResult::Enum res;
+
+	{
+		const size_t bufSize = 256;
+		size_t bufLeft = srcBufSize;
+		size_t i = 0;
+
+		do
+		{
+			size_t srcSize = core::Min(bufLeft, bufSize);
+			bufLeft -= srcSize;
+
+			const bool last = (bufLeft == 0);
+
+			res = deflater.Deflate(&pUncompressed[bufSize * i], srcSize, last);
+
+			i++;
+		} while (res == ZlibDefalte::DeflateResult::OK && bufLeft > 0);
+
+		EXPECT_EQ(0, bufLeft);
+		EXPECT_EQ(ZlibDefalte::DeflateResult::DONE, res);
+	}
+
+	// now deflate normal and compare.
+ 	const size_t deflatedSize = (pDst - pDeflated);
+	bool inflateOk = Zlib::inflate(g_arena, pDeflated, deflatedSize, pUncompressed2, srcBufSize);
+	EXPECT_TRUE(inflateOk);
+
+	if (ZlibDefalte::DeflateResult::DONE == res)
+	{
+		EXPECT_EQ(0, memcmp(pUncompressed, pUncompressed2, srcBufSize));
+	}
+
+	X_DELETE_ARRAY(pUncompressed, g_arena);
+	X_DELETE_ARRAY(pUncompressed2, g_arena);
+	X_DELETE_ARRAY(pDeflated, g_arena);
+}
+
+
+TEST(Zlib, Array)
+{ 
 	core::Array<uint8_t> data(g_arena);
 	core::Array<uint8_t> deflated(g_arena);
 
