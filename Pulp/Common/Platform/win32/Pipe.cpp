@@ -236,7 +236,7 @@ namespace IPC
 		{
 			core::lastError::Description Dsc;
 			uint32_t lastErr = core::lastError::Get();
-			X_ERROR("Pipe", "Failed to write to pipe. Err(%i): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
+			X_ERROR("Pipe", "Failed to write to pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
 			return false;
 		}
 
@@ -244,10 +244,10 @@ namespace IPC
 			core::lastError::Description Dsc;
 			uint32_t lastErr = core::lastError::Get();
 			if (lastErr == ERROR_BROKEN_PIPE) {
-				X_ERROR("Pipe", "Failed to write to a broken pipe. Err(%i): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
+				X_ERROR("Pipe", "Failed to write to a broken pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
 			}
 			else {
-				X_ERROR("Pipe", "Failed to write to pipe. Err(%i): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
+				X_ERROR("Pipe", "Failed to write to pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
 			}
 			return false;
 		}
@@ -279,7 +279,7 @@ namespace IPC
 		{
 			core::lastError::Description Dsc;
 			uint32_t lastErr = core::lastError::Get();
-			X_ERROR("Pipe", "Failed to read from pipe. Err(%i): %s", lastErr, core::lastError::ToString(Dsc));
+			X_ERROR("Pipe", "Failed to read from pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(Dsc));
 			return false;
 		}
 
@@ -287,10 +287,10 @@ namespace IPC
 			core::lastError::Description Dsc;
 			uint32_t lastErr = core::lastError::Get();
 			if (lastErr == ERROR_BROKEN_PIPE) {
-				X_ERROR("Pipe", "Failed to read from a broken pipe. Err(%i): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
+				X_ERROR("Pipe", "Failed to read from a broken pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
 			}
 			else {
-				X_ERROR("Pipe", "Failed to read from pipe. Err(%i): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
+				X_ERROR("Pipe", "Failed to read from pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(lastErr, Dsc));
 			}
 			return false;
 		}
@@ -322,7 +322,7 @@ namespace IPC
 		{
 			core::lastError::Description Dsc;
 			uint32_t lastErr = core::lastError::Get();
-			X_ERROR("Pipe", "Failed to peek pipe. Err(%i): %s", lastErr, core::lastError::ToString(Dsc));
+			X_ERROR("Pipe", "Failed to peek pipe. Err(%" PRIu32 "): %s", lastErr, core::lastError::ToString(Dsc));
 			return false;
 		}
 
