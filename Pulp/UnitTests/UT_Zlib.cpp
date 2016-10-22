@@ -73,7 +73,6 @@ TEST(Zlib, Unbuffered)
 	X_DELETE_ARRAY(pCompressed, g_arena);
 }
 
-#if 0
 TEST(Zlib, buffered)
 {
 	const size_t srcBufSize = 4096;
@@ -98,7 +97,13 @@ TEST(Zlib, buffered)
 		memset(pUncompressed2, 0, srcBufSize);
 
 		// do it in steps.
-		ZlibInflate inflater(g_arena, pUncompressed2, srcBufSize);
+		uint8_t* pDst = pUncompressed2;
+
+		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len) {
+			std::memcpy(pDst, pData, len);
+			pDst += len;
+		});
+
 		ZlibInflate::InflateResult::Enum res;
 
 		const size_t bufSize = 256;
@@ -128,7 +133,6 @@ TEST(Zlib, buffered)
 		X_DELETE_ARRAY(pUncompressed2, g_arena);
 	}
 }
-#endif
 
 TEST(Zlib, Array)
 {
