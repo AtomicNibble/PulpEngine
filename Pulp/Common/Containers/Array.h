@@ -63,6 +63,8 @@ public:
 	void clear(void);		
 	// clear the list, and Free memory
 	void free(void);
+	// attempts to make capacity == size, not guaranteed.
+	void shrinkToFit(void);
 	// returns number of elements in list
 	size_type size(void) const;
 	// returns number of elements allocated for

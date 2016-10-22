@@ -272,6 +272,29 @@ X_INLINE void Array<T>::free(void)
 	size_ = 0;
 }
 
+template<typename T>
+X_INLINE void Array<T>::shrinkToFit(void)
+{
+	if (capacity() > size())
+	{
+		Type* pOldList = list_;
+
+		// new list, do i want to make it a multiple of gran tho?
+		list_ = Allocate(num_);
+
+		// copy old items over.
+		if (pOldList)
+		{
+			Mem::CopyArrayUninitialized(list_, pOldList, pOldList + num_);
+
+			// delete old.
+			DeleteArr(pOldList);
+		}
+
+		size_ = num_;
+	}
+}
+
 
 template<typename T>
 X_INLINE typename Array<T>::size_type Array<T>::size(void) const {
