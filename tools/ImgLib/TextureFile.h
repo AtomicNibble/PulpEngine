@@ -6,7 +6,7 @@
 #include <ITexture.h>
 #include <Containers\Array.h>
 
-#include "TextureUtil.h"
+#include "Util\TextureUtil.h"
 
 X_NAMESPACE_BEGIN(texture)
 

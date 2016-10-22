@@ -334,9 +334,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Converter\Converter.h" />
-    <ClInclude Include="Converter\Filters.h" />
-    <ClInclude Include="Converter\FloatImage.h" />
-    <ClInclude Include="Converter\Types.h" />
     <ClInclude Include="Fmts\CI_Img.h" />
     <ClInclude Include="Fmts\TextureLoaderCI.h" />
     <ClInclude Include="Fmts\TextureLoaderDDS.h" />
@@ -348,12 +345,13 @@
     <ClInclude Include="Lib\ImgLib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TextureFile.h" />
+    <ClInclude Include="Util\Filters.h" />
+    <ClInclude Include="Util\FloatImage.h" />
     <ClInclude Include="Util\TextureUtil.h" />
+    <ClInclude Include="Util\Types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Converter\Converter.cpp" />
-    <ClCompile Include="Converter\Filters.cpp" />
-    <ClCompile Include="Converter\FloatImage.cpp" />
     <ClCompile Include="Fmts\CIWritter.cpp" />
     <ClCompile Include="Fmts\TextureLoaderCI.cpp" />
     <ClCompile Include="Fmts\TextureLoaderDDS.cpp" />
@@ -376,12 +374,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TextureFile.cpp" />
+    <ClCompile Include="Util\Filters.cpp" />
+    <ClCompile Include="Util\FloatImage.cpp" />
     <ClCompile Include="Util\TextureUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Converter\Filters.inl" />
-    <None Include="Converter\FloatImage.inl" />
     <None Include="TextureFile.inl" />
+    <None Include="Util\Filters.inl" />
+    <None Include="Util\FloatImage.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -3,7 +3,7 @@
 
 #include <ITexture.h>
 #include "TextureFile.h"
-#include "Types.h"
+#include "Util\Types.h"
 
 X_NAMESPACE_DECLARE(core,
 	class LinearAllocator;

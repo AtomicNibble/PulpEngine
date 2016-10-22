@@ -26,7 +26,7 @@
 #include "Fmts\TextureLoaderPSD.h"
 #include "Fmts\TextureLoaderTGA.h"
 
-#include "TextureUtil.h"
+#include "Util\TextureUtil.h"
 #include "TextureFile.h"
 
 #endif // !X_IMGLIB_H_

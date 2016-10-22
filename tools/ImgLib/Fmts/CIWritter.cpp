@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "TextureLoaderCI.h"
 #include "TextureFile.h"
-#include "TextureUtil.h"
+#include "Util\TextureUtil.h"
 
 #include <IFileSys.h>
 #include <ITexture.h>

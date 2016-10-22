@@ -9,8 +9,8 @@
 
 #include <Memory/AllocationPolicies/LinearAllocator.h>
 
-#include "Filters.h"
-#include "FloatImage.h"
+#include "Util\Filters.h"
+#include "Util\FloatImage.h"
 
 
 X_NAMESPACE_BEGIN(texture)

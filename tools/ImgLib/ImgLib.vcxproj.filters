@@ -74,16 +74,16 @@
     <ClInclude Include="Converter\Converter.h">
       <Filter>Header Files\Converter</Filter>
     </ClInclude>
-    <ClInclude Include="Converter\Filters.h">
-      <Filter>Header Files\Converter</Filter>
-    </ClInclude>
-    <ClInclude Include="Converter\FloatImage.h">
-      <Filter>Header Files\Converter</Filter>
-    </ClInclude>
-    <ClInclude Include="Converter\Types.h">
-      <Filter>Header Files\Converter</Filter>
-    </ClInclude>
     <ClInclude Include="Util\TextureUtil.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Filters.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\FloatImage.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Types.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
@@ -124,13 +124,13 @@
     <ClCompile Include="Converter\Converter.cpp">
       <Filter>Source Files\Converter</Filter>
     </ClCompile>
-    <ClCompile Include="Converter\Filters.cpp">
-      <Filter>Source Files\Converter</Filter>
-    </ClCompile>
-    <ClCompile Include="Converter\FloatImage.cpp">
-      <Filter>Source Files\Converter</Filter>
-    </ClCompile>
     <ClCompile Include="Util\TextureUtil.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Filters.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\FloatImage.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
@@ -138,11 +138,11 @@
     <None Include="TextureFile.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Converter\Filters.inl">
-      <Filter>Header Files\Converter</Filter>
+    <None Include="Util\Filters.inl">
+      <Filter>Header Files\Util</Filter>
     </None>
-    <None Include="Converter\FloatImage.inl">
-      <Filter>Header Files\Converter</Filter>
+    <None Include="Util\FloatImage.inl">
+      <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
 </Project>
