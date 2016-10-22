@@ -114,7 +114,7 @@ namespace PNG
 		X_ENSURE_SIZE(IHDR, IHDR::TAG_SIZE + 4);
 
 
-		static uint32_t png_get_bpp(uint32_t depth, uint32_t color_type)
+		static uint32_t png_get_bpp(uint32_t depth, PngColorType::Enum color_type)
 		{
 			uint32_t bpp;
 			switch (color_type)
@@ -137,7 +137,7 @@ namespace PNG
 			return bpp;
 		}
 
-		static Texturefmt::Enum map_png_format(uint32_t color_type)
+		static Texturefmt::Enum map_png_format(PngColorType::Enum color_type)
 		{
 			switch (color_type)
 			{
@@ -161,88 +161,8 @@ namespace PNG
 				return magic == PNG_FILE_MAGIC;
 			}
 		};
-
-
-		bool LoadChucksIDAT(core::MemoryArenaBase* swapArea, core::XFile* file,
-			uint32_t length, uint32_t InfaltedSize, uint8_t* inflated_data)
-		{
-			X_ASSERT_NOT_NULL(file);
-
-			core::Array<uint8_t> ZlibData(swapArea);
-			ZlibData.reserve(length);
-
-			uint32_t tagName;
-			uint32_t orig_crc;
-
-			using namespace core::Compression;
-
-			ZlibInflate inflater(swapArea, inflated_data, InfaltedSize);
-			ZlibInflate::InflateResult::Enum zRes;
-
-			do
-			{
-				// fill the buffer with the data.
-				if (file->read(ZlibData.ptr(), length) != length)
-				{
-					X_ERROR("TexturePNG", "failed to reed block of size: %i", length);
-					return false;
-				}
-
-				// infalte it baby.
-				zRes = inflater.Inflate(ZlibData.ptr(), length);
-
-				if (zRes == ZlibInflate::InflateResult::ERROR)
-				{
-					X_ERROR("TexturePNG", "Zlib error");
-					return false;
-				}
-
-				// after block there is a crc32
-				file->readObj(orig_crc);
-
-			//	size_t left = file->remainingBytes();
-
-				if (file->readObj(length) != sizeof(length))
-				{
-					X_ERROR("TexturePNG", "failed to read tag length");
-					return false;
-				}
-
-				// check for next tag
-				if (file->readObj(tagName) != sizeof(tagName))
-				{
-					X_ERROR("TexturePNG", "failed to read tag name");
-					return false;
-				}
-
-				length = core::Endian::swap(length);
-
-				// ok another block if the block size is bigger we can either.
-				// 1. do multiple reads and inflates
-				// 2. reallocate buffer.
-				// from reading specs most software writing multiple IDAT chucks is for a fixed buffer
-				// size, so it's unlikley the next block will be bigger, so just going to reallocate if needed
-				// to avoid adding additional complexity to the loop.
-
-				if (length > safe_static_cast<uint32_t, size_t>(ZlibData.capacity()))
-				{
-					ZlibData.reserve(length);
-				}
-
-			} while (tagName == PNG_TAG_IDAT);
-
-			if (zRes != ZlibInflate::InflateResult::DONE) {
-				X_ERROR("TexturePNG", "Potential zlib error, did not inflate expected amount");
-				return false;
-			}
-
-			if (tagName != PNG_TAG_IEND) {
-				X_WARNING("TexturePNG", "failed to find IEND tag");
-			}
-
-			return true;
-		}
-	}
+	
+	} // namespace 
 
 	XTexLoaderPNG::XTexLoaderPNG()
 	{
@@ -289,87 +209,98 @@ namespace PNG
 	bool XTexLoaderPNG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pCore);
+
+		core::Crc32* pCrc = gEnv->pCore->GetCrc32();
 
 		Png_Header hdr;
-		uint32_t length, i, tagName;
-		uint32_t orig_crc, width, height, depth, color_type;
-		uint32_t compression_method, filter_method, interlace_method, bpp;
-		uint8_t ihdr[13 + 4];	/* length should be 13, make room for type (IHDR) */
+		if (file->readObj(hdr) != sizeof(hdr)) {
+			X_ERROR("TexturePNG", "Failed to read header");
+			return false;
+		}
 
-		file->readObj(hdr);
-
-		if (!hdr.isValid())
-		{
+		if (!hdr.isValid()) {
 			X_ERROR("TexturePNG", "invalid png header.");
 			return nullptr;
 		}
 
-		file->readObj(length);
+		// ihdr length
+		int32_t length;
+		if (file->readObj(length) != sizeof(length)) {
+			X_ERROR("TexturePNG", "failed to read TAG length");
+			return false;
+		}
 		length = core::Endian::swap(length);
 
-		if (length != 13)
-		{
-			X_ERROR("TexturePNG", "invalid png length. provided: %i required: 13", length);
+		if (length != IHDR::TAG_SIZE) {
+			X_ERROR("TexturePNG", "invalid png length. provided: %" PRIu32 " required: %" PRIi32, length, IHDR::TAG_SIZE);
 			return false;
 		}
 
-		file->readObj(ihdr);
-		file->readObj(orig_crc);
+		IHDR ihdr;
+		if (file->readObj(ihdr) != sizeof(ihdr)) {
+			X_ERROR("TexturePNG", "Failed to read IHDR data");
+			return false;
+		}
 
-		core::MemCursor<uint8_t> cursor(ihdr, 13+4);
-	
-		if (cursor.getSeek<uint32_t>() != PNG_TAG_IHDR)
-		{
+		if (ihdr.tag != IHDR::TAG_ID) {
 			X_ERROR("TexturePNG", "invalid sub tag. expoected: IHDR");
 			return false;
 		}
 
-		width = core::Endian::swap(cursor.getSeek<uint32_t>());
-		height = core::Endian::swap(cursor.getSeek<uint32_t>());
+		uint32_t tagCrc;
+		if (file->readObj(tagCrc) != sizeof(tagCrc)) {
+			X_ERROR("TexturePNG", "Failed to read tag crc");
+			return false;
+		}
+		tagCrc = core::Endian::swap(tagCrc);
 
-		depth = cursor.getSeek<uint8_t>();
-		color_type = cursor.getSeek<uint8_t>();
-		compression_method = cursor.getSeek<uint8_t>();
-		filter_method = cursor.getSeek<uint8_t>();
-		interlace_method = cursor.getSeek<uint8_t>();
-
-
-		if (height < 1 || height > TEX_MAX_DIMENSIONS || width < 1 || width > TEX_MAX_DIMENSIONS)
-		{
-			X_ERROR("TexturePNG", "invalid image dimensions. provided: %ix%i max: %ix%i", 
-				height, width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
+		// check crc.
+		if (pCrc->GetCRC32OfObject(ihdr) != tagCrc) {
+			X_ERROR("TexturePNG", "IHDR crc mismatch");
 			return false;
 		}
 
-		if (!core::bitUtil::IsPowerOfTwo(height) || !core::bitUtil::IsPowerOfTwo(width))
+		// swap the dims.
+		ihdr.width = core::Endian::swap(ihdr.width);
+		ihdr.height = core::Endian::swap(ihdr.height);
+
+		if (ihdr.height < 1 || ihdr.height > TEX_MAX_DIMENSIONS || ihdr.width < 1 || ihdr.width > TEX_MAX_DIMENSIONS)
 		{
-			X_ERROR("TexturePNG", "invalid image dimensions, must be power of two. provided: %ix%i", 
-				height, width);
+			X_ERROR("TexturePNG", "invalid image dimensions. provided: %" PRIi32 "x%" PRIi32 " max: %" PRIu32 "x%" PRIu32,
+				ihdr.height, ihdr.width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
 			return false;
 		}
 
-		if (color_type == PngColorType::INDEXED)
+		if (!core::bitUtil::IsPowerOfTwo(ihdr.height) || !core::bitUtil::IsPowerOfTwo(ihdr.width))
+		{
+			X_ERROR("TexturePNG", "invalid image dimensions, must be power of two. provided: %" PRIi32 "x%" PRIi32,
+				ihdr.height, ihdr.width);
+			return false;
+		}
+
+		if (ihdr.colType == PngColorType::INDEXED)
 		{
 			X_ERROR("TexturePNG", "invalud color type. expected: TRUECOLOR | TRUECOLOR_ALPHA");
 			return false;
 		}
 
-		if (depth != 8 && depth != 16)
+		if (ihdr.bitDepth != 8 && ihdr.bitDepth != 16)
 		{
-			X_ERROR("TexturePNG", "invalud depth. provided: %i expected: 8 | 16", depth);
+			X_ERROR("TexturePNG", "invalud depth. provided: %" PRIi8 " expected: 8 | 16", ihdr.bitDepth);
 			return false;
 		}
 	
-		if (interlace_method > 0)
+		if (ihdr.interLace != InterlaceMethod::None)
 		{
 			X_ERROR("TexturePNG", "interlace not supported");
 			return false;
 		}
 		
-		bpp = png_get_bpp(depth,color_type);
-
-		// read any more tags!
-		for (i = 0; i < 32; i++)
+		// skip all the tags untill we reach PNG_TAG_IDAT
+		uint32_t tagName;
+		for (int32_t i = 0; i < 256; i++)
 		{
 			if (file->readObj(length) != sizeof(length)) {
 				X_ERROR("TexturePNG", "failed to read TAG length");
@@ -379,7 +310,10 @@ namespace PNG
 			length = core::Endian::swap(length);
 			
 			// read the Tag name
-			file->readObj(tagName);
+			if (file->readObj(tagName) != sizeof(tagName)) {
+				X_ERROR("TexturePNG", "Failed to read tag");
+				return false;
+			}
 
 			if (tagName == PNG_TAG_IDAT) {
 				break;
@@ -389,6 +323,7 @@ namespace PNG
 			file->seek(length + 4, core::SeekMode::CUR);
 		}
 
+		// we got a PNG_TAG_IDAT?
 		if (tagName != PNG_TAG_IDAT) {
 			X_ERROR("TexturePNG", "failed to find IDAT tag in file");
 			return false;
@@ -400,29 +335,175 @@ namespace PNG
 		TextureFlags flags;
 		flags.Set(TextureFlags::NOMIPS);
 
-		if (color_type == PngColorType::TRUECOLOR_ALPHA) {
+		if (ihdr.colType == PngColorType::TRUECOLOR_ALPHA) {
 			flags.Set(TextureFlags::ALPHA);
 		}
 
-		imgFile.setFormat(map_png_format(color_type));
+		imgFile.setFormat(map_png_format(ihdr.colType));
 		imgFile.setNumFaces(1);
 		imgFile.setNumMips(1);
 		imgFile.setDepth(1);
 		imgFile.setFlags(flags);
 		imgFile.setType(TextureType::T2D);
-		imgFile.setHeigth(safe_static_cast<uint16_t,uint32_t>(height));
-		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(width));
+		imgFile.setHeigth(safe_static_cast<uint16_t,uint32_t>(ihdr.height));
+		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(ihdr.width));
 		imgFile.resize();
 
 		// ok so the length is the size of the compreseed block we need to read.
 		// it is possible to have multiple IDAT blocks.
-		uint32_t inflated_size = (width * height * bpp);
+		const uint32_t bpp = png_get_bpp(ihdr.bitDepth, ihdr.colType);
+		const uint32_t inflated_size = (ihdr.width * ihdr.height * bpp);
 
-		if (!LoadChucksIDAT(swapArena, file, length, inflated_size, imgFile.getFace(0)))
+		X_ASSERT(inflated_size == imgFile.getFaceSize(), "Calculated size don't match face size")(inflated_size, imgFile.getFaceSize());
+
+		if (!LoadChucksIDAT(swapArena, pCrc, file, length, imgFile))
 		{
 			X_ERROR("TexturePNG", "failed to load PNG chunks");
 			return false;
 		}
+
+		return true;
+	}
+
+	bool XTexLoaderPNG::LoadChucksIDAT(core::MemoryArenaBase* swapArea, core::Crc32* pCrc, core::XFile* file,
+		int32_t idatBlockLength, XTextureFile& imgFile)
+	{
+		X_ASSERT_NOT_NULL(file);
+
+		const size_t rowBytes = Util::rowBytes(imgFile.getWidth(), 1, imgFile.getFormat()) + 1;
+		size_t bytesLeft = imgFile.getFaceSize();
+		uint8_t* pDst = imgFile.getFace(0);
+
+		using namespace core::Compression;
+
+		ZlibInflate inflater(swapArea, [&](const uint8_t* pData, size_t len) {
+
+			X_ASSERT(rowBytes == len, "deflated buffer not match row size")(rowBytes, len);
+
+			// ignore filter byte.
+			++pData;
+			--len;
+
+			X_ASSERT(bytesLeft >= len, "Recived too much data")(bytesLeft, len);
+			bytesLeft -= len;
+
+			std::memcpy(pDst, pData, len);
+			pDst += len;
+		});
+
+		// row bytes is rgb / rgba + 1 filter byte.
+		inflater.setBufferSize(rowBytes);
+
+
+		uint32_t tagName;
+		uint32_t blockCrc;
+
+		ZlibInflate::InflateResult::Enum zRes;
+
+		// going to just load the block in chuncks so even if a png is saved as single large block.
+		// my memory usage will stay low.
+		core::Array<uint8_t> deflatedData(swapArea);
+		deflatedData.resize(IO_READ_BLOCK_SIZE);
+
+		do
+		{
+#if VALIDATE_IDAT_CRC
+			uint32_t calcCrc = pCrc->Begin();
+			pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), calcCrc);
+#endif // !VALIDATE_IDAT_CRC
+
+			int32_t bytesToRead = idatBlockLength;
+			while (bytesToRead > 0)
+			{
+				const int32_t readSize = core::Min(bytesToRead, IO_READ_BLOCK_SIZE);
+
+				if (file->read(deflatedData.ptr(), readSize) != readSize) {
+					X_ERROR("TexturePNG", "failed to reed block of size: %" PRIuS, readSize);
+					return false;
+				}
+
+#if VALIDATE_IDAT_CRC
+				pCrc->Update(deflatedData.ptr(), readSize, calcCrc);
+#endif // !VALIDATE_IDAT_CRC
+
+
+				// infalte it baby.
+				zRes = inflater.Inflate(deflatedData.ptr(), readSize);
+
+				if (zRes == ZlibInflate::InflateResult::ERROR) {
+					X_ERROR("TexturePNG", "Zlib error");
+					return false;
+				}
+
+				bytesToRead -= readSize;
+			}
+
+			// after block there is a crc32
+			if (file->readObj(blockCrc) != sizeof(blockCrc)) {
+				X_ERROR("TexturePNG", "failed to read tag crc");
+				return false;
+			}
+			blockCrc = core::Endian::swap(blockCrc);
+
+#if VALIDATE_IDAT_CRC
+			calcCrc = pCrc->Finish(calcCrc);
+			if (blockCrc != calcCrc) {
+				X_ERROR("TexturePNG", "IDAT crc mismatch. dataCrc: %" PRIu32 " expectedCrc: %" PRIu32, calcCrc, blockCrc);
+				return false;
+			}
+#endif // !VALIDATE_IDAT_CRC
+
+
+			uint32_t blockLen;
+			if (file->readObj(blockLen) != sizeof(blockLen)) {
+				X_ERROR("TexturePNG", "failed to read tag length");
+				return false;
+			}
+
+			blockLen = core::Endian::swap(blockLen);
+
+			// check for next tag
+			if (file->readObj(tagName) != sizeof(tagName)) {
+				X_ERROR("TexturePNG", "failed to read tag name");
+				return false;
+			}
+
+			idatBlockLength = blockLen;
+
+		} while (tagName == PNG_TAG_IDAT);
+
+		if (zRes != ZlibInflate::InflateResult::DONE) {
+			X_ERROR("TexturePNG", "Potential zlib error, did not inflate expected amount");
+			return false;
+		}
+
+		if (tagName != PNG_TAG_IEND) {
+			X_WARNING("TexturePNG", "failed to find IEND tag");
+		}
+
+		// check the image is fully valid
+		if (bytesLeft != 0) {
+			X_ERROR("TexturePNG", "Not all texture data was populated %" PRIuS " left uninitialized", bytesLeft);
+			return false;
+		}
+
+		if (file->readObj(blockCrc) != sizeof(blockCrc)) {
+			X_WARNING("TexturePNG", "failed to read IEND crc");
+			return false;
+		}
+		blockCrc = core::Endian::swap(blockCrc);
+
+		if (pCrc->GetCRC32OfObject(tagName) != blockCrc) {
+			X_ERROR("TexturePNG", "IEND crc mismatch");
+			return false;
+		}
+
+#if 0 // could just be more tags, so don't warn
+		const auto bytesLeft = file->remainingBytes();
+		if (bytesLeft != 0) {
+			X_WARNING("TexturePNG", "Trailing bytes after IEND");
+		}
+#endif
 
 		return true;
 	}

@@ -10,10 +10,12 @@ X_NAMESPACE_BEGIN(texture)
 
 namespace PNG
 {
+	#define VALIDATE_IDAT_CRC 1
 
 	class IMGLIB_EXPORT XTexLoaderPNG : public ITextureFmt
 	{
 		static const int32_t BLOCK_SIZE = 1024 * 32; // save as 32kb chunks.
+		static const int32_t IO_READ_BLOCK_SIZE = (1024 * 4) * 4; // read the IDAT in max of 16kb chunks regardless of it's size.
 
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::PNG;
@@ -36,7 +38,9 @@ namespace PNG
 		// ~ITextureFmt
 
 	private:
-
+		static bool LoadChucksIDAT(core::MemoryArenaBase* swapArea, core::Crc32* pCrc, core::XFile* file,
+			int32_t idatBlockLength, XTextureFile& imgFile);
+		
 	};
 
 } // namespace PNG
