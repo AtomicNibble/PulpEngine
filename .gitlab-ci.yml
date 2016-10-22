@@ -25,6 +25,7 @@ build:win32_debug:
    expire_in: 1 week
    paths:
     - build/Win32/Debug/*.exe
+    - build/Win32/Debug/*.dll
     - build/Win32/Debug/*.pdb
   tags:
     - windows
@@ -39,6 +40,7 @@ build:win32_release:
    expire_in: 1 week
    paths:
     - build/Win32/Release/*.exe
+    - build/Win32/Release/*.dll
   tags:
     - windows
 
@@ -52,6 +54,7 @@ build:win32_super:
    expire_in: 1 week
    paths:
     - build/Win32/Super/*.exe
+    - build/Win32/Super/*.dll
   tags:
     - windows
 
@@ -66,6 +69,7 @@ build:x64_debug:
    expire_in: 1 week
    paths:
     - build/x64/Debug/*.exe
+    - build/x64/Debug/*.dll
     - build/x64/Debug/*.pdb
   tags:
     - windows
@@ -80,6 +84,7 @@ build:x64_release:
    expire_in: 1 week
    paths:
     - build/x64/Release/*.exe
+    - build/x64/Release/*.dll
   tags:
     - windows
 
@@ -93,6 +98,7 @@ build:x64_super:
    expire_in: 1 week
    paths:
     - build/x64/Super/*.exe
+    - build/x64/Super/*.dll
   tags:
     - windows
 
