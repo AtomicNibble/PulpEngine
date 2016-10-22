@@ -550,7 +550,7 @@ namespace PNG
 		
 		// complete my ego.
 		{
-			core::StackString<96> str;
+			core::StackString<128> str;
 			str.appendFmt("%s - %s - %s - %s", X_ENGINE_NAME, X_ENGINE_VERSION_STR, X_CPUSTRING, X_PLATFORM_STR);
 
 			uint32_t crc = pCrc->Begin();
