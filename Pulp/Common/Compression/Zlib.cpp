@@ -244,9 +244,8 @@ namespace Compression
 
 		stream_->next_out = nullptr;
 		stream_->avail_out = 0;
-	//	stream_->next_out = reinterpret_cast<uint8_t*>(pDst);
-	//	stream_->avail_out = safe_static_cast<uint32_t>(destLen);
-
+		stream_->next_out = nullptr;
+		stream_->avail_out = 0;
 	}
 
 	ZlibInflate::~ZlibInflate()
