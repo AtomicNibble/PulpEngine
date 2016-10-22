@@ -441,95 +441,10 @@ namespace Converter
 				}
 			}
 
-
-			const uint32_t numPixels = halfImg.width() * halfImg.height();
-			const float* pRedChannel = halfImg.channel(0);
-			const float* pGreenChannel = halfImg.channel(1);
-			const float* pBlueChannel = halfImg.channel(2);
-			const float* pAlphaChannel = halfImg.channel(3);
-
-			// we copy the data back to src img.
-			{
-				const size_t dstSize = srcImg.getLevelSize(mip);
-				uint8_t* pMipDst = srcImg.getLevel(faceIdx, mip);
-
-				if (srcImg.getFormat() == Texturefmt::R16G16B16A16_FLOAT)
-				{
-					// are we on the same page? (mentally)
-					const size_t expectedSize = (numPixels * 8);
-					X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
-
-
-					for (uint32_t i = 0; i < numPixels; i++)
-					{
-						uint16_t* pPixel = reinterpret_cast<uint16_t*>(&pMipDst[i * 8]);
-
-						pPixel[0] = XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-						pPixel[1] = XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-						pPixel[2] = XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
-						pPixel[3] = XHalfCompressor::compress(math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
-					}
-				}
-				else if (srcImg.getFormat() == Texturefmt::R8G8B8A8)
-				{
-					const size_t expectedSize = (numPixels * 4);
-					X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
-
-					for (uint32_t i = 0; i < numPixels; i++)
-					{
-						uint8_t* pPixel = &pMipDst[i * 4];
-						pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-						pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-						pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
-						pPixel[3] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
-					}
-				}
-				else if (srcImg.getFormat() == Texturefmt::B8G8R8A8)
-				{
-					const size_t expectedSize = (numPixels * 4);
-					X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
-
-					for (uint32_t i = 0; i < numPixels; i++)
-					{
-						uint8_t* pPixel = &pMipDst[i * 4];
-						pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
-						pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-						pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-						pPixel[3] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
-					}
-				}
-				else if (srcImg.getFormat() == Texturefmt::R8G8B8)
-				{
-					const size_t expectedSize = (numPixels * 3);
-					X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
-
-					for (uint32_t i = 0; i < numPixels; i++)
-					{
-						uint8_t* pPixel = &pMipDst[i * 3];
-						pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-						pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-						pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
-					}
-				}
-				else if (srcImg.getFormat() == Texturefmt::B8G8R8)
-				{
-					const size_t expectedSize = (numPixels * 3);
-					X_ASSERT(dstSize == expectedSize, "Size missmatch for expected vs provided size")(dstSize, expectedSize);
-
-					for (uint32_t i = 0; i < numPixels; i++)
-					{
-						uint8_t* pPixel = &pMipDst[i * 3];
-						pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
-						pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-						pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-					}
-				}
-				else
-				{
-					X_ASSERT_NOT_IMPLEMENTED();
-					jobdata.result = false;
-					return;
-				}
+			if (!halfImg.saveToImg(srcImg, faceIdx, mip)) {
+				X_ERROR("Img", "Error Saving mip data to src format");
+				jobdata.result = false;
+				return;
 			}
 
 			// now we want to swap?

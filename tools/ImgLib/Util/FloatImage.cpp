@@ -121,11 +121,109 @@ namespace Converter
 			}
 		}
 		else
+
+	bool FloatImage::saveToImg(XTextureFile& img, int32_t face, int32_t mip)
+	{
+		// out img
+		const size_t mipSize = img.getLevelSize(mip);
+		uint8_t* pMipDst = img.getLevel(face, mip);
+		const auto fmt = img.getFormat();
+
+		if (componentCount() < 3) {
+			X_ERROR("FloatImg", "Saving of images with less than 3 components is not currently supported");
+			return false;
+		}
+
+		// this img
+		const uint32_t numPixels = width() * height();
+		const float* pRedChannel = channel(0);
+		const float* pGreenChannel = channel(1);
+		const float* pBlueChannel = channel(2);
+		const float* pAlphaChannel = nullptr;
+
+		if (componentCount() >= 4) {
+			pAlphaChannel = channel(3);
+		}
+
+		// just swap the channel pointers.
+		if (fmt == Texturefmt::B8G8R8A8 || fmt == Texturefmt::B8G8R8) {
+			core::Swap(pRedChannel, pBlueChannel);
+		}
+
+		if (fmt == Texturefmt::R8G8B8A8 || fmt == Texturefmt::B8G8R8A8)
 		{
-			for (uint32_t i = 0; i < count; i++)
+			const size_t expectedSize = (numPixels * 4);
+			X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize);
+
+			if (componentCount() >= 4)
 			{
-				pAlpha_channel[i] = 1.f;
+				for (uint32_t i = 0; i < numPixels; i++)
+				{
+					uint8_t* pPixel = &pMipDst[i * 4];
+					pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+					pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+					pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+					pPixel[3] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
+				}
 			}
+			else
+			{
+				for (uint32_t i = 0; i < numPixels; i++)
+				{
+					uint8_t* pPixel = &pMipDst[i * 4];
+					pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+					pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+					pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+					pPixel[3] = std::numeric_limits<uint8_t>::max();
+				}
+			}
+		}
+		else if (fmt == Texturefmt::R8G8B8 || fmt == Texturefmt::B8G8R8)
+		{
+			const size_t expectedSize = (numPixels * 3);
+			X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize);
+
+			for (uint32_t i = 0; i < numPixels; i++)
+			{
+				uint8_t* pPixel = &pMipDst[i * 3];
+				pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+				pPixel[1] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+				pPixel[2] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+			}
+		}
+		else if (fmt == Texturefmt::R16G16B16A16_FLOAT)
+		{
+			// are we on the same page? (mentally)
+			const size_t expectedSize = (numPixels * 8);
+			X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize);
+
+			if (componentCount() >= 4)
+			{
+				for (uint32_t i = 0; i < numPixels; i++)
+				{
+					uint16_t* pPixel = reinterpret_cast<uint16_t*>(&pMipDst[i * 8]);
+					pPixel[0] = XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+					pPixel[1] = XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+					pPixel[2] = XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+					pPixel[3] = XHalfCompressor::compress(math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < numPixels; i++)
+				{
+					uint16_t* pPixel = reinterpret_cast<uint16_t*>(&pMipDst[i * 8]);
+					pPixel[0] = XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+					pPixel[1] = XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+					pPixel[2] = XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+					pPixel[3] = std::numeric_limits<uint16_t>::max();
+				}
+			}
+		}
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+			return false;
 		}
 
 		return true;
