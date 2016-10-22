@@ -62,16 +62,18 @@ namespace Converter
 	{
 		clear();
 
+		const auto fmt = img.getFormat();
+
 		// init from rgb8 for now.
-		if (img.getFormat() != Texturefmt::R8G8B8A8 && 
-			img.getFormat() != Texturefmt::B8G8R8A8 &&
-			img.getFormat() != Texturefmt::R8G8B8 &&
-			img.getFormat() != Texturefmt::B8G8R8) {
-			X_ERROR("FloatImg", "Contruction from fromat \"%s\" not currently supported", Texturefmt::ToString(img.getFormat()));
+		if (fmt != Texturefmt::R8G8B8A8 && 
+			fmt != Texturefmt::B8G8R8A8 &&
+			fmt != Texturefmt::R8G8B8 &&
+			fmt != Texturefmt::B8G8R8) {
+			X_ERROR("FloatImg", "Contruction from fromat \"%s\" not currently supported", Texturefmt::ToString(fmt));
 			return false;
 		}
 
-		const bool hasAlpha = !(img.getFormat() == Texturefmt::R8G8B8 || img.getFormat() == Texturefmt::B8G8R8);
+		const bool hasAlpha = !(fmt == Texturefmt::R8G8B8 || fmt == Texturefmt::B8G8R8);
 
 		// need to get width of the mip.
 		{
@@ -92,6 +94,11 @@ namespace Converter
 		if (hasAlpha) {
 			// don't set this if only forceAlphaChannel, as this is input stride.
 			pixelStride = 4;
+		}
+
+		// just swap the channel pointers.
+		if (fmt == Texturefmt::B8G8R8A8 || fmt == Texturefmt::B8G8R8) {
+			core::Swap(pRed_channel, pBlue_channel);
 		}
 
 		// lets do each channel one by one.
