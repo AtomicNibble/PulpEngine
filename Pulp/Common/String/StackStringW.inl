@@ -39,7 +39,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const StringRange<wchar_t>& range)
 	: len_(safe_static_cast<size_t>(range.GetLength()))
 {
-	X_ASSERT(len_ < N, "StringRange does not fit into StackString of size %d.", N)();
+	X_ASSERT(len_ < N, "StringRange  of length %d does not fit into StackString of size %d.", len_, N)(len_, N);
 
 	// ranges do not necessarily contain a null-terminator, hence we add it manually
 	memcpy(str_, range.GetStart(), len_* sizeof(wchar_t));
@@ -53,7 +53,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
 	: len_(safe_static_cast<size_t>(endExclusive - beginInclusive))
 {
-	X_ASSERT(len_ < N, "String of length %d does not fit into StackString of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "String of length %d does not fit into StackString of size %d.", len_, N)(len_, N);
 	memcpy(str_, beginInclusive, len_ * sizeof(wchar_t));
 	str_[len_] = 0;
 }
@@ -64,7 +64,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const bool b)
 	: len_(1)
 {
-	X_ASSERT(len_ < N, "bool val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "bool val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	str_[0] = b ? L'1' : L'0';
 	str_[1] = L'\0';
@@ -76,7 +76,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const char c)
 	: len_(1)
 {
-	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	str_[0] = static_cast<wchar_t>(c);
 	str_[1] = '\0';
@@ -88,7 +88,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const wchar_t c)
 	: len_(1)
 {
-	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	str_[0] = c;
 	str_[1] = '\0';
@@ -100,7 +100,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const int i)
 	: len_(12)
 {
-	X_ASSERT(len_ < N, "int val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "int val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = swprintf_s(str_, L"%d", i);
 }
@@ -111,7 +111,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const unsigned u)
 	: len_(12)
 {
-	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = swprintf_s(str_, L"%u", u);
 }
@@ -123,7 +123,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const float f)
 	: len_(24) // represent any float.
 {
-	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	wchar_t text[64];
 
@@ -144,7 +144,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const unsigned __int64 u)
 	: len_(24)
 {
-	X_ASSERT(len_ < N, "unsigned __int64 does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "unsigned __int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = swprintf_s(str_, L"%I64u", u);
 }
@@ -155,7 +155,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const __int64 u)
 	: len_(24)
 {
-	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = swprintf_s(str_, L"%I64d", u);
 }

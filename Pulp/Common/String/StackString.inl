@@ -33,7 +33,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
-	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)();
+	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)(len_, N);
 	memcpy(str_, str, len_ + 1);
 }
 
@@ -60,7 +60,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const TChar* const beginInclusive, const TChar* const endExclusive)
 	: len_(safe_static_cast<size_t>(endExclusive - beginInclusive))
 {
-	X_ASSERT(len_ < N, "String of length %d does not fit into StackString of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "String of length %d does not fit into StackString of size %d.", len_, N)(len_, N);
 	memcpy(str_, beginInclusive, len_);
 	str_[len_] = 0;
 }
@@ -71,7 +71,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const bool b)
 : len_(1)
 {
-	X_ASSERT(len_ < N, "bool val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "bool val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	str_[0] = b ? '1' : '0';
 	str_[1] = '\0';
@@ -83,7 +83,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const char c)
 	: len_(1)
 {
-	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	str_[0] = static_cast<TChar>(c);
 	str_[1] = '\0';
@@ -95,7 +95,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const wchar_t c)
 : len_(1)
 {
-	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	str_[0] = static_cast<TChar>(c);
 	str_[1] = '\0';
@@ -107,7 +107,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const int i)
 : len_(12)
 {
-	X_ASSERT(len_ < N, "int val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "int val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = sprintf_s(str_, "%d", i);
 }
@@ -118,7 +118,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const unsigned u)
 : len_(12)
 {
-	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = sprintf_s(str_, "%u", u);
 }
@@ -130,7 +130,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const float f)
 : len_(24) // represent any float.
 {
-	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
 	TChar text[64];
 
@@ -151,7 +151,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const unsigned __int64 u)
 : len_(24)
 {
-	X_ASSERT(len_ < N, "unsigned __int64 does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "unsigned __int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = sprintf_s(str_, "%I64u", u);
 }
@@ -162,7 +162,7 @@ template <size_t N, typename TChar>
 StackString<N, TChar>::StackString(const __int64 u)
 : len_(24)
 {
-	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_, N)();
+	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
 	len_ = sprintf_s(str_, "%I64d", u);
 }
