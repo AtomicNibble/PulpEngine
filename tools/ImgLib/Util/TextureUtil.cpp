@@ -537,6 +537,11 @@ namespace Util
 		core::StackString<64, char> strUpper(pStr);
 		strUpper.toUpper();
 
+		// everything is 2 or mroe currently.
+		if (strUpper.length() < 2) {
+			return Texturefmt::UNKNOWN;
+		}
+
 		using namespace core::Hash::Fnva1Literals;
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
