@@ -118,7 +118,7 @@ MStatus PotatoAnimExporter::loadBones(void)
 		{
 			MFnDagNode node(jointDag);
 			
-			MayaUtil::MayaPrintMsg("Bone(%i) name: %s", i, node.name().asChar());
+			MayaUtil::MayaPrintMsg("Bone(%" PRIu32 ") name: %s", i, node.name().asChar());
 
 			Bone& bone = bones_.AddOne();
 			bone.dag = jointDag;
@@ -127,7 +127,7 @@ MStatus PotatoAnimExporter::loadBones(void)
 		}
 		else
 		{
-			MayaUtil::MayaPrintMsg("Not a valid joint: %i", i);
+			MayaUtil::MayaPrintMsg("Not a valid joint: %" PRIu32, i);
 		}
 	}
 
@@ -143,14 +143,14 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 	// for each frame load anim data.
 	int32_t curFrame = startFrame_;
 
-	MayaUtil::MayaPrintMsg("Loading frames: %i - %i", startFrame_, endFrame_);
+	MayaUtil::MayaPrintMsg("Loading frames: %" PRIi32 " - %" PRIi32, startFrame_, endFrame_);
 
 	while (curFrame <= endFrame_)
 	{
 		time.setValue(curFrame);
 		MAnimControl::setCurrentTime(time);
 
-		MayaUtil::MayaPrintVerbose("Loading frame: %i", curFrame);
+		MayaUtil::MayaPrintVerbose("Loading frame: %" PRIi32, curFrame);
 		{
 			MVector position;
 
@@ -159,7 +159,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 			{
 				Bone& bone = bones_[i];
 
-				MayaUtil::MayaPrintVerbose("Bone(%i): %s", i, bone.name.asChar());
+				MayaUtil::MayaPrintVerbose("Bone(%" PRIuS "): %s", i, bone.name.asChar());
 
 
 				MTransformationMatrix worldMatrix = bone.dag.inclusiveMatrix();
@@ -249,7 +249,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 			}
 			else
 			{
-				MayaUtil::MayaPrintError("Failed to open file for saving(%i): %s", err, filePath_.c_str());
+				MayaUtil::MayaPrintError("Failed to open file for saving(%" PRIi32 "): %s", err, filePath_.c_str());
 				return MS::kFailure;
 			}
 		}
@@ -286,12 +286,12 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
 	buf.clear();
 	buf.appendFmt("// Potato intermidiate animation format\n");
 	buf.appendFmt("// Source: \"%s\"\n", cuirrentFile.asChar());
-	buf.appendFmt("// TimeLine range: %i <-> %i\n", startFrame_, endFrame_);
+	buf.appendFmt("// TimeLine range: %" PRIi32 " <-> %" PRIi32 "\n", startFrame_, endFrame_);
 	buf.appendFmt("\n");
-	buf.appendFmt("VERSION %i\n", anim::ANIM_INTER_VERSION);
-	buf.appendFmt("BONES %i\n", numBones);
-	buf.appendFmt("FRAMES %i\n", numFrames);
-	buf.appendFmt("FPS %i\n", fps);
+	buf.appendFmt("VERSION %" PRIu32 "\n", anim::ANIM_INTER_VERSION);
+	buf.appendFmt("BONES %" PRIi32 "\n", numBones);
+	buf.appendFmt("FRAMES %" PRIi32 "\n", numFrames);
+	buf.appendFmt("FPS %" PRIi32 "\n", fps);
 	buf.appendFmt("\n");
 
 	// list the bones.
@@ -360,7 +360,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 	int32_t numFrames = getNumFrames();
 
 	MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath_.c_str());
-	MayaUtil::MayaPrintMsg("Frames -> start: %i end: %i num: %i", startFrame_, endFrame_, numFrames); 
+	MayaUtil::MayaPrintMsg("Frames -> start: %" PRIi32 " end: %" PRIi32 " num: %" PRIi32, startFrame_, endFrame_, numFrames);
 	MayaUtil::MayaPrintMsg(""); // new line
 
 	// print the error after printing info about frames and the name.
@@ -372,7 +372,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 	// name length check
 	if (strlen(filePath_.fileName()) > anim::ANIM_MAX_NAME_LENGTH)
 	{
-		MayaUtil::MayaPrintError("Anim name is too long. MAX: %i, provided: %i",
+		MayaUtil::MayaPrintError("Anim name is too long. MAX: %" PRIu32 ", provided: %" PRIuS,
 			anim::ANIM_MAX_NAME_LENGTH, filePath_.length());
 		return MS::kFailure;;
 	}
