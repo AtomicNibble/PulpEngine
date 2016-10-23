@@ -492,7 +492,7 @@ MString ModelExporter::argsToJson(void) const
 	for (size_t i = 0; i < model::MODEL_MAX_LODS; i++)
 	{
 		core::StackString<32> buf;
-		buf.appendFmt("lod%i_dis", i);
+		buf.appendFmt("lod%" PRIuS "_dis", i);
 
 		writer.Key(buf.c_str());
 
@@ -746,7 +746,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		for (uint32_t i = 0; i < model::MODEL_MAX_LODS; i++)
 		{
 			core::StackString<32> lodName;
-			lodName.appendFmt("LOD%i", i);
+			lodName.appendFmt("LOD%" PRIu32, i);
 			idx = args.flagIndex(lodName.c_str());
 			if (idx != MArgList::kInvalidArgIndex)
 			{
