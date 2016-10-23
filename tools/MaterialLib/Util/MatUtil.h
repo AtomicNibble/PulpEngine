@@ -11,6 +11,7 @@ namespace Util
 	MaterialType::Enum MatTypeFromStr(const char* str);
 	MaterialUsage::Enum MatUsageFromStr(const char* str);
 	MaterialSurType::Enum MatSurfaceTypeFromStr(const char* str);
+	MaterialFilterType::Enum MatFilterTypeFromStr(const char* str);
 
 
 } // namespace Util

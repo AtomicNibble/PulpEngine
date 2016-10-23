@@ -113,6 +113,41 @@ namespace Util
 		}
 	}
 
+	MaterialFilterType::Enum MatFilterTypeFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "nearest (mip none)"_fnv1a:
+				return MaterialFilterType::NEAREST_MIP_NONE;
+			case "nearest (mip nearest)"_fnv1a:
+				return MaterialFilterType::NEAREST_MIP_NEAREST;
+			case "nearest (mip linear)"_fnv1a:
+				return MaterialFilterType::NEAREST_MIP_LINEAR;
+
+			case "linear (mip none)"_fnv1a:
+				return MaterialFilterType::LINEAR_MIP_NONE;
+			case "linear (mip nearest)"_fnv1a:
+				return MaterialFilterType::LINEAR_MIP_NEAREST;
+			case "linear (mip linear)"_fnv1a:
+				return MaterialFilterType::LINEAR_MIP_LINEAR;
+
+			case "anisotropicx2"_fnv1a:
+				return MaterialFilterType::ANISOTROPIC_X2;
+			case "anisotropicx4"_fnv1a:
+				return MaterialFilterType::ANISOTROPIC_X4;
+			case "anisotropicx8"_fnv1a:
+				return MaterialFilterType::ANISOTROPIC_X8;
+			case "anisotropicx16"_fnv1a:
+				return MaterialFilterType::ANISOTROPIC_X16;
+
+			default:
+				X_ERROR("Mtl", "Unknown filter type: '%s' (case-sen)", str);
+				return MaterialFilterType::NEAREST_MIP_NEAREST;
+		}
+	}
+
 
 
 } // namespace Util
