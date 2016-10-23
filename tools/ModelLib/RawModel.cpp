@@ -157,7 +157,7 @@ namespace RawModel
 
 
 		if (version < model::MODEL_RAW_VERSION) {
-			X_ERROR("RawModel", "RawModel file version is too old: %i required: %i",
+			X_ERROR("RawModel", "RawModel file version is too old: %" PRIi32 " required: %" PRIu32,
 				version, model::MODEL_RAW_VERSION);
 			return false;
 		}
@@ -167,12 +167,12 @@ namespace RawModel
 			return true;
 		}
 		if (numLods > model::MODEL_MAX_LODS) {
-			X_WARNING("RawModel", "RawModel has no many lods: %i max", 
+			X_WARNING("RawModel", "RawModel has no many lods: %" PRIu32 " max",
 				model::MODEL_MAX_LODS);
 			return true;
 		}
 		if (numBones > model::MODEL_MAX_BONES) {
-			X_ERROR("RaWModel", "model has too many bones: %i max: %i",
+			X_ERROR("RaWModel", "model has too many bones: %" PRIi32 " max: %" PRIu32,
 				numBones, model::MODEL_MAX_BONES);
 			return false;
 		}
@@ -305,7 +305,7 @@ namespace RawModel
 			}
 
 			if (numMesh > model::MODEL_MAX_MESH) {
-				X_ERROR("RaWModel", "lod has too many mesh: %i max: %i",
+				X_ERROR("RaWModel", "lod has too many mesh: %" PRIi32 " max: %" PRIu32,
 					numMesh, model::MODEL_MAX_MESH);
 				return false;
 			}
@@ -398,7 +398,7 @@ namespace RawModel
 
 				// check the bone idx is valid
 				if (bind.boneIdx_ > numBones) {
-					X_ERROR("RawModel", "Vert(%s" PRIuS ") bind has invalid bone idx: %i max: %i",
+					X_ERROR("RawModel", "Vert(%s" PRIuS ") bind has invalid bone idx: %" PRIi32 " max: %" PRIi32,
 						i, bind.boneIdx_, numBones);
 					return false;
 				}
@@ -434,7 +434,8 @@ namespace RawModel
 
 				// validate the index.
 				if (vert.index_ > numVerts) {
-					X_ERROR("RawModel", "Tri(%" PRIuS ":%" PRIuS ") has invalid index of: %i max: %i", i, t, vert.index_, numVerts);
+					X_ERROR("RawModel", "Tri(%" PRIuS ":%" PRIuS ") has invalid index of: %" PRIu32 " max: %" PRIu32, 
+						i, t, vert.index_, numVerts);
 					return false;
 				}
 
@@ -656,7 +657,7 @@ namespace RawModel
 		}
 
 		pCurBuf->append("\n");
-		pCurBuf->appendFmt("VERSION %i\n", VERSION);
+		pCurBuf->appendFmt("VERSION %" PRIi32 "\n", VERSION);
 		pCurBuf->appendFmt("LODS %" PRIuS "\n", lods_.size());
 		pCurBuf->appendFmt("BONES %" PRIuS "\n", bones_.size());
 		pCurBuf->append("\n");
@@ -684,7 +685,7 @@ namespace RawModel
 
 		for (const auto& bone : bones_)
 		{
-			pCurBuf->appendFmt("BONE %i \"%s\"\n", bone.parIndx_, bone.name_.c_str());
+			pCurBuf->appendFmt("BONE %" PRIi32 " \"%s\"\n", bone.parIndx_, bone.name_.c_str());
 			pCurBuf->appendFmt("POS (%f %f %f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
 			auto ang = bone.rotation_;
 			pCurBuf->appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n",
@@ -811,7 +812,7 @@ namespace RawModel
 
 			for (const auto& bind : vert.binds_)
 			{
-				pCurBuf->appendFmt("%i %f\n", bind.boneIdx_, bind.weight_);
+				pCurBuf->appendFmt("%" PRIi32 " %f\n", bind.boneIdx_, bind.weight_);
 			}
 
 			pCurBuf->append("\n");
@@ -845,7 +846,7 @@ namespace RawModel
 				const Color& col = triVert.col_;
 				const Vec2f& uv = triVert.uv_;
 
-				pCurBuf->appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n",
+				pCurBuf->appendFmt("%" PRIu32 "\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n",
 					index,
 					normal.x, normal.y, normal.z,
 					tan.x, tan.y, tan.z,
