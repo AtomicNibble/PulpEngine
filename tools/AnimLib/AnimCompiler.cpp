@@ -365,12 +365,12 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 	}
 
 	if (inter_.getFps() > anim::ANIM_MAX_FPS) {
-		X_ERROR("Anim", "inter anim fps exceeds max: %i", 
+		X_ERROR("Anim", "inter anim fps exceeds max: %" PRIu32,
 			anim::ANIM_MAX_FPS);
 		return false;
 	}
 	if (inter_.getNumFrames() > anim::ANIM_MAX_FRAMES) {
-		X_ERROR("Anim", "inter anim exceeds max frames: %i",
+		X_ERROR("Anim", "inter anim exceeds max frames: %" PRIu32,
 			anim::ANIM_MAX_FRAMES);
 		return false;
 	}
