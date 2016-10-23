@@ -251,14 +251,14 @@ namespace V2
 
 	bool JobSystem::StartThreads(void)
 	{
-		X_LOG0("JobSystemV2", "Creating %i threads", numThreads_);
+		X_LOG0("JobSystemV2", "Creating %" PRIu32 " threads", numThreads_);
 
 		// que for main thread also.
 		uint32_t threadId = Thread::GetCurrentID();
 
 		CreateThreadObjects(threadId);
 		{
-			size_t threadIdx = GetThreadIndex();
+			const size_t threadIdx = GetThreadIndex();
 			ThreadQue_.SetValue(pThreadQues_[threadIdx]);
 			ThreadAllocator_.SetValue(pJobAllocators_[threadIdx]);
 		}
@@ -267,7 +267,7 @@ namespace V2
 		for (i = 0; i < numThreads_; i++)
 		{
 			core::StackString<64> name;
-			name.appendFmt("JobSystemV2::Worker_%i", i);
+			name.appendFmt("JobSystemV2::Worker_%" PRIu32, i);
 			threads_[i].setData(this);
 			threads_[i].Create(name.c_str()); // default stack size.
 
@@ -284,7 +284,7 @@ namespace V2
 
 	void JobSystem::CreateThreadObjects(uint32_t threadId)
 	{
-		uint32_t idx = safe_static_cast<uint32_t, size_t>(threadIdToIndex_.size());
+		const uint32_t idx = safe_static_cast<uint32_t, size_t>(threadIdToIndex_.size());
 
 		X_ASSERT(idx < HW_THREAD_MAX, "No room for thread que")(idx, HW_THREAD_MAX);
 
@@ -534,7 +534,7 @@ namespace V2
 
 	size_t JobSystem::GetThreadIndex(void) const
 	{
-		uint32_t threadId = Thread::GetCurrentID();
+		const uint32_t threadId = Thread::GetCurrentID();
 
 		for (auto id : threadIdToIndex_) {
 			if (id.first == threadId) {
@@ -548,7 +548,7 @@ namespace V2
 
 	bool JobSystem::CurrentThreadHasIndex(void) const
 	{
-		uint32_t threadId = Thread::GetCurrentID();
+		const uint32_t threadId = Thread::GetCurrentID();
 
 		for (auto id : threadIdToIndex_) {
 			if (id.first == threadId) {
@@ -592,7 +592,7 @@ namespace V2
 
 	Thread::ReturnValue JobSystem::ThreadRun(const Thread& thread)
 	{
-		size_t threadIdx = GetThreadIndex();
+		const size_t threadIdx = GetThreadIndex();
 		ThreadQue& threadQue = *GetWorkerThreadQueue(threadIdx);
 		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);
 
