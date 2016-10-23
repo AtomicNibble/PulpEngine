@@ -158,7 +158,7 @@ XMaterial::XMaterial()
 
 	texRepeat_ = MaterialTexRepeat::TILE_BOTH;
 	polyOffsetType_ = MaterialPolygonOffset::NONE;
-	filterType_ = MaterialFilterType::LINEAR;
+	filterType_ = MaterialFilterType::LINEAR_MIP_LINEAR;
 	MatType_ = MaterialType::UNKNOWN;
 	coverage_ = MaterialCoverage::BAD;
 }
