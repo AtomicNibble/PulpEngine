@@ -95,7 +95,7 @@ ByteStream& ByteStream::operator=(ByteStream&& oth)
 template<typename T>
 inline void ByteStream::write(const T& val)
 {
-	X_ASSERT(sizeof(T) <= freeSpace(), "can't write a object of size: %i", sizeof(T))(sizeof(T), freeSpace());
+	X_ASSERT(sizeof(T) <= freeSpace(), "can't write a object of size: %" PRIuS, sizeof(T))(sizeof(T), freeSpace());
 
 	union {
 		char* as_char;
@@ -111,7 +111,7 @@ inline void ByteStream::write(const T& val)
 template<typename T>
 inline void ByteStream::write(const T* val, size_t num)
 {
-	X_ASSERT(((sizeof(T) * num) <= freeSpace()), "can't write %i objects of size: %i",
+	X_ASSERT(((sizeof(T) * num) <= freeSpace()), "can't write %" PRIuS " objects of size: %" PRIuS,
 		num, sizeof(T)) (sizeof(T), freeSpace());
 
 	union {
@@ -134,7 +134,7 @@ inline void ByteStream::write(const T* val, size_t num)
 template<typename T>
 inline T ByteStream::read(void)
 {
-	X_ASSERT(sizeof(T) <= size(), "can't read a object of size: %i", sizeof(T))(sizeof(T), size());
+	X_ASSERT(sizeof(T) <= size(), "can't read a object of size: %" PRIuS, sizeof(T))(sizeof(T), size());
 
 	union {
 		char* as_char;
@@ -149,7 +149,7 @@ inline T ByteStream::read(void)
 template<typename T>
 inline T ByteStream::peek(void) const
 {
-	X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %i", sizeof(T))(sizeof(T), size());
+	X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %" PRIuS, sizeof(T))(sizeof(T), size());
 
 	union {
 		char* as_char;
