@@ -18,6 +18,18 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{2a3996ba-05c2-471c-a14d-8cc646189388}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Compiler">
+      <UniqueIdentifier>{59b78c98-13e6-4269-9d4d-eed4458a2094}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Compiler">
+      <UniqueIdentifier>{10badb09-c7d1-4dc3-a125-6f69b8859a01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{6f0d98c9-d4fb-4357-a937-caaed0d4e349}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{bce20ef8-909b-4b53-ab96-2abc8123580e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -25,6 +37,12 @@
     </ClInclude>
     <ClInclude Include="Lib\MaterialLib.h">
       <Filter>Header Files\Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\MatUtil.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Compiler\Compiler.h">
+      <Filter>Header Files\Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +54,12 @@
     </ClCompile>
     <ClCompile Include="ConverterLib.cpp">
       <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\MatUtil.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Compiler\Compiler.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

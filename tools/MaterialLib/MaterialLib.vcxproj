@@ -323,10 +323,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Lib\MaterialLib.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\MatUtil.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Lib\MaterialLib.cpp" />
     <ClCompile Include="ConverterLib.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -341,6 +344,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\MatUtil.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
