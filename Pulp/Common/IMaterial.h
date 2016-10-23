@@ -55,7 +55,8 @@ X_DECLARE_FLAGS(MaterialFlag)(
 
 	NO_FALL_DMG,	// no dmg given on fall
 	NO_IMPACT,		// impacts not shown
-	NO_PENNETRATE	// bullets can't pass through.
+	NO_PENNETRATE,	// bullets can't pass through.
+	NO_STEPS		// don't create footsteps.
 );
 
 typedef Flags<MaterialFlag> MaterialFlags;
