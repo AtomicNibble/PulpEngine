@@ -35,22 +35,27 @@ X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
 
 
 X_DECLARE_FLAGS(MaterialFlag)(
-	NODRAW,			// 1 not visable
-	EDITOR_VISABLE, // 2 makes nodraw visable in editor modes.
+	NODRAW,			// not visable
+	EDITOR_VISABLE, // makes nodraw visable in editor modes.
 
-	SOLID,			// 4 eye/view can't be in a solid
+	SOLID,			// eye/view can't be in a solid
 
-	STRUCTURAL,		// 8 collision, used to buold area's also.
-	DETAIL,			// 16 no collision
+	STRUCTURAL,		// collision, used to buold area's also.
+	DETAIL,			// no collision
 
-	PORTAL,			// 32 for creating render cells
+	PORTAL,			// for creating render cells
 
-	PLAYER_CLIP,	// 64 players can't go through this
-	AI_CLIP,		// 128 AI can't go throught this
+	MOUNT,			// can mount
 
-	NO_FALL_DMG,	// 256 no dmg given on fall
-	NO_IMPACT,		// 512 impacts not shown
-	NO_PENNETRATE	// 1024 bullets can't pass through.
+	PLAYER_CLIP,	// players can't go through this
+	AI_CLIP,		// AI can't go throught this
+	BULLET_CLIP,
+	MISSLE_CLIP,
+	VEHICLE_CLIP,
+
+	NO_FALL_DMG,	// no dmg given on fall
+	NO_IMPACT,		// impacts not shown
+	NO_PENNETRATE	// bullets can't pass through.
 );
 
 typedef Flags<MaterialFlag> MaterialFlags;
