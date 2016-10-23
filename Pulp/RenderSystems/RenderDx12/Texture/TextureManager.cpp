@@ -310,7 +310,7 @@ X_NAMESPACE_BEGIN(texture)
 		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
 		texDesc.Width = imgFile.getWidth();
 		texDesc.Height = imgFile.getHeight();
-		texDesc.DepthOrArraySize = 1;
+		texDesc.DepthOrArraySize = imgFile.getDepth();
 		texDesc.MipLevels = imgFile.getNumMips();
 		texDesc.Format = fmt;
 		texDesc.SampleDesc.Count = 1;
