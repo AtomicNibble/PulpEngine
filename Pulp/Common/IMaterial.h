@@ -127,6 +127,21 @@ X_DECLARE_ENUM8(MaterialSurType)(
 	WATER
 );
 
+// used for grouping in editor etc
+// not used at runtime.
+X_DECLARE_ENUM8(MaterialUsage)(
+	NONE,
+
+	DOOR,
+	FLOOR,
+	CELING,
+	ROOF,
+	WINDOW,
+	SKY
+);
+
+
+
 X_DECLARE_ENUM8(MaterialCullType)(
 	FRONT_SIDED,
 	BACK_SIDED,
