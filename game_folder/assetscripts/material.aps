@@ -68,6 +68,26 @@ void GenerateUI( asset& Asset )
         Asset.AddCheckBox( "f_no_steps", false ).SetTitle( "No Steps" ).SetToolTip("Disable footstep marks");
 
     }
+
+    Asset.BeginGroup("Advanced");
+    {
+        string cullFaceModes = "back | front | none";
+        string stencilFunc = "never | less | equal | less_equal | greater | not_equal | greater_equal | always";
+        string stencilOp = "keep | zero | replace | incr_sat | decr_sat | invert | incr | decr";
+        string polyOffset = "none | decal | impact";
+        string blendFuncs = "zero | one | src_color | inv_src_color | src_alpha | inv_src_alpha | dest_alpha | inv_dest_alpha | dest_color | inv_dest_color | src_alpha_sat | blend_factor | inv_blend_factor | src1_color | inv_src1_color | src1_alpha | inv_src1_alpha";
+
+        Asset.AddCombo( "srcBlendColor", blendFuncs).SetTitle( "Src Blend Color" ).SetDefaultValue("src_alpha");
+        Asset.AddCombo( "dstBlendColor", blendFuncs).SetTitle( "Dst Blend Color" ).SetDefaultValue("src_alpha");
+        Asset.AddCombo( "srcBlendAlpha", blendFuncs).SetTitle( "Src Blend Alpha" ).SetDefaultValue("inv_src_alpha");
+        Asset.AddCombo( "dstBlendAlpha", blendFuncs).SetTitle( "Dst Blend Alpha" ).SetDefaultValue("inv_src_alpha");
+        Asset.AddCombo( "polyOffset", polyOffset).SetTitle( "PolyOffset" );
+        Asset.AddCombo( "cullFace", cullFaceModes).SetTitle( "CullFace" );
+        Asset.AddCombo( "depthTest", stencilFunc ).SetTitle( "Depth Test" );
+        Asset.AddCheckBox( "depthWrite", true ).SetTitle( "Depth Write" );
+        Asset.AddCheckBox( "wireFrame", false ).SetTitle( "WireFrame" ); // for shits
+
+    }
 }
 
 
