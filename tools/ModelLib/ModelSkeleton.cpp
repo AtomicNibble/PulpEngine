@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(model)
 bool ModelHeader::isValid(void) const
 {
 	if (version != MODEL_VERSION) {
-		X_ERROR("Model", "model version is invalid. FileVer: %i RequiredVer: %i",
+		X_ERROR("Model", "model version is invalid. FileVer: %" PRIu8 " RequiredVer: %" PRIu32,
 			version, MODEL_VERSION);
 	}
 
