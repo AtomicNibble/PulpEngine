@@ -233,42 +233,43 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ICompressor* pCompressor = nullptr;
 
 	static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
-
-	if (algo == Algo::LZ4) {
-		pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
-		if (defalte && outFile.empty()) {
-			outFile = inFile + L".lz4";
-		}
+	
+	switch (algo)
+	{
+		case Algo::LZ4:
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".lz4";
+			}
+			break;
+		case Algo::LZ4HC:
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".lz4";
+			}
+			break;
+		case Algo::LZMA:
+			pCompressor = X_NEW(Compressor<core::Compression::LZMA>, g_arena, "LZMA");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".lzma";
+			}
+			break;
+		case Algo::ZLIB:
+			pCompressor = X_NEW(Compressor<core::Compression::Zlib>, g_arena, "ZLIB");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".zlib";
+			}
+			break;
+		case Algo::STORE:
+			pCompressor = X_NEW(Compressor<core::Compression::Store>, g_arena, "Store");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".store";
+			}
+			break;
+		default:
+			X_ERROR("Compress", "unknown compression algo: %i", algo);
+			return -1;
 	}
-	else if (algo == Algo::LZ4HC) {
-		pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
-		if (defalte && outFile.empty()) {
-			outFile = inFile + L".lz4";
-		}
-	}
-	else if (algo == Algo::LZMA) {
-		pCompressor = X_NEW(Compressor<core::Compression::LZMA>, g_arena, "LZMA");
-		if (defalte && outFile.empty()) {
-			outFile = inFile + L".lzma";
-		}
-	}
-	else if (algo == Algo::ZLIB) {
-		pCompressor = X_NEW(Compressor<core::Compression::Zlib>, g_arena, "ZLIB");
-		if (defalte && outFile.empty()) {
-			outFile = inFile + L".zlib";
-		}
-	}
-	else if (algo == Algo::ZLIB) {
-		pCompressor = X_NEW(Compressor<core::Compression::Store>, g_arena, "Store");
-		if (defalte && outFile.empty()) {
-			outFile = inFile + L".store";
-		}
-	}
-	else {
-		X_ERROR("Compress","unknown compression algo: %i", algo);
-		return -1;
-	}
- 
 
 	bool res = false;
 
