@@ -30,6 +30,10 @@ private:
 	MaterialUsage::Enum usage_;
 	MaterialSurType::Enum surType_;
 
+	MaterialPolygonOffset::Enum polyOffset_;
+	MaterialCullType::Enum cullType_;
+
+
 	Tex colMap_;
 	Tex normalMap_;
 	Tex detailNormalMap_;
