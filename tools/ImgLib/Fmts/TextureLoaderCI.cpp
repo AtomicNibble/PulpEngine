@@ -83,7 +83,7 @@ namespace CI
 		}
 
 		if (hdr.version != CI_VERSION) {
-			X_ERROR("TextureCI", "version is invalid. provided: %i expected: %i", hdr.version, CI_VERSION);
+			X_ERROR("TextureCI", "version is invalid. provided: %" PRIu8 " expected: %" PRIu8, hdr.version, CI_VERSION);
 			return false;
 		}
 
@@ -93,14 +93,14 @@ namespace CI
 		// they might try load a larger image, so lets just check dimensions.
 		if (hdr.height > TEX_MAX_DIMENSIONS || hdr.width > TEX_MAX_DIMENSIONS)
 		{
-			X_ERROR("TextureCI", "invalid image dimensions. provided: %ix%i max: %ix%i", 
+			X_ERROR("TextureCI", "invalid image dimensions. provided: %" PRIu16 "x%" PRIu16 " max: %" PRIu32 "x%" PRIu32,
 				hdr.height, hdr.width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
 			return false;
 		}
 
 		if (!core::bitUtil::IsPowerOfTwo(hdr.height) || !core::bitUtil::IsPowerOfTwo(hdr.width))
 		{
-			X_ERROR("TextureCI", "invalid image dimensions, must be power of two. provided: %ix%i", 
+			X_ERROR("TextureCI", "invalid image dimensions, must be power of two. provided: %" PRIu16 "x%" PRIu16,
 				hdr.height, hdr.width);
 			return false;
 		}
@@ -139,7 +139,7 @@ namespace CI
 
 		if (file->remainingBytes() != 0)
 		{
-			X_ERROR("TextureCI", "read fail, bytes left in file: %i", file->remainingBytes());
+			X_ERROR("TextureCI", "read fail, bytes left in file: %" PRIu64, file->remainingBytes());
 			return false;
 		}
 
