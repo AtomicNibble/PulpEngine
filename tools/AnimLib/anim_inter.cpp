@@ -55,7 +55,7 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 
 	core::XFileScoped file;
 	if (file.openFile(filePath.c_str(), mode)) {
-		X_ERROR("InterAnim", "failed to open file(%i): %ls", filePath.c_str());
+		X_ERROR("InterAnim", "failed to open file: %ls", filePath.c_str());
 		return false;
 	}
 
@@ -135,24 +135,24 @@ bool InterAnim::ParseData(core::XLexer& lex)
 
 	// check dat version number slut.
 	if (version < anim::ANIM_INTER_VERSION) {
-		X_ERROR("InterAnim", "InterAnim file version is too old: %i required: %i",
+		X_ERROR("InterAnim", "InterAnim file version is too old: %" PRIi32 " required: %" PRIu32,
 			version, anim::ANIM_INTER_VERSION);
 		return false;
 	}
 	// limit checks
 	if (fps_ > anim::ANIM_MAX_FPS) {
-		X_ERROR("InterAnim", "InterAnim file fps is too high: %i max: %i",
-			fps_, version, anim::ANIM_MAX_FPS);
+		X_ERROR("InterAnim", "InterAnim file fps is too high: %" PRIi32 " max: %" PRIu32,
+			fps_, anim::ANIM_MAX_FPS);
 		return false;
 	}
 	if (fps_ < anim::ANIM_MIN_FPS) {
-		X_ERROR("InterAnim", "InterAnim file fps is too low: %i min: %i",
-			fps_, version, anim::ANIM_MIN_FPS);
+		X_ERROR("InterAnim", "InterAnim file fps is too low: %" PRIi32 " min: %" PRIu32,
+			fps_, anim::ANIM_MIN_FPS);
 		return false;
 	}
 	if (numBones > anim::ANIM_MAX_BONES) {
-		X_ERROR("InterAnim", "InterAnim file has too many bones: %i max: %i",
-			numBones, version, anim::ANIM_MAX_BONES);
+		X_ERROR("InterAnim", "InterAnim file has too many bones: %" PRIi32 " max: %" PRIu32,
+			numBones, anim::ANIM_MAX_BONES);
 		return false;
 	}
 
@@ -254,7 +254,7 @@ bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
 			return false;
 		}
 		if (bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
-			X_ERROR("InterAnim", "bone name too long: \"%s\" max: %i",
+			X_ERROR("InterAnim", "bone name too long: \"%s\" max: %" PRIu32,
 				bone.name.c_str(), model::MODEL_MAX_BONE_NAME_LENGTH);
 			return false;
 		}
