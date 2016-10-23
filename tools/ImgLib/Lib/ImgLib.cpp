@@ -51,10 +51,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	WrapMode::Enum wrapMode = WrapMode::Clamp;
 	Texturefmt::Enum dstImgFmt = Texturefmt::UNKNOWN;
 
-	// Required args:
-	// * imgPath
-	// * imgFmt (for now)
-	// 
 
 	if (d.HasMember("ignoreSrcMips")) {
 		if (d["ignoreSrcMips"].GetBool()) {
@@ -426,31 +422,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 			}
 		}
 	}
-
-	// now what :(
-	// the main things that is going to be a pain is taking N formats and allow converting to N formats.
-	// realistically that is going to be a pain.
-	// so i need some sort of conversion groups that define what formats can be come what.
-	// 
-	// we don't express these groups based on file formats, but format of loaded data.
-	// the file format the data came from is not important.
-	//
-	// if the format is already correct we can just write to CI.
-	// but it may need mip map generation which i will only support for some formats.
-	// what are the logical steps tho?
-	//
-	// - LoadImg
-	//		if we do a lot of scaling, adding support for mip skip might be nice
-	// - Create Mips
-	//		skip if noMips
-	// - Convert each mip
-	//		skipping high mips if scaled
-	//		
-	// - Write data?
-	// - flex pecs? (required)
-	// 
-	//  Where do we perform premultiply alpha?
-	// 
 
 	if (!flags.IsSet(CompileFlag::NOMIPS)) {
 
