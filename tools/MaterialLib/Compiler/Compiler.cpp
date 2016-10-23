@@ -51,18 +51,22 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	// now we do some flag parsing.
 	flags_.Clear();
 
-	std::array<std::pair<const char*, MaterialFlag::Enum>, 11> flags = { {
+	std::array<std::pair<const char*, MaterialFlag::Enum>, 15> flags = { {
 			{ "f_nodraw", MaterialFlag::NODRAW }, 
-			{ "f_solid", MaterialFlag::NODRAW },
-			{ "f_structual", MaterialFlag::NODRAW },
-			{ "f_detail", MaterialFlag::NODRAW },
-			{ "f_portal", MaterialFlag::NODRAW },
-			{ "f_player_clip", MaterialFlag::NODRAW },
-			{ "f_ai_clip", MaterialFlag::NODRAW },
-			{ "f_no_fall_dmg", MaterialFlag::NODRAW },
-			{ "f_no_impact", MaterialFlag::NODRAW },
-			{ "f_no_pennetrate", MaterialFlag::NODRAW },
-			{ "f_no_steps", MaterialFlag::NODRAW }
+			{ "f_solid", MaterialFlag::SOLID },
+			{ "f_structual", MaterialFlag::STRUCTURAL },
+			{ "f_detail", MaterialFlag::DETAIL },
+			{ "f_portal", MaterialFlag::PORTAL },
+			{ "f_mount", MaterialFlag::MOUNT },
+			{ "f_player_clip", MaterialFlag::PLAYER_CLIP },
+			{ "f_ai_clip", MaterialFlag::AI_CLIP },
+			{ "f_bullet_clip", MaterialFlag::BULLET_CLIP },
+			{ "f_missile_clip", MaterialFlag::MISSLE_CLIP },
+			{ "f_vehicle_clip", MaterialFlag::VEHICLE_CLIP },
+			{ "f_no_fall_dmg", MaterialFlag::NO_FALL_DMG },
+			{ "f_no_impact", MaterialFlag::NO_IMPACT },
+			{ "f_no_pennetrate", MaterialFlag::NO_PENNETRATE },
+			{ "f_no_steps", MaterialFlag::NO_STEPS }
 		}
 	};
 
