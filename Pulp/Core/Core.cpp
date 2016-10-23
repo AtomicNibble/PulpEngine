@@ -505,7 +505,7 @@ void XCore::ListProgramArgs(void)
 		const auto& arg = args_[i];
 		size_t j, argsNum = arg.getArgc();
 
-		merged.appendFmt("(%i) ", i);
+		merged.appendFmt("(%" PRIuS ") ", i);
 
 		for (j = 0; j < argsNum; j++)
 		{

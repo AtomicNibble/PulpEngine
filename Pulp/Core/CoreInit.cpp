@@ -437,7 +437,7 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 	for (i = 0; i < num; i++)
 	{
 		if (args_.size() >= args_.capacity()) {
-			X_WARNING("Core", "Ignoring %i remaning command args, max reached: %i", num - args_.size(), args_.capacity());
+			X_WARNING("Core", "Ignoring %" PRIuS " remaning command args, max reached: %" PRIuS, num - args_.size(), args_.capacity());
 			break;
 		}
 

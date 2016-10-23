@@ -142,7 +142,7 @@ bool XCore::Update(void)
 
 		core::StackString<128> title;
 		title.clear();
-		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %gms) Game: (x%g) UI: (x%g)",
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %gms) Game: (x%g) UI: (x%g)",
 			static_cast<int>(fps),
 			frametime.GetMilliSeconds(),
 			time_.GetScale(core::ITimer::Timer::GAME),
@@ -203,7 +203,7 @@ bool XCore::Update(void)
 
 		core::StackString<128> title;
 		title.clear();
-		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %ims) Time: %I64u(x%g) UI: %I64u",
 			static_cast<int>(fps),
 			static_cast<int>(frametime * 1000.f),
 			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
