@@ -157,7 +157,7 @@ StackString<N, wchar_t>::StackString(const __int64 u)
 {
 	X_ASSERT(len_ < N, "__int64 does not fit into stackstring of size %d.", len_)(len_, N);
 
-	len_ = swprintf_s(str_, L"%I" X_WIDEN(PRIi64), u);
+	len_ = swprintf_s(str_, L"%" X_WIDEN(PRIi64), u);
 }
 
 
