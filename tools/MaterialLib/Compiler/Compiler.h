@@ -9,6 +9,9 @@ class MaterialCompiler
 {
 	struct Tex
 	{
+		bool parse(core::json::Document& doc, const char* pName);
+
+	public:
 		core::string name;
 		MaterialFilterType::Enum filterType_;
 		MaterialTexRepeat::Enum texRepeat_;
@@ -20,7 +23,6 @@ public:
 	bool loadFromJson(core::string& str);
 
 private:
-	bool parseTexInfo(core::json::Document& doc, Tex& tex, const char* pName);
 
 private:
 	MaterialFlags flags_;

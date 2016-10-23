@@ -6,6 +6,39 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+bool MaterialCompiler::Tex::parse(core::json::Document& d, const char* pName)
+{
+	core::StackString<64, char> map("map");
+	core::StackString<64, char> tile("tile");
+	core::StackString<64, char> filter("filter");
+
+	map.append(pName);
+	tile.append(pName);
+	filter.append(pName);
+
+	if (!d.HasMember(map.c_str())) {
+		X_ERROR("Mat", "Missing \"%s\" value", map.c_str());
+		return false;
+	}
+	if (!d.HasMember(tile.c_str())) {
+		X_ERROR("Mat", "Missing \"%s\" value", tile.c_str());
+		return false;
+	}
+	if (!d.HasMember(filter.c_str())) {
+		X_ERROR("Mat", "Missing \"%s\" value", filter.c_str());
+		return false;
+	}
+
+	const char* pMapName = d[map.c_str()].GetString();
+	const char* pTileMode = d[tile.c_str()].GetString();
+	const char* pFilterType = d[filter.c_str()].GetString();
+
+	name = pMapName;
+	filterType_ = Util::MatFilterTypeFromStr(pFilterType);
+	texRepeat_ = Util::MatTexRepeatFromStr(pTileMode);
+	return true;
+}
+
 MaterialCompiler::MaterialCompiler()
 {
 
@@ -103,59 +136,25 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
 
 	// col map.
-	if (!parseTexInfo(d, colMap_, "Color")) {
+	if (!colMap_.parse(d, "Color")) {
 		X_ERROR("Mat", "Failed to parse texture info");
 		return false;
 	}
-	if (!parseTexInfo(d, normalMap_, "Normal")) {
+	if (!normalMap_.parse(d, "Normal")) {
 		X_ERROR("Mat", "Failed to parse texture info");
 		return false;
 	}
-	if (!parseTexInfo(d, detailNormalMap_, "DetailNormal")) {
+	if (!detailNormalMap_.parse(d, "DetailNormal")) {
 		X_ERROR("Mat", "Failed to parse texture info");
 		return false;
 	}
-	if (!parseTexInfo(d, specColMap_, "SpecCol")) {
+	if (!specColMap_.parse(d, "SpecCol")) {
 		X_ERROR("Mat", "Failed to parse texture info");
 		return false;
 	}
 
 	return true;
 }
-
-bool MaterialCompiler::parseTexInfo(core::json::Document& d, Tex& tex, const char* pName)
-{
-	core::StackString<64, char> map("map");
-	core::StackString<64, char> tile("tile");
-	core::StackString<64, char> filter("filter");
-
-	map.append(pName);
-	tile.append(pName);
-	filter.append(pName);
-
-	if (!d.HasMember(map.c_str())) {
-		X_ERROR("Mat", "Missing \"%s\" value", map.c_str());
-		return false;
-	}
-	if (!d.HasMember(tile.c_str())) {
-		X_ERROR("Mat", "Missing \"%s\" value", tile.c_str());
-		return false;
-	}
-	if (!d.HasMember(filter.c_str())) {
-		X_ERROR("Mat", "Missing \"%s\" value", filter.c_str());
-		return false;
-	}
-
-	const char* pMapName = d[map.c_str()].GetString();
-	const char* pTileMode = d[tile.c_str()].GetString();
-	const char* pFilterType = d[filter.c_str()].GetString();
-
-	tex.name = pMapName;
-	tex.filterType_ = Util::MatFilterTypeFromStr(pFilterType);
-	tex.texRepeat_ = Util::MatTexRepeatFromStr(pTileMode);
-	return true;
-}
-
 
 
 X_NAMESPACE_END
