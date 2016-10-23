@@ -1126,9 +1126,6 @@
     <ClInclude Include="ITexture.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
-    <ClInclude Include="IMaterial.h">
-      <Filter>Interfaces_h\Render</Filter>
-    </ClInclude>
     <ClInclude Include="I3DEngine.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
@@ -1149,6 +1146,9 @@
     </ClInclude>
     <ClInclude Include="Prepro\PreproWiden.h">
       <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="IMaterial.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
