@@ -16,7 +16,7 @@ namespace HumanSize
 		// i use each type untill there is 10,240 of them.
 		if (numBytes <= 10240) 
 		{
-			str.appendFmt("%ibytes", numBytes);
+			str.appendFmt("%" PRIu64 "bytes", numBytes);
 		}
 		else if (numBytes <= 10485760)
 		{
