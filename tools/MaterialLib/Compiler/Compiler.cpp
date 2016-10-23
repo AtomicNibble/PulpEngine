@@ -46,7 +46,6 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	type_ = Util::MatTypeFromStr(pCat);
 	usage_ = Util::MatUsageFromStr(pUsage);
 	surType_ = Util::MatSurfaceTypeFromStr(pSurfaceType);
-
 	
 	// now we do some flag parsing.
 	flags_.Clear();
@@ -103,8 +102,60 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	}
 
 
+	// col map.
+	if (!parseTexInfo(d, colMap_, "Color")) {
+		X_ERROR("Mat", "Failed to parse texture info");
+		return false;
+	}
+	if (!parseTexInfo(d, normalMap_, "Normal")) {
+		X_ERROR("Mat", "Failed to parse texture info");
+		return false;
+	}
+	if (!parseTexInfo(d, detailNormalMap_, "DetailNormal")) {
+		X_ERROR("Mat", "Failed to parse texture info");
+		return false;
+	}
+	if (!parseTexInfo(d, specColMap_, "SpecCol")) {
+		X_ERROR("Mat", "Failed to parse texture info");
+		return false;
+	}
 
 	return true;
 }
+
+bool MaterialCompiler::parseTexInfo(core::json::Document& d, Tex& tex, const char* pName)
+{
+	core::StackString<64, char> map("map");
+	core::StackString<64, char> tile("tile");
+	core::StackString<64, char> filter("filter");
+
+	map.append(pName);
+	tile.append(pName);
+	filter.append(pName);
+
+	if (!d.HasMember(map.c_str())) {
+		X_ERROR("Mat", "Missing \"%s\" value", map.c_str());
+		return false;
+	}
+	if (!d.HasMember(tile.c_str())) {
+		X_ERROR("Mat", "Missing \"%s\" value", tile.c_str());
+		return false;
+	}
+	if (!d.HasMember(filter.c_str())) {
+		X_ERROR("Mat", "Missing \"%s\" value", filter.c_str());
+		return false;
+	}
+
+	const char* pMapName = d[map.c_str()].GetString();
+	const char* pTileMode = d[tile.c_str()].GetString();
+	const char* pFilterType = d[filter.c_str()].GetString();
+
+	tex.name = pMapName;
+	tex.filterType_ = Util::MatFilterTypeFromStr(pFilterType);
+	tex.texRepeat_ = Util::MatTexRepeatFromStr(pTileMode);
+	return true;
+}
+
+
 
 X_NAMESPACE_END
