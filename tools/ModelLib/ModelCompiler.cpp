@@ -78,12 +78,12 @@ void ModelCompiler::Stats::print(CompileFlags flags) const
 {
 	X_LOG0("Model", "Model Info:");
 	X_LOG0("Model", "> Compile Time: %fms", compileTime.GetMilliSeconds());
-	X_LOG0("Model", "> Total Lods: %i", totalLods);
-	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
-	X_LOG0("Model", "> Total Mesh Merged: %i", totalMeshMerged);
-	X_LOG0("Model", "> Total Col Mesh: %i", totalColMesh);
-	X_LOG0("Model", "> Total Joints: %i", totalJoints);
-	X_LOG0("Model", "> Total Joints Dropped: %i", totalJointsDropped);
+	X_LOG0("Model", "> Total Lods: %" PRIu32, totalLods);
+	X_LOG0("Model", "> Total Mesh: %" PRIu32, totalMesh);
+	X_LOG0("Model", "> Total Mesh Merged: %" PRIu32, totalMeshMerged);
+	X_LOG0("Model", "> Total Col Mesh: %" PRIu32, totalColMesh);
+	X_LOG0("Model", "> Total Joints: %" PRIu32, totalJoints);
+	X_LOG0("Model", "> Total Joints Dropped: %" PRIu32, totalJointsDropped);
 
 	core::StackString<1024> info;
 
@@ -107,10 +107,10 @@ void ModelCompiler::Stats::print(CompileFlags flags) const
 	}
 
 	X_LOG0("Model", info.c_str());
-	X_LOG0("Model", "> Total Verts: %i", totalVerts);
-	X_LOG0("Model", "> Total Verts Merged: %i", totalVertsMerged);
-	X_LOG0("Model", "> Total Faces: %i", totalFaces);
-	X_LOG0("Model", "> Total eights Dropped: %i", totalWeightsDropped);
+	X_LOG0("Model", "> Total Verts: %" PRIu32, totalVerts);
+	X_LOG0("Model", "> Total Verts Merged: %" PRIu32, totalVertsMerged);
+	X_LOG0("Model", "> Total Faces: %" PRIu32, totalFaces);
+	X_LOG0("Model", "> Total eights Dropped: %" PRIu32, totalWeightsDropped);
 
 	if (totalWeightsDropped > 0) {
 		uint32_t maxWeights = model::MODEL_MAX_VERT_BINDS_NONE_EXT;
@@ -118,7 +118,7 @@ void ModelCompiler::Stats::print(CompileFlags flags) const
 			maxWeights = model::MODEL_MAX_VERT_BINDS;
 		}
 
-		X_LOG0("Model", "!> bind weights where dropped, consider binding with max influences: %i", maxWeights);
+		X_LOG0("Model", "!> bind weights where dropped, consider binding with max influences: %" PRIu32, maxWeights);
 	}
 
 	{
@@ -812,7 +812,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			stats_.totalFaces += (meshHdr.numIndexes / 3);
 
 			if ((meshHdr.numIndexes % 3) != 0) {
-				X_ERROR("Model", "Mesh index count is not a multiple of 3, count: %i", meshHdr.numIndexes);
+				X_ERROR("Model", "Mesh index count is not a multiple of 3, count: %" PRIu16, meshHdr.numIndexes);
 				return false;
 			}
 
@@ -1099,8 +1099,8 @@ bool ModelCompiler::DropWeights(void)
 {
 	core::Stack<core::V2::Job*> jobs(arena_, 512);
 
-	uint32_t batchSize = safe_static_cast<uint32_t,size_t>(getBatchSize(sizeof(RawModel::Vert)));
-	X_LOG2("Model", "using batch size of %i", batchSize);
+	const uint32_t batchSize = safe_static_cast<uint32_t,size_t>(getBatchSize(sizeof(RawModel::Vert)));
+	X_LOG2("Model", "using batch size of %" PRIu32, batchSize);
 
 	droppedWeights_ = 0;
 
@@ -1113,7 +1113,7 @@ bool ModelCompiler::DropWeights(void)
 		for (auto& mesh : lod.meshes_)
 		{
 			RawModel::Vert* pVerts = mesh.verts_.ptr();
-			uint32_t numVerts = safe_static_cast<uint32_t,size_t>(mesh.verts_.size());
+			const uint32_t numVerts = safe_static_cast<uint32_t,size_t>(mesh.verts_.size());
 
 			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del, pVerts, numVerts,
 				core::V2::CountSplitter32(batchSize));
@@ -1213,7 +1213,7 @@ bool ModelCompiler::CreateData(void)
 	{
 		RawModel::Mesh* pRawMesh = lods_[i].meshes_.ptr();
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
-		size_t numMesh = compiledLods_[i].meshes_.size();
+		const size_t numMesh = compiledLods_[i].meshes_.size();
 
 		for (size_t x = 0; x < numMesh; x++) {
 
@@ -1256,7 +1256,7 @@ bool ModelCompiler::ValidateLodDistances(void)
 	for (size_t i = 1; i < compiledLods_.size(); i++)
 	{
 		if (compiledLods_[i].distance_ <= lastDistance) {
-			X_ERROR("Model", "LOD%i has a distance less or euqal to LOD%i", i, i-1);
+			X_ERROR("Model", "LOD%" PRIuS " has a distance less or euqal to LOD%" PRIuS, i, i-1);
 			return false;
 		}
 
@@ -1338,7 +1338,7 @@ bool ModelCompiler::CreateBindData(void)
 	for (i = 0; i < compiledLods_.size(); i++)
 	{
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
-		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
+		const uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
@@ -1374,7 +1374,7 @@ bool ModelCompiler::MergVerts(void)
 	for (i = 0; i < compiledLods_.size(); i++)
 	{
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
-		uint32_t numMesh = safe_static_cast<uint32_t,size_t>(compiledLods_[i].numMeshes());
+		const uint32_t numMesh = safe_static_cast<uint32_t,size_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
@@ -1404,15 +1404,15 @@ bool ModelCompiler::ScaleModel(void)
 
 	core::Stack<core::V2::Job*> jobs(arena_, 512);
 
-	uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(Vert)));
-	X_LOG2("Model", "using batch size of %i", batchSize);
+	const uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(Vert)));
+	X_LOG2("Model", "using batch size of %" PRIu32, batchSize);
 
 	core::Delegate<void(Vert*, uint32_t)> del;
 	del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
 
 	auto addScaleJobForMesh = [&](auto& m) {
 		Vert* pVerts = m.verts_.ptr();
-		uint32_t numVerts = safe_static_cast<uint32_t, size_t>(m.verts_.size());
+		const uint32_t numVerts = safe_static_cast<uint32_t, size_t>(m.verts_.size());
 
 		core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
 			pVerts, numVerts, core::V2::CountSplitter32(batchSize));
@@ -1510,7 +1510,7 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 					X_ERROR("Model", "Failed to remove collision mesh. \"%s\"", mesh.name_.c_str());
 				}
 				else {
-					X_ERROR("Model", "Collision meshes are only support on LOD0. \"LOG%i:%s\"", i, mesh.name_.c_str());
+					X_ERROR("Model", "Collision meshes are only support on LOD0. \"LOG%" PRIuS ":%s\"", i, mesh.name_.c_str());
 				}
 				return false;
 			}
@@ -1554,7 +1554,7 @@ bool ModelCompiler::CheckLimits(void)
 	// up to 2k verts there is no reason we can't support that even tho mesh limit is 64.
 
 	if (bones_.size() > model::MODEL_MAX_BONES) {
-		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
+		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %" PRIu32,
 			bones_.size(), model::MODEL_MAX_BONES);
 		return false;
 	}
@@ -1563,7 +1563,7 @@ bool ModelCompiler::CheckLimits(void)
 	for (const auto& bone : bones_)
 	{
 		if (bone.name_.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
-			X_ERROR("Model", "Bone name length '%s(%" PRIuS ")' exceeds limit of: %i",
+			X_ERROR("Model", "Bone name length '%s(%" PRIuS ")' exceeds limit of: %" PRIu32,
 				bone.name_.c_str(), bone.name_.length(), model::MODEL_MAX_BONE_NAME_LENGTH);
 			return false;
 		}	
@@ -1590,13 +1590,13 @@ bool ModelCompiler::CheckLimits(void)
 		bool invalid = false;
 
 		if (numVerts > model::MODEL_MAX_VERTS) {
-			X_ERROR("Model", "LOD(%" PRIuS ") vert count '%" PRIuS "' exceeds limit of: %i",
+			X_ERROR("Model", "LOD(%" PRIuS ") vert count '%" PRIuS "' exceeds limit of: %" PRIu32,
 				i, numVerts, model::MODEL_MAX_VERTS);
 			invalid = false;
 		}
 		// index not face!
 		if (numIndex > model::MODEL_MAX_INDEXS) {
-			X_ERROR("Model", "LOD(%" PRIuS ") index count '%" PRIuS "' exceeds limit of: %i",
+			X_ERROR("Model", "LOD(%" PRIuS ") index count '%" PRIuS "' exceeds limit of: %" PRIu32,
 				i, numIndex, model::MODEL_MAX_INDEXS);
 			invalid = false;
 		}
@@ -1615,7 +1615,7 @@ bool ModelCompiler::CheckLimits(void)
 			}
 
 			if (mat.name_.length() > engine::MTL_MATERIAL_MAX_LEN) {
-				X_ERROR("Model", "Material name length '%s(%" PRIuS ")' exceeds limit of: %i mesh: \"%s:%s\"",
+				X_ERROR("Model", "Material name length '%s(%" PRIuS ")' exceeds limit of: %" PRIu32 " mesh: \"%s:%s\"",
 					mat.name_.c_str(), mat.name_.length(), engine::MTL_MATERIAL_MAX_LEN,
 					// so some potentially helpful info.
 					mesh.name_.c_str(), mesh.displayName_.c_str());
@@ -1635,7 +1635,7 @@ bool ModelCompiler::CheckLimits(void)
 
 	// check each lods.
 	if (bones_.size() > model::MODEL_MAX_BONES) {
-		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
+		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %" PRIu32,
 			bones_.size(), model::MODEL_MAX_BONES);
 		return false;
 	}
@@ -1643,7 +1643,7 @@ bool ModelCompiler::CheckLimits(void)
 
 	// basically impossible, but check it anyway.
 	if (compiledLods_.size() > model::MODEL_MAX_LODS) {
-		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
+		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %" PRIu32,
 			compiledLods_.size(), model::MODEL_MAX_LODS);
 
 		// notify me we did something impossible.
@@ -1704,7 +1704,7 @@ void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
 				{
 					const RawModel::Index& idx = face[x];
 					if (idx > numVerts) {
-						X_ERROR("Model", "Face index is invalid: %i verts: %" PRIuS, numVerts);
+						X_ERROR("Model", "Face index is invalid: %" PRIu32 " verts: %" PRIu32, idx, numVerts);
 						return;
 					}
 
