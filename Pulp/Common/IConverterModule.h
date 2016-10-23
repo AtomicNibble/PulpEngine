@@ -58,9 +58,10 @@ struct IConverter
 
 	// thumbs disabled for all types by default.
 	virtual bool thumbGenerationSupported(void) const { return false; }
-	virtual bool CreateThumb(IConverterHost& host, int32_t assetId) { 
+	virtual bool CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim) {
 		X_UNUSED(host);
 		X_UNUSED(assetId);
+		X_UNUSED(targetDim);
 		X_ASSERT_UNREACHABLE();
 		return false;
 	};

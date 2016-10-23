@@ -471,7 +471,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 }
 
 
-bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId)
+bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim)
 {
 	// load file data
 	core::Array<uint8_t> fileData(host.getScratchArena());
@@ -504,7 +504,6 @@ bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId)
 	}
 
 	Vec2i srcDim(srcImg.getWidth(), srcImg.getHeight());
-	const Vec2i thumbDim(64, 64);
 
 	// remove mips
 	srcImg.dropMips();
@@ -518,15 +517,15 @@ bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId)
 	}
 
 	BoxFilter filter;
-	fltImg.resize(fltThumb, host.getScratchArena(), filter, thumbDim.x, thumbDim.y, WrapMode::Clamp);
+	fltImg.resize(fltThumb, host.getScratchArena(), filter, targetDim.x, targetDim.y, WrapMode::Clamp);
 
 	// now we want a textureFile.
 	XTextureFile thumb(host.getScratchArena());
 	thumb.setDepth(1);
 	thumb.setNumFaces(1);
 	thumb.setNumMips(1);
-	thumb.setWidth(thumbDim.x);
-	thumb.setHeigth(thumbDim.y);
+	thumb.setWidth(targetDim.x);
+	thumb.setHeigth(targetDim.y);
 	thumb.setType(TextureType::T2D);
 	if (Util::hasAlpha(srcImg.getFormat())) {
 		thumb.setFormat(Texturefmt::R8G8B8A8);
@@ -556,7 +555,7 @@ bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId)
 		return false;
 	}
 
-	host.UpdateAssetThumb(assetId, thumbDim, srcDim, buf);
+	host.UpdateAssetThumb(assetId, targetDim, srcDim, buf);
 	return true;
 }
 

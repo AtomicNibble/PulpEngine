@@ -424,7 +424,7 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 
 	core::StopWatch timer;
 
-	if (!pCon->CreateThumb(*this, assetId)) {
+	if (!pCon->CreateThumb(*this, assetId, Vec2i(64,64))) {
 		X_ERROR("Converter", "Failed to generate thumb for \"%s\" \"%s\"", name.c_str(), AssetType::ToString(assType));
 		return false;
 	}

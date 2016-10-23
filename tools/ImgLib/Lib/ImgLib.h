@@ -16,7 +16,7 @@ public:
 	virtual bool thumbGenerationSupported(void) const X_OVERRIDE;
 
 	virtual bool Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath) X_OVERRIDE;
-	virtual bool CreateThumb(IConverterHost& host, int32_t assetId) X_OVERRIDE;
+	virtual bool CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim) X_OVERRIDE;
 private:
 };
 
