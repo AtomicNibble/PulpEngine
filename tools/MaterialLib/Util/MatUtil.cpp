@@ -148,6 +148,26 @@ namespace Util
 		}
 	}
 
+	MaterialTexRepeat::Enum MatTexRepeatFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "no tile"_fnv1a:
+				return MaterialTexRepeat::NO_TILE;
+			case "tile both"_fnv1a:
+				return MaterialTexRepeat::TILE_BOTH;
+			case "tile horizontal"_fnv1a:
+				return MaterialTexRepeat::TILE_HOZ;
+			case "tile vertical"_fnv1a:
+				return MaterialTexRepeat::TILE_VERT;
+
+			default:
+				X_ERROR("Mtl", "Unknown tex repeat: '%s' (case-sen)", str);
+				return MaterialTexRepeat::TILE_BOTH;
+		}
+	}
 
 
 } // namespace Util
