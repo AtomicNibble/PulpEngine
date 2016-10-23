@@ -11,6 +11,45 @@ void GenerateUI( asset& Asset )
     Asset.AddCombo( "surface_type", surTypes ).SetTitle( "Surface Type:" );
     Asset.AddCombo( "usage", usage ).SetTitle( "Edtior Group:" );
 
+    string nearestFilters = "nearest (mip none) | nearest (mip nearest) | nearest (mip linear)";
+    string linearFilters = "linear (mip none) | linear (mip nearest) | linear (mip linear)";
+    string anisotropicFilters = "anisotropicx2 | anisotropicx4| anisotropicx8 | anisotropicx16";
+    string filters = nearestFilters + " | " + linearFilters + " | " + anisotropicFilters;
+
+    string tileTypes  = "tile both | tile horizontal | tile vertical | no tile";
+
+    Asset.BeginGroup("ColorMap");
+    {
+        Asset.AddAssetRef( "mapColor", "image", "" ).SetTitle("Color Map");
+
+        Asset.AddCombo( "tileColor", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
+        Asset.AddCombo( "filterColor", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" );
+    }
+
+    Asset.BeginGroup("NormalMap");
+    {
+        Asset.AddAssetRef( "mapNormal", "image", "" ).SetTitle("Color Map");
+
+        Asset.AddCombo( "tileNormal", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
+        Asset.AddCombo( "filterNormal", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" );
+    }
+
+    Asset.BeginGroup("DetailNormalMap");
+    {
+        Asset.AddAssetRef( "mapDetailNormal", "image", "" ).SetTitle("Color Map");
+
+        Asset.AddCombo( "tileDetailNormal", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
+        Asset.AddCombo( "filterDetailNormal", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" );
+    }
+
+    Asset.BeginGroup("SpecColMap");
+    {
+        Asset.AddAssetRef( "mapSpecCol", "image", "" ).SetTitle("Color Map");
+
+        Asset.AddCombo( "tileSpecCol", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
+        Asset.AddCombo( "filterSpecCol", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "linear (mip nearest)" );
+    }
+
     Asset.BeginGroup("Properties");
     {
         Asset.AddCheckBox( "f_nodraw", false ).SetTitle( "NoDraw" );
@@ -18,8 +57,11 @@ void GenerateUI( asset& Asset )
         Asset.AddCheckBox( "f_structual", false ).SetTitle( "Structual" );
         Asset.AddCheckBox( "f_detail", false ).SetTitle( "Detail" );
         Asset.AddCheckBox( "f_portal", false ).SetTitle( "Portal" );
+        Asset.AddCheckBox( "f_mount", false ).SetTitle( "Mount" );
         Asset.AddCheckBox( "f_player_clip", false ).SetTitle( "Player Clip" ).SetToolTip("Blocks players");
         Asset.AddCheckBox( "f_ai_clip", false ).SetTitle( "AI Clip" ).SetToolTip("Blocks AI (not inc players)");
+        Asset.AddCheckBox( "f_bullet_clip", false ).SetTitle( "Bullet Clip" ).SetToolTip("Blocks Bullets");
+        Asset.AddCheckBox( "f_vehicle_clip", false ).SetTitle( "Vehicle Clip" ).SetToolTip("Blocks Vehicles");
         Asset.AddCheckBox( "f_no_fall_dmg", false ).SetTitle( "No Fall Dmg" ).SetToolTip("No fall dmg no matter the height!");
         Asset.AddCheckBox( "f_no_impact", false ).SetTitle( "No Impact" ).SetToolTip("No impact marks");
         Asset.AddCheckBox( "f_no_pennetrate", false ).SetTitle( "No Pennetrate" ).SetToolTip("projectiles and bullets can't penatrate");
