@@ -169,6 +169,150 @@ namespace Util
 		}
 	}
 
+	MaterialPolygonOffset::Enum MatPolyOffsetFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "none"_fnv1a:
+				return MaterialPolygonOffset::NONE;
+			case "decal"_fnv1a:
+				return MaterialPolygonOffset::STATIC_DECAL;
+			case "impact"_fnv1a:
+				return MaterialPolygonOffset::WEAPON_IMPACT;
+
+			default:
+				X_ERROR("Mtl", "Unknown poly offset: '%s' (case-sen)", str);
+				return MaterialPolygonOffset::NONE;
+		}
+	}
+
+	MaterialCullType::Enum MatCullTypeFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "back"_fnv1a:
+				return MaterialCullType::BACK_SIDED;
+			case "front"_fnv1a:
+				return MaterialCullType::FRONT_SIDED;
+			case "none"_fnv1a:
+				return MaterialCullType::TWO_SIDED;
+
+			default:
+				X_ERROR("Mtl", "Unknown cull type: '%s' (case-sen)", str);
+				return MaterialCullType::BACK_SIDED;
+		}
+	}
+
+	MaterialBlendType::Enum MatBlendTypeFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "zero"_fnv1a:
+				return MaterialBlendType::ZERO;
+			case "one"_fnv1a:
+				return MaterialBlendType::ONE;
+
+			case "src_color"_fnv1a:
+				return MaterialBlendType::SRC_COLOR;
+			case "src_alpha"_fnv1a:
+				return MaterialBlendType::SRC_ALPHA;
+			case "src_alpha_sat"_fnv1a:
+				return MaterialBlendType::SRC_ALPHA_SAT;
+			case "src1_color"_fnv1a:
+				return MaterialBlendType::SRC1_COLOR;
+			case "src1_alpha"_fnv1a:
+				return MaterialBlendType::SRC1_ALPHA;
+
+			case "inv_src_color"_fnv1a:
+				return MaterialBlendType::INV_SRC_COLOR;
+			case "inv_src1_alpha"_fnv1a:
+				return MaterialBlendType::INV_SRC1_ALPHA;
+
+			case "dest_color"_fnv1a:
+				return MaterialBlendType::DEST_COLOR;
+			case "dest_alpha"_fnv1a:
+				return MaterialBlendType::DEST_ALPHA;
+
+			case "inv_dest_color"_fnv1a:
+				return MaterialBlendType::INV_DEST_COLOR;
+			case "inv_dest_alpha"_fnv1a:
+				return MaterialBlendType::INV_DEST_ALPHA;
+
+			case "blend_factor"_fnv1a:
+				return MaterialBlendType::BLEND_FACTOR;
+			case "inv_blend_factor"_fnv1a:
+				return MaterialBlendType::INV_BLEND_FACTOR;
+
+
+			default:
+				X_ERROR("Mtl", "Unknown blend type: '%s' (case-sen)", str);
+				return MaterialBlendType::INVALID;
+		}
+	}
+
+	StencilOperation::Enum StencilOpFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "keep"_fnv1a:
+				return StencilOperation::KEEP;
+			case "zero"_fnv1a:
+				return StencilOperation::ZERO;
+			case "replace"_fnv1a:
+				return StencilOperation::REPLACE;
+			case "incr_sat"_fnv1a:
+				return StencilOperation::INCR_SAT;
+			case "decr_sat"_fnv1a:
+				return StencilOperation::DECR_SAT;
+			case "invert"_fnv1a:
+				return StencilOperation::INVERT;
+			case "incr"_fnv1a:
+				return StencilOperation::INCR;
+			case "decr"_fnv1a:
+				return StencilOperation::DECR;
+
+			default:
+				X_ERROR("Mtl", "Unknown stencil op: '%s' (case-sen)", str);
+				return StencilOperation::KEEP;
+		}
+	}
+
+	StencilFunc::Enum StencilFuncFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "never"_fnv1a:
+				return StencilFunc::NEVER;
+			case "less"_fnv1a:
+				return StencilFunc::LESS;
+			case "equal"_fnv1a:
+				return StencilFunc::EQUAL;
+			case "less_equal"_fnv1a:
+				return StencilFunc::LESS_EQUAL;
+			case "greater"_fnv1a:
+				return StencilFunc::GREATER;
+			case "not_equal"_fnv1a:
+				return StencilFunc::NOT_EQUAL;
+			case "greater_equal"_fnv1a:
+				return StencilFunc::GREATER_EQUAL;
+			case "always"_fnv1a:
+				return StencilFunc::ALWAYS;
+
+			default:
+				X_ERROR("Mtl", "Unknown stencil func: '%s' (case-sen)", str);
+				return StencilFunc::ALWAYS;
+		}
+	}
 
 } // namespace Util
 
