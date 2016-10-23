@@ -58,7 +58,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		}
 	};
 
-	for (int32_t i = 0; i < requiredValues.size(); i++)
+	for (size_t i = 0; i < requiredValues.size(); i++)
 	{
 		const auto& item = requiredValues[i];
 
@@ -103,7 +103,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	};
 
 	// process all the flags.
-	for (int32_t i = 0; i < flags.size(); i++)
+	for (size_t i = 0; i < flags.size(); i++)
 	{
 		const auto& flag = flags[i];
 
