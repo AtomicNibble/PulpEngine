@@ -53,6 +53,9 @@ X_DECLARE_FLAGS(MaterialFlag)(
 	NO_PENNETRATE	// 1024 bullets can't pass through.
 );
 
+typedef Flags<MaterialFlag> MaterialFlags;
+
+
 // the type of material it is, changes nothing really currently.
 X_DECLARE_ENUM8(MaterialType)(
 	UI,
@@ -148,7 +151,6 @@ X_DECLARE_ENUM8(MaterialCullType)(
 	TWO_SIDED
 );
 
-typedef Flags<MaterialFlag> MaterialFlags;
 
 
 
