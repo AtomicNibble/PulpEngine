@@ -639,7 +639,7 @@ namespace DDS
 
 			if (size16 != DDSSizeofDDSurfaceDesc2)
 			{
-				X_ERROR("DDSLoader", "image header surface size is invalid. provided: %i epected: 124", hdr.dwSize);
+				X_ERROR("DDSLoader", "image header surface size is invalid. provided: %" PRIu32 " epected: 124", hdr.dwSize);
 				return false;
 			}
 			else
@@ -650,14 +650,14 @@ namespace DDS
 
 		if (hdr.dwHeight > DDSMaxImageDimensions && hdr.dwWidth > DDSMaxImageDimensions)
 		{
-			X_ERROR("DDSLoader", "image dimensions exceed the max. provided: %ix%i max: %ix%i",
+			X_ERROR("DDSLoader", "image dimensions exceed the max. provided: %" PRIu32 "x%" PRIu32 " max: %" PRIu32 "x%" PRIu32,
 				hdr.dwHeight, hdr.dwWidth, DDSMaxImageDimensions, DDSMaxImageDimensions);
 			return false;
 		}
 
 		if (!core::bitUtil::IsPowerOfTwo(hdr.dwHeight) || !core::bitUtil::IsPowerOfTwo(hdr.dwWidth))
 		{
-			X_ERROR("DDSLoader", "invalid image dimensions, must be power of two. provided: %ix%i", hdr.dwHeight, hdr.dwWidth);
+			X_ERROR("DDSLoader", "invalid image dimensions, must be power of two. provided: %" PRIu32 "x%" PRIu32, hdr.dwHeight, hdr.dwWidth);
 			return false;
 		}
 		
@@ -672,7 +672,7 @@ namespace DDS
 			num_mip_maps = hdr.dwMipMapCount;
 
 			if (num_mip_maps != ComputMaxMips(hdr.dwWidth, hdr.dwHeight)) {
-				X_ERROR("DDSLoader", "mip map count is incorrect. provided: %i expected: %i", num_mip_maps,
+				X_ERROR("DDSLoader", "mip map count is incorrect. provided: %" PRIu32 " expected: %" PRIu32, num_mip_maps,
 					ComputMaxMips(hdr.dwWidth, hdr.dwHeight));
 				return false;
 			}
@@ -834,7 +834,7 @@ namespace DDS
 		}
 		else if ((hdr.sPixelFormat.dwRGBBitCount < 8) || (hdr.sPixelFormat.dwRGBBitCount > 32) || (hdr.sPixelFormat.dwRGBBitCount & 7))
 		{
-			X_ERROR("DDSLoader", "Unsupported bit count: %i", hdr.sPixelFormat.dwRGBBitCount);
+			X_ERROR("DDSLoader", "Unsupported bit count: %" PRIu32, hdr.sPixelFormat.dwRGBBitCount);
 			return false;
 		}
 		else if (hdr.sPixelFormat.dwFlags & DDPF_RGB)
@@ -941,7 +941,7 @@ namespace DDS
 					bool ValidRGB = (mapped_format == Texturefmt::R8G8B8 && mask_size[3] == 0);
 					if (!ValidRGB)
 					{
-						X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
+						X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%" PRIu32 ",%" PRIu32 ",%" PRIu32 ",%" PRIu32 ")",
 							mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
 						return false;
 					}
@@ -961,7 +961,7 @@ namespace DDS
 						|| mask_ofs[3] != 24)
 					{
 						// this is not a valid RGBA
-						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,24) provided(%i,%i,%i,%i)",
+						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,24) provided(%" PRIu32 ",%" PRIu32 ",%" PRIu32 ",%" PRIu32 ")",
 							mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
 						return false;
 					}
@@ -982,7 +982,7 @@ namespace DDS
 						}
 
 						// this is not a valid RGB
-						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16,0) provided(%i,%i,%i,%i)",
+						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16,0) provided(%" PRIu32 ",%" PRIu32 ",%" PRIu32 ",%" PRIu32 ")",
 							mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
 						return false;
 					}
@@ -1034,7 +1034,7 @@ namespace DDS
 
 			if (bytes_read != total_bytes_per_face)
 			{
-				X_ERROR("DDSLoader", "failed to read all mips. requested: %i bytes got: %i bytes", 
+				X_ERROR("DDSLoader", "failed to read all mips. requested: %" PRIu32 " bytes got: %" PRIu32 " bytes",
 					total_bytes_per_face, bytes_read);
 				return false;
 			}
@@ -1042,8 +1042,8 @@ namespace DDS
 		}
 
 #if X_DEBUG == 1
-		uint64_t left = file->remainingBytes();
-		X_WARNING_IF(left > 0, "DDSLoader", "potential read fail, bytes left in file: %i", left);
+		const uint64_t left = file->remainingBytes();
+		X_WARNING_IF(left > 0, "DDSLoader", "potential read fail, bytes left in file: %" PRIu64, left);
 #endif
 
 		return true;
