@@ -328,6 +328,9 @@
     <ClCompile Include="UT_C_AlignedArray.cpp">
       <Filter>Source Files\tests\Containers</Filter>
     </ClCompile>
+    <ClCompile Include="UT_Function.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
