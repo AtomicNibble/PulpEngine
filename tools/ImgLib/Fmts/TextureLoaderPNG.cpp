@@ -376,8 +376,8 @@ namespace PNG
 
 		using namespace core::Compression;
 
-		ZlibInflate inflater(swapArea, [&](const uint8_t* pData, size_t len) {
-
+		ZlibInflate inflater(swapArea, [&](const uint8_t* pData, size_t len, size_t inflatedOffset) {
+			X_UNUSED(inflatedOffset);
 			X_ASSERT(rowBytes == len, "deflated buffer not match row size")(rowBytes, len);
 
 			// ignore filter byte.
@@ -574,7 +574,8 @@ namespace PNG
 		uint32_t idataCrc = pCrc->Begin();
 		pCrc->Update(&IDAT::TAG_ID, sizeof(IDAT::TAG_ID), idataCrc);
 
-		ZlibDefalte zlib(swapArena, [&] (const uint8_t* pData, size_t len) {
+		ZlibDefalte zlib(swapArena, [&] (const uint8_t* pData, size_t len, size_t deflateOffset) {
+			X_UNUSED(deflateOffset);
 			// get crc of block.
 			uint32_t crc = idataCrc;
 			pCrc->Update(pData, len, crc);

@@ -96,13 +96,14 @@ namespace Compression
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 
-		typedef core::Function<void(const uint8_t* pData, size_t len), 64> InflateCallback;
+		typedef core::Function<void(const uint8_t* pData, size_t len, size_t inflatedOffset), 64> InflateCallback;
 
 	public:
 		ZlibInflate(core::MemoryArenaBase* arena, InflateCallback&& inflateCallback);
 		~ZlibInflate();
 
 		void setBufferSize(size_t size);
+		size_t inflatedSize(void) const;
 
 		Result::Enum Inflate(const void* pCompessedData, size_t len);
 
@@ -126,13 +127,14 @@ namespace Compression
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 
-		typedef core::Function<void(const uint8_t* pData, size_t len), 64> DeflateCallback;
+		typedef core::Function<void(const uint8_t* pData, size_t len, size_t deflatedOffset), 64> DeflateCallback;
 
 	public:
 		ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback&& defalteCallBack, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 		~ZlibDefalte();
 
 		void setBufferSize(size_t size);
+		size_t deflatedSize(void) const;
 
 		// this will accept N input blocks and call the deflate callback everytime the buffer is full or we are flusing (finish == true)
 		// you can just pass a huge src block with finish == true and the callback will keep been called with blocks untill it's finished.

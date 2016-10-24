@@ -264,6 +264,11 @@ namespace Compression
 		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 	}
 
+	size_t ZlibInflate::inflatedSize(void) const
+	{
+		return stream_->total_out;
+	}
+
 	ZlibInflate::Result::Enum ZlibInflate::Inflate(const void* pCompessedData, size_t len)
 	{
 		X_ASSERT_NOT_NULL(pCompessedData);
@@ -286,7 +291,8 @@ namespace Compression
 			// do we have a finished block?
 			if (stream_->avail_out == 0)
 			{
-				callback_(buffer_.data(), buffer_.size());
+				const size_t inflatedOffset = stream_->total_out - buffer_.size();
+				callback_(buffer_.data(), buffer_.size(), inflatedOffset);
 
 				stream_->next_out = buffer_.data();
 				stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
@@ -305,7 +311,8 @@ namespace Compression
 			{
 				const size_t bytesInBuf = (buffer_.size() - stream_->avail_out);
 				if (bytesInBuf > 0) {
-					callback_(buffer_.data(), bytesInBuf);
+					const size_t inflatedOffset = stream_->total_out - buffer_.size();
+					callback_(buffer_.data(), bytesInBuf, inflatedOffset);
 				}
 
 				stream_->next_out = nullptr;
@@ -362,6 +369,11 @@ namespace Compression
 		stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
 	}
 
+	size_t ZlibDefalte::deflatedSize(void) const
+	{
+		return stream_->total_out;
+	}
+
 	ZlibDefalte::Result::Enum ZlibDefalte::Deflate(const void* pSrcData, size_t len, bool finish)
 	{
 		if (buffer_.isEmpty()) {
@@ -378,7 +390,8 @@ namespace Compression
 			// do we have a finished block?
 			if (stream_->avail_out == 0)
 			{
-				callback_(buffer_.data(), buffer_.size());
+				const size_t deflatedOffset = stream_->total_out - buffer_.size();
+				callback_(buffer_.data(), buffer_.size(), deflatedOffset);
 
 				stream_->next_out = buffer_.data();
 				stream_->avail_out = safe_static_cast<uint32_t>(buffer_.size());
@@ -406,8 +419,9 @@ namespace Compression
 			else if (res == Z_STREAM_END && finish)
 			{
 				const size_t bytesInBuf = (buffer_.size() - stream_->avail_out);
+				const size_t deflatedOffset = stream_->total_out - bytesInBuf;
 				if (bytesInBuf > 0) {
-					callback_(buffer_.data(), bytesInBuf);
+					callback_(buffer_.data(), bytesInBuf, deflatedOffset);
 				}
 
 				stream_->next_out = nullptr;

@@ -97,11 +97,8 @@ TEST(Zlib, bufferedInflate)
 		memset(pUncompressed2, 0, srcBufSize);
 
 		// do it in steps.
-		uint8_t* pDst = pUncompressed2;
-
-		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len) {
-			std::memcpy(pDst, pData, len);
-			pDst += len;
+		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len, size_t inflatedOffset) {
+			std::memcpy(&pUncompressed2[inflatedOffset], pData, len);
 		});
 
 		ZlibInflate::Result::Enum res;
@@ -159,11 +156,8 @@ TEST(Zlib, bufferedInflate2)
 		memset(pUncompressed2, 0, srcBufSize);
 
 		// do it in steps.
-		uint8_t* pDst = pUncompressed2;
-
-		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len) {
-			std::memcpy(pDst, pData, len);
-			pDst += len;
+		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len, size_t inflatedOffset) {
+			std::memcpy(&pUncompressed2[inflatedOffset], pData, len);
 		});
 
 		inflater.setBufferSize(1);
@@ -209,10 +203,9 @@ TEST(Zlib, bufferedDeflate)
 	size_t comrpessedBufSize = Zlib::requiredDeflateDestBuf(srcBufSize);
 	uint8_t* pDeflated = X_NEW_ARRAY(uint8_t, comrpessedBufSize, g_arena, "ZlibCompressed");
 
-	uint8_t* pDst = pDeflated;
-	ZlibDefalte deflater(g_arena, [&](const uint8_t* pData, size_t len) {
-		std::memcpy(pDst, pData, len);
-		pDst += len;
+
+	ZlibDefalte deflater(g_arena, [&](const uint8_t* pData, size_t len, size_t deflateOffset) {
+		std::memcpy(&pDeflated[deflateOffset], pData, len);
 	});
 
 	deflater.setBufferSize(1);
@@ -240,7 +233,7 @@ TEST(Zlib, bufferedDeflate)
 	}
 
 	// now deflate normal and compare.
- 	const size_t deflatedSize = (pDst - pDeflated);
+ 	const size_t deflatedSize = deflater.deflatedSize();
 	bool inflateOk = Zlib::inflate(g_arena, pDeflated, deflatedSize, pUncompressed2, srcBufSize);
 	EXPECT_TRUE(inflateOk);
 
