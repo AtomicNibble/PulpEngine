@@ -26,13 +26,11 @@ namespace Compression
 			X_ASSERT_NOT_NULL(opaque);
 			core::MemoryArenaBase* pArena = reinterpret_cast<core::MemoryArenaBase*>(opaque);
 
-			return X_NEW_ARRAY(uint8_t, items* size, pArena, "ZlibInternalData");
+			return X_NEW_ARRAY(uint8_t, items * size, pArena, "ZlibInternalData");
 		}
 
 		static void StaticFree(void* opaque, void* address)
 		{
-			X_ASSERT_NOT_NULL(opaque);
-			X_ASSERT_NOT_NULL(address);
 			core::MemoryArenaBase* pArena = reinterpret_cast<core::MemoryArenaBase*>(opaque);
 
 			X_DELETE(address, pArena);
@@ -225,8 +223,8 @@ namespace Compression
 
 	// --------------------------------------
 
-	ZlibInflate::ZlibInflate(core::MemoryArenaBase* arena, InflateCallback inflateCallback) :
-		callback_(inflateCallback),
+	ZlibInflate::ZlibInflate(core::MemoryArenaBase* arena, InflateCallback&& inflateCallback) :
+		callback_(std::forward<InflateCallback>(inflateCallback)),
 		arena_(arena),
 		buffer_(arena),
 		stream_(nullptr)
@@ -329,8 +327,8 @@ namespace Compression
 	// --------------------------------------
 
 
-	ZlibDefalte::ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback defalteCallBack, CompressLevel::Enum lvl) :
-		callback_(defalteCallBack),
+	ZlibDefalte::ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback&& defalteCallBack, CompressLevel::Enum lvl) :
+		callback_(std::forward<DeflateCallback>(defalteCallBack)),
 		arena_(arena),
 		buffer_(arena)
 	{

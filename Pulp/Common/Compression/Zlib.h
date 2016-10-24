@@ -1,6 +1,5 @@
 #pragma once
 
-#include <functional>
 
 #ifndef X_COMPRESSION_ZLIB_H_
 #define X_COMPRESSION_ZLIB_H_
@@ -12,6 +11,8 @@ extern "C" {
 #include <CompileTime\IsPOD.h>
 #include <Containers\Array.h>
 #include <ICompression.h>
+
+#include <Util\Function.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -95,10 +96,10 @@ namespace Compression
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 
-		typedef std::function<void(const uint8_t* pData, size_t len)> InflateCallback;
+		typedef core::Function<void(const uint8_t* pData, size_t len), 64> InflateCallback;
 
 	public:
-		ZlibInflate(core::MemoryArenaBase* arena, InflateCallback inflateCallback);
+		ZlibInflate(core::MemoryArenaBase* arena, InflateCallback&& inflateCallback);
 		~ZlibInflate();
 
 		void setBufferSize(size_t size);
@@ -125,10 +126,10 @@ namespace Compression
 
 		static const size_t DEFAULT_BUF_SIZE = 1024 * 16;
 
-		typedef std::function<void(const uint8_t* pData, size_t len)> DeflateCallback;
+		typedef core::Function<void(const uint8_t* pData, size_t len), 64> DeflateCallback;
 
 	public:
-		ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback defalteCallBack, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+		ZlibDefalte(core::MemoryArenaBase* arena, DeflateCallback&& defalteCallBack, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 		~ZlibDefalte();
 
 		void setBufferSize(size_t size);
