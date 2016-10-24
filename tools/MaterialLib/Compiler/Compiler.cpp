@@ -81,8 +81,8 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	type_ = Util::MatTypeFromStr(pCat);
 	usage_ = Util::MatUsageFromStr(pUsage);
 	surType_ = Util::MatSurfaceTypeFromStr(pSurfaceType);
-	polyOffset_ = Util::MatSurfaceTypeFromStr(pPolyOffset);
-	cullType_ = Util::MatSurfaceTypeFromStr(pCullFace);
+	polyOffset_ = Util::MatPolyOffsetFromStr(pPolyOffset);
+	cullType_ = Util::MatCullTypeFromStr(pCullFace);
 	
 	// now we do some flag parsing.
 	flags_.Clear();
