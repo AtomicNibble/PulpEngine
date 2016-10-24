@@ -11,7 +11,9 @@ Function<R(Args...), MaxSize>::Function() :
 }
 
 template <class R, class... Args, size_t MaxSize>
-Function<R(Args...), MaxSize>::Function(std::nullptr_t)
+Function<R(Args...), MaxSize>::Function(std::nullptr_t) :
+	invoker_(nullptr),
+	manager_(nullptr)
 {
 }
 
@@ -26,7 +28,9 @@ Function<R(Args...), MaxSize>::Function(const Function &other)
 }
 
 template <class R, class... Args, size_t MaxSize>
-Function<R(Args...), MaxSize>::Function(Function&& other)
+Function<R(Args...), MaxSize>::Function(Function&& other) :
+	invoker_(nullptr),
+	manager_(nullptr)
 { 
 	other.swap(*this); 
 }
