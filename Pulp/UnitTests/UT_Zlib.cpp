@@ -132,10 +132,48 @@ TEST(Zlib, bufferedInflate)
 	}
 }
 
-
-TEST(Zlib, bufferedInflate2)
+struct BufInfo
 {
-	const size_t srcBufSize = 4096;
+	BufInfo(size_t src, size_t block, size_t out) :
+		srcBufSize(src),
+		blockBufSize(block),
+		outBufSize(out)
+	{}
+
+	size_t srcBufSize;
+	size_t blockBufSize;
+	size_t outBufSize;
+};
+
+std::ostream& operator<<(std::ostream& s, BufInfo const& bi)
+{
+	s << "src " << bi.srcBufSize;
+	s << " block " << bi.blockBufSize;
+	s << " outBuf " << bi.outBufSize;
+	return s;
+}
+
+class ZlibBufferd : public ::testing::TestWithParam<BufInfo> {
+};
+
+// run the test with a load of diffrent buffer sizes to make sure 
+// buffers that are allowed to be bigger / smaller than others behave correct
+INSTANTIATE_TEST_CASE_P(buffered, ZlibBufferd, ::testing::Values(
+	BufInfo(4096, 1, 256),
+	BufInfo(4096, 4096, 256),
+	BufInfo(4096, 4096, 4096),
+	BufInfo(4096, 8096, 256),
+	BufInfo(4096, 8096, 4096),
+	BufInfo(1, 1, 1),
+	BufInfo(8538, 16, 8096),
+	BufInfo(8538, 16, 8096 * 2)
+));
+
+TEST_P(ZlibBufferd, bufferedInflate2)
+{
+	const BufInfo& bufInfo = GetParam();
+
+	const size_t srcBufSize = bufInfo.srcBufSize;
 	size_t deflatedSize, DestbufSize;
 
 	// create a buffer.
@@ -158,14 +196,15 @@ TEST(Zlib, bufferedInflate2)
 
 		// do it in steps.
 		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len, size_t inflatedOffset) {
+			ASSERT_LE(inflatedOffset + len, srcBufSize);
 			std::memcpy(&pUncompressed2[inflatedOffset], pData, len);
 		});
 
-		inflater.setBufferSize(1);
+		inflater.setBufferSize(bufInfo.outBufSize);
 
 		ZlibInflate::Result::Enum res;
 
-		const size_t bufSize = 256;
+		const size_t bufSize = bufInfo.outBufSize;
 		size_t bufLeft = deflatedSize;
 		size_t i = 0;
 
@@ -183,6 +222,7 @@ TEST(Zlib, bufferedInflate2)
 
 		EXPECT_EQ(0, bufLeft);
 		EXPECT_EQ(ZlibInflate::Result::DONE, res);
+		ASSERT_EQ(inflater.inflatedSize(), srcBufSize);
 
 		if (ZlibInflate::Result::DONE == res)
 		{
@@ -193,9 +233,11 @@ TEST(Zlib, bufferedInflate2)
 	}
 }
 
-TEST(Zlib, bufferedDeflate)
+TEST_P(ZlibBufferd, bufferedDeflate)
 {
-	const size_t srcBufSize = 4096;
+	const BufInfo& bufInfo = GetParam();
+
+	const size_t srcBufSize = bufInfo.srcBufSize;
 
 	uint8_t* pUncompressed = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed");
 	uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed");
@@ -206,14 +248,15 @@ TEST(Zlib, bufferedDeflate)
 
 
 	ZlibDefalte deflater(g_arena, [&](const uint8_t* pData, size_t len, size_t deflateOffset) {
+		ASSERT_LE(deflateOffset + len, comrpessedBufSize);
 		std::memcpy(&pDeflated[deflateOffset], pData, len);
 	});
 
-	deflater.setBufferSize(1);
+	deflater.setBufferSize(bufInfo.outBufSize);
 	ZlibDefalte::Result::Enum res;
 
 	{
-		const size_t bufSize = 256;
+		const size_t bufSize = bufInfo.blockBufSize;
 		size_t bufLeft = srcBufSize;
 		size_t i = 0;
 
