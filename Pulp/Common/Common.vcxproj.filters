@@ -1150,6 +1150,9 @@
     <ClInclude Include="IMaterial.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Function.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1436,6 +1439,9 @@
     </None>
     <None Include="IPrimativeContext.inl">
       <Filter>Interfaces_h\3DEngine</Filter>
+    </None>
+    <None Include="Util\Function.inl">
+      <Filter>Headers\Util</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

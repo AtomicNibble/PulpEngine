@@ -362,6 +362,7 @@
     <ClInclude Include="Util\Flags.h" />
     <ClInclude Include="Util\FlagsMacros.h" />
     <ClInclude Include="Util\FloatIEEEUtil.h" />
+    <ClInclude Include="Util\Function.h" />
     <ClInclude Include="Util\GenericUtil.h" />
     <ClInclude Include="Util\HelperMacros.h" />
     <ClInclude Include="Util\LastError.h" />
@@ -542,6 +543,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="Util\Flags.inl" />
+    <None Include="Util\Function.inl" />
     <None Include="Util\Pointer64.inl" />
     <None Include="Util\PointerFlags.inl" />
     <None Include="Util\PointerUtil.inl" />
