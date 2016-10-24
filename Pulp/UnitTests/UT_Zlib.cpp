@@ -98,6 +98,7 @@ TEST(Zlib, bufferedInflate)
 
 		// do it in steps.
 		ZlibInflate inflater(g_arena, [&](const uint8_t* pData, size_t len, size_t inflatedOffset) {
+			ASSERT_LE(srcBufSize, inflatedOffset + len);
 			std::memcpy(&pUncompressed2[inflatedOffset], pData, len);
 		});
 
