@@ -311,7 +311,7 @@ namespace Compression
 			{
 				const size_t bytesInBuf = (buffer_.size() - stream_->avail_out);
 				if (bytesInBuf > 0) {
-					const size_t inflatedOffset = stream_->total_out - buffer_.size();
+					const size_t inflatedOffset = stream_->total_out - bytesInBuf;
 					callback_(buffer_.data(), bytesInBuf, inflatedOffset);
 				}
 
