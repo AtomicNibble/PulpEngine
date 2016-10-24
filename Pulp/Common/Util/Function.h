@@ -6,7 +6,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-template <class, size_t MaxSize = 512> class Function;
+template <class, size_t MaxSize = 256> class Function;
 
 template <class R, class... Args, size_t MaxSize> 
 class Function<R(Args...), MaxSize> 
@@ -41,6 +41,7 @@ public:
 
 	X_INLINE explicit operator bool() const;
 	X_INLINE R operator()(Args... args);
+	X_INLINE R Invoke(Args... args);
 
 	X_INLINE void swap(Function& other);
 
@@ -65,10 +66,9 @@ private:
 	}
 
 private:
-	Storage data_;
 	Invoker invoker_;
 	Manager manager_;
-
+	Storage data_;
 };
 
 X_NAMESPACE_END

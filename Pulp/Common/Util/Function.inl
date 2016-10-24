@@ -3,7 +3,9 @@
 X_NAMESPACE_BEGIN(core)
 
 template <class R, class... Args, size_t MaxSize>
-Function<R(Args...), MaxSize>::Function()
+Function<R(Args...), MaxSize>::Function() :
+	invoker_(nullptr),
+	manager_(nullptr)
 {
 
 }
@@ -108,6 +110,12 @@ R Function<R(Args...), MaxSize>::operator()(Args... args)
 		// worth the branch?
 		// should just let it fail :D
 	}
+	return invoker_(&data_, std::forward<Args>(args)...);
+}
+
+template <class R, class... Args, size_t MaxSize>
+R Function<R(Args...), MaxSize>::Invoke(Args... args)
+{
 	return invoker_(&data_, std::forward<Args>(args)...);
 }
 
