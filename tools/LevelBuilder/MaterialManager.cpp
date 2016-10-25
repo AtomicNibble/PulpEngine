@@ -230,6 +230,9 @@ engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
+		// this needs updating to use new logic.
+		X_ASSERT_NOT_IMPLEMENTED();
+
 		file.readObj(hdr);
 
 		if (hdr.isValid())
@@ -243,7 +246,7 @@ engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 			{
 				pMat = (engine::XMaterial*)createMaterial(MtlName);
 				pMat->setCullType(hdr.cullType);
-				pMat->setSurfaceType(hdr.type);
+			//	pMat->setSurfaceType(hdr.type);
 			}
 			else
 			{
