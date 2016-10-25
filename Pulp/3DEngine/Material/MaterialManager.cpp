@@ -737,22 +737,23 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 {
 	X_ASSERT_NOT_NULL(MtlName);
-	core::XFileScoped file;
-	core::Path<char> path;
-	MaterialHeader hdr;
 	XMaterial* pMat = nullptr;
-	uint32_t i;
 
+
+#if 1
+	X_ASSERT_NOT_IMPLEMENTED();
+#else
+
+	core::Path<char> path;
 	path /= "materials/";
 	path.setFileName(MtlName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
-//	if (!pFileSys_->fileExists(path.c_str())) {
-//		return pMat;
-//	}
-
+	core::XFileScoped file;
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
+		MaterialHeader hdr;
+
 		file.readObj(hdr);
 
 		if (hdr.isValid())
@@ -775,7 +776,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				input.material.specShininess = hdr.shineness;
 				input.opacity = hdr.opacity;
 				
-				for (i = 0; i < Num; i++)
+				for (uint32_t i = 0; i < Num; i++)
 				{
 					X_ASSERT(texture[i].type < static_cast<int32_t>(render::shader::ShaderTextureIdx::ENUM_COUNT),
 						"invalid texture type")();
@@ -803,6 +804,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 		}
 	}
 
+#endif
 	return pMat;
 }
 
