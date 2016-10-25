@@ -13,6 +13,8 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(MaterialType::ENUM_COUNT == 5, "Added additional material types? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "world"_fnv1a:
@@ -36,6 +38,8 @@ namespace Util
 
 		core::StackString<96, char> strUpper(str);
 		strUpper.toLower();
+
+		static_assert(MaterialUsage::ENUM_COUNT == 7, "Added additional material usage? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
@@ -67,6 +71,8 @@ namespace Util
 
 		core::StackString<96, char> strUpper(str);
 		strUpper.toLower();
+
+		static_assert(MaterialSurType::ENUM_COUNT == 18, "Added additional surface types? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
@@ -117,6 +123,8 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(MaterialFilterType::ENUM_COUNT == 10, "Added additional filter types? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "nearest (mip none)"_fnv1a:
@@ -152,6 +160,8 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(MaterialTexRepeat::ENUM_COUNT == 4, "Added additional repeat types? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "no tile"_fnv1a:
@@ -173,6 +183,8 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(MaterialPolygonOffset::ENUM_COUNT == 3, "Added additional polyoffsets? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "none"_fnv1a:
@@ -192,6 +204,8 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(MaterialCullType::ENUM_COUNT == 3, "Added additional cull types? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "back"_fnv1a:
@@ -210,6 +224,8 @@ namespace Util
 	MaterialBlendType::Enum MatBlendTypeFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(MaterialBlendType::ENUM_COUNT == 18, "Added additional blend types? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
@@ -260,6 +276,8 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(StencilOperation::ENUM_COUNT == 8, "Added additional stencil op types? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "keep"_fnv1a:
@@ -288,6 +306,8 @@ namespace Util
 	StencilFunc::Enum StencilFuncFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(StencilFunc::ENUM_COUNT == 8, "Added additional stencil funcs? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
