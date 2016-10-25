@@ -310,6 +310,14 @@ struct IMaterial
 };
 
 
+X_DECLARE_FLAGS(MaterialTexFlags)(
+	DIFFUSE,
+	NORMAL,
+	DETAIL,
+	SPECCOL
+);
+
+typedef Flags8<MaterialStateFlag> MaterialStateFlags;
 
 struct MaterialHeader
 {
