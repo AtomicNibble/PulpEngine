@@ -95,6 +95,7 @@ namespace AssetExplorer {
 		void updateContextMenuActions(void);
 
 	private:
+		QMenu* sessionMenu_;
 		QMenu* projectMenu_;
 		QMenu* folderMenu_;
 		QMenu* fileMenu_;

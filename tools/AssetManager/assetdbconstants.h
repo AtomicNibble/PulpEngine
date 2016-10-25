@@ -32,11 +32,16 @@ namespace AssetExplorer
 
 
 		// Context menus
+		const char M_SESSIONCONTEXT[] = "Project.Menu.Session";
 		const char M_PROJECTCONTEXT[] = "Project.Menu.Project";
 		const char M_FOLDERCONTEXT[] = "Project.Menu.Folder";
 		const char M_FILECONTEXT[] = "Project.Menu.File";
 
 		// Context menu groups
+		const char G_SESSION_FILES[] = "Session.Group.Files";
+		const char G_SESSION_BUILD[] = "Session.Group.Build";
+		const char G_SESSION_REBUILD[] = "Session.Group.Rebuild";
+
 		const char G_PROJECT_FIRST[] = "Project.Group.Open";
 		const char G_PROJECT_FILES[] = "Project.Group.Files";
 		const char G_PROJECT_LAST[] = "Project.Group.Last";

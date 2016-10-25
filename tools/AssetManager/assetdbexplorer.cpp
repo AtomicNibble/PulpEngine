@@ -123,20 +123,29 @@ bool AssetExplorer::init(void)
     ICommand* pCmd = nullptr;
 
     // context menus
-    ActionContainer* mprojectContextMenu = ActionManager::createMenu(Constants::M_PROJECTCONTEXT);
+	ActionContainer* msessionContextMenu = ActionManager::createMenu(Constants::M_SESSIONCONTEXT);
+	ActionContainer* mprojectContextMenu = ActionManager::createMenu(Constants::M_PROJECTCONTEXT);
     ActionContainer* mfolderContextMenu = ActionManager::createMenu(Constants::M_FOLDERCONTEXT);
     ActionContainer* mfileContextMenu = ActionManager::createMenu(Constants::M_FILECONTEXT);
 
 
+	sessionMenu_ = msessionContextMenu->menu();
 	projectMenu_ = mprojectContextMenu->menu();
 	folderMenu_ = mfolderContextMenu->menu();
 	fileMenu_ = mfileContextMenu->menu();
 
     // Groups
+	msessionContextMenu->appendGroup(Constants::G_SESSION_FILES);
+	msessionContextMenu->appendGroup(Constants::G_SESSION_BUILD);
+	msessionContextMenu->appendGroup(Constants::G_SESSION_REBUILD);
+	msessionContextMenu->appendGroup(Constants::G_PROJECT_TREE);
+	msessionContextMenu->addSeparator(globalcontext, Constants::G_SESSION_BUILD);
+
     mprojectContextMenu->appendGroup(Constants::G_PROJECT_FIRST);
     mprojectContextMenu->appendGroup(Constants::G_PROJECT_FILES);
     mprojectContextMenu->appendGroup(Constants::G_PROJECT_LAST);
     mprojectContextMenu->appendGroup(Constants::G_PROJECT_TREE);
+	mprojectContextMenu->addSeparator(globalcontext, Constants::G_PROJECT_FILES);
 
     mfolderContextMenu->appendGroup(Constants::G_FOLDER_FILES);
     mfolderContextMenu->appendGroup(Constants::G_FOLDER_COMPILE);
@@ -150,9 +159,6 @@ bool AssetExplorer::init(void)
 	mfileContextMenu->appendGroup(Constants::G_FILE_COMPILE);
 	mfileContextMenu->appendGroup(Constants::G_FILE_OTHER);
     mfileContextMenu->appendGroup(Constants::G_PROJECT_TREE);
-
-    // Separators
-    mprojectContextMenu->addSeparator(globalcontext, Constants::G_PROJECT_FILES);
 	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OPEN);
 	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_NEW);
 	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_COMPILE);
@@ -165,6 +171,8 @@ bool AssetExplorer::init(void)
 		pCmd = ActionManager::registerAction(projectTreeCollapseAllAction_,
                                Constants::PROJECTTREE_COLLAPSE_ALL, projecTreeContext);
 
+		msessionContextMenu->addSeparator(globalcontext, treeGroup);
+		msessionContextMenu->addAction(pCmd, treeGroup);
         mprojectContextMenu->addSeparator(globalcontext, treeGroup);
         mprojectContextMenu->addAction(pCmd, treeGroup);
         mfolderContextMenu->addSeparator(globalcontext, treeGroup);
@@ -180,6 +188,7 @@ bool AssetExplorer::init(void)
 		pCmd = ActionManager::registerAction(projectTreeExpandAllAction_,
 			Constants::PROJECTTREE_EXPAND_ALL, projecTreeContext);
 
+		msessionContextMenu->addAction(pCmd, treeGroup);
 		mprojectContextMenu->addAction(pCmd, treeGroup);
 		mfolderContextMenu->addAction(pCmd, treeGroup);
 		mfileContextMenu->addAction(pCmd, treeGroup);
@@ -229,6 +238,7 @@ bool AssetExplorer::init(void)
 
 	// add new
 	pCmd = ActionManager::registerAction(addNewAssetAction_, assman::AssetExplorer::Constants::NEW_ASSET, projecTreeContext);
+	msessionContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_SESSION_FILES);
 	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FIRST);
 	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_FILES);
 	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_NEW);
@@ -241,12 +251,14 @@ bool AssetExplorer::init(void)
 
 	// build action
 	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
+	msessionContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_SESSION_BUILD);
 	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
 	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
 	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
 
 	// re-build action
 	pCmd = ActionManager::registerAction(reBuildAction_, assman::AssetExplorer::Constants::REBUILD, projecTreeContext);
+	msessionContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_SESSION_REBUILD);
 	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
 	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
 	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
@@ -424,8 +436,8 @@ void AssetExplorer::showContextMenu(QWidget* pView, const QPoint& globalPos, Nod
 		}
 	}
 	else { // session item
-		   //   emit aboutToShowContextMenu(0, node);
-		   //   contextMenu = m_sessionContextMenu;
+		emit aboutToShowContextMenu(nullptr, pNode);
+		pContextMenu = sessionMenu_;
 	}
 
 	updateContextMenuActions();
@@ -536,6 +548,10 @@ void AssetExplorer::updateContextMenuActions(void)
 			deleteAssetAction_->setEnabled(enableDelete);
 			renameAssetAction_->setEnabled(enableRename);
 		}
+	}
+	else
+	{
+		addNewAssetAction_->setEnabled(true);
 	}
 }
 
@@ -655,6 +671,10 @@ void AssetExplorer::addNewAsset(void)
 	if (currentProject_) {
 		dialog.setPrefredMod(currentProject_->displayName());
 	}
+	else if (Project* pProject = SessionManager::startupProject()) {
+		dialog.setPrefredMod(pProject->displayName());
+	}
+
 	dialog.exec();
 }
 
@@ -669,7 +689,6 @@ void AssetExplorer::addNewAssetType(void)
 	}
 
 	AddAssetDialog dialog(ICore::mainWindow(), db_);
-
 	AssetTypeVirtualFolderNode* pAssetTypeFolder = nullptr;
 	
 
