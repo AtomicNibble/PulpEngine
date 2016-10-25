@@ -3,6 +3,8 @@
 
 #include "AssetComboBoxWidget.h"
 
+#include <IMaterial.h>
+
 X_NAMESPACE_BEGIN(assman)
 
 
@@ -459,6 +461,26 @@ bool AssetScriptProps::getPropValueBool(const std::string& key)
 	return getItem(key)->GetValueBool();
 }
 
+std::string AssetScriptProps::getMaterialCats(void)
+{
+	std::string s;
+	core::StackString<128, char> temp;
+
+	s.reserve(engine::MaterialCat::ENUM_COUNT * 16);
+
+	for (uint32_t i = 0; i < engine::MaterialCat::ENUM_COUNT; i++)
+	{
+		const char* pName = engine::MaterialCat::ToString(i);
+
+		temp.set(pName);
+		temp.toLower();
+
+		s += temp.c_str();
+		s += "|";
+	}
+
+	return s;
+}
 
 AssetScriptProperty* AssetScriptProps::getProperty(const std::string& key, AssetProperty::PropertyType::Enum type)
 {

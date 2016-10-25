@@ -99,6 +99,8 @@ public:
 	int32_t getPropValueInt(const std::string& key);
 	bool getPropValueBool(const std::string& key);
 
+	std::string getMaterialCats(void);
+
 private:
 	AssetScriptProperty* getProperty(const std::string& key, AssetProperty::PropertyType::Enum type);
 
