@@ -544,6 +544,8 @@ namespace Util
 
 		using namespace core::Hash::Fnva1Literals;
 
+		static_assert(Texturefmt::ENUM_COUNT == 51, "Added additional texture fmts? this code needs updating.");
+
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
 			case "A8"_fnv1a:
