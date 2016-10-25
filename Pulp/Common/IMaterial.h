@@ -320,8 +320,6 @@ struct MaterialHeader
 
 struct MaterialTexture
 {
-	render::shader::ShaderTextureIdx::Enum type;
-
 	uint8_t nameLen;
 	MaterialFilterType::Enum filterType;
 	MaterialTexRepeat::Enum texRepeat;
@@ -343,7 +341,7 @@ X_ENSURE_SIZE(StencilFunc::Enum, 1);
 
 
 X_ENSURE_SIZE(MaterialHeader, 52);
-X_ENSURE_SIZE(MaterialTexture, 8);
+X_ENSURE_SIZE(MaterialTexture, 4);
 
 
 struct IMaterialManagerListener
