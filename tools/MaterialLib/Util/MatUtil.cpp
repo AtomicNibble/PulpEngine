@@ -39,7 +39,7 @@ namespace Util
 		core::StackString<96, char> strUpper(str);
 		strUpper.toLower();
 
-		static_assert(MaterialUsage::ENUM_COUNT == 7, "Added additional material usage? this code needs updating.");
+		static_assert(MaterialUsage::ENUM_COUNT == 14, "Added additional material usage? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
@@ -53,10 +53,24 @@ namespace Util
 				return MaterialUsage::CELING;
 			case "roof"_fnv1a:
 				return MaterialUsage::ROOF;
+			case "wall_interior"_fnv1a:
+				return MaterialUsage::WALL_INTERIOR;
+			case "wall_exterior"_fnv1a:
+				return MaterialUsage::WALL_EXTERIOR;
+			case "trim_interior"_fnv1a:
+				return MaterialUsage::TRIM_INTERIOR;
+			case "trim_exterior"_fnv1a:
+				return MaterialUsage::TRIM_EXTERIOR;
 			case "window"_fnv1a:
 				return MaterialUsage::WINDOW;
+			case "foliage"_fnv1a:
+				return MaterialUsage::FOLIAGE;
+			case "water"_fnv1a:
+				return MaterialUsage::WATER;
 			case "sky"_fnv1a:
 				return MaterialUsage::SKY;
+			case "decal"_fnv1a:
+				return MaterialUsage::DECAL;
 
 			default:
 				X_ERROR("Mtl", "Unknown material usage: '%s'", str);
@@ -72,42 +86,68 @@ namespace Util
 		core::StackString<96, char> strUpper(str);
 		strUpper.toLower();
 
-		static_assert(MaterialSurType::ENUM_COUNT == 18, "Added additional surface types? this code needs updating.");
+		static_assert(MaterialSurType::ENUM_COUNT == 26, "Added additional surface types? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
 			case "none"_fnv1a:
 				return MaterialSurType::NONE;
+
 			case "brick"_fnv1a:
 				return MaterialSurType::BRICK;
 			case "concrete"_fnv1a:
 				return MaterialSurType::CONCRETE;
 			case "cloth"_fnv1a:
 				return MaterialSurType::CLOTH;
+			case "carpet"_fnv1a:
+				return MaterialSurType::CARPET;
+			case "ceramic"_fnv1a:
+				return MaterialSurType::CERAMIC;
+
+			case "dirt"_fnv1a:
+				return MaterialSurType::DIRT;
+
 			case "flesh"_fnv1a:
 				return MaterialSurType::FLESH;
+			case "foliage"_fnv1a:
+				return MaterialSurType::FOLIAGE;
+
+
 			case "glass"_fnv1a:
 				return MaterialSurType::GLASS;
 			case "grass"_fnv1a:
 				return MaterialSurType::GRASS;
 			case "gravel"_fnv1a:
 				return MaterialSurType::GRAVEL;
+
 			case "ice"_fnv1a:
 				return MaterialSurType::ICE;
+
 			case "metal"_fnv1a:
 				return MaterialSurType::METAL;
+			case "metal_thin"_fnv1a:
+				return MaterialSurType::METAL_THIN;
+			case "metal_hollow"_fnv1a:
+				return MaterialSurType::METAL_HOLLOW;
 			case "mud"_fnv1a:
 				return MaterialSurType::MUD;
+
 			case "plastic"_fnv1a:
 				return MaterialSurType::PLASTIC;
 			case "paper"_fnv1a:
 				return MaterialSurType::PAPER;
+			case "plaster"_fnv1a:
+				return MaterialSurType::PLASTER;
 			case "rock"_fnv1a:
 				return MaterialSurType::ROCK;
+			case "rubber"_fnv1a:
+				return MaterialSurType::RUBBER;
+
 			case "snow"_fnv1a:
 				return MaterialSurType::SNOW;
 			case "sand"_fnv1a:
 				return MaterialSurType::SAND;
+
 			case "wood"_fnv1a:
 				return MaterialSurType::WOOD;
 			case "water"_fnv1a:
