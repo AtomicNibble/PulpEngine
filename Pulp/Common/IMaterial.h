@@ -339,6 +339,10 @@ struct MaterialHeader
 	MaterialStateFlags stateFlags;
 	bool _pad;
 
+	// used for custom texture repeat.
+	// if < 0 the textures dim's are used.
+	Vec2i tiling;
+
 	// 12
 	Color8u diffuse;
 	Color8u specular;
