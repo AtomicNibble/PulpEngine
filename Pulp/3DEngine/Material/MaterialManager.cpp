@@ -55,29 +55,6 @@ namespace {
 		return false;
 	}
 
-	// string to material type.
-	MaterialType::Enum MatTypeFromStr(const char* str)
-	{
-		// case sensitive for this one
-		const char* pBegin = str;
-		const char* pEnd = str + core::strUtil::strlen(str);
-
-		if (core::strUtil::IsEqual(pBegin, pEnd, "world")) {
-			return MaterialType::WORLD;
-		}
-		if (core::strUtil::IsEqual(pBegin, pEnd, "ui")) {
-			return MaterialType::UI;
-		}
-		if (core::strUtil::IsEqual(pBegin, pEnd, "model")) {
-			return MaterialType::MODEL;
-		}
-		if (core::strUtil::IsEqual(pBegin, pEnd, "tool")) {
-			return MaterialType::TOOL;
-		}
-
-		X_ERROR("Mtl", "Unknown material type: '%s' (case-sen)", str);
-		return MaterialType::UNKNOWN;
-	}
 
 	MaterialSurType::Enum SurfaceTypeFromStr(const char* str)
 	{
@@ -214,8 +191,8 @@ namespace {
 			else if (core::strUtil::IsEqual(begin, end, "MaterialType"))
 			{
 				// make sure the name is a valid material type.
-				MaterialType::Enum type = MatTypeFromStr(attr->value());
-				pMaterial->setType(type);
+			//	MaterialType::Enum type = MatTypeFromStr(attr->value());
+			//	pMaterial->setType(type);
 			}
 			else
 			{

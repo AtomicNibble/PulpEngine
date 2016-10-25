@@ -44,28 +44,6 @@ namespace
 	}
 
 	// string to material type.
-	MaterialType::Enum MatTypeFromStr(const char* str)
-	{
-		// case sensitive for this one
-		using namespace core::Hash::Fnva1Literals;
-
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
-		{
-			case "world"_fnv1a:
-				return MaterialType::WORLD;
-			case "ui"_fnv1a:
-				return MaterialType::UI;
-			case "model"_fnv1a:
-				return MaterialType::MODEL;
-			case "tool"_fnv1a:
-				return MaterialType::WORLD;
-
-			default:
-				X_ERROR("Mtl", "Unknown material type: '%s' (case-sen)", str);
-				return MaterialType::UNKNOWN;
-		}
-	}
-
 	MaterialSurType::Enum SurfaceTypeFromStr(const char* str)
 	{
 		// case sensitive for this one
@@ -159,7 +137,7 @@ XMaterial::XMaterial()
 	texRepeat_ = MaterialTexRepeat::TILE_BOTH;
 	polyOffsetType_ = MaterialPolygonOffset::NONE;
 	filterType_ = MaterialFilterType::LINEAR_MIP_LINEAR;
-	MatType_ = MaterialType::UNKNOWN;
+//	MatType_ = MaterialType::UNKNOWN;
 	coverage_ = MaterialCoverage::BAD;
 }
 
@@ -262,6 +240,7 @@ void XMaterial::setFilterType(MaterialFilterType::Enum filterType)
 	filterType_ = filterType;
 }
 
+#if 0
 MaterialType::Enum XMaterial::getType(void) const
 {
 	return MatType_;
@@ -271,6 +250,7 @@ void XMaterial::setType(MaterialType::Enum type)
 {
 	MatType_ = type;
 }
+#endif
 
 MaterialCoverage::Enum XMaterial::getCoverage(void) const
 {
@@ -349,8 +329,8 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 		else if (core::strUtil::IsEqual(begin, end, "MaterialType"))
 		{
 			// make sure the name is a valid material type.
-			MaterialType::Enum type = MatTypeFromStr(attr->value());
-			pMaterial->setType(type);
+		//	MaterialType::Enum type = MatTypeFromStr(attr->value());
+		//	pMaterial->setType(type);
 		}
 		else
 		{

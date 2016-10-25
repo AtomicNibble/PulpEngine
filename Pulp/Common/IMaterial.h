@@ -73,12 +73,16 @@ X_DECLARE_FLAGS(MaterialStateFlag)(
 
 typedef Flags8<MaterialStateFlag> MaterialStateFlags;
 
-// the type of material it is, changes nothing really currently.
-X_DECLARE_ENUM8(MaterialType)(
+// cat used to refine avaliable subtypes.
+X_DECLARE_ENUM8(MaterialCat)(
+	GEO,
+	DECAL,
 	UI,
-	WORLD,
-	MODEL,
 	TOOL,
+	CODE,
+	FILTERS,
+	WEAPON,
+	EFFECT,
 	UNKNOWN
 );
 
@@ -275,8 +279,8 @@ struct IMaterial
 	virtual MaterialFilterType::Enum getFilterType(void) const X_ABSTRACT;
 	virtual void setFilterType(MaterialFilterType::Enum filterType) X_ABSTRACT;
 
-	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
-	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
+//	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
+//	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
 
 	virtual MaterialCoverage::Enum getCoverage(void) const X_ABSTRACT;
 	virtual void setCoverage(MaterialCoverage::Enum coverage) X_ABSTRACT;
@@ -301,7 +305,7 @@ struct MaterialHeader
 	// 4
 	uint8_t version;
 	uint8_t numTextures;
-	MaterialType::Enum type;
+	MaterialCat::Enum cat;
 	MaterialSurType::Enum surfaceType;
 
 	// 4
@@ -343,7 +347,7 @@ struct MaterialTexture
 };
 
 
-X_ENSURE_SIZE(MaterialType::Enum, 1);
+X_ENSURE_SIZE(MaterialCat::Enum, 1);
 X_ENSURE_SIZE(MaterialCoverage::Enum, 1);
 X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
 X_ENSURE_SIZE(MaterialFilterType::Enum, 1);

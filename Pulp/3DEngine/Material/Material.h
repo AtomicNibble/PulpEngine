@@ -66,8 +66,8 @@ public:
 	virtual MaterialFilterType::Enum getFilterType(void) const X_OVERRIDE;
 	virtual void setFilterType(MaterialFilterType::Enum filterType) X_OVERRIDE;
 
-	virtual MaterialType::Enum getType(void) const X_OVERRIDE;
-	virtual void setType(MaterialType::Enum type) X_OVERRIDE;
+//	virtual MaterialType::Enum getType(void) const X_OVERRIDE;
+//	virtual void setType(MaterialType::Enum type) X_OVERRIDE;
 
 	virtual MaterialCoverage::Enum getCoverage(void) const X_OVERRIDE;
 	virtual void setCoverage(MaterialCoverage::Enum coverage) X_OVERRIDE;
@@ -94,7 +94,7 @@ protected:
 	MaterialTexRepeat::Enum texRepeat_;
 	MaterialPolygonOffset::Enum polyOffsetType_;
 	MaterialFilterType::Enum filterType_;
-	MaterialType::Enum		MatType_;
+//	MaterialType::Enum		MatType_;
 	MaterialCoverage::Enum  coverage_;
 
 //	shader::XShaderItem     shaderItem_;

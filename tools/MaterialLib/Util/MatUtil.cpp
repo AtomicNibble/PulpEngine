@@ -9,26 +9,34 @@ X_NAMESPACE_BEGIN(engine)
 namespace Util
 {
 
-	MaterialType::Enum MatTypeFromStr(const char* str)
+	MaterialCat::Enum MatCatFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(MaterialType::ENUM_COUNT == 5, "Added additional material types? this code needs updating.");
+		static_assert(MaterialCat::ENUM_COUNT == 9, "Added additional material cats? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
-			case "world"_fnv1a:
-				return MaterialType::WORLD;
+			case "geo"_fnv1a:
+				return MaterialCat::GEO;
+			case "decal"_fnv1a:
+				return MaterialCat::DECAL;
 			case "ui"_fnv1a:
-				return MaterialType::UI;
-			case "model"_fnv1a:
-				return MaterialType::MODEL;
+				return MaterialCat::UI;
 			case "tool"_fnv1a:
-				return MaterialType::WORLD;
+				return MaterialCat::TOOL;
+			case "code"_fnv1a:
+				return MaterialCat::CODE;
+			case "filters"_fnv1a:
+				return MaterialCat::FILTERS;
+			case "weapon"_fnv1a:
+				return MaterialCat::WEAPON;
+			case "effect"_fnv1a:
+				return MaterialCat::EFFECT;
 
 			default:
-				X_ERROR("Mtl", "Unknown material type: '%s' (case-sen)", str);
-				return MaterialType::UNKNOWN;
+				X_ERROR("Mtl", "Unknown material cat: '%s' (case-sen)", str);
+				return MaterialCat::UNKNOWN;
 		}
 	}
 
