@@ -3,6 +3,13 @@
 #ifndef _X_MATERIAL_I_H_
 #define _X_MATERIAL_I_H_
 
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif // !TRANSPARENT
+#ifdef OPAQUE
+#undef OPAQUE
+#endif // !OPAQUE
+
 #include <IShader.h>
 #include <IConverterModule.h>
 #include "Util\GenericUtil.h"
@@ -23,12 +30,10 @@ static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
 
 
 
-
 struct IMaterialLib : public IConverter
 {
 
 };
-
 
 
 X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
@@ -61,6 +66,12 @@ X_DECLARE_FLAGS(MaterialFlag)(
 
 typedef Flags<MaterialFlag> MaterialFlags;
 
+X_DECLARE_FLAGS(MaterialStateFlag)(
+	DEPTHWRITE,
+	WIREFRAME
+);
+
+typedef Flags8<MaterialStateFlag> MaterialStateFlags;
 
 // the type of material it is, changes nothing really currently.
 X_DECLARE_ENUM8(MaterialType)(
@@ -70,13 +81,6 @@ X_DECLARE_ENUM8(MaterialType)(
 	TOOL,
 	UNKNOWN
 );
-
-#ifdef TRANSPARENT
-#undef TRANSPARENT
-#endif // !TRANSPARENT
-#ifdef OPAQUE
-#undef OPAQUE
-#endif // !OPAQUE
 
 X_DECLARE_ENUM8(MaterialCoverage)(
 	BAD,
@@ -277,24 +281,36 @@ struct IMaterial
 struct MaterialHeader
 {
 	// 4
-	uint32 fourCC;
+	uint32_t fourCC;
 	// 4
-	uint8 version;
-	uint8 numTextures;
-	MaterialCullType::Enum cullType;
-	MaterialSurType::Enum type;
-	// 4
-	MaterialTexRepeat::Enum texRepeat;
-	MaterialPolygonOffset::Enum polyOffsetType;
-	MaterialFilterType::Enum filterType;
-	MaterialType::Enum matType;
-	// 1
-	MaterialCoverage::Enum coverage;
-	uint8_t _pad[3];
+	uint8_t version;
+	uint8_t numTextures;
+	MaterialType::Enum type;
+	MaterialSurType::Enum surfaceType;
 
-	Color diffuse;
-	Color specular;
-	Color emissive;
+	// 4
+	MaterialUsage::Enum usage;
+	MaterialCullType::Enum cullType;
+	MaterialPolygonOffset::Enum polyOffsetType;
+	MaterialCoverage::Enum coverage;
+
+	// 4: blend ops.
+	MaterialBlendType::Enum srcBlendColor;
+	MaterialBlendType::Enum dstBlendColor;
+	MaterialBlendType::Enum srcBlendAlpha;
+	MaterialBlendType::Enum dstBlendAlpha;
+
+	// 4
+	StencilFunc::Enum depthTest;
+	MaterialFlags flags;
+	MaterialStateFlags stateFlags;
+	bool _pad;
+
+	// 12
+	Color8u diffuse;
+	Color8u specular;
+	Color8u emissive;
+	// 8
 	float shineness;
 	float opacity;
 
@@ -305,22 +321,29 @@ struct MaterialHeader
 struct MaterialTexture
 {
 	render::shader::ShaderTextureIdx::Enum type;
-	core::StackString<MTL_MATERIAL_MAX_LEN> name;
 
+	uint8_t nameLen;
+	MaterialFilterType::Enum filterType;
+	MaterialTexRepeat::Enum texRepeat;
+	uint8_t _pad;
 };
 
 
-
-X_ENSURE_SIZE(MaterialCullType::Enum, 1);
-X_ENSURE_SIZE(MaterialSurType::Enum, 1);
-
-X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
-X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
-X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
 X_ENSURE_SIZE(MaterialType::Enum, 1);
 X_ENSURE_SIZE(MaterialCoverage::Enum, 1);
+X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
+X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
+X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
+X_ENSURE_SIZE(MaterialSurType::Enum, 1);
+X_ENSURE_SIZE(MaterialUsage::Enum, 1);
+X_ENSURE_SIZE(MaterialCullType::Enum, 1);
+X_ENSURE_SIZE(MaterialBlendType::Enum, 1);
+X_ENSURE_SIZE(StencilOperation::Enum, 1);
+X_ENSURE_SIZE(StencilFunc::Enum, 1);
 
-X_ENSURE_SIZE(MaterialHeader, 72);
+
+X_ENSURE_SIZE(MaterialHeader, 52);
+X_ENSURE_SIZE(MaterialTexture, 8);
 
 
 struct IMaterialManagerListener
