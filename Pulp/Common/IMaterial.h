@@ -341,7 +341,7 @@ struct MaterialHeader
 
 	// used for custom texture repeat.
 	// if < 0 the textures dim's are used.
-	Vec2i tiling;
+	Vec2<int16_t> tiling;
 
 	// 12
 	Color8u diffuse;
@@ -377,7 +377,7 @@ X_ENSURE_SIZE(StencilOperation::Enum, 1);
 X_ENSURE_SIZE(StencilFunc::Enum, 1);
 
 
-X_ENSURE_SIZE(MaterialHeader, 52);
+X_ENSURE_SIZE(MaterialHeader, 56);
 X_ENSURE_SIZE(MaterialTexture, 4);
 
 
