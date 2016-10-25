@@ -8,6 +8,32 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace Util
 {
+	MaterialMountType::Enum MatMountTypeFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(MaterialMountType::ENUM_COUNT == 6, "Added additional material mount types? this code needs updating.");
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "none"_fnv1a:
+				return MaterialMountType::NONE;
+			case "ladder"_fnv1a:
+				return MaterialMountType::LADDER;
+			case "mantleon"_fnv1a:
+				return MaterialMountType::MANTLEON;
+			case "mantleover"_fnv1a:
+				return MaterialMountType::MANTLEOVER;
+			case "climbwall"_fnv1a:
+				return MaterialMountType::CLIMBWALL;
+			case "climbpipe"_fnv1a:
+				return MaterialMountType::CLIMBPIPE;
+
+			default:
+				X_ERROR("Mtl", "Unknown material mount type: '%s' (case-sen)", str);
+				return MaterialMountType::NONE;
+		}
+	}
 
 	MaterialCat::Enum MatCatFromStr(const char* str)
 	{

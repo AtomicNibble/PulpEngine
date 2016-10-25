@@ -64,6 +64,19 @@ X_DECLARE_FLAGS(MaterialFlag)(
 	NO_STEPS		// don't create footsteps.
 );
 
+
+
+
+X_DECLARE_ENUM8(MaterialMountType)(
+	NONE,
+	LADDER,
+	MANTLEON,
+	MANTLEOVER,
+	CLIMBWALL,
+	CLIMBPIPE
+);
+
+
 typedef Flags<MaterialFlag> MaterialFlags;
 
 X_DECLARE_FLAGS(MaterialStateFlag)(
