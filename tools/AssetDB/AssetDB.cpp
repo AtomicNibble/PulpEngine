@@ -2063,6 +2063,7 @@ bool AssetDB::OnAssetCompiled(int32_t assetId)
 
 	const auto it = qry.begin();
 	if (it == qry.end()) {
+		X_ERROR("AssetDB", "Failed to find asset for updating: %" PRIi32, assetId);
 		return false;
 	}
 
