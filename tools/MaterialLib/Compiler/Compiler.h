@@ -45,8 +45,10 @@ private:
 	MaterialPolygonOffset::Enum polyOffset_;
 	MaterialCullType::Enum cullType_;
 	MaterialCoverage::Enum coverage_;
+	MaterialMountType::Enum mountType_;
 
 	Vec2<int16_t> tiling_;
+	Vec2f uvScroll_;
 
 	// stencil
 	StencilFunc::Enum depthTest_;

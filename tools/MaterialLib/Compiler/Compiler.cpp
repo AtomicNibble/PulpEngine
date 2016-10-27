@@ -52,9 +52,10 @@ bool MaterialCompiler::Tex::parse(core::json::Document& d, const char* pName)
 bool MaterialCompiler::Tex::write(core::XFile* pFile) const
 {
 	MaterialTexture tex;
+	tex.nameLen = safe_static_cast<decltype(MaterialTexture::nameLen), size_t>(name.length());
 	tex.filterType = filterType_;
 	tex.texRepeat = texRepeat_;
-	tex.nameLen = safe_static_cast<decltype(MaterialTexture::nameLen), size_t>(name.length());
+	tex._pad = 0;
 
 	if (pFile->writeObj(tex) != sizeof(tex)) {
 		return false;
@@ -69,7 +70,7 @@ bool MaterialCompiler::Tex::writeName(core::XFile* pFile) const
 		return true;
 	}
 
-	return pFile->writeString(name.c_str()) == name.length();
+	return pFile->writeString(name.c_str()) == name.length() + 1;
 }
 
 // --------------------------------------
@@ -86,12 +87,18 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	d.Parse(str.c_str(), str.length());
 
 	// find all the things.
-	std::array<std::pair<const char*, core::json::Type>, 5> requiredValues = { {
+	std::array<std::pair<const char*, core::json::Type>, 11> requiredValues = { {
 			{ "cat", core::json::kStringType },
 			{ "usage", core::json::kStringType },
 			{ "surface_type", core::json::kStringType },
 			{ "polyOffset", core::json::kStringType },
-			{ "cullFace", core::json::kStringType }
+			{ "cullFace", core::json::kStringType },
+			{ "depthTest", core::json::kStringType },
+			{ "climbType", core::json::kStringType },
+			{ "uScroll", core::json::kNumberType },
+			{ "vScroll", core::json::kNumberType },
+			{ "tilingWidth", core::json::kStringType },
+			{ "tilingHeight", core::json::kStringType }
 		}
 	};
 
@@ -115,13 +122,17 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	const char* pSurfaceType = d["surface_type"].GetString();
 	const char* pPolyOffset = d["polyOffset"].GetString();
 	const char* pCullFace = d["cullFace"].GetString();
+	const char* pDepthTest = d["depthTest"].GetString();
+	const char* pMountType = d["climbType"].GetString();
 
 	cat_ = Util::MatCatFromStr(pCat);
 	usage_ = Util::MatUsageFromStr(pUsage);
 	surType_ = Util::MatSurfaceTypeFromStr(pSurfaceType);
 	polyOffset_ = Util::MatPolyOffsetFromStr(pPolyOffset);
 	cullType_ = Util::MatCullTypeFromStr(pCullFace);
+	depthTest_ = Util::StencilFuncFromStr(pDepthTest);
 	coverage_ = MaterialCoverage::OPAQUE;
+	mountType_ = Util::MatMountTypeFromStr(pMountType);
 	
 	// blend ops.
 	const char* pSrcCol = d["srcBlendColor"].GetString();
@@ -134,35 +145,30 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	srcBlendAlpha_ = Util::MatBlendTypeFromStr(pSrcAlpha);
 	dstBlendAlpha_ = Util::MatBlendTypeFromStr(pDstAlpha);
 
-
 	// tilling shit.
 	// how many goats for a given N pickles
-	const auto tillingWidthTyep = d["tilingWidth"].GetType();
-	if (tillingWidthTyep != core::json::kNumberType) {
-		tiling_.x = -1;
-	}
-	else {
-		const int32_t tillingWidth = d["tilingWidth"].GetInt();
-		tiling_.x = safe_static_cast<int16_t>(tillingWidth);
-	}
-	
-	const auto tillingHeightType = d["tilingHeight"].GetType();
-	if (tillingHeightType != core::json::kNumberType) {
-		tiling_.y = -1;
-	}
-	else {
-		const int32_t tillingHeight = d["tilingHeight"].GetInt();
-		tiling_.y = safe_static_cast<int16_t>(tillingHeight);
-	}
+	const char* pTilingWidth = d["tilingWidth"].GetString();
+	const char* pTilingHeight = d["tilingHeight"].GetString();
 
+	tiling_.x = Util::TilingSizeFromStr(pTilingWidth);
+	tiling_.y = Util::TilingSizeFromStr(pTilingHeight);
 
+	// UV scroll
+	const auto& uvScroll_U = d["uScroll"];
+	const auto& uvScroll_V = d["vScroll"];
+
+	uvScroll_.x = uvScroll_U.GetFloat();
+	uvScroll_.y = uvScroll_V.GetFloat();
 
 	// now we do some flag parsing.
 	flags_.Clear();
 	stateFlags_.Clear();
 
-	std::array<std::pair<const char*, MaterialFlag::Enum>, 15> flags = { {
-			{ "f_nodraw", MaterialFlag::NODRAW }, 
+	static_assert(MaterialFlag::FLAGS_COUNT == 16, "Added additional mat flags? this code might need updating.");
+
+	std::array<std::pair<const char*, MaterialFlag::Enum>, 16> flags = { {
+			{ "f_nodraw", MaterialFlag::NODRAW },
+			{ "f_editorvisible", MaterialFlag::EDITOR_VISABLE },
 			{ "f_solid", MaterialFlag::SOLID },
 			{ "f_structual", MaterialFlag::STRUCTURAL },
 			{ "f_detail", MaterialFlag::DETAIL },
@@ -180,9 +186,15 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		}
 	};
 
-	std::array<std::pair<const char*, MaterialStateFlag::Enum>, 2> stateFlags = { {
+	static_assert(MaterialStateFlag::FLAGS_COUNT == 6, "Added additional mat state flags? this code might need updating.");
+
+	std::array<std::pair<const char*, MaterialStateFlag::Enum>, 6> stateFlags = { {
 			{ "depthWrite", MaterialStateFlag::DEPTHWRITE },
-			{ "wireFrame", MaterialStateFlag::WIREFRAME }
+			{ "wireFrame", MaterialStateFlag::WIREFRAME },
+			{ "useUVScroll", MaterialStateFlag::UV_SCROLL },
+			{ "useUVRotate", MaterialStateFlag::UV_ROTATE },
+			{ "clampU", MaterialStateFlag::UV_CLAMP_U },
+			{ "clampV", MaterialStateFlag::UV_CLAMP_V }
 		}
 	};
 
@@ -226,28 +238,38 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 
 	MaterialHeader hdr;
 	hdr.fourCC = MTL_B_FOURCC;
+
 	hdr.version = MTL_B_VERSION;
-
-	hdr.flags = flags_;
-	hdr.stateFlags = stateFlags_;
+	hdr.numTextures = 1;
 	hdr.cat = cat_;
-	hdr.usage = usage_;
 	hdr.surfaceType = surType_;
-	hdr.polyOffsetType = polyOffset_;
-	hdr.cullType = cullType_;
-	hdr.coverage = coverage_;
 
-	hdr.depthTest = depthTest_;
+	hdr.usage = usage_;
+	hdr.cullType = cullType_;
+	hdr.polyOffsetType = polyOffset_;
+	hdr.coverage = coverage_;
 
 	hdr.srcBlendColor = srcBlendColor_;
 	hdr.dstBlendColor = dstBlendColor_;
 	hdr.srcBlendAlpha = srcBlendAlpha_;
 	hdr.dstBlendAlpha = dstBlendAlpha_;
 
+	hdr.mountType = mountType_;
+	hdr.depthTest = depthTest_;
+	hdr.stateFlags = stateFlags_;
+	hdr._pad = 0;
+
+	hdr.flags = flags_;
+	
+	hdr.tiling = tiling_;
+
+	hdr.shineness = 1.f;
+	hdr.opacity = 1.f;
+
 	// textures.
-	hdr.numTextures = 1;
 	
 	if (pFile->writeObj(hdr) != sizeof(hdr)) {
+		X_ERROR("Mtl", "Failed to write img header");
 		return false;
 	}
 
@@ -262,6 +284,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	for (const auto& t : textures)
 	{
 		if (!t->write(pFile)) {
+			X_ERROR("Mtl", "Failed to write img info");
 			return false;
 		}
 	}
@@ -270,6 +293,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	for (const auto& t : textures)
 	{
 		if (!t->writeName(pFile)) {
+			X_ERROR("Mtl", "Failed to write img name");
 			return false;
 		}
 	}
