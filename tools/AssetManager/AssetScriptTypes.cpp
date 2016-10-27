@@ -296,12 +296,17 @@ AssetScriptProperty* AssetScriptProps::AddAnim(const std::string& key, const std
 	return pProp;
 }
 
-AssetScriptProperty* AssetScriptProps::AddAssetRef(const std::string& key, const std::string& type, const std::string& default)
+AssetScriptProperty* AssetScriptProps::AddAssetRef(const std::string& key, const std::string& type)
 {
-	X_UNUSED(type);
-
 	auto pProp = getProperty(key, AssetProperty::PropertyType::ASSET_REF);
-	pProp->prop().SetDefaultValue(default);
+
+	bool newProp = pProp->prop().isNewProp();
+
+	pProp->prop().SetDefaultValue(type);
+	if (newProp) {
+		pProp->prop().SetSavedValue("");
+	}
+
 	return pProp;
 }
 
