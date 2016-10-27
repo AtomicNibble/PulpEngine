@@ -176,7 +176,6 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_win32_super.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
-    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
@@ -191,7 +190,6 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\solutions\_engine_win64_super.props" />
-    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
