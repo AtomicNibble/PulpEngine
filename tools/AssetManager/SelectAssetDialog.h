@@ -20,7 +20,10 @@ public:
 
 	QString getSelectedName(void) const;
 
+private:
+
 private slots:
+	void processSelected(const QModelIndex & index);
 	void accept(void);
 	void reject(void);
 	void done(int32_t val);
@@ -30,7 +33,11 @@ private:
 	assetDb::AssetDB& db_;
 	assetDb::AssetType::Enum type_;
 
-	QListWidget* pList_;
+	QStringListModel items_;
+	QSortFilterProxyModel* pSortFilter_;
+
+	QLineEdit* pSearch_;
+	QListView* pList_;
 
 	QString selectedAssetName_;
 };

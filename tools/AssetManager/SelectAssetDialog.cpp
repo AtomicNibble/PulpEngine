@@ -17,16 +17,33 @@ SelectAssetDialog::SelectAssetDialog(QWidget *parent, assetDb::AssetDB& db, asse
 
 	QVBoxLayout* pLayout = new QVBoxLayout();
 
+	pSortFilter_ = new  QSortFilterProxyModel(this);
+	pSortFilter_->setSourceModel(&items_);
+
 	{
-		pList_ = new QListWidget();
+		pSearch_ = new QLineEdit(this);
+		pSearch_->setPlaceholderText(tr("Search..."));
+
+		connect(pSearch_, SIGNAL(textChanged(QString)), pSortFilter_, SLOT(setFilterFixedString(QString)));
+
+		pLayout->addWidget(pSearch_);
+	}
+
+	{
+		pList_ = new QListView(this);
 		pList_->setUniformItemSizes(true);
+		pList_->setModel(pSortFilter_);
+		pList_->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+		connect(pList_, SIGNAL(doubleClicked(const QModelIndex &)), this, SLOT(processSelected(const QModelIndex &)));
+
 
 		pLayout->addWidget(pList_);
 	}
 
 
 	{
-		QDialogButtonBox* pButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+		QDialogButtonBox* pButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 		pButtonBox->button(QDialogButtonBox::Ok)->setDefault(true);
 		connect(pButtonBox, SIGNAL(accepted()), this, SLOT(accept()));
 		connect(pButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
@@ -42,14 +59,19 @@ SelectAssetDialog::SelectAssetDialog(QWidget *parent, assetDb::AssetDB& db, asse
 	assetDb::AssetDB::AssetInfoArr assets(g_arena);
 	db_.GetAssetList(type_, assets);
 
+	QStringList items;
+	items.reserve(static_cast<int32_t>(assets.size()));
+
 	for (const auto& a : assets)
 	{
 		QString str(a.name.c_str());
-		pList_->addItem(str);
+		items.append(str);
 	}
 
+	items_.setStringList(items);
+
 	pList_->setUpdatesEnabled(true);
-	pList_->blockSignals(false);	
+	pList_->blockSignals(false);
 }
 
 SelectAssetDialog::~SelectAssetDialog()
@@ -62,18 +84,32 @@ QString SelectAssetDialog::getSelectedName(void) const
 	return selectedAssetName_;
 }
 
-void SelectAssetDialog::accept(void)
+void SelectAssetDialog::processSelected(const QModelIndex& index)
 {
-	const int32_t row = pList_->currentRow();
-	if (row < 0) {
+	if(!index.isValid()) {
 		return;
 	}
 
-	QListWidgetItem* pItem = pList_->item(row);
-	QString item = pItem->text();
+	const auto data = items_.data(index, 0);
+	if (!data.isValid()) {
+		return;
+	}
 
-	selectedAssetName_ = item;
+	if (data.type() != QVariant::String) {
+		return;
+	}
+
+	QString name = data.toString();
+
+	selectedAssetName_ = name;
 	done(QDialog::Accepted);
+}
+
+void SelectAssetDialog::accept(void)
+{
+	const auto row = pList_->currentIndex();
+
+	processSelected(row);
 }
 
 void SelectAssetDialog::reject(void)
