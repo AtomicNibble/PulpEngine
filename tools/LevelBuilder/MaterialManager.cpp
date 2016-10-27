@@ -99,11 +99,17 @@ engine::IMaterial* MatManager::createMaterial(const char* MtlName)
 	}
 	else
 	{
+#if 1
+		X_ASSERT_NOT_IMPLEMENTED();
+		return nullptr;
+#else
+
 		pMat = X_NEW(engine::XMaterial, g_arena, "Material");
 		pMat->setName(MtlName);
 
 		// add it.
 		materials_.AddAsset(MtlName, pMat);
+#endif
 	}
 
 	return pMat;
@@ -161,6 +167,11 @@ engine::IMaterial* MatManager::loadMaterial(const char* MtlName)
 
 engine::IMaterial* MatManager::loadMaterialXML(const char* MtlName)
 {
+#if 1
+	X_ASSERT_NOT_IMPLEMENTED();
+	return nullptr;
+#else
+
 	X_ASSERT_NOT_NULL(MtlName);
 
 	core::XFileScoped file;
@@ -210,10 +221,16 @@ engine::IMaterial* MatManager::loadMaterialXML(const char* MtlName)
 	}
 
 	return pMat;
+#endif
 }
 
 engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 {
+#if 1
+	X_ASSERT_NOT_IMPLEMENTED();
+	return nullptr;
+#else
+
 	X_ASSERT_NOT_NULL(MtlName);
 	core::XFileScoped file;
 	core::Path<char> path;
@@ -260,6 +277,7 @@ engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 	}
 
 	return pMat;
+#endif
 }
 
 X_NAMESPACE_END

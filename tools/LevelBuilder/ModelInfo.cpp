@@ -23,6 +23,10 @@ namespace ModelInfo
 
 		if (file.openFile(path.c_str(), mode))
 		{
+#if 1
+			X_ASSERT_NOT_IMPLEMENTED();
+			return false;
+#else
 			model::ModelHeader hdr;
 		
 			if (file.readObj(hdr) != sizeof(hdr))
@@ -42,6 +46,7 @@ namespace ModelInfo
 
 			boxOut = hdr.boundingBox;
 			return true;
+#endif
 		}
 
 		X_ERROR("ModelInfo", "Failed to open model file for reading.");
