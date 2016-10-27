@@ -14,7 +14,7 @@ class AssetAssetRefWidget : public QWidget
 	Q_OBJECT
 
 public:
-	AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, assetDb::AssetType::Enum type, const std::string& value);
+	AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, const std::string& typeStr, const std::string& value);
 	~AssetAssetRefWidget();
 
 signals:

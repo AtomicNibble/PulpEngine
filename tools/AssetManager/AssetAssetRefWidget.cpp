@@ -5,11 +5,31 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, assetDb::AssetType::Enum type, const std::string& value) :
+AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, const std::string& typeStr, const std::string& value) :
 	QWidget(parent),
 	db_(db),
-	type_(type)
+	type_(assetDb::AssetType::MODEL)
 {
+	// work out the type.
+	core::StackString<96, char> typeStrLower(typeStr.c_str(), typeStr.c_str() + typeStr.length());
+	core::StackString<96, char> temp;
+
+	typeStrLower.toLower();
+	int32_t i;
+	for (i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+	{
+		const char* pName = assetDb::AssetType::ToString(i);
+
+		temp.set(pName);
+		temp.toLower();
+
+		if (temp == typeStrLower)
+		{
+			type_ = static_cast<assetDb::AssetType::Enum>(i);
+			break;
+		}
+	}
+
 	// this is for selecting a asset of type 'type'
 	// so we want a edit to show the name and a button for selecting.
 	QHBoxLayout* pLayout = new QHBoxLayout();
@@ -29,6 +49,13 @@ AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, 
 	setValue(value);
 
 	setLayout(pLayout);
+
+	// found a vlaid type?
+	if (i == assetDb::AssetType::ENUM_COUNT) {
+		X_ERROR("AssetRef", "Invalid asset type of \"%s\"", typeStr.c_str());
+
+		pBrowse->setEnabled(false);
+	}
 }
 
 AssetAssetRefWidget::~AssetAssetRefWidget()

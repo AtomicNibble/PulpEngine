@@ -107,7 +107,7 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 		pAnimWidget_ = new AssetAnimWidget(pParent, pAssEntry, val);
 		break;
 	case PropertyType::ASSET_REF:
-		pAssetRefWidget_ = new AssetAssetRefWidget(pParent, db, assetDb::AssetType::MODEL, val);
+		pAssetRefWidget_ = new AssetAssetRefWidget(pParent, db, defaultValue_, val);
 		break;
 	case PropertyType::STRING:
 		pStringWidget_ = new AssetStringWidget(pParent, val);
