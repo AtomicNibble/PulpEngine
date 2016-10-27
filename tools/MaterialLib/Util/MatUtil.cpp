@@ -17,6 +17,7 @@ namespace Util
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "none"_fnv1a:
+			case "<none>"_fnv1a:
 				return MaterialMountType::NONE;
 			case "ladder"_fnv1a:
 				return MaterialMountType::LADDER;
@@ -78,6 +79,7 @@ namespace Util
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
 			case "none"_fnv1a:
+			case "<none>"_fnv1a:
 				return MaterialUsage::NONE;
 			case "door"_fnv1a:
 				return MaterialUsage::DOOR;
@@ -125,6 +127,7 @@ namespace Util
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
 			case "none"_fnv1a:
+			case "<none>"_fnv1a:
 				return MaterialSurType::NONE;
 
 			case "brick"_fnv1a:
@@ -262,6 +265,7 @@ namespace Util
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "none"_fnv1a:
+			case "<none>"_fnv1a:
 				return MaterialPolygonOffset::NONE;
 			case "decal"_fnv1a:
 				return MaterialPolygonOffset::STATIC_DECAL;
