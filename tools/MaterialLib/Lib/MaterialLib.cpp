@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "MaterialLib.h"
 
+#include "IFileSys.h"
+
 #include "Compiler\Compiler.h"
 
 X_NAMESPACE_BEGIN(engine)
@@ -37,9 +39,20 @@ bool MaterialLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& ar
 		return false;
 	}
 
+	core::XFileScoped file;
+	core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 
+	if (!file.openFile(destPath.c_str(), mode)) {
 
-	return false;
+		return false;
+	}
+	
+	if(!compiler.writeToFile(file.GetFile())) {
+
+		return false;
+	}
+
+	return true;
 }
 
 
