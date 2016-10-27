@@ -1882,6 +1882,31 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 	return false;
 }
 
+bool AssetDB::AssetHasRawFile(int32_t assetId, int32_t* pRawFileId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT raw_file FROM file_ids WHERE file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	auto row = *it;
+
+	// is it set?
+	if (row.columnType(0) == sql::ColumType::SNULL) {
+		return false;
+	}
+
+	if (pRawFileId) {
+		*pRawFileId = (*it).get<int32_t>(0);
+	}
+
+	return true;
+}
+
 bool AssetDB::AssetHasThumb(int32_t assetId)
 {
 	ThumbInfo info;
