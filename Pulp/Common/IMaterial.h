@@ -28,7 +28,7 @@ static const char*		 MTL_DEFAULT_NAME = "default";
 static const float POLY_DECAL_OFFSET = 0.05f;
 static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
 
-
+static const int16_t AUTO_TILING = -1;
 
 struct IMaterialLib : public IConverter
 {
@@ -79,12 +79,19 @@ X_DECLARE_ENUM8(MaterialMountType)(
 
 typedef Flags<MaterialFlag> MaterialFlags;
 
-X_DECLARE_FLAGS(MaterialStateFlag)(
+X_DECLARE_FLAGS8(MaterialStateFlag)(
 	DEPTHWRITE,
-	WIREFRAME
+	WIREFRAME,
+
+	// dunno if i want to keep these here.
+	UV_SCROLL,
+	UV_ROTATE,
+	UV_CLAMP_U,
+	UV_CLAMP_V
 );
 
 typedef Flags8<MaterialStateFlag> MaterialStateFlags;
+
 
 // cat used to refine avaliable subtypes.
 X_DECLARE_ENUM8(MaterialCat)(
@@ -310,14 +317,12 @@ struct IMaterial
 };
 
 
-X_DECLARE_FLAGS(MaterialTexFlags)(
+X_DECLARE_FLAGS8(MaterialTexFlags)(
 	DIFFUSE,
 	NORMAL,
 	DETAIL,
 	SPECCOL
 );
-
-typedef Flags8<MaterialStateFlag> MaterialStateFlags;
 
 struct MaterialHeader
 {
@@ -342,13 +347,16 @@ struct MaterialHeader
 	MaterialBlendType::Enum dstBlendAlpha;
 
 	// 4
+	MaterialMountType::Enum mountType;
 	StencilFunc::Enum depthTest;
-	MaterialFlags flags;
 	MaterialStateFlags stateFlags;
 	bool _pad;
 
+	// 4
+	MaterialFlags flags;
+
 	// used for custom texture repeat.
-	// if < 0 the textures dim's are used.
+	// if AUTO_TILING the textures dim's are used.
 	Vec2<int16_t> tiling;
 
 	// 12
@@ -380,12 +388,15 @@ X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
 X_ENSURE_SIZE(MaterialSurType::Enum, 1);
 X_ENSURE_SIZE(MaterialUsage::Enum, 1);
 X_ENSURE_SIZE(MaterialCullType::Enum, 1);
+X_ENSURE_SIZE(MaterialMountType::Enum, 1);
 X_ENSURE_SIZE(MaterialBlendType::Enum, 1);
 X_ENSURE_SIZE(StencilOperation::Enum, 1);
 X_ENSURE_SIZE(StencilFunc::Enum, 1);
+X_ENSURE_SIZE(MaterialStateFlag::Bits, 1);
+X_ENSURE_SIZE(MaterialStateFlags, 1);
 
 
-X_ENSURE_SIZE(MaterialHeader, 56);
+X_ENSURE_SIZE(MaterialHeader, 48);
 X_ENSURE_SIZE(MaterialTexture, 4);
 
 
