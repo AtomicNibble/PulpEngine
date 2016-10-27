@@ -470,8 +470,12 @@ std::string AssetScriptProps::getMaterialCats(void)
 
 	for (uint32_t i = 0; i < engine::MaterialCat::ENUM_COUNT; i++)
 	{
-		const char* pName = engine::MaterialCat::ToString(i);
+		engine::MaterialCat::Enum type = static_cast<engine::MaterialCat::Enum>(i);
+		if (type == engine::MaterialCat::UNKNOWN) {
+			continue;
+		}
 
+		const char* pName = engine::MaterialCat::ToString(i);
 		temp.set(pName);
 		temp.toLower();
 
