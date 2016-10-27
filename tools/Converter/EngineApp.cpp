@@ -88,7 +88,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	LinkModule(pICore_, "Conveter");
 
-	// AssetDB
+	// ConvertLib
 	if (!pICore_->IntializeLoadedEngineModule("Engine_ConverterLib", "Engine_ConverterLib")) {
 		return false;
 	}
