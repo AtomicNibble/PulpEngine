@@ -2,7 +2,7 @@
 
 void GenerateUI( asset& Asset )
 {
-    string cats = "Geo | Decal | Effect | UI | Tool";
+    string cats = Asset.getMaterialCats(); // "Geo | Decal | Effect | UI | Tool";
     string surTypes = "<none> | Brick | Concrete | Cloth | Flesh | Glass | Gravel | Ice | Metal | Mud | Plastic | Paper | Rock | Snow | Sand | Wood | Water";
     // for grouping in editor
     string usage = "<none> | Door | Floor | Celing | Roof | Window | Sky";
@@ -35,7 +35,7 @@ void GenerateUI( asset& Asset )
         climbPipe |
     """;
 
-    Asset.AddCombo( "tilingWidth", tilingSizes ).SetTitle( "Tiling Width" ).SetToolTip( "Sets the tiling width of this material. <auto> would use the largest width from the material images." ).;
+    Asset.AddCombo( "tilingWidth", tilingSizes ).SetTitle( "Tiling Width" ).SetToolTip( "Sets the tiling width of this material. <auto> would use the largest width from the material images." );
     Asset.AddCombo( "tilingHeight", tilingSizes ).SetTitle( "Tiling Height" ).SetToolTip( "Sets the tiling height of this material. <auto> would use the largest height from the material images." );
 
     Asset.AddCombo( "climbType", climbType ).SetTitle( "Climb Type" );
@@ -47,9 +47,12 @@ void GenerateUI( asset& Asset )
 
     string tileTypes  = "tile both | tile horizontal | tile vertical | no tile";
 
+    string TileTip = "Wraps the image so it repeats at the edges, or clamps it so it stops at the edges";
+    string FilterTip = "Makes the image clearer when viewed from an angle, at some cost of rendering time";
+
     Asset.BeginGroup("ColorMap");
     {
-        Asset.AddAssetRef( "mapColor", "image", "" ).SetTitle("Color Map");
+        Asset.AddAssetRef( "mapColor", "img" ).SetTitle("Color Map");
 
         Asset.AddCombo( "tileColor", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
         Asset.AddCombo( "filterColor", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" );
@@ -57,7 +60,7 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("NormalMap");
     {
-        Asset.AddAssetRef( "mapNormal", "image", "" ).SetTitle("Color Map");
+        Asset.AddAssetRef( "mapNormal", "img" ).SetTitle("Color Map");
 
         Asset.AddCombo( "tileNormal", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
         Asset.AddCombo( "filterNormal", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" );
@@ -65,7 +68,7 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("DetailNormalMap");
     {
-        Asset.AddAssetRef( "mapDetailNormal", "image", "" ).SetTitle("Color Map");
+        Asset.AddAssetRef( "mapDetailNormal", "img").SetTitle("Color Map");
 
         Asset.AddCombo( "tileDetailNormal", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
         Asset.AddCombo( "filterDetailNormal", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" );
@@ -73,7 +76,7 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("SpecColMap");
     {
-        Asset.AddAssetRef( "mapSpecCol", "image", "" ).SetTitle("Color Map");
+        Asset.AddAssetRef( "mapSpecCol", "img" ).SetTitle("Color Map");
 
         Asset.AddCombo( "tileSpecCol", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip );
         Asset.AddCombo( "filterSpecCol", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "linear (mip nearest)" );
@@ -82,6 +85,7 @@ void GenerateUI( asset& Asset )
     Asset.BeginGroup("Properties");
     {
         Asset.AddCheckBox( "f_nodraw", false ).SetTitle( "NoDraw" );
+        Asset.AddCheckBox( "f_editorvisible", false ).SetTitle( "Editor Visible" ).SetToolTip("makes nodraw visable in editor modes.");
         Asset.AddCheckBox( "f_solid", true ).SetTitle( "solid" );
         Asset.AddCheckBox( "f_structual", false ).SetTitle( "Structual" );
         Asset.AddCheckBox( "f_detail", false ).SetTitle( "Detail" );
@@ -99,6 +103,9 @@ void GenerateUI( asset& Asset )
     }
     Asset.BeginGroup("Motion");
     {
+        Asset.AddCheckBox( "useUVScroll", false ).SetTitle( "UV Scroll" );
+        Asset.AddCheckBox( "useUVRotate", false ).SetTitle( "UV Rotate" );
+
         Asset.AddVec2( "uScroll", "vScroll", 0.0, 0.0, -10.0, 10.0 ).SetTitle( "Amount" ).SetToolTip( "Texture scroll speed in u direction. 1.0 means the entire texture will scroll by in 1 sec." );
 
         Asset.AddCheckBox( "clampU", false ).SetTitle( "Clamp U" );
@@ -111,7 +118,7 @@ void GenerateUI( asset& Asset )
         string cullFaceModes = "back | front | none";
         string stencilFunc = "never | less | equal | less_equal | greater | not_equal | greater_equal | always";
         string stencilOp = "keep | zero | replace | incr_sat | decr_sat | invert | incr | decr";
-        string polyOffset = "none | decal | impact";
+        string polyOffset = "<none> | decal | impact";
         string blendFuncs = "zero | one | src_color | inv_src_color | src_alpha | inv_src_alpha | dest_alpha | inv_dest_alpha | dest_color | inv_dest_color | src_alpha_sat | blend_factor | inv_blend_factor | src1_color | inv_src1_color | src1_alpha | inv_src1_alpha";
 
         Asset.AddCombo( "srcBlendColor", blendFuncs).SetTitle( "Src Blend Color" ).SetDefaultValue("src_alpha");
