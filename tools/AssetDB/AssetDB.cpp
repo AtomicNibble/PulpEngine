@@ -2057,6 +2057,23 @@ bool AssetDB::IsAssetStale(int32_t assetId)
 
 bool AssetDB::OnAssetCompiled(int32_t assetId)
 {
+	if (!AssetHasRawFile(assetId)) 
+	{
+		sql::SqlLiteTransaction trans(db_);
+
+		// this is more simple, just copy the args hash.
+		sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = argsHash, lastUpdateTime = DateTime('now') WHERE file_id = ?");
+		cmd.bind(1, assetId);
+
+		sql::Result::Enum res = cmd.execute();
+		if (res != sql::Result::OK) {
+			return false;
+		}
+
+		trans.commit();
+		return true;
+	}
+
 	sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash, raw_files.size FROM file_ids "
 		"INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
