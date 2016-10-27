@@ -412,6 +412,40 @@ namespace Util
 		}
 	}
 
+	int16_t TilingSizeFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "auto"_fnv1a:
+			case "<auto>"_fnv1a:
+				return engine::AUTO_TILING;
+			
+			default:
+				break;
+		}
+
+		// should be power of two.
+		const auto tile = core::strUtil::StringToInt<int32_t>(str);
+
+		if (tile <= 0) {
+			return engine::AUTO_TILING;
+		}
+
+		if (!core::bitUtil::IsPowerOfTwo(tile)) {
+			X_ERROR("Mtl", "Tiling stride is not pow2: %" PRIi32, tile);
+			return engine::AUTO_TILING;
+		}
+
+		if (tile > std::numeric_limits<int16_t>::max()) {
+			X_ERROR("Mtl", "Tiling stride %" PRIi32 " exceeds limit of %" PRIi16, tile, std::numeric_limits<int16_t>::max());
+			return engine::AUTO_TILING;
+		}
+
+		return tile;
+	}
+
 } // namespace Util
 
 X_NAMESPACE_END

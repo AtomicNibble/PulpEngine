@@ -21,6 +21,8 @@ namespace Util
 	StencilOperation::Enum StencilOpFromStr(const char* str);
 	StencilFunc::Enum StencilFuncFromStr(const char* str);
 
+	// engine::AUTO_TILING for auto.
+	int16_t TilingSizeFromStr(const char* str);
 
 
 } // namespace Util
