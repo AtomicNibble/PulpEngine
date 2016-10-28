@@ -18,7 +18,7 @@
 #include <Ilevel.h>
 
 #include "../../tools/MaterialLib/MatLib.h"
-
+#include "../../tools/ModelLib/ModelLib.h"
 
 X_USING_NAMESPACE;
 

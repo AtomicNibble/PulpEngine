@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "LvlBuilder.h"
-#include "ModelInfo.h"
 
 #include <Containers\FixedArray.h>
 #include <IModel.h>
@@ -264,7 +263,7 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 bool LvlBuilder::LoadDefaultModel(void)
 {
-	if (!ModelInfo::GetNModelAABB(X_CONST_STRING("default"), defaultModelBounds_))
+	if (!model::Util::GetModelAABB(X_CONST_STRING("default"), defaultModelBounds_))
 	{
 		X_ERROR("","Failed to load default model info");
 		return false;

@@ -3,8 +3,6 @@
 
 #include "MapTypes.h"
 #include "MapLoader.h"
-#include "ModelInfo.h"
-
 
 namespace
 {
@@ -352,7 +350,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 		{ 
 			core::string& name = it->second;
 			// load the models bounding box.
-			if (!ModelInfo::GetNModelAABB(name, ent.bounds))
+			if (!model::Util::GetModelAABB(name, ent.bounds))
 			{
 				X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
 				name.c_str(), ent.origin.x,ent.origin.y, ent.origin.z);

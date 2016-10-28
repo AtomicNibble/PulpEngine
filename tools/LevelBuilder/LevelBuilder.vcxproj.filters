@@ -40,14 +40,8 @@
     <Filter Include="Source Files\Material">
       <UniqueIdentifier>{d7808d51-1c4d-4c29-bab8-5f1d00d8aee7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Model">
-      <UniqueIdentifier>{1d5b6143-e760-495b-819e-61560a6b2a6a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{0946935c-ec71-4ac9-8df3-4a02e906d184}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Model">
-      <UniqueIdentifier>{ff709cd7-b5be-4e57-9265-d55b85d7b7a9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -95,9 +89,6 @@
     </ClInclude>
     <ClInclude Include="LvlBuilder.h">
       <Filter>Header Files\Lvl</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelInfo.h">
-      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -157,9 +148,6 @@
     </ClCompile>
     <ClCompile Include="LvlFile.cpp">
       <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelInfo.cpp">
-      <Filter>Source Files\Model</Filter>
     </ClCompile>
     <ClCompile Include="PlaneSet.cpp">
       <Filter>Source Files\Util</Filter>

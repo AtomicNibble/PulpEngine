@@ -47,6 +47,7 @@ typedef core::MemoryArena<
 
 
 X_LINK_LIB("engine_MaterialLib");
+X_LINK_LIB("engine_ModelLib");
 
 
 #ifdef X_LIB
