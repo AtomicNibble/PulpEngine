@@ -15,6 +15,7 @@
 #include "EditorManager.h"
 
 #include "AddAssetDialog.h"
+#include "DeleteAssetDialog.h"
 
 #include <../AssetDB/AssetDB.h>
 
@@ -633,8 +634,17 @@ void AssetExplorer::renameAsset(void)
 
 void AssetExplorer::deleteAsset(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	BUG_ASSERT(currentNode_, return);
 
+	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_)) {
+		DeleteAssetDialog dlg(ICore::mainWindow(), db_, pFileNode->assetType(), pFileNode->name());
+
+		if (!dlg.loadInfo()) {
+			return;
+		}
+
+		dlg.exec();
+	}
 }
 
 void AssetExplorer::cutAsset(void)
