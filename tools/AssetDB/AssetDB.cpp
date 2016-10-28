@@ -1042,7 +1042,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const
 AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
 {
 	int32_t assetId;
-	if (AssetExsists(type, name, &assetId)) {
+	if (!AssetExsists(type, name, &assetId)) {
 		X_ERROR("AssetDB", "Failed to delete asset: %s:%s it does not exist", AssetType::ToString(type), name.c_str());
 		return Result::ERROR;
 	}
