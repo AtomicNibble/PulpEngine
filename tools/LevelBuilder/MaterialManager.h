@@ -4,8 +4,7 @@
 #ifndef X_LVL_BUILDER_MAT_MANAGER_H_
 #define X_LVL_BUILDER_MAT_MANAGER_H_
 
-#include "Assets\AssertContainer.h"
-
+#include <Util\ReferenceCounted.h>
 
 #include <../../tools/MaterialLib/MatLib.h>
 
@@ -14,34 +13,8 @@ X_NAMESPACE_BEGIN(lvl)
 
 class MatManager
 {
-	template<typename T>
-	struct ResourceRef : public T
-	{
-		const int32_t addRef(void)
-		{
-			++refCount_;
-			return refCount_;
-		}
-
-		const int32_t removeRef(void)
-		{
-			--refCount_;
-			return refCount_;
-		}
-
-		const int32_t getRefCounter(void) const 
-		{ 
-			return refCount_;
-		}
-
-
-	private:
-		core::AtomicInt refCount_;
-	};
-
-	typedef ResourceRef<engine::Material> MatResource;
+	typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
 	typedef core::HashMap<core::string, MatResource*> MaterialMap;
-
 
 public:
 	MatManager(core::MemoryArenaBase* arena);
