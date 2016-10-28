@@ -77,9 +77,6 @@ public:
 
 	virtual bool isDefault() const X_OVERRIDE;
 
-
-	static bool ProcessMaterialXML(XMaterial* pMaterial, core::xml::rapidxml::xml_node<char>* node);
-
 protected:
 	friend class XMaterialManager;
 
