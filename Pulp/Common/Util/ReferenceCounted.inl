@@ -28,6 +28,12 @@ int32_t ReferenceCountedInstance<T, Primative>::removeReference(void) const
 	return --refCount_;
 }
 
+template <class T, typename Primative>
+int32_t ReferenceCountedInstance<T, Primative>::getRefCount(void) const
+{
+	return refCount_;
+}
+
 
 template <class T, typename Primative>
 T* ReferenceCountedInstance<T, Primative>::instance(void)
