@@ -22,7 +22,7 @@ static const uint32_t	 MTL_B_VERSION = 3;
 static const uint32_t	 MTL_B_FOURCC = X_TAG('m', 't', 'l', 'b');
 static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
-static const char*		 MTL_DEFAULT_NAME = "default";
+static const char*		 MTL_DEFAULT_NAME = "default/default";
 
 
 static const float POLY_DECAL_OFFSET = 0.05f;
