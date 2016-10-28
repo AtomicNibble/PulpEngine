@@ -24,3 +24,16 @@ typedef core::MemoryArena<
 > MatLibrena;
 
 extern MatLibrena* g_MatLibArena;
+
+
+#ifdef X_LIB
+#define MATLIB_EXPORT
+#else
+#ifdef MAT_LIB_EXPORT
+#define MATLIB_EXPORT X_EXPORT
+#else
+#define MATLIB_EXPORT X_IMPORT
+#endif // !MAT_LIB_EXPORT
+#endif // X_LIB
+
+
