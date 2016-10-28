@@ -164,7 +164,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	flags_.Clear();
 	stateFlags_.Clear();
 
-	static_assert(MaterialFlag::FLAGS_COUNT == 16, "Added additional mat flags? this code might need updating.");
+	static_assert(MaterialFlag::FLAGS_COUNT == 17, "Added additional mat flags? this code might need updating.");
 
 	std::array<std::pair<const char*, MaterialFlag::Enum>, 16> flags = { {
 			{ "f_nodraw", MaterialFlag::NODRAW },
