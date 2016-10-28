@@ -1991,7 +1991,7 @@ bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 
 bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
 {
-	sql::SqlLiteQuery qry(db_, "SELECT name, file_id, parent_id, type FROM file_ids WHERE file_ids.file_id = ?");
+	sql::SqlLiteQuery qry(db_, "SELECT name, file_id, type, parent_id FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
 
 	const auto it = qry.begin();
@@ -2001,10 +2001,19 @@ bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
 		return false;
 	}
 
-	infoOut.name = (*it).get<const char*>(0);
-	infoOut.id = (*it).get<int32_t>(1);
-	infoOut.parentId = (*it).get<int32_t>(2);
-	infoOut.type = static_cast<AssetType::Enum>((*it).get<int32_t>(3));
+	auto row = *it;
+
+	infoOut.name = row.get<const char*>(0);
+	infoOut.id = row.get<int32_t>(1);
+	infoOut.type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
+
+	if (row.columnType(3) != sql::ColumType::SNULL) {
+		infoOut.parentId = row.get<int32_t>(3);
+	}
+	else {
+		infoOut.parentId = INVALID_ASSET_ID;
+	}
+
 	return true;
 }
 
