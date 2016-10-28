@@ -5,6 +5,7 @@
 
 #include <Containers\HashMap.h>
 #include <String\StrRef.h>
+#include <Util\ReferenceCounted.h>
 
 #include "EngineBase.h"
 
@@ -22,24 +23,6 @@ class XMaterialManager :
 	public XEngineBase,
 	public core::IXHotReload
 {
-	template<typename T>
-	struct ResourceRef : public T
-	{
-		const int32_t addRef(void)
-		{
-			++refCount_;
-			return refCount_;
-		}
-
-		const int32_t removeRef(void) 
-		{
-			--refCount_;
-			return refCount_;
-		}
-
-	private:
-		core::AtomicInt refCount_;
-	};
 
 public:
 	XMaterialManager();
@@ -77,7 +60,7 @@ private:
 	void InitDefaults(void);
 
 private:
-	typedef ResourceRef<engine::Material> MatResource;
+	typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
 	typedef core::HashMap<core::string, MatResource*> MaterialMap;
 
 
