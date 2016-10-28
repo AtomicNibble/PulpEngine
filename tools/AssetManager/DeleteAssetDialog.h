@@ -42,8 +42,10 @@ private:
 	QFormLayout* pFormLayout_;
 	QLineEdit* pAssetName_;
 	QListWidget* pRefList_;
+	QDialogButtonBox* pButtonBox_;
 
 	bool infoLoaded_;
+	bool hasRefs_;
 };
 
 

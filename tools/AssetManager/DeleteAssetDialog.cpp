@@ -13,7 +13,8 @@ DeleteAssetDialog::DeleteAssetDialog(QWidget *parent, assetDb::AssetDB& db, asse
 	db_(db),
 	type_(type),
 	name_(name.toLatin1()),
-	infoLoaded_(false)
+	infoLoaded_(false),
+	hasRefs_(false)
 {
 	setWindowTitle("Delete Asset - Confirm");
 
@@ -29,11 +30,11 @@ DeleteAssetDialog::DeleteAssetDialog(QWidget *parent, assetDb::AssetDB& db, asse
 	pFormLayout_->addRow("Refrenced by", pRefList_);
 
 	{
-		QDialogButtonBox* pButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-		pButtonBox->button(QDialogButtonBox::Cancel)->setDefault(true);
-		connect(pButtonBox, SIGNAL(accepted()), this, SLOT(accept()));
-		connect(pButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
-		pFormLayout_->addWidget(pButtonBox);
+		pButtonBox_ = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+		pButtonBox_->button(QDialogButtonBox::Cancel)->setDefault(true);
+		connect(pButtonBox_, SIGNAL(accepted()), this, SLOT(accept()));
+		connect(pButtonBox_, SIGNAL(rejected()), this, SLOT(reject()));
+		pFormLayout_->addWidget(pButtonBox_);
 	}
 
 	setLayout(pFormLayout_);
@@ -62,6 +63,13 @@ bool DeleteAssetDialog::loadInfo(void)
 
 	if(refs.isNotEmpty())
 	{
+		hasRefs_ = true;
+
+		// disable ok.
+		pButtonBox_->button(QDialogButtonBox::Ok)->setEnabled(false);
+		pButtonBox_->button(QDialogButtonBox::Ok)->setToolTip(tr("Can't delete asset with refrences"));
+
+
 		assetDb::AssetDB::AssetInfo info;
 		for (const auto& ref : refs)
 		{
