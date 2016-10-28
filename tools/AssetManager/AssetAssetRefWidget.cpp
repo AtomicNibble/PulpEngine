@@ -1,13 +1,18 @@
 #include "AssetAssetRefWidget.h"
-
 #include "SelectAssetDialog.h"
+
+#include "IAssetEntry.h"
+
+#include <../AssetDB/AssetDB.h>
 
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, const std::string& typeStr, const std::string& value) :
+AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, IAssetEntry* pAssEntry, 
+	const std::string& typeStr, const std::string& value) :
 	QWidget(parent),
 	db_(db),
+	pAssEntry_(pAssEntry),
 	type_(assetDb::AssetType::MODEL)
 {
 	// work out the type.
@@ -79,15 +84,78 @@ void AssetAssetRefWidget::browseClicked(void)
 
 	if (dig.exec() == QDialog::Accepted)
 	{
-		QString assName = dig.getSelectedName();
+		const QString oldName = pLineEdit_->text();
+		const QString assName = dig.getSelectedName();
 
-		pLineEdit_->setText(assName);
+		if (!removeRef(oldName)) {
+			return;
+		}
 
 		// should we also add a ref to this asset?
 		// fucking yes you slut.
+		if (!addRef(assName)) {
+			return;
+		}
+
+		pLineEdit_->setText(assName);
 
 		emit valueChanged(assName.toStdString());
 	}
+}
+
+
+bool AssetAssetRefWidget::removeRef(const QString& assName)
+{
+	if (assName.isEmpty()) {
+		return true;
+	}
+
+	const std::string str = assName.toStdString();
+
+	int32_t targetAssetId;
+	if (!db_.AssetExsists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
+		X_ERROR("AssetRef", "Failed to get ref asset's id for removal");
+		return false;
+	}
+
+	int32_t assetId;
+	if (!db_.AssetExsists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
+		X_ERROR("AssetRef", "Failed to get source asset id for ref removal");
+		return false;
+	}
+
+	auto res = db_.RemoveAssertRef(assetId, targetAssetId);
+	if (res != assetDb::AssetDB::Result::OK) {
+		X_ERROR("AssetRef", "Failed to remove exsisting asset ref");
+		return false;
+	}
+
+	return true;
+}
+
+bool AssetAssetRefWidget::addRef(const QString& assName)
+{
+	const std::string str = assName.toStdString();
+
+	int32_t targetAssetId;
+	if (!db_.AssetExsists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
+		X_ERROR("AssetRef", "Failed to get ref asset's id");
+		return false;
+	}
+
+	int32_t assetId;
+	if (!db_.AssetExsists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
+		X_ERROR("AssetRef", "Failed to get source asset id for adding ref");
+		return false;
+	}
+
+	auto res = db_.AddAssertRef(assetId, targetAssetId);
+	if(res != assetDb::AssetDB::Result::OK) {
+		X_ERROR("AssetRef", "Failed to add asset ref");
+		return false;
+	}
+
+	return true;
 }
 
 

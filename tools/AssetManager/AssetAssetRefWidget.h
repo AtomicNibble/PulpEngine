@@ -9,12 +9,15 @@ X_NAMESPACE_DECLARE(assetDb,
 
 X_NAMESPACE_BEGIN(assman)
 
+class IAssetEntry;
+
 class AssetAssetRefWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, const std::string& typeStr, const std::string& value);
+	AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, IAssetEntry* pAssEntry, 
+		const std::string& typeStr, const std::string& value);
 	~AssetAssetRefWidget();
 
 signals:
@@ -25,10 +28,16 @@ private slots:
 	void browseClicked(void);
 
 private:
+	bool removeRef(const QString& assName);
+	bool addRef(const QString& assName);
+
+
+private:
 	QLineEdit* pLineEdit_;
 
 private:
 	assetDb::AssetDB& db_;
+	IAssetEntry* pAssEntry_;
 	assetDb::AssetType::Enum type_;
 };
 
