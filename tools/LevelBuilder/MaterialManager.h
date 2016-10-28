@@ -7,42 +7,70 @@
 #include "Assets\AssertContainer.h"
 
 
-X_NAMESPACE_DECLARE(engine,
-class XMaterial;
-struct IMaterial;
-)
+#include <../../tools/MaterialLib/MatLib.h>
+
 
 X_NAMESPACE_BEGIN(lvl)
 
 class MatManager
 {
+	template<typename T>
+	struct ResourceRef : public T
+	{
+		const int32_t addRef(void)
+		{
+			++refCount_;
+			return refCount_;
+		}
+
+		const int32_t removeRef(void)
+		{
+			--refCount_;
+			return refCount_;
+		}
+
+		const int32_t getRefCounter(void) const 
+		{ 
+			return refCount_;
+		}
+
+
+	private:
+		core::AtomicInt refCount_;
+	};
+
+	typedef ResourceRef<engine::Material> MatResource;
+	typedef core::HashMap<core::string, MatResource*> MaterialMap;
+
+
 public:
-	MatManager();
+	MatManager(core::MemoryArenaBase* arena);
 	~MatManager();
 
 	bool Init(void);
 	void ShutDown(void);
 
-	engine::IMaterial* createMaterial(const char* MtlName);
-	engine::IMaterial* findMaterial(const char* MtlName) const;
-	engine::IMaterial* loadMaterial(const char* MtlName);
+	engine::Material* loadMaterial(const char* MtlName);
+	void releaseMaterial(engine::Material* pMat);
+
+	engine::Material* getDefaultMaterial(void) const;
 
 private:
 	bool loadDefaultMaterial(void);
 
-	engine::IMaterial* getDefaultMaterial(void) const;
+private:
+	bool loadMatFromFile(MatResource& mat, const core::string& name);
+
+	// only call if you know don't exsists in map.
+	MatResource* createMatResource(const core::string& name);
+	MatResource* findMatResource(const core::string& name);
+
 
 private:
-	friend class XMaterial;
+	core::MemoryArenaBase* arena_;
+	MaterialMap	materials_;
 
-	engine::IMaterial* loadMaterialCompiled(const char* MtlName);
-
-private:
-	typedef core::XResourceContainer MaterialCon;
-
-	MaterialCon	materials_;
-	
-	engine::IMaterial* pDefaultMtl_;
+	MatResource* pDefaultMtl_;
 	core::IFileSys* pFileSys_;
 };
 

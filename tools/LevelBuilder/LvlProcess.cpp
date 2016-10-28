@@ -517,14 +517,14 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		multiModelRefLists_[i].clear();
 	}
 
-	numEnts = map_->getNumEntities();
+	numEnts = pMap_->getNumEntities();
 
 	// more than enougth.
 	staticModels_.reserve(numEnts);
 
 	for (i = 0; i < numEnts; i++)
 	{
-		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
 		
 		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
@@ -645,7 +645,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	// everything that is not a misc model.
 	for (i = 0; i < numEnts; i++)
 	{
-		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
 
 		if (lvlEnt.classType == level::ClassType::MISC_MODEL) {
@@ -911,7 +911,7 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 
 	// take the entities and use them to floor the node portals.
 	// so that all inside leafs are marked.
-	if (!ent.FloodEntities(planes, entities_, map_)) {
+	if (!ent.FloodEntities(planes, entities_, pMap_)) {
 		X_ERROR("LvlEntity", "leaked");
 		return false;
 	}

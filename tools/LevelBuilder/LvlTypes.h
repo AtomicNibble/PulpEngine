@@ -5,7 +5,6 @@
 #define X_LVL_TYPES_H_
 
 #include <IModel.h>
-#include <IMaterial.h>
 #include <String\GrowingStringTable.h>
 
 #include "BSPTypes.h"
@@ -44,7 +43,7 @@ public:
 	Vec2f				  matRepeate;
 	Vec2f				  shift;
 	float				  rotate;
-	engine::IMaterial*	  pMaterial;
+	engine::Material*	  pMaterial;
 };
 
 struct LvlBrushSide
@@ -112,7 +111,7 @@ struct LvlTris
 {
 	LvlTris();
 
-	engine::IMaterial*	  pMaterial;
+	engine::Material*	  pMaterial;
 
 	xVert verts[3];
 };

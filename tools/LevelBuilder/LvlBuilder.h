@@ -81,7 +81,7 @@ private:
 	AABB		mapBounds;
 	Vec3f		blockSize_;
 	
-	mapfile::XMapFile* map_;
+	mapfile::XMapFile* pMap_;
 
 	lvl::MatManager matMan_;
 

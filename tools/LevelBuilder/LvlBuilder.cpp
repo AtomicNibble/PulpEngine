@@ -186,18 +186,19 @@ namespace
 
 
 LvlBuilder::LvlBuilder() :
-staticModels_(g_arena),
-entities_(g_arena),
-areas_(g_arena),
+	staticModels_(g_arena),
+	entities_(g_arena),
+	areas_(g_arena),
 
-multiRefEntLists_({{ g_arena, g_arena, g_arena, g_arena,
-g_arena, g_arena, g_arena, g_arena }}),
-
-multiModelRefLists_({ { g_arena, g_arena, g_arena, g_arena,
+	multiRefEntLists_({ { g_arena, g_arena, g_arena, g_arena,
 	g_arena, g_arena, g_arena, g_arena } }),
 
-stringTable_(g_arena),
-map_(nullptr)
+	multiModelRefLists_({ { g_arena, g_arena, g_arena, g_arena,
+		g_arena, g_arena, g_arena, g_arena } }),
+
+	stringTable_(g_arena),
+	pMap_(nullptr),
+	matMan_(g_arena)
 {
 	core::zero_object(stats_);
 
@@ -216,7 +217,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_ASSERT_NOT_NULL(map);
 	size_t i;
 
-	map_ = map;
+	pMap_ = map;
 
 	// first we need to load the AABB of the default model.
 	if (!LoadDefaultModel()) {
@@ -400,7 +401,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 		// load the material.
 		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->material.name.c_str());
-		if (!side.matInfo.pMaterial) {
+		if (!side.matInfo.pMaterial->isLoaded()) {
 			return false;
 		}
 	}
@@ -491,9 +492,12 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 			DEFAULT_CURVE_MAX_LENGTH, true);
 	}
 
-	engine::IMaterial* pMaterial = matMan_.loadMaterial(patch.GetMatName());
+	engine::Material* pMaterial = matMan_.loadMaterial(patch.GetMatName());
 
 	X_ASSERT_NOT_NULL(pMaterial);
+	// this code seams to expect material to always load?
+	// maybe thats just incorrect logic.
+	X_ASSERT(pMaterial->isLoaded(), "Material should be loaded?")();
 
 	// create a Primative
 	for (i = 0; i < patch.GetNumIndexes(); i += 3)

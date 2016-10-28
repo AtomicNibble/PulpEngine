@@ -1,35 +1,15 @@
 #include "stdafx.h"
 #include "MaterialManager.h"
 
-#include "../3DEngine/Material/Material.h"
-
-
-
 
 X_NAMESPACE_BEGIN(lvl)
 
-using namespace core::xml::rapidxml;
 
-namespace
-{
-	void* XmlAllocate(std::size_t size)
-	{
-		return X_NEW_ARRAY(char, size, g_arena, "xmlPool");
-	}
-
-	void XmlFree(void* pointer)
-	{
-		char* pChar = (char*)pointer;
-		X_DELETE_ARRAY(pChar, g_arena);
-	}
-
-} // namespace
-
-
-MatManager::MatManager() :
-materials_(g_arena, 2048),
-pDefaultMtl_(nullptr),
-pFileSys_(nullptr)
+MatManager::MatManager(core::MemoryArenaBase* arena) :
+	arena_(arena),
+	materials_(arena, 2048),
+	pDefaultMtl_(nullptr),
+	pFileSys_(nullptr)
 {
 }
 
@@ -52,170 +32,145 @@ void MatManager::ShutDown(void)
 {
 	// clear everything up.
 
-	core::XResourceContainer::ResourceItor it = materials_.begin();
+	auto it = materials_.begin();
 	for (; it != materials_.end();)
 	{
-		engine::XMaterial * pMat = (engine::XMaterial *)it->second;
+		MatResource* pMatRes = it->second;
 
 		++it;
 
-		if (!pMat)
+		if (!pMatRes) {
 			continue;
+		}
 
-		X_DELETE(pMat, g_arena);
-	//	while (pMat->release() > 0) {
-	//	}
+		// tell them off?
+		X_WARNING("MtlMan", "Dangling material \"%s\" refs: %" PRIi32,
+			pMatRes->getName().c_str(), pMatRes->getRefCounter());
+
+		X_DELETE(pMatRes, g_arena);
 	}
 }
 
 bool MatManager::loadDefaultMaterial(void)
 {
-	// even tho loadMaterial returns default when not found, default is set as null
-	// so we are able to tell if it loaded.
-	engine::IMaterial* pDefault = loadMaterial(engine::MTL_DEFAULT_NAME);
-	if (!pDefault) {
-		X_ERROR("MatMan", "Failed to load default material");
+	core::string defaultName(engine::MTL_DEFAULT_NAME);
+
+	pDefaultMtl_ = createMatResource(defaultName);
+	if (!pDefaultMtl_) {
+		X_ERROR("MtlMan", "Failed to create default material");
 		return false;
 	}
 
-	this->pDefaultMtl_ = pDefault;
+	if (!loadMatFromFile(*pDefaultMtl_, defaultName)) {
+		X_ERROR("MtlMan", "Failed to load default material");
+		return false;
+	}
+
 	return true;
 }
 
-engine::IMaterial* MatManager::getDefaultMaterial(void) const
+engine::Material* MatManager::getDefaultMaterial(void) const
 {
 	return pDefaultMtl_;
 }
 
-engine::IMaterial* MatManager::createMaterial(const char* MtlName)
+engine::Material* MatManager::loadMaterial(const char* pMtlName)
 {
-	engine::XMaterial *pMat = nullptr;
+	X_ASSERT_NOT_NULL(pMtlName);
 
-	pMat = reinterpret_cast<engine::XMaterial*>(materials_.findAsset(MtlName));
+	core::string name(pMtlName);
 
-	if (pMat)
-	{
-		pMat->addRef(); // add a ref.
-	}
-	else
-	{
-#if 1
-		X_ASSERT_NOT_IMPLEMENTED();
-		return nullptr;
-#else
-
-		pMat = X_NEW(engine::XMaterial, g_arena, "Material");
-		pMat->setName(MtlName);
-
-		// add it.
-		materials_.AddAsset(MtlName, pMat);
-#endif
-	}
-
-	return pMat;
-}
-
-
-engine::IMaterial* MatManager::findMaterial(const char* MtlName) const
-{
-	X_ASSERT_NOT_NULL(MtlName);
-
-	engine::XMaterial* pMaterial = (engine::XMaterial*)materials_.findAsset(MtlName);
-	if (pMaterial)
-		return pMaterial;
-
-	return nullptr;
-}
-
-engine::IMaterial* MatManager::loadMaterial(const char* MtlName)
-{
-	X_ASSERT_NOT_NULL(MtlName);
 	const char* pExt;
-	engine::IMaterial* iMat;
-
-	if ((pExt = core::strUtil::FileExtension(MtlName)))
+	if ((pExt = core::strUtil::FileExtension(name.begin(), name.end())))
 	{
-		// engine should not make requests for materials with a extensiob
-		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s",
-			pExt);
+		// engine should not make requests for materials with a extension
+		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s", pExt);
 		return nullptr;
 	}
 
 	// try find it.
-	if (iMat = findMaterial(MtlName)){
-		// inc ref count.
-		((engine::XMaterial*)iMat)->addRef();
-		return iMat;
+	MatResource* pMatRes = findMatResource(name);
+	if (pMatRes) {
+		pMatRes->addRef();
+
+		return pMatRes;
 	}
 
-	// lets look for binary first.
-	if ((iMat = loadMaterialCompiled(MtlName))) {
-		return iMat;
+	// create a new material.
+	pMatRes = createMatResource(name);
+
+	// now we need to load it.
+	if (loadMatFromFile(*pMatRes, name)) {
+		return pMatRes;
 	}
 
-	X_ERROR("MatMan", "Failed to find material: %s", MtlName);
+	X_ERROR("MatMan", "Failed to load material: %s", pMtlName);
 
-	// return default?
-	return getDefaultMaterial();
+	// we want to give back the real instacne and not the default instance
+	// so that when we hot reload stuff tha'ts default can get updated to real.
+	pMatRes->assignProps(*pDefaultMtl_);
+
+	return pMatRes;
 }
 
-// loaders.
-
-
-engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
+void MatManager::releaseMaterial(engine::Material* pMat)
 {
-#if 1
-	X_ASSERT_NOT_IMPLEMENTED();
-	return nullptr;
-#else
+	X_ASSERT_NOT_NULL(pMat);
 
-	X_ASSERT_NOT_NULL(MtlName);
+	MatResource* pMatRes = static_cast<MatResource*>(pMat);
+	if (pMatRes->removeRef() == 0)
+	{
+		materials_.erase(pMatRes->getName());
+	}
+}
+
+
+bool MatManager::loadMatFromFile(MatResource& mat, const core::string& name)
+{
 	core::XFileScoped file;
 	core::Path<char> path;
-	engine::MaterialHeader hdr;
-	engine::XMaterial* pMat = nullptr;
-
 	path /= "materials/";
-	path.setFileName(MtlName);
+	path.setFileName(name);
 	path.setExtension(engine::MTL_B_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
-
-	if (file.openFile(path.c_str(), core::fileMode::READ))
+	if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
 	{
-		// this needs updating to use new logic.
-		X_ASSERT_NOT_IMPLEMENTED();
-
-		file.readObj(hdr);
-
-		if (hdr.isValid())
+		if (mat.load(file.GetFile()))
 		{
-			// read the file entries.
-			engine::MaterialTexture texture[render::shader::ShaderTextureIdx::ENUM_COUNT];
-
-			uint32_t Num = core::Min<uint32_t>(hdr.numTextures, render::shader::ShaderTextureIdx::ENUM_COUNT);
-
-			if (file.readObjs(texture, Num) == Num)
-			{
-				pMat = (engine::XMaterial*)createMaterial(MtlName);
-				pMat->setCullType(hdr.cullType);
-			//	pMat->setSurfaceType(hdr.type);
-			}
-			else
-			{
-				X_ERROR("Mtlb", "failed to read texture info");
-			}
-		}
-		else
-		{
-			X_ERROR("Mtlb", "material header is invalid.");
+			return true;
 		}
 	}
 
-	return pMat;
-#endif
+	X_ERROR("MatMan", "Failed to load material \"%s\"", name.c_str());
+	return false;
 }
+
+MatManager::MatResource* MatManager::createMatResource(const core::string& name)
+{
+	X_ASSERT(materials_.find(name) == materials_.end(), "mat already exists")();
+
+	// create a new material.
+	auto pMatRes = X_NEW(MatResource, arena_, "MaterialRes");
+	pMatRes->setName(name.c_str());
+	materials_.insert(MaterialMap::value_type(name, pMatRes));
+
+	// check we have correct default.
+	X_ASSERT(pMatRes->getRefCounter() == 1, "Invalid ref count")();
+
+	return pMatRes;
+}
+
+
+MatManager::MatResource* MatManager::findMatResource(const core::string& name)
+{
+	auto it = materials_.find(name);
+	if (it != materials_.end()) {
+		return it->second;
+	}
+
+	return nullptr;
+}
+
+
 
 X_NAMESPACE_END

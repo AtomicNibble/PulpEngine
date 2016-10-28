@@ -291,7 +291,7 @@ bool LvlBrush::calculateContents(void)
 			return false;
 		}
 
-		engine::IMaterial* pMat = side.matInfo.pMaterial;
+		engine::Material* pMat = side.matInfo.pMaterial;
 
 		combinedMatFlags |= pMat->getFlags();
 
