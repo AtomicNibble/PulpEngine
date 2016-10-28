@@ -35,7 +35,6 @@ private:
 private:
 	friend class XMaterial;
 
-	engine::IMaterial* loadMaterialXML(const char* MtlName);
 	engine::IMaterial* loadMaterialCompiled(const char* MtlName);
 
 private:

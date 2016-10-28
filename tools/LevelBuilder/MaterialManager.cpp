@@ -153,10 +153,6 @@ engine::IMaterial* MatManager::loadMaterial(const char* MtlName)
 		return iMat;
 	}
 
-	if ((iMat = loadMaterialXML(MtlName))) {
-		return iMat;
-	}
-
 	X_ERROR("MatMan", "Failed to find material: %s", MtlName);
 
 	// return default?
@@ -165,64 +161,6 @@ engine::IMaterial* MatManager::loadMaterial(const char* MtlName)
 
 // loaders.
 
-engine::IMaterial* MatManager::loadMaterialXML(const char* MtlName)
-{
-#if 1
-	X_ASSERT_NOT_IMPLEMENTED();
-	return nullptr;
-#else
-
-	X_ASSERT_NOT_NULL(MtlName);
-
-	core::XFileScoped file;
-	core::Path<char> path;
-	size_t length;
-	engine::XMaterial* pMat = nullptr;
-
-	path /= "materials/";
-	path.setFileName(MtlName);
-	path.setExtension(engine::MTL_FILE_EXTENSION);
-
-//	if (!pFileSys_->fileExists(path.c_str())) {
-//		return pMat;
-//	}
-
-	if (file.openFile(path.c_str(), core::fileMode::READ))
-	{
-		length = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-
-		char* pText = X_NEW_ARRAY_ALIGNED(char, length + 1, g_arena, "MaterialXMLBuf", 4);
-
-		// add a null term baby!
-		pText[length] = '\0';
-
-		if (file.read(pText, length) == length)
-		{
-			xml_document<> doc;    // character type defaults to char
-			doc.set_allocator(XmlAllocate, XmlFree);
-			doc.parse<0>(pText);    // 0 means default parse flags
-
-			xml_node<>* node = doc.first_node("material");
-			if (node)
-			{
-				pMat = (engine::XMaterial*)createMaterial(MtlName);
-				if (!engine::XMaterial::ProcessMaterialXML(pMat, node))
-				{
-					pMat = nullptr;
-				}
-			}
-			else
-			{
-				X_ERROR("Mtl", "material is missing <material> node");
-			}
-		}
-
-		X_DELETE_ARRAY(pText, g_arena);
-	}
-
-	return pMat;
-#endif
-}
 
 engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 {
