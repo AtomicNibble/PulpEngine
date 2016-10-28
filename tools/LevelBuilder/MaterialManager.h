@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(lvl)
 
 class MatManager
 {
-	typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
+	typedef core::ReferenceCountedInherit<engine::Material, core::AtomicInt> MatResource;
 	typedef core::HashMap<core::string, MatResource*> MaterialMap;
 
 public:

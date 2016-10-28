@@ -43,11 +43,9 @@ void MatManager::ShutDown(void)
 			continue;
 		}
 
-		auto pMat = pMatRes->instance();
-
 		// tell them off?
 		X_WARNING("MtlMan", "Dangling material \"%s\" refs: %" PRIi32,
-			pMat->getName().c_str(), pMatRes->getRefCount());
+			pMatRes->getName().c_str(), pMatRes->getRefCount());
 
 		X_DELETE(pMatRes, g_arena);
 	}
@@ -94,7 +92,7 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 	MatResource* pMatRes = findMatResource(name);
 	if (pMatRes) {
 		pMatRes->addReference();
-		return pMatRes->instance();
+		return pMatRes;
 	}
 
 	// create a new material.
@@ -102,14 +100,14 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 
 	// now we need to load it.
 	if (loadMatFromFile(*pMatRes, name)) {
-		return pMatRes->instance();
+		return pMatRes;
 	}
 
 	X_ERROR("MatMan", "Failed to load material: %s", pMtlName);
 
 	// we want to give back the real instacne and not the default instance
 	// so that when we hot reload stuff tha'ts default can get updated to real.
-	pMatRes->instance()->assignProps(*pDefaultMtl_->instance());
+	pMatRes->assignProps(*pDefaultMtl_);
 
 	return pMatRes->instance();
 }
@@ -136,9 +134,7 @@ bool MatManager::loadMatFromFile(MatResource& mat, const core::string& name)
 
 	if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
 	{
-		auto pMat = mat.instance();
-
-		if (pMat->load(file.GetFile()))
+		if (mat.load(file.GetFile()))
 		{
 			return true;
 		}
@@ -159,7 +155,7 @@ MatManager::MatResource* MatManager::createMatResource(const core::string& name)
 	// check we have correct default.
 	X_ASSERT(pMatRes->getRefCount() == 1, "Invalid ref count")();
 
-	pMatRes->instance()->setName(name.c_str());
+	pMatRes->setName(name.c_str());
 
 	return pMatRes;
 }
