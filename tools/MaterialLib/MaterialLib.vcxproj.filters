@@ -44,6 +44,9 @@
     <ClInclude Include="Compiler\Compiler.h">
       <Filter>Header Files\Compiler</Filter>
     </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -61,5 +64,13 @@
     <ClCompile Include="Compiler\Compiler.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Material.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

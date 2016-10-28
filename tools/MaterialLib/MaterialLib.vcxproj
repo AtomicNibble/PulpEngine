@@ -325,6 +325,7 @@
   <ItemGroup>
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Lib\MaterialLib.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\MatUtil.h" />
   </ItemGroup>
@@ -332,6 +333,7 @@
     <ClCompile Include="Compiler\Compiler.cpp" />
     <ClCompile Include="Lib\MaterialLib.cpp" />
     <ClCompile Include="ConverterLib.cpp" />
+    <ClCompile Include="Material.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -345,6 +347,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\MatUtil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Material.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
