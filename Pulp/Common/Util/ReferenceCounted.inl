@@ -1,42 +1,42 @@
 
-template <class T>
-ReferenceCountedInstance<T>::ReferenceCountedInstance(void)
-	: instance_(),
+template <class T, typename Primative>
+ReferenceCountedInstance<T, Primative>::ReferenceCountedInstance(void) :
+	instance_(),
 	refCount_(1)
 {
 }
 
 
-template <class T>
-ReferenceCountedInstance<T>::ReferenceCountedInstance(const T& instance)
-	: instance_(instance),
+template <class T, typename Primative>
+ReferenceCountedInstance<T, Primative>::ReferenceCountedInstance(const T& instance) :
+	instance_(instance),
 	refCount_(1)
 {
 }
 
 
-template <class T>
-uint32_t ReferenceCountedInstance<T>::addReference(void)
+template <class T, typename Primative>
+int32_t ReferenceCountedInstance<T, Primative>::addReference(void) const
 {
 	return ++refCount_;
 }
 
 
-template <class T>
-uint32_t ReferenceCountedInstance<T>::removeReference(void)
+template <class T, typename Primative>
+int32_t ReferenceCountedInstance<T, Primative>::removeReference(void) const
 {
 	return --refCount_;
 }
 
 
-template <class T>
-T* ReferenceCountedInstance<T>::instance(void)
+template <class T, typename Primative>
+T* ReferenceCountedInstance<T, Primative>::instance(void)
 {
 	return &instance_;
 }
 
-template <class T>
-const T* ReferenceCountedInstance<T>::instance(void) const
+template <class T, typename Primative>
+const T* ReferenceCountedInstance<T, Primative>::instance(void) const
 {
 	return &instance_;
 }
@@ -45,26 +45,26 @@ const T* ReferenceCountedInstance<T>::instance(void) const
 // ======================================
 
 
-template <class T>
-ReferenceCounted<T>::ReferenceCounted(void) :
+template <typename Primative>
+ReferenceCounted<Primative>::ReferenceCounted(void) :
 	refCount_(1)
 {
 }
 
-template <class T>
-X_INLINE uint32_t ReferenceCounted<T>::addReference(void)
+template <typename Primative>
+X_INLINE int32_t ReferenceCounted<Primative>::addReference(void) const
 {
 	return ++refCount_;
 }
 	
-template <class T>	
-X_INLINE uint32_t ReferenceCounted<T>::removeReference(void)
+template <typename Primative>
+X_INLINE int32_t ReferenceCounted<Primative>::removeReference(void) const
 {
 	return --refCount_;
 }
 
-template <class T>
-X_INLINE uint32_t ReferenceCounted<T>::getRefCount(void) const
+template <typename Primative>
+X_INLINE int32_t ReferenceCounted<Primative>::getRefCount(void) const
 {
 	return refCount_;
 }
