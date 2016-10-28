@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef X_MATERIAL_H_
-#define X_MATERIAL_H_
+#ifndef X_MATERIAL_OLD_H_
+#define X_MATERIAL_OLD_H_
 
 #include "IShader.h"
 #include "IMaterial.h"
@@ -103,4 +103,4 @@ X_NAMESPACE_END
 
 
 
-#endif // X_MATERIAL_H_
+#endif // X_MATERIAL_OLD_H_
