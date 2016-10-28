@@ -5,17 +5,13 @@
 
 #include <Containers\HashMap.h>
 #include <String\StrRef.h>
-// #include <IMaterial.h>
 
 #include "EngineBase.h"
 
 #include <IDirectoryWatcher.h>
 
-struct IMaterial;
+#include <../../tools/MaterialLib/MatLib.h>
 
-X_NAMESPACE_DECLARE(engine,
-class XMaterial;
-)
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -26,6 +22,25 @@ class XMaterialManager :
 	public XEngineBase,
 	public core::IXHotReload
 {
+	template<typename T>
+	struct ResourceRef : public T
+	{
+		const int32_t addRef(void)
+		{
+			++refCount_;
+			return refCount_;
+		}
+
+		const int32_t removeRef(void) 
+		{
+			--refCount_;
+			return refCount_;
+		}
+
+	private:
+		core::AtomicInt refCount_;
+	};
+
 public:
 	XMaterialManager();
 	virtual ~XMaterialManager();
@@ -34,9 +49,9 @@ public:
 	void ShutDown(void);
 
 	// IMaterialManager
-	virtual IMaterial* createMaterial(const char* MtlName) X_OVERRIDE;
-	virtual IMaterial* findMaterial(const char* MtlName) const X_OVERRIDE;
-	virtual IMaterial* loadMaterial(const char* MtlName) X_OVERRIDE;
+	virtual IMaterial* createMaterial(const char* pMtlName) X_OVERRIDE;
+	virtual IMaterial* findMaterial(const char* pMtlName) const X_OVERRIDE;
+	virtual IMaterial* loadMaterial(const char* pMtlName) X_OVERRIDE;
 
 	virtual IMaterial* getDefaultMaterial() X_OVERRIDE;
 
@@ -51,7 +66,7 @@ public:
 	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
-	void ListMaterials(const char* searchPatten = nullptr) const;
+	void ListMaterials(const char* pSearchPatten = nullptr) const;
 
 protected:
 	friend class XMaterial;
@@ -59,16 +74,14 @@ protected:
 	void unregister(IMaterial* pMat);
 
 private:
-	IMaterial* loadMaterialCompiled(const char* MtlName);
-
-	bool saveMaterialCompiled(IMaterial* pMat);
-	
 	void InitDefaults(void);
 
 private:
-	typedef core::XResourceContainer MaterialCon;
+	typedef ResourceRef<engine::Material> MatResource;
+	typedef core::HashMap<core::string, MatResource*> MaterialMap;
 
-	MaterialCon	materials_;
+
+	MaterialMap	materials_;
 
 	IMaterialManagerListener* pListner_;
 	XMaterial*	pDefaultMtl_;
