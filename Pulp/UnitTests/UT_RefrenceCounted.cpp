@@ -14,7 +14,7 @@ using namespace core;
 namespace 
 {
 
-		struct RefCountedTest : public ReferenceCounted<RefCountedTest>
+		struct RefCountedTest : public ReferenceCounted<int32_t>
 		{
 		public:
 			static size_t CONSTRUCTOR_COUNT;
