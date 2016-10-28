@@ -326,6 +326,7 @@
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Lib\MaterialLib.h" />
     <ClInclude Include="Material.h" />
+    <ClInclude Include="MatLib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\MatUtil.h" />
   </ItemGroup>
