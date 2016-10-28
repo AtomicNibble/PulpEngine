@@ -51,6 +51,41 @@ const T* ReferenceCountedInstance<T, Primative>::instance(void) const
 // ======================================
 
 
+template <class T, typename Primative>
+int32_t ReferenceCountedInherit<T, Primative>::addReference(void) const
+{
+	return ++refCount_;
+}
+
+
+template <class T, typename Primative>
+int32_t ReferenceCountedInherit<T, Primative>::removeReference(void) const
+{
+	return --refCount_;
+}
+
+template <class T, typename Primative>
+int32_t ReferenceCountedInherit<T, Primative>::getRefCount(void) const
+{
+	return refCount_;
+}
+
+
+template <class T, typename Primative>
+T* ReferenceCountedInherit<T, Primative>::instance(void)
+{
+	return this;
+}
+
+template <class T, typename Primative>
+const T* ReferenceCountedInherit<T, Primative>::instance(void) const
+{
+	return this;
+}
+
+// ======================================
+
+
 template <typename Primative>
 ReferenceCounted<Primative>::ReferenceCounted(void) :
 	refCount_(1)

@@ -27,6 +27,25 @@ private:
 	mutable Primative refCount_;
 };
 
+template <class T, typename Primative = int32_t>
+class ReferenceCountedInherit : public T
+{
+public:
+	using T::T;
+
+	// these are const as the class data don't change
+	X_INLINE int32_t addReference(void) const;
+	X_INLINE int32_t removeReference(void) const;
+	X_INLINE int32_t getRefCount(void) const;
+
+
+	X_INLINE T* instance(void);
+	X_INLINE const T* instance(void) const;
+
+private:
+	mutable Primative refCount_{ 1 };
+};
+
 
 // inherit this to add ref counting.
 template <typename Primative = int32_t>
