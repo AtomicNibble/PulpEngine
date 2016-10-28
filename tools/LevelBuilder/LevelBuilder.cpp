@@ -46,6 +46,9 @@ typedef core::MemoryArena<
 > PoolArena;
 
 
+X_LINK_LIB("engine_MaterialLib");
+
+
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
