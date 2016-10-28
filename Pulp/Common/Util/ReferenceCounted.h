@@ -28,8 +28,7 @@ private:
 };
 
 
-// this can be used to inhert a instance
-// to give it refrence counting 
+// inherit this to add ref counting.
 template <typename Primative = int32_t>
 class ReferenceCounted
 {
