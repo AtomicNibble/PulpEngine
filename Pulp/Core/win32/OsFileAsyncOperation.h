@@ -10,11 +10,7 @@ X_NAMESPACE_BEGIN(core)
 
 struct XOsFileAsyncOperation
 {
-	struct ReferenceCountedOverlapped : public OVERLAPPED, public
-		core::ReferenceCounted<ReferenceCountedOverlapped>
-	{
-
-	};
+	typedef ReferenceCountedInstance<OVERLAPPED> ReferenceCountedOverlapped;
 
 
 public:
@@ -33,10 +29,10 @@ public:
 
 
 	X_INLINE OVERLAPPED* getOverlapped(void) {
-		return overlapped_.instance();
+		return overlapped_->instance();
 	}
 	X_INLINE const OVERLAPPED* getOverlapped(void) const {
-		return overlapped_.instance();
+		return overlapped_->instance();
 	}
 private:
 	HANDLE hFile_;
