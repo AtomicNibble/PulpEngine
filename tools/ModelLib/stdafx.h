@@ -24,3 +24,17 @@ typedef core::MemoryArena<
 > ModelLibrena;
 
 extern ModelLibrena* g_ModelLibArena;
+
+
+
+#ifdef X_LIB
+#define MODELLIB_EXPORT
+#else
+#ifdef MODEL_LIB_EXPORT
+#define MODELLIB_EXPORT X_EXPORT
+#else
+#define MODELLIB_EXPORT X_IMPORT
+#endif // !MODEL_LIB_EXPORT
+#endif // X_LIB
+
+

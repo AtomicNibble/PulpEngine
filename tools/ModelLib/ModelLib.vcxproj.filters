@@ -30,6 +30,12 @@
     <Filter Include="Header Files\Lib">
       <UniqueIdentifier>{97c6cbdb-58ac-4605-9650-15a6c544c845}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{40e50832-d32f-4ee6-9c24-a701b8ec6878}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{03d4a191-c7b6-4a4e-9410-b762229293e2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -52,6 +58,12 @@
     </ClInclude>
     <ClInclude Include="XModelLib.h">
       <Filter>Header Files\Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ModelUtil.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="XModelLib.cpp">
       <Filter>Source Files\Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\ModelUtil.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
