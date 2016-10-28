@@ -116,18 +116,6 @@ namespace
 } // namespace
 
 
-bool MaterialHeader::isValid(void) const
-{
-	if (version != MTL_B_VERSION) {
-		X_ERROR("Mtl", "material version is invalid. FileVer: %i RequiredVer: %i",
-			version, MTL_B_VERSION);
-	}
-
-	return version == MTL_B_VERSION &&
-		fourCC == MTL_B_FOURCC;
-}
-
-
 
 XMaterial::XMaterial() 
 {
