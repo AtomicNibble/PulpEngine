@@ -59,7 +59,6 @@ protected:
 	void unregister(IMaterial* pMat);
 
 private:
-	IMaterial* loadMaterialXML(const char* MtlName);
 	IMaterial* loadMaterialCompiled(const char* MtlName);
 
 	bool saveMaterialCompiled(IMaterial* pMat);
