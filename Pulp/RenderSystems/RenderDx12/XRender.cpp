@@ -3,6 +3,7 @@
 
 #include "Texture\TextureManager.h"
 #include "Texture\Texture.h"
+#include "Shader\ShaderManager.h"
 #include "Shader\Shader.h"
 #include "Shader\HWShader.h"
 #include "Auxiliary\AuxRenderImp.h"
@@ -54,9 +55,9 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pDevice_(nullptr),
 	pAdapter_(nullptr),
 	pSwapChain_(nullptr),
+	pShaderMan_(nullptr),
 	pTextureMan_(nullptr),
 	pAuxRender_(nullptr),
-	shaderMan_(arena),
 	pContextMan_(nullptr),
 	cmdListManager_(arena),
 	pBuffMan_(nullptr),
@@ -326,7 +327,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	presentRS_.finalize(*pRootSigCache_);
 
 
-	if (!shaderMan_.init()) {
+	pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
+	if (!pShaderMan_->init()) {
 		X_ERROR("Render", "failed to init shader system");
 		return false;
 	}
@@ -386,8 +388,10 @@ void XRender::shutDown(void)
 		X_DELETE_AND_NULL(pRootSigCache_, arena_);
 	}
 
-
-	shaderMan_.shutdown();
+	if (pShaderMan_) {
+		pShaderMan_->shutDown();
+		X_DELETE_AND_NULL(pShaderMan_, arena_);
+	}
 
 	cmdListManager_.shutdown();
 
@@ -796,8 +800,7 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 
 shader::IShader* XRender::getShader(const char* pName)
 {
-	shader::XShader* pShader = shaderMan_.forName(pName);
-
+	shader::XShader* pShader = pShaderMan_->forName(pName);
 
 	return pShader;
 }

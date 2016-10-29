@@ -14,7 +14,6 @@
 #include "Buffers\ColorBuffer.h"
 #include "Features.h"
 
-#include "Shader\ShaderManager.h"
 #include "Vars\RenderVars.h"
 #include "Auxiliary\AuxRender.h"
 #include "RootSignature.h"
@@ -27,6 +26,11 @@ X_NAMESPACE_DECLARE(core,
 )
 
 X_NAMESPACE_BEGIN(render)
+
+namespace shader
+{
+	class XShaderManager;
+} // namespace shader
 
 class RenderAuxImp;
 class ContextManager;
@@ -206,7 +210,7 @@ private:
 
 	RenderVars vars_;
 
-	shader::XShaderManager shaderMan_; // might make this allocoated, just so can forward declare like tex man.
+	shader::XShaderManager* pShaderMan_; // might make this allocoated, just so can forward declare like tex man.
 	texture::TextureManager* pTextureMan_;
 	RenderAuxImp* pAuxRender_;
 
