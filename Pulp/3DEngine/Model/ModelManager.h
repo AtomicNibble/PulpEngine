@@ -6,13 +6,20 @@
 #include "EngineBase.h"
 #include <IModel.h>
 
+#include <Assets\AssertContainer.h>
+
 X_NAMESPACE_BEGIN(model)
+
+class XModel;
 
 class XModelManager :
 	public IModelManager,
 	public engine::XEngineBase,
 	public core::IXHotReload
 {
+	typedef core::AssetContainer<XModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
+	typedef ModelContainer::Resource ModelResource;
+
 public:
 	XModelManager();
 	virtual ~XModelManager() X_OVERRIDE;
@@ -26,6 +33,9 @@ public:
 	// this only performs cpu loading, and currently loads all lods at once.
 	// as well as resolving materials, will alwyas return a instance, but might contain default data.
 	IModel* loadModel(const char* ModelName) X_FINAL;
+	IModel* loadModelSync(const char* pModelName) X_FINAL;
+
+	void releaseModel(IModel* pModel) X_FINAL;
 
 	IModel* getDefaultModel(void) X_FINAL;
 
@@ -37,19 +47,15 @@ public:
 
 	void ListModels(const char* searchPatten = nullptr) const;
 	void ReloadModel(const char* pName);
-private:
-	IModel* createModel(const char* ModelName);
-	IModel* loadModelSync(const char* ModelName);
-
-	IModel* findModel_Internal(const char* ModelName) const;
-
-	IModel* LoadCompiledModel(const char* ModelName);
 
 private:
-	typedef core::XResourceContainer ModelCon;
+	ModelResource* createModel(const char* pModelName);
+	ModelResource* findModel_Internal(const core::string& name) const;
 
-	IModel*		pDefaultModel_;
-	ModelCon	models_;
+
+private:
+	IModel*	pDefaultModel_;
+	ModelContainer	models_;
 };
 
 X_NAMESPACE_END

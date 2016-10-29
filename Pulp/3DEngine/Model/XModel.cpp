@@ -45,36 +45,10 @@ XModel::~XModel()
 
 
 // IModel
-const int XModel::addRef(void)
-{ 
-	return XBaseAsset::addRef(); 
-}
 
-// XBaseAsset
-const int XModel::release(void)
+const core::string& XModel::getName(void) const
 {
-	const int ref = XBaseAsset::release();
-	if (ref == 0) {
-		X_DELETE(this, g_3dEngineArena);
-	}
-	return ref;
-}
-
-// ~XBaseAsset
-const int XModel::forceRelease(void)
-{
-	for (;;) {
-		if (release() <= 0) {
-			break;
-		}
-	}
-	return 0;
-}
-
-
-const char* XModel::getName(void) const
-{
-	return name_.c_str();
+	return name_;
 }
 
 int32_t XModel::numLods(void) const
@@ -431,7 +405,7 @@ bool XModel::LoadModelAsync(const char* name)
 	path.setExtension(".model");
 
 	// save the name
-	name_.set(path.fileName());
+	name_ = path.fileName();
 
 	// dispatch a read request baby!
 	core::IoRequestData req;
@@ -483,7 +457,7 @@ bool XModel::LoadModel(const char* name)
 
 	path.removeExtension();
 
-	name_.set(path.fileName());
+	name_ = path.fileName();
 
 	return LoadModel(file.GetFile());
 }

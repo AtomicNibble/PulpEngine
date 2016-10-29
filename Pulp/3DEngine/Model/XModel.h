@@ -24,20 +24,16 @@ struct XFileAsync;
 X_NAMESPACE_BEGIN(model)
 
 
-class XModel : public IModel, public core::XBaseAsset, public engine::XEngineBase
+class XModel : public IModel, public engine::XEngineBase
 {
-	typedef core::StackString<MODEL_MAX_NAME_LENGTH> ModelName;
+	typedef core::string ModelName;
 
 public:
 	XModel();
 	~XModel();
 
 	// IModel
-	const int addRef(void) X_OVERRIDE;
-	const int release(void) X_OVERRIDE;
-	const int forceRelease(void) X_OVERRIDE;
-
-	virtual const char* getName(void) const X_FINAL;
+	virtual const core::string& getName(void) const X_FINAL;
 	virtual int32_t numLods(void) const X_FINAL;
 	virtual int32_t numBones(void) const X_FINAL;
 	virtual int32_t numBlankBones(void) const X_FINAL;

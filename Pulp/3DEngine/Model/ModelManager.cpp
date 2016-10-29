@@ -72,7 +72,7 @@ WE have special case for default model which we want to load / setup in a synchr
 
 XModelManager::XModelManager() : 
 	pDefaultModel_(nullptr),
-	models_(g_3dEngineArena, 2048)
+	models_(g_3dEngineArena, sizeof(XModel), X_ALIGN_OF(XModel))
 {
 
 }
@@ -118,59 +118,45 @@ void XModelManager::ShutDown(void)
 
 	// default model
 	if (pDefaultModel_) {
-		pDefaultModel_->forceRelease();
+		releaseModel(pDefaultModel_);
 	}
 
 	// any left?
-	core::XResourceContainer::ResourceItor it = models_.begin();
-	for (; it != models_.end();)
+	for (const auto& m : models_)
 	{
-		IModel* pModel = static_cast<XModel*>(it->second);
-		
-		++it;
-
-		if (!pModel) {
-			continue;
-		}
-
-		X_WARNING("XModel", "\"%s\" was not deleted", pModel->getName());
-		pModel->forceRelease();
+		ModelResource* pModelRes = m.second;
+		X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, pModelRes->getName(), pModelRes->getRefCount());
 	}
+
+	models_.free();
 }
 
 
-IModel* XModelManager::findModel(const char* ModelName) const
+IModel* XModelManager::findModel(const char* pModelName) const
 {
-	X_UNUSED(ModelName);
+	core::string name(pModelName);
 
-	IModel* pModel = findModel_Internal(ModelName);
-
+	IModel* pModel = findModel_Internal(name);
 	if (pModel) {
 		return pModel;
 	}
 
-	X_WARNING("ModelManager", "Failed to find model: \"%s\"", ModelName);
+	X_WARNING("ModelManager", "Failed to find model: \"%s\"", pModelName);
 	return nullptr;
 }
 
-IModel* XModelManager::findModel_Internal(const char* ModelName) const
+XModelManager::ModelResource* XModelManager::findModel_Internal(const core::string& name) const
 {
-	X_UNUSED(ModelName);
-
-	XModel* pModel = static_cast<XModel*>(
-		models_.findAsset(X_CONST_STRING(ModelName)));
-
-	return pModel;
+	return models_.findAsset(name);
 }
 
 
-IModel* XModelManager::loadModel(const char* ModelName)
+IModel* XModelManager::loadModel(const char* pModelName)
 {
-	X_ASSERT_NOT_NULL(ModelName);
+	X_ASSERT_NOT_NULL(pModelName);
 	const char* pExt;
-	IModel* iModel;
 
-	pExt = core::strUtil::FileExtension(ModelName);
+	pExt = core::strUtil::FileExtension(pModelName);
 	if (pExt)
 	{
 		// engine should not make requests for models with a extension
@@ -179,46 +165,31 @@ IModel* XModelManager::loadModel(const char* ModelName)
 		return getDefaultModel();
 	}
 
-	// try find it.
-	iModel = findModel_Internal(ModelName);
+	core::string name(pModelName);
 
-	if (iModel)
+	// try find it.
+	ModelResource* pModelRes = findModel_Internal(name);
+	if (pModelRes)
 	{
 		// inc ref count.
-		iModel->addRef();
-		return iModel;
+		pModelRes->addReference();
+		return pModelRes;
 	}
 
 	// we create a model and give it back
-	XModel* pModel = X_NEW(XModel, g_3dEngineArena, "3DModel");
+	pModelRes = models_.createAsset(name);
+	pModelRes->LoadModelAsync(pModelName);
 
-	pModel->LoadModelAsync(ModelName);
-
-	models_.AddAsset(ModelName, pModel);
-
-	return pModel;
+	return pModelRes;
 }
 
-IModel* XModelManager::createModel(const char* ModelName)
+
+IModel* XModelManager::loadModelSync(const char* pModelName)
 {
-	XModel* pModel = X_NEW(XModel, g_3dEngineArena, "3DModel");
-	if (pModel)
-	{
-		pModel->AssignDefault();
-
-		models_.AddAsset(ModelName, pModel);
-	}
-
-	return pModel;
-}
-
-IModel* XModelManager::loadModelSync(const char* ModelName)
-{
-	X_ASSERT_NOT_NULL(ModelName);
+	X_ASSERT_NOT_NULL(pModelName);
 	const char* pExt;
-	IModel* iModel;
 
-	pExt = core::strUtil::FileExtension(ModelName);
+	pExt = core::strUtil::FileExtension(pModelName);
 	if (pExt)
 	{
 		// engine should not make requests for models with a extension
@@ -227,26 +198,49 @@ IModel* XModelManager::loadModelSync(const char* ModelName)
 		return getDefaultModel();
 	}
 
-	// try find it.
-	iModel = findModel_Internal(ModelName);
+	core::string name(pModelName);
 
-	if (iModel)
+	// try find it.
+	ModelResource* pModelRes = findModel_Internal(name);
+	if (pModelRes)
 	{
 		// inc ref count.
-		iModel->addRef();
-		return iModel;
+		pModelRes->addReference();
+		return pModelRes;
 	}
 
+	pModelRes = models_.createAsset(name);
 
-	// try load it.
-	iModel = LoadCompiledModel(ModelName);
-	if (iModel) {
-		X_LOG1("ModelManager", "Loaded model: \"%s\"", ModelName);
-		return iModel;
+	if (!pModelRes->LoadModel(pModelName))
+	{
+		pModelRes->AssignDefault();
+		X_WARNING("ModelManager", "Failed to load model: \"%s\"", pModelName);
+	}
+	else
+	{
+		X_LOG1("ModelManager", "Loaded model: \"%s\"", pModelName);
 	}
 
-	X_WARNING("ModelManager", "Failed to load model: \"%s\"", ModelName);
-	return getDefaultModel();
+	return pModelRes;
+}
+
+void XModelManager::releaseModel(IModel* pModel)
+{
+	ModelResource* pModelRes = static_cast<ModelResource*>(pModel);
+	if (pModelRes->removeReference() == 0)
+	{
+		models_.releaseAsset(pModelRes);
+	}
+}
+
+
+XModelManager::ModelResource* XModelManager::createModel(const char* pModelName)
+{
+	core::string name(pModelName);
+
+	ModelResource* pModelRes = models_.createAsset(name);
+	pModelRes->AssignDefault();
+	return pModelRes;
 }
 
 
@@ -286,15 +280,13 @@ void XModelManager::ListModels(const char* searchPatten) const
 	core::Array<XModel*> sorted_models(g_3dEngineArena);
 	sorted_models.setGranularity(models_.size());
 
-	ModelCon::ResourceConstItor ModelIt;
-
-	for (ModelIt = models_.begin(); ModelIt != models_.end(); ++ModelIt)
+	for (const auto& model : models_)
 	{
-		XModel* model = static_cast<XModel*>(ModelIt->second);
+		auto* pModelRes = model.second;
 
-		if (!searchPatten || core::strUtil::WildCompare(searchPatten, model->getName()))
+		if (!searchPatten || core::strUtil::WildCompare(searchPatten, pModelRes->getName()))
 		{
-			sorted_models.push_back(model);
+			sorted_models.push_back(pModelRes);
 		}
 	}
 
@@ -302,10 +294,8 @@ void XModelManager::ListModels(const char* searchPatten) const
 
 	X_LOG0("Console", "------------ ^8Models(%" PRIuS ")^7 ---------------", sorted_models.size());
 
-	core::Array<XModel*>::ConstIterator it = sorted_models.begin();
-	for (; it != sorted_models.end(); ++it)
+	for (const auto& model : sorted_models)
 	{
-		const XModel* model = *it;
 		X_LOG0("Model", "^2%-32s^7 Lods:^2%i^7 Bones:^2%i^7 BlankBones:^2%i^7 TotalMesh:^2%i^7",
 			model->getName(), model->numLods(), model->numBones(), model->numBlankBones(),
 			model->numMeshTotal());
@@ -315,38 +305,20 @@ void XModelManager::ListModels(const char* searchPatten) const
 
 }
 
-void XModelManager::ReloadModel(const char* pName)
+void XModelManager::ReloadModel(const char* pModelName)
 {
-	X_ASSERT_NOT_NULL(pName);
+	core::string name(pModelName);
 
-	XModel* pModel = static_cast<XModel*>(findModel_Internal(pName));
-	if (pModel)
+	ModelResource* pModelRes = findModel_Internal(name);
+	if (pModelRes)
 	{
-		X_LOG0("Model", "Reload model: \"%s\"", pName);
-		pModel->ReloadAsync();
+		X_LOG0("Model", "Reload model: \"%s\"", name.c_str());
+		pModelRes->ReloadAsync();
 	}
 	else
 	{
-		X_WARNING("Model", "%s is not loaded skipping reload", pName);
+		X_WARNING("Model", "\"%s\" is not loaded skipping reload", name.c_str());
 	}
-}
-
-IModel* XModelManager::LoadCompiledModel(const char* ModelName)
-{
-	// check if the file exsists.
-	XModel* pModel = X_NEW(XModel, g_3dEngineArena, "3DModel");
-	if (pModel)
-	{
-		if (pModel->LoadModel(ModelName))
-		{
-			models_.AddAsset(ModelName, pModel);
-		}
-		else
-		{
-			X_DELETE_AND_NULL(pModel, g_3dEngineArena);
-		}
-	}
-	return pModel;
 }
 
 X_NAMESPACE_END

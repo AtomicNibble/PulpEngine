@@ -464,11 +464,7 @@ struct IModel
 {
 	virtual ~IModel() {}
 
-	virtual const int addRef(void) X_ABSTRACT;
-	virtual const int release(void) X_ABSTRACT;
-	virtual const int forceRelease(void) X_ABSTRACT;
-
-	virtual const char* getName(void) const X_ABSTRACT;
+	virtual const core::string& getName(void) const X_ABSTRACT;
 	virtual int32_t numLods(void) const X_ABSTRACT;
 	virtual int32_t numBones(void) const X_ABSTRACT;
 	virtual int32_t numBlankBones(void) const X_ABSTRACT;
@@ -495,6 +491,9 @@ struct IModelManager
 	// if material is found adds ref and returns, if not try's to load the material file.
 	// if file can't be loaded or error it return the default material.
 	virtual IModel* loadModel(const char* ModelName) X_ABSTRACT;
+	virtual IModel* loadModelSync(const char* ModelName) X_ABSTRACT;
+
+	virtual void releaseModel(IModel* pModel) X_ABSTRACT;
 
 	virtual IModel* getDefaultModel(void) X_ABSTRACT;
 };
