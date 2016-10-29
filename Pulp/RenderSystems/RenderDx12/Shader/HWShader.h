@@ -17,9 +17,9 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-	X_DECLARE_FLAGS(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
-	X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, ReadyToRock, FailedToCompile);
-	X_DECLARE_ENUM(ConstbufType)(PER_FRAME,	PER_BATCH, PER_INSTANCE);
+	X_DECLARE_FLAGS8(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
+	X_DECLARE_FLAGS8(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, ReadyToRock, FailedToCompile);
+	X_DECLARE_ENUM8(ConstbufType)(PER_FRAME, PER_BATCH, PER_INSTANCE);
 
 	class ShaderBin;
 	class XShaderManager;
@@ -90,16 +90,19 @@ namespace shader
 		XShaderParam(const XShaderParam& sb) = default;
 		XShaderParam& operator = (const XShaderParam& sb) = default;
 
-
+		// 8
 		core::string		name;
+		// 4
 		core::StrHash		nameHash;
-		Flags<ParamFlags>	flags;
+		Flags8<ParamFlags>	flags;
 		ParamType::Enum		type;
+		// 8
 		int16_t				bind;
 		int16_t				constBufferSlot;
 		int32_t				numParameters;
 	};
 
+	X_ENSURE_SIZE(XShaderParam, 24);
 	X_ENSURE_SIZE(ParamType::Enum, 1);
 
 
