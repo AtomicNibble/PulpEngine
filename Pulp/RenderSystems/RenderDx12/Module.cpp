@@ -74,7 +74,7 @@ class XEngineModule_Render : public IEngineModule
 			return false;
 		}
 
-		if (!pCore->IntializeLoadedEngineModule("Engine_ImgLib", "Engine_ImgLib")) {
+		if (!pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
 			X_ERROR("Render", "Failed to init imgLib");
 
 			X_DELETE(pRender, g_rendererArena);
