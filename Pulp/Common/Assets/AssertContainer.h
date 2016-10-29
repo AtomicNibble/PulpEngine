@@ -178,20 +178,17 @@ public:
 		core::SimpleMemoryTracking,
 		core::SimpleMemoryTagging> AssetPoolArena;
 
-	static const size_t ALLOCATION_SIZE = sizeof(AssetResource);
-	static const size_t ALLOCATION_ALIGN = X_ALIGN_OF(AssetResource);
-
 public:
-	AssetPool() :
+	AssetPool(size_t allocSize, size_t allocAlign) :
 		assetPoolHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
-				AssetPoolArena::getMemoryRequirement(ALLOCATION_SIZE) * MaxAssets,
+				AssetPoolArena::getMemoryRequirement(allocSize) * MaxAssets,
 				core::VirtualMem::GetPageSize()
 				)
 		),
 		assetPoolAllocator_(assetPoolHeap_.start(), assetPoolHeap_.end(),
-			AssetPoolArena::getMemoryRequirement(ALLOCATION_SIZE),
-			AssetPoolArena::getMemoryAlignmentRequirement(ALLOCATION_ALIGN),
+			AssetPoolArena::getMemoryRequirement(allocSize),
+			AssetPoolArena::getMemoryAlignmentRequirement(allocAlign),
 			AssetPoolArena::getMemoryOffsetRequirement()
 		),
 		assetPoolArena_(&assetPoolAllocator_, "AssetPoolArena")
@@ -228,9 +225,9 @@ public:
 
 
 public:
-	AssetContainer(core::MemoryArenaBase* arena) :
+	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
 		hash_(arena, MaxAssets),
-		AssetPool()
+		AssetPool(allocSize, allocAlign)
 	{
 
 	}
