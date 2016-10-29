@@ -64,6 +64,7 @@ X_DECLARE_FLAGS(MaterialFlag)(
 );
 
 
+typedef Flags<MaterialFlag> MaterialFlags;
 
 
 X_DECLARE_ENUM8(MaterialMountType)(
@@ -76,7 +77,6 @@ X_DECLARE_ENUM8(MaterialMountType)(
 );
 
 
-typedef Flags<MaterialFlag> MaterialFlags;
 
 X_DECLARE_FLAGS8(MaterialStateFlag)(
 	DEPTHWRITE,
