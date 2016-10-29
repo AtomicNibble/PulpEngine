@@ -331,6 +331,7 @@ struct ICore
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
 
 	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
+	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
 
 	virtual IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
 

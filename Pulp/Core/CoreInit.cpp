@@ -151,6 +151,38 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 	return true;
 }
 
+
+bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName)
+{
+#if !defined(X_LIB)
+	core::Module::Handle handle = core::Module::Load(pDllName);
+
+	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
+		core::Module::GetProc(handle, DLL_MODULE_INIT_ICORE));
+
+	if (pfnModuleInitISystem) {
+		pfnModuleInitISystem(this, pDllName);
+	}
+
+#endif
+
+	std::shared_ptr<IConverterModule> pModule;
+	if (PotatoCreateClassInstance(pModuleClassName, pModule))
+	{
+		if (!pModule->Initialize()) {
+			X_ERROR("Core", "failed to initialize: %s -> %s", pDllName, pModuleClassName);
+			return false;
+		}
+	}
+	else
+	{
+		X_ERROR("Core", "failed to find interface: %s -> %s", pDllName, pModuleClassName);
+		return false;
+	}
+
+	return true;
+}
+
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)
 {
 	core::Path<char> path(dllName);

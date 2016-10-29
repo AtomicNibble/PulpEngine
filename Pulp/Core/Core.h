@@ -115,6 +115,7 @@ public:
 	virtual bool RunGameLoop(void) X_FINAL;
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
 	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_OVERRIDE;
+	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName) X_OVERRIDE;
 
 
 	X_INLINE core::ITimer* GetITimer(void) X_OVERRIDE;
