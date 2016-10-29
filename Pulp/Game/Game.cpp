@@ -40,6 +40,10 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_3DEngine@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Physics@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Game@@0V12@A")
 
+// some libs that w link against.
+X_LINK_LIB("engine_ImgLib")
+X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Img@@0V12@A")
+
 #endif // !X_LIB
 
 void InitRootDir(void)
