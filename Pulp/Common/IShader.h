@@ -25,50 +25,6 @@ static const uint32_t MAX_HW_SHADERS = 256;
 static const uint32_t MAX_SHADER_SOURCE = 256;
 
 
-struct BlendType
-{
-	enum Enum
-	{
-		ZERO,
-		ONE,
-
-		SRC_COLOR,
-		SRC_ALPHA,
-		SRC_ALPHA_SAT,
-		SRC1_COLOR,
-		SRC1_ALPHA,
-
-		INV_SRC_COLOR,
-		INV_SRC_ALPHA,
-
-		INV_SRC1_COLOR,
-		INV_SRC1_ALPHA,
-
-		DEST_COLOR,
-		DEST_ALPHA,
-
-		INV_DEST_COLOR,
-		INV_DEST_ALPHA,
-
-		BLEND_FACTOR,
-		INV_BLEND_FACTOR,
-
-		INVALID
-	};
-
-	static Enum typeFromStr(const char* _str);
-};
-
-struct BlendInfo
-{
-	BlendInfo() = default;
-
-public:
-	BlendType::Enum color;
-	BlendType::Enum alpha;
-};
-
-
 // we have shader params that will need to be updated at diffrent rates.
 // so we should group them.
 // 

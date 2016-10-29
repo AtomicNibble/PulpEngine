@@ -76,30 +76,16 @@ namespace shader
 		X_INLINE const core::string& getVertexFunc(void) const;
 		X_INLINE const core::string& getPixelFunc(void) const;
 
-		X_INLINE const BlendInfo& getSrcBlendInfo(void) const;
-		X_INLINE const BlendInfo& getDstBlendInfo(void) const;
-
-		X_INLINE const render::CullMode::Enum getCullMode(void) const;
-		X_INLINE const render::StateFlag getStateFlag(void) const;
 		X_INLINE const TechFlags getTechFlags(void) const;
 
 	private:
 		bool processName(void);
-		bool parseBlend(BlendInfo& blend, const char* name,
-			const core::StackString512& key, const core::StackString512& value);
 
 	private:
 		core::string name_;
 		core::string vertex_func_;
 		core::string pixel_func_;
 
-		BlendInfo src_;
-		BlendInfo dst_;
-
-		render::CullMode::Enum cullMode_;
-		bool depth_write_;
-
-		render::StateFlag state_;
 		Flags<TechniquePrams> flags_;
 		TechFlags techFlags_;
 	};

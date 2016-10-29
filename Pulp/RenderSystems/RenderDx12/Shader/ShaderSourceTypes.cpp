@@ -68,7 +68,7 @@ namespace shader
 
 	ShaderSourceFileTechnique::ShaderSourceFileTechnique()
 	{
-		depth_write_ = true;
+		
 	}
 
 	bool ShaderSourceFileTechnique::parse(core::XLexer& lex)
@@ -78,9 +78,6 @@ namespace shader
 		core::XLexToken token;
 
 		flags_.Clear();
-
-		src_.color = BlendType::SRC_ALPHA;
-		dst_.color = BlendType::INV_SRC_ALPHA;
 
 		// lots of pairs :D !
 		while (lex.ReadToken(token))
@@ -117,65 +114,27 @@ namespace shader
 			}
 			else if (key.isEqual("cull_mode"))
 			{
-				// none, front, back
-				if (value.isEqual("none"))
-					this->cullMode_ = CullMode::NONE;
-				else if (value.isEqual("front"))
-					this->cullMode_ = CullMode::FRONT;
-				else if (value.isEqual("back"))
-					this->cullMode_ = CullMode::BACK;
-				else {
-					X_WARNING("Shader", "invalid 'cull_mode' value, possible values: none/front/back");
-				}
+				X_WARNING("Shader", "cull_mode is deprecated");
 			}
 			else if (key.isEqual("depth_test"))
 			{
-				//   NEVER, LESS, EQUAL, LESS_EQUAL, GREATER, NOT_EQUAL, GREATER_EQUAL, ALWAYS 
-				if (value.isEqual("less_equal"))
-					state_ |= States::DEPTHFUNC_LEQUAL;
-				else if (value.isEqual("equal"))
-					state_ |= States::DEPTHFUNC_EQUAL;
-				else if (value.isEqual("greater"))
-					state_ |= States::DEPTHFUNC_GREAT;
-				else if (value.isEqual("less"))
-					state_ |= States::DEPTHFUNC_LESS;
-				else if (value.isEqual("greater_equal"))
-					state_ |= States::DEPTHFUNC_GEQUAL;
-				else if (value.isEqual("not_equal"))
-					state_ |= States::DEPTHFUNC_NOTEQUAL;
-				else if (value.isEqual("always"))
-				{
-					state_ |= States::NO_DEPTH_TEST;
-				}
-				else
-				{
-					X_WARNING("Shader", "invalid 'depth_test' value, possible values: "
-						"less_equal/equal/greater/less/greater_equal/not_equal");
-				}
+				X_WARNING("Shader", "depth_test is deprecated");
 			}
 			else if (key.isEqual("depth_write"))
 			{
-				// true false.
-				if (value.isEqual("true"))
-					this->depth_write_ = true;
-				else if (value.isEqual("false"))
-					this->depth_write_ = false;
-				else {
-					X_WARNING("Shader", "invalid 'depth_write' value, possible values: true/false");
-				}
+				X_WARNING("Shader", "depth_write is deprecated");
 			}
 			else if (key.isEqual("wireframe"))
 			{
-				if (value.isEqual("true")) {
-					state_ |= States::WIREFRAME;
-				}
+				X_WARNING("Shader", "wireframe is deprecated");
 			}
-
-			// we could have blend functions.
-			else if (parseBlend(src_, "src_blend", key, value) ||
-				parseBlend(dst_, "dst_blend", key, value))
+			else if (key.isEqual("src_blend"))
 			{
-				// valid.
+				X_WARNING("Shader", "src_blend is deprecated");
+			}
+			else if (key.isEqual("dst_blend"))
+			{
+				X_WARNING("Shader", "dst_blend is deprecated");
 			}
 			else
 			{
@@ -198,92 +157,6 @@ namespace shader
 			return false;
 		}
 
-
-		if (depth_write_) {
-			state_.Set(render::States::DEPTHWRITE);
-		}
-
-		// defaults
-		if (src_.color == BlendType::INVALID) {
-			src_.color = BlendType::SRC_ALPHA;
-		}
-
-		if (dst_.color == BlendType::INVALID) {
-			dst_.color = BlendType::INV_SRC_ALPHA;
-		}
-
-		// build the state.
-		switch (src_.color)
-		{
-		case BlendType::ZERO:
-			state_.Set(render::States::BLEND_SRC_ZERO);
-			break;
-		case BlendType::ONE:
-			state_.Set(render::States::BLEND_SRC_ONE);
-			break;
-		case BlendType::DEST_COLOR:
-			state_.Set(render::States::BLEND_SRC_DEST_COLOR);
-			break;
-		case BlendType::INV_DEST_COLOR:
-			state_.Set(render::States::BLEND_SRC_INV_DEST_COLOR);
-			break;
-		case BlendType::SRC_ALPHA:
-			state_.Set(render::States::BLEND_SRC_SRC_ALPHA);
-			break;
-		case BlendType::INV_SRC_ALPHA:
-			state_.Set(render::States::BLEND_SRC_INV_SRC_ALPHA);
-			break;
-		case BlendType::DEST_ALPHA:
-			state_.Set(render::States::BLEND_SRC_DEST_ALPHA);
-			break;
-		case BlendType::INV_DEST_ALPHA:
-			state_.Set(render::States::BLEND_SRC_INV_DEST_ALPHA);
-			break;
-		case BlendType::SRC_ALPHA_SAT:
-			state_.Set(render::States::BLEND_SRC_ALPHA_SAT);
-			break;
-#if X_DEBUG
-		default:
-			X_ASSERT_UNREACHABLE();
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif
-		}
-
-		switch (dst_.color)
-		{
-		case BlendType::ZERO:
-			state_.Set(render::States::BLEND_DEST_ZERO);
-			break;
-		case BlendType::ONE:
-			state_.Set(render::States::BLEND_DEST_ONE);
-			break;
-		case BlendType::SRC_COLOR:
-			state_.Set(render::States::BLEND_DEST_SRC_COLOR);
-			break;
-		case BlendType::INV_SRC_COLOR:
-			state_.Set(render::States::BLEND_DEST_INV_SRC_COLOR);
-			break;
-		case BlendType::SRC_ALPHA:
-			state_.Set(render::States::BLEND_DEST_SRC_ALPHA);
-			break;
-		case BlendType::INV_SRC_ALPHA:
-			state_.Set(render::States::BLEND_DEST_INV_SRC_ALPHA);
-			break;
-		case BlendType::DEST_ALPHA:
-			state_.Set(render::States::BLEND_DEST_DEST_ALPHA);
-			break;
-		case BlendType::INV_DEST_ALPHA:
-			state_.Set(render::States::BLEND_DEST_INV_DEST_ALPHA);
-			break;
-#if X_DEBUG
-		default:
-			X_ASSERT_UNREACHABLE();
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif
-		}
-
 		// did we reach EOF before close brace?
 		if (!token.isEqual("}")) {
 			X_ERROR("Shader", "technique missing closing brace");
@@ -291,42 +164,6 @@ namespace shader
 		}
 
 		return processName();
-	}
-
-
-
-	bool ShaderSourceFileTechnique::parseBlend(BlendInfo& blend, const char* pName,
-		const core::StackString512& key, const core::StackString512& value)
-	{
-		X_ASSERT_NOT_NULL(pName);
-
-		core::StackString<64> color_str(pName);
-		core::StackString<64> alpha_str(pName);
-
-		color_str.append("_color");
-		alpha_str.append("_alpha");
-
-		if (color_str.isEqual(key.c_str()))
-		{
-			blend.color = BlendType::typeFromStr(value.c_str());
-			if (blend.color == BlendType::INVALID) {
-				X_ERROR("Shader", "invalid %s type: %s", color_str.c_str(), value.c_str());
-				return false; // invalid
-			}
-		}
-		else if (alpha_str.isEqual(key.c_str()))
-		{
-			blend.alpha = BlendType::typeFromStr(value.c_str());
-			if (blend.alpha == BlendType::INVALID) {
-				X_ERROR("Shader", "invalid %s type: %s", alpha_str.c_str(), value.c_str());
-				return false; // invalid
-			}
-		}
-		else {
-			return false;
-		}
-
-		return true;
 	}
 
 	bool ShaderSourceFileTechnique::processName(void)

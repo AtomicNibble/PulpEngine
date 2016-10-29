@@ -84,26 +84,6 @@ namespace shader
 		return pixel_func_;
 	}
 
-	X_INLINE const BlendInfo& ShaderSourceFileTechnique::getSrcBlendInfo(void) const
-	{
-		return src_;
-	}
-
-	X_INLINE const BlendInfo& ShaderSourceFileTechnique::getDstBlendInfo(void) const
-	{
-		return dst_;
-	}
-
-	X_INLINE const render::CullMode::Enum ShaderSourceFileTechnique::getCullMode(void) const
-	{
-		return cullMode_;
-	}
-
-	X_INLINE const render::StateFlag ShaderSourceFileTechnique::getStateFlag(void) const
-	{
-		return state_;
-	}
-
 	X_INLINE const TechFlags ShaderSourceFileTechnique::getTechFlags(void) const
 	{
 		return techFlags_;

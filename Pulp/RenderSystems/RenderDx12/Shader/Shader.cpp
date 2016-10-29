@@ -45,61 +45,6 @@ namespace shader
 //
 
 
-
-BlendType::Enum BlendType::typeFromStr(const char* _str)
-{
-	core::StackString<256> str(_str, _str + strlen(_str));
-
-	str.toLower();
-
-	if (str.isEqual("zero"))
-		return ZERO;
-	if (str.isEqual("one"))
-		return ONE;
-
-	if (str.isEqual("src_color"))
-		return SRC_COLOR;
-	if (str.isEqual("inv_src_color"))
-		return INV_SRC_COLOR;
-
-	if (str.isEqual("src_alpha"))
-		return SRC_ALPHA;
-	if (str.isEqual("inv_src_alpha"))
-		return INV_SRC_ALPHA;
-
-	if (str.isEqual("dest_alpha"))
-		return DEST_ALPHA;
-	if (str.isEqual("inv_dest_alpha"))
-		return INV_DEST_ALPHA;
-
-	if (str.isEqual("dest_color"))
-		return DEST_COLOR;
-	if (str.isEqual("inv_dest_color"))
-		return INV_DEST_COLOR;
-
-	if (str.isEqual("src_alpha_Sat"))
-		return SRC_ALPHA_SAT;
-
-	if (str.isEqual("blend_factor"))
-		return BLEND_FACTOR;
-	if (str.isEqual("inv_blend_factor"))
-		return INV_BLEND_FACTOR;
-
-	if (str.isEqual("src1_color"))
-		return SRC1_COLOR;
-	if (str.isEqual("inv_src1_color"))
-		return INV_SRC1_COLOR;
-	if (str.isEqual("src1_alpha"))
-		return SRC1_ALPHA;
-	if (str.isEqual("inv_src1_alpha"))
-		return INV_SRC1_ALPHA;
-
-	// O'Deer
-	return INVALID;
-}
-
-
-
 // ----------------------------------------------------
 
 
@@ -114,14 +59,6 @@ void XShaderTechnique::assignSourceTech(const ShaderSourceFileTechnique& srcTech
 {
 	name = srcTech.getName();
 	nameHash = core::StrHash(srcTech.getName());
-	// Blend info
-	src = srcTech.getSrcBlendInfo();
-	dst = srcTech.getDstBlendInfo();
-	// State
-	state = srcTech.getStateFlag();
-	// Cullmode
-	cullMode = srcTech.getCullMode();
-
 	// compileflags
 	techFlags = srcTech.getTechFlags();
 }
