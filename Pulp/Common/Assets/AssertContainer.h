@@ -11,6 +11,15 @@
 
 #include <String\Path.h>
 
+// for new
+#include <IAssetDb.h>
+#include <Util\BitUtil.h>
+#include <Util\ReferenceCounted.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\HeapArea.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Memory\VirtualMem.h>
+
 X_NAMESPACE_BEGIN(core)
 
 class XResourceContainer;
@@ -153,7 +162,145 @@ public:
 
 };
 
+// ---------------------------------------------------------------------------
 
+
+template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy>
+class AssetPool
+{
+public:
+	typedef core::ReferenceCountedInherit<AssetType, core::AtomicInt> AssetResource;
+
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		MemoryThreadPolicy,
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging> AssetPoolArena;
+
+	static const size_t ALLOCATION_SIZE = sizeof(AssetResource);
+	static const size_t ALLOCATION_ALIGN = X_ALIGN_OF(AssetResource);
+
+public:
+	AssetPool() :
+		assetPoolHeap_(
+			core::bitUtil::RoundUpToMultiple<size_t>(
+				AssetPoolArena::getMemoryRequirement(ALLOCATION_SIZE) * MaxAssets,
+				core::VirtualMem::GetPageSize()
+				)
+		),
+		assetPoolAllocator_(assetPoolHeap_.start(), assetPoolHeap_.end(),
+			AssetPoolArena::getMemoryRequirement(ALLOCATION_SIZE),
+			AssetPoolArena::getMemoryAlignmentRequirement(ALLOCATION_ALIGN),
+			AssetPoolArena::getMemoryOffsetRequirement()
+		),
+		assetPoolArena_(&assetPoolAllocator_, "AssetPoolArena")
+	{
+	}
+
+	template<class... Args>
+	X_INLINE AssetResource* allocate(Args&&... args)
+	{
+		return X_NEW(AssetResource, &assetPoolArena_, "AsetRes")(std::forward<Args>(args)...);
+	}
+
+	X_INLINE void free(AssetResource* pRes)
+	{
+		X_DELETE(pRes, &assetPoolArena_);
+	}
+
+private:
+	core::HeapArea      assetPoolHeap_;
+	core::PoolAllocator assetPoolAllocator_;
+	AssetPoolArena		assetPoolArena_;
+};
+
+template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy>
+class AssetContainer : private AssetPool<AssetType, MaxAssets, MemoryThreadPolicy>
+{
+	typedef AssetPool<AssetType, MaxAssets, MemoryThreadPolicy> Pool;
+public:
+	typedef Pool::AssetResource Resource;
+	typedef core::HashMap<core::string, Resource*> ResourceMap;
+
+	typedef typename ResourceMap::iterator ResourceItor;
+	typedef typename ResourceMap::const_iterator ResourceConstItor;
+
+
+public:
+	AssetContainer(core::MemoryArenaBase* arena) :
+		hash_(arena, MaxAssets),
+		AssetPool()
+	{
+
+	}
+
+	X_INLINE void free(void)
+	{
+		for (const auto& it : hash_) {
+			Pool::free(it.second);
+		}
+
+		hash_.free();
+	}
+
+	X_INLINE Resource* findAsset(const core::string& name) const
+	{
+		X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
+			"asset name has invalid slash")(name.c_str());
+	
+		auto it = hash_.find(name);
+		if (it != hash_.end()) {
+			return it->second;
+		}
+
+		return nullptr;
+	}
+
+	template<class... Args>
+	Resource* createAsset(const core::string& name, Args&&... args)
+	{
+		X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
+			"asset name has invalid slash")(name.c_str());
+
+		Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
+
+		hash_.insert(ResourceMap::value_type(name, pRes));
+
+		return pRes;
+	}
+
+	X_INLINE void releaseAsset(Resource* pRes)
+	{
+		X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")(pRes->getRefCount());
+
+		hash_.erase(pRes->getName());
+
+		Pool::free(pRes);
+	}
+
+public:
+
+	X_INLINE ResourceItor begin(void) {
+		return hash_.begin();
+	}
+	X_INLINE ResourceConstItor begin(void) const {
+		return hash_.begin();
+	}
+	X_INLINE ResourceItor end(void) {
+		return hash_.end();
+	}
+	X_INLINE ResourceConstItor end(void) const {
+		return hash_.end();
+	}
+
+	X_INLINE const size_t size(void) const {
+		return hash_.size();
+	}
+
+private:
+	ResourceMap hash_;
+};
 
 
 X_NAMESPACE_END
