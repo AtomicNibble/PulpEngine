@@ -20,6 +20,10 @@ namespace shader
 {
 
 
+static const uint32_t MAX_SHADERS = 256;
+static const uint32_t MAX_HW_SHADERS = 256;
+static const uint32_t MAX_SHADER_SOURCE = 256;
+
 struct BlendType
 {
 	enum Enum
