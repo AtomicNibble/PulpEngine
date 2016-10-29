@@ -36,9 +36,6 @@ struct IMaterialLib : public IConverter
 };
 
 
-X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
-
-
 X_DECLARE_FLAGS(MaterialFlag)(
 	NODRAW,			// not visable
 	EDITOR_VISABLE, // makes nodraw visable in editor modes.
