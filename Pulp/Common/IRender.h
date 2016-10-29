@@ -481,6 +481,9 @@ struct IRender
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
 
+	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
+	virtual void releaseShader(shader::IShader* pShader) X_ABSTRACT;
+
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================

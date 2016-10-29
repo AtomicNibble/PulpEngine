@@ -171,6 +171,18 @@ shader::IShader* RenderNull::getShader(const char* path)
 	return nullptr;
 }
 
+void RenderNull::releaseTexture(texture::ITexture* pTex)
+{
+	X_UNUSED(pTex);
+
+}
+
+void RenderNull::releaseShader(shader::IShader* pShader)
+{
+	X_UNUSED(pShader);
+
+}
+
 void RenderNull::SetState(StateFlag state)
 {
 	X_UNUSED(state);

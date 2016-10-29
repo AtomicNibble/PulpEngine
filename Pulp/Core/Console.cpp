@@ -606,6 +606,7 @@ void XConsole::freeRenderResources(void)
 	if (pRender_)
 	{
 		if (pBackground_) {
+			pRender_->releaseTexture(pBackground_);
 		}
 	}
 }

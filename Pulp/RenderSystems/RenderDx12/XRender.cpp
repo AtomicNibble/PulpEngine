@@ -805,6 +805,15 @@ shader::IShader* XRender::getShader(const char* pName)
 	return pShader;
 }
 
+void XRender::releaseTexture(texture::ITexture* pTex)
+{
+	pTextureMan_->releaseTexture(pTex);
+}
+
+void XRender::releaseShader(shader::IShader* pShader)
+{
+	pShaderMan_->releaseShader(static_cast<shader::XShader*>(pShader));
+}
 
 bool XRender::freeSwapChainResources(void)
 {

@@ -47,6 +47,9 @@ public:
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;
 
+	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
+	void releaseShader(shader::IShader* pShader) X_OVERRIDE;
+
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================
