@@ -131,6 +131,10 @@ static const char		 MODEL_MESH_COL_SPHERE_PREFIX[] = "PSP_";
 static const char		 MODEL_MESH_COL_CONVEX_PREFIX[] = "PCX_";
 
 
+static const uint32_t	 MODEL_MAX_LOADED = 1 << 13; // max models that can be loaded.
+
+
+
 struct IModelLib : public IConverter
 {
 
