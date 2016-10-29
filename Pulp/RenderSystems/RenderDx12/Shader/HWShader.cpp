@@ -22,24 +22,24 @@ namespace shader
 	namespace
 	{
 
-		Flags<ParamFlags> VarTypeToFlags(const D3D12_SHADER_TYPE_DESC& CDesc)
+		ParamFlags VarTypeToFlags(const D3D12_SHADER_TYPE_DESC& CDesc)
 		{
-			Flags<ParamFlags> f;
+			ParamFlags f;
 
 			if (CDesc.Class == D3D10_SVC_MATRIX_COLUMNS)
 			{
-				f.Set(ParamFlags::MATRIX);
+				f.Set(ParamFlag::MATRIX);
 			}
 			else if (CDesc.Class == D3D10_SVC_VECTOR)
 			{
 				if (CDesc.Columns == 4) {
-					f.Set(ParamFlags::VEC4);
+					f.Set(ParamFlag::VEC4);
 				}
 				else if (CDesc.Columns == 3) {
-					f.Set(ParamFlags::VEC3);
+					f.Set(ParamFlag::VEC3);
 				}
 				else if (CDesc.Columns == 2) {
-					f.Set(ParamFlags::VEC2);
+					f.Set(ParamFlag::VEC2);
 				}
 				else
 				{
@@ -60,7 +60,7 @@ namespace shader
 		{
 			const char* name;
 			ParamType::Enum type;
-			Flags<ParamFlags> flags;
+			ParamFlags flags;
 			XParamDB()
 			{
 				name = nullptr;
@@ -72,7 +72,7 @@ namespace shader
 				type = inType;
 			}
 
-			XParamDB(const char* inName, ParamType::Enum inType, ParamFlags::Enum inFlags) :
+			XParamDB(const char* inName, ParamType::Enum inType, ParamFlag::Enum inFlags) :
 				XParamDB(inName, inType)
 			{
 				flags = inFlags;
@@ -93,21 +93,21 @@ namespace shader
 			//	XParamDB("ViewProjMatrix", ParamType::PF_ViewProjMatrix),
 			//	XParamDB("ViewProjMatrix", ParamType::PF_ViewProjMatrix),
 
-			XParamDB("worldToScreenMatrix", ParamType::PF_worldToScreenMatrix, ParamFlags::MATRIX),
-			XParamDB("worldToCameraMatrix", ParamType::PF_worldToCameraMatrix, ParamFlags::MATRIX),
-			XParamDB("cameraToWorldMatrix", ParamType::PF_cameraToWorldMatrix, ParamFlags::MATRIX),
-			XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, ParamFlags::MATRIX),
+			XParamDB("worldToScreenMatrix", ParamType::PF_worldToScreenMatrix, ParamFlag::MATRIX),
+			XParamDB("worldToCameraMatrix", ParamType::PF_worldToCameraMatrix, ParamFlag::MATRIX),
+			XParamDB("cameraToWorldMatrix", ParamType::PF_cameraToWorldMatrix, ParamFlag::MATRIX),
+			XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, ParamFlag::MATRIX),
 
-			XParamDB("worldMatrix", ParamType::PI_worldMatrix, ParamFlags::MATRIX),
-			XParamDB("viewMatrix", ParamType::PI_viewMatrix, ParamFlags::MATRIX),
-			XParamDB("projectionMatrix", ParamType::PI_projectionMatrix, ParamFlags::MATRIX),
-			XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, ParamFlags::MATRIX),
+			XParamDB("worldMatrix", ParamType::PI_worldMatrix, ParamFlag::MATRIX),
+			XParamDB("viewMatrix", ParamType::PI_viewMatrix, ParamFlag::MATRIX),
+			XParamDB("projectionMatrix", ParamType::PI_projectionMatrix, ParamFlag::MATRIX),
+			XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, ParamFlag::MATRIX),
 
 
 
-			XParamDB("time", ParamType::PF_Time, ParamFlags::FLOAT),
-			XParamDB("frameTime", ParamType::PF_FrameTime, ParamFlags::FLOAT),
-			XParamDB("screensize", ParamType::PF_ScreenSize, ParamFlags::VEC4),
+			XParamDB("time", ParamType::PF_Time, ParamFlag::FLOAT),
+			XParamDB("frameTime", ParamType::PF_FrameTime, ParamFlag::FLOAT),
+			XParamDB("screensize", ParamType::PF_ScreenSize, ParamFlag::VEC4),
 			XParamDB("cameraPos", ParamType::PF_CameraPos),
 
 			XParamDB("cameraFront", ParamType::PB_CameraFront),
@@ -559,7 +559,7 @@ namespace shader
 					continue;
 				}
 
-				if (entry->flags.IsSet(ParamFlags::MATRIX))
+				if (entry->flags.IsSet(ParamFlag::MATRIX))
 				{
 					if (CTDesc.Class != D3D10_SVC_MATRIX_COLUMNS && CTDesc.Class != D3D10_SVC_MATRIX_ROWS)
 					{
@@ -573,7 +573,7 @@ namespace shader
 					}
 
 				}
-				else if (entry->flags.IsSet(ParamFlags::VEC4))
+				else if (entry->flags.IsSet(ParamFlag::VEC4))
 				{
 					if (CTDesc.Class != D3D10_SVC_VECTOR || CTDesc.Columns != 4)
 					{
@@ -581,7 +581,7 @@ namespace shader
 						return false;
 					}
 				}
-				else if (entry->flags.IsSet(ParamFlags::FLOAT))
+				else if (entry->flags.IsSet(ParamFlag::FLOAT))
 				{
 					if (CTDesc.Class != D3D10_SVC_SCALAR || CTDesc.Columns != 1 || CTDesc.Rows != 1)
 					{

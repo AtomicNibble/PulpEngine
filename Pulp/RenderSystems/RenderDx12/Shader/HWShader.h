@@ -17,9 +17,11 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-	X_DECLARE_FLAGS8(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
+	X_DECLARE_FLAGS8(ParamFlag)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
 	X_DECLARE_FLAGS8(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, ReadyToRock, FailedToCompile);
 	X_DECLARE_ENUM8(ConstbufType)(PER_FRAME, PER_BATCH, PER_INSTANCE);
+
+	typedef Flags8<ParamFlag> ParamFlags;
 
 	class ShaderBin;
 	class XShaderManager;
@@ -94,7 +96,7 @@ namespace shader
 		core::string		name;
 		// 4
 		core::StrHash		nameHash;
-		Flags8<ParamFlags>	flags;
+		ParamFlags			flags;
 		ParamType::Enum		type;
 		// 8
 		int16_t				bind;
@@ -199,6 +201,7 @@ namespace shader
 		ParamArr bindVars_;
 		ByteArr bytecode_;
 	};
+
 
 } // namespace shader
 
