@@ -24,6 +24,7 @@ static const uint32_t MAX_SHADERS = 256;
 static const uint32_t MAX_HW_SHADERS = 256;
 static const uint32_t MAX_SHADER_SOURCE = 256;
 
+
 struct BlendType
 {
 	enum Enum
@@ -363,7 +364,7 @@ public:
 	}
 
 	X_INLINE void cleanUp(void) {	
-		core::SafeRelease(pITex);
+	//	core::SafeRelease(pITex);
 	}
 
 	union {
@@ -437,11 +438,11 @@ struct IShader
 {
 	virtual ~IShader() {}
 
-	virtual ShaderID getID(void) X_ABSTRACT;
-	virtual const int32_t addRef(void) X_ABSTRACT;
-	virtual const int32_t release(void) X_ABSTRACT;
+//	virtual ShaderID getID(void) X_ABSTRACT;
+//	virtual const int32_t addRef(void) X_ABSTRACT;
+//	virtual const int32_t release(void) X_ABSTRACT;
 
-	virtual const char* getName(void) const X_ABSTRACT;
+	virtual const core::string& getName(void) const X_ABSTRACT;
 
 
 	// tech stuff.

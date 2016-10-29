@@ -9,6 +9,8 @@
 #include <String\Lexer.h>
 #include <String\StringHash.h>
 
+#include <Util\ScopedPointer.h>
+
 #include <IConsole.h>
 #include <IFileSys.h>
 
@@ -102,15 +104,28 @@ namespace shader
 	XShaderManager::XShaderManager(core::MemoryArenaBase* arena) :
 		arena_(arena),
 		pCrc32_(nullptr),
-		sourcebin_(arena, 128),
+		sourcebin_(arena, MAX_SHADER_SOURCE),
 		shaderBin_(arena),
-		shaders_(arena, 256),
-		hwShaders_(arena, 256),
+		hwShaders_(arena, sizeof(XHWShader), X_ALIGN_OF(XHWShader)),
+		shaders_(arena, sizeof(XShader), X_ALIGN_OF(XShader)),
 		ilRoot_(arena),
 		pDefaultShader_(nullptr),
 		pFixedFunction_(nullptr),
 		pFont_(nullptr),
-		pGui_(nullptr)
+		pGui_(nullptr),
+
+		sourcePoolHeap_(
+			core::bitUtil::RoundUpToMultiple<size_t>(
+				PoolArena::getMemoryRequirement(core::Max(sizeof(SourceFile),sizeof(ShaderSourceFile))) * MAX_SHADER_SOURCE,
+				core::VirtualMem::GetPageSize()
+			)
+		),
+		sourcePoolAllocator_(sourcePoolHeap_.start(), sourcePoolHeap_.end(),
+			PoolArena::getMemoryRequirement(sizeof(SourceFile)),
+			PoolArena::getMemoryAlignmentRequirement(core::Max(X_ALIGN_OF(SourceFile), X_ALIGN_OF(ShaderSourceFile))),
+			PoolArena::getMemoryOffsetRequirement()
+		),
+		sourcePoolArena_(&sourcePoolAllocator_, "ShaderSourcePool")
 	{
 
 	}
@@ -161,7 +176,7 @@ namespace shader
 		return true;
 	}
 
-	bool XShaderManager::shutdown(void)
+	bool XShaderManager::shutDown(void)
 	{
 		X_LOG1("ShadersManager", "Shutting Down");
 		X_ASSERT_NOT_NULL(gEnv);
@@ -184,11 +199,20 @@ namespace shader
 
 	XShader* XShaderManager::forName(const char* pName)
 	{
-		core::Path<char> temp(pName);
+		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> temp(pName);
 		temp.toLower();
 		return loadShader(temp.c_str());
 	}
 
+	void XShaderManager::releaseShader(XShader* pShader)
+	{
+		ShaderResource* pshaderRes = static_cast<ShaderResource*>(pShader);
+
+		if (pshaderRes->removeReference() == 0)
+		{
+			shaders_.releaseAsset(pshaderRes);
+		}
+	}
 
 	bool XShaderManager::sourceToString(const char* pName, core::string& strOut)
 	{
@@ -243,20 +267,19 @@ namespace shader
 
 	bool XShaderManager::freeCoreShaders(void)
 	{
-		core::SafeRelease(pDefaultShader_);
-		core::SafeRelease(pFixedFunction_);
-		core::SafeRelease(pFont_);
-		core::SafeRelease(pGui_);
-
+		releaseShader(pDefaultShader_);
+		releaseShader(pFixedFunction_);
+		releaseShader(pFont_);
+		releaseShader(pGui_);
+		
 		return true;
 	}
 
 
-	XShader* XShaderManager::getLoadedShader(const char* pName)
+	XShaderManager::ShaderResource* XShaderManager::getLoadedShader(const char* pName)
 	{
-		auto shader = shaders_.findAsset(pName);
-		
-		return static_cast<XShader*>(shader);
+		core::string name(pName);
+		return shaders_.findAsset(name);
 	}
 
 
@@ -322,7 +345,7 @@ namespace shader
 					}
 
 					{
-						pShaderSource = X_NEW_ALIGNED(ShaderSourceFile, g_rendererArena, "ShaderSourceFile", 8)(arena_);
+						pShaderSource = X_NEW(ShaderSourceFile, &sourcePoolArena_, "ShaderSourceFile")(arena_);
 
 						while (lex.ReadToken(token))
 						{
@@ -332,7 +355,7 @@ namespace shader
 
 							if (!token.isEqual("{")) {
 								X_ERROR("Shader", "expected { on line: %i", token.GetLine());
-								X_DELETE(pShaderSource, g_rendererArena);
+								X_DELETE(pShaderSource, &sourcePoolArena_);
 								return nullptr;
 							}
 
@@ -342,7 +365,7 @@ namespace shader
 							if (!tech.parse(lex))
 							{
 								X_ERROR("Shader", "failed to parse tech");
-								X_DELETE(pShaderSource, g_rendererArena);
+								X_DELETE(pShaderSource, &sourcePoolArena_);
 								return nullptr;
 							}
 
@@ -353,7 +376,7 @@ namespace shader
 
 					if (!lex.ExpectTokenString("}")) {
 						X_ERROR("Shader", "missing closing brace");
-						X_DELETE(pShaderSource, g_rendererArena);
+						X_DELETE(pShaderSource, &sourcePoolArena_);
 						pShaderSource = nullptr;
 					}
 				}
@@ -371,7 +394,7 @@ namespace shader
 			pShaderSource->pHlslFile_ = loadRawSourceFile(sourceFileName.c_str());
 
 			if (!pShaderSource->pHlslFile_) {
-				X_DELETE(pShaderSource, g_rendererArena);
+				X_DELETE(pShaderSource, &sourcePoolArena_);
 				return nullptr;
 			}
 
@@ -461,7 +484,7 @@ namespace shader
 				else
 				{
 
-					pSourceFile = X_NEW_ALIGNED(SourceFile, arena_, "SourceFile", 8)(arena_);
+					pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(arena_);
 					pSourceFile->setName(core::string(pName));
 					pSourceFile->setFileName(core::string(path.fileName()));
 					pSourceFile->setFileData(str);
@@ -611,26 +634,15 @@ namespace shader
 	}
 
 
-	XShader* XShaderManager::createShader(const char* pName)
+	XShaderManager::ShaderResource* XShaderManager::createShader(const char* pName)
 	{
-		X_ASSERT_NOT_NULL(pName);
+		core::string name(pName);
+
+		X_ASSERT(shaders_.findAsset(name) == nullptr, "Creating asset that already exsists")(pName);
 
 		// check if this shader already exsists.
-		XShader* pShader = getLoadedShader(pName);
-
-		if (pShader)
-		{
-			pShader->addRef();
-		}
-		else
-		{
-			core::string name(pName);
-
-			pShader = X_NEW(XShader, arena_, "Shader")(arena_);
-			pShader->name_ = name;
-			shaders_.AddAsset(name, pShader);
-		}
-
+		auto* pShader = shaders_.createAsset(name, arena_);
+		pShader->name_ = name;
 		return pShader;
 	}
 
@@ -639,12 +651,10 @@ namespace shader
 	{
 		X_ASSERT_NOT_NULL(pName);
 
-		XShader* pShader = nullptr;
-
 		// already loaded?
-		pShader = getLoadedShader(pName);
-
+		auto*  pShader = getLoadedShader(pName);
 		if (pShader) {
+			pShader->addReference();
 			return pShader;
 		}
 
@@ -713,7 +723,7 @@ namespace shader
 
 			}
 
-			X_DELETE(pSource, g_rendererArena);
+			X_DELETE(pSource, &sourcePoolArena_);
 		}
 
 		return pShader;
@@ -725,7 +735,6 @@ namespace shader
 		X_ASSERT_NOT_NULL(name);
 
 		XShader* pShader = nullptr;
-		ShaderSourceFile* pShaderSource = nullptr;
 		size_t i, x, numTecs;
 
 		// already loaded?
@@ -735,9 +744,11 @@ namespace shader
 		{
 
 			// reload the shader file.
-			pShaderSource = loadShaderFile(name, true);
+			ShaderSourceFile * pShaderSource = loadShaderFile(name, true);
 			if (pShaderSource)
 			{
+				core::ScopedPointer<ShaderSourceFile> scopedDelete(pShaderSource, &sourcePoolArena_);
+
 				// we don't reload the .shader if the source is the same.
 				if (pShader->sourceCrc32_ != pShaderSource->sourceCrc32_)
 				{
@@ -881,8 +892,6 @@ namespace shader
 						}
 					}
 				}
-
-				X_DELETE(pShaderSource, g_rendererArena);
 			}
 		}
 		else
@@ -918,39 +927,33 @@ namespace shader
 		X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-		XHWShader* pShader = nullptr;
+		core::string nameStr(name.c_str());
 
-		auto it = hwShaders_.find(X_CONST_STRING(name.c_str()));
-		if (it != hwShaders_.end())
+		HWShaderResource* pHWShaderRes = hwShaders_.findAsset(nameStr);
+		if (pHWShaderRes)
 		{
-			pShader = it->second;
+			pHWShaderRes->addReference();
 
-		//	pShader->addRef();
-
-			if (pShader->invalidateIfChanged(pSourceFile->getSourceCrc32()))
+			if (pHWShaderRes->invalidateIfChanged(pSourceFile->getSourceCrc32()))
 			{
-				// we don't need to do anything currently.
-				
+				// we don't need to do anything currently.		
 			}
-		}
-		else
-		{
-			pShader = X_NEW(XHWShader, arena_, "HWShader")(arena_, *this, type,
-				name.c_str(), entry, pSourceFile, techFlags);
 
-
-			hwShaders_.insert(std::make_pair(core::string(name.c_str()), pShader));
+			return pHWShaderRes;
 		}
 
+		pHWShaderRes = hwShaders_.createAsset(nameStr, arena_, *this, type,
+			name.c_str(), entry, pSourceFile, techFlags);
 
-		return pShader;
+
+		return pHWShaderRes;
 	}
 
 	bool XShaderManager::freeSourcebin(void)
 	{
-		ShaderSourceMap::iterator it = sourcebin_.begin();;
+		auto it = sourcebin_.begin();;
 		for (; it != sourcebin_.end(); ++it) {
-			X_DELETE(it->second, g_rendererArena);
+			X_DELETE(it->second, &sourcePoolArena_);
 		}
 
 		sourcebin_.free();
@@ -959,11 +962,6 @@ namespace shader
 
 	bool XShaderManager::freeSourceHwShaders(void)
 	{
-		HWShaderMap::iterator it = hwShaders_.begin();;
-		for (; it != hwShaders_.end(); ++it) {
-			X_DELETE(it->second, g_rendererArena);
-		}
-
 		hwShaders_.free();
 		return true;
 	}
@@ -973,24 +971,20 @@ namespace shader
 	{
 		X_UNUSED(pSarchPatten);
 
-#if 0
-		render::XRenderResourceContainer::ResourceConstItor it = shaders_.begin();
-		XShader* pShader;
+		auto it = shaders_.begin();
 
 		X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", shaders_.size());
-
 		for (; it != shaders_.end(); ++it)
 		{
-			pShader = static_cast<XShader*>(it->second);
+			auto pShader = it->second;
 
-			X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %" PRIuS " crc: ^10x%08x^7 vertexFmt: %s",
+			X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %" PRIuS " crc: ^10x%08x^7",
 				pShader->name_.c_str(),
 				pShader->techs_.size(),
-				pShader->sourceCrc32_,
-				VertexFormat::toString(pShader->vertexFmt_));
+				pShader->sourceCrc32_
+			);
 		}
 		X_LOG0("Shader", "------------ ^8Shaders End^7 -------------");
-#endif
 	}
 
 	void XShaderManager::listShaderSources(const char* pSarchPatten)
@@ -1003,8 +997,7 @@ namespace shader
 				pSource->getSourceCrc32());
 		};
 
-		ShaderSourceMap::const_iterator it = sourcebin_.begin();
-
+		auto it = sourcebin_.begin();
 		if (!pSarchPatten) {
 			for (; it != sourcebin_.end(); ++it) {
 				printfunc(it->second);

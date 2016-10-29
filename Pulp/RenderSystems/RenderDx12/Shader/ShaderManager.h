@@ -8,9 +8,11 @@
 
 #include <Assets\AssertContainer.h>
 
+#include "Shader.h"
 #include "ShaderBin.h"
 #include "ShaderVars.h"
 #include "ILTree.h"
+
 
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
@@ -30,18 +32,34 @@ namespace shader
 	class XShaderManager : public core::IXHotReload
 	{
 		typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
-		typedef core::HashMap<core::string, XHWShader*> HWShaderMap;
-		typedef core::XResourceContainer ShaderCon;
+		
+		// Shaders
+		typedef core::AssetContainer<XShader, MAX_SHADERS, core::MultiThreadPolicy<core::Spinlock>> ShaderContainer;
+		typedef ShaderContainer::Resource ShaderResource;
+
+		// HWShaders
+		typedef core::AssetContainer<XHWShader, MAX_HW_SHADERS, core::MultiThreadPolicy<core::Spinlock>> HWShaderContainer;
+		typedef HWShaderContainer::Resource HWShaderResource;
+
+		// Shader Source
+		typedef core::MemoryArena<
+			core::PoolAllocator,
+			core::MultiThreadPolicy<core::Spinlock>,
+			core::SimpleBoundsChecking,
+			core::SimpleMemoryTracking,
+			core::SimpleMemoryTagging> PoolArena;
+
 
 	public:
 		XShaderManager(core::MemoryArenaBase* arena);
 		~XShaderManager();
 
 		bool init(void);
-		bool shutdown(void);
+		bool shutDown(void);
 
 		// loads shader if not already loaded.
 		XShader* forName(const char* pName);
+		void releaseShader(XShader* pShader);
 
 		// returns merged source.
 		bool sourceToString(const char* pName, core::string& strOut);
@@ -55,7 +73,7 @@ namespace shader
 
 
 		// returns a loaded shader, null if not fnd.
-		XShader* getLoadedShader(const char* pName);
+		ShaderResource* getLoadedShader(const char* pName);
 
 		ShaderSourceFile* loadShaderFile(const char* pName, bool reload = false);
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
@@ -63,7 +81,7 @@ namespace shader
 		void parseIncludesAndPrePro_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
 			bool reload = false);
 
-		XShader* createShader(const char* pName);
+		ShaderResource* createShader(const char* pName);
 		XShader* loadShader(const char* pName);
 		XShader* reloadShader(const char* pName);
 
@@ -95,8 +113,15 @@ namespace shader
 		core::Crc32* pCrc32_;
 		ShaderSourceMap sourcebin_;
 		ShaderBin shaderBin_;
-		ShaderCon shaders_;
-		HWShaderMap hwShaders_;
+
+		// allocator for source objects.
+		core::HeapArea      sourcePoolHeap_;
+		core::PoolAllocator sourcePoolAllocator_;
+		PoolArena			sourcePoolArena_;
+
+		// ref counted resources
+		HWShaderContainer hwShaders_;
+		ShaderContainer shaders_;
 
 		ILTreeNode ilRoot_;	
 		ShaderVars vars_;

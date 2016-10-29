@@ -155,17 +155,6 @@ XShader::~XShader()
 	}
 }
 
-const int32_t XShader::release(void)
-{
-	int32_t ref = XBaseAsset::release();
-	if (ref == 0)
-	{
-		X_DELETE(this, g_rendererArena);
-	}
-
-	return ref;
-}
-
 
 
 } // namespace shader
