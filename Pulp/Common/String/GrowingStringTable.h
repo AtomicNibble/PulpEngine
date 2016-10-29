@@ -11,6 +11,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+struct XFile;
+
 // valid IdTypes: uint16_t, uint32_t
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
