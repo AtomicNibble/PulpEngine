@@ -6,8 +6,7 @@ X_INLINE XHashIndex::XHashIndex(core::MemoryArenaBase* arena)
 	init(DEFAULT_HASH_SIZE, DEFAULT_HASH_SIZE);
 }
 
-X_INLINE XHashIndex::XHashIndex(const int initialHashSize, const int initialIndexSize, 
-	core::MemoryArenaBase* arena) 
+X_INLINE XHashIndex::XHashIndex(core::MemoryArenaBase* arena, const int initialHashSize, const int initialIndexSize) 
 {
 	arena_ = arena;
 	init(initialHashSize, initialIndexSize);

@@ -15,10 +15,9 @@ class XHashIndex
 	typedef int32_t index_type;
 	typedef int32_t size_type;
 
-	
 public:
 	XHashIndex(core::MemoryArenaBase* arena);
-	XHashIndex(const int initialHashSize, const int initialIndexSize, core::MemoryArenaBase* arena);
+	XHashIndex(core::MemoryArenaBase* arena, const int initialHashSize, const int initialIndexSize);
 	~XHashIndex(void);
 
 	// returns total size of allocated memory
