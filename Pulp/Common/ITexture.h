@@ -326,16 +326,10 @@ struct ITexture
 {
 	virtual ~ITexture(){};
 
-	// textures are shared, we ref count them so we know when we are done.
-	virtual const int addRef() X_ABSTRACT;
-	virtual const int release() X_ABSTRACT;
-	virtual const int forceRelease() X_ABSTRACT;
-
-
 	// the resource id.
 	virtual const TexID getTexID() const X_ABSTRACT;
 
-	virtual const char* getName() const X_ABSTRACT;
+	virtual const core::string& getName() const X_ABSTRACT;
 	virtual const Vec2<uint16_t> getDimensions() const X_ABSTRACT;
 	virtual const int getWidth() const X_ABSTRACT;
 	virtual const int getHeight() const X_ABSTRACT;

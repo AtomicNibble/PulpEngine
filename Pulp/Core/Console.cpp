@@ -606,7 +606,6 @@ void XConsole::freeRenderResources(void)
 	if (pRender_)
 	{
 		if (pBackground_) {
-			pBackground_->release();
 		}
 	}
 }

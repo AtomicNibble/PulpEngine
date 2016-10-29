@@ -5,6 +5,8 @@
 
 #include "TextureVars.h"
 
+#include <Assets\AssertContainer.h>
+
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
 )
@@ -23,7 +25,10 @@ class XTextureFile;
 
 class TextureManager : public core::IXHotReload
 {
-	typedef core::HashMap<core::string, Texture*> TextureMap;
+	typedef core::AssetContainer<Texture, TEX_MAX_LOADED_IMAGES, core::MultiThreadPolicy<core::Spinlock>> TextureContainer;
+	typedef TextureContainer::Resource TextureResource;
+	typedef TextureContainer::Resource TexRes;
+
 	typedef core::FixedArray<ITextureFmt*, 8> TextureLoadersArr;
 
 public:
@@ -42,10 +47,13 @@ public:
 	Texture* getByID(TexID texId);
 	Texture* getDefault(void);
 
+	// must not be null.
+	void releaseTexture(texture::ITexture* pTex);
+	void releaseTexture(Texture* pTex);
+
 private:
-	Texture* findTexture(const char* pName);
-	Texture* findTexture(const core::string& name);
-	void removeTexture(Texture* pTex);
+	TexRes* findTexture(const char* pName);
+	TexRes* findTexture(const core::string& name);
 	bool reloadForName(const char* pName);
 
 	bool loadDefaultTextures(void);
@@ -79,7 +87,7 @@ private:
 	render::DescriptorAllocator& descriptorAlloc_;
 
 	core::MemoryArenaBase* arena_;
-	TextureMap textures_;
+	TextureContainer textures_;
 	TextureVars vars_;
 
 	ITextureFmt* pCILoader_;

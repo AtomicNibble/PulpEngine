@@ -24,14 +24,11 @@ class TextureManager;
 		void destroy(void);
 
 		// temp maybe
-		X_INLINE const int addRef() X_OVERRIDE { return 1; }
-		X_INLINE const int release() X_OVERRIDE { return 0; }
-		X_INLINE const int forceRelease() X_OVERRIDE { return 0;}
 		X_INLINE const TexID getTexID(void) const X_OVERRIDE { return 0; };
 		X_INLINE const bool IsShared() const X_OVERRIDE { return false; }
 
 
-		X_INLINE const char* getName(void) const X_OVERRIDE;
+		X_INLINE const core::string& getName(void) const X_OVERRIDE;
 		X_INLINE const Vec2<uint16_t> getDimensions(void) const X_OVERRIDE;
 		X_INLINE const int32_t getWidth(void) const X_OVERRIDE;
 		X_INLINE const int32_t getHeight(void) const X_OVERRIDE;

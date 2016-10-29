@@ -18,7 +18,7 @@ X_NAMESPACE_BEGIN(texture)
 		pDevice_(pDevice),
 		descriptorAlloc_(descriptorAlloc),
 		arena_(arena),
-		textures_(arena, TEX_MAX_LOADED_IMAGES),
+		textures_(arena, sizeof(Texture), X_ALIGN_OF(Texture)),
 		pTexDefault_(nullptr),
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
@@ -119,36 +119,36 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		core::string name(pName);
 
-		Texture* pTex = findTexture(name);
+		TexRes* pTexRes = findTexture(name);
 
-		if (pTex)
+		if (pTexRes)
 		{
-		//	pTex->addRef(); // add a ref.
+			pTexRes->addReference();
 		}
 		else
 		{
-			pTex = X_NEW(Texture, arena_, "Texture")(pName, flags);
-			textures_.insert(std::make_pair(name, pTex));
+			pTexRes = textures_.createAsset(name, pName, flags);
 
-			if (pTex->IsStreamable() && flags.IsSet(TexFlag::DONT_STREAM)) {
-				stream(pTex);
+			if (pTexRes->IsStreamable() && flags.IsSet(TexFlag::DONT_STREAM)) {
+				stream(pTexRes);
 			}
 			else {
-				if (!load(pTex)) {
-					pTex->flags_.Set(TexFlag::LOAD_FAILED);
+				if (!load(pTexRes)) {
+					pTexRes->flags_.Set(TexFlag::LOAD_FAILED);
 
-					X_WARNING("Texture", "Failed to load: \"%s\"", pTex->fileName_.c_str());
+					X_WARNING("Texture", "Failed to load: \"%s\"", pTexRes->fileName_.c_str());
 				}
 			}
 		}
 
-		return pTex;
+		return pTexRes;
 	}
 
 
 	Texture* TextureManager::getByID(TexID texId)
 	{
 		X_UNUSED(texId);
+		X_ASSERT_NOT_IMPLEMENTED();
 		return nullptr;
 	}
 
@@ -157,35 +157,36 @@ X_NAMESPACE_BEGIN(texture)
 		return pTexDefault_;
 	}
 
-	Texture* TextureManager::findTexture(const char* pName)
+	void TextureManager::releaseTexture(texture::ITexture* pTex)
 	{
-		auto it = textures_.find(X_CONST_STRING(pName));
-		if (it != textures_.end()) {
-			return it->second;
-		}
-
-		return nullptr;
+		return releaseTexture(static_cast<Texture*>(pTex));
 	}
 
-	Texture* TextureManager::findTexture(const core::string& name)
+	void TextureManager::releaseTexture(Texture* pTex)
 	{
-		auto it = textures_.find(name);
-		if (it != textures_.end()) {
-			return it->second;
-		}
+		X_ASSERT_NOT_NULL(pTex);
 
-		return nullptr;
-	}
+		TexRes* pTexRes = static_cast<TexRes*>(pTex);
 
-	void TextureManager::removeTexture(Texture* pTex)
-	{
-		if (pTex && pTex->release() == 0)
+		if (pTexRes->removeReference() == 0)
 		{
 			core::string name(pTex->getName());
-			X_DELETE(pTex, arena_);
-			textures_.erase(name);
+			
+			textures_.releaseAsset(pTexRes);
 		}
 	}
+
+	TextureManager::TexRes* TextureManager::findTexture(const char* pName)
+	{
+		core::string name(pName);
+		return findTexture(name);
+	}
+
+	TextureManager::TexRes* TextureManager::findTexture(const core::string& name)
+	{
+		return textures_.findAsset(name);
+	}
+
 
 	bool TextureManager::reloadForName(const char* pName)
 	{
@@ -232,17 +233,17 @@ X_NAMESPACE_BEGIN(texture)
 	void TextureManager::releaseDefaultTextures(void)
 	{
 
-		removeTexture(pTexDefault_);
-		removeTexture(pTexDefaultBump_);
-		removeTexture(ptexMipMapDebug_);
+		releaseTexture(pTexDefault_);
+		releaseTexture(pTexDefaultBump_);
+		releaseTexture(ptexMipMapDebug_);
 	}
 
 	void TextureManager::releaseDanglingTextures(void)
 	{
-		TextureMap::iterator it = textures_.begin();;
+		auto it = textures_.begin();
 		for (; it != textures_.end(); ++it) {
-			X_WARNING("Texture", "\"%s\" was not deleted", it->second->getName());
-			X_DELETE(it->second, arena_);
+			auto texRes = it->second;
+			X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, texRes->getName(), texRes->getRefCount());
 		}
 
 		textures_.free();
@@ -251,7 +252,7 @@ X_NAMESPACE_BEGIN(texture)
 	bool TextureManager::stream(Texture* pTex)
 	{
 		// start streaming the texture.
-
+		X_ASSERT_NOT_IMPLEMENTED();
 
 		return true;
 	}
@@ -292,7 +293,8 @@ X_NAMESPACE_BEGIN(texture)
 		const auto flags = pTex->getFlags();
 		if (flags.IsSet(TextureFlags::FORCE_MIPS))
 		{
-
+			// we could just load the img lib and process this.
+			// but fuck you.
 			X_ASSERT_NOT_IMPLEMENTED();
 			return false;
 		}
@@ -515,7 +517,7 @@ X_NAMESPACE_BEGIN(texture)
 		switch (fmt)
 		{
 		case Texturefmt::R8G8B8:
-			return DXGI_FORMAT_R8G8B8A8_UNORM;
+			return DXGI_FORMAT_R8G8B8A8_UNORM; // is this right?
 		case Texturefmt::R8G8B8A8:
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
 

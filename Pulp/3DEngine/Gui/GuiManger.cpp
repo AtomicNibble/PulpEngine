@@ -100,8 +100,7 @@ void XGuiManager::Shutdown(void)
 
 	gEnv->pInput->RemoveEventListener(this);
 
-	if (pCursorArrow_) {
-		pCursorArrow_->release();
+	if (gEnv->pRender && pCursorArrow_) {
 	}
 }
 

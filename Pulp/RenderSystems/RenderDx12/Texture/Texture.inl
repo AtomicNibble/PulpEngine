@@ -2,9 +2,9 @@
 X_NAMESPACE_BEGIN(texture)
 
 
-	X_INLINE const char* Texture::getName(void) const
+	X_INLINE const core::string& Texture::getName(void) const
 	{
-		return fileName_.c_str();
+		return fileName_;
 	}
 
 	X_INLINE const Vec2<uint16_t> Texture::getDimensions(void) const
