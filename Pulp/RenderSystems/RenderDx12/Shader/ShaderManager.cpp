@@ -1136,17 +1136,6 @@ namespace shader
 #endif
 	}
 
-	void XShaderManager::writeSourceToFile(core::XFile* pFile, const SourceFile* pSourceFile)
-	{
-		X_ASSERT_NOT_NULL(pFile);
-		X_ASSERT_NOT_NULL(pSourceFile);
-
-		pFile->printf("\n// ======== %s ========\n\n", pSourceFile->getFileName().c_str());
-		pFile->write(pSourceFile->getFileData().c_str(), safe_static_cast<uint32_t, size_t>(pSourceFile->getFileData().length()));
-	}
-
-
-
 	void XShaderManager::Cmd_ListShaders(core::IConsoleCmdArgs* pArgs)
 	{
 		// optional search criteria

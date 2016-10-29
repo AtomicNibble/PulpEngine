@@ -37,6 +37,8 @@ namespace shader
 		SourceFile(core::MemoryArenaBase* arena);
 		~SourceFile() = default;
 
+		void writeSourceToFile(core::XFile* pFile) const;
+
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE const core::string& getFileName(void) const;
 		X_INLINE const core::string& getFileData(void) const;

@@ -4,6 +4,8 @@
 #include <String\Lexer.h>
 #include <String\StringTokenizer.h>
 
+#include <IFileSys.h>
+
 X_NAMESPACE_BEGIN(render)
 
 namespace shader
@@ -52,6 +54,15 @@ namespace shader
 	{
 
 	}
+
+	void SourceFile::writeSourceToFile(core::XFile* pFile) const
+	{
+		pFile->printf("\n// ======== %s ========\n\n", getFileName().c_str());
+		pFile->writeStringNNT(getFileData());
+	}
+
+
+	// -------------------------------------------------------------
 
 	ShaderSourceFile::ShaderSourceFile(core::MemoryArenaBase* arena) :
 		pFile_(nullptr),

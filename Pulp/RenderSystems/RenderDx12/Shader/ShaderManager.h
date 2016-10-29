@@ -103,7 +103,6 @@ namespace shader
 		// ~IXHotReload
 
 	private:
-		void writeSourceToFile(core::XFile* pFile, const SourceFile* pSource);
 
 		void Cmd_ListShaders(core::IConsoleCmdArgs* pArgs);
 		void Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs);
