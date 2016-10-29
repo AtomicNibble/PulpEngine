@@ -6,6 +6,7 @@ X_NAMESPACE_BEGIN(assetDb)
 
 
 static const char ASSET_NAME_SLASH = '/';
+static const char ASSET_NAME_INVALID_SLASH = '\\';
 static const size_t ASSET_NAME_MAX_LENGTH = 128;
 static const size_t ASSET_NAME_MIN_LENGTH = 2; // ban single char asset names?
 
