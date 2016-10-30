@@ -79,6 +79,7 @@ private:
 	void Cmd_ReloadTextures(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ReloadTexture(core::IConsoleCmdArgs* pCmd);
 
+public:
 	static DXGI_FORMAT DXGIFormatFromTexFmt(Texturefmt::Enum fmt);
 
 private:
