@@ -65,81 +65,36 @@ struct ShaderParamFreq
 
 // I support diffrent vertex formats
 // for use by the engine, not so much assets.
-struct VertexFormat
-{
-	// P = Position
-	// C = Color
-	// T = TexCord
-	// N = Normal
-	// TB = tanget & bi-normal
-	//
-	// Layout:
-	//         Type | Num | Format
-	// Eg: P3F -> Position 3 floats.
-	enum Enum : uint32_t
-	{		
-		P3F_T3F, // used in Aux Geo.
 
-		// 16bit tex coords
-		P3F_T2S,
-		P3F_T2S_C4B,
-		P3F_T2S_C4B_N3F,
-		P3F_T2S_C4B_N3F_TB3F,
+// P = Position
+// C = Color
+// T = TexCord
+// N = Normal
+// TB = tanget & bi-normal
+//
+// Layout:
+//         Type | Num | Format
+// Eg: P3F -> Position 3 floats.
 
-		// same as above but using compressed normals.
-		P3F_T2S_C4B_N10,
-		P3F_T2S_C4B_N10_TB10,
+X_DECLARE_ENUM8(VertexFormat)(
+	P3F_T3F, // used in Aux Geo.
 
-		// 32bit texcoords
-		P3F_T2F_C4B,  // used by gui.
+			 // 16bit tex coords
+	P3F_T2S,
+	P3F_T2S_C4B,
+	P3F_T2S_C4B_N3F,
+	P3F_T2S_C4B_N3F_TB3F,
 
-		// double coords
-		P3F_T4F_C4B_N3F,
+	// same as above but using compressed normals.
+	P3F_T2S_C4B_N10,
+	P3F_T2S_C4B_N10_TB10,
 
-		Num
-	};
+	// 32bit texcoords
+	P3F_T2F_C4B,  // used by gui.
 
-	// REMEBER: if you add new types that the input layout sytem 
-	// will need to check for it's flag.
-	static const char* toString(Enum type) {
-		switch (type) {
-			case P3F_T3F:
-				return "P3F_T3F";
-
-			case P3F_T2S:
-				return "P3F_T2S";
-			case P3F_T2S_C4B:
-				return "P3F_T2S_C4B";
-			case P3F_T2S_C4B_N3F:
-				return "P3F_T2S_C4B_N3F";
-			case P3F_T2S_C4B_N3F_TB3F:
-				return "P3F_T2S_C4B_N3F_TB3F";
-
-			case P3F_T2S_C4B_N10:
-				return "P3F_T2S_C4B_N10";
-			case P3F_T2S_C4B_N10_TB10:
-				return "P3F_T2S_C4B_N10_TB10";
-
-			case P3F_T2F_C4B:
-				return "P3F_T2F_C4B";
-
-			case P3F_T4F_C4B_N3F:
-				return "P3F_T4F_C4B_N3F";
-
-			case Num:
-				return "";
-#if X_DEBUG		
-			default:
-				X_ASSERT_UNREACHABLE();
-#else
-				X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
-		}
-
-		return "VertexFormat::Ukn";
-	}
-};
-
+				  // double coords
+	P3F_T4F_C4B_N3F
+);
 
 
 // -----------------------------------------------------------------------

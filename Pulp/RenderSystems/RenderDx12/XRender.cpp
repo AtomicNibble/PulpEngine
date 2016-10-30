@@ -827,7 +827,7 @@ bool XRender::freeSwapChainResources(void)
 
 void XRender::initILDescriptions(void)
 {
-	const uint32_t num = shader::VertexFormat::Num;
+	const uint32_t num = shader::VertexFormat::ENUM_COUNT;
 
 	D3D12_INPUT_ELEMENT_DESC elem_pos = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
 	D3D12_INPUT_ELEMENT_DESC elem_nor101010 = { "NORMAL", 0, DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };

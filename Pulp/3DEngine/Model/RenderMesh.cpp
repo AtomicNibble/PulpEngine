@@ -14,7 +14,7 @@ namespace
 {
 
 	// these are here till i can think of better place to put them.
-	static uint32_t vertexFormatStride[render::shader::VertexFormat::Num] =
+	static uint32_t vertexFormatStride[render::shader::VertexFormat::ENUM_COUNT] =
 	{
 		sizeof(Vertex_P3F_T3F),					// P3F_T3F
 
@@ -32,7 +32,7 @@ namespace
 	};
 
 
-	static uint32_t vertexSteamStride[VertexStream::ENUM_COUNT][render::shader::VertexFormat::Num] =
+	static uint32_t vertexSteamStride[VertexStream::ENUM_COUNT][render::shader::VertexFormat::ENUM_COUNT] =
 	{
 		// base vert stream
 		{
