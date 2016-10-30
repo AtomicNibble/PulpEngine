@@ -411,8 +411,11 @@ X_MULTILINE_MACRO_END
 
 
 //	 This function must be called once by each module at the beginning, to setup global pointers.
-extern "C" DLL_EXPORT void LinkModule(ICore *pCore, const char *moduleName);
-
+#if defined(_LAUNCHER)
+extern "C" void LinkModule(ICore* pCore, const char* moduleName);
+#else
+extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName);
+#endif
 
 // Summary:
 //	 Interface of the DLL.

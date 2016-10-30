@@ -30,7 +30,11 @@ struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 #endif
 
 
+#if defined(_LAUNCHER)
+extern "C" void LinkModule(ICore* pCore, const char* moduleName)
+#else
 extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
+#endif
 {
 	X_UNUSED(moduleName);
 

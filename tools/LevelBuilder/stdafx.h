@@ -1,5 +1,7 @@
 #pragma once
 
+#define _LAUNCHER
+
 #include <EngineCommon.h>
 
 #include "resource.h"
