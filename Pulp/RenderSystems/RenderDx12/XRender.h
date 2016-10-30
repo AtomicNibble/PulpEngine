@@ -104,9 +104,9 @@ public:
 	// ============== OLD API ======================
 	// =============================================
 
-	virtual void SetState(StateFlag state) X_OVERRIDE;
+//	virtual void SetState(StateFlag state) X_OVERRIDE;
 //	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
-	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
+//	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
 	virtual void SetViewport(int x, int y, int width, int height) X_OVERRIDE;
@@ -165,8 +165,8 @@ public:
 	virtual void FontSetBlending() X_OVERRIDE;
 	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
 		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
-	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-		PrimitiveTypePublic::Enum type) X_OVERRIDE;
+//	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+//		PrimitiveTypePublic::Enum type) X_OVERRIDE;
 	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_OVERRIDE;
 	virtual bool DefferedBegin(void) X_OVERRIDE;
 	virtual bool DefferedEnd(void) X_OVERRIDE;

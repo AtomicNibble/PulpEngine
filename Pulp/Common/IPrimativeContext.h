@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 class IPrimativeContext
 {
 protected:
-	typedef render::PrimitiveTypePublic PrimitiveType;
+	typedef render::TopoType PrimitiveType;
 
 public:
 	IPrimativeContext();

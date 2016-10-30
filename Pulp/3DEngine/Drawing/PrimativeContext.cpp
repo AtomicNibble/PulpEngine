@@ -66,7 +66,7 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 	// if the last entry was the same type
 	// just merge the verts in.
 	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().flags == flags &&
-		(PrimitiveType::PointList == primType || PrimitiveType::LineList == primType || PrimitiveType::TriangleList == primType))
+		(PrimitiveType::POINTLIST == primType || PrimitiveType::LINELIST == primType || PrimitiveType::TRIANGLELIST == primType))
 	{
 		auto& lastEntry = pushBufferArr_.back();
 		lastEntry.numVertices += numVertices;

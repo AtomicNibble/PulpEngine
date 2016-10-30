@@ -808,8 +808,9 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 
 			if (vbOffset == FONT_QUAD_BUFFER_SIZE)
 			{
-				pRenderer->DrawVB(pVertBuffer_, vbOffset,
-					render::PrimitiveTypePublic::TriangleList);
+				X_ASSERT_NOT_IMPLEMENTED();
+			//	pRenderer->DrawVB(pVertBuffer_, vbOffset,
+			//		render::PrimitiveTypePublic::TriangleList);
 
 				// reset baby.
 				vbOffset = 0;
@@ -822,8 +823,9 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 
 	// draw anything left.
 	if (vbOffset) {
-		pRenderer->DrawVB(pVertBuffer_, vbOffset,
-			render::PrimitiveTypePublic::TriangleList);
+		X_ASSERT_NOT_IMPLEMENTED();
+	//	pRenderer->DrawVB(pVertBuffer_, vbOffset,
+	//		render::PrimitiveTypePublic::TriangleList);
 	}
 
 	pRenderer->FontRestoreRenderingState();

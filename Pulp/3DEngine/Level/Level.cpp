@@ -635,23 +635,23 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 				// use the frustrum.		
 
 #if 0
-				CullType::Enum type = cam_.cullAABB_FastT(wbounds);
-				if (type == CullType::EXCLUSION)
+				CullResult::Enum type = cam_.cullAABB_FastT(wbounds);
+				if (type == CullResult::EXCLUSION)
 				{
 					frameStats_.culledModels++;
 					culled = true;
 				}
 
 #else
-				CullType::Enum type = cam_.cullSphere_ExactT(wSphere);
-				if (type == CullType::OVERLAP)
+				auto type = cam_.cullSphere_ExactT(wSphere);
+				if (type == CullResult::OVERLAP)
 				{
 					if (s_var_cullEnts_ > 1)
 					{
 						// sphere test says overlap.
 						// see if we can cull it with AABB.
 						type = cam_.cullAABB_FastT(wbounds);
-						if (type == CullType::EXCLUSION)
+						if (type == CullResult::EXCLUSION)
 						{
 							// got culled by AABB
 							cullColor = Color8u(0, 128, 0, 128);
@@ -668,7 +668,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 						visColor = Color8u(0, 0, 128, 128);
 					}	
 				}
-				else if (type == CullType::EXCLUSION)
+				else if (type == CullResult::EXCLUSION)
 				{
 					frameStats_.culledModels++;
 					culled = true;

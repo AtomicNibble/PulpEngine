@@ -30,7 +30,7 @@ class Ray;
 
 
 X_DECLARE_ENUM(FrustumPlane)(NEAR,FAR,RIGHT,LEFT,TOP,BOTTOM);
-X_DECLARE_ENUM(CullType)(EXCLUSION, OVERLAP, INCLUSION);
+X_DECLARE_ENUM(CullResult)(EXCLUSION, OVERLAP, INCLUSION);
 X_DECLARE_ENUM(PlaneVert)(TLEFT,TRIGHT,BLEFT,BRIGHT);
 
 class XFrustum
@@ -76,20 +76,20 @@ public:
 	// AABB
 	bool cullAABB_Fast(const AABB& box) const;
 	bool cullAABB_Exact(const AABB& box) const;
-	CullType::Enum cullAABB_FastT(const AABB& box) const;
-	CullType::Enum cullAABB_ExactT(const AABB& box) const;
+	CullResult::Enum cullAABB_FastT(const AABB& box) const;
+	CullResult::Enum cullAABB_ExactT(const AABB& box) const;
 
 	// OBB
 	bool cullOBB_Fast(const OBB& box) const;
 	bool cullOBB_Exact(const OBB& box) const;
-	CullType::Enum cullOBB_FastT(const OBB& box) const;
-	CullType::Enum cullOBB_ExactT(const OBB& box) const;
+	CullResult::Enum cullOBB_FastT(const OBB& box) const;
+	CullResult::Enum cullOBB_ExactT(const OBB& box) const;
 
 	// Sphere
 	bool cullSphere_Fast(const Sphere& sphere) const;
 	bool cullSphere_Exact(const Sphere& sphere) const;
-	CullType::Enum cullSphere_FastT(const Sphere& sphere) const;
-	CullType::Enum cullSphere_ExactT(const Sphere& sphere) const;
+	CullResult::Enum cullSphere_FastT(const Sphere& sphere) const;
+	CullResult::Enum cullSphere_ExactT(const Sphere& sphere) const;
 
 	void GetFrustumVertices(std::array<Vec3f, 8>& verts) const;
 	void GetFrustumVertices(std::array<Vec3f, 12>& verts) const;
@@ -102,8 +102,8 @@ public:
 		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
 
 private:
-	CullType::Enum AdditionalCheck(const AABB& aabb) const;
-	CullType::Enum AdditionalCheck(const OBB& obb, float32_t scale) const;
+	CullResult::Enum AdditionalCheck(const AABB& aabb) const;
+	CullResult::Enum AdditionalCheck(const OBB& obb, float32_t scale) const;
 
 
 protected:

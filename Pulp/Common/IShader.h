@@ -63,32 +63,6 @@ struct ShaderParamFreq
 };
 
 
-X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
-X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
-
-X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
-X_DECLARE_FLAGS(TechFlag)(Color, Textured, Skinned, Instanced);
-
-typedef Flags<ILFlag> ILFlags;
-typedef Flags<TechFlag> TechFlags;
-
-// a shader can have flags
-// Eg:
-//	"Fill(Textured)"
-//
-//	this means we compile it with thoses flags.
-//  
-//	"Fill(Textured)" -> compiled with X_TEXTURED
-//	"Fill(Color)" -> compiled with X_COLOR
-//	"Fill(Color, Textured)" -> compiled with X_COLOR then X_TEXTURED
-//
-//	how can the render system make use of this?
-//  what if a technique has flags that saying it supports Color, Textured
-//
-//
-
-
-
 // I support diffrent vertex formats
 // for use by the engine, not so much assets.
 struct VertexFormat
@@ -166,6 +140,58 @@ struct VertexFormat
 	}
 };
 
+
+
+// -----------------------------------------------------------------------
+
+X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
+X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
+
+
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//
+// These ILFlags are automatically detected whne parsing the hlsl source file.
+// It looks for macros that start with IL_*(Normal, BiNormal, Color)
+// 
+// When it finds these flags it knows the source supports been compiled with AND without that flags.
+// Which lets you define a shader that both works with and without Normal stream.
+//
+// The source will be compiled first with no flags defined which will be the minimum the shader requires as input.
+// Then the shader works out what the required streams are for that compiled source.
+//	
+//  It then repeats this step each time adding a flag follwed by calculating the IL for that compiled source.	
+//
+//	Example:
+//
+//		if the hlsl contains:
+//			#if IL_NORMAL
+//			#if IL_BINORMAL
+//
+//
+//		compile0:
+//				flags: <none>
+//				detectedIL:	POS_UV_COL
+//
+//		compile1:
+//				flags: IL_NORMAL
+//				detectedIL:	POS_UV_COL_NORM
+//
+//		compile2:
+//				flags: IL_NORMAL, IL_BINORMAL
+//				detectedIL:	POS_UV_COL_NORM_TAN_BI
+//
+//
+//	the order the flags are define between each compile pass matches the order of the enum.
+//	So you won't get: IL_BINORMAL defined before IL_NORMAL is defined, they accumulate in order.
+//		
+//	But it's totally possible to just have only IL_BINORMAL defined, if the shader requires normals but not binormals.
+//
+
+
+X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
+typedef Flags<ILFlag> ILFlags;
+
 X_DECLARE_ENUM(InputLayoutFormat)(
 	POS_UV,
 	POS_UV_COL,
@@ -173,11 +199,7 @@ X_DECLARE_ENUM(InputLayoutFormat)(
 	POS_UV_COL_NORM_TAN,
 	POS_UV_COL_NORM_TAN_BI,
 
-//	POS_UV2,
-//	POS_UV2_COL,
 	POS_UV2_COL_NORM,
-//	POS_UV2_COL_NORM_TAN,
-//	POS_UV2_COL_NORM_TAN_BI,
 
 	Invalid
 );
@@ -185,6 +207,41 @@ X_DECLARE_ENUM(InputLayoutFormat)(
 
 extern InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt);
 extern ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt);
+
+
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//
+//	These flags are to allow a shader to be compiled supporting difffrent features.
+//
+//	This means a shader can be select that supports skinning only
+//	Or the same shader that supports skinning and instancing.
+//	The flags are defined in the .shader file with the tech name currently.
+//
+//	Every permatation of the shader will be compiled:
+//
+//	"Fill(Textured)" -> compiled with: <none>, X_TEXTURED
+//	"Fill(Color)" -> compiled with: <none>, X_COLOR
+//	"Fill(Color, Textured)" -> compiled with: <none>, X_COLOR, X_TEXTURED, X_TEXTURED|X_COLOR
+//
+//
+//
+
+
+X_DECLARE_FLAGS(TechFlag)(
+	Color, 
+	Textured, 
+	Skinned, 
+	Instanced
+);
+
+typedef Flags<TechFlag> TechFlags;
+
+
+// <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
 
 struct TextureAddressMode
 {

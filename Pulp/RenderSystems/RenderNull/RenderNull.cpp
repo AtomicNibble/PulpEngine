@@ -183,15 +183,15 @@ void RenderNull::releaseShader(shader::IShader* pShader)
 
 }
 
-void RenderNull::SetState(StateFlag state)
-{
-	X_UNUSED(state);
-}
-
-void RenderNull::SetCullMode(CullMode::Enum mode)
-{
-	X_UNUSED(mode);
-}
+//void RenderNull::SetState(StateFlag state)
+//{
+//	X_UNUSED(state);
+//}
+//
+//void RenderNull::SetCullMode(CullMode::Enum mode)
+//{
+//	X_UNUSED(mode);
+//}
 
 void RenderNull::Set2D(bool value, float znear, float zfar)
 {
@@ -630,16 +630,16 @@ void RenderNull::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
 // ~Font
 
 
-void RenderNull::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-	PrimitiveTypePublic::Enum type)
-{
-	X_ASSERT_NOT_NULL(pVertBuffer);
-
-	X_UNUSED(pVertBuffer);
-	X_UNUSED(size);
-	X_UNUSED(type);
-
-}
+//void RenderNull::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+//	PrimitiveTypePublic::Enum type)
+//{
+//	X_ASSERT_NOT_NULL(pVertBuffer);
+//
+//	X_UNUSED(pVertBuffer);
+//	X_UNUSED(size);
+//	X_UNUSED(type);
+//
+//}
 
 // Shader Stuff
 

@@ -11,6 +11,7 @@
 #endif // !OPAQUE
 
 #include <IShader.h>
+#include <IRender.h>
 #include <IConverterModule.h>
 #include "Util\GenericUtil.h"
 
@@ -119,30 +120,6 @@ X_DECLARE_ENUM8(MaterialPolygonOffset)(
 	WEAPON_IMPACT
 );
 
-// LINEAR is linera with none mip sampling aka LINEAR_MIP_NONE
-// BILINEAR is linera with point mip sampling aka LINEAR_MIP_NEAREST
-// TRILINEAR is linera with linear mip sampling aka LINEAR_MIP_LINEAR
-X_DECLARE_ENUM8(MaterialFilterType)(
-	NEAREST_MIP_NONE,
-	NEAREST_MIP_NEAREST,
-	NEAREST_MIP_LINEAR,
-
-	LINEAR_MIP_NONE,
-	LINEAR_MIP_NEAREST,
-	LINEAR_MIP_LINEAR,
-
-	ANISOTROPIC_X2,
-	ANISOTROPIC_X4,
-	ANISOTROPIC_X8,
-	ANISOTROPIC_X16
-);
-
-X_DECLARE_ENUM8(MaterialTexRepeat)(
-	NO_TILE,
-	TILE_BOTH,
-	TILE_HOZ,
-	TILE_VERT
-);
 
 X_DECLARE_ENUM8(MaterialSurType)(
 	NONE,
@@ -203,63 +180,12 @@ X_DECLARE_ENUM8(MaterialUsage)(
 );
 
 
-
-X_DECLARE_ENUM8(MaterialCullType)(
-	FRONT_SIDED,
-	BACK_SIDED,
-	TWO_SIDED
-);
-
-X_DECLARE_ENUM8(MaterialBlendType)(
-	ZERO,
-	ONE,
-
-	SRC_COLOR,
-	SRC_ALPHA,
-	SRC_ALPHA_SAT,
-	SRC1_COLOR,
-	SRC1_ALPHA,
-
-	INV_SRC_COLOR,
-	INV_SRC_ALPHA,
-
-	INV_SRC1_COLOR,
-	INV_SRC1_ALPHA,
-
-	DEST_COLOR,
-	DEST_ALPHA,
-
-	INV_DEST_COLOR,
-	INV_DEST_ALPHA,
-
-	BLEND_FACTOR,
-	INV_BLEND_FACTOR,
-
-	INVALID
-);
-
-X_DECLARE_ENUM8(StencilOperation)(
-	KEEP, 
-	ZERO, 
-	REPLACE, 
-	INCR_SAT, 
-	DECR_SAT, 
-	INVERT, 
-	INCR, 
-	DECR
-);
-
-X_DECLARE_ENUM8(StencilFunc)(
-	NEVER, 
-	LESS, 
-	EQUAL, 
-	LESS_EQUAL, 
-	GREATER,
-	NOT_EQUAL, 
-	GREATER_EQUAL, 
-	ALWAYS
-);
-
+typedef render::CullType MaterialCullType;
+typedef render::TexRepeat MaterialTexRepeat;
+typedef render::FilterType MaterialFilterType;
+typedef render::BlendType MaterialBlendType;
+typedef render::StencilOperation StencilOperation;
+typedef render::StencilFunc StencilFunc;
 
 
 /*
@@ -317,14 +243,6 @@ struct IMaterial
 		return !getFlags().IsSet(MaterialFlag::NODRAW);
 	}
 };
-
-
-X_DECLARE_FLAGS8(MaterialTexFlags)(
-	DIFFUSE,
-	NORMAL,
-	DETAIL,
-	SPECCOL
-);
 
 struct MaterialHeader
 {

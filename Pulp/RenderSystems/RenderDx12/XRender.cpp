@@ -539,7 +539,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 	}
 
 	StateFlag state;
-	StencilState stencilState;
+	StencilState stencilState = {};
 
 	// create a PSO object for this slut.
 	D3D12_BLEND_DESC blendDesc;
@@ -1447,10 +1447,10 @@ void XRender::createDescFromState(StateFlag state, StencilState stencilState, D3
 		auto& frontFace = depthStencilDesc.FrontFace;
 		const auto& state = stencilState.front;
 
-		frontFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.ZFailOp.ToInt()]);
-		frontFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.FailOp.ToInt()]);
-		frontFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.PassOp.ToInt()]);
-		frontFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.StencilFunc.ToInt()]);
+		frontFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.zFailOp]);
+		frontFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.failOp]);
+		frontFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.passOp]);
+		frontFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.stencilFunc]);
 	}
 
 	// Stencil operations if pixel is back-facing.
@@ -1458,10 +1458,10 @@ void XRender::createDescFromState(StateFlag state, StencilState stencilState, D3
 		auto& backFace = depthStencilDesc.BackFace;
 		const auto& state = stencilState.back;
 
-		backFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.ZFailOp.ToInt()]);
-		backFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.FailOp.ToInt()]);
-		backFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.PassOp.ToInt()]);
-		backFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.StencilFunc.ToInt()]);
+		backFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.zFailOp]);
+		backFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.failOp]);
+		backFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.passOp]);
+		backFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.stencilFunc]);
 	}
 
 
@@ -1569,20 +1569,20 @@ void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 // =============================================
 
 
-void XRender::SetState(StateFlag state)
-{
-	X_UNUSED(state);
-}
+//void XRender::SetState(StateFlag state)
+//{
+//	X_UNUSED(state);
+//}
 
 //void XRender::SetStencilState(StencilState::Value ss)
 //{
 //	X_UNUSED(ss);
 //}
 
-void XRender::SetCullMode(CullMode::Enum mode)
-{
-	X_UNUSED(mode);
-}
+//void XRender::SetCullMode(CullMode::Enum mode)
+//{
+//	X_UNUSED(mode);
+//}
 
 void XRender::Set2D(bool value, float znear, float zfar)
 {
@@ -2022,16 +2022,17 @@ void XRender::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
 // ~Font
 
 
-void XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-	PrimitiveTypePublic::Enum type)
-{
-	X_ASSERT_NOT_NULL(pVertBuffer);
+//void XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+//	PrimitiveTypePublic::Enum type)
+//{
+//	X_ASSERT_NOT_NULL(pVertBuffer);
+//
+//	X_UNUSED(pVertBuffer);
+//	X_UNUSED(size);
+//	X_UNUSED(type);
+//
+//}
 
-	X_UNUSED(pVertBuffer);
-	X_UNUSED(size);
-	X_UNUSED(type);
-
-}
 
 // Shader Stuff
 

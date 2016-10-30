@@ -38,35 +38,51 @@ namespace shader {
 
 X_NAMESPACE_BEGIN(render)
 
-
 static const uint32_t MAX_RENDER_TARGETS = 8;
 
 
-X_DECLARE_ENUM(CullMode)(
-	NONE,
-	FRONT,
-	BACK
+X_DECLARE_ENUM8(CullType)(
+	FRONT_SIDED,
+	BACK_SIDED,
+	TWO_SIDED
 );
 
-X_DECLARE_ENUM(PrimitiveTypePublic)(
-	TriangleList,
-	TriangleStrip,
-	LineList,
-	LineStrip,
-	PointList
+X_DECLARE_ENUM8(TopoType)(
+	TRIANGLELIST,
+	TRIANGLESTRIP,
+	LINELIST,
+	LINESTRIP,
+	POINTLIST
 );
 
+X_DECLARE_ENUM8(StencilOperation)(
+	KEEP,
+	ZERO,
+	REPLACE,
+	INCR_SAT,
+	DECR_SAT,
+	INVERT,
+	INCR,
+	DECR
+);
 
-#if 1
-X_DECLARE_FLAGS8(StencilOperation)( KEEP, ZERO, REPLACE, INCR_SAT, DECR_SAT, INVERT, INCR, DECR );
-X_DECLARE_FLAGS8(StencilFunc)(NEVER, LESS, EQUAL, LESS_EQUAL, GREATER, NOT_EQUAL, GREATER_EQUAL, ALWAYS);
+X_DECLARE_ENUM8(StencilFunc)(
+	NEVER,
+	LESS,
+	EQUAL,
+	LESS_EQUAL,
+	GREATER,
+	NOT_EQUAL,
+	GREATER_EQUAL,
+	ALWAYS
+);
 
 struct StencilDesc
 {
-	Flags8<StencilFunc> StencilFunc;
-	Flags8<StencilOperation> FailOp;
-	Flags8<StencilOperation> ZFailOp;
-	Flags8<StencilOperation> PassOp;
+	StencilFunc::Enum stencilFunc;
+	StencilOperation::Enum failOp;
+	StencilOperation::Enum zFailOp;
+	StencilOperation::Enum passOp;
 };
 
 struct StencilState
@@ -75,103 +91,125 @@ struct StencilState
 	StencilDesc back;
 };
 
-
 X_ENSURE_SIZE(StencilDesc, 4);
 X_ENSURE_SIZE(StencilState, 8);
 
 
-#else
-struct StencilState
+X_DECLARE_ENUM8(DepthFunc)(
+	LEQUAL,
+	EQUAL,
+	GREAT,
+	LESS,
+	GEQUAL,
+	NOTEQUAL
+);
+
+
+X_DECLARE_ENUM8(BlendType)(
+	ZERO,
+	ONE,
+
+	SRC_COLOR,
+	SRC_ALPHA,
+	SRC_ALPHA_SAT,
+	SRC1_COLOR,
+	SRC1_ALPHA,
+
+	INV_SRC_COLOR,
+	INV_SRC_ALPHA,
+
+	INV_SRC1_COLOR,
+	INV_SRC1_ALPHA,
+
+	DEST_COLOR,
+	DEST_ALPHA,
+
+	INV_DEST_COLOR,
+	INV_DEST_ALPHA,
+
+	BLEND_FACTOR,
+	INV_BLEND_FACTOR,
+
+	INVALID
+);
+
+
+struct BlendState
 {
-	// 3 operation and one function.
-	// 4|4|4|4 & 4|4|4|4(backface)
-	enum Enum
-	{
-		FUNC_NEVER = 0x1,
-		FUNC_LESS = 0x2,
-		FUNC_LESS_EQUAL = 0x3,
-		FUNC_GREATER = 0x4,
-		FUNC_GREATER_EQUAL = 0x5,
-		FUNC_EQUAL = 0x6,
-		FUNC_NOT_EQUAL = 0x7,
-		FUNC_ALWAYS = 0x8,
+	BlendType::Enum srcBlendColor;
+	BlendType::Enum dstBlendColor;
+	BlendType::Enum srcBlendAlpha;
+	BlendType::Enum dstBlendAlpha;
+};
 
-		OP_KEEP = 0x1,
-		OP_ZERO = 0x2,
-		OP_REPLACE = 0x3,
-		OP_INCR_SAT = 0x4,
-		OP_DECR_SAT = 0x5,
-		OP_INVERT = 0x6,
-		OP_INCR = 0x7,
-		OP_DECR = 0x8,
-		
+X_ENSURE_SIZE(BlendState, 4);
 
-		STENC_FUNC_MASK = 0xF,
-		STENC_FAIL_OP_MASK = 0xf0,  
-		STENC_ZFAIL_OP_MASK = 0xf00,
-		STENC_PASS_OP_MASK = 0xf000,
-		STENC_BACKFACE_MASK = 0xffff0000,
 
-	};
+X_DECLARE_ENUM8(TextureSlot)(
+	DIFFUSE,
+	NORMAL,
+	DETAIL,
+	SPECCOL,
+	CAMO,
+	OCCLUSION,
+	OPACITY,
+	ROUGTHNESS
+);
 
-	struct Bits
-	{
-		uint32_t BIT_stencilfunc : 4;
-		uint32_t BIT_FailOP : 4;
-		uint32_t BIT_ZFailOP : 4;
-		uint32_t BIT_PassOP : 4;
-	};
+// LINEAR is linera with none mip sampling aka LINEAR_MIP_NONE
+// BILINEAR is linera with point mip sampling aka LINEAR_MIP_NEAREST
+// TRILINEAR is linera with linear mip sampling aka LINEAR_MIP_LINEAR
+X_DECLARE_ENUM8(FilterType)(
+	NEAREST_MIP_NONE,
+	NEAREST_MIP_NEAREST,
+	NEAREST_MIP_LINEAR,
 
-	struct Value
-	{
-		friend struct StencilState;
-	protected:
-		Value(int v) : bits(v) {}
+	LINEAR_MIP_NONE,
+	LINEAR_MIP_NEAREST,
+	LINEAR_MIP_LINEAR,
 
-	public:
-		struct Face
-		{
-			X_INLINE int getStencilFuncIdx(void) const {
-				return (bits_ & STENC_FUNC_MASK);
-			}
-			X_INLINE int getStencilFailOpIdx(void) const {
-				return (bits_ & STENC_FAIL_OP_MASK) >> 4;
-			}
-			X_INLINE int getStencilZFailOpIdx(void) const {
-				return (bits_ & STENC_ZFAIL_OP_MASK) >> 8;
-			}
-			X_INLINE int getStencilPassOpIdx(void) const {
-				return (bits_ & STENC_PASS_OP_MASK) >> 12;
-			}
-		private:
-			uint16_t bits_;
-		};
+	ANISOTROPIC_X2,
+	ANISOTROPIC_X4,
+	ANISOTROPIC_X8,
+	ANISOTROPIC_X16
+);
 
-		union {
-			int bits;
-			Face faces[2];
-		};
+X_DECLARE_ENUM8(TexRepeat)(
+	NO_TILE,
+	TILE_BOTH,
+	TILE_HOZ,
+	TILE_VERT
+);
 
-		X_INLINE bool backFaceInfo(void) const {
-			return (bits & STENC_BACKFACE_MASK) != 0;
-		}
-	};
 
-	static Value create(Enum StenFunc, Enum FailOp, Enum ZFailOp, Enum PassOp) {
-		return Value(StenFunc | (FailOp << 4) | (ZFailOp << 8) | (PassOp << 12));
-	}
+X_DECLARE_FLAGS8(StateNewFlag)(
+	DEPTHWRITE,
+	WIREFRAME,
 
-	static Value create(Enum StenFunc, Enum FailOp, Enum ZFailOp, Enum PassOp,
-		Enum bckStenFunc, Enum bckFailOp, Enum bckZFailOp, Enum bckPassOp) {
-		return Value(StenFunc | (FailOp << 4) | (ZFailOp << 8) | (PassOp << 12) |
-			(bckStenFunc << 16) | (bckFailOp << 20) | (bckZFailOp << 24) | (bckPassOp << 28));
-	}
+	NO_DEPTH_TEST,
+	STENCIL
+);
+
+typedef Flags8<StateNewFlag> StateNewFlags;
+
+struct StateDesc
+{
+	StencilState stencil;
+	BlendState blend;
+	// 4
+	CullType::Enum cullType;
+	TopoType::Enum topo;
+	DepthFunc::Enum depthFunc;
+	StateNewFlags state;
 };
 
 
+X_ENSURE_SIZE(StateDesc, 16);
 
 
-#endif
+
+
+// ==================== OLD =========================================
 
 X_DECLARE_FLAGS(DrawTextFlags)(CENTER, RIGHT, CENTER_VER, MONOSPACE, POS_2D, FIXED_SIZE, FRAMED);
 
@@ -272,8 +310,10 @@ struct States
 	}
 };
 
-
 typedef Flags<States> StateFlag;
+
+// ==================== OLD  =========================================
+
 
 #if 0
 struct IRender
@@ -489,9 +529,9 @@ struct IRender
 	// =============================================
 
 	// everying is depriciated.
-	virtual void SetState(StateFlag state) X_ABSTRACT;
+//	virtual void SetState(StateFlag state) X_ABSTRACT;
 //	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
-	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;
+//	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
 
 	// ViewPort
@@ -589,8 +629,8 @@ struct IRender
 	// ~Font
 
 	// used by font's mainly.
-	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-		PrimitiveTypePublic::Enum type) X_ABSTRACT;
+//	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+//		PrimitiveTypePublic::Enum type) X_ABSTRACT;
 
 	// Shader Stuff
 
