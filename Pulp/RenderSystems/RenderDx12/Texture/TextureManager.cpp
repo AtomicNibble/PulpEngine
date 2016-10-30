@@ -569,12 +569,12 @@ X_NAMESPACE_BEGIN(texture)
 #if X_DEBUG
 		default:
 			X_ASSERT_UNREACHABLE();
-			break;
+			return DXGI_FORMAT_UNKNOWN;
 #else
+		default:
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 		}
-		return DXGI_FORMAT_UNKNOWN;
 	}
 
 X_NAMESPACE_END
