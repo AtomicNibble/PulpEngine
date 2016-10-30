@@ -92,19 +92,22 @@ namespace shader
 		XShaderParam(const XShaderParam& sb) = default;
 		XShaderParam& operator = (const XShaderParam& sb) = default;
 
-		// 8
+		// 8 / 4
 		core::string		name;
 		// 4
 		core::StrHash		nameHash;
+		// 4
 		ParamFlags			flags;
 		ParamType::Enum		type;
+		uint8_t _pad[2];
+
 		// 8
 		int16_t				bind;
 		int16_t				constBufferSlot;
 		int32_t				numParameters;
 	};
 
-	X_ENSURE_SIZE(XShaderParam, 24);
+	// X_ENSURE_SIZE(XShaderParam, 24);
 	X_ENSURE_SIZE(ParamType::Enum, 1);
 
 
