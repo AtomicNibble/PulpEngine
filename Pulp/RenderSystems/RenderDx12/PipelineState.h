@@ -32,9 +32,7 @@ protected:
 class GraphicsPSO : public PSO
 {
 public:
-	typedef core::Array<D3D12_INPUT_ELEMENT_DESC> InputLayoutArr;
-public:
-	X_INLINE GraphicsPSO(core::MemoryArenaBase* arena);
+	X_INLINE GraphicsPSO();
 	X_INLINE ~GraphicsPSO();
 
 	void finalize(PSODeviceCache& cache);
@@ -47,8 +45,11 @@ public:
 	X_INLINE void setRenderTargetFormat(DXGI_FORMAT RTVFormat, DXGI_FORMAT DSVFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
 	void setRenderTargetFormats(uint32_t numRTVs, const DXGI_FORMAT* pRTVFormats,
 		DXGI_FORMAT DSVFormat, uint32_t MsaaCount = 1, uint32_t MsaaQuality = 0);
-	void setInputLayout(uint32_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs);
 	X_INLINE void setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps);
+
+	// you must ensure this memory remains valid untill finalize is called.
+	// this is becuase pretty much all these will come from the IL cache which is built on startup.
+	void setInputLayout(size_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs);
 
 	X_INLINE void setVertexShader(const void* pBinary, size_t Size);
 	X_INLINE void setPixelShader(const void* pBinary, size_t Size);
@@ -66,8 +67,8 @@ public:
 
 private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC PSODesc_;
-	InputLayoutArr inputLayouts_;
 };
+
 
 class ComputePSO : public PSO
 {
@@ -96,11 +97,11 @@ public:
 
 	void destoryAll(void);
 
-	bool compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il, ID3D12PipelineState** pPSO);
+	bool compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D12PipelineState** pPSO);
 	bool compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12PipelineState** pPSO);
 
 private:
-	static HashVal getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il);
+	static HashVal getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc);
 	static HashVal getHash(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc);
 
 private:

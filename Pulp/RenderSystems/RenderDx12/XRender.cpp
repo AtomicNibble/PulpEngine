@@ -569,7 +569,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 	);
 
-	GraphicsPSO pso(arena_);
+	GraphicsPSO pso;
 	pso.setRootSignature(rootSig);
 	pso.setBlendState(blendDesc);
 	pso.setRasterizerState(rasterizerDesc);

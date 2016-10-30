@@ -30,15 +30,9 @@ void PSODeviceCache::destoryAll(void)
 	cache_.clear();
 }
 
-bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il, 
-	ID3D12PipelineState** pPSO)
+bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D12PipelineState** pPSO)
 {
-	X_ASSERT(gpsoDesc.InputLayout.NumElements == il.size(), "Input element size mismatch")(gpsoDesc.InputLayout.NumElements, il.size());
-
-	HashVal hash = getHash(gpsoDesc, il);
-
-	// set after calculating hash.
-	gpsoDesc.InputLayout.pInputElementDescs = il.data();
+	HashVal hash = getHash(gpsoDesc);
 
 	ID3D12PipelineState** pPSORef = nullptr;
 	bool notCompiled = false;
@@ -122,18 +116,20 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 	return true;
 }
 
-PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il)
+PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc)
 {
 	core::Hash::xxHash64 hasher;
 
 	// we don't want to include the pointer in the hash.
 	// we have root sig pointer but that's ok.
+	const auto ILCopy = gpsoDesc.InputLayout;
 	gpsoDesc.InputLayout.pInputElementDescs = nullptr;
 
 	hasher.reset(0x52652);
 	hasher.update(&gpsoDesc, 1);
-	hasher.update(il.data(), il.size());
+	hasher.update(ILCopy.pInputElementDescs, ILCopy.NumElements);
 
+	gpsoDesc.InputLayout = ILCopy;
 	return hasher.finalize();
 }
 
@@ -164,7 +160,7 @@ void GraphicsPSO::finalize(PSODeviceCache& cache)
 
 	X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
-	cache.compile(PSODesc_, inputLayouts_, &pPSO_);
+	cache.compile(PSODesc_, &pPSO_);
 }
 
 
@@ -186,21 +182,10 @@ void GraphicsPSO::setRenderTargetFormats(uint32_t numRTVs, const DXGI_FORMAT* pR
 	PSODesc_.SampleDesc.Quality = MsaaQuality;
 }
 
-void GraphicsPSO::setInputLayout(uint32_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs)
+void GraphicsPSO::setInputLayout(size_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs)
 {
-	PSODesc_.InputLayout.NumElements = numElements;
-
-	if (numElements > 0)
-	{
-		X_ASSERT_NOT_NULL(pInputElementDescs);
-
-		inputLayouts_.resize(numElements);
-
-		memcpy(inputLayouts_.data(), pInputElementDescs, numElements * sizeof(D3D12_INPUT_ELEMENT_DESC));
-	} 
-	else {
-		inputLayouts_.clear();
-	}
+	PSODesc_.InputLayout.NumElements = safe_static_cast<uint32_t, size_t>(numElements);
+	PSODesc_.InputLayout.pInputElementDescs = pInputElementDescs;
 }
 
 

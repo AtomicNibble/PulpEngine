@@ -35,8 +35,7 @@ X_INLINE ID3D12PipelineState* PSO::getPipelineStateObject(void) const
 // ----------------------------------------
 
 
-X_INLINE GraphicsPSO::GraphicsPSO(core::MemoryArenaBase* arena) :
-	inputLayouts_(arena)
+X_INLINE GraphicsPSO::GraphicsPSO() 
 {
 	core::zero_object(PSODesc_);
 	PSODesc_.NodeMask = 1;
