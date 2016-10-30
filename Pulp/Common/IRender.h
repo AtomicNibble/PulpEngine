@@ -13,26 +13,25 @@
 
 typedef void* WIN_HWND;
 
-struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_DECLARE(font,
-struct IXFont_RenderProxy;
-struct XTextDrawConect;
+	struct IXFont_RenderProxy;
+	struct XTextDrawConect;
 )
 
 X_NAMESPACE_DECLARE(model,
-struct MeshHeader;
+	struct MeshHeader;
 )
 
 X_NAMESPACE_DECLARE(render,
-struct IRenderAux;
-template<typename>
-class CommandBucket;
+	struct IRenderAux;
 
-namespace shader {
-	struct IShader;
-} // namespace shader
+	template<typename>
+	class CommandBucket;
 
+	namespace shader {
+		struct IShader;
+	} // namespace shader
 )
 
 
