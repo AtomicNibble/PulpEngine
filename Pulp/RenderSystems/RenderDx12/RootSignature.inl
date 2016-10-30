@@ -24,36 +24,36 @@ X_INLINE void RootParameter::clear(void)
 	rootParam_.ParameterType = static_cast<D3D12_ROOT_PARAMETER_TYPE>(0xFFFFFFFF);
 }
 
-X_INLINE void RootParameter::initAsConstants(uint32_t Register, uint32_t NumDwords, D3D12_SHADER_VISIBILITY visibility)
+X_INLINE void RootParameter::initAsConstants(uint32_t shaderRegister, uint32_t NumDwords, D3D12_SHADER_VISIBILITY visibility)
 {
 	rootParam_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS;
 	rootParam_.ShaderVisibility = visibility;
 	rootParam_.Constants.Num32BitValues = NumDwords;
-	rootParam_.Constants.ShaderRegister = Register;
+	rootParam_.Constants.ShaderRegister = shaderRegister;
 	rootParam_.Constants.RegisterSpace = 0;
 }
 
-X_INLINE void RootParameter::initAsConstantBuffer(uint32_t Register, D3D12_SHADER_VISIBILITY visibility)
+X_INLINE void RootParameter::initAsCBV(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility)
 {
 	rootParam_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_CBV;
 	rootParam_.ShaderVisibility = visibility;
-	rootParam_.Descriptor.ShaderRegister = Register;
+	rootParam_.Descriptor.ShaderRegister = shaderRegister;
 	rootParam_.Descriptor.RegisterSpace = 0;
 }
 
-X_INLINE void RootParameter::initAsBufferSRV(uint32_t Register, D3D12_SHADER_VISIBILITY visibility)
+X_INLINE void RootParameter::initAsSRV(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility)
 {
 	rootParam_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_SRV;
 	rootParam_.ShaderVisibility = visibility;
-	rootParam_.Descriptor.ShaderRegister = Register;
+	rootParam_.Descriptor.ShaderRegister = shaderRegister;
 	rootParam_.Descriptor.RegisterSpace = 0;
 }
 
-X_INLINE void RootParameter::initAsBufferUAV(uint32_t Register, D3D12_SHADER_VISIBILITY visibility)
+X_INLINE void RootParameter::initAsUAV(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility)
 {
 	rootParam_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_UAV;
 	rootParam_.ShaderVisibility = visibility;
-	rootParam_.Descriptor.ShaderRegister = Register;
+	rootParam_.Descriptor.ShaderRegister = shaderRegister;
 	rootParam_.Descriptor.RegisterSpace = 0;
 }
 
@@ -73,12 +73,12 @@ X_INLINE void RootParameter::initAsDescriptorTable(uint32_t rangeCount, D3D12_SH
 }
 
 X_INLINE void RootParameter::setTableRange(uint32_t rangeIndex, D3D12_DESCRIPTOR_RANGE_TYPE Type,
-	uint32_t Register, uint32_t count, uint32_t space)
+	uint32_t baseShaderRegister, uint32_t count, uint32_t space)
 {
 	D3D12_DESCRIPTOR_RANGE* pRange = const_cast<D3D12_DESCRIPTOR_RANGE*>(rootParam_.DescriptorTable.pDescriptorRanges + rangeIndex);
 	pRange->RangeType = Type;
 	pRange->NumDescriptors = count;
-	pRange->BaseShaderRegister = Register;
+	pRange->BaseShaderRegister = baseShaderRegister;
 	pRange->RegisterSpace = space;
 	pRange->OffsetInDescriptorsFromTableStart = D3D12_DESCRIPTOR_RANGE_OFFSET_APPEND;
 }
