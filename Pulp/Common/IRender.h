@@ -220,10 +220,13 @@ struct StateDesc
 	TopoType::Enum topo;
 	DepthFunc::Enum depthFunc;
 	StateNewFlags state;
+
+	shader::VertexFormat::Enum vertexFmt;
+	bool _pad[3];
 };
 
 
-X_ENSURE_SIZE(StateDesc, 16);
+X_ENSURE_SIZE(StateDesc, 20);
 
 
 
