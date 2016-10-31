@@ -18,7 +18,7 @@ X_INLINE uint32_t PixelBuffer::getDepth(void) const
 	return arraySize_;
 }
 
-X_INLINE const DXGI_FORMAT& PixelBuffer::getFormat(void) const
+X_INLINE const DXGI_FORMAT PixelBuffer::getFormat(void) const
 {
 	return format_;
 }

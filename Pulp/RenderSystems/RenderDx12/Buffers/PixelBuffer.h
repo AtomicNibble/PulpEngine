@@ -25,7 +25,7 @@ public:
 	X_INLINE uint32_t getWidth(void) const;
 	X_INLINE uint32_t getHeight(void) const;
 	X_INLINE uint32_t getDepth(void) const;
-	X_INLINE const DXGI_FORMAT& getFormat(void) const;
+	X_INLINE const DXGI_FORMAT getFormat(void) const;
 
 protected:
 
