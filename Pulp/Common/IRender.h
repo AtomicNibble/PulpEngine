@@ -233,6 +233,7 @@ struct StateDesc
 X_ENSURE_SIZE(StateDesc, 20);
 
 
+typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
 
 
 // ==================== OLD =========================================
@@ -500,7 +501,6 @@ struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
-	typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
 
 
 	virtual ~IRender() {};
