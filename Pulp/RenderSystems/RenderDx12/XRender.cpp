@@ -47,6 +47,319 @@ namespace
 		D3D12_STENCIL_OP_DECR,
 	};
 
+
+
+	void createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc)
+	{
+		blendDesc.IndependentBlendEnable = FALSE;
+		blendDesc.AlphaToCoverageEnable = state.IsSet(States::ALPHATEST_MASK);
+
+		if (state.IsSet(States::BLEND_MASK))
+		{
+			for (size_t i = 0; i < 8; ++i) {
+				blendDesc.RenderTarget[i].BlendEnable = TRUE;
+				// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
+				blendDesc.RenderTarget[i].RenderTargetWriteMask = 0;
+			}
+
+			// Blend Src.
+			if (state.IsSet(States::BLEND_SRC_MASK))
+			{
+				switch (state.ToInt() & States::BLEND_SRC_MASK)
+				{
+					case States::BLEND_SRC_ZERO:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
+						break;
+					case States::BLEND_SRC_ONE:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+						break;
+					case States::BLEND_SRC_DEST_COLOR:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_COLOR;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+						break;
+					case States::BLEND_SRC_INV_DEST_COLOR:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+						break;
+					case States::BLEND_SRC_SRC_ALPHA:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+						break;
+					case States::BLEND_SRC_INV_SRC_ALPHA:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+						break;
+					case States::BLEND_SRC_DEST_ALPHA:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_ALPHA;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+						break;
+					case States::BLEND_SRC_INV_DEST_ALPHA:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_ALPHA;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+						break;
+					case States::BLEND_SRC_ALPHA_SAT:
+						blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA_SAT;
+						blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA_SAT;
+						break;
+				}
+			}
+
+			// Blend Dst.
+			if (state.IsSet(States::BLEND_DEST_MASK))
+			{
+				switch (state.ToInt() & States::BLEND_DEST_MASK)
+				{
+					case States::BLEND_DEST_ZERO:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+						break;
+					case States::BLEND_DEST_ONE:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+						break;
+					case States::BLEND_DEST_SRC_COLOR:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+						break;
+					case States::BLEND_DEST_INV_SRC_COLOR:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_COLOR;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+						break;
+					case States::BLEND_DEST_SRC_ALPHA:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+						break;
+					case States::BLEND_DEST_INV_SRC_ALPHA:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+						break;
+					case States::BLEND_DEST_DEST_ALPHA:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_ALPHA;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+						break;
+					case States::BLEND_DEST_INV_DEST_ALPHA:
+						blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_ALPHA;
+						blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+						break;
+				}
+
+			}
+
+			//Blending operation
+			D3D12_BLEND_OP blendOperation = D3D12_BLEND_OP_ADD;
+
+			switch (state.ToInt() & States::BLEND_OP_MASK)
+			{
+				case States::BLEND_OP_ADD:
+					blendOperation = D3D12_BLEND_OP_ADD;
+					break;
+				case States::BLEND_OP_SUB:
+					blendOperation = D3D12_BLEND_OP_SUBTRACT;
+					break;
+				case States::BLEND_OP_REB_SUB:
+					blendOperation = D3D12_BLEND_OP_REV_SUBTRACT;
+					break;
+				case States::BLEND_OP_MIN:
+					blendOperation = D3D12_BLEND_OP_MIN;
+					break;
+				case States::BLEND_OP_MAX:
+					blendOperation = D3D12_BLEND_OP_MAX;
+					break;
+			}
+
+			// todo: add separate alpha blend support for mrt
+			for (size_t i = 0; i < 8; ++i) {
+				blendDesc.RenderTarget[i].BlendOp = blendOperation;
+				blendDesc.RenderTarget[i].BlendOpAlpha = blendOperation;
+			}
+		}
+		else
+		{
+			// disable blending.
+			for (size_t i = 0; i < 8; ++i) {
+				blendDesc.RenderTarget[i].BlendEnable = FALSE;
+			}
+		}
+
+	}
+
+	void createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc)
+	{
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+		rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+		rasterizerDesc.FrontCounterClockwise = TRUE;
+		rasterizerDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+		rasterizerDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+		rasterizerDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+		rasterizerDesc.DepthClipEnable = TRUE;
+		rasterizerDesc.MultisampleEnable = FALSE;
+		rasterizerDesc.AntialiasedLineEnable = FALSE;
+		rasterizerDesc.ForcedSampleCount = 0;
+		rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+		if (state.IsSet(StateFlag::WIREFRAME)) {
+			rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+		}
+
+		if (state.IsSet(States::CULL_MASK))
+		{
+			switch (state.ToInt() & States::CULL_MASK)
+			{
+				case States::CULL_NONE:
+					rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+					break;
+				case States::CULL_FRONT:
+					rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+					break;
+				case States::CULL_BACK:
+					rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+					break;
+			}
+		}
+	}
+
+	void createDescFromState(StateFlag state, const StencilState& stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
+	{
+		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+		depthStencilDesc.DepthEnable = TRUE;
+		depthStencilDesc.StencilEnable = FALSE;
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+		depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+
+		// Stencil operations if pixel is front-facing.
+		{
+			auto& frontFace = depthStencilDesc.FrontFace;
+			const auto& state = stencilState.front;
+
+			frontFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.zFailOp]);
+			frontFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.failOp]);
+			frontFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.passOp]);
+			frontFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.stencilFunc]);
+		}
+
+		// Stencil operations if pixel is back-facing.
+		{
+			auto& backFace = depthStencilDesc.BackFace;
+			const auto& state = stencilState.back;
+
+			backFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.zFailOp]);
+			backFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.failOp]);
+			backFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.passOp]);
+			backFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.stencilFunc]);
+		}
+
+
+
+		if (state.IsSet(StateFlag::DEPTHWRITE)) {
+			depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+		}
+		if (state.IsSet(StateFlag::NO_DEPTH_TEST)) {
+			depthStencilDesc.DepthEnable = FALSE;
+		}
+		if (state.IsSet(StateFlag::STENCIL)) {
+			depthStencilDesc.StencilEnable = TRUE;
+		}
+
+		switch (state.ToInt() & States::DEPTHFUNC_MASK)
+		{
+			case States::DEPTHFUNC_LEQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+				break;
+			case States::DEPTHFUNC_EQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+				break;
+			case States::DEPTHFUNC_GREAT:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+				break;
+			case States::DEPTHFUNC_LESS:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+				break;
+			case States::DEPTHFUNC_GEQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+				break;
+			case States::DEPTHFUNC_NOTEQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NOT_EQUAL;
+				break;
+
+#if X_DEBUG
+			default:
+				X_ASSERT_UNREACHABLE();
+				break;
+#else
+				X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+		}
+	}
+
+	StateFlag stateFlagFromDesc(const StateDesc& desc)
+	{
+
+		return StateFlag();
+	}
+
+	StencilState stencilStateFromDesc(const StateDesc& desc)
+	{
+
+		return StencilState();
+	}
+
+	D3D12_PRIMITIVE_TOPOLOGY_TYPE topoTypeFromDesc(const StateDesc& desc)
+	{
+		switch (desc.topo)
+		{
+			case TopoType::TRIANGLELIST:
+				return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			case TopoType::TRIANGLESTRIP:
+				return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+			case TopoType::LINELIST:
+				return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+			case TopoType::LINESTRIP:
+				return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+			case TopoType::POINTLIST:
+				return D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+
+			default:
+#if X_DEBUG
+				X_ASSERT_UNREACHABLE();
+				return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+#else
+				X_NO_SWITCH_DEFAULT;
+#endif // X_DEBUG
+		}
+	}
+
+	D3D12_PRIMITIVE_TOPOLOGY topoFromDesc(const StateDesc& desc)
+	{
+		switch (desc.topo)
+		{
+			case TopoType::TRIANGLELIST:
+				return D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			case TopoType::TRIANGLESTRIP:
+				return D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+			case TopoType::LINELIST:
+				return D3D_PRIMITIVE_TOPOLOGY_LINELIST;
+			case TopoType::LINESTRIP:
+				return D3D_PRIMITIVE_TOPOLOGY_LINESTRIP;
+			case TopoType::POINTLIST:
+				return D3D_PRIMITIVE_TOPOLOGY_POINTLIST;
+
+			default:
+#if X_DEBUG
+				X_ASSERT_UNREACHABLE();
+				return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+#else
+				X_NO_SWITCH_DEFAULT;
+#endif // X_DEBUG
+		}
+	}
+
+
+	
+
+
 } // namespace
 
 
@@ -538,83 +851,21 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 		RTVFormats[i] = rtv.getFormat();
 	}
 
-	StateFlag state;
-	StencilState stencilState = {};
-
-	// create a PSO object for this slut.
-	D3D12_BLEND_DESC blendDesc;
-	D3D12_RASTERIZER_DESC rasterizerDesc;
-	D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
-
-	createDescFromState(state, blendDesc);
-	createDescFromState(state, rasterizerDesc);
-	createDescFromState(state, stencilState, depthStencilDesc);
-
-	// this will either be global or set via a command.
-	// since we will have some buckets where everything is sent to same shader.
-	// not much will switch shaders between draws.
-	shader::XShader* pShader = nullptr;
-	shader::XShaderTechnique* pTech = nullptr;
-	shader::XShaderTechniqueHW* pHWTech = nullptr; 
-
-	shader::VertexFormat::Enum vertexFmt = shader::VertexFormat::P3F_T2S_C4B;
-
-	RootSignature rootSig(arena_, 0, 0);
-	// what to populate this with?
-	// well more where do we get the info from to populate this.
-	// from the shader?
-	// or somewhre else.
-	//	If it's the shader the engine will have to know the size
-	rootSig.finalize(*pRootSigCache_,
-		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
-	);
-
-	GraphicsPSO pso;
-	pso.setRootSignature(rootSig);
-	pso.setBlendState(blendDesc);
-	pso.setRasterizerState(rasterizerDesc);
-	pso.setDepthStencilState(depthStencilDesc);
-	pso.setSampleMask(0xFFFFFFFF);
-	pso.setRenderTargetFormats(numRtvs, RTVFormats, DXGI_FORMAT_UNKNOWN);
-	pso.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-
-	const auto& inputDesc = ilDescriptions_[vertexFmt];
-	pso.setInputLayout(safe_static_cast<uint32_t, size_t>(inputDesc.size()), inputDesc.ptr());
-
-	X_ASSERT_NOT_NULL(pHWTech);
-
-	// we should handle stuff like checking if compiled and not rendering
-	if (!pHWTech->canDraw()) {
-
-		pHWTech->tryCompile();
-		return;
-	}
-
-	if (pHWTech->pVertexShader) {
-		const auto& byteCode = pHWTech->pVertexShader->getShaderByteCode();
-		pso.setVertexShader(byteCode.data(), byteCode.size());
-	}
-	if (pHWTech->pPixelShader) {
-		const auto& byteCode = pHWTech->pPixelShader->getShaderByteCode();
-		pso.setPixelShader(byteCode.data(), byteCode.size());
-	}
-
-
-	pso.finalize(*pPSOCache_);
+	// we should validate that RTVFormats matches the pass state.
 
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
-
-
-	pContext->setRootSignature(rootSig);
-	pContext->setPipelineState(pso);
-	pContext->setViewportAndScissor(0, 0, viewport.getWidth(), viewport.getHeight());
+	GraphicsContext& context = *pContext;
 
 	for (size_t i = 0; i < rtvs.size(); i++) {
 		ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
-		pContext->transitionResource(rtv, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		context.transitionResource(rtv, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
-	
-	pContext->setRenderTargets(numRtvs, RTVs);
+
+	context.setRenderTargets(numRtvs, RTVs);
+	context.setViewportAndScissor(viewport);
+
+
+	State curState;
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
 	{
@@ -623,7 +874,68 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 
 		while (pPacket != nullptr)
 		{
-			submitPacket(*pContext, pPacket);
+			const CommandPacket::Command::Enum cmdType = CommandPacket::loadCommandType(pPacket);
+			const void* pCmd = CommandPacket::loadCommand(pPacket);
+
+			switch (cmdType)
+			{
+				case Commands::Command::DRAW:
+				{
+					const Commands::Draw& draw = *reinterpret_cast<const Commands::Draw*>(pCmd);
+
+					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
+					context.draw(draw.vertexCount, draw.startVertex);
+					break;
+				}
+				case Commands::Command::DRAW_INDEXED:
+				{
+					const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
+
+					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
+
+					// don't bother looking up ib if same handle.
+					if (curState.indexBuffer != draw.indexBuffer) {
+						curState.indexBuffer = draw.indexBuffer;
+						const auto pIBuf = pBuffMan_->IBFromHandle(draw.indexBuffer);
+						context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
+					}
+
+					context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
+					break;
+				}
+				case Commands::Command::COPY_CONST_BUF_DATA:
+					break;
+				case Commands::Command::COPY_INDEXES_BUF_DATA:
+				{
+					const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
+					auto pIBuf = pBuffMan_->IBFromHandle(updateIB.indexBuffer);
+
+					X_ASSERT(pIBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
+
+					context.writeBuffer(pIBuf->getBuf(), 0, updateIB.pData, updateIB.size);
+				}
+				break;
+				case Commands::Command::COPY_VERTEX_BUF_DATA:
+				{
+					const Commands::CopyVertexBufferData& updateVB = *reinterpret_cast<const Commands::CopyVertexBufferData*>(pCmd);
+					auto pVBuf = pBuffMan_->IBFromHandle(updateVB.vertexBuffer);
+
+					X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
+
+					context.writeBuffer(pVBuf->getBuf(), 0, updateVB.pData, updateVB.size);
+				}
+				break;
+
+				default:
+#if X_DEBUG
+					X_ASSERT_NOT_IMPLEMENTED();
+					break;
+#else
+				X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+			}
+
+
 			pPacket = CommandPacket::loadNextCommandPacket(pPacket);
 		}
 	}
@@ -633,88 +945,63 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 
 }
 
-
-void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet pPacket)
+X_INLINE void XRender::CreateVBView(const VertexHandleArr& vertexBuffers,
+	D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams)
 {
-	const CommandPacket::Command::Enum cmdType = CommandPacket::loadCommandType(pPacket);
-	const void* pCmd = CommandPacket::loadCommand(pPacket);
-	
-	switch (cmdType)
-	{
-	case Commands::Command::DRAW:
-	{
-		const Commands::Draw& draw = *reinterpret_cast<const Commands::Draw*>(pCmd);
+	numVertexStreams = 0;
 
-		// could add a seperate vert stream command if not many things use streams.
-		// but pretty much all models are using streams.
+	core::zero_object(viewsOut);
+	for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++)
+	{
+		if (vertexBuffers[i]) 
+		{
+			const auto pVertBuf = pBuffMan_->VBFromHandle(vertexBuffers[i]);
+
+			viewsOut[i] = pVertBuf->getBuf().vertexBufferView();
+			numVertexStreams++;
+		}
+	}
+}
+
+
+void XRender::ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
+	const VertexHandleArr& vertexBuffers)
+{
+#if 1
+	if (curState.handle != handle) // if the handle is the same, everything is the same.
+	{
+		curState.handle = handle;
+
+		// now we check what parts of the state are diffrent.
+		const DeviceState& newState = *reinterpret_cast<const DeviceState*>(handle);
+
+		// contains a redundant check.
+		context.setRootSignature(newState.rootSig);
+
+		if (curState.pPso != newState.pPso) {
+			context.setPipelineState(newState.pPso);
+			curState.pPso = newState.pPso;
+		}
+		if (curState.topo != newState.topo) {
+			context.setPrimitiveTopology(newState.topo);
+			curState.topo = newState.topo;
+		}
+	}
+
+	// any handles diffrent?
+	// wonder if this be quicker if i shove it on a boundary, have to check what compiler does.
+	if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) == 0)
+	{
+		curState.vertexBuffers = vertexBuffers;
+
 		uint32_t numVertexStreams = 0;
 		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
-		for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++) {
-			if (draw.vertexBuffers[i]) {
-				auto pVertBuf = pBuffMan_->VBFromHandle(draw.vertexBuffers[i]);
-
-				vertexViews[i] = pVertBuf->getBuf().vertexBufferView();
-				numVertexStreams++;
-			}
-		}
+		CreateVBView(vertexBuffers, vertexViews, numVertexStreams);
 
 		context.setVertexBuffers(0, numVertexStreams, vertexViews);
-		context.draw(draw.vertexCount, draw.startVertex);
-		break;
 	}
-	case Commands::Command::DRAW_INDEXED:
-	{
-		const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
 
-		uint32_t numVertexStreams = 0;
-		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
-		for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++) {
-			if (draw.vertexBuffers[i]) {
-				auto pVertBuf = pBuffMan_->VBFromHandle(draw.vertexBuffers[i]);
-
-				vertexViews[i] = pVertBuf->getBuf().vertexBufferView();
-				numVertexStreams++;
-			}
-		}
-
-		auto pIBuf = pBuffMan_->IBFromHandle(draw.indexBuffer);
-
-		context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
-		context.setVertexBuffers(0, numVertexStreams, vertexViews);
-		context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
-		break;
-	}
-	case Commands::Command::COPY_CONST_BUF_DATA:
-		break;
-	case Commands::Command::COPY_INDEXES_BUF_DATA:
-	{
-		const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
-		auto pIBuf = pBuffMan_->IBFromHandle(updateIB.indexBuffer);
-
-		X_ASSERT(pIBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
-
-		context.writeBuffer(pIBuf->getBuf(), 0, updateIB.pData, updateIB.size);
-	}
-		break;
-	case Commands::Command::COPY_VERTEX_BUF_DATA:
-	{
-		const Commands::CopyVertexBufferData& updateVB = *reinterpret_cast<const Commands::CopyVertexBufferData*>(pCmd);
-		auto pVBuf = pBuffMan_->IBFromHandle(updateVB.vertexBuffer);
-
-		X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
-
-		context.writeBuffer(pVBuf->getBuf(), 0, updateVB.pData, updateVB.size);
-	}
-		break;
-
-#if X_DEBUG
-	default:
-		X_ASSERT_NOT_IMPLEMENTED();
-		break;
-#else
-		X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
-	}
+#endif
 }
 
 
@@ -814,6 +1101,109 @@ void XRender::releaseShader(shader::IShader* pShader)
 {
 	pShaderMan_->releaseShader(static_cast<shader::XShader*>(pShader));
 }
+
+PassStateHandle XRender::createPassState(const RenderTargetFmtsArr& rtfs)
+{
+	PassState* pPass = X_NEW(PassState, arena_, "PassState");
+	pPass->rtfs = rtfs;
+
+	return reinterpret_cast<PassStateHandle>(pPass);
+}
+
+void XRender::destoryPassState(PassStateHandle passHandle)
+{
+	PassState* pPassState = reinterpret_cast<PassState*>(passHandle);
+
+	X_DELETE(pPassState, arena_);
+}
+
+StateHandle XRender::createState(PassStateHandle passHandle, const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
+{
+	const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
+
+	const StateFlag state = stateFlagFromDesc(desc);
+	const StencilState stencilState = stencilStateFromDesc(desc);
+
+	DeviceState* pState = X_NEW(DeviceState, arena_, "DeviceState")(arena_);
+	
+	// we need a root sig to compile this PSO with.
+	// but it don't have to be the rootSig we render with.
+	RootSignature& rootSig = pState->rootSig;
+	rootSig.reset(4, 0);
+	rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSig.getParamRef(1).initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSig.getParamRef(2).initAsSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+
+	rootSig.finalize(*pRootSigCache_, 
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+		// should i just disable these for now?
+		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+	);
+
+	// we need to create a PSO.
+	GraphicsPSO pso;
+
+	DXGI_FORMAT RTVFormats[MAX_RENDER_TARGETS];
+	core::zero_object(RTVFormats);
+
+	for (size_t i = 0; i < pPassState->rtfs.size(); i++) {
+		RTVFormats[i] = texture::TextureManager::DXGIFormatFromTexFmt(pPassState->rtfs[i]);
+	}
+
+	D3D12_BLEND_DESC blendDesc;
+	D3D12_RASTERIZER_DESC rasterizerDesc;
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
+	createDescFromState(state, blendDesc);
+	createDescFromState(state, rasterizerDesc);
+	createDescFromState(state, stencilState, depthStencilDesc);
+
+	pso.setRootSignature(rootSig);
+	pso.setBlendState(blendDesc);
+	pso.setRasterizerState(rasterizerDesc);
+	pso.setDepthStencilState(depthStencilDesc);
+	pso.setSampleMask(0xFFFFFFFF);
+	pso.setRenderTargetFormats(static_cast<uint32_t>(pPassState->rtfs.size()), RTVFormats, DXGI_FORMAT_UNKNOWN, 1, 0);
+	pso.setPrimitiveTopologyType(topoTypeFromDesc(desc));
+
+	const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
+	pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+
+	shader::XShaderTechniqueHW* pHWTech = nullptr;
+	if (pHWTech->pVertexShader) {
+		const auto& byteCode = pHWTech->pVertexShader->getShaderByteCode();
+		pso.setVertexShader(byteCode.data(), byteCode.size());
+	}
+	if (pHWTech->pPixelShader) {
+		const auto& byteCode = pHWTech->pPixelShader->getShaderByteCode();
+		pso.setPixelShader(byteCode.data(), byteCode.size());
+	}
+	if (pHWTech->pDomainShader || pHWTech->pHullShader || pHWTech->pGeoShader) {
+		// in order to allow these check if the root sig flags need changing then just duplicate 
+		// the bytecode setting logic.
+		X_ERROR("Dx12", "Domain, Hull, Geo are not enabled currently");
+	}
+
+	pso.finalize(*pPSOCache_);
+
+
+	pState->pPso = pso.getPipelineStateObject();
+	pState->topo = topoFromDesc(desc);
+	pState->texStates.resize(numStates);
+	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
+
+	return reinterpret_cast<StateHandle>(pState);
+}
+
+void XRender::destoryState(StateHandle handle)
+{
+	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
+
+	X_DELETE(pState, arena_);
+}
+
 
 bool XRender::freeSwapChainResources(void)
 {
@@ -1262,250 +1652,6 @@ bool XRender::deviceIsSupported(void) const
 	return true;
 }
 
-void XRender::createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc)
-{
-	blendDesc.IndependentBlendEnable = FALSE;
-	blendDesc.AlphaToCoverageEnable = state.IsSet(States::ALPHATEST_MASK);
-
-	if (state.IsSet(States::BLEND_MASK))
-	{
-		for (size_t i = 0; i < 8; ++i) {
-			blendDesc.RenderTarget[i].BlendEnable = TRUE;
-			// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
-			blendDesc.RenderTarget[i].RenderTargetWriteMask = 0;
-		}
-
-		// Blend Src.
-		if (state.IsSet(States::BLEND_SRC_MASK))
-		{
-			switch (state.ToInt() & States::BLEND_SRC_MASK)
-			{
-			case States::BLEND_SRC_ZERO:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
-				break;
-			case States::BLEND_SRC_ONE:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-				break;
-			case States::BLEND_SRC_DEST_COLOR:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_COLOR;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-				break;
-			case States::BLEND_SRC_INV_DEST_COLOR:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-				break;
-			case States::BLEND_SRC_SRC_ALPHA:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA;
-				break;
-			case States::BLEND_SRC_INV_SRC_ALPHA:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-				break;
-			case States::BLEND_SRC_DEST_ALPHA:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_ALPHA;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-				break;
-			case States::BLEND_SRC_INV_DEST_ALPHA:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_ALPHA;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-				break;
-			case States::BLEND_SRC_ALPHA_SAT:
-				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA_SAT;
-				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA_SAT;
-				break;
-			}
-		}
-
-		// Blend Dst.
-		if (state.IsSet(States::BLEND_DEST_MASK))
-		{
-			switch (state.ToInt() & States::BLEND_DEST_MASK)
-			{
-			case States::BLEND_DEST_ZERO:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-				break;
-			case States::BLEND_DEST_ONE:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
-				break;
-			case States::BLEND_DEST_SRC_COLOR:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
-				break;
-			case States::BLEND_DEST_INV_SRC_COLOR:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_COLOR;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-				break;
-			case States::BLEND_DEST_SRC_ALPHA:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
-				break;
-			case States::BLEND_DEST_INV_SRC_ALPHA:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-				break;
-			case States::BLEND_DEST_DEST_ALPHA:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_ALPHA;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-				break;
-			case States::BLEND_DEST_INV_DEST_ALPHA:
-				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_ALPHA;
-				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-				break;
-			}
-
-		}
-
-		//Blending operation
-		D3D12_BLEND_OP blendOperation = D3D12_BLEND_OP_ADD;
-
-		switch (state.ToInt() & States::BLEND_OP_MASK)
-		{
-		case States::BLEND_OP_ADD:
-			blendOperation = D3D12_BLEND_OP_ADD;
-			break;
-		case States::BLEND_OP_SUB:
-			blendOperation = D3D12_BLEND_OP_SUBTRACT;
-			break;
-		case States::BLEND_OP_REB_SUB:
-			blendOperation = D3D12_BLEND_OP_REV_SUBTRACT;
-			break;
-		case States::BLEND_OP_MIN:
-			blendOperation = D3D12_BLEND_OP_MIN;
-			break;
-		case States::BLEND_OP_MAX:
-			blendOperation = D3D12_BLEND_OP_MAX;
-			break;
-		}
-
-		// todo: add separate alpha blend support for mrt
-		for (size_t i = 0; i < 8; ++i) {
-			blendDesc.RenderTarget[i].BlendOp = blendOperation;
-			blendDesc.RenderTarget[i].BlendOpAlpha = blendOperation;
-		}
-	}
-	else
-	{
-		// disable blending.
-		for (size_t i = 0; i < 8; ++i) {
-			blendDesc.RenderTarget[i].BlendEnable = FALSE;
-		}
-	}
-
-}
-
-void XRender::createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc)
-{
-	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-	rasterizerDesc.FrontCounterClockwise = TRUE;
-	rasterizerDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
-	rasterizerDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
-	rasterizerDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
-	rasterizerDesc.DepthClipEnable = TRUE;
-	rasterizerDesc.MultisampleEnable = FALSE;
-	rasterizerDesc.AntialiasedLineEnable = FALSE;
-	rasterizerDesc.ForcedSampleCount = 0;
-	rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
-
-	if (state.IsSet(StateFlag::WIREFRAME)) {
-		rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
-	}
-
-	if (state.IsSet(States::CULL_MASK))
-	{
-		switch (state.ToInt() & States::CULL_MASK)
-		{
-		case States::CULL_NONE:
-			rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
-			break;
-		case States::CULL_FRONT:
-			rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
-			break;
-		case States::CULL_BACK:
-			rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
-			break;
-		}
-	}
-}
-
-void XRender::createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
-{
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	depthStencilDesc.DepthEnable = TRUE;
-	depthStencilDesc.StencilEnable = FALSE;
-	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-	depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
-	depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
-
-	// Stencil operations if pixel is front-facing.
-	{
-		auto& frontFace = depthStencilDesc.FrontFace;
-		const auto& state = stencilState.front;
-
-		frontFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.zFailOp]);
-		frontFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.failOp]);
-		frontFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.passOp]);
-		frontFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.stencilFunc]);
-	}
-
-	// Stencil operations if pixel is back-facing.
-	{
-		auto& backFace = depthStencilDesc.BackFace;
-		const auto& state = stencilState.back;
-
-		backFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.zFailOp]);
-		backFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.failOp]);
-		backFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.passOp]);
-		backFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.stencilFunc]);
-	}
-
-
-
-	if (state.IsSet(StateFlag::DEPTHWRITE)) {
-		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
-	}
-	if (state.IsSet(StateFlag::NO_DEPTH_TEST)) {
-		depthStencilDesc.DepthEnable = FALSE;
-	}
-	if (state.IsSet(StateFlag::STENCIL)) {
-		depthStencilDesc.StencilEnable = TRUE;
-	}
-
-	switch (state.ToInt() & States::DEPTHFUNC_MASK)
-	{
-	case States::DEPTHFUNC_LEQUAL:
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		break;
-	case States::DEPTHFUNC_EQUAL:
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
-		break;
-	case States::DEPTHFUNC_GREAT:
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
-		break;
-	case States::DEPTHFUNC_LESS:
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
-		break;
-	case States::DEPTHFUNC_GEQUAL:
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
-		break;
-	case States::DEPTHFUNC_NOTEQUAL:
-		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NOT_EQUAL;
-		break;
-
-#if X_DEBUG
-	default:
-		X_ASSERT_UNREACHABLE();
-		break;
-#else
-		X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
-	}
-}
 
 
 void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)

@@ -53,6 +53,60 @@ class XRender : public IRender
 
 	typedef core::FixedArray<D3D12_INPUT_ELEMENT_DESC, 12> VertexLayoutDescArr;
 	typedef std::array<VertexLayoutDescArr, shader::VertexFormat::ENUM_COUNT> VertexFormatILArr;
+	typedef VertexBufferHandleArr VertexHandleArr;
+
+
+	struct PassState
+	{
+		XRender::RenderTargetFmtsArr rtfs;
+
+	};
+
+	struct DeviceState
+	{
+		typedef core::Array<TextureState> TextureStateArray;
+
+		DeviceState(core::MemoryArenaBase* arena) :
+			rootSig(arena),
+			texStates(arena)
+		{}
+
+
+		RootSignature rootSig;
+		ID3D12PipelineState* pPso;
+
+		D3D12_PRIMITIVE_TOPOLOGY topo;
+
+		// we want to store also the textures and samplers you want to use slut.
+		// this won't stay as vector, just no point doing it fast way as might refactor before done.
+		TextureStateArray texStates;
+	};
+
+	struct State
+	{
+		State() {
+			reset();
+		}
+
+		void reset() {
+			handle = INVALID_BUF_HANLDE;
+			indexBuffer = INVALID_BUF_HANLDE;
+			vertexBuffers.fill(INVALID_BUF_HANLDE);
+
+			pRootSig = nullptr;
+			pPso = nullptr;
+			topo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+		}
+
+		StateHandle handle;
+		IndexBufferHandle indexBuffer;
+		VertexHandleArr vertexBuffers;
+
+		ID3D12RootSignature* pRootSig;
+		ID3D12PipelineState* pPso;
+		D3D12_PRIMITIVE_TOPOLOGY topo;
+	};
+
 
 public:
 	XRender(core::MemoryArenaBase* arena);
@@ -98,6 +152,14 @@ public:
 
 	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
 	void releaseShader(shader::IShader* pShader) X_OVERRIDE;
+
+
+	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_OVERRIDE;
+	void destoryPassState(PassStateHandle handle) X_OVERRIDE;
+
+
+	StateHandle createState(PassStateHandle passHandle, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
+	void destoryState(StateHandle handle) X_OVERRIDE;
 
 
 	// =============================================
@@ -182,8 +244,11 @@ public:
 	// =============================================
 
 private:
-	void submitPacket(GraphicsContext& context, const CommandPacket::Packet pPacket);
+	void CreateVBView(const VertexHandleArr& vertexBuffers,
+		D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams);
 
+	void ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
+		const VertexHandleArr& vertexBuffers);
 
 private:
 	bool freeSwapChainResources(void);
@@ -197,9 +262,9 @@ private:
 
 private:
 
-	static void createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc);
-	static void createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc);
-	static void createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
+//	static void createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc);
+//	static void createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc);
+//	static void createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
 
 private:
 	void Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd);

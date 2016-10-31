@@ -496,6 +496,7 @@ struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
+	typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
 
 
 	virtual ~IRender() {};
@@ -545,6 +546,13 @@ struct IRender
 
 	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
 	virtual void releaseShader(shader::IShader* pShader) X_ABSTRACT;
+
+	// state
+	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
+	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
+
+	virtual StateHandle createState(PassStateHandle passHandle, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
+	virtual void destoryState(StateHandle handle) X_ABSTRACT;
 
 	// =============================================
 	// ============== OLD API ======================
