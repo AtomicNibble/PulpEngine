@@ -531,7 +531,7 @@ struct IRender
 	// and just do as it's told?
 	// how will we handle buffer resize?
 
-	virtual IRenderTarget* createRenderTarget() X_ABSTRACT;
+	virtual IRenderTarget* createRenderTarget(void) X_ABSTRACT;
 	virtual void destoryRenderTarget(IRenderTarget* pRT) X_ABSTRACT;
 	virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_ABSTRACT;
 

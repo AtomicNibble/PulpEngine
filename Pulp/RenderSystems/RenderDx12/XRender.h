@@ -130,7 +130,7 @@ public:
 
 	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
-	IRenderTarget* createRenderTarget() X_OVERRIDE;
+	IRenderTarget* createRenderTarget(void) X_OVERRIDE;
 	void destoryRenderTarget(IRenderTarget* pRT) X_OVERRIDE;
 	IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_OVERRIDE;
 
