@@ -11,6 +11,9 @@ typedef uintptr_t ConstantBufferHandle;
 typedef uintptr_t PassStateHandle;
 typedef uintptr_t StateHandle;
 
+typedef std::array<VertexBufferHandle, VertexStream::ENUM_COUNT> VertexBufferHandleArr;
+
+
 static const uintptr_t INVALID_BUF_HANLDE = 0;
 
 namespace Commands
@@ -31,7 +34,7 @@ namespace Commands
 		uint32_t startVertex;
 
 		StateHandle stateHandle;
-		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
+		VertexBufferHandleArr vertexBuffers;
 	};
 
 	struct DrawIndexed
@@ -43,7 +46,7 @@ namespace Commands
 		uint32_t baseVertex;
 
 		StateHandle stateHandle;
-		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
+		VertexBufferHandleArr vertexBuffers;
 		IndexBufferHandle indexBuffer;
 	};
 
