@@ -359,6 +359,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
+    <ClInclude Include="Texture\TextureUtil.h" />
     <ClInclude Include="Texture\TextureVars.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Constants.h" />
@@ -412,6 +413,7 @@
     </ClCompile>
     <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
+    <ClCompile Include="Texture\TextureUtil.cpp" />
     <ClCompile Include="Texture\TextureVars.cpp" />
     <ClCompile Include="Vars\RenderVars.cpp" />
     <ClCompile Include="XRender.cpp" />

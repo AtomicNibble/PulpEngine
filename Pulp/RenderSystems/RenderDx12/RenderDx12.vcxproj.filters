@@ -176,6 +176,9 @@
     <ClInclude Include="Buffers\BufferManager.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\TextureUtil.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -285,6 +288,9 @@
     </ClCompile>
     <ClCompile Include="Buffers\BufferManager.cpp">
       <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\TextureUtil.cpp">
+      <Filter>Source Files\Texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -79,9 +79,6 @@ private:
 	void Cmd_ReloadTextures(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ReloadTexture(core::IConsoleCmdArgs* pCmd);
 
-public:
-	static DXGI_FORMAT DXGIFormatFromTexFmt(Texturefmt::Enum fmt);
-
 private:
 	ID3D12Device* pDevice_;
 	render::ContextManager& contextMan_;
