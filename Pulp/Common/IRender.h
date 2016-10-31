@@ -484,6 +484,8 @@ struct IRenderTarget
 	virtual ~IRenderTarget() {};
 
 
+	virtual texture::Texturefmt::Enum getFmt(void) X_ABSTRACT;
+
 };
 
 X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);

@@ -28,6 +28,11 @@ public:
 	X_INLINE void setClearColor(const Colorf& col);
 	X_INLINE Colorf getClearColor(void) const;
 
+	// IRenderTarget
+	texture::Texturefmt::Enum getFmt(void) X_FINAL;
+
+	// ~IRenderTarget
+
 protected:
 	void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, DXGI_FORMAT format,
 		uint32_t rraySize, uint32_t NumMips = 1);

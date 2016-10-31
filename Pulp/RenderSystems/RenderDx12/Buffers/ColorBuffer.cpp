@@ -2,6 +2,8 @@
 #include "ColorBuffer.h"
 #include "Allocators\DescriptorAllocator.h"
 
+#include "Texture\TextureUtil.h"
+
 X_NAMESPACE_BEGIN(render)
 
 ColorBuffer::ColorBuffer(Colorf clearCol) :
@@ -138,5 +140,11 @@ void ColorBuffer::createArray(ID3D12Device* pDevice, DescriptorAllocator& alloca
 }
 
 
+texture::Texturefmt::Enum ColorBuffer::getFmt(void)
+{
+	auto dxgiFmt = getFormat();
+
+	return texture::Util::texFmtFromDXGI(dxgiFmt);
+}
 
 X_NAMESPACE_END
