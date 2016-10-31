@@ -222,6 +222,7 @@ public:
 	X_INLINE void setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
 	
 	void setPipelineState(const GraphicsPSO& PSO);
+	void setPipelineState(ID3D12PipelineState* pPso);
 	X_INLINE void setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants);
 	X_INLINE void setConstants(uint32_t rootIndex, Param X);
 	X_INLINE void setConstants(uint32_t rootIndex, Param X, Param Y);

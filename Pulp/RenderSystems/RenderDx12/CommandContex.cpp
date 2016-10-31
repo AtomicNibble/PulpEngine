@@ -699,6 +699,16 @@ void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
 	pCurComputePipelineState_ = pPipelineState;
 }
 
+void GraphicsContext::setPipelineState(ID3D12PipelineState* pPso)
+{
+	if (pPso == pCurComputePipelineState_) {
+		return;
+	}
+
+	pCommandList_->SetPipelineState(pPso);
+	pCurComputePipelineState_ = pPso;
+}
+
 
 void GraphicsContext::setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, 
 	const void* pBufferData)
