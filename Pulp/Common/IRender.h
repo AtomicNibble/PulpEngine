@@ -132,6 +132,13 @@ X_DECLARE_ENUM8(BlendType)(
 	INVALID
 );
 
+X_DECLARE_ENUM8(BlendOp)(
+	OP_ADD,
+	OP_SUB,
+	OP_REB_SUB,
+	OP_MIN,
+	OP_MAX 
+);
 
 struct BlendState
 {
@@ -205,15 +212,17 @@ X_ENSURE_SIZE(TextureState, 16);
 X_ENSURE_SIZE(TextureState, 12);
 #endif
 
-X_DECLARE_FLAGS8(StateNewFlag)(
+X_DECLARE_FLAGS8(StateFlag)(
 	DEPTHWRITE,
 	WIREFRAME,
 
 	NO_DEPTH_TEST,
-	STENCIL
+	STENCIL,
+	BLEND,
+	ALPHATEST
 );
 
-typedef Flags8<StateNewFlag> StateNewFlags;
+typedef Flags8<StateFlag> StatFlags;
 
 struct StateDesc
 {
@@ -223,12 +232,12 @@ struct StateDesc
 	CullType::Enum cullType;
 	TopoType::Enum topo;
 	DepthFunc::Enum depthFunc;
-	StateNewFlags stateFlags;
+	StatFlags stateFlags;
 
+	BlendOp::Enum blendOp;
 	shader::VertexFormat::Enum vertexFmt;
-	bool _pad[3];
+	bool _pad[2];
 };
-
 
 X_ENSURE_SIZE(StateDesc, 20);
 
@@ -246,98 +255,6 @@ struct XDrawTextInfo
 	Color col;
 };
 
-
-struct States
-{
-	static const unsigned int FLAGS_COUNT = 8;
-
-	enum Enum
-	{
-		BLEND_SRC_ZERO				= 0x1,
-		BLEND_SRC_ONE				= 0x2,
-		BLEND_SRC_DEST_COLOR		= 0x3,
-		BLEND_SRC_INV_DEST_COLOR	= 0x4,
-		BLEND_SRC_SRC_ALPHA			= 0x5,
-		BLEND_SRC_INV_SRC_ALPHA		= 0x6,
-		BLEND_SRC_DEST_ALPHA		= 0x7,
-		BLEND_SRC_INV_DEST_ALPHA	= 0x8,
-		BLEND_SRC_ALPHA_SAT			= 0x9,
-
-		BLEND_DEST_ZERO				= 0x10,
-		BLEND_DEST_ONE				= 0x20,
-		BLEND_DEST_SRC_COLOR		= 0x30,
-		BLEND_DEST_INV_SRC_COLOR	= 0x40,
-		BLEND_DEST_SRC_ALPHA		= 0x50,
-		BLEND_DEST_INV_SRC_ALPHA	= 0x60,
-		BLEND_DEST_DEST_ALPHA		= 0x70,
-		BLEND_DEST_INV_DEST_ALPHA	= 0x80,
-
-		BLEND_OP_ADD		= 0x00001000,
-		BLEND_OP_SUB		= 0x00002000,
-		BLEND_OP_REB_SUB	= 0x00004000,
-		BLEND_OP_MIN		= 0x00008000,
-		BLEND_OP_MAX		= 0x00010000,
-
-		CULL_BACK			= 0x00000000,
-		CULL_FRONT			= 0x00020000,
-		CULL_NONE			= 0x00040000,
-
-		DEPTHFUNC_LEQUAL	= 0x00000000,
-		DEPTHFUNC_EQUAL		= 0x00100000,
-		DEPTHFUNC_GREAT		= 0x00200000,
-		DEPTHFUNC_LESS		= 0x00300000,
-		DEPTHFUNC_GEQUAL	= 0x00400000,
-		DEPTHFUNC_NOTEQUAL	= 0x00500000,
-
-		ALPHATEST_GREATER	= 0x10000000,
-		ALPHATEST_LESS		= 0x20000000,
-		ALPHATEST_GEQUAL	= 0x40000000,
-		ALPHATEST_LEQUAL	= 0x80000000,
-
-		// single flags
-		DEPTHWRITE          = 0x00000100,
-		WIREFRAME			= 0x00000200,
-		NO_DEPTH_TEST		= 0x00000400,
-		STENCIL             = 0x00000800,
-
-		// Blend Masks.
-		BLEND_SRC_MASK		= 0x0000000f,
-		BLEND_DEST_MASK		= 0x000000f0,
-		BLEND_MASK			= 0x000000ff,
-		BLEND_OP_MASK		= 0x0001F000,
-
-		CULL_MASK			= 0x00060000,
-
-		DEPTHFUNC_MASK		= 0x00700000,
-		ALPHATEST_MASK		= 0xf0000000,
-	};
-
-
-
-	struct Bits																															
-	{																																	
-		uint32_t BIT_blendSrc : 4;
-		uint32_t BIT_blendDst : 4;
-		uint32_t BIT_depthWrite : 1;
-		uint32_t BIT_wireframe : 1;
-		uint32_t BIT_no_depth_test : 1;
-		uint32_t BIT_stencil : 1;
-		uint32_t BIT_blendOP : 5;
-		uint32_t BIT_cull : 2;
-		uint32_t BIT_pad8 : 1;
-		uint32_t BIT_depthFuncMask : 3;
-		uint32_t BIT_pad1 : 5;
-		uint32_t BIT_alphaTestMask : 4;
-	};
-
-	static const char* ToString(uint32_t value)																							
-	{					
-		X_UNUSED(value);
-		return "not Supported"; // cba :D !																												
-	}
-};
-
-typedef Flags<States> StateFlag;
 
 // ==================== OLD  =========================================
 
