@@ -8,6 +8,7 @@ X_NAMESPACE_BEGIN(render)
 typedef uintptr_t VertexBufferHandle;
 typedef uintptr_t IndexBufferHandle;
 typedef uintptr_t ConstantBufferHandle;
+typedef uintptr_t PassStateHandle;
 typedef uintptr_t StateHandle;
 
 static const uintptr_t INVALID_BUF_HANLDE = 0;
