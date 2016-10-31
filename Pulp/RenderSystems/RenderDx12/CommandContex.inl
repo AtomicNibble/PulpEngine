@@ -212,6 +212,20 @@ X_INLINE void GraphicsContext::setScissor(uint32_t left, uint32_t top, uint32_t 
 	setScissor(rect);
 }
 
+X_INLINE void GraphicsContext::setViewportAndScissor(const XViewPort& vp)
+{
+	setViewport(vp);
+	const auto r = vp.getRect();
+
+	D3D12_RECT rect;
+	rect.left = r.getX1();
+	rect.right = r.getX2();
+	rect.top = r.getY1();
+	rect.bottom = r.getY2();
+	setScissor(rect);
+}
+
+
 X_INLINE void GraphicsContext::setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& rect)
 {
 	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();

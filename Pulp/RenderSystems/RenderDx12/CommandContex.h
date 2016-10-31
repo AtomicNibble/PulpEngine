@@ -213,7 +213,8 @@ public:
 	X_INLINE void setViewport(float32_t x, float32_t y, float32_t w, float32_t h, float32_t minDepth = 0.0f, float32_t maxDepth = 1.0f);
 	X_INLINE void setScissor(const D3D12_RECT& rect);
 	X_INLINE void setScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
-	X_INLINE void setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& rect);
+	X_INLINE void setViewportAndScissor(const XViewPort& vp); // sets viewport and scissor to same.
+	X_INLINE void setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& scissorRect);
 	X_INLINE void setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect);
 	X_INLINE void setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 	X_INLINE void setStencilRef(uint32_t stencilRef);
