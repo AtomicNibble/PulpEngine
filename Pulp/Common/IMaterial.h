@@ -25,6 +25,8 @@ static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
 static const char*		 MTL_DEFAULT_NAME = "default/default";
 
+static const uint32_t MTL_MAX_LOADED = 1 << 12;
+
 
 static const float POLY_DECAL_OFFSET = 0.05f;
 static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
