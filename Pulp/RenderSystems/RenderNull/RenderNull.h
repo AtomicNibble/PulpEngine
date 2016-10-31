@@ -50,6 +50,12 @@ public:
 	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
 	void releaseShader(shader::IShader* pShader) X_OVERRIDE;
 
+	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_OVERRIDE;
+	void destoryPassState(PassStateHandle handle) X_OVERRIDE;
+
+	StateHandle createState(PassStateHandle passHandle, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
+	void destoryState(StateHandle handle) X_OVERRIDE;
+
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================

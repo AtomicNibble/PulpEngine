@@ -183,6 +183,37 @@ void RenderNull::releaseShader(shader::IShader* pShader)
 
 }
 
+PassStateHandle RenderNull::createPassState(const RenderTargetFmtsArr& rtfs)
+{
+	X_UNUSED(rtfs);
+
+	return INVALID_BUF_HANLDE;
+}
+
+void RenderNull::destoryPassState(PassStateHandle handle)
+{
+	X_UNUSED(handle);
+
+}
+
+StateHandle RenderNull::createState(PassStateHandle passHandle, const StateDesc& state, 
+	const TextureState* pTextStates, size_t numStates)
+{
+	X_UNUSED(passHandle);
+	X_UNUSED(state);
+	X_UNUSED(pTextStates);
+	X_UNUSED(numStates);
+
+	return INVALID_BUF_HANLDE;
+}
+
+void RenderNull::destoryState(StateHandle handle)
+{
+	X_UNUSED(handle);
+}
+
+// =====================================================================
+
 //void RenderNull::SetState(StateFlag state)
 //{
 //	X_UNUSED(state);
