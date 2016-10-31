@@ -72,7 +72,7 @@ WE have special case for default model which we want to load / setup in a synchr
 
 XModelManager::XModelManager() : 
 	pDefaultModel_(nullptr),
-	models_(g_3dEngineArena, sizeof(XModel), X_ALIGN_OF(XModel))
+	models_(g_3dEngineArena, sizeof(ModelResource), X_ALIGN_OF(ModelResource))
 {
 
 }
