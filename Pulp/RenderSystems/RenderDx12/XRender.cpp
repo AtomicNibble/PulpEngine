@@ -1150,7 +1150,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const StateDesc& de
 	core::zero_object(RTVFormats);
 
 	for (size_t i = 0; i < pPassState->rtfs.size(); i++) {
-		RTVFormats[i] = texture::TextureManager::DXGIFormatFromTexFmt(pPassState->rtfs[i]);
+		RTVFormats[i] = texture::Util::DXGIFormatFromTexFmt(pPassState->rtfs[i]);
 	}
 
 	D3D12_BLEND_DESC blendDesc;
