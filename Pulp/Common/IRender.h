@@ -196,10 +196,14 @@ struct TextureState
 	// do i want to pass this?
 	// or try be fancy and pass arrays in TextureSlot index order.
 	TextureSlot::Enum slot; 
-	uint8_t _pad[5];
+	uint8_t _pad[2];
 };
 
+#if X_64
 X_ENSURE_SIZE(TextureState, 16);
+#else
+X_ENSURE_SIZE(TextureState, 12);
+#endif
 
 X_DECLARE_FLAGS8(StateNewFlag)(
 	DEPTHWRITE,
