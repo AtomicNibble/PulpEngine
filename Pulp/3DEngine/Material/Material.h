@@ -24,28 +24,13 @@ X_NAMESPACE_BEGIN(engine)
 
 class XMaterialManager;
 
-class XMaterial : public IMaterial, public core::XBaseAsset, public XEngineBase
+class XMaterial : public IMaterial, public XEngineBase
 {
 public:
 	XMaterial();
 	~XMaterial();
 
-	void ShutDown(void);
-
-
-	X_INLINE const int addRef() X_OVERRIDE{ return XBaseAsset::addRef(); }
-	// XBaseAsset
-	X_INLINE const int release() X_OVERRIDE;
-	// ~XBaseAsset
-	X_INLINE const int forceRelease() X_OVERRIDE{
-		for (;;) {
-			if (release() <= 0)
-				break;
-		}
-		return 0;
-	}
-
-	virtual const char* getName() const X_OVERRIDE { return MatName_.c_str(); };
+	virtual const core::string& getName(void) const X_OVERRIDE { return matName_; };
 	virtual void setName(const char* pName) X_OVERRIDE;
 
 	virtual const MaterialFlags getFlags() const X_OVERRIDE;
@@ -78,12 +63,10 @@ public:
 	virtual bool isDefault() const X_OVERRIDE;
 
 protected:
-	friend class XMaterialManager;
-
 	X_NO_COPY(XMaterial);
 	X_NO_ASSIGN(XMaterial);
 
-	core::string			MatName_;
+	core::string			matName_;
 	MaterialFlags			flags_;
 	MaterialSurType::Enum	MatSurfaceType_;
 	MaterialCullType::Enum	CullType_;

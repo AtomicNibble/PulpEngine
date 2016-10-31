@@ -51,7 +51,7 @@ namespace
 XMaterialManager::XMaterialManager() :
 	pListner_(nullptr),
 	pDefaultMtl_(nullptr),
-	materials_(g_3dEngineArena, 2048)
+	materials_(g_3dEngineArena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource))
 {
 }
 
@@ -78,7 +78,6 @@ bool XMaterialManager::Init(void)
 	return true;
 }
 
-
 void XMaterialManager::ShutDown(void)
 {
 	X_LOG0("MtlManager", "Shutting Down");
@@ -89,7 +88,7 @@ void XMaterialManager::ShutDown(void)
 	gEnv->pHotReload->addfileType(nullptr, MTL_B_FILE_EXTENSION);
 
 
-	core::SafeRelease(pDefaultMtl_);
+	releaseMaterial(pDefaultMtl_);
 
 #if 0
 	// any left?
@@ -140,90 +139,34 @@ void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core:
 }
 
 
-void XMaterialManager::InitDefaults(void)
-{
-	if (pDefaultMtl_ == nullptr)
-	{
-		pDefaultMtl_ = static_cast<XMaterial*>(createMaterial("default"));
-
-		// we want texture info to sent and get back a shader item.
-		XInputShaderResources input;
-		input.material.diffuse.set(1.0, 1.0, 1.0, 1.0);
-		input.textures[ShaderTextureIdx::DIFFUSE].name = texture::TEX_DEFAULT_DIFFUSE;
-		input.textures[ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
-
-		// load the shader / textures needed.
-		XShaderItem item = gEnv->pRender->LoadShaderItem(input);
-
-#if 1
-	//	X_ASSERT_NOT_IMPLEMENTED();
-#else
-		pDefaultMtl_->setShaderItem(item);
-#endif
-		pDefaultMtl_->setCoverage(MaterialCoverage::OPAQUE);
-	}
-}
-
 // IMaterialManager
 IMaterial* XMaterialManager::createMaterial(const char* pMtlName)
 {
-	XMaterial *pMat = nullptr;
+	XMaterial* pMat = nullptr;
 
-#if 1
 	X_UNUSED(pMtlName);
 	X_ASSERT_NOT_IMPLEMENTED();
-#else
-
-	pMat = static_cast<XMaterial*>(materials_.findAsset(X_CONST_STRING(MtlName)));
-
-	if (pMat)
-	{
-		pMat->addRef(); // add a ref.
-	}
-	else
-	{
-		pMat = X_NEW_ALIGNED( XMaterial, g_3dEngineArena, "Material", X_ALIGN_OF(XMaterial));
-		pMat->setName(MtlName);
-
-		if (pListner_) {
-			pListner_->OnCreateMaterial(pMat);
-		}
-
-		// add it.
-		materials_.AddAsset(MtlName, pMat);
-	}
-#endif
-
 	return pMat;
 }
 
 IMaterial* XMaterialManager::findMaterial(const char* pMtlName) const
 {
-	X_ASSERT_NOT_NULL(pMtlName);
+	core::string name(pMtlName);
 
-#if 1
-	X_ASSERT_NOT_IMPLEMENTED();
-#else
-
-	XMaterial* pMaterial = static_cast<XMaterial*>(
-		materials_.findAsset(X_CONST_STRING(MtlName)));
-
-	if (pMaterial) {
-		return pMaterial;
+	IMaterial* pMtl = findMaterial_Internal(name);
+	if (pMtl) {
+		return pMtl;
 	}
 
-#endif
-
+	X_WARNING("MatMan", "Failed to find material: \"%s\"", pMtlName);
 	return nullptr;
 }
 
-IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
+IMaterial* XMaterialManager::loadMaterial(const char* pMtlName)
 {
-	X_ASSERT_NOT_NULL(MtlName);
-	const char* pExt;
-	IMaterial* iMat;
+	X_ASSERT_NOT_NULL(pMtlName);
 
-	pExt = core::strUtil::FileExtension(MtlName);
+	const char* pExt = core::strUtil::FileExtension(pMtlName);
 	if(pExt)
 	{
 		// engine should not make requests for materials with a extensiob
@@ -233,14 +176,17 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 
 	}
 
-	// try find it.
-	iMat = findMaterial(MtlName);
+	core::string name(pMtlName);
 
-	if (iMat)
+
+	// try find it.
+	MaterialResource* pMatRes = findMaterial_Internal(name);
+
+	if (pMatRes)
 	{
 		// inc ref count.
-		static_cast<XMaterial*>(iMat)->addRef();
-		return iMat;
+		pMatRes->addReference();
+		return pMatRes;
 	}
 
 	// lets look for binary first.
@@ -250,20 +196,62 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	//}
 
 
-	X_ERROR("MatMan", "Failed to find material: %s", MtlName);
+	X_ERROR("MatMan", "Failed to find material: %s", pMtlName);
 	return getDefaultMaterial();
 }
 
-void XMaterialManager::unregister(IMaterial* pMat)
+void XMaterialManager::releaseMaterial(IMaterial* pMat)
 {
-	X_ASSERT_NOT_NULL(pMat);
-
-//	XMaterial* pXMat = (XMaterial*)pMat;
-
-	if (pListner_) {
-		pListner_->OnDeleteMaterial(pMat);
+	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
+	if (pMatRes->removeReference() == 0)
+	{
+		materials_.releaseAsset(pMatRes);
 	}
 }
+
+
+XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(const char* pMtlName)
+{
+	core::string name(pMtlName);
+
+	// internal create expects you to know no duplicates
+	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
+
+	auto pMatRes = materials_.createAsset(name);
+
+	return pMatRes;
+}
+
+XMaterialManager::MaterialResource* XMaterialManager::findMaterial_Internal(const core::string& name) const
+{
+	return materials_.findAsset(name);
+}
+
+void XMaterialManager::InitDefaults(void)
+{
+	if (pDefaultMtl_ == nullptr)
+	{
+		pDefaultMtl_ = createMaterial_Internal(MTL_DEFAULT_NAME);
+
+		// we want texture info to sent and get back a shader item.
+		XInputShaderResources input;
+		input.material.diffuse.set(1.0, 1.0, 1.0, 1.0);
+		input.textures[ShaderTextureIdx::DIFFUSE].name = texture::TEX_DEFAULT_DIFFUSE;
+		input.textures[ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
+
+		// load the shader / textures needed.
+	//	XShaderItem item = gEnv->pRender->LoadShaderItem(input);
+
+#if 1
+		//	X_ASSERT_NOT_IMPLEMENTED();
+#else
+		pDefaultMtl_->setShaderItem(item);
+#endif
+		pDefaultMtl_->setCoverage(MaterialCoverage::OPAQUE);
+	}
+}
+
+
 
 IMaterial* XMaterialManager::getDefaultMaterial()
 {
@@ -272,7 +260,6 @@ IMaterial* XMaterialManager::getDefaultMaterial()
 
 void XMaterialManager::setListener(IMaterialManagerListener* pListner)
 {
-//	X_ASSERT_NOT_NULL(pListner); // allow null? (to disable)
 	pListner_ = pListner;
 }
 

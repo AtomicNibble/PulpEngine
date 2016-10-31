@@ -21,36 +21,14 @@ XMaterial::XMaterial()
 
 XMaterial::~XMaterial()
 {
-	ShutDown();
+
 }
 
-void XMaterial::ShutDown(void)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-//	core::SafeRelease(shaderItem_.pShader_);
-//	core::SafeRelease(shaderItem_.pResources_);
-
-	// free my nipples!
-	if (getMaterialManager()) {
-		static_cast<XMaterialManager*>(getMaterialManager())->unregister(this);
-	}
-}
-
-// XBaseAsset
-const int XMaterial::release()
-{
-	const int ref = XBaseAsset::release();
-	if (ref == 0) {
-		X_DELETE(this, g_3dEngineArena);
-	}
-	return ref;
-}
-// ~XBaseAsset
 
 
 void XMaterial::setName(const char* pName)
 {
-	MatName_ = pName;
+	matName_ = pName;
 }
 
 

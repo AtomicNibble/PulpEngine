@@ -147,8 +147,9 @@ void XWindow::clear(void)
 	}
 
 	// release mat.
-	if (pBackgroundMat_)
-		pBackgroundMat_->release();
+	if (pBackgroundMat_) {
+		pMaterialManager_->releaseMaterial(pBackgroundMat_);
+	}
 
 	init_ = false;
 }
@@ -1304,7 +1305,7 @@ void XWindow::reDraw(engine::IPrimativeContext* pDrawCon)
 		// check if the dvar has changed.
 		if (!core::strUtil::IsEqual(pBackgroundMat_->getName(),background_.getName()))
 		{
-			pBackgroundMat_->release();
+			pMaterialManager_->releaseMaterial(pBackgroundMat_);
 			// this might cause a material to be loaded from disk.
 			pBackgroundMat_ = getMaterialManager()->loadMaterial(background_.c_str());
 		}

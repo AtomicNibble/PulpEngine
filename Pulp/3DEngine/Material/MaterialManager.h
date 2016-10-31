@@ -3,16 +3,14 @@
 #ifndef X_3D_MATERIAL_MAN_H_
 #define X_3D_MATERIAL_MAN_H_
 
-#include <Containers\HashMap.h>
 #include <String\StrRef.h>
-#include <Util\ReferenceCounted.h>
+#include <IDirectoryWatcher.h>
 
 #include "EngineBase.h"
 
-#include <IDirectoryWatcher.h>
-
 #include <../../tools/MaterialLib/MatLib.h>
 
+#include <Assets\AssertContainer.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -23,6 +21,8 @@ class XMaterialManager :
 	public XEngineBase,
 	public core::IXHotReload
 {
+	typedef core::AssetContainer<XMaterial, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
+	typedef MaterialContainer::Resource MaterialResource;
 
 public:
 	XMaterialManager();
@@ -36,7 +36,9 @@ public:
 	virtual IMaterial* findMaterial(const char* pMtlName) const X_OVERRIDE;
 	virtual IMaterial* loadMaterial(const char* pMtlName) X_OVERRIDE;
 
-	virtual IMaterial* getDefaultMaterial() X_OVERRIDE;
+	void releaseMaterial(IMaterial* pMat);
+
+	virtual IMaterial* getDefaultMaterial(void) X_OVERRIDE;
 
 	virtual void setListener(IMaterialManagerListener* pListner) X_OVERRIDE;
 	// ~IMaterialManager
@@ -51,20 +53,17 @@ public:
 
 	void ListMaterials(const char* pSearchPatten = nullptr) const;
 
-protected:
-	friend class XMaterial;
-
-	void unregister(IMaterial* pMat);
-
 private:
+	MaterialResource* createMaterial_Internal(const char* pModelName);
+	MaterialResource* findMaterial_Internal(const core::string& name) const;
+
 	void InitDefaults(void);
 
 private:
-	typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
-	typedef core::HashMap<core::string, MatResource*> MaterialMap;
+	// typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
+	// typedef core::HashMap<core::string, MatResource*> MaterialMap;
 
-
-	MaterialMap	materials_;
+	MaterialContainer materials_;
 
 	IMaterialManagerListener* pListner_;
 	XMaterial*	pDefaultMtl_;
