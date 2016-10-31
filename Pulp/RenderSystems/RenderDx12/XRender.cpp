@@ -97,7 +97,7 @@ namespace
 #if X_DEBUG
 					X_ASSERT_NOT_IMPLEMENTED();
 #else
-					X_NO_SWITCH_DEFAULT
+					X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
 			}
 
@@ -134,7 +134,7 @@ namespace
 #if X_DEBUG
 					X_ASSERT_NOT_IMPLEMENTED();
 #else
-					X_NO_SWITCH_DEFAULT
+					X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
 			}
 
@@ -165,7 +165,7 @@ namespace
 #if X_DEBUG
 					X_ASSERT_NOT_IMPLEMENTED();
 #else
-					X_NO_SWITCH_DEFAULT
+					X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
 			}
 
@@ -240,7 +240,7 @@ namespace
 #if X_DEBUG
 				X_ASSERT_NOT_IMPLEMENTED();
 #else
-				X_NO_SWITCH_DEFAULT
+				X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
 		}
 	}
