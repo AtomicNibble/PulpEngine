@@ -1130,11 +1130,11 @@ StateHandle XRender::createState(PassStateHandle passHandle, const StateDesc& de
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
 	RootSignature& rootSig = pState->rootSig;
-	rootSig.reset(4, 0);
+	rootSig.reset(1, 0);
 	rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootSig.getParamRef(1).initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootSig.getParamRef(2).initAsSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+//	rootSig.getParamRef(1).initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
+//	rootSig.getParamRef(2).initAsSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
+//	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 
 	rootSig.finalize(*pRootSigCache_, 
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
