@@ -8,6 +8,7 @@ X_NAMESPACE_BEGIN(render)
 typedef uintptr_t VertexBufferHandle;
 typedef uintptr_t IndexBufferHandle;
 typedef uintptr_t ConstantBufferHandle;
+typedef uintptr_t StateHandle;
 
 static const uintptr_t INVALID_BUF_HANLDE = 0;
 
@@ -28,8 +29,7 @@ namespace Commands
 		uint32_t vertexCount;
 		uint32_t startVertex;
 
-	// not supporting for now till i have a need.
-	//	shader::VertexFormat::Enum vertexLayout;
+		StateHandle stateHandle;
 		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
 	};
 
@@ -41,7 +41,7 @@ namespace Commands
 		uint32_t startIndex;
 		uint32_t baseVertex;
 
-	//	shader::VertexFormat::Enum vertexLayout;
+		StateHandle stateHandle;
 		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
 		IndexBufferHandle indexBuffer;
 	};
