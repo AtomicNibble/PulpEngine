@@ -3,6 +3,7 @@
 
 #include "Texture\TextureManager.h"
 #include "Texture\Texture.h"
+#include "Texture\TextureUtil.h"
 #include "Shader\ShaderManager.h"
 #include "Shader\Shader.h"
 #include "Shader\HWShader.h"
