@@ -27,6 +27,17 @@ X_INLINE void XViewPort::set(const Vec2<uint32_t>& wh)
 	set(wh.x, wh.y);
 }
 
+X_INLINE uint32_t XViewPort::getX(void) const
+{
+	return view_.getX1();
+}
+
+X_INLINE uint32_t XViewPort::getY(void) const
+{
+	return view_.getY1();
+}
+
+
 X_INLINE uint32_t XViewPort::getWidth(void) const
 {
 	return view_.getWidth();
@@ -35,6 +46,16 @@ X_INLINE uint32_t XViewPort::getWidth(void) const
 X_INLINE uint32_t XViewPort::getHeight(void) const
 {
 	return view_.getHeight();
+}
+
+X_INLINE float XViewPort::getXf(void) const
+{
+	return viewf_.getX1();
+}
+
+X_INLINE float XViewPort::getYf(void) const
+{
+	return viewf_.getY1();
 }
 
 X_INLINE float XViewPort::getWidthf(void) const
