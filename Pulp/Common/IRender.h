@@ -223,7 +223,7 @@ struct StateDesc
 	CullType::Enum cullType;
 	TopoType::Enum topo;
 	DepthFunc::Enum depthFunc;
-	StateNewFlags state;
+	StateNewFlags stateFlags;
 
 	shader::VertexFormat::Enum vertexFmt;
 	bool _pad[3];
