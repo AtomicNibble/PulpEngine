@@ -170,8 +170,8 @@ X_INLINE void GraphicsContext::setViewport(const XViewPort& vp)
 	D3D12_VIEWPORT dvp;
 	dvp.Width = vp.getWidthf();
 	dvp.Height = vp.getHeightf();
-	dvp.TopLeftX = 0;
-	dvp.TopLeftY = 0;
+	dvp.TopLeftX = vp.getXf();
+	dvp.TopLeftY = vp.getYf();
 	dvp.MinDepth = vp.getZNear();
 	dvp.MaxDepth = vp.getZFar();
 
