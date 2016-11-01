@@ -249,11 +249,7 @@ template<typename T>
 X_INLINE void Array<T>::clear(void) 
 {
 	// properly destruct the instances
-	size_t i;
-
-	for (i = 0; i < size(); ++i) {
-		Mem::Destruct(list_ + i);
-	}
+	Mem::DestructArray(list_, size());
 
 	num_ = 0; // don't free any memory
 }
