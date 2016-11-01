@@ -255,13 +255,42 @@ namespace Mem
 
 	// ---------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------
+
+	template <typename T>
+	inline void DestructArray(T* instances, size_t N, PODType)
+	{
+		X_UNUSED(instances);
+		X_UNUSED(N);
+
+		if (N > 0) {
+			X_ASSERT_NOT_NULL(instances);
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------------------------------------------
+
+	template <typename T>
+	inline void DestructArray(T* instances, size_t N, NonPODType)
+	{
+		if (N > 0) {
+			X_ASSERT_NOT_NULL(instances);
+		}
+
+		for (size_t i = 0; i < N; ++i) {
+			instances[i].~T();
+		}
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------------------------------------------
 	template <typename T>
 	inline void DestructArray(T* instances, size_t N)
 	{
-		X_ASSERT_NOT_NULL(instances);
+		if (N > 0) {
+			X_ASSERT_NOT_NULL(instances);
+		}
 
-		// call the instances' destructors in reverse order
-		for (size_t i=N; i>0; --i)
-			Destruct(instances + i - 1);
+		DestructArray(instances, N, compileTime::IntToType<compileTime::IsPOD<T>::Value>());
 	}
 }
