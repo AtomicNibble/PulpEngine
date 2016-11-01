@@ -139,6 +139,7 @@ namespace Mem
 		// properly destruct the instances
 		DestructArray(as_T, N);
 
+		X_ASSERT_NOT_IMPLEMENTED(); // is this -1 correct??
 		arena->free(as_uint32_t - 1); 
 	}
 
