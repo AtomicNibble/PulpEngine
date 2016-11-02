@@ -37,7 +37,7 @@ public:
 
 	X_INLINE uint32_t getSize(void) const;
 
-private:
+public:
 	BufUsage::Enum usage_;
 
 	uint32_t sizeBytes_;

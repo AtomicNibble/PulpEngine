@@ -72,6 +72,16 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numEle
 
 	X3DBuffer* pBuf = Int_CreateVB(size);
 
+	pBuf->usage_ = usage;
+	pBuf->offset_ = 0;
+	pBuf->sizeBytes_ = size; // ??
+	pBuf->size_ = size;
+	pBuf->unPaddedSize_ = size;
+
+	pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "VbBuf");
+	pBuf->pBackingHeap_ = nullptr;
+
+	pBuf->pBuffer_->create(pDevice_, *pContextMan_, *pDescriptorAllocator_, numElements, elementSize, pInitialData);
 
 	return createHandleForBuffer(pBuf);
 }
