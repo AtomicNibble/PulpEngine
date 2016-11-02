@@ -175,11 +175,7 @@ void X3DEngine::OnFrameBegin(void)
 
 	testBucket.submit();
 #endif
-}
 
-void X3DEngine::Update(void)
-{
-	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
 
 
 	// ok so lets dump out the primative context.
@@ -210,15 +206,15 @@ void X3DEngine::Update(void)
 		XCamera cam;
 		XViewPort viewPort;
 
-		viewPort.set(1920, 1080);
+		viewPort.set(1680, 1050);
 
 		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 256);
 		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
 		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems, cam, viewPort);
 
 
-		const auto* pShader = pRender_->getShader("gui");
-		const auto* pTech = pShader->getTech("Fill");
+		const auto* pShader = pRender_->getShader("AuxGeom");
+		const auto* pTech = pShader->getTech("AuxGeometry");
 
 
 		// fuck a flying camel just before it lands.
@@ -230,7 +226,7 @@ void X3DEngine::Update(void)
 		desc.blend.dstBlendAlpha = render::BlendType::ZERO;
 		desc.blendOp = render::BlendOp::OP_ADD;
 		desc.cullType = render::CullType::BACK_SIDED;
-		desc.topo = render::TopoType::LINELIST;
+		desc.topo = render::TopoType::TRIANGLESTRIP;
 		desc.depthFunc = render::DepthFunc::LESS;
 		desc.stateFlags.Clear();
 		desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
@@ -244,15 +240,24 @@ void X3DEngine::Update(void)
 
 		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
-
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 		{
 			auto& context = primContexts_[i];
 			if (!context.isEmpty())
 			{
 				const auto& elems = context.getUnsortedBuffer();
+				const auto& verts = context.getVerts();
 
-				render::VertexBufferHandle vertexBuf = 0;
+
+				// need a vb.
+				render::VertexBufferHandle vertexBuf = pRender_->createVertexBuffer(
+					sizeof(PrimativeContext::PrimVertex),
+					safe_static_cast<uint32_t>(verts.size()),
+					verts.data(),
+					render::BufUsage::DYNAMIC,
+					render::CpuAccess::WRITE
+				);
+
 
 				const auto& front = elems.front();
 				uint32_t curFlags = front.flags;
@@ -299,6 +304,13 @@ void X3DEngine::Update(void)
 
 		pRender_->submitCommandPackets(primBucket, render::Commands::Key::Type::PRIM);
 	}
+}
+
+void X3DEngine::Update(void)
+{
+	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
+
+
 }
 
 IPrimativeContext* X3DEngine::getPrimContext(PrimContext::Enum user)
