@@ -12,32 +12,33 @@ X_INLINE void CommandBucketBase::appendRenderTarget(IRenderTarget* pRTV)
 }
 
 
-X_INLINE const Matrix44f& CommandBucketBase::getViewMatrix(void)
+
+X_INLINE const Matrix44f& CommandBucketBase::getViewMatrix(void) const
 {
 	return view_;
 }
 
-X_INLINE const Matrix44f& CommandBucketBase::getProjMatrix(void)
+X_INLINE const Matrix44f& CommandBucketBase::getProjMatrix(void) const
 {
 	return proj_;
 }
 
-X_INLINE const XViewPort& CommandBucketBase::getViewport(void)
+X_INLINE const XViewPort& CommandBucketBase::getViewport(void) const
 {
 	return viewport_;
 }
 
-X_INLINE const CommandBucketBase::RenderTargetsArr& CommandBucketBase::getRTVS(void)
+X_INLINE const CommandBucketBase::RenderTargetsArr& CommandBucketBase::getRTVS(void) const
 {
 	return rtvs_;
 }
 
-X_INLINE const CommandBucketBase::SortedIdxArr& CommandBucketBase::getSortedIdx(void)
+X_INLINE const CommandBucketBase::SortedIdxArr& CommandBucketBase::getSortedIdx(void) const
 {
 	return sortedIdx_;
 }
 
-X_INLINE const CommandBucketBase::PacketArr& CommandBucketBase::getPackets(void)
+X_INLINE const CommandBucketBase::PacketArr& CommandBucketBase::getPackets(void) const
 {
 	return packets_;
 }
