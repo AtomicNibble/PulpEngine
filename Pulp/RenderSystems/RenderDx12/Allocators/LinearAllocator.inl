@@ -47,11 +47,6 @@ X_INLINE void* LinearAllocationPage::cpuVirtualAddress(void) const
 	return pCpuVirtualAddress_;
 }
 
-X_INLINE D3D12_GPU_VIRTUAL_ADDRESS LinearAllocationPage::gpuVirtualAddress(void) const
-{
-	return gpuVirtualAddress_;
-}
-
 // ------------------------------------------------------------------
 
 X_INLINE LinearAllocationPage* LinearAllocatorManager::requestPage(LinearAllocatorType::Enum type)

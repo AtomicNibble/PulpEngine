@@ -45,11 +45,9 @@ public:
 
 
 	X_INLINE void* cpuVirtualAddress(void) const;
-	X_INLINE D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress(void) const;
 
 private:
 	void* pCpuVirtualAddress_;
-	D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress_; // this overloads the member in GpuResource do i want that?
 };
 
 
