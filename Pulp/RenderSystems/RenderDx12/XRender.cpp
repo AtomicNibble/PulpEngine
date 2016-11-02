@@ -1003,7 +1003,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 	// any handles diffrent?
 	// wonder if this be quicker if i shove it on a boundary, have to check what compiler does.
-	if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) == 0)
+	if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) != 0)
 	{
 		curState.vertexBuffers = vertexBuffers;
 
