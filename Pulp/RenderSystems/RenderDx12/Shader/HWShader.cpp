@@ -173,7 +173,7 @@ namespace shader
 	}
 
 
-	bool XHWShader::compile(ShaderBin& shaderBin)
+	bool XHWShader::compile(bool forceSync)
 	{
 		if (isValid()) {
 			return true;
@@ -183,11 +183,12 @@ namespace shader
 			return false;
 		}
 
+		ShaderBin& shaderBin = shaderMan_.getBin();
 		if (loadFromCache(shaderBin)) {
 			return true;
 		}
 
-		if (!loadFromSource()) {
+		if (!loadSourceAndCompile(forceSync)) {
 			status_ = ShaderStatus::FailedToCompile;
 			X_LOG0("Shader", "Failed to compile shader: \"%s\"", getName());
 			return false;
@@ -297,12 +298,12 @@ namespace shader
 		return true;
 	}
 
-	bool XHWShader::loadFromSource(void)
+	bool XHWShader::loadSourceAndCompile(bool forceSync)
 	{
 		core::string source;
 
 		// we need to get the whole file :D
-		if (!shaderMan_.sourceToString(source, this->sourceFileName_))
+		if (!shaderMan_.sourceToString(this->sourceFileName_, source))
 		{
 			X_ERROR("Shader", "failed to get source for compiling");
 			return false;
@@ -326,7 +327,7 @@ namespace shader
 			}
 		}
 
-		if (vars.asyncCompile())
+		if (!forceSync && vars.asyncCompile())
 		{
 			source_ = source;
 
@@ -417,7 +418,7 @@ namespace shader
 				core::StackString<4096> filterd(pErrStr, pErrStr + strlen(pErrStr));
 
 				// skip file path.
-				pErrStr = filterd.find(this->sourceFileName_);
+				pErrStr = filterd.find(sourcName);
 
 				if (pErrStr) {
 					core::StackString512 path(filterd.begin(), pErrStr);
@@ -444,6 +445,9 @@ namespace shader
 		// release 
 		core::SafeReleaseDX(pErrorBlob);
 		core::SafeReleaseDX(pBlob);
+
+		status_ = ShaderStatus::ReadyToRock;
+		saveToCache(shaderMan_.getBin());
 
 		const float elapsed = timer.GetMilliSeconds();
 		X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
@@ -824,6 +828,7 @@ namespace shader
 	// -----------------------------------------------
 
 
+
 	void XShaderTechniqueHW::release(void)
 	{
 		core::SafeRelease(pVertexShader);
@@ -856,9 +861,20 @@ namespace shader
 		return canDraw;
 	}
 
-	void XShaderTechniqueHW::tryCompile(void)
+	bool XShaderTechniqueHW::tryCompile(bool forceSync)
 	{
+		if (pVertexShader && pVertexShader->getStatus() == ShaderStatus::NotCompiled) {
+			if (!pVertexShader->compile(forceSync)) {
+				return false;
+			}
+		}
+		if (pPixelShader && pPixelShader->getStatus() == ShaderStatus::NotCompiled) {
+			if (!pPixelShader->compile(forceSync)) {
+				return false;
+			}
+		}
 
+		return true;
 	}
 
 

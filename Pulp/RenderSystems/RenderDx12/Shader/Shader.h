@@ -107,7 +107,7 @@ public:
 
 	void release(void);
 	bool canDraw(void) const;
-	void tryCompile(void);
+	bool tryCompile(bool forceSync = false);
 
 public:
 	TechFlags techFlags;
@@ -130,6 +130,8 @@ public:
 
 	void assignSourceTech(const ShaderSourceFileTechnique& srcTech);
 	void append(const XShaderTechniqueHW& hwTech);
+
+
 
 public:
 	core::string name;

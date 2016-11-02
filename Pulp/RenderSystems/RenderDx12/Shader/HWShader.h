@@ -151,7 +151,7 @@ namespace shader
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
-		bool compile(ShaderBin& shaderBin);
+		bool compile(bool forceSync = false);
 		bool invalidateIfChanged(uint32_t newSourceCrc32);
 
 		XShaderParam* getParameter(const core::StrHash& nameHash);
@@ -164,7 +164,7 @@ namespace shader
 		bool loadFromCache(ShaderBin& shaderBin);
 		bool saveToCache(ShaderBin& shaderBin);
 
-		bool loadFromSource(void);
+		bool loadSourceAndCompile(bool forceSync = false);
 		bool compileFromSource(core::string& source);
 		void CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 		bool reflectShader(void);
