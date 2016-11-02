@@ -24,8 +24,7 @@ X_INLINE Array<T>::Array(MemoryArenaBase* arena, size_type size) :
 
 	list_ = Allocate(size);
 
-	for (size_type i = 0; i<size; ++i)
-		Mem::Construct<T>(list_ + i);
+	Mem::ConstructArray<T>(list_, size);
 }
 
 template<typename T>
@@ -52,12 +51,11 @@ X_INLINE Array<T>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList)
 {
 	size_t size = iList.size();
 	std::initializer_list<T>::const_iterator pList = iList.begin();
+	std::initializer_list<T>::const_iterator pListEnd = iList.end();
 
 	ensureSize(size);
 
-	for (size_type i = 0; i < size; ++i) {
-		Mem::Construct<T>(list_ + i, pList[i]);
-	}
+	Mem::CopyArrayUninitialized<T>(list_, pList, pListEnd);
 
 	num_ = size;
 }
