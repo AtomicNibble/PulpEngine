@@ -183,7 +183,10 @@ LinearAllocator::LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorMa
 	pCurPage_(nullptr),
 	retiredPages_(arena)
 {
-
+	pageSize_ = LinearAllocatorPageManager::CPU_ALLOCATOION_PAGE_SIZE;
+	if (type == LinearAllocatorType::GPU_EXCLUSIVE) {
+		pageSize_ = LinearAllocatorPageManager::GPU_ALLOCATOION_PAGE_SIZE;
+	}
 }
 
 DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
