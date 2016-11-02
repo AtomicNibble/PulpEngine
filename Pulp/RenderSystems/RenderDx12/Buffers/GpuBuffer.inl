@@ -22,13 +22,13 @@ X_INLINE D3D12_GPU_VIRTUAL_ADDRESS GpuBuffer::rootConstantBufferView(void) const
 X_INLINE D3D12_VERTEX_BUFFER_VIEW GpuBuffer::vertexBufferView(size_t baseVertexIndex) const
 {
 	const size_t offset = baseVertexIndex * elementSize_;
-	return vertexBufferView(offset, safe_static_cast<uint32_t, size_t>(elementSize_ - offset), elementSize_);
+	return vertexBufferView(offset, safe_static_cast<uint32_t, size_t>(bufferSize_ - offset), elementSize_);
 }
 
 X_INLINE D3D12_INDEX_BUFFER_VIEW GpuBuffer::indexBufferView(size_t startIndex) const
 {
 	const size_t offset = startIndex * elementSize_;
-	return indexBufferView(offset, safe_static_cast<uint32_t, size_t>(elementSize_ - offset), elementSize_ == 4);
+	return indexBufferView(offset, safe_static_cast<uint32_t, size_t>(bufferSize_ - offset), elementSize_ == 4);
 }
 
 X_NAMESPACE_END
