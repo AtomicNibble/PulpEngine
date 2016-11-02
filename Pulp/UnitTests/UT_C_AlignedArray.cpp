@@ -2,8 +2,7 @@
 
 #include <IFileSys.h>
 
-#include <Containers\AlignedArray.h>
-
+#include <Containers\Array.h>
 
 #include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
@@ -158,7 +157,7 @@ public:
 
 TYPED_TEST(AlignedArrayTest, Contruct)
 {
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	list.append(TypeParam());
 	list.append(TypeParam());
@@ -166,7 +165,7 @@ TYPED_TEST(AlignedArrayTest, Contruct)
 	list.append(TypeParam());
 	list.append(TypeParam());
 
-	AlignedArray<TypeParam> list2(list);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list2(list);
 
 	EXPECT_EQ(4, list.size());
 	EXPECT_EQ(4, list2.size());
@@ -187,7 +186,7 @@ TYPED_TEST(AlignedArrayTest, Clear)
 	CustomType::DECONSRUCTION_COUNT = 0;
 
 
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	list.setGranularity(128);
 
@@ -215,7 +214,7 @@ TYPED_TEST(AlignedArrayTest, Free)
 	CustomType::DECONSRUCTION_COUNT = 0;
 
 	{
-		AlignedArray<TypeParam> list(g_arena);
+		Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 		list.setGranularity(128);
 
@@ -246,7 +245,7 @@ TYPED_TEST(AlignedArrayTest, Move)
 {
 	// make a stack based arena that can't allocate multiple buffers.
 	// meaning allocation will fail if the copy constructors are used.
-	const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(AlignedArray<TypeParam>) * 2) +
+	const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>) * 2) +
 		(sizeof(size_t) * 3); // Linear header block.
 
 	CustomType::CONSRUCTION_COUNT = 0;
@@ -258,12 +257,12 @@ TYPED_TEST(AlignedArrayTest, Move)
 
 		LinearArea arena(&allocator, "MoveAllocator");
 
-		AlignedArray<AlignedArray<TypeParam>> list(&arena);
+		Array<Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>> list(&arena);
 		list.setGranularity(2);
 		list.reserve(2);
 
-		list.push_back(AlignedArray<TypeParam>(&arena, 100, TypeParam()));
-		list.push_back(AlignedArray<TypeParam>(&arena, 64, TypeParam()));
+		list.push_back(Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>(&arena, 100, TypeParam()));
+		list.push_back(Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>(&arena, 64, TypeParam()));
 	}
 
 	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
@@ -271,11 +270,11 @@ TYPED_TEST(AlignedArrayTest, Move)
 
 TYPED_TEST(AlignedArrayTest, Append)
 {
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT((AlignedArray<TypeParam>::size_type)0, list.granularity()); // gran should be above 0.
+	EXPECT_LT((Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::size_type)0, list.granularity()); // gran should be above 0.
 
 	EXPECT_EQ(nullptr, list.ptr());
 
@@ -299,7 +298,7 @@ TYPED_TEST(AlignedArrayTest, Append)
 	}
 
 	// test the memory block it gives us.
-	AlignedArray<TypeParam>::Type* pArr = list.ptr();
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::Type* pArr = list.ptr();
 	for (int i = 0; i < 64; i++)
 	{
 		EXPECT_EQ(i * 4, pArr[i]);
@@ -326,11 +325,11 @@ TYPED_TEST(AlignedArrayTest, Append)
 TYPED_TEST(AlignedArrayTest, AppendArr)
 {
 	// we now allow a array of same tpye to be appended.
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT((AlignedArray<TypeParam>::size_type)0, list.granularity()); // gran should be above 0.
+	EXPECT_LT((Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::size_type)0, list.granularity()); // gran should be above 0.
 
 	EXPECT_EQ(nullptr, list.ptr());
 
@@ -341,7 +340,7 @@ TYPED_TEST(AlignedArrayTest, AppendArr)
 
 	EXPECT_EQ(39, list.size());
 
-	AlignedArray<TypeParam> list2(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list2(g_arena);
 	list2.append(1337);
 
 	EXPECT_EQ(1, list2.size());
@@ -377,7 +376,7 @@ TYPED_TEST(AlignedArrayTest, AppendArr)
 
 TYPED_TEST(AlignedArrayTest, Insert)
 {
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	// it should resize for us.
 	for (int i = 0; i < 64; i++)
@@ -408,7 +407,7 @@ TYPED_TEST(AlignedArrayTest, Remove)
 	CustomType::DECONSRUCTION_COUNT = 0;
 
 	{
-		AlignedArray<TypeParam> list(g_arena);
+		Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 		list.setGranularity(128);
 
@@ -450,20 +449,20 @@ TYPED_TEST(AlignedArrayTest, Remove)
 
 TYPED_TEST(AlignedArrayTest, Iterator)
 {
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	// 64 items all with value of 128
 	list.resize(64, 128);
 
 
-	AlignedArray<TypeParam>::Iterator it = list.begin();
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::Iterator it = list.begin();
 	for (; it != list.end(); ++it)
 	{
 		EXPECT_EQ(128, *it);
 		*it = 64;
 	}
 
-	AlignedArray<TypeParam>::ConstIterator cit = list.begin();
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::ConstIterator cit = list.begin();
 	for (; cit != list.end(); ++cit)
 	{
 		EXPECT_EQ(64, *cit);
@@ -477,11 +476,11 @@ TYPED_TEST(AlignedArrayTest, Serialize)
 		return;
 	}
 
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT((AlignedArray<TypeParam>::size_type)0, list.granularity()); // gran should be above 0.
+	EXPECT_LT((Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::size_type)0, list.granularity()); // gran should be above 0.
 
 	EXPECT_EQ(nullptr, list.ptr());
 
@@ -548,7 +547,7 @@ TYPED_TEST(AlignedArrayTest, Serialize)
 
 TYPED_TEST(AlignedArrayTest, InitializerConstruct)
 {
-	AlignedArray<TypeParam> list(g_arena, {
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena, {
 		static_cast<TypeParam>(4),
 		static_cast<TypeParam>(8),
 		static_cast<TypeParam>(1),
@@ -567,11 +566,11 @@ TYPED_TEST(AlignedArrayTest, InitializerConstruct)
 
 TYPED_TEST(AlignedArrayTest, InitializerAsing)
 {
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT(static_cast<AlignedArray<TypeParam>::size_type>(0), list.granularity());
+	EXPECT_LT((static_cast<Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::size_type>(0)), list.granularity());
 
 	EXPECT_EQ(nullptr, list.ptr());
 
@@ -615,11 +614,11 @@ TYPED_TEST(AlignedArrayTest, InitializerAsing)
 
 TYPED_TEST(AlignedArrayTest, EmplaceBack)
 {
-	AlignedArray<TypeParam> list(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT(static_cast<AlignedArray<TypeParam>::size_type>(0), list.granularity()); // gran should be above 0.
+	EXPECT_LT((static_cast<Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::size_type>(0)), list.granularity()); // gran should be above 0.
 
 	EXPECT_EQ(nullptr, list.ptr());
 
@@ -631,7 +630,7 @@ TYPED_TEST(AlignedArrayTest, EmplaceBack)
 
 	for (int i = 0; i < 64; i++)
 	{
-		list.emplace_back(static_cast<AlignedArray<TypeParam>::Type>(i * 4));
+		list.emplace_back(static_cast<Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::Type>(i * 4));
 	}
 
 	EXPECT_EQ(64, list.size());
@@ -643,7 +642,7 @@ TYPED_TEST(AlignedArrayTest, EmplaceBack)
 	}
 
 	// test the memory block it gives us.
-	AlignedArray<TypeParam>::Type* pArr = list.ptr();
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::Type* pArr = list.ptr();
 	for (int i = 0; i < 64; i++)
 	{
 		EXPECT_EQ(i * 4, pArr[i]);
@@ -669,11 +668,11 @@ TYPED_TEST(AlignedArrayTest, EmplaceBack)
 
 TEST(AlignedArrayTest, EmplaceBackComplex)
 {
-	AlignedArray<CustomTypeComplex> list(g_arena);
+	Array<CustomTypeComplex, core::ArrayAlignedAllocator<CustomTypeComplex>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT(static_cast<AlignedArray<CustomTypeComplex>::size_type>(0), list.granularity()); // gran should be above 0.
+	EXPECT_LT((static_cast<Array<CustomTypeComplex, core::ArrayAlignedAllocator<CustomTypeComplex>>::size_type>(0)), list.granularity()); // gran should be above 0.
 
 	EXPECT_EQ(nullptr, list.ptr());
 
@@ -739,26 +738,26 @@ TEST(AlignedArrayTest, EmplaceBackComplex)
 
 TYPED_TEST(AlignedArrayTest, front)
 {
-	AlignedArray<TypeParam> array(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> array(g_arena);
 
 	array.append(static_cast<TypeParam>(5));
 	array.append(static_cast<TypeParam>(6));
 	EXPECT_EQ(5, array.front());
 
-	AlignedArray<TypeParam>::ConstReference constRef = array.front();
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::ConstReference constRef = array.front();
 
 	EXPECT_EQ(5, constRef);
 }
 
 TYPED_TEST(AlignedArrayTest, back)
 {
-	AlignedArray<TypeParam> array(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> array(g_arena);
 
 	array.append(static_cast<TypeParam>(5));
 	array.append(static_cast<TypeParam>(6));
 	EXPECT_EQ(6, array.back());
 
-	AlignedArray<TypeParam>::ConstReference constRef = array.back();
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::ConstReference constRef = array.back();
 	EXPECT_EQ(6, constRef);
 }
 
@@ -766,8 +765,8 @@ X_PRAGMA(optimize("", off))
 
 TYPED_TEST(AlignedArrayTest, front_fail)
 {
-	AlignedArray<TypeParam> array(g_arena);
-	const AlignedArray<TypeParam> const_array(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> array(g_arena);
+	const Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> const_array(g_arena);
 
 	core::debugging::EnableBreakpoints(false);
 	g_AssetChecker.ExpectAssertion(true);
@@ -787,8 +786,8 @@ TYPED_TEST(AlignedArrayTest, front_fail)
 
 TYPED_TEST(AlignedArrayTest, back_fail)
 {
-	AlignedArray<TypeParam> array(g_arena);
-	const AlignedArray<TypeParam> const_array(g_arena);
+	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> array(g_arena);
+	const Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> const_array(g_arena);
 
 	core::debugging::EnableBreakpoints(false);
 	g_AssetChecker.ExpectAssertion(true);

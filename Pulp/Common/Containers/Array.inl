@@ -1,23 +1,22 @@
 
-template<typename T>
-X_INLINE Array<T>::Array(MemoryArenaBase* arena) :
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena) :
 	granularity_( 16 ),
 	list_( nullptr ),
 	num_( 0 ),
 	size_( 0 ),
-	arena_(arena)
+	allocator_(arena)
 {
-//	X_ASSERT_NOT_NULL(arena);
 }
 
 
-template<typename T>
-X_INLINE Array<T>::Array(MemoryArenaBase* arena, size_type size) :
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
 	granularity_(16),
 	list_(nullptr),
 	num_(size),
 	size_(size),
-	arena_(arena)
+	allocator_(arena)
 {
 	X_ASSERT(size > 0, "List size must be positive")(size);
 	X_ASSERT_NOT_NULL(arena);
@@ -27,13 +26,13 @@ X_INLINE Array<T>::Array(MemoryArenaBase* arena, size_type size) :
 	Mem::ConstructArray<T>(list_, size);
 }
 
-template<typename T>
-X_INLINE Array<T>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
 granularity_(16),
 list_(nullptr),
 num_(size),
 size_(size),
-arena_(arena)
+allocator_(arena)
 {
 	X_ASSERT(size > 0, "List size must be positive")(size);
 	X_ASSERT_NOT_NULL(arena);
@@ -45,8 +44,8 @@ arena_(arena)
 	}
 }
 
-template<typename T>
-X_INLINE Array<T>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList) :
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList) :
 	Array(arena)
 {
 	size_t size = iList.size();
@@ -60,8 +59,9 @@ X_INLINE Array<T>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList)
 	num_ = size;
 }
 
-template<typename T>
-X_INLINE Array<T>::Array(const Array<T>& oth) :
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::Array(const Array<T, Allocator>& oth) :
+allocator_(oth.allocator_),
 granularity_(16),
 list_(nullptr),
 num_(0),
@@ -71,19 +71,14 @@ size_(0)
 }
 
 
-template<typename T>
-X_INLINE Array<T>::Array(Array<T>&& oth) :
-granularity_(16),
-list_(nullptr),
-num_(0),
-size_(0)
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::Array(Array<T, Allocator>&& oth) :
+	allocator_(oth.allocator_),
+	granularity_(oth.granularity_),
+	list_(oth.list_),
+	num_(oth.num_),
+	size_(oth.size_)
 {
-	list_ = oth.list_;
-	num_ = oth.num_;
-	size_ = oth.size_;
-	granularity_ = oth.granularity_;
-	arena_ = oth.arena_;
-
 	// clear other.
 	oth.list_ = nullptr;
 	oth.num_ = 0;
@@ -91,39 +86,52 @@ size_(0)
 }
 
 
-template<typename T>
-X_INLINE Array<T>::~Array(void) 
+template<typename T, class Allocator>
+X_INLINE Array<T, Allocator>::~Array(void) 
 {
 	free();
 }
 
-template<typename T>
-X_INLINE void Array<T>::setArena(MemoryArenaBase* arena)
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::setArena(MemoryArenaBase* arena)
 {
-	X_ASSERT(arena_ == nullptr || num_ == 0, "can't set arena on a array that has items")(num_);
-	arena_ = arena;
+	X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
+	allocator_.setArena(arena);
 }
 
-template<typename T>
-X_INLINE void Array<T>::setArena(MemoryArenaBase* arena, size_type capacity)
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::setArena(MemoryArenaBase* arena, size_type capacity)
 {
-	X_ASSERT(arena_ == nullptr || num_ == 0, "can't set arena on a array that has items")(num_);
-	arena_ = arena;
+	X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
+	allocator_.setArena(arena);
 
 	reserve(capacity);
 }
 
-template<typename T>
-X_INLINE core::MemoryArenaBase*  Array<T>::getArena(void) const
+template<typename T, class Allocator>
+X_INLINE core::MemoryArenaBase* Array<T, Allocator>::getArena(void) const
 {
-	return arena_;
+	return allocator_.getArena();
 }
-
 
 // ---------------------------------------------------------
 
-template<typename T>
-Array<T>& Array<T>::operator=(std::initializer_list<T> iList)
+template<typename T, class Allocator>
+X_INLINE Allocator& Array<T, Allocator>::getAllocator(void)
+{
+	return allocator_;
+}
+
+template<typename T, class Allocator>
+X_INLINE const Allocator& Array<T, Allocator>::getAllocator(void) const
+{
+	return allocator_;
+}
+
+// ---------------------------------------------------------
+
+template<typename T, class Allocator>
+Array<T, Allocator>& Array<T, Allocator>::operator=(std::initializer_list<T> iList)
 {
 	size_type i;
 	free();
@@ -142,8 +150,8 @@ Array<T>& Array<T>::operator=(std::initializer_list<T> iList)
 	return *this;
 }
 
-template<typename T>
-Array<T>& Array<T>::operator=(const Array<T> &oth)
+template<typename T, class Allocator>
+Array<T, Allocator>& Array<T, Allocator>::operator=(const Array<T, Allocator> &oth)
 {
 	size_type i;
 	free();
@@ -151,7 +159,7 @@ Array<T>& Array<T>::operator=(const Array<T> &oth)
 	num_ = oth.num_;
 	size_ = oth.size_;
 	granularity_ = oth.granularity_;
-	arena_ = oth.arena_;
+	allocator_ = oth.allocator_;
 
 	if (size_) {
 		list_ = Allocate(size_);
@@ -163,8 +171,8 @@ Array<T>& Array<T>::operator=(const Array<T> &oth)
 	return *this;
 }
 
-template<typename T>
-Array<T>& Array<T>::operator=(Array<T>&& oth)
+template<typename T, class Allocator>
+Array<T, Allocator>& Array<T, Allocator>::operator=(Array<T, Allocator>&& oth)
 {
 	if (this != &oth)
 	{
@@ -174,7 +182,7 @@ Array<T>& Array<T>::operator=(Array<T>&& oth)
 		num_ = oth.num_;
 		size_ = oth.size_;
 		granularity_ = oth.granularity_;
-		arena_ = oth.arena_;
+		allocator_ = oth.allocator_;
 
 		// clear other.
 		oth.list_ = nullptr;
@@ -184,34 +192,34 @@ Array<T>& Array<T>::operator=(Array<T>&& oth)
 	return *this;
 }
 
-template<typename T>
-X_INLINE const T&Array<T>::operator[](size_type idx) const {
+template<typename T, class Allocator>
+X_INLINE const T&Array<T, Allocator>::operator[](size_type idx) const {
 	X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
 	return list_[idx];
 }
 
 
-template<typename T>
-X_INLINE T&Array<T>::operator[](size_type idx) {
+template<typename T, class Allocator>
+X_INLINE T&Array<T, Allocator>::operator[](size_type idx) {
 	X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
 	return list_[idx];
 }
 
 // ---------------------------------------------------------
 
-template<typename T>
-X_INLINE T *Array<T>::ptr(void) {
+template<typename T, class Allocator>
+X_INLINE T *Array<T, Allocator>::ptr(void) {
 	return list_;
 }
 
 
-template<typename T>
-const X_INLINE T *Array<T>::ptr(void) const {
+template<typename T, class Allocator>
+const X_INLINE T *Array<T, Allocator>::ptr(void) const {
 	return list_;
 }
 
-template<typename T>
-X_INLINE T *Array<T>::data(void) {
+template<typename T, class Allocator>
+X_INLINE T *Array<T, Allocator>::data(void) {
 	if (isNotEmpty()) {
 		return &front();
 	}
@@ -220,8 +228,8 @@ X_INLINE T *Array<T>::data(void) {
 }
 
 
-template<typename T>
-const X_INLINE T *Array<T>::data(void) const {
+template<typename T, class Allocator>
+const X_INLINE T *Array<T, Allocator>::data(void) const {
 	if (isNotEmpty()) {
 		return &front();
 	}
@@ -231,20 +239,20 @@ const X_INLINE T *Array<T>::data(void) const {
 
 // ---------------------------------------------------------
 
-template<typename T>
-X_INLINE const bool Array<T>::isEmpty(void) const
+template<typename T, class Allocator>
+X_INLINE const bool Array<T, Allocator>::isEmpty(void) const
 {
 	return num_ == 0;
 }
 
-template<typename T>
-X_INLINE const bool Array<T>::isNotEmpty(void) const
+template<typename T, class Allocator>
+X_INLINE const bool Array<T, Allocator>::isNotEmpty(void) const
 {
 	return num_ > 0;
 }
 
-template<typename T>
-X_INLINE void Array<T>::clear(void) 
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::clear(void) 
 {
 	// properly destruct the instances
 	Mem::DestructArray(list_, size());
@@ -252,8 +260,8 @@ X_INLINE void Array<T>::clear(void)
 	num_ = 0; // don't free any memory
 }
 
-template<typename T>
-X_INLINE void Array<T>::free(void)
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::free(void)
 {
 	clear(); // make sure to destruct the objects.
 
@@ -266,8 +274,8 @@ X_INLINE void Array<T>::free(void)
 	size_ = 0;
 }
 
-template<typename T>
-X_INLINE void Array<T>::shrinkToFit(void)
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::shrinkToFit(void)
 {
 	if (capacity() > size())
 	{
@@ -292,20 +300,20 @@ X_INLINE void Array<T>::shrinkToFit(void)
 }
 
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::size(void) const {
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::size(void) const {
 	return num_;
 }
 
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::capacity(void) const {
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::capacity(void) const {
 	return size_;
 }
 
 
-template<typename T>
-X_INLINE void Array<T>::setGranularity(size_type newgranularity)
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::setGranularity(size_type newgranularity)
 {
 	X_ASSERT( newgranularity >= 0, "granularity size must be positive" )( newgranularity );
 
@@ -313,8 +321,8 @@ X_INLINE void Array<T>::setGranularity(size_type newgranularity)
 }
 
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::granularity(void) const {
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::granularity(void) const {
 	return granularity_;
 }
 
@@ -322,8 +330,8 @@ X_INLINE typename Array<T>::size_type Array<T>::granularity(void) const {
 
 
 // Inserts or erases elements at the end such that size is 'size'
-template<typename T>
-X_INLINE void Array<T>::resize(size_type newNum, const T& t) 
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t) 
 {
 	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 
@@ -358,8 +366,8 @@ X_INLINE void Array<T>::resize(size_type newNum, const T& t)
 // --------------------------------------------------
 
 
-template<typename T>
-X_INLINE void Array<T>::reserve(size_type __size) 
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::reserve(size_type __size) 
 {
 	X_ASSERT(__size >= 0, "array size must be positive")(__size);
 	ensureSize(__size);
@@ -368,8 +376,8 @@ X_INLINE void Array<T>::reserve(size_type __size)
 
 // ---------------------------------------------------------
 
-template<typename T>
-X_INLINE typename Array<T>::Type& Array<T>::AddOne(void)
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(void)
 {
 	if (!list_)
 		reserve(granularity_);
@@ -385,8 +393,8 @@ X_INLINE typename Array<T>::Type& Array<T>::AddOne(void)
 // ---------------------------------------------------------
 
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::append(T const& obj) {
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T const& obj) {
 	// if list empty allocate it
 	if ( !list_ ) 
 		reserve(granularity_);
@@ -399,8 +407,8 @@ X_INLINE typename Array<T>::size_type Array<T>::append(T const& obj) {
 	return num_ - 1;
 }
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::append(T&& obj) {
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T&& obj) {
 	// if list empty allocate it
 	if (!list_)
 		reserve(granularity_);
@@ -413,8 +421,8 @@ X_INLINE typename Array<T>::size_type Array<T>::append(T&& obj) {
 	return num_ - 1;
 }
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::append(const Array<T>& oth) 
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(const Array<T, Allocator>& oth) 
 {
 	if (this != &oth)
 	{
@@ -435,8 +443,8 @@ X_INLINE typename Array<T>::size_type Array<T>::append(const Array<T>& oth)
 	return num_ - 1;
 }
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj)
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(T const& obj)
 {
 	// if list empty allocate it
 	if (!list_) {
@@ -452,8 +460,8 @@ X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj)
 	return num_ - 1;
 }
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj)
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(T&& obj)
 {
 	// if list empty allocate it
 	if (!list_) {
@@ -469,9 +477,9 @@ X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj)
 	return num_ - 1;
 }
 
-template<typename T>
+template<typename T, class Allocator>
 template<class... ArgsT>
-X_INLINE typename Array<T>::size_type Array<T>::emplace_back(ArgsT&&... args)
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::emplace_back(ArgsT&&... args)
 {
 	if (!list_) {
 		reserve(granularity_);
@@ -489,8 +497,8 @@ X_INLINE typename Array<T>::size_type Array<T>::emplace_back(ArgsT&&... args)
 
 // -----------------------------------------------
 
-template<typename T>
-X_INLINE void Array<T>::pop_back()
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::pop_back()
 {
 	if (size() > 0)
 	{
@@ -501,8 +509,8 @@ X_INLINE void Array<T>::pop_back()
 
 // -----------------------------------------------
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_type index)
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insert(const Type& obj, size_type index)
 {
 	if (!list_) {
 		reserve(granularity_);
@@ -531,8 +539,8 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_typ
 	return index;
 }
 
-template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::insert(Type&& obj, size_type index)
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insert(Type&& obj, size_type index)
 {
 	if (!list_) {
 		reserve(granularity_);
@@ -561,8 +569,8 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(Type&& obj, size_type ind
 }
 
 
-template<typename T>
-bool Array<T>::removeIndex(size_type idx)
+template<typename T, class Allocator>
+bool Array<T, Allocator>::removeIndex(size_type idx)
 {
 	if (idx == (size_type)-1) {
 		return false;
@@ -595,8 +603,8 @@ bool Array<T>::removeIndex(size_type idx)
 	return true;
 }
 
-template<typename T>
-void Array<T>::remove(const T& item)
+template<typename T, class Allocator>
+void Array<T, Allocator>::remove(const T& item)
 {
 	size_type idx = find(item);
 
@@ -608,8 +616,8 @@ void Array<T>::remove(const T& item)
 	X_ASSERT(false, "Item to remove could not be found.")(item);
 }
 
-template<typename T>
-typename Array<T>::size_type Array<T>::find(const Type& val) const
+template<typename T, class Allocator>
+typename Array<T, Allocator>::size_type Array<T, Allocator>::find(const Type& val) const
 {
 	size_type i;
 	size_type num = num_;
@@ -624,8 +632,8 @@ typename Array<T>::size_type Array<T>::find(const Type& val) const
 	return invalid_index;
 }
 
-template<typename T>
-void Array<T>::swap(Array& oth)
+template<typename T, class Allocator>
+void Array<T, Allocator>::swap(Array& oth)
 {
 	// swap them baby.
 	core::Swap(list_, oth.list_);
@@ -633,61 +641,61 @@ void Array<T>::swap(Array& oth)
 	core::Swap(size_, oth.size_);
 	core::Swap(granularity_, oth.granularity_);
 
-	core::Swap(arena_, oth.arena_);
+	core::Swap(allocator_, oth.allocator_);
 }
 
 
 // -----------------------------------------------
 
-template<typename T>
-inline typename Array<T>::Iterator Array<T>::begin(void)
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::Iterator Array<T, Allocator>::begin(void)
 {
 	return list_;
 }
 
-template<typename T>
-inline typename Array<T>::ConstIterator Array<T>::begin(void) const
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::begin(void) const
 {
 	return list_;
 }
 
-template<typename T>
-inline typename Array<T>::Iterator Array<T>::end(void)
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::Iterator Array<T, Allocator>::end(void)
 {
 	return list_ + num_;
 }
 
-template<typename T>
-inline typename Array<T>::ConstIterator Array<T>::end(void) const
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::end(void) const
 {
 	return list_ + num_;
 }
 
 
-template<typename T>
-inline typename Array<T>::Reference Array<T>::front(void)
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::Reference Array<T, Allocator>::front(void)
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
 	return *list_;
 }
 
-template<typename T>
-inline typename Array<T>::ConstReference Array<T>::front(void) const
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::ConstReference Array<T, Allocator>::front(void) const
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
 	return *list_;
 }
 
 
-template<typename T>
-inline typename Array<T>::Reference Array<T>::back(void)
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::Reference Array<T, Allocator>::back(void)
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
 }
 
-template<typename T>
-inline typename Array<T>::ConstReference Array<T>::back(void) const
+template<typename T, class Allocator>
+inline typename Array<T, Allocator>::ConstReference Array<T, Allocator>::back(void) const
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
@@ -697,8 +705,8 @@ inline typename Array<T>::ConstReference Array<T>::back(void) const
 // -----------------------------------------------
 
 // ISerialize
-template<typename T>
-bool Array<T>::SSave(XFile* pFile) const
+template<typename T, class Allocator>
+bool Array<T, Allocator>::SSave(XFile* pFile) const
 {
 	X_ASSERT_NOT_NULL(pFile);
 
@@ -716,8 +724,8 @@ bool Array<T>::SSave(XFile* pFile) const
 	return true;
 }
 
-template<typename T>
-bool Array<T>::SLoad(XFile* pFile)
+template<typename T, class Allocator>
+bool Array<T, Allocator>::SLoad(XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
@@ -755,8 +763,8 @@ bool Array<T>::SLoad(XFile* pFile)
 // -----------------------------------------------
 
 
-template<typename T>
-void Array<T>::ensureSize(size_type size)
+template<typename T, class Allocator>
+void Array<T, Allocator>::ensureSize(size_type size)
 {
 	if (size > size_)
 	{
@@ -786,22 +794,17 @@ void Array<T>::ensureSize(size_type size)
 }
 
 
-template<typename T>
-X_INLINE void Array<T>::DeleteArr(T* pArr)
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::DeleteArr(T* pArr)
 {
-	X_ASSERT_NOT_NULL(arena_);
-
-	arena_->free(pArr);
-	// X_DELETE_ARRAY(pArr, arena_);
+	allocator_.free(pArr);
 }
 
-template<typename T>
-X_INLINE T* Array<T>::Allocate(size_type num)
+template<typename T, class Allocator>
+X_INLINE T* Array<T, Allocator>::Allocate(size_type num)
 {
-	X_ASSERT_NOT_NULL(arena_);
-
 	// we don't allocate the object type.
 	// since we don't want to construct any of them.
 	// that is done on a per item bases.
-	return static_cast<T*>(arena_->allocate(sizeof(T)*num, X_ALIGN_OF(T), 0, "Array", "T[]", X_SOURCE_INFO));
+	return allocator_.allocate(num);
 }

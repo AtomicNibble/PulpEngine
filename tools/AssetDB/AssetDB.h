@@ -4,13 +4,12 @@
 
 #include <Util\Delegate.h>
 #include <Hashing\MD5.h>
+#include <Containers\Array.h>
 
 #include <IAssetDb.h>
 #include <ICompression.h>
 
 X_NAMESPACE_DECLARE(core,
-	template<typename T>
-	class Array;
 
 	class LinearAllocator;
 );

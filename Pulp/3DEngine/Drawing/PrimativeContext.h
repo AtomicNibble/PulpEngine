@@ -54,7 +54,7 @@ public:
 
 	typedef core::Array<PushBufferEntry> PushBufferArr;
 	typedef core::Array<const PushBufferEntry*> SortedPushBufferArr;
-	typedef core::Array<PrimVertex> VertexArr;
+	typedef core::Array<PrimVertex, core::ArrayAlignedAllocator<PrimVertex>> VertexArr;
 
 public:
 	PrimativeContext(core::MemoryArenaBase* arena);

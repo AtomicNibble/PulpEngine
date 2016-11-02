@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "AuxRenderImp.h"
 
-#include "Containers\AlignedArray.h"
 
 
 X_NAMESPACE_BEGIN(render)
@@ -10,8 +9,8 @@ X_NAMESPACE_BEGIN(render)
 namespace
 {
 
-	typedef core::AlignedArray<AuxObjVertex> AuxObjVertexArr;
-	typedef core::AlignedArray<uint16> AuxObjIndexArr;
+	typedef core::Array<AuxObjVertex, core::ArrayAlignedAllocator<AuxObjVertex>> AuxObjVertexArr;
+	typedef core::Array<uint16_t, core::ArrayAlignedAllocator<uint16_t>> AuxObjIndexArr;
 
 	// function to generate a sphere mesh
 	static void CreateSphere(AuxObjVertexArr& vb, AuxObjIndexArr& ib,
@@ -343,8 +342,8 @@ bool RenderAuxImp::createMesh(ID3D12Device* pDevice, ContextManager& contexMan, 
 	AuxObjVertexArr vb(arena);
 	AuxObjIndexArr ib(arena);
 
-	vb.setBaseAlignment(16);
-	ib.setBaseAlignment(16);
+	vb.getAllocator().setBaseAlignment(16);
+	ib.getAllocator().setBaseAlignment(16);
 
 	meshFunc.CreateMesh(vb, ib);
 

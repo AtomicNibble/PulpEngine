@@ -58,7 +58,7 @@
     <ClInclude Include="Compression\Lzma2.h" />
     <ClInclude Include="Compression\Store.h" />
     <ClInclude Include="Compression\Zlib.h" />
-    <ClInclude Include="Containers\AlignedArray.h" />
+    <ClInclude Include="Containers\ArrayAllocators.h" />
     <ClInclude Include="Containers\BitStream.h" />
     <ClInclude Include="Containers\ByteStream.h" />
     <ClInclude Include="Containers\ByteStreamFifo.h" />
@@ -383,7 +383,6 @@
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
     <None Include="CmdBucket.inl" />
-    <None Include="Containers\AlignedArray.inl" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
     <None Include="Containers\ByteStreamFifo.inl" />

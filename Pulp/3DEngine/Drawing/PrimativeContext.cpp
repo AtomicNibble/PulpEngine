@@ -11,6 +11,7 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 {
 	
 	pushBufferArr_.reserve(64);
+	vertexArr_.getAllocator().setBaseAlignment(16); // for simd.
 	vertexArr_.reserve(256);
 }
 

@@ -2,6 +2,7 @@
 
 #include <maya\MPxCommand.h>
 
+#include <Containers\Array.h>
 
 #include <Platform\Pipe.h>
 
@@ -13,10 +14,6 @@ namespace AssetDB {
 );
 
 
-X_NAMESPACE_DECLARE(core,
-	template<typename T>
-	class Array;
-);
 
 
 X_NAMESPACE_BEGIN(maya)

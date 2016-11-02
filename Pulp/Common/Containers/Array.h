@@ -6,13 +6,14 @@
 #include <ISerialize.h>
 
 #include "CompileTime\IsPOD.h"
+#include "Containers\ArrayAllocators.h"
 
 X_NAMESPACE_BEGIN(core)
 
 class MemoryArenaBase;
 struct XFile;
 
-template <typename T>
+template <typename T, class Allocator = ArrayAllocator<T>>
 class Array
 {
 public:
@@ -24,6 +25,7 @@ public:
 	typedef size_t size_type;
 	typedef T& Reference;
 	typedef const T& ConstReference;
+
 
 	enum : size_type {
 		invalid_index = static_cast<size_type>(-1)
@@ -41,9 +43,12 @@ public:
 	void setArena(MemoryArenaBase* arena, size_type capacity);
 	core::MemoryArenaBase* getArena(void) const; // have one use case for this currently lol.
 
-	Array<T>& operator=(std::initializer_list<T> iList);
-	Array<T>& operator=(const Array<T>& oth);
-	Array<T>& operator=(Array<T>&& oth);
+	Allocator& getAllocator(void);
+	const Allocator& getAllocator(void) const;
+
+	Array<T, Allocator>& operator=(std::initializer_list<T> iList);
+	Array<T, Allocator>& operator=(const Array<T, Allocator>& oth);
+	Array<T, Allocator>& operator=(Array<T, Allocator>&& oth);
 
 	// index operators
 	const T& operator[](size_type idx) const;
@@ -88,7 +93,7 @@ public:
 	size_type append(const T& obj);
 	size_type append(T&& obj);
 	// add the list
-	size_type append(const Array<T>& oth);
+	size_type append(const Array<T, Allocator>& oth);
 	// appends a item to the end, resizing if required.
 	size_type push_back(const T& obj);
 	size_type push_back(T&& obj);
@@ -138,13 +143,13 @@ protected:
 	X_INLINE void DeleteArr(T* pArr);
 	X_INLINE T* Allocate(size_type size);
 
-private:
+protected:
 	T*				list_;			// pointer to memory block
 	size_type		num_;			// num elemets stored in the list
 	size_type		size_;			// the current allocated size
 	size_type		granularity_;	// the allocation size stratergy
 
-	MemoryArenaBase* arena_;
+	Allocator		allocator_;
 };
 
 #include "Array.inl"

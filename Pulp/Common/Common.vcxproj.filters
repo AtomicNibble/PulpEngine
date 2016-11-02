@@ -1108,9 +1108,6 @@
     <ClInclude Include="Memory\MemUtil.h">
       <Filter>Headers\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Containers\AlignedArray.h">
-      <Filter>Headers\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="IRender.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
@@ -1152,6 +1149,9 @@
     </ClInclude>
     <ClInclude Include="Util\Function.h">
       <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\ArrayAllocators.h">
+      <Filter>Headers\Containers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1430,9 +1430,6 @@
     </None>
     <None Include="Math\XViewPort.inl">
       <Filter>Headers\Math</Filter>
-    </None>
-    <None Include="Containers\AlignedArray.inl">
-      <Filter>Headers\Containers</Filter>
     </None>
     <None Include="CmdBucket.inl">
       <Filter>Interfaces_h\Render</Filter>

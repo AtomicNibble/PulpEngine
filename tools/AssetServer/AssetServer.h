@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Containers\Array.h>
 #include <Platform\Pipe.h>
 #include <../AssetDB/AssetDB.h>
 
@@ -13,11 +14,6 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 		class UpdateAsset;
 		enum Reponse_Result;
 	}
-);
-
-X_NAMESPACE_DECLARE(core,
-	template<typename T>
-	class Array;
 );
 
 X_NAMESPACE_BEGIN(assetServer)
