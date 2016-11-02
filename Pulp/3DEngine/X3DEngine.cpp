@@ -187,90 +187,116 @@ void X3DEngine::Update(void)
 	// safe to start creating gpu commands for the context.
 	// since te
 
-	XCamera cam;
-	XViewPort viewPort;
-
-	render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 0x1000 * 64);
-	cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-	render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, 0x1000, cam, viewPort);
-
-	// fuck a flying camel just before it lands.
-	// then skin it and put the skin on a goat.
-	render::StateDesc desc;
-	desc.blend.srcBlendColor = render::BlendType::ONE;
-	desc.blend.srcBlendAlpha = render::BlendType::ONE;
-	desc.blend.dstBlendColor = render::BlendType::ZERO;
-	desc.blend.dstBlendAlpha = render::BlendType::ZERO;
-	desc.blendOp = render::BlendOp::OP_ADD;
-	desc.cullType = render::CullType::BACK_SIDED;
-	desc.topo = render::TopoType::LINELIST;
-	desc.depthFunc = render::DepthFunc::LESS;
-	desc.stateFlags.Clear();
-	desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
-
-	auto renderTarget = pRender_->getCurBackBuffer();
-
-	render::RenderTargetFmtsArr rtfs;
-	rtfs.append(renderTarget->getFmt());
-	render::PassStateHandle passHandle = pRender_->createPassState(rtfs);
-	render::StateHandle stateHandle = pRender_->createState(passHandle, desc, nullptr, 0);
-
-	primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
 	// we could populate this command bucket with a job for each primContext.
 	// and just shove the index at MSB of key to keep order.
 	size_t totalElems = 0;
 
-	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++) 
+
+	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 	{
 		auto& context = primContexts_[i];
-		if (!context.isEmpty()) 
+		if (!context.isEmpty())
 		{
 			const auto& elems = context.getUnsortedBuffer();
 
 			totalElems += elems.size();
-
-			render::VertexBufferHandle vertexBuf = 0;
-
-			const auto& front = elems.front();
-			uint32_t curFlags = front.flags;
-
-			render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(curFlags, 0);
-			pDraw->startVertex = front.vertexOffs;
-			pDraw->vertexCount = front.numVertices;
-			pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
-			pDraw->stateHandle = stateHandle; // we need state :cry:
-
-			for(size_t x=1; x< elems.size(); x++)
-			{
-				const auto& elem = elems[x];
-				uint32_t flags = elem.flags;
-
-				// while the flags don't change, we append. WHY?
-				if (flags == curFlags)
-				{
-					render::Commands::Draw* pChild = primBucket.appendCommand<render::Commands::Draw>(pDraw, 0);
-					pChild->startVertex = elem.vertexOffs;
-					pChild->vertexCount = elem.numVertices;
-					pChild->vertexBuffers[VertexStream::VERT] = vertexBuf;
-					pDraw->stateHandle = stateHandle;
-				}
-				else
-				{
-					pDraw = primBucket.addCommand<render::Commands::Draw>(flags, 0);
-					pDraw->startVertex = elem.vertexOffs;
-					pDraw->vertexCount = elem.numVertices;
-					pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
-					pDraw->stateHandle = stateHandle;
-
-					// update flags.
-					curFlags = flags;
-				}
-			}
 		}
 	}
 
-	if (totalElems > 0) {
+	if (totalElems > 0)
+	{
+
+		XCamera cam;
+		XViewPort viewPort;
+
+		viewPort.set(1920, 1080);
+
+		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 256);
+		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems, cam, viewPort);
+
+
+		const auto* pShader = pRender_->getShader("gui");
+		const auto* pTech = pShader->getTech("Fill");
+
+
+		// fuck a flying camel just before it lands.
+		// then skin it and put the skin on a goat.
+		render::StateDesc desc;
+		desc.blend.srcBlendColor = render::BlendType::ONE;
+		desc.blend.srcBlendAlpha = render::BlendType::ONE;
+		desc.blend.dstBlendColor = render::BlendType::ZERO;
+		desc.blend.dstBlendAlpha = render::BlendType::ZERO;
+		desc.blendOp = render::BlendOp::OP_ADD;
+		desc.cullType = render::CullType::BACK_SIDED;
+		desc.topo = render::TopoType::LINELIST;
+		desc.depthFunc = render::DepthFunc::LESS;
+		desc.stateFlags.Clear();
+		desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
+
+		auto renderTarget = pRender_->getCurBackBuffer();
+
+		render::RenderTargetFmtsArr rtfs;
+		rtfs.append(renderTarget->getFmt());
+		render::PassStateHandle passHandle = pRender_->createPassState(rtfs);
+		render::StateHandle stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
+
+		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
+
+
+		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
+		{
+			auto& context = primContexts_[i];
+			if (!context.isEmpty())
+			{
+				const auto& elems = context.getUnsortedBuffer();
+
+				render::VertexBufferHandle vertexBuf = 0;
+
+				const auto& front = elems.front();
+				uint32_t curFlags = front.flags;
+
+				render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(curFlags, 0);
+				pDraw->startVertex = front.vertexOffs;
+				pDraw->vertexCount = front.numVertices;
+				core::zero_object(pDraw->vertexBuffers);
+				pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
+				pDraw->stateHandle = stateHandle; // we need state :cry:
+
+				for (size_t x = 1; x < elems.size(); x++)
+				{
+					const auto& elem = elems[x];
+					uint32_t flags = elem.flags;
+
+					// while the flags don't change, we append. WHY?
+					if (flags == curFlags)
+					{
+						render::Commands::Draw* pChild = primBucket.appendCommand<render::Commands::Draw>(pDraw, 0);
+						pChild->startVertex = elem.vertexOffs;
+						pChild->vertexCount = elem.numVertices;
+						core::zero_object(pDraw->vertexBuffers);
+						pChild->vertexBuffers[VertexStream::VERT] = vertexBuf;
+						pDraw->stateHandle = stateHandle;
+					}
+					else
+					{
+						pDraw = primBucket.addCommand<render::Commands::Draw>(flags, 0);
+						pDraw->startVertex = elem.vertexOffs;
+						pDraw->vertexCount = elem.numVertices;
+						core::zero_object(pDraw->vertexBuffers);
+						pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
+						pDraw->stateHandle = stateHandle;
+
+						// update flags.
+						curFlags = flags;
+					}
+				}
+			}
+		}
+
+		primBucket.sort();
+
 		pRender_->submitCommandPackets(primBucket, render::Commands::Key::Type::PRIM);
 	}
 }
