@@ -84,7 +84,12 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 	X_ASSERT_NOT_NULL(pPath);
 	X_ASSERT_NOT_NULL(pShader);
 
-	if (!pShader->isValid() || !pShader->isILFmtValid())
+	if (!pShader->isValid())
+	{
+		X_ERROR("Shader", "Failed to save compiled shader it's not valid.");
+		return false;
+	}
+	if (pShader->getType() == ShaderType::Vertex && !pShader->isILFmtValid())
 	{
 		X_ERROR("Shader", "Failed to save compiled shader it's not valid.");
 		return false;
