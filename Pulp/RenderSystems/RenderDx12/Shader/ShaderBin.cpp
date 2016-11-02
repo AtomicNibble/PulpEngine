@@ -6,6 +6,9 @@
 
 #include "HWShader.h"
 
+#include <ICompression.h>
+#include <Compression\LZ4.h>
+
 
 X_NAMESPACE_BEGIN(render)
 
@@ -14,6 +17,11 @@ namespace shader
 
 	namespace
 	{
+		X_DECLARE_FLAGS8(BinFileFlag)(
+			COMPRESSED	
+		);
+
+		typedef Flags8<BinFileFlag> BinFileFlags;
 
 		struct ShaderBinHeader
 		{
@@ -26,10 +34,11 @@ namespace shader
 			// the version it was compiled against.
 			uint8_t profileMajorVersion;		
 			uint8_t profileMinorVersion;		
-			uint8_t unused[1];
+			BinFileFlags flags;
 			uint32_t crc32;
 			uint32_t sourceCRC32;
 			uint32_t blobLength;
+			uint32_t deflatedLength;
 			uint32_t compileFlags;
 			core::dateTimeStampSmall modifed;
 
@@ -53,7 +62,7 @@ namespace shader
 			}
 		};
 
-		X_ENSURE_SIZE(ShaderBinHeader, 56);
+		X_ENSURE_SIZE(ShaderBinHeader, 60);
 
 	} // namespace
 
@@ -94,11 +103,13 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 	hdr.version = ShaderBinHeader::X_SHADER_BIN_VERSION;
 	hdr.profileMajorVersion = profileVersion.first;
 	hdr.profileMinorVersion = profileVersion.second;
+	hdr.flags.Set(BinFileFlag::COMPRESSED);
 	hdr.modifed = core::dateTimeStampSmall::systemDateTime();
 	hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
 	hdr.sourceCRC32 = pShader->getSourceCrc32();
 	hdr.compileFlags = pShader->getD3DCompileFlags();
 	hdr.blobLength = safe_static_cast<uint32_t, size_t>(byteCode.size());
+	hdr.deflatedLength = 0;
 
 	// shader reflection info.
 	hdr.numBindVars = safe_static_cast<uint32_t, size_t>(bindVars.size());
@@ -127,8 +138,28 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 			file.write(bind.numParameters);
 		}
 
-		if (file.write(byteCode.data(), byteCode.size()) != byteCode.size()) {
-			return false;
+		if (hdr.flags.IsSet(BinFileFlag::COMPRESSED)) 
+		{
+			core::Compression::Compressor<core::Compression::LZ4> comp;
+			core::Array<uint8_t> compressed(g_rendererArena);
+
+			if (!comp.deflate(g_rendererArena, byteCode, compressed, core::Compression::CompressLevel::NORMAL))
+			{
+				X_ERROR("Shader", "Failed to defalte data");
+				return false;
+			}
+
+			hdr.deflatedLength = safe_static_cast<uint32_t, size_t>(compressed.size());
+
+			if (file.write(compressed.data(), compressed.size()) != compressed.size()) {
+				return false;
+			}
+		}
+		else 
+		{
+			if (file.write(byteCode.data(), byteCode.size()) != byteCode.size()) {
+				return false;
+			}
 		}
 	}
 	else
@@ -235,10 +266,35 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 
 			pShader->bytecode_.resize(hdr.blobLength);
 
-			if (file.read(pShader->bytecode_.data(), hdr.blobLength) != hdr.blobLength) {
-				X_ERROR("Shader", "Failed to read shader byte code");
-				return false;
+			if (hdr.flags.IsSet(BinFileFlag::COMPRESSED))
+			{
+				core::Compression::Compressor<core::Compression::LZ4> comp;
+				core::Array<uint8_t> compressed(g_rendererArena, hdr.deflatedLength);
+
+				if (hdr.deflatedLength < 1) {
+					X_ERROR("Shader", "Failed to read shader byte code");
+					return false;
+				}
+
+				if (file.read(compressed.data(), hdr.blobLength) != hdr.blobLength) {
+					X_ERROR("Shader", "Failed to read shader byte code");
+					return false;
+				}
+
+				if (!comp.inflate(g_rendererArena, compressed, pShader->bytecode_))
+				{
+					X_ERROR("Shader", "Failed to inflate data");
+					return false;
+				}
 			}
+			else
+			{
+				if (file.read(pShader->bytecode_.data(), hdr.blobLength) != hdr.blobLength) {
+					X_ERROR("Shader", "Failed to read shader byte code");
+					return false;
+				}
+			}
+
 
 			std::memcpy(pShader->maxVecs_, maxVecs, sizeof(maxVecs));
 			pShader->numSamplers_ = hdr.numSamplers;
