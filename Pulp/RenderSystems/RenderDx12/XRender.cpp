@@ -860,7 +860,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 
 	for (size_t i = 0; i < rtvs.size(); i++) {
 		const ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
-		RTVs[i] = rtv.getSRV();
+		RTVs[i] = rtv.getRTV();
 		RTVFormats[i] = rtv.getFormat();
 	}
 
