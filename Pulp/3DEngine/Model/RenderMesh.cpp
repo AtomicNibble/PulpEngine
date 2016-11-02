@@ -113,23 +113,23 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend,
 	const uint32_t normalStride = vertexSteamStride[VertexStream::NORMALS][vertexFmt];
 	const uint32_t tanBiStride = vertexSteamStride[VertexStream::TANGENT_BI][vertexFmt];
 
-	indexStream_ = pRend->createIndexBuffer(ibSize, render::BufUsage::IMMUTABLE);
+	indexStream_ = pRend->createIndexBuffer(sizeof(model::Index), mesh.numIndexes, render::BufUsage::IMMUTABLE);
 
 	// we always carry vert?
 	X_ASSERT(baseVertStride > 0, "Vertex stride of zero")(baseVertStride);
-	vertexStreams_[VertexStream::VERT] = pRend->createVertexBuffer(baseVertStride * numVerts,
+	vertexStreams_[VertexStream::VERT] = pRend->createVertexBuffer(baseVertStride, numVerts,
 		mesh.streams[VertexStream::VERT], render::BufUsage::IMMUTABLE);
 
 	if (colorStride > 0) {
-		vertexStreams_[VertexStream::COLOR] = pRend->createVertexBuffer(colorStride * numVerts,
+		vertexStreams_[VertexStream::COLOR] = pRend->createVertexBuffer(colorStride, numVerts,
 			mesh.streams[VertexStream::COLOR], render::BufUsage::IMMUTABLE);
 	}
 	if (colorStride > 0) {
-		vertexStreams_[VertexStream::NORMALS] = pRend->createVertexBuffer(normalStride * numVerts,
+		vertexStreams_[VertexStream::NORMALS] = pRend->createVertexBuffer(normalStride, numVerts,
 			mesh.streams[VertexStream::NORMALS], render::BufUsage::IMMUTABLE);
 	}
 	if (colorStride > 0) {
-		vertexStreams_[VertexStream::TANGENT_BI] = pRend->createVertexBuffer(tanBiStride * numVerts,
+		vertexStreams_[VertexStream::TANGENT_BI] = pRend->createVertexBuffer(tanBiStride, numVerts,
 			mesh.streams[VertexStream::TANGENT_BI], render::BufUsage::IMMUTABLE);
 	}
 
