@@ -99,8 +99,8 @@ X_DECLARE_ENUM8(VertexFormat)(
 
 // -----------------------------------------------------------------------
 
-X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
-X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
+X_DECLARE_ENUM8(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
+X_DECLARE_ENUM8(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 
 
 
