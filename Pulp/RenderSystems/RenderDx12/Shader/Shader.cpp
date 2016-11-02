@@ -76,9 +76,6 @@ XShader::XShader(core::MemoryArenaBase* arena) :
 {
 	sourceCrc32_ = 0;
 	hlslSourceCrc32_ = 0;
-
-	// vertexFmt_ = VertexFormat::P3F_T2F_C4B;
-
 	pHlslFile_ = nullptr;
 }
 
@@ -90,9 +87,6 @@ XShader::~XShader()
 const IShaderTech* XShader::getTech(const char* pName) const
 {
 	for (const auto& tech : techs_)
-	size_t i, numTecs;
-	numTecs = techs_.size();
-	for (i = 0; i < numTecs; i++)
 	{
 		if (tech.name == pName)
 		{
