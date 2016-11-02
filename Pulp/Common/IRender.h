@@ -474,7 +474,7 @@ struct IRender
 	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
 	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
 
-	virtual StateHandle createState(PassStateHandle passHandle, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
+	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
 	virtual void destoryState(StateHandle handle) X_ABSTRACT;
 
 	// =============================================

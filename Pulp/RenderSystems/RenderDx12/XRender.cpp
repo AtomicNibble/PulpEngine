@@ -1130,7 +1130,8 @@ void XRender::destoryPassState(PassStateHandle passHandle)
 	X_DELETE(pPassState, arena_);
 }
 
-StateHandle XRender::createState(PassStateHandle passHandle, const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
+StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderTech* pTech_,
+	const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
 {
 	const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
 
@@ -1181,17 +1182,23 @@ StateHandle XRender::createState(PassStateHandle passHandle, const StateDesc& de
 	const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
 	pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
 
-#if 0
-	shader::XShaderTechniqueHW* pHWTech = nullptr;
-	if (pHWTech->pVertexShader) {
-		const auto& byteCode = pHWTech->pVertexShader->getShaderByteCode();
+	shader::XShaderTechnique* pTech = const_cast<shader::XShaderTechnique*>(static_cast<const shader::XShaderTechnique*>(pTech_));
+
+#if 1
+	shader::XShaderTechniqueHW& hwTech = pTech->hwTechs[0];
+
+	hwTech.tryCompile(true);
+//	pShaderMan_->compile(hwTech);
+
+	if (hwTech.pVertexShader) {
+		const auto& byteCode = hwTech.pVertexShader->getShaderByteCode();
 		pso.setVertexShader(byteCode.data(), byteCode.size());
 	}
-	if (pHWTech->pPixelShader) {
-		const auto& byteCode = pHWTech->pPixelShader->getShaderByteCode();
+	if (hwTech.pPixelShader) {
+		const auto& byteCode = hwTech.pPixelShader->getShaderByteCode();
 		pso.setPixelShader(byteCode.data(), byteCode.size());
 	}
-	if (pHWTech->pDomainShader || pHWTech->pHullShader || pHWTech->pGeoShader) {
+	if (hwTech.pDomainShader || hwTech.pHullShader || hwTech.pGeoShader) {
 		// in order to allow these check if the root sig flags need changing then just duplicate 
 		// the bytecode setting logic.
 		X_ERROR("Dx12", "Domain, Hull, Geo are not enabled currently");

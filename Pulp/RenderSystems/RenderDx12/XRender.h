@@ -158,7 +158,7 @@ public:
 	void destoryPassState(PassStateHandle handle) X_OVERRIDE;
 
 
-	StateHandle createState(PassStateHandle passHandle, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
 	void destoryState(StateHandle handle) X_OVERRIDE;
 
 
