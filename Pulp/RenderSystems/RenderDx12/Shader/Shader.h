@@ -145,6 +145,8 @@ X_ALIGNED_SYMBOL(class XShader, 16) : public IShader
 {
 	friend class XShaderManager;
 
+	typedef core::Array<XShaderTechnique> TechArr;
+
 public:
 	XShader(core::MemoryArenaBase* arena);
 	~XShader();
@@ -158,7 +160,7 @@ private:
 	uint32_t sourceCrc32_;
 	uint32_t hlslSourceCrc32_;
 	SourceFile* pHlslFile_;
-	core::Array<XShaderTechnique> techs_;
+	TechArr techs_;
 };
 
 
