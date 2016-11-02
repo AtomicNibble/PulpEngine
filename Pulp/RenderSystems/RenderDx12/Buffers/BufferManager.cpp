@@ -32,8 +32,11 @@ BufferManager::Stats::Stats()
 
 // -------------------------------------------
 
-BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
+BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+	ContextManager* pContextMan, DescriptorAllocator* pDescriptorAllocator) :
 	pDevice_(pDevice),
+	pContextMan_(pContextMan),
+	pDescriptorAllocator_(pDescriptorAllocator),
 
 	heap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(POOL_SIZE * POOL_ALLOCATION_SIZE,

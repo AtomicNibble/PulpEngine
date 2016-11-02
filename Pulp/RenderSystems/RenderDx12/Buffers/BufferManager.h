@@ -92,7 +92,8 @@ public:
 	};
 
 public:
-	BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
+	BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+		ContextManager* pContextMan, DescriptorAllocator* pDescriptorAllocator);
 	~BufferManager();
 
 	bool init(void);
@@ -123,6 +124,8 @@ private:
 
 private:
 	ID3D12Device* pDevice_;
+	ContextManager* pContextMan_;
+	DescriptorAllocator* pDescriptorAllocator_;
 
 	core::HeapArea heap_;
 	core::PoolAllocator pool_;
