@@ -147,7 +147,7 @@ X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 typedef Flags<ILFlag> ILFlags;
 
-X_DECLARE_ENUM(InputLayoutFormat)(
+X_DECLARE_ENUM8(InputLayoutFormat)(
 	Invalid,
 
 	POS_UV,
