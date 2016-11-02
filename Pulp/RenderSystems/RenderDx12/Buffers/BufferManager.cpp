@@ -75,7 +75,7 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t size, 
 BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t size, const void* pInitialData,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	X3DBuffer* pBuf = Int_CreateVB(size);
+	X3DBuffer* pBuf = Int_CreateIB(size);
 
 
 	return createHandleForBuffer(pBuf);
