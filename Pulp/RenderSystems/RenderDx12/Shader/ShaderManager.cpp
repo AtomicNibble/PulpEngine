@@ -243,6 +243,11 @@ namespace shader
 		return vars_;
 	}
 
+	ShaderBin& XShaderManager::getBin(void)
+	{
+		return shaderBin_;
+	}
+
 
 	bool XShaderManager::loadCoreShaders(void)
 	{

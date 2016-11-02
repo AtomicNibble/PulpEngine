@@ -66,6 +66,8 @@ namespace shader
 
 		ILTreeNode& getILTree(void);
 		ShaderVars& getShaderVars(void);
+		ShaderBin& getBin(void);
+
 
 	private:
 		bool loadCoreShaders(void);
