@@ -52,6 +52,11 @@ namespace shader
 		return status_ == ShaderStatus::ReadyToRock;
 	}
 
+	X_INLINE bool XHWShader::isILFmtValid(void) const
+	{
+		return 	IlFmt_ != InputLayoutFormat::Invalid;
+	}
+
 	X_INLINE bool XHWShader::FailedtoCompile(void) const
 	{
 		return status_ == ShaderStatus::FailedToCompile;
