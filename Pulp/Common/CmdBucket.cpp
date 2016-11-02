@@ -100,7 +100,7 @@ void CommandBucket<KeyT>::sort(void)
 {
 	const int32_t current = current_;
 
-	core::Sorting::radix_sort_buf<uint32_t>(keys_.begin(), keys_.begin() + current, sortedIdx_, arena_);
+	core::Sorting::radix_sort_buf<uint32_t>(keys_.begin(), keys_.end(), sortedIdx_, arena_);
 }
 
 template <typename KeyT>
