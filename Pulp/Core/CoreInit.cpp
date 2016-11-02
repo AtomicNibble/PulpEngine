@@ -4,6 +4,7 @@
 #include "Log.h"
 
 #include <String\CmdArgs.h>
+#include <String\HumanSize.h>
 
 #include "NullImplementation\ConsoleNULL.h"
 #include "NullImplementation/NullInput.h"
@@ -227,8 +228,9 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 
 #if !defined(X_LIB)
 	core::GetProcessMemInfo(memEnd);
-	uint64 memUsed = memEnd.WorkingSetSize - memStart.WorkingSetSize;
-	X_LOG0("Engine", "Init \"%s\", MemUsage=%dKb ^6%gms", name ? (name+1) : dllName, uint32(memUsed / 1024), time.GetMilliSeconds());
+	int64 memUsed = static_cast<int64_t>(memEnd.WorkingSetSize) - static_cast<int64_t>(memStart.WorkingSetSize);
+	core::HumanSize::Str sizeStr;
+	X_LOG0("Engine", "Init \"%s\", MemUsage=%s ^6%gms", name ? (name+1) : dllName, core::HumanSize::toString(sizeStr, memUsed), time.GetMilliSeconds());
 #else
 	X_LOG0("Engine", "Init \"%s\": %s ^6%gms", name ? (name + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
 #endif // #if !defined(X_LIB) 
