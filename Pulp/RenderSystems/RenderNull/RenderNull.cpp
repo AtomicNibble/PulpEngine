@@ -196,10 +196,11 @@ void RenderNull::destoryPassState(PassStateHandle handle)
 
 }
 
-StateHandle RenderNull::createState(PassStateHandle passHandle, const StateDesc& state, 
+StateHandle RenderNull::createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state,
 	const TextureState* pTextStates, size_t numStates)
 {
 	X_UNUSED(passHandle);
+	X_UNUSED(pTech);
 	X_UNUSED(state);
 	X_UNUSED(pTextStates);
 	X_UNUSED(numStates);
