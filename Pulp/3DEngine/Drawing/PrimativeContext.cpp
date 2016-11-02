@@ -51,6 +51,11 @@ const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void)
 	return pushBufferArr_;
 }
 
+const PrimativeContext::VertexArr& PrimativeContext::getVerts(void) const
+{
+	return vertexArr_;
+}
+
 void PrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText)
 {
 	X_UNUSED(pos);

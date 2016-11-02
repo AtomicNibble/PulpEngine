@@ -65,6 +65,7 @@ public:
 	bool isEmpty(void) const;
 	void getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
+	const VertexArr& getVerts(void) const;
 
 	void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText) X_FINAL;
 
