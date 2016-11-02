@@ -125,6 +125,28 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 	core::XFileScoped file;
 	if (file.openFile(pPath, core::fileMode::WRITE | core::fileMode::RECREATE))
 	{
+		typedef core::Array<uint8_t> DataArr;
+
+		DataArr compressed(g_rendererArena);
+		const DataArr* pData = &byteCode;
+
+		// need to compress before writing header.
+		if (hdr.flags.IsSet(BinFileFlag::COMPRESSED))
+		{
+			core::Compression::Compressor<core::Compression::LZ4> comp;
+
+			if (!comp.deflate(g_rendererArena, byteCode, compressed, core::Compression::CompressLevel::NORMAL))
+			{
+				X_ERROR("Shader", "Failed to defalte data");
+				return false;
+			}
+
+			hdr.deflatedLength = safe_static_cast<uint32_t, size_t>(compressed.size());
+
+			pData = &compressed;
+		}
+		X_ASSERT_NOT_NULL(pData);
+
 		file.write(hdr);
 
 		for (auto& bind : bindVars)
@@ -138,29 +160,9 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 			file.write(bind.numParameters);
 		}
 
-		if (hdr.flags.IsSet(BinFileFlag::COMPRESSED)) 
-		{
-			core::Compression::Compressor<core::Compression::LZ4> comp;
-			core::Array<uint8_t> compressed(g_rendererArena);
-
-			if (!comp.deflate(g_rendererArena, byteCode, compressed, core::Compression::CompressLevel::NORMAL))
-			{
-				X_ERROR("Shader", "Failed to defalte data");
-				return false;
-			}
-
-			hdr.deflatedLength = safe_static_cast<uint32_t, size_t>(compressed.size());
-
-			if (file.write(compressed.data(), compressed.size()) != compressed.size()) {
-				return false;
-			}
-		}
-		else 
-		{
-			if (file.write(byteCode.data(), byteCode.size()) != byteCode.size()) {
-				return false;
-			}
-		}
+		if (file.write(pData->data(), pData->size()) != pData->size()) {
+			return false;
+		}		
 	}
 	else
 	{
