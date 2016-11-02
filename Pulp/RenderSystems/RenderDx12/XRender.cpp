@@ -802,27 +802,38 @@ void XRender::renderBegin(void)
 
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
-	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_RENDER_TARGET);
-	pContext->setViewportAndScissor(0, 0, currentNativeRes_.x, currentNativeRes_.y);
-	pContext->setRootSignature(presentRS_);
-
-	pContext->setRenderTargets(_countof(RTVs), RTVs);
-	pContext->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	pContext->draw(3);
-
+	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_RENDER_TARGET, true);
 	pContext->clearColor(displayPlane_[currentBufferIdx_]);
-	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
+	// pContext->setRenderTargets(_countof(RTVs), RTVs);
+
+//	pContext->setViewportAndScissor(0, 0, currentNativeRes_.x, currentNativeRes_.y);
+//	pContext->setRootSignature(presentRS_);
+//
+//	pContext->setRenderTargets(_countof(RTVs), RTVs);
+//	pContext->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+//	pContext->draw(3);
+
+	// pContext->clearColor(displayPlane_[currentBufferIdx_]);
+//	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
 	pContext->finishAndFree(false);
 }
 
 void XRender::renderEnd(void)
 {
-	currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
+
+	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
+
+
+	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
+	pContext->finishAndFree(true);
+
 
 	HRESULT hr = pSwapChain_->Present(0, 0);
 	if (FAILED(hr)) {
 		X_ERROR("Dx12", "Present failed. err: %" PRIu32, hr);
 	}
+
+	currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
 
 	handleResolutionChange();
 }
