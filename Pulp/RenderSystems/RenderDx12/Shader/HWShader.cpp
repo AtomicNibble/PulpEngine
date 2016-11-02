@@ -155,7 +155,7 @@ namespace shader
 		entryPoint_(entry),
 		status_(ShaderStatus::NotCompiled),
 		type_(type),
-		IlFmt_(InputLayoutFormat::POS_UV),
+		IlFmt_(InputLayoutFormat::Invalid),
 		numRenderTargets_(0),
 		numSamplers_(0),
 		numConstBuffers_(0),
