@@ -406,10 +406,6 @@ struct IShader
 {
 	virtual ~IShader() {}
 
-//	virtual ShaderID getID(void) X_ABSTRACT;
-//	virtual const int32_t addRef(void) X_ABSTRACT;
-//	virtual const int32_t release(void) X_ABSTRACT;
-
 	virtual const core::string& getName(void) const X_ABSTRACT;
 
 
