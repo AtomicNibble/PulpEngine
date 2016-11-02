@@ -283,7 +283,7 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 				core::Compression::Compressor<core::Compression::LZ4> comp;
 				core::Array<uint8_t> compressed(g_rendererArena, hdr.deflatedLength);
 
-				if (file.read(compressed.data(), hdr.blobLength) != hdr.blobLength) {
+				if (file.read(compressed.data(), hdr.deflatedLength) != hdr.deflatedLength) {
 					X_ERROR("Shader", "Failed to read shader byte code");
 					return false;
 				}
