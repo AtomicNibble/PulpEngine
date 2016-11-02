@@ -446,6 +446,11 @@ namespace shader
 		core::SafeReleaseDX(pErrorBlob);
 		core::SafeReleaseDX(pBlob);
 
+		if (!reflectShader()) {
+
+			return false;
+		}
+
 		status_ = ShaderStatus::ReadyToRock;
 		saveToCache(shaderMan_.getBin());
 
@@ -867,6 +872,8 @@ namespace shader
 			if (!pVertexShader->compile(forceSync)) {
 				return false;
 			}
+
+			IlFmt = pVertexShader->getILFormat();
 		}
 		if (pPixelShader && pPixelShader->getStatus() == ShaderStatus::NotCompiled) {
 			if (!pPixelShader->compile(forceSync)) {
