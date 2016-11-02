@@ -1,28 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-  <Type Name="Potato::core::Array&lt;*&gt;">
+  <Type Name="Potato::core::Array&lt;*,*&gt;">
     <Expand>
       <Item Name="[size]" ExcludeView="simple">num_</Item>
       <Item Name="[capacity]" ExcludeView="simple">size_</Item>
       <Item Name="[growsize]" ExcludeView="simple">granularity_</Item>
       <Item Name="[pData]" ExcludeView="simple">list_</Item>
       <Item Name="[pEnd]" ExcludeView="simple">list_ + num_</Item>
-      <Item Name="[arena]" ExcludeView="simple">arena_</Item>
-      <ArrayItems>
-        <Size>num_</Size>
-        <ValuePointer>($T1*)list_</ValuePointer>
-      </ArrayItems>
-    </Expand>
-  </Type>
-  <Type Name="Potato::core::AlignedArray&lt;*&gt;">
-    <Expand>
-      <Item Name="[size]" ExcludeView="simple">num_</Item>
-      <Item Name="[capacity]" ExcludeView="simple">size_</Item>
-      <Item Name="[growsize]" ExcludeView="simple">granularity_</Item>
-      <Item Name="[baseAlign]" ExcludeView="simple">align_</Item>
-      <Item Name="[pData]" ExcludeView="simple">list_</Item>
-      <Item Name="[pEnd]" ExcludeView="simple">list_ + num_</Item>
-      <Item Name="[arena]" ExcludeView="simple">arena_</Item>
+      <Item Name="[allocator]" ExcludeView="simple">allocator_</Item>
       <ArrayItems>
         <Size>num_</Size>
         <ValuePointer>($T1*)list_</ValuePointer>
