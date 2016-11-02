@@ -230,7 +230,7 @@ public:
 	X_INLINE void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z);
 	X_INLINE void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W);
 	X_INLINE void setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV);
-	void setDynamicConstantBufferView(uint32_t RootIndex, size_t BufferSize, const void* pBufferData);
+	void setDynamicCBV(uint32_t rootIndex, size_t BufferSize, const void* pBufferData);
 	void setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0);
 	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);
 	X_INLINE void setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle);
@@ -276,7 +276,7 @@ public:
 	X_INLINE void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z);
 	X_INLINE void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W);
 	void setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV);
-	void setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, const void* pBufferData);
+	void setDynamicCBV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData);
 	void setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData);
 	void setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0);
 	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);

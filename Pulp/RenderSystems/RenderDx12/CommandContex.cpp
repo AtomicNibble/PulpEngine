@@ -710,7 +710,7 @@ void GraphicsContext::setPipelineState(ID3D12PipelineState* pPso)
 }
 
 
-void GraphicsContext::setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, 
+void GraphicsContext::setDynamicCBV(uint32_t rootIndex, size_t bufferSize,
 	const void* pBufferData)
 {
 	X_ASSERT_NOT_NULL(pBufferData);
@@ -851,7 +851,7 @@ void ComputeContext::setPipelineState(const ComputePSO& PSO)
 	pCurComputePipelineState_ = pPipelineState;
 }
 
-void ComputeContext::setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
+void ComputeContext::setDynamicCBV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
 {
 	X_ASSERT_NOT_NULL(pBufferData);
 	X_ASSERT_ALIGNMENT(pBufferData, 16, 0);
