@@ -211,6 +211,8 @@ DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
 	{
 		pCurPage_ = manager_.requestPage(allocationType_);
 		curOffset_ = 0;
+
+		X_ASSERT_NOT_NULL(pCurPage_);
 	}
 
 	void* pData = (reinterpret_cast<uint8_t*>(pCurPage_->cpuVirtualAddress()) + curOffset_);
