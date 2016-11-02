@@ -18,7 +18,7 @@ namespace shader
 		struct ShaderBinHeader
 		{
 			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-			static const uint32_t X_SHADER_BIN_VERSION = 4; // change this to force all shaders to be recompiled.
+			static const uint32_t X_SHADER_BIN_VERSION = 1; // change this to force all shaders to be recompiled.
 
 
 			uint32_t forcc;
@@ -40,14 +40,20 @@ namespace shader
 			uint32_t numInputParams;
 			uint32_t numRenderTargets;
 
+			// 4
 			TechFlags techFlags;
+			// 4
 			ShaderType::Enum type;
 			InputLayoutFormat::Enum ILFmt;
+			uint8_t _pad[2];
+
 
 			X_INLINE const bool isValid(void) const {
 				return forcc == X_SHADER_BIN_FOURCC;
 			}
 		};
+
+		X_ENSURE_SIZE(ShaderBinHeader, 56);
 
 	} // namespace
 
