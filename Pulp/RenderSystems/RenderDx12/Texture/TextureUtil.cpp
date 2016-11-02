@@ -57,7 +57,12 @@ namespace Util
 
 			case Texturefmt::R16G16_FLOAT:
 				return DXGI_FORMAT_R16G16_FLOAT;
+
 			case Texturefmt::R10G10B10A2:
+				return DXGI_FORMAT_R10G10B10A2_UNORM;
+			case Texturefmt::R10G10B10A2_UINT:
+				return DXGI_FORMAT_R10G10B10A2_UINT;
+			case Texturefmt::R10G10B10A2_TYPELESS:
 				return DXGI_FORMAT_R10G10B10A2_TYPELESS;
 
 #if X_DEBUG
@@ -78,10 +83,12 @@ namespace Util
 			case DXGI_FORMAT_R8G8B8A8_UNORM:
 				return Texturefmt::A8R8G8B8;
 
-			case DXGI_FORMAT_R10G10B10A2_TYPELESS:
 			case DXGI_FORMAT_R10G10B10A2_UNORM:
-			case DXGI_FORMAT_R10G10B10A2_UINT:
 				return Texturefmt::R10G10B10A2;
+			case DXGI_FORMAT_R10G10B10A2_TYPELESS:
+				return Texturefmt::R10G10B10A2_TYPELESS;
+			case DXGI_FORMAT_R10G10B10A2_UINT:
+				return Texturefmt::R10G10B10A2_UINT;
 
 #if X_DEBUG
 			default:

@@ -544,7 +544,7 @@ namespace Util
 
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(Texturefmt::ENUM_COUNT == 51, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
@@ -658,6 +658,11 @@ namespace Util
 
 			case "R10G10B10A2"_fnv1a:
 				return Texturefmt::R10G10B10A2;
+			case "R10G10B10A2_UINT"_fnv1a:
+				return Texturefmt::R10G10B10A2_UINT;
+			case "R10G10B10A2_TYPELESS"_fnv1a:
+				return Texturefmt::R10G10B10A2_TYPELESS;
+
 
 			case "R16G16B16A16_FLOAT"_fnv1a:
 				return Texturefmt::R16G16B16A16_FLOAT;
