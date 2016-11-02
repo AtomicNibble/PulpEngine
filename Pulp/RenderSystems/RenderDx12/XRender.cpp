@@ -1057,24 +1057,24 @@ IRenderTarget* XRender::getCurBackBuffer(uint32_t* pIdx)
 	return &displayPlane_[currentBufferIdx_];
 }
 
-VertexBufferHandle XRender::createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+VertexBufferHandle XRender::createVertexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createVertexBuf(size, nullptr, usage, accessFlag);
+	return pBuffMan_->createVertexBuf(numElements, elementSize, nullptr, usage, accessFlag);
 }
 
-VertexBufferHandle XRender::createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+VertexBufferHandle XRender::createVertexBuffer(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createVertexBuf(size, pInitialData, usage, accessFlag);
+	return pBuffMan_->createVertexBuf(numElements, elementSize, pInitialData, usage, accessFlag);
 }
 
-IndexBufferHandle XRender::createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+IndexBufferHandle XRender::createIndexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createIndexBuf(size, nullptr, usage, accessFlag);
+	return pBuffMan_->createIndexBuf(numElements, elementSize, nullptr, usage, accessFlag);
 }
 
-IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+IndexBufferHandle XRender::createIndexBuffer(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createIndexBuf(size, pInitialData, usage, accessFlag);
+	return pBuffMan_->createIndexBuf(numElements, elementSize, pInitialData, usage, accessFlag);
 }
 
 

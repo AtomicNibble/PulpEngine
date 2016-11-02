@@ -90,38 +90,42 @@ IRenderTarget* RenderNull::getCurBackBuffer(uint32_t* pIdx)
 }
 
 
-VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
+VertexBufferHandle RenderNull::createVertexBuffer(uint32_t numElements, uint32_t elementSize,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	X_UNUSED(size);
+	X_UNUSED(numElements);
+	X_UNUSED(elementSize);
 	X_UNUSED(usage);
 	X_UNUSED(accessFlag);
 	return 0;
 }
 
-VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
+VertexBufferHandle RenderNull::createVertexBuffer(uint32_t numElements, uint32_t elementSize,
 	const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	X_UNUSED(size);
+	X_UNUSED(numElements);
+	X_UNUSED(elementSize);
 	X_UNUSED(pInitialData);
 	X_UNUSED(usage);
 	X_UNUSED(accessFlag);
 	return 0;
 }
 
-IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
+IndexBufferHandle RenderNull::createIndexBuffer(uint32_t numElements, uint32_t elementSize,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	X_UNUSED(size);
+	X_UNUSED(numElements);
+	X_UNUSED(elementSize);
 	X_UNUSED(usage);
 	X_UNUSED(accessFlag);
 	return 0;
 }
 
-IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
+IndexBufferHandle RenderNull::createIndexBuffer(uint32_t numElements, uint32_t elementSize,
 	const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	X_UNUSED(size);
+	X_UNUSED(numElements);
+	X_UNUSED(elementSize);
 	X_UNUSED(pInitialData);
 	X_UNUSED(usage);
 	X_UNUSED(accessFlag);

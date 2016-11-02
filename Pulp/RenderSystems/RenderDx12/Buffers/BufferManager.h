@@ -99,8 +99,8 @@ public:
 	bool init(void);
 	void shutDown(void);
 
-	VertexBufferHandle createVertexBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
-	IndexBufferHandle createIndexBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
+	VertexBufferHandle createVertexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
+	IndexBufferHandle createIndexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 
 	// free from ID
 	void freeIB(IndexBufferHandle IBHandle);
