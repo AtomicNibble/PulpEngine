@@ -718,7 +718,7 @@ void GraphicsContext::setDynamicCBV(uint32_t rootIndex, size_t bufferSize,
 
 	DynAlloc cb = cpuLinearAllocator_.allocate(bufferSize);
 	memcpy(cb.getCpuData(), pBufferData, bufferSize);
-	pCommandList_->SetComputeRootConstantBufferView(rootIndex, cb.getGpuAddress());
+	pCommandList_->SetGraphicsRootConstantBufferView(rootIndex, cb.getGpuAddress());
 }
 
 void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
