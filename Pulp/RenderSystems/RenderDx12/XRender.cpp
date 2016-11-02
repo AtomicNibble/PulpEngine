@@ -7,6 +7,7 @@
 #include "Shader\ShaderManager.h"
 #include "Shader\Shader.h"
 #include "Shader\HWShader.h"
+#include "Shader\ShaderUtil.h"
 #include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"
@@ -1189,6 +1190,12 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	hwTech.tryCompile(true);
 //	pShaderMan_->compile(hwTech);
+
+	if (hwTech.IlFmt != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
+		X_ERROR("Dx12", "Hardware tech's input layout does not match state description \"%s\" -> %s",
+			shader::InputLayoutFormat::ToString(hwTech.IlFmt),
+			shader::InputLayoutFormat::ToString(shader::Util::ILfromVertexFormat(desc.vertexFmt)));
+	}
 
 	if (hwTech.pVertexShader) {
 		const auto& byteCode = hwTech.pVertexShader->getShaderByteCode();
