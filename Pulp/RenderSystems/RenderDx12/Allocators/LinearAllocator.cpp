@@ -228,7 +228,7 @@ DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
 
 void LinearAllocator::cleanupUsedPages(uint64_t fenceID)
 {
-	if (pCurPage_) {
+	if (!pCurPage_) {
 		return;
 	}
 
