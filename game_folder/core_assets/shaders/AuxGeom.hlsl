@@ -1,6 +1,6 @@
 
 
-cbuffer ObjectConstants  : register(cb1)
+cbuffer ObjectConstants  : register(b0)
 {
 	float4x4 matViewProj;
 	float4x4 matWorldViewProj;
