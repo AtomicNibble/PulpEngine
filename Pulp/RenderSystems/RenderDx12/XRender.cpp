@@ -963,15 +963,23 @@ X_INLINE void XRender::CreateVBView(const VertexHandleArr& vertexBuffers,
 {
 	numVertexStreams = 0;
 
-	core::zero_object(viewsOut);
-	for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++)
+	for (uint32_t i = 0; i < VertexStream::ENUM_COUNT; i++)
 	{
 		if (vertexBuffers[i]) 
 		{
 			const auto pVertBuf = pBuffMan_->VBFromHandle(vertexBuffers[i]);
 
 			viewsOut[i] = pVertBuf->getBuf().vertexBufferView();
-			numVertexStreams++;
+
+			// it's total that need to be passed to device, which inclde 
+			// any null ones in between.
+			numVertexStreams = i + 1;
+		}
+		else
+		{
+			viewsOut[i].BufferLocation = 0;
+			viewsOut[i].SizeInBytes = 0;
+			viewsOut[i].StrideInBytes = 0;
 		}
 	}
 }
