@@ -148,15 +148,15 @@ X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 typedef Flags<ILFlag> ILFlags;
 
 X_DECLARE_ENUM(InputLayoutFormat)(
+	Invalid,
+
 	POS_UV,
 	POS_UV_COL,
 	POS_UV_COL_NORM,
 	POS_UV_COL_NORM_TAN,
 	POS_UV_COL_NORM_TAN_BI,
 
-	POS_UV2_COL_NORM,
-
-	Invalid
+	POS_UV2_COL_NORM
 );
 
 

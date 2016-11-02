@@ -101,6 +101,7 @@ class XShaderTechniqueHW
 {
 public:
 	XShaderTechniqueHW() {
+		static_assert(InputLayoutFormat::Invalid == 0, "Memset won't make enum invalid");
 		core::zero_this(this);
 	}
 
