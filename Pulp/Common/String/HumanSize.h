@@ -18,6 +18,7 @@ namespace HumanSize
 	// only 10 needed for string since we 1024 / 1024
 	typedef StackString<28> Str; // 28 + 4 size = 32;
 
+	const char* toString(Str& str, uint32_t numBytes);
 	const char* toString(Str& str, uint64_t numBytes);
 	const char* toString(Str& str, int64_t numBytes);
 
