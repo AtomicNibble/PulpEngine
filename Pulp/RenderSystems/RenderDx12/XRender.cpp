@@ -889,6 +889,30 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 	context.setViewportAndScissor(viewport);
 
 
+	X_ALIGNED_SYMBOL(struct Cbuffer, 16)
+	{
+		Matrix44f viewProj;
+		Matrix44f worldViewProj;
+
+		Vec4f objcolor;
+		Vec4f lightLocal;
+		Vec4f objShadind;
+	};
+
+	Cbuffer buf;
+	buf.viewProj = viewMat * projMat;
+	buf.worldViewProj.setToIdentity();
+
+	buf.viewProj = Matrix44f(
+		2, 0, 0, 0,
+		0, -2, 0, 0,
+		0, 0, 0, 0,
+		-1, 1, 0, 1
+	);
+
+	MatrixOrthoOffCenterRH(&buf.viewProj, 0, 1680, 1050, 0, -1e10f, 1e10);
+
+
 	State curState;
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
@@ -908,6 +932,9 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 					const Commands::Draw& draw = *reinterpret_cast<const Commands::Draw*>(pCmd);
 
 					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
+
+					context.setDynamicCBV(1, sizeof(buf), &buf);
+
 					context.draw(draw.vertexCount, draw.startVertex);
 					break;
 				}
@@ -1159,9 +1186,9 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
 	RootSignature& rootSig = pState->rootSig;
-	rootSig.reset(1, 0);
+	rootSig.reset(2, 0);
 	rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
-//	rootSig.getParamRef(1).initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSig.getParamRef(1).initAsCBV(0, D3D12_SHADER_VISIBILITY_VERTEX);
 //	rootSig.getParamRef(2).initAsSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
 //	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 
