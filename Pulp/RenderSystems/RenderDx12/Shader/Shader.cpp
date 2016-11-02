@@ -84,14 +84,24 @@ XShader::XShader(core::MemoryArenaBase* arena) :
 
 XShader::~XShader()
 {
+
+}
+
+const IShaderTech* XShader::getTech(const char* pName) const
+{
+	for (const auto& tech : techs_)
 	size_t i, numTecs;
 	numTecs = techs_.size();
 	for (i = 0; i < numTecs; i++)
 	{
-		//		techs_[i].release();
+		if (tech.name == pName)
+		{
+			return &tech;
+		}
 	}
-}
 
+	return nullptr;
+}
 
 
 } // namespace shader

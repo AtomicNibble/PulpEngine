@@ -401,6 +401,12 @@ private:
 
 
 typedef int32_t ShaderID;
+typedef uintptr_t TechHandle;
+
+struct IShaderTech
+{
+
+};
 
 struct IShader
 {
@@ -410,7 +416,7 @@ struct IShader
 
 
 	// tech stuff.
-
+	virtual const IShaderTech* getTech(const char* pName) const X_ABSTRACT;
 	
 //	virtual VertexFormat::Enum getVertexFmt() X_ABSTRACT;
 //	virtual ShaderType::Enum getType() X_ABSTRACT;

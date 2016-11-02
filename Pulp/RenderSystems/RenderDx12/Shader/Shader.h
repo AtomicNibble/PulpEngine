@@ -121,7 +121,7 @@ public:
 	XHWShader* pDomainShader;
 };
 
-class XShaderTechnique
+class XShaderTechnique : public IShaderTech
 {
 	typedef core::Array<XShaderTechniqueHW> HWTechArr;
 
@@ -152,6 +152,7 @@ public:
 	~XShader();
 
 	X_INLINE const core::string& getName(void) const X_OVERRIDE;
+	const IShaderTech* getTech(const char* pName) const X_OVERRIDE;
 
 	X_INLINE size_t numTechs(void) const;
 
