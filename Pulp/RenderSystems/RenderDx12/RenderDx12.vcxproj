@@ -355,6 +355,7 @@
     <ClInclude Include="Shader\ShaderBin.h" />
     <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="Shader\ShaderSourceTypes.h" />
+    <ClInclude Include="Shader\ShaderUtil.h" />
     <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture\Texture.h" />
@@ -398,6 +399,7 @@
     <ClCompile Include="Shader\ShaderBin.cpp" />
     <ClCompile Include="Shader\ShaderManager.cpp" />
     <ClCompile Include="Shader\ShaderSourceTypes.cpp" />
+    <ClCompile Include="Shader\ShaderUtil.cpp" />
     <ClCompile Include="Shader\ShaderVars.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

@@ -160,10 +160,6 @@ X_DECLARE_ENUM8(InputLayoutFormat)(
 );
 
 
-extern InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt);
-extern ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt);
-
-
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
