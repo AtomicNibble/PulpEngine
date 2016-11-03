@@ -95,12 +95,14 @@ X_ENSURE_SIZE(StencilState, 8);
 
 
 X_DECLARE_ENUM8(DepthFunc)(
+//	NEVER, // just don't enable depth test?
 	LEQUAL,
 	EQUAL,
 	GREAT,
 	LESS,
 	GEQUAL,
-	NOTEQUAL
+	NOTEQUAL,
+	ALWAYS
 );
 
 
