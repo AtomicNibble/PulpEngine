@@ -55,13 +55,16 @@ namespace
 		blendDesc.IndependentBlendEnable = FALSE;
 		blendDesc.AlphaToCoverageEnable = state.stateFlags.IsSet(StateFlag::ALPHATEST);
 
-		if (state.stateFlags.IsSet(StateFlag::ALPHATEST))
+		if (state.stateFlags.IsSet(StateFlag::BLEND))
 		{
-			for (size_t i = 0; i < 8; ++i) {
-				blendDesc.RenderTarget[i].BlendEnable = TRUE;
-				// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
-				blendDesc.RenderTarget[i].RenderTargetWriteMask = 0;
-			}
+			blendDesc.RenderTarget[0].BlendEnable = TRUE;
+			// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
+			blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+
+			blendDesc.RenderTarget[0].LogicOpEnable = FALSE;
+			blendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
+
+			
 
 			const auto blendState = state.blend;
 
@@ -140,6 +143,80 @@ namespace
 			}
 
 
+			switch (blendState.dstBlendColor)
+			{
+				case BlendType::ZERO:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+					break;
+				case BlendType::ONE:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+					break;
+				case BlendType::DEST_COLOR:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_COLOR;
+					break;
+				case BlendType::INV_DEST_COLOR:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_COLOR;
+					break;
+				case BlendType::SRC_ALPHA:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA;
+					break;
+				case BlendType::INV_SRC_ALPHA:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+					break;
+				case BlendType::DEST_ALPHA:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_ALPHA;
+					break;
+				case BlendType::INV_DEST_ALPHA:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_ALPHA;
+					break;
+				case BlendType::SRC_ALPHA_SAT:
+					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA_SAT;
+					break;
+				default:
+#if X_DEBUG
+					X_ASSERT_NOT_IMPLEMENTED();
+#else
+					X_NO_SWITCH_DEFAULT;
+#endif // X_DEBUG
+			}
+
+			switch (blendState.dstBlendAlpha)
+			{
+				case BlendType::ZERO:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+					break;
+				case BlendType::ONE:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+					break;
+				case BlendType::DEST_COLOR:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+					break;
+				case BlendType::INV_DEST_COLOR:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+					break;
+				case BlendType::SRC_ALPHA:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+					break;
+				case BlendType::INV_SRC_ALPHA:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+					break;
+				case BlendType::DEST_ALPHA:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+					break;
+				case BlendType::INV_DEST_ALPHA:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+					break;
+				case BlendType::SRC_ALPHA_SAT:
+					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA_SAT;
+					break;
+				default:
+#if X_DEBUG
+					X_ASSERT_NOT_IMPLEMENTED();
+#else
+					X_NO_SWITCH_DEFAULT;
+#endif // X_DEBUG
+			}
+
 
 			//Blending operation
 			D3D12_BLEND_OP blendOperation = D3D12_BLEND_OP_ADD;
@@ -171,9 +248,11 @@ namespace
 			}
 
 			// todo: add separate alpha blend support for mrt
-			for (size_t i = 0; i < 8; ++i) {
-				blendDesc.RenderTarget[i].BlendOp = blendOperation;
-				blendDesc.RenderTarget[i].BlendOpAlpha = blendOperation;
+			blendDesc.RenderTarget[0].BlendOp = blendOperation;
+			blendDesc.RenderTarget[0].BlendOpAlpha = blendOperation;
+
+			for (size_t i = 1; i < 8; ++i) {
+				std::memcpy(&blendDesc.RenderTarget[i], &blendDesc.RenderTarget[i - 1], sizeof(blendDesc.RenderTarget[0]));
 			}
 		}
 		else
@@ -308,7 +387,10 @@ namespace
 			case DepthFunc::NOTEQUAL:
 				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NOT_EQUAL;
 				break;
-
+			case DepthFunc::ALWAYS:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+				break;
+				
 #if X_DEBUG
 			default:
 				X_ASSERT_UNREACHABLE();
