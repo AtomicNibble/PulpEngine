@@ -1926,8 +1926,6 @@ void XConsole::DrawBuffer(void)
 		return;
 	}
 
-	pPrimContext_->reset();
-
 	font::XTextDrawConect ctx;
 	ctx.SetColor(Col_Khaki);
 	ctx.SetProportional(false);
