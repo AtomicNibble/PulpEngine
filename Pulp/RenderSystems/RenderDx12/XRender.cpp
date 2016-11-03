@@ -1120,6 +1120,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 		context.setRootSignature(newState.rootSig);
 
 		if (curState.pPso != newState.pPso) {
+			X_ASSERT_NOT_NULL(newState.pPso);
 			context.setPipelineState(newState.pPso);
 			curState.pPso = newState.pPso;
 		}
@@ -1264,7 +1265,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
 
 	DeviceState* pState = X_NEW(DeviceState, arena_, "DeviceState")(arena_);
-	
+	pState->pPso = nullptr;
+	pState->topo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
 	RootSignature& rootSig = pState->rootSig;
