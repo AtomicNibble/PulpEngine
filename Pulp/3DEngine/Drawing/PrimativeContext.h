@@ -14,10 +14,12 @@ public:
 		enum Enum : uint32_t
 		{
 			TextureIdShift = 0,
-			TextureIdMask = 0xFFFFF << TextureIdShift,
+			TextureIdBits = 20,
+			TextureIdMask = ((1 << TextureIdBits) - 1) << TextureIdShift,
 
-			PrimTypeShift = 20,
-			PrimTypeMask = 0x7 << PrimTypeShift,
+			PrimTypeShift = TextureIdBits,
+			PrimTypeBits = 3,
+			PrimTypeMask = ((1 << PrimTypeBits) - 1) << PrimTypeShift,
 		};
 	};
 
@@ -29,12 +31,15 @@ public:
 
 		X_INLINE bool operator ==(const PrimRenderFlags& rhs) const;
 		X_INLINE bool operator !=(const PrimRenderFlags& rhs) const;
+		X_INLINE bool operator <(const PrimRenderFlags& rhs) const;
 
-		X_INLINE operator uint32_t();
-		X_INLINE operator const uint32_t() const;
+		X_INLINE PrimitiveType::Enum getPrimType(void) const;
+		X_INLINE texture::TexID getTextureId(void) const;
+
+		X_INLINE uint32_t toInt(void) const;
 
 	private:
-		uint32_t flags;
+		uint32_t flags_;
 	};
 
 	struct PushBufferEntry
