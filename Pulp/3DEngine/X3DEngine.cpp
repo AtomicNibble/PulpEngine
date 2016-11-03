@@ -304,6 +304,15 @@ void X3DEngine::OnFrameBegin(void)
 
 		pRender_->submitCommandPackets(primBucket, render::Commands::Key::Type::PRIM);
 	}
+
+	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
+	{
+		auto& context = primContexts_[i];
+		if (!context.isEmpty())
+		{
+			context.reset();
+		}
+	}
 }
 
 void X3DEngine::Update(void)
