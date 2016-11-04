@@ -359,7 +359,6 @@ private:
 	engine::IPrimativeContext* pPrimContext_;
 	input::IInput*			pInput_;
 
-	texture::ITexture*		pBackground_;
 
 	Cursor					cursor_;
 

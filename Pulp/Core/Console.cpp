@@ -361,7 +361,6 @@ XConsole::XConsole() :
 	pRender_ = nullptr;
 	pPrimContext_ = nullptr;
 	pInput_ = nullptr;
-	pBackground_ = nullptr;
 
 	// Auto goat a boat.
 	autoCompleteNum_ = 0;
@@ -468,8 +467,6 @@ void XConsole::LoadRenderResources(void)
 	pRender_ = pCore_->GetIRender();
 	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
 
-	// load a texture baby!
-	pBackground_ = pRender_->getTexture(texture::TEX_DEFAULT_WHITE, texture::TexFlag::DONT_STREAM);
 }
 
 void XConsole::RegisterInputListener(void)
@@ -603,12 +600,7 @@ void XConsole::unregisterInputListener(void)
 
 void XConsole::freeRenderResources(void)
 {
-	if (pRender_)
-	{
-		if (pBackground_) {
-			pRender_->releaseTexture(pBackground_);
-		}
-	}
+
 }
 
 
@@ -2429,8 +2421,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				height += fCharHeight;
 
 
-				pPrimContext_->drawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
-				pPrimContext_->drawRect(xpos, ypos, width, height, console_output_box_color_border);
+				pPrimContext_->drawQuad(xpos, ypos, width, height, col, console_output_box_color_border);
 				pPrimContext_->drawQuad(xpos, ypos + height + box2Offset, descWidth, height, col, console_input_box_color_border);
 
 				xpos += 5.f;
@@ -2461,8 +2452,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				width += 10; // add a few pixels.
 		//		height += 5; // add a few pixels.
 
-				pPrimContext_->drawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
-				pPrimContext_->drawRect(xpos, ypos, width, height, console_output_box_color_border);
+				pPrimContext_->drawQuad(xpos, ypos, width, height, col, console_output_box_color_border);
 
 				xpos += 5;
 
