@@ -532,7 +532,7 @@ void XModel::ProcessData(char* pData)
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT_ALIGNMENT(pData, 16, 0);
 
-	int i, x;
+	int32_t i, x;
 
 	if (!pData) {
 		X_ERROR("Model", "model data is null");
