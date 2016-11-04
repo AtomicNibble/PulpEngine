@@ -354,7 +354,7 @@ private:
 	TimeVal					repeatEventTimer_; // the time a repeat event will be trigger.
 
 	ICore*					pCore_;
-	font::IFFont*			pFont_;
+	font::IFont*			pFont_;
 	render::IRender*		pRender_;
 	engine::IPrimativeContext* pPrimContext_;
 	input::IInput*			pInput_;

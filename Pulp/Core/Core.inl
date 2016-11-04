@@ -42,9 +42,9 @@ X_INLINE render::IRender* XCore::GetIRender(void)
 	return env_.pRender;
 }
 
-X_INLINE font::IXFontSys* XCore::GetIFontSys(void)
+X_INLINE font::IFontSys* XCore::GetIFontSys(void)
 {
-	return env_.pFont;
+	return env_.pFontSys;
 }
 
 X_INLINE core::V2::JobSystem* XCore::GetJobSystem(void)

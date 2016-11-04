@@ -12,9 +12,9 @@ struct Vertex_P3F_T2F_C4B;
 X_NAMESPACE_BEGIN(font)
 
 class XFontTexture;
-class XFont;
+class XFontSystem;
 
-class XFFont : public IFFont, public IXFont_RenderProxy
+class XFont : public IFont, public IXFont_RenderProxy
 {
 public:
 	friend class XFont;
@@ -28,8 +28,8 @@ public:
 
 
 public:
-	XFFont(ICore* pCore, XFont* pXFont, const char* pFontName);
-	~XFFont();
+	XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName);
+	~XFont();
 
 	struct FontPass
 	{
@@ -45,7 +45,7 @@ public:
 	};
 
 
-	// IFFont
+	// IFont
 	virtual void Release(void) X_OVERRIDE;
 	virtual void Free(void) X_OVERRIDE;
 	virtual void FreeBuffers(void) X_OVERRIDE;
@@ -72,7 +72,7 @@ public:
 
 	virtual void GetGradientTextureCoord(float& minU, float& minV, 
 		float& maxU, float& maxV) const X_OVERRIDE;
-	// ~IFFont
+	// ~IFont
 
 	// IXFont_RenderProxy
 	virtual void RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& ctx);
@@ -102,7 +102,7 @@ private:
 	core::StackString<128> sourceName_;
 
 	ICore* pCore_;
-	XFont* pXFont_;
+	XFontSystem* pFontSys_;
 	
 	XFontTexture* pFontTexture_;
 	uint8_t* FontBuffer_;

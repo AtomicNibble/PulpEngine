@@ -170,10 +170,10 @@ void XCore::ShutDown()
 		core::SafeRelease(env_.pSound);
 	}
 
-	if (env_.pFont)
+	if (env_.pFontSys)
 	{
-		env_.pFont->ShutDown();
-		core::SafeRelease(env_.pFont);
+		env_.pFontSys->ShutDown();
+		core::SafeRelease(env_.pFontSys);
 	}
 
 	if (env_.pScriptSys)

@@ -292,7 +292,7 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 {
 	SCRIPT_CHECK_PARAMETERS(9);
 
-	font::IXFontSys* pFontSys = gEnv->pFont;
+	font::IFontSys* pFontSys = gEnv->pFontSys;
 
 	if (!pFontSys)
 		return pH->EndFunction();
@@ -318,7 +318,7 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 	pH->GetParam(8, b);
 	pH->GetParam(9, a);
 
-	font::IFFont* pFont = pFontSys->GetFont(fontName);
+	font::IFont* pFont = pFontSys->GetFont(fontName);
 
 	if (!pFont)
 	{

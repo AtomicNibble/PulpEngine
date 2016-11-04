@@ -388,7 +388,7 @@ void XRender::Draw2dText(float posX, float posY, const char* pStr, const XDrawTe
 {
 	static const float UIDRAW_TEXTSIZEFACTOR = 16.f;
 
-	font::IFFont* pFont = pDefaultFont_;
+	font::IFont* pFont = pDefaultFont_;
 	if (!pFont)
 		return;
 

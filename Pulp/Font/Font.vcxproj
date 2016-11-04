@@ -354,7 +354,7 @@
     <ClInclude Include="XFontRender.h" />
     <ClInclude Include="XGlyphBitmap.h" />
     <ClInclude Include="XNullfont.h" />
-    <ClInclude Include="XFont.h" />
+    <ClInclude Include="XFontSystem.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XFontTexture.h" />
     <ClInclude Include="XGlyphCache.h" />
@@ -366,7 +366,7 @@
     <ClCompile Include="XFontRender.cpp" />
     <ClCompile Include="XGlyphBitmap.cpp" />
     <ClCompile Include="XNullfont.cpp" />
-    <ClCompile Include="XFont.cpp" />
+    <ClCompile Include="XFontSystem.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>

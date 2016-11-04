@@ -30,13 +30,13 @@ namespace
 	};
 } // namespace
 
-const float XFFont::FONT_SPACE_SIZE = 0.2f;
-const float XFFont::FONT_GLYPH_PROP_SPACING = 1.f;
+const float XFont::FONT_SPACE_SIZE = 0.2f;
+const float XFont::FONT_GLYPH_PROP_SPACING = 1.f;
 
 
-XFFont::XFFont(ICore* pCore, XFont* pXFont, const char* pFontName) :
+XFont::XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName) :
 	pCore_(pCore),
-	pXFont_(pXFont),
+	pFontSys_(pFontSys),
 	name_(pFontName),
 	pFontTexture_(nullptr),
 	FontBuffer_(nullptr),
@@ -52,19 +52,19 @@ XFFont::XFFont(ICore* pCore, XFont* pXFont, const char* pFontName) :
 }
 
 
-XFFont::~XFFont()
+XFont::~XFont()
 {
 	Free();
 
 	X_DELETE_ARRAY(pVertBuffer_, g_fontArena);
 }
 
-void XFFont::Release()
+void XFont::Release()
 {
 }
 
 
-void XFFont::Free()
+void XFont::Free()
 {
 	effects_.clear();
 	effects_.free();
@@ -73,13 +73,13 @@ void XFFont::Free()
 	FreeTexture();
 }
 
-void XFFont::FreeBuffers()
+void XFont::FreeBuffers()
 {
 	X_DELETE_AND_NULL(pFontTexture_, g_fontArena);
 	X_DELETE_AND_NULL(FontBuffer_, g_fontArena);
 }
 
-void XFFont::FreeTexture()
+void XFont::FreeTexture()
 {
 	if (texID_ > -1) 
 	{
@@ -93,7 +93,7 @@ void XFFont::FreeTexture()
 }
 
 
-bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
+bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 {
 	core::Path<char> path;
 	core::XFileScoped file;
@@ -148,14 +148,14 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	return true;
 }
 
-void XFFont::Reload(void)
+void XFont::Reload(void)
 {
 	// this is .shader reloading only for now.
 	// thought a diffrent .tff file may be set.
 	loadFont();
 }
 
-void XFFont::DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex)
+void XFont::DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex)
 {
 	if (!pStr) {
 		return;
@@ -169,7 +169,7 @@ void XFFont::DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConec
 }
 
 
-void XFFont::DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex)
+void XFont::DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex)
 {
 	if (!pStr) {
 		return;
@@ -183,7 +183,7 @@ void XFFont::DrawString(float x, float y, const char* pStr, const XTextDrawConec
 }
 
 
-void XFFont::DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex)
+void XFont::DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex)
 {
 	if (!pStr) {
 		return;
@@ -197,12 +197,12 @@ void XFFont::DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConec
 }
 
 // Wide
-void XFFont::DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
+void XFont::DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
 {
 	DrawStringWInternal(Vec3f(pos.x,pos.y,1.0f), pStr, contex);
 }
 
-void XFFont::DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
+void XFont::DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
 {
 	DrawStringWInternal(pos, pStr, contex);
 }
@@ -210,7 +210,7 @@ void XFFont::DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawC
 
 
 // calculate the size.
-Vec2f XFFont::GetTextSize(const char* pStr, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSize(const char* pStr, const XTextDrawConect& contex)
 {
 	if (!pStr) {
 		return Vec2f::zero();
@@ -223,12 +223,12 @@ Vec2f XFFont::GetTextSize(const char* pStr, const XTextDrawConect& contex)
 	return GetTextSizeWInternal(strW, contex);
 }
 
-Vec2f XFFont::GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex)
 {
 	return GetTextSizeWInternal(pStr, contex);
 }
 
-uint32_t XFFont::GetEffectId(const char* pEffectName) const
+uint32_t XFont::GetEffectId(const char* pEffectName) const
 {
 	X_ASSERT_NOT_NULL(pEffectName);
 	Effets::ConstIterator it;
@@ -242,7 +242,7 @@ uint32_t XFFont::GetEffectId(const char* pEffectName) const
 }
 
 
-void XFFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float& maxV) const
+void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float& maxV) const
 {
 	const XTextureSlot* pSlot = pFontTexture_->GetGradientSlot();
 	X_ASSERT_NOT_NULL(pSlot);
@@ -259,7 +259,7 @@ void XFFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, floa
 
 // =======================================================================================
 
-void XFFont::DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
+void XFont::DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
 {
 	if (!pStr) {
 		return;
@@ -270,7 +270,7 @@ void XFFont::DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XT
 	pRenderer->DrawStringW(this, pos, pStr, contex);
 }
 
-Vec2f XFFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ctx)
+Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ctx)
 {
 	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
 
@@ -405,7 +405,7 @@ Vec2f XFFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& c
 	return Vec2f(maxW, maxH);
 }
 
-size_t XFFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
+size_t XFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
 {
 	size_t size = 0;
 
@@ -452,7 +452,7 @@ size_t XFFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
 	return size;
 }
 
-size_t XFFont::GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const
+size_t XFont::GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const
 {
 	size_t size = 0;
 
@@ -499,7 +499,7 @@ size_t XFFont::GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) co
 	return size;
 }
 
-bool XFFont::InitCache(void)
+bool XFont::InitCache(void)
 {
 	pFontTexture_->CreateGradientSlot();
 
@@ -527,7 +527,7 @@ bool XFFont::InitCache(void)
 	return true;
 }
 
-void XFFont::Prepare(const wchar_t* pStr, bool updateTexture)
+void XFont::Prepare(const wchar_t* pStr, bool updateTexture)
 {
 	X_PROFILE_BEGIN("FontPrepare", core::ProfileSubSys::FONT);
 
@@ -550,7 +550,7 @@ void XFFont::Prepare(const wchar_t* pStr, bool updateTexture)
 }
 
 
-void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& ctx)
+void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& ctx)
 {
 	X_PROFILE_BEGIN("FontRender", core::ProfileSubSys::FONT);
 
@@ -832,7 +832,7 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 }
 
 
-bool XFFont::InitTexture(void)
+bool XFont::InitTexture(void)
 {
 	texID_ = gEnv->pRender->FontCreateTexture(
 		pFontTexture_->GetSize(), 
@@ -847,7 +847,7 @@ bool XFFont::InitTexture(void)
 }
 
 
-void XFFont::ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen)
+void XFont::ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen)
 {
 	const size_t len = core::Min<size_t>(buflen, strlen(pStr));
 

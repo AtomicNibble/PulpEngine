@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Font.h"
 
+#include <Util\ScopedPointer.h>
 
 #include <IFileSys.h>
 
@@ -106,7 +107,7 @@ bool ParsePassPos(xml_node<>* node, Vec2f& pos)
 	return false;
 }
 
-bool ParseEffect(xml_node<>* node, XFFont::FontEffect& effect)
+bool ParseEffect(xml_node<>* node, XFont::FontEffect& effect)
 {
 	X_ASSERT_NOT_NULL(node);
 	core::StackString<64> name;
@@ -143,10 +144,10 @@ bool ParseEffect(xml_node<>* node, XFFont::FontEffect& effect)
 		if (strUtil::IsEqualCaseInsen("pass", pass->name()))
 		{
 			// add a pass, additional info is optional.		
-			XFFont::FontPass effectPass;
+			XFont::FontPass effectPass;
 
-			if (effect.passes.size() == XFFont::MAX_FONT_PASS) {
-				X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(XFFont::MAX_FONT_PASS) " ignoring extra passes");
+			if (effect.passes.size() == XFont::MAX_FONT_PASS) {
+				X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(XFont::MAX_FONT_PASS) " ignoring extra passes");
 				break;
 			}
 
@@ -180,7 +181,7 @@ bool ParseEffect(xml_node<>* node, XFFont::FontEffect& effect)
 	// we support effects with no passes defied.
 	// it's the same as a single empty pass.
 	if (effect.passes.isEmpty()) {
-		XFFont::FontPass stdPass;
+		XFont::FontPass stdPass;
 		effect.passes.append(stdPass);
 	}
 
@@ -188,7 +189,7 @@ bool ParseEffect(xml_node<>* node, XFFont::FontEffect& effect)
 }
 
 
-bool XFFont::loadFont()
+bool XFont::loadFont()
 {
 	core::XFileScoped file;
 	core::Path<char> path;
@@ -207,18 +208,18 @@ bool XFFont::loadFont()
 	{
 		length = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
-		char* pText = X_NEW_ARRAY_ALIGNED(char, length + 1, g_fontArena, "FontXMLBuf", 4);
+		ScopedPointer<char[]> textbuffer(X_NEW_ARRAY_ALIGNED(char, length + 1, g_fontArena, "FontXMLBuf", 4), g_fontArena);
 
 		// add a null term baby!
 		// shake that booty.
 		// mmmmmmmmmmmm
-		pText[length] = '\0';
+		textbuffer.get()[length] = '\0';
 
-		if (file.read(pText, length) == length)
+		if (file.read(textbuffer.get(), length) == length)
 		{
 			xml_document<> doc;    // character type defaults to char
 			doc.set_allocator(XmlAllocate, XmlFree);
-			doc.parse<0>(pText);    // 0 means default parse flags
+			doc.parse<0>(textbuffer.get());    // 0 means default parse flags
 
 			xml_node<>* node = doc.first_node("font");
 			if (node) 
@@ -256,13 +257,11 @@ bool XFFont::loadFont()
 				else
 				{
 					X_ERROR("Font", "missing source attr from <font> tag");
-					X_DELETE_ARRAY(pText, g_fontArena);
 					return false;
 				}
 			}
 		}
 
-		X_DELETE_ARRAY(pText, g_fontArena);
 	}
 	else
 	{

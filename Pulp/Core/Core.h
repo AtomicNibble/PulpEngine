@@ -126,7 +126,7 @@ public:
 	X_INLINE engine::I3DEngine* Get3DEngine(void) X_OVERRIDE;
 	X_INLINE script::IScriptSys* GetISscriptSys(void) X_OVERRIDE;
 	X_INLINE render::IRender* GetIRender(void) X_OVERRIDE;
-	X_INLINE font::IXFontSys* GetIFontSys(void) X_OVERRIDE;
+	X_INLINE font::IFontSys* GetIFontSys(void) X_OVERRIDE;
 	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_OVERRIDE;
 	X_INLINE physics::IPhysics* GetPhysics(void) X_OVERRIDE;
 

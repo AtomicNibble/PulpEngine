@@ -145,13 +145,13 @@ void XFontSysNull::release(void)
 }
 
 
-IFFont* XFontSysNull::NewFont(const char* pFontName)
+IFont* XFontSysNull::NewFont(const char* pFontName)
 { 
 	X_UNUSED(pFontName);
 	return &nullFont_;
 }
 
-IFFont* XFontSysNull::GetFont(const char* pFontName) const 
+IFont* XFontSysNull::GetFont(const char* pFontName) const 
 { 
 	X_UNUSED(pFontName);
 	return &nullFont_; 

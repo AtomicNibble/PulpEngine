@@ -586,7 +586,7 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 		return false;
 	}
 
-	if (!env_.pFont) {
+	if (!env_.pFontSys) {
 		return false;
 	}
 
@@ -595,7 +595,7 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 	}
 
 	// load a default font.
-	font::IFFont* font = env_.pFont->NewFont("default");
+	font::IFont* font = env_.pFontSys->NewFont("default");
 
 	if (font == nullptr) {
 		X_ERROR("Font", "failed to create default font");

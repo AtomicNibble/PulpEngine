@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "XFont.h"
+#include "XFontSystem.h"
 #include "Font.h"
 #include "XFontTexture.h"
 
@@ -15,14 +15,14 @@ namespace
 	void Command_ListFonts(core::IConsoleCmdArgs* pCmd)
 	{
 		X_UNUSED(pCmd);
-		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
+		XFontSystem* pFont = static_cast<XFontSystem*>(gEnv->pFontSys);
 
 		pFont->ListFontNames();
 	}
 
 	void Command_DumpForName(core::IConsoleCmdArgs* pCmd)
 	{
-		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
+		XFontSystem* pFont = static_cast<XFontSystem*>(gEnv->pFontSys);
 
 		size_t Num = pCmd->GetArgCount();
 
@@ -33,7 +33,7 @@ namespace
 		}
 
 		const char* name = pCmd->GetArg(1);
-		XFFont* font = static_cast<XFFont*>(pFont->GetFont(name));
+		XFont* font = static_cast<XFont*>(pFont->GetFont(name));
 		if (font)
 		{
 			if (font->getFontTexture()->WriteToFile(name))
@@ -50,7 +50,7 @@ namespace
 
 }
 
-XFont::XFont(ICore* pCore) :
+XFontSystem::XFontSystem(ICore* pCore) :
 	pCore_(pCore),
 	fonts_(g_fontArena, 6)
 {
@@ -59,18 +59,18 @@ XFont::XFont(ICore* pCore) :
 
 }
 
-XFont::~XFont()
+XFontSystem::~XFontSystem()
 {
 
 }
 
-void XFont::release(void)
+void XFontSystem::release(void)
 {
 	X_DELETE(this,g_fontArena);
 }
 
 
-bool XFont::Init(void)
+bool XFontSystem::Init(void)
 {
 	X_LOG0("FontSys", "Starting");
 
@@ -86,7 +86,7 @@ bool XFont::Init(void)
 	return true;
 }
 
-void XFont::ShutDown(void)
+void XFontSystem::ShutDown(void)
 {
 	X_LOG0("FontSys", "Shutting Down");
 
@@ -102,24 +102,25 @@ void XFont::ShutDown(void)
 }
 
 
-IFFont* XFont::NewFont(const char* pFontName)
+IFont* XFontSystem::NewFont(const char* pFontName)
 {
 	FontMapItor it = fonts_.find(X_CONST_STRING(pFontName));
-	if (it != fonts_.end())
+	if (it != fonts_.end()) {
 		return it->second;
+	}
 
-	XFFont* pFont = X_NEW(XFFont, g_fontArena, "FontObject")(pCore_, this, pFontName);
+	XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(pCore_, this, pFontName);
 	fonts_.insert(FontMap::value_type(core::string(pFontName), pFont));
 	return pFont;
 }
 
-IFFont* XFont::GetFont(const char* pFontName) const
+IFont* XFontSystem::GetFont(const char* pFontName) const
 {
 	FontMapConstItor it = fonts_.find(X_CONST_STRING(pFontName));
 	return it != fonts_.end() ? it->second : 0;
 }
 
-void XFont::ListFontNames(void) const
+void XFontSystem::ListFontNames(void) const
 {
 	FontMapConstItor it = fonts_.begin();
 
@@ -139,7 +140,7 @@ void XFont::ListFontNames(void) const
 	X_LOG0("Fonts", "-------------- ^8Fonts End^7 --------------");
 }
 
-void XFont::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+void XFontSystem::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
 	X_UNUSED(jobSys);
 #if 0

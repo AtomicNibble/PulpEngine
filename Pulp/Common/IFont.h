@@ -27,12 +27,11 @@ X_NAMESPACE_BEGIN(font)
 #define TTFFLAG_SMOOTH_AMOUNT_SHIFT	16				// Shift amount for retrieving.
 
 
-struct IXFont;
-struct IFFont;
+struct IFont;
 
-struct IXFontSys
+struct IFontSys
 {
-	virtual ~IXFontSys(){}
+	virtual ~IFontSys(){}
 	
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
@@ -41,10 +40,10 @@ struct IXFontSys
 
 	// Summary:
 	//	 Creates a named font (case sensitive)
-	virtual IFFont* NewFont(const char* pFontName) X_ABSTRACT;
+	virtual IFont* NewFont(const char* pFontName) X_ABSTRACT;
 	// Summary:
 	//	 Gets a named font (case sensitive)
-	virtual IFFont* GetFont(const char* pFontName) const X_ABSTRACT;
+	virtual IFont* GetFont(const char* pFontName) const X_ABSTRACT;
 
 	// this should really take a sink no?
 	virtual void ListFontNames(void) const X_ABSTRACT;
@@ -53,6 +52,18 @@ struct IXFontSys
 #ifdef GetCharWidth
 #undef GetCharWidth
 #endif
+
+X_DECLARE_FLAGS(DrawTextFlag)(
+	CENTER,
+	RIGHT,
+	CENTER_VER,
+	MONOSPACE,
+	POS_2D,
+	FIXED_SIZE,
+	FRAMED
+);
+
+typedef Flags<DrawTextFlag> DrawTextFlags;
 
 struct XTextDrawConect
 {
@@ -64,8 +75,10 @@ struct XTextDrawConect
 	bool clipEnabled;
 	bool drawFrame;
 	bool scale800x600;
-//	bool pad[2];
 	uint32_t effectId;
+
+	DrawTextFlags flags;
+	IFont* pFont;
 
 	XTextDrawConect() :
 		proportinal(true),
@@ -99,15 +112,17 @@ struct XTextDrawConect
 };
 
 
+typedef XTextDrawConect TextDrawContext;
+
 //
 //	We support both ascii and wide char.
 //	since it's not much work to support wide char
 //  and saves me hassel later if I wanna support strange languages
 //  most engines now a day support wide char like Blizzard
 //  binary can still be multi-byte also.
-struct IFFont
+struct IFont
 {
-	virtual ~IFFont(){};
+	virtual ~IFont(){};
 	virtual void Release(void) X_ABSTRACT;	// release the object
 	virtual void Free(void) X_ABSTRACT;		// free internal memory
 	virtual void FreeBuffers(void) X_ABSTRACT;		// free texture buffers
@@ -154,9 +169,9 @@ X_NAMESPACE_END
 extern "C"
 {
 #endif
-	typedef X_NAMESPACE(font)::IXFontSys(*IP_PTRCREATEFONTFNC(ICore *pCore));
+	typedef X_NAMESPACE(font)::IFontSys(*IP_PTRCREATEFONTFNC(ICore *pCore));
 
-	IPFONT_API X_NAMESPACE(font)::IXFontSys *CreateFontInterface(ICore *pCore);
+	IPFONT_API X_NAMESPACE(font)::IFontSys *CreateFontInterface(ICore *pCore);
 
 #ifdef __cplusplus
 };

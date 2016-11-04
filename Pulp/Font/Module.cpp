@@ -5,7 +5,7 @@
 #include <ICore.h>
 #include <IEngineModule.h>
 
-#include "XFont.h"
+#include "XFontSystem.h"
 #include "XNullfont.h"
 
 #include <Extension\XExtensionMacros.h>
@@ -37,7 +37,7 @@ class XEngineModule_Font : public IEngineModule
 		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
-		env.pFont = nullptr;
+		env.pFontSys = nullptr;
 
 
 		LinkModule(pCore, "XFont");
@@ -46,7 +46,7 @@ class XEngineModule_Font : public IEngineModule
 		g_fontArena = X_NEW(FontArena, gEnv->pArena, "InputArena")(&g_fontAlloc, "InputArena");
 
 
-		font::IXFontSys* pFontSys = nullptr;
+		font::IFontSys* pFontSys = nullptr;
 
 		if (gEnv->IsDedicated())
 		{
@@ -62,7 +62,7 @@ class XEngineModule_Font : public IEngineModule
 		pFontSys = X_NEW(font::XFontSysNull, g_fontArena, "FontSysNull")();
 #else
 
-		pFontSys = X_NEW(font::XFont, g_fontArena, "fontSys")(pCore);
+		pFontSys = X_NEW(font::XFontSystem, g_fontArena, "fontSys")(pCore);
 #endif // !X_USE_NULLFONT
 
 		if (!pFontSys) {
@@ -74,7 +74,7 @@ class XEngineModule_Font : public IEngineModule
 			return false;
 		}
 
-		env.pFont = pFontSys;
+		env.pFontSys = pFontSys;
 		return true;
 	}
 

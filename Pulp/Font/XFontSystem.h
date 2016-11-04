@@ -8,23 +8,22 @@
 
 X_NAMESPACE_BEGIN(font)
 
-class XFFont;
+class XFont;
 
-class XFont : public IXFontSys, public core::IXHotReload
+class XFontSystem : public IFontSys, public core::IXHotReload
 {
-	friend class XFFont;
 
 public:
-	XFont(ICore* pCore);
-	virtual ~XFont();
+	XFontSystem(ICore* pCore);
+	virtual ~XFontSystem();
 
 	// IXFont
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 
-	virtual IFFont* NewFont(const char* pFontName) X_OVERRIDE;
-	virtual IFFont* GetFont(const char* pFontName) const X_OVERRIDE;
+	virtual IFont* NewFont(const char* pFontName) X_OVERRIDE;
+	virtual IFont* GetFont(const char* pFontName) const X_OVERRIDE;
 	virtual void ListFontNames(void) const X_OVERRIDE;
 	// ~IXFont
 
@@ -36,7 +35,7 @@ public:
 private:
 	ICore* pCore_;
 
-	typedef core::HashMap<core::string, XFFont*> FontMap;
+	typedef core::HashMap<core::string, XFont*> FontMap;
 	typedef FontMap::iterator FontMapItor;
 	typedef FontMap::const_iterator FontMapConstItor;
 

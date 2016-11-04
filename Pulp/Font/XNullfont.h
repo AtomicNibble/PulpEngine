@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(font)
 
 #if defined(X_USE_NULLFONT)
 
-class XFontNull : public IFFont
+class XFontNull : public IFont
 {
 public:
 	~XFontNull() X_OVERRIDE = default;
@@ -40,7 +40,7 @@ public:
 };
 
 
-class XFontSysNull : public IXFontSys
+class XFontSysNull : public IFontSys
 {
 public:
 	~XFontSysNull() X_OVERRIDE = default;
@@ -50,8 +50,8 @@ public:
 	virtual void release(void) X_OVERRIDE;
 
 
-	virtual IFFont* NewFont(const char* pFontName) X_OVERRIDE;
-	virtual IFFont* GetFont(const char* pFontName) const X_OVERRIDE;
+	virtual IFont* NewFont(const char* pFontName) X_OVERRIDE;
+	virtual IFont* GetFont(const char* pFontName) const X_OVERRIDE;
 
 	virtual void ListFontNames(void) const X_OVERRIDE;
 

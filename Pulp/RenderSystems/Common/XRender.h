@@ -195,7 +195,7 @@ protected:
 	int fontIdx_;
 
 	// default font baby.
-	font::IFFont* pDefaultFont_;
+	font::IFont* pDefaultFont_;
 
 	// vars
 	Colorf r_clear_color;
