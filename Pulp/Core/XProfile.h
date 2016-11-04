@@ -6,6 +6,7 @@
 #include <Containers\Array.h>
 
 #include <IRender.h>
+#include <IFont.h>
 
 X_NAMESPACE_DECLARE(render, struct IRender);
 
@@ -114,7 +115,7 @@ private:
 
 
 	void DrawLabel(float x, float y, const char* pStr, const Color& col);
-	void DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<render::DrawTextFlags> flags);
+	void DrawLabel(float x, float y, const char* pStr, const Color& col, font::DrawTextFlags flags);
 
 	void DrawRect(float x1, float y1, float x2, float y2, const Color& col);
 	void DrawRect(Vec4f& rec, const Color& col);
