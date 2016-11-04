@@ -95,11 +95,17 @@ X_NAMESPACE_BEGIN(model)
 //	Version 12:
 //		Bump model version to signify the flip uv and reverse face winding.
 //
+//	Version 13:
+//		Align all the vertex streams to 16byte offsets, so that when we map the file to memory.
+//		As long as the base memory location of the buffer is 16byte alinged all the stream starts will be also.
+//		This then allows SIMD memcpy on the streams in the render system, when uploading.
+//
+
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 12;
+static const uint32_t	 MODEL_VERSION = 13;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
