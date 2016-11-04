@@ -15,6 +15,7 @@ typedef std::array<VertexBufferHandle, VertexStream::ENUM_COUNT> VertexBufferHan
 
 
 static const uintptr_t INVALID_BUF_HANLDE = 0;
+static const uintptr_t INVALID_STATE_HANLDE = 0;
 
 namespace Commands
 {
