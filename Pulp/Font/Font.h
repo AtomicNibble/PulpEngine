@@ -14,7 +14,7 @@ X_NAMESPACE_BEGIN(font)
 class XFontTexture;
 class XFontSystem;
 
-class XFont : public IFont, public IXFont_RenderProxy
+class XFont : public IFont
 {
 public:
 	friend class XFont;
@@ -51,37 +51,35 @@ public:
 	virtual void FreeBuffers(void) X_OVERRIDE;
 	virtual void FreeTexture(void) X_OVERRIDE;
 
-//	virtual bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height) X_OVERRIDE;
+	X_INLINE virtual texture::TexID getTextureId(void) const X_OVERRIDE;
+
+
 	virtual bool loadFont(void) X_OVERRIDE;
 
-	virtual void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	virtual void DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	virtual void DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-
-	virtual void DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	virtual void DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos
+		, const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
 
 	virtual size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
-	virtual size_t GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+	virtual size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
 
 	// calculate the size.
 	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	virtual Vec2f GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	virtual Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 
 	virtual uint32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
 
-	virtual void GetGradientTextureCoord(float& minU, float& minV, 
-		float& maxU, float& maxV) const X_OVERRIDE;
 	// ~IFont
+	void GetGradientTextureCoord(float& minU, float& minV, 
+		float& maxU, float& maxV) const;
 
-	// IXFont_RenderProxy
-	virtual void RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& ctx);
 
-	X_INLINE const char* getName(void) const { return name_.c_str(); }
-	X_INLINE XFontTexture* getFontTexture(void) const { return pFontTexture_; }
+	X_INLINE const char* getName(void) const;
+	X_INLINE XFontTexture* getFontTexture(void) const;
 
 private:
-	void DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex);
+//	void DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex);
 	Vec2f GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& contex);
 
 	bool InitTexture(void);
@@ -107,14 +105,26 @@ private:
 	XFontTexture* pFontTexture_;
 	uint8_t* FontBuffer_;
 
-	int texID_;
+	texture::TexID texID_;
 	bool fontTexDirty_;
 
 	Effets effects_;
-
-	Vertex_P3F_T2F_C4B* pVertBuffer_;
 };
 
+X_INLINE texture::TexID XFont::getTextureId(void) const
+{
+	return texID_;
+}
+
+X_INLINE const char* XFont::getName(void) const
+{ 
+	return name_.c_str();
+}
+
+X_INLINE XFontTexture* XFont::getFontTexture(void) const
+{ 
+	return pFontTexture_;
+}
 
 X_NAMESPACE_END
 

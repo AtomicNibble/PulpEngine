@@ -7,6 +7,7 @@
 #include <ICore.h>
 #include <ITexture.h>
 #include <IFileSys.h>
+#include <IPrimativeContext.h>
 
 #include <Math\VertexFormats.h>
 
@@ -42,13 +43,9 @@ XFont::XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName) :
 	FontBuffer_(nullptr),
 	texID_(-1),
 	fontTexDirty_(false),
-	pVertBuffer_(nullptr),
 	effects_(g_fontArena)
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
-
-	pVertBuffer_ = X_NEW_ARRAY_ALIGNED( Vertex_P3F_T2F_C4B, FONT_QUAD_BUFFER_SIZE, 
-		g_fontArena, "fontVertexBuffer", 16);
 }
 
 
@@ -56,7 +53,6 @@ XFont::~XFont()
 {
 	Free();
 
-	X_DELETE_ARRAY(pVertBuffer_, g_fontArena);
 }
 
 void XFont::Release()
@@ -119,8 +115,10 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	{
 		len = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 		if (len > 0) {
-			pBuffer = X_NEW_ARRAY(uint8_t,len,g_fontArena, "FontTTFBuffer");
-			file.read(pBuffer, len);
+			pBuffer = X_NEW_ARRAY(uint8_t,len, g_fontArena, "FontTTFBuffer");
+			if (file.read(pBuffer, len) != len) {
+
+			}
 		}
 	}
 
@@ -155,58 +153,347 @@ void XFont::Reload(void)
 	loadFont();
 }
 
-void XFont::DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex)
-{
-	if (!pStr) {
-		return;
-	}
 
+
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+	const XTextDrawConect& contex, const char* pBegin, const char* pEnd)
+{
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
-	ByteToWide(pStr, strW, MAX_TXT_SIZE);
+	
+	size_t txtLen = pEnd - pBegin;
+	const wchar_t* pWideBegin = core::strUtil::Convert(pBegin, strW);
+	const wchar_t* pWideEnd = pWideBegin + txtLen;
 
-	DrawStringWInternal(Vec3f(pos.x, pos.y, 1.0f), strW, contex);
+	DrawString(
+		pPrimCon,
+		pos,
+		contex,
+		pWideBegin,
+		pWideEnd
+	);
 }
 
-
-void XFont::DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex)
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, 
+	const XTextDrawConect& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
-	if (!pStr) {
-		return;
+	X_UNUSED(pEnd);
+
+	Vec2f size = ctx.size; // in pixel
+	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
+	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
+
+	const auto effecIdx = ctx.GetEffectId() < effects_.size() ? ctx.GetEffectId() : 0;
+
+	FontEffect& effect = effects_[effecIdx];
+	for (auto passIdx = 0; passIdx < effect.passes.size(); passIdx++)
+	{
+		const FontPass& pass = effect.passes[passIdx];
+
+		Color8u col = ctx.col;
+
+		float z = pos.z;
+		float charX = pos.x + pass.offset.x;
+		float charY = pos.y + pass.offset.y;
+		float rcpCellWidth;
+
+		Vec2f baseXY(pos.x, pos.y);
+		Vec2f scale;
+
+		if (proportinal)
+		{
+			// to have backward compatible behavior (can be refactored later)
+			rcpCellWidth = (1.0f / (512.0f / 16.0f)) * size.x;
+			scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y / 32.0f);
+		}
+		else
+		{
+			rcpCellWidth = size.x / 16.0f;
+			scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y * ctx.widthScale / 16.0f);
+		}
+
+		if (drawFrame && passIdx == 0)
+		{
+			const Vec2f textSize = GetTextSizeWInternal(pBegin, ctx);
+
+			const Color8u frameColor(7, 7, 7, 80); //dark grey, 65% opacity
+
+			const float x0 = baseXY.x - 3;
+			const float y0 = baseXY.y;
+			const float x1 = baseXY.x + textSize.x + 2;
+			const float y1 = baseXY.y + textSize.y;
+
+			const Vec3f v0(x0, y0, z);
+			const Vec3f v2(x1, y1, z);
+			const Vec3f v1(v2.x, v0.y, v0.z); // to avoid float->half conversion
+			const Vec3f v3(v0.x, v2.y, v0.z); // to avoid float->half conversion
+
+			Vec2f gradientUvMin, gradientUvMax;
+			GetGradientTextureCoord(gradientUvMin.x, gradientUvMin.y, gradientUvMax.x, gradientUvMax.y);
+
+			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, texID_);
+
+			pVerts[0].pos = v0;
+			pVerts[0].color = frameColor;
+			pVerts[0].st = Vec2f(gradientUvMin.x, gradientUvMax.y);
+
+			pVerts[1].pos = v1;
+			pVerts[1].color = frameColor;
+			pVerts[1].st = pVerts[0].st;
+
+			pVerts[2].pos = v2;
+			pVerts[2].color = frameColor;
+			pVerts[2].st = pVerts[0].st;
+
+			pVerts[3].pos = v2;
+			pVerts[3].color = frameColor;
+			pVerts[3].st = pVerts[0].st;
+
+			pVerts[4].pos = v3;
+			pVerts[4].color = frameColor;
+			pVerts[4].st = pVerts[0].st;
+
+			pVerts[5].pos = v0;
+			pVerts[5].color = frameColor;
+			pVerts[5].st = pVerts[0].st;
+		}
+
+		const wchar_t* pChar = pBegin;
+		while (wchar_t ch = *pChar++)
+		{
+			// check for special chars that alter how we render.
+			switch (ch)
+			{
+				case L' ':
+				{
+					if (proportinal) {
+						charX += size.x * FONT_SPACE_SIZE;
+					}
+					else {
+						charX += size.x * ctx.widthScale;
+					}
+					continue;
+					break;
+				}
+
+				case L'^':
+				{
+					if (*pChar == L'^') {
+						++pChar;
+					}
+					else if (core::strUtil::IsDigitW(*pChar))
+					{
+						const int32_t colorIndex = (*pChar) - L'0';
+						Color8u newColor = g_ColorTable[colorIndex];
+						col.r = newColor.r;
+						col.g = newColor.g;
+						col.b = newColor.b;
+						++pChar;
+					}
+					continue;
+					break;
+				}
+
+				case L'\n':
+				{
+					charX = baseXY.x;
+					charY += size.y;
+					continue;
+					break;
+				}
+
+				case L'\r':
+				{
+					charX = baseXY.x;
+					continue;
+					break;
+				}
+
+				case L'\t':
+				{
+					if (proportinal) {
+						charX += FONT_TAB_CHAR_NUM * size.x * FONT_SPACE_SIZE;
+					}
+					else {
+						charX += FONT_TAB_CHAR_NUM * size.x * ctx.widthScale;
+					}
+					continue;
+					break;
+				}
+
+				default:
+					break;
+			}
+
+			const int32_t charWidth = pFontTexture_->GetCharacterWidth(ch);
+			const XTextureSlot* pSlot = pFontTexture_->GetCharSlot(ch);
+			XCharCords cords;
+			pFontTexture_->GetTextureCoord(pSlot, cords);
+			
+			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, texID_);
+
+			float hozAdvance = 0;
+			if (proportinal)
+			{
+				hozAdvance = (charWidth + FONT_GLYPH_PROP_SPACING) * scale.x;
+				cords.offset.x = 0;
+			}
+			else
+			{
+				hozAdvance = size.x * ctx.widthScale;
+			}
+
+			float xpos = charX + cords.offset.x * scale.x;
+			float ypos = charY + cords.offset.y * scale.y;
+			float right = xpos + cords.size.x * scale.x;
+			float bottom = ypos + cords.size.y * scale.y;
+
+			// Verts
+			const Vec3f tl(xpos, ypos, z);
+			const Vec3f br(right, bottom, z);
+			const Vec3f tr(br.x, tl.y, tl.z);
+			const Vec3f bl(tl.x, br.y, tl.z);
+
+			// cords
+			const Vec2f tc_tl(cords.texCoords[0], cords.texCoords[1]);
+			const Vec2f tc_br(cords.texCoords[2], cords.texCoords[3]);
+			const Vec2f tc_tr(tc_br.x, tc_tl.y);
+			const Vec2f tc_bl(tc_tl.x, tc_br.y);
+
+			const Color8u finalCol = pass.col * col;
+			// We need 6 since each char is not connected.
+			// so we make seprate tri's
+
+			// TL
+			pVerts[0].pos = tl;
+			pVerts[0].color = finalCol;
+			pVerts[0].st = tc_tl;
+
+			// TR
+			pVerts[1].pos = tr;
+			pVerts[1].color = finalCol;
+			pVerts[1].st = tc_tr;
+
+			// BR
+			pVerts[2].pos = br;
+			pVerts[2].color = finalCol;
+			pVerts[2].st = tc_br;
+
+			// BR
+			pVerts[3].pos = br;
+			pVerts[3].color = finalCol;
+			pVerts[3].st = tc_br;
+
+			// BL
+			pVerts[4].pos = bl;
+			pVerts[4].color = finalCol;
+			pVerts[4].st = tc_bl;
+
+			// TL
+			pVerts[5].pos = tl;
+			pVerts[5].color = finalCol;
+			pVerts[5].st = tc_tl;
+
+			charX += hozAdvance;
+		}
 	}
 
-	// to wide char
-	wchar_t strW[MAX_TXT_SIZE];
-	ByteToWide(pStr, strW, MAX_TXT_SIZE);
-
-	DrawStringWInternal(Vec3f(x, y, 1.0f), strW, contex);
 }
 
 
-void XFont::DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex)
+size_t XFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
 {
-	if (!pStr) {
-		return;
+	size_t size = 0;
+
+	// parse the string, ignoring control characters
+	const char* pChar = pStr;
+	while (char ch = *pChar++)
+	{
+		switch (ch)
+		{
+			case '\\':
+			{
+				if (*pChar != 'n' || !asciiMultiLine)
+				{
+					break;
+				}
+				++pChar;
+			}
+			case '\n':
+			case '\r':
+			case '\t':
+			{
+				continue;
+			}
+			break;
+			case '^':
+			{
+				if (*pChar == '^')
+				{
+					++pChar;
+				}
+				else if (*pChar)
+				{
+					++pChar;
+					continue;
+				}
+			}
+			break;
+			default:
+				break;
+		}
+		++size;
 	}
 
-	// to wide char
-	wchar_t strW[MAX_TXT_SIZE];
-	ByteToWide(pStr, strW, MAX_TXT_SIZE);
-
-	DrawStringWInternal(pos, strW, contex);
+	return size;
 }
 
-// Wide
-void XFont::DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
+size_t XFont::GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const
 {
-	DrawStringWInternal(Vec3f(pos.x,pos.y,1.0f), pStr, contex);
-}
+	size_t size = 0;
 
-void XFont::DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
-{
-	DrawStringWInternal(pos, pStr, contex);
-}
+	// parse the string, ignoring control characters
+	const wchar_t* pChar = pStr;
+	while (wchar_t ch = *pChar++)
+	{
+		switch (ch)
+		{
+			case L'\\':
+			{
+				if (*pChar != L'n' || !asciiMultiLine)
+				{
+					break;
+				}
+				++pChar;
+			}
+			case L'\n':
+			case L'\r':
+			case L'\t':
+			{
+				continue;
+			}
+			break;
+			case L'$':
+			{
+				if (*pChar == L'$')
+				{
+					++pChar;
+				}
+				else if (*pChar)
+				{
+					++pChar;
+					continue;
+				}
+			}
+			break;
+			default:
+				break;
+		}
+		++size;
+	}
 
+	return size;
+}
 
 
 // calculate the size.
@@ -223,7 +510,7 @@ Vec2f XFont::GetTextSize(const char* pStr, const XTextDrawConect& contex)
 	return GetTextSizeWInternal(strW, contex);
 }
 
-Vec2f XFont::GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex)
 {
 	return GetTextSizeWInternal(pStr, contex);
 }
@@ -259,16 +546,6 @@ void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float
 
 // =======================================================================================
 
-void XFont::DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
-{
-	if (!pStr) {
-		return;
-	}
-
-	render::IRender* pRenderer = gEnv->pRender;
-
-	pRenderer->DrawStringW(this, pos, pStr, contex);
-}
 
 Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ctx)
 {
@@ -288,15 +565,16 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 
 	// Scale it?
 	Vec2f size = ctx.size; // in pixel
-	if (ctx.getScaleFrom800x600())
+	if (ctx.flags.IsSet(DrawTextFlag::SCALE_800x600))
 	{
 		pRenderer->ScaleCoord(size);
 	}
 
 	Prepare(pStr, false);
 
+	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
 
-	if (ctx.proportinal)
+	if (proportinal)
 	{
 		rcpCellWidth = (1.0f / (512.0f / 16.0f)) * size.x;
 		scale = Vec2f(rcpCellWidth, size.y / 32.0f);
@@ -353,7 +631,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 				break;
 			case L'\t':
 			{
-				if (ctx.proportinal)
+				if (proportinal)
 					charX += FONT_TAB_CHAR_NUM * size.x * FONT_SPACE_SIZE;
 				else
 					charX += FONT_TAB_CHAR_NUM * size.x * ctx.widthScale;
@@ -362,7 +640,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 				break;
 			case L' ':
 			{
-				 if (ctx.proportinal)
+				 if (proportinal)
 					charX += FONT_SPACE_SIZE * size.x;
 				 else
 					 charX += size.x * ctx.widthScale;
@@ -385,7 +663,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 		}
 
 		float advance;
-		if (ctx.proportinal)
+		if (proportinal)
 		{
 			int iCharWidth = this->pFontTexture_->GetCharacterWidth(ch);
 			advance = (iCharWidth + FONT_GLYPH_PROP_SPACING) * scale.x;
@@ -403,100 +681,6 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 	}
 
 	return Vec2f(maxW, maxH);
-}
-
-size_t XFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
-{
-	size_t size = 0;
-
-	// parse the string, ignoring control characters
-	const char* pChar = pStr;
-	while (char ch = *pChar++)
-	{
-		switch (ch)
-		{
-			case '\\':
-			{
-				if (*pChar != 'n' || !asciiMultiLine)
-				{
-					break;
-				}
-				++pChar;
-			}
-			case '\n':
-			case '\r':
-			case '\t':
-			{
-				continue;
-			}
-				break;
-			case '^':
-			{
-				if (*pChar == '^')
-				{
-					++pChar;
-				}
-				else if (*pChar)
-				{
-					++pChar;
-					continue;
-				}
-			}
-				break;
-			default:
-				break;
-		}
-		++size;
-	}
-
-	return size;
-}
-
-size_t XFont::GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const
-{
-	size_t size = 0;
-
-	// parse the string, ignoring control characters
-	const wchar_t* pChar = pStr;
-	while (wchar_t ch = *pChar++)
-	{
-		switch (ch)
-		{
-			case L'\\':
-			{
-				if (*pChar != L'n' || !asciiMultiLine)
-				{
-					break;
-				}
-				++pChar;
-			}
-			case L'\n':
-			case L'\r':
-			case L'\t':
-			{
-				continue;
-			}
-				break;
-			case L'$':
-			{
-				if (*pChar == L'$')
-				{
-					++pChar;
-				}
-				else if (*pChar)
-				{
-					++pChar;
-					continue;
-				}
-			}
-				break;
-			default:
-				break;
-		}
-		++size;
-	}
-
-	return size;
 }
 
 bool XFont::InitCache(void)
@@ -549,14 +733,14 @@ void XFont::Prepare(const wchar_t* pStr, bool updateTexture)
 	}
 }
 
-
+#if 0
 void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& ctx)
 {
 	X_PROFILE_BEGIN("FontRender", core::ProfileSubSys::FONT);
 
-	Vertex_P3F_T2F_C4B* pQuad, *pVertex;
+	Vertex_P3F_T2F_C4B* pVerts, *pVertex;
 	XTextureSlot* pSlot;
-	render::IRender* pRenderer;
+//	render::IRender* pRenderer;
 	XCharCords cords;
 	int charWidth;
 	uint32_t vbOffset;
@@ -572,20 +756,20 @@ void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDra
 	}
 
 	vbOffset = 0;
-	pRenderer = gEnv->pRender;
+//	pRenderer = gEnv->pRender;
 
 	Prepare(pStr, true);
 
-	pRenderer->FontSetTexture(texID_);
-	if (!pRenderer->FontSetRenderingState()) {
-		return;
-	}
+//	pRenderer->FontSetTexture(texID_);
+//	if (!pRenderer->FontSetRenderingState()) {
+//		return;
+//	}
 
 	// Scale it?
 	Vec2f size = ctx.size; // in pixel
 	if (ctx.getScaleFrom800x600())
 	{
-		pRenderer->ScaleCoord(size);
+	//	pRenderer->ScaleCoord(size);
 	}
 	
 	
@@ -738,7 +922,7 @@ void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDra
 			charWidth = pFontTexture_->GetCharacterWidth(ch);
 			pSlot = pFontTexture_->GetCharSlot(ch);
 			pFontTexture_->GetTextureCoord(pSlot, cords);
-			pQuad = &pVertBuffer_[vbOffset];
+			pVerts = &pVertBuffer_[vbOffset];
 
 			float advance;
 
@@ -774,39 +958,39 @@ void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDra
 			// so we make seprate tri's
 
 			// TL
-			pQuad[0].pos = tl;
-			pQuad[0].color = finalCol;
-			pQuad[0].st = tc_tl;
+			pVerts[0].pos = tl;
+			pVerts[0].color = finalCol;
+			pVerts[0].st = tc_tl;
 
 			// TR
-			pQuad[1].pos = tr;
-			pQuad[1].color = finalCol;
-			pQuad[1].st = tc_tr;
+			pVerts[1].pos = tr;
+			pVerts[1].color = finalCol;
+			pVerts[1].st = tc_tr;
 
 			// BR
-			pQuad[2].pos = br;
-			pQuad[2].color = finalCol;
-			pQuad[2].st = tc_br;
+			pVerts[2].pos = br;
+			pVerts[2].color = finalCol;
+			pVerts[2].st = tc_br;
 
 			// BR
-			pQuad[3].pos = br;
-			pQuad[3].color = finalCol;
-			pQuad[3].st = tc_br;
+			pVerts[3].pos = br;
+			pVerts[3].color = finalCol;
+			pVerts[3].st = tc_br;
 
 			// BL
-			pQuad[4].pos = bl;
-			pQuad[4].color = finalCol;
-			pQuad[4].st = tc_bl;
+			pVerts[4].pos = bl;
+			pVerts[4].color = finalCol;
+			pVerts[4].st = tc_bl;
 
 			// TL
-			pQuad[5].pos = tl;
-			pQuad[5].color = finalCol;
-			pQuad[5].st = tc_tl;
+			pVerts[5].pos = tl;
+			pVerts[5].color = finalCol;
+			pVerts[5].st = tc_tl;
 
 
 			vbOffset += 6;
 
-			if (vbOffset == FONT_QUAD_BUFFER_SIZE)
+//			if (vbOffset == FONT_QUAD_BUFFER_SIZE)
 			{
 				X_ASSERT_NOT_IMPLEMENTED();
 			//	pRenderer->DrawVB(pVertBuffer_, vbOffset,
@@ -821,15 +1005,8 @@ void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDra
 	}
 
 
-	// draw anything left.
-	if (vbOffset) {
-		X_ASSERT_NOT_IMPLEMENTED();
-	//	pRenderer->DrawVB(pVertBuffer_, vbOffset,
-	//		render::PrimitiveTypePublic::TriangleList);
-	}
-
-	pRenderer->FontRestoreRenderingState();
 }
+#endif
 
 
 bool XFont::InitTexture(void)

@@ -65,48 +65,37 @@ typedef Flags<DrawTextFlag> DrawTextFlags;
 
 struct XTextDrawConect
 {
-	Vec2f	size;
-	Rectf	clip;
-	Colorf	col;
-	float widthScale;
-	bool proportinal;
-	bool clipEnabled;
-	bool drawFrame;
-	bool scale800x600;
+	Color8u	col;  // 4
+	Vec2f	size; // 8
+	Rectf	clip; // 16
+	float	widthScale; // 4
 	uint32_t effectId;
 
 	DrawTextFlags flags;
 	IFont* pFont;
 
 	XTextDrawConect() :
-		proportinal(true),
-		clipEnabled(false),
-		drawFrame(false),
-		scale800x600(false),
 		widthScale(1.f),
 		size(16.f,16.f),
-		effectId(0)
+		effectId(0),
+		flags(0),
+		pFont(nullptr)
 	{}
 
 	void Reset() { *this = XTextDrawConect(); }
 	void SetSize(const Vec2f& _size) { size = _size; }
 	void SetClip(const Rectf& rec) { clip = rec; }
-	void SetProportional(bool proportional) { proportinal = proportional; }
-	void EnableClipping(bool enable) { clipEnabled = enable; }
 	void SetColor(const Colorf& _col) { col = _col; }
+	void SetColor(const Color8u& _col) { col = _col; }
 	void SetCharWidthScale(const float scale) { widthScale = scale; }
 	void SetEffectId(uint32_t id) { effectId = id; }
 	void SetDefaultEffect(void) { effectId = 0; }
-	void SetDrawFrame(bool enable) { drawFrame = enable; }
-	void SetScaleFrom800x600(bool enable) { scale800x600 = enable; }
 
-	X_INLINE float GetCharWidth() const { return size.x; }
-	X_INLINE float GetCharWidthScaled() const { return size.x * widthScale; }
-	X_INLINE float GetCharHeight() const { return size.y; }
-	X_INLINE float GetCharWidthScale() const { return widthScale; }
-	X_INLINE uint32_t GetEffectId() const { return effectId; }
-	X_INLINE bool getDrawFrame(void) const { return drawFrame; }
-	X_INLINE bool getScaleFrom800x600(void) const { return scale800x600; }
+	X_INLINE float GetCharWidth(void) const { return size.x; }
+	X_INLINE float GetCharWidthScaled(void) const { return size.x * widthScale; }
+	X_INLINE float GetCharHeight(void) const { return size.y; }
+	X_INLINE float GetCharWidthScale(void) const { return widthScale; }
+	X_INLINE uint32_t GetEffectId(void) const { return effectId; }
 };
 
 
@@ -126,39 +115,30 @@ struct IFont
 	virtual void FreeBuffers(void) X_ABSTRACT;		// free texture buffers
 	virtual void FreeTexture(void) X_ABSTRACT;
 
-//	virtual bool load(const char* pFilePath, uint32_t width, uint32_t height) X_ABSTRACT;
+	virtual texture::TexID getTextureId(void) const X_ABSTRACT;
 
-//	virtual bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height) X_ABSTRACT;
+
 	virtual bool loadFont(void) X_ABSTRACT;
 
-	// expose drawing shit baby.
-	virtual void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
-	virtual void DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
-	virtual void DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
-
-	virtual void DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_ABSTRACT;
-	virtual void DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_ABSTRACT;
+	// these draw the text into the primative context.
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 
 
 	virtual size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_ABSTRACT;
-	virtual size_t GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const X_ABSTRACT;
+	virtual size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_ABSTRACT;
 
 	// calculate the size.
 	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
-	virtual Vec2f GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex) X_ABSTRACT;
+	virtual Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_ABSTRACT;
 
 	virtual uint32_t GetEffectId(const char* pEffectName) const X_ABSTRACT;
 
-	virtual void GetGradientTextureCoord(float& minU, float& minV,
-		float& maxU, float& maxV) const X_ABSTRACT;
+//	virtual void GetGradientTextureCoord(float& minU, float& minV,
+//		float& maxU, float& maxV) const X_ABSTRACT;
 };
 
 
-struct IXFont_RenderProxy
-{
-	virtual ~IXFont_RenderProxy(){}
-	virtual void RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& ctx) X_ABSTRACT;
-};
 
 X_NAMESPACE_END
 
