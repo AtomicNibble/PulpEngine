@@ -325,18 +325,20 @@ void XScriptSys::Update()
 
 	if (c_script_draw_memory_stats_)
 	{
-		core::MemoryAllocatorStatistics allocStats = g_ScriptArena->getAllocatorStatistics(true);
-		core::MemoryAllocatorStatistics luaAllocStats = g_LuaAllocator.getStatistics();
+		X_ASSERT_NOT_IMPLEMENTED();
+
+	//	core::MemoryAllocatorStatistics allocStats = g_ScriptArena->getAllocatorStatistics(true);
+	//	core::MemoryAllocatorStatistics luaAllocStats = g_LuaAllocator.getStatistics();
 
 
-		Vec3f pos(10,30, 1);
-		render::XDrawTextInfo ti;
-		ti.col = Col_Whitesmoke;
-		ti.flags = render::DrawTextFlags::POS_2D | render::DrawTextFlags::MONOSPACE;
+	//	Vec3f pos(10,30, 1);
+	//	render::DrawTextInfo ti;
+	//	ti.col = Col_Whitesmoke;
+	//	ti.flags = render::DrawTextFlags::POS_2D | render::DrawTextFlags::MONOSPACE;
 	
 
-		gEnv->pRender->DrawAllocStats(Vec3f(10, 35, 1), ti, allocStats, "ScriptSys");
-		gEnv->pRender->DrawAllocStats(Vec3f(250, 35, 1), ti, luaAllocStats, "Lua");
+	//	gEnv->pRender->DrawAllocStats(Vec3f(10, 35, 1), ti, allocStats, "ScriptSys");
+	//	gEnv->pRender->DrawAllocStats(Vec3f(250, 35, 1), ti, luaAllocStats, "Lua");
 	}
 }
 
