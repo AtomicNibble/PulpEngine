@@ -3,9 +3,12 @@
 #ifndef _X_FONT_I_H_
 #define _X_FONT_I_H_
 
+#include <ITexture.h>
+
 struct ICore;
 
 
+X_NAMESPACE_DECLARE(engine, class IPrimativeContext);
 
 X_NAMESPACE_BEGIN(font)
 
