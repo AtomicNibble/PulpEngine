@@ -1111,6 +1111,10 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 #if 1
 	if (curState.handle != handle) // if the handle is the same, everything is the same.
 	{
+		// the render system should not have to check ever state is valid, the 3dengine should check at creation time.
+		// so it's a one off cost not a cost we pay for every fucking state change.
+		X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states you cunt")(handle, INVALID_STATE_HANLDE);
+
 		curState.handle = handle;
 
 		// now we check what parts of the state are diffrent.
@@ -1278,13 +1282,16 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 //	rootSig.getParamRef(2).initAsSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
 //	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 
-	rootSig.finalize(*pRootSigCache_, 
+	if (!rootSig.finalize(*pRootSigCache_,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 		// should i just disable these for now?
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
-	);
+	)) {
+		X_DELETE(pState, arena_);
+		return INVALID_STATE_HANLDE;
+	}
 
 	// we need to create a PSO.
 	GraphicsPSO pso;
@@ -1319,7 +1326,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 #if 1
 	shader::XShaderTechniqueHW& hwTech = pTech->hwTechs[0];
 
-	hwTech.tryCompile(true);
+	if (!hwTech.tryCompile(true)) {
+		X_DELETE(pState, arena_);
+		return INVALID_STATE_HANLDE;
+	}
 //	pShaderMan_->compile(hwTech);
 
 	if (hwTech.IlFmt != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
@@ -1343,19 +1353,24 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	}
 #endif
 
-	pso.finalize(*pPSOCache_);
+	if (!pso.finalize(*pPSOCache_)) {
+		X_DELETE(pState, arena_);
+		return INVALID_STATE_HANLDE;
+	}
 
 
 	pState->pPso = pso.getPipelineStateObject();
 	pState->topo = topoFromDesc(desc);
 	pState->texStates.resize(numStates);
 	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
-
 	return reinterpret_cast<StateHandle>(pState);
 }
 
 void XRender::destoryState(StateHandle handle)
 {
+	// this implies you are not checking they are valid when creating, which you should!
+	X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
+
 	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
 
 	X_DELETE(pState, arena_);
