@@ -56,7 +56,9 @@ X_DECLARE_FLAGS(DrawTextFlag)(
 	MONOSPACE,
 	POS_2D,
 	FIXED_SIZE,
-	FRAMED
+	FRAMED,
+	CLIP,
+	SCALE_800x600
 );
 
 typedef Flags<DrawTextFlag> DrawTextFlags;
