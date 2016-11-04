@@ -191,7 +191,7 @@ void X3DEngine::OnFrameBegin(void)
 
 	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 	{
-		auto& context = primContexts_[i];
+		const auto& context = primContexts_[i];
 		if (!context.isEmpty())
 		{
 			const auto& elems = context.getUnsortedBuffer();
@@ -220,15 +220,17 @@ void X3DEngine::OnFrameBegin(void)
 		// fuck a flying camel just before it lands.
 		// then skin it and put the skin on a goat.
 		render::StateDesc desc;
-		desc.blend.srcBlendColor = render::BlendType::ONE;
-		desc.blend.srcBlendAlpha = render::BlendType::ONE;
-		desc.blend.dstBlendColor = render::BlendType::ZERO;
-		desc.blend.dstBlendAlpha = render::BlendType::ZERO;
+		desc.blend.srcBlendColor = render::BlendType::SRC_ALPHA;
+		desc.blend.srcBlendAlpha = render::BlendType::SRC_ALPHA;
+		desc.blend.dstBlendColor = render::BlendType::INV_SRC_ALPHA;
+		desc.blend.dstBlendAlpha = render::BlendType::INV_SRC_ALPHA;
 		desc.blendOp = render::BlendOp::OP_ADD;
-		desc.cullType = render::CullType::BACK_SIDED;
+		desc.cullType = render::CullType::TWO_SIDED;
 		desc.topo = render::TopoType::TRIANGLESTRIP;
-		desc.depthFunc = render::DepthFunc::LESS;
+		desc.depthFunc = render::DepthFunc::ALWAYS;
 		desc.stateFlags.Clear();
+		desc.stateFlags.Set(render::StateFlag::BLEND);
+		desc.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
 		desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
 
 		auto renderTarget = pRender_->getCurBackBuffer();
@@ -236,7 +238,6 @@ void X3DEngine::OnFrameBegin(void)
 		render::RenderTargetFmtsArr rtfs;
 		rtfs.append(renderTarget->getFmt());
 		render::PassStateHandle passHandle = pRender_->createPassState(rtfs);
-		render::StateHandle stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
 
 		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
@@ -258,6 +259,37 @@ void X3DEngine::OnFrameBegin(void)
 					render::CpuAccess::WRITE
 				);
 
+				render::StateHandle stateHandle = 0;
+
+#if 1
+				const auto& front = elems.front();
+				auto curFlags = front.flags;
+
+
+				desc.topo = curFlags.getPrimType();
+				stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
+
+				for (size_t x = 0; x < elems.size(); x++)
+				{
+					const auto& elem = elems[x];
+					const auto flags = elem.flags;
+
+					if (flags != curFlags)
+					{
+						desc.topo = flags.getPrimType();
+
+						stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
+						curFlags = flags;
+					}
+
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(flags.toInt(), 0);
+					pDraw->startVertex = elem.vertexOffs;
+					pDraw->vertexCount = elem.numVertices;
+					core::zero_object(pDraw->vertexBuffers);
+					pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
+					pDraw->stateHandle = stateHandle; // we need state :cry:
+				}
+#else
 
 				const auto& front = elems.front();
 				uint32_t curFlags = front.flags;
@@ -297,6 +329,7 @@ void X3DEngine::OnFrameBegin(void)
 						curFlags = flags;
 					}
 				}
+#endif
 			}
 		}
 
