@@ -2322,20 +2322,6 @@ void XRender::FontSetBlending()
 }
 
 
-void XRender::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-	const wchar_t* pStr, const font::XTextDrawConect& ctx) const
-{
-	X_ASSERT_NOT_NULL(pFont);
-	X_ASSERT_NOT_NULL(pStr);
-
-	X_UNUSED(pFont);
-	X_UNUSED(pos);
-	X_UNUSED(pStr);
-	X_UNUSED(ctx);
-
-
-}
-
 
 // ~Font
 

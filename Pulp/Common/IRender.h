@@ -571,8 +571,8 @@ struct IRender
 	virtual bool FontSetRenderingState() X_ABSTRACT;
 	virtual void FontRestoreRenderingState() X_ABSTRACT;
 	virtual void FontSetBlending() X_ABSTRACT;
-	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_ABSTRACT;
+//	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
+//		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_ABSTRACT;
 
 	// ~Font
 
