@@ -499,7 +499,7 @@ bool XModel::LoadModel(core::XFile* file)
 	// ok now we just have the model + bone data.
 	// which we can load all at once and just set pointers.
 	//	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, g_3dEngineArena, "ModelBuffer", 8);
-	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, gEnv->pArena, "ModelBuffer", 8);
+	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, gEnv->pArena, "ModelBuffer", 16); 
 	size_t readSize;
 
 	if ((readSize = file->read(pData, hdr_.dataSize)) != hdr_.dataSize)
@@ -530,6 +530,8 @@ bool XModel::LoadModel(core::XFile* file)
 void XModel::ProcessData(char* pData)
 {
 	X_ASSERT_NOT_NULL(pData);
+	X_ASSERT_ALIGNMENT(pData, 16, 0);
+
 	int i, x;
 
 	if (!pData) {
