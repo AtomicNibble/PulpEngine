@@ -88,7 +88,12 @@ X_NAMESPACE_BEGIN(model)
 //
 //	Version 10:
 //			Includes combined AABB in header.
-//	
+//
+//	Version 11:
+//		Add vertex format to the model file Header. also force 4 byte padding.
+//
+//	Version 12:
+//		Bump model version to signify the flip uv and reverse face winding.
 //
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
