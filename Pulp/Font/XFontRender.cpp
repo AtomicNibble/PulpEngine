@@ -6,14 +6,14 @@
 X_NAMESPACE_BEGIN(font)
 
 XFontRender::XFontRender() : 
-pLibrary_(0),
-pFace_(0),
-pGlyph_(0), 
-pEncoding_(X_FONT_ENCODING_UNICODE),
-fSizeRatio_(0.8f),
-// fSizeRatio_(1.0f),
-iGlyphBitmapWidth_(0),
-iGlyphBitmapHeight_(0)
+	pLibrary_(0),
+	pFace_(0),
+	pGlyph_(0), 
+	pEncoding_(ENCODING_UNICODE),
+	fSizeRatio_(0.8f),
+	// fSizeRatio_(1.0f),
+	glyphBitmapWidth_(0),
+	glyphBitmapHeight_(0)
 {
 
 }
@@ -63,19 +63,19 @@ bool XFontRender::LoadFromMemory(BYTE* pBuffer, size_t bufferLength)
 		return false;
 	}
 
-	SetEncoding(X_FONT_ENCODING_UNICODE);
+	SetEncoding(ENCODING_UNICODE);
 	return true;
 }
 
 
 void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
 {
-	iGlyphBitmapWidth_ = width;
-	iGlyphBitmapHeight_ = height;
+	glyphBitmapWidth_ = width;
+	glyphBitmapHeight_ = height;
 
 	const int32_t err = FT_Set_Pixel_Sizes(pFace_, 
-		static_cast<int32_t>(iGlyphBitmapWidth_ * fSizeRatio_),
-		static_cast<int32_t>(iGlyphBitmapHeight_ * fSizeRatio_));
+		static_cast<int32_t>(glyphBitmapWidth_ * fSizeRatio_),
+		static_cast<int32_t>(glyphBitmapHeight_ * fSizeRatio_));
 
 	if (err)
 	{
@@ -86,10 +86,10 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
 void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 {
 	if (pWidth) {
-		*pWidth = iGlyphBitmapWidth_;
+		*pWidth = glyphBitmapWidth_;
 	} 
 	if (pHeight) {
-		*pHeight = iGlyphBitmapHeight_;
+		*pHeight = glyphBitmapHeight_;
 	}
 }
 
@@ -105,19 +105,19 @@ bool XFontRender::SetEncoding(FT_Encoding pEncoding)
 
 
 bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
-	int8_t& iCharOffsetX, int8_t& iCharOffsetY, int32_t iX, int32_t iY, int32_t iCharCode)
+	int8_t& charOffsetX, int8_t& charOffsetY, int32_t iX, int32_t iY, int32_t charCode)
 { 
-	int iError = FT_Load_Char(pFace_, iCharCode, FT_LOAD_DEFAULT);
+	int32_t  err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
 
-	if (iError) {
+	if (err) {
 		return false;
 	}
 
 	pGlyph_ = pFace_->glyph;
 
-	iError = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
+	err = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
 
-	if (iError) {
+	if (err) {
 		return false;
 	}
 
@@ -128,30 +128,29 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 		*pGlyphHeight = safe_static_cast<uint8_t, int32_t>(pGlyph_->bitmap.rows);
 	}
 
-//	int iTopOffset = (iGlyphBitmapHeight_ - (int)(iGlyphBitmapHeight_ * fSizeRatio_)) + pGlyph_->bitmap_top;
-
-	iCharOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
-	iCharOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(iGlyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
+	charOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
+	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
 	unsigned char* pBuffer = pGlyphBitmap->GetBuffer();
 	uint32 dwGlyphWidth = pGlyphBitmap->GetWidth();
 
 	for (uint32_t i = 0; i < pGlyph_->bitmap.rows; i++)
 	{
-		int iNewY = i + iY;
+		const int32_t newY = i + iY;
 
 		for (uint32_t j = 0; j < pGlyph_->bitmap.width; j++)
 		{
-			unsigned char	cColor = pGlyph_->bitmap.buffer[(i * pGlyph_->bitmap.width) + j];
-			int				iOffset = iNewY * dwGlyphWidth + iX + j;
+			uint8_t	color =		pGlyph_->bitmap.buffer[(i * pGlyph_->bitmap.width) + j];
+			int32_t				offset = newY * dwGlyphWidth + iX + j;
 
-			if (iOffset >= (int)dwGlyphWidth * iGlyphBitmapHeight_)
+			if (offset >= static_cast<int32_t>(dwGlyphWidth * glyphBitmapHeight_)) {
 				continue;
+			}
 
 #if X_FONT_DEBUG_RENDER
-			pBuffer[iOffset] = cColor / 2 + 32;
+			pBuffer[offset] = color / 2 + 32;
 #else
-			pBuffer[iOffset] = cColor;
+			pBuffer[offset] = color;
 #endif // !X_FONT_DEBUG_RENDER
 		}
 	}
