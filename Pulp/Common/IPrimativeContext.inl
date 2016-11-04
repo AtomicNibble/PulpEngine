@@ -81,12 +81,27 @@ X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float he
 }
 
 
-X_INLINE void IPrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pFormat, va_list args)
+X_INLINE void IPrimativeContext::drawText(Vec3f pos, const font::TextDrawContext& con, const char* pFormat, va_list args)
 {
 	core::StackString<2048> temp;
 	temp.appendFmt(pFormat, args);
 
-	drawTextQueued(pos, ti, temp.c_str());
+	drawText(pos, con, temp.begin(), temp.end());
+}
+
+X_INLINE void IPrimativeContext::drawText(Vec3f pos, const font::TextDrawContext& con, const char* pText)
+{
+	drawText(pos, con, pText, pText + core::strUtil::strlen(pText));
+}
+
+X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const char* pText)
+{
+	drawText(Vec3f(x, y, 1), con, pText, pText + core::strUtil::strlen(pText));
+}
+
+X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const char* pText, const char* pEnd)
+{
+	drawText(Vec3f(x, y, 1 ), con, pText, pEnd);
 }
 
 

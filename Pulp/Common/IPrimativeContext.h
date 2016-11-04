@@ -55,9 +55,11 @@ public:
 
 
 	// format buffer is 2048 in size.
-	X_INLINE void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pFormat, va_list args);
-	// no limit for text length.
-	virtual void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText) X_ABSTRACT;
+	X_INLINE void drawText(Vec3f pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
+	X_INLINE void drawText(Vec3f pos, const font::TextDrawContext& con, const char* pText);
+	X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const char* pText);
+	X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const char* pText, const char* pEnd);
+	virtual void drawText(Vec3f pos, const font::TextDrawContext& con, const char* pText, const char* pEnd) X_ABSTRACT;
 
 
 private:
