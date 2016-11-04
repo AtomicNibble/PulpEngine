@@ -98,6 +98,12 @@ bool X3DEngine::Init(void)
 		return false;
 	}
 
+	// init the prim context states.
+	for (auto& primcon : primContexts_)
+	{
+		primcon.createStates(pRender_);
+	}
+
 	level::Level::Init();
 
 	return true;
@@ -111,6 +117,11 @@ void X3DEngine::ShutDown(void)
 	gEnv->pHotReload->addfileType(nullptr, "map");
 
 	guisMan_.Shutdown();
+
+	for (auto& primcon : primContexts_)
+	{
+		primcon.freeStates(pRender_);
+	}
 
 	if (pModelManager_) {
 		pModelManager_->ShutDown();
