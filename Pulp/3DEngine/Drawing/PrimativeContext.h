@@ -80,7 +80,7 @@ public:
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	const VertexArr& getVerts(void) const;
 
-	void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText) X_FINAL;
+	void drawText(Vec3f pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
 
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId) X_FINAL;

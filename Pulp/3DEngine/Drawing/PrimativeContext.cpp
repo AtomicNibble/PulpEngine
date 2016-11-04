@@ -120,11 +120,19 @@ const PrimativeContext::VertexArr& PrimativeContext::getVerts(void) const
 	return vertexArr_;
 }
 
-void PrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText)
+
+
+void PrimativeContext::drawText(Vec3f pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd)
 {
 	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(pText);
+	X_UNUSED(con);
+	X_UNUSED(pBegin);
+	X_UNUSED(pEnd);
+
+	// so we need todo the cpu side font rendering task here.
+	// so we need the font.
+	
+
 
 }
 
