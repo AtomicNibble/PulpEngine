@@ -117,6 +117,7 @@ static const uint32_t	 MODEL_MAX_LODS = 4;
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
 static const char*		 MODEL_FILE_EXTENSION = "model";
 static const wchar_t*	 MODEL_FILE_EXTENSION_W = L"model";
+static const char*		 MODEL_DEFAULT_NAME = "default/default";
 
 // max col meshes per mesh
 static const uint32_t	MODEL_MAX_COL_MESH = 8;
