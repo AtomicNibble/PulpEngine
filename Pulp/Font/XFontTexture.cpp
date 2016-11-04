@@ -455,7 +455,7 @@ int32_t XFontTexture::GetCharacterWidth(wchar_t cChar) const
 	return rSlot.charWidth + 1; // extra pixel for nicer bilinear filter
 }
 
-void XFontTexture::GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const
+void XFontTexture::GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const
 {
 	if (!pSlot) {
 		return;	// expected behavior

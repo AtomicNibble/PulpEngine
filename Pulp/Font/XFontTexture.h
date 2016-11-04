@@ -106,7 +106,7 @@ public:
 	int32_t PreCacheString(const wchar_t* pString, int32_t* pUpdated = 0);
 
 	int32_t GetCharacterWidth(wchar_t cChar) const;
-	void GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const;
+	void GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const;
 
 
 	X_INLINE const Vec2i GetSize(void) const;
