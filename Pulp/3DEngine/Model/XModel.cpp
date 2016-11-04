@@ -592,7 +592,7 @@ void XModel::ProcessData(char* pData)
 			{
 				SubMeshHeader& mesh = meshHeads[x];
 				// when model is created the submesh streams have the byte offsets set.
-				// so that we can just app the base address to fix them up.
+				// so that we can just add the base address to fix them up.
 				mesh.streams[VertexStream::VERT] += lod.streams[VertexStream::VERT];
 				mesh.streams[VertexStream::COLOR] += lod.streams[VertexStream::COLOR];
 				mesh.streams[VertexStream::NORMALS] += lod.streams[VertexStream::NORMALS];
