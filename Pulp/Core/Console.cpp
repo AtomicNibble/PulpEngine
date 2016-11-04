@@ -1919,8 +1919,10 @@ void XConsole::DrawBuffer(void)
 	}
 
 	font::XTextDrawConect ctx;
+	ctx.pFont = pFont_;
+	ctx.effectId = 0;
 	ctx.SetColor(Col_Khaki);
-	ctx.SetProportional(false);
+//	ctx.SetProportional(false);
 	ctx.SetSize(Vec2f(20, static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)));
 	ctx.SetCharWidthScale(0.5f);
 //	ctx.SetScaleFrom800x600(true);
@@ -2166,10 +2168,10 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 		// Font contex
 		font::XTextDrawConect ctx;
-		ctx.SetProportional(false);
+		ctx.pFont = pFont_;
+		ctx.effectId = 0;
 		ctx.SetSize(Vec2f(14, 14));
 		ctx.SetCharWidthScale(0.65f);
-	//	ctx.SetScaleFrom800x600(true);
 
 
 		// Autocomplete
@@ -2508,7 +2510,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			}
 			else
 			{
-				pFont_->DrawString(txtPos, InputBuffer_.c_str(), ctx);
+				pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, InputBuffer_.begin(), InputBuffer_.end());
 			}
 		}
 	}
