@@ -329,10 +329,11 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 	font::XTextDrawConect ctx;
 	ctx.SetColor(Color(r, g, b, a));
 	ctx.SetSize(Vec2f(size, size));
-	ctx.SetProportional(true);
+//	ctx.SetProportional(true);
 //	ctx.SetSizeIn800x600(true);
 
-	pFont->DrawString(x, y, text, ctx);
+	X_ASSERT_NOT_IMPLEMENTED();
+//	pFont->DrawString(x, y, text, ctx);
 
 	return pH->EndFunction();
 }
