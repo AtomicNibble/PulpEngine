@@ -48,7 +48,7 @@ namespace V2 {
 	struct Job;
 }
 )
-X_NAMESPACE_DECLARE(font, struct IXFontSys; struct IFFont)
+X_NAMESPACE_DECLARE(font, struct IFontSys; struct IFont)
 X_NAMESPACE_DECLARE(sound, struct ISound)
 X_NAMESPACE_DECLARE(script, struct IScriptSys)
 X_NAMESPACE_DECLARE(render, 
@@ -253,7 +253,7 @@ struct SCoreGlobals // obbject is zerod on start.
 	core::ITimer*				pTimer;
 	core::IConsole*				pConsole;
 	core::IFileSys*				pFileSys;
-	font::IXFontSys*			pFont;
+	font::IFontSys*				pFontSys;
 	sound::ISound*				pSound;
 	core::ILog*					pLog;
 //	core::IProfileSys*			pProfileSys;
@@ -346,7 +346,7 @@ struct ICore
 	virtual engine::I3DEngine* Get3DEngine(void) X_ABSTRACT;
 	virtual script::IScriptSys* GetISscriptSys(void) X_ABSTRACT;
 	virtual render::IRender* GetIRender(void) X_ABSTRACT;
-	virtual font::IXFontSys* GetIFontSys(void) X_ABSTRACT;
+	virtual font::IFontSys* GetIFontSys(void) X_ABSTRACT;
 	virtual core::V2::JobSystem* GetJobSystem(void) X_ABSTRACT;
 	virtual physics::IPhysics* GetPhysics(void) X_ABSTRACT;
 	virtual core::IProfileSys* GetIProfileSys(void) X_ABSTRACT;
