@@ -124,16 +124,13 @@ const PrimativeContext::VertexArr& PrimativeContext::getVerts(void) const
 
 void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
-	X_UNUSED(pos);
-	X_UNUSED(con);
-	X_UNUSED(pBegin);
-	X_UNUSED(pEnd);
-
 	// so we need todo the cpu side font rendering task here.
-	// so we need the font.
-	
+	// so we need the font to create all the verts for us.
+	// and we need a texture id to draw with.
+	X_ASSERT_NOT_NULL(ctx.pFont);
 
-
+	// we just send outself to the fonts render function that way the font can add what primatives it wishes.
+	ctx.pFont->DrawString(this, pos, ctx, pBegin, pEnd);
 }
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType, texture::TexID textureId)
