@@ -103,15 +103,26 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 		HRESULT hr = pDevice_->CreateComputePipelineState(&cpsoDesc, IID_PPV_ARGS(pPSO));
 		if (FAILED(hr)) {
 			X_FATAL("Dx12", "Failed to create compute PSO: %" PRIu32, hr);
+			*pPSORef = reinterpret_cast<ID3D12PipelineState *>(-1);
+			return false;
 		}
 
 		*pPSORef = *pPSO;
 	}
 	else
 	{
-		while (*pPSORef == nullptr) {
-			core::Thread::Yield();
+		if (*pPSORef == nullptr)
+		{
+			while (*pPSORef == nullptr) {
+				core::Thread::Yield();
+			}
+
+			// did the compile that we waited for fail?
+			if (*pPSORef == reinterpret_cast<ID3D12PipelineState *>(-1)) {
+				return false;
+			}
 		}
+
 		*pPSO = *pPSORef;
 	}
 
@@ -155,14 +166,14 @@ void PSO::setRootSignature(const RootSignature& BindMappings)
 
 // --------------------------------------------------
 
-void GraphicsPSO::finalize(PSODeviceCache& cache)
+bool GraphicsPSO::finalize(PSODeviceCache& cache)
 {
 	// Make sure the root signature is finalized first
 	PSODesc_.pRootSignature = pRootSignature_->getSignature();
 
 	X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
-	cache.compile(PSODesc_, &pPSO_);
+	return cache.compile(PSODesc_, &pPSO_);
 }
 
 
@@ -193,14 +204,14 @@ void GraphicsPSO::setInputLayout(size_t numElements, const D3D12_INPUT_ELEMENT_D
 
 // ----------------------------------------
 
-void ComputePSO::finalize(PSODeviceCache& cache)
+bool ComputePSO::finalize(PSODeviceCache& cache)
 {
 	// Make sure the root signature is finalized first
 	PSODesc_.pRootSignature = pRootSignature_->getSignature();
 
 	X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
-	cache.compile(PSODesc_, &pPSO_);
+	return cache.compile(PSODesc_, &pPSO_);
 }
 
 

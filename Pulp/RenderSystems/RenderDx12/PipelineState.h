@@ -35,7 +35,7 @@ public:
 	X_INLINE GraphicsPSO();
 	X_INLINE ~GraphicsPSO();
 
-	void finalize(PSODeviceCache& cache);
+	bool finalize(PSODeviceCache& cache);
 
 	X_INLINE void setBlendState(const D3D12_BLEND_DESC& blendDesc);
 	X_INLINE void setRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc);
@@ -76,7 +76,7 @@ public:
 	X_INLINE ComputePSO();
 	X_INLINE ~ComputePSO();
 
-	void finalize(PSODeviceCache& cache);
+	bool finalize(PSODeviceCache& cache);
 
 	void setComputeShader(const void* pBinary, size_t size);
 	X_INLINE void setComputeShader(const D3D12_SHADER_BYTECODE& binary);
