@@ -163,11 +163,11 @@ void RootSignature::initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DES
 	}
 }
 
-void RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags)
+bool RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
 	if (pSignature_) {
 		X_WARNING("Dx12", "finalize called on a rootSig that already has a device object");
-		return;
+		return false;
 	}
 
 	X_ASSERT(samplesInitCount_ == static_cast<uint32_t>(samplers_.size()), "Not all samplers are init")(samplesInitCount_, samplers_.size());
@@ -206,8 +206,8 @@ void RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATU
 	}
 
 	if (numDwords > MAX_DWORDS) {
-		X_FATAL("Dx12", "rootSig parameters size exceeds limit. num: %" PRIu32, " max: %" PRIuS, numDwords, MAX_DWORDS );
-		return;
+		X_ERROR("Dx12", "rootSig parameters size exceeds limit. num: %" PRIu32, " max: %" PRIuS, numDwords, MAX_DWORDS );
+		return false;
 	}
 
 #endif // !X_DEBUG
@@ -216,7 +216,10 @@ void RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATU
 
 	if (!cache.compile(rootDesc, hash, flags, &pSignature_)) {
 		X_ERROR("Dx12", "Failed to compile root sig");
+		return false;
 	}
+
+	return true;
 }
 
 
