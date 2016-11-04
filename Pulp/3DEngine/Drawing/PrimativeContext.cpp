@@ -122,7 +122,7 @@ const PrimativeContext::VertexArr& PrimativeContext::getVerts(void) const
 
 
 
-void PrimativeContext::drawText(Vec3f pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd)
+void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
 	X_UNUSED(pos);
 	X_UNUSED(con);

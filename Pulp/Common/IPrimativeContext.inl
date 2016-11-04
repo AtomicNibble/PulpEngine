@@ -81,7 +81,7 @@ X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float he
 }
 
 
-X_INLINE void IPrimativeContext::drawText(Vec3f pos, const font::TextDrawContext& con, const char* pFormat, va_list args)
+X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args)
 {
 	core::StackString<2048> temp;
 	temp.appendFmt(pFormat, args);
@@ -89,7 +89,7 @@ X_INLINE void IPrimativeContext::drawText(Vec3f pos, const font::TextDrawContext
 	drawText(pos, con, temp.begin(), temp.end());
 }
 
-X_INLINE void IPrimativeContext::drawText(Vec3f pos, const font::TextDrawContext& con, const char* pText)
+X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pText)
 {
 	drawText(pos, con, pText, pText + core::strUtil::strlen(pText));
 }
