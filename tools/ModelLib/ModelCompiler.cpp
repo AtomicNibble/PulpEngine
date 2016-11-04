@@ -839,7 +839,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			+ (16 * 5));
 		stream.reset();
 
-		const size_t streamOffset = file.tell() - sizeof(header);
+		const size_t streamOffset = safe_static_cast<size_t>(file.tell() - sizeof(header));
 
 		// this pads the stream so that the end of the stream is 16byte aligned.
 		auto padStream = [streamOffset, &stream]()
