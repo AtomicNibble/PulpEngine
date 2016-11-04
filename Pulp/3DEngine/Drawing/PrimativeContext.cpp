@@ -168,11 +168,10 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 #endif // !X_DEBUG
 
 	// resize and return.
-	auto& vertexArr = vertexArr_;
-	const auto oldVBSize = vertexArr.size();
-	vertexArr.resize(oldVBSize + numVertices);
+	const auto oldVBSize = vertexArr_.size();
+	vertexArr_.resize(oldVBSize + numVertices);
 
-	return &vertexArr[oldVBSize];
+	return &vertexArr_[oldVBSize];
 }
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
