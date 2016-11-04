@@ -213,10 +213,10 @@ public:
 	virtual void DrawRect(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_OVERRIDE;
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_OVERRIDE;
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
-	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
+//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_OVERRIDE;
+//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
+//	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
+//		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
 	virtual void FlushTextBuffer(void) X_OVERRIDE;
 	virtual int FontCreateTexture(const Vec2i& size, BYTE *pData,
 		texture::Texturefmt::Enum eTF = texture::Texturefmt::R8G8B8A8, bool genMips = false) X_OVERRIDE;

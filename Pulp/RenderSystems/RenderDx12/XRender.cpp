@@ -2219,31 +2219,31 @@ void XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 	X_UNUSED(padding);
 	X_UNUSED(max);
 }
-
-void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
-{
-	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(format);
-	X_UNUSED(args);
-}
-
-void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
-{
-	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(text);
-}
-
-void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-	const core::MemoryAllocatorStatistics& allocStats, const char* title)
-{
-	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(allocStats);
-	X_UNUSED(title);
-
-}
+//
+//void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
+//{
+//	X_UNUSED(pos);
+//	X_UNUSED(ti);
+//	X_UNUSED(format);
+//	X_UNUSED(args);
+//}
+//
+//void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
+//{
+//	X_UNUSED(pos);
+//	X_UNUSED(ti);
+//	X_UNUSED(text);
+//}
+//
+//void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
+//	const core::MemoryAllocatorStatistics& allocStats, const char* title)
+//{
+//	X_UNUSED(pos);
+//	X_UNUSED(ti);
+//	X_UNUSED(allocStats);
+//	X_UNUSED(title);
+//
+//}
 
 void XRender::FlushTextBuffer(void)
 {

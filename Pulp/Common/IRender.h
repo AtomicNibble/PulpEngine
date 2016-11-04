@@ -249,13 +249,6 @@ typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTa
 
 // ==================== OLD =========================================
 
-X_DECLARE_FLAGS(DrawTextFlags)(CENTER, RIGHT, CENTER_VER, MONOSPACE, POS_2D, FIXED_SIZE, FRAMED);
-
-struct XDrawTextInfo
-{
-	Flags<DrawTextFlags> flags;
-	Color col;
-};
 
 
 // ==================== OLD  =========================================
@@ -560,11 +553,11 @@ struct IRender
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_ABSTRACT;
 
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_ABSTRACT;
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_ABSTRACT;
-
-	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_ABSTRACT;
+//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_ABSTRACT;
+//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_ABSTRACT;
+//
+//	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
+//		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_ABSTRACT;
 
 	virtual void FlushTextBuffer(void) X_ABSTRACT;
 	// ~Drawing
