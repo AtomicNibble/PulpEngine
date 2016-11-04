@@ -79,10 +79,11 @@ XWindow::~XWindow()
 void XWindow::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pFont);
+	X_ASSERT_NOT_NULL(gEnv->pFontSys);
 
-	if (init_)
+	if (init_) {
 		return;
+	}
 
 	init_ = true;
 
@@ -117,7 +118,7 @@ void XWindow::init(void)
 	pOverChild_ = nullptr;
 
 	// default font
-	pFont_ = gEnv->pFont->GetFont("default");
+	pFont_ = gEnv->pFontSys->GetFont("default");
 	pBackgroundMat_ = nullptr;
 
 	hover_ = false;
