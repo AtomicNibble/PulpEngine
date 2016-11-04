@@ -834,8 +834,28 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		requiredStreamSize = compiledLods_[i].getSubDataSize(streamsFlags);
 
 		// writing this info to a stream makes write time 5x times faster.
-		stream.resize(requiredStreamSize);
+		stream.resize(requiredStreamSize 
+			// space for max padding.
+			+ (16 * 5));
 		stream.reset();
+
+		const size_t streamOffset = file.tell() - sizeof(header);
+
+		// this pads the stream so that the end of the stream is 16byte aligned.
+		auto padStream = [streamOffset, &stream]()
+		{
+			const size_t curOffset = streamOffset + stream.size();
+			const size_t pad = core::bitUtil::RoundUpToMultiple<size_t>(curOffset, 16u) - curOffset;
+			for (size_t i = 0; i < pad; i++)
+			{
+				stream.write<uint8_t>(0xff);
+			}
+
+			X_ASSERT_ALIGNMENT(stream.size() + streamOffset, 16, 0);
+		};
+
+
+		padStream();
 
 		// write all the verts.
 		for (auto& compiledMesh : compiledLods_[i].meshes_)
@@ -853,6 +873,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 				stream.write(vert);
 			}
+
+			padStream();
 		}
 
 		// write all the colors.
@@ -881,6 +903,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 					}
 				}
 			}
+
+			padStream();
 		}
 
 		// write normals
@@ -898,6 +922,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 					stream.write(normal);
 				}
 			}
+
+			padStream();
 		}
 
 		// write tangents and bi-normals
@@ -916,6 +942,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 					stream.write(tangent);
 				}
 			}
+
+			padStream();
 		}
 
 		// write all the faces
