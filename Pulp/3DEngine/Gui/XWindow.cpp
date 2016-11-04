@@ -1343,8 +1343,6 @@ void XWindow::reDraw(engine::IPrimativeContext* pDrawCon)
 void XWindow::drawDebug(engine::IPrimativeContext* pDrawCon)
 {
 	core::StackString<2048> str;
-	render::XDrawTextInfo ti;
-	Vec3f pos;
 
 	str.appendFmt("Name: '%s'\n", name_.c_str());
 	str.appendFmt("Text: '%s'\n", text_.c_str());
@@ -1356,15 +1354,18 @@ void XWindow::drawDebug(engine::IPrimativeContext* pDrawCon)
 	// make the text visable.
 	float v = (backColor_.r() + backColor_.g() + backColor_.b()) / 3.f > 0.5f ? 0.f : 1.f;
 
-	ti.col = Color(v, v, v);
-	ti.flags = render::DrawTextFlags::MONOSPACE;
 
 	// pos :Z?
+	Vec3f pos;
 	pos = Vec3f(rectClient_.getUpperLeft());
 	pos.x += 3.f;
 	pos.y += 3.f;
 
-	pDrawCon->drawTextQueued(pos, ti, str.c_str());
+	font::TextDrawContext ctx;
+	ctx.col = Color(v, v, v);
+	ctx.flags = font::DrawTextFlag::MONOSPACE;
+
+	pDrawCon->drawText(pos, ctx, str.begin(), str.end());
 }
 
 

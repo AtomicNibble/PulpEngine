@@ -48,13 +48,13 @@ void XGui::DrawCursor(engine::IPrimativeContext* pDrawCon)
 	texture::ITexture* pCursorArrow = getGuiManager()->GetCursor();
 	render::IRender* pRender = getRender();
 
-
-	render::XDrawTextInfo ti;
-	ti.col = Col_Red;
 	core::StackString<64> posStr;
 	posStr.appendFmt("Pos: %g x %g", cursorPos_.x, cursorPos_.y);
 
-	pDrawCon->drawTextQueued(Vec3f(300, 10, 0), ti, posStr.c_str());
+	font::TextDrawContext ctx;
+	ctx.col = Col_Red;
+
+	pDrawCon->drawText(Vec3f(300, 10, 1), ctx, posStr.begin(), posStr.end());
 
 	Vec2f rect;
 	rect = pRender->getDisplayRes();

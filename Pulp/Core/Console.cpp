@@ -1948,16 +1948,16 @@ void XConsole::DrawBuffer(void)
 	}
 
 	{
-		const char* txt = X_ENGINE_NAME " Engine " X_BUILD_STRING ">";
+		const char* pTxt = X_ENGINE_NAME " Engine " X_BUILD_STRING ">";
 
 		Vec2f pos(10, 5);
-		Vec2f txtwidth = pFont_->GetTextSize(txt, ctx);
+		Vec2f txtwidth = pFont_->GetTextSize(pTxt, ctx);
 		float fCharHeight = 0.8f * ctx.GetCharHeight();
 		int	  CharHeight = static_cast<int>(fCharHeight);
 
 		ctx.SetEffectId(pFont_->GetEffectId("drop"));
 		
-		pFont_->DrawString(pos, txt, ctx);
+		pPrimContext_->drawText(pos.x, pos.y, ctx, pTxt);
 	
 		ctx.SetDefaultEffect();
 		ctx.SetColor(Col_White);
@@ -1970,7 +1970,7 @@ void XConsole::DrawBuffer(void)
 			core::StackString<256> temp(InputBuffer_.c_str(), InputBuffer_.c_str() + CursorPos_);
 			float Lwidth = pFont_->GetTextSize(temp.c_str(), ctx).x + 3; // 3px offset from engine txt.
 
-			pFont_->DrawString(Vec2f(pos.x + Lwidth, pos.y), "_", ctx);
+			pPrimContext_->drawText(pos.x + Lwidth, pos.y, ctx, "_");
 		}
 
 		size_t numDraw = 0;
@@ -1994,9 +1994,9 @@ void XConsole::DrawBuffer(void)
 			{
 				if (nScroll >= ScrollPos_)
 				{
-					const char *buf = ritor->c_str();
+					const char* pBuf = ritor->c_str();
 
-					pFont_->DrawString(xPos, yPos, buf, ctx);
+					pPrimContext_->drawText(xPos, yPos, ctx, pBuf);
 					yPos -= CharHeight;
 					numDraw++;
 				}
@@ -2310,14 +2310,14 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					width,
 					pFont_->GetTextSize(nameStr.c_str(), ctx).x,
 					pFont_->GetTextSize(defaultStr.c_str(), ctx).x
-					);
+				);
 
 				width += nameValueSpacing; // name - value spacing.
 				xposValueOffset = width;
 				width += core::Max(
 					pFont_->GetTextSize(value.c_str(), ctx).x,
 					pFont_->GetTextSize(defaultValue.c_str(), ctx).x
-					);
+				);
 
 				float box2Offset = 5;
 				float height2 = fCharHeight * (domain.isEmpty() ? 1.5f : 2.5f);
@@ -2325,7 +2325,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					width,
 					pFont_->GetTextSize(description.c_str(), ctx).x,
 					pFont_->GetTextSize(domain.c_str(), ctx).x
-					);
+				);
 
 
 				width += 15; // add a few pixels.
@@ -2388,33 +2388,33 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				xpos += 5;
 
 				ctx.SetColor(Col_Whitesmoke);
-				pFont_->DrawString(xpos, ypos, nameStr.c_str(), ctx);
-				pFont_->DrawString(xpos + xposValueOffset, ypos, value.c_str(), ctx);
+				pPrimContext_->drawText(xpos, ypos, ctx, nameStr.begin(), nameStr.end());
+				pPrimContext_->drawText(xpos + xposValueOffset, ypos, ctx, value.begin(), value.end());
 
 				ctx.SetColor(Col_Darkgray);
 				ypos += fCharHeight;
-				pFont_->DrawString(xpos, ypos, defaultStr.c_str(), ctx);
-				pFont_->DrawString(xpos + xposValueOffset, ypos, defaultValue.c_str(), ctx);
+				pPrimContext_->drawText(xpos, ypos, ctx, defaultStr.begin(), defaultStr.end());
+				pPrimContext_->drawText(xpos + xposValueOffset, ypos, ctx, defaultValue.begin(), defaultValue.end());
 
 				ypos += fCharHeight * 1.5f;
 				ypos += box2Offset;
 
 				ctx.SetColor(Col_Darkgray);
-				pFont_->DrawString(xpos, ypos, description.c_str(), ctx);
+				pPrimContext_->drawText(xpos, ypos, ctx, description.begin(), description.end());
 
 				if (!domain.isEmpty())
 				{
 					ypos += fCharHeight;
-					pFont_->DrawString(xpos, ypos, domain.c_str(), ctx);
+					pPrimContext_->drawText(xpos, ypos, ctx, domain.begin(), domain.end());
 				}
 			}
 			else if (isSingleCmd)
 			{
 				AutoResult& result = *results.begin();
-				const core::string& Desc = result.pCmd->Desc;
+				const core::string& descStr = result.pCmd->Desc;
 
 				const float box2Offset = 5.f;
-				const float descWidth = core::Max(width, pFont_->GetTextSize(Desc, ctx).x) + 10.f;
+				const float descWidth = core::Max(width, pFont_->GetTextSize(descStr, ctx).x) + 10.f;
 
 				width = core::Max(width, pFont_->GetTextSize(result.name, ctx).x);
 				width += 10; // add a few pixels.
@@ -2428,14 +2428,14 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 				// cmd color
 				ctx.SetColor(Col_Darkblue);
-				pFont_->DrawString(xpos, ypos, result.name, ctx);
+				pPrimContext_->drawText(xpos, ypos, ctx, result.name);
 
 				ypos += fCharHeight;
 				ypos += 5.f;
 				ypos += box2Offset;
 
 				ctx.SetColor(Col_Whitesmoke);
-				pFont_->DrawString(xpos, ypos, Desc, ctx);
+				pPrimContext_->drawText(xpos, ypos, ctx, descStr.begin(), descStr.end());
 
 			}
 			else
@@ -2467,7 +2467,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					else
 						ctx.SetColor(Col_Darkblue);
 
-					pFont_->DrawString(xpos, ypos, resIt->name, ctx);
+					pPrimContext_->drawText(xpos, ypos, ctx, resIt->name);
 
 					ypos += fCharHeight;
 				}
@@ -2486,7 +2486,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			if (space)
 			{
 				core::StackString<64> temp(InputBuffer_.begin(), space);
-#if 1
+
 				// preserve any colors.
 				core::StackString<128> temp2;
 				
@@ -2500,17 +2500,11 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				temp2.append(space);
 
 
-				pFont_->DrawString(txtPos, temp.c_str(), ctx);
+				pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, temp.begin(), temp.end());
 				ctx.SetColor(Col_White);
 				txtPos.x += pFont_->GetTextSize(temp.c_str(), ctx).x;
-				pFont_->DrawString(txtPos, temp2.c_str(), ctx);
-#else
-				pFont_->DrawString(txtPos, temp.c_str(), ctx);
-				ctx.SetColor(Col_White);
-				txtPos.x += pFont_->GetTextSize(temp.c_str(), ctx).x;
+				pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, temp2.begin(), temp2.end());
 
-				pFont_->DrawString(txtPos, &InputBuffer_[space], ctx);
-#endif
 			}
 			else
 			{

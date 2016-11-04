@@ -127,10 +127,10 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
-	XDrawTextInfo ti;
-	ti.col = Col_Red;
-	ti.flags = DrawTextFlags::POS_2D | DrawTextFlags::MONOSPACE | DrawTextFlags::CENTER;
-	pPrimCon_->drawTextQueued(txtPos, ti, "Sub Systems");
+	font::XTextDrawConect con;
+	con.col = Col_Red;
+	con.flags = font::DrawTextFlag::POS_2D | font::DrawTextFlag::MONOSPACE | font::DrawTextFlag::CENTER;
+	pPrimCon_->drawText(txtPos, con, "Sub Systems");
 
 	float percent;
 	float total;
@@ -184,7 +184,7 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, float height)
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	DrawLabel(pos.x + (width / 2), pos.y, "Combined Mem Stats(Sys)", Col_Red,
-		DrawTextFlags::CENTER);
+		font::DrawTextFlag::CENTER);
 	DrawLabel(pos.x + 5, pos.y + 20, str.c_str(), txt_col);
 
 	// string stats.
@@ -208,7 +208,7 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, float height)
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	DrawLabel(stringPos.x + (width / 2), stringPos.y, "String Memory Stats(Sys)", Col_Red,
-		DrawTextFlags::CENTER);
+		font::DrawTextFlag::CENTER);
 
 	DrawLabel(stringPos.x + 5, stringPos.y + 20, str.c_str(), txt_col);
 
@@ -295,19 +295,19 @@ Vec2f XProfileSys::RenderProfileDataHeader(const Vec2f& pos, const float width)
 	float offset = 3;
 
 	DrawLabel(pos.x + offset, pos.y + (header_height / 2.f),
-		"Name", Col_Whitesmoke, DrawTextFlags::CENTER_VER);
+		"Name", Col_Whitesmoke, font::DrawTextFlag::CENTER_VER);
 
 	offset += (width * 0.7f);
 	DrawLabel(pos.x + offset, pos.y + (header_height / 2.f), 
-		"Total", Col_Whitesmoke, DrawTextFlags::CENTER_VER);
+		"Total", Col_Whitesmoke, font::DrawTextFlag::CENTER_VER);
 
 	offset += (width * 0.10f);
 	DrawLabel(pos.x + offset, pos.y + (header_height / 2.f), 
-		"Self", Col_Whitesmoke, DrawTextFlags::CENTER_VER);
+		"Self", Col_Whitesmoke, font::DrawTextFlag::CENTER_VER);
 
 	offset += (width * 0.10f);
 	DrawLabel(pos.x + offset, pos.y + (header_height / 2.f),
-		"Calls", Col_Whitesmoke, DrawTextFlags::CENTER_VER);
+		"Calls", Col_Whitesmoke, font::DrawTextFlag::CENTER_VER);
 
 
 	return Vec2f(width, header_height + header_padding);
@@ -360,20 +360,20 @@ Vec2f XProfileSys::RenderFrameTimes(const Vec2f& pos, const float width, const f
 void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col)
 {
 	Vec3f pos(x, y, 1);
-	XDrawTextInfo ti;
-	ti.col = col;
-	ti.flags = DrawTextFlags::POS_2D | DrawTextFlags::MONOSPACE;
-	pPrimCon_->drawTextQueued(pos, ti, pStr);
+	font::TextDrawContext ctx;
+	ctx.col = col;
+	ctx.flags = font::DrawTextFlags::POS_2D | font::DrawTextFlags::MONOSPACE;
+	pPrimCon_->drawText(pos, ctx, pStr);
 }
 
-void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<DrawTextFlags> flags)
+void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col, font::DrawTextFlags flags)
 {
 	Vec3f pos(x,y, 1);
-	XDrawTextInfo ti;
-	ti.col = col;
-	ti.flags = DrawTextFlags::POS_2D | DrawTextFlags::MONOSPACE;
-	ti.flags |= flags;
-	pPrimCon_->drawTextQueued(pos, ti, pStr);
+	font::TextDrawContext ctx;
+	ctx.col = col;
+	ctx.flags = font::DrawTextFlag::POS_2D | font::DrawTextFlag::MONOSPACE;
+	ctx.flags |= flags;
+	pPrimCon_->drawText(pos, ctx, pStr);
 }
 
 
@@ -409,7 +409,7 @@ void XProfileSys::DrawPercentageBlock(float x, float y,
 	pPrimCon_->drawQuad(x, y, width * percent, height, fill);
 	// 2.5% offset
 	DrawLabel(x + (width / 40.f), y + (height / 2.f), percentStr.c_str(), Col_Whitesmoke,
-		DrawTextFlags::CENTER_VER);
+		font::DrawTextFlag::CENTER_VER);
 }
 
 

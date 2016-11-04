@@ -476,6 +476,8 @@ void Level::DrawStatsBlock(void) const
 		return;
 	}
 
+	// needs re doing with a prim context.
+#if 0
 	pRender_->Set2D(true);
 	{
 		core::StackString512 str;
@@ -499,23 +501,24 @@ void Level::DrawStatsBlock(void) const
 			Color(0.01f, 0.01f, 0.01f, 0.95f));
 		
 		{
-			render::XDrawTextInfo ti;
+			render::DrawTextInfo ti;
 			ti.col = txt_col;
 			ti.flags = render::DrawTextFlags::POS_2D | render::DrawTextFlags::MONOSPACE;
 
 			{
 				Vec3f txtPos(pos.x + 5, pos.y + 20, 1);
-				pRender_->DrawTextQueued(txtPos, ti, str.c_str());
+				pRender_->DrawText(txtPos, ti, str.c_str());
 			}
 
 			{
 				Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
 				ti.flags |= render::DrawTextFlags::CENTER;
-				pRender_->DrawTextQueued(txtPos, ti, "Level Draw Stats");
+				pRender_->DrawText(txtPos, ti, "Level Draw Stats");
 			}
 		}
 	}
 	pRender_->Set2D(false);
+#endif
 }
 
 void Level::DrawArea(const Area& area)
