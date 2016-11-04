@@ -99,7 +99,7 @@ bool XModelManager::Init(void)
 
 	// should load the default model.
 
-	pDefaultModel_ = loadModelSync("default");
+	pDefaultModel_ = loadModelSync(MODEL_DEFAULT_NAME);
 	if (!pDefaultModel_) {
 		X_ERROR("ModelManager", "Failed to load default model");
 		return false;
