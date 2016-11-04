@@ -47,23 +47,31 @@ public:
 		PushBufferEntry() = default;
 
 		X_INLINE PushBufferEntry(uint32 numVertices, uint32 vertexOffs,
-			PrimRenderFlags flags);
+			PrimRenderFlags flags, render::StateHandle stateHandle);
 
 
 		uint32 numVertices;
 		uint32 vertexOffs;
 		PrimRenderFlags flags;
+
+		render::StateHandle stateHandle;
 	};
 
-	X_ENSURE_SIZE(PushBufferEntry, 16); // not important, just ensuring padd correct.
 
 	typedef core::Array<PushBufferEntry> PushBufferArr;
 	typedef core::Array<const PushBufferEntry*> SortedPushBufferArr;
 	typedef core::Array<PrimVertex, core::ArrayAlignedAllocator<PrimVertex>> VertexArr;
 
+	X_ENSURE_SIZE(PushBufferEntry, 16); // not important, just ensuring padd correct.
+
+private:
+
 public:
 	PrimativeContext(core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
+
+	bool createStates(render::IRender* pRender);
+	bool freeStates(render::IRender* pRender);
 
 	void reset(void) X_FINAL;
 	
@@ -81,7 +89,12 @@ private:
 private:
 	PushBufferArr pushBufferArr_;
 	VertexArr vertexArr_;
+
+	render::PassStateHandle passHandle_;
+	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
 };
+
+
 
 X_NAMESPACE_END
 

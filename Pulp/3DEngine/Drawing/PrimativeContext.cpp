@@ -3,21 +3,84 @@
 
 #include "Math\VertexFormats.h"
 
+#include <IRender.h>
+#include <IShader.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pushBufferArr_(arena),
 	vertexArr_(arena)
 {
-	
 	pushBufferArr_.reserve(64);
 	vertexArr_.getAllocator().setBaseAlignment(16); // for simd.
 	vertexArr_.reserve(256);
+
+	passHandle_ = render::INVALID_STATE_HANLDE;
+	for (auto& h : stateCache_)
+	{
+		h = render::INVALID_STATE_HANLDE;
+	}
 }
 
 PrimativeContext::~PrimativeContext() 
 {
 
+}
+
+bool PrimativeContext::createStates(render::IRender* pRender)
+{
+	render::StateDesc desc;
+	desc.blend.srcBlendColor = render::BlendType::SRC_ALPHA;
+	desc.blend.srcBlendAlpha = render::BlendType::SRC_ALPHA;
+	desc.blend.dstBlendColor = render::BlendType::INV_SRC_ALPHA;
+	desc.blend.dstBlendAlpha = render::BlendType::INV_SRC_ALPHA;
+	desc.blendOp = render::BlendOp::OP_ADD;
+	desc.cullType = render::CullType::TWO_SIDED;
+	desc.depthFunc = render::DepthFunc::ALWAYS;
+	desc.stateFlags.Clear();
+	desc.stateFlags.Set(render::StateFlag::BLEND);
+	desc.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
+	desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
+
+
+	const auto* pShader = pRender->getShader("AuxGeom");
+	const auto* pTech = pShader->getTech("AuxGeometry");
+
+	auto renderTarget = pRender->getCurBackBuffer();
+
+	render::RenderTargetFmtsArr rtfs;
+	rtfs.append(renderTarget->getFmt());
+
+	passHandle_ = pRender->createPassState(rtfs);
+
+	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
+	{
+		const auto primType = static_cast<PrimitiveType::Enum>(i);
+
+		desc.topo = primType;
+		stateCache_[primType] = pRender->createState(passHandle_, pTech, desc, nullptr, 0);
+
+		if (stateCache_[primType] == render::INVALID_STATE_HANLDE) {
+			X_ERROR("PrimContext", "Failed to create state for primType: \"%s\"", PrimitiveType::ToString(primType));
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool PrimativeContext::freeStates(render::IRender* pRender)
+{
+	for (auto& state : stateCache_)
+	{
+		if (state == render::INVALID_STATE_HANLDE) {
+			pRender->destoryState(state);
+		}
+	}
+
+	pRender->destoryPassState(passHandle_);
+	return true;
 }
 
 void PrimativeContext::reset(void)
@@ -81,7 +144,8 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 	{
 		pushBufferArr_.emplace_back(numVertices,
 			safe_static_cast<uint32_t, size_t>(vertexArr_.size()),
-			flags
+			flags,
+			stateCache_[primType]
 		);
 	}
 
