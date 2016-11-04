@@ -5,11 +5,7 @@
 
 struct ICore;
 
-#ifdef IPFONT_EXPORTS
-#define IPFONT_API DLL_EXPORT
-#else
-#define IPFONT_API DLL_IMPORT
-#endif
+
 
 X_NAMESPACE_BEGIN(font)
 
@@ -164,18 +160,6 @@ struct IXFont_RenderProxy
 
 X_NAMESPACE_END
 
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-	typedef X_NAMESPACE(font)::IFontSys(*IP_PTRCREATEFONTFNC(ICore *pCore));
-
-	IPFONT_API X_NAMESPACE(font)::IFontSys *CreateFontInterface(ICore *pCore);
-
-#ifdef __cplusplus
-};
-#endif
 
 
 #endif // !_X_FONT_I_H_
