@@ -570,22 +570,48 @@ void XModel::ProcessData(char* pData)
 		// Verts, Faces, Binddata
 		SubMeshHeader* meshHeads = lod.subMeshHeads;
 
+		/*
+		These streams are padded to 16byte align so we must seek past the
+		the padding bytes manually.
+		*/
+		auto seekCursorToPad = [&cursor]() {
+
+			// when the value is aligned we must work how much to seek by.
+			// we do this by taking a coon to market.
+			auto* pCur = cursor.getPtr<const char*>();
+			auto* pAligned = core::pointerUtil::AlignTop(pCur, 16);
+
+			const size_t diff = union_cast<size_t>(pAligned) - union_cast<size_t>(pCur);
+
+			cursor.SeekBytes(static_cast<uint32_t>(diff));
+		};
+
+		seekCursorToPad();
+
 		// verts (always provided)
 		lod.streams[VertexStream::VERT] = cursor.postSeekPtr<Vertex>(lod.numVerts);
+		X_ASSERT_ALIGNMENT(lod.streams[VertexStream::VERT].as<uintptr_t>(), 16, 0);
+		seekCursorToPad();
 
 		// color
 		if (lod.streamsFlag.IsSet(StreamType::COLOR)) {
 			lod.streams[VertexStream::COLOR] = cursor.postSeekPtr<VertexColor>(lod.numVerts);
+			X_ASSERT_ALIGNMENT(lod.streams[VertexStream::COLOR].as<uintptr_t>(), 16, 0);
+			seekCursorToPad();
 		}
 
 		// normals
 		if (lod.streamsFlag.IsSet(StreamType::NORMALS)) {
 			lod.streams[VertexStream::NORMALS] = cursor.postSeekPtr<VertexNormal>(lod.numVerts);
+			X_ASSERT_ALIGNMENT(lod.streams[VertexStream::NORMALS].as<uintptr_t>(), 16, 0);
+			seekCursorToPad();
 		}
 
 		// tangents bi-normals
 		if (lod.streamsFlag.IsSet(StreamType::TANGENT_BI)) {
 			lod.streams[VertexStream::TANGENT_BI] = cursor.postSeekPtr<VertexTangentBi>(lod.numVerts);
+			X_ASSERT_ALIGNMENT(lod.streams[VertexStream::TANGENT_BI].as<uintptr_t>(), 16, 0);
+			seekCursorToPad();
 		}
 
 		// now set the sub mesh pointers.
@@ -622,6 +648,8 @@ void XModel::ProcessData(char* pData)
 		// index 0 is always valid, since a valid lod must
 		// have a mesh.
 		lod.indexes = meshHeads[0].indexes;
+
+		X_ASSERT_ALIGNMENT(lod.indexes.as<uintptr_t>(), 16, 0);
 	}
 
 
