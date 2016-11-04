@@ -1517,15 +1517,11 @@ void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, floa
 
 	font::XTextDrawConect contex;
 	contex.widthScale = 1.0f;
-	contex.col = foreColor_;
+	contex.col = Colorf(foreColor_);
 
-	if (flags_.IsSet(WindowFlags::NO_CLIP))
+	if (!flags_.IsSet(WindowFlags::NO_CLIP))
 	{
-		contex.clipEnabled = false;
-	}
-	else
-	{
-		contex.clipEnabled = true;
+		contex.flags.Set(font::DrawTextFlag::CLIP);
 		contex.clip = rect;
 	}
 
@@ -1618,7 +1614,7 @@ void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, floa
 	y += textAlignY_;
 
 	// draw it.
-	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
+	pDrawCon->drawText(Vec3f(x, y, 0.f), contex, text_.c_str());
 }
 
 void XWindow::drawBackground(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect)
