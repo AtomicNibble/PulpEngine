@@ -561,30 +561,30 @@ void RenderNull::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 	X_UNUSED(max);
 }
 
-void RenderNull::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
-{
-	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(format);
-	X_UNUSED(args);
-}
-
-void RenderNull::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
-{
-	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(text);
-}
-
-void RenderNull::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-	const core::MemoryAllocatorStatistics& allocStats, const char* title)
-{
-	X_UNUSED(pos);
-	X_UNUSED(ti);
-	X_UNUSED(allocStats);
-	X_UNUSED(title);
-
-}
+//void RenderNull::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
+//{
+//	X_UNUSED(pos);
+//	X_UNUSED(ti);
+//	X_UNUSED(format);
+//	X_UNUSED(args);
+//}
+//
+//void RenderNull::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
+//{
+//	X_UNUSED(pos);
+//	X_UNUSED(ti);
+//	X_UNUSED(text);
+//}
+//
+//void RenderNull::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
+//	const core::MemoryAllocatorStatistics& allocStats, const char* title)
+//{
+//	X_UNUSED(pos);
+//	X_UNUSED(ti);
+//	X_UNUSED(allocStats);
+//	X_UNUSED(title);
+//
+//}
 
 void RenderNull::FlushTextBuffer(void)
 {
@@ -648,19 +648,19 @@ void RenderNull::FontSetBlending()
 }
 
 
-void RenderNull::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-	const wchar_t* pStr, const font::XTextDrawConect& ctx) const
-{
-	X_ASSERT_NOT_NULL(pFont);
-	X_ASSERT_NOT_NULL(pStr);
-
-	X_UNUSED(pFont);
-	X_UNUSED(pos);
-	X_UNUSED(pStr);
-	X_UNUSED(ctx);
-
-
-}
+//void RenderNull::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
+//	const wchar_t* pStr, const font::XTextDrawConect& ctx) const
+//{
+//	X_ASSERT_NOT_NULL(pFont);
+//	X_ASSERT_NOT_NULL(pStr);
+//
+//	X_UNUSED(pFont);
+//	X_UNUSED(pos);
+//	X_UNUSED(pStr);
+//	X_UNUSED(ctx);
+//
+//
+//}
 
 
 // ~Font

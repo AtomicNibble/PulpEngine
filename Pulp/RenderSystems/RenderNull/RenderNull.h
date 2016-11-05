@@ -134,11 +134,11 @@ public:
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_OVERRIDE;
 
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_OVERRIDE;
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
-
-	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
+//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_OVERRIDE;
+//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
+//
+//	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
+//		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
 
 	virtual void FlushTextBuffer(void) X_OVERRIDE;
 	// ~Drawing
@@ -152,8 +152,8 @@ public:
 	virtual bool FontSetRenderingState() X_OVERRIDE;
 	virtual void FontRestoreRenderingState() X_OVERRIDE;
 	virtual void FontSetBlending() X_OVERRIDE;
-	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
+//	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
+//		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
 	// ~Font
 
 //	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
