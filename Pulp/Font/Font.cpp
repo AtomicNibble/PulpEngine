@@ -186,7 +186,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const auto effecIdx = ctx.GetEffectId() < effects_.size() ? ctx.GetEffectId() : 0;
 
 	FontEffect& effect = effects_[effecIdx];
-	for (auto passIdx = 0; passIdx < effect.passes.size(); passIdx++)
+	for (auto passIdx = 0u; passIdx < effect.passes.size(); passIdx++)
 	{
 		const FontPass& pass = effect.passes[passIdx];
 
