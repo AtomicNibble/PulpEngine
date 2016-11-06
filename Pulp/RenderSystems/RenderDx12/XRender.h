@@ -58,7 +58,7 @@ class XRender : public IRender
 
 	struct PassState
 	{
-		XRender::RenderTargetFmtsArr rtfs;
+		RenderTargetFmtsArr rtfs;
 
 	};
 
