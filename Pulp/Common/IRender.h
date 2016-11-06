@@ -5,11 +5,12 @@
 
 #include <ITexture.h>
 #include <IShader.h>
-#include <IRenderCommands.h>
 
 #include <Containers\Array.h>
 
 #include <Util\Flags.h>
+#include <Math\VertexFormats.h>
+
 
 typedef void* WIN_HWND;
 
@@ -38,6 +39,17 @@ X_NAMESPACE_DECLARE(render,
 X_NAMESPACE_BEGIN(render)
 
 static const uint32_t MAX_RENDER_TARGETS = 8;
+
+typedef uintptr_t VertexBufferHandle;
+typedef uintptr_t IndexBufferHandle;
+typedef uintptr_t ConstantBufferHandle;
+typedef uintptr_t PassStateHandle;
+typedef uintptr_t StateHandle;
+
+typedef std::array<VertexBufferHandle, VertexStream::ENUM_COUNT> VertexBufferHandleArr;
+
+static const uintptr_t INVALID_BUF_HANLDE = 0;
+static const uintptr_t INVALID_STATE_HANLDE = 0;
 
 
 X_DECLARE_ENUM8(CullType)(

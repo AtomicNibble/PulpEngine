@@ -1,21 +1,9 @@
 #pragma once
 
-
-#include <Math\VertexFormats.h>
+#include <IRender.h>
 
 X_NAMESPACE_BEGIN(render)
 
-typedef uintptr_t VertexBufferHandle;
-typedef uintptr_t IndexBufferHandle;
-typedef uintptr_t ConstantBufferHandle;
-typedef uintptr_t PassStateHandle;
-typedef uintptr_t StateHandle;
-
-typedef std::array<VertexBufferHandle, VertexStream::ENUM_COUNT> VertexBufferHandleArr;
-
-
-static const uintptr_t INVALID_BUF_HANLDE = 0;
-static const uintptr_t INVALID_STATE_HANLDE = 0;
 
 namespace Commands
 {
