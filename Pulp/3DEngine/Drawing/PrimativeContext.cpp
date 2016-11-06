@@ -67,6 +67,18 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		}
 	}
 
+	const auto* pTextShader = pRender->getShader("Font");
+	const auto* pTextTech = pTextShader->getTech("Font");
+
+	// this root sig needs to have one text handler.
+	// how to handle the problem of diffrent shaders having diffrent texture slot requirements.
+	// which we need to know about when creating a root sig that works with that shader.
+	// so maybe we should just work it out from the shader. :D
+
+	desc.topo = PrimitiveType::TRIANGLELIST;
+	textDrawState_ = pRender->createState(passHandle_, pTextTech, desc, nullptr, 0);
+
+
 	return true;
 }
 
