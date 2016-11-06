@@ -22,6 +22,14 @@ namespace Commands
 		uint32_t vertexCount;
 		uint32_t startVertex;
 
+		// we need to be able to pass textures.
+		// i think we are going to have fixed texture slots.
+		// so if you want to set diffuse it's always at idx 0 etc.
+		// i don't want to really pass all indexes so variable size would be nice.
+		// if we have a handle for the texture collection that could also be nice as 
+		// it provides single check for texture change.
+		TextureState textures[TextureSlot::ENUM_COUNT];
+
 		StateHandle stateHandle;
 		VertexBufferHandleArr vertexBuffers;
 	};
