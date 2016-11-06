@@ -452,8 +452,71 @@ namespace
 		}
 	}
 
+	void samplerDescFromState(SamplerState state, SamplerDesc& desc)
+	{
+		switch (state.repeat)
+		{
+			case TexRepeat::NO_TILE:
+				desc.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+				break;
 
-	
+			case TexRepeat::TILE_BOTH:
+				desc.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_MIRROR);
+				break;
+			case TexRepeat::TILE_HOZ:
+				desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+				desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+				desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+				break;
+			case TexRepeat::TILE_VERT:
+				desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+				desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
+				desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+				break;
+		}
+
+		switch (state.filter)
+		{
+			case FilterType::NEAREST_MIP_NONE:
+				desc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+				desc.MaxLOD = 0;
+				break;
+			case FilterType::NEAREST_MIP_NEAREST:
+				desc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+				break;
+			case FilterType::NEAREST_MIP_LINEAR:
+				desc.Filter = D3D12_FILTER_MIN_MAG_POINT_MIP_LINEAR;
+				break;
+
+			case FilterType::LINEAR_MIP_NONE:
+				desc.Filter = D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+				desc.MaxLOD = 0;
+				break;
+			case FilterType::LINEAR_MIP_NEAREST:
+				desc.Filter = D3D12_FILTER_MIN_MAG_LINEAR_MIP_POINT;
+				break;
+			case FilterType::LINEAR_MIP_LINEAR:
+				desc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+				break;
+
+			case FilterType::ANISOTROPIC_X2:
+				desc.Filter = D3D12_FILTER_ANISOTROPIC;
+				desc.MaxAnisotropy = 2;
+				break;
+			case FilterType::ANISOTROPIC_X4:
+				desc.Filter = D3D12_FILTER_ANISOTROPIC;
+				desc.MaxAnisotropy = 4;
+				break;
+			case FilterType::ANISOTROPIC_X8:
+				desc.Filter = D3D12_FILTER_ANISOTROPIC;
+				desc.MaxAnisotropy = 8;
+				break;
+			case FilterType::ANISOTROPIC_X16:
+				desc.Filter = D3D12_FILTER_ANISOTROPIC;
+				desc.MaxAnisotropy = 16;
+				break;
+		}
+	}
 
 
 } // namespace
