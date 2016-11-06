@@ -720,13 +720,13 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 
 
-		render::IRender* pRender = getRender();
-		pRender->SetModelMatrix(posMat);
+//		render::IRender* pRender = getRender();
+//		pRender->SetModelMatrix(posMat);
 
 		pModel->Render();
 		pModel->RenderBones(posMat);
 
-		pRender->SetModelMatrix(Matrix44f::identity());
+//		pRender->SetModelMatrix(Matrix44f::identity());
 
 		if (s_var_drawModelBounds_)
 		{
