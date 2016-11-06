@@ -27,12 +27,14 @@ ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(void)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
+	// move and completed heaps into the available list.
 	while(retiredDescriptorHeaps_.isNotEmpty() && commandManager_.isFenceComplete(retiredDescriptorHeaps_.peek().first))
 	{
 		availableDescriptorHeaps_.push(retiredDescriptorHeaps_.peek().second);
 		retiredDescriptorHeaps_.pop();
 	}
 
+	// any we can reuse?
 	if (availableDescriptorHeaps_.isNotEmpty())
 	{
 		ID3D12DescriptorHeap* pHeapPtr = availableDescriptorHeaps_.peek();
