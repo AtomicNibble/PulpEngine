@@ -124,7 +124,7 @@ public:
 	void renderBegin(void) X_OVERRIDE;
 	void renderEnd(void) X_OVERRIDE;
 
-	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType) X_OVERRIDE;
+	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_OVERRIDE;
 
 	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 

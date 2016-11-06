@@ -346,7 +346,7 @@ void X3DEngine::OnFrameBegin(void)
 
 		primBucket.sort();
 
-		pRender_->submitCommandPackets(primBucket, render::Commands::Key::Type::PRIM);
+		pRender_->submitCommandPackets(primBucket);
 	}
 
 	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)

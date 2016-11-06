@@ -443,7 +443,7 @@ struct IRender
 	virtual void renderBegin(void) X_ABSTRACT;
 	virtual void renderEnd(void) X_ABSTRACT;
 
-	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType) X_ABSTRACT;
+	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
 
 	// each enum has a instance, and you don't own the pointer.
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;

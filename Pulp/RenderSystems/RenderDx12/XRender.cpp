@@ -984,7 +984,7 @@ void XRender::renderEnd(void)
 }
 
 
-void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType)
+void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 {
 	const auto& sortedIdx = cmdBucket.getSortedIdx();
 	const auto& packets = cmdBucket.getPackets();
