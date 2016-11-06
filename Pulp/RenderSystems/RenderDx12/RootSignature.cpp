@@ -58,13 +58,14 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, Root
 				pErr = static_cast<const char*>(pErrorBlob->GetBufferPointer());
 			}
 
-			X_FATAL("Dx12", "Failed to serialize root signature: %" PRIu32 " Err: \"%s\"", hr, pErr);
+			X_ERROR("Dx12", "Failed to serialize root signature: %" PRIu32 " Err: \"%s\"", hr, pErr);
 			return false;
 		}
 
 		hr = pDevice_->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS(pSignature));
 		if (FAILED(hr)) {
-			X_FATAL("Dx12", "Failed to create root signature: %" PRIu32, hr);
+			X_ERROR("Dx12", "Failed to create root signature: %" PRIu32, hr);
+			X_BREAKPOINT;
 			return false;
 		}
 
