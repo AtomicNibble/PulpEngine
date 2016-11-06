@@ -185,7 +185,7 @@ bool LvlBuilder::save(const char* name)
 	path.append(name);
 	path.setExtension(level::LVL_FILE_EXTENSION);
 
-	core::ScopedPointer<core::Crc32> crc(X_NEW(core::Crc32, g_arena, "LevelFileCrc32"), g_arena);
+	core::ScopedPointer<core::Crc32> crc(g_arena, X_NEW(core::Crc32, g_arena, "LevelFileCrc32"));
 
 
 	core::ByteStream stream(g_arena);

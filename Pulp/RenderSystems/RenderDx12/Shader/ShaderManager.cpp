@@ -133,7 +133,6 @@ namespace shader
 	XShaderManager::~XShaderManager()
 	{
 
-
 	}
 
 
@@ -752,7 +751,7 @@ namespace shader
 			ShaderSourceFile * pShaderSource = loadShaderFile(name, true);
 			if (pShaderSource)
 			{
-				core::ScopedPointer<ShaderSourceFile> scopedDelete(pShaderSource, &sourcePoolArena_);
+				core::ScopedPointer<ShaderSourceFile> scopedDelete(&sourcePoolArena_, pShaderSource);
 
 				// we don't reload the .shader if the source is the same.
 				if (pShader->sourceCrc32_ != pShaderSource->sourceCrc32_)

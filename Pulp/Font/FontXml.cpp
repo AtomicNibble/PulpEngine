@@ -208,7 +208,7 @@ bool XFont::loadFont()
 	{
 		length = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
-		ScopedPointer<char[]> textbuffer(X_NEW_ARRAY_ALIGNED(char, length + 1, g_fontArena, "FontXMLBuf", 4), g_fontArena);
+		ScopedPointer<char[]> textbuffer(g_fontArena, X_NEW_ARRAY_ALIGNED(char, length + 1, g_fontArena, "FontXMLBuf", 4));
 
 		// add a null term baby!
 		// shake that booty.

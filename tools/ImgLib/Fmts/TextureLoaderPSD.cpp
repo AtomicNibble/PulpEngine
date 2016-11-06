@@ -136,8 +136,8 @@ namespace PSD
 			int8_t* tmpData = X_NEW_ARRAY_ALIGNED(int8_t, header.width * header.height, swapArena, "PsdTmpbuf", 8);
 			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, swapArena, "PsdTmpRowbuf", 8);
 
-			core::ScopedPointer<int8_t[]> scoped_tmpData(tmpData, swapArena);
-			core::ScopedPointer<uint16_t[]> scoped_rleCount(rleCount, swapArena);
+			core::ScopedPointer<int8_t[]> scoped_tmpData(swapArena, tmpData);
+			core::ScopedPointer<uint16_t[]> scoped_rleCount(swapArena, rleCount);
 
 			uint32_t size = 0;
 
@@ -158,7 +158,7 @@ namespace PSD
 
 			int8_t* buf = X_NEW_ARRAY_ALIGNED(int8_t, size, swapArena, "PsdTmpBuf", 8);
 
-			core::ScopedPointer<int8_t[]> scoped_buf(buf, swapArena);
+			core::ScopedPointer<int8_t[]> scoped_buf(swapArena, buf);
 
 			if (!file->read(buf, size))
 			{
@@ -237,7 +237,7 @@ namespace PSD
 		bool readRawImageData(core::MemoryArenaBase* swapArena, core::XFile* file, const PsdHeader& header, uint32_t* imageData)
 		{
 			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, swapArena, "PsdTempBuf", 8);
-			core::ScopedPointer<uint8_t[]> scoped_tmpData(tmpData, swapArena);
+			core::ScopedPointer<uint8_t[]> scoped_tmpData(swapArena, tmpData);
 
 			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
 			{
