@@ -212,18 +212,18 @@ X_ENSURE_SIZE(SamplerState, 2);
 // do we want to explicitly group these?
 struct TextureState
 {
-	texture::ITexture* pTexture; // i will make this 16bit texture id making this whoel thing 4bytes.
+	texture::TexID textureId; 
 	SamplerState sampler;
 	// do i want to pass this?
 	// or try be fancy and pass arrays in TextureSlot index order.
-	TextureSlot::Enum slot; 
-	uint8_t _pad[2];
+//	TextureSlot::Enum slot; 
+//	uint8_t _pad[2];
 };
 
 #if X_64
-X_ENSURE_SIZE(TextureState, 16);
+X_ENSURE_SIZE(TextureState, 8);
 #else
-X_ENSURE_SIZE(TextureState, 12);
+X_ENSURE_SIZE(TextureState, 8);
 #endif
 
 X_DECLARE_FLAGS8(StateFlag)(
