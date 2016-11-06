@@ -148,6 +148,7 @@ public:
 
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
+	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;
 
 	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;

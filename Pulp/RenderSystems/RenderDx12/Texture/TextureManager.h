@@ -44,6 +44,8 @@ public:
 
 
 	Texture* forName(const char* pName, TextureFlags flags);
+	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
+
 	Texture* getByID(TexID texId);
 	Texture* getDefault(void);
 
@@ -64,7 +66,7 @@ private:
 	bool load(Texture* pTex);
 	bool loadFromFile(XTextureFile& imgFile, const char* pPath);
 	bool processImgFile(Texture* pTex, XTextureFile& imgFile);
-	bool createDeviceTexture(Texture* pTex, XTextureFile& imgFile);
+	bool createDeviceTexture(Texture* pTex);
 	bool initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData);
 
 	uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,

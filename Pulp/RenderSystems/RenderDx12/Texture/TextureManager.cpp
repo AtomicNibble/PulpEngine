@@ -24,7 +24,6 @@ X_NAMESPACE_BEGIN(texture)
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
 	{
-
 	}
 
 	TextureManager::~TextureManager()
@@ -128,7 +127,7 @@ X_NAMESPACE_BEGIN(texture)
 		}
 		else
 		{
-			pTexRes = textures_.createAsset(name, pName, flags);
+			pTexRes = textures_.createAsset(name, name, flags);
 
 			if (pTexRes->IsStreamable() && flags.IsSet(TexFlag::DONT_STREAM)) {
 				stream(pTexRes);
@@ -145,12 +144,67 @@ X_NAMESPACE_BEGIN(texture)
 		return pTexRes;
 	}
 
+	Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
+		texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+	{
+		core::string name(pNickName);
+
+		TexRes* pTexRes = findTexture(name);
+
+		if (pTexRes)
+		{
+			pTexRes->addReference();
+
+			X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%s\"", pNickName);
+			if (pInitialData) {
+				// update?
+			}
+		}
+		else
+		{
+			pTexRes = textures_.createAsset(name, name, TexFlag::DONT_STREAM | TexFlag::DONT_RESIZE | TexFlag::NOMIPS);
+
+			pTexRes->setDepth(1);
+			pTexRes->setNumFaces(1);
+			pTexRes->setNumMips(1);
+			pTexRes->setWidth(dim.x);
+			pTexRes->setHeight(dim.y);
+			pTexRes->setFormat(fmt);
+
+
+			if (!createDeviceTexture(pTexRes)) {
+				X_ERROR("Texture", "Failed to create device texture");
+			}
+
+			if (pInitialData) {
+				// need to refactor to make this nicer todo without duplication of logic.
+
+				D3D12_SUBRESOURCE_DATA texResource;
+				{
+					const size_t rowBytes = Util::rowBytes(pTexRes->getWidth(), 1, pTexRes->getFormat());
+
+					texResource.pData = pInitialData;
+					texResource.RowPitch = rowBytes;
+					texResource.SlicePitch = texResource.RowPitch * pTexRes->getHeight();
+				}
+
+				auto& gpuResource = pTexRes->getGpuResource();
+
+				if (!initializeTexture(gpuResource, 1, &texResource)) {
+					// we should mark the texture as invalid.
+				}
+			}
+		}
+
+		return pTexRes;
+	}
+
 
 	Texture* TextureManager::getByID(TexID texId)
 	{
-		X_UNUSED(texId);
-		X_ASSERT_NOT_IMPLEMENTED();
-		return nullptr;
+	//	X_UNUSED(texId);
+	//	X_ASSERT_NOT_IMPLEMENTED();
+		return textures_.findAsset(texId);
 	}
 
 	Texture* TextureManager::getDefault(void)
@@ -272,7 +326,24 @@ X_NAMESPACE_BEGIN(texture)
 			return false;
 		}
 
-		if (!createDeviceTexture(pTex, imgFile)) {
+		if (!createDeviceTexture(pTex)) {
+			return false;
+		}
+
+
+		D3D12_SUBRESOURCE_DATA texResource;
+		{
+			const size_t rowBytes = Util::rowBytes(imgFile.getWidth(), 1, imgFile.getFormat());
+
+			texResource.pData = imgFile.getFace(0);
+			texResource.RowPitch = rowBytes;
+			texResource.SlicePitch = texResource.RowPitch * imgFile.getHeight();
+		}
+
+		auto& gpuResource = pTex->getGpuResource();
+
+		if (!initializeTexture(gpuResource, 1, &texResource)) {
+			// we should mark the texture as invalid.
 			return false;
 		}
 
@@ -303,18 +374,18 @@ X_NAMESPACE_BEGIN(texture)
 		return true;
 	}
 
-	bool TextureManager::createDeviceTexture(Texture* pTex, XTextureFile& imgFile)
+	bool TextureManager::createDeviceTexture(Texture* pTex)
 	{
-		auto fmt = Util::DXGIFormatFromTexFmt(imgFile.getFormat());
+		auto fmt = Util::DXGIFormatFromTexFmt(pTex->getFormat());
 		auto& gpuResource = pTex->getGpuResource();
 
 		D3D12_RESOURCE_DESC texDesc;
 		core::zero_object(texDesc);
 		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		texDesc.Width = imgFile.getWidth();
-		texDesc.Height = imgFile.getHeight();
-		texDesc.DepthOrArraySize = imgFile.getDepth();
-		texDesc.MipLevels = imgFile.getNumMips();
+		texDesc.Width = pTex->getWidth();
+		texDesc.Height = pTex->getHeight();
+		texDesc.DepthOrArraySize = pTex->getDepth();
+		texDesc.MipLevels = pTex->getNumMips();
 		texDesc.Format = fmt;
 		texDesc.SampleDesc.Count = 1;
 		texDesc.SampleDesc.Quality = 0;
@@ -335,20 +406,6 @@ X_NAMESPACE_BEGIN(texture)
 			return false;
 		}
 
-
-		D3D12_SUBRESOURCE_DATA texResource;
-		{
-			const size_t rowBytes = Util::rowBytes(imgFile.getWidth(), 1, imgFile.getFormat());
-
-			texResource.pData = imgFile.getFace(0);
-			texResource.RowPitch = rowBytes;
-			texResource.SlicePitch = texResource.RowPitch * imgFile.getHeight();
-		}
-
-		if (!initializeTexture(gpuResource, 1, &texResource)) {
-			// we should mark the texture as invalid.
-			return false;
-		}
 
 		if (pTex->getSRV().ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
 			D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptor = descriptorAlloc_.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);

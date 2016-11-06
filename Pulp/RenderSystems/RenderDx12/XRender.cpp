@@ -1231,6 +1231,13 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 	return pText;
 }
 
+::texture::ITexture* XRender::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+{
+	texture::Texture* pText = pTextureMan_->createTexture(pNickName, dim, fmt, pInitialData);
+
+	return pText;
+}
+
 shader::IShader* XRender::getShader(const char* pName)
 {
 	shader::XShader* pShader = pShaderMan_->forName(pName);
