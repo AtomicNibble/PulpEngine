@@ -479,9 +479,7 @@ struct IRender
 	// =============================================
 
 	// everying is depriciated.
-//	virtual void SetState(StateFlag state) X_ABSTRACT;
-//	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
-//	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;
+
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
 
 	// ViewPort
@@ -510,16 +508,6 @@ struct IRender
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
 	// ~AuxGeo
-
-	// Textures 
-//	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_ABSTRACT;
-
-	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
-
-	virtual bool SetTexture(texture::TexID texId) X_ABSTRACT;
-	// ~Textures
-
-	// Drawing util
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
@@ -555,51 +543,7 @@ struct IRender
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_ABSTRACT;
 
-//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_ABSTRACT;
-//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_ABSTRACT;
-//
-//	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-//		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_ABSTRACT;
-
-	virtual void FlushTextBuffer(void) X_ABSTRACT;
-	// ~Drawing
-
-	// Font
-	virtual int FontCreateTexture(const Vec2i& size, BYTE *pData,
-		texture::Texturefmt::Enum eTF = texture::Texturefmt::R8G8B8A8, bool genMips = false) X_ABSTRACT;
-
-	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_ABSTRACT;
-	virtual bool FontSetTexture(int texId) X_ABSTRACT;
-	virtual bool FontSetRenderingState() X_ABSTRACT;
-	virtual void FontRestoreRenderingState() X_ABSTRACT;
-	virtual void FontSetBlending() X_ABSTRACT;
-//	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-//		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_ABSTRACT;
-
-	// ~Font
-
-	// used by font's mainly.
-//	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-//		PrimitiveTypePublic::Enum type) X_ABSTRACT;
-
-	// Shader Stuff
-
 	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_ABSTRACT;
-
-	virtual bool DefferedBegin(void) X_ABSTRACT;
-	virtual bool DefferedEnd(void) X_ABSTRACT;
-	virtual bool SetWorldShader(void) X_ABSTRACT;
-	virtual bool setGUIShader(bool textured = false) X_ABSTRACT;
-	// ~Shader Stuff
-
-	// Model
-//	virtual model::IRenderMesh* createRenderMesh(void) X_ABSTRACT;
-//	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
-//		shader::VertexFormat::Enum fmt, const char* name) X_ABSTRACT;
-//	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_ABSTRACT;
-
-	virtual void SetModelMatrix(const Matrix44f& mat) X_ABSTRACT;
-	// ~Model
 
 };
 

@@ -187,8 +187,8 @@ public:
 	virtual const XCamera& GetCamera() X_OVERRIDE;
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
 	// virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
-	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
-	virtual bool SetTexture(texture::TexID texId) X_OVERRIDE;
+//	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
+//	virtual bool SetTexture(texture::TexID texId) X_OVERRIDE;
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
 	virtual void DrawQuadSS(const Rectf& rect, const Color& col) X_OVERRIDE;
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
@@ -218,28 +218,28 @@ public:
 //	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
 //	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
 //		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
-	virtual void FlushTextBuffer(void) X_OVERRIDE;
-	virtual int FontCreateTexture(const Vec2i& size, BYTE *pData,
-		texture::Texturefmt::Enum eTF = texture::Texturefmt::R8G8B8A8, bool genMips = false) X_OVERRIDE;
-	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_OVERRIDE;
-	virtual bool FontSetTexture(int texId) X_OVERRIDE;
-	virtual bool FontSetRenderingState() X_OVERRIDE;
-	virtual void FontRestoreRenderingState() X_OVERRIDE;
-	virtual void FontSetBlending() X_OVERRIDE;
+//	virtual void FlushTextBuffer(void) X_OVERRIDE;
+//	virtual int FontCreateTexture(const Vec2i& size, BYTE *pData,
+//		texture::Texturefmt::Enum eTF = texture::Texturefmt::R8G8B8A8, bool genMips = false) X_OVERRIDE;
+//	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_OVERRIDE;
+//	virtual bool FontSetTexture(int texId) X_OVERRIDE;
+//	virtual bool FontSetRenderingState() X_OVERRIDE;
+//	virtual void FontRestoreRenderingState() X_OVERRIDE;
+//	virtual void FontSetBlending() X_OVERRIDE;
 //	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
 //		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
 //	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 //		PrimitiveTypePublic::Enum type) X_OVERRIDE;
 	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_OVERRIDE;
-	virtual bool DefferedBegin(void) X_OVERRIDE;
-	virtual bool DefferedEnd(void) X_OVERRIDE;
-	virtual bool SetWorldShader(void) X_OVERRIDE;
-	virtual bool setGUIShader(bool textured = false) X_OVERRIDE;
+//	virtual bool DefferedBegin(void) X_OVERRIDE;
+//	virtual bool DefferedEnd(void) X_OVERRIDE;
+//	virtual bool SetWorldShader(void) X_OVERRIDE;
+//	virtual bool setGUIShader(bool textured = false) X_OVERRIDE;
 //	virtual model::IRenderMesh* createRenderMesh(void) X_OVERRIDE;
 //	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
 //		shader::VertexFormat::Enum fmt, const char* name) X_OVERRIDE;
 //	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_OVERRIDE;
-	virtual void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
+//	virtual void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
 
 	// =============================================
 	// =============================================

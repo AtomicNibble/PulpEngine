@@ -1894,21 +1894,6 @@ void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 // =============================================
 
 
-//void XRender::SetState(StateFlag state)
-//{
-//	X_UNUSED(state);
-//}
-
-//void XRender::SetStencilState(StencilState::Value ss)
-//{
-//	X_UNUSED(ss);
-//}
-
-//void XRender::SetCullMode(CullMode::Enum mode)
-//{
-//	X_UNUSED(mode);
-//}
-
 void XRender::Set2D(bool value, float znear, float zfar)
 {
 	X_UNUSED(value);
@@ -2010,21 +1995,6 @@ IRenderAux* XRender::GetIRenderAuxGeo(void)
 }
 // ~AuxGeo
 
-
-// Textures 
-
-void XRender::ReleaseTexture(texture::TexID id)
-{
-	X_UNUSED(id);
-}
-
-bool XRender::SetTexture(texture::TexID id)
-{
-	X_UNUSED(id);
-	return false;
-}
-
-// ~Textures
 
 
 // Drawing
@@ -2241,173 +2211,13 @@ void XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 	X_UNUSED(padding);
 	X_UNUSED(max);
 }
-//
-//void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
-//{
-//	X_UNUSED(pos);
-//	X_UNUSED(ti);
-//	X_UNUSED(format);
-//	X_UNUSED(args);
-//}
-//
-//void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
-//{
-//	X_UNUSED(pos);
-//	X_UNUSED(ti);
-//	X_UNUSED(text);
-//}
-//
-//void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-//	const core::MemoryAllocatorStatistics& allocStats, const char* title)
-//{
-//	X_UNUSED(pos);
-//	X_UNUSED(ti);
-//	X_UNUSED(allocStats);
-//	X_UNUSED(title);
-//
-//}
 
-void XRender::FlushTextBuffer(void)
-{
-
-}
-
-// ~Drawing
-
-
-
-// Font
-
-int XRender::FontCreateTexture(const Vec2i& size, BYTE* pData,
-	texture::Texturefmt::Enum eTF, bool genMips)
-{
-	X_ASSERT_NOT_NULL(pData);
-	X_UNUSED(size);
-	X_UNUSED(pData);
-	X_UNUSED(eTF);
-	X_UNUSED(genMips);
-
-
-	return 0;
-}
-
-
-bool XRender::FontUpdateTexture(int texId, int x, int y, int USize, int VSize,
-	uint8_t* pData)
-{
-	X_ASSERT_NOT_NULL(pData);
-	X_UNUSED(texId);
-	X_UNUSED(x);
-	X_UNUSED(y);
-	X_UNUSED(USize);
-	X_UNUSED(VSize);
-	X_UNUSED(pData);
-
-	return false;
-}
-
-bool XRender::FontSetTexture(int texId)
-{
-	X_UNUSED(texId);
-
-	return false;
-}
-
-bool XRender::FontSetRenderingState()
-{
-	return false;
-}
-
-void XRender::FontRestoreRenderingState()
-{
-
-}
-
-void XRender::FontSetBlending()
-{
-
-}
-
-
-
-// ~Font
-
-
-//void XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-//	PrimitiveTypePublic::Enum type)
-//{
-//	X_ASSERT_NOT_NULL(pVertBuffer);
-//
-//	X_UNUSED(pVertBuffer);
-//	X_UNUSED(size);
-//	X_UNUSED(type);
-//
-//}
-
-
-// Shader Stuff
 
 shader::XShaderItem XRender::LoadShaderItem(shader::XInputShaderResources& res)
 {
 	X_UNUSED(res);
 	return shader::XShaderItem();
 }
-
-
-bool XRender::DefferedBegin(void)
-{
-	return false;
-}
-
-bool XRender::DefferedEnd(void)
-{
-	return false;
-}
-
-bool XRender::SetWorldShader(void)
-{
-	return false;
-}
-
-bool XRender::setGUIShader(bool textured)
-{
-	X_UNUSED(textured);
-
-	return false;
-}
-
-// ~Shader Stuff
-
-// Model
-#if 0
-model::IRenderMesh* XRender::createRenderMesh(void)
-{
-	return nullptr;
-}
-
-model::IRenderMesh* XRender::createRenderMesh(const model::MeshHeader* pMesh,
-	shader::VertexFormat::Enum fmt, const char* name)
-{
-	X_UNUSED(pMesh);
-	X_UNUSED(fmt);
-	X_UNUSED(name);
-
-	return nullptr;
-}
-
-void XRender::freeRenderMesh(model::IRenderMesh* pMesh)
-{
-	X_UNUSED(pMesh);
-
-}
-#endif
-
-void XRender::SetModelMatrix(const Matrix44f& mat)
-{
-	X_UNUSED(mat);
-}
-
-// ~Model
 
 
 
