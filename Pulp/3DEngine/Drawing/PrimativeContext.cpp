@@ -131,6 +131,34 @@ void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& c
 
 	// we just send outself to the fonts render function that way the font can add what primatives it wishes.
 	ctx.pFont->DrawString(this, pos, ctx, pBegin, pEnd);
+
+PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
+	texture::TexID textureId, render::StateHandle stateHandle)
+{
+	PrimRenderFlags flags(primType, textureId);
+
+	// if the last entry was the same type
+	// just merge the verts in.
+	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().flags == flags && pushBufferArr_.back().stateHandle == stateHandle &&
+		(PrimitiveType::POINTLIST == primType || PrimitiveType::LINELIST == primType || PrimitiveType::TRIANGLELIST == primType))
+	{
+		auto& lastEntry = pushBufferArr_.back();
+		lastEntry.numVertices += numVertices;
+	}
+	else
+	{
+		pushBufferArr_.emplace_back(numVertices,
+			safe_static_cast<uint32_t, size_t>(vertexArr_.size()),
+			flags,
+			stateHandle
+		);
+	}
+
+	// resize and return.
+	const auto oldVBSize = vertexArr_.size();
+	vertexArr_.resize(oldVBSize + numVertices);
+
+	return &vertexArr_[oldVBSize];
 }
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType, texture::TexID textureId)

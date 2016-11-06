@@ -82,6 +82,7 @@ public:
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
 
 private:
+	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId, render::StateHandle stateHandle) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
 

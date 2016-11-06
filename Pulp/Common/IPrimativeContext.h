@@ -74,8 +74,9 @@ private:
 		texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered = true);
 
 public:
-	virtual Vertex_P3F_T2F_C4B* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID texture_id) X_ABSTRACT;
-	virtual Vertex_P3F_T2F_C4B* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
+	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId, render::StateHandle stateHandle) X_ABSTRACT;
+	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID texture_id) X_ABSTRACT;
+	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
 };
 
