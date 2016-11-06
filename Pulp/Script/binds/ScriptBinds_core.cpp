@@ -274,6 +274,9 @@ int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
 
 	Color8u col(fcol);
 
+#if 1
+	X_ASSERT_UNREACHABLE();
+#else
 	render::IRenderAux* pRenderAuxGeom = gEnv->pRender->GetIRenderAuxGeo();
 	render::XAuxGeomRenderFlags flags(render::AuxGeom_Defaults::Def2DPRenderflags);
 
@@ -284,6 +287,7 @@ int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
 
 	pRenderAuxGeom->setRenderFlags(flags);
 	pRenderAuxGeom->drawLine(v0, col, v1, col);
+#endif
 
 	return pH->EndFunction();
 }
@@ -359,10 +363,14 @@ int XBinds_Core::DrawCone(IFunctionHandler *pH)
 
 	Color8u col(fcol);
 
+#if 1
+	X_ASSERT_UNREACHABLE();
+#else
 	render::IRenderAux* pRenderAuxGeom = gEnv->pRender->GetIRenderAuxGeo();
 	render::XAuxGeomRenderFlags flags(render::AuxGeom_Defaults::Def3DRenderflags);
 
 	pRenderAuxGeom->drawCone(pos, dir, radius, height, col);
+#endif
 
 	return pH->EndFunction();
 }
