@@ -55,10 +55,10 @@ void RenderNull::renderEnd()
 
 }
 
-void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType)
+void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 {
 	X_UNUSED(cmdBucket);
-	X_UNUSED(keyType);
+
 }
 
 IRenderAux* RenderNull::getAuxRender(AuxRenderer::Enum user)
@@ -164,6 +164,16 @@ texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlag
 	X_ASSERT_NOT_NULL(path);
 	X_UNUSED(path);
 	X_UNUSED(flags);
+
+	return nullptr;
+}
+
+texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+{
+	X_ASSERT_NOT_NULL(pNickName);
+	X_UNUSED(dim);
+	X_UNUSED(fmt);
+	X_UNUSED(pInitialData);
 
 	return nullptr;
 }
@@ -330,18 +340,7 @@ IRenderAux* RenderNull::GetIRenderAuxGeo(void)
 // ~AuxGeo
 
 
-// Textures 
 
-void RenderNull::ReleaseTexture(texture::TexID id)
-{
-	X_UNUSED(id);
-}
-
-bool RenderNull::SetTexture(texture::TexID id)
-{
-	X_UNUSED(id);
-	return false;
-}
 
 // ~Textures
 
@@ -561,122 +560,6 @@ void RenderNull::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 	X_UNUSED(max);
 }
 
-//void RenderNull::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
-//{
-//	X_UNUSED(pos);
-//	X_UNUSED(ti);
-//	X_UNUSED(format);
-//	X_UNUSED(args);
-//}
-//
-//void RenderNull::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
-//{
-//	X_UNUSED(pos);
-//	X_UNUSED(ti);
-//	X_UNUSED(text);
-//}
-//
-//void RenderNull::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-//	const core::MemoryAllocatorStatistics& allocStats, const char* title)
-//{
-//	X_UNUSED(pos);
-//	X_UNUSED(ti);
-//	X_UNUSED(allocStats);
-//	X_UNUSED(title);
-//
-//}
-
-void RenderNull::FlushTextBuffer(void)
-{
-
-}
-
-// ~Drawing
-
-
-
-// Font
-
-int RenderNull::FontCreateTexture(const Vec2i& size, BYTE* pData,
-	texture::Texturefmt::Enum eTF, bool genMips)
-{
-	X_ASSERT_NOT_NULL(pData);
-	X_UNUSED(size);
-	X_UNUSED(pData);
-	X_UNUSED(eTF);
-	X_UNUSED(genMips);
-
-
-	return 0;
-}
-
-
-bool RenderNull::FontUpdateTexture(int texId, int x, int y, int USize, int VSize,
-	uint8_t* pData)
-{
-	X_ASSERT_NOT_NULL(pData);
-	X_UNUSED(texId);
-	X_UNUSED(x);
-	X_UNUSED(y);
-	X_UNUSED(USize);
-	X_UNUSED(VSize);
-	X_UNUSED(pData);
-
-	return false;
-}
-
-bool RenderNull::FontSetTexture(int texId)
-{
-	X_UNUSED(texId);
-
-	return false;
-}
-
-bool RenderNull::FontSetRenderingState()
-{
-	return false;
-}
-
-void RenderNull::FontRestoreRenderingState()
-{
-
-}
-
-void RenderNull::FontSetBlending()
-{
-
-}
-
-
-//void RenderNull::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-//	const wchar_t* pStr, const font::XTextDrawConect& ctx) const
-//{
-//	X_ASSERT_NOT_NULL(pFont);
-//	X_ASSERT_NOT_NULL(pStr);
-//
-//	X_UNUSED(pFont);
-//	X_UNUSED(pos);
-//	X_UNUSED(pStr);
-//	X_UNUSED(ctx);
-//
-//
-//}
-
-
-// ~Font
-
-
-//void RenderNull::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-//	PrimitiveTypePublic::Enum type)
-//{
-//	X_ASSERT_NOT_NULL(pVertBuffer);
-//
-//	X_UNUSED(pVertBuffer);
-//	X_UNUSED(size);
-//	X_UNUSED(type);
-//
-//}
-
 // Shader Stuff
 
 shader::XShaderItem RenderNull::LoadShaderItem(shader::XInputShaderResources& res)
@@ -684,41 +567,6 @@ shader::XShaderItem RenderNull::LoadShaderItem(shader::XInputShaderResources& re
 	X_UNUSED(res);
 	return shader::XShaderItem();
 }
-
-
-bool RenderNull::DefferedBegin(void)
-{
-	return false;
-}
-
-bool RenderNull::DefferedEnd(void)
-{
-	return false;
-}
-
-bool RenderNull::SetWorldShader(void)
-{
-	return false;
-}
-
-bool RenderNull::setGUIShader(bool textured)
-{
-	X_UNUSED(textured);
-
-	return false;
-}
-
-// ~Shader Stuff
-
-// Model
-
-
-void RenderNull::SetModelMatrix(const Matrix44f& mat)
-{
-	X_UNUSED(mat);
-}
-
-// ~Model
 
 
 

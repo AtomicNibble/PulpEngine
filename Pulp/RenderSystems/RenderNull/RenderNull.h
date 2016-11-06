@@ -22,7 +22,7 @@ public:
 	virtual void renderBegin(void) X_OVERRIDE;
 	virtual void renderEnd(void) X_OVERRIDE;
 
-	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType) X_OVERRIDE;
+	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_OVERRIDE;
 
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
@@ -45,6 +45,7 @@ public:
 
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
+	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;
 
 	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
@@ -60,9 +61,6 @@ public:
 	// ============== OLD API ======================
 	// =============================================
 
-//	virtual void SetState(StateFlag state) X_OVERRIDE;
-//	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
-//	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 
 	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
@@ -91,13 +89,6 @@ public:
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
 	// ~AuxGeo
-
-	// Textures 
-//	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
-
-	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
-	virtual bool SetTexture(texture::TexID texId) X_OVERRIDE;
-	// ~Textures
 
 	// Drawing
 
@@ -134,45 +125,9 @@ public:
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_OVERRIDE;
 
-//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_OVERRIDE;
-//	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
-//
-//	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-//		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
-
-	virtual void FlushTextBuffer(void) X_OVERRIDE;
-	// ~Drawing
-
-	// Font
-	virtual int FontCreateTexture(const Vec2i& size, BYTE *pData,
-		texture::Texturefmt::Enum eTF = texture::Texturefmt::R8G8B8A8, bool genMips = false) X_OVERRIDE;
-
-	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_OVERRIDE;
-	virtual bool FontSetTexture(int texId) X_OVERRIDE;
-	virtual bool FontSetRenderingState() X_OVERRIDE;
-	virtual void FontRestoreRenderingState() X_OVERRIDE;
-	virtual void FontSetBlending() X_OVERRIDE;
-//	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-//		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
-	// ~Font
-
-//	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-//		PrimitiveTypePublic::Enum type) X_OVERRIDE;
-
-	// Shader Stuff
 
 	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_OVERRIDE;
 
-	virtual bool DefferedBegin(void) X_OVERRIDE;
-	virtual bool DefferedEnd(void) X_OVERRIDE;
-	virtual bool SetWorldShader(void) X_OVERRIDE;
-	virtual bool setGUIShader(bool textured = false) X_OVERRIDE;
-	// ~Shader Stuff
-
-	// Model
-
-	virtual void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
-	// ~Model
 
 
 private:
