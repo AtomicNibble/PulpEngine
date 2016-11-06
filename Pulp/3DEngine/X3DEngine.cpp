@@ -223,7 +223,7 @@ void X3DEngine::OnFrameBegin(void)
 		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
 		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems, cam, viewPort);
 
-
+#if 0
 		const auto* pShader = pRender_->getShader("AuxGeom");
 		const auto* pTech = pShader->getTech("AuxGeometry");
 
@@ -250,6 +250,7 @@ void X3DEngine::OnFrameBegin(void)
 		rtfs.append(renderTarget->getFmt());
 		render::PassStateHandle passHandle = pRender_->createPassState(rtfs);
 
+#endif
 		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
@@ -263,42 +264,42 @@ void X3DEngine::OnFrameBegin(void)
 
 				// need a vb.
 				render::VertexBufferHandle vertexBuf = pRender_->createVertexBuffer(
-					sizeof(PrimativeContext::PrimVertex),
+					sizeof(IPrimativeContext::PrimVertex),
 					safe_static_cast<uint32_t>(verts.size()),
 					verts.data(),
 					render::BufUsage::DYNAMIC,
 					render::CpuAccess::WRITE
 				);
 
-				render::StateHandle stateHandle = 0;
+//				render::StateHandle stateHandle = 0;
 
 #if 1
 				const auto& front = elems.front();
 				auto curFlags = front.flags;
 
 
-				desc.topo = curFlags.getPrimType();
-				stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
+			//	desc.topo = curFlags.getPrimType();
+			//	stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
 
 				for (size_t x = 0; x < elems.size(); x++)
 				{
 					const auto& elem = elems[x];
 					const auto flags = elem.flags;
 
-					if (flags != curFlags)
-					{
-						desc.topo = flags.getPrimType();
+					const auto textureId = flags.getTextureId();
 
-						stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
-						curFlags = flags;
-					}
-
-					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(flags.toInt(), 0);
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x), 0);
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
+					pDraw->stateHandle = elem.stateHandle; 
 					core::zero_object(pDraw->vertexBuffers);
 					pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
-					pDraw->stateHandle = stateHandle; // we need state :cry:
+
+					core::zero_object(pDraw->textures);
+					pDraw->textures[render::TextureSlot::DIFFUSE].textureId = textureId;
+					pDraw->textures[render::TextureSlot::DIFFUSE].sampler.filter = render::FilterType::LINEAR_MIP_NONE;
+					pDraw->textures[render::TextureSlot::DIFFUSE].sampler.repeat = render::TexRepeat::NO_TILE;
+
 				}
 #else
 
