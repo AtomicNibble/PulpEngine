@@ -103,7 +103,6 @@ private:
 	XFontSystem* pFontSys_;
 	
 	XFontTexture* pFontTexture_;
-	uint8_t* FontBuffer_;
 
 	texture::ITexture* pTexture_;
 	bool fontTexDirty_;

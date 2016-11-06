@@ -11,6 +11,8 @@
 
 #include <Math\VertexFormats.h>
 
+#include <Util\ScopedPointer.h>
+
 
 X_NAMESPACE_BEGIN(font)
 
@@ -40,7 +42,6 @@ XFont::XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName) :
 	pFontSys_(pFontSys),
 	name_(pFontName),
 	pFontTexture_(nullptr),
-	FontBuffer_(nullptr),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
 	effects_(g_fontArena)
@@ -72,7 +73,6 @@ void XFont::Free()
 void XFont::FreeBuffers()
 {
 	X_DELETE_AND_NULL(pFontTexture_, g_fontArena);
-	X_DELETE_AND_NULL(FontBuffer_, g_fontArena);
 }
 
 void XFont::FreeTexture()
@@ -107,23 +107,23 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 
 	FreeBuffers();
 
+	core::ScopedPointer<uint8_t[]> fileDataBuf(g_fontArena, nullptr);
 
 	size_t len = 0;
-	uint8_t* pBuffer = nullptr;
 
 	core::XFileScoped file;
 	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
 	{
 		len = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 		if (len > 0) {
-			pBuffer = X_NEW_ARRAY(uint8_t,len, g_fontArena, "FontTTFBuffer");
-			if (file.read(pBuffer, len) != len) {
+			fileDataBuf.reset(X_NEW_ARRAY(uint8_t,len, fileDataBuf.getArena(), "FontTTFBuffer"));
+			if (file.read(fileDataBuf.get(), len) != len) {
 
 			}
 		}
 	}
 
-	if (pBuffer == nullptr || len == 0) {
+	if (fileDataBuf.get() == nullptr || len == 0) {
 		return false;
 	}
 
@@ -131,15 +131,11 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 		pFontTexture_ = X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena);
 	}
 
-	if (!pFontTexture_->CreateFromMemory(pBuffer, len, width, height, iSmoothMethod, iSmoothAmount)) {
-
-		X_DELETE_AND_NULL(pBuffer, g_fontArena);
+	if (!pFontTexture_->CreateFromMemory(fileDataBuf.get(), len, width, height, iSmoothMethod, iSmoothAmount)) {
 		X_DELETE_AND_NULL(pFontTexture_, g_fontArena);
-
 		return false;
 	}
 
-	FontBuffer_ = pBuffer;
 	fontTexDirty_ = true;
 
 	InitCache();
