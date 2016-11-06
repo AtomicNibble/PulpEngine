@@ -94,7 +94,9 @@ void RootSignature::clear(void)
 
 	samplesInitCount_ = 0;
 
-	core::SafeReleaseDX(pSignature_);
+	// we can't release as the cache will still hold the pointer.
+	// core::SafeReleaseDX(pSignature_);
+	pSignature_ = nullptr;
 }
 
 void RootSignature::free(void)
