@@ -92,43 +92,6 @@ public:
 
 	// Drawing
 
-	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
-	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
-	virtual void DrawQuadSS(const Rectf& rect, const Color& col) X_OVERRIDE;
-	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
-	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_OVERRIDE;
-	virtual void DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col) X_OVERRIDE;
-	virtual void DrawRectSS(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
-	virtual void DrawRectSS(const Rectf& rect, const Color& col) X_OVERRIDE;
-	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
-		const Vec2f& vPos2, const Color& vColor2) X_OVERRIDE;
-
-	virtual void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_OVERRIDE;
-	virtual void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, const Color& col) X_OVERRIDE;
-	virtual void DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre, const Color& col) X_OVERRIDE;
-
-
-	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_OVERRIDE;
-	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
-	virtual void DrawQuad(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
-	virtual void DrawQuad(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
-	virtual void DrawQuad(Vec2<float> pos, float width, float height, const Color& col) X_OVERRIDE;
-	virtual void DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col) X_OVERRIDE;
-
-	virtual void DrawLines(Vec3f* points, uint32_t num, const Color& col) X_OVERRIDE;
-	virtual void DrawLine(const Vec3f& pos1, const Vec3f& pos2) X_OVERRIDE;
-	virtual void DrawLineColor(const Vec3f& vPos1, const Color& color1,
-		const Vec3f& vPos2, const Color& vColor2) X_OVERRIDE;
-
-	virtual void DrawRect(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
-
-	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
-		float padding, uint32_t max) X_OVERRIDE;
-
-
-	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_OVERRIDE;
-
-
 
 private:
 	XCamera cam_;
