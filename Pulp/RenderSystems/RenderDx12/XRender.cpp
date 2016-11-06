@@ -1080,6 +1080,25 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					context.setDynamicCBV(1, sizeof(buf), &buf);
 
+					auto* pDefault = pTextureMan_->getDefault();
+
+					// set textures?
+					D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
+					std::fill_n(textureSRVS, render::TextureSlot::ENUM_COUNT, pDefault->getSRV());
+
+					for (uint32_t t = 0; t < render::TextureSlot::ENUM_COUNT; t++)
+					{
+						if (draw.textures[t].textureId != 0)
+						{
+							// want to bind the texture.
+							texture::Texture* pTex = pTextureMan_->getByID(draw.textures[t].textureId);
+
+							textureSRVS[t] = pTex->getSRV();
+						}
+					}
+
+					context.setDynamicDescriptors(0, 0, render::TextureSlot::ENUM_COUNT, textureSRVS);
+
 					context.draw(draw.vertexCount, draw.startVertex);
 					break;
 				}
