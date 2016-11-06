@@ -11,8 +11,8 @@ DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, I
 	CommandListManger& commandManager) :
 	pDevice_(pDevice),
 	commandManager_(commandManager),
-	retiredDescriptorHeaps_(arena),
-	availableDescriptorHeaps_(arena),
+	retiredDescriptorHeaps_(arena, 128),
+	availableDescriptorHeaps_(arena, 128),
 	descriptorHeapPool_(arena)
 {
 
@@ -64,6 +64,7 @@ void DescriptorAllocatorPool::discardDescriptorHeaps(uint64_t fenceValue, const 
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	for (auto iter = usedHeaps.begin(); iter != usedHeaps.end(); ++iter) {
+		X_ASSERT(retiredDescriptorHeaps_.size() < retiredDescriptorHeaps_.capacity(), "fifo is full")();
 		retiredDescriptorHeaps_.push(std::make_pair(fenceValue, *iter));
 	}
 }
