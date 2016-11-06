@@ -8,6 +8,7 @@
 #include <Threading\AtomicInt.h>
 #include <Containers\HashMap.h>
 #include <Containers\Array.h>
+#include <Containers\Fifo.h>
 
 #include <String\Path.h>
 
@@ -212,28 +213,54 @@ private:
 	AssetPoolArena		assetPoolArena_;
 };
 
-template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy>
-class AssetContainer : private AssetPool<AssetType, MaxAssets, MemoryThreadPolicy>
+template<typename AssetType, size_t MaxAssets, class ThreadPolicy>
+class AssetContainer : private AssetPool<AssetType, MaxAssets, core::SingleThreadPolicy>
 {
-	typedef AssetPool<AssetType, MaxAssets, MemoryThreadPolicy> Pool;
+	typedef AssetPool<AssetType, MaxAssets, core::SingleThreadPolicy> Pool;
 public:
 	typedef Pool::AssetResource Resource;
 	typedef core::HashMap<core::string, Resource*> ResourceMap;
+	typedef core::Array<Resource*> ResourceList;
+	typedef core::Fifo<int32_t> IndexList;
 
 	typedef typename ResourceMap::iterator ResourceItor;
 	typedef typename ResourceMap::const_iterator ResourceConstItor;
 
+private:
+	class ScopedLock
+	{
+	public:
+		inline explicit ScopedLock(ThreadPolicy& policy) :
+			policy_(policy)
+		{
+			policy_.Enter();
+		}
+
+		inline ~ScopedLock(void) {
+			policy_.Leave();
+		}
+
+	private:
+		X_NO_COPY(ScopedLock);
+		X_NO_ASSIGN(ScopedLock);
+
+		ThreadPolicy& policy_;
+	};
 
 public:
 	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
 		hash_(arena, MaxAssets),
+		list_(arena),
+		freeList_(arena, 128),
 		AssetPool(allocSize, allocAlign)
 	{
-
+		list_.reserve(MaxAssets);
 	}
 
 	X_INLINE void free(void)
 	{
+		ScopedLock lock(threadPolicy_);
+
 		for (const auto& it : hash_) {
 			Pool::free(it.second);
 		}
@@ -246,6 +273,8 @@ public:
 		X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
 			"asset name has invalid slash")(name.c_str());
 	
+		ScopedLock lock(threadPolicy_);
+
 		auto it = hash_.find(name);
 		if (it != hash_.end()) {
 			return it->second;
@@ -254,16 +283,39 @@ public:
 		return nullptr;
 	}
 
+	X_INLINE Resource* findAsset(uint32_t id) const
+	{
+		return list_[id];
+	}
+
 	template<class... Args>
 	Resource* createAsset(const core::string& name, Args&&... args)
 	{
 		X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
 			"asset name has invalid slash")(name.c_str());
 
+		ScopedLock lock(threadPolicy_);
+
 		Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
 
 		hash_.insert(ResourceMap::value_type(name, pRes));
 
+		int32_t id;
+
+		if (freeList_.isNotEmpty())
+		{
+			id = freeList_.peek();
+			freeList_.pop();
+
+			list_[id] = pRes;
+		}
+		else
+		{
+			id = safe_static_cast<int32_t>(list_.size());
+			list_.append(pRes);
+		}
+
+		pRes->setID(id);
 		return pRes;
 	}
 
@@ -271,9 +323,13 @@ public:
 	{
 		X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")(pRes->getRefCount());
 
+		ScopedLock lock(threadPolicy_);
+
 		hash_.erase(pRes->getName());
 
 		Pool::free(pRes);
+
+		freeList_.push(pRes->getID());
 	}
 
 public:
@@ -296,7 +352,11 @@ public:
 	}
 
 private:
+	mutable ThreadPolicy threadPolicy_;
+
 	ResourceMap hash_;
+	ResourceList list_;
+	IndexList freeList_;
 };
 
 
