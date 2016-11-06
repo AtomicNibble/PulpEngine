@@ -7,7 +7,6 @@ X_NAMESPACE_BEGIN(engine)
 class PrimativeContext : public IPrimativeContext
 {
 public:
-	typedef Vertex_P3F_T2F_C4B PrimVertex;
 
 	struct PrimFlagBitMasks
 	{
