@@ -15,6 +15,16 @@ namespace shader
 		return techs_.size(); 
 	}
 
+	X_INLINE const int32_t XShader::getID(void) const
+	{
+		return id_;
+	}
+
+	X_INLINE void XShader::setID(int32_t id)
+	{
+		id_ = id;
+	}
+
 
 } // namespace shader
 

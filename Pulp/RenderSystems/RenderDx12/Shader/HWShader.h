@@ -124,10 +124,8 @@ namespace shader
 			ShaderType::Enum type, const char* pName, const core::string& entry,
 			SourceFile* pSourceFile, TechFlags techFlags);
 
-		const int32_t release(void) {
-			return 0;
-		}
-
+		X_INLINE const int32_t getID(void) const;
+		X_INLINE void setID(int32_t id);
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE const core::string& getSourceFileName(void) const;
@@ -182,6 +180,7 @@ namespace shader
 		core::string entryPoint_;
 		core::string source_;
 
+		int32_t id_;
 		uint32_t sourceCrc32_; // the crc of the source this was compiled from.
 
 		// status

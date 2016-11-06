@@ -169,5 +169,11 @@
     <None Include="Drawing\PrimativeContext.inl">
       <Filter>Header Files\Drawing</Filter>
     </None>
+    <None Include="Material\Material.inl">
+      <Filter>Header Files\Material</Filter>
+    </None>
+    <None Include="Model\XModel.inl">
+      <Filter>Header Files\Model</Filter>
+    </None>
   </ItemGroup>
 </Project>

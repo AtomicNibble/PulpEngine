@@ -836,11 +836,12 @@ namespace shader
 
 	void XShaderTechniqueHW::release(void)
 	{
-		core::SafeRelease(pVertexShader);
-		core::SafeRelease(pPixelShader);
-		core::SafeRelease(pGeoShader);
-		core::SafeRelease(pHullShader);
-		core::SafeRelease(pDomainShader);
+		X_ASSERT_NOT_IMPLEMENTED();
+	//	core::SafeRelease(pVertexShader);
+	//	core::SafeRelease(pPixelShader);
+	//	core::SafeRelease(pGeoShader);
+	//	core::SafeRelease(pHullShader);
+	//	core::SafeRelease(pDomainShader);
 	}
 
 	bool XShaderTechniqueHW::canDraw(void) const

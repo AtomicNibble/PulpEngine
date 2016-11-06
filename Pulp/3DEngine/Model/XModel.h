@@ -51,6 +51,9 @@ public:
 
 	// ~IModel
 
+	X_INLINE const int32_t getID(void) const;
+	X_INLINE void setID(int32_t id);
+
 	// can upload each lod individually.
 	bool createRenderBuffersForLod(size_t idx);
 	void releaseLodRenderBuffers(size_t idx);
@@ -84,6 +87,8 @@ private:
 	static bool ReadHeader(ModelHeader& hdr, core::XFile* file);
 
 private:
+	int32_t id_;
+
 	ModelName name_;
 
 	XRenderMesh renderMeshes_[MODEL_MAX_LODS];
@@ -115,5 +120,7 @@ private:
 
 
 X_NAMESPACE_END
+
+#include "XModel.inl"
 
 #endif // !X_MODEL_H_

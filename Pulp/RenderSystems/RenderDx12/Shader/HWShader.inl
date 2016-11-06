@@ -4,6 +4,16 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+	X_INLINE const int32_t XHWShader::getID(void) const
+	{
+		return id_;
+	}
+
+	X_INLINE void XHWShader::setID(int32_t id)
+	{
+		id_ = id;
+	}
+
 	X_INLINE const core::string& XHWShader::getName(void) const {
 		return name_;
 	}

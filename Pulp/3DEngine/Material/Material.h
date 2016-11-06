@@ -30,6 +30,9 @@ public:
 	XMaterial();
 	~XMaterial();
 
+	X_INLINE const int32_t getID(void) const;
+	X_INLINE void setID(int32_t id);
+
 	virtual const core::string& getName(void) const X_OVERRIDE { return matName_; };
 	virtual void setName(const char* pName) X_OVERRIDE;
 
@@ -66,6 +69,8 @@ protected:
 	X_NO_COPY(XMaterial);
 	X_NO_ASSIGN(XMaterial);
 
+	int32_t id_;
+
 	core::string			matName_;
 	MaterialFlags			flags_;
 	MaterialSurType::Enum	MatSurfaceType_;
@@ -84,6 +89,7 @@ protected:
 
 X_NAMESPACE_END
 
+#include "Material.inl"
 
 
 #endif // X_MATERIAL_OLD_H_

@@ -423,7 +423,9 @@
     <None Include="Gui\Gui.inl" />
     <None Include="Gui\SimpleWindow.inl" />
     <None Include="Gui\XWindow.inl" />
+    <None Include="Material\Material.inl" />
     <None Include="Model\RenderMesh.inl" />
+    <None Include="Model\XModel.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

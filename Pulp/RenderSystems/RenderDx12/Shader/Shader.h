@@ -158,8 +158,13 @@ public:
 
 	X_INLINE size_t numTechs(void) const;
 
+	X_INLINE const int32_t getID(void) const;
+	X_INLINE void setID(int32_t id);
+
+
 private:
 	core::string name_;
+	int32_t id_;
 	uint32_t sourceCrc32_;
 	uint32_t hlslSourceCrc32_;
 	SourceFile* pHlslFile_;

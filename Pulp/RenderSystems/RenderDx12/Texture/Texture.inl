@@ -80,6 +80,17 @@ X_NAMESPACE_BEGIN(texture)
 		return hCpuDescriptorHandle_;
 	}
 
+
+	X_INLINE const int32_t Texture::getID(void) const
+	{
+		return id_;
+	}
+
+	X_INLINE void Texture::setID(TexID id)
+	{
+		id_ = id;
+	}
+
 	X_INLINE void Texture::setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv)
 	{
 		hCpuDescriptorHandle_ = srv;

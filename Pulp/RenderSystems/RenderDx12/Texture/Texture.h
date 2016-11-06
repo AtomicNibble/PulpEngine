@@ -19,12 +19,13 @@ class TextureManager;
 
 	public:
 		Texture(const char* pName, TextureFlags flags);
+		Texture(core::string name, TextureFlags flags);
 		~Texture();
 
 		void destroy(void);
 
 		// temp maybe
-		X_INLINE const TexID getTexID(void) const X_OVERRIDE { return 0; };
+		X_INLINE const TexID getTexID(void) const X_OVERRIDE { return id_; };
 		X_INLINE const bool IsShared() const X_OVERRIDE { return false; }
 
 
@@ -46,6 +47,9 @@ class TextureManager;
 
 		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
 
+		X_INLINE const int32_t getID(void) const;
+		X_INLINE void setID(TexID id);
+
 	protected:
 		X_INLINE render::GpuResource& getGpuResource(void);
 		X_INLINE void setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv);
@@ -64,6 +68,7 @@ class TextureManager;
 		D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptorHandle_;
 
 		core::string		fileName_;
+		TexID				id_;
 		Vec2<uint16_t>		dimensions_;
 		uint32_t			datasize_; // size of the higest mip in bytes.
 		TextureType::Enum	type_;
