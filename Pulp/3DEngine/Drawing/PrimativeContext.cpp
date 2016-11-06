@@ -142,7 +142,8 @@ void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& c
 	X_ASSERT_NOT_NULL(ctx.pFont);
 
 	// we just send outself to the fonts render function that way the font can add what primatives it wishes.
-	ctx.pFont->DrawString(this, pos, ctx, pBegin, pEnd);
+	ctx.pFont->DrawString(this, textDrawState_, pos, ctx, pBegin, pEnd);
+}
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
 	texture::TexID textureId, render::StateHandle stateHandle)
