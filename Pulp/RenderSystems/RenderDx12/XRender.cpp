@@ -1346,11 +1346,20 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
 	RootSignature& rootSig = pState->rootSig;
-	rootSig.reset(2, 0);
+	rootSig.reset(2,1);
+
+	// we need a root sig that maps correct with this shader.
+	// maybe just having the root sig in the shader def makes sense then?
+	// id rather not i think the render system should be able to decide;
+	// but should it just be worked out based on the shader?
+	// so the description is past of the hwshader.
 	rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSig.getParamRef(1).initAsCBV(0, D3D12_SHADER_VISIBILITY_VERTEX);
-//	rootSig.getParamRef(2).initAsSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
+//	rootSig.getParamRef(2).initAsSRV(1, D3D12_SHADER_VISIBILITY_PIXEL);
+//	rootSig.getParamRef(2).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
 //	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+	rootSig.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
+
 
 	if (!rootSig.finalize(*pRootSigCache_,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
