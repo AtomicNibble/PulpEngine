@@ -56,10 +56,10 @@ public:
 
 	virtual bool loadFont(void) X_OVERRIDE;
 
-	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
 		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
-	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos
-		, const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
 
 	virtual size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
 	virtual size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
@@ -105,7 +105,7 @@ private:
 	XFontTexture* pFontTexture_;
 	uint8_t* FontBuffer_;
 
-	texture::TexID texID_;
+	texture::ITexture* pTexture_;
 	bool fontTexDirty_;
 
 	Effets effects_;
@@ -113,7 +113,7 @@ private:
 
 X_INLINE texture::TexID XFont::getTextureId(void) const
 {
-	return texID_;
+	return pTexture_->getTexID();
 }
 
 X_INLINE const char* XFont::getName(void) const

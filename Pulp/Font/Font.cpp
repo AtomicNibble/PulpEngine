@@ -41,7 +41,7 @@ XFont::XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName) :
 	name_(pFontName),
 	pFontTexture_(nullptr),
 	FontBuffer_(nullptr),
-	texID_(-1),
+	pTexture_(nullptr),
 	fontTexDirty_(false),
 	effects_(g_fontArena)
 {
@@ -77,24 +77,19 @@ void XFont::FreeBuffers()
 
 void XFont::FreeTexture()
 {
-	if (texID_ > -1) 
+	if (pTexture_)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pRender);
 
-		gEnv->pRender->ReleaseTexture(texID_);
-
-		texID_ = -1;
+		gEnv->pRender->releaseTexture(pTexture_);
+		pTexture_ = nullptr;
 	}
 }
 
 
 bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 {
-	core::Path<char> path;
-	core::XFileScoped file;
-	uint8_t* pBuffer = nullptr;
-	size_t len = 0;
 
 	uint32_t flags = 0;
 	const int32_t iSmoothMethod = (flags & TTFFLAG_SMOOTH_MASK) >> TTFFLAG_SMOOTH_SHIFT;
@@ -106,11 +101,17 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 
 	X_LOG0("Font", "loading: \"%s\"", pFilePath);
 
+	core::Path<char> path;
 	path /= "Fonts/";
 	path.setFileName(pFilePath);
 
 	FreeBuffers();
 
+
+	size_t len = 0;
+	uint8_t* pBuffer = nullptr;
+
+	core::XFileScoped file;
 	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
 	{
 		len = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
@@ -155,7 +156,7 @@ void XFont::Reload(void)
 
 
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
 	const XTextDrawConect& contex, const char* pBegin, const char* pEnd)
 {
 	// to wide char
@@ -167,6 +168,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 
 	DrawString(
 		pPrimCon,
+		stateHandle,
 		pos,
 		contex,
 		pWideBegin,
@@ -174,16 +176,21 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	);
 }
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, 
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
 	const XTextDrawConect& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	X_UNUSED(pEnd);
+
+	if (!pTexture_ && !InitTexture()) {
+		return;
+	}
 
 	Vec2f size = ctx.size; // in pixel
 	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 
 	const auto effecIdx = ctx.GetEffectId() < effects_.size() ? ctx.GetEffectId() : 0;
+	const auto textId = pTexture_->getTexID();
 
 	FontEffect& effect = effects_[effecIdx];
 	for (auto passIdx = 0u; passIdx < effect.passes.size(); passIdx++)
@@ -231,7 +238,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			Vec2f gradientUvMin, gradientUvMax;
 			GetGradientTextureCoord(gradientUvMin.x, gradientUvMin.y, gradientUvMax.x, gradientUvMax.y);
 
-			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, texID_);
+			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, textId, stateHandle);
 
 			pVerts[0].pos = v0;
 			pVerts[0].color = frameColor;
@@ -330,7 +337,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			XCharCords cords;
 			pFontTexture_->GetTextureCoord(pSlot, cords);
 			
-			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, texID_);
+			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, textId, stateHandle);
 
 			float hozAdvance = 0;
 			if (proportinal)
@@ -715,15 +722,16 @@ void XFont::Prepare(const wchar_t* pStr, bool updateTexture)
 {
 	X_PROFILE_BEGIN("FontPrepare", core::ProfileSubSys::FONT);
 
-	bool cache = pFontTexture_->PreCacheString(pStr) == 1;
-	bool texUpdateNeeded = fontTexDirty_ || cache;
-	if (updateTexture && texUpdateNeeded && texID_ >= 0)
+	const bool cache = pFontTexture_->PreCacheString(pStr) == 1;
+	const bool texUpdateNeeded = fontTexDirty_ || cache;
+
+	if (updateTexture && texUpdateNeeded && pTexture_)
 	{
-		gEnv->pRender->FontUpdateTexture(texID_, 0, 0, 
-			pFontTexture_->GetWidth(),
-			pFontTexture_->GetHeight(),
-			pFontTexture_->GetBuffer()
-		);
+	//	gEnv->pRender->FontUpdateTexture(texID_, 0, 0, 
+	//		pFontTexture_->GetWidth(),
+	//		pFontTexture_->GetHeight(),
+	//		pFontTexture_->GetBuffer()
+	//	);
 
 		fontTexDirty_ = false;
 	}
@@ -1011,16 +1019,19 @@ void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDra
 
 bool XFont::InitTexture(void)
 {
-	texID_ = gEnv->pRender->FontCreateTexture(
+	pTexture_ = gEnv->pRender->createTexture(
+		"$fontTexture",
 		pFontTexture_->GetSize(), 
-		pFontTexture_->GetBuffer(), 
-		texture::Texturefmt::A8);
+		texture::Texturefmt::A8,
+		pFontTexture_->GetBuffer()
+	);
 
-	if (texID_ <= 0) {
+	if (!pTexture_->isLoaded()) {
 		X_WARNING("Font", "Failed to create font texture.");
+		return false;
 	}
 
-	return texID_ >= 0;
+	return true;
 }
 
 
