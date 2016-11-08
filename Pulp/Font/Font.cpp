@@ -709,31 +709,17 @@ bool XFont::InitCache(void)
 
 	*p = 0;
 
-	Prepare(buf, false);
-
+	Prepare(buf, buf + sizeof(buf));
 	return true;
 }
 
-void XFont::Prepare(const wchar_t* pStr, bool updateTexture)
+void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	X_PROFILE_BEGIN("FontPrepare", core::ProfileSubSys::FONT);
 
-	const bool cache = pFontTexture_->PreCacheString(pStr) == 1;
-	const bool texUpdateNeeded = fontTexDirty_ || cache;
-
-	if (updateTexture && texUpdateNeeded && pTexture_)
+	if (pFontTexture_->PreCacheString(pBegin, pEnd) == CacheResult::UPDATED)
 	{
-	//	gEnv->pRender->FontUpdateTexture(texID_, 0, 0, 
-	//		pFontTexture_->GetWidth(),
-	//		pFontTexture_->GetHeight(),
-	//		pFontTexture_->GetBuffer()
-	//	);
-
-		fontTexDirty_ = false;
-	}
-	else
-	{
-		fontTexDirty_ = texUpdateNeeded;
+		fontTexDirty_ = true;
 	}
 }
 

@@ -84,7 +84,7 @@ private:
 
 	bool InitTexture(void);
 	bool InitCache(void);
-	void Prepare(const wchar_t* pStr, bool updateTexture);
+	void Prepare(const wchar_t* pBegin, const wchar_t* pEnd);
 	void Reload(void);
 
 	bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height);

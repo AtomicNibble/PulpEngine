@@ -132,47 +132,48 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t smoothMethod, i
 }
 
 
-int32_t XFontTexture::PreCacheString(const wchar_t* pString, int32_t* pUpdated)
+CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wchar_t* pEnd, int32_t* pUpdatedOut)
 {
-	uint16 wSlotUsage = slotUsage_++;
-	size_t length = core::strUtil::strlen(pString);
+	uint16 slotUsage = slotUsage_++;
+	size_t length = union_cast<size_t>(pEnd - pBegin);
 	int32_t updated = 0;
 
 	for (size_t i = 0; i < length; i++)
 	{
-		const wchar_t cChar = pString[i];
+		const wchar_t cChar = pBegin[i];
 
 		XTextureSlot* pSlot = GetCharSlot(cChar);
-
 		if (!pSlot)
 		{
+			// get a free slot.
 			pSlot = GetLRUSlot();
-
 			if (!pSlot) {
-				return 0;
+				X_ERROR("Font", "Failed to get free slot for char");
+				return CacheResult::ERROR;
 			}
 
-			if (!UpdateSlot(pSlot->textureSlot, wSlotUsage, cChar)) {
-				return 0;
+			if (!UpdateSlot(pSlot->textureSlot, slotUsage, cChar)) {
+				return CacheResult::ERROR;
 			}
 
 			++updated;
 		}
 		else
 		{
-			pSlot->slotUsage = wSlotUsage;
+			// update the LRU vale
+			pSlot->slotUsage = slotUsage;
 		}
 	}
 
-	if (pUpdated) {
-		*pUpdated = updated;
+	if (pUpdatedOut) {
+		*pUpdatedOut = updated;
 	}
 
-	if (updated) {
-		return 1;
+	if (updated > 0) {
+		return CacheResult::UPDATED;
 	}
 
-	return 2;
+	return CacheResult::UNCHANGED;
 }
 
 //-------------------------------------------------------------------------------------------------
