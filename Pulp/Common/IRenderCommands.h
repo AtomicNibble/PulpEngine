@@ -83,7 +83,7 @@ namespace Commands
 		static const Command::Enum CMD = Command::UPDATE_TEXTUTE_BUF_DATA;
 
 		texture::TexID textureId;
-		void* pData; // you own this, safe to clear after submitCommandPackets
+		const void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
 	};
 
@@ -92,7 +92,7 @@ namespace Commands
 		static const Command::Enum CMD = Command::UPDATE_TEXTUTE_SUB_BUF_DATA;
 
 		texture::TexID textureId;
-		void* pData; // you own this, safe to clear after submitCommandPackets
+		const void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
 		Recti rect; // the rect to update.
 	};
