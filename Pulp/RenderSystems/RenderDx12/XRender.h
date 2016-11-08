@@ -49,7 +49,7 @@ class XRender : public IRender
 {
 	static const uint32_t SWAP_CHAIN_BUFFER_COUNT = 3;
 
-	static const DXGI_FORMAT SWAP_CHAIN_FORMAT = DXGI_FORMAT_R10G10B10A2_UNORM;
+	static const DXGI_FORMAT SWAP_CHAIN_FORMAT = DXGI_FORMAT_R8G8B8A8_UNORM; //  DXGI_FORMAT_R10G10B10A2_UNORM;
 
 	typedef core::FixedArray<D3D12_INPUT_ELEMENT_DESC, 12> VertexLayoutDescArr;
 	typedef std::array<VertexLayoutDescArr, shader::VertexFormat::ENUM_COUNT> VertexFormatILArr;
