@@ -117,7 +117,7 @@ IFont* XFontSystem::NewFont(const char* pFontName)
 IFont* XFontSystem::GetFont(const char* pFontName) const
 {
 	FontMapConstItor it = fonts_.find(X_CONST_STRING(pFontName));
-	return it != fonts_.end() ? it->second : 0;
+	return it != fonts_.end() ? it->second : nullptr;
 }
 
 void XFontSystem::ListFontNames(void) const
