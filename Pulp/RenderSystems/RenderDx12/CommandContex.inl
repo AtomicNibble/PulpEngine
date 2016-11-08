@@ -273,38 +273,38 @@ X_INLINE void GraphicsContext::setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY top
 X_INLINE void GraphicsContext::setConstants(uint32_t rootIndex, uint32_t numConstants,
 	const void* pConstants)
 {
-	pCommandList_->SetComputeRoot32BitConstants(rootIndex, numConstants, pConstants, 0);
+	pCommandList_->SetGraphicsRoot32BitConstants(rootIndex, numConstants, pConstants, 0);
 }
 
 X_INLINE void GraphicsContext::setConstants(uint32_t rootIndex, Param X)
 {
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, X.uint, 0);
 }
 
 X_INLINE void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y)
 {
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, Y.uint, 1);
 }
 
 X_INLINE void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z)
 {
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, Y.uint, 1);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, Z.uint, 2);
 }
 
 X_INLINE void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W)
 {
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, W.uint, 3);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, Y.uint, 1);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, Z.uint, 2);
+	pCommandList_->SetGraphicsRoot32BitConstant(rootIndex, W.uint, 3);
 }
 
 X_INLINE void GraphicsContext::setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV)
 {
-	pCommandList_->SetComputeRootConstantBufferView(rootIndex, CBV);
+	pCommandList_->SetGraphicsRootConstantBufferView(rootIndex, CBV);
 }
 
 
