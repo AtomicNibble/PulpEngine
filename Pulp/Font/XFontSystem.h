@@ -12,6 +12,9 @@ class XFont;
 
 class XFontSystem : public IFontSys, public core::IXHotReload
 {
+	typedef core::HashMap<core::string, XFont*> FontMap;
+	typedef FontMap::iterator FontMapItor;
+	typedef FontMap::const_iterator FontMapConstItor;
 
 public:
 	XFontSystem(ICore* pCore);
@@ -34,11 +37,6 @@ public:
 
 private:
 	ICore* pCore_;
-
-	typedef core::HashMap<core::string, XFont*> FontMap;
-	typedef FontMap::iterator FontMapItor;
-	typedef FontMap::const_iterator FontMapConstItor;
-
 	FontMap fonts_;
 };
 
