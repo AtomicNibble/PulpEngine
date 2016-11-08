@@ -70,7 +70,7 @@ private:
 	bool initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData);
 
 	uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
-		uint32_t firstSubresource, uint32_t numSubresources);
+		uint32_t firstSubresource, uint32_t numSubresources) const;
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
