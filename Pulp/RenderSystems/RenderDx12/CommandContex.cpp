@@ -690,23 +690,17 @@ void GraphicsContext::setRootSignature(const RootSignature& rootSig)
 
 void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
 {
-	ID3D12PipelineState* pPipelineState = PSO.getPipelineStateObject();
-	if (pPipelineState == pCurComputePipelineState_) {
-		return;
-	}
-
-	pCommandList_->SetPipelineState(pPipelineState);
-	pCurComputePipelineState_ = pPipelineState;
+	setPipelineState(PSO.getPipelineStateObject())
 }
 
 void GraphicsContext::setPipelineState(ID3D12PipelineState* pPso)
 {
-	if (pPso == pCurComputePipelineState_) {
+	if (pPso == pCurGraphicsPipelineState_) {
 		return;
 	}
 
 	pCommandList_->SetPipelineState(pPso);
-	pCurComputePipelineState_ = pPso;
+	pCurGraphicsPipelineState_ = pPso;
 }
 
 
