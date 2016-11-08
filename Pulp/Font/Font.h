@@ -41,6 +41,8 @@ public:
 		core::FixedArray<FontPass, MAX_FONT_PASS> passes;
 	};
 
+	typedef core::Array<FontEffect> EffetsArr;
+
 public:
 	XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName);
 	~XFont();
@@ -80,7 +82,6 @@ public:
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
 private:
-//	void DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex);
 	Vec2f GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& contex);
 
 	bool InitTexture(void);
@@ -95,21 +96,18 @@ private:
 
 
 private:
-	typedef core::Array<FontEffect> Effets;
-
 	core::StackString<128> name_;
 	core::StackString<128> sourceName_;
 
 	ICore* pCore_;
 	XFontSystem* pFontSys_;
 	
-	// XFontTexture* pFontTexture_;
 	core::UniquePointer<XFontTexture> fontTexture_;
 
 	texture::ITexture* pTexture_;
 	bool fontTexDirty_;
 
-	Effets effects_;
+	EffetsArr effects_;
 };
 
 X_INLINE texture::TexID XFont::getTextureId(void) const
