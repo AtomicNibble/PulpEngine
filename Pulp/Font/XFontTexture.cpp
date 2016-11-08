@@ -27,8 +27,8 @@ heightCellCount_(0),
 
 textureSlotCount_(0),
 
-smoothMethod_(0),
-smoothAmount_(0),
+smoothMethod_(FontSmooth::NONE),
+smoothAmount_(FontSmoothAmount::NONE),
 
 slotUsage_(1), // space for gradiant.
 
@@ -61,7 +61,7 @@ int32_t XFontTexture::Release(void)
 }
 
 bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t width,
-	int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+	int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCharCount, int32_t heightCharCount)
 {
 	if (!glyphCache_.LoadFontFromMemory(pFileData, dataLength))
@@ -78,7 +78,7 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t 
 	return true;
 }
 
-bool XFontTexture::Create(int32_t width, int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCellCount, int32_t heightCellCount)
 {
 	pBuffer_ = X_NEW_ARRAY(uint8, width * height, g_fontArena, "fontTexture");
@@ -97,14 +97,8 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t smoothMethod, i
 	heightCellCount_ = heightCellCount;
 	textureSlotCount_ = widthCellCount * heightCellCount;
 
-#if 0
-	smoothMethod_ = X_FONT_SMOOTH_SUPERSAMPLE;
-	smoothAmount_ = X_FONT_SMOOTH_AMOUNT_4X;
-
-#else
 	smoothMethod_ = smoothMethod;
 	smoothAmount_ = smoothAmount;
-#endif
 
 	cellWidth_ = width / widthCellCount;
 	cellHeight_ = height / heightCellCount;

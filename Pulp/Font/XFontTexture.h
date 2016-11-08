@@ -99,11 +99,11 @@ public:
 	int32_t Release(void);
 
 	bool CreateFromMemory(uint8_t* pFileData, size_t dataSize, int32_t width,
-			int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+			int32_t height, FontSmooth::Enum  smoothMethod, FontSmoothAmount::Enum smoothAmount,
 			float sizeRatio = 0.875f, int32_t widthCharCount = 16,
 		int32_t heightCharCount = 16);
 
-	bool Create(int32_t width, int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+	bool Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 		float sizeRatio = 0.8f, int32_t widthCharCount = 16, int32_t heightCharCount = 16);
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
@@ -167,8 +167,8 @@ private:
 
 	int32_t		textureSlotCount_;
 
-	int32_t		smoothMethod_;
-	int32_t		smoothAmount_;
+	FontSmooth::Enum		smoothMethod_;
+	FontSmoothAmount::Enum	smoothAmount_;
 
 	XGlyphCache			glyphCache_;
 	XTextureSlotList	slotList_;

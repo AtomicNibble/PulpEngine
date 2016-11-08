@@ -11,7 +11,6 @@
 
 #include <Math\VertexFormats.h>
 
-#include <Util\ScopedPointer.h>
 
 
 X_NAMESPACE_BEGIN(font)
@@ -90,15 +89,7 @@ void XFont::FreeTexture()
 
 bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 {
-
-	uint32_t flags = 0;
-	const int32_t iSmoothMethod = (flags & TTFFLAG_SMOOTH_MASK) >> TTFFLAG_SMOOTH_SHIFT;
-	const int32_t iSmoothAmount = (flags & TTFFLAG_SMOOTH_AMOUNT_MASK) >> TTFFLAG_SMOOTH_AMOUNT_SHIFT;
-
-	if (!pFilePath) {
-		return false;
-	}
-
+	X_ASSERT_NOT_NULL(pFilePath);
 	X_LOG0("Font", "loading: \"%s\"", pFilePath);
 
 	core::Path<char> path;
@@ -107,23 +98,25 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 
 	FreeBuffers();
 
-	core::ScopedPointer<uint8_t[]> fileDataBuf(g_fontArena, nullptr);
+	core::Array<uint8_t> fileDataBuf(g_fontArena);
 
-	size_t len = 0;
+	size_t filesize = 0;
 
 	core::XFileScoped file;
 	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
 	{
-		len = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-		if (len > 0) {
-			fileDataBuf.reset(X_NEW_ARRAY(uint8_t,len, fileDataBuf.getArena(), "FontTTFBuffer"));
-			if (file.read(fileDataBuf.get(), len) != len) {
-
+		filesize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
+		if (filesize > 0) {
+			fileDataBuf.resize(filesize);
+			if (file.read(fileDataBuf.data(), filesize) != filesize) {
+				X_ERROR("Font", "Error reading ttf font data");
+				return false;
 			}
 		}
 	}
 
-	if (fileDataBuf.get() == nullptr || len == 0) {
+	if (fileDataBuf.isEmpty() || filesize == 0) {
+		X_ERROR("Font", "Error reading ttf font data");
 		return false;
 	}
 
@@ -131,7 +124,7 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 		pFontTexture_ = X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena);
 	}
 
-	if (!pFontTexture_->CreateFromMemory(fileDataBuf.get(), len, width, height, iSmoothMethod, iSmoothAmount)) {
+	if (!pFontTexture_->CreateFromMemory(fileDataBuf.ptr(), filesize, width, height, FontSmooth::NONE, FontSmoothAmount::NONE)) {
 		X_DELETE_AND_NULL(pFontTexture_, g_fontArena);
 		return false;
 	}
