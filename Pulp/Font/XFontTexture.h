@@ -23,8 +23,9 @@ struct FontSmooth
 	enum Enum
 	{
 		NONE,
-		BLUR,
-		SUPERSAMPLE
+		BLUR,			// Smooth by blurring it.
+		SUPERSAMPLE		// Smooth by rendering the characters into a bigger texture, and then resize it to the normal size using bilinear filtering.
+
 	};
 };
 

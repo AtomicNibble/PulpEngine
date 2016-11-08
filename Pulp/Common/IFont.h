@@ -13,18 +13,6 @@ X_NAMESPACE_DECLARE(engine, class IPrimativeContext);
 
 X_NAMESPACE_BEGIN(font)
 
-#define TTFFLAG_SMOOTH_NONE			0x00000000		// No smooth.
-#define TTFFLAG_SMOOTH_BLUR			0x00000001		// Smooth by blurring it.
-#define TTFFLAG_SMOOTH_SUPERSAMPLE	0x00000002		// Smooth by rendering the characters into a bigger texture, and then resize it to the normal size using bilinear filtering.
-
-#define TTFFLAG_SMOOTH_MASK			0x0000000f		// Mask for retrieving.
-#define TTFFLAG_SMOOTH_SHIFT		0				// Shift amount for retrieving.
-
-#define TTFLAG_SMOOTH_AMOUNT_2X		0x00010000		// Blur / supersample [2x]
-#define TTFLAG_SMOOTH_AMOUNT_4X		0x00020000		// Blur / supersample [4x]
-
-#define TTFFLAG_SMOOTH_AMOUNT_MASK	0x000f0000		// Mask for retrieving.
-#define TTFFLAG_SMOOTH_AMOUNT_SHIFT	16				// Shift amount for retrieving.
 
 
 struct IFont;
