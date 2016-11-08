@@ -179,6 +179,9 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 		return;
 	}
 
+	X_ASSERT(ctx.GetEffectId() >=0 && ctx.GetEffectId() < static_cast<int32_t>(effects_.size()), 
+		"Effect index invalid")(ctx.GetEffectId(), effects_.size());
+
 	// updates LRU cache and adds glyphs to font texture if missing.
 	// the device texture is not updated here tho.
 	Prepare(pBegin, pEnd);
@@ -188,7 +191,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 
-	const auto effecIdx = ctx.GetEffectId() < effects_.size() ? ctx.GetEffectId() : 0;
+	const auto effecIdx = ctx.GetEffectId();
 	const auto textId = pTexture_->getTexID();
 
 	FontEffect& effect = effects_[effecIdx];
