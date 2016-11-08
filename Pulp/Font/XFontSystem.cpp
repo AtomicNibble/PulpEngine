@@ -4,7 +4,6 @@
 #include "Font.h"
 #include "XFontTexture.h"
 
-
 #include <IConsole.h>
 
 X_NAMESPACE_BEGIN(font)
@@ -99,6 +98,19 @@ void XFontSystem::ShutDown(void)
 
 
 	fonts_.clear();
+}
+
+void XFontSystem::updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
+{
+	for (const auto& fontIt : fonts_)
+	{
+		auto* pFont = fontIt.second;
+
+		if (pFont->isDirty())
+		{
+			pFont->updateDirtyBuffer(bucket);
+		}
+	}
 }
 
 

@@ -8,10 +8,11 @@
 #include <ITexture.h>
 #include <IFileSys.h>
 #include <IPrimativeContext.h>
+#include <IRenderCommands.h>
 
 #include <Math\VertexFormats.h>
 
-
+#include "CmdBucket.h"
 
 X_NAMESPACE_BEGIN(font)
 
@@ -169,7 +170,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 {
 	X_UNUSED(pEnd);
 
-	if (!pTexture_ && !InitTexture()) {
+	if (!pTexture_ && !CreateDeviceTexture()) {
 		return;
 	}
 
@@ -555,6 +556,23 @@ void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float
 	maxV = pSlot->texCoord[1] + (pSlot->charHeight - 1) * invHeight;
 }
 
+void XFont::updateDirtyBuffer(render::CommandBucket<uint32_t>& bucket)
+{
+	if (!isDirty()) {
+		return;
+	}
+
+	const auto& buf = fontTexture_->GetBuffer();
+
+	// we want to submit a draw
+	render::Commands::CopyTextureBufferData* pCopyCmd = bucket.addCommand<render::Commands::CopyTextureBufferData>(0, 0);
+	pCopyCmd->textureId = pTexture_->getTexID();
+	pCopyCmd->pData = buf.data();
+	pCopyCmd->size = safe_static_cast<uint32_t>(buf.size());
+
+	fontTexDirty_ = false;
+}
+
 // =======================================================================================
 
 
@@ -731,7 +749,7 @@ void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 	}
 }
 
-bool XFont::InitTexture(void)
+bool XFont::CreateDeviceTexture(void)
 {
 	core::StackString512 name("$fontTexture_");
 	name.append(getName());

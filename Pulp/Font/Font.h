@@ -49,29 +49,28 @@ public:
 
 
 	// IFont
-	virtual void Release(void) X_OVERRIDE;
-	virtual void Free(void) X_OVERRIDE;
-	virtual void FreeBuffers(void) X_OVERRIDE;
-	virtual void FreeTexture(void) X_OVERRIDE;
+	void Release(void) X_OVERRIDE;
+	void Free(void) X_OVERRIDE;
+	void FreeBuffers(void) X_OVERRIDE;
+	void FreeTexture(void) X_OVERRIDE;
 
-	X_INLINE virtual texture::TexID getTextureId(void) const X_OVERRIDE;
+	X_INLINE texture::TexID getTextureId(void) const X_OVERRIDE;
 
+	bool loadFont(void) X_OVERRIDE;
 
-	virtual bool loadFont(void) X_OVERRIDE;
-
-	virtual void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
 		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
-	virtual void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
 		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
 
-	virtual size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
-	virtual size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
 
 	// calculate the size.
-	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	virtual Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 
-	virtual int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
+	int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
 
 	// ~IFont
 
@@ -83,10 +82,12 @@ public:
 	X_INLINE bool isTextureValid(void) const;
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
+	void updateDirtyBuffer(render::CommandBucket<uint32_t>& bucket);
+
 private:
 	Vec2f GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& contex);
 
-	bool InitTexture(void);
+	bool CreateDeviceTexture(void);
 	bool InitCache(void);
 	void Prepare(const wchar_t* pBegin, const wchar_t* pEnd);
 	void Reload(void);

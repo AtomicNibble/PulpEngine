@@ -25,6 +25,7 @@ struct IFontSys
 	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 
+	virtual void updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 
 	// Summary:
 	//	 Creates a named font (case sensitive)
