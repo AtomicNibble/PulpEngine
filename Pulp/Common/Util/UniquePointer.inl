@@ -30,6 +30,12 @@ X_INLINE const typename UniquePointerBase<T>::pointer& UniquePointerBase<T>::ptr
 
 // ---------------------------------------
 
+template<typename T>
+X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena) :
+	Mybase(arena, pointer())
+{
+	X_ASSERT_NOT_NULL(arena);
+}
 
 template<typename T>
 X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, nullptr_t) :
@@ -113,16 +119,16 @@ X_INLINE typename UniquePointer<T>::pointer UniquePointer<T>::release(void)
 {
 	// yield ownership of pointer
 	pointer pAns = get();
-	pInstance_ = pointer();
+	ptr() = pointer();
 	return pAns;
 }
 
 template<typename T>
-X_INLINE void UniquePointer<T>::reset(pointer ptr)
+X_INLINE void UniquePointer<T>::reset(pointer ptr_)
 {
 	// establish new pointer
 	pointer pOld = get();
-	pInstance_ = ptr;
+	ptr() = ptr_;
 	if (pOld != pointer()) {
 		deleter(pOld);
 	}
@@ -137,6 +143,13 @@ X_INLINE void UniquePointer<T>::swap(UniquePointer& oth)
 
 
 // ------------------------------------------------------
+
+template<typename T>
+X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena) :
+	Mybase(arena, pointer())
+{
+	X_ASSERT_NOT_NULL(arena);
+}
 
 template<typename T>
 X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena, nullptr_t) :
@@ -155,8 +168,7 @@ X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena, T* pIns
 
 template<typename T>
 X_INLINE UniquePointer<T[]>::UniquePointer(UniquePointer&& oth) :
-	pInstance_(oth.release()),
-	arena_(oth.arena_)
+	Mybase(oth.arena_, oth.release())
 {
 }
 
@@ -220,16 +232,16 @@ X_INLINE typename UniquePointer<T[]>::pointer UniquePointer<T[]>::release(void)
 {
 	// yield ownership of pointer
 	pointer pAns = get();
-	pInstance_ = pointer();
+	ptr() = pointer();
 	return pAns;
 }
 
 template<typename T>
-X_INLINE void UniquePointer<T[]>::reset(pointer ptr)
+X_INLINE void UniquePointer<T[]>::reset(pointer ptr_)
 {
 	// establish new pointer
 	pointer pOld = get();
-	pInstance_ = ptr;
+	ptr() = ptr_;
 	if (pOld != pointer()) {
 		deleter(pOld);
 	}
@@ -238,7 +250,7 @@ X_INLINE void UniquePointer<T[]>::reset(pointer ptr)
 template<typename T>
 X_INLINE void UniquePointer<T[]>::swap(UniquePointer& oth)
 {
-	std::move(pInstance_, oth.pInstance_);
+	std::move(ptr(), oth.ptr());
 	std::move(arena_, oth.arena_);
 }
 
