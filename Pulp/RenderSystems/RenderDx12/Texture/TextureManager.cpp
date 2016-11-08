@@ -200,14 +200,14 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 
-	Texture* TextureManager::getByID(TexID texId)
+	Texture* TextureManager::getByID(TexID texId) const
 	{
 	//	X_UNUSED(texId);
 	//	X_ASSERT_NOT_IMPLEMENTED();
 		return textures_.findAsset(texId);
 	}
 
-	Texture* TextureManager::getDefault(void)
+	Texture* TextureManager::getDefault(void) const
 	{
 		return pTexDefault_;
 	}

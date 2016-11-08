@@ -46,8 +46,8 @@ public:
 	Texture* forName(const char* pName, TextureFlags flags);
 	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
 
-	Texture* getByID(TexID texId);
-	Texture* getDefault(void);
+	Texture* getByID(TexID texId) const;
+	Texture* getDefault(void) const;
 
 	// must not be null.
 	void releaseTexture(texture::ITexture* pTex);
