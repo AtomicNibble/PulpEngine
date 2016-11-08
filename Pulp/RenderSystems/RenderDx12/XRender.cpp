@@ -1383,11 +1383,15 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	if (!rootSig.finalize(*pRootSigCache_,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
 		// should i just disable these for now?
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-		| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+		// seams not:
+		//		"Don't simultaneously set visible and deny flags for the same shader stages on root table entries
+		//		For current drivers the deny flags only work when D3D12_SHADER_VISIBILITY_ALL is set"
+	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
 	)) {
 		X_DELETE(pState, arena_);
+
 		return INVALID_STATE_HANLDE;
 	}
 
