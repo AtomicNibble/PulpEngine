@@ -73,8 +73,9 @@ bool ParsePassCol(xml_node<>* node, Color8u& col)
 		}
 	}
 
-	if (num == 4)
+	if (num == 4) {
 		return true;
+	}
 	X_ERROR("Font", "invalid color node required attr: r,g,b,a");
 	return false;
 }
@@ -88,20 +89,23 @@ bool ParsePassPos(xml_node<>* node, Vec2f& pos)
 
 	for (attr = node->first_attribute(); attr; attr = attr->next_attribute())
 	{
-		if (strUtil::IsEqual("x", attr->name()))
-		if (strUtil::IsNumeric(attr->value())) {
-			pos.x = strUtil::StringToFloat<float>(attr->value());
-			num++;
+		if (strUtil::IsEqual("x", attr->name())) {
+			if (strUtil::IsNumeric(attr->value())) {
+				pos.x = strUtil::StringToFloat<float>(attr->value());
+				num++;
+			}
 		}
 			
-		if (strUtil::IsEqual("y", attr->name()))
-		if (strUtil::IsNumeric(attr->value())) {
-			pos.y = strUtil::StringToFloat<float>(attr->value());
-			num++;
+		if (strUtil::IsEqual("y", attr->name())) {
+			if (strUtil::IsNumeric(attr->value())) {
+				pos.y = strUtil::StringToFloat<float>(attr->value());
+				num++;
+			}
 		}
 	}
-	if (num == 2)
+	if (num == 2) {
 		return true;
+	}
 	X_ERROR("Font", "invalid pos node required attr: x and y");
 	return false;
 }
@@ -226,8 +230,9 @@ bool XFont::loadFont()
 				xml_attribute<>* source = node->first_attribute("source");
 				if (source) 
 				{
-					if(source->value_size() < 128)
-						sourceName.append( source->value() );
+					if (source->value_size() < 128) {
+						sourceName.append(source->value());
+					}
 				}
 
 				if (!sourceName.isEmpty()) 
@@ -274,8 +279,9 @@ bool XFont::loadFont()
 		return false;
 	}
 
-	if (sourceName_ == sourceName) 
+	if (sourceName_ == sourceName) {
 		return true;
+	}
 
 	sourceName_ = sourceName;
 	if (loadTTF(sourceName.c_str(), 512, 512)) {
