@@ -2,7 +2,6 @@
 #include "TextureLoaderPSD.h"
 
 #include <Util\EndianUtil.h>
-#include <Util\ScopedPointer.h>
 #include <IFileSys.h>
 
 #include "TextureFile.h"
@@ -133,11 +132,8 @@ namespace PSD
 			type 1 (no compression).
 			*/
 			
-			int8_t* tmpData = X_NEW_ARRAY_ALIGNED(int8_t, header.width * header.height, swapArena, "PsdTmpbuf", 8);
-			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, swapArena, "PsdTmpRowbuf", 8);
-
-			core::ScopedPointer<int8_t[]> scoped_tmpData(swapArena, tmpData);
-			core::ScopedPointer<uint16_t[]> scoped_rleCount(swapArena, rleCount);
+			core::Array<int8_t> tmpData(swapArena, header.width * header.height);
+			core::Array<uint16_t> rleCount(swapArena, header.width * header.channels);
 
 			uint32_t size = 0;
 
@@ -156,22 +152,21 @@ namespace PSD
 				size += rleCount[y];
 			}
 
-			int8_t* buf = X_NEW_ARRAY_ALIGNED(int8_t, size, swapArena, "PsdTmpBuf", 8);
 
-			core::ScopedPointer<int8_t[]> scoped_buf(swapArena, buf);
+			core::Array<int8_t> buf(swapArena, size);
 
-			if (!file->read(buf, size))
+			if (!file->read(buf.ptr(), size))
 			{
 				X_ERROR("TexturePSD", "failed to read rle rows");
 				return false;
 			}
 
-			uint16_t *rcount = rleCount;
+			uint16_t *rcount = rleCount.ptr();
 
 			int8_t rh;
 			uint16_t bytesRead;
 			int8_t *dest;
-			int8_t *pBuf = buf;
+			int8_t *pBuf = buf.ptr();
 
 			// decompress packbit rle
 
@@ -236,12 +231,11 @@ namespace PSD
 
 		bool readRawImageData(core::MemoryArenaBase* swapArena, core::XFile* file, const PsdHeader& header, uint32_t* imageData)
 		{
-			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, swapArena, "PsdTempBuf", 8);
-			core::ScopedPointer<uint8_t[]> scoped_tmpData(swapArena, tmpData);
+			core::Array<uint8_t> tmpData(swapArena, header.width * header.height);
 
 			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
 			{
-				if (!file->read(tmpData, sizeof(uint8_t) * header.width * header.height))
+				if (!file->read(tmpData.ptr(), sizeof(uint8_t) * header.width * header.height))
 				{
 					X_ERROR("TexturePSD","failed to read color channel");
 					break;
