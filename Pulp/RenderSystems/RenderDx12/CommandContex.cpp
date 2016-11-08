@@ -696,7 +696,7 @@ void GraphicsContext::setRootSignature(const RootSignature& rootSig)
 
 void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
 {
-	setPipelineState(PSO.getPipelineStateObject())
+	setPipelineState(PSO.getPipelineStateObject());
 }
 
 void GraphicsContext::setPipelineState(ID3D12PipelineState* pPso)
