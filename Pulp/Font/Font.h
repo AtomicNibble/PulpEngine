@@ -7,6 +7,8 @@
 #include <Containers\FixedArray.h>
 #include <Containers\Array.h>
 
+#include <Util\UniquePointer.h>
+
 struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_BEGIN(font)
@@ -102,7 +104,8 @@ private:
 	ICore* pCore_;
 	XFontSystem* pFontSys_;
 	
-	XFontTexture* pFontTexture_;
+	// XFontTexture* pFontTexture_;
+	core::UniquePointer<XFontTexture> fontTexture_;
 
 	texture::ITexture* pTexture_;
 	bool fontTexDirty_;
@@ -122,7 +125,7 @@ X_INLINE const char* XFont::getName(void) const
 
 X_INLINE XFontTexture* XFont::getFontTexture(void) const
 { 
-	return pFontTexture_;
+	return fontTexture_.ptr();
 }
 
 X_NAMESPACE_END
