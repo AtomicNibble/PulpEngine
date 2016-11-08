@@ -12,7 +12,9 @@ namespace Commands
 		DRAW_INDEXED, 
 		COPY_CONST_BUF_DATA,
 		COPY_INDEXES_BUF_DATA,
-		COPY_VERTEX_BUF_DATA
+		COPY_VERTEX_BUF_DATA,
+		UPDATE_TEXTUTE_BUF_DATA,
+		UPDATE_TEXTUTE_SUB_BUF_DATA
 	);
 
 	struct Draw
@@ -74,6 +76,25 @@ namespace Commands
 		VertexBufferHandle vertexBuffer;
 		void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
+	};
+
+	struct CopyTextureBufferData
+	{
+		static const Command::Enum CMD = Command::UPDATE_TEXTUTE_BUF_DATA;
+
+		texture::TexID textureId;
+		void* pData; // you own this, safe to clear after submitCommandPackets
+		uint32_t size;
+	};
+
+	struct CopyTextureSubRegionBufferData
+	{
+		static const Command::Enum CMD = Command::UPDATE_TEXTUTE_SUB_BUF_DATA;
+
+		texture::TexID textureId;
+		void* pData; // you own this, safe to clear after submitCommandPackets
+		uint32_t size;
+		Recti rect; // the rect to update.
 	};
 	//~
 
