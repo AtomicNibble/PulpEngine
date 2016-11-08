@@ -28,23 +28,22 @@ public:
 	static const float FONT_SPACE_SIZE;
 	static const float FONT_GLYPH_PROP_SPACING;
 
-
-public:
-	XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName);
-	~XFont();
-
 	struct FontPass
 	{
-		FontPass() : col(255,255,255,255) { }
+		FontPass() : col(255, 255, 255, 255) { }
 		Color8u col;
 		Vec2f offset;
 	};
-	
+
 	struct FontEffect
 	{
 		core::StackString<64> name;
 		core::FixedArray<FontPass, MAX_FONT_PASS> passes;
 	};
+
+public:
+	XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName);
+	~XFont();
 
 
 	// IFont
