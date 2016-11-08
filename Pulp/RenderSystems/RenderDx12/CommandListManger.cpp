@@ -31,7 +31,7 @@ bool CommandListManger::create(ID3D12Device* pDevice)
 		!computeQueue_.create(pDevice) ||
 		!copyQueue_.create(pDevice)) 
 	{
-
+		X_ERROR("Dx12", "Failed to create required que's");
 		return false;
 	}
 
