@@ -6,7 +6,6 @@
 #include <Ilevel.h>
 
 #include <Hashing\crc32.h>
-#include <Util\ScopedPointer.h>
 
 X_USING_NAMESPACE;
 
@@ -161,6 +160,9 @@ namespace
 
 bool LvlBuilder::save(const char* name)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pCore);
+
 	core::fileModeFlags mode;
 	FileHeader hdr;
 	core::Path<char> path;
@@ -184,8 +186,6 @@ bool LvlBuilder::save(const char* name)
 
 	path.append(name);
 	path.setExtension(level::LVL_FILE_EXTENSION);
-
-	core::ScopedPointer<core::Crc32> crc(g_arena, X_NEW(core::Crc32, g_arena, "LevelFileCrc32"));
 
 
 	core::ByteStream stream(g_arena);
@@ -413,7 +413,7 @@ bool LvlBuilder::save(const char* name)
 		hdr.fourCC = LVL_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());
 		// crc the header
-		hdr.datacrc32 = crc->GetCRC32OfObject(hdr);
+		hdr.datacrc32 = gEnv->pCore->GetCrc32()->GetCRC32OfObject(hdr);
 
 		for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++)
 		{
