@@ -172,6 +172,16 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 		return;
 	}
 
+	if (effects_.isEmpty()) {
+		X_WARNING("Font", "\"%s\" has no effects.", getName());
+		return;
+	}
+
+	// updates LRU cache and adds glyphs to font texture if missing.
+	// the device texture is not updated here tho.
+	Prepare(pBegin, pEnd);
+
+
 	Vec2f size = ctx.size; // in pixel
 	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
