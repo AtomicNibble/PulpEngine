@@ -992,8 +992,10 @@ void XFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDra
 
 bool XFont::InitTexture(void)
 {
+	core::StackString512 name("$fontTexture_");
+	name.append(getName());
+
 	pTexture_ = gEnv->pRender->createTexture(
-		"$fontTexture",
 		name.c_str(),
 		fontTexture_->GetSize(),
 		texture::Texturefmt::A8,
