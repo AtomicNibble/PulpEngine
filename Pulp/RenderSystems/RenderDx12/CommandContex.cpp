@@ -175,11 +175,17 @@ uint64_t CommandContext::flush(bool waitForCompletion)
 
 	if (pCurGraphicsRootSignature_)
 	{
+		X_ASSERT(pCurComputeRootSignature_ == nullptr, "Both graphics and compute root sig set")();
+		X_ASSERT(pCurComputePipelineState_ == nullptr, "Both graphics and compute PSO set")();
+
 		pCommandList_->SetGraphicsRootSignature(pCurGraphicsRootSignature_);
 		pCommandList_->SetPipelineState(pCurGraphicsPipelineState_);
 	}
 	if (pCurComputeRootSignature_)
 	{
+		X_ASSERT(pCurGraphicsRootSignature_ == nullptr, "Both graphics and compute root sig set")();
+		X_ASSERT(pCurGraphicsPipelineState_ == nullptr, "Both graphics and compute PSO set")();
+
 		pCommandList_->SetComputeRootSignature(pCurComputeRootSignature_);
 		pCommandList_->SetPipelineState(pCurComputePipelineState_);
 	}
