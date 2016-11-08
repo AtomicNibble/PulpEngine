@@ -3,7 +3,7 @@
 X_NAMESPACE_BEGIN(font)
 
 
-X_INLINE int XGlyphCache::SetEncoding(FT_Encoding pEncoding)
+X_INLINE bool XGlyphCache::SetEncoding(FT_Encoding pEncoding)
 { 
 	return fontRenderer_.SetEncoding(pEncoding);
 }

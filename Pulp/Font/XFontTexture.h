@@ -18,27 +18,6 @@ X_NAMESPACE_BEGIN(font)
 // so if we run out of slots the slot that is LRU
 // is replaced.
 
-struct FontSmooth
-{
-	enum Enum
-	{
-		NONE,
-		BLUR,			// Smooth by blurring it.
-		SUPERSAMPLE		// Smooth by rendering the characters into a bigger texture, and then resize it to the normal size using bilinear filtering.
-
-	};
-};
-
-struct FontSmoothAmount
-{
-	enum Enum
-	{
-		NONE,
-		X2,
-		X4
-	};
-};
-
 
 X_DECLARE_ENUM(CacheResult)(
 	UPDATED,
@@ -48,16 +27,16 @@ X_DECLARE_ENUM(CacheResult)(
 
 struct XTextureSlot
 {
-	uint16		slotUsage;			// for LRU strategy, 0xffff is never released
+	uint16_t	slotUsage;			// for LRU strategy, 0xffff is never released
 	wchar_t		currentChar;		// ~0 if not used for characters
 	int32_t		textureSlot;		
 	float		texCoord[2];		// character position in the texture (not yet half texel corrected)
-	uint8		charWidth;			// size in pixel
-	uint8		charHeight;		// size in pixel
+	uint8_t		charWidth;			// size in pixel
+	uint8_t		charHeight;			// size in pixel
 	int8_t		charOffsetX;
 	int8_t		charOffsetY;
 
-	void reset(void)
+	X_INLINE void reset(void)
 	{
 		slotUsage = 0;
 		currentChar = static_cast<wchar_t>(~0);
@@ -67,12 +46,14 @@ struct XTextureSlot
 		charOffsetY = 0;
 	}
 
-	void setNotReusable(void) { // this slot can't be reused for somthing else.
+	X_INLINE void setNotReusable(void) { // this slot can't be reused for somthing else.
 		slotUsage = 0xffff;
 	}
 
 };
 
+// keep this small
+X_ENSURE_SIZE(XTextureSlot, 20);
 
 struct XCharCords
 {
@@ -86,6 +67,7 @@ class XFontTexture
 {
 	typedef core::Array<XTextureSlot*>					XTextureSlotList;
 	typedef core::Array<XTextureSlot*>::Iterator		XTextureSlotListItor;
+	typedef core::Array<uint8_t>						BufferArr;
 
 	typedef core::HashMap<uint16, XTextureSlot*>		XTextureSlotTable;
 	typedef XTextureSlotTable::iterator					XTextureSlotTableItor;
@@ -97,9 +79,9 @@ public:
 	XFontTexture(core::MemoryArenaBase* arena);
 	~XFontTexture();
 
-	int32_t Release(void);
+	void ClearBuffer(void);
 
-	bool CreateFromMemory(uint8_t* pFileData, size_t dataSize, int32_t width,
+	bool CreateFromMemory(const BufferArr& buf, int32_t width,
 			int32_t height, FontSmooth::Enum  smoothMethod, FontSmoothAmount::Enum smoothAmount,
 			float sizeRatio = 0.875f, int32_t widthCharCount = 16,
 		int32_t heightCharCount = 16);
@@ -118,7 +100,7 @@ public:
 	X_INLINE const Vec2i GetSize(void) const;
 	X_INLINE const int32_t GetWidth(void) const;
 	X_INLINE const int32_t GetHeight(void) const;
-	X_INLINE uint8* GetBuffer(void);
+	X_INLINE const BufferArr& GetBuffer(void) const;
 
 	X_INLINE float GetTextureCellWidth(void) const;
 	X_INLINE float GetTextureCellHeight(void) const;
@@ -142,9 +124,9 @@ public:
 	bool WriteToFile(const char* filename);
 
 private:
-	int32_t CreateSlotList(int32_t listSize);
-	int32_t ReleaseSlotList(void);
-	int32_t UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar);
+	bool CreateSlotList(int32_t listSize);
+	bool ReleaseSlotList(void);
+	bool UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar);
 
 private:
 	core::MemoryArenaBase* textureSlotArea_;
@@ -152,21 +134,21 @@ private:
 	int32_t width_;
 	int32_t height_;
 
-	uint8*	pBuffer_;
+	BufferArr buffer_;
 
-	float		invWidth_;
-	float		invHeight_;
+	float	invWidth_;
+	float	invHeight_;
 
-	int32_t		cellWidth_;
-	int32_t		cellHeight_;
+	int32_t	cellWidth_;
+	int32_t	cellHeight_;
 
-	float		textureCellWidth_;
-	float		textureCellHeight_;
+	float	textureCellWidth_;
+	float	textureCellHeight_;
 
-	int32_t		widthCellCount_;
-	int32_t		heightCellCount_;
+	int32_t	widthCellCount_;
+	int32_t	heightCellCount_;
 
-	int32_t		textureSlotCount_;
+	int32_t	textureSlotCount_;
 
 	FontSmooth::Enum		smoothMethod_;
 	FontSmoothAmount::Enum	smoothAmount_;
@@ -175,7 +157,7 @@ private:
 	XTextureSlotList	slotList_;
 	XTextureSlotTable	slotTable_;
 
-	uint16		slotUsage_;
+	uint16	slotUsage_;
 };
 
 

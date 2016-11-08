@@ -14,7 +14,7 @@ glyphBitmapWidth_(0),
 glyphBitmapHeight_(0),
 fSizeRatio_(0.8f),
 
-pScaleBitmap_(nullptr),
+scaleBitmap_(arena),
 
 usage_(0),
 
@@ -33,7 +33,7 @@ XGlyphCache::~XGlyphCache()
 }
 
 bool XGlyphCache::Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
-	int32_t smoothMethod, int32_t smoothAmount, float sizeRatio)
+	FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio)
 {
 	fSizeRatio_ = sizeRatio;
 
@@ -74,17 +74,11 @@ bool XGlyphCache::Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t gl
 	}
 
 	// Scaled?
-	if (scaledGlyphWidth)
+	if (scaledGlyphWidth > 0)
 	{
-		pScaleBitmap_ = X_NEW(XGlyphBitmap, arena_,"BitMap");
+		scaleBitmap_.reset(X_NEW(XGlyphBitmap, arena_,"BitMap"));
 
-		if (!pScaleBitmap_)
-		{
-			Release();
-			return false;
-		}
-
-		if (!pScaleBitmap_->Create(scaledGlyphWidth, scaledGlyphHeight))
+		if (!scaleBitmap_->Create(scaledGlyphWidth, scaledGlyphHeight))
 		{
 			Release();
 			return false;
@@ -106,12 +100,7 @@ void XGlyphCache::Release(void)
 
 	cacheTable_.clear();
 
-	if (pScaleBitmap_)
-	{
-		pScaleBitmap_->Release();
-
-		X_DELETE_AND_NULL(pScaleBitmap_, arena_);
-	}
+	scaleBitmap_.release();
 
 	glyphBitmapWidth_ = 0;
 	glyphBitmapHeight_ = 0;
@@ -123,9 +112,9 @@ void XGlyphCache::ReleaseFont(void)
 	fontRenderer_.Release();
 }
 
-bool XGlyphCache::LoadFontFromMemory(uint8_t* pFileBuffer, size_t iDataSize)
+bool XGlyphCache::LoadFontFromMemory(const BufferArr& buf)
 {
-	return fontRenderer_.LoadFromMemory(pFileBuffer, iDataSize);
+	return fontRenderer_.LoadFromMemory(buf);
 }
 
 
@@ -167,7 +156,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	}
 
 	// scaling 
-	if (pScaleBitmap_)
+	if (scaleBitmap_)
 	{
 		int32_t offsetMult = 1;
 
@@ -181,9 +170,9 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 			break;
 		}
 
-		pScaleBitmap_->Clear();
+		scaleBitmap_->Clear();
 
-		if (!fontRenderer_.GetGlyph(pScaleBitmap_, &pSlot->charWidth, &pSlot->charHeight,
+		if (!fontRenderer_.GetGlyph(scaleBitmap_.ptr(), &pSlot->charWidth, &pSlot->charHeight,
 				pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
 		{
 			// failed to render
@@ -193,11 +182,11 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		pSlot->charWidth >>= offsetMult >> 1;
 		pSlot->charHeight >>= offsetMult >> 1;
 
-		pScaleBitmap_->BlitScaledTo8(
+		scaleBitmap_->BlitScaledTo8(
 			pSlot->glyphBitmap.GetBuffer(),
 			0, 0, 
-			pScaleBitmap_->GetWidth(), 
-			pScaleBitmap_->GetHeight(),
+			scaleBitmap_->GetWidth(),
+			scaleBitmap_->GetHeight(),
 			0, 0, 
 			pSlot->glyphBitmap.GetWidth(),
 			pSlot->glyphBitmap.GetHeight(),
@@ -251,82 +240,47 @@ bool XGlyphCache::GlyphCached(wchar_t cChar)
 
 XCacheSlot* XGlyphCache::GetLRUSlot(void)
 {
-	uint32_t		minUsage = 0xffffffff;
-	XCacheSlot		*pLRUSlot = 0;
-	XCacheSlot		*pSlot;
+	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot* s1, const XCacheSlot* s2) {
+		return s1->usage < s2->usage;
+	});
 
-	XCacheSlotListItor pItor = slotList_.begin();
-
-	while (pItor != slotList_.end())
-	{
-		pSlot = *pItor;
-		if (pSlot->usage == 0)
-		{
-			return pSlot;
-		}
-		else
-		{
-			if (pSlot->usage < minUsage)
-			{
-				pLRUSlot = pSlot;
-				minUsage = pSlot->usage;
-			}
-		}
-		++pItor;
-	}
-	return pLRUSlot;
+	return *it;
 }
 
 //------------------------------------------------------------------------------------------------- 
 
 XCacheSlot* XGlyphCache::GetMRUSlot(void)
 {
-	uint32_t		maxUsage = 0;
-	XCacheSlot		*pMRUSlot = 0;
-	XCacheSlot		*pSlot;
+	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot* s1, const XCacheSlot* s2) {
+		return s1->usage < s2->usage;
+	});
 
-	XCacheSlotListItor pItor = slotList_.begin();
-
-	while (pItor != slotList_.end())
-	{
-		pSlot = *pItor;
-
-		if (pSlot->usage != 0)
-		{
-			if (pSlot->usage > maxUsage)
-			{
-				pMRUSlot = pSlot;
-				maxUsage = pSlot->usage;
-			}
-		}
-		++pItor;
-	}
-	return pMRUSlot;
+	return *it;
 }
 
 //------------------------------------------------------------------------------------------------- 
 
-bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* pWidth, int32_t* pHeight, 
+bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* pHeight,
 	int8_t& charOffsetX, int8_t& charOffsetY, wchar_t cChar)
 {
-	XCacheTable::iterator pItor = cacheTable_.find(cChar);
-
 	// glyph already chached?
+	XCacheTable::iterator pItor = cacheTable_.find(cChar);
 	if (pItor == cacheTable_.end())
 	{
 		if (!PreCacheGlyph(cChar))
 		{
+			X_ERROR("Font", "Failed to cache glyph for char: '%lc'", cChar);
 			return false;
 		}
 	}
 
 	// should be in the cache table now.
 	pItor = cacheTable_.find(cChar);
-
 	X_ASSERT_NOT_NULL(pItor->second);
 
 	pItor->second->usage = usage_++;
-	(*pGlyph) = &pItor->second->glyphBitmap;
+
+	pGlyphOut = &pItor->second->glyphBitmap;
 
 	if (pWidth) {
 		*pWidth = pItor->second->charWidth;
@@ -338,7 +292,6 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* pWidth, int32_t* pHei
 
 	charOffsetX = pItor->second->charOffsetX;
 	charOffsetY = pItor->second->charOffsetY;
-
 	return true;
 }
 
@@ -349,11 +302,6 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 	for (size_t i = 0; i < listSize; i++)
 	{
 		XCacheSlot* pCacheSlot = X_NEW(XCacheSlot, arena_, "GlyphCache");
-
-		if (!pCacheSlot) {
-			return false;
-		}
-
 		if (!pCacheSlot->glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
 		{
 			X_DELETE(pCacheSlot, arena_);

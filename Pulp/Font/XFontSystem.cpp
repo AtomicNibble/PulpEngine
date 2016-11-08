@@ -103,10 +103,12 @@ void XFontSystem::ShutDown(void)
 
 
 IFont* XFontSystem::NewFont(const char* pFontName)
-{
-	FontMapItor it = fonts_.find(X_CONST_STRING(pFontName));
-	if (it != fonts_.end()) {
-		return it->second;
+{	
+	{
+		IFont* pFont;
+		if ((pFont = GetFont(pFontName)) != nullptr) {
+			return pFont;
+		}
 	}
 
 	XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(pCore_, this, pFontName);

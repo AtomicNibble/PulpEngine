@@ -33,10 +33,9 @@ bool XFontRender::Release(void)
 	return true;
 }
 
-bool XFontRender::LoadFromMemory(BYTE* pBuffer, size_t bufferLength)
+bool XFontRender::LoadFromMemory(const BufferArr& buf)
 {
-	int err = FT_Init_FreeType(&pLibrary_);
-
+	int32_t err = FT_Init_FreeType(&pLibrary_);
 	if (err)
 	{
 		X_ERROR("Font", "failed to init freetype. Error: %i", err);
@@ -51,8 +50,8 @@ bool XFontRender::LoadFromMemory(BYTE* pBuffer, size_t bufferLength)
 
 	err = FT_New_Memory_Face(
 		pLibrary_, 
-		pBuffer, 
-		safe_static_cast<int,size_t>(bufferLength), 
+		buf.ptr(),
+		safe_static_cast<int32_t>(buf.size()),
 		0, 
 		&pFace_
 	);
@@ -96,7 +95,8 @@ void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
 bool XFontRender::SetEncoding(FT_Encoding pEncoding)
 {
-	if (FT_Select_Charmap(pFace_, pEncoding)) {
+	if (FT_Select_Charmap(pFace_, pEncoding) != 0) {
+		X_ERROR("Font", "Failed to set encode to: %i", pEncoding);
 		return false;
 	}
 
@@ -108,16 +108,16 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 	int8_t& charOffsetX, int8_t& charOffsetY, int32_t iX, int32_t iY, int32_t charCode)
 { 
 	int32_t  err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
-
 	if (err) {
+		X_ERROR("Font", "Failed to render glyp for char(" PRIi32 "): '%lc'", err, charCode);
 		return false;
 	}
 
 	pGlyph_ = pFace_->glyph;
 
 	err = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
-
 	if (err) {
+		X_ERROR("Font", "Failed to render glyp for char(" PRIi32 "): '%lc'", err, charCode);
 		return false;
 	}
 
@@ -131,7 +131,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 	charOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
 	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
-	unsigned char* pBuffer = pGlyphBitmap->GetBuffer();
+	uint8_t* pBuffer = pGlyphBitmap->GetBuffer();
 	uint32 dwGlyphWidth = pGlyphBitmap->GetWidth();
 
 	for (uint32_t i = 0; i < pGlyph_->bitmap.rows; i++)

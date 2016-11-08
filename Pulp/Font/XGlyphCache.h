@@ -3,7 +3,7 @@
 #ifndef _X_FONT_GLYPH_CACHE_H_
 #define _X_FONT_GLYPH_CACHE_H_
 
-
+#include <Util\UniquePointer.h>
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
 
@@ -18,7 +18,7 @@ giving much faster text rendering at the cost of some memory.
 struct XCacheSlot
 {
 
-	void reset(void)
+	X_INLINE void reset(void)
 	{
 		usage = 0;
 		currentChar = static_cast<wchar_t>(~0);
@@ -45,6 +45,28 @@ public:
 };
 
 
+struct FontSmooth
+{
+	enum Enum
+	{
+		NONE,
+		BLUR,			// Smooth by blurring it.
+		SUPERSAMPLE		// Smooth by rendering the characters into a bigger texture, and then resize it to the normal size using bilinear filtering.
+
+	};
+};
+
+struct FontSmoothAmount
+{
+	enum Enum
+	{
+		NONE,
+		X2,
+		X4
+	};
+};
+
+
 #ifdef WIN64
 #undef GetCharWidth
 #undef GetCharHeight
@@ -52,20 +74,21 @@ public:
 
 class XGlyphCache
 {
-	typedef core::HashMap<uint16, XCacheSlot *>			XCacheTable;
-	typedef core::Array<XCacheSlot *>					XCacheSlotList;
-	typedef core::Array<XCacheSlot *>::Iterator			XCacheSlotListItor;
+	typedef core::HashMap<uint16, XCacheSlot*>			XCacheTable;
+	typedef core::Array<XCacheSlot*>					XCacheSlotList;
+	typedef core::Array<XCacheSlot*>::Iterator			XCacheSlotListItor;
+	typedef core::Array<uint8_t>						BufferArr;
 
 
 public:
 	XGlyphCache(core::MemoryArenaBase* arena);
 	~XGlyphCache();
 
-	bool Create(int32_t iCacheSize, int32_t iGlyphBitmapWidth, int32_t iGlyphBitmapHeight,
-		int32_t iSmoothMethod, int32_t iSmoothAmount, float fSizeRatio = 0.8f);
+	bool Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
+		FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio = 0.8f);
 	void Release(void);
 
-	bool LoadFontFromMemory(uint8_t* pFileBuffer, size_t iDataSize);
+	bool LoadFontFromMemory(const BufferArr& buf);
 	void ReleaseFont(void);
 
 	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
@@ -77,11 +100,11 @@ public:
 	XCacheSlot* GetLRUSlot(void);
 	XCacheSlot* GetMRUSlot(void);
 
-	bool GetGlyph(XGlyphBitmap** pGlyph, int32_t* piWidth, int32_t* piHeight,
-		int8_t& iCharOffsetX, int8_t& iCharOffsetY, wchar_t cChar);
+	bool GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* pHeight,
+		int8_t& charOffsetX, int8_t& charOffsetY, wchar_t cChar);
 
 
-	X_INLINE int SetEncoding(FT_Encoding pEncoding);
+	X_INLINE bool SetEncoding(FT_Encoding pEncoding);
 	X_INLINE FT_Encoding GetEncoding(void) const;
 
 private:
@@ -98,7 +121,7 @@ private:
 	XCacheSlotList	slotList_;
 	XCacheTable		cacheTable_;
 
-	XGlyphBitmap*	pScaleBitmap_;
+	core::UniquePointer<XGlyphBitmap> scaleBitmap_;
 	XFontRender		fontRenderer_;
 
 	uint32_t		usage_;

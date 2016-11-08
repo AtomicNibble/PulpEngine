@@ -71,14 +71,16 @@ public:
 	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 	virtual Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 
-	virtual uint32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
+	virtual int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
 
 	// ~IFont
+
 	void GetGradientTextureCoord(float& minU, float& minV, 
 		float& maxU, float& maxV) const;
 
-
 	X_INLINE const char* getName(void) const;
+	X_INLINE bool isDirty(void) const;
+	X_INLINE bool isTextureValid(void) const;
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
 private:
@@ -118,6 +120,11 @@ X_INLINE texture::TexID XFont::getTextureId(void) const
 X_INLINE const char* XFont::getName(void) const
 { 
 	return name_.c_str();
+}
+
+X_INLINE bool XFont::isDirty(void) const
+{
+	return fontTexDirty_;
 }
 
 X_INLINE XFontTexture* XFont::getFontTexture(void) const

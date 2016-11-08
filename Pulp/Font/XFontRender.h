@@ -26,12 +26,13 @@ class XFontRender
 	// For more information, see `http://www.ceviz.net/symbol.htm'.
 	static const FT_Encoding_ ENCODING_SYMBOL = FT_ENCODING_MS_SYMBOL;
 
+	typedef core::Array<uint8_t> BufferArr;
 
 public:
 	XFontRender();
 	~XFontRender();
 
-	bool LoadFromMemory(BYTE* pBuffer, size_t bufferLength);
+	bool LoadFromMemory(const BufferArr& buf);
 	bool Release(void); 
 
 	bool GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 

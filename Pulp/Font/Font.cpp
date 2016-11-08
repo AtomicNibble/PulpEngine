@@ -72,6 +72,7 @@ void XFont::Free()
 void XFont::FreeBuffers()
 {
 	fontTexture_.release();
+	fontTexDirty_ = true;
 }
 
 void XFont::FreeTexture()
@@ -124,7 +125,7 @@ bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 		fontTexture_.reset(X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena));
 	}
 
-	if (!fontTexture_->CreateFromMemory(fileDataBuf.ptr(), filesize, width, height, FontSmooth::NONE, FontSmoothAmount::NONE)) {
+	if (!fontTexture_->CreateFromMemory(fileDataBuf, width, height, FontSmooth::NONE, FontSmoothAmount::NONE)) {
 		return false;
 	}
 
@@ -519,16 +520,22 @@ Vec2f XFont::GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex)
 	return GetTextSizeWInternal(pStr, contex);
 }
 
-uint32_t XFont::GetEffectId(const char* pEffectName) const
+int32_t XFont::GetEffectId(const char* pEffectName) const
 {
 	X_ASSERT_NOT_NULL(pEffectName);
-	Effets::ConstIterator it;
-	uint32_t idx = 0;
-	for (it = effects_.begin(); it != effects_.end(); ++it, idx++) {
-		if (it->name.isEqual(pEffectName)) {
+
+	int32_t idx = 0;
+	for (; idx < static_cast<int32_t>(effects_.size()); ++idx) {
+		if (effects_[idx].name.isEqual(pEffectName)) {
 			break;
 		}
 	}
+
+	if (idx == static_cast<int32_t>(effects_.size())) {
+		X_ERROR("Font", "Failed to find effect with name: \"%s\"", pEffectName);
+		return -1;
+	}
+
 	return idx;
 }
 
@@ -729,11 +736,13 @@ bool XFont::InitTexture(void)
 	core::StackString512 name("$fontTexture_");
 	name.append(getName());
 
+	const auto& buf = fontTexture_->GetBuffer();
+
 	pTexture_ = gEnv->pRender->createTexture(
 		name.c_str(),
 		fontTexture_->GetSize(),
 		texture::Texturefmt::A8,
-		fontTexture_->GetBuffer()
+		buf.data()
 	);
 
 	if (!pTexture_->isLoaded()) {

@@ -11,7 +11,7 @@ textureSlotArea_(arena),
 
 width_(0),
 height_(0),
-pBuffer_(nullptr),
+buffer_(arena),
 
 invWidth_(0),
 invHeight_(0),
@@ -41,14 +41,12 @@ slotTable_(arena, 8)
 
 XFontTexture::~XFontTexture()
 {
-	Release();
 }
 
 
-int32_t XFontTexture::Release(void)
+void XFontTexture::ClearBuffer(void)
 {
-	X_DELETE_ARRAY(pBuffer_, g_fontArena);
-	pBuffer_ = nullptr;
+	buffer_.clear();
 
 	width_ = 0;
 	height_ = 0;
@@ -56,17 +54,15 @@ int32_t XFontTexture::Release(void)
 	ReleaseSlotList();
 
 	glyphCache_.Release();
-
-	return 1;
 }
 
-bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t width,
+bool XFontTexture::CreateFromMemory(const BufferArr& buf, int32_t width,
 	int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCharCount, int32_t heightCharCount)
 {
-	if (!glyphCache_.LoadFontFromMemory(pFileData, dataLength))
+	if (!glyphCache_.LoadFontFromMemory(buf))
 	{
-		Release();
+		ClearBuffer();
 		return false;
 	}
 
@@ -81,12 +77,8 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t 
 bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCellCount, int32_t heightCellCount)
 {
-	pBuffer_ = X_NEW_ARRAY(uint8, width * height, g_fontArena, "fontTexture");
-	if (!pBuffer_) {
-		return false;
-	}
-
-	std::memset(pBuffer_, 0, width * height * sizeof(uint8));
+	buffer_.resize(width * height);
+	std::fill(buffer_.begin(), buffer_.end(), 0);
 	
 	width_ = width;
 	height_ = height;
@@ -106,19 +98,19 @@ bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smooth
 	textureCellWidth_ = cellWidth_ * invWidth_;
 	textureCellHeight_ = cellHeight_ * invHeight_;
 
-	
-	if (!glyphCache_.Create(FONT_GLYPH_CACHE_SIZE,
+	if (!glyphCache_.Create(
+		FONT_GLYPH_CACHE_SIZE,
 		cellWidth_, cellHeight_, 
 		smoothMethod_, smoothAmount_, 
 		sizeRatio))
 	{
-		Release();
+		ClearBuffer();
 		return false;
 	}
 
 	if (!CreateSlotList(textureSlotCount_))
 	{
-		Release();
+		ClearBuffer();
 		return false;
 	}
 
@@ -255,17 +247,13 @@ XTextureSlot* XFontTexture::GetMRUSlot(void)
 }
 
 
-int32_t XFontTexture::CreateSlotList(int32_t listSize)
+bool XFontTexture::CreateSlotList(int32_t listSize)
 {
 	int32_t y, x;
 
 	for (int32_t i = 0; i < listSize; i++)
 	{
 		XTextureSlot* pTextureSlot = X_NEW(XTextureSlot, textureSlotArea_,"fontTexSlot");
-
-		if (!pTextureSlot) {
-			return 0;
-		}
 
 		pTextureSlot->textureSlot = i;
 		pTextureSlot->reset();
@@ -280,11 +268,11 @@ int32_t XFontTexture::CreateSlotList(int32_t listSize)
 		slotList_.push_back(pTextureSlot);
 	}
 
-	return 1;
+	return true;
 }
 
 //-------------------------------------------------------------------------------------------------
-int32_t XFontTexture::ReleaseSlotList(void)
+bool XFontTexture::ReleaseSlotList(void)
 {
 	XTextureSlotListItor pItor = slotList_.begin();
 
@@ -294,20 +282,18 @@ int32_t XFontTexture::ReleaseSlotList(void)
 	}
 
 	slotList_.free();
-	return 1;
+	return true;
 }
 
 //-------------------------------------------------------------------------------------------------
-int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar)
+bool XFontTexture::UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar)
 {
 	XTextureSlot* pSlot = slotList_[slot];
-
 	if (!pSlot) {
-		return 0;
+		return false;
 	}
 
 	XTextureSlotTableItor pItor = slotTable_.find(pSlot->currentChar);
-
 	if (pItor != slotTable_.end()) {
 		slotTable_.erase(pItor);
 	}
@@ -317,32 +303,43 @@ int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar)
 	pSlot->slotUsage = slotUsage;
 	pSlot->currentChar = cChar;
 
-	int32_t iWidth = 0;
-	int32_t iHeight = 0;
 
 	// blit the char glyph into the texture
 	const int32_t x = pSlot->textureSlot % widthCellCount_;
 	const int32_t y = pSlot->textureSlot / widthCellCount_;
 
-	XGlyphBitmap *pGlyphBitmap;
+	int32_t width = 0;
+	int32_t height = 0;
 
-	if (!glyphCache_.GetGlyph(&pGlyphBitmap,
-		&iWidth, &iHeight,
+	XGlyphBitmap* pGlyphBitmap = nullptr;
+
+	if (!glyphCache_.GetGlyph(pGlyphBitmap,
+		&width, &height,
 		pSlot->charOffsetX, pSlot->charOffsetY,
-		cChar)) {
-		return 0;
+		cChar)) 
+	{
+		X_ERROR("Font", "Failed to get glyph for char: '%lc'", cChar);
+		return false;
 	}
 
-	pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(iWidth);
-	pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(iHeight);
+	X_ASSERT_NOT_NULL(pGlyphBitmap);
 
-	pGlyphBitmap->BlitTo8(pBuffer_, 
-		0, 0,
-		iWidth, iHeight, 
-		x * cellWidth_, y * cellHeight_, 
-		width_);
+	pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(width);
+	pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(height);
 
-	return 1;
+	// blit the glyp to my buffer
+	pGlyphBitmap->BlitTo8(
+		buffer_.ptr(),
+		0, // srcX
+		0, // srcY
+		width, // srcWidth
+		height,  // srcHeight
+		x * cellWidth_, // destx
+		y * cellHeight_, // desy
+		width_ // destWidth / stride
+	);
+
+	return true;
 }
 
 void XFontTexture::CreateGradientSlot(void)
@@ -360,7 +357,7 @@ void XFontTexture::CreateGradientSlot(void)
 	const int32_t x = pSlot->textureSlot % widthCellCount_;
 	const int32_t y = pSlot->textureSlot / widthCellCount_;
 
-	uint8* pBuffer = &pBuffer_[x*cellWidth_ + y*cellHeight_*height_];
+	uint8* pBuffer = &buffer_[x*cellWidth_ + y*cellHeight_*height_];
 
 	for (uint32 dwY = 0; dwY < pSlot->charHeight; ++dwY) {
 		for (uint32 dwX = 0; dwX < pSlot->charWidth; ++dwX) {
@@ -382,7 +379,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 	path.setFileName(filename);
 	path.setExtension(".bmp");
 
-	if (!pBuffer_) {
+	if (buffer_.isEmpty()) {
 		X_WARNING("Font", "Failed to write font texture, buffer is invalid.");
 		return false;
 	}
@@ -417,7 +414,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 		{
 			for (int32_t j = 0; j < width_; j++)
 			{
-				cRGB[0] = pBuffer_[(i * width_) + j];
+				cRGB[0] = buffer_[(i * width_) + j];
 				cRGB[1] = *cRGB;
 				cRGB[2] = *cRGB;
 

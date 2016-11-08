@@ -61,7 +61,7 @@ struct XTextDrawConect
 	Vec2f	size; // 8
 	Rectf	clip; // 16
 	float	widthScale; // 4
-	uint32_t effectId;
+	int32_t effectId;
 
 	DrawTextFlags flags;
 	IFont* pFont;
@@ -69,7 +69,7 @@ struct XTextDrawConect
 	XTextDrawConect() :
 		widthScale(1.f),
 		size(16.f,16.f),
-		effectId(0),
+		effectId(-1),
 		flags(0),
 		pFont(nullptr)
 	{}
@@ -80,14 +80,14 @@ struct XTextDrawConect
 	void SetColor(const Colorf& _col) { col = _col; }
 	void SetColor(const Color8u& _col) { col = _col; }
 	void SetCharWidthScale(const float scale) { widthScale = scale; }
-	void SetEffectId(uint32_t id) { effectId = id; }
+	void SetEffectId(int32_t id) { effectId = id; }
 	void SetDefaultEffect(void) { effectId = 0; }
 
 	X_INLINE float GetCharWidth(void) const { return size.x; }
 	X_INLINE float GetCharWidthScaled(void) const { return size.x * widthScale; }
 	X_INLINE float GetCharHeight(void) const { return size.y; }
 	X_INLINE float GetCharWidthScale(void) const { return widthScale; }
-	X_INLINE uint32_t GetEffectId(void) const { return effectId; }
+	X_INLINE int32_t GetEffectId(void) const { return effectId; }
 };
 
 
@@ -126,7 +126,7 @@ struct IFont
 	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
 	virtual Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_ABSTRACT;
 
-	virtual uint32_t GetEffectId(const char* pEffectName) const X_ABSTRACT;
+	virtual int32_t GetEffectId(const char* pEffectName) const X_ABSTRACT;
 
 //	virtual void GetGradientTextureCoord(float& minU, float& minV,
 //		float& maxU, float& maxV) const X_ABSTRACT;
