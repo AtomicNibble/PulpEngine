@@ -17,26 +17,23 @@ public:
 	void FreeBuffers(void) X_OVERRIDE;		// free texture buffers
 	void FreeTexture(void) X_OVERRIDE;
 
+	texture::TexID getTextureId(void) const X_OVERRIDE;
+
 	bool loadFont(void) X_OVERRIDE;
 
-	void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	void DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	void DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-
-	void DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	void DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-
+	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
+	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
 
 	size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
-	size_t GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
 
+	// calculate the size.
 	Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	Vec2f GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 
-	uint32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
-
-	void GetGradientTextureCoord(float& minU, float& minV,
-		float& maxU, float& maxV) const X_OVERRIDE;
+	int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
 };
 
 
@@ -49,6 +46,7 @@ public:
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 
+	virtual void updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_OVERRIDE;
 
 	virtual IFont* NewFont(const char* pFontName) X_OVERRIDE;
 	virtual IFont* GetFont(const char* pFontName) const X_OVERRIDE;
