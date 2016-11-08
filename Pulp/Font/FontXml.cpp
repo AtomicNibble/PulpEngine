@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Font.h"
 
-#include <Util\ScopedPointer.h>
 
 #include <IFileSys.h>
 
@@ -208,18 +207,18 @@ bool XFont::loadFont()
 	{
 		length = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
-		ScopedPointer<char[]> textbuffer(g_fontArena, X_NEW_ARRAY_ALIGNED(char, length + 1, g_fontArena, "FontXMLBuf", 4));
+		core::Array<char> textbuffer(g_fontArena, length + 1);
 
 		// add a null term baby!
 		// shake that booty.
 		// mmmmmmmmmmmm
-		textbuffer.get()[length] = '\0';
+		textbuffer[length] = '\0';
 
-		if (file.read(textbuffer.get(), length) == length)
+		if (file.read(textbuffer.ptr(), length) == length)
 		{
 			xml_document<> doc;    // character type defaults to char
 			doc.set_allocator(XmlAllocate, XmlFree);
-			doc.parse<0>(textbuffer.get());    // 0 means default parse flags
+			doc.parse<0>(textbuffer.ptr());    // 0 means default parse flags
 
 			xml_node<>* node = doc.first_node("font");
 			if (node) 
