@@ -372,7 +372,7 @@
     <ClInclude Include="Util\PointerUtil.h" />
     <ClInclude Include="Util\ReferenceCounted.h" />
     <ClInclude Include="Util\ReferenceCountedOwner.h" />
-    <ClInclude Include="Util\ScopedPointer.h" />
+    <ClInclude Include="Util\UniquePointer.h" />
     <ClInclude Include="Util\SmartPointer.h" />
     <ClInclude Include="Util\SourceInfo.h" />
     <ClInclude Include="Util\SourceInfoMacros.h" />
@@ -550,6 +550,7 @@
     <None Include="Util\ReferenceCountedOwner.inl" />
     <None Include="Util\SmartPointer.inl" />
     <None Include="Util\SourceInfo.inl" />
+    <None Include="Util\UniquePointer.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">

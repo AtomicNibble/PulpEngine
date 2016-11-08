@@ -8,7 +8,7 @@
 #include <String\StackString.h>
 
 #include <Util\SmartPointer.h>
-#include <Util\ScopedPointer.h>
+#include <Util\UniquePointer.h>
 
 X_NAMESPACE_BEGIN(script)
 
@@ -17,7 +17,7 @@ class XScriptableBase;
 
 class XScriptBinds
 {
-	typedef core::FixedArray<core::ScopedPointer<XScriptableBase>, ScriptMoudles::ENUM_COUNT> ScriptModels;
+	typedef core::FixedArray<core::UniquePointer<XScriptableBase>, ScriptMoudles::ENUM_COUNT> ScriptModels;
 
 public:
 	XScriptBinds();

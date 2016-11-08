@@ -9,7 +9,7 @@
 #include <String\Lexer.h>
 #include <String\StringHash.h>
 
-#include <Util\ScopedPointer.h>
+#include <Util\UniquePointer.h>
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -746,12 +746,11 @@ namespace shader
 
 		if (pShader)
 		{
-
 			// reload the shader file.
 			ShaderSourceFile * pShaderSource = loadShaderFile(name, true);
 			if (pShaderSource)
 			{
-				core::ScopedPointer<ShaderSourceFile> scopedDelete(&sourcePoolArena_, pShaderSource);
+				core::UniquePointer<ShaderSourceFile> scopedDelete(&sourcePoolArena_, pShaderSource);
 
 				// we don't reload the .shader if the source is the same.
 				if (pShader->sourceCrc32_ != pShaderSource->sourceCrc32_)

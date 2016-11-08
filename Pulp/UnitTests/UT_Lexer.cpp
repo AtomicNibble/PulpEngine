@@ -5,7 +5,7 @@
 #include <String\Lexer.h>
 #include <String\StrRef.h>
 
-#include <Util\ScopedPointer.h>
+#include <Util\UniquePointer.h>
 
 #include <IFileSys.h>
 
@@ -522,7 +522,7 @@ bool XMapFile::Parse(core::XFile* file)
 {
 	size_t size = safe_static_cast<size_t, uint64_t>(file->remainingBytes());
 
-	core::ScopedPointer<char[]> pData(g_arena, X_NEW_ARRAY(char, size, g_arena, "LexTextBuf"));
+	core::UniquePointer<char[]> pData(g_arena, X_NEW_ARRAY(char, size, g_arena, "LexTextBuf"));
 
 	entities.reserve(2048);
 
