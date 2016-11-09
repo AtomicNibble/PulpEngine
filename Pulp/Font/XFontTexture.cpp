@@ -191,61 +191,21 @@ XTextureSlot* XFontTexture::GetGradientSlot(void)
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetLRUSlot(void)
 {
-	uint16 wMinSlotUsage = 0xffff;
-	XTextureSlot* pLRUSlot = nullptr;
-	XTextureSlot* pSlot;
+	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot* s1, const XTextureSlot* s2) {
+		return s1->slotUsage < s2->slotUsage;
+	});
 
-	XTextureSlotListItor pItor = slotList_.begin();
-
-	while (pItor != slotList_.end())
-	{
-		pSlot = *pItor;
-
-		if (pSlot->slotUsage == 0)
-		{
-			return pSlot;
-		}
-		else
-		{
-			if (pSlot->slotUsage  < wMinSlotUsage)
-			{
-				pLRUSlot = pSlot;
-				wMinSlotUsage = pSlot->slotUsage;
-			}
-		}
-
-		pItor++;
-	}
-
-	return pLRUSlot;
+	return *it;
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetMRUSlot(void)
 {
-	uint16 wMaxSlotUsage = 0;
-	XTextureSlot *pMRUSlot = 0;
-	XTextureSlot *pSlot;
+	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot* s1, const XTextureSlot* s2) {
+		return s1->slotUsage < s2->slotUsage;
+	});
 
-	XTextureSlotListItor pItor = slotList_.begin();
-
-	while (pItor != slotList_.end())
-	{
-		pSlot = *pItor;
-
-		if (pSlot->slotUsage != 0)
-		{
-			if (pSlot->slotUsage  > wMaxSlotUsage)
-			{
-				pMRUSlot = pSlot;
-				wMaxSlotUsage = pSlot->slotUsage;
-			}
-		}
-
-		pItor++;
-	}
-
-	return pMRUSlot;
+	return *it;
 }
 
 
