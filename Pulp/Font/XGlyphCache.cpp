@@ -271,20 +271,22 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* p
 	pItor = cacheTable_.find(cChar);
 	X_ASSERT_NOT_NULL(pItor->second);
 
-	pItor->second->usage = usage_++;
+	auto* pGlyph = pItor->second;
 
-	pGlyphOut = &pItor->second->glyphBitmap;
+	pGlyph->usage = usage_++;
+
+	pGlyphOut = &pGlyph->glyphBitmap;
 
 	if (pWidth) {
-		*pWidth = pItor->second->charWidth;
+		*pWidth = pGlyph->charWidth;
 	}
 
 	if (pHeight) {
-		*pHeight = pItor->second->charHeight;
+		*pHeight = pGlyph->charHeight;
 	}
 
-	charOffsetX = pItor->second->charOffsetX;
-	charOffsetY = pItor->second->charOffsetY;
+	charOffsetX = pGlyph->charOffsetX;
+	charOffsetY = pGlyph->charOffsetY;
 	return true;
 }
 
