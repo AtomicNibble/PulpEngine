@@ -44,7 +44,7 @@ void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
 	const size_t numAllocators = threadIdToIndex_.size();
 	const size_t totalBufSize = numAllocators * threadAllocatorSize_;
 
-	pBuf_ = X_NEW_ARRAY(uint8_t, totalBufSize, arena_, "CmdPcketAllocatorBuf");
+	pBuf_ = X_NEW_ARRAY_ALIGNED(uint8_t, totalBufSize, arena_, "CmdPcketAllocatorBuf", 16);
 
 	for (size_t i = 0; i < numAllocators; i++)
 	{
