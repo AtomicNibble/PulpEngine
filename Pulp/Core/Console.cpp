@@ -1984,26 +1984,24 @@ void XConsole::DrawBuffer(void)
 			ctx.SetSize(Vec2f(12,12));
 			ctx.SetCharWidthScale(0.75f);
 
-			ConsoleBufferRItor ritor;
-			ritor = ConsoleLog_.rbegin();
 			float xPos = 8;
 			float yPos = height + 15; // 15 uints up
-			int nScroll = 0;
+			int32_t scroll = 0;
 
 			decltype(logLock_)::ScopedLock lock(logLock_);
 
-			while (ritor != ConsoleLog_.rend() && yPos >= 30) // max 30 below top(not bottom)
+
+			for(size_t i=0; i<ConsoleLog_.size() && yPos >= 30; ++i)
 			{
-				if (nScroll >= ScrollPos_)
+				if (scroll >= ScrollPos_)
 				{
-					const char* pBuf = ritor->c_str();
+					const char* pBuf = ConsoleLog_[i].c_str();
 
 					pPrimContext_->drawText(xPos, yPos, ctx, pBuf);
 					yPos -= CharHeight;
 					numDraw++;
 				}
-				nScroll++;
-				++ritor;
+				scroll++;
 			}
 		}
 
