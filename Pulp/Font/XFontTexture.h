@@ -126,7 +126,7 @@ public:
 private:
 	bool CreateSlotList(int32_t listSize);
 	bool ReleaseSlotList(void);
-	bool UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar);
+	bool UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar);
 
 private:
 	core::MemoryArenaBase* textureSlotArea_;

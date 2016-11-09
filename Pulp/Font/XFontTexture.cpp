@@ -140,7 +140,7 @@ CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wcha
 				return CacheResult::ERROR;
 			}
 
-			if (!UpdateSlot(pSlot->textureSlot, slotUsage, cChar)) {
+			if (!UpdateSlot(pSlot, slotUsage, cChar)) {
 				return CacheResult::ERROR;
 			}
 
@@ -288,13 +288,11 @@ bool XFontTexture::ReleaseSlotList(void)
 }
 
 //-------------------------------------------------------------------------------------------------
-bool XFontTexture::UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar)
+bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar)
 {
-	XTextureSlot* pSlot = slotList_[slot];
-	if (!pSlot) {
-		return false;
-	}
+	X_ASSERT_NOT_NULL(pSlot);
 
+	// remove and replace.
 	XTextureSlotTableItor pItor = slotTable_.find(pSlot->currentChar);
 	if (pItor != slotTable_.end()) {
 		slotTable_.erase(pItor);
