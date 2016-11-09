@@ -52,6 +52,10 @@ public:
 private:
 	static const char* errToStr(FT_Error err);
 
+	X_NO_COPY(XFontRender);
+	X_NO_ASSIGN(XFontRender);
+
+private:
 	FT_Library		pLibrary_;
 	FT_Face			pFace_;
 	FT_GlyphSlot	pGlyph_;
