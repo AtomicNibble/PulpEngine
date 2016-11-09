@@ -602,8 +602,6 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 		pRenderer->ScaleCoord(size);
 	}
 
-	Prepare(pStr, false);
-
 	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
 
 	if (proportinal)
