@@ -1990,7 +1990,7 @@ void XConsole::DrawBuffer(void)
 			float yPos = height + 15; // 15 uints up
 			int nScroll = 0;
 
-			core::Spinlock::ScopedLock lock(logLock_);
+			decltype(logLock_)::ScopedLock lock(logLock_);
 
 			while (ritor != ConsoleLog_.rend() && yPos >= 30) // max 30 below top(not bottom)
 			{
@@ -2528,7 +2528,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 {
 	X_UNUSED(length);
 
-	core::Spinlock::ScopedLock lock(logLock_);
+	decltype(logLock_)::ScopedLock lock(logLock_);
 
 	ConsoleLog_.emplace_back(pStr);
 
