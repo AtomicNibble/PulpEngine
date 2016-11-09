@@ -132,14 +132,7 @@ void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
 bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 {
-	XCacheTable::iterator pItor = cacheTable_.find(cChar);
-
-	// already chaced?
-	if (pItor != cacheTable_.end())
-	{
-		pItor->second->usage = usage_;
-		return true;
-	}
+	X_ASSERT(cacheTable_.find(cChar) == cacheTable_.end(), "Precache caleed when already in cache")();
 
 	// get the Least recently used Slot
 	XCacheSlot* pSlot = GetLRUSlot();
