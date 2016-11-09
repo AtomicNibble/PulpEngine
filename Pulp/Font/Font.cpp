@@ -559,7 +559,7 @@ void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float
 	maxV = pSlot->texCoord[1] + (pSlot->charHeight - 1) * invHeight;
 }
 
-void XFont::updateDirtyBuffer(render::CommandBucket<uint32_t>& bucket)
+void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
 	if (!isDirty()) {
 		return;

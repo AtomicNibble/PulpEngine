@@ -25,7 +25,7 @@ public:
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 
-	virtual void updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_OVERRIDE;
+	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_OVERRIDE;
 
 	virtual IFont* NewFont(const char* pFontName) X_OVERRIDE;
 	virtual IFont* GetFont(const char* pFontName) const X_OVERRIDE;

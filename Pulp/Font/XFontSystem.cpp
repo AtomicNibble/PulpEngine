@@ -100,7 +100,7 @@ void XFontSystem::ShutDown(void)
 	fonts_.clear();
 }
 
-void XFontSystem::updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
+void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
 {
 	for (const auto& fontIt : fonts_)
 	{
@@ -108,7 +108,7 @@ void XFontSystem::updateDirtyBuffers(render::CommandBucket<uint32_t>& bucket) co
 
 		if (pFont->isDirty())
 		{
-			pFont->updateDirtyBuffer(bucket);
+			pFont->appendDirtyBuffers(bucket);
 		}
 	}
 }

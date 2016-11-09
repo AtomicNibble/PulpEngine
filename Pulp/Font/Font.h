@@ -82,7 +82,7 @@ public:
 	X_INLINE bool isTextureValid(void) const;
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
-	void updateDirtyBuffer(render::CommandBucket<uint32_t>& bucket);
+	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);
 
 private:
 	Vec2f GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& contex);
