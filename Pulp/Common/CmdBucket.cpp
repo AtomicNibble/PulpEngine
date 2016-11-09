@@ -23,6 +23,10 @@ CmdPacketAllocator::~CmdPacketAllocator()
 			X_DELETE(allocators_[i], arena_);
 		}
 	}
+
+	if (pBuf_) {
+		X_DELETE_ARRAY(pBuf_, arena_);
+	}
 }
 
 void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
