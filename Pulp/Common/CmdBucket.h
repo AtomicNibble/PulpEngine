@@ -120,8 +120,8 @@ protected:
 	RenderTargetsArr rtvs_;
 
 	core::AtomicInt current_;
-	core::Array<CommandPacket::Packet> packets_;
-	core::Array<uint32_t> sortedIdx_;
+	PacketArr packets_;
+	SortedIdxArr sortedIdx_;
 };
 
 template <typename KeyT>
