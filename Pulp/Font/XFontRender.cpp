@@ -38,7 +38,7 @@ bool XFontRender::LoadFromMemory(const BufferArr& buf)
 	int32_t err = FT_Init_FreeType(&pLibrary_);
 	if (err)
 	{
-		X_ERROR("Font", "failed to init freetype. Error: %i", err);
+		X_ERROR("Font", "failed to init freetype. Error(%" PRIi32 "): \"%s\"", err, errToStr(err));
 		return false;
 	}
 
@@ -58,7 +58,7 @@ bool XFontRender::LoadFromMemory(const BufferArr& buf)
 
 	if (err)
 	{
-		X_ERROR("Font", "failed to create new freetype face. Error: %i", err);
+		X_ERROR("Font", "failed to create new freetype face. Error(%" PRIi32 "): \"%s\"", err, errToStr(err));
 		return false;
 	}
 
@@ -78,7 +78,7 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
 
 	if (err)
 	{
-		X_ERROR("Font", "failed to set pixel size(%i,%i). Error: %i", width, height, err);
+		X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
 	}
 }
 
@@ -95,8 +95,9 @@ void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
 bool XFontRender::SetEncoding(FT_Encoding pEncoding)
 {
-	if (FT_Select_Charmap(pFace_, pEncoding) != 0) {
-		X_ERROR("Font", "Failed to set encode to: %i", pEncoding);
+	const int32_t err = FT_Select_Charmap(pFace_, pEncoding);	
+	if(err) {
+		X_ERROR("Font", "Failed to set encode to: %i. Error(%" PRIi32 "): \"%s\"", pEncoding, err, errToStr(err));
 		return false;
 	}
 
@@ -107,9 +108,9 @@ bool XFontRender::SetEncoding(FT_Encoding pEncoding)
 bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
 	int8_t& charOffsetX, int8_t& charOffsetY, int32_t iX, int32_t iY, int32_t charCode)
 { 
-	int32_t  err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
+	int32_t err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
 	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'", err, charCode);
+		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error: \"%s\"", err, charCode, errToStr(err));
 		return false;
 	}
 
@@ -117,7 +118,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 
 	err = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
 	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'", err, charCode);
+		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error: \"%s\"", err, charCode, errToStr(err));
 		return false;
 	}
 
@@ -160,5 +161,15 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 
 
 //------------------------------------------------------------------------------------------------- 
+
+const char* XFontRender::errToStr(FT_Error err)
+{
+	#undef FTERRORS_H_
+    #define FT_ERRORDEF( e, v, s )  case e: return s;
+    #define FT_ERROR_START_LIST     switch (err) {
+    #define FT_ERROR_END_LIST       }
+    #include FT_ERRORS_H
+    return "<ukn>";
+}
 
 X_NAMESPACE_END

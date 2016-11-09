@@ -50,6 +50,8 @@ public:
 
 
 private:
+	static const char* errToStr(FT_Error err);
+
 	FT_Library		pLibrary_;
 	FT_Face			pFace_;
 	FT_GlyphSlot	pGlyph_;
