@@ -46,3 +46,56 @@ X_INLINE Spinlock::ScopedLock::~ScopedLock(void)
 {
 	spinlock_.Leave();
 }
+
+// -------------------------------------------
+
+X_INLINE SpinlockRecursive::SpinlockRecursive() :
+	locked_(0),
+	threadId_(static_cast<uint32_t>(-1)),
+	count_(0)
+{
+}
+
+X_INLINE void SpinlockRecursive::Enter(void)
+{
+	uint32_t threadId = core::Thread::GetCurrentID();
+
+	if (threadId != threadId_)
+	{
+		for (;;) {
+			if (atomic::CompareExchange(&locked_, 1, 0) == 0)
+				break;
+		}
+
+		threadId_ = threadId;
+	}
+
+	++count_;
+}
+
+X_INLINE void SpinlockRecursive::Leave(void)
+{
+	X_ASSERT(core::Thread::GetCurrentID() == threadId_, 
+		"Recursive spin lock leave called from a none owning thread")(core::Thread::GetCurrentID(), threadId_);
+
+	--count_;
+
+	if (count_ == 0) {
+		threadId_ = static_cast<uint32_t>(-1);
+		atomic::Exchange(&locked_, 0);
+	}
+}
+
+
+// -------------------------------------------
+
+X_INLINE SpinlockRecursive::ScopedLock::ScopedLock(SpinlockRecursive& spinlock) :
+	spinlock_(spinlock)
+{
+	spinlock.Enter();
+}
+
+X_INLINE SpinlockRecursive::ScopedLock::~ScopedLock(void)
+{
+	spinlock_.Leave();
+}
