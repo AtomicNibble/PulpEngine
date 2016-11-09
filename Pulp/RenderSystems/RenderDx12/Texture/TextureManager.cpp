@@ -287,10 +287,15 @@ X_NAMESPACE_BEGIN(texture)
 		
 	void TextureManager::releaseDefaultTextures(void)
 	{
-
-		releaseTexture(pTexDefault_);
-		releaseTexture(pTexDefaultBump_);
-		releaseTexture(ptexMipMapDebug_);
+		if (pTexDefault_) {
+			releaseTexture(pTexDefault_);
+		}
+		if (pTexDefaultBump_) {
+			releaseTexture(pTexDefaultBump_);
+		}
+		if (ptexMipMapDebug_) {
+			releaseTexture(ptexMipMapDebug_);
+		}
 	}
 
 	void TextureManager::releaseDanglingTextures(void)
