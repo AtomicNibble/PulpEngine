@@ -988,7 +988,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 {
 	const auto& sortedIdx = cmdBucket.getSortedIdx();
 	const auto& packets = cmdBucket.getPackets();
-	const auto& keys = cmdBucket.getKeys();
+//	const auto& keys = cmdBucket.getKeys();
 
 	const auto& viewMat = cmdBucket.getViewMatrix();
 	const auto& projMat = cmdBucket.getProjMatrix();
@@ -1062,7 +1062,6 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
 	{
-		const uint32_t key = keys[i];
 		CommandPacket::Packet pPacket = packets[sortedIdx[i]];
 
 		do
