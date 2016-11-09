@@ -102,7 +102,56 @@ CommandBucket<KeyT>::~CommandBucket()
 template <typename KeyT>
 void CommandBucket<KeyT>::sort(void)
 {
-	const int32_t current = current_;
+	// lets trim the bucket to it's actual size?
+	// first we need to find the slot with lowest offset
+	AlignedIntArr sortedSlots(threadSlotsInfo_);
+
+	std::sort(sortedSlots.begin(), sortedSlots.end(), [](const ThreadSlotInfo& lhs, const ThreadSlotInfo& rhs) {
+		return lhs.offset < rhs.offset;
+	});
+
+	int32_t total = current_;
+
+	static_assert(core::compileTime::IsPOD<KeyT>::Value, "This logic requires pod keys");
+	static_assert(core::compileTime::IsPOD<PacketArr::Type>::Value, "This logic requires pod packet values");
+
+	for (size_t i=0; i<sortedSlots.size(); i++)
+	{
+		const auto& slot = sortedSlots[i];
+		if (slot.remaining)
+		{
+			total -= slot.remaining;
+
+			// we need to move the next slots data down into this offset.
+			int32_t curEnd = slot.offset + (FETCH_SIZE - slot.remaining);
+
+			// so we search util we find a block with some items?
+			for (i++; i<sortedSlots.size(); i++)
+			{
+				const auto& nextSlot = sortedSlots[i];
+
+				if (nextSlot.offset <= slot.offset) {
+					continue;
+				}
+
+				total -= nextSlot.remaining;
+
+				// we have some to shit.
+				const int32_t numToShift = (FETCH_SIZE - nextSlot.remaining);
+				std::memcpy(&keys_[curEnd], &keys_[nextSlot.offset], numToShift * sizeof(KeyT));
+				std::memcpy(&packets_[curEnd], &packets_[nextSlot.offset], numToShift * sizeof(PacketArr::Type));
+
+#if X_DEBUG
+				std::memset(&keys_[nextSlot.offset], 0xDB, numToShift * sizeof(KeyT));
+				std::memset(&packets_[nextSlot.offset], 0xDB, numToShift * sizeof(PacketArr::Type));
+#endif // X_DEBUG
+
+				curEnd += numToShift;
+			}
+		}
+	}
+
+	keys_.resize(total);
 
 	core::Sorting::radix_sort_buf<uint32_t>(keys_.begin(), keys_.end(), sortedIdx_, arena_);
 }
