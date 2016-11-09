@@ -109,7 +109,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 { 
 	int32_t  err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
 	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(" PRIi32 "): '%lc'", err, charCode);
+		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'", err, charCode);
 		return false;
 	}
 
@@ -117,7 +117,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 
 	err = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
 	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(" PRIi32 "): '%lc'", err, charCode);
+		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'", err, charCode);
 		return false;
 	}
 
