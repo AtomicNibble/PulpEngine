@@ -1065,7 +1065,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 		const uint32_t key = keys[i];
 		CommandPacket::Packet pPacket = packets[sortedIdx[i]];
 
-		while (pPacket != nullptr)
+		do
 		{
 			const CommandPacket::Command::Enum cmdType = CommandPacket::loadCommandType(pPacket);
 			const void* pCmd = CommandPacket::loadCommand(pPacket);
@@ -1153,6 +1153,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 			pPacket = CommandPacket::loadNextCommandPacket(pPacket);
 		}
+		while (pPacket != nullptr);
 	}
 
 	// for now wait.
