@@ -2,7 +2,7 @@
 
 
 X_INLINE Spinlock::Spinlock() :
-locked_(0)
+	locked_(0)
 {
 }
 
@@ -36,8 +36,8 @@ X_INLINE void Spinlock::Leave(void)
 
 // -------------------------------------------
 
-X_INLINE Spinlock::ScopedLock::ScopedLock(Spinlock& spinlock)
-: spinlock_(spinlock)
+X_INLINE Spinlock::ScopedLock::ScopedLock(Spinlock& spinlock) :
+	spinlock_(spinlock)
 {
 	spinlock.Enter();
 }
