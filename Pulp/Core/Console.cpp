@@ -1990,7 +1990,10 @@ void XConsole::DrawBuffer(void)
 
 			decltype(logLock_)::ScopedLock lock(logLock_);
 
-			for(size_t i=0; i<ConsoleLog_.size() && yPos >= 30; ++i)
+
+			const int32_t num = safe_static_cast<int32_t>(ConsoleLog_.size());
+
+			for(int32_t i=(num - 1); i>= 0 && yPos >= 30; --i, ++scroll)
 			{
 				if (scroll >= ScrollPos_)
 				{
@@ -2000,7 +2003,6 @@ void XConsole::DrawBuffer(void)
 					yPos -= CharHeight;
 					numDraw++;
 				}
-				scroll++;
 			}
 		}
 
