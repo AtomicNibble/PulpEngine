@@ -13,7 +13,8 @@ XFontRender::XFontRender() :
 	fSizeRatio_(0.8f),
 	// fSizeRatio_(1.0f),
 	glyphBitmapWidth_(0),
-	glyphBitmapHeight_(0)
+	glyphBitmapHeight_(0),
+	fileData_(g_fontArena)
 {
 
 }
@@ -30,11 +31,15 @@ bool XFontRender::Release(void)
 	FT_Done_FreeType(pLibrary_);
 	pFace_ = nullptr;
 	pLibrary_ = nullptr;
+
+	fileData_.free();
 	return true;
 }
 
-bool XFontRender::LoadFromMemory(const BufferArr& buf)
+bool XFontRender::LoadFromMemory(BufferArr& buf)
 {
+	fileData_.swap(buf); // we need to keep this buffer in memory.
+
 	int32_t err = FT_Init_FreeType(&pLibrary_);
 	if (err)
 	{
@@ -50,8 +55,8 @@ bool XFontRender::LoadFromMemory(const BufferArr& buf)
 
 	err = FT_New_Memory_Face(
 		pLibrary_, 
-		buf.ptr(),
-		safe_static_cast<int32_t>(buf.size()),
+		fileData_.ptr(),
+		safe_static_cast<int32_t>(fileData_.size()),
 		0, 
 		&pFace_
 	);

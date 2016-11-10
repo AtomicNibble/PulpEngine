@@ -88,7 +88,7 @@ public:
 		FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio = 0.8f);
 	void Release(void);
 
-	bool LoadFontFromMemory(const BufferArr& buf);
+	bool LoadFontFromMemory(BufferArr& buf);
 	void ReleaseFont(void);
 
 	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;

@@ -81,7 +81,7 @@ public:
 
 	void ClearBuffer(void);
 
-	bool CreateFromMemory(const BufferArr& buf, int32_t width,
+	bool CreateFromMemory(BufferArr& buf, int32_t width,
 			int32_t height, FontSmooth::Enum  smoothMethod, FontSmoothAmount::Enum smoothAmount,
 			float sizeRatio = 0.875f, int32_t widthCharCount = 16,
 		int32_t heightCharCount = 16);

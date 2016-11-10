@@ -112,7 +112,7 @@ void XGlyphCache::ReleaseFont(void)
 	fontRenderer_.Release();
 }
 
-bool XGlyphCache::LoadFontFromMemory(const BufferArr& buf)
+bool XGlyphCache::LoadFontFromMemory(BufferArr& buf)
 {
 	return fontRenderer_.LoadFromMemory(buf);
 }

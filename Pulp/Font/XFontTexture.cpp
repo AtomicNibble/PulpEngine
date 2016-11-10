@@ -56,7 +56,7 @@ void XFontTexture::ClearBuffer(void)
 	glyphCache_.Release();
 }
 
-bool XFontTexture::CreateFromMemory(const BufferArr& buf, int32_t width,
+bool XFontTexture::CreateFromMemory(BufferArr& buf, int32_t width,
 	int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCharCount, int32_t heightCharCount)
 {
