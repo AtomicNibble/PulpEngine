@@ -1990,7 +1990,6 @@ void XConsole::DrawBuffer(void)
 
 			decltype(logLock_)::ScopedLock lock(logLock_);
 
-
 			for(size_t i=0; i<ConsoleLog_.size() && yPos >= 30; ++i)
 			{
 				if (scroll >= ScrollPos_)
@@ -2530,9 +2529,9 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
 	ConsoleLog_.emplace_back(pStr);
 
-	int bufferSize = console_buffer_size;
+	const int32_t bufferSize = console_buffer_size;
 
-	if (safe_static_cast<int,size_t>(ConsoleLog_.size()) > bufferSize)
+	if (safe_static_cast<int32_t,size_t>(ConsoleLog_.size()) > bufferSize)
 	{
 		ConsoleLog_.pop_front();
 
@@ -2551,9 +2550,9 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 	}
 }
 
-int XConsole::getLineCount(void) const
+int32_t XConsole::getLineCount(void) const
 {
-	return safe_static_cast<int, size_t>(ConsoleLog_.size());
+	return safe_static_cast<int32_t, size_t>(ConsoleLog_.size());
 }
 
 ///////////////////////////////////////////////////////////

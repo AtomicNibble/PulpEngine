@@ -195,7 +195,7 @@ public:
 	// ~IXHotReload
 
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
-	virtual int getLineCount(void) const X_FINAL;
+	virtual int32_t getLineCount(void) const X_FINAL;
 
 
 	X_INLINE void ShowConsole(consoleState::Enum state);
@@ -263,8 +263,8 @@ private:
 	void ResetAutoCompletion(void);
 	void DrawInputTxt(const Vec2f& start);
 
-	int autoCompleteNum_;
-	int autoCompleteIdx_;
+	int32_t autoCompleteNum_;
+	int32_t autoCompleteIdx_;
 	bool autoCompleteSelect_;
 
 	X_INLINE bool isAutocompleteVis(void);
