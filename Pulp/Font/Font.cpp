@@ -72,7 +72,7 @@ void XFont::Free()
 
 void XFont::FreeBuffers()
 {
-	fontTexture_.release();
+	fontTexture_.reset();
 	fontTexDirty_ = true;
 }
 
