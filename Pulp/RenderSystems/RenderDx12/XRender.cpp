@@ -1140,6 +1140,17 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				}
 				break;
 
+				case Commands::Command::UPDATE_TEXTUTE_BUF_DATA:
+				{
+					const Commands::CopyTextureBufferData& updateTex = *reinterpret_cast<const Commands::CopyTextureBufferData*>(pCmd);
+					
+					pTextureMan_->updateTexture(context, updateTex.textureId, static_cast<const uint8_t*>(updateTex.pData), updateTex.size);
+				}
+				break;
+
+
+
+
 				default:
 #if X_DEBUG
 					X_ASSERT_NOT_IMPLEMENTED();
