@@ -91,7 +91,14 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 		}
 	}
 
-	pRender->destoryPassState(passHandle_);
+	if (textDrawState_ != render::INVALID_STATE_HANLDE) {
+		pRender->destoryState(textDrawState_);
+	}
+
+	if (passHandle_ != render::INVALID_STATE_HANLDE) {
+		pRender->destoryPassState(passHandle_);
+	}
+
 	return true;
 }
 
