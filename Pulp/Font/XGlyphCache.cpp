@@ -233,22 +233,24 @@ bool XGlyphCache::GlyphCached(wchar_t cChar)
 
 XCacheSlot* XGlyphCache::GetLRUSlot(void)
 {
-	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot* s1, const XCacheSlot* s2) {
-		return s1->usage < s2->usage;
+	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot& s1, const XCacheSlot& s2) {
+		return s1.usage < s2.usage;
 	});
 
-	return *it;
+	auto& slot = *it;
+	return &slot;
 }
 
 //------------------------------------------------------------------------------------------------- 
 
 XCacheSlot* XGlyphCache::GetMRUSlot(void)
 {
-	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot* s1, const XCacheSlot* s2) {
-		return s1->usage < s2->usage;
+	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot& s1, const XCacheSlot& s2) {
+		return s1.usage < s2.usage;
 	});
 
-	return *it;
+	auto& slot = *it;
+	return &slot;
 }
 
 //------------------------------------------------------------------------------------------------- 
@@ -294,19 +296,18 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* p
 
 bool XGlyphCache::CreateSlotList(size_t listSize)
 {
+	slotList_.resize(listSize);
+
 	for (size_t i = 0; i < listSize; i++)
 	{
-		XCacheSlot* pCacheSlot = X_NEW(XCacheSlot, arena_, "GlyphCache");
-		if (!pCacheSlot->glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
+		XCacheSlot& slot = slotList_[i];
+		if (!slot.glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
 		{
-			X_DELETE(pCacheSlot, arena_);
 			return false;
 		}
 
-		pCacheSlot->reset();
-		pCacheSlot->cacheSlot = static_cast<uint32_t>(i);
-
-		slotList_.push_back(pCacheSlot);
+		slot.reset();
+		slot.cacheSlot = static_cast<uint32_t>(i);
 	}
 
 	return true;
@@ -316,17 +317,6 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 
 void XGlyphCache::ReleaseSlotList(void)
 {
-	XCacheSlotListItor pItor = slotList_.begin();
-
-	while (pItor != slotList_.end())
-	{
-		XCacheSlot* pSlot = (*pItor);
-		++pItor;
-
-		X_ASSERT_NOT_NULL(pSlot);
-		X_DELETE(pSlot, arena_);
-	}
-
 	slotList_.free();
 }
 

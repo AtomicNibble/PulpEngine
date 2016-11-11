@@ -75,8 +75,8 @@ struct FontSmoothAmount
 class XGlyphCache
 {
 	typedef core::HashMap<uint16, XCacheSlot*>			XCacheTable;
-	typedef core::Array<XCacheSlot*>					XCacheSlotList;
-	typedef core::Array<XCacheSlot*>::Iterator			XCacheSlotListItor;
+	typedef core::Array<XCacheSlot>						XCacheSlotList;
+	typedef XCacheSlotList::Iterator					XCacheSlotListItor;
 	typedef core::Array<uint8_t>						BufferArr;
 
 
