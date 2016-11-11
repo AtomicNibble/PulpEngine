@@ -1104,10 +1104,13 @@ void XConsole::LoadCmdHistory(void)
 		core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
 		StringRange<char> range(nullptr, nullptr);
 
+		// lets not clear, we can append and just pop off end if too many in total.
+		// CmdHistory_.clear();
+
 		while (tokenizer.ExtractToken(range))
 		{
 			if (range.GetLength() > 0) {
-				AddCmdToHistory(core::string(range.GetStart(), range.GetEnd()));
+				CmdHistory_.emplace_front(core::string(range.GetStart(), range.GetEnd()));
 			}
 		}
 
@@ -1115,6 +1118,8 @@ void XConsole::LoadCmdHistory(void)
 		while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
 			CmdHistory_.pop_back();
 		}
+
+		ResetHistoryPos();
 	}
 }
 
