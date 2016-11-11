@@ -189,6 +189,7 @@ namespace shader
 
 		freeCoreShaders();
 		freeSourcebin();
+		freeDanglingShaders();
 		freeSourceHwShaders();
 
 		return true;
@@ -276,6 +277,18 @@ namespace shader
 		releaseShader(pFont_);
 		releaseShader(pGui_);
 		
+		return true;
+	}
+
+	bool XShaderManager::freeDanglingShaders(void)
+	{
+		for (auto& shaderIt : shaders_)
+		{
+			const auto& name = shaderIt.second->getName();
+			X_WARNING("ShadersManager", "shader \"%s\" is dangling", name.c_str());
+		}
+
+		shaders_.free();
 		return true;
 	}
 
