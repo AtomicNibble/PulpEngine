@@ -72,6 +72,7 @@ namespace shader
 	private:
 		bool loadCoreShaders(void);
 		bool freeCoreShaders(void);
+		bool freeDanglingShaders(void);
 
 
 		// returns a loaded shader, null if not fnd.
