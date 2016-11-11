@@ -23,6 +23,7 @@
 #include <Debugging\CallStack.h>
 #include <Memory\VirtualMem.h>
 #include <String\HumanSize.h>
+#include <Time\StopWatch.h>
 
 #include <Console.h>
 
@@ -131,6 +132,8 @@ void XCore::ShutDown()
 {
 	X_LOG0("Core", "Shutting Down");
 	env_.state_ = SCoreGlobals::State::CLOSING;
+
+	core::StopWatch timer;
 
 #if X_DEBUG
 	hotReloadIgnores_.free();
@@ -254,6 +257,8 @@ void XCore::ShutDown()
 
 	moduleInterfaces_.free();
 	converterInterfaces_.free();
+
+	X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
 
 #if X_PLATFORM_WIN32 // && X_DEBUG
 	if (!initParams_.bTesting) { // don't pause when testing.
