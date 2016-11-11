@@ -125,7 +125,8 @@ void XModelManager::ShutDown(void)
 	for (const auto& m : models_)
 	{
 		ModelResource* pModelRes = m.second;
-		X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, pModelRes->getName(), pModelRes->getRefCount());
+		const auto& name = pModelRes->getName();
+		X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
 	}
 
 	models_.free();
