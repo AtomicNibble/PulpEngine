@@ -21,9 +21,13 @@ typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
 	core::SimpleBoundsChecking,
-	//	core::SimpleMemoryTracking,
+#if X_DEBUG
+	core::SimpleMemoryTracking,
 	//	core::ExtendedMemoryTracking,
-	core::FullMemoryTracking,
+#else
+	core::NoMemoryTracking,
+#endif
+
 	core::SimpleMemoryTagging
 > RendererArena;
 
