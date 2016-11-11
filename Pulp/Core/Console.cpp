@@ -601,7 +601,7 @@ void XConsole::unregisterInputListener(void)
 
 void XConsole::freeRenderResources(void)
 {
-
+	pRender_ = nullptr;
 }
 
 
