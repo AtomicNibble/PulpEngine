@@ -167,7 +167,7 @@ CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wcha
 //-------------------------------------------------------------------------------------------------
 wchar_t XFontTexture::GetSlotChar(int32_t slot) const
 {
-	return slotList_[slot]->currentChar;
+	return slotList_[slot].currentChar;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -185,27 +185,30 @@ XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetGradientSlot(void)
 {
-	return slotList_[0];
+	X_ASSERT(slotList_.isNotEmpty(), "slot list should be valid")();
+	return &slotList_[0];
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetLRUSlot(void)
 {
-	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot* s1, const XTextureSlot* s2) {
-		return s1->slotUsage < s2->slotUsage;
+	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
+		return s1.slotUsage < s2.slotUsage;
 	});
 
-	return *it;
+	auto& slot = *it;
+	return &slot;
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetMRUSlot(void)
 {
-	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot* s1, const XTextureSlot* s2) {
-		return s1->slotUsage < s2->slotUsage;
+	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
+		return s1.slotUsage < s2.slotUsage;
 	});
 
-	return *it;
+	auto& slot = *it;
+	return &slot;
 }
 
 
@@ -213,21 +216,20 @@ bool XFontTexture::CreateSlotList(int32_t listSize)
 {
 	int32_t y, x;
 
+	slotList_.resize(listSize);
+
 	for (int32_t i = 0; i < listSize; i++)
 	{
-		XTextureSlot* pTextureSlot = X_NEW(XTextureSlot, textureSlotArea_,"fontTexSlot");
+		XTextureSlot& slot = slotList_[i];
 
-		pTextureSlot->textureSlot = i;
-		pTextureSlot->reset();
+		slot.textureSlot = i;
+		slot.reset();
 
 		y = i / widthCellCount_;
 		x = i % widthCellCount_;
 
-		pTextureSlot->texCoord[0] = static_cast<float>((x * textureCellWidth_) + (0.5f / static_cast<float>(width_)));
-		pTextureSlot->texCoord[1] = static_cast<float>((y * textureCellHeight_) + (0.5f / static_cast<float>(height_)));
-
-		// TODO: crashes in super dynamic x64 O.o
-		slotList_.push_back(pTextureSlot);
+		slot.texCoord[0] = static_cast<float>((x * textureCellWidth_) + (0.5f / static_cast<float>(width_)));
+		slot.texCoord[1] = static_cast<float>((y * textureCellHeight_) + (0.5f / static_cast<float>(height_)));
 	}
 
 	return true;
@@ -236,13 +238,6 @@ bool XFontTexture::CreateSlotList(int32_t listSize)
 //-------------------------------------------------------------------------------------------------
 bool XFontTexture::ReleaseSlotList(void)
 {
-	XTextureSlotListItor pItor = slotList_.begin();
-
-	for (; pItor != slotList_.end(); ++pItor)
-	{
-		X_DELETE((*pItor), textureSlotArea_);
-	}
-
 	slotList_.free();
 	return true;
 }
@@ -397,8 +392,8 @@ bool XFontTexture::WriteToFile(const char* filename)
 int32_t XFontTexture::GetCharacterWidth(wchar_t cChar) const
 {
 	XTextureSlotTableItorConst pItor = slotTable_.find(cChar);
-
 	if (pItor == slotTable_.end()) {
+		X_WARNING("Font", "Failed to find char for width lookup. char: '%lc'", cChar);
 		return 0;
 	}
 

@@ -65,8 +65,8 @@ struct XCharCords
 
 class XFontTexture
 {
-	typedef core::Array<XTextureSlot*>					XTextureSlotList;
-	typedef core::Array<XTextureSlot*>::Iterator		XTextureSlotListItor;
+	typedef core::Array<XTextureSlot>					XTextureSlotList;
+	typedef XTextureSlotList::Iterator					XTextureSlotListItor;
 	typedef core::Array<uint8_t>						BufferArr;
 
 	typedef core::HashMap<uint16, XTextureSlot*>		XTextureSlotTable;
