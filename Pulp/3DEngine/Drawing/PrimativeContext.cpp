@@ -86,7 +86,7 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 {
 	for (auto& state : stateCache_)
 	{
-		if (state == render::INVALID_STATE_HANLDE) {
+		if (state != render::INVALID_STATE_HANLDE) {
 			pRender->destoryState(state);
 		}
 	}
