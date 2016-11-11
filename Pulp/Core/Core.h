@@ -230,6 +230,7 @@ private:
 private:
 	typedef core::Array<WIN_HMODULE> ModuleHandlesArr;
 	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
+	typedef core::Array<std::pair<std::shared_ptr<IConverterModule>, IConverter*>> ConverterModuleInterfacesArr;
 	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
 	// I think i can just use stack strings, since all handlers are hard coded.
 	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
@@ -251,6 +252,7 @@ private:
 
 	ModuleHandlesArr				moduleDLLHandles_;
 	ModuleInterfacesArr				moduleInterfaces_;
+	ConverterModuleInterfacesArr	converterInterfaces_;
 	ArrsetHandlersArr				assertHandlers_;
 
 	core::XProfileSys				profileSys_;

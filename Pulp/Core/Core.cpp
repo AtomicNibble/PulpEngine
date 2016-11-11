@@ -52,6 +52,7 @@ XCore::XCore() :
 	
 	moduleDLLHandles_(g_coreArena),
 	moduleInterfaces_(g_coreArena),
+	converterInterfaces_(g_coreArena),
 	assertHandlers_(g_coreArena),
 	dirWatcher_(g_coreArena),
 	hotReloadExtMap_(g_coreArena),
@@ -241,10 +242,18 @@ void XCore::ShutDown()
 
 	// shut down interfaces before logging is removed.
 	for (auto it : moduleInterfaces_) {
-		it->ShutDown();
+		if (!it->ShutDown()) {
+
+		}
+	}
+	for (auto it : converterInterfaces_) {
+		if (!it.first->ShutDown(it.second)) {
+
+		}
 	}
 
 	moduleInterfaces_.free();
+	converterInterfaces_.free();
 
 #if X_PLATFORM_WIN32 // && X_DEBUG
 	if (!initParams_.bTesting) { // don't pause when testing.

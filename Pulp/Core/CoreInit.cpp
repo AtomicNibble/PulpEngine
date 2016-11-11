@@ -168,9 +168,12 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 #endif
 
 	std::shared_ptr<IConverterModule> pModule;
+	IConverter* pConverter = nullptr;
+
 	if (PotatoCreateClassInstance(pModuleClassName, pModule))
 	{
-		if (!pModule->Initialize()) {
+		pConverter = pModule->Initialize();
+		if (!pConverter) {
 			X_ERROR("Core", "failed to initialize: %s -> %s", pDllName, pModuleClassName);
 			return false;
 		}
@@ -180,6 +183,8 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 		X_ERROR("Core", "failed to find interface: %s -> %s", pDllName, pModuleClassName);
 		return false;
 	}
+
+	converterInterfaces_.append(std::make_pair(pModule, pConverter));
 
 	return true;
 }
