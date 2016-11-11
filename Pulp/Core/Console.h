@@ -32,6 +32,7 @@ X_ENABLE_WARNING(4702)
 #include "Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h"
 
 #include <Containers\HashMap.h>
+#include <Containers\Fifo.h>
 
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 
@@ -307,7 +308,7 @@ private:
 	typedef core::HashMap<string, string> ConsoleBindMap;
 	typedef ConsoleBindMap::iterator ConsoleBindMapItor;
 
-	typedef std::deque<ExecCommand> ExecCmdList;
+	typedef core::Fifo<ExecCommand> ExecCmdList;
 
 	typedef std::deque<string> ConsoleBuffer;
 	typedef ConsoleBuffer::iterator ConsoleBufferItor;

@@ -346,7 +346,8 @@ XConsole::XConsole() :
 		VarPool::getMemoryAlignmentRequirement(VAR_ALLOCATION_ALIGNMENT),
 		VarPool::getMemoryOffsetRequirement()
 	),
-	varArena_(&varAllocator_,"VarArena")
+	varArena_(&varAllocator_,"VarArena"),
+	cmds_(g_coreArena, 64)
 {
 	HistoryPos_ = -1;
 	CursorPos_ = 0;
@@ -1641,7 +1642,7 @@ void XConsole::AddCmd(const char* pCommand, ExecSource::Enum src, bool silent)
 
 void XConsole::AddCmd(const string& command, ExecSource::Enum src, bool silent)
 {
-	cmds_.emplace_back(command, src, silent);
+	cmds_.emplace(command, src, silent);
 }
 
 void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
@@ -1872,12 +1873,12 @@ void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
 
 void XConsole::Job_runCmds(void)
 {
-	for (const auto& c : cmds_)
+	while (cmds_.isNotEmpty())
 	{
-		ExecuteStringInternal(c);
+		ExecuteStringInternal(cmds_.peek());
+		cmds_.pop();
 	}
 
-	cmds_.clear();
 }
 
 
