@@ -40,8 +40,9 @@ class XConverterLib_Img : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
+		texture::ImgLib* pImgLib = static_cast<texture::ImgLib*>(pCon);
 
-		X_DELETE_AND_NULL(pCon, gEnv->pArena);
+		X_DELETE_AND_NULL(pImgLib, g_ImgLibArena);
 		X_DELETE_AND_NULL(g_ImgLibArena, gEnv->pArena);
 		return true;
 	}
