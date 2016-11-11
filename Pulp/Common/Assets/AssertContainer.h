@@ -325,7 +325,8 @@ public:
 
 		ScopedLock lock(threadPolicy_);
 
-		hash_.erase(pRes->getName());
+		// we should earse only one asset
+		X_ASSERT(hash_.erase(pRes->getName()) == 1, "Failed to erase asset correct")();
 
 		Pool::free(pRes);
 
