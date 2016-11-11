@@ -457,7 +457,7 @@ bool XModel::LoadModel(const char* name)
 
 	path.removeExtension();
 
-	name_ = path.fileName();
+	name_ = name;
 
 	return LoadModel(file.GetFile());
 }
