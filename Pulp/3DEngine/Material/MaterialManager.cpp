@@ -218,6 +218,7 @@ XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(co
 	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
 
 	auto pMatRes = materials_.createAsset(name);
+	pMatRes->setName(name);
 
 	return pMatRes;
 }
