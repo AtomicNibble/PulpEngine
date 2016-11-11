@@ -3,6 +3,9 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
+    <PropertyGroup>
+    <_PropertySheetDisplayName>Engine Link DebugHelp</_PropertySheetDisplayName>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile />
     <Link>
