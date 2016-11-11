@@ -221,7 +221,7 @@ void X3DEngine::OnFrameBegin(void)
 
 		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 256);
 		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems, cam, viewPort);
+		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems + 512, cam, viewPort);
 
 #if 0
 		const auto* pShader = pRender_->getShader("AuxGeom");
@@ -253,6 +253,8 @@ void X3DEngine::OnFrameBegin(void)
 #endif
 		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
+		gEnv->pFontSys->appendDirtyBuffers(primBucket);
+
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 		{
 			auto& context = primContexts_[i];
@@ -280,7 +282,7 @@ void X3DEngine::OnFrameBegin(void)
 
 			//	desc.topo = curFlags.getPrimType();
 			//	stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
-
+#if 0
 				for (size_t x = 0; x < elems.size(); x++)
 				{
 					const auto& elem = elems[x];
@@ -301,6 +303,57 @@ void X3DEngine::OnFrameBegin(void)
 					pDraw->textures[render::TextureSlot::DIFFUSE].sampler.repeat = render::TexRepeat::NO_TILE;
 
 				}
+#else
+				struct JobData
+				{
+					const PrimativeContext::PushBufferEntry* pElem;
+					render::CommandBucket<uint32_t>* pPrimBucket;
+					render::VertexBufferHandle vertexBuf;
+					uint32_t hash;
+				};
+
+				auto* pRootJob = gEnv->pJobSys->CreateJob(core::V2::JobSystem::EmptyJob, nullptr);
+	
+
+				for (size_t x = 0; x < elems.size(); x++)
+				{
+					JobData data;
+					data.pElem = &elems[x];
+					data.pPrimBucket = &primBucket;
+					data.vertexBuf = vertexBuf;
+					data.hash = static_cast<uint32_t>(x);
+
+					auto* pJob = gEnv->pJobSys->CreateJobAsChild(pRootJob, [](core::V2::JobSystem&, size_t, core::V2::Job*, void* pData_) {
+						
+						const JobData* pData = reinterpret_cast<const JobData*>(pData_);
+
+						const auto& elem = *pData->pElem;
+						const auto flags = elem.flags;
+						const auto textureId = flags.getTextureId();
+
+						render::Commands::Draw* pDraw = pData->pPrimBucket->addCommand<render::Commands::Draw>(pData->hash, 0);
+						pDraw->startVertex = elem.vertexOffs;
+						pDraw->vertexCount = elem.numVertices;
+						pDraw->stateHandle = elem.stateHandle;
+						core::zero_object(pDraw->vertexBuffers);
+						pDraw->vertexBuffers[VertexStream::VERT] = pData->vertexBuf;
+
+						core::zero_object(pDraw->textures);
+						pDraw->textures[render::TextureSlot::DIFFUSE].textureId = textureId;
+						pDraw->textures[render::TextureSlot::DIFFUSE].sampler.filter = render::FilterType::LINEAR_MIP_NONE;
+						pDraw->textures[render::TextureSlot::DIFFUSE].sampler.repeat = render::TexRepeat::NO_TILE;
+
+					
+					}, data);
+
+					gEnv->pJobSys->Run(pJob);
+				}
+
+				gEnv->pJobSys->Run(pRootJob);
+				gEnv->pJobSys->Wait(pRootJob);
+#endif
+
+
 #else
 
 				const auto& front = elems.front();
