@@ -2543,11 +2543,17 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 	{
 		ConsoleLog_.pop_front();
 
-		size_t noneScroll = MaxVisibleLogLines();
+		// too handle the case we log after render has been shutdown or not init.
+		// really the MaxVisibleLogLines should be updated to not use render interface 
+		// and just listen for core events to get size.
+		if (pRender_)
+		{
+			size_t noneScroll = MaxVisibleLogLines();
 
-		// move scroll wheel with the moving items?
-		if (ScrollPos_ > 0 && ScrollPos_ < safe_static_cast<int32_t,size_t>(ConsoleLog_.size() - noneScroll)) {
-			ScrollPos_++;
+			// move scroll wheel with the moving items?
+			if (ScrollPos_ > 0 && ScrollPos_ < safe_static_cast<int32_t, size_t>(ConsoleLog_.size() - noneScroll)) {
+				ScrollPos_++;
+			}
 		}
 	}
 	else
