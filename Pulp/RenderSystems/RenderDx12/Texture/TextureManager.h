@@ -13,6 +13,7 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_DECLARE(render,
 	class ContextManager;
+	class CommandContext;
 	class CommandListManger;
 	class DescriptorAllocator;
 	class GpuResource;
@@ -52,6 +53,8 @@ public:
 	// must not be null.
 	void releaseTexture(texture::ITexture* pTex);
 	void releaseTexture(Texture* pTex);
+
+	bool updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const;
 
 private:
 	TexRes* findTexture(const char* pName);

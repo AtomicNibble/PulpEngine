@@ -231,6 +231,62 @@ X_NAMESPACE_BEGIN(texture)
 		}
 	}
 
+	bool TextureManager::updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const
+	{
+		Texture* pTex = getByID(texId);
+		auto& dest = pTex->getGpuResource();
+
+		const size_t rowBytes = Util::rowBytes(pTex->getWidth(), 1, pTex->getFormat());
+
+		D3D12_SUBRESOURCE_DATA texResource;
+		texResource.pData = pSrc;
+		texResource.RowPitch = rowBytes;
+		texResource.SlicePitch = texResource.RowPitch * pTex->getHeight();
+		
+		const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, 1);
+
+		D3D12_HEAP_PROPERTIES heapProps;
+		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProps.CreationNodeMask = 1;
+		heapProps.VisibleNodeMask = 1;
+
+		D3D12_RESOURCE_DESC bufferDesc;
+		bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		bufferDesc.Alignment = 0;
+		bufferDesc.Width = uploadBufSize;
+		bufferDesc.Height = 1;
+		bufferDesc.DepthOrArraySize = 1;
+		bufferDesc.MipLevels = 1;
+		bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+		bufferDesc.SampleDesc.Count = 1;
+		bufferDesc.SampleDesc.Quality = 0;
+		bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* pUploadBuffer;
+
+		HRESULT hr = pDevice_->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
+			&bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&pUploadBuffer));
+
+		if (FAILED(hr))
+		{
+			// if we fail we can handle it by just showing default texture, without much trouble.
+			X_ERROR("Texture", "Failed to create commited resource for uploading. res: %" PRIu32, hr);
+			return false;
+		}
+
+		contex.transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
+		contex.updateSubresources<1>(dest, pUploadBuffer, 0, 0, 1, &texResource);
+		contex.transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
+
+		// we have to keep this..
+	//	pUploadBuffer->Release();
+
+		return true;
+	}
+
 	TextureManager::TexRes* TextureManager::findTexture(const char* pName)
 	{
 		core::string name(pName);
