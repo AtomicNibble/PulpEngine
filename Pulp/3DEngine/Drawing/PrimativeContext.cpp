@@ -17,6 +17,7 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	vertexArr_.reserve(256);
 
 	passHandle_ = render::INVALID_STATE_HANLDE;
+	textDrawState_ = render::INVALID_STATE_HANLDE;
 	for (auto& h : stateCache_)
 	{
 		h = render::INVALID_STATE_HANLDE;
@@ -98,6 +99,15 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 	if (passHandle_ != render::INVALID_STATE_HANLDE) {
 		pRender->destoryPassState(passHandle_);
 	}
+
+#if X_DEBUG
+	passHandle_ = render::INVALID_STATE_HANLDE;
+	textDrawState_ = render::INVALID_STATE_HANLDE;
+	for (auto& h : stateCache_)
+	{
+		h = render::INVALID_STATE_HANLDE;
+	}
+#endif // X_DEBUG
 
 	return true;
 }
