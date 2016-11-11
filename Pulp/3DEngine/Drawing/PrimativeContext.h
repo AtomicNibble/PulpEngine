@@ -93,6 +93,9 @@ private:
 	render::PassStateHandle passHandle_;
 	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
 	render::StateHandle textDrawState_;
+
+	render::shader::IShader* pAuxShader_;
+	render::shader::IShader* pTextShader_;
 };
 
 

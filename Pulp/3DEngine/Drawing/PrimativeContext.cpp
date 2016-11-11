@@ -10,7 +10,9 @@ X_NAMESPACE_BEGIN(engine)
 
 PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pushBufferArr_(arena),
-	vertexArr_(arena)
+	vertexArr_(arena),
+	pAuxShader_(nullptr),
+	pTextShader_(nullptr)
 {
 	pushBufferArr_.reserve(64);
 	vertexArr_.getAllocator().setBaseAlignment(16); // for simd.
@@ -45,8 +47,8 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 	desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
 
 
-	const auto* pShader = pRender->getShader("AuxGeom");
-	const auto* pTech = pShader->getTech("AuxGeometry");
+	pAuxShader_ = pRender->getShader("AuxGeom");
+	const auto* pTech = pAuxShader_->getTech("AuxGeometry");
 
 	auto renderTarget = pRender->getCurBackBuffer();
 
@@ -68,8 +70,8 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		}
 	}
 
-	const auto* pTextShader = pRender->getShader("Font");
-	const auto* pTextTech = pTextShader->getTech("Font");
+	pTextShader_ = pRender->getShader("Font");
+	const auto* pTextTech = pTextShader_->getTech("Font");
 
 	// this root sig needs to have one text handler.
 	// how to handle the problem of diffrent shaders having diffrent texture slot requirements.
@@ -109,6 +111,12 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 	}
 #endif // X_DEBUG
 
+	if (pAuxShader_) {
+		pRender->releaseShader(pAuxShader_);
+	}
+	if (pTextShader_) {
+		pRender->releaseShader(pTextShader_);
+	}
 	return true;
 }
 
