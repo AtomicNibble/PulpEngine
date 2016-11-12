@@ -65,7 +65,8 @@ public:
 
 private:
 
-	static const uint32_t NUMVERTS_PER_PAGE = 1024 * 32;
+	static const uint32_t NUMVERTS_PER_PAGE = 0xaaa * 16;
+	static const uint32_t PAGE_BYTES = NUMVERTS_PER_PAGE * sizeof(PrimVertex);
 
 
 public:
