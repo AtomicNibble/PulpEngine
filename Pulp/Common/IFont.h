@@ -120,12 +120,12 @@ struct IFont
 		const Vec3f& pos, const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 
 
-	virtual size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_ABSTRACT;
-	virtual size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_ABSTRACT;
+	virtual size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_ABSTRACT;
+	virtual size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_ABSTRACT;
 
 	// calculate the size.
-	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
-	virtual Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_ABSTRACT;
+	virtual Vec2f GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex) X_ABSTRACT;
+	virtual Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex) X_ABSTRACT;
 
 	virtual int32_t GetEffectId(const char* pEffectName) const X_ABSTRACT;
 

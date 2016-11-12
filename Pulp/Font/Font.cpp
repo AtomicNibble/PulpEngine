@@ -223,7 +223,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 
 		if (drawFrame && passIdx == 0)
 		{
-			const Vec2f textSize = GetTextSizeWInternal(pBegin, ctx);
+			const Vec2f textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
 
 			const Color8u frameColor(7, 7, 7, 80); //dark grey, 65% opacity
 
@@ -410,23 +410,23 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 }
 
 
-size_t XFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
+size_t XFont::GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const
 {
 	size_t size = 0;
 
 	// parse the string, ignoring control characters
-	const char* pChar = pStr;
-	while (char ch = *pChar++)
+	const char* pCur = pBegin;
+	while (pCur < pEnd)
 	{
-		switch (ch)
+		switch (*pCur++)
 		{
 			case '\\':
 			{
-				if (*pChar != 'n' || !asciiMultiLine)
+				if (*pCur != 'n' || !asciiMultiLine)
 				{
 					break;
 				}
-				++pChar;
+				++pCur;
 			}
 			case '\n':
 			case '\r':
@@ -437,13 +437,13 @@ size_t XFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
 			break;
 			case '^':
 			{
-				if (*pChar == '^')
+				if (*pCur == '^')
 				{
-					++pChar;
+					++pCur;
 				}
-				else if (*pChar)
+				else if (*pCur)
 				{
-					++pChar;
+					++pCur;
 					continue;
 				}
 			}
@@ -457,23 +457,23 @@ size_t XFont::GetTextLength(const char* pStr, const bool asciiMultiLine) const
 	return size;
 }
 
-size_t XFont::GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const
+size_t XFont::GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const
 {
 	size_t size = 0;
 
 	// parse the string, ignoring control characters
-	const wchar_t* pChar = pStr;
-	while (wchar_t ch = *pChar++)
+	const wchar_t* pCur = pBegin;
+	while (pCur < pEnd)
 	{
-		switch (ch)
+		switch (*pCur++)
 		{
 			case L'\\':
 			{
-				if (*pChar != L'n' || !asciiMultiLine)
+				if (*pCur != L'n' || !asciiMultiLine)
 				{
 					break;
 				}
-				++pChar;
+				++pCur;
 			}
 			case L'\n':
 			case L'\r':
@@ -484,13 +484,13 @@ size_t XFont::GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) cons
 			break;
 			case L'$':
 			{
-				if (*pChar == L'$')
+				if (*pCur == L'$')
 				{
-					++pChar;
+					++pCur;
 				}
-				else if (*pChar)
+				else if (*pCur)
 				{
-					++pChar;
+					++pCur;
 					continue;
 				}
 			}
@@ -498,6 +498,7 @@ size_t XFont::GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) cons
 			default:
 				break;
 		}
+
 		++size;
 	}
 
@@ -506,22 +507,18 @@ size_t XFont::GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) cons
 
 
 // calculate the size.
-Vec2f XFont::GetTextSize(const char* pStr, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex)
 {
-	if (!pStr) {
-		return Vec2f::zero();
-	}
-
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
-	ByteToWide(pStr, strW, MAX_TXT_SIZE);
+	const size_t len = ByteToWide(pBegin, pEnd, strW, MAX_TXT_SIZE);
 
-	return GetTextSizeWInternal(strW, contex);
+	return GetTextSizeWInternal(strW, strW + len, contex);
 }
 
-Vec2f XFont::GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex)
 {
-	return GetTextSizeWInternal(pStr, contex);
+	return GetTextSizeWInternal(pBegin, pEnd, contex);
 }
 
 int32_t XFont::GetEffectId(const char* pEffectName) const
@@ -579,13 +576,9 @@ void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 // =======================================================================================
 
 
-Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ctx)
+Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& ctx)
 {
 	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
-
-	if (!pStr) {
-		return Vec2f::zero();
-	}
 
 	render::IRender* pRenderer = gEnv->pRender;
 
@@ -624,22 +617,25 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 	}
 
 	// parse the string, ignoring control characters
-	wchar_t* pChar = (wchar_t*)pStr;
-	while (wchar_t ch = *pChar++)
+	const wchar_t* pCur = pBegin;
+	while (pCur < pEnd)
 	{
+		const wchar_t ch = *pCur++;
 		switch (ch)
 		{
 			case L'\\':
 			{
-				if (*pChar != L'n')
+				if (*pCur != L'n') {
 					break;
+				}
 
-				++pChar;
+				++pCur;
 			}
 			case L'\n':
 			{
-				if (charX > maxW)
+				if (charX > maxW) {
 					maxW = charX;
+				}
 
 				charX = 0;
 				charY += size.y;
@@ -679,11 +675,12 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& ct
 				break;
 			case L'^':
 			{
-				if (*pChar == L'^')
-					++pChar;
-				 else if (*pChar)
+				if (*pCur == L'^') {
+					++pCur;
+				}
+				else if (*pCur)
 				{
-					++pChar;
+					++pCur;
 					continue;
 				}
 			}
@@ -773,14 +770,21 @@ bool XFont::CreateDeviceTexture(void)
 }
 
 
-void XFont::ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen)
+size_t XFont::ByteToWide(const char* pBegin, const char* pEnd, wchar_t* pOut, size_t bufLen)
 {
-	const size_t len = core::Min<size_t>(buflen, strlen(pStr));
-
-	for (size_t i = 0; i < len; ++i) {
-		pOut[i] = static_cast<uint8_t>(pStr[i]);
+	size_t len = union_cast<size_t>(pEnd - pBegin);
+	if (len > bufLen - 1) {
+		X_ERROR("Font", "Wide conversion buffer overflow, clipping buffer. in: %" PRIuS " out: %" PRIuS, len, bufLen);
+		len = bufLen - 1;
 	}
+
+	while (pBegin < pEnd)
+	{
+		*pOut++ = static_cast<uint8_t>(*pBegin++);
+	}
+
 	pOut[len] = 0;
+	return len;
 }
 
 X_NAMESPACE_END

@@ -63,12 +63,12 @@ public:
 	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
 		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
 
-	size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
-	size_t GetTextLength(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_OVERRIDE;
 
 	// calculate the size.
-	Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
-	Vec2f GetTextSize(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex) X_OVERRIDE;
 
 	int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
 
@@ -85,7 +85,7 @@ public:
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);
 
 private:
-	Vec2f GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& contex);
+	Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex);
 
 	bool CreateDeviceTexture(void);
 	bool InitCache(void);
@@ -95,7 +95,7 @@ private:
 	bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height);
 
 private:
-	static void ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen);
+	static size_t ByteToWide(const char* pBegin, const char* pEnd, wchar_t* pOut, const size_t buflen);
 
 
 private:
