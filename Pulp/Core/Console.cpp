@@ -2506,7 +2506,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			core::string::const_str space = InputBuffer_.find(' ');
 			if (space)
 			{
-				core::StackString<64> temp(InputBuffer_.begin(), space);
+				core::StackString<128> temp(InputBuffer_.begin(), space);
 
 				// preserve any colors.
 				core::StackString<128> temp2;
