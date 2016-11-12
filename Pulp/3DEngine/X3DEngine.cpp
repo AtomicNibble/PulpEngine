@@ -262,18 +262,14 @@ void X3DEngine::OnFrameBegin(void)
 			{
 				const auto& elems = context.getUnsortedBuffer();
 				const auto& verts = context.getVerts();
+				const auto vertexBuf = context.getVertBufHandle();
 
 
-				// need a vb.
-				render::VertexBufferHandle vertexBuf = pRender_->createVertexBuffer(
-					sizeof(IPrimativeContext::PrimVertex),
-					safe_static_cast<uint32_t>(verts.size()),
-					verts.data(),
-					render::BufUsage::DYNAMIC,
-					render::CpuAccess::WRITE
-				);
+				auto* pUpdateVb = primBucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
+				pUpdateVb->pData = verts.data();
+				pUpdateVb->size = context.getVertBufBytes(); 
+				pUpdateVb->vertexBuffer = vertexBuf;
 
-//				render::StateHandle stateHandle = 0;
 
 #if 1
 				const auto& front = elems.front();
@@ -290,7 +286,7 @@ void X3DEngine::OnFrameBegin(void)
 
 					const auto textureId = flags.getTextureId();
 
-					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x), 0);
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x + 10), 0);
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
 					pDraw->stateHandle = elem.stateHandle; 
@@ -321,7 +317,7 @@ void X3DEngine::OnFrameBegin(void)
 					data.pElem = &elems[x];
 					data.pPrimBucket = &primBucket;
 					data.vertexBuf = vertexBuf;
-					data.hash = static_cast<uint32_t>(x);
+					data.hash = static_cast<uint32_t>(x) + 10;
 
 					auto* pJob = gEnv->pJobSys->CreateJobAsChild(pRootJob, [](core::V2::JobSystem&, size_t, core::V2::Job*, void* pData_) {
 						
@@ -401,6 +397,7 @@ void X3DEngine::OnFrameBegin(void)
 		primBucket.sort();
 
 		pRender_->submitCommandPackets(primBucket);
+
 	}
 
 	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
