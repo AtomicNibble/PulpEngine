@@ -204,6 +204,13 @@ void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& c
 	ctx.pFont->DrawString(this, textDrawState_, pos, ctx, pBegin, pEnd);
 }
 
+void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
+{
+	X_ASSERT_NOT_NULL(ctx.pFont);
+
+	ctx.pFont->DrawString(this, textDrawState_, pos, ctx, pBegin, pEnd);
+}
+
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
 	texture::TexID textureId, render::StateHandle stateHandle)
 {

@@ -86,6 +86,7 @@ public:
 	const uint32_t getVertBufBytes(void) const;
 
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
+	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId, render::StateHandle stateHandle) X_FINAL;
