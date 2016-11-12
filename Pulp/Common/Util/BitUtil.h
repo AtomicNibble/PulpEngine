@@ -93,7 +93,7 @@ namespace bitUtil
 	/// \brief Returns whether a given integer is a power-of-two.
 	/// \remark 0 is considered to be a power-of-two in this case.
 	template <typename T>
-	inline bool IsPowerOfTwo(T x);
+	inline constexpr bool IsPowerOfTwo(T x);
 
 	/// Returns the next power-of-two for a given value.
 	template <typename T>

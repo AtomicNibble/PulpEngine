@@ -620,7 +620,7 @@ namespace bitUtil
 	}
 
 	template <typename T>
-	inline bool IsPowerOfTwo(T x)
+	inline constexpr bool IsPowerOfTwo(T x)
 	{
 		return (x & (x - 1)) == 0;
 	}
