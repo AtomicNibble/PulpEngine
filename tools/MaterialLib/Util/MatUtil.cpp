@@ -291,7 +291,7 @@ namespace Util
 			case "front"_fnv1a:
 				return MaterialCullType::FRONT_SIDED;
 			case "none"_fnv1a:
-				return MaterialCullType::TWO_SIDED;
+				return MaterialCullType::NONE;
 
 			default:
 				X_ERROR("Mtl", "Unknown cull type: '%s' (case-sen)", str);

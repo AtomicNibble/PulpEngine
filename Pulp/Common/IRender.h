@@ -55,7 +55,7 @@ static const uintptr_t INVALID_STATE_HANLDE = 0;
 X_DECLARE_ENUM8(CullType)(
 	FRONT_SIDED,
 	BACK_SIDED,
-	TWO_SIDED
+	NONE
 );
 
 X_DECLARE_ENUM8(TopoType)(

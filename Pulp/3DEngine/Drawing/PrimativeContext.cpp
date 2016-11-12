@@ -41,7 +41,7 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 	desc.blend.dstBlendColor = render::BlendType::INV_SRC_ALPHA;
 	desc.blend.dstBlendAlpha = render::BlendType::INV_SRC_ALPHA;
 	desc.blendOp = render::BlendOp::OP_ADD;
-	desc.cullType = render::CullType::TWO_SIDED;
+	desc.cullType = render::CullType::NONE;
 	desc.depthFunc = render::DepthFunc::ALWAYS;
 	desc.stateFlags.Clear();
 	desc.stateFlags.Set(render::StateFlag::BLEND);

@@ -306,7 +306,7 @@ namespace
 
 		switch (state.cullType)
 		{
-			case CullType::TWO_SIDED:
+			case CullType::NONE:
 				rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
 				break;
 			case CullType::FRONT_SIDED:
