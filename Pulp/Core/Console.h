@@ -115,7 +115,8 @@ X_DECLARE_FLAGS(ExecSource)(
 class XConsole : 
 	public IConsole, 
 	public input::IInputEventListner,
-	public core::IXHotReload
+	public core::IXHotReload,
+	public ICoreEventListener
 {
 
 	struct ExecCommand
@@ -229,6 +230,11 @@ public:
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
+
+	// ICoreEventListener
+	void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
+	// ~ICoreEventListener
+
 
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
 	virtual int32_t getLineCount(void) const X_FINAL;
@@ -345,6 +351,8 @@ private:
 	int32_t					ScrollPos_;
 	string					InputBuffer_;
 	string                  RefString_;
+
+	Vec2<int32_t>			renderRes_;
 
 	X_DISABLE_WARNING(4324);
 	input::InputEvent		repeatEvent_;

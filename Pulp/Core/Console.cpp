@@ -443,6 +443,8 @@ void XConsole::Startup(ICore* pCore, bool basic)
 
 	if (!basic)
 	{
+		pCore->GetCoreEventDispatcher()->RegisterListener(this);
+
 		// hot reload
 		pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 
@@ -471,6 +473,8 @@ void XConsole::LoadRenderResources(void)
 	pRender_ = pCore_->GetIRender();
 	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
 
+
+	renderRes_ = pRender_->getDisplayRes();
 }
 
 void XConsole::RegisterInputListener(void)
@@ -516,6 +520,7 @@ void XConsole::ShutDown(void)
 	// check if core failed to init.
 	if (pCore_)
 	{
+		pCore_->GetCoreEventDispatcher()->RemoveListener(this);
 		pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
 		pCore_->GetILog()->RemoveLogger(&logger_);
 	}
@@ -1567,6 +1572,16 @@ void XConsole::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<ch
 }
 // ~IXHotReload
 
+
+void XConsole::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+{
+	if (event == CoreEvent::RENDER_RES_CHANGED)
+	{
+		renderRes_.x = static_cast<int32_t>(wparam);
+		renderRes_.y = static_cast<int32_t>(lparam);
+	}
+}
+
 void XConsole::ConfigExec(const char* pCommand)
 {
 	// if it's from config, should i limit what commands can be used?
@@ -1910,7 +1925,7 @@ consoleState::Enum XConsole::getVisState(void) const
 
 int32_t XConsole::MaxVisibleLogLines(void) const
 {
-	const int32_t height = pRender_->getDisplayRes().y - 40;
+	const int32_t height = renderRes_.y - 40;
 
 	return height / console_output_line_height;
 }
