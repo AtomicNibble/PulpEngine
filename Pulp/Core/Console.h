@@ -128,6 +128,40 @@ class XConsole :
 		bool silentMode;
 	};
 
+	struct Cursor
+	{
+		Cursor();
+
+		TimeVal curTime;
+		TimeVal displayTime;
+		bool draw;
+		bool _pad[3];
+	};
+
+
+	// members.
+	typedef core::HashMap<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap;		// key points into string stored in ICVar or in .exe/.dll
+	typedef ConsoleVarMap::iterator ConsoleVarMapItor;
+
+	typedef core::HashMap<string, ConsoleCommand, core::hash<const char*>, equal_to_case_insen> ConsoleCmdMap;
+	typedef ConsoleCmdMap::iterator ConsoleCmdMapItor;
+
+	typedef core::HashMap<string, string, core::hash<const char*>, equal_to_case_insen> ConfigCmdsMap;
+
+	typedef core::HashMap<string, string> ConsoleBindMap;
+	typedef ConsoleBindMap::iterator ConsoleBindMapItor;
+
+	typedef core::Fifo<ExecCommand> ExecCmdList;
+
+	typedef std::deque<string> ConsoleBuffer;
+	typedef ConsoleBuffer::iterator ConsoleBufferItor;
+	typedef ConsoleBuffer::reverse_iterator ConsoleBufferRItor;
+
+	typedef core::Logger<
+		core::LoggerNoFilterPolicy,
+		core::LoggerInternalConsoleFormatPolicy,
+		core::LoggerInternalConsoleWritePolicy> Logger;
+
 
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
@@ -285,41 +319,6 @@ private:
 	static bool CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source);
 			
 private:
-
-	struct Cursor
-	{
-		Cursor();
-
-		TimeVal curTime;
-		TimeVal displayTime;
-		bool draw;
-		bool _pad[3];
-	};
-
-
-	// members.
-	typedef core::HashMap<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap;		// key points into string stored in ICVar or in .exe/.dll
-	typedef ConsoleVarMap::iterator ConsoleVarMapItor;
-
-	typedef core::HashMap<string, ConsoleCommand, core::hash<const char*>, equal_to_case_insen> ConsoleCmdMap;
-	typedef ConsoleCmdMap::iterator ConsoleCmdMapItor;
-
-	typedef core::HashMap<string, string, core::hash<const char*>, equal_to_case_insen> ConfigCmdsMap;
-
-	typedef core::HashMap<string, string> ConsoleBindMap;
-	typedef ConsoleBindMap::iterator ConsoleBindMapItor;
-
-	typedef core::Fifo<ExecCommand> ExecCmdList;
-
-	typedef std::deque<string> ConsoleBuffer;
-	typedef ConsoleBuffer::iterator ConsoleBufferItor;
-	typedef ConsoleBuffer::reverse_iterator ConsoleBufferRItor;
-
-	typedef core::Logger<
-		core::LoggerNoFilterPolicy,
-		core::LoggerInternalConsoleFormatPolicy,
-		core::LoggerInternalConsoleWritePolicy> Logger;
-
 	core::HeapArea			varHeap_;
 	core::PoolAllocator		varAllocator_;
 	VarPool					varArena_;
