@@ -1525,7 +1525,7 @@ void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, floa
 		contex.clip = rect;
 	}
 
-	Vec2f textDimension = pFont_->GetTextSize(text_, contex);
+	Vec2f textDimension = pFont_->GetTextSize(text_.begin(), text_.end(), contex);
 
 	// top align
 	switch (textAlign_)
