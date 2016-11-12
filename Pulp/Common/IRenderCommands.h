@@ -54,7 +54,7 @@ namespace Commands
 		static const Command::Enum CMD = Command::COPY_CONST_BUF_DATA;
 
 		ConstantBufferHandle constantBuffer;
-		void* pData;
+		const void* pData;
 		uint32_t size;
 	};
 
@@ -65,7 +65,7 @@ namespace Commands
 		static const Command::Enum CMD = Command::COPY_INDEXES_BUF_DATA;
 
 		IndexBufferHandle indexBuffer;
-		void* pData; // you own this, safe to clear after submitCommandPackets
+		const void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
 	};
 
@@ -74,7 +74,7 @@ namespace Commands
 		static const Command::Enum CMD = Command::COPY_VERTEX_BUF_DATA;
 
 		VertexBufferHandle vertexBuffer;
-		void* pData; // you own this, safe to clear after submitCommandPackets
+		const void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
 	};
 
