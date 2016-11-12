@@ -57,7 +57,7 @@ namespace bitUtil
 
 			/// Internal function used by bitUtil::RoundUpToMultiple.
 			template <typename T>
-			static inline uint64_t RoundUpToMultiple(T numToRound, T multipleOf)
+			static inline constexpr uint64_t RoundUpToMultiple(T numToRound, T multipleOf)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
@@ -342,7 +342,7 @@ namespace bitUtil
 
 			/// Internal function used by bitUtil::RoundUpToMultiple.
 			template <typename T>
-			static inline unsigned int RoundUpToMultiple(T numToRound, T multipleOf)
+			static inline constexpr unsigned int RoundUpToMultiple(T numToRound, T multipleOf)
 			{
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
 
@@ -634,7 +634,7 @@ namespace bitUtil
 
 
 	template <typename T>
-	inline T RoundUpToMultiple(T numToRound, T multipleOf)
+	inline constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
 	{
 		return internal::Implementation<sizeof(T)>::RoundUpToMultiple(numToRound, multipleOf);
 	}

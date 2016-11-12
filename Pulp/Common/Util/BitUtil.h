@@ -101,7 +101,7 @@ namespace bitUtil
 
 	/// Rounds a number up to the next multiple of a power-of-two.
 	template <typename T>
-	inline T RoundUpToMultiple(T numToRound, T multipleOf);
+	inline constexpr T RoundUpToMultiple(T numToRound, T multipleOf);
 
 	/// Rounds a number down to the next multiple of a power-of-two.
 	inline uint32_t RoundDownToMultiple(uint32_t numToRound, uint32_t multipleOf);
