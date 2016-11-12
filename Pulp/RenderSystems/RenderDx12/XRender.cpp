@@ -1171,7 +1171,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 }
 
-X_INLINE void XRender::CreateVBView(const VertexHandleArr& vertexBuffers,
+X_INLINE void XRender::CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
 	D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams)
 {
 	numVertexStreams = 0;
@@ -1181,8 +1181,12 @@ X_INLINE void XRender::CreateVBView(const VertexHandleArr& vertexBuffers,
 		if (vertexBuffers[i]) 
 		{
 			const auto pVertBuf = pBuffMan_->VBFromHandle(vertexBuffers[i]);
+			auto& buffer = pVertBuf->getBuf();
 
-			viewsOut[i] = pVertBuf->getBuf().vertexBufferView();
+			// transition if needed.
+			context.transitionResource(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+
+			viewsOut[i] = buffer.vertexBufferView();
 
 			// it's total that need to be passed to device, which inclde 
 			// any null ones in between.
@@ -1235,7 +1239,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 		uint32_t numVertexStreams = 0;
 		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
-		CreateVBView(vertexBuffers, vertexViews, numVertexStreams);
+		CreateVBView(context, vertexBuffers, vertexViews, numVertexStreams);
 
 		context.setVertexBuffers(0, numVertexStreams, vertexViews);
 	}

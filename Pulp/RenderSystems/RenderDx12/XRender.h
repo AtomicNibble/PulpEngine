@@ -190,7 +190,7 @@ public:
 
 
 private:
-	void CreateVBView(const VertexHandleArr& vertexBuffers,
+	void CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
 		D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams);
 
 	void ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
