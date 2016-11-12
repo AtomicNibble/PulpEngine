@@ -1588,7 +1588,7 @@ void XConsole::ConfigExec(const char* pCommand)
 
 void XConsole::PageUp(void)
 {
-	int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+	const int32_t visibleNum = MaxVisibleLogLines();
 	ScrollPos_ += visibleNum;
 
 	ValidateScrollPos();
@@ -1596,7 +1596,7 @@ void XConsole::PageUp(void)
 
 void XConsole::PageDown(void)
 {
-	int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+	const int32_t visibleNum = MaxVisibleLogLines();
 	ScrollPos_ -= visibleNum;
 
 	ValidateScrollPos();
@@ -1609,8 +1609,8 @@ void XConsole::ValidateScrollPos(void)
 	}
 	else
 	{
-		int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
-		int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+		int32_t logSize = safe_static_cast<int32_t>(ConsoleLog_.size());
+		const int32_t visibleNum = MaxVisibleLogLines();
 
 		logSize -= visibleNum;
 		logSize += 2;
@@ -1911,9 +1911,8 @@ consoleState::Enum XConsole::getVisState(void) const
 int32_t XConsole::MaxVisibleLogLines(void) const
 {
 	const int32_t height = pRender_->getDisplayRes().y - 40;
-	const int32_t scaledLogHeight = static_cast<size_t>(static_cast<float>(console_output_line_height) * 0.8f);
 
-	return height / scaledLogHeight;
+	return height / console_output_line_height;
 }
 
 void XConsole::DrawBuffer(void)
@@ -2047,8 +2046,8 @@ void XConsole::DrawScrollBar(void)
 
 		// work out the possition of slider.
 		// we take the height of the bar - slider and divide.
-		size_t visibleNum = MaxVisibleLogLines();
-		size_t scrollableLines = ConsoleLog_.size() - (visibleNum += 2);
+		const int32_t visibleNum = MaxVisibleLogLines();
+		const int32_t scrollableLines = safe_static_cast<int32_t>(ConsoleLog_.size()) - (visibleNum + 2);
 
 		float positionPercent = PercentageOf(ScrollPos_, scrollableLines) * 0.01f;
 		float offset = (barHeight - slider_height) * positionPercent;
@@ -2548,10 +2547,10 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 		// and just listen for core events to get size.
 		if (pRender_)
 		{
-			size_t noneScroll = MaxVisibleLogLines();
+			const auto noneScroll = MaxVisibleLogLines();
 
 			// move scroll wheel with the moving items?
-			if (ScrollPos_ > 0 && ScrollPos_ < safe_static_cast<int32_t, size_t>(ConsoleLog_.size() - noneScroll)) {
+			if (ScrollPos_ > 0 && ScrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(ConsoleLog_.size()) - noneScroll)) {
 				ScrollPos_++;
 			}
 		}
