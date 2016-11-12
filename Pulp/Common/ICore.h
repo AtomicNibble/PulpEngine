@@ -67,80 +67,25 @@ X_NAMESPACE_DECLARE(physics,
 X_USING_NAMESPACE;
 
 
+typedef core::traits::Function<void(class core::XProfileScope* pProScope)> ProfileScopeFunc;
 
+X_DECLARE_ENUM(CoreEvent)(
+	CHANGE_FOCUS,
+	MOVE,
+	RESIZE,
+	ACTIVATE,
 
-typedef void(*pProfileScopeCall)(class core::XProfileScope* pProScope);
+	LEVEL_LOAD_START_LOADINGSCREEN,
+	LEVEL_LOAD_START,
+	LEVEL_LOAD_END,
+	LEVEL_UNLOAD,
+	LEVEL_POST_UNLOAD,
 
-struct CoreEvent
-{
-	enum Enum
-	{
-		CHANGE_FOCUS = 10,
-		MOVE = 11,
-		RESIZE = 12,
-		ACTIVATE = 13,
+	SHUTDOWN,
+	TOGGLE_FULLSCREEN,
+	USER
+);
 
-		LEVEL_LOAD_START_LOADINGSCREEN,
-		LEVEL_LOAD_START,
-		LEVEL_LOAD_END,
-		LEVEL_UNLOAD,
-		LEVEL_POST_UNLOAD,
-
-		GAME_POST_INIT,
-	//	GAME_POST_INIT_DONE,
-		SHUTDOWN,
-		TOGGLE_FULLSCREEN,
-	//	POST_3D_RENDERING_START,
-	//	POST_3D_RENDERING_END,
-		USER = 0x1000,
-	};
-
-	// MEOW!
-	static const char* toString(Enum event) {
-
-		switch (event)
-		{
-			case Enum::CHANGE_FOCUS:
-				return "CHANGE_FOCUS";
-			case Enum::MOVE:
-				return "MOVE";
-			case Enum::RESIZE:
-				return "RESIZE";
-			case Enum::ACTIVATE:
-				return "ACTIVATE";
-			case Enum::GAME_POST_INIT:
-				return "GAME_POST_INIT";
-			case Enum::SHUTDOWN:
-				return "SHUTDOWN";
-			case Enum::TOGGLE_FULLSCREEN:
-				return "TOGGLE_FULLSCREEN";
-
-			case Enum::LEVEL_LOAD_START_LOADINGSCREEN:
-				return "LEVEL_LOAD_START_LOADINGSCREEN";
-			case Enum::LEVEL_LOAD_START:
-				return "LEVEL_LOAD_START";
-			case Enum::LEVEL_LOAD_END:
-				return "LEVEL_LOAD_END";
-			case Enum::LEVEL_UNLOAD:
-				return "LEVEL_UNLOAD";
-			case Enum::LEVEL_POST_UNLOAD:
-				return "LEVEL_POST_UNLOAD";
-
-			case Enum::USER:
-				return "USER";
-
-			default:
-#if X_DEBUG
-				X_ASSERT_UNREACHABLE();
-				return "";
-
-#else
-				X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
-
-		}
-	}
-};
 
 // Description:
 //	 Interface used for getting notified when a system event occurs.
@@ -276,8 +221,8 @@ struct SCoreGlobals // obbject is zerod on start.
 	uint32_t					uMainThreadId;		
 
 	
-	pProfileScopeCall			profileScopeStart;
-	pProfileScopeCall			profileScopeEnd;
+	ProfileScopeFunc::Pointer	profileScopeStart;
+	ProfileScopeFunc::Pointer	profileScopeEnd;
 
 	X_INLINE const bool isStarting(void) const {
 		return state_ != State::STARTING;
