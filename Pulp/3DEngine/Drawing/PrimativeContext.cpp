@@ -15,8 +15,10 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pTextShader_(nullptr)
 {
 	pushBufferArr_.reserve(64);
+	pushBufferArr_.setGranularity(512);
 	vertexArr_.getAllocator().setBaseAlignment(16); // for simd.
 	vertexArr_.reserve(256);
+	vertexArr_.setGranularity(1024 * 4);
 
 	passHandle_ = render::INVALID_STATE_HANLDE;
 	textDrawState_ = render::INVALID_STATE_HANLDE;
