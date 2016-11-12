@@ -75,6 +75,8 @@ X_DECLARE_ENUM(CoreEvent)(
 	RESIZE,
 	ACTIVATE,
 
+	RENDER_RES_CHANGED, // broadcast when the render resolution changes.
+
 	LEVEL_LOAD_START_LOADINGSCREEN,
 	LEVEL_LOAD_START,
 	LEVEL_LOAD_END,

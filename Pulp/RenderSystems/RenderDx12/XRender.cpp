@@ -1786,6 +1786,8 @@ bool XRender::resize(uint32_t width, uint32_t height)
 		displayPlane_[i].createFromSwapChain(pDevice_, *pDescriptorAllocator_, pDisplayPlane);
 	}
 
+	// post a event.
+	gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::RENDER_RES_CHANGED, displayRes_.x, displayRes_.y);
 	return true;
 }
 
