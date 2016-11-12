@@ -84,6 +84,13 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 	textDrawState_ = pRender->createState(passHandle_, pTextTech, desc, nullptr, 0);
 
 
+	vertexBuf_ = pRender->createVertexBuffer(
+		sizeof(IPrimativeContext::PrimVertex),
+		NUMVERTS_PER_PAGE,
+		render::BufUsage::DYNAMIC,
+		render::CpuAccess::WRITE
+	);
+
 	return true;
 }
 
@@ -119,6 +126,10 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 	if (pTextShader_) {
 		pRender->releaseShader(pTextShader_);
 	}
+
+
+	pRender->destoryVertexBuffer(vertexBuf_);
+
 	return true;
 }
 
@@ -159,6 +170,10 @@ const PrimativeContext::VertexArr& PrimativeContext::getVerts(void) const
 	return vertexArr_;
 }
 
+const render::VertexBufferHandle PrimativeContext::getVertBufHandle(void) const
+{
+	return vertexBuf_;
+}
 
 
 void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)

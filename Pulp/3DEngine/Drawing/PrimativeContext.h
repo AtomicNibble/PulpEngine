@@ -65,6 +65,9 @@ public:
 
 private:
 
+	static const uint32_t NUMVERTS_PER_PAGE = 1024 * 32;
+
+
 public:
 	PrimativeContext(core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
@@ -78,6 +81,7 @@ public:
 	void getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	const VertexArr& getVerts(void) const;
+	const render::VertexBufferHandle getVertBufHandle(void) const;
 
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
 
@@ -96,6 +100,8 @@ private:
 
 	render::shader::IShader* pAuxShader_;
 	render::shader::IShader* pTextShader_;
+
+	render::VertexBufferHandle vertexBuf_;
 };
 
 
