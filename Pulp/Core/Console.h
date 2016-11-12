@@ -131,7 +131,8 @@ class XConsole :
 
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
-	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
+	static const size_t CONSOLE_INPUT_LINE_HIEGHT = 20;
+	static const size_t CONSOLE_DEFAULT_LOG_LINE_HIEGHT = 14;
 
 	static const size_t VAR_MAX = 4096;
 
@@ -271,7 +272,7 @@ private:
 	X_INLINE bool isAutocompleteVis(void);
 
 	// returns the max log lines that fit on screen.
-	size_t MaxVisibleLogLines(void) const;
+	int32_t MaxVisibleLogLines(void) const;
 
 private:
 	void DrawBuffer(void);
@@ -379,6 +380,7 @@ private:
 	static Color	console_output_scroll_bar_color;
 	static Color	console_output_scroll_bar_slider_color;
 	static int		console_output_draw_channel;
+	static int		console_output_line_height;
 	static int		console_buffer_size;
 	static int		console_cursor_skip_color_codes;
 

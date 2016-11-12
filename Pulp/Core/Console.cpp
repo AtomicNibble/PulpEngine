@@ -303,6 +303,7 @@ Color XConsole::console_output_box_channel_color;
 Color XConsole::console_output_scroll_bar_color;
 Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
+int	  XConsole::console_output_line_height;
 int	XConsole::console_buffer_size = 0;
 int XConsole::console_disable_mouse = 0;
 int XConsole::console_cursor_skip_color_codes = 0;
@@ -412,10 +413,12 @@ void XConsole::Startup(ICore* pCore, bool basic)
 		"Console input auto complete is case-sensitive");
 	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Saves command history to file");
-	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, 
+	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Size of the log buffer");
 	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, 
 		"Draw the channel in a diffrent color. 0=disabled 1=enabled");
+	ADD_CVAR_REF_NO_NAME(console_output_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 12, 32, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Line height of log messages");
 
 	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), 
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
@@ -425,7 +428,7 @@ void XConsole::Startup(ICore* pCore, bool basic)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.9f), 
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.5f), 
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box channel color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_color, Color(0.5f, 0.5f, 0.5f, 0.5f),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
@@ -1905,11 +1908,10 @@ consoleState::Enum XConsole::getVisState(void) const
 	return consoleState_;
 }
 
-size_t XConsole::MaxVisibleLogLines(void) const
+int32_t XConsole::MaxVisibleLogLines(void) const
 {
-	const size_t height = pRender_->getDisplayRes().y - 40;
-	const size_t scaledLogHeight = static_cast<size_t>(
-		static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)* 0.8f);
+	const int32_t height = pRender_->getDisplayRes().y - 40;
+	const int32_t scaledLogHeight = static_cast<size_t>(static_cast<float>(console_output_line_height) * 0.8f);
 
 	return height / scaledLogHeight;
 }
@@ -1929,27 +1931,29 @@ void XConsole::DrawBuffer(void)
 	ctx.effectId = 0;
 	ctx.SetColor(Col_Khaki);
 //	ctx.SetProportional(false);
-	ctx.SetSize(Vec2f(20, static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)));
+	ctx.SetSize(Vec2f(20.f, static_cast<float>(CONSOLE_INPUT_LINE_HIEGHT)));
 	ctx.SetCharWidthScale(0.5f);
 //	ctx.SetScaleFrom800x600(true);
 
 	Vec2f res;
 	res = pRender_->getDisplayRes();
 
-	const float width = res.x - 10;
-	const float height = res.y - 40;
+
+	const float xStart = 5.f;
+	const float yStart = 35.f;
+	const float width = res.x - 10.f;
+	const float height = res.y - 40.f;
 
 	{
-		pPrimContext_->drawQuad(5, 5, width, 24, console_input_box_color, console_input_box_color_border);
+		pPrimContext_->drawQuad(xStart, 5, width, 24, console_input_box_color, console_input_box_color_border);
 
-		if (isExpanded()) {
+		if (isExpanded()) 
+		{
+			pPrimContext_->drawQuad(xStart, yStart, width, height, console_output_box_color, console_output_box_color_border);
 
-			// draw a channel colum?
 			if (console_output_draw_channel) {
-				pPrimContext_->drawQuad(5, 35, 11 * ctx.GetCharWidthScaled(), height, console_output_box_channel_color);
+				pPrimContext_->drawQuad(xStart, yStart, 11.f * ctx.GetCharWidthScaled(), height, console_output_box_channel_color);
 			}
-
-			pPrimContext_->drawQuad(5, 35, width, height, console_output_box_color, console_output_box_color_border);
 
 			DrawScrollBar();
 		}
@@ -1960,8 +1964,6 @@ void XConsole::DrawBuffer(void)
 
 		Vec2f pos(10, 5);
 		Vec2f txtwidth = pFont_->GetTextSize(pTxt, ctx);
-		float fCharHeight = 0.8f * ctx.GetCharHeight();
-		int	  CharHeight = static_cast<int>(fCharHeight);
 
 		ctx.SetEffectId(pFont_->GetEffectId("drop"));
 		
@@ -1981,21 +1983,20 @@ void XConsole::DrawBuffer(void)
 			pPrimContext_->drawText(pos.x + Lwidth, pos.y, ctx, "_");
 		}
 
-		size_t numDraw = 0;
-
 		// the log.
 		if (isExpanded())
 		{
 			ctx.SetColor(Col_White);
-			ctx.SetSize(Vec2f(12,12));
+			ctx.SetSize(Vec2f(12.f, static_cast<float>(console_output_line_height)));
 			ctx.SetCharWidthScale(0.75f);
 
+			float fCharHeight =  ctx.GetCharHeight();
+
 			float xPos = 8;
-			float yPos = height + 15; // 15 uints up
+			float yPos = (height + yStart) - (fCharHeight + 10); // 15 uints up
 			int32_t scroll = 0;
 
 			decltype(logLock_)::ScopedLock lock(logLock_);
-
 
 			const int32_t num = safe_static_cast<int32_t>(ConsoleLog_.size());
 
@@ -2006,8 +2007,7 @@ void XConsole::DrawBuffer(void)
 					const char* pBuf = ConsoleLog_[i].c_str();
 
 					pPrimContext_->drawText(xPos, yPos, ctx, pBuf);
-					yPos -= CharHeight;
-					numDraw++;
+					yPos -= fCharHeight;
 				}
 			}
 		}
