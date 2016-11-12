@@ -152,9 +152,17 @@ public:
 		return value;
 	}
 
-	X_INLINE size_t getLength(void) {
+	X_INLINE size_t getLength(void) const {
 		return value.length();
 	}
+
+	X_INLINE auto begin(void) const {
+		return value.begin();
+	}
+	X_INLINE auto end(void) const {
+		return value.end();
+	}
+
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
 	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
