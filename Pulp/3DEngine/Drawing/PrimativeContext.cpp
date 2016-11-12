@@ -175,6 +175,23 @@ const render::VertexBufferHandle PrimativeContext::getVertBufHandle(void) const
 	return vertexBuf_;
 }
 
+const uint32_t PrimativeContext::getVertBufBytes(void) const
+{
+	uint32_t numVerts = safe_static_cast<uint32_t>(vertexArr_.size());
+
+	// this is kinda bad yo.
+	// since we probs end up slicing a prim.
+	// and we will still try draw above the valid vert index.
+	// really we should just handle this..
+	if (numVerts > NUMVERTS_PER_PAGE) {
+		X_ERROR("Prim", "Prim verts don't fit in dest buffer. capping %" PRIu32 " to: %" PRIu32, numVerts, NUMVERTS_PER_PAGE);
+		numVerts = NUMVERTS_PER_PAGE;
+	}
+
+	// we need to give the render system a 16byte aligned buffer that is a multiple of 16 bytes.
+	// i think i might support not requiring the buffer size to be a multiple of 16 as that means we always need padding if vert not multiple of 16.
+	return core::bitUtil::RoundUpToMultiple<uint32_t>(numVerts * sizeof(PrimVertex), 16u);
+}
 
 void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
