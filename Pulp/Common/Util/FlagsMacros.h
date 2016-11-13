@@ -79,7 +79,7 @@
 	static const unsigned int FLAGS_COUNT = X_PP_NUM_ARGS(__VA_ARGS__);																\
 	static_assert(FLAGS_COUNT <= 8, "Too many flags used in X_DECLARE_FLAGS. A maximum number of 8 flags is allowed.");				\
 	\
-enum Enum																															\
+enum Enum : uint8_t																																	\
 		{																																	\
 		X_PP_EXPAND_ARGS X_PP_PASS_ARGS(X_DECLARE_FLAGS_IMPL_ENUM, __VA_ARGS__)														\
 		};																																	\
