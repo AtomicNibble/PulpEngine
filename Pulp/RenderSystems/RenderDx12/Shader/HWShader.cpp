@@ -51,6 +51,19 @@ namespace shader
 				X_ASSERT_NOT_IMPLEMENTED();
 			}
 
+			switch (CDesc.Type)
+			{
+				case D3D_SVT_BOOL:
+					f.Set(ParamFlag::BOOL);
+					break;
+				case D3D_SVT_INT:
+					f.Set(ParamFlag::INT);
+					break;
+				case D3D_SVT_FLOAT:
+					f.Set(ParamFlag::FLOAT);
+					break;
+			}
+
 			return f;
 		}
 
