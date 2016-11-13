@@ -204,6 +204,12 @@ namespace {
 							length -= SectionSize;
 							pCur = pCur + SectionSize;
 							SectionSize = 0;
+
+							if (length > 0 && *pCur == L'\"')
+							{
+								isString = (isString == 0);
+							}
+
 						}
 					}
 					else if (curChar == L'\"')
@@ -231,6 +237,9 @@ namespace {
 						SectionSize = 0;
 
 						isString = (isString == 0);
+						if (!isString) {
+							continue; // we need to check for color code right after a closing "
+						}
 					}
 				}
 				else
