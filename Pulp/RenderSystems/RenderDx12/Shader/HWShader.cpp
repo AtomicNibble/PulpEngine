@@ -26,11 +26,11 @@ namespace shader
 		{
 			ParamFlags f;
 
-			if (CDesc.Class == D3D10_SVC_MATRIX_COLUMNS)
+			if (CDesc.Class == D3D_SVC_MATRIX_COLUMNS)
 			{
 				f.Set(ParamFlag::MATRIX);
 			}
-			else if (CDesc.Class == D3D10_SVC_VECTOR)
+			else if (CDesc.Class == D3D_SVC_VECTOR)
 			{
 				if (CDesc.Columns == 4) {
 					f.Set(ParamFlag::VEC4);
@@ -539,7 +539,7 @@ namespace shader
 				int nReg = CDesc.StartOffset >> 4;
 
 				// used and abused?
-				if (!core::bitUtil::IsBitFlagSet(CDesc.uFlags, D3D10_SVF_USED))
+				if (!core::bitUtil::IsBitFlagSet(CDesc.uFlags, D3D_SVF_USED)) {
 					continue;
 
 				XParamDB* entry = findParamBySematic(CDesc.Name);
@@ -570,7 +570,7 @@ namespace shader
 
 				if (entry->flags.IsSet(ParamFlag::MATRIX))
 				{
-					if (CTDesc.Class != D3D10_SVC_MATRIX_COLUMNS && CTDesc.Class != D3D10_SVC_MATRIX_ROWS)
+					if (CTDesc.Class != D3D_SVC_MATRIX_COLUMNS && CTDesc.Class != D3D_SVC_MATRIX_ROWS)
 					{
 						X_ERROR("Shader", "input var: \"%s\" should be a matrix", CDesc.Name);
 						return false;
@@ -584,7 +584,7 @@ namespace shader
 				}
 				else if (entry->flags.IsSet(ParamFlag::VEC4))
 				{
-					if (CTDesc.Class != D3D10_SVC_VECTOR || CTDesc.Columns != 4)
+					if (CTDesc.Class != D3D_SVC_VECTOR || CTDesc.Columns != 4)
 					{
 						X_ERROR("Shader", "input var: \"%s\" should be a float4", CDesc.Name);
 						return false;
@@ -592,7 +592,7 @@ namespace shader
 				}
 				else if (entry->flags.IsSet(ParamFlag::FLOAT))
 				{
-					if (CTDesc.Class != D3D10_SVC_SCALAR || CTDesc.Columns != 1 || CTDesc.Rows != 1)
+					if (CTDesc.Class != D3D_SVC_SCALAR || CTDesc.Columns != 1 || CTDesc.Rows != 1)
 					{
 						X_ERROR("Shader", "input var: \"%s\" should be a float(1)", CDesc.Name);
 						return false;
@@ -642,8 +642,9 @@ namespace shader
 				break;
 			}
 
-			if (InputBindDesc.Type != D3D10_SIT_TEXTURE)
+			if (InputBindDesc.Type != D3D_SIT_TEXTURE) {
 				continue;
+			}
 
 			XShaderParam bind;
 
@@ -669,8 +670,9 @@ namespace shader
 
 				pShaderReflection->GetResourceBindingDesc(n, &InputBindDesc);
 
-				if (InputBindDesc.Type != D3D10_SIT_SAMPLER)
+				if (InputBindDesc.Type != D3D_SIT_SAMPLER) {
 					continue;
+				}
 
 				core::StackString512 temp(InputBindDesc.Name);
 
@@ -701,9 +703,8 @@ namespace shader
 
 			if (!bSampler)
 			{
-				X_LOG0("Shader", "add FX Parameter: \"%s\", %i, Cb:%i (%i)", pB->name.c_str(),
+				X_LOG0("Shader", "add Parameter: \"%s\", %i, Cb:%i (%i)", pB->name.c_str(),
 					pB->numParameters, pB->constBufferSlot, pB->bind);
-
 			}
 			else
 			{
@@ -716,7 +717,7 @@ namespace shader
 			}
 		}
 
-		if (this->type_ == ShaderType::Vertex)
+		if (type_ == ShaderType::Vertex)
 		{
 			const ILTreeNode* pILnode = &shaderMan_.getILTree();
 			D3D12_SIGNATURE_PARAMETER_DESC InputDsc;
