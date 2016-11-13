@@ -252,7 +252,7 @@ void Level::update(void)
 
 	// don't update cam if we are deteched.
 	if (!s_var_detechCam_) {
-		cam_ = gEnv->pRender->GetCamera();
+//		cam_ = gEnv->pRender->GetCamera();
 	}
 }
 

@@ -580,8 +580,6 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 {
 	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
 
-	render::IRender* pRenderer = gEnv->pRender;
-
 	float32_t maxW = 0;
 	float32_t maxH = 0;
 
@@ -592,7 +590,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 	Vec2f size = ctx.size; // in pixel
 	if (ctx.flags.IsSet(DrawTextFlag::SCALE_800x600))
 	{
-		pRenderer->ScaleCoord(size);
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);

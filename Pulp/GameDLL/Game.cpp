@@ -95,7 +95,7 @@ bool XGame::update(core::FrameData& frame)
 	frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
 
 
-	pRender_->SetCamera(cam_);
+//	pRender_->SetCamera(cam_);
 
 	return true;
 }

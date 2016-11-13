@@ -1462,8 +1462,8 @@ void XWindow::calcClientRect(void)
 {
 	const Rectf& rect = rect_;
 
-	const float width = pRender_->getWidthf();
-	const float height = pRender_->getHeightf();
+	const float width = static_cast<float>(pRender_->getDisplayRes().x);
+	const float height = static_cast<float>(pRender_->getDisplayRes().y);
 
 	// 800x600 virtual.
 	const float scale_x = width / 800;
