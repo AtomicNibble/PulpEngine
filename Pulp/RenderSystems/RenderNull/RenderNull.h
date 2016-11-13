@@ -60,31 +60,6 @@ public:
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================
-
-	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
-
-	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
-	virtual void SetViewport(int x, int y, int width, int height) X_OVERRIDE;
-	virtual void GetViewport(Recti& rect) X_OVERRIDE;
-	virtual void SetViewport(const Recti& rect) X_OVERRIDE;
-
-
-	virtual int getWidth(void) const X_OVERRIDE;
-	virtual int getHeight(void) const X_OVERRIDE;
-	virtual float getWidthf(void) const X_OVERRIDE;
-	virtual float getHeightf(void) const X_OVERRIDE;
-	// ~ViewPort
-
-	// scales from 800x600 range to what ever res.
-	// 400(x) on 1650x1050 becomes 825
-	virtual float ScaleCoordX(float value) const X_OVERRIDE;
-	virtual float ScaleCoordY(float value) const X_OVERRIDE;
-	virtual void ScaleCoord(float& x, float& y) const X_OVERRIDE;
-	virtual void ScaleCoord(Vec2f& xy) const X_OVERRIDE;
-
-
-	virtual void  SetCamera(const XCamera& cam) X_OVERRIDE;
-	virtual const XCamera& GetCamera() X_OVERRIDE;
 	
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
