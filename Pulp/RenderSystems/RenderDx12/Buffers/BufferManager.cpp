@@ -119,6 +119,8 @@ void BufferManager::freeVB(VertexBufferHandle VBHandle)
 	stats_.numVertexBuffers--;
 #endif // !VID_MEMORY_STATS
 	
+
+	X_DELETE(pBuf->pBuffer_, &arena_);
 	X_DELETE(pBuf, &arena_);
 }
 
