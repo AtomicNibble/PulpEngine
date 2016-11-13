@@ -1878,6 +1878,7 @@ void XRender::populateFeatureInfo(void)
 
 		features_.isTbdr = archFeature.TileBasedRenderer ? true : false;
 		features_.isUMA = archFeature.UMA ? true : false;
+		features_.isUMACacheCoherent = archFeature.CacheCoherentUMA ? true : false;
 	}
 
 	features_.hwInstancingSupport = true;
@@ -1970,6 +1971,7 @@ void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 
 	X_LOG0("Dx12", "TileBasedRenderer: %s", features_.isTbdr ? "true" : "false");
 	X_LOG0("Dx12", "UnifiedMemoryArchitecture: %s", features_.isUMA ? "true" : "false");
+	X_LOG0("Dx12", "UMACacheCoherent: %s", features_.isUMACacheCoherent ? "true" : "false");
 
 	X_LOG0("Dx12", "hwInstancingSupport: %s", features_.hwInstancingSupport ? "true" : "false");
 	X_LOG0("Dx12", "instanceIdSupport: %s", features_.instanceIdSupport ? "true" : "false");

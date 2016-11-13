@@ -45,6 +45,7 @@ struct GpuFeatures
 
 	bool isTbdr : 1; // TileBasedRenderer
 	bool isUMA : 1; //  unified memory architecture. 
+	bool isUMACacheCoherent : 1; //  unified memory architecture. 
 
 	bool hwInstancingSupport : 1;
 	bool instanceIdSupport : 1;
