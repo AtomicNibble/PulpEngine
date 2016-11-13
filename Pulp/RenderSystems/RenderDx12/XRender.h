@@ -167,24 +167,6 @@ public:
 	// ============== OLD API ======================
 	// =============================================
 
-//	virtual void SetState(StateFlag state) X_OVERRIDE;
-//	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
-//	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
-	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
-	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
-	virtual void SetViewport(int x, int y, int width, int height) X_OVERRIDE;
-	virtual void GetViewport(Recti& rect) X_OVERRIDE;
-	virtual void SetViewport(const Recti& rect) X_OVERRIDE;
-	virtual int getWidth(void) const X_OVERRIDE;
-	virtual int getHeight(void) const X_OVERRIDE;
-	virtual float getWidthf(void) const X_OVERRIDE;
-	virtual float getHeightf(void) const X_OVERRIDE;
-	virtual float ScaleCoordX(float value) const X_OVERRIDE;
-	virtual float ScaleCoordY(float value) const X_OVERRIDE;
-	virtual void ScaleCoord(float& x, float& y) const X_OVERRIDE;
-	virtual void ScaleCoord(Vec2f& xy) const X_OVERRIDE;
-	virtual void  SetCamera(const XCamera& cam) X_OVERRIDE;
-	virtual const XCamera& GetCamera() X_OVERRIDE;
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
 
 

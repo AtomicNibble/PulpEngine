@@ -490,33 +490,6 @@ struct IRender
 	// ============== OLD API ======================
 	// =============================================
 
-	// everying is depriciated.
-
-	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
-
-	// ViewPort
-	virtual void GetViewport(int* left, int* top, int* right, int* bottom) X_ABSTRACT;
-	virtual void SetViewport(int left, int top, int right, int bottom) X_ABSTRACT;
-	virtual void GetViewport(Recti& rect) X_ABSTRACT;
-	virtual void SetViewport(const Recti& rect) X_ABSTRACT;
-
-	virtual int getWidth(void) const X_ABSTRACT;
-	virtual int getHeight(void) const X_ABSTRACT;
-	virtual float getWidthf(void) const X_ABSTRACT;
-	virtual float getHeightf(void) const X_ABSTRACT;
-	// ~ViewPort
-
-	// scales from 800x600 range to what ever res.
-	// 400(x) on 1650x1050 becomes 825
-	virtual float ScaleCoordX(float value) const X_ABSTRACT;
-	virtual float ScaleCoordY(float value) const X_ABSTRACT;
-	virtual void ScaleCoord(float& x, float& y) const X_ABSTRACT;
-	virtual void ScaleCoord(Vec2f& xy) const X_ABSTRACT;
-
-
-	virtual void  SetCamera(const XCamera& cam) X_ABSTRACT;
-	virtual const XCamera& GetCamera() X_ABSTRACT;
-
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
 	// ~AuxGeo
