@@ -40,16 +40,17 @@ X_NAMESPACE_BEGIN(render)
 
 static const uint32_t MAX_RENDER_TARGETS = 8;
 
-typedef uintptr_t VertexBufferHandle;
-typedef uintptr_t IndexBufferHandle;
-typedef uintptr_t ConstantBufferHandle;
-typedef uintptr_t PassStateHandle;
-typedef uintptr_t StateHandle;
+typedef uintptr_t Handle;
+typedef Handle VertexBufferHandle;
+typedef Handle IndexBufferHandle;
+typedef Handle ConstantBufferHandle;
+typedef Handle PassStateHandle;
+typedef Handle StateHandle;
 
 typedef std::array<VertexBufferHandle, VertexStream::ENUM_COUNT> VertexBufferHandleArr;
 
-static const uintptr_t INVALID_BUF_HANLDE = 0;
-static const uintptr_t INVALID_STATE_HANLDE = 0;
+static const Handle INVALID_BUF_HANLDE = 0;
+static const Handle INVALID_STATE_HANLDE = 0;
 
 
 X_DECLARE_ENUM8(CullType)(
