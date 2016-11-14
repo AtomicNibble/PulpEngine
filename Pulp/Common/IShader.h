@@ -99,10 +99,11 @@ X_DECLARE_ENUM8(VertexFormat)(
 
 // -----------------------------------------------------------------------
 
-X_DECLARE_ENUM8(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
+// this use to be a enum, but in some cases i use it as flags (eg shader stage visibility flags)
+X_DECLARE_FLAGS8(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
 X_DECLARE_ENUM8(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 
-
+typedef Flags8<ShaderType> ShaderTypeFlags;
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //
