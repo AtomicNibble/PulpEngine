@@ -86,8 +86,8 @@ public:
 	// dose not increase the amount of items.
 	void reserve(size_type size);
 
-
-	Type& AddOne(void);
+	template<class... Args>
+	Type& AddOne(Args&&... args);
 
 	// append element (same as push_back)
 	size_type append(const T& obj);

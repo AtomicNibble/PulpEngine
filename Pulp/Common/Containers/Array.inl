@@ -377,7 +377,8 @@ X_INLINE void Array<T, Allocator>::reserve(size_type __size)
 // ---------------------------------------------------------
 
 template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(void)
+template<class... Args>
+X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(Args&&... args)
 {
 	if (!list_)
 		reserve(granularity_);
@@ -385,7 +386,7 @@ X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(void)
 	if (num_ == size_)
 		reserve(size_ + granularity_);
 
-	Mem::Construct<T>(&list_[num_]);
+	Mem::Construct<T>(&list_[num_], std::forward<Args>(args)...);
 
 	return list_[num_++];
 }
