@@ -64,28 +64,6 @@ namespace shader
 	};
 
 
-
-	// Per frame
-	struct XParamsPF
-	{
-	public:
-
-		Matrix44f ViewProjMatrix;	//	PF_ViewProjMatrix
-
-		Vec3f CameraFront;			//	PB_CameraFront
-		Vec3f CameraRight;			//	PB_CameraRight
-		Vec3f CameraUp;				//	PB_CameraUp
-		Vec3f CameraPos;			//	PF_CameraPos
-
-		Vec4f ScreenSize;			//	PF_ScreenSize
-		Vec4f NearFarDist;			//	PF_NearFarDist
-
-		Vec3f SunColor;				//	PF_SunColor 
-		Vec3f SkyColor;				//	PF_SkyColor 
-		Vec3f SunDirection;			//	PF_SunDirection
-	};
-
-
 	struct XShaderParam
 	{
 		XShaderParam();
