@@ -257,151 +257,13 @@ struct StateDesc
 X_ENSURE_SIZE(StateDesc, 20);
 
 
-typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
-
-
-// ==================== OLD =========================================
-
-
-
-// ==================== OLD  =========================================
-
-
-#if 0
-struct IRender
+struct CBState
 {
-	virtual ~IRender(){};
-
-	virtual bool Init(HWND hWnd, uint32_t width, uint32_t hieght) X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
-	virtual void freeResources() X_ABSTRACT;
-
-	virtual void RenderBegin() X_ABSTRACT;
-	virtual void RenderEnd() X_ABSTRACT;
-
-	virtual void SetState(StateFlag state) X_ABSTRACT;
-	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
-	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;
-	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
-
-	// ViewPort
-	virtual void GetViewport(int* left, int* top, int* right, int* bottom) X_ABSTRACT;
-	virtual void SetViewport(int left, int top, int right, int bottom) X_ABSTRACT;
-	virtual void GetViewport(Recti& rect) X_ABSTRACT;
-	virtual void SetViewport(const Recti& rect) X_ABSTRACT;
-
-	virtual int getWidth(void) const X_ABSTRACT;
-	virtual int getHeight(void) const X_ABSTRACT;
-	virtual float getWidthf(void) const X_ABSTRACT;
-	virtual float getHeightf(void) const X_ABSTRACT;
-	// ~ViewPort
-
-	// scales from 800x600 range to what ever res.
-	// 400(x) on 1650x1050 becomes 825
-	virtual float ScaleCoordX(float value) const X_ABSTRACT;
-	virtual float ScaleCoordY(float value) const X_ABSTRACT;
-	virtual void ScaleCoord(float& x, float& y) const X_ABSTRACT;
-	virtual void ScaleCoord(Vec2f& xy) const X_ABSTRACT;
-
-
-	virtual void  SetCamera(const XCamera& cam) X_ABSTRACT;
-	virtual const XCamera& GetCamera() X_ABSTRACT;
-
-	// AuxGeo
-	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
-	// ~AuxGeo
-
-	// Textures 
-	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_ABSTRACT;
-
-	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
-
-	virtual bool SetTexture(texture::TexID texId) X_ABSTRACT;
-	// ~Textures
-
-	// Drawing util
-
-	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
-	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
-	virtual void DrawQuadSS(const Rectf& rect, const Color& col) X_ABSTRACT;
-	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
-	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_ABSTRACT;
-	virtual void DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col) X_ABSTRACT;
-	virtual void DrawRectSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
-	virtual void DrawRectSS(const Rectf& rect, const Color& col) X_ABSTRACT;
-	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
-		const Vec2f& vPos2, const Color& vColor2) X_ABSTRACT;
-
-	virtual void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_ABSTRACT;
-	virtual void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, const Color& col) X_ABSTRACT;
-	virtual void DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre, const Color& col) X_ABSTRACT;
-
-	// for 2d, z is depth not position
-	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_ABSTRACT;
-	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
-	virtual void DrawQuad(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
-	virtual void DrawQuad(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
-	virtual void DrawQuad(Vec2<float> pos, float width, float height, const Color& col) X_ABSTRACT;
-	// draw a quad in 3d z is position not depth.
-	virtual void DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col) X_ABSTRACT;
-
-	virtual void DrawLines(Vec3f* points, uint32_t num, const Color& col) X_ABSTRACT;
-	virtual void DrawLine(const Vec3f& pos1, const Vec3f& pos2) X_ABSTRACT;
-	virtual void DrawLineColor(const Vec3f& vPos1, const Color& color1,
-		const Vec3f& vPos2, const Color& vColor2) X_ABSTRACT;
-
-	virtual void DrawRect(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
-	
-	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
-		float padding, uint32_t max) X_ABSTRACT;
-
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_ABSTRACT;
-	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_ABSTRACT;
-
-	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_ABSTRACT;
-
-	virtual void FlushTextBuffer(void) X_ABSTRACT;
-	// ~Drawing
-
-	// Font
-	virtual int FontCreateTexture(const Vec2i& size, BYTE *pData,
-		texture::Texturefmt::Enum eTF = texture::Texturefmt::R8G8B8A8, bool genMips = false) X_ABSTRACT;
-
-	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_ABSTRACT;
-	virtual bool FontSetTexture(int texId) X_ABSTRACT;
-	virtual bool FontSetRenderingState() X_ABSTRACT;
-	virtual void FontRestoreRenderingState() X_ABSTRACT;
-	virtual void FontSetBlending() X_ABSTRACT;
-	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_ABSTRACT;
-
-	// ~Font
-
-	// used by font's mainly.
-	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-		PrimitiveTypePublic::Enum type) X_ABSTRACT;
-
-	// Shader Stuff
-
-	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_ABSTRACT;
-	
-	virtual bool DefferedBegin(void) X_ABSTRACT;
-	virtual bool DefferedEnd(void) X_ABSTRACT;
-	virtual bool SetWorldShader(void) X_ABSTRACT;
-	virtual bool setGUIShader(bool textured = false) X_ABSTRACT;
-	// ~Shader Stuff
-
-	// Model
-	virtual model::IRenderMesh* createRenderMesh(void) X_ABSTRACT;
-	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
-		shader::VertexFormat::Enum fmt, const char* name) X_ABSTRACT;
-	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_ABSTRACT;
-	 
-	virtual void SetModelMatrix(const Matrix44f& mat) X_ABSTRACT;
-	// ~Model
+	ConstantBufferHandle cb;
+	shader::ShaderTypeFlags visibility;
 };
-#else
+
+typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
 
 
 struct IRenderTarget
@@ -410,7 +272,6 @@ struct IRenderTarget
 
 
 	virtual texture::Texturefmt::Enum getFmt(void) X_ABSTRACT;
-
 };
 
 X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
@@ -428,8 +289,6 @@ struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
-
-
 	virtual ~IRender() {};
 
 	virtual bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_ABSTRACT;
@@ -494,10 +353,9 @@ struct IRender
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
 	// ~AuxGeo
-
 };
 
-#endif
+
 X_NAMESPACE_END
 
 #endif // !_X_RENDER_I_H_
