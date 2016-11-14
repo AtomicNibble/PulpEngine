@@ -71,25 +71,27 @@ namespace shader
 		// we need a list of chicken ready for dippin!
 		struct XParamDB
 		{
-			const char* name;
-			ParamType::Enum type;
-			ParamFlags flags;
-			XParamDB()
+			XParamDB(const char* pName_, ParamType::Enum type_) :
+				XParamDB(pName_, type_, ParamFlags())
 			{
-				name = nullptr;
-				type = ParamType::Unknown;
-			}
-			XParamDB(const char* inName, ParamType::Enum inType)
-			{
-				name = inName;
-				type = inType;
 			}
 
-			XParamDB(const char* inName, ParamType::Enum inType, ParamFlag::Enum inFlags) :
-				XParamDB(inName, inType)
+			XParamDB(const char* pName_, ParamType::Enum type_, ParamFlags flags_)
 			{
-				flags = inFlags;
+				core::StackString<192, char> nameUpper(pName_);
+				nameUpper.toUpper();
+
+				pName = pName_;
+				upperNameHash = core::StrHash(nameUpper.c_str(), nameUpper.length());
+				type = type_;
+				flags = flags_;		
 			}
+
+
+			const char* pName;
+			core::StrHash upperNameHash;
+			ParamType::Enum type;
+			ParamFlags flags;
 		};
 
 		// GL = global
@@ -129,34 +131,62 @@ namespace shader
 
 		};
 
-		XParamDB* findParamBySematic(const char* name)
+		const XParamDB* findParamBySematic(const char* pName)
 		{
 			const size_t num = sizeof(g_SematicParams) / sizeof(XParamDB);
 
+			core::StackString<192, char> nameUpper(pName);
+			core::StrHash upperNameHash(nameUpper.c_str(), nameUpper.length());
+
 			for (size_t i = 0; i < num; i++)
 			{
-				if (core::strUtil::IsEqualCaseInsen(name, g_SematicParams[i].name)) {
-					return &g_SematicParams[i];
+				const auto& param = g_SematicParams[i];
+
+				if (upperNameHash != param.upperNameHash) {
+					continue;
+				}
+
+				if (core::strUtil::IsEqualCaseInsen(pName, param.pName)) {
+					return &param;
 				}
 			}
 			return nullptr;
 		}
 
-
-		static const uint32_t SHADER_BIND_SAMPLER = 0x4000;
-
 	} // namespace
+
+	// -------------------------------------------------------------------
 
 
 	XShaderParam::XShaderParam() :
 		type(ParamType::Unknown),
-		bind(-2),
-		constBufferSlot(0),
-		numParameters(1)
+		bind(-1),
+		numParameters(0)
 	{
 
 	}
 
+	void XShaderParam::print(void)
+	{
+
+	}
+
+	// -------------------------------------------------------------------
+
+
+	XCBuffer::XCBuffer(core::MemoryArenaBase* arena) :
+		size(0),
+		bindPoint(-1),
+		bindCount(-1),
+		params(arena)
+	{
+
+	}
+
+	void XCBuffer::print(void)
+	{
+
+	}
 
 	// -------------------------------------------------------------------
 
@@ -169,11 +199,11 @@ namespace shader
 		status_(ShaderStatus::NotCompiled),
 		type_(type),
 		IlFmt_(InputLayoutFormat::Invalid),
+		numInputParams_(0),
 		numRenderTargets_(0),
 		numSamplers_(0),
-		numConstBuffers_(0),
-		numInputParams_(0),
-		bindVars_(arena),
+		numTextures_(0),
+		cbuffers_(arena),
 		bytecode_(arena),
 		D3DCompileflags_(0)
 	{
@@ -182,7 +212,6 @@ namespace shader
 		sourceFileName_ = pSourceFile->getName();
 		sourceCrc32_ = pSourceFile->getSourceCrc32();
 
-		core::zero_object(maxVecs_);
 	}
 
 
@@ -228,18 +257,6 @@ namespace shader
 		}
 
 		return false;
-	}
-
-	XShaderParam* XHWShader::getParameter(const core::StrHash& nameHash)
-	{
-		for (size_t i = 0; i < bindVars_.size(); i++)
-		{
-			if (bindVars_[i].nameHash == nameHash) {
-				return &bindVars_[i];
-			}
-		}
-
-		return nullptr;
 	}
 
 
@@ -362,8 +379,10 @@ namespace shader
 
 		D3DCompileflags_ = 0;
 
-#if X_DEBUG // todo make this a cvar
+#if X_DEBUG && 0 // todo make this a cvar
 		D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
+#else
+		D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL2;
 #endif // !X_DEBUG
 
 		// allow 16 flags.
@@ -494,10 +513,6 @@ namespace shader
 	{
 		ID3D12ShaderReflection* pShaderReflection;
 		ID3D12ShaderReflectionConstantBuffer* pCB;
-		D3D12_SHADER_DESC shaderDesc;
-		uint32 i, n;
-
-		core::Array<XShaderParam> BindVars(g_rendererArena);
 
 		if (FAILED(D3DReflect(bytecode_.data(), bytecode_.size(), IID_ID3D12ShaderReflection, (void **)&pShaderReflection)))
 		{
@@ -505,6 +520,7 @@ namespace shader
 			return false;
 		}
 
+		D3D12_SHADER_DESC shaderDesc;
 		pShaderReflection->GetDesc(&shaderDesc);
 
 		X_LOG_BULLET;
@@ -514,227 +530,193 @@ namespace shader
 		X_LOG0("Shader", "InputParameters: %i", shaderDesc.InputParameters);
 		X_LOG0("Shader", "OutputParameters: %i", shaderDesc.OutputParameters);
 
-		for (n = 0; n<shaderDesc.ConstantBuffers; n++)
+
+		cbuffers_.setGranularity(shaderDesc.ConstantBuffers);
+
+		for (uint32 n = 0; n<shaderDesc.ConstantBuffers; n++)
 		{
 			pCB = pShaderReflection->GetConstantBufferByIndex(n);
 
 			D3D12_SHADER_BUFFER_DESC BufferDesc;
 			pCB->GetDesc(&BufferDesc);
 
-			if (BufferDesc.Type == D3D11_CT_RESOURCE_BIND_INFO)
+			if (BufferDesc.Type == D3D_CT_RESOURCE_BIND_INFO) {
 				continue;
+			}
 
-			ConstbufType::Enum constBuftype;
+			ConstbufType::Enum cbufType;
 
 			if (core::strUtil::IsEqual("$Globals", BufferDesc.Name)) {
-				constBuftype = ConstbufType::PER_BATCH;
+				cbufType = ConstbufType::PER_BATCH;
 			}
 			else if (core::strUtil::FindCaseInsensitive("PerFrameConstants", BufferDesc.Name)) {
-				constBuftype = ConstbufType::PER_FRAME;
+				cbufType = ConstbufType::PER_FRAME;
 			}
 			else if (core::strUtil::FindCaseInsensitive("ObjectConstants", BufferDesc.Name)) {
-				constBuftype = ConstbufType::PER_INSTANCE;
+				cbufType = ConstbufType::PER_INSTANCE;
 			}
 			else {
 				X_WARNING("Shader", "Unknown cbuffer name, ignoring.");
 				continue;
 			}
 
-			for (i = 0; i<BufferDesc.Variables; i++)
+			XCBuffer& cbuf = cbuffers_.AddOne(cbuffers_.getArena());
+			cbuf.name = BufferDesc.Name;
+			cbuf.size = safe_static_cast<int16_t>(BufferDesc.Size);
+			cbuf.type = cbufType;
+			cbuf.params.setGranularity(BufferDesc.Variables);
+
+			for (uint32 i = 0; i<BufferDesc.Variables; i++)
 			{
 				ID3D12ShaderReflectionVariable* pCV = pCB->GetVariableByIndex(i);
-				ID3D12ShaderReflectionType* pVT = pCV->GetType();
 				D3D12_SHADER_VARIABLE_DESC CDesc;
-				D3D12_SHADER_TYPE_DESC CTDesc;
-				pVT->GetDesc(&CTDesc);
 				pCV->GetDesc(&CDesc);
-
-				int nReg = CDesc.StartOffset >> 4;
 
 				// used and abused?
 				if (!core::bitUtil::IsBitFlagSet(CDesc.uFlags, D3D_SVF_USED)) {
 					continue;
+				}
 
-				XParamDB* entry = findParamBySematic(CDesc.Name);
+				D3D12_SHADER_TYPE_DESC CTDesc;
+				ID3D12ShaderReflectionType* pVT = pCV->GetType();
+				pVT->GetDesc(&CTDesc);
 
-				if (!entry)
+				const int32_t reg = (CDesc.StartOffset >> 4);
+
+				XShaderParam& bind = cbuf.params.AddOne();
+				bind.name = CDesc.Name;
+				bind.nameHash = core::StrHash(CDesc.Name);
+				bind.bind = safe_static_cast<int16_t>(reg);
+				bind.slot = cbuf.type;
+				bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
+
+				// a predefined param?
+				const XParamDB* pEntry = findParamBySematic(CDesc.Name);
+				if (!pEntry)
 				{
-					X_WARNING("Shader", "unknown input var must be set manualy: \"%s\"", CDesc.Name);
-
-					// if we are here the var is used, so the shader won't work correct.
-					// no point letting it run with a invalid buffer.
-					//	pShaderReflection->Release();
-					//	return false;
-
-					// going allow it to be added, then it can be set manualy via code.
-					XShaderParam bind;
-
-					bind.name = CDesc.Name;
-					bind.nameHash = core::StrHash(CDesc.Name);
-					bind.bind = safe_static_cast<short, int>(nReg);
-					bind.constBufferSlot = safe_static_cast<short, ConstbufType::Enum>(constBuftype);
-					bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
+					X_WARNING("Shader", "unknown input var must be set manualy: \"%s\"", CDesc.Name);	
 					bind.flags = VarTypeToFlags(CTDesc);
 					bind.type = ParamType::Unknown;
-
-					BindVars.push_back(bind);
-					continue;
-				}
-
-				if (entry->flags.IsSet(ParamFlag::MATRIX))
-				{
-					if (CTDesc.Class != D3D_SVC_MATRIX_COLUMNS && CTDesc.Class != D3D_SVC_MATRIX_ROWS)
-					{
-						X_ERROR("Shader", "input var: \"%s\" should be a matrix", CDesc.Name);
-						return false;
-					}
-					if (CTDesc.Rows != 4 || CTDesc.Columns != 4)
-					{
-						X_ERROR("Shader", "input var: \"%s\" should be a 4x4 matrix", CDesc.Name);
-						return false;
-					}
-
-				}
-				else if (entry->flags.IsSet(ParamFlag::VEC4))
-				{
-					if (CTDesc.Class != D3D_SVC_VECTOR || CTDesc.Columns != 4)
-					{
-						X_ERROR("Shader", "input var: \"%s\" should be a float4", CDesc.Name);
-						return false;
-					}
-				}
-				else if (entry->flags.IsSet(ParamFlag::FLOAT))
-				{
-					if (CTDesc.Class != D3D_SVC_SCALAR || CTDesc.Columns != 1 || CTDesc.Rows != 1)
-					{
-						X_ERROR("Shader", "input var: \"%s\" should be a float(1)", CDesc.Name);
-						return false;
-					}
 				}
 				else
 				{
-					X_ASSERT_NOT_IMPLEMENTED();
-					return false;
-				}
+					bind.flags = pEntry->flags;
+					bind.type = pEntry->type;
 
-
-				XShaderParam bind;
-				bind.name = CDesc.Name;
-				bind.nameHash = core::StrHash(CDesc.Name);
-				bind.bind = safe_static_cast<short, int>(nReg);
-				bind.constBufferSlot = safe_static_cast<short, ConstbufType::Enum>(constBuftype);
-				bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
-				bind.flags = entry->flags;
-				bind.type = entry->type;
-
-				BindVars.push_back(bind);
+					if (pEntry->flags.IsSet(ParamFlag::MATRIX))
+					{
+						if (CTDesc.Class != D3D_SVC_MATRIX_COLUMNS && CTDesc.Class != D3D_SVC_MATRIX_ROWS)
+						{
+							X_ERROR("Shader", "input var: \"%s\" should be a matrix", CDesc.Name);
+							return false;
+						}
+						if (CTDesc.Rows != 4 || CTDesc.Columns != 4)
+						{
+							X_ERROR("Shader", "input var: \"%s\" should be a 4x4 matrix", CDesc.Name);
+							return false;
+						}
+					}
+					else if (pEntry->flags.IsSet(ParamFlag::VEC4))
+					{
+						if (CTDesc.Class != D3D_SVC_VECTOR || CTDesc.Columns != 4)
+						{
+							X_ERROR("Shader", "input var: \"%s\" should be a float4", CDesc.Name);
+							return false;
+						}
+					}
+					else if (pEntry->flags.IsSet(ParamFlag::FLOAT))
+					{
+						if (CTDesc.Class != D3D_SVC_SCALAR || CTDesc.Columns != 1 || CTDesc.Rows != 1)
+						{
+							X_ERROR("Shader", "input var: \"%s\" should be a float(1)", CDesc.Name);
+							return false;
+						}
+					}
+					else
+					{
+						X_ASSERT_NOT_IMPLEMENTED();
+						return false;
+					}
+				}	
 			}
 		}
 
 		D3D12_SHADER_INPUT_BIND_DESC InputBindDesc;
-		for (n = 0; n<shaderDesc.BoundResources; n++)
+		for (uint32 n = 0; n<shaderDesc.BoundResources; n++)
 		{
 			core::zero_object(InputBindDesc);
 			pShaderReflection->GetResourceBindingDesc(n, &InputBindDesc);
 
-			switch (InputBindDesc.Type)
+			if (InputBindDesc.Type == D3D_SIT_CBUFFER) 
 			{
-			case D3D_SIT_CBUFFER:
-				break;
-
-			case D3D_SIT_TBUFFER:
-				break;
-
-			case D3D_SIT_TEXTURE:
-				break;
-
-			case D3D_SIT_SAMPLER:
-				break;
-
-			default:
-				break;
-			}
-
-			if (InputBindDesc.Type != D3D_SIT_TEXTURE) {
-				continue;
-			}
-
-			XShaderParam bind;
-
-			bind.name = InputBindDesc.Name;
-			bind.bind = safe_static_cast<short, UINT>(InputBindDesc.BindPoint | SHADER_BIND_SAMPLER);
-			bind.numParameters = InputBindDesc.BindCount;
-			//	BindVars.push_back(bind);
-		}
-
-		for (i = 0; i < BindVars.size(); i++)
-		{
-			XShaderParam* pB = &BindVars[i];
-			if (!(pB->bind & SHADER_BIND_SAMPLER)) {
-				continue;
-			}
-
-			numSamplers_++;
-
-			// find it's sampler
-			for (n = 0; n < shaderDesc.BoundResources; n++)
-			{
-				core::zero_object(InputBindDesc);
-
-				pShaderReflection->GetResourceBindingDesc(n, &InputBindDesc);
-
-				if (InputBindDesc.Type != D3D_SIT_SAMPLER) {
-					continue;
-				}
-
-				core::StackString512 temp(InputBindDesc.Name);
-
-				// if the sampler state has the same name
-				// as the texture link them.
-				if (temp.isEqual(pB->name))
+				// find the cbuffer?
+				for (auto& cb : cbuffers_)
 				{
-					pB->constBufferSlot = safe_static_cast<short, UINT>(InputBindDesc.BindPoint);
-					break;
-				}
+					if (cb.name == InputBindDesc.Name)
+					{
+						cb.bindPoint = safe_static_cast<int16_t>(InputBindDesc.BindPoint);
+						cb.bindCount = safe_static_cast<int16_t>(InputBindDesc.BindCount);
+						break;
+					}
+				}		
+			}
+			else if (InputBindDesc.Type == D3D_SIT_SAMPLER)
+			{
+				numSamplers_++;
+			}
+			else if (InputBindDesc.Type == D3D_SIT_TEXTURE)
+			{
+				numTextures_++;
 
-				// nameing convention: (name + sampler)
-				// Texture	basemap
-				// samnpler basemapSampler
-				if (temp.findCaseInsen(pB->name) && temp.findCaseInsen("sampler"))
+				// we still want to find a sampler for a given textures?
+				// I will add that back in if a need it, but it would be nice to just support
+				// samplers that are shared.
+				// but thinking about it the sampling is defined per material.
+				// so in order to control the sampling for each texture based on materials we need to have sampler per texture.
+				// unless we generate a shader variant that has the correct samplers inserted...
+				core::StackString512 textureResName(InputBindDesc.Name);
+
+				for (uint32 i = 0; i < shaderDesc.BoundResources; i++)
 				{
-					pB->constBufferSlot = safe_static_cast<short, UINT>(InputBindDesc.BindPoint);
-					break;
+					pShaderReflection->GetResourceBindingDesc(i, &InputBindDesc);
+					if (InputBindDesc.Type != D3D_SIT_SAMPLER) {
+						continue;
+					}
+
+					core::StackString512 samplerResName(InputBindDesc.Name);
+
+					// if the sampler state has the same name
+					// as the texture link them.
+					if (textureResName == samplerResName)
+					{
+						// we found it's sampler.
+						break;
+					}
+
+					const size_t samplerSuffixLen = sizeof("sampler") - 1;
+					if ((textureResName.length() + samplerSuffixLen) == samplerResName.length())
+					{
+						const char* pName = samplerResName.findCaseInsen(textureResName.begin());
+						if (pName)
+						{
+							const size_t baseNameLen = textureResName.length();
+							if (core::strUtil::IsEqualCaseInsen(pName + baseNameLen, samplerResName.end(), "sampler"))
+							{
+								// we found it's sampler.
+								break;
+							}
+						}
+					}
 				}
 			}
-		}
 
-		for (i = 0; i < BindVars.size(); i++)
-		{
-			XShaderParam* pB = &BindVars[i];
-			// const char *param = pB->name.c_str();
-			bool bSampler = (pB->bind & SHADER_BIND_SAMPLER) != 0;
-
-			if (!bSampler)
-			{
-				X_LOG0("Shader", "add Parameter: \"%s\", %i, Cb:%i (%i)", pB->name.c_str(),
-					pB->numParameters, pB->constBufferSlot, pB->bind);
-			}
-			else
-			{
-				X_LOG0("Shader", "add sampler: \"%s\", %i", pB->name.c_str(), pB->bind);
-			}
-
-			// set max slots
-			if (pB->constBufferSlot < 3) {
-				maxVecs_[pB->constBufferSlot] = core::Max(pB->bind + pB->numParameters, maxVecs_[pB->constBufferSlot]);
-			}
 		}
 
 		if (type_ == ShaderType::Vertex)
 		{
 			const ILTreeNode* pILnode = &shaderMan_.getILTree();
 			D3D12_SIGNATURE_PARAMETER_DESC InputDsc;
-			for (n = 0; n < shaderDesc.InputParameters; n++)
+			for (uint32 n = 0; n < shaderDesc.InputParameters; n++)
 			{
 				pShaderReflection->GetInputParameterDesc(n, &InputDsc);
 
@@ -761,35 +743,28 @@ namespace shader
 		}
 		else if (type_ == ShaderType::Pixel)
 		{
+#if 0	// i just save number of output params don't store any extra info currently.
 			D3D12_SIGNATURE_PARAMETER_DESC OutputDsc;
-
-			for (n = 0; n < shaderDesc.OutputParameters; n++)
+			for (uint32 n = 0; n < shaderDesc.OutputParameters; n++)
 			{
 				pShaderReflection->GetOutputParameterDesc(n, &OutputDsc);
+
+				int goat = 0;
 			}
-		}
-
-
-		X_LOG_BULLET;
-		for (i = 0; i < BindVars.size(); i++)
-		{
-			X_LOG0("ShaderPram", "Name: \"%s\"", BindVars[i].name.c_str());
+#endif
 		}
 
 		pShaderReflection->Release();
 
-		// add them.
-		// addGlobalParams(BindVars, this->type_);
-
-		// shader has a copy!
-		bindVars_ = BindVars;
-
 		// save some data.
 		if (type_ == ShaderType::Pixel) {
-			numRenderTargets_ = shaderDesc.OutputParameters;
+			numRenderTargets_ = safe_static_cast<int32_t>(shaderDesc.OutputParameters);
 		}
-		numConstBuffers_ = shaderDesc.ConstantBuffers;
-		numInputParams_ = shaderDesc.InputParameters;
+		else {
+			numRenderTargets_ = 0;
+		}
+
+		numInputParams_ = safe_static_cast<int32_t>(shaderDesc.InputParameters);
 		return true;
 	}
 
@@ -846,18 +821,6 @@ namespace shader
 
 	// -----------------------------------------------
 
-
-
-	void XShaderTechniqueHW::release(void)
-	{
-		X_ASSERT_NOT_IMPLEMENTED();
-	//	core::SafeRelease(pVertexShader);
-	//	core::SafeRelease(pPixelShader);
-	//	core::SafeRelease(pGeoShader);
-	//	core::SafeRelease(pHullShader);
-	//	core::SafeRelease(pDomainShader);
-	}
-
 	bool XShaderTechniqueHW::canDraw(void) const
 	{
 		bool canDraw = true;
@@ -898,238 +861,6 @@ namespace shader
 
 		return true;
 	}
-
-
-#if 0
-
-
-	void XHWShader_Dx10::InitBufferPointers(void)
-	{
-		// already allocated?
-		if (pConstBuffers_[0][0] != nullptr)
-			return;
-
-		int i, x;
-
-		for (i = 0; i < ConstbufType::Num; i++)
-		{
-			for (x = 0; x < ShaderType::ENUM_COUNT; x++)
-			{
-				size_t size = 256;
-
-				pConstBuffers_[x][i] = X_NEW_ARRAY_ALIGNED(ID3D11Buffer*, size, g_rendererArena, "ShaderConstBuffers", X_ALIGN_OF(ID3D11Buffer*));
-				memset(pConstBuffers_[x][i], 0, sizeof(ID3D11Buffer*)*(size));
-			}
-		}
-
-
-	}
-
-	void XHWShader_Dx10::FreeBufferPointers(void)
-	{
-		int i, x;
-
-		for (i = 0; i < ConstbufType::Num; i++)
-		{
-			for (x = 0; x < ShaderType::ENUM_COUNT; x++)
-			{
-				X_DELETE_ARRAY(pConstBuffers_[x][i], g_rendererArena);
-			}
-		}
-
-	}
-
-
-	// ------------------------------------------------------------------
-
-
-	XShaderParam* XHWShader_Dx10::getParameter(const core::StrHash& nameHash)
-	{
-		core::Array<XShaderParam>::size_type i;
-		for (i = 0; i < bindVars_.size(); i++)
-		{
-			if (bindVars_[i].nameHash == nameHash)
-				return &bindVars_[i];
-		}
-
-		return nullptr;
-	}
-
-	// ====================== Static =============================
-
-
-	void XHWShader_Dx10::commitConstBuffer(ConstbufType::Enum buf_type, ShaderType::Enum shader_type)
-	{
-		// unmap it :)
-		// it checks if any updates where made.
-		unMapConstbuffer(shader_type, buf_type);
-	}
-
-	void XHWShader_Dx10::comitParamsGlobal(void)
-	{
-		X_PROFILE_BEGIN("setParamsGlobal", core::ProfileSubSys::RENDER);
-
-		setParamsGlobal();
-
-		commitConstBuffer(ConstbufType::PER_FRAME, ShaderType::Vertex);
-		commitConstBuffer(ConstbufType::PER_FRAME, ShaderType::Pixel);
-	}
-
-	void XHWShader_Dx10::comitParams(void)
-	{
-		X_PROFILE_BEGIN("setParams", core::ProfileSubSys::RENDER);
-
-		//	setParams();
-
-		commitConstBuffer(ConstbufType::PER_BATCH, ShaderType::Vertex);
-		commitConstBuffer(ConstbufType::PER_BATCH, ShaderType::Pixel);
-
-		commitConstBuffer(ConstbufType::PER_INSTANCE, ShaderType::Vertex);
-		commitConstBuffer(ConstbufType::PER_INSTANCE, ShaderType::Pixel);
-
-		// Geo shader
-		if (pCurGS_) {
-			commitConstBuffer(ConstbufType::PER_BATCH, ShaderType::Geometry);
-			commitConstBuffer(ConstbufType::PER_INSTANCE, ShaderType::Geometry);
-		}
-
-	}
-
-
-
-	void XHWShader_Dx10::setParamsGlobal(void)
-	{
-		if (!perFrameParams_[ShaderType::Vertex].isEmpty())
-		{
-			setParamValues(
-				perFrameParams_[ShaderType::Vertex].ptr(),
-				(uint32_t)perFrameParams_[ShaderType::Vertex].size(),
-				ShaderType::Vertex,
-				perFrameMaxVecs_[ShaderType::Vertex]
-			);
-		}
-		if (!perFrameParams_[ShaderType::Pixel].isEmpty())
-		{
-			setParamValues(
-				perFrameParams_[ShaderType::Pixel].ptr(),
-				(uint32_t)perFrameParams_[ShaderType::Pixel].size(),
-				ShaderType::Pixel,
-				perFrameMaxVecs_[ShaderType::Pixel]
-			);
-		}
-
-	}
-
-	void XHWShader_Dx10::setParams(void)
-	{
-		// we basically just loop over the parama update the values, 
-		// and copy them into the mapped buffer.
-
-		if (!perInstantParams_[ShaderType::Vertex].isEmpty())
-		{
-			setParamValues(
-				perInstantParams_[ShaderType::Vertex].ptr(),
-				(uint32_t)perInstantParams_[ShaderType::Vertex].size(),
-				ShaderType::Vertex,
-				perInstantMaxVecs_[ShaderType::Vertex]
-			);
-		}
-		if (!perInstantParams_[ShaderType::Pixel].isEmpty())
-		{
-			setParamValues(
-				perInstantParams_[ShaderType::Pixel].ptr(),
-				(uint32_t)perInstantParams_[ShaderType::Pixel].size(),
-				ShaderType::Pixel,
-				perInstantMaxVecs_[ShaderType::Pixel]
-			);
-		}
-
-
-	}
-
-
-	void XHWShader_Dx10::setParamValues(XShaderParam* pPrams, uint32_t numPrams,
-		ShaderType::Enum shaderType, uint32_t maxVecs)
-	{
-		X_ASSERT_NOT_NULL(pPrams);
-
-#if 1
-		X_ASSERT_NOT_IMPLEMENTED();
-
-#else
-		uint32_t i, num;
-		XShaderParam* pCurParam;
-		Vec4f* pDest;
-
-		num = numPrams;
-		pDest = vecTemp;
-
-		// render::DX11XRender* const __restrict r = &render::g_Dx11D3D;
-		//	XHWShader_Dx10::InitBufferPointers();
-		X_ASSERT_NOT_IMPLEMENTED();
-
-		for (i = 0; i < num; i++)
-		{
-
-			if (pCurParam->flags.IsSet(ParamFlags::INT))
-				setParameteri(pCurParam, pDest, shaderType, maxVecs);
-			else
-				setParameterf(pCurParam, pDest, shaderType, maxVecs);
-		}
-#endif
-	}
-
-
-	// pILTree_
-
-	void XHWShader_Dx10::addGlobalParams(core::Array<XShaderParam>& BindVars, ShaderType::Enum type)
-	{
-		core::Array<XShaderParam>::Iterator It, it2;
-		core::Array<XShaderParam>& current = perFrameParams_[type];
-		core::Array<XShaderParam>& currentPI = perInstantParams_[type];
-
-		// I don't know how cbuffers will work across multipel shaders.
-		// umm have to see how it works tbh.
-		// like should i check name and register?
-		// if register diffrent add it ? 
-
-		// alright I played around with shit.
-		// it seams Directx gives same register for identical names.
-
-		It = BindVars.begin();
-		for (; It != BindVars.end(); ++It)
-		{
-			const XShaderParam* param = It;
-
-			it2 = current.begin();
-			for (; it2 != current.end(); ++it2)
-			{
-				if (param->name == it2->name)
-				{
-					goto skip;
-				}
-			}
-
-			if (param->constBufferSlot == shader::ConstbufType::PER_FRAME)
-			{
-				current.append(*param);
-				perFrameMaxVecs_[type] = core::Max(param->bind + param->numParameters, perFrameMaxVecs_[type]);
-			}
-			else if (param->constBufferSlot == shader::ConstbufType::PER_INSTANCE)
-			{
-				currentPI.append(*param);
-				perInstantMaxVecs_[type] = core::Max(param->bind + param->numParameters, perInstantMaxVecs_[type]);
-			}
-
-		skip:
-			;
-		}
-	}
-
-
-
-
-#endif
 
 } // namespace shader
 

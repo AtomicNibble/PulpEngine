@@ -45,7 +45,6 @@ public:
 		core::zero_this(this);
 	}
 
-	void release(void);
 	bool canDraw(void) const;
 	bool tryCompile(bool forceSync = false);
 
@@ -54,6 +53,7 @@ public:
 	ILFlags ILFlags;
 	InputLayoutFormat::Enum IlFmt;
 
+	// cbuffers.
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
 	XHWShader* pGeoShader;

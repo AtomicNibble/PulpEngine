@@ -37,22 +37,25 @@ namespace shader
 		return IlFmt_;
 	}
 
-	X_INLINE uint32_t XHWShader::getNumRenderTargets(void) const {
+	X_INLINE int32_t XHWShader::getNumRenderTargets(void) const {
 		return numRenderTargets_;
 	}
-	X_INLINE uint32_t XHWShader::getNumSamplers(void) const {
+	X_INLINE int32_t XHWShader::getNumSamplers(void) const {
 		return numSamplers_;
 	}
-	X_INLINE uint32_t XHWShader::getNumConstantBuffers(void) const {
-		return numConstBuffers_;
+	X_INLINE int32_t XHWShader::getNumTextures(void) const {
+		return numTextures_;
 	}
-	X_INLINE uint32_t XHWShader::getNumInputParams(void) const {
+	X_INLINE int32_t XHWShader::getNumConstantBuffers(void) const {
+		return safe_static_cast<int32_t>(cbuffers_.size());
+	}
+	X_INLINE int32_t XHWShader::getNumInputParams(void) const {
 		return numInputParams_;
 	}
-	X_INLINE uint32_t XHWShader::getSourceCrc32(void) const {
+	X_INLINE int32_t XHWShader::getSourceCrc32(void) const {
 		return sourceCrc32_;
 	}
-	X_INLINE uint32_t XHWShader::getD3DCompileFlags(void) const {
+	X_INLINE int32_t XHWShader::getD3DCompileFlags(void) const {
 		return D3DCompileflags_;
 	}
 
@@ -77,9 +80,14 @@ namespace shader
 		return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
 	}
 
-	X_INLINE const core::Array<XShaderParam> XHWShader::getBindVars(void) const
+	X_INLINE const XHWShader::CBufferArr& XHWShader::getCBuffers(void) const
 	{
-		return bindVars_;
+		return cbuffers_;
+	}
+
+	X_INLINE XHWShader::CBufferArr& XHWShader::getCBuffers(void)
+	{
+		return cbuffers_;
 	}
 
 	X_INLINE const core::Array<uint8_t>& XHWShader::getShaderByteCode(void) const

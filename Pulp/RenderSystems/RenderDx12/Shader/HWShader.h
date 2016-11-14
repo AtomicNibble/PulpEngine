@@ -17,7 +17,7 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-	X_DECLARE_FLAGS8(ParamFlag)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
+	X_DECLARE_FLAGS8(ParamFlag)(FLOAT, INT, BOOL, SAMPLER, MATRIX, VEC2, VEC3, VEC4);
 	X_DECLARE_FLAGS8(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, ReadyToRock, FailedToCompile);
 	X_DECLARE_ENUM8(ConstbufType)(PER_FRAME, PER_BATCH, PER_INSTANCE);
 
@@ -70,6 +70,8 @@ namespace shader
 		XShaderParam(const XShaderParam& sb) = default;
 		XShaderParam& operator = (const XShaderParam& sb) = default;
 
+		void print(void);
+
 		// 8 / 4
 		core::string		name;
 		// 4
@@ -77,12 +79,37 @@ namespace shader
 		// 4
 		ParamFlags			flags;
 		ParamType::Enum		type;
-		uint8_t _pad[2];
+		ConstbufType::Enum  slot;
+		uint8_t _pad[1];
 
 		// 8
 		int16_t				bind;
-		int16_t				constBufferSlot;
-		int32_t				numParameters;
+		int16_t				numParameters;
+	};
+
+
+	struct XCBuffer
+	{
+		typedef core::Array<XShaderParam> ParamArr;
+
+	public:
+		XCBuffer(core::MemoryArenaBase* arena);
+		XCBuffer(const XCBuffer& sb) = default;
+		XCBuffer& operator = (const XCBuffer& sb) = default;
+
+		void print(void);
+
+		// 8
+		core::string name;
+
+		ConstbufType::Enum type;
+		uint8_t _pad;
+		int16_t size;
+
+		int16_t bindPoint;
+		int16_t bindCount;
+
+		ParamArr params;
 	};
 
 	// X_ENSURE_SIZE(XShaderParam, 24);
@@ -92,7 +119,7 @@ namespace shader
 
 	X_ALIGNED_SYMBOL(class XHWShader, 64)
 	{
-		typedef core::Array<XShaderParam> ParamArr;
+		typedef core::Array<XCBuffer> CBufferArr;
 		typedef core::Array<uint8_t> ByteArr;
 
 		friend class ShaderBin;
@@ -111,12 +138,13 @@ namespace shader
 		X_INLINE TechFlags getTechFlags(void) const;
 		X_INLINE ShaderType::Enum getType(void) const;
 		X_INLINE InputLayoutFormat::Enum getILFormat(void) const;
-		X_INLINE uint32_t getNumRenderTargets(void) const;
-		X_INLINE uint32_t getNumSamplers(void) const;
-		X_INLINE uint32_t getNumConstantBuffers(void) const;
-		X_INLINE uint32_t getNumInputParams(void) const;
-		X_INLINE uint32_t getSourceCrc32(void) const;
-		X_INLINE uint32_t getD3DCompileFlags(void) const;
+		X_INLINE int32_t getNumRenderTargets(void) const;
+		X_INLINE int32_t getNumSamplers(void) const;
+		X_INLINE int32_t getNumTextures(void) const;
+		X_INLINE int32_t getNumConstantBuffers(void) const;
+		X_INLINE int32_t getNumInputParams(void) const;
+		X_INLINE int32_t getSourceCrc32(void) const;
+		X_INLINE int32_t getD3DCompileFlags(void) const;
 
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
 		X_INLINE bool isValid(void) const;
@@ -124,14 +152,13 @@ namespace shader
 		X_INLINE bool FailedtoCompile(void) const;
 		X_INLINE bool isCompiling(void) const;
 
-		X_INLINE const core::Array<XShaderParam> getBindVars(void) const;
+		X_INLINE const CBufferArr& getCBuffers(void) const;
+		X_INLINE CBufferArr& getCBuffers(void);
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
 		bool compile(bool forceSync = false);
 		bool invalidateIfChanged(uint32_t newSourceCrc32);
-
-		XShaderParam* getParameter(const core::StrHash& nameHash);
 
 	private:
 		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
@@ -171,15 +198,15 @@ namespace shader
 		InputLayoutFormat::Enum IlFmt_;
 
 		// save info from shader reflection.
-		uint32_t numRenderTargets_;
-		uint32_t numSamplers_;
-		uint32_t numConstBuffers_;
-		uint32_t numInputParams_;
+		int32_t numInputParams_;
+		int32_t numRenderTargets_;
+		int32_t numSamplers_;
+		int32_t numTextures_;
 		// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
 		uint32_t D3DCompileflags_;
-		int32_t maxVecs_[3];
 
-		ParamArr bindVars_;
+		CBufferArr cbuffers_;
+
 		ByteArr bytecode_;
 	};
 

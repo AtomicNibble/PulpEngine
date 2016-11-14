@@ -43,11 +43,13 @@ namespace shader
 			core::dateTimeStampSmall modifed;
 
 			// i now save reflection info.
-			uint32_t numBindVars;
-			uint32_t numSamplers;
-			uint32_t numConstBuffers;
-			uint32_t numInputParams;
-			uint32_t numRenderTargets;
+			uint8_t numInputParams;
+			uint8_t numRenderTargets;
+			uint8_t numSamplers;
+			uint8_t numTextures;
+			// 
+			uint8_t numCBufs;
+			uint8_t __pad[3];
 
 			// 4
 			TechFlags techFlags;
@@ -62,7 +64,7 @@ namespace shader
 			}
 		};
 
-		X_ENSURE_SIZE(ShaderBinHeader, 60);
+		X_ENSURE_SIZE(ShaderBinHeader, 48);
 
 	} // namespace
 
@@ -96,7 +98,7 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 	}
 
 	const auto& byteCode = pShader->getShaderByteCode();
-	const auto& bindVars = pShader->getBindVars();
+	const auto& cbuffers = pShader->getCBuffers();
 
 	// for now every shader for a given type is compiled with same version.
 	// if diffrent shaders have diffrent versions this will ned changing.
@@ -113,15 +115,15 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 	hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
 	hdr.sourceCRC32 = pShader->getSourceCrc32();
 	hdr.compileFlags = pShader->getD3DCompileFlags();
-	hdr.blobLength = safe_static_cast<uint32_t, size_t>(byteCode.size());
+	hdr.blobLength = safe_static_cast<uint32_t>(byteCode.size());
 	hdr.deflatedLength = 0;
 
 	// shader reflection info.
-	hdr.numBindVars = safe_static_cast<uint32_t, size_t>(bindVars.size());
-	hdr.numSamplers = pShader->getNumSamplers();
-	hdr.numConstBuffers = pShader->getNumConstantBuffers();
 	hdr.numInputParams = pShader->getNumInputParams();
 	hdr.numRenderTargets = pShader->getNumRenderTargets();
+	hdr.numSamplers = pShader->getNumSamplers();
+	hdr.numTextures = pShader->getNumTextures();
+	hdr.numCBufs = pShader->getNumConstantBuffers();
 
 	hdr.techFlags = pShader->getTechFlags();
 	hdr.type = pShader->getType();
@@ -154,15 +156,25 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 
 		file.write(hdr);
 
-		for (auto& bind : bindVars)
+		for (const auto& cb : cbuffers)
 		{
-			file.writeString(bind.name);
-			file.write(bind.nameHash);
-			file.write(bind.flags);
-			file.write(bind.type);
-			file.write(bind.bind);
-			file.write(bind.constBufferSlot);
-			file.write(bind.numParameters);
+			file.writeString(cb.name);
+			file.write(cb.type);
+			file.write(cb.size);
+			file.write(cb.bindPoint);
+			file.write(cb.bindCount);
+			file.write<uint8_t>(safe_static_cast<uint8_t>(cb.params.size()));
+
+			for (const auto& bind : cb.params)
+			{
+				file.writeString(bind.name);
+				file.write(bind.nameHash);
+				file.write(bind.flags);
+				file.write(bind.type);
+				file.write(bind.bind);
+				file.write(bind.slot);
+				file.write(bind.numParameters);
+			}
 		}
 
 		if (file.write(pData->data(), pData->size()) != pData->size()) {
@@ -238,36 +250,32 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 			pShader->status_ = ShaderStatus::NotCompiled;
 
 
-			auto& bindvars = pShader->bindVars_; 
-			bindvars.reserve(hdr.numBindVars);
+			auto& cbufs = pShader->getCBuffers(); 
+			cbufs.resize(hdr.numCBufs, cbufs.getArena());
 
 			// load bind vars.
-			uint32_t i;
-			for (i = 0; i < hdr.numBindVars; i++)
+			for(auto& cb : cbufs)
 			{
-				XShaderParam bind;
+				uint8_t numParams;
 
-				file.readString(bind.name);
-				file.read(bind.nameHash);
-				file.read(bind.flags);
-				file.read(bind.type);
-				file.read(bind.bind);
-				file.read(bind.constBufferSlot);
-				file.read(bind.numParameters);
+				file.readString(cb.name);
+				file.read(cb.type);
+				file.read(cb.size);
+				file.read(cb.bindPoint);
+				file.read(cb.bindCount);
+				file.read(numParams);
 
-				bindvars.append(bind);
-			}
+				cb.params.resize(numParams);
 
-			int32_t maxVecs[3] = {};
-			for (i = 0; i < bindvars.size(); i++)
-			{
-				XShaderParam* pB = &bindvars[i];
-
-				// set max slots
-				if (pB->constBufferSlot < 3)
+				for (auto& bind : cb.params)
 				{
-					maxVecs[pB->constBufferSlot] = core::Max(pB->bind +
-						pB->numParameters, maxVecs[pB->constBufferSlot]);
+					file.readString(bind.name);
+					file.read(bind.nameHash);
+					file.read(bind.flags);
+					file.read(bind.type);
+					file.read(bind.bind);
+					file.read(bind.slot);
+					file.read(bind.numParameters);
 				}
 			}
 
@@ -302,12 +310,11 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 				}
 			}
 
-
-			std::memcpy(pShader->maxVecs_, maxVecs, sizeof(maxVecs));
-			pShader->numSamplers_ = hdr.numSamplers;
-			pShader->numConstBuffers_ = hdr.numConstBuffers;
 			pShader->numInputParams_ = hdr.numInputParams;
 			pShader->numRenderTargets_ = hdr.numRenderTargets;
+			pShader->numSamplers_ = hdr.numSamplers;
+			pShader->numTextures_ = hdr.numTextures;
+			X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")();
 
 			pShader->techFlags_ = hdr.techFlags;
 			pShader->IlFmt_ = hdr.ILFmt;
