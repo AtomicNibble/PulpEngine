@@ -864,11 +864,13 @@ namespace shader
 				if (link.pCBufer->isEqual(cb))
 				{
 					link.stages.Set(pShader->getType());
-					break;
+					goto skip_outer_loop;
 				}
 			}
 
 			cbLinks.emplace_back(pShader->getType(), &cb);
+
+		skip_outer_loop:;
 		}
 	}
 
