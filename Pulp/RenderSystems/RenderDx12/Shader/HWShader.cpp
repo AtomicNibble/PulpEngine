@@ -179,6 +179,7 @@ namespace shader
 		sourceFileName_ = pSourceFile->getName();
 		sourceCrc32_ = pSourceFile->getSourceCrc32();
 
+		cbuffers_.setGranularity(2);
 	}
 
 
@@ -800,7 +801,7 @@ namespace shader
 	XShaderTechniqueHW::XShaderTechniqueHW(core::MemoryArenaBase* arena) :
 		cbLinks(arena)
 	{
-
+		cbLinks.setGranularity(2);
 	}
 
 	bool XShaderTechniqueHW::canDraw(void) const
