@@ -861,8 +861,7 @@ namespace shader
 			// we match by name and size currently.
 			for (auto& link : cbLinks)
 			{
-				if (link.pCBufer->size == cb.size &&
-					link.pCBufer->name == cb.name)
+				if (link.pCBufer->isEqual(cb))
 				{
 					link.stages.Set(pShader->getType());
 					break;
