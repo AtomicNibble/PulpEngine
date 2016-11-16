@@ -235,10 +235,10 @@ void XMaterialManager::InitDefaults(void)
 		pDefaultMtl_ = createMaterial_Internal(MTL_DEFAULT_NAME);
 
 		// we want texture info to sent and get back a shader item.
-		XInputShaderResources input;
-		input.material.diffuse.set(1.0, 1.0, 1.0, 1.0);
-		input.textures[ShaderTextureIdx::DIFFUSE].name = texture::TEX_DEFAULT_DIFFUSE;
-		input.textures[ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
+//		XInputShaderResources input;
+//		input.material.diffuse.set(1.0, 1.0, 1.0, 1.0);
+//		input.textures[ShaderTextureIdx::DIFFUSE].name = texture::TEX_DEFAULT_DIFFUSE;
+//		input.textures[ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
 
 		// load the shader / textures needed.
 	//	XShaderItem item = gEnv->pRender->LoadShaderItem(input);
