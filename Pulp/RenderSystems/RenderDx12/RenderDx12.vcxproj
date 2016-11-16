@@ -349,6 +349,7 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
+    <ClInclude Include="Shader\CBuffer.h" />
     <ClInclude Include="Shader\HWShader.h" />
     <ClInclude Include="Shader\ILTree.h" />
     <ClInclude Include="Shader\Shader.h" />
@@ -393,6 +394,7 @@
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
+    <ClCompile Include="Shader\CBuffer.cpp" />
     <ClCompile Include="Shader\HWShader.cpp" />
     <ClCompile Include="Shader\ILTree.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />

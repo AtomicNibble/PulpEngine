@@ -157,39 +157,6 @@ namespace shader
 
 	// -------------------------------------------------------------------
 
-
-	XShaderParam::XShaderParam() :
-		type(ParamType::Unknown),
-		bind(-1),
-		numParameters(0)
-	{
-
-	}
-
-	void XShaderParam::print(void)
-	{
-
-	}
-
-	// -------------------------------------------------------------------
-
-
-	XCBuffer::XCBuffer(core::MemoryArenaBase* arena) :
-		size(0),
-		bindPoint(-1),
-		bindCount(-1),
-		params(arena)
-	{
-
-	}
-
-	void XCBuffer::print(void)
-	{
-
-	}
-
-	// -------------------------------------------------------------------
-
 	XHWShader::XHWShader(core::MemoryArenaBase* arena, XShaderManager& shaderMan,
 			ShaderType::Enum type, const char* pName, const core::string& entry,
 			SourceFile* pSourceFile, TechFlags techFlags) :
@@ -379,7 +346,7 @@ namespace shader
 
 		D3DCompileflags_ = 0;
 
-#if X_DEBUG && 0 // todo make this a cvar
+#if X_DEBUG // todo make this a cvar
 		D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
 #else
 		D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL2;
@@ -462,7 +429,6 @@ namespace shader
 			else
 			{
 				X_ERROR("Shader", "Failed to compile: %x", hr);
-
 			}
 
 			core::SafeReleaseDX(pErrorBlob);
@@ -479,7 +445,7 @@ namespace shader
 		core::SafeReleaseDX(pBlob);
 
 		if (!reflectShader()) {
-
+			X_ERROR("Shader", "Failed to reflect shader");
 			return false;
 		}
 
@@ -821,6 +787,22 @@ namespace shader
 
 	// -----------------------------------------------
 
+	CBufferLink::CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer_) :
+		stages(stage),
+		pCBufer(pCBufer_)
+	{
+
+	}
+
+	// -----------------------------------------------
+
+
+	XShaderTechniqueHW::XShaderTechniqueHW(core::MemoryArenaBase* arena) :
+		cbLinks(arena)
+	{
+
+	}
+
 	bool XShaderTechniqueHW::canDraw(void) const
 	{
 		bool canDraw = true;
@@ -844,8 +826,11 @@ namespace shader
 		return canDraw;
 	}
 
+
+
 	bool XShaderTechniqueHW::tryCompile(bool forceSync)
 	{
+
 		if (pVertexShader && pVertexShader->getStatus() == ShaderStatus::NotCompiled) {
 			if (!pVertexShader->compile(forceSync)) {
 				return false;
@@ -859,7 +844,33 @@ namespace shader
 			}
 		}
 
+		// create a merged list of const buffers.
+		// so that we know if any const buffers are shared between stages
+		// so that we can set visibility flags in the root sig.
+		addCbufs(pVertexShader);
+		addCbufs(pPixelShader);
+
 		return true;
+	}
+
+	void XShaderTechniqueHW::addCbufs(XHWShader* pShader)
+	{
+		const auto& cbufs = pShader->getCBuffers();
+		for (const auto& cb : cbufs)
+		{
+			// we match by name and size currently.
+			for (auto& link : cbLinks)
+			{
+				if (link.pCBufer->size == cb.size &&
+					link.pCBufer->name == cb.name)
+				{
+					link.stages.Set(pShader->getType());
+					break;
+				}
+			}
+
+			cbLinks.emplace_back(pShader->getType(), &cb);
+		}
 	}
 
 } // namespace shader

@@ -182,6 +182,9 @@
     <ClInclude Include="Shader\ShaderUtil.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Shader\CBuffer.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -296,6 +299,9 @@
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
     <ClCompile Include="Shader\ShaderUtil.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\CBuffer.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
   </ItemGroup>

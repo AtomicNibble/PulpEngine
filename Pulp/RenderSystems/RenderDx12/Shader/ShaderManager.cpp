@@ -714,7 +714,7 @@ namespace shader
 
 					for (x = 0; x < numTechFlags + 1; x++)
 					{
-						XShaderTechniqueHW hwTech;
+						XShaderTechniqueHW hwTech(arena_);
 
 						// create the hardware shaders.
 						hwTech.pVertexShader = hwForName(ShaderType::Vertex, pName,
@@ -802,7 +802,7 @@ namespace shader
 
 							for (j = 0; j < numTechFlags + 1; j++)
 							{
-								XShaderTechniqueHW hwTech;
+								XShaderTechniqueHW hwTech(arena_);
 
 								// create the hardware shaders.
 								hwTech.pVertexShader = hwForName(ShaderType::Vertex, name, srcTech.getVertexFunc(),

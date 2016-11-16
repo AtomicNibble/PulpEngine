@@ -17,7 +17,7 @@
 
 #include <../Common/Resources/BaseRenderAsset.h>
 
-#include <unordered_set>
+#include "CBuffer.h"
 
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
@@ -35,18 +35,27 @@ class XShaderTechniqueHW;
 class XHWShader;
 class XShaderManager;
 
+struct CBufferLink
+{
+	CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer);
+
+	ShaderTypeFlags stages;
+	const XCBuffer* pCBufer;
+};
 
 
 class XShaderTechniqueHW
 {
+	typedef core::Array<CBufferLink> CBufLinksArr;
+
 public:
-	XShaderTechniqueHW() {
-		static_assert(InputLayoutFormat::Invalid == 0, "Memset won't make enum invalid");
-		core::zero_this(this);
-	}
+	XShaderTechniqueHW(core::MemoryArenaBase* arena);
 
 	bool canDraw(void) const;
 	bool tryCompile(bool forceSync = false);
+
+private:
+	void addCbufs(XHWShader* pShader);
 
 public:
 	TechFlags techFlags;
@@ -54,6 +63,8 @@ public:
 	InputLayoutFormat::Enum IlFmt;
 
 	// cbuffers.
+	CBufLinksArr cbLinks;
+
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
 	XHWShader* pGeoShader;
