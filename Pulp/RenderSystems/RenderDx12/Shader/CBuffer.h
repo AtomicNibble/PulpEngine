@@ -57,6 +57,9 @@ namespace shader
 
 		void print(void) const;
 
+		bool isEqual(const XShaderParam& oth) const;
+
+
 		// 8 / 4
 		core::string		name;
 		// 4
@@ -83,6 +86,8 @@ namespace shader
 		XCBuffer& operator = (const XCBuffer& sb) = default;
 
 		void print(void) const;
+
+		bool isEqual(const XCBuffer& oth) const;
 
 		// 8
 		core::string name;
