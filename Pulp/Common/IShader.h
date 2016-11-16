@@ -235,6 +235,8 @@ typedef uintptr_t TechHandle;
 
 struct IShaderTech
 {
+	virtual ~IShaderTech() {}
+
 
 };
 
