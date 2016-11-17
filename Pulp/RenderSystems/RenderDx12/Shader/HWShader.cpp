@@ -512,16 +512,16 @@ namespace shader
 				continue;
 			}
 
-			ConstbufType::Enum cbufType;
+			UpdateFreq::Enum baseUpdateRate = UpdateFreq::FRAME;
 
 			if (core::strUtil::IsEqual("$Globals", BufferDesc.Name)) {
-				cbufType = ConstbufType::PER_BATCH;
+				baseUpdateRate = UpdateFreq::BATCH;
 			}
 			else if (core::strUtil::FindCaseInsensitive("PerFrameConstants", BufferDesc.Name)) {
-				cbufType = ConstbufType::PER_FRAME;
+				baseUpdateRate = UpdateFreq::FRAME;
 			}
 			else if (core::strUtil::FindCaseInsensitive("ObjectConstants", BufferDesc.Name)) {
-				cbufType = ConstbufType::PER_INSTANCE;
+				baseUpdateRate = UpdateFreq::INSTANCE;
 			}
 			else {
 				X_WARNING("Shader", "Unknown cbuffer name, ignoring.");
@@ -531,7 +531,7 @@ namespace shader
 			XCBuffer& cbuf = cbuffers_.AddOne(cbuffers_.getArena());
 			cbuf.name = BufferDesc.Name;
 			cbuf.size = safe_static_cast<int16_t>(BufferDesc.Size);
-			cbuf.type = cbufType;
+			cbuf.updateRate = baseUpdateRate;
 			cbuf.params.setGranularity(BufferDesc.Variables);
 			cbuf.allParamsPreDefined = true;
 
@@ -556,7 +556,6 @@ namespace shader
 				bind.name = CDesc.Name;
 				bind.nameHash = core::StrHash(CDesc.Name);
 				bind.bind = safe_static_cast<int16_t>(reg);
-				bind.slot = cbuf.type;
 				bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
 
 				// a predefined param?

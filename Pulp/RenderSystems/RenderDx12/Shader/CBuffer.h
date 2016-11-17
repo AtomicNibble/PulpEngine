@@ -7,7 +7,6 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-	X_DECLARE_ENUM8(ConstbufType)(PER_FRAME, PER_BATCH, PER_INSTANCE);
 	typedef Flags8<ParamFlag> ParamFlags;
 
 
@@ -29,7 +28,7 @@ namespace shader
 		// 4
 		ParamFlags			flags;
 		ParamType::Enum		type;
-		ConstbufType::Enum  slot;
+		UpdateFreq::Enum	updateRate;
 		uint8_t _pad[1];
 
 		// 8
@@ -55,7 +54,7 @@ namespace shader
 		// 8
 		core::string name;
 
-		ConstbufType::Enum type;
+		UpdateFreq::Enum updateRate;
 		int16_t size;
 		bool allParamsPreDefined;
 

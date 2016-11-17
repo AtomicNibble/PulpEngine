@@ -35,7 +35,7 @@ namespace shader
 
 		if (flags.ToInt() != oth.flags.ToInt() || 
 			type != oth.type || 
-			slot != oth.slot || 
+			updateRate != oth.updateRate ||
 			bind != oth.bind || 
 			numParameters != oth.numParameters) {
 			return false;
