@@ -50,13 +50,14 @@ namespace shader
 		void print(void) const;
 
 		bool isEqual(const XCBuffer& oth) const;
+		bool fullyPreDefinedParams(void) const;
 
 		// 8
 		core::string name;
 
 		ConstbufType::Enum type;
-		uint8_t _pad;
 		int16_t size;
+		bool allParamsPreDefined;
 
 		int16_t bindPoint;
 		int16_t bindCount;

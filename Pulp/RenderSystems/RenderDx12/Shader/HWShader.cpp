@@ -533,6 +533,7 @@ namespace shader
 			cbuf.size = safe_static_cast<int16_t>(BufferDesc.Size);
 			cbuf.type = cbufType;
 			cbuf.params.setGranularity(BufferDesc.Variables);
+			cbuf.allParamsPreDefined = true;
 
 			for (uint32 i = 0; i<BufferDesc.Variables; i++)
 			{
@@ -565,6 +566,7 @@ namespace shader
 					X_WARNING("Shader", "unknown input var must be set manualy: \"%s\"", CDesc.Name);	
 					bind.flags = VarTypeToFlags(CTDesc);
 					bind.type = ParamType::Unknown;
+					cbuf.allParamsPreDefined = false;
 				}
 				else
 				{

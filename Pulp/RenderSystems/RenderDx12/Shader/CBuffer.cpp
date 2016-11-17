@@ -49,6 +49,7 @@ namespace shader
 
 	XCBuffer::XCBuffer(core::MemoryArenaBase* arena) :
 		size(0),
+		allParamsPreDefined(false),
 		bindPoint(-1),
 		bindCount(-1),
 		params(arena)
@@ -91,6 +92,11 @@ namespace shader
 		}
 
 		return true;
+	}
+
+	bool XCBuffer::fullyPreDefinedParams(void) const
+	{
+		return allParamsPreDefined;
 	}
 
 } // namespace shader
