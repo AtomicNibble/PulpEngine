@@ -44,7 +44,7 @@ struct CBufferLink
 };
 
 
-class XShaderTechniqueHW
+class XShaderTechniqueHW : public IShaderPermatation
 {
 	typedef core::Array<CBufferLink> CBufLinksArr;
 
@@ -52,7 +52,7 @@ public:
 	XShaderTechniqueHW(core::MemoryArenaBase* arena);
 
 	bool canDraw(void) const;
-	bool tryCompile(bool forceSync = false);
+	bool tryCompile(bool forceSync = false) X_FINAL;
 
 private:
 	void addCbufs(XHWShader* pShader);
@@ -82,6 +82,9 @@ public:
 	void assignSourceTech(const ShaderSourceFileTechnique& srcTech);
 	void append(const XShaderTechniqueHW& hwTech);
 
+	bool tryCompile(bool forceSync = false) X_FINAL;
+
+	IShaderPermatation* getPermatation(VertexFormat::Enum vertexFmt) X_FINAL;
 
 
 public:
@@ -105,7 +108,7 @@ public:
 	~XShader();
 
 	X_INLINE const core::string& getName(void) const X_OVERRIDE;
-	const IShaderTech* getTech(const char* pName) const X_OVERRIDE;
+	IShaderTech* getTech(const char* pName) X_OVERRIDE;
 
 	X_INLINE size_t numTechs(void) const;
 

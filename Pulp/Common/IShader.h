@@ -269,10 +269,21 @@ struct FilterMode
 typedef int32_t ShaderID;
 typedef uintptr_t TechHandle;
 
+struct IShaderPermatation
+{
+	virtual ~IShaderPermatation() {}
+
+	virtual bool tryCompile(bool forceSync = false) X_ABSTRACT;
+};
+
+
 struct IShaderTech
 {
 	virtual ~IShaderTech() {}
 
+	virtual bool tryCompile(bool forceSync = false) X_ABSTRACT;
+
+	virtual IShaderPermatation* getPermatation(VertexFormat::Enum vertexFmt) X_ABSTRACT;
 
 };
 
@@ -284,7 +295,7 @@ struct IShader
 
 
 	// tech stuff.
-	virtual const IShaderTech* getTech(const char* pName) const X_ABSTRACT;
+	virtual IShaderTech* getTech(const char* pName) X_ABSTRACT;
 	
 //	virtual VertexFormat::Enum getVertexFmt() X_ABSTRACT;
 //	virtual ShaderType::Enum getType() X_ABSTRACT;

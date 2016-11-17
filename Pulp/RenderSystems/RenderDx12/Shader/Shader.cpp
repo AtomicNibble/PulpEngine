@@ -14,6 +14,7 @@
 #include "XRender.h"
 
 #include "ShaderSourceTypes.h"
+#include "ShaderUtil.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -68,6 +69,35 @@ void XShaderTechnique::append(const XShaderTechniqueHW& hwTech)
 	hwTechs.emplace_back(hwTech);
 }
 
+bool XShaderTechnique::tryCompile(bool forceSync)
+{
+	for (auto& tech : hwTechs)
+	{
+		if (tech.tryCompile(forceSync))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
+IShaderPermatation* XShaderTechnique::getPermatation(VertexFormat::Enum vertexFmt)
+{
+	InputLayoutFormat::Enum ilFmt = Util::ILfromVertexFormat(vertexFmt);
+
+	for (auto& tech : hwTechs)
+	{
+		if (tech.IlFmt == ilFmt)
+		{
+			return &tech;
+		}
+	}
+
+	return nullptr;
+}
+
 // ----------------------------------------------------
 
 
@@ -84,9 +114,9 @@ XShader::~XShader()
 
 }
 
-const IShaderTech* XShader::getTech(const char* pName) const
+IShaderTech* XShader::getTech(const char* pName)
 {
-	for (const auto& tech : techs_)
+	for (auto& tech : techs_)
 	{
 		if (tech.name == pName)
 		{
