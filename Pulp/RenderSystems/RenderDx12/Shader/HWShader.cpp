@@ -71,12 +71,12 @@ namespace shader
 		// we need a list of chicken ready for dippin!
 		struct XParamDB
 		{
-			XParamDB(const char* pName_, ParamType::Enum type_) :
-				XParamDB(pName_, type_, ParamFlags())
+			XParamDB(const char* pName_, ParamType::Enum type_, UpdateFreq::Enum ur) :
+				XParamDB(pName_, type_, ur, ParamFlags())
 			{
 			}
 
-			XParamDB(const char* pName_, ParamType::Enum type_, ParamFlags flags_)
+			XParamDB(const char* pName_, ParamType::Enum type_, UpdateFreq::Enum ur, ParamFlags flags_)
 			{
 				core::StackString<192, char> nameUpper(pName_);
 				nameUpper.toUpper();
@@ -84,6 +84,7 @@ namespace shader
 				pName = pName_;
 				upperNameHash = core::StrHash(nameUpper.c_str(), nameUpper.length());
 				type = type_;
+				updateRate = ur;
 				flags = flags_;		
 			}
 
@@ -91,6 +92,7 @@ namespace shader
 			const char* pName;
 			core::StrHash upperNameHash;
 			ParamType::Enum type;
+			UpdateFreq::Enum updateRate;
 			ParamFlags flags;
 		};
 
@@ -103,32 +105,23 @@ namespace shader
 		// SK = Skin data
 
 		// used for matching sematics to types.
-		static XParamDB g_SematicParams[] =
+		static const XParamDB g_SematicParams[] =
 		{
-			//	XParamDB("ViewProjMatrix", ParamType::PF_ViewProjMatrix),
-			//	XParamDB("ViewProjMatrix", ParamType::PF_ViewProjMatrix),
 
-			XParamDB("worldToScreenMatrix", ParamType::PF_worldToScreenMatrix, ParamFlag::MATRIX),
-			XParamDB("worldToCameraMatrix", ParamType::PF_worldToCameraMatrix, ParamFlag::MATRIX),
-			XParamDB("cameraToWorldMatrix", ParamType::PF_cameraToWorldMatrix, ParamFlag::MATRIX),
-			XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, ParamFlag::MATRIX),
+			XParamDB("worldToScreenMatrix", ParamType::PF_worldToScreenMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("worldToCameraMatrix", ParamType::PF_worldToCameraMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("cameraToWorldMatrix", ParamType::PF_cameraToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 
-			XParamDB("worldMatrix", ParamType::PI_worldMatrix, ParamFlag::MATRIX),
-			XParamDB("viewMatrix", ParamType::PI_viewMatrix, ParamFlag::MATRIX),
-			XParamDB("projectionMatrix", ParamType::PI_projectionMatrix, ParamFlag::MATRIX),
-			XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, ParamFlag::MATRIX),
+			XParamDB("time", ParamType::PF_Time,  UpdateFreq::FRAME, ParamFlag::FLOAT),
+			XParamDB("frameTime", ParamType::PF_FrameTime,  UpdateFreq::FRAME, ParamFlag::FLOAT),
+			XParamDB("screensize", ParamType::PF_ScreenSize, UpdateFreq::FRAME, ParamFlag::VEC4),
+			XParamDB("cameraPos", ParamType::PF_CameraPos, UpdateFreq::FRAME, ParamFlag::FLOAT),
 
-
-
-			XParamDB("time", ParamType::PF_Time, ParamFlag::FLOAT),
-			XParamDB("frameTime", ParamType::PF_FrameTime, ParamFlag::FLOAT),
-			XParamDB("screensize", ParamType::PF_ScreenSize, ParamFlag::VEC4),
-			XParamDB("cameraPos", ParamType::PF_CameraPos),
-
-			XParamDB("cameraFront", ParamType::PB_CameraFront),
-			XParamDB("cameraRight", ParamType::PB_CameraRight),
-			XParamDB("cameraUp", ParamType::PB_CameraUp),
-
+			XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("worldMatrix", ParamType::PI_worldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("viewMatrix", ParamType::PI_viewMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("projectionMatrix", ParamType::PI_projectionMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 		};
 
 		const XParamDB* findParamBySematic(const char* pName)
