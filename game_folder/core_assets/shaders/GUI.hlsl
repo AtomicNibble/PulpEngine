@@ -13,7 +13,7 @@ struct VS_INPUT
 {
     float4 position       		: POSITION;
     float2 texCoord         	: TEXCOORD0;
-    float4 color            		: COLOR0;  
+    float4 color            		: COLOR0;
 };
 
 struct VS_OUTPUT
@@ -36,7 +36,7 @@ struct Material
 
 
 Texture2D  	baseMap : register(t0);
-SamplerState  	baseMapSampler;
+SamplerState  	baseMapSampler  : register(s0);
 
 
 void SampleTexture( float2 texCoord, float4 color, inout float4 resultColor)
@@ -49,7 +49,7 @@ void SampleTexture( float2 texCoord, float4 color, inout float4 resultColor)
 VS_OUTPUT guiVS(VS_INPUT input)
 {
     VS_OUTPUT output;
-    
+
     // screen space input.
     output.position   	= input.position;
     output.color       	= input.color;
@@ -63,7 +63,7 @@ VS_OUTPUT guiVS(VS_INPUT input)
 float4 guiPS(PS_INPUT input) : SV_TARGET
 {
     float4	resultColor;
-    
+
 #if X_TEXTURED
     SampleTexture(input.texCoord, input.color, resultColor);
 #else
@@ -77,13 +77,13 @@ float4 guiPS(PS_INPUT input) : SV_TARGET
 float4 AlphaTestPS(PS_INPUT input) : SV_TARGET
 {
     float4 resultColor;
-    
+
 #if X_TEXTURED
     SampleTexture(input.texCoord, input.color, resultColor);
 #else
    resultColor =  input.color;
 #endif
- 
+
     clip(resultColor.a - 0.5);
     return resultColor;
 }
