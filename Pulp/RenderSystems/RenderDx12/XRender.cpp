@@ -1322,6 +1322,20 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
 }
 
+// cb's
+ConstantBufferHandle XRender::createConstBuffer(uint32_t size, BufUsage::Enum usage)
+{
+
+
+	return 0; // get fooked
+}
+
+void XRender::destoryConstBuffer(ConstantBufferHandle handle)
+{
+	handle = 0;
+
+}
+
 
 ::texture::ITexture* XRender::getTexture(const char* pName, texture::TextureFlags flags)
 {

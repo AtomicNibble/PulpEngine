@@ -146,6 +146,10 @@ public:
 	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 
+	// cb's
+	ConstantBufferHandle createConstBuffer(uint32_t size, BufUsage::Enum usage) X_OVERRIDE;
+	void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
+
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;

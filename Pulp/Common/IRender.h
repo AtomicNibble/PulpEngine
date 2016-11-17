@@ -330,6 +330,10 @@ struct IRender
 	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 
+	// cb's
+	virtual ConstantBufferHandle createConstBuffer(uint32_t size, BufUsage::Enum usage) X_ABSTRACT;
+	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_ABSTRACT;
+
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	// creates a texture for dynamic content, no data loaded from disk.
