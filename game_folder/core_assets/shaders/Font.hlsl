@@ -11,7 +11,7 @@ struct VS_INPUT
 
 struct VS_OUTPUT
 {
-    float4 ssPosition           	: SV_POSITION;    
+    float4 ssPosition           	: SV_POSITION;
     float2 texCoord             	: TEXCOORD;
     float4 color                	: COLOR;
 };
@@ -29,8 +29,8 @@ struct PS_OUTPUT
 };
 
 
-Texture2D  	baseMap : register(t0);
-SamplerState  	baseMapSampler;
+Texture2D  	       baseMap : register(t0);
+SamplerState        baseMapSampler;
 
 
 VS_OUTPUT BasicVS(VS_INPUT input)
