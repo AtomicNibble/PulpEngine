@@ -13,10 +13,7 @@ cbuffer PerFrameConstants  : register(b0)
   float4x4    worldToCameraMatrix; // world to cameraspace (view)
   float4x4 	 cameraToWorldMatrix; // cameraspace back to worldspace (inView)
 
-  float4x4    worldViewProjectionMatrix; // objectspace to screenspace
-  float4x4    objectToWorldMatrix;
-
-  float4        screensize;   // x,y, 0.5/x, 0.5 /y
+  float4       screensize;   // x,y, 0.5/x, 0.5 /y
   float         time;
   float         frameTime;
 
