@@ -2,14 +2,12 @@
 
 cbuffer ObjectConstants  : register(b0)
 {
-	float4x4 matViewProj;
-	float4x4 matWorldViewProj;
-	
+	float4x4 worldToScreenMatrix;
+	float4x4 worldViewProjectionMatrix;
+
 	float4 auxGeomObjColor;
-	float3 globalLightLocal;
 	float2 auxGeomObjShading;
 };
-
 
 
 struct VS_INPUT
@@ -29,7 +27,7 @@ struct VS_INPUT_OBJ
 
 struct VS_OUTPUT
 {
-    float4 ssPosition           	: SV_POSITION;    
+    float4 ssPosition           	: SV_POSITION;
     float4 color                	: COLOR;
 };
 
@@ -49,24 +47,23 @@ struct PS_OUTPUT
 VS_OUTPUT AuxGeomVS( VS_INPUT IN )
 {
   VS_OUTPUT OUT;
-  OUT.ssPosition = mul( matViewProj, float4(IN.osPosition, 1.0) );
-  OUT.color =  IN.color;
+  OUT.ssPosition = mul( worldToScreenMatrix, float4(IN.osPosition, 1.0) );
+  OUT.color =  IN.color * auxGeomObjColor;
   return OUT;
 }
 
 VS_OUTPUT AuxGeomObjVS( VS_INPUT_OBJ IN )
 {
   VS_OUTPUT OUT;
-  OUT.ssPosition = mul( matWorldViewProj, float4(IN.osPosition, 1.0) );
- 
-   float shading = dot( IN.normal, globalLightLocal );
-  shading = auxGeomObjShading.x * shading + auxGeomObjShading.y;
-  OUT.color = float4( auxGeomObjColor.rgb * shading, auxGeomObjColor.a );
- 
+  OUT.ssPosition = mul( worldViewProjectionMatrix, float4(IN.osPosition, 1.0) );
+
+  float shading = auxGeomObjShading.x * auxGeomObjShading.y;
+  OUT.color = float4( auxGeomObjColor.rgb, auxGeomObjColor.a );
+
   return OUT;
 }
 
-PS_OUTPUT AuxGeomPS( PS_INPUT IN ) 
+PS_OUTPUT AuxGeomPS( PS_INPUT IN )
 {
 	PS_OUTPUT output;
 	output.color = IN.color;
