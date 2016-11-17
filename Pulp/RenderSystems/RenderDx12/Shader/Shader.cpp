@@ -51,7 +51,7 @@ namespace shader
 XShaderTechnique::XShaderTechnique(core::MemoryArenaBase* arena) : 
 	hwTechs(arena)
 {
-
+	hwTechs.setGranularity(6);
 }
 
 
