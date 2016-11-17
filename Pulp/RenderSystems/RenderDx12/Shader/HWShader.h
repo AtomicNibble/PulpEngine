@@ -80,10 +80,6 @@ namespace shader
 		void CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 		bool reflectShader(void);
 
-	public:
-		static const char* getProfileFromType(ShaderType::Enum type);
-		static std::pair<uint8_t, uint8_t> getProfileVersionForType(ShaderType::Enum type);
-
 	protected:
 		XShaderManager& shaderMan_;
 

@@ -4,6 +4,7 @@
 #include "HWShader.h"
 #include "ShaderManager.h"
 #include "ShaderSourceTypes.h"
+#include "ShaderUtil.h"
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -410,7 +411,7 @@ namespace shader
 			Shader_Macros, // pDefines
 			NULL, // pInclude
 			this->entryPoint_,
-			getProfileFromType(type_),
+			Util::getProfileFromType(type_),
 			D3DCompileflags_, // Flags
 			0, // Flags2
 			&pBlob,
@@ -751,64 +752,12 @@ namespace shader
 		return true;
 	}
 
-
-	const char* XHWShader::getProfileFromType(ShaderType::Enum type)
-	{
-		switch (type)
-		{
-		case ShaderType::Vertex:
-			return "vs_5_0";
-		case ShaderType::Pixel:
-			return "ps_5_0";
-		case ShaderType::Geometry:
-			return "gs_5_0";
-		case ShaderType::Hull:
-			return "hs_5_0";
-		case ShaderType::Domain:
-			return "ds_5_0";
-
-		case ShaderType::UnKnown:
-			break;
-		}
-
-		X_ASSERT_UNREACHABLE();
-		return "";
-	}
-
-	std::pair<uint8_t, uint8_t> XHWShader::getProfileVersionForType(ShaderType::Enum type)
-	{
-		uint8_t major, minor;
-
-		major = 0;
-		minor = 0;
-
-		switch (type)
-		{
-		case ShaderType::Vertex:
-		case ShaderType::Pixel:
-		case ShaderType::Geometry:
-		case ShaderType::Hull:
-		case ShaderType::Domain:
-			major = 5;
-			minor = 0;
-			break;
-
-		default:
-			X_ASSERT_UNREACHABLE();
-			break;
-		}
-
-		return std::make_pair(major, minor);
-	}
-
-
 	// -----------------------------------------------
 
 	CBufferLink::CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer_) :
 		stages(stage),
 		pCBufer(pCBufer_)
 	{
-
 	}
 
 	// -----------------------------------------------

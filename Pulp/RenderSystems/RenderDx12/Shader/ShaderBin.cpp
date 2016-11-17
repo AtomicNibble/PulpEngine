@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "ShaderBin.h"
+#include "ShaderUtil.h"
 
 #include <IFileSys.h>
 #include <Hashing\crc32.h>
@@ -102,7 +103,7 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 
 	// for now every shader for a given type is compiled with same version.
 	// if diffrent shaders have diffrent versions this will ned changing.
-	auto profileVersion = XHWShader::getProfileVersionForType(pShader->getType());
+	auto profileVersion = Util::getProfileVersionForType(pShader->getType());
 
 	ShaderBinHeader hdr;
 	core::zero_object(hdr);
@@ -238,7 +239,7 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 			}
 
 			// validate the profile version.
-			auto profileVersion = XHWShader::getProfileVersionForType(pShader->getType());
+			auto profileVersion = Util::getProfileVersionForType(pShader->getType());
 			if (profileVersion.first != hdr.profileMajorVersion || profileVersion.second != hdr.profileMinorVersion)
 			{
 				X_WARNING("Shader", "bin shader is stale, compiled with diffrent shader mode: %" PRIu8 "_%" PRIu8

@@ -83,7 +83,57 @@ namespace shader
 			}
 		}
 
-	}
-}
+
+		const char* getProfileFromType(ShaderType::Enum type)
+		{
+			switch (type)
+			{
+				case ShaderType::Vertex:
+					return "vs_5_0";
+				case ShaderType::Pixel:
+					return "ps_5_0";
+				case ShaderType::Geometry:
+					return "gs_5_0";
+				case ShaderType::Hull:
+					return "hs_5_0";
+				case ShaderType::Domain:
+					return "ds_5_0";
+
+				case ShaderType::UnKnown:
+					break;
+			}
+
+			X_ASSERT_UNREACHABLE();
+			return "";
+		}
+
+		std::pair<uint8_t, uint8_t> getProfileVersionForType(ShaderType::Enum type)
+		{
+			uint8_t major, minor;
+
+			major = 0;
+			minor = 0;
+
+			switch (type)
+			{
+				case ShaderType::Vertex:
+				case ShaderType::Pixel:
+				case ShaderType::Geometry:
+				case ShaderType::Hull:
+				case ShaderType::Domain:
+					major = 5;
+					minor = 0;
+					break;
+
+				default:
+					X_ASSERT_UNREACHABLE();
+					break;
+			}
+
+			return { major, minor };
+		}
+
+	} // namespace Util
+} // namespace shader
 
 X_NAMESPACE_END
