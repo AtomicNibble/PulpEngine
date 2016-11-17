@@ -75,6 +75,16 @@ namespace shader
 			return false;
 		}
 
+		if (bindPoint != oth.bindPoint) {
+			X_WARNING("CBuffer", "buffer has smae name but diffrent bind point");
+
+			return false;
+		}
+		if (bindCount != oth.bindCount) {
+			X_WARNING("CBuffer", "buffer has smae name but diffrent bind count");
+			return false;
+		}
+
 		// now check all the params are the smae.
 		if (params.size() != oth.params.size()) {
 			X_WARNING("CBuffer", "buffer has smae name but diffrent params");
