@@ -136,6 +136,7 @@ namespace shader
 			const size_t num = sizeof(g_SematicParams) / sizeof(XParamDB);
 
 			core::StackString<192, char> nameUpper(pName);
+			nameUpper.toUpper();
 			core::StrHash upperNameHash(nameUpper.c_str(), nameUpper.length());
 
 			for (size_t i = 0; i < num; i++)
