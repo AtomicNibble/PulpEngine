@@ -155,6 +155,9 @@ namespace CommandPacket
 
 	template <typename CommandT>
 	X_INLINE char* getAuxiliaryMemory(CommandT* command);
+	template <typename CommandT>
+	X_INLINE const char* getAuxiliaryMemory(const CommandT* command);
+
 	void storeNextCommandPacket(Packet pPacket, Packet nextPacket);
 
 	template <typename CommandT>
@@ -192,6 +195,12 @@ namespace CommandPacket
 	X_INLINE char* getAuxiliaryMemory(CommandT* command)
 	{
 		return reinterpret_cast<char*>(command) + sizeof(CommandT);
+	}
+
+	template <typename CommandT>
+	X_INLINE const char* getAuxiliaryMemory(const CommandT* command)
+	{
+		return reinterpret_cast<const char*>(command) + sizeof(CommandT);
 	}
 
 	template <typename CommandT>
