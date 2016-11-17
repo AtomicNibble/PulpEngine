@@ -860,19 +860,17 @@ namespace shader
 				return false;
 			}
 
+			addCbufs(pVertexShader);	
+
 			IlFmt = pVertexShader->getILFormat();
 		}
 		if (pPixelShader && pPixelShader->getStatus() == ShaderStatus::NotCompiled) {
 			if (!pPixelShader->compile(forceSync)) {
 				return false;
 			}
-		}
 
-		// create a merged list of const buffers.
-		// so that we know if any const buffers are shared between stages
-		// so that we can set visibility flags in the root sig.
-		addCbufs(pVertexShader);
-		addCbufs(pPixelShader);
+			addCbufs(pPixelShader);
+		}
 
 		return true;
 	}
