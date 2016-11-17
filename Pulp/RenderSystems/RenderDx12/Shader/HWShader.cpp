@@ -147,6 +147,20 @@ namespace shader
 			return nullptr;
 		}
 
+		UpdateFreq::Enum updateFreqMax(UpdateFreq::Enum lhs, UpdateFreq::Enum rhs)
+		{
+			static_assert(UpdateFreq::BATCH > UpdateFreq::FRAME, "enum order not increasing");
+			static_assert(UpdateFreq::INSTANCE > UpdateFreq::BATCH, "enum order not increasing");
+			static_assert(UpdateFreq::MATERIAL > UpdateFreq::INSTANCE, "enum order not increasing");
+			static_assert(UpdateFreq::SKINDATA > UpdateFreq::MATERIAL, "enum order not increasing");
+			static_assert(UpdateFreq::UNKNOWN > UpdateFreq::SKINDATA, "enum order not increasing");
+
+			// add more static asserts yo.
+			static_assert(UpdateFreq::ENUM_COUNT == 6, "Enum count changed this code need updating?");
+
+			return core::Max(lhs, rhs);
+		}
+
 	} // namespace
 
 	// -------------------------------------------------------------------
@@ -558,12 +572,15 @@ namespace shader
 					X_WARNING("Shader", "unknown input var must be set manualy: \"%s\"", CDesc.Name);	
 					bind.flags = VarTypeToFlags(CTDesc);
 					bind.type = ParamType::Unknown;
+					bind.updateRate = UpdateFreq::UNKNOWN;
+
 					cbuf.allParamsPreDefined = false;
 				}
 				else
 				{
 					bind.flags = pEntry->flags;
 					bind.type = pEntry->type;
+					bind.updateRate = pEntry->updateRate;
 
 					if (pEntry->flags.IsSet(ParamFlag::MATRIX))
 					{
@@ -600,6 +617,10 @@ namespace shader
 						return false;
 					}
 				}	
+
+
+				// the cbuf has a update rate equal to the param with the highest update rate.
+				cbuf.updateRate = updateFreqMax(cbuf.updateRate, bind.updateRate);
 			}
 		}
 
