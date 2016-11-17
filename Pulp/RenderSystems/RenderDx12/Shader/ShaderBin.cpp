@@ -159,8 +159,9 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 		for (const auto& cb : cbuffers)
 		{
 			file.writeString(cb.name);
-			file.write(cb.type);
+			file.write(cb.updateRate);
 			file.write(cb.size);
+			file.write(cb.allParamsPreDefined);
 			file.write(cb.bindPoint);
 			file.write(cb.bindCount);
 			file.write<uint8_t>(safe_static_cast<uint8_t>(cb.params.size()));
@@ -171,8 +172,8 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 				file.write(bind.nameHash);
 				file.write(bind.flags);
 				file.write(bind.type);
+				file.write(bind.updateRate);
 				file.write(bind.bind);
-				file.write(bind.slot);
 				file.write(bind.numParameters);
 			}
 		}
@@ -259,8 +260,9 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 				uint8_t numParams;
 
 				file.readString(cb.name);
-				file.read(cb.type);
+				file.read(cb.updateRate);
 				file.read(cb.size);
+				file.read(cb.allParamsPreDefined);
 				file.read(cb.bindPoint);
 				file.read(cb.bindCount);
 				file.read(numParams);
@@ -274,7 +276,7 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 					file.read(bind.flags);
 					file.read(bind.type);
 					file.read(bind.bind);
-					file.read(bind.slot);
+					file.read(bind.updateRate);
 					file.read(bind.numParameters);
 				}
 			}
