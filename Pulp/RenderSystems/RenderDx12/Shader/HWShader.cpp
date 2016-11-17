@@ -818,6 +818,13 @@ namespace shader
 		cbLinks(arena)
 	{
 		cbLinks.setGranularity(2);
+
+		IlFmt = InputLayoutFormat::Invalid;
+		pVertexShader = nullptr;
+		pPixelShader = nullptr;
+		pGeoShader = nullptr;
+		pHullShader = nullptr;
+		pDomainShader = nullptr;
 	}
 
 	bool XShaderTechniqueHW::canDraw(void) const
