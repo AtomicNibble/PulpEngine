@@ -53,15 +53,51 @@ static const uint32_t MAX_SHADER_SOURCE = 256;
 // MP = Morph data
 */
 
-struct ShaderParamFreq
-{
-	enum Enum
-	{
-		FRAME,
-		INSTANCE
-	};
-};
+X_DECLARE_ENUM8(UpdateFreq) (
+	// these need to be ordered in update freq high to low.
+	FRAME,
+	BATCH,
+	INSTANCE,
+	MATERIAL,
+	SKINDATA,
+	UNKNOWN		// unknow is assumed worse case.
+);
 
+
+// param can have multiple flags set eg: (Float & matrix)
+X_DECLARE_FLAGS8(ParamFlag)(
+	FLOAT,
+	INT, 
+	BOOL, 
+	MATRIX, 
+	VEC2, 
+	VEC3, 
+	VEC4
+	// SAMPLER, 
+);
+
+typedef Flags8<ParamFlag> ParamFlags;
+
+X_DECLARE_ENUM8(ParamType) ( // would like a better name.
+
+	Unknown,
+
+	PF_worldToScreenMatrix,		 // worldspace to screenspace (view * proj)
+	PF_worldToCameraMatrix,		 // world to cameraspace (view)
+	PF_cameraToWorldMatrix,		 // cameraspace back to worldspace (inView)
+
+	PF_Time,
+	PF_FrameTime,
+	PF_ScreenSize,
+	PF_CameraPos,
+
+	PI_objectToWorldMatrix, // ?
+	PI_worldMatrix,
+	PI_viewMatrix,
+	PI_projectionMatrix,
+	PI_worldViewProjectionMatrix
+
+);
 
 // I support diffrent vertex formats
 // for use by the engine, not so much assets.

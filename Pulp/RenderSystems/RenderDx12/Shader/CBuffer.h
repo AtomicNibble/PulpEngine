@@ -7,46 +7,8 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-	X_DECLARE_FLAGS8(ParamFlag)(FLOAT, INT, BOOL, SAMPLER, MATRIX, VEC2, VEC3, VEC4);
 	X_DECLARE_ENUM8(ConstbufType)(PER_FRAME, PER_BATCH, PER_INSTANCE);
-
 	typedef Flags8<ParamFlag> ParamFlags;
-
-	// PF = PerFrame
-	// PI = Per Instance
-	// PB = Per Batch
-	struct ParamType
-	{
-		enum Enum : uint8_t
-		{
-			Unknown,
-
-			//	PF_ViewProjMatrix,
-
-			PF_worldToScreenMatrix,
-			PF_worldToCameraMatrix,
-			PF_cameraToWorldMatrix,
-
-			PI_objectToWorldMatrix,
-
-			PI_worldMatrix,
-			PI_viewMatrix,
-			PI_projectionMatrix,
-			PI_worldViewProjectionMatrix,
-
-			PF_Time,
-			PF_FrameTime,
-			PF_ScreenSize,
-			PF_CameraPos,
-
-			PB_CameraFront,
-			PB_CameraRight,
-			PB_CameraUp,
-
-
-			ParamCount,
-		};
-	};
 
 
 	struct XShaderParam
