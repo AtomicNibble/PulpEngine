@@ -5,6 +5,13 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+	CBufferLink::CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer_) :
+		stages(stage),
+		pCBufer(pCBufer_)
+	{
+	}
+
+	// -------------------------------------------------------------------
 
 	XShaderParam::XShaderParam() :
 		type(ParamType::Unknown),

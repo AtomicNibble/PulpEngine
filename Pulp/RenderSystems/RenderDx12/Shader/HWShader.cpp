@@ -754,14 +754,6 @@ namespace shader
 
 	// -----------------------------------------------
 
-	CBufferLink::CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer_) :
-		stages(stage),
-		pCBufer(pCBufer_)
-	{
-	}
-
-	// -----------------------------------------------
-
 
 	XShaderTechniqueHW::XShaderTechniqueHW(core::MemoryArenaBase* arena) :
 		cbLinks(arena)
