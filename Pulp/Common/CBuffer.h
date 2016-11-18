@@ -10,7 +10,17 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+	struct XCBuffer;
 
+	struct CBufferLink
+	{
+		CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer);
+
+		ShaderTypeFlags stages;
+		const XCBuffer* pCBufer;
+	};
+
+	typedef core::Array<CBufferLink> CBufLinksArr;
 
 	struct XShaderParam
 	{

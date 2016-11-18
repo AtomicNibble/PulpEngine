@@ -35,18 +35,9 @@ class XShaderTechniqueHW;
 class XHWShader;
 class XShaderManager;
 
-struct CBufferLink
-{
-	CBufferLink(ShaderType::Enum stage, const XCBuffer* pCBufer);
-
-	ShaderTypeFlags stages;
-	const XCBuffer* pCBufer;
-};
-
 
 class XShaderTechniqueHW : public IShaderPermatation
 {
-	typedef core::Array<CBufferLink> CBufLinksArr;
 
 public:
 	XShaderTechniqueHW(core::MemoryArenaBase* arena);
@@ -54,7 +45,7 @@ public:
 	bool canDraw(void) const;
 	bool tryCompile(bool forceSync = false) X_FINAL;
 
-	const CBufLinksArr& getCbufferLinks(void) const;
+	const CBufLinksArr& getCbufferLinks(void) const X_FINAL;
 
 private:
 	void addCbufs(XHWShader* pShader);
