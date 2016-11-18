@@ -53,6 +53,7 @@ class XRender : public IRender
 
 	typedef core::FixedArray<D3D12_INPUT_ELEMENT_DESC, 12> VertexLayoutDescArr;
 	typedef std::array<VertexLayoutDescArr, shader::VertexFormat::ENUM_COUNT> VertexFormatILArr;
+	typedef std::array<ConstantBufferHandle, MAX_CONST_BUFFERS_BOUND> ConstBuffersArr;
 	typedef VertexBufferHandleArr VertexHandleArr;
 
 
@@ -92,6 +93,7 @@ class XRender : public IRender
 			handle = INVALID_BUF_HANLDE;
 			indexBuffer = INVALID_BUF_HANLDE;
 			vertexBuffers.fill(INVALID_BUF_HANLDE);
+			constBuffers.fill(INVALID_BUF_HANLDE);
 
 			pRootSig = nullptr;
 			pPso = nullptr;
@@ -101,6 +103,7 @@ class XRender : public IRender
 		StateHandle handle;
 		IndexBufferHandle indexBuffer;
 		VertexHandleArr vertexBuffers;
+		ConstBuffersArr constBuffers; // rootSig indexed
 
 		ID3D12RootSignature* pRootSig;
 		ID3D12PipelineState* pPso;
