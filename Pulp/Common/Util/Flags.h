@@ -196,6 +196,10 @@ class Flags8 : public T
 	typedef typename T::Enum Enum;
 	typedef typename T::Bits Bits;
 
+	static const int32_t FLAG_COUNT = T::FLAGS_COUNT;
+
+	static_assert(FLAG_COUNT <= 8, "Flags8 constructed with a flag type containing more than 8 flags");
+
 public:
 	typedef char Description[512];
 	// Default constructor, initializes the flags to zero.
