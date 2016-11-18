@@ -43,6 +43,8 @@ public:
 	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 
+	virtual ConstantBufferHandle createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage) X_OVERRIDE;
+	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;
@@ -54,7 +56,7 @@ public:
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_OVERRIDE;
 	void destoryPassState(PassStateHandle handle) X_OVERRIDE;
 
-	StateHandle createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
 	void destoryState(StateHandle handle) X_OVERRIDE;
 
 	// =============================================

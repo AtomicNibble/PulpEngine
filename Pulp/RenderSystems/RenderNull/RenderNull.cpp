@@ -158,6 +158,22 @@ void RenderNull::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal
 }
 
 
+ConstantBufferHandle RenderNull::createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage)
+{
+	X_UNUSED(size);
+	X_UNUSED(registerIndex);
+	X_UNUSED(usage);
+
+	return INVALID_BUF_HANLDE;
+}
+
+void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
+{
+	X_UNUSED(handle);
+
+}
+
+
 
 texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlags flags)
 {
@@ -210,7 +226,7 @@ void RenderNull::destoryPassState(PassStateHandle handle)
 
 }
 
-StateHandle RenderNull::createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state,
+StateHandle RenderNull::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pTech, const StateDesc& state,
 	const TextureState* pTextStates, size_t numStates)
 {
 	X_UNUSED(passHandle);
@@ -219,7 +235,7 @@ StateHandle RenderNull::createState(PassStateHandle passHandle, const shader::IS
 	X_UNUSED(pTextStates);
 	X_UNUSED(numStates);
 
-	return INVALID_BUF_HANLDE;
+	return INVALID_STATE_HANLDE;
 }
 
 void RenderNull::destoryState(StateHandle handle)
