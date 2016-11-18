@@ -824,6 +824,11 @@ namespace shader
 		return true;
 	}
 
+	const XShaderTechniqueHW::CBufLinksArr& XShaderTechniqueHW::getCbufferLinks(void) const
+	{
+		return cbLinks;
+	}
+
 	void XShaderTechniqueHW::addCbufs(XHWShader* pShader)
 	{
 		const auto& cbufs = pShader->getCBuffers();

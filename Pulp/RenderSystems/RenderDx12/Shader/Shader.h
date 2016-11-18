@@ -54,6 +54,8 @@ public:
 	bool canDraw(void) const;
 	bool tryCompile(bool forceSync = false) X_FINAL;
 
+	const CBufLinksArr& getCbufferLinks(void) const;
+
 private:
 	void addCbufs(XHWShader* pShader);
 
