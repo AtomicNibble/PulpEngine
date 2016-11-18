@@ -46,6 +46,7 @@
     <ClInclude Include="Assets\AssertContainer.h" />
     <ClInclude Include="Casts\safe_static_cast.h" />
     <ClInclude Include="Casts\union_cast.h" />
+    <ClInclude Include="CBuffer.h" />
     <ClInclude Include="CmdBucket.h" />
     <ClInclude Include="CompileTime\ClassInfo.h" />
     <ClInclude Include="CompileTime\ExtractCount.h" />
@@ -382,6 +383,7 @@
   <ItemGroup>
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
+    <None Include="CBuffer.inl" />
     <None Include="CmdBucket.inl" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
@@ -484,6 +486,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SmallerTypeCheck>
     </ClCompile>
+    <ClCompile Include="CBuffer.cpp" />
     <ClCompile Include="CmdBucket.cpp" />
     <ClCompile Include="Compression\Store.cpp" />
     <ClCompile Include="Hashing\xxHash.cpp" />

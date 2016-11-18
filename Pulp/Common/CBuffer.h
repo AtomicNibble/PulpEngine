@@ -1,13 +1,15 @@
 #pragma once
 
+#include <IShader.h>
 
 #include <String\StringHash.h>
+
+#include <Containers\Array.h>
 
 X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-	typedef Flags8<ParamFlag> ParamFlags;
 
 
 	struct XShaderParam
@@ -51,6 +53,10 @@ namespace shader
 		bool isEqual(const XCBuffer& oth) const;
 		bool fullyPreDefinedParams(void) const;
 
+		int16_t getBindPoint(void) const;
+		int16_t getBindCount(void) const;
+
+	public:
 		// 8
 		core::string name;
 
@@ -70,3 +76,5 @@ namespace shader
 } // namespace shader
 
 X_NAMESPACE_END
+
+#include "CBuffer.inl"

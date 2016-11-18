@@ -1153,6 +1153,9 @@
     <ClInclude Include="Util\UniquePointer.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="CBuffer.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1442,6 +1445,9 @@
     </None>
     <None Include="Util\UniquePointer.inl">
       <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="CBuffer.inl">
+      <Filter>Interfaces_h\Render</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1772,6 +1778,9 @@
     </ClCompile>
     <ClCompile Include="Compression\Store.cpp">
       <Filter>SourceFiles\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="CBuffer.cpp">
+      <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

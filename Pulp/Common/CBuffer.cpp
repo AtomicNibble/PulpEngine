@@ -1,13 +1,10 @@
-#include "stdafx.h"
+#include <EngineCommon.h>
 #include "CBuffer.h"
-
 
 X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-
-
 
 	XShaderParam::XShaderParam() :
 		type(ParamType::Unknown),
@@ -33,10 +30,10 @@ namespace shader
 			return false;
 		}
 
-		if (flags.ToInt() != oth.flags.ToInt() || 
-			type != oth.type || 
+		if (flags.ToInt() != oth.flags.ToInt() ||
+			type != oth.type ||
 			updateRate != oth.updateRate ||
-			bind != oth.bind || 
+			bind != oth.bind ||
 			numParameters != oth.numParameters) {
 			return false;
 		}
@@ -104,10 +101,6 @@ namespace shader
 		return true;
 	}
 
-	bool XCBuffer::fullyPreDefinedParams(void) const
-	{
-		return allParamsPreDefined;
-	}
 
 } // namespace shader
 
