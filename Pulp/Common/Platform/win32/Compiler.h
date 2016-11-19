@@ -41,8 +41,9 @@ extern "C" void* _ReturnAddress(void);
 #define X_IMPORT									__declspec(dllimport)
 #define X_EXPORT									__declspec(dllexport)
 
-#define X_PATHSEPERATOR_STR							"\\"
-#define X_PATHSEPERATOR_CHAR						'\\'
+// these should not be used there is a native patch seperator define in Path<T>::
+// #define X_PATHSEPERATOR_STR						"\\"
+// #define X_PATHSEPERATOR_CHAR						'\\'
 
 
 
