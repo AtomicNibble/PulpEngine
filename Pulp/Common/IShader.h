@@ -78,7 +78,7 @@ X_DECLARE_FLAGS8(ParamFlag)(
 
 typedef Flags8<ParamFlag> ParamFlags;
 
-X_DECLARE_ENUM8(ParamType) ( // would like a better name.
+X_DECLARE_FLAGS(ParamType) ( // these are used as flags for dirty checks.
 
 	Unknown,
 
@@ -99,6 +99,7 @@ X_DECLARE_ENUM8(ParamType) ( // would like a better name.
 
 );
 
+typedef Flags<ParamType> ParamTypeFlags;
 // I support diffrent vertex formats
 // for use by the engine, not so much assets.
 

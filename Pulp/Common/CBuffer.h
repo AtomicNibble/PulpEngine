@@ -81,7 +81,9 @@ namespace shader
 	};
 
 	// X_ENSURE_SIZE(XShaderParam, 24);
-	X_ENSURE_SIZE(ParamType::Enum, 1);
+
+	// these are used as flags and enum so 32bit meaning we can have 32max. instead of 255.
+	X_ENSURE_SIZE(ParamType::Enum, 4); 
 
 } // namespace shader
 
