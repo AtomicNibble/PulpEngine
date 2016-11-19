@@ -14,6 +14,7 @@ X_NAMESPACE_DECLARE(texture, class XTexture);
 
 #include <ITexture.h>
 
+
 X_NAMESPACE_BEGIN(render)
 
 namespace shader
@@ -100,6 +101,8 @@ X_DECLARE_FLAGS(ParamType) ( // these are used as flags for dirty checks.
 );
 
 typedef Flags<ParamType> ParamTypeFlags;
+
+
 // I support diffrent vertex formats
 // for use by the engine, not so much assets.
 
@@ -270,11 +273,17 @@ struct FilterMode
 typedef int32_t ShaderID;
 typedef uintptr_t TechHandle;
 
+struct CBufferLink;
+
 struct IShaderPermatation
 {
+	typedef core::Array<CBufferLink> CBufLinksArr;
+
 	virtual ~IShaderPermatation() {}
 
 	virtual bool tryCompile(bool forceSync = false) X_ABSTRACT;
+
+	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
 };
 
 
