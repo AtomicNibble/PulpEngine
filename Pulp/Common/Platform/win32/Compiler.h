@@ -57,14 +57,15 @@ extern "C" void* _ReturnAddress(void);
 template <typename ToCheck,
 	size_t ExpectedSize,
 	size_t RealSize = sizeof(ToCheck)>
-struct check_size_static
+struct check_size_static : std::true_type
 {
 	static_assert(ExpectedSize == RealSize, "type has a incorrect size");
 };
 
+// static const check_size_static<type, size> X_PP_UNIQUE_NAME(size_check);
 
 #define X_ENSURE_SIZE(type,size) \
-	static check_size_static<type, size> X_PP_UNIQUE_NAME(size_check);
+	static_assert(check_size_static<type, size>::value, "Size check fail");
 
 #else 
 	 #define X_ENSURE_SIZE(type,size)	static_assert(sizeof(type)==size, #type " is not " #size " bytes in size")
