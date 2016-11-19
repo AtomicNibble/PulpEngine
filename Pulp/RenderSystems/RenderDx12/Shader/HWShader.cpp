@@ -148,20 +148,6 @@ namespace shader
 			return nullptr;
 		}
 
-		UpdateFreq::Enum updateFreqMax(UpdateFreq::Enum lhs, UpdateFreq::Enum rhs)
-		{
-			static_assert(UpdateFreq::BATCH > UpdateFreq::FRAME, "enum order not increasing");
-			static_assert(UpdateFreq::INSTANCE > UpdateFreq::BATCH, "enum order not increasing");
-			static_assert(UpdateFreq::MATERIAL > UpdateFreq::INSTANCE, "enum order not increasing");
-			static_assert(UpdateFreq::SKINDATA > UpdateFreq::MATERIAL, "enum order not increasing");
-			static_assert(UpdateFreq::UNKNOWN > UpdateFreq::SKINDATA, "enum order not increasing");
-
-			// add more static asserts yo.
-			static_assert(UpdateFreq::ENUM_COUNT == 6, "Enum count changed this code need updating?");
-
-			return core::Max(lhs, rhs);
-		}
-
 	} // namespace
 
 	// -------------------------------------------------------------------
@@ -537,11 +523,10 @@ namespace shader
 			}
 
 			XCBuffer& cbuf = cbuffers_.AddOne(cbuffers_.getArena());
-			cbuf.name = BufferDesc.Name;
-			cbuf.size = safe_static_cast<int16_t>(BufferDesc.Size);
-			cbuf.updateRate = baseUpdateRate;
-			cbuf.params.setGranularity(BufferDesc.Variables);
-			cbuf.allParamsPreDefined = true;
+			cbuf.setName(BufferDesc.Name);
+			cbuf.setSize(safe_static_cast<int16_t>(BufferDesc.Size));
+			cbuf.setParamGranularitys(BufferDesc.Variables);
+			cbuf.setUpdateRate(baseUpdateRate);
 
 			for (uint32 i = 0; i<BufferDesc.Variables; i++)
 			{
@@ -560,28 +545,26 @@ namespace shader
 
 				const int32_t reg = (CDesc.StartOffset >> 4);
 
-				XShaderParam& bind = cbuf.params.AddOne();
-				bind.name = CDesc.Name;
-				bind.nameHash = core::StrHash(CDesc.Name);
-				bind.bind = safe_static_cast<int16_t>(reg);
-				bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
+				XShaderParam bind;
+				bind.setName(CDesc.Name);
+				bind.setBindPoint(reg);
+				bind.setSize(CDesc.Size);		
+				// bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
 
 				// a predefined param?
 				const XParamDB* pEntry = findParamBySematic(CDesc.Name);
 				if (!pEntry)
 				{
 					X_WARNING("Shader", "unknown input var must be set manualy: \"%s\"", CDesc.Name);	
-					bind.flags = VarTypeToFlags(CTDesc);
-					bind.type = ParamType::Unknown;
-					bind.updateRate = UpdateFreq::UNKNOWN;
-
-					cbuf.allParamsPreDefined = false;
+					bind.setFlags(VarTypeToFlags(CTDesc));
+					bind.setType(ParamType::Unknown);
+					bind.setUpdateRate(UpdateFreq::UNKNOWN);
 				}
 				else
 				{
-					bind.flags = pEntry->flags;
-					bind.type = pEntry->type;
-					bind.updateRate = pEntry->updateRate;
+					bind.setFlags(pEntry->flags);
+					bind.setType(pEntry->type);
+					bind.setUpdateRate(pEntry->updateRate);
 
 					if (pEntry->flags.IsSet(ParamFlag::MATRIX))
 					{
@@ -620,9 +603,10 @@ namespace shader
 				}	
 
 
-				// the cbuf has a update rate equal to the param with the highest update rate.
-				cbuf.updateRate = updateFreqMax(cbuf.updateRate, bind.updateRate);
+				cbuf.addParam(std::move(bind));
 			}
+
+			cbuf.postPopulate();
 		}
 
 		D3D12_SHADER_INPUT_BIND_DESC InputBindDesc;
@@ -636,10 +620,12 @@ namespace shader
 				// find the cbuffer?
 				for (auto& cb : cbuffers_)
 				{
-					if (cb.name == InputBindDesc.Name)
+					if (cb.getName() == InputBindDesc.Name)
 					{
-						cb.bindPoint = safe_static_cast<int16_t>(InputBindDesc.BindPoint);
-						cb.bindCount = safe_static_cast<int16_t>(InputBindDesc.BindCount);
+						cb.setBindPointAndCount(
+							safe_static_cast<int16_t>(InputBindDesc.BindPoint),
+							safe_static_cast<int16_t>(InputBindDesc.BindCount)
+						);
 						break;
 					}
 				}		
@@ -823,8 +809,8 @@ namespace shader
 
 	void XShaderTechniqueHW::addCbufs(XHWShader* pShader)
 	{
-		const auto& cbufs = pShader->getCBuffers();
-		for (const auto& cb : cbufs)
+		auto& cbufs = pShader->getCBuffers();
+		for (auto& cb : cbufs)
 		{
 			// we match by name and size currently.
 			for (auto& link : cbLinks)

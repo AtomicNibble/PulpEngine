@@ -159,24 +159,7 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 
 		for (const auto& cb : cbuffers)
 		{
-			file.writeString(cb.name);
-			file.write(cb.updateRate);
-			file.write(cb.size);
-			file.write(cb.allParamsPreDefined);
-			file.write(cb.bindPoint);
-			file.write(cb.bindCount);
-			file.write<uint8_t>(safe_static_cast<uint8_t>(cb.params.size()));
-
-			for (const auto& bind : cb.params)
-			{
-				file.writeString(bind.name);
-				file.write(bind.nameHash);
-				file.write(bind.flags);
-				file.write(bind.type);
-				file.write(bind.updateRate);
-				file.write(bind.bind);
-				file.write(bind.numParameters);
-			}
+			cb.SSave(file.GetFile());
 		}
 
 		if (file.write(pData->data(), pData->size()) != pData->size()) {
@@ -258,28 +241,7 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 			// load bind vars.
 			for(auto& cb : cbufs)
 			{
-				uint8_t numParams;
-
-				file.readString(cb.name);
-				file.read(cb.updateRate);
-				file.read(cb.size);
-				file.read(cb.allParamsPreDefined);
-				file.read(cb.bindPoint);
-				file.read(cb.bindCount);
-				file.read(numParams);
-
-				cb.params.resize(numParams);
-
-				for (auto& bind : cb.params)
-				{
-					file.readString(bind.name);
-					file.read(bind.nameHash);
-					file.read(bind.flags);
-					file.read(bind.type);
-					file.read(bind.bind);
-					file.read(bind.updateRate);
-					file.read(bind.numParameters);
-				}
+				cb.SLoad(file.GetFile());
 			}
 
 			pShader->bytecode_.resize(hdr.blobLength);
