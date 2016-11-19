@@ -25,22 +25,19 @@ namespace Commands
 
 #if 1
 
+	X_PACK_PUSH(2)
 	X_DISABLE_WARNING(4201)
-
 	struct ResourceStateBase
 	{
 		X_INLINE int8_t getNumTextStates(void) const;
-		X_INLINE int8_t getNumVBs(void) const;
 		X_INLINE int8_t getNumCBs(void) const;
 
 		X_INLINE bool anySet(void) const;
 
 		X_INLINE TextureState* getTexStates(void);
-		X_INLINE VertexBufferHandle* getVBs(void);
 		X_INLINE ConstantBufferHandle* getCBs(void);
 
 		X_INLINE const TextureState* getTexStates(void) const;
-		X_INLINE const VertexBufferHandle* getVBs(void) const;
 		X_INLINE const ConstantBufferHandle* getCBs(void) const;
 
 		X_INLINE int32_t getTotalSize(void) const;
@@ -54,23 +51,19 @@ namespace Commands
 		union {
 			struct {
 				int8_t numTextStates;
-				int8_t numVertexBufs;
 				int8_t numCbs;
-				int8_t _pad;
 			};
-			uint32_t val;
+			uint16_t val;
 		};
 	};
+	X_PACK_POP
 	X_ENABLE_WARNING(4201)
+
+	X_ENSURE_SIZE(ResourceStateBase, 2);
 
 	X_INLINE int8_t ResourceStateBase::getNumTextStates(void) const
 	{
 		return numTextStates;
-	}
-
-	X_INLINE int8_t ResourceStateBase::getNumVBs(void) const
-	{
-		return numVertexBufs;
 	}
 
 	X_INLINE int8_t ResourceStateBase::getNumCBs(void) const
@@ -88,18 +81,11 @@ namespace Commands
 		return reinterpret_cast<TextureState*>(getDataStart());
 	}
 
-	X_INLINE VertexBufferHandle* ResourceStateBase::getVBs(void)
-	{
-		uint8_t* pStart = getDataStart();
-		pStart += (sizeof(TextureState) * numTextStates);
-		return reinterpret_cast<VertexBufferHandle*>(pStart);
-	}
 
 	X_INLINE ConstantBufferHandle* ResourceStateBase::getCBs(void)
 	{
 		uint8_t* pStart = getDataStart();
 		pStart += (sizeof(TextureState) * numTextStates);
-		pStart += (sizeof(VertexBufferHandle) * numVertexBufs);
 		return reinterpret_cast<ConstantBufferHandle*>(pStart);
 	}
 
@@ -108,18 +94,10 @@ namespace Commands
 		return reinterpret_cast<const TextureState*>(getDataStart());
 	}
 
-	X_INLINE const VertexBufferHandle* ResourceStateBase::getVBs(void) const
-	{
-		const uint8_t* pStart = getDataStart();
-		pStart += (sizeof(TextureState) * numTextStates);
-		return reinterpret_cast<const VertexBufferHandle*>(pStart);
-	}
-
 	X_INLINE const ConstantBufferHandle* ResourceStateBase::getCBs(void) const
 	{
 		const uint8_t* pStart = getDataStart();
 		pStart += (sizeof(TextureState) * numTextStates);
-		pStart += (sizeof(VertexBufferHandle) * numVertexBufs);
 		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
 	}
 
@@ -137,7 +115,6 @@ namespace Commands
 	{
 		int32_t size = sizeof(ResourceStateBase);
 		size += (sizeof(TextureState) * numTextStates);
-		size += (sizeof(VertexBufferHandle) * numVertexBufs);
 		size += (sizeof(ConstantBufferHandle) * numCbs);
 		return size;
 	}
@@ -146,7 +123,6 @@ namespace Commands
 	{
 		int32_t size = 0;
 		size += (sizeof(TextureState) * numTextStates);
-		size += (sizeof(VertexBufferHandle) * numVertexBufs);
 		size += (sizeof(ConstantBufferHandle) * numCbs);
 		return size;
 	}
