@@ -179,6 +179,8 @@ X_DECLARE_ENUM8(TextureSlot)(
 	ROUGTHNESS
 );
 
+static_assert(MAX_TEXTURES_BOUND >= TextureSlot::ENUM_COUNT, "Slots bound must be greater or equal to num slots");
+
 // LINEAR is linera with none mip sampling aka LINEAR_MIP_NONE
 // BILINEAR is linera with point mip sampling aka LINEAR_MIP_NEAREST
 // TRILINEAR is linera with linear mip sampling aka LINEAR_MIP_LINEAR
