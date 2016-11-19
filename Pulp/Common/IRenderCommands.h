@@ -17,6 +17,263 @@ namespace Commands
 		UPDATE_TEXTUTE_SUB_BUF_DATA
 	);
 
+	// how to pass these states in nice way.
+	// i don't really want to create handles for them as these are just arrays of handles.
+	// so maybe storing this info in the bucket is just best way?
+	// 
+	// 
+
+#if 1
+
+	X_DISABLE_WARNING(4201)
+
+	struct ResourceStateBase
+	{
+		X_INLINE int8_t getNumTextStates(void) const;
+		X_INLINE int8_t getNumVBs(void) const;
+		X_INLINE int8_t getNumCBs(void) const;
+
+		X_INLINE bool anySet(void) const;
+
+		X_INLINE TextureState* getTexStates(void);
+		X_INLINE VertexBufferHandle* getVBs(void);
+		X_INLINE ConstantBufferHandle* getCBs(void);
+
+		X_INLINE const TextureState* getTexStates(void) const;
+		X_INLINE const VertexBufferHandle* getVBs(void) const;
+		X_INLINE const ConstantBufferHandle* getCBs(void) const;
+
+		X_INLINE int32_t getTotalSize(void) const;
+		X_INLINE int32_t getStateSize(void) const;
+
+	private:
+		X_INLINE const uint8_t* getDataStart(void) const;
+		X_INLINE uint8_t* getDataStart(void);
+
+	protected:
+		union {
+			struct {
+				int8_t numTextStates;
+				int8_t numVertexBufs;
+				int8_t numCbs;
+				int8_t _pad;
+			};
+			uint32_t val;
+		};
+	};
+	X_ENABLE_WARNING(4201)
+
+	X_INLINE int8_t ResourceStateBase::getNumTextStates(void) const
+	{
+		return numTextStates;
+	}
+
+	X_INLINE int8_t ResourceStateBase::getNumVBs(void) const
+	{
+		return numVertexBufs;
+	}
+
+	X_INLINE int8_t ResourceStateBase::getNumCBs(void) const
+	{
+		return numCbs;
+	}
+
+	X_INLINE bool ResourceStateBase::anySet(void) const
+	{
+		return val != 0;
+	}
+
+	X_INLINE TextureState* ResourceStateBase::getTexStates(void)
+	{
+		return reinterpret_cast<TextureState*>(getDataStart());
+	}
+
+	X_INLINE VertexBufferHandle* ResourceStateBase::getVBs(void)
+	{
+		uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		return reinterpret_cast<VertexBufferHandle*>(pStart);
+	}
+
+	X_INLINE ConstantBufferHandle* ResourceStateBase::getCBs(void)
+	{
+		uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(VertexBufferHandle) * numVertexBufs);
+		return reinterpret_cast<ConstantBufferHandle*>(pStart);
+	}
+
+	X_INLINE const TextureState* ResourceStateBase::getTexStates(void) const
+	{
+		return reinterpret_cast<const TextureState*>(getDataStart());
+	}
+
+	X_INLINE const VertexBufferHandle* ResourceStateBase::getVBs(void) const
+	{
+		const uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		return reinterpret_cast<const VertexBufferHandle*>(pStart);
+	}
+
+	X_INLINE const ConstantBufferHandle* ResourceStateBase::getCBs(void) const
+	{
+		const uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(VertexBufferHandle) * numVertexBufs);
+		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
+	}
+
+	X_INLINE const uint8_t* ResourceStateBase::getDataStart(void) const
+	{
+		return reinterpret_cast<const uint8_t*>(this + 1);
+	}
+
+	X_INLINE uint8_t* ResourceStateBase::getDataStart(void)
+	{
+		return reinterpret_cast<uint8_t*>(this + 1);
+	}
+
+	X_INLINE int32_t ResourceStateBase::getTotalSize(void) const
+	{
+		int32_t size = sizeof(ResourceStateBase);
+		size += (sizeof(TextureState) * numTextStates);
+		size += (sizeof(VertexBufferHandle) * numVertexBufs);
+		size += (sizeof(ConstantBufferHandle) * numCbs);
+		return size;
+	}
+
+	X_INLINE int32_t ResourceStateBase::getStateSize(void) const
+	{
+		int32_t size = 0;
+		size += (sizeof(TextureState) * numTextStates);
+		size += (sizeof(VertexBufferHandle) * numVertexBufs);
+		size += (sizeof(ConstantBufferHandle) * numCbs);
+		return size;
+	}
+
+
+#else
+
+	X_DISABLE_WARNING(4201)
+
+	struct ResourceStateBase
+	{
+		union {
+			struct {
+				int8_t numTextStates;
+				int8_t numVertexBufs;
+				int8_t numCbs;
+				int8_t _pad;
+			};
+			uint32_t val;
+		};
+	};
+	X_ENABLE_WARNING(4201)
+
+	template<size_t numTex, size_t numVBs, size_t numCBs>
+	struct ResourceState : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(TextureState) * numTex) + 
+			(sizeof(VertexBufferHandle) * numVBs) +
+			(sizeof(ConstantBufferHandle) * numCBs);
+
+		X_INLINE const void* getData(void) const {
+			return &tex;
+		}
+
+		TextureState tex[numTex];
+		VertexBufferHandle vbs[numVBs];
+		ConstantBufferHandle cbs[numCBs];
+	};
+
+	template<size_t numTex, size_t numVBs>
+	struct ResourceState<numTex, numVBs, 0> : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(TextureState) * numTex) +
+			(sizeof(VertexBufferHandle) * numVBs);
+
+		X_INLINE const void* getData(void) const {
+			return &tex;
+		}
+
+		TextureState tex[numTex];
+		VertexBufferHandle vbs[numVBs];
+	};
+
+
+	template<size_t numTex, size_t numCBs>
+	struct ResourceState<numTex, 0, numCBs> : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(TextureState) * numTex) +
+			(sizeof(ConstantBufferHandle) * numCBs);
+
+		X_INLINE const void* getData(void) const {
+			return &tex;
+		}
+
+		TextureState tex[numTex];
+		ConstantBufferHandle cbs[numCBs];
+	};
+
+	template<size_t numVBs, size_t numCBs>
+	struct ResourceState<0, numVBs, numCBs> : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(VertexBufferHandle) * numVBs) +
+			(sizeof(ConstantBufferHandle) * numCBs);
+
+		X_INLINE const void* getData(void) const {
+			return &vbs;
+		}
+
+		VertexBufferHandle vbs[numVBs];
+		ConstantBufferHandle cbs[numCBs];
+	};
+
+	template<size_t numTex>
+	struct ResourceState<numTex, 0, 0> : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(TextureState) * numTex);
+
+		X_INLINE const void* getData(void) const {
+			return &tex;
+		}
+
+		TextureState tex[numTex];
+	};
+
+	template<size_t numVBs>
+	struct ResourceState<0, numVBs, 0> : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(VertexBufferHandle) * numVBs);
+
+		X_INLINE const void* getData(void) const {
+			return &vbs;
+		}
+
+		VertexBufferHandle vbs[numVBs];
+	};
+
+	template<size_t numCBs>
+	struct ResourceState<0, 0, numCBs> : public ResourceStateBase
+	{
+		static const uint32_t STATE_DATA_SIZE =
+			(sizeof(ConstantBufferHandle) * numCBs);
+
+		X_INLINE const void* getData(void) const {
+			return &vbs;
+		}
+
+		ConstantBufferHandle cbs[numCBs];
+	};
+
+#endif
+
 	struct Draw
 	{
 		static const Command::Enum CMD = Command::DRAW;
@@ -24,16 +281,14 @@ namespace Commands
 		uint32_t vertexCount;
 		uint32_t startVertex;
 
-		// we need to be able to pass textures.
-		// i think we are going to have fixed texture slots.
-		// so if you want to set diffuse it's always at idx 0 etc.
-		// i don't want to really pass all indexes so variable size would be nice.
-		// if we have a handle for the texture collection that could also be nice as 
-		// it provides single check for texture change.
-		TextureState textures[TextureSlot::ENUM_COUNT];
 
 		StateHandle stateHandle;
 		VertexBufferHandleArr vertexBuffers;
+		// maybe i could make this in place and place the data in the aux buf.
+		// requires copying of data but then the render pipeline can read from same cache line
+		// i'll bench mark it.
+		// more memory but better cache access is proberly faster.
+		ResourceStateBase resourceState;
 	};
 
 	struct DrawIndexed
@@ -45,8 +300,9 @@ namespace Commands
 		uint32_t baseVertex;
 
 		StateHandle stateHandle;
-		VertexBufferHandleArr vertexBuffers;
 		IndexBufferHandle indexBuffer;
+		ResourceStateBase resourceState;
+
 	};
 
 	struct CopyConstantBufferData
