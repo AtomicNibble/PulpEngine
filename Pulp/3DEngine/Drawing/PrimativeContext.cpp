@@ -229,7 +229,7 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 	for (size_t i=0; i<vertexPages_.size(); i++)
 	{
 		if (expectNull) {
-			X_ASSERT(vertexPages_[i].verts.isEmpty(), "Avertex page had data after a page that was empty")();
+			X_ASSERT(vertexPages_[i].verts.isEmpty(), "A vertex page had data after a page that was empty")();
 		}
 		else
 		{
