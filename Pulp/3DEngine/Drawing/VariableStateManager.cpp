@@ -10,10 +10,7 @@ namespace
 	// didnt make these static members as Vs won't show me the size when i hover over :(
 
 	const uint32_t MAX_ALIGN = X_ALIGN_OF(render::Commands::ResourceStateBase);
-	const uint32_t MAX_ALOC_SIZE =
-		sizeof(render::Commands::ResourceStateBase) +
-		(sizeof(render::TextureState) * VariableStateManager::MAX_TEX_STATES) +
-		(sizeof(render::ConstantBufferHandle) * VariableStateManager::MAX_CONST_BUFFERS);
+	const uint32_t MAX_ALOC_SIZE = render::Commands::ResourceStateBase::getMaxStateSize();
 
 	// used to access the protected members.
 	// thought id try somthing diffrent than making the manager a friend :|
