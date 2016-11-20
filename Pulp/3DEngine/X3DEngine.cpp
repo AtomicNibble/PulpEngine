@@ -255,6 +255,50 @@ void X3DEngine::OnFrameBegin(void)
 
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
 
+#if 1
+		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
+		{
+			auto& context = primContexts_[i];
+			if (!context.isEmpty())
+			{
+				// create a command(s) to update the VB data.
+				context.appendDirtyBuffers(primBucket);
+
+				const auto& elems = context.getUnsortedBuffer();
+				auto vertexPageHandles = context.getVertBufHandles();
+
+				// the variable state for the material.
+				// so this might just be the line material or some other SHIT!
+				// but it may also be a textured quad so it will contain texture info.
+				render::Commands::ResourceStateBase* pVariableState = nullptr;
+
+				for (size_t x = 0; x < elems.size(); x++)
+				{
+					const auto& elem = elems[x];
+					const auto flags = elem.flags;
+
+					const auto textureId = flags.getTextureId();
+
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x + 10), pVariableState->getStateSize());
+					pDraw->startVertex = elem.vertexOffs;
+					pDraw->vertexCount = elem.numVertices;
+					pDraw->stateHandle = elem.stateHandle;
+					// set the vertex handle to correct one.
+					core::zero_object(pDraw->vertexBuffers);
+					pDraw->vertexBuffers[VertexStream::VERT] = vertexPageHandles[elem.pageIdx];
+
+					// variable state data.
+					char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDraw);
+					std::memcpy(pAuxData, pVariableState->getDataStart(), pVariableState->getStateSize());
+				}
+
+			}
+
+
+		}
+
+
+#else
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 		{
 			auto& context = primContexts_[i];
@@ -272,13 +316,24 @@ void X3DEngine::OnFrameBegin(void)
 
 
 #if 1
-				const auto& front = elems.front();
-				auto curFlags = front.flags;
+#if 1
 
-
-			//	desc.topo = curFlags.getPrimType();
-			//	stateHandle = pRender_->createState(passHandle, pTech, desc, nullptr, 0);
 #if 0
+				typedef render::Commands::ResourceState<1, 1, 1> ResState;
+				ResState state;
+				state.numTextStates = 0;
+				state.numVertexBufs = 1;
+				state.numCbs = 1;
+				state._pad = 0;
+				state.vbs[0] = vertexBuf;
+				state.cbs[0] = vertexBuf;
+				// textures
+				state.tex[0].sampler.filter = render::FilterType::LINEAR_MIP_NONE;
+				state.tex[0].sampler.repeat = render::TexRepeat::TILE_BOTH;
+				state.tex[0].slot = render::TextureSlot::DIFFUSE;
+				state.tex[0].textureId = 0;
+
+
 				for (size_t x = 0; x < elems.size(); x++)
 				{
 					const auto& elem = elems[x];
@@ -290,21 +345,23 @@ void X3DEngine::OnFrameBegin(void)
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
 					pDraw->stateHandle = elem.stateHandle; 
-					core::zero_object(pDraw->vertexBuffers);
-					pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
+					// copy the state sizes.
+					pDraw->resourceState = state;
 
-					core::zero_object(pDraw->textures);
-					pDraw->textures[render::TextureSlot::DIFFUSE].textureId = textureId;
-					pDraw->textures[render::TextureSlot::DIFFUSE].sampler.filter = render::FilterType::LINEAR_MIP_NONE;
-					pDraw->textures[render::TextureSlot::DIFFUSE].sampler.repeat = render::TexRepeat::NO_TILE;
-
+					// state data.
+					char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDraw);
+					std::memcpy(pAuxData, state.getData(), ResState::STATE_DATA_SIZE);
 				}
+
+#endif
+
 #else
 				struct JobData
 				{
 					const PrimativeContext::PushBufferEntry* pElem;
 					render::CommandBucket<uint32_t>* pPrimBucket;
 					render::VertexBufferHandle vertexBuf;
+					render::ConstantBufferHandle constBuf;
 					uint32_t hash;
 				};
 
@@ -327,19 +384,29 @@ void X3DEngine::OnFrameBegin(void)
 						const auto flags = elem.flags;
 						const auto textureId = flags.getTextureId();
 
-						render::Commands::Draw* pDraw = pData->pPrimBucket->addCommand<render::Commands::Draw>(pData->hash, 0);
+
+						typedef render::Commands::ResourceState<0, 1, 1> ResState;
+						ResState state;
+						state.numTextStates = 0;
+						state.numVertexBufs = 1;
+						state.numCbs = 1;
+						state._pad = 0;
+						state.vbs[0] = pData->vertexBuf;
+						state.cbs[0] = pData->vertexBuf;
+
+
+						render::Commands::Draw* pDraw = pData->pPrimBucket->addCommand<render::Commands::Draw>(pData->hash, ResState::STATE_DATA_SIZE);
 						pDraw->startVertex = elem.vertexOffs;
 						pDraw->vertexCount = elem.numVertices;
 						pDraw->stateHandle = elem.stateHandle;
-						core::zero_object(pDraw->vertexBuffers);
-						pDraw->vertexBuffers[VertexStream::VERT] = pData->vertexBuf;
+						pDraw->resourceState = state;
 
-						core::zero_object(pDraw->textures);
-						pDraw->textures[render::TextureSlot::DIFFUSE].textureId = textureId;
-						pDraw->textures[render::TextureSlot::DIFFUSE].sampler.filter = render::FilterType::LINEAR_MIP_NONE;
-						pDraw->textures[render::TextureSlot::DIFFUSE].sampler.repeat = render::TexRepeat::NO_TILE;
+						char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDraw);
+						std::memcpy(pAuxData, state.getData(), ResState::STATE_DATA_SIZE);
 
-					
+						//core::zero_object(pDraw->vertexBuffers);
+						//pDraw->vertexBuffers[VertexStream::VERT] = pData->vertexBuf;
+
 					}, data);
 
 					gEnv->pJobSys->Run(pJob);
@@ -394,6 +461,7 @@ void X3DEngine::OnFrameBegin(void)
 			}
 		}
 
+#endif
 		primBucket.sort();
 
 		pRender_->submitCommandPackets(primBucket);
