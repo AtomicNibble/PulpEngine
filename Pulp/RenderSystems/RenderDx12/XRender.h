@@ -98,12 +98,20 @@ class XRender : public IRender
 			pRootSig = nullptr;
 			pPso = nullptr;
 			topo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
+
+			variableStateSize = 0;
+			core::zero_object(variableState);
 		}
 
 		StateHandle handle;
 		IndexBufferHandle indexBuffer;
 		VertexHandleArr vertexBuffers;
 		ConstBuffersArr constBuffers; // rootSig indexed
+
+		// a buffer that can store any variable state.
+		// and we can just memcmp to know if it's diffrent.
+		int32_t variableStateSize;
+		uint8_t variableState[render::Commands::ResourceStateBase::getMaxStateSize()];
 
 		ID3D12RootSignature* pRootSig;
 		ID3D12PipelineState* pPso;
