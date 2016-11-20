@@ -50,6 +50,13 @@ public:
 	ID3D12Heap* pBackingHeap_;
 };
 
+
+struct ConstBuffer : X3DBuffer
+{
+	uint32_t registerIdx;
+};
+
+
 class BufferManager
 {
 public:
