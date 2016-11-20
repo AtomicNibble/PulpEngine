@@ -35,6 +35,9 @@ public:
 	render::Commands::ResourceStateBase* createVariableState(int8_t numTexStates, int8_t numCBs);
 
 private:
+	render::Commands::ResourceStateBase* createVariableState_Interal(int8_t numTexStates, int8_t numCBs);
+
+private:
 	static constexpr size_t allocSize(int8_t numTexStates, int8_t numCBs);
 
 private:
@@ -44,6 +47,9 @@ private:
 	core::HeapArea      statePoolHeap_;
 	core::PoolAllocator statePoolAllocator_;
 	PoolArena			statePool_;
+
+
+	render::Commands::ResourceStateBase* pEmtpyState_;
 };
 
 

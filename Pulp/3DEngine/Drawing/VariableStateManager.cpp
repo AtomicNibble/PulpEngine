@@ -40,9 +40,11 @@ VariableStateManager::VariableStateManager() :
 		PoolArena::getMemoryAlignmentRequirement(MAX_ALIGN),
 		PoolArena::getMemoryOffsetRequirement()
 	),
-	statePool_(&statePoolAllocator_, "StatePool")
+	statePool_(&statePoolAllocator_, "StatePool"),
+	pEmtpyState_(nullptr)
 {
 
+	pEmtpyState_ = createVariableState_Interal(0,0);
 
 }
 
@@ -52,6 +54,20 @@ VariableStateManager::~VariableStateManager()
 }
 
 render::Commands::ResourceStateBase* VariableStateManager::createVariableState(int8_t numTexStates, int8_t numCBs)
+{
+	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
+
+	// return the same state for empty ones.
+	// reduces allocations.
+	// and increases chance of cache hit for empty ones as same memory.
+	if (numTexStates == 0 && numCBs == 0) {
+		return pEmtpyState_;
+	}
+	
+	return createVariableState_Interal(numTexStates, numCBs);
+}
+
+render::Commands::ResourceStateBase* VariableStateManager::createVariableState_Interal(int8_t numTexStates, int8_t numCBs)
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
 
