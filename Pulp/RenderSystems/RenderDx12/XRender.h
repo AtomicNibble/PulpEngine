@@ -150,7 +150,7 @@ public:
 	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 
 	// cb's
-	ConstantBufferHandle createConstBuffer(uint32_t size, BufUsage::Enum usage) X_OVERRIDE;
+	ConstantBufferHandle createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage) X_OVERRIDE;
 	void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
 
 
@@ -166,7 +166,7 @@ public:
 	void destoryPassState(PassStateHandle handle) X_OVERRIDE;
 
 
-	StateHandle createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
 	void destoryState(StateHandle handle) X_OVERRIDE;
 
 

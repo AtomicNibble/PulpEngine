@@ -335,7 +335,7 @@ struct IRender
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 
 	// cb's
-	virtual ConstantBufferHandle createConstBuffer(uint32_t size, BufUsage::Enum usage) X_ABSTRACT;
+	virtual ConstantBufferHandle createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage) X_ABSTRACT;
 	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_ABSTRACT;
 
 
@@ -351,7 +351,7 @@ struct IRender
 	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
 	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
 
-	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderTech* pTech, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
+	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
 	virtual void destoryState(StateHandle handle) X_ABSTRACT;
 
 	// =============================================

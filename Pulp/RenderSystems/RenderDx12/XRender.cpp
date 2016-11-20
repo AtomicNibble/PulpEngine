@@ -1323,7 +1323,7 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 }
 
 // cb's
-ConstantBufferHandle XRender::createConstBuffer(uint32_t size, BufUsage::Enum usage)
+ConstantBufferHandle XRender::createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage)
 {
 
 
@@ -1383,10 +1383,49 @@ void XRender::destoryPassState(PassStateHandle passHandle)
 	X_DELETE(pPassState, arena_);
 }
 
-StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderTech* pTech_,
+D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderTypeFlags stageFlags)
+{
+	const auto flagsInt = stageFlags.ToInt();
+
+	switch (flagsInt)
+	{
+		case shader::ShaderType::Vertex:
+			return D3D12_SHADER_VISIBILITY_VERTEX;
+		case shader::ShaderType::Pixel:
+			return D3D12_SHADER_VISIBILITY_PIXEL;
+		case shader::ShaderType::Domain:
+			return D3D12_SHADER_VISIBILITY_DOMAIN;
+		case shader::ShaderType::Geometry:
+			return D3D12_SHADER_VISIBILITY_GEOMETRY;
+		case shader::ShaderType::Hull:
+			return D3D12_SHADER_VISIBILITY_HULL;
+
+		// any combination results in all visibility.
+		default:
+			return D3D12_SHADER_VISIBILITY_ALL;
+	}
+}
+
+StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm,
 	const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
 {
 	const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
+
+	X_ASSERT_NOT_NULL(pPerm);
+	const shader::XShaderTechniqueHW& hwTech = *static_cast<const shader::XShaderTechniqueHW*>(pPerm);
+
+	if (!hwTech.canDraw()) {
+		return INVALID_STATE_HANLDE;
+	}
+	if (hwTech.IlFmt != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
+		X_ERROR("Dx12", "Hardware tech's input layout does not match state description \"%s\" -> %s",
+			shader::InputLayoutFormat::ToString(hwTech.IlFmt),
+			shader::InputLayoutFormat::ToString(shader::Util::ILfromVertexFormat(desc.vertexFmt)));
+
+		// this is user error, trying to use a permatation with a diffrent vertex fmt than it was compiled for.
+		// or maybe we have some permatation selection logic issues..
+		return INVALID_STATE_HANLDE;
+	}
 
 	DeviceState* pState = X_NEW(DeviceState, arena_, "DeviceState")(arena_);
 	pState->pPso = nullptr;
@@ -1396,20 +1435,72 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
 	RootSignature& rootSig = pState->rootSig;
-	rootSig.reset(2,1);
 
+#if 1
+
+	// we are going to create a rootsig based on the shader.
+	// we should try be smart about it like using static samplers if possible.
+	// all cbv's are gonna go in root sig.
+	// we need to know all the srv's we need also
+	// we may want to support textures in none pixel stage also.
+
+	// this is a list of cbuffers used by all stages and also defining what stages they need to be visible.
+	const auto& cbufLinks = hwTech.getCbufferLinks();
+
+	size_t numParams = 0;
+
+	numParams += cbufLinks.size(); // one for each cbuffer.
+
+	if (hwTech.pPixelShader) {
+		if (hwTech.pPixelShader->getNumTextures() > 0) {
+			numParams++; // a descriptor range
+		}
+		if (hwTech.pPixelShader->getNumSamplers() > 0) {
+			numParams++; // a descriptor range
+		}
+	}
+
+	rootSig.reset(numParams, 0);
+
+	uint32_t currentParamIdx = 0;
+	for (size_t i=0; i<cbufLinks.size(); i++)
+	{
+		const auto& cbLink = cbufLinks[i];
+		auto vis = stageFlagsToStageVisibility(cbLink.stages);
+		auto bindPoint = cbLink.pCBufer->getBindPoint();
+
+		rootSig.getParamRef(currentParamIdx++).initAsCBV(bindPoint, vis);
+	}
+
+	if (hwTech.pPixelShader) 
+	{
+		auto numTextures = hwTech.pPixelShader->getNumTextures();
+		auto numSamplers = hwTech.pPixelShader->getNumSamplers();
+
+		if (numTextures > 0) {
+			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
+				0, numTextures, D3D12_SHADER_VISIBILITY_PIXEL);
+		}
+		if (numSamplers > 0) {
+			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
+				0, numSamplers, D3D12_SHADER_VISIBILITY_PIXEL);
+		}
+	}
+
+
+#else
 	// we need a root sig that maps correct with this shader.
 	// maybe just having the root sig in the shader def makes sense then?
 	// id rather not i think the render system should be able to decide;
 	// but should it just be worked out based on the shader?
-	// so the description is past of the hwshader.
+	// so the description is part of the hwshader.
 	rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSig.getParamRef(1).initAsCBV(0, D3D12_SHADER_VISIBILITY_VERTEX);
 //	rootSig.getParamRef(2).initAsSRV(1, D3D12_SHADER_VISIBILITY_PIXEL);
 //	rootSig.getParamRef(2).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
 //	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 	rootSig.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
-
+#endif
 
 	if (!rootSig.finalize(*pRootSigCache_,
 		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
@@ -1422,7 +1513,6 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
 	)) {
 		X_DELETE(pState, arena_);
-
 		return INVALID_STATE_HANLDE;
 	}
 
@@ -1454,23 +1544,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
 	pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
 
-	shader::XShaderTechnique* pTech = const_cast<shader::XShaderTechnique*>(static_cast<const shader::XShaderTechnique*>(pTech_));
-
-#if 1
-	shader::XShaderTechniqueHW& hwTech = pTech->hwTechs[0];
-
-	if (!hwTech.tryCompile(true)) {
-		X_DELETE(pState, arena_);
-		return INVALID_STATE_HANLDE;
-	}
-//	pShaderMan_->compile(hwTech);
-
-	if (hwTech.IlFmt != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
-		X_ERROR("Dx12", "Hardware tech's input layout does not match state description \"%s\" -> %s",
-			shader::InputLayoutFormat::ToString(hwTech.IlFmt),
-			shader::InputLayoutFormat::ToString(shader::Util::ILfromVertexFormat(desc.vertexFmt)));
-	}
-
+	
 	if (hwTech.pVertexShader) {
 		const auto& byteCode = hwTech.pVertexShader->getShaderByteCode();
 		pso.setVertexShader(byteCode.data(), byteCode.size());
@@ -1484,7 +1558,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		// the bytecode setting logic.
 		X_ERROR("Dx12", "Domain, Hull, Geo are not enabled currently");
 	}
-#endif
+
 
 	if (!pso.finalize(*pPSOCache_)) {
 		X_DELETE(pState, arena_);
