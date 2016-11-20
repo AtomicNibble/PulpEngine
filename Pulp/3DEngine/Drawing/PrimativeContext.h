@@ -45,6 +45,7 @@ public:
 		uint32_t flags_;
 	};
 
+
 	// should i make this POD so growing the push buffer is faster. humm.
 	struct PushBufferEntry
 	{
@@ -58,8 +59,10 @@ public:
 		uint16_t vertexOffs;
 		// 4
 		int32_t pageIdx;
+
 		// 4
 		PrimRenderFlags flags; // we need these if we have material :| ?
+		// 4
 		uint32_t _pad;
 
 		// 8
@@ -68,6 +71,11 @@ public:
 		// int32_t material;
 	};
 
+#if X_64
+	X_ENSURE_SIZE(PushBufferEntry, 24); // not important, just ensuring padd correct.
+#else
+	X_ENSURE_SIZE(PushBufferEntry, 20); 
+#endif
 
 	typedef core::Array<PushBufferEntry> PushBufferArr;
 	typedef core::Array<const PushBufferEntry*> SortedPushBufferArr;
@@ -94,7 +102,6 @@ public:
 
 	typedef core::Array<VertexPage> VertexPagesArr;
 
-	X_ENSURE_SIZE(PushBufferEntry, 24); // not important, just ensuring padd correct.
 
 private:
 
