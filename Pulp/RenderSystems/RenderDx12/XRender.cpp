@@ -1075,8 +1075,14 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 			{
 				case Commands::Command::DRAW:
 				{
-					const Commands::Draw& draw = *reinterpret_cast<const Commands::Draw*>(pCmd);
+					const Commands::Draw* pDraw = reinterpret_cast<const Commands::Draw*>(pCmd);
 
+#if 1
+					
+					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
+
+#else
 					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
 
 					context.setDynamicCBV(1, sizeof(buf), &buf);
@@ -1099,12 +1105,14 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					}
 
 					context.setDynamicDescriptors(0, 0, render::TextureSlot::ENUM_COUNT, textureSRVS);
+#endif
 
-					context.draw(draw.vertexCount, draw.startVertex);
+					context.draw(pDraw->vertexCount, pDraw->startVertex);
 					break;
 				}
 				case Commands::Command::DRAW_INDEXED:
 				{
+#if 0
 					const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
 
 					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
@@ -1117,6 +1125,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					}
 
 					context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
+#endif
 					break;
 				}
 				case Commands::Command::COPY_CONST_BUF_DATA:
@@ -1150,6 +1159,13 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				}
 				break;
 
+				case Commands::Command::UPDATE_TEXTUTE_SUB_BUF_DATA:
+				{
+					const Commands::CopyTextureSubRegionBufferData& updateSubTex = *reinterpret_cast<const Commands::CopyTextureSubRegionBufferData*>(pCmd);
+				
+					pTextureMan_->updateTexture(context, updateSubTex.textureId, static_cast<const uint8_t*>(updateSubTex.pData), updateSubTex.size);
+				}
+				break;
 
 
 
@@ -1205,9 +1221,8 @@ X_INLINE void XRender::CreateVBView(GraphicsContext& context, const VertexHandle
 
 
 void XRender::ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
-	const VertexHandleArr& vertexBuffers)
+	const VertexHandleArr& vertexBuffers, const Commands::ResourceStateBase& resourceState, const char* pStateData)
 {
-#if 1
 	if (curState.handle != handle) // if the handle is the same, everything is the same.
 	{
 		// the render system should not have to check ever state is valid, the 3dengine should check at creation time.
@@ -1233,6 +1248,113 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 		}
 	}
 
+#if 1
+
+	// vertex buffers are staying fixed size.
+	// later i will try make the handles smaller tho ideally 16bit.
+	if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) != 0)
+	{
+		curState.vertexBuffers = vertexBuffers;
+
+		uint32_t numVertexStreams = 0;
+		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
+		CreateVBView(context, vertexBuffers, vertexViews, numVertexStreams);
+
+		context.setVertexBuffers(0, numVertexStreams, vertexViews);
+	}
+
+
+	// got a variable state?
+	// i want some nice texture and vertex stream state checks.
+	// since we allow variable size now it's not so simple as to juust memcmp
+	// we would need either a hash or something else.
+	// for vertex buffers it might just be better to not make it variable.
+	// as most of time alot will be set.
+	// and it solves the slot problem.
+	// maybe if we have some sort of index flags.
+	// so the state stores the indexes that are set.
+	// so then we can check if bound indexes are same, if so we can just memcmp the variable sized array.
+	if (resourceState.anySet())
+	{
+		if (resourceState.getNumTextStates())
+		{
+			D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
+			const TextureState* pTexStates = resourceState.getTexStates();
+
+			for (int32_t t = 0; t < resourceState.getNumTextStates(); t++)
+			{
+				const auto* pTex = pTextureMan_->getByID(pTexStates[t].textureId);
+
+				textureSRVS[t] = pTex->getSRV();
+			}
+		}
+
+#if 0
+		if (resourceState.getNumVBs())
+		{
+			// work out if changed..
+
+			D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
+			const VertexBufferHandle* pVbs = resourceState.getVBs();
+
+			for (int32_t t = 0; t < resourceState.getNumVBs(); t++)
+			{
+				if (pVbs[t])
+				{
+					const auto pVertBuf = pBuffMan_->VBFromHandle(pVbs[t]);
+					auto& buffer = pVertBuf->getBuf();
+
+					// transition if needed.
+					context.transitionResource(buffer, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+
+					vertexViews[t] = buffer.vertexBufferView();
+				}
+				else
+				{
+					vertexViews[t].BufferLocation = 0;
+					vertexViews[t].SizeInBytes = 0;
+					vertexViews[t].StrideInBytes = 0;
+				}
+			}
+
+			context.setVertexBuffers(0, resourceState.getNumVBs(), vertexViews);
+
+		}
+#endif
+
+		if (resourceState.getNumCBs())
+		{
+			const ConstantBufferHandle* pCBVs = resourceState.getCBs();
+
+			for (int32_t t = 0; t < resourceState.getNumCBs(); t++)
+			{
+				ConstantBufferHandle cbh = pCBVs[t];
+
+				if (cbh == curState.constBuffers[t]) {
+					continue;
+				}
+
+				// this needs clearing when rootsig changes.
+				curState.constBuffers[t] = cbh;
+
+				// we need to know the index this cb should be bound to.
+				ConstBuffer* pCbuf = reinterpret_cast<ConstBuffer*>(cbh);
+				auto& buf = pCbuf->getBuf();
+
+				context.transitionResource(buf, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+				context.setConstantBuffer(pCbuf->registerIdx, buf.getGpuVirtualAddress());
+			}
+		}
+	}
+	else
+	{
+		// clear?
+		// or just leave them bound.
+	}
+
+
+
+#else
 	// any handles diffrent?
 	// wonder if this be quicker if i shove it on a boundary, have to check what compiler does.
 	if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) != 0)
