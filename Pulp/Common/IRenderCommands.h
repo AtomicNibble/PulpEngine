@@ -29,6 +29,10 @@ namespace Commands
 	X_DISABLE_WARNING(4201)
 	struct ResourceStateBase
 	{
+		static const uint32_t MAX_CONST_BUFFERS = render::MAX_CONST_BUFFERS_BOUND;
+		static const uint32_t MAX_TEX_STATES = render::MAX_TEXTURES_BOUND;
+
+	public:
 		X_INLINE int8_t getNumTextStates(void) const;
 		X_INLINE int8_t getNumCBs(void) const;
 
@@ -42,6 +46,7 @@ namespace Commands
 
 		X_INLINE int32_t getTotalSize(void) const;
 		X_INLINE int32_t getStateSize(void) const;
+		X_INLINE static constexpr int32_t getMaxStateSize(void);
 
 		X_INLINE const uint8_t* getDataStart(void) const;
 		X_INLINE uint8_t* getDataStart(void);
@@ -59,6 +64,14 @@ namespace Commands
 	X_ENABLE_WARNING(4201)
 
 	X_ENSURE_SIZE(ResourceStateBase, 2);
+
+	X_INLINE constexpr int32_t ResourceStateBase::getMaxStateSize(void)
+	{
+		return sizeof(ResourceStateBase) +
+			(sizeof(render::TextureState) * MAX_TEX_STATES) +
+			(sizeof(render::ConstantBufferHandle) * MAX_CONST_BUFFERS);
+	}
+	
 
 	X_INLINE int8_t ResourceStateBase::getNumTextStates(void) const
 	{
