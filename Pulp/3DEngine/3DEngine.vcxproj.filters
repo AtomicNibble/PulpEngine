@@ -58,6 +58,9 @@
     <ClCompile Include="Drawing\PrimativeContext.cpp">
       <Filter>Source Files\Drawing</Filter>
     </ClCompile>
+    <ClCompile Include="Drawing\CBufferManager.cpp">
+      <Filter>Source Files\Drawing</Filter>
+    </ClCompile>
     <ClCompile Include="Drawing\VariableStateManager.cpp">
       <Filter>Source Files\Drawing</Filter>
     </ClCompile>
@@ -112,6 +115,9 @@
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="Drawing\PrimativeContext.h">
+      <Filter>Header Files\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="Drawing\CBufferManager.h">
       <Filter>Header Files\Drawing</Filter>
     </ClInclude>
     <ClInclude Include="Drawing\VariableStateManager.h">
