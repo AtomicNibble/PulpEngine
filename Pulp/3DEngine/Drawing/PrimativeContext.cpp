@@ -49,7 +49,7 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pRender_(nullptr),
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
-	currentPage_(0),
+	currentPage_(-1),
 	pAuxShader_(nullptr),
 	pTextShader_(nullptr)
 {
@@ -245,7 +245,7 @@ void PrimativeContext::reset(void)
 {
 	pushBufferArr_.clear();
 
-	currentPage_ = 0;
+	currentPage_ = -1;
 
 	for (auto& vp : vertexPages_) {
 		vp.reset();
@@ -312,7 +312,7 @@ void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& c
 
 PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
 {
-	if (vertexPages_[currentPage_].freeSpace() > requiredVerts) {
+	if (currentPage_ >= 0 && vertexPages_[currentPage_].freeSpace() > requiredVerts) {
 		return vertexPages_[currentPage_];
 	}
 
