@@ -77,15 +77,15 @@ public:
 	{
 		VertexPage(core::MemoryArenaBase* arena);
 
-		void reset(void);
+		X_INLINE void reset(void);
 
 		void createVB(render::IRender* pRender);
 		void destoryVB(render::IRender* pRender);
 
-		bool isVbValid(void) const;
+		X_INLINE bool isVbValid(void) const;
 
-		const uint32_t getVertBufBytes(void) const;
-		const uint32_t freeSpace(void) const;
+		X_INLINE const uint32_t getVertBufBytes(void) const;
+		X_INLINE const uint32_t freeSpace(void) const;
 
 	public:
 		render::VertexBufferHandle vertexBufHandle;
