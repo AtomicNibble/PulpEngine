@@ -3,10 +3,11 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint32 numVertices, uint32 vertexOffs,
+X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
 	PrimRenderFlags flags, render::StateHandle stateHandle) :
 	numVertices(numVertices),
 	vertexOffs(vertexOffs),
+	pageIdx(pageIdx),
 	flags(flags),
 	stateHandle(stateHandle)
 {
