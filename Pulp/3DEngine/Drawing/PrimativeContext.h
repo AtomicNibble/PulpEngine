@@ -108,6 +108,11 @@ private:
 	static const uint32_t PAGE_BYTES = NUMVERTS_PER_PAGE * sizeof(PrimVertex);
 	static const uint32_t MAX_PAGES = 8; // lets not go mental.
 
+	static_assert(NUMVERTS_PER_PAGE < std::numeric_limits<decltype(PushBufferEntry::vertexOffs)>::max(),
+		"Verts per page exceeds numerical limit of offset type");
+	static_assert(NUMVERTS_PER_PAGE < std::numeric_limits<decltype(PushBufferEntry::numVertices)>::max(),
+		"Verts per page exceeds numerical limit of count type");
+
 	typedef std::array<render::VertexBufferHandle, MAX_PAGES> VertexPageHandlesArr;
 
 
