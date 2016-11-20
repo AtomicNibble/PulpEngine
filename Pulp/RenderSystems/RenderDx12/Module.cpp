@@ -20,23 +20,29 @@ X_NAMESPACE_BEGIN(render)
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
-#if X_DEBUG
 	core::SimpleMemoryTracking,
-	//	core::ExtendedMemoryTracking,
-#else
-	core::NoMemoryTracking,
-#endif
-
 	core::SimpleMemoryTagging
+#else
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > RendererArena;
 
 typedef core::MemoryArena<
 	core::GrowingBlockAllocator,
 	core::MultiThreadPolicy<core::CriticalSection>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging
+#else
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > TextureArena;
 
 

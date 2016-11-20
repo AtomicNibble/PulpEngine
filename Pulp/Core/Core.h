@@ -78,6 +78,7 @@ typedef core::Logger<
 	core::LoggerSimpleFormatPolicy,
 	core::LoggerConsoleWritePolicy> ConsoleLogger;
 
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 
 typedef core::MemoryArena<
 core::MallocFreeAllocator,
@@ -95,6 +96,27 @@ typedef core::MemoryArena<
 	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging
 > StrArena;
+
+#else
+
+typedef core::MemoryArena<
+	core::MallocFreeAllocator,
+	core::SingleThreadPolicy,
+	core::NoBoundsChecking,
+	core::SimpleMemoryTracking,
+	core::NoMemoryTagging
+> GlobalArena;
+
+
+typedef core::MemoryArena<
+	core::GrowingGenericAllocator,
+	core::SingleThreadPolicy,
+	core::NoBoundsChecking,
+	core::SimpleMemoryTracking,
+	core::NoMemoryTagging
+> StrArena;
+
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 
 
 class XCore :

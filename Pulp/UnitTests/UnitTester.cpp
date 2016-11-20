@@ -26,10 +26,15 @@ HINSTANCE g_hInstance = 0;
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::MultiThreadPolicy<core::CriticalSection>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
-//	core::SimpleMemoryTracking,
-	core::NoMemoryTracking,			// allow leaks in the tests.
+	core::NoMemoryTracking,
 	core::SimpleMemoryTagging
+#else
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > UnitTestArena;
 
 

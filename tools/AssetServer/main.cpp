@@ -24,9 +24,15 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
-	core::NoMemoryTracking,
+	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging
+#else
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > AssertServerArena;
 
 core::MemoryArenaBase* g_arena = nullptr;

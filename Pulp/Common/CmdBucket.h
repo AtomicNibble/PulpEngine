@@ -44,9 +44,16 @@ private:
 	typedef core::MemoryArena<
 		core::LinearAllocator,
 		core::SingleThreadPolicy,
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
 		core::NoMemoryTracking,
 		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> LinearArena;
 
 	typedef core::FixedArray<uint32_t, MAX_THREAD_COUNT> ThreadIdToIndex;

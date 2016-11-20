@@ -175,9 +175,17 @@ public:
 	typedef core::MemoryArena<
 		core::PoolAllocator,
 		MemoryThreadPolicy,
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
 		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging> AssetPoolArena;
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> AssetPoolArena;
 
 public:
 	AssetPool(size_t allocSize, size_t allocAlign) :

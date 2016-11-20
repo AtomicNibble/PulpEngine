@@ -17,9 +17,17 @@ class VariableStateManager
 	typedef core::MemoryArena<
 		core::PoolAllocator,
 		core::MultiThreadPolicy<core::Spinlock>, // allow multi thread creation.
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
 		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging> PoolArena;
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> PoolArena;
 
 public:
 	static const uint32_t MAX_CONST_BUFFERS = render::MAX_CONST_BUFFERS_BOUND;

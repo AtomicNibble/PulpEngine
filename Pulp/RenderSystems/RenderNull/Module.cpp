@@ -22,18 +22,18 @@ X_USING_NAMESPACE;
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
 > RendererArena;
 
 
 typedef core::MemoryArena<
 	core::GrowingBlockAllocator,
 	core::MultiThreadPolicy<core::CriticalSection>,
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
 > TextureArena;
 
 // the allocator dose not check for leaks so it

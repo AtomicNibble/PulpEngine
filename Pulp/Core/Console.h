@@ -54,9 +54,16 @@ X_NAMESPACE_BEGIN(core)
 typedef core::MemoryArena<
 	core::PoolAllocator, 
 	core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking, 
-	core::SimpleMemoryTagging> VarPool;
+	core::SimpleMemoryTracking,
+	core::SimpleMemoryTagging
+#else
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+> VarPool;
 
 struct equal_to_case_insen
 {

@@ -14,15 +14,16 @@ X_USING_NAMESPACE;
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::MultiThreadPolicy<core::Spinlock>,
-	core::SimpleBoundsChecking,
-#if X_SUPER || 1
-	core::SimpleMemoryTracking,
-	core::NoMemoryTagging
-#else 
-	core::FullMemoryTracking,
-	core::SimpleMemoryTagging
-#endif // !X_SUPER
 
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+	core::SimpleBoundsChecking,
+	core::SimpleMemoryTracking,
+	core::SimpleMemoryTagging
+#else
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > CoreArena;
 
 

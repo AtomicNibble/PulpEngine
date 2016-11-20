@@ -55,16 +55,30 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 	typedef core::MemoryArena<
 		core::PoolAllocator,
 		core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
 		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging> FilePoolArena;
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> FilePoolArena;
 
 	typedef core::MemoryArena<
 		core::MallocFreeAllocator,
 		core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
 		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging> MemfileArena;
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> MemfileArena;
 
 public:
 #ifdef X_PLATFORM_WIN32
