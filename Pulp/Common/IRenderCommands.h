@@ -43,7 +43,6 @@ namespace Commands
 		X_INLINE int32_t getTotalSize(void) const;
 		X_INLINE int32_t getStateSize(void) const;
 
-	private:
 		X_INLINE const uint8_t* getDataStart(void) const;
 		X_INLINE uint8_t* getDataStart(void);
 
