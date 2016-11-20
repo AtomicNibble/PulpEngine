@@ -7,6 +7,8 @@
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
 
+#include <Containers\HashMap.h>
+
 X_NAMESPACE_BEGIN(font)
 
 /*
