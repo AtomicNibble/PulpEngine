@@ -216,6 +216,8 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 			break;
 		}
 
+		X_ASSERT(vp.vertexBufHandle != render::INVALID_BUF_HANLDE, "Vertex buffer handle should be valid")();
+
 		auto* pUpdateVb = bucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
 		pUpdateVb->pData = vp.verts.data();
 		pUpdateVb->size = vp.getVertBufBytes();
