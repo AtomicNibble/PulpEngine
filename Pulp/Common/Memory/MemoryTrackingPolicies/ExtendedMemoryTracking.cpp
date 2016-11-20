@@ -2,8 +2,10 @@
 #include "ExtendedMemoryTracking.h"
 #include "memory\VirtualMem.h"
 
-X_NAMESPACE_BEGIN(core)
 
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+
+X_NAMESPACE_BEGIN(core)
 
 
 	/// \brief The data stored for each allocation.
@@ -107,3 +109,5 @@ void ExtendedMemoryTracking::OnDeallocation(void* memory)
 
 X_NAMESPACE_END
 
+
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES

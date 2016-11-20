@@ -3,6 +3,8 @@
 #ifndef X_EXTENDEDMEMORYTRACKING_H_
 #define X_EXTENDEDMEMORYTRACKING_H_
 
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+
 #include "Memory/HeapArea.h"
 #include "Memory/MemoryArena.h"
 #include "Memory/AllocationPolicies/LinearAllocator.h"
@@ -91,4 +93,6 @@ private:
 X_NAMESPACE_END
 
 
-#endif
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+
+#endif // !X_EXTENDEDMEMORYTRACKING_H_
