@@ -3,28 +3,22 @@
 #ifndef X_MATERIAL_OLD_H_
 #define X_MATERIAL_OLD_H_
 
-#include "IShader.h"
-#include "IMaterial.h"
+#include <IShader.h>
+#include <IMaterial.h>
+#include <IRender.h>
+#include <IRenderCommands.h>
 
 #include "String\StrRef.h"
-#include "Assets\AssertContainer.h"
 
 #include "..\EngineBase.h"
 
 
-X_NAMESPACE_DECLARE(core,
-	namespace xml {
-		namespace rapidxml {
-			template<class Ch> class xml_node;
-		}
-	}
-)
 
 X_NAMESPACE_BEGIN(engine)
 
 class XMaterialManager;
 
-class XMaterial : public IMaterial, public XEngineBase
+class XMaterial
 {
 public:
 	XMaterial();
@@ -33,37 +27,28 @@ public:
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
 
-	virtual const core::string& getName(void) const X_OVERRIDE { return matName_; };
-	virtual void setName(const char* pName) X_OVERRIDE;
+	X_INLINE void setName(const core::string& name);
+	X_INLINE void setName(const char* pName);
+	X_INLINE void setFlags(MaterialFlags flags);
+	X_INLINE void setSurfaceType(MaterialSurType::Enum surfaceType);
+	X_INLINE void setCoverage(MaterialCoverage::Enum coverage);
+	X_INLINE void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffset);
+	X_INLINE void setMountType(MaterialMountType::Enum mt);
+	X_INLINE void setCat(MaterialCat::Enum cat);
+	X_INLINE void setStateDesc(render::StateDesc& stateDesc);
+	X_INLINE void setStateHandle(render::StateHandle handle);
 
-	virtual const MaterialFlags getFlags() const X_OVERRIDE;
-	virtual void setFlags(const MaterialFlags flags) X_OVERRIDE;
+	X_INLINE const core::string& getName(void) const;
+	X_INLINE MaterialFlags getFlags(void) const;
+	X_INLINE MaterialSurType::Enum getSurfaceType(void) const;
+	X_INLINE MaterialCoverage::Enum getCoverage(void) const;
+	X_INLINE MaterialPolygonOffset::Enum getPolyOffsetType(void) const;
+	X_INLINE MaterialMountType::Enum getMountType(void) const;
+	X_INLINE MaterialCat::Enum getCat(void) const;
+	X_INLINE const render::StateDesc& getStateDesc(void) const;
+	X_INLINE render::StateHandle getStateHandle(void) const;
+	X_INLINE render::Commands::ResourceStateBase* getVariableState(void) const;
 
-	virtual MaterialSurType::Enum getSurfaceType() const X_OVERRIDE;
-	virtual void setSurfaceType(MaterialSurType::Enum type) X_OVERRIDE;
-
-	virtual MaterialCullType::Enum getCullType() const X_OVERRIDE;
-	virtual void setCullType(MaterialCullType::Enum type) X_OVERRIDE;
-
-	virtual MaterialTexRepeat::Enum getTexRepeat(void) const X_OVERRIDE;
-	virtual void setTexRepeat(MaterialTexRepeat::Enum texRepeat) X_OVERRIDE;
-
-	virtual MaterialPolygonOffset::Enum getPolyOffsetType(void) const X_OVERRIDE;
-	virtual void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType) X_OVERRIDE;
-
-	virtual MaterialFilterType::Enum getFilterType(void) const X_OVERRIDE;
-	virtual void setFilterType(MaterialFilterType::Enum filterType) X_OVERRIDE;
-
-//	virtual MaterialType::Enum getType(void) const X_OVERRIDE;
-//	virtual void setType(MaterialType::Enum type) X_OVERRIDE;
-
-	virtual MaterialCoverage::Enum getCoverage(void) const X_OVERRIDE;
-	virtual void setCoverage(MaterialCoverage::Enum coverage) X_OVERRIDE;
-
-//	virtual void setShaderItem(shader::XShaderItem& item) X_OVERRIDE;
-//	virtual shader::XShaderItem& getShaderItem(void) X_OVERRIDE{ return shaderItem_; }
-
-	virtual bool isDefault() const X_OVERRIDE;
 
 protected:
 	X_NO_COPY(XMaterial);
@@ -71,19 +56,31 @@ protected:
 
 	int32_t id_;
 
-	core::string			matName_;
-	MaterialFlags			flags_;
-	MaterialSurType::Enum	MatSurfaceType_;
-	MaterialCullType::Enum	CullType_;
+	core::string name_;
 
-	MaterialTexRepeat::Enum texRepeat_;
+	// 4
+	MaterialFlags				flags_;
+	// 4
+	MaterialSurType::Enum		surfaceType_;
+	MaterialCoverage::Enum		coverage_;
 	MaterialPolygonOffset::Enum polyOffsetType_;
-	MaterialFilterType::Enum filterType_;
-//	MaterialType::Enum		MatType_;
-	MaterialCoverage::Enum  coverage_;
+	MaterialMountType::Enum		mountType_;
 
-//	shader::XShaderItem     shaderItem_;
+	// 4
+	uint8_t numTextures_;
+	uint8_t numCBs_; // the number of const buffers this material requires.
+	MaterialUsage::Enum usage_;
+	MaterialCat::Enum cat_;
 
+	// we store things like blend. cullType etc in the form required for passing to render system.
+	render::StateDesc stateDesc_;
+	render::StateHandle stateHandle_; // the pipeline state required for this material.
+	render::Commands::ResourceStateBase* pVariableState_;
+	// every material has a shader defined.
+	// based on the type of material it is.
+	// but the permatation selected depends on what this material has enabled.
+	// for example if uv scroll is enabled a shader permatation that supports that is selected.
+	render::shader::IShader* pShader_; 
 };
 
 
