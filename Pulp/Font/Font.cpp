@@ -194,6 +194,12 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 	const auto effecIdx = ctx.GetEffectId();
 	const auto textId = pTexture_->getTexID();
 
+#if 1
+	X_UNUSED(pos);
+	X_UNUSED(stateHandle);
+	X_UNUSED(pPrimCon);
+
+#else
 	FontEffect& effect = effects_[effecIdx];
 	for (auto passIdx = 0u; passIdx < effect.passes.size(); passIdx++)
 	{
@@ -406,7 +412,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 			charX += hozAdvance;
 		}
 	}
-
+#endif
 }
 
 
