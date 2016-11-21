@@ -258,6 +258,7 @@ void X3DEngine::OnFrameBegin(void)
 		render::PassStateHandle passHandle = pRender_->createPassState(rtfs);
 
 #endif
+
 		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
@@ -277,31 +278,32 @@ void X3DEngine::OnFrameBegin(void)
 				// the variable state for the material.
 				// so this might just be the line material or some other SHIT!
 				// but it may also be a textured quad so it will contain texture info.
-				render::Commands::ResourceStateBase* pVariableState = nullptr;
+				// render::Commands::ResourceStateBase* pVariableState = pVariableStateMan_->createVariableState(0,0);
 
 				for (size_t x = 0; x < elems.size(); x++)
 				{
 					const auto& elem = elems[x];
-					const auto flags = elem.flags;
+					const auto* pMat = elem.pMaterial;
+					const auto* pVariableState = pMat->getVariableState();
+					auto variableStateSize = pVariableState->getStateSize();
 
-					const auto textureId = flags.getTextureId();
-
-					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x + 10), pVariableState->getStateSize());
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x + 10), variableStateSize);
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
-					pDraw->stateHandle = elem.stateHandle;
+					pDraw->stateHandle = pMat->getStateHandle();
+					pDraw->resourceState = *pVariableState; // slice the sizes into command.
 					// set the vertex handle to correct one.
 					core::zero_object(pDraw->vertexBuffers);
 					pDraw->vertexBuffers[VertexStream::VERT] = vertexPageHandles[elem.pageIdx];
 
-					// variable state data.
-					char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDraw);
-					std::memcpy(pAuxData, pVariableState->getDataStart(), pVariableState->getStateSize());
+					if (variableStateSize)
+					{
+						// variable state data.
+						char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDraw);
+						std::memcpy(pAuxData, pVariableState->getDataStart(), pVariableState->getStateSize());
+					}
 				}
-
 			}
-
-
 		}
 
 
@@ -469,6 +471,7 @@ void X3DEngine::OnFrameBegin(void)
 		}
 
 #endif
+
 		primBucket.sort();
 
 		pRender_->submitCommandPackets(primBucket);
