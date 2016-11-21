@@ -3,6 +3,8 @@
 #ifndef X_GUI_MANAGER_H_
 #define X_GUI_MANAGER_H_
 
+#include "EngineBase.h"
+
 #include <IGui.h>
 #include <IInput.h>
 
@@ -19,7 +21,8 @@ X_NAMESPACE_BEGIN(gui)
 class XGuiManager :
 	public IGuiManger, 
 	public core::IXHotReload,
-	public input::IInputEventListner
+	public input::IInputEventListner,
+	public engine::XEngineBase
 {
 public:
 	XGuiManager();
@@ -48,7 +51,7 @@ public:
 		return var_showDebug_ == 1;
 	}
 
-	X_INLINE texture::ITexture* GetCursor(void) const {
+	X_INLINE engine::XMaterial* GetCursor(void) const {
 		return pCursorArrow_;
 	}
 
@@ -60,7 +63,7 @@ private:
 
 	int var_showDebug_;
 
-	texture::ITexture* pCursorArrow_;
+	engine::XMaterial* pCursorArrow_;
 
 private:
 	friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);

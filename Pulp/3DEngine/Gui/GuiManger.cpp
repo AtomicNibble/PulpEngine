@@ -79,13 +79,19 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = gEnv->pRender->getTexture("imgs/ui/cursor",
-		texture::TextureFlags::NOMIPS | texture::TextureFlags::DONT_STREAM);
+	pCursorArrow_ = pMaterialManager_->loadMaterial("imgs/ui/cursor");
+	if (!pCursorArrow_) {
+		// if we load a material how we force texture loads :|
+		X_FATAL("Gui", "failed to load main cursor");
+		return false;
+	}
 
+#if 0
 	if (!pCursorArrow_->isLoaded()) {
 		X_FATAL("Gui", "failed to load main cursor");
 		return false;
 	}
+#endif
 
 	return true;
 }
@@ -100,8 +106,8 @@ void XGuiManager::Shutdown(void)
 
 	gEnv->pInput->RemoveEventListener(this);
 
-	if (gEnv->pRender && pCursorArrow_) {
-		gEnv->pRender->releaseTexture(pCursorArrow_);
+	if (pMaterialManager_ && pCursorArrow_) {
+		pMaterialManager_->releaseMaterial(pCursorArrow_);
 	}
 }
 
