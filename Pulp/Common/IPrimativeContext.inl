@@ -10,10 +10,10 @@ X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float
 }
 
 
-X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, const Color& col)
+X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, XMaterial* pMaterial, const Color& col)
 {
 	const Rectf rect(x, y, x + width, y + height);
-	drawQuadImageSS(rect, texture_id, col);
+	drawQuadImageSS(rect, pMaterial, col);
 }
 
 
@@ -24,26 +24,20 @@ X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float
 }
 
 X_INLINE void IPrimativeContext::drawQuadImage(float xpos, float ypos,
-	float w, float h, texture::TexID texture_id, const Color& col)
+	float w, float h, XMaterial* pMaterial, const Color& col)
 {
-	drawImage(xpos, ypos, 0.f, w, h, texture_id, 0, 1, 1, 0, col);
+	drawImage(xpos, ypos, 0.f, w, h, pMaterial, 0, 1, 1, 0, col);
 }
 
-X_INLINE void IPrimativeContext::drawQuadImage(float xpos, float ypos,
-	float w, float h, texture::ITexture* pTexutre, const Color& col)
-{
-	drawImage(xpos, ypos, 0.f, w, h, pTexutre->getTexID(), 0, 1, 1, 0, col);
-}
-
-X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, texture::ITexture* pTexutre,
+X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, XMaterial* pMaterial,
 	const Color& col)
 {
 	drawImage(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(),
-		pTexutre->getTexID(), 0, 1, 1, 0, col);
+		pMaterial, 0, 1, 1, 0, col);
 }
 
 X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, float s0, float t0, float s1, float t1,
+	XMaterial* pMaterial, float s0, float t0, float s1, float t1,
 	const Colorf& col, bool filtered)
 {
 	float s[4], t[4];
@@ -53,7 +47,7 @@ X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, floa
 	s[2] = s0;	t[2] = 1.0f - t1;
 	s[3] = s1;	t[3] = 1.0f - t1;
 
-	drawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
+	drawImageWithUV(xpos, ypos, z, w, h, pMaterial, s, t, col, filtered);
 }
 
 X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height, const Color& col)

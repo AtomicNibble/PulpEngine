@@ -110,7 +110,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color& col)
 }
 
 
-void IPrimativeContext::drawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col)
+void IPrimativeContext::drawQuadImageSS(const Rectf& rect, XMaterial* pMaterial, const Color& col)
 {
 	float x1, y1, x2, y2;
 	float z;
@@ -127,7 +127,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, texture::TexID textur
 	x2 = x1 + rect.getWidth();
 	y2 = y1 - rect.getHeight();
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, texture_id);
+	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
 
 	// TL
 	pQuad[0].pos.x = x1;
@@ -383,14 +383,14 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHe
 
 
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, const float* s, const float* t,
+	XMaterial* pMaterial, const float* s, const float* t,
 	const Colorf& col, bool filtered)
 {
 	X_ASSERT_NOT_NULL(s);
 	X_ASSERT_NOT_NULL(t);
 	X_UNUSED(filtered);
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, texture_id);
+	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
 
 	// TL
 	pQuad[0].pos.x = xpos;

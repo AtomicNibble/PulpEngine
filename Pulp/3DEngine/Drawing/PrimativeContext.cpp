@@ -67,6 +67,8 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	{
 		h = render::INVALID_STATE_HANLDE;
 	}
+
+	core::zero_object(primMaterials_);
 }
 
 
@@ -75,7 +77,7 @@ PrimativeContext::~PrimativeContext()
 
 }
 
-bool PrimativeContext::createStates(render::IRender* pRender)
+bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* pMatMan)
 {
 	pRender_ = pRender;
 
@@ -121,9 +123,14 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 
 	passHandle_ = pRender->createPassState(rtfs);
 
+
 	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
 	{
 		const auto primType = static_cast<PrimitiveType::Enum>(i);
+		core::StackString<64, char> name("$prim_");
+		name.append(PrimitiveType::ToString(primType));
+
+		XMaterial* pMat = pMatMan->createMaterial(name.c_str());
 
 		desc.topo = primType;
 		stateCache_[primType] = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
@@ -132,36 +139,72 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 			X_ERROR("PrimContext", "Failed to create state for primType: \"%s\"", PrimitiveType::ToString(primType));
 			return false;
 		}
+
+		pMat->setStateDesc(desc);
+		pMat->setStateHandle(stateCache_[primType]);
+		pMat->setCat(MaterialCat::CODE);
+		
+		// how to pick shader and tech.
+		// and also permatation.
+		// plus creaete a variable state that can store the shit.
+		// well we are only creating materials for stuff we know is simple primatives with no textures.
+		// so we know the variable state needs no textures and if we select the tech's 
+
+
+		// MeOwWwWWW !!!
+		primMaterials_[primType] = pMat;
 	}
 
-	pTextShader_ = pRender->getShader("Font");
-	auto* pTextTech = pTextShader_->getTech("Font");
-	pTextTech->tryCompile(true);
 
-	pPerm = pTextTech->getPermatation(desc.vertexFmt);
+	// what we essentialy need is a variable state that has the const buffer handles in.
+	// we create handles for the const buffers and then each frame we ask the CB manager to update us.
+	// that way we only attemp the update CB's when we plan to use them.
+	// The other way i was thinking was registering const buffers and the manager would update them each frame if changed.
+	// but that has the problem of updating const buffers every frame that may never be used.
+	// then we also need variable states for when we want to render with textures.
+	// we we render with a texture we need a diffrent shader and also the texture id and wrap mode.
+	// which is all info store in a material.
+	// so i want to move to rendering with materials.
+	// so when the GUI has a quad with a material it just sets the material.
+	// and we get the variable state from the material which will contain the texture handles needed and the correct PSO
+	// for use to render the textures.
+	// it may also contain additional const buffers if the material supports scrolling uv's
+	// so by supporting materials this prim context then automatically supports rendering quads that have scrolling uv's
+	// without the prim context having todo anything but render what it's told.
+	// so my fat nigerian goat, we need to make a material for drawing primative shit.
 
+
+
+
+	// i think i'll move this into the font's that way they can define wierd pipeline states for each font if they want.
 	{
-		const auto& cbufs = pPerm->getCbufferLinks();
-		for (auto& cb : cbufs)
+		pTextShader_ = pRender->getShader("Font");
+		auto* pTextTech = pTextShader_->getTech("Font");
+		pTextTech->tryCompile(true);
+
+		pPerm = pTextTech->getPermatation(desc.vertexFmt);
+
 		{
-			if (cb.pCBufer->requireManualUpdate())
+			const auto& cbufs = pPerm->getCbufferLinks();
+			for (auto& cb : cbufs)
 			{
-				X_ERROR("PrimContext", "Font technique has a cbuffer \"%s\" that requires manual update", cb.pCBufer->getName().c_str());
-				return false;
+				if (cb.pCBufer->requireManualUpdate())
+				{
+					X_ERROR("PrimContext", "Font technique has a cbuffer \"%s\" that requires manual update", cb.pCBufer->getName().c_str());
+					return false;
+				}
 			}
 		}
+
+		// this root sig needs to have one text handler.
+		// how to handle the problem of diffrent shaders having diffrent texture slot requirements.
+		// which we need to know about when creating a root sig that works with that shader.
+		// so maybe we should just work it out from the shader. :D
+
+		desc.topo = PrimitiveType::TRIANGLELIST;
+		textDrawState_ = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
+
 	}
-
-	// this root sig needs to have one text handler.
-	// how to handle the problem of diffrent shaders having diffrent texture slot requirements.
-	// which we need to know about when creating a root sig that works with that shader.
-	// so maybe we should just work it out from the shader. :D
-
-	desc.topo = PrimitiveType::TRIANGLELIST;
-	textDrawState_ = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
-
-
-
 	return true;
 }
 
@@ -224,7 +267,7 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 		pUpdateVb->vertexBuffer = vp.vertexBufHandle;
 	}
 
-#if X_DEBUG
+#if X_DEBUG // check that a page was not 'skipped' or not reset correct.
 	bool expectNull = false;
 	for (size_t i=0; i<vertexPages_.size(); i++)
 	{
@@ -266,11 +309,13 @@ void PrimativeContext::getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) co
 		sortedPushBuffer.push_back(&ap);
 	}
 
-	std::sort(sortedPushBuffer.begin(), sortedPushBuffer.end(),
-		[](const PushBufferEntry* lhs, const PushBufferEntry* rhs) {
-			return lhs->flags < rhs->flags;
-		}
-	);
+	// what to sort by :Z ?
+	X_ASSERT_NOT_IMPLEMENTED();
+//	std::sort(sortedPushBuffer.begin(), sortedPushBuffer.end(),
+//		[](const PushBufferEntry* lhs, const PushBufferEntry* rhs) {
+//			return lhs->flags < rhs->flags;
+//		}
+//	);
 }
 
 const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void) const
@@ -330,16 +375,14 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
 }
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
-	texture::TexID textureId, render::StateHandle stateHandle)
+	XMaterial* pMaterial)
 {
-	PrimRenderFlags flags(primType, textureId);
-
 	auto& curPage = getPage(numVertices);
 	auto& vertexArr = curPage.verts;
 
 	// if the last entry was the same type
 	// just merge the verts in.
-	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().flags == flags && pushBufferArr_.back().stateHandle == stateHandle &&
+	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().pMaterial == pMaterial &&
 		(PrimitiveType::POINTLIST == primType || PrimitiveType::LINELIST == primType || PrimitiveType::TRIANGLELIST == primType))
 	{
 		auto& lastEntry = pushBufferArr_.back();
@@ -351,8 +394,7 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 			safe_static_cast<uint16_t>(numVertices),
 			safe_static_cast<uint16_t>(vertexArr.size()),
 			currentPage_,
-			flags,
-			stateHandle
+			pMaterial
 		);
 	}
 
@@ -363,14 +405,9 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 	return &vertexArr[oldVBSize];
 }
 
-PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType, texture::TexID textureId)
-{
-	return addPrimative(numVertices, primType, textureId, stateCache_[primType]);
-}
-
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
-	return addPrimative(numVertices, primType, 0);
+	return addPrimative(numVertices, primType, primMaterials_[primType]);
 }
 
 X_NAMESPACE_END

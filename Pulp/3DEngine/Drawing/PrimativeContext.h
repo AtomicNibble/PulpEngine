@@ -52,29 +52,30 @@ public:
 		PushBufferEntry() = default;
 
 		X_INLINE PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
-			PrimRenderFlags flags, render::StateHandle stateHandle);
+			XMaterial* pMaterial);
 
 		// 4
 		uint16_t numVertices;
 		uint16_t vertexOffs;
 		// 4
-		int32_t pageIdx;
+		int32_t pageIdx; // need to try find a good place to put this, 3 bits is enougth to store this.
 
 		// 4
-		PrimRenderFlags flags; // we need these if we have material :| ?
-		// 4
-		uint32_t _pad;
+	//	PrimRenderFlags flags; // we need these if we have material :| ?
+	//	// 4
+	//	uint32_t _pad;
 
 		// 8
-		render::StateHandle stateHandle;
+	//	render::StateHandle stateHandle;
 		// material.
 		// int32_t material;
+		XMaterial* pMaterial;
 	};
 
 #if X_64
-	X_ENSURE_SIZE(PushBufferEntry, 24); // not important, just ensuring padd correct.
+	X_ENSURE_SIZE(PushBufferEntry, 16); // not important, just ensuring padd correct.
 #else
-	X_ENSURE_SIZE(PushBufferEntry, 20); 
+	X_ENSURE_SIZE(PushBufferEntry, 12); 
 #endif
 
 	typedef core::Array<PushBufferEntry> PushBufferArr;
@@ -127,7 +128,7 @@ public:
 	PrimativeContext(core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
 
-	bool createStates(render::IRender* pRender);
+	bool createStates(render::IRender* pRender, IMaterialManager* pMatMan);
 	bool freeStates(render::IRender* pRender);
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const;
@@ -146,8 +147,7 @@ private:
 	VertexPage& getPage(size_t requiredVerts);
 
 private:
-	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId, render::StateHandle stateHandle) X_FINAL;
-	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID textureId) X_FINAL;
+	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, XMaterial* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
 
 private:
@@ -161,6 +161,9 @@ private:
 	render::PassStateHandle passHandle_;
 	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
 	render::StateHandle textDrawState_;
+
+	XMaterial* primMaterials_[PrimitiveType::ENUM_COUNT];
+
 
 	render::shader::IShader* pAuxShader_;
 	render::shader::IShader* pTextShader_;
