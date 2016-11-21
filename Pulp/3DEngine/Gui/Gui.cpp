@@ -45,7 +45,7 @@ void XGui::DrawCursor(engine::IPrimativeContext* pDrawCon)
 	// so that multiple gui's can share the same pointer.
 	// or maybe Gui should own it and it's just ref counted.
 	
-	texture::ITexture* pCursorArrow = getGuiManager()->GetCursor();
+	auto* pCursorArrow = getGuiManager()->GetCursor();
 	render::IRender* pRender = getRender();
 
 	core::StackString<64> posStr;
@@ -62,10 +62,11 @@ void XGui::DrawCursor(engine::IPrimativeContext* pDrawCon)
 	const float width = rect.x;
 	const float height = rect.y;
 
+
 	pDrawCon->drawQuadImageSS(
 		cursorPos_.x / width, cursorPos_.y / height,
 		0.1f,0.1f,
-		pCursorArrow->getTexID(),
+		pCursorArrow,
 		Col_White
 	);
 }
