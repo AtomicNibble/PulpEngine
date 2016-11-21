@@ -48,10 +48,11 @@ namespace
 
 } // namespace
 
-XMaterialManager::XMaterialManager() :
+XMaterialManager::XMaterialManager(VariableStateManager& vsMan) :
+	vsMan_(vsMan),
+	materials_(g_3dEngineArena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource)),
 	pListner_(nullptr),
-	pDefaultMtl_(nullptr),
-	materials_(g_3dEngineArena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource))
+	pDefaultMtl_(nullptr)
 {
 }
 
@@ -140,20 +141,26 @@ void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core:
 
 
 // IMaterialManager
-IMaterial* XMaterialManager::createMaterial(const char* pMtlName)
-{
-	XMaterial* pMat = nullptr;
-
-	X_UNUSED(pMtlName);
-	X_ASSERT_NOT_IMPLEMENTED();
-	return pMat;
-}
-
-IMaterial* XMaterialManager::findMaterial(const char* pMtlName) const
+XMaterial* XMaterialManager::createMaterial(const char* pMtlName)
 {
 	core::string name(pMtlName);
 
-	IMaterial* pMtl = findMaterial_Internal(name);
+	MaterialResource* pMtl = findMaterial_Internal(name);
+	if (pMtl) {
+		// add ref?
+		pMtl->addReference();
+		X_WARNING("MtlMan", "Create material called with name of exsisting material: \"%s\"", pMtlName);
+		return pMtl;
+	}
+
+	return createMaterial_Internal(pMtlName);
+}
+
+XMaterial* XMaterialManager::findMaterial(const char* pMtlName) const
+{
+	core::string name(pMtlName);
+
+	XMaterial* pMtl = findMaterial_Internal(name);
 	if (pMtl) {
 		return pMtl;
 	}
@@ -162,7 +169,7 @@ IMaterial* XMaterialManager::findMaterial(const char* pMtlName) const
 	return nullptr;
 }
 
-IMaterial* XMaterialManager::loadMaterial(const char* pMtlName)
+XMaterial* XMaterialManager::loadMaterial(const char* pMtlName)
 {
 	X_ASSERT_NOT_NULL(pMtlName);
 
@@ -200,7 +207,7 @@ IMaterial* XMaterialManager::loadMaterial(const char* pMtlName)
 	return getDefaultMaterial();
 }
 
-void XMaterialManager::releaseMaterial(IMaterial* pMat)
+void XMaterialManager::releaseMaterial(XMaterial* pMat)
 {
 	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
 	if (pMatRes->removeReference() == 0)
@@ -248,13 +255,13 @@ void XMaterialManager::InitDefaults(void)
 #else
 		pDefaultMtl_->setShaderItem(item);
 #endif
-		pDefaultMtl_->setCoverage(MaterialCoverage::OPAQUE);
+	//	pDefaultMtl_->setCoverage(MaterialCoverage::OPAQUE);
 	}
 }
 
 
 
-IMaterial* XMaterialManager::getDefaultMaterial()
+XMaterial* XMaterialManager::getDefaultMaterial(void)
 {
 	return pDefaultMtl_;
 }

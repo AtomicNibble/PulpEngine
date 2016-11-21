@@ -341,14 +341,14 @@ struct IMaterialManager
 
 	// if mat of this name exsists returns and adds refrence
 	// dose not load anything.
-	virtual IMaterial* createMaterial(const char* MtlName) X_ABSTRACT;
+	virtual XMaterial* createMaterial(const char* MtlName) X_ABSTRACT;
 	// returns null if not found, ref count unaffected
-	virtual IMaterial* findMaterial(const char* MtlName) const X_ABSTRACT;
+	virtual XMaterial* findMaterial(const char* MtlName) const X_ABSTRACT;
 	// if material is found adds ref and returns, if not try's to load the material file.
 	// if file can't be loaded or error it return the default material.
-	virtual IMaterial* loadMaterial(const char* MtlName) X_ABSTRACT;
+	virtual XMaterial* loadMaterial(const char* MtlName) X_ABSTRACT;
 
-	virtual IMaterial* getDefaultMaterial() X_ABSTRACT;
+	virtual XMaterial* getDefaultMaterial(void) X_ABSTRACT;
 
 	virtual void setListener(IMaterialManagerListener* pListner) X_ABSTRACT;
 };

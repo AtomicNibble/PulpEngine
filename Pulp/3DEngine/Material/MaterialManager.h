@@ -14,6 +14,9 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+class VariableStateManager;
+
+class XMaterial;
 
 class XMaterialManager : 
 	public IMaterialManager, 
@@ -25,20 +28,20 @@ class XMaterialManager :
 	typedef MaterialContainer::Resource MaterialResource;
 
 public:
-	XMaterialManager();
+	XMaterialManager(VariableStateManager& vsMan);
 	virtual ~XMaterialManager();
 
 	bool Init(void);
 	void ShutDown(void);
 
 	// IMaterialManager
-	virtual IMaterial* createMaterial(const char* pMtlName) X_OVERRIDE;
-	virtual IMaterial* findMaterial(const char* pMtlName) const X_OVERRIDE;
-	virtual IMaterial* loadMaterial(const char* pMtlName) X_OVERRIDE;
+	virtual XMaterial* createMaterial(const char* pMtlName) X_OVERRIDE;
+	virtual XMaterial* findMaterial(const char* pMtlName) const X_OVERRIDE;
+	virtual XMaterial* loadMaterial(const char* pMtlName) X_OVERRIDE;
 
-	void releaseMaterial(IMaterial* pMat);
+	void releaseMaterial(XMaterial* pMat);
 
-	virtual IMaterial* getDefaultMaterial(void) X_OVERRIDE;
+	virtual XMaterial* getDefaultMaterial(void) X_OVERRIDE;
 
 	virtual void setListener(IMaterialManagerListener* pListner) X_OVERRIDE;
 	// ~IMaterialManager
@@ -62,11 +65,12 @@ private:
 private:
 	// typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
 	// typedef core::HashMap<core::string, MatResource*> MaterialMap;
+	VariableStateManager& vsMan_;
 
 	MaterialContainer materials_;
 
 	IMaterialManagerListener* pListner_;
-	XMaterial*	pDefaultMtl_;
+	XMaterial* pDefaultMtl_;
 };
 
 
