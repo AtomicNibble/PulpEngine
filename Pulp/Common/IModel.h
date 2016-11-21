@@ -388,7 +388,7 @@ struct SubMeshHeader
 
 
 	// 16
-	core::Pointer64<engine::IMaterial> pMat;
+	core::Pointer64<engine::XMaterial> pMat;
 	core::Pointer64<const char> materialName;
 
 	/* cold fields down here, shizz that's not 
