@@ -330,9 +330,9 @@ X_ENSURE_SIZE(MaterialTexture, 4);
 struct IMaterialManagerListener
 {
 	virtual ~IMaterialManagerListener(){}
-	virtual  IMaterial* OnLoadMaterial(const char* MtlName) X_ABSTRACT;
-	virtual  IMaterial* OnCreateMaterial(IMaterial* pMat) X_ABSTRACT;
-	virtual  IMaterial* OnDeleteMaterial(IMaterial* pMat) X_ABSTRACT;
+	virtual IMaterial* OnLoadMaterial(const char* MtlName) X_ABSTRACT;
+	virtual IMaterial* OnCreateMaterial(IMaterial* pMat) X_ABSTRACT;
+	virtual IMaterial* OnDeleteMaterial(IMaterial* pMat) X_ABSTRACT;
 };
 
 class XMaterial;
