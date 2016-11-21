@@ -335,6 +335,8 @@ struct IMaterialManagerListener
 	virtual  IMaterial* OnDeleteMaterial(IMaterial* pMat) X_ABSTRACT;
 };
 
+class XMaterial;
+
 struct IMaterialManager
 {
 	virtual ~IMaterialManager(){}
