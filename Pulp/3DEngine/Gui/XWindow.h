@@ -293,7 +293,7 @@ protected:
 	XWindow* pOverChild_;		// if a child window has mouse capture
 
 	font::IFont* 			pFont_;
-	engine::IMaterial*		pBackgroundMat_;
+	engine::XMaterial*		pBackgroundMat_;
 
 	XGuiScriptList* 		scripts_[ScriptFunction::ENUM_COUNT];
 
