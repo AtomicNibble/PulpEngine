@@ -3,18 +3,18 @@
 
 #include <ITimer.h>
 #include <IMaterial.h>
-
 #include <IRender.h>
 #include <IRenderAux.h>
-
 #include <IConsole.h>
-
 #include <IGui.h>
 
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
 
 #include "CmdBucket.h"
+
+#include "Drawing\CBufferManager.h"
+#include "Drawing\VariableStateManager.h"
 
 #include <Time\StopWatch.h>
 
@@ -32,6 +32,10 @@ engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
 model::XModelManager* X3DEngine::pModelManager_ = nullptr;
 
 gui::XGuiManager* X3DEngine::pGuiManger_ = nullptr;
+
+CBufferManager* X3DEngine::pCBufMan_ = nullptr;
+
+VariableStateManager* X3DEngine::pVariableStateMan_ = nullptr;
 
 
 //------------------------------------------
@@ -83,7 +87,10 @@ bool X3DEngine::Init(void)
 	gEnv->pHotReload->addfileType(this, "level");
 	gEnv->pHotReload->addfileType(this, "map");
 
-	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
+	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan");
+	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
+
+	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(*pVariableStateMan_);
 	if (!pMaterialManager_->Init()) {
 		return false;
 	}
@@ -101,7 +108,7 @@ bool X3DEngine::Init(void)
 	// init the prim context states.
 	for (auto& primcon : primContexts_)
 	{
-		primcon.createStates(pRender_);
+		primcon.createStates(pRender_, pMaterialManager_);
 	}
 
 	level::Level::Init();

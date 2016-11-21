@@ -18,6 +18,8 @@ struct IRender;
 
 X_NAMESPACE_DECLARE(engine,
 class XMaterialManager;
+class CBufferManager;
+class VariableStateManager;
 )
 
 X_NAMESPACE_DECLARE(gui,
@@ -31,6 +33,7 @@ struct IModelManager;
 
 
 X_NAMESPACE_BEGIN(engine)
+
 
 struct XEngineBase
 {
@@ -47,6 +50,9 @@ struct XEngineBase
 
 	// gui
 	static gui::XGuiManager* pGuiManger_;
+
+	static CBufferManager* pCBufMan_;
+	static VariableStateManager* pVariableStateMan_;
 
 	// goats.
 	X_INLINE static ICore* getCore(void) { return pCore_; }
