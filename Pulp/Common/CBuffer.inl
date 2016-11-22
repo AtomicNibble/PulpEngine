@@ -160,6 +160,11 @@ namespace shader
 		return rootIdx_;
 	}
 
+	X_INLINE typename XCBuffer::Hasher::HashVal XCBuffer::getHash(void) const
+	{
+		return hash_;
+	}
+
 	X_INLINE const XShaderParam& XCBuffer::operator[](size_t idx) const
 	{
 		return params_[idx];

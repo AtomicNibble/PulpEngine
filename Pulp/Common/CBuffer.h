@@ -113,6 +113,7 @@ namespace shader
 		X_INLINE int16_t getBindCount(void) const;
 		X_INLINE int32_t getParamCount(void) const;
 		X_INLINE int8_t getRootIdx(void) const;
+		X_INLINE Hasher::HashVal getHash(void) const;
 
 		X_INLINE const XShaderParam& operator[](size_t idx) const;
 		X_INLINE XShaderParam& operator[](size_t idx);
