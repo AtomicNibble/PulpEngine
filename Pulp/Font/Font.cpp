@@ -44,7 +44,10 @@ XFont::XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName) :
 	fontTexture_(g_fontArena),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
-	effects_(g_fontArena)
+	effects_(g_fontArena),
+	pTextShader_(nullptr),
+	stateHandle_(render::INVALID_STATE_HANLDE),
+	pMaterial_(nullptr)
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
 }
@@ -193,7 +196,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const auto effecIdx = ctx.GetEffectId();
 	const auto textId = pTexture_->getTexID();
 
-#if 1
+#if 0
 	X_UNUSED(pos);
 	X_UNUSED(pPrimCon);
 
@@ -244,7 +247,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			Vec2f gradientUvMin, gradientUvMax;
 			GetGradientTextureCoord(gradientUvMin.x, gradientUvMin.y, gradientUvMax.x, gradientUvMax.y);
 
-			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, textId, stateHandle);
+			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
 			pVerts[0].pos = v0;
 			pVerts[0].color = frameColor;
@@ -343,7 +346,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			XCharCords cords;
 			fontTexture_->GetTextureCoord(pSlot, cords);
 			
-			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, textId, stateHandle);
+			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
 			float hozAdvance = 0;
 			if (proportinal)

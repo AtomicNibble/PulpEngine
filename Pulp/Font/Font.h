@@ -11,6 +11,10 @@
 
 struct Vertex_P3F_T2F_C4B;
 
+X_NAMESPACE_DECLARE(engine,
+	class XMaterial;
+);
+
 X_NAMESPACE_BEGIN(font)
 
 class XFontTexture;
@@ -111,6 +115,12 @@ private:
 	bool fontTexDirty_;
 
 	EffetsArr effects_;
+
+	// shader and state.
+	render::shader::IShader* pTextShader_;
+	render::StateHandle stateHandle_;
+
+	engine::XMaterial* pMaterial_;
 };
 
 X_INLINE texture::TexID XFont::getTextureId(void) const
