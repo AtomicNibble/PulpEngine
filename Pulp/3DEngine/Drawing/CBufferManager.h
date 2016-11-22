@@ -54,6 +54,9 @@ public:
 	X_INLINE void setViewProjMat(const Matrix44f& view, const Matrix44f& proj);
 
 private:
+	X_INLINE void updateMatrixes(void);
+
+private:
 	render::shader::ParamTypeFlags dirtyParamFlags;
 
 	core::TimeVal time_;
@@ -87,18 +90,29 @@ X_INLINE void CBufferManager::setViewPort(const XViewPort& viewport)
 X_INLINE void CBufferManager::setViewMat(const Matrix44f& view)
 {
 	view_ = view;
-	inView_ = view.inverted();
+
+	updateMatrixes();
 }
 
 X_INLINE void CBufferManager::setProjMat(const Matrix44f& proj)
 {
 	proj_ = proj;
+
+	updateMatrixes();
 }
 
 X_INLINE void CBufferManager::setViewProjMat(const Matrix44f& view, const Matrix44f& proj)
 {
-	setViewMat(view);
-	setViewMat(proj);
+	view_ = view;
+	proj_ = proj;
+
+	updateMatrixes();
+}
+
+X_INLINE void CBufferManager::updateMatrixes(void)
+{
+	inView_ = view_.inverted();
+	viewProj_ = view_ * proj_;
 }
 
 
