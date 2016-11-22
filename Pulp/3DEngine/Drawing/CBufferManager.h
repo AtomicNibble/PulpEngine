@@ -101,6 +101,7 @@ private:
 	Matrix44f proj_;
 
 	Matrix44f viewProj_;
+	Matrix44f viewProjInv_;
 };
 
 
