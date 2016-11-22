@@ -33,8 +33,8 @@ public:
 	void ShutDown(void) X_OVERRIDE;
 	void release(void) X_OVERRIDE;
 
+	void Update(core::FrameData& frame) X_OVERRIDE;
 	void OnFrameBegin(void) X_OVERRIDE;
-	void Update(void) X_OVERRIDE;
 
 
 	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_OVERRIDE;

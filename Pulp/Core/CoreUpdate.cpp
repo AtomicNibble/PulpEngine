@@ -113,7 +113,7 @@ bool XCore::Update(void)
 	}
 
 	if (env_.p3DEngine) {
-		env_.p3DEngine->Update();
+		env_.p3DEngine->Update(frameData);
 	}
 
 	// we could update the sound system while rendering on gpu.

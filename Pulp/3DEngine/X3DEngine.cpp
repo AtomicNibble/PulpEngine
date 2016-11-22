@@ -150,6 +150,20 @@ void X3DEngine::release(void)
 	X_DELETE(this,g_3dEngineArena);
 }
 
+void X3DEngine::Update(core::FrameData& frame)
+{
+	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
+
+
+//	Matrix44f view = Matrix44f::identity();
+//	Matrix44f viewProj;
+//	MatrixOrthoOffCenterRH(&viewProj, 0, 1680, 1050, 0, -1e10f, 1e10);
+
+	
+
+	pCBufMan_->update(frame);
+
+}
 
 void X3DEngine::OnFrameBegin(void)
 {
@@ -490,12 +504,6 @@ void X3DEngine::OnFrameBegin(void)
 	}
 }
 
-void X3DEngine::Update(void)
-{
-	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
-
-
-}
 
 IPrimativeContext* X3DEngine::getPrimContext(PrimContext::Enum user)
 {
