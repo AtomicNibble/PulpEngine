@@ -145,7 +145,7 @@ void XFont::Reload(void)
 
 
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const XTextDrawConect& contex, const char* pBegin, const char* pEnd)
 {
 	// to wide char
@@ -157,7 +157,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 
 	DrawString(
 		pPrimCon,
-		stateHandle,
 		pos,
 		contex,
 		pWideBegin,
@@ -165,7 +164,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 	);
 }
 
-void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const XTextDrawConect& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	X_UNUSED(pEnd);
@@ -196,7 +195,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle 
 
 #if 1
 	X_UNUSED(pos);
-	X_UNUSED(stateHandle);
 	X_UNUSED(pPrimCon);
 
 #else

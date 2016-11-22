@@ -114,9 +114,9 @@ struct IFont
 	virtual bool loadFont(void) X_ABSTRACT;
 
 	// these draw the text into the primative context.
-	virtual void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle,
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon,
 		const Vec3f& pos, const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
-	virtual void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, 
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon,
 		const Vec3f& pos, const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 
 

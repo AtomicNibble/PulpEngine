@@ -50,8 +50,7 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
 	currentPage_(-1),
-	pAuxShader_(nullptr),
-	pTextShader_(nullptr)
+	pAuxShader_(nullptr)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
@@ -62,7 +61,6 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	// that way we grow fast but if not rendering much we stay small.
 
 	passHandle_ = render::INVALID_STATE_HANLDE;
-	textDrawState_ = render::INVALID_STATE_HANLDE;
 	for (auto& h : stateCache_)
 	{
 		h = render::INVALID_STATE_HANLDE;
@@ -177,6 +175,7 @@ bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* 
 
 
 	// i think i'll move this into the font's that way they can define wierd pipeline states for each font if they want.
+#if 0
 	{
 		pTextShader_ = pRender->getShader("Font");
 		auto* pTextTech = pTextShader_->getTech("Font");
@@ -205,6 +204,7 @@ bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* 
 		textDrawState_ = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
 
 	}
+#endif
 	return true;
 }
 
@@ -217,17 +217,12 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 		}
 	}
 
-	if (textDrawState_ != render::INVALID_STATE_HANLDE) {
-		pRender->destoryState(textDrawState_);
-	}
-
 	if (passHandle_ != render::INVALID_STATE_HANLDE) {
 		pRender->destoryPassState(passHandle_);
 	}
 
 #if X_DEBUG
 	passHandle_ = render::INVALID_STATE_HANLDE;
-	textDrawState_ = render::INVALID_STATE_HANLDE;
 	for (auto& h : stateCache_)
 	{
 		h = render::INVALID_STATE_HANLDE;
@@ -237,9 +232,7 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 	if (pAuxShader_) {
 		pRender->releaseShader(pAuxShader_);
 	}
-	if (pTextShader_) {
-		pRender->releaseShader(pTextShader_);
-	}
+
 
 	for (auto& vp : vertexPages_) {
 		vp.destoryVB(pRender);
@@ -345,14 +338,14 @@ void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& c
 	X_ASSERT_NOT_NULL(ctx.pFont);
 
 	// we just send outself to the fonts render function that way the font can add what primatives it wishes.
-	ctx.pFont->DrawString(this, textDrawState_, pos, ctx, pBegin, pEnd);
+	ctx.pFont->DrawString(this, pos, ctx, pBegin, pEnd);
 }
 
 void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	X_ASSERT_NOT_NULL(ctx.pFont);
 
-	ctx.pFont->DrawString(this, textDrawState_, pos, ctx, pBegin, pEnd);
+	ctx.pFont->DrawString(this, pos, ctx, pBegin, pEnd);
 }
 
 PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)

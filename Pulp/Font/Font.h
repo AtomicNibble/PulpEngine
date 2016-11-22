@@ -58,9 +58,9 @@ public:
 
 	bool loadFont(void) X_OVERRIDE;
 
-	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
-	void DrawString(engine::IPrimativeContext* pPrimCon, render::StateHandle stateHandle, const Vec3f& pos,
+	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
 
 	size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_OVERRIDE;
