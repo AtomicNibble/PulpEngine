@@ -32,6 +32,8 @@ X_NAMESPACE_DECLARE(render,
 
 	namespace shader {
 		struct IShader;
+
+		class XCBuffer;
 	} // namespace shader
 )
 
