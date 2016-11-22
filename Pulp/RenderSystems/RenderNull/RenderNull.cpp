@@ -158,10 +158,9 @@ void RenderNull::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal
 }
 
 
-ConstantBufferHandle RenderNull::createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage)
+ConstantBufferHandle RenderNull::createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage)
 {
-	X_UNUSED(size);
-	X_UNUSED(registerIndex);
+	X_UNUSED(cbuffer);
 	X_UNUSED(usage);
 
 	return INVALID_BUF_HANLDE;

@@ -43,7 +43,7 @@ public:
 	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 
-	virtual ConstantBufferHandle createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage) X_OVERRIDE;
+	virtual ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_OVERRIDE;
 	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
