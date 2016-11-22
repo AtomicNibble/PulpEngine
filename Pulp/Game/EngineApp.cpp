@@ -144,7 +144,6 @@ bool EngineApp::PumpMessages()
 	return true;
 }
 
-#include "I3DEngine.h"
 
 int EngineApp::MainLoop()
 {
