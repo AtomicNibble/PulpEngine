@@ -1051,34 +1051,9 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				case Commands::Command::DRAW:
 				{
 					const Commands::Draw* pDraw = reinterpret_cast<const Commands::Draw*>(pCmd);
-
-#if 1
 					
 					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
-
-#else
-					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
-
-					auto* pDefault = pTextureMan_->getDefault();
-
-					// set textures?
-					D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
-					std::fill_n(textureSRVS, render::TextureSlot::ENUM_COUNT, pDefault->getSRV());
-
-					for (uint32_t t = 0; t < render::TextureSlot::ENUM_COUNT; t++)
-					{
-						if (draw.textures[t].textureId != 0)
-						{
-							// want to bind the texture.
-							texture::Texture* pTex = pTextureMan_->getByID(draw.textures[t].textureId);
-
-							textureSRVS[t] = pTex->getSRV();
-						}
-					}
-
-					context.setDynamicDescriptors(0, 0, render::TextureSlot::ENUM_COUNT, textureSRVS);
-#endif
 
 					context.draw(pDraw->vertexCount, pDraw->startVertex);
 					break;
