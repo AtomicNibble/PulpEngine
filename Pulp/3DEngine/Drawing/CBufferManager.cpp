@@ -51,6 +51,9 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 			case ParamType::PF_worldToScreenMatrix:
 				std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
 				break;
+			case ParamType::PF_screenToWorldMatrix:
+				std::memcpy(pDst, &viewProjInv_, sizeof(viewProjInv_));
+				break;
 			case ParamType::PF_worldToCameraMatrix:
 				std::memcpy(pDst, &view_, sizeof(view_));
 				break;
@@ -62,7 +65,10 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 				std::memcpy(pDst, &time_, sizeof(time_));
 				break;
 			case ParamType::PF_FrameTime:
-				std::memcpy(pDst, &frameTime_, sizeof(frameTime_));
+				std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
+				break;
+			case ParamType::PF_FrameTimeUI:
+				std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
 				break;
 			case ParamType::PF_ScreenSize:
 				std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
