@@ -74,15 +74,10 @@ public:
 	render::ConstantBufferHandle createCBuffer(render::shader::XCBuffer& cbuf);
 	void destoryConstBuffer(render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
 
+private:
 	X_INLINE void setTime(core::TimeVal time);
 	X_INLINE void setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal time);
 	X_INLINE void setViewPort(const XViewPort& viewport);
-	X_INLINE void setViewMat(const Matrix44f& view);
-	X_INLINE void setProjMat(const Matrix44f& proj);
-	X_INLINE void setViewProjMat(const Matrix44f& view, const Matrix44f& proj);
-
-private:
-	X_INLINE void updateMatrixes(void);
 
 private:
 	render::IRender* pRender_;
@@ -124,33 +119,6 @@ X_INLINE void CBufferManager::setViewPort(const XViewPort& viewport)
 	screenSize_.w = 0.f / screenSize_.y;
 }
 
-X_INLINE void CBufferManager::setViewMat(const Matrix44f& view)
-{
-	view_ = view;
-
-	updateMatrixes();
-}
-
-X_INLINE void CBufferManager::setProjMat(const Matrix44f& proj)
-{
-	proj_ = proj;
-
-	updateMatrixes();
-}
-
-X_INLINE void CBufferManager::setViewProjMat(const Matrix44f& view, const Matrix44f& proj)
-{
-	view_ = view;
-	proj_ = proj;
-
-	updateMatrixes();
-}
-
-X_INLINE void CBufferManager::updateMatrixes(void)
-{
-	inView_ = view_.inverted();
-	viewProj_ = view_ * proj_;
-}
 
 
 X_NAMESPACE_END
