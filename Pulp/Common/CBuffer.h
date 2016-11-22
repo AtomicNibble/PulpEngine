@@ -102,7 +102,7 @@ namespace shader
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE bool requireManualUpdate(void) const;
 		X_INLINE UpdateFreq::Enum getUpdateFreg(void) const;
-		X_INLINE int16_t getBindSize(void) const;
+		X_INLINE int16_t getBindSize(void) const; // this is size in bytes cb should be.
 		X_INLINE int16_t getBindPoint(void) const;
 		X_INLINE int16_t getBindCount(void) const;
 		X_INLINE int32_t getParamCount(void) const;
