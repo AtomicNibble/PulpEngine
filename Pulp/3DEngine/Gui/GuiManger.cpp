@@ -79,7 +79,7 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = pMaterialManager_->loadMaterial("imgs/ui/cursor");
+	pCursorArrow_ = pMaterialManager_->loadMaterial("ui/cursor");
 	if (!pCursorArrow_) {
 		// if we load a material how we force texture loads :|
 		X_FATAL("Gui", "failed to load main cursor");
