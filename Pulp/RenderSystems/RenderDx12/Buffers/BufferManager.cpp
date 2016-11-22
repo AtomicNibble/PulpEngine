@@ -98,6 +98,27 @@ BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t numEleme
 	return createHandleForBuffer(pBuf);
 }
 
+BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size, uint32_t rootIdx, const void* pInitialData,
+	BufUsage::Enum usage, CpuAccessFlags accessFlag)
+{
+	ConstBuffer* pBuf = Int_CreateCB(size);
+
+	pBuf->usage_ = usage;
+	pBuf->offset_ = 0;
+	pBuf->sizeBytes_ = size; // ??
+	pBuf->size_ = size;
+	pBuf->unPaddedSize_ = size;
+
+	pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "CbBuf");
+	pBuf->pBackingHeap_ = nullptr;
+
+	pBuf->pBuffer_->create(pDevice_, *pContextMan_, *pDescriptorAllocator_, size, 1, pInitialData);
+
+	pBuf->rootIdx_ = rootIdx;
+
+	return createHandleForBuffer(pBuf);
+}
+
 void BufferManager::freeIB(IndexBufferHandle IBHandle)
 {
 	X3DBuffer* pBuf = bufferForHandle(IBHandle);
@@ -119,6 +140,20 @@ void BufferManager::freeVB(VertexBufferHandle VBHandle)
 	stats_.numVertexBuffers--;
 #endif // !VID_MEMORY_STATS
 	
+
+	X_DELETE(pBuf->pBuffer_, &arena_);
+	X_DELETE(pBuf, &arena_);
+}
+
+void BufferManager::freeCB(VertexBufferHandle CBHandle)
+{
+	X3DBuffer* pBuf = bufferForHandle(CBHandle);
+
+
+#if VID_MEMORY_STATS
+	stats_.numConstBuffers--;
+#endif // !VID_MEMORY_STATS
+
 
 	X_DELETE(pBuf->pBuffer_, &arena_);
 	X_DELETE(pBuf, &arena_);
@@ -179,15 +214,18 @@ X3DBuffer* BufferManager::Int_CreateIB(uint32_t size)
 	return pBuf;
 }
 
-BufferManager::BufferHandle BufferManager::createHandleForBuffer(X3DBuffer* pBuf)
+ConstBuffer* BufferManager::Int_CreateCB(uint32_t size)
 {
-	return reinterpret_cast<BufferManager::BufferHandle>(pBuf);
+	ConstBuffer* pBuf = X_NEW(ConstBuffer, &arena_, "VidMemCB");
+
+#if VID_MEMORY_STATS
+	stats_.numConstBuffers++;
+	stats_.maxConstBuffers = core::Max(stats_.maxConstBuffers, stats_.numConstBuffers);
+#endif // !VID_MEMORY_STATS
+
+	return pBuf;
 }
 
-X3DBuffer* BufferManager::bufferForHandle(BufferHandle handle) const
-{
-	return reinterpret_cast<X3DBuffer*>(handle);
-}
 
 
 

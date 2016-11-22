@@ -67,13 +67,14 @@ class BufferManager
 public:
 	static const size_t MIN_DEVICE_BUF_SIZE = 1024 * 64;
 	static const size_t POOL_SIZE = 8192;
-	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(X3DBuffer), sizeof(ByteAddressBuffer));
-	static const size_t POOL_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(X3DBuffer), X_ALIGN_OF(ByteAddressBuffer));
+	static const size_t POOL_ALLOCATION_SIZE = core::Max(core::Max(sizeof(X3DBuffer), sizeof(ConstBuffer)), sizeof(ByteAddressBuffer));
+	static const size_t POOL_ALLOCATION_ALIGN = core::Max(core::Max(X_ALIGN_OF(X3DBuffer), X_ALIGN_OF(ConstBuffer)), X_ALIGN_OF(ByteAddressBuffer));
 
 
+	typedef render::Handle BufferHandle;
 	typedef VertexBufferHandle VertexBufferHandle;
 	typedef IndexBufferHandle IndexBufferHandle;
-	typedef IndexBufferHandle BufferHandle;
+	typedef ConstantBufferHandle ConstantBufferHandle;
 
 	typedef core::MemoryArena<core::PoolAllocator,
 		core::SingleThreadPolicy,
@@ -94,8 +95,10 @@ public:
 
 		uint32_t numIndexBuffers;
 		uint32_t numVertexBuffers;
+		uint32_t numConstBuffers;
 		uint32_t maxIndexBuffers;
 		uint32_t maxVertexBuffers;
+		uint32_t maxConstBuffers;
 
 		uint32_t indexesBytes;
 		uint32_t vertexBytes;
@@ -113,14 +116,17 @@ public:
 
 	VertexBufferHandle createVertexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 	IndexBufferHandle createIndexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
+	ConstantBufferHandle createConstBuf(uint32_t size, uint32_t rootIdx, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 
 	// free from ID
 	void freeIB(IndexBufferHandle IBHandle);
 	void freeVB(VertexBufferHandle VBHandle);
+	void freeCB(VertexBufferHandle CBHandle);
 
 	// get the buffer from a ID
 	X_INLINE X3DBuffer* IBFromHandle(IndexBufferHandle bufHandle) const;
 	X_INLINE X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle) const;
+	X_INLINE ConstBuffer* CBFromHandle(ConstantBufferHandle bufHandle) const;
 
 	void getBufSize(BufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize) const;
 
@@ -130,9 +136,11 @@ private:
 	// Internal create
 	X3DBuffer* Int_CreateVB(uint32_t size);
 	X3DBuffer* Int_CreateIB(uint32_t size);
+	ConstBuffer* Int_CreateCB(uint32_t size);
 
-	BufferHandle createHandleForBuffer(X3DBuffer* pBuf);
-	X3DBuffer* bufferForHandle(BufferHandle handle) const;
+	X_INLINE BufferHandle createHandleForBuffer(X3DBuffer* pBuf);
+	X_INLINE X3DBuffer* bufferForHandle(BufferHandle handle) const;
+	X_INLINE ConstBuffer* constBufferForHandle(BufferHandle handle) const;
 
 private:
 	ID3D12Device* pDevice_;

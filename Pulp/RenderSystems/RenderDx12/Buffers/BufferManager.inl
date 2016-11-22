@@ -38,6 +38,26 @@ X_INLINE uint32_t ConstBuffer::getRootIdx(void) const
 
 // ------------------------------------------
 
+
+X_INLINE BufferManager::BufferHandle BufferManager::createHandleForBuffer(X3DBuffer* pBuf)
+{
+	return reinterpret_cast<BufferManager::BufferHandle>(pBuf);
+}
+
+X_INLINE X3DBuffer* BufferManager::bufferForHandle(BufferHandle handle) const
+{
+	return reinterpret_cast<X3DBuffer*>(handle);
+}
+
+X_INLINE ConstBuffer* BufferManager::constBufferForHandle(BufferHandle handle) const
+{
+	return reinterpret_cast<ConstBuffer*>(handle);
+}
+
+// ------------------------------------------
+
+
+
 X_INLINE X3DBuffer* BufferManager::IBFromHandle(IndexBufferHandle bufHandle) const
 {
 	return bufferForHandle(bufHandle);
@@ -46,6 +66,11 @@ X_INLINE X3DBuffer* BufferManager::IBFromHandle(IndexBufferHandle bufHandle) con
 X_INLINE X3DBuffer* BufferManager::VBFromHandle(VertexBufferHandle bufHandle) const
 {
 	return bufferForHandle(bufHandle);
+}
+
+X_INLINE ConstBuffer* BufferManager::CBFromHandle(ConstantBufferHandle bufHandle) const
+{
+	return constBufferForHandle(bufHandle);
 }
 
 
