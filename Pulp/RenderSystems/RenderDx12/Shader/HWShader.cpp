@@ -106,6 +106,8 @@ namespace shader
 		// SK = Skin data
 
 		// used for matching sematics to types.
+		static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
+
 		static const XParamDB g_SematicParams[] =
 		{
 

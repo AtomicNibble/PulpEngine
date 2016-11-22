@@ -46,6 +46,8 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 		const auto& p = cbuf[i];
 		uint8_t* pDst = &cpuData[p.getBindPoint()];
 
+		static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
+
 		switch (p.getType())
 		{
 			case ParamType::PF_worldToScreenMatrix:
