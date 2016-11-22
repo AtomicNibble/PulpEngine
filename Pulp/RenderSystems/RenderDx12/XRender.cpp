@@ -1315,11 +1315,11 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 					curState.constBuffers[t] = cbh;
 
 					// we need to know the index this cb should be bound to.
-					ConstBuffer* pCbuf = reinterpret_cast<ConstBuffer*>(cbh);
+					auto* pCbuf = pBuffMan_->CBFromHandle(cbh);
 					auto& buf = pCbuf->getBuf();
 
 					context.transitionResource(buf, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-					context.setConstantBuffer(pCbuf->registerIdx, buf.getGpuVirtualAddress());
+					context.setConstantBuffer(pCbuf->getRootIdx(), buf.getGpuVirtualAddress());
 				}
 			}
 		}
