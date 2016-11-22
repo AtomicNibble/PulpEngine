@@ -63,6 +63,11 @@ X_INLINE void XMaterial::setStateHandle(render::StateHandle handle)
 	stateHandle_ = handle;
 }
 
+X_INLINE void XMaterial::setVariableState(render::Commands::ResourceStateBase* pState)
+{
+	pVariableState_ = pState;
+}
+
 
 X_INLINE const core::string& XMaterial::getName(void) const
 {

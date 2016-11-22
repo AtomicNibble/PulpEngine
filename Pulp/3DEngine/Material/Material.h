@@ -37,6 +37,7 @@ public:
 	X_INLINE void setCat(MaterialCat::Enum cat);
 	X_INLINE void setStateDesc(render::StateDesc& stateDesc);
 	X_INLINE void setStateHandle(render::StateHandle handle);
+	X_INLINE void setVariableState(render::Commands::ResourceStateBase* pState);
 
 	X_INLINE const core::string& getName(void) const;
 	X_INLINE MaterialFlags getFlags(void) const;
