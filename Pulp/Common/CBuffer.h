@@ -98,6 +98,7 @@ namespace shader
 		X_INLINE void setSize(int16_t size);
 		X_INLINE void setBindPointAndCount(int16_t bindPoint, int16_t bindCount);
 		X_INLINE void setParamGranularitys(size_t varGran);
+		X_INLINE void setRootIdx(int8_t idx);
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE bool requireManualUpdate(void) const;
@@ -106,6 +107,7 @@ namespace shader
 		X_INLINE int16_t getBindPoint(void) const;
 		X_INLINE int16_t getBindCount(void) const;
 		X_INLINE int32_t getParamCount(void) const;
+		X_INLINE int8_t getRootIdx(void) const;
 
 		X_INLINE const XShaderParam& operator[](size_t idx) const;
 		X_INLINE XShaderParam& operator[](size_t idx);
@@ -131,7 +133,7 @@ namespace shader
 
 		// 4
 		UpdateFreq::Enum updateRate_;
-		int8_t _pad;
+		int8_t  rootIdx_;
 		int16_t size_;
 
 		// 4

@@ -112,6 +112,12 @@ namespace shader
 		params_.setGranularity(varGran);
 	}
 
+	X_INLINE void XCBuffer::setRootIdx(int8_t idx)
+	{
+		rootIdx_ = idx;
+	}
+
+	// <><><><>
 
 	X_INLINE const core::string& XCBuffer::getName(void) const
 	{
@@ -149,6 +155,10 @@ namespace shader
 		return safe_static_cast<int32_t>(params_.size());
 	}
 
+	X_INLINE int8_t XCBuffer::getRootIdx(void) const
+	{
+		return rootIdx_;
+	}
 
 	X_INLINE const XShaderParam& XCBuffer::operator[](size_t idx) const
 	{
