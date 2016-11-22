@@ -51,6 +51,9 @@ namespace Commands
 		X_INLINE const uint8_t* getDataStart(void) const;
 		X_INLINE uint8_t* getDataStart(void);
 
+		X_INLINE const TextureState* getTexStates(const void* pBase) const;
+		X_INLINE const ConstantBufferHandle* getCBs(const void* pBase) const;
+
 	protected:
 		union {
 			struct {
@@ -139,6 +142,17 @@ namespace Commands
 		return size;
 	}
 
+	X_INLINE const TextureState* ResourceStateBase::getTexStates(const void* pBase) const
+	{
+		return reinterpret_cast<const TextureState*>(pBase);
+	}
+
+	X_INLINE const ConstantBufferHandle* ResourceStateBase::getCBs(const void* pBase) const
+	{
+		const uint8_t* pStart = reinterpret_cast<const uint8_t*>(pBase);
+		pStart += (sizeof(TextureState) * numTextStates);
+		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
+	}
 
 #else
 
