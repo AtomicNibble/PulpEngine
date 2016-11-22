@@ -219,12 +219,14 @@ X_ENSURE_SIZE(SamplerState, 2);
 // do we want to explicitly group these?
 struct TextureState
 {
+	// 4
 	texture::TexID textureId; 
+	// 2
 	SamplerState sampler;
 	// do i want to pass this?
 	// or try be fancy and pass arrays in TextureSlot index order.
-//	TextureSlot::Enum slot; 
-//	uint8_t _pad[2];
+	TextureSlot::Enum slot; 
+	uint8_t _pad[1];
 };
 
 #if X_64
