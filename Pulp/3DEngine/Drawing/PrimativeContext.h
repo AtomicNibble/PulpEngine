@@ -8,7 +8,8 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-class PrimativeContext : public IPrimativeContext
+
+class PrimativeContext : public IPrimativeContext, public XEngineBase
 {
 public:
 
@@ -128,7 +129,7 @@ public:
 	PrimativeContext(core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
 
-	bool createStates(render::IRender* pRender, IMaterialManager* pMatMan);
+	bool createStates(render::IRender* pRender);
 	bool freeStates(render::IRender* pRender);
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const;

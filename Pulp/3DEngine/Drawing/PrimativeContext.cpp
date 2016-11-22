@@ -8,6 +8,8 @@
 #include <CBuffer.h>
 
 #include "CmdBucket.h"
+#include "VariableStateManager.h"
+#include "CBufferManager.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -75,7 +77,7 @@ PrimativeContext::~PrimativeContext()
 
 }
 
-bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* pMatMan)
+bool PrimativeContext::createStates(render::IRender* pRender)
 {
 	pRender_ = pRender;
 
@@ -95,23 +97,14 @@ bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* 
 
 	pAuxShader_ = pRender->getShader("Prim");
 	auto* pTech = pAuxShader_->getTech("Prim");
-	pTech->tryCompile(true);
-	auto* pPerm = pTech->getPermatation(desc.vertexFmt);
 
-	{
-		// can get a list of all the cbuffers needed for this permatation.
-		const auto& cbufs = pPerm->getCbufferLinks();
-		for (auto& cb : cbufs)
-		{
-			// for the prim contex we only support shaders that make use of automated params.
-			// this way you can edit it as much as you want without needing to edit engine code.
-			// as the cbuffers can be populated automatically.
-			if (cb.pCBufer->requireManualUpdate())
-			{
-				X_ERROR("PrimContext", "Prim technique has a cbuffer \"%s\" that requires manual update", cb.pCBufer->getName().c_str());
-				return false;
-			}
-		}
+	// needed currently to generate the permatations.
+	pTech->tryCompile(true);
+
+	auto* pPerm = pTech->getPermatation(desc.vertexFmt);
+	if (!pPerm) {
+		X_ERROR("PrimContext", "Failed to get permatation");
+		return false;
 	}
 
 	auto renderTarget = pRender->getCurBackBuffer();
@@ -125,10 +118,6 @@ bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* 
 	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
 	{
 		const auto primType = static_cast<PrimitiveType::Enum>(i);
-		core::StackString<64, char> name("$prim_");
-		name.append(PrimitiveType::ToString(primType));
-
-		XMaterial* pMat = pMatMan->createMaterial(name.c_str());
 
 		desc.topo = primType;
 		stateCache_[primType] = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
@@ -138,73 +127,44 @@ bool PrimativeContext::createStates(render::IRender* pRender, IMaterialManager* 
 			return false;
 		}
 
+		const auto& cbufs = pPerm->getCbufferLinks();
+
+		// Create a variable State and Cbuffers then set the handles.
+		auto* pVariableState = pVariableStateMan_->createVariableState(0, safe_static_cast<int8_t>(cbufs.size()));
+		auto* pCBufHandles = pVariableState->getCBs();
+
+		for (size_t c = 0; c<cbufs.size(); c++)
+		{
+			auto& cb = *cbufs[c].pCBufer;
+
+			if (cb.requireManualUpdate()) {
+				X_ERROR("PrimContext", "Prim technique has a cbuffer \"%s\" that requires manual update", cb.getName().c_str());
+				return false;
+			}
+
+			// start with a initial value for now.
+			// later should be able to technically remove this.
+			// since when it's actually used we should notice it's stale and update it.
+			pCBufMan_->autoFillBuffer(cb);
+
+			auto cbHandle = pCBufMan_->createCBuffer(cb);
+
+			pCBufHandles[c] = cbHandle;
+		}
+
+		core::StackString<64, char> matName("$prim_");
+		matName.append(PrimitiveType::ToString(primType));
+
+		XMaterial* pMat = pMaterialManager_->createMaterial(matName.c_str());
 		pMat->setStateDesc(desc);
 		pMat->setStateHandle(stateCache_[primType]);
 		pMat->setCat(MaterialCat::CODE);
-		
-		// how to pick shader and tech.
-		// and also permatation.
-		// plus creaete a variable state that can store the shit.
-		// well we are only creating materials for stuff we know is simple primatives with no textures.
-		// so we know the variable state needs no textures and if we select the tech's 
-
+		pMat->setVariableState(pVariableState);
 
 		// MeOwWwWWW !!!
 		primMaterials_[primType] = pMat;
 	}
 
-
-	// what we essentialy need is a variable state that has the const buffer handles in.
-	// we create handles for the const buffers and then each frame we ask the CB manager to update us.
-	// that way we only attemp the update CB's when we plan to use them.
-	// The other way i was thinking was registering const buffers and the manager would update them each frame if changed.
-	// but that has the problem of updating const buffers every frame that may never be used.
-	// then we also need variable states for when we want to render with textures.
-	// we we render with a texture we need a diffrent shader and also the texture id and wrap mode.
-	// which is all info store in a material.
-	// so i want to move to rendering with materials.
-	// so when the GUI has a quad with a material it just sets the material.
-	// and we get the variable state from the material which will contain the texture handles needed and the correct PSO
-	// for use to render the textures.
-	// it may also contain additional const buffers if the material supports scrolling uv's
-	// so by supporting materials this prim context then automatically supports rendering quads that have scrolling uv's
-	// without the prim context having todo anything but render what it's told.
-	// so my fat nigerian goat, we need to make a material for drawing primative shit.
-
-
-
-
-	// i think i'll move this into the font's that way they can define wierd pipeline states for each font if they want.
-#if 0
-	{
-		pTextShader_ = pRender->getShader("Font");
-		auto* pTextTech = pTextShader_->getTech("Font");
-		pTextTech->tryCompile(true);
-
-		pPerm = pTextTech->getPermatation(desc.vertexFmt);
-
-		{
-			const auto& cbufs = pPerm->getCbufferLinks();
-			for (auto& cb : cbufs)
-			{
-				if (cb.pCBufer->requireManualUpdate())
-				{
-					X_ERROR("PrimContext", "Font technique has a cbuffer \"%s\" that requires manual update", cb.pCBufer->getName().c_str());
-					return false;
-				}
-			}
-		}
-
-		// this root sig needs to have one text handler.
-		// how to handle the problem of diffrent shaders having diffrent texture slot requirements.
-		// which we need to know about when creating a root sig that works with that shader.
-		// so maybe we should just work it out from the shader. :D
-
-		desc.topo = PrimitiveType::TRIANGLELIST;
-		textDrawState_ = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
-
-	}
-#endif
 	return true;
 }
 
@@ -237,6 +197,12 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 	for (auto& vp : vertexPages_) {
 		vp.destoryVB(pRender);
 	}
+
+	for (auto& pMat : primMaterials_)
+	{
+		pMaterialManager_->releaseMaterial(pMat);
+	}	
+
 
 	// clear the member render pointer, nothing should be trying to use it after a state clear :|
 	pRender_ = nullptr;

@@ -108,7 +108,9 @@ bool X3DEngine::Init(void)
 	// init the prim context states.
 	for (auto& primcon : primContexts_)
 	{
-		primcon.createStates(pRender_, pMaterialManager_);
+		if (!primcon.createStates(pRender_)) {
+			return false;
+		}
 	}
 
 	level::Level::Init();
