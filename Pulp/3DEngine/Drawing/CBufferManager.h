@@ -13,6 +13,7 @@
 #include <Util\ReferenceCounted.h>
 
 #include <IShader.h>
+#include <ITimer.h>
 
 X_NAMESPACE_DECLARE(render,
 	namespace shader
@@ -73,7 +74,7 @@ public:
 	void destoryConstBuffer(render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
 
 	X_INLINE void setTime(core::TimeVal time);
-	X_INLINE void setFrameTime(core::TimeVal time);
+	X_INLINE void setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal time);
 	X_INLINE void setViewPort(const XViewPort& viewport);
 	X_INLINE void setViewMat(const Matrix44f& view);
 	X_INLINE void setProjMat(const Matrix44f& proj);
@@ -91,7 +92,7 @@ private:
 	render::shader::ParamTypeFlags dirtyParamFlags;
 
 	float time_;
-	float frameTime_;
+	float frameTime_[core::ITimer::Timer::ENUM_COUNT];
 
 	Vec4f screenSize_;
 
@@ -108,9 +109,9 @@ X_INLINE void CBufferManager::setTime(core::TimeVal time)
 	time_ = time.GetMilliSeconds();
 }
 
-X_INLINE void CBufferManager::setFrameTime(core::TimeVal frameTime)
+X_INLINE void CBufferManager::setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal frameTime)
 {
-	frameTime_ = frameTime.GetMilliSeconds();
+	frameTime_[timer] = frameTime.GetMilliSeconds();
 }
 
 X_INLINE void CBufferManager::setViewPort(const XViewPort& viewport)
