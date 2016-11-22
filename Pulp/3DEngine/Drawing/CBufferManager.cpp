@@ -3,6 +3,8 @@
 
 #include "CBuffer.h"
 
+#include <IFrameData.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -33,6 +35,21 @@ CBufferManager::~CBufferManager()
 
 }
 
+void CBufferManager::update(core::FrameData& frame)
+{
+	// time
+	setTime(frame.timeInfo.startTimeReal);
+	setFrameTime(core::ITimer::Timer::GAME, frame.timeInfo.deltas[core::ITimer::Timer::GAME]);
+	setFrameTime(core::ITimer::Timer::UI, frame.timeInfo.deltas[core::ITimer::Timer::UI]);
+
+	// view
+	setViewPort(frame.view.viewport);
+	view_ = frame.view.viewMatrix;
+	inView_ = frame.view.viewMatrix.inverted();
+	proj_ = frame.view.projMatrix;
+	viewProj_ = frame.view.viewProjMatrix;
+	viewProjInv_ = frame.view.viewProjInvMatrix;
+}
 
 void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 {

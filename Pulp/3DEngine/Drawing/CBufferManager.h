@@ -66,6 +66,7 @@ public:
 	CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender);
 	~CBufferManager();
 
+	void update(core::FrameData& frame);
 
 	void autoFillBuffer(render::shader::XCBuffer& cbuf);
 
