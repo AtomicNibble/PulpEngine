@@ -90,10 +90,10 @@ private:
 private:
 	render::shader::ParamTypeFlags dirtyParamFlags;
 
-	core::TimeVal time_;
-	core::TimeVal frameTime_;
+	float time_;
+	float frameTime_;
 
-	XViewPort viewPort_;
+	Vec4f screenSize_;
 
 	Matrix44f view_;
 	Matrix44f inView_;
@@ -105,17 +105,20 @@ private:
 
 X_INLINE void CBufferManager::setTime(core::TimeVal time)
 {
-	time_ = time;
+	time_ = time.GetMilliSeconds();
 }
 
 X_INLINE void CBufferManager::setFrameTime(core::TimeVal frameTime)
 {
-	frameTime_ = frameTime;
+	frameTime_ = frameTime.GetMilliSeconds();
 }
 
 X_INLINE void CBufferManager::setViewPort(const XViewPort& viewport)
 {
-	viewPort_ = viewport;
+	screenSize_.x = viewport.getWidthf();
+	screenSize_.y = viewport.getHeightf();
+	screenSize_.z = 0.f / screenSize_.x;
+	screenSize_.w = 0.f / screenSize_.y;
 }
 
 X_INLINE void CBufferManager::setViewMat(const Matrix44f& view)
