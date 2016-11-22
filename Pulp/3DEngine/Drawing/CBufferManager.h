@@ -6,6 +6,10 @@
 #include <Math\XMatrix44.h>
 #include <Math\XViewPort.h>
 
+#include <Containers\HashMap.h>
+
+#include <Hashing\xxHash.h>
+
 #include <IShader.h>
 
 X_NAMESPACE_DECLARE(render,
@@ -36,8 +40,25 @@ X_NAMESPACE_BEGIN(engine)
 
 class CBufferManager
 {
+	struct hash
+	{
+		size_t operator()(const render::shader::XCBuffer* cbh) const;
+	};
+
+	struct equal_to
+	{
+		bool operator()(const render::shader::XCBuffer* lhs, const render::shader::XCBuffer* rhs) const;
+	};
+
+	typedef core::HashMap<
+		render::shader::XCBuffer*,
+		render::ConstantBufferHandle,
+		hash,
+		equal_to
+	> ConstBufferCacheMap;
+
 public:
-	CBufferManager();
+	CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender);
 	~CBufferManager();
 
 	// updates any stale gpu buffers.
@@ -45,6 +66,10 @@ public:
 	void batchBegin(void);
 
 	void autoFillBuffer(render::shader::XCBuffer& cbuf);
+
+	// create a device cbuffer.
+	render::ConstantBufferHandle createCBuffer(render::shader::XCBuffer& cbuf);
+
 
 	X_INLINE void setTime(core::TimeVal time);
 	X_INLINE void setFrameTime(core::TimeVal time);
@@ -55,6 +80,11 @@ public:
 
 private:
 	X_INLINE void updateMatrixes(void);
+
+private:
+	render::IRender* pRender_;
+
+	ConstBufferCacheMap cbMap_;
 
 private:
 	render::shader::ParamTypeFlags dirtyParamFlags;

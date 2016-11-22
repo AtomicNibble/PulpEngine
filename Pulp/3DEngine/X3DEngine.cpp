@@ -87,7 +87,7 @@ bool X3DEngine::Init(void)
 	gEnv->pHotReload->addfileType(this, "level");
 	gEnv->pHotReload->addfileType(this, "map");
 
-	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan");
+	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender_);
 	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
 
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(*pVariableStateMan_);
