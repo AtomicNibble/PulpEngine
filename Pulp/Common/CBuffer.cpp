@@ -232,6 +232,7 @@ namespace shader
 		uint8_t numParams;
 		pFile->readObj(numParams);
 
+		cpuData_.resize(size_);
 		params_.resize(numParams);
 		for (auto& p : params_)
 		{
