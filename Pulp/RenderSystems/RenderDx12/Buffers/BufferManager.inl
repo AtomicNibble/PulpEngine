@@ -30,6 +30,14 @@ X_INLINE uint32_t X3DBuffer::getSize(void) const
 // ------------------------------------------
 
 
+X_INLINE uint32_t ConstBuffer::getRootIdx(void) const
+{
+	return rootIdx_;
+}
+
+
+// ------------------------------------------
+
 X_INLINE X3DBuffer* BufferManager::IBFromHandle(IndexBufferHandle bufHandle) const
 {
 	return bufferForHandle(bufHandle);

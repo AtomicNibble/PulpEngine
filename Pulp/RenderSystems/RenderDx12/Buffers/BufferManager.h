@@ -53,7 +53,12 @@ public:
 
 struct ConstBuffer : X3DBuffer
 {
-	uint32_t registerIdx;
+
+	X_INLINE uint32_t getRootIdx(void) const;
+
+
+public:
+	uint32_t rootIdx_;
 };
 
 
