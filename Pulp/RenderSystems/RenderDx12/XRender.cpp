@@ -1287,7 +1287,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 			if (resourceState.getNumTextStates())
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
-				const TextureState* pTexStates = resourceState.getTexStates();
+				const TextureState* pTexStates = resourceState.getTexStates(pStateData);
 
 				for (int32_t t = 0; t < resourceState.getNumTextStates(); t++)
 				{
@@ -1301,7 +1301,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 			if (resourceState.getNumCBs())
 			{
-				const ConstantBufferHandle* pCBVs = resourceState.getCBs();
+				const ConstantBufferHandle* pCBVs = resourceState.getCBs(pStateData);
 
 				for (int32_t t = 0; t < resourceState.getNumCBs(); t++)
 				{
