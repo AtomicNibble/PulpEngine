@@ -84,11 +84,13 @@ X_DECLARE_FLAGS(ParamType) ( // these are used as flags for dirty checks.
 	Unknown,
 
 	PF_worldToScreenMatrix,		 // worldspace to screenspace (view * proj)
+	PF_screenToWorldMatrix,		 // screenspace to worldspace Inv(view * proj)
 	PF_worldToCameraMatrix,		 // world to cameraspace (view)
 	PF_cameraToWorldMatrix,		 // cameraspace back to worldspace (inView)
 
 	PF_Time,					 // float ms (total time passed)
 	PF_FrameTime,				 // float ms (frame delta)
+	PF_FrameTimeUI,				 // float ms (frame detla with UI scale);
 	PF_ScreenSize,				 // x,y, 0.5/x, 0.5 /y
 	PF_CameraPos,				 
 
