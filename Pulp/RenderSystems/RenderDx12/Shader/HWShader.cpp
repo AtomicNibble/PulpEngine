@@ -110,11 +110,13 @@ namespace shader
 		{
 
 			XParamDB("worldToScreenMatrix", ParamType::PF_worldToScreenMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("screenToWorldMatrix", ParamType::PF_screenToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 			XParamDB("worldToCameraMatrix", ParamType::PF_worldToCameraMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 			XParamDB("cameraToWorldMatrix", ParamType::PF_cameraToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 
 			XParamDB("time", ParamType::PF_Time,  UpdateFreq::FRAME, ParamFlag::FLOAT),
 			XParamDB("frameTime", ParamType::PF_FrameTime,  UpdateFreq::FRAME, ParamFlag::FLOAT),
+			XParamDB("frameTimeUI", ParamType::PF_FrameTimeUI,  UpdateFreq::FRAME, ParamFlag::FLOAT),
 			XParamDB("screensize", ParamType::PF_ScreenSize, UpdateFreq::FRAME, ParamFlag::VEC4),
 			XParamDB("cameraPos", ParamType::PF_CameraPos, UpdateFreq::FRAME, ParamFlag::FLOAT),
 
