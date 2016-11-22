@@ -1407,7 +1407,7 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 }
 
 // cb's
-ConstantBufferHandle XRender::createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage)
+ConstantBufferHandle XRender::createConstBuffer(shader::XCBuffer& cb, BufUsage::Enum usage)
 {
 
 

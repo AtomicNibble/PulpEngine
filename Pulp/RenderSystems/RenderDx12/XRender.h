@@ -159,7 +159,7 @@ public:
 	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 
 	// cb's
-	ConstantBufferHandle createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage) X_OVERRIDE;
+	ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_OVERRIDE;
 	void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
 
 

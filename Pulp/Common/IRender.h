@@ -335,7 +335,7 @@ struct IRender
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 
 	// cb's
-	virtual ConstantBufferHandle createConstBuffer(uint32_t size, uint32_t registerIndex, BufUsage::Enum usage) X_ABSTRACT;
+	virtual ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
 	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_ABSTRACT;
 
 
