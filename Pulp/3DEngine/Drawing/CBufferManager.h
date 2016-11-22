@@ -10,6 +10,8 @@
 
 #include <Hashing\xxHash.h>
 
+#include <Util\ReferenceCounted.h>
+
 #include <IShader.h>
 
 X_NAMESPACE_DECLARE(render,
@@ -40,18 +42,20 @@ X_NAMESPACE_BEGIN(engine)
 
 class CBufferManager
 {
+	typedef core::ReferenceCountedInstance<render::shader::XCBuffer*> RefCountedCBuf;
+
 	struct hash
 	{
-		size_t operator()(const render::shader::XCBuffer* cbh) const;
+		size_t operator()(const RefCountedCBuf& cbh) const;
 	};
 
 	struct equal_to
 	{
-		bool operator()(const render::shader::XCBuffer* lhs, const render::shader::XCBuffer* rhs) const;
+		bool operator()(const RefCountedCBuf& lhs, const RefCountedCBuf& rhs) const;
 	};
 
 	typedef core::HashMap<
-		render::shader::XCBuffer*,
+		RefCountedCBuf,
 		render::ConstantBufferHandle,
 		hash,
 		equal_to
@@ -69,7 +73,7 @@ public:
 
 	// create a device cbuffer.
 	render::ConstantBufferHandle createCBuffer(render::shader::XCBuffer& cbuf);
-
+	void destoryConstBuffer(render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
 
 	X_INLINE void setTime(core::TimeVal time);
 	X_INLINE void setFrameTime(core::TimeVal time);

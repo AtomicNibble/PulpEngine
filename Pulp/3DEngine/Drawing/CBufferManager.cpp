@@ -7,14 +7,18 @@ X_NAMESPACE_BEGIN(engine)
 
 
 
-size_t CBufferManager::hash::operator()(const render::shader::XCBuffer* cbh) const
+size_t CBufferManager::hash::operator()(const RefCountedCBuf& cbh) const
 {
-	return cbh->getHash();
+	auto* pCuf = *cbh.instance();
+	return pCuf->getHash();
 }
 
-bool CBufferManager::equal_to::operator()(const render::shader::XCBuffer* lhs, const render::shader::XCBuffer* rhs) const
+bool CBufferManager::equal_to::operator()(const RefCountedCBuf& lhs, const RefCountedCBuf& rhs) const
 {
-	return lhs->isEqual(*rhs);
+	auto* pCuflhs = *lhs.instance();
+	auto* pCufrhs = *rhs.instance();
+
+	return pCuflhs->isEqual(*pCufrhs);
 }
 
 CBufferManager::CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender) :
@@ -75,9 +79,12 @@ render::ConstantBufferHandle CBufferManager::createCBuffer(render::shader::XCBuf
 	// we can have a map that checks the camels twice.
 	X_ASSERT(cbuf.getHash() != 0, "Hash is not calculated")();
 	
-	auto it = cbMap_.find(&cbuf);
+	RefCountedCBuf key(&cbuf);
+
+	auto it = cbMap_.find(key);
 	if (it != cbMap_.end())
 	{
+		it->first.addReference();
 		return it->second;
 	}
 
@@ -87,10 +94,35 @@ render::ConstantBufferHandle CBufferManager::createCBuffer(render::shader::XCBuf
 	// keep pointers to the cbuffer instances.
 	// and i don't think ref counting is a good solution in this case.
 	// as the life of the cbuffer should be tied to the shader, not who uses it last.
-	cbMap_.insert(std::make_pair(&cbuf, handle));
+	cbMap_.insert(std::make_pair(key, handle));
 
 	return handle;
 }
 
+void CBufferManager::destoryConstBuffer(render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle)
+{
+	// we need ref counting in order to know when we can free the device buffer.
+	// we should have the ref couting implemented here.
+	// so the value needs to contain a ref count.
+
+	// how do we find the cbuffer instnace for the given handle tho?
+	// i need a way to get back to the cbuffer pointer that was used to make the cbuffer.
+	// should i just require the cbuffer isntance also?
+
+	RefCountedCBuf key(&cbuf);
+
+	auto it = cbMap_.find(key);
+	if (it == cbMap_.end())
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+
+	X_ASSERT(it->second == handle, "Destory CB called with a handle that was not created from the provided CB")();
+
+	if (it->first.removeReference() == 0)
+	{
+		cbMap_.erase(it);
+	}
+}
 
 X_NAMESPACE_END
