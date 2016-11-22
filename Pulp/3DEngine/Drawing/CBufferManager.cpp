@@ -58,6 +58,17 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 				std::memcpy(pDst, &inView_, sizeof(inView_));
 				break;
 
+			case ParamType::PF_Time:
+				std::memcpy(pDst, &time_, sizeof(time_));
+				break;
+			case ParamType::PF_FrameTime:
+				std::memcpy(pDst, &frameTime_, sizeof(frameTime_));
+				break;
+			case ParamType::PF_ScreenSize:
+				std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
+				break;
+
+
 			case ParamType::Unknown:
 				// need to be manually set.
 				break;
