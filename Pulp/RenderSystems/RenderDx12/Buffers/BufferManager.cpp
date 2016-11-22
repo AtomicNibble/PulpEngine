@@ -149,8 +149,8 @@ void BufferManager::freeCB(VertexBufferHandle CBHandle)
 {
 	X3DBuffer* pBuf = bufferForHandle(CBHandle);
 
-
 #if VID_MEMORY_STATS
+	stats_.constBufferBytes -= 0; // TODO
 	stats_.numConstBuffers--;
 #endif // !VID_MEMORY_STATS
 
@@ -219,6 +219,8 @@ ConstBuffer* BufferManager::Int_CreateCB(uint32_t size)
 	ConstBuffer* pBuf = X_NEW(ConstBuffer, &arena_, "VidMemCB");
 
 #if VID_MEMORY_STATS
+	stats_.constBufferBytes += size;
+	stats_.maxConstBufferBytes = core::Max(stats_.maxConstBufferBytes, stats_.constBufferBytes);
 	stats_.numConstBuffers++;
 	stats_.maxConstBuffers = core::Max(stats_.maxConstBuffers, stats_.numConstBuffers);
 #endif // !VID_MEMORY_STATS

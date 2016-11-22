@@ -102,8 +102,10 @@ public:
 
 		uint32_t indexesBytes;
 		uint32_t vertexBytes;
+		uint32_t constBufferBytes;
 		uint32_t maxIndexesBytes;
 		uint32_t maxVertexBytes;
+		uint32_t maxConstBufferBytes;
 	};
 
 public:
