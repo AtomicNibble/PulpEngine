@@ -65,9 +65,6 @@ public:
 	CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender);
 	~CBufferManager();
 
-	// updates any stale gpu buffers.
-	void frameBegin(void);
-	void batchBegin(void);
 
 	void autoFillBuffer(render::shader::XCBuffer& cbuf);
 
