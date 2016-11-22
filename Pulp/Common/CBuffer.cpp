@@ -84,7 +84,7 @@ namespace shader
 		return true;
 	}
 
-	void XShaderParam::addToHash(core::Hash::xxHash32& hasher) const
+	void XShaderParam::addToHash(Hasher& hasher) const
 	{
 		hasher.update<uint32_t>(nameHash_);
 		hasher.update(flags_.ToInt());
@@ -273,7 +273,7 @@ namespace shader
 
 	void XCBuffer::computeHash(void)
 	{
-		core::Hash::xxHash32 hasher;
+		Hasher hasher;
 
 		hasher.reset(0);
 		hasher.update(name_.c_str(), name_.length());

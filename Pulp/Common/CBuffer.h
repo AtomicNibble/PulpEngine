@@ -25,6 +25,9 @@ namespace shader
 
 	struct XShaderParam
 	{
+		typedef core::Hash::xxHash64 Hasher;
+
+	public:
 		XShaderParam();
 		XShaderParam(const XShaderParam& sb) = default;
 		XShaderParam(XShaderParam&& sb);
@@ -34,7 +37,7 @@ namespace shader
 		void print(void) const;
 
 		bool isEqual(const XShaderParam& oth) const;
-		void addToHash(core::Hash::xxHash32& hasher) const;
+		void addToHash(Hasher& hasher) const;
 
 		X_INLINE void setName(const core::string& name);
 		X_INLINE void setName(const char* pName);
@@ -78,6 +81,8 @@ namespace shader
 	{
 		typedef core::Array<XShaderParam> ParamArr;
 		typedef core::Array<uint8_t, core::ArrayAlignedAllocator<uint8_t>> DataArr;
+
+		typedef core::Hash::xxHash64 Hasher;
 
 	public:
 		XCBuffer(core::MemoryArenaBase* arena);
@@ -129,7 +134,7 @@ namespace shader
 		// 8
 		core::string name_;
 
-		core::Hash::xxHash32::HashVal hash_;
+		Hasher::HashVal hash_;
 
 		// 4
 		UpdateFreq::Enum updateRate_;
