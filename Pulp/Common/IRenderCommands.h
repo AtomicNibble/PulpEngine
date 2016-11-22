@@ -276,6 +276,10 @@ namespace Commands
 
 #endif
 
+	// not sure if i want to pack these down close or have each command start aligned.
+	// I currently support them been 8 bute aligned.
+	X_PACK_PUSH(1)
+
 	struct Draw
 	{
 		static const Command::Enum CMD = Command::DRAW;
@@ -355,6 +359,8 @@ namespace Commands
 		Recti rect; // the rect to update.
 	};
 	//~
+
+	X_PACK_POP
 
 
 	namespace Key
