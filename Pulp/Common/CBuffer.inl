@@ -123,6 +123,11 @@ namespace shader
 		return paramFlags_.IsSet(ParamType::Unknown);
 	}
 
+	X_INLINE UpdateFreq::Enum XCBuffer::getUpdateFreg(void) const
+	{
+		return updateRate_;
+	}
+
 	X_INLINE int16_t XCBuffer::getBindSize(void) const
 	{
 		return size_;
