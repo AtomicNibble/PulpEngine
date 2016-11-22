@@ -1559,8 +1559,11 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	{
 		const auto& cbLink = cbufLinks[i];
 		auto vis = stageFlagsToStageVisibility(cbLink.stages);
-		auto bindPoint = cbLink.pCBufer->getBindPoint();
+		auto& cb = *cbLink.pCBufer;
+		auto bindPoint = cb.getBindPoint();
 
+		// tell the render system what root index this needs to be bound at.
+		cb.setRootIdx(currentParamIdx);
 		rootSig.getParamRef(currentParamIdx++).initAsCBV(bindPoint, vis);
 	}
 
