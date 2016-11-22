@@ -126,6 +126,7 @@ namespace shader
 	XCBuffer::XCBuffer(core::MemoryArenaBase* arena) :
 		hash_(0),
 		updateRate_(UpdateFreq::UNKNOWN),
+		rootIdx_(-1),
 		size_(0),
 		bindPoint_(-1),
 		bindCount_(-1),
