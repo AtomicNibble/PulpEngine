@@ -1409,15 +1409,23 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 // cb's
 ConstantBufferHandle XRender::createConstBuffer(shader::XCBuffer& cb, BufUsage::Enum usage)
 {
+	// so we need to create a allocation and maybe also store some info about the cbuf?
+	// potentially we just store a copy of the cbuffer :/
+	// but then we start to build a web of dependancies.
+	// since the cbuffer is from the shader.
+	// so for now we copy PASTA!
+	const auto& data = cb.getCpuData();
 
+	X_ASSERT(cb.getRootIdx() >= 0, "CB has invalid root idx")(cb.getName().c_str(), static_cast<int32_t>(cb.getRootIdx()));
 
-	return 0; // get fooked
+	ConstantBufferHandle handle = pBuffMan_->createConstBuf(cb.getBindSize(), cb.getRootIdx(), data.data(), usage, render::CpuAccess::WRITE);
+
+	return handle; 
 }
 
 void XRender::destoryConstBuffer(ConstantBufferHandle handle)
 {
-	handle = 0;
-
+	pBuffMan_->freeCB(handle);
 }
 
 
