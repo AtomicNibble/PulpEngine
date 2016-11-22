@@ -1035,31 +1035,6 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	context.setRenderTargets(numRtvs, RTVs);
 	context.setViewportAndScissor(viewport);
 
-
-	X_ALIGNED_SYMBOL(struct Cbuffer, 16)
-	{
-		Matrix44f viewProj;
-		Matrix44f worldViewProj;
-
-		Vec4f objcolor;
-		Vec4f lightLocal;
-		Vec4f objShadind;
-	};
-
-	Cbuffer buf;
-	buf.viewProj = viewMat * projMat;
-	buf.worldViewProj.setToIdentity();
-
-	buf.viewProj = Matrix44f(
-		2, 0, 0, 0,
-		0, -2, 0, 0,
-		0, 0, 0, 0,
-		-1, 1, 0, 1
-	);
-
-	MatrixOrthoOffCenterRH(&buf.viewProj, 0, 1680, 1050, 0, -1e10f, 1e10);
-
-
 	State curState;
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
@@ -1084,8 +1059,6 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 #else
 					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
-
-					context.setDynamicCBV(1, sizeof(buf), &buf);
 
 					auto* pDefault = pTextureMan_->getDefault();
 
