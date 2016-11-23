@@ -78,7 +78,7 @@ void CBufferManager::update(core::FrameData& frame)
 	++frameIdx_;
 }
 
-void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
+bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 {
 	// if this cbuffer was updated last frame we know what was chnaged since then.
 	// so we can skip updating potentially anything.
@@ -87,7 +87,7 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 	// if the version is same and the cbuf only changes everyframe nothing will have changed.
 	if (cbufVersion == frameIdx_ && cbuf.getUpdateFreg() == render::shader::UpdateFreq::FRAME)
 	{
-		return;
+		return false;
 	}
 
 	auto changed = cbuf.getParamFlags();
@@ -101,7 +101,7 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 	// nothing to update.
 	if (!changed.IsAnySet()) 
 	{
-		return;
+		return false;
 	}
 
 	auto& cpuData = cbuf.getCpuData();
@@ -159,6 +159,8 @@ void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 				break;
 		}
 	}
+
+	return true;
 }
 
 render::ConstantBufferHandle CBufferManager::createCBuffer(render::shader::XCBuffer& cbuf)

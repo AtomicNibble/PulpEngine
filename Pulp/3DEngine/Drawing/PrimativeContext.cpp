@@ -145,7 +145,7 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 			// start with a initial value for now.
 			// later should be able to technically remove this.
 			// since when it's actually used we should notice it's stale and update it.
-			pCBufMan_->autoFillBuffer(cb);
+			pCBufMan_->autoUpdateBuffer(cb);
 
 			auto cbHandle = pCBufMan_->createCBuffer(cb);
 

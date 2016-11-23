@@ -69,7 +69,8 @@ public:
 
 	void update(core::FrameData& frame);
 
-	void autoFillBuffer(render::shader::XCBuffer& cbuf);
+	// returns true if stale.
+	bool autoUpdateBuffer(render::shader::XCBuffer& cbuf);
 
 	// create a device cbuffer.
 	render::ConstantBufferHandle createCBuffer(render::shader::XCBuffer& cbuf);
