@@ -115,6 +115,8 @@ namespace shader
 			XParamDB("screenToWorldMatrix", ParamType::PF_screenToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 			XParamDB("worldToCameraMatrix", ParamType::PF_worldToCameraMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 			XParamDB("cameraToWorldMatrix", ParamType::PF_cameraToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("viewMatrix", ParamType::PF_viewMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+			XParamDB("projectionMatrix", ParamType::PF_projectionMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 
 			XParamDB("time", ParamType::PF_Time,  UpdateFreq::FRAME, ParamFlag::FLOAT),
 			XParamDB("frameTime", ParamType::PF_FrameTime,  UpdateFreq::FRAME, ParamFlag::FLOAT),
@@ -124,8 +126,6 @@ namespace shader
 
 			XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 			XParamDB("worldMatrix", ParamType::PI_worldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
-			XParamDB("viewMatrix", ParamType::PI_viewMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
-			XParamDB("projectionMatrix", ParamType::PI_projectionMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 			XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
 		};
 
