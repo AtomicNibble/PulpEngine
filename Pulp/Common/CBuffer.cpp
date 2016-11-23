@@ -131,6 +131,7 @@ namespace shader
 		bindPoint_(-1),
 		bindCount_(-1),
 		params_(arena),
+		cpuDataVersion_(-1),
 		cpuData_(arena)
 	{
 		// lets make it so all cbuf cpu data that we send to the render system 

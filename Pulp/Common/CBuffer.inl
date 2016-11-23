@@ -117,6 +117,11 @@ namespace shader
 		rootIdx_ = idx;
 	}
 
+	X_INLINE void XCBuffer::setCpuDataVersion(int32_t version)
+	{
+		cpuDataVersion_ = version;
+	}
+
 	// <><><><>
 
 	X_INLINE const core::string& XCBuffer::getName(void) const
@@ -168,6 +173,11 @@ namespace shader
 	X_INLINE ParamTypeFlags XCBuffer::getParamFlags(void) const
 	{
 		return paramFlags_;
+	}
+
+	X_INLINE int32_t XCBuffer::getCpuDataVersion(void) const
+	{
+		return cpuDataVersion_;
 	}
 
 	X_INLINE const XShaderParam& XCBuffer::operator[](size_t idx) const

@@ -104,6 +104,7 @@ namespace shader
 		X_INLINE void setBindPointAndCount(int16_t bindPoint, int16_t bindCount);
 		X_INLINE void setParamGranularitys(size_t varGran);
 		X_INLINE void setRootIdx(int8_t idx);
+		X_INLINE void setCpuDataVersion(int32_t version);
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE bool requireManualUpdate(void) const;
@@ -115,6 +116,7 @@ namespace shader
 		X_INLINE int8_t getRootIdx(void) const;
 		X_INLINE Hasher::HashVal getHash(void) const;
 		X_INLINE ParamTypeFlags getParamFlags(void) const;
+		X_INLINE int32_t getCpuDataVersion(void) const;
 
 		X_INLINE const XShaderParam& operator[](size_t idx) const;
 		X_INLINE XShaderParam& operator[](size_t idx);
@@ -150,6 +152,8 @@ namespace shader
 		ParamTypeFlags paramFlags_; // the flags that are set ParamType::unknow is set if 1 or more are unknow.
 		ParamArr params_;
 
+		// the version of the data in cpu.
+		int32_t cpuDataVersion_;
 		DataArr cpuData_;
 	};
 
