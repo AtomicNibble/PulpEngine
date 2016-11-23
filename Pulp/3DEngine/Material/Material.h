@@ -20,14 +20,14 @@ class XMaterialManager;
 
 #if 0
 
-class XMaterial
+class Material
 {
 public:
-	XMaterial();
-	~XMaterial();
+	Material();
+	~Material();
 
 	// assigns the material props but name styas same etc.
-	X_INLINE void assignProps(const XMaterial& oth);
+	X_INLINE void assignProps(const Material& oth);
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
@@ -61,8 +61,8 @@ public:
 
 
 protected:
-	X_NO_COPY(XMaterial);
-	X_NO_ASSIGN(XMaterial);
+	X_NO_COPY(Material);
+	X_NO_ASSIGN(Material);
 
 	int32_t id_;
 

@@ -155,7 +155,7 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		core::StackString<64, char> matName("$prim_");
 		matName.append(PrimitiveType::ToString(primType));
 
-		XMaterial* pMat = pMaterialManager_->createMaterial(matName.c_str());
+		Material* pMat = pMaterialManager_->createMaterial(matName.c_str());
 		pMat->setStateDesc(desc);
 		pMat->setStateHandle(stateCache_[primType]);
 		pMat->setCat(MaterialCat::CODE);
@@ -334,7 +334,7 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
 }
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
-	XMaterial* pMaterial)
+	Material* pMaterial)
 {
 	auto& curPage = getPage(numVertices);
 	auto& vertexArr = curPage.verts;

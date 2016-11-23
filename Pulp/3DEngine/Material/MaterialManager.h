@@ -16,7 +16,7 @@ X_NAMESPACE_BEGIN(engine)
 
 class VariableStateManager;
 
-class XMaterial;
+class Material;
 
 class XMaterialManager : 
 	public IMaterialManager, 
@@ -24,7 +24,7 @@ class XMaterialManager :
 	public XEngineBase,
 	public core::IXHotReload
 {
-	typedef core::AssetContainer<XMaterial, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
+	typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
 	typedef MaterialContainer::Resource MaterialResource;
 
 public:
@@ -35,13 +35,13 @@ public:
 	void ShutDown(void);
 
 	// IMaterialManager
-	virtual XMaterial* createMaterial(const char* pMtlName) X_OVERRIDE;
-	virtual XMaterial* findMaterial(const char* pMtlName) const X_OVERRIDE;
-	virtual XMaterial* loadMaterial(const char* pMtlName) X_OVERRIDE;
+	virtual Material* createMaterial(const char* pMtlName) X_OVERRIDE;
+	virtual Material* findMaterial(const char* pMtlName) const X_OVERRIDE;
+	virtual Material* loadMaterial(const char* pMtlName) X_OVERRIDE;
 
-	void releaseMaterial(XMaterial* pMat);
+	void releaseMaterial(Material* pMat);
 
-	virtual XMaterial* getDefaultMaterial(void) X_OVERRIDE;
+	virtual Material* getDefaultMaterial(void) X_OVERRIDE;
 
 	virtual void setListener(IMaterialManagerListener* pListner) X_OVERRIDE;
 	// ~IMaterialManager
@@ -70,7 +70,7 @@ private:
 	MaterialContainer materials_;
 
 	IMaterialManagerListener* pListner_;
-	XMaterial* pDefaultMtl_;
+	Material* pDefaultMtl_;
 };
 
 

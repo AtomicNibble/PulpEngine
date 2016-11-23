@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(engine)
 #if 1
 
 
-void XMaterial::assignProps(const XMaterial& oth)
+void Material::assignProps(const Material& oth)
 {
 	X_UNUSED(oth);
 }

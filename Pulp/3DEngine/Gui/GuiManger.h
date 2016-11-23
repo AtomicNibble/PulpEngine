@@ -51,7 +51,7 @@ public:
 		return var_showDebug_ == 1;
 	}
 
-	X_INLINE engine::XMaterial* GetCursor(void) const {
+	X_INLINE engine::Material* GetCursor(void) const {
 		return pCursorArrow_;
 	}
 
@@ -63,7 +63,7 @@ private:
 
 	int var_showDebug_;
 
-	engine::XMaterial* pCursorArrow_;
+	engine::Material* pCursorArrow_;
 
 private:
 	friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);

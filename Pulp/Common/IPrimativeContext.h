@@ -7,7 +7,7 @@ struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_BEGIN(engine)
 
-class XMaterial;
+class Material;
 
 class IPrimativeContext
 {
@@ -27,15 +27,15 @@ public:
 	void drawQuadSS(float x, float y, float width, float height, const Color& col);
 	void drawQuadSS(const Rectf& rect, const Color& col);
 	X_INLINE void drawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol);
-	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, XMaterial* pMaterial, const Color& col);
-	void drawQuadImageSS(const Rectf& rect, XMaterial* pMaterial, const Color& col);
+	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color& col);
+	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color& col);
 	X_INLINE void drawRectSS(float x, float y, float width, float height, const Color& col);
 	void drawRectSS(const Rectf& rect, const Color& col);
 	void drawLineColorSS(const Vec2f& vPos1, const Color& color1,
 		const Vec2f& vPos2, const Color& vColor2);
 
-	X_INLINE void drawQuadImage(float x, float y, float width, float height, XMaterial* pMaterial, const Color& col);
-	X_INLINE void drawQuadImage(const Rectf& rect, XMaterial* pMaterial, const Color& col);
+	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, const Color& col);
+	X_INLINE void drawQuadImage(const Rectf& rect, Material* pMaterial, const Color& col);
 
 	// for 2d, z is depth not position
 	void drawQuad(float x, float y, float z, float width, float height, const Color& col);
@@ -69,13 +69,13 @@ public:
 
 private:
 	X_INLINE void drawImage(float xpos, float ypos, float z, float w, float h,
-		XMaterial* pMaterial, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
+		Material* pMaterial, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
 
 	void drawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		XMaterial* pMaterial, const float* s, const float* t, const Colorf& col, bool filtered = true);
+		Material* pMaterial, const float* s, const float* t, const Colorf& col, bool filtered = true);
 
 public:
-	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, XMaterial* pMaterial) X_ABSTRACT;
+	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
 };

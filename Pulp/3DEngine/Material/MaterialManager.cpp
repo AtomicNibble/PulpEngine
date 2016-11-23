@@ -96,7 +96,7 @@ void XMaterialManager::ShutDown(void)
 	core::XResourceContainer::ResourceItor it = materials_.begin();
 	for (; it != materials_.end(); )
 	{
-		XMaterial* pMat = static_cast<XMaterial*>(it->second);
+		Material* pMat = static_cast<Material*>(it->second);
 
 		++it;
 
@@ -141,7 +141,7 @@ void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core:
 
 
 // IMaterialManager
-XMaterial* XMaterialManager::createMaterial(const char* pMtlName)
+Material* XMaterialManager::createMaterial(const char* pMtlName)
 {
 	core::string name(pMtlName);
 
@@ -156,11 +156,11 @@ XMaterial* XMaterialManager::createMaterial(const char* pMtlName)
 	return createMaterial_Internal(pMtlName);
 }
 
-XMaterial* XMaterialManager::findMaterial(const char* pMtlName) const
+Material* XMaterialManager::findMaterial(const char* pMtlName) const
 {
 	core::string name(pMtlName);
 
-	XMaterial* pMtl = findMaterial_Internal(name);
+	Material* pMtl = findMaterial_Internal(name);
 	if (pMtl) {
 		return pMtl;
 	}
@@ -169,7 +169,7 @@ XMaterial* XMaterialManager::findMaterial(const char* pMtlName) const
 	return nullptr;
 }
 
-XMaterial* XMaterialManager::loadMaterial(const char* pMtlName)
+Material* XMaterialManager::loadMaterial(const char* pMtlName)
 {
 	X_ASSERT_NOT_NULL(pMtlName);
 
@@ -207,7 +207,7 @@ XMaterial* XMaterialManager::loadMaterial(const char* pMtlName)
 	return getDefaultMaterial();
 }
 
-void XMaterialManager::releaseMaterial(XMaterial* pMat)
+void XMaterialManager::releaseMaterial(Material* pMat)
 {
 	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
 	if (pMatRes->removeReference() == 0)
@@ -261,7 +261,7 @@ void XMaterialManager::InitDefaults(void)
 
 
 
-XMaterial* XMaterialManager::getDefaultMaterial(void)
+Material* XMaterialManager::getDefaultMaterial(void)
 {
 	return pDefaultMtl_;
 }
@@ -300,7 +300,7 @@ void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 
 	for (Matit = materials_.begin(); Matit != materials_.end(); ++Matit)
 	{
-		IMaterial* mat = static_cast<XMaterial*>(Matit->second);
+		IMaterial* mat = static_cast<Material*>(Matit->second);
 
 		if (!searchPatten || core::strUtil::WildCompare(pSearchPatten, mat->getName()))
 		{

@@ -22,14 +22,14 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(engine)
 
-class XMaterial
+class Material
 {
 public:
-	X_INLINE XMaterial();
-	~XMaterial() = default;
+	X_INLINE Material();
+	~Material() = default;
 
 	// assigns the material props but name styas same etc.
-	MATLIB_EXPORT void assignProps(const XMaterial& oth);
+	MATLIB_EXPORT void assignProps(const Material& oth);
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
@@ -63,8 +63,8 @@ public:
 
 
 protected:
-	X_NO_COPY(XMaterial);
-	X_NO_ASSIGN(XMaterial);
+	X_NO_COPY(Material);
+	X_NO_ASSIGN(Material);
 
 	int32_t id_;
 
@@ -101,8 +101,6 @@ protected:
 	render::Commands::ResourceStateBase* pVariableState_;
 	render::shader::IShader* pShader_;
 };
-
-typedef XMaterial Material;
 
 X_NAMESPACE_END
 

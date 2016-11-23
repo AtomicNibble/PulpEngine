@@ -53,7 +53,7 @@ public:
 		PushBufferEntry() = default;
 
 		X_INLINE PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
-			XMaterial* pMaterial);
+			Material* pMaterial);
 
 		// 4
 		uint16_t numVertices;
@@ -70,7 +70,7 @@ public:
 	//	render::StateHandle stateHandle;
 		// material.
 		// int32_t material;
-		XMaterial* pMaterial;
+		Material* pMaterial;
 	};
 
 #if X_64
@@ -148,7 +148,7 @@ private:
 	VertexPage& getPage(size_t requiredVerts);
 
 private:
-	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, XMaterial* pMaterial) X_FINAL;
+	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
 
 private:
@@ -162,7 +162,7 @@ private:
 	render::PassStateHandle passHandle_;
 	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
 
-	XMaterial* primMaterials_[PrimitiveType::ENUM_COUNT];
+	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
 
 	render::shader::IShader* pAuxShader_;
 };

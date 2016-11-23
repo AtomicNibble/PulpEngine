@@ -4,7 +4,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
-	XMaterial* pMaterial) :
+	Material* pMaterial) :
 	numVertices(numVertices),
 	vertexOffs(vertexOffs),
 	pageIdx(pageIdx),

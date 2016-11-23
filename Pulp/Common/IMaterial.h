@@ -326,16 +326,16 @@ X_ENSURE_SIZE(MaterialStateFlags, 1);
 X_ENSURE_SIZE(MaterialHeader, 48);
 X_ENSURE_SIZE(MaterialTexture, 4);
 
+class Material;
 
 struct IMaterialManagerListener
 {
 	virtual ~IMaterialManagerListener(){}
-	virtual IMaterial* OnLoadMaterial(const char* MtlName) X_ABSTRACT;
-	virtual IMaterial* OnCreateMaterial(IMaterial* pMat) X_ABSTRACT;
-	virtual IMaterial* OnDeleteMaterial(IMaterial* pMat) X_ABSTRACT;
+	virtual Material* OnLoadMaterial(const char* MtlName) X_ABSTRACT;
+	virtual Material* OnCreateMaterial(IMaterial* pMat) X_ABSTRACT;
+	virtual Material* OnDeleteMaterial(IMaterial* pMat) X_ABSTRACT;
 };
 
-class XMaterial;
 
 struct IMaterialManager
 {
@@ -343,14 +343,14 @@ struct IMaterialManager
 
 	// if mat of this name exsists returns and adds refrence
 	// dose not load anything.
-	virtual XMaterial* createMaterial(const char* MtlName) X_ABSTRACT;
+	virtual Material* createMaterial(const char* MtlName) X_ABSTRACT;
 	// returns null if not found, ref count unaffected
-	virtual XMaterial* findMaterial(const char* MtlName) const X_ABSTRACT;
+	virtual Material* findMaterial(const char* MtlName) const X_ABSTRACT;
 	// if material is found adds ref and returns, if not try's to load the material file.
 	// if file can't be loaded or error it return the default material.
-	virtual XMaterial* loadMaterial(const char* MtlName) X_ABSTRACT;
+	virtual Material* loadMaterial(const char* MtlName) X_ABSTRACT;
 
-	virtual XMaterial* getDefaultMaterial(void) X_ABSTRACT;
+	virtual Material* getDefaultMaterial(void) X_ABSTRACT;
 
 	virtual void setListener(IMaterialManagerListener* pListner) X_ABSTRACT;
 };

@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(engine)
 
 #if 0
 
-XMaterial::XMaterial() :
+Material::Material() :
 	pVariableState_(nullptr),
 	pShader_(nullptr)
 {
@@ -22,7 +22,7 @@ XMaterial::XMaterial() :
 	cat_ = MaterialCat::CODE;
 }
 
-XMaterial::~XMaterial()
+Material::~Material()
 {
 
 }

@@ -110,7 +110,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color& col)
 }
 
 
-void IPrimativeContext::drawQuadImageSS(const Rectf& rect, XMaterial* pMaterial, const Color& col)
+void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color& col)
 {
 	float x1, y1, x2, y2;
 	float z;
@@ -383,7 +383,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHe
 
 
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	XMaterial* pMaterial, const float* s, const float* t,
+	Material* pMaterial, const float* s, const float* t,
 	const Colorf& col, bool filtered)
 {
 	X_ASSERT_NOT_NULL(s);

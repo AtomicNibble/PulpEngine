@@ -12,7 +12,7 @@
 struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_DECLARE(engine,
-	class XMaterial;
+	class Material;
 );
 
 X_NAMESPACE_BEGIN(font)
@@ -120,7 +120,7 @@ private:
 	render::shader::IShader* pTextShader_;
 	render::StateHandle stateHandle_;
 
-	engine::XMaterial* pMaterial_;
+	engine::Material* pMaterial_;
 };
 
 X_INLINE texture::TexID XFont::getTextureId(void) const

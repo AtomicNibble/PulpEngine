@@ -10,7 +10,7 @@ X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float
 }
 
 
-X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, XMaterial* pMaterial, const Color& col)
+X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color& col)
 {
 	const Rectf rect(x, y, x + width, y + height);
 	drawQuadImageSS(rect, pMaterial, col);
@@ -24,12 +24,12 @@ X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float
 }
 
 X_INLINE void IPrimativeContext::drawQuadImage(float xpos, float ypos,
-	float w, float h, XMaterial* pMaterial, const Color& col)
+	float w, float h, Material* pMaterial, const Color& col)
 {
 	drawImage(xpos, ypos, 0.f, w, h, pMaterial, 0, 1, 1, 0, col);
 }
 
-X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, XMaterial* pMaterial,
+X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, Material* pMaterial,
 	const Color& col)
 {
 	drawImage(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(),
@@ -37,7 +37,7 @@ X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, XMaterial* pMa
 }
 
 X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, float w, float h,
-	XMaterial* pMaterial, float s0, float t0, float s1, float t1,
+	Material* pMaterial, float s0, float t0, float s1, float t1,
 	const Colorf& col, bool filtered)
 {
 	float s[4], t[4];
