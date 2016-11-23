@@ -6,6 +6,7 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+#if 0
 
 XMaterial::XMaterial() :
 	pVariableState_(nullptr),
@@ -25,5 +26,7 @@ XMaterial::~XMaterial()
 {
 
 }
+
+#endif
 
 X_NAMESPACE_END

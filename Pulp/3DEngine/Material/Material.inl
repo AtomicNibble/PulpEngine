@@ -1,6 +1,7 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+#if 0
 
 X_INLINE const int32_t XMaterial::getID(void) const
 {
@@ -68,6 +69,18 @@ X_INLINE void XMaterial::setVariableState(render::Commands::ResourceStateBase* p
 	pVariableState_ = pState;
 }
 
+// ---------------------------------------------
+
+X_INLINE bool XMaterial::isDrawn(void) const
+{
+	return flags_.IsSet(MaterialFlag::NODRAW) == false;
+}
+
+X_INLINE bool XMaterial::isLoaded(void) const
+{
+	return flags_.IsSet(MaterialFlag::LOAD_FAILED) == false;
+}
+
 
 X_INLINE const core::string& XMaterial::getName(void) const
 {
@@ -118,5 +131,7 @@ X_INLINE render::Commands::ResourceStateBase* XMaterial::getVariableState(void) 
 {
 	return pVariableState_;
 }
+
+#endif
 
 X_NAMESPACE_END

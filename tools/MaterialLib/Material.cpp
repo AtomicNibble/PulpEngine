@@ -5,6 +5,17 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+#if 1
+
+
+void XMaterial::assignProps(const XMaterial& oth)
+{
+	X_UNUSED(oth);
+}
+
+
+#else
+
 Material::Material()
 {
 
@@ -78,5 +89,7 @@ void Material::assignProps(const Material& oth)
 	shineness_ = oth.shineness_;
 	opacity_ = oth.opacity_;
 }
+
+#endif
 
 X_NAMESPACE_END

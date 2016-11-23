@@ -134,7 +134,8 @@ bool MatManager::loadMatFromFile(MatResource& mat, const core::string& name)
 
 	if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
 	{
-		if (mat.load(file.GetFile()))
+		X_ASSERT_NOT_IMPLEMENTED();
+//		if (mat.load(file.GetFile()))
 		{
 			return true;
 		}

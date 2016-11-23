@@ -18,11 +18,16 @@ X_NAMESPACE_BEGIN(engine)
 
 class XMaterialManager;
 
+#if 0
+
 class XMaterial
 {
 public:
 	XMaterial();
 	~XMaterial();
+
+	// assigns the material props but name styas same etc.
+	X_INLINE void assignProps(const XMaterial& oth);
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
@@ -38,6 +43,10 @@ public:
 	X_INLINE void setStateDesc(render::StateDesc& stateDesc);
 	X_INLINE void setStateHandle(render::StateHandle handle);
 	X_INLINE void setVariableState(render::Commands::ResourceStateBase* pState);
+
+	// flag helpers.
+	X_INLINE bool isDrawn(void) const;
+	X_INLINE bool isLoaded(void) const;
 
 	X_INLINE const core::string& getName(void) const;
 	X_INLINE MaterialFlags getFlags(void) const;
@@ -67,11 +76,20 @@ protected:
 	MaterialPolygonOffset::Enum polyOffsetType_;
 	MaterialMountType::Enum		mountType_;
 
+	MaterialUsage::Enum usage_;
+	MaterialCat::Enum cat_;
+	MaterialStateFlags stateFlags_;
+	uint8_t _pad[1];
+
+	// used for custom texture repeat.
+	// if AUTO_TILING the textures dim's are used.
+	Vec2<int16_t> tiling_;
+
 	// 4
 	uint8_t numTextures_;
 	uint8_t numCBs_; // the number of const buffers this material requires.
-	MaterialUsage::Enum usage_;
-	MaterialCat::Enum cat_;
+	uint8_t __pad[2];
+
 
 	// we store things like blend. cullType etc in the form required for passing to render system.
 	render::StateDesc stateDesc_;
@@ -84,6 +102,7 @@ protected:
 	render::shader::IShader* pShader_; 
 };
 
+#endif
 
 X_NAMESPACE_END
 
