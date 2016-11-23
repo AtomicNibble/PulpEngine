@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "IMaterial.h"
-#include "Material.h"
 #include "MaterialManager.h"
 
 #include <IFileSys.h>

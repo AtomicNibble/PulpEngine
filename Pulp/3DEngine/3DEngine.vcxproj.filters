@@ -34,9 +34,6 @@
     <ClCompile Include="Model\XModel.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Material\Material.cpp">
-      <Filter>Source Files\Material</Filter>
-    </ClCompile>
     <ClCompile Include="Material\MaterialManager.cpp">
       <Filter>Source Files\Material</Filter>
     </ClCompile>
@@ -101,9 +98,6 @@
     </ClInclude>
     <ClInclude Include="Model\XModel.h">
       <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Material\Material.h">
-      <Filter>Header Files\Material</Filter>
     </ClInclude>
     <ClInclude Include="Material\MaterialManager.h">
       <Filter>Header Files\Material</Filter>
@@ -180,9 +174,6 @@
     </None>
     <None Include="Drawing\PrimativeContext.inl">
       <Filter>Header Files\Drawing</Filter>
-    </None>
-    <None Include="Material\Material.inl">
-      <Filter>Header Files\Material</Filter>
     </None>
     <None Include="Model\XModel.inl">
       <Filter>Header Files\Model</Filter>
