@@ -238,40 +238,6 @@ typedef Flags<TechFlag> TechFlags;
 
 
 
-struct TextureAddressMode
-{
-	enum Enum
-	{
-		WRAP,
-		MIRROR,
-		CLAMP,
-		BORDER
-	};
-};
-
-#define X_RENDER_ALLOW_ANISOTROPIC 1
-
-struct FilterMode
-{
-	enum Enum
-	{
-		NONE = -1,
-		POINT = 0,
-		LINEAR = 1,
-		BILINEAR,
-		TRILINEAR,
-#if X_RENDER_ALLOW_ANISOTROPIC
-		ANISO2X,
-		ANISO4X,
-		ANISO8X,
-		ANISO16X,
-#endif // !X_RENDER_ALLOW_ANISOTROPIC
-	};
-};
-
-
-
-
 
 typedef int32_t ShaderID;
 typedef uintptr_t TechHandle;
