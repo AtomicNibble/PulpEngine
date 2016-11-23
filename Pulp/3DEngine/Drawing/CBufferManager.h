@@ -40,6 +40,7 @@ X_NAMESPACE_BEGIN(engine)
 //	they can both use the same gpu memory and we only have to update one.
 //
 
+X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
 
 class CBufferManager
 {
@@ -93,13 +94,15 @@ private:
 
 	Vec4f screenSize_;
 
-	Matrix44f view_;
-	Matrix44f inView_;
-	Matrix44f proj_;
+	X_ALIGN16_MATRIX44F(view_);
+	X_ALIGN16_MATRIX44F(inView_);
+	X_ALIGN16_MATRIX44F(proj_);
 
-	Matrix44f viewProj_;
-	Matrix44f viewProjInv_;
+	X_ALIGN16_MATRIX44F(viewProj_);
+	X_ALIGN16_MATRIX44F(viewProjInv_);
 };
+
+X_ENABLE_WARNING(4324)
 
 
 X_INLINE void CBufferManager::setTime(core::TimeVal time)
