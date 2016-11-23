@@ -80,19 +80,48 @@ void CBufferManager::update(core::FrameData& frame)
 
 void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)
 {
-	// set the values for all the auto params.
-	using render::shader::ParamType;
+	// if this cbuffer was updated last frame we know what was chnaged since then.
+	// so we can skip updating potentially anything.
+	const auto cbufVersion = cbuf.getCpuDataVersion();
+
+	// if the version is same and the cbuf only changes everyframe nothing will have changed.
+	if (cbufVersion == frameIdx_ && cbuf.getUpdateFreg() == render::shader::UpdateFreq::FRAME)
+	{
+		return;
+	}
+
+	auto changed = cbuf.getParamFlags();
+	if ((cbufVersion + 1) == frameIdx_)
+	{
+		changed &= dirtyFlags_;
+	}
+
+	cbuf.setCpuDataVersion(frameIdx_);
+
+	// nothing to update.
+	if (!changed.IsAnySet()) 
+	{
+		return;
+	}
 
 	auto& cpuData = cbuf.getCpuData();
-
 	for (int32_t i = 0; i < cbuf.getParamCount(); i++)
 	{
 		const auto& p = cbuf[i];
 		uint8_t* pDst = &cpuData[p.getBindPoint()];
 
+		using render::shader::ParamType;
+
 		static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
 
-		switch (p.getType())
+		const auto type = p.getType();
+
+		// we can skip the copy if not changed.
+		if (!changed.IsSet(type)) {
+			continue;
+		}
+
+		switch (type)
 		{
 			case ParamType::PF_worldToScreenMatrix:
 				std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
