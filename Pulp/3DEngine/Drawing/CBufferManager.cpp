@@ -25,7 +25,8 @@ bool CBufferManager::equal_to::operator()(const RefCountedCBuf& lhs, const RefCo
 
 CBufferManager::CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender) :
 	pRender_(pRender),
-	cbMap_(arena, 128)
+	cbMap_(arena, 128),
+	frameIdx_(0)
 {
 
 }
@@ -37,6 +38,10 @@ CBufferManager::~CBufferManager()
 
 void CBufferManager::update(core::FrameData& frame)
 {
+	using render::shader::ParamType;
+
+	dirtyFlags_.Clear();
+
 	// time
 	setTime(frame.timeInfo.startTimeReal);
 	setFrameTime(core::ITimer::Timer::GAME, frame.timeInfo.deltas[core::ITimer::Timer::GAME]);
@@ -44,11 +49,33 @@ void CBufferManager::update(core::FrameData& frame)
 
 	// view
 	setViewPort(frame.view.viewport);
-	view_ = frame.view.viewMatrix;
-	inView_ = frame.view.viewMatrix.inverted();
-	proj_ = frame.view.projMatrix;
-	viewProj_ = frame.view.viewProjMatrix;
-	viewProjInv_ = frame.view.viewProjInvMatrix;
+
+	if (view_ != frame.view.viewMatrix) {
+		view_ = frame.view.viewMatrix;
+		inView_ = frame.view.viewMatrix.inverted();
+
+		dirtyFlags_.Set(ParamType::PF_viewMatrix);
+		dirtyFlags_.Set(ParamType::PF_cameraToWorldMatrix);
+	}
+	if (proj_ != frame.view.projMatrix) {
+		proj_ = frame.view.projMatrix;
+
+		dirtyFlags_.Set(ParamType::PF_projectionMatrix);
+	}
+
+	if (viewProj_ != frame.view.viewProjMatrix) {
+		viewProj_ = frame.view.viewProjMatrix;
+
+		dirtyFlags_.Set(ParamType::PF_worldToScreenMatrix);
+	}
+
+	if (viewProjInv_ != frame.view.viewProjInvMatrix) {
+		viewProjInv_ = frame.view.viewProjInvMatrix;
+
+		dirtyFlags_.Set(ParamType::PF_screenToWorldMatrix);
+	}
+
+	++frameIdx_;
 }
 
 void CBufferManager::autoFillBuffer(render::shader::XCBuffer& cbuf)

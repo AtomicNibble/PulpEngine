@@ -81,11 +81,12 @@ private:
 
 private:
 	render::IRender* pRender_;
-
 	ConstBufferCacheMap cbMap_;
 
+	int32_t frameIdx_;
+
 private:
-	render::shader::ParamTypeFlags dirtyParamFlags;
+	render::shader::ParamTypeFlags dirtyFlags_;
 
 	float time_;
 	float frameTime_[core::ITimer::Timer::ENUM_COUNT];
@@ -103,20 +104,50 @@ private:
 
 X_INLINE void CBufferManager::setTime(core::TimeVal time)
 {
-	time_ = time.GetMilliSeconds();
+	const float newTime = time.GetMilliSeconds();
+
+	if (math<float>::abs(newTime - time_) >= EPSILON_VALUEf)
+	{
+		time_ = newTime;
+
+		dirtyFlags_.Set(render::shader::ParamType::PF_Time);
+	}
 }
 
 X_INLINE void CBufferManager::setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal frameTime)
 {
-	frameTime_[timer] = frameTime.GetMilliSeconds();
+	const float newTime = frameTime.GetMilliSeconds();
+
+	if (math<float>::abs(newTime - frameTime_[timer]) >= EPSILON_VALUEf)
+	{
+		frameTime_[timer] = newTime;
+
+		static_assert(core::ITimer::Timer::ENUM_COUNT == 2, "Timer count changed? check this code");
+
+		if (timer == core::ITimer::Timer::Enum::GAME) {
+			dirtyFlags_.Set(render::shader::ParamType::PF_FrameTime);
+		}
+		else if (timer == core::ITimer::Timer::Enum::UI) {
+			dirtyFlags_.Set(render::shader::ParamType::PF_FrameTimeUI);
+		}
+		else {
+			X_ASSERT_UNREACHABLE();
+		}
+	}
 }
 
 X_INLINE void CBufferManager::setViewPort(const XViewPort& viewport)
 {
-	screenSize_.x = viewport.getWidthf();
-	screenSize_.y = viewport.getHeightf();
-	screenSize_.z = 0.f / screenSize_.x;
-	screenSize_.w = 0.f / screenSize_.y;
+	Vec4f screenSize;
+	screenSize.x = viewport.getWidthf();
+	screenSize.y = viewport.getHeightf();
+	screenSize.z = 0.5f / screenSize.x;
+	screenSize.w = 0.5f / screenSize.y;
+
+	if (screenSize_ != screenSize) {
+		screenSize_ = screenSize;
+		dirtyFlags_.Set(render::shader::ParamType::PF_ScreenSize);
+	}
 }
 
 
