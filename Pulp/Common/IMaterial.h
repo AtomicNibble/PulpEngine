@@ -198,48 +198,6 @@ it decdes what lod to render.
 */
 
 
-struct IMaterial
-{
-	virtual ~IMaterial(){};
-
-	virtual const core::string& getName(void) const X_ABSTRACT;
-	virtual void setName(const char* pName) X_ABSTRACT;
-
-	virtual const MaterialFlags getFlags() const X_ABSTRACT;
-	virtual void setFlags(const MaterialFlags flags) X_ABSTRACT;
-
-	virtual MaterialSurType::Enum getSurfaceType() const X_ABSTRACT;
-	virtual void setSurfaceType(MaterialSurType::Enum type) X_ABSTRACT;
-
-	virtual MaterialCullType::Enum getCullType() const X_ABSTRACT;
-	virtual void setCullType(MaterialCullType::Enum type) X_ABSTRACT;
-
-	virtual MaterialTexRepeat::Enum getTexRepeat(void) const X_ABSTRACT;
-	virtual void setTexRepeat(MaterialTexRepeat::Enum texRepeat) X_ABSTRACT;
-
-	virtual MaterialPolygonOffset::Enum getPolyOffsetType(void) const X_ABSTRACT;
-	virtual void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType) X_ABSTRACT;
-
-	virtual MaterialFilterType::Enum getFilterType(void) const X_ABSTRACT;
-	virtual void setFilterType(MaterialFilterType::Enum filterType) X_ABSTRACT;
-
-//	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
-//	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
-
-	virtual MaterialCoverage::Enum getCoverage(void) const X_ABSTRACT;
-	virtual void setCoverage(MaterialCoverage::Enum coverage) X_ABSTRACT;
-
-//	virtual void setShaderItem(render::shader::XShaderItem& item) X_ABSTRACT;
-//	virtual render::shader::XShaderItem& getShaderItem(void) X_ABSTRACT;
-
-	virtual bool isDefault() const X_ABSTRACT;
-
-	// util.
-	X_INLINE bool isDrawn(void) const {
-		return !getFlags().IsSet(MaterialFlag::NODRAW);
-	}
-};
-
 struct MaterialHeader
 {
 	// 4
@@ -328,14 +286,6 @@ X_ENSURE_SIZE(MaterialTexture, 4);
 
 class Material;
 
-struct IMaterialManagerListener
-{
-	virtual ~IMaterialManagerListener(){}
-	virtual Material* OnLoadMaterial(const char* MtlName) X_ABSTRACT;
-	virtual Material* OnCreateMaterial(IMaterial* pMat) X_ABSTRACT;
-	virtual Material* OnDeleteMaterial(IMaterial* pMat) X_ABSTRACT;
-};
-
 
 struct IMaterialManager
 {
@@ -351,8 +301,6 @@ struct IMaterialManager
 	virtual Material* loadMaterial(const char* MtlName) X_ABSTRACT;
 
 	virtual Material* getDefaultMaterial(void) X_ABSTRACT;
-
-	virtual void setListener(IMaterialManagerListener* pListner) X_ABSTRACT;
 };
 
 X_NAMESPACE_END

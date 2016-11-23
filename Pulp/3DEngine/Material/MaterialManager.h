@@ -43,7 +43,6 @@ public:
 
 	virtual Material* getDefaultMaterial(void) X_OVERRIDE;
 
-	virtual void setListener(IMaterialManagerListener* pListner) X_OVERRIDE;
 	// ~IMaterialManager
 
 	// ICoreEventListener
@@ -69,7 +68,6 @@ private:
 
 	MaterialContainer materials_;
 
-	IMaterialManagerListener* pListner_;
 	Material* pDefaultMtl_;
 };
 

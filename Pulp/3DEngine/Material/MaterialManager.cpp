@@ -35,22 +35,12 @@ namespace
 		(static_cast<XMaterialManager*>(XEngineBase::getMaterialManager()))->ListMaterials(pSearchPatten);
 	}
 
-	void sortMatsByName(core::Array<IMaterial*>& mats)
-	{
-		std::sort(mats.begin(), mats.end(), [](IMaterial* a, IMaterial* b){
-				const char* nameA = a->getName();
-				const char* nameB = b->getName();
-				return strcmp(nameA, nameB) < 0;
-			}
-		);
-	}
 
 } // namespace
 
 XMaterialManager::XMaterialManager(VariableStateManager& vsMan) :
 	vsMan_(vsMan),
 	materials_(g_3dEngineArena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource)),
-	pListner_(nullptr),
 	pDefaultMtl_(nullptr)
 {
 }
@@ -265,10 +255,6 @@ Material* XMaterialManager::getDefaultMaterial(void)
 	return pDefaultMtl_;
 }
 
-void XMaterialManager::setListener(IMaterialManagerListener* pListner)
-{
-	pListner_ = pListner;
-}
 
 // ~IMaterialManager
 
@@ -307,7 +293,12 @@ void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 		}
 	}
 
-	sortMatsByName(sorted_mats);
+	std::sort(sorted_mats.begin(), sorted_mats.end(), [](Material* a, Material* b) {
+		const char* nameA = a->getName();
+		const char* nameB = b->getName();
+		return strcmp(nameA, nameB) < 0;
+	}
+	);
 
 	X_LOG0("Console", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
 
