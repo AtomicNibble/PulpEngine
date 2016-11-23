@@ -165,6 +165,11 @@ namespace shader
 		return hash_;
 	}
 
+	X_INLINE ParamTypeFlags XCBuffer::getParamFlags(void) const
+	{
+		return paramFlags_;
+	}
+
 	X_INLINE const XShaderParam& XCBuffer::operator[](size_t idx) const
 	{
 		return params_[idx];
