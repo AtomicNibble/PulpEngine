@@ -245,7 +245,7 @@ X_DECLARE_FLAGS8(StateFlag)(
 	ALPHATEST
 );
 
-typedef Flags8<StateFlag> StatFlags;
+typedef Flags8<StateFlag> StateFlags;
 
 struct StateDesc
 {
@@ -255,7 +255,7 @@ struct StateDesc
 	CullType::Enum cullType;
 	TopoType::Enum topo;
 	DepthFunc::Enum depthFunc;
-	StatFlags stateFlags;
+	StateFlags stateFlags;
 
 	BlendOp::Enum blendOp;
 	shader::VertexFormat::Enum vertexFmt;
