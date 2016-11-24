@@ -15,6 +15,7 @@
 
 #include <String\Json.h>
 #include <String\HumanSize.h>
+#include <String\StringTokenizer.h>
 
 #include <Random\MultiplyWithCarry.h>
 
@@ -2521,23 +2522,42 @@ bool AssetDB::ValidName(const core::string& name)
 		return false;
 	}
 
+	// support a prefix that can only appear at start of a sub name.
+	core::StringTokenizer<char> tokenize(name.begin(), name.end(), ASSET_NAME_SLASH);
+	core::StringRange<char> token(nullptr, nullptr);
 
-	for (size_t i = 0; i < name.length(); i++)
+	while (tokenize.ExtractToken(token))
 	{
-		// are you valid!?
-		const char ch = name[i];
-
-		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_' || ch == ASSET_NAME_SLASH;
-		if (!valid) {
-			X_ERROR("AssetDB", "Asset name \"%s\" has invalid character at position %" PRIuS, name.c_str(), i + 1);
+		// don't allow "name\\post_double" 
+		if (token.GetLength() < 1) {
 			return false;
 		}
 
-		// provide more info when it's case error.
-		if (core::strUtil::IsAlpha(ch) && !core::strUtil::IsLower(ch)) {
-			X_ERROR("AssetDB", "Asset name \"%s\" has invalid upper-case character at position %" PRIuS, name.c_str(), 
-				i + 1); // make it none 0 index based for the plebs.
-			return false;
+		const auto len = token.GetLength();
+		const auto pSrc = token.GetStart();
+		
+		size_t i = 0;
+		if (pSrc[i] == ASSET_NAME_PREFIX) {
+			++i;
+		}
+
+		for (; i < len; i++)
+		{
+			const char ch = pSrc[i];
+
+			bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_' || ch == ASSET_NAME_SLASH;
+			if (!valid) {
+				const size_t idx = (&pSrc[i] - name.begin()) + 1;
+				X_ERROR("AssetDB", "Asset name \"%s\" has invalid character at position %" PRIuS, name.c_str(), idx);
+				return false;
+			}
+
+			// provide more info when it's case error.
+			if (core::strUtil::IsAlpha(ch) && !core::strUtil::IsLower(ch)) {
+				const size_t idx = (&pSrc[i] - name.begin()) + 1; // make it none 0 index based for the plebs.
+				X_ERROR("AssetDB", "Asset name \"%s\" has invalid upper-case character at position %" PRIuS, name.c_str(), idx); 
+				return false;
+			}
 		}
 	}
 
