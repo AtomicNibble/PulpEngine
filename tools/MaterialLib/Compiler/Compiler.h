@@ -41,7 +41,6 @@ private:
 
 private:
 	MaterialFlags flags_;
-	MaterialStateFlags stateFlags_;
 	MaterialCat::Enum cat_;
 	MaterialUsage::Enum usage_;
 

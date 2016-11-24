@@ -197,11 +197,10 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
 	// now we do some flag parsing.
 	flags_.Clear();
-	stateFlags_.Clear();
 
-	static_assert(MaterialFlag::FLAGS_COUNT == 17, "Added additional mat flags? this code might need updating.");
+	static_assert(MaterialFlag::FLAGS_COUNT == 17 + 4, "Added additional mat flags? this code might need updating.");
 
-	std::array<std::pair<const char*, MaterialFlag::Enum>, 16> flags = { {
+	std::array<std::pair<const char*, MaterialFlag::Enum>, 16 + 4> flags = { {
 			{ "f_nodraw", MaterialFlag::NODRAW },
 			{ "f_editorvisible", MaterialFlag::EDITOR_VISABLE },
 			{ "f_solid", MaterialFlag::SOLID },
@@ -217,26 +216,19 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			{ "f_no_fall_dmg", MaterialFlag::NO_FALL_DMG },
 			{ "f_no_impact", MaterialFlag::NO_IMPACT },
 			{ "f_no_pennetrate", MaterialFlag::NO_PENNETRATE },
-			{ "f_no_steps", MaterialFlag::NO_STEPS }
+			{ "f_no_steps", MaterialFlag::NO_STEPS },
+
+			// these are merged in for now.
+			{ "useUVScroll", MaterialFlag::UV_SCROLL },
+			{ "useUVRotate", MaterialFlag::UV_ROTATE },
+			{ "clampU", MaterialFlag::UV_CLAMP_U },
+			{ "clampV", MaterialFlag::UV_CLAMP_V }
 		}
 	};
 
-	static_assert(MaterialStateFlag::FLAGS_COUNT == 4, "Added additional mat state flags? this code might need updating.");
-
-	std::array<std::pair<const char*, MaterialStateFlag::Enum>, 4> stateFlags = { {
-			{ "useUVScroll", MaterialStateFlag::UV_SCROLL },
-			{ "useUVRotate", MaterialStateFlag::UV_ROTATE },
-			{ "clampU", MaterialStateFlag::UV_CLAMP_U },
-			{ "clampV", MaterialStateFlag::UV_CLAMP_V }
-		}
-	};
 
 	if (!processFlagGroup(d, flags_, flags)) {
 		X_ERROR("Mat", "Failed to parse flags");
-		return false;
-	}
-	if (!processFlagGroup(d, stateFlags_, stateFlags)) {
-		X_ERROR("Mat", "Failed to parse state flags");
 		return false;
 	}
 
@@ -280,7 +272,6 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.polyOffsetType = polyOffset_;
 	hdr.coverage = coverage_;
 	hdr.mountType = mountType_;
-	hdr.stateFlags = stateFlags_;
 
 	hdr.stateDesc = stateDesc_;
 

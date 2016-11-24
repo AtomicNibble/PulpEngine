@@ -63,6 +63,12 @@ X_DECLARE_FLAGS(MaterialFlag)(
 	NO_PENNETRATE,	// bullets can't pass through.
 	NO_STEPS,		// don't create footsteps.
 
+	// might move these out later.
+	UV_SCROLL,
+	UV_ROTATE,
+	UV_CLAMP_U,
+	UV_CLAMP_V,
+
 	LOAD_FAILED
 );
 
@@ -78,18 +84,6 @@ X_DECLARE_ENUM8(MaterialMountType)(
 	CLIMBWALL,
 	CLIMBPIPE
 );
-
-
-
-X_DECLARE_FLAGS8(MaterialStateFlag)(
-	// dunno if i want to keep these here.
-	UV_SCROLL,
-	UV_ROTATE,
-	UV_CLAMP_U,
-	UV_CLAMP_V
-);
-
-typedef Flags8<MaterialStateFlag> MaterialStateFlags;
 
 
 // cat used to refine avaliable subtypes.
@@ -204,10 +198,6 @@ struct MaterialHeader
 	MaterialMountType::Enum mountType;
 
 	// 4
-	MaterialStateFlags stateFlags;
-	bool __pad[3];
-
-	// 4
 	MaterialFlags flags;
 
 	// used for custom texture repeat.
@@ -216,6 +206,9 @@ struct MaterialHeader
 
 	// 20
 	render::StateDesc stateDesc;
+
+	// 4
+	uint32_t _pad;
 
 	// 12
 	Color8u diffuse;
@@ -256,8 +249,8 @@ X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
 X_ENSURE_SIZE(MaterialSurType::Enum, 1);
 X_ENSURE_SIZE(MaterialUsage::Enum, 1);
 X_ENSURE_SIZE(MaterialMountType::Enum, 1);
-X_ENSURE_SIZE(MaterialStateFlag::Bits, 1);
-X_ENSURE_SIZE(MaterialStateFlags, 1);
+// X_ENSURE_SIZE(MaterialStateFlag::Bits, 1);
+// X_ENSURE_SIZE(MaterialStateFlags, 1);
 // X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
 // X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
 // X_ENSURE_SIZE(MaterialCullType::Enum, 1);

@@ -80,7 +80,6 @@ protected:
 
 	MaterialUsage::Enum usage_;
 	MaterialCat::Enum cat_;
-	MaterialStateFlags stateFlags_;
 	uint8_t _pad[1];
 
 	// used for custom texture repeat.
