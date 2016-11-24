@@ -2539,6 +2539,13 @@ bool AssetDB::ValidName(const core::string& name)
 		size_t i = 0;
 		if (pSrc[i] == ASSET_NAME_PREFIX) {
 			++i;
+
+			// make sure no more slashes.
+			if (core::strUtil::Find(&pSrc[i], ASSET_NAME_SLASH))
+			{
+				X_ERROR("AssetDB", "Asset name \"%s\" has slash after prefix", name.c_str());
+				return false;
+			}
 		}
 
 		for (; i < len; i++)
