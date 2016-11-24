@@ -25,6 +25,9 @@ class Converter
 	: public IConverterHost
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
+
+	typedef std::array<std::shared_ptr<IConverterModule>, AssetType::ENUM_COUNT> ConverterModuleInterfacesArr;
+
 public:
 	typedef IConverter::ConvertArgs ConvertArgs;
 	typedef IConverter::OutPath OutPath;
@@ -77,6 +80,7 @@ private:
 
 	bool IntializeConverterModule(AssetType::Enum assType);
 	bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
+	void UnloadConverters(void);
 	core::Module::Handle LoadDLL(const char* dllName);
 
 private:
@@ -85,13 +89,15 @@ private:
 
 private:
 	core::MemoryArenaBase* scratchArea_;
-	IConverter* converters_[AssetType::ENUM_COUNT];
 	assetDb::AssetDB& db_;
 
+	IConverter* converters_[AssetType::ENUM_COUNT];
 	core::string conversionProfiles_[AssetType::ENUM_COUNT];
 
 	bool forceConvert_;
 	bool _pad[3];
+
+	ConverterModuleInterfacesArr converterModules_;
 };
 
 

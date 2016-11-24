@@ -31,7 +31,7 @@ Converter::Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
 
 Converter::~Converter()
 {
-
+	UnloadConverters();
 }
 
 void Converter::PrintBanner(void)
@@ -648,7 +648,28 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* dl
 		return false;
 	}
 
+	// save for cleanup.
+	converterModules_[assType] = pModule;
+
 	return converters_[assType] != nullptr;
+}
+
+void Converter::UnloadConverters(void)
+{
+	for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+	{
+		if (converters_[i])
+		{
+			X_ASSERT((bool)converterModules_[i], "Have a converter interface without a corrisponding moduleInterface")();
+
+			if (!converterModules_[i]->ShutDown(converters_[i])) {
+				X_ERROR("Converter", "error shuting down converter module");
+			}
+
+			converterModules_[i].reset();
+			converters_[i] = nullptr;
+		}
+	}
 }
 
 core::Module::Handle Converter::LoadDLL(const char* dllName)
