@@ -767,7 +767,8 @@ void AssetExplorer::build(void)
 	BUG_ASSERT(currentNode_, return);
 
 	if (currentNode_->nodeType() != NodeType::FileNodeType &&
-		currentNode_->nodeType() != NodeType::VirtualFolderNodeType && 
+		currentNode_->nodeType() != NodeType::FolderNodeType &&
+		currentNode_->nodeType() != NodeType::VirtualFolderNodeType &&
 		currentNode_->nodeType() != NodeType::ProjectNodeType) {
 		return;
 	}
@@ -782,6 +783,7 @@ void AssetExplorer::buildForce(void)
 	BUG_ASSERT(currentNode_, return);
 
 	if (currentNode_->nodeType() != NodeType::FileNodeType &&
+		currentNode_->nodeType() != NodeType::FolderNodeType &&
 		currentNode_->nodeType() != NodeType::VirtualFolderNodeType &&
 		currentNode_->nodeType() != NodeType::ProjectNodeType) {
 		return;
