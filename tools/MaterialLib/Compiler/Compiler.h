@@ -32,6 +32,8 @@ public:
 	bool writeToFile(core::XFile* pFile) const;
 
 private:
+	bool hasFlagAndTrue(core::json::Document& d, const char* pName);
+
 	template<typename FlagClass, size_t Num>
 	bool processFlagGroup(core::json::Document& doc, FlagClass& flags,
 		const std::array<std::pair<const char*, typename FlagClass::Enum>, Num>& flagValues);

@@ -82,9 +82,6 @@ X_DECLARE_ENUM8(MaterialMountType)(
 
 
 X_DECLARE_FLAGS8(MaterialStateFlag)(
-	DEPTHWRITE,
-	WIREFRAME,
-
 	// dunno if i want to keep these here.
 	UV_SCROLL,
 	UV_ROTATE,

@@ -138,7 +138,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	const char* pCullFace = d["cullFace"].GetString();
 	const char* pDepthTest = d["depthTest"].GetString();
 
-
+	// no stencil materials for now.
 	stateDesc_.stencil.front.stencilFunc = render::StencilFunc::NEVER;
 	stateDesc_.stencil.front.failOp = render::StencilOperation::KEEP;
 	stateDesc_.stencil.front.zFailOp = render::StencilOperation::KEEP;
@@ -147,6 +147,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	stateDesc_.stencil.back.failOp = render::StencilOperation::KEEP;
 	stateDesc_.stencil.back.zFailOp = render::StencilOperation::KEEP;
 	stateDesc_.stencil.back.passOp = render::StencilOperation::KEEP;
+
 	stateDesc_.blend.srcBlendColor = Util::BlendTypeFromStr(pSrcCol);
 	stateDesc_.blend.dstBlendColor = Util::BlendTypeFromStr(pDstCol);
 	stateDesc_.blend.srcBlendAlpha = Util::BlendTypeFromStr(pSrcAlpha);
@@ -155,12 +156,28 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	stateDesc_.topo = render::TopoType::TRIANGLELIST;
 	stateDesc_.depthFunc = render::DepthFunc::ALWAYS;
 	stateDesc_.stateFlags.Clear();
-	stateDesc_.blendOp = render::BlendOp::OP_ADD;
+	stateDesc_.blendOp = render::BlendOp::OP_ADD; // this can be fixed for now
+
 	// a material should not be bound to a vertex fmt.
 	// but we it's part of the stateDesc.
 	// which we pre make so we can use it directly at runtime.
 	// the vertexVmt will just need patching to correct one.
 	stateDesc_.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B; 
+
+	if (hasFlagAndTrue(d, "noDepthTest")) {
+		stateDesc_.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
+	}
+	if (hasFlagAndTrue(d, "depthWrite")) {
+		stateDesc_.stateFlags.Set(render::StateFlag::DEPTHWRITE);
+	}
+	if (hasFlagAndTrue(d, "wireFrame")) {
+		stateDesc_.stateFlags.Set(render::StateFlag::WIREFRAME);
+	}
+
+	// some flags we don't allow to be set currently.
+	// stateDesc_.stateFlags.Set(render::StateFlag::ALPHATEST);
+	// stateDesc_.stateFlags.Set(render::StateFlag::BLEND);
+	// stateDesc_.stateFlags.Set(render::StateFlag::STENCIL);
 
 
 	// tilling shit.
@@ -204,11 +221,9 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		}
 	};
 
-	static_assert(MaterialStateFlag::FLAGS_COUNT == 6, "Added additional mat state flags? this code might need updating.");
+	static_assert(MaterialStateFlag::FLAGS_COUNT == 4, "Added additional mat state flags? this code might need updating.");
 
-	std::array<std::pair<const char*, MaterialStateFlag::Enum>, 6> stateFlags = { {
-			{ "depthWrite", MaterialStateFlag::DEPTHWRITE },
-			{ "wireFrame", MaterialStateFlag::WIREFRAME },
+	std::array<std::pair<const char*, MaterialStateFlag::Enum>, 4> stateFlags = { {
 			{ "useUVScroll", MaterialStateFlag::UV_SCROLL },
 			{ "useUVRotate", MaterialStateFlag::UV_ROTATE },
 			{ "clampU", MaterialStateFlag::UV_CLAMP_U },
@@ -225,7 +240,6 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		return false;
 	}
 
-	
 	// col map.
 	if (!colMap_.parse(d, "Color")) {
 		X_ERROR("Mat", "Failed to parse texture info");
@@ -310,6 +324,37 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	}
 
 	return true;
+}
+
+
+bool MaterialCompiler::hasFlagAndTrue(core::json::Document& d, const char* pName)
+{
+	if (!d.HasMember(pName)){
+		return false;
+	}
+
+	const auto& val = d[pName];
+
+	switch (val.GetType())
+	{
+		case core::json::kFalseType:
+			return false;
+			break;
+		case core::json::kTrueType:
+			return true;
+			break;
+		case core::json::kNumberType:
+			if (val.IsBool()) {
+				return val.GetBool();
+				break;
+			}
+			// fall through if not bool
+		default:
+			X_ERROR("Mat", "Flag \"%s\" has a value with a incorrect type: %" PRIi32, pName, val.GetType());
+			break;
+	}
+
+	return false;
 }
 
 template<typename FlagClass, size_t Num>
