@@ -7,11 +7,12 @@ X_NAMESPACE_BEGIN(assetDb)
 
 static const char ASSET_NAME_SLASH = '/';
 static const char ASSET_NAME_INVALID_SLASH = '\\';
+static const char ASSET_NAME_PREFIX = '$'; // allow names with this prefix.
 static const size_t ASSET_NAME_MAX_LENGTH = 128;
 static const size_t ASSET_NAME_MIN_LENGTH = 2; // ban single char asset names?
 
 // Valid chars for asset name are:
-// [a-z0-9_] & ASSET_NAME_SLASH Upper case is not allowed!!!
+// [a-z0-9_] & ASSET_NAME_SLASH. Upper case is not allowed!!!
 
 
 X_DECLARE_ENUM(AssetType)(
