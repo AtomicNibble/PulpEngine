@@ -149,6 +149,9 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 		return false;
 	}
 
+	// auto clean up by core shutdown.
+	moduleInterfaces_.append(pModule);
+
 	return true;
 }
 
