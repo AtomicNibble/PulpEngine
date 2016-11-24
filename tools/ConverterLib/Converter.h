@@ -3,6 +3,7 @@
 
 #include <IConverterModule.h>
 #include <String\CmdArgs.h>
+#include <Platform\Module.h>
 
 #include <../AssetDB/AssetDB.h>
 
@@ -74,9 +75,9 @@ private:
 	IConverter* GetConverter(AssetType::Enum assType);
 	bool EnsureLibLoaded(AssetType::Enum assType);
 
-	void* LoadDLL(const char* dllName);
 	bool IntializeConverterModule(AssetType::Enum assType);
 	bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
+	core::Module::Handle LoadDLL(const char* dllName);
 
 private:
 	void GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,

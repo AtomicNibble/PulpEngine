@@ -10,7 +10,6 @@
 #include <Extension\PotatoCreateClass.h>
 
 #include <Containers\Array.h>
-#include <Platform\Module.h>
 
 #include <String\HumanDuration.h>
 #include <String\Json.h>
@@ -627,7 +626,7 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* dl
 	path.setExtension(".dll");
 
 #if !defined(X_LIB) 
-	void* hModule = LoadDLL(path.c_str());
+	core::Module::Handle hModule = LoadDLL(path.c_str());
 	if (!hModule) {
 		if (gEnv && gEnv->pLog) {
 			X_ERROR("Converter", "Failed to load converter module: %s", dllName);
@@ -652,9 +651,9 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* dl
 	return converters_[assType] != nullptr;
 }
 
-void* Converter::LoadDLL(const char* dllName)
+core::Module::Handle Converter::LoadDLL(const char* dllName)
 {
-	void* hDll = core::Module::Load(dllName);
+	core::Module::Handle hDll = core::Module::Load(dllName);
 
 	if (!hDll) {
 		return nullptr;
