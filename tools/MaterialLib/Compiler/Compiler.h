@@ -1,6 +1,7 @@
 #pragma once
 
 #include <IMaterial.h>
+#include <IRender.h>
 
 X_NAMESPACE_DECLARE(core,
 	struct XFile;
@@ -20,8 +21,8 @@ class MaterialCompiler
 
 	public:
 		core::string name;
-		MaterialFilterType::Enum filterType_;
-		MaterialTexRepeat::Enum texRepeat_;
+		render::FilterType::Enum filterType_;
+		render::TexRepeat::Enum texRepeat_;
 	};
 
 public:
@@ -41,23 +42,17 @@ private:
 	MaterialStateFlags stateFlags_;
 	MaterialCat::Enum cat_;
 	MaterialUsage::Enum usage_;
+
 	MaterialSurType::Enum surType_;
 	MaterialPolygonOffset::Enum polyOffset_;
-	MaterialCullType::Enum cullType_;
 	MaterialCoverage::Enum coverage_;
 	MaterialMountType::Enum mountType_;
+
+	render::StateDesc stateDesc_;
 
 	Vec2<int16_t> tiling_;
 	Vec2f uvScroll_;
 
-	// stencil
-	StencilFunc::Enum depthTest_;
-
-	// blend ops.
-	MaterialBlendType::Enum srcBlendColor_;
-	MaterialBlendType::Enum dstBlendColor_;
-	MaterialBlendType::Enum srcBlendAlpha_;
-	MaterialBlendType::Enum dstBlendAlpha_;
 
 	Tex colMap_;
 	Tex normalMap_;

@@ -182,14 +182,6 @@ X_DECLARE_ENUM8(MaterialUsage)(
 );
 
 
-typedef render::CullType MaterialCullType;
-typedef render::TexRepeat MaterialTexRepeat;
-typedef render::FilterType MaterialFilterType;
-typedef render::BlendType MaterialBlendType;
-typedef render::StencilOperation StencilOperation;
-typedef render::StencilFunc StencilFunc;
-
-
 /*
 what o do for the shader input system that i need todo for my engine.
 ineed to also add in the engine system that dose the culling and deteriming what ld to render for each model
@@ -206,25 +198,17 @@ struct MaterialHeader
 	uint8_t version;
 	uint8_t numTextures;
 	MaterialCat::Enum cat;
-	MaterialSurType::Enum surfaceType;
+	MaterialUsage::Enum usage;
 
 	// 4
-	MaterialUsage::Enum usage;
-	MaterialCullType::Enum cullType;
+	MaterialSurType::Enum surfaceType;
 	MaterialPolygonOffset::Enum polyOffsetType;
 	MaterialCoverage::Enum coverage;
-
-	// 4: blend ops.
-	MaterialBlendType::Enum srcBlendColor;
-	MaterialBlendType::Enum dstBlendColor;
-	MaterialBlendType::Enum srcBlendAlpha;
-	MaterialBlendType::Enum dstBlendAlpha;
+	MaterialMountType::Enum mountType;
 
 	// 4
-	MaterialMountType::Enum mountType;
-	StencilFunc::Enum depthTest;
 	MaterialStateFlags stateFlags;
-	bool _pad;
+	bool __pad[3];
 
 	// 4
 	MaterialFlags flags;
@@ -232,6 +216,9 @@ struct MaterialHeader
 	// used for custom texture repeat.
 	// if AUTO_TILING the textures dim's are used.
 	Vec2<int16_t> tiling;
+
+	// 20
+	render::StateDesc stateDesc;
 
 	// 12
 	Color8u diffuse;
@@ -259,29 +246,30 @@ struct MaterialHeader
 struct MaterialTexture
 {
 	uint8_t nameLen;
-	MaterialFilterType::Enum filterType;
-	MaterialTexRepeat::Enum texRepeat;
+	render::FilterType::Enum filterType;
+	render::TexRepeat::Enum texRepeat;
 	uint8_t _pad;
 };
 
 
+X_ENSURE_SIZE(MaterialFlags, 4);
 X_ENSURE_SIZE(MaterialCat::Enum, 1);
 X_ENSURE_SIZE(MaterialCoverage::Enum, 1);
 X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
-X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
-X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
 X_ENSURE_SIZE(MaterialSurType::Enum, 1);
 X_ENSURE_SIZE(MaterialUsage::Enum, 1);
-X_ENSURE_SIZE(MaterialCullType::Enum, 1);
 X_ENSURE_SIZE(MaterialMountType::Enum, 1);
-X_ENSURE_SIZE(MaterialBlendType::Enum, 1);
-X_ENSURE_SIZE(StencilOperation::Enum, 1);
-X_ENSURE_SIZE(StencilFunc::Enum, 1);
 X_ENSURE_SIZE(MaterialStateFlag::Bits, 1);
 X_ENSURE_SIZE(MaterialStateFlags, 1);
+// X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
+// X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
+// X_ENSURE_SIZE(MaterialCullType::Enum, 1);
+// X_ENSURE_SIZE(MaterialBlendType::Enum, 1);
+//X_ENSURE_SIZE(StencilOperation::Enum, 1);
+//X_ENSURE_SIZE(StencilFunc::Enum, 1);
 
 
-X_ENSURE_SIZE(MaterialHeader, 48);
+X_ENSURE_SIZE(MaterialHeader, 64);
 X_ENSURE_SIZE(MaterialTexture, 4);
 
 class Material;

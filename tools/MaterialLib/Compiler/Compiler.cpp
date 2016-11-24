@@ -9,8 +9,8 @@
 X_NAMESPACE_BEGIN(engine)
 
 MaterialCompiler::Tex::Tex() :
-	filterType_(MaterialFilterType::LINEAR_MIP_LINEAR),
-	texRepeat_(MaterialTexRepeat::TILE_BOTH)
+	filterType_(render::FilterType::LINEAR_MIP_LINEAR),
+	texRepeat_(render::TexRepeat::TILE_BOTH)
 {
 }
 
@@ -43,8 +43,8 @@ bool MaterialCompiler::Tex::parse(core::json::Document& d, const char* pName)
 	const char* pFilterType = d[filter.c_str()].GetString();
 
 	name = pMapName;
-	filterType_ = Util::MatFilterTypeFromStr(pFilterType);
-	texRepeat_ = Util::MatTexRepeatFromStr(pTileMode);
+	filterType_ = Util::FilterTypeFromStr(pFilterType);
+	texRepeat_ = Util::TexRepeatFromStr(pTileMode);
 	return true;
 }
 
@@ -121,29 +121,47 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	const char* pUsage = d["usage"].GetString();
 	const char* pSurfaceType = d["surface_type"].GetString();
 	const char* pPolyOffset = d["polyOffset"].GetString();
-	const char* pCullFace = d["cullFace"].GetString();
-	const char* pDepthTest = d["depthTest"].GetString();
 	const char* pMountType = d["climbType"].GetString();
 
 	cat_ = Util::MatCatFromStr(pCat);
 	usage_ = Util::MatUsageFromStr(pUsage);
 	surType_ = Util::MatSurfaceTypeFromStr(pSurfaceType);
 	polyOffset_ = Util::MatPolyOffsetFromStr(pPolyOffset);
-	cullType_ = Util::MatCullTypeFromStr(pCullFace);
-	depthTest_ = Util::StencilFuncFromStr(pDepthTest);
 	coverage_ = MaterialCoverage::OPAQUE;
 	mountType_ = Util::MatMountTypeFromStr(pMountType);
 	
-	// blend ops.
+	// State
 	const char* pSrcCol = d["srcBlendColor"].GetString();
 	const char* pDstCol = d["dstBlendColor"].GetString();
 	const char* pSrcAlpha = d["srcBlendAlpha"].GetString();
 	const char* pDstAlpha = d["dstBlendAlpha"].GetString();
+	const char* pCullFace = d["cullFace"].GetString();
+	const char* pDepthTest = d["depthTest"].GetString();
 
-	srcBlendColor_ = Util::MatBlendTypeFromStr(pSrcCol);
-	dstBlendColor_ = Util::MatBlendTypeFromStr(pDstCol);
-	srcBlendAlpha_ = Util::MatBlendTypeFromStr(pSrcAlpha);
-	dstBlendAlpha_ = Util::MatBlendTypeFromStr(pDstAlpha);
+
+	stateDesc_.stencil.front.stencilFunc = render::StencilFunc::NEVER;
+	stateDesc_.stencil.front.failOp = render::StencilOperation::KEEP;
+	stateDesc_.stencil.front.zFailOp = render::StencilOperation::KEEP;
+	stateDesc_.stencil.front.passOp = render::StencilOperation::KEEP;
+	stateDesc_.stencil.back.stencilFunc = render::StencilFunc::NEVER;
+	stateDesc_.stencil.back.failOp = render::StencilOperation::KEEP;
+	stateDesc_.stencil.back.zFailOp = render::StencilOperation::KEEP;
+	stateDesc_.stencil.back.passOp = render::StencilOperation::KEEP;
+	stateDesc_.blend.srcBlendColor = Util::BlendTypeFromStr(pSrcCol);
+	stateDesc_.blend.dstBlendColor = Util::BlendTypeFromStr(pDstCol);
+	stateDesc_.blend.srcBlendAlpha = Util::BlendTypeFromStr(pSrcAlpha);
+	stateDesc_.blend.dstBlendAlpha = Util::BlendTypeFromStr(pDstAlpha);
+	stateDesc_.cullType = Util::CullTypeFromStr(pCullFace);
+	stateDesc_.topo = render::TopoType::TRIANGLELIST;
+	stateDesc_.depthFunc = render::DepthFunc::ALWAYS;
+	stateDesc_.stateFlags.Clear();
+	stateDesc_.blendOp = render::BlendOp::OP_ADD;
+	// a material should not be bound to a vertex fmt.
+	// but we it's part of the stateDesc.
+	// which we pre make so we can use it directly at runtime.
+	// the vertexVmt will just need patching to correct one.
+	stateDesc_.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B; 
+
 
 	// tilling shit.
 	// how many goats for a given N pickles
@@ -242,22 +260,15 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.version = MTL_B_VERSION;
 	hdr.numTextures = 1;
 	hdr.cat = cat_;
-	hdr.surfaceType = surType_;
-
 	hdr.usage = usage_;
-	hdr.cullType = cullType_;
+
+	hdr.surfaceType = surType_;
 	hdr.polyOffsetType = polyOffset_;
 	hdr.coverage = coverage_;
-
-	hdr.srcBlendColor = srcBlendColor_;
-	hdr.dstBlendColor = dstBlendColor_;
-	hdr.srcBlendAlpha = srcBlendAlpha_;
-	hdr.dstBlendAlpha = dstBlendAlpha_;
-
 	hdr.mountType = mountType_;
-	hdr.depthTest = depthTest_;
 	hdr.stateFlags = stateFlags_;
-	hdr._pad = 0;
+
+	hdr.stateDesc = stateDesc_;
 
 	hdr.flags = flags_;
 	

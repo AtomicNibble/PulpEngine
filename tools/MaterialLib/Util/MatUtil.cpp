@@ -196,66 +196,6 @@ namespace Util
 		}
 	}
 
-	MaterialFilterType::Enum MatFilterTypeFromStr(const char* str)
-	{
-		using namespace core::Hash::Fnva1Literals;
-
-		static_assert(MaterialFilterType::ENUM_COUNT == 10, "Added additional filter types? this code needs updating.");
-
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
-		{
-			case "nearest (mip none)"_fnv1a:
-				return MaterialFilterType::NEAREST_MIP_NONE;
-			case "nearest (mip nearest)"_fnv1a:
-				return MaterialFilterType::NEAREST_MIP_NEAREST;
-			case "nearest (mip linear)"_fnv1a:
-				return MaterialFilterType::NEAREST_MIP_LINEAR;
-
-			case "linear (mip none)"_fnv1a:
-				return MaterialFilterType::LINEAR_MIP_NONE;
-			case "linear (mip nearest)"_fnv1a:
-				return MaterialFilterType::LINEAR_MIP_NEAREST;
-			case "linear (mip linear)"_fnv1a:
-				return MaterialFilterType::LINEAR_MIP_LINEAR;
-
-			case "anisotropicx2"_fnv1a:
-				return MaterialFilterType::ANISOTROPIC_X2;
-			case "anisotropicx4"_fnv1a:
-				return MaterialFilterType::ANISOTROPIC_X4;
-			case "anisotropicx8"_fnv1a:
-				return MaterialFilterType::ANISOTROPIC_X8;
-			case "anisotropicx16"_fnv1a:
-				return MaterialFilterType::ANISOTROPIC_X16;
-
-			default:
-				X_ERROR("Mtl", "Unknown filter type: '%s' (case-sen)", str);
-				return MaterialFilterType::NEAREST_MIP_NEAREST;
-		}
-	}
-
-	MaterialTexRepeat::Enum MatTexRepeatFromStr(const char* str)
-	{
-		using namespace core::Hash::Fnva1Literals;
-
-		static_assert(MaterialTexRepeat::ENUM_COUNT == 4, "Added additional repeat types? this code needs updating.");
-
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
-		{
-			case "no tile"_fnv1a:
-				return MaterialTexRepeat::NO_TILE;
-			case "tile both"_fnv1a:
-				return MaterialTexRepeat::TILE_BOTH;
-			case "tile horizontal"_fnv1a:
-				return MaterialTexRepeat::TILE_HOZ;
-			case "tile vertical"_fnv1a:
-				return MaterialTexRepeat::TILE_VERT;
-
-			default:
-				X_ERROR("Mtl", "Unknown tex repeat: '%s' (case-sen)", str);
-				return MaterialTexRepeat::TILE_BOTH;
-		}
-	}
-
 	MaterialPolygonOffset::Enum MatPolyOffsetFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
@@ -278,137 +218,197 @@ namespace Util
 		}
 	}
 
-	MaterialCullType::Enum MatCullTypeFromStr(const char* str)
+	render::FilterType::Enum FilterTypeFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(MaterialCullType::ENUM_COUNT == 3, "Added additional cull types? this code needs updating.");
+		static_assert(render::FilterType::ENUM_COUNT == 10, "Added additional filter types? this code needs updating.");
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "nearest (mip none)"_fnv1a:
+				return render::FilterType::NEAREST_MIP_NONE;
+			case "nearest (mip nearest)"_fnv1a:
+				return render::FilterType::NEAREST_MIP_NEAREST;
+			case "nearest (mip linear)"_fnv1a:
+				return render::FilterType::NEAREST_MIP_LINEAR;
+
+			case "linear (mip none)"_fnv1a:
+				return render::FilterType::LINEAR_MIP_NONE;
+			case "linear (mip nearest)"_fnv1a:
+				return render::FilterType::LINEAR_MIP_NEAREST;
+			case "linear (mip linear)"_fnv1a:
+				return render::FilterType::LINEAR_MIP_LINEAR;
+
+			case "anisotropicx2"_fnv1a:
+				return render::FilterType::ANISOTROPIC_X2;
+			case "anisotropicx4"_fnv1a:
+				return render::FilterType::ANISOTROPIC_X4;
+			case "anisotropicx8"_fnv1a:
+				return render::FilterType::ANISOTROPIC_X8;
+			case "anisotropicx16"_fnv1a:
+				return render::FilterType::ANISOTROPIC_X16;
+
+			default:
+				X_ERROR("Mtl", "Unknown filter type: '%s' (case-sen)", str);
+				return render::FilterType::NEAREST_MIP_NEAREST;
+		}
+	}
+
+	render::TexRepeat::Enum TexRepeatFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(render::TexRepeat::ENUM_COUNT == 4, "Added additional repeat types? this code needs updating.");
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "no tile"_fnv1a:
+				return render::TexRepeat::NO_TILE;
+			case "tile both"_fnv1a:
+				return render::TexRepeat::TILE_BOTH;
+			case "tile horizontal"_fnv1a:
+				return render::TexRepeat::TILE_HOZ;
+			case "tile vertical"_fnv1a:
+				return render::TexRepeat::TILE_VERT;
+
+			default:
+				X_ERROR("Mtl", "Unknown tex repeat: '%s' (case-sen)", str);
+				return render::TexRepeat::TILE_BOTH;
+		}
+	}
+
+	render::CullType::Enum CullTypeFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(render::CullType::ENUM_COUNT == 3, "Added additional cull types? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "back"_fnv1a:
-				return MaterialCullType::BACK_SIDED;
+				return render::CullType::BACK_SIDED;
 			case "front"_fnv1a:
-				return MaterialCullType::FRONT_SIDED;
+				return render::CullType::FRONT_SIDED;
 			case "none"_fnv1a:
-				return MaterialCullType::NONE;
+				return render::CullType::NONE;
 
 			default:
 				X_ERROR("Mtl", "Unknown cull type: '%s' (case-sen)", str);
-				return MaterialCullType::BACK_SIDED;
+				return render::CullType::BACK_SIDED;
 		}
 	}
 
-	MaterialBlendType::Enum MatBlendTypeFromStr(const char* str)
+	render::BlendType::Enum BlendTypeFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(MaterialBlendType::ENUM_COUNT == 18, "Added additional blend types? this code needs updating.");
+		static_assert(render::BlendType::ENUM_COUNT == 18, "Added additional blend types? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "zero"_fnv1a:
-				return MaterialBlendType::ZERO;
+				return render::BlendType::ZERO;
 			case "one"_fnv1a:
-				return MaterialBlendType::ONE;
+				return render::BlendType::ONE;
 
 			case "src_color"_fnv1a:
-				return MaterialBlendType::SRC_COLOR;
+				return render::BlendType::SRC_COLOR;
 			case "src_alpha"_fnv1a:
-				return MaterialBlendType::SRC_ALPHA;
+				return render::BlendType::SRC_ALPHA;
 			case "src_alpha_sat"_fnv1a:
-				return MaterialBlendType::SRC_ALPHA_SAT;
+				return render::BlendType::SRC_ALPHA_SAT;
 			case "src1_color"_fnv1a:
-				return MaterialBlendType::SRC1_COLOR;
+				return render::BlendType::SRC1_COLOR;
 			case "src1_alpha"_fnv1a:
-				return MaterialBlendType::SRC1_ALPHA;
+				return render::BlendType::SRC1_ALPHA;
 
 			case "inv_src_color"_fnv1a:
-				return MaterialBlendType::INV_SRC_COLOR;
+				return render::BlendType::INV_SRC_COLOR;
 			case "inv_src1_alpha"_fnv1a:
-				return MaterialBlendType::INV_SRC1_ALPHA;
+				return render::BlendType::INV_SRC1_ALPHA;
 
 			case "dest_color"_fnv1a:
-				return MaterialBlendType::DEST_COLOR;
+				return render::BlendType::DEST_COLOR;
 			case "dest_alpha"_fnv1a:
-				return MaterialBlendType::DEST_ALPHA;
+				return render::BlendType::DEST_ALPHA;
 
 			case "inv_dest_color"_fnv1a:
-				return MaterialBlendType::INV_DEST_COLOR;
+				return render::BlendType::INV_DEST_COLOR;
 			case "inv_dest_alpha"_fnv1a:
-				return MaterialBlendType::INV_DEST_ALPHA;
+				return render::BlendType::INV_DEST_ALPHA;
 
 			case "blend_factor"_fnv1a:
-				return MaterialBlendType::BLEND_FACTOR;
+				return render::BlendType::BLEND_FACTOR;
 			case "inv_blend_factor"_fnv1a:
-				return MaterialBlendType::INV_BLEND_FACTOR;
+				return render::BlendType::INV_BLEND_FACTOR;
 
 
 			default:
 				X_ERROR("Mtl", "Unknown blend type: '%s' (case-sen)", str);
-				return MaterialBlendType::INVALID;
+				return render::BlendType::INVALID;
 		}
 	}
 
-	StencilOperation::Enum StencilOpFromStr(const char* str)
+	render::StencilOperation::Enum StencilOpFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(StencilOperation::ENUM_COUNT == 8, "Added additional stencil op types? this code needs updating.");
+		static_assert(render::StencilOperation::ENUM_COUNT == 8, "Added additional stencil op types? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "keep"_fnv1a:
-				return StencilOperation::KEEP;
+				return render::StencilOperation::KEEP;
 			case "zero"_fnv1a:
-				return StencilOperation::ZERO;
+				return render::StencilOperation::ZERO;
 			case "replace"_fnv1a:
-				return StencilOperation::REPLACE;
+				return render::StencilOperation::REPLACE;
 			case "incr_sat"_fnv1a:
-				return StencilOperation::INCR_SAT;
+				return render::StencilOperation::INCR_SAT;
 			case "decr_sat"_fnv1a:
-				return StencilOperation::DECR_SAT;
+				return render::StencilOperation::DECR_SAT;
 			case "invert"_fnv1a:
-				return StencilOperation::INVERT;
+				return render::StencilOperation::INVERT;
 			case "incr"_fnv1a:
-				return StencilOperation::INCR;
+				return render::StencilOperation::INCR;
 			case "decr"_fnv1a:
-				return StencilOperation::DECR;
+				return render::StencilOperation::DECR;
 
 			default:
 				X_ERROR("Mtl", "Unknown stencil op: '%s' (case-sen)", str);
-				return StencilOperation::KEEP;
+				return render::StencilOperation::KEEP;
 		}
 	}
 
-	StencilFunc::Enum StencilFuncFromStr(const char* str)
+	render::StencilFunc::Enum StencilFuncFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(StencilFunc::ENUM_COUNT == 8, "Added additional stencil funcs? this code needs updating.");
+		static_assert(render::StencilFunc::ENUM_COUNT == 8, "Added additional stencil funcs? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "never"_fnv1a:
-				return StencilFunc::NEVER;
+				return render::StencilFunc::NEVER;
 			case "less"_fnv1a:
-				return StencilFunc::LESS;
+				return render::StencilFunc::LESS;
 			case "equal"_fnv1a:
-				return StencilFunc::EQUAL;
+				return render::StencilFunc::EQUAL;
 			case "less_equal"_fnv1a:
-				return StencilFunc::LESS_EQUAL;
+				return render::StencilFunc::LESS_EQUAL;
 			case "greater"_fnv1a:
-				return StencilFunc::GREATER;
+				return render::StencilFunc::GREATER;
 			case "not_equal"_fnv1a:
-				return StencilFunc::NOT_EQUAL;
+				return render::StencilFunc::NOT_EQUAL;
 			case "greater_equal"_fnv1a:
-				return StencilFunc::GREATER_EQUAL;
+				return render::StencilFunc::GREATER_EQUAL;
 			case "always"_fnv1a:
-				return StencilFunc::ALWAYS;
+				return render::StencilFunc::ALWAYS;
 
 			default:
 				X_ERROR("Mtl", "Unknown stencil func: '%s' (case-sen)", str);
-				return StencilFunc::ALWAYS;
+				return render::StencilFunc::ALWAYS;
 		}
 	}
 
