@@ -306,6 +306,7 @@ namespace shader
 			hr = D3DStripShader(
 				pBlob->GetBufferPointer(),
 				pBlob->GetBufferSize(),
+				D3DCOMPILER_STRIP_ROOT_SIGNATURE | // you silly slut.
 				D3DCOMPILER_STRIP_REFLECTION_DATA |
 				D3DCOMPILER_STRIP_TEST_BLOBS,
 				&pStripped
