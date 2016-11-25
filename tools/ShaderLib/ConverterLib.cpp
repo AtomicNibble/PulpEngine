@@ -42,7 +42,7 @@ class XConverterLib_Shader : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 
-		X_DELETE_AND_NULL(pCon, gEnv->pArena);
+		X_DELETE_AND_NULL(pCon, g_ShaderLibArena);
 		X_DELETE_AND_NULL(g_ShaderLibArena, gEnv->pArena);
 		return true;
 	}
