@@ -86,15 +86,6 @@
     <ClInclude Include="Shader\Shader.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Shader\ShaderBin.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader\HWShader.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader\ILTree.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Shader\ShaderManager.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
@@ -179,9 +170,6 @@
     <ClInclude Include="Texture\TextureUtil.h">
       <Filter>Header Files\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Shader\ShaderUtil.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -214,19 +202,10 @@
     <ClCompile Include="Shader\Shader.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Shader\ShaderBin.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader\HWShader.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Shader\ShaderManager.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Shader\ShaderSourceTypes.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader\ILTree.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Shader\ShaderVars.cpp">
@@ -295,9 +274,6 @@
     <ClCompile Include="Texture\TextureUtil.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Shader\ShaderUtil.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandSignature.inl">
@@ -318,16 +294,10 @@
     <None Include="CommandContex.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Shader\HWShader.inl">
-      <Filter>Header Files\Shader</Filter>
-    </None>
     <None Include="Shader\ShaderSourceTypes.inl">
       <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Shader\Shader.inl">
-      <Filter>Header Files\Shader</Filter>
-    </None>
-    <None Include="Shader\ILTree.inl">
       <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Shader\ShaderVars.inl">

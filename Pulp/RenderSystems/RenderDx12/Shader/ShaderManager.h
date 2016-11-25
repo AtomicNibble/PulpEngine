@@ -9,9 +9,7 @@
 #include <Assets\AssertContainer.h>
 
 #include "Shader.h"
-#include "ShaderBin.h"
 #include "ShaderVars.h"
-#include "ILTree.h"
 
 
 X_NAMESPACE_DECLARE(core,
@@ -27,7 +25,6 @@ namespace shader
 	class ShaderSourceFile;
 	class XShader;
 	class XHWShader;
-
 
 	class XShaderManager : public core::IXHotReload
 	{
@@ -71,7 +68,6 @@ namespace shader
 		// returns merged source.
 		bool sourceToString(const char* pName, core::string& strOut);
 
-		ILTreeNode& getILTree(void);
 		ShaderVars& getShaderVars(void);
 		ShaderBin& getBin(void);
 
@@ -105,8 +101,6 @@ namespace shader
 		void listShaders(const char* pSarchPatten = nullptr);
 		void listShaderSources(const char* pSarchPatten = nullptr);
 
-		void createInputLayoutTree(void);
-
 	private:
 		// IXHotReload
 		void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
@@ -132,7 +126,6 @@ namespace shader
 		HWShaderContainer hwShaders_;
 		ShaderContainer shaders_;
 
-		ILTreeNode ilRoot_;	
 		ShaderVars vars_;
 
 	private:

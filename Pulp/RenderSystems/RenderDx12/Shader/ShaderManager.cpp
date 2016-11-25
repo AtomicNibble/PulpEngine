@@ -2,8 +2,6 @@
 #include "ShaderManager.h"
 #include "ShaderSourceTypes.h"
 #include "Shader.h"
-#include "HWShader.h"
-#include "ILTree.h"
 
 #include <Hashing\crc32.h>
 #include <String\Lexer.h>
@@ -108,7 +106,6 @@ namespace shader
 		shaderBin_(arena),
 		hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource)),
 		shaders_(arena, sizeof(ShaderResource), X_ALIGN_OF(ShaderResource)),
-		ilRoot_(arena),
 		pDefaultShader_(nullptr),
 		pFixedFunction_(nullptr),
 		pFont_(nullptr),
@@ -165,7 +162,6 @@ namespace shader
 		ADD_COMMAND_MEMBER("listShaderSource", this, XShaderManager, &XShaderManager::Cmd_ListShaderSources, core::VarFlag::SYSTEM,
 			"lists the loaded shaders sources");
 
-		createInputLayoutTree();
 		vars_.RegisterVars();
 
 		if (!loadCoreShaders()) {
@@ -231,11 +227,6 @@ namespace shader
 			return true;
 		}
 		return false;
-	}
-
-	ILTreeNode& XShaderManager::getILTree(void)
-	{
-		return ilRoot_;
 	}
 
 	ShaderVars& XShaderManager::getShaderVars(void)
@@ -958,8 +949,8 @@ namespace shader
 			return pHWShaderRes;
 		}
 
-		pHWShaderRes = hwShaders_.createAsset(nameStr, arena_, *this, type,
-			name.c_str(), entry, pSourceFile, techFlags);
+		pHWShaderRes = hwShaders_.createAsset(nameStr, arena_, type,
+			name.c_str(), entry, pSourceFile->getName(), pSourceFile->getSourceCrc32(), techFlags);
 
 
 		return pHWShaderRes;
@@ -1033,54 +1024,6 @@ namespace shader
 
 		X_LOG0("Shader", "--------- ^8Shader Sources End^7 ---------");
 	}
-
-	void XShaderManager::createInputLayoutTree(void)
-	{
-		// all the posible node types.
-		ILTreeNode blank(arena_);
-		ILTreeNode pos(arena_, "POSITION");
-		ILTreeNode uv(arena_, "TEXCOORD");
-		ILTreeNode col(arena_, "COLOR");
-		ILTreeNode nor(arena_, "NORMAL");
-		ILTreeNode tan(arena_, "TANGENT");
-		ILTreeNode bin(arena_, "BINORMAL");
-
-		// for shader input layouts the format is not given since the shader
-		// don't care what the format comes in as.
-		// so how can i work out what the formats are since i support identical sematic layouts
-		// with diffrent foramts :(
-		//
-		// maybe i should just have a sematic format, which can be used to tell if the current input
-		// layout will work with the shader :)
-		//
-		//        .
-		//        |
-		//       P3F_____
-		//       / \     \
-		//     T2S  T4F  T3F
-		//      |    |__
-		//     C4B	    |
-		//	  __|	   C4B 
-		//	 /  |       |
-		// N3F N10	   N3F
-		//  |    \
-		// TB3F  TB10
-		//
-
-		ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
-		uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
-			AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
-			AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
-			AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
-
-		// double text coords.
-		uvBase.AddChild(uv).
-			AddChild(col).
-			AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM);
-
-		ilRoot_ = blank;
-	}
-
 
 	void XShaderManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 	{

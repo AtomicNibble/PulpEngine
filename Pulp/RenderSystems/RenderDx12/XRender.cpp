@@ -6,8 +6,6 @@
 #include "Texture\TextureUtil.h"
 #include "Shader\ShaderManager.h"
 #include "Shader\Shader.h"
-#include "Shader\HWShader.h"
-#include "Shader\ShaderUtil.h"
 #include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"

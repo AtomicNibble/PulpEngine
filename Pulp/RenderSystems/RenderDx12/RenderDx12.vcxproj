@@ -417,13 +417,9 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
-    <ClInclude Include="Shader\HWShader.h" />
-    <ClInclude Include="Shader\ILTree.h" />
     <ClInclude Include="Shader\Shader.h" />
-    <ClInclude Include="Shader\ShaderBin.h" />
     <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="Shader\ShaderSourceTypes.h" />
-    <ClInclude Include="Shader\ShaderUtil.h" />
     <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture\Texture.h" />
@@ -461,13 +457,9 @@
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
-    <ClCompile Include="Shader\HWShader.cpp" />
-    <ClCompile Include="Shader\ILTree.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />
-    <ClCompile Include="Shader\ShaderBin.cpp" />
     <ClCompile Include="Shader\ShaderManager.cpp" />
     <ClCompile Include="Shader\ShaderSourceTypes.cpp" />
-    <ClCompile Include="Shader\ShaderUtil.cpp" />
     <ClCompile Include="Shader\ShaderVars.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -510,8 +502,6 @@
     <None Include="PipelineState.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
-    <None Include="Shader\HWShader.inl" />
-    <None Include="Shader\ILTree.inl" />
     <None Include="Shader\Shader.inl" />
     <None Include="Shader\ShaderSourceTypes.inl" />
     <None Include="Shader\ShaderVars.inl" />
