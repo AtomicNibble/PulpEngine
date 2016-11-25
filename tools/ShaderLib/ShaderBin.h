@@ -18,11 +18,11 @@ namespace shader
 		typedef core::HashMap<core::string, uint32_t> HashCacheMap;
 
 	public:
-		ShaderBin(core::MemoryArenaBase* arena);
-		~ShaderBin();
+		SHADERLIB_EXPORT ShaderBin(core::MemoryArenaBase* arena);
+		SHADERLIB_EXPORT ~ShaderBin();
 
-		bool saveShader(const char* pPath, const XHWShader* pShader);
-		bool loadShader(const char* pPath, XHWShader* pShader);
+		SHADERLIB_EXPORT bool saveShader(const char* pPath, const XHWShader* pShader);
+		SHADERLIB_EXPORT bool loadShader(const char* pPath, XHWShader* pShader);
 
 	private:
 		// returns true if we know the file has a diffrent crc32.

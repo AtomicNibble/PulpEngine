@@ -29,7 +29,7 @@ namespace shader
 		friend class ShaderBin;
 
 	public:
-		XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
+		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
 			const core::string& sourceFile, uint32_t soruceFilecrc32, TechFlags techFlags);
 
 		X_INLINE const int32_t getID(void) const;
@@ -60,8 +60,8 @@ namespace shader
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
-		bool compile(bool forceSync = false);
-		bool invalidateIfChanged(uint32_t newSourceCrc32);
+		SHADERLIB_EXPORT bool compile(bool forceSync = false);
+		SHADERLIB_EXPORT bool invalidateIfChanged(uint32_t newSourceCrc32);
 
 	private:
 		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);

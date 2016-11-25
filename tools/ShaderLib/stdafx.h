@@ -23,6 +23,18 @@ typedef core::MemoryArena<
 extern ShaderLibArena* g_ShaderLibArena;
 
 
+#ifdef X_LIB
+#define SHADERLIB_EXPORT
+#else
+#ifdef SHADER_LIB_EXPORT
+#define SHADERLIB_EXPORT X_EXPORT
+#else
+#define SHADERLIB_EXPORT X_IMPORT
+#endif // !SHADER_LIB_EXPORT
+#endif // X_LIB
+
+
+
 // this shader lib is dx12 specific for now.
 // but even so very little of the logic is actuall dx12 specific.
 // just no point splitting things out yet.

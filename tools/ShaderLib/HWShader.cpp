@@ -2,6 +2,7 @@
 
 #include "HWShader.h"
 #include "ShaderUtil.h"
+#include "ShaderBin.h"
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -53,19 +54,12 @@ namespace shader
 			return false;
 		}
 
-#if 0
-		ShaderBin& shaderBin = shaderMan_.getBin();
-		if (loadFromCache(shaderBin)) {
-			return true;
-		}
-
 		if (!loadSourceAndCompile(forceSync)) {
 			status_ = ShaderStatus::FailedToCompile;
 			X_LOG0("Shader", "Failed to compile shader: \"%s\"", getName());
 			return false;
 		}
 
-#endif
 		return true;
 	}
 
@@ -128,7 +122,6 @@ namespace shader
 		core::Path<char> dest;
 
 		getShaderCompileDest(dest);
-#if 0
 
 		// we should check if a compiled version already exsists!
 		if (shaderBin.loadShader(dest.c_str(), this))
@@ -136,7 +129,7 @@ namespace shader
 			X_LOG0("Shader", "shader loaded from cache: \"%s\"", name_.c_str());
 			return true;
 		}
-#endif
+
 		return false;
 	}
 
@@ -144,8 +137,6 @@ namespace shader
 	{
 		core::Path<char> dest;
 		getShaderCompileDest(dest);
-
-#if 0
 
 		// write the compiled version.
 		if (shaderBin.saveShader(dest.c_str(), this))
@@ -157,7 +148,6 @@ namespace shader
 			X_ERROR("Shader", "failed to save shader to cache");
 			return false;
 		}
-#endif
 
 		return true;
 	}
@@ -343,9 +333,6 @@ namespace shader
 
 
 		status_ = ShaderStatus::ReadyToRock;
-#if 0
-		saveToCache(shaderMan_.getBin());
-#endif
 		const float elapsed = timer.GetMilliSeconds();
 		X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
 
