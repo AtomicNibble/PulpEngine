@@ -54,7 +54,7 @@
     <ProjectGuid>{EB0BFB0F-A07D-4FD0-8123-08F1A1BCEEA0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ShaderLib</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -391,10 +391,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="HWShader.h" />
+    <ClInclude Include="ILTree.h" />
+    <ClInclude Include="ShaderBin.h" />
+    <ClInclude Include="ShaderUtil.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ConverterLib.cpp" />
+    <ClCompile Include="HWShader.cpp" />
+    <ClCompile Include="ILTree.cpp" />
+    <ClCompile Include="ShaderBin.cpp" />
+    <ClCompile Include="ShaderUtil.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -409,6 +417,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="HWShader.inl" />
+    <None Include="ILTree.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
