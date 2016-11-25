@@ -42,7 +42,7 @@ class XConverterLib_Model : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 
-		X_DELETE_AND_NULL(pCon, gEnv->pArena);
+		X_DELETE_AND_NULL(pCon, g_ModelLibArena);
 		X_DELETE_AND_NULL(g_ModelLibArena, gEnv->pArena);
 		return true;
 	}
