@@ -44,7 +44,7 @@ class XConverterLib_Anim : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 
-		X_DELETE_AND_NULL(pCon, gEnv->pArena);
+		X_DELETE_AND_NULL(pCon, g_AnimLibArena);
 		X_DELETE_AND_NULL(g_AnimLibArena, gEnv->pArena);
 		return true;
 	}
