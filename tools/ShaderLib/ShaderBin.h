@@ -21,17 +21,23 @@ namespace shader
 		SHADERLIB_EXPORT ShaderBin(core::MemoryArenaBase* arena);
 		SHADERLIB_EXPORT ~ShaderBin();
 
-		SHADERLIB_EXPORT bool saveShader(const char* pPath, const XHWShader* pShader);
-		SHADERLIB_EXPORT bool loadShader(const char* pPath, XHWShader* pShader);
+		SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader);
+		SHADERLIB_EXPORT bool loadShader(XHWShader* pShader);
 
 	private:
 		// returns true if we know the file has a diffrent crc32.
 		// saves opening it.
-		bool cacheNotValid(const char* pPath, uint32_t sourceCrc32) const;
-		void updateCacheCrc(const char* pPath, uint32_t sourceCrc32);
+		bool cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const;
+		void updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32);
+
+	private:
+		void getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut);
+
 
 	private:
 		core::MemoryArenaBase* scratchArena_;
+		core::IFileSys* pFileSys_;
+
 		// any point caching these?
 		// maybe caching the hashes might be worth it.
 		HashCacheMap cache_;

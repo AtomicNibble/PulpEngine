@@ -83,9 +83,8 @@ namespace shader
 
 
 
-	bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
+	bool ShaderBin::saveShader(const XHWShader* pShader)
 	{
-		X_ASSERT_NOT_NULL(pPath);
 		X_ASSERT_NOT_NULL(pShader);
 
 		if (!pShader->isValid())
@@ -131,8 +130,11 @@ namespace shader
 		hdr.type = pShader->getType();
 		hdr.ILFmt = pShader->getILFormat();
 
+		core::Path<char> path;
+		getShaderCompileDest(pShader, path);
+
 		core::XFileScoped file;
-		if (file.openFile(pPath, core::fileMode::WRITE | core::fileMode::RECREATE))
+		if (file.openFile(path.c_str(), core::fileMode::WRITE | core::fileMode::RECREATE))
 		{
 			typedef core::Array<uint8_t> DataArr;
 
@@ -174,22 +176,24 @@ namespace shader
 			return false;
 		}
 
-		updateCacheCrc(pPath, pShader->getSourceCrc32());
+		updateCacheCrc(path, pShader->getSourceCrc32());
 		return true;
 	}
 
 
-	bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
+	bool ShaderBin::loadShader(XHWShader* pShader)
 	{
-		X_ASSERT_NOT_NULL(pPath);
 		X_ASSERT_NOT_NULL(pShader);
 
-		if (cacheNotValid(pPath, pShader->getSourceCrc32())) {
+		core::Path<char> path;
+		getShaderCompileDest(pShader, path);
+
+		if (cacheNotValid(path, pShader->getSourceCrc32())) {
 			return false;
 		}
 
-		if (!gEnv->pFileSys->fileExists(pPath)) {
-			X_LOG1("Shader", "no cache exsits for: \"%s\"", pPath);
+		if (!pFileSys_->fileExists(path.c_str())) {
+			X_LOG1("Shader", "no cache exsits for: \"%s\"", path.c_str());
 			return false;
 		}
 
@@ -197,7 +201,7 @@ namespace shader
 		core::zero_object(hdr);
 
 		core::XFileScoped file;
-		if (file.openFile(pPath, core::fileMode::READ))
+		if (file.openFile(path.c_str(), core::fileMode::READ))
 		{
 			file.readObj(hdr);
 
@@ -206,7 +210,7 @@ namespace shader
 				if (hdr.version != ShaderBinHeader::X_SHADER_BIN_VERSION)
 				{
 					X_WARNING("Shader", "bin shader \"%s\" version is invalid. provided: %i, required: %i",
-						pPath, hdr.version, ShaderBinHeader::X_SHADER_BIN_VERSION);
+						path.c_str(), hdr.version, ShaderBinHeader::X_SHADER_BIN_VERSION);
 					return false;
 				}
 
@@ -302,9 +306,9 @@ namespace shader
 	}
 
 
-	bool ShaderBin::cacheNotValid(const char* pPath, uint32_t sourceCrc32) const
+	bool ShaderBin::cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const
 	{
-		auto it = cache_.find(X_CONST_STRING(pPath));
+		auto it = cache_.find(X_CONST_STRING(path.c_str()));
 		if (it != cache_.end()) {
 			if (it->second != sourceCrc32) {
 				// we have a cache file, but it was compiled with source that had diffrent crc.
@@ -314,10 +318,22 @@ namespace shader
 		return false;
 	}
 
-	void ShaderBin::updateCacheCrc(const char* pPath, uint32_t sourceCrc32)
+	void ShaderBin::updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32)
 	{
-		cache_.insert(std::make_pair(core::string(pPath), sourceCrc32));
+		cache_.insert(std::make_pair(core::string(path.c_str()), sourceCrc32));
 	}
+
+
+	void ShaderBin::getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut)
+	{
+		destOut.clear();
+		destOut.appendFmt("shaders/compiled/%s.fxcb", pShader->getName().c_str());
+
+		// make sure the directory is created.
+		pFileSys_->createDirectoryTree(destOut.c_str());
+	}
+
+
 
 } // namespace shader
 

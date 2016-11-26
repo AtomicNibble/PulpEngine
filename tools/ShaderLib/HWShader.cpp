@@ -110,17 +110,7 @@ namespace shader
 		gEnv->pFileSys->createDirectoryTree(src.c_str());
 	}
 
-
-	void XHWShader::getShaderCompileDest(core::Path<char>& dest)
-	{
-		dest.clear();
-		dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
-
-		// make sure the directory is created.
-		gEnv->pFileSys->createDirectoryTree(dest.c_str());
-	}
-
-
+#if 0
 	bool XHWShader::loadFromCache(ShaderBin& shaderBin)
 	{
 		core::Path<char> dest;
@@ -155,6 +145,7 @@ namespace shader
 
 		return true;
 	}
+#endif
 
 	bool XHWShader::loadSourceAndCompile(bool forceSync)
 	{

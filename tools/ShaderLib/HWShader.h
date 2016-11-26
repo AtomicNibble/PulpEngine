@@ -67,10 +67,9 @@ namespace shader
 	private:
 		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
 		void getShaderCompileSrc(core::Path<char>& src);
-		void getShaderCompileDest(core::Path<char>& dest);
 
-		bool loadFromCache(ShaderBin& shaderBin);
-		bool saveToCache(ShaderBin& shaderBin);
+	//	bool loadFromCache(ShaderBin& shaderBin);
+	//	bool saveToCache(ShaderBin& shaderBin);
 
 		bool loadSourceAndCompile(bool forceSync = false);
 		bool compileFromSource(core::string& source);
