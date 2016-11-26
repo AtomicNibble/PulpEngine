@@ -13,33 +13,30 @@ namespace shader
 {
 	namespace
 	{
-		struct TechFlagEntry
-		{
-			const char* pName;
-			TechFlag::Enum flag;
-		};
-
-		TechFlagEntry g_TechFlags[] = {
-			{ "Color", TechFlag::Color },
-			{ "Textured", TechFlag::Textured },
-			{ "Skinned", TechFlag::Skinned },
-			{ "Instanced", TechFlag::Instanced },
-		};
-
 
 		static bool TechFlagFromStr(const char* pStr, TechFlags& flagOut)
 		{
-			const size_t num = sizeof(g_TechFlags) / sizeof(const char*);
-			size_t i;
-			for (i = 0; i < num; i++)
+			using namespace core::Hash::Fnva1Literals;
+
+			core::StackString<128, char> strUpper(pStr);
+			strUpper.toUpper();
+
+			static_assert(TechFlags::FLAGS_COUNT == 4, "TechFlag count changed? this code needs updating.");
+			switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 			{
-				if (core::strUtil::IsEqualCaseInsen(pStr, g_TechFlags[i].pName))
-				{
-					flagOut.Set(g_TechFlags[i].flag);
-					return true;
-				}
+				case "COLOR"_fnv1a:
+					flagOut = TechFlags::Color;
+				case "TEXTURED"_fnv1a:
+					flagOut = TechFlags::Textured;
+				case "SKINNED"_fnv1a:
+					flagOut = TechFlags::Skinned;
+				case "INSTANCED"_fnv1a:
+					flagOut = TechFlags::Instanced;
+				default:
+					return false;
 			}
-			return false;
+
+			return true;
 		}
 
 	} // namespace
