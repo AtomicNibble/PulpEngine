@@ -54,7 +54,6 @@ namespace shader
 	X_INLINE void SourceFile::setFileData(const core::string& name)
 	{
 		fileData_ = name;
-
 	}
 
 	X_INLINE void SourceFile::setSourceCrc32(uint32_t crc)
