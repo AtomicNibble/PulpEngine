@@ -28,6 +28,8 @@ EngineApp::~EngineApp()
 	if (hSystemHandle_) {
 		core::Module::UnLoad(hSystemHandle_);
 	}
+
+	gEnv = nullptr;
 }
 
 
