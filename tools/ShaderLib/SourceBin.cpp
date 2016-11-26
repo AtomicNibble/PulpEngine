@@ -62,13 +62,13 @@ namespace shader
 			return true;
 		}
 
-		bool ILFlagFromStr(const char* pStr, ILFlags& flagOut)
+		bool ILFlagFromStr(const char* pStr, ILFlag::Enum& flagOut)
 		{
 			using namespace core::Hash::Fnva1Literals;
 
 			core::StackString<128, char> strUpper(pStr);
 			strUpper.toUpper();
-
+			
 			static_assert(ILFlag::FLAGS_COUNT == 3, "ILFlag count changed? this code needs updating.");
 			switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 			{
@@ -321,10 +321,16 @@ namespace shader
 													   // starts with IL_
 									if (ifDefValue.findCaseInsen("IL_") == ifDefValue.begin())
 									{
-										if (!ILFlagFromStr(ifDefValue.begin() + 3, pSourceFile->getILFlags()))
+										ILFlag::Enum ilFlag;
+										if (!ILFlagFromStr(ifDefValue.begin() + 3, ilFlag))
 										{
 											X_ERROR("Shader", "invalid InputLayout prepro in shader: % value: %s",
 												pSourceFile->getName().c_str(), ifDefValue.c_str());
+										}
+										else
+										{
+											// add the flag.
+											pSourceFile->setILFlags(pSourceFile->getILFlags() | ilFlag);
 										}
 									}
 								}
