@@ -20,6 +20,7 @@
 
 
 #include "ShaderBin.h"
+#include "SourceBin.h"
 #include "HWShader.h"
 #include "ShaderUtil.h"
 

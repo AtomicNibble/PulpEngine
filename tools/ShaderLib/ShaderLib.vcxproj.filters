@@ -41,6 +41,12 @@
     <ClInclude Include="ShaderLib\ShaderLib.h">
       <Filter>Header Files\Lib</Filter>
     </ClInclude>
+    <ClInclude Include="SourceBin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderSourceTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -64,12 +70,21 @@
     <ClCompile Include="ShaderLib\ShaderLib.cpp">
       <Filter>Source Files\Lib</Filter>
     </ClCompile>
+    <ClCompile Include="SourceBin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderSourceTypes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HWShader.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="ILTree.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ShaderSourceTypes.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
