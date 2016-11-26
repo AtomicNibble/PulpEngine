@@ -142,7 +142,15 @@ Material* XMaterialManager::createMaterial(const char* pMtlName)
 		return pMtl;
 	}
 
-	return createMaterial_Internal(pMtlName);
+	// now I kinda want the material manager to handle the creation of variable state.
+	// and the storing of all the cbuffers and permatation for the materials.
+	// basically the things we need to render something with the material.
+//	render::shader::IShader* pShader = nullptr;
+
+
+
+
+	return createMaterial_Internal(name);
 }
 
 Material* XMaterialManager::findMaterial(const char* pMtlName) const
@@ -185,11 +193,11 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 		return pMatRes;
 	}
 
-	// lets look for binary first.
-	//iMat = loadMaterialCompiled(MtlName);
-	//if (iMat) {
-	//	return iMat;
-	//}
+	// only support loading compile materials now bitch!
+	pMatRes = loadMaterialCompiled(name);
+	if (pMatRes) {
+		return pMatRes;
+	}
 
 
 	X_ERROR("MatMan", "Failed to find material: %s", pMtlName);
@@ -206,10 +214,42 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 }
 
 
-XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(const char* pMtlName)
+XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& name)
 {
-	core::string name(pMtlName);
+	core::Path<char> path;
+	path /= "materials/";
+	path.setFileName(name);
+	path.setExtension(MTL_B_FILE_EXTENSION);
 
+	MaterialHeader hdr;
+
+	core::XFileScoped file;
+	if (!file.openFile(path.c_str(), core::fileMode::READ)) {
+		return false;
+	}
+
+	if (file.readObj(hdr) != sizeof(hdr)) {
+		return false;
+	}
+
+	if (!hdr.isValid()) {
+		return false;
+	}
+
+	// we need to poke the goat.
+
+#if X_DEBUG
+	const auto left = file.remainingBytes();
+	X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
+#endif // !X_DEBUG
+
+	MaterialResource* pMatRes = createMaterial_Internal(name);
+
+	return pMatRes;
+}
+
+XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(const core::string& name)
+{
 	// internal create expects you to know no duplicates
 	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
 
@@ -228,7 +268,7 @@ void XMaterialManager::InitDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
-		pDefaultMtl_ = createMaterial_Internal(MTL_DEFAULT_NAME);
+		pDefaultMtl_ = createMaterial_Internal(core::string(MTL_DEFAULT_NAME));
 
 		// we want texture info to sent and get back a shader item.
 //		XInputShaderResources input;
