@@ -71,10 +71,10 @@ namespace shader
 	class ShaderSourceFileTechnique
 	{
 	public:
-		ShaderSourceFileTechnique();
+		SHADERLIB_EXPORT ShaderSourceFileTechnique();
 		~ShaderSourceFileTechnique() = default;
 
-		bool parse(core::XLexer& lex);
+		SHADERLIB_EXPORT bool parse(core::XLexer& lex);
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE const core::string& getVertexFunc(void) const;
@@ -99,12 +99,12 @@ namespace shader
 		typedef core::Array<ShaderSourceFileTechnique> TechArr;
 
 	public:
-		ShaderSourceFile(core::MemoryArenaBase* arena);
+		SHADERLIB_EXPORT ShaderSourceFile(core::MemoryArenaBase* arena);
 		~ShaderSourceFile() = default;
 
 		X_INLINE size_t numTechs(void) const;
 
-		void addTech(const ShaderSourceFileTechnique& tech);
+		X_INLINE void addTech(const ShaderSourceFileTechnique& tech);
 
 	public:
 		core::string name_;
