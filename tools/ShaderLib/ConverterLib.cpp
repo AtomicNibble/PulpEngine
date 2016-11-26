@@ -6,6 +6,8 @@
 #include <ModuleExports.h> // needed for gEnv
 
 
+#include "ShaderLib\ShaderLib.h"
+
 namespace
 {
 
@@ -19,7 +21,7 @@ ShaderLibArena* g_ShaderLibArena = nullptr;
 
 class XConverterLib_Shader : public IConverterModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Shader, "Engine_Lib");
+	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Shader, "Engine_ShaderLib");
 
 	virtual const char* GetName(void) X_OVERRIDE
 	{
@@ -32,8 +34,8 @@ class XConverterLib_Shader : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		g_ShaderLibArena = X_NEW(ShaderLibArena, gEnv->pArena, "ShaderLibArena")(&g_ShaderLibAlloc, "ShaderLibArena");
-
-		return nullptr;
+		
+		return X_NEW(render::shader::ShaderLib, g_ShaderLibArena, "ShaderLib")();
 	}
 
 	virtual bool ShutDown(IConverter* pCon) X_OVERRIDE

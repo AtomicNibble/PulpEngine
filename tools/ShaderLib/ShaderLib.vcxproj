@@ -395,6 +395,7 @@
     <ClInclude Include="ILTree.h" />
     <ClInclude Include="ShaderBin.h" />
     <ClInclude Include="ShaderLib.h" />
+    <ClInclude Include="ShaderLib\ShaderLib.h" />
     <ClInclude Include="ShaderUtil.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -403,6 +404,7 @@
     <ClCompile Include="HWShader.cpp" />
     <ClCompile Include="ILTree.cpp" />
     <ClCompile Include="ShaderBin.cpp" />
+    <ClCompile Include="ShaderLib\ShaderLib.cpp" />
     <ClCompile Include="ShaderUtil.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

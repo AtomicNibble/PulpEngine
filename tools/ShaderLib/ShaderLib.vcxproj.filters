@@ -12,6 +12,12 @@
     <Filter Include="Source Files\ConverterModule">
       <UniqueIdentifier>{bf84baeb-5313-4d82-be0e-9755749a9588}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lib">
+      <UniqueIdentifier>{6409e017-42fb-4a2c-be7f-9132ce29cfc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lib">
+      <UniqueIdentifier>{4233d8a6-e713-4b8a-bcb7-aab5cafebcca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -32,6 +38,9 @@
     <ClInclude Include="ShaderLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderLib\ShaderLib.h">
+      <Filter>Header Files\Lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -51,6 +60,9 @@
     </ClCompile>
     <ClCompile Include="ILTree.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderLib\ShaderLib.cpp">
+      <Filter>Source Files\Lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
