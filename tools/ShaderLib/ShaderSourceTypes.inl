@@ -35,7 +35,7 @@ namespace shader
 		return includedFiles_;
 	}
 
-	X_INLINE ILFlags SourceFile::getILFlags(void)
+	X_INLINE ILFlags SourceFile::getILFlags(void) const
 	{
 		return ILFlags_;
 	}
@@ -60,6 +60,11 @@ namespace shader
 	X_INLINE void SourceFile::setSourceCrc32(uint32_t crc)
 	{
 		sourceCrc32_ = crc;
+	}
+
+	X_INLINE void SourceFile::setILFlags(ILFlags flags)
+	{
+		ILFlags_ = flags;
 	}
 
 	X_INLINE void SourceFile::addRefrence(const core::string& name)

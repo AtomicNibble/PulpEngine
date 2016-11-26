@@ -47,12 +47,13 @@ namespace shader
 		X_INLINE uint32_t getSourceCrc32(void) const;
 		X_INLINE const IncludedSourceArr& getIncludeArr(void) const;
 		X_INLINE IncludedSourceArr& getIncludeArr(void);
-		X_INLINE ILFlags getILFlags(void);
+		X_INLINE ILFlags getILFlags(void) const;
 
 		X_INLINE void setName(const core::string& name);
 		X_INLINE void setFileName(const core::string& name);
 		X_INLINE void setFileData(const core::string& name);
 		X_INLINE void setSourceCrc32(uint32_t crc);
+		X_INLINE void setILFlags(ILFlags flags);
 
 		X_INLINE void addRefrence(const core::string& name);
 
