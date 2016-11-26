@@ -28,6 +28,7 @@ namespace shader
 				return false;
 			}
 
+			static_assert(PreProType::ENUM_COUNT == 8, "PreProType count changed? this code needs updating.");
 			switch (core::Hash::Fnv1aHash(token.begin(), len))
 			{
 				case "include"_fnv1a:
@@ -68,6 +69,7 @@ namespace shader
 			core::StackString<128, char> strUpper(pStr);
 			strUpper.toUpper();
 
+			static_assert(ILFlag::FLAGS_COUNT == 3, "ILFlag count changed? this code needs updating.");
 			switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 			{
 				case "NORMAL"_fnv1a:
