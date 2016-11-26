@@ -99,7 +99,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 		return false;
 	}
 
-	CreateIcon(0, L"Potato - AssetServer", IDI_ASSETSERVER, IDR_MENU1);
+	CreateIcon(0, X_WIDEN(X_ENGINE_NAME) L" - AssetServer", IDI_ASSETSERVER, IDR_MENU1);
 	return true;
 }
 

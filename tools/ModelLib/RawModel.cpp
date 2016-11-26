@@ -645,7 +645,7 @@ namespace RawModel
 		ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
 		dataArr.append(pCurBuf);
 
-		pCurBuf->appendFmt("// Potato engine RawModel.\n");
+		pCurBuf->appendFmt("// " X_ENGINE_NAME " engine RawModel.\n");
 
 		// save some info it's not part of format
 		for (size_t i = 0; i < lods_.size(); i++)

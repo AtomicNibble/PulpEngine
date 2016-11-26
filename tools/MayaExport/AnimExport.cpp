@@ -284,7 +284,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
 
 	core::StackString<4096> buf;
 	buf.clear();
-	buf.appendFmt("// Potato intermidiate animation format\n");
+	buf.appendFmt("// " X_ENGINE_NAME " intermidiate animation format\n");
 	buf.appendFmt("// Source: \"%s\"\n", cuirrentFile.asChar());
 	buf.appendFmt("// TimeLine range: %" PRIi32 " <-> %" PRIi32 "\n", startFrame_, endFrame_);
 	buf.appendFmt("\n");

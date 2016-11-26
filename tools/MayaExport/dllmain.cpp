@@ -152,7 +152,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 		return stat;
 	}
 
-	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s %gms) ===", ver.c_str(),
+	MayaUtil::MayaPrintMsg("=== " X_ENGINE_NAME " Plugin Loaded (%s %gms) ===", ver.c_str(),
 		timer.GetMilliSeconds());
 
 	return stat;
