@@ -105,6 +105,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 bool EngineApp::ShutDown(void)
 {
+	// the ConvertLib and AssetDb libs will be cleaned up for us by core.
+
 	if (pICore_) {
 		pICore_->UnRegisterAssertHandler(this);
 		pICore_->Release();
