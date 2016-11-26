@@ -19,68 +19,6 @@ namespace shader
 	namespace
 	{
 
-		struct PreProEntry
-		{
-			const char* name;
-			PreProType::Enum type;
-		};
-
-		struct InputLayoutEntry
-		{
-			const char* name;
-			ILFlag::Enum flag;
-		};
-
-		PreProEntry g_ProPros[] =
-		{
-			{ "include", PreProType::Include },
-			{ "define", PreProType::Define },
-			{ "undef", PreProType::Undef },
-			{ "if", PreProType::If },
-			{ "ifdef", PreProType::IfDef },
-			{ "ifndef", PreProType::IfNDef },
-			{ "else", PreProType::Else },
-			{ "endif", PreProType::EndIF },
-		};
-
-		// must be prefixed with IL_ (Input Layout)
-		InputLayoutEntry g_ILFlags[] = {
-			{ "Normal", ILFlag::Normal },
-			{ "BiNornmal", ILFlag::BiNormal },
-			{ "Color", ILFlag::Color },
-		};
-
-
-		static bool ILFlagFromStr(const char* pStr, ILFlags& flagOut)
-		{
-			const size_t num = sizeof(g_ILFlags) / sizeof(const char*);
-			size_t i;
-			for (i = 0; i < num; i++)
-			{
-				if (core::strUtil::IsEqualCaseInsen(pStr, g_ILFlags[i].name))
-				{
-					flagOut.Set(g_ILFlags[i].flag);
-					return true;
-				}
-			}
-			return false;
-		}
-
-		static bool PreProFromStr(core::XLexToken& token, PreProType::Enum& typeOut)
-		{
-			const size_t num = sizeof(g_ProPros) / sizeof(PreProEntry);
-			size_t i;
-			for (i = 0; i < num; i++)
-			{
-				if (core::strUtil::IsEqualCaseInsen(token.begin(), token.end(), g_ProPros[i].name))
-				{
-					typeOut = g_ProPros[i].type;
-					return true;
-				}
-			}
-			return false;
-		}
-
 		template<typename TFlags>
 		void AppendFlagTillEqual(const Flags<TFlags>& srcflags, Flags<TFlags>& dest)
 		{
@@ -102,8 +40,8 @@ namespace shader
 	XShaderManager::XShaderManager(core::MemoryArenaBase* arena) :
 		arena_(arena),
 		pCrc32_(nullptr),
-		sourcebin_(arena, MAX_SHADER_SOURCE),
 		shaderBin_(arena),
+		sourceBin_(arena),
 		hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource)),
 		shaders_(arena, sizeof(ShaderResource), X_ALIGN_OF(ShaderResource)),
 		pDefaultShader_(nullptr),
@@ -212,21 +150,7 @@ namespace shader
 
 	bool XShaderManager::sourceToString(const char* pName, core::string& strOut)
 	{
-		SourceFile* pSourceFile = loadRawSourceFile(pName);
-
-		if (pSourceFile)
-		{
-			for (auto f : pSourceFile->getIncludeArr())
-			{
-				strOut.append(f->getFileData());
-				strOut.append("\r\n");
-			}
-
-			strOut.append(pSourceFile->getFileData());
-
-			return true;
-		}
-		return false;
+		return sourceBin_.getMergedSource(pName, strOut);
 	}
 
 	ShaderVars& XShaderManager::getShaderVars(void)
@@ -431,214 +355,7 @@ namespace shader
 
 	SourceFile* XShaderManager::loadRawSourceFile(const char* pName, bool reload)
 	{
-		X_ASSERT_NOT_NULL(pName);
-
-		// already loded o.o?
-
-		ShaderSourceMap::iterator it = sourcebin_.find(X_CONST_STRING(pName));
-		SourceFile* pSourceFile = nullptr;
-
-		if (it != sourcebin_.end())
-		{
-			pSourceFile = it->second;
-
-			if (!reload) {
-				return pSourceFile;
-			}
-		}
-
-		// fixed relative folder.
-		core::Path<char> path("shaders/");
-		path.setFileName(pName);
-		if (path.extension() == path.begin()) {
-			path.setExtension("shader");
-		}
-
-		core::XFileScoped file;
-
-		if (file.openFile(path.c_str(), core::fileMode::READ))
-		{
-			size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-
-			// load into a string for now!
-			core::string str;
-			str.resize(size);
-
-			uint32_t str_len = safe_static_cast<uint32_t, size_t>(size);
-
-			if (file.read((void*)str.data(), str_len) == str_len)
-			{
-				// tickle my pickle?
-				// check the crc.
-				uint32_t crc32 = pCrc32_->GetCRC32(str.data());
-
-				if (pSourceFile)
-				{
-					// if we reloaded the file and crc32 is same
-					// don't both reparsing includes
-					if (pSourceFile->getSourceCrc32() == crc32) {
-						return pSourceFile;
-					}
-
-					pSourceFile->setSourceCrc32(crc32);
-					pSourceFile->getIncludeArr().clear();
-					pSourceFile->setFileData(str);
-
-					// load any files it includes.
-					parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
-
-					return pSourceFile;
-				}
-				else
-				{
-
-					pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(arena_);
-					pSourceFile->setName(core::string(pName));
-					pSourceFile->setFileName(core::string(path.fileName()));
-					pSourceFile->setFileData(str);
-					pSourceFile->setSourceCrc32(crc32);
-
-					sourcebin_.insert(std::make_pair(pSourceFile->getFileName(), pSourceFile));
-
-					// load any files it includes.
-					parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr());
-
-					return pSourceFile;
-				}
-			}
-		}
-
-		return nullptr;
-	}
-
-
-	void XShaderManager::parseIncludesAndPrePro_r(SourceFile* pSourceFile,
-		core::Array<SourceFile*>& includedFiles, bool reload)
-	{
-		X_ASSERT_NOT_NULL(pSourceFile);
-
-		const auto& fileData = pSourceFile->getFileData();
-
-		core::string::const_str pos = nullptr;
-		pos = fileData.find("#include");
-
-		if (pos)
-		{
-			core::XLexer lexer(fileData.begin(), fileData.end());
-			core::XLexToken token;
-			core::StackString512 fileName;
-
-			lexer.setFlags(core::LexFlag::ALLOWPATHNAMES);
-
-			while (lexer.SkipUntilString("#"))
-			{
-				fileName.clear();
-				PrePro prepro;
-
-				if (lexer.ReadTokenOnLine(token))
-				{
-					// check if it's a valid prepro type.
-					if (PreProFromStr(token, prepro.type))
-					{
-						if (prepro.type == PreProType::Include)
-						{
-							const char* pStart = token.begin() - 1;
-							if (lexer.ReadTokenOnLine(token))
-							{
-								// get the file name, then remove it from the buffer
-								// to stop Dx compiler trying to include it.
-								fileName.set(token.begin(), token.end());
-								memset(const_cast<char*>(pStart), ' ', (token.end() - pStart) + 1);
-							}
-
-							// you silly hoe!
-							if (fileName.isEmpty())
-							{
-								X_WARNING("Shader", "invalid #include in: \"%s\" line: %i",
-									pSourceFile->getName().c_str(), token.GetLine());
-								return;
-							}
-
-							// all source names tolower for reload reasons.
-							fileName.toLower();
-
-							// load it PLZ.
-							SourceFile* pChildSourceFile = loadRawSourceFile(fileName.c_str(), reload);
-							if (pChildSourceFile)
-							{
-								// is this file already included in the tree?
-								if (std::find(includedFiles.begin(), includedFiles.end(), pChildSourceFile)
-									== includedFiles.end())
-								{
-									// check if for includes.
-									parseIncludesAndPrePro_r(pChildSourceFile, includedFiles);
-
-									// add the include files crc to this one.
-									// only after parsing for child includes so that
-									// they are included.
-									pSourceFile->setSourceCrc32(pCrc32_->Combine(pSourceFile->getSourceCrc32(),
-										pChildSourceFile->getSourceCrc32(),
-										safe_static_cast<uint32_t, size_t>(pChildSourceFile->getFileData().length())));
-
-
-									includedFiles.append(pChildSourceFile);
-								}
-								else
-								{
-									X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i",
-										fileName.c_str(), pSourceFile->getName().c_str(), token.GetLine());
-								}
-							}
-							else
-							{
-								X_WARNING("Shader", "File not found: \"%s\"", fileName.c_str());
-							}
-
-
-						}
-						else
-						{
-							// which ones do i care about :|
-							// ifdef only tbh, for IL
-							if (prepro.type == PreProType::IfDef)
-							{
-								core::StackString512 ifDefValue;
-								if (lexer.ReadTokenOnLine(token))
-								{
-									if (token.length() > 3) // IL_
-									{
-										ifDefValue.set(token.begin(), token.end());
-										ifDefValue.trim(); // remove white spaces
-														   // starts with IL_
-										if (ifDefValue.findCaseInsen("IL_") == ifDefValue.begin())
-										{
-											if (!ILFlagFromStr(ifDefValue.begin() + 3, pSourceFile->getILFlags()))
-											{
-												X_ERROR("Shader", "invalid InputLayout prepro in shader: % value: %s",
-													pSourceFile->getName().c_str(), ifDefValue.c_str());
-											}
-										}
-									}
-									else
-									{
-										// dont care about these.
-									}
-								}
-							}
-						}
-					}
-					else
-					{
-						// just make use of this buffer
-						fileName.set(token.begin(), token.end());
-						X_ERROR("Shader", "Invalid prepro in shader source: %s", fileName.c_str());
-						continue;
-					}
-				}
-
-			}
-
-		}
+		return sourceBin_.loadRawSourceFile(pName, reload);
 	}
 
 
@@ -958,12 +675,7 @@ namespace shader
 
 	bool XShaderManager::freeSourcebin(void)
 	{
-		auto it = sourcebin_.begin();;
-		for (; it != sourcebin_.end(); ++it) {
-			X_DELETE(it->second, &sourcePoolArena_);
-		}
-
-		sourcebin_.free();
+		sourceBin_.free();
 		return true;
 	}
 
@@ -994,35 +706,9 @@ namespace shader
 		X_LOG0("Shader", "------------ ^8Shaders End^7 -------------");
 	}
 
-	void XShaderManager::listShaderSources(const char* pSarchPatten)
+	void XShaderManager::listShaderSources(const char* pSearchPatten)
 	{
-		X_LOG0("Shader", "--------- ^8Shader Sources(%" PRIuS ")^7 ---------", sourcebin_.size());
-
-		auto printfunc = [](const SourceFile* pSource) {
-			X_LOG0("Shader", "Name: ^2\"%s\"^7 crc: ^10x%08x^7",
-				pSource->getFileName().c_str(),
-				pSource->getSourceCrc32());
-		};
-
-		auto it = sourcebin_.begin();
-		if (!pSarchPatten) {
-			for (; it != sourcebin_.end(); ++it) {
-				printfunc(it->second);
-			}
-		}
-		else
-		{
-			const SourceFile* pSource = nullptr;
-
-			for (; it != sourcebin_.end(); ++it) {
-				pSource = it->second;
-				if (core::strUtil::WildCompare(pSarchPatten, pSource->getName())) {
-					printfunc(pSource);
-				}
-			}
-		}
-
-		X_LOG0("Shader", "--------- ^8Shader Sources End^7 ---------");
+		sourceBin_.listShaderSources(pSearchPatten);
 	}
 
 	void XShaderManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)

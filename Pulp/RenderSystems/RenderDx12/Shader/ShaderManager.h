@@ -28,8 +28,6 @@ namespace shader
 
 	class XShaderManager : public core::IXHotReload
 	{
-		typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
-		
 		// Shaders
 		typedef core::AssetContainer<XShader, MAX_SHADERS, core::MultiThreadPolicy<core::Spinlock>> ShaderContainer;
 		typedef ShaderContainer::Resource ShaderResource;
@@ -84,8 +82,6 @@ namespace shader
 		ShaderSourceFile* loadShaderFile(const char* pName, bool reload = false);
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
 
-		void parseIncludesAndPrePro_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
-			bool reload = false);
 
 		ShaderResource* createShader(const char* pName);
 		XShader* loadShader(const char* pName);
@@ -114,8 +110,8 @@ namespace shader
 	private:
 		core::MemoryArenaBase* arena_;
 		core::Crc32* pCrc32_;
-		ShaderSourceMap sourcebin_;
 		ShaderBin shaderBin_;
+		SourceBin sourceBin_;
 
 		// allocator for source objects.
 		core::HeapArea      sourcePoolHeap_;
