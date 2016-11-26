@@ -122,7 +122,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		g_bspNodeAllocator = &bspNodeArena;
 
 
-		core::Console Console(L"Level Compiler");
+		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Level Compiler");
 		Console.SetSize(150, 60, 8000);
 		Console.MoveTo(10, 10);
 

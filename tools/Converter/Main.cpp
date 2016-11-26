@@ -175,7 +175,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	g_hInstance = hInstance;
 
 
-	core::Console Console(L"Potato - Converter");
+	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Converter");
 	Console.RedirectSTD();
 	Console.SetSize(60, 40, 2000);
 	Console.MoveTo(10, 10);

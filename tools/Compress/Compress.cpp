@@ -110,7 +110,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	g_hInstance = hInstance;
 
-	core::Console Console(L"Potato - Compressor");
+	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Compressor");
 	Console.RedirectSTD();
 	Console.SetSize(100, 40, 2000);
 	Console.MoveTo(10, 10);
