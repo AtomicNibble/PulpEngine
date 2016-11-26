@@ -31,6 +31,7 @@ namespace shader
 	public:
 		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
 			const core::string& sourceFile, uint32_t soruceFilecrc32, TechFlags techFlags);
+		SHADERLIB_EXPORT ~XHWShader();
 
 		X_INLINE const int32_t getID(void) const;
 		X_INLINE void setID(int32_t id);

@@ -43,6 +43,10 @@ namespace shader
 		cbuffers_.setGranularity(2);
 	}
 
+	XHWShader::~XHWShader()
+	{
+
+	}
 
 	bool XHWShader::compile(bool forceSync)
 	{
