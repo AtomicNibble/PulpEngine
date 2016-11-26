@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "ShaderManager.h"
-#include "ShaderSourceTypes.h"
 #include "Shader.h"
 
 #include <Hashing\crc32.h>
@@ -11,6 +10,9 @@
 
 #include <IConsole.h>
 #include <IFileSys.h>
+
+
+#include <../../tools/ShaderLib/ShaderSourceTypes.h>
 
 X_NAMESPACE_BEGIN(render)
 

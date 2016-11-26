@@ -89,9 +89,6 @@
     <ClInclude Include="Shader\ShaderManager.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="Shader\ShaderSourceTypes.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Shader\ShaderVars.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
@@ -205,9 +202,6 @@
     <ClCompile Include="Shader\ShaderManager.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
-    <ClCompile Include="Shader\ShaderSourceTypes.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Shader\ShaderVars.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
@@ -293,9 +287,6 @@
     </None>
     <None Include="CommandContex.inl">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="Shader\ShaderSourceTypes.inl">
-      <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Shader\Shader.inl">
       <Filter>Header Files\Shader</Filter>

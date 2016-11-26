@@ -419,7 +419,6 @@
     <ClInclude Include="SamplerDesc.h" />
     <ClInclude Include="Shader\Shader.h" />
     <ClInclude Include="Shader\ShaderManager.h" />
-    <ClInclude Include="Shader\ShaderSourceTypes.h" />
     <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture\Texture.h" />
@@ -459,7 +458,6 @@
     <ClCompile Include="SampleDesc.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />
     <ClCompile Include="Shader\ShaderManager.cpp" />
-    <ClCompile Include="Shader\ShaderSourceTypes.cpp" />
     <ClCompile Include="Shader\ShaderVars.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -503,7 +501,6 @@
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
     <None Include="Shader\Shader.inl" />
-    <None Include="Shader\ShaderSourceTypes.inl" />
     <None Include="Shader\ShaderVars.inl" />
     <None Include="Texture\Texture.inl" />
     <None Include="Texture\TextureVars.inl" />

@@ -13,7 +13,7 @@
 
 #include "XRender.h"
 
-#include "ShaderSourceTypes.h"
+#include <../../tools/ShaderLib/ShaderSourceTypes.h>
 
 X_NAMESPACE_BEGIN(render)
 
