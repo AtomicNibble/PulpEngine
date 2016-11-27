@@ -4,6 +4,8 @@
 
 #include <Hashing\Fnva1Hash.h>
 
+#include <Logging\LoggerBase.h>
+
 
 X_NAMESPACE_BEGIN(core)
 
@@ -776,13 +778,12 @@ void XParser::addDefinetoHash(MacroDefine* define)
 
 void XParser::Error(const char *str, ...)
 {
-	core::StackString<1024> temp;
+	core::StackString<sizeof(core::LoggerBase::Line)> temp;
 
 	va_list args;
 	va_start(args, str);
 
 	temp.appendFmt(str, args);
-//	temp.appendFmt(" Line: %i", this->curLine_);
 
 	va_end(args);
 	X_ERROR("Parse", temp.c_str());
@@ -790,11 +791,13 @@ void XParser::Error(const char *str, ...)
 
 void XParser::Warning(const char *str, ...)
 {
-	core::StackString<1024> temp;
+	core::StackString<sizeof(core::LoggerBase::Line)> temp;
 
 	va_list args;
 	va_start(args, str);
-	vsprintf(&temp[0], str, args);
+
+	temp.appendFmt(str, args);
+
 	va_end(args);
 
 	X_WARNING("Parse", temp.c_str());
