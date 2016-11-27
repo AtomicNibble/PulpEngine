@@ -29,7 +29,7 @@ X_NAMESPACE_BEGIN(engine)
 
 	struct StencilState
 	{
-		render::StencilState state;
+		render::StencilDesc state;
 		bool enabled;
 	};
 

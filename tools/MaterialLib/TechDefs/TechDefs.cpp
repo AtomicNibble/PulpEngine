@@ -262,8 +262,6 @@ X_NAMESPACE_BEGIN(engine)
 		while (lex.ReadToken(token))
 		{
 			if (token.isEqual("}")) {
-
-				state.back = state.front;
 				return true;
 			}
 
@@ -277,22 +275,22 @@ X_NAMESPACE_BEGIN(engine)
 					}
 					break;
 				case "func"_fnv1a:
-					if (!parseStencilFunc(lex, state.front.stencilFunc)) {
+					if (!parseStencilFunc(lex, state.stencilFunc)) {
 						return false;
 					}
 					break;
 				case "opFail"_fnv1a:
-					if (!parseStencilOp(lex, state.front.failOp)) {
+					if (!parseStencilOp(lex, state.failOp)) {
 						return false;
 					}
 					break;
 				case "opPass"_fnv1a:
-					if (!parseStencilOp(lex, state.front.passOp)) {
+					if (!parseStencilOp(lex, state.passOp)) {
 						return false;
 					}
 					break;
 				case "opZFail"_fnv1a:
-					if (!parseStencilOp(lex, state.front.zFailOp)) {
+					if (!parseStencilOp(lex, state.zFailOp)) {
 						return false;
 					}
 					break;
