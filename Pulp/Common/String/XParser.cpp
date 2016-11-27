@@ -499,13 +499,12 @@ bool XParser::CheckTokenString(const char* string)
 
 int XParser::FindDefineParm(MacroDefine* define, const XLexToken& token)
 {
-	core::StackString512 name(token.begin(), token.end());
 	XLexToken* p;
 	int i;
 
 	i = 0;
 	for (p = define->pParms; p; p = p->pNext_) {
-		if (p->isEqual(name.c_str())) {
+		if (p->isEqual(token.begin(), token.end())) {
 			return i;
 		}
 		i++;
