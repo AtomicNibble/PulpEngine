@@ -280,10 +280,7 @@ namespace
 		}
 		else
 		{
-			// disable blending.
-
 			// disabling 'BlendEnable' is not actually enougth... it still requires valid values.
-#if 1
 			D3D12_RENDER_TARGET_BLEND_DESC defaultDesc = {
 				FALSE,
 				FALSE,
@@ -300,11 +297,6 @@ namespace
 			for (size_t i = 0; i < 8; ++i) {
 				std::memcpy(&blendDesc.RenderTarget[i], &defaultDesc, sizeof(defaultDesc));
 			}
-#else
-			for (size_t i = 0; i < 8; ++i) {
-				blendDesc.RenderTarget[i].BlendEnable = FALSE;
-			}
-#endif
 		}
 	}
 
