@@ -177,9 +177,10 @@ struct BlendState
 	BlendType::Enum dstBlendAlpha;
 	BlendOp::Enum colorOp;
 	BlendOp::Enum alphaOp;
+	WriteMaskFlags writeMask;
 };
 
-X_ENSURE_SIZE(BlendState, 6);
+X_ENSURE_SIZE(BlendState, 7);
 
 
 X_DECLARE_ENUM8(TextureSlot)(
@@ -263,11 +264,10 @@ struct StateDesc
 {
 	// 8
 	StencilState stencil;
-	// 6
+	// 7
 	BlendState blend;
-	// 2
+	// 1
 	shader::VertexFormat::Enum vertexFmt;
-	bool _pad[1];
 
 	// 4
 	CullType::Enum cullType;
