@@ -5,7 +5,7 @@
 #include <IFileSys.h>
 
 #include <Hashing\crc32.h>
-#include <String\Lexer.h>
+#include <String\XParser.h>
 #include <String\StringHash.h>
 #include <Memory\VirtualMem.h>
 
@@ -18,9 +18,10 @@ namespace shader
 	namespace
 	{
 
-		bool PreProFromStr(core::XLexToken& token, PreProType::Enum& typeOut)
+		bool PreProFromStr(core::XLexToken& token, core::PreProType::Enum& typeOut)
 		{
 			using namespace core::Hash::Fnva1Literals;
+			using namespace core;
 
 			// too long?
 			const auto len = token.length();
@@ -244,14 +245,14 @@ namespace shader
 		while (lexer.SkipUntilString("#"))
 		{
 			fileName.clear();
-			PrePro prepro;
+			core::PreProType::Enum preproType;
 
 			if (lexer.ReadTokenOnLine(token))
 			{
 				// check if it's a valid prepro type.
-				if (PreProFromStr(token, prepro.type))
+				if (PreProFromStr(token, preproType))
 				{
-					if (prepro.type == PreProType::Include)
+					if (preproType == core::PreProType::Include)
 					{
 						const char* pStart = token.begin() - 1;
 						if (lexer.ReadTokenOnLine(token))
@@ -309,7 +310,7 @@ namespace shader
 					{
 						// which ones do i care about :|
 						// ifdef only tbh, for IL
-						if (prepro.type == PreProType::IfDef)
+						if (preproType == core::PreProType::IfDef)
 						{
 							core::StackString512 ifDefValue;
 							if (lexer.ReadTokenOnLine(token))

@@ -16,15 +16,7 @@ namespace shader
 {
 	// these are just types for loading the .shader format and holding hlsl source.
 
-	X_DECLARE_ENUM(PreProType)(Include, Define, Undef, If, IfDef, IfNDef, Else, EndIF);
 	X_DECLARE_FLAGS(TechniquePrams) (NAME, VERTEX_FNC, PIXEL_FNC);
-
-
-	struct PrePro
-	{
-		PreProType::Enum type;
-		core::string expression;
-	};
 
 
 	// a hlsl
@@ -32,7 +24,6 @@ namespace shader
 	{
 	public:
 		typedef core::Array<SourceFile*> IncludedSourceArr;
-		typedef core::Array<PrePro> PreProArr;
 		typedef std::unordered_set<core::string, core::hash<core::string>> RefrenceMap;
 
 	public:
@@ -62,7 +53,6 @@ namespace shader
 		core::string fileName_;
 		core::string fileData_;
 		IncludedSourceArr includedFiles_;
-		PreProArr prePros_;
 		RefrenceMap refrences_;
 		ILFlags ILFlags_;
 		uint32_t sourceCrc32_;

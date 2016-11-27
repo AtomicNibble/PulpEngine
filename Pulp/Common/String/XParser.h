@@ -12,6 +12,17 @@ X_NAMESPACE_BEGIN(core)
 //
 //	This is a Lexer that supports macros
 //
+X_DECLARE_ENUM(PreProType)(
+	Include,
+	Define, 
+	Undef, 
+	If, 
+	IfDef, 
+	IfNDef, 
+	Else, 
+	EndIF
+);
+
 
 struct MacroDefine
 {

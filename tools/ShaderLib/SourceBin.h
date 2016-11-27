@@ -7,10 +7,6 @@
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
-X_NAMESPACE_DECLARE(core,
-	class XLexToken;
-);
-
 X_NAMESPACE_BEGIN(render)
 
 namespace shader

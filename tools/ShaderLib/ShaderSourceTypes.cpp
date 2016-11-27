@@ -47,7 +47,6 @@ namespace shader
 
 	SourceFile::SourceFile(core::MemoryArenaBase* arena) :
 		includedFiles_(arena),
-		prePros_(arena),
 		sourceCrc32_(0)
 	{
 
