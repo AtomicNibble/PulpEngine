@@ -2,8 +2,10 @@
 #include "XParser.h"
 
 
-X_NAMESPACE_BEGIN(core)
+#include <Hashing\Fnva1Hash.h>
 
+
+X_NAMESPACE_BEGIN(core)
 
 
 
@@ -181,7 +183,7 @@ int XParser::ParseInt()
 {
 	XLexToken token;
 
-	if (!ReadToken(token)) {
+	if (!XParser::ReadToken(token)) {
 		Error("couldn't read expected integer");
 		return 0;
 	}
@@ -204,7 +206,7 @@ bool XParser::ParseBool()
 {
 	XLexToken token;
 
-	if (!ReadToken(token)) {
+	if (!XParser::ReadToken(token)) {
 		Error("couldn't read expected bool");
 		return false;
 	}
@@ -232,7 +234,7 @@ float XParser::ParseFloat()
 {
 	XLexToken token;
 
-	if (!ReadToken(token)) {
+	if (!XParser::ReadToken(token)) {
 		Error("couldn't read expected floating point number");
 		return 0.0f;
 	}
@@ -316,13 +318,22 @@ bool XParser::ReadDirective(void)
 
 	if (token.GetType() == TokenType::NAME)
 	{
-		if (token.isEqual("define"))
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(PreProType::ENUM_COUNT == 8, "PreProType count changed? this code needs updating.");
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
-			return Directive_define();
-		}
-		if (token.isEqual("include"))
-		{
-			return Directive_include();
+			case "include"_fnv1a:
+				return Directive_include();
+			case "define"_fnv1a:
+				return Directive_define();
+			case "undef"_fnv1a:
+			case "if"_fnv1a:
+			case "ifdef"_fnv1a:
+			case "ifndef"_fnv1a:
+			case "else"_fnv1a:
+			case "endif"_fnv1a:
+				break;
 		}
 	}
 

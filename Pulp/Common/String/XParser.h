@@ -28,6 +28,7 @@ struct MacroDefine
 class XParser
 {
 	typedef XLexer::LexFlags LexFlags;
+	typedef core::HashMap<core::string, MacroDefine*> MacroMap;
 
 	static const int32_t MAX_DEFINEPARMS = 32;
 
@@ -87,8 +88,6 @@ private:
 	void addDefinetoHash(MacroDefine* define);
 
 private:
-	typedef core::HashMap<core::string, MacroDefine*> MacroMap;
-
 	core::string filename_;
 
 	MacroMap macros_;
