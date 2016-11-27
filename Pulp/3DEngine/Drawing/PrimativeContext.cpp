@@ -6,6 +6,7 @@
 #include <IRender.h>
 #include <IShader.h>
 #include <CBuffer.h>
+#include <IAssetDb.h>
 
 #include "CmdBucket.h"
 #include "VariableStateManager.h"
@@ -81,6 +82,44 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 {
 	pRender_ = pRender;
 
+#if 1
+
+	pAuxShader_ = pRender->getShader("Prim");
+	auto* pTech = pAuxShader_->getTech("Prim");
+
+	// needed currently to generate the permatations.
+	pTech->tryCompile(true);
+
+	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
+	{
+		const auto primType = static_cast<PrimitiveType::Enum>(i);
+
+		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
+		matName.appendFmt("code%c$%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType));
+		matName.toLower();
+
+		// we load the material for the primative type :D
+		// so the state and shaders used is fully data driven MMMMM.
+		Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
+
+		// but i don't think a material can currently be loaded in a self contained manner.
+		// since in order for it to create a render state it needs a pass state.
+		// so i think when we make a material we should really classifily everything.
+		// work out what the shader that is going to be used and the permatation required.
+		// and then once we have that we can reflect the permatations shader and know all the cbuffers this material must have.
+		// which then means we know at compile time that material shader params are valid.
+		// does that mean we want to move shader compiling offline lol? :| :D twat! <:)
+		// 
+		// How to keep this online?
+		// We would have to know the shader but at runtime we compile the shader selecte a permatation.
+		// then work out the cbuffers of the shader and create a variable state for the material.
+		// which i think i'll do for now, and move more offline later. 
+		// 
+
+		primMaterials_[primType] = pMat;
+	}
+
+#else
 	render::StateDesc desc;
 	desc.blend.srcBlendColor = render::BlendType::SRC_ALPHA;
 	desc.blend.srcBlendAlpha = render::BlendType::SRC_ALPHA;
@@ -165,6 +204,7 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		primMaterials_[primType] = pMat;
 	}
 
+#endif
 	return true;
 }
 
