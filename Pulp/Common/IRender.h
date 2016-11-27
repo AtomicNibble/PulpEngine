@@ -156,7 +156,8 @@ X_DECLARE_ENUM8(BlendOp)(
 	OP_SUB,
 	OP_REB_SUB,
 	OP_MIN,
-	OP_MAX 
+	OP_MAX,
+	DISABLE // disables blend 
 );
 
 struct BlendState

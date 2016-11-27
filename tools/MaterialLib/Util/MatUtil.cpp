@@ -361,7 +361,7 @@ namespace Util
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(render::BlendOp::ENUM_COUNT == 5, "Added additional blend op? this code needs updating.");
+		static_assert(render::BlendOp::ENUM_COUNT == 6, "Added additional blend op? this code needs updating.");
 		
 		const size_t len = (pEnd - pBegin);
 		switch (core::Hash::Fnv1aHash(pBegin, len))
@@ -376,7 +376,8 @@ namespace Util
 				return render::BlendOp::OP_MIN;
 			case "max"_fnv1a:
 				return render::BlendOp::OP_MAX;
-
+			case "disable"_fnv1a:
+				return render::BlendOp::DISABLE;
 			default:
 				X_ERROR("Mtl", "Unknown blend op: '%.*s' (case-sen)", len, pBegin);
 				return render::BlendOp ::OP_ADD;
