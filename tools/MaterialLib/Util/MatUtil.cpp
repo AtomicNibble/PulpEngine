@@ -433,6 +433,36 @@ namespace Util
 		return mask;
 	}
 
+	render::DepthFunc::Enum DepthFuncFromStr(const char* pBegin, const char* pEnd)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(render::DepthFunc::ENUM_COUNT == 7, "Added additional depthFunc? this code needs updating.");
+
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
+		{
+			case "lequal"_fnv1a:
+				return render::DepthFunc::LEQUAL;
+			case "equal"_fnv1a:
+				return render::DepthFunc::EQUAL;
+			case "great"_fnv1a:
+				return render::DepthFunc::GREAT;
+			case "less"_fnv1a:
+				return render::DepthFunc::LESS;
+			case "gequal"_fnv1a:
+				return render::DepthFunc::GEQUAL;
+			case "notequal"_fnv1a:
+				return render::DepthFunc::NOTEQUAL;
+			case "always"_fnv1a:
+				return render::DepthFunc::ALWAYS;
+
+			default:
+				X_ERROR("Mtl", "Unknown blend op: '%.*s' (case-sen)", len, pBegin);
+				return render::DepthFunc::ALWAYS;
+		}
+	}
+
 	render::StencilOperation::Enum StencilOpFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
