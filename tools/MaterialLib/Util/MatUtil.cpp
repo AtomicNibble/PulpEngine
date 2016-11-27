@@ -332,6 +332,11 @@ namespace Util
 
 			case "inv_src_color"_fnv1a:
 				return render::BlendType::INV_SRC_COLOR;
+			case "inv_src_alpha"_fnv1a:
+				return render::BlendType::INV_SRC_ALPHA;
+
+			case "inv_src1_color"_fnv1a:
+				return render::BlendType::INV_SRC1_COLOR;
 			case "inv_src1_alpha"_fnv1a:
 				return render::BlendType::INV_SRC1_ALPHA;
 
