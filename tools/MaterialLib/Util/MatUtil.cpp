@@ -458,7 +458,7 @@ namespace Util
 				return render::DepthFunc::ALWAYS;
 
 			default:
-				X_ERROR("Mtl", "Unknown blend op: '%.*s' (case-sen)", len, pBegin);
+				X_ERROR("Mtl", "Unknown Depth func: '%.*s' (case-sen)", len, pBegin);
 				return render::DepthFunc::ALWAYS;
 		}
 	}
