@@ -130,7 +130,7 @@ void CommandQue::waitForFence(uint64_t fenceValue)
 		core::CriticalSection::ScopedLock  lock(eventCs_);
 
 		pFence_->SetEventOnCompletion(fenceValue, fenceEventHandle_);
-		WaitForSingleObject(fenceEventHandle_, INFINITE);
+		WaitForSingleObject(fenceEventHandle_, 0xFFFFFFFF /* INFINITE */ );
 		lastCompletedFenceValue_ = fenceValue;
 	}
 }
