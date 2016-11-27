@@ -62,7 +62,7 @@ namespace
 			blendDesc.RenderTarget[0].LogicOpEnable = FALSE;
 			blendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
 
-			
+
 
 			const auto blendState = state.blend;
 
@@ -217,37 +217,41 @@ namespace
 
 
 			//Blending operation
-			D3D12_BLEND_OP blendOperation = D3D12_BLEND_OP_ADD;
-
-			switch (state.blendOp)
+			auto bledOpResolve = [](BlendOp::Enum op) -> auto 
 			{
-				case BlendOp::OP_ADD:
-					blendOperation = D3D12_BLEND_OP_ADD;
-					break;
-				case BlendOp::OP_SUB:
-					blendOperation = D3D12_BLEND_OP_SUBTRACT;
-					break;
-				case BlendOp::OP_REB_SUB:
-					blendOperation = D3D12_BLEND_OP_REV_SUBTRACT;
-					break;
-				case BlendOp::OP_MIN:
-					blendOperation = D3D12_BLEND_OP_MIN;
-					break;
-				case BlendOp::OP_MAX:
-					blendOperation = D3D12_BLEND_OP_MAX;
-					break;
+				D3D12_BLEND_OP blendOperation = D3D12_BLEND_OP_ADD;
+				switch (op)
+				{
+					case BlendOp::OP_ADD:
+						blendOperation = D3D12_BLEND_OP_ADD;
+						break;
+					case BlendOp::OP_SUB:
+						blendOperation = D3D12_BLEND_OP_SUBTRACT;
+						break;
+					case BlendOp::OP_REB_SUB:
+						blendOperation = D3D12_BLEND_OP_REV_SUBTRACT;
+						break;
+					case BlendOp::OP_MIN:
+						blendOperation = D3D12_BLEND_OP_MIN;
+						break;
+					case BlendOp::OP_MAX:
+						blendOperation = D3D12_BLEND_OP_MAX;
+						break;
 
-				default:
+					default:
 #if X_DEBUG
-					X_ASSERT_NOT_IMPLEMENTED();
+						X_ASSERT_NOT_IMPLEMENTED();
 #else
-					X_NO_SWITCH_DEFAULT;
+						X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
-			}
+				}
+
+				return blendOperation;
+			};
 
 			// todo: add separate alpha blend support for mrt
-			blendDesc.RenderTarget[0].BlendOp = blendOperation;
-			blendDesc.RenderTarget[0].BlendOpAlpha = blendOperation;
+			blendDesc.RenderTarget[0].BlendOp = bledOpResolve(blendState.colorOp);
+			blendDesc.RenderTarget[0].BlendOpAlpha = bledOpResolve(blendState.alphaOp);
 
 			for (size_t i = 1; i < 8; ++i) {
 				std::memcpy(&blendDesc.RenderTarget[i], &blendDesc.RenderTarget[i - 1], sizeof(blendDesc.RenderTarget[0]));
