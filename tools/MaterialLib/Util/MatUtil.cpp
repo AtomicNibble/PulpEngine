@@ -350,6 +350,32 @@ namespace Util
 		}
 	}
 
+	render::BlendOp::Enum BlendOpFromStr(const char* str)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(render::BlendOp::ENUM_COUNT == 5, "Added additional blend op? this code needs updating.");
+
+		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		{
+			case "add"_fnv1a:
+				return render::BlendOp::OP_ADD;
+			case "sub"_fnv1a:
+				return render::BlendOp::OP_SUB;
+			case "reb_sub"_fnv1a:
+				return render::BlendOp::OP_REB_SUB;
+			case "min"_fnv1a:
+				return render::BlendOp::OP_MIN;
+			case "max"_fnv1a:
+				return render::BlendOp::OP_MAX;
+
+			default:
+				X_ERROR("Mtl", "Unknown blend op: '%s' (case-sen)", str);
+				return render::BlendOp ::OP_ADD;
+		}
+	}
+
+
 	render::StencilOperation::Enum StencilOpFromStr(const char* str)
 	{
 		using namespace core::Hash::Fnva1Literals;

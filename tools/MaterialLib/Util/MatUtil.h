@@ -17,6 +17,7 @@ namespace Util
 	MATLIB_EXPORT render::TexRepeat::Enum TexRepeatFromStr(const char* str);
 	MATLIB_EXPORT render::CullType::Enum CullTypeFromStr(const char* str);
 	MATLIB_EXPORT render::BlendType::Enum BlendTypeFromStr(const char* str);
+	MATLIB_EXPORT render::BlendOp::Enum BlendOpFromStr(const char* str);
 
 	MATLIB_EXPORT render::StencilOperation::Enum StencilOpFromStr(const char* str);
 	MATLIB_EXPORT render::StencilFunc::Enum StencilFuncFromStr(const char* str);
