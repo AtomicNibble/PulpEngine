@@ -28,6 +28,7 @@ X_NAMESPACE_BEGIN(engine)
 		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
 
 		if (!file.openFile(path.c_str(), mode)) {
+			X_ERROR("TestDefs", "Failed to open file");
 			return false;
 		}
 
@@ -36,7 +37,7 @@ X_NAMESPACE_BEGIN(engine)
 		FileBuf fileData(arena_, fileSize);
 
 		if (file.read(fileData.data(), fileSize) != fileSize) {
-
+			X_ERROR("TestDefs", "Failed to read file data");
 			return false;
 		}
 
@@ -49,11 +50,8 @@ X_NAMESPACE_BEGIN(engine)
 	{
 		core::XLexToken token;
 
-
 		// we want to parse the format :|
 		// how best to support includes without doing include pass.
-
-
 		while (lex.ReadToken(token))
 		{
 			// each line can be either:
@@ -65,24 +63,20 @@ X_NAMESPACE_BEGIN(engine)
 			if (token.isEqual("BlendState"))
 			{
 				if (!parseBlendState(lex)) {
+					X_ERROR("TestDefs", "Failed to parse BlendState");
 					return false;
 				}
 			}
 			else if (token.isEqual("StencilState"))
 			{
 				if (!parseStencilState(lex)) {
+					X_ERROR("TestDefs", "Failed to parse StencilState");
 					return false;
 				}
 			}
 			else if (token.isEqual("State"))
 			{
 				parseBlendState(lex);
-			}
-			else if(token.length() > 0 && token.begin()[0] == '#')
-			{
-				// we support includes.
-				int meow = 0;
-
 			}
 			else
 			{
@@ -190,6 +184,7 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		if (token.GetType() != core::TokenType::NAME) {
+			X_ERROR("TestDefs", "Expected name token for BlendType. Line: %" PRIi32, lex.GetLineNumber());
 			return false;
 		}
 
@@ -213,6 +208,7 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		if (token.GetType() != core::TokenType::NAME) {
+			X_ERROR("TestDefs", "Expected name token for blendOp. Line: %" PRIi32, lex.GetLineNumber());
 			return false;
 		}
 
@@ -232,6 +228,7 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("TestDefs", "Expected string token for writeChannel mask. Line: %" PRIi32, lex.GetLineNumber());
 			return false;
 		}
 
@@ -322,6 +319,7 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		if (token.GetType() != core::TokenType::NAME) {
+			X_ERROR("TestDefs", "Expected name token for stencilFunc. Line: %" PRIi32, lex.GetLineNumber());
 			return false;
 		}
 
@@ -341,6 +339,7 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		if (token.GetType() != core::TokenType::NAME) {
+			X_ERROR("TestDefs", "Expected name token for stencilOp. Line: %" PRIi32, lex.GetLineNumber());
 			return false;
 		}
 
@@ -373,6 +372,7 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("TestDefs", "Expected string token for name. Line: %" PRIi32, lex.GetLineNumber());
 			return false;
 		}
 
