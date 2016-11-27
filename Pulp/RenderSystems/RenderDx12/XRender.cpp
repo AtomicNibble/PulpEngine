@@ -87,155 +87,65 @@ namespace
 				}
 			}
 
-			switch (blendState.srcBlendColor)
+			auto blendTypeResolve = [](BlendType::Enum type) -> auto
 			{
-				case BlendType::ZERO:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
-					break;
-				case BlendType::ONE:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
-					break;
-				case BlendType::DEST_COLOR:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_COLOR;
-					break;
-				case BlendType::INV_DEST_COLOR:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
-					break;
-				case BlendType::SRC_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
-					break;
-				case BlendType::INV_SRC_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
-					break;
-				case BlendType::DEST_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_ALPHA;
-					break;
-				case BlendType::INV_DEST_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_ALPHA;
-					break;
-				case BlendType::SRC_ALPHA_SAT:
-					blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA_SAT;
-					break;
-				default:
+				switch (type)
+				{
+					case BlendType::ZERO:
+						return D3D12_BLEND_ZERO;
+					case BlendType::ONE:
+						return D3D12_BLEND_ONE;
+
+					case BlendType::SRC_COLOR:
+						return D3D12_BLEND_SRC_COLOR;
+					case BlendType::SRC_ALPHA:
+						return D3D12_BLEND_SRC_ALPHA;
+					case BlendType::SRC_ALPHA_SAT:
+						return D3D12_BLEND_SRC_ALPHA_SAT;
+					case BlendType::SRC1_COLOR:
+						return D3D12_BLEND_SRC1_COLOR;
+					case BlendType::SRC1_ALPHA:
+						return D3D12_BLEND_SRC1_ALPHA;
+
+					case BlendType::INV_SRC_COLOR:
+						return D3D12_BLEND_INV_SRC_COLOR;
+					case BlendType::INV_SRC_ALPHA:
+						return D3D12_BLEND_INV_SRC_ALPHA;
+
+					case BlendType::INV_SRC1_COLOR:
+						return D3D12_BLEND_INV_SRC1_COLOR;
+					case BlendType::INV_SRC1_ALPHA:
+						return D3D12_BLEND_INV_SRC1_ALPHA;
+
+					case BlendType::DEST_COLOR:
+						return D3D12_BLEND_DEST_COLOR;
+					case BlendType::DEST_ALPHA:
+						return D3D12_BLEND_DEST_ALPHA;
+
+					case BlendType::INV_DEST_COLOR:
+						return D3D12_BLEND_INV_DEST_COLOR;
+					case BlendType::INV_DEST_ALPHA:
+						return D3D12_BLEND_INV_DEST_ALPHA;
+
+					case BlendType::BLEND_FACTOR:
+						return D3D12_BLEND_BLEND_FACTOR;
+					case BlendType::INV_BLEND_FACTOR:
+						return D3D12_BLEND_INV_BLEND_FACTOR;
+
+					case BlendType::INVALID:
+						X_ERROR("Dx12", "Invalid blend type passed to render device");
+						return D3D12_BLEND_ZERO;
+
+					default:
 #if X_DEBUG
-					X_ASSERT_NOT_IMPLEMENTED();
+						X_ASSERT_NOT_IMPLEMENTED();
+						return D3D12_BLEND_ZERO;
 #else
-					X_NO_SWITCH_DEFAULT;
+						X_NO_SWITCH_DEFAULT;
 #endif // X_DEBUG
-			}
+				}
 
-			switch (blendState.srcBlendAlpha)
-			{
-				case BlendType::ZERO:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
-					break;
-				case BlendType::ONE:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
-					break;
-				case BlendType::DEST_COLOR:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-					break;
-				case BlendType::INV_DEST_COLOR:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-					break;
-				case BlendType::SRC_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA;
-					break;
-				case BlendType::INV_SRC_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-					break;
-				case BlendType::DEST_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-					break;
-				case BlendType::INV_DEST_ALPHA:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-					break;
-				case BlendType::SRC_ALPHA_SAT:
-					blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA_SAT;
-					break;
-				default:
-#if X_DEBUG
-					X_ASSERT_NOT_IMPLEMENTED();
-#else
-					X_NO_SWITCH_DEFAULT;
-#endif // X_DEBUG
-			}
-
-
-			switch (blendState.dstBlendColor)
-			{
-				case BlendType::ZERO:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
-					break;
-				case BlendType::ONE:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
-					break;
-				case BlendType::DEST_COLOR:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_COLOR;
-					break;
-				case BlendType::INV_DEST_COLOR:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_COLOR;
-					break;
-				case BlendType::SRC_ALPHA:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA;
-					break;
-				case BlendType::INV_SRC_ALPHA:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-					break;
-				case BlendType::DEST_ALPHA:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_ALPHA;
-					break;
-				case BlendType::INV_DEST_ALPHA:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_ALPHA;
-					break;
-				case BlendType::SRC_ALPHA_SAT:
-					blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA_SAT;
-					break;
-				default:
-#if X_DEBUG
-					X_ASSERT_NOT_IMPLEMENTED();
-#else
-					X_NO_SWITCH_DEFAULT;
-#endif // X_DEBUG
-			}
-
-			switch (blendState.dstBlendAlpha)
-			{
-				case BlendType::ZERO:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
-					break;
-				case BlendType::ONE:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
-					break;
-				case BlendType::DEST_COLOR:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-					break;
-				case BlendType::INV_DEST_COLOR:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-					break;
-				case BlendType::SRC_ALPHA:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
-					break;
-				case BlendType::INV_SRC_ALPHA:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
-					break;
-				case BlendType::DEST_ALPHA:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
-					break;
-				case BlendType::INV_DEST_ALPHA:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
-					break;
-				case BlendType::SRC_ALPHA_SAT:
-					blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA_SAT;
-					break;
-				default:
-#if X_DEBUG
-					X_ASSERT_NOT_IMPLEMENTED();
-#else
-					X_NO_SWITCH_DEFAULT;
-#endif // X_DEBUG
-			}
-
+			};
 
 			//Blending operation
 			auto bledOpResolve = [](BlendOp::Enum op) -> auto 
@@ -269,6 +179,11 @@ namespace
 
 				return blendOperation;
 			};
+
+			blendDesc.RenderTarget[0].SrcBlend = blendTypeResolve(blendState.srcBlendColor);
+			blendDesc.RenderTarget[0].SrcBlendAlpha = blendTypeResolve(blendState.srcBlendAlpha);
+			blendDesc.RenderTarget[0].DestBlend = blendTypeResolve(blendState.dstBlendColor);
+			blendDesc.RenderTarget[0].DestBlendAlpha = blendTypeResolve(blendState.dstBlendAlpha);
 
 			// todo: add separate alpha blend support for mrt
 			blendDesc.RenderTarget[0].BlendOp = bledOpResolve(blendState.colorOp);
