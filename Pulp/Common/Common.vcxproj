@@ -468,6 +468,7 @@
     <None Include="String\StringTable.inl" />
     <None Include="String\StringUtil.inl" />
     <None Include="String\StrRef.inl" />
+    <None Include="String\XParser.inl" />
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\FiberScheduler.inl" />

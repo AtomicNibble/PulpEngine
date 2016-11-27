@@ -1449,6 +1449,9 @@
     <None Include="CBuffer.inl">
       <Filter>Interfaces_h\Render</Filter>
     </None>
+    <None Include="String\XParser.inl">
+      <Filter>Headers\String</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

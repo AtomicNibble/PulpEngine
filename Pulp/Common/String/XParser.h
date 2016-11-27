@@ -50,12 +50,8 @@ public:
 	const int GetLineNumber(void);
 	bool isEOF(void) const;
 
-	X_INLINE void setFlags(LexFlags flags) {
-		flags_ = flags;
-	}
-	X_INLINE LexFlags getFlags(void) {
-		return flags_;
-	}
+	X_INLINE void setFlags(LexFlags flags);
+	X_INLINE LexFlags getFlags(void);
 
 private:
 	void Error(const char* str, ...);
@@ -103,6 +99,9 @@ private:
 	uint8_t macroCharCache[255];
 };
 
+
 X_NAMESPACE_END
+
+#include "XParser.inl"
 
 #endif // !X_STR_PARSER_H_
