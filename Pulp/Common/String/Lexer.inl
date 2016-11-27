@@ -68,6 +68,12 @@ bool XLexToken::isEqual(const char* str) const
 	return strUtil::IsEqual(start_, end_, str);
 }
 
+bool XLexToken::isEqual(const char* pBegin, const char* pEnd) const
+{
+	return strUtil::IsEqual(start_, end_, pBegin, pEnd);
+}
+
+
 double XLexToken::GetDoubleValue(void)
 {
 	if (type_ != TokenType::NUMBER) {

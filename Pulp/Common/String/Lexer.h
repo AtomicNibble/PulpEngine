@@ -166,6 +166,7 @@ public:
 	X_INLINE const char* end(void) const;
 
 	X_INLINE bool isEqual(const char* str) const;
+	X_INLINE bool isEqual(const char* pBegin, const char* pEnd) const;
 
 	X_INLINE double GetDoubleValue(void);				// double value of TT_NUMBER
 	X_INLINE float GetFloatValue(void);					// float value of TT_NUMBER
