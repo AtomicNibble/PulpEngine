@@ -194,7 +194,7 @@ int XParser::ParseInt()
 		ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER,
 			PunctuationId::UNUSET, token);
 
-		return -(safe_static_cast<signed int, int32_t>(token.GetIntValue()));
+		return -(safe_static_cast<int32_t>(token.GetIntValue()));
 	}
 	else if (token.GetType() != TokenType::NUMBER 
 		|| token.GetSubType() == TokenSubType::FLOAT) {
