@@ -28,6 +28,9 @@ struct MacroDefine
 class XParser
 {
 	typedef XLexer::LexFlags LexFlags;
+
+	static const int32_t MAX_DEFINEPARMS = 32;
+
 public:
 	explicit XParser(MemoryArenaBase* arena);
 	XParser(LexFlags flags, MemoryArenaBase* arena);

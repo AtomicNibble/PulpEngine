@@ -524,7 +524,6 @@ int	XParser::ReadLine(XLexToken& token)
 }
 
 
-static const int MAX_DEFINEPARMS = 32;
 
 int XParser::ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxparms)
 {
