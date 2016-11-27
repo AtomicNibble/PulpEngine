@@ -160,6 +160,15 @@ X_DECLARE_ENUM8(BlendOp)(
 	DISABLE // disables blend 
 );
 
+X_DECLARE_FLAGS8(WriteMask)(
+	RED,
+	GREEN,
+	BLUE,
+	ALPHA
+);
+
+typedef Flags8<WriteMask> WriteMaskFlags;
+
 struct BlendState
 {
 	BlendType::Enum srcBlendColor;
