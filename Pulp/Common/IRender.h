@@ -165,9 +165,11 @@ struct BlendState
 	BlendType::Enum dstBlendColor;
 	BlendType::Enum srcBlendAlpha;
 	BlendType::Enum dstBlendAlpha;
+	BlendOp::Enum colorOp;
+	BlendOp::Enum alphaOp;
 };
 
-X_ENSURE_SIZE(BlendState, 4);
+X_ENSURE_SIZE(BlendState, 6);
 
 
 X_DECLARE_ENUM8(TextureSlot)(
@@ -249,17 +251,20 @@ typedef Flags8<StateFlag> StateFlags;
 
 struct StateDesc
 {
+	// 8
 	StencilState stencil;
+	// 6
 	BlendState blend;
+	// 2
+	shader::VertexFormat::Enum vertexFmt;
+	bool _pad[1];
+
 	// 4
 	CullType::Enum cullType;
 	TopoType::Enum topo;
 	DepthFunc::Enum depthFunc;
 	StateFlags stateFlags;
 
-	BlendOp::Enum blendOp;
-	shader::VertexFormat::Enum vertexFmt;
-	bool _pad[2];
 };
 
 X_ENSURE_SIZE(StateDesc, 20);

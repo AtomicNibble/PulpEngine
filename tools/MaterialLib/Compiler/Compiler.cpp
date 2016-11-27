@@ -152,11 +152,13 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	stateDesc_.blend.dstBlendColor = Util::BlendTypeFromStr(pDstCol);
 	stateDesc_.blend.srcBlendAlpha = Util::BlendTypeFromStr(pSrcAlpha);
 	stateDesc_.blend.dstBlendAlpha = Util::BlendTypeFromStr(pDstAlpha);
+	stateDesc_.blend.colorOp = render::BlendOp::OP_ADD; // this can be fixed for now
+	stateDesc_.blend.alphaOp = render::BlendOp::OP_ADD; 
+
 	stateDesc_.cullType = Util::CullTypeFromStr(pCullFace);
 	stateDesc_.topo = render::TopoType::TRIANGLELIST;
 	stateDesc_.depthFunc = render::DepthFunc::ALWAYS;
 	stateDesc_.stateFlags.Clear();
-	stateDesc_.blendOp = render::BlendOp::OP_ADD; // this can be fixed for now
 
 	// a material should not be bound to a vertex fmt.
 	// but we it's part of the stateDesc.
