@@ -18,6 +18,7 @@ namespace Util
 	MATLIB_EXPORT render::CullType::Enum CullTypeFromStr(const char* pBegin, const char* pEnd);
 	MATLIB_EXPORT render::BlendType::Enum BlendTypeFromStr(const char* pBegin, const char* pEnd);
 	MATLIB_EXPORT render::BlendOp::Enum BlendOpFromStr(const char* pBegin, const char* pEnd);
+	MATLIB_EXPORT render::WriteMaskFlags WriteMaskFromStr(const char* pBegin, const char* pEnd);
 
 	MATLIB_EXPORT render::StencilOperation::Enum StencilOpFromStr(const char* pBegin, const char* pEnd);
 	MATLIB_EXPORT render::StencilFunc::Enum StencilFuncFromStr(const char* pBegin, const char* pEnd);

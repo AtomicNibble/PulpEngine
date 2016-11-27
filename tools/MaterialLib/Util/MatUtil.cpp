@@ -390,6 +390,49 @@ namespace Util
 	}
 
 
+	render::WriteMaskFlags WriteMaskFromStr(const char* pBegin, const char* pEnd)
+	{
+		// "rgba"
+		render::WriteMaskFlags mask;
+
+		const size_t len = (pEnd - pBegin);
+		if (len > 4) {
+			X_ERROR("Mtl", "Write mask exceeds max length of 4. len: %" PRIuS, len);
+			return mask;
+		}
+
+		for (size_t i = 0; i < len; i++)
+		{
+			const char c = pBegin[i];
+
+			switch (c)
+			{
+				case 'r':
+				case 'R':
+					mask.Set(render::WriteMask::RED);
+					break;
+				case 'g':
+				case 'G':
+					mask.Set(render::WriteMask::GREEN);
+					break;
+				case 'b':
+				case 'B':
+					mask.Set(render::WriteMask::BLUE);
+					break;
+				case 'a':
+				case 'A':
+					mask.Set(render::WriteMask::ALPHA);
+					break;
+
+				default:
+					X_ERROR("Mtl", "Unknown wrtie mask: '%c'", c);
+					break;
+			}
+		}
+
+		return mask;
+	}
+
 	render::StencilOperation::Enum StencilOpFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
