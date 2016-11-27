@@ -204,13 +204,27 @@ bool XParser::ParseBool()
 {
 	XLexToken token;
 
-	if (!ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET, 
-		PunctuationId::UNUSET, token)) 
-	{
-		Error("couldn't read expected boolean");
+	if (!ReadToken(token)) {
+		Error("couldn't read expected bool");
 		return false;
 	}
-	return (token.GetIntValue() != 0);
+
+	if (token.GetType() == TokenType::NUMBER)
+	{
+		return (token.GetIntValue() != 0);
+	}
+	else if (token.GetType() == TokenType::NAME)
+	{
+		if (token.isEqual("true")) {
+			return true;
+		}
+		else if (token.isEqual("false")) {
+			return false;
+		}
+	}
+
+	Error("couldn't read expected boolean");
+	return false;
 }
 
 
