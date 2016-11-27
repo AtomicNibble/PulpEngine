@@ -56,15 +56,36 @@ namespace
 		if (state.stateFlags.IsSet(StateFlag::BLEND))
 		{
 			blendDesc.RenderTarget[0].BlendEnable = TRUE;
-			// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
-			blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-
 			blendDesc.RenderTarget[0].LogicOpEnable = FALSE;
 			blendDesc.RenderTarget[0].LogicOp = D3D12_LOGIC_OP_NOOP;
 
 
-
 			const auto blendState = state.blend;
+
+			// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
+			blendDesc.RenderTarget[0].RenderTargetWriteMask = 0;
+
+			const WriteMaskFlags fullMask(WriteMask::RED | WriteMask::GREEN | WriteMask::BLUE | WriteMask::ALPHA);
+
+			if (blendState.writeMask.ToInt() == fullMask.ToInt())
+			{
+				blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+			}
+			else
+			{
+				if (blendState.writeMask.IsSet(WriteMask::RED)) {
+					blendDesc.RenderTarget[0].RenderTargetWriteMask |= D3D12_COLOR_WRITE_ENABLE_RED;
+				}
+				if (blendState.writeMask.IsSet(WriteMask::GREEN)) {
+					blendDesc.RenderTarget[0].RenderTargetWriteMask |= D3D12_COLOR_WRITE_ENABLE_GREEN;
+				}
+				if (blendState.writeMask.IsSet(WriteMask::BLUE)) {
+					blendDesc.RenderTarget[0].RenderTargetWriteMask |= D3D12_COLOR_WRITE_ENABLE_BLUE;
+				}
+				if (blendState.writeMask.IsSet(WriteMask::ALPHA)) {
+					blendDesc.RenderTarget[0].RenderTargetWriteMask |= D3D12_COLOR_WRITE_ENABLE_ALPHA;
+				}
+			}
 
 			switch (blendState.srcBlendColor)
 			{
