@@ -394,6 +394,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="MatLib.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TechDefs\TechDefs.h" />
     <ClInclude Include="Util\MatUtil.h" />
   </ItemGroup>
   <ItemGroup>
@@ -415,6 +416,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TechDefs\TechDefs.cpp" />
     <ClCompile Include="Util\MatUtil.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -30,6 +30,12 @@
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{bce20ef8-909b-4b53-ab96-2abc8123580e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\TechDefs">
+      <UniqueIdentifier>{5a1c522e-fbaa-451d-ae91-a2c314501766}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\TechDefs">
+      <UniqueIdentifier>{d0733c18-a748-452c-9f72-aff2a2fdb97f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -50,6 +56,9 @@
     <ClInclude Include="MatLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TechDefs\TechDefs.h">
+      <Filter>Header Files\TechDefs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -69,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TechDefs\TechDefs.cpp">
+      <Filter>Source Files\TechDefs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
