@@ -15,7 +15,8 @@ X_NAMESPACE_BEGIN(engine)
 	TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
 		arena_(arena),
 		blendStates_(arena, 32),
-		stencilStates_(arena, 16)
+		stencilStates_(arena, 16),
+		states_(arena, 16)
 	{
 
 	}
@@ -76,14 +77,16 @@ X_NAMESPACE_BEGIN(engine)
 			}
 			else if (token.isEqual("State"))
 			{
-				parseBlendState(lex);
+				if (!parseState(lex)) {
+					X_ERROR("TestDefs", "Failed to parse State");
+					return false;
+				}
 			}
 			else
 			{
 				X_ERROR("TestDefs", "Unexpected token \"%.*s\" Line: %" PRId32, token.length(), token.begin(), lex.GetLineNumber());
 				return false;
 			}
-
 		}
 
 		if (!lex.isEOF()) {
@@ -96,14 +99,10 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::parseBlendState(core::XParser& lex)
 	{
-		core::string name;
+		core::string name, parentName;
 
 		// we have the name.
-		if (!parseName(lex, name)) {
-			return false;
-		}
-
-		if (!lex.ExpectTokenString("{")) {
+		if (!parseName(lex, name, parentName)) {
 			return false;
 		}
 
@@ -111,8 +110,16 @@ X_NAMESPACE_BEGIN(engine)
 			return false;
 		}
 
-		BlendState& blend = addBlendState(name);
-		auto& state = blend.state;
+		render::BlendState& blend = addBlendState(name, parentName);
+
+		return parseBlendStateData(lex, blend);
+	}
+
+	bool TechSetDefs::parseBlendStateData(core::XParser& lex, render::BlendState& blend)
+	{
+		if (!lex.ExpectTokenString("{")) {
+			return false;
+		}
 
 		// parse all the values.
 		core::XLexToken token;
@@ -127,37 +134,37 @@ X_NAMESPACE_BEGIN(engine)
 			switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 			{
 				case "colorBlendFunc"_fnv1a:
-					if (!parseBlendOp(lex, state.colorOp)) {
+					if (!parseBlendOp(lex, blend.colorOp)) {
 						return false;
 					}
 					break;
 				case "colorBlendSrc"_fnv1a:
-					if (!parseBlendType(lex, state.srcBlendColor)) {
+					if (!parseBlendType(lex, blend.srcBlendColor)) {
 						return false;
 					}
 					break;
 				case "colorBlendDst"_fnv1a:
-					if (!parseBlendType(lex, state.dstBlendColor)) {
+					if (!parseBlendType(lex, blend.dstBlendColor)) {
 						return false;
 					}
 					break;
 				case "alphaBlendFunc"_fnv1a:
-					if (!parseBlendOp(lex, state.alphaOp)) {
+					if (!parseBlendOp(lex, blend.alphaOp)) {
 						return false;
 					}
 					break;
 				case "alphaBlendSrc"_fnv1a:
-					if (!parseBlendType(lex, state.srcBlendAlpha)) {
+					if (!parseBlendType(lex, blend.srcBlendAlpha)) {
 						return false;
 					}
 					break;
 				case "alphaBlendDst"_fnv1a:
-					if (!parseBlendType(lex, state.dstBlendAlpha)) {
+					if (!parseBlendType(lex, blend.dstBlendAlpha)) {
 						return false;
 					}
 					break;
 				case "writeChannels"_fnv1a:
-					if (!parseWriteChannels(lex, state.writeMask)) {
+					if (!parseWriteChannels(lex, blend.writeMask)) {
 						return false;
 					}
 					break;
@@ -240,14 +247,10 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::parseStencilState(core::XParser& lex)
 	{
-		core::string name;
+		core::string name, parentName;
 
 		// we have the name.
-		if (!parseName(lex, name)) {
-			return false;
-		}
-
-		if (!lex.ExpectTokenString("{")) {
+		if (!parseName(lex, name, parentName)) {
 			return false;
 		}
 
@@ -255,8 +258,18 @@ X_NAMESPACE_BEGIN(engine)
 			return false;
 		}
 
-		StencilState& stencil = addStencilState(name);
+		StencilState& stencil = addStencilState(name, parentName);
+
+		return parseStencilStateData(lex, stencil);
+	}
+
+	bool TechSetDefs::parseStencilStateData(core::XParser& lex, StencilState& stencil)
+	{
 		auto& state = stencil.state;
+
+		if (!lex.ExpectTokenString("{")) {
+			return false;
+		}
 
 		core::XLexToken token;
 		while (lex.ReadToken(token))
@@ -345,6 +358,242 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
+	// ----------------------------------------------------
+
+	bool TechSetDefs::parseState(core::XParser& lex)
+	{
+		core::string name, parentName;
+
+		// we have the name.
+		if (!parseName(lex, name, parentName)) {
+			return false;
+		}
+
+		if (!lex.ExpectTokenString("{")) {
+			return false;
+		}
+
+		if (stateExsists(name)) {
+			return false;
+		}
+
+		auto& state = addState(name, parentName);
+
+		core::XLexToken token;
+		while (lex.ReadToken(token))
+		{
+			if (token.isEqual("}")) {
+				return true;
+			}
+
+			using namespace core::Hash::Fnva1Literals;
+
+			switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+			{
+				// anything that is not Stencil or blend.
+				case "stencilFront"_fnv1a:
+				{
+					StencilState stencil;
+					if (!parseStencilState(lex, stencil)) {
+						return false;
+					}
+
+					state.stencil.front = stencil.state;
+					if (stencil.enabled) {
+						state.stateFlags.Set(render::StateFlag::STENCIL);
+					}
+					break;
+				}
+				case "stencilBack"_fnv1a:
+				{
+					StencilState stencil;
+					if (!parseStencilState(lex, stencil)) {
+						return false;
+					}
+
+					state.stencil.back = stencil.state;
+					if (stencil.enabled) {
+						state.stateFlags.Set(render::StateFlag::STENCIL);
+					}
+					break;
+				}
+				case "stencilRef"_fnv1a:
+
+					break;
+				case "blendState0"_fnv1a:
+					if (!parseBlendState(lex, state.blend)) {
+						return false;
+					}
+					break;
+				case "cull"_fnv1a:
+					if (!parseCullMode(lex, state.cullType)) {
+						return false;
+					}
+					break;
+				case "depthWrite"_fnv1a:
+				{
+					bool depthWrite = false;
+					if (!parseBool(lex, depthWrite)) {
+						return false;
+					}
+
+					if (depthWrite) {
+						state.stateFlags.Set(render::StateFlag::DEPTHWRITE);
+					}
+					break;
+				}
+				case "depthTest"_fnv1a:
+					if (!parseDepthTest(lex, state.depthFunc)) {
+						return false;
+					}
+					break;
+				case "polygonOffset"_fnv1a:
+
+					break;
+
+				default:
+					X_ERROR("TechDef", "Unknown state prop: \"%.*s\"", token.length(), token.begin());
+					return false;
+			}
+		}
+
+		// failed to read token
+		return false;
+	}
+
+	bool TechSetDefs::parseBlendState(core::XParser& lex, render::BlendState& blendState)
+	{
+		// this can eitehr be a string or inline define of new state.
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() == core::TokenType::NAME) 
+		{
+			// inline declare.
+			if (!lex.ExpectTokenString("BlendState")) {
+				return false;
+			}
+
+			// got ()
+			if (!lex.ExpectTokenString("(")) {
+				return false;
+			}
+			if (!lex.ExpectTokenString(")")) {
+				return false;
+			}
+
+			// parse the inline state.
+			if (!parseBlendStateData(lex, blendState)) {
+				return false;
+			}
+		}
+		else if (token.GetType() == core::TokenType::STRING)
+		{
+			// a predefined one
+			core::string name(token.begin(), token.end());
+
+			if (blendStateExsists(name, &blendState)) {
+				return true;
+			}
+
+			X_ERROR("TechDef", "State uses undefined blendstate: \"%s\" Line: %" PRIi32, name.c_str(), lex.GetLineNumber());
+		}
+
+		return false;
+	}
+
+	bool TechSetDefs::parseStencilState(core::XParser& lex, StencilState& stencilstate)
+	{
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() == core::TokenType::NAME)
+		{
+			// inline declare.
+			if (!lex.ExpectTokenString("StencilState")) {
+				return false;
+			}
+
+			// got ()
+			if (!lex.ExpectTokenString("(")) {
+				return false;
+			}
+			if (!lex.ExpectTokenString(")")) {
+				return false;
+			}
+
+			// parse the inline state.
+			if (!parseStencilStateData(lex, stencilstate)) {
+				return false;
+			}
+		}
+		else if (token.GetType() == core::TokenType::STRING)
+		{
+			// a predefined one
+			core::string name(token.begin(), token.end());
+
+			if (stencilStateExsists(name, &stencilstate)) {
+				return true;
+			}
+
+			X_ERROR("TechDef", "State uses undefined StencilState: \"%s\" Line: %" PRIi32, name.c_str(), lex.GetLineNumber());
+		}
+
+		return false;
+	}
+
+	bool TechSetDefs::parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut)
+	{
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NAME) {
+			X_ERROR("TestDefs", "Expected name token for cullMode. Line: %" PRIi32, lex.GetLineNumber());
+			return false;
+		}
+
+		cullOut = engine::Util::CullTypeFromStr(token.begin(), token.end());
+		return true;
+	}
+
+	bool TechSetDefs::parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& depthFuncOut)
+	{
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NAME) {
+			X_ERROR("TestDefs", "Expected name token for depthFunc. Line: %" PRIi32, lex.GetLineNumber());
+			return false;
+		}
+
+		depthFuncOut = engine::Util::DepthFuncFromStr(token.begin(), token.end());
+		return true;
+	}
+
 
 	// ----------------------------------------------------
 
@@ -358,7 +607,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseName(core::XParser& lex, core::string& name)
+	bool TechSetDefs::parseName(core::XParser& lex, core::string& name, core::string& parentName)
 	{
 		if (!lex.ExpectTokenString("(")) {
 			return false;
@@ -380,32 +629,136 @@ X_NAMESPACE_BEGIN(engine)
 			return false;
 		}
 
+		// look for parent name.
+		parentName.clear();
+
+		if (lex.ReadToken(token))
+		{
+			if (!token.isEqual(":"))
+			{
+				lex.UnreadToken(token);
+			}
+			else
+			{
+				// got a parent name.
+				if (!lex.ReadToken(token)) {
+					X_ERROR("TestDefs", "Failed to read parent name. Line: %" PRIi32, lex.GetLineNumber());
+					return false;
+				}
+
+				if (token.GetType() != core::TokenType::STRING) {
+					X_ERROR("TestDefs", "Expected string token for parent name. Line: %" PRIi32, lex.GetLineNumber());
+					return false;
+				}
+
+				parentName = core::string(token.begin(), token.end());
+			}
+		}
+
 		return true;
 	}
 
-	bool TechSetDefs::blendStateExsists(const core::string& name)
+	bool TechSetDefs::blendStateExsists(const core::string& name, render::BlendState* pBlendOut)
 	{
-		return blendStates_.find(name) != blendStates_.end();
+		auto it = blendStates_.find(name);
+		if (it != blendStates_.end()) {
+			if (pBlendOut) {
+				*pBlendOut = it->second;
+			}
+			return true;
+		}
+
+		return false;
 	}
 
-	bool TechSetDefs::stencilStateExsists(const core::string& name)
+	bool TechSetDefs::stencilStateExsists(const core::string& name, StencilState* pStencilOut)
 	{
-		return stencilStates_.find(name) != stencilStates_.end();
+		auto it = stencilStates_.find(name);
+		if (it != stencilStates_.end()) {
+			if (pStencilOut) {
+				*pStencilOut = it->second;
+			}
+			return true;
+		}
+
+		return false;
 	}
 
-
-	BlendState& TechSetDefs::addBlendState(const core::string& name)
+	bool TechSetDefs::stateExsists(const core::string& name)
 	{
-		blendStates_.insert(std::make_pair(name, BlendState()));
+		return states_.find(name) != states_.end();
+	}
+
+	render::BlendState& TechSetDefs::addBlendState(const core::string& name, const core::string& parentName)
+	{
+		if (!parentName.isEmpty())
+		{
+			auto it = blendStates_.find(parentName);
+			if (it != blendStates_.end())
+			{
+				blendStates_.insert(std::make_pair(name, it->second));
+			}
+			else
+			{
+				X_ERROR("TestDef", "Unknown parent blend state: \"%s\"", parentName.c_str());
+				goto insert_default;
+			}
+		}
+		else
+		{
+		insert_default:
+			blendStates_.insert(std::make_pair(name, render::BlendState()));
+		}
 
 		return blendStates_[name];
 	}
 
-	StencilState& TechSetDefs::addStencilState(const core::string& name)
+	StencilState& TechSetDefs::addStencilState(const core::string& name, const core::string& parentName)
 	{
-		stencilStates_.insert(std::make_pair(name, StencilState()));
+		if (!parentName.isEmpty())
+		{
+			auto it = stencilStates_.find(parentName);
+			if (it != stencilStates_.end())
+			{
+				stencilStates_.insert(std::make_pair(name, it->second));
+			}
+			else
+			{
+				X_ERROR("TestDef", "Unknown parent stencil state: \"%s\"", parentName.c_str());
+				goto insert_default;
+			}
+		}
+		else
+		{
+		insert_default:
+			stencilStates_.insert(std::make_pair(name, StencilState()));
+		}
 
 		return stencilStates_[name];
+	}
+
+	render::StateDesc& TechSetDefs::addState(const core::string& name, const core::string& parentName)
+	{
+		if (!parentName.isEmpty())
+		{
+			auto it = states_.find(parentName);
+			if (it != states_.end())
+			{
+				states_.insert(std::make_pair(name, it->second));
+			}
+			else
+			{
+				X_ERROR("TestDef", "Unknown parent state: \"%s\"", parentName.c_str());
+				goto insert_default;
+			}
+		}
+		else
+		{
+		insert_default:
+			states_.insert(std::make_pair(name, render::StateDesc()));
+		}
+
+		return states_[name];
 	}
 
 X_NAMESPACE_END

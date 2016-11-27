@@ -21,11 +21,6 @@ X_NAMESPACE_BEGIN(engine)
 	//
 	//
 
-	struct BlendState
-	{
-		render::BlendState state;
-
-	};
 
 	struct StencilState
 	{
@@ -33,12 +28,11 @@ X_NAMESPACE_BEGIN(engine)
 		bool enabled;
 	};
 
-
-
 	class TechSetDefs
 	{
-		typedef core::HashMap<core::string, BlendState> BlendStatesArr;
-		typedef core::HashMap<core::string, StencilState> StencilStatesArr;
+		typedef core::HashMap<core::string, render::BlendState> BlendStatesMap;
+		typedef core::HashMap<core::string, StencilState> StencilStatesMap;
+		typedef core::HashMap<core::string, render::StateDesc> StatesMap;
 
 		typedef core::Array<char> FileBuf;
 
@@ -53,30 +47,42 @@ X_NAMESPACE_BEGIN(engine)
 		
 		// blend
 		bool parseBlendState(core::XParser& lex);
+		bool parseBlendStateData(core::XParser& lex, render::BlendState& blend);
 		bool parseBlendType(core::XParser& lex, render::BlendType::Enum& blendTypeOut);
 		bool parseBlendOp(core::XParser& lex, render::BlendOp::Enum& blendOpOut);
 		bool parseWriteChannels(core::XParser& lex, render::WriteMaskFlags& channels);
 
 		// stencil
 		bool parseStencilState(core::XParser& lex);
+		bool parseStencilStateData(core::XParser& lex, StencilState& stencil);
 		bool parseStencilFunc(core::XParser& lex, render::StencilFunc::Enum& funcOut);
 		bool parseStencilOp(core::XParser& lex, render::StencilOperation::Enum& opOut);
 
+		// State
+		bool parseState(core::XParser& lex);
+		bool parseBlendState(core::XParser& lex, render::BlendState& blendState);
+		bool parseStencilState(core::XParser& lex, StencilState& stencilstate);
+		bool parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut);
+		bool parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& depthFuncOut);
+
+
 		bool parseBool(core::XParser& lex, bool& out);
-		bool parseName(core::XParser& lex, core::string& name);
+		bool parseName(core::XParser& lex, core::string& name, core::string& parentName);
 
-		bool blendStateExsists(const core::string& name);
-		bool stencilStateExsists(const core::string& name);
+		bool blendStateExsists(const core::string& name, render::BlendState* pBlendOut = nullptr);
+		bool stencilStateExsists(const core::string& name, StencilState* pStencilOut = nullptr);
+		bool stateExsists(const core::string& name);
 
-		BlendState& addBlendState(const core::string& name);
-		StencilState& addStencilState(const core::string& name);
+		render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
+		StencilState& addStencilState(const core::string& name, const core::string& parentName);
+		render::StateDesc& addState(const core::string& name, const core::string& parentName);
 
 	private:
 		core::MemoryArenaBase* arena_;
 
-		BlendStatesArr blendStates_;
-		StencilStatesArr stencilStates_;
-
+		BlendStatesMap blendStates_;
+		StencilStatesMap stencilStates_;
+		StatesMap states_;
 	};
 
 
