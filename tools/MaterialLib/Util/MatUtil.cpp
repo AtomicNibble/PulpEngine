@@ -8,13 +8,14 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace Util
 {
-	MaterialMountType::Enum MatMountTypeFromStr(const char* str)
+	MaterialMountType::Enum MatMountTypeFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(MaterialMountType::ENUM_COUNT == 6, "Added additional material mount types? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "none"_fnv1a:
 			case "<none>"_fnv1a:
@@ -31,18 +32,19 @@ namespace Util
 				return MaterialMountType::CLIMBPIPE;
 
 			default:
-				X_ERROR("Mtl", "Unknown material mount type: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown material mount type: '%.*s' (case-sen)", len, pBegin);
 				return MaterialMountType::NONE;
 		}
 	}
 
-	MaterialCat::Enum MatCatFromStr(const char* str)
+	MaterialCat::Enum MatCatFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(MaterialCat::ENUM_COUNT == 9, "Added additional material cats? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "geo"_fnv1a:
 				return MaterialCat::GEO;
@@ -62,16 +64,16 @@ namespace Util
 				return MaterialCat::EFFECT;
 
 			default:
-				X_ERROR("Mtl", "Unknown material cat: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown material cat: '%.*s' (case-sen)", len, pBegin);
 				return MaterialCat::UNKNOWN;
 		}
 	}
 
-	MaterialUsage::Enum MatUsageFromStr(const char* str)
+	MaterialUsage::Enum MatUsageFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		core::StackString<96, char> strUpper(str);
+		core::StackString<96, char> strUpper(pBegin, pEnd);
 		strUpper.toLower();
 
 		static_assert(MaterialUsage::ENUM_COUNT == 14, "Added additional material usage? this code needs updating.");
@@ -109,17 +111,17 @@ namespace Util
 				return MaterialUsage::DECAL;
 
 			default:
-				X_ERROR("Mtl", "Unknown material usage: '%s'", str);
+				X_ERROR("Mtl", "Unknown material usage: '%.*s'", strUpper.length(), pBegin);
 				return MaterialUsage::NONE;
 		}
 	}
 
 
-	MaterialSurType::Enum MatSurfaceTypeFromStr(const char* str)
+	MaterialSurType::Enum MatSurfaceTypeFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		core::StackString<96, char> strUpper(str);
+		core::StackString<96, char> strUpper(pBegin, pEnd);
 		strUpper.toLower();
 
 		static_assert(MaterialSurType::ENUM_COUNT == 26, "Added additional surface types? this code needs updating.");
@@ -191,18 +193,19 @@ namespace Util
 				return MaterialSurType::WATER;
 
 			default:
-				X_ERROR("Mtl", "Unknown material surface type: '%s'", str);
+				X_ERROR("Mtl", "Unknown material surface type: '%.*s'", strUpper.length(), pBegin);
 				return MaterialSurType::NONE;
 		}
 	}
 
-	MaterialPolygonOffset::Enum MatPolyOffsetFromStr(const char* str)
+	MaterialPolygonOffset::Enum MatPolyOffsetFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(MaterialPolygonOffset::ENUM_COUNT == 3, "Added additional polyoffsets? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "none"_fnv1a:
 			case "<none>"_fnv1a:
@@ -213,18 +216,19 @@ namespace Util
 				return MaterialPolygonOffset::WEAPON_IMPACT;
 
 			default:
-				X_ERROR("Mtl", "Unknown poly offset: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown poly offset: '%.*s' (case-sen)", len, pBegin);
 				return MaterialPolygonOffset::NONE;
 		}
 	}
 
-	render::FilterType::Enum FilterTypeFromStr(const char* str)
+	render::FilterType::Enum FilterTypeFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::FilterType::ENUM_COUNT == 10, "Added additional filter types? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "nearest (mip none)"_fnv1a:
 				return render::FilterType::NEAREST_MIP_NONE;
@@ -250,18 +254,19 @@ namespace Util
 				return render::FilterType::ANISOTROPIC_X16;
 
 			default:
-				X_ERROR("Mtl", "Unknown filter type: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown filter type: '%.*s' (case-sen)", len, pBegin);
 				return render::FilterType::NEAREST_MIP_NEAREST;
 		}
 	}
 
-	render::TexRepeat::Enum TexRepeatFromStr(const char* str)
+	render::TexRepeat::Enum TexRepeatFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::TexRepeat::ENUM_COUNT == 4, "Added additional repeat types? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "no tile"_fnv1a:
 				return render::TexRepeat::NO_TILE;
@@ -273,18 +278,19 @@ namespace Util
 				return render::TexRepeat::TILE_VERT;
 
 			default:
-				X_ERROR("Mtl", "Unknown tex repeat: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown tex repeat: '%.*s' (case-sen)", len, pBegin);
 				return render::TexRepeat::TILE_BOTH;
 		}
 	}
 
-	render::CullType::Enum CullTypeFromStr(const char* str)
+	render::CullType::Enum CullTypeFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::CullType::ENUM_COUNT == 3, "Added additional cull types? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "back"_fnv1a:
 				return render::CullType::BACK_SIDED;
@@ -294,18 +300,19 @@ namespace Util
 				return render::CullType::NONE;
 
 			default:
-				X_ERROR("Mtl", "Unknown cull type: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown cull type: '%.*s' (case-sen)", len, pBegin);
 				return render::CullType::BACK_SIDED;
 		}
 	}
 
-	render::BlendType::Enum BlendTypeFromStr(const char* str)
+	render::BlendType::Enum BlendTypeFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::BlendType::ENUM_COUNT == 18, "Added additional blend types? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "zero"_fnv1a:
 				return render::BlendType::ZERO;
@@ -345,18 +352,19 @@ namespace Util
 
 
 			default:
-				X_ERROR("Mtl", "Unknown blend type: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown blend type: '%.*s' (case-sen)", len, pBegin);
 				return render::BlendType::INVALID;
 		}
 	}
 
-	render::BlendOp::Enum BlendOpFromStr(const char* str)
+	render::BlendOp::Enum BlendOpFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::BlendOp::ENUM_COUNT == 5, "Added additional blend op? this code needs updating.");
-
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "add"_fnv1a:
 				return render::BlendOp::OP_ADD;
@@ -370,19 +378,20 @@ namespace Util
 				return render::BlendOp::OP_MAX;
 
 			default:
-				X_ERROR("Mtl", "Unknown blend op: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown blend op: '%.*s' (case-sen)", len, pBegin);
 				return render::BlendOp ::OP_ADD;
 		}
 	}
 
 
-	render::StencilOperation::Enum StencilOpFromStr(const char* str)
+	render::StencilOperation::Enum StencilOpFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::StencilOperation::ENUM_COUNT == 8, "Added additional stencil op types? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "keep"_fnv1a:
 				return render::StencilOperation::KEEP;
@@ -402,18 +411,19 @@ namespace Util
 				return render::StencilOperation::DECR;
 
 			default:
-				X_ERROR("Mtl", "Unknown stencil op: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown stencil op: '%.*s' (case-sen)", len, pBegin);
 				return render::StencilOperation::KEEP;
 		}
 	}
 
-	render::StencilFunc::Enum StencilFuncFromStr(const char* str)
+	render::StencilFunc::Enum StencilFuncFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
 		static_assert(render::StencilFunc::ENUM_COUNT == 8, "Added additional stencil funcs? this code needs updating.");
 
-		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "never"_fnv1a:
 				return render::StencilFunc::NEVER;
@@ -433,7 +443,7 @@ namespace Util
 				return render::StencilFunc::ALWAYS;
 
 			default:
-				X_ERROR("Mtl", "Unknown stencil func: '%s' (case-sen)", str);
+				X_ERROR("Mtl", "Unknown stencil func: '%.*s' (case-sen)", len, pBegin);
 				return render::StencilFunc::ALWAYS;
 		}
 	}

@@ -75,5 +75,8 @@
     <None Include="Material.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="MatUtil.inl">
+      <Filter>Header Files\Util</Filter>
+    </None>
   </ItemGroup>
 </Project>
