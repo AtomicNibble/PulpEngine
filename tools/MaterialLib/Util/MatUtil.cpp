@@ -446,6 +446,7 @@ namespace Util
 		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
 			case "lequal"_fnv1a:
+			case "less_equal"_fnv1a:
 				return render::DepthFunc::LEQUAL;
 			case "equal"_fnv1a:
 				return render::DepthFunc::EQUAL;
@@ -454,8 +455,10 @@ namespace Util
 			case "less"_fnv1a:
 				return render::DepthFunc::LESS;
 			case "gequal"_fnv1a:
+			case "greater_equal"_fnv1a:
 				return render::DepthFunc::GEQUAL;
 			case "notequal"_fnv1a:
+			case "not_equal"_fnv1a:
 				return render::DepthFunc::NOTEQUAL;
 			case "always"_fnv1a:
 				return render::DepthFunc::ALWAYS;
