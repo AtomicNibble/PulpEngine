@@ -31,9 +31,9 @@ X_NAMESPACE_BEGIN(engine)
 		bool enabled;
 	};
 
-
 	struct Shader
 	{
+
 		core::string source;
 		core::string entry;
 		core::string defines;
@@ -115,6 +115,7 @@ X_NAMESPACE_BEGIN(engine)
 		 
 		bool parseBool(core::XParser& lex, bool& out);
 		bool parseString(core::XParser& lex, core::string& out);
+		bool parseDefines(core::XParser& lex, core::string& out);
 		bool parseName(core::XParser& lex, core::string& name, core::string& parentName);
 
 		template <typename T>

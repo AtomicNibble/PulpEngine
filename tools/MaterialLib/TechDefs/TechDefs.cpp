@@ -703,7 +703,7 @@ X_NAMESPACE_BEGIN(engine)
 					}
 					break;
 				case "defines"_fnv1a:
-					if (!parseString(lex, shader.defines)) {
+					if (!parseDefines(lex, shader.defines)) {
 						return false;
 					}
 					break;
@@ -773,7 +773,7 @@ X_NAMESPACE_BEGIN(engine)
 					}
 					break;
 				case "defines"_fnv1a:
-					if (!parseString(lex, tech.defines)) {
+					if (!parseDefines(lex, tech.defines)) {
 						return false;
 					}
 					break;
@@ -883,6 +883,72 @@ X_NAMESPACE_BEGIN(engine)
 		else if (punc == core::PunctuationId::ADD_ASSIGN)
 		{
 			out += core::string(token.begin(), token.end());
+		}
+		else
+		{
+			X_ASSERT_UNREACHABLE();
+		}
+
+		return true;
+	}
+
+
+	bool TechSetDefs::parseDefines(core::XParser& lex, core::string& out)
+	{
+		core::XLexToken token;
+		if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
+			core::TokenSubType::UNUSET, core::PunctuationId::UNUSET, token)) {
+			return false;
+		}
+
+		const auto punc = token.GetPuncId();
+		if (punc != core::PunctuationId::ASSIGN && token.GetPuncId() != core::PunctuationId::ADD_ASSIGN) {
+			X_ERROR("TechDef", "Expected assign or add assign. Line: %" PRIi32, lex.GetLineNumber());
+			return false;
+		}
+
+		if (!lex.ExpectTokenType(core::TokenType::STRING,
+			core::TokenSubType::UNUSET, core::PunctuationId::UNUSET, token)) {
+			return false;
+		}
+
+		// support multiple common delmie.
+		core::string value(token.begin(), token.end());
+
+		while (1)
+		{
+			if (!lex.ReadToken(token)) {
+				break; // don't assume always more to read.
+			}
+
+			if (token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::COMMA)
+			{
+				// another string.
+				if (!lex.ReadToken(token)) {
+					return false;
+				}
+
+				value += ",";
+				value += core::string(token.begin(), token.end());
+			}
+			else
+			{
+				lex.UnreadToken(token);
+				break;
+			}
+		}
+
+
+		if (punc == core::PunctuationId::ASSIGN)
+		{
+			out = value;
+		}
+		else if (punc == core::PunctuationId::ADD_ASSIGN)
+		{
+			if (out.isNotEmpty()) {
+				out += ",";
+			}
+			out += value;
 		}
 		else
 		{
