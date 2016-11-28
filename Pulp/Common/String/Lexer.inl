@@ -3,11 +3,8 @@
 X_NAMESPACE_BEGIN(core)
 
 XLexToken::XLexToken() :
-start_(nullptr), 
-end_(nullptr), 
-pNext_(nullptr)
+	XLexToken(nullptr, nullptr)
 { 
-	Init(); 
 }
 
 XLexToken::XLexToken(const char* start, const char* end) :
@@ -18,7 +15,7 @@ pNext_(nullptr)
 	Init(); 
 }
 
-size_t XLexToken::length() const
+size_t XLexToken::length(void) const
 { 
 	return end_ - start_; 
 }
@@ -38,7 +35,7 @@ PunctuationId::Enum XLexToken::GetPuncId(void) const
 	return puncId_;
 }
 
-int XLexToken::GetLine(void) const
+int32_t XLexToken::GetLine(void) const
 {
 	return line_;
 }
@@ -53,12 +50,12 @@ void XLexToken::SetSubType(TokenSubTypeFlags subType)
 	subtype_ = subType;
 }
 
-const char* XLexToken::begin() const
+const char* XLexToken::begin(void) const
 { 
 	return start_; 
 }
 
-const char* XLexToken::end() const
+const char* XLexToken::end(void) const
 { 
 	return end_;
 }
@@ -119,7 +116,7 @@ void XLexToken::Init(void)
 {
 	line_ = -1;
 	linesCrossed_ = -1;
-	flags_ = 0;
+//	flags_ = 0;
 
 	intvalue_ = 0;
 	floatvalue_ = 0.f;
@@ -150,11 +147,6 @@ const XLexToken* XLexToken::GetNext(void) const
 }
 
 // ------------------------------------------
-
-XLexer::XLexer()
-{
-
-}
 
 bool XLexer::isEOF(void) const
 {
@@ -193,7 +185,7 @@ XLexer::ErrorState::Enum XLexer::GetErrorState(void) const
 }
 
 
-int XLexer::CheckString(const char *str) const 
+int32_t XLexer::CheckString(const char *str) const 
 {
 	int i;
 
@@ -205,7 +197,7 @@ int XLexer::CheckString(const char *str) const
 	return true;
 }
 
-const int XLexer::GetLineNumber(void) const
+const int32_t XLexer::GetLineNumber(void) const
 {
 	return curLine_;
 }

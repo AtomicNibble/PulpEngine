@@ -1,32 +1,21 @@
 #include "EngineCommon.h"
 #include "XParser.h"
 
-
 #include <Hashing\Fnva1Hash.h>
-
 #include <Logging\LoggerBase.h>
-
+#include <Util\UniquePointer.h>
 
 X_NAMESPACE_BEGIN(core)
 
 
 
 XParser::XParser(MemoryArenaBase* arena) :
-arena_(arena),
-pLexer_(nullptr),
-pTokens_(nullptr),
-macros_(arena,4)
+	XParser(LexFlags(), arena)
 {
-	X_ASSERT_NOT_NULL(arena);
-	core::zero_object(macroCharCache);
 }
 
 XParser::XParser(LexFlags flags, MemoryArenaBase* arena) :
-arena_(arena),
-pLexer_(nullptr),
-pTokens_(nullptr),
-macros_(arena, 4),
-flags_(flags)
+	XParser(nullptr, nullptr, nullptr, flags, arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 	core::zero_object(macroCharCache);
@@ -35,15 +24,18 @@ flags_(flags)
 XParser::XParser(const char* startInclusive, const char* endExclusive,
 	const char* name, LexFlags flags, MemoryArenaBase* arena) :
 arena_(arena),
-pLexer_(nullptr),
 pTokens_(nullptr),
 macros_(arena, 4),
+idents_(arena, MAX_IDENTS),
+scriptStack_(arena, MAX_SCRIPT_STACK),
 flags_(flags)
 {
 	X_ASSERT_NOT_NULL(arena);
 	core::zero_object(macroCharCache);
 
-	LoadMemory(startInclusive, endExclusive, name);
+	if (startInclusive) {
+		SetMemory(startInclusive, endExclusive, name);
+	}
 }
 
 
@@ -51,26 +43,59 @@ XParser::~XParser()
 {
 	freeSource();
 }
+
+void XParser::setIncludeCallback(OpenIncludeDel& del)
+{
+	openIncDel_ = del;
+}
+
 	
 void XParser::freeSource(void)
 {
-	if (pLexer_) {
-		X_DELETE(pLexer_, arena_);
-		pLexer_ = nullptr;
+	while (scriptStack_.isNotEmpty())
+	{
+		X_DELETE(scriptStack_.top(), arena_);
+		scriptStack_.pop();
 	}
+
+	idents_.clear();
+
+	while (pTokens_) {
+		auto token = pTokens_;
+		pTokens_ = token;
+		X_DELETE(token, arena_);
+	}
+
+	for (auto d : macros_) {
+		X_DELETE(d.second, arena_);
+	}
+
+	macros_.clear();
+
+	filename_.clear();
 }
 
-bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, 
+bool XParser::SetMemory(const char* startInclusive, const char* endExclusive,
 	const char* name)
 {
 	X_ASSERT_NOT_NULL(startInclusive);
 	X_ASSERT_NOT_NULL(endExclusive);
 	X_ASSERT_NOT_NULL(name);
 
+	if (scriptStack_.isNotEmpty()) {
+		// someting already set.
+		return false;
+	}
+
 	filename_ = name;
 
-	pLexer_ = X_NEW(XLexer, arena_, "ParserLex")(startInclusive, endExclusive);
-	pLexer_->setFlags(flags_);
+	auto* pLexer = X_NEW(XLexer, arena_, "ParserLex")(startInclusive, endExclusive);
+	pLexer->setFlags(flags_);
+
+
+	scriptStack_.push(pLexer);
+
+	skip_ = false;
 
 	return true;
 }
@@ -130,7 +155,6 @@ bool XParser::ExpectTokenString(const char* string)
 bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags subtype,
 	PunctuationId::Enum puncId, XLexToken& token)
 {
-	core::StackString<128> str;
 
 	if (!ReadToken(token)) {
 		Error("couldn't read expected token");
@@ -139,6 +163,8 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
 
 	if (token.GetType() != type) 
 	{
+		core::StackString<128> str;
+
 		switch (type) {
 			case TokenType::STRING: str.append("string"); break;
 			case TokenType::LITERAL: str.append("literal"); break;
@@ -155,7 +181,7 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
 	{
 		if ((token.GetSubType() & subtype) != subtype) 
 		{
-			str.clear();
+			core::StackString<128> str;
 			if (subtype.IsSet(TokenSubType::DECIMAL)) str.append("decimal ");
 			if (subtype.IsSet(TokenSubType::HEX)) str.append("hex ");
 			if (subtype.IsSet(TokenSubType::OCTAL)) str.append("octal ");
@@ -173,15 +199,17 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
 	{
 		if (token.GetPuncId() != puncId)
 		{
+			X_ASSERT(scriptStack_.isNotEmpty(), "Script stack should not be empty")();
+
 			Error("expected '%s' but found '%.*s'", 
-				pLexer_->GetPunctuationFromId(puncId), token.length(), token.begin());
+				 scriptStack_.top()->GetPunctuationFromId(puncId), token.length(), token.begin());
 			return false;
 		}
 	}
 	return true;
 }
 
-int XParser::ParseInt()
+int32_t XParser::ParseInt(void)
 {
 	XLexToken token;
 
@@ -204,7 +232,7 @@ int XParser::ParseInt()
 }
 
 
-bool XParser::ParseBool()
+bool XParser::ParseBool(void)
 {
 	XLexToken token;
 
@@ -232,7 +260,7 @@ bool XParser::ParseBool()
 }
 
 
-float XParser::ParseFloat()
+float XParser::ParseFloat(void)
 {
 	XLexToken token;
 
@@ -259,8 +287,8 @@ void XParser::UnreadToken(const XLexToken& token)
 
 const int XParser::GetLineNumber(void)
 {
-	if (pLexer_) {
-		return pLexer_->GetLineNumber();
+	if (scriptStack_.isNotEmpty()) {
+		return scriptStack_.top()->GetLineNumber();
 	}
 	X_WARNING("Parser", "called 'GetLineNumber' on a parser without a valid file loaded");
 	return true;
@@ -268,8 +296,8 @@ const int XParser::GetLineNumber(void)
 
 bool XParser::isEOF(void) const
 {
-	if (pLexer_) {
-		return pLexer_->isEOF();
+	if (scriptStack_.isNotEmpty()) {
+		return scriptStack_.top()->isEOF();
 	}
 	X_WARNING("Parser", "called 'EOF' on a parser without a valid file loaded");
 	return true;
@@ -277,25 +305,56 @@ bool XParser::isEOF(void) const
 
 bool XParser::ReadSourceToken(XLexToken& token)
 {
-	if (!pLexer_) {
+	if (scriptStack_.isEmpty()) {
 		X_ERROR("Parser", "can't read token, no source loaded");
 		return false;
 	}
 
-	if (pTokens_)
+	int32_t changedScript = 0;
+	while (!pTokens_)
 	{
-		// copy the already available token
-		token = *pTokens_;
+		auto pCurScript = scriptStack_.top();
 
-		// remove the token from the source
-		XLexToken* t = pTokens_;
-		pTokens_ = t->pNext_;
-		
-		X_DELETE(t,arena_);
-		return true;
+		if (pCurScript->ReadToken(token))
+		{
+			token.linesCrossed_ += changedScript;
+
+			return true;
+		}
+
+		// if at end of file.
+		if (pCurScript->isEOF())
+		{
+			// remove all unclosed indents.
+			while (idents_.isNotEmpty() && idents_.top().pScript == pCurScript)
+			{
+				XParser::Warning("missing #endif");
+				idents_.pop();
+			}
+
+			changedScript = 1;
+		}
+
+		// any more scripts to read from?
+		if (idents_.isEmpty()) {
+			return false;
+		}
+
+		X_DELETE(scriptStack_.top(), arena_);
+		scriptStack_.pop();
 	}
 
-	return pLexer_->ReadToken(token) == 1;
+	// copy the already available token
+	token = *pTokens_;
+
+	// remove the token from the source
+	XLexToken* t = pTokens_;
+	pTokens_ = t->pNext_;
+
+	X_DELETE(t, arena_);
+	return true;
+
+
 }
 
 bool XParser::UnreadSourceToken(const XLexToken& token)
@@ -322,20 +381,54 @@ bool XParser::ReadDirective(void)
 	{
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(PreProType::ENUM_COUNT == 8, "PreProType count changed? this code needs updating.");
-		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		static_assert(PreProType::ENUM_COUNT == 10, "PreProType count changed? this code needs updating.");
+		const auto tokenHash = core::Hash::Fnv1aHash(token.begin(), token.length());
+
+		switch (tokenHash)
 		{
-			case "include"_fnv1a:
-				return Directive_include();
-			case "define"_fnv1a:
-				return Directive_define();
-			case "undef"_fnv1a:
 			case "if"_fnv1a:
+				return Directive_if();
 			case "ifdef"_fnv1a:
+				return Directive_ifdef();
 			case "ifndef"_fnv1a:
+				return Directive_ifndef();
+			case "elif"_fnv1a:
+				return Directive_elif();
 			case "else"_fnv1a:
+				return Directive_else();
 			case "endif"_fnv1a:
+				return Directive_endif();
+
+			default:
+			{
+				if (skip_) {
+					while (XParser::ReadLine(token)) {
+						// read rest of line
+					}
+					return true;
+				}
+
+				switch (tokenHash)
+				{
+					case "include"_fnv1a:
+						return Directive_include();
+					case "define"_fnv1a:
+						return Directive_define();
+					case "undef"_fnv1a:
+						return Directive_undef();
+					case "line"_fnv1a:
+						return Directive_line();
+					case "error"_fnv1a:
+						return Directive_error();
+					case "warning"_fnv1a:
+						return Directive_warning();
+
+					default:
+						break;
+				}
+
 				break;
+			}
 		}
 	}
 
@@ -462,6 +555,7 @@ bool XParser::Directive_define(void)
 		XLexToken* pT = X_NEW(XLexToken, arena_, "Macrotoken")(token);
 
 		if (token.GetType() == TokenType::NAME && token.isEqual(define->name)) {
+//			token.flags_;
 		//	t->flags |= TOKEN_FL_RECURSIVE_DEFINE;
 			XParser::Warning("recursive define (removed recursion)");
 		} 
@@ -477,8 +571,277 @@ bool XParser::Directive_define(void)
 
 bool XParser::Directive_include(void)
 {
+	XLexToken token;
+
+	if (!openIncDel_) {
+		XParser::Error("#include callback not set");
+		return false;
+	}
+
+	if (!XParser::ReadSourceToken(token)) {
+		XParser::Error("#include without filename");
+		return false;
+	}
+
+	if (token.linesCrossed_ > 0) {
+		XParser::Error("#include without file name");
+		return false;
+	}
+
+	core::UniquePointer<XLexer> lex = makeUnique<XLexer>(arena_);
+	core::string path;
+
+	if (token.GetType() == TokenType::STRING)
+	{
+		path = core::string(token.begin(), token.end());
+
+		if(!openIncDel_.Invoke(*lex.ptr(), path))
+		{
+			lex.reset();
+		}
+	}
+	else if (token.GetType() == TokenType::PUNCTUATION && token.GetPuncId() == PunctuationId::LOGIC_LESS) // "<"
+	{
+		while (XParser::ReadSourceToken(token)) 
+		{
+			if (token.linesCrossed_ > 0) 
+			{
+				XParser::UnreadSourceToken(token);
+				break;
+			}
+			if (token.GetType() == TokenType::PUNCTUATION && token.GetPuncId() == PunctuationId::LOGIC_GREATER) // ">"
+			{
+				break;
+			}
+		
+			path.append(token.begin(), token.end());
+		}
+
+		if (token.GetPuncId() == PunctuationId::LOGIC_GREATER) {
+			XParser::Warning("#include missing trailing >");
+		}
+		if (!path.length()) {
+			XParser::Error("#include without file name between < >");
+			return false;
+		}
+
+		// open the fucker!
+		if (!openIncDel_.Invoke(*lex.ptr(), path))
+		{
+			lex.reset();
+		}
+	}
+	else
+	{
+		XParser::Error("#include without file name");
+		return false;
+	}
+
+	if (!lex) {
+		XParser::Error("#include file \"%s\" not found", path.c_str());
+		return false;
+	}
+
+	scriptStack_.push(lex.release());
+	return true;
+}
+
+bool XParser::Directive_undef(void)
+{
+	XLexToken token;
+
+	if (!XParser::ReadLine(token)) {
+		XParser::Error("undef without name");
+		return false;
+	}
+
+	if (token.GetType() != TokenType::NAME) {
+		XParser::UnreadSourceToken(token);
+		XParser::Error("expected name but found '%.*s'", token.length(), token.begin());
+		return false;
+	}
+
+	MacroDefine* pDefine = FindDefine(token);
+	if (!pDefine) {
+		XParser::Warning("can't undef '%.*s' not defined", token.length(), token.begin());
+		return true;
+	}
+
+	if (pDefine->flags.IsSet(DefineFlag::BUILTIN)) {
+		XParser::Warning("can't undef '%.*s'", token.length(), token.begin());
+	}
+	else {
+		removeDefine(pDefine);
+	}
+
+	return true;
+}
+
+bool XParser::Directive_if_def(PreProType::Enum type)
+{
+	XLexToken token;
+
+	if (!XParser::ReadLine(token)) {
+		XParser::Error("undef without name");
+		return false;
+	}
+
+	if (token.GetType() != TokenType::NAME) {
+		XParser::UnreadSourceToken(token);
+		XParser::Error("expected name after #ifdef, found '%.*s'", token.length(), token.begin());
+		return false;
+	}
+
+	MacroDefine* pDefine = FindDefine(token);
+
+	const bool skip = (type == PreProType::IfNDef) == (pDefine == nullptr);
+	XParser::PushIndent(type, skip);
+	return true;
+}
+
+bool XParser::Directive_ifdef(void)
+{
+	return XParser::Directive_if_def(PreProType::IfDef);
+}
+
+bool XParser::Directive_ifndef(void)
+{
+	return XParser::Directive_if_def(PreProType::IfNDef);
+}
+
+bool XParser::Directive_else(void)
+{
+	bool skip;
+	PreProType::Enum type;
+
+	XParser::PopIndent(&type, &skip);
+	if (!type) {
+		XParser::Error("misplaced #else");
+		return false;
+	}
+	if (type == PreProType::Else) {
+		XParser::Error("#else after #else");
+		return false;
+	}
+
+	XParser::PushIndent(PreProType::Else, !skip);
+	return true;
+}
+
+bool XParser::Directive_endif(void)
+{
+	bool skip;
+	PreProType::Enum type;
+
+	XParser::PopIndent(&type, &skip);
+	if (type == PreProType::Undefined) {
+		XParser::Error("misplaced #endif");
+		return false;
+	}
+	return true;
+}
+
+bool XParser::Directive_elif(void)
+{
+	bool skip;
+	PreProType::Enum type;
+
+	XParser::PopIndent(&type, &skip);
+
+	if (type == PreProType::Undefined || type == PreProType::Else) {
+		XParser::Error("misplaced #elif");
+		return false;
+	}
+
+	X_ASSERT_UNREACHABLE();
+	int32_t value = 0;
+//	if (!XParser::Evaluate(&value, nullptr, true)) {
+//		return false;
+//	}
+
+	skip = (value == 0);
+	XParser::PushIndent(PreProType::ElseIf, skip);
+	return true;
+}
+
+bool XParser::Directive_if(void)
+{
+
 	X_ASSERT_NOT_IMPLEMENTED();
-	return false;
+	int32_t value = 0;
+//	if (!XParser::Evaluate(&value, NULL, true)) {
+//		return false;
+//	}
+
+	const bool skip = (value == 0);
+
+	XParser::PushIndent(PreProType::If, skip);
+	return true;
+}
+
+bool XParser::Directive_line(void)
+{
+	XLexToken token;
+
+	XParser::Error("#line directive not supported");
+	while (XParser::ReadLine(token)) {
+		// ...
+	}
+	return true;
+}
+
+bool XParser::Directive_error(void)
+{
+	XLexToken token;
+
+	if (!XParser::ReadLine(token) || token.GetType() != TokenType::STRING) {
+		XParser::Error("#error without string");
+		return false;
+	}
+
+	XParser::Error("#error: %.*s", token.length(), token.begin());
+	return true;
+}
+
+bool XParser::Directive_warning(void)
+{
+	XLexToken token;
+
+	if (!XParser::ReadLine(token) || token.GetType() != TokenType::STRING) {
+		XParser::Error("#warning without string");
+		return false;
+	}
+
+	XParser::Warning("#warning: %.*s", token.length(), token.begin());
+	return true;
+}
+
+void XParser::PushIndent(PreProType::Enum type, bool skip)
+{
+	if (idents_.size() == MAX_IDENTS) {
+		XParser::Error("Exceeded limit of max idents. Max: %" PRIuS, idents_.size());
+		return;
+	}
+
+	idents_.emplace(type, skip, scriptStack_.top());
+}
+
+void XParser::PopIndent(PreProType::Enum* pType, bool* pSkip)
+{
+	X_ASSERT_NOT_NULL(pType);
+	X_ASSERT_NOT_NULL(pSkip);
+
+	if (idents_.isEmpty()) {
+		*pType = PreProType::Undefined;
+		*pSkip = false;
+		return;
+	}
+
+	const auto ident = idents_.top();
+	*pType = ident.type;
+	*pSkip = ident.skip;
+
+	idents_.pop();
 }
 
 bool XParser::CheckTokenString(const char* string)
@@ -515,9 +878,8 @@ int XParser::FindDefineParm(MacroDefine* define, const XLexToken& token)
 
 int	XParser::ReadLine(XLexToken& token)
 {
-	int crossline;
+	int crossline = 0;
 
-	crossline = 0;
 	do 
 	{
 		if (!ReadSourceToken(token)) {
@@ -742,7 +1104,6 @@ bool XParser::ExpandDefineIntoSource(XLexToken& token, MacroDefine* pDefine)
 		pTokens_ = firsttoken;
 	}
 
-
 	return true;
 }
 
@@ -753,27 +1114,33 @@ MacroDefine* XParser::FindDefine(XLexToken& token) const
 	// little optermisation, which will work very well if all macro's
 	// are upper case, since anything else in the file not starting with uppercase.
 	// will fail this test.
-	if (!isInCache(token.begin()[0]))
+	if (!isInCache(token.begin()[0])) {
 		return nullptr;
+	}
 
 	// create a null term string.
 	core::StackString512 temp(token.begin(), token.end());
 
-	MacroMap::const_iterator it = macros_.find(X_CONST_STRING(temp.c_str()));
-
-	if (it != macros_.end())
+	auto it = macros_.find(X_CONST_STRING(temp.c_str()));
+	if (it != macros_.end()) {
 		return it->second;
+	}
 
 	return nullptr;
 }
 
-void XParser::addDefinetoHash(MacroDefine* define)
+void XParser::addDefinetoHash(MacroDefine* pDefine)
 {
-	X_ASSERT_NOT_NULL(define);
+	X_ASSERT_NOT_NULL(pDefine);
 
-	macros_.insert(MacroMap::value_type(core::string(define->name.c_str()), define));
+	macros_.insert(MacroMap::value_type(pDefine->name, pDefine));
 }
 
+void XParser::removeDefine(MacroDefine* pDefine)
+{
+	macros_.erase(pDefine->name);
+	X_DELETE(pDefine, arena_);
+}
 
 void XParser::Error(const char *str, ...)
 {

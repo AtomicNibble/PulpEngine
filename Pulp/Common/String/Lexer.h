@@ -27,6 +27,7 @@ X_DECLARE_FLAGS(LexFlag)(
 	ONLYSTRINGS					// parse as whitespace deliminated strings (quoted strings keep quotes)
 );
 
+
 X_DECLARE_ENUM(TokenType)(
 	STRING,
 	LITERAL,
@@ -157,7 +158,7 @@ public:
 	X_INLINE TokenType::Enum GetType(void) const;
 	X_INLINE TokenSubTypeFlags GetSubType(void) const;
 	X_INLINE PunctuationId::Enum GetPuncId(void) const;
-	X_INLINE int GetLine(void) const;
+	X_INLINE int32_t GetLine(void) const;
 	X_INLINE void SetType(TokenType::Enum type);
 	X_INLINE void SetSubType(TokenSubTypeFlags subType);
 
@@ -171,7 +172,7 @@ public:
 	X_INLINE double GetDoubleValue(void);				// double value of TT_NUMBER
 	X_INLINE float GetFloatValue(void);					// float value of TT_NUMBER
 	X_INLINE unsigned long GetUnsignedLongValue(void);	// unsigned long value of TT_NUMBER
-	X_INLINE int GetIntValue(void);
+	X_INLINE int32_t GetIntValue(void);
 
 	X_INLINE void Reset(void);
 
@@ -196,9 +197,9 @@ private:
 	PunctuationId::Enum puncId_;	// punctiation id
 
 
-	int32_t	line_;				// line in script the token was on
-	int32_t	linesCrossed_;		// number of lines crossed in white space before token
-	int32_t	flags_;				// token flags, used for recursive defines
+	int32_t	line_;					// line in script the token was on
+	int32_t	linesCrossed_;			// number of lines crossed in white space before token
+//	Flags<TokenFlag>	flags_;			// token flags, used for recursive defines
 
 	long intvalue_;			// integer value
 	double floatvalue_;
@@ -214,9 +215,6 @@ class XLexer
 {
 	friend class XParser;
 
-
-	X_INLINE XLexer();
-
 public:
 	X_DECLARE_ENUM(ErrorState) (
 		OK,
@@ -227,6 +225,7 @@ public:
 public:
 	typedef Flags<LexFlag> LexFlags;
 
+	XLexer();
 	XLexer(const char* startInclusive, const char* endExclusive);
 
 	bool ReadToken(XLexToken& token);
@@ -242,20 +241,20 @@ public:
 	bool SkipUntilString(const char* string);
 	bool SkipRestOfLine(void);
 
-	int	ParseInt(void);
+	int32_t	ParseInt(void);
 	bool ParseBool(void);
 	float ParseFloat(void);
 
 	// parse matrices with floats
-	bool Parse1DMatrix(int x, float* m);
-	bool Parse2DMatrix(int y, int x, float* m);
-	bool Parse3DMatrix(int z, int y, int x, float* m);
+	bool Parse1DMatrix(int32_t x, float* m);
+	bool Parse2DMatrix(int32_t y, int32_t x, float* m);
+	bool Parse3DMatrix(int32_t z, int32_t y, int32_t x, float* m);
 
 	void UnreadToken(const XLexToken& token);
 	// read a token only if on the same line
 	bool ReadTokenOnLine(XLexToken& token);
 
-	X_INLINE const int GetLineNumber(void) const;
+	X_INLINE const int32_t GetLineNumber(void) const;
 	X_INLINE bool isEOF(void) const;
 	X_INLINE bool isEOF(bool skipWhiteSpace);
 	X_INLINE size_t BytesLeft(void) const;
@@ -279,22 +278,23 @@ private:
 	bool ReadPunctuation(XLexToken& token);
 	bool ReadPrimitive(XLexToken& token);
 
-	X_INLINE int CheckString(const char* str) const;
+	X_INLINE int32_t CheckString(const char* str) const;
 
+private:
 	const char* start_;
 	const char* end_;
 	const char* current_;
 	const char* lastp_;
-	int			curLine_;
-	int			lastLine_;				// line before reading token
+	int32_t		curLine_;
+	int32_t		lastLine_;				// line before reading token
 	LexFlags	flags_;
 
 	XLexToken	token_;
-	int			tokenavailable_;
+	int32_t		tokenavailable_;
 
 	const PunctuationPair* punctuations_;		// the punctuations used in the script
-	int *			punctuationtable_;		// ASCII table with punctuations
-	int *			nextpunctuation_;
+	int32_t*			punctuationtable_;		// ASCII table with punctuations
+	int32_t*			nextpunctuation_;
 
 	ErrorState::Enum errState_;
 };

@@ -4,12 +4,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
-namespace
-{
+#define USE_PUNCTABLE
 
-	#define PUNCTABLE
-
-} // namespace
 
 void XLexToken::NumberValue(void)
 {
@@ -274,6 +270,11 @@ int default_nextpunctuation[sizeof(default_punctuations_) / sizeof(PunctuationPa
 bool default_setup = false;
 
 
+XLexer::XLexer() :
+	XLexer(nullptr, nullptr)
+{
+
+}
 
 
 XLexer::XLexer(const char* startInclusive, const char* endExclusive)
@@ -295,7 +296,7 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive)
 	errState_ = ErrorState::OK;
 }
 
-const char *XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
+const char* XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
 	int i;
 
 	for (i = 0; punctuations_[i].pCharacter; i++) {
@@ -368,14 +369,14 @@ void XLexer::CreatePunctuationTable(const PunctuationPair* punctuations)
 
 void XLexer::SetPunctuations(const PunctuationPair* p)
 {
-#ifdef PUNCTABLE
+#ifdef USE_PUNCTABLE
 	if (p) {
 		CreatePunctuationTable(p);
 	}
 	else {
 		CreatePunctuationTable(default_punctuations_);
 	}
-#endif //PUNCTABLE
+#endif // !USE_PUNCTABLE
 	if (p) {
 		punctuations_ = p;
 	}
@@ -415,7 +416,7 @@ bool XLexer::ReadToken(XLexToken& token)
 	// number of lines crossed before token
 	token.linesCrossed_ = curLine_ - lastLine_;
 	// clear token flags
-	token.flags_ = 0;
+//	token.flags_ = 0;
 
 	c = *current_;
 
@@ -1220,7 +1221,7 @@ bool XLexer::ReadPunctuation(XLexToken& token)
 	const char* p;
 	const PunctuationPair* punc;
 
-#ifdef PUNCTABLE
+#ifdef USE_PUNCTABLE
 	for (n = punctuationtable_[(unsigned int)*(current_)]; n >= 0; n = nextpunctuation_[n])
 	{
 		punc = &(punctuations_[n]);
@@ -1229,7 +1230,7 @@ bool XLexer::ReadPunctuation(XLexToken& token)
 
 	for (i = 0; punctuations_[i].p; i++) {
 		punc = &punctuations_[i];
-#endif
+#endif // !USE_PUNCTABLE
 		p = punc->pCharacter;
 		// check for this punctuation in the script
 		for (l = 0; p[l] && current_[l]; l++) {

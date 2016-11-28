@@ -6,6 +6,9 @@
 #include "Lexer.h"
 
 #include "Containers\HashMap.h"
+#include <Containers\Stack.h>
+
+#include <Util\Delegate.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -20,9 +23,17 @@ X_DECLARE_ENUM(PreProType)(
 	IfDef, 
 	IfNDef, 
 	Else, 
-	EndIF
+	ElseIf,
+	EndIF,
+	Undefined
 );
 
+X_DECLARE_FLAGS(DefineFlag)(
+	RECURSIVE,
+	BUILTIN
+);
+
+typedef Flags<DefineFlag> DefineFlags;
 
 struct MacroDefine
 {
@@ -30,18 +41,37 @@ struct MacroDefine
 
 	core::string name;
 	int32_t numParams;
+	DefineFlags flags;
 	XLexToken* pTokens;
 	XLexToken* pParms;
 };
 
+struct Ident
+{
+	Ident() = default;
+	Ident(PreProType::Enum type, bool skip, XLexer* pScript) :
+		type(type), skip(skip), pScript(pScript)
+	{}
 
+	PreProType::Enum type;
+	bool skip;
+	bool _pad[3];
+	XLexer* pScript;
+};
 
 class XParser
 {
 	typedef XLexer::LexFlags LexFlags;
 	typedef core::HashMap<core::string, MacroDefine*> MacroMap;
+	typedef core::Stack<Ident> IdentStack;
+	typedef core::Stack<XLexer*> ScriptStack;
+
+public:
+	typedef core::Delegate<bool(XLexer& lex, core::string&)> OpenIncludeDel;
 
 	static const int32_t MAX_DEFINEPARMS = 32;
+	static const int32_t MAX_IDENTS = 16; // this is stack so you can have unlimited groups this is more of a depth limit.
+	static const int32_t MAX_SCRIPT_STACK = 8;
 
 public:
 	explicit XParser(MemoryArenaBase* arena);
@@ -49,8 +79,10 @@ public:
 	XParser(const char* startInclusive, const char* endExclusive, const char* name, LexFlags flags, MemoryArenaBase* arena);
 	~XParser();
 
+	void setIncludeCallback(OpenIncludeDel& del);
+
 	// load me up!
-	bool LoadMemory(const char* startInclusive, const char* endExclusive, const char* name);
+	bool SetMemory(const char* startInclusive, const char* endExclusive, const char* name);
 
 	bool ReadToken(XLexToken& token);
 	bool ExpectTokenString(const char* string);
@@ -84,6 +116,21 @@ private:
 	bool Directive_define(void);
 	bool Directive_include(void);
 
+	bool Directive_undef(void);
+	bool Directive_if_def(PreProType::Enum type);
+	bool Directive_ifdef(void);
+	bool Directive_ifndef(void);
+	bool Directive_else(void);
+	bool Directive_endif(void);
+	bool Directive_elif(void);
+	bool Directive_if(void);
+	bool Directive_line(void);
+	bool Directive_error(void);
+	bool Directive_warning(void);
+
+	void PushIndent(PreProType::Enum type, bool skip);
+	void PopIndent(PreProType::Enum* pType, bool *skip);
+
 	bool CheckTokenString(const char* string);
 	int FindDefineParm(MacroDefine* define, const XLexToken& token);
 	int ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxparms);
@@ -96,18 +143,24 @@ private:
 	bool ExpandDefineIntoSource(XLexToken& token, MacroDefine* pDefine);
 
 	MacroDefine* FindDefine(XLexToken& token) const;
-	void addDefinetoHash(MacroDefine* define);
+	void addDefinetoHash(MacroDefine* pDefine);
+	void removeDefine(MacroDefine* pDefine);
 
 private:
+	MemoryArenaBase* arena_;
+
 	core::string filename_;
 
 	MacroMap macros_;
+	IdentStack idents_;
 	LexFlags flags_;
 
-	MemoryArenaBase* arena_;
-	XLexer* pLexer_;
+	ScriptStack scriptStack_;
 	XLexToken* pTokens_;
 
+	OpenIncludeDel openIncDel_;
+
+	bool skip_; // skip current content inside a #if 0 .. #endif etc..
 
 	uint8_t macroCharCache[255];
 };
