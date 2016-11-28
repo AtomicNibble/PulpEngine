@@ -207,12 +207,15 @@ namespace Util
 		const size_t len = (pEnd - pBegin);
 		switch (core::Hash::Fnv1aHash(pBegin, len))
 		{
+			case "0"_fnv1a:
 			case "none"_fnv1a:
 			case "<none>"_fnv1a:
 				return MaterialPolygonOffset::NONE;
 			case "decal"_fnv1a:
+			case "static_decal"_fnv1a:
 				return MaterialPolygonOffset::STATIC_DECAL;
 			case "impact"_fnv1a:
+			case "weapon_impact"_fnv1a:
 				return MaterialPolygonOffset::WEAPON_IMPACT;
 
 			default:
