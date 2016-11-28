@@ -29,7 +29,7 @@ namespace shader
 				return false;
 			}
 
-			static_assert(PreProType::ENUM_COUNT == 8, "PreProType count changed? this code needs updating.");
+			static_assert(PreProType::ENUM_COUNT == 10, "PreProType count changed? this code needs updating.");
 			switch (core::Hash::Fnv1aHash(token.begin(), len))
 			{
 				case "include"_fnv1a:
@@ -52,6 +52,9 @@ namespace shader
 					break;
 				case "else"_fnv1a:
 					typeOut = PreProType::Else;
+					break;
+				case "elif"_fnv1a:
+					typeOut = PreProType::ElseIf;
 					break;
 				case "endif"_fnv1a:
 					typeOut = PreProType::EndIF;
