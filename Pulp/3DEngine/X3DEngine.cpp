@@ -246,37 +246,12 @@ void X3DEngine::OnFrameBegin(void)
 		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
 		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems + 512, cam, viewPort);
 
-#if 0
-		const auto* pShader = pRender_->getShader("AuxGeom");
-		const auto* pTech = pShader->getTech("AuxGeometry");
-
-
-		// fuck a flying camel just before it lands.
-		// then skin it and put the skin on a goat.
-		render::StateDesc desc;
-		desc.blend.srcBlendColor = render::BlendType::SRC_ALPHA;
-		desc.blend.srcBlendAlpha = render::BlendType::SRC_ALPHA;
-		desc.blend.dstBlendColor = render::BlendType::INV_SRC_ALPHA;
-		desc.blend.dstBlendAlpha = render::BlendType::INV_SRC_ALPHA;
-		desc.blendOp = render::BlendOp::OP_ADD;
-		desc.cullType = render::CullType::TWO_SIDED;
-		desc.topo = render::TopoType::TRIANGLESTRIP;
-		desc.depthFunc = render::DepthFunc::ALWAYS;
-		desc.stateFlags.Clear();
-		desc.stateFlags.Set(render::StateFlag::BLEND);
-		desc.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
-		desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
-
-		auto renderTarget = pRender_->getCurBackBuffer();
-
-		render::RenderTargetFmtsArr rtfs;
-		rtfs.append(renderTarget->getFmt());
-		render::PassStateHandle passHandle = pRender_->createPassState(rtfs);
-
-#endif
 
 		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
 
+		// the updating of dirty font buffers should happen regardless of
+		// prim drawing.
+		// unless only way to draw text is with prim humm.... !
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
 
 #if 1
@@ -290,11 +265,6 @@ void X3DEngine::OnFrameBegin(void)
 
 				const auto& elems = context.getUnsortedBuffer();
 				auto vertexPageHandles = context.getVertBufHandles();
-
-				// the variable state for the material.
-				// so this might just be the line material or some other SHIT!
-				// but it may also be a textured quad so it will contain texture info.
-				// render::Commands::ResourceStateBase* pVariableState = pVariableStateMan_->createVariableState(0,0);
 
 				for (size_t x = 0; x < elems.size(); x++)
 				{
