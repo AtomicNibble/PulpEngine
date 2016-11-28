@@ -17,6 +17,7 @@ X_NAMESPACE_BEGIN(engine)
 		blendStates_(arena, 32),
 		stencilStates_(arena, 16),
 		states_(arena, 128),
+		shaders_(arena, 128),
 		techs_(arena, 128)
 	{
 
@@ -94,6 +95,20 @@ X_NAMESPACE_BEGIN(engine)
 			{
 				if (!parseTechnique(lex)) {
 					X_ERROR("TestDefs", "Failed to parse Technique");
+					return false;
+				}
+			}
+			else if (token.isEqual("VertexShader"))
+			{
+				if (!parseVertexShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse VertexShader");
+					return false;
+				}
+			}
+			else if (token.isEqual("PixelShader"))
+			{
+				if (!parsePixelShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse PixelShader");
 					return false;
 				}
 			}
@@ -699,6 +714,100 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ----------------------------------------------------
 
+	bool TechSetDefs::parseVertexShader(core::XParser& lex)
+	{
+		core::string name, parentName;
+
+		// we have the name.
+		if (!parseName(lex, name, parentName)) {
+			return false;
+		}
+
+		if (!lex.ExpectTokenString("{")) {
+			return false;
+		}
+
+		if (stateExsists(name)) {
+			return false;
+		}
+
+		auto& shader = addShader(name, parentName, render::shader::ShaderType::Vertex);
+
+		return parseVertexShaderData(lex, shader);
+	}
+
+	bool TechSetDefs::parseVertexShaderData(core::XParser& lex, Shader& shader)
+	{
+		return parsePixelShaderData(lex, shader);
+	}
+
+	// ----------------------------------------------------
+
+	bool TechSetDefs::parsePixelShader(core::XParser& lex)
+	{
+		core::string name, parentName;
+
+		// we have the name.
+		if (!parseName(lex, name, parentName)) {
+			return false;
+		}
+
+		if (!lex.ExpectTokenString("{")) {
+			return false;
+		}
+
+		if (stateExsists(name)) {
+			return false;
+		}
+
+		auto& shader = addShader(name, parentName, render::shader::ShaderType::Pixel);
+
+
+		return parsePixelShaderData(lex, shader);
+	}
+
+	bool TechSetDefs::parsePixelShaderData(core::XParser& lex, Shader& shader)
+	{
+		// start of define.
+		if (!lex.ExpectTokenString("{")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		while (lex.ReadToken(token))
+		{
+			if (token.isEqual("}")) {
+				return true;
+			}
+
+			using namespace core::Hash::Fnva1Literals;
+
+			switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+			{
+				case "source"_fnv1a:
+					if (!parseString(lex, shader.source)) {
+						return false;
+					}
+					break;
+				case "defines"_fnv1a:
+					if (!parseString(lex, shader.defines)) {
+						return false;
+					}
+					break;
+
+				default:
+					X_ERROR("TechDef", "Unknown Shader prop: \"%.*s\"", token.length(), token.begin());
+					return false;
+			}
+		}
+
+
+		return false;
+	}
+
+	// ----------------------------------------------------
+
+
 
 	bool TechSetDefs::parseTechnique(core::XParser& lex)
 	{
@@ -741,12 +850,12 @@ X_NAMESPACE_BEGIN(engine)
 					}
 					break;
 				case "vs"_fnv1a:
-					if (!parseString(lex, tech.vs)) {
+					if (!parseVertexShader(lex, tech.vs)) {
 						return false;
 					}
 					break;
 				case "ps"_fnv1a:
-					if (!parseString(lex, tech.ps)) {
+					if (!parsePixelShader(lex, tech.ps)) {
 						return false;
 					}
 					break;
@@ -809,6 +918,58 @@ X_NAMESPACE_BEGIN(engine)
 			}
 
 			X_ERROR("TechDef", "Tech uses undefined State: \"%s\" Line: %" PRIi32, name.c_str(), lex.GetLineNumber());
+		}
+
+		return false;
+	}
+
+	bool TechSetDefs::parseVertexShader(core::XParser& lex, Shader& shader)
+	{
+		// it's the same for now.
+		return parsePixelShader(lex, shader);
+	}
+
+	bool TechSetDefs::parsePixelShader(core::XParser& lex, Shader& shader)
+	{
+		// can be a function name or a inline define.
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() == core::TokenType::NAME)
+		{
+			// inline declare.
+			if (!token.isEqual("VertexShader") && !token.isEqual("PixelShader")) {
+				X_ERROR("TechDef", "Expected shader entry or inline Shader define. Line: %" PRIi32, lex.GetLineNumber());
+				return false;
+			}
+
+			// got ()
+			if (!lex.ExpectTokenString("(")) {
+				return false;
+			}
+			if (!lex.ExpectTokenString(")")) {
+				return false;
+			}
+
+			// parse the inline state.
+			if (parsePixelShaderData(lex, shader)) {
+				return true;
+			}
+
+			X_ERROR("TechDef", "Failed to parse inline shader. Line: %" PRIi32, lex.GetLineNumber());
+			// fall through to false.
+		}
+		else if (token.GetType() == core::TokenType::STRING)
+		{
+			// a predefined one
+			shader.entry = core::string(token.begin(), token.end());
+			return true;
 		}
 
 		return false;
@@ -908,6 +1069,11 @@ X_NAMESPACE_BEGIN(engine)
 		return findHelper(states_, name, pStateOut);
 	}
 
+	bool TechSetDefs::shaderExsists(const core::string& name, Shader* pShaderOut)
+	{
+		return findHelper(shaders_, name, pShaderOut);
+	}
+
 	bool TechSetDefs::techniqueExsists(const core::string& name)
 	{
 		return techs_.find(name) != techs_.end();
@@ -926,6 +1092,12 @@ X_NAMESPACE_BEGIN(engine)
 	render::StateDesc& TechSetDefs::addState(const core::string& name, const core::string& parentName)
 	{
 		return addHelper(states_, name, parentName, "state");
+	}
+
+	Shader& TechSetDefs::addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type)
+	{
+		X_UNUSED(type);
+		return addHelper(shaders_, name, parentName, "state");
 	}
 
 	Technique& TechSetDefs::addTechnique(const core::string& name, const core::string& parentName)

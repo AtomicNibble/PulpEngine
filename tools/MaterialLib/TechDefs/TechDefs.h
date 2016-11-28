@@ -29,13 +29,22 @@ X_NAMESPACE_BEGIN(engine)
 		bool enabled;
 	};
 
+
+	struct Shader
+	{
+		core::string source;
+		core::string entry;
+		core::string defines;
+
+	};
+
 	struct Technique
 	{
 		render::StateDesc state;
 
 		core::string source;
-		core::string vs;
-		core::string ps;
+		Shader vs;
+		Shader ps;
 		core::string defines;
 	};
 
@@ -45,6 +54,7 @@ X_NAMESPACE_BEGIN(engine)
 		typedef core::HashMap<core::string, StencilState> StencilStatesMap;
 		typedef core::HashMap<core::string, render::StateDesc> StatesMap;
 		typedef core::HashMap<core::string, Technique> TechniqueMap;
+		typedef core::HashMap<core::string, Shader> ShaderMap;
 
 		typedef core::Array<char> FileBuf;
 
@@ -83,9 +93,21 @@ X_NAMESPACE_BEGIN(engine)
 		// RenderFlags
 		bool parseRenderFlags(core::XParser& lex);
 
+
+		// VertexShader
+		bool parseVertexShader(core::XParser& lex);
+		bool parseVertexShaderData(core::XParser& lex, Shader& shader);
+
+		// PixelShader
+		bool parsePixelShader(core::XParser& lex);
+		bool parsePixelShaderData(core::XParser& lex, Shader& shader);
+
+
 		// Technique
 		bool parseTechnique(core::XParser& lex);
 		bool parseState(core::XParser& lex, render::StateDesc& state);
+		bool parseVertexShader(core::XParser& lex, Shader& shader);
+		bool parsePixelShader(core::XParser& lex, Shader& shader);
 
 
 		 
@@ -96,11 +118,13 @@ X_NAMESPACE_BEGIN(engine)
 		bool blendStateExsists(const core::string& name, render::BlendState* pBlendOut = nullptr);
 		bool stencilStateExsists(const core::string& name, StencilState* pStencilOut = nullptr);
 		bool stateExsists(const core::string& name, render::StateDesc* pStateOut = nullptr);
+		bool shaderExsists(const core::string& name, Shader* pShaderOut = nullptr);
 		bool techniqueExsists(const core::string& name);
 
 		render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
 		StencilState& addStencilState(const core::string& name, const core::string& parentName);
 		render::StateDesc& addState(const core::string& name, const core::string& parentName);
+		Shader& addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type);
 		Technique& addTechnique(const core::string& name, const core::string& parentName);
 
 		template<typename T>
@@ -117,6 +141,7 @@ X_NAMESPACE_BEGIN(engine)
 		BlendStatesMap blendStates_;
 		StencilStatesMap stencilStates_;
 		StatesMap states_;
+		ShaderMap shaders_;
 		TechniqueMap techs_;
 	};
 
