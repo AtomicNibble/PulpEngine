@@ -175,7 +175,7 @@ X_NAMESPACE_BEGIN(engine)
 		MATLIB_EXPORT void setBaseDir(core::Path<char>& path);
 		MATLIB_EXPORT bool parseTechDef(const core::string& name);
 
-		MATLIB_EXPORT void clearIncCache(void);
+		MATLIB_EXPORT void clearIncSrcCache(void);
 
 	private:
 		bool loadFile(const core::string& name, FileBuf& bufOut);
