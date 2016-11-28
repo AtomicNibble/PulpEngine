@@ -228,6 +228,8 @@ public:
 	XLexer();
 	XLexer(const char* startInclusive, const char* endExclusive);
 
+	bool SetMemory(const char* startInclusive, const char* endExclusive, const core::string& name);
+
 	bool ReadToken(XLexToken& token);
 
 	bool ExpectTokenString(const char* string);
