@@ -859,19 +859,39 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::parseString(core::XParser& lex, core::string& out)
 	{
-		if (!lex.ExpectTokenString("=")) {
-			return false;
-		}
-
 		core::XLexToken token;
-		if (lex.ExpectTokenType(core::TokenType::STRING, 
+		if (lex.ExpectTokenType(core::TokenType::PUNCTUATION,
 			core::TokenSubType::UNUSET, core::PunctuationId::UNUSET, token)) {
 			return false;
 		}
 
-		out = core::string(token.begin(), token.end());
+		const auto punc = token.GetPuncId();
+		if (punc != core::PunctuationId::ASSIGN && token.GetPuncId() != core::PunctuationId::ADD_ASSIGN) {
+			X_ERROR("TechDef", "Expected assign or add assign. Line: %" PRIi32, lex.GetLineNumber());
+			return false;
+		}
+
+		if (!lex.ExpectTokenType(core::TokenType::STRING, 
+			core::TokenSubType::UNUSET, core::PunctuationId::UNUSET, token)) {
+			return false;
+		}
+
+		if (punc == core::PunctuationId::ASSIGN)
+		{
+			out = core::string(token.begin(), token.end());
+		}
+		else if (punc == core::PunctuationId::ADD_ASSIGN)
+		{
+			out += core::string(token.begin(), token.end());
+		}
+		else
+		{
+			X_ASSERT_UNREACHABLE();
+		}
+
 		return true;
 	}
+
 
 	bool TechSetDefs::parseName(core::XParser& lex, core::string& name, core::string& parentName)
 	{
