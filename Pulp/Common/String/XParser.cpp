@@ -119,6 +119,11 @@ bool XParser::ReadToken(XLexToken& token)
 			continue;
 		}
 
+		// keep reading skipped tokens.
+		if (skip_) {
+			continue;
+		}
+
 		if (token.GetType() == TokenType::NAME)
 		{
 			MacroDefine* define = FindDefine(token);
