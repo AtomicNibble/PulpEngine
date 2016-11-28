@@ -173,8 +173,9 @@ X_NAMESPACE_BEGIN(engine)
 		MATLIB_EXPORT TechSetDefs(core::MemoryArenaBase* arena);
 
 		MATLIB_EXPORT void setBaseDir(core::Path<char>& path);
-
 		MATLIB_EXPORT bool parseTechDef(const core::string& name);
+
+		MATLIB_EXPORT void clearIncCache(void);
 
 	private:
 		bool loadFile(const core::string& name, FileBuf& bufOut);

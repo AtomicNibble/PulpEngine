@@ -1254,6 +1254,11 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
+	void TechSetDefs::clearIncSrcCache(void)
+	{
+		incSourceMap_.clear();
+	}
+
 	bool TechSetDefs::loadFile(const core::string& name, FileBuf& bufOut)
 	{
 		core::XFileScoped file;
