@@ -335,13 +335,14 @@ bool XParser::ReadSourceToken(XLexToken& token)
 			changedScript = 1;
 		}
 
-		// any more scripts to read from?
-		if (idents_.isEmpty()) {
-			return false;
-		}
-
+		// this script is fully parsed.
 		X_DELETE(scriptStack_.top(), arena_);
 		scriptStack_.pop();
+
+		// any more scripts to read from?
+		if (scriptStack_.isEmpty()) {
+			return false;
+		}
 	}
 
 	// copy the already available token
