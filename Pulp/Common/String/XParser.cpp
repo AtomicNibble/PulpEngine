@@ -111,7 +111,7 @@ bool XParser::ReadToken(XLexToken& token)
 			return false;
 		}
 
-		if (token.GetType() == TokenType::PUNCTUATION && token.length() > 0 && token.begin()[0] == '#')
+		if (token.GetType() == TokenType::PUNCTUATION && token.GetPuncId() == PunctuationId::PRECOMP)
 		{
 			if (!ReadDirective()) {
 				return false;
