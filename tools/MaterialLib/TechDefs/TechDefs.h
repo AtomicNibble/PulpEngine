@@ -1,6 +1,7 @@
 #pragma once
 
 #include <IRender.h>
+#include <IMaterial.h>
 
 #include <Containers\Array.h>
 #include <Containers\HashMap.h>
@@ -62,10 +63,12 @@ X_NAMESPACE_BEGIN(engine)
 		bool parseState(core::XParser& lex);
 		bool parseBlendState(core::XParser& lex, render::BlendState& blendState);
 		bool parseStencilState(core::XParser& lex, StencilState& stencilstate);
+		bool parseStencilRef(core::XParser& lex, uint32_t& stencilRef);
 		bool parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut);
 		bool parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& depthFuncOut);
+		bool parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum& polyOffset);
 
-
+		 
 		bool parseBool(core::XParser& lex, bool& out);
 		bool parseName(core::XParser& lex, core::string& name, core::string& parentName);
 

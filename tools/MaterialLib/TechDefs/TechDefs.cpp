@@ -16,7 +16,7 @@ X_NAMESPACE_BEGIN(engine)
 		arena_(arena),
 		blendStates_(arena, 32),
 		stencilStates_(arena, 16),
-		states_(arena, 16)
+		states_(arena, 128)
 	{
 
 	}
@@ -379,6 +379,8 @@ X_NAMESPACE_BEGIN(engine)
 
 		auto& state = addState(name, parentName);
 
+		MaterialPolygonOffset::Enum polyOffset;
+
 		core::XLexToken token;
 		while (lex.ReadToken(token))
 		{
@@ -418,9 +420,18 @@ X_NAMESPACE_BEGIN(engine)
 					break;
 				}
 				case "stencilRef"_fnv1a:
-
+				{
+					uint32_t ref = 0;
+					if (!parseStencilRef(lex, ref)) {
+						return false;
+					}
 					break;
+				}
+				case "blendState"_fnv1a:
 				case "blendState0"_fnv1a:
+				// we should probs support blend states for the diffrent rt's
+				case "blendState1"_fnv1a:
+				case "blendState2"_fnv1a:
 					if (!parseBlendState(lex, state.blend)) {
 						return false;
 					}
@@ -442,13 +453,27 @@ X_NAMESPACE_BEGIN(engine)
 					}
 					break;
 				}
+				case "wireframe"_fnv1a:
+				{
+					bool wireframe = false;
+					if (!parseBool(lex, wireframe)) {
+						return false;
+					}
+
+					if (wireframe) {
+						state.stateFlags.Set(render::StateFlag::WIREFRAME);
+					}
+					break;
+				}
 				case "depthTest"_fnv1a:
 					if (!parseDepthTest(lex, state.depthFunc)) {
 						return false;
 					}
 					break;
 				case "polygonOffset"_fnv1a:
-
+					if (!parsePolyOffset(lex, polyOffset)) {
+						return false;
+					}
 					break;
 
 				default:
@@ -476,7 +501,8 @@ X_NAMESPACE_BEGIN(engine)
 		if (token.GetType() == core::TokenType::NAME) 
 		{
 			// inline declare.
-			if (!lex.ExpectTokenString("BlendState")) {
+			if (!token.isEqual("BlendState")) {
+				X_ERROR("TechDef", "Expected either blend state name or inline define. Line: %" PRIi32, lex.GetLineNumber());
 				return false;
 			}
 
@@ -489,9 +515,11 @@ X_NAMESPACE_BEGIN(engine)
 			}
 
 			// parse the inline state.
-			if (!parseBlendStateData(lex, blendState)) {
-				return false;
+			if (parseBlendStateData(lex, blendState)) {
+				return true;
 			}
+
+			X_ERROR("TechDef", "Failed to parse inline BlendState. Line: %" PRIi32, lex.GetLineNumber());
 		}
 		else if (token.GetType() == core::TokenType::STRING)
 		{
@@ -522,7 +550,8 @@ X_NAMESPACE_BEGIN(engine)
 		if (token.GetType() == core::TokenType::NAME)
 		{
 			// inline declare.
-			if (!lex.ExpectTokenString("StencilState")) {
+			if (!token.isEqual("StencilState")) {
+				X_ERROR("TechDef", "Expected either stencil state name or inline define. Line: %" PRIi32, lex.GetLineNumber());
 				return false;
 			}
 
@@ -535,9 +564,11 @@ X_NAMESPACE_BEGIN(engine)
 			}
 
 			// parse the inline state.
-			if (!parseStencilStateData(lex, stencilstate)) {
-				return false;
+			if (parseStencilStateData(lex, stencilstate)) {
+				return true;
 			}
+
+			X_ERROR("TechDef", "Failed to parse inline BlendState. Line: %" PRIi32, lex.GetLineNumber());
 		}
 		else if (token.GetType() == core::TokenType::STRING)
 		{
@@ -552,6 +583,27 @@ X_NAMESPACE_BEGIN(engine)
 		}
 
 		return false;
+	}
+
+	bool TechSetDefs::parseStencilRef(core::XParser& lex, uint32_t& stencilRef)
+	{
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+
+		if (token.GetType() != core::TokenType::NUMBER) {
+			X_ERROR("TestDefs", "Expected numeric token for stencilRef. Line: %" PRIi32, lex.GetLineNumber());
+			return false;
+		}
+
+		stencilRef = static_cast<uint32_t>(token.GetIntValue());
+		return true;
 	}
 
 	bool TechSetDefs::parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut)
@@ -594,6 +646,25 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
+	bool TechSetDefs::parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum& polyOffset)
+	{
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("TestDefs", "Expected string token for polyOffset. Line: %" PRIi32, lex.GetLineNumber());
+			return false;
+		}
+
+		polyOffset = Util::MatPolyOffsetFromStr(token.begin(), token.end());
+		return true;
+	}
 
 	// ----------------------------------------------------
 
@@ -646,8 +717,8 @@ X_NAMESPACE_BEGIN(engine)
 					return false;
 				}
 
-				if (token.GetType() != core::TokenType::STRING) {
-					X_ERROR("TestDefs", "Expected string token for parent name. Line: %" PRIi32, lex.GetLineNumber());
+				if (token.GetType() != core::TokenType::STRING && token.GetType() != core::TokenType::NAME) {
+					X_ERROR("TestDefs", "Expected string/name token for parent name. Line: %" PRIi32, lex.GetLineNumber());
 					return false;
 				}
 
