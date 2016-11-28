@@ -50,7 +50,7 @@ X_NAMESPACE_BEGIN(engine)
 		core::string defines;
 	};
 
-	class TechSetDefs
+	class TechSetDef
 	{
 		typedef core::HashMap<core::string, render::BlendState> BlendStatesMap;
 		typedef core::HashMap<core::string, StencilState> StencilStatesMap;
@@ -61,7 +61,7 @@ X_NAMESPACE_BEGIN(engine)
 		typedef core::Array<char> FileBuf;
 
 	public:
-		MATLIB_EXPORT TechSetDefs(core::MemoryArenaBase* arena);
+		MATLIB_EXPORT TechSetDef(core::MemoryArenaBase* arena);
 
 
 		MATLIB_EXPORT bool parseFile(core::Path<char>& path);
@@ -120,8 +120,8 @@ X_NAMESPACE_BEGIN(engine)
 
 		template <typename T>
 		bool parseHelper(core::XParser& lex, T& state,
-			typename core::traits::MemberFunction<TechSetDefs, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
-			typename core::traits::MemberFunction<TechSetDefs, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc, 
+			typename core::traits::MemberFunction<TechSetDef, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
+			typename core::traits::MemberFunction<TechSetDef, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc, 
 			const char* pObjName, const char* pStateName);
 		bool parseInlineDefine(core::XParser& lex, core::string& name, core::string& parentName, const char* pStateName);
 		bool parseNameInline(core::XParser& lex, core::string& parentName);

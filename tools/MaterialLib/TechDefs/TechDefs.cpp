@@ -12,7 +12,7 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-	TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
+	TechSetDef::TechSetDef(core::MemoryArenaBase* arena) :
 		arena_(arena),
 		blendStates_(arena, 32),
 		stencilStates_(arena, 16),
@@ -25,7 +25,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 
-	bool TechSetDefs::parseFile(core::Path<char>& path)
+	bool TechSetDef::parseFile(core::Path<char>& path)
 	{
 		core::XFileScoped file;
 		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
@@ -49,7 +49,7 @@ X_NAMESPACE_BEGIN(engine)
 		return parseFile(lex);
 	}
 
-	bool TechSetDefs::parseFile(core::XParser& lex)
+	bool TechSetDef::parseFile(core::XParser& lex)
 	{
 		core::XLexToken token;
 
@@ -127,7 +127,7 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 
-	bool TechSetDefs::parseBlendState(core::XParser& lex)
+	bool TechSetDef::parseBlendState(core::XParser& lex)
 	{
 		core::string name, parentName;
 
@@ -145,7 +145,7 @@ X_NAMESPACE_BEGIN(engine)
 		return parseBlendStateData(lex, blend);
 	}
 
-	bool TechSetDefs::parseBlendStateData(core::XParser& lex, render::BlendState& blend)
+	bool TechSetDef::parseBlendStateData(core::XParser& lex, render::BlendState& blend)
 	{
 		if (!lex.ExpectTokenString("{")) {
 			return false;
@@ -209,7 +209,7 @@ X_NAMESPACE_BEGIN(engine)
 		return false;
 	}
 
-	bool TechSetDefs::parseBlendType(core::XParser& lex, render::BlendType::Enum& blendTypeOut)
+	bool TechSetDef::parseBlendType(core::XParser& lex, render::BlendType::Enum& blendTypeOut)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -233,7 +233,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseBlendOp(core::XParser& lex, render::BlendOp::Enum& blendOpOut)
+	bool TechSetDef::parseBlendOp(core::XParser& lex, render::BlendOp::Enum& blendOpOut)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -253,7 +253,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseWriteChannels(core::XParser& lex, render::WriteMaskFlags& channels)
+	bool TechSetDef::parseWriteChannels(core::XParser& lex, render::WriteMaskFlags& channels)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -275,7 +275,7 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ----------------------------------------------------
 
-	bool TechSetDefs::parseStencilState(core::XParser& lex)
+	bool TechSetDef::parseStencilState(core::XParser& lex)
 	{
 		core::string name, parentName;
 
@@ -293,7 +293,7 @@ X_NAMESPACE_BEGIN(engine)
 		return parseStencilStateData(lex, stencil);
 	}
 
-	bool TechSetDefs::parseStencilStateData(core::XParser& lex, StencilState& stencil)
+	bool TechSetDef::parseStencilStateData(core::XParser& lex, StencilState& stencil)
 	{
 		auto& state = stencil.state;
 
@@ -348,7 +348,7 @@ X_NAMESPACE_BEGIN(engine)
 		return false;
 	}
 
-	bool TechSetDefs::parseStencilFunc(core::XParser& lex, render::StencilFunc::Enum& funcOut)
+	bool TechSetDef::parseStencilFunc(core::XParser& lex, render::StencilFunc::Enum& funcOut)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -368,7 +368,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseStencilOp(core::XParser& lex, render::StencilOperation::Enum& opOut)
+	bool TechSetDef::parseStencilOp(core::XParser& lex, render::StencilOperation::Enum& opOut)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -390,7 +390,7 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ----------------------------------------------------
 
-	bool TechSetDefs::parseState(core::XParser& lex)
+	bool TechSetDef::parseState(core::XParser& lex)
 	{
 		core::string name, parentName;
 
@@ -412,7 +412,7 @@ X_NAMESPACE_BEGIN(engine)
 		return parseStateData(lex, state);
 	}
 
-	bool TechSetDefs::parseStateData(core::XParser& lex, render::StateDesc& state)
+	bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 	{
 		MaterialPolygonOffset::Enum polyOffset;
 
@@ -521,19 +521,19 @@ X_NAMESPACE_BEGIN(engine)
 		return false;
 	}
 
-	bool TechSetDefs::parseBlendState(core::XParser& lex, render::BlendState& blendState)
+	bool TechSetDef::parseBlendState(core::XParser& lex, render::BlendState& blendState)
 	{
-		return parseHelper<render::BlendState>(lex, blendState, &TechSetDefs::parseBlendStateData,
-			&TechSetDefs::blendStateExsists, "State", "BlendState");
+		return parseHelper<render::BlendState>(lex, blendState, &TechSetDef::parseBlendStateData,
+			&TechSetDef::blendStateExsists, "State", "BlendState");
 	}
 
-	bool TechSetDefs::parseStencilState(core::XParser& lex, StencilState& stencilstate)
+	bool TechSetDef::parseStencilState(core::XParser& lex, StencilState& stencilstate)
 	{
-		return parseHelper<StencilState>(lex, stencilstate, &TechSetDefs::parseStencilStateData, 
-			&TechSetDefs::stencilStateExsists, "State", "StencilState");
+		return parseHelper<StencilState>(lex, stencilstate, &TechSetDef::parseStencilStateData, 
+			&TechSetDef::stencilStateExsists, "State", "StencilState");
 	}
 
-	bool TechSetDefs::parseStencilRef(core::XParser& lex, uint32_t& stencilRef)
+	bool TechSetDef::parseStencilRef(core::XParser& lex, uint32_t& stencilRef)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -554,7 +554,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut)
+	bool TechSetDef::parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -574,7 +574,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& depthFuncOut)
+	bool TechSetDef::parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& depthFuncOut)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -594,7 +594,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum& polyOffset)
+	bool TechSetDef::parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum& polyOffset)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -617,7 +617,7 @@ X_NAMESPACE_BEGIN(engine)
 	// ----------------------------------------------------
 
 
-	bool TechSetDefs::parseRenderFlags(core::XParser& lex)
+	bool TechSetDef::parseRenderFlags(core::XParser& lex)
 	{
 
 
@@ -627,7 +627,7 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ----------------------------------------------------
 
-	bool TechSetDefs::parseVertexShader(core::XParser& lex)
+	bool TechSetDef::parseVertexShader(core::XParser& lex)
 	{
 		core::string name, parentName;
 
@@ -649,14 +649,14 @@ X_NAMESPACE_BEGIN(engine)
 		return parseVertexShaderData(lex, shader);
 	}
 
-	bool TechSetDefs::parseVertexShaderData(core::XParser& lex, Shader& shader)
+	bool TechSetDef::parseVertexShaderData(core::XParser& lex, Shader& shader)
 	{
 		return parsePixelShaderData(lex, shader);
 	}
 
 	// ----------------------------------------------------
 
-	bool TechSetDefs::parsePixelShader(core::XParser& lex)
+	bool TechSetDef::parsePixelShader(core::XParser& lex)
 	{
 		core::string name, parentName;
 
@@ -679,7 +679,7 @@ X_NAMESPACE_BEGIN(engine)
 		return parsePixelShaderData(lex, shader);
 	}
 
-	bool TechSetDefs::parsePixelShaderData(core::XParser& lex, Shader& shader)
+	bool TechSetDef::parsePixelShaderData(core::XParser& lex, Shader& shader)
 	{
 		// start of define.
 		if (!lex.ExpectTokenString("{")) {
@@ -722,7 +722,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 
-	bool TechSetDefs::parseTechnique(core::XParser& lex)
+	bool TechSetDef::parseTechnique(core::XParser& lex)
 	{
 		core::string name, parentName;
 
@@ -787,19 +787,19 @@ X_NAMESPACE_BEGIN(engine)
 		return false;
 	}
 
-	bool TechSetDefs::parseState(core::XParser& lex, render::StateDesc& state)
+	bool TechSetDef::parseState(core::XParser& lex, render::StateDesc& state)
 	{
-		return parseHelper<render::StateDesc>(lex, state, &TechSetDefs::parseStateData,
-			&TechSetDefs::stateExsists, "Tech", "State");
+		return parseHelper<render::StateDesc>(lex, state, &TechSetDef::parseStateData,
+			&TechSetDef::stateExsists, "Tech", "State");
 	}
 
-	bool TechSetDefs::parseVertexShader(core::XParser& lex, Shader& shader)
+	bool TechSetDef::parseVertexShader(core::XParser& lex, Shader& shader)
 	{
 		// it's the same for now.
 		return parsePixelShader(lex, shader);
 	}
 
-	bool TechSetDefs::parsePixelShader(core::XParser& lex, Shader& shader)
+	bool TechSetDef::parsePixelShader(core::XParser& lex, Shader& shader)
 	{
 		// can be a function name or a inline define.
 		if (!lex.ExpectTokenString("=")) {
@@ -847,7 +847,7 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ----------------------------------------------------
 
-	bool TechSetDefs::parseBool(core::XParser& lex, bool& out)
+	bool TechSetDef::parseBool(core::XParser& lex, bool& out)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -857,7 +857,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseString(core::XParser& lex, core::string& out)
+	bool TechSetDef::parseString(core::XParser& lex, core::string& out)
 	{
 		core::XLexToken token;
 		if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
@@ -893,7 +893,7 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 
-	bool TechSetDefs::parseDefines(core::XParser& lex, core::string& out)
+	bool TechSetDef::parseDefines(core::XParser& lex, core::string& out)
 	{
 		core::XLexToken token;
 		if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
@@ -959,7 +959,7 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 
-	bool TechSetDefs::parseName(core::XParser& lex, core::string& name, core::string& parentName)
+	bool TechSetDef::parseName(core::XParser& lex, core::string& name, core::string& parentName)
 	{
 		if (!lex.ExpectTokenString("(")) {
 			return false;
@@ -1012,9 +1012,9 @@ X_NAMESPACE_BEGIN(engine)
 
 
 	template <typename T>
-	bool TechSetDefs::parseHelper(core::XParser& lex, T& state,
-		typename core::traits::MemberFunction<TechSetDefs, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
-		typename core::traits::MemberFunction<TechSetDefs, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc,
+	bool TechSetDef::parseHelper(core::XParser& lex, T& state,
+		typename core::traits::MemberFunction<TechSetDef, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
+		typename core::traits::MemberFunction<TechSetDef, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc,
 		const char* pObjName, const char* pStateName)
 	{
 		// this supports inline defines we parents or name of exsisting state.
@@ -1058,7 +1058,7 @@ X_NAMESPACE_BEGIN(engine)
 		return false;
 	}
 
-	bool TechSetDefs::parseInlineDefine(core::XParser& lex, core::string& name, core::string& parentName, const char* pStateName)
+	bool TechSetDef::parseInlineDefine(core::XParser& lex, core::string& name, core::string& parentName, const char* pStateName)
 	{
 		if (!lex.ExpectTokenString("=")) {
 			return false;
@@ -1093,7 +1093,7 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 
-	bool TechSetDefs::parseNameInline(core::XParser& lex, core::string& parentName)
+	bool TechSetDef::parseNameInline(core::XParser& lex, core::string& parentName)
 	{
 		if (!lex.ExpectTokenString("(")) {
 			return false;
@@ -1133,60 +1133,60 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 
-	bool TechSetDefs::blendStateExsists(const core::string& name, render::BlendState* pBlendOut)
+	bool TechSetDef::blendStateExsists(const core::string& name, render::BlendState* pBlendOut)
 	{
 		return findHelper(blendStates_, name, pBlendOut);
 	}
 
-	bool TechSetDefs::stencilStateExsists(const core::string& name, StencilState* pStencilOut)
+	bool TechSetDef::stencilStateExsists(const core::string& name, StencilState* pStencilOut)
 	{
 		return findHelper(stencilStates_, name, pStencilOut);
 	}
 
-	bool TechSetDefs::stateExsists(const core::string& name, render::StateDesc* pStateOut)
+	bool TechSetDef::stateExsists(const core::string& name, render::StateDesc* pStateOut)
 	{
 		return findHelper(states_, name, pStateOut);
 	}
 
-	bool TechSetDefs::shaderExsists(const core::string& name, Shader* pShaderOut)
+	bool TechSetDef::shaderExsists(const core::string& name, Shader* pShaderOut)
 	{
 		return findHelper(shaders_, name, pShaderOut);
 	}
 
-	bool TechSetDefs::techniqueExsists(const core::string& name)
+	bool TechSetDef::techniqueExsists(const core::string& name)
 	{
 		return techs_.find(name) != techs_.end();
 	}
 
-	render::BlendState& TechSetDefs::addBlendState(const core::string& name, const core::string& parentName)
+	render::BlendState& TechSetDef::addBlendState(const core::string& name, const core::string& parentName)
 	{
 		return addHelper(blendStates_, name, parentName, "BlendState");
 	}
 
-	StencilState& TechSetDefs::addStencilState(const core::string& name, const core::string& parentName)
+	StencilState& TechSetDef::addStencilState(const core::string& name, const core::string& parentName)
 	{
 		return addHelper(stencilStates_, name, parentName, "StencilState");
 	}
 
-	render::StateDesc& TechSetDefs::addState(const core::string& name, const core::string& parentName)
+	render::StateDesc& TechSetDef::addState(const core::string& name, const core::string& parentName)
 	{
 		return addHelper(states_, name, parentName, "state");
 	}
 
-	Shader& TechSetDefs::addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type)
+	Shader& TechSetDef::addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type)
 	{
 		X_UNUSED(type);
 		return addHelper(shaders_, name, parentName, "state");
 	}
 
-	Technique& TechSetDefs::addTechnique(const core::string& name, const core::string& parentName)
+	Technique& TechSetDef::addTechnique(const core::string& name, const core::string& parentName)
 	{
 		return addHelper(techs_, name, parentName, "Tech");
 	}
 
 
 	template<typename T>
-	X_INLINE bool TechSetDefs::findHelper(core::HashMap<core::string, T>& map,
+	X_INLINE bool TechSetDef::findHelper(core::HashMap<core::string, T>& map,
 		const core::string& name, T* pOut)
 	{
 		auto it = map.find(name);
@@ -1201,7 +1201,7 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 	template<typename T>
-	X_INLINE  T& TechSetDefs::addHelper(core::HashMap<core::string, T>& map,
+	X_INLINE  T& TechSetDef::addHelper(core::HashMap<core::string, T>& map,
 		const core::string& name, const core::string& parentName, const char* pNick)
 	{
 		if (!parentName.isEmpty())
