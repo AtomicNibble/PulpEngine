@@ -7,6 +7,7 @@
 #include <Containers\HashMap.h>
 
 #include <Traits\MemberFunctionTraits.h>
+#include <Util\Delegate.h>
 
 X_NAMESPACE_DECLARE(core,
 	class XLexer;
@@ -61,14 +62,18 @@ X_NAMESPACE_BEGIN(engine)
 		typedef core::Array<char> FileBuf;
 
 	public:
-		MATLIB_EXPORT TechSetDef(core::MemoryArenaBase* arena);
+		typedef core::Delegate<bool(core::XLexer& lex, core::string&)> OpenIncludeDel;
+
+	public:
+		TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
 
 
-		MATLIB_EXPORT bool parseFile(core::Path<char>& path);
+		bool parseFile(FileBuf& buf);
+		bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
 
 	private:
 		bool parseFile(core::XParser& lex);
-		
+
 		// blend
 		bool parseBlendState(core::XParser& lex);
 		bool parseBlendStateData(core::XParser& lex, render::BlendState& blend);
@@ -148,12 +153,41 @@ X_NAMESPACE_BEGIN(engine)
 
 	private:
 		core::MemoryArenaBase* arena_;
+		core::string fileName_;
 
 		BlendStatesMap blendStates_;
 		StencilStatesMap stencilStates_;
 		StatesMap states_;
 		ShaderMap shaders_;
 		TechniqueMap techs_;
+	};
+
+
+	class TechSetDefs
+	{
+		typedef core::Array<char> FileBuf;
+		typedef core::HashMap<core::string, FileBuf> SourceMap;
+		typedef core::HashMap<core::string, TechSetDef> TechSetDefMap;
+
+	public:
+		MATLIB_EXPORT TechSetDefs(core::MemoryArenaBase* arena);
+
+		MATLIB_EXPORT void setBaseDir(core::Path<char>& path);
+
+		MATLIB_EXPORT bool parseTechDef(const core::string& name);
+
+	private:
+		bool loadFile(const core::string& name, FileBuf& bufOut);
+
+		bool includeCallback(core::XLexer& lex, core::string& name);
+
+	private:
+		core::MemoryArenaBase* arena_;
+		TechSetDef::OpenIncludeDel incDel_;
+		core::Path<char> baseDir_;
+
+		TechSetDefMap techDefs_;
+		SourceMap incSourceMap_;
 	};
 
 

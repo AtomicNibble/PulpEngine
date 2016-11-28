@@ -12,8 +12,9 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-	TechSetDef::TechSetDef(core::MemoryArenaBase* arena) :
+	TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 		arena_(arena),
+		fileName_(fileName),
 		blendStates_(arena, 32),
 		stencilStates_(arena, 16),
 		states_(arena, 128),
@@ -24,27 +25,17 @@ X_NAMESPACE_BEGIN(engine)
 	}
 
 
-
-	bool TechSetDef::parseFile(core::Path<char>& path)
+	bool TechSetDef::parseFile(FileBuf& buf)
 	{
-		core::XFileScoped file;
-		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
+		core::XParser lex(buf.begin(), buf.end(), fileName_, core::LexFlag::ALLOWPATHNAMES, arena_);
 
-		if (!file.openFile(path.c_str(), mode)) {
-			X_ERROR("TestDefs", "Failed to open file");
-			return false;
-		}
+		return parseFile(lex);
+	}
 
-		const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
-
-		FileBuf fileData(arena_, fileSize);
-
-		if (file.read(fileData.data(), fileSize) != fileSize) {
-			X_ERROR("TestDefs", "Failed to read file data");
-			return false;
-		}
-
-		core::XParser lex(fileData.begin(), fileData.end(), path.fileName(), core::LexFlag::ALLOWPATHNAMES, arena_);
+	bool TechSetDef::parseFile(FileBuf& buf, TechSetDef::OpenIncludeDel incDel)
+	{
+		core::XParser lex(buf.begin(), buf.end(), fileName_, core::LexFlag::ALLOWPATHNAMES, arena_);
+		lex.setIncludeCallback(incDel);
 
 		return parseFile(lex);
 	}
@@ -125,7 +116,6 @@ X_NAMESPACE_BEGIN(engine)
 
 		return true;
 	}
-
 
 	bool TechSetDef::parseBlendState(core::XParser& lex)
 	{
@@ -1225,5 +1215,91 @@ X_NAMESPACE_BEGIN(engine)
 
 		return map[name];
 	}
+
+
+	// ------------------------------------------------------------------------------
+
+	TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
+		arena_(arena),
+		techDefs_(arena, 128),
+		incSourceMap_(arena, 128)
+	{
+		incDel_.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
+	}
+
+	void TechSetDefs::setBaseDir(core::Path<char>& path)
+	{
+		X_ASSERT(baseDir_.isEmpty(), "Can't re set base dir, cache will need clearing to support such behaviour")();
+		baseDir_ = path;
+	}
+
+	bool TechSetDefs::parseTechDef(const core::string& name)
+	{
+		FileBuf fileData(arena_);
+
+		if (!loadFile(name, fileData)) {
+			return false;
+		}
+
+		auto it = techDefs_.insert(TechSetDefMap::value_type(name, TechSetDef(name, arena_)));
+
+		TechSetDef& techDef = it.first->second;
+
+		if (!techDef.parseFile(fileData, incDel_)) {
+			X_ERROR("TechSetDefs", "Failed to load: \"%s\"", name.c_str());
+			techDefs_.erase(it.first);
+			return false;
+		}
+
+		return true;
+	}
+
+	bool TechSetDefs::loadFile(const core::string& name, FileBuf& bufOut)
+	{
+		core::XFileScoped file;
+		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
+
+		core::Path<char> path(baseDir_);
+		path /= name;
+
+		if (!file.openFile(path.c_str(), mode)) {
+			X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", name.c_str());
+			return false;
+		}
+
+		const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
+
+		bufOut.resize(fileSize);
+
+		if (file.read(bufOut.data(), fileSize) != fileSize) {
+			X_ERROR("TechSetDefs", "Failed to read file data");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name)
+	{
+		auto it = incSourceMap_.find(name);
+		if (it == incSourceMap_.end())
+		{
+			// we need to load it.
+			FileBuf fileData(arena_);
+
+			if (!loadFile(name, fileData)) {
+				return false;
+			}
+
+			auto insertedIt = incSourceMap_.insert(SourceMap::value_type(name, std::move(fileData)));
+			it = insertedIt.first;
+		}
+
+		FileBuf& buf = it->second;
+
+		return lex.SetMemory(buf.begin(), buf.end(), name);
+	}
+
+
 
 X_NAMESPACE_END
