@@ -101,6 +101,13 @@ private:
 };
 
 
+template<typename T, class... _Types>
+X_INLINE core::UniquePointer<T> makeUnique(core::MemoryArenaBase* arena, _Types&&... _Args)
+{
+	return core::UniquePointer<T>(arena, X_NEW(T, arena, "makeUnique<T>")(std::forward<_Types>(_Args)...));
+}
+
+
 X_NAMESPACE_END
 
 #include "UniquePointer.inl"
