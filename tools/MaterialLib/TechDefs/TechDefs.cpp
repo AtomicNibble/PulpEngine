@@ -523,101 +523,14 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::parseBlendState(core::XParser& lex, render::BlendState& blendState)
 	{
-		// this can eitehr be a string or inline define of new state.
-		if (!lex.ExpectTokenString("=")) {
-			return false;
-		}
-
-		core::XLexToken token;
-		if (!lex.ReadToken(token)) {
-			return false;
-		}
-
-		if (token.GetType() == core::TokenType::NAME) 
-		{
-			// inline declare.
-			if (!token.isEqual("BlendState")) {
-				X_ERROR("TechDef", "Expected either blend state name or inline define. Line: %" PRIi32, lex.GetLineNumber());
-				return false;
-			}
-
-			// got ()
-			if (!lex.ExpectTokenString("(")) {
-				return false;
-			}
-			if (!lex.ExpectTokenString(")")) {
-				return false;
-			}
-
-			// parse the inline state.
-			if (parseBlendStateData(lex, blendState)) {
-				return true;
-			}
-
-			X_ERROR("TechDef", "Failed to parse inline BlendState. Line: %" PRIi32, lex.GetLineNumber());
-		}
-		else if (token.GetType() == core::TokenType::STRING)
-		{
-			// a predefined one
-			core::string name(token.begin(), token.end());
-
-			if (blendStateExsists(name, &blendState)) {
-				return true;
-			}
-
-			X_ERROR("TechDef", "State uses undefined blendstate: \"%s\" Line: %" PRIi32, name.c_str(), lex.GetLineNumber());
-		}
-
-		return false;
+		return parseHelper<render::BlendState>(lex, blendState, &TechSetDefs::parseBlendStateData,
+			&TechSetDefs::blendStateExsists, "State", "BlendState");
 	}
 
 	bool TechSetDefs::parseStencilState(core::XParser& lex, StencilState& stencilstate)
 	{
-		if (!lex.ExpectTokenString("=")) {
-			return false;
-		}
-
-		core::XLexToken token;
-		if (!lex.ReadToken(token)) {
-			return false;
-		}
-
-		if (token.GetType() == core::TokenType::NAME)
-		{
-			// inline declare.
-			if (!token.isEqual("StencilState")) {
-				X_ERROR("TechDef", "Expected either stencil state name or inline define. Line: %" PRIi32, lex.GetLineNumber());
-				return false;
-			}
-
-			// got ()
-			if (!lex.ExpectTokenString("(")) {
-				return false;
-			}
-			if (!lex.ExpectTokenString(")")) {
-				return false;
-			}
-
-			// parse the inline state.
-			if (parseStencilStateData(lex, stencilstate)) {
-				return true;
-			}
-
-			X_ERROR("TechDef", "Failed to parse inline StencilState. Line: %" PRIi32, lex.GetLineNumber());
-		}
-		else if (token.GetType() == core::TokenType::STRING)
-		{
-			// a predefined one
-			core::string name(token.begin(), token.end());
-
-			if (stencilStateExsists(name, &stencilstate)) {
-				return true;
-			}
-
-			X_ERROR("TechDef", "State uses undefined StencilState: \"%s\" Line: %" PRIi32, name.c_str(), lex.GetLineNumber());
-		}
-
-		return false;
+		return parseHelper<StencilState>(lex, stencilstate, &TechSetDefs::parseStencilStateData, 
+			&TechSetDefs::stencilStateExsists, "State", "StencilState");
 	}
 
 	bool TechSetDefs::parseStencilRef(core::XParser& lex, uint32_t& stencilRef)
@@ -876,51 +789,8 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::parseState(core::XParser& lex, render::StateDesc& state)
 	{
-		if (!lex.ExpectTokenString("=")) {
-			return false;
-		}
-
-		core::XLexToken token;
-		if (!lex.ReadToken(token)) {
-			return false;
-		}
-
-		if (token.GetType() == core::TokenType::NAME)
-		{
-			// inline declare.
-			if (!token.isEqual("State")) {
-				X_ERROR("TechDef", "Expected either State name or inline define. Line: %" PRIi32, lex.GetLineNumber());
-				return false;
-			}
-
-			// got ()
-			if (!lex.ExpectTokenString("(")) {
-				return false;
-			}
-			if (!lex.ExpectTokenString(")")) {
-				return false;
-			}
-
-			// parse the inline state.
-			if (parseStateData(lex, state)) {
-				return true;
-			}
-
-			X_ERROR("TechDef", "Failed to parse inline State. Line: %" PRIi32, lex.GetLineNumber());
-		}
-		else if (token.GetType() == core::TokenType::STRING)
-		{
-			// a predefined one
-			core::string name(token.begin(), token.end());
-
-			if (stateExsists(name, &state)) {
-				return true;
-			}
-
-			X_ERROR("TechDef", "Tech uses undefined State: \"%s\" Line: %" PRIi32, name.c_str(), lex.GetLineNumber());
-		}
-
-		return false;
+		return parseHelper<render::StateDesc>(lex, state, &TechSetDefs::parseStateData,
+			&TechSetDefs::stateExsists, "Tech", "State");
 	}
 
 	bool TechSetDefs::parseVertexShader(core::XParser& lex, Shader& shader)
@@ -1053,6 +923,129 @@ X_NAMESPACE_BEGIN(engine)
 
 		return true;
 	}
+
+
+	template <typename T>
+	bool TechSetDefs::parseHelper(core::XParser& lex, T& state,
+		typename core::traits::MemberFunction<TechSetDefs, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
+		typename core::traits::MemberFunction<TechSetDefs, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc,
+		const char* pObjName, const char* pStateName)
+	{
+		// this supports inline defines we parents or name of exsisting state.
+		core::string name, parentName;
+
+		if (!parseInlineDefine(lex, name, parentName, pStateName)) {
+			return false;
+		}
+
+		if (name.isNotEmpty())
+		{
+			if ((*this.*stateExsistsFunc)(name, &state)) {
+				return true;
+			}
+
+			X_ERROR("TechDef", "%s uses undefined %s: \"%s\" Line: %" PRIi32, pObjName, pStateName, name.c_str(), lex.GetLineNumber());
+		}
+		else
+		{
+			X_ASSERT(name.isEmpty(), "Inline define can't have a name")(name.c_str());
+
+			if (parentName.isNotEmpty())
+			{
+				// inline define can have a parent.
+				// but it must exist if defined.
+				if (!(*this.*stateExsistsFunc)(parentName, &state)) {
+					X_ERROR("TechDef", "%s has a inline %s define with a undefined parent of: %s \"%s\" Line: %" PRIi32,
+						pObjName, pStateName, parentName.c_str(), lex.GetLineNumber());
+					return false;
+				}
+			}
+
+			// parse the inline state.
+			if ((*this.*parseStateFunc)(lex, state)) {
+				return true;
+			}
+
+			X_ERROR("TechDef", "Failed to parse inline %s. Line: %" PRIi32, pStateName, lex.GetLineNumber());
+		}
+
+		return false;
+	}
+
+	bool TechSetDefs::parseInlineDefine(core::XParser& lex, core::string& name, core::string& parentName, const char* pStateName)
+	{
+		if (!lex.ExpectTokenString("=")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() == core::TokenType::NAME)
+		{
+			name.clear();
+
+			if (!token.isEqual(pStateName)) {
+				X_ERROR("TechDef", "Expected '%s entry' or inline '%s' define. Line: %" PRIi32, pStateName, pStateName, lex.GetLineNumber());
+				return false;
+			}
+
+			if (parseNameInline(lex, parentName)) {
+				return true;
+			}
+		}
+		else if (token.GetType() == core::TokenType::STRING)
+		{
+			// a predefined one
+			name = core::string(token.begin(), token.end());
+			return true;
+		}
+
+		return false;
+	}
+
+
+	bool TechSetDefs::parseNameInline(core::XParser& lex, core::string& parentName)
+	{
+		if (!lex.ExpectTokenString("(")) {
+			return false;
+		}
+		if (!lex.ExpectTokenString(")")) {
+			return false;
+		}
+
+		// look for parent name.
+		parentName.clear();
+
+		core::XLexToken token;
+		if (lex.ReadToken(token))
+		{
+			if (!token.isEqual(":"))
+			{
+				lex.UnreadToken(token);
+			}
+			else
+			{
+				// got a parent name.
+				if (!lex.ReadToken(token)) {
+					X_ERROR("TestDefs", "Failed to read parent name. Line: %" PRIi32, lex.GetLineNumber());
+					return false;
+				}
+
+				if (token.GetType() != core::TokenType::STRING && token.GetType() != core::TokenType::NAME) {
+					X_ERROR("TestDefs", "Expected string/name token for parent name. Line: %" PRIi32, lex.GetLineNumber());
+					return false;
+				}
+
+				parentName = core::string(token.begin(), token.end());
+			}
+		}
+
+		return true;
+	}
+
 
 	bool TechSetDefs::blendStateExsists(const core::string& name, render::BlendState* pBlendOut)
 	{

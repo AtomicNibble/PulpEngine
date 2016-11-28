@@ -6,6 +6,8 @@
 #include <Containers\Array.h>
 #include <Containers\HashMap.h>
 
+#include <Traits\MemberFunctionTraits.h>
+
 X_NAMESPACE_DECLARE(core,
 	class XLexer;
 	class XParser;
@@ -114,6 +116,14 @@ X_NAMESPACE_BEGIN(engine)
 		bool parseBool(core::XParser& lex, bool& out);
 		bool parseString(core::XParser& lex, core::string& out);
 		bool parseName(core::XParser& lex, core::string& name, core::string& parentName);
+
+		template <typename T>
+		bool parseHelper(core::XParser& lex, T& state,
+			typename core::traits::MemberFunction<TechSetDefs, bool(core::XParser& lex, T& state)>::Pointer parseStateFunc,
+			typename core::traits::MemberFunction<TechSetDefs, bool(const core::string& name, T* pState)>::Pointer stateExsistsFunc, 
+			const char* pObjName, const char* pStateName);
+		bool parseInlineDefine(core::XParser& lex, core::string& name, core::string& parentName, const char* pStateName);
+		bool parseNameInline(core::XParser& lex, core::string& parentName);
 
 		bool blendStateExsists(const core::string& name, render::BlendState* pBlendOut = nullptr);
 		bool stencilStateExsists(const core::string& name, StencilState* pStencilOut = nullptr);
