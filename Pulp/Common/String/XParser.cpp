@@ -169,7 +169,7 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
 			return false;
 		}
 	}
-	else if (token.GetType() == TokenType::PUNCTUATION) 
+	else if (token.GetType() == TokenType::PUNCTUATION && puncId != PunctuationId::UNUSET)
 	{
 		if (token.GetPuncId() != puncId)
 		{
