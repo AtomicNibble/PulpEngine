@@ -895,41 +895,17 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::blendStateExsists(const core::string& name, render::BlendState* pBlendOut)
 	{
-		auto it = blendStates_.find(name);
-		if (it != blendStates_.end()) {
-			if (pBlendOut) {
-				*pBlendOut = it->second;
-			}
-			return true;
-		}
-
-		return false;
+		return findHelper(blendStates_, name, pBlendOut);
 	}
 
 	bool TechSetDefs::stencilStateExsists(const core::string& name, StencilState* pStencilOut)
 	{
-		auto it = stencilStates_.find(name);
-		if (it != stencilStates_.end()) {
-			if (pStencilOut) {
-				*pStencilOut = it->second;
-			}
-			return true;
-		}
-
-		return false;
+		return findHelper(stencilStates_, name, pStencilOut);
 	}
 
 	bool TechSetDefs::stateExsists(const core::string& name, render::StateDesc* pStateOut)
 	{
-		auto it = states_.find(name);
-		if (it != states_.end()) {
-			if (pStateOut) {
-				*pStateOut = it->second;
-			}
-			return true;
-		}
-
-		return false;
+		return findHelper(states_, name, pStateOut);
 	}
 
 	bool TechSetDefs::techniqueExsists(const core::string& name)
@@ -957,8 +933,24 @@ X_NAMESPACE_BEGIN(engine)
 		return addHelper(techs_, name, parentName, "Tech");
 	}
 
+
 	template<typename T>
-	T& TechSetDefs::addHelper(core::HashMap<core::string, T>& map, 
+	X_INLINE bool TechSetDefs::findHelper(core::HashMap<core::string, T>& map,
+		const core::string& name, T* pOut)
+	{
+		auto it = map.find(name);
+		if (it != map.end()) {
+			if (pOut) {
+				*pOut = it->second;
+			}
+			return true;
+		}
+
+		return false;
+	}
+
+	template<typename T>
+	X_INLINE  T& TechSetDefs::addHelper(core::HashMap<core::string, T>& map,
 		const core::string& name, const core::string& parentName, const char* pNick)
 	{
 		if (!parentName.isEmpty())

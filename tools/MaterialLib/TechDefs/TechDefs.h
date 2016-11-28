@@ -104,6 +104,10 @@ X_NAMESPACE_BEGIN(engine)
 		Technique& addTechnique(const core::string& name, const core::string& parentName);
 
 		template<typename T>
+		static bool findHelper(core::HashMap<core::string, T>& map,
+			const core::string& name, T* pOut);
+
+		template<typename T>
 		static T& addHelper(core::HashMap<core::string, T>& map, 
 			const core::string& name, const core::string& parentName, const char* pNick);
 
