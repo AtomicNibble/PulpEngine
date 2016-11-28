@@ -860,7 +860,7 @@ X_NAMESPACE_BEGIN(engine)
 	bool TechSetDefs::parseString(core::XParser& lex, core::string& out)
 	{
 		core::XLexToken token;
-		if (lex.ExpectTokenType(core::TokenType::PUNCTUATION,
+		if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
 			core::TokenSubType::UNUSET, core::PunctuationId::UNUSET, token)) {
 			return false;
 		}
