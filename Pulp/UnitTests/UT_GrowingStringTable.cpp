@@ -202,10 +202,10 @@ TEST(GrowingStringTable, Serialize)
 	IFileSys* pFileSys = gEnv->pFileSys;
 
 	core::Path<char> fileName;
-	fileName /= X_ENGINE_NAME;
-	fileName /= "_ut_GrowingStringTable_serialize_Type(";
-	fileName /= "uint16_t";
-	fileName /= ").ut_dat";
+	fileName += X_ENGINE_NAME;
+	fileName += "_ut_GrowingStringTable_serialize_Type(";
+	fileName += "uint16_t";
+	fileName += ").ut_dat";
 
 	XFile* file = pFileSys->openFile(fileName.c_str(),
 		fileMode::WRITE | fileMode::READ | fileMode::RECREATE | fileMode::RANDOM_ACCESS);

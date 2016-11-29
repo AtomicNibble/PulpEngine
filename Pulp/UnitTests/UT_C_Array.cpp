@@ -539,10 +539,10 @@ TYPED_TEST(ArrayTest, Serialize)
 	const char* TypeName = typeid(TypeParam).name();
 	core::Path<char> fileName;
 
-	fileName /= X_ENGINE_NAME;
-	fileName /= "_ut_array_serialize_Type(";
-	fileName /= TypeName;
-	fileName /= ").ut_dat";
+	fileName += X_ENGINE_NAME;
+	fileName += "_ut_array_serialize_Type(";
+	fileName += TypeName;
+	fileName += ").ut_dat";
 
 	XFile* file = pFileSys->openFile(fileName.c_str(),
 		fileMode::WRITE | fileMode::READ | fileMode::RECREATE | fileMode::RANDOM_ACCESS);
