@@ -128,9 +128,13 @@ public:
 	void addModDir(pathTypeW path) X_FINAL;
 
 	// Find util
-	uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_FINAL;
-	bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_FINAL;
+	uintptr_t findFirst(pathType path, findData* findinfo) X_FINAL;
+	bool findnext(uintptr_t handle, findData* findinfo) X_FINAL;
 	void findClose(uintptr_t handle) X_FINAL;
+
+	uintptr_t findFirst2(pathType path, findData& findinfo) X_FINAL;
+	bool findnext2(uintptr_t handle, findData& findinfo) X_FINAL;
+	void findClose2(uintptr_t handle) X_FINAL;
 
 	// Delete
 	bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;

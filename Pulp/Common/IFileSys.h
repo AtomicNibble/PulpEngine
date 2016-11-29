@@ -635,9 +635,13 @@ struct IFileSys
 	virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
 	// Find util
-	virtual uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_ABSTRACT;
-	virtual bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_ABSTRACT;
+	virtual uintptr_t findFirst(pathType path, findData* findinfo) X_ABSTRACT;
+	virtual bool findnext(uintptr_t handle, findData* findinfo) X_ABSTRACT;
 	virtual void findClose(uintptr_t handle) X_ABSTRACT;
+
+	virtual uintptr_t findFirst2(pathType path, findData& findinfo) X_ABSTRACT;
+	virtual bool findnext2(uintptr_t handle, findData& findinfo) X_ABSTRACT;
+	virtual void findClose2(uintptr_t handle) X_ABSTRACT;
 
 	// Delete
 	virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;

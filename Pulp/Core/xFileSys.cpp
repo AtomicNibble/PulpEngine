@@ -638,7 +638,7 @@ void xFileSys::addModDir(pathTypeW path)
 
 // --------------------- Find util ---------------------
 
-uintptr_t xFileSys::findFirst(pathType path, _wfinddatai64_t* findinfo)
+uintptr_t xFileSys::findFirst(pathType path, findData* findinfo)
 {
 	X_ASSERT_NOT_NULL(path);
 	X_ASSERT_NOT_NULL(findinfo);
@@ -662,7 +662,7 @@ uintptr_t xFileSys::findFirst(pathType path, _wfinddatai64_t* findinfo)
 	return reinterpret_cast<uintptr_t>(pFindData);
 }
 
-bool xFileSys::findnext(uintptr_t handle, _wfinddatai64_t* findinfo)
+bool xFileSys::findnext(uintptr_t handle, findData* findinfo)
 {
 	X_ASSERT_NOT_NULL(findinfo);
 
@@ -693,6 +693,41 @@ void xFileSys::findClose(uintptr_t handle)
 #if X_DEBUG == 1
 	findData_.erase(pFindData);
 #endif // !X_DEBUG
+}
+
+
+uintptr_t xFileSys::findFirst2(pathType path, findData& findinfo)
+{
+	// i don't like how the findData shit works currently it's anoying!
+	// so this is start of new version but i dunno how i want it to work yet.
+	// i want somthing better but don't know what it is :)
+	// list of shit:
+	// 1. should return relative paths to the requested search dir.
+	// 2. should expose some nicer scoped based / maybe iterative design to make nicer to use.
+	// 3. <insert idea here>
+	//
+
+	Path<wchar_t> buf;
+	createOSPath(gameDir_, path, buf);
+
+	uintptr_t handle = PathUtil::findFirst(buf.c_str(), findinfo);
+
+	return handle;
+}
+
+bool xFileSys::findnext2(uintptr_t handle, findData& findinfo)
+{
+	X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
+
+	return PathUtil::findNext(handle, findinfo);
+}
+
+void xFileSys::findClose2(uintptr_t handle)
+{
+	if (handle != PathUtil::INVALID_FIND_HANDLE)
+	{
+		PathUtil::findClose(handle);
+	}
 }
 
 
