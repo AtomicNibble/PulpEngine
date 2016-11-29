@@ -139,7 +139,7 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 	if (PotatoCreateClassInstance(pModuleClassName, pModule))
 	{
 		if (!pModule->Initialize(env_, initParams_)) {
-			X_ERROR("Core", "failed to initialize: %s -> %s", pDllName, pModuleClassName);
+			X_ERROR("Core", "failed to initialize IEng: %s -> %s", pDllName, pModuleClassName);
 			return false;
 		}
 	}
@@ -177,7 +177,7 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 	{
 		pConverter = pModule->Initialize();
 		if (!pConverter) {
-			X_ERROR("Core", "failed to initialize: %s -> %s", pDllName, pModuleClassName);
+			X_ERROR("Core", "failed to initialize ICon: %s -> %s", pDllName, pModuleClassName);
 			return false;
 		}
 	}
