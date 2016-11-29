@@ -874,6 +874,49 @@ private:
 };
 
 
+class FindFirstScoped
+{
+public:
+	X_INLINE FindFirstScoped() :
+		handle_(core::IFileSys::INVALID_HANDLE)
+	{
+		pFileSys_ = gEnv->pFileSys;
+	}
+
+	X_INLINE ~FindFirstScoped() {
+		if (handle_ != core::IFileSys::INVALID_HANDLE) {
+			pFileSys_->findClose2(handle_);
+		}
+	}
+
+	X_INLINE bool findfirst(const char* pPath) {
+		handle_ = pFileSys_->findFirst2(pPath, fd_);
+		return handle_ != core::IFileSys::INVALID_HANDLE;
+	}
+
+	X_INLINE bool findNext(void) {
+		X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")();
+		return pFileSys_->findnext2(handle_, fd_);
+	}
+
+	X_INLINE core::IFileSys::findData& fileData(void) {
+		return fd_;
+	}
+	X_INLINE const core::IFileSys::findData& fileData(void) const {
+		return fd_;
+	}
+
+	X_INLINE operator bool() const {
+		return handle_ != core::IFileSys::INVALID_HANDLE;
+	}
+
+private:
+	core::IFileSys::findData fd_;
+	core::IFileSys* pFileSys_;
+	uintptr_t handle_;
+};
+
+
 
 X_NAMESPACE_END
 
