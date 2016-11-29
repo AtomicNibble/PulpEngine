@@ -1331,7 +1331,6 @@ X_NAMESPACE_BEGIN(engine)
 
 		core::Path<char> path;
 		path /= cat;
-		path.ensureSlash();
 		path /= name;
 
 		if (!loadFile(path, fileData)) {
@@ -1387,7 +1386,6 @@ X_NAMESPACE_BEGIN(engine)
 
 		if (useIncludePath) {
 			path = INCLUDE_DIR;
-			path.ensureSlash();
 			path /= name;
 		}
 		else {

@@ -400,7 +400,7 @@ bool XModel::LoadModelAsync(const char* name)
 	AssignDefault();
 
 	core::Path<char> path;
-	path /= "models/";
+	path /= "models";
 	path /= name;
 	path.setExtension(".model");
 
@@ -424,7 +424,7 @@ bool XModel::LoadModelAsync(const char* name)
 bool XModel::ReloadAsync(void)
 {
 	core::Path<char> path;
-	path /= "models/";
+	path /= "models";
 	path /= name_.c_str();
 	path.setExtension(".model");
 
@@ -446,7 +446,7 @@ bool XModel::LoadModel(const char* name)
 {
 	core::XFileScoped file;
 	core::Path<char> path;
-	path /= "models/";
+	path /= "models";
 	path /= name;
 	path.setExtension(".model");
 

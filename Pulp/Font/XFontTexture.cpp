@@ -330,7 +330,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 	BITMAPFILEHEADER pHeader;
 	BITMAPINFOHEADER pInfoHeader;
 
-	path /= "Fonts/";
+	path = "Fonts/";
 	path.setFileName(filename);
 	path.setExtension(".bmp");
 

@@ -333,7 +333,6 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 			core::Path<char> assetPath;
 			assetPath.clear();
 			assetPath /= outDir;
-			assetPath.ensureSlash();
 			assetPath /= AssetType::ToString(assType);
 			assetPath /= "s";
 			assetPath.toLower();
@@ -696,7 +695,6 @@ void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::strin
 {
 	pathOut.clear();
 	pathOut /= modPath;
-	pathOut.ensureSlash();
 	pathOut /= AssetType::ToString(assType);
 	pathOut /= "s";
 	pathOut.toLower();

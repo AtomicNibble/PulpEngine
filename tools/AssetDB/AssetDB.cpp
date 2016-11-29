@@ -1244,7 +1244,6 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			// path include folder, so don't need type to load it.
 			path = AssetTypeRawFolder(type);
 			path.toLower();
-			path.ensureSlash();
 			path /= name;
 
 			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
@@ -1459,7 +1458,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 			// so that the raw_files path works without needing asset type
 			path = AssetTypeRawFolder(type);
 			path.toLower();
-			path.ensureSlash();
 			path /= name;
 
 			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
@@ -1646,10 +1644,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 		core::Hash::MD5Digest::String strBuf;
 
 		filePath = ASSET_DB_FOLDER;
-		filePath.ensureSlash();
 		filePath /= THUMBS_FOLDER;
 		filePath.toLower();
-		filePath.ensureSlash();
 		filePath /= hash.ToString(strBuf);
 
 		// if a thumb with same md5 exsists don't update.
@@ -2475,12 +2471,9 @@ const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)
 void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut)
 {
 	pathOut = ASSET_DB_FOLDER;
-	pathOut.ensureSlash();
 	pathOut /= RAW_FILES_FOLDER;
-	pathOut.ensureSlash();
 	pathOut /= AssetTypeRawFolder(type);
 	pathOut.toLower();
-	pathOut.ensureSlash();
 	pathOut /= name;
 	pathOut.replaceSeprators();
 }
@@ -2488,9 +2481,7 @@ void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, c
 void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 {
 	pathOut = ASSET_DB_FOLDER;
-	pathOut.ensureSlash();
 	pathOut /= RAW_FILES_FOLDER;
-	pathOut.ensureSlash();
 	pathOut /= raw.path;
 	pathOut.replaceSeprators();
 }
@@ -2500,9 +2491,7 @@ void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOu
 	core::Hash::MD5Digest::String hashStr;
 
 	pathOut = ASSET_DB_FOLDER;
-	pathOut.ensureSlash();
 	pathOut /= THUMBS_FOLDER;
-	pathOut.ensureSlash();
 	pathOut /= thumb.hash.ToString(hashStr);
 	pathOut.replaceSeprators();
 }

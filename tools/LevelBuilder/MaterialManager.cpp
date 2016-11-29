@@ -128,7 +128,7 @@ bool MatManager::loadMatFromFile(MatResource& mat, const core::string& name)
 {
 	core::XFileScoped file;
 	core::Path<char> path;
-	path /= "materials/";
+	path = "materials/";
 	path.setFileName(name);
 	path.setExtension(engine::MTL_B_FILE_EXTENSION);
 

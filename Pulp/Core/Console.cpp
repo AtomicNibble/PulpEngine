@@ -1466,7 +1466,7 @@ bool XConsole::LoadConfig(const char* fileName)
 {
 	core::Path<char> path;
 
-	path /= "config/";
+	path = "config";
 	path /= fileName;
 	path.setExtension(CONFIG_FILE_EXTENSION);
 
