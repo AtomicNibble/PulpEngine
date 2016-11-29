@@ -84,7 +84,7 @@ X_INLINE UniquePointer<T>& UniquePointer<T>::operator=(UniquePointer&& rhs)
 	{
 		// different, do the move
 		reset(rhs.release());
-		arena_ = oth.arena_;
+		arena_ = rhs.arena_;
 	}
 	return *this;
 }
