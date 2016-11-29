@@ -145,6 +145,7 @@ template<typename TChar>
 const Path<TChar> Path<TChar>::operator/(const Path<TChar>& oth) const
 {
 	Path path(*this);
+	path.ensureSlash();
 	path.append(oth.c_str());
 	return path;
 }
@@ -153,6 +154,7 @@ template<typename TChar>
 const Path<TChar> Path<TChar>::operator/(const TChar* str) const
 {
 	Path<TChar> path(*this);
+	path.ensureSlash();
 	path.append(str);
 	return path;
 }
@@ -160,6 +162,7 @@ const Path<TChar> Path<TChar>::operator/(const TChar* str) const
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator/=(const Path<TChar>& oth)
 {
+	ensureSlash();
 	append(oth.c_str(), oth.length());
 	return *this;
 }
@@ -167,6 +170,7 @@ const Path<TChar>& Path<TChar>::operator/=(const Path<TChar>& oth)
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator/=(const TChar* str)
 {
+	ensureSlash();
 	append(str);
 	return *this;
 }
