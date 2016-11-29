@@ -177,9 +177,9 @@ X_NAMESPACE_BEGIN(engine)
 		{
 			typedef core::Array<core::string> StrArr;
 			
-			TechCat(core::MemoryArenaBase* arena);
+			TechCat(MaterialCat::Enum cat, core::MemoryArenaBase* arena);
 
-			core::string catName;
+			MaterialCat::Enum cat;
 			StrArr defs;
 		};
 
@@ -192,12 +192,12 @@ X_NAMESPACE_BEGIN(engine)
 		MATLIB_EXPORT void setBaseDir(core::Path<char>& path);
 
 		MATLIB_EXPORT bool getTechCats(TechCatArr& techsOut);
-		MATLIB_EXPORT bool getTechDef(const core::string& cat, const core::string& name, TechSetDef*& pTechDefOut);
+		MATLIB_EXPORT bool getTechDef(MaterialCat::Enum cat, const core::string& name, TechSetDef*& pTechDefOut);
 
 		MATLIB_EXPORT void clearIncSrcCache(void);
 
 	private:
-		bool loadTechDef(const core::string& cat, const core::string& name);
+		bool loadTechDef(MaterialCat::Enum cat, const core::string& name);
 		bool loadTechCat(TechCat& lis);
 
 		bool loadFile(const core::Path<char>& path, FileBuf& bufOut);

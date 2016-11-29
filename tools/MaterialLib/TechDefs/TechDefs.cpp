@@ -1218,7 +1218,8 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ------------------------------------------------------------------------------
 
-	TechSetDefs::TechCat::TechCat(core::MemoryArenaBase* arena) :
+	TechSetDefs::TechCat::TechCat(MaterialCat::Enum cat, core::MemoryArenaBase* arena) :
+		cat(cat),
 		defs(arena)
 	{
 
@@ -1257,52 +1258,35 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::getTechCats(TechCatArr& techsOut)
 	{
-		// this be some crazyy shieeeet.
-		core::Path<char> path(baseDir_);
-		path.ensureSlash();
-		path.append("*");
-
-		core::FindFirstScoped find;
-		if (find.findfirst(path.c_str()))
+		// see if any dir's exsits.
+		for (uint32_t i = 0; i < MaterialCat::ENUM_COUNT; i++)
 		{
-			char buf[512];
+			const MaterialCat::Enum cat = static_cast<MaterialCat::Enum>(i);
 
-			do
+			core::Path<char> path(baseDir_);
+			path /= MaterialCat::ToString(cat);
+			path.toLower();
+
+			if (pFileSys_->directoryExists(path.c_str()))
 			{
-				auto& fd = find.fileData();
-				if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY)
-				{
-					if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
-						continue;
-					}
+				TechCat& list = techsOut.AddOne(cat, techsOut.getArena());
 
-					if (core::strUtil::IsEqual(fd.name, INCLUDE_DIR_W)) {
-						continue;
-					}
-
-					TechCat& list = techsOut.AddOne(techsOut.getArena());
-					list.catName = core::strUtil::Convert(fd.name, buf);
-
-					if (!loadTechCat(list)) {
-						return false;
-					}
+				if (!loadTechCat(list)) {
+					return false;
 				}
-
-				X_LOG0("findresult", "name: \"%ls\"", fd.name);
-
 			}
-			while (find.findNext());		
 		}
 
 		return true;
 	}
 
-	bool TechSetDefs::getTechDef(const core::string& cat, const core::string& name, TechSetDef*& pTechDefOut)
+
+	bool TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name, TechSetDef*& pTechDefOut)
 	{
 		core::Path<char> path;
-		path /= cat;
+		path /= MaterialCat::ToString(cat);
 		path /= name;
-
+		path.toLower();
 
 		auto it = techDefs_.find(path);
 		if (it != techDefs_.end()) {
@@ -1324,10 +1308,10 @@ X_NAMESPACE_BEGIN(engine)
 	bool TechSetDefs::loadTechCat(TechCat& cat)
 	{
 		core::Path<char> path(baseDir_);
-		path.ensureSlash();
-		path /= cat.catName;
+		path /= MaterialCat::ToString(cat.cat);
 		path.ensureSlash();
 		path.append("*.techsetdef");
+		path.toLower();
 
 		core::FindFirstScoped find;
 
@@ -1351,13 +1335,14 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::loadTechDef(const core::string& cat, const core::string& name)
+	bool TechSetDefs::loadTechDef(MaterialCat::Enum cat, const core::string& name)
 	{
 		FileBuf fileData(arena_);
 
 		core::Path<char> path;
-		path /= cat;
+		path /= MaterialCat::ToString(cat);
 		path /= name;
+		path.toLower();
 
 		if (!loadFile(path, fileData)) {
 			return false;
