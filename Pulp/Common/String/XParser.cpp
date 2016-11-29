@@ -600,7 +600,7 @@ bool XParser::Directive_include(void)
 	{
 		path = core::string(token.begin(), token.end());
 
-		if(!openIncDel_.Invoke(*lex.ptr(), path))
+		if(!openIncDel_.Invoke(*lex.ptr(), path, false))
 		{
 			lex.reset();
 		}
@@ -631,7 +631,7 @@ bool XParser::Directive_include(void)
 		}
 
 		// open the fucker!
-		if (!openIncDel_.Invoke(*lex.ptr(), path))
+		if (!openIncDel_.Invoke(*lex.ptr(), path, true))
 		{
 			lex.reset();
 		}

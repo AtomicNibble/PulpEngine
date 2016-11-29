@@ -1288,25 +1288,36 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name)
+	bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath)
 	{
-		auto it = incSourceMap_.find(name);
+		core::string path;
+
+		if (useIncludePath) {
+			path = INCLUDE_DIR;
+			path += core::Path<char>::NATIVE_SLASH;
+			path += name;
+		}
+		else {
+			path = name;
+		}
+
+		auto it = incSourceMap_.find(path);
 		if (it == incSourceMap_.end())
 		{
 			// we need to load it.
 			FileBuf fileData(arena_);
 
-			if (!loadFile(name, fileData)) {
+			if (!loadFile(path, fileData)) {
 				return false;
 			}
 
-			auto insertedIt = incSourceMap_.insert(SourceMap::value_type(name, std::move(fileData)));
+			auto insertedIt = incSourceMap_.insert(SourceMap::value_type(path, std::move(fileData)));
 			it = insertedIt.first;
 		}
 
 		FileBuf& buf = it->second;
 
-		return lex.SetMemory(buf.begin(), buf.end(), name);
+		return lex.SetMemory(buf.begin(), buf.end(), path);
 	}
 
 

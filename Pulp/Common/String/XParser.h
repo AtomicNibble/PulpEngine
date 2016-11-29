@@ -67,7 +67,7 @@ class XParser
 	typedef core::Stack<XLexer*> ScriptStack;
 
 public:
-	typedef core::Delegate<bool(XLexer& lex, core::string&)> OpenIncludeDel;
+	typedef core::Delegate<bool(XLexer& lex, core::string&, bool useIncludePath)> OpenIncludeDel;
 
 	static const int32_t MAX_DEFINEPARMS = 32;
 	static const int32_t MAX_IDENTS = 16; // this is stack so you can have unlimited groups this is more of a depth limit.

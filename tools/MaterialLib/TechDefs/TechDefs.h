@@ -62,7 +62,7 @@ X_NAMESPACE_BEGIN(engine)
 		typedef core::Array<char> FileBuf;
 
 	public:
-		typedef core::Delegate<bool(core::XLexer& lex, core::string&)> OpenIncludeDel;
+		typedef core::Delegate<bool(core::XLexer& lex, core::string&, bool)> OpenIncludeDel;
 
 	public:
 		TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
@@ -183,7 +183,7 @@ X_NAMESPACE_BEGIN(engine)
 	private:
 		bool loadFile(const core::string& name, FileBuf& bufOut);
 
-		bool includeCallback(core::XLexer& lex, core::string& name);
+		bool includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath);
 
 	private:
 		core::MemoryArenaBase* arena_;
