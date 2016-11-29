@@ -16,6 +16,7 @@ class SingleThreadPolicy
 public:
 	/// A human-readable string literal containing the policy's type.
 	static const char* const TYPE_NAME;
+	static const bool IS_THREAD_SAFE = false;
 
 	/// Empty implementation.
 	inline void Enter(void) const {}

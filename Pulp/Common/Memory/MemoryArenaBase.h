@@ -35,6 +35,7 @@ public:
 
 	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_ABSTRACT;
 
+	virtual bool isThreadSafe(void) const X_ABSTRACT;
 
 	// adds it baby.
 	void addChildArena(MemoryArenaBase* arena) {

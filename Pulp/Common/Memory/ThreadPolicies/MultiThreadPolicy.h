@@ -30,6 +30,8 @@ class MultiThreadPolicy
 public:
 	/// A human-readable string literal containing the policy's type.
 	static const char* const TYPE_NAME;
+	static const bool IS_THREAD_SAFE = true;
+
 
 	/// Enters the synchronization primitive.
 	inline void Enter(void);

@@ -195,8 +195,12 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
 #endif
 }
 
-
-
+template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
+bool MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy,
+	MemoryTrackingPolicy, MemoryTaggingPolicy>::isThreadSafe(void) const
+{
+	return IS_THREAD_SAFE;
+}
 
 
 // ---------------------------------------------------------------------------------------------------------------------

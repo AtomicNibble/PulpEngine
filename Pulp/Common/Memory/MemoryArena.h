@@ -70,6 +70,8 @@ public:
 	/// A simple typedef that introduces the template type into this class.
 	typedef typename MemoryTaggingPolicy MemoryTaggingPolicy;
 
+	static const bool IS_THREAD_SAFE = ThreadPolicy::IS_THREAD_SAFE;
+
 	/// \brief Constructs an arena that uses a given allocator for satisfying allocation requests.
 	/// \details The \a name argument can be used to identify different memory arenas.
 	/// \remark Ownership of the provided allocator stays at the calling site.
@@ -93,6 +95,7 @@ public:
 
 	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_OVERRIDE;
 
+	virtual bool isThreadSafe(void) const X_OVERRIDE;
 
 	/// \brief Freezes the memory arena.
 	/// \details When an arena is frozen, no allocations can be made or freed.
