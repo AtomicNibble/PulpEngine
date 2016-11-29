@@ -5,10 +5,13 @@
 
 #include "Compiler\Compiler.h"
 
+#include "TechDefs\TechDefs.h"
+
 X_NAMESPACE_BEGIN(engine)
 
 
-MaterialLib::MaterialLib()
+MaterialLib::MaterialLib() :
+	pTechDefs_(g_MatLibArena)
 {
 
 
@@ -30,9 +33,15 @@ bool MaterialLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& ar
 	X_UNUSED(host);
 	X_ASSERT_NOT_NULL(gEnv);
 
+	// lazy make the techDef loader.
+	if (!pTechDefs_) {
+		pTechDefs_ = core::makeUnique<TechSetDefs>(g_MatLibArena, g_MatLibArena);
+		pTechDefs_->setBaseDir(core::Path<char>(TECH_DEFS_DIR));
+	}
+
 	// we basically just take the json and compile it into a binary format.
 
-	MaterialCompiler compiler;
+	MaterialCompiler compiler(*pTechDefs_.get());
 
 	if (!compiler.loadFromJson(args)) {
 		X_ERROR("Mat", "Error parsing material args");

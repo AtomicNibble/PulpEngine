@@ -2,8 +2,11 @@
 
 #include <IMaterial.h>
 
+#include <Util\UniquePointer.h>
 
 X_NAMESPACE_BEGIN(engine)
+
+class TechSetDefs;
 
 class MaterialLib : public IMaterialLib
 {
@@ -17,6 +20,7 @@ public:
 
 
 private:
+	core::UniquePointer<TechSetDefs> pTechDefs_;
 };
 
 
