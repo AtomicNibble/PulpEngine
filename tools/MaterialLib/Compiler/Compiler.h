@@ -9,6 +9,8 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(engine)
 
+class TechSetDefs;
+
 class MaterialCompiler
 {
 	struct Tex
@@ -26,7 +28,7 @@ class MaterialCompiler
 	};
 
 public:
-	MaterialCompiler();
+	MaterialCompiler(TechSetDefs& techDefs);
 
 	bool loadFromJson(core::string& str);
 	bool writeToFile(core::XFile* pFile) const;
@@ -40,6 +42,8 @@ private:
 
 
 private:
+	TechSetDefs& techDefs_;
+
 	MaterialFlags flags_;
 	MaterialCat::Enum cat_;
 	MaterialUsage::Enum usage_;

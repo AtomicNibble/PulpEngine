@@ -5,6 +5,7 @@
 #include <IFileSys.h>
 
 #include "Util\MatUtil.h"
+#include "TechDefs\TechDefs.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -75,7 +76,8 @@ bool MaterialCompiler::Tex::writeName(core::XFile* pFile) const
 
 // --------------------------------------
 
-MaterialCompiler::MaterialCompiler()
+MaterialCompiler::MaterialCompiler(TechSetDefs& techDefs) :
+	techDefs_(techDefs)
 {
 
 }
@@ -87,13 +89,13 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	d.Parse(str.c_str(), str.length());
 
 	// find all the things.
-	std::array<std::pair<const char*, core::json::Type>, 11> requiredValues = { {
+	std::array<std::pair<const char*, core::json::Type>, 9> requiredValues = { {
 			{ "cat", core::json::kStringType },
 			{ "usage", core::json::kStringType },
 			{ "surface_type", core::json::kStringType },
 			{ "polyOffset", core::json::kStringType },
-			{ "cullFace", core::json::kStringType },
-			{ "depthTest", core::json::kStringType },
+		//	{ "cullFace", core::json::kStringType },
+		//	{ "depthTest", core::json::kStringType },
 			{ "climbType", core::json::kStringType },
 			{ "uScroll", core::json::kNumberType },
 			{ "vScroll", core::json::kNumberType },
@@ -118,6 +120,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
 	// shieezz
 	const char* pCat = d["cat"].GetString();
+	const char* pType = d["type"].GetString();
 	const char* pUsage = d["usage"].GetString();
 	const char* pSurfaceType = d["surface_type"].GetString();
 	const char* pPolyOffset = d["polyOffset"].GetString();
@@ -129,7 +132,37 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	polyOffset_ = Util::MatPolyOffsetFromStr(pPolyOffset);
 	coverage_ = MaterialCoverage::OPAQUE;
 	mountType_ = Util::MatMountTypeFromStr(pMountType);
-	
+
+#if 1
+
+	if (cat_ == MaterialCat::UNKNOWN) {
+		return false;
+	}
+
+	// so we don't store state of camel flaps in the material data.
+	// instead a material picks a techDef by process of picking a cat and type.
+	// currently cat is fixed, but type is data driven.
+	core::string type(pType);
+
+	engine::TechSetDef* pTechDef = nullptr;
+	if (!techDefs_.getTechDef(cat_, type, pTechDef)) {
+		X_ERROR("Mat", "Failed to get techDef for cat: %s type: %s", pCat, pType);
+		return false;
+	}
+
+	X_ASSERT_NOT_NULL(pTechDef);
+
+	// so now that we have a tech def you fucking TWAT!
+	// we know all the techs this material supports.
+	// and we also know what extra params we need to include in the material for sending to const buffer.
+	// we also know the permatation for the shader that's been used / features so we could compile it?
+	// or hold our heads been our legs and hope it compiles itself magically.
+	int goat = 0;
+
+
+
+#else
+
 	// State
 	const char* pSrcCol = d["srcBlendColor"].GetString();
 	const char* pDstCol = d["dstBlendColor"].GetString();
@@ -175,7 +208,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	if (hasFlagAndTrue(d, "wireFrame")) {
 		stateDesc_.stateFlags.Set(render::StateFlag::WIREFRAME);
 	}
-
+#endif
 	// some flags we don't allow to be set currently.
 	// stateDesc_.stateFlags.Set(render::StateFlag::ALPHATEST);
 	// stateDesc_.stateFlags.Set(render::StateFlag::BLEND);
