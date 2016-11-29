@@ -25,6 +25,9 @@ static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
 static const char*		 MTL_DEFAULT_NAME = "default/default";
 
+static const char*		 TECH_DEFS_DIR = "techdefs";
+
+
 static const uint32_t MTL_MAX_LOADED = 1 << 12;
 
 
