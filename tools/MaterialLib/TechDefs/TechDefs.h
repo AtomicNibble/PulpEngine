@@ -166,27 +166,46 @@ X_NAMESPACE_BEGIN(engine)
 	class TechSetDefs
 	{
 		typedef core::Array<char> FileBuf;
-		typedef core::HashMap<core::string, FileBuf> SourceMap;
+		typedef core::HashMap<core::Path<char>, FileBuf> SourceMap;
 		typedef core::HashMap<core::string, TechSetDef> TechSetDefMap;
 
 		static const char* INCLUDE_DIR;
 		static const wchar_t* INCLUDE_DIR_W;
 
 	public:
+		struct TechCat
+		{
+			typedef core::Array<core::string> StrArr;
+			
+			TechCat(core::MemoryArenaBase* arena);
+
+			core::string catName;
+			StrArr defs;
+		};
+
+		typedef core::Array<TechCat> TechCatArr;
+
+	public:
 		MATLIB_EXPORT TechSetDefs(core::MemoryArenaBase* arena);
 
 		MATLIB_EXPORT void setBaseDir(core::Path<char>& path);
-		MATLIB_EXPORT bool parseTechDef(const core::string& name);
+
+		MATLIB_EXPORT bool getTechCats(TechCatArr& techsOut);
+		MATLIB_EXPORT bool parseTechDef(const core::string& cat, const core::string& name);
 
 		MATLIB_EXPORT void clearIncSrcCache(void);
 
 	private:
-		bool loadFile(const core::string& name, FileBuf& bufOut);
+		bool loadTechCat(TechCat& lis);
+
+		bool loadFile(const core::Path<char>& path, FileBuf& bufOut);
 
 		bool includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath);
 
 	private:
 		core::MemoryArenaBase* arena_;
+		core::IFileSys* pFileSys_;
+
 		TechSetDef::OpenIncludeDel incDel_;
 		core::Path<char> baseDir_;
 

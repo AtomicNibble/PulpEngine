@@ -1216,6 +1216,14 @@ X_NAMESPACE_BEGIN(engine)
 		return map[name];
 	}
 
+	// ------------------------------------------------------------------------------
+
+	TechSetDefs::TechCat::TechCat(core::MemoryArenaBase* arena) :
+		defs(arena)
+	{
+
+	}
+
 
 	// ------------------------------------------------------------------------------
 
@@ -1228,6 +1236,8 @@ X_NAMESPACE_BEGIN(engine)
 		techDefs_(arena, 128),
 		incSourceMap_(arena, 128)
 	{
+		pFileSys_ = gEnv->pFileSys;
+
 		incDel_.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
 	}
 
@@ -1237,11 +1247,94 @@ X_NAMESPACE_BEGIN(engine)
 		baseDir_ = path;
 	}
 
-	bool TechSetDefs::parseTechDef(const core::string& name)
+	bool TechSetDefs::getTechCats(TechCatArr& techsOut)
+	{
+		// this be some crazyy shieeeet.
+
+		core::IFileSys::findData fd;
+
+		core::Path<char> path(baseDir_);
+		path.ensureSlash();
+		path.append("*");
+
+		uintptr_t handle = pFileSys_->findFirst2(path.c_str(), fd);
+		if (handle != core::IFileSys::INVALID_HANDLE)
+		{
+			char buf[512];
+
+			do
+			{
+				if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY)
+				{
+					if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
+						continue;
+					}
+
+					if (core::strUtil::IsEqual(fd.name, INCLUDE_DIR_W)) {
+						continue;
+					}
+
+					TechCat& list = techsOut.AddOne(techsOut.getArena());
+					list.catName = core::strUtil::Convert(fd.name, buf);
+
+					if (!loadTechCat(list)) {
+						pFileSys_->findClose(handle);
+						return false;
+					}
+				}
+
+				X_LOG0("findresult", "name: \"%ls\"", fd.name);
+
+			}
+			while (pFileSys_->findnext2(handle, fd));
+			
+			pFileSys_->findClose2(handle);
+		}
+
+		return true;
+	}
+
+	bool TechSetDefs::loadTechCat(TechCat& cat)
+	{
+		core::Path<char> path(baseDir_);
+		path.ensureSlash();
+		path /= cat.catName;
+		path.ensureSlash();
+		path.append("*.techsetdef");
+
+		core::IFileSys::findData fd;
+
+		uintptr_t handle = pFileSys_->findFirst2(path.c_str(), fd);
+		if (handle != core::IFileSys::INVALID_HANDLE)
+		{
+			char buf[512];
+
+			do
+			{
+				if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
+					continue;
+				}
+
+				cat.defs.emplace_back(core::strUtil::Convert(fd.name, buf));
+			} 
+			while (pFileSys_->findnext2(handle, fd));
+			
+			pFileSys_->findClose2(handle);
+		}
+
+		return true;
+	}
+
+	bool TechSetDefs::parseTechDef(const core::string& cat, const core::string& name)
 	{
 		FileBuf fileData(arena_);
 
-		if (!loadFile(name, fileData)) {
+		core::Path<char> path;
+		path /= cat;
+		path.ensureSlash();
+		path /= name;
+
+		if (!loadFile(path, fileData)) {
 			return false;
 		}
 
@@ -1263,16 +1356,16 @@ X_NAMESPACE_BEGIN(engine)
 		incSourceMap_.clear();
 	}
 
-	bool TechSetDefs::loadFile(const core::string& name, FileBuf& bufOut)
+	bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
 	{
 		core::XFileScoped file;
 		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
 
-		core::Path<char> path(baseDir_);
-		path /= name;
+		core::Path<char> fullPath(baseDir_);
+		fullPath /= path;
 
-		if (!file.openFile(path.c_str(), mode)) {
-			X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", name.c_str());
+		if (!file.openFile(fullPath.c_str(), mode)) {
+			X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", path.c_str());
 			return false;
 		}
 
@@ -1290,16 +1383,18 @@ X_NAMESPACE_BEGIN(engine)
 
 	bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath)
 	{
-		core::string path;
+		core::Path<char> path;
 
 		if (useIncludePath) {
 			path = INCLUDE_DIR;
-			path += core::Path<char>::NATIVE_SLASH;
-			path += name;
+			path.ensureSlash();
+			path /= name;
 		}
 		else {
 			path = name;
 		}
+
+		path.setExtension(".techsetdef");
 
 		auto it = incSourceMap_.find(path);
 		if (it == incSourceMap_.end())
@@ -1317,7 +1412,7 @@ X_NAMESPACE_BEGIN(engine)
 
 		FileBuf& buf = it->second;
 
-		return lex.SetMemory(buf.begin(), buf.end(), path);
+		return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
 	}
 
 
