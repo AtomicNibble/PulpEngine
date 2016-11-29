@@ -169,6 +169,9 @@ X_NAMESPACE_BEGIN(engine)
 		typedef core::HashMap<core::string, FileBuf> SourceMap;
 		typedef core::HashMap<core::string, TechSetDef> TechSetDefMap;
 
+		static const char* INCLUDE_DIR;
+		static const wchar_t* INCLUDE_DIR_W;
+
 	public:
 		MATLIB_EXPORT TechSetDefs(core::MemoryArenaBase* arena);
 

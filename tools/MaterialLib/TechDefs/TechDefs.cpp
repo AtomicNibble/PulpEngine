@@ -1219,6 +1219,10 @@ X_NAMESPACE_BEGIN(engine)
 
 	// ------------------------------------------------------------------------------
 
+	const char* TechSetDefs::INCLUDE_DIR = "include";
+	const wchar_t* TechSetDefs::INCLUDE_DIR_W = L"include";
+
+
 	TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
 		arena_(arena),
 		techDefs_(arena, 128),
