@@ -21,9 +21,9 @@ public:
 	X_INLINE pointer& ptr(void);
 	X_INLINE const pointer& ptr(void) const;
 
-
 private:
 	pointer pInstance_;
+protected:
 	core::MemoryArenaBase* arena_;
 };
 
