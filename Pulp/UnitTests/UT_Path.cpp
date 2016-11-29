@@ -538,8 +538,10 @@ TEST(Path, ConcatAssign)
 	EXPECT_STREQ("c:\\", path.c_str());
 	path /= "tickle_me_plz";
 	EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
-	path /= "\\goat\\";
-	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+	path /= "\\goat";
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat", path.c_str());
+	path /= "goat\\"; // should auto add slash.
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\goat\\", path.c_str());
 }
 
 TEST(Path, ConcatAssignW)
@@ -549,8 +551,10 @@ TEST(Path, ConcatAssignW)
 	EXPECT_STREQ(L"c:\\", path.c_str());
 	path /= L"tickle_me_plz";
 	EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
-	path /= L"\\goat\\";
-	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+	path /= L"\\goat";
+	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat", path.c_str());
+	path /= L"goat\\"; // should auto add slash.
+	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\goat\\", path.c_str());
 }
 
 
@@ -561,8 +565,10 @@ TEST(Path, ConcatPathAssign)
 	EXPECT_STREQ("c:\\", path.c_str());
 	path /= core::Path<char>("tickle_me_plz");
 	EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
-	path /= core::Path<char>("\\goat\\");
-	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+	path /= core::Path<char>("\\goat");
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat", path.c_str());
+	path /= core::Path<char>("goat");
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\goat\\", path.c_str());
 }
 
 TEST(Path, ConcatPathAssignW)
