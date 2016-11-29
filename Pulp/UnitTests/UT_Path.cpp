@@ -485,6 +485,80 @@ TEST(Path, AssignW)
 }
 
 
+TEST(Path, Append)
+{
+	core::Path<char> path("c:\\");
+	EXPECT_STREQ("c:\\", path.c_str());
+	path = path + "tickle_me_plz";
+	EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
+	path = path + "\\goat\\";
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendW)
+{
+	core::Path<wchar_t> path(L"c:\\");
+	EXPECT_STREQ(L"c:\\", path.c_str());
+	path = path + L"tickle_me_plz";
+	EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
+	path = path + L"\\goat\\";
+	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendPath)
+{
+	core::Path<char> path("c:\\");
+	EXPECT_STREQ("c:\\", path.c_str());
+	path = path + core::Path<char>("tickle_me_plz");
+	EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
+	path = path + core::Path<char>("\\goat\\");
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendPathW)
+{
+	core::Path<wchar_t> path(L"c:\\");
+	EXPECT_STREQ(L"c:\\", path.c_str());
+	path = path + core::Path<wchar_t>(L"tickle_me_plz");
+	EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
+	path = path + core::Path<wchar_t>(L"\\goat\\");
+	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendAssign)
+{
+	core::Path<char> path("c:\\");
+	EXPECT_STREQ("c:\\", path.c_str());
+	path += "tickle_me_plz";
+	EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
+	path += "\\goat\\";
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendAssignW)
+{
+	core::Path<wchar_t> path(L"c:\\");
+	EXPECT_STREQ(L"c:\\", path.c_str());
+	path += L"tickle_me_plz";
+	EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
+	path += L"\\goat\\";
+	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendPathAssign)
+{
+	core::Path<char> path("c:\\");
+	EXPECT_STREQ("c:\\", path.c_str());
+	path += core::Path<char>("tickle_me_plz");
+	EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
+	path += core::Path<char>("\\goat\\");
+	EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+TEST(Path, AppendPathAssignW)
+{
+	core::Path<wchar_t> path(L"c:\\");
+	EXPECT_STREQ(L"c:\\", path.c_str());
+	path += core::Path<wchar_t>(L"tickle_me_plz");
+	EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
+	path += core::Path<wchar_t>(L"\\goat\\");
+	EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+}
+
+
 TEST(Path, Concat)
 {
 	core::Path<char> path("c:\\");
