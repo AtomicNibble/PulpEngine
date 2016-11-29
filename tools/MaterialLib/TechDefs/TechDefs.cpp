@@ -1258,20 +1258,18 @@ X_NAMESPACE_BEGIN(engine)
 	bool TechSetDefs::getTechCats(TechCatArr& techsOut)
 	{
 		// this be some crazyy shieeeet.
-
-		core::IFileSys::findData fd;
-
 		core::Path<char> path(baseDir_);
 		path.ensureSlash();
 		path.append("*");
 
-		uintptr_t handle = pFileSys_->findFirst2(path.c_str(), fd);
-		if (handle != core::IFileSys::INVALID_HANDLE)
+		core::FindFirstScoped find;
+		if (find.findfirst(path.c_str()))
 		{
 			char buf[512];
 
 			do
 			{
+				auto& fd = find.fileData();
 				if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY)
 				{
 					if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
@@ -1286,7 +1284,6 @@ X_NAMESPACE_BEGIN(engine)
 					list.catName = core::strUtil::Convert(fd.name, buf);
 
 					if (!loadTechCat(list)) {
-						pFileSys_->findClose(handle);
 						return false;
 					}
 				}
@@ -1294,9 +1291,7 @@ X_NAMESPACE_BEGIN(engine)
 				X_LOG0("findresult", "name: \"%ls\"", fd.name);
 
 			}
-			while (pFileSys_->findnext2(handle, fd));
-			
-			pFileSys_->findClose2(handle);
+			while (find.findNext());		
 		}
 
 		return true;
@@ -1334,24 +1329,23 @@ X_NAMESPACE_BEGIN(engine)
 		path.ensureSlash();
 		path.append("*.techsetdef");
 
-		core::IFileSys::findData fd;
+		core::FindFirstScoped find;
 
-		uintptr_t handle = pFileSys_->findFirst2(path.c_str(), fd);
-		if (handle != core::IFileSys::INVALID_HANDLE)
+		if (find.findfirst(path.c_str()))
 		{
 			char buf[512];
 
 			do
 			{
+				const auto& fd = find.fileData();
+
 				if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
 					continue;
 				}
 
 				cat.defs.emplace_back(core::strUtil::Convert(fd.name, buf));
 			} 
-			while (pFileSys_->findnext2(handle, fd));
-			
-			pFileSys_->findClose2(handle);
+			while (find.findNext());
 		}
 
 		return true;
