@@ -167,7 +167,7 @@ X_NAMESPACE_BEGIN(engine)
 	{
 		typedef core::Array<char> FileBuf;
 		typedef core::HashMap<core::Path<char>, FileBuf> SourceMap;
-		typedef core::HashMap<core::string, TechSetDef> TechSetDefMap;
+		typedef core::HashMap<core::Path<char>, TechSetDef*> TechSetDefMap;
 
 		static const char* INCLUDE_DIR;
 		static const wchar_t* INCLUDE_DIR_W;
@@ -187,15 +187,17 @@ X_NAMESPACE_BEGIN(engine)
 
 	public:
 		MATLIB_EXPORT TechSetDefs(core::MemoryArenaBase* arena);
+		MATLIB_EXPORT ~TechSetDefs();
 
 		MATLIB_EXPORT void setBaseDir(core::Path<char>& path);
 
 		MATLIB_EXPORT bool getTechCats(TechCatArr& techsOut);
-		MATLIB_EXPORT bool parseTechDef(const core::string& cat, const core::string& name);
+		MATLIB_EXPORT bool getTechDef(const core::string& cat, const core::string& name, TechSetDef*& pTechDefOut);
 
 		MATLIB_EXPORT void clearIncSrcCache(void);
 
 	private:
+		bool loadTechDef(const core::string& cat, const core::string& name);
 		bool loadTechCat(TechCat& lis);
 
 		bool loadFile(const core::Path<char>& path, FileBuf& bufOut);

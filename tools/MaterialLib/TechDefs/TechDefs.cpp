@@ -1241,6 +1241,14 @@ X_NAMESPACE_BEGIN(engine)
 		incDel_.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
 	}
 
+	TechSetDefs::~TechSetDefs()
+	{
+		for (const auto& t : techDefs_)
+		{
+			X_DELETE(t.second, arena_);
+		}
+	}
+
 	void TechSetDefs::setBaseDir(core::Path<char>& path)
 	{
 		X_ASSERT(baseDir_.isEmpty(), "Can't re set base dir, cache will need clearing to support such behaviour")();
@@ -1294,6 +1302,30 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
+	bool TechSetDefs::getTechDef(const core::string& cat, const core::string& name, TechSetDef*& pTechDefOut)
+	{
+		core::Path<char> path;
+		path /= cat;
+		path /= name;
+
+
+		auto it = techDefs_.find(path);
+		if (it != techDefs_.end()) {
+			pTechDefOut = it->second;
+			return true;
+		}
+
+		if (!loadTechDef(cat, name)) {
+			return false;
+		}
+
+		it = techDefs_.find(path);
+		X_ASSERT(it != techDefs_.end(), "Must be in map if load passed")();
+
+		pTechDefOut = it->second;
+		return true;
+	}
+
 	bool TechSetDefs::loadTechCat(TechCat& cat)
 	{
 		core::Path<char> path(baseDir_);
@@ -1325,7 +1357,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::parseTechDef(const core::string& cat, const core::string& name)
+	bool TechSetDefs::loadTechDef(const core::string& cat, const core::string& name)
 	{
 		FileBuf fileData(arena_);
 
@@ -1337,16 +1369,14 @@ X_NAMESPACE_BEGIN(engine)
 			return false;
 		}
 
-		auto it = techDefs_.insert(TechSetDefMap::value_type(name, TechSetDef(name, arena_)));
+		TechSetDef* pTechDef = X_NEW(TechSetDef, arena_, "TechDef")(name, arena_);
 
-		TechSetDef& techDef = it.first->second;
-
-		if (!techDef.parseFile(fileData, incDel_)) {
+		if (!pTechDef->parseFile(fileData, incDel_)) {
 			X_ERROR("TechSetDefs", "Failed to load: \"%s\"", name.c_str());
-			techDefs_.erase(it.first);
 			return false;
 		}
 
+		techDefs_.insert(TechSetDefMap::value_type(path, pTechDef));
 		return true;
 	}
 
