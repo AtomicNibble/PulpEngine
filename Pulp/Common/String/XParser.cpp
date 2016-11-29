@@ -622,7 +622,7 @@ bool XParser::Directive_include(void)
 			path.append(token.begin(), token.end());
 		}
 
-		if (token.GetPuncId() == PunctuationId::LOGIC_GREATER) {
+		if (token.GetPuncId() != PunctuationId::LOGIC_GREATER) {
 			XParser::Warning("#include missing trailing >");
 		}
 		if (!path.length()) {
