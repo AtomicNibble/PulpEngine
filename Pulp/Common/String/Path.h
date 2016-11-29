@@ -55,6 +55,12 @@ public:
 	inline const Path& operator/=(const Path<TChar>& oth);
 	inline const Path& operator/=(const TChar*);
 
+	inline const Path operator+(const Path<TChar>& oth) const;
+	inline const Path operator+(const TChar*) const;
+
+	inline const Path& operator+=(const Path<TChar>& oth);
+	inline const Path& operator+=(const TChar*);
+
 	inline void ensureSlash(void);
 	inline void replaceSeprators(void);
 	inline void removeFileName(void);

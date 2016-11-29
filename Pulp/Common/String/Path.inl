@@ -175,8 +175,40 @@ const Path<TChar>& Path<TChar>::operator/=(const TChar* str)
 	return *this;
 }
 
+// -----------------------------------------------
+
+template<typename TChar>
+const Path<TChar> Path<TChar>::operator+(const Path<TChar>& oth) const
+{
+	Path path(*this);
+	path.append(oth.c_str());
+	return path;
+}
+
+template<typename TChar>
+const Path<TChar> Path<TChar>::operator+(const TChar* str) const
+{
+	Path<TChar> path(*this);
+	path.append(str);
+	return path;
+}
+
+template<typename TChar>
+const Path<TChar>& Path<TChar>::operator+=(const Path<TChar>& oth)
+{
+	append(oth.c_str(), oth.length());
+	return *this;
+}
+
+template<typename TChar>
+const Path<TChar>& Path<TChar>::operator+=(const TChar* str)
+{
+	append(str);
+	return *this;
+}
 
 // -----------------------------------------------
+
 template<typename TChar>
 inline void Path<TChar>::ensureSlash(void)
 {
