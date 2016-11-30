@@ -87,7 +87,7 @@
     <None Include="Material.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="MatUtil.inl">
+    <None Include="Util\MatUtil.inl">
       <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
