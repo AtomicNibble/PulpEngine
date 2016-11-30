@@ -59,6 +59,9 @@
     <ClInclude Include="TechDefs\TechDefs.h">
       <Filter>Header Files\TechDefs</Filter>
     </ClInclude>
+    <ClInclude Include="TechDefs\TechSetDef.h">
+      <Filter>Header Files\TechDefs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -80,6 +83,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TechDefs\TechDefs.cpp">
+      <Filter>Source Files\TechDefs</Filter>
+    </ClCompile>
+    <ClCompile Include="TechDefs\TechSetDef.cpp">
       <Filter>Source Files\TechDefs</Filter>
     </ClCompile>
   </ItemGroup>
