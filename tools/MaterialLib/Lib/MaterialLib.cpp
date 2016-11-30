@@ -36,7 +36,6 @@ bool MaterialLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& ar
 	// lazy make the techDef loader.
 	if (!pTechDefs_) {
 		pTechDefs_ = core::makeUnique<TechSetDefs>(g_MatLibArena, g_MatLibArena);
-		pTechDefs_->setBaseDir(core::Path<char>(TECH_DEFS_DIR));
 	}
 
 	// we basically just take the json and compile it into a binary format.
