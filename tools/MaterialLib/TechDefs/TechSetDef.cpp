@@ -111,7 +111,8 @@ bool TechSetDef::parseFile(core::XParser& lex)
 	}
 
 	if (!lex.isEOF()) {
-		X_WARNING("TechDefs", "Failed to fully parse file");
+		X_ERROR("TechDefs", "Failed to fully parse file");
+		return false;
 	}
 
 	return true;
