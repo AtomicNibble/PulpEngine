@@ -112,8 +112,8 @@ X_POP_WARNING_LEVEL
 #define DLL_EXPORT
 #define DLL_IMPORT
 #else // !X_LIB
-#define DLL_EXPORT __declspec(dllexport)
-#define DLL_IMPORT __declspec(dllimport)
+#define DLL_EXPORT X_EXPORT
+#define DLL_IMPORT X_IMPORT
 #endif // !X_LIB
 
 
