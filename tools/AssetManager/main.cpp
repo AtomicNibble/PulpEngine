@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
 //    a.setApplicationName("AssetManager");
     a.setApplicationVersion("0.0.0.1");
 	a.setOrganizationName("Tom Crowley");
-	a.setOrganizationDomain("Potato - Engine");
+	a.setOrganizationDomain(X_ENGINE_NAME " - Engine");
 	a.setWindowIcon(QIcon(":/misc/img/icon.png"));
 	a.setStyle(QStyleFactory::create("Fusion"));
 
