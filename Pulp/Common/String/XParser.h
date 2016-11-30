@@ -66,6 +66,14 @@ class XParser
 	typedef core::Stack<Ident> IdentStack;
 	typedef core::Stack<XLexer*> ScriptStack;
 
+	struct Value
+	{
+		int32_t intvalue;
+		double floatvalue;
+		int32_t parentheses;
+	};
+
+
 public:
 	typedef core::Delegate<bool(XLexer& lex, core::string&, bool useIncludePath)> OpenIncludeDel;
 
@@ -131,6 +139,9 @@ private:
 	void PushIndent(PreProType::Enum type, bool skip);
 	void PopIndent(PreProType::Enum* pType, bool *skip);
 
+	bool Evaluate(int32_t* pIntvalue, double* pFloatvalue, bool isInteger);
+	bool EvaluateTokens(XLexToken* pTokens, int32_t* pIntvalue, double* pFloatvalue, bool isInteger);
+
 	bool CheckTokenString(const char* string);
 	int FindDefineParm(MacroDefine* define, const XLexToken& token);
 	int ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxparms);
@@ -160,7 +171,7 @@ private:
 
 	OpenIncludeDel openIncDel_;
 
-	bool skip_; // skip current content inside a #if 0 .. #endif etc..
+	int32_t skip_; // skip(count) current content inside a #if 0 .. #endif etc..
 
 	uint8_t macroCharCache[255];
 };

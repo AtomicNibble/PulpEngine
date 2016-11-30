@@ -758,11 +758,10 @@ bool XParser::Directive_elif(void)
 		return false;
 	}
 
-	X_ASSERT_UNREACHABLE();
 	int32_t value = 0;
-//	if (!XParser::Evaluate(&value, nullptr, true)) {
-//		return false;
-//	}
+	if (!XParser::Evaluate(&value, nullptr, true)) {
+		return false;
+	}
 
 	skip = (value == 0);
 	XParser::PushIndent(PreProType::ElseIf, skip);
@@ -771,12 +770,10 @@ bool XParser::Directive_elif(void)
 
 bool XParser::Directive_if(void)
 {
-
-	X_ASSERT_NOT_IMPLEMENTED();
 	int32_t value = 0;
-//	if (!XParser::Evaluate(&value, NULL, true)) {
-//		return false;
-//	}
+	if (!XParser::Evaluate(&value, nullptr, true)) {
+		return false;
+	}
 
 	const bool skip = (value == 0);
 
@@ -828,6 +825,8 @@ void XParser::PushIndent(PreProType::Enum type, bool skip)
 		return;
 	}
 
+	skip_ += skip;
+
 	idents_.emplace(type, skip, scriptStack_.top());
 }
 
@@ -843,11 +842,229 @@ void XParser::PopIndent(PreProType::Enum* pType, bool* pSkip)
 	}
 
 	const auto ident = idents_.top();
+	if (ident.pScript != scriptStack_.top()) {
+		XParser::Warning("Tried to pop ident that is not from current script");
+		return;
+	}
+
 	*pType = ident.type;
 	*pSkip = ident.skip;
 
+	skip_ -= ident.skip;
+
 	idents_.pop();
 }
+
+
+bool XParser::Evaluate(int32_t* pIntvalue, double* pFloatvalue, bool isInteger)
+{
+	XLexToken token, *pFirsttoken, *pLasttoken;
+	XLexToken *pToken, *pNexttoken;
+
+
+	if (pIntvalue) {
+		*pIntvalue = 0;
+	}
+	if (pFloatvalue) {
+		*pFloatvalue = 0;
+	}
+
+	//
+	if (!XParser::ReadLine(token)) {
+		XParser::Error("no value after #if/#elif");
+		return false;
+	}
+
+	pFirsttoken = nullptr;
+	pLasttoken = nullptr;
+
+	bool defined = false;
+	MacroDefine* pDefine = nullptr;
+
+	do 
+	{
+		//if the token is a name
+		if (token.GetType() == TokenType::NAME) 
+		{
+			if (defined) {
+				defined = false;
+				pToken = X_NEW(XLexToken, arena_, "Evaltoken")(token); 
+				pToken->pNext_ = nullptr;
+				if (pLasttoken) 
+					pLasttoken->pNext_ = pToken;
+				else 
+					pFirsttoken = pToken;
+
+				pLasttoken = pToken;
+			}
+			else if (token.isEqual("defined")) {
+				defined = true;
+				pToken = X_NEW(XLexToken, arena_, "Evaltoken")(token);
+				pToken->pNext_ = nullptr;
+				if (pLasttoken)
+					pLasttoken->pNext_ = pToken;
+				else
+					pFirsttoken = pToken;
+
+				pLasttoken = pToken;
+			}
+			else 
+			{
+				//then it must be a define
+				pDefine = FindDefine(token);
+				if (!pDefine) {
+					XParser::Error("can't Evaluate '%.*s', not defined", token.length(), token.begin());
+					return false;
+				}
+				if (!XParser::ExpandDefineIntoSource(token, pDefine)) {
+					return false;
+				}
+			}
+		}
+		else if (token.GetType() == TokenType::NUMBER || token.GetType() == TokenType::PUNCTUATION) 
+		{
+			pToken = X_NEW(XLexToken, arena_, "Evaltoken")(token);
+			pToken->pNext_ = nullptr;
+			if (pLasttoken)
+				pLasttoken->pNext_ = pToken;
+			else 
+				pFirsttoken = pToken;
+
+			pLasttoken = pToken;
+		}
+		else {
+			XParser::Error("can't Evaluate '%.*s'", token.length(), token.begin());
+			return false;
+		}
+	}
+	while (XParser::ReadLine(token));
+	
+	if (!XParser::EvaluateTokens(pFirsttoken, pIntvalue, pFloatvalue, isInteger)) {
+		return false;
+	}
+
+// #define DEBUG_EVAL 0
+
+#ifdef DEBUG_EVAL
+	X_LOG0("Parse", "eval:");
+#endif //DEBUG_EVAL
+	for (pToken = pFirsttoken; pToken; pToken = pNexttoken)
+	{
+#ifdef DEBUG_EVAL
+		X_LOG0("Parse", " %.*s", pToken->length(), pToken->begin());
+#endif //DEBUG_EVAL
+		pNexttoken = pToken->pNext_;
+		X_DELETE(pToken, arena_);
+	}
+
+#ifdef DEBUG_EVAL
+	if (isInteger) {
+		X_LOG0("Parse", "eval result: %d", *pIntvalue);
+	}
+	else {
+		X_LOG0("Parse", "eval result: %f", *pFloatvalue);
+	}
+#endif
+
+	return true;
+}
+
+bool XParser::EvaluateTokens(XLexToken* pTokens, int32_t* pIntvalue, double* pFloatvalue, bool isInteger)
+{
+	if (pIntvalue) {
+		*pIntvalue = 0;
+	}
+	if (pFloatvalue) {
+		*pFloatvalue = 0;
+	}
+
+	bool brace = false;
+	bool parentheses = false;
+	bool lastwasvalue = false;
+	bool negativevalue = false;
+	bool error = false;
+
+	X_UNUSED(isInteger);
+	X_UNUSED(brace);
+
+	XLexToken* pToken = nullptr;
+
+	core::FixedArray<Value, 64> values;
+
+	for (pToken = pTokens; pToken; pToken = pToken->pNext_)
+	{
+		switch (pToken->GetType())
+		{
+			case TokenType::NAME:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
+
+			case TokenType::NUMBER:
+			{
+				if (lastwasvalue) {
+					XParser::Error("syntax error in #if/#elif");
+					error = true;
+					break;
+				}
+
+				auto& v = values.AddOne();
+
+				if (negativevalue) {
+					v.intvalue = -pToken->GetIntValue();
+					v.floatvalue = -pToken->GetFloatValue();
+				}
+				else {
+					v.intvalue = pToken->GetIntValue();
+					v.floatvalue = pToken->GetFloatValue();
+				}
+
+				v.parentheses = parentheses;
+			
+				//last token was a value
+				lastwasvalue = true;
+				negativevalue = false;
+				break;
+			}
+
+			case TokenType::PUNCTUATION:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
+
+			default:
+				XParser::Error("unknown '%.*s' in #if/#elif", pToken->length(), pToken->begin());
+				error = true;
+				break;
+		}
+	}
+
+
+	if (!error)
+	{
+		if (!lastwasvalue) {
+			XParser::Error("trailing operator in #if/#elif");
+			error = true;
+		}
+		else if (parentheses) {
+			XParser::Error("too many ( in #if/#elif");
+			error = true;
+		}
+	}
+
+	if(values.isNotEmpty())
+	{
+		auto& v = values.back();
+		if (pIntvalue) {
+			*pIntvalue = v.intvalue;
+		}
+		if (pFloatvalue) {
+			*pFloatvalue = v.floatvalue;
+		}
+
+	}
+
+	return !error;
+}
+
 
 bool XParser::CheckTokenString(const char* string)
 {
