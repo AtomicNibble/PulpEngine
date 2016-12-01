@@ -27,7 +27,7 @@ struct StencilState
 
 struct Shader
 {
-
+	render::shader::ShaderType::Enum stage;
 	core::string source;
 	core::string entry;
 	core::string defines;
@@ -39,9 +39,10 @@ struct Technique
 	render::StateDesc state;
 
 	core::string source;
-	Shader vs;
-	Shader ps;
 	core::string defines;
+
+	render::shader::ShaderTypeFlags stageFlags;
+	Shader shaders[render::shader::ShaderType::FLAGS_COUNT];
 };
 
 class TechSetDef
@@ -106,9 +107,7 @@ private:
 	// Technique
 	bool parseTechnique(core::XParser& lex);
 	bool parseState(core::XParser& lex, render::StateDesc& state);
-	bool parseVertexShader(core::XParser& lex, Shader& shader);
-	bool parsePixelShader(core::XParser& lex, Shader& shader);
-
+	bool parseShaderStage(core::XParser& lex, Shader& shader);
 
 
 	bool parseBool(core::XParser& lex, bool& out);

@@ -738,6 +738,23 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 	while (lex.ReadToken(token))
 	{
 		if (token.isEqual("}")) {
+
+			// we have a global source than is passed down to shaders if they don't override.
+			if (tech.source.isNotEmpty())
+			{
+				// only set source for defined stages.
+				for(uint32_t i=0; i<render::shader::ShaderType::FLAGS_COUNT; i++)
+				{
+					const auto stage = static_cast<render::shader::ShaderType::Enum>(i);
+					if (tech.stageFlags.IsSet(stage))
+					{
+						if (tech.shaders[stage].source.isEmpty()) {
+							tech.shaders[stage].source = tech.source;
+						}
+					}
+				}
+
+			}
 			return true;
 		}
 
@@ -756,14 +773,34 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 				}
 				break;
 			case "vs"_fnv1a:
-				if (!parseVertexShader(lex, tech.vs)) {
+				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Vertex])) {
 					return false;
 				}
+				tech.stageFlags.Set(render::shader::ShaderType::Vertex);
 				break;
 			case "ps"_fnv1a:
-				if (!parsePixelShader(lex, tech.ps)) {
+				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Pixel])) {
 					return false;
 				}
+				tech.stageFlags.Set(render::shader::ShaderType::Pixel);
+				break;
+			case "ds"_fnv1a:
+				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Domain])) {
+					return false;
+				}
+				tech.stageFlags.Set(render::shader::ShaderType::Domain);
+				break;
+			case "gs"_fnv1a:
+				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Geometry])) {
+					return false;
+				}
+				tech.stageFlags.Set(render::shader::ShaderType::Geometry);
+				break;
+			case "hs"_fnv1a:
+				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Hull])) {
+					return false;
+				}
+				tech.stageFlags.Set(render::shader::ShaderType::Hull);
 				break;
 			case "defines"_fnv1a:
 				if (!parseDefines(lex, tech.defines)) {
@@ -786,13 +823,7 @@ bool TechSetDef::parseState(core::XParser& lex, render::StateDesc& state)
 		&TechSetDef::stateExsists, "Tech", "State");
 }
 
-bool TechSetDef::parseVertexShader(core::XParser& lex, Shader& shader)
-{
-	// it's the same for now.
-	return parsePixelShader(lex, shader);
-}
-
-bool TechSetDef::parsePixelShader(core::XParser& lex, Shader& shader)
+bool TechSetDef::parseShaderStage(core::XParser& lex, Shader& shader)
 {
 	// can be a function name or a inline define.
 	if (!lex.ExpectTokenString("=")) {
@@ -1171,7 +1202,9 @@ render::StateDesc& TechSetDef::addState(const core::string& name, const core::st
 Shader& TechSetDef::addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type)
 {
 	X_UNUSED(type);
-	return addHelper(shaders_, name, parentName, "state");
+	Shader& shader = addHelper(shaders_, name, parentName, "state");
+	shader.stage = type;
+	return shader;
 }
 
 Technique& TechSetDef::addTechnique(const core::string& name, const core::string& parentName)
