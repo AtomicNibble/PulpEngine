@@ -192,6 +192,11 @@ struct MaterialHeader
 	// 4
 	uint8_t version;
 	uint8_t numTextures;
+	uint8_t numTechs;
+	uint8_t _pad;
+
+	// 4
+	uint8_t __pad[2];
 	MaterialCat::Enum cat;
 	MaterialUsage::Enum usage;
 
@@ -207,12 +212,6 @@ struct MaterialHeader
 	// used for custom texture repeat.
 	// if AUTO_TILING the textures dim's are used.
 	Vec2<int16_t> tiling;
-
-	// 20
-	render::StateDesc stateDesc;
-
-	// 4
-	uint32_t _pad;
 
 	// 12
 	Color8u diffuse;
@@ -263,7 +262,7 @@ X_ENSURE_SIZE(MaterialMountType::Enum, 1);
 //X_ENSURE_SIZE(StencilFunc::Enum, 1);
 
 
-X_ENSURE_SIZE(MaterialHeader, 64);
+X_ENSURE_SIZE(MaterialHeader, 44);
 X_ENSURE_SIZE(MaterialTexture, 4);
 
 class Material;

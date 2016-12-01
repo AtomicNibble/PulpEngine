@@ -308,8 +308,6 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.coverage = coverage_;
 	hdr.mountType = mountType_;
 
-	hdr.stateDesc = stateDesc_;
-
 	hdr.flags = flags_;
 	
 	hdr.tiling = tiling_;
