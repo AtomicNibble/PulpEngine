@@ -47,7 +47,7 @@ X_NAMESPACE_BEGIN(engine)
 		MATLIB_EXPORT void clearIncSrcCache(void);
 
 	private:
-		bool loadTechDef(MaterialCat::Enum cat, const core::string& name);
+		bool loadTechDef(const core::Path<char>& path, const core::string& name);
 		static bool loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut);
 
 		bool loadFile(const core::Path<char>& path, FileBuf& bufOut);

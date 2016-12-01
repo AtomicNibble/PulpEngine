@@ -66,6 +66,8 @@ X_NAMESPACE_BEGIN(engine)
 		path /= MaterialCat::ToString(cat);
 		path /= name;
 		path.toLower();
+		path.replaceSeprators();
+		path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
 		auto it = techDefs_.find(path);
 		if (it != techDefs_.end()) {
@@ -73,7 +75,7 @@ X_NAMESPACE_BEGIN(engine)
 			return true;
 		}
 
-		if (!loadTechDef(cat, name)) {
+		if (!loadTechDef(path, name)) {
 			return false;
 		}
 
@@ -89,7 +91,7 @@ X_NAMESPACE_BEGIN(engine)
 		core::Path<char> path(TECH_DEFS_DIR);
 		path /= MaterialCat::ToString(cat);
 		path.ensureSlash();
-		path.append("*.techsetdef");
+		path.appendFmt("*.%s", TECH_DEFS_FILE_EXTENSION);
 		path.toLower();
 
 		core::FindFirstScoped find;
@@ -120,14 +122,9 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::loadTechDef(MaterialCat::Enum cat, const core::string& name)
+	bool TechSetDefs::loadTechDef(const core::Path<char>& path, const core::string& name)
 	{
 		FileBuf fileData(arena_);
-
-		core::Path<char> path;
-		path /= MaterialCat::ToString(cat);
-		path /= name;
-		path.toLower();
 
 		if (!loadFile(path, fileData)) {
 			return false;
@@ -189,7 +186,7 @@ X_NAMESPACE_BEGIN(engine)
 			path = name;
 		}
 
-		path.setExtension(".techsetdef");
+		path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
 		auto it = incSourceMap_.find(path);
 		if (it == incSourceMap_.end())
