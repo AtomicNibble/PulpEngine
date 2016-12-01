@@ -5,6 +5,8 @@
 
 #include <IMaterial.h>
 
+#include <../../tools/MaterialLib/MatLib.h>
+
 X_NAMESPACE_BEGIN(assman)
 
 
@@ -485,6 +487,36 @@ std::string AssetScriptProps::getMaterialCats(void)
 		temp.toLower();
 
 		s += temp.c_str();
+		s += "|";
+	}
+
+	return s;
+}
+
+
+std::string AssetScriptProps::getMaterialTypes(std::string& catStr)
+{
+	if (catStr.empty()) {
+		return "";
+	}
+
+	const engine::MaterialCat::Enum cat = engine::Util::MatCatFromStr(catStr.data(), catStr.data() + catStr.length());
+
+	// we need to load the tech defs for this cat :|
+	engine::TechSetDefs::CatTypeArr types(g_arena);
+	if (!engine::TechSetDefs::getTechCatTypes(cat, types)) {
+		X_ERROR("AssetScript", "Failed to get tech cat type");
+		return "<error>";
+	}
+
+	if (types.isEmpty()) {
+		return "<none>";
+	}
+
+	std::string s;
+	for (const auto& t : types)
+	{
+		s += t;
 		s += "|";
 	}
 

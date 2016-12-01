@@ -100,6 +100,7 @@ public:
 	bool getPropValueBool(const std::string& key);
 
 	std::string getMaterialCats(void);
+	std::string getMaterialTypes(std::string& cat);
 
 private:
 	AssetScriptProperty* getProperty(const std::string& key, AssetProperty::PropertyType::Enum type);
