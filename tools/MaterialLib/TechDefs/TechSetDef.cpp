@@ -105,7 +105,8 @@ bool TechSetDef::parseFile(core::XParser& lex)
 		}
 		else
 		{
-			X_ERROR("TestDefs", "Unexpected token \"%.*s\" Line: %" PRId32, token.length(), token.begin(), lex.GetLineNumber());
+			X_ERROR("TestDefs", "Unexpected token \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(), 
+				lex.GetFileName(), lex.GetLineNumber());
 			return false;
 		}
 	}
@@ -700,7 +701,8 @@ bool TechSetDef::parsePixelShaderData(core::XParser& lex, Shader& shader)
 				break;
 
 			default:
-				X_ERROR("TechDef", "Unknown Shader prop: \"%.*s\"", token.length(), token.begin());
+				X_ERROR("TechDef", "Unknown Shader prop: \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(),
+					lex.GetFileName(), lex.GetLineNumber());
 				return false;
 		}
 	}
@@ -1021,7 +1023,8 @@ bool TechSetDef::parseHelper(core::XParser& lex, T& state,
 			return true;
 		}
 
-		X_ERROR("TechDef", "%s uses undefined %s: \"%s\" Line: %" PRIi32, pObjName, pStateName, name.c_str(), lex.GetLineNumber());
+		X_ERROR("TechDef", "%s uses undefined %s: \"%s\" File: %s:%" PRIi32, pObjName, pStateName, name.c_str(),
+			lex.GetFileName(), lex.GetLineNumber());
 	}
 	else
 	{
@@ -1032,8 +1035,8 @@ bool TechSetDef::parseHelper(core::XParser& lex, T& state,
 			// inline define can have a parent.
 			// but it must exist if defined.
 			if (!(*this.*stateExsistsFunc)(parentName, &state)) {
-				X_ERROR("TechDef", "%s has a inline %s define with a undefined parent of: %s \"%s\" Line: %" PRIi32,
-					pObjName, pStateName, parentName.c_str(), lex.GetLineNumber());
+				X_ERROR("TechDef", "%s has a inline %s define with a undefined parent of: %s \"%s\" File: %s:%" PRIi32,
+					pObjName, pStateName, parentName.c_str(), lex.GetFileName(), lex.GetLineNumber());
 				return false;
 			}
 		}
@@ -1043,7 +1046,7 @@ bool TechSetDef::parseHelper(core::XParser& lex, T& state,
 			return true;
 		}
 
-		X_ERROR("TechDef", "Failed to parse inline %s. Line: %" PRIi32, pStateName, lex.GetLineNumber());
+		X_ERROR("TechDef", "Failed to parse inline %s. File: %s:%" PRIi32, pStateName, lex.GetFileName(), lex.GetLineNumber());
 	}
 
 	return false;
@@ -1065,7 +1068,8 @@ bool TechSetDef::parseInlineDefine(core::XParser& lex, core::string& name, core:
 		name.clear();
 
 		if (!token.isEqual(pStateName)) {
-			X_ERROR("TechDef", "Expected '%s entry' or inline '%s' define. Line: %" PRIi32, pStateName, pStateName, lex.GetLineNumber());
+			X_ERROR("TechDef", "Expected '%s entry' or inline '%s' define. File: %s:%" PRIi32, pStateName, pStateName, 
+				lex.GetFileName(), lex.GetLineNumber());
 			return false;
 		}
 
@@ -1107,12 +1111,12 @@ bool TechSetDef::parseNameInline(core::XParser& lex, core::string& parentName)
 		{
 			// got a parent name.
 			if (!lex.ReadToken(token)) {
-				X_ERROR("TestDefs", "Failed to read parent name. Line: %" PRIi32, lex.GetLineNumber());
+				X_ERROR("TestDefs", "Failed to read parent name. File: %s:%" PRIi32, lex.GetFileName(), lex.GetLineNumber());
 				return false;
 			}
 
 			if (token.GetType() != core::TokenType::STRING && token.GetType() != core::TokenType::NAME) {
-				X_ERROR("TestDefs", "Expected string/name token for parent name. Line: %" PRIi32, lex.GetLineNumber());
+				X_ERROR("TestDefs", "Expected string/name token for parent name. File: %s:%" PRIi32, lex.GetFileName(), lex.GetLineNumber());
 				return false;
 			}
 
