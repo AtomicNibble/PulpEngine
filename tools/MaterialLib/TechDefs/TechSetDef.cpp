@@ -68,61 +68,76 @@ bool TechSetDef::parseFile(core::XParser& lex)
 		// BlendState, State, StencilState
 
 		// how best to find each type since the token can contain more than just the name i think.
+		using namespace core::Hash::Fnva1Literals;
 
-		if (token.isEqual("BlendState"))
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
-			if (!parseBlendState(lex)) {
-				X_ERROR("TestDefs", "Failed to parse BlendState");
-				return false;
-			}
-		}
-		else if (token.isEqual("StencilState"))
-		{
-			if (!parseStencilState(lex)) {
-				X_ERROR("TestDefs", "Failed to parse StencilState");
-				return false;
-			}
-		}
-		else if (token.isEqual("State"))
-		{
-			if (!parseState(lex)) {
-				X_ERROR("TestDefs", "Failed to parse State");
-				return false;
-			}
-		}
-		else if (token.isEqual("RenderFlags"))
-		{
-			if (!parseRenderFlags(lex)) {
-				X_ERROR("TestDefs", "Failed to parse RenderFlags");
-				return false;
-			}
-		}
-		else if (token.isEqual("Technique"))
-		{
-			if (!parseTechnique(lex)) {
-				X_ERROR("TestDefs", "Failed to parse Technique");
-				return false;
-			}
-		}
-		else if (token.isEqual("VertexShader"))
-		{
-			if (!parseVertexShader(lex)) {
-				X_ERROR("TestDefs", "Failed to parse VertexShader");
-				return false;
-			}
-		}
-		else if (token.isEqual("PixelShader"))
-		{
-			if (!parsePixelShader(lex)) {
-				X_ERROR("TestDefs", "Failed to parse PixelShader");
-				return false;
-			}
-		}
-		else
-		{
-			X_ERROR("TestDefs", "Unexpected token \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(), 
-				lex.GetFileName(), lex.GetLineNumber());
-			return false;
+			case "BlendState"_fnv1a:
+				if (!parseBlendState(lex)) {
+					X_ERROR("TestDefs", "Failed to parse BlendState");
+					return false;
+				}
+				break;
+
+			case "StencilState"_fnv1a:
+				if (!parseStencilState(lex)) {
+					X_ERROR("TestDefs", "Failed to parse StencilState");
+					return false;
+				}
+				break;
+			case "State"_fnv1a:
+				if (!parseState(lex)) {
+					X_ERROR("TestDefs", "Failed to parse State");
+					return false;
+				}
+				break;
+			case "RenderFlags"_fnv1a:
+				if (!parseRenderFlags(lex)) {
+					X_ERROR("TestDefs", "Failed to parse RenderFlags");
+					return false;
+				}
+				break;
+			case "Technique"_fnv1a:
+				if (!parseTechnique(lex)) {
+					X_ERROR("TestDefs", "Failed to parse Technique");
+					return false;
+				}
+				break;
+			case "VertexShader"_fnv1a:
+				if (!parseVertexShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse VertexShader");
+					return false;
+				}
+				break;
+			case "PixelShader"_fnv1a:
+				if (!parsePixelShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse PixelShader");
+					return false;
+				}
+				break;
+			case "HullShader"_fnv1a:
+				if (!parseHullShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse HullShader");
+					return false;
+				}
+				break;
+			case "DomainShader"_fnv1a:
+				if (!parseDomainShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse DomainShader");
+					return false;
+				}
+				break;
+			case "GeometryShader"_fnv1a:
+				if (!parseGeoShader(lex)) {
+					X_ERROR("TestDefs", "Failed to parse GeometryShader");
+					return false;
+				}
+				break;
+
+			default:
+				X_ERROR("TestDefs", "Unexpected token \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(),
+					lex.GetFileName(), lex.GetLineNumber());
+				return false;			
 		}
 	}
 
@@ -636,34 +651,32 @@ bool TechSetDef::parseRenderFlags(core::XParser& lex)
 
 bool TechSetDef::parseVertexShader(core::XParser& lex)
 {
-	core::string name, parentName;
-
-	// we have the name.
-	if (!parseName(lex, name, parentName)) {
-		return false;
-	}
-
-	if (!lex.ExpectTokenString("{")) {
-		return false;
-	}
-
-	if (stateExsists(name)) {
-		return false;
-	}
-
-	auto& shader = addShader(name, parentName, render::shader::ShaderType::Vertex);
-
-	return parseVertexShaderData(lex, shader);
+	return parseShader(lex, render::shader::ShaderType::Vertex);
 }
 
-bool TechSetDef::parseVertexShaderData(core::XParser& lex, Shader& shader)
+bool TechSetDef::parsePixelShader(core::XParser& lex)
 {
-	return parsePixelShaderData(lex, shader);
+	return parseShader(lex, render::shader::ShaderType::Pixel);
+}
+
+bool TechSetDef::parseHullShader(core::XParser& lex)
+{
+	return parseShader(lex, render::shader::ShaderType::Hull);
+}
+
+bool TechSetDef::parseDomainShader(core::XParser& lex)
+{
+	return parseShader(lex, render::shader::ShaderType::Domain);
+}
+
+bool TechSetDef::parseGeoShader(core::XParser& lex)
+{
+	return parseShader(lex, render::shader::ShaderType::Geometry);
 }
 
 // ----------------------------------------------------
 
-bool TechSetDef::parsePixelShader(core::XParser& lex)
+bool TechSetDef::parseShader(core::XParser& lex, render::shader::ShaderType::Enum stage)
 {
 	core::string name, parentName;
 
@@ -680,13 +693,13 @@ bool TechSetDef::parsePixelShader(core::XParser& lex)
 		return false;
 	}
 
-	auto& shader = addShader(name, parentName, render::shader::ShaderType::Pixel);
+	auto& shader = addShader(name, parentName, stage);
 
 
-	return parsePixelShaderData(lex, shader);
+	return parseShaderData(lex, shader);
 }
 
-bool TechSetDef::parsePixelShaderData(core::XParser& lex, Shader& shader)
+bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 {
 	// start of define.
 	if (!lex.ExpectTokenString("{")) {
@@ -788,31 +801,31 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 				}
 				break;
 			case "vs"_fnv1a:
-				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Vertex])) {
+				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Vertex)) {
 					return false;
 				}
 				tech.stageFlags.Set(render::shader::ShaderType::Vertex);
 				break;
 			case "ps"_fnv1a:
-				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Pixel])) {
+				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Pixel)) {
 					return false;
 				}
 				tech.stageFlags.Set(render::shader::ShaderType::Pixel);
 				break;
 			case "ds"_fnv1a:
-				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Domain])) {
+				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Domain)) {
 					return false;
 				}
 				tech.stageFlags.Set(render::shader::ShaderType::Domain);
 				break;
 			case "gs"_fnv1a:
-				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Geometry])) {
+				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Geometry)) {
 					return false;
 				}
 				tech.stageFlags.Set(render::shader::ShaderType::Geometry);
 				break;
 			case "hs"_fnv1a:
-				if (!parseShaderStage(lex, tech.shaders[render::shader::ShaderType::Hull])) {
+				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Hull)) {
 					return false;
 				}
 				tech.stageFlags.Set(render::shader::ShaderType::Hull);
@@ -828,6 +841,7 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 		}
 	}
 
+
 	// failed to read token
 	return false;
 }
@@ -838,47 +852,85 @@ bool TechSetDef::parseState(core::XParser& lex, render::StateDesc& state)
 		&TechSetDef::stateExsists, "Tech", "State");
 }
 
-bool TechSetDef::parseShaderStage(core::XParser& lex, Shader& shader)
+bool TechSetDef::parseShaderStage(core::XParser& lex, Technique& tech, render::shader::ShaderType::Enum stage)
 {
-	// can be a function name or a inline define.
-	if (!lex.ExpectTokenString("=")) {
+	Shader& shader = tech.shaders[stage];
+	shader.stage = render::shader::ShaderType::UnKnown;
+
+	if (!parseShaderStageHelper(lex, shader, stage)) {
 		return false;
 	}
 
-	core::XLexToken token;
-	if (!lex.ReadToken(token)) {
-		return false;
-	}
-
-	if (token.GetType() == core::TokenType::NAME)
+	// check it's from correct stage.
+	if (shader.stage != stage)
 	{
-		// inline declare.
-		if (!token.isEqual("VertexShader") && !token.isEqual("PixelShader")) {
-			X_ERROR("TechDef", "Expected shader entry or inline Shader define. Line: %" PRIi32, lex.GetLineNumber());
-			return false;
+		// if the state is unknow it was inline and it must be correct otherwise parsing would fail.
+		if (shader.stage == render::shader::ShaderType::UnKnown)
+		{
+			shader.stage = stage;
 		}
+		else
+		{
 
-		// got ()
-		if (!lex.ExpectTokenString("(")) {
 			return false;
 		}
-		if (!lex.ExpectTokenString(")")) {
-			return false;
-		}
+	}
 
-		// parse the inline state.
-		if (parsePixelShaderData(lex, shader)) {
+	tech.stageFlags.Set(stage);
+	return true;
+}
+
+bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, render::shader::ShaderType::Enum stage)
+{
+	core::StackString<128, char> defName;
+	defName.appendFmt("%sShader", render::shader::ShaderType::ToString(stage));
+
+
+	core::string name, parentName;
+
+	if (!parseInlineDefine(lex, name, parentName, defName.c_str())) {
+		return false;
+	}
+
+	if (name.isNotEmpty())
+	{
+		name += render::shader::ShaderType::ToString(stage);
+
+		if (shaderExsists(name, &shader)) {
 			return true;
 		}
 
-		X_ERROR("TechDef", "Failed to parse inline shader. Line: %" PRIi32, lex.GetLineNumber());
-		// fall through to false.
+		X_ERROR("TechDef", "Tech uses undefined %s: \"%s\" File: %s:%" PRIi32, defName.c_str(), name.c_str(),
+			lex.GetFileName(), lex.GetLineNumber());
 	}
-	else if (token.GetType() == core::TokenType::STRING)
+	else
 	{
-		// a predefined one
-		shader.entry = core::string(token.begin(), token.end());
-		return true;
+		X_ASSERT(name.isEmpty(), "Inline define can't have a name")(name.c_str());
+
+		if (parentName.isNotEmpty())
+		{
+			// create temp so we don't log diffrent parent name, then in file.
+			const core::string mergedParentName = parentName + render::shader::ShaderType::ToString(stage);
+			// inline define can have a parent.
+			// but it must exist if defined.
+			if (!shaderExsists(mergedParentName, &shader)) {
+				X_ERROR("TechDef", "Tech has a inline %s define with a undefined parent of: %s \"%s\" File: %s:%" PRIi32,
+					defName.c_str(), parentName.c_str(), lex.GetFileName(), lex.GetLineNumber());
+				return false;
+			}
+
+			// if we selected a parent it should be impossible for it to have a diffrent stage.
+			// even if the user wanted to. this is source code logic fail.
+			X_ASSERT(shader.stage == stage, "Parent not from same stage")(shader.stage, stage);
+		}
+
+		// parse the inline state.
+		if (parseShaderData(lex, shader)) {
+			shader.stage = stage;
+			return true;
+		}
+
+		X_ERROR("TechDef", "Failed to parse inline %s. File: %s:%" PRIi32, defName.c_str(), lex.GetFileName(), lex.GetLineNumber());
 	}
 
 	return false;

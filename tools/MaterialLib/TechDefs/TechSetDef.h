@@ -31,7 +31,6 @@ struct Shader
 	core::string source;
 	core::string entry;
 	core::string defines;
-
 };
 
 struct Technique
@@ -101,17 +100,22 @@ private:
 
 	// VertexShader
 	bool parseVertexShader(core::XParser& lex);
-	bool parseVertexShaderData(core::XParser& lex, Shader& shader);
-
-	// PixelShader
 	bool parsePixelShader(core::XParser& lex);
-	bool parsePixelShaderData(core::XParser& lex, Shader& shader);
+	bool parseHullShader(core::XParser& lex);
+	bool parseDomainShader(core::XParser& lex);
+	bool parseGeoShader(core::XParser& lex);
+
+
+	// Shaders
+	bool parseShader(core::XParser& lex, render::shader::ShaderType::Enum stage);
+	bool parseShaderData(core::XParser& lex, Shader& shader);
 
 
 	// Technique
 	bool parseTechnique(core::XParser& lex);
 	bool parseState(core::XParser& lex, render::StateDesc& state);
-	bool parseShaderStage(core::XParser& lex, Shader& shader);
+	bool parseShaderStage(core::XParser& lex, Technique& tech, render::shader::ShaderType::Enum stage);
+	bool parseShaderStageHelper(core::XParser& lex, Shader& shader, render::shader::ShaderType::Enum stage);
 
 
 	bool parseBool(core::XParser& lex, bool& out);
