@@ -21,5 +21,7 @@
 
 
 #include "Material.h"
+#include "Util\MatUtil.h"
+#include "TechDefs\TechDefs.h"
 
 #endif // !X_MATLIB_H_
