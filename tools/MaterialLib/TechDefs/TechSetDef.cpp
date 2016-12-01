@@ -18,8 +18,8 @@ TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	blendStates_(arena, 32),
 	stencilStates_(arena, 16),
 	states_(arena, 128),
-	shaders_(arena, 128),
-	techs_(arena, 128)
+	shaders_(arena, 16),
+	techs_(arena, 8)
 {
 
 }
