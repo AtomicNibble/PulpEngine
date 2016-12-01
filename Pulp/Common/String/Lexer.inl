@@ -197,7 +197,13 @@ int32_t XLexer::CheckString(const char *str) const
 	return true;
 }
 
-const int32_t XLexer::GetLineNumber(void) const
+const char* XLexer::GetFileName(void) const
+{
+	return filename_.c_str();
+}
+
+
+int32_t XLexer::GetLineNumber(void) const
 {
 	return curLine_;
 }

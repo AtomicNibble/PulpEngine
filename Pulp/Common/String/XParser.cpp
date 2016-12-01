@@ -89,7 +89,7 @@ bool XParser::SetMemory(const char* startInclusive, const char* endExclusive,
 
 	filename_ = name;
 
-	auto* pLexer = X_NEW(XLexer, arena_, "ParserLex")(startInclusive, endExclusive);
+	auto* pLexer = X_NEW(XLexer, arena_, "ParserLex")(startInclusive, endExclusive, filename_);
 	pLexer->setFlags(flags_);
 
 
@@ -288,15 +288,6 @@ float XParser::ParseFloat(void)
 void XParser::UnreadToken(const XLexToken& token)
 {
 	UnreadSourceToken(token);
-}
-
-const int XParser::GetLineNumber(void)
-{
-	if (scriptStack_.isNotEmpty()) {
-		return scriptStack_.top()->GetLineNumber();
-	}
-	X_WARNING("Parser", "called 'GetLineNumber' on a parser without a valid file loaded");
-	return true;
 }
 
 bool XParser::isEOF(void) const

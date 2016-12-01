@@ -102,9 +102,10 @@ public:
 	float ParseFloat(void);
 
 	void UnreadToken(const XLexToken& token);
-	const int GetLineNumber(void);
 	bool isEOF(void) const;
 
+	X_INLINE const char* GetFileName(void) const;
+	X_INLINE int32_t GetLineNumber(void) const;
 	X_INLINE void setFlags(LexFlags flags);
 	X_INLINE LexFlags getFlags(void);
 

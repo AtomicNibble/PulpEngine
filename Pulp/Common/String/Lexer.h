@@ -227,8 +227,9 @@ public:
 
 	XLexer();
 	XLexer(const char* startInclusive, const char* endExclusive);
+	XLexer(const char* startInclusive, const char* endExclusive, core::string name);
 
-	bool SetMemory(const char* startInclusive, const char* endExclusive, const core::string& name);
+	bool SetMemory(const char* startInclusive, const char* endExclusive, core::string name);
 
 	bool ReadToken(XLexToken& token);
 
@@ -256,7 +257,8 @@ public:
 	// read a token only if on the same line
 	bool ReadTokenOnLine(XLexToken& token);
 
-	X_INLINE const int32_t GetLineNumber(void) const;
+	X_INLINE const char* GetFileName(void) const;
+	X_INLINE int32_t GetLineNumber(void) const;
 	X_INLINE bool isEOF(void) const;
 	X_INLINE bool isEOF(bool skipWhiteSpace);
 	X_INLINE size_t BytesLeft(void) const;
@@ -283,6 +285,8 @@ private:
 	X_INLINE int32_t CheckString(const char* str) const;
 
 private:
+	core::string filename_;
+
 	const char* start_;
 	const char* end_;
 	const char* current_;

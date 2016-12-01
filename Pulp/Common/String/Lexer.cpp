@@ -271,13 +271,19 @@ bool default_setup = false;
 
 
 XLexer::XLexer() :
-	XLexer(nullptr, nullptr)
+	XLexer(nullptr, nullptr, core::string())
 {
 
 }
 
+XLexer::XLexer(const char* startInclusive, const char* endExclusive) :
+	XLexer(startInclusive, endExclusive, core::string())
+{
 
-XLexer::XLexer(const char* startInclusive, const char* endExclusive)
+}
+
+XLexer::XLexer(const char* startInclusive, const char* endExclusive, core::string name) :
+	filename_(name)
 {
 	start_ = startInclusive;
 	current_ = startInclusive;
@@ -296,15 +302,15 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive)
 	errState_ = ErrorState::OK;
 }
 
-bool XLexer::SetMemory(const char* startInclusive, const char* endExclusive, const core::string& name)
+bool XLexer::SetMemory(const char* startInclusive, const char* endExclusive, core::string name)
 {
 	X_ASSERT(start_ == nullptr, "Can't set memory on a Lex that is already init.")(start_, end_, current_);
-	X_UNUSED(name);
 
 	if (start_) {
 		return false;
 	}
 
+	filename_ = name;
 	start_ = startInclusive;
 	current_ = startInclusive;
 	lastp_ = startInclusive;
