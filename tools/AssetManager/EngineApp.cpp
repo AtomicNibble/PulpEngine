@@ -97,6 +97,11 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 		return false;
 	}
 
+	// MatLib
+	if (!pICore_->IntializeLoadedConverterModule("Engine_MaterialLib", "Engine_MaterialLib")) {
+		return false;
+	}
+
 	return true;
 }
 
