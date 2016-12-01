@@ -61,6 +61,10 @@ public:
 public:
 	TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
 
+	// we need a api for getting the techs.
+	TechniqueMap::size_type numTechs(void) const;
+	TechniqueMap::const_iterator techBegin(void) const;
+	TechniqueMap::const_iterator techEnd(void) const;
 
 	bool parseFile(FileBuf& buf);
 	bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
@@ -151,7 +155,7 @@ private:
 	StencilStatesMap stencilStates_;
 	StatesMap states_;
 	ShaderMap shaders_;
-	TechniqueMap techs_;
+	TechniqueMap techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
 };
 
 
