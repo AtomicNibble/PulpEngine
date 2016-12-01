@@ -25,7 +25,11 @@ static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
 static const char*		 MTL_DEFAULT_NAME = "default/default";
 
-static const char*		 TECH_DEFS_DIR = "techdefs";
+// some limits for each material
+static const uint32_t    MTL_MAX_TECHS = 16;
+
+
+static const char*		 TECH_DEFS_DIR = "core_assets/techdefs";
 static const char*		 TECH_DEFS_FILE_EXTENSION = "techsetdef";
 
 
