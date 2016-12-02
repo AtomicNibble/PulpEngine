@@ -722,6 +722,11 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 					return false;
 				}
 				break;
+			case "entry"_fnv1a:
+				if (!parseString(lex, shader.entry)) {
+					return false;
+				}
+				break;
 			case "defines"_fnv1a:
 				if (!parseDefines(lex, shader.defines)) {
 					return false;
