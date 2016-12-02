@@ -49,14 +49,13 @@ class XEngineModule_3DEngine : public IEngineModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_UNUSED(initParams);
 
-		engine::I3DEngine* engine = nullptr;
+		engine::I3DEngine* pEngine = nullptr;
 
 		g_3dEngineArena = X_NEW_ALIGNED(Engine3DArena, gEnv->pArena, "3DEngineArena", 8)(&g_3dEngineAlloc, "3DEngineArena");
 
+		pEngine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
 
-		engine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
-
-		env.p3DEngine = engine;
+		env.p3DEngine = pEngine;
 		return true;
 	}
 
