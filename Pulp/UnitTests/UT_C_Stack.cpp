@@ -114,6 +114,10 @@ TYPED_TEST(StackTest, DefaultTypes)
 
 TEST(StackTest, CustomTypes)
 {
+	CustomType::MOVE_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
+	CustomType::CONSRUCTION_COUNT = 0;
+
 	Stack<CustomType> stack(g_arena);
 	{
 		CustomType val;
@@ -161,6 +165,55 @@ TEST(StackTest, CustomTypes)
 	EXPECT_EQ(91, CustomType::DECONSRUCTION_COUNT);
 	EXPECT_EQ(91, CustomType::CONSRUCTION_COUNT);
 }
+
+TEST(StackTest, CustomTypesDecon) // check leaving scope cleans up correct.
+{
+	CustomType::MOVE_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
+	CustomType::CONSRUCTION_COUNT = 0;
+
+	{
+		Stack<CustomType> stack(g_arena);
+		{
+			CustomType val;
+
+			EXPECT_EQ(0, stack.size());
+			EXPECT_EQ(0, stack.capacity());
+
+			stack.reserve(100);
+
+			EXPECT_EQ(0, stack.size());
+			ASSERT_EQ(100, stack.capacity()); // must have room.
+
+											  // add some items baby.
+			for (int i = 0; i < 90; i++) {
+				stack.push(val);
+			}
+
+			EXPECT_EQ(90, stack.size());
+			EXPECT_EQ(100, stack.capacity());
+
+			for (int i = 90; i > 10; i--) {
+				EXPECT_EQ(16, stack.top().GetVar());
+				stack.pop();
+			}
+
+			EXPECT_EQ(10, stack.size());
+			EXPECT_EQ(100, stack.capacity()); // should be unchanged.
+
+			// should clear itself up.
+		}
+	}
+
+	size_t m = CustomType::MOVE_COUNT;
+	size_t d = CustomType::DECONSRUCTION_COUNT;
+	size_t c = CustomType::CONSRUCTION_COUNT;
+
+	EXPECT_EQ(0, CustomType::MOVE_COUNT);
+	EXPECT_EQ(91, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(91, CustomType::CONSRUCTION_COUNT);
+}
+
 
 TEST(StackTest, Emplace)
 {
