@@ -39,7 +39,7 @@ VariableStateManager* X3DEngine::pVariableStateMan_ = nullptr;
 
 
 //------------------------------------------
-gui::IGui* gui = nullptr;
+engine::gui::IGui* pGui = nullptr;
 
 
 X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
@@ -175,9 +175,9 @@ void X3DEngine::OnFrameBegin(void)
 	}
 
 	// draw me some gui baby
-	if (gui) {
+	if (pGui) {
 	//	pRender_->setGUIShader();
-	//	gui->Redraw();
+	//	pGui ->Redraw();
 	}
 
 #if 0

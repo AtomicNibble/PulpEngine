@@ -4,37 +4,42 @@
 #define X_GUI_SIMPLE_WINDOW_H_
 
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
 
-class XWindowSimple
+namespace gui
 {
-	friend class XWindow;
-public:
-	XWindowSimple();
-	~XWindowSimple();
 
-	void drawBackground(const Rectf& drawRect);
-	void drawBorderAndCaption(const Rectf& drawRect);
+	class XWindowSimple
+	{
+		friend class XWindow;
+	public:
+		XWindowSimple();
+		~XWindowSimple();
 
-	X_INLINE const char* getName(void) const;
-	X_INLINE XWindow* getParent(void);
+		void drawBackground(const Rectf& drawRect);
+		void drawBorderAndCaption(const Rectf& drawRect);
 
-private:
-	core::string	name_;
-	core::string	text_;
+		X_INLINE const char* getName(void) const;
+		X_INLINE XWindow* getParent(void);
 
-	Rectf			rect_;				// overall rect
-	Color			backColor_;
-	Color			matColor_;
-	Color			foreColor_;
-	Color			borderColor_;
-	float			textScale_;
-	bool			visible_;
+	private:
+		core::string	name_;
+		core::string	text_;
 
-	XWindow* pParent_;
-};
+		Rectf			rect_;				// overall rect
+		Color			backColor_;
+		Color			matColor_;
+		Color			foreColor_;
+		Color			borderColor_;
+		float			textScale_;
+		bool			visible_;
+
+		XWindow* pParent_;
+	};
 
 #include "SimpleWindow.inl"
+
+} // namespace gui
 
 X_NAMESPACE_END
 

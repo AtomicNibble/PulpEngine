@@ -8,61 +8,67 @@
 // #include "XWindow.h"
 #include "WinVar.h"
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
 
-class XWindow;
-class XGuiScriptList;
-
-struct XGSWinVar 
+namespace gui
 {
-	XGSWinVar() {
-		var = nullptr;
-		own = false;
-	}
-	XWinVar* var;
-	bool own;
-};
 
 
-class XGuiScript 
-{
-	friend class XGuiScriptList;
-	friend class XWindow;
+	class XWindow;
+	class XGuiScriptList;
 
-public:
-	XGuiScript();
-	~XGuiScript();
-
-	bool Parse(core::XParser& lex);
-	void Execute(XWindow* win);
-	void FixUpParms(XWindow* win);
-
-protected:
-	typedef core::Array<XGSWinVar> ParamsArr;
-
-	int conditionReg;
-	XGuiScriptList* ifList;
-	XGuiScriptList* elseList;
-	ParamsArr parms;
-	void(*handler) (XWindow *window, core::Array<XGSWinVar>& src);
-};
+	struct XGSWinVar
+	{
+		XGSWinVar() {
+			var = nullptr;
+			own = false;
+		}
+		XWinVar* var;
+		bool own;
+	};
 
 
-class XGuiScriptList 
-{
-public:
-	XGuiScriptList();
-	~XGuiScriptList();
+	class XGuiScript
+	{
+		friend class XGuiScriptList;
+		friend class XWindow;
 
-	void Execute(XWindow* win);
-	void append(XGuiScript* gs) {
-		list.append(gs);
-	}
-	void FixUpParms(XWindow* win);
+	public:
+		XGuiScript();
+		~XGuiScript();
 
-private:
-	core::Array<XGuiScript*> list;
-};
+		bool Parse(core::XParser& lex);
+		void Execute(XWindow* win);
+		void FixUpParms(XWindow* win);
+
+	protected:
+		typedef core::Array<XGSWinVar> ParamsArr;
+
+		int conditionReg;
+		XGuiScriptList* ifList;
+		XGuiScriptList* elseList;
+		ParamsArr parms;
+		void(*handler) (XWindow *window, core::Array<XGSWinVar>& src);
+	};
+
+
+	class XGuiScriptList
+	{
+	public:
+		XGuiScriptList();
+		~XGuiScriptList();
+
+		void Execute(XWindow* win);
+		void append(XGuiScript* gs) {
+			list.append(gs);
+		}
+		void FixUpParms(XWindow* win);
+
+	private:
+		core::Array<XGuiScript*> list;
+	};
+
+} // namespace gui
 
 X_NAMESPACE_END
 

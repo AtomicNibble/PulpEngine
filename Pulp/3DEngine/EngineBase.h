@@ -20,10 +20,10 @@ X_NAMESPACE_DECLARE(engine,
 class XMaterialManager;
 class CBufferManager;
 class VariableStateManager;
-)
 
-X_NAMESPACE_DECLARE(gui,
-class XGuiManager;
+	namespace gui {
+		class XGuiManager;
+	}
 )
 
 X_NAMESPACE_DECLARE(model,
@@ -49,7 +49,7 @@ struct XEngineBase
 	static model::XModelManager* pModelManager_;
 
 	// gui
-	static gui::XGuiManager* pGuiManger_;
+	static engine::gui::XGuiManager* pGuiManger_;
 
 	static CBufferManager* pCBufMan_;
 	static VariableStateManager* pVariableStateMan_;
@@ -69,7 +69,7 @@ struct XEngineBase
 		return reinterpret_cast<model::IModelManager*>(pModelManager_);
 	}
 
-	X_INLINE static gui::XGuiManager* getGuiManager(void) {
+	X_INLINE static engine::gui::XGuiManager* getGuiManager(void) {
 		return pGuiManger_;
 	}
 

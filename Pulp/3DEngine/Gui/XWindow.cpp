@@ -10,7 +10,11 @@
 
 #include "GuiManger.h"
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
+
+namespace gui
+{
+
 
 namespace
 {
@@ -1742,6 +1746,6 @@ void XWindow::mouseEnter(void)
 
 }
 
-
+} // namespace gui
 
 X_NAMESPACE_END

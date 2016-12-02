@@ -16,59 +16,64 @@ X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
 );
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
 
-class XGuiManager :
-	public IGuiManger, 
-	public core::IXHotReload,
-	public input::IInputEventListner,
-	public engine::XEngineBase
+namespace gui
 {
-public:
-	XGuiManager();
-	~XGuiManager() X_FINAL;
 
-	//IGuiManger
-	bool Init(void) X_FINAL;
-	void Shutdown(void) X_FINAL;
 
-	IGui* loadGui(const char* name) X_FINAL;
-	IGui* findGui(const char* name) X_FINAL;
+	class XGuiManager :
+		public IGuiManger,
+		public core::IXHotReload,
+		public input::IInputEventListner,
+		public engine::XEngineBase
+	{
+	public:
+		XGuiManager();
+		~XGuiManager() X_FINAL;
 
-	void listGuis(const char* wildcardSearch = nullptr) const X_FINAL;
-	//~IGuiManger
+		//IGuiManger
+		bool Init(void) X_FINAL;
+		void Shutdown(void) X_FINAL;
 
-	// IXHotReload
-	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-	// ~IXHotReload
+		IGui* loadGui(const char* name) X_FINAL;
+		IGui* findGui(const char* name) X_FINAL;
 
-	// IInputEventListner
-	bool OnInputEvent(const input::InputEvent& event) X_FINAL;
-	bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
-	// ~IInputEventListner
+		void listGuis(const char* wildcardSearch = nullptr) const X_FINAL;
+		//~IGuiManger
 
-	X_INLINE bool ShowDeubug(void) const{
-		return var_showDebug_ == 1;
-	}
+		// IXHotReload
+		void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+		// ~IXHotReload
 
-	X_INLINE engine::Material* GetCursor(void) const {
-		return pCursorArrow_;
-	}
+		// IInputEventListner
+		bool OnInputEvent(const input::InputEvent& event) X_FINAL;
+		bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
+		// ~IInputEventListner
 
-private:
-	typedef core::Array<XGui*> Guis;
+		X_INLINE bool ShowDeubug(void) const {
+			return var_showDebug_ == 1;
+		}
 
-	Rectf screenRect_;
-	Guis guis_;
+		X_INLINE engine::Material* GetCursor(void) const {
+			return pCursorArrow_;
+		}
 
-	int var_showDebug_;
+	private:
+		typedef core::Array<XGui*> Guis;
 
-	engine::Material* pCursorArrow_;
+		Rectf screenRect_;
+		Guis guis_;
 
-private:
-	friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);
-};
+		int var_showDebug_;
 
+		engine::Material* pCursorArrow_;
+
+	private:
+		friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);
+	};
+
+} // namespace gui
 
 X_NAMESPACE_END
 

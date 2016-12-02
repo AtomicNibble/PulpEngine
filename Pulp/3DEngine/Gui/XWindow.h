@@ -26,297 +26,302 @@ X_NAMESPACE_DECLARE(engine,
 
 
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
 
-const int MAX_EXPRESSION_REGISTERS = 4096;
-const int MAX_EXPRESSION_OPS = 4096;
-
-enum
+namespace gui
 {
-	WEXP_REG_TIME,
-	WEXP_REG_NUM_PREDEFINED
-};
 
+	const int MAX_EXPRESSION_REGISTERS = 4096;
+	const int MAX_EXPRESSION_OPS = 4096;
 
-X_DECLARE_ENUM(OpType)(
-	ADD,
-	SUBTRACT,
-	MULTIPLY,
-	DIVIDE,
-	MOD,
-	TABLE,
-	GT,
-	GE,
-	LT,
-	LE,
-	EQ,
-	NE,
-	AND,
-	OR,
-	VAR,
-	VAR_STR,
-	VAR_FLOAT,
-	VAR_INT,
-	VAR_BOOL,
-	COND
-);
-
-struct xOpt
-{
-	OpType::Enum opType;
-	int	a, b, c, d;
-};
-
-struct XDrawWin
-{
-	XDrawWin() : 
-		pWindow(nullptr), 
-		pSimpleWindow(nullptr)
-	{	
-	}
-
-	XWindow* pWindow;
-	XWindowSimple* pSimpleWindow;
-};
-
-struct XRegEntry 
-{
-	const char* name;
-	RegisterType::Enum type;
-};
-
-struct XTransitionData
-{
-	XTransitionData() : pData(nullptr) {}
-
-	XWinVar* pData;
-	XInterpolateAccelDecelLinear<Vec4f> interp;
-};
-
-struct XTimeLineEvent
-{
-	XTimeLineEvent() : pending(true)
+	enum
 	{
-		script = X_NEW(XGuiScriptList,g_3dEngineArena,"TimeGuiScript");
-	}
-	~XTimeLineEvent()
+		WEXP_REG_TIME,
+		WEXP_REG_NUM_PREDEFINED
+	};
+
+
+	X_DECLARE_ENUM(OpType)(
+		ADD,
+		SUBTRACT,
+		MULTIPLY,
+		DIVIDE,
+		MOD,
+		TABLE,
+		GT,
+		GE,
+		LT,
+		LE,
+		EQ,
+		NE,
+		AND,
+		OR,
+		VAR,
+		VAR_STR,
+		VAR_FLOAT,
+		VAR_INT,
+		VAR_BOOL,
+		COND
+		);
+
+	struct xOpt
 	{
-		X_DELETE(script,g_3dEngineArena);
-	}
+		OpType::Enum opType;
+		int	a, b, c, d;
+	};
 
-	core::TimeVal time;
-	XGuiScriptList* script;
-	bool pending;
-};
+	struct XDrawWin
+	{
+		XDrawWin() :
+			pWindow(nullptr),
+			pSimpleWindow(nullptr)
+		{
+		}
 
-class XGui;
-class XWindowSimple;
-class XWindow : public engine::XEngineBase
-{
-public:
-	typedef Flags<WindowFlag> WindowFlags;
+		XWindow* pWindow;
+		XWindowSimple* pSimpleWindow;
+	};
 
-	X_DECLARE_ENUM(ScriptFunction) (
-		MOUSE_ENTER,
-		MOUSE_LEAVE,
-		ESC,
-		ENTER,
-		OPEN,
-		CLOSE,
-		ACTION // when you click it baby
-	);
+	struct XRegEntry
+	{
+		const char* name;
+		RegisterType::Enum type;
+	};
 
-	static const char*	s_ScriptNames[ScriptFunction::ENUM_COUNT];
+	struct XTransitionData
+	{
+		XTransitionData() : pData(nullptr) {}
 
-	static XRegEntry	s_RegisterVars[];
-	static const int	s_NumRegisterVars;
+		XWinVar* pData;
+		XInterpolateAccelDecelLinear<Vec4f> interp;
+	};
 
-private:
-	static bool s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; // statics to assist during parsing
+	struct XTimeLineEvent
+	{
+		XTimeLineEvent() : pending(true)
+		{
+			script = X_NEW(XGuiScriptList, g_3dEngineArena, "TimeGuiScript");
+		}
+		~XTimeLineEvent()
+		{
+			X_DELETE(script, g_3dEngineArena);
+		}
 
-public:
-	XWindow(XGui* pGui);
-	~XWindow();
+		core::TimeVal time;
+		XGuiScriptList* script;
+		bool pending;
+	};
 
-	void init(void);
-	void clear(void);
-	void reset(void); // Clear() + Init();
+	class XGui;
+	class XWindowSimple;
+	class XWindow : public engine::XEngineBase
+	{
+	public:
+		typedef Flags<WindowFlag> WindowFlags;
 
-	// Parent
-	X_INLINE void setParent(XWindow* pParent);
-	X_INLINE XWindow* getParent(void);
+		X_DECLARE_ENUM(ScriptFunction) (
+			MOUSE_ENTER,
+			MOUSE_LEAVE,
+			ESC,
+			ENTER,
+			OPEN,
+			CLOSE,
+			ACTION // when you click it baby
+			);
 
-	// Flags
-	X_INLINE void setFlag(WindowFlag::Enum flag); // sets only one, intentional.
-	X_INLINE void clearFlags(void);
-	X_INLINE WindowFlags getFlags(void) const;
+		static const char*	s_ScriptNames[ScriptFunction::ENUM_COUNT];
 
-	// Children
-	X_INLINE void addChild(XWindow* pChild);
-	X_INLINE void removeChild(XWindow* pChild);
-	X_INLINE XWindow* getChild(int index);
-	X_INLINE size_t	getNumChildren(void) const;
-	X_INLINE uint32_t getIndexForChild(XWindow* pWindow) const;
+		static XRegEntry	s_RegisterVars[];
+		static const int	s_NumRegisterVars;
 
-	// Name
-	X_INLINE const char* getName(void) const;
+	private:
+		static bool s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; // statics to assist during parsing
 
-	// Drawing
-	void reDraw(engine::IPrimativeContext* pDrawCon);
-	void drawDebug(engine::IPrimativeContext* pDrawCon);
+	public:
+		XWindow(XGui* pGui);
+		~XWindow();
 
-	// input
-	bool OnInputEvent(const input::InputEvent& event);
-	bool OnInputEventChar(const input::InputEvent& event);
+		void init(void);
+		void clear(void);
+		void reset(void); // Clear() + Init();
 
-	// Overrides
-	virtual bool Parse(core::XParser& lex);
-	virtual bool Parse(core::XFile* pFile);
-	virtual bool WriteToFile(core::XFile* pFile);
-	virtual void draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, float x, float y);
-	virtual void drawBackground(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect);
-	virtual void activate(bool activate);
-	virtual void gainFocus(void);
-	virtual void loseFocus(void);
-	virtual void gainCapture(void);
-	virtual void loseCapture(void);
-	virtual void sized(void);
-	virtual void moved(void);
-	virtual void mouseExit(void);
-	virtual void mouseEnter(void);
+		// Parent
+		X_INLINE void setParent(XWindow* pParent);
+		X_INLINE XWindow* getParent(void);
 
-	
-	
-	int ParseExpression(core::XParser& lex, XWinVar* var = nullptr);
-	int ParseTerm(core::XParser& lex, XWinVar* var, int component);
-	int ExpressionConstant(float f);
+		// Flags
+		X_INLINE void setFlag(WindowFlag::Enum flag); // sets only one, intentional.
+		X_INLINE void clearFlags(void);
+		X_INLINE WindowFlags getFlags(void) const;
 
-private:
-	// some none public drawing shiz.
-	void drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect);
+		// Children
+		X_INLINE void addChild(XWindow* pChild);
+		X_INLINE void removeChild(XWindow* pChild);
+		X_INLINE XWindow* getChild(int index);
+		X_INLINE size_t	getNumChildren(void) const;
+		X_INLINE uint32_t getIndexForChild(XWindow* pWindow) const;
+
+		// Name
+		X_INLINE const char* getName(void) const;
+
+		// Drawing
+		void reDraw(engine::IPrimativeContext* pDrawCon);
+		void drawDebug(engine::IPrimativeContext* pDrawCon);
+
+		// input
+		bool OnInputEvent(const input::InputEvent& event);
+		bool OnInputEventChar(const input::InputEvent& event);
+
+		// Overrides
+		virtual bool Parse(core::XParser& lex);
+		virtual bool Parse(core::XFile* pFile);
+		virtual bool WriteToFile(core::XFile* pFile);
+		virtual void draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, float x, float y);
+		virtual void drawBackground(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect);
+		virtual void activate(bool activate);
+		virtual void gainFocus(void);
+		virtual void loseFocus(void);
+		virtual void gainCapture(void);
+		virtual void loseCapture(void);
+		virtual void sized(void);
+		virtual void moved(void);
+		virtual void mouseExit(void);
+		virtual void mouseEnter(void);
 
 
-	void calcClientRect(void);
 
-private:
-	int ExpressionTemporary(void);
-	xOpt* ExpressionOp(void);
+		int ParseExpression(core::XParser& lex, XWinVar* var = nullptr);
+		int ParseTerm(core::XParser& lex, XWinVar* var, int component);
+		int ExpressionConstant(float f);
 
-	int EmitOp(int a, int b, OpType::Enum opType, xOpt** opp = nullptr);
+	private:
+		// some none public drawing shiz.
+		void drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect);
 
-	int ParseEmitOp(core::XParser& lex, int a, OpType::Enum opType,
-		int priority, xOpt** opp = nullptr);
 
-	int ParseExpressionPriority(core::XParser& lex, int priority,
-		XWinVar* var = nullptr, int component = 0);
+		void calcClientRect(void);
 
-	bool ParseString(core::XParser& lex, core::string& out);
-	bool ParseVar(const core::XLexToken& token, core::XParser& lex);
-	bool ParseRegEntry(const core::XLexToken& token, core::XParser& lex);
-	bool ParseScriptFunction(const core::XLexToken& token, core::XParser& lex);
-	bool ParseScript(core::XParser& lex, XGuiScriptList& list);
+	private:
+		int ExpressionTemporary(void);
+		xOpt* ExpressionOp(void);
 
-	void SaveExpressionParseState();
-	void RestoreExpressionParseState();
+		int EmitOp(int a, int b, OpType::Enum opType, xOpt** opp = nullptr);
 
-	void EvaluateRegisters(float* registers);
+		int ParseEmitOp(core::XParser& lex, int a, OpType::Enum opType,
+			int priority, xOpt** opp = nullptr);
 
-	// called post parse.
-	void SetupFromState(void);
+		int ParseExpressionPriority(core::XParser& lex, int priority,
+			XWinVar* var = nullptr, int component = 0);
 
-public:
-	float EvalRegs(int test = -1, bool force = false);
+		bool ParseString(core::XParser& lex, core::string& out);
+		bool ParseVar(const core::XLexToken& token, core::XParser& lex);
+		bool ParseRegEntry(const core::XLexToken& token, core::XParser& lex);
+		bool ParseScriptFunction(const core::XLexToken& token, core::XParser& lex);
+		bool ParseScript(core::XParser& lex, XGuiScriptList& list);
 
-	XWinVar* GetWinVarByName(const char* name);
+		void SaveExpressionParseState();
+		void RestoreExpressionParseState();
 
-	void FixUpParms(void);
+		void EvaluateRegisters(float* registers);
 
-	void StartTransition();
-	void AddTransition(XWinVar* dest, Vec4f from, Vec4f to,
-		int timeMs, float accelTime, float decelTime);
-	
+		// called post parse.
+		void SetupFromState(void);
 
-	void ResetTime(int timeMs);
-private:
-	bool RunTimeEvents(core::TimeVal time);
-	void Time(core::TimeVal time);
+	public:
+		float EvalRegs(int test = -1, bool force = false);
 
-	void Transition(void);
+		XWinVar* GetWinVarByName(const char* name);
 
-	bool RunScriptList(XGuiScriptList* src);
-	bool RunScript(ScriptFunction::Enum func);
+		void FixUpParms(void);
 
-protected:
-	typedef core::Array<XWindow*> Children;
-	typedef Children::Iterator Childit;
+		void StartTransition();
+		void AddTransition(XWinVar* dest, Vec4f from, Vec4f to,
+			int timeMs, float accelTime, float decelTime);
 
-	Rectf rectDraw_;
-	Rectf rectClient_;
-	Rectf rectText_;
 
-	// Registers: shit that can be changed by code.
-	XWinRect	rect_;
-	XWinColor	backColor_;
-	XWinColor	foreColor_;
-	XWinColor	hoverColor_;
-	XWinColor	borderColor_;
-	XWinBool	visable_;
-	XWinBool	hideCursor_;
-	XWinFloat	textScale_;
-	XWinStr		text_;
-	XWinStr		background_;
-	// ~
+		void ResetTime(int timeMs);
+	private:
+		bool RunTimeEvents(core::TimeVal time);
+		void Time(core::TimeVal time);
 
-	// variables, can only be set by the gui file.
-	// can't change at runtime.
-	WindowStyle::Enum style_;
-	WindowBorderStyle::Enum borderStyle_;
-	float borderSize_;
-	float textAlignX_;				// x offset from aligned position
-	float textAlignY_;				// y offset from aligned position.
-	TextAlign::Value textAlign_;		// alignment type flags, LEFT, MIDDLE, BOTTOM, etc..
-	bool shadowText_;				// 'shadow'
-	bool __pad[2];
-	WindowFlags flags_;
-	// if you change this, update file read/write for XWindow
-	core::StackString<GUI_MAX_WINDOW_NAME_LEN> name_;
-	// ~
+		void Transition(void);
 
-	core::TimeVal lastTimeRun_;
-	core::TimeVal timeLine_;
+		bool RunScriptList(XGuiScriptList* src);
+		bool RunScript(ScriptFunction::Enum func);
 
-	uint32_t childId_; // if this is a child, this is it's id.
+	protected:
+		typedef core::Array<XWindow*> Children;
+		typedef Children::Iterator Childit;
 
-	XWindow* pParent_;
-	XWindow* pFocusedChild_;	// if a child window has the focus
-	XWindow* pCaptureChild_;	// if a child window has mouse capture
-	XWindow* pOverChild_;		// if a child window has mouse capture
+		Rectf rectDraw_;
+		Rectf rectClient_;
+		Rectf rectText_;
 
-	font::IFont* 			pFont_;
-	engine::Material*		pBackgroundMat_;
+		// Registers: shit that can be changed by code.
+		XWinRect	rect_;
+		XWinColor	backColor_;
+		XWinColor	foreColor_;
+		XWinColor	hoverColor_;
+		XWinColor	borderColor_;
+		XWinBool	visable_;
+		XWinBool	hideCursor_;
+		XWinFloat	textScale_;
+		XWinStr		text_;
+		XWinStr		background_;
+		// ~
 
-	XGuiScriptList* 		scripts_[ScriptFunction::ENUM_COUNT];
+		// variables, can only be set by the gui file.
+		// can't change at runtime.
+		WindowStyle::Enum style_;
+		WindowBorderStyle::Enum borderStyle_;
+		float borderSize_;
+		float textAlignX_;				// x offset from aligned position
+		float textAlignY_;				// y offset from aligned position.
+		TextAlign::Value textAlign_;		// alignment type flags, LEFT, MIDDLE, BOTTOM, etc..
+		bool shadowText_;				// 'shadow'
+		bool __pad[2];
+		WindowFlags flags_;
+		// if you change this, update file read/write for XWindow
+		core::StackString<GUI_MAX_WINDOW_NAME_LEN> name_;
+		// ~
 
-	Children						children_;
-	core::Array<XDrawWin>			drawWindows_;
+		core::TimeVal lastTimeRun_;
+		core::TimeVal timeLine_;
 
-	core::Array<XTimeLineEvent*>	timeLineEvents_;
-	core::Array<XTransitionData>	transitions_;
+		uint32_t childId_; // if this is a child, this is it's id.
 
-	core::Array<xOpt>				ops_;
-	core::Array<float>				expressionRegisters_;
-	XRegisterList					regList_;
+		XWindow* pParent_;
+		XWindow* pFocusedChild_;	// if a child window has the focus
+		XWindow* pCaptureChild_;	// if a child window has mouse capture
+		XWindow* pOverChild_;		// if a child window has mouse capture
 
-	XGui* pGui_;
+		font::IFont* 			pFont_;
+		engine::Material*		pBackgroundMat_;
 
-	bool* pSaveTemps_;
+		XGuiScriptList* 		scripts_[ScriptFunction::ENUM_COUNT];
 
-	bool	hover_;
-	bool	init_;
-	bool    ___pad[2];
-};
+		Children						children_;
+		core::Array<XDrawWin>			drawWindows_;
+
+		core::Array<XTimeLineEvent*>	timeLineEvents_;
+		core::Array<XTransitionData>	transitions_;
+
+		core::Array<xOpt>				ops_;
+		core::Array<float>				expressionRegisters_;
+		XRegisterList					regList_;
+
+		XGui* pGui_;
+
+		bool* pSaveTemps_;
+
+		bool	hover_;
+		bool	init_;
+		bool    ___pad[2];
+	};
 
 #include "XWindow.inl"
+
+} // namespace gui
 
 X_NAMESPACE_END
 

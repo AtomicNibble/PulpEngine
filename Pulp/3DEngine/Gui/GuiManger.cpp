@@ -9,243 +9,248 @@
 #include <algorithm>
 
 
-X_NAMESPACE_BEGIN(gui)                                                                                                                                        
+X_NAMESPACE_BEGIN(engine)                                                                                                                                        
 
-namespace
+namespace gui
 {
 
-
-static void sortGuisByName(core::Array<XGui*>& vars)
+	namespace
 	{
-		using namespace std;
 
-		std::sort(vars.begin(), vars.end(),
-			[](XGui* a, XGui* b){
+
+		static void sortGuisByName(core::Array<XGui*>& vars)
+		{
+			using namespace std;
+
+			std::sort(vars.begin(), vars.end(),
+				[](XGui* a, XGui* b) {
 				return ::strcmp(a->getName(), b->getName()) < 0;
 			}
-		);
+			);
+		}
+
+
 	}
 
-
-}
-
-void Command_ListUis(core::IConsoleCmdArgs* pArgs)
-{
-	// we support wildcards
-	const char* pSearchString = nullptr;
-	if (pArgs->GetArgCount() > 1)
+	void Command_ListUis(core::IConsoleCmdArgs* pArgs)
 	{
-		pSearchString = pArgs->GetArg(1);
+		// we support wildcards
+		const char* pSearchString = nullptr;
+		if (pArgs->GetArgCount() > 1)
+		{
+			pSearchString = pArgs->GetArg(1);
+		}
+
+
+		engine::XEngineBase::getGuiManager()->listGuis(pSearchString);
 	}
 
 
-	engine::XEngineBase::getGuiManager()->listGuis(pSearchString);
-}
+	XGuiManager::XGuiManager() :
+		guis_(g_3dEngineArena),
+		pCursorArrow_(nullptr)
+	{
+		screenRect_.set(0, 0, 800, 600);
 
-
-XGuiManager::XGuiManager() :
-	guis_(g_3dEngineArena),
-	pCursorArrow_(nullptr)
-{
-	screenRect_.set(0, 0, 800, 600);
-
-	// meh
-	guis_.reserve(GUI_MAX_MENUS);
-}
-
-XGuiManager::~XGuiManager()
-{
-
-}
-
-
-bool XGuiManager::Init(void)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pCore);
-	X_ASSERT_NOT_NULL(gEnv->pHotReload);
-	X_ASSERT_NOT_NULL(gEnv->pInput);
-	X_ASSERT_NOT_NULL(gEnv->pRender);
-	X_LOG0("Gui", "Starting GUI System");
-
-	ADD_COMMAND("uiList", Command_ListUis, 0, "List the loaded ui's <search-filter>");
-	ADD_COMMAND("listUi", Command_ListUis, 0, "List the loaded ui's <search-filter>");
-
-	ADD_CVAR_REF("ui_DrawDebug", var_showDebug_, 1, 0, 1, core::VarFlag::SYSTEM, "draw debug info over gui");
-
-	gEnv->pHotReload->addfileType(this, gui::GUI_FILE_EXTENSION);
-	gEnv->pHotReload->addfileType(this, gui::GUI_BINARY_FILE_EXTENSION);
-	// what's a gui without input :| ?
-	gEnv->pInput->AddEventListener(this);
-
-	// what you pointing at? rude..
-	pCursorArrow_ = pMaterialManager_->loadMaterial("ui/cursor");
-	if (!pCursorArrow_) {
-		// if we load a material how we force texture loads :|
-		X_FATAL("Gui", "failed to load main cursor");
-		return false;
+		// meh
+		guis_.reserve(GUI_MAX_MENUS);
 	}
+
+	XGuiManager::~XGuiManager()
+	{
+
+	}
+
+
+	bool XGuiManager::Init(void)
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pCore);
+		X_ASSERT_NOT_NULL(gEnv->pHotReload);
+		X_ASSERT_NOT_NULL(gEnv->pInput);
+		X_ASSERT_NOT_NULL(gEnv->pRender);
+		X_LOG0("Gui", "Starting GUI System");
+
+		ADD_COMMAND("uiList", Command_ListUis, 0, "List the loaded ui's <search-filter>");
+		ADD_COMMAND("listUi", Command_ListUis, 0, "List the loaded ui's <search-filter>");
+
+		ADD_CVAR_REF("ui_DrawDebug", var_showDebug_, 1, 0, 1, core::VarFlag::SYSTEM, "draw debug info over gui");
+
+		gEnv->pHotReload->addfileType(this, gui::GUI_FILE_EXTENSION);
+		gEnv->pHotReload->addfileType(this, gui::GUI_BINARY_FILE_EXTENSION);
+		// what's a gui without input :| ?
+		gEnv->pInput->AddEventListener(this);
+
+		// what you pointing at? rude..
+		pCursorArrow_ = pMaterialManager_->loadMaterial("ui/cursor");
+		if (!pCursorArrow_) {
+			// if we load a material how we force texture loads :|
+			X_FATAL("Gui", "failed to load main cursor");
+			return false;
+		}
 
 #if 0
-	if (!pCursorArrow_->isLoaded()) {
-		X_FATAL("Gui", "failed to load main cursor");
-		return false;
-	}
+		if (!pCursorArrow_->isLoaded()) {
+			X_FATAL("Gui", "failed to load main cursor");
+			return false;
+		}
 #endif
 
-	return true;
-}
-
-void XGuiManager::Shutdown(void)
-{
-	X_LOG0("Gui", "Shutting Down");
-
-
-	gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);
-	gEnv->pHotReload->addfileType(nullptr, gui::GUI_BINARY_FILE_EXTENSION);
-
-	gEnv->pInput->RemoveEventListener(this);
-
-	if (pMaterialManager_ && pCursorArrow_) {
-		pMaterialManager_->releaseMaterial(pCursorArrow_);
-	}
-}
-
-IGui* XGuiManager::loadGui(const char* name)
-{
-	X_ASSERT_NOT_NULL(name);
-	XGui* pGui = nullptr;
-
-	pGui = static_cast<XGui*>(findGui(name));
-	if (!pGui) {
-		return pGui;
+		return true;
 	}
 
-	// try load it :|
-	pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
+	void XGuiManager::Shutdown(void)
+	{
+		X_LOG0("Gui", "Shutting Down");
 
-	if (pGui->InitFromFile(name)) {
-		guis_.append(pGui);
-		return pGui;
-	}
 
-	X_DELETE(pGui, g_3dEngineArena);
-	return nullptr;
-}
+		gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);
+		gEnv->pHotReload->addfileType(nullptr, gui::GUI_BINARY_FILE_EXTENSION);
 
-IGui* XGuiManager::findGui(const char* name)
-{
-	X_ASSERT_NOT_NULL(name);
+		gEnv->pInput->RemoveEventListener(this);
 
-	Guis::ConstIterator it;
-
-	const char* nameBegin = name;
-	const char* nameEnd = name + core::strUtil::strlen(name);
-
-	for (it = guis_.begin(); it != guis_.end(); ++it) {
-		if (core::strUtil::IsEqual(nameBegin, nameEnd, (*it)->getName())) {
-			return (*it);
+		if (pMaterialManager_ && pCursorArrow_) {
+			pMaterialManager_->releaseMaterial(pCursorArrow_);
 		}
 	}
 
-	return nullptr;
-}
-
-
-
-
-void XGuiManager::listGuis(const char* wildcardSearch) const
-{
-	// sort them.
-	Guis::ConstIterator itrGui, itrGuiEnd = guis_.end();
-	Guis sorted_guis(g_3dEngineArena);
-	sorted_guis.reserve(guis_.size());
-
-	for (itrGui = guis_.begin(); itrGui != itrGuiEnd; ++itrGui)
+	IGui* XGuiManager::loadGui(const char* name)
 	{
-		XGui* pGui = *itrGui;
+		X_ASSERT_NOT_NULL(name);
+		XGui* pGui = nullptr;
 
-		if (!wildcardSearch || core::strUtil::WildCompare(wildcardSearch, pGui->getName())) {
-			sorted_guis.append(pGui);
+		pGui = static_cast<XGui*>(findGui(name));
+		if (!pGui) {
+			return pGui;
 		}
+
+		// try load it :|
+		pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
+
+		if (pGui->InitFromFile(name)) {
+			guis_.append(pGui);
+			return pGui;
+		}
+
+		X_DELETE(pGui, g_3dEngineArena);
+		return nullptr;
 	}
 
-	sortGuisByName(sorted_guis);
-	X_LOG0("Gui", "-------------- ^8Guis(%" PRIuS ")^7 ---------------", sorted_guis.size());
-
-	itrGui = sorted_guis.begin();
-	for (; itrGui != sorted_guis.end(); ++itrGui)
+	IGui* XGuiManager::findGui(const char* name)
 	{
-		const XGui* pGui = *itrGui;
-		X_LOG0("Gui", "^2\"%s\"", pGui->getName());
+		X_ASSERT_NOT_NULL(name);
+
+		Guis::ConstIterator it;
+
+		const char* nameBegin = name;
+		const char* nameEnd = name + core::strUtil::strlen(name);
+
+		for (it = guis_.begin(); it != guis_.end(); ++it) {
+			if (core::strUtil::IsEqual(nameBegin, nameEnd, (*it)->getName())) {
+				return (*it);
+			}
+		}
+
+		return nullptr;
 	}
 
-	X_LOG0("Gui", "-------------- ^8Guis End^7 --------------");
-}
 
 
-// IXHotReload
-void XGuiManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
-{
-	X_UNUSED(jobSys);
-#if 0
-	core::Path<char> path(name);
-	XGui* pGui = nullptr;
 
-	// we don't keep extension for name.
-	path.removeExtension();
-
-	pGui = static_cast<XGui*>(findGui(path.fileName()));
-
-	if (pGui)
+	void XGuiManager::listGuis(const char* wildcardSearch) const
 	{
-		path = path.fileName();
+		// sort them.
+		Guis::ConstIterator itrGui, itrGuiEnd = guis_.end();
+		Guis sorted_guis(g_3dEngineArena);
+		sorted_guis.reserve(guis_.size());
 
-		X_LOG0("Gui", "reloading \"%s\"", path.c_str());
-
-		if (pGui->InitFromFile(path.fileName()))
+		for (itrGui = guis_.begin(); itrGui != itrGuiEnd; ++itrGui)
 		{
+			XGui* pGui = *itrGui;
 
+			if (!wildcardSearch || core::strUtil::WildCompare(wildcardSearch, pGui->getName())) {
+				sorted_guis.append(pGui);
+			}
+		}
+
+		sortGuisByName(sorted_guis);
+		X_LOG0("Gui", "-------------- ^8Guis(%" PRIuS ")^7 ---------------", sorted_guis.size());
+
+		itrGui = sorted_guis.begin();
+		for (; itrGui != sorted_guis.end(); ++itrGui)
+		{
+			const XGui* pGui = *itrGui;
+			X_LOG0("Gui", "^2\"%s\"", pGui->getName());
+		}
+
+		X_LOG0("Gui", "-------------- ^8Guis End^7 --------------");
+	}
+
+
+	// IXHotReload
+	void XGuiManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+	{
+		X_UNUSED(jobSys);
+#if 0
+		core::Path<char> path(name);
+		XGui* pGui = nullptr;
+
+		// we don't keep extension for name.
+		path.removeExtension();
+
+		pGui = static_cast<XGui*>(findGui(path.fileName()));
+
+		if (pGui)
+		{
+			path = path.fileName();
+
+			X_LOG0("Gui", "reloading \"%s\"", path.c_str());
+
+			if (pGui->InitFromFile(path.fileName()))
+			{
+
+			}
+			else
+			{
+				X_ERROR("Gui", "reload failed");
+			}
 		}
 		else
 		{
-			X_ERROR("Gui", "reload failed");
+			X_LOG0("Gui", "menu \"%s\" is not used, skipping reload.", name);
 		}
-	}
-	else
-	{
-		X_LOG0("Gui", "menu \"%s\" is not used, skipping reload.", name);
-	}
 
-	return false;
+		return false;
 #else
-	X_UNUSED(name);
+		X_UNUSED(name);
 #endif
-}
-// ~IXHotReload
-
-// IInputEventListner
-bool XGuiManager::OnInputEvent(const input::InputEvent& event)
-{
-	Guis::Iterator it;
-	for (it = guis_.begin(); it != guis_.end(); ++it) {
-		if ((*it)->OnInputEvent(event)) {
-			return true;
-		}
 	}
-	return false;
-}
+	// ~IXHotReload
 
-bool XGuiManager::OnInputEventChar(const input::InputEvent& event)
-{
-	Guis::Iterator it;
-	for (it = guis_.begin(); it != guis_.end(); ++it) {
-		if ((*it)->OnInputEventChar(event)) {
-			return true;
+	// IInputEventListner
+	bool XGuiManager::OnInputEvent(const input::InputEvent& event)
+	{
+		Guis::Iterator it;
+		for (it = guis_.begin(); it != guis_.end(); ++it) {
+			if ((*it)->OnInputEvent(event)) {
+				return true;
+			}
 		}
+		return false;
 	}
-	return false;
-}
-// ~IInputEventListner
+
+	bool XGuiManager::OnInputEventChar(const input::InputEvent& event)
+	{
+		Guis::Iterator it;
+		for (it = guis_.begin(); it != guis_.end(); ++it) {
+			if ((*it)->OnInputEventChar(event)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	// ~IInputEventListner
+
+} // namespace gui
 
 X_NAMESPACE_END

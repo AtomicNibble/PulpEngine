@@ -3,134 +3,139 @@
 
 #include <IFileSys.h>
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
 
-XWinVar::XWinVar()
-{
-	eval = true;
-}
-
-XWinVar::~XWinVar()
+namespace gui
 {
 
-}
 
-void XWinVar::Init(const char* _name, XWindow* win)
-{
-	Set(_name);
-	X_UNUSED(win);
-}
+	XWinVar::XWinVar()
+	{
+		eval = true;
+	}
 
-// the file loades.
+	XWinVar::~XWinVar()
+	{
 
-void XWinBool::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	}
 
-void XWinStr::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readString(value);
-}
+	void XWinVar::Init(const char* _name, XWindow* win)
+	{
+		Set(_name);
+		X_UNUSED(win);
+	}
 
-void XWinInt::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	// the file loades.
 
-void XWinFloat::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	void XWinBool::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinVec2::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	void XWinStr::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readString(value);
+	}
 
-void XWinVec3::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	void XWinInt::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinVec4::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	void XWinFloat::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinRect::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
+	void XWinVec2::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinColor::fromFile(core::XFile* pFile)
-{
-	pFile->readString(name);
-	pFile->readObj(value);
-}
- 
-// write to file
-void XWinBool::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinVec3::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinStr::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeString(value);
-}
+	void XWinVec4::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinInt::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinRect::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinFloat::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinColor::fromFile(core::XFile* pFile)
+	{
+		pFile->readString(name);
+		pFile->readObj(value);
+	}
 
-void XWinVec2::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	// write to file
+	void XWinBool::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
 
-void XWinVec3::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinStr::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeString(value);
+	}
 
-void XWinVec4::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinInt::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
 
-void XWinRect::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinFloat::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
 
-void XWinColor::toFile(core::XFile* pFile)
-{
-	pFile->writeString(name);
-	pFile->writeObj(value);
-}
+	void XWinVec2::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
 
+	void XWinVec3::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
+
+	void XWinVec4::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
+
+	void XWinRect::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
+
+	void XWinColor::toFile(core::XFile* pFile)
+	{
+		pFile->writeString(name);
+		pFile->writeObj(value);
+	}
+
+} // namespace gui
 
 X_NAMESPACE_END

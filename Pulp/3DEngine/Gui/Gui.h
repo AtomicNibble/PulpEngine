@@ -14,61 +14,66 @@ X_NAMESPACE_DECLARE(engine,
 );
 
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(engine)
 
-class XWindow;
-class XGuiManager;
-
-// This is a interface container.
-// it has a baser menu which may have multiple childs menus.
-class XGui : public IGui,
- public engine::XEngineBase
+namespace gui
 {
-public:
-	XGui();
-	~XGui() X_FINAL;
 
-	const char*	getName(void) const X_FINAL;
+	class XWindow;
+	class XGuiManager;
 
-	void setCursorPos(float x, float y) X_FINAL;
-	void setCursorPos(const Vec2f& pos) X_FINAL;
-	Vec2f getCursorPos(void) X_FINAL;
-	float getCursorPosX(void) X_FINAL;
-	float getCursorPosY(void) X_FINAL;
+	// This is a interface container.
+	// it has a baser menu which may have multiple childs menus.
+	class XGui : public IGui,
+		public engine::XEngineBase
+	{
+	public:
+		XGui();
+		~XGui() X_FINAL;
 
-	// repaints the ui
-	void Redraw(engine::IPrimativeContext* pDrawCon) X_FINAL;
-	void DrawCursor(engine::IPrimativeContext* pDrawCon) X_FINAL;
+		const char*	getName(void) const X_FINAL;
 
-	const char* Activate(bool activate, int time) X_FINAL;
+		void setCursorPos(float x, float y) X_FINAL;
+		void setCursorPos(const Vec2f& pos) X_FINAL;
+		Vec2f getCursorPos(void) X_FINAL;
+		float getCursorPosX(void) X_FINAL;
+		float getCursorPosY(void) X_FINAL;
 
-	// same as input interface but not. since we don't register them.
-	bool OnInputEvent(const input::InputEvent& event);
-	bool OnInputEventChar(const input::InputEvent& event);
+		// repaints the ui
+		void Redraw(engine::IPrimativeContext* pDrawCon) X_FINAL;
+		void DrawCursor(engine::IPrimativeContext* pDrawCon) X_FINAL;
 
-protected:
-	friend class XGuiManager;
+		const char* Activate(bool activate, int time) X_FINAL;
 
-	// Init this object with the contents of the file.
-	bool InitFromFile(const char* name);
-	bool SaveBinaryVersion(void);
+		// same as input interface but not. since we don't register them.
+		bool OnInputEvent(const input::InputEvent& event);
+		bool OnInputEventChar(const input::InputEvent& event);
 
-	void setName(const char* name);
-private:
-	bool ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile);
-	bool ParseTextFile(const char* begin, const char* end);
+	protected:
+		friend class XGuiManager;
 
-	bool isDeskTopValid(void) const;
+		// Init this object with the contents of the file.
+		bool InitFromFile(const char* name);
+		bool SaveBinaryVersion(void);
 
-private:
-	core::string name_;
-	Vec2f cursorPos_;
+		void setName(const char* name);
+	private:
+		bool ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile);
+		bool ParseTextFile(const char* begin, const char* end);
 
-	XWindow*	pDesktop_;
-	uint32_t sourceCrc32_;
-};
+		bool isDeskTopValid(void) const;
+
+	private:
+		core::string name_;
+		Vec2f cursorPos_;
+
+		XWindow*	pDesktop_;
+		uint32_t sourceCrc32_;
+	};
 
 #include "Gui.inl"
+
+} // namespace gui
 
 X_NAMESPACE_END
 
