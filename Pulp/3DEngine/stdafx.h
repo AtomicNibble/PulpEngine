@@ -12,6 +12,9 @@
 #include "Material\MaterialManager.h"
 
 
+#include <../../tools/MaterialLib/MatLib.h>
+
+X_LINK_LIB("engine_MaterialLib");
 
 
 extern core::MemoryArenaBase* g_3dEngineArena;
