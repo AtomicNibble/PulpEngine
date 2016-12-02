@@ -773,7 +773,7 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 				// only set source for defined stages.
 				for(uint32_t i=0; i<render::shader::ShaderType::FLAGS_COUNT; i++)
 				{
-					const auto stage = static_cast<render::shader::ShaderType::Enum>(i);
+					const auto stage = static_cast<render::shader::ShaderType::Enum>(1 << i);
 					if (tech.stageFlags.IsSet(stage))
 					{
 						if (tech.shaders[stage].source.isEmpty()) {
