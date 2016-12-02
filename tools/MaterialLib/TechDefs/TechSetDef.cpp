@@ -804,31 +804,26 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Vertex)) {
 					return false;
 				}
-				tech.stageFlags.Set(render::shader::ShaderType::Vertex);
 				break;
 			case "ps"_fnv1a:
 				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Pixel)) {
 					return false;
 				}
-				tech.stageFlags.Set(render::shader::ShaderType::Pixel);
 				break;
 			case "ds"_fnv1a:
 				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Domain)) {
 					return false;
 				}
-				tech.stageFlags.Set(render::shader::ShaderType::Domain);
 				break;
 			case "gs"_fnv1a:
 				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Geometry)) {
 					return false;
 				}
-				tech.stageFlags.Set(render::shader::ShaderType::Geometry);
 				break;
 			case "hs"_fnv1a:
 				if (!parseShaderStage(lex, tech, render::shader::ShaderType::Hull)) {
 					return false;
 				}
-				tech.stageFlags.Set(render::shader::ShaderType::Hull);
 				break;
 			case "defines"_fnv1a:
 				if (!parseDefines(lex, tech.defines)) {
