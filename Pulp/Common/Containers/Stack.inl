@@ -3,23 +3,29 @@
 // constructs the Stack no memory is allocated.
 template<typename T>
 Stack<T>::Stack(MemoryArenaBase* arena) :
-current_(nullptr),
-end_(nullptr),
-start_(nullptr),
-arena_(arena)
+	current_(nullptr),
+	end_(nullptr),
+	start_(nullptr),
+	arena_(arena)
 {
 
 }
 
 template<typename T>
 Stack<T>::Stack(MemoryArenaBase* arena, size_type numElements) :
-current_(nullptr),
-end_(nullptr),
-start_(nullptr),
-arena_(arena)
+	current_(nullptr),
+	end_(nullptr),
+	start_(nullptr),
+	arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 	reserve(numElements);
+}
+
+template<typename T>
+Stack<T>::~Stack()
+{
+	free();
 }
 
 

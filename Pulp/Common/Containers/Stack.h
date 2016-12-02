@@ -27,6 +27,8 @@ public:
 	// constast stack with space for numElements
 	inline Stack(MemoryArenaBase* arena, size_type numElements);
 
+	inline ~Stack();
+
 	inline void SetArena(MemoryArenaBase* arena);
 
 	// push a value onto the stack
