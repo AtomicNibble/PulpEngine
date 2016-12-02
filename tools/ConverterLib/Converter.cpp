@@ -696,14 +696,16 @@ void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::strin
 	pathOut.clear();
 	pathOut /= modPath;
 	pathOut /= AssetType::ToString(assType);
-	pathOut /= "s";
+	pathOut += "s";
 	pathOut.toLower();
 	pathOut.ensureSlash();
+	pathOut.replaceSeprators();
 
 	// make sure output folder is valid.
 	gEnv->pFileSys->createDirectoryTree(pathOut.c_str());
 
 	pathOut /= name;
+	pathOut.replaceSeprators();
 
 	// get the extension that will be used.
 	// so we can actually find the output file on disk if we want.
