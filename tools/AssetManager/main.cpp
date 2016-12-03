@@ -20,9 +20,11 @@ struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 X_LINK_LIB("engine_Core")
 X_LINK_LIB("engine_SqLite")
 
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_ConverterLib@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_AssetDB@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_SqLite@@0V12@A")
+
+X_FORCE_LINK_FACTORY("XEngineModule_ConverterLib");
+X_FORCE_LINK_FACTORY("XEngineModule_AssetDB");
+X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
+
 
 #endif // !X_LIB
 
