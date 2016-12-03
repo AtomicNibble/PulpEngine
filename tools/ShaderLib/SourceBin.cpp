@@ -188,7 +188,7 @@ namespace shader
 
 		// tickle my pickle?
 		// check the crc.
-		uint32_t crc32 = pCrc32_->GetCRC32(str.data());
+		uint32_t crc32 = pCrc32_->GetCRC32(str.data(), str.length());
 
 		if (pSourceFile)
 		{
