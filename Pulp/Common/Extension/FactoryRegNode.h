@@ -13,9 +13,9 @@ struct XRegFactoryNode
 	{
 	}
 
-	XRegFactoryNode(IPotatoFactory* pFactory)
-		: m_pFactory(pFactory)
-		, m_pNext(g_pHeadToRegFactories)
+	XRegFactoryNode(IPotatoFactory* pFactory) :
+		pFactory(pFactory),
+		pNext(g_pHeadToRegFactories)
 	{
 		g_pHeadToRegFactories = this;
 	}
@@ -29,6 +29,6 @@ struct XRegFactoryNode
 	{
 	}
 
-	IPotatoFactory* m_pFactory;
-	XRegFactoryNode* m_pNext;
+	IPotatoFactory* pFactory;
+	XRegFactoryNode* pNext;
 };

@@ -31,7 +31,7 @@
 #include <IGame.h>
 #include <IJobSystem.h>
 
-#include <Extension\IPotatoClass.h>
+#include <Extension\IPotatoUnknown.h>
 #include <Extension\IPotatoFactory.h>
 #include <Extension\PotatoCreateClass.h>
 

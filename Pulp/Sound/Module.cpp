@@ -43,7 +43,11 @@ core::MemoryArenaBase* g_SoundArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Sound : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Sound, "Engine_Sound");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Sound, "Engine_Sound",
+	0x527ab038, 0xbe01, 0x4a98, 0x84, 0x32, 0x9c, 0x9c, 0x26, 0xe3, 0xcc, 0xb3);
+
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char* GetName(void) X_OVERRIDE{ return "Sound"; };
 

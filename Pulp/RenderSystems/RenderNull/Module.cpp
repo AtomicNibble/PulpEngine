@@ -68,7 +68,12 @@ render::IRender* CreateRender(ICore *pCore)
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Render : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderNull");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderNull",
+	0x7072e440, 0x4bf4, 0x4b09, 0xaf, 0xb5, 0xd8, 0x71, 0xeb, 0x3, 0xc8, 0xc3);
+
+
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char* GetName(void) X_OVERRIDE{ return "RenderNull"; };
 

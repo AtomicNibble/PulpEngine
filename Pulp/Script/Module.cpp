@@ -39,7 +39,11 @@ core::MemoryArenaBase* g_ScriptArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Script : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Script, "Engine_Script");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Script, "Engine_Script",
+	0x424ceada, 0x4094, 0x4a2a, 0xa3, 0x68, 0x15, 0x55, 0x3d, 0x7f, 0xcc, 0x88);
+
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char* GetName(void) X_OVERRIDE{ return "Script"; };
 

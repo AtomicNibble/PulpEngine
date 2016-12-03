@@ -5,16 +5,17 @@
 #include <Extension\IPotatoFactoryRegistryImpl.h>
 #include <Containers\FixedArray.h>
 
-#include <vector>
+#include <Extension\GUID.h>
 
 class XPotatoFactoryRegistryImpl : public IPotatoFactoryRegistryImpl
 {
 public:
-	virtual IPotatoFactory* GetFactory(const char* cname) const;
+	virtual IPotatoFactory* GetFactory(const char* cname) const X_OVERRIDE;
+	virtual IPotatoFactory* GetFactory(const PotatoGUID& guid) const X_OVERRIDE;
 
 
-	virtual void RegisterFactories(const XRegFactoryNode* pFactories);
-	virtual void UnregisterFactories(const XRegFactoryNode* pFactories);
+	virtual void RegisterFactories(const XRegFactoryNode* pFactories) X_OVERRIDE;
+	virtual void UnregisterFactories(const XRegFactoryNode* pFactories) X_OVERRIDE;
 
 public:
 	static XPotatoFactoryRegistryImpl& Access();
@@ -24,26 +25,37 @@ public:
 private:
 	struct FactoryByCName
 	{
-		const char* m_cname;
-		IPotatoFactory* m_ptr;
+		const char* pCname;
+		IPotatoFactory* pPtr;
 
-		FactoryByCName() : m_cname(nullptr), m_ptr(nullptr) {}
-		FactoryByCName(const char* cname) : m_cname(cname), m_ptr(0) { }
-		FactoryByCName(IPotatoFactory* ptr) : m_cname(ptr ? ptr->GetName() : 0), m_ptr(ptr) {  }
-		bool operator <(const FactoryByCName& rhs) const { return strcmp(m_cname, rhs.m_cname) < 0; }
+		FactoryByCName() : pCname(nullptr), pPtr(nullptr) {}
+		FactoryByCName(const char* cname) : pCname(cname), pPtr(0) { }
+		FactoryByCName(IPotatoFactory* ptr) : pCname(ptr ? ptr->GetName() : nullptr), pPtr(ptr) {  }
+		bool operator <(const FactoryByCName& rhs) const { return strcmp(pCname, rhs.pCname) < 0; }
 	};
 
-	// typedef std::vector<FactoryByCName> FactoriesByCName;
-	typedef core::FixedArray<FactoryByCName,16> FactoriesByCName;
-	typedef FactoriesByCName::iterator FactoriesByCNameIt;
-	typedef FactoriesByCName::const_iterator FactoriesByCNameConstIt;
+	typedef core::FixedArray<FactoryByCName, 16> FactoriesByCName;
+
+	struct FactoryByID
+	{
+		PotatoGUID id;
+		IPotatoFactory* pPtr;
+
+		FactoryByID(PotatoGUID id) : id(id), pPtr(nullptr) {  }
+		FactoryByID(IPotatoFactory* ptr) : id(ptr ? ptr->GetGUID() : PotatoGUID()), pPtr(ptr) {  }
+		bool operator <(const FactoryByID& rhs) const { if (id != rhs.id) return id < rhs.id; return pPtr < rhs.pPtr; }
+	};
+
+	typedef core::FixedArray<FactoryByID, 16> FactoriesByID;
+
 
 
 	bool GetInsertionPos(IPotatoFactory* pFactory,
-		FactoriesByCNameIt& itPosForCName);
+		FactoriesByCName::iterator& itPosForCName, FactoriesByID::iterator& itPosForId);
 
 private:
 	FactoriesByCName byCName_;
+	FactoriesByID byID_;
 
 
 private:

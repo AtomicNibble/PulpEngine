@@ -1030,9 +1030,6 @@
     <ClInclude Include="Time\StopWatch.h">
       <Filter>Headers\Time</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\IPotatoClass.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\IPotatoFactory.h">
       <Filter>Headers\Extension</Filter>
     </ClInclude>
@@ -1155,6 +1152,15 @@
     </ClInclude>
     <ClInclude Include="CBuffer.h">
       <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\GUID.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IPotatoUnknown.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\TypeList.h">
+      <Filter>Headers\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

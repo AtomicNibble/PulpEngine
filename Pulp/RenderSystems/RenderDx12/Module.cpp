@@ -60,7 +60,11 @@ core::MemoryArenaBase* g_textureDataArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Render : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderDx12");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderDx12",
+	0x241a57f0, 0xe743, 0x4aaa, 0x8b, 0xd2, 0x84, 0x4, 0x6b, 0xc3, 0x47, 0xb9);
+
 	
 	virtual const char* GetName(void) X_OVERRIDE { return "RenderDx12"; };
 

@@ -3,7 +3,7 @@
 
 #include "Core.h"
 
-#include <Extension\IPotatoClass.h>
+#include <Extension\IPotatoUnknown.h>
 #include <Extension\IPotatoFactory.h>
 #include <Extension\FactoryRegNode.h>
 
@@ -29,28 +29,45 @@ XPotatoFactoryRegistryImpl::XPotatoFactoryRegistryImpl()
 
 IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const char* cname) const
 {
-	if (!cname)
-		return 0;
+	if (!cname) {
+		return nullptr;
+	}
 
 	const FactoryByCName search(cname);
-	FactoriesByCNameConstIt it = std::lower_bound(byCName_.begin(), byCName_.end(), search);
-	return it != byCName_.end() && !(search < *it) ? (*it).m_ptr : 0;
+	auto it = std::lower_bound(byCName_.begin(), byCName_.end(), search);
+	return it != byCName_.end() && !(search < *it) ? (*it).pPtr : nullptr;
+}
+
+IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const PotatoGUID& guid) const
+{
+	const FactoryByID search(guid);
+
+	auto it = std::lower_bound(byID_.begin(), byID_.end(), search);
+	return it != byID_.end() && !(search < *it) ? (*it).pPtr :nullptr;
 }
 
 
-
 bool XPotatoFactoryRegistryImpl::GetInsertionPos(IPotatoFactory* pFactory,
-	FactoriesByCNameIt& itPosForCName)
+	FactoriesByCName::iterator& itPosForCName, FactoriesByID::iterator& itPosForId)
 {
 	FactoryByCName searchByCName(pFactory);
-	FactoriesByCNameIt itForCName 
-		= std::lower_bound(byCName_.begin(), byCName_.end(), searchByCName);
+	auto itForCName = std::lower_bound(byCName_.begin(), byCName_.end(), searchByCName);
 	if (itForCName != byCName_.end() && !(searchByCName < *itForCName))
 	{
+		X_ASSERT_UNREACHABLE();
+		return false;
+	}
+
+	FactoryByID searchByID(pFactory);
+	auto itForId = std::lower_bound(byID_.begin(), byID_.end(), searchByID);
+	if (itForId != byID_.end() && !(searchByID < *itForId))
+	{
+		X_ASSERT_UNREACHABLE();
 		return false;
 	}
 
 	itPosForCName = itForCName;
+	itPosForId = itForId;
 	return true;
 }
 
@@ -60,19 +77,18 @@ void XPotatoFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFacto
 	const XRegFactoryNode* p = pFactories;
 	while (p)
 	{
-		IPotatoFactory* pFactory = p->m_pFactory;
+		IPotatoFactory* pFactory = p->pFactory;
 		if (pFactory)
 		{
-			FactoriesByCNameIt itPosForCName;
-			if (GetInsertionPos(pFactory, itPosForCName))
+			FactoriesByCName::iterator itPosForCName;
+			FactoriesByID::iterator itPosForCNameID;
+			if (GetInsertionPos(pFactory, itPosForCName, itPosForCNameID))
 			{
 				byCName_.insert(itPosForCName, FactoryByCName(pFactory));
-				
-			//	byCName_.append(FactoryByCName(pFactory));
-
+				byID_.insert(itPosForCNameID, FactoryByID(pFactory));
 			}
 
-			p = p->m_pNext;
+			p = p->pNext;
 		}
 	}
 

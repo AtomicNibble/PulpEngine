@@ -4,13 +4,16 @@
 #define _X_ENGINEMODULE_I_H_
 
 
-#include <Extension\IPotatoClass.h>
+#include <Extension\IPotatoUnknown.h>
 
 struct SCoreInitParams;
 
 // Base Interface for all engine module extensions
-struct IEngineModule : public IPotatoClass
+struct IEngineModule : public IPotatoUnknown
 {
+	POTATO_INTERFACE_DECLARE(IEngineModule, 0xd4c7e5cb, 0xf73e, 0x4fdd, 0x97, 0x62, 0x91, 0x4f, 0xe5, 0x9f, 0x5d, 0xd3);
+	
+
 	// Retrieve name of the extension module.
 	virtual const char* GetName(void) X_ABSTRACT;
 

@@ -21,7 +21,10 @@ AnimLibArena* g_AnimLibArena = nullptr;
 
 class XConverterLib_Anim : public IConverterModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Anim, "Engine_AnimLib");
+	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Anim, "Engine_AnimLib", 
+	0xac497e0a, 0x2cbd, 0x441c, 0x95, 0xc1, 0xe5, 0xc6, 0x3e, 0x81, 0xda, 0x48);
 
 	virtual const char* GetName(void) X_OVERRIDE
 	{

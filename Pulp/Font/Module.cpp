@@ -24,7 +24,11 @@ namespace {
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Font : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Font, "Engine_Font");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Font, "Engine_Font",
+	0x425f6ef9, 0xb0da, 0x49ce, 0x83, 0x43, 0xcf, 0x24, 0xc9, 0x10, 0x6a, 0xd9);
+
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char* GetName(void) X_OVERRIDE { return "Font"; };

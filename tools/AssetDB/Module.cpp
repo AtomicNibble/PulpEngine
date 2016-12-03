@@ -21,7 +21,11 @@ AssetDBArena* g_AssetDBArena = nullptr;
 
 class XEngineModule_AssetDB : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_AssetDB, "Engine_AssetDB");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_AssetDB, "Engine_AssetDB",
+	0x1f67e4b3, 0xa3b0, 0x4eaf, 0x85, 0x99, 0x9f, 0x82, 0xb0, 0x2e, 0x77, 0xc2);
+
 
 	virtual const char* GetName(void) X_OVERRIDE
 	{

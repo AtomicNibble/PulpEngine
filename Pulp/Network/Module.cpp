@@ -22,7 +22,12 @@ namespace {
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Network : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Network, "Engine_Network");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Network, "Engine_Network",
+	0x8472b6c5, 0xa5e, 0x4463, 0xbd, 0x7f, 0x8f, 0x6c, 0x85, 0xe8, 0xab, 0x7f);
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char* GetName(void) X_OVERRIDE { return "Network"; };

@@ -21,7 +21,12 @@ namespace {
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Game : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Game, "Engine_Game");
+	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Game, "Engine_Game",
+	0xaa1b4442, 0x7cf8, 0x4992, 0xa8, 0x7e, 0x8c, 0xe5, 0x0, 0x18, 0xe7, 0xf);
+
+
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char* GetName(void) X_OVERRIDE{ return "Game"; };
 

@@ -4,7 +4,7 @@
 #ifndef X_CONVETER_MODULE_I_H_
 #define X_CONVETER_MODULE_I_H_
 
-#include <Extension\IPotatoClass.h>
+#include <Extension\IPotatoUnknown.h>
 #include <Containers\Array.h>
 
 #include <IAssetDb.h>
@@ -19,8 +19,10 @@ struct IModelLib
 
 
 struct IConverter;
-struct IConverterModule : public IPotatoClass
+struct IConverterModule : public IPotatoUnknown
 {
+	POTATO_INTERFACE_DECLARE(IConverterModule, 0x695c4e33, 0x4481, 0x45a7, 0x91, 0xe8, 0xb6, 0x4b, 0x67, 0x13, 0xe1, 0x6d );
+
 	virtual const char* GetName(void) X_ABSTRACT;
 
 	virtual IConverter* Initialize(void) X_ABSTRACT;

@@ -2,12 +2,13 @@
 
 #include "IPotatoFactoryRegistry.h"
 
+struct PotatoGUID;
 struct XRegFactoryNode;
 
 struct IPotatoFactoryRegistryImpl : public IPotatoFactoryRegistry
 {
 	virtual IPotatoFactory* GetFactory(const char* cname) const = 0;
-
+	virtual IPotatoFactory* GetFactory(const PotatoGUID& guid) const = 0;
 
 
 	virtual void RegisterFactories(const XRegFactoryNode* pFactories) = 0;

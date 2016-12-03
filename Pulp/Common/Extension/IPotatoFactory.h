@@ -5,16 +5,18 @@
 #define _X_POTATO_FACTORY_I_H_
 
 
-
-struct IPotatoClass;
+struct PotatoGUID;
+struct IPotatoUnknown;
 
 struct IPotatoFactory
 {
 protected:
 	virtual ~IPotatoFactory() {};
 public:
-	virtual const char* GetName() const X_ABSTRACT;
-	virtual std::shared_ptr<IPotatoClass> CreateInstance() const X_ABSTRACT;
+	virtual const char* GetName(void) const X_ABSTRACT;
+	virtual const PotatoGUID& GetGUID(void) const X_ABSTRACT;
+	virtual bool ClassSupports(const PotatoGUID& guid) const X_ABSTRACT;
+	virtual IPotatoUnknown* CreateInstance(void) const X_ABSTRACT;
 
 
 };
