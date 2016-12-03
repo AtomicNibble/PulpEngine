@@ -96,5 +96,8 @@
     <None Include="Util\MatUtil.inl">
       <Filter>Header Files\Util</Filter>
     </None>
+    <None Include="TechDefs\TechSetDef.inl">
+      <Filter>Header Files\TechDefs</Filter>
+    </None>
   </ItemGroup>
 </Project>

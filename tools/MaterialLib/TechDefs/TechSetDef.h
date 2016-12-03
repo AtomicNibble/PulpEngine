@@ -61,9 +61,9 @@ public:
 	TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
 
 	// we need a api for getting the techs.
-	TechniqueMap::size_type numTechs(void) const;
-	TechniqueMap::const_iterator techBegin(void) const;
-	TechniqueMap::const_iterator techEnd(void) const;
+	X_INLINE TechniqueMap::size_type numTechs(void) const;
+	X_INLINE TechniqueMap::const_iterator techBegin(void) const;
+	X_INLINE TechniqueMap::const_iterator techEnd(void) const;
 
 	bool parseFile(FileBuf& buf);
 	bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
@@ -163,6 +163,6 @@ private:
 };
 
 
-
-
 X_NAMESPACE_END
+
+#include "TechSetDef.inl"

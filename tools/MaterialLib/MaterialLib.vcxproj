@@ -425,6 +425,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Material.inl" />
+    <None Include="TechDefs\TechSetDef.inl" />
     <None Include="Util\MatUtil.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

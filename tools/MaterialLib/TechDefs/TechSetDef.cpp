@@ -24,22 +24,6 @@ TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 
 }
 
-TechSetDef::TechniqueMap::size_type TechSetDef::numTechs(void) const
-{
-	return techs_.size();
-}
-
-TechSetDef::TechniqueMap::const_iterator TechSetDef::techBegin(void) const
-{
-	return techs_.begin();
-}
-
-TechSetDef::TechniqueMap::const_iterator TechSetDef::techEnd(void) const
-{
-	return techs_.end();
-}
-
-
 bool TechSetDef::parseFile(FileBuf& buf)
 {
 	core::XParser lex(buf.begin(), buf.end(), fileName_, core::LexFlag::ALLOWPATHNAMES, arena_);
