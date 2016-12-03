@@ -26,7 +26,7 @@ core::MallocFreeAllocator* gMalloc = nullptr;
 
 
 #if  !defined(X_LIB)
-struct XRegFactoryNode* g_pHeadToRegFactories = 0;
+struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 #endif
 
 

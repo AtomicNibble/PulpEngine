@@ -39,7 +39,7 @@ typedef core::MemoryArena<
 
 
 #ifdef X_LIB
-struct XRegFactoryNode* g_pHeadToRegFactories = 0;
+struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
 X_LINK_LIB("engine_Font")
 X_LINK_LIB("engine_Core")

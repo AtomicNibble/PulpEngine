@@ -11,7 +11,7 @@ HINSTANCE g_hInstance = 0;
 
 #ifdef X_LIB
 
-struct XRegFactoryNode* g_pHeadToRegFactories = 0;
+struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
 X_LINK_LIB("engine_Core")
 X_LINK_LIB("engine_RenderNull")
