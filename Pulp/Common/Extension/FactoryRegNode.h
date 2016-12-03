@@ -32,3 +32,6 @@ struct XRegFactoryNode
 	IPotatoFactory* pFactory;
 	XRegFactoryNode* pNext;
 };
+
+#define X_FORCE_LINK_FACTORY(className) \
+	X_FORCE_SYMBOL_LINK("?s_factory@" ## className "@@0V?$XSingletonFactory@V" ## className "@@@@A")

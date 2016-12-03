@@ -49,10 +49,11 @@ X_LINK_LIB("engine_RenderNull")
 X_LINK_LIB("engine_ImgLib")
 
 
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Img@@0V12@A")
+X_FORCE_LINK_FACTORY("XEngineModule_Font");
+X_FORCE_LINK_FACTORY("XEngineModule_Script");
+//X_FORCE_LINK_FACTORY("XEngineModule_Render");
+X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
+X_FORCE_LINK_FACTORY("XConverterLib_Img");
 
 
 #endif // !X_LIB

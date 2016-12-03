@@ -30,19 +30,20 @@ X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_Physics")
 X_LINK_LIB("engine_GameDLL")
 
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Input@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Sound@@0V12@A")
-// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@render@Potato@@0V1234@A");
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_3DEngine@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Physics@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Game@@0V12@A")
+X_FORCE_LINK_FACTORY("XEngineModule_Input")
+X_FORCE_LINK_FACTORY("XEngineModule_Font")
+X_FORCE_LINK_FACTORY("XEngineModule_Script")
+X_FORCE_LINK_FACTORY("XEngineModule_Sound")
+X_FORCE_LINK_FACTORY("XEngineModule_3DEngine")
+X_FORCE_LINK_FACTORY("XEngineModule_Physics")
+X_FORCE_LINK_FACTORY("XEngineModule_Game")
+
+X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
+// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@render@Potato@@0V1234@A");
 
 // some libs that w link against.
 X_LINK_LIB("engine_ImgLib")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Img@@0V12@A")
+X_FORCE_LINK_FACTORY("XConverterLib_Img")
 
 #endif // !X_LIB
 
