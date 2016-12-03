@@ -196,8 +196,7 @@ struct MaterialHeader
 	// 4
 	uint8_t version;
 	uint8_t numTextures;
-	uint8_t numTechs;
-	uint8_t _pad;
+	uint8_t _pad[2];
 
 	// 4
 	uint8_t __pad[2];
