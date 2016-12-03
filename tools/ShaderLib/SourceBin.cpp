@@ -94,6 +94,7 @@ namespace shader
 
 	SourceBin::SourceBin(core::MemoryArenaBase* arena) :
 		arena_(arena),
+		pCrc32_(nullptr),
 		source_(arena, MAX_SHADER_SOURCE),
 		sourcePoolHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
@@ -108,7 +109,10 @@ namespace shader
 		),
 		sourcePoolArena_(&sourcePoolAllocator_, "ShaderSourcePool")
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pCore);
 
+		pCrc32_ = gEnv->pCore->GetCrc32();
 	}
 
 	void SourceBin::free(void)
