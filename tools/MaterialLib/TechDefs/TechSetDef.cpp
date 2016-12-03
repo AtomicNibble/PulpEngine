@@ -765,8 +765,8 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 					const auto stage = static_cast<render::shader::ShaderType::Enum>(1 << i);
 					if (tech.stageFlags.IsSet(stage))
 					{
-						if (tech.shaders[stage].source.isEmpty()) {
-							tech.shaders[stage].source = tech.source;
+						if (tech.shaders[i].source.isEmpty()) {
+							tech.shaders[i].source = tech.source;
 						}
 					}
 				}
