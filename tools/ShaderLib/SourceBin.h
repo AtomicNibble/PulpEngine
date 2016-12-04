@@ -40,7 +40,7 @@ namespace shader
 		SHADERLIB_EXPORT void free(void);
 
 		// returns the source of a shader with all it's includes merged.
-		SHADERLIB_EXPORT bool getMergedSource(const char* pName, core::string& strOut);
+		SHADERLIB_EXPORT bool getMergedSource(const core::string& name, core::string& strOut);
 
 		SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
 		SHADERLIB_EXPORT SourceFile* sourceForName(const char* pName);

@@ -125,9 +125,9 @@ namespace shader
 		source_.free();
 	}
 
-	bool SourceBin::getMergedSource(const char* pName, core::string& strOut)
+	bool SourceBin::getMergedSource(const core::string& name, core::string& strOut)
 	{
-		SourceFile* pSourceFile = loadRawSourceFile(pName);
+		SourceFile* pSourceFile = loadRawSourceFile(name);
 
 		if (pSourceFile)
 		{
