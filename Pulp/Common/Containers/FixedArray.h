@@ -36,7 +36,8 @@ public:
 	// clear the list, no memory free
 	inline void clear(void);
 
-	inline Type& AddOne(void);
+	template<class... Args>
+	inline Type& AddOne(Args&&... args);
 
 	// append element (same as push_back)
 	inline size_type append(const T& obj);
