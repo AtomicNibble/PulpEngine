@@ -42,8 +42,8 @@ struct Technique
 	core::string source;
 	core::string defines;
 
-	render::shader::ShaderTypeFlags stageFlags;
-	Shader shaders[render::shader::ShaderType::FLAGS_COUNT];
+	render::shader::ShaderStageFlags stages;
+	Shader shaders[render::shader::ShaderType::ENUM_COUNT - 1];
 };
 
 class TechSetDef

@@ -769,10 +769,12 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 			if (tech.source.isNotEmpty())
 			{
 				// only set source for defined stages.
-				for(uint32_t i=0; i<render::shader::ShaderType::FLAGS_COUNT; i++)
+				for(uint32_t i=0; i<render::shader::ShaderStage::FLAGS_COUNT; i++)
 				{
-					const auto stage = static_cast<render::shader::ShaderType::Enum>(1 << i);
-					if (tech.stageFlags.IsSet(stage))
+					const auto type = static_cast<render::shader::ShaderType::Enum>(1);
+					const auto stage = staderTypeToStageFlag(type);
+
+					if (tech.stages.IsSet(stage))
 					{
 						if (tech.shaders[i].source.isEmpty()) {
 							tech.shaders[i].source = tech.source;
@@ -845,22 +847,24 @@ bool TechSetDef::parseState(core::XParser& lex, render::StateDesc& state)
 		&TechSetDef::stateExsists, "Tech", "State");
 }
 
-bool TechSetDef::parseShaderStage(core::XParser& lex, Technique& tech, render::shader::ShaderType::Enum stage)
-{
-	Shader& shader = tech.shaders[stage];
-	shader.stage = render::shader::ShaderType::UnKnown;
 
-	if (!parseShaderStageHelper(lex, shader, stage)) {
+
+bool TechSetDef::parseShaderStage(core::XParser& lex, Technique& tech, render::shader::ShaderType::Enum type)
+{
+	Shader& shader = tech.shaders[type];
+	shader.type = render::shader::ShaderType::UnKnown;
+
+	if (!parseShaderStageHelper(lex, shader, type)) {
 		return false;
 	}
 
 	// check it's from correct stage.
-	if (shader.stage != stage)
+	if (shader.type != type)
 	{
 		// if the state is unknow it was inline and it must be correct otherwise parsing would fail.
-		if (shader.stage == render::shader::ShaderType::UnKnown)
+		if (shader.type == render::shader::ShaderType::UnKnown)
 		{
-			shader.stage = stage;
+			shader.type = type;
 		}
 		else
 		{
@@ -869,14 +873,14 @@ bool TechSetDef::parseShaderStage(core::XParser& lex, Technique& tech, render::s
 		}
 	}
 
-	tech.stageFlags.Set(stage);
+	tech.stages.Set(staderTypeToStageFlag(type));
 	return true;
 }
 
-bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, render::shader::ShaderType::Enum stage)
+bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, render::shader::ShaderType::Enum type)
 {
 	core::StackString<128, char> defName;
-	defName.appendFmt("%sShader", render::shader::ShaderType::ToString(stage));
+	defName.appendFmt("%sShader", render::shader::ShaderType::ToString(type));
 
 
 	core::string name, parentName;
@@ -887,7 +891,7 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 	if (name.isNotEmpty())
 	{
-		name += render::shader::ShaderType::ToString(stage);
+		name += render::shader::ShaderType::ToString(type);
 
 		if (shaderExsists(name, &shader)) {
 			return true;
@@ -903,7 +907,7 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 		if (parentName.isNotEmpty())
 		{
 			// create temp so we don't log diffrent parent name, then in file.
-			const core::string mergedParentName = parentName + render::shader::ShaderType::ToString(stage);
+			const core::string mergedParentName = parentName + render::shader::ShaderType::ToString(type);
 			// inline define can have a parent.
 			// but it must exist if defined.
 			if (!shaderExsists(mergedParentName, &shader)) {
@@ -914,12 +918,12 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 			// if we selected a parent it should be impossible for it to have a diffrent stage.
 			// even if the user wanted to. this is source code logic fail.
-			X_ASSERT(shader.stage == stage, "Parent not from same stage")(shader.stage, stage);
+			X_ASSERT(shader.type == type, "Parent not from same stage")(shader.type, type);
 		}
 
 		// parse the inline state.
 		if (parseShaderData(lex, shader)) {
-			shader.stage = stage;
+			shader.type = type;
 			return true;
 		}
 
@@ -1263,7 +1267,7 @@ Shader& TechSetDef::addShader(const core::string& name, const core::string& pare
 {
 	X_UNUSED(type);
 	Shader& shader = addHelper(shaders_, name, parentName, "state");
-	shader.stage = type;
+	shader.type = type;
 	return shader;
 }
 
