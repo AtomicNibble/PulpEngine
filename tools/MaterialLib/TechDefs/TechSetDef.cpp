@@ -11,6 +11,15 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+Shader::Shader() :
+	type(render::shader::ShaderType::UnKnown)
+{
+
+}
+
+
+//-------------------------------------------------
+
 
 TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	arena_(arena),

@@ -27,7 +27,9 @@ struct StencilState
 
 struct Shader
 {
-	render::shader::ShaderType::Enum stage;
+	Shader();
+
+	render::shader::ShaderType::Enum type;
 	core::string source;
 	core::string entry;
 	core::string defines;
