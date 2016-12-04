@@ -62,7 +62,7 @@ class XEngineModule_3DEngine : public IEngineModule
 		pEngine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
 
 
-		if (!gEnv->pCore->IntializeLoadedConverterModule("engine_MaterialLib", "engine_MaterialLib")) {
+		if (!gEnv->pCore->IntializeLoadedConverterModule("Engine_MaterialLib", "Engine_MaterialLib")) {
 			X_ERROR("3DEngine", "Failed to init MaterialLib");
 			X_DELETE(pEngine, g_3dEngineArena);
 			return false;
