@@ -42,6 +42,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 		MATLIB_EXPORT static bool getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut);
+		MATLIB_EXPORT bool getTechDef(MaterialCat::Enum cat, const char* pName, TechSetDef*& pTechDefOut);
 		MATLIB_EXPORT bool getTechDef(MaterialCat::Enum cat, const core::string& name, TechSetDef*& pTechDefOut);
 
 		MATLIB_EXPORT void clearIncSrcCache(void);

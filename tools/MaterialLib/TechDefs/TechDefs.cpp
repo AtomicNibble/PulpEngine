@@ -59,6 +59,10 @@ X_NAMESPACE_BEGIN(engine)
 		return false;
 	}
 
+	bool TechSetDefs::getTechDef(const MaterialCat::Enum cat, const char* pName, TechSetDef*& pTechDefOut)
+	{
+		return getTechDef(cat, core::string(pName), pTechDefOut);
+	}
 
 	bool TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name, TechSetDef*& pTechDefOut)
 	{
