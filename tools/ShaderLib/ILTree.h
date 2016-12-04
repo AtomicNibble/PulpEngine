@@ -17,8 +17,8 @@ namespace shader
 
 	public:
 		ILTreeNode();
-		ILTreeNode(const char* Sematic);
-		ILTreeNode(const ILTreeNode& oth);
+		explicit ILTreeNode(const char* Sematic);
+		explicit ILTreeNode(const ILTreeNode& oth);
 		~ILTreeNode();
 
 		static const ILTreeNode* getILTree(void);
