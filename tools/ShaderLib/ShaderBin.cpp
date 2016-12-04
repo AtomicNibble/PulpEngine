@@ -73,7 +73,10 @@ namespace shader
 		scratchArena_(arena),
 		cache_(arena, 32)
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
+		pFileSys_ = gEnv->pFileSys;
 	}
 
 	ShaderBin::~ShaderBin()
