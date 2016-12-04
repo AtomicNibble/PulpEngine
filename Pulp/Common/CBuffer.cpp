@@ -27,7 +27,7 @@ namespace shader
 	} // namespace
 
 
-	CBufferLink::CBufferLink(ShaderType::Enum stage, XCBuffer* pCBufer_) :
+	CBufferLink::CBufferLink(ShaderStage::Enum stage, XCBuffer* pCBufer_) :
 		stages(stage),
 		pCBufer(pCBufer_)
 	{

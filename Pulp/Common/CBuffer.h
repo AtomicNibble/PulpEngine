@@ -15,9 +15,9 @@ namespace shader
 
 	struct CBufferLink
 	{
-		CBufferLink(ShaderType::Enum stage, XCBuffer* pCBufer);
+		CBufferLink(ShaderStage::Enum stage, XCBuffer* pCBufer);
 
-		ShaderTypeFlags stages;
+		ShaderStageFlags stages;
 		XCBuffer* pCBufer;
 	};
 
