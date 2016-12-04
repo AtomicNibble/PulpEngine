@@ -157,11 +157,22 @@ X_DECLARE_ENUM8(VertexFormat)(
 // -----------------------------------------------------------------------
 
 // this use to be a enum, but in some cases i use it as flags (eg shader stage visibility flags)
-X_DECLARE_FLAGS8(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
+// now it's back to enum cus it's too nayoing to use as flags.
+X_DECLARE_ENUM8(ShaderType)(Vertex, Pixel, Geometry, Hull, Domain, UnKnown);
 X_DECLARE_ENUM8(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 
-typedef Flags8<ShaderType> ShaderTypeFlags;
+// kinda same as flags, but used for checking set stages etc.
+X_DECLARE_FLAGS8(ShaderStage)(Vertex, Pixel, Geometry, Hull, Domain);
 
+typedef Flags8<ShaderStage> ShaderStageFlags;
+
+
+// not sure where to put this.
+// it's used in material lib.
+X_INLINE ShaderStage::Enum staderTypeToStageFlag(ShaderType::Enum type)
+{
+	return static_cast<ShaderStage::Enum>(1 << type);
+}
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //
 // These ILFlags are automatically detected whne parsing the hlsl source file.
