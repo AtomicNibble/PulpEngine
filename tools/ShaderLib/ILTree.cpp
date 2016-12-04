@@ -42,6 +42,10 @@ namespace shader
 		static ILTreeNode tan("TANGENT");
 		static ILTreeNode bin("BINORMAL");
 
+		static ILTreeNode uv2("TEXCOORD");
+		static ILTreeNode col2("COLOR");
+		static ILTreeNode nor2("NORMAL");
+
 		// for shader input layouts the format is not given since the shader
 		// don't care what the format comes in as.
 		// so how can i work out what the formats are since i support identical sematic layouts
@@ -71,9 +75,9 @@ namespace shader
 			AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
 
 		// double text coords.
-		uvBase.AddChild(uv).
-			AddChild(col).
-			AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM);
+		uvBase.AddChild(uv2).
+			AddChild(col2).
+			AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM);
 
 		return &blank;
 	}
