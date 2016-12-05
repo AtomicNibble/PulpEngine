@@ -1393,9 +1393,23 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 {
 	const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
 
-	X_ASSERT_NOT_NULL(pPerm);
-	const shader::XShaderTechniqueHW& hwTech = *static_cast<const shader::XShaderTechniqueHW*>(pPerm);
+	// permatations are currently compiled on creation.
+	const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pPerm);
 
+	if (!perm.isCompiled()) {
+		return INVALID_STATE_HANLDE;
+	}
+	if (perm.getILFmt() != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
+		X_ERROR("Dx12", "Hardware tech's input layout does not match state description \"%s\" -> %s",
+			shader::InputLayoutFormat::ToString(perm.getILFmt()),
+			shader::InputLayoutFormat::ToString(shader::Util::ILfromVertexFormat(desc.vertexFmt)));
+
+		// this is user error, trying to use a permatation with a diffrent vertex fmt than it was compiled for.
+		// or maybe we have some permatation selection logic issues..
+		return INVALID_STATE_HANLDE;
+	}
+
+#if 0
 	if (!hwTech.canDraw()) {
 		return INVALID_STATE_HANLDE;
 	}
@@ -1408,6 +1422,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		// or maybe we have some permatation selection logic issues..
 		return INVALID_STATE_HANLDE;
 	}
+#endif
 
 	DeviceState* pState = X_NEW(DeviceState, arena_, "DeviceState")(arena_);
 	pState->pPso = nullptr;
@@ -1427,17 +1442,20 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	// we may want to support textures in none pixel stage also.
 
 	// this is a list of cbuffers used by all stages and also defining what stages they need to be visible.
-	const auto& cbufLinks = hwTech.getCbufferLinks();
+	const auto& cbufLinks = perm.getCbufferLinks();
 
 	size_t numParams = 0;
 
 	numParams += cbufLinks.size(); // one for each cbuffer.
 
-	if (hwTech.pPixelShader) {
-		if (hwTech.pPixelShader->getNumTextures() > 0) {
+	if (perm.isStageSet(shader::ShaderType::Pixel))
+	{
+		auto* pPixelShader = perm.getStage(shader::ShaderType::Pixel);
+
+		if (pPixelShader->getNumTextures() > 0) {
 			numParams++; // a descriptor range
 		}
-		if (hwTech.pPixelShader->getNumSamplers() > 0) {
+		if (pPixelShader->getNumSamplers() > 0) {
 			numParams++; // a descriptor range
 		}
 	}
@@ -1457,10 +1475,12 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		rootSig.getParamRef(currentParamIdx++).initAsCBV(bindPoint, vis);
 	}
 
-	if (hwTech.pPixelShader) 
+	if (perm.isStageSet(shader::ShaderType::Pixel))
 	{
-		auto numTextures = hwTech.pPixelShader->getNumTextures();
-		auto numSamplers = hwTech.pPixelShader->getNumSamplers();
+		auto* pPixelShader = perm.getStage(shader::ShaderType::Pixel);
+
+		auto numTextures = pPixelShader->getNumTextures();
+		auto numSamplers = pPixelShader->getNumSamplers();
 
 		if (numTextures > 0) {
 			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
@@ -1529,16 +1549,17 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
 	pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
 
-	
-	if (hwTech.pVertexShader) {
-		const auto& byteCode = hwTech.pVertexShader->getShaderByteCode();
+	if (perm.isStageSet(shader::ShaderType::Vertex)) {
+		const auto* pVertexShader = perm.getStage(shader::ShaderType::Vertex);
+		const auto& byteCode = pVertexShader->getShaderByteCode();
 		pso.setVertexShader(byteCode.data(), byteCode.size());
 	}
-	if (hwTech.pPixelShader) {
-		const auto& byteCode = hwTech.pPixelShader->getShaderByteCode();
+	if (perm.isStageSet(shader::ShaderType::Pixel)) {
+		const auto* pPixelShader = perm.getStage(shader::ShaderType::Pixel);
+		const auto& byteCode = pPixelShader->getShaderByteCode();
 		pso.setPixelShader(byteCode.data(), byteCode.size());
 	}
-	if (hwTech.pDomainShader || hwTech.pHullShader || hwTech.pGeoShader) {
+	if (perm.isStageSet(shader::ShaderType::Hull) || perm.isStageSet(shader::ShaderType::Domain) || perm.isStageSet(shader::ShaderType::Geometry)) {
 		// in order to allow these check if the root sig flags need changing then just duplicate 
 		// the bytecode setting logic.
 		X_ERROR("Dx12", "Domain, Hull, Geo are not enabled currently");
