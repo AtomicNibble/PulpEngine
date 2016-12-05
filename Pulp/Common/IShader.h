@@ -312,7 +312,6 @@ struct IHWShader
 
 };
 
-typedef std::array<IHWShader*, ShaderType::ENUM_COUNT - 1> ShaderStagesArr;
 
 
 struct IShaderSource
@@ -323,7 +322,8 @@ struct IShaderSource
 
 };
 
-
+typedef std::array<IShaderSource*, ShaderStage::FLAGS_COUNT> ShaderSourceArr;
+typedef std::array<IHWShader*, ShaderStage::FLAGS_COUNT> ShaderStagesArr;
 
 
 } // namespace shader
