@@ -275,8 +275,6 @@ struct IShaderPermatation
 
 	virtual ~IShaderPermatation() {}
 
-	virtual bool tryCompile(bool forceSync = false) X_ABSTRACT;
-
 	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
 };
 
@@ -284,8 +282,6 @@ struct IShaderPermatation
 struct IShaderTech
 {
 	virtual ~IShaderTech() {}
-
-	virtual bool tryCompile(bool forceSync = false) X_ABSTRACT;
 
 	virtual IShaderPermatation* getPermatation(VertexFormat::Enum vertexFmt) X_ABSTRACT;
 
