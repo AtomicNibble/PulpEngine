@@ -193,12 +193,38 @@ texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, t
 	return nullptr;
 }
 
-shader::IShader* RenderNull::getShader(const char* path)
+
+shader::IShaderSource* RenderNull::getShaderSource(const char* pName)
 {
-	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(pName);
 
 	return nullptr;
 }
+
+shader::IHWShader* RenderNull::createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile)
+{
+	X_UNUSED(type);
+	X_UNUSED(entry);
+	X_UNUSED(pSourceFile);
+
+	return nullptr;
+}
+
+shader::IShaderPermatation* RenderNull::createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel)
+{
+	X_UNUSED(pVertex);
+	X_UNUSED(pPixel);
+
+	return nullptr;
+}
+
+shader::IShaderPermatation* RenderNull::createPermatation(const shader::ShaderStagesArr& stages)
+{
+	X_UNUSED(stages);
+
+	return nullptr;
+}
+
 
 void RenderNull::releaseTexture(texture::ITexture* pTex)
 {
@@ -206,11 +232,6 @@ void RenderNull::releaseTexture(texture::ITexture* pTex)
 
 }
 
-void RenderNull::releaseShader(shader::IShader* pShader)
-{
-	X_UNUSED(pShader);
-
-}
 
 PassStateHandle RenderNull::createPassState(const RenderTargetFmtsArr& rtfs)
 {
