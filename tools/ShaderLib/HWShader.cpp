@@ -48,24 +48,6 @@ namespace shader
 
 	}
 
-	bool XHWShader::compile(bool forceSync)
-	{
-		if (isValid()) {
-			return true;
-		}
-
-		if (FailedtoCompile()) {
-			return false;
-		}
-
-		if (!loadSourceAndCompile(forceSync)) {
-			status_ = ShaderStatus::FailedToCompile;
-			X_LOG0("Shader", "Failed to compile shader: \"%s\"", getName());
-			return false;
-		}
-
-		return true;
-	}
 
 	bool XHWShader::invalidateIfChanged(uint32_t newSourceCrc32)
 	{
@@ -88,108 +70,8 @@ namespace shader
 	}
 
 
-	void XHWShader::getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest)
+	bool XHWShader::compile(core::string& source)
 	{
-		src.clear();
-		src.appendFmt("shaders/temp/%s.merged", sourceFileName_.c_str());
-
-		dest.clear();
-		dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
-
-		// make sure the directory is created.
-		gEnv->pFileSys->createDirectoryTree(src.c_str());
-		gEnv->pFileSys->createDirectoryTree(dest.c_str());
-	}
-
-	void XHWShader::getShaderCompileSrc(core::Path<char>& src)
-	{
-		src.clear();
-		src.appendFmt("shaders/temp/%s.fxcb", name_.c_str());
-
-		// make sure the directory is created.
-		gEnv->pFileSys->createDirectoryTree(src.c_str());
-	}
-
-#if 0
-	bool XHWShader::loadFromCache(ShaderBin& shaderBin)
-	{
-		core::Path<char> dest;
-
-		getShaderCompileDest(dest);
-
-		// we should check if a compiled version already exsists!
-		if (shaderBin.loadShader(dest.c_str(), this))
-		{
-			X_LOG0("Shader", "shader loaded from cache: \"%s\"", name_.c_str());
-			return true;
-		}
-
-		return false;
-	}
-
-	bool XHWShader::saveToCache(ShaderBin& shaderBin)
-	{
-		core::Path<char> dest;
-		getShaderCompileDest(dest);
-
-		// write the compiled version.
-		if (shaderBin.saveShader(dest.c_str(), this))
-		{
-			X_LOG1("Shader", "saved shader to cache file: \"%s\"", dest.c_str());
-		}
-		else
-		{
-			X_ERROR("Shader", "failed to save shader to cache");
-			return false;
-		}
-
-		return true;
-	}
-#endif
-
-	bool XHWShader::loadSourceAndCompile(bool forceSync)
-	{
-		core::string source;
-
-#if 0
-
-		// we need to get the whole file :D
-		if (!shaderMan_.sourceToString(this->sourceFileName_, source))
-		{
-			X_ERROR("Shader", "failed to get source for compiling");
-			return false;
-		}
-
-		ShaderVars& vars = shaderMan_.getShaderVars();
-
-		// save copy of merged shader for debugging.
-		if (vars.writeMergedSource())
-		{
-			core::Path<char> src;
-			getShaderCompileSrc(src);
-
-			src /= ".hlsl";
-
-			core::XFileScoped fileOut;
-			if (fileOut.openFile(src.c_str(), core::fileModeFlags::RECREATE |
-				core::fileModeFlags::WRITE))
-			{
-				fileOut.write(source.data(), source.length());
-			}
-		}
-
-		if (!forceSync && vars.asyncCompile())
-		{
-			source_ = source;
-
-			core::V2::JobSystem* pJobSys = gEnv->pJobSys;
-			core::V2::Job* pJob = pJobSys->CreateMemberJob<XHWShader>(this, &XHWShader::CompileShader_job, nullptr);
-			pJobSys->Run(pJob);
-
-			status_ = ShaderStatus::Compiling;
-			return true;
-		}
-#endif
 		return compileFromSource(source);
 	}
 
@@ -290,13 +172,16 @@ namespace shader
 			return false;
 		}
 
-		if (!reflectShader()) {
+		if (!reflectShader(pBlob)) {
+			core::SafeReleaseDX(pBlob);
 			X_ERROR("Shader", "Failed to reflect shader");
 			return false;
 		}
 
 		{
 			ID3DBlob* pStripped = nullptr;
+
+			const size_t preStripSize = pBlob->GetBufferSize();
 
 			hr = D3DStripShader(
 				pBlob->GetBufferPointer(),
@@ -309,6 +194,9 @@ namespace shader
 
 			if (SUCCEEDED(hr))
 			{
+				const size_t strippedBytes = preStripSize - pStripped->GetBufferSize();
+				X_LOG2("Shader", "Stripped %" PRIuS " bytes from shader", strippedBytes);
+
 				core::SafeReleaseDX(pBlob);
 				pBlob = pStripped;
 			}
@@ -335,31 +223,16 @@ namespace shader
 		return true;
 	}
 
-	void XHWShader::CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-	{
-		X_UNUSED(jobSys);
-		X_UNUSED(threadIdx);
-		X_UNUSED(pJob);
-		X_UNUSED(pData);
 
-		if (!compileFromSource(source_)) {
-			status_ = ShaderStatus::FailedToCompile;
-		}
-		else {
-			status_ = ShaderStatus::AsyncCompileDone;
-		}
-
-		source_.clear();
-	}
-
-	bool XHWShader::reflectShader(void)
+	bool XHWShader::reflectShader(ID3DBlob* pshaderBlob)
 	{
 		ID3D12ShaderReflection* pShaderReflection;
 		ID3D12ShaderReflectionConstantBuffer* pCB;
 
-		if (FAILED(D3DReflect(bytecode_.data(), bytecode_.size(), IID_ID3D12ShaderReflection, (void **)&pShaderReflection)))
+		auto hr = D3DReflect(pshaderBlob->GetBufferPointer(), pshaderBlob->GetBufferSize(), IID_ID3D12ShaderReflection, (void **)&pShaderReflection);
+		if(FAILED(hr))
 		{
-			X_ERROR("Shader", "failed to reflect shader: %s", name_.c_str());
+			X_ERROR("Shader", "D3D reflect failed(%" PRIi32 "): %s", hr, name_.c_str());
 			return false;
 		}
 

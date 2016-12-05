@@ -27,7 +27,7 @@ namespace shader
 
 	class ShaderBin;
 
-	X_ALIGNED_SYMBOL(class XHWShader, 64)
+	X_ALIGNED_SYMBOL(class XHWShader, 64) : public IHWShader
 	{
 		typedef core::Array<XCBuffer> CBufferArr;
 		typedef core::Array<uint8_t> ByteArr;
@@ -67,26 +67,19 @@ namespace shader
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
-		SHADERLIB_EXPORT bool compile(bool forceSync = false);
+		SHADERLIB_EXPORT bool compile(core::string& source);
+
+		[[deprecated]]
 		SHADERLIB_EXPORT bool invalidateIfChanged(uint32_t newSourceCrc32);
 
 	private:
-		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
-		void getShaderCompileSrc(core::Path<char>& src);
-
-	//	bool loadFromCache(ShaderBin& shaderBin);
-	//	bool saveToCache(ShaderBin& shaderBin);
-
-		bool loadSourceAndCompile(bool forceSync = false);
 		bool compileFromSource(core::string& source);
-		void CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-		bool reflectShader(void);
+		bool reflectShader(ID3DBlob* pshaderBlob);
 
 	protected:
 		core::string name_;
 		core::string sourceFileName_;
 		core::string entryPoint_;
-		core::string source_;
 
 		int32_t id_;
 		uint32_t sourceCrc32_; // the crc of the source this was compiled from.
