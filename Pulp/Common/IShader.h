@@ -169,10 +169,18 @@ typedef Flags8<ShaderStage> ShaderStageFlags;
 
 // not sure where to put this.
 // it's used in material lib.
-X_INLINE ShaderStage::Enum staderTypeToStageFlag(ShaderType::Enum type)
+X_INLINE constexpr ShaderStage::Enum staderTypeToStageFlag(ShaderType::Enum type)
 {
 	return static_cast<ShaderStage::Enum>(1 << type);
 }
+
+// make sure helper works correct :)
+static_assert(staderTypeToStageFlag(ShaderType::Vertex) == ShaderStage::Vertex, "Enum to flag helper logic error");
+static_assert(staderTypeToStageFlag(ShaderType::Pixel) == ShaderStage::Pixel, "Enum to flag helper logic error");
+static_assert(staderTypeToStageFlag(ShaderType::Geometry) == ShaderStage::Geometry, "Enum to flag helper logic error");
+static_assert(staderTypeToStageFlag(ShaderType::Hull) == ShaderStage::Hull, "Enum to flag helper logic error");
+static_assert(staderTypeToStageFlag(ShaderType::Domain) == ShaderStage::Domain, "Enum to flag helper logic error");
+
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //
 // These ILFlags are automatically detected whne parsing the hlsl source file.
