@@ -16,8 +16,14 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+	X_DECLARE_FLAGS8(ShaderStatus) (
+		NotCompiled,
+		Compiling,
+		AsyncCompileDone,
+		ReadyToRock,
+		FailedToCompile
+	);
 
-	X_DECLARE_FLAGS8(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, ReadyToRock, FailedToCompile);
 
 	class ShaderBin;
 
