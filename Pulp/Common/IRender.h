@@ -283,7 +283,7 @@ X_ENSURE_SIZE(StateDesc, 20);
 struct CBState
 {
 	ConstantBufferHandle cb;
-	shader::ShaderTypeFlags visibility;
+	shader::ShaderStageFlags visibility;
 };
 
 typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
