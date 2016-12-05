@@ -8,6 +8,11 @@ void GenerateUI( asset& Asset )
     string usage = "<none> | Door | Floor | Celing | Roof | Window | Sky";
 
     Asset.AddCombo( "cat", cats ).SetTitle( "Category:" );
+
+    string currentMaterialCategory = Asset.getPropValue( "cat" );
+    string materialTypes = Asset.getMaterialTypes( currentMaterialCategory );
+
+    Asset.AddCombo( "type", materialTypes ).SetTitle( "Type:" );
     Asset.AddCombo( "surface_type", surTypes ).SetTitle( "Surface Type:" );
     Asset.AddCombo( "usage", usage ).SetTitle( "Edtior Group:" );
 
