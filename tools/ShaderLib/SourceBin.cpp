@@ -98,13 +98,13 @@ namespace shader
 		source_(arena, MAX_SHADER_SOURCE),
 		sourcePoolHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
-				PoolArena::getMemoryRequirement(core::Max(sizeof(SourceFile), sizeof(ShaderSourceFile))) * MAX_SHADER_SOURCE,
+				PoolArena::getMemoryRequirement(sizeof(SourceFile)) * MAX_SHADER_SOURCE,
 				core::VirtualMem::GetPageSize()
 			)
 		),
 		sourcePoolAllocator_(sourcePoolHeap_.start(), sourcePoolHeap_.end(),
 			PoolArena::getMemoryRequirement(sizeof(SourceFile)),
-			PoolArena::getMemoryAlignmentRequirement(core::Max(X_ALIGN_OF(SourceFile), X_ALIGN_OF(ShaderSourceFile))),
+			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(SourceFile)),
 			PoolArena::getMemoryOffsetRequirement()
 		),
 		sourcePoolArena_(&sourcePoolAllocator_, "ShaderSourcePool")
