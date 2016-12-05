@@ -417,7 +417,7 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
-    <ClInclude Include="Shader\Shader.h" />
+    <ClInclude Include="Shader\ShaderPermatation.h" />
     <ClInclude Include="Shader\ShaderManager.h" />
     <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
@@ -456,7 +456,7 @@
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
-    <ClCompile Include="Shader\Shader.cpp" />
+    <ClCompile Include="Shader\ShaderPermatation.cpp" />
     <ClCompile Include="Shader\ShaderManager.cpp" />
     <ClCompile Include="Shader\ShaderVars.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -500,7 +500,7 @@
     <None Include="PipelineState.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
-    <None Include="Shader\Shader.inl" />
+    <None Include="Shader\ShaderPermatation.inl" />
     <None Include="Shader\ShaderVars.inl" />
     <None Include="Texture\Texture.inl" />
     <None Include="Texture\TextureVars.inl" />

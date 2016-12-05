@@ -34,6 +34,7 @@ X_NAMESPACE_DECLARE(render,
 		struct IShader;
 
 		class XCBuffer;
+		class ShaderPermatation;
 	} // namespace shader
 )
 
@@ -361,10 +362,16 @@ struct IRender
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	// creates a texture for dynamic content, no data loaded from disk.
 	virtual texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
-	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
+	
+	// shaders
+	// new api for creating techs in 3dengine
+	virtual shader::IShaderSource* getShaderSource(const char* pName) X_ABSTRACT;
+	virtual shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile) X_ABSTRACT;
+	virtual shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_ABSTRACT;
+	virtual shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_ABSTRACT;
+
 
 	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
-	virtual void releaseShader(shader::IShader* pShader) X_ABSTRACT;
 
 	// state
 	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;

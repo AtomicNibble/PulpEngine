@@ -5,7 +5,7 @@
 #include "Texture\Texture.h"
 #include "Texture\TextureUtil.h"
 #include "Shader\ShaderManager.h"
-#include "Shader\Shader.h"
+#include "Shader\ShaderPermatation.h"
 #include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"
@@ -1321,22 +1321,34 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
 	return pText;
 }
 
-shader::IShader* XRender::getShader(const char* pName)
-{
-	shader::XShader* pShader = pShaderMan_->forName(pName);
 
-	return pShader;
+
+shader::IShaderSource* XRender::getShaderSource(const char* pSourceName)
+{
+	return pShaderMan_->sourceforName(pSourceName);
 }
+
+shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile)
+{
+	return pShaderMan_->createHWShader(type, entry, pSourceFile);
+}
+
+shader::IShaderPermatation* XRender::createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel)
+{
+	return nullptr;
+}
+
+shader::IShaderPermatation* XRender::createPermatation(const shader::ShaderStagesArr& stages)
+{
+	return pShaderMan_->createPermatation(stages);
+}
+
 
 void XRender::releaseTexture(texture::ITexture* pTex)
 {
 	pTextureMan_->releaseTexture(pTex);
 }
 
-void XRender::releaseShader(shader::IShader* pShader)
-{
-	pShaderMan_->releaseShader(static_cast<shader::XShader*>(pShader));
-}
 
 PassStateHandle XRender::createPassState(const RenderTargetFmtsArr& rtfs)
 {

@@ -165,10 +165,14 @@ public:
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;
-	shader::IShader* getShader(const char* pName) X_OVERRIDE;
+
+	shader::IShaderSource* getShaderSource(const char* pName) X_OVERRIDE;
+	shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile) X_OVERRIDE;
+	shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_OVERRIDE;
+	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_OVERRIDE;
+
 
 	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
-	void releaseShader(shader::IShader* pShader) X_OVERRIDE;
 
 
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_OVERRIDE;

@@ -1,15 +1,7 @@
 #include "stdafx.h"
-#include "Shader.h"
+#include "ShaderPermatation.h"
 
 #include <ICore.h>
-#include <IFileSys.h>
-#include <IConsole.h>
-
-#include <String\StrRef.h>
-#include <String\StringTokenizer.h>
-#include <String\StringRange.h>
-
-#include <Hashing\crc32.h>
 
 #include "XRender.h"
 
@@ -46,6 +38,83 @@ namespace shader
 
 // ----------------------------------------------------
 
+#if 1
+
+	ShaderPermatation::ShaderPermatation(const ShaderStagesArr& stages, core::MemoryArenaBase* arena) :
+		IlFmt_(InputLayoutFormat::Invalid),
+		cbLinks_(arena)
+	{
+		cbLinks_.setGranularity(2);
+
+		X_ASSERT(stages_.size() == stages_.size(), "Stage aray sizes don't match")();
+
+		for (size_t i=0; i<stages.size(); i++)
+		{
+			stages_[i] = static_cast<XHWShader*>(stages[i]);
+		}
+	}
+
+	void ShaderPermatation::postCompile(void)
+	{
+		if (isStageSet(ShaderType::Vertex))
+		{
+			IlFmt_ = getStage(ShaderType::Vertex)->getILFormat();
+		}
+
+		createCbLinks();
+	}
+
+
+	bool ShaderPermatation::isCompiled(void) const
+	{
+		for (const auto* pShader : stages_)
+		{
+			if (pShader && pShader->getStatus() != ShaderStatus::ReadyToRock) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	void ShaderPermatation::createCbLinks(void)
+	{
+		cbLinks_.clear();
+
+		for (auto* pShader : stages_)
+		{
+			if (pShader)
+			{
+				X_ASSERT(pShader->getStatus() == ShaderStatus::ReadyToRock, "All shaders should be compiled when creating CB links")();
+				addCbufstoLink(pShader);
+			}
+		}
+	}
+
+	void ShaderPermatation::addCbufstoLink(XHWShader* pShader)
+	{
+		auto& cbufs = pShader->getCBuffers();
+		auto stage = staderTypeToStageFlag(pShader->getType());
+
+		for (auto& cb : cbufs)
+		{
+			// we match by name and size currently.
+			for (auto& link : cbLinks_)
+			{
+				if (link.pCBufer->isEqual(cb))
+				{
+					link.stages.Set(stage);
+					goto skip_outer_loop;
+				}
+			}
+
+			cbLinks_.emplace_back(stage, &cb);
+
+		skip_outer_loop:;
+		}
+	}
+
+#else
 
 	XShaderTechniqueHW::XShaderTechniqueHW(core::MemoryArenaBase* arena) :
 		cbLinks(arena)
@@ -123,7 +192,7 @@ namespace shader
 			{
 				if (link.pCBufer->isEqual(cb))
 				{
-					link.stages.Set(pShader->getType());
+				//	link.stages.Set(pShader->getType());
 					goto skip_outer_loop;
 				}
 			}
@@ -134,88 +203,7 @@ namespace shader
 		}
 	}
 
-
-
-// ----------------------------------------------------
-
-
-XShaderTechnique::XShaderTechnique(core::MemoryArenaBase* arena) : 
-	hwTechs(arena)
-{
-	hwTechs.setGranularity(6);
-}
-
-
-void XShaderTechnique::assignSourceTech(const ShaderSourceFileTechnique& srcTech)
-{
-	name = srcTech.getName();
-	nameHash = core::StrHash(srcTech.getName());
-	// compileflags
-	techFlags = srcTech.getTechFlags();
-}
-
-void XShaderTechnique::append(const XShaderTechniqueHW& hwTech)
-{
-	hwTechs.emplace_back(hwTech);
-}
-
-bool XShaderTechnique::tryCompile(bool forceSync)
-{
-	for (auto& tech : hwTechs)
-	{
-		if (tech.tryCompile(forceSync))
-		{
-			return false;
-		}
-	}
-
-	return true;
-}
-
-
-IShaderPermatation* XShaderTechnique::getPermatation(VertexFormat::Enum vertexFmt)
-{
-	InputLayoutFormat::Enum ilFmt = Util::ILfromVertexFormat(vertexFmt);
-
-	for (auto& tech : hwTechs)
-	{
-		if (tech.IlFmt == ilFmt)
-		{
-			return &tech;
-		}
-	}
-
-	return nullptr;
-}
-
-// ----------------------------------------------------
-
-
-XShader::XShader(core::MemoryArenaBase* arena) :
-	techs_(arena)
-{
-	sourceCrc32_ = 0;
-	hlslSourceCrc32_ = 0;
-	pHlslFile_ = nullptr;
-}
-
-XShader::~XShader()
-{
-
-}
-
-IShaderTech* XShader::getTech(const char* pName)
-{
-	for (auto& tech : techs_)
-	{
-		if (tech.name == pName)
-		{
-			return &tech;
-		}
-	}
-
-	return nullptr;
-}
+#endif
 
 
 } // namespace shader

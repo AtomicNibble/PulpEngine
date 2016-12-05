@@ -8,7 +8,6 @@
 
 #include <Assets\AssertContainer.h>
 
-#include "Shader.h"
 #include "ShaderVars.h"
 
 
@@ -22,16 +21,11 @@ namespace shader
 {
 
 	class SourceFile;
-	class ShaderSourceFile;
 	class XShader;
 	class XHWShader;
 
 	class XShaderManager : public core::IXHotReload
 	{
-		// Shaders
-		typedef core::AssetContainer<XShader, MAX_SHADERS, core::MultiThreadPolicy<core::Spinlock>> ShaderContainer;
-		typedef ShaderContainer::Resource ShaderResource;
-
 		// HWShaders
 		typedef core::AssetContainer<XHWShader, MAX_HW_SHADERS, core::MultiThreadPolicy<core::Spinlock>> HWShaderContainer;
 		typedef HWShaderContainer::Resource HWShaderResource;
@@ -58,43 +52,30 @@ namespace shader
 
 		bool init(void);
 		bool shutDown(void);
+		
+		IShaderSource* sourceforName(const char* pSourceName);
+		IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile);
 
-		// loads shader if not already loaded.
-		XShader* forName(const char* pName);
-		void releaseShader(XShader* pShader);
-
-		// returns merged source.
-		bool sourceToString(const char* pName, core::string& strOut);
+		shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
 
 		ShaderVars& getShaderVars(void);
 		ShaderBin& getBin(void);
 
 
 	private:
-		bool loadCoreShaders(void);
-		bool freeCoreShaders(void);
-		bool freeDanglingShaders(void);
-
-
-		// returns a loaded shader, null if not fnd.
-		ShaderResource* getLoadedShader(const char* pName);
-
-		ShaderSourceFile* loadShaderFile(const char* pName, bool reload = false);
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
-
-
-		ShaderResource* createShader(const char* pName);
-		XShader* loadShader(const char* pName);
-		XShader* reloadShader(const char* pName);
 
 		XHWShader* hwForName(ShaderType::Enum type, const char* pShaderName, const core::string& entry,
 			SourceFile* pSourceFile, const TechFlags techFlags,
 			ILFlags ILFlags);
 
 	private:
+		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);
+
+
 		bool freeSourcebin(void);
-		bool freeSourceHwShaders(void);
-		void listShaders(const char* pSarchPatten = nullptr);
+		bool freeHwShaders(void);
+		void listHWShaders(const char* pSarchPatten = nullptr);
 		void listShaderSources(const char* pSarchPatten = nullptr);
 
 	private:
@@ -104,31 +85,18 @@ namespace shader
 
 	private:
 
-		void Cmd_ListShaders(core::IConsoleCmdArgs* pArgs);
+		void Cmd_ListHWShaders(core::IConsoleCmdArgs* pArgs);
 		void Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs);
 
 	private:
 		core::MemoryArenaBase* arena_;
-		core::Crc32* pCrc32_;
 		ShaderBin shaderBin_;
 		SourceBin sourceBin_;
 
-		// allocator for source objects.
-		core::HeapArea      sourcePoolHeap_;
-		core::PoolAllocator sourcePoolAllocator_;
-		PoolArena			sourcePoolArena_;
-
 		// ref counted resources
 		HWShaderContainer hwShaders_;
-		ShaderContainer shaders_;
 
 		ShaderVars vars_;
-
-	private:
-		XShader* pDefaultShader_;
-		XShader* pFixedFunction_;
-		XShader* pFont_;
-		XShader* pGui_;
 	};
 
 
