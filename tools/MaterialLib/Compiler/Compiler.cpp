@@ -89,8 +89,9 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	d.Parse(str.c_str(), str.length());
 
 	// find all the things.
-	std::array<std::pair<const char*, core::json::Type>, 9> requiredValues = { {
+	std::array<std::pair<const char*, core::json::Type>, 10> requiredValues = { {
 			{ "cat", core::json::kStringType },
+			{ "type", core::json::kStringType },
 			{ "usage", core::json::kStringType },
 			{ "surface_type", core::json::kStringType },
 			{ "polyOffset", core::json::kStringType },
