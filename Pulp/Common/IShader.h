@@ -308,6 +308,26 @@ struct IShader
 
 
 
+struct IHWShader
+{
+	virtual ~IHWShader() {}
+
+
+};
+
+typedef std::array<IHWShader*, ShaderType::ENUM_COUNT - 1> ShaderStagesArr;
+
+
+struct IShaderSource
+{
+	virtual ~IShaderSource() {}
+
+	virtual ILFlags getILFlags(void) const X_ABSTRACT;
+
+};
+
+
+
 
 } // namespace shader
 
