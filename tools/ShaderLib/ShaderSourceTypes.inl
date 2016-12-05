@@ -71,41 +71,6 @@ namespace shader
 		refrences_.insert(name);
 	}
 
-	// -------------------------------------------
-
-	X_INLINE const core::string& ShaderSourceFileTechnique::getName(void) const
-	{
-		return name_;
-	}
-
-	X_INLINE const core::string& ShaderSourceFileTechnique::getVertexFunc(void) const
-	{
-		return vertex_func_;
-	}
-
-	X_INLINE const core::string& ShaderSourceFileTechnique::getPixelFunc(void) const
-	{
-		return pixel_func_;
-	}
-
-	X_INLINE const TechFlags ShaderSourceFileTechnique::getTechFlags(void) const
-	{
-		return techFlags_;
-	}
-
-
-	// -------------------------------------------
-
-
-	X_INLINE size_t ShaderSourceFile::numTechs(void) const
-	{
-		return techniques_.size();
-	}
-
-	X_INLINE void ShaderSourceFile::addTech(const ShaderSourceFileTechnique& tech)
-	{
-		techniques_.emplace_back(tech);
-	}
 
 
 } // namespace shader

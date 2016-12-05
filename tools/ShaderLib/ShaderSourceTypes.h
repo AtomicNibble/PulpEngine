@@ -59,53 +59,6 @@ namespace shader
 	};
 
 
-	class ShaderSourceFileTechnique
-	{
-	public:
-		SHADERLIB_EXPORT ShaderSourceFileTechnique();
-		~ShaderSourceFileTechnique() = default;
-
-		SHADERLIB_EXPORT bool parse(core::XLexer& lex);
-
-		X_INLINE const core::string& getName(void) const;
-		X_INLINE const core::string& getVertexFunc(void) const;
-		X_INLINE const core::string& getPixelFunc(void) const;
-
-		X_INLINE const TechFlags getTechFlags(void) const;
-
-	private:
-		bool processName(void);
-
-	private:
-		core::string name_;
-		core::string vertex_func_;
-		core::string pixel_func_;
-
-		Flags<TechniquePrams> flags_;
-		TechFlags techFlags_;
-	};
-
-	class ShaderSourceFile
-	{
-		typedef core::Array<ShaderSourceFileTechnique> TechArr;
-
-	public:
-		SHADERLIB_EXPORT ShaderSourceFile(core::MemoryArenaBase* arena);
-		~ShaderSourceFile() = default;
-
-		X_INLINE size_t numTechs(void) const;
-
-		X_INLINE void addTech(const ShaderSourceFileTechnique& tech);
-
-	public:
-		core::string name_;
-		SourceFile* pFile_;
-		SourceFile* pHlslFile_;
-		uint32_t sourceCrc32_;
-		uint32_t hlslSourceCrc32_;
-		TechArr techniques_;
-	};
-
 } // namespace shader
 
 X_NAMESPACE_END
