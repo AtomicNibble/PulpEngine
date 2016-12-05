@@ -143,15 +143,19 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	// so we don't store state of camel flaps in the material data.
 	// instead a material picks a techDef by process of picking a cat and type.
 	// currently cat is fixed, but type is data driven.
-	core::string type(pType);
+	techType_ = pType;
 
 	engine::TechSetDef* pTechDef = nullptr;
-	if (!techDefs_.getTechDef(cat_, type, pTechDef)) {
+	if (!techDefs_.getTechDef(cat_, techType_, pTechDef)) {
 		X_ERROR("Mat", "Failed to get techDef for cat: %s type: %s", pCat, pType);
 		return false;
 	}
 
 	X_ASSERT_NOT_NULL(pTechDef);
+
+	if (pTechDef->numTechs() > MTL_MAX_TECHS) {
+		return false;
+	}
 
 	// so now that we have a tech def you fucking TWAT!
 	// we know all the techs this material supports.
@@ -296,6 +300,9 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	static_assert(assetDb::ASSET_NAME_MAX_LENGTH <= std::numeric_limits<decltype(MaterialTexture::nameLen)>::max(),
 		"Material only supports 255 max name len");
 
+	X_ASSERT(cat_ != MaterialCat::UNKNOWN, "MatCat can't be unknown")();
+	X_ASSERT(techType_.isNotEmpty(), "TechType can't be empty")();
+
 	MaterialHeader hdr;
 	hdr.fourCC = MTL_B_FOURCC;
 
@@ -322,6 +329,9 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 		X_ERROR("Mtl", "Failed to write img header");
 		return false;
 	}
+
+	// write techs name.
+	pFile->writeString(techType_);
 
 	// i want to just write all the tex blocks regardless if they are set or not.
 	std::array<const Tex* const, 4> textures = {

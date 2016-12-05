@@ -63,6 +63,7 @@ private:
 	Tex normalMap_;
 	Tex detailNormalMap_;
 	Tex specColMap_;
+	core::string techType_;
 };
 
 
