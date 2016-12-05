@@ -53,7 +53,6 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
 	currentPage_(-1),
-	pAuxShader_(nullptr)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
@@ -84,12 +83,6 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 
 #if 1
 
-	pAuxShader_ = nullptr; //  pRender->getShader("Prim");
-//	auto* pTech = pAuxShader_->getTech("Prim");
-
-	// needed currently to generate the permatations.
-//	pTech->tryCompile(true);
-
 	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
 	{
 		const auto primType = static_cast<PrimitiveType::Enum>(i);
@@ -119,7 +112,14 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		primMaterials_[primType] = pMat;
 	}
 
+
 #else
+	pAuxShader_ = nullptr; //  pRender->getShader("Prim");
+						   //	auto* pTech = pAuxShader_->getTech("Prim");
+
+						   // needed currently to generate the permatations.
+						   //	pTech->tryCompile(true);
+
 	render::StateDesc desc;
 	desc.blend.srcBlendColor = render::BlendType::SRC_ALPHA;
 	desc.blend.srcBlendAlpha = render::BlendType::SRC_ALPHA;
@@ -228,11 +228,6 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 		h = render::INVALID_STATE_HANLDE;
 	}
 #endif // X_DEBUG
-
-	if (pAuxShader_) {
-//		pRender->releaseShader(pAuxShader_);
-	}
-
 
 	for (auto& vp : vertexPages_) {
 		vp.destoryVB(pRender);

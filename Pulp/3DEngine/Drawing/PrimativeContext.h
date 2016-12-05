@@ -163,8 +163,6 @@ private:
 	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
 
 	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
-
-	render::shader::IShader* pAuxShader_;
 };
 
 
