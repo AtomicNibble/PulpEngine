@@ -1365,21 +1365,21 @@ void XRender::destoryPassState(PassStateHandle passHandle)
 	X_DELETE(pPassState, arena_);
 }
 
-D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderTypeFlags stageFlags)
+D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderStageFlags stageFlags)
 {
 	const auto flagsInt = stageFlags.ToInt();
 
 	switch (flagsInt)
 	{
-		case shader::ShaderType::Vertex:
+		case shader::ShaderStage::Vertex:
 			return D3D12_SHADER_VISIBILITY_VERTEX;
-		case shader::ShaderType::Pixel:
+		case shader::ShaderStage::Pixel:
 			return D3D12_SHADER_VISIBILITY_PIXEL;
-		case shader::ShaderType::Domain:
+		case shader::ShaderStage::Domain:
 			return D3D12_SHADER_VISIBILITY_DOMAIN;
-		case shader::ShaderType::Geometry:
+		case shader::ShaderStage::Geometry:
 			return D3D12_SHADER_VISIBILITY_GEOMETRY;
-		case shader::ShaderType::Hull:
+		case shader::ShaderStage::Hull:
 			return D3D12_SHADER_VISIBILITY_HULL;
 
 		// any combination results in all visibility.
