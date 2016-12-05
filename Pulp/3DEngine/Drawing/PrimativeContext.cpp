@@ -84,11 +84,11 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 
 #if 1
 
-	pAuxShader_ = pRender->getShader("Prim");
-	auto* pTech = pAuxShader_->getTech("Prim");
+	pAuxShader_ = nullptr; //  pRender->getShader("Prim");
+//	auto* pTech = pAuxShader_->getTech("Prim");
 
 	// needed currently to generate the permatations.
-	pTech->tryCompile(true);
+//	pTech->tryCompile(true);
 
 	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
 	{
@@ -230,7 +230,7 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 #endif // X_DEBUG
 
 	if (pAuxShader_) {
-		pRender->releaseShader(pAuxShader_);
+//		pRender->releaseShader(pAuxShader_);
 	}
 
 
