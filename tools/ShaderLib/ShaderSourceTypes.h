@@ -20,7 +20,7 @@ namespace shader
 
 
 	// a hlsl
-	class SourceFile
+	class SourceFile : public IShaderSource
 	{
 	public:
 		typedef core::Array<SourceFile*> IncludedSourceArr;
@@ -38,7 +38,7 @@ namespace shader
 		X_INLINE uint32_t getSourceCrc32(void) const;
 		X_INLINE const IncludedSourceArr& getIncludeArr(void) const;
 		X_INLINE IncludedSourceArr& getIncludeArr(void);
-		X_INLINE ILFlags getILFlags(void) const;
+		X_INLINE ILFlags getILFlags(void) const X_FINAL;
 
 		X_INLINE void setName(const core::string& name);
 		X_INLINE void setFileName(const core::string& name);
