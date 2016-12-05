@@ -52,7 +52,7 @@ PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
 	pRender_(nullptr),
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
-	currentPage_(-1),
+	currentPage_(-1)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
