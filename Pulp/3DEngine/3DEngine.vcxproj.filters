@@ -61,6 +61,9 @@
     <ClCompile Include="Drawing\VariableStateManager.cpp">
       <Filter>Source Files\Drawing</Filter>
     </ClCompile>
+    <ClCompile Include="Material\TechDefStateManager.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -116,6 +119,9 @@
     </ClInclude>
     <ClInclude Include="Drawing\VariableStateManager.h">
       <Filter>Header Files\Drawing</Filter>
+    </ClInclude>
+    <ClInclude Include="Material\TechDefStateManager.h">
+      <Filter>Header Files\Material</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
