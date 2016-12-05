@@ -275,6 +275,7 @@ struct IShaderPermatation
 
 	virtual ~IShaderPermatation() {}
 
+	virtual InputLayoutFormat::Enum getILFmt(void) const X_ABSTRACT;
 	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
 };
 
