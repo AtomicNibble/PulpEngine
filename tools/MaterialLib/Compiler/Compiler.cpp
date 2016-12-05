@@ -6,6 +6,8 @@
 
 #include "Util\MatUtil.h"
 #include "TechDefs\TechDefs.h"
+#include "TechDefs\TechSetDef.h"
+
 
 X_NAMESPACE_BEGIN(engine)
 
