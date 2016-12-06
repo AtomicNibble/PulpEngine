@@ -24,7 +24,7 @@ class TechDef
 public:
 	TechDef(core::MemoryArenaBase* arena);
 
-	TechDefPerm* getPerm();
+	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt);
 
 public:
 	core::StrHash nameHash;
@@ -48,7 +48,7 @@ public:
 
 public:
 	MaterialCat::Enum cat;
-	core::string name;
+	core::string name; // not a tech name.
 
 	// the techs defined eg: "unlit", "depth", "flyinggoat"
 	TechDefArr techs_;

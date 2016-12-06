@@ -12,11 +12,12 @@ TechDef::TechDef(core::MemoryArenaBase* arena) :
 	shaderSource.fill(nullptr);
 }
 
-TechDefPerm* TechDef::getPerm()
+TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt)
 {
 	// ok so this will be called to get a permatation.
 	// we want to lazy compile these i think.
 	// so how do we know what is supported.
+	X_UNUSED(vertFmt);
 
 	return nullptr;
 }
