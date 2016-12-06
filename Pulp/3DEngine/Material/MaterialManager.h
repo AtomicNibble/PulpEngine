@@ -14,8 +14,10 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+class TechSetDefs;
 class VariableStateManager;
-
+class TechDefStateManager;
+class CBufferManager;
 class Material;
 
 class XMaterialManager : 
@@ -41,6 +43,8 @@ public:
 
 	void releaseMaterial(Material* pMat);
 
+	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt);
+
 	virtual Material* getDefaultMaterial(void) X_OVERRIDE;
 
 	// ~IMaterialManager
@@ -65,6 +69,8 @@ private:
 
 private:
 	VariableStateManager& vsMan_;
+	TechDefStateManager* pTechDefMan_;
+	CBufferManager* pCBufMan_;
 
 	MaterialContainer materials_;
 

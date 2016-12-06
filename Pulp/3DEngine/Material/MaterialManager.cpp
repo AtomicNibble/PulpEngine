@@ -8,10 +8,11 @@
 #include <IConsole.h>
 #include <ITexture.h>
 
+#include "TechDefStateManager.h"
+#include "Drawing\VariableStateManager.h"
+#include <CBuffer.h>
 
-#include <Memory\AllocationPolicies\MallocFreeAllocator.h>
-
-#include <algorithm>
+#include "Drawing\CBufferManager.h"
 
 
 X_NAMESPACE_BEGIN(engine)
@@ -39,15 +40,20 @@ namespace
 } // namespace
 
 XMaterialManager::XMaterialManager(VariableStateManager& vsMan) :
+	pTechDefMan_(nullptr),
 	vsMan_(vsMan),
 	materials_(g_3dEngineArena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource)),
 	pDefaultMtl_(nullptr)
 {
+	pTechDefMan_ = X_NEW(TechDefStateManager, g_3dEngineArena, "TechDefStateManager")(g_3dEngineArena);
+
 }
 
 XMaterialManager::~XMaterialManager()
 {
-
+	if (pTechDefMan_) {
+		X_DELETE(pTechDefMan_, g_3dEngineArena);
+	}
 }
 
 
@@ -213,6 +219,73 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 	}
 }
 
+Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt)
+{
+	// the material holds all it's techs like a cache, but when it don't have one we must create it.
+	auto* pTech = pMat->getTech(techNameHash, vrtFmt);
+	if (pTech) {
+		return pTech;
+	}
+
+	// we must get the techDef so we can select the tech definition.
+	TechDefState* pTechDefState = pMat->getTechDefState();
+
+	// now we have the tech we wnat to create a permatation of it supporting what we want.
+	TechDef* pTechDef = pTechDefState->getTech(techNameHash);
+
+	// we now have a permatation of the shader that we want.
+	// this gives us the pipeline state handle.
+	// we just now need to make variable state.
+	TechDefPerm* pPerm = pTechDef->getOrCreatePerm(vrtFmt);
+
+	render::shader::IShaderPermatation* pShaderPerm = pPerm->pShaderPerm;
+
+	// from the shader perm we can see how many const buffers we need to provide.
+	const auto& cbLinks = pShaderPerm->getCbufferLinks();
+
+	// we need to know how many textures we are going to be sending.
+	// it may be less than what the material has.
+	// the tech should tell us O_O
+	// him -> pTechDef
+	const size_t numTex = 1;
+
+	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(numTex, cbLinks.size());
+
+	// we should create the const buffers we need and set them in the variable state.
+	auto* pCBHandles = pVariableState->getCBs();
+	for (size_t i = 0; i < cbLinks.size(); i++)
+	{
+		auto& cb = cbLinks[i];
+		
+		auto cbHandle = pCBufMan_->createCBuffer(*cb.pCBufer);
+
+		pCBHandles[i] = cbHandle;
+	}
+
+	auto* pTexStates = pVariableState->getTexStates();
+	for (size_t i = 0; i < numTex; i++)
+	{
+		auto& texState = pTexStates[i];
+
+		// we need to select the correct texture from the material, and pass the texture id and states.
+
+
+		texState.textureId = 0; // get FOOKED.
+		texState.slot = render::TextureSlot::DIFFUSE;
+		texState.sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
+		texState.sampler.repeat = render::TexRepeat::TILE_BOTH;
+	}
+
+
+
+	Material::Tech matTech;
+	matTech.hash = techNameHash;
+	matTech.vertFmt = vrtFmt;
+	matTech.stateHandle = pPerm->stateHandle;
+	matTech.pVariableState = pVariableState;
+
+	return nullptr;
+}
 
 XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& name)
 {
@@ -237,6 +310,33 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	}
 
 	// we need to poke the goat.
+	// so now materials store the cat and type which we can use to get techdef info.
+
+	core::string catType;
+	file.readString(catType);
+
+	// so my fat one legged camel.
+	// we get the techDefState for this material.
+	// which tells us the possible techs this material supports.
+	// the material can request 'permatations' from this like ones with diffrent vertex formats (if supported).
+	// when you have a perm you will have a state handle that you can render with.
+	// this is so for a given material you can render it:
+	// 1: either instanced or none-instanced.
+	// 2: with less vertex streams
+	// 3: etc..
+	// But when you get a diffrent perm it's likley you will need to make a diffrent variableState to pass with 
+	// that perm for rendering.
+	// also once you have a perm you can ask it what cbuffers it needs.
+	TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, catType);
+	if (!pTechDefState) {
+		return false;
+	}
+
+	// ok for a material we need to create all the techs now.
+
+	auto* pTech = pTechDefState->getTech(core::StrHash("unlit"));
+	pTech = nullptr;
+
 
 #if X_DEBUG
 	const auto left = file.remainingBytes();
@@ -244,6 +344,8 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 #endif // !X_DEBUG
 
 	MaterialResource* pMatRes = createMaterial_Internal(name);
+
+	pMatRes->setTechDefState(pTechDefState);
 
 	return pMatRes;
 }
@@ -253,7 +355,7 @@ XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(co
 	// internal create expects you to know no duplicates
 	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
 
-	auto pMatRes = materials_.createAsset(name);
+	auto pMatRes = materials_.createAsset(name, g_3dEngineArena);
 	pMatRes->setName(name);
 
 	return pMatRes;
