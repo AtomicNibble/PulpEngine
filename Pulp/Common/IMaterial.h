@@ -27,6 +27,7 @@ static const char*		 MTL_DEFAULT_NAME = "default/default";
 
 // some limits for each material
 static const uint32_t    MTL_MAX_TECHS = 16;
+static const uint32_t    MTL_MAX_TEXTURES = 8;
 
 
 static const char*		 TECH_DEFS_DIR = "core_assets/techdefs";
