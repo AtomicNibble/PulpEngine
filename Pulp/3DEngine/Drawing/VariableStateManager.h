@@ -40,7 +40,7 @@ public:
 	~VariableStateManager();
 
 
-	render::Commands::ResourceStateBase* createVariableState(int8_t numTexStates, int8_t numCBs);
+	render::Commands::ResourceStateBase* createVariableState(size_t numTexStates, size_t numCBs);
 
 private:
 	render::Commands::ResourceStateBase* createVariableState_Interal(int8_t numTexStates, int8_t numCBs);

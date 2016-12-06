@@ -53,7 +53,7 @@ VariableStateManager::~VariableStateManager()
 
 }
 
-render::Commands::ResourceStateBase* VariableStateManager::createVariableState(int8_t numTexStates, int8_t numCBs)
+render::Commands::ResourceStateBase* VariableStateManager::createVariableState(size_t numTexStates, size_t numCBs)
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
 
@@ -64,7 +64,7 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState(i
 		return pEmtpyState_;
 	}
 	
-	return createVariableState_Interal(numTexStates, numCBs);
+	return createVariableState_Interal(safe_static_cast<int8_t>(numTexStates), safe_static_cast<int8_t>(numCBs));
 }
 
 render::Commands::ResourceStateBase* VariableStateManager::createVariableState_Interal(int8_t numTexStates, int8_t numCBs)
