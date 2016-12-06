@@ -17,6 +17,8 @@
 #include "Drawing\VariableStateManager.h"
 
 #include <Time\StopWatch.h>
+#include <String\StringHash.h>
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -255,6 +257,7 @@ void X3DEngine::OnFrameBegin(void)
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
 
 #if 1
+#if 0
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 		{
 			auto& context = primContexts_[i];
@@ -269,14 +272,39 @@ void X3DEngine::OnFrameBegin(void)
 				for (size_t x = 0; x < elems.size(); x++)
 				{
 					const auto& elem = elems[x];
-					const auto* pMat = elem.pMaterial;
-					const auto* pVariableState = pMat->getVariableState();
+					auto* pMat = elem.pMaterial;
+
+					// so when we have a material we need select a tech and a permatation.
+					// then we will have a state handle and variable state.
+					// so we will want to select the tech we are rendering with.
+					const core::StrHash tech("unlit");
+
+					// i want a tech for this material to render with.
+					// if i'm supporting diffrent vertex formats.
+					// when the 3dengine decides it wants to render something instanced it need to be able to pick that.
+					// i don't want to make the manual techs so we pass tech name and permatations is selected from that.
+					// but should a material have all perms even if not using or should it make them on demand.
+					// if we can move perms into techStateDefs that would be nicer.
+					// since then we don't care to much about creating them all.
+					// so if this was able to create variable states and perms on demand all would be good in the world.
+					// as this then basically magically gives us multithread state creation..
+					// but fuck... if some states are taking over two frames to compile we need to really just not draw till that state is ready.
+					// so maybe if we ask mat man for states for each material.
+					// this way once a material has the states it will just return it's local copy.
+					// but if the state needs to be created we can create a job todo it.
+					// is it better to stall or just not render till next frame..
+					// well we can make it just not draw and add option to stall on request if needs be.
+					// lets just get it functional and see what is causing most of the delays.
+					const auto* pTech = pMat->getTech(tech, IPrimativeContext::VERTEX_FMT);
+
+					const auto stateHandle = pTech->stateHandle;
+					const auto* pVariableState = pTech->pVariableState;
 					auto variableStateSize = pVariableState->getStateSize();
 
 					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x + 10), variableStateSize);
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
-					pDraw->stateHandle = pMat->getStateHandle();
+					pDraw->stateHandle = stateHandle;
 					pDraw->resourceState = *pVariableState; // slice the sizes into command.
 					// set the vertex handle to correct one.
 					core::zero_object(pDraw->vertexBuffers);
@@ -291,7 +319,7 @@ void X3DEngine::OnFrameBegin(void)
 				}
 			}
 		}
-
+#endif
 
 #else
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
