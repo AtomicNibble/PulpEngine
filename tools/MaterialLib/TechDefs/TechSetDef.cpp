@@ -431,6 +431,8 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 {
 	MaterialPolygonOffset::Enum polyOffset;
 
+	state.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
+
 	core::XLexToken token;
 	while (lex.ReadToken(token))
 	{
