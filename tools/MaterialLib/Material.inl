@@ -1,9 +1,9 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-X_INLINE Material::Material() :
-	pVariableState_(nullptr),
-	pShader_(nullptr)
+X_INLINE Material::Material(core::MemoryArenaBase* arena) :
+	techs_(arena),
+	textures_(arena)
 {
 	id_ = -1;
 
@@ -15,6 +15,17 @@ X_INLINE Material::Material() :
 	cat_ = MaterialCat::CODE;
 }
 
+X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt)
+{
+	for (auto& tech : techs_)
+	{
+		if (tech.hash == hash && tech.vertFmt == vertFmt) {
+			return &tech;
+		}
+	}
+
+	return nullptr;
+}
 
 X_INLINE const int32_t Material::getID(void) const
 {
@@ -67,19 +78,9 @@ X_INLINE void Material::setCat(MaterialCat::Enum cat)
 	cat_ = cat;
 }
 
-X_INLINE void Material::setStateDesc(render::StateDesc& stateDesc)
+X_INLINE void Material::setTechDefState(TechDefState* pTechDefState)
 {
-	stateDesc_ = stateDesc;
-}
-
-X_INLINE void Material::setStateHandle(render::StateHandle handle)
-{
-	stateHandle_ = handle;
-}
-
-X_INLINE void Material::setVariableState(render::Commands::ResourceStateBase* pState)
-{
-	pVariableState_ = pState;
+	pTechDefState_ = pTechDefState;
 }
 
 // ---------------------------------------------
@@ -130,19 +131,9 @@ X_INLINE MaterialCat::Enum Material::getCat(void) const
 	return cat_;
 }
 
-X_INLINE const render::StateDesc& Material::getStateDesc(void) const
+X_INLINE TechDefState* Material::getTechDefState(void) const
 {
-	return stateDesc_;
-}
-
-X_INLINE render::StateHandle Material::getStateHandle(void) const
-{
-	return stateHandle_;
-}
-
-X_INLINE render::Commands::ResourceStateBase* Material::getVariableState(void) const
-{
-	return pVariableState_;
+	return pTechDefState_;
 }
 
 

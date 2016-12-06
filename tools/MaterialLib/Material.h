@@ -7,6 +7,8 @@
 #include <IRender.h>
 #include <IRenderCommands.h>
 
+#include <String\StringHash.h>
+
 X_NAMESPACE_DECLARE(render,
 
 	namespace Commands {
@@ -22,11 +24,38 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(engine)
 
+class TechSetDef;
+class TechDefState;
+
 class Material
 {
 public:
-	X_INLINE Material();
+	struct Tech
+	{
+		core::StrHash hash;
+		render::shader::VertexFormat::Enum vertFmt;
+		render::StateHandle stateHandle;
+		render::Commands::ResourceStateBase* pVariableState;
+	};
+
+	struct Texture
+	{
+		texture::TexID texId;
+		render::FilterType::Enum filterType;
+		render::TexRepeat::Enum texRepeat;
+	};
+
+	// god dam name hash even tho just int has a constructor.
+//	static_assert(core::compileTime::IsPOD<Tech>::Value, "Tech should be POD");
+
+	typedef core::Array<Tech> TechArr;
+	typedef core::Array<Texture> TextureArr;
+
+public:
+	X_INLINE Material(core::MemoryArenaBase* arena);
 	~Material() = default;
+
+	X_INLINE Tech* getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt);
 
 	// assigns the material props but name styas same etc.
 	MATLIB_EXPORT void assignProps(const Material& oth);
@@ -42,9 +71,7 @@ public:
 	X_INLINE void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffset);
 	X_INLINE void setMountType(MaterialMountType::Enum mt);
 	X_INLINE void setCat(MaterialCat::Enum cat);
-	X_INLINE void setStateDesc(render::StateDesc& stateDesc);
-	X_INLINE void setStateHandle(render::StateHandle handle);
-	X_INLINE void setVariableState(render::Commands::ResourceStateBase* pState);
+	X_INLINE void setTechDefState(TechDefState* pTechDefState);
 
 	// flag helpers.
 	X_INLINE bool isDrawn(void) const;
@@ -57,10 +84,7 @@ public:
 	X_INLINE MaterialPolygonOffset::Enum getPolyOffsetType(void) const;
 	X_INLINE MaterialMountType::Enum getMountType(void) const;
 	X_INLINE MaterialCat::Enum getCat(void) const;
-	X_INLINE const render::StateDesc& getStateDesc(void) const;
-	X_INLINE render::StateHandle getStateHandle(void) const;
-	X_INLINE render::Commands::ResourceStateBase* getVariableState(void) const;
-
+	X_INLINE TechDefState* getTechDefState(void) const;
 
 protected:
 	X_NO_COPY(Material);
@@ -88,17 +112,20 @@ protected:
 
 	// 4
 	uint8_t numTextures_;
-	uint8_t numCBs_; // the number of const buffers this material requires.
-	uint8_t __pad[2];
+	uint8_t __pad[3];
 
+	TechDefState* pTechDefState_;
 
-	// we store things like blend. cullType etc in the form required for passing to render system.
-	render::StateDesc stateDesc_;
-
-	// stuff if we have valid render device.
-	render::StateHandle stateHandle_; // the pipeline state required for this material.
-	render::Commands::ResourceStateBase* pVariableState_;
-	render::shader::IShader* pShader_;
+	TechArr techs_;
+	TextureArr textures_;
+	// this is old now, even tho never really used :D
+	// since the techs will store states for us.
+	// this makes it alot nicer since we will only have like maybe 200 techs max.
+	// so that results in only 200 calls to render system to make states.
+	// instead of having to ask the render system for every material.
+	// we also get the advantage of state livetime is not tied to the materials.
+	// so we can load/unload materials without having to re ask for states.
+	// this will also potentially make shader hot reloading more easy.
 };
 
 X_NAMESPACE_END
