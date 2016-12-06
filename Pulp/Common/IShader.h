@@ -33,12 +33,6 @@ static const uint32_t MAX_HW_SHADERS = 256;
 static const uint32_t MAX_SHADER_SOURCE = 256;
 
 
-static const char* DEFAULT_PS_ENTRY = "ps_main";
-static const char* DEFAULT_VS_ENTRY = "vs_main";
-static const char* DEFAULT_HS_ENTRY = "hs_main";
-static const char* DEFAULT_DS_ENTRY = "ds_main";
-static const char* DEFAULT_GS_ENTRY = "gs_main";
-
 
 // we have shader params that will need to be updated at diffrent rates.
 // so we should group them.
@@ -180,6 +174,15 @@ static_assert(staderTypeToStageFlag(ShaderType::Pixel) == ShaderStage::Pixel, "E
 static_assert(staderTypeToStageFlag(ShaderType::Geometry) == ShaderStage::Geometry, "Enum to flag helper logic error");
 static_assert(staderTypeToStageFlag(ShaderType::Hull) == ShaderStage::Hull, "Enum to flag helper logic error");
 static_assert(staderTypeToStageFlag(ShaderType::Domain) == ShaderStage::Domain, "Enum to flag helper logic error");
+
+
+static const char* DEFAULT_SHADER_ENTRY[ShaderStage::FLAGS_COUNT] = {
+	 "vs_main",
+	 "ps_main",
+	 "gs_main"
+	 "hs_main",
+	 "ds_main",
+};
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 //
