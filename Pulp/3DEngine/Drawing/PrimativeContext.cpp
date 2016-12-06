@@ -10,7 +10,6 @@
 
 #include "CmdBucket.h"
 #include "VariableStateManager.h"
-#include "CBufferManager.h"
 
 X_NAMESPACE_BEGIN(engine)
 
