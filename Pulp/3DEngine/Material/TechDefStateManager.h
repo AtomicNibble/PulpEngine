@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(engine)
 
 struct TechDefPerm
 {
-	render::shader::IShaderPermatation* pPerm;
+	render::shader::IShaderPermatation* pShaderPerm;
 	render::StateHandle stateHandle;
 };
 
