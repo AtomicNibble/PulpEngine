@@ -60,6 +60,19 @@ const T* FixedArray<T, N>::ptr(void) const
 	return begin();
 }
 
+template<typename T, size_t N>
+T* FixedArray<T, N>::data(void)
+{
+	return begin();
+}
+
+template<typename T, size_t N>
+const T* FixedArray<T, N>::data(void) const
+{
+	return begin();
+}
+
+
 
 // clear the list, no memory free
 template<typename T, size_t N>

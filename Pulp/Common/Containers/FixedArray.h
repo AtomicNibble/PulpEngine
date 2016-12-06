@@ -33,6 +33,9 @@ public:
 	T* ptr(void);
 	const T* ptr(void) const;
 
+	T* data(void);
+	const T* data(void) const;
+
 	// clear the list, no memory free
 	inline void clear(void);
 
