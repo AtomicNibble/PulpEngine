@@ -64,8 +64,6 @@ private:
 	void InitDefaults(void);
 
 private:
-	// typedef core::ReferenceCountedInstance<engine::Material, core::AtomicInt> MatResource;
-	// typedef core::HashMap<core::string, MatResource*> MaterialMap;
 	VariableStateManager& vsMan_;
 
 	MaterialContainer materials_;
