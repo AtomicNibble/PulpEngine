@@ -150,7 +150,7 @@ MatManager::MatResource* MatManager::createMatResource(const core::string& name)
 	X_ASSERT(materials_.find(name) == materials_.end(), "mat already exists")();
 
 	// create a new material.
-	auto pMatRes = X_NEW(MatResource, arena_, "MaterialRes");
+	auto pMatRes = X_NEW(MatResource, arena_, "MaterialRes")(arena_);
 	materials_.insert(MaterialMap::value_type(name, pMatRes));
 
 	// check we have correct default.
