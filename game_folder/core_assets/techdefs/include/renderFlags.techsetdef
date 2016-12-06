@@ -1,0 +1,159 @@
+
+RenderFlags( "none" )
+{
+}
+
+
+RenderFlags( "lit deferred opaque" )
+{
+	isGbuffer = true
+	isOpaque = true
+	castsShadows = true
+	isOccluder = true
+}
+
+RenderFlags( "lit deferred opaque nocull" ) : "lit deferred opaque"
+{
+	isDoubleSided = true
+}
+
+RenderFlags( "lit deferred opaque animating" ) : "lit deferred opaque"
+{
+	isAnimating = true
+}
+
+RenderFlags( "lit forward opaque" )
+{
+	isOpaque = true
+	castsShadows = true
+	requiresPrepass = true
+	isOccluder = true
+}
+
+RenderFlags( "emissive opaque" )
+{
+	isEmissive = true
+	isOpaque = true
+	castsShadows = true
+	requiresPrepass = true
+	isOccluder = true
+}
+
+RenderFlags( "emissive sky" )
+{
+	isEmissive = true
+	isOpaque = true
+	isSky = true
+}
+
+RenderFlags( "lit deferred semi opaque" ) : "lit deferred opaque"
+{
+	isOccluder = false
+	isDoubleSided = true
+}
+
+RenderFlags( "lit deferred semi opaque nocull" ) : "lit deferred semi opaque"
+{
+	isDoubleSided = true
+}
+
+RenderFlags( "lit deferred semi opaque animating" ) : "lit deferred semi opaque"
+{
+	isAnimating = true
+}
+
+RenderFlags( "lit deferred semi opaque nocull animating" ) : "lit deferred semi opaque nocull"
+{
+	isAnimating = true
+}
+
+RenderFlags( "lit forward semi opaque" ) : "lit forward opaque"
+{
+	isDoubleSided = true
+	isOccluder = false
+}
+
+RenderFlags( "lit forward semi opaque animating" ) : "lit forward semi opaque"
+{
+	isAnimating = true
+}
+
+RenderFlags( "emissive semi opaque" ) : "emissive opaque"
+{
+	isOccluder = false
+}
+
+RenderFlags( "lit forward sss" ) : "lit forward opaque"
+{
+	isDoubleSided = true
+	isSubSurfaceScattering = true
+}
+
+RenderFlags( "lit deferred decal" )
+{
+	isGbuffer = true
+	isDecal = true
+	noBspCollision = true
+}
+
+RenderFlags( "lit forward decal" )
+{
+	isDecal = true
+	noBspCollision = true
+}
+
+
+RenderFlags( "lit forward distortion" )
+{
+	isOpaque = true
+	needCurrentResolve = true
+}
+
+RenderFlags( "emissive decal" )
+{
+	isEmissive = true
+	isDecal = true
+	noBspCollision = true
+}
+
+RenderFlags( "lit transparent" )
+{
+	isTransparent = true
+	shouldSortIndices = true
+	isOccluder = false
+}
+
+RenderFlags( "lit transparent noduplicate" ) : "lit transparent"
+{
+	noDuplicate = true
+}
+
+RenderFlags( "lit transparent distortion" ) : "lit transparent"
+{
+	needOpaqueResolve   = true
+	needCurrentResolve	= true
+}
+
+RenderFlags( "lit transparent shadow" ) : "lit transparent"
+{
+	castsShadows = true
+}
+
+RenderFlags( "lit semi transparent" ) : "lit transparent"
+{
+	castsShadows = true
+	isDoubleSided = true
+}
+
+RenderFlags( "lit semi transparent animating" ) : "lit semi transparent"
+{
+	isAnimating = true
+}
+
+RenderFlags( "emissive transparent" )
+{
+	isTransparent = true
+	isEmissive = true
+	shouldSortIndices = true
+}
+

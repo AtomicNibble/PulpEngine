@@ -1,0 +1,18 @@
+#include <states>
+
+
+
+Technique( "unlit" )
+{
+	state = "add + nocull"
+
+	vs = VertexShader()
+	{
+		source = "techsetdef_2d.hlsl"
+	}
+	ps = PixelShader()
+	{
+		source = "techsetdef_2d.hlsl"
+	//	colorMapSampler = "colorMap"
+	}
+}

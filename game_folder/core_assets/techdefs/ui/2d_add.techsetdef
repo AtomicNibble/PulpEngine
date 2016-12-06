@@ -1,0 +1,20 @@
+#include <states>
+
+
+
+Technique( "unlit" )
+{
+	state = "add + nocull"
+
+	vs = VertexShader()
+	{
+		source = "Prim.hlsl"
+		entry = "PrimVS"
+	}
+	ps = PixelShader()
+	{
+		source = "Prim.hlsl"
+		entry = "PrimPS"
+	//	colorMapSampler = "colorMap"
+	}
+}
