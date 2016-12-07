@@ -53,6 +53,7 @@ class TechSetDef
 	typedef core::HashMap<core::string, render::StateDesc> StatesMap;
 	typedef core::HashMap<core::string, Technique> TechniqueMap;
 	typedef core::HashMap<core::string, Shader> ShaderMap;
+	typedef core::HashMap<core::string, render::TopoType::Enum> PrimMap;
 
 	typedef core::Array<char> FileBuf;
 
@@ -61,6 +62,7 @@ public:
 
 public:
 	TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
+	~TechSetDef();
 
 	// we need a api for getting the techs.
 	X_INLINE TechniqueMap::size_type numTechs(void) const;
@@ -99,6 +101,9 @@ private:
 	// RenderFlags
 	bool parseRenderFlags(core::XParser& lex);
 
+	// Primt
+	bool parsePrimitiveType(core::XParser& lex);
+	bool parsePrimitiveTypeData(core::XParser& lex, render::TopoType::Enum& topo);
 
 	// VertexShader
 	bool parseVertexShader(core::XParser& lex);
@@ -138,12 +143,14 @@ private:
 	bool stateExsists(const core::string& name, render::StateDesc* pStateOut = nullptr);
 	bool shaderExsists(const core::string& name, Shader* pShaderOut = nullptr);
 	bool techniqueExsists(const core::string& name);
+	bool primTypeExsists(const core::string& name);
 
 	render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
 	StencilState& addStencilState(const core::string& name, const core::string& parentName);
 	render::StateDesc& addState(const core::string& name, const core::string& parentName);
 	Shader& addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type);
 	Technique& addTechnique(const core::string& name, const core::string& parentName);
+	render::TopoType::Enum& addPrimType(const core::string& name, const core::string& parentName);
 
 	template<typename T>
 	static bool findHelper(core::HashMap<core::string, T>& map,
@@ -162,6 +169,7 @@ private:
 	StatesMap states_;
 	ShaderMap shaders_;
 	TechniqueMap techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
+	PrimMap prims_;
 };
 
 

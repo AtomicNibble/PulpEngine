@@ -28,10 +28,22 @@ TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	stencilStates_(arena, 16),
 	states_(arena, 128),
 	shaders_(arena, 16),
-	techs_(arena, 8)
+	techs_(arena, 8),
+	prims_(arena, 6)
 {
 
 }
+
+TechSetDef::~TechSetDef()
+{
+	blendStates_.free();
+	stencilStates_.free();
+	states_.free();
+	shaders_.free();
+	techs_.free();
+	prims_.free();
+}
+
 
 bool TechSetDef::parseFile(FileBuf& buf)
 {
@@ -123,6 +135,12 @@ bool TechSetDef::parseFile(core::XParser& lex)
 			case "GeometryShader"_fnv1a:
 				if (!parseGeoShader(lex)) {
 					X_ERROR("TestDefs", "Failed to parse GeometryShader");
+					return false;
+				}
+				break;
+			case "PrimitiveType"_fnv1a:
+				if (!parsePrimitiveType(lex)) {
+					X_ERROR("TestDefs", "Failed to parse PrimitiveType");
 					return false;
 				}
 				break;
@@ -636,7 +654,67 @@ bool TechSetDef::parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum
 
 bool TechSetDef::parseRenderFlags(core::XParser& lex)
 {
+	return false;
+}
 
+// ----------------------------------------------------
+
+
+bool TechSetDef::parsePrimitiveType(core::XParser& lex)
+{
+	core::string name, parentName;
+
+	// we have the name.
+	if (!parseName(lex, name, parentName)) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	if (primTypeExsists(name)) {
+		return false;
+	}
+
+	auto& prim = addPrimType(name, parentName);
+
+	return parsePrimitiveTypeData(lex, prim);
+}
+
+bool TechSetDef::parsePrimitiveTypeData(core::XParser& lex, render::TopoType::Enum& topo)
+{
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
+			return true;
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		{
+			// anything that is not Stencil or blend.
+			case "topo"_fnv1a:
+			{
+				if (!lex.ExpectTokenString("=")) {
+					return false;
+				}
+				
+				if (!lex.ReadToken(token)) {
+					return false;
+				}
+
+				topo = Util::TopoFromStr(token.begin(), token.end());
+				break;
+			}
+
+			default:
+				X_ERROR("TechDef", "Unknown PrimitiveType prop: \"%.*s\"", token.length(), token.begin());
+				return false;
+		}
+	}
 
 	return false;
 }
@@ -1250,6 +1328,12 @@ bool TechSetDef::techniqueExsists(const core::string& name)
 	return techs_.find(name) != techs_.end();
 }
 
+bool TechSetDef::primTypeExsists(const core::string& name)
+{
+	return prims_.find(name) != prims_.end();
+}
+
+
 render::BlendState& TechSetDef::addBlendState(const core::string& name, const core::string& parentName)
 {
 	return addHelper(blendStates_, name, parentName, "BlendState");
@@ -1278,6 +1362,10 @@ Technique& TechSetDef::addTechnique(const core::string& name, const core::string
 	return addHelper(techs_, name, parentName, "Tech");
 }
 
+render::TopoType::Enum& TechSetDef::addPrimType(const core::string& name, const core::string& parentName)
+{
+	return addHelper(prims_, name, parentName, "PrimitiveType");
+}
 
 template<typename T>
 X_INLINE bool TechSetDef::findHelper(core::HashMap<core::string, T>& map,
