@@ -469,6 +469,37 @@ namespace Util
 		}
 	}
 
+	render::TopoType::Enum TopoFromStr(const char* pBegin, const char* pEnd)
+	{
+		using namespace core::Hash::Fnva1Literals;
+
+		static_assert(render::TopoType::ENUM_COUNT == 5, "Added Topo types? this code needs updating.");
+
+		const size_t len = (pEnd - pBegin);
+		switch (core::Hash::Fnv1aHash(pBegin, len))
+		{
+			case "trianglelist"_fnv1a:
+			case "TriList"_fnv1a:
+				return render::TopoType::TRIANGLELIST;
+			case "trianglestrip"_fnv1a:
+			case "TriStrip"_fnv1a:
+				return render::TopoType::TRIANGLESTRIP;
+			case "linelist"_fnv1a:
+			case "LineList"_fnv1a:
+				return render::TopoType::LINELIST;
+			case "linestrip"_fnv1a:
+			case "LineStrip"_fnv1a:
+				return render::TopoType::LINESTRIP;
+			case "pointlist"_fnv1a:
+			case "PointList"_fnv1a:
+				return render::TopoType::POINTLIST;
+
+			default:
+				X_ERROR("Mtl", "Unknown TopoType func: '%.*s' (case-sen)", len, pBegin);
+				return render::TopoType::TRIANGLELIST;
+		}
+	}
+
 	render::StencilOperation::Enum StencilOpFromStr(const char* pBegin, const char* pEnd)
 	{
 		using namespace core::Hash::Fnva1Literals;
