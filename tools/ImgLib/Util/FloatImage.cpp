@@ -231,10 +231,10 @@ namespace Converter
 				for (uint32_t i = 0; i < numPixels; i++)
 				{
 					uint16_t* pPixel = reinterpret_cast<uint16_t*>(&pMipDst[i * 8]);
-					pPixel[0] = XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-					pPixel[1] = XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-					pPixel[2] = XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
-					pPixel[3] = XHalfCompressor::compress(math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
+					pPixel[0] = core::XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+					pPixel[1] = core::XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+					pPixel[2] = core::XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+					pPixel[3] = core::XHalfCompressor::compress(math<float>::clamp(pAlphaChannel[i], 0.f, 1.f));
 				}
 			}
 			else
@@ -242,9 +242,9 @@ namespace Converter
 				for (uint32_t i = 0; i < numPixels; i++)
 				{
 					uint16_t* pPixel = reinterpret_cast<uint16_t*>(&pMipDst[i * 8]);
-					pPixel[0] = XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
-					pPixel[1] = XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
-					pPixel[2] = XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
+					pPixel[0] = core::XHalfCompressor::compress(math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+					pPixel[1] = core::XHalfCompressor::compress(math<float>::clamp(pGreenChannel[i], 0.f, 1.f));
+					pPixel[2] = core::XHalfCompressor::compress(math<float>::clamp(pBlueChannel[i], 0.f, 1.f));
 					pPixel[3] = std::numeric_limits<uint16_t>::max();
 				}
 			}

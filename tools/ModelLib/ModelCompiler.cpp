@@ -868,8 +868,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 				const Vert& compiledVert = compiledMesh.verts_[x];
 
 				vert.pos = compiledVert.pos_;
-				vert.st[0] = XHalfCompressor::compress(compiledVert.uv_[0]);
-				vert.st[1] = XHalfCompressor::compress(compiledVert.uv_[1]);
+				vert.st = core::XHalf2::compress(compiledVert.uv_[0], compiledVert.uv_[1]);
 
 				stream.write(vert);
 			}
