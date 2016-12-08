@@ -546,6 +546,12 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 					return false;
 				}
 				break;
+			case "primitiveType"_fnv1a:
+				if (!parsePrimitiveType(lex, state.topo)) {
+					return false;
+				}
+				break;
+				
 
 			default:
 				X_ERROR("TechDef", "Unknown state prop: \"%.*s\"", token.length(), token.begin());
@@ -648,6 +654,13 @@ bool TechSetDef::parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum
 
 	polyOffset = Util::MatPolyOffsetFromStr(token.begin(), token.end());
 	return true;
+}
+
+
+bool TechSetDef::parsePrimitiveType(core::XParser& lex, render::TopoType::Enum& topo)
+{
+	return parseHelper<render::TopoType::Enum>(lex, topo, &TechSetDef::parsePrimitiveTypeData,
+		&TechSetDef::primTypeExsists, "State", "PrimitiveType");
 }
 
 // ----------------------------------------------------
@@ -1329,9 +1342,9 @@ bool TechSetDef::techniqueExsists(const core::string& name)
 	return techs_.find(name) != techs_.end();
 }
 
-bool TechSetDef::primTypeExsists(const core::string& name)
+bool TechSetDef::primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo)
 {
-	return prims_.find(name) != prims_.end();
+	return findHelper(prims_, name, pTopo);
 }
 
 

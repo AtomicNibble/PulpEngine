@@ -97,6 +97,7 @@ private:
 	bool parseCullMode(core::XParser& lex, render::CullType::Enum& cullOut);
 	bool parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& depthFuncOut);
 	bool parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum& polyOffset);
+	bool parsePrimitiveType(core::XParser& lex, render::TopoType::Enum& topo);
 
 	// RenderFlags
 	bool parseRenderFlags(core::XParser& lex);
@@ -143,7 +144,7 @@ private:
 	bool stateExsists(const core::string& name, render::StateDesc* pStateOut = nullptr);
 	bool shaderExsists(const core::string& name, Shader* pShaderOut = nullptr);
 	bool techniqueExsists(const core::string& name);
-	bool primTypeExsists(const core::string& name);
+	bool primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
 
 	render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
 	StencilState& addStencilState(const core::string& name, const core::string& parentName);
