@@ -38,7 +38,7 @@ struct Vertex_W4B_I4B
 struct Vertex_P3F_T2S
 {
 	Vec3f		pos;	// 12
-	Vec2<XHalf> st;		// 4
+	X_NAMESPACE(core)::XHalf2 st;		// 4
 }; // 16
 
 struct Vertex_P3F_T2S_C4B : public Vertex_P3F_T2S
