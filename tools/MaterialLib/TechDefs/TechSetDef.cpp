@@ -432,10 +432,6 @@ bool TechSetDef::parseState(core::XParser& lex)
 		return false;
 	}
 
-	if (!lex.ExpectTokenString("{")) {
-		return false;
-	}
-
 	if (stateExsists(name)) {
 		return false;
 	}
@@ -451,6 +447,10 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 
 	state.topo = render::TopoType::TRIANGLELIST;
 	state.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
 
 	core::XLexToken token;
 	while (lex.ReadToken(token))
