@@ -63,6 +63,16 @@ struct hash<core::StackString<N>>
 	}
 };
 
+template<typename CharT>
+struct hash<core::Path<CharT>>
+{
+	size_t operator()(const core::Path<CharT>& __s) const
+	{
+		return (size_t)core::Hash::Fnv1aHash(__s.c_str(), __s.length());
+	}
+};
+
+
 template<>
 struct hash<const char*>
 {
@@ -104,6 +114,15 @@ struct equal_to<core::StackString<N>>
 		return (_Left == _Right);
 	}
 };
+
+template<typename CharT>
+struct equal_to<core::Path<CharT>>
+{
+	bool operator()(const core::Path<CharT>& _Left, const core::Path<CharT>& _Right) const {
+		return (_Left == _Right);
+	}
+};
+
 
 template<>
 struct equal_to<const char*>
