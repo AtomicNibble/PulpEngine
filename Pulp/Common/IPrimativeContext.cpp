@@ -38,7 +38,7 @@ void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, 
 	y2 = y1 - height;
 
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
+	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
 	// TL
 	pQuad[0].pos.x = x1;
@@ -83,7 +83,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color& col)
 	x2 = rect.x2 - 1.f;
 	y2 = 1.f - rect.y2;
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
+	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
 	// TL
 	pQuad[0].pos.x = x1;
@@ -127,7 +127,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 	x2 = x1 + rect.getWidth();
 	y2 = y1 - rect.getHeight();
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
+	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
 
 	// TL
 	pQuad[0].pos.x = x1;
@@ -203,7 +203,7 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
 	const float fw = width;
 	const float fh = height;
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
+	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
 	// TL
 	pQuad[0].pos.x = fx;
@@ -232,7 +232,7 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
 
 void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col)
 {
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
+	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
 	pQuad[0].pos = pos0;
 	pQuad[1].pos = pos1;
@@ -255,7 +255,7 @@ void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col
 		return;
 	}
 
-	Vertex_P3F_T2F_C4B* pLine = addPrimative(num, PrimitiveType::LINELIST);
+	PrimVertex* pLine = addPrimative(num, PrimitiveType::LINELIST);
 
 	for (uint32_t i = 0; i < num / 2; i++)
 	{
@@ -270,7 +270,7 @@ void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col
 
 void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
 {
-	Vertex_P3F_T2F_C4B* pLine = addPrimative(2, PrimitiveType::LINELIST);
+	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
 	pLine[0].pos = pos1;
 	pLine[0].color = Color::white();
@@ -283,7 +283,7 @@ void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
 
 void IPrimativeContext::drawLineColor(const Vec3f& pos1, const Color& color1, const Vec3f& pos2, const Color& color2)
 {
-	Vertex_P3F_T2F_C4B* pLine = addPrimative(2, PrimitiveType::LINELIST);
+	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
 	pLine[0].pos = pos1;
 	pLine[0].color = color1;
@@ -331,13 +331,13 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHe
 
 	const Color8u col8(col);
 
-	Vertex_P3F_T2F_C4B* pQuads = addPrimative(num * 6, PrimitiveType::LINELIST);
+	PrimVertex* pQuads = addPrimative(num * 6, PrimitiveType::LINELIST);
 
 	// TL - TR - BR
 	// BR - BL - TL
 	for (uint32_t i = 0; i < num; i++)
 	{
-		Vertex_P3F_T2F_C4B* pQuad = &pQuads[i * 6];
+		PrimVertex* pQuad = &pQuads[i * 6];
 		float cur_bar = pHeights[i];
 
 		// TL
@@ -390,7 +390,7 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
 	X_ASSERT_NOT_NULL(t);
 	X_UNUSED(filtered);
 
-	Vertex_P3F_T2F_C4B* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
+	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
 
 	// TL
 	pQuad[0].pos.x = xpos;
