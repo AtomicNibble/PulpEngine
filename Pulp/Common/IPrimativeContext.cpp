@@ -3,6 +3,7 @@
 
 #include "Math\VertexFormats.h"
 
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -60,7 +61,7 @@ void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, 
 	for (uint32 i = 0; i<4; ++i)
 	{
 		pQuad[i].color = col;
-		pQuad[i].st = Vec2f::zero();
+		pQuad[i].st = core::XHalf2::zero();
 	}
 }
 
@@ -102,10 +103,11 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color& col)
 	pQuad[3].pos.y = y2;
 	pQuad[3].pos.z = z;
 
+
 	for (uint32 i = 0; i<4; ++i)
 	{
 		pQuad[i].color = col;
-		pQuad[i].st = Vec2f::zero();
+		pQuad[i].st = core::XHalf2::zero();
 	}
 }
 
@@ -149,7 +151,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 	for (uint32 i = 0; i<4; ++i)
 	{
 		pQuad[i].color = col;
-		pQuad[i].st = Vec2f(s[i], t[i]);
+		pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
 	}
 }
 
@@ -225,7 +227,7 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
 	for (uint32 i = 0; i<4; ++i)
 	{
 		pQuad[i].color = col;
-		pQuad[i].st = Vec2f::zero();
+		pQuad[i].st = core::XHalf2::zero();
 	}
 }
 
@@ -242,7 +244,7 @@ void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const V
 	for (uint32 i = 0; i < 4; ++i)
 	{
 		pQuad[i].color = col;
-		pQuad[i].st = Vec2f::zero();
+		pQuad[i].st = core::XHalf2::zero();
 	}
 }
 
@@ -261,10 +263,10 @@ void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col
 	{
 		pLine[i].pos = pPoints[i];
 		pLine[i].color = col;
-		pLine[i].st = Vec2<float32_t>::zero();
+		pLine[i].st = core::XHalf2::zero();
 		pLine[i + 1].pos = pPoints[i + 1];
 		pLine[i + 1].color = col;
-		pLine[i + 1].st = Vec2<float32_t>::zero();
+		pLine[i + 1].st = core::XHalf2::zero();
 	}
 }
 
@@ -274,11 +276,11 @@ void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
 
 	pLine[0].pos = pos1;
 	pLine[0].color = Color::white();
-	pLine[0].st = Vec2f::zero();
+	pLine[0].st = core::XHalf2::zero();
 
 	pLine[1].pos = pos2;
 	pLine[1].color = Color::white();
-	pLine[1].st = Vec2f::zero();
+	pLine[1].st = core::XHalf2::zero();
 }
 
 void IPrimativeContext::drawLineColor(const Vec3f& pos1, const Color& color1, const Vec3f& pos2, const Color& color2)
@@ -412,7 +414,7 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
 	for (uint32 i = 0; i<4; ++i)
 	{
 		pQuad[i].color = col;
-		pQuad[i].st = Vec2f(s[i], t[i]);
+		pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
 	}
 }
 

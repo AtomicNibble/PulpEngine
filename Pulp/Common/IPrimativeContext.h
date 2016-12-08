@@ -15,8 +15,8 @@ protected:
 	typedef render::TopoType PrimitiveType;
 
 public:
-	typedef Vertex_P3F_T2F_C4B PrimVertex;
-	static const auto VERTEX_FMT = render::shader::VertexFormat::P3F_T2F_C4B;
+	typedef Vertex_P3F_T2S_C4B PrimVertex;
+	static const auto VERTEX_FMT = render::shader::VertexFormat::P3F_T2S_C4B;
 
 public:
 	IPrimativeContext();
