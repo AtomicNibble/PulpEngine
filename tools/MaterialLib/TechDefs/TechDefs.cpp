@@ -7,6 +7,7 @@
 #include <String\Lexer.h>
 #include <String\XParser.h>
 #include <Hashing\Fnva1Hash.h>
+#include <Util\UniquePointer.h>
 
 #include <IFileSys.h>
 
@@ -134,7 +135,7 @@ X_NAMESPACE_BEGIN(engine)
 			return false;
 		}
 
-		TechSetDef* pTechDef = X_NEW(TechSetDef, arena_, "TechDef")(name, arena_);
+		core::UniquePointer<TechSetDef> pTechDef = core::makeUnique<TechSetDef>(arena_, name, arena_);
 
 		TechSetDef::OpenIncludeDel incDel;
 		incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
@@ -144,7 +145,7 @@ X_NAMESPACE_BEGIN(engine)
 			return false;
 		}
 
-		techDefs_.insert(TechSetDefMap::value_type(path, pTechDef));
+		techDefs_.insert(TechSetDefMap::value_type(path, pTechDef.release()));
 		return true;
 	}
 
