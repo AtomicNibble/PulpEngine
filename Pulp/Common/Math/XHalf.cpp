@@ -1,6 +1,9 @@
 #include <EngineCommon.h>
 #include "XHalf.h"
 
+X_NAMESPACE_BEGIN(core)
+
+
 namespace
 {
 	X_DISABLE_WARNING(4146)
@@ -735,3 +738,5 @@ float XHalfCompressor::decompress(uint16_t value)
 }
 
 X_ENABLE_WARNING(4244)
+
+X_NAMESPACE_END

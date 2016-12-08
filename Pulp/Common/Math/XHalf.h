@@ -4,6 +4,9 @@
 #define _H_MATH_HALF_H_
 
 #include <Math\XVector.h>
+#include <Util\CustomLiterals.h>
+
+X_NAMESPACE_BEGIN(core)
 
 typedef uint16_t XHalf;
 
@@ -73,6 +76,19 @@ struct XHalf2
 		y = rhs.y;
 		return *this;
 	}
+
+
+	static XHalf2 compress(float x, float y) {
+		return XHalf2(
+			XHalfCompressor::compress(x),
+			XHalfCompressor::compress(y)
+		);
+	}
+
+	static XHalf2 zero(void)
+	{
+		return XHalf2(0_u16, 0_u16);
+	}
 };
 
 struct XHalf4
@@ -120,9 +136,13 @@ struct XHalf4
 		);
 	}
 
+	static XHalf4 zero(void)
+	{
+		return XHalf4(0_u16,0_u16,0_u16,0_u16);
+	}
 };
 
 
-
+X_NAMESPACE_END
 
 #endif // !_H_MATH_HALF_H_
