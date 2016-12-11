@@ -21,24 +21,24 @@ public:
 	XSound();
 	virtual ~XSound() X_OVERRIDE;
 
-	virtual void registerVars(void) X_OVERRIDE;
-	virtual void registerCmds(void) X_OVERRIDE;
+	virtual void registerVars(void) X_FINAL;
+	virtual void registerCmds(void) X_FINAL;
 
-	virtual bool Init(void) X_OVERRIDE;
-	virtual void ShutDown(void) X_OVERRIDE;
-	virtual void release(void) X_OVERRIDE;
+	virtual bool Init(void) X_FINAL;
+	virtual void ShutDown(void) X_FINAL;
+	virtual void release(void) X_FINAL;
 
-	virtual void Update(void) X_OVERRIDE;
-	virtual void StopAll(void) X_OVERRIDE;
+	virtual void Update(void) X_FINAL;
+	virtual void StopAll(void) X_FINAL;
 
 	// Shut up!
-	virtual void Mute(bool mute) X_OVERRIDE;
+	virtual void Mute(bool mute) X_FINAL;
 
 	// Volume
-	virtual void SetMasterVolume(float v) X_OVERRIDE;
-	virtual void SetMusicVolume(float vol) X_OVERRIDE;
-	virtual void SetVoiceVolume(float vol) X_OVERRIDE;
-	virtual void SetSFXVolume(float vol) X_OVERRIDE;
+	virtual void SetMasterVolume(float v) X_FINAL;
+	virtual void SetMusicVolume(float vol) X_FINAL;
+	virtual void SetVoiceVolume(float vol) X_FINAL;
+	virtual void SetSFXVolume(float vol) X_FINAL;
 
 private:
 
