@@ -170,6 +170,7 @@ X_NAMESPACE_BEGIN(texture)
 			pTexRes->setWidth(dim.x);
 			pTexRes->setHeight(dim.y);
 			pTexRes->setFormat(fmt);
+			pTexRes->setType(texture::TextureType::T2D);
 
 
 			if (!createDeviceTexture(pTexRes)) {
