@@ -65,9 +65,8 @@ namespace shader
 	private:
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
 
-		XHWShader* hwForName(ShaderType::Enum type, const char* pShaderName, const core::string& entry,
-			SourceFile* pSourceFile, const TechFlags techFlags,
-			ILFlags ILFlags);
+		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry,
+			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
 
 	private:
 		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);

@@ -103,7 +103,7 @@ namespace shader
 
 	IHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile)
 	{
-		XHWShader* pHW = hwForName(type, "", entry, static_cast<SourceFile*>(pSourceFile), 0, 0);
+		XHWShader* pHW = hwForName(type, entry, static_cast<SourceFile*>(pSourceFile), 0, 0);
 
 		return pHW;
 	}
@@ -214,16 +214,15 @@ namespace shader
 	}
 
 
-	XHWShader* XShaderManager::hwForName(ShaderType::Enum type, const char* pShaderName, 
+	XHWShader* XShaderManager::hwForName(ShaderType::Enum type,
 		const core::string& entry, SourceFile* pSourceFile,
 		const TechFlags techFlags, ILFlags ILFlags)
 	{
-		X_ASSERT_NOT_NULL(pShaderName);
 		X_ASSERT_NOT_NULL(pSourceFile);
 
 		core::StackString512 name;
 
-		name.appendFmt("%s@%s", pShaderName, entry);
+		name.appendFmt("%s@%s", pSourceFile->getName().c_str(), entry);
 
 		// macros are now part of the name.
 		name.appendFmt("_%x", techFlags.ToInt());
