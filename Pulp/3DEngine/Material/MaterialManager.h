@@ -37,9 +37,9 @@ public:
 	void ShutDown(void);
 
 	// IMaterialManager
-	virtual Material* createMaterial(const char* pMtlName) X_OVERRIDE;
-	virtual Material* findMaterial(const char* pMtlName) const X_OVERRIDE;
-	virtual Material* loadMaterial(const char* pMtlName) X_OVERRIDE;
+	virtual Material* createMaterial(const char* pMtlName) X_FINAL;
+	virtual Material* findMaterial(const char* pMtlName) const X_FINAL;
+	virtual Material* loadMaterial(const char* pMtlName) X_FINAL;
 
 	void releaseMaterial(Material* pMat);
 
