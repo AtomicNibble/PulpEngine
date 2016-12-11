@@ -643,3 +643,23 @@ State( "forward opaque + nocull" ) : "forward opaque"
 
 
 
+
+PrimitiveType ("trilist")
+{
+	topo = "TriList"
+}
+
+PrimitiveType ("tristrip")
+{
+	topo = "TriStrip"
+}
+
+PrimitiveType ("pointlist")
+{
+	topo = "PointList"
+}
+
+PrimitiveType ("linelist")
+{
+	topo = "LineList"
+}

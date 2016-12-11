@@ -6,13 +6,14 @@ Technique( "unlit" )
 {
 	state = "add + nocull"
 
+	source = "Prim.hlsl"
+
 	vs = VertexShader()
 	{
-		source = "techsetdef_2d.hlsl"
+		entry = "PrimVS"
 	}
 	ps = PixelShader()
 	{
-		source = "techsetdef_2d.hlsl"
-	//	colorMapSampler = "colorMap"
+		entry = "PrimPS"
 	}
 }

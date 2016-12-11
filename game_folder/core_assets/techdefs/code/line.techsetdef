@@ -4,15 +4,19 @@
 
 Technique( "unlit" )
 {
-	state = "add + nocull"
+	state = State() : "add + nocull"
+	{
+		primitiveType = "linelist"
+	}
+
+	source = "Prim.hlsl"
 
 	vs = VertexShader()
 	{
-		source = "techsetdef_2d.hlsl"
+		entry = "PrimVS"
 	}
 	ps = PixelShader()
 	{
-		source = "techsetdef_2d.hlsl"
-	//	colorMapSampler = "colorMap"
+		entry = "PrimPS"
 	}
 }

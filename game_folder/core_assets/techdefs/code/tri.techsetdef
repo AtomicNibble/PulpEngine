@@ -4,7 +4,11 @@
 
 Technique( "unlit" )
 {
-	state = "add + nocull"
+	state = State() : "add + nocull"
+	{
+		primitiveType = "tristrip"
+	}
+
 	source = "Prim.hlsl"
 
 	vs = VertexShader()

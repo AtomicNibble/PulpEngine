@@ -1,0 +1,46 @@
+#include <states>
+
+/*
+Texture( "fontCache" )
+{
+	image = Image( <codeTexture00> )
+	semantic = "diffuse"
+
+	// for assMan
+	ass = AssProps()
+	{
+		cat  = "Details"
+		title     = "Detail Normal Map"
+	}
+}
+*/
+
+// define a sampler for it, that can't be edited in AssMan.
+Sampler( "fontCacheSampler" )
+{
+	repeat   = "tile both"
+	filter = "linear (mip none)"
+}
+
+Technique( "unlit" )
+{
+	state = "blend + nocull"
+	source = "Font.hlsl"
+
+	vs = VertexShader()
+	{
+		entry = "BasicVS"
+	}
+	ps = PixelShader()
+	{
+		entry = "FontPS"
+
+		// this defines a texture that is needed by the shader and says that the texture is from code.
+		fontCache = CodeTexture( "codeTexture0" )
+	}
+}
+
+
+
+// float1, float2, float4
+// bool, int, Texture, Sampler, Color
