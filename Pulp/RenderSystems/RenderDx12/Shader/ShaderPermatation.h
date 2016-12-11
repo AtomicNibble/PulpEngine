@@ -26,7 +26,7 @@ public:
 public:
 	ShaderPermatation(const ShaderStagesArr& stages, core::MemoryArenaBase* arena);
 
-	void postCompile(void);
+	void generateMeta(void);
 
 	bool isCompiled(void) const;
 

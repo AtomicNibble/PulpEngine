@@ -175,9 +175,11 @@ namespace shader
 				}
 			}
 
-			pPerm->postCompile();
 		}
 
+		// we still need to make cb links and get ilFmt even if all the hardware shaders are compiled.
+		pPerm->generateMeta();
+		
 		return pPerm.release();
 	}
 	

@@ -54,7 +54,7 @@ namespace shader
 		}
 	}
 
-	void ShaderPermatation::postCompile(void)
+	void ShaderPermatation::generateMeta(void)
 	{
 		if (isStageSet(ShaderType::Vertex))
 		{
