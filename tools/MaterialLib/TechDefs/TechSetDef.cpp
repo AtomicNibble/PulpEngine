@@ -269,6 +269,9 @@ bool TechSetDef::parseBlendState(core::XParser& lex)
 
 bool TechSetDef::parseBlendStateData(core::XParser& lex, render::BlendState& blend)
 {
+	// enagble all by default.
+	blend.writeMask = render::WriteMaskFlags(render::WriteMask::RED | render::WriteMask::GREEN | render::WriteMask::BLUE | render::WriteMask::ALPHA);
+
 	if (!lex.ExpectTokenString("{")) {
 		return false;
 	}
