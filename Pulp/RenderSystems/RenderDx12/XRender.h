@@ -124,70 +124,70 @@ public:
 	XRender(core::MemoryArenaBase* arena);
 	~XRender();
 
-	bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_OVERRIDE;
-	void shutDown(void) X_OVERRIDE;
-	void freeResources(void) X_OVERRIDE;
+	bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_FINAL;
+	void shutDown(void) X_FINAL;
+	void freeResources(void) X_FINAL;
 
-	void release(void) X_OVERRIDE;
+	void release(void) X_FINAL;
 
-	void registerVars(void) X_OVERRIDE;
-	void registerCmds(void) X_OVERRIDE;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	void renderBegin(void) X_OVERRIDE;
-	void renderEnd(void) X_OVERRIDE;
+	void renderBegin(void) X_FINAL;
+	void renderEnd(void) X_FINAL;
 
-	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_OVERRIDE;
+	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
+	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_FINAL;
 
-	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
+	Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
 
-	IRenderTarget* createRenderTarget(void) X_OVERRIDE;
-	void destoryRenderTarget(IRenderTarget* pRT) X_OVERRIDE;
-	IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_OVERRIDE;
+	IRenderTarget* createRenderTarget(void) X_FINAL;
+	void destoryRenderTarget(IRenderTarget* pRT) X_FINAL;
+	IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_FINAL;
 
 
-	VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
 
-	void destoryVertexBuffer(VertexBufferHandle handle) X_OVERRIDE;
-	void destoryIndexBuffer(IndexBufferHandle handle) X_OVERRIDE;
+	void destoryVertexBuffer(VertexBufferHandle handle) X_FINAL;
+	void destoryIndexBuffer(IndexBufferHandle handle) X_FINAL;
 
-	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
-	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
+	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
+	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 
 	// cb's
-	ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_OVERRIDE;
-	void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
+	ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
+	void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
 
 
-	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
-	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;
+	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
+	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
 
-	shader::IShaderSource* getShaderSource(const char* pName) X_OVERRIDE;
-	shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile) X_OVERRIDE;
-	shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_OVERRIDE;
-	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_OVERRIDE;
-
-
-	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
+	shader::IShaderSource* getShaderSource(const char* pName) X_FINAL;
+	shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile) X_FINAL;
+	shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_FINAL;
+	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_FINAL;
 
 
-	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_OVERRIDE;
-	void destoryPassState(PassStateHandle handle) X_OVERRIDE;
+	void releaseTexture(texture::ITexture* pTex) X_FINAL;
 
 
-	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
-	void destoryState(StateHandle handle) X_OVERRIDE;
+	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
+	void destoryPassState(PassStateHandle handle) X_FINAL;
+
+
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
+	void destoryState(StateHandle handle) X_FINAL;
 
 
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================
 
-	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
+	virtual IRenderAux* GetIRenderAuxGeo(void) X_FINAL;
 
 
 
