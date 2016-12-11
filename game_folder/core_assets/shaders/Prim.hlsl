@@ -1,11 +1,13 @@
 
+#include "Vertexbase.inc"
 
+/*
 cbuffer ObjectConstants  : register(b0)
 {
 	float4x4 worldToScreenMatrix;
 	float4x4 worldViewProjectionMatrix;
 };
-
+*/
 
 struct VS_INPUT
 {
