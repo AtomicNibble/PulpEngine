@@ -21,15 +21,15 @@ public:
 	virtual ~XFontSystem();
 
 	// IXFont
-	virtual bool Init(void) X_OVERRIDE;
-	virtual void ShutDown(void) X_OVERRIDE;
-	virtual void release(void) X_OVERRIDE;
+	virtual bool Init(void) X_FINAL;
+	virtual void ShutDown(void) X_FINAL;
+	virtual void release(void) X_FINAL;
 
-	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_OVERRIDE;
+	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
-	virtual IFont* NewFont(const char* pFontName) X_OVERRIDE;
-	virtual IFont* GetFont(const char* pFontName) const X_OVERRIDE;
-	virtual void ListFontNames(void) const X_OVERRIDE;
+	virtual IFont* NewFont(const char* pFontName) X_FINAL;
+	virtual IFont* GetFont(const char* pFontName) const X_FINAL;
+	virtual void ListFontNames(void) const X_FINAL;
 	// ~IXFont
 
 	// IXHotReload

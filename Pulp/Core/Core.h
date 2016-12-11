@@ -128,57 +128,57 @@ class XCore :
 	static const size_t MAX_CMD_ARS = 16;
 public:
 	XCore();
-	~XCore() X_OVERRIDE;
+	~XCore() X_FINAL;
 
-	virtual bool Init(const SCoreInitParams &startupParams) X_OVERRIDE;
+	virtual bool Init(const SCoreInitParams &startupParams) X_FINAL;
 	virtual void ShutDown(void); // not part of ICore currently
-	virtual void Release(void) X_OVERRIDE;
+	virtual void Release(void) X_FINAL;
 
 	virtual bool RunGameLoop(void) X_FINAL;
-	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
-	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_OVERRIDE;
-	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName) X_OVERRIDE;
+	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
+	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
+	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
 
 
-	X_INLINE core::ITimer* GetITimer(void) X_OVERRIDE;
-	X_INLINE input::IInput* GetIInput(void) X_OVERRIDE;
-	X_INLINE core::IConsole* GetIConsole(void) X_OVERRIDE;
-	X_INLINE core::IFileSys* GetIFileSys(void) X_OVERRIDE;
-	X_INLINE sound::ISound* GetISound(void) X_OVERRIDE;
-	X_INLINE engine::I3DEngine* Get3DEngine(void) X_OVERRIDE;
-	X_INLINE script::IScriptSys* GetISscriptSys(void) X_OVERRIDE;
-	X_INLINE render::IRender* GetIRender(void) X_OVERRIDE;
-	X_INLINE font::IFontSys* GetIFontSys(void) X_OVERRIDE;
-	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_OVERRIDE;
-	X_INLINE physics::IPhysics* GetPhysics(void) X_OVERRIDE;
+	X_INLINE core::ITimer* GetITimer(void) X_FINAL;
+	X_INLINE input::IInput* GetIInput(void) X_FINAL;
+	X_INLINE core::IConsole* GetIConsole(void) X_FINAL;
+	X_INLINE core::IFileSys* GetIFileSys(void) X_FINAL;
+	X_INLINE sound::ISound* GetISound(void) X_FINAL;
+	X_INLINE engine::I3DEngine* Get3DEngine(void) X_FINAL;
+	X_INLINE script::IScriptSys* GetISscriptSys(void) X_FINAL;
+	X_INLINE render::IRender* GetIRender(void) X_FINAL;
+	X_INLINE font::IFontSys* GetIFontSys(void) X_FINAL;
+	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_FINAL;
+	X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
 
-	X_INLINE core::IProfileSys* GetIProfileSys(void) X_OVERRIDE;
-	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_OVERRIDE;
-	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_OVERRIDE;
+	X_INLINE core::IProfileSys* GetIProfileSys(void) X_FINAL;
+	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
+	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
 	
-	X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_OVERRIDE;
-	X_INLINE core::ILog* GetILog(void) X_OVERRIDE;
-	X_INLINE core::Crc32* GetCrc32(void) X_OVERRIDE;
-	X_INLINE core::CpuInfo*	GetCPUInfo(void) X_OVERRIDE;
+	X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
+	X_INLINE core::ILog* GetILog(void) X_FINAL;
+	X_INLINE core::Crc32* GetCrc32(void) X_FINAL;
+	X_INLINE core::CpuInfo*	GetCPUInfo(void) X_FINAL;
 	
-	X_INLINE core::xWindow* GetGameWindow(void) X_OVERRIDE;
+	X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
 
-	X_INLINE SCoreGlobals* GetGlobalEnv(void) X_OVERRIDE;
-	X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_OVERRIDE;
+	X_INLINE SCoreGlobals* GetGlobalEnv(void) X_FINAL;
+	X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
 
-	IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_OVERRIDE;
+	IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
 
 private:
 	static SCoreGlobals env_;
 	static core::MallocFreeAllocator malloc_;
 
 public:
-	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_OVERRIDE;
-	virtual void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_OVERRIDE;
-	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
-	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+	virtual void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_FINAL;
+	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_FINAL;
 
-	virtual void OnFatalError(const char* format, va_list args) X_OVERRIDE;
+	virtual void OnFatalError(const char* format, va_list args) X_FINAL;
 
 private:
 	bool PumpMessages(void);

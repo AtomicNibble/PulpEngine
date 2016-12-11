@@ -53,28 +53,28 @@ public:
 
 
 	// IFont
-	void Release(void) X_OVERRIDE;
-	void Free(void) X_OVERRIDE;
-	void FreeBuffers(void) X_OVERRIDE;
-	void FreeTexture(void) X_OVERRIDE;
+	void Release(void) X_FINAL;
+	void Free(void) X_FINAL;
+	void FreeBuffers(void) X_FINAL;
+	void FreeTexture(void) X_FINAL;
 
 	X_INLINE texture::TexID getTextureId(void) const X_OVERRIDE;
 
-	bool loadFont(void) X_OVERRIDE;
+	bool loadFont(void) X_FINAL;
 
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_OVERRIDE;
+		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_FINAL;
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_OVERRIDE;
+		const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
-	size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_OVERRIDE;
-	size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_FINAL;
+	size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_FINAL;
 
 	// calculate the size.
-	Vec2f GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex) X_OVERRIDE;
-	Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex) X_FINAL;
+	Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex) X_FINAL;
 
-	int32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
+	int32_t GetEffectId(const char* pEffectName) const X_FINAL;
 
 	// ~IFont
 
