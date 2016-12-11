@@ -12,11 +12,48 @@
 X_NAMESPACE_BEGIN(engine)
 
 Shader::Shader() :
-	type(render::shader::ShaderType::UnKnown)
+	type(render::shader::ShaderType::UnKnown),
+	boundTextures(g_MatLibArena)
 {
 
 }
 
+//-------------------------------------------------
+
+Param::Param(const Param& oth)
+{
+	*this = oth;
+}
+
+Param& Param::operator=(const Param& oth)
+{
+	static_assert(ParamType::ENUM_COUNT == 7, "Added additional ParamType? this code needs updating.");
+
+	if (this != &oth)
+	{
+		type = oth.type;
+		assProps = oth.assProps;
+
+		switch (type)
+		{
+			case ParamType::Texture:
+				img = oth.img;
+				texSlot = oth.texSlot;
+				break;
+
+			case ParamType::Float1:
+			case ParamType::Float2:
+			case ParamType::Float4:
+			case ParamType::Int:
+			case ParamType::Bool:
+			case ParamType::Color:
+				vec4 = oth.vec4;
+				break;
+		}
+	}
+
+	return *this;
+}
 
 //-------------------------------------------------
 
@@ -29,7 +66,9 @@ TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	states_(arena, 128),
 	shaders_(arena, 16),
 	techs_(arena, 8),
-	prims_(arena, 6)
+	prims_(arena, 6),
+	params_(arena, 8),
+	samplers_(arena, 8)
 {
 
 }
@@ -141,6 +180,56 @@ bool TechSetDef::parseFile(core::XParser& lex)
 			case "PrimitiveType"_fnv1a:
 				if (!parsePrimitiveType(lex)) {
 					X_ERROR("TestDefs", "Failed to parse PrimitiveType");
+					return false;
+				}
+				break;
+
+			// params.
+			case "float1"_fnv1a:
+				if (!parseParamFloat1(lex)) {
+					X_ERROR("TestDefs", "Failed to parse float1");
+					return false;
+				}
+				break;
+			case "float2"_fnv1a:
+				if (!parseParamFloat2(lex)) {
+					X_ERROR("TestDefs", "Failed to parse float2");
+					return false;
+				}
+				break;
+			case "float4"_fnv1a:
+				if (!parseParamFloat4(lex)) {
+					X_ERROR("TestDefs", "Failed to parse float4");
+					return false;
+				}
+				break;
+			case "bool"_fnv1a:
+				if (!parseParamBool(lex)) {
+					X_ERROR("TestDefs", "Failed to parse bool");
+					return false;
+				}
+				break;
+			case "int"_fnv1a:
+				if (!parseParamInt(lex)) {
+					X_ERROR("TestDefs", "Failed to parse int");
+					return false;
+				}
+				break;
+			case "Texture"_fnv1a:
+				if (!parseParamTexture(lex)) {
+					X_ERROR("TestDefs", "Failed to parse Texture");
+					return false;
+				}
+				break;
+			case "Sampler"_fnv1a:
+				if (!parseParamSampler(lex)) {
+					X_ERROR("TestDefs", "Failed to parse Sampler");
+					return false;
+				}
+				break;
+			case "Color"_fnv1a:
+				if (!parseParamColor(lex)) {
+					X_ERROR("TestDefs", "Failed to parse Color");
 					return false;
 				}
 				break;
@@ -821,9 +910,39 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 				break;
 
 			default:
-				X_ERROR("TechDef", "Unknown Shader prop: \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(),
-					lex.GetFileName(), lex.GetLineNumber());
-				return false;
+			{
+				BoundTexture bt;
+				// we support defining bound textures.
+				// i would have to compile the perm to know if it's valid.
+				bt.resourceName = core::string(token.begin(), token.end());
+
+				if (!lex.ExpectTokenString("=")) {
+					return false;
+				}
+
+
+				if (!lex.ExpectTokenString("CodeTexture")) {
+					return false;
+				}
+
+				if (!lex.ExpectTokenString("(")) {
+					return false;
+				}
+
+				if (!lex.ReadToken(token)) {
+					return false;
+				}
+
+				bt.isCode = true;
+				bt.name = core::string(token.begin(), token.end());
+				bt.nameHash = core::StrHash(token.begin(), token.length());
+
+				if (!lex.ExpectTokenString(")")) {
+					return false;
+				}
+
+				shader.boundTextures.append(bt);
+			}
 		}
 	}
 
@@ -1028,6 +1147,353 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 }
 
 // ----------------------------------------------------
+
+bool TechSetDef::parseParamFloat1(core::XParser& lex)
+{
+
+	return false;
+}
+
+bool TechSetDef::parseParamFloat2(core::XParser& lex)
+{
+
+	return false;
+}
+
+bool TechSetDef::parseParamFloat4(core::XParser& lex)
+{
+
+	return false;
+}
+
+bool TechSetDef::parseParamColor(core::XParser& lex)
+{
+
+	return false;
+}
+
+bool TechSetDef::parseParamInt(core::XParser& lex)
+{
+
+	return false;
+}
+
+bool TechSetDef::parseParamBool(core::XParser& lex)
+{
+
+	return false;
+}
+
+bool TechSetDef::parseParamTexture(core::XParser& lex)
+{
+	core::string name, parentName;
+
+	// we have the name.
+	if (!parseName(lex, name, parentName)) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	if (paramExsists(name)) {
+		return false;
+	}
+
+	auto& param = addParam(name, parentName, ParamType::Texture);
+
+
+	// parse it.
+	// this is texture specific fields.
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
+			return true;
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		{
+			case "image"_fnv1a:
+				if (!parseParamImageData(lex, param.img)) {
+					return false;
+				}
+				break;
+			case "semantic"_fnv1a:
+				if (!parseParamTextureSlot(lex, param.texSlot)) {
+					return false;
+				}
+				break;
+			case "ass"_fnv1a:
+				if (!parseAssPropsData(lex, param.assProps)) {
+					return false;
+				}
+				break;
+
+			default:
+				X_ERROR("TechDef", "Unknown Texture state prop: \"%.*s\"", token.length(), token.begin());
+				return false;
+		}
+	}
+
+	// failed to read token
+	return false;
+}
+
+bool TechSetDef::parseParamTextureSlot(core::XParser& lex, render::TextureSlot::Enum& texSlot)
+{
+	if (!lex.ExpectTokenString("=")) {
+		return false;
+	}
+
+	core::XLexToken token;
+	if (!lex.ReadToken(token)) {
+		return false;
+	}
+
+	if (token.GetType() != core::TokenType::STRING) {
+		X_ERROR("TestDefs", "Expected string token for TextureSlot. Line: %" PRIi32, lex.GetLineNumber());
+		return false;
+	}
+
+	texSlot = Util::TextureSlotFromStr(token.begin(), token.end());
+	return true;
+}
+
+bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
+{
+	if (!lex.ExpectTokenString("=")) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("Image")) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("(")) {
+		return false;
+	}
+
+	{
+		// i want to support like defaults
+		// so for normal maps etc I can specify a default texture name.
+		// but I also want to be able to specify textures that only exsist at runtime.
+		// i guess i don't really need any special logic for that just need to give the runtime textures names.
+
+		if (!lex.ExpectTokenString("<")) {
+			return false;
+		}
+
+		core::XLexToken token;
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NAME) {
+			return false;
+		}
+
+		img.propName = core::string(token.begin(), token.end());
+
+		// now we have optional default value.
+		{
+			if (!lex.ReadToken(token)) {
+				return false;
+			}
+
+			if (token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::COMMA)
+			{
+				// default value.
+				if (!lex.ReadToken(token)) {
+					return false;
+				}
+
+				if (token.GetType() != core::TokenType::NAME) {
+					return false;
+				}
+
+				img.default = core::string(token.begin(), token.end());
+			}
+			else
+			{
+				lex.UnreadToken(token);
+			}
+		}
+
+		if (!lex.ExpectTokenString(">")) {
+			return false;
+		}
+	}
+
+	if (!lex.ExpectTokenString(")")) {
+		return false;
+	}
+
+	return true;
+}
+
+bool TechSetDef::parseParamSampler(core::XParser& lex)
+{
+	core::string name, parentName;
+
+	// we have the name.
+	if (!parseName(lex, name, parentName)) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	if (samplerExsists(name)) {
+		return false;
+	}
+
+	auto& sampler = addSampler(name, parentName);
+
+	// parse it.
+	// this is texture specific fields.
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
+			return true;
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		bool isExplicit;
+
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		{
+			case "repeat"_fnv1a:
+				// we need to parse it can be a string or punctiation.
+				if (!parsePropName(lex, sampler.repeatStr, isExplicit)) {
+					return false;
+				}
+
+				if (isExplicit) {
+					sampler.repeat = Util::TexRepeatFromStr(sampler.repeatStr.begin(), sampler.repeatStr.end());
+				}
+				break;
+			case "filter"_fnv1a:
+				if (!parsePropName(lex, sampler.filterStr, isExplicit)) {
+					return false;
+				}
+
+				if (isExplicit) {
+					sampler.filter = Util::FilterTypeFromStr(sampler.filterStr.begin(), sampler.filterStr.end());
+				}
+				break;
+
+			default:
+				X_ERROR("TechDef", "Unknown Sampler state prop: \"%.*s\"", token.length(), token.begin());
+				return false;
+		}
+	}
+
+	// failed to read token
+	return false;
+}
+
+bool TechSetDef::parsePropName(core::XParser& lex, core::string& str, bool& isExplicit)
+{
+	if (!lex.ExpectTokenString("=")) {
+		return false;
+	}
+
+	core::XLexToken token;
+	if (!lex.ReadToken(token)) {
+
+		return false;
+	}
+
+	if (token.GetType() == core::TokenType::PUNCTUATION)
+	{
+		if (token.GetPuncId() != core::PunctuationId::LOGIC_GREATER) {
+			return false;
+		}
+
+		if (!lex.ReadToken(token)) {
+
+			return false;
+		}
+
+		str = core::string(token.begin(), token.end());
+		isExplicit = false;
+
+		if (!lex.ExpectTokenString(">")) {
+			return false;
+		}
+	}
+	else if(token.GetType() == core::TokenType::STRING)
+	{
+		str = core::string(token.begin(), token.end());
+		isExplicit = true;
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool TechSetDef::parseAssPropsData(core::XParser& lex, AssManProps& props)
+{
+	core::string name, parentName;
+
+	if (!parseInlineDefine(lex, name, parentName, "AssProps")) {
+		return false;
+	}
+
+	if (parentName.isNotEmpty()) {
+		X_ERROR("TechDef", "Parent name not supported for 'AssProps' File: %s:%" PRId32, lex.GetFileName(), lex.GetLineNumber());
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
+			return true;
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		{
+			case "cat"_fnv1a:
+				if (!parseString(lex, props.cat)) {
+					return false;
+				}
+				break;
+			case "title"_fnv1a:
+				if (!parseString(lex, props.title)) {
+					return false;
+				}
+				break;
+
+			default:
+				X_ERROR("TechDef", "Unknown AssProp prop: \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(),
+					lex.GetFileName(), lex.GetLineNumber());
+				return false;
+		}
+	}
+
+	return false;
+}
+
+
+// ----------------------------------------------------
+
 
 bool TechSetDef::parseBool(core::XParser& lex, bool& out)
 {
@@ -1347,6 +1813,15 @@ bool TechSetDef::primTypeExsists(const core::string& name, render::TopoType::Enu
 	return findHelper(prims_, name, pTopo);
 }
 
+bool TechSetDef::paramExsists(const core::string& name, Param* pParam)
+{
+	return findHelper(params_, name, pParam);
+}
+
+bool TechSetDef::samplerExsists(const core::string& name, Sampler* pSampler)
+{
+	return findHelper(samplers_, name, pSampler);
+}
 
 render::BlendState& TechSetDef::addBlendState(const core::string& name, const core::string& parentName)
 {
@@ -1380,6 +1855,20 @@ render::TopoType::Enum& TechSetDef::addPrimType(const core::string& name, const 
 {
 	return addHelper(prims_, name, parentName, "PrimitiveType");
 }
+
+Param& TechSetDef::addParam(const core::string& name, const core::string& parentName, ParamType::Enum type)
+{
+	auto& p = addHelper(params_, name, parentName, ParamType::ToString(type));
+	p.type = type;
+	return p;
+}
+
+Sampler& TechSetDef::addSampler(const core::string& name, const core::string& parentName)
+{
+	auto& p = addHelper(samplers_, name, parentName, "Sampler");
+	return p;
+}
+
 
 template<typename T>
 X_INLINE bool TechSetDef::findHelper(core::HashMap<core::string, T>& map,

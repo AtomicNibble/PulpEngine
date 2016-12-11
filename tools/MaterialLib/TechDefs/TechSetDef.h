@@ -25,14 +25,26 @@ struct StencilState
 	bool enabled;
 };
 
+struct BoundTexture
+{
+	bool isCode;
+	core::string resourceName;
+	core::string name;
+	core::StrHash nameHash;
+};
+
 struct Shader
 {
+	typedef core::Array<BoundTexture> BoundTexturesArr;
+
 	Shader();
 
 	render::shader::ShaderType::Enum type;
 	core::string source;
 	core::string entry;
 	core::string defines;
+
+	BoundTexturesArr boundTextures;
 };
 
 struct Technique
@@ -46,6 +58,74 @@ struct Technique
 	Shader shaders[render::shader::ShaderType::ENUM_COUNT - 1];
 };
 
+struct AssManProps
+{
+	core::string cat; // the assetScript cat.
+	core::string title;
+	core::string default;
+};
+
+struct Image
+{
+	core::string propName;
+	core::string default;
+};
+
+// the names of these are used directly as the define names (case sensitive)
+X_DECLARE_ENUM(ParamType)(
+	Float1,
+	Float2,
+	Float4,
+	Int,
+	Bool,
+	Color,
+	Texture
+);
+
+struct Param
+{
+	Param() = default;
+	Param(const Param& oth);
+
+	Param& operator=(const Param& oth);
+
+
+	ParamType::Enum type;
+
+	// we can store most params in this.
+	// bool, int, float1, float2, float4, color
+	Vec4f vec4;
+
+	// texture stuff
+	render::TextureSlot::Enum texSlot;
+	Image img;
+
+	// for assetManager
+	AssManProps assProps;
+};
+
+struct Sampler
+{
+	Sampler() :
+		repeat(static_cast<render::TexRepeat::Enum>(0xff)),
+		filter(static_cast<render::FilterType::Enum>(0xff))
+	{}
+
+	bool isRepeateDefined(void) const {
+		return repeat != static_cast<render::TexRepeat::Enum>(0xff);
+	}
+	bool isFilterDefined(void) const {
+		return filter != static_cast<render::FilterType::Enum>(0xff);
+	}
+
+
+	core::string repeatStr;
+	core::string filterStr;
+
+	render::TexRepeat::Enum repeat;
+	render::FilterType::Enum filter;
+};
+
 class TechSetDef
 {
 	typedef core::HashMap<core::string, render::BlendState> BlendStatesMap;
@@ -54,6 +134,8 @@ class TechSetDef
 	typedef core::HashMap<core::string, Technique> TechniqueMap;
 	typedef core::HashMap<core::string, Shader> ShaderMap;
 	typedef core::HashMap<core::string, render::TopoType::Enum> PrimMap;
+	typedef core::HashMap<core::string, Param> ParamMap;
+	typedef core::HashMap<core::string, Sampler> SamplerMap;
 
 	typedef core::Array<char> FileBuf;
 
@@ -68,6 +150,14 @@ public:
 	X_INLINE TechniqueMap::size_type numTechs(void) const;
 	X_INLINE TechniqueMap::const_iterator techBegin(void) const;
 	X_INLINE TechniqueMap::const_iterator techEnd(void) const;
+
+	X_INLINE ParamMap::size_type numParams(void) const;
+	X_INLINE ParamMap::const_iterator paramBegin(void) const;
+	X_INLINE ParamMap::const_iterator paramEnd(void) const;
+
+	X_INLINE SamplerMap::size_type numSampler(void) const;
+	X_INLINE SamplerMap::const_iterator samplerBegin(void) const;
+	X_INLINE SamplerMap::const_iterator samplerEnd(void) const;
 
 	bool parseFile(FileBuf& buf);
 	bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
@@ -125,7 +215,22 @@ private:
 	bool parseShaderStage(core::XParser& lex, Technique& tech, render::shader::ShaderType::Enum stage);
 	bool parseShaderStageHelper(core::XParser& lex, Shader& shader, render::shader::ShaderType::Enum stage);
 
+	// params
+	bool parseParamFloat1(core::XParser& lex);
+	bool parseParamFloat2(core::XParser& lex);
+	bool parseParamFloat4(core::XParser& lex);
+	bool parseParamColor(core::XParser& lex);
+	bool parseParamInt(core::XParser& lex);
+	bool parseParamBool(core::XParser& lex);
+	bool parseParamTexture(core::XParser& lex);
+	bool parseParamTextureSlot(core::XParser& lex, render::TextureSlot::Enum& texSlot);
+	bool parseParamImageData(core::XParser& lex, Image& props);
+	bool parseParamSampler(core::XParser& lex);
+	bool parseAssPropsData(core::XParser& lex, AssManProps& props);
 
+	bool parsePropName(core::XParser& lex, core::string& str, bool& isExplicit);
+
+	// Helpers.
 	bool parseBool(core::XParser& lex, bool& out);
 	bool parseString(core::XParser& lex, core::string& out);
 	bool parseDefines(core::XParser& lex, core::string& out);
@@ -145,6 +250,8 @@ private:
 	bool shaderExsists(const core::string& name, Shader* pShaderOut = nullptr);
 	bool techniqueExsists(const core::string& name);
 	bool primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
+	bool paramExsists(const core::string& name, Param* pParam = nullptr);
+	bool samplerExsists(const core::string& name, Sampler* pSampler= nullptr);
 
 	render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
 	StencilState& addStencilState(const core::string& name, const core::string& parentName);
@@ -152,6 +259,8 @@ private:
 	Shader& addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type);
 	Technique& addTechnique(const core::string& name, const core::string& parentName);
 	render::TopoType::Enum& addPrimType(const core::string& name, const core::string& parentName);
+	Param& addParam(const core::string& name, const core::string& parentName, ParamType::Enum type);
+	Sampler& addSampler(const core::string& name, const core::string& parentName);
 
 	template<typename T>
 	static bool findHelper(core::HashMap<core::string, T>& map,
@@ -171,6 +280,8 @@ private:
 	ShaderMap shaders_;
 	TechniqueMap techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
 	PrimMap prims_;
+	ParamMap params_;
+	SamplerMap samplers_;
 };
 
 
