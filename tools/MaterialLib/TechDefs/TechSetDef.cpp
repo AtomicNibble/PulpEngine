@@ -598,6 +598,26 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 				if (!parseBlendState(lex, state.blend)) {
 					return false;
 				}
+
+				// work out if blend state should be anbled.
+				if (
+					state.blend.colorOp != render::BlendOp::OP_ADD ||
+					state.blend.dstBlendColor != render::BlendType::ONE ||
+					state.blend.srcBlendColor != render::BlendType::ZERO ||
+					state.blend.alphaOp != render::BlendOp::OP_ADD ||
+					state.blend.dstBlendAlpha != render::BlendType::ONE ||
+					state.blend.srcBlendAlpha != render::BlendType::ZERO ||
+					// enable if wrtie mask diffrent?
+					!state.blend.writeMask.AreAllSet()
+					)
+				{
+					// check for disabled op's also.
+					if (state.blend.colorOp != render::BlendOp::DISABLE && state.blend.alphaOp != render::BlendOp::DISABLE)
+					{
+						state.stateFlags.Set(render::StateFlag::BLEND);
+					}
+				}
+
 				break;
 			case "cull"_fnv1a:
 				if (!parseCullMode(lex, state.cullType)) {
