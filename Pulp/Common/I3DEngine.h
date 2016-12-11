@@ -10,6 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 X_DECLARE_ENUM(PrimContext)(CONSOLE, GUI, PROFILE);
 
 class IPrimativeContext;
+struct IMaterialManager;
 
 struct I3DEngine
 {
@@ -30,6 +31,7 @@ struct I3DEngine
 	// each enum has a instance, and you don't own the pointer.
 	virtual IPrimativeContext* getPrimContext(PrimContext::Enum user) X_ABSTRACT;
 
+	virtual IMaterialManager* getMaterialManager(void) X_ABSTRACT;
 };
 
 

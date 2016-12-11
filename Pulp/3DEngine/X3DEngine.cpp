@@ -508,6 +508,11 @@ IPrimativeContext* X3DEngine::getPrimContext(PrimContext::Enum user)
 	return &primContexts_[user];
 }
 
+IMaterialManager* X3DEngine::getMaterialManager(void)
+{
+	return pMaterialManager_;
+}
+
 void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
 	// do nothing for now.

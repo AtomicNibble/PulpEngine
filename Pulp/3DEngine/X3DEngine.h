@@ -38,6 +38,7 @@ public:
 
 
 	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_OVERRIDE;
+	IMaterialManager* getMaterialManager(void) X_OVERRIDE;
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
