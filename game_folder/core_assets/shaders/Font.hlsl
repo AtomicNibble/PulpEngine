@@ -29,14 +29,14 @@ struct PS_OUTPUT
 };
 
 
-Texture2D  	       baseMap : register(t0);
-SamplerState        baseMapSampler;
+Texture2D  	       fontCache : register(t0);
+SamplerState        fontCacheSampler;
 
 
 VS_OUTPUT BasicVS(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.ssPosition        	= mul(float4(input.osPosition, 1.0), worldToScreenMatrix);
+    output.ssPosition        	= mul( worldToScreenMatrix, float4(input.osPosition, 1.0) );
     output.texCoord          	= input.texCoord;
     output.color             	= input.color;
     return output;
@@ -47,6 +47,6 @@ PS_OUTPUT FontPS(PS_INPUT input)
 {
     PS_OUTPUT output;
     output.color = input.color;
-    output.color.a *= baseMap.Sample(baseMapSampler, input.texCoord).a;
+    output.color.a *= fontCache.Sample(fontCacheSampler, input.texCoord).a;
     return output;
 }
