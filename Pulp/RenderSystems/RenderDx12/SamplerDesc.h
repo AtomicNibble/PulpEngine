@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Containers\HashMap.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -22,14 +23,32 @@ public:
 	SamplerDescriptor() = default;
 	X_INLINE SamplerDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptor);
 
-	void create(ID3D12Device* pDevice, DescriptorAllocator& allocator, const D3D12_SAMPLER_DESC& Desc);
-
 	X_INLINE D3D12_CPU_DESCRIPTOR_HANDLE getCpuDescriptorHandle(void) const;
 
 protected:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptorHandle_;
 };
+
+class SamplerDescriptorCache
+{
+	typedef core::HashMap<core::Hash::xxHash64::HashVal, SamplerDescriptor> DescriptorMap;
+
+public:
+	SamplerDescriptorCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
+
+
+	SamplerDescriptor createDescriptor(DescriptorAllocator& allocator, const SamplerState state);
+	SamplerDescriptor createDescriptor(DescriptorAllocator& allocator, const D3D12_SAMPLER_DESC& desc);
+
+private:
+	static core::Hash::xxHash64::HashVal hashDesc(const D3D12_SAMPLER_DESC& desc);
+
+private:
+	ID3D12Device* pDevice_;
+	DescriptorMap map_;
+};
+
 
 X_NAMESPACE_END
 

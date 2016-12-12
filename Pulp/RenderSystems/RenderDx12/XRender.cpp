@@ -47,7 +47,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pDescriptorAllocatorPool_(nullptr),
 	pRootSigCache_(nullptr),
 	pPSOCache_(nullptr),
-	presentRS_(arena),
+//	presentRS_(arena),
 	currentBufferIdx_(0),
 	auxQues_ {arena, arena} 
 {
@@ -266,6 +266,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 
 	// Samplers.
+#if 0
 	samplerLinearWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerLinearWrap_.create(pDevice_, descriptorAllocator, samplerLinearWrapDesc_);
 
@@ -297,8 +298,10 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	samplerLinearBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
 	samplerLinearBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
 	samplerLinearBorder_.create(pDevice_, descriptorAllocator, samplerLinearBorderDesc_);
+#endif
 
 	// RootSig
+#if 0
 	presentRS_.reset(4, 2);
 	presentRS_.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
 	presentRS_.getParamRef(1).initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
@@ -307,7 +310,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	presentRS_.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
 	presentRS_.initStaticSampler(1, samplerPointClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
 	presentRS_.finalize(*pRootSigCache_);
-
+#endif
 
 	pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
 	if (!pShaderMan_->init()) {
@@ -334,7 +337,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 void XRender::shutDown(void)
 {
-	presentRS_.free();
+//	presentRS_.free();
 
 	if (pBuffMan_) {
 		pBuffMan_->shutDown();
