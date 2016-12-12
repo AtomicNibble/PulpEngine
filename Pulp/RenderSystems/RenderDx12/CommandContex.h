@@ -286,9 +286,6 @@ public:
 	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);
 	X_INLINE void setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle);
 
-	X_INLINE void setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
-	X_INLINE void setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
-
 	X_INLINE void dispatch(size_t groupCountX = 1, size_t groupCountY = 1, size_t groupCountZ = 1);
 	X_INLINE void dispatch1D(size_t threadCountX, size_t groupSizeX = 64);
 	X_INLINE void dispatch2D(size_t threadCountX, size_t threadCountY, size_t groupSizeX = 8, size_t groupSizeY = 8);

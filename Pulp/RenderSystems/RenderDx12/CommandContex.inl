@@ -459,16 +459,6 @@ X_INLINE void ComputeContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_D
 	pCommandList_->SetComputeRootDescriptorTable(rootIndex, firstHandle);
 }
 
-X_INLINE void ComputeContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
-{
-	setDynamicDescriptors(rootIndex, offset, 1, &handle);
-}
-
-X_INLINE void ComputeContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
-{
-	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
-}
-
 
 X_INLINE void ComputeContext::dispatch(size_t groupCountX, size_t groupCountY, size_t groupCountZ)
 {
