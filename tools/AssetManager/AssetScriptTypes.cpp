@@ -523,6 +523,13 @@ std::string AssetScriptProps::getMaterialTypes(std::string& catStr)
 	return s;
 }
 
+void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& typeStr)
+{
+	const engine::MaterialCat::Enum cat = engine::Util::MatCatFromStr(catStr.data(), catStr.data() + catStr.length());
+
+	X_UNUSED(typeStr);
+}
+
 AssetScriptProperty* AssetScriptProps::getProperty(const std::string& key, AssetProperty::PropertyType::Enum type)
 {
 	AssetScriptProperty* pScriptProp = nullptr;

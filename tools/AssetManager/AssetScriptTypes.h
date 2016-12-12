@@ -101,6 +101,7 @@ public:
 
 	std::string getMaterialCats(void);
 	std::string getMaterialTypes(std::string& cat);
+	void addMaterialTypeProps(std::string& cat, std::string& type);
 
 private:
 	AssetScriptProperty* getProperty(const std::string& key, AssetProperty::PropertyType::Enum type);
