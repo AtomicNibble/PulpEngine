@@ -31,6 +31,34 @@ private:
 	core::Array<ID3D12DescriptorHeap*> descriptorHeapPool_;
 };
 
+
+//
+// This is a linear allocator for dynamic generated descriptor tables.
+// It internally caches the handles so can move to a new descriptor heap if we run out of room.
+//
+// The class requires the rootSig to be set so we can get info on what rootIdx are descriptor tables and create caches for each.
+// We have a 'DescriptorTableCache' for each rootIdx that is a descriptor table.
+//
+// Note this class ignores sampler descriptorTables..
+//
+// We have a 'DescriptorHandleCache' for compute and one for graphics.
+// Each one has support for MAXNUM_DESCRIPTOR_TABLES descriptor tables with a max root index of MAXNUM_DESCRIPTOR_TABLES.
+// MAXNUM_DESCRIPTORS is the max descriptors across all descriptor ranges.
+// each DescriptorTableCache places it's cache in this single buffer.
+// 
+// 
+// calling 'setGraphicsDescriptorHandles' copy's the descriptors into to cpu cache for that rootIdx and marks the rootIdx as stale.
+// it does not perform redudancy checks currently but could.
+// 
+// calling commitGraphicsRootDescriptorTables is no-op if no params are stale aka no calls to 'setGraphicsDescriptorHandles' since last time.
+// when there are stale params it first work out how much space is needed to store all descriptors for each stale rootIdx.
+// if the current bound descriptorHeap is full we allocate a new one and mark all params as stale.
+// next we ensure the decriptor heap is correct for the current context.
+// now for each rootIDx that is stale we update the rootIdx descriptor table pointer by calling 'ID3D12GraphicsCommandList::SetGraphicsRootDescriptorTable'
+// then it proceesed to upload the cpu descriptor handles to the dscriptorheap in batches of MAX_DESCRIPTORS_PER_COPY by calling  pDevice->CopyDescriptors
+//
+//
+//
 class DynamicDescriptorHeap
 {
 	typedef core::traits::MemberFunctionStd<ID3D12GraphicsCommandList, 
@@ -50,8 +78,8 @@ private:
 	struct DescriptorHandleCache
 	{
 		static const uint32_t MAXNUM_DESCRIPTOR_TABLES = 16;
-		static const uint32_t MAXNUM_DESCRIPTORS = 256;
-		static const uint32_t MAX_DESCRIPTORS_PER_COPY = 16;
+		static const uint32_t MAXNUM_DESCRIPTORS = 64;
+		static const uint32_t MAX_DESCRIPTORS_PER_COPY = 16; // max we send to device::CopyDescriptors at once.
 
 	public:
 		DescriptorHandleCache();
