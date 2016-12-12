@@ -484,6 +484,8 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 {
 	bool anyChanged = false;
 
+	X_ASSERT(heapCount <= 2, "Can't set more than 2 descriptor heaps")(heapCount);
+
 	for (uint32_t i = 0; i < heapCount; ++i)
 	{
 		X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")(pTypes[i]);
