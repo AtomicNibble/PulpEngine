@@ -163,6 +163,7 @@ protected:
 	ID3D12PipelineState* pCurComputePipelineState_;
 
 	DynamicDescriptorHeap dynamicDescriptorHeap_;
+	DynamicDescriptorHeap dynamicSamplerDescriptorHeap_;
 
 	LinearAllocator cpuLinearAllocator_;
 	LinearAllocator gpuLinearAllocator_;
@@ -237,6 +238,9 @@ public:
 
 	X_INLINE void setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
 	X_INLINE void setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
+
+	X_INLINE void setDynamicSamplerDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	X_INLINE void setDynamicSamplerDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
 
 	X_INLINE void setIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& IBView);
 	X_INLINE void setVertexBuffer(uint32_t slot, const D3D12_VERTEX_BUFFER_VIEW& VBView);

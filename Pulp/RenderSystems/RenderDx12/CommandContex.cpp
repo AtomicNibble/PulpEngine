@@ -128,7 +128,8 @@ CommandContext::CommandContext(ContextManager& contexMan, core::MemoryArenaBase*
 	pCurGraphicsPipelineState_(nullptr),
 	pCurComputeRootSignature_(nullptr),
 	pCurComputePipelineState_(nullptr),
-	dynamicDescriptorHeap_(arena, pDevice, pool, *this),
+	dynamicDescriptorHeap_(arena, pDevice, pool, *this, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV),
+	dynamicSamplerDescriptorHeap_(arena, pDevice, pool, *this, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER),
 	cpuLinearAllocator_(arena, linAllocMan, LinearAllocatorType::CPU_WRITABLE),
 	gpuLinearAllocator_(arena, linAllocMan, LinearAllocatorType::GPU_EXCLUSIVE),
 	numBarriersToFlush_(0)
@@ -214,6 +215,7 @@ uint64_t CommandContext::finishAndFree(bool waitForCompletion)
 	cpuLinearAllocator_.cleanupUsedPages(fenceValue);
 	gpuLinearAllocator_.cleanupUsedPages(fenceValue);
 	dynamicDescriptorHeap_.cleanupUsedHeaps(fenceValue);
+	dynamicSamplerDescriptorHeap_.cleanupUsedHeaps(fenceValue);
 
 	if (waitForCompletion) {
 		cmdListMan.waitForFence(fenceValue);
@@ -693,6 +695,7 @@ void GraphicsContext::setRootSignature(const RootSignature& rootSig)
 	pCommandList_->SetGraphicsRootSignature(pCurGraphicsRootSignature_ = rootSig.getSignature());
 
 	dynamicDescriptorHeap_.parseGraphicsRootSignature(rootSig);
+	dynamicSamplerDescriptorHeap_.parseGraphicsRootSignature(rootSig);
 }
 
 

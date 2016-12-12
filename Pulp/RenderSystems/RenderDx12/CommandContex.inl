@@ -319,13 +319,23 @@ X_INLINE void GraphicsContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t
 	setDynamicDescriptors(rootIndex, offset, 1, &handle);
 }
 
-
 X_INLINE void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count,
 	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
 {
 	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
 }
 
+X_INLINE void GraphicsContext::setDynamicSamplerDescriptor(uint32_t rootIndex, uint32_t offset,
+	D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+	setDynamicSamplerDescriptors(rootIndex, offset, 1, &handle);
+}
+
+X_INLINE void GraphicsContext::setDynamicSamplerDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count,
+	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
+{
+	dynamicSamplerDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
+}
 
 X_INLINE void GraphicsContext::setIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& IBView)
 {
@@ -361,6 +371,7 @@ X_INLINE void GraphicsContext::drawInstanced(uint32_t vertexCountPerInstance, ui
 {
 	flushResourceBarriers();
 	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
+	dynamicSamplerDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
 	pCommandList_->DrawInstanced(vertexCountPerInstance, instanceCount,
 		startVertexLocation, startInstanceLocation);
 }
@@ -370,6 +381,7 @@ X_INLINE void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstan
 {
 	flushResourceBarriers();
 	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
+	dynamicSamplerDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
 	pCommandList_->DrawIndexedInstanced(indexCountPerInstance, instanceCount,
 		startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
@@ -463,6 +475,7 @@ X_INLINE void ComputeContext::dispatch(size_t groupCountX, size_t groupCountY, s
 	flushResourceBarriers();
 
 	dynamicDescriptorHeap_.commitComputeRootDescriptorTables(pCommandList_);
+	dynamicSamplerDescriptorHeap_.commitComputeRootDescriptorTables(pCommandList_);
 
 	pCommandList_->Dispatch(
 		safe_static_cast<uint32_t, size_t>(groupCountX),
