@@ -200,6 +200,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	pContextMan_ = X_NEW(ContextManager, arena_, "ContextMan")(arena_, pDevice_, cmdListManager_, descriptorAllocatorPool, *pLinearAllocatorMan_);
 	pRootSigCache_ = X_NEW(RootSignatureDeviceCache, arena_, "RootSignatureDeviceCache")(arena_, pDevice_);
 	pPSOCache_ = X_NEW(PSODeviceCache, arena_, "PSODeviceCache")(arena_, pDevice_);
+	pSamplerCache_ = X_NEW(SamplerDescriptorCache, arena_, "SamplerDescriptorCache")(arena_, pDevice_);
 
 	pBuffMan_ = X_NEW(BufferManager, arena_, "BufferManager")(arena_, pDevice_, pContextMan_, pDescriptorAllocator_);
 	if (!pBuffMan_->init()) {
@@ -371,6 +372,9 @@ void XRender::shutDown(void)
 	if (pRootSigCache_) {
 		pRootSigCache_->destoryAll();
 		X_DELETE_AND_NULL(pRootSigCache_, arena_);
+	}
+	if (pSamplerCache_) {
+		X_DELETE_AND_NULL(pSamplerCache_, arena_);
 	}
 
 	if (pShaderMan_) {

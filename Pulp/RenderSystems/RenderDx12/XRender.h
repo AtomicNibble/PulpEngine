@@ -38,6 +38,7 @@ class LinearAllocatorManager;
 class BufferManager;
 class RootSignatureDeviceCache;
 class PSODeviceCache;
+class SamplerDescriptorCache;
 
 class GraphicsContext;
 
@@ -238,6 +239,7 @@ private:
 	DescriptorAllocator* pDescriptorAllocator_;
 	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
 
+	SamplerDescriptorCache* pSamplerCache_;
 	RootSignatureDeviceCache* pRootSigCache_;
 	PSODeviceCache* pPSOCache_;
 
