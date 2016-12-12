@@ -57,6 +57,9 @@
     <Filter Include="Source Files\Model">
       <UniqueIdentifier>{993786c1-4f2d-4c81-b4b6-96346b673e62}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{03ad25ea-e61c-47fc-a22d-53be01adc0c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -167,6 +170,9 @@
     <ClInclude Include="Shader\ShaderPermatation.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="Util\StateHelpers.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -268,6 +274,9 @@
     <ClCompile Include="Shader\ShaderPermatation.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="Util\StateHelpers.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandSignature.inl">
@@ -341,6 +350,9 @@
     </None>
     <None Include="Shader\ShaderPermatation.inl">
       <Filter>Header Files\Shader</Filter>
+    </None>
+    <None Include="Util\StateHelpers.inl">
+      <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
 </Project>
