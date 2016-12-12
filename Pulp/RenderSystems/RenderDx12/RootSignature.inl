@@ -102,8 +102,9 @@ X_INLINE RootSignature::RootSignature(core::MemoryArenaBase* arena, size_t numRo
 {
 	samplers_.setGranularity(1);
 
-	// should be safe to leave these un-init.
+	// should be safe to leave these un-init, in release builds
 	descriptorTableBitMap_ = 0;
+	descriptorTableSamplerBitMap_ = 0;
 	maxDescriptorCacheHandleCount_ = 0;
 	core::zero_object(descriptorTableSize_);
 	// ~
@@ -150,9 +151,17 @@ X_INLINE ID3D12RootSignature* RootSignature::getSignature(void) const
 	return pSignature_;
 }
 
-X_INLINE uint32_t RootSignature::descriptorTableBitMap(void) const
+X_INLINE uint32_t RootSignature::descriptorTableBitMap(D3D12_DESCRIPTOR_HEAP_TYPE type) const
 {
-	return descriptorTableBitMap_;
+	if (type == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV) {
+		return descriptorTableBitMap_;
+	}
+	else if (type == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER) {
+		return descriptorTableSamplerBitMap_;
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return 0;
 }
 
 X_INLINE uint32_t RootSignature::descriptorTableSize(size_t idx) const

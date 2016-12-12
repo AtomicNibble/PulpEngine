@@ -102,7 +102,7 @@ public:
 	X_INLINE const RootParameter& getParamRef(size_t idx) const;
 	X_INLINE ID3D12RootSignature* getSignature(void) const;
 
-	X_INLINE uint32_t descriptorTableBitMap(void) const;
+	X_INLINE uint32_t descriptorTableBitMap(D3D12_DESCRIPTOR_HEAP_TYPE type) const;
 	X_INLINE uint32_t descriptorTableSize(size_t idx) const;
 
 private:
@@ -115,7 +115,8 @@ protected:
 	core::Array<D3D12_STATIC_SAMPLER_DESC> samplers_;
 
 	uint32_t descriptorTableBitMap_;			// One bit is set for root parameters that are (non-sampler) descriptor tables
-	uint32_t descriptorTableSize_[16];			// Non-sampler descriptor tables need to know their descriptor count
+	uint32_t descriptorTableSamplerBitMap_;		// One bit is set for root parameters that are (sampler) descriptor tables
+	uint32_t descriptorTableSize_[16];			// includes both sampler/none-sampeler descriptor tables need to know their descriptor count
 	uint32_t maxDescriptorCacheHandleCount_;	// The sum of all non-sampler descriptor table counts
 
 	uint32_t samplesInitCount_;

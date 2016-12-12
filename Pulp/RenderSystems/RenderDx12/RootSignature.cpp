@@ -245,12 +245,15 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
 			hasher.update(rootParam.DescriptorTable.pDescriptorRanges, rootParam.DescriptorTable.NumDescriptorRanges);
 
 			// We don't care about sampler descriptor tables.  We don't cache them
-			if (rootParam.DescriptorTable.pDescriptorRanges->RangeType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {
-				continue;
+			if (rootParam.DescriptorTable.pDescriptorRanges->RangeType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) 
+			{
+				descriptorTableSamplerBitMap_ |= (1 << param);
+			}
+			else
+			{
+				descriptorTableBitMap_ |= (1 << param);
 			}
 
-			// ...
-			descriptorTableBitMap_ |= (1 << param);
 
 			for (uint32_t tableRange = 0; tableRange < rootParam.DescriptorTable.NumDescriptorRanges; ++tableRange) {
 				descriptorTableSize_[param] += rootParam.DescriptorTable.pDescriptorRanges[tableRange].NumDescriptors;
@@ -258,7 +261,7 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
 
 			if (descriptorTableSize_[param] > 32) {
 				// this is due to 32bit flags in DecriptorCache
-				X_ERROR("Dx12", "RootSig param %" PRIu32" table size %" PRIu32 " > 32, which exceeds the artifical limit", 
+				X_ERROR("Dx12", "RootSig param %" PRIu32" table size %" PRIu32 " > 32, which exceeds the artifical limit",
 					param, descriptorTableSize_[param]);
 			}
 
