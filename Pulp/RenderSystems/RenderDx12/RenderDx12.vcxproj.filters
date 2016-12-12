@@ -193,9 +193,6 @@
     <ClCompile Include="GpuResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SampleDesc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PipelineState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -276,6 +273,9 @@
     </ClCompile>
     <ClCompile Include="Util\StateHelpers.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerDesc.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

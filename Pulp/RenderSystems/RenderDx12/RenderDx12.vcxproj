@@ -456,7 +456,7 @@
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
-    <ClCompile Include="SampleDesc.cpp" />
+    <ClCompile Include="SamplerDesc.cpp" />
     <ClCompile Include="Shader\ShaderPermatation.cpp" />
     <ClCompile Include="Shader\ShaderManager.cpp" />
     <ClCompile Include="Shader\ShaderVars.cpp" />
