@@ -43,9 +43,9 @@ public:
 
 	void releaseMaterial(Material* pMat);
 
-	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt);
+	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt) X_FINAL;
 
-	virtual Material* getDefaultMaterial(void) X_OVERRIDE;
+	virtual Material* getDefaultMaterial(void) X_FINAL;
 
 	// ~IMaterialManager
 
