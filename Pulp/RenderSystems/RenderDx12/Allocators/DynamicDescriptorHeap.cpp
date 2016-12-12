@@ -258,8 +258,9 @@ void DynamicDescriptorHeap::DescriptorHandleCache::unbindAllValid(void)
 void DynamicDescriptorHeap::DescriptorHandleCache::stageDescriptorHandles(uint32_t rootIndex, uint32_t offset,
 	uint32_t numHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
 {
-	X_ASSERT(((1 << rootIndex) & rootDescriptorTablesBitMap_) != 0, "Root parameter is not a CBV_SRV_UAV descriptor table")();
-	X_ASSERT(offset + numHandles <= rootDescriptorTable_[rootIndex].tableSize, "")();
+	X_ASSERT(((1 << rootIndex) & rootDescriptorTablesBitMap_) != 0, "Root parameter is not a CBV_SRV_UAV descriptor table")(rootIndex);
+	// you basically called me with a invalid range for this rootIndex.
+	X_ASSERT(offset + numHandles <= rootDescriptorTable_[rootIndex].tableSize, "Cache overrun for root index: %" PRIi32, rootIndex)(rootIndex);
 
 	DescriptorTableCache& tableCache = rootDescriptorTable_[rootIndex];
 	D3D12_CPU_DESCRIPTOR_HANDLE* pCopyDest = tableCache.pTableStart + offset;
@@ -275,7 +276,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(const Root
 {
 	uint32_t CurrentOffset = 0;
 
-	X_ASSERT(rootSig.numParams() <= 16, "Maybe we need to support something greater")(rootSig.numParams());
+	X_ASSERT(rootSig.numParams() <= MAXNUM_DESCRIPTOR_TABLES, "Maybe we need to support something greater")(rootSig.numParams());
 
 	staleRootParamsBitMap_ = 0;
 	rootDescriptorTablesBitMap_ = rootSig.descriptorTableBitMap();
@@ -299,7 +300,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(const Root
 
 	maxCachedDescriptors_ = CurrentOffset;
 
-	X_ASSERT(maxCachedDescriptors_ <= MAXNUM_DESCRIPTORS, "Exceeded user-supplied maximum cache size")();
+	X_ASSERT(maxCachedDescriptors_ <= MAXNUM_DESCRIPTORS, "Exceeded user-supplied maximum cache size")(maxCachedDescriptors_, MAXNUM_DESCRIPTORS);
 }
 
 
@@ -407,7 +408,7 @@ ID3D12DescriptorHeap* DynamicDescriptorHeap::getHeapPointer(void)
 {
 	if (pCurrentHeapPtr_ == nullptr)
 	{
-		X_ASSERT(currentOffset_ == 0, "")(currentOffset_);
+		X_ASSERT(currentOffset_ == 0, "Current heap should of been retired before requesting a new one")(currentOffset_);
 		pCurrentHeapPtr_ = pool_.requestDescriptorHeap();
 
 		firstDescriptor_ = DescriptorHandle(
