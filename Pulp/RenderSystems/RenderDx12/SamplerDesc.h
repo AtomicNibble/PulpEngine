@@ -32,17 +32,20 @@ protected:
 
 class SamplerDescriptorCache
 {
-	typedef core::HashMap<core::Hash::xxHash64::HashVal, SamplerDescriptor> DescriptorMap;
+	struct equal_to
+	{
+		bool operator()(const SamplerState lhs, const SamplerState rhs) const {
+			return lhs.filter == rhs.filter && lhs.repeat == rhs.repeat;
+		}
+	};
+
+	typedef core::HashMap<SamplerState, SamplerDescriptor, core::hash<SamplerState>, equal_to> DescriptorMap;
 
 public:
 	SamplerDescriptorCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
 
-
 	SamplerDescriptor createDescriptor(DescriptorAllocator& allocator, const SamplerState state);
-	SamplerDescriptor createDescriptor(DescriptorAllocator& allocator, const D3D12_SAMPLER_DESC& desc);
 
-private:
-	static core::Hash::xxHash64::HashVal hashDesc(const D3D12_SAMPLER_DESC& desc);
 
 private:
 	ID3D12Device* pDevice_;
