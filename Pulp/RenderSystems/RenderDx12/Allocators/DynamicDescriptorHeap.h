@@ -9,19 +9,25 @@ class RootSignature;
 class CommandContext;
 class CommandListManger;
 
-class DescriptorAllocatorPool
+class DescriptorTypeAllocatorPool
 {
 public:
-	static const uint32_t NUM_DESCRIPTORS_PER_HEAP = 1024;
+	static const uint32_t NUM_DESCRIPTORS_PER_HEAP[2];
 
 public:
-	DescriptorAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice, CommandListManger& commandManager);
-	~DescriptorAllocatorPool();
+	DescriptorTypeAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice, CommandListManger& commandManager, D3D12_DESCRIPTOR_HEAP_TYPE type);
+	~DescriptorTypeAllocatorPool();
+
+	void destoryAll(void);
 
 	ID3D12DescriptorHeap* requestDescriptorHeap(void);
 	void discardDescriptorHeaps(uint64_t fenceValueForReset, const core::Array<ID3D12DescriptorHeap*>& usedHeaps);
 
+	D3D12_DESCRIPTOR_HEAP_TYPE getType(void) const;
+
+
 private:
+	D3D12_DESCRIPTOR_HEAP_TYPE type_;
 	ID3D12Device* pDevice_;
 	CommandListManger& commandManager_;
 
@@ -29,6 +35,25 @@ private:
 	core::Fifo<std::pair<uint64_t, ID3D12DescriptorHeap*>> retiredDescriptorHeaps_;
 	core::Fifo<ID3D12DescriptorHeap*> availableDescriptorHeaps_;
 	core::Array<ID3D12DescriptorHeap*> descriptorHeapPool_;
+};
+
+
+class DescriptorAllocatorPool
+{
+public:
+
+public:
+	DescriptorAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice, CommandListManger& commandManager);
+	~DescriptorAllocatorPool() = default;
+
+	void destoryAll(void);
+
+	ID3D12DescriptorHeap* requestDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type);
+	void discardDescriptorHeaps(D3D12_DESCRIPTOR_HEAP_TYPE type, uint64_t fenceValueForReset, const core::Array<ID3D12DescriptorHeap*>& usedHeaps);
+
+private:
+
+	std::array<DescriptorTypeAllocatorPool, 2> allocators_;
 };
 
 
@@ -87,13 +112,13 @@ private:
 		void clearCache(void);
 
 		uint32_t computeStagedSize(void);
-		void copyAndBindStaleTables(ID3D12Device* pDevice, DescriptorHandle DestHandleStart, 
+		void copyAndBindStaleTables(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12Device* pDevice, DescriptorHandle DestHandleStart,
 			uint32_t descriptorSize, ID3D12GraphicsCommandList* pCmdList, SetRootDescriptorfunctionPtr pSetFunc);
 
 
 		void unbindAllValid(void);
 		void stageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
-		void parseRootSignature(const RootSignature& rootSig);
+		void parseRootSignature(D3D12_DESCRIPTOR_HEAP_TYPE type, const RootSignature& rootSig);
 
 		X_INLINE uint32_t rootDescriptorTablesBitMap(void) const;
 		X_INLINE uint32_t staleRootParamsBitMap(void) const;
@@ -110,7 +135,9 @@ private:
 
 
 public:
-	DynamicDescriptorHeap(core::MemoryArenaBase* arena, ID3D12Device* pDevice, DescriptorAllocatorPool& pool, CommandContext& owningContext);
+	DynamicDescriptorHeap(core::MemoryArenaBase* arena, ID3D12Device* pDevice, DescriptorAllocatorPool& pool,
+		CommandContext& owningContext, D3D12_DESCRIPTOR_HEAP_TYPE type);
+
 	~DynamicDescriptorHeap();
 
 
@@ -150,6 +177,7 @@ private:
 
 
 private:
+	D3D12_DESCRIPTOR_HEAP_TYPE type_;
 	ID3D12Device* pDevice_;
 
 	DescriptorHandleCache graphicsHandleCache_;

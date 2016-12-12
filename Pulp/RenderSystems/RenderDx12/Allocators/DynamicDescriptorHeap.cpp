@@ -7,8 +7,12 @@
 
 X_NAMESPACE_BEGIN(render)
 
-DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
-	CommandListManger& commandManager) :
+const uint32_t DescriptorTypeAllocatorPool::NUM_DESCRIPTORS_PER_HEAP[2] = { 1024, 512 };
+
+
+DescriptorTypeAllocatorPool::DescriptorTypeAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+	CommandListManger& commandManager, D3D12_DESCRIPTOR_HEAP_TYPE type) :
+	type_(type),
 	pDevice_(pDevice),
 	commandManager_(commandManager),
 	retiredDescriptorHeaps_(arena, 128),
@@ -18,12 +22,19 @@ DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, I
 
 }
 
-DescriptorAllocatorPool::~DescriptorAllocatorPool()
+DescriptorTypeAllocatorPool::~DescriptorTypeAllocatorPool()
 {
 
 }
 
-ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(void)
+void DescriptorTypeAllocatorPool::destoryAll(void)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	descriptorHeapPool_.clear();
+}
+
+ID3D12DescriptorHeap* DescriptorTypeAllocatorPool::requestDescriptorHeap(void)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
@@ -45,8 +56,8 @@ ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(void)
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC heapDesc;
 		core::zero_object(heapDesc);
-		heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		heapDesc.NumDescriptors = NUM_DESCRIPTORS_PER_HEAP;
+		heapDesc.Type = type_;
+		heapDesc.NumDescriptors = NUM_DESCRIPTORS_PER_HEAP[type_];
 		heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		heapDesc.NodeMask = 1;
 
@@ -61,7 +72,7 @@ ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(void)
 	}
 }
 
-void DescriptorAllocatorPool::discardDescriptorHeaps(uint64_t fenceValue, const core::Array<ID3D12DescriptorHeap*>& usedHeaps)
+void DescriptorTypeAllocatorPool::discardDescriptorHeaps(uint64_t fenceValue, const core::Array<ID3D12DescriptorHeap*>& usedHeaps)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
@@ -71,7 +82,46 @@ void DescriptorAllocatorPool::discardDescriptorHeaps(uint64_t fenceValue, const 
 	}
 }
 
+D3D12_DESCRIPTOR_HEAP_TYPE DescriptorTypeAllocatorPool::getType(void) const
+{
+	return type_;
+}
 
+
+// ---------------------------------------------------------------------
+
+DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+	CommandListManger& commandManager) :
+	allocators_{{ 
+		{ arena, pDevice, commandManager, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV },
+		{ arena, pDevice, commandManager, D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER }
+	}}
+{
+	static_assert(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV == 0, "Heap enum value has changed");
+	static_assert(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER == 1, "Heap enum value has changed");
+
+	// do a runtime check also.
+	X_ASSERT(allocators_[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, "Index error")();
+	X_ASSERT(allocators_[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, "Index error")();
+}
+
+void DescriptorAllocatorPool::destoryAll(void)
+{
+	for (auto& a : allocators_) {
+		a.destoryAll();
+	}
+}
+
+ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type)
+{
+	return allocators_[type].requestDescriptorHeap();
+}
+
+void DescriptorAllocatorPool::discardDescriptorHeaps(D3D12_DESCRIPTOR_HEAP_TYPE type, uint64_t fenceValueForReset,
+	const core::Array<ID3D12DescriptorHeap*>& usedHeaps)
+{
+	allocators_[type].discardDescriptorHeaps(fenceValueForReset, usedHeaps);
+}
 
 // ---------------------------------------------------------------------
 
@@ -119,7 +169,7 @@ uint32_t DynamicDescriptorHeap::DescriptorHandleCache::computeStagedSize(void)
 	return neededSpace;
 }
 
-void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12Device* pDevice, 
+void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12Device* pDevice,
 	DescriptorHandle DestHandleStart, uint32_t descriptorSize,
 	ID3D12GraphicsCommandList* pCmdList, SetRootDescriptorfunctionPtr pSetFunc)
 {
@@ -204,7 +254,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 				pDevice->CopyDescriptors(
 					numDestDescriptorRanges, pDestDescriptorRangeStarts, pDestDescriptorRangeSizes,
 					numSrcDescriptorRanges, pSrcDescriptorRangeStarts, pSrcDescriptorRangeSizes,
-					D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+					type);
 
 				numSrcDescriptorRanges = 0;
 				numDestDescriptorRanges = 0;
@@ -234,7 +284,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 	pDevice->CopyDescriptors(
 		numDestDescriptorRanges, pDestDescriptorRangeStarts, pDestDescriptorRangeSizes,
 		numSrcDescriptorRanges, pSrcDescriptorRangeStarts, pSrcDescriptorRangeSizes,
-		D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		type);
 }
 
 
@@ -272,14 +322,14 @@ void DynamicDescriptorHeap::DescriptorHandleCache::stageDescriptorHandles(uint32
 	staleRootParamsBitMap_ |= (1 << rootIndex);
 }
 
-void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(const RootSignature& rootSig)
+void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(D3D12_DESCRIPTOR_HEAP_TYPE type, const RootSignature& rootSig)
 {
 	uint32_t CurrentOffset = 0;
 
 	X_ASSERT(rootSig.numParams() <= MAXNUM_DESCRIPTOR_TABLES, "Maybe we need to support something greater")(rootSig.numParams());
 
 	staleRootParamsBitMap_ = 0;
-	rootDescriptorTablesBitMap_ = rootSig.descriptorTableBitMap();
+	rootDescriptorTablesBitMap_ = rootSig.descriptorTableBitMap(type);
 
 	uint32_t tableParams = rootDescriptorTablesBitMap_;
 	uint32_t rootIndex;
@@ -309,7 +359,8 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(const Root
 
 
 DynamicDescriptorHeap::DynamicDescriptorHeap(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		DescriptorAllocatorPool& pool, CommandContext& owningContext) :
+		DescriptorAllocatorPool& pool, CommandContext& owningContext, D3D12_DESCRIPTOR_HEAP_TYPE type) :
+	type_(type),
 	pDevice_(pDevice),
 	retiredHeaps_(arena),
 	owningContext_(owningContext),
@@ -354,31 +405,31 @@ D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorHeap::uploadDirect(D3D12_CPU_DESCRI
 		unbindAllValid();
 	}
 
-	owningContext_.setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, getHeapPointer());
+	owningContext_.setDescriptorHeap(type_, getHeapPointer());
 
 	DescriptorHandle destHandle = firstDescriptor_ + currentOffset_ * getDescriptorSize();
 	currentOffset_ += 1;
 
 	// thread free
-	pDevice_->CopyDescriptorsSimple(1, destHandle.getCpuHandle(), handle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	pDevice_->CopyDescriptorsSimple(1, destHandle.getCpuHandle(), handle, type_);
 
 	return destHandle.getGpuHandle();
 }
 
 void DynamicDescriptorHeap::parseGraphicsRootSignature(const RootSignature& rootSig)
 {
-	graphicsHandleCache_.parseRootSignature(rootSig);
+	graphicsHandleCache_.parseRootSignature(type_, rootSig);
 }
 
 void DynamicDescriptorHeap::parseComputeRootSignature(const RootSignature& rootSig)
 {
-	computeHandleCache_.parseRootSignature(rootSig);
+	computeHandleCache_.parseRootSignature(type_, rootSig);
 }
 
 
 bool DynamicDescriptorHeap::hasSpace(uint32_t count) const
 {
-	return (pCurrentHeapPtr_ != nullptr && currentOffset_ + count <= DescriptorAllocatorPool::NUM_DESCRIPTORS_PER_HEAP);
+	return (pCurrentHeapPtr_ != nullptr && currentOffset_ + count <= DescriptorTypeAllocatorPool::NUM_DESCRIPTORS_PER_HEAP[type_]);
 }
 
 void DynamicDescriptorHeap::retireCurrentHeap(void)
@@ -400,7 +451,7 @@ void DynamicDescriptorHeap::retireCurrentHeap(void)
 
 void DynamicDescriptorHeap::retireUsedHeaps(uint64_t fenceValue)
 {
-	pool_.discardDescriptorHeaps(fenceValue, retiredHeaps_);
+	pool_.discardDescriptorHeaps(type_, fenceValue, retiredHeaps_);
 	retiredHeaps_.clear();
 }
 
@@ -409,7 +460,7 @@ ID3D12DescriptorHeap* DynamicDescriptorHeap::getHeapPointer(void)
 	if (pCurrentHeapPtr_ == nullptr)
 	{
 		X_ASSERT(currentOffset_ == 0, "Current heap should of been retired before requesting a new one")(currentOffset_);
-		pCurrentHeapPtr_ = pool_.requestDescriptorHeap();
+		pCurrentHeapPtr_ = pool_.requestDescriptorHeap(type_);
 
 		firstDescriptor_ = DescriptorHandle(
 			pCurrentHeapPtr_->GetCPUDescriptorHandleForHeapStart(),
@@ -452,9 +503,9 @@ void DynamicDescriptorHeap::copyAndBindStagedTables(DescriptorHandleCache& handl
 	}
 
 	// This can trigger the creation of a new heap
-	owningContext_.setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, getHeapPointer());
+	owningContext_.setDescriptorHeap(type_, getHeapPointer());
 
-	handleCache.copyAndBindStaleTables(pDevice_, allocate(neededSize), getDescriptorSize(), pCmdList, pSetFunc);
+	handleCache.copyAndBindStaleTables(type_, pDevice_, allocate(neededSize), getDescriptorSize(), pCmdList, pSetFunc);
 }
 
 // Mark all descriptors in the cache as stale and in need of re-uploading.
@@ -464,10 +515,10 @@ void DynamicDescriptorHeap::unbindAllValid(void)
 	computeHandleCache_.unbindAllValid();
 }
 
-uint32_t DynamicDescriptorHeap::getDescriptorSize()
+uint32_t DynamicDescriptorHeap::getDescriptorSize(void)
 {
 	if (descriptorSize_ == 0) {
-		descriptorSize_ = pDevice_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descriptorSize_ = pDevice_->GetDescriptorHandleIncrementSize(type_);
 	}
 	return descriptorSize_;
 }
