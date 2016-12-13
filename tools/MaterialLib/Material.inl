@@ -27,6 +27,12 @@ X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::V
 	return nullptr;
 }
 
+X_INLINE void Material::addTech(const Tech& tech)
+{
+	techs_.append(tech);
+
+}
+
 X_INLINE const int32_t Material::getID(void) const
 {
 	return id_;
