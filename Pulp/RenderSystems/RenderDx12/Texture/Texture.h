@@ -50,8 +50,8 @@ class TextureManager;
 		X_INLINE const int32_t getID(void) const;
 		X_INLINE void setID(TexID id);
 
-	protected:
 		X_INLINE render::GpuResource& getGpuResource(void);
+	protected:
 		X_INLINE void setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv);
 
 		X_INLINE void setFormat(Texturefmt::Enum fmt);
