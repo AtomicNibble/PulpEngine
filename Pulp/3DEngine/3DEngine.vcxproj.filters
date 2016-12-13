@@ -184,5 +184,8 @@
     <None Include="Model\XModel.inl">
       <Filter>Header Files\Model</Filter>
     </None>
+    <None Include="Material\TechDefStateManager.inl">
+      <Filter>Header Files\Material</Filter>
+    </None>
   </ItemGroup>
 </Project>

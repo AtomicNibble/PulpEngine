@@ -89,6 +89,16 @@ X_INLINE void Material::setTechDefState(TechDefState* pTechDefState)
 	pTechDefState_ = pTechDefState;
 }
 
+X_INLINE void Material::setTextures(const FixedTextureArr& texArr)
+{
+	textures_.resize(texArr.size());
+
+	for (size_t i = 0; i < texArr.size(); i++)
+	{
+		textures_[i] = texArr[i];
+	}
+}
+
 // ---------------------------------------------
 
 X_INLINE bool Material::isDrawn(void) const

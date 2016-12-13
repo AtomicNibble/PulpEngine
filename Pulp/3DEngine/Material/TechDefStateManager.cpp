@@ -7,9 +7,10 @@
 X_NAMESPACE_BEGIN(engine)
 
 TechDef::TechDef(core::MemoryArenaBase* arena) :
-	perms_(arena)
+	perms_(arena),
+	boundTextures_(arena)
 {
-	shaderSource.fill(nullptr);
+	shaderSource_.fill(nullptr);
 }
 
 TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt)
@@ -19,7 +20,52 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// so how do we know what is supported.
 	X_UNUSED(vertFmt);
 
-	return nullptr;
+	render::IRender* pRenderSys = gEnv->pRender;
+
+	// for now just make one :|
+
+	// create the hardware shaders
+	render::shader::ShaderStagesArr stages{};
+
+	for (size_t i=0; i<shaderSource_.size(); i++)
+	{
+		auto* pSource = shaderSource_[i];
+		if (!pSource) {
+			continue;
+		}
+
+		const auto type = static_cast<render::shader::ShaderType::Enum>(i);
+
+
+		// create a instance of the shader with the flags we want it compiled with.
+		// this won't actually compile it.
+		stages[type] = pRenderSys->createHWShader(type, shaderEntry_[type], pSource);
+	}
+
+	render::shader::IShaderPermatation* pPerm = pRenderSys->createPermatation(stages);
+
+
+	render::RenderTargetFmtsArr rtfs;
+	rtfs.append(texture::Texturefmt::R8G8B8A8);
+
+	auto passHandle = pRenderSys->createPassState(rtfs);
+	if (passHandle == render::INVALID_STATE_HANLDE)
+	{
+		return false;
+	}
+
+	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDesc, nullptr, 0);
+
+	if (stateHandle == render::INVALID_STATE_HANLDE)
+	{
+		return false;
+	}
+
+	TechDefPerm& perm = perms_.AddOne();
+	perm.pShaderPerm = pPerm;
+	perm.stateHandle = stateHandle;
+
+	return &perm;
 }
 
 
@@ -156,7 +202,13 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 				return nullptr;
 			}
 
-			tech.shaderSource[type] = pShaderSource;
+			tech.shaderEntry_[type] = shader.entry;
+			tech.shaderSource_[type] = pShaderSource;
+
+			for (const auto& bt : shader.boundTextures)
+			{
+				tech.boundTextures_ .emplace_back(bt);
+			}
 		}
 	}
 

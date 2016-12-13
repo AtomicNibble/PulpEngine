@@ -14,6 +14,7 @@
 #include <IRender.h>
 #include <IConverterModule.h>
 #include "Util\GenericUtil.h"
+#include <String\StringHash.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -271,6 +272,7 @@ X_ENSURE_SIZE(MaterialHeader, 44);
 X_ENSURE_SIZE(MaterialTexture, 4);
 
 class Material;
+struct MaterialTech;
 
 
 struct IMaterialManager
@@ -287,6 +289,9 @@ struct IMaterialManager
 	virtual Material* loadMaterial(const char* MtlName) X_ABSTRACT;
 
 	virtual MaterialTech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt) X_ABSTRACT;
+	virtual bool setTextureID(Material* pMat, MaterialTech* pTech, core::StrHash texNameHash, texture::TexID id) X_ABSTRACT;
+
+
 	virtual Material* getDefaultMaterial(void) X_ABSTRACT;
 };
 

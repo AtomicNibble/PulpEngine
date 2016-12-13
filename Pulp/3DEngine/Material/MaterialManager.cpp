@@ -64,7 +64,6 @@ bool XMaterialManager::Init(void)
 
 	InitDefaults();
 
-
 	ADD_COMMAND("listMaterials", Cmd_ListMaterials, core::VarFlag::SYSTEM, "List all the loaded materials");
 
 	// hotreload support.
@@ -221,6 +220,8 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 
 Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt)
 {
+	X_ASSERT_NOT_NULL(pMat);
+
 	// the material holds all it's techs like a cache, but when it don't have one we must create it.
 	auto* pTech = pMat->getTech(techNameHash, vrtFmt);
 	if (pTech) {
@@ -247,7 +248,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// it may be less than what the material has.
 	// the tech should tell us O_O
 	// him -> pTechDef
-	const size_t numTex = 1;
+	const size_t numTex = pTechDef->getNumBoundTextures();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(numTex, cbLinks.size());
 
@@ -257,6 +258,8 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	{
 		auto& cb = cbLinks[i];
 		
+		pCBufMan_->autoUpdateBuffer(*cb.pCBufer);
+
 		auto cbHandle = pCBufMan_->createCBuffer(*cb.pCBufer);
 
 		pCBHandles[i] = cbHandle;
@@ -277,14 +280,43 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	}
 
 
-
+	// we now have a material tech that contains the pipeline state needed and what variable state also needs to be set 
+	// we just add this to the materials local store, so it don't have to ask us for this next time.
+	// so once everything has it's state to render anything we just have to check
 	Material::Tech matTech;
 	matTech.hash = techNameHash;
 	matTech.vertFmt = vrtFmt;
 	matTech.stateHandle = pPerm->stateHandle;
 	matTech.pVariableState = pVariableState;
 
-	return nullptr;
+	pMat->addTech(matTech);
+	return pMat->getTech(techNameHash, vrtFmt);
+}
+
+bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id)
+{
+	TechDefState* pTechDefState = pMat->getTechDefState();
+
+	TechDef* pTechDef = pTechDefState->getTech(pTech->hash);
+
+	if (pTechDef->getNumBoundTextures() < 1) {
+		return false;
+	}
+
+	auto& bts = pTechDef->getBoundTextures();
+
+	for (size_t i=0; i<bts.size(); i++)
+	{
+		const auto& bt = bts[i];
+		if (bt.nameHash == texNameHash)
+		{
+			auto* pTextureStates = pTech->pVariableState->getTexStates();
+			pTextureStates[i].textureId = id;
+			return true;
+		}
+	}
+
+	return false;
 }
 
 XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& name)
@@ -309,11 +341,48 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 		return false;
 	}
 
+	if (hdr.numTextures > MTL_MAX_TEXTURES) {
+		return false;
+	}
+
 	// we need to poke the goat.
 	// so now materials store the cat and type which we can use to get techdef info.
 
+
+	// we also have texture info.
+	core::FixedArray<MaterialTexture, MTL_MAX_TEXTURES> texInfo;
+	core::FixedArray<const char*, MTL_MAX_TEXTURES> texNames;
+	texInfo.resize(hdr.numTextures);
+
+	if (file.readObjs(texInfo.data(), hdr.numTextures) != hdr.numTextures) {
+		return false;
+	}
+
+
+#if 1
 	core::string catType;
+
 	file.readString(catType);
+
+#else
+	// now we have strings
+	core::string catType;
+	char nameBuffer[assetDb::ASSET_NAME_MAX_LENGTH * MTL_MAX_TEXTURES];
+
+	file.read(nameBuffer, hdr.strDataSize);
+
+
+	catType = nameBuffer;
+
+	const char* pNameCur = nameBuffer + hdr.catTypeNameLen;
+
+	for (const auto& tex : texInfo)
+	{
+		texNames.append(pNameCur);
+		pNameCur += tex.nameLen;
+	}
+#endif
+
 
 	// so my fat one legged camel.
 	// we get the techDefState for this material.
@@ -334,8 +403,8 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 
 	// ok for a material we need to create all the techs now.
 
-	auto* pTech = pTechDefState->getTech(core::StrHash("unlit"));
-	pTech = nullptr;
+//	auto* pTech = pTechDefState->getTech(core::StrHash("unlit"));
+//	pTech = nullptr;
 
 
 #if X_DEBUG
@@ -344,8 +413,25 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 #endif // !X_DEBUG
 
 	MaterialResource* pMatRes = createMaterial_Internal(name);
-
 	pMatRes->setTechDefState(pTechDefState);
+
+	// so my fine little goat muncher.
+	// we need to slap textures for the goats that fly towards us.
+	core::FixedArray<Material::Texture, MTL_MAX_TEXTURES> processedInfo;
+	processedInfo.resize(texInfo.size());
+
+	for (size_t i=0; i<texInfo.size(); i++)
+	{
+		auto* pITexture = pRender_->getTexture(texNames[i], texture::TextureFlags::STREAMABLE);
+
+
+		Material::Texture tex;
+		tex.texId = pITexture->getTexID();
+		tex.filterType = texInfo[i].filterType;
+		tex.texRepeat = texInfo[i].texRepeat;
+	}
+
+	pMatRes->setTextures(processedInfo);
 
 	return pMatRes;
 }

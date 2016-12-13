@@ -44,6 +44,7 @@ public:
 	void releaseMaterial(Material* pMat);
 
 	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt) X_FINAL;
+	bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
 
 	virtual Material* getDefaultMaterial(void) X_FINAL;
 
@@ -70,7 +71,6 @@ private:
 private:
 	VariableStateManager& vsMan_;
 	TechDefStateManager* pTechDefMan_;
-	CBufferManager* pCBufMan_;
 
 	MaterialContainer materials_;
 

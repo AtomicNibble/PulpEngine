@@ -18,13 +18,19 @@ struct TechDefPerm
 
 class TechDef
 {
+	typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderEntryArr;
+
 	typedef render::shader::ShaderSourceArr ShaderSourceArr;
 	typedef core::Array<TechDefPerm> TechDefPermArr;
+	typedef core::Array<BoundTexture> BoundTexturesArr;
 
 public:
 	TechDef(core::MemoryArenaBase* arena);
 
 	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt);
+
+	X_INLINE BoundTexturesArr::size_type getNumBoundTextures(void) const;
+	X_INLINE const BoundTexturesArr& getBoundTextures(void) const;
 
 public:
 	core::StrHash nameHash;
@@ -33,8 +39,10 @@ public:
 	render::StateDesc stateDesc;
 
 	// the source files every perm is made from
-	ShaderSourceArr shaderSource;
+	ShaderEntryArr shaderEntry_;
+	ShaderSourceArr shaderSource_;
 	TechDefPermArr perms_;
+	BoundTexturesArr boundTextures_;
 };
 
 class TechDefState
@@ -84,3 +92,5 @@ private:
 
 
 X_NAMESPACE_END
+
+#include "TechDefStateManager.inl"

@@ -54,6 +54,8 @@ public:
 	// god dam name hash even tho just int has a constructor.
 //	static_assert(core::compileTime::IsPOD<Tech>::Value, "Tech should be POD");
 
+	typedef core::FixedArray<Texture, MTL_MAX_TEXTURES> FixedTextureArr;
+
 	typedef core::Array<Tech> TechArr;
 	typedef core::Array<Texture> TextureArr;
 
@@ -79,6 +81,9 @@ public:
 	X_INLINE void setMountType(MaterialMountType::Enum mt);
 	X_INLINE void setCat(MaterialCat::Enum cat);
 	X_INLINE void setTechDefState(TechDefState* pTechDefState);
+
+	X_INLINE void setTextures(const FixedTextureArr& texArr);
+
 
 	// flag helpers.
 	X_INLINE bool isDrawn(void) const;
