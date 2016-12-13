@@ -4,13 +4,17 @@
 #include "XFontTexture.h"
 
 #include <IRender.h>
+#include <I3DEngine.h>
 #include <ICore.h>
 #include <ITexture.h>
+#include <IMaterial.h>
 #include <IFileSys.h>
 #include <IPrimativeContext.h>
 #include <IRenderCommands.h>
 
 #include <Math\VertexFormats.h>
+
+#include <../../tools/MaterialLib/MatLib.h>
 
 #include "CmdBucket.h"
 
@@ -37,16 +41,14 @@ const float XFont::FONT_SPACE_SIZE = 0.2f;
 const float XFont::FONT_GLYPH_PROP_SPACING = 1.f;
 
 
-XFont::XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName) :
+XFont::XFont(ICore* pCore, XFontSystem& fontSys, const char* pFontName) :
 	pCore_(pCore),
-	pFontSys_(pFontSys),
+	fontSys_(fontSys),
 	name_(pFontName),
 	fontTexture_(g_fontArena),
+	effects_(g_fontArena),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
-	effects_(g_fontArena),
-	pTextShader_(nullptr),
-	stateHandle_(render::INVALID_STATE_HANLDE),
 	pMaterial_(nullptr)
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
@@ -172,7 +174,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 {
 	X_UNUSED(pEnd);
 
-	if (!pTexture_ && !CreateDeviceTexture()) {
+	if (!pMaterial_ && !CreateDeviceTexture()) {
 		return;
 	}
 
@@ -181,7 +183,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		return;
 	}
 
-	X_ASSERT(ctx.GetEffectId() >=0 && ctx.GetEffectId() < static_cast<int32_t>(effects_.size()), 
+	X_ASSERT(ctx.GetEffectId() >= 0 && ctx.GetEffectId() < static_cast<int32_t>(effects_.size()), 
 		"Effect index invalid")(ctx.GetEffectId(), effects_.size());
 
 	// updates LRU cache and adds glyphs to font texture if missing.
@@ -194,7 +196,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 
 	const auto effecIdx = ctx.GetEffectId();
-	const auto textId = pTexture_->getTexID();
 
 #if 0
 	X_UNUSED(pos);
@@ -247,11 +248,11 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			Vec2f gradientUvMin, gradientUvMax;
 			GetGradientTextureCoord(gradientUvMin.x, gradientUvMin.y, gradientUvMax.x, gradientUvMax.y);
 
-			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
+			engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
 			pVerts[0].pos = v0;
 			pVerts[0].color = frameColor;
-			pVerts[0].st = Vec2f(gradientUvMin.x, gradientUvMax.y);
+			pVerts[0].st = core::XHalf2::compress(gradientUvMin.x, gradientUvMax.y);
 
 			pVerts[1].pos = v1;
 			pVerts[1].color = frameColor;
@@ -346,7 +347,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			XCharCords cords;
 			fontTexture_->GetTextureCoord(pSlot, cords);
 			
-			Vertex_P3F_T2F_C4B* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
+			engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
 			float hozAdvance = 0;
 			if (proportinal)
@@ -371,10 +372,10 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			const Vec3f bl(tl.x, br.y, tl.z);
 
 			// cords
-			const Vec2f tc_tl(cords.texCoords[0], cords.texCoords[1]);
-			const Vec2f tc_br(cords.texCoords[2], cords.texCoords[3]);
-			const Vec2f tc_tr(tc_br.x, tc_tl.y);
-			const Vec2f tc_bl(tc_tl.x, tc_br.y);
+			const core::XHalf2 tc_tl(cords.texCoords[0], cords.texCoords[1]);
+			const core::XHalf2 tc_br(cords.texCoords[2], cords.texCoords[3]);
+			const core::XHalf2 tc_tr(tc_br.x, tc_tl.y);
+			const core::XHalf2 tc_bl(tc_tl.x, tc_br.y);
 
 			const Color8u finalCol = pass.col * col;
 			// We need 6 since each char is not connected.
@@ -565,7 +566,7 @@ void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float
 
 void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
-	if (!isDirty()) {
+	if (!isDirty() || 1) {
 		return;
 	}
 
@@ -759,6 +760,8 @@ bool XFont::CreateDeviceTexture(void)
 
 	const auto& buf = fontTexture_->GetBuffer();
 
+	X_ASSERT(pTexture_ == nullptr, "double init of font texture")(pTexture_);
+
 	pTexture_ = gEnv->pRender->createTexture(
 		name.c_str(),
 		fontTexture_->GetSize(),
@@ -768,6 +771,27 @@ bool XFont::CreateDeviceTexture(void)
 
 	if (!pTexture_->isLoaded()) {
 		X_WARNING("Font", "Failed to create font texture.");
+		return false;
+	}
+
+	// create a material here.
+	// default_font
+	auto* pMaterialMan = gEnv->p3DEngine->getMaterialManager();
+
+
+	pMaterial_ = pMaterialMan->loadMaterial("code/default_font");
+	// we wil lget back default if fails to load.
+	// when we are default we ignore the textureSet and it just results in default texture been drawn.
+
+	auto* pTech = pMaterialMan->getTechForMaterial(pMaterial_, core::StrHash("unlit"), render::shader::VertexFormat::P3F_T2S_C4B);
+	if (!pTech) {
+		X_ERROR("Font", "Failed to get 'unlit' tech for font");
+		return false;
+	}
+
+	// set the texture id for the bound resource.
+	if (!pMaterialMan->setTextureID(pMaterial_, pTech, core::StrHash("codeTexture0"), pTexture_->getTexID())) {
+		X_ERROR("Font", "Failed to bind fontcache taxture to font state");
 		return false;
 	}
 

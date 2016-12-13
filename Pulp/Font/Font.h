@@ -48,7 +48,7 @@ public:
 	typedef core::Array<FontEffect> EffetsArr;
 
 public:
-	XFont(ICore* pCore, XFontSystem* pFontSys, const char* pFontName);
+	XFont(ICore* pCore, XFontSystem& fontSys, const char* pFontName);
 	~XFont();
 
 
@@ -57,8 +57,6 @@ public:
 	void Free(void) X_FINAL;
 	void FreeBuffers(void) X_FINAL;
 	void FreeTexture(void) X_FINAL;
-
-	X_INLINE texture::TexID getTextureId(void) const X_OVERRIDE;
 
 	bool loadFont(void) X_FINAL;
 
@@ -107,26 +105,17 @@ private:
 	core::StackString<128> sourceName_;
 
 	ICore* pCore_;
-	XFontSystem* pFontSys_;
+	XFontSystem& fontSys_;
 	
 	core::UniquePointer<XFontTexture> fontTexture_;
+	EffetsArr effects_;
 
 	texture::ITexture* pTexture_;
 	bool fontTexDirty_;
 
-	EffetsArr effects_;
-
 	// shader and state.
-	render::shader::IShader* pTextShader_;
-	render::StateHandle stateHandle_;
-
 	engine::Material* pMaterial_;
 };
-
-X_INLINE texture::TexID XFont::getTextureId(void) const
-{
-	return pTexture_->getTexID();
-}
 
 X_INLINE const char* XFont::getName(void) const
 { 

@@ -123,7 +123,7 @@ IFont* XFontSystem::NewFont(const char* pFontName)
 		}
 	}
 
-	XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(pCore_, this, pFontName);
+	XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(pCore_, *this, pFontName);
 	fonts_.insert(FontMap::value_type(core::string(pFontName), pFont));
 	return pFont;
 }
