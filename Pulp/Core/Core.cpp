@@ -244,13 +244,15 @@ void XCore::ShutDown()
 
 
 	// shut down interfaces before logging is removed.
-	for (auto it : moduleInterfaces_) {
+	for (auto& it : moduleInterfaces_) {
 		if (!it->ShutDown()) {
 			X_ERROR("Core", "error shuting down engine module");
 		}
 	}
-	for (auto it : converterInterfaces_) {
-		if (!it.first->ShutDown(it.second)) {
+	for (const auto& it : converterInterfaces_) {
+		auto* conModule = it.pConModule.get();
+		const auto& instance = it.pConverter;
+		if (!conModule->ShutDown(instance)) {
 			X_ERROR("Core", "error shuting down converter module");
 		}
 	}

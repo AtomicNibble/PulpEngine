@@ -156,8 +156,27 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 }
 
 
-bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName)
+bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName, 
+	IConverterModule** pConvertModuleOut, IConverter** pConverterInstance)
 {
+	for (auto& c : converterInterfaces_)
+	{
+		if (c.dllName == pDllName && c.moduleClassName == pModuleClassName)
+		{
+			c.addReference();
+
+			if (pConvertModuleOut) {
+				*pConvertModuleOut = c.pConModule.get();
+			}
+
+			if (pConverterInstance) {
+				*pConverterInstance = c.pConverter;
+			}
+
+			return true;
+		}
+	}
+
 #if !defined(X_LIB)
 	core::Module::Handle handle = core::Module::Load(pDllName);
 
@@ -187,10 +206,47 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 		return false;
 	}
 
-	converterInterfaces_.append(std::make_pair(pModule, pConverter));
+	// this is a little more messy than i'd like in terms of how the ref counting is done.
+	// ideally we need to remove the responsibility of creating a convter instance on to the caller
+	// that way creating multiple converter instances is supported (no use case ofr it yet but supported by all converter modules)
+
+	ConverterModule conMod;
+	conMod.dllName = pDllName;
+	conMod.moduleClassName = pModuleClassName;
+	conMod.pConverter = pConverter;
+	conMod.pConModule = pModule;
+
+	converterInterfaces_.emplace_back(conMod);
+
+	if (pConvertModuleOut) {
+		*pConvertModuleOut = pModule.get();
+	}
+
+	if (pConverterInstance) {
+		*pConverterInstance = pConverter;
+	}
 
 	return true;
 }
+
+bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
+{
+	for (size_t i= 0; i< converterInterfaces_.size(); i++)
+	{
+		auto& c = converterInterfaces_[i];
+		if (c.pConModule.get() == pConvertModule)
+		{
+			if (c.removeReference() == 0) {
+				converterInterfaces_.removeIndex(i);
+			}
+
+			return true;
+		}
+	}
+	return false;
+}
+
+
 
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)
 {

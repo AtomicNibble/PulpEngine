@@ -11,6 +11,7 @@
 #include "XProfile.h"
 
 #include "Util\SourceInfo.h"
+#include "Util\ReferenceCounted.h"
 #include "String\StrRef.h"
 #include "String\CmdArgs.h"
 
@@ -137,7 +138,9 @@ public:
 	virtual bool RunGameLoop(void) X_FINAL;
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
 	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
-	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
+	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+		IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_FINAL;
+	virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_FINAL;
 
 
 	X_INLINE core::ITimer* GetITimer(void) X_FINAL;
@@ -247,12 +250,18 @@ private:
 	void WindowSizeVarChange(core::ICVar* pVar);
 	void WindowCustomFrameVarChange(core::ICVar* pVar);
 
-
+	struct ConverterModule : public core::ReferenceCounted<int32_t>
+	{
+		core::string dllName;
+		core::string moduleClassName;
+		IConverter* pConverter;
+		std::shared_ptr<IConverterModule> pConModule;
+	};
 
 private:
 	typedef core::Array<WIN_HMODULE> ModuleHandlesArr;
 	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
-	typedef core::Array<std::pair<std::shared_ptr<IConverterModule>, IConverter*>> ConverterModuleInterfacesArr;
+	typedef core::Array<ConverterModule> ConverterModulesArr;
 	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
 	// I think i can just use stack strings, since all handlers are hard coded.
 	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
@@ -274,7 +283,7 @@ private:
 
 	ModuleHandlesArr				moduleDLLHandles_;
 	ModuleInterfacesArr				moduleInterfaces_;
-	ConverterModuleInterfacesArr	converterInterfaces_;
+	ConverterModulesArr				converterInterfaces_;
 	ArrsetHandlersArr				assertHandlers_;
 
 	core::XProfileSys				profileSys_;

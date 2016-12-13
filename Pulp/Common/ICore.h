@@ -24,6 +24,9 @@
 struct ICore;
 struct IPotatoFactoryRegistry;
 
+struct IConverterModule;
+struct IConverter;
+
 X_NAMESPACE_DECLARE(input, struct IInput)
 X_NAMESPACE_DECLARE(core, 
 struct ILog; 
@@ -278,7 +281,9 @@ struct ICore
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
 
 	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
-	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
+	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+		IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_ABSTRACT;
+	virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_ABSTRACT;
 
 	virtual IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
 
