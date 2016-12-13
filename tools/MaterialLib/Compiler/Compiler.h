@@ -10,6 +10,7 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(engine)
 
 class TechSetDefs;
+class TechSetDef;
 
 class MaterialCompiler
 {
@@ -26,6 +27,23 @@ class MaterialCompiler
 		render::FilterType::Enum filterType_;
 		render::TexRepeat::Enum texRepeat_;
 	};
+
+	struct Sampler
+	{
+		core::string name;
+		render::FilterType::Enum filterType;
+		render::TexRepeat::Enum texRepeat;
+	};
+
+	struct Param
+	{
+		core::string name;
+		core::string val;
+	};
+
+	typedef core::Array<Sampler> SamplerArr;
+	typedef core::Array<Tex> TexArr;
+	typedef core::Array<Param> ParamArr;
 
 public:
 	MaterialCompiler(TechSetDefs& techDefs);
@@ -58,12 +76,13 @@ private:
 	Vec2<int16_t> tiling_;
 	Vec2f uvScroll_;
 
-
-	Tex colMap_;
-	Tex normalMap_;
-	Tex detailNormalMap_;
-	Tex specColMap_;
 	core::string techType_;
+
+	TexArr textures_;
+	SamplerArr samplers_;
+	ParamArr params_;
+
+	engine::TechSetDef* pTechDef_;
 };
 
 

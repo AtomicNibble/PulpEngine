@@ -8,6 +8,8 @@
 #include "TechDefs\TechDefs.h"
 #include "TechDefs\TechSetDef.h"
 
+#include <functional>
+#include <numeric>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -20,16 +22,14 @@ MaterialCompiler::Tex::Tex() :
 
 bool MaterialCompiler::Tex::parse(core::json::Document& d, const char* pName)
 {
-	core::StackString<64, char> map("map");
 	core::StackString<64, char> tile("tile");
 	core::StackString<64, char> filter("filter");
 
-	map.append(pName);
 	tile.append(pName);
 	filter.append(pName);
 
-	if (!d.HasMember(map.c_str())) {
-		X_ERROR("Mat", "Missing \"%s\" value", map.c_str());
+	if (!d.HasMember(pName)) {
+		X_ERROR("Mat", "Missing \"%s\" value", pName);
 		return false;
 	}
 	if (!d.HasMember(tile.c_str())) {
@@ -41,7 +41,7 @@ bool MaterialCompiler::Tex::parse(core::json::Document& d, const char* pName)
 		return false;
 	}
 
-	const char* pMapName = d[map.c_str()].GetString();
+	const char* pMapName = d[pName].GetString();
 	const char* pTileMode = d[tile.c_str()].GetString();
 	const char* pFilterType = d[filter.c_str()].GetString();
 
@@ -73,13 +73,17 @@ bool MaterialCompiler::Tex::writeName(core::XFile* pFile) const
 		return true;
 	}
 
-	return pFile->writeString(name.c_str()) == name.length() + 1;
+	return pFile->writeString(name.c_str()) == core::strUtil::StringBytesIncNull(name);
 }
 
 // --------------------------------------
 
 MaterialCompiler::MaterialCompiler(TechSetDefs& techDefs) :
-	techDefs_(techDefs)
+	techDefs_(techDefs),
+	params_(g_MatLibArena),
+	samplers_(g_MatLibArena),
+	textures_(g_MatLibArena),
+	pTechDef_(nullptr)
 {
 
 }
@@ -143,84 +147,101 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	}
 
 	// so we don't store state of camel flaps in the material data.
-	// instead a material picks a techDef by process of picking a cat and type.
-	// currently cat is fixed, but type is data driven.
+ 	// currently cat is fixed, but type is data driven.
 	techType_ = pType;
 
-	engine::TechSetDef* pTechDef = nullptr;
-	if (!techDefs_.getTechDef(cat_, techType_, pTechDef)) {
+	if (!techDefs_.getTechDef(cat_, techType_, pTechDef_)) {
 		X_ERROR("Mat", "Failed to get techDef for cat: %s type: %s", pCat, pType);
 		return false;
 	}
 
-	X_ASSERT_NOT_NULL(pTechDef);
-
-	if (pTechDef->numTechs() > MTL_MAX_TECHS) {
-		return false;
-	}
+	X_ASSERT_NOT_NULL(pTechDef_);
 
 	// so now that we have a tech def you fucking TWAT!
 	// we know all the techs this material supports.
 	// and we also know what extra params we need to include in the material for sending to const buffer.
 	// we also know the permatation for the shader that's been used / features so we could compile it?
 	// or hold our heads been our legs and hope it compiles itself magically.
-	int goat = 0;
 
+	// so we must now iterate the params and make sure they are set.
+	for (auto it = pTechDef_->paramBegin(); it != pTechDef_->paramEnd(); ++it)
+	{
+		const auto& propName = it->first;
+		const auto& param = it->second;
 
+		if (param.type == ParamType::Texture)
+		{
+			// ok my little fat nigerna spoon.
+			// for tewxture param we have sampler / texture.
+			const auto& texProp = param.img.propName;
 
-#else
+			auto& tex = textures_.AddOne();
+			
+			if (!tex.parse(d, texProp.c_str())) {
 
-	// State
-	const char* pSrcCol = d["srcBlendColor"].GetString();
-	const char* pDstCol = d["dstBlendColor"].GetString();
-	const char* pSrcAlpha = d["srcBlendAlpha"].GetString();
-	const char* pDstAlpha = d["dstBlendAlpha"].GetString();
-	const char* pCullFace = d["cullFace"].GetString();
-	const char* pDepthTest = d["depthTest"].GetString();
+				return false;
+			}
+		}
+		else
+		{
+			if (!d.HasMember(propName)) {
+				X_ERROR("Mat", "Missing required value: \"%s\"", propName.c_str());
+				return false;
+			}
 
-	// no stencil materials for now.
-	stateDesc_.stencil.front.stencilFunc = render::StencilFunc::NEVER;
-	stateDesc_.stencil.front.failOp = render::StencilOperation::KEEP;
-	stateDesc_.stencil.front.zFailOp = render::StencilOperation::KEEP;
-	stateDesc_.stencil.front.passOp = render::StencilOperation::KEEP;
-	stateDesc_.stencil.back.stencilFunc = render::StencilFunc::NEVER;
-	stateDesc_.stencil.back.failOp = render::StencilOperation::KEEP;
-	stateDesc_.stencil.back.zFailOp = render::StencilOperation::KEEP;
-	stateDesc_.stencil.back.passOp = render::StencilOperation::KEEP;
+			// meow de meow.
+			// get the value.
+			const char* pValue = d[propName.c_str()].GetString();
 
-	stateDesc_.blend.srcBlendColor = Util::BlendTypeFromStr(pSrcCol);
-	stateDesc_.blend.dstBlendColor = Util::BlendTypeFromStr(pDstCol);
-	stateDesc_.blend.srcBlendAlpha = Util::BlendTypeFromStr(pSrcAlpha);
-	stateDesc_.blend.dstBlendAlpha = Util::BlendTypeFromStr(pDstAlpha);
-	stateDesc_.blend.colorOp = render::BlendOp::OP_ADD; // this can be fixed for now
-	stateDesc_.blend.alphaOp = render::BlendOp::OP_ADD; 
-
-	stateDesc_.cullType = Util::CullTypeFromStr(pCullFace);
-	stateDesc_.topo = render::TopoType::TRIANGLELIST;
-	stateDesc_.depthFunc = render::DepthFunc::ALWAYS;
-	stateDesc_.stateFlags.Clear();
-
-	// a material should not be bound to a vertex fmt.
-	// but we it's part of the stateDesc.
-	// which we pre make so we can use it directly at runtime.
-	// the vertexVmt will just need patching to correct one.
-	stateDesc_.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B; 
-
-	if (hasFlagAndTrue(d, "noDepthTest")) {
-		stateDesc_.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
+			auto& p = params_.AddOne();
+			p.name = propName;
+			p.val = pValue;
+		}
 	}
-	if (hasFlagAndTrue(d, "depthWrite")) {
-		stateDesc_.stateFlags.Set(render::StateFlag::DEPTHWRITE);
+
+	// process samplers.
+	for (auto it = pTechDef_->samplerBegin(); it != pTechDef_->samplerEnd(); ++it)
+	{
+		const auto& samplerName = it->first;
+		const auto& samplerDesc = it->second;
+
+		auto& sampler = samplers_.AddOne();
+		sampler.name = samplerName;
+
+		if (samplerDesc.isFilterDefined())
+		{
+			sampler.filterType = samplerDesc.filter;
+		}
+		else
+		{
+			if (!d.HasMember(samplerName)) {
+				X_ERROR("Mat", "Missing required value: \"%s\"", samplerName.c_str());
+				return false;
+			}
+
+			const char* pValue = d[samplerName.c_str()].GetString();
+
+			sampler.filterType = Util::FilterTypeFromStr(pValue);
+		}
+
+		if (samplerDesc.isRepeateDefined())
+		{
+			sampler.texRepeat = samplerDesc.repeat;
+		}
+		else
+		{
+			if (!d.HasMember(samplerName)) {
+				X_ERROR("Mat", "Missing required value: \"%s\"", samplerName.c_str());
+				return false;
+			}
+
+			const char* pValue = d[samplerName.c_str()].GetString();
+
+			sampler.texRepeat = Util::TexRepeatFromStr(pValue);
+		}
 	}
-	if (hasFlagAndTrue(d, "wireFrame")) {
-		stateDesc_.stateFlags.Set(render::StateFlag::WIREFRAME);
-	}
+
 #endif
-	// some flags we don't allow to be set currently.
-	// stateDesc_.stateFlags.Set(render::StateFlag::ALPHATEST);
-	// stateDesc_.stateFlags.Set(render::StateFlag::BLEND);
-	// stateDesc_.stateFlags.Set(render::StateFlag::STENCIL);
-
 
 	// tilling shit.
 	// how many goats for a given N pickles
@@ -274,24 +295,6 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		return false;
 	}
 
-	// col map.
-	if (!colMap_.parse(d, "Color")) {
-		X_ERROR("Mat", "Failed to parse texture info");
-		return false;
-	}
-	if (!normalMap_.parse(d, "Normal")) {
-		X_ERROR("Mat", "Failed to parse texture info");
-		return false;
-	}
-	if (!detailNormalMap_.parse(d, "DetailNormal")) {
-		X_ERROR("Mat", "Failed to parse texture info");
-		return false;
-	}
-	if (!specColMap_.parse(d, "SpecCol")) {
-		X_ERROR("Mat", "Failed to parse texture info");
-		return false;
-	}
-
 	return true;
 }
 
@@ -305,11 +308,15 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	X_ASSERT(cat_ != MaterialCat::UNKNOWN, "MatCat can't be unknown")();
 	X_ASSERT(techType_.isNotEmpty(), "TechType can't be empty")();
 
+
 	MaterialHeader hdr;
 	hdr.fourCC = MTL_B_FOURCC;
 
 	hdr.version = MTL_B_VERSION;
-	hdr.numTextures = 1;
+	hdr.numTextures = safe_static_cast<uint8_t>(textures_.size());
+	hdr.numParams = safe_static_cast<uint8_t>(pTechDef_->numParams());
+	hdr.strDataSize = 0; 
+	hdr.catTypeNameLen = 0; 
 	hdr.cat = cat_;
 	hdr.usage = usage_;
 
@@ -325,39 +332,28 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.shineness = 1.f;
 	hdr.opacity = 1.f;
 
-	// textures.
-	
 	if (pFile->writeObj(hdr) != sizeof(hdr)) {
 		X_ERROR("Mtl", "Failed to write img header");
 		return false;
 	}
 
-	// write techs name.
 	pFile->writeString(techType_);
 
-	// i want to just write all the tex blocks regardless if they are set or not.
-	std::array<const Tex* const, 4> textures = {
-		&colMap_,
-		&normalMap_,
-		&detailNormalMap_,
-		&specColMap_
-	};
 
-	for (const auto& t : textures)
+	// everything is data driven.
+	// i'm not sure if i want one type to define all the params / samplers or keep them split.
+
+	for (const auto& s : samplers_)
 	{
-		if (!t->write(pFile)) {
-			X_ERROR("Mtl", "Failed to write img info");
-			return false;
-		}
+		pFile->writeObj(s.filterType);
+		pFile->writeObj(s.texRepeat);
+		pFile->writeString(s.name);
 	}
 
-	// now write the names.
-	for (const auto& t : textures)
+	for (const auto& p : params_)
 	{
-		if (!t->writeName(pFile)) {
-			X_ERROR("Mtl", "Failed to write img name");
-			return false;
-		}
+		pFile->writeString(p.name);
+		pFile->writeString(p.val);
 	}
 
 	return true;

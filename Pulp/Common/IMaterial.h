@@ -197,10 +197,11 @@ struct MaterialHeader
 	// 4
 	uint8_t version;
 	uint8_t numTextures;
-	uint8_t _pad[2];
+	uint16_t strDataSize;
 
 	// 4
-	uint8_t __pad[2];
+	uint8_t catTypeNameLen;
+	uint8_t numParams;
 	MaterialCat::Enum cat;
 	MaterialUsage::Enum usage;
 
