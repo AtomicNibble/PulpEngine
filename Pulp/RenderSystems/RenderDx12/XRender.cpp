@@ -751,16 +751,39 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 			if (resourceState.getNumTextStates())
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
+				D3D12_CPU_DESCRIPTOR_HANDLE samplerSRVS[render::TextureSlot::ENUM_COUNT] = {};
 				const TextureState* pTexStates = resourceState.getTexStates(pStateData);
 
 				for (int32_t t = 0; t < resourceState.getNumTextStates(); t++)
 				{
-					const auto* pTex = pTextureMan_->getByID(pTexStates[t].textureId);
+					const auto& texState = pTexStates[t];
+					auto* pTex = pTextureMan_->getByID(texState.textureId);
+					
+					auto& gpuResource = pTex->getGpuResource();
+
+					context.transitionResource(gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+					textureSRVS[texState.slot] = pTex->getSRV();
 
 					// we need to handle setting samplers...
+					// we should first get the sampler from cache.
+					// i currnetly have sampler states bound to textures.
+					// which means each texture would need a seperate sampler deifned in the shader.
+					// how do we know which index the sampler for this texture is?
+					// should we just assume they share same register index?
+					// for now i'll force them in same slot.
+					// 
 
-					textureSRVS[t] = pTex->getSRV();
+					auto sampler = pSamplerCache_->createDescriptor(*pDescriptorAllocator_, texState.sampler);
+				
+					samplerSRVS[texState.slot] = sampler.getCpuDescriptorHandle();
 				}
+
+				// for now assume all slots are linera and no gaps.
+				const auto count = resourceState.getNumTextStates();
+
+				context.setDynamicDescriptors(1, 0, count, textureSRVS);
+				context.setDynamicSamplerDescriptors(2, 0, count, samplerSRVS);
 			}
 
 			if (resourceState.getNumCBs())
