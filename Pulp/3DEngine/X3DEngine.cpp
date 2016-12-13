@@ -295,7 +295,7 @@ void X3DEngine::OnFrameBegin(void)
 					// is it better to stall or just not render till next frame..
 					// well we can make it just not draw and add option to stall on request if needs be.
 					// lets just get it functional and see what is causing most of the delays.
-					const auto* pTech = pMat->getTech(tech, IPrimativeContext::VERTEX_FMT);
+					const auto* pTech = pMaterialManager_->getTechForMaterial(pMat, tech, IPrimativeContext::VERTEX_FMT);
 
 					const auto stateHandle = pTech->stateHandle;
 					const auto* pVariableState = pTech->pVariableState;
