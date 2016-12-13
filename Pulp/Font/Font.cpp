@@ -566,7 +566,7 @@ void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float
 
 void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
-	if (!isDirty() || 1) {
+	if (!isDirty()) {
 		return;
 	}
 
