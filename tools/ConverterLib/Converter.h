@@ -26,7 +26,7 @@ class Converter
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
 
-	typedef std::array<std::shared_ptr<IConverterModule>, AssetType::ENUM_COUNT> ConverterModuleInterfacesArr;
+	typedef std::array<IConverterModule*, AssetType::ENUM_COUNT> ConverterModuleInterfacesArr;
 
 public:
 	typedef IConverter::ConvertArgs ConvertArgs;
@@ -81,7 +81,6 @@ private:
 	bool IntializeConverterModule(AssetType::Enum assType);
 	bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
 	void UnloadConverters(void);
-	core::Module::Handle LoadDLL(const char* dllName);
 
 private:
 	void GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,

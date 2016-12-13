@@ -618,39 +618,23 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType)
 	return IntializeConverterModule(assType, dllName.c_str(), className.c_str());
 }
 
-bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName)
+bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* pDllName, const char* pModuleClassName)
 {
-	core::Path<char> path(dllName);
+	X_ASSERT(converters_[assType] == nullptr, "converter already init")(pDllName, pModuleClassName);
 
-	path.setExtension(".dll");
+	IConverterModule* pConvertModuleOut = nullptr;
+	IConverter* pConverterInstance = nullptr;
 
-#if !defined(X_LIB) 
-	core::Module::Handle hModule = LoadDLL(path.c_str());
-	if (!hModule) {
-		if (gEnv && gEnv->pLog) {
-			X_ERROR("Converter", "Failed to load converter module: %s", dllName);
-		}
-		return false;
-	}
-
-#endif // #if !defined(X_LIB) 
-
-
-	std::shared_ptr<IConverterModule> pModule;
-	if (PotatoCreateClassInstance(moduleClassName, pModule))
-	{
-		converters_[assType] = pModule->Initialize();
-	}
-	else
-	{
-		X_ERROR("Converter", "failed to find interface: %s -> %s", dllName, moduleClassName);
+	bool result = gEnv->pCore->IntializeLoadedConverterModule(pDllName, pModuleClassName, &pConvertModuleOut, &pConverterInstance);
+	if (!result) {
 		return false;
 	}
 
 	// save for cleanup.
-	converterModules_[assType] = pModule;
+	converterModules_[assType] = pConvertModuleOut;
+	converters_[assType] = pConverterInstance;
 
-	return converters_[assType] != nullptr;
+	return true;
 }
 
 void Converter::UnloadConverters(void)
@@ -659,36 +643,21 @@ void Converter::UnloadConverters(void)
 	{
 		if (converters_[i])
 		{
-			X_ASSERT((bool)converterModules_[i], "Have a converter interface without a corrisponding moduleInterface")();
+			X_ASSERT(converterModules_[i] != nullptr, "Have a converter interface without a corrisponding moduleInterface")();
 
 			if (!converterModules_[i]->ShutDown(converters_[i])) {
 				X_ERROR("Converter", "error shuting down converter module");
 			}
 
-			converterModules_[i].reset();
+			// con modules are ref counted so we can't free ourself.
+			gEnv->pCore->FreeConverterModule(converterModules_[i]);
+
+			converterModules_[i] = nullptr;
 			converters_[i] = nullptr;
 		}
 	}
 }
 
-core::Module::Handle Converter::LoadDLL(const char* dllName)
-{
-	core::Module::Handle hDll = core::Module::Load(dllName);
-
-	if (!hDll) {
-		return nullptr;
-	}
-
-	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
-		core::Module::GetProc(hDll, "LinkModule"));
-
-	if (pfnModuleInitISystem)
-	{
-		pfnModuleInitISystem(gEnv->pCore, dllName);
-	}
-
-	return hDll;
-}
 
 void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
 	const core::Path<char>& modPath, core::Path<char>& pathOut)
