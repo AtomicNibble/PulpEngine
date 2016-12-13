@@ -26,17 +26,23 @@ X_NAMESPACE_BEGIN(engine)
 
 class TechSetDef;
 class TechDefState;
+class TechDef;
+
+struct MaterialTech
+{
+	// for lookup.
+	core::StrHash hash;
+	render::shader::VertexFormat::Enum vertFmt;
+
+	// for drawing.
+	render::StateHandle stateHandle;
+	render::Commands::ResourceStateBase* pVariableState;
+};
 
 class Material
 {
 public:
-	struct Tech
-	{
-		core::StrHash hash;
-		render::shader::VertexFormat::Enum vertFmt;
-		render::StateHandle stateHandle;
-		render::Commands::ResourceStateBase* pVariableState;
-	};
+	typedef MaterialTech Tech;
 
 	struct Texture
 	{
