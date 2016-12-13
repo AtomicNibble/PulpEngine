@@ -751,7 +751,6 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 			if (resourceState.getNumTextStates())
 			{
 				D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
-				D3D12_CPU_DESCRIPTOR_HANDLE samplerSRVS[render::TextureSlot::ENUM_COUNT] = {};
 				const TextureState* pTexStates = resourceState.getTexStates(pStateData);
 
 				for (int32_t t = 0; t < resourceState.getNumTextStates(); t++)
@@ -774,15 +773,31 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 					// for now i'll force them in same slot.
 					// 
 
-					auto sampler = pSamplerCache_->createDescriptor(*pDescriptorAllocator_, texState.sampler);
-				
-					samplerSRVS[texState.slot] = sampler.getCpuDescriptorHandle();
 				}
 
 				// for now assume all slots are linera and no gaps.
 				const auto count = resourceState.getNumTextStates();
-
 				context.setDynamicDescriptors(1, 0, count, textureSRVS);
+			}
+
+			// this may be zero even if we have samplers, if they are all static.
+			if (resourceState.getNumSamplers())
+			{
+				D3D12_CPU_DESCRIPTOR_HANDLE samplerSRVS[render::TextureSlot::ENUM_COUNT] = {};
+				const SamplerState* pSamplers = resourceState.getSamplers(pStateData);
+
+				// potentially I want todo redundancy here.
+				// I may also want to require the 3dengine to make sampler states in advance so not done here.
+				// and we just pass sampler id's that map to samplerDescriptors.
+				for (int32_t t = 0; t < resourceState.getNumTextStates(); t++)
+				{
+					const auto& sampler = pSamplers[t];
+					auto samplerDescriptor = pSamplerCache_->createDescriptor(*pDescriptorAllocator_, sampler);
+
+					samplerSRVS[t] = samplerDescriptor.getCpuDescriptorHandle();
+				}
+
+				const auto count = resourceState.getNumSamplers();
 				context.setDynamicSamplerDescriptors(2, 0, count, samplerSRVS);
 			}
 
@@ -1068,6 +1083,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 			numParams++; // a descriptor range
 		}
 	}
+
 
 	rootSig.reset(numParams, 0);
 

@@ -235,12 +235,10 @@ struct TextureState
 {
 	// 4
 	texture::TexID textureId; 
-	// 2
-	SamplerState sampler;
 	// do i want to pass this?
 	// or try be fancy and pass arrays in TextureSlot index order.
 	TextureSlot::Enum slot; 
-	uint8_t _pad[1];
+	uint8_t _pad[3];
 };
 
 #if X_64

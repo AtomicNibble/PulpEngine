@@ -31,17 +31,21 @@ namespace Commands
 	{
 		static const uint32_t MAX_CONST_BUFFERS = render::MAX_CONST_BUFFERS_BOUND;
 		static const uint32_t MAX_TEX_STATES = render::MAX_TEXTURES_BOUND;
+		static const uint32_t MAX_SAMPLER_STATES = render::MAX_TEXTURES_BOUND;
 
 	public:
 		X_INLINE int8_t getNumTextStates(void) const;
+		X_INLINE int8_t getNumSamplers(void) const;
 		X_INLINE int8_t getNumCBs(void) const;
 
 		X_INLINE bool anySet(void) const;
 
 		X_INLINE TextureState* getTexStates(void);
+		X_INLINE SamplerState* getSamplers(void);
 		X_INLINE ConstantBufferHandle* getCBs(void);
 
 		X_INLINE const TextureState* getTexStates(void) const;
+		X_INLINE const SamplerState* getSamplers(void) const;
 		X_INLINE const ConstantBufferHandle* getCBs(void) const;
 
 		X_INLINE int32_t getTotalSize(void) const;
@@ -52,26 +56,30 @@ namespace Commands
 		X_INLINE uint8_t* getDataStart(void);
 
 		X_INLINE const TextureState* getTexStates(const void* pBase) const;
+		X_INLINE const SamplerState* getSamplers(const void* pBase) const;
 		X_INLINE const ConstantBufferHandle* getCBs(const void* pBase) const;
 
 	protected:
 		union {
 			struct {
 				int8_t numTextStates;
+				int8_t numSamplers;
 				int8_t numCbs;
+				int8_t _pad; // to pad or not to pad! 
 			};
-			uint16_t val;
+			uint32_t val;
 		};
 	};
 	X_PACK_POP
 	X_ENABLE_WARNING(4201)
 
-	X_ENSURE_SIZE(ResourceStateBase, 2);
+	X_ENSURE_SIZE(ResourceStateBase, 4);
 
 	X_INLINE constexpr int32_t ResourceStateBase::getMaxStateSize(void)
 	{
 		return sizeof(ResourceStateBase) +
 			(sizeof(render::TextureState) * MAX_TEX_STATES) +
+			(sizeof(render::SamplerState) * MAX_SAMPLER_STATES) +
 			(sizeof(render::ConstantBufferHandle) * MAX_CONST_BUFFERS);
 	}
 	
@@ -79,6 +87,11 @@ namespace Commands
 	X_INLINE int8_t ResourceStateBase::getNumTextStates(void) const
 	{
 		return numTextStates;
+	}
+
+	X_INLINE int8_t ResourceStateBase::getNumSamplers(void) const
+	{
+		return numSamplers;
 	}
 
 	X_INLINE int8_t ResourceStateBase::getNumCBs(void) const
@@ -96,11 +109,18 @@ namespace Commands
 		return reinterpret_cast<TextureState*>(getDataStart());
 	}
 
+	X_INLINE SamplerState* ResourceStateBase::getSamplers(void)
+	{
+		uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		return reinterpret_cast<SamplerState*>(pStart);
+	}
 
 	X_INLINE ConstantBufferHandle* ResourceStateBase::getCBs(void)
 	{
 		uint8_t* pStart = getDataStart();
 		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(SamplerState) * numSamplers);
 		return reinterpret_cast<ConstantBufferHandle*>(pStart);
 	}
 
@@ -109,10 +129,19 @@ namespace Commands
 		return reinterpret_cast<const TextureState*>(getDataStart());
 	}
 
+	X_INLINE const SamplerState* ResourceStateBase::getSamplers(void) const
+	{
+		const uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		return reinterpret_cast<const SamplerState*>(pStart);
+	}
+
+
 	X_INLINE const ConstantBufferHandle* ResourceStateBase::getCBs(void) const
 	{
 		const uint8_t* pStart = getDataStart();
 		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(SamplerState) * numSamplers);
 		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
 	}
 
@@ -130,6 +159,7 @@ namespace Commands
 	{
 		int32_t size = sizeof(ResourceStateBase);
 		size += (sizeof(TextureState) * numTextStates);
+		size += (sizeof(SamplerState) * numSamplers);
 		size += (sizeof(ConstantBufferHandle) * numCbs);
 		return size;
 	}
@@ -138,6 +168,7 @@ namespace Commands
 	{
 		int32_t size = 0;
 		size += (sizeof(TextureState) * numTextStates);
+		size += (sizeof(SamplerState) * numSamplers);
 		size += (sizeof(ConstantBufferHandle) * numCbs);
 		return size;
 	}
@@ -147,10 +178,18 @@ namespace Commands
 		return reinterpret_cast<const TextureState*>(pBase);
 	}
 
+	X_INLINE const SamplerState* ResourceStateBase::getSamplers(const void* pBase) const
+	{
+		const uint8_t* pStart = reinterpret_cast<const uint8_t*>(pBase);
+		pStart += (sizeof(TextureState) * numTextStates);
+		return reinterpret_cast<const SamplerState*>(pStart);
+	}
+
 	X_INLINE const ConstantBufferHandle* ResourceStateBase::getCBs(const void* pBase) const
 	{
 		const uint8_t* pStart = reinterpret_cast<const uint8_t*>(pBase);
 		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(SamplerState) * numSamplers);
 		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
 	}
 

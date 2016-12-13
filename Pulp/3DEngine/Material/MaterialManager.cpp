@@ -250,7 +250,11 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// him -> pTechDef
 	const size_t numTex = pTechDef->getNumBoundTextures();
 
-	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(numTex, cbLinks.size());
+	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
+		numTex, 
+		numTex, // same as numTex for now as i refactor sampler out of texState.
+		cbLinks.size()
+	);
 
 	// we should create the const buffers we need and set them in the variable state.
 	auto* pCBHandles = pVariableState->getCBs();
@@ -275,8 +279,14 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 		texState.textureId = 0; // get FOOKED.
 		texState.slot = render::TextureSlot::DIFFUSE;
-		texState.sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
-		texState.sampler.repeat = render::TexRepeat::TILE_BOTH;
+	}
+
+	auto* pSamplers = pVariableState->getSamplers();
+	for (size_t i = 0; i < numTex; i++)
+	{
+		auto& sampler = pSamplers[i];
+		sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
+		sampler.repeat = render::TexRepeat::TILE_BOTH;
 	}
 
 
