@@ -62,17 +62,6 @@ public:
 	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_OVERRIDE;
 	void destoryState(StateHandle handle) X_OVERRIDE;
 
-	// =============================================
-	// ============== OLD API ======================
-	// =============================================
-	
-	// AuxGeo
-	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
-	// ~AuxGeo
-
-	// Drawing
-
-
 private:
 	XCamera cam_;
 };

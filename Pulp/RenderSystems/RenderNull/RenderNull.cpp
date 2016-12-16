@@ -263,23 +263,6 @@ void RenderNull::destoryState(StateHandle handle)
 	X_UNUSED(handle);
 }
 
-// =====================================================================
-
-
-// AuxGeo
-IRenderAux* RenderNull::GetIRenderAuxGeo(void)
-{
-	return nullptr;
-}
-// ~AuxGeo
-
-
-
-
-// ~Textures
-
-
-// Drawing
 
 
 

@@ -378,13 +378,6 @@ struct IRender
 	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
 	virtual void destoryState(StateHandle handle) X_ABSTRACT;
 
-	// =============================================
-	// ============== OLD API ======================
-	// =============================================
-
-	// AuxGeo
-	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
-	// ~AuxGeo
 };
 
 

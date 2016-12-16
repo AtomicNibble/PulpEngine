@@ -241,11 +241,14 @@ int XBinds_Core::DrawLine(IFunctionHandler* pH)
 	pH->GetParam(6, fcol.a);
 
 	Color8u col(fcol);
-
+#if 1
+	X_ASSERT_UNREACHABLE();
+#else
 	render::IRenderAux* pRenderAuxGeom = gEnv->pRender->GetIRenderAuxGeo();
 
 	pRenderAuxGeom->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
 	pRenderAuxGeom->drawLine(v0, col, v1, col);
+#endif
 
 	return pH->EndFunction();
 }

@@ -191,7 +191,7 @@ staticModels_(g_3dEngineArena)
 	pTimer_ = gEnv->pTimer;
 	pFileSys_ = gEnv->pFileSys;
 	pJobSys_ = gEnv->pJobSys;
-	pAux_ = gEnv->pRender->GetIRenderAuxGeo();
+	pAux_ = nullptr;
 }
 
 Level::~Level()

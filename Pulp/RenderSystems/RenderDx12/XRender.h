@@ -184,14 +184,6 @@ public:
 	void destoryState(StateHandle handle) X_FINAL;
 
 
-	// =============================================
-	// ============== OLD API ======================
-	// =============================================
-
-	virtual IRenderAux* GetIRenderAuxGeo(void) X_FINAL;
-
-
-
 private:
 	void CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
 		D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams);

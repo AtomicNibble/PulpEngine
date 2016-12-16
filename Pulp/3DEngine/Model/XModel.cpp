@@ -118,6 +118,9 @@ void XModel::RenderBones(const Matrix44f& modelMat)
 		return;
 	}
 
+#if 1
+	X_UNUSED(modelMat);
+#else
 	if (numBones() > 0)
 	{
 		render::IRenderAux* pAux = this->getRender()->GetIRenderAuxGeo();
@@ -156,6 +159,7 @@ void XModel::RenderBones(const Matrix44f& modelMat)
 			}
 		}
 	}
+#endif
 }
 
 // ~IModel

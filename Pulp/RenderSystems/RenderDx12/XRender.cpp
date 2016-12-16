@@ -1722,21 +1722,4 @@ void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 
 
 
-
-
-// =============================================
-// ============== OLD API ======================
-// =============================================
-
-
-// AuxGeo
-IRenderAux* XRender::GetIRenderAuxGeo(void)
-{
-	return nullptr;
-}
-// ~AuxGeo
-
-
-
-
 X_NAMESPACE_END
