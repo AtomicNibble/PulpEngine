@@ -68,6 +68,23 @@ bool BufferManager::init(void)
 
 void BufferManager::shutDown(void)
 {
+	// so I currently don't keep track of buffers allocated.
+	// so only when stats are enalbed do i know if we have leaks.
+#if VID_MEMORY_STATS
+
+	if (stats_.numIndexBuffers > 0) {
+		X_WARNING("VidMem", "%" PRIu32 " indexbuffer(s) are still active", stats_.numIndexBuffers);
+	}
+
+	if (stats_.numVertexBuffers > 0) {
+		X_WARNING("VidMem", "%" PRIu32 " vertexbuffer(s) are still active", stats_.numVertexBuffers);
+	}
+
+	if (stats_.numConstBuffers > 0) {
+		X_WARNING("VidMem", "%" PRIu32 " constbuffer(s) are still active", stats_.numConstBuffers);
+	}
+
+#endif // !VID_MEMORY_STATS
 
 }
 
