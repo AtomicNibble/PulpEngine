@@ -12,6 +12,8 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(engine)
 
+#define VARIABLE_STATE_STATS 1
+
 class VariableStateManager
 {
 	typedef core::MemoryArena<
@@ -20,7 +22,7 @@ class VariableStateManager
 
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
+		core::NoMemoryTracking,
 		core::SimpleMemoryTagging
 #else
 		core::NoBoundsChecking,
@@ -28,6 +30,18 @@ class VariableStateManager
 		core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> PoolArena;
+
+	struct Stats
+	{
+		Stats();
+
+		uint32_t numVariablestates;
+		uint32_t maxVariablestates;
+
+		uint32_t numTexStates;
+		uint32_t numSamplers;
+		uint32_t numCBS;
+	};
 
 public:
 	static const uint32_t MAX_CONST_BUFFERS = render::MAX_CONST_BUFFERS_BOUND;
@@ -43,6 +57,7 @@ public:
 	render::Commands::ResourceStateBase* createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs);
 	void releaseVariableState(render::Commands::ResourceStateBase* pVS);
 
+	Stats getStats(void) const;
 
 private:
 	render::Commands::ResourceStateBase* createVariableState_Interal(int8_t numTexStates, int8_t numSamp, int8_t numCBs);
@@ -60,6 +75,11 @@ private:
 
 
 	render::Commands::ResourceStateBase* pEmtpyState_;
+
+private:
+#if VARIABLE_STATE_STATS
+	Stats stats_;
+#endif // !VARIABLE_STATE_STATS
 };
 
 
