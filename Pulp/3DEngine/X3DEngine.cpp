@@ -144,6 +144,16 @@ void X3DEngine::ShutDown(void)
 		X_DELETE(pMaterialManager_, g_3dEngineArena);
 	}
 
+	if (pVariableStateMan_) {
+		pVariableStateMan_->shutDown();
+		X_DELETE(pVariableStateMan_, g_3dEngineArena);
+	}
+
+	if (pCBufMan_) {
+		pCBufMan_->shutDown();
+		X_DELETE(pCBufMan_, g_3dEngineArena);
+	}
+
 	level::Level::ShutDown();
 }
 
