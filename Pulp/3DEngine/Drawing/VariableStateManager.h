@@ -41,6 +41,8 @@ public:
 
 
 	render::Commands::ResourceStateBase* createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs);
+	void releaseVariableState(render::Commands::ResourceStateBase* pVS);
+
 
 private:
 	render::Commands::ResourceStateBase* createVariableState_Interal(int8_t numTexStates, int8_t numSamp, int8_t numCBs);

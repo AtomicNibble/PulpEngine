@@ -69,6 +69,14 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState(s
 	return createVariableState_Interal(safe_static_cast<int8_t>(numTexStates), safe_static_cast<int8_t>(numSamp), safe_static_cast<int8_t>(numCBs));
 }
 
+void VariableStateManager::releaseVariableState(render::Commands::ResourceStateBase* pVS)
+{
+	X_ASSERT_NOT_NULL(pVS);
+
+
+	X_DELETE(pVS, &statePool_);
+}
+
 render::Commands::ResourceStateBase* VariableStateManager::createVariableState_Interal(int8_t numTexStates, int8_t numSamp, int8_t numCBs)
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
