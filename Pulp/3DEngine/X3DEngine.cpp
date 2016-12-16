@@ -92,7 +92,7 @@ bool X3DEngine::Init(void)
 	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender_);
 	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
 
-	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(*pVariableStateMan_);
+	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_);
 	if (!pMaterialManager_->Init()) {
 		return false;
 	}

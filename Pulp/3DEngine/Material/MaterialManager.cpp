@@ -39,20 +39,21 @@ namespace
 
 } // namespace
 
-XMaterialManager::XMaterialManager(VariableStateManager& vsMan) :
+XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan) :
+	arena_(arena),
 	pTechDefMan_(nullptr),
 	vsMan_(vsMan),
-	materials_(g_3dEngineArena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource)),
+	materials_(arena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource)),
 	pDefaultMtl_(nullptr)
 {
-	pTechDefMan_ = X_NEW(TechDefStateManager, g_3dEngineArena, "TechDefStateManager")(g_3dEngineArena);
+	pTechDefMan_ = X_NEW(TechDefStateManager, arena, "TechDefStateManager")(arena);
 
 }
 
 XMaterialManager::~XMaterialManager()
 {
 	if (pTechDefMan_) {
-		X_DELETE(pTechDefMan_, g_3dEngineArena);
+		X_DELETE(pTechDefMan_, arena_);
 	}
 }
 

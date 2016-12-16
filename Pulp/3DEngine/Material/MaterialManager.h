@@ -30,7 +30,7 @@ class XMaterialManager :
 	typedef MaterialContainer::Resource MaterialResource;
 
 public:
-	XMaterialManager(VariableStateManager& vsMan);
+	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan);
 	virtual ~XMaterialManager();
 
 	bool Init(void);
@@ -70,6 +70,7 @@ private:
 	void freeDanglingMaterials(void);
 
 private:
+	core::MemoryArenaBase* arena_;
 	VariableStateManager& vsMan_;
 	TechDefStateManager* pTechDefMan_;
 
