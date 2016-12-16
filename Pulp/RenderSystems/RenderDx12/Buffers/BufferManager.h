@@ -78,11 +78,12 @@ public:
 
 	typedef core::MemoryArena<core::PoolAllocator,
 		core::SingleThreadPolicy,
-		core::NoBoundsChecking,
 #if X_DEBUG
-		core::SimpleMemoryTracking,
+		core::SimpleBoundsChecking,
+		core::NoMemoryTracking,
 		core::SimpleMemoryTagging
 #else
+		core::NoBoundsChecking,
 		core::NoMemoryTracking,
 		core::NoMemoryTagging
 #endif !X_DEBUG
