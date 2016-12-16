@@ -49,7 +49,20 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pPSOCache_(nullptr),
 //	presentRS_(arena),
 	currentBufferIdx_(0),
-	auxQues_ {arena, arena} 
+	auxQues_ {arena, arena} ,
+
+	statePoolHeap_(
+		core::bitUtil::RoundUpToMultiple<size_t>(
+			StatePoolArena::getMemoryRequirement(MAX_STATE_ALOC_SIZE) * MAX_STATES,
+			core::VirtualMem::GetPageSize()
+		)
+	),
+	statePoolAllocator_(statePoolHeap_.start(), statePoolHeap_.end(),
+		StatePoolArena::getMemoryRequirement(MAX_STATE_ALOC_SIZE),
+		StatePoolArena::getMemoryAlignmentRequirement(MAX_STATE_ALOC_ALIGN),
+		StatePoolArena::getMemoryOffsetRequirement()
+	),
+	statePool_(&statePoolAllocator_, "StatePool")
 {
 
 }
@@ -981,7 +994,7 @@ void XRender::releaseTexture(texture::ITexture* pTex)
 
 PassStateHandle XRender::createPassState(const RenderTargetFmtsArr& rtfs)
 {
-	PassState* pPass = X_NEW(PassState, arena_, "PassState");
+	PassState* pPass = X_NEW(PassState, &statePool_, "PassState");
 	pPass->rtfs = rtfs;
 
 	return reinterpret_cast<PassStateHandle>(pPass);
@@ -991,7 +1004,7 @@ void XRender::destoryPassState(PassStateHandle passHandle)
 {
 	PassState* pPassState = reinterpret_cast<PassState*>(passHandle);
 
-	X_DELETE(pPassState, arena_);
+	X_DELETE(pPassState, &statePool_);
 }
 
 D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderStageFlags stageFlags)
@@ -1053,7 +1066,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	}
 #endif
 
-	DeviceState* pState = X_NEW(DeviceState, arena_, "DeviceState")(arena_);
+	DeviceState* pState = X_NEW(DeviceState, &statePool_, "DeviceState")(arena_);
 	pState->pPso = nullptr;
 	pState->topo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
@@ -1216,7 +1229,7 @@ void XRender::destoryState(StateHandle handle)
 
 	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
 
-	X_DELETE(pState, arena_);
+	X_DELETE(pState, &statePool_);
 }
 
 

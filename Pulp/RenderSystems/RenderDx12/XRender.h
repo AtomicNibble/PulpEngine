@@ -74,7 +74,7 @@ class XRender : public IRender
 		{}
 
 
-		RootSignature rootSig;
+		RootSignature rootSig; // dam rootsig is a chunky fucker.
 		ID3D12PipelineState* pPso;
 
 		D3D12_PRIMITIVE_TOPOLOGY topo;
@@ -119,6 +119,25 @@ class XRender : public IRender
 		D3D12_PRIMITIVE_TOPOLOGY topo;
 	};
 
+
+	static const size_t MAX_STATES = 1024 * 4;
+	static const size_t MAX_STATE_ALOC_SIZE = core::Max(sizeof(PassState), sizeof(DeviceState));
+	static const size_t MAX_STATE_ALOC_ALIGN = core::Max(X_ALIGN_OF(PassState), X_ALIGN_OF(DeviceState));
+
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		core::MultiThreadPolicy<core::Spinlock>, // allow multi thread creation.
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::NoMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> StatePoolArena;
 
 
 public:
@@ -236,6 +255,10 @@ private:
 	RootSignatureDeviceCache* pRootSigCache_;
 	PSODeviceCache* pPSOCache_;
 
+
+	core::HeapArea      statePoolHeap_;
+	core::PoolAllocator statePoolAllocator_;
+	StatePoolArena		statePool_;
 
 
 //	RootSignature presentRS_;
