@@ -85,24 +85,7 @@ void XMaterialManager::ShutDown(void)
 
 	releaseMaterial(pDefaultMtl_);
 
-#if 0
-	// any left?
-	core::XResourceContainer::ResourceItor it = materials_.begin();
-	for (; it != materials_.end(); )
-	{
-		Material* pMat = static_cast<Material*>(it->second);
-
-		++it;
-
-		if (!pMat) {
-			continue;
-		}
-
-		X_WARNING("Material", "\"%s\" was not deleted", pMat->getName());
-
-		pMat->release();
-	}
-#endif 
+	freeDanglingMaterials();
 }
 
 void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
@@ -509,6 +492,17 @@ void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_
 }
 // ~ICoreEventListener
 
+
+void XMaterialManager::freeDanglingMaterials(void)
+{
+	auto it = materials_.begin();
+	for (; it != materials_.end(); ++it) {
+		auto matRes = it->second;
+		X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, matRes->getName(), matRes->getRefCount());
+	}
+
+	materials_.free();
+}
 
 void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 {

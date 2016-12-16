@@ -67,6 +67,7 @@ private:
 	MaterialResource* findMaterial_Internal(const core::string& name) const;
 
 	void InitDefaults(void);
+	void freeDanglingMaterials(void);
 
 private:
 	VariableStateManager& vsMan_;
