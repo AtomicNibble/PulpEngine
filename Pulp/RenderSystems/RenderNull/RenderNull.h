@@ -54,6 +54,7 @@ public:
 	shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_OVERRIDE;
 	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_OVERRIDE;
 
+	void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_OVERRIDE;
 	void releaseTexture(texture::ITexture* pTex) X_OVERRIDE;
 
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_OVERRIDE;

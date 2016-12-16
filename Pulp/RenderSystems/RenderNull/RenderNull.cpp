@@ -225,6 +225,10 @@ shader::IShaderPermatation* RenderNull::createPermatation(const shader::ShaderSt
 	return nullptr;
 }
 
+void RenderNull::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
+{
+	X_UNUSED(pPerm);
+}
 
 void RenderNull::releaseTexture(texture::ITexture* pTex)
 {

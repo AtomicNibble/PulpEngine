@@ -173,6 +173,7 @@ public:
 	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_FINAL;
 
 
+	void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;
 	void releaseTexture(texture::ITexture* pTex) X_FINAL;
 
 

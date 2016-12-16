@@ -368,7 +368,7 @@ struct IRender
 	virtual shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_ABSTRACT;
 	virtual shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_ABSTRACT;
 
-
+	virtual void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_ABSTRACT;
 	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
 
 	// state

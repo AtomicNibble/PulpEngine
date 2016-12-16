@@ -968,6 +968,11 @@ shader::IShaderPermatation* XRender::createPermatation(const shader::ShaderStage
 }
 
 
+void XRender::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
+{
+	pShaderMan_->releaseShaderPermatation(pPerm);
+}
+
 void XRender::releaseTexture(texture::ITexture* pTex)
 {
 	pTextureMan_->releaseTexture(pTex);
