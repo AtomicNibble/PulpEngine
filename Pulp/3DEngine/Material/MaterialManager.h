@@ -46,7 +46,7 @@ public:
 	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt) X_FINAL;
 	bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
 
-	virtual Material* getDefaultMaterial(void) X_FINAL;
+	X_INLINE virtual Material* getDefaultMaterial(void) const X_FINAL;
 
 	// ~IMaterialManager
 
@@ -81,5 +81,6 @@ private:
 
 X_NAMESPACE_END
 
+#include "MaterialManager.inl"
 
 #endif // X_3D_MATERIAL_MAN_H_

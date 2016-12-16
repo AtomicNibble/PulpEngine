@@ -292,7 +292,7 @@ struct IMaterialManager
 	virtual bool setTextureID(Material* pMat, MaterialTech* pTech, core::StrHash texNameHash, texture::TexID id) X_ABSTRACT;
 
 
-	virtual Material* getDefaultMaterial(void) X_ABSTRACT;
+	virtual Material* getDefaultMaterial(void) const X_ABSTRACT;
 };
 
 X_NAMESPACE_END

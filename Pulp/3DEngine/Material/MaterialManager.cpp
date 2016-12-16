@@ -470,13 +470,6 @@ void XMaterialManager::InitDefaults(void)
 }
 
 
-
-Material* XMaterialManager::getDefaultMaterial(void)
-{
-	return pDefaultMtl_;
-}
-
-
 // ~IMaterialManager
 
 

@@ -187,5 +187,8 @@
     <None Include="Material\TechDefStateManager.inl">
       <Filter>Header Files\Material</Filter>
     </None>
+    <None Include="Material\MaterialManager.inl">
+      <Filter>Header Files\Material</Filter>
+    </None>
   </ItemGroup>
 </Project>
