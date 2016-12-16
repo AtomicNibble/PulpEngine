@@ -215,6 +215,7 @@ void CBufferManager::destoryConstBuffer(render::shader::XCBuffer& cbuf, render::
 
 	if (it->first.removeReference() == 0)
 	{
+		pRender_->destoryConstBuffer(it->second);
 		cbMap_.erase(it);
 	}
 }
