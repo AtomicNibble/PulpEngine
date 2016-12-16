@@ -42,7 +42,13 @@ BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice
 		core::bitUtil::RoundUpToMultiple<size_t>(POOL_SIZE * POOL_ALLOCATION_SIZE,
 			core::VirtualMem::GetPageSize())
 	),
-	pool_(heap_.start(), heap_.end(), POOL_ALLOCATION_SIZE, POOL_ALLOCATION_ALIGN, 0),
+	pool_(
+		heap_.start(), 
+		heap_.end(),
+		PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE),
+		PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
+		PoolArena::getMemoryOffsetRequirement()
+	),
 	arena_(&pool_, "VidMemBuffer")
 {
 	X_UNUSED(arena);
