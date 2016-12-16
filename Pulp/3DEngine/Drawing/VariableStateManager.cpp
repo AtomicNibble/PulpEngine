@@ -63,6 +63,15 @@ VariableStateManager::~VariableStateManager()
 
 }
 
+void VariableStateManager::shutDown(void)
+{
+
+
+	if (pEmtpyState_) {
+		releaseVariableState(pEmtpyState_);
+	}
+}
+
 render::Commands::ResourceStateBase* VariableStateManager::createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs)
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");

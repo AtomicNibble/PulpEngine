@@ -53,6 +53,7 @@ public:
 	VariableStateManager();
 	~VariableStateManager();
 
+	void shutDown(void);
 
 	render::Commands::ResourceStateBase* createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs);
 	void releaseVariableState(render::Commands::ResourceStateBase* pVS);
