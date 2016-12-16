@@ -36,6 +36,23 @@ CBufferManager::~CBufferManager()
 
 }
 
+void CBufferManager::shutDown(void)
+{
+	if (!cbMap_.empty())
+	{
+		for (auto it = cbMap_.begin(); it != cbMap_.end(); ++it)
+		{
+			const auto& cb = it->first;
+			const render::shader::XCBuffer* pCB = *cb.instance();
+			X_WARNING("CBuf", "Dangling cbuffer: \"%s\" refs: %" PRIi32, pCB->getName(), cb.getRefCount());
+
+			pRender_->destoryConstBuffer(it->second);
+		}
+	
+		cbMap_.clear();
+	}
+}
+
 void CBufferManager::update(core::FrameData& frame)
 {
 	using render::shader::ParamType;

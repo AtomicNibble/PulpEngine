@@ -67,6 +67,8 @@ public:
 	CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender);
 	~CBufferManager();
 
+	void shutDown(void);
+
 	void update(core::FrameData& frame);
 
 	// returns true if stale.
