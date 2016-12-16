@@ -33,10 +33,10 @@ BufferManager::Stats::Stats()
 // -------------------------------------------
 
 BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-	ContextManager* pContextMan, DescriptorAllocator* pDescriptorAllocator) :
+	ContextManager& contextMan, DescriptorAllocator& descriptorAllocator) :
 	pDevice_(pDevice),
-	pContextMan_(pContextMan),
-	pDescriptorAllocator_(pDescriptorAllocator),
+	contextMan_(contextMan),
+	descriptorAllocator_(descriptorAllocator),
 
 	heap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(POOL_SIZE * POOL_ALLOCATION_SIZE,
@@ -81,7 +81,7 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numEle
 	pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "VbBuf");
 	pBuf->pBackingHeap_ = nullptr;
 
-	pBuf->pBuffer_->create(pDevice_, *pContextMan_, *pDescriptorAllocator_, numElements, elementSize, pInitialData);
+	pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, numElements, elementSize, pInitialData);
 
 	return createHandleForBuffer(pBuf);
 }
@@ -112,7 +112,7 @@ BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size,
 	pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "CbBuf");
 	pBuf->pBackingHeap_ = nullptr;
 
-	pBuf->pBuffer_->create(pDevice_, *pContextMan_, *pDescriptorAllocator_, size, 1, pInitialData);
+	pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, size, 1, pInitialData);
 
 	pBuf->rootIdx_ = rootIdx;
 

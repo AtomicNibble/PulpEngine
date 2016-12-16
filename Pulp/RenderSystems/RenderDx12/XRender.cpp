@@ -202,7 +202,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	pPSOCache_ = X_NEW(PSODeviceCache, arena_, "PSODeviceCache")(arena_, pDevice_);
 	pSamplerCache_ = X_NEW(SamplerDescriptorCache, arena_, "SamplerDescriptorCache")(arena_, pDevice_);
 
-	pBuffMan_ = X_NEW(BufferManager, arena_, "BufferManager")(arena_, pDevice_, pContextMan_, pDescriptorAllocator_);
+	pBuffMan_ = X_NEW(BufferManager, arena_, "BufferManager")(arena_, pDevice_, *pContextMan_, *pDescriptorAllocator_);
 	if (!pBuffMan_->init()) {
 		X_ERROR("Render", "failed to init buffer manager");
 		return false;
