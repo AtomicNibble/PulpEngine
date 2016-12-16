@@ -183,6 +183,12 @@ namespace shader
 		return pPerm.release();
 	}
 	
+	void XShaderManager::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
+	{
+		// term the perm!
+
+		X_DELETE(pPerm, arena_);
+	}
 
 	void XShaderManager::getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut)
 	{

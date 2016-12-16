@@ -57,6 +57,7 @@ namespace shader
 		IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile);
 
 		shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
+		void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
 
 		ShaderVars& getShaderVars(void);
 		ShaderBin& getBin(void);
