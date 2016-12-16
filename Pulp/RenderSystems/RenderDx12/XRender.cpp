@@ -31,6 +31,14 @@ namespace
 } // namespace
 
 
+XRender::Stats::Stats()
+{
+	core::zero_this(this);
+}
+
+
+// ---------------------------------------------------------------------
+
 XRender::XRender(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	pDevice_(nullptr),
@@ -997,12 +1005,21 @@ PassStateHandle XRender::createPassState(const RenderTargetFmtsArr& rtfs)
 	PassState* pPass = X_NEW(PassState, &statePool_, "PassState");
 	pPass->rtfs = rtfs;
 
+#if RENDER_STATS
+	++stats_.numPassStates;
+	stats_.maxPassStates = core::Max(stats_.maxPassStates, stats_.numPassStates);
+#endif // !RENDER_STATS
+
 	return reinterpret_cast<PassStateHandle>(pPass);
 }
 
 void XRender::destoryPassState(PassStateHandle passHandle)
 {
 	PassState* pPassState = reinterpret_cast<PassState*>(passHandle);
+
+#if RENDER_STATS
+	--stats_.numPassStates;
+#endif // !RENDER_STATS
 
 	X_DELETE(pPassState, &statePool_);
 }
@@ -1219,6 +1236,12 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pState->topo = topoFromDesc(desc);
 	pState->texStates.resize(numStates);
 	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
+
+#if RENDER_STATS
+	++stats_.numStates;
+	stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
+#endif // !RENDER_STATS
+
 	return reinterpret_cast<StateHandle>(pState);
 }
 
@@ -1228,6 +1251,10 @@ void XRender::destoryState(StateHandle handle)
 	X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
 
 	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
+
+#if RENDER_STATS
+	--stats_.numStates;
+#endif // !RENDER_STATS
 
 	X_DELETE(pState, &statePool_);
 }

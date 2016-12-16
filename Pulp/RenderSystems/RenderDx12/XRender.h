@@ -120,6 +120,17 @@ class XRender : public IRender
 	};
 
 
+	struct Stats
+	{
+		Stats();
+
+		uint32_t numPassStates;
+		uint32_t maxPassStates;
+		
+		uint32_t numStates;
+		uint32_t maxStates;
+	};
+
 	static const size_t MAX_STATES = 1024 * 4;
 	static const size_t MAX_STATE_ALOC_SIZE = core::Max(sizeof(PassState), sizeof(DeviceState));
 	static const size_t MAX_STATE_ALOC_ALIGN = core::Max(X_ALIGN_OF(PassState), X_ALIGN_OF(DeviceState));
@@ -301,6 +312,10 @@ private:
 	size_t dedicatedvideoMemory_;
 
 	RenderAux auxQues_[AuxRenderer::ENUM_COUNT];
+
+#if RENDER_STATS
+	Stats stats_;
+#endif // !RENDER_STATS
 };
 
 
