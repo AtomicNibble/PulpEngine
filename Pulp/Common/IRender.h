@@ -346,15 +346,9 @@ struct IRender
 	virtual IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
 	virtual IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
 
-	virtual void destoryVertexBuffer(VertexBufferHandle handle) X_ABSTRACT;
-	virtual void destoryIndexBuffer(IndexBufferHandle handle) X_ABSTRACT;
-
-	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
-	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 
 	// cb's
 	virtual ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
-	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_ABSTRACT;
 
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
@@ -368,15 +362,21 @@ struct IRender
 	virtual shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_ABSTRACT;
 	virtual shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_ABSTRACT;
 
+	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
+	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
+
+	// Release
 	virtual void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_ABSTRACT;
 	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
-
-	// state
-	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
 	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
-
-	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
 	virtual void destoryState(StateHandle handle) X_ABSTRACT;
+
+	virtual void destoryVertexBuffer(VertexBufferHandle handle) X_ABSTRACT;
+	virtual void destoryIndexBuffer(IndexBufferHandle handle) X_ABSTRACT;
+	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_ABSTRACT;
+
+	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
+	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 
 };
 

@@ -183,16 +183,8 @@ public:
 	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
 	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
 
-	void destoryVertexBuffer(VertexBufferHandle handle) X_FINAL;
-	void destoryIndexBuffer(IndexBufferHandle handle) X_FINAL;
-
-	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
-	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
-
 	// cb's
 	ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
-	void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
-
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
@@ -202,18 +194,21 @@ public:
 	shader::IShaderPermatation* createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel) X_FINAL;
 	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_FINAL;
 
+	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
 
+	// Release
 	void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;
 	void releaseTexture(texture::ITexture* pTex) X_FINAL;
-
-
-	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
 	void destoryPassState(PassStateHandle handle) X_FINAL;
-
-
-	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
 	void destoryState(StateHandle handle) X_FINAL;
 
+	void destoryVertexBuffer(VertexBufferHandle handle) X_FINAL;
+	void destoryIndexBuffer(IndexBufferHandle handle) X_FINAL;
+	void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
+
+	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
+	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 
 private:
 	void CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
