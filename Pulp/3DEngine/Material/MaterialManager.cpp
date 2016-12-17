@@ -266,7 +266,6 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 
 		texState.textureId = 0; // get FOOKED.
-		texState.slot = render::TextureSlot::DIFFUSE;
 	}
 
 	auto* pSamplers = pVariableState->getSamplers();

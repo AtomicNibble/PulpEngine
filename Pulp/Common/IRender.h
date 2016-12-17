@@ -235,16 +235,12 @@ struct TextureState
 {
 	// 4
 	texture::TexID textureId; 
-	// do i want to pass this?
-	// or try be fancy and pass arrays in TextureSlot index order.
-	TextureSlot::Enum slot; 
-	uint8_t _pad[3];
 };
 
 #if X_64
-X_ENSURE_SIZE(TextureState, 8);
+X_ENSURE_SIZE(TextureState, 4);
 #else
-X_ENSURE_SIZE(TextureState, 8);
+X_ENSURE_SIZE(TextureState, 4);
 #endif
 
 X_DECLARE_FLAGS8(StateFlag)(

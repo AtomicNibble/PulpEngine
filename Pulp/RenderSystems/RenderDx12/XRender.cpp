@@ -783,7 +783,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 					context.transitionResource(gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-					textureSRVS[texState.slot] = pTex->getSRV();
+					textureSRVS[t] = pTex->getSRV();
 
 					// we need to handle setting samplers...
 					// we should first get the sampler from cache.
