@@ -87,24 +87,13 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, Root
 
 // --------------------------------------------------------
 
-void RootSignature::clear(void)
+
+void RootSignature::freeParams(void)
 {
-	params_.clear();
-	samplers_.clear();
-
-	samplesInitCount_ = 0;
-
-	// we can't release as the cache will still hold the pointer.
-	// core::SafeReleaseDX(pSignature_);
-	pSignature_ = nullptr;
-}
-
-void RootSignature::free(void)
-{
-	clear();
-
 	params_.free();
 	samplers_.free();
+
+	samplesInitCount_ = 0;
 }
 
 

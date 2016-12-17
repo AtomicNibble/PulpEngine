@@ -114,7 +114,7 @@ X_INLINE RootSignature::RootSignature(core::MemoryArenaBase* arena, size_t numRo
 
 X_INLINE RootSignature::~RootSignature()
 {
-	free();
+	freeParams();
 }
 
 

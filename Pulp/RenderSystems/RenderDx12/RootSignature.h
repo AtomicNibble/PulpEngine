@@ -88,8 +88,9 @@ public:
 	X_INLINE RootSignature(core::MemoryArenaBase* arena, size_t numRootParams = 0, size_t numStaticSamplers = 0);
 	X_INLINE ~RootSignature();
 
-	void clear(void); // keeps param memory.
-	void free(void);
+	// free's all the cpu param descriptions.
+	// safe todo after finalize.
+	void freeParams(void);
 	X_INLINE void reset(size_t numRootParams, size_t numStaticSamplers = 0);
 
 	void initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
