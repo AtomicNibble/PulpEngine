@@ -365,7 +365,7 @@ struct IRender
 	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
 	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
 
-	// Release
+	// Will relesse all the HWShaders in the perm for you.
 	virtual void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_ABSTRACT;
 	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
 	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
