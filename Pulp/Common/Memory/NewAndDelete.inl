@@ -233,10 +233,8 @@ namespace Mem
 	// ---------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------
 	template <typename T>
-	inline void Destruct(T* instance, PODType)
+	inline void Destruct(T*, PODType)
 	{
-		X_ASSERT_NOT_NULL(instance);
-
 		// no destructor needs to be called for POD types
 	}
 
