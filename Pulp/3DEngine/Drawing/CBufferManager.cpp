@@ -38,6 +38,11 @@ CBufferManager::~CBufferManager()
 
 void CBufferManager::shutDown(void)
 {
+#if 1
+	// we don't own the cbuffer instances, the hardware shaders do.
+	// so freeing the hardware shaders will clean them all up.
+	cbMap_.clear();
+#else
 	if (!cbMap_.empty())
 	{
 		for (auto it = cbMap_.begin(); it != cbMap_.end(); ++it)
@@ -51,6 +56,7 @@ void CBufferManager::shutDown(void)
 	
 		cbMap_.clear();
 	}
+#endif
 }
 
 void CBufferManager::update(core::FrameData& frame)
