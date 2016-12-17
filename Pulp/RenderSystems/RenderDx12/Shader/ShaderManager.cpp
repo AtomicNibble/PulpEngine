@@ -188,9 +188,20 @@ namespace shader
 		return pPerm.release();
 	}
 	
-	void XShaderManager::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
+	void XShaderManager::releaseShaderPermatation(shader::IShaderPermatation* pIPerm)
 	{
 		// term the perm!
+		ShaderPermatation* pPerm = static_cast<ShaderPermatation*>(pIPerm);
+
+		const auto& stages = pPerm->getStages();
+		for (auto* pHWShader : stages)
+		{
+			if (!pHWShader) {
+				continue;
+			}
+
+			releaseHWShader(pHWShader);
+		}
 
 		X_DELETE(pPerm, arena_);
 	}
