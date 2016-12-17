@@ -53,8 +53,6 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		stages[type] = pRenderSys->createHWShader(type, shaderEntry_[type], pSource);
 	}
 
-	render::shader::IShaderPermatation* pPerm = pRenderSys->createPermatation(stages);
-
 
 	render::RenderTargetFmtsArr rtfs;
 	rtfs.append(texture::Texturefmt::R8G8B8A8);
@@ -62,13 +60,20 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	auto passHandle = pRenderSys->createPassState(rtfs);
 	if (passHandle == render::INVALID_STATE_HANLDE)
 	{
+		X_ERROR("Tech", "Failed to create passState");
 		return false;
 	}
+
+	// this will result in all shaders been compiled and cbuffer info created.
+	render::shader::IShaderPermatation* pPerm = pRenderSys->createPermatation(stages);
 
 	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDesc, nullptr, 0);
 
 	if (stateHandle == render::INVALID_STATE_HANLDE)
 	{
+		X_ERROR("Tech", "Failed to create state");
+		pRenderSys->destoryPassState(passHandle);
+		pRenderSys->releaseShaderPermatation(pPerm);
 		return false;
 	}
 
