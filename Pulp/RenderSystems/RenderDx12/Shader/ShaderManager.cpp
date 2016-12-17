@@ -108,6 +108,11 @@ namespace shader
 		return pHW;
 	}
 
+	void XShaderManager::releaseHWShader(IHWShader* pHWSHader)
+	{
+		releaseHWShader(static_cast<XHWShader*>(pHWSHader));
+	}
+
 	shader::IShaderPermatation* XShaderManager::createPermatation(const shader::ShaderStagesArr& stages)
 	{
 		// ok so for now when we create a permatation we also require all the shaders to be compiled.
@@ -265,6 +270,16 @@ namespace shader
 
 
 		return pHWShaderRes;
+	}
+
+	void XShaderManager::releaseHWShader(XHWShader* pHWSHader)
+	{
+		HWShaderResource* pHWRes = static_cast<HWShaderResource*>(pHWSHader);
+
+		if (pHWRes->removeReference() == 0)
+		{
+			hwShaders_.releaseAsset(pHWRes);
+		}
 	}
 
 	bool XShaderManager::freeSourcebin(void)

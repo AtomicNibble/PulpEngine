@@ -55,6 +55,7 @@ namespace shader
 		
 		IShaderSource* sourceforName(const char* pSourceName);
 		IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile);
+		void releaseHWShader(IHWShader* pHWSHader);
 
 		shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
 		void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
@@ -62,12 +63,12 @@ namespace shader
 		ShaderVars& getShaderVars(void);
 		ShaderBin& getBin(void);
 
-
 	private:
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
 
 		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry,
 			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
+		void releaseHWShader(XHWShader* pHWSHader);
 
 	private:
 		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);
