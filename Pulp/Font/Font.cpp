@@ -737,9 +737,9 @@ bool XFont::InitCache(void)
 		*p++ = i;
 	}
 
-	*p = 0;
+	const size_t len = (p - buf);
 
-	Prepare(buf, buf + sizeof(buf));
+	Prepare(buf, buf + len);
 	return true;
 }
 
