@@ -13,6 +13,17 @@ TechDef::TechDef(core::MemoryArenaBase* arena) :
 	shaderSource_.fill(nullptr);
 }
 
+TechDef::~TechDef()
+{
+	render::IRender* pRenderSys = gEnv->pRender;
+
+	for (auto& perm : perms_)
+	{
+		pRenderSys->releaseShaderPermatation(perm.pShaderPerm);
+	}
+}
+
+
 TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt)
 {
 	// ok so this will be called to get a permatation.
@@ -77,6 +88,12 @@ TechDefState::TechDefState(core::MemoryArenaBase* arena) :
 
 }
 
+TechDefState::~TechDefState()
+{
+
+}
+
+
 TechDef* TechDefState::getTech(core::StrHash hash)
 {
 	for (auto& tech : techs_) {
@@ -104,8 +121,20 @@ TechDefStateManager::TechDefStateManager(core::MemoryArenaBase* arena) :
 
 TechDefStateManager::~TechDefStateManager()
 {
+	shutDown();
+}
+
+void TechDefStateManager::shutDown(void)
+{
+	for (auto* pTechDefState : techStates_)
+	{
+		X_DELETE(pTechDefState, arena_);
+	}
+
+	techStates_.free();
+
 	if (pTechDefs_) {
-		X_DELETE(pTechDefs_, g_3dEngineArena);
+		X_DELETE_AND_NULL(pTechDefs_, g_3dEngineArena);
 	}
 }
 

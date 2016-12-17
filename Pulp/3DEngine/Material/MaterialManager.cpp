@@ -87,6 +87,10 @@ void XMaterialManager::ShutDown(void)
 	releaseMaterial(pDefaultMtl_);
 
 	freeDanglingMaterials();
+
+	if (pTechDefMan_) {
+		pTechDefMan_->shutDown();
+	}
 }
 
 void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)

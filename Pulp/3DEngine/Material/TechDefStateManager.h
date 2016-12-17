@@ -26,6 +26,7 @@ class TechDef
 
 public:
 	TechDef(core::MemoryArenaBase* arena);
+	~TechDef();
 
 	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt);
 
@@ -51,6 +52,7 @@ class TechDefState
 
 public:
 	TechDefState(core::MemoryArenaBase* arena);
+	~TechDefState();
 
 	TechDef* getTech(core::StrHash hash);
 
@@ -74,6 +76,8 @@ class TechDefStateManager
 public:
 	TechDefStateManager(core::MemoryArenaBase* arena);
 	~TechDefStateManager();
+
+	void shutDown(void);
 
 
 	TechDefState* getTechDefState(const MaterialCat::Enum cat, const core::string& name);
