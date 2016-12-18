@@ -681,6 +681,11 @@ bool AssetProperty::isModified(void) const
 	return settings_.IsSet(Setting::MODIFIED);
 }
 
+bool AssetProperty::isUpdateOnChange(void) const
+{
+	return settings_.IsSet(Setting::UPDATE_ON_CHANGE);
+}
+
 AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const
 {
 	return type_;
