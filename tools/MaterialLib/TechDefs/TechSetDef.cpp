@@ -1412,6 +1412,12 @@ bool TechSetDef::parseParamSampler(core::XParser& lex)
 				}
 				break;
 
+			case "ass"_fnv1a:
+				if (!parseAssPropsData(lex, sampler.assProps)) {
+					return false;
+				}
+				break;
+
 			default:
 				X_ERROR("TechDef", "Unknown Sampler state prop: \"%.*s\"", token.length(), token.begin());
 				return false;

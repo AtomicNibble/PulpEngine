@@ -124,6 +124,8 @@ struct Sampler
 
 	render::TexRepeat::Enum repeat;
 	render::FilterType::Enum filter;
+
+	AssManProps assProps;
 };
 
 class TechSetDef
