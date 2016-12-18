@@ -1181,6 +1181,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		return INVALID_STATE_HANLDE;
 	}
 
+#if X_DEBUG == 0 || 1
+	rootSig.freeParams();
+#endif
+
 	// we need to create a PSO.
 	GraphicsPSO pso;
 
