@@ -198,24 +198,6 @@ bool PrimativeContext::isEmpty(void) const
 	return pushBufferArr_.isEmpty();
 }
 
-void PrimativeContext::getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const
-{
-	sortedPushBuffer.reserve(pushBufferArr_.size());
-	sortedPushBuffer.resize(0);
-
-	for (const auto& ap : pushBufferArr_) {
-		sortedPushBuffer.push_back(&ap);
-	}
-
-	// what to sort by :Z ?
-	X_ASSERT_NOT_IMPLEMENTED();
-//	std::sort(sortedPushBuffer.begin(), sortedPushBuffer.end(),
-//		[](const PushBufferEntry* lhs, const PushBufferEntry* rhs) {
-//			return lhs->flags < rhs->flags;
-//		}
-//	);
-}
-
 const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void) const
 {
 	return pushBufferArr_;

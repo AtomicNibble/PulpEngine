@@ -137,7 +137,6 @@ public:
 	void reset(void) X_FINAL;
 	
 	bool isEmpty(void) const;
-	void getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	VertexPageHandlesArr getVertBufHandles(void) const;
 
