@@ -1306,47 +1306,63 @@ bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
 		// but I also want to be able to specify textures that only exsist at runtime.
 		// i guess i don't really need any special logic for that just need to give the runtime textures names.
 
-		if (!lex.ExpectTokenString("<")) {
-			return false;
-		}
+		// "iamgeName" : hardcoded image name
+		// <propName> : the property name
+		// <proName, imageName> : property name followed by hardcoded default.
 
 		core::XLexToken token;
 		if (!lex.ReadToken(token)) {
 			return false;
 		}
 
-		if (token.GetType() != core::TokenType::NAME) {
-			return false;
+		if (token.GetType() == core::TokenType::NAME)
+		{
+			// this is just hard coded image name.
+			img.default = core::string(token.begin(), token.end());
 		}
-
-		img.propName = core::string(token.begin(), token.end());
-
-		// now we have optional default value.
+		else if(token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::LOGIC_LESS)
 		{
 			if (!lex.ReadToken(token)) {
 				return false;
 			}
 
-			if (token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::COMMA)
+			if (token.GetType() != core::TokenType::NAME) {
+				return false;
+			}
+
+			img.propName = core::string(token.begin(), token.end());
+
+			// now we have optional default value.
 			{
-				// default value.
 				if (!lex.ReadToken(token)) {
 					return false;
 				}
 
-				if (token.GetType() != core::TokenType::NAME) {
-					return false;
-				}
+				if (token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::COMMA)
+				{
+					// default value.
+					if (!lex.ReadToken(token)) {
+						return false;
+					}
 
-				img.default = core::string(token.begin(), token.end());
+					if (token.GetType() != core::TokenType::NAME) {
+						return false;
+					}
+
+					img.default = core::string(token.begin(), token.end());
+				}
+				else
+				{
+					lex.UnreadToken(token);
+				}
 			}
-			else
-			{
-				lex.UnreadToken(token);
+
+			if (!lex.ExpectTokenString(">")) {
+				return false;
 			}
 		}
-
-		if (!lex.ExpectTokenString(">")) {
+		else
+		{
 			return false;
 		}
 	}
