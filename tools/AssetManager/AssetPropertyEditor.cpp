@@ -180,6 +180,13 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 		pCheckBoxWidget_->setText(title);
 		pCheckBoxWidget_->setToolTip(toolTip);
 
+		if (settings_.IsSet(Setting::BOLD_TEXT))
+		{
+			auto font = pCheckBoxWidget_->font();
+			font.setBold(true);
+			pCheckBoxWidget_->setFont(font);
+		}
+
 		// checkbox icon hype.
 		if (!icon_.isEmpty()) {
 			const QString& iconPath = icon_;
