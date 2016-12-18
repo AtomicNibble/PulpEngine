@@ -64,6 +64,7 @@ public:
 		ANIM,
 		ASSET_REF,
 		PATH,
+		LABEL,
 
 		GROUPBOX // used to start a group box.
 	);
@@ -211,6 +212,7 @@ private:
 		AssetComboBoxWidget* pComboBoxWidget_;
 		AssetGroupWidget* pGroupWidget_;
 		AssetLineEditWidget* pLineEditWidget_;
+		QLabel* pLabelWidget_;
 	};
 
 

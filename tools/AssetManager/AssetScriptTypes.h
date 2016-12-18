@@ -94,6 +94,7 @@ public:
 	AssetScriptProperty* AddText(const std::string& key, const std::string& value);
 	AssetScriptProperty* AddString(const std::string& key, const std::string& value);
 	AssetScriptProperty* AddPath(const std::string& key, const std::string& value);
+	AssetScriptProperty* AddLabel(const std::string& key, const std::string& value);
 
 	void BeginGroup(const std::string& groupName);
 

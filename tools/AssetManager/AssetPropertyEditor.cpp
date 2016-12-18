@@ -118,6 +118,22 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::COMBOBOX:
 		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, initData_, settings_.IsSet(Setting::EDITIABLE));
 		break;
+	case PropertyType::LABEL:
+		pLabelWidget_ = new QLabel(pParent);
+		pLabelWidget_->setText(QString::fromStdString(val));
+		if (settings_.IsSet(Setting::BOLD_TEXT))
+		{
+			auto font = pLabelWidget_->font();
+			font.setBold(true);
+			pLabelWidget_->setFont(font);
+		}
+
+		if(fontCol_ != QColor())
+		{
+			pLabelWidget_->setStyleSheet(QString("QLabel { color : rgb(%1, %2, %3); }").arg(fontCol_.red()).arg(fontCol_.green()).arg(fontCol_.blue()));
+		}
+
+		break;
 	case PropertyType::GROUPBOX:
 		X_ASSERT(pGroupWidget_, "Group not valid")(pGroupWidget_);
 
@@ -337,6 +353,9 @@ void AssetProperty::show(bool vis)
 	case PropertyType::GROUPBOX:
 		pGroupWidget_->show(vis);
 		break;
+	case PropertyType::LABEL:
+		pLabelWidget_->setVisible(vis);
+		break;
 	default:
 		X_ASSERT_NOT_IMPLEMENTED();
 		break;
@@ -390,6 +409,9 @@ void AssetProperty::enable(bool val)
 		break;
 	case PropertyType::GROUPBOX:
 		pGroupWidget_->setEnabled(val);
+		break;
+	case PropertyType::LABEL:
+		pLabelWidget_->setEnabled(val);
 		break;
 	default:
 		X_ASSERT_NOT_IMPLEMENTED();
@@ -1098,6 +1120,10 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 			break;
 		case AssetProperty::PropertyType::CHECKBOX:
 			writer.Bool(item.GetValueBool());
+			break;
+
+		case AssetProperty::PropertyType::LABEL:
+			// we don't save label's in props data.
 			break;
 
 		case AssetProperty::PropertyType::TEXT:

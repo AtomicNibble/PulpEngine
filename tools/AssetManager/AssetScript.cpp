@@ -200,6 +200,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddText(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddText), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddPath(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddPath), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddString(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddString), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddLabel(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddLabel), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "void BeginGroup(const string& in)", asMETHOD(AssetScriptProps, BeginGroup), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ getItem(const string& in)", asMETHOD(AssetScriptProps, getItem), asCALL_THISCALL); BUG_CHECK(r >= 0);

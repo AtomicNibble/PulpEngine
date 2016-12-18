@@ -437,6 +437,13 @@ AssetScriptProperty* AssetScriptProps::AddPath(const std::string& key, const std
 	return pProp;
 }
 
+AssetScriptProperty* AssetScriptProps::AddLabel(const std::string& key, const std::string& value)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::LABEL);
+	pProp->prop().SetDefaultValue(value);
+	return pProp;
+}
+
 void AssetScriptProps::BeginGroup(const std::string& groupName)
 {
 	props_.BeginGroup(groupName);
