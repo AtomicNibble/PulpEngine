@@ -80,8 +80,6 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 {
 	pRender_ = pRender;
 
-#if 1
-
 	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
 	{
 		const auto primType = static_cast<PrimitiveType::Enum>(i);
@@ -111,99 +109,6 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		primMaterials_[primType] = pMat;
 	}
 
-
-#else
-	pAuxShader_ = nullptr; //  pRender->getShader("Prim");
-						   //	auto* pTech = pAuxShader_->getTech("Prim");
-
-						   // needed currently to generate the permatations.
-						   //	pTech->tryCompile(true);
-
-	render::StateDesc desc;
-	desc.blend.srcBlendColor = render::BlendType::SRC_ALPHA;
-	desc.blend.srcBlendAlpha = render::BlendType::SRC_ALPHA;
-	desc.blend.dstBlendColor = render::BlendType::INV_SRC_ALPHA;
-	desc.blend.dstBlendAlpha = render::BlendType::INV_SRC_ALPHA;
-	desc.blendOp = render::BlendOp::OP_ADD;
-	desc.cullType = render::CullType::NONE;
-	desc.depthFunc = render::DepthFunc::ALWAYS;
-	desc.stateFlags.Clear();
-	desc.stateFlags.Set(render::StateFlag::BLEND);
-	desc.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
-	desc.vertexFmt = render::shader::VertexFormat::P3F_T2F_C4B;
-
-
-	pAuxShader_ = pRender->getShader("Prim");
-	auto* pTech = pAuxShader_->getTech("Prim");
-
-	// needed currently to generate the permatations.
-	pTech->tryCompile(true);
-
-	auto* pPerm = pTech->getPermatation(desc.vertexFmt);
-	if (!pPerm) {
-		X_ERROR("PrimContext", "Failed to get permatation");
-		return false;
-	}
-
-	auto renderTarget = pRender->getCurBackBuffer();
-
-	render::RenderTargetFmtsArr rtfs;
-	rtfs.append(renderTarget->getFmt());
-
-	passHandle_ = pRender->createPassState(rtfs);
-
-
-	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
-	{
-		const auto primType = static_cast<PrimitiveType::Enum>(i);
-
-		desc.topo = primType;
-		stateCache_[primType] = pRender->createState(passHandle_, pPerm, desc, nullptr, 0);
-
-		if (stateCache_[primType] == render::INVALID_STATE_HANLDE) {
-			X_ERROR("PrimContext", "Failed to create state for primType: \"%s\"", PrimitiveType::ToString(primType));
-			return false;
-		}
-
-		const auto& cbufs = pPerm->getCbufferLinks();
-
-		// Create a variable State and Cbuffers then set the handles.
-		auto* pVariableState = pVariableStateMan_->createVariableState(0, safe_static_cast<int8_t>(cbufs.size()));
-		auto* pCBufHandles = pVariableState->getCBs();
-
-		for (size_t c = 0; c<cbufs.size(); c++)
-		{
-			auto& cb = *cbufs[c].pCBufer;
-
-			if (cb.requireManualUpdate()) {
-				X_ERROR("PrimContext", "Prim technique has a cbuffer \"%s\" that requires manual update", cb.getName().c_str());
-				return false;
-			}
-
-			// start with a initial value for now.
-			// later should be able to technically remove this.
-			// since when it's actually used we should notice it's stale and update it.
-			pCBufMan_->autoUpdateBuffer(cb);
-
-			auto cbHandle = pCBufMan_->createCBuffer(cb);
-
-			pCBufHandles[c] = cbHandle;
-		}
-
-		core::StackString<64, char> matName("$prim_");
-		matName.append(PrimitiveType::ToString(primType));
-
-		Material* pMat = pMaterialManager_->createMaterial(matName.c_str());
-		pMat->setStateDesc(desc);
-		pMat->setStateHandle(stateCache_[primType]);
-		pMat->setCat(MaterialCat::CODE);
-		pMat->setVariableState(pVariableState);
-
-		// MeOwWwWWW !!!
-		primMaterials_[primType] = pMat;
-	}
-
-#endif
 	return true;
 }
 
