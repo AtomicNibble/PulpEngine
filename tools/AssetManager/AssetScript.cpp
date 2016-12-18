@@ -7,7 +7,12 @@
 
 #include "AssetEntryManager.h"
 
+#include <time\StopWatch.h>
+#include <String\HumanDuration.h>
+
 #include <../../tools/MaterialLib/MatLib.h>
+
+
 X_NAMESPACE_BEGIN(assman)
 
 namespace
@@ -414,6 +419,8 @@ bool AssetPropsScriptManager::execScript(AssetProperties& props, asIScriptModule
 		return false;
 	}
 
+	core::StopWatch timer;
+
 	AssetScriptProps scriptProps(props, *pTechDefs_);
 
 	asIScriptContext* pCtx = pEngine_->CreateContext();
@@ -431,6 +438,8 @@ bool AssetPropsScriptManager::execScript(AssetProperties& props, asIScriptModule
 		return false;
 	}
 
+	core::HumanDuration::Str timeStr;
+	X_LOG1("AssetScript", "Script exec took: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 	return true;
 }
 
