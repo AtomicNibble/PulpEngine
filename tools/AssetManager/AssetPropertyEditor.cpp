@@ -199,6 +199,13 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 		pLabel_ = new QLabel();
 		pLabel_->setText(title);
 		pLabel_->setToolTip(toolTip);
+		
+		if (settings_.IsSet(Setting::BOLD_TEXT))
+		{
+			auto font = pLabel_->font();
+			font.setBold(true);
+			pLabel_->setFont(font);
+		}
 
 		pLayout->addWidget(pLabel_, row, depth, 1, colSpanForCol(depth));
 		pLayout->addWidget(pWidget_, row, MAX_COL_IDX);
