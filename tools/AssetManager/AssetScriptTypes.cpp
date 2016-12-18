@@ -255,8 +255,9 @@ AssetScriptProperty* AssetScriptProperty::copyFactory(const AssetScriptProperty&
 // -----------------------------------------------------------
 
 
-AssetScriptProps::AssetScriptProps(AssetProperties& props) :
+AssetScriptProps::AssetScriptProps(AssetProperties& props, engine::TechSetDefs& techDefs) :
 	props_(props),
+	techDefs_(techDefs),
 	refCount_(1)
 {
 

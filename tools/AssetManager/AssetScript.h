@@ -6,6 +6,10 @@ class asIScriptEngine;
 class asIScriptContext;
 struct asSMessageInfo;
 
+X_NAMESPACE_DECLARE(engine,
+	class TechSetDefs
+);
+
 X_NAMESPACE_BEGIN(assman)
 
 class AssetProperties;
@@ -82,6 +86,7 @@ private slots:
 private:
 	asIScriptEngine* pEngine_;
 	QFileSystemWatcher* pWatcher_;
+	engine::TechSetDefs* pTechDefs_;
 	ScriptCacheArr cache_;
 };
 

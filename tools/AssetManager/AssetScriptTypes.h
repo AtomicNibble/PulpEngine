@@ -4,6 +4,10 @@
 
 #include "AssetPropertyEditor.h"
 
+X_NAMESPACE_DECLARE(engine, 
+	class TechSetDefs
+);
+
 X_NAMESPACE_BEGIN(assman)
 
 // ----------------------------------------------
@@ -65,7 +69,7 @@ class AssetScriptProps
 	typedef QMap<std::string, AssetScriptProperty*> KeyMap;
 
 public:
-	AssetScriptProps(AssetProperties& props);
+	AssetScriptProps(AssetProperties& props, engine::TechSetDefs& techDefs);
 	~AssetScriptProps();
 
 	void addRef(void);
@@ -108,6 +112,8 @@ private:
 
 private:
 	AssetProperties& props_;
+	engine::TechSetDefs& techDefs_;
+
 	KeyMap map_;
 	int32_t refCount_;
 };

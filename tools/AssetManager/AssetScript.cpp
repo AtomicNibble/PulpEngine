@@ -7,6 +7,7 @@
 
 #include "AssetEntryManager.h"
 
+#include <../../tools/MaterialLib/MatLib.h>
 X_NAMESPACE_BEGIN(assman)
 
 namespace
@@ -82,7 +83,8 @@ const char* AssetPropsScriptManager::SCRIPT_ENTRY = "void GenerateUI(asset& Asse
 
 AssetPropsScriptManager::AssetPropsScriptManager() :
 	pEngine_(nullptr),
-	pWatcher_(nullptr)
+	pWatcher_(nullptr),
+	pTechDefs_(nullptr)
 {
 	// cache_.fill(nullptr);
 }
@@ -94,6 +96,9 @@ AssetPropsScriptManager::~AssetPropsScriptManager()
 	if (pWatcher_) {
 		delete pWatcher_;
 	}
+	if (pTechDefs_) {
+		delete pTechDefs_;
+	}
 }
 
 bool AssetPropsScriptManager::init(bool enableHotReload)
@@ -103,6 +108,10 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 
 		connect(pWatcher_, SIGNAL(fileChanged(const QString &)),
 			this, SLOT(fileChanged(const QString &)));
+	}
+
+	if (!pTechDefs_) {
+		pTechDefs_ = new engine::TechSetDefs(g_arena);
 	}
 
 
@@ -405,7 +414,7 @@ bool AssetPropsScriptManager::execScript(AssetProperties& props, asIScriptModule
 		return false;
 	}
 
-	AssetScriptProps scriptProps(props);
+	AssetScriptProps scriptProps(props, *pTechDefs_);
 
 	asIScriptContext* pCtx = pEngine_->CreateContext();
 	pCtx->Prepare(pFunc);
