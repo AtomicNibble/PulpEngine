@@ -524,6 +524,30 @@ std::string AssetScriptProps::getMaterialTypes(std::string& catStr)
 	return s;
 }
 
+bool AssetScriptProps::isMaterialType(std::string& catStr, std::string& typeStr)
+{
+	const engine::MaterialCat::Enum cat = engine::Util::MatCatFromStr(catStr.data(), catStr.data() + catStr.length());
+
+	if (cat == engine::MaterialCat::UNKNOWN) {
+		return false;
+	}
+
+	engine::TechSetDefs::CatTypeArr types(g_arena);
+	if (!techDefs_.getTechCatTypes(cat, types)) {
+		return false;
+	}
+
+	for (const auto& t : types)
+	{
+		if (t.compare(typeStr.c_str()))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& typeStr)
 {
 	const engine::MaterialCat::Enum cat = engine::Util::MatCatFromStr(catStr.data(), catStr.data() + catStr.length());

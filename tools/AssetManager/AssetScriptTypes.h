@@ -105,6 +105,7 @@ public:
 
 	std::string getMaterialCats(void);
 	std::string getMaterialTypes(std::string& cat);
+	bool isMaterialType(std::string& cat, std::string& type);
 	void addMaterialTypeProps(std::string& cat, std::string& type);
 
 private:
