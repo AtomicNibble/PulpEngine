@@ -552,7 +552,72 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 {
 	const engine::MaterialCat::Enum cat = engine::Util::MatCatFromStr(catStr.data(), catStr.data() + catStr.length());
 
-	X_UNUSED(typeStr);
+	// we wnat the TECH DEF!
+	// then once we have it we get all the params
+	// we just look for them and enable.
+	engine::TechSetDef* pTechDef = nullptr;
+	if (!techDefs_.getTechDef(cat, typeStr.c_str(), pTechDef)) {
+		return;
+	}
+
+	// right now we just need to show the props that are part of this techSetDef.
+
+	auto showProps = [&](const core::string& propName, const engine::AssManProps& assProps) {
+		auto propIt = map_.find(std::string(propName));
+		if (propIt != map_.end())
+		{
+			(*propIt)->SetVisible(true);
+
+			if (assProps.title.isNotEmpty())
+			{
+				(*propIt)->SetTitle(std::string(assProps.title));
+			}
+			if (assProps.default.isNotEmpty())
+			{
+				(*propIt)->SetDefaultValue(std::string(assProps.default));
+			}
+
+		}
+		else
+		{
+			X_WARNING("AssetScript", "Failed to find techSet prop: \"%s\"", propName.c_str());
+		}
+	};
+
+	for (auto it = pTechDef->paramBegin(); it != pTechDef->paramEnd(); ++it)
+	{
+		const auto& propName = it->first;
+		const auto& param = it->second;
+
+		if (param.type == engine::ParamType::Texture)
+		{
+			// is this texture have a prop?
+			if(param.img.propName.isNotEmpty())
+			{
+				showProps(param.img.propName, param.assProps);
+			}
+		}
+		else
+		{
+			showProps(propName, param.assProps);
+		}
+	}
+
+	for (auto it = pTechDef->samplerBegin(); it != pTechDef->samplerEnd(); ++it)
+	{
+	//	const auto& samplerName = it->first;
+		const auto& samplerDesc = it->second;
+
+		if (!samplerDesc.isFilterDefined())
+		{
+			showProps(samplerDesc.filterStr, samplerDesc.assProps);
+		}
+
+		if (!samplerDesc.isRepeateDefined())
+		{
+			showProps(samplerDesc.repeatStr, samplerDesc.assProps);
+		}
+	}
 }
 
 AssetScriptProperty* AssetScriptProps::getProperty(const std::string& key, AssetProperty::PropertyType::Enum type)
