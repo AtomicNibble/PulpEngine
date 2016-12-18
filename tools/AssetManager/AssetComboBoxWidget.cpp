@@ -35,6 +35,8 @@ AssetComboBoxWidget::AssetComboBoxWidget(QWidget *parent, const std::string& val
 	// cosnt Qstring& version also
 	connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
 
+	setFocusPolicy(Qt::StrongFocus);
+
 	// we need to map values.
 	setValue(value);
 }
@@ -154,6 +156,13 @@ void AssetComboBoxWidget::returnPressed(void)
 {
 
 
+}
+
+void AssetComboBoxWidget::wheelEvent(QWheelEvent *e)
+{
+	if (hasFocus()) {
+		QComboBox::wheelEvent(e);
+	}
 }
 
 X_NAMESPACE_END

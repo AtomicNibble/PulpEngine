@@ -38,6 +38,9 @@ private slots:
 	void returnPressed(void);
 
 private:
+	void wheelEvent(QWheelEvent *e);
+
+private:
 	ComboEntryArr values_;
 	bool editable_;
 };
