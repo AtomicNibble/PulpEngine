@@ -14,20 +14,6 @@ class TechSetDef;
 
 class MaterialCompiler
 {
-	struct Tex
-	{
-		Tex();
-
-		bool parse(core::json::Document& doc, const char* pName);
-		bool write(core::XFile* pFile) const;
-		bool writeName(core::XFile* pFile) const;
-
-	public:
-		core::string name;
-		render::FilterType::Enum filterType_;
-		render::TexRepeat::Enum texRepeat_;
-	};
-
 	struct Sampler
 	{
 		core::string name;
@@ -42,7 +28,6 @@ class MaterialCompiler
 	};
 
 	typedef core::Array<Sampler> SamplerArr;
-	typedef core::Array<Tex> TexArr;
 	typedef core::Array<Param> ParamArr;
 
 public:
@@ -78,7 +63,6 @@ private:
 
 	core::string techType_;
 
-	TexArr textures_;
 	SamplerArr samplers_;
 	ParamArr params_;
 

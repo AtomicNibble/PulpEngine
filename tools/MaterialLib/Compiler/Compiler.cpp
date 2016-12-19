@@ -13,76 +13,12 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-MaterialCompiler::Tex::Tex() :
-	filterType_(render::FilterType::LINEAR_MIP_LINEAR),
-	texRepeat_(render::TexRepeat::TILE_BOTH)
-{
-}
-
-
-bool MaterialCompiler::Tex::parse(core::json::Document& d, const char* pName)
-{
-	core::StackString<64, char> tile("tile");
-	core::StackString<64, char> filter("filter");
-
-	tile.append(pName);
-	filter.append(pName);
-
-	if (!d.HasMember(pName)) {
-		X_ERROR("Mat", "Missing \"%s\" value", pName);
-		return false;
-	}
-	if (!d.HasMember(tile.c_str())) {
-		X_ERROR("Mat", "Missing \"%s\" value", tile.c_str());
-		return false;
-	}
-	if (!d.HasMember(filter.c_str())) {
-		X_ERROR("Mat", "Missing \"%s\" value", filter.c_str());
-		return false;
-	}
-
-	const char* pMapName = d[pName].GetString();
-	const char* pTileMode = d[tile.c_str()].GetString();
-	const char* pFilterType = d[filter.c_str()].GetString();
-
-	name = pMapName;
-	filterType_ = Util::FilterTypeFromStr(pFilterType);
-	texRepeat_ = Util::TexRepeatFromStr(pTileMode);
-	return true;
-}
-
-
-bool MaterialCompiler::Tex::write(core::XFile* pFile) const
-{
-	MaterialTexture tex;
-	tex.nameLen = safe_static_cast<decltype(MaterialTexture::nameLen), size_t>(name.length());
-	tex.filterType = filterType_;
-	tex.texRepeat = texRepeat_;
-	tex._pad = 0;
-
-	if (pFile->writeObj(tex) != sizeof(tex)) {
-		return false;
-	}
-
-	return true;
-}
-
-bool MaterialCompiler::Tex::writeName(core::XFile* pFile) const
-{
-	if (name.isEmpty()) {
-		return true;
-	}
-
-	return pFile->writeString(name.c_str()) == core::strUtil::StringBytesIncNull(name);
-}
-
 // --------------------------------------
 
 MaterialCompiler::MaterialCompiler(TechSetDefs& techDefs) :
 	techDefs_(techDefs),
 	params_(g_MatLibArena),
 	samplers_(g_MatLibArena),
-	textures_(g_MatLibArena),
 	pTechDef_(nullptr)
 {
 
@@ -172,14 +108,34 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		if (param.type == ParamType::Texture)
 		{
 			// ok my little fat nigerna spoon.
-			// for tewxture param we have sampler / texture.
-			const auto& texProp = param.img.propName;
+			const auto& img = param.img;
 
-			auto& tex = textures_.AddOne();
-			
-			if (!tex.parse(d, texProp.c_str())) {
+			if (img.propName.isNotEmpty())
+			{
+				// we need to look for the texture value in props.
+				if (!d.HasMember(img.propName))
+				{
+					// if we have a default texture we just use that.
+					if (img.default.isNotEmpty())
+					{
+						auto& p = params_.AddOne();
+						p.name = img.propName;
+						p.val = img.default;
+					}
+					else
+					{
+						X_ERROR("Mat", "Required texture property is missing: \"%s\"", img.propName.c_str());
+						return false;
+					}
+				}
+				else
+				{
+					const char* pValue = d[img.propName.c_str()].GetString();
 
-				return false;
+					auto& p = params_.AddOne();
+					p.name = img.propName;
+					p.val = pValue;
+				}
 			}
 		}
 		else
@@ -313,7 +269,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.fourCC = MTL_B_FOURCC;
 
 	hdr.version = MTL_B_VERSION;
-	hdr.numTextures = safe_static_cast<uint8_t>(textures_.size());
+	hdr.numTextures = 0; // safe_static_cast<uint8_t>(textures_.size());
 	hdr.numParams = safe_static_cast<uint8_t>(pTechDef_->numParams());
 	hdr.strDataSize = 0; 
 	hdr.catTypeNameLen = 0; 
