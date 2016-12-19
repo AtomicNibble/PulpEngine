@@ -13,6 +13,7 @@
 
 X_NAMESPACE_DECLARE(core,
 	class XLexer;
+	class XLexToken;
 	class XParser;
 )
 
@@ -143,7 +144,8 @@ class TechSetDef
 	typedef core::Array<char> FileBuf;
 
 public:
-	typedef core::traits::Function<bool(core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash)>::Pointer ParamParseFunction;
+	typedef core::traits::Function<bool(core::XParser& lex, Param& param, 
+		const core::XLexToken& token, core::Hash::Fnv1aVal hash)>::Pointer ParamParseFunction;
 
 	typedef core::Delegate<bool(core::XLexer& lex, core::string&, bool)> OpenIncludeDel;
 

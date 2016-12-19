@@ -1191,7 +1191,7 @@ bool TechSetDef::parseParamFloat1(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Float1, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Float1, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "x"_fnv1a:
@@ -1199,6 +1199,9 @@ bool TechSetDef::parseParamFloat1(core::XParser& lex)
 						return false;
 					}
 					break;
+				default:
+					X_ERROR("TechDef", "Unknown Float1 prop: \"%.*s\"", token.length(), token.begin());
+					return false;
 			}
 			return true;
 		}
@@ -1209,7 +1212,7 @@ bool TechSetDef::parseParamFloat2(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Float2, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Float2, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "x"_fnv1a:
@@ -1222,6 +1225,9 @@ bool TechSetDef::parseParamFloat2(core::XParser& lex)
 						return false;
 					}
 					break;
+				default:
+					X_ERROR("TechDef", "Unknown Float2 prop: \"%.*s\"", token.length(), token.begin());
+					return false;
 			}
 			return true;
 		}
@@ -1232,7 +1238,7 @@ bool TechSetDef::parseParamFloat4(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Float4, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Float4, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "x"_fnv1a:
@@ -1255,6 +1261,9 @@ bool TechSetDef::parseParamFloat4(core::XParser& lex)
 						return false;
 					}
 					break;
+				default:
+					X_ERROR("TechDef", "Unknown Float4 prop: \"%.*s\"", token.length(), token.begin());
+					return false;
 			}
 			return true;
 		}
@@ -1266,7 +1275,7 @@ bool TechSetDef::parseParamColor(core::XParser& lex)
 	// for color it's just single prop.
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 		
 		bool isExplicit = false;
 		switch (hash)
@@ -1277,6 +1286,9 @@ bool TechSetDef::parseParamColor(core::XParser& lex)
 					return false;
 				}
 				break;
+			default:
+				X_ERROR("TechDef", "Unknown Color prop: \"%.*s\"", token.length(), token.begin());
+				return false;
 
 		}
 		return true;
@@ -1288,7 +1300,7 @@ bool TechSetDef::parseParamInt(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "value"_fnv1a:
@@ -1296,6 +1308,9 @@ bool TechSetDef::parseParamInt(core::XParser& lex)
 						return false;
 					}
 					break;
+				default:
+					X_ERROR("TechDef", "Unknown Int prop: \"%.*s\"", token.length(), token.begin());
+					return false;
 			}
 			return true;
 		}
@@ -1306,7 +1321,7 @@ bool TechSetDef::parseParamBool(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "value"_fnv1a:
@@ -1314,6 +1329,9 @@ bool TechSetDef::parseParamBool(core::XParser& lex)
 						return false;
 					}
 					break;
+				default:
+					X_ERROR("TechDef", "Unknown Bool prop: \"%.*s\"", token.length(), token.begin());
+					return false;
 			}
 			return true;
 		}
@@ -1324,7 +1342,7 @@ bool TechSetDef::parseParamTexture(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Texture, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Texture, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "image"_fnv1a:
@@ -1337,6 +1355,9 @@ bool TechSetDef::parseParamTexture(core::XParser& lex)
 						return false;
 					}
 					break;
+				default:
+					X_ERROR("TechDef", "Unknown Texture prop: \"%.*s\"", token.length(), token.begin());
+					return false;
 			}
 			return true;
 		}	
@@ -1466,7 +1487,7 @@ bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
 						return false;
 					}
 
-					if (token.GetType() != core::TokenType::NAME) {
+					if (token.GetType() != core::TokenType::NAME && token.GetType() != core::TokenType::STRING) {
 						return false;
 					}
 
@@ -1648,8 +1669,7 @@ bool TechSetDef::parseParamHelper(core::XParser& lex, ParamType::Enum type, Para
 				break;
 
 			default:
-				if (!parseFieldsFunc(lex, param, hash)) {
-					X_ERROR("TechDef", "Unknown Texture state prop: \"%.*s\"", token.length(), token.begin());
+				if (!parseFieldsFunc(lex, param, token, hash)) {
 					return false;
 				}
 				break;
