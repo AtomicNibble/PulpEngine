@@ -5,11 +5,15 @@ void UI_ShowProps( asset& Asset )
     {
         Asset.showProp( "f_nodraw");
         Asset.showProp( "f_editorvisible");
+        Asset.showProp( "f_transparent");
         Asset.showProp( "f_solid");
         Asset.showProp( "f_structual");
         Asset.showProp( "f_detail");
         Asset.showProp( "f_portal");
         Asset.showProp( "f_mount");
+        Asset.showProp( "f_stairs");
+        Asset.showProp( "f_slick");
+        Asset.showProp( "f_sky");
         Asset.showProp( "f_player_clip");
         Asset.showProp( "f_ai_clip");
         Asset.showProp( "f_bullet_clip");
@@ -154,11 +158,15 @@ void GenerateUI( asset& Asset )
     // Props
     Asset.AddCheckBox( "f_nodraw", false ).SetTitle( "NoDraw" ).SetVisible(false);
     Asset.AddCheckBox( "f_editorvisible", false ).SetTitle( "Editor Visible" ).SetToolTip("makes nodraw visable in editor modes.").SetVisible(false);
-    Asset.AddCheckBox( "f_solid", true ).SetTitle( "solid" ).SetVisible(false);
-    Asset.AddCheckBox( "f_structual", false ).SetTitle( "Structual" ).SetVisible(false);
+    Asset.AddCheckBox( "f_transparent", false ).SetTitle( "Transparent" ).SetToolTip("This material is tranparent. (Will be treaten as none-structual in BSP compiler)").SetVisible(false);
+    Asset.AddCheckBox( "f_solid", true ).SetTitle( "Solid" ).SetVisible(false);
+    Asset.AddCheckBox( "f_structual", false ).SetTitle( "Structual" ).SetToolTip("Will split BSP in level compiler").SetVisible(false);
     Asset.AddCheckBox( "f_detail", false ).SetTitle( "Detail" ).SetVisible(false);
     Asset.AddCheckBox( "f_portal", false ).SetTitle( "Portal" ).SetVisible(false);
     Asset.AddCheckBox( "f_mount", false ).SetTitle( "Mount" ).SetVisible(false);
+    Asset.AddCheckBox( "f_stairs", false ).SetTitle( "Stairs" ).SetVisible(false);
+    Asset.AddCheckBox( "f_slick", false ).SetTitle( "Slick" ).SetVisible(false);
+    Asset.AddCheckBox( "f_sky", false ).SetTitle( "Sky" ).SetToolTip("Sup :D").SetVisible(false);
     Asset.AddCheckBox( "f_player_clip", false ).SetTitle( "Player Clip" ).SetToolTip("Blocks players").SetVisible(false);
     Asset.AddCheckBox( "f_ai_clip", false ).SetTitle( "AI Clip" ).SetToolTip("Blocks AI (not inc players)").SetVisible(false);
     Asset.AddCheckBox( "f_bullet_clip", false ).SetTitle( "Bullet Clip" ).SetToolTip("Blocks Bullets").SetVisible(false);
