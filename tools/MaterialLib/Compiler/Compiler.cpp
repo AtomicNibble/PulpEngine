@@ -269,7 +269,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.fourCC = MTL_B_FOURCC;
 
 	hdr.version = MTL_B_VERSION;
-	hdr.numTextures = 0; // safe_static_cast<uint8_t>(textures_.size());
+	hdr.numSamplers = safe_static_cast<uint8_t>(samplers_.size());
 	hdr.numParams = safe_static_cast<uint8_t>(pTechDef_->numParams());
 	hdr.strDataSize = 0; 
 	hdr.catTypeNameLen = 0; 
@@ -301,8 +301,13 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 
 	for (const auto& s : samplers_)
 	{
-		pFile->writeObj(s.filterType);
-		pFile->writeObj(s.texRepeat);
+		// even tho could just write enums this is a bit more robust.
+		// since i read it out as sampler, might re order the members etc..
+		render::SamplerState sampler;
+		sampler.filter = s.filterType;
+		sampler.repeat = s.texRepeat;
+
+		pFile->writeObj(sampler);
 		pFile->writeString(s.name);
 	}
 

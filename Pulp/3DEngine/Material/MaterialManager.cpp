@@ -322,11 +322,11 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 	return false;
 }
 
-XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& name)
+XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& matName)
 {
 	core::Path<char> path;
 	path /= "materials/";
-	path.setFileName(name);
+	path.setFileName(matName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
 	MaterialHeader hdr;
@@ -344,13 +344,39 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 		return false;
 	}
 
-	if (hdr.numTextures > MTL_MAX_TEXTURES) {
+	if (hdr.numSamplers > MTL_MAX_SAMPLERS) {
 		return false;
 	}
 
 	// we need to poke the goat.
 	// so now materials store the cat and type which we can use to get techdef info.
 
+#if 1
+
+	core::string catType;
+	file.readString(catType);
+
+	// now samplers.
+	for (uint8_t i = 0; i < hdr.numSamplers; i++)
+	{
+		render::SamplerState sampler;
+		core::string samplerName;
+
+		file.readObj(sampler);
+		file.readString(samplerName);
+	}
+
+	// now params.
+	for (uint8_t i = 0; i < hdr.numParams; i++)
+	{
+		core::string name, val;
+
+		file.readString(name);
+		file.readString(val);
+	}
+
+
+#else
 
 	// we also have texture info.
 	core::FixedArray<MaterialTexture, MTL_MAX_TEXTURES> texInfo;
@@ -385,6 +411,13 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 		pNameCur += tex.nameLen;
 	}
 #endif
+#endif
+
+
+#if X_DEBUG
+	const auto left = file.remainingBytes();
+	X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
+#endif // !X_DEBUG
 
 
 	// so my fat one legged camel.
@@ -410,14 +443,11 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 //	pTech = nullptr;
 
 
-#if X_DEBUG
-	const auto left = file.remainingBytes();
-	X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
-#endif // !X_DEBUG
 
-	MaterialResource* pMatRes = createMaterial_Internal(name);
+	MaterialResource* pMatRes = createMaterial_Internal(matName);
 	pMatRes->setTechDefState(pTechDefState);
 
+#if 0
 	// so my fine little goat muncher.
 	// we need to slap textures for the goats that fly towards us.
 	core::FixedArray<Material::Texture, MTL_MAX_TEXTURES> processedInfo;
@@ -435,6 +465,7 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	}
 
 	pMatRes->setTextures(processedInfo);
+#endif
 
 	return pMatRes;
 }

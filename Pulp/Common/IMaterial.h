@@ -198,7 +198,7 @@ struct MaterialHeader
 	uint32_t fourCC;
 	// 4
 	uint8_t version;
-	uint8_t numTextures;
+	uint8_t numSamplers;
 	uint16_t strDataSize;
 
 	// 4
