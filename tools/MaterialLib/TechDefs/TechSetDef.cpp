@@ -1458,7 +1458,7 @@ bool TechSetDef::parsePropName(core::XParser& lex, core::string& str, bool& isEx
 
 	if (token.GetType() == core::TokenType::PUNCTUATION)
 	{
-		if (token.GetPuncId() != core::PunctuationId::LOGIC_GREATER) {
+		if (token.GetPuncId() != core::PunctuationId::LOGIC_LESS) {
 			return false;
 		}
 
