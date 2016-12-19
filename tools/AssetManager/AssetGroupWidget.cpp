@@ -106,6 +106,34 @@ void AssetGroupWidget::AddChild(AssetProperty* pChild)
 	return children_.append(pChild);
 }
 
+bool AssetGroupWidget::HasChild(const AssetProperty& prop) const
+{
+	for (const auto& p : children_)
+	{
+		if (p == &prop)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool AssetGroupWidget::RemoveChild(const AssetProperty& prop)
+{
+	for (int32_t i=0; i<children_.size(); i++)
+	{
+		if (children_[i] == &prop)
+		{
+			children_.removeAt(i);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 AssetGroupWidget::ConstIterator AssetGroupWidget::begin(void) const
 {
 	return children_.begin();
