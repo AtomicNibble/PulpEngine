@@ -1369,7 +1369,21 @@ void AssetProperties::propModified(void)
 
 		emit modificationChanged(modified);
 		emit changed();
+
+		if (pProp->isUpdateOnChange())
+		{
+			X_LOG0("Prop", "Update on change requted by: %s", pProp->GetKey().c_str());
+
+			// we can't reload the ui here as we are in a slot for a widget we may delete so it must be delayed.
+			QMetaObject::invokeMethod(this, "reloadUiSlot", Qt::QueuedConnection);
+		}
 	}
+}
+
+void AssetProperties::reloadUiSlot(void)
+{
+	const bool res = reloadUi();
+	X_UNUSED(res);
 }
 
 AssetPropertyEditorWidget* AssetProperties::getEditor(void)

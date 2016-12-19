@@ -278,6 +278,7 @@ public:
 
 private slots:
 	void propModified(void);
+	void reloadUiSlot(void);
 
 signals:
 	void modificationChanged(bool);
