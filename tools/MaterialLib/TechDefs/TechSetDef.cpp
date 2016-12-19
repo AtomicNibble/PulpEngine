@@ -900,11 +900,6 @@ bool TechSetDef::parseShader(core::XParser& lex, render::shader::ShaderType::Enu
 
 bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 {
-	// start of define.
-	if (!lex.ExpectTokenString("{")) {
-		return false;
-	}
-
 	core::XLexToken token;
 	while (lex.ReadToken(token))
 	{
@@ -1143,9 +1138,10 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 	if (name.isNotEmpty())
 	{
-		name += render::shader::ShaderType::ToString(type);
+		core::string mergedName(name);
+		mergedName += render::shader::ShaderType::ToString(type);
 
-		if (shaderExsists(name, &shader)) {
+		if (shaderExsists(mergedName, &shader)) {
 			return true;
 		}
 
@@ -1171,6 +1167,10 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 			// if we selected a parent it should be impossible for it to have a diffrent stage.
 			// even if the user wanted to. this is source code logic fail.
 			X_ASSERT(shader.type == type, "Parent not from same stage")(shader.type, type);
+		}
+
+		if (!lex.ExpectTokenString("{")) {
+			return false;
 		}
 
 		// parse the inline state.
@@ -2060,8 +2060,11 @@ render::StateDesc& TechSetDef::addState(const core::string& name, const core::st
 
 Shader& TechSetDef::addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type)
 {
-	X_UNUSED(type);
-	Shader& shader = addHelper(shaders_, name, parentName, "state");
+	core::string mergedName(name);
+	mergedName += render::shader::ShaderType::ToString(type);
+
+
+	Shader& shader = addHelper(shaders_, mergedName, parentName, "state");
 	shader.type = type;
 	return shader;
 }
