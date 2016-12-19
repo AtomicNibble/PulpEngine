@@ -95,6 +95,7 @@ struct Param
 	// we can store most params in this.
 	// bool, int, float1, float2, float4, color
 	Vec4f vec4;
+	core::string vec4Props[4];
 
 	// texture stuff
 	render::TextureSlot::Enum texSlot;
@@ -142,6 +143,8 @@ class TechSetDef
 	typedef core::Array<char> FileBuf;
 
 public:
+	typedef core::traits::Function<bool(core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash)>::Pointer ParamParseFunction;
+
 	typedef core::Delegate<bool(core::XLexer& lex, core::string&, bool)> OpenIncludeDel;
 
 public:
@@ -225,12 +228,15 @@ private:
 	bool parseParamInt(core::XParser& lex);
 	bool parseParamBool(core::XParser& lex);
 	bool parseParamTexture(core::XParser& lex);
-	bool parseParamTextureSlot(core::XParser& lex, render::TextureSlot::Enum& texSlot);
-	bool parseParamImageData(core::XParser& lex, Image& props);
 	bool parseParamSampler(core::XParser& lex);
-	bool parseAssPropsData(core::XParser& lex, AssManProps& props);
 
-	bool parsePropName(core::XParser& lex, core::string& str, bool& isExplicit);
+	bool parseAssPropsData(core::XParser& lex, AssManProps& props);
+	static bool parseParamFloat(core::XParser& lex, core::string& propsName, float& val);
+	static bool parseParamTextureSlot(core::XParser& lex, render::TextureSlot::Enum& texSlot);
+	static bool parseParamImageData(core::XParser& lex, Image& props);
+	static bool parsePropName(core::XParser& lex, core::string& str, bool& isExplicit);
+
+	bool parseParamHelper(core::XParser& lex, ParamType::Enum type, ParamParseFunction parseFieldsFunc);
 
 	// Helpers.
 	bool parseBool(core::XParser& lex, bool& out);

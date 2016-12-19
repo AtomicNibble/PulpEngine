@@ -1189,97 +1189,202 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 bool TechSetDef::parseParamFloat1(core::XParser& lex)
 {
+	using namespace core::Hash::Fnva1Literals;
 
-	return false;
+	return parseParamHelper(lex, ParamType::Float1, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+			switch (hash)
+			{
+				case "x"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[0], param.vec4.x)) {
+						return false;
+					}
+					break;
+			}
+			return true;
+		}
+	);
 }
 
 bool TechSetDef::parseParamFloat2(core::XParser& lex)
 {
+	using namespace core::Hash::Fnva1Literals;
 
-	return false;
+	return parseParamHelper(lex, ParamType::Float2, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+			switch (hash)
+			{
+				case "x"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[0], param.vec4.x)) {
+						return false;
+					}
+					break;
+				case "y"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[1], param.vec4.y)) {
+						return false;
+					}
+					break;
+			}
+			return true;
+		}
+	);
 }
 
 bool TechSetDef::parseParamFloat4(core::XParser& lex)
 {
+	using namespace core::Hash::Fnva1Literals;
 
-	return false;
+	return parseParamHelper(lex, ParamType::Float4, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+			switch (hash)
+			{
+				case "x"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[0], param.vec4.x)) {
+						return false;
+					}
+					break;
+				case "y"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[1], param.vec4.y)) {
+						return false;
+					}
+					break;
+				case "z"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[2], param.vec4.z)) {
+						return false;
+					}
+					break;
+				case "w"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[3], param.vec4.w)) {
+						return false;
+					}
+					break;
+			}
+			return true;
+		}
+	);
 }
 
 bool TechSetDef::parseParamColor(core::XParser& lex)
 {
+	// for color it's just single prop.
+	using namespace core::Hash::Fnva1Literals;
 
-	return false;
+	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+		
+		bool isExplicit = false;
+		switch (hash)
+		{
+			case "value"_fnv1a:
+				if (!parsePropName(lex, param.vec4Props[0], isExplicit)) {
+					X_ERROR("TechDef", "Failed to parse repeat prop");
+					return false;
+				}
+				break;
+
+		}
+		return true;
+	}
+	);
 }
 
 bool TechSetDef::parseParamInt(core::XParser& lex)
 {
+	using namespace core::Hash::Fnva1Literals;
 
-	return false;
+	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+			switch (hash)
+			{
+				case "value"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[0], param.vec4.x)) {
+						return false;
+					}
+					break;
+			}
+			return true;
+		}
+	);
 }
 
 bool TechSetDef::parseParamBool(core::XParser& lex)
 {
+	using namespace core::Hash::Fnva1Literals;
 
-	return false;
+	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+			switch (hash)
+			{
+				case "value"_fnv1a:
+					if (!parseParamFloat(lex, param.vec4Props[0], param.vec4.x)) {
+						return false;
+					}
+					break;
+			}
+			return true;
+		}
+	);
 }
 
 bool TechSetDef::parseParamTexture(core::XParser& lex)
 {
-	core::string name, parentName;
+	using namespace core::Hash::Fnva1Literals;
 
-	// we have the name.
-	if (!parseName(lex, name, parentName)) {
-		return false;
-	}
-
-	if (!lex.ExpectTokenString("{")) {
-		return false;
-	}
-
-	if (paramExsists(name)) {
-		return false;
-	}
-
-	auto& param = addParam(name, parentName, ParamType::Texture);
-
-
-	// parse it.
-	// this is texture specific fields.
-	core::XLexToken token;
-	while (lex.ReadToken(token))
-	{
-		if (token.isEqual("}")) {
+	return parseParamHelper(lex, ParamType::Texture, [](core::XParser& lex, Param& param, core::Hash::Fnv1aVal hash) -> bool {
+			switch (hash)
+			{
+				case "image"_fnv1a:
+					if (!parseParamImageData(lex, param.img)) {
+						return false;
+					}
+					break;
+				case "semantic"_fnv1a:
+					if (!parseParamTextureSlot(lex, param.texSlot)) {
+						return false;
+					}
+					break;
+			}
 			return true;
-		}
+		}	
+	);
+}
 
-		using namespace core::Hash::Fnva1Literals;
 
-		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
-		{
-			case "image"_fnv1a:
-				if (!parseParamImageData(lex, param.img)) {
-					return false;
-				}
-				break;
-			case "semantic"_fnv1a:
-				if (!parseParamTextureSlot(lex, param.texSlot)) {
-					return false;
-				}
-				break;
-			case "ass"_fnv1a:
-				if (!parseAssPropsData(lex, param.assProps)) {
-					return false;
-				}
-				break;
-
-			default:
-				X_ERROR("TechDef", "Unknown Texture state prop: \"%.*s\"", token.length(), token.begin());
-				return false;
-		}
+bool TechSetDef::parseParamFloat(core::XParser& lex, core::string& propsName, float& val)
+{
+	// this is either a constant or prop name :D !
+	if (!lex.ExpectTokenString("=")) {
+		return false;
 	}
 
-	// failed to read token
-	return false;
+	core::XLexToken token;
+	if (!lex.ReadToken(token)) {
+		return false;
+	}
+
+	if(token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::LOGIC_LESS)
+	{
+		// it's a prop.
+		if (!lex.ReadToken(token)) {
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NAME) {
+			return false;
+		}
+
+		propsName = core::string(token.begin(), token.end());
+		val = 0;
+
+		if (!lex.ExpectTokenString(">")) {
+			return false;
+		}
+	}
+	else
+	{
+		// we want a float.
+		if (token.GetType() != core::TokenType::NUMBER) {
+			return false;
+		}
+
+		val = token.GetFloatValue();
+	}
+
+	return true;
 }
 
 bool TechSetDef::parseParamTextureSlot(core::XParser& lex, render::TextureSlot::Enum& texSlot)
@@ -1504,6 +1609,58 @@ bool TechSetDef::parsePropName(core::XParser& lex, core::string& str, bool& isEx
 
 	return true;
 }
+
+bool TechSetDef::parseParamHelper(core::XParser& lex, ParamType::Enum type, ParamParseFunction parseFieldsFunc)
+{
+	core::string name, parentName;
+
+	// we have the name.
+	if (!parseName(lex, name, parentName)) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	if (paramExsists(name)) {
+		return false;
+	}
+
+	auto& param = addParam(name, parentName, type);
+
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
+			return true;
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		const auto hash = core::Hash::Fnv1aHash(token.begin(), token.length());
+		switch (hash)
+		{
+			case "ass"_fnv1a:
+				if (!parseAssPropsData(lex, param.assProps)) {
+					return false;
+				}
+				break;
+
+			default:
+				if (!parseFieldsFunc(lex, param, hash)) {
+					X_ERROR("TechDef", "Unknown Texture state prop: \"%.*s\"", token.length(), token.begin());
+					return false;
+				}
+				break;
+		}
+	}
+
+	// failed to read token
+	return false;
+}
+
+
 
 bool TechSetDef::parseAssPropsData(core::XParser& lex, AssManProps& props)
 {
