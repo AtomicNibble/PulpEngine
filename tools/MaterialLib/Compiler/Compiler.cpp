@@ -219,7 +219,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
 	static_assert(MaterialFlag::FLAGS_COUNT == 17 + 4, "Added additional mat flags? this code might need updating.");
 
-	std::array<std::pair<const char*, MaterialFlag::Enum>, 16 + 4> flags = { {
+	std::array<std::pair<const char*, MaterialFlag::Enum>, 16> flags = { {
 			{ "f_nodraw", MaterialFlag::NODRAW },
 			{ "f_editorvisible", MaterialFlag::EDITOR_VISABLE },
 			{ "f_solid", MaterialFlag::SOLID },
@@ -238,10 +238,10 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			{ "f_no_steps", MaterialFlag::NO_STEPS },
 
 			// these are merged in for now.
-			{ "useUVScroll", MaterialFlag::UV_SCROLL },
-			{ "useUVRotate", MaterialFlag::UV_ROTATE },
-			{ "clampU", MaterialFlag::UV_CLAMP_U },
-			{ "clampV", MaterialFlag::UV_CLAMP_V }
+		//	{ "useUVScroll", MaterialFlag::UV_SCROLL },
+		//	{ "useUVRotate", MaterialFlag::UV_ROTATE },
+		//	{ "clampU", MaterialFlag::UV_CLAMP_U },
+		//	{ "clampV", MaterialFlag::UV_CLAMP_V }
 		}
 	};
 
