@@ -274,6 +274,7 @@ private:
 	AssetProperty& addItem(const std::string& key);
 public:
 	AssetProperty& addItemIU(const std::string& key, AssetProperty::PropertyType::Enum type);
+	void showInCurrentCat(const AssetProperty& prop);
 
 private slots:
 	void propModified(void);

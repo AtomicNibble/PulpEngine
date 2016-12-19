@@ -1316,6 +1316,47 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 	return *pItem;
 }
 
+void AssetProperties::showInCurrentCat(const AssetProperty& prop)
+{
+	// would this would work better if props where not in a tree.
+	// but the gui was still created in a tree.
+	// then we could just change hte props cat name
+	// dunno if that would making showing them more of a pain tho..
+	// or props could keep a pointer to the cat they are in.
+	// that way when we iterate props for creating the ui
+	// we just add the ui to the group it's pointing at.
+	// would mean a refactor :) !
+
+
+	X_ASSERT_NOT_NULL(pCur_);
+
+	// so first we need to know if item is not in this cat.
+	if (!pCur_->HasChild(prop))
+	{
+		// we need to move it to this cat :(
+		// how do we find it ?
+		// maybe we should only just support moving for items in the root cat.
+		// it's the use case we are looking for so sounds good to me.
+
+		if (root_.begin() == root_.end())
+		{
+			return;
+		}
+
+		AssetProperty* pDefaultGRoup = *root_.begin();
+
+		if (!pDefaultGRoup->RemoveChild(prop))
+		{
+
+			return;
+		}
+
+		// add it. const_cast kinda feels right since this function won't edit it.
+		// but later the group might edit it hence why it's none const.
+		pCur_->AddChild(const_cast<AssetProperty*>(&prop));
+	}
+}
+
 void AssetProperties::propModified(void)
 {
 	// a prop was modified.
