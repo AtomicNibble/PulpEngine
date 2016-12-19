@@ -170,12 +170,12 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		}
 		else
 		{
-			if (!d.HasMember(samplerName)) {
-				X_ERROR("Mat", "Missing required value: \"%s\"", samplerName.c_str());
+			if (!d.HasMember(samplerDesc.filterStr)) {
+				X_ERROR("Mat", "Missing required value: \"%s\"", samplerDesc.filterStr.c_str());
 				return false;
 			}
 
-			const char* pValue = d[samplerName.c_str()].GetString();
+			const char* pValue = d[samplerDesc.filterStr.c_str()].GetString();
 
 			sampler.filterType = Util::FilterTypeFromStr(pValue);
 		}
@@ -186,12 +186,12 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		}
 		else
 		{
-			if (!d.HasMember(samplerName)) {
-				X_ERROR("Mat", "Missing required value: \"%s\"", samplerName.c_str());
+			if (!d.HasMember(samplerDesc.repeatStr)) {
+				X_ERROR("Mat", "Missing required value: \"%s\"", samplerDesc.repeatStr.c_str());
 				return false;
 			}
 
-			const char* pValue = d[samplerName.c_str()].GetString();
+			const char* pValue = d[samplerDesc.repeatStr.c_str()].GetString();
 
 			sampler.texRepeat = Util::TexRepeatFromStr(pValue);
 		}
