@@ -1411,6 +1411,7 @@ bool TechSetDef::parseParamSampler(core::XParser& lex)
 			case "repeat"_fnv1a:
 				// we need to parse it can be a string or punctiation.
 				if (!parsePropName(lex, sampler.repeatStr, isExplicit)) {
+					X_ERROR("TechDef", "Failed to parse repeat prop");
 					return false;
 				}
 
@@ -1420,6 +1421,7 @@ bool TechSetDef::parseParamSampler(core::XParser& lex)
 				break;
 			case "filter"_fnv1a:
 				if (!parsePropName(lex, sampler.filterStr, isExplicit)) {
+					X_ERROR("TechDef", "Failed to parse filter prop");
 					return false;
 				}
 
