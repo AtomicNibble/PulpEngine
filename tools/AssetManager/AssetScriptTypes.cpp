@@ -594,17 +594,25 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 		auto propIt = map_.find(std::string(propName));
 		if (propIt != map_.end())
 		{
-			(*propIt)->SetVisible(true);
+			auto* pProp = *(propIt);
+
+			pProp->prop().SetVisible(true);
+
+			// set the active cat.
+			if (assProps.cat.isNotEmpty())
+			{
+				props_.BeginGroup(std::string(assProps.cat));
+				props_.showInCurrentCat(pProp->prop());
+			}
 
 			if (assProps.title.isNotEmpty())
 			{
-				(*propIt)->SetTitle(std::string(assProps.title));
+				pProp->SetTitle(std::string(assProps.title));
 			}
 			if (assProps.default.isNotEmpty())
 			{
-				(*propIt)->SetDefaultValue(std::string(assProps.default));
+				pProp->SetDefaultValue(std::string(assProps.default));
 			}
-
 		}
 		else
 		{
