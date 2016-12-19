@@ -1,0 +1,23 @@
+#include <states>
+
+Sampler( "colorSampler" )
+{
+    repeat = <tileColor>
+    filter = <filterColor>
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+    }
+}
+
+Texture( "colorMap" )
+{
+    image = Image( <mapColor> )
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+        title  = "Color Map"
+    }
+}

@@ -2,7 +2,10 @@
 
 Technique( "unlit" )
 {
-	state = "add + nocull"
+	state = State() : "add + nocull"
+	{
+		depthTest = less_equal
+	}
 
 	vs = VertexShader()
 	{
@@ -13,6 +16,5 @@ Technique( "unlit" )
 	{
 		source = "Prim.hlsl"
 		entry = "PrimPS"
-	//	colorMapSampler = "colorMap"
 	}
 }
