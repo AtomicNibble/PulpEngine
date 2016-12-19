@@ -1,0 +1,34 @@
+#include <states>
+
+Sampler( "colorSampler" )
+{
+    repeat = <tileColor>
+    filter = <filterColor>
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+    }
+}
+
+Texture( "colorMap" )
+{
+    image = Image( <mapColor, "default/white"> )
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+        title  = "Color Map"
+    }
+}
+
+
+VertexShader( "vs_default" )
+{
+    source = "effect_cloud_simple.hlsl"
+}
+
+PixelShader( "ps_default" )
+{
+    source = "effect_cloud_simple.hlsl"
+}

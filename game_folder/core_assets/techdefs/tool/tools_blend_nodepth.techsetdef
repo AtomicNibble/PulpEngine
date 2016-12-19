@@ -1,0 +1,24 @@
+#include <tools_base>
+
+// offset them like decals.
+State( "tools_blend" ) : "blend + nocull"
+{
+    polygonOffset  = "static_decal"
+}
+
+
+Technique( "lit" )
+{
+    state = "tools_blend"
+
+    vs = "vs_default"
+    ps = "ps_default"
+}
+
+Technique( "unlit" )
+{
+    state = "blend + nocull"
+
+    vs = "vs_default"
+    ps = "ps_default"
+}
