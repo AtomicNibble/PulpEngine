@@ -476,6 +476,27 @@ bool AssetScriptProps::getPropValueBool(const std::string& key)
 	return getItem(key)->GetValueBool();
 }
 
+void AssetScriptProps::showProp(const std::string& key)
+{
+	// so this shows the prop, but it also allows a prop to shif cat.
+	// so the cat this function is called in is where the prop ends up.
+	// basically allowing a prop to be re 'cat'
+
+	auto it = map_.find(key);
+	if (it != map_.end())
+	{
+		auto* pProp = *it;
+		pProp->prop().SetVisible(true);
+
+		// move it's cat.
+		props_.showInCurrentCat(pProp->prop());
+	}
+	else
+	{
+		X_WARNING("AssetScript", "Failed to find prop to show: \"%s\"", key.c_str());
+	}
+}
+
 std::string AssetScriptProps::getMaterialCats(void)
 {
 	std::string s;

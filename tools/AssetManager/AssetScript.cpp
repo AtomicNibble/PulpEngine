@@ -208,6 +208,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	r = pEngine_->RegisterObjectMethod("asset", "double getPropValueFloat(const string& in)", asMETHOD(AssetScriptProps, getPropValueFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "int getPropValueInt(const string& in)", asMETHOD(AssetScriptProps, getPropValueInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "bool getPropValueBool(const string& in)", asMETHOD(AssetScriptProps, getPropValueBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "void showProp(const string& in)", asMETHOD(AssetScriptProps, showProp), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
 	r = pEngine_->RegisterObjectMethod("asset", "string getMaterialCats()", asMETHOD(AssetScriptProps, getMaterialCats), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "string getMaterialTypes(const string& in)", asMETHOD(AssetScriptProps, getMaterialTypes), asCALL_THISCALL); BUG_CHECK(r >= 0);

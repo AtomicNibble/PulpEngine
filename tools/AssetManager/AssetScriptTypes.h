@@ -103,6 +103,7 @@ public:
 	double getPropValueFloat(const std::string& key);
 	int32_t getPropValueInt(const std::string& key);
 	bool getPropValueBool(const std::string& key);
+	void showProp(const std::string& key);
 
 	std::string getMaterialCats(void);
 	std::string getMaterialTypes(std::string& cat);
