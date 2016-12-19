@@ -25,7 +25,7 @@ struct StencilState
 	bool enabled;
 };
 
-struct BoundTexture
+struct Alias
 {
 	bool isCode;
 	core::string resourceName;
@@ -35,7 +35,7 @@ struct BoundTexture
 
 struct Shader
 {
-	typedef core::Array<BoundTexture> BoundTexturesArr;
+	typedef core::Array<Alias> AliaseArr;
 
 	Shader();
 
@@ -44,7 +44,7 @@ struct Shader
 	core::string entry;
 	core::string defines;
 
-	BoundTexturesArr boundTextures;
+	AliaseArr aliases;
 };
 
 struct Technique

@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(engine)
 
 TechDef::TechDef(core::MemoryArenaBase* arena) :
 	perms_(arena),
-	boundTextures_(arena)
+	aliases_(arena)
 {
 	shaderSource_.fill(nullptr);
 }
@@ -239,9 +239,9 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 			tech.shaderEntry_[type] = shader.entry;
 			tech.shaderSource_[type] = pShaderSource;
 
-			for (const auto& bt : shader.boundTextures)
+			for (const auto& al : shader.aliases)
 			{
-				tech.boundTextures_ .emplace_back(bt);
+				tech.aliases_.emplace_back(al);
 			}
 		}
 	}

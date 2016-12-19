@@ -3,14 +3,14 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-typename TechDef::BoundTexturesArr::size_type TechDef::getNumBoundTextures(void) const
+typename Shader::AliaseArr::size_type TechDef::getNumAliases(void) const
 {
-	return boundTextures_.size();
+	return aliases_.size();
 }
 
-typename const TechDef::BoundTexturesArr& TechDef::getBoundTextures(void) const
+typename const Shader::AliaseArr& TechDef::getAliases(void) const
 {
-	return boundTextures_;
+	return aliases_;
 }
 
 

@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(engine)
 
 Shader::Shader() :
 	type(render::shader::ShaderType::UnKnown),
-	boundTextures(g_MatLibArena)
+	aliases(g_MatLibArena)
 {
 
 }
@@ -934,37 +934,53 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 
 			default:
 			{
-				BoundTexture bt;
-				// we support defining bound textures.
-				// i would have to compile the perm to know if it's valid.
-				bt.resourceName = core::string(token.begin(), token.end());
+				// we support 'aliasing' which basically allows mapping values to resource names in shader.
+				// so for example if a shader has 3 samplers but you only want to expose 1 sampler to assMan
+				// but you want the value of that sampler to be used in all 3, you can just alias the other two
+				Alias al;
+				al.resourceName = core::string(token.begin(), token.end());
 
 				if (!lex.ExpectTokenString("=")) {
 					return false;
 				}
 
-
-				if (!lex.ExpectTokenString("CodeTexture")) {
-					return false;
-				}
-
-				if (!lex.ExpectTokenString("(")) {
-					return false;
-				}
-
+				// this can just be a simple name alias or currently a 'CodeTexture'
+				// which just means the resource if aliased from a texture defined at runtime.
 				if (!lex.ReadToken(token)) {
 					return false;
 				}
 
-				bt.isCode = true;
-				bt.name = core::string(token.begin(), token.end());
-				bt.nameHash = core::StrHash(token.begin(), token.length());
+				if (token.GetType() == core::TokenType::NAME)
+				{
+					// only codeTexture allowed currently for named shit.
+					if (!token.isEqual("CodeTexture")) {
+						return false;
+					}
 
-				if (!lex.ExpectTokenString(")")) {
-					return false;
+					if (!lex.ExpectTokenString("(")) {
+						return false;
+					}
+
+					if (!lex.ReadToken(token)) {
+						return false;
+					}
+
+					if (!lex.ExpectTokenString(")")) {
+						return false;
+					}
+
+					al.isCode = true;
+				}
+				else
+				{
+					// do nothing the token contains the name.
+					al.isCode = false;
 				}
 
-				shader.boundTextures.append(bt);
+				al.name = core::string(token.begin(), token.end());
+				al.nameHash = core::StrHash(token.begin(), token.length());
+
+				shader.aliases.append(al);
 			}
 		}
 	}

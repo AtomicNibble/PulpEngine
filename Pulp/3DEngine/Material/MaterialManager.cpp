@@ -236,7 +236,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// it may be less than what the material has.
 	// the tech should tell us O_O
 	// him -> pTechDef
-	const size_t numTex = pTechDef->getNumBoundTextures();
+	const size_t numTex = pTechDef->getNumAliases();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
@@ -296,17 +296,23 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 
 	TechDef* pTechDef = pTechDefState->getTech(pTech->hash);
 
-	if (pTechDef->getNumBoundTextures() < 1) {
+	if (pTechDef->getNumAliases() < 1) {
 		return false;
 	}
 
-	auto& bts = pTechDef->getBoundTextures();
+	auto& als = pTechDef->getAliases();
 
-	for (size_t i=0; i<bts.size(); i++)
+	for (size_t i=0; i<als.size(); i++)
 	{
-		const auto& bt = bts[i];
-		if (bt.nameHash == texNameHash)
+		const auto& alias = als[i];
+		if (alias.nameHash == texNameHash)
 		{
+			if (!alias.isCode)
+			{
+				// this was just a plain name alias not a code one! TWAT!
+				return false;
+			}
+
 			auto* pTextureStates = pTech->pVariableState->getTexStates();
 			pTextureStates[i].textureId = id;
 			return true;

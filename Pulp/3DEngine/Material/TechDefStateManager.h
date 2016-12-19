@@ -22,7 +22,6 @@ class TechDef
 
 	typedef render::shader::ShaderSourceArr ShaderSourceArr;
 	typedef core::Array<TechDefPerm> TechDefPermArr;
-	typedef core::Array<BoundTexture> BoundTexturesArr;
 
 public:
 	TechDef(core::MemoryArenaBase* arena);
@@ -30,8 +29,8 @@ public:
 
 	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt);
 
-	X_INLINE BoundTexturesArr::size_type getNumBoundTextures(void) const;
-	X_INLINE const BoundTexturesArr& getBoundTextures(void) const;
+	X_INLINE Shader::AliaseArr::size_type getNumAliases(void) const;
+	X_INLINE const Shader::AliaseArr& getAliases(void) const;
 
 public:
 	core::StrHash nameHash;
@@ -43,7 +42,7 @@ public:
 	ShaderEntryArr shaderEntry_;
 	ShaderSourceArr shaderSource_;
 	TechDefPermArr perms_;
-	BoundTexturesArr boundTextures_;
+	Shader::AliaseArr aliases_;
 };
 
 class TechDefState
