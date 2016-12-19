@@ -511,7 +511,7 @@ bool XLexer::ExpectTokenString(const char* string)
 		return false;
 	}
 	if (!token.isEqual(string)) {
-		Error("expected '%s' but found '%.*s'", string, token.length(), token.begin());
+		Error("expected '%s' but found '%.*s:%" PRId32 "'", string, token.length(), token.begin(), GetLineNumber());
 		return false;
 	}
 	return true;
