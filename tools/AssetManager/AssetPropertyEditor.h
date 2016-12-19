@@ -111,6 +111,8 @@ public:
 	void SetParentKey(const std::string& key);
 	void SetType(PropertyType::Enum type);
 	void AddChild(AssetProperty* pChild);
+	bool HasChild(const AssetProperty& prop) const;
+	bool RemoveChild(const AssetProperty& prop);
 
 	ConstIterator begin(void) const;
 	ConstIterator end(void) const;

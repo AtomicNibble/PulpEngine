@@ -521,6 +521,26 @@ void AssetProperty::AddChild(AssetProperty* pChild)
 	}
 }
 
+bool AssetProperty::HasChild(const AssetProperty& prop) const
+{
+	if (type_ == PropertyType::GROUPBOX) {
+		return pGroupWidget_->HasChild(prop);
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return false;
+}
+
+bool AssetProperty::RemoveChild(const AssetProperty& prop)
+{
+	if (type_ == PropertyType::GROUPBOX) {
+		return pGroupWidget_->RemoveChild(prop);
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return false;
+}
+
 
 AssetProperty::ConstIterator AssetProperty::begin(void) const
 {
