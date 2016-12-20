@@ -236,7 +236,13 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
 		auto& c = converterInterfaces_[i];
 		if (c.pConModule.get() == pConvertModule)
 		{
-			if (c.removeReference() == 0) {
+			if (c.removeReference() == 0) 
+			{
+				if(!c.pConModule->ShutDown(c.pConverter))
+				{
+					X_ERROR("Core", "error shuting down converter module");
+				}
+
 				converterInterfaces_.removeIndex(i);
 			}
 

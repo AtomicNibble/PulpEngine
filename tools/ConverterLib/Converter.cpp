@@ -645,10 +645,6 @@ void Converter::UnloadConverters(void)
 		{
 			X_ASSERT(converterModules_[i] != nullptr, "Have a converter interface without a corrisponding moduleInterface")();
 
-			if (!converterModules_[i]->ShutDown(converters_[i])) {
-				X_ERROR("Converter", "error shuting down converter module");
-			}
-
 			// con modules are ref counted so we can't free ourself.
 			gEnv->pCore->FreeConverterModule(converterModules_[i]);
 
