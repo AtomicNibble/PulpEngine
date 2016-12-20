@@ -167,6 +167,8 @@ X_DECLARE_ENUM8(MaterialSurType)(
 // not used at runtime.
 X_DECLARE_ENUM8(MaterialUsage)(
 	NONE,
+	TOOLS,
+	CLIP,
 
 	DOOR,
 	FLOOR,

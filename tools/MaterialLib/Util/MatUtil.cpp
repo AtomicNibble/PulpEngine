@@ -76,13 +76,17 @@ namespace Util
 		core::StackString<96, char> strUpper(pBegin, pEnd);
 		strUpper.toLower();
 
-		static_assert(MaterialUsage::ENUM_COUNT == 14, "Added additional material usage? this code needs updating.");
+		static_assert(MaterialUsage::ENUM_COUNT == 16, "Added additional material usage? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
 			case "none"_fnv1a:
 			case "<none>"_fnv1a:
 				return MaterialUsage::NONE;
+			case "tools"_fnv1a:
+				return MaterialUsage::TOOLS;
+			case "clip"_fnv1a:
+				return MaterialUsage::CLIP;
 			case "door"_fnv1a:
 				return MaterialUsage::DOOR;
 			case "floor"_fnv1a:

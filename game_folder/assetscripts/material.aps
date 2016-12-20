@@ -46,7 +46,21 @@ void GenerateUI( asset& Asset )
 
 
     string surTypes = "<none> | Brick | Concrete | Cloth | Flesh | Glass | Gravel | Ice | Metal | Mud | Plastic | Paper | Rock | Snow | Sand | Wood | Water";
-    string usage = "<none> | Door | Floor | Celing | Roof | Window | Sky";  // for grouping in editor
+
+    // for grouping in editor
+    string usage =
+    """
+        <none> |
+        tools |
+        clip |
+        ------------------------ |
+        Door |
+        Floor |
+        Celing |
+        Roof |
+        Window |
+        Sky
+    """;
 
     Asset.AddCombo( "surface_type", surTypes ).SetTitle( "Surface Type:" );
     Asset.AddCombo( "usage", usage ).SetTitle( "Edtior Group:" );
