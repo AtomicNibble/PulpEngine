@@ -58,8 +58,15 @@ void GenerateUI( asset& Asset )
         Floor |
         Celing |
         Roof |
+        Wall Interior |
+        Wall Exterior |
+        Trim Interior |
+        Trim Exterior |
         Window |
-        Sky
+        Foliage |
+        Water |
+        Sky |
+        Decal
     """;
 
     Asset.AddCombo( "surface_type", surTypes ).SetTitle( "Surface Type:" );
