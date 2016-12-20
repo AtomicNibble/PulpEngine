@@ -1,0 +1,55 @@
+#include <states>
+
+
+// fixed sampler and texture.
+Sampler( "colorSampler" )
+{
+    repeat = "tile both"
+    filter = "linear (mip nearest)"
+}
+
+Texture( "colorMap" )
+{
+    image = Image( "default/$default" )
+}
+
+
+// since it's default we want to support lots of techs.
+Technique( "depth prepass" )
+{
+    state = "depthPrepass"
+    source = "techsetdef_prepass.hlsl"
+
+    vs = VertexShader()
+    {
+    }
+    ps = PixelShader()
+    {
+    }
+}
+
+Technique( "lit" )
+{
+    state = "forward opaque"
+    source = "techsetdef_prepass.hlsl"
+
+    vs = VertexShader()
+    {
+    }
+    ps = PixelShader()
+    {
+    }
+}
+
+Technique( "unlit" )
+{
+    state = "replace + depth"
+    source = "techsetdef_prepass.hlsl"
+
+    vs = VertexShader()
+    {
+    }
+    ps = PixelShader()
+    {
+    }
+}
