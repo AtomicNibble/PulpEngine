@@ -257,7 +257,7 @@ private:
 	bool blendStateExsists(const core::string& name, render::BlendState* pBlendOut = nullptr);
 	bool stencilStateExsists(const core::string& name, StencilState* pStencilOut = nullptr);
 	bool stateExsists(const core::string& name, render::StateDesc* pStateOut = nullptr);
-	bool shaderExsists(const core::string& name, Shader* pShaderOut = nullptr);
+	bool shaderExsists(const core::string& name, render::shader::ShaderType::Enum type, Shader* pShaderOut = nullptr);
 	bool techniqueExsists(const core::string& name);
 	bool primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
 	bool paramExsists(const core::string& name, Param* pParam = nullptr);

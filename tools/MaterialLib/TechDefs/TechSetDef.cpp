@@ -892,7 +892,7 @@ bool TechSetDef::parseShader(core::XParser& lex, render::shader::ShaderType::Enu
 		return false;
 	}
 
-	if (stateExsists(name)) {
+	if (shaderExsists(name, stage)) {
 		X_ERROR("TechDef", "Shader with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
@@ -1144,10 +1144,7 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 	if (name.isNotEmpty())
 	{
-		core::string mergedName(name);
-		mergedName += render::shader::ShaderType::ToString(type);
-
-		if (shaderExsists(mergedName, &shader)) {
+		if (shaderExsists(name, type, &shader)) {
 			return true;
 		}
 
@@ -1160,11 +1157,9 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 		if (parentName.isNotEmpty())
 		{
-			// create temp so we don't log diffrent parent name, then in file.
-			const core::string mergedParentName = parentName + render::shader::ShaderType::ToString(type);
 			// inline define can have a parent.
 			// but it must exist if defined.
-			if (!shaderExsists(mergedParentName, &shader)) {
+			if (!shaderExsists(parentName, type, &shader)) {
 				X_ERROR("TechDef", "Tech has a inline %s define with a undefined parent of: %s \"%s\" File: %s:%" PRIi32,
 					defName.c_str(), parentName.c_str(), lex.GetFileName(), lex.GetLineNumber());
 				return false;
@@ -2046,9 +2041,12 @@ bool TechSetDef::stateExsists(const core::string& name, render::StateDesc* pStat
 	return findHelper(states_, name, pStateOut);
 }
 
-bool TechSetDef::shaderExsists(const core::string& name, Shader* pShaderOut)
+bool TechSetDef::shaderExsists(const core::string& name, render::shader::ShaderType::Enum type, Shader* pShaderOut)
 {
-	return findHelper(shaders_, name, pShaderOut);
+	core::string mergedName(name);
+	mergedName += render::shader::ShaderType::ToString(type);
+
+	return findHelper(shaders_, mergedName, pShaderOut);
 }
 
 bool TechSetDef::techniqueExsists(const core::string& name)
@@ -2090,8 +2088,7 @@ Shader& TechSetDef::addShader(const core::string& name, const core::string& pare
 {
 	core::string mergedName(name);
 	mergedName += render::shader::ShaderType::ToString(type);
-
-
+			
 	Shader& shader = addHelper(shaders_, mergedName, parentName, "state");
 	shader.type = type;
 	return shader;
