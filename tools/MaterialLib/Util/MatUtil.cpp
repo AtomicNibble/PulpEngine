@@ -96,12 +96,16 @@ namespace Util
 			case "roof"_fnv1a:
 				return MaterialUsage::ROOF;
 			case "wall_interior"_fnv1a:
+			case "wall interior"_fnv1a:
 				return MaterialUsage::WALL_INTERIOR;
 			case "wall_exterior"_fnv1a:
+			case "wall exterior"_fnv1a:
 				return MaterialUsage::WALL_EXTERIOR;
 			case "trim_interior"_fnv1a:
+			case "trim interior"_fnv1a:
 				return MaterialUsage::TRIM_INTERIOR;
 			case "trim_exterior"_fnv1a:
+			case "trim exterior"_fnv1a:
 				return MaterialUsage::TRIM_EXTERIOR;
 			case "window"_fnv1a:
 				return MaterialUsage::WINDOW;
