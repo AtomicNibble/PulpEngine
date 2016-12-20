@@ -1457,7 +1457,7 @@ bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
 			return false;
 		}
 
-		if (token.GetType() == core::TokenType::NAME)
+		if (token.GetType() == core::TokenType::NAME || token.GetType() == core::TokenType::STRING)
 		{
 			// this is just hard coded image name.
 			img.default = core::string(token.begin(), token.end());
