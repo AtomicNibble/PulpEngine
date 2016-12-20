@@ -80,7 +80,7 @@ X_NAMESPACE_BEGIN(engine)
 			return true;
 		}
 
-		if (!loadTechDef(path, name)) {
+		if (!loadTechDef(path, cat, name)) {
 			return false;
 		}
 
@@ -127,7 +127,7 @@ X_NAMESPACE_BEGIN(engine)
 		return true;
 	}
 
-	bool TechSetDefs::loadTechDef(const core::Path<char>& path, const core::string& name)
+	bool TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
 	{
 		FileBuf fileData(arena_);
 
@@ -141,7 +141,7 @@ X_NAMESPACE_BEGIN(engine)
 		incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
 
 		if (!pTechDef->parseFile(fileData, incDel)) {
-			X_ERROR("TechSetDefs", "Failed to load: \"%s\"", name.c_str());
+			X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), name.c_str());
 			return false;
 		}
 
