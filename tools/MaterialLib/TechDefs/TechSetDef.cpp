@@ -259,6 +259,7 @@ bool TechSetDef::parseBlendState(core::XParser& lex)
 	}
 
 	if (blendStateExsists(name)) {
+		X_ERROR("TechDef", "BlendState with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -410,6 +411,7 @@ bool TechSetDef::parseStencilState(core::XParser& lex)
 	}
 
 	if (stencilStateExsists(name)) {
+		X_ERROR("TechDef", "StencilState with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -525,6 +527,7 @@ bool TechSetDef::parseState(core::XParser& lex)
 	}
 
 	if (stateExsists(name)) {
+		X_ERROR("TechDef", "State with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -800,6 +803,7 @@ bool TechSetDef::parsePrimitiveType(core::XParser& lex)
 	}
 
 	if (primTypeExsists(name)) {
+		X_ERROR("TechDef", "PrimType with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -889,6 +893,7 @@ bool TechSetDef::parseShader(core::XParser& lex, render::shader::ShaderType::Enu
 	}
 
 	if (stateExsists(name)) {
+		X_ERROR("TechDef", "Shader with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -1002,6 +1007,7 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 	}
 
 	if (techniqueExsists(name)) {
+		X_ERROR("TechDef", "Technique with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -1530,6 +1536,7 @@ bool TechSetDef::parseParamSampler(core::XParser& lex)
 	}
 
 	if (samplerExsists(name)) {
+		X_ERROR("TechDef", "Sampler with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
@@ -1645,6 +1652,7 @@ bool TechSetDef::parseParamHelper(core::XParser& lex, ParamType::Enum type, Para
 	}
 
 	if (paramExsists(name)) {
+		X_ERROR("TechDef", "Param with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
 		return false;
 	}
 
