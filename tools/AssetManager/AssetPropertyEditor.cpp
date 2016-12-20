@@ -1131,6 +1131,11 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		const auto& key = it.key();
 		const auto& item = *it.value();
 
+		// we don't save label's in props data.
+		if (item.GetType() == AssetProperty::PropertyType::LABEL) {
+			continue;
+		}
+
 		writer.Key(key.c_str());
 		// do we want to try work out a better type?
 
@@ -1147,10 +1152,6 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 			break;
 		case AssetProperty::PropertyType::CHECKBOX:
 			writer.Bool(item.GetValueBool());
-			break;
-
-		case AssetProperty::PropertyType::LABEL:
-			// we don't save label's in props data.
 			break;
 
 		case AssetProperty::PropertyType::TEXT:
