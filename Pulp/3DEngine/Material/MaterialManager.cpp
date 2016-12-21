@@ -219,6 +219,8 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// we must get the techDef so we can select the tech definition.
 	TechDefState* pTechDefState = pMat->getTechDefState();
 
+	X_ASSERT_NOT_NULL(pTechDefState);
+
 	// now we have the tech we wnat to create a permatation of it supporting what we want.
 	TechDef* pTechDef = pTechDefState->getTech(techNameHash);
 
