@@ -192,9 +192,15 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 		return pMatRes;
 	}
 
-
+	// we want to create real instance but assign default props to it,
 	X_ERROR("MatMan", "Failed to find material: %s", pMtlName);
-	return getDefaultMaterial();
+
+	const auto* pDefault = getDefaultMaterial();
+
+	pMatRes = createMaterial_Internal(name);
+	pMatRes->assignProps(*pDefault);
+
+	return pMatRes;
 }
 
 void XMaterialManager::releaseMaterial(Material* pMat)
