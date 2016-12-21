@@ -32,7 +32,7 @@ static const uint32_t    MTL_MAX_TEXTURES = 8;
 static const uint32_t    MTL_MAX_SAMPLERS = 8;
 
 
-static const char*		 TECH_DEFS_DIR = "core_assets/techdefs";
+static const char*		 TECH_DEFS_DIR = "techdefs";
 static const char*		 TECH_DEFS_FILE_EXTENSION = "techsetdef";
 
 
