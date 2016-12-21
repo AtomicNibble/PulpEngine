@@ -181,7 +181,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			int32_t iAlgo = core::strUtil::StringToInt<int32_t>(pAlgo);
 			iAlgo = constrain<int32_t>(iAlgo, 1, 3);
 
-			static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
+			static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
 
 			if (iAlgo == 1) {
 				algo = Algo::LZ4;
@@ -190,12 +190,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				algo = Algo::LZ4HC;
 			}
 			else if (iAlgo == 3) {
-				algo = Algo::LZMA;
+				algo = Algo::LZ5;
 			}
 			else if (iAlgo == 4) {
-				algo = Algo::ZLIB;
+				algo = Algo::LZ5HC;
 			}
 			else if (iAlgo == 5) {
+				algo = Algo::LZMA;
+			}
+			else if (iAlgo == 6) {
+				algo = Algo::ZLIB;
+			}
+			else if (iAlgo == 7) {
 				algo = Algo::STORE;
 			}
 			else {
@@ -238,7 +244,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	ICompressor* pCompressor = nullptr;
 
-	static_assert(core::Compression::Algo::ENUM_COUNT == 5, "Added additional compression algos? this code needs updating.");
+	static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
 	
 	switch (algo)
 	{
@@ -249,6 +255,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			}
 			break;
 		case Algo::LZ4HC:
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".lz4";
+			}
+			break;
+		case Algo::LZ5:
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
+			if (defalte && outFile.empty()) {
+				outFile = inFile + L".lz4";
+			}
+			break;
+		case Algo::LZ5HC:
 			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".lz4";
