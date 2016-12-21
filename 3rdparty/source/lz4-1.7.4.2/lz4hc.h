@@ -40,7 +40,7 @@ extern "C" {
 
 /* --- Dependency --- */
 /* note : lz4hc is not an independent module, it requires lz4.h/lz4.c for proper compilation */
-#include "lz4.h"   /* stddef, LZ4LIB_API, LZ4_DEPRECATED */
+#include "lz4_lib.h"   /* stddef, LZ4LIB_API, LZ4_DEPRECATED */
 
 
 /* --- Useful constants --- */
