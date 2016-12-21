@@ -1719,9 +1719,6 @@
     <ClCompile Include="Time\win32\TimeStamp.cpp">
       <Filter>SourceFiles\Time\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
-      <Filter>SourceFiles\Compression\lz4</Filter>
-    </ClCompile>
     <ClCompile Include="Math\XHalf.cpp">
       <Filter>SourceFiles\Math</Filter>
     </ClCompile>
@@ -1751,9 +1748,6 @@
     </ClCompile>
     <ClCompile Include="Platform\win32\TrayIcon.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4hc.c">
-      <Filter>SourceFiles\Compression\lz4</Filter>
     </ClCompile>
     <ClCompile Include="Hashing\xxHash.cpp">
       <Filter>SourceFiles\Hashing</Filter>
@@ -1793,6 +1787,12 @@
     </ClCompile>
     <ClCompile Include="CBuffer.cpp">
       <Filter>Interfaces_h\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz4-1.7.4.2\lz4_lib.c">
+      <Filter>SourceFiles\Compression\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz4-1.7.4.2\lz4hc.c">
+      <Filter>SourceFiles\Compression\lz4</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
