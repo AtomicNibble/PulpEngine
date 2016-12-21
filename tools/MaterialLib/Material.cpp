@@ -10,7 +10,20 @@ X_NAMESPACE_BEGIN(engine)
 
 void Material::assignProps(const Material& oth)
 {
-	X_UNUSED(oth);
+	flags_ = oth.flags_;
+	surfaceType_ = oth.surfaceType_;
+	coverage_ = oth.coverage_;
+	polyOffsetType_ = oth.polyOffsetType_;
+	mountType_ = oth.mountType_;
+	
+	usage_ = oth.usage_;
+	cat_ = oth.cat_;
+	
+	tiling_ = oth.tiling_;
+	numTextures_ = oth.numTextures_;
+	pTechDefState_ = oth.pTechDefState_;
+	techs_ = oth.techs_;
+	textures_ = oth.textures_;
 }
 
 
