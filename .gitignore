@@ -172,6 +172,7 @@ user_config.cfg
 
 # assMan ui scripts
 !/game_folder/assetscripts/*.aps
+!/game_folder/core_assets/assetscripts/*.aps
 /game_folder/asset_db
 /game_folder/core_assets/imgs
 /game_folder/core_assets/sound
