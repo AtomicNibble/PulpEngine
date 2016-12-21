@@ -10,7 +10,8 @@ X_NAMESPACE_BEGIN(assman)
 
 AddAssetDialog::AddAssetDialog(QWidget *parent, assetDb::AssetDB& db) :
 	QDialog(parent, Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
-	db_(db)
+	db_(db),
+	modId_(assetDb::AssetDB::INVALID_MOD_ID)
 {
 	// hey, you looking at my code? you loco!
 	// We want:
@@ -127,9 +128,14 @@ assetDb::AssetType::Enum AddAssetDialog::getType(void) const
 	return type_;
 }
 
+int32_t AddAssetDialog::getModId(void) const
+{
+	return modId_;
+}
+
 void AddAssetDialog::accept(void)
 {
-	int32_t modId = assetDb::AssetDB::INVALID_MOD_ID;
+	modId_ = assetDb::AssetDB::INVALID_MOD_ID;
 
 	// name
 	{
@@ -181,12 +187,12 @@ void AddAssetDialog::accept(void)
 			return;
 		}
 
-		modId = variant.toInt();
+		modId_ = variant.toInt();
 	}
 
 
 	// o baby!
-	auto res = db_.AddAsset(modId, type_, assetName_);
+	auto res = db_.AddAsset(modId_, type_, assetName_);
 	if (res == assetDb::AssetDB::Result::OK) {
 		done(QDialog::Accepted);
 		return;

@@ -23,6 +23,7 @@ public:
 
 	core::string getName(void) const;
 	assetDb::AssetType::Enum getType(void) const;
+	int32_t getModId(void) const;
 
 private slots:
 	void accept(void);
@@ -40,6 +41,7 @@ private:
 private:
 	core::string assetName_;
 	assetDb::AssetType::Enum type_;
+	int32_t modId_;
 };
 
 
