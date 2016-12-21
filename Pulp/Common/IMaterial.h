@@ -212,9 +212,9 @@ struct MaterialHeader
 
 	// 4
 	MaterialSurType::Enum surfaceType;
-	MaterialPolygonOffset::Enum polyOffsetType;
 	MaterialCoverage::Enum coverage;
 	MaterialMountType::Enum mountType;
+	uint8_t pad;
 
 	// 4
 	MaterialFlags flags;

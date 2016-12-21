@@ -36,7 +36,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			{ "type", core::json::kStringType },
 			{ "usage", core::json::kStringType },
 			{ "surface_type", core::json::kStringType },
-			{ "polyOffset", core::json::kStringType },
+		//	{ "polyOffset", core::json::kStringType },
 		//	{ "cullFace", core::json::kStringType },
 		//	{ "depthTest", core::json::kStringType },
 			{ "climbType", core::json::kStringType },
@@ -66,13 +66,11 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	const char* pType = d["type"].GetString();
 	const char* pUsage = d["usage"].GetString();
 	const char* pSurfaceType = d["surface_type"].GetString();
-	const char* pPolyOffset = d["polyOffset"].GetString();
 	const char* pMountType = d["climbType"].GetString();
 
 	cat_ = Util::MatCatFromStr(pCat);
 	usage_ = Util::MatUsageFromStr(pUsage);
 	surType_ = Util::MatSurfaceTypeFromStr(pSurfaceType);
-	polyOffset_ = Util::MatPolyOffsetFromStr(pPolyOffset);
 	coverage_ = MaterialCoverage::OPAQUE;
 	mountType_ = Util::MatMountTypeFromStr(pMountType);
 
@@ -277,7 +275,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.usage = usage_;
 
 	hdr.surfaceType = surType_;
-	hdr.polyOffsetType = polyOffset_;
+
 	hdr.coverage = coverage_;
 	hdr.mountType = mountType_;
 

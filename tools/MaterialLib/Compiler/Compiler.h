@@ -52,7 +52,7 @@ private:
 	MaterialUsage::Enum usage_;
 
 	MaterialSurType::Enum surType_;
-	MaterialPolygonOffset::Enum polyOffset_;
+	uint8_t pad_;
 	MaterialCoverage::Enum coverage_;
 	MaterialMountType::Enum mountType_;
 
