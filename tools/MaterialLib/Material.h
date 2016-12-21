@@ -88,6 +88,7 @@ public:
 	// flag helpers.
 	X_INLINE bool isDrawn(void) const;
 	X_INLINE bool isLoaded(void) const;
+	X_INLINE bool isDefault(void) const;
 
 	X_INLINE const core::string& getName(void) const;
 	X_INLINE MaterialFlags getFlags(void) const;

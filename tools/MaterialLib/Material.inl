@@ -112,6 +112,10 @@ X_INLINE bool Material::isLoaded(void) const
 	return flags_.IsSet(MaterialFlag::LOAD_FAILED) == false;
 }
 
+X_INLINE bool Material::isDefault(void) const
+{
+	return flags_.IsSet(MaterialFlag::DEFAULT);
+}
 
 X_INLINE const core::string& Material::getName(void) const
 {
