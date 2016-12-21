@@ -3,7 +3,8 @@ X_NAMESPACE_BEGIN(engine)
 
 X_INLINE Material::Material(core::MemoryArenaBase* arena) :
 	techs_(arena),
-	textures_(arena)
+	textures_(arena),
+	pTechDefState_(nullptr)
 {
 	id_ = -1;
 
