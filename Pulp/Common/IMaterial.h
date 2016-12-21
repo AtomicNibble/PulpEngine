@@ -80,7 +80,8 @@ X_DECLARE_FLAGS(MaterialFlag)(
 	UV_CLAMP_U,
 	UV_CLAMP_V,
 
-	LOAD_FAILED
+	LOAD_FAILED,
+	DEFAULT // set if default material. (it will still be named as original material tho, so you can hotreload a material that failed to load initially)
 );
 
 
