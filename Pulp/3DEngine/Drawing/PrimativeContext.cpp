@@ -92,6 +92,9 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		// so the state and shaders used is fully data driven MMMMM.
 		Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
 
+		// we still assign even tho may be default so it get's cleaned up.
+		primMaterials_[primType] = pMat;
+
 		if (pMat->isDefault()) {
 			X_ERROR("Prim", "Error loading one of primative materials");
 			return false;
@@ -110,7 +113,6 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		// which i think i'll do for now, and move more offline later. 
 		// 
 
-		primMaterials_[primType] = pMat;
 	}
 
 	return true;
