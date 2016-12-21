@@ -194,115 +194,6 @@ using namespace AK;
 
 X_NAMESPACE_BEGIN(sound)
 
-namespace
-{
-
-	// snd_set_rtpc <name> <state> <ObjectId>
-	void cmd_SetRtpc(core::IConsoleCmdArgs* pArgs)
-	{
-		if (pArgs->GetArgCount() < 2) {
-			X_WARNING("Console", "snd_set_rtpc <name> <state> <ObjectId>");
-			return;
-		}
-
-		const char* pName = pArgs->GetArg(0);
-		const char* pState = pArgs->GetArg(1);
-
-		// optional ObjectId
-		int32_t objectId = 0;
-		if (pArgs->GetArgCount() > 2) {
-			objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(2));
-		}
-
-		// TODO
-		X_UNUSED(pName);
-		X_UNUSED(pState);
-		X_UNUSED(objectId);
-	}
-
-	// snd_set_switchstate <name> <state> <ObjectId>
-	void cmd_SetSwitchState(core::IConsoleCmdArgs* pArgs)
-	{
-		if (pArgs->GetArgCount() < 2) {
-			X_WARNING("Console", "snd_set_switchstate <name> <state> <ObjectId>");
-			return;
-		}
-
-		const char* pName = pArgs->GetArg(0);
-		const char* pState = pArgs->GetArg(1);
-
-		// optional ObjectId
-		int32_t objectId = 0;
-		if (pArgs->GetArgCount() > 2) {
-			objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(2));
-		}
-
-		// TODO
-		X_UNUSED(pName);
-		X_UNUSED(pState);
-		X_UNUSED(objectId);
-	}
-
-	// snd_post_event <eventName> <ObjectId>
-	void cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
-	{
-		if (pArgs->GetArgCount() < 1) {
-			X_WARNING("Console", "snd_post_event <eventName> <ObjectId>");
-			return;
-		}
-
-		const char* pEventName = pArgs->GetArg(0);
-
-		// optional ObjectId
-		int32_t objectId = 0;
-		if (pArgs->GetArgCount() > 1) {
-			objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(1));
-		}
-
-		// TODO
-		X_UNUSED(pEventName);
-		X_UNUSED(objectId);
-	}
-
-
-	// snd_stop_event <eventName> <ObjectId>
-	void cmd_StopEvent(core::IConsoleCmdArgs* pArgs)
-	{
-		if (pArgs->GetArgCount() < 1) {
-			X_WARNING("Console", "snd_stop_event <eventName> <ObjectId>");
-			return;
-		}
-
-		const char* pEventName = pArgs->GetArg(0);
-
-		// optional ObjectId
-		int32_t objectId = 0;
-		if (pArgs->GetArgCount() > 1) {
-			objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(1));
-		}
-
-		// TODO
-		X_UNUSED(pEventName);
-		X_UNUSED(objectId);
-	}
-
-
-	// snd_stop_all_event <ObjectId>
-	void cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
-	{
-		// optional ObjectId
-		int32_t objectId = 0;
-		if (pArgs->GetArgCount() > 1) {
-			objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(0));
-		}
-
-		// TODO
-		X_UNUSED(objectId);
-	}
-
-
-} // namespace
-
 XSound::XSound() :
 	globalObjID_(static_cast<AkGameObjectID>(-2)), // 0 & -1  are reserved.
 	initBankID_(AK_INVALID_BANK_ID),
@@ -329,17 +220,17 @@ void XSound::registerCmds(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 
-	ADD_COMMAND("snd_set_rtpc", cmd_SetRtpc, core::VarFlag::SYSTEM, 
+	ADD_COMMAND_MEMBER("snd_set_rtpc", this, XSound, &XSound::cmd_SetRtpc, core::VarFlag::SYSTEM,
 		"Set a audio RTPC value. <name> <state> <ObjectId>");
-	ADD_COMMAND("snd_set_switchstate", cmd_SetSwitchState, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("snd_set_switchstate", this, XSound, &XSound::cmd_SetSwitchState, core::VarFlag::SYSTEM,
 		"Set a audio Switch State. <name> <state> <ObjectId>");
 
-	ADD_COMMAND("snd_post_event", cmd_PostEvent, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("snd_post_event", this, XSound, &XSound::cmd_PostEvent, core::VarFlag::SYSTEM,
 		"Post a audio event. <eventName> <ObjectId>");
-	ADD_COMMAND("snd_stop_event", cmd_StopEvent, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("snd_stop_event", this, XSound, &XSound::cmd_StopEvent, core::VarFlag::SYSTEM,
 		"Stop a audio event on a object. <eventName> <ObjectId>");
 
-	ADD_COMMAND("snd_stop_all_event", cmd_StopAllEvent, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("snd_stop_all_event", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
 		"Stop all audio events for a object. <ObjectId>");
 
 }
@@ -749,5 +640,111 @@ void XSound::SetSFXVolume(float vol)
 
 	SoundEngine::SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
 }
+
+// ------------------ Commands ----------------------------
+
+// snd_set_rtpc <name> <state> <ObjectId>
+void XSound::cmd_SetRtpc(core::IConsoleCmdArgs* pArgs)
+{
+	if (pArgs->GetArgCount() < 2) {
+		X_WARNING("Console", "snd_set_rtpc <name> <state> <ObjectId>");
+		return;
+	}
+
+	const char* pName = pArgs->GetArg(0);
+	const char* pState = pArgs->GetArg(1);
+
+	// optional ObjectId
+	int32_t objectId = 0;
+	if (pArgs->GetArgCount() > 2) {
+		objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(2));
+	}
+
+	// TODO
+	X_UNUSED(pName);
+	X_UNUSED(pState);
+	X_UNUSED(objectId);
+}
+
+// snd_set_switchstate <name> <state> <ObjectId>
+void XSound::cmd_SetSwitchState(core::IConsoleCmdArgs* pArgs)
+{
+	if (pArgs->GetArgCount() < 2) {
+		X_WARNING("Console", "snd_set_switchstate <name> <state> <ObjectId>");
+		return;
+	}
+
+	const char* pName = pArgs->GetArg(0);
+	const char* pState = pArgs->GetArg(1);
+
+	// optional ObjectId
+	int32_t objectId = 0;
+	if (pArgs->GetArgCount() > 2) {
+		objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(2));
+	}
+
+	// TODO
+	X_UNUSED(pName);
+	X_UNUSED(pState);
+	X_UNUSED(objectId);
+}
+
+// snd_post_event <eventName> <ObjectId>
+void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
+{
+	if (pArgs->GetArgCount() < 1) {
+		X_WARNING("Console", "snd_post_event <eventName> <ObjectId>");
+		return;
+	}
+
+	const char* pEventName = pArgs->GetArg(0);
+
+	// optional ObjectId
+	int32_t objectId = 0;
+	if (pArgs->GetArgCount() > 1) {
+		objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(1));
+	}
+
+	// TODO
+	X_UNUSED(pEventName);
+	X_UNUSED(objectId);
+}
+
+
+// snd_stop_event <eventName> <ObjectId>
+void XSound::cmd_StopEvent(core::IConsoleCmdArgs* pArgs)
+{
+	if (pArgs->GetArgCount() < 1) {
+		X_WARNING("Console", "snd_stop_event <eventName> <ObjectId>");
+		return;
+	}
+
+	const char* pEventName = pArgs->GetArg(0);
+
+	// optional ObjectId
+	int32_t objectId = 0;
+	if (pArgs->GetArgCount() > 1) {
+		objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(1));
+	}
+
+	// TODO
+	X_UNUSED(pEventName);
+	X_UNUSED(objectId);
+}
+
+
+// snd_stop_all_event <ObjectId>
+void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
+{
+	// optional ObjectId
+	int32_t objectId = 0;
+	if (pArgs->GetArgCount() > 1) {
+		objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(0));
+	}
+
+	// TODO
+	X_UNUSED(objectId);
+}
+
 
 X_NAMESPACE_END

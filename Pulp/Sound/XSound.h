@@ -11,6 +11,7 @@
 
 X_NAMESPACE_DECLARE(core,
 struct ICVar;
+struct IConsoleCmdArgs;
 )
 
 X_NAMESPACE_BEGIN(sound)
@@ -45,6 +46,12 @@ private:
 private:
 	void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
 
+private:
+	void cmd_SetRtpc(core::IConsoleCmdArgs* pArgs);
+	void cmd_SetSwitchState(core::IConsoleCmdArgs* pArgs);
+	void cmd_PostEvent(core::IConsoleCmdArgs* pArgs);
+	void cmd_StopEvent(core::IConsoleCmdArgs* pArgs);
+	void cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs);
 
 private:
 	IOhook ioHook_;
