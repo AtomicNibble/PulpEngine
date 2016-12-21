@@ -92,6 +92,10 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 		// so the state and shaders used is fully data driven MMMMM.
 		Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
 
+		if (pMat->isDefault()) {
+			X_ERROR("Prim", "Error loading one of primative materials");
+			return false;
+		}
 		// but i don't think a material can currently be loaded in a self contained manner.
 		// since in order for it to create a render state it needs a pass state.
 		// so i think when we make a material we should really classifily everything.
