@@ -143,7 +143,9 @@ bool PrimativeContext::freeStates(render::IRender* pRender)
 
 	for (auto& pMat : primMaterials_)
 	{
-		pMaterialManager_->releaseMaterial(pMat);
+		if (pMat) {
+			pMaterialManager_->releaseMaterial(pMat);
+		}
 	}	
 
 
