@@ -492,9 +492,11 @@ void XMaterialManager::InitDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
+		// this will be data driven soon.
 		pDefaultMtl_ = createMaterial_Internal(core::string(MTL_DEFAULT_NAME));
 
-
+		// it's default :|
+		pDefaultMtl_->setFlags(MaterialFlag::DEFAULT);
 	}
 }
 
