@@ -237,7 +237,7 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	if (!settings_.IsSet(Setting::ENABLED)) {
 		enable(false);
 	}
-	if (!settings_.IsSet(Setting::VISIBLE)) {
+	if (!isVisible()) {
 		show(false);
 	}
 	// re refreshing ui, re apply modified style if set.
@@ -740,6 +740,18 @@ bool AssetProperty::isModified(void) const
 bool AssetProperty::isUpdateOnChange(void) const
 {
 	return settings_.IsSet(Setting::UPDATE_ON_CHANGE);
+}
+
+bool AssetProperty::isVisible(void) const
+{
+	if (!parentKey_.empty())
+	{
+		// we should check if parent is visible :|
+		// but how do we find him!
+
+	}
+
+	return settings_.IsSet(Setting::VISIBLE);
 }
 
 AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const

@@ -143,6 +143,7 @@ public:
 	bool isNewProp(void) const;
 	bool isModified(void) const;
 	bool isUpdateOnChange(void) const;
+	bool isVisible(void) const;
 	PropertyType::Enum GetType(void) const;
 	const std::string& GetKey(void) const;
 	const std::string& GetParentKey(void) const;
