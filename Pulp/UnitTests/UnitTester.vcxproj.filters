@@ -331,6 +331,9 @@
     <ClCompile Include="UT_Function.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="UT_LZ5.cpp">
+      <Filter>Source Files\tests\Compression</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
