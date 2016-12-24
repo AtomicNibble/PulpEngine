@@ -180,7 +180,7 @@ void GenerateUI( asset& Asset )
     Asset.AddCheckBox( "f_nodraw", false ).SetTitle( "NoDraw" ).SetVisible(false);
     Asset.AddCheckBox( "f_editorvisible", false ).SetTitle( "Editor Visible" ).SetToolTip("makes nodraw visable in editor modes.").SetVisible(false);
     Asset.AddCheckBox( "f_transparent", false ).SetTitle( "Transparent" ).SetToolTip("This material is tranparent. (Will be treaten as none-structual in BSP compiler)").SetVisible(false);
-    Asset.AddCheckBox( "f_solid", true ).SetTitle( "Solid" ).SetVisible(false);
+    Asset.AddCheckBox( "f_solid", false ).SetTitle( "Solid" ).SetVisible(false);
     Asset.AddCheckBox( "f_structual", false ).SetTitle( "Structual" ).SetToolTip("Will split BSP in level compiler").SetVisible(false);
     Asset.AddCheckBox( "f_detail", false ).SetTitle( "Detail" ).SetVisible(false);
     Asset.AddCheckBox( "f_portal", false ).SetTitle( "Portal" ).SetVisible(false);
