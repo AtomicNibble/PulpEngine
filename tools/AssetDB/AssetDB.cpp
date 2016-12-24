@@ -229,7 +229,7 @@ bool AssetDB::CreateTables(void)
 		"ref_id INTEGER PRIMARY KEY,"
 		"toId INTEGER NOT NULL," 
 		"fromId INTEGER NOT NULL,"
-		"FOREIGN KEY(ref_id) REFERENCES file_ids(file_id),"
+		"FOREIGN KEY(toId) REFERENCES file_ids(file_id),"
 		"FOREIGN KEY(fromId) REFERENCES file_ids(file_id)"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'refs' table");
