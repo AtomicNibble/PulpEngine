@@ -1256,6 +1256,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			path = AssetTypeRawFolder(type);
 			path.toLower();
 			path /= name;
+			path.replaceSeprators();
 
 			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
 				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
