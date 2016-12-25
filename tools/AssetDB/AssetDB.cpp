@@ -1134,7 +1134,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 			// now move the file.
 			core::Path<char> newFilePath, oldFilePath;
 			AssetPathForName(type, newName, newFilePath);
-			AssetPathForName(type, rawData.path, oldFilePath);
+			AssetPathForRawFile(rawData, oldFilePath);
 
 
 			// make sure dir tree for new name is valid.
