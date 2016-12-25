@@ -205,7 +205,8 @@ public:
 	// some assetRef stuff.
 	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
 	bool IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func);
-	bool GetAssetRefs(int32_t assetId, AssetIdArr& refsOut);
+	bool GetAssetRefs(int32_t assetId, AssetIdArr& refsOut); // returns a list of assets that refrence assetId
+	bool GetAssetRefsFrom(int32_t assetId, AssetIdArr& refsOut); // returns a list of assets that assetId refrences.
 	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
 	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
 

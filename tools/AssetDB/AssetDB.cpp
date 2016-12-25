@@ -2177,6 +2177,26 @@ bool AssetDB::GetAssetRefs(int32_t assetId, AssetIdArr& refsOut)
 	return true;
 }
 
+bool AssetDB::GetAssetRefsFrom(int32_t assetId, AssetIdArr& refsOut)
+{
+	refsOut.clear();
+
+	sql::SqlLiteQuery qry(db_, "SELECT toId from refs WHERE fromId = ?");
+	qry.bind(1, assetId);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t refId = row.get<int32_t>(0);
+
+		refsOut.emplace_back(refId);
+	}
+
+	return true;
+}
+
 
 AssetDB::Result::Enum AssetDB::AddAssertRef(int32_t assetId, int32_t targetAssetId)
 {
