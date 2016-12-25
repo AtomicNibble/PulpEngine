@@ -12,8 +12,8 @@ void GenerateUI( asset& Asset )
     Asset.BeginGroup("Args");
 
     Asset.AddCombo( "semantic", semantics ).SetTitle( "Image Usage:" );
-    Asset.AddCombo( "compressionMethod", autoCompMethod ).SetTitle("Auto Compression");
-    Asset.AddCombo( "imgFmt", dstFmts ).SetTitle("Force Compression algo").SetVisible( true );
+    Asset.AddCombo( "compressionMethod", autoCompMethod ).SetTitle("Auto Compression").UpdateOnChange(true);
+    Asset.AddCombo( "imgFmt", dstFmts ).SetTitle("Force Compression algo").SetVisible(  Asset.getPropValue( "compressionMethod" ) == "Custom" );
     Asset.AddCombo( "imageType", "Texture | Cube | Volume" ).SetTitle( "Image Type" );
 
     Asset.BeginGroup("Options");
