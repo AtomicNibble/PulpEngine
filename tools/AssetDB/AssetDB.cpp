@@ -1121,9 +1121,15 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 		int32_t rawId;
 		if (GetRawfileForId(assetId, rawData, &rawId))
 		{
+			core::Path<char> path;
+			path = AssetTypeRawFolder(type);
+			path.toLower();
+			path /= newName;
+			path.replaceSeprators();
+
 			sql::SqlLiteTransaction trans(db_);
 			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE file_id = ?");
-			cmd.bind(1, newName.c_str());
+			cmd.bind(1, path.c_str());
 			cmd.bind(2, rawId);
 
 			sql::Result::Enum res = cmd.execute();
