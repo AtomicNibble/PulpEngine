@@ -13,7 +13,7 @@ SelectAssetDialog::SelectAssetDialog(QWidget *parent, assetDb::AssetDB& db, asse
 	db_(db),
 	type_(type)
 {
-	setWindowTitle("Select Asset");
+	setWindowTitle(QString("Select Asset - %1").arg(assetDb::AssetType::ToString(type)));
 
 	QVBoxLayout* pLayout = new QVBoxLayout();
 
