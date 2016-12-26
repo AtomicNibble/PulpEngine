@@ -675,7 +675,7 @@ QList<Node*> AssetDBModel::childNodes(FolderNode *parentNode) const
     return nodeList;
 }
 
-bool AssetDBModel::filter(Node *node) const
+X_INLINE bool AssetDBModel::filter(Node *node) const
 {
     Q_UNUSED(node);
 
