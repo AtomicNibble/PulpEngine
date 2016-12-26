@@ -83,6 +83,9 @@ private:
 	void UnloadConverters(void);
 
 private:
+	static void GetOutputPathForAssetType(AssetType::Enum assType,
+		const core::Path<char>& modPath, core::Path<char>& pathOut);
+
 	void GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
 		const core::Path<char>& modPath, core::Path<char>& pathOut);
 

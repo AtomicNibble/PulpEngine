@@ -331,11 +331,7 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 			AssetType::Enum assType = static_cast<AssetType::Enum>(i);
 
 			core::Path<char> assetPath;
-			assetPath.clear();
-			assetPath /= outDir;
-			assetPath /= AssetType::ToString(assType);
-			assetPath /= "s";
-			assetPath.toLower();
+			GetOutputPathForAssetType(assType, outDir, assetPath);
 
 			if (pFileSys->directoryExists(assetPath.c_str()))
 			{
@@ -345,9 +341,14 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 				}
 			}
 		}
+
+		X_LOG0("Converter", "Cleaning complete");
+	}
+	else
+	{
+		X_WARNING("Converter", "mod dir not fnd cleaning skipped: \"\"", outDir.c_str());
 	}
 	
-	X_LOG0("Converter", "Cleaning complete");
 	return true;
 }
 
@@ -654,8 +655,7 @@ void Converter::UnloadConverters(void)
 	}
 }
 
-
-void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
+void Converter::GetOutputPathForAssetType(AssetType::Enum assType,
 	const core::Path<char>& modPath, core::Path<char>& pathOut)
 {
 	pathOut.clear();
@@ -663,8 +663,13 @@ void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::strin
 	pathOut /= AssetType::ToString(assType);
 	pathOut += "s";
 	pathOut.toLower();
-	pathOut.ensureSlash();
 	pathOut.replaceSeprators();
+}
+
+void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
+	const core::Path<char>& modPath, core::Path<char>& pathOut)
+{
+	GetOutputPathForAssetType(assType, modPath, pathOut);
 
 	// make sure output folder is valid.
 	gEnv->pFileSys->createDirectoryTree(pathOut.c_str());
