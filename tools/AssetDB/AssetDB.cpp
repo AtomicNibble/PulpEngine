@@ -1073,10 +1073,45 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 		return Result::HAS_REFS; // technically it has refs by been a parent, so reuse this and who ever gets the error should just work it out.
 	}
 
+	// do we ref anything?
+	// if so we need to remove them.
+	RefsArr refs(g_AssetDBArena);
+	if (!GetAssetRefsFrom(assetId, refs)) {
+		X_ERROR("AssetDB", "Failed to delete asset: %s:%s error getting ref count", AssetType::ToString(type), name.c_str());
+		return Result::ERROR;
+	}
+
 	// If we are a child, it don't matter currently
 	// as the child stores the link, not the parent.
 
 	sql::SqlLiteTransaction trans(db_);
+
+	if (refs.isNotEmpty())
+	{
+		core::StackString<2048, char> stm("DELETE FROM refs WHERE ref_id IN (?");
+		stm.append(", ?", refs.size() - 1);
+		stm.append(")");
+
+		sql::SqlLiteCmd cmd(db_, stm.c_str());
+		for (size_t i = 0; i < refs.size(); i++)
+		{
+			cmd.bind(static_cast<int32_t>(i + 1), refs[i].id);
+		}
+
+		sql::Result::Enum res = cmd.execute();
+		if (res != sql::Result::OK) {
+			X_ERROR("AssetDB", "Error deleting refs when deleting asset");
+			return Result::ERROR;
+		}
+
+		// check we delete correct amount, otherwise we have some sort of logic error.
+		if (db_.numChangesFromLastStmt() != safe_static_cast<int32_t>(refs.size())) {
+			X_ASSERT_UNREACHABLE();
+			X_ERROR("AssetDB", "Error deleting all assets refs before removing asset");
+			return Result::ERROR;
+		}
+	}
+
 	sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE file_id = ? AND type = ? AND name = ?");
 	cmd.bind(1, assetId); // make sure it's same one we found above.
 	cmd.bind(2, type);
