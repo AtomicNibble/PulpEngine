@@ -212,7 +212,16 @@ Result::Enum SqlLiteDb::enableExtendedResultCodes(bool enable)
 SqlLiteDb::RowId SqlLiteDb::lastInsertRowid(void) const
 {
 	return sqlite3_last_insert_rowid(db_);
+}
 
+int32_t SqlLiteDb::numChangesFromLastStmt(void) const
+{
+	return sqlite3_changes(db_);
+}
+
+int32_t SqlLiteDb::numChangesSinceDBOpen(void) const
+{
+	return sqlite3_total_changes(db_);
 }
 
 Result::Enum SqlLiteDb::errorCode(void) const

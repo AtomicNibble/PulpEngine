@@ -112,6 +112,8 @@ public:
 	Result::Enum enableExtendedResultCodes(bool enable = true);
 
 	RowId lastInsertRowid(void) const;
+	int32_t numChangesFromLastStmt(void) const;
+	int32_t numChangesSinceDBOpen(void) const;
 
 	Result::Enum errorCode(void) const;
 	const char* errorMsg(void) const;
