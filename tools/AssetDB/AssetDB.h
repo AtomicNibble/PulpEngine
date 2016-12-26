@@ -72,6 +72,16 @@ public:
 		core::string name;
 	};
 
+	struct AssetRef
+	{
+		X_INLINE AssetRef();
+		X_INLINE AssetRef(int32_t id, int32_t toId, int32_t fromId);
+
+		int32_t id;
+		int32_t toId;
+		int32_t fromId;
+	};
+
 
 public:
 	typedef int32_t ModId;
@@ -95,6 +105,7 @@ public:
 	typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
 	typedef core::Array<Mod> ModsArr;
 	typedef core::Array<AssetInfo> AssetInfoArr;
+	typedef core::Array<AssetRef> RefsArr;
 	typedef core::Array<int32_t> AssetIdArr;
 	typedef core::Array<uint8_t> DataArr;
 
@@ -207,6 +218,8 @@ public:
 	bool IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func);
 	bool GetAssetRefs(int32_t assetId, AssetIdArr& refsOut); // returns a list of assets that refrence assetId
 	bool GetAssetRefsFrom(int32_t assetId, AssetIdArr& refsOut); // returns a list of assets that assetId refrences.
+	bool GetAssetRefsFrom(int32_t assetId, RefsArr& refsOut); // returns a list of refs that assetId refrences.
+
 	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
 	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
 

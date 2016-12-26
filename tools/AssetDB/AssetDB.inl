@@ -65,5 +65,23 @@ X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const cor
 
 }
 
+// -----------------------------------------------------
+
+X_INLINE AssetDB::AssetRef::AssetRef() :
+	id(INVALID_ASSET_ID),
+	toId(INVALID_ASSET_ID),
+	fromId(INVALID_ASSET_ID)
+{
+
+}
+
+X_INLINE AssetDB::AssetRef::AssetRef(int32_t id, int32_t toId, int32_t fromId) :
+	id(id),
+	toId(toId),
+	fromId(fromId)
+{
+
+}
+
 
 X_NAMESPACE_END
