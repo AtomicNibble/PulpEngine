@@ -95,6 +95,17 @@ bool DeleteAssetDialog::loadInfo(void)
 	return true;
 }
 
+core::string DeleteAssetDialog::getName(void) const
+{
+	return name_;
+}
+
+assetDb::AssetType::Enum DeleteAssetDialog::getType(void) const
+{
+	return type_;
+}
+
+
 
 void DeleteAssetDialog::accept(void)
 {

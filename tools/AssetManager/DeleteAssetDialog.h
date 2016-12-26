@@ -26,6 +26,9 @@ public:
 	// one idea might be to make this memeber staitc tho and pass data to constructor tho....
 	bool loadInfo(void);
 
+	core::string getName(void) const;
+	assetDb::AssetType::Enum getType(void) const;
+
 private:
 
 private slots:
