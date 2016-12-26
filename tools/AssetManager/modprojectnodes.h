@@ -22,6 +22,7 @@ public:
 	bool removeSubProjects(const QStringList& projectNames) X_OVERRIDE;
 
 	bool addFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
+	bool removeFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
 
 	bool clean(ConverterHost& conHost) const X_OVERRIDE;
 
@@ -49,6 +50,9 @@ public:
 	QString tooltip(void) const X_OVERRIDE;
 	bool hasUnLoadedChildren(void) const X_OVERRIDE;
 	bool loadChildren(void) X_OVERRIDE;
+
+	bool addFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
+	bool removeFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
 
 private:
 	bool build(ConverterHost& conHost, bool force) const X_OVERRIDE;

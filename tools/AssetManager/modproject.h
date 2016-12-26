@@ -5,7 +5,6 @@
 #include "project.h"
 #include <../AssetDB/AssetDB.h>
 
-class ModProjectNode;
 
 X_NAMESPACE_DECLARE(assetDb,
 	class AssetDB;
@@ -13,6 +12,8 @@ X_NAMESPACE_DECLARE(assetDb,
 
 X_NAMESPACE_BEGIN(assman)
 
+class ModProjectNode;
+class ModVirtualFolderNode;
 
 class ModProject : public AssetExplorer::Project
 {
@@ -40,6 +41,9 @@ public:
 
 	void loadAssetTypeNodes(void);
 
+	bool addFile(const core::string& name, assetDb::AssetType::Enum type);
+	bool removeFile(const core::string& name, assetDb::AssetType::Enum type);
+
 	QString displayName(void) const override;
 	int32_t modId(void) const;
 	AssetExplorer::ProjectNode* rootProjectNode(void) const override;
@@ -56,6 +60,7 @@ private:
 	QString name_;
 	int32_t modId_;
 	ModProjectNode* rootNode_;
+	ModVirtualFolderNode* assetTypeFolders_[AssetType::ENUM_COUNT];
 
 	AssetTypeInfoArr assetDisplayInfo_;
 };

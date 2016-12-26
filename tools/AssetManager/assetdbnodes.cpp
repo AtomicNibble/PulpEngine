@@ -422,6 +422,15 @@ bool FolderNode::addFile(const core::string& name, assetDb::AssetType::Enum type
 }
 
 
+bool FolderNode::removeFile(const core::string& name, assetDb::AssetType::Enum type)
+{
+	if (projectNode()) {
+		return projectNode()->removeFile(name, type);
+	}
+	return false;
+}
+
+
 // ------------------------------------------------------------------
 
 

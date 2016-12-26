@@ -289,6 +289,236 @@ namespace
 			pFolder->addFileNodes(nodesToAdd);
 		}
 
+		void insertSubFolders(ModProject* pProject, AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		{
+			insertFiles(pProject, pFolder, type);
+
+
+			// updateFolders
+			QMultiMap<QString, AssetExplorer::FolderNode*> existingFolderNodes;
+			{
+				const auto subfolderNodes = pFolder->subFolderNodes();
+
+				foreach(AssetExplorer::FolderNode* pNode, subfolderNodes) {
+					if (pNode->nodeType() != AssetExplorer::NodeType::ProjectNodeType) {
+						existingFolderNodes.insert(pNode->name(), pNode);
+					}
+				}
+			}
+
+			QList<AssetExplorer::FolderNode*> foldersToAdd;
+			typedef QPair<InternalNode*, AssetExplorer::FolderNode*> NodePair;
+			QList<NodePair> nodesToUpdate;
+
+			// Check virtual
+			{
+				auto it = virtualfolders.constBegin();
+				auto end = virtualfolders.constEnd();
+				for (; it != end; ++it)
+				{
+					bool found = false;
+					const QString& path = (*it)->fullPath;
+					auto oldit = existingFolderNodes.constFind(path);
+
+					while (oldit != existingFolderNodes.constEnd() && oldit.key() == path)
+					{
+						if (oldit.value()->nodeType() == AssetExplorer::NodeType::VirtualFolderNodeType) {
+							AssetExplorer::VirtualFolderNode* vfn = qobject_cast<AssetExplorer::VirtualFolderNode *>(oldit.value());
+							if (vfn->priority() == (*it)->priority) {
+								found = true;
+								break;
+							}
+						}
+						++oldit;
+					}
+
+					if (found)
+					{
+						nodesToUpdate.append(NodePair(*it, *oldit));
+					}
+					else
+					{
+						AssetExplorer::FolderNode* pNewNode = createFolderNode(*it);
+						foldersToAdd.append(pNewNode);
+						nodesToUpdate.append(NodePair(*it, pNewNode));
+					}
+				}
+			}
+
+			// Check subnodes
+			{
+				auto it = subnodes.constBegin();
+				auto end = subnodes.constEnd();
+
+				for (; it != end; ++it)
+				{
+					bool found = false;
+					QString path = it.value()->fullPath;
+
+					auto oldit = existingFolderNodes.constFind(path);
+
+					while (oldit != existingFolderNodes.constEnd() && oldit.key() == path)
+					{
+						if (oldit.value()->nodeType() == AssetExplorer::NodeType::FolderNodeType) {
+							found = true;
+							break;
+						}
+						++oldit;
+					}
+
+					if (found)
+					{
+						nodesToUpdate << NodePair(it.value(), *oldit);
+					}
+					else
+					{
+						AssetExplorer::FolderNode *newNode = createFolderNode(it.value());
+						foldersToAdd << newNode;
+						nodesToUpdate << NodePair(it.value(), newNode);
+					}
+				}
+			}
+
+			QSet<AssetExplorer::FolderNode*> toKeep;
+			toKeep.reserve(nodesToUpdate.size());
+
+			foreach(const NodePair& np, nodesToUpdate) {
+				toKeep.insert(np.second);
+			}
+
+			if (!foldersToAdd.isEmpty()) {
+				pFolder->addFolderNodes(foldersToAdd);
+			}
+
+			foreach(const NodePair &np, nodesToUpdate) {
+				np.first->insertSubFolders(pProject, np.second, type);
+			}
+
+		}
+
+		void removeSubFolders(ModProject* pProject, AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		{
+			updateFiles(pProject, pFolder, type);
+
+			// updateFolders
+			QMultiMap<QString, AssetExplorer::FolderNode*> existingFolderNodes;
+			{
+				const auto subfolderNodes = pFolder->subFolderNodes();
+
+				foreach(AssetExplorer::FolderNode* pNode, subfolderNodes) {
+					if (pNode->nodeType() != AssetExplorer::NodeType::ProjectNodeType) {
+						existingFolderNodes.insert(pNode->name(), pNode);
+					}
+				}
+			}
+
+			QList<AssetExplorer::FolderNode*> foldersToRemove;
+			typedef QPair<InternalNode*, AssetExplorer::FolderNode*> NodePair;
+			QList<NodePair> nodesToUpdate;
+
+			// Check virtual
+			{
+				auto it = virtualfolders.constBegin();
+				auto end = virtualfolders.constEnd();
+				for (; it != end; ++it)
+				{
+					bool found = false;
+					const QString& path = (*it)->fullPath;
+					auto oldit = existingFolderNodes.constFind(path);
+
+					while (oldit != existingFolderNodes.constEnd() && oldit.key() == path)
+					{
+						if (oldit.value()->nodeType() == AssetExplorer::NodeType::VirtualFolderNodeType) {
+							AssetExplorer::VirtualFolderNode* vfn = qobject_cast<AssetExplorer::VirtualFolderNode *>(oldit.value());
+							if (vfn->priority() == (*it)->priority) {
+								found = true;
+								break;
+							}
+						}
+						++oldit;
+					}
+
+					if (found)
+					{
+						nodesToUpdate.append(NodePair(*it, *oldit));
+					}
+				}
+			}
+
+			// Check subnodes
+			{
+				auto it = subnodes.constBegin();
+				auto end = subnodes.constEnd();
+
+				for (; it != end; ++it)
+				{
+					bool found = false;
+					QString path = it.value()->fullPath;
+
+					auto oldit = existingFolderNodes.constFind(path);
+
+					while (oldit != existingFolderNodes.constEnd() && oldit.key() == path)
+					{
+						if (oldit.value()->nodeType() == AssetExplorer::NodeType::FolderNodeType) {
+							found = true;
+							break;
+						}
+						++oldit;
+					}
+
+					if (found)
+					{
+						nodesToUpdate << NodePair(it.value(), *oldit);
+					}
+				}
+			}
+
+			// we only want to remove a folder if it's empty
+			// and it's the parent of a file we deleting.
+
+			auto jit = existingFolderNodes.constBegin();
+			auto jend = existingFolderNodes.constEnd();
+			for (; jit != jend; ++jit) {
+
+					foldersToRemove << jit.value();
+				
+			}
+
+			if (!foldersToRemove.isEmpty()) {
+		//		pFolder->removeFolderNodes(foldersToRemove);
+			}
+
+			foreach(const NodePair &np, nodesToUpdate) {
+				np.first->removeSubFolders(pProject, np.second, type);
+			}
+
+		}
+
+		void insertFiles(ModProject* pProject, AssetExplorer::FolderNode* pFolder, assetDb::AssetType::Enum type)
+		{
+			QList<AssetExplorer::FileNode*> existingFileNodes = pFolder->fileNodes();
+			QList<AssetExplorer::FileNode*> filesToRemove;
+			QStringList filesToAdd;
+
+			SortByName sortByName;
+			qSort(files.begin(), files.end(), sortByName);
+			qSort(existingFileNodes.begin(), existingFileNodes.end(), sortByName);
+
+			compareSortedLists(existingFileNodes, files, filesToRemove, filesToAdd, sortByName);
+
+			QList<AssetExplorer::FileNode *> nodesToAdd;
+			nodesToAdd.reserve(filesToAdd.size());
+			foreach(const QString& file, filesToAdd)
+			{
+				ModFileNode* pFileNode = new ModFileNode(file, file, type);
+				pFileNode->setIcon(pProject->getIconForAssetType(type));
+
+				nodesToAdd.append(pFileNode);
+			}
+
+			pFolder->addFileNodes(nodesToAdd);
+		}
+
 	private:
 		QList<InternalNode *> virtualfolders;
 		QMap<QString, InternalNode *> subnodes;
@@ -343,12 +573,13 @@ bool ModProjectNode::removeSubProjects(const QStringList& projectNames)
 
 bool ModProjectNode::addFile(const core::string& name, assetDb::AssetType::Enum type)
 {
-	Q_UNUSED(name);
-	Q_UNUSED(type);
-
-	return true;
+	return pProject_->addFile(name, type);
 }
 
+bool ModProjectNode::removeFile(const core::string& name, assetDb::AssetType::Enum type)
+{
+	return pProject_->removeFile(name, type);
+}
 
 bool ModProjectNode::clean(ConverterHost& conHost) const
 {
@@ -445,6 +676,67 @@ bool ModVirtualFolderNode::loadChildren(void)
 
     return true;
 }
+
+bool ModVirtualFolderNode::addFile(const core::string& name, assetDb::AssetType::Enum type)
+{
+	// inc asset count.
+	++numAssets_;
+
+
+	ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
+	if (pProjectNode)
+	{
+		ModProject* pProject = pProjectNode->getModProject();
+
+		core::Array<ModProject::AssetInfo> assetsOutTmp(g_arena);
+		// maybe get this from the asset db :/
+		auto& info = assetsOutTmp.AddOne();
+		info.id = assetDb::AssetDB::INVALID_ASSET_ID;
+		info.parentId = assetDb::AssetDB::INVALID_ASSET_ID;
+		info.name = name;
+		info.type = type;
+
+		InternalNode contents;
+		contents.create(assetsOutTmp);
+		contents.compress(); 
+		contents.insertSubFolders(pProject, this, assetType());
+	}
+
+	return true;
+}
+
+bool ModVirtualFolderNode::removeFile(const core::string& name, assetDb::AssetType::Enum type)
+{
+	// dec asset count.
+	--numAssets_;
+
+	ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
+	if (pProjectNode)
+	{
+#if 1
+	X_UNUSED(name);
+	X_UNUSED(type);
+#else
+		ModProject* pProject = pProjectNode->getModProject();
+
+		core::Array<ModProject::AssetInfo> assetsOutTmp(g_arena);
+		// maybe get this from the asset db :/
+		auto& info = assetsOutTmp.AddOne();
+		info.id = assetDb::AssetDB::INVALID_ASSET_ID;
+		info.parentId = assetDb::AssetDB::INVALID_ASSET_ID;
+		info.name = name;
+		info.type = type;
+
+		InternalNode contents;
+		contents.create(assetsOutTmp);
+		contents.compress();
+		contents.removeSubFolders(pProject, this, assetType());
+#endif
+	}
+
+	return true;
+}
+
 
 bool ModVirtualFolderNode::build(ConverterHost& conHost, bool force) const
 {
