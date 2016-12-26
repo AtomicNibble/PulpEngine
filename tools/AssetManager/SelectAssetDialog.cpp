@@ -90,7 +90,7 @@ void SelectAssetDialog::processSelected(const QModelIndex& index)
 		return;
 	}
 
-	const auto data = items_.data(index, 0);
+	const auto data = pSortFilter_->data(index, 0);
 	if (!data.isValid()) {
 		return;
 	}
