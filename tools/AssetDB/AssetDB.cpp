@@ -1270,94 +1270,16 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
-	core::string stmt;
 
-	if (data.isNotEmpty())
 	{
-		// save the file.
-		core::Path<char> path;
-
-		{
-			core::XFileScoped file;
-			core::fileModeFlags mode;
-			core::Path<char> filePath;
-
-			mode.Set(core::fileMode::WRITE);
-			mode.Set(core::fileMode::RECREATE);
-
-			AssetPathForName(type, name, filePath);
-
-			// path include folder, so don't need type to load it.
-			path = AssetTypeRawFolder(type);
-			path.toLower();
-			path /= name;
-			path.replaceSeprators();
-
-			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
-				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
-				return Result::ERROR;
-			}
-
-			if (!file.openFile(filePath.c_str(), mode)) {
-				X_ERROR("AssetDB", "Failed to write raw asset");
-				return Result::ERROR;
-			}
-
-			if (file.write(data.ptr(), data.size()) != data.size()) {
-				X_ERROR("AssetDB", "Failed to write raw asset data");
-				return Result::ERROR;
-			}
-		}
-
-
-		if (rawId == INVALID_RAWFILE_ID)
-		{
-			sql::SqlLiteDb::RowId lastRowId;
-
-			// insert entry
-			{
-				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
-				cmd.bind(1, path.c_str());
-				cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
-				cmd.bind(3, static_cast<int32_t>(dataCrc));
-
-				sql::Result::Enum res = cmd.execute();
-				if (res != sql::Result::OK) {
-					return Result::ERROR;
-				}
-
-				lastRowId = db_.lastInsertRowid();
-			}
-
-			// update asset row.
-			{
-				sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
-				cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
-				cmd.bind(2, assetId);
-
-				sql::Result::Enum res = cmd.execute();
-				if (res != sql::Result::OK) {
-					return Result::ERROR;
-				}
-			}
-		}
-		else
-		{
-			// just update.
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
-			cmd.bind(1, path.c_str());
-			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
-			cmd.bind(3, static_cast<int32_t>(dataCrc));
-			cmd.bind(4, rawId);
-
-			sql::Result::Enum res = cmd.execute();
-			if (res != sql::Result::OK) {
-				return Result::ERROR;
-			}
+		auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, data);
+		if (res != Result::OK) {
+			return res;
 		}
 	}
 
 	// now update file info.
+	core::string stmt;
 	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args, argsHash = :argsHash";
 	stmt += " WHERE type = :t AND name = :n ";
 
@@ -1485,84 +1407,87 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
 
-	if (data.isNotEmpty())
+	auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, data);
+	if (res != Result::OK) {
+		return res;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
+	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& data)
+{
+	if (data.isEmpty())
 	{
-		// save the file.
-		core::Path<char> path;
+		return Result::OK;
+	}
 
-		{
-			core::XFileScoped file;
-			core::fileModeFlags mode;
-			core::Path<char> filePath;
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
 
-			mode.Set(core::fileMode::WRITE);
-			mode.Set(core::fileMode::RECREATE);
+	// save the file.
+	core::Path<char> path;
 
-			AssetPathForName(type, name, filePath);
+	{
+		core::XFileScoped file;
+		core::fileModeFlags mode;
+		core::Path<char> filePath;
 
-			// path include folder, so don't need type to load it.
-			// We need this in addition to AssetPathForName
-			// so that the raw_files path works without needing asset type
-			path = AssetTypeRawFolder(type);
-			path.toLower();
-			path /= name;
-			path.replaceSeprators();
+		mode.Set(core::fileMode::WRITE);
+		mode.Set(core::fileMode::RECREATE);
 
-			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
-				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
-				return Result::ERROR;
-			}
+		AssetPathForName(type, name, filePath);
 
-			if (!file.openFile(filePath.c_str(), mode)) {
-				X_ERROR("AssetDB", "Failed to write raw asset");
-				return Result::ERROR;
-			}
+		// path include folder, so don't need type to load it.
+		// We need this in addition to AssetPathForName
+		// so that the raw_files path works without needing asset type
+		path = AssetTypeRawFolder(type);
+		path.toLower();
+		path /= name;
+		path.replaceSeprators();
 
-			if (file.write(data.ptr(), data.size()) != data.size()) {
-				X_ERROR("AssetDB", "Failed to write raw asset data");
-				return Result::ERROR;
-			}
+		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+			X_ERROR("AssetDB", "Failed to create dir to save raw asset");
+			return Result::ERROR;
 		}
 
-		if (rawId == INVALID_RAWFILE_ID)
-		{
-			sql::SqlLiteDb::RowId lastRowId;
-
-			// insert entry
-			{
-				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
-				cmd.bind(1, path.c_str());
-				cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
-				cmd.bind(3, static_cast<int32_t>(dataCrc));
-
-				sql::Result::Enum res = cmd.execute();
-				if (res != sql::Result::OK) {
-					return Result::ERROR;
-				}
-
-				lastRowId = db_.lastInsertRowid();
-			}
-
-			// update asset row.
-			{
-				sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
-				cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
-				cmd.bind(2, assetId);
-
-				sql::Result::Enum res = cmd.execute();
-				if (res != sql::Result::OK) {
-					return Result::ERROR;
-				}
-			}
+		if (!file.openFile(filePath.c_str(), mode)) {
+			X_ERROR("AssetDB", "Failed to write raw asset");
+			return Result::ERROR;
 		}
-		else
+
+		if (file.write(data.ptr(), data.size()) != data.size()) {
+			X_ERROR("AssetDB", "Failed to write raw asset data");
+			return Result::ERROR;
+		}
+	}
+
+	if (rawId == INVALID_RAWFILE_ID)
+	{
+		sql::SqlLiteDb::RowId lastRowId;
+
+		// insert entry
 		{
-			// just update.
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+			sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
 			cmd.bind(1, path.c_str());
 			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
 			cmd.bind(3, static_cast<int32_t>(dataCrc));
-			cmd.bind(4, rawId);
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				return Result::ERROR;
+			}
+
+			lastRowId = db_.lastInsertRowid();
+		}
+
+		// update asset row.
+		{
+			sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
+			cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
+			cmd.bind(2, assetId);
 
 			sql::Result::Enum res = cmd.execute();
 			if (res != sql::Result::OK) {
@@ -1570,10 +1495,25 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 			}
 		}
 	}
+	else
+	{
+		// just update.
+		sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+		cmd.bind(1, path.c_str());
+		cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
+		cmd.bind(3, static_cast<int32_t>(dataCrc));
+		cmd.bind(4, rawId);
 
-	trans.commit();
+		sql::Result::Enum res = cmd.execute();
+		if (res != sql::Result::OK) {
+			return Result::ERROR;
+		}
+	}
+
+
 	return Result::OK;
 }
+
 
 AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt)
 {
