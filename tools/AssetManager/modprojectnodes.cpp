@@ -766,13 +766,19 @@ bool ModFolderNode::build(ConverterHost& conHost, bool force) const
 	const auto folders = subFolderNodes();
 	for (const auto& f : folders)
 	{
-		f->build(conHost, force);
+		if (!f->build(conHost, force)) {
+			// we should probs have a setting that allow continue on single build failure.
+			// but actually this is not building but scheduling build.
+			return false;
+		}
 	}
 
 	const auto files = fileNodes();
 	for (const auto& f : files)
 	{
-		f->build(conHost, force);
+		if (!f->build(conHost, force)) {
+			return false;
+		}
 	}
 
 	return true;
