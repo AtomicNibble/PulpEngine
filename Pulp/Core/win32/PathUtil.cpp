@@ -57,37 +57,97 @@ namespace PathUtil
 
 	bool DeleteDirectory(const wchar_t* pDir, bool resursive)
 	{
+		if (!IsDirectory(pDir))
+		{
+			X_ERROR("FileSys", "DeleteDirectory was ran on a File: \"%ls\"", pDir);
+			return false;
+		}
+
+		if (!resursive) {
+			// not sure if this logic works or how id even want / expect it to work.
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+#if 1
+		// SHFileOperationW seams to be crashing when called in a qt app.
+		// so just gonna do the delete logic myself.
+		// we need to empty the dir before we can call RemoveDirectory.
+		core::Path<wchar_t> searchPath(pDir);
+
+		const wchar_t* pDirEnd = pDir + searchPath.length();
+
+		searchPath.ensureSlash();
+		searchPath.append(L"*");
+
+		PathUtil::findData fd;
+		uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
+		if (handle != PathUtil::INVALID_FIND_HANDLE)
+		{
+			core::Path<wchar_t> dirItem;
+
+			do
+			{
+				if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
+					continue;
+				}
+
+				dirItem.set(pDir, pDirEnd);
+				dirItem /= fd.name;
+
+				if (PathUtil::IsDirectory(fd))
+				{
+					if (!DeleteDirectory(dirItem, resursive)) {
+						PathUtil::findClose(handle);
+						return false;
+					}
+				}
+				else
+				{
+					if (!DeleteFile(dirItem)) {
+						PathUtil::findClose(handle);
+						return false;
+					}
+				}
+
+			} while (PathUtil::findNext(handle, fd));
+
+			PathUtil::findClose(handle);
+		}
+
+
+		if (!RemoveDirectoryW(pDir))
+		{
+			core::lastError::Description Dsc;
+			X_ERROR("FileSys", "RemoveDirectory failed. Error: %s", lastError::ToString(Dsc));
+			return false;
+		}
+
+		return true;
+#else
 		FILEOP_FLAGS flags = FOF_NOCONFIRMATION |
 			FOF_NOERRORUI |
 			FOF_SILENT;
 
 		if (!resursive) {
-			// not sure if this logic works or how id even want / expect it to work.
-			X_ASSERT_NOT_IMPLEMENTED();
-
 			flags |= FOF_NORECURSION;
 		}
 
-		if (!IsDirectory(pDir)) {
-			X_ERROR("FileSys", "DeleteDirectory was ran on a File: \"%ls\"", pDir);
-			return false;
-		}
-
 		SHFILEOPSTRUCTW file_op = {
-			NULL,
+			nullptr,
 			FO_DELETE,
 			pDir,
-			L"",
+			nullptr,
 			flags,
 			false,
-			0,
-			L"" };
+			nullptr,
+			nullptr };
 
 		int ret = SHFileOperationW(&file_op);
 
 		X_ERROR_IF(ret != 0, "FileSys", "Failed to delete directory: \"%ls\"", pDir);
 
 		return ret == 0; // returns 0 on success, non zero on failure.
+#endif
 	}
 
 	// ------------------------------------------------
