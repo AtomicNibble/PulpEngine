@@ -28,8 +28,8 @@ private slots:
 	void browseClicked(void);
 
 private:
-	bool removeRef(const QString& assName);
-	bool addRef(const QString& assName);
+	bool removeRef(int32_t assetId, const QString& assName);
+	bool addRef(int32_t assetId, const QString& assName);
 
 
 private:

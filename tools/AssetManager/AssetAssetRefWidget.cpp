@@ -87,13 +87,20 @@ void AssetAssetRefWidget::browseClicked(void)
 		const QString oldName = pLineEdit_->text();
 		const QString assName = dig.getSelectedName();
 
-		if (!removeRef(oldName)) {
+
+		int32_t assetId;
+		if (!db_.AssetExsists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
+			X_ERROR("AssetRef", "Failed to get source asset id");
+			return;
+		}
+
+		if (!removeRef(assetId, oldName)) {
 			return;
 		}
 
 		// should we also add a ref to this asset?
 		// fucking yes you slut.
-		if (!addRef(assName)) {
+		if (!addRef(assetId, assName)) {
 			return;
 		}
 
@@ -104,7 +111,7 @@ void AssetAssetRefWidget::browseClicked(void)
 }
 
 
-bool AssetAssetRefWidget::removeRef(const QString& assName)
+bool AssetAssetRefWidget::removeRef(int32_t assetId, const QString& assName)
 {
 	if (assName.isEmpty()) {
 		return true;
@@ -118,12 +125,6 @@ bool AssetAssetRefWidget::removeRef(const QString& assName)
 		return false;
 	}
 
-	int32_t assetId;
-	if (!db_.AssetExsists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
-		X_ERROR("AssetRef", "Failed to get source asset id for ref removal");
-		return false;
-	}
-
 	auto res = db_.RemoveAssertRef(assetId, targetAssetId);
 	if (res != assetDb::AssetDB::Result::OK) {
 		X_ERROR("AssetRef", "Failed to remove exsisting asset ref");
@@ -133,19 +134,13 @@ bool AssetAssetRefWidget::removeRef(const QString& assName)
 	return true;
 }
 
-bool AssetAssetRefWidget::addRef(const QString& assName)
+bool AssetAssetRefWidget::addRef(int32_t assetId, const QString& assName)
 {
 	const std::string str = assName.toStdString();
 
 	int32_t targetAssetId;
 	if (!db_.AssetExsists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
 		X_ERROR("AssetRef", "Failed to get ref asset's id");
-		return false;
-	}
-
-	int32_t assetId;
-	if (!db_.AssetExsists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
-		X_ERROR("AssetRef", "Failed to get source asset id for adding ref");
 		return false;
 	}
 
