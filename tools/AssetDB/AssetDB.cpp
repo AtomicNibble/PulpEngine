@@ -1178,7 +1178,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 
 			// now move the file.
 			core::Path<char> newFilePath, oldFilePath;
-			AssetPathForName(type, newName, newFilePath);
+			AssetPathForName(type, newName, rawData.hash, newFilePath); // we pass current hash as the data is not changing.
 			AssetPathForRawFile(rawData, oldFilePath);
 
 
@@ -1442,15 +1442,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		mode.Set(core::fileMode::WRITE);
 		mode.Set(core::fileMode::RECREATE);
 
-		AssetPathForName(type, name, filePath);
-
-		// path include folder, so don't need type to load it.
-		// We need this in addition to AssetPathForName
-		// so that the raw_files path works without needing asset type
-		path = AssetTypeRawFolder(type);
-		path.toLower();
-		path /= name;
-		path.replaceSeprators();
+		AssetPathForName(type, name, dataCrc, filePath);
 
 		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
 			X_ERROR("AssetDB", "Failed to create dir to save raw asset");
@@ -1471,6 +1463,12 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 	if (rawId == INVALID_RAWFILE_ID)
 	{
 		sql::SqlLiteDb::RowId lastRowId;
+
+		path = AssetTypeRawFolder(type);
+		path.toLower();
+		path /= name;
+		path.replaceSeprators();
+		// we don't include hash here.
 
 		// insert entry
 		{
@@ -2462,6 +2460,7 @@ bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pT
 	return true;
 }
 
+
 bool AssetDB::MergeArgs(int32_t assetId, core::string& argsInOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");
@@ -2552,7 +2551,7 @@ const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)
 	return AssetType::ToString(type);
 }
 
-void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut)
+void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, uint32_t rawDataHash, core::Path<char>& pathOut)
 {
 	pathOut = ASSET_DB_FOLDER;
 	pathOut /= RAW_FILES_FOLDER;
@@ -2560,6 +2559,7 @@ void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, c
 	pathOut.toLower();
 	pathOut /= name;
 	pathOut.replaceSeprators();
+	pathOut.appendFmt(".%" PRIu32, rawDataHash);
 }
 
 void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
@@ -2568,6 +2568,7 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 	pathOut /= RAW_FILES_FOLDER;
 	pathOut /= raw.path;
 	pathOut.replaceSeprators();
+	pathOut.appendFmt(".%" PRIu32, raw.hash);
 }
 
 void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOut)
