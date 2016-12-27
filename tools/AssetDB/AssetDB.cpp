@@ -2389,6 +2389,30 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFi
 	return true;
 }
 
+bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT file_id, path, size, hash FROM raw_files WHERE file_id = ?");
+	qry.bind(1, rawFileId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	if ((*it).columnType(1) != sql::ColumType::SNULL) {
+		dataOut.path = (*it).get<const char*>(1);
+	}
+	else {
+		dataOut.path.clear();
+	}
+
+	dataOut.file_id = (*it).get<int32_t>(0);
+	dataOut.size = (*it).get<int32_t>(2);
+	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(3));
+	return true;
+}
+
 bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, "
