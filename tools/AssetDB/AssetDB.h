@@ -19,6 +19,8 @@ X_NAMESPACE_BEGIN(assetDb)
 
 class DLL_EXPORT AssetDB
 {
+	static const int32_t DB_VERSION = 1;
+
 	static const char* ASSET_DB_FOLDER;
 	static const char* DB_NAME;
 	static const char* RAW_FILES_FOLDER;
@@ -238,6 +240,8 @@ private:
 	bool GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut);
 	bool GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId = nullptr);
 	bool MergeArgs(int32_t assetId, core::string& argsInOut);
+	bool getDBVersion(int32_t& versionOut);
+	bool setDBVersion(int32_t version);
 	bool isModSet(void) const;
 
 	static const char* AssetTypeRawFolder(AssetType::Enum type);
@@ -251,6 +255,7 @@ private:
 private:
 	sql::SqlLiteDb db_;
 	int32_t modId_;
+	int32_t dbVersion_;
 	bool open_;
 };
 

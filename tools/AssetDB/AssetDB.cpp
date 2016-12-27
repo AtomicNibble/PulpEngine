@@ -94,6 +94,7 @@ const size_t AssetDB::MAX_COMPRESSOR_SIZE = core::Max<size_t>(
 
 AssetDB::AssetDB() :
 	modId_(INVALID_MOD_ID),
+	dbVersion_(-1),
 	open_(false)
 {
 
@@ -133,6 +134,9 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 		return false;
 	}
 
+	if (!getDBVersion(dbVersion_)) {
+		return false;
+	}
 	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal; PRAGMA foreign_keys = ON;")) {
 		return false;
 	}
@@ -2510,6 +2514,31 @@ bool AssetDB::MergeArgs(int32_t assetId, core::string& argsInOut)
 	}
 
 	argsInOut = core::string(s.GetString(), s.GetSize());
+	return true;
+}
+
+bool AssetDB::getDBVersion(int32_t& versionOut)
+{
+	sql::SqlLiteQuery qry(db_, "PRAGMA user_version");
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	versionOut = (*it).get<int32_t>(0);
+	return true;
+}
+
+bool AssetDB::setDBVersion(int32_t version)
+{
+	core::StackString512 versionStr("PRAGMA user_version = ");
+	versionStr.appendFmt("%" PRIi32 ";", DB_VERSION);
+	if (!db_.execute(versionStr.c_str())) {
+		return false;
+	}
+
 	return true;
 }
 
