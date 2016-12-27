@@ -249,6 +249,7 @@ bool XPhysics::init(void)
 	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
 	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
 
+	sceneDesc.broadPhaseCallback = this;
 
 	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
 		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
@@ -449,6 +450,24 @@ void XPhysics::onRelease(const physx::PxBase* pObserved, void* pUserData,
 	}
 }
 
+
+void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
+{
+	// This function is called when an object leaves the broad - phase.
+	// shape	Shape that left the broad - phase bounds
+	// actor	Owner actor
+
+	// for now we just log that somthing left the physx world.
+	// dunno what shit to log.
+	X_ERROR("Phys", "Obbject out of bounds. Name: \"%S\"", actor.getName());
+}
+
+void XPhysics::onObjectOutOfBounds(physx::PxAggregate& aggregate)
+{
+	// This function is called when an aggregate leaves the broad - phase.
+	// 	An aggregate is a collection of actors. 
+	X_ERROR("Phys", "Aggregate out of bounds. %p", &aggregate);
+}
 
 void XPhysics::onSubstepPreFetchResult(void)
 {

@@ -27,6 +27,7 @@ X_NAMESPACE_BEGIN(physics)
 class XPhysics : public IPhysics,
 	public PVD::PvdConnectionHandler, //receive notifications when pvd is connected and disconnected.
 	public physx::PxDeletionListener,
+	public physx::PxBroadPhaseCallback,
 	public IStepperHandler
 {
 
@@ -76,11 +77,17 @@ private:
 	virtual void onRelease(const physx::PxBase* observed, void* userData, physx::PxDeletionEventFlag::Enum deletionEvent) X_FINAL;
 	// ~PxDeletionListener
 
+	// PxBroadPhaseCallback
+	virtual	void onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor) X_FINAL;
+	virtual	void onObjectOutOfBounds(physx::PxAggregate& aggregate) X_FINAL;
+	// ~PxBroadPhaseCallback
+
 	// IStepperHandler
 	virtual void onSubstepPreFetchResult(void) X_FINAL;
 	virtual void onSubstep(float32_t dtTime) X_FINAL;
 	virtual void onSubstepSetup(float dtime, physx::PxBaseTask* cont) X_FINAL;
 	// ~IStepperHandler
+
 
 	void togglePvdConnection(void);
 	void createPvdConnection(void);
