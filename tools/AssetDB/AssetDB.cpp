@@ -20,6 +20,8 @@
 
 #include <Random\MultiplyWithCarry.h>
 
+#include <Platform\MessageBox.h>
+
 #include <Time\StopWatch.h>
 
 #include <Memory/AllocationPolicies/LinearAllocator.h>
@@ -137,6 +139,19 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 	if (!getDBVersion(dbVersion_)) {
 		return false;
 	}
+
+	if (dbVersion_ != DB_VERSION) {
+		if (!PerformMigrations()) {
+			X_ERROR("AssetDB", "Failed to perform DB migrations");
+			return false;
+		}
+
+		if (!setDBVersion(DB_VERSION)) {
+			X_ERROR("AssetDB", "Failed to set new DB version to %" PRIi32 " it's recommend you do it manually as migrations passed", DB_VERSION);
+			return false;
+		}
+	}
+
 	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal; PRAGMA foreign_keys = ON;")) {
 		return false;
 	}
@@ -315,6 +330,71 @@ bool AssetDB::AddDefaultProfiles(void)
     }
 }
 )"));
+	}
+
+	return true;
+}
+
+bool AssetDB::PerformMigrations(void)
+{
+	if (dbVersion_ == DB_VERSION) {
+		return true;
+	}
+
+	core::StackString<1024, wchar_t> msg(L"Performing DB migrations. it's recommended to back up the ");
+	msg.appendFmt(L"'%s' folder before pressin Ok. Cancel will skip.", ASSET_DB_FOLDER);
+
+	const auto res = core::msgbox::show(msg.c_str(), L"AssetDB Migratation", core::msgbox::Buttons::OKCancel);
+	if (res == core::msgbox::Selection::Cancel)
+	{
+		return false;
+	}
+
+	if (dbVersion_ < 1)
+	{
+		X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 1", dbVersion_);
+		// perform upgrades from 0 to 1.
+		// must iterate all raw files and rename on disk.
+		// there is no DB updates required.
+
+		// could select everything in this query but GetRawfileForId is neater.
+		sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
+
+		auto it = qry.begin();
+		for (; it != qry.end(); ++it)
+		{
+			auto row = *it;
+
+			int32_t rawFileId = row.get<int32_t>(0);
+			RawFile rawfileInfo;
+
+			if (GetRawfileForRawId(rawFileId, rawfileInfo))
+			{
+				core::Path<char> newFilePath, oldFilePath;
+				AssetPathForRawFile(rawfileInfo, newFilePath);
+
+				// build the old path.
+				core::StackString512 hashLenStr;
+				hashLenStr.appendFmt(".%" PRIu32, rawfileInfo.hash);
+
+				// build old path by removing hash from name.
+				oldFilePath.set(newFilePath.begin(), newFilePath.end() - hashLenStr.length());
+
+				X_LOG1("AssetDB", "Renaming raw_file %" PRIi32 "from \"%s\" to \"%s\"", rawFileId, oldFilePath.c_str(), newFilePath.c_str());
+
+				// make sure dir tree for new name is valid.
+				// not really needed here since renaming in same folder but it's not hurting anything.
+				if (!gEnv->pFileSys->createDirectoryTree(newFilePath.c_str())) {
+					X_ERROR("AssetDB", "Failed to create dir to move raw asset");
+					// don't early out migrations keep trying the others.
+				}
+
+				// if this fails, we return and the update is not commited.
+				if (!gEnv->pFileSys->moveFile(oldFilePath.c_str(), newFilePath.c_str())) {
+					X_ERROR("AssetDB", "Failed to move asset raw file");
+				}
+			}
+		}
 	}
 
 	return true;

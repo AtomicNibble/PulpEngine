@@ -18,6 +18,8 @@ X_NAMESPACE_BEGIN(assetDb)
 
 class DLL_EXPORT AssetDB
 {
+	// Version 1: stores raw files with hash after file name on disk.
+	//				In order to migrate must rename all rawfiles on disk.
 	static const int32_t DB_VERSION = 1;
 
 	static const char* ASSET_DB_FOLDER;
@@ -127,6 +129,7 @@ public:
 	bool DropTables(void);
 	bool AddDefaultMods(void);
 	bool AddDefaultProfiles(void);
+	bool PerformMigrations(void);
 	bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
 	// Conversion Profile api.
