@@ -1171,6 +1171,9 @@
     <ClInclude Include="Compression\LZ5.h">
       <Filter>Headers\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\MessageBox.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1808,6 +1811,9 @@
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\lz5hc.c">
       <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\MessageBox.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

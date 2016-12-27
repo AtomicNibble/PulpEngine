@@ -249,6 +249,7 @@
     <ClInclude Include="Platform\Compiler.h" />
     <ClInclude Include="Platform\Console.h" />
     <ClInclude Include="Platform\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\MessageBox.h" />
     <ClInclude Include="Platform\Module.h" />
     <ClInclude Include="Platform\Pipe.h" />
     <ClInclude Include="Platform\SystemInfo.h" />
@@ -567,6 +568,7 @@
     <ClCompile Include="Math\XAabb.cpp" />
     <ClCompile Include="Math\XCamera.cpp" />
     <ClCompile Include="Memory\MemUtil.cpp" />
+    <ClCompile Include="Platform\win32\MessageBox.cpp" />
     <ClCompile Include="Platform\win32\Module.cpp" />
     <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Platform\win32\SystemInfo.cpp" />
