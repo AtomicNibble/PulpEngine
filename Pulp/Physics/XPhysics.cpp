@@ -71,25 +71,6 @@ namespace
 	} gDelayLoadHook;
 
 
-	X_INLINE physx::PxVec3 MakePhysxVec3(const Vec3f& vec)
-	{
-		return physx::PxVec3(vec.x, vec.y, vec.z);
-	}
-
-	X_INLINE physx::PxQuat MakePhysxQuat(const Quatf& quat)
-	{
-		return physx::PxQuat(quat.v.x, quat.v.y, quat.v.z, quat.w);
-	}
-
-	X_INLINE physx::PxTransform MakePhysxTrans(const QuatTransf& myTrans)
-	{
-		physx::PxTransform trans;
-		trans.p = MakePhysxVec3(myTrans.trans);
-		trans.q = MakePhysxQuat(myTrans.quat);
-		return trans;
-	}
-
-
 } // namespace
 
 
@@ -102,6 +83,13 @@ XPhysics::PvdParameters::PvdParameters() :
 }
 
 // ---------------------------------
+
+const physx::PxShapeFlags XPhysics::DEFALT_SHAPE_FLAGS =
+	physx::PxShapeFlag::eVISUALIZATION |
+	physx::PxShapeFlag::eSCENE_QUERY_SHAPE |
+	physx::PxShapeFlag::eSIMULATION_SHAPE;
+
+
 
 XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	arena_(arena),
@@ -432,41 +420,197 @@ MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 RegionHandle XPhysics::addRegion(const AABB& bounds)
 {
 	physx::PxBroadPhaseRegion region;
-	region.bounds.minimum = MakePhysxVec3(bounds.min);
-	region.bounds.maximum = MakePhysxVec3(bounds.max);
+	region.bounds = PxBounds3FromAABB(bounds);
 	region.userData = nullptr;
 
 	uint32_t handle = pScene_->addBroadPhaseRegion(region);
 
+	if (handle == 0xFFFFFFFF) {
+		core::StackString256 tmp;
+		X_ERROR("Phys", "error adding region with bounds: %s", bounds.toString(tmp));
+	}
+
 	return handle;
 }
 
-TriggerHandle XPhysics::createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds)
+void XPhysics::addActorToScene(ActorHandle handle)
 {
-	physx::PxTransform trans = MakePhysxTrans(myTrans);
-
-	physx::PxBoxGeometry geo(MakePhysxVec3(bounds.halfVec()));
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
 	physx::PxSceneWriteLock scopedLock(*pScene_);
 
-	physx::PxShapeFlags shapeFlags =
-		physx::PxShapeFlag::eVISUALIZATION | 
-		physx::PxShapeFlag::eSCENE_QUERY_SHAPE | 
-		physx::PxShapeFlag::eSIMULATION_SHAPE;
+	pScene_->addActor(actor);
+}
 
-	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, shapeFlags);
+void XPhysics::addActorsToScene(ActorHandle* pHandles, size_t num)
+{
+	physx::PxActor* pActors = reinterpret_cast<physx::PxActor*>(pHandles);
+
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	pScene_->addActors(&pActors, safe_static_cast<physx::PxU32>(num));
+}
+
+// ------------------------------------------
+
+ActorHandle XPhysics::createPlane(const QuatTransf& myTrans, float density)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(physx::PxPlaneGeometry(), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createSphere(const QuatTransf& myTrans, float radius, float density)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createBox(const QuatTransf& myTrans, const AABB& bounds, float density)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
+
+	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+// ------------------------------------------
+
+ActorHandle XPhysics::createStaticPlane(const QuatTransf& myTrans)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(physx::PxPlaneGeometry(), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	setupDefaultRigidStatic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createStaticSphere(const QuatTransf& myTrans, float radius)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	setupDefaultRigidStatic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	setupDefaultRigidStatic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createStaticBox(const QuatTransf& myTrans, const AABB& bounds)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
+
+	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	// calls: createRigidStatic, attachShape
+	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	setupDefaultRigidStatic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
+
+	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 	pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
 	pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
 
+	// calls: createRigidStatic, attachShape
 	physx::PxRigidStatic* pTrigger = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
 
 	pShape->release();
 
-	// no grav :D
-	pTrigger->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
-
-	return reinterpret_cast<TriggerHandle>(pTrigger);
+	setupDefaultRigidStatic(*pTrigger);
+	return reinterpret_cast<ActorHandle>(pTrigger);
 }
+
+	
+void XPhysics::setupDefaultRigidDynamic(physx::PxRigidDynamic& body, bool kinematic)
+{
+	body.setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+	body.setAngularDamping(0.5f);
+	body.setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, kinematic);
+}
+
+
+void XPhysics::setupDefaultRigidStatic(physx::PxRigidStatic& body)
+{
+	body.setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
+	body.setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
+}
+
+
 
 void XPhysics::onPvdSendClassDescriptions(PVD::PvdConnection& conn)
 {

@@ -48,6 +48,8 @@ class XPhysics : public IPhysics,
 public:
 	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 16;
 
+	static const physx::PxShapeFlags DEFALT_SHAPE_FLAGS;
+
 public:
 	XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
 	~XPhysics() X_OVERRIDE;
@@ -69,7 +71,19 @@ public:
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
 	RegionHandle addRegion(const AABB& bounds) X_FINAL;
 
-	TriggerHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
+	void addActorToScene(ActorHandle handle);
+	void addActorsToScene(ActorHandle* pHandles, size_t num);
+
+	ActorHandle createPlane(const QuatTransf& myTrans, float density);
+	ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density);
+	ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density);
+	ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density);
+
+	ActorHandle createStaticPlane(const QuatTransf& myTrans);
+	ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius);
+	ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight);
+	ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds);
+	ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
 
 private:
 	// PvdConnectionHandler
@@ -118,6 +132,9 @@ private:
 	void setVisualizationCullingBox(AABB& box);
 
 private:
+	void setupDefaultRigidDynamic(physx::PxRigidDynamic& body, bool kinematic = false);
+	void setupDefaultRigidStatic(physx::PxRigidStatic& body);
+	
 	X_INLINE bool IsPaused(void) const;
 	X_INLINE void togglePause(void);
 
