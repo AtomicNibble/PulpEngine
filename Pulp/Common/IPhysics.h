@@ -20,7 +20,7 @@ struct MaterialDesc
 typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
 typedef Handle RegionHandle;
-typedef Handle TriggerHandle;
+typedef Handle ActorHandle;
 
 static const Handle INVALID_HANLDE = 0;
 
@@ -48,7 +48,7 @@ struct IPhysics
 	// best to just make all regions for level on load before adding any actors to scene.
 	virtual RegionHandle addRegion(const AABB& bounds) X_ABSTRACT;
 
-	virtual TriggerHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
+	virtual ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
 
 
 };
