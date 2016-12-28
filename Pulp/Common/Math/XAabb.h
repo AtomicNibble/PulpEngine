@@ -97,6 +97,8 @@ public:
 	X_INLINE PlaneSide::Enum planeSide(const Plane<T>& plane, const float epsilon = 0.1f) const;
 
 	X_INLINE void toPoints(Vec3f points[8]) const;
+
+	X_INLINE const char* toString(core::StackString256& str) const;
 };
 
 

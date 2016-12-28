@@ -250,3 +250,13 @@ X_INLINE void AABB::toPoints(Vec3f points[8]) const
 		points[i][2] = vecs[(i >> 2) & 1][2];
 	}
 }
+
+
+X_INLINE const char* AABB::toString(core::StackString256& str) const
+{
+	str.clear();
+	str.appendFmt("(%f, %f, %f) <-> (%f, %f, %f)", min.x, min.y, min.z,
+		max.x, max.y, max.z);
+
+	return str.c_str();
+}
