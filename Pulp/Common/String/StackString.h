@@ -295,6 +295,9 @@ protected:
 
 typedef StackString<512, char> StackString512;
 typedef StackString<512, wchar_t> StackStringW512;
+typedef StackString<256, char> StackString256;
+typedef StackString<256, wchar_t> StackStringW256;
+
 
 X_NAMESPACE_END
 
