@@ -71,6 +71,24 @@ namespace
 	} gDelayLoadHook;
 
 
+	X_INLINE physx::PxVec3 MakePhysxVec3(const Vec3f& vec)
+	{
+		return physx::PxVec3(vec.x, vec.y, vec.z);
+	}
+
+	X_INLINE physx::PxQuat MakePhysxQuat(const Quatf& quat)
+	{
+		return physx::PxQuat(quat.v.x, quat.v.y, quat.v.z, quat.w);
+	}
+
+	X_INLINE physx::PxTransform MakePhysxTrans(const QuatTransf& myTrans)
+	{
+		physx::PxTransform trans;
+		trans.p = MakePhysxVec3(myTrans.trans);
+		trans.q = MakePhysxQuat(myTrans.quat);
+		return trans;
+	}
+
 
 } // namespace
 
@@ -231,14 +249,10 @@ bool XPhysics::init(void)
 
 	physx::PxSceneDesc sceneDesc(pPhysics_->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-	getDefaultSceneDesc(sceneDesc);
-	customizeSceneDesc(sceneDesc);
-
 	sceneDesc.cpuDispatcher = &jobDispatcher_;
-
-	if (!sceneDesc.filterShader) {
-		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-	}
+	sceneDesc.broadPhaseCallback = this;
+	sceneDesc.simulationEventCallback = this;
+	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
 
 
 
@@ -247,9 +261,10 @@ bool XPhysics::init(void)
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
 	//sceneDesc.flags |= physx::PxSceneFlag::eADAPTIVE_FORCE;
 	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
 	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
 
-	sceneDesc.broadPhaseCallback = this;
+	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
 
 	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
 		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
@@ -407,6 +422,52 @@ void XPhysics::render(void)
 	}
 }
 
+MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
+{
+	auto* pMaterial = pPhysics_->createMaterial(desc.staticFriction, desc.dynamicFriction, desc.restitutio);
+
+	return reinterpret_cast<MaterialHandle>(pMaterial);
+}
+
+RegionHandle XPhysics::addRegion(const AABB& bounds)
+{
+	physx::PxBroadPhaseRegion region;
+	region.bounds.minimum = MakePhysxVec3(bounds.min);
+	region.bounds.maximum = MakePhysxVec3(bounds.max);
+	region.userData = nullptr;
+
+	uint32_t handle = pScene_->addBroadPhaseRegion(region);
+
+	return handle;
+}
+
+TriggerHandle XPhysics::createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds)
+{
+	physx::PxTransform trans = MakePhysxTrans(myTrans);
+
+	physx::PxBoxGeometry geo(MakePhysxVec3(bounds.halfVec()));
+
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	physx::PxShapeFlags shapeFlags =
+		physx::PxShapeFlag::eVISUALIZATION | 
+		physx::PxShapeFlag::eSCENE_QUERY_SHAPE | 
+		physx::PxShapeFlag::eSIMULATION_SHAPE;
+
+	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, shapeFlags);
+	pShape->setFlag(physx::PxShapeFlag::eSIMULATION_SHAPE, false);
+	pShape->setFlag(physx::PxShapeFlag::eTRIGGER_SHAPE, true);
+
+	physx::PxRigidStatic* pTrigger = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	// no grav :D
+	pTrigger->setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
+
+	return reinterpret_cast<TriggerHandle>(pTrigger);
+}
+
 void XPhysics::onPvdSendClassDescriptions(PVD::PvdConnection& conn)
 {
 	X_UNUSED(conn);
@@ -488,6 +549,38 @@ void XPhysics::onSubstepSetup(float dtime, physx::PxBaseTask* cont)
 }
 
 
+void XPhysics::onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count)
+{
+	X_UNUSED(constraints);
+	X_UNUSED(count);
+}
+
+void XPhysics::onWake(physx::PxActor** actors, physx::PxU32 count)
+{
+	X_UNUSED(actors);
+	X_UNUSED(count);
+}
+
+void XPhysics::onSleep(physx::PxActor** actors, physx::PxU32 count)
+{
+	X_UNUSED(actors);
+	X_UNUSED(count);
+}
+
+void XPhysics::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs)
+{
+	X_UNUSED(pairHeader);
+	X_UNUSED(pairs);
+	X_UNUSED(nbPairs);
+}
+
+void XPhysics::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
+{
+	X_UNUSED(pairs);
+	X_UNUSED(count);
+}
+
+
 void XPhysics::togglePvdConnection(void)
 {
 	if (!pPhysics_->getPvdConnectionManager())
@@ -543,16 +636,6 @@ void XPhysics::createPvdConnection(void)
 
 
 // --------------------------------------------------------
-
-void XPhysics::getDefaultSceneDesc(physx::PxSceneDesc&)
-{
-
-}
-
-void XPhysics::customizeSceneDesc(physx::PxSceneDesc&)
-{
-
-}
 
 void XPhysics::customizeTolerances(physx::PxTolerancesScale&)
 {

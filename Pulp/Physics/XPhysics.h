@@ -28,6 +28,7 @@ class XPhysics : public IPhysics,
 	public PVD::PvdConnectionHandler, //receive notifications when pvd is connected and disconnected.
 	public physx::PxDeletionListener,
 	public physx::PxBroadPhaseCallback,
+	public physx::PxSimulationEventCallback,
 	public IStepperHandler
 {
 
@@ -64,7 +65,11 @@ public:
 	void onTickPostRender(float dtime) X_FINAL;
 	void render(void) X_FINAL;
 	// ~IPhysics
+	
+	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
+	RegionHandle addRegion(const AABB& bounds) X_FINAL;
 
+	TriggerHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
 
 private:
 	// PvdConnectionHandler
@@ -88,13 +93,18 @@ private:
 	virtual void onSubstepSetup(float dtime, physx::PxBaseTask* cont) X_FINAL;
 	// ~IStepperHandler
 
+	// PxSimulationEventCallback
+	virtual void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) X_FINAL;
+	virtual void onWake(physx::PxActor** actors, physx::PxU32 count) X_FINAL;
+	virtual void onSleep(physx::PxActor** actors, physx::PxU32 count) X_FINAL;
+	virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) X_FINAL;
+	virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) X_FINAL;
+	// ~PxSimulationEventCallback
 
 	void togglePvdConnection(void);
 	void createPvdConnection(void);
 
 
-	void getDefaultSceneDesc(physx::PxSceneDesc&);
-	void customizeSceneDesc(physx::PxSceneDesc&);
 	void customizeTolerances(physx::PxTolerancesScale&);
 
 	void updateRenderObjectsDebug(float dtime); // update of render actors debug draw information, will be called while the simulation is NOT running
