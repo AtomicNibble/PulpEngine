@@ -511,7 +511,6 @@ bool XPhysics::cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut)
 		auto& destSampler = samples[i];
 
 		destSampler.height = pSamplers[i].height;
-		// for now single material for a height field :Z
 		destSampler.materialIndex0 = pSamplers[i].matIdx0;
 		destSampler.materialIndex1 = pSamplers[i].matIdx1;
 	}
