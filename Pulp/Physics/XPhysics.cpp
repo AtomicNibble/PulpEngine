@@ -70,6 +70,14 @@ namespace
 		}
 	} gDelayLoadHook;
 
+	X_INLINE physx::PxBoundedData PxBoundedDataFromBounded(const BoundedData& in)
+	{
+		physx::PxBoundedData bd;
+		bd.data = in.pData;
+		bd.stride = in.stride;
+		bd.count = in.count;
+		return bd;
+	}
 
 } // namespace
 
@@ -422,15 +430,6 @@ IPhysicsCooking* XPhysics::getCooking(void)
 bool XPhysics::cookingSupported(void) const
 {
 	return true;
-}
-
-X_INLINE physx::PxBoundedData PxBoundedDataFromBounded(const BoundedData& in)
-{
-	physx::PxBoundedData bd;
-	bd.data = in.pData;
-	bd.stride = in.stride;
-	bd.count = in.count;
-	return bd;
 }
 
 bool XPhysics::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut)
