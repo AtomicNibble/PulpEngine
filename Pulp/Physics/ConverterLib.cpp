@@ -4,8 +4,14 @@
 
 #include <IConverterModule.h>
 #include <Extension\XExtensionMacros.h>
+#include <Util\UniquePointer.h>
+
+#include "XPhysLib.h"
 
 
+namespace {
+	core::MallocFreeAllocator g_PhysicsAlloc;
+}
 
 class XConverterLib_Phys : public IConverterModule
 {
@@ -29,8 +35,21 @@ class XConverterLib_Phys : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
+		// you can't call init on both a engine module and a converter module instnace.
+		if (g_PhysicsArena) {
+			return nullptr;
+		}
 
-		return nullptr;
+		g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
+
+		auto lib = core::makeUnique<physics::XPhysLib>(g_PhysicsArena, g_PhysicsArena);
+
+		if (!lib->init()) {
+			X_ERROR("Phys", "Failed to init lib");
+			return nullptr;
+		}
+
+		return lib.release();
 	}
 
 	virtual bool ShutDown(IConverter* pCon) X_OVERRIDE
@@ -38,6 +57,8 @@ class XConverterLib_Phys : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
+		X_DELETE_AND_NULL(pCon, g_PhysicsArena);
+		X_DELETE_AND_NULL(g_PhysicsArena, gEnv->pArena);
 		return true;
 	}
 };

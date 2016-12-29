@@ -12,25 +12,6 @@
 X_USING_NAMESPACE;
 
 
-#include "Memory\BoundsCheckingPolicies\NoBoundsChecking.h"
-#include "Memory\MemoryTaggingPolicies\NoMemoryTagging.h"
-#include "Memory\MemoryTrackingPolicies\NoMemoryTracking.h"
-
-typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
-#if X_DEBUG
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
-#else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
-#endif // !X_DEBUG
-> PhysicsArena;
-
-
 
 namespace {
 	core::MallocFreeAllocator g_PhysicsAlloc;
@@ -68,6 +49,9 @@ class XEngineModule_Physics : public IEngineModule
 
 		physics::IPhysics* pPhysics = nullptr;
 
+		if (g_PhysicsArena) {
+			return nullptr;
+		}
 
 		// kinky shit.
 		g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
