@@ -73,13 +73,18 @@ public:
 	IPhysicsCooking* getCooking(void) X_FINAL;
 	// ~IPhysics
 
+
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
 	RegionHandle addRegion(const AABB& bounds) X_FINAL;
 	bool removeRegion(RegionHandle handles) X_FINAL;
 
+	AggregateHandle createAggregate(uint32_t maxActors, bool selfCollisions) X_FINAL;
+	bool addActorToAggregate(AggregateHandle handle, ActorHandle actor) X_FINAL;
+	bool releaseAggregate(AggregateHandle handle) X_FINAL;
 
 	void addActorToScene(ActorHandle handle) X_FINAL;
 	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
+
 
 	// you must pass cooked data :|
 	// if you don't have cooked data use getCooking() to cook it!

@@ -21,6 +21,7 @@ typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
 typedef Handle RegionHandle;
 typedef Handle ActorHandle;
+typedef Handle AggregateHandle;
 
 static const Handle INVALID_HANLDE = 0;
 
@@ -128,6 +129,13 @@ struct IPhysics
 	// will be reported as out of bounds.
 	virtual bool removeRegion(RegionHandle handles) X_ABSTRACT;
 
+	// An aggregate is a collection of actors.
+	// which in turn allows optimized spatial data operations.
+	// A typical use case is a ragdoll, made of N different body parts, with each part a actor.
+	// Without aggregates, this gives rise to N broad - phase entries for the ragdoll.
+	virtual AggregateHandle createAggregate(uint32_t maxActors, bool selfCollisions) X_ABSTRACT;
+	virtual bool addActorToAggregate(AggregateHandle handle, ActorHandle actor) X_ABSTRACT;
+	virtual bool releaseAggregate(AggregateHandle handle) X_ABSTRACT;
 
 	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
 	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;

@@ -431,6 +431,39 @@ bool XPhysics::removeRegion(RegionHandle handle_)
 	return true;
 }
 
+
+AggregateHandle XPhysics::createAggregate(uint32_t maxActors, bool selfCollisions)
+{
+	physx::PxAggregate* pAggregate = pPhysics_->createAggregate(maxActors, selfCollisions);
+
+	if (!pAggregate) {
+		X_ERROR("Phys", "Failed to create aggregate. maxActor: %" PRIu32 " selfCol: %" PRIu8, maxActors, selfCollisions);
+	}
+
+	return reinterpret_cast<AggregateHandle>(pAggregate);
+}
+
+bool XPhysics::addActorToAggregate(AggregateHandle handle, ActorHandle actor)
+{
+	physx::PxAggregate* pAggregate = reinterpret_cast<physx::PxAggregate*>(handle);
+	physx::PxActor* pActor = reinterpret_cast<physx::PxActor*>(actor);
+
+	if (!pAggregate->addActor(*pActor)) {
+		X_ERROR("Phys", "Failed to add actor %p to aggregate: %p", pActor, pAggregate);
+		return false;
+	}
+
+	return true;
+}
+
+bool XPhysics::releaseAggregate(AggregateHandle handle)
+{
+	physx::PxAggregate* pAggregate = reinterpret_cast<physx::PxAggregate*>(handle);
+	pAggregate->release();
+	return true;
+}
+
+
 void XPhysics::addActorToScene(ActorHandle handle)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
