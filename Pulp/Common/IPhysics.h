@@ -98,6 +98,8 @@ struct IPhysLib : public IConverter
 
 struct IPhysics
 {
+	typedef core::Array<uint8_t> DataArr;
+
 	virtual ~IPhysics() {}
 
 	virtual void registerVars(void) X_ABSTRACT;
@@ -127,6 +129,9 @@ struct IPhysics
 	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
 	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
 
+	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createHieghtField(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createPlane(const QuatTransf& myTrans, float density) X_ABSTRACT;
 	virtual ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_ABSTRACT;
 	virtual ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_ABSTRACT;

@@ -79,6 +79,11 @@ public:
 	void addActorToScene(ActorHandle handle) X_FINAL;
 	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
 
+	// you must pass cooked data :|
+	// if you don't have cooked data use getCooking() to cook it!
+	ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createHieghtField(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
 	ActorHandle createPlane(const QuatTransf& myTrans, float density) X_FINAL;
 	ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_FINAL;
 	ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_FINAL;

@@ -439,13 +439,77 @@ void XPhysics::addActorsToScene(ActorHandle* pHandles, size_t num)
 
 // ------------------------------------------
 
+ActorHandle XPhysics::createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	// Looks liek they forgot const on PxDefaultMemoryInputData constructor, as the member var is a const pointer.
+	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
+	physx::PxConvexMesh* pConvexMesh = pPhysics_->createConvexMesh(input);
+	physx::PxMeshScale meshScale;
+	meshScale.rotation = physx::PxQuat::createIdentity();
+	meshScale.scale = Px3FromVec3(scale);
+
+	auto* pShape = pPhysics_->createShape(physx::PxConvexMeshGeometry(pConvexMesh, meshScale), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	// Looks liek they forgot const on PxDefaultMemoryInputData constructor, as the member var is a const pointer.
+	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
+	physx::PxTriangleMesh* pTriMesh = pPhysics_->createTriangleMesh(input);
+	physx::PxMeshScale meshScale;
+	meshScale.rotation = physx::PxQuat::createIdentity();
+	meshScale.scale = Px3FromVec3(scale);
+
+	auto* pShape = pPhysics_->createShape(physx::PxTriangleMeshGeometry(pTriMesh, meshScale), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createHieghtField(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& heightRowColScale)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	// Looks liek they forgot const on PxDefaultMemoryInputData constructor, as the member var is a const pointer.
+	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
+	physx::PxHeightField* pHeightField = pPhysics_->createHeightField(input);
+
+	auto* pShape = pPhysics_->createShape(
+		physx::PxHeightFieldGeometry(pHeightField, physx::PxMeshGeometryFlags(), heightRowColScale.x, heightRowColScale.y, heightRowColScale.z),
+		*pMaterial_, 
+		true, 
+		DEFALT_SHAPE_FLAGS
+	);
+
+	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
+
+	pShape->release();
+
+	setupDefaultRigidDynamic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
 ActorHandle XPhysics::createPlane(const QuatTransf& myTrans, float density)
 {
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(physx::PxPlaneGeometry(), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
-	// calls: createRigidStatic, attachShape
 	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
 
 	pShape->release();
@@ -460,7 +524,6 @@ ActorHandle XPhysics::createSphere(const QuatTransf& myTrans, float radius, floa
 
 	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
-	// calls: createRigidStatic, attachShape
 	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
 
 	pShape->release();
@@ -475,7 +538,6 @@ ActorHandle XPhysics::createCapsule(const QuatTransf& myTrans, float radius, flo
 
 	auto* pShape = pPhysics_->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
-	// calls: createRigidStatic, attachShape
 	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
 
 	pShape->release();
@@ -491,7 +553,6 @@ ActorHandle XPhysics::createBox(const QuatTransf& myTrans, const AABB& bounds, f
 
 	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
-	// calls: createRigidStatic, attachShape
 	physx::PxRigidDynamic* pActor = physx::PxCreateDynamic(*pPhysics_, trans, *pShape, density);
 
 	pShape->release();
