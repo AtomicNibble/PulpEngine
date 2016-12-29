@@ -419,6 +419,18 @@ RegionHandle XPhysics::addRegion(const AABB& bounds)
 	return handle;
 }
 
+bool XPhysics::removeRegion(RegionHandle handle_)
+{
+	uint32_t handle = safe_static_cast<uint32_t>(handle_);
+
+	if (!pScene_->removeBroadPhaseRegion(handle)) {
+		X_ERROR("Phys", "Failed to remove region id: %" PRIu32, handle);
+		return false;
+	}
+
+	return true;
+}
+
 void XPhysics::addActorToScene(ActorHandle handle)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);

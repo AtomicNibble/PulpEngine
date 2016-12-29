@@ -75,6 +75,8 @@ public:
 
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
 	RegionHandle addRegion(const AABB& bounds) X_FINAL;
+	bool removeRegion(RegionHandle handles) X_FINAL;
+
 
 	void addActorToScene(ActorHandle handle) X_FINAL;
 	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
