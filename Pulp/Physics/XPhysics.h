@@ -24,7 +24,9 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(physics)
 
-class XPhysics : public IPhysics,
+class XPhysics : 
+	public IPhysics, 
+	public IPhysicsCooking,
 	public PVD::PvdConnectionHandler, //receive notifications when pvd is connected and disconnected.
 	public physx::PxDeletionListener,
 	public physx::PxBroadPhaseCallback,
@@ -66,7 +68,17 @@ public:
 	void onTickPreRender(float dtime) X_FINAL;
 	void onTickPostRender(float dtime) X_FINAL;
 	void render(void) X_FINAL;
+
+	IPhysicsCooking* getCooking(void) X_FINAL;
 	// ~IPhysics
+
+	// IPhysicsCooking
+	bool cookingSupported(void) const X_FINAL;
+
+	bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_FINAL;
+	bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut) X_FINAL;
+	bool cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut) X_FINAL;
+	// ~IPhysicsCooking
 	
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
 	RegionHandle addRegion(const AABB& bounds) X_FINAL;

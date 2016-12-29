@@ -206,7 +206,10 @@ bool XPhysics::init(void)
 	}
 
 	physx::PxCookingParams params(scale);
+	params.targetPlatform = physx::PxPlatform::ePC;
 	params.meshWeldTolerance = 0.001f;
+	// params.meshCookingHint = physx::PxMeshCookingHint::eCOOKING_PERFORMANCE;
+	params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
 	params.meshPreprocessParams = physx::PxMeshPreprocessingFlags(
 		physx::PxMeshPreprocessingFlag::eWELD_VERTICES |
 		physx::PxMeshPreprocessingFlag::eREMOVE_UNREFERENCED_VERTICES |
@@ -218,7 +221,7 @@ bool XPhysics::init(void)
 		return false;
 	}
 
-
+	
 	if (pPhysics_->getPvdConnectionManager()) {
 		pPhysics_->getPvdConnectionManager()->addHandler(*this);
 	}
@@ -409,6 +412,121 @@ void XPhysics::render(void)
 		pDebugRender_->queueForRender();
 	}
 }
+
+IPhysicsCooking* XPhysics::getCooking(void)
+{
+	return this;
+}
+
+
+bool XPhysics::cookingSupported(void) const
+{
+	return true;
+}
+
+X_INLINE physx::PxBoundedData PxBoundedDataFromBounded(const BoundedData& in)
+{
+	physx::PxBoundedData bd;
+	bd.data = in.pData;
+	bd.stride = in.stride;
+	bd.count = in.count;
+	return bd;
+}
+
+bool XPhysics::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut)
+{
+	X_ASSERT_NOT_NULL(pCooking_);
+
+	physx::PxTriangleMeshDesc meshDesc;
+	meshDesc.points = PxBoundedDataFromBounded(desc.points);
+	meshDesc.triangles = PxBoundedDataFromBounded(desc.triangles);
+
+	if (!meshDesc.isValid()) {
+		X_ERROR("Phys", "Failed to cook tri mesh, description is invalid");
+		return false;
+	}
+
+	// i could props make my own outputstream wrapper that writes directly to the dataOut.
+	// cba for now.
+	physx::PxDefaultMemoryOutputStream writeBuffer;
+	bool status = pCooking_->cookTriangleMesh(meshDesc, writeBuffer);
+	if (!status) {
+		X_ERROR("Phys", "Failed to cook tri mesh");
+		return false;
+	}
+
+	dataOut.resize(writeBuffer.getSize());
+	std::memcpy(dataOut.data(), writeBuffer.getData(), writeBuffer.getSize());
+	return true;
+}
+
+
+bool XPhysics::cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut)
+{
+	physx::PxConvexMeshDesc meshDesc;
+	meshDesc.points = PxBoundedDataFromBounded(desc.points);
+	meshDesc.triangles = PxBoundedDataFromBounded(desc.polygons);
+
+	if (!meshDesc.isValid()) {
+		X_ERROR("Phys", "Failed to cook convex mesh, description is invalid");
+		return false;
+	}
+
+	physx::PxDefaultMemoryOutputStream writeBuffer;
+	bool status = pCooking_->cookConvexMesh(meshDesc, writeBuffer);
+	if (!status) {
+		X_ERROR("Phys", "Failed to cook convex mesh");
+		return false;
+	}
+
+	dataOut.resize(writeBuffer.getSize());
+	std::memcpy(dataOut.data(), writeBuffer.getData(), writeBuffer.getSize());
+	return true;
+}
+
+
+bool XPhysics::cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut)
+{
+	physx::PxHeightFieldDesc hfDesc;
+	hfDesc.format = physx::PxHeightFieldFormat::eS16_TM;
+	hfDesc.nbColumns = desc.numCols;
+	hfDesc.nbRows = desc.numRows;
+	hfDesc.samples.data = desc.samples.pData;
+	hfDesc.samples.stride = sizeof(physx::PxHeightFieldSample);
+
+	if (!hfDesc.isValid()) {
+		X_ERROR("Phys", "Failed to cook height field, description is invalid");
+		return false;
+	}
+
+	const uint32_t numSamples = desc.numCols * desc.numRows;
+
+	core::Array<physx::PxHeightFieldSample> samples(g_PhysicsArena);
+	samples.resize(numSamples);
+
+	const HeightFieldSample* pSamplers = reinterpret_cast<const HeightFieldSample*>(desc.samples.pData);
+
+	for (uint32_t i = 0; i < numSamples; i++)
+	{
+		samples[i].height = pSamplers[i].height;
+		// for now single material for a height field :Z
+		samples[i].materialIndex0 = 0;
+		samples[i].materialIndex1 = 0;
+	}
+
+	physx::PxDefaultMemoryOutputStream writeBuffer;
+	bool status = pCooking_->cookHeightField(hfDesc, writeBuffer);
+	if (!status) {
+		X_ERROR("Phys", "Failed to cook height field");
+		return false;
+	}
+
+	dataOut.resize(writeBuffer.getSize());
+	std::memcpy(dataOut.data(), writeBuffer.getData(), writeBuffer.getSize());
+	return true;
+}
+
+
 
 MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 {

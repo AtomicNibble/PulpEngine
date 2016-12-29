@@ -24,6 +24,61 @@ typedef Handle ActorHandle;
 
 static const Handle INVALID_HANLDE = 0;
 
+
+struct StridedData
+{
+	X_INLINE StridedData() : pData(nullptr), stride(0) {}
+
+	const void* pData;
+	uint32_t stride;
+};
+
+struct BoundedData : public StridedData
+{
+	X_INLINE BoundedData() : count(0) {}
+
+	uint32_t count;
+};
+
+struct TriangleMeshDesc
+{
+	BoundedData points; // Vec3f
+	BoundedData triangles; // 16bit int's
+};
+
+struct ConvexMeshDesc
+{
+	BoundedData points;
+	// optional
+	BoundedData polygons;
+};
+
+struct HeightFieldSample
+{
+	uint16_t height;
+};
+
+struct HeightFieldDesc
+{
+	uint32_t numRows;
+	uint32_t numCols;
+	StridedData	samples; // HeightFieldSample
+};
+
+struct IPhysicsCooking
+{
+	typedef core::Array<uint8_t> DataArr;
+
+	virtual ~IPhysicsCooking() {}
+
+	virtual bool cookingSupported(void) const X_ABSTRACT;
+
+	virtual bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
+	virtual bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
+	virtual bool cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut) X_ABSTRACT;
+
+};
+
 struct IPhysics
 {
 	virtual ~IPhysics() {}
@@ -40,6 +95,9 @@ struct IPhysics
 	virtual void onTickPostRender(float dtime) X_ABSTRACT;
 	virtual void render(void) X_ABSTRACT; // render stuff like debug shapes.
 
+	// if you create a full physics instance you get cooking with it.
+	// if you want just cooking use the converter interface.
+	virtual IPhysicsCooking* getCooking(void) X_ABSTRACT;
 
 	// we need to make a api for creating the physc objects for use in the 3dengine.
 	virtual MaterialHandle createMaterial(MaterialDesc& desc) X_ABSTRACT;
