@@ -80,6 +80,15 @@ bool PhysCooking::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOu
 		return false;
 	}
 
+	if (pCooking_->getParams().meshPreprocessParams & physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH)
+	{
+		if (!pCooking_->validateTriangleMesh(meshDesc))
+		{
+			X_ERROR("Phys", "Failed to cook tri mesh, validation failed");
+			return false;
+		}
+	}
+
 	// i could props make my own outputstream wrapper that writes directly to the dataOut.
 	// cba for now.
 	physx::PxDefaultMemoryOutputStream writeBuffer;
