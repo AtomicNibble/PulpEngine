@@ -508,10 +508,12 @@ bool XPhysics::cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut)
 
 	for (uint32_t i = 0; i < numSamples; i++)
 	{
-		samples[i].height = pSamplers[i].height;
+		auto& destSampler = samples[i];
+
+		destSampler.height = pSamplers[i].height;
 		// for now single material for a height field :Z
-		samples[i].materialIndex0 = 0;
-		samples[i].materialIndex1 = 0;
+		destSampler.materialIndex0 = pSamplers[i].matIdx0;
+		destSampler.materialIndex1 = pSamplers[i].matIdx1;
 	}
 
 	physx::PxDefaultMemoryOutputStream writeBuffer;

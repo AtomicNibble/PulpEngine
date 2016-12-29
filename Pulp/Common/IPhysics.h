@@ -56,6 +56,8 @@ struct ConvexMeshDesc
 struct HeightFieldSample
 {
 	uint16_t height;
+	uint8_t matIdx0;
+	uint8_t matIdx1;
 };
 
 struct HeightFieldDesc
