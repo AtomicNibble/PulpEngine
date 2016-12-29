@@ -48,8 +48,20 @@ struct IPhysics
 	// best to just make all regions for level on load before adding any actors to scene.
 	virtual RegionHandle addRegion(const AABB& bounds) X_ABSTRACT;
 
-	virtual ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
 
+	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
+	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
+
+	virtual ActorHandle createPlane(const QuatTransf& myTrans, float density) X_ABSTRACT;
+	virtual ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_ABSTRACT;
+	virtual ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_ABSTRACT;
+	virtual ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_ABSTRACT;
+
+	virtual ActorHandle createStaticPlane(const QuatTransf& myTrans) X_ABSTRACT;
+	virtual ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_ABSTRACT;
+	virtual ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_ABSTRACT;
+	virtual ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
+	virtual ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
 
 };
 
