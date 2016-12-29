@@ -35,17 +35,28 @@ bool PhysCooking::cookingSupported(void) const
 	return true;
 }
 
-bool PhysCooking::init(const physx::PxTolerancesScale& scale, physx::PxFoundation& foundation)
+bool PhysCooking::setCookingMode(CookingMode::Enum mode)
 {
+	static_assert(CookingMode::ENUM_COUNT == 3, "Added additional cooking modes? this code needs updating.");
+
+	if (!pCooking_) {
+		X_ERROR("Phys", "Can;t set cooking mode before cooking is init");
+		return false;
+	}
+
+	physx::PxCookingParams params(scale_);
+	setCookingParamsForMode(params, mode);
+
+	pCooking_->setParams(params);
+	return true;
+}
+
+bool PhysCooking::init(const physx::PxTolerancesScale& scale, physx::PxFoundation& foundation, CookingMode::Enum mode)
+{
+	scale_ = scale;
+
 	physx::PxCookingParams params(scale);
-	params.targetPlatform = physx::PxPlatform::ePC;
-	params.meshWeldTolerance = 0.001f;
-	// params.meshCookingHint = physx::PxMeshCookingHint::eCOOKING_PERFORMANCE;
-	params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
-	params.meshPreprocessParams = physx::PxMeshPreprocessingFlags(
-		physx::PxMeshPreprocessingFlag::eWELD_VERTICES |
-		physx::PxMeshPreprocessingFlag::eREMOVE_UNREFERENCED_VERTICES |
-		physx::PxMeshPreprocessingFlag::eREMOVE_DUPLICATED_TRIANGLES);
+	setCookingParamsForMode(params, mode);
 
 	pCooking_ = PxCreateCooking(PX_PHYSICS_VERSION, foundation, params);
 	if (!pCooking_) {
@@ -150,5 +161,41 @@ bool PhysCooking::cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut)
 	return true;
 }
 
+
+void PhysCooking::setCookingParamsForMode(physx::PxCookingParams& params, CookingMode::Enum mode)
+{
+	params.targetPlatform = physx::PxPlatform::ePC;
+	params.meshWeldTolerance = 0.001f;
+
+	switch (mode)
+	{
+		case CookingMode::Fast:
+			params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
+			params.meshPreprocessParams = physx::PxMeshPreprocessingFlags(
+				physx::PxMeshPreprocessingFlag::eDISABLE_CLEAN_MESH |
+				physx::PxMeshPreprocessingFlag::eDISABLE_ACTIVE_EDGES_PRECOMPUTE);
+			break;
+
+		case CookingMode::Slow:
+			params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
+			params.meshPreprocessParams = physx::PxMeshPreprocessingFlags(
+				physx::PxMeshPreprocessingFlag::eWELD_VERTICES |
+				physx::PxMeshPreprocessingFlag::eREMOVE_UNREFERENCED_VERTICES |
+				physx::PxMeshPreprocessingFlag::eREMOVE_DUPLICATED_TRIANGLES);
+			break;
+
+		case CookingMode::VerySlow:
+			params.meshCookingHint = physx::PxMeshCookingHint::eSIM_PERFORMANCE;
+			params.meshPreprocessParams = physx::PxMeshPreprocessingFlags(
+				physx::PxMeshPreprocessingFlag::eWELD_VERTICES |
+				physx::PxMeshPreprocessingFlag::eREMOVE_UNREFERENCED_VERTICES |
+				physx::PxMeshPreprocessingFlag::eREMOVE_DUPLICATED_TRIANGLES);
+			break;
+
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+	}
+}
 
 X_NAMESPACE_END

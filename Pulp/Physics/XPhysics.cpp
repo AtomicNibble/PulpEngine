@@ -191,7 +191,7 @@ bool XPhysics::init(void)
 		return false;
 	}
 
-	if (pCooking_->init(scale, *pFoundation_)) {
+	if (pCooking_->init(scale, *pFoundation_, CookingMode::Slow)) {
 		X_ERROR("Physics", "Cooking init failed!");
 		return false;
 	}

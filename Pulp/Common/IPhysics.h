@@ -67,6 +67,12 @@ struct HeightFieldDesc
 	StridedData	samples; // HeightFieldSample
 };
 
+X_DECLARE_ENUM(CookingMode)(
+	Fast,		// quickiest possible cooking time
+	Slow,
+	VerySlow	// all cooking optermistations enabled
+);
+
 struct IPhysicsCooking
 {
 	typedef core::Array<uint8_t> DataArr;
@@ -74,6 +80,7 @@ struct IPhysicsCooking
 	virtual ~IPhysicsCooking() {}
 
 	virtual bool cookingSupported(void) const X_ABSTRACT;
+	virtual bool setCookingMode(CookingMode::Enum mode) X_ABSTRACT;
 
 	virtual bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
 	virtual bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
