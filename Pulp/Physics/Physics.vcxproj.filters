@@ -30,6 +30,12 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{2074c190-9e17-48b0-861f-980b4ca2b208}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ConverterModule">
+      <UniqueIdentifier>{189550c8-1a09-471b-8165-4e959238475b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ConverterModule">
+      <UniqueIdentifier>{233fcf05-deba-4db0-b8b8-978a044b1320}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -57,6 +63,15 @@
       <Filter>Header Files\DebugRender</Filter>
     </ClInclude>
     <ClInclude Include="MathHelpers.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="XPhysLib.h">
+      <Filter>Header Files\ConverterModule</Filter>
+    </ClInclude>
+    <ClInclude Include="Cooking.h">
+      <Filter>Header Files\ConverterModule</Filter>
+    </ClInclude>
+    <ClInclude Include="DelayLoadHook.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
@@ -87,6 +102,18 @@
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="XPhysLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Cooking.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="DelayLoadHook.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -81,6 +81,14 @@ struct IPhysicsCooking
 
 };
 
+struct IPhysLib : public IConverter
+{
+	virtual ~IPhysLib() {}
+
+	virtual IPhysicsCooking* getCooking(void) X_ABSTRACT;
+};
+
+
 struct IPhysics
 {
 	virtual ~IPhysics() {}
