@@ -230,6 +230,8 @@ bool XPhysics::init(void)
 	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
 	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
 
+	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eMBP;
+//	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eSAP;
 	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
 
 	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
