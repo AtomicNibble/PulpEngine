@@ -74,6 +74,9 @@
     <ClInclude Include="DelayLoadHook.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="JointWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -124,6 +127,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="Stepper.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="JointWrapper.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

@@ -3,6 +3,7 @@
 #include "MathHelpers.h"
 #include "Cooking.h"
 #include "DelayLoadHook.h"
+#include "JointWrapper.h"
 
 #include <IConsole.h>
 #include <IRender.h>
@@ -220,7 +221,6 @@ bool XPhysics::init(void)
 	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
 
 
-
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_TWO_DIRECTIONAL_FRICTION;
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
@@ -395,6 +395,7 @@ IPhysicsCooking* XPhysics::getCooking(void)
 	return pCooking_;
 }
 
+// ------------------------------------------
 
 MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 {
@@ -402,6 +403,8 @@ MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 
 	return reinterpret_cast<MaterialHandle>(pMaterial);
 }
+// ------------------------------------------
+
 
 RegionHandle XPhysics::addRegion(const AABB& bounds)
 {
@@ -431,6 +434,7 @@ bool XPhysics::removeRegion(RegionHandle handle_)
 	return true;
 }
 
+// ------------------------------------------
 
 AggregateHandle XPhysics::createAggregate(uint32_t maxActors, bool selfCollisions)
 {
@@ -463,6 +467,74 @@ bool XPhysics::releaseAggregate(AggregateHandle handle)
 	return true;
 }
 
+// ------------------------------------------
+
+
+IJoint* XPhysics::createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1,
+	const QuatTransf& localFrame0, const QuatTransf& localFrame1)
+{
+	physx::PxRigidActor* pActor0 = reinterpret_cast<physx::PxRigidActor*>(actor0);
+	physx::PxRigidActor* pActor1 = reinterpret_cast<physx::PxRigidActor*>(actor1);
+
+	physx::PxTransform trans0 = PxTransFromQuatTrans(localFrame0);
+	physx::PxTransform trans1 = PxTransFromQuatTrans(localFrame1);
+
+
+	// i want to make a api for creating all the diffrent joint types.
+	// the problem is how to make it sexy yet functional.
+	// i think i will want to update joint info post creation
+	// so exposing a api seams like the most sensible thing todo.
+	// so lets define some interfaces 1st.
+	// 
+	// ok so i have interfaces for all the diffrent joint types
+	// just need to make impl's for the interfaces now so that we can return them.
+	static_assert(JointType::ENUM_COUNT == 5, "Added additional JointTypes? this code needs updating.");
+
+	switch (type)
+	{
+		case JointType::Fixed:
+		{
+			physx::PxFixedJoint* pJoint = physx::PxFixedJointCreate(*pPhysics_, pActor0, trans0, pActor1, trans1);
+
+			return X_NEW(XFixedJoint, arena_, "FixedJoint")(pJoint);
+		}
+		case JointType::Distance:
+		{
+			physx::PxDistanceJoint* pJoint = physx::PxDistanceJointCreate(*pPhysics_, pActor0, trans0, pActor1, trans1);
+
+			return X_NEW(XDistanceJoint, arena_, "DistanceJoint")(pJoint);
+		}
+		case JointType::Spherical:
+		{
+			physx::PxSphericalJoint* pJoint = physx::PxSphericalJointCreate(*pPhysics_, pActor0, trans0, pActor1, trans1);
+
+			return X_NEW(XSphericalJoint, arena_, "SphericalJoint")(pJoint);
+		}
+		case JointType::Revolute:
+		{
+			physx::PxRevoluteJoint* pJoint = physx::PxRevoluteJointCreate(*pPhysics_, pActor0, trans0, pActor1, trans1);
+		
+			return X_NEW(XRevoluteJoint, arena_, "RevoluteJoint")(pJoint);
+		}
+		case JointType::Prismatic:
+		{
+			physx::PxPrismaticJoint* pJoint = physx::PxPrismaticJointCreate(*pPhysics_, pActor0, trans0, pActor1, trans1);
+		
+			return X_NEW(XPrismaticJoint, arena_, "PrismaticJoint")(pJoint);
+		}
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return nullptr;
+}
+
+void XPhysics::releaseJoint(IJoint* pJoint)
+{
+	X_DELETE(pJoint, arena_);
+}
+
+
+// ------------------------------------------
 
 void XPhysics::addActorToScene(ActorHandle handle)
 {

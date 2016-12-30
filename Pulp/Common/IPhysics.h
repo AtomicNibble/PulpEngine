@@ -74,6 +74,172 @@ X_DECLARE_ENUM(CookingMode)(
 	VerySlow	// all cooking optermistations enabled
 );
 
+X_DECLARE_ENUM(JointType)(
+	Fixed,		// locks the orientations and origins rigidly together
+	Distance,	// keeps the origins within a certain distance range
+	Spherical,	// (also called a ball-and-socket) keeps the origins together, but allows the orientations to vary freely.
+	Revolute,	// (also called a hinge) keeps the origins and x-axes of the frames together, and allows free rotation around this common axis.
+	Prismatic	// (also called a slider) keeps the orientations identical, but allows the origin of each frame to slide freely along the common x-axis.
+);
+
+struct JointLimit
+{
+	JointLimit() :
+		restitution(0),
+		bounceThreshold(0),
+		stiffness(0),
+		damping(0),
+		contactDistance(0)
+	{
+	}
+
+	// Controls the amount of bounce when the joint hits a limit.
+
+	// A restitution value of 1.0 causes the joint to bounce back with the velocity which it hit the limit.
+	// A value of zero causes the joint to stop dead.
+	
+	// In situations where the joint has many locked DOFs(e.g. 5) the restitution may not be applied
+	// correctly.This is due to a limitation in the solver which causes the restitution velocity to become zero
+	// as the solver enforces constraints on the other DOFs.
+	
+	// This limitation applies to both angular and linear limits, however it is generally most apparent with limited
+	// angular DOFs.Disabling joint projection and increasing the solver iteration count may improve this behavior
+	// to some extent.
+	
+	// Also, combining soft joint limits with joint drives driving against those limits may affect stability.
+	float32_t restitution;
+	// determines the minimum impact velocity which will cause the joint to bounce
+	float32_t bounceThreshold;
+	// if greater than zero, the limit is soft, i.e. a spring pulls the joint back to the limit
+	float32_t stiffness;
+	// if spring is greater than zero, this is the damping of the limit spring
+	float32_t damping;
+
+	// the distance inside the limit value at which the limit will be considered to be active by the
+	// solver.  As this value is made larger, the limit becomes active more quickly. It thus becomes less
+	// likely to violate the extents of the limit, but more expensive.
+
+	// The contact distance should be less than the limit angle or distance, and in the case of a pair limit,
+	// less than half the distance between the upper and lower bounds. Exceeding this value will result in
+	// the limit being active all the time.
+	
+	// Making this value too small can result in jitter around the limit.
+	float32_t contactDistance;
+};
+
+
+struct JointLinearLimit : public JointLimit
+{
+	// the extent of the limit. 
+	float32_t value;
+};
+
+
+struct JointLinearLimitPair : public JointLimit
+{
+	// the range of the limit.The upper limit must be no lower than the
+	// lower limit, and if they are equal the limited degree of freedom will be treated as locked.
+
+	float32_t upper;
+	float32_t lower;
+};
+
+struct JointAngularLimitPair : public JointLimit
+{
+	// the range of the limit. The upper limit must be no lower than the lower limit.
+
+	float32_t upper;
+	float32_t lower;
+};
+
+struct JointLimitCone : public JointLimit
+{
+	// the maximum angle from the Y axis of the constraint frame.
+	float32_t yAngle;
+	// the maximum angle from the Z-axis of the constraint frame.
+	float32_t zAngle;
+};
+
+
+
+
+struct IJoint
+{
+	enum class ActorIdx {
+		Actor0,
+		Actor1
+	};
+
+	virtual ~IJoint() {}
+
+	virtual void setBreakForce(float32_t force, float32_t torque) X_ABSTRACT;
+	virtual void getBreakForce(float32_t& force, float32_t& torque) const X_ABSTRACT;
+
+	virtual void setLocalPose(ActorIdx actor, const QuatTransf& localPose) X_ABSTRACT;
+	virtual QuatTransf getLocalPose(ActorIdx actor) const X_ABSTRACT;
+};
+
+struct IFixedJoint : public IJoint
+{
+
+
+};
+
+struct IDistanceJoint : public IJoint
+{
+
+	// Return the current distance of the joint
+	virtual float32_t getDistance(void) const X_ABSTRACT;
+
+	virtual void setMinDistance(float32_t distance) X_ABSTRACT;
+	virtual float32_t getMinDistance(void) const X_ABSTRACT;
+
+	virtual void setMaxDistance(float32_t distance) X_ABSTRACT;
+	virtual float32_t getMaxDistance(void) const X_ABSTRACT;
+
+	virtual void setTolerance(float32_t tolerance) X_ABSTRACT;
+	virtual float32_t getTolerance(void) const X_ABSTRACT;
+
+	virtual void setStiffness(float32_t spring) X_ABSTRACT;
+	virtual float32_t getStiffness(void) const X_ABSTRACT;
+
+	virtual void setDamping(float32_t damping) X_ABSTRACT;
+	virtual float32_t getDamping(void) const X_ABSTRACT;
+
+};
+
+struct ISphericalJoint : public IJoint
+{
+	virtual JointLimitCone getLimitCone(void) const X_ABSTRACT;
+	virtual void setLimitCone(const JointLimitCone& limit) X_ABSTRACT;
+
+	virtual bool limitEnabled(void) const X_ABSTRACT;
+	virtual void setLimitEnabled(bool enable) X_ABSTRACT;
+};
+
+struct IRevoluteJoint : public IJoint
+{
+	virtual float32_t getAngle(void) const X_ABSTRACT;
+	virtual float32_t getVelocity(void) const X_ABSTRACT;
+
+	virtual void setLimit(const JointAngularLimitPair& limits) X_ABSTRACT;
+	virtual JointAngularLimitPair getLimit(void) const X_ABSTRACT;
+};
+
+
+struct IPrismaticJoint : public IJoint
+{
+
+	virtual float32_t getPosition(void) X_ABSTRACT;
+	virtual float32_t getVelocity(void) X_ABSTRACT;
+
+	virtual void setLimit(const JointLinearLimitPair& limits) X_ABSTRACT;
+	virtual JointLinearLimitPair getLimit(void) const X_ABSTRACT;
+};
+
+
+
+
 struct IPhysicsCooking
 {
 	typedef core::Array<uint8_t> DataArr;
@@ -136,6 +302,12 @@ struct IPhysics
 	virtual AggregateHandle createAggregate(uint32_t maxActors, bool selfCollisions) X_ABSTRACT;
 	virtual bool addActorToAggregate(AggregateHandle handle, ActorHandle actor) X_ABSTRACT;
 	virtual bool releaseAggregate(AggregateHandle handle) X_ABSTRACT;
+
+	// joints. I may want to return a interface for this not sure yet.
+	// localFrame's are `position and orientation of the joint relative to actor`
+	virtual IJoint* createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1, 
+		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_ABSTRACT;
+	virtual void releaseJoint(IJoint* pJoint) X_ABSTRACT;
 
 	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
 	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;

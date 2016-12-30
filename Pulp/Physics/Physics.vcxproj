@@ -414,6 +414,7 @@
     <ClInclude Include="CpuDispatcher.h" />
     <ClInclude Include="DebugRender.h" />
     <ClInclude Include="DelayLoadHook.h" />
+    <ClInclude Include="JointWrapper.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MathHelpers.h" />
     <ClInclude Include="PhysicsVars.h" />
@@ -451,6 +452,7 @@
     <ClCompile Include="XPhysLib.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="JointWrapper.inl" />
     <None Include="PhysicsVars.inl" />
     <None Include="Stepper.inl" />
     <None Include="XPhysics.inl" />

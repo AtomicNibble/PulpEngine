@@ -73,14 +73,22 @@ public:
 	IPhysicsCooking* getCooking(void) X_FINAL;
 	// ~IPhysics
 
-
+	// materials
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
+
+	// region's
 	RegionHandle addRegion(const AABB& bounds) X_FINAL;
 	bool removeRegion(RegionHandle handles) X_FINAL;
 
+	// aggregates's
 	AggregateHandle createAggregate(uint32_t maxActors, bool selfCollisions) X_FINAL;
 	bool addActorToAggregate(AggregateHandle handle, ActorHandle actor) X_FINAL;
 	bool releaseAggregate(AggregateHandle handle) X_FINAL;
+
+	// joints
+	IJoint* createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1,
+		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_FINAL;
+	void releaseJoint(IJoint* pJoint) X_FINAL;
 
 	void addActorToScene(ActorHandle handle) X_FINAL;
 	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
