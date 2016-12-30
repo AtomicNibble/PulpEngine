@@ -21,6 +21,7 @@ public:
 	StepperType::Enum GetStepperType(void) const;
 
 	int32_t DebugDrawEnabled(void) const;
+	float32_t DebugDrawScale(void) const;
 
 private:
 	void Var_OnStepperStyleChange(core::ICVar* pVar);
@@ -33,6 +34,7 @@ private:
 	StepperType::Enum stepperType_;
 
 	int32_t debugDraw_;
+	float debugDrawScale_;
 };
 
 

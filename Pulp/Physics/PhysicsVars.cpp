@@ -36,6 +36,8 @@ void PhysXVars::RegisterVars(void)
 
 	ADD_CVAR_REF("physx_draw_debug_shapes", debugDraw_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
 		"Enable drawing of physics debug shapes");
+	ADD_CVAR_REF("physx_draw_debug_scale", debugDrawScale_, 1.0, 0.f, 10.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Debug draw scale");
 }
 
 
