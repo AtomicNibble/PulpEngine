@@ -196,11 +196,10 @@ private:
 	uint8_t*	pScratchBlock_;
 	size_t		scratchBlockSize_;
 
-	bool initialDebugRender_;
 	bool waitForResults_;
 	bool pause_;
 	bool oneFrameUpdate_;
-	physx::PxReal debugRenderScale_;
+	bool _pad;
 
 	PvdParameters pvdParams_;
 

@@ -86,11 +86,9 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	pCpuDispatcher_(nullptr),
 	pScratchBlock_(nullptr),
 	scratchBlockSize_(0),
-	initialDebugRender_(false),
 	waitForResults_(false),
 	pause_(false),
 	oneFrameUpdate_(false),
-	debugRenderScale_(1.f),
 	stepperType_(StepperType::FIXED_STEPPER),
 
 	debugStepper_(0.016666660f),
@@ -245,7 +243,8 @@ bool XPhysics::init(void)
 	}
 
 	physx::PxSceneWriteLock scopedLock(*pScene_);
-	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, initialDebugRender_ ? debugRenderScale_ : 0.0f);
+	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+//	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, vars_.DebugDrawEnabled() ? vars_.DebugDrawScale() : 0.0f);
 	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
 
