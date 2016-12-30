@@ -570,6 +570,13 @@ void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 		return;
 	}
 
+	// we may of created the texture and done the initally precache
+	// but never actually drawn anything with the font.
+	// so currently no point in uploading a texture.
+	if (!pTexture_) {
+		return;
+	}
+
 	const auto& buf = fontTexture_->GetBuffer();
 
 	// we want to submit a draw
