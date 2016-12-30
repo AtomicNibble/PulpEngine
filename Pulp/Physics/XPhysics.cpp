@@ -408,6 +408,12 @@ MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 
 RegionHandle XPhysics::addRegion(const AABB& bounds)
 {
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
+		return 0;
+	}
+
 	physx::PxBroadPhaseRegion region;
 	region.bounds = PxBounds3FromAABB(bounds);
 	region.userData = nullptr;
@@ -424,6 +430,12 @@ RegionHandle XPhysics::addRegion(const AABB& bounds)
 
 bool XPhysics::removeRegion(RegionHandle handle_)
 {
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
+		return true;
+	}
+
 	uint32_t handle = safe_static_cast<uint32_t>(handle_);
 
 	if (!pScene_->removeBroadPhaseRegion(handle)) {
