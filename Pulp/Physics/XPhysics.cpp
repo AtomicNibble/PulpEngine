@@ -232,6 +232,7 @@ bool XPhysics::init(void)
 //	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eSAP;
 	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
 
+	stepperType_ = vars_.GetStepperType();
 	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
 		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
 	}
@@ -255,7 +256,6 @@ bool XPhysics::init(void)
 	}
 
 	setScratchBlockSize(vars_.ScratchBufferSize());
-	stepperType_ = vars_.GetStepperType();
 
 	return true;
 }
