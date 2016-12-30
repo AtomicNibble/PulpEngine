@@ -193,7 +193,7 @@ bool XPhysics::init(void)
 		return false;
 	}
 
-	if (pCooking_->init(scale, *pFoundation_, CookingMode::Slow)) {
+	if (!pCooking_->init(scale, *pFoundation_, CookingMode::Slow)) {
 		X_ERROR("Physics", "Cooking init failed!");
 		return false;
 	}
@@ -593,7 +593,7 @@ ICharacterController* XPhysics::createCharacterController(const ControllerDesc& 
 		}
 
 		auto* pController = pControllerManager_->createController(pxDesc);
-	
+		
 		return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
 	}
 
