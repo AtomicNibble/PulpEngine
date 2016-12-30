@@ -28,7 +28,7 @@ physx::PxU32 PhysxCpuDispacher::getWorkerCount() const
 
 void PhysxCpuDispacher::RunTask(core::V2::JobSystem&, size_t, core::V2::Job*, void* pData)
 {
-	physx::PxBaseTask* pTask = *reinterpret_cast<physx::PxBaseTask**>(pData);
+	physx::PxBaseTask* pTask = reinterpret_cast<physx::PxBaseTask*>(pData);
 
 	pTask->run();
 	pTask->release();
