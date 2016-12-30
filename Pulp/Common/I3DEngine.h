@@ -7,7 +7,7 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-X_DECLARE_ENUM(PrimContext)(CONSOLE, GUI, PROFILE);
+X_DECLARE_ENUM(PrimContext)(PHYSICS, GUI, PROFILE, CONSOLE);
 
 class IPrimativeContext;
 struct IMaterialManager;

@@ -45,7 +45,7 @@ engine::gui::IGui* pGui = nullptr;
 
 
 X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
-	primContexts_{ arena, arena, arena }
+	primContexts_{ arena, arena, arena, arena }
 {
 
 }
