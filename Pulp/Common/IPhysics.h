@@ -316,6 +316,8 @@ struct ICharacterController
 {
 	virtual ~ICharacterController() {}
 
+	virtual ControllerDesc::ShapeType getType(void) const X_ABSTRACT;
+
 	virtual	bool setPosition(const Vec3d& position) X_ABSTRACT;
 	virtual Vec3d getPosition(void) const X_ABSTRACT;
 

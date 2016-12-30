@@ -16,6 +16,22 @@ X_INLINE XCharController<Base, ControllerType>::~XCharController()
 }
 
 template<class Base, typename ControllerType>
+X_INLINE ControllerDesc::ShapeType XCharController<Base, ControllerType>::getType(void) const
+{
+	auto pxShapeType = getController()->getType();
+	if (pxShapeType == physx::PxControllerShapeType::eBOX) {
+		return ControllerDesc::ShapeType::Box;
+	}
+	if (pxShapeType == physx::PxControllerShapeType::eCAPSULE) {
+		return ControllerDesc::ShapeType::Capsule;
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return ControllerDesc::ShapeType::Box;
+}
+
+
+template<class Base, typename ControllerType>
 X_INLINE bool XCharController<Base, ControllerType>::setPosition(const Vec3d& position) 
 {
 	return getController()->setPosition(Px3ExtFromVec3(position));

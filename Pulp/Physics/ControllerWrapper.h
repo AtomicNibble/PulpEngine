@@ -15,6 +15,8 @@ protected:
 public:
 	X_INLINE ~XCharController() X_OVERRIDE;
 
+	X_INLINE ControllerDesc::ShapeType getType(void) const X_FINAL;
+
 	X_INLINE bool setPosition(const Vec3d& position) X_FINAL;
 	X_INLINE Vec3d getPosition(void) const X_FINAL;
 			 
