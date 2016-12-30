@@ -74,6 +74,75 @@ X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float he
 	drawQuad(pos.x, pos.y, width, height, col);
 }
 
+// Points
+X_INLINE void IPrimativeContext::drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size)
+{
+	X_UNUSED(size);
+
+	PrimVertex* pVertices = addPrimative(1, PrimitiveType::POINTLIST);
+
+	pVertices->pos = pos;
+	pVertices->color = col;
+}
+
+X_INLINE void IPrimativeContext::drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size)
+{
+	X_UNUSED(size);
+
+	PrimVertex* pVertices = addPrimative(numPoints, PrimitiveType::POINTLIST);
+
+	for (uint32 i = 0; i < numPoints; ++i)
+	{
+		pVertices[i].pos = pPoints[i];
+		pVertices[i].color = col;
+	}
+}
+
+X_INLINE void IPrimativeContext::drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size)
+{
+	X_UNUSED(size);
+
+	PrimVertex* pVertices = addPrimative(numPoints, PrimitiveType::POINTLIST);
+
+	for (uint32 i = 0; i < numPoints; ++i)
+	{
+		pVertices[i].pos = pPoints[i];
+		pVertices[i].color = pCol[i];
+	}
+}
+
+// Triangle
+X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Color8u& col0,
+	const Vec3f& v1, const Color8u& col1,
+	const Vec3f& v2, const Color8u& col2)
+{
+	PrimVertex* pVertices = addPrimative(3, PrimitiveType::TRIANGLELIST);
+
+	pVertices[0].pos = v0;
+	pVertices[0].color = col0;
+
+	pVertices[1].pos = v1;
+	pVertices[1].color = col1;
+
+	pVertices[2].pos = v2;
+	pVertices[2].color = col2;
+}
+
+X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col)
+{
+	PrimVertex* pVertices = addPrimative(3, PrimitiveType::TRIANGLELIST);
+
+	pVertices[0].pos = v0;
+	pVertices[0].color = col;
+
+	pVertices[1].pos = v1;
+	pVertices[1].color = col;
+
+	pVertices[2].pos = v2;
+	pVertices[2].color = col;
+}
+
+
 
 X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args)
 {

@@ -59,6 +59,18 @@ public:
 		float padding, uint32_t max, const Color& col);
 
 
+	// Points
+	X_INLINE void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1);
+	X_INLINE void drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1);
+	X_INLINE void drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size = 1);
+
+	// Triangle
+	X_INLINE void drawTriangle(const Vec3f& v0, const Color8u& col0,
+		const Vec3f& v1, const Color8u& col1,
+		const Vec3f& v2, const Color8u& col2);
+	X_INLINE void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col);
+
+
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pText);
