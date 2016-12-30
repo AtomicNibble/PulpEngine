@@ -9,7 +9,7 @@ X_INLINE QuatTrans<T>::QuatTrans()
 template<typename T>
 X_INLINE QuatTrans<T>::QuatTrans(const Vec3<T>& vec_, const Quat<T>& quat_) :
 quat(quat_),
-trans(vec_),
+trans(vec_)
 {
 }
 
