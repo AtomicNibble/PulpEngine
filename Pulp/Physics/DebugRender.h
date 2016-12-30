@@ -1,7 +1,7 @@
 #pragma once
 
-X_NAMESPACE_DECLARE(render,
-	struct IRenderAux;
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
 );
 
 X_NAMESPACE_BEGIN(physics)
@@ -10,7 +10,7 @@ class DebugRender
 {
 
 public:
-	DebugRender(render::IRenderAux* pAuxRender);
+	DebugRender(engine::IPrimativeContext* pPrimCon);
 	~DebugRender();
 
 
@@ -21,7 +21,7 @@ public:
 
 
 private:
-	render::IRenderAux* pAuxRender_;
+	engine::IPrimativeContext* pPrimCon_;
 };
 
 

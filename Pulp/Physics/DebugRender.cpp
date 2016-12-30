@@ -2,15 +2,15 @@
 #include "DebugRender.h"
 #include "MathHelpers.h"
 
-#include <IRenderAux.h>
+#include <IPrimativeContext.h>
 
 X_NAMESPACE_BEGIN(physics)
 
 
-DebugRender::DebugRender(render::IRenderAux* pAuxRender) :
-	pAuxRender_(pAuxRender)
+DebugRender::DebugRender(engine::IPrimativeContext* pPrimCon) :
+	pPrimCon_(pPrimCon)
 {
-	X_ASSERT_NOT_NULL(pAuxRender_);
+	X_ASSERT_NOT_NULL(pPrimCon_);
 }
 
 DebugRender::~DebugRender()
@@ -20,8 +20,6 @@ DebugRender::~DebugRender()
 
 void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 {
-	render::IRenderAux& aux = *pAuxRender_;
-
 	// be better if we could send everything at once.
 	// since each call will make auxRender resize etc.
 	// might be faster to just make vectors here, populate them
@@ -37,7 +35,7 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 		{
 			const physx::PxDebugPoint& point = points[i];
 			const Color8u col = Color8u::hexA(point.color);
-			aux.drawPoint(Vec3FromPhysx(point.pos), col);
+			pPrimCon_->drawPoint(Vec3FromPhysx(point.pos), col);
 		}
 	}
 
@@ -51,7 +49,7 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 		{
 			const physx::PxDebugLine& line = lines[i];
 			const Color8u col = Color8u::hexA(line.color0);
-			aux.drawLine(Vec3FromPhysx(line.pos0), col, Vec3FromPhysx(line.pos1), col);
+			pPrimCon_->drawLineColor(Vec3FromPhysx(line.pos0), col, Vec3FromPhysx(line.pos1), col);
 		}
 	}
 
@@ -65,7 +63,7 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 		{
 			const physx::PxDebugTriangle& triangle = triangles[i];
 
-			aux.drawTriangle(Vec3FromPhysx(triangle.pos0),
+			pPrimCon_->drawTriangle(Vec3FromPhysx(triangle.pos0),
 				Vec3FromPhysx(triangle.pos1), 
 				Vec3FromPhysx(triangle.pos2), 
 				Color8u::hexA(triangle.color0));
@@ -75,12 +73,12 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 
 void DebugRender::queueForRender(void)
 {
-	pAuxRender_->flush();
+	// ..
 }
 
 void DebugRender::clear(void)
 {
-	pAuxRender_->clear();
+	pPrimCon_->reset();
 }
 
 

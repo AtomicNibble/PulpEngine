@@ -7,7 +7,7 @@
 #include "ControllerWrapper.h"
 
 #include <IConsole.h>
-#include <IRender.h>
+#include <I3DEngine.h>
 
 #include <pvd\PxVisualDebugger.h>
 #include <common\windows\PxWindowsDelayLoadHook.h>
@@ -263,12 +263,16 @@ bool XPhysics::init(void)
 bool XPhysics::initRenderResources(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pRender);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
 
 	X_ASSERT(!pDebugRender_, "Debug render already init")(pDebugRender_);
 
-	render::IRenderAux* pAux = gEnv->pRender->getAuxRender(render::AuxRenderer::PHYSICS);
-	pDebugRender_ = X_NEW(DebugRender, arena_, "PhysDebugRender")(pAux);
+	auto* pPrimCon = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PHYSICS);
+	if (!pPrimCon) {
+		return false;
+	}
+
+	pDebugRender_ = X_NEW(DebugRender, arena_, "PhysDebugRender")(pPrimCon);
 
 	return true;
 }
