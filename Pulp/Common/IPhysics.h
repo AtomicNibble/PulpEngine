@@ -9,14 +9,6 @@
 X_NAMESPACE_BEGIN(physics)
 
 
-struct MaterialDesc
-{
-	float32_t staticFriction;	// the coefficient of static friction
-	float32_t dynamicFriction;	// the coefficient of dynamic friction
-	float32_t restitutio;		// the coefficient of restitution
-};
-
-
 typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
 typedef Handle RegionHandle;
@@ -25,6 +17,13 @@ typedef Handle AggregateHandle;
 
 static const Handle INVALID_HANLDE = 0;
 
+
+struct MaterialDesc
+{
+	float32_t staticFriction;	// the coefficient of static friction
+	float32_t dynamicFriction;	// the coefficient of dynamic friction
+	float32_t restitutio;		// the coefficient of restitution
+};
 
 struct StridedData
 {
@@ -187,7 +186,6 @@ struct IFixedJoint : public IJoint
 
 struct IDistanceJoint : public IJoint
 {
-
 	// Return the current distance of the joint
 	virtual float32_t getDistance(void) const X_ABSTRACT;
 
@@ -205,7 +203,6 @@ struct IDistanceJoint : public IJoint
 
 	virtual void setDamping(float32_t damping) X_ABSTRACT;
 	virtual float32_t getDamping(void) const X_ABSTRACT;
-
 };
 
 struct ISphericalJoint : public IJoint
@@ -229,7 +226,6 @@ struct IRevoluteJoint : public IJoint
 
 struct IPrismaticJoint : public IJoint
 {
-
 	virtual float32_t getPosition(void) X_ABSTRACT;
 	virtual float32_t getVelocity(void) X_ABSTRACT;
 
@@ -237,6 +233,122 @@ struct IPrismaticJoint : public IJoint
 	virtual JointLinearLimitPair getLimit(void) const X_ABSTRACT;
 };
 
+struct ControllerDesc
+{
+	enum class ShapeType {
+		Box,
+		Capsule
+	};
+
+	enum class NonWalkableMode {
+		PreventClimbing,				// Stops character from climbing up non-walkable slopes, but doesn't move it otherwise
+		PreventClimbingAndForceSliding	// Stops character from climbing up non-walkable slopes, and forces it to slide down those slopes
+	};
+
+protected:
+	X_INLINE ControllerDesc(ShapeType st) 
+	{
+		shape = st;
+		position = Vec3d::zero();
+		upDirection = Vec3f::zAxis();
+		slopeLimit = 0.707f;
+		invisibleWallHeight = 0.0f;
+		maxJumpHeight = 0.0f;
+		contactOffset = 0.1f;
+		stepOffset = 0.5f;
+		density = 10.0f;
+		scaleCoeff = 0.8f;
+		volumeGrowth = 1.5f;
+		nonWalkableMode = NonWalkableMode::PreventClimbing;
+	}
+
+public:
+	ShapeType shape;
+	Vec3d position;
+	Vec3f upDirection;
+	float32_t slopeLimit;
+	float32_t invisibleWallHeight;
+	float32_t maxJumpHeight;
+	float32_t contactOffset;
+	float32_t stepOffset;
+	float32_t density;
+	float32_t scaleCoeff;
+	float32_t volumeGrowth;
+	NonWalkableMode nonWalkableMode;
+};
+
+struct BoxControllerDesc : public ControllerDesc
+{
+	X_INLINE BoxControllerDesc() :
+		ControllerDesc(ShapeType::Box)
+	{
+		halfHeight = 1.f;
+		halfSideExtent = 0.5f;
+		halfForwardExtent = 0.5f;
+	}
+
+	float32_t halfHeight;
+	float32_t halfSideExtent;
+	float32_t halfForwardExtent;
+
+};
+
+struct CapsuleControllerDesc : public ControllerDesc
+{
+	enum class ClimbingMode {
+		Easy,
+		Constrained
+	};
+
+	X_INLINE CapsuleControllerDesc() :
+		ControllerDesc(ShapeType::Capsule)
+	{
+		radius = height = 0.0f;
+		climbingMode = ClimbingMode::Easy;
+	}
+
+	float32_t radius;
+	float32_t height;
+	ClimbingMode climbingMode;
+};
+
+struct ICharacterController
+{
+	virtual ~ICharacterController() {}
+
+	virtual	bool setPosition(const Vec3d& position) X_ABSTRACT;
+	virtual Vec3d getPosition(void) const X_ABSTRACT;
+
+	virtual	bool setFootPosition(const Vec3d& position) X_ABSTRACT;
+	virtual	Vec3d getFootPosition(void) const X_ABSTRACT;
+
+	virtual	void setStepOffset(const float32_t offset) X_ABSTRACT;
+	virtual	float32_t getStepOffset(void) const X_ABSTRACT;
+
+	virtual	void resize(float32_t height) X_ABSTRACT;
+};
+
+struct IBoxCharacterController : public ICharacterController
+{
+	virtual	float32_t getHalfHeight(void) const X_ABSTRACT;
+	virtual	float32_t getHalfSideExtent(void) const X_ABSTRACT;
+	virtual	float32_t getHalfForwardExtent(void) const X_ABSTRACT;
+
+	virtual	bool setHalfHeight(float32_t halfHeight) X_ABSTRACT;
+	virtual	bool setHalfSideExtent(float32_t halfSideExtent) X_ABSTRACT;
+	virtual	bool setHalfForwardExtent(float32_t halfForwardExtent) X_ABSTRACT;
+};
+
+struct ICapsuleCharacterController : public ICharacterController
+{
+	virtual	float32_t getRadius(void) const X_ABSTRACT;
+	virtual	float32_t getHeight(void) const X_ABSTRACT;
+	virtual	CapsuleControllerDesc::ClimbingMode getClimbingMode(void) const X_ABSTRACT;
+
+	virtual	bool setRadius(float32_t radius) X_ABSTRACT;
+	virtual	bool setHeight(float32_t height) X_ABSTRACT;
+	virtual	bool setClimbingMode(CapsuleControllerDesc::ClimbingMode mode) X_ABSTRACT;
+};
 
 
 
@@ -308,6 +420,11 @@ struct IPhysics
 	virtual IJoint* createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1, 
 		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_ABSTRACT;
 	virtual void releaseJoint(IJoint* pJoint) X_ABSTRACT;
+
+	// Characters controllers
+	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
+	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
+
 
 	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
 	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;

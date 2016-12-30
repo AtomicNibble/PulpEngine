@@ -4,6 +4,7 @@
 #include "Cooking.h"
 #include "DelayLoadHook.h"
 #include "JointWrapper.h"
+#include "ControllerWrapper.h"
 
 #include <IConsole.h>
 #include <IRender.h>
@@ -251,7 +252,6 @@ bool XPhysics::init(void)
 		X_ERROR("PhysicsSys", "Failed to create controller manager");
 		return false;
 	}
-
 
 	setScratchBlockSize(vars_.ScratchBufferSize());
 	stepperType_ = vars_.GetStepperType();
@@ -501,7 +501,7 @@ IJoint* XPhysics::createJoint(JointType::Enum type, ActorHandle actor0, ActorHan
 		case JointType::Distance:
 		{
 			physx::PxDistanceJoint* pJoint = physx::PxDistanceJointCreate(*pPhysics_, pActor0, trans0, pActor1, trans1);
-
+		
 			return X_NEW(XDistanceJoint, arena_, "DistanceJoint")(pJoint);
 		}
 		case JointType::Spherical:
@@ -533,6 +533,78 @@ void XPhysics::releaseJoint(IJoint* pJoint)
 	X_DELETE(pJoint, arena_);
 }
 
+// ------------------------------------------
+
+void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
+{
+	pxDesc.position = Px3ExtFromVec3(desc.position);
+	pxDesc.upDirection = Px3FromVec3(desc.upDirection);
+	pxDesc.slopeLimit = desc.slopeLimit;
+	pxDesc.invisibleWallHeight = desc.invisibleWallHeight;
+	pxDesc.maxJumpHeight = desc.maxJumpHeight;
+	pxDesc.contactOffset = desc.contactOffset;
+	pxDesc.stepOffset = desc.stepOffset;
+	pxDesc.density = desc.density;
+	pxDesc.scaleCoeff = desc.scaleCoeff;
+	pxDesc.volumeGrowth = desc.volumeGrowth;
+	if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbing) {
+		pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
+	}
+	else if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbingAndForceSliding) {
+		pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING_AND_FORCE_SLIDING;
+	}
+	else {
+		X_ASSERT_UNREACHABLE();
+	}
+}
+
+ICharacterController* XPhysics::createCharacterController(const ControllerDesc& desc)
+{
+	if (desc.shape == ControllerDesc::ShapeType::Box)
+	{
+		physx::PxBoxControllerDesc pxDesc;
+		copycontrollerDesc(pxDesc, desc);
+
+		const BoxControllerDesc& boxDesc = static_cast<const BoxControllerDesc&>(desc);
+		pxDesc.halfHeight = boxDesc.halfHeight;
+		pxDesc.halfSideExtent = boxDesc.halfSideExtent;
+		pxDesc.halfForwardExtent = boxDesc.halfForwardExtent;
+
+		auto* pController = pControllerManager_->createController(pxDesc);
+
+		return X_NEW(XBoxCharController, arena_, "BoxCharController")(static_cast<physx::PxBoxController*>(pController));
+	}
+	if (desc.shape == ControllerDesc::ShapeType::Capsule)
+	{
+		physx::PxCapsuleControllerDesc pxDesc;
+		copycontrollerDesc(pxDesc, desc);
+
+		const CapsuleControllerDesc& boxDesc = static_cast<const CapsuleControllerDesc&>(desc);
+		pxDesc.radius = boxDesc.radius;
+		pxDesc.height = boxDesc.height;
+		if (boxDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
+			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eEASY;
+		}
+		else if (boxDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Constrained) {
+			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eCONSTRAINED;
+		}
+		else {
+			X_ASSERT_UNREACHABLE();
+		}
+
+		auto* pController = pControllerManager_->createController(pxDesc);
+	
+		return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return nullptr;
+}
+
+void XPhysics::releaseCharacterController(ICharacterController* pController)
+{
+	X_DELETE(pController, arena_);
+}
 
 // ------------------------------------------
 

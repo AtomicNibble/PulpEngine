@@ -77,6 +77,9 @@
     <ClInclude Include="JointWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ControllerWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -130,6 +133,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="JointWrapper.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ControllerWrapper.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

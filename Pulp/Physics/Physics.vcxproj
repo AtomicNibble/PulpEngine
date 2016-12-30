@@ -410,6 +410,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Allocator.h" />
+    <ClInclude Include="ControllerWrapper.h" />
     <ClInclude Include="Cooking.h" />
     <ClInclude Include="CpuDispatcher.h" />
     <ClInclude Include="DebugRender.h" />
@@ -452,6 +453,7 @@
     <ClCompile Include="XPhysLib.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ControllerWrapper.inl" />
     <None Include="JointWrapper.inl" />
     <None Include="PhysicsVars.inl" />
     <None Include="Stepper.inl" />

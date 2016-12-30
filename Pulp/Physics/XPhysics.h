@@ -71,7 +71,6 @@ public:
 	void render(void) X_FINAL;
 
 	IPhysicsCooking* getCooking(void) X_FINAL;
-	// ~IPhysics
 
 	// materials
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
@@ -89,6 +88,11 @@ public:
 	IJoint* createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1,
 		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_FINAL;
 	void releaseJoint(IJoint* pJoint) X_FINAL;
+
+	// Characters controllers
+	ICharacterController* createCharacterController(const ControllerDesc& desc) X_FINAL;
+	void releaseCharacterController(ICharacterController* pController) X_FINAL;
+
 
 	void addActorToScene(ActorHandle handle) X_FINAL;
 	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
@@ -109,6 +113,7 @@ public:
 	ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_FINAL;
 	ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
 	ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
+	// ~IPhysics
 
 private:
 	// PvdConnectionHandler
