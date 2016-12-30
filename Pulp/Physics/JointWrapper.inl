@@ -11,6 +11,7 @@ X_INLINE XJoint<Base, JointType>::XJoint(JointType* pJoint) :
 template<class Base, typename JointType>
 X_INLINE XJoint<Base, JointType>::~XJoint()
 {
+	getJoint()->release();
 }
 
 
