@@ -252,6 +252,18 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
 	// switch page.
 	++currentPage_;
 
+	if (currentPage_ > MAX_PAGES) {
+		X_ERROR("Prim", "Exceeded max pages for context.");
+		// instead of crashing we just go back one page and reset it.
+		// reason i don't go back to first page is because this is going to cause rendering artifacts.
+		// but stuff in the later pages is less likley to be noticible.
+		// * If this ever happens you are drawing far too much prim shit.
+		//	 if you reall want to draw that much should just create multiple prim contexts ^^.
+		//	 as each has a seperate set of pages.
+		--currentPage_;
+		vertexPages_[currentPage_].reset();
+	}
+
 	auto& newPage = vertexPages_[currentPage_];
 	if(!newPage.isVbValid()) {
 		// virgin page, need a good slapping..

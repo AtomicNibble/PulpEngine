@@ -79,6 +79,7 @@ private:
 	static const uint32_t NUMVERTS_PER_PAGE = 0xaaa * 16;
 	static const uint32_t PAGE_BYTES = NUMVERTS_PER_PAGE * sizeof(PrimVertex);
 	static const uint32_t MAX_PAGES = MaterialWithPageIdx::BIT_MASK + 1; // what ever we can fit in the bits is the max.
+	static const uint32_t MAX_VERTS_TOTAL = NUMVERTS_PER_PAGE * MAX_PAGES;
 
 	static_assert(NUMVERTS_PER_PAGE < std::numeric_limits<decltype(PushBufferEntry::vertexOffs)>::max(),
 		"Verts per page exceeds numerical limit of offset type");
