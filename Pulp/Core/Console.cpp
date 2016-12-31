@@ -1481,21 +1481,22 @@ bool XConsole::LoadConfig(const char* fileName)
 
 		if (bytes > 0)
 		{
-			// 16 byte align it for faster strlen and find. (SSE)
-			char* pData = X_NEW_ARRAY_ALIGNED(char, bytes + 2, g_coreArena, "ConfigFileData", 16);
+			core::Array<char, core::ArrayAlignedAllocator<char>> data(g_coreArena);
+			data.getAllocator().setBaseAlignment(16);
+			data.resize(bytes + 2);
 
-			if (file.read(pData, bytes) == bytes)
+			if (file.read(data.data(), bytes) == bytes)
 			{
 				// 2 bytes at end so the multiline search can be more simple.
 				// and not have to worrie about reading out of bounds.
-				pData[bytes] = '\0';
-				pData[bytes + 1] = '\0';
+				data[bytes] = '\0';
+				data[bytes + 1] = '\0';
 
 				// execute all the data in the file.
 				// it's parsed in memory.
 				// remove comments here.
-				char* begin = pData;
-				char* end = pData + bytes;
+				char* begin = data.begin();
+				char* end = begin + bytes;
 				const char* pComment;
 
 				// we support // and /* */ so loook for a '/'
@@ -1536,11 +1537,9 @@ bool XConsole::LoadConfig(const char* fileName)
 					}
 				}
 
-
-				ConfigExec(pData);
+				ConfigExec(data.begin(), data.begin() + bytes);
 			}
 
-			X_DELETE_ARRAY(pData, g_coreArena);
 		}
 	}
 	else
@@ -1582,7 +1581,7 @@ void XConsole::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lpar
 	}
 }
 
-void XConsole::ConfigExec(const char* pCommand)
+void XConsole::ConfigExec(const char* pCommand, const char* pEnd)
 {
 	// if it's from config, should i limit what commands can be used?
 	// for now i'll let any be used

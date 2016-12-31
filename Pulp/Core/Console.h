@@ -299,7 +299,7 @@ private:
 
 	void Listbinds(IKeyBindDumpSink* CallBack);
 
-	void ConfigExec(const char* pCommand);
+	void ConfigExec(const char* pCommand, const char* pEnd);
 
 	// scrool helpers
 private:
