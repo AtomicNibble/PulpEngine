@@ -13,39 +13,6 @@ class PrimativeContext : public IPrimativeContext, public XEngineBase
 {
 public:
 
-	struct PrimFlagBitMasks
-	{
-		enum Enum : uint32_t
-		{
-			TextureIdShift = 0,
-			TextureIdBits = 20,
-			TextureIdMask = ((1 << TextureIdBits) - 1) << TextureIdShift,
-
-			PrimTypeShift = TextureIdBits,
-			PrimTypeBits = 3,
-			PrimTypeMask = ((1 << PrimTypeBits) - 1) << PrimTypeShift,
-		};
-	};
-
-	static_assert(PrimitiveType::ENUM_COUNT < 7, "Primt enum count don't fit in prim type mask");
-
-	struct PrimRenderFlags
-	{
-		X_INLINE PrimRenderFlags(PrimitiveType::Enum type, texture::TexID textureId);
-
-		X_INLINE bool operator ==(const PrimRenderFlags& rhs) const;
-		X_INLINE bool operator !=(const PrimRenderFlags& rhs) const;
-		X_INLINE bool operator <(const PrimRenderFlags& rhs) const;
-
-		X_INLINE PrimitiveType::Enum getPrimType(void) const;
-		X_INLINE texture::TexID getTextureId(void) const;
-
-		X_INLINE uint32_t toInt(void) const;
-
-	private:
-		uint32_t flags_;
-	};
-
 
 	// should i make this POD so growing the push buffer is faster. humm.
 	struct PushBufferEntry
