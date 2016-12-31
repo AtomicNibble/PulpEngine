@@ -43,7 +43,7 @@ XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateMa
 	arena_(arena),
 	pTechDefMan_(nullptr),
 	vsMan_(vsMan),
-	materials_(arena, sizeof(MaterialResource), X_ALIGN_OF(MaterialResource)),
+	materials_(arena, sizeof(MaterialResource), core::Max(8u,X_ALIGN_OF(MaterialResource))),
 	pDefaultMtl_(nullptr)
 {
 	pTechDefMan_ = X_NEW(TechDefStateManager, arena, "TechDefStateManager")(arena);
