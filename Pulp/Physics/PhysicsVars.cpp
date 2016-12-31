@@ -97,6 +97,22 @@ void PhysXVars::RegisterVars(void)
 void PhysXVars::SetScene(physx::PxScene* pScene)
 {
 	pScene_ = pScene;
+
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	// set current values.
+	for (uint32_t i = 0; i < physx::PxVisualizationParameter::eNUM_VALUES; i++)
+	{		
+		const auto* pVar = scaleVars_[i];
+		if (pVar)
+		{
+			const float val = pVar->GetFloat();
+
+			if (val > 0.f) {
+				pScene_->setVisualizationParameter(static_cast<physx::PxVisualizationParameter::Enum>(i), val);
+			}
+		}
+	}
 }
 
 uint32_t PhysXVars::ScratchBufferSize(void) const
