@@ -1592,7 +1592,7 @@ void XConsole::ConfigExec(const char* pCommand, const char* pEnd)
 	else {
 		// we run the command now.
 		ExecCommand cmd;
-		cmd.command = X_CONST_STRING(pCommand);
+		cmd.command = core::string(pCommand, pEnd);
 		cmd.source = ExecSource::CONFIG;
 		cmd.silentMode = false;
 
