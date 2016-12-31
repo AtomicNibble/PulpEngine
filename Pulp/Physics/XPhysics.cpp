@@ -361,7 +361,7 @@ void XPhysics::onTickPostRender(float dtime)
 
 		core::TimeVal simTime = pStepper->getSimulationTime();
 
-		X_LOG0("Phys", "Sim time: %gms", simTime.GetMilliSeconds());
+		X_LOG0_EVERY_N(30, "Phys", "Sim time: %gms", simTime.GetMilliSeconds());
 
 		if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
 			pStepper->postRender(dtime);
