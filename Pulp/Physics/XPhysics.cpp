@@ -332,6 +332,12 @@ void XPhysics::onTickPreRender(float dtime)
 
 	if (!IsPaused())
 	{
+		if (vars_.DebugDrawCullEnabled()) {
+			physx::PxSceneWriteLock scopedLock(*pScene_);
+
+			pScene_->setVisualizationCullingBox(PxBounds3FromAABB(AABB(Vec3f::zero(), 2000.f)));
+		}
+
 		Stepper* pStepper = getStepper();
 
 		waitForResults_ = false;
