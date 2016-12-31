@@ -19,12 +19,14 @@ public:
 	void SetScene(physx::PxScene* pScene);
 
 	uint32_t ScratchBufferSize(void) const;
-	StepperType::Enum GetStepperType(void) const;
+	X_INLINE StepperType::Enum GetStepperType(void) const;
 
-	int32_t DebugDrawEnabled(void) const;
+	X_INLINE int32_t DebugDrawEnabled(void) const;
+	X_INLINE int32_t DebugDrawCullEnabled(void) const;
 
 private:
 	void Var_OnScaleChanged(core::ICVar* pVar);
+	void Var_OnDebugUseCullChange(core::ICVar* pVar);
 	void Var_OnStepperStyleChange(core::ICVar* pVar);
 
 private:
@@ -37,6 +39,7 @@ private:
 	StepperType::Enum stepperType_;
 
 	int32_t debugDraw_;
+	int32_t debugDrawUseCullBox_;
 
 	const char* scaleVarNames_[physx::PxVisualizationParameter::eNUM_VALUES];
 	core::ICVar* scaleVars_[physx::PxVisualizationParameter::eNUM_VALUES];

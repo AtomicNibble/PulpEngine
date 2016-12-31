@@ -42,6 +42,12 @@ void PhysXVars::RegisterVars(void)
 	ADD_CVAR_REF("phys_draw_debug", debugDraw_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
 		"Enable drawing of physics debug shapes");
 
+	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugUseCullChange>(this);
+
+	ADD_CVAR_REF("phys_draw_debug_cull", debugDrawUseCullBox_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable culling of physics debug shapes")->SetOnChangeCallback(del);
+
+
 	// all the scales yo.
 	// we need to register call backs for all these so we can update the scene.
 	core::ConsoleVarFunc scaleChangedDel;
@@ -144,6 +150,31 @@ void PhysXVars::Var_OnScaleChanged(core::ICVar* pVar)
 	}
 
 	X_ERROR("Phys", "Failed to find scale var in lookup: \"%s\"", pVar->GetName());
+}
+
+void PhysXVars::Var_OnDebugUseCullChange(core::ICVar* pVar)
+{
+	// o my.
+	// you want to cull me baby?
+	// well then..
+
+	if (!pScene_) {
+		X_ERROR("Phys", "Can't update vis culling without a valid scene");
+		return;
+	}
+
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	if (pVar->GetInteger() == 0)
+	{
+		pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCULL_BOX, 0);
+	}
+	else
+	{
+		// when we enable this we need to ensure a valid bounds is set with 'setVisualizationCullingBox'
+		// this needs to be done before the next call to simulate.
+		pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCULL_BOX, 1);
+	}
 }
 
 void PhysXVars::Var_OnStepperStyleChange(core::ICVar* pVar)

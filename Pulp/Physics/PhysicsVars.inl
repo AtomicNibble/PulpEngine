@@ -13,5 +13,9 @@ X_INLINE int32_t PhysXVars::DebugDrawEnabled(void) const
 	return debugDraw_;
 }
 
+X_INLINE int32_t PhysXVars::DebugDrawCullEnabled(void) const
+{
+	return debugDrawUseCullBox_;
+}
 
 X_NAMESPACE_END
