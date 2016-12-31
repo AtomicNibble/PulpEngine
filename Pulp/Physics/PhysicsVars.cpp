@@ -74,7 +74,8 @@ void PhysXVars::RegisterVars(void)
 	scaleVarNames_[physx::PxVisualizationParameter::eJOINT_LIMITS]   			= "phys_draw_debug_scale_joint_limits";
 	// skipped particle ones for now
 	// ..
-	scaleVarNames_[physx::PxVisualizationParameter::eCULL_BOX]   				= "phys_draw_debug_scale_cull_box";
+// this enalbes cull box not visulization of cull box.
+//	scaleVarNames_[physx::PxVisualizationParameter::eCULL_BOX]   				= "phys_draw_debug_scale_cull_box";
 	// skipped cloth ones for now
 	// ..
 	scaleVarNames_[physx::PxVisualizationParameter::eMBP_REGIONS]   			= "phys_draw_debug_scale_mpb_regions";
