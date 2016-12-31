@@ -41,12 +41,12 @@ public:
 	X_INLINE T* operator->(void);
 	X_INLINE const T* operator->(void) const;
 
-	X_INLINE operator T*(void);
-	X_INLINE operator const T*(void) const;
+	// since i'm returning by value here i can make return non const./
+	// this way we can get none const pointer from const pointerflags.
+	X_INLINE operator T*(void) const;
 
 private:
-	X_INLINE T* GetRawPointer(void);
-	X_INLINE const T* GetRawPointer(void) const;
+	X_INLINE T* GetRawPointer(void) const;
 
 	X_NO_ASSIGN(PointerFlags);
 
