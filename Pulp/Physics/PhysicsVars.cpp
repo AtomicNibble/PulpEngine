@@ -88,8 +88,10 @@ void PhysXVars::RegisterVars(void)
 			continue;
 		}
 
-		scaleVars_[i] = ADD_CVAR_FLOAT(scaleVarNames_[i], 0.f, 0.f, 10.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Debug draw scale");
-		scaleVars_[i]->SetOnChangeCallback(scaleChangedDel);
+		auto* pVar = ADD_CVAR_FLOAT(scaleVarNames_[i], 1.f, 0.f, 10.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Debug draw scale");
+		pVar->SetOnChangeCallback(scaleChangedDel);
+
+		scaleVars_[i] = pVar;
 	}
 
 }
