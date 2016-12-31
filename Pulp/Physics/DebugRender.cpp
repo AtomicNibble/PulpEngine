@@ -20,10 +20,11 @@ DebugRender::~DebugRender()
 
 void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 {
-	// be better if we could send everything at once.
-	// since each call will make auxRender resize etc.
-	// might be faster to just make vectors here, populate them
-	// then pass them to aux render, would use more memory but likley much faster.
+	// We need to handle the case where any of the primatives take more verts than a given page.
+	// we can handle the case where points lines and triangles use allmost a page each just fine
+	// it's just if one of them is bigger than a single page we will crash due to access violation.
+	// the ideall way to handle this is for the primContex to tell use how many verts we got back that way we can spread 
+	// the prims across multiple pages if required.
 
 	// Points
 	const uint32_t numPoints = debugRenderable.getNbPoints();
