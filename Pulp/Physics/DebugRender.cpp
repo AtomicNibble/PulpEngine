@@ -29,9 +29,9 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 	const uint32_t numPoints = debugRenderable.getNbPoints();
 	if (numPoints)
 	{
-		const physx::PxDebugPoint* PX_RESTRICT points = debugRenderable.getPoints();
+		const physx::PxDebugPoint* X_RESTRICT points = debugRenderable.getPoints();
 
-		engine::IPrimativeContext::PrimVertex* pPoints = pPrimCon_->addPrimative(numPoints, 
+		engine::IPrimativeContext::PrimVertex* X_RESTRICT pPoints = pPrimCon_->addPrimative(numPoints,
 			engine::IPrimativeContext::PrimitiveType::POINTLIST);
 
 		for (uint32_t i = 0; i<numPoints; i++)
@@ -47,10 +47,10 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 	const uint32_t numLines = debugRenderable.getNbLines();
 	if (numLines)
 	{
-		const physx::PxDebugLine* PX_RESTRICT lines = debugRenderable.getLines();
+		const physx::PxDebugLine* X_RESTRICT lines = debugRenderable.getLines();
 
 		// lets do the batching ourself, since we need to cast so we can't use the range submit.
-		engine::IPrimativeContext::PrimVertex* pLines = pPrimCon_->addPrimative(2 * numLines,
+		engine::IPrimativeContext::PrimVertex* X_RESTRICT pLines = pPrimCon_->addPrimative(2 * numLines,
 			engine::IPrimativeContext::PrimitiveType::LINELIST);
 
 		for (uint32_t i = 0; i<numLines; i++)
@@ -69,9 +69,9 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 	const uint32_t numTriangles = debugRenderable.getNbTriangles();
 	if (numTriangles)
 	{
-		const physx::PxDebugTriangle* PX_RESTRICT triangles = debugRenderable.getTriangles();
+		const physx::PxDebugTriangle* X_RESTRICT triangles = debugRenderable.getTriangles();
 
-		engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon_->addPrimative(3 * numTriangles,
+		engine::IPrimativeContext::PrimVertex* X_RESTRICT pVerts = pPrimCon_->addPrimative(3 * numTriangles,
 			engine::IPrimativeContext::PrimitiveType::TRIANGLELIST);
 
 		for (uint32_t i = 0; i<numTriangles; i++)
