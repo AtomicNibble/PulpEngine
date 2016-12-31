@@ -11,7 +11,7 @@ class Material;
 
 class IPrimativeContext
 {
-protected:
+public:
 	typedef render::TopoType PrimitiveType;
 
 public:
