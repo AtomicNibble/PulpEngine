@@ -115,6 +115,11 @@ void XMouse::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)
 
 void XMouse::PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame)
 {
+	if (inputFrame.events.size() == inputFrame.events.capacity()) {
+		X_WARNING("Mouse", "Exceeded input frame event limit of: %" PRIuS " dropping event", inputFrame.events.size());
+		return;
+	}
+
 	pSymbol->AssignToEvent(inputFrame.events.AddOne(), GetIInput().GetModifiers());
 }
 
