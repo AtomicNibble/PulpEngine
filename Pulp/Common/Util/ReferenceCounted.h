@@ -31,6 +31,7 @@ template <class T, typename Primative = int32_t>
 class ReferenceCountedInherit : public T
 {
 public:
+	typedef Primative PrimativeType;
 	using T::T;
 
 	// these are const as the class data don't change
