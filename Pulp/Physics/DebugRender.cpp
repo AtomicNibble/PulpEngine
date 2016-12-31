@@ -31,11 +31,15 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 	{
 		const physx::PxDebugPoint* PX_RESTRICT points = debugRenderable.getPoints();
 
+		engine::IPrimativeContext::PrimVertex* pPoints = pPrimCon_->addPrimative(numPoints, 
+			engine::IPrimativeContext::PrimitiveType::POINTLIST);
+
 		for (uint32_t i = 0; i<numPoints; i++)
 		{
 			const physx::PxDebugPoint& point = points[i];
-			const Color8u col = Color8u::hexA(point.color);
-			pPrimCon_->drawPoint(Vec3FromPhysx(point.pos), col);
+
+			pPoints[i].pos = Vec3FromPhysx(point.pos);
+			pPoints[i].color = Color8u::hexA(point.color);
 		}
 	}
 
@@ -45,11 +49,19 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 	{
 		const physx::PxDebugLine* PX_RESTRICT lines = debugRenderable.getLines();
 
+		// lets do the batching ourself, since we need to cast so we can't use the range submit.
+		engine::IPrimativeContext::PrimVertex* pLines = pPrimCon_->addPrimative(2 * numLines,
+			engine::IPrimativeContext::PrimitiveType::LINELIST);
+
 		for (uint32_t i = 0; i<numLines; i++)
 		{
 			const physx::PxDebugLine& line = lines[i];
-			const Color8u col = Color8u::hexA(line.color0);
-			pPrimCon_->drawLineColor(Vec3FromPhysx(line.pos0), col, Vec3FromPhysx(line.pos1), col);
+
+			pLines[0].pos = Vec3FromPhysx(line.pos0);
+			pLines[0].color = Color8u::hexA(line.color0);
+			pLines[1].pos = Vec3FromPhysx(line.pos1);
+			pLines[1].color = Color8u::hexA(line.color1);
+			pLines += 2;
 		}
 	}
 
@@ -59,14 +71,20 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 	{
 		const physx::PxDebugTriangle* PX_RESTRICT triangles = debugRenderable.getTriangles();
 
+		engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon_->addPrimative(3 * numTriangles,
+			engine::IPrimativeContext::PrimitiveType::TRIANGLELIST);
+
 		for (uint32_t i = 0; i<numTriangles; i++)
 		{
 			const physx::PxDebugTriangle& triangle = triangles[i];
+			auto* pTri = &pVerts[i * 3];
 
-			pPrimCon_->drawTriangle(Vec3FromPhysx(triangle.pos0),
-				Vec3FromPhysx(triangle.pos1), 
-				Vec3FromPhysx(triangle.pos2), 
-				Color8u::hexA(triangle.color0));
+			pTri[0].pos = Vec3FromPhysx(triangle.pos0);
+			pTri[0].color = Color8u::hexA(triangle.color0);
+			pTri[1].pos = Vec3FromPhysx(triangle.pos1);
+			pTri[1].color = Color8u::hexA(triangle.color1);
+			pTri[2].pos = Vec3FromPhysx(triangle.pos2);
+			pTri[2].color = Color8u::hexA(triangle.color2);
 		}
 	}
 }
