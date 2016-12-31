@@ -47,11 +47,12 @@ void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
 
 // ---------------------------------------------------------------------------
 
-PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
+PrimativeContext::PrimativeContext(Mode mode, core::MemoryArenaBase* arena) :
 	pRender_(nullptr),
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
-	currentPage_(-1)
+	currentPage_(-1),
+	mode_(mode)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
@@ -188,6 +189,11 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 		}
 	}
 #endif // X_DEBUG
+}
+
+PrimativeContext::Mode PrimativeContext::getMode(void) const
+{
+	return mode_;
 }
 
 void PrimativeContext::reset(void)

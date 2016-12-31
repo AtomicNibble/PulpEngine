@@ -14,14 +14,22 @@ class IPrimativeContext
 public:
 	typedef render::TopoType PrimitiveType;
 
+	enum class Mode {
+		Mode2D,
+		Mode3D,
+	};
+
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
 	static const auto VERTEX_FMT = render::shader::VertexFormat::P3F_T2S_C4B;
 
-public:
+protected:
 	IPrimativeContext();
+public:
 	virtual ~IPrimativeContext();
 
+
+	virtual Mode getMode(void) const X_ABSTRACT;
 	virtual void reset(void) X_ABSTRACT;
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels

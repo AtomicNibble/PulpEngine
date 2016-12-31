@@ -90,7 +90,7 @@ private:
 
 
 public:
-	PrimativeContext(core::MemoryArenaBase* arena);
+	PrimativeContext(Mode mode, core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
 
 	bool createStates(render::IRender* pRender);
@@ -98,6 +98,7 @@ public:
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const;
 
+	Mode getMode(void) const X_FINAL;
 	void reset(void) X_FINAL;
 	
 	bool isEmpty(void) const;
@@ -121,6 +122,7 @@ private:
 	VertexPagesArr vertexPages_;
 
 	int32_t currentPage_;
+	Mode mode_;
 
 	render::PassStateHandle passHandle_;
 	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
