@@ -322,7 +322,7 @@ void XPhysics::release(void)
 }
 
 
-void XPhysics::onTickPreRender(float dtime)
+void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 {
 	stepperType_ = vars_.GetStepperType();
 
@@ -335,7 +335,7 @@ void XPhysics::onTickPreRender(float dtime)
 		if (vars_.DebugDrawCullEnabled()) {
 			physx::PxSceneWriteLock scopedLock(*pScene_);
 
-			pScene_->setVisualizationCullingBox(PxBounds3FromAABB(AABB(Vec3f::zero(), 2000.f)));
+			pScene_->setVisualizationCullingBox(PxBounds3FromAABB(debugVisCullBounds));
 		}
 
 		Stepper* pStepper = getStepper();

@@ -66,7 +66,7 @@ public:
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
-	void onTickPreRender(float dtime) X_FINAL;
+	void onTickPreRender(float dtime, const AABB& debugVisCullBounds) X_FINAL;
 	void onTickPostRender(float dtime) X_FINAL;
 	void render(void) X_FINAL;
 
