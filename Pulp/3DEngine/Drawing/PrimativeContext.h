@@ -3,8 +3,9 @@
 #include "EngineBase.h"
 
 #include <IRenderCommands.h>
-
 #include "IPrimativeContext.h"
+
+#include <Util\PointerFlags.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -12,7 +13,7 @@ X_NAMESPACE_BEGIN(engine)
 class PrimativeContext : public IPrimativeContext, public XEngineBase
 {
 public:
-
+	typedef core::PointerFlags<Material, 3> MaterialWithPageIdx;
 
 	// should i make this POD so growing the push buffer is faster. humm.
 	struct PushBufferEntry
@@ -26,24 +27,19 @@ public:
 		uint16_t numVertices;
 		uint16_t vertexOffs;
 		// 4
-		int32_t pageIdx; // need to try find a good place to put this, 3 bits is enougth to store this.
+	//	int32_t pageIdx; // need to try find a good place to put this, 3 bits is enougth to store this.
 
-		// 4
-	//	PrimRenderFlags flags; // we need these if we have material :| ?
-	//	// 4
-	//	uint32_t _pad;
 
-		// 8
-	//	render::StateHandle stateHandle;
-		// material.
-		// int32_t material;
-		Material* pMaterial;
+	// if i fource all materials to be 8byte aligned i can store the page index in here :D
+	// could props get away with shoving it in the msb's but not as portable and safe.
+		MaterialWithPageIdx material;
+	//	Material* pMaterial;
 	};
 
 #if X_64
 	X_ENSURE_SIZE(PushBufferEntry, 16); // not important, just ensuring padd correct.
 #else
-	X_ENSURE_SIZE(PushBufferEntry, 12); 
+	X_ENSURE_SIZE(PushBufferEntry, 8); 
 #endif
 
 	typedef core::Array<PushBufferEntry> PushBufferArr;
@@ -82,7 +78,7 @@ private:
 	// allowing us to support drawing large amounts but claming back the memory after it's not used.
 	static const uint32_t NUMVERTS_PER_PAGE = 0xaaa * 16;
 	static const uint32_t PAGE_BYTES = NUMVERTS_PER_PAGE * sizeof(PrimVertex);
-	static const uint32_t MAX_PAGES = 8; // lets not go mental.
+	static const uint32_t MAX_PAGES = MaterialWithPageIdx::BIT_MASK + 1; // what ever we can fit in the bits is the max.
 
 	static_assert(NUMVERTS_PER_PAGE < std::numeric_limits<decltype(PushBufferEntry::vertexOffs)>::max(),
 		"Verts per page exceeds numerical limit of offset type");

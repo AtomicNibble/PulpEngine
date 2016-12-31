@@ -282,7 +282,8 @@ void X3DEngine::OnFrameBegin(void)
 				for (size_t x = 0; x < elems.size(); x++)
 				{
 					const auto& elem = elems[x];
-					auto* pMat = elem.pMaterial;
+					Material* pMat = elem.material;
+					uintptr_t pageIdx = elem.material.GetBits();
 
 					// so when we have a material we need select a tech and a permatation.
 					// then we will have a state handle and variable state.
@@ -318,7 +319,7 @@ void X3DEngine::OnFrameBegin(void)
 					pDraw->resourceState = *pVariableState; // slice the sizes into command.
 					// set the vertex handle to correct one.
 					core::zero_object(pDraw->vertexBuffers);
-					pDraw->vertexBuffers[VertexStream::VERT] = vertexPageHandles[elem.pageIdx];
+					pDraw->vertexBuffers[VertexStream::VERT] = vertexPageHandles[pageIdx];
 
 					if (variableStateSize)
 					{

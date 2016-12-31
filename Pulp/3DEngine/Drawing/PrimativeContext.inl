@@ -7,10 +7,9 @@ X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, 
 	Material* pMaterial) :
 	numVertices(numVertices),
 	vertexOffs(vertexOffs),
-	pageIdx(pageIdx),
-	pMaterial(pMaterial)
+	material(pMaterial)
 {
-
+	material.SetBits(pageIdx);
 }
 
 // --------------------------------------------------------

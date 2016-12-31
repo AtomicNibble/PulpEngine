@@ -265,12 +265,14 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType,
 	Material* pMaterial)
 {
+	X_ASSERT_ALIGNMENT(pMaterial, 8, 0); // we require 3 lsb bits for flags.
+
 	auto& curPage = getPage(numVertices);
 	auto& vertexArr = curPage.verts;
 
 	// if the last entry was the same type
 	// just merge the verts in.
-	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().pMaterial == pMaterial &&
+	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().material == pMaterial &&
 		(PrimitiveType::POINTLIST == primType || PrimitiveType::LINELIST == primType || PrimitiveType::TRIANGLELIST == primType))
 	{
 		auto& lastEntry = pushBufferArr_.back();
