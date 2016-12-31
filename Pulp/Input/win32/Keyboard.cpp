@@ -514,7 +514,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 			{
 				if (g_pInputCVars->input_debug)
 				{
-					X_LOG0("Keyboard", "Skipped (%s) state is already down. flags: %i, value: %f", 
+					X_LOG0("Keyboard", "Skipped (%s) state is already down. flags: %i, value: %f",
 						pSymbol->name.c_str(), flags, pSymbol->value);
 				}
 				return;
@@ -554,7 +554,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 		{
 			if (g_pInputCVars->input_debug)
 			{
-				X_LOG0("Keyboard", "Skipped (%s) state has not changed: %s, flags: %i, value: %f", 
+				X_LOG0("Keyboard", "Skipped (%s) state has not changed: %s, flags: %i, value: %f",
 					pSymbol->name.c_str(), InputState::toString(newstate), modifierFlags.ToInt(), pSymbol->value);
 			}
 			return;
@@ -563,7 +563,15 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 		pSymbol->state = newstate;
 
 		bool isChar = false;
-		
+
+		// make sure we have room for event plus possible char event.
+		if (inputFrame.events.size() + 1 == inputFrame.events.capacity())
+		{
+			X_WARNING("Keyboard", "Exceeded input frame event limit of: %" PRIuS " dropping event for symbol: \"%s\"",
+				inputFrame.events.size(), pSymbol->name.c_str());
+			return;
+		}
+
 		InputEvent& event = inputFrame.events.AddOne();
 		event.deviceType = InputDeviceType::KEYBOARD;
 		event.keyId = (KeyId::Enum)virtualKey;
@@ -583,7 +591,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 			X_LOG0("Keyboard", "VK: %i, state: %s, name: %s", virtualKey, InputState::toString(newstate),
 				event.name.c_str());
 		}
-		
+
 		// if it's a char post it again.
 		if (newstate == InputState::PRESSED && isChar)
 		{
