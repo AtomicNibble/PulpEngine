@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(engine)
 size_t CBufferManager::hash::operator()(const RefCountedCBuf& cbh) const
 {
 	auto* pCuf = *cbh.instance();
-	return static_cast<size_t>(pCuf->getHash()); // drop top 32MSB's in 32bit
+	return static_cast<size_t>(pCuf->getHash() & 0xFFFFFFFF); // drop top 32MSB's in 32bit
 }
 
 bool CBufferManager::equal_to::operator()(const RefCountedCBuf& lhs, const RefCountedCBuf& rhs) const
