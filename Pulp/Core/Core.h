@@ -104,7 +104,11 @@ typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
 	core::NoBoundsChecking,
+#if X_ENABLE_MEMORY_SIMPLE_TRACKING
 	core::SimpleMemoryTracking,
+#else
+	core::NoMemoryTracking,
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	core::NoMemoryTagging
 > GlobalArena;
 
@@ -113,11 +117,15 @@ typedef core::MemoryArena<
 	core::GrowingGenericAllocator,
 	core::SingleThreadPolicy,
 	core::NoBoundsChecking,
+#if X_ENABLE_MEMORY_SIMPLE_TRACKING
 	core::SimpleMemoryTracking,
+#else
+	core::NoMemoryTracking,
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	core::NoMemoryTagging
 > StrArena;
 
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
 
 
 class XCore :

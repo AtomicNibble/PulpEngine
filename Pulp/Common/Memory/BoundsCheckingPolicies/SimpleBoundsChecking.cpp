@@ -2,7 +2,7 @@
 
 #include "SimpleBoundsChecking.h"
 
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
+#if X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
 
 X_NAMESPACE_BEGIN(core)
 
@@ -56,4 +56,4 @@ void SimpleBoundsChecking::CheckBack(const void* memory)
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS

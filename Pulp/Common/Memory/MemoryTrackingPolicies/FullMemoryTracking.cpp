@@ -2,7 +2,7 @@
 #include "FullMemoryTracking.h"
 #include "memory\VirtualMem.h"
 
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
+#if X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
 
 X_NAMESPACE_BEGIN(core)
 
@@ -151,4 +151,4 @@ void FullMemoryTracking::OnDeallocation(void* memory)
 
 X_NAMESPACE_END
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS

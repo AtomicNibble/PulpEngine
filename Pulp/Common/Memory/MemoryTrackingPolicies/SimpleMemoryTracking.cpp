@@ -1,7 +1,7 @@
 #include "EngineCommon.h"
-
 #include "SimpleMemoryTracking.h"
 
+#if X_ENABLE_MEMORY_SIMPLE_TRACKING
 
 X_NAMESPACE_BEGIN(core)
 
@@ -23,3 +23,4 @@ SimpleMemoryTracking::~SimpleMemoryTracking(void)
 
 X_NAMESPACE_END
 
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING

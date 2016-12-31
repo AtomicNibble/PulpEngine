@@ -3,7 +3,7 @@
 #ifndef X_FULLMEMORYTRACKING_H_
 #define X_FULLMEMORYTRACKING_H_
 
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
+#if X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
 
 #include "Memory/HeapArea.h"
 #include "Memory/MemoryArena.h"
@@ -87,6 +87,6 @@ private:
 X_NAMESPACE_END
 
 
-#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES_DEFS
 
 #endif // !X_FULLMEMORYTRACKING_H_

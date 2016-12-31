@@ -62,7 +62,7 @@ typedef core::MemoryArena<
 	core::NoBoundsChecking,
 	core::NoMemoryTracking,
 	core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
 > VarPool;
 
 struct equal_to_case_insen
