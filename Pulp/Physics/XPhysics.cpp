@@ -243,10 +243,12 @@ bool XPhysics::init(void)
 		return false;
 	}
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
+	vars_.SetScene(pScene_);
+
+//	physx::PxSceneWriteLock scopedLock(*pScene_);
+//	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
 //	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, vars_.DebugDrawEnabled() ? vars_.DebugDrawScale() : 0.0f);
-	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+//	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
 
 	pControllerManager_ = PxCreateControllerManager(*pScene_);
