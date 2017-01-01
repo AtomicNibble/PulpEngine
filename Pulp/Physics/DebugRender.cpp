@@ -65,9 +65,12 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 		// lets do the batching ourself, since we need to cast so we can't use the range submit.
 		while (numLines)
 		{
-			const uint32_t lineBatchSize = core::Min(maxVertsPerBatch, numLines * 2);
+			const uint32_t lineBatchVertSize = core::Min(maxVertsPerBatch, numLines * 2);
+			const uint32_t lineBatchSize = lineBatchVertSize >> 1;
 
-			engine::IPrimativeContext::PrimVertex* X_RESTRICT pLines = pPrimCon_->addPrimative(lineBatchSize,
+			X_ASSERT(lineBatchSize * 2 == lineBatchVertSize, "")();
+
+			engine::IPrimativeContext::PrimVertex* X_RESTRICT pLines = pPrimCon_->addPrimative(lineBatchVertSize,
 				engine::IPrimativeContext::PrimitiveType::LINELIST);
 
 			for (uint32_t i = 0; i < lineBatchSize; i++)
@@ -81,8 +84,8 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 				pLines += 2;
 			}
 
-			lines += (lineBatchSize >> 1);
-			numLines -= (lineBatchSize >> 1);
+			lines += lineBatchSize;
+			numLines -= lineBatchSize;
 		}
 	}
 
@@ -94,9 +97,12 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 
 		while (numTriangles)
 		{
-			const uint32_t triBatchSize = core::Min(maxVertsPerBatch, numTriangles * 3);
+			const uint32_t triBatchVertSize = core::Min(maxVertsPerBatch, numTriangles * 3);
+			const uint32_t triBatchSize = triBatchVertSize / 3;
 
-			engine::IPrimativeContext::PrimVertex* X_RESTRICT pVerts = pPrimCon_->addPrimative(triBatchSize,
+			X_ASSERT(triBatchSize * 3 == triBatchVertSize, "")();
+
+			engine::IPrimativeContext::PrimVertex* X_RESTRICT pVerts = pPrimCon_->addPrimative(triBatchVertSize,
 				engine::IPrimativeContext::PrimitiveType::TRIANGLELIST);
 
 			for (uint32_t i = 0; i < triBatchSize; i++)
@@ -116,8 +122,8 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 				pVerts += 3;
 			}
 
-			triangles += (triBatchSize / 3);
-			numTriangles -= (triBatchSize / 3);
+			triangles += triBatchSize;
+			numTriangles -= triBatchSize;
 		}
 	}
 }
