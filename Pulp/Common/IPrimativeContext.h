@@ -27,8 +27,8 @@ protected:
 	IPrimativeContext();
 public:
 	virtual ~IPrimativeContext();
-
-
+	
+	virtual size_t maxVertsPerPrim(void) const X_ABSTRACT;
 	virtual Mode getMode(void) const X_ABSTRACT;
 	virtual void reset(void) X_ABSTRACT;
 

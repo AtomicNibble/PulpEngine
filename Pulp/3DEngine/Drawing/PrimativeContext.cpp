@@ -191,6 +191,11 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 #endif // X_DEBUG
 }
 
+size_t PrimativeContext::maxVertsPerPrim(void) const
+{
+	return NUMVERTS_PER_PAGE;
+}
+
 PrimativeContext::Mode PrimativeContext::getMode(void) const
 {
 	return mode_;

@@ -98,6 +98,7 @@ public:
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const;
 
+	size_t maxVertsPerPrim(void) const X_FINAL;
 	Mode getMode(void) const X_FINAL;
 	void reset(void) X_FINAL;
 	
