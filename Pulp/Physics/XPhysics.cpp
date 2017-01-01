@@ -136,7 +136,7 @@ void XPhysics::registerCmds(void)
 		"Steps one frame in the simulation");
 
 	ADD_COMMAND_MEMBER("phys_toggle_visualization", this, XPhysics, &XPhysics::cmd_ToggleVis, core::VarFlag::SYSTEM,
-		"Toggles physics visualization");
+		"Toggles physics visualization, requires 'phys_draw_debug_scale' to be none negative");
 }
 
 bool XPhysics::init(void)
