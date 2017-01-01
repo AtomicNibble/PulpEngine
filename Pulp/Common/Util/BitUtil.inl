@@ -440,6 +440,28 @@ namespace bitUtil
 				return (static_cast<T>(static_cast<uint16_t>(value) & (~(1u << whichBit))));
 			}
 
+			template <typename T>
+			static inline constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
+			{
+				static_assert(sizeof(T) == 2 "sizeof(T) is not 2 bytes.");
+
+				return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
+			}
+
+			template <typename T>
+			static inline T NextPowerOfTwo(T v)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+
+				--v;
+				v |= v >> 1;
+				v |= v >> 2;
+				v |= v >> 4;
+				v |= v >> 8;
+				++v;
+
+				return v;
+			}
 
 			template<typename T>
 			static inline bool isSignBitSet(T value)
