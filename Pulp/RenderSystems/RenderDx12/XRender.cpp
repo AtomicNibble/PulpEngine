@@ -620,7 +620,14 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					X_ASSERT(pCBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pCBuf->getUsage());
 
-					context.writeBuffer(pCBuf->getBuf(), 0, updateCB.pData, updateCB.size);
+					if (core::pointerUtil::IsAligned(updateCB.pData, 16, 0))
+					{
+						context.writeBuffer(pCBuf->getBuf(), 0, updateCB.pData, updateCB.size);
+					}
+					else
+					{
+						context.writeBufferUnAligned(pCBuf->getBuf(), 0, updateCB.pData, updateCB.size);
+					}
 				}
 				break;
 				case Commands::Command::COPY_INDEXES_BUF_DATA:
