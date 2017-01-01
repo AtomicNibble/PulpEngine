@@ -172,7 +172,11 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const XTextDrawConect& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
-	X_UNUSED(pEnd);
+	const size_t textLen = (pEnd - pBegin);
+
+	if (!textLen) {
+		return;
+	}
 
 	if (!pMaterial_ && !CreateDeviceTexture()) {
 		return;
