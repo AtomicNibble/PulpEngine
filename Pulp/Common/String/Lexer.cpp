@@ -419,15 +419,17 @@ bool XLexer::ReadToken(XLexToken& token)
 		return true;
 	}
 
-	if (BytesLeft() == 0) {
-		return false;
-	}
-
 	lastLine_ = curLine_;
 
 	if (!ReadWhiteSpace()) {
 		return false;
 	}
+
+	if (isEOF()) {
+		return false;
+	}
+
+	X_ASSERT(current_< end_, "Trying to read from end of buffer")(current_, end_);
 
 	// save script pointer
 	lastp_ = current_;
