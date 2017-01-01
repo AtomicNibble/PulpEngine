@@ -144,7 +144,7 @@ bool XParser::ExpectTokenString(const char* string)
 {
 	XLexToken token;
 
-	if (!ReadToken(token)) {
+	if (!XParser::ReadToken(token)) {
 		X_LOG0("Parser", "couldn't find expected '%s'", string);
 		return false;
 	}
@@ -161,7 +161,7 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
 	PunctuationId::Enum puncId, XLexToken& token)
 {
 
-	if (!ReadToken(token)) {
+	if (!XParser::ReadToken(token)) {
 		Error("couldn't read expected token");
 		return false;
 	}
@@ -1061,7 +1061,7 @@ bool XParser::CheckTokenString(const char* string)
 {
 	XLexToken tok;
 
-	if (!ReadToken(tok)) {
+	if (!XParser::ReadToken(tok)) {
 		return false;
 	}
 	//if the token is available
