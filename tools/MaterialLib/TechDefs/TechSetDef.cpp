@@ -118,68 +118,68 @@ bool TechSetDef::parseFile(core::XParser& lex)
 		{
 			case "BlendState"_fnv1a:
 				if (!parseBlendState(lex)) {
-					X_ERROR("TestDefs", "Failed to parse BlendState");
+					X_ERROR("TechDef", "Failed to parse BlendState");
 					return false;
 				}
 				break;
 
 			case "StencilState"_fnv1a:
 				if (!parseStencilState(lex)) {
-					X_ERROR("TestDefs", "Failed to parse StencilState");
+					X_ERROR("TechDef", "Failed to parse StencilState");
 					return false;
 				}
 				break;
 			case "State"_fnv1a:
 				if (!parseState(lex)) {
-					X_ERROR("TestDefs", "Failed to parse State");
+					X_ERROR("TechDef", "Failed to parse State");
 					return false;
 				}
 				break;
 			case "RenderFlags"_fnv1a:
 				if (!parseRenderFlags(lex)) {
-					X_ERROR("TestDefs", "Failed to parse RenderFlags");
+					X_ERROR("TechDef", "Failed to parse RenderFlags");
 					return false;
 				}
 				break;
 			case "Technique"_fnv1a:
 				if (!parseTechnique(lex)) {
-					X_ERROR("TestDefs", "Failed to parse Technique");
+					X_ERROR("TechDef", "Failed to parse Technique");
 					return false;
 				}
 				break;
 			case "VertexShader"_fnv1a:
 				if (!parseVertexShader(lex)) {
-					X_ERROR("TestDefs", "Failed to parse VertexShader");
+					X_ERROR("TechDef", "Failed to parse VertexShader");
 					return false;
 				}
 				break;
 			case "PixelShader"_fnv1a:
 				if (!parsePixelShader(lex)) {
-					X_ERROR("TestDefs", "Failed to parse PixelShader");
+					X_ERROR("TechDef", "Failed to parse PixelShader");
 					return false;
 				}
 				break;
 			case "HullShader"_fnv1a:
 				if (!parseHullShader(lex)) {
-					X_ERROR("TestDefs", "Failed to parse HullShader");
+					X_ERROR("TechDef", "Failed to parse HullShader");
 					return false;
 				}
 				break;
 			case "DomainShader"_fnv1a:
 				if (!parseDomainShader(lex)) {
-					X_ERROR("TestDefs", "Failed to parse DomainShader");
+					X_ERROR("TechDef", "Failed to parse DomainShader");
 					return false;
 				}
 				break;
 			case "GeometryShader"_fnv1a:
 				if (!parseGeoShader(lex)) {
-					X_ERROR("TestDefs", "Failed to parse GeometryShader");
+					X_ERROR("TechDef", "Failed to parse GeometryShader");
 					return false;
 				}
 				break;
 			case "PrimitiveType"_fnv1a:
 				if (!parsePrimitiveType(lex)) {
-					X_ERROR("TestDefs", "Failed to parse PrimitiveType");
+					X_ERROR("TechDef", "Failed to parse PrimitiveType");
 					return false;
 				}
 				break;
@@ -187,55 +187,55 @@ bool TechSetDef::parseFile(core::XParser& lex)
 			// params.
 			case "float1"_fnv1a:
 				if (!parseParamFloat1(lex)) {
-					X_ERROR("TestDefs", "Failed to parse float1");
+					X_ERROR("TechDef", "Failed to parse float1");
 					return false;
 				}
 				break;
 			case "float2"_fnv1a:
 				if (!parseParamFloat2(lex)) {
-					X_ERROR("TestDefs", "Failed to parse float2");
+					X_ERROR("TechDef", "Failed to parse float2");
 					return false;
 				}
 				break;
 			case "float4"_fnv1a:
 				if (!parseParamFloat4(lex)) {
-					X_ERROR("TestDefs", "Failed to parse float4");
+					X_ERROR("TechDef", "Failed to parse float4");
 					return false;
 				}
 				break;
 			case "bool"_fnv1a:
 				if (!parseParamBool(lex)) {
-					X_ERROR("TestDefs", "Failed to parse bool");
+					X_ERROR("TechDef", "Failed to parse bool");
 					return false;
 				}
 				break;
 			case "int"_fnv1a:
 				if (!parseParamInt(lex)) {
-					X_ERROR("TestDefs", "Failed to parse int");
+					X_ERROR("TechDef", "Failed to parse int");
 					return false;
 				}
 				break;
 			case "Texture"_fnv1a:
 				if (!parseParamTexture(lex)) {
-					X_ERROR("TestDefs", "Failed to parse Texture");
+					X_ERROR("TechDef", "Failed to parse Texture");
 					return false;
 				}
 				break;
 			case "Sampler"_fnv1a:
 				if (!parseParamSampler(lex)) {
-					X_ERROR("TestDefs", "Failed to parse Sampler");
+					X_ERROR("TechDef", "Failed to parse Sampler");
 					return false;
 				}
 				break;
 			case "Color"_fnv1a:
 				if (!parseParamColor(lex)) {
-					X_ERROR("TestDefs", "Failed to parse Color");
+					X_ERROR("TechDef", "Failed to parse Color");
 					return false;
 				}
 				break;
 
 			default:
-				X_ERROR("TestDefs", "Unexpected token \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(),
+				X_ERROR("TechDef", "Unexpected token \"%.*s\" File: %s:%" PRId32, token.length(), token.begin(),
 					lex.GetFileName(), lex.GetLineNumber());
 				return false;			
 		}
@@ -347,7 +347,7 @@ bool TechSetDef::parseBlendType(core::XParser& lex, render::BlendType::Enum& ble
 	}
 
 	if (token.GetType() != core::TokenType::NAME) {
-		X_ERROR("TestDefs", "Expected name token for BlendType. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected name token for BlendType. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -371,7 +371,7 @@ bool TechSetDef::parseBlendOp(core::XParser& lex, render::BlendOp::Enum& blendOp
 	}
 
 	if (token.GetType() != core::TokenType::NAME) {
-		X_ERROR("TestDefs", "Expected name token for blendOp. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected name token for blendOp. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -391,7 +391,7 @@ bool TechSetDef::parseWriteChannels(core::XParser& lex, render::WriteMaskFlags& 
 	}
 
 	if (token.GetType() != core::TokenType::STRING) {
-		X_ERROR("TestDefs", "Expected string token for writeChannel mask. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected string token for writeChannel mask. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -487,7 +487,7 @@ bool TechSetDef::parseStencilFunc(core::XParser& lex, render::StencilFunc::Enum&
 	}
 
 	if (token.GetType() != core::TokenType::NAME) {
-		X_ERROR("TestDefs", "Expected name token for stencilFunc. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected name token for stencilFunc. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -507,7 +507,7 @@ bool TechSetDef::parseStencilOp(core::XParser& lex, render::StencilOperation::En
 	}
 
 	if (token.GetType() != core::TokenType::NAME) {
-		X_ERROR("TestDefs", "Expected name token for stencilOp. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected name token for stencilOp. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -703,7 +703,7 @@ bool TechSetDef::parseStencilRef(core::XParser& lex, uint32_t& stencilRef)
 
 
 	if (token.GetType() != core::TokenType::NUMBER) {
-		X_ERROR("TestDefs", "Expected numeric token for stencilRef. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected numeric token for stencilRef. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -723,7 +723,7 @@ bool TechSetDef::parseCullMode(core::XParser& lex, render::CullType::Enum& cullO
 	}
 
 	if (token.GetType() != core::TokenType::NAME) {
-		X_ERROR("TestDefs", "Expected name token for cullMode. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected name token for cullMode. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -743,7 +743,7 @@ bool TechSetDef::parseDepthTest(core::XParser& lex, render::DepthFunc::Enum& dep
 	}
 
 	if (token.GetType() != core::TokenType::NAME) {
-		X_ERROR("TestDefs", "Expected name token for depthFunc. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected name token for depthFunc. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -763,7 +763,7 @@ bool TechSetDef::parsePolyOffset(core::XParser& lex, MaterialPolygonOffset::Enum
 	}
 
 	if (token.GetType() != core::TokenType::STRING) {
-		X_ERROR("TestDefs", "Expected string token for polyOffset. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected string token for polyOffset. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -1421,7 +1421,7 @@ bool TechSetDef::parseParamTextureSlot(core::XParser& lex, render::TextureSlot::
 	}
 
 	if (token.GetType() != core::TokenType::STRING) {
-		X_ERROR("TestDefs", "Expected string token for TextureSlot. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected string token for TextureSlot. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -1862,7 +1862,7 @@ bool TechSetDef::parseName(core::XParser& lex, core::string& name, core::string&
 	}
 
 	if (token.GetType() != core::TokenType::STRING) {
-		X_ERROR("TestDefs", "Expected string token for name. Line: %" PRIi32, lex.GetLineNumber());
+		X_ERROR("TechDef", "Expected string token for name. Line: %" PRIi32, lex.GetLineNumber());
 		return false;
 	}
 
@@ -1885,12 +1885,12 @@ bool TechSetDef::parseName(core::XParser& lex, core::string& name, core::string&
 		{
 			// got a parent name.
 			if (!lex.ReadToken(token)) {
-				X_ERROR("TestDefs", "Failed to read parent name. Line: %" PRIi32, lex.GetLineNumber());
+				X_ERROR("TechDef", "Failed to read parent name. Line: %" PRIi32, lex.GetLineNumber());
 				return false;
 			}
 
 			if (token.GetType() != core::TokenType::STRING && token.GetType() != core::TokenType::NAME) {
-				X_ERROR("TestDefs", "Expected string/name token for parent name. Line: %" PRIi32, lex.GetLineNumber());
+				X_ERROR("TechDef", "Expected string/name token for parent name. Line: %" PRIi32, lex.GetLineNumber());
 				return false;
 			}
 
@@ -2009,12 +2009,12 @@ bool TechSetDef::parseNameInline(core::XParser& lex, core::string& parentName)
 		{
 			// got a parent name.
 			if (!lex.ReadToken(token)) {
-				X_ERROR("TestDefs", "Failed to read parent name. File: %s:%" PRIi32, lex.GetFileName(), lex.GetLineNumber());
+				X_ERROR("TechDef", "Failed to read parent name. File: %s:%" PRIi32, lex.GetFileName(), lex.GetLineNumber());
 				return false;
 			}
 
 			if (token.GetType() != core::TokenType::STRING && token.GetType() != core::TokenType::NAME) {
-				X_ERROR("TestDefs", "Expected string/name token for parent name. File: %s:%" PRIi32, lex.GetFileName(), lex.GetLineNumber());
+				X_ERROR("TechDef", "Expected string/name token for parent name. File: %s:%" PRIi32, lex.GetFileName(), lex.GetLineNumber());
 				return false;
 			}
 
