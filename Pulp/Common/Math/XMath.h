@@ -119,8 +119,6 @@ struct math<int>
 	X_INLINE static  int	ceil(int x)					{ return ::ceil(double(x)); }
 	X_INLINE static  int	abs(int x)					{ return ::fabs(double(x)); }
 	X_INLINE static  int	floor(int x)				{ return ::floor(double(x)); }
-	X_INLINE static  constexpr float  max(float x, float y) { return (x > y) ? x : y; }
-	X_INLINE static  constexpr float  min(float x, float y) { return (x < y) ? x : y; }
 	X_INLINE static  constexpr int	  clamp(int x, int min = 0, int max = 1) { return (x < min) ? min : ((x > max) ? max : x); }
 
 	X_INLINE static int32 isneg(int32 x) 
@@ -135,6 +133,10 @@ struct math<int>
 		return (y & (~mask)) | (x & mask);
 	}
 
+	X_INLINE static constexpr int max(int x, int y)
+	{
+		return (x > y) ? x : y;
+	}
 };
 
 X_ENABLE_WARNING(4244)
