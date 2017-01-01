@@ -596,6 +596,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 {
 	env_.pLog = X_NEW_ALIGNED( core::XLog, g_coreArena, "LogSystem", 8);
 
+#if X_ENABLE_LOGGING
 	if (env_.pLog) {
 		if (initParams.bVsLog)
 		{
@@ -623,6 +624,9 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 		}
 	}
 
+#else
+	X_UNUSED(initParams);
+#endif
 	return env_.pLog != nullptr;
 }
 
