@@ -949,6 +949,7 @@
     <Natvis Include="Array.natvis" />
     <Natvis Include="FixedArray.natvis" />
     <Natvis Include="Math.natvis" />
+    <Natvis Include="Stack.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{07328CCB-F9CC-4967-861E-272BCA0CAB04}</ProjectGuid>

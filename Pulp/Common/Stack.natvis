@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::core::Stack&lt;*&gt;">
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">current_ - start_</Item>
+      <Item Name="[capacity]" ExcludeView="simple">end_ - start_</Item>
+      <Item Name="[top]" ExcludeView="simple">current_ - 1</Item>
+      <Item Name="[start]" ExcludeView="simple">start_</Item>
+      <Item Name="[end]" ExcludeView="simple">end_</Item>
+      <Item Name="[write]" ExcludeView="simple">current_</Item>
+      <Item Name="[arena]" ExcludeView="simple">arena_</Item>
+      <ArrayItems>
+        <Size>current_ - start_</Size>
+        <ValuePointer>($T1*)start_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

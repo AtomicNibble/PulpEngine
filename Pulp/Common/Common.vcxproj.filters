@@ -1826,5 +1826,8 @@
     <Natvis Include="Math.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="Stack.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>
