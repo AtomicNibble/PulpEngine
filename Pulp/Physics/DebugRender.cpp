@@ -78,14 +78,18 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 		for (uint32_t i = 0; i<numTriangles; i++)
 		{
 			const physx::PxDebugTriangle& triangle = triangles[i];
-			auto* pTri = &pVerts[i * 3];
+			auto* pTri = pVerts;
 
 			pTri[0].pos = Vec3FromPhysx(triangle.pos0);
 			pTri[0].color = Color8u::hexA(triangle.color0);
+
 			pTri[1].pos = Vec3FromPhysx(triangle.pos1);
 			pTri[1].color = Color8u::hexA(triangle.color1);
+
 			pTri[2].pos = Vec3FromPhysx(triangle.pos2);
 			pTri[2].color = Color8u::hexA(triangle.color2);
+
+			pVerts += 3;
 		}
 	}
 }
