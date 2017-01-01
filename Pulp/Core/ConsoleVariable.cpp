@@ -112,9 +112,10 @@ void CVarBase::Release()
 	this->pConsole_->UnregisterVariable(GetName());
 }
 
-void CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
+ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 {
 	changeFunc_ = changeFunc;
+	return this;
 }
 
 ConsoleVarFunc CVarBase::GetOnChangeCallback()

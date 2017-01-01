@@ -168,7 +168,7 @@ struct ICVar
 	virtual void Release(void) X_ABSTRACT;
 	virtual void Reset(void) X_ABSTRACT; // reset to default value.
 
-	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_ABSTRACT;
+	virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_ABSTRACT;
 	virtual ConsoleVarFunc GetOnChangeCallback(void) X_ABSTRACT;
 };
 

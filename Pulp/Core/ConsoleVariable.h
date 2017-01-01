@@ -32,7 +32,7 @@ public:
 	virtual void ForceSet(const char* s) X_OVERRIDE;
 	virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
+	virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
 	virtual ConsoleVarFunc GetOnChangeCallback(void) X_OVERRIDE;
 
 	virtual void OnModified(void);
