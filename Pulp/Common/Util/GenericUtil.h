@@ -48,7 +48,7 @@ X_INLINE void copy_object(T& dest, T& src)
 }
 
 template<typename T>
-X_INLINE T X_FOURCC( char a, char b, char c, char d )
+X_INLINE constexpr T X_FOURCC( char a, char b, char c, char d )
 {
 	static_assert(sizeof(T) == 4, "error size of fourcc must be 4");
 	return (T)(a | b << 8 | c << 16 | d << 24);
@@ -129,7 +129,7 @@ inline T exchange(T& val, OtherT&& newVal)
 }
 
 template <typename T, typename T2>
-inline float PercentageOf(const T& sub, const T2& of)
+inline constexpr float PercentageOf(const T& sub, const T2& of)
 {
 	return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
 }
