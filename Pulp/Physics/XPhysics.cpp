@@ -143,9 +143,17 @@ bool XPhysics::init(void)
 {
 	X_LOG0("PhysicsSys", "Starting");
 
-#if 0 // 1 if you just wanna edit it in code.
+
+#if X_DEBUG
+	gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
+#elif X_RELEASE
+	gDelayLoadHook.forceConfig(DelayLoadHook::Config::Profile);
+#elif X_SUPER
 	gDelayLoadHook.forceConfig(DelayLoadHook::Config::Release);
 #else
+#error "Unknown config"
+#endif
+
 	{
 		const char* pDllOverrideStr = vars_.getDllOverrideStr();
 		const size_t len = core::strUtil::strlen(pDllOverrideStr);
@@ -178,7 +186,7 @@ bool XPhysics::init(void)
 			}
 		}
 	}
-#endif
+
 
 	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
 	physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);
