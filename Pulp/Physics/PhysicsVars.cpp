@@ -11,7 +11,8 @@ X_NAMESPACE_BEGIN(physics)
 PhysXVars::PhysXVars() :
 	pScene_(nullptr),
 	pVarScratchBufSize_(nullptr),
-	pVarStepperType_(nullptr)
+	pVarStepperType_(nullptr),
+	pVarDebugDraw_(nullptr)
 {
 	scratchBufferDefaultSize_ = 16; // 16 KiB
 	stepperType_ = StepperType::FIXED_STEPPER;
@@ -26,21 +27,23 @@ PhysXVars::PhysXVars() :
 
 void PhysXVars::RegisterVars(void)
 {
+	core::ConsoleVarFunc del;
+
 	pVarScratchBufSize_ = ADD_CVAR_INT("phys_scratch_buf_size", scratchBufferDefaultSize_, 0, std::numeric_limits<int32_t>::max(),
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
 		"Size of the scratch buffer in kib, must be a multiple of 16.");
 
+	del.Bind<PhysXVars, &PhysXVars::Var_OnStepperStyleChange>(this);
+
 	pVarStepperType_ = ADD_CVAR_INT("phys_stepper_style", stepperType_, 0, StepperType::ENUM_COUNT - 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Stepper style for physics update. 0=debug, 1=fixed, 2=inverted-fixed, 3=variable.");
+		"Stepper style for physics update. 0=debug, 1=fixed, 2=inverted-fixed, 3=variable.")->SetOnChangeCallback(del);
 
-	core::ConsoleVarFunc del;
-	del.Bind<PhysXVars, &PhysXVars::Var_OnStepperStyleChange>(this);
-	pVarStepperType_->SetOnChangeCallback(del);
+	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugDrawChange>(this);
 
 	// toggle drawing on off. seperate to the scales.
-	ADD_CVAR_REF("phys_draw_debug", debugDraw_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
-		"Enable drawing of physics debug shapes");
+	pVarDebugDraw_ = ADD_CVAR_REF("phys_draw_debug", debugDraw_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable drawing of physics debug shapes")->SetOnChangeCallback(del);
 
 	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugUseCullChange>(this);
 
@@ -128,6 +131,43 @@ uint32_t PhysXVars::ScratchBufferSize(void) const
 	return safe_static_cast<uint32_t, int32_t>(pVarScratchBufSize_->GetInteger() << 10);
 }
 
+void PhysXVars::SetDebugDrawEnabled(bool enable)
+{
+	if (pVarDebugDraw_) {
+		pVarDebugDraw_->Set(enable ? 1 : 0);
+	}
+	else {
+		debugDraw_ = enable ? 1 : 0;
+	}
+}
+
+void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
+{
+	X_UNUSED(pVar);
+	// so this is like my var to turn my drawing on / off.
+	// but we should also turn off the physx scale to increase performance.
+	// i don't think i'll bother changing the console var value for 'phys_draw_debug_scale'
+	// this can just be a slient internal change.
+
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	if (debugDraw_)
+	{
+		// check current value.
+		if (scaleVars_[physx::PxVisualizationParameter::eSCALE])
+		{
+			float scale = scaleVars_[physx::PxVisualizationParameter::eSCALE]->GetFloat();
+
+			// maybe I should actuall always update 'phys_draw_debug_scale' to 1 here.
+			// since you are toggling drawing :/
+			pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, scale);
+		}
+	}
+	else
+	{
+		pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 0);
+	}
+}
 
 void PhysXVars::Var_OnScaleChanged(core::ICVar* pVar)
 {

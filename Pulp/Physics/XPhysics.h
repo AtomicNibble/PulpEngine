@@ -158,7 +158,6 @@ private:
 	Stepper* getStepper(void);
 
 	void setScratchBlockSize(size_t size);
-	void toggleVisualizationParam(physx::PxVisualizationParameter::Enum param);
 	void setVisualizationCullingBox(AABB& box);
 
 private:

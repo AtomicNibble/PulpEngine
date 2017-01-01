@@ -1107,15 +1107,6 @@ void XPhysics::setScratchBlockSize(size_t size)
 }
 
 
-void XPhysics::toggleVisualizationParam(physx::PxVisualizationParameter::Enum param)
-{
-	if (pScene_) {
-		physx::PxSceneWriteLock scopedLock(*pScene_);
-		const bool visualization = pScene_->getVisualizationParameter(param) == 1.0f;
-		pScene_->setVisualizationParameter(param, visualization ? 0.0f : 1.0f);
-	}
-}
-
 void XPhysics::setVisualizationCullingBox(AABB& box)
 {
 	if (pScene_) {
@@ -1156,7 +1147,9 @@ void XPhysics::cmd_ToggleVis(core::IConsoleCmdArgs* pArgs)
 {
 	X_UNUSED(pArgs);
 
-	toggleVisualizationParam(physx::PxVisualizationParameter::eSCALE);
+	// we want to turn off eScale but we need todo it via vars.
+	// otherwise the var value is out of 
+	vars_.SetDebugDrawEnabled(!vars_.DebugDrawEnabled());
 }
 
 

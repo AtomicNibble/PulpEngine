@@ -24,7 +24,10 @@ public:
 	X_INLINE int32_t DebugDrawEnabled(void) const;
 	X_INLINE int32_t DebugDrawCullEnabled(void) const;
 
+	void SetDebugDrawEnabled(bool enable);
+
 private:
+	void Var_OnDebugDrawChange(core::ICVar* pVar);
 	void Var_OnScaleChanged(core::ICVar* pVar);
 	void Var_OnDebugUseCullChange(core::ICVar* pVar);
 	void Var_OnStepperStyleChange(core::ICVar* pVar);
@@ -34,6 +37,7 @@ private:
 
 	core::ICVar* pVarScratchBufSize_;
 	core::ICVar* pVarStepperType_;
+	core::ICVar* pVarDebugDraw_;
 
 	int32_t scratchBufferDefaultSize_;
 	StepperType::Enum stepperType_;
