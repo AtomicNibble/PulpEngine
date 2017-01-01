@@ -614,7 +614,15 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					break;
 				}
 				case Commands::Command::COPY_CONST_BUF_DATA:
-					break;
+				{
+					const Commands::CopyConstantBufferData& updateCB = *reinterpret_cast<const Commands::CopyConstantBufferData*>(pCmd);
+					auto pCBuf = pBuffMan_->CBFromHandle(updateCB.constantBuffer);
+
+					X_ASSERT(pCBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pCBuf->getUsage());
+
+					context.writeBuffer(pCBuf->getBuf(), 0, updateCB.pData, updateCB.size);
+				}
+				break;
 				case Commands::Command::COPY_INDEXES_BUF_DATA:
 				{
 					const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
