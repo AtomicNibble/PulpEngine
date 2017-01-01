@@ -11,10 +11,7 @@
     <AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\Physx\;$(SolutionDir)..\3rdparty\Physx_libs\lib\$(PlatformName)\;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
   </Link>
         <PostBuildEvent>
-      <Command>xcopy /y /d  "$(ProjectDir)..\..\3rdparty\Physx_libs\bin\$(PlatformName)\PhysX.dll" "$(OutDir)"
-        xcopy /y /d  "$(ProjectDir)..\..\3rdparty\Physx_libs\bin\$(PlatformName)\PhysXCharacterKinematic.dll" "$(OutDir)"
-        xcopy /y /d  "$(ProjectDir)..\..\3rdparty\Physx_libs\bin\$(PlatformName)\PhysXCommon.dll" "$(OutDir)"
-        xcopy /y /d  "$(ProjectDir)..\..\3rdparty\Physx_libs\bin\$(PlatformName)\PhysXCooking.dll" "$(OutDir)"
+      <Command>xcopy /y /d  "$(ProjectDir)..\..\3rdparty\Physx_libs\bin\$(PlatformName)\PhysX*.dll" "$(OutDir)"
       xcopy /y /d  "$(ProjectDir)..\..\3rdparty\Physx_libs\bin\$(PlatformName)\nvToolsExt*.dll" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
