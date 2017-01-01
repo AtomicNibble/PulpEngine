@@ -124,7 +124,7 @@ CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wcha
 	size_t length = union_cast<size_t>(pEnd - pBegin);
 	int32_t updated = 0;
 
-	X_ASSERT(pEnd > pBegin, "Invalid begin end pair")(pBegin, pEnd);
+	X_ASSERT(pEnd >= pBegin, "Invalid begin end pair")(pBegin, pEnd);
 
 	for (size_t i = 0; i < length; i++)
 	{
