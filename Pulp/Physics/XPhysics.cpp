@@ -9,6 +9,8 @@
 #include <IConsole.h>
 #include <I3DEngine.h>
 
+#include <Hashing\Fnva1Hash.h>
+
 #include <pvd\PxVisualDebugger.h>
 #include <common\windows\PxWindowsDelayLoadHook.h>
 #include <characterkinematic\PxControllerManager.h>
@@ -140,6 +142,43 @@ void XPhysics::registerCmds(void)
 bool XPhysics::init(void)
 {
 	X_LOG0("PhysicsSys", "Starting");
+
+#if 0 // 1 if you just wanna edit it in code.
+	gDelayLoadHook.forceConfig(DelayLoadHook::Config::Release);
+#else
+	{
+		const char* pDllOverrideStr = vars_.getDllOverrideStr();
+		const size_t len = core::strUtil::strlen(pDllOverrideStr);
+
+		// i might move this str to enum logic into PhysicsVars.cpp 
+		// just dpeends if i wanna include the delay load def in there.
+		if (len)
+		{
+			using namespace core::Hash::Fnva1Literals;
+			switch (core::Hash::Fnv1aHash(pDllOverrideStr, len))
+			{
+				case "none"_fnv1a:
+					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Normal);
+					break;
+				case "debug"_fnv1a:
+					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Debug);
+					break;
+				case "checked"_fnv1a:
+					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
+					break;
+				case "profile"_fnv1a:
+					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Profile);
+					break;
+				case "release"_fnv1a:
+					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Release);
+					break;
+				default:
+					X_WARNING("Physics", "Invalid dll ovverride value: \"%s\"", pDllOverrideStr);
+					break;
+			}
+		}
+	}
+#endif
 
 	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
 	physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);

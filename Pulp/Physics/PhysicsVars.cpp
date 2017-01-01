@@ -10,6 +10,7 @@ X_NAMESPACE_BEGIN(physics)
 
 PhysXVars::PhysXVars() :
 	pScene_(nullptr),
+	pVarDllOverride_(nullptr),
 	pVarScratchBufSize_(nullptr),
 	pVarStepperType_(nullptr),
 	pVarDebugDraw_(nullptr)
@@ -28,6 +29,9 @@ PhysXVars::PhysXVars() :
 void PhysXVars::RegisterVars(void)
 {
 	core::ConsoleVarFunc del;
+
+	pVarDllOverride_ = ADD_CVAR_STRING("phys_dll_override", "none", core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Override which physx dll is loaded. Valid Values: <none>, <debug>, <checked>, <profile>, <release>");
 
 	pVarScratchBufSize_ = ADD_CVAR_INT("phys_scratch_buf_size", scratchBufferDefaultSize_, 0, std::numeric_limits<int32_t>::max(),
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
@@ -126,8 +130,16 @@ void PhysXVars::SetScene(physx::PxScene* pScene)
 	}
 }
 
+const char* PhysXVars::getDllOverrideStr(void) const
+{
+	X_ASSERT_NOT_NULL(pVarDllOverride_);
+	static core::ICVar::StrBuf buf;
+	return pVarDllOverride_->GetString(buf);
+}
+
 uint32_t PhysXVars::ScratchBufferSize(void) const
 {
+	X_ASSERT_NOT_NULL(pVarScratchBufSize_);
 	return safe_static_cast<uint32_t, int32_t>(pVarScratchBufSize_->GetInteger() << 10);
 }
 

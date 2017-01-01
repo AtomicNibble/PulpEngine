@@ -18,6 +18,7 @@ public:
 	void RegisterVars(void);
 	void SetScene(physx::PxScene* pScene);
 
+	const char* getDllOverrideStr(void) const;
 	uint32_t ScratchBufferSize(void) const;
 	X_INLINE StepperType::Enum GetStepperType(void) const;
 
@@ -25,6 +26,7 @@ public:
 	X_INLINE int32_t DebugDrawCullEnabled(void) const;
 
 	void SetDebugDrawEnabled(bool enable);
+
 
 private:
 	void Var_OnDebugDrawChange(core::ICVar* pVar);
@@ -35,6 +37,7 @@ private:
 private:
 	physx::PxScene* pScene_;
 
+	core::ICVar* pVarDllOverride_;
 	core::ICVar* pVarScratchBufSize_;
 	core::ICVar* pVarStepperType_;
 	core::ICVar* pVarDebugDraw_;
