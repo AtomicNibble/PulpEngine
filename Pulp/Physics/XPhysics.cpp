@@ -13,6 +13,9 @@
 #include <common\windows\PxWindowsDelayLoadHook.h>
 #include <characterkinematic\PxControllerManager.h>
 
+
+// don't change this if you want to load say release physx in a debug build
+// just do it via 'gDelayLoadHook.forceConfig'
 #if X_DEBUG
 #define PHYS_LIB_SUFFIX "DEBUG"
 #elif X_RELEASE
