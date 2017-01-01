@@ -340,6 +340,15 @@ void CommandContext::writeBuffer(GpuResource& dest, size_t destOffset, const voi
 	copyBufferRegion(dest, destOffset, tempSpace.getBuffer(), tempSpace.getOffset(), numBytes);
 }
 
+void CommandContext::writeBufferUnAligned(GpuResource& dest, size_t destOffset, const void* pData, size_t numBytes)
+{
+	X_ASSERT_NOT_NULL(pData);
+
+	DynAlloc tempSpace = cpuLinearAllocator_.allocate(numBytes, 512);
+	std::memcpy(tempSpace.getCpuData(), pData, numBytes);
+	copyBufferRegion(dest, destOffset, tempSpace.getBuffer(), tempSpace.getOffset(), numBytes);
+}
+
 void CommandContext::fillBuffer(GpuResource& dest, size_t destOffset, Param val, size_t numBytes)
 {
 	DynAlloc tempSpace = cpuLinearAllocator_.allocate(numBytes, 512);

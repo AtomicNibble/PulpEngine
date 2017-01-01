@@ -116,6 +116,7 @@ public:
 	void resetCounter(StructuredBuffer& buf, uint32_t value = 0);
 
 	void writeBuffer(GpuResource& dest, size_t destOffset, const void* pData, size_t numBytes);
+	void writeBufferUnAligned(GpuResource& dest, size_t destOffset, const void* pData, size_t numBytes);
 	void fillBuffer(GpuResource& dest, size_t destOffset, Param val, size_t numBytes);
 
 
