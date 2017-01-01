@@ -23,8 +23,6 @@ namespace Commands
 	// 
 	// 
 
-#if 1
-
 	X_PACK_PUSH(2)
 	X_DISABLE_WARNING(4201)
 	struct ResourceStateBase
@@ -193,127 +191,6 @@ namespace Commands
 		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
 	}
 
-#else
-
-	X_DISABLE_WARNING(4201)
-
-	struct ResourceStateBase
-	{
-		union {
-			struct {
-				int8_t numTextStates;
-				int8_t numVertexBufs;
-				int8_t numCbs;
-				int8_t _pad;
-			};
-			uint32_t val;
-		};
-	};
-	X_ENABLE_WARNING(4201)
-
-	template<size_t numTex, size_t numVBs, size_t numCBs>
-	struct ResourceState : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(TextureState) * numTex) + 
-			(sizeof(VertexBufferHandle) * numVBs) +
-			(sizeof(ConstantBufferHandle) * numCBs);
-
-		X_INLINE const void* getData(void) const {
-			return &tex;
-		}
-
-		TextureState tex[numTex];
-		VertexBufferHandle vbs[numVBs];
-		ConstantBufferHandle cbs[numCBs];
-	};
-
-	template<size_t numTex, size_t numVBs>
-	struct ResourceState<numTex, numVBs, 0> : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(TextureState) * numTex) +
-			(sizeof(VertexBufferHandle) * numVBs);
-
-		X_INLINE const void* getData(void) const {
-			return &tex;
-		}
-
-		TextureState tex[numTex];
-		VertexBufferHandle vbs[numVBs];
-	};
-
-
-	template<size_t numTex, size_t numCBs>
-	struct ResourceState<numTex, 0, numCBs> : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(TextureState) * numTex) +
-			(sizeof(ConstantBufferHandle) * numCBs);
-
-		X_INLINE const void* getData(void) const {
-			return &tex;
-		}
-
-		TextureState tex[numTex];
-		ConstantBufferHandle cbs[numCBs];
-	};
-
-	template<size_t numVBs, size_t numCBs>
-	struct ResourceState<0, numVBs, numCBs> : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(VertexBufferHandle) * numVBs) +
-			(sizeof(ConstantBufferHandle) * numCBs);
-
-		X_INLINE const void* getData(void) const {
-			return &vbs;
-		}
-
-		VertexBufferHandle vbs[numVBs];
-		ConstantBufferHandle cbs[numCBs];
-	};
-
-	template<size_t numTex>
-	struct ResourceState<numTex, 0, 0> : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(TextureState) * numTex);
-
-		X_INLINE const void* getData(void) const {
-			return &tex;
-		}
-
-		TextureState tex[numTex];
-	};
-
-	template<size_t numVBs>
-	struct ResourceState<0, numVBs, 0> : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(VertexBufferHandle) * numVBs);
-
-		X_INLINE const void* getData(void) const {
-			return &vbs;
-		}
-
-		VertexBufferHandle vbs[numVBs];
-	};
-
-	template<size_t numCBs>
-	struct ResourceState<0, 0, numCBs> : public ResourceStateBase
-	{
-		static const uint32_t STATE_DATA_SIZE =
-			(sizeof(ConstantBufferHandle) * numCBs);
-
-		X_INLINE const void* getData(void) const {
-			return &vbs;
-		}
-
-		ConstantBufferHandle cbs[numCBs];
-	};
-
-#endif
 
 	// not sure if i want to pack these down close or have each command start aligned.
 	// I currently support them been 8 bute aligned.
