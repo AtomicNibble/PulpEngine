@@ -20,7 +20,7 @@ X_DISABLE_WARNING(4244)
 template<typename T>
 struct math
 {
-	X_INLINE static  T  square(T x)		{ return x * x; }
+	X_INLINE static  constexpr T  square(T x)		{ return x * x; }
 
 	X_INLINE static  T	acos(T x)		{ return ::acos(double(x)); }
 	X_INLINE static  T	asin(T x)		{ return ::asin(double(x)); }
@@ -52,9 +52,9 @@ struct math
 	X_INLINE static  T	fmod(T x, T y)				{ return ::fmod(double(x), double(y)); }
 	X_INLINE static  T	hypot(T x, T y)				{ return ::hypot(double(x), double(y)); }
 	X_INLINE static  T	signum(T x)					{ return (x >0.0) ? 1.0 : ((x < 0.0) ? -1.0 : 0.0); }
-	X_INLINE static  T	min(T x, T y)				{ return (x < y) ? x : y; }
-	X_INLINE static  T	max(T x, T y)				{ return (x > y) ? x : y; }
-	X_INLINE static  T	clamp(T x, T min = 0, T max = 1)	{ return (x < min) ? min : ((x > max) ? max : x); }
+	X_INLINE static  constexpr T	min(T x, T y)	{ return (x < y) ? x : y; }
+	X_INLINE static  constexpr T	max(T x, T y)	{ return (x > y) ? x : y; }
+	X_INLINE static  constexpr T	clamp(T x, T min = 0, T max = 1)	{ return (x < min) ? min : ((x > max) ? max : x); }
 
 	X_INLINE static int32 isneg(T x)
 	{
@@ -96,9 +96,9 @@ struct math<float>
 	X_INLINE static  float	fmod(float x, float y)	{ return ::fmodf(x, y); }
 	X_INLINE static  float	hypot(float x, float y)	{ return ::sqrtf(x*x + y*y); }
 	X_INLINE static  float	signum(float x)			{ return (x > 0.0f) ? 1.0f : ((x < 0.0f) ? -1.0f : 0.0f); }
-	X_INLINE static  float	max(float x, float y)	{ return (x > y) ? x : y; }
-	X_INLINE static  float	min(float x, float y)	{ return (x < y) ? x : y; }
-	X_INLINE static  float	clamp(float x, float min = 0, float max = 1)	{ return (x < min) ? min : ((x > max) ? max : x); }
+	X_INLINE static  constexpr float	max(float x, float y)	{ return (x > y) ? x : y; }
+	X_INLINE static  constexpr float	min(float x, float y)	{ return (x < y) ? x : y; }
+	X_INLINE static  constexpr float	clamp(float x, float min = 0, float max = 1)	{ return (x < min) ? min : ((x > max) ? max : x); }
 
 
 	X_INLINE static int32 isneg(float x) {
@@ -119,7 +119,9 @@ struct math<int>
 	X_INLINE static  int	ceil(int x)					{ return ::ceil(double(x)); }
 	X_INLINE static  int	abs(int x)					{ return ::fabs(double(x)); }
 	X_INLINE static  int	floor(int x)				{ return ::floor(double(x)); }
-	X_INLINE static  int	clamp(int x, int min = 0, int max = 1) { return (x < min) ? min : ((x > max) ? max : x); }
+	X_INLINE static  constexpr float  max(float x, float y) { return (x > y) ? x : y; }
+	X_INLINE static  constexpr float  min(float x, float y) { return (x < y) ? x : y; }
+	X_INLINE static  constexpr int	  clamp(int x, int min = 0, int max = 1) { return (x < min) ? min : ((x > max) ? max : x); }
 
 	X_INLINE static int32 isneg(int32 x) 
 	{
@@ -157,46 +159,46 @@ const float32_t EPSILON_VALUEf = 4.37114e-05f;
 
 static const float	INFINITY = 1e30f;
 
-inline float fsel(float a, float b, float c)
+inline constexpr float fsel(float a, float b, float c)
 {
 	return a >= 0 ? b : c;
 }
 
-inline float toRadians(float x)
+inline constexpr float toRadians(float x)
 {
 	return x * 0.017453292519943295769f; // ( x * PI / 180 )
 }
 
-inline double toRadians(double x)
+inline constexpr double toRadians(double x)
 {
 	return x * 0.017453292519943295769; // ( x * PI / 180 )
 }
 
-inline float toDegrees(float x)
+inline constexpr float toDegrees(float x)
 {
 	return x * 57.295779513082321f; // ( x * 180 / PI )
 }
 
-inline double toDegrees(double x)
+inline constexpr double toDegrees(double x)
 {
 	return x * 57.295779513082321; // ( x * 180 / PI )
 }
 
 
 template <typename T> 
-inline T divideByMultiple(T value, size_t alignment)
+inline constexpr T divideByMultiple(T value, size_t alignment)
 {
 	return static_cast<T>((value + alignment - 1) / alignment);
 }
 
 template<typename T, typename L>
-T lerp(const T &a, const T &b, L factor)
+constexpr T lerp(const T &a, const T &b, L factor)
 {
 	return a + (b - a) * factor;
 }
 
 template<typename T>
-T lmap(T val, T inMin, T inMax, T outMin, T outMax)
+constexpr T lmap(T val, T inMin, T inMax, T outMin, T outMax)
 {
 	return outMin + (outMax - outMin) * ((val - inMin) / (inMax - inMin));
 }
