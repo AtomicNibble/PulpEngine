@@ -262,11 +262,11 @@ void XCore::ShutDown()
 
 	X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
 
-#if X_PLATFORM_WIN32 // && X_DEBUG
+#if X_PLATFORM_WIN32 && X_ENABLE_LOGGING
 	if (!initParams_.bTesting) { // don't pause when testing.
 		_getch();
 	}
-#endif // !X_PLATFORM_WIN32
+#endif // !X_PLATFORM_WIN32 && X_ENABLE_LOGGING
 
 	if (env_.pConsole)
 	{
