@@ -121,8 +121,7 @@ struct IConsole
 	virtual void Exec(const char* pCommand) X_ABSTRACT;
 
 //	virtual void ConfigExec(const char* command) X_ABSTRACT;
-	virtual bool LoadConfig(const char* pFileName) X_ABSTRACT;
-
+	virtual bool LoadAndExecConfigFile(const char* pFileName) X_ABSTRACT;
 
 	// Logging
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_ABSTRACT;

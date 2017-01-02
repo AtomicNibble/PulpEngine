@@ -55,7 +55,7 @@ public:
 	virtual void Exec(const char* command) X_FINAL;
 
 //	virtual void ConfigExec(const char* command) X_FINAL;
-	virtual bool LoadConfig(const char* fileName) X_FINAL;
+	virtual bool LoadAndExecConfigFile(const char* fileName) X_FINAL;
 
 	// Loggging
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

@@ -1462,7 +1462,7 @@ void XConsole::Exec(const char* pCommand)
 	AddCmd(pCommand, ExecSource::SYSTEM, false);
 }
 
-bool XConsole::LoadConfig(const char* fileName)
+bool XConsole::LoadAndExecConfigFile(const char* fileName)
 {
 	core::Path<char> path;
 
@@ -2688,9 +2688,9 @@ void XConsole::Command_Exec(IConsoleCmdArgs* pCmd)
 		return;
 	}
 
-	const char* filename = pCmd->GetArg(1);
+	const char* pFilename = pCmd->GetArg(1);
 
-	LoadConfig(filename);
+	LoadAndExecConfigFile(pFilename);
 }
 
 void XConsole::Command_Help(IConsoleCmdArgs* pCmd)

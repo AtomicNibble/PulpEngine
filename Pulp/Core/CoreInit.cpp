@@ -393,7 +393,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// Load the default config.
 	if (!startupParams.isCoreOnly()) {
-		if (!env_.pConsole->LoadConfig("default.cfg")) {
+		if (!env_.pConsole->LoadAndExecConfigFile("default.cfg")) {
 			return false;
 		}
 	}
@@ -633,8 +633,9 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
 	env_.pConsole->Startup(this, initParams.basicConsole());
-	env_.pConsole->LoadConfig("user_config.cfg");
+	if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
 
+	}
 
 	return true;
 }

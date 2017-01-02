@@ -230,7 +230,7 @@ void XConsoleNULL::Exec(const char* command)
 }
 
 
-bool XConsoleNULL::LoadConfig(const char* fileName)
+bool XConsoleNULL::LoadAndExecConfigFile(const char* fileName)
 {
 	X_UNUSED(fileName);
 	return true;
