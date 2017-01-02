@@ -1659,7 +1659,7 @@ bool XConsole::CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
 
 void XConsole::AddCmd(const char* pCommand, ExecSource::Enum src, bool silent)
 {
-	AddCmd(string(pCommand), src, silent);
+	cmds_.emplace(string(pCommand), src, silent);
 }
 
 void XConsole::AddCmd(const string& command, ExecSource::Enum src, bool silent)
