@@ -1669,9 +1669,6 @@ void XConsole::AddCmd(const string& command, ExecSource::Enum src, bool silent)
 
 void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 {
-	ConsoleCmdMapItor itrCmd;
-	ConsoleVarMapItor itrVar;
-
 	core::StackString512 name;
 	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS> value;
 	core::StringRange<char> range(nullptr, nullptr);
@@ -1698,11 +1695,12 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 		name.trim();
 		name.stripColorCodes();
 
-		if (name.isEmpty())
+		if (name.isEmpty()) {
 			continue;
+		}
 
 		// === Check if is a command ===
-		itrCmd = CmdMap_.find(X_CONST_STRING(name.c_str()));
+		auto itrCmd = CmdMap_.find(X_CONST_STRING(name.c_str()));
 		if (itrCmd != CmdMap_.end())
 		{
 			value.set(range.GetStart(), range.GetEnd());
@@ -1711,7 +1709,7 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 		}
 
 		// === check for var ===
-		itrVar = VarMap_.find(X_CONST_STRING(name.c_str()));
+		auto itrVar = VarMap_.find(X_CONST_STRING(name.c_str()));
 		if (itrVar != VarMap_.end())
 		{
 			ICVar* pCVar = itrVar->second;
