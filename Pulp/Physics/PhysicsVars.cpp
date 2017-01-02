@@ -56,7 +56,7 @@ void PhysXVars::RegisterVars(void)
 		"Enable culling of physics debug shapes")->SetOnChangeCallback(del);
 
 	// this is read only.
-	ADD_CVAR_REF_VEC3("phys_gravity", gravityVec_, Vec3f::zAxis(), core::VarFlag::SYSTEM | core::VarFlag::STATIC,
+	ADD_CVAR_REF_VEC3("phys_gravity", gravityVec_, Vec3f::zAxis(), core::VarFlag::SYSTEM | core::VarFlag::READONLY,
 		"The gavity vector");
 
 	// all the scales yo.

@@ -32,9 +32,9 @@ void RenderVars::registerVars(void)
 	ADD_CVAR_REF_COL("r_clear_color", clearColor_, clearColor_,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Clear color");
 
-	pNativeRes_ = ADD_CVAR_STRING("r_native_res", "", core::VarFlag::SYSTEM | core::VarFlag::STATIC,
+	pNativeRes_ = ADD_CVAR_STRING("r_native_res", "", core::VarFlag::SYSTEM | core::VarFlag::READONLY,
 		"The final render resolution");
-	pRes_ = ADD_CVAR_STRING("r_res", "", core::VarFlag::SYSTEM | core::VarFlag::STATIC,
+	pRes_ = ADD_CVAR_STRING("r_res", "", core::VarFlag::SYSTEM | core::VarFlag::READONLY,
 		"The render buffer resolution, scaled to 'r_native_res'");
 
 	varsRegisterd_ = true;

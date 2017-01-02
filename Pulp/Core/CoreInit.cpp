@@ -905,7 +905,7 @@ void XCore::CreateSystemVars(void)
 	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");
 
 
-	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::STATIC, "Engine Version");
+	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
 
 	ADD_COMMAND_MEMBER("filesysHotReloadEtxList", this, XCore, &XCore::Command_HotReloadListExts, VarFlag::SYSTEM,
 		"Display all registered file extensions in the hotreload system");

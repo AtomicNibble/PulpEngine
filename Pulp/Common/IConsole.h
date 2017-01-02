@@ -28,7 +28,7 @@ COLOR,
 VECTOR,
 BITFIELD,
 
-STATIC,			// statically declared, not user created
+STATIC_DECL,	// statically declared, not user created
 CHEAT,			// variable is considered a cheat
 READONLY,		// display only, cannot be set by user / config
 HIDDEN,			// not visable to the user.
