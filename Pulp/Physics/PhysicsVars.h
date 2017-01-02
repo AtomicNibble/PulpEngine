@@ -27,7 +27,7 @@ public:
 
 	void SetDebugDrawEnabled(bool enable);
 	void SetGravityVecValue(const Vec3f& gravity);
-
+	void SetAllScalesToValue(float32_t val);
 
 private:
 	void Var_OnDebugDrawChange(core::ICVar* pVar);

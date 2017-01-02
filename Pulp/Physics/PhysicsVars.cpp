@@ -164,6 +164,19 @@ void PhysXVars::SetGravityVecValue(const Vec3f& gravity)
 	gravityVec_ = gravity;
 }
 
+void PhysXVars::SetAllScalesToValue(float32_t val)
+{
+	for (uint32_t i = 0; i < physx::PxVisualizationParameter::eNUM_VALUES; i++)
+	{
+		if (scaleVars_[i])
+		{
+			// this will result in the Var_OnScaleChanged getting called.
+			// so the scene scales will get updated.
+			scaleVars_[i]->Set(val);
+		}
+	}
+}
+
 void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 {
 	X_UNUSED(pVar);
