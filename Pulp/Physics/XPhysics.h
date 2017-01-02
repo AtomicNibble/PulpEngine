@@ -70,6 +70,11 @@ public:
 	void onTickPostRender(float dtime) X_FINAL;
 	void render(void) X_FINAL;
 
+	// some runtime tweaks.
+	void setGravity(const Vec3f& gravity) X_FINAL;
+	void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_FINAL;
+	// ~
+
 	IPhysicsCooking* getCooking(void) X_FINAL;
 
 	// materials

@@ -453,6 +453,11 @@ struct IPhysics
 	virtual void render(void) X_ABSTRACT; // render stuff like debug shapes.
 
 
+	// some runtime tweaks.
+	virtual void setGravity(const Vec3f& gravity) X_ABSTRACT;
+	virtual void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_ABSTRACT;
+	// ~
+
 	// if you create a full physics instance you get cooking with it.
 	// if you want just cooking use the converter interface.
 	virtual IPhysicsCooking* getCooking(void) X_ABSTRACT;

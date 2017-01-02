@@ -541,6 +541,26 @@ void XPhysics::render(void)
 	}
 }
 
+// ------------------------------------------
+
+void XPhysics::setGravity(const Vec3f& gravity)
+{
+	vars_.SetGravityVecValue(gravity);
+
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	pScene_->setGravity(Px3FromVec3(gravity));
+}
+
+void XPhysics::setBounceThresholdVelocity(float32_t bounceThresholdVelocity)
+{
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+
+	pScene_->setBounceThresholdVelocity(bounceThresholdVelocity);
+}
+
+// ------------------------------------------
+
 IPhysicsCooking* XPhysics::getCooking(void)
 {
 	return pCooking_;
