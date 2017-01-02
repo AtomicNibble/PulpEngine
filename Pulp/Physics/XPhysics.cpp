@@ -344,7 +344,7 @@ bool XPhysics::init(const SceneDesc& desc)
 	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
 	sceneDesc.cpuDispatcher = &jobDispatcher_;
 	sceneDesc.solverBatchSize = 32; // i might make this lower to improve scaling.
-	sceneDesc.nbContactDataBlocks = 64;
+	sceneDesc.nbContactDataBlocks = 256;
 	sceneDesc.maxNbContactDataBlocks = 65536;
 
 	// algorithums
