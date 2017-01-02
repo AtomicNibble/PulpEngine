@@ -176,6 +176,7 @@ private:
 	void cmd_TogglePause(core::IConsoleCmdArgs* pArgs);
 	void cmd_StepOne(core::IConsoleCmdArgs* pArgs);
 	void cmd_ToggleVis(core::IConsoleCmdArgs* pArgs);
+	void cmd_SetAllScales(core::IConsoleCmdArgs* pArgs);
 
 private:
 	core::MemoryArenaBase* arena_;

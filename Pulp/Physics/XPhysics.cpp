@@ -205,6 +205,9 @@ void XPhysics::registerCmds(void)
 
 	ADD_COMMAND_MEMBER("phys_toggle_visualization", this, XPhysics, &XPhysics::cmd_ToggleVis, core::VarFlag::SYSTEM,
 		"Toggles physics visualization, requires 'phys_draw_debug_scale' to be none negative");
+
+	ADD_COMMAND_MEMBER("phys_draw_debug_scale_set_all", this, XPhysics, &XPhysics::cmd_SetAllScales, core::VarFlag::SYSTEM,
+		"Sets all scales values to the specified value. <scale>");
 }
 
 bool XPhysics::init(const SceneDesc& desc)
@@ -1287,6 +1290,21 @@ void XPhysics::cmd_ToggleVis(core::IConsoleCmdArgs* pArgs)
 	// otherwise the var value is out of 
 	vars_.SetDebugDrawEnabled(!vars_.DebugDrawEnabled());
 }
+
+
+void XPhysics::cmd_SetAllScales(core::IConsoleCmdArgs* pArgs)
+{
+	if (pArgs->GetArgCount() != 2) {
+		X_WARNING("Phys", "phys_draw_debug_scale_set_all <scale>");
+		return;
+	}
+
+	const char* pScaleStr = pArgs->GetArg(1);
+	const float scle = core::strUtil::StringToFloat<float>(pScaleStr);
+
+	vars_.SetAllScalesToValue(scle);
+}
+
 
 
 X_NAMESPACE_END
