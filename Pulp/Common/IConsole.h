@@ -115,9 +115,8 @@ struct IConsole
 
 	virtual void UnregisterVariable(const char* pVarName) X_ABSTRACT;
 
-	virtual void AddCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* desc) X_ABSTRACT;
-
-	virtual void RemoveCommand(const char* pName) X_ABSTRACT;
+	virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* desc) X_ABSTRACT;
+	virtual void UnRegisterCommand(const char* pName) X_ABSTRACT;
 
 	virtual void Exec(const char* pCommand) X_ABSTRACT;
 

@@ -226,9 +226,8 @@ public:
 
 	virtual void UnregisterVariable(const char* pVarName) X_FINAL;
 
-	virtual void AddCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* pDesc) X_FINAL;
-
-	virtual void RemoveCommand(const char* pName) X_FINAL;
+	virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* pDesc) X_FINAL;
+	virtual void UnRegisterCommand(const char* pName) X_FINAL;
 
 	virtual void Exec(const char* pCommand) X_FINAL;
 

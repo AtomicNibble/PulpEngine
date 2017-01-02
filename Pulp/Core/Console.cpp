@@ -1423,7 +1423,7 @@ void XConsole::UnregisterVariable(const char* sVarName)
 
 // Commands :)
 
-void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc)
+void XConsole::RegisterCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1446,7 +1446,7 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 }
 
 
-void XConsole::RemoveCommand(const char* Name)
+void XConsole::UnRegisterCommand(const char* Name)
 {
 	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(Name));
 	if (it != CmdMap_.end()) {

@@ -205,7 +205,7 @@ void XConsoleNULL::UnregisterVariable(const char* sVarName)
 }
 
 
-void XConsoleNULL::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags,
+void XConsoleNULL::RegisterCommand(const char* Name, ConsoleCmdFunc func, int Flags,
 	const char* desc)
 {
 	X_UNUSED(Name);
@@ -216,7 +216,7 @@ void XConsoleNULL::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags,
 }
 
 
-void XConsoleNULL::RemoveCommand(const char* Name)
+void XConsoleNULL::UnRegisterCommand(const char* Name)
 {
 	X_UNUSED(Name);
 
