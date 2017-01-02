@@ -698,29 +698,6 @@ void XPhysics::releaseJoint(IJoint* pJoint)
 
 // ------------------------------------------
 
-void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
-{
-	pxDesc.position = Px3ExtFromVec3(desc.position);
-	pxDesc.upDirection = Px3FromVec3(desc.upDirection);
-	pxDesc.slopeLimit = desc.slopeLimit;
-	pxDesc.invisibleWallHeight = desc.invisibleWallHeight;
-	pxDesc.maxJumpHeight = desc.maxJumpHeight;
-	pxDesc.contactOffset = desc.contactOffset;
-	pxDesc.stepOffset = desc.stepOffset;
-	pxDesc.density = desc.density;
-	pxDesc.scaleCoeff = desc.scaleCoeff;
-	pxDesc.volumeGrowth = desc.volumeGrowth;
-	if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbing) {
-		pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
-	}
-	else if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbingAndForceSliding) {
-		pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING_AND_FORCE_SLIDING;
-	}
-	else {
-		X_ASSERT_UNREACHABLE();
-	}
-}
-
 ICharacterController* XPhysics::createCharacterController(const ControllerDesc& desc)
 {
 	if (desc.shape == ControllerDesc::ShapeType::Box)
