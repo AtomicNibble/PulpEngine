@@ -490,7 +490,8 @@ struct IPhysics
 	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
 	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
 
-
+	// debug name for logs, only stores the pointer you must ensure the memory outlives the actor :) !
+	virtual void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_ABSTRACT;
 	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
 	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
 

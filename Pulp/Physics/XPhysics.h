@@ -98,7 +98,7 @@ public:
 	ICharacterController* createCharacterController(const ControllerDesc& desc) X_FINAL;
 	void releaseCharacterController(ICharacterController* pController) X_FINAL;
 
-
+	void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_FINAL;
 	void addActorToScene(ActorHandle handle) X_FINAL;
 	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
 

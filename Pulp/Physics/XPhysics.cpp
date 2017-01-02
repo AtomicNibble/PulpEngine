@@ -771,6 +771,14 @@ void XPhysics::releaseCharacterController(ICharacterController* pController)
 
 // ------------------------------------------
 
+void XPhysics::setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	// should we lock here?
+	actor.setName(pNamePointer);
+}
+
 void XPhysics::addActorToScene(ActorHandle handle)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
