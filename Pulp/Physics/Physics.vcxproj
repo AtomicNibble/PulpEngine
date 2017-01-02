@@ -408,6 +408,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Allocator.h" />
+    <ClInclude Include="AssertHandler.h" />
     <ClInclude Include="ControllerWrapper.h" />
     <ClInclude Include="Cooking.h" />
     <ClInclude Include="CpuDispatcher.h" />
@@ -424,6 +425,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Allocator.cpp" />
+    <ClCompile Include="AssertHandler.cpp" />
     <ClCompile Include="ConverterLib.cpp" />
     <ClCompile Include="Cooking.cpp" />
     <ClCompile Include="CpuDispatcher.cpp" />

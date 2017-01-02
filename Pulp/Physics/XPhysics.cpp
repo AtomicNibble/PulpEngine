@@ -2,6 +2,7 @@
 #include "XPhysics.h"
 #include "MathHelpers.h"
 #include "Cooking.h"
+#include "AssertHandler.h"
 #include "DelayLoadHook.h"
 #include "JointWrapper.h"
 #include "ControllerWrapper.h"
@@ -187,7 +188,7 @@ bool XPhysics::init(void)
 		}
 	}
 
-
+	physx::PxSetAssertHandler(gAssetHandler);
 	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
 	physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);
 
