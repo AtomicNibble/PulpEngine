@@ -60,11 +60,13 @@ class XEngineModule_Physics : public IEngineModule
 		pPhysics->registerVars();
 		pPhysics->registerCmds();
 
+#if 0 // the 3d engine should call this
 		if (!pPhysics->init()) {
 			pPhysics->shutDown();
 			X_DELETE(pPhysics, g_PhysicsArena);
 			return false;
 		}
+#endif
 
 		env.pPhysics = pPhysics;
 		return true;
