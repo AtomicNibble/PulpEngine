@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PhysicsVars.h"
+#include "MathHelpers.h"
 
 #include <IConsole.h>
 
@@ -54,6 +55,9 @@ void PhysXVars::RegisterVars(void)
 	ADD_CVAR_REF("phys_draw_debug_cull", debugDrawUseCullBox_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable culling of physics debug shapes")->SetOnChangeCallback(del);
 
+	// this is read only.
+	ADD_CVAR_REF_VEC3("phys_gravity", gravityVec_, Vec3f::zAxis(), core::VarFlag::SYSTEM | core::VarFlag::STATIC,
+		"The gavity vector");
 
 	// all the scales yo.
 	// we need to register call backs for all these so we can update the scene.
@@ -115,6 +119,8 @@ void PhysXVars::SetScene(physx::PxScene* pScene)
 
 	physx::PxSceneWriteLock scopedLock(*pScene_);
 
+	SetGravityVecValue(Vec3FromPhysx(pScene_->getGravity()));
+
 	// set current values.
 	for (uint32_t i = 0; i < physx::PxVisualizationParameter::eNUM_VALUES; i++)
 	{		
@@ -151,6 +157,11 @@ void PhysXVars::SetDebugDrawEnabled(bool enable)
 	else {
 		debugDraw_ = enable ? 1 : 0;
 	}
+}
+
+void PhysXVars::SetGravityVecValue(const Vec3f& gravity)
+{
+	gravityVec_ = gravity;
 }
 
 void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)

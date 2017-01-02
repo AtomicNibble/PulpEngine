@@ -26,6 +26,7 @@ public:
 	X_INLINE int32_t DebugDrawCullEnabled(void) const;
 
 	void SetDebugDrawEnabled(bool enable);
+	void SetGravityVecValue(const Vec3f& gravity);
 
 
 private:
@@ -47,6 +48,7 @@ private:
 
 	int32_t debugDraw_;
 	int32_t debugDrawUseCullBox_;
+	Vec3f gravityVec_;
 
 	const char* scaleVarNames_[physx::PxVisualizationParameter::eNUM_VALUES];
 	core::ICVar* scaleVars_[physx::PxVisualizationParameter::eNUM_VALUES];
