@@ -1079,25 +1079,33 @@ void XPhysics::onWake(physx::PxActor** actors, physx::PxU32 count)
 {
 	X_UNUSED(actors);
 	X_UNUSED(count);
+	X_LOG0("Phys", "onWake: num: %" PRIu32, count);
 }
 
 void XPhysics::onSleep(physx::PxActor** actors, physx::PxU32 count)
 {
 	X_UNUSED(actors);
 	X_UNUSED(count);
+
+	X_LOG0("Phys", "onSleep: num: %" PRIu32, count);
 }
 
-void XPhysics::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs)
+void XPhysics::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 count)
 {
 	X_UNUSED(pairHeader);
 	X_UNUSED(pairs);
-	X_UNUSED(nbPairs);
+	X_UNUSED(count);
+
+	X_LOG0("Phys", "onContact: num: %" PRIu32, count);
 }
 
 void XPhysics::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 {
 	X_UNUSED(pairs);
 	X_UNUSED(count);
+
+	X_LOG0("Phys", "onTrigger: num: %" PRIu32, count);
+
 }
 
 
