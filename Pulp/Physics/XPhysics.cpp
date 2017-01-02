@@ -58,6 +58,73 @@ namespace
 #endif // !PHYSX_DEFAULT_ALLOCATOR
 
 
+	void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
+	{
+		pxDesc.position = Px3ExtFromVec3(desc.position);
+		pxDesc.upDirection = Px3FromVec3(desc.upDirection);
+		pxDesc.slopeLimit = desc.slopeLimit;
+		pxDesc.invisibleWallHeight = desc.invisibleWallHeight;
+		pxDesc.maxJumpHeight = desc.maxJumpHeight;
+		pxDesc.contactOffset = desc.contactOffset;
+		pxDesc.stepOffset = desc.stepOffset;
+		pxDesc.density = desc.density;
+		pxDesc.scaleCoeff = desc.scaleCoeff;
+		pxDesc.volumeGrowth = desc.volumeGrowth;
+		if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbing) {
+			pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
+		}
+		else if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbingAndForceSliding) {
+			pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING_AND_FORCE_SLIDING;
+		}
+		else {
+			X_ASSERT_UNREACHABLE();
+		}
+	}
+
+
+	void copyToleranceScale(physx::PxTolerancesScale& pxScale, const ToleranceScale& scale)
+	{
+		pxScale.length = scale.length;
+		pxScale.mass = scale.mass;
+		pxScale.speed = scale.speed;
+	}
+
+	void copySceneDesc(physx::PxSceneLimits& pxLimits, const SceneLimits& limits)
+	{
+		pxLimits.maxNbActors = limits.maxActors;
+		pxLimits.maxNbActors = limits.maxBodies;
+		pxLimits.maxNbActors = limits.maxStaticShapes;
+		pxLimits.maxNbActors = limits.maxDynamicShapes;
+		pxLimits.maxNbActors = limits.maxAggregates;
+		pxLimits.maxNbActors = limits.maxConstraints;
+		pxLimits.maxNbActors = limits.maxRegions;
+		pxLimits.maxNbActors = limits.maxObjectsPerRegion;
+	}
+
+	void copySceneDesc(physx::PxSceneDesc& pxSceneDesc, const SceneDesc& sceneDesc)
+	{
+		copySceneDesc(pxSceneDesc.limits, sceneDesc.sceneLimitHint);
+
+		pxSceneDesc.gravity = Px3FromVec3(sceneDesc.gravity);
+		pxSceneDesc.frictionOffsetThreshold = sceneDesc.frictionOffsetThreshold * sceneDesc.scale.length;
+		pxSceneDesc.contactCorrelationDistance = sceneDesc.contractCorrelationDis * sceneDesc.scale.length;
+		pxSceneDesc.bounceThresholdVelocity = sceneDesc.bounceThresholdVelocity * sceneDesc.scale.speed;
+		pxSceneDesc.sanityBounds = PxBounds3FromAABB(sceneDesc.sanityBounds);
+
+		if (sceneDesc.frictionType == FrictionType::Patch) {
+			pxSceneDesc.frictionType = physx::PxFrictionType::ePATCH;
+		}
+		else if (sceneDesc.frictionType == FrictionType::OneDirectional) {
+			pxSceneDesc.frictionType = physx::PxFrictionType::eONE_DIRECTIONAL;
+		}
+		else if (sceneDesc.frictionType == FrictionType::TwoDirectional) {
+			pxSceneDesc.frictionType = physx::PxFrictionType::eTWO_DIRECTIONAL;
+		}
+		else {
+			X_ASSERT_UNREACHABLE();
+		}
+	}
+
 } // namespace
 
 
@@ -140,7 +207,7 @@ void XPhysics::registerCmds(void)
 		"Toggles physics visualization, requires 'phys_draw_debug_scale' to be none negative");
 }
 
-bool XPhysics::init(void)
+bool XPhysics::init(const SceneDesc& desc)
 {
 	X_LOG0("PhysicsSys", "Starting");
 
@@ -218,8 +285,12 @@ bool XPhysics::init(void)
 	bool recordMemoryAllocations = true;
 
 	physx::PxTolerancesScale scale;
-	customizeTolerances(scale);
+	copyToleranceScale(scale, desc.scale);
 
+	if (!scale.isValid()) {
+		X_ERROR("PhysicsSys", "Scene scale description is invalid");
+		return false;
+	}
 
 	pPhysics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation_,
 		scale, recordMemoryAllocations, pProfileZoneManager_);
@@ -256,21 +327,37 @@ bool XPhysics::init(void)
 	pPhysics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
 
-	pMaterial_ = pPhysics_->createMaterial(0.5f, 0.5f, 0.1f);
+	pMaterial_ = pPhysics_->createMaterial(1.f, 1.f, 1.f);
 	if (!pMaterial_) {
 		X_ERROR("Physics", "Failed to create material");
 		return false;
 	}
 
+	stepperType_ = vars_.GetStepperType();
 
-	physx::PxSceneDesc sceneDesc(pPhysics_->getTolerancesScale());
-	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
-	sceneDesc.cpuDispatcher = &jobDispatcher_;
+	physx::PxSceneDesc sceneDesc(scale);
 	sceneDesc.broadPhaseCallback = this;
 	sceneDesc.simulationEventCallback = this;
 	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+	sceneDesc.cpuDispatcher = &jobDispatcher_;
+	sceneDesc.solverBatchSize = 32; // i might make this lower to improve scaling.
+	sceneDesc.nbContactDataBlocks = 64;
+	sceneDesc.maxNbContactDataBlocks = 65536;
 
+	// algorithums
+	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eMBP;
+	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
+	sceneDesc.dynamicStructure = physx::PxPruningStructure::eDYNAMIC_AABB_TREE;
+	sceneDesc.dynamicTreeRebuildRateHint = 100;
 
+	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
+		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
+	}
+	else {
+		sceneDesc.simulationOrder = physx::PxSimulationOrder::eCOLLIDE_SOLVE;
+	}
+
+	// flags
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_TWO_DIRECTIONAL_FRICTION;
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
@@ -279,13 +366,13 @@ bool XPhysics::init(void)
 	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
 	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
 
-	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eMBP;
-//	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eSAP;
-	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
+	// stuff we allow to be configured.
+	// keep in mind it may override what you set above.
+	copySceneDesc(sceneDesc, desc);
 
-	stepperType_ = vars_.GetStepperType();
-	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
-		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
+	if (!sceneDesc.isValid()) {
+		X_ERROR("PhysicsSys", "Scene description is invalid");
+		return false;
 	}
 
 	pScene_ = pPhysics_->createScene(sceneDesc);
@@ -1090,13 +1177,6 @@ void XPhysics::createPvdConnection(void)
 	}
 }
 
-
-// --------------------------------------------------------
-
-void XPhysics::customizeTolerances(physx::PxTolerancesScale&)
-{
-
-}
 
 // --------------------------------------------------------
 

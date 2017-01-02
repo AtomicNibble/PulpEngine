@@ -61,7 +61,7 @@ public:
 	void registerVars(void) X_FINAL;
 	void registerCmds(void) X_FINAL;
 
-	bool init(void) X_FINAL;
+	bool init(const SceneDesc& desc) X_FINAL;
 	bool initRenderResources(void) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
@@ -147,9 +147,6 @@ private:
 
 	void togglePvdConnection(void);
 	void createPvdConnection(void);
-
-
-	void customizeTolerances(physx::PxTolerancesScale&);
 
 	void updateRenderObjectsDebug(float dtime); // update of render actors debug draw information, will be called while the simulation is NOT running
 	void updateRenderObjectsSync(float dtime);  // update of render objects while the simulation is NOT running (for particles, cloth etc. because data is not double buffered)

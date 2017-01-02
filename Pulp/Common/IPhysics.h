@@ -377,6 +377,63 @@ struct IPhysLib : public IConverter
 };
 
 
+// 0 = no limit
+// these values are not hard limits
+// more of a 'what to expect'
+struct SceneLimits
+{
+	uint32_t maxActors;
+	uint32_t maxBodies;
+	uint32_t maxStaticShapes;
+	uint32_t maxDynamicShapes;
+	uint32_t maxAggregates;
+	uint32_t maxConstraints;
+	uint32_t maxRegions; // has hard limit of 256
+	uint32_t maxObjectsPerRegion;
+};
+
+struct ToleranceScale
+{
+	// The approximate size of objects in the simulation.
+	// 
+	// For simulating roughly human - sized in metric units, 1 is a good choice.
+	// If simulation is done in centimetres, use 100 instead.This is used to
+	// estimate certain length - related tolerances.
+	float32_t length;
+
+	// The approximate mass of a length * length * length block.
+	// If using metric scale for character sized objects and measuring mass in
+	// kilogrammes, 1000 is a good choice.
+	float32_t mass;
+
+	// The typical magnitude of velocities of objects in simulation. This is used to estimate
+	// whether a contact should be treated as bouncing or resting based on its impact velocity,
+	// and a kinetic energy threshold below which the simulation may put objects to sleep.
+	// 
+	// For normal physical environments, a good choice is the approximate speed of an object falling
+	// under gravity for one second.
+	float32_t speed;
+};
+
+enum class FrictionType {
+	Patch,
+	OneDirectional,
+	TwoDirectional
+};
+
+struct SceneDesc
+{
+	SceneLimits sceneLimitHint;
+	ToleranceScale scale;
+
+	Vec3f gravity;						// constant gravity for the entire scene.
+	FrictionType frictionType;			// the type of friction :D !
+	float32_t frictionOffsetThreshold;	// (multiplied by scale.length) A threshold of contact separation distance used to decide if a contact point will experience friction forces.
+	float32_t contractCorrelationDis;	// (multiplied by scale.length) The patch friction model uses this coefficient to determine if a friction anchor can persist between frames.
+	float32_t bounceThresholdVelocity;	// (multiplied by scale.speed) Collision speeds below this threshold will not cause a bounce.
+	AABB sanityBounds;					// nothing sound ever be outside these bounds, it's reported if so.
+};
+
 struct IPhysics
 {
 	typedef core::Array<uint8_t> DataArr;
@@ -386,7 +443,7 @@ struct IPhysics
 	virtual void registerVars(void) X_ABSTRACT;
 	virtual void registerCmds(void) X_ABSTRACT;
 
-	virtual bool init(void) X_ABSTRACT;
+	virtual bool init(const SceneDesc& desc) X_ABSTRACT;
 	virtual bool initRenderResources(void) X_ABSTRACT; // allocates a Aux render
 	virtual void shutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
