@@ -58,6 +58,7 @@ class Console;
 
 struct XCoreVars
 {
+	int core_fast_shutdown;
 	int core_event_debug;
 
 	int win_x_pos;
