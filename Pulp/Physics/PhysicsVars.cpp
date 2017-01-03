@@ -116,7 +116,7 @@ void PhysXVars::SetScene(physx::PxScene* pScene)
 {
 	pScene_ = pScene;
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	SetGravityVecValue(Vec3FromPhysx(pScene_->getGravity()));
 
@@ -184,7 +184,7 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 	// i don't think i'll bother changing the console var value for 'phys_draw_debug_scale'
 	// this can just be a slient internal change.
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	if (debugDraw_)
 	{
@@ -218,7 +218,7 @@ void PhysXVars::Var_OnScaleChanged(core::ICVar* pVar)
 		{
 			const float val = pVar->GetFloat();
 
-			physx::PxSceneWriteLock scopedLock(*pScene_);
+			PHYS_SCENE_WRITE_LOCK(pScene_);
 			pScene_->setVisualizationParameter(static_cast<physx::PxVisualizationParameter::Enum>(i), val);
 			return;
 		}
@@ -238,7 +238,7 @@ void PhysXVars::Var_OnDebugUseCullChange(core::ICVar* pVar)
 		return;
 	}
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	if (pVar->GetInteger() == 0)
 	{

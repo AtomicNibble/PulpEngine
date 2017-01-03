@@ -44,4 +44,5 @@ extern core::MemoryArenaBase* g_PhysicsArena;
 
 
 #include "Config.h"
+#include "SceneLock.h"
 

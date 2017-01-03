@@ -98,7 +98,7 @@ void XScene::setVisualizationCullingBox(const AABB& box)
 	bounds.minimum = Px3FromVec3(box.min);
 	bounds.maximum = Px3FromVec3(box.max);
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 	pScene_->setVisualizationCullingBox(bounds);
 }
 
@@ -108,15 +108,13 @@ void XScene::setGravity(const Vec3f& gravity)
 {
 	vars_.SetGravityVecValue(gravity);
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 	pScene_->setGravity(Px3FromVec3(gravity));
 }
 
 void XScene::setBounceThresholdVelocity(float32_t bounceThresholdVelocity)
 {
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 	pScene_->setBounceThresholdVelocity(bounceThresholdVelocity);
 }
 
@@ -125,7 +123,7 @@ void XScene::setBounceThresholdVelocity(float32_t bounceThresholdVelocity)
 
 RegionHandle XScene::addRegion(const AABB& bounds)
 {
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
 		return 0;
@@ -147,7 +145,7 @@ RegionHandle XScene::addRegion(const AABB& bounds)
 
 bool XScene::removeRegion(RegionHandle handle_)
 {
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
 		return true;
@@ -170,7 +168,7 @@ void XScene::addActorToScene(ActorHandle handle)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	pScene_->addActor(actor);
 }
@@ -180,7 +178,7 @@ void XScene::addActorToScene(ActorHandle handle, const char* pDebugNamePointer)
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 	actor.setName(pDebugNamePointer);
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	pScene_->addActor(actor);
 }
@@ -189,7 +187,7 @@ void XScene::addActorsToScene(ActorHandle* pHandles, size_t num)
 {
 	physx::PxActor* pActors = reinterpret_cast<physx::PxActor*>(pHandles);
 
-	physx::PxSceneWriteLock scopedLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	pScene_->addActors(&pActors, safe_static_cast<physx::PxU32>(num));
 }

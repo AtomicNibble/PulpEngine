@@ -100,7 +100,7 @@ void MultiThreadStepper::substepDone(StepperTask* ownerTask)
 
 	{
 #ifndef PX_PROFILE
-		physx::PxSceneWriteLock writeLock(*pScene_);
+		PHYS_SCENE_WRITE_LOCK(pScene_);
 #endif
 		pScene_->fetchResults(true);
 	}
@@ -160,7 +160,7 @@ void MultiThreadStepper::substep(StepperTask& completionTask)
 
 void MultiThreadStepper::solveStep(physx::PxBaseTask* ownerTask)
 {
-	physx::PxSceneWriteLock writeLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 #if PX_ENABLE_INVERTED_STEPPER_FEATURE
 	pScene_->solve(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
@@ -172,7 +172,7 @@ void MultiThreadStepper::solveStep(physx::PxBaseTask* ownerTask)
 void MultiThreadStepper::collisionStep(physx::PxBaseTask* ownerTask)
 {
 #if PX_ENABLE_INVERTED_STEPPER_FEATURE
-	PxSceneWriteLock writeLock(*pScene_);
+	PHYS_SCENE_WRITE_LOCK(pScene_);
 	pScene_->collide(subStepSize_, ownerTask);
 #endif
 }
@@ -193,13 +193,13 @@ void DebugStepper::substepStrategy(const float32_t stepSize, uint32_t& substepCo
 	substepSize = stepSize_;
 }
 
-bool DebugStepper::advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize)
+bool DebugStepper::advance(physx::PxScene* pScene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize)
 {
 	timer_.Start();
 
 	{
-		physx::PxSceneWriteLock writeLock(*scene);
-		scene->simulate(stepSize_, nullptr, scratchBlock, scratchBlockSize);
+		PHYS_SCENE_WRITE_LOCK(pScene);
+		pScene->simulate(stepSize_, nullptr, scratchBlock, scratchBlockSize);
 	}
 
 	return true;
@@ -212,13 +212,13 @@ void DebugStepper::setSubStepper(const float32_t stepSize, const uint32_t maxSte
 	stepSize_ = stepSize;
 }
 
-void DebugStepper::wait(physx::PxScene* scene)
+void DebugStepper::wait(physx::PxScene* pScene)
 {
 	pHandler_->onSubstepPreFetchResult();
 
 	{
-		physx::PxSceneWriteLock writeLock(*scene);
-		scene->fetchResults(true, nullptr);
+		PHYS_SCENE_WRITE_LOCK(pScene);
+		pScene->fetchResults(true, nullptr);
 	}
 
 	simulationTime_ = timer_.GetTimeVal();
@@ -332,7 +332,7 @@ void InvertedFixedStepper::substepDone(StepperTask* ownerTask)
 
 	{
 #ifndef PX_PROFILE
-		physx::PxSceneWriteLock writeLock(*pScene_);
+		PHYS_SCENE_WRITE_LOCK(pScene_);
 #endif
 		pScene_->fetchResults(true);
 	}

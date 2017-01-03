@@ -89,6 +89,9 @@
     <ClInclude Include="Config.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="SceneLock.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

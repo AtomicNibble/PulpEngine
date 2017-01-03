@@ -419,6 +419,7 @@
     <ClInclude Include="Logger.h" />
     <ClInclude Include="MathHelpers.h" />
     <ClInclude Include="PhysicsVars.h" />
+    <ClInclude Include="SceneLock.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Stepper.h" />
     <ClInclude Include="XPhysics.h" />

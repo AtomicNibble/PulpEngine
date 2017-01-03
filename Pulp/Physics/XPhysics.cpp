@@ -486,9 +486,15 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
 	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
 	//sceneDesc.flags |= physx::PxSceneFlag::eADAPTIVE_FORCE;
-	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
-	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
 	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
+	
+	// 
+	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+
+#if PHYSX_SCENE_REQUIRES_LOCK
+	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
+
 
 	// stuff we allow to be configured.
 	// keep in mind it may override what you set above.
