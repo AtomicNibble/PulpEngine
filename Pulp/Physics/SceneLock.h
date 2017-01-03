@@ -7,8 +7,8 @@ X_NAMESPACE_BEGIN(physics)
 
 #if PHYSX_SCENE_REQUIRES_LOCK
 
-#define PHYS_SCENE_READ_LOCK(pScene) physx::PxSceneWriteLock scopedLock(*pScene, __FILE__, __LINE__);
-#define PHYS_SCENE_WRITE_LOCK(pScene) physx::PxSceneReadLock scopedLock(*pScene, __FILE__, __LINE__);
+#define PHYS_SCENE_READ_LOCK(pScene) physx::PxSceneReadLock scopedLock(*pScene, __FILE__, __LINE__);
+#define PHYS_SCENE_WRITE_LOCK(pScene) physx::PxSceneWriteLock scopedLock(*pScene, __FILE__, __LINE__);
 
 #else
 
