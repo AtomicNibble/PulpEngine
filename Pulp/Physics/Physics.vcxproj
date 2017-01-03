@@ -409,6 +409,7 @@
   <ItemGroup>
     <ClInclude Include="Allocator.h" />
     <ClInclude Include="AssertHandler.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="ControllerWrapper.h" />
     <ClInclude Include="Cooking.h" />
     <ClInclude Include="CpuDispatcher.h" />

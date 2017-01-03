@@ -43,5 +43,5 @@ typedef core::MemoryArena<
 extern core::MemoryArenaBase* g_PhysicsArena;
 
 
+#include "Config.h"
 
-#define PHYSX_DEFAULT_ALLOCATOR 0
