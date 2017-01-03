@@ -424,7 +424,6 @@ enum class FrictionType {
 struct SceneDesc
 {
 	SceneLimits sceneLimitHint;
-	ToleranceScale scale;
 
 	Vec3f gravity;						// constant gravity for the entire scene.
 	FrictionType frictionType;			// the type of friction :D !
@@ -432,6 +431,32 @@ struct SceneDesc
 	float32_t contractCorrelationDis;	// (multiplied by scale.length) The patch friction model uses this coefficient to determine if a friction anchor can persist between frames.
 	float32_t bounceThresholdVelocity;	// (multiplied by scale.speed) Collision speeds below this threshold will not cause a bounce.
 	AABB sanityBounds;					// nothing sound ever be outside these bounds, it's reported if so.
+};
+
+struct IScene
+{
+	virtual ~IScene() {}
+
+
+	// some runtime tweaks.
+	virtual void setGravity(const Vec3f& gravity) X_ABSTRACT;
+	virtual void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_ABSTRACT;
+	// ~
+
+	// you must add a region before adding actors that reside in the region.
+	// best to just make all regions for level on load before adding any actors to scene.
+	virtual RegionHandle addRegion(const AABB& bounds) X_ABSTRACT;
+	// removes the region, anything that stil resides in this regions bounds and another region don't overlap
+	// will be reported as out of bounds.
+	virtual bool removeRegion(RegionHandle handles) X_ABSTRACT;
+
+	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
+	virtual void addActorToScene(ActorHandle handle, const char* pDebugNamePointer) X_ABSTRACT;
+	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
+
+	// Characters controllers
+	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
+	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
 };
 
 struct IPhysics
@@ -443,7 +468,7 @@ struct IPhysics
 	virtual void registerVars(void) X_ABSTRACT;
 	virtual void registerCmds(void) X_ABSTRACT;
 
-	virtual bool init(const SceneDesc& desc) X_ABSTRACT;
+	virtual bool init(const ToleranceScale& scale) X_ABSTRACT;
 	virtual bool initRenderResources(void) X_ABSTRACT; // allocates a Aux render
 	virtual void shutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
@@ -452,25 +477,16 @@ struct IPhysics
 	virtual void onTickPostRender(float dtime) X_ABSTRACT;
 	virtual void render(void) X_ABSTRACT; // render stuff like debug shapes.
 
-
-	// some runtime tweaks.
-	virtual void setGravity(const Vec3f& gravity) X_ABSTRACT;
-	virtual void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_ABSTRACT;
-	// ~
-
 	// if you create a full physics instance you get cooking with it.
 	// if you want just cooking use the converter interface.
 	virtual IPhysicsCooking* getCooking(void) X_ABSTRACT;
 
+	// Scene stuff
+	virtual IScene* createScene(const SceneDesc& desc) X_ABSTRACT;
+	virtual void releaseScene(IScene* pScene) X_ABSTRACT;
+
 	// we need to make a api for creating the physc objects for use in the 3dengine.
 	virtual MaterialHandle createMaterial(MaterialDesc& desc) X_ABSTRACT;
-
-	// you must add a region before adding actors that reside in the region.
-	// best to just make all regions for level on load before adding any actors to scene.
-	virtual RegionHandle addRegion(const AABB& bounds) X_ABSTRACT;
-	// removes the region, anything that stil resides in this regions bounds and another region don't overlap
-	// will be reported as out of bounds.
-	virtual bool removeRegion(RegionHandle handles) X_ABSTRACT;
 
 	// An aggregate is a collection of actors.
 	// which in turn allows optimized spatial data operations.
@@ -486,14 +502,8 @@ struct IPhysics
 		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_ABSTRACT;
 	virtual void releaseJoint(IJoint* pJoint) X_ABSTRACT;
 
-	// Characters controllers
-	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
-	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
-
 	// debug name for logs, only stores the pointer you must ensure the memory outlives the actor :) !
 	virtual void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_ABSTRACT;
-	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
-	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
 
 	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;

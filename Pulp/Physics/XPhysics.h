@@ -25,6 +25,7 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(physics)
 
 class PhysCooking;
+class XScene;
 
 class XPhysics : 
 	public IPhysics, 
@@ -61,7 +62,7 @@ public:
 	void registerVars(void) X_FINAL;
 	void registerCmds(void) X_FINAL;
 
-	bool init(const SceneDesc& desc) X_FINAL;
+	bool init(const ToleranceScale& scale) X_FINAL;
 	bool initRenderResources(void) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
@@ -70,19 +71,14 @@ public:
 	void onTickPostRender(float dtime) X_FINAL;
 	void render(void) X_FINAL;
 
-	// some runtime tweaks.
-	void setGravity(const Vec3f& gravity) X_FINAL;
-	void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_FINAL;
-	// ~
-
 	IPhysicsCooking* getCooking(void) X_FINAL;
+
+	// Scene stuff
+	IScene* createScene(const SceneDesc& desc) X_FINAL;
+	void releaseScene(IScene* pScene) X_FINAL;
 
 	// materials
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
-
-	// region's
-	RegionHandle addRegion(const AABB& bounds) X_FINAL;
-	bool removeRegion(RegionHandle handles) X_FINAL;
 
 	// aggregates's
 	AggregateHandle createAggregate(uint32_t maxActors, bool selfCollisions) X_FINAL;
@@ -94,14 +90,7 @@ public:
 		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_FINAL;
 	void releaseJoint(IJoint* pJoint) X_FINAL;
 
-	// Characters controllers
-	ICharacterController* createCharacterController(const ControllerDesc& desc) X_FINAL;
-	void releaseCharacterController(ICharacterController* pController) X_FINAL;
-
 	void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_FINAL;
-	void addActorToScene(ActorHandle handle) X_FINAL;
-	void addActorsToScene(ActorHandle* pHandles, size_t num) X_FINAL;
-
 
 	// you must pass cooked data :|
 	// if you don't have cooked data use getCooking() to cook it!
@@ -160,7 +149,6 @@ private:
 	Stepper* getStepper(void);
 
 	void setScratchBlockSize(size_t size);
-	void setVisualizationCullingBox(AABB& box);
 
 private:
 	void setupDefaultRigidDynamic(physx::PxRigidDynamic& body, bool kinematic = false);
@@ -187,10 +175,9 @@ private:
 
 	physx::PxFoundation*			pFoundation_;
 	physx::PxProfileZoneManager*	pProfileZoneManager_;
-	physx::PxControllerManager*		pControllerManager_;
 
 	physx::PxPhysics*				pPhysics_;
-	physx::PxScene*					pScene_;
+	XScene*							pScene_;
 	physx::PxMaterial*				pMaterial_;
 	physx::PxDefaultCpuDispatcher*	pCpuDispatcher_;
 	PhysCooking*					pCooking_;
@@ -204,6 +191,7 @@ private:
 	bool _pad;
 
 	PvdParameters pvdParams_;
+	physx::PxTolerancesScale scale_;
 
 	// Steppers
 	StepperType::Enum		stepperType_;

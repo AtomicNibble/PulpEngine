@@ -83,6 +83,9 @@
     <ClInclude Include="AssertHandler.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="XScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -126,6 +129,9 @@
     </ClCompile>
     <ClCompile Include="AssertHandler.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="XScene.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,16 +5,16 @@
 #include "AssertHandler.h"
 #include "DelayLoadHook.h"
 #include "JointWrapper.h"
-#include "ControllerWrapper.h"
+#include "XScene.h"
 
 #include <IConsole.h>
 #include <I3DEngine.h>
 
 #include <Hashing\Fnva1Hash.h>
+#include <Util\UniquePointer.h>
 
 #include <pvd\PxVisualDebugger.h>
 #include <common\windows\PxWindowsDelayLoadHook.h>
-#include <characterkinematic\PxControllerManager.h>
 
 
 // don't change this if you want to load say release physx in a debug build
@@ -57,31 +57,6 @@ namespace
 	physx::PxDefaultAllocator gDefaultAllocatorCallback;
 #endif // !PHYSX_DEFAULT_ALLOCATOR
 
-
-	void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
-	{
-		pxDesc.position = Px3ExtFromVec3(desc.position);
-		pxDesc.upDirection = Px3FromVec3(desc.upDirection);
-		pxDesc.slopeLimit = desc.slopeLimit;
-		pxDesc.invisibleWallHeight = desc.invisibleWallHeight;
-		pxDesc.maxJumpHeight = desc.maxJumpHeight;
-		pxDesc.contactOffset = desc.contactOffset;
-		pxDesc.stepOffset = desc.stepOffset;
-		pxDesc.density = desc.density;
-		pxDesc.scaleCoeff = desc.scaleCoeff;
-		pxDesc.volumeGrowth = desc.volumeGrowth;
-		if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbing) {
-			pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
-		}
-		else if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbingAndForceSliding) {
-			pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING_AND_FORCE_SLIDING;
-		}
-		else {
-			X_ASSERT_UNREACHABLE();
-		}
-	}
-
-
 	void copyToleranceScale(physx::PxTolerancesScale& pxScale, const ToleranceScale& scale)
 	{
 		pxScale.length = scale.length;
@@ -101,14 +76,14 @@ namespace
 		pxLimits.maxNbActors = limits.maxObjectsPerRegion;
 	}
 
-	void copySceneDesc(physx::PxSceneDesc& pxSceneDesc, const SceneDesc& sceneDesc)
+	void copySceneDesc(physx::PxSceneDesc& pxSceneDesc, const physx::PxTolerancesScale scale, const SceneDesc& sceneDesc)
 	{
 		copySceneDesc(pxSceneDesc.limits, sceneDesc.sceneLimitHint);
 
 		pxSceneDesc.gravity = Px3FromVec3(sceneDesc.gravity);
-		pxSceneDesc.frictionOffsetThreshold = sceneDesc.frictionOffsetThreshold * sceneDesc.scale.length;
-		pxSceneDesc.contactCorrelationDistance = sceneDesc.contractCorrelationDis * sceneDesc.scale.length;
-		pxSceneDesc.bounceThresholdVelocity = sceneDesc.bounceThresholdVelocity * sceneDesc.scale.speed;
+		pxSceneDesc.frictionOffsetThreshold = sceneDesc.frictionOffsetThreshold * scale.length;
+		pxSceneDesc.contactCorrelationDistance = sceneDesc.contractCorrelationDis * scale.length;
+		pxSceneDesc.bounceThresholdVelocity = sceneDesc.bounceThresholdVelocity * scale.speed;
 		pxSceneDesc.sanityBounds = PxBounds3FromAABB(sceneDesc.sanityBounds);
 
 		if (sceneDesc.frictionType == FrictionType::Patch) {
@@ -151,7 +126,6 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	allocator_(arena),
 	pFoundation_(nullptr),
 	pProfileZoneManager_(nullptr),
-	pControllerManager_(nullptr),
 	pPhysics_(nullptr),
 	pCooking_(nullptr),
 	pScene_(nullptr),
@@ -210,7 +184,7 @@ void XPhysics::registerCmds(void)
 		"Sets all scales values to the specified value. <scale>");
 }
 
-bool XPhysics::init(const SceneDesc& desc)
+bool XPhysics::init(const ToleranceScale& scale)
 {
 	X_LOG0("PhysicsSys", "Starting");
 
@@ -276,7 +250,6 @@ bool XPhysics::init(const SceneDesc& desc)
 		return false;
 	}
 
-
 #if !X_SUPER
 	pProfileZoneManager_ = &physx::PxProfileZoneManager::createProfileZoneManager(pFoundation_);
 	if (!pProfileZoneManager_) {
@@ -287,28 +260,24 @@ bool XPhysics::init(const SceneDesc& desc)
 
 	bool recordMemoryAllocations = true;
 
-	physx::PxTolerancesScale scale;
-	copyToleranceScale(scale, desc.scale);
-
-	if (!scale.isValid()) {
+	copyToleranceScale(scale_, scale);
+	if (!scale_.isValid()) {
 		X_ERROR("PhysicsSys", "Scene scale description is invalid");
 		return false;
 	}
 
 	pPhysics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation_,
-		scale, recordMemoryAllocations, pProfileZoneManager_);
+		scale_, recordMemoryAllocations, pProfileZoneManager_);
 
 	if (!pPhysics_) {
 		X_ERROR("Physics", "PxCreatePhysics failed!");
 		return false;
 	}	
 
-
 	if (!PxInitExtensions(*pPhysics_)) {
 		X_ERROR("Physics", "Failed to init extensions");
 		return false;
 	}
-
 
 	pCooking_ = X_NEW(PhysCooking, arena_, "RuntimePhysCooking")(arena_);
 	if (!pCooking_) {
@@ -316,7 +285,7 @@ bool XPhysics::init(const SceneDesc& desc)
 		return false;
 	}
 
-	if (!pCooking_->init(scale, *pFoundation_, CookingMode::Slow)) {
+	if (!pCooking_->init(scale_, *pFoundation_, CookingMode::Slow)) {
 		X_ERROR("Physics", "Cooking init failed!");
 		return false;
 	}
@@ -337,69 +306,7 @@ bool XPhysics::init(const SceneDesc& desc)
 	}
 
 	stepperType_ = vars_.GetStepperType();
-
-	physx::PxSceneDesc sceneDesc(scale);
-	sceneDesc.broadPhaseCallback = this;
-	sceneDesc.simulationEventCallback = this;
-	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
-	sceneDesc.cpuDispatcher = &jobDispatcher_;
-	sceneDesc.solverBatchSize = 32; // i might make this lower to improve scaling.
-	sceneDesc.nbContactDataBlocks = 256;
-	sceneDesc.maxNbContactDataBlocks = 65536;
-
-	// algorithums
-	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eMBP;
-	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
-	sceneDesc.dynamicStructure = physx::PxPruningStructure::eDYNAMIC_AABB_TREE;
-	sceneDesc.dynamicTreeRebuildRateHint = 100;
-
-	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
-		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
-	}
-	else {
-		sceneDesc.simulationOrder = physx::PxSimulationOrder::eCOLLIDE_SOLVE;
-	}
-
-	// flags
-	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_TWO_DIRECTIONAL_FRICTION;
-	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
-	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
-	//sceneDesc.flags |= physx::PxSceneFlag::eADAPTIVE_FORCE;
-	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
-	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
-	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
-
-	// stuff we allow to be configured.
-	// keep in mind it may override what you set above.
-	copySceneDesc(sceneDesc, desc);
-
-	if (!sceneDesc.isValid()) {
-		X_ERROR("PhysicsSys", "Scene description is invalid");
-		return false;
-	}
-
-	pScene_ = pPhysics_->createScene(sceneDesc);
-	if (!pScene_) {
-		X_ERROR("PhysicsSys", "Failed to create scene");
-		return false;
-	}
-
-	vars_.SetScene(pScene_);
-
-//	physx::PxSceneWriteLock scopedLock(*pScene_);
-//	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 1.0f);
-//	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, vars_.DebugDrawEnabled() ? vars_.DebugDrawScale() : 0.0f);
-//	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
-
-
-	pControllerManager_ = PxCreateControllerManager(*pScene_);
-	if (!pControllerManager_) {
-		X_ERROR("PhysicsSys", "Failed to create controller manager");
-		return false;
-	}
-
 	setScratchBlockSize(vars_.ScratchBufferSize());
-
 	return true;
 }
 
@@ -433,16 +340,14 @@ void XPhysics::shutDown(void)
 	invertedFixedStepper_.shutdown();
 	variableStepper_.shutdown();
 
-	if (pScene_) {
-		pScene_->fetchResults(true);
-	}
 	if (pPhysics_) {
 		pPhysics_->unregisterDeletionListener(*this);
 	}
 
-	core::SafeRelease(pControllerManager_);
+	if (pScene_) {
+		releaseScene(pScene_);
+	}
 
-	core::SafeRelease(pScene_);
 	core::SafeRelease(pCpuDispatcher_);
 	core::SafeRelease(pMaterial_);
 
@@ -471,40 +376,37 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 		pause_ = false;
 	}
 
-	if (!IsPaused())
+	if (!IsPaused() && pScene_)
 	{
 		if (vars_.DebugDrawCullEnabled()) {
-			physx::PxSceneWriteLock scopedLock(*pScene_);
-
-			pScene_->setVisualizationCullingBox(PxBounds3FromAABB(debugVisCullBounds));
+			pScene_->setVisualizationCullingBox(debugVisCullBounds);
 		}
 
 		Stepper* pStepper = getStepper();
 
 		waitForResults_ = false;
 
-		if (pScene_)
-		{
 
-			waitForResults_ = pStepper->advance(pScene_, dtime, pScratchBlock_,
-				safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
+		waitForResults_ = pStepper->advance(pScene_->getPxScene(), dtime, pScratchBlock_,
+			safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
 
-			// tells the stepper shape data is not going to be accessed until next frame 
-			// (frame ends with stepper->wait(mScene))
-			pStepper->renderDone();
-
-
-		}
+		// tells the stepper shape data is not going to be accessed until next frame 
+		// (frame ends with stepper->wait(mScene))
+		pStepper->renderDone();	
 	}
 }
 
 
 void XPhysics::onTickPostRender(float dtime)
 {
-	if (!IsPaused() && pScene_ && waitForResults_)
+	if (!pScene_) {
+		return;
+	}
+
+	if (!IsPaused() && waitForResults_)
 	{
 		Stepper* pStepper = getStepper();
-		pStepper->wait(pScene_);
+		pStepper->wait(pScene_->getPxScene());
 
 		core::TimeVal simTime = pStepper->getSimulationTime();
 
@@ -516,14 +418,11 @@ void XPhysics::onTickPostRender(float dtime)
 	}
 
 	// debug Vis
-	if (pScene_ && vars_.DebugDrawEnabled() && pDebugRender_)
+	if (vars_.DebugDrawEnabled() && pDebugRender_)
 	{
-		const physx::PxRenderBuffer& debugRenderable = pScene_->getRenderBuffer();
-
 		pDebugRender_->clear();
-		pDebugRender_->update(debugRenderable);
-
-		updateRenderObjectsDebug(dtime);
+		// draw debug objects for this scene
+		pScene_->drawDebug(pDebugRender_);
 	}
 
 	// pause if one frame update.
@@ -546,27 +445,74 @@ void XPhysics::render(void)
 
 // ------------------------------------------
 
-void XPhysics::setGravity(const Vec3f& gravity)
+IPhysicsCooking* XPhysics::getCooking(void)
 {
-	vars_.SetGravityVecValue(gravity);
-
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
-	pScene_->setGravity(Px3FromVec3(gravity));
-}
-
-void XPhysics::setBounceThresholdVelocity(float32_t bounceThresholdVelocity)
-{
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
-	pScene_->setBounceThresholdVelocity(bounceThresholdVelocity);
+	return pCooking_;
 }
 
 // ------------------------------------------
 
-IPhysicsCooking* XPhysics::getCooking(void)
+IScene* XPhysics::createScene(const SceneDesc& desc)
 {
-	return pCooking_;
+	if (pScene_) {
+		X_ERROR("Phys", "Only one scene is allowed, release the old before creating a new one");
+		return nullptr;
+	}
+
+	physx::PxSceneDesc sceneDesc(scale_);
+	sceneDesc.broadPhaseCallback = this;
+	sceneDesc.simulationEventCallback = this;
+	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+	sceneDesc.cpuDispatcher = &jobDispatcher_;
+	sceneDesc.solverBatchSize = 32; // i might make this lower to improve scaling.
+	sceneDesc.nbContactDataBlocks = 256;
+	sceneDesc.maxNbContactDataBlocks = 65536;
+
+	// algorithums
+	sceneDesc.broadPhaseType = physx::PxBroadPhaseType::eMBP;
+	sceneDesc.staticStructure = physx::PxPruningStructure::eSTATIC_AABB_TREE;
+	sceneDesc.dynamicStructure = physx::PxPruningStructure::eDYNAMIC_AABB_TREE;
+	sceneDesc.dynamicTreeRebuildRateHint = 100;
+
+	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
+		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
+	}
+	else {
+		sceneDesc.simulationOrder = physx::PxSimulationOrder::eCOLLIDE_SOLVE;
+	}
+
+	// flags
+	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_TWO_DIRECTIONAL_FRICTION;
+	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
+	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
+	//sceneDesc.flags |= physx::PxSceneFlag::eADAPTIVE_FORCE;
+	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
+	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
+
+	// stuff we allow to be configured.
+	// keep in mind it may override what you set above.
+	copySceneDesc(sceneDesc, scale_, desc);
+
+	auto scene = core::makeUnique<XScene>(arena_, vars_, pPhysics_, arena_);
+	if (!scene->createPxScene(sceneDesc)) {
+		X_ERROR("Phys", "Failed to create scene");
+		return nullptr;
+	}
+
+	vars_.SetScene(scene->getPxScene());
+
+	pScene_ = scene.get();
+	return scene.release();
+}
+
+void XPhysics::releaseScene(IScene* pScene)
+{
+	// todo free :D!
+	X_ASSERT(pScene == pScene_, "Invalid scene pointer")(pScene, pScene_);
+
+	pScene_ = nullptr;
+	X_DELETE(pScene, arena_);
 }
 
 // ------------------------------------------
@@ -577,48 +523,7 @@ MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 
 	return reinterpret_cast<MaterialHandle>(pMaterial);
 }
-// ------------------------------------------
 
-
-RegionHandle XPhysics::addRegion(const AABB& bounds)
-{
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
-	if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
-		return 0;
-	}
-
-	physx::PxBroadPhaseRegion region;
-	region.bounds = PxBounds3FromAABB(bounds);
-	region.userData = nullptr;
-
-	uint32_t handle = pScene_->addBroadPhaseRegion(region);
-
-	if (handle == 0xFFFFFFFF) {
-		core::StackString256 tmp;
-		X_ERROR("Phys", "error adding region with bounds: %s", bounds.toString(tmp));
-	}
-
-	return handle;
-}
-
-bool XPhysics::removeRegion(RegionHandle handle_)
-{
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
-	if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
-		return true;
-	}
-
-	uint32_t handle = safe_static_cast<uint32_t>(handle_);
-
-	if (!pScene_->removeBroadPhaseRegion(handle)) {
-		X_ERROR("Phys", "Failed to remove region id: %" PRIu32, handle);
-		return false;
-	}
-
-	return true;
-}
 
 // ------------------------------------------
 
@@ -721,80 +626,12 @@ void XPhysics::releaseJoint(IJoint* pJoint)
 
 // ------------------------------------------
 
-ICharacterController* XPhysics::createCharacterController(const ControllerDesc& desc)
-{
-	if (desc.shape == ControllerDesc::ShapeType::Box)
-	{
-		physx::PxBoxControllerDesc pxDesc;
-		copycontrollerDesc(pxDesc, desc);
-
-		const BoxControllerDesc& boxDesc = static_cast<const BoxControllerDesc&>(desc);
-		pxDesc.halfHeight = boxDesc.halfHeight;
-		pxDesc.halfSideExtent = boxDesc.halfSideExtent;
-		pxDesc.halfForwardExtent = boxDesc.halfForwardExtent;
-
-		auto* pController = pControllerManager_->createController(pxDesc);
-
-		return X_NEW(XBoxCharController, arena_, "BoxCharController")(static_cast<physx::PxBoxController*>(pController));
-	}
-	if (desc.shape == ControllerDesc::ShapeType::Capsule)
-	{
-		physx::PxCapsuleControllerDesc pxDesc;
-		copycontrollerDesc(pxDesc, desc);
-
-		const CapsuleControllerDesc& boxDesc = static_cast<const CapsuleControllerDesc&>(desc);
-		pxDesc.radius = boxDesc.radius;
-		pxDesc.height = boxDesc.height;
-		if (boxDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
-			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eEASY;
-		}
-		else if (boxDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Constrained) {
-			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eCONSTRAINED;
-		}
-		else {
-			X_ASSERT_UNREACHABLE();
-		}
-
-		auto* pController = pControllerManager_->createController(pxDesc);
-		
-		return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
-	}
-
-	X_ASSERT_UNREACHABLE();
-	return nullptr;
-}
-
-void XPhysics::releaseCharacterController(ICharacterController* pController)
-{
-	X_DELETE(pController, arena_);
-}
-
-// ------------------------------------------
-
 void XPhysics::setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
 	// should we lock here?
 	actor.setName(pNamePointer);
-}
-
-void XPhysics::addActorToScene(ActorHandle handle)
-{
-	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
-
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
-	pScene_->addActor(actor);
-}
-
-void XPhysics::addActorsToScene(ActorHandle* pHandles, size_t num)
-{
-	physx::PxActor* pActors = reinterpret_cast<physx::PxActor*>(pHandles);
-
-	physx::PxSceneWriteLock scopedLock(*pScene_);
-
-	pScene_->addActors(&pActors, safe_static_cast<physx::PxU32>(num));
 }
 
 // ------------------------------------------
@@ -1197,21 +1034,6 @@ void XPhysics::createPvdConnection(void)
 // --------------------------------------------------------
 
 
-void XPhysics::updateRenderObjectsDebug(float dtime)
-{
-	X_UNUSED(dtime);
-}
-
-void XPhysics::updateRenderObjectsSync(float dtime)
-{
-	X_UNUSED(dtime);
-}
-
-void XPhysics::updateRenderObjectsAsync(float dtime)
-{
-	X_UNUSED(dtime);
-}
-
 
 
 Stepper* XPhysics::getStepper(void)
@@ -1254,18 +1076,6 @@ void XPhysics::setScratchBlockSize(size_t size)
 }
 
 
-void XPhysics::setVisualizationCullingBox(AABB& box)
-{
-	if (pScene_) {
-
-		physx::PxBounds3 bounds;
-		bounds.minimum = Px3FromVec3(box.min);
-		bounds.maximum = Px3FromVec3(box.max);
-
-		pScene_->setVisualizationCullingBox(bounds);
-		pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCULL_BOX, 1.0f);
-	}
-}
 
 void XPhysics::cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
 {

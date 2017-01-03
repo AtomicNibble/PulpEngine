@@ -422,6 +422,7 @@
     <ClInclude Include="Stepper.h" />
     <ClInclude Include="XPhysics.h" />
     <ClInclude Include="XPhysLib.h" />
+    <ClInclude Include="XScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Allocator.cpp" />
@@ -451,6 +452,7 @@
     <ClCompile Include="Stepper.cpp" />
     <ClCompile Include="XPhysics.cpp" />
     <ClCompile Include="XPhysLib.cpp" />
+    <ClCompile Include="XScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ControllerWrapper.inl" />
