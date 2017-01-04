@@ -630,7 +630,6 @@ struct IScene
 {
 	virtual ~IScene() {}
 
-
 	// some runtime tweaks.
 	virtual void setGravity(const Vec3f& gravity) X_ABSTRACT;
 	virtual void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_ABSTRACT;
@@ -650,6 +649,18 @@ struct IScene
 	// Characters controllers
 	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
 	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
+
+	// some query api.
+
+	virtual bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
+		RaycastCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_ABSTRACT;
+
+	virtual bool sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+		SweepCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		const float32_t inflation = 0.f) const X_ABSTRACT;
+
+	virtual bool overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const X_ABSTRACT;
+
 };
 
 struct IPhysics

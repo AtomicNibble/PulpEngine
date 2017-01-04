@@ -68,6 +68,7 @@ namespace
 
 
 
+
 	void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
 	{
 		pxDesc.position = Px3ExtFromVec3(desc.position);
@@ -295,6 +296,49 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 void XScene::releaseCharacterController(ICharacterController* pController)
 {
 	X_DELETE(pController, arena_);
+}
+
+// ------------------------------------------
+
+bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
+	RaycastCallback& hitCall, HitFlags hitFlags) const
+{
+	PHYS_SCENE_READ_LOCK(pScene_);
+
+	// static assets check this stuff maps.
+	return pScene_->raycast(
+		Px3FromVec3(origin), 
+		Px3FromVec3(unitDir), 
+		distance,
+		reinterpret_cast<physx::PxRaycastCallback&>(hitCall), 
+		static_cast<physx::PxHitFlags>(hitFlags.ToInt())
+	);
+}
+
+bool XScene::sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+	SweepCallback& hitCall, HitFlags hitFlags, const float32_t inflation) const
+{
+	PHYS_SCENE_READ_LOCK(pScene_);
+
+	return pScene_->sweep(
+		PxGeoFromGeo(geometry),
+		PxTransFromQuatTrans(pose),
+		Px3FromVec3(unitDir),
+		distance,
+		reinterpret_cast<physx::PxSweepCallback&>(hitCall),
+		static_cast<physx::PxHitFlags>(hitFlags.ToInt())
+	);
+}
+
+bool XScene::overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const
+{
+	PHYS_SCENE_READ_LOCK(pScene_);
+
+	return pScene_->overlap(
+		PxGeoFromGeo(geometry),
+		PxTransFromQuatTrans(pose),
+		reinterpret_cast<physx::PxOverlapCallback&>(hitCall)
+	);
 }
 
 X_NAMESPACE_END
