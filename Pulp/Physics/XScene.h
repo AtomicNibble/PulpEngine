@@ -36,6 +36,10 @@ public:
 	void removeActor(ActorHandle handle) X_FINAL;
 	void removeActors(ActorHandle* pHandles, size_t num) X_FINAL;
 
+	// Aggregate
+	void addAggregate(AggregateHandle handle) X_FINAL;
+	void removeAggregate(AggregateHandle handle) X_FINAL;
+
 	// Characters controllers
 	ICharacterController* createCharacterController(const ControllerDesc& desc) X_FINAL;
 	void releaseCharacterController(ICharacterController* pController) X_FINAL;

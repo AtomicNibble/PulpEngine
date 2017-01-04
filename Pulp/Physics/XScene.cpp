@@ -268,6 +268,26 @@ void XScene::removeActors(ActorHandle* pHandles, size_t num)
 
 // ------------------------------------------
 
+void XScene::addAggregate(AggregateHandle handle)
+{
+	physx::PxAggregate& agg = *reinterpret_cast<physx::PxAggregate*>(handle);
+
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
+	pScene_->addAggregate(agg);
+}
+
+void XScene::removeAggregate(AggregateHandle handle)
+{
+	physx::PxAggregate& agg = *reinterpret_cast<physx::PxAggregate*>(handle);
+
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
+	pScene_->removeAggregate(agg, true);
+}
+
+// ------------------------------------------
+
 ICharacterController* XScene::createCharacterController(const ControllerDesc& desc)
 {
 	if (desc.shape == ControllerDesc::ShapeType::Box)

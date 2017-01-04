@@ -652,6 +652,10 @@ struct IScene
 	virtual void removeActor(ActorHandle handle) X_ABSTRACT;
 	virtual void removeActors(ActorHandle* pHandles, size_t num) X_ABSTRACT;
 
+	// Aggregate
+	virtual void addAggregate(AggregateHandle handle) X_ABSTRACT;
+	virtual void removeAggregate(AggregateHandle handle) X_ABSTRACT;
+
 	// Characters controllers
 	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
 	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
