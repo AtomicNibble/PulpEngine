@@ -12,6 +12,13 @@ namespace
 	X_ENSURE_SIZE(AABB, sizeof(physx::PxBounds3));
 	X_ENSURE_SIZE(QuatTransf, sizeof(physx::PxTransform));
 
+	X_ENSURE_SIZE(GeometryBase, sizeof(physx::PxGeometry));
+	X_ENSURE_SIZE(BoxGeometry, sizeof(physx::PxBoxGeometry));
+	X_ENSURE_SIZE(SphereGeometry, sizeof(physx::PxSphereGeometry));
+	X_ENSURE_SIZE(PlaneGeometry, sizeof(physx::PxPlaneGeometry));
+	X_ENSURE_SIZE(CapsuleGeometry, sizeof(physx::PxCapsuleGeometry));
+
+
 
 	static_assert(X_OFFSETOF(Vec3f, x) == X_OFFSETOF(physx::PxVec3, x), "Offset don't match");
 	static_assert(X_OFFSETOF(Vec3f, y) == X_OFFSETOF(physx::PxVec3, y), "Offset don't match");

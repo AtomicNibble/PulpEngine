@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IPhysics.h>
 
 X_NAMESPACE_BEGIN(physics)
 
@@ -98,6 +99,53 @@ X_INLINE physx::PxBounds3& PxBounds3FromAABB(AABB& aabb)
 {
 	return reinterpret_cast<physx::PxBounds3&>(aabb);
 }
+
+// Geo
+X_INLINE const physx::PxGeometry& PxGeoFromGeo(const GeometryBase& geo)
+{
+	return reinterpret_cast<const physx::PxBoxGeometry&>(geo);
+}
+X_INLINE physx::PxGeometry& PxGeoFromGeo(GeometryBase& geo)
+{
+	return reinterpret_cast<physx::PxGeometry&>(geo);
+}
+
+X_INLINE const physx::PxBoxGeometry& PxBoxGeoFromBoxGeo(const BoxGeometry& box)
+{
+	return reinterpret_cast<const physx::PxBoxGeometry&>(box);
+}
+X_INLINE physx::PxBoxGeometry& PxBoxGeoFromBoxGeo(BoxGeometry& box)
+{
+	return reinterpret_cast<physx::PxBoxGeometry&>(box);
+}
+
+X_INLINE const physx::PxSphereGeometry& PxSphereGeoFromSphereGeo(const SphereGeometry& sphere)
+{
+	return reinterpret_cast<const physx::PxSphereGeometry&>(sphere);
+}
+X_INLINE physx::PxSphereGeometry& PxSphereGeoFromSphereGeo(SphereGeometry& sphere)
+{
+	return reinterpret_cast<physx::PxSphereGeometry&>(sphere);
+}
+
+X_INLINE const physx::PxPlaneGeometry& PxPlaneGeoFromPlaneGeo(const PlaneGeometry& plane)
+{
+	return reinterpret_cast<const physx::PxPlaneGeometry&>(plane);
+}
+X_INLINE physx::PxPlaneGeometry& PxPlaneGeoFromPlaneGeo(PlaneGeometry& plane)
+{
+	return reinterpret_cast<physx::PxPlaneGeometry&>(plane);
+}
+
+X_INLINE const physx::PxCapsuleGeometry& PxCapsuleGeoFromCapsuleGeo(const CapsuleGeometry& cap)
+{
+	return reinterpret_cast<const physx::PxCapsuleGeometry&>(cap);
+}
+X_INLINE physx::PxCapsuleGeometry& PxCapsuleGeoFromCapsuleGeo(CapsuleGeometry& cap)
+{
+	return reinterpret_cast<physx::PxCapsuleGeometry&>(cap);
+}
+
 
 
 X_NAMESPACE_END
