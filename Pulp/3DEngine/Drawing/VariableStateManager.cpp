@@ -16,7 +16,7 @@ namespace
 	// thought id try somthing diffrent than making the manager a friend :|
 	struct ResourceStateInit : public render::Commands::ResourceStateBase
 	{
-		static const size_t lastMemberEnd = offsetof(ResourceStateBase, _pad) + sizeof(ResourceStateBase::_pad);
+		static const size_t lastMemberEnd = X_OFFSETOF(ResourceStateBase, _pad) + sizeof(ResourceStateBase::_pad);
 		// make sure that the compiler did not add in padding after last member.
 		static_assert(sizeof(ResourceStateBase) == lastMemberEnd, "Compiler added paddin at end");
 

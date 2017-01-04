@@ -100,7 +100,7 @@ private:
 #include "LinkedListIntrusive.inl"
 
 
-#define INTRUSIVE_LIST_DECLARE(T, link) core::XListIntrusiveDeclare<T, offsetof(T, link)>
+#define INTRUSIVE_LIST_DECLARE(T, link) core::XListIntrusiveDeclare<T, X_OFFSETOF(T, link)>
 #define INTRUSIVE_LIST_LINK(T) core::XLinkIntrusive<T>
 #define INTRUSIVE_LIST_PTR(T) core::XListIntrusive<T> *
 
