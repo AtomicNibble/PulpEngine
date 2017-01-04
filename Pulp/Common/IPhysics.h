@@ -569,6 +569,62 @@ typedef HitBuffer<OverlapHit> OverlapBuffer;
 typedef HitBuffer<SweepHit> SweepBuffer;
 
 
+// For passing geo to physics in abstract way.
+enum class GeometryType
+{
+	Sphere,
+	Plane,
+	Capsule,
+	Box
+};
+
+struct GeometryBase
+{
+protected:
+	X_INLINE GeometryBase(GeometryType t) : type_(t) {}
+
+protected:
+	GeometryType type_;
+};
+
+class SphereGeometry : public GeometryBase
+{
+public:
+	X_INLINE SphereGeometry() : GeometryBase(GeometryType::Sphere), radius_(0) {}
+	X_INLINE SphereGeometry(float32_t ir) : GeometryBase(GeometryType::Sphere), radius_(ir) {}
+
+private:
+	float32_t radius_;
+};
+
+class PlaneGeometry : public GeometryBase
+{
+public:
+	X_INLINE PlaneGeometry() : GeometryBase(GeometryType::Plane) {}
+};
+
+class CapsuleGeometry : public GeometryBase
+{
+public:
+	X_INLINE CapsuleGeometry() : GeometryBase(GeometryType::Capsule), radius_(0) {}
+	X_INLINE CapsuleGeometry(float32_t radius, float32_t halfHeight): GeometryBase(GeometryType::Capsule), radius_(radius), halfHeight_(halfHeight) {}
+
+private:
+	float32_t radius_;
+	float32_t halfHeight_;
+};
+
+class BoxGeometry : public GeometryBase
+{
+public:
+	X_INLINE BoxGeometry() : GeometryBase(GeometryType::Sphere) {}
+	X_INLINE BoxGeometry(float hx, float hy, float hz) : GeometryBase(GeometryType::Sphere), halfExtents_(hx, hy, hz) {}
+	X_INLINE BoxGeometry(const Vec3f& halfExtents) : GeometryBase(GeometryType::Sphere), halfExtents_(halfExtents) {}
+
+private:
+	Vec3f halfExtents_;
+};
+
 
 struct IScene
 {
