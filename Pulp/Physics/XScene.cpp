@@ -12,6 +12,61 @@ X_NAMESPACE_BEGIN(physics)
 
 namespace
 {
+	// some asserts to check we can just cast directly to px types.
+
+	static_assert(HitFlag::POSITION == physx::PxHitFlag::ePOSITION, "HitFlag mismatch");
+	static_assert(HitFlag::NORMAL == physx::PxHitFlag::eNORMAL, "HitFlag mismatch");
+	static_assert(HitFlag::DISTANCE == physx::PxHitFlag::eDISTANCE, "HitFlag mismatch");
+	static_assert(HitFlag::UV == physx::PxHitFlag::eUV, "HitFlag mismatch");
+	static_assert(HitFlag::ASSUME_NO_INITIAL_OVERLAP == physx::PxHitFlag::eASSUME_NO_INITIAL_OVERLAP, "HitFlag mismatch");
+	static_assert(HitFlag::MESH_MULTIPLE == physx::PxHitFlag::eMESH_MULTIPLE, "HitFlag mismatch");
+	static_assert(HitFlag::MESH_ANY == physx::PxHitFlag::eMESH_ANY, "HitFlag mismatch");
+	static_assert(HitFlag::MESH_BOTH_SIDES == physx::PxHitFlag::eMESH_BOTH_SIDES, "HitFlag mismatch");
+	static_assert(HitFlag::PRECISE_SWEEP == physx::PxHitFlag::ePRECISE_SWEEP, "HitFlag mismatch");
+	static_assert(HitFlag::MTD == physx::PxHitFlag::eMTD, "HitFlag mismatch");
+
+
+	X_ENSURE_SIZE(ActorShape, sizeof(physx::PxActorShape));
+	X_ENSURE_SIZE(QueryHit, sizeof(physx::PxQueryHit));
+	X_ENSURE_SIZE(LocationHit, sizeof(physx::PxLocationHit));
+	X_ENSURE_SIZE(RaycastHit, sizeof(physx::PxRaycastHit));
+	X_ENSURE_SIZE(OverlapHit, sizeof(physx::PxOverlapHit));
+	X_ENSURE_SIZE(SweepHit, sizeof(physx::PxSweepHit));
+
+
+	X_ENSURE_SIZE(HitCallback<ActorShape>, sizeof(physx::PxHitCallback<physx::PxActorShape>));
+	X_ENSURE_SIZE(HitCallback<OverlapHit>, sizeof(physx::PxHitCallback<physx::PxOverlapHit>));
+	X_ENSURE_SIZE(HitCallback<SweepHit>, sizeof(physx::PxHitCallback<physx::PxSweepHit>));
+
+	X_ENSURE_SIZE(HitBuffer<RaycastHit>, sizeof(physx::PxHitBuffer<physx::PxRaycastHit>));
+	X_ENSURE_SIZE(HitBuffer<OverlapHit>, sizeof(physx::PxHitBuffer<physx::PxOverlapHit>));
+	X_ENSURE_SIZE(HitBuffer<SweepHit>, sizeof(physx::PxHitBuffer<physx::PxSweepHit>));
+
+	static_assert(X_OFFSETOF(ActorShape, actor) == X_OFFSETOF(physx::PxActorShape, actor), "Offset don't match");
+	static_assert(X_OFFSETOF(ActorShape, pShape) == X_OFFSETOF(physx::PxActorShape, shape), "Offset don't match");
+
+	static_assert(X_OFFSETOF(QueryHit, faceIndex) == X_OFFSETOF(physx::PxQueryHit, faceIndex), "Offset don't match");
+
+	static_assert(X_OFFSETOF(LocationHit, flags) == X_OFFSETOF(physx::PxLocationHit, flags), "Offset don't match");
+	static_assert(X_OFFSETOF(LocationHit, position) == X_OFFSETOF(physx::PxLocationHit, position), "Offset don't match");
+	static_assert(X_OFFSETOF(LocationHit, normal) == X_OFFSETOF(physx::PxLocationHit, normal), "Offset don't match");
+	static_assert(X_OFFSETOF(LocationHit, distance) == X_OFFSETOF(physx::PxLocationHit, distance), "Offset don't match");
+
+
+	static_assert(X_OFFSETOF(RaycastHit, u) == X_OFFSETOF(physx::PxRaycastHit, u), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastHit, v) == X_OFFSETOF(physx::PxRaycastHit, v), "Offset don't match");
+
+	static_assert(X_OFFSETOF(OverlapHit, padTo16Bytes) == X_OFFSETOF(physx::PxOverlapHit, padTo16Bytes), "Offset don't match");
+
+	static_assert(X_OFFSETOF(SweepHit, padTo16Bytes) == X_OFFSETOF(physx::PxSweepHit, padTo16Bytes), "Offset don't match");
+
+	static_assert(X_OFFSETOF(RaycastCallback, block) == X_OFFSETOF(physx::PxRaycastCallback, block), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastCallback, hasBlock) == X_OFFSETOF(physx::PxRaycastCallback, hasBlock), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastCallback, pTouches) == X_OFFSETOF(physx::PxRaycastCallback, touches), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastCallback, maxNbTouches) == X_OFFSETOF(physx::PxRaycastCallback, maxNbTouches), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastCallback, nbTouches) == X_OFFSETOF(physx::PxRaycastCallback, nbTouches), "Offset don't match");
+
+
 
 	void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
 	{
