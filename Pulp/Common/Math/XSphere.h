@@ -26,8 +26,10 @@ public:
 	X_INLINE bool intersect(const Ray& ray, float *intersection);
 
 protected:
-	Vec3f	Center_;
-	float	Radius_;
+	Vec3f	center_;
+	float	radius_;
+};
+
 };
 
 #include "XSphere.inl"

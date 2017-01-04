@@ -1,39 +1,39 @@
 
 X_INLINE Sphere::Sphere(const Vec3f& aCenter, float aRadius) :
-	Center_(aCenter), 
-	Radius_(aRadius) 
+	center_(aCenter), 
+	radius_(aRadius) 
 {
 
 }
 
 X_INLINE float Sphere::radius(void) const
 { 
-	return Radius_; 
+	return radius_; 
 }
 
 X_INLINE void Sphere::setRadius(float radius)
 { 
-	Radius_ = radius; 
+	radius_ = radius; 
 }
 
 X_INLINE const Vec3f& Sphere::center(void) const
 { 
-	return Center_; 
+	return center_; 
 }
 
 X_INLINE const void	Sphere::setCenter(const Vec3f& center)
 { 
-	Center_ = center; 
+	center_ = center; 
 }
 
 
 X_INLINE bool Sphere::intersects(const Ray &ray)
 {
 	float 		t;
-	Vec3f		temp = ray.getOrigin() - Center_;
+	Vec3f		temp = ray.getOrigin() - center_;
 	float 		a = ray.getDirection().dot(ray.getDirection());
 	float 		b = 2.0f * temp.dot(ray.getDirection());
-	float 		c = temp.dot(temp) - Radius_ * Radius_;
+	float 		c = temp.dot(temp) - radius_ * radius_;
 	float 		disc = b * b - 4.0f * a * c;
 
 	if (disc < 0.0f) {
@@ -60,10 +60,10 @@ X_INLINE bool Sphere::intersects(const Ray &ray)
 X_INLINE bool Sphere::intersect(const Ray &ray, float *intersection)
 {
 	float 		t;
-	Vec3f		temp = ray.getOrigin() - Center_;
+	Vec3f		temp = ray.getOrigin() - center_;
 	float 		a = ray.getDirection().dot(ray.getDirection());
 	float 		b = 2.0f * temp.dot(ray.getDirection());
-	float 		c = temp.dot(temp) - Radius_ * Radius_;
+	float 		c = temp.dot(temp) - radius_ * radius_;
 	float 		disc = b * b - 4.0f * a * c;
 
 	if (disc < 0.0f) {
