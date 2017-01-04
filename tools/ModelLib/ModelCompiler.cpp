@@ -1124,7 +1124,7 @@ bool ModelCompiler::ProcessModel(void)
 
 bool ModelCompiler::DropWeights(void)
 {
-	core::Stack<core::V2::Job*> jobs(arena_, 512);
+	core::V2::Job* pLodJobs[model::MODEL_MAX_LODS] = { nullptr };
 
 	const uint32_t batchSize = safe_static_cast<uint32_t,size_t>(getBatchSize(sizeof(RawModel::Vert)));
 	X_LOG2("Model", "using batch size of %" PRIu32, batchSize);
@@ -1135,40 +1135,33 @@ bool ModelCompiler::DropWeights(void)
 	del.Bind<ModelCompiler, &ModelCompiler::DropWeightsJob>(this);
 
 	// create jobs for each mesh.
-	for (auto& lod : lods_)
+	for (size_t i=0; i<lods_.size(); i++)
 	{
+		auto& lod = lods_[i];
+		pLodJobs[i] = pJobSys_->CreateJob(core::V2::JobSystem::EmptyJob);
+
 		for (auto& mesh : lod.meshes_)
 		{
 			RawModel::Vert* pVerts = mesh.verts_.ptr();
 			const uint32_t numVerts = safe_static_cast<uint32_t,size_t>(mesh.verts_.size());
 
-			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del, pVerts, numVerts,
+			core::V2::Job* pJob = pJobSys_->parallel_for_member_child<ModelCompiler>(pLodJobs[i], del, pVerts, numVerts,
 				core::V2::CountSplitter32(batchSize));
 
 			pJobSys_->Run(pJob);
-
-			// handle the rare case stack is full
-			if (jobs.size() == jobs.capacity())
-			{
-				core::V2::Job* pJob = jobs.top();
-				pJobSys_->Wait(pJob);
-				jobs.pop();
-			}
-
-			jobs.push(pJob);
 		}
 	}
 
-	while (jobs.isNotEmpty())
+	for (auto* pLodJob : pLodJobs)
 	{
-		core::V2::Job* pJob = jobs.top();
-		pJobSys_->Wait(pJob);
-		jobs.pop();
+		if (pLodJob)
+		{
+			pJobSys_->Wait(pLodJob);
+		}
 	}
 
 	// update stats
 	stats_.totalWeightsDropped = droppedWeights_;
-
 	return true;
 }
 
@@ -1429,53 +1422,49 @@ bool ModelCompiler::ScaleModel(void)
 		return true;
 	}
 
-	core::Stack<core::V2::Job*> jobs(arena_, 512);
-
 	const uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(Vert)));
 	X_LOG2("Model", "using batch size of %" PRIu32, batchSize);
 
 	core::Delegate<void(Vert*, uint32_t)> del;
 	del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
 
-	auto addScaleJobForMesh = [&](auto& m) {
+	auto addScaleJobForMesh = [&](core::V2::Job* pParent, auto& m) {
 		Vert* pVerts = m.verts_.ptr();
 		const uint32_t numVerts = safe_static_cast<uint32_t, size_t>(m.verts_.size());
 
-		core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
+		core::V2::Job* pJob = pJobSys_->parallel_for_member_child<ModelCompiler>(pParent, del,
 			pVerts, numVerts, core::V2::CountSplitter32(batchSize));
 
 		pJobSys_->Run(pJob);
 
-		// handle the rare case stack is full
-		if (jobs.size() == jobs.capacity())
-		{
-			core::V2::Job* pJob = jobs.top();
-			pJobSys_->Wait(pJob);
-			jobs.pop();
-		}
-
-		jobs.push(pJob);
 	};
 
+	core::V2::Job* pLodJobs[model::MODEL_MAX_LODS] = { nullptr };
+
 	// create jobs for each mesh.
-	for (auto& lod : compiledLods_)
+	for (size_t i=0; i<compiledLods_.size(); i++)
 	{
+		auto& lod = compiledLods_[i];
+
+		pLodJobs[i] = pJobSys_->CreateJob(core::V2::JobSystem::EmptyJob);
+
 		for (auto& mesh : lod.meshes_)
 		{
-			addScaleJobForMesh(mesh);
+			addScaleJobForMesh(pLodJobs[i], mesh);
 
 			for (auto& colMesh : mesh.colMeshes_)
 			{
-				addScaleJobForMesh(colMesh);
+				addScaleJobForMesh(pLodJobs[i], colMesh);
 			}
 		}
 	}
 
-	while (jobs.isNotEmpty())
+	for (auto* pLodJob : pLodJobs)
 	{
-		core::V2::Job* pJob = jobs.top();
-		pJobSys_->Wait(pJob);
-		jobs.pop();
+		if (pLodJob)
+		{
+			pJobSys_->Wait(pLodJob);
+		}
 	}
 
 	return ScaleBones();
