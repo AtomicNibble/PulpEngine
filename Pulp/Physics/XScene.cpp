@@ -241,11 +241,29 @@ void XScene::addActorToScene(ActorHandle handle, const char* pDebugNamePointer)
 
 void XScene::addActorsToScene(ActorHandle* pHandles, size_t num)
 {
-	physx::PxActor* pActors = reinterpret_cast<physx::PxActor*>(pHandles);
+	physx::PxActor* const pActors = reinterpret_cast<physx::PxActor* const>(pHandles);
 
 	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	pScene_->addActors(&pActors, safe_static_cast<physx::PxU32>(num));
+}
+
+void XScene::removeActor(ActorHandle handle)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
+	pScene_->removeActor(actor, true);
+}
+
+void XScene::removeActors(ActorHandle* pHandles, size_t num)
+{
+	physx::PxActor* const pActors = reinterpret_cast<physx::PxActor* const>(pHandles);
+
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
+	pScene_->removeActors(&pActors, safe_static_cast<physx::PxU32>(num), true);
 }
 
 // ------------------------------------------

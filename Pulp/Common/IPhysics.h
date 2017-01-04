@@ -649,6 +649,8 @@ struct IScene
 	virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
 	virtual void addActorToScene(ActorHandle handle, const char* pDebugNamePointer) X_ABSTRACT;
 	virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
+	virtual void removeActor(ActorHandle handle) X_ABSTRACT;
+	virtual void removeActors(ActorHandle* pHandles, size_t num) X_ABSTRACT;
 
 	// Characters controllers
 	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
