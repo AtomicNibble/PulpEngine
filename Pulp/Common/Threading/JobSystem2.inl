@@ -106,6 +106,18 @@ namespace V2
 		return job;
 	}
 
+	template <typename T, typename SplitterT>
+	X_INLINE Job* JobSystem::parallel_for_child(Job* pParent, T* data, size_t count,
+		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter)
+	{
+		typedef parallel_for_job_data<T, SplitterT> JobData;
+		JobData jobData(data, count, function, splitter);
+
+		Job* job = CreateJobAsChild<JobData>(pParent, &parallel_for_job<JobData>, jobData);
+
+		return job;
+	}
+
 	template <typename ClassType, typename T, typename SplitterT>
 	X_INLINE Job* JobSystem::parallel_for_member(typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del,
 		T* data, uint32_t count, const SplitterT& splitter)
