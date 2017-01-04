@@ -30,8 +30,6 @@ protected:
 	float	radius_;
 };
 
-};
-
 #include "XSphere.inl"
 
 #endif // !_X_MATH_SPHERE_H_
