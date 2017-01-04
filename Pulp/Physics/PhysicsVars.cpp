@@ -118,7 +118,7 @@ void PhysXVars::SetScene(physx::PxScene* pScene)
 
 	PHYS_SCENE_WRITE_LOCK(pScene_);
 
-	SetGravityVecValue(Vec3FromPhysx(pScene_->getGravity()));
+	SetGravityVecValue(Vec3FromPx3(pScene_->getGravity()));
 
 	// set current values.
 	for (uint32_t i = 0; i < physx::PxVisualizationParameter::eNUM_VALUES; i++)

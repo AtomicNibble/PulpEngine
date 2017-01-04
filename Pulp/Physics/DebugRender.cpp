@@ -47,7 +47,7 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 			{
 				const physx::PxDebugPoint& point = points[i];
 
-				pPoints[i].pos = Vec3FromPhysx(point.pos);
+				pPoints[i].pos = Vec3FromPx3(point.pos);
 				pPoints[i].color = Color8u::hexA(point.color);
 			}
 
@@ -77,9 +77,9 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 			{
 				const physx::PxDebugLine& line = lines[i];
 
-				pLines[0].pos = Vec3FromPhysx(line.pos0);
+				pLines[0].pos = Vec3FromPx3(line.pos0);
 				pLines[0].color = Color8u::hexA(line.color0);
-				pLines[1].pos = Vec3FromPhysx(line.pos1);
+				pLines[1].pos = Vec3FromPx3(line.pos1);
 				pLines[1].color = Color8u::hexA(line.color1);
 				pLines += 2;
 			}
@@ -110,13 +110,13 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 				const physx::PxDebugTriangle& triangle = triangles[i];
 				auto* pTri = pVerts;
 
-				pTri[0].pos = Vec3FromPhysx(triangle.pos0);
+				pTri[0].pos = Vec3FromPx3(triangle.pos0);
 				pTri[0].color = Color8u::hexA(triangle.color0);
 
-				pTri[1].pos = Vec3FromPhysx(triangle.pos1);
+				pTri[1].pos = Vec3FromPx3(triangle.pos1);
 				pTri[1].color = Color8u::hexA(triangle.color1);
 
-				pTri[2].pos = Vec3FromPhysx(triangle.pos2);
+				pTri[2].pos = Vec3FromPx3(triangle.pos2);
 				pTri[2].color = Color8u::hexA(triangle.color2);
 
 				pVerts += 3;
