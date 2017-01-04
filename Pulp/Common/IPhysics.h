@@ -495,6 +495,10 @@ struct RaycastHit : public LocationHit
 
 	// the following fields are set in accordance with the HitFlags
 	float32_t u, v;
+
+#if X_64 == 0
+	uint32_t padTo16Bytes[3];
+#endif // !X_64
 };
 
 struct OverlapHit : public QueryHit 
