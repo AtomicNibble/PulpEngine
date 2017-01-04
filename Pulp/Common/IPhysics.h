@@ -433,6 +433,143 @@ struct SceneDesc
 	AABB sanityBounds;					// nothing sound ever be outside these bounds, it's reported if so.
 };
 
+X_DECLARE_FLAGS(HitFlag)(
+	POSITION,						// "position" member of QueryHit is valid
+	NORMAL,							// "normal" member of QueryHit is valid
+	DISTANCE,						// "distance" member of QueryHit is valid
+	UV,								// "u" and "v" barycentric coordinates of QueryHit are valid. Not applicable to sweep queries.
+	ASSUME_NO_INITIAL_OVERLAP,		// Performance hint flag for sweeps when it is known upfront there's no initial overlap.
+									// NOTE: using this flag may cause undefined results if shapes are initially overlapping.
+	MESH_MULTIPLE,					// Report all hits for meshes rather than just the first. Not applicable to sweep queries.
+	MESH_ANY,						// Report any first hit for meshes. If neither MESH_MULTIPLE nor MESH_ANY is specified,
+									// a single closest hit will be reported for meshes.
+	MESH_BOTH_SIDES,				// Report hits with back faces of mesh triangles. Also report hits for raycast
+									// originating on mesh surface and facing away from the surface normal. Not applicable to sweep queries.
+									// Please refer to the user guide for heightfield-specific differences.
+	PRECISE_SWEEP,					// Use more accurate but slower narrow phase sweep tests.
+	MTD								// Report the minimum translation depth, normal and contact point. 
+);
+
+typedef Flags<HitFlag> HitFlags;
+
+struct ActorShape
+{
+	X_INLINE ActorShape() : actor(INVALID_HANLDE), pShape(nullptr) {}
+	X_INLINE ActorShape(ActorHandle a, void* s) : actor(a), pShape(s) {}
+
+	ActorHandle		actor;
+	void*			pShape;
+};
+
+struct QueryHit : ActorShape
+{
+	X_INLINE QueryHit() : faceIndex(0xFFFFffff) {}
+
+	uint32_t faceIndex;
+};
+
+struct LocationHit : public QueryHit
+{
+	X_INLINE LocationHit() : 
+		flags(0), 
+		position(Vec3f::zero()), 
+		normal(Vec3f::zero()),
+		distance(std::numeric_limits<float32_t>::max()) 
+	{}
+
+	X_INLINE bool hadInitialOverlap(void) const { 
+		return (distance <= 0.0f); 
+	}
+
+	// the following fields are set in accordance with the HitFlags
+	HitFlags flags;		
+	Vec3f position;								
+	Vec3f normal;		
+	float32_t distance;
+};
+
+
+struct RaycastHit : public LocationHit
+{
+	X_INLINE RaycastHit() : u(0.0f), v(0.0f) {}
+
+	// the following fields are set in accordance with the HitFlags
+	float32_t u, v;
+};
+
+struct OverlapHit : public QueryHit 
+{ 
+	uint32_t padTo16Bytes;
+};
+
+struct SweepHit : public LocationHit
+{
+	X_INLINE SweepHit() {}
+
+	uint32_t padTo16Bytes;
+};
+
+template<typename HitType>
+struct HitCallback
+{
+	HitCallback(HitType* aTouches, uint32_t aMaxNbTouches) :
+		hasBlock(false),
+		touches(aTouches), 
+		maxNbTouches(aMaxNbTouches), 
+		nbTouches(0)
+	{}
+
+	virtual ~HitCallback() {}
+
+	virtual bool processTouches(const HitType* buffer, uint32_t nbHits) X_ABSTRACT;
+	virtual void finalizeQuery() {} 
+
+	X_INLINE bool hasAnyHits(void) { 
+		return (hasBlock || (nbTouches > 0));
+	}
+
+
+	HitType		block;			
+	bool		hasBlock;		
+
+	HitType*	pTouches;		
+	uint32_t	maxNbTouches;
+	uint32_t	nbTouches;
+};
+
+template<typename HitType>
+struct HitBuffer : public HitCallback<HitType>
+{
+	HitBuffer(HitType* pTouches = nullptr, uint32_t maxNbTouches = 0) : 
+		HitCallback<HitType>(pTouches, maxNbTouches)
+	{}
+	
+	virtual ~HitBuffer() {}
+
+	X_INLINE uint32_t getNbAnyHits(void) const { return getNbTouches() + uint32_t(this->hasBlock); }
+	X_INLINE const HitType&	getAnyHit(const uint32_t index) const {
+		X_ASSERT(index < getNbTouches() + uint32_t(this->hasBlock), "")();
+		return index < getNbTouches() ? getTouches()[index] : this->block;
+	}
+
+	X_INLINE uint32_t getNbTouches(void) const { return this->nbTouches; }
+	X_INLINE const HitType*	getTouches(void) const { return this->touches; }
+	X_INLINE const HitType&	getTouch(const uint32_t index) const {
+		X_ASSERT(index < getNbTouches(), "")(); 
+		return getTouches()[index]; 
+	}
+	X_INLINE uint32_t getMaxNbTouches(void) const { return this->maxNbTouches; }
+};
+
+typedef HitCallback<RaycastHit> RaycastCallback;
+typedef HitCallback<OverlapHit> OverlapCallback;
+typedef HitCallback<SweepHit> SweepCallback;
+typedef HitBuffer<RaycastHit> RaycastBuffer;
+typedef HitBuffer<OverlapHit> OverlapBuffer;
+typedef HitBuffer<SweepHit> SweepBuffer;
+
+
+
 struct IScene
 {
 	virtual ~IScene() {}
