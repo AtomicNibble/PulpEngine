@@ -364,6 +364,9 @@ public:
 	X_INLINE Job* parallel_for_member(typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del, 
 		T* data, uint32_t count, const SplitterT& splitter);
 
+	template <typename ClassType, typename T, typename SplitterT>
+	X_INLINE Job* parallel_for_member_child(Job* pParent, typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del,
+		T* data, uint32_t count, const SplitterT& splitter);
 
 	template<typename ClassType>
 	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
