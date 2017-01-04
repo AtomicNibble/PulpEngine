@@ -40,6 +40,7 @@ extern "C" void* _ReturnAddress(void);
 #define X_MULTILINE_MACRO_END						} while (0) X_ENABLE_WARNING(4127)
 #define X_IMPORT									__declspec(dllimport)
 #define X_EXPORT									__declspec(dllexport)
+#define X_OFFSETOF(s,m)								offsetof(s,m)
 
 // these should not be used there is a native patch seperator define in Path<T>::
 // #define X_PATHSEPERATOR_STR						"\\"
