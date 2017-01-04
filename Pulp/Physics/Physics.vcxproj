@@ -434,6 +434,7 @@
     <ClCompile Include="CpuDispatcher.cpp" />
     <ClCompile Include="DebugRender.cpp" />
     <ClCompile Include="DelayLoadHook.cpp" />
+    <ClCompile Include="MathHelpers.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="PhysicsVars.cpp" />
