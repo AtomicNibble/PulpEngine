@@ -2027,6 +2027,8 @@ RawModel::Mesh::NameString ModelCompiler::StripColisionPrefix(const RawModel::Me
 		return colMeshName;
 	}
 
+	static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+
 	// lets check my + 4 logic is not broken.
 	static_assert(sizeof(model::MODEL_MESH_COL_BOX_PREFIX) == 5, "MODEL_MESH_COL_BOX_PREFIX size changed");
 	static_assert(sizeof(model::MODEL_MESH_COL_SPHERE_PREFIX) == 5, "MODEL_MESH_COL_SPHERE_PREFIX size changed");
