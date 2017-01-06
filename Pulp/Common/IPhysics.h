@@ -43,13 +43,14 @@ struct BoundedData : public StridedData
 struct TriangleMeshDesc
 {
 	BoundedData points; // Vec3f
-	BoundedData triangles; // 16bit int's
+	BoundedData triangles; // it's either 16 or 32bit zero based index's depending on CookFlag. the stride is the face not index size. aka 6 for 16bit
 };
 
 struct ConvexMeshDesc
 {
 	BoundedData points;  // vec3f, can use stride to jump to next if it's inside a struct.
-	BoundedData indices; // optinal, it's either 16 or 32bit zero based index's depending on CookFlag.
+	BoundedData polygons; // 
+	BoundedData indices; // 
 };
 
 struct HeightFieldSample
@@ -368,8 +369,10 @@ public:
 	virtual bool cookingSupported(void) const X_ABSTRACT;
 	virtual bool setCookingMode(CookingMode::Enum mode) X_ABSTRACT;
 
-	virtual bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
-	virtual bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, CookFlags flags) X_ABSTRACT;
+	virtual bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut, CookFlags flags = CookFlags()) X_ABSTRACT;
+	// cook convex from a tri description, the tri mesh must still be convex.
+	virtual bool cookConvexMesh(const TriangleMeshDesc& desc, DataArr& dataOut, CookFlags flags = CookFlags()) X_ABSTRACT;
+	virtual bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, CookFlags flags = CookFlags()) X_ABSTRACT;
 	virtual bool cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut) X_ABSTRACT;
 
 };

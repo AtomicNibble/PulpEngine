@@ -3,6 +3,8 @@
 
 #include <IPhysics.h>
 
+#include "Allocator.h"
+
 X_NAMESPACE_BEGIN(physics)
 
 class PhysCooking : public IPhysicsCooking
@@ -17,7 +19,8 @@ public:
 	bool cookingSupported(void) const X_FINAL;
 	virtual bool setCookingMode(CookingMode::Enum mode) X_FINAL;
 
-	bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_FINAL;
+	bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut, CookFlags flags) X_FINAL;
+	bool cookConvexMesh(const TriangleMeshDesc& desc, DataArr& dataOut, CookFlags flags) X_FINAL;
 	bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, CookFlags flags) X_FINAL;
 	bool cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut) X_FINAL;
 	// ~IPhysicsCooking
@@ -28,8 +31,9 @@ private:
 
 private:
 	core::MemoryArenaBase*	arena_;
-	physx::PxCooking*		pCooking_;
+	PhysxArenaAllocator		physAllocator_;
 
+	physx::PxCooking*		pCooking_;
 	physx::PxTolerancesScale scale_;
 };
 

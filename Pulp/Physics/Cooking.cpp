@@ -20,6 +20,7 @@ namespace
 
 PhysCooking::PhysCooking(core::MemoryArenaBase* arena) :
 	arena_(arena),
+	physAllocator_(arena),
 	pCooking_(nullptr)
 {
 
@@ -67,13 +68,17 @@ bool PhysCooking::init(const physx::PxTolerancesScale& scale, physx::PxFoundatio
 	return true;
 }
 
-bool PhysCooking::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut)
+bool PhysCooking::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut, CookFlags flags)
 {
 	X_ASSERT_NOT_NULL(pCooking_);
 
 	physx::PxTriangleMeshDesc meshDesc;
 	meshDesc.points = PxBoundedDataFromBounded(desc.points);
 	meshDesc.triangles = PxBoundedDataFromBounded(desc.triangles);
+
+	if (flags.IsSet(CookFlag::INDICES_16BIT)) {
+		meshDesc.flags.set(physx::PxMeshFlag::e16_BIT_INDICES);
+	}
 
 	if (!meshDesc.isValid()) {
 		X_ERROR("Phys", "Failed to cook tri mesh, description is invalid");
@@ -103,11 +108,82 @@ bool PhysCooking::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOu
 	return true;
 }
 
+bool PhysCooking::cookConvexMesh(const TriangleMeshDesc& triDesc, DataArr& dataOut, CookFlags flags)
+{
+	// we support cooking a convex mesh from a triangle representation.
+	physx::PxSimpleTriangleMesh triMesh;
+	triMesh.points = PxBoundedDataFromBounded(triDesc.points);
+	triMesh.triangles = PxBoundedDataFromBounded(triDesc.triangles);
+
+	if (flags.IsSet(CookFlag::INDICES_16BIT)) {
+		triMesh.flags.set(physx::PxMeshFlag::e16_BIT_INDICES);
+	}
+
+	if (!triMesh.isValid()) {
+		X_ERROR("Phys", "Failed to cook convex mesh, tri mesh is invalid");
+		return false;
+	}
+
+	physx::PxU32 numVerts = 0;
+	physx::PxVec3* pVertices = nullptr;
+	physx::PxU32 numIndices = 0;
+	physx::PxU32* pIndices = nullptr;
+	physx::PxU32 numPolygons = 0; 
+	physx::PxHullPolygon* pPolygons = nullptr;
+
+	if (!pCooking_->computeHullPolygons(
+		triMesh,
+		physAllocator_,
+		numVerts, pVertices,
+		numIndices, pIndices,
+		numPolygons, pPolygons
+	)) {
+		X_ERROR("Phys", "Failed to compute convex hull for tri mesh");
+		return false;
+	}
+
+	// now we bake convex.
+	physx::PxConvexMeshDesc meshDesc;
+	meshDesc.points.data = pVertices;
+	meshDesc.points.count = numVerts;
+	meshDesc.points.stride = sizeof(physx::PxVec3);
+	// even if we where given 16bit indices, computeHullPolygons will give us 32bit ones.
+	meshDesc.indices.data = pIndices;
+	meshDesc.indices.count = numIndices;
+	meshDesc.indices.stride = sizeof(physx::PxU32);
+	meshDesc.polygons.data = pPolygons;
+	meshDesc.polygons.count = numPolygons;
+	meshDesc.polygons.stride = sizeof(physx::PxHullPolygon);
+
+	if (!meshDesc.isValid()) {
+		X_ERROR("Phys", "Failed to cook convex mesh, description is invalid");
+		return false;
+	}
+
+	physx::PxDefaultMemoryOutputStream writeBuffer;
+	bool status = pCooking_->cookConvexMesh(meshDesc, writeBuffer);
+	if (!status) {
+		physAllocator_.deallocate(pVertices);
+		physAllocator_.deallocate(pIndices);
+		physAllocator_.deallocate(pPolygons);
+		X_ERROR("Phys", "Failed to cook convex mesh");
+		return false;
+	}
+
+	physAllocator_.deallocate(pVertices);
+	physAllocator_.deallocate(pIndices);
+	physAllocator_.deallocate(pPolygons);
+
+	dataOut.resize(writeBuffer.getSize());
+	std::memcpy(dataOut.data(), writeBuffer.getData(), writeBuffer.getSize());
+	return true;
+}
 
 bool PhysCooking::cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, CookFlags flags)
 {
 	physx::PxConvexMeshDesc meshDesc;
 	meshDesc.points = PxBoundedDataFromBounded(desc.points);
+	meshDesc.polygons = PxBoundedDataFromBounded(desc.polygons);
 	meshDesc.indices = PxBoundedDataFromBounded(desc.indices);
 
 	if (flags.IsSet(CookFlag::INDICES_16BIT)) {
