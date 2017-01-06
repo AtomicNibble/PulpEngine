@@ -413,15 +413,16 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
 		{
 			static_assert(std::is_same<Vec3f, decltype(VertsArr::Type::pos_)>::value, "Cooking requires vec3f points");
 			
-			physics::ConvexMeshDesc desc;
+			physics::TriangleMeshDesc desc;
 			desc.points.pData = &verts_.front().pos_;
 			desc.points.stride = sizeof(VertsArr::Type);
 			desc.points.count = static_cast<uint32_t>(verts_.size());
-			desc.indices.pData = faces_.data();
-			desc.indices.stride = sizeof(FaceArr::Type);
-			desc.indices.count = safe_static_cast<uint32_t>(faces_.size());
+			desc.triangles.pData = faces_.data();
+			desc.triangles.stride = sizeof(FaceArr::Type);
+			desc.triangles.count = safe_static_cast<uint32_t>(faces_.size());
 
-			if (!pCooker->cookConvexMesh(desc, cooked_, physics::IPhysicsCooking::CookFlag::INDICES_16BIT))
+			// we have 32bit faces.
+			if (!pCooker->cookConvexMesh(desc, cooked_))
 			{
 				X_ERROR("Model", "Failed to cook convex physics mesh");
 				return false;
