@@ -10,7 +10,7 @@ public:
 	PhysxArenaAllocator(core::MemoryArenaBase* arena) :
 		arena_(arena) {}
 
-private:
+public:
 	X_INLINE void* allocate(size_t size, const char* typeName, const char* filename, int line) X_FINAL
 	{
 		core::SourceInfo srcInfo("Physx", filename, line, "-", "-");
