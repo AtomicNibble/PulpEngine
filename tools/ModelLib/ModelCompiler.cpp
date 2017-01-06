@@ -9,6 +9,7 @@
 #include <IMaterial.h>
 #include <IFileSys.h>
 
+#include "Math\XSphereGen.h"
 
 #include "FaceOptermize.h"
 
@@ -55,6 +56,16 @@ namespace
 
 		ModelCompiler::Vert* pVert;
 		int32_t idx;
+	};
+
+	template < typename Pit_, typename Cit_ >
+	struct VertAccessor
+	{
+		typedef Pit_    Pit;
+		typedef Cit_    Cit;
+		inline  Cit operator() (Pit it) const {
+			return &(*it).pos_.x;
+		}
 	};
 
 } // namesace 
@@ -355,7 +366,8 @@ void ModelCompiler::Mesh::calBoundingbox(void)
 ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 	Mesh(oth),
 	type_(oth.type_),
-	sphere_(oth.sphere_)
+	sphere_(oth.sphere_),
+	cooked_(oth.cooked_)
 {
 
 }
@@ -364,7 +376,8 @@ ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 
 ModelCompiler::ColMesh::ColMesh(const Mesh& oth, ColMeshType::Enum type) :
 	Mesh(oth.arena_),
-	type_(type)
+	type_(type),
+	cooked_(oth.arena_)
 {
 
 }
@@ -372,6 +385,61 @@ ModelCompiler::ColMesh::ColMesh(const Mesh& oth, ColMeshType::Enum type) :
 ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
 {
 	return type_;
+}
+
+bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
+{
+	static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+
+	if (type_ == ColMeshType::BOX)
+	{
+		// ok so we want a bounding box of the mesh.
+		// we can do just reuse the normal mesh aabb logic.
+		calBoundingbox();
+	}
+	else if (type_ = ColMeshType::SPHERE)
+	{
+		typedef core::BoundingSphereGen <3, VertAccessor<VertsArr::ConstIterator, const float*>> BS;
+		BS bs(arena_, verts_.begin(), verts_.end());
+
+		Vec3f center(bs.center()[0], bs.center()[1], bs.center()[2]);
+
+		sphere_ = Sphere(center, bs.squaredRadius());
+	}
+	else if (type_ = ColMeshType::CONVEX)
+	{
+		// i'm gonna cook you good.
+		if (pCooker)
+		{
+			static_assert(std::is_same<Vec3f, decltype(VertsArr::Type::pos_)>::value, "Cooking requires vec3f points");
+			
+			physics::ConvexMeshDesc desc;
+			desc.points.pData = &verts_.front().pos_;
+			desc.points.stride = sizeof(VertsArr::Type);
+			desc.points.count = static_cast<uint32_t>(verts_.size());
+			desc.indices.pData = faces_.data();
+			desc.indices.stride = sizeof(FaceArr::Type);
+			desc.indices.count = safe_static_cast<uint32_t>(faces_.size());
+
+			if (!pCooker->cookConvexMesh(desc, cooked_, physics::IPhysicsCooking::CookFlag::INDICES_16BIT))
+			{
+				X_ERROR("Model", "Failed to cook convex physics mesh");
+				return false;
+			}
+		}
+		else
+		{
+			// runtime cooking..
+		}
+	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+		return false;
+	}
+
+
+	return true;
 }
 
 // ---------------------------------------------------------------

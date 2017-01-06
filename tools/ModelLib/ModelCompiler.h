@@ -1,6 +1,7 @@
 #pragma once
 
 #include <IFileSys.h>
+#include <IPhysics.h>
 
 #include <String\Path.h>
 #include <Containers\Array.h>
@@ -153,6 +154,7 @@ public:
 
 		ColMeshType::Enum getType(void) const;
 
+		bool processColMesh(physics::IPhysicsCooking* pCooker);
 
 	private:
 		ColMeshType::Enum type_;
@@ -160,6 +162,7 @@ public:
 		// we inherit from Mesh which already has a AABB which is where the bounds are sotred 
 		// when type is BOX.
 		Sphere sphere_;
+		physics::IPhysicsCooking::DataArr cooked_;
 	};
 
 	class Lod
