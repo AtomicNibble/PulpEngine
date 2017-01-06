@@ -1628,6 +1628,10 @@ bool ModelCompiler::ProcessCollisionMeshes(void)
 
 bool ModelCompiler::BakeCollisionMeshes(void)
 {
+	if (compiledLods_.isEmpty()) {
+		return true;
+	}
+
 	auto& lod = compiledLods_[0];
 
 	// look for any collision meshes in LOD0
