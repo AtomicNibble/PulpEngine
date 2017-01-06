@@ -194,7 +194,7 @@ public:
 
 
 public:
-	ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
+	ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooker = nullptr);
 	~ModelCompiler() = default;
 
 	void SetVertexElipson(float elipson);

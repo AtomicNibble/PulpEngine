@@ -440,9 +440,10 @@ size_t ModelCompiler::Lod::totalIndexs(void) const
 
 // ---------------------------------------------------------------
 
-ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
+ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooker) :
 	RawModel::Model(arena, pJobSys),
 	pJobSys_(pJobSys),
+	pPhysCooker_(pPhysCooker),
 	vertexElipsion_(MERGE_VERTEX_ELIPSION),
 	texcoordElipson_(MERGE_TEXCOORDS_ELIPSION),
 	jointWeightThreshold_(JOINT_WEIGHT_THRESHOLD),
