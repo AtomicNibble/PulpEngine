@@ -144,22 +144,22 @@ public:
 
 	class ColMesh : public Mesh
 	{
-		X_DECLARE_ENUM(ColMeshType)(SPHERE, BOX, CONVEX);
+	public:
 
 	public:
-		ColMesh(core::MemoryArenaBase* arena);
 		ColMesh(const ColMesh& oth);
-		ColMesh(const Mesh& oth);
+		ColMesh(const Mesh& oth, ColMeshType::Enum type);
 		~ColMesh() = default;
+
+		ColMeshType::Enum getType(void) const;
 
 
 	private:
 		ColMeshType::Enum type_;
 
-		union {
-			AABB box_;
-			Sphere sphere_;
-		};
+		// we inherit from Mesh which already has a AABB which is where the bounds are sotred 
+		// when type is BOX.
+		Sphere sphere_;
 	};
 
 	class Lod

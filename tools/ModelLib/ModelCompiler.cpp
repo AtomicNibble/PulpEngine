@@ -345,33 +345,34 @@ void ModelCompiler::Mesh::calBoundingbox(void)
 
 // ---------------------------------------------------------------
 
-ModelCompiler::ColMesh::ColMesh(core::MemoryArenaBase* arena) :
-	Mesh(arena),
-	type_(ColMeshType::CONVEX)
-{
-
-}
+//ModelCompiler::ColMesh::ColMesh(core::MemoryArenaBase* arena) :
+//	Mesh(arena),
+//	type_(ColMeshType::CONVEX)
+//{
+//
+//}
 
 ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 	Mesh(oth),
-	type_(oth.type_)
+	type_(oth.type_),
+	sphere_(oth.sphere_)
 {
-	if (type_ == ColMeshType::SPHERE) {
-		sphere_ = oth.sphere_;
-	} else 	if (type_ == ColMeshType::BOX) {
-		box_ = oth.box_;
-	}
+
 }
 
 
 
-ModelCompiler::ColMesh::ColMesh(const Mesh& oth) : 
+ModelCompiler::ColMesh::ColMesh(const Mesh& oth, ColMeshType::Enum type) :
 	Mesh(oth.arena_),
-	type_(ColMeshType::CONVEX)
+	type_(type)
 {
 
 }
 
+ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
+{
+	return type_;
+}
 
 // ---------------------------------------------------------------
 
