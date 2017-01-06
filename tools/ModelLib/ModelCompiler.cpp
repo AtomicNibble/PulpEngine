@@ -1771,6 +1771,27 @@ bool ModelCompiler::CheckLimits(void)
 				return false;
 			}
 #endif // !X_MODEL_MTL_LOWER_CASE_NAMES
+
+			// check col mesh limits again here.
+			if (mesh.colMeshes_.size() > MODEL_MESH_COL_MAX_MESH)
+			{
+				X_ERROR("Model", "Mesh has \"%s\" has too many physics shapes defined, max: %" PRIuS,
+					mesh.name_.c_str(), MODEL_MESH_COL_MAX_MESH);
+				return false;
+			}
+
+			for (const auto& colMesh : mesh.colMeshes_)
+			{
+				if (colMesh.getType() == ColMeshType::CONVEX)
+				{
+					if (colMesh.verts_.size() > MODEL_MESH_COL_MAX_VERTS)
+					{
+						X_ERROR("Model", "Convex col mesh exceeds vert limit of: %" PRIu32 " provided: %" PRIuS,
+							MODEL_MESH_COL_MAX_VERTS, colMesh.verts_.size());
+						return false;
+					}
+				}
+			}
 		}
 	}
 
