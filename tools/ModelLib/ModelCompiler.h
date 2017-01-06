@@ -230,7 +230,7 @@ private:
 	size_t calculateBoneDataSize(void) const;
 
 	bool ProcessModel(void);
-	bool PrcoessCollisionMeshes(void);
+	bool ProcessCollisionMeshes(void);
 	bool BakeCollisionMeshes(void);
 	bool DropWeights(void);
 	bool MergMesh(void);

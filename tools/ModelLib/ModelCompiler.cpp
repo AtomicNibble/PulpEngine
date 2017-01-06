@@ -1174,7 +1174,7 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
-	if (!PrcoessCollisionMeshes()) {
+	if (!ProcessCollisionMeshes()) {
 		X_ERROR("Model", "Failed to process collision mesh");
 		return false;
 	}
@@ -1541,7 +1541,7 @@ bool ModelCompiler::ScaleModel(void)
 }
 
 
-bool ModelCompiler::PrcoessCollisionMeshes(void)
+bool ModelCompiler::ProcessCollisionMeshes(void)
 {
 	if (compiledLods_.isEmpty()) {
 		return true;
