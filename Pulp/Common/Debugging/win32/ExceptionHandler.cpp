@@ -476,10 +476,13 @@ namespace exceptionHandler
 				X_LOG_BULLET;
 				X_LOG0( "ExceptionHandler", "Writing crash dump to a file." );
 
-				const char* Date = "DATE"; // TODO
-				const char* Time = "TIME";
+				TimeStamp time = TimeStamp::GetSystemTime();
+				DateStamp date = DateStamp::GetSystemDate();
 
-				filename.appendFmt( "CrashDump %s %s.dmp", Date, Time );
+				TimeStamp::FileDescription time_txt;
+				DateStamp::Description date_txt;
+
+				filename.appendFmt("MiniDump_%s_%s.dmp", date.ToString(date_txt), time.ToString(time_txt));
 
 				if( !debugging::WriteMiniDump( filename.c_str(), debugging::DumpType::Medium, exceptionPointers ) )
 				{
