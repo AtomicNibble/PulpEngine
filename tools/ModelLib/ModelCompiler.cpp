@@ -1184,6 +1184,11 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	if (!BakeCollisionMeshes()) {
+		X_ERROR("Model", "Failed to bake collision mesh");
+		return false;
+	}
+
 	if (!CheckLimits()) {
 		X_ERROR("Model", "Model exceeds limits");
 		return false;
