@@ -9,6 +9,7 @@
 
 #include "RawModel.h"
 
+
 X_NAMESPACE_DECLARE(model,
 	namespace RawModel {
 		class Model;
@@ -230,6 +231,7 @@ private:
 
 	bool ProcessModel(void);
 	bool PrcoessCollisionMeshes(void);
+	bool BakeCollisionMeshes(void);
 	bool DropWeights(void);
 	bool MergMesh(void);
 	bool CreateData(void);

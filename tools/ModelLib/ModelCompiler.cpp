@@ -1592,6 +1592,7 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 									mesh.name_.c_str(), MODEL_MESH_COL_MAX_MESH);
 								return false;
 							}
+
 							// move it into the meshes col meshes.
 							mesh.colMeshes_.emplace_back(othMesh, type);
 
@@ -1625,6 +1626,31 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 	return true;
 }
 
+bool ModelCompiler::BakeCollisionMeshes(void)
+{
+	auto& lod = compiledLods_[0];
+
+	// look for any collision meshes in LOD0
+	for (auto& lod : compiledLods_)
+	{
+		for (auto& mesh : lod.meshes_)
+		{
+			// for each mesh we can have multiple physics shapes.
+			for (auto& colMesh : mesh.colMeshes_)
+			{
+				// process the mesh into either a AABB / sphere.
+				// if it's a convex mesh we cook it.
+				if (!colMesh.processColMesh(pPhysCooker_))
+				{
+					X_ERROR("Model", "Failed to process physics mesh: \"%s\"", colMesh.name_.c_str());
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
 
 
 bool ModelCompiler::UpdateMeshBounds(void)
