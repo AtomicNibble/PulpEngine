@@ -13,12 +13,44 @@ X_NAMESPACE_BEGIN(core)
 
 namespace debugging
 {
-	bool WriteMiniDump(const char* filename, EXCEPTION_POINTERS* exceptionPointers)
+	namespace
+	{
+		uint32_t getDumpType(DumpType type)
+		{
+			switch (type)
+			{
+				case DumpType::Full:
+					return MiniDumpWithDataSegs | 
+						MiniDumpWithFullMemoryInfo |
+						MiniDumpWithThreadInfo |
+						MiniDumpWithProcessThreadData |
+						MiniDumpWithUnloadedModules |
+						MiniDumpWithPrivateReadWriteMemory;
+
+				case DumpType::Medium:
+					return MiniDumpWithDataSegs |
+						MiniDumpWithFullMemory |
+						MiniDumpWithFullMemoryInfo |
+						MiniDumpWithThreadInfo |
+						MiniDumpWithProcessThreadData |
+						MiniDumpWithUnloadedModules |
+						MiniDumpWithPrivateReadWriteMemory;
+
+				case DumpType::Small:
+					return MiniDumpNormal;
+			}
+	
+			return MiniDumpNormal;
+		}
+
+	} // namespace
+
+	bool WriteMiniDump(const char* filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers)
 	{
 #if X_ENABLE_MINI_DUMP
 		MINIDUMP_EXCEPTION_INFORMATION miniDumpInfo;
 
-		MINIDUMP_TYPE DumpType = MiniDumpNormal;
+		MINIDUMP_TYPE DumpType = static_cast<MINIDUMP_TYPE>(getDumpType(type));
 		PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam = nullptr;
 		PMINIDUMP_CALLBACK_INFORMATION CallbackParam = nullptr;
 

@@ -21,7 +21,15 @@ namespace debugging
 	/// \remark Code generation is enabled/disabled via the preprocessor option \ref X_ENABLE_MINI_DUMP. Disabling
 	/// writing of mini dumps reduces the executable's size, and may be useful for some builds.
 	/// \sa X_ENABLE_MINI_DUMP exceptionHandler
-	bool WriteMiniDump(const char* filename, EXCEPTION_POINTERS* exceptionPointers);
+
+	enum class DumpType
+	{
+		Full,
+		Medium,
+		Small
+	};
+
+	bool WriteMiniDump(const char* filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers);
 }
 
 X_NAMESPACE_END

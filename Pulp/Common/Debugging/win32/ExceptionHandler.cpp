@@ -303,7 +303,7 @@ namespace exceptionHandler
 
 				filename.appendFmt( "MiniDump_%s_%s.dmp", date.ToString( date_txt ), time.ToString( time_txt ) );
 
-				if( !debugging::WriteMiniDump( filename.c_str(), exceptionPointers ) )
+				if( !debugging::WriteMiniDump( filename.c_str(), debugging::DumpType::Medium, exceptionPointers ) )
 				{
 					X_ERROR( "ExceptionHandler", "Could not write crash dump." );
 				}
@@ -481,7 +481,7 @@ namespace exceptionHandler
 
 				filename.appendFmt( "CrashDump %s %s.dmp", Date, Time );
 
-				if( !debugging::WriteMiniDump( filename.c_str(), exceptionPointers ) )
+				if( !debugging::WriteMiniDump( filename.c_str(), debugging::DumpType::Medium, exceptionPointers ) )
 				{
 					X_ERROR( "ExceptionHandler", "Quitting the application." );
 				}
