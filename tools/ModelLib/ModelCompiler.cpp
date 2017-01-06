@@ -1492,7 +1492,9 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 				auto& othMesh = lod.meshes_[i];
 				if (&mesh != &othMesh)
 				{
-					if (isColisionMesh(othMesh.name_))
+					ColMeshType::Enum type;
+
+					if (isColisionMesh(othMesh.name_, &type))
 					{
 						const auto colMeshMame = StripColisionPrefix(othMesh.name_);
 
@@ -1505,7 +1507,7 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 							// the only trailing chars we allow are _01, _02
 
 							// move it into the meshes col meshes.
-							mesh.colMeshes_.append(othMesh);
+							mesh.colMeshes_.emplace_back(othMesh, type);
 
 							lod.meshes_.removeIndex(i);
 
