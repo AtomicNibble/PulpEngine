@@ -126,7 +126,6 @@ static const wchar_t*	 MODEL_FILE_EXTENSION_W = L"model";
 static const char*		 MODEL_DEFAULT_NAME = "default/default";
 
 // max col meshes per mesh
-static const uint32_t	MODEL_MAX_COL_MESH = 8;
 
 
 // Intermidiate format stuff.
@@ -138,9 +137,12 @@ static const uint32_t	 MODEL_RAW_VERSION = 1;
 static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
 
 
+// col mesh info
 static const char		 MODEL_MESH_COL_BOX_PREFIX[] = "PBX_";
 static const char		 MODEL_MESH_COL_SPHERE_PREFIX[] = "PSP_";
 static const char		 MODEL_MESH_COL_CONVEX_PREFIX[] = "PCX_";
+static const uint32_t	 MODEL_MESH_COL_MAX_VERTS = 256; // source and baked limit
+static const uint32_t	 MODEL_MESH_COL_MAX_MESH = 8; // max col mesh per a mesh. (yes we allow multiple col meshes for each mesh)
 
 
 static const uint32_t	 MODEL_MAX_LOADED = 1 << 13; // max models that can be loaded.
