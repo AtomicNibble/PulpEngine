@@ -108,7 +108,8 @@ bool PhysCooking::cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut)
 {
 	physx::PxConvexMeshDesc meshDesc;
 	meshDesc.points = PxBoundedDataFromBounded(desc.points);
-	meshDesc.triangles = PxBoundedDataFromBounded(desc.polygons);
+	meshDesc.indices = PxBoundedDataFromBounded(desc.indices);
+
 
 	if (!meshDesc.isValid()) {
 		X_ERROR("Phys", "Failed to cook convex mesh, description is invalid");

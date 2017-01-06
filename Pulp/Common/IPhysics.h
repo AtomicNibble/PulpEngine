@@ -48,9 +48,8 @@ struct TriangleMeshDesc
 
 struct ConvexMeshDesc
 {
-	BoundedData points;
-	// optional
-	BoundedData polygons;
+	BoundedData points;  // vec3f, can use stride to jump to next if it's inside a struct.
+	BoundedData indices; // optinal, it's either 16 or 32bit zero based index's depending on CookFlag.
 };
 
 struct HeightFieldSample
