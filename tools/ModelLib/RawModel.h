@@ -83,7 +83,7 @@ namespace RawModel
 		bool WriteMaterial(ModelDataStrArr& arr, const Material& mat) const;
 		
 	protected:
-		static bool isColisionMesh(const RawModel::Mesh::NameString& name);
+		static bool isColisionMesh(const RawModel::Mesh::NameString& name, ColMeshType::Enum* pType = nullptr);
 
 	private:
 

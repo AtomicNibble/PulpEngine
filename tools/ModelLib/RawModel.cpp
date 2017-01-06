@@ -892,8 +892,10 @@ namespace RawModel
 		return true;
 	}
 
-	bool Model::isColisionMesh(const RawModel::Mesh::NameString& name)
+	bool Model::isColisionMesh(const RawModel::Mesh::NameString& name, ColMeshType::Enum* pType)
 	{
+		static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+
 		const char* pFind = nullptr;
 
 		// PBX_ * _ *
@@ -901,6 +903,10 @@ namespace RawModel
 		{
 			if (pFind != name.begin()) {
 				goto ignore;
+			}
+
+			if (pType) {
+				*pType = ColMeshType::BOX;
 			}
 			return true;
 		}
@@ -910,6 +916,10 @@ namespace RawModel
 			if (pFind != name.begin()) {
 				goto ignore;
 			}
+
+			if (pType) {
+				*pType = ColMeshType::SPHERE;
+			}
 			return true;
 		}
 		// PCX_ * _ *
@@ -917,6 +927,10 @@ namespace RawModel
 		{
 			if (pFind != name.begin()) {
 				goto ignore;
+			}
+
+			if (pType) {
+				*pType = ColMeshType::CONVEX;
 			}
 			return true;
 		}
