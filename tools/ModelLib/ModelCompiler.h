@@ -256,6 +256,7 @@ private:
 
 private:
 	core::V2::JobSystem* pJobSys_;
+	physics::IPhysicsCooking* pPhysCooker_;
 
 	float vertexElipsion_;
 	float texcoordElipson_;
