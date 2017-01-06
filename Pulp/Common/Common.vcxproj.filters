@@ -1174,6 +1174,9 @@
     <ClInclude Include="Platform\MessageBox.h">
       <Filter>Headers\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Math\XSphereGen.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1469,6 +1472,9 @@
     </None>
     <None Include="String\XParser.inl">
       <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Math\XSphereGen.inl">
+      <Filter>Headers\Math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

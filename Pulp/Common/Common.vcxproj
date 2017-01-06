@@ -209,6 +209,7 @@
     <ClInclude Include="Math\XRay.h" />
     <ClInclude Include="Math\XRect.h" />
     <ClInclude Include="Math\XSphere.h" />
+    <ClInclude Include="Math\XSphereGen.h" />
     <ClInclude Include="Math\XVecCompressed.h" />
     <ClInclude Include="Math\XVector.h" />
     <ClInclude Include="Math\XVectorAligned.h" />
@@ -439,6 +440,7 @@
     <None Include="Math\XQuatCompressed.inl" />
     <None Include="Math\XRect.inl" />
     <None Include="Math\XSphere.inl" />
+    <None Include="Math\XSphereGen.inl" />
     <None Include="Math\XViewPort.inl" />
     <None Include="Math\XWinding.inl" />
     <None Include="Memory\AllocationPolicies\GrowingBlockAllocator.inl" />
