@@ -171,6 +171,12 @@ X_DECLARE_FLAGS(MeshFlag)(
 	BIG_INDEX
 ); 
 
+X_DECLARE_ENUM(ColMeshType)(
+	SPHERE, 
+	BOX, 
+	CONVEX
+);
+
 // VertexStream from vertexformats.h is has a copy also, but it is enum not flags.
 // we have flags here for checking what streams are provided.
 // vert is always provided.
