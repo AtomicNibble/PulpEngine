@@ -18,7 +18,7 @@ public:
 	virtual bool setCookingMode(CookingMode::Enum mode) X_FINAL;
 
 	bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_FINAL;
-	bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut) X_FINAL;
+	bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, CookFlags flags) X_FINAL;
 	bool cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut) X_FINAL;
 	// ~IPhysicsCooking
 

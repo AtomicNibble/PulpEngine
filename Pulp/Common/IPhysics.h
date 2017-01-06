@@ -355,6 +355,12 @@ struct ICapsuleCharacterController : public ICharacterController
 
 struct IPhysicsCooking
 {
+public:
+	X_DECLARE_FLAGS(CookFlag)(
+		INDICES_16BIT
+	);
+
+	typedef Flags<CookFlag> CookFlags;
 	typedef core::Array<uint8_t> DataArr;
 
 	virtual ~IPhysicsCooking() {}
@@ -363,7 +369,7 @@ struct IPhysicsCooking
 	virtual bool setCookingMode(CookingMode::Enum mode) X_ABSTRACT;
 
 	virtual bool cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
-	virtual bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut) X_ABSTRACT;
+	virtual bool cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, CookFlags flags) X_ABSTRACT;
 	virtual bool cookHeightField(const HeightFieldDesc& desc, DataArr& dataOut) X_ABSTRACT;
 
 };
