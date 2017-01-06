@@ -1479,6 +1479,7 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 		return true;
 	}
 
+	// we only look for col mesh on lod0 currently.
 	auto& lod = compiledLods_[0];
 
 	// look for any collision meshes in LOD0
@@ -1506,6 +1507,23 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 							// lets validate it.
 							// the only trailing chars we allow are _01, _02
 
+							// check limits.
+							if (type == ColMeshType::CONVEX)
+							{
+								if (othMesh.verts_.size() > MODEL_MESH_COL_MAX_VERTS)
+								{
+									X_ERROR("Model", "Convex col mesh exceeds vert limit of: %" PRIu32 " provided: %" PRIuS,
+										MODEL_MESH_COL_MAX_VERTS, othMesh.verts_.size());
+									return false;
+								}
+							}
+
+							if (mesh.colMeshes_.size() > MODEL_MESH_COL_MAX_MESH)
+							{
+								X_ERROR("Model", "Mesh has \"%s\" has too many physics shapes defined, max: %" PRIuS,
+									mesh.name_.c_str(), MODEL_MESH_COL_MAX_MESH);
+								return false;
+							}
 							// move it into the meshes col meshes.
 							mesh.colMeshes_.emplace_back(othMesh, type);
 
