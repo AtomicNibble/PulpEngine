@@ -1318,8 +1318,10 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 		pItem->SetType(type);
 		pItem->SetNewProp();
 
-		// CONNECT :D !
-		connect(pItem, SIGNAL(modified(void)), this, SLOT(propModified(void)));
+		if (type != AssetProperty::PropertyType::LABEL) {
+			 // CONNECT :D !
+			connect(pItem, SIGNAL(modified(void)), this, SLOT(propModified(void)));
+		}
 
 		keys_[key] = pItem;
 	}
