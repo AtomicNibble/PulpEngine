@@ -62,6 +62,46 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 		}
 	}
 
+	// cooking is enabled by default.
+	flags.Set(ModelCompiler::CompileFlag::COOK_PHYS_MESH);
+
+	// can edit physics cooking from conversion profile
+	core::string conProfile;
+	if (host.getConversionProfileData(assetDb::AssetType::MODEL, conProfile))
+	{
+		core::json::Document pd;
+		pd.Parse(conProfile.c_str());
+
+		for (auto it = pd.MemberBegin(); it != pd.MemberEnd(); ++it)
+		{
+			const auto& name = it->name;
+			const auto& val = it->value;
+
+			using namespace core::Hash::Fnva1Literals;
+
+			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
+			{
+				case "physCook"_fnv1a:
+					if (val.GetType() == core::json::Type::kNumberType)
+					{
+						if (val.GetInt())
+						{
+							flags.Set(ModelCompiler::CompileFlag::COOK_PHYS_MESH);
+						}
+						else
+						{
+							flags.Remove(ModelCompiler::CompileFlag::COOK_PHYS_MESH);
+						}
+					}
+					break;
+
+				default:
+					X_WARNING("Model", "Unknown conversion option: %.*s", name.GetStringLength(), name.GetString());
+					break;
+			}
+		}
+	}
+
 	// get the physics cooking the physics / cooking pointers may be null.
 	physics::IPhysicsCooking* pCooking = nullptr;
 	auto* pPhys = host.GetPhsicsLib();
