@@ -748,7 +748,11 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	header.flags.Set(model::ModelFlags::STREAMS);
 	if (totalColMesh) {
 		header.flags.Set(model::ModelFlags::PHYS_DATA);
-		header.flags.Set(model::ModelFlags::PHYS_BAKED);
+
+		// set it even if no convex mesh it don't matter.
+		if (flags_.IsSet(CompileFlag::COOK_PHYS_MESH)) {
+			header.flags.Set(model::ModelFlags::PHYS_BAKED);
+		}
 	}
 
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
