@@ -341,6 +341,11 @@ ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
 
 }
 
+bool ModelCompiler::Mesh::hasColMesh(void) const
+{
+	return colMeshes_.isNotEmpty();
+}
+
 void ModelCompiler::Mesh::calBoundingbox(void)
 {
 	AABB aabb;
@@ -486,6 +491,17 @@ size_t ModelCompiler::Lod::numMeshes(void) const
 	return meshes_.size();
 }
 
+size_t ModelCompiler::Lod::numColMeshes(void) const
+{
+	size_t total = 0;
+
+	for (const auto& mesh : meshes_) {
+		total += mesh.colMeshes_.size();
+	}
+
+	return total;
+}
+
 size_t ModelCompiler::Lod::totalVerts(void) const
 {
 	size_t total = 0;
@@ -590,7 +606,17 @@ size_t ModelCompiler::totalMeshes(void) const
 {
 	size_t num = 0;
 	for (auto& lod : compiledLods_) {
-		num += lod.meshes_.size();
+		num += lod.numMeshes();
+	}
+
+	return num;
+}
+
+size_t ModelCompiler::totalColMeshes(void) const
+{
+	size_t num = 0;
+	for (auto& lod : compiledLods_) {
+		num += lod.numColMeshes();
 	}
 
 	return num;

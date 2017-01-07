@@ -128,6 +128,7 @@ public:
 		Mesh(core::MemoryArenaBase* arena);
 		~Mesh() = default;
 
+		bool hasColMesh(void) const;
 		void calBoundingbox(void);
 
 	public:
@@ -176,6 +177,7 @@ public:
 
 		size_t getSubDataSize(const Flags8<model::StreamType>& streams) const;
 		size_t numMeshes(void) const;
+		size_t numColMeshes(void) const;
 		size_t totalVerts(void) const;
 		size_t totalIndexs(void) const;
 
@@ -216,6 +218,7 @@ public:
 	CompileFlags getFlags(void) const;
 
 	size_t totalMeshes(void) const;
+	size_t totalColMeshes(void) const;
 
 	bool CompileModel(const core::Path<char>& outFile);
 	bool CompileModel(const core::Path<wchar_t>& outFile);
