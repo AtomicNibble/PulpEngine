@@ -396,6 +396,7 @@
     <ClInclude Include="Util\SourceInfo.h" />
     <ClInclude Include="Util\SourceInfoMacros.h" />
     <ClInclude Include="Util\ToggleChecker.h" />
+    <ClInclude Include="Util\UserLiterals.h" />
     <ClInclude Include="Util\win32\LastError.h" />
   </ItemGroup>
   <ItemGroup>

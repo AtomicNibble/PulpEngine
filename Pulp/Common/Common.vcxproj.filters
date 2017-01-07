@@ -1177,6 +1177,9 @@
     <ClInclude Include="Math\XSphereGen.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Util\UserLiterals.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
