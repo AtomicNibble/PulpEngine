@@ -441,7 +441,39 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
 		}
 		else
 		{
-			// runtime cooking..
+			// we pack the raw data here, so writing out the convext mesh data once compiled is the same
+			// if it's baked or not.
+			const size_t requiredBytes = (sizeof(Vec3f) * verts_.size()) + (sizeof(uint16_t) * faces_.size());
+
+			// we need the verts to be Vec3f otherwise i need to convert them here.
+			// we pack the faces into 16bit since there can only be 255 verts.
+			// meaning we could pack as 8bit, but just makes the runtime code more messy.
+			static_assert(std::is_same<decltype(VertsArr::Type::pos_), Vec3f>::value,
+				"Raw convex points need to be vec3f, convert them here is you want to change how stored in VertsArr");
+
+			core::ByteStream stream(cooked_.getArena(), requiredBytes);
+
+			for (const auto& v : verts_)
+			{
+				stream.write(v.pos_);
+			}
+
+			for (const auto& f : faces_)
+			{
+				Vec3<uint16_t> packedFace;
+				packedFace[0] = static_cast<uint16_t>(f[0]);
+				packedFace[1] = static_cast<uint16_t>(f[1]);
+				packedFace[2] = static_cast<uint16_t>(f[2]);
+				stream.write(packedFace);
+			}
+
+			// stream should be full.
+			X_ASSERT(stream.isEos(), "Logic error")();
+			X_ASSERT(stream.size() == requiredBytes, "Logic error")();
+
+
+			cooked_.resize(requiredBytes);
+			std::memcpy(cooked_.data(), stream.begin(), stream.size());
 		}
 	}
 	else
