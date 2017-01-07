@@ -43,6 +43,8 @@ struct IConverterHost
 	// get global conversion settings data.
 	virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_ABSTRACT;
 
+	virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_ABSTRACT;
+
 	virtual core::MemoryArenaBase* getScratchArena(void) X_ABSTRACT;
 };
 

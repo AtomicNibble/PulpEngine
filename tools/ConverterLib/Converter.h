@@ -63,6 +63,8 @@ public:
 
 	CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_OVERRIDE;
 
+	CONVERTERLIB_EXPORT virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_OVERRIDE;
+
 	CONVERTERLIB_EXPORT virtual core::MemoryArenaBase* getScratchArena(void) X_OVERRIDE;
 	// ~IConverterHost
 
@@ -75,7 +77,7 @@ private:
 	bool GenerateThumb(AssetType::Enum assType, const core::string& name);
 	bool Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut);
 
-	IConverter* GetConverter(AssetType::Enum assType);
+//	IConverter* GetConverter(AssetType::Enum assType);
 	bool EnsureLibLoaded(AssetType::Enum assType);
 
 	bool IntializeConverterModule(AssetType::Enum assType);
