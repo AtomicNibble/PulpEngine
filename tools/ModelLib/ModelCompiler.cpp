@@ -404,6 +404,24 @@ const ModelCompiler::ColMesh::CookedData& ModelCompiler::ColMesh::getCookedConve
 	return cooked_;
 }
 
+size_t ModelCompiler::ColMesh::getPhysDataSize(void) const
+{
+	static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+
+	switch (type_)
+	{
+		case ColMeshType::BOX:
+			return sizeof(AABB);
+		case ColMeshType::SPHERE:
+			return sizeof(Sphere);
+		case ColMeshType::CONVEX:
+			return sizeof(CollisionConvexHdr) + cooked_.size();
+		default:
+			X_ASSERT_NOT_IMPLEMENTED();
+			return 0;
+	}
+}
+
 bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, bool cook)
 {
 	static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
@@ -534,6 +552,21 @@ size_t ModelCompiler::Lod::getSubDataSize(const Flags8<model::StreamType>& strea
 
 		// bind data
 		size += safe_static_cast<size_t, size_t>(mesh.binds_.dataSizeTotal());
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::Lod::getPhysDataSize(void) const
+{
+	size_t size = 0;
+
+	for (auto& mesh : meshes_)
+	{
+		for (auto& colMesh : mesh.colMeshes_)
+		{
+			size += colMesh.getPhysDataSize();
+		}
 	}
 
 	return size;
@@ -1014,6 +1047,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 				{
 					const auto& data = pColMesh->getCookedConvexData();
 
+					// maybe i should just store the 'CollisionConvexHdr' in the cooked buffer humm..
 					CollisionConvexHdr convexHdr;
 					if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED))
 					{
@@ -1309,6 +1343,13 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 	size += (totalbones * sizeof(uint16_t));	// string table idx's
 
 	return size;
+}
+
+size_t ModelCompiler::calculatePhysDataSize(void) const
+{
+	return core::accumulate(compiledLods_.begin(), compiledLods_.end(), 0_sz, [](const Lod& lod) { 
+		return lod.getPhysDataSize();
+	});
 }
 
 

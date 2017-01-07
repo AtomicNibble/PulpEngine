@@ -159,6 +159,7 @@ public:
 		ColMeshType::Enum getType(void) const;
 		const Sphere& getBoundingSphere(void) const;
 		const CookedData& getCookedConvexData(void) const;
+		size_t getPhysDataSize(void) const;
 
 		bool processColMesh(physics::IPhysicsCooking* pCooker, bool cook);
 
@@ -180,6 +181,7 @@ public:
 		~Lod() = default;
 
 		size_t getSubDataSize(const Flags8<model::StreamType>& streams) const;
+		size_t getPhysDataSize(void) const;
 		size_t numMeshes(void) const;
 		size_t numColMeshes(void) const;
 		size_t totalVerts(void) const;
@@ -235,6 +237,7 @@ private:
 	size_t calculateMaterialNameDataSize(void) const ;
 	size_t calculateSubDataSize(const Flags8<model::StreamType>& streams) const;
 	size_t calculateBoneDataSize(void) const;
+	size_t calculatePhysDataSize(void) const;
 
 	bool ProcessModel(void);
 	bool ProcessCollisionMeshes(void);
