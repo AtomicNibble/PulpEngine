@@ -364,6 +364,39 @@ private:
 	BindCountsArr compBinds_;
 };
 
+
+// for the col mesh i want to have like a block fo data for the collision data for a given lod.
+// i also want to group them by type, so that we can load all col mesh of a given type as a block.
+// we then basicall need a way to get the col meshes for a given submesh.
+// since we support more than one per a mesh we need to store a offset and a count.
+// maybe we should store a seperate 1:1 list of offsets and counts :/
+
+struct CollisionInfoHdr
+{
+	uint8_t shapeCounts[ColMeshType::ENUM_COUNT]; // this is the number of each type we have, they appear in order.
+	uint8_t _pad;
+
+};
+
+struct CollisionConvexHdr
+{
+	// if convex mesh is baked or not is a per model flag.
+	// having only a subset baked is not supported.
+	union
+	{
+		struct 
+		{
+			// when !isBaked these are raw vert and face counts.
+			// we have a limit of 255 so 8 bits is fine here.
+			uint8_t numVerts;
+			uint8_t numFace;
+		}raw;
+
+		// when isBaked it's the blob size.
+		uint16_t dataSize;
+	};
+};
+
 // SubMeshHeader is part of a single mesh.
 // each SubMeshHeader typically has a diffrent material.
 // the submesh provides vertex / index Offsets, for the verts.
