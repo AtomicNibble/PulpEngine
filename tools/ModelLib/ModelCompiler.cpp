@@ -444,6 +444,7 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
 				X_ERROR("Model", "Failed to cook convex physics mesh");
 				return false;
 			}
+
 			if (cooked_.size() > MODEL_MESH_COL_MAX_COOKED_SIZE)
 			{
 				X_ERROR("Model", "Cooked convex mesh is too big: %" PRIuS " max allowed size in bytes: %" PRIuS,
@@ -2002,6 +2003,7 @@ bool ModelCompiler::CheckLimits(void)
 						X_ERROR("Model", "Convex col mesh exceeds face limit of: %" PRIu32 " provided: %" PRIuS,
 							MODEL_MESH_COL_MAX_FACE, colMesh.faces_.size());
 						return false;
+					}
 				}
 			}
 		}
