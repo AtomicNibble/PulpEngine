@@ -398,6 +398,7 @@ struct CollisionConvexHdr
 	};
 };
 
+
 // SubMeshHeader is part of a single mesh.
 // each SubMeshHeader typically has a diffrent material.
 // the submesh provides vertex / index Offsets, for the verts.
@@ -620,6 +621,9 @@ X_ENSURE_SIZE(MeshHeader, 128);
 X_ENSURE_SIZE(LODHeader, sizeof(MeshHeader)+8);
 X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + 52);
 
+
+X_ENSURE_SIZE(CollisionInfoHdr, 4);
+X_ENSURE_SIZE(CollisionConvexHdr, 2);
 
 
 X_NAMESPACE_END
