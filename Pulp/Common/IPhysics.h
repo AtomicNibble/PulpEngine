@@ -726,6 +726,9 @@ struct IPhysics
 
 	// debug name for logs, only stores the pointer you must ensure the memory outlives the actor :) !
 	virtual void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_ABSTRACT;
+	// value between 0-31 groups that higer can pusher lower ones, all actors default to 0.
+	virtual void setActorDominanceGroup(ActorHandle handle, int8_t group) X_ABSTRACT;
+
 
 	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;

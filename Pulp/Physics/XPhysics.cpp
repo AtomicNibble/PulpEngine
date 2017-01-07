@@ -640,6 +640,14 @@ void XPhysics::setActorDebugNamePointer(ActorHandle handle, const char* pNamePoi
 	actor.setName(pNamePointer);
 }
 
+void XPhysics::setActorDominanceGroup(ActorHandle handle, int8_t group)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	// should we lock here?
+	actor.setDominanceGroup(group);
+}
+
 // ------------------------------------------
 
 ActorHandle XPhysics::createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale)

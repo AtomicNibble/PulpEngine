@@ -91,6 +91,7 @@ public:
 	void releaseJoint(IJoint* pJoint) X_FINAL;
 
 	void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_FINAL;
+	void setActorDominanceGroup(ActorHandle handle, int8_t group) X_FINAL;
 
 	// you must pass cooked data :|
 	// if you don't have cooked data use getCooking() to cook it!
