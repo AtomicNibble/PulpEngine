@@ -585,6 +585,12 @@ IConverter* Converter::GetConverter(AssetType::Enum assType)
 	return converters_[assType];
 }
 
+physics::IPhysLib* Converter::GetPhsicsLib(void)
+{
+	return nullptr;
+}
+
+
 bool Converter::EnsureLibLoaded(AssetType::Enum assType)
 {
 	// this needs to be more generic.

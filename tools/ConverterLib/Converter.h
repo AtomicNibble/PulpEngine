@@ -64,6 +64,7 @@ public:
 	CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
 
 	CONVERTERLIB_EXPORT virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_FINAL;
+	CONVERTERLIB_EXPORT virtual physics::IPhysLib* GetPhsicsLib(void) X_FINAL;
 
 	CONVERTERLIB_EXPORT virtual core::MemoryArenaBase* getScratchArena(void) X_FINAL;
 	// ~IConverterHost

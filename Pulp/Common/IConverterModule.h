@@ -16,7 +16,9 @@ struct 	IAnimLib
 X_NAMESPACE_DECLARE(model,
 struct IModelLib
 )
-
+X_NAMESPACE_DECLARE(physics,
+struct IPhysLib
+)
 
 struct IConverter;
 struct IConverterModule : public IPotatoUnknown
@@ -44,6 +46,9 @@ struct IConverterHost
 	virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_ABSTRACT;
 
 	virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_ABSTRACT;
+
+	// can return null.
+	virtual physics::IPhysLib* GetPhsicsLib(void) X_ABSTRACT;
 
 	virtual core::MemoryArenaBase* getScratchArena(void) X_ABSTRACT;
 };
