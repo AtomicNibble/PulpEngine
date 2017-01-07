@@ -93,6 +93,7 @@ namespace debugging
 		return res;
 #else
 		X_UNUSED(filename);
+		X_UNUSED(type);
 		X_UNUSED(exceptionPointers);
 		return true;
 #endif
