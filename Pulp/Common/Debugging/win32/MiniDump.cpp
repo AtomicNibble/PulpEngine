@@ -45,7 +45,7 @@ namespace debugging
 
 	} // namespace
 
-	bool WriteMiniDump(const char* filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers)
+	bool WriteMiniDump(const Path<char>& filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers)
 	{
 #if X_ENABLE_MINI_DUMP
 		MINIDUMP_EXCEPTION_INFORMATION miniDumpInfo;
@@ -58,14 +58,14 @@ namespace debugging
 		miniDumpInfo.ExceptionPointers = exceptionPointers;
 		miniDumpInfo.ClientPointers = FALSE;
 
-		HANDLE hFile = CreateFileA(filename, GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+		HANDLE hFile = CreateFileA(filename.c_str(), GENERIC_WRITE, 0, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 
 		bool res = false;
 
 		if ( hFile == INVALID_HANDLE_VALUE )
 		{
 			core::lastError::Description err;
-			X_ERROR("MiniDump", "Cannot obtain handle for file \"%s\". Error: %s", filename, lastError::ToString( err ) );
+			X_ERROR("MiniDump", "Cannot obtain handle for file \"%s\". Error: %s", filename.c_str(), lastError::ToString( err ) );
 		}
 		else
 		{
@@ -83,7 +83,7 @@ namespace debugging
 			{
 				// shieeeeeeet
 				core::lastError::Description err;
-				X_ERROR("MiniDump", "Cannot write minidump to file \"%s\". Error: %s", filename, lastError::ToString( err ) );
+				X_ERROR("MiniDump", "Cannot write minidump to file \"%s\". Error: %s", filename.c_str(), lastError::ToString( err ) );
 
 			}
 

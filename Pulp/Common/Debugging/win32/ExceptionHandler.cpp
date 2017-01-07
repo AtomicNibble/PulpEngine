@@ -140,8 +140,6 @@ namespace exceptionHandler
 
 		_tagSTACKFRAME64	stackFrame;
 
-		Path<char> filename;
-
 		DWORD Code = ExceptionRecord->ExceptionCode;
 
 		X_FATAL( "ExceptionHandler", "%s exception %s (0x%08X) occurred at address 0x%08p." );
@@ -301,9 +299,10 @@ namespace exceptionHandler
 				TimeStamp::FileDescription time_txt;
 				DateStamp::Description date_txt;
 
+				Path<char> filename;
 				filename.appendFmt( "MiniDump_%s_%s.dmp", date.ToString( date_txt ), time.ToString( time_txt ) );
 
-				if( !debugging::WriteMiniDump( filename.c_str(), debugging::DumpType::Medium, exceptionPointers ) )
+				if( !debugging::WriteMiniDump( filename, debugging::DumpType::Medium, exceptionPointers ) )
 				{
 					X_ERROR( "ExceptionHandler", "Could not write crash dump." );
 				}
@@ -325,9 +324,6 @@ namespace exceptionHandler
 		PCONTEXT			ContextRecord   = exceptionPointers->ContextRecord;
 
 		_tagSTACKFRAME64	stackFrame;
-
-		Path<char> filename;
-
 
 		DWORD Code = ExceptionRecord->ExceptionCode;
 
@@ -482,9 +478,10 @@ namespace exceptionHandler
 				TimeStamp::FileDescription time_txt;
 				DateStamp::Description date_txt;
 
+				Path<char> filename;
 				filename.appendFmt("MiniDump_%s_%s.dmp", date.ToString(date_txt), time.ToString(time_txt));
 
-				if( !debugging::WriteMiniDump( filename.c_str(), debugging::DumpType::Medium, exceptionPointers ) )
+				if( !debugging::WriteMiniDump( filename, debugging::DumpType::Medium, exceptionPointers ) )
 				{
 					X_ERROR( "ExceptionHandler", "Quitting the application." );
 				}
