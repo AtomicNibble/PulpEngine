@@ -404,7 +404,7 @@ const ModelCompiler::ColMesh::CookedData& ModelCompiler::ColMesh::getCookedConve
 	return cooked_;
 }
 
-bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
+bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, bool cook)
 {
 	static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
 
@@ -426,8 +426,10 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
 	else if (type_ = ColMeshType::CONVEX)
 	{
 		// i'm gonna cook you good.
-		if (pCooker)
+		if (cook)
 		{
+			X_ASSERT_NOT_NULL(pCooker);
+
 			static_assert(std::is_same<Vec3f, decltype(VertsArr::Type::pos_)>::value, "Cooking requires vec3f points");
 			
 			physics::TriangleMeshDesc desc;
@@ -1330,6 +1332,12 @@ bool ModelCompiler::ProcessModel(void)
 	// 8. calculate bounds.
 	// 9. check limits
 	// 10. done
+	
+	// require cooking if flag set.
+	if (flags_.IsSet(CompileFlag::COOK_PHYS_MESH) && !pPhysCooker_) {
+		X_ERROR("Model", "Can't cook meshes without a cooker instance");
+		return false;
+	}
 
 	if (!DropWeights()) {
 		X_ERROR("Model", "Failed to drop weights");
@@ -1857,7 +1865,7 @@ bool ModelCompiler::BakeCollisionMeshes(void)
 			{
 				// process the mesh into either a AABB / sphere.
 				// if it's a convex mesh we cook it.
-				if (!colMesh.processColMesh(pPhysCooker_))
+				if (!colMesh.processColMesh(pPhysCooker_, flags_.IsSet(CompileFlag::COOK_PHYS_MESH)))
 				{
 					X_ERROR("Model", "Failed to process physics mesh: \"%s\"", colMesh.name_.c_str());
 					return false;

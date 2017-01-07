@@ -160,7 +160,7 @@ public:
 		const Sphere& getBoundingSphere(void) const;
 		const CookedData& getCookedConvexData(void) const;
 
-		bool processColMesh(physics::IPhysicsCooking* pCooker);
+		bool processColMesh(physics::IPhysicsCooking* pCooker, bool cook);
 
 	private:
 		ColMeshType::Enum type_;
