@@ -112,6 +112,8 @@ static const uint32_t	 MODEL_MAX_MESH = 64;
 static const uint32_t	 MODEL_MAX_VERTS = (1 << 16) - 1;
 static const uint32_t	 MODEL_MAX_INDEXS = MODEL_MAX_VERTS;
 static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_INDEXS / 3;
+static const uint32_t	 MODEL_MAX_COL_SHAPES = 255; // max shapes per model, there is a per mesh limit also MODEL_MESH_COL_MAX_MESH
+static const uint32_t	 MODEL_MAX_COL_DATA_SIZE = std::numeric_limits<uint16_t>::max(); // max size of all phys data.
 
 // humm might make this 8 (would be for faces, probs make it a option)
 // I've made it 8 for the format, but i'm gonna make it so you need to turn on 8vert mode for compiler.
