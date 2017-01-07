@@ -149,6 +149,7 @@ public:
 	class ColMesh : public Mesh
 	{
 	public:
+		typedef physics::IPhysicsCooking::DataArr CookedData;
 
 	public:
 		ColMesh(const ColMesh& oth);
@@ -156,6 +157,8 @@ public:
 		~ColMesh() = default;
 
 		ColMeshType::Enum getType(void) const;
+		const Sphere& getBoundingSphere(void) const;
+		const CookedData& getCookedConvexData(void) const;
 
 		bool processColMesh(physics::IPhysicsCooking* pCooker);
 
@@ -165,7 +168,7 @@ public:
 		// we inherit from Mesh which already has a AABB which is where the bounds are sotred 
 		// when type is BOX.
 		Sphere sphere_;
-		physics::IPhysicsCooking::DataArr cooked_;
+		CookedData cooked_;
 	};
 
 	class Lod

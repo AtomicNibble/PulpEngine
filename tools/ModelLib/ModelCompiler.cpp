@@ -392,6 +392,18 @@ ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
 	return type_;
 }
 
+const Sphere& ModelCompiler::ColMesh::getBoundingSphere(void) const
+{
+	X_ASSERT(getType() == ColMeshType::SPHERE, "Invalid call on non sphere mesh")();
+	return sphere_;
+}
+
+const ModelCompiler::ColMesh::CookedData& ModelCompiler::ColMesh::getCookedConvexData(void) const
+{
+	X_ASSERT(getType() == ColMeshType::CONVEX, "Invalid call on non convext mesh")();
+	return cooked_;
+}
+
 bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
 {
 	static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
