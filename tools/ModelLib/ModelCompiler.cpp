@@ -827,7 +827,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		this->calculateSubDataSize(streamsFlags));
 	header.dataSize = (header.subDataSize +
 		header.tagNameDataSize + header.materialNameDataSize);
-
+	header.physDataSize = safe_static_cast<uint16_t, size_t>(
+		this->calculatePhysDataSize());
 
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
 	for (auto& bone : bones_) {
