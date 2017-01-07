@@ -370,19 +370,15 @@ private:
 };
 
 
-// for the col mesh i want to have like a block fo data for the collision data for a given lod.
-// i also want to group them by type, so that we can load all col mesh of a given type as a block.
-// we then basicall need a way to get the col meshes for a given submesh.
-// since we support more than one per a mesh we need to store a offset and a count.
-// maybe we should store a seperate 1:1 list of offsets and counts :/
-
+// one of these is stored if there is physics data.
+// all the colMesh shapes are store in enum order and the counts below show how many.
 struct CollisionInfoHdr
 {
 	uint8_t shapeCounts[ColMeshType::ENUM_COUNT]; // this is the number of each type we have, they appear in order.
-	uint8_t _pad;
-
+	uint8_t idxMap[1]; // we have total shapes * 8bit, this is used to covert the colmeshIndex into the index of the sorted shapes.
 };
 
+// each convex mesh data block is prefixed with this header.
 struct CollisionConvexHdr
 {
 	// if convex mesh is baked or not is a per model flag.
