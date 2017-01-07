@@ -728,6 +728,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 	stats_.totalJoints = safe_static_cast<uint8_t, size_t>(bones_.size());
 
+	const size_t totalColMesh = totalColMeshes();
 
 	core::ByteStream stream(arena_);
 
@@ -742,6 +743,11 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	header.version = model::MODEL_VERSION;
 	header.flags.Set(model::ModelFlags::LOOSE);
 	header.flags.Set(model::ModelFlags::STREAMS);
+	if (totalColMesh) {
+		header.flags.Set(model::ModelFlags::PHYS_DATA);
+		header.flags.Set(model::ModelFlags::PHYS_BAKED);
+	}
+
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	header.numBlankBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
 	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
@@ -913,6 +919,124 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			if (file.writeObj(pos) != sizeof(pos)) {
 				X_ERROR("Model", "Failed to write bone pos");
 				return false;
+			}
+		}
+	}
+
+	// col data. (currently we only allow col data on lod0 so makes more sense to be seperate from lodinfo.
+	if(header.flags.IsSet(model::ModelFlags::PHYS_DATA))
+	{
+		static_assert(std::is_trivially_constructible<CollisionInfoHdr>::value, "Potentially not safe to zero_object");
+
+		CollisionInfoHdr colHdr;
+		core::zero_object(colHdr);
+
+		// we need to order the col mesh into type order and also create some sort of mapping to them.
+		// i think i'll create like a index list and given a offset and count you can get all the indexe's into the sorted data.
+		core::Array<ColMesh*> colMeshes(arena_, totalColMesh);
+
+		for (auto& mesh : compiledLods_[0].meshes_)
+		{
+			for (auto& colMesh : mesh.colMeshes_)
+			{
+				++colHdr.shapeCounts[colMesh.getType()];
+
+				colMeshes.push_back(&colMesh);
+			}
+		}
+
+		// write out the couts.
+		if (file.writeObj(colHdr) != sizeof(colHdr)) {
+			X_ERROR("Model", "Failed to col header");
+			return false;
+		}
+
+		// sort them by type.
+		std::sort(colMeshes.begin(), colMeshes.end(), [](const ColMesh* p1, const ColMesh* p2) {
+			return p1->getType() < p2->getType();
+		});
+
+		// write the index lookup.
+		{
+			core::Array<uint8_t> idxMap(arena_);
+			idxMap.reserve(totalColMesh);
+
+			for (auto& mesh : compiledLods_[0].meshes_)
+			{
+				for (auto& colMesh : mesh.colMeshes_)
+				{
+					// so we need to work out where are mesh has moved to and store the index.
+					// so lets just find the new position.
+					auto sortexIdx = colMeshes.find(&colMesh);
+					if (sortexIdx == decltype(colMeshes)::invalid_index)
+					{
+						X_ASSERT_UNREACHABLE();
+						return false;
+					}
+
+					idxMap.push_back(safe_static_cast<uint8_t>(sortexIdx));
+				}
+			}
+
+			if (file.write(idxMap.data(), idxMap.size()) != idxMap.size()) {
+				X_ERROR("Model", "Failed to write idx map");
+				return false;
+			}
+		}
+
+		// write the shapes out
+		for (auto* pColMesh : colMeshes)
+		{
+			static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+
+			switch (pColMesh->getType())
+			{
+				case ColMeshType::SPHERE:
+					if (file.writeObj<const Sphere>(pColMesh->getBoundingSphere()) != sizeof(Sphere)) {
+						X_ERROR("Model", "Failed to write col data");
+						return false;
+					}
+					break;
+				case ColMeshType::BOX:
+					if (file.writeObj<const AABB>(pColMesh->boundingBox_) != sizeof(AABB)) {
+						X_ERROR("Model", "Failed to write col data");
+						return false;
+					}
+					break;
+				case ColMeshType::CONVEX:
+				{
+					const auto& data = pColMesh->getCookedConvexData();
+
+					CollisionConvexHdr convexHdr;
+					if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED))
+					{
+						static_assert(MODEL_MESH_COL_MAX_COOKED_SIZE <= std::numeric_limits<uint16_t>::max(), "Can't represent cooked convex mesh");
+
+						// we enforce a 65k byte limit on cooked data, which should be more than enougth..
+						convexHdr.dataSize = safe_static_cast<uint16_t>(data.size());
+					}
+					else
+					{
+						// the limits should ensure these are below 255, but lets check that's still true.
+						static_assert(MODEL_MESH_COL_MAX_VERTS <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh verts");
+						static_assert(MODEL_MESH_COL_MAX_FACE <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh faces");
+
+						convexHdr.raw.numVerts = safe_static_cast<uint8_t>(pColMesh->verts_.size());
+						convexHdr.raw.numFace = safe_static_cast<uint8_t>(pColMesh->faces_.size());
+					}
+
+					if (file.writeObj(convexHdr) != sizeof(convexHdr) ||
+						file.write(data.data(), data.size()) != data.size()) 
+					{			
+						X_ERROR("Model", "Failed to write col data");
+						return false;
+					}
+					break;
+				}
+
+				default:
+					X_ASSERT_UNREACHABLE();
+					return false;
 			}
 		}
 	}
