@@ -56,16 +56,16 @@ public:
 	CONVERTERLIB_EXPORT bool GenerateThumbs(void);
 
 	// IConverterHost
-	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_OVERRIDE;
-	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut) X_OVERRIDE;
-	CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_OVERRIDE;
-	CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data) X_OVERRIDE;
+	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data) X_FINAL;
 
-	CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_OVERRIDE;
+	CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
 
-	CONVERTERLIB_EXPORT virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_OVERRIDE;
+	CONVERTERLIB_EXPORT virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_FINAL;
 
-	CONVERTERLIB_EXPORT virtual core::MemoryArenaBase* getScratchArena(void) X_OVERRIDE;
+	CONVERTERLIB_EXPORT virtual core::MemoryArenaBase* getScratchArena(void) X_FINAL;
 	// ~IConverterHost
 
 private:
