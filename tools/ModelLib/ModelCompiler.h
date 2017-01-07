@@ -27,7 +27,8 @@ public:
 		MERGE_MESH,
 		MERGE_VERTS,
 		EXT_WEIGHTS, // allow 8 inf per vert.
-		OPTERMIZE_FACES
+		OPTERMIZE_FACES,
+		COOK_PHYS_MESH // cooks convex mesh, spheres and AABB are always converted.
 	);
 
 	typedef Flags<CompileFlag> CompileFlags;
