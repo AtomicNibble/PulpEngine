@@ -94,6 +94,33 @@ void AssetAssetRefWidget::browseClicked(void)
 			return;
 		}
 
+		// we want to see if the ref we are trying to set is actually the same ref as current but just renamed.
+		// this means we on't be able to find old ref by name.
+		// maybe we should switch this asset ref to just storing the id instead of name.
+		// that way when we rename a asset we don't have todo anything.
+		// anyway for now we need to check all refs and see if any have a name matching new ref.
+		assetDb::AssetDB::AssetIdArr refs(g_arena);
+		if (db_.GetAssetRefsFrom(assetId, refs))
+		{
+			assetDb::AssetDB::AssetInfo info;
+			for (auto id : refs)
+			{
+				if (db_.GetAssetInfoForAsset(id, info))
+				{
+					if (info.type == type_ && info.name == assName)
+					{
+						// it was renamed.
+						X_LOG0("AssetRef", "Detected ref rename, updating name from: \"%s\" -> \"%s\"", 
+							qPrintable(oldName), qPrintable(assName));
+
+						pLineEdit_->setText(assName);
+						emit valueChanged(assName.toStdString());
+						return;
+					}
+				}
+			}
+		}
+
 		if (!removeRef(assetId, oldName)) {
 			return;
 		}
