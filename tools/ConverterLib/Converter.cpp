@@ -5,6 +5,7 @@
 #include <IAnimation.h>
 #include <IConverterModule.h>
 #include <IFileSys.h>
+#include <IPhysics.h>
 
 #include <Extension\IPotatoFactory.h>
 #include <Extension\PotatoCreateClass.h>
@@ -24,6 +25,8 @@ X_NAMESPACE_BEGIN(converter)
 Converter::Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
 	scratchArea_(scratchArea),
 	db_(db),
+	pPhysLib_(nullptr),
+	pPhysConverterMod_(nullptr),
 	forceConvert_(false)
 {
 	core::zero_object(converters_);
@@ -587,7 +590,25 @@ IConverter* Converter::GetConverter(AssetType::Enum assType)
 
 physics::IPhysLib* Converter::GetPhsicsLib(void)
 {
-	return nullptr;
+	if (pPhysLib_) {
+		return pPhysLib_;
+	}
+
+	// load it :|
+	IConverter* pConverterInstance = nullptr;
+
+	// ideally we should be requesting the physics interface by guid directly.
+	// will need to make the core api support that.
+	bool result = gEnv->pCore->IntializeLoadedConverterModule("engine_Physics", "Engine_PhysLib", 
+		&pPhysConverterMod_, &pConverterInstance);
+
+	if (!result) {
+		return nullptr;
+	}
+
+	pPhysLib_ = static_cast<physics::IPhysLib*>(pConverterInstance);
+
+	return pPhysLib_;
 }
 
 
@@ -658,6 +679,11 @@ void Converter::UnloadConverters(void)
 			converterModules_[i] = nullptr;
 			converters_[i] = nullptr;
 		}
+	}
+
+	if (pPhysConverterMod_) {
+		gEnv->pCore->FreeConverterModule(pPhysConverterMod_);
+		pPhysConverterMod_ = nullptr;
 	}
 }
 

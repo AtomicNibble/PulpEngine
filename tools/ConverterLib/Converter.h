@@ -96,6 +96,10 @@ private:
 	core::MemoryArenaBase* scratchArea_;
 	assetDb::AssetDB& db_;
 
+	// physics converter is special just like you.
+	physics::IPhysLib* pPhysLib_;
+	IConverterModule* pPhysConverterMod_;
+
 	IConverter* converters_[AssetType::ENUM_COUNT];
 	core::string conversionProfiles_[AssetType::ENUM_COUNT];
 
