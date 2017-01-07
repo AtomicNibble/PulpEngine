@@ -1790,6 +1790,12 @@ bool ModelCompiler::ProcessCollisionMeshes(void)
 										MODEL_MESH_COL_MAX_VERTS, othMesh.verts_.size());
 									return false;
 								}
+								if (othMesh.faces_.size() > MODEL_MESH_COL_MAX_FACE)
+								{
+									X_ERROR("Model", "Convex col mesh exceeds face limit of: %" PRIu32 " provided: %" PRIuS,
+										MODEL_MESH_COL_MAX_FACE, othMesh.faces_.size());
+									return false;
+								}
 							}
 
 							if (mesh.colMeshes_.size() > MODEL_MESH_COL_MAX_MESH)
@@ -1991,6 +1997,11 @@ bool ModelCompiler::CheckLimits(void)
 							MODEL_MESH_COL_MAX_VERTS, colMesh.verts_.size());
 						return false;
 					}
+					if (colMesh.faces_.size() > MODEL_MESH_COL_MAX_FACE)
+					{
+						X_ERROR("Model", "Convex col mesh exceeds face limit of: %" PRIu32 " provided: %" PRIuS,
+							MODEL_MESH_COL_MAX_FACE, colMesh.faces_.size());
+						return false;
 				}
 			}
 		}
