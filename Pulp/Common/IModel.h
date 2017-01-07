@@ -163,8 +163,9 @@ struct IModelLib : public IConverter
 // FULL_VERT: the vertex data is not compressed.
 // STREAMS: more than just vertex stream. (a stream info block is included)
 // ANIMATED: model has bind data.
-// BAKED_PHYS: the physx meshes are pre baked.
-X_DECLARE_FLAGS8(ModelFlag)(LOOSE, FULL_VERT, STREAMS, ANIMATED, BAKED_PHYS);
+// PHYS_DATA: this model contains collision shapes.
+// PHYS_BAKED: the convex meshes are baked.
+X_DECLARE_FLAGS8(ModelFlag)(LOOSE, FULL_VERT, STREAMS, ANIMATED, PHYS_DATA, PHYS_BAKED);
 X_DECLARE_FLAGS(MeshFlag)(
 	SYS_MEMORY, 
 	VIDEO_MEMORY, 
