@@ -62,7 +62,16 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 		}
 	}
 
-	ModelCompiler model(gEnv->pJobSys, g_ModelLibArena);
+	// get the physics cooking the physics / cooking pointers may be null.
+	physics::IPhysicsCooking* pCooking = nullptr;
+	auto* pPhys = host.GetPhsicsLib();
+
+	if(pPhys)
+	{
+		pCooking = pPhys->getCooking();
+	}
+
+	ModelCompiler model(gEnv->pJobSys, g_ModelLibArena, pCooking);
 	model.setFlags(flags);
 
 	// overrides.
