@@ -1487,6 +1487,7 @@ bool ModelCompiler::DropWeights(void)
 	{
 		if (pLodJob)
 		{
+			pJobSys_->Run(pLodJob);
 			pJobSys_->Wait(pLodJob);
 		}
 	}
@@ -1794,6 +1795,7 @@ bool ModelCompiler::ScaleModel(void)
 	{
 		if (pLodJob)
 		{
+			pJobSys_->Run(pLodJob);
 			pJobSys_->Wait(pLodJob);
 		}
 	}
