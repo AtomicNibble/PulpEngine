@@ -432,6 +432,12 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker)
 				X_ERROR("Model", "Failed to cook convex physics mesh");
 				return false;
 			}
+			if (cooked_.size() > MODEL_MESH_COL_MAX_COOKED_SIZE)
+			{
+				X_ERROR("Model", "Cooked convex mesh is too big: %" PRIuS " max allowed size in bytes: %" PRIuS,
+					cooked_.size(), MODEL_MESH_COL_MAX_COOKED_SIZE);
+				return false;
+			}
 		}
 		else
 		{
