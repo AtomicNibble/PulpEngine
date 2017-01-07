@@ -31,7 +31,7 @@ void RenameAssetDialog::createGui(const QString& name)
 	{
 		pAssetName_ = new QLineEdit();
 
-		QRegularExpression re(QString("[a-z0-9_\\%1]*").arg(QChar(assetDb::ASSET_NAME_SLASH)));
+		QRegularExpression re(QString("[a-z0-9_\\%1\\%2]*").arg(QChar(assetDb::ASSET_NAME_PREFIX)).arg(QChar(assetDb::ASSET_NAME_SLASH)));
 
 		pAssetName_->setMaxLength(assetDb::ASSET_NAME_MAX_LENGTH);
 		pAssetName_->setValidator(new QRegularExpressionValidator(re));
