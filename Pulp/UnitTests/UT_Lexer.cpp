@@ -612,3 +612,24 @@ TEST(Lexer, Mapfile)
 
 	}
 }
+
+TEST(Lexer, WhiteSpaceAtEnd)
+{
+	// I had a bug where if there was white space at the end of the file it would 
+	// read the white space then continue to read past the end of the buffer
+	// as the EOF check was performed before whitespae skipping :|
+
+	const char textText[] = "hellow this text has trailing whitespace  ";
+
+	core::XLexer lex(textText, textText + sizeof(textText));
+	core::XLexToken token;
+
+	while (lex.ReadToken(token)) {
+
+	}
+
+	// isEOF will trigger asset if past end.
+	EXPECT_TRUE(lex.isEOF());
+	// this will fail if past end since it performs end - cur;
+	EXPECT_EQ(0, lex.BytesLeft());
+}
