@@ -51,7 +51,7 @@ namespace V2
 
 	X_INLINE bool JobSystem::HasJobCompleted(Job* pJob) const
 	{
-		return pJob->unfinishedJobs < 1;
+		return pJob->unfinishedJobs == 0;
 	}
 
 	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, void* pData)
