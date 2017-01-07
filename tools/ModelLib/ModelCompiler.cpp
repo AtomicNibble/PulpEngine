@@ -986,7 +986,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		}
 
 		// write out the couts.
-		if (file.writeObj(colHdr) != sizeof(colHdr)) {
+		if (file.writeObj(colHdr.shapeCounts) != sizeof(colHdr.shapeCounts)) {
 			X_ERROR("Model", "Failed to col header");
 			return false;
 		}
