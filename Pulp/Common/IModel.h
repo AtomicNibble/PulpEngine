@@ -141,7 +141,8 @@ static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
 static const char		 MODEL_MESH_COL_BOX_PREFIX[] = "PBX_";
 static const char		 MODEL_MESH_COL_SPHERE_PREFIX[] = "PSP_";
 static const char		 MODEL_MESH_COL_CONVEX_PREFIX[] = "PCX_";
-static const uint32_t	 MODEL_MESH_COL_MAX_VERTS = 256; // source and baked limit, this is only for convex, for aabb / sphere i don't care.
+static const uint32_t	 MODEL_MESH_COL_MAX_VERTS = 255; // source and baked limit, this is only for convex, for aabb / sphere i don't care.
+static const uint32_t	 MODEL_MESH_COL_MAX_FACE = 255;
 static const uint32_t	 MODEL_MESH_COL_MAX_MESH = 8; // max col mesh per a mesh. (yes we allow multiple col meshes for each mesh)
 
 
