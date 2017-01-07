@@ -575,9 +575,11 @@ struct ModelHeader // File header.
 	uint16_t materialNameDataSize;	// size of material name block
 	uint16_t tagNameDataSize;		// size of tag name block.
 
-	
+
+	uint16_t physDataSize;
+	uint8_t _pad;
+
 	// the format of the merged streams.
-	// 4 bytes currently, shrink it down to 1 if other things needed adding 
 	render::shader::VertexFormat::Enum vertexFmt;
 
 	// this is all the lod aabb's merged
