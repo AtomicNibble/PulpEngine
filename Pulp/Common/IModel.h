@@ -100,12 +100,30 @@ X_NAMESPACE_BEGIN(model)
 //		As long as the base memory location of the buffer is 16byte alinged all the stream starts will be also.
 //		This then allows SIMD memcpy on the streams in the render system, when uploading.
 //
-
+//	Version 14:
+//		Add support for physics data.
+//		Physics data is stored if PHYS_DATA flag is set, and it's stored directly after the bone data.
+//		
+//		The whole block can be skipped by seeking hdr.physDataSize
+//		
+//		Layout:
+//		
+//			CollisionInfoHdr colHdr
+//			uint8_t 8bitIndexMap[numShapes]
+//	
+//			Sphere[colHdr.numShpere]
+//			AABB[colHdr.numBox]
+//			{
+//				CollisionConvexHdr
+//				convexDataBlob
+//			} [colHdr.numConvex]
+//				
+//
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 13;
+static const uint32_t	 MODEL_VERSION = 14;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
