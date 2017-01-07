@@ -2080,6 +2080,20 @@ bool ModelCompiler::CheckLimits(void)
 		return false;
 	}
 
+	if (totalColMeshes() > MODEL_MAX_COL_SHAPES)
+	{
+		X_ERROR("Model", "total ColShape count '%" PRIuS "' exceeds per model shape limit of: %" PRIu32,
+			totalColMeshes(), MODEL_MAX_COL_SHAPES);
+		return false;
+	}
+
+	// check we can represent all the phys data
+	if (calculatePhysDataSize() > MODEL_MAX_COL_DATA_SIZE)
+	{
+		X_ERROR("Model", "Cumulative size of collision data exceeds limit, try reducing convex col meshes / complexity");
+		return false;
+	}
+
 	return true;
 }
 
