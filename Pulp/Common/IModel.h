@@ -410,7 +410,7 @@ struct SubMeshHeader
 		numVerts = 0;
 		numIndexes = 0;
 		numBinds = 0;
-		_unused = 0;
+		numColMesh = 0;
 
 		startVertex = (uint32_t)-1;
 		startIndex = (uint32_t)-1;
@@ -421,7 +421,7 @@ struct SubMeshHeader
 	uint16_t numIndexes;
 	uint16_t numBinds;	// used for solid binds.
 	Flags8<StreamType> streamsFlag; // this is just a dublicate of the meshheaders value, never diffrent.
-	uint8_t _unused; // 8
+	uint8_t numColMesh; // 8
 
 	// offset into the mesh's streames.
 	uint32_t startVertex;
@@ -580,8 +580,8 @@ struct ModelHeader // File header.
 	// 4 bytes currently, shrink it down to 1 if other things needed adding 
 	render::shader::VertexFormat::Enum vertexFmt;
 
-	// do i need this?
-	// the lods store one for each mesh so kinda redundant.
+	// this is all the lod aabb's merged
+	// it's here so we can get bounds for model just from loading header with one read.
 	AABB boundingBox;
 
 	LODHeader lodInfo[MODEL_MAX_LODS];
