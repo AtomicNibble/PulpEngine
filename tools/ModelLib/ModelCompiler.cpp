@@ -1477,7 +1477,12 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 
 size_t ModelCompiler::calculatePhysDataSize(void) const
 {
-	return core::accumulate(compiledLods_.begin(), compiledLods_.end(), 0_sz, [](const Lod& lod) { 
+	size_t size = 0;
+
+	size += sizeof(CollisionInfoHdr::shapeCounts);
+	size += sizeof(uint8_t) * totalColMeshes();
+
+	return core::accumulate(compiledLods_.begin(), compiledLods_.end(), size, [](const Lod& lod) {
 		return lod.getPhysDataSize();
 	});
 }
