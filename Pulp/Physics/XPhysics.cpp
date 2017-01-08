@@ -237,6 +237,17 @@ bool XPhysics::init(const ToleranceScale& scale)
 		}
 	}
 
+#if X_DEBUG
+
+	// we can't load a release version in debug build since physx removes some symbols in release builds.
+	// so we get unresolved procs, we would need to compile release with them in to support it, which is possible..
+	if (gDelayLoadHook.getConfig() == DelayLoadHook::Config::Profile || gDelayLoadHook.getConfig() == DelayLoadHook::Config::Release)
+	{
+		gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
+		X_WARNING("Physics", "Can't load profile or release phyiscs in debug builds, loading checked instead");
+	}
+#endif // !X_DEBUG
+
 	physx::PxSetAssertHandler(gAssetHandler);
 	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
 	physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);
