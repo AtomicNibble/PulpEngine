@@ -246,7 +246,16 @@ bool XPhysics::init(const ToleranceScale& scale)
 		gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
 		X_WARNING("Physics", "Can't load profile or release phyiscs in debug builds, loading checked instead");
 	}
-#endif // !X_DEBUG
+
+#elif X_RELEASE || X_SUPER
+
+	if (gDelayLoadHook.getConfig() == DelayLoadHook::Config::Debug || gDelayLoadHook.getConfig() == DelayLoadHook::Config::Checked)
+	{
+		gDelayLoadHook.forceConfig(DelayLoadHook::Config::Profile);
+		X_WARNING("Physics", "Can't load debug or checked phyiscs in release builds, loading profile instead");
+	}
+
+#endif // 
 
 	physx::PxSetAssertHandler(gAssetHandler);
 	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
