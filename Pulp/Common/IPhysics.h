@@ -829,6 +829,8 @@ struct IPhysics
 	// value between 0-31 groups that higer can pusher lower ones, all actors default to 0.
 	virtual void setActorDominanceGroup(ActorHandle handle, int8_t group) X_ABSTRACT;
 	// actors have default group, only need to call this for none default.
+	virtual void setGroup(ActorHandle handle, const GroupFlag::Enum group) X_ABSTRACT;
+	// for setting multiple groups on a actor, this does not override the group, set with function above.
 	virtual void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_ABSTRACT;
 
 	// for setting what collides with what, by default everything collides.
