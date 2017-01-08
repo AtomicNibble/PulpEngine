@@ -323,6 +323,10 @@ bool XPhysics::init(const ToleranceScale& scale)
 
 	stepperType_ = vars_.GetStepperType();
 	setScratchBlockSize(vars_.ScratchBufferSize());
+
+	// it might be init already.
+	onDebugDrawChange(vars_.DebugDrawEnabled() != 0);
+
 	return true;
 }
 
