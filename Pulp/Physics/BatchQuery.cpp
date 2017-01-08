@@ -7,15 +7,16 @@
 
 X_NAMESPACE_BEGIN(physics)
 
-BatchedQuery::BatchedQuery(physx::PxBatchQuery* pBatchedQuery) :
-	pBatchedQuery_(pBatchedQuery)
+BatchedQuery::BatchedQuery(physx::PxBatchQuery* pBatchedQuery, core::MemoryArenaBase* arena) :
+	pBatchedQuery_(pBatchedQuery),
+	arena_(arena)
 {
 
 }
 
 BatchedQuery::~BatchedQuery()
 {
-	release();
+	core::SafeRelease(pBatchedQuery_);
 }
 
 void BatchedQuery::execute(void)
@@ -25,10 +26,8 @@ void BatchedQuery::execute(void)
 
 void BatchedQuery::release(void)
 {
-	// Meoooow!
 	// we need to delete ourself :O
-
-	core::SafeRelease(pBatchedQuery_);
+	X_DELETE(this, arena_);
 }
 
 void BatchedQuery::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,

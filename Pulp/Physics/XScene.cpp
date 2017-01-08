@@ -425,7 +425,7 @@ IBatchedQuery* XScene::createBatchQuery(const QueryMemory& desc)
 		}
 	}
 
-	return X_NEW(BatchedQuery, arena_, "BatchedQuery")(pBatched);
+	return X_NEW(BatchedQuery, arena_, "BatchedQuery")(pBatched, arena_);
 }
 
 // ------------------------------------------

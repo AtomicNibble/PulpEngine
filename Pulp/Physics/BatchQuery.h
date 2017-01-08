@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(physics)
 class BatchedQuery : public IBatchedQuery
 {
 public:
-	BatchedQuery(physx::PxBatchQuery* pBatchedQuery);
+	BatchedQuery(physx::PxBatchQuery* pBatchedQuery, core::MemoryArenaBase* arena);
 	~BatchedQuery();
 
 	void execute(void) X_FINAL;
@@ -31,6 +31,7 @@ public:
 
 private:
 	physx::PxBatchQuery* pBatchedQuery_;
+	core::MemoryArenaBase* arena_;
 };
 
 X_NAMESPACE_END
