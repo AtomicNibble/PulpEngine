@@ -638,6 +638,13 @@ private:
 };
 
 
+struct ActiveTransform
+{
+	ActorHandle		actor;				
+	void*			userData;			
+	QuatTransf		actor2World;		
+};
+
 struct IScene
 {
 	virtual ~IScene() {}
@@ -678,6 +685,9 @@ struct IScene
 		const float32_t inflation = 0.f) const X_ABSTRACT;
 
 	virtual bool overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const X_ABSTRACT;
+
+	// post simulation results.
+	virtual const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_ABSTRACT;
 
 };
 

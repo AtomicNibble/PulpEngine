@@ -379,4 +379,18 @@ bool XScene::overlap(const GeometryBase& geometry, const QuatTransf& pose, Overl
 	);
 }
 
+// ------------------------------------------
+
+const ActiveTransform* XScene::getActiveTransforms(size_t& numTransformsOut)
+{
+	PHYS_SCENE_READ_LOCK(pScene_);
+
+	physx::PxU32 num = 0;
+	const physx::PxActiveTransform* pTrans = pScene_->getActiveTransforms(num);
+
+	numTransformsOut = num;
+	return reinterpret_cast<const ActiveTransform*>(pTrans);
+}
+
+
 X_NAMESPACE_END
