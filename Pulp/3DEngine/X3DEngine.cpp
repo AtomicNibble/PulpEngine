@@ -7,6 +7,7 @@
 #include <IRenderAux.h>
 #include <IConsole.h>
 #include <IGui.h>
+#include <IPhysics.h>
 
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
@@ -28,6 +29,7 @@ core::ITimer* X3DEngine::pTimer_ = nullptr;
 core::IFileSys* X3DEngine::pFileSys_ = nullptr;
 core::IConsole* X3DEngine::pConsole_ = nullptr;
 render::IRender* X3DEngine::pRender_ = nullptr;
+physics::IPhysics* X3DEngine::pPhysics_ = nullptr;
 
 // 3d
 engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
@@ -87,12 +89,14 @@ bool X3DEngine::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 	X_ASSERT_NOT_NULL(gEnv->pRender);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
+	X_ASSERT_NOT_NULL(gEnv->pPhysics);
 
 	pCore_ = gEnv->pCore;
 	pTimer_ = gEnv->pTimer;
 	pFileSys_ = gEnv->pFileSys;
 	pConsole_ = gEnv->pConsole;
 	pRender_ = gEnv->pRender;
+	pPhysics_ = gEnv->pPhysics;
 
 	// register some file types.
 	gEnv->pHotReload->addfileType(this, "level");

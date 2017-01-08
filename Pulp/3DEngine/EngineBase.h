@@ -28,6 +28,10 @@ class VariableStateManager;
 
 X_NAMESPACE_DECLARE(model,
 class XModelManager;
+)
+
+X_NAMESPACE_DECLARE(physics,
+struct IPhysics;
 struct IModelManager;
 )
 
@@ -43,6 +47,7 @@ struct XEngineBase
 	static core::IFileSys* pFileSys_;
 	static core::IConsole* pConsole_;
 	static render::IRender* pRender_;
+	static physics::IPhysics* pPhysics_;
 
 	// 3d
 	static engine::XMaterialManager* pMaterialManager_;
@@ -64,6 +69,7 @@ struct XEngineBase
 	X_INLINE static IMaterialManager* getMaterialManager(void) { 
 		return reinterpret_cast<IMaterialManager*>(pMaterialManager_); 
 	}
+	X_INLINE static physics::IPhysics* getPhysics(void);
 
 	X_INLINE static model::IModelManager* getModelManager(void) {
 		return reinterpret_cast<model::IModelManager*>(pModelManager_);
@@ -73,6 +79,10 @@ struct XEngineBase
 		return pGuiManger_;
 	}
 
+X_INLINE physics::IPhysics* XEngineBase::getPhysics(void)
+{ 
+	return pPhysics_;
+}
 
 };
 
