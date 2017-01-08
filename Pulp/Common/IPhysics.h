@@ -441,6 +441,9 @@ struct SceneDesc
 	AABB sanityBounds;					// nothing sound ever be outside these bounds, it's reported if so.
 };
 
+// ------------------------------------------------
+
+
 X_DECLARE_FLAGS(HitFlag)(
 	POSITION,						// "position" member of QueryHit is valid
 	NORMAL,							// "normal" member of QueryHit is valid
@@ -581,6 +584,8 @@ typedef HitBuffer<OverlapHit> OverlapBuffer;
 typedef HitBuffer<SweepHit> SweepBuffer;
 
 
+// ------------------------------------------------
+
 // For passing geo to physics in abstract way.
 enum class GeometryType
 {
@@ -637,6 +642,7 @@ private:
 	Vec3f halfExtents_;
 };
 
+// ------------------------------------------------
 
 struct ActiveTransform
 {
@@ -644,6 +650,74 @@ struct ActiveTransform
 	void*			userData;			
 	QuatTransf		actor2World;		
 };
+
+// ------------------------------------------------
+
+
+template<typename HitType>
+struct BatchQueryResult
+{
+	HitType			block;			//!< Holds the closest blocking hit for a single query in a batch. Only valid if hasBlock is true.
+	HitType*		touches;		//!< This pointer will either be set to NULL for 0 nbTouches or will point
+									//!< into the user provided batch query results buffer specified in PxBatchQueryDesc.
+	uint32_t		nbTouches;		//!< Number of touching hits returned by this query, works in tandem with touches pointer.
+	void*			userData;		//!< Copy of the userData pointer specified in the corresponding query.
+	uint8_t			queryStatus;	//!< Takes on values from PxBatchQueryStatus::Enum.
+	bool			hasBlock;		//!< True if there was a blocking hit.
+	uint16_t		pad;			//!< pads the struct to 16 bytes.
+
+	X_INLINE uint32_t getNbAnyHits(void) const {
+		return nbTouches + (hasBlock ? 1 : 0);
+	}
+
+	X_INLINE const HitType& getAnyHit(const uint32_t index) const {
+		X_ASSERT(index < nbTouches + (hasBlock ? 1 : 0), "")();
+		return index < nbTouches ? touches[index] : block;
+	}
+};
+
+
+typedef BatchQueryResult<RaycastHit>	RaycastQueryResult;
+typedef BatchQueryResult<SweepHit>		SweepQueryResult;
+typedef BatchQueryResult<OverlapHit>	OverlapQueryResult;
+
+
+// all these must be 16 byte aligned.
+struct QueryMemory
+{
+	RaycastQueryResult*			userRaycastResultBuffer;
+	RaycastHit*					userRaycastTouchBuffer;
+	SweepQueryResult*			userSweepResultBuffer;
+	SweepHit*					userSweepTouchBuffer;
+	OverlapQueryResult*			userOverlapResultBuffer;
+	OverlapHit*					userOverlapTouchBuffer;
+
+	size_t raycastTouchBufferSize;	// Capacity in elements
+	size_t sweepTouchBufferSize;	// Capacity in elements
+	size_t overlapTouchBufferSize;	// Capacity in elements
+};
+
+
+struct IBatchedQuery
+{
+	virtual ~IBatchedQuery() {}
+
+	virtual	void execute(void) X_ABSTRACT;
+	virtual	void release(void) X_ABSTRACT;
+
+	virtual void raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
+		int16_t maxtouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_ABSTRACT;
+
+	virtual void sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+		int16_t maxTouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		const float32_t inflation = 0.f) const X_ABSTRACT;
+
+	virtual void overlap(const GeometryBase& geometry, const QuatTransf& pose, int16_t maxTouchHits) const X_ABSTRACT;
+
+};
+
+// ------------------------------------------------
+
 
 struct IScene
 {
@@ -686,10 +760,14 @@ struct IScene
 
 	virtual bool overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const X_ABSTRACT;
 
+	virtual	IBatchedQuery* createBatchQuery(const QueryMemory& desc) X_ABSTRACT;
+
 	// post simulation results.
 	virtual const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_ABSTRACT;
 
 };
+
+// ------------------------------------------------
 
 struct IPhysics
 {

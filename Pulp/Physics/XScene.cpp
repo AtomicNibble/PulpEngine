@@ -5,6 +5,7 @@
 #include "PhysicsVars.h"
 #include "DebugRender.h"
 #include "ControllerWrapper.h"
+#include "BatchQuery.h"
 
 #include <characterkinematic\PxControllerManager.h>
 
@@ -42,6 +43,11 @@ namespace
 	X_ENSURE_SIZE(HitBuffer<OverlapHit>, sizeof(physx::PxHitBuffer<physx::PxOverlapHit>));
 	X_ENSURE_SIZE(HitBuffer<SweepHit>, sizeof(physx::PxHitBuffer<physx::PxSweepHit>));
 
+	X_ENSURE_SIZE(RaycastQueryResult, sizeof(physx::PxRaycastQueryResult));
+	X_ENSURE_SIZE(SweepQueryResult, sizeof(physx::PxSweepQueryResult));
+	X_ENSURE_SIZE(OverlapQueryResult, sizeof(physx::PxOverlapQueryResult));
+
+
 	static_assert(X_OFFSETOF(ActorShape, actor) == X_OFFSETOF(physx::PxActorShape, actor), "Offset don't match");
 	static_assert(X_OFFSETOF(ActorShape, pShape) == X_OFFSETOF(physx::PxActorShape, shape), "Offset don't match");
 
@@ -66,6 +72,14 @@ namespace
 	static_assert(X_OFFSETOF(RaycastCallback, maxNbTouches) == X_OFFSETOF(physx::PxRaycastCallback, maxNbTouches), "Offset don't match");
 	static_assert(X_OFFSETOF(RaycastCallback, nbTouches) == X_OFFSETOF(physx::PxRaycastCallback, nbTouches), "Offset don't match");
 
+
+	static_assert(X_OFFSETOF(RaycastQueryResult, block) == X_OFFSETOF(physx::PxRaycastQueryResult, block), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, touches) == X_OFFSETOF(physx::PxRaycastQueryResult, touches), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, nbTouches) == X_OFFSETOF(physx::PxRaycastQueryResult, nbTouches), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, userData) == X_OFFSETOF(physx::PxRaycastQueryResult, userData), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, queryStatus) == X_OFFSETOF(physx::PxRaycastQueryResult, queryStatus), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, hasBlock) == X_OFFSETOF(physx::PxRaycastQueryResult, hasBlock), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, pad) == X_OFFSETOF(physx::PxRaycastQueryResult, pad), "Offset don't match");
 
 
 
@@ -377,6 +391,41 @@ bool XScene::overlap(const GeometryBase& geometry, const QuatTransf& pose, Overl
 		PxTransFromQuatTrans(pose),
 		reinterpret_cast<physx::PxOverlapCallback&>(hitCall)
 	);
+}
+
+IBatchedQuery* XScene::createBatchQuery(const QueryMemory& desc)
+{
+	physx::PxBatchQueryDesc pxDesc(
+		static_cast<physx::PxU32>(desc.raycastTouchBufferSize),
+		static_cast<physx::PxU32>(desc.sweepTouchBufferSize),
+		static_cast<physx::PxU32>(desc.overlapTouchBufferSize)
+	);
+
+	pxDesc.queryMemory.userRaycastResultBuffer	= reinterpret_cast<physx::PxRaycastQueryResult*>(desc.userRaycastResultBuffer);
+	pxDesc.queryMemory.userRaycastTouchBuffer	= reinterpret_cast<physx::PxRaycastHit*>(desc.userRaycastTouchBuffer);
+	pxDesc.queryMemory.userSweepResultBuffer	= reinterpret_cast<physx::PxSweepQueryResult*>(desc.userSweepResultBuffer);
+	pxDesc.queryMemory.userSweepTouchBuffer		= reinterpret_cast<physx::PxSweepHit*>(desc.userSweepTouchBuffer);
+	pxDesc.queryMemory.userOverlapResultBuffer	= reinterpret_cast<physx::PxOverlapQueryResult*>(desc.userOverlapResultBuffer);
+	pxDesc.queryMemory.userOverlapTouchBuffer	= reinterpret_cast<physx::PxOverlapHit*>(desc.userOverlapTouchBuffer);
+
+	if (!pxDesc.isValid()) {
+		X_ERROR("Physics", "Batched query description is invalid");
+		return nullptr;
+	}
+
+	// props need write lock not sure.
+	// since it's not editing the scene objects :/
+	physx::PxBatchQuery* pBatched = nullptr;
+	{
+		PHYS_SCENE_WRITE_LOCK(pScene_);
+
+		pBatched = pScene_->createBatchQuery(pxDesc);
+		if (!pBatched) {
+			return nullptr;
+		}
+	}
+
+	return X_NEW(BatchedQuery, arena_, "BatchedQuery")(pBatched);
 }
 
 // ------------------------------------------

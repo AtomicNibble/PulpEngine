@@ -55,6 +55,8 @@ public:
 
 	bool overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const X_FINAL;
 
+	IBatchedQuery* createBatchQuery(const QueryMemory& desc) X_FINAL;
+
 	// get shit that's moved.
 	const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_FINAL;
 
