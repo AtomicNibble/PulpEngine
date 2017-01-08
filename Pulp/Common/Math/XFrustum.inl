@@ -257,9 +257,10 @@ X_INLINE CullResult::Enum XFrustum::cullOBB_FastT(const OBB& obb) const
 
 	//extract the orientation-vectors from the columns of the 3x3 matrix
 	//and scale them by the half-lengths
-	Vec3f ax = obb.orientation().getColumn(0)*obb.halfVec().x;
-	Vec3f ay = obb.orientation().getColumn(1)*obb.halfVec().y;
-	Vec3f az = obb.orientation().getColumn(2)*obb.halfVec().z;
+	Matrix33f orientTation = obb.orientation().toMatrix33();
+	Vec3f ax = orientTation.getColumn(0)*obb.halfVec().x;
+	Vec3f ay = orientTation.getColumn(1)*obb.halfVec().y;
+	Vec3f az = orientTation.getColumn(2)*obb.halfVec().z;
 
 	//we project the axes of the OBB onto the normal of each of the 6 planes.
 	//If the absolute value of the distance from the center of the OBB to the plane 
@@ -321,9 +322,10 @@ X_INLINE CullResult::Enum XFrustum::cullOBB_ExactT(const OBB& obb) const
 	//extract the orientation-vectors from the columns of the 3x3 matrix
 	//and scale them by the half-lengths
 	float32_t scale = 1.f;
-	Vec3f ax = obb.orientation().getColumn(0)*obb.halfVec().x*scale;
-	Vec3f ay = obb.orientation().getColumn(1)*obb.halfVec().y*scale;
-	Vec3f az = obb.orientation().getColumn(2)*obb.halfVec().z*scale;
+	Matrix33f orientTation = obb.orientation().toMatrix33();
+	Vec3f ax = orientTation.getColumn(0)*obb.halfVec().x*scale;
+	Vec3f ay = orientTation.getColumn(1)*obb.halfVec().y*scale;
+	Vec3f az = orientTation.getColumn(2)*obb.halfVec().z*scale;
 
 	//we project the axes of the OBB onto the normal of each of the 6 planes.
 	//If the absolute value of the distance from the center of the OBB to the plane 

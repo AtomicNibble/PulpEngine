@@ -25,7 +25,7 @@ TEST(Obb, Set)
 	EXPECT_EQ(half, obb.halfVec());
 
 	// matrix code is unit tested, just check that it's been assigned.
-	EXPECT_EQ(mat, obb.orientation());
+	EXPECT_EQ(Quatf::identity(), obb.orientation());
 }
 
 TEST(Obb, SetMat)
@@ -44,7 +44,7 @@ TEST(Obb, SetMat)
 	EXPECT_EQ(Vec3f(2.5f), obb.halfVec());
 
 	// matrix code is unit tested, just check that it's been assigned.
-	EXPECT_EQ(mat, obb.orientation());
+	EXPECT_EQ(Quatf::identity(), obb.orientation());
 }
 
 TEST(Obb, SetQuat)
@@ -62,5 +62,5 @@ TEST(Obb, SetQuat)
 	EXPECT_EQ(Vec3f(5.f, 50.f, 430.f), obb.halfVec());
 
 	// matrix code is unit tested, just check that it's been assigned.
-	EXPECT_EQ(mat, obb.orientation());
+	EXPECT_EQ(Quatf(mat), obb.orientation());
 }

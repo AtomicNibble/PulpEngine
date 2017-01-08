@@ -20,7 +20,7 @@ public:
 	typedef float32_t value_type;
 
 
-	X_INLINE OBB() {}
+	X_INLINE OBB() = default;
 	X_INLINE OBB(Matrix33f m33, const Vec3f& center, const Vec3f& hlv);
 	X_INLINE OBB(Matrix33f m33, const AABB& aabb);
 	X_INLINE OBB(Quatf quat, const AABB& aabb);
@@ -33,10 +33,10 @@ public:
 	X_INLINE Vec3f center(void) const;	// the center point of the box
 	X_INLINE Vec3f size(void) const;	// the size of the box.
 	X_INLINE Vec3f halfVec(void) const;	// 
-	X_INLINE const Matrix33f& orientation(void) const;	// 
+	X_INLINE const Quatf& orientation(void) const;	// 
 
 private:
-	Matrix33f orientation_;
+	Quatf orientation_;
 	Vec3f center_;			// center location
 	Vec3f halfLVec_;		// half of the box vec.
 };
