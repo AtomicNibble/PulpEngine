@@ -21,11 +21,11 @@ TEST(Obb, Set)
 
 	obb.set(mat, center, half);
 
-	EXPECT_EQ(mat * center, obb.center());
+	EXPECT_NEAR_VEC3(mat * center, obb.center(), 0.001f);
 	EXPECT_EQ(half, obb.halfVec());
 
 	// matrix code is unit tested, just check that it's been assigned.
-	EXPECT_EQ(Quatf::identity(), obb.orientation());
+	EXPECT_EQ(Quatf(mat), obb.orientation());
 }
 
 TEST(Obb, SetMat)
@@ -40,11 +40,11 @@ TEST(Obb, SetMat)
 	obb.set(mat, aabb);
 
 
-	EXPECT_EQ(mat * Vec3f(7.5f), obb.center());
+	EXPECT_NEAR_VEC3(mat * Vec3f(7.5f), obb.center(), 0.001f);
 	EXPECT_EQ(Vec3f(2.5f), obb.halfVec());
 
 	// matrix code is unit tested, just check that it's been assigned.
-	EXPECT_EQ(Quatf::identity(), obb.orientation());
+	EXPECT_EQ(Quatf(mat), obb.orientation());
 }
 
 TEST(Obb, SetQuat)
