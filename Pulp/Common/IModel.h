@@ -118,12 +118,24 @@ X_NAMESPACE_BEGIN(model)
 //				convexDataBlob
 //			} [colHdr.numConvex]
 //				
+//	Version 15:
+//		Add support for hitbox data.
+//		HitBox data is stored if HITBOX flag is set, and it's stored directly after bone / phys data.
+//	
+//		The whole block can be skipped by seeking (hdr.hitboxDataBlocks * 64)
+//
+//		Layout:
+//			HitBoxHdr
+//			uint8_t boneIdxMap[numShapes]
+//			Sphere[colHdr.numShpere]
+//			OBB[colHdr.numOBB]
+//
 //
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 14;
+static const uint32_t	 MODEL_VERSION = 15;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -132,6 +144,7 @@ static const uint32_t	 MODEL_MAX_INDEXS = MODEL_MAX_VERTS;
 static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_INDEXS / 3;
 static const uint32_t	 MODEL_MAX_COL_SHAPES = 255; // max shapes per model, there is a per mesh limit also MODEL_MESH_COL_MAX_MESH
 static const uint32_t	 MODEL_MAX_COL_DATA_SIZE = std::numeric_limits<uint16_t>::max(); // max size of all phys data.
+static const uint32_t	 MODEL_MAX_HITBOX_DATA_SIZE = MODEL_MAX_BONES * 64;
 
 // humm might make this 8 (would be for faces, probs make it a option)
 // I've made it 8 for the format, but i'm gonna make it so you need to turn on 8vert mode for compiler.
@@ -167,6 +180,7 @@ static const uint32_t	 MODEL_MESH_COL_MAX_COOKED_SIZE = std::numeric_limits<uint
 static const uint32_t	 MODEL_MESH_COL_MAX_MESH = 8; // max col mesh per a mesh. (yes we allow multiple col meshes for each mesh)
 
 
+
 static const uint32_t	 MODEL_MAX_LOADED = 1 << 13; // max models that can be loaded.
 
 
@@ -199,7 +213,13 @@ X_DECLARE_FLAGS(MeshFlag)(
 X_DECLARE_ENUM(ColMeshType)(
 	SPHERE, 
 	BOX, 
+	// CAPSULE,
 	CONVEX
+);
+
+X_DECLARE_ENUM(HitBoxType)(
+	SPHERE,
+	OBB
 );
 
 // VertexStream from vertexformats.h is has a copy also, but it is enum not flags.
@@ -417,6 +437,17 @@ struct CollisionConvexHdr
 };
 
 
+// Hitboxes.
+//	 There is a HitBoxHdr, followed by a 8bit bone index map.	
+//	 followed by the shapes in enum order.
+//
+
+struct HitBoxHdr
+{
+	uint8_t shapeCounts[HitBoxType::ENUM_COUNT];
+};
+
+
 // SubMeshHeader is part of a single mesh.
 // each SubMeshHeader typically has a diffrent material.
 // the submesh provides vertex / index Offsets, for the verts.
@@ -594,7 +625,7 @@ struct ModelHeader // File header.
 
 
 	uint16_t physDataSize;
-	uint8_t _pad;
+	uint8_t hitboxDataBlocks; // multiply by 64 to get byte size.
 
 	// the format of the merged streams.
 	render::shader::VertexFormat::Enum vertexFmt;
