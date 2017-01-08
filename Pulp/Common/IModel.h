@@ -185,7 +185,7 @@ struct IModelLib : public IConverter
 // ANIMATED: model has bind data.
 // PHYS_DATA: this model contains collision shapes.
 // PHYS_BAKED: the convex meshes are baked.
-X_DECLARE_FLAGS8(ModelFlag)(LOOSE, FULL_VERT, STREAMS, ANIMATED, PHYS_DATA, PHYS_BAKED);
+X_DECLARE_FLAGS8(ModelFlag)(LOOSE, FULL_VERT, STREAMS, ANIMATED, PHYS_DATA, PHYS_BAKED, HITBOX);
 X_DECLARE_FLAGS(MeshFlag)(
 	SYS_MEMORY, 
 	VIDEO_MEMORY, 
