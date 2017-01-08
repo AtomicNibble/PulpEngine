@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "XModel.h"
+#include "ModelManager.h"
 
 #include "IFileSys.h"
 #include "Memory\MemCursor.h"

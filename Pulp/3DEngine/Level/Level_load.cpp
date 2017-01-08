@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Level.h"
+#include "Model\ModelManager.h"
 
 #include <IFileSys.h>
 #include <IRender.h>
