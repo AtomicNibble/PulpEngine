@@ -43,6 +43,28 @@ namespace filter
 			return GroupFlags(fd.word1);
 		}
 
+		X_INLINE uint32_t convertFlagToIdx(const GroupFlag::Enum group)
+		{
+			uint32_t idx = core::bitUtil::ScanBits(group);
+			X_ASSERT(idx != core::bitUtil::NO_BIT_SET, "Flag is invalid")(group, idx);
+			return idx;
+		}
+
+		static void SetGroupCollisionFlag(const uint32_t group1, const uint32_t group2, const bool enable)
+		{
+			X_ASSERT(group1 < GroupFlag::FLAGS_COUNT, "Index out of range")(group1);
+			X_ASSERT(group2 < GroupFlag::FLAGS_COUNT, "Index out of range")(group2);
+			gCollisionTable[group1][group2] = enable;
+			gCollisionTable[group2][group1] = enable;
+		}
+
+		static bool GetGroupCollisionFlag(const uint32_t group1, const uint32_t group2)
+		{
+			X_ASSERT(group1 < GroupFlag::FLAGS_COUNT, "Index out of range")(group1);
+			X_ASSERT(group2 < GroupFlag::FLAGS_COUNT, "Index out of range")(group2);
+			return gCollisionTable[group1][group2]();
+		}
+
 		X_INLINE static void adjustFilterData(bool groupsMask, const physx::PxFilterData& src, physx::PxFilterData& dst)
 		{
 			if (groupsMask)
@@ -122,21 +144,19 @@ namespace filter
 		return physx::PxFilterFlags();
 	}
 
-
 	bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2)
 	{
-		return gCollisionTable[group1][group2]();
+		return gCollisionTable[convertFlagToIdx(group1)][convertFlagToIdx(group2)]();
 	}
 
 	void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable)
-	{
-		gCollisionTable[group1][group2] = enable;
-		gCollisionTable[group2][group1] = enable;
+	{		
+		SetGroupCollisionFlag(convertFlagToIdx(group1),convertFlagToIdx(group2), enable);
 	}
 
 	void SetGroup(physx::PxActor& actor, const GroupFlag::Enum group)
 	{
-		physx::PxFilterData fd = convert(group);
+		physx::PxFilterData fd(convertFlagToIdx(group), 0, 0, 0);
 		setFilterData<false>(actor, fd);
 	}
 
