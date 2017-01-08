@@ -343,7 +343,9 @@ void XPhysics::shutDown(void)
 		X_DELETE(pCooking_, arena_);
 	}
 
-	PxCloseExtensions();
+	if (pPhysics_) {
+		PxCloseExtensions();
+	}
 
 	core::SafeRelease(pPhysics_);
 	core::SafeRelease(pProfileZoneManager_);
