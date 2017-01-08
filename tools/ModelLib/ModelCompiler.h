@@ -10,12 +10,6 @@
 #include "RawModel.h"
 
 
-X_NAMESPACE_DECLARE(model,
-	namespace RawModel {
-		class Model;
-	}
-);
-
 X_NAMESPACE_BEGIN(model)
 
 class ModelCompiler : public RawModel::Model
