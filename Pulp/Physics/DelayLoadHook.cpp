@@ -26,6 +26,11 @@ void DelayLoadHook::forceConfig(Config config)
 	config_ = config;
 }
 
+DelayLoadHook::Config DelayLoadHook::getConfig(void) const
+{
+	return config_;
+}
+
 const char* DelayLoadHook::getPhysXCommonDEBUGDllName(void) const
 {
 	return getCommonDllName(Config::Debug);

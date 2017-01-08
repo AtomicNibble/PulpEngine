@@ -27,6 +27,7 @@ public:
 	DelayLoadHook();
 
 	void forceConfig(Config config);
+	Config getConfig(void) const;
 
 	virtual const char* getPhysXCommonDEBUGDllName(void) const X_FINAL;
 	virtual const char* getPhysXCommonCHECKEDDllName(void) const X_FINAL;
