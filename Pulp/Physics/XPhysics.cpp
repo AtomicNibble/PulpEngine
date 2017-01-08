@@ -6,6 +6,7 @@
 #include "DelayLoadHook.h"
 #include "JointWrapper.h"
 #include "XScene.h"
+#include "FilterShader.h"
 
 #include <IConsole.h>
 #include <I3DEngine.h>
@@ -476,7 +477,11 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 	physx::PxSceneDesc sceneDesc(scale_);
 	sceneDesc.broadPhaseCallback = this;
 	sceneDesc.simulationEventCallback = this;
+#if 1
+	sceneDesc.filterShader = filter::FilterShader;
+#else
 	sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+#endif
 	sceneDesc.cpuDispatcher = &jobDispatcher_;
 	sceneDesc.solverBatchSize = 32; // i might make this lower to improve scaling.
 	sceneDesc.nbContactDataBlocks = 256;
