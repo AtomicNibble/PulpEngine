@@ -214,6 +214,10 @@ IModel* XModelManager::loadModelSync(const char* pModelName)
 
 	if (!pModelRes->LoadModel(pModelName))
 	{
+		if (!pDefaultModel_) { // this could be the default not failed to load.
+			releaseModel(pModelRes);
+			return nullptr;
+		}
 		pModelRes->AssignDefault();
 		X_WARNING("ModelManager", "Failed to load model: \"%s\"", pModelName);
 	}
