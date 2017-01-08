@@ -341,7 +341,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <DelayLoadDLLs>PhysXCHECKED.dll;PhysXCharacterKinematicCHECKED.dll;PhysXCommonCHECKED.dll;PhysXCookingCHECKED.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -403,7 +403,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <DelayLoadDLLs>PhysXCHECKED.dll;PhysXCharacterKinematicCHECKED.dll;PhysXCommonCHECKED.dll;PhysXCookingCHECKED.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

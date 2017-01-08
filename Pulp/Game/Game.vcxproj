@@ -352,7 +352,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXCommonCHECKED.dll;PhysXCookingCHECKED.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -370,7 +370,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXCommonCHECKED.dll;PhysXCookingCHECKED.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">
