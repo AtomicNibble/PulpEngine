@@ -669,6 +669,27 @@ void XPhysics::setActorDominanceGroup(ActorHandle handle, int8_t group)
 
 // ------------------------------------------
 
+
+void XPhysics::setGroupFlags(ActorHandle handle, const GroupFlags groupFlags)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	filter::SetGroup(actor, groupFlags);
+}
+
+// group collision
+bool XPhysics::GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2)
+{
+	return filter::GetGroupCollisionFlag(group1, group2);
+}
+
+void XPhysics::SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable)
+{
+	filter::SetGroupCollisionFlag(group1, group2, enable);
+}
+
+// ------------------------------------------
+
 ActorHandle XPhysics::createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale)
 {
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
@@ -887,7 +908,7 @@ void XPhysics::setupDefaultRigidStatic(physx::PxRigidStatic& body)
 	body.setActorFlag(physx::PxActorFlag::eDISABLE_GRAVITY, true);
 }
 
-
+// --------------------------------------------------
 
 void XPhysics::onPvdSendClassDescriptions(PVD::PvdConnection& conn)
 {

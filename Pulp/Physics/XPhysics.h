@@ -91,6 +91,11 @@ public:
 
 	void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_FINAL;
 	void setActorDominanceGroup(ActorHandle handle, int8_t group) X_FINAL;
+	void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_FINAL;
+
+	// group collision
+	bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_FINAL;
+	void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_FINAL;
 
 	// you must pass cooked data :|
 	// if you don't have cooked data use getCooking() to cook it!

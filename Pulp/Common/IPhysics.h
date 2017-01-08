@@ -828,6 +828,13 @@ struct IPhysics
 	virtual void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_ABSTRACT;
 	// value between 0-31 groups that higer can pusher lower ones, all actors default to 0.
 	virtual void setActorDominanceGroup(ActorHandle handle, int8_t group) X_ABSTRACT;
+	// actors have default group, only need to call this for none default.
+	virtual void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_ABSTRACT;
+
+	// for setting what collides with what, by default everything collides.
+	virtual bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_ABSTRACT;
+	virtual void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_ABSTRACT;
+
 
 
 	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
