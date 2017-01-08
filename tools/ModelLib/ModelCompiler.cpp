@@ -522,6 +522,51 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
 // ---------------------------------------------------------------
 
 
+ModelCompiler::HitBoxShape::HitBoxShape() :
+	boneIdx_(std::numeric_limits<decltype(boneIdx_)>::max())
+{
+
+}
+
+uint8_t ModelCompiler::HitBoxShape::getBoneIdx(void) const
+{
+	return boneIdx_;
+}
+
+HitBoxType::Enum ModelCompiler::HitBoxShape::getType(void) const
+{
+	return type_;
+}
+
+const Sphere& ModelCompiler::HitBoxShape::getBoundingSphere(void) const
+{
+	return sphere_;
+}
+
+const OBB& ModelCompiler::HitBoxShape::getOBB(void) const
+{
+	return oob_;
+}
+
+size_t ModelCompiler::HitBoxShape::getHitBoxDataSize(void) const
+{
+	static_assert(HitBoxType::ENUM_COUNT == 2, "Added additional hitbox types? this code needs updating");
+
+	switch (type_)
+	{
+		case HitBoxType::SPHERE:
+			return sizeof(AABB);
+		case HitBoxType::OBB:
+			return sizeof(OBB);
+		default:
+			X_ASSERT_NOT_IMPLEMENTED();
+			return 0;
+	}
+}
+
+// ---------------------------------------------------------------
+
+
 ModelCompiler::Lod::Lod(core::MemoryArenaBase* arena) :
 	distance_(0.f),
 	meshes_(arena)
@@ -621,7 +666,8 @@ ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	jointWeightThreshold_(JOINT_WEIGHT_THRESHOLD),
 	scale_(1.f),
 	flags_(DEFAULT_FLAGS),
-	stats_(arena)
+	stats_(arena),
+	hitboxShapes_(arena)
 {
 	core::zero_object(lodDistances_);
 }
@@ -816,6 +862,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		return false;
 	}
 
+	const size_t hitBoxDataSize = calculateHitBoxDataSize();
+
 	// Sizes
 	header.tagNameDataSize = safe_static_cast<uint16_t, size_t>(
 		this->calculateTagNameDataSize());
@@ -829,6 +877,10 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		header.tagNameDataSize + header.materialNameDataSize);
 	header.physDataSize = safe_static_cast<uint16_t, size_t>(
 		this->calculatePhysDataSize());
+
+	// turn it into num blocks.
+	static_assert(MODEL_MAX_HITBOX_DATA_SIZE / 64 <= std::numeric_limits<uint8_t>::max(), "Can't represent max hitbox data");
+	header.hitboxDataBlocks = safe_static_cast<uint8_t>(core::bitUtil::RoundUpToMultiple(hitBoxDataSize, 64_sz) / 64);
 
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
 	for (auto& bone : bones_) {
@@ -1082,6 +1134,83 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			}
 		}
 	}
+
+	if (header.flags.IsSet(model::ModelFlags::HITBOX))
+	{
+		static_assert(std::is_trivially_constructible<HitBoxHdr>::value, "Potentially not safe to zero_object");
+
+		HitBoxHdr hitBoxHdr;
+		core::zero_object(hitBoxHdr);
+
+		core::FixedArray<const HitBoxShape*, MODEL_MAX_BONES> hitShapes;
+		core::FixedArray<uint8_t, MODEL_MAX_BONES> boneIdxMap;
+
+		for (const auto& shape : hitboxShapes_)
+		{
+			++hitBoxHdr.shapeCounts[shape.getType()];
+			hitShapes.push_back(&shape);
+		}
+
+		// sort them by type.
+		std::sort(hitShapes.begin(), hitShapes.end(), [](const HitBoxShape* p1, const HitBoxShape* p2) {
+			return p1->getType() < p2->getType();
+		});
+
+		// create the sorted boneIdx's array.
+		for (const auto* pShape : hitShapes)
+		{
+			boneIdxMap.push_back(pShape->getBoneIdx());
+		}
+
+		X_ASSERT(hitShapes.size() == boneIdxMap.size(), "Sizes should match")(hitShapes.size(), boneIdxMap.size());
+
+		if (file.writeObj(hitBoxHdr) != sizeof(hitBoxHdr)) {
+			X_ERROR("Model", "Failed to hitBox header");
+			return false;
+		}
+		if (file.write(boneIdxMap.data(), boneIdxMap.size()) != boneIdxMap.size()) {
+			X_ERROR("Model", "Failed to write bone idx map");
+			return false;
+		}
+
+		// now dump the shapes.
+		for (const auto* pShape : hitShapes)
+		{
+			static_assert(HitBoxType::ENUM_COUNT == 2, "Added additional hitbox types? this code needs updating");
+
+			switch (pShape->getType())
+			{
+				case HitBoxType::SPHERE:
+					if (file.writeObj<const Sphere>(pShape->getBoundingSphere()) != sizeof(Sphere)) {
+						X_ERROR("Model", "Failed to write hitbox data");
+						return false;
+					}
+					break;
+				case HitBoxType::OBB:
+					if (file.writeObj<const OBB>(pShape->getOBB()) != sizeof(OBB)) {
+						X_ERROR("Model", "Failed to write hitbox data");
+						return false;
+					}
+					break;
+				default:
+					X_ASSERT_UNREACHABLE();
+					return false;
+			}
+		}
+
+		// now we must pad to 64 bytes, so that we can store hte block size as only 8bits.
+		if ((hitBoxDataSize % 64) != 0)
+		{
+			const size_t padSize = 64 - (hitBoxDataSize % 64);
+			char pad[64] = {};
+
+			if (file.write(pad, padSize) != padSize) {
+				X_ERROR("Model", "Failed to hitbox pad");
+				return false;
+			}
+		}
+	}
+
 
 	// write mesh headers for each lod.
 	for (size_t i = 0; i < compiledLods_.size(); i++)
@@ -1352,6 +1481,22 @@ size_t ModelCompiler::calculatePhysDataSize(void) const
 		return lod.getPhysDataSize();
 	});
 }
+
+size_t ModelCompiler::calculateHitBoxDataSize(void) const
+{
+	size_t size = 0;
+
+	size += sizeof(HitBoxHdr);
+	size += sizeof(uint8_t) * hitboxShapes_.size();
+
+	for (const auto& shape : hitboxShapes_)
+	{
+		size += shape.getHitBoxDataSize();
+	}
+
+	return size;
+}
+
 
 
 bool ModelCompiler::ProcessModel(void)
@@ -2094,6 +2239,27 @@ bool ModelCompiler::CheckLimits(void)
 	if (calculatePhysDataSize() > MODEL_MAX_COL_DATA_SIZE)
 	{
 		X_ERROR("Model", "Cumulative size of collision data exceeds limit, try reducing convex col meshes / complexity");
+		return false;
+	}
+
+	// this is a source code error tbh
+	if (hitboxShapes_.size() > bones_.size())
+	{
+		X_ERROR("Model", "Can't have more hitbox shapes than bones.");
+		return false;
+	}
+
+	// this is a source code error.
+	if (hitboxShapes_.size() > MODEL_MAX_BONES)
+	{
+		X_ERROR("Model", "Can't have more hitbox shapes than bones.");
+		return false;
+	}
+
+	const size_t hitBoxDataSize = calculateHitBoxDataSize();
+	if (hitBoxDataSize > MODEL_MAX_HITBOX_DATA_SIZE)
+	{
+		X_ERROR("Model", "Cumulative size of hitbox data exceeds limit.");
 		return false;
 	}
 

@@ -172,6 +172,30 @@ public:
 		CookedData cooked_;
 	};
 
+	class HitBoxShape
+	{
+	public:
+		HitBoxShape();
+
+		uint8_t getBoneIdx(void) const;
+		HitBoxType::Enum getType(void) const;
+		const Sphere& getBoundingSphere(void) const;
+		const OBB& getOBB(void) const;
+		size_t getHitBoxDataSize(void) const;
+
+
+	private:
+		uint8_t boneIdx_;
+		HitBoxType::Enum type_;
+
+		union {
+			Sphere sphere_;
+			OBB oob_;
+		};
+	};
+
+	typedef core::Array<HitBoxShape> HitBoxShapeArr;
+
 	class Lod
 	{
 		typedef core::Array<Mesh> MeshArr;
@@ -238,6 +262,7 @@ private:
 	size_t calculateSubDataSize(const Flags8<model::StreamType>& streams) const;
 	size_t calculateBoneDataSize(void) const;
 	size_t calculatePhysDataSize(void) const;
+	size_t calculateHitBoxDataSize(void) const;
 
 	bool ProcessModel(void);
 	bool ProcessCollisionMeshes(void);
@@ -280,6 +305,7 @@ private:
 
 	CompileFlags flags_;
 	CompiledLodArr compiledLods_;
+	HitBoxShapeArr hitboxShapes_;
 
 	float lodDistances_[model::MODEL_MAX_LODS];
 
