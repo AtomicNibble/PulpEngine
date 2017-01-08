@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Util\Delegate.h>
 #include "Stepper.h"
 
 X_NAMESPACE_DECLARE(core,
@@ -12,11 +13,16 @@ X_NAMESPACE_BEGIN(physics)
 class PhysXVars
 {
 public:
+	typedef core::Delegate<void(bool)> DebugDrawEnabledDel;
+
+
+public:
 	PhysXVars();
 	~PhysXVars() = default;
 
 	void RegisterVars(void);
 	void SetScene(physx::PxScene* pScene);
+	void SetDebugDrawChangedDel(DebugDrawEnabledDel del);
 
 	const char* getDllOverrideStr(void) const;
 	uint32_t ScratchBufferSize(void) const;
@@ -46,6 +52,7 @@ private:
 	int32_t scratchBufferDefaultSize_;
 	StepperType::Enum stepperType_;
 
+	DebugDrawEnabledDel debugDrawChangedDel_;
 	int32_t debugDraw_;
 	int32_t debugDrawUseCullBox_;
 	Vec3f gravityVec_;

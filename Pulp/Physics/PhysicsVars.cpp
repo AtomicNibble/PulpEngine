@@ -135,6 +135,12 @@ void PhysXVars::SetScene(physx::PxScene* pScene)
 	}
 }
 
+void PhysXVars::SetDebugDrawChangedDel(DebugDrawEnabledDel del)
+{
+	debugDrawChangedDel_ = del;
+}
+
+
 const char* PhysXVars::getDllOverrideStr(void) const
 {
 	X_ASSERT_NOT_NULL(pVarDllOverride_);
@@ -201,6 +207,10 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 	else
 	{
 		pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, 0);
+	}
+
+	if (debugDrawChangedDel_) {
+		debugDrawChangedDel_.Invoke(debugDraw_ != 0);
 	}
 }
 

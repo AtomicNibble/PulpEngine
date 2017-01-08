@@ -63,7 +63,6 @@ public:
 	void registerCmds(void) X_FINAL;
 
 	bool init(const ToleranceScale& scale) X_FINAL;
-	bool initRenderResources(void) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
@@ -150,6 +149,9 @@ private:
 	Stepper* getStepper(void);
 
 	void setScratchBlockSize(size_t size);
+
+	void onDebugDrawChange(bool enabled);
+	bool initDebugRenderer(void);
 
 private:
 	void setupDefaultRigidDynamic(physx::PxRigidDynamic& body, bool kinematic = false);

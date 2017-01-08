@@ -163,6 +163,10 @@ XPhysics::~XPhysics()
 // IPhysics
 void XPhysics::registerVars(void)
 {
+	PhysXVars::DebugDrawEnabledDel del;
+	del.Bind<XPhysics, &XPhysics::onDebugDrawChange>(this);
+
+	vars_.SetDebugDrawChangedDel(del);
 	vars_.RegisterVars();
 }
 
@@ -308,23 +312,6 @@ bool XPhysics::init(const ToleranceScale& scale)
 
 	stepperType_ = vars_.GetStepperType();
 	setScratchBlockSize(vars_.ScratchBufferSize());
-	return true;
-}
-
-bool XPhysics::initRenderResources(void)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
-
-	X_ASSERT(!pDebugRender_, "Debug render already init")(pDebugRender_);
-
-	auto* pPrimCon = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PHYSICS);
-	if (!pPrimCon) {
-		return false;
-	}
-
-	pDebugRender_ = X_NEW(DebugRender, arena_, "PhysDebugRender")(pPrimCon);
-
 	return true;
 }
 
@@ -1090,6 +1077,32 @@ void XPhysics::setScratchBlockSize(size_t size)
 	scratchBlockSize_ = size;
 }
 
+
+void XPhysics::onDebugDrawChange(bool enabled)
+{
+	if (enabled && !pDebugRender_) {
+		if (!initDebugRenderer())
+		{
+			X_ERROR("Physics", "Failed to init debugdraw");
+		}
+	}
+}
+
+bool XPhysics::initDebugRenderer(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
+
+	X_ASSERT(!pDebugRender_, "Debug render already init")(pDebugRender_);
+
+	auto* pPrimCon = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PHYSICS);
+	if (!pPrimCon) {
+		return false;
+	}
+
+	pDebugRender_ = X_NEW(DebugRender, arena_, "PhysDebugRender")(pPrimCon);
+	return true;
+}
 
 
 void XPhysics::cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
