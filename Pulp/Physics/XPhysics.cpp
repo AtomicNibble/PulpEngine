@@ -669,13 +669,20 @@ void XPhysics::setActorDominanceGroup(ActorHandle handle, int8_t group)
 
 // ------------------------------------------
 
+void XPhysics::setGroup(ActorHandle handle, const GroupFlag::Enum group)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	filter::SetGroup(actor, group);
+}
 
 void XPhysics::setGroupFlags(ActorHandle handle, const GroupFlags groupFlags)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
-	filter::SetGroup(actor, groupFlags);
+	filter::SetGroupMask(actor, groupFlags);
 }
+
 
 // group collision
 bool XPhysics::GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2)

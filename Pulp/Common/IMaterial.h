@@ -102,7 +102,7 @@ X_DECLARE_ENUM8(MaterialMountType)(
 X_DECLARE_ENUM8(MaterialCat)(
 	GEO,
 	DECAL,
-	UI,
+	UI, // 2D
 	TOOL,
 	CODE,
 	FILTERS,

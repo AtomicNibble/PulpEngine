@@ -34,22 +34,20 @@ namespace filter
 		static physx::PxFilterData convert(const GroupFlags& mask)
 		{
 			physx::PxFilterData fd;
-			fd.word2 = physx::PxU32(mask.ToInt());
+			fd.word1 = physx::PxU32(mask.ToInt());
 			return fd;
 		}
 
 		static GroupFlags convert(const physx::PxFilterData& fd)
 		{
-			return GroupFlags(fd.word0);
+			return GroupFlags(fd.word1);
 		}
-
 
 		X_INLINE static void adjustFilterData(bool groupsMask, const physx::PxFilterData& src, physx::PxFilterData& dst)
 		{
 			if (groupsMask)
 			{
-				dst.word2 = src.word2;
-				dst.word3 = src.word3;
+				dst.word1 = src.word1;
 			}
 			else
 			{
@@ -91,7 +89,6 @@ namespace filter
 					break;
 			}
 		}
-
 
 	} // namespace
 
@@ -137,12 +134,17 @@ namespace filter
 		gCollisionTable[group2][group1] = enable;
 	}
 
-	void SetGroup(physx::PxActor& actor, const GroupFlags groups)
+	void SetGroup(physx::PxActor& actor, const GroupFlag::Enum group)
+	{
+		physx::PxFilterData fd = convert(group);
+		setFilterData<false>(actor, fd);
+	}
+
+	void SetGroupMask(physx::PxActor& actor, const GroupFlags groups)
 	{
 		physx::PxFilterData fd = convert(groups);
 		setFilterData<true>(actor, fd);
 	}
-
 
 } // namespace filter
 

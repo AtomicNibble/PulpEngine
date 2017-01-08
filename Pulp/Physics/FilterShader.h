@@ -19,7 +19,9 @@ namespace filter
 	bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2);
 	void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable);
 
-	void SetGroup(physx::PxActor& actor, const GroupFlags groups);
+	void SetGroup(physx::PxActor& actor, const GroupFlag::Enum group);
+	void SetGroupMask(physx::PxActor& actor, const GroupFlags groups);
+
 
 } // namespace filter
 

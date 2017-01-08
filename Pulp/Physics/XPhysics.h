@@ -91,6 +91,7 @@ public:
 
 	void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_FINAL;
 	void setActorDominanceGroup(ActorHandle handle, int8_t group) X_FINAL;
+	void setGroup(ActorHandle handle, const GroupFlag::Enum group) X_FINAL;
 	void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_FINAL;
 
 	// group collision
