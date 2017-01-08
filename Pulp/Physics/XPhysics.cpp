@@ -211,7 +211,8 @@ bool XPhysics::init(const ToleranceScale& scale)
 			switch (core::Hash::Fnv1aHash(pDllOverrideStr, len))
 			{
 				case "none"_fnv1a:
-					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Normal);
+				//	don't override what was set above.
+				//	gDelayLoadHook.forceConfig(DelayLoadHook::Config::Normal);
 					break;
 				case "debug"_fnv1a:
 					gDelayLoadHook.forceConfig(DelayLoadHook::Config::Debug);
