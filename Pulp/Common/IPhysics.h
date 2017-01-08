@@ -8,6 +8,19 @@
 
 X_NAMESPACE_BEGIN(physics)
 
+X_DECLARE_FLAGS(GroupFlag)(
+	Default,	// nothing can pass through this
+	Player,		// can walk through AiClip and VehicleClip
+	Ai,			// can walk through PlayerClip and VehicleClip
+	Vehicle,	// can walk through PlayerClip and VehicleClip
+
+
+	PlayerClip,	// a actor group that stops actors in Player group
+	AiClip,		// a actor group that stops actors in Ai group
+	VehicleClip	// a actor group that stops actors in Vehicle group
+);
+
+typedef Flags<GroupFlag> GroupFlags;
 
 typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
