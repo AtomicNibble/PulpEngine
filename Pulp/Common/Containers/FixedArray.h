@@ -21,6 +21,10 @@ public:
 	typedef T& Reference;
 	typedef const T& ConstReference;
 
+	enum : size_type {
+		invalid_index = static_cast<size_type>(-1)
+	};
+
 	FixedArray();
 	FixedArray(const T& initalval);
 	~FixedArray(void);
@@ -57,6 +61,9 @@ public:
 	bool removeIndex(size_type idx);
 
 	bool remove(iterator position);
+
+	// returns invalid_index when not found.
+	size_type find(const Type& val) const;
 
 	// Inserts or erases elements at the end such that size is 'size'
 	inline void resize(size_type size, const T& t = T());
