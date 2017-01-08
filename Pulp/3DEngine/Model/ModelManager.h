@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(model)
 class XModel;
 
 class XModelManager :
-	public IModelManager,
+//	public IModelManager,
 	public engine::XEngineBase,
 	public core::IXHotReload
 {
@@ -22,22 +22,22 @@ class XModelManager :
 
 public:
 	XModelManager();
-	virtual ~XModelManager() X_OVERRIDE;
+	~XModelManager();
 
 	bool Init(void);
 	void ShutDown(void);
 
 	// IModelManager
 
-	IModel* findModel(const char* ModelName) const X_FINAL;
+	IModel* findModel(const char* ModelName) const;
 	// this only performs cpu loading, and currently loads all lods at once.
 	// as well as resolving materials, will alwyas return a instance, but might contain default data.
-	IModel* loadModel(const char* ModelName) X_FINAL;
-	IModel* loadModelSync(const char* pModelName) X_FINAL;
+	IModel* loadModel(const char* ModelName);
+	IModel* loadModelSync(const char* pModelName);
 
-	void releaseModel(IModel* pModel) X_FINAL;
+	void releaseModel(IModel* pModel);
 
-	IModel* getDefaultModel(void) X_FINAL;
+	IModel* getDefaultModel(void);
 
 	// ~IModelManager
 

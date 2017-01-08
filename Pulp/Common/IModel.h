@@ -587,6 +587,7 @@ struct IModel
 	virtual void RenderBones(const Matrix44f& modelMax) X_ABSTRACT;
 };
 
+#if 0 // don't see the need for this anymore, why you need model outside 3degnine? :| !
 struct IModelManager
 {
 	virtual ~IModelManager(){}
@@ -602,7 +603,7 @@ struct IModelManager
 
 	virtual IModel* getDefaultModel(void) X_ABSTRACT;
 };
-
+#endif
 
 X_PACK_PUSH(4)
 
