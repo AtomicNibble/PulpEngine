@@ -32,7 +32,6 @@ class XModelManager;
 
 X_NAMESPACE_DECLARE(physics,
 struct IPhysics;
-struct IModelManager;
 )
 
 
@@ -60,31 +59,64 @@ struct XEngineBase
 	static VariableStateManager* pVariableStateMan_;
 
 	// goats.
-	X_INLINE static ICore* getCore(void) { return pCore_; }
-	X_INLINE static core::ITimer* getTime(void) { return pTimer_; }
-	X_INLINE static core::IFileSys* getFileSys(void) { return pFileSys_; }
-	X_INLINE static core::IConsole* getConsole(void) { return pConsole_; }
-	X_INLINE static render::IRender* getRender(void) { return pRender_; }
-
-	X_INLINE static IMaterialManager* getMaterialManager(void) { 
-		return reinterpret_cast<IMaterialManager*>(pMaterialManager_); 
-	}
+	X_INLINE static ICore* getCore(void);
+	X_INLINE static core::ITimer* getTime(void);
+	X_INLINE static core::IFileSys* getFileSys(void);
+	X_INLINE static core::IConsole* getConsole(void);
+	X_INLINE static render::IRender* getRender(void);
 	X_INLINE static physics::IPhysics* getPhysics(void);
 
-	X_INLINE static model::IModelManager* getModelManager(void) {
-		return reinterpret_cast<model::IModelManager*>(pModelManager_);
-	}
+	X_INLINE static XMaterialManager* getMaterialManager(void);
+	X_INLINE static model::XModelManager* getModelManager(void);
+	X_INLINE static engine::gui::XGuiManager* getGuiManager(void);
+};
 
-	X_INLINE static engine::gui::XGuiManager* getGuiManager(void) {
-		return pGuiManger_;
-	}
+
+X_INLINE ICore* XEngineBase::getCore(void)
+{ 
+	return pCore_; 
+}
+
+X_INLINE core::ITimer* XEngineBase::getTime(void) 
+{ 
+	return pTimer_; 
+}
+
+X_INLINE core::IFileSys* XEngineBase::getFileSys(void) 
+{ 
+	return pFileSys_;
+}
+
+X_INLINE core::IConsole* XEngineBase::getConsole(void) 
+{ 
+	return pConsole_; 
+}
+
+X_INLINE render::IRender* XEngineBase::getRender(void) 
+{ 
+	return pRender_; 
+}
 
 X_INLINE physics::IPhysics* XEngineBase::getPhysics(void)
 { 
 	return pPhysics_;
 }
 
-};
+X_INLINE XMaterialManager* XEngineBase::getMaterialManager(void)
+{
+	return pMaterialManager_;
+}
+
+X_INLINE model::XModelManager* XEngineBase::getModelManager(void) 
+{
+	return pModelManager_;
+}
+
+X_INLINE engine::gui::XGuiManager* XEngineBase::getGuiManager(void) 
+{
+	return pGuiManger_;
+}
+
 
 X_NAMESPACE_END
 
