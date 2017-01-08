@@ -140,6 +140,18 @@ bool X3DEngine::Init(void)
 		return false;
 	}
 
+	// setup groups collision filters.
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Player, false);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Ai, true);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Vehicle, false);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Player, false);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Ai, true);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Vehicle, false);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Player, false);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Ai, false);
+	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
+
+
 
 	level::Level::Init();
 
