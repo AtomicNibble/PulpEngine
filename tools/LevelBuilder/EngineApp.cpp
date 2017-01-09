@@ -98,7 +98,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	if (!pICore_->IntializeLoadedConverterModule("engine_Physics", "Engine_PhysLib",
 		&pPhysConverterMod_, &pConverterInstance))
 	{
-		Error("Engine Init Failed");
+		X_ERROR("LvlBuilder", "Engine Init Failed");
 		return false;
 	}
 
