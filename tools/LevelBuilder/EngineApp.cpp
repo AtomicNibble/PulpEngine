@@ -86,6 +86,11 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	LinkModule(pICore_, "LevelBuilder");
 
+	// we can use logging now.
+	if (!pICore_->IntializeLoadedConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
+		X_ERROR("LvlBuilder", "Failed to init shaderLib");
+		return false;
+	}
 
 	// ConvertLib
 	IConverter* pConverterInstance = nullptr;
