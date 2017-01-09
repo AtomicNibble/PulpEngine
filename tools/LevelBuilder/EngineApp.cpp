@@ -84,7 +84,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	pICore_->RegisterAssertHandler(this);
 
 
-	LinkModule(pICore_, "PotatoBSP");
+	LinkModule(pICore_, "LevelBuilder");
+
 
 	// ConvertLib
 	IConverter* pConverterInstance = nullptr;
