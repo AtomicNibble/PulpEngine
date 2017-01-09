@@ -10,21 +10,42 @@ namespace msgbox
 
 	namespace 
 	{
-
-		UINT getIcon(Style style)
+		UINT getFlags(StyleFlags style)
 		{
-			switch (style) {
-				case Style::Info:
-					return MB_ICONINFORMATION;
-				case Style::Warning:
-					return MB_ICONWARNING;
-				case Style::Error:
-					return MB_ICONERROR;
-				case Style::Question:
-					return MB_ICONQUESTION;
-				default:
-					return MB_ICONINFORMATION;
+			UINT flags = 0;
+
+			if (style.IsSet(Style::Topmost))
+			{
+				flags |= MB_TOPMOST;
 			}
+			if (style.IsSet(Style::DefaultDesktop))
+			{
+				flags |= MB_DEFAULT_DESKTOP_ONLY;
+			}
+			
+			return flags;
+		}
+
+		UINT getIcon(StyleFlags style)
+		{
+			if (style.IsSet(Style::Info))
+			{
+				return MB_ICONINFORMATION;
+			}
+			if (style.IsSet(Style::Warning))
+			{
+				return MB_ICONWARNING;
+			}
+			if (style.IsSet(Style::Error))
+			{
+				return MB_ICONERROR;
+			}
+			if (style.IsSet(Style::Question))
+			{
+				return MB_ICONQUESTION;
+			}
+
+			return MB_ICONINFORMATION;
 		}
 
 		UINT getButtons(Buttons buttons) 
@@ -62,21 +83,23 @@ namespace msgbox
 
 
 
-	Selection show(const char* pMessage, const char* pTitle, Style style, Buttons buttons)
+	Selection show(const char* pMessage, const char* pTitle, StyleFlags style, Buttons buttons)
 	{
 		UINT flags = MB_TASKMODAL;
 
 		flags |= getIcon(style);
+		flags |= getFlags(style);
 		flags |= getButtons(buttons);
 
 		return getSelection(MessageBoxA(nullptr, pMessage, pTitle, flags));
 	}
 
-	Selection show(const wchar_t* pMessage, const wchar_t* pTitle, Style style, Buttons buttons)
+	Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style, Buttons buttons)
 	{
 		UINT flags = MB_TASKMODAL;
 
 		flags |= getIcon(style);
+		flags |= getFlags(style);
 		flags |= getButtons(buttons);
 
 		return getSelection(MessageBoxW(nullptr, pMessage, pTitle, flags));
