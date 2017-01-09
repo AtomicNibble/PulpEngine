@@ -58,6 +58,8 @@ typedef core::MemoryArena<
 
 X_LINK_LIB("engine_MaterialLib");
 X_LINK_LIB("engine_ModelLib");
+X_LINK_LIB("engine_Physics");
+
 
 
 #ifdef X_LIB
@@ -67,16 +69,92 @@ struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 X_LINK_LIB("engine_Core")
 X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_RenderNull")
+X_LINK_LIB("engine_Physics");
+
 // X_LINK_LIB("engine_Script")
 
 
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")
+X_FORCE_LINK_FACTORY("XConverterLib_Phys")
+
 
 #endif // !X_LIB
 
-void CompileLevel(core::Path<char>& path);
+
+void CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking)
+{
+	if (!pPhysCooking)
+	{
+		X_ERROR("Level", "Physics cooking is null");
+		return;
+	}
+
+	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
+	{
+		X_ERROR("Map", "extension is not valid, must be .map");
+		return;
+	}
+
+	X_LOG0("Map", "Loading: \"%s\"", path.fileName());
+
+	core::StopWatch stopwatch;
+
+	core::XFileMemScoped file;
+	core::IFileSys::fileModeFlags mode;
+	mode.Set(core::IFileSys::fileMode::READ);
+
+	if (file.openFile(path.c_str(), mode))
+	{
+		mapfile::XMapFile map;
+		LvlBuilder lvl(pPhysCooking, g_arena);
+
+		//	parse the map file.
+		if (map.Parse(file->getBufferStart(), safe_static_cast<size_t, uint64_t>(file->getSize())))
+		{
+			core::TimeVal elapsed = stopwatch.GetTimeVal();
+			{
+				X_LOG_BULLET;
+				X_LOG0("Map", "Loaded: ^6%.4fms", elapsed.GetMilliSeconds());
+				X_LOG0("Map", "Num Entities: ^8%" PRIuS, map.getNumEntities());
+				X_LOG0("Map", "Num Brushes: ^8%" PRIuS, map.getNumBrushes());
+				X_LOG0("Map", "Num Patches: ^8%" PRIuS, map.getNumPatches());
+			}
+
+			// all loaded time to get naked.
+			if (lvl.LoadFromMap(&map))
+			{
+				if (lvl.ProcessModels())
+				{
+					core::StopWatch timer;
+
+					if (lvl.save(path.fileName()))
+					{
+						core::TimeVal saveElapsed = timer.GetTimeVal();
+
+						X_LOG0("Level", "Success. saved in: ^6%gms",
+							saveElapsed.GetMilliSeconds());
+						//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
+					}
+					else
+					{
+						X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
+					}
+				}
+			}
+
+
+			elapsed = stopwatch.GetTimeVal();
+			X_LOG0("Info", "Total Time: ^6%.4fms", elapsed.GetMilliSeconds());
+		}
+		else
+		{
+			X_ERROR("Map", "Failed to parse map file");
+		}
+	}
+}
+
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -152,7 +230,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				name.setFileName("portal_test.map");
 				name.setFileName("entity_test.map");
 				
-				CompileLevel(name);
+				CompileLevel(name, engine.GetPhysCooking());
 
 				X_LOG0("Level", "Operation Complete...");
 			}
@@ -167,72 +245,3 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-void CompileLevel(core::Path<char>& path)
-{
-	core::ITimer* pTimer = gEnv->pTimer;
-
-	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
-	{
-		X_ERROR("Map", "extension is not valid, must be .map");
-		return;
-	}
-	core::IFileSys::fileModeFlags mode;
-	mode.Set(core::IFileSys::fileMode::READ);
-
-	core::XFileMem* pFile;
-
-	X_LOG0("Map", "Loading: \"%s\"", path.fileName());
-
-	core::StopWatch stopwatch;
-
-	if (pFile = gEnv->pFileSys->openFileMem(path.c_str(), mode))
-	{
-		mapfile::XMapFile map;
-		LvlBuilder lvl;
-
-		//	parse the map file.
-		if (map.Parse(pFile->getBufferStart(), safe_static_cast<size_t, uint64_t>(pFile->getSize())))
-		{
-			core::TimeVal elapsed = stopwatch.GetTimeVal();
-			{
-				X_LOG_BULLET;
-				X_LOG0("Map", "Loaded: ^6%.4fms", elapsed.GetMilliSeconds());
-				X_LOG0("Map", "Num Entities: ^8%" PRIuS, map.getNumEntities());
-				X_LOG0("Map", "Num Brushes: ^8%" PRIuS, map.getNumBrushes());
-				X_LOG0("Map", "Num Patches: ^8%" PRIuS, map.getNumPatches());
-			}
-
-			// all loaded time to get naked.
-			if (lvl.LoadFromMap(&map))
-			{
-				if (lvl.ProcessModels())
-				{
-					core::StopWatch timer;
-
-					if (lvl.save(path.fileName()))
-					{
-						core::TimeVal saveElapsed = timer.GetTimeVal();
-
-						X_LOG0("Level", "Success. saved in: ^6%gms",
-							saveElapsed.GetMilliSeconds());
-					//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
-					}
-					else
-					{
-						X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
-					}
-				}
-			}
-
-
-			elapsed = stopwatch.GetTimeVal();
-			X_LOG0("Info", "Total Time: ^6%.4fms", elapsed.GetMilliSeconds());
-		}
-		else
-		{
-			X_ERROR("Map", "Failed to parse map file");
-		}
-
-		gEnv->pFileSys->closeFileMem(pFile);
-	}
-}

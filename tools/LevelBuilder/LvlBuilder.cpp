@@ -183,20 +183,21 @@ namespace
 
 
 
-LvlBuilder::LvlBuilder() :
-	staticModels_(g_arena),
-	entities_(g_arena),
-	areas_(g_arena),
+LvlBuilder::LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArenaBase* arena) :
+	staticModels_(arena),
+	entities_(arena),
+	areas_(arena),
 
-	multiRefEntLists_({ { g_arena, g_arena, g_arena, g_arena,
-	g_arena, g_arena, g_arena, g_arena } }),
+	multiRefEntLists_({ { arena, arena, arena, arena,
+		arena, arena, arena, arena } }),
 
-	multiModelRefLists_({ { g_arena, g_arena, g_arena, g_arena,
-		g_arena, g_arena, g_arena, g_arena } }),
+	multiModelRefLists_({ { arena, arena, arena, arena,
+		arena, arena, arena, arena } }),
 
-	stringTable_(g_arena),
+	stringTable_(arena),
 	pMap_(nullptr),
-	matMan_(g_arena)
+	pPhysCooking_(pPhysCooking),
+	matMan_(arena)
 {
 	core::zero_object(stats_);
 

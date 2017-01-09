@@ -5,7 +5,12 @@
 #include <Platform\Console.h>
 #include <Platform\Module.h>
 
-#define WIN_ENGINE_WINDOW_CLASSNAME "WinCatEngine"
+
+X_NAMESPACE_DECLARE(physics,
+	struct IPhysLib;
+	struct IPhysicsCooking;
+)
+
 
 class EngineApp : public IAssertHandler
 {
@@ -15,6 +20,8 @@ public:
 
 	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
 	bool ShutDown(void);
+
+	physics::IPhysicsCooking* GetPhysCooking(void);
 
 private:
 	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
@@ -27,5 +34,8 @@ private:
 private:
 	core::Module::Handle hSystemHandle_;
 	ICore* pICore_;
+
+	physics::IPhysLib* pPhysLib_;
+	IConverterModule* pPhysConverterMod_;
 };
 

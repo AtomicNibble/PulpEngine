@@ -3,6 +3,10 @@
 #ifndef X_LVL_BUILDER_H_
 #define X_LVL_BUILDER_H_
 
+X_NAMESPACE_DECLARE(physics,
+	struct IPhysicsCooking;
+);
+
 #include "MaterialManager.h"
 #include "LvlTypes.h"
 
@@ -16,7 +20,7 @@ class LvlBuilder
 		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;
 
 public:
-	LvlBuilder();
+	LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArenaBase* arena);
 	~LvlBuilder();
 
 	bool LoadFromMap(mapfile::XMapFile* map);
@@ -82,7 +86,7 @@ private:
 	Vec3f		blockSize_;
 	
 	mapfile::XMapFile* pMap_;
-
+	physics::IPhysicsCooking* pPhysCooking_;
 	lvl::MatManager matMan_;
 
 	LvlStats stats_;

@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
-#include "ITimer.h"
+#include <ITimer.h>
+#include <IPhysics.h>
 
 #include <Debugging\DebuggerConnection.h>
 
@@ -85,6 +86,17 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	LinkModule(pICore_, "PotatoBSP");
 
+	// ConvertLib
+	IConverter* pConverterInstance = nullptr;
+
+	if (!pICore_->IntializeLoadedConverterModule("engine_Physics", "Engine_PhysLib",
+		&pPhysConverterMod_, &pConverterInstance))
+	{
+		Error("Engine Init Failed");
+		return false;
+	}
+
+	pPhysLib_ = static_cast<physics::IPhysLib*>(pConverterInstance);
 	return true;
 }
 
@@ -98,6 +110,11 @@ bool EngineApp::ShutDown(void)
 	return true;
 }
 
+physics::IPhysicsCooking* EngineApp::GetPhysCooking(void)
+{
+	X_ASSERT_NOT_NULL(pPhysLib_);
+	return pPhysLib_->getCooking();
+}
 
 void EngineApp::OnAssert(const core::SourceInfo& sourceInfo)
 {
