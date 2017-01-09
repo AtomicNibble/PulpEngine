@@ -28,6 +28,28 @@ PhysCooking::PhysCooking(core::MemoryArenaBase* arena) :
 
 PhysCooking::~PhysCooking()
 {
+	shutDown();
+}
+
+
+bool PhysCooking::init(const physx::PxTolerancesScale& scale, physx::PxFoundation& foundation, CookingMode::Enum mode)
+{
+	scale_ = scale;
+
+	physx::PxCookingParams params(scale);
+	setCookingParamsForMode(params, mode);
+
+	pCooking_ = PxCreateCooking(PX_PHYSICS_VERSION, foundation, params);
+	if (!pCooking_) {
+		X_ERROR("Physics", "PxCreateCooking failed!");
+		return false;
+	}
+
+	return true;
+}
+
+void PhysCooking::shutDown(void)
+{
 	core::SafeRelease(pCooking_);
 }
 
@@ -52,21 +74,6 @@ bool PhysCooking::setCookingMode(CookingMode::Enum mode)
 	return true;
 }
 
-bool PhysCooking::init(const physx::PxTolerancesScale& scale, physx::PxFoundation& foundation, CookingMode::Enum mode)
-{
-	scale_ = scale;
-
-	physx::PxCookingParams params(scale);
-	setCookingParamsForMode(params, mode);
-
-	pCooking_ = PxCreateCooking(PX_PHYSICS_VERSION, foundation, params);
-	if (!pCooking_) {
-		X_ERROR("Physics", "PxCreateCooking failed!");
-		return false;
-	}
-
-	return true;
-}
 
 bool PhysCooking::cookTriangleMesh(const TriangleMeshDesc& desc, DataArr& dataOut, CookFlags flags)
 {

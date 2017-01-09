@@ -21,6 +21,8 @@ XPhysLib::XPhysLib(core::MemoryArenaBase* arena) :
 
 XPhysLib::~XPhysLib()
 {
+	cooking_.shutDown();
+
 	core::SafeRelease(pFoundation_);
 }
 

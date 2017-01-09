@@ -14,6 +14,7 @@ public:
 	~PhysCooking() X_FINAL;
 
 	bool init(const physx::PxTolerancesScale& scale, physx::PxFoundation& foundation, CookingMode::Enum mode);
+	void shutDown(void);
 
 	// IPhysicsCooking
 	bool cookingSupported(void) const X_FINAL;
