@@ -16,6 +16,59 @@
 #include "GUID.h"
 
 
+namespace Internal
+{
+	template<class Dst> 
+	struct InterfaceCast;
+
+	template<class Dst>
+	struct InterfaceCast
+	{
+		template<class T>
+		static void* Op(T* p)
+		{
+			return (Dst*)p;
+		}
+	};
+
+	template<>
+	struct InterfaceCast<IPotatoUnknown>
+	{
+		template<class T>
+		static void* Op(T* p)
+		{
+			return const_cast<IPotatoUnknown*>(static_cast<const IPotatoUnknown*>(static_cast<const void*>(p)));
+		}
+	};
+}
+
+template<class TList>
+struct InterfaceCast;
+
+template<>
+struct InterfaceCast<TL::NullType>
+{
+	template<class T>
+	static void* Op(T*, const PotatoGUID&)
+	{
+		return nullptr;
+	}
+};
+
+template<class Head, class Tail>
+struct InterfaceCast<TL::Typelist<Head, Tail>>
+{
+	template<class T>
+	static void* Op(T* p, const PotatoGUID& iid)
+	{
+		if (PotatoIdOf<Head>() == iid) {
+			return Internal::InterfaceCast<Head>::Op(p);
+		}
+		return InterfaceCast<Tail>::Op(p, iid);
+	}
+};
+
+
 template<class TList>
 struct FillIIDs;
 
@@ -129,7 +182,11 @@ public:
       return &s_factory;                                                   \
     }                                                                      \
                                                                            \
-  protected: 
+  protected:															   \
+	virtual void* QueryInterface(const PotatoGUID &iid) const override	   \
+    {                                                                      \
+	  return InterfaceCast<FullInterfaceList>::Op(this, iid);          \
+    }
 
 #define _POTATO_ADD_MEMBERS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11) \
 public: \
