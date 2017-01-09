@@ -5,14 +5,11 @@
 
 #include <Debugging\DebuggerConnection.h>
 #include <Platform\Module.h>
+#include <Platform\MessageBox.h>
 
 
 extern HINSTANCE g_hInstance;
 
-void Error(const char* sErrorText)
-{
-	MessageBoxA(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
-}
 
 EngineApp::EngineApp() :
 	pICore_(nullptr),
@@ -124,6 +121,15 @@ LRESULT CALLBACK EngineApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
+
+void EngineApp::Error(const char* pErrorText)
+{
+	core::msgbox::show(pErrorText,
+		X_ENGINE_NAME" Start Error",
+		core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+		core::msgbox::Buttons::OK
+	);
+}
 
 bool EngineApp::PumpMessages()
 {

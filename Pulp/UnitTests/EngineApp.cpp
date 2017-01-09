@@ -5,15 +5,12 @@
 
 #include <Debugging\DebuggerConnection.h>
 #include <Platform\Module.h>
+#include <Platform\MessageBox.h>
 
 
 
 extern HINSTANCE g_hInstance;
 
-void Error(const char* sErrorText)
-{
-	MessageBoxA(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
-}
 
 AssetHandler::AssetHandler(void)
 {
@@ -123,3 +120,11 @@ int EngineApp::MainLoop()
 	return 0;
 }
 
+void EngineApp::Error(const char* pErrorText)
+{
+	core::msgbox::show(pErrorText,
+		X_ENGINE_NAME" Start Error",
+		core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+		core::msgbox::Buttons::OK
+	);
+}

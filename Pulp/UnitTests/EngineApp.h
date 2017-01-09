@@ -32,7 +32,7 @@ public:
 	int	MainLoop();
 
 private:
-
+	static void Error(const char* pErrorText);
 
 private:
 	AssetHandler assertCallback_;

@@ -5,6 +5,7 @@
 
 #include <Debugging\DebuggerConnection.h>
 #include <Platform\Module.h>
+#include <Platform\MessageBox.h>
 
 
 

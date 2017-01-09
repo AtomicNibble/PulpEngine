@@ -21,8 +21,10 @@ private:
 	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
-
 	virtual LRESULT OnTrayCmd(WPARAM wParam, LPARAM lParam) X_FINAL;
+
+private:
+	static void Error(const char* pErrorText);
 
 private:
 	bool run_;

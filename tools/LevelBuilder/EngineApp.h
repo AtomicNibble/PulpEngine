@@ -30,6 +30,8 @@ private:
 private:
 
 	static LRESULT CALLBACK	WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static void Error(const char* pErrorText);
+
 
 private:
 	core::Module::Handle hSystemHandle_;
