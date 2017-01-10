@@ -348,6 +348,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -364,6 +365,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">
@@ -381,6 +383,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysX.dll;PhysXCharacterKinematic.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">
@@ -433,6 +436,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysX.dll;PhysXCharacterKinematic.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">
