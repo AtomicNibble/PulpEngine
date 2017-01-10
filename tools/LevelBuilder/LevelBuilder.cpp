@@ -67,16 +67,23 @@ struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
 // X_LINK_LIB("engine_Font")
 X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_RenderNull")
 X_LINK_LIB("engine_Physics");
 
+
+// X_LINK_LIB("engine_3DEngine")
 // X_LINK_LIB("engine_Script")
 
+
+// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Model@@0V12@A")
+// X_FORCE_LINK_FACTORY("?factory__@XFactory@XConverterLib_Model@@0V12@A")
 
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")
+
+X_FORCE_LINK_FACTORY("XConverterLib_Material")
+X_FORCE_LINK_FACTORY("XConverterLib_Model")
 X_FORCE_LINK_FACTORY("XConverterLib_Phys")
 
 
