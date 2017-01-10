@@ -71,7 +71,7 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
 	data_.swap(newBuf);
 
 	// fill in the mip counts.
-	numMips_ = mipCnt;
+	numMips_ = safe_static_cast<uint8_t>(mipCnt);
 	
 	updateOffsets();
 }
@@ -196,12 +196,12 @@ X_INLINE const Vec2<uint16_t>& XTextureFile::getSize(void) const
 	return size_; 
 }
 
-X_INLINE Vec2<uint16_t> XTextureFile::getMipDim(int32_t mipIdx) const
+X_INLINE Vec2<uint16_t> XTextureFile::getMipDim(size_t mipIdx) const
 {
 	Vec2<uint16_t> size = size_;
 
-	size.x = core::Max(size.x >> mipIdx, 1);
-	size.y = core::Max(size.y >> mipIdx, 1);
+	size.x = core::Max<uint16_t>(size.x >> mipIdx, 1u);
+	size.y = core::Max<uint16_t>(size.y >> mipIdx, 1u);
 
 	return size;
 }
@@ -285,7 +285,7 @@ X_INLINE size_t XTextureFile::getFaceSize(void) const
 
 X_INLINE size_t XTextureFile::getLevelSize(size_t mip) const
 {
-	if (mip == (numMips_ - 1)) 
+	if (mip == (numMips_ - 1u)) 
 	{
 		// have to calculate if last.
 		uint32_t width = size_.x;

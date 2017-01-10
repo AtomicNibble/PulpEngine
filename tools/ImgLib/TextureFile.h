@@ -29,7 +29,7 @@ public:
 
 
 	X_INLINE const Vec2<uint16_t>& getSize(void) const;
-	X_INLINE Vec2<uint16_t> getMipDim(int32_t mipIdx) const;
+	X_INLINE Vec2<uint16_t> getMipDim(size_t mipIdx) const;
 	X_INLINE int32_t getWidth(void) const;
 	X_INLINE int32_t getHeight(void) const;
 	X_INLINE uint8_t getNumFaces(void) const;
