@@ -25,7 +25,7 @@ bool ModelCache::getModelAABB(const core::string& name, AABB& bounds)
 		return true;
 	}
 
-	if (model::Util::GetModelAABB(name, bounds))
+	if (!model::Util::GetModelAABB(name, bounds))
 	{
 		bounds = defaultModelBounds_;
 		// we don't insert in cache otherwise it would return true for the next request.
