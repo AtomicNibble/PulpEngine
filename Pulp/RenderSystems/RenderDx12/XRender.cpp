@@ -995,6 +995,7 @@ shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const 
 
 shader::IShaderPermatation* XRender::createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel)
 {
+	X_ASSERT_NOT_IMPLEMENTED();
 	return nullptr;
 }
 
