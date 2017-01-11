@@ -491,7 +491,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AreaModel.cpp" />
+    <ClCompile Include="LvlArea.cpp" />
     <ClCompile Include="BSPFace.cpp" />
     <ClCompile Include="LvlFile.cpp" />
     <ClCompile Include="bspNode.cpp" />

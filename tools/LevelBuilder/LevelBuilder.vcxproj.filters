@@ -119,9 +119,6 @@
     <ClCompile Include="Settings.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="AreaModel.cpp">
-      <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
     <ClCompile Include="LvlProcess.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
@@ -151,6 +148,9 @@
     </ClCompile>
     <ClCompile Include="PlaneSet.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlArea.cpp">
+      <Filter>Source Files\Lvl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -86,9 +86,9 @@ AreaSubMesh::AreaSubMesh() : verts_(g_arena), faces_(g_arena)
 
 
 LvlArea::LvlArea() :
-areaMeshes(g_arena),
-entRefs(g_arena),
-modelsRefs(g_arena)
+	areaMeshes(g_arena),
+	entRefs(g_arena),
+	modelsRefs(g_arena)
 {
 	areaMeshes.reserve(2048);
 	entRefs.reserve(256);
