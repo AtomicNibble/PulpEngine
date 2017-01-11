@@ -380,6 +380,52 @@ bool LvlBuilder::save(const char* name)
 			}
 		}
 
+		// area collision data.
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_COLLISION], file);
+
+			// we want to wrtie the collision for each area out in blocks.
+			// each area can have multiple 
+			for (size_t i = 0; i < areas_.size(); i++)
+			{
+				const LvlArea& area = areas_[i];
+				const AreaCollsiion& col = area.collision;
+
+				AreaCollisionHdr colHdr;
+				colHdr.numGroups = safe_static_cast<uint8_t>(col.numGroups());
+
+				file.writeObj(colHdr);
+
+				for (const auto& group : col.getGroups())
+				{
+					const auto& triDataArr = group.getTriMeshDataArr();
+
+					AreaCollisionGroupHdr groupHdr;
+					groupHdr.groupFlags = group.getGroupFlags();
+					core::zero_object(groupHdr.numTypes);
+					groupHdr.numTypes[CollisionDataType::TriMesh] = safe_static_cast<uint8_t>(triDataArr.size());
+					groupHdr.numTypes[CollisionDataType::HeightField] = 0;
+
+					file.writeObj(groupHdr);
+
+					// write all the meshess.
+					for (const auto& triMesh : triDataArr)
+					{
+						const auto& cooked = triMesh.cookedData;
+
+						X_ASSERT(cooked.isEmpty(), "Collision data is empty")();
+
+						AreaCollisionDataHdr dataHdr;
+						dataHdr.dataSize = safe_static_cast<uint16_t>(cooked.size());
+
+						file.writeObj(dataHdr);
+						file.write(cooked.data(), cooked.size());
+					}
+				}
+
+			}
+		}
+
 		// models
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::STATIC_MODELS], file);
