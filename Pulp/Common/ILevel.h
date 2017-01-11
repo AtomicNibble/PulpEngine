@@ -11,6 +11,7 @@
 
 #include <IRenderMesh.h>
 #include <IFileSys.h>
+#include <IPhysics.h>
 
 
 // forward Decs.
@@ -447,6 +448,48 @@ struct FileStaticModel
 	uint32_t modelNameIdx;
 };
 
+
+X_DECLARE_ENUM8(CollisionDataType)(
+	TriMesh,
+	HeightField
+);
+
+
+X_PACK_PUSH(1)
+
+struct AreaCollisionHdr
+{
+	uint8_t numGroups;
+
+};
+
+struct AreaCollisionGroupHdr
+{
+	// the flags for this group
+	physics::GroupFlags groupFlags;
+	// the number of each type.
+	uint8_t numTypes[CollisionDataType::ENUM_COUNT];
+};
+
+// one for each type.
+struct AreaCollisionDataHdr
+{
+	uint16_t dataSize;
+
+};
+
+
+// some checks for col types.
+static_assert(std::numeric_limits<decltype(AreaCollisionHdr::numGroups)>::max() >= MAP_MAX_AREA_COL_GROUPS, "Limit exceeds type max");
+static_assert(std::numeric_limits<std::remove_reference<decltype(AreaCollisionGroupHdr::numTypes[0])>::type>::max() >= MAP_MAX_AREA_COL_DATA, "Limit exceeds type max");
+static_assert(std::numeric_limits<decltype(AreaCollisionDataHdr::dataSize)>::max() >= MAP_MAX_AREA_COL_DATA_SIZE, "Limit exceeds type max");
+
+X_ENSURE_SIZE(AreaCollisionHdr, 1);
+X_ENSURE_SIZE(AreaCollisionGroupHdr, 6);
+X_ENSURE_SIZE(AreaCollisionDataHdr, 2);
+
+
+X_PACK_POP
 
 
 struct FileNode
