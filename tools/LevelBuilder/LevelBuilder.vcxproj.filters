@@ -43,6 +43,12 @@
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{0946935c-ec71-4ac9-8df3-4a02e906d184}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{22a186ff-2f96-4ee4-8059-86468f006075}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{bab4193c-7c73-4fb1-9aeb-7525dec17f9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -89,6 +95,9 @@
     </ClInclude>
     <ClInclude Include="LvlBuilder.h">
       <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelCache.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="LvlArea.cpp">
       <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelCache.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

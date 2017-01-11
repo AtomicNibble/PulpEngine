@@ -480,6 +480,7 @@
     <ClInclude Include="Globals.h" />
     <ClInclude Include="LvlTypes.h" />
     <ClInclude Include="MaterialManager.h" />
+    <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
     <ClInclude Include="VertexFmt.h" />
@@ -508,6 +509,7 @@
     <ClCompile Include="MapTypes.cpp" />
     <ClCompile Include="LevelBuilder.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
+    <ClCompile Include="ModelCache.cpp" />
     <ClCompile Include="PlaneSet.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp">
