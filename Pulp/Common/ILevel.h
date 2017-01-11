@@ -285,7 +285,8 @@ static const uint32_t	 MAP_MAX_MODELS = 0x400;			// a model is a 'area'.
 static const uint32_t	 MAP_MAX_MODEL_SURFACES = 65536 * 2;// the maximum surfaces a map model can have.
 static const uint32_t	 MAP_MAX_MODEL_VERTS = 65536;		// the maximum verts a map model can have.
 static const uint32_t	 MAP_MAX_MODEL_INDEXES = 65536;		// the maximum indexes a map model can have.
-static const uint32_t	 MAP_MAX_MATERIALs = 0x800;		
+static const uint32_t	 MAP_MAX_MATERIALS = 0x800;			// this is for level geo only
+
 
 // Should be checked in compiler.
 static const uint32_t	 MAP_MAX_ENTITES = 0x400;
