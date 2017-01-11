@@ -287,6 +287,11 @@ static const uint32_t	 MAP_MAX_MODEL_VERTS = 65536;		// the maximum verts a map 
 static const uint32_t	 MAP_MAX_MODEL_INDEXES = 65536;		// the maximum indexes a map model can have.
 static const uint32_t	 MAP_MAX_MATERIALS = 0x800;			// this is for level geo only
 
+// area col stuff
+static const uint32_t	 MAP_MAX_AREA_COL_GROUPS = 0xff;	// the max amount of col groups for a given area
+static const uint32_t	 MAP_MAX_AREA_COL_DATA = 0xff;		// the max amount of col data for a arena, aka the sum of all data types for that area (triMesh, hieghtField)
+static const uint32_t	 MAP_MAX_AREA_COL_DATA_SIZE = std::numeric_limits<uint16_t>::max(); // the max size of a single col data
+
 
 // Should be checked in compiler.
 static const uint32_t	 MAP_MAX_ENTITES = 0x400;
