@@ -204,11 +204,17 @@ LvlBuilder::LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArena
 	core::zero_object(stats_);
 
 	matMan_.Init();
+
+	pModelCache_ = X_NEW(lvl::ModelCache, arena, "LvlModelCache")(arena);
 }
 
 LvlBuilder::~LvlBuilder()
 {
 	matMan_.ShutDown();
+
+	if (pModelCache_) {
+		X_DELETE(pModelCache_, arena_);
+	}
 }
 
 
