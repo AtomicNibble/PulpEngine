@@ -14,7 +14,7 @@ namespace Util
 	bool GetModelAABB(const core::string& name, AABB& boxOut)
 	{
 		core::Path<char> path;
-		path /= "models/";
+		path /= "models";
 		path /= name;
 		path.setExtension(model::MODEL_FILE_EXTENSION);
 
