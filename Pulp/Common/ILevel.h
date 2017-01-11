@@ -12,6 +12,7 @@
 #include <IRenderMesh.h>
 #include <IFileSys.h>
 #include <IPhysics.h>
+#include <IAssetDb.h>
 
 
 // forward Decs.
@@ -299,7 +300,7 @@ static const uint32_t	 MAP_MAX_ENTITES = 0x400;
 static const uint32_t	 MAP_MAX_LIGHTS_WORLD = 4096;
 
 // might be removed in-favor of embeded binary materials
-static const uint32_t	 MAP_MAX_MATERIAL_LEN = 64;
+static const uint32_t	 MAP_MAX_MATERIAL_LEN = assetDb::ASSET_NAME_MAX_LENGTH; 
 
 // Key / Value limits
 static const uint32_t	 MAX_KEY_LENGTH = 64;			// KVP: name
