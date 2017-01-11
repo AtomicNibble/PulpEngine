@@ -400,6 +400,7 @@ X_DECLARE_ENUM(FileNodes) (
 	AREA_PORTALS,
 	AREA_ENT_REFS,		// all ents except models.
 	AREA_MODEL_REFS,	// area model refs.
+	AREA_COLLISION,		// the collision data for each area.
 	STATIC_MODELS,		// all the static models in the map.
 	BSP_TREE
 );
