@@ -4,7 +4,10 @@
 #ifndef X_LVL_TYPES_H_
 #define X_LVL_TYPES_H_
 
+#include <IPhysics.h>
 #include <IModel.h>
+#include <ILevel.h>
+
 #include <String\GrowingStringTable.h>
 
 #include "BSPTypes.h"
@@ -177,6 +180,53 @@ public:
 };
 
 
+// contains all the collision data for a area.
+// we will support tri mesh and hieght fields.
+struct AreaCollsiion
+{
+	// a single chunck of collision data.
+	struct TriMeshData
+	{
+		TriMeshData(core::MemoryArenaBase* arena);
+
+		bool cook(physics::IPhysicsCooking* pCooking);
+
+		core::Array<level::Vertex> verts;
+		core::Array<model::Face> faces;
+		core::Array<uint8_t> cookedData;
+	};
+
+	// a collection of collision data for a given set of group flags.
+	struct GroupBucket
+	{
+		typedef core::Array<TriMeshData> TriMesgDataArr;
+
+		GroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena);
+
+		physics::GroupFlags getGroupFlags(void) const;
+		const TriMesgDataArr& getTriMeshDataArr(void) const;
+		
+		TriMeshData& getCurrentTriMeshData(void);
+		void beginNewTriMesh(void); // move to a new block of data, used to break collision data up into smaller chuncks for potential performance gains.
+
+	private:
+		physics::GroupFlags groupFlags_;
+		TriMesgDataArr triMeshData_;
+	};
+
+	typedef core::Array<GroupBucket> ColGroupBucketArr;
+
+
+public:
+	AreaCollsiion(core::MemoryArenaBase* arena);
+
+	size_t numGroups(void) const;
+	const ColGroupBucketArr& getGroups(void) const;
+
+private:
+	ColGroupBucketArr colGroupBuckets_;
+};
+
 struct AreaModel
 {
 	AreaModel();
@@ -231,6 +281,7 @@ public:
 public:
 	// area has one model.
 	AreaModel model;
+	AreaCollsiion collision;
 
 	AreaMeshMap areaMeshes;
 	AreaRefs entRefs;

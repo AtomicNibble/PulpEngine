@@ -2,10 +2,101 @@
 #include "LvlTypes.h"
 
 
+
+AreaCollsiion::TriMeshData::TriMeshData(core::MemoryArenaBase* arena) :
+	verts(arena),
+	faces(arena),
+	cookedData(arena)
+{
+
+}
+
+bool AreaCollsiion::TriMeshData::cook(physics::IPhysicsCooking* pCooking)
+{
+	using namespace physics;
+	
+	IPhysicsCooking::CookFlags flags;
+
+	static_assert(sizeof(decltype(faces)::Type::value_type) == 2, "No longer using 16bit indicies?");
+	flags.Set(IPhysicsCooking::CookFlag::INDICES_16BIT);
+
+	TriangleMeshDesc desc;
+	desc.points.pData = verts.data();
+	desc.points.stride = sizeof(decltype(verts)::Type);
+	desc.points.count = safe_static_cast<uint32>(verts.size());
+	desc.triangles.pData = faces.data();
+	desc.triangles.stride = sizeof(decltype(faces)::Type);
+	desc.triangles.count = safe_static_cast<uint32>(faces.size());
+
+	if (!pCooking->cookTriangleMesh(desc, cookedData, flags))
+	{
+		X_ERROR("TriMesh", "Failed to cook area collision");
+		return false;
+	}
+
+	return true;
+}
+
+// ==========================================
+
+
+AreaCollsiion::GroupBucket::GroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena) :
+	groupFlags_(groupFlags),
+	triMeshData_(arena)
+{
+
+}
+
+physics::GroupFlags AreaCollsiion::GroupBucket::getGroupFlags(void) const
+{
+	return groupFlags_;
+}
+
+const AreaCollsiion::GroupBucket::TriMesgDataArr& AreaCollsiion::GroupBucket::getTriMeshDataArr(void) const
+{
+	return triMeshData_;
+}
+
+
+AreaCollsiion::TriMeshData& AreaCollsiion::GroupBucket::getCurrentTriMeshData(void)
+{
+	if (triMeshData_.isEmpty()) {
+		beginNewTriMesh();
+	}
+
+	return triMeshData_.back();
+}
+
+void AreaCollsiion::GroupBucket::beginNewTriMesh(void)
+{
+	triMeshData_.emplace_back(triMeshData_.getArena());
+}
+
+// ==========================================
+
+AreaCollsiion::AreaCollsiion(core::MemoryArenaBase* arena) :
+	colGroupBuckets_(arena)
+{
+
+}
+
+size_t AreaCollsiion::numGroups(void) const
+{
+	return colGroupBuckets_.size();
+}
+
+const AreaCollsiion::ColGroupBucketArr& AreaCollsiion::getGroups(void) const
+{
+	return colGroupBuckets_;
+}
+
+// ----------------------------
+
+
 AreaModel::AreaModel() :
-meshes(g_arena),
-verts(g_arena),
-faces(g_arena)
+	meshes(g_arena),
+	verts(g_arena),
+	faces(g_arena)
 {
 
 }
@@ -75,7 +166,9 @@ void AreaModel::EndModel(void)
 
 // ----------------------------
 
-AreaSubMesh::AreaSubMesh() : verts_(g_arena), faces_(g_arena)
+AreaSubMesh::AreaSubMesh() : 
+	verts_(g_arena), 
+	faces_(g_arena)
 {
 	verts_.setGranularity(4096);
 	faces_.setGranularity(4096);
@@ -86,6 +179,7 @@ AreaSubMesh::AreaSubMesh() : verts_(g_arena), faces_(g_arena)
 
 
 LvlArea::LvlArea() :
+	collision(g_arena),
 	areaMeshes(g_arena),
 	entRefs(g_arena),
 	modelsRefs(g_arena)
