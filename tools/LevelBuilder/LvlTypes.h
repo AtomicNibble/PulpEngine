@@ -223,6 +223,8 @@ public:
 	size_t numGroups(void) const;
 	const ColGroupBucketArr& getGroups(void) const;
 
+	GroupBucket& getBucket(physics::GroupFlags flags);
+
 private:
 	ColGroupBucketArr colGroupBuckets_;
 };

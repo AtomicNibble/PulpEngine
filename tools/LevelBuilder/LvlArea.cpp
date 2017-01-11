@@ -96,6 +96,22 @@ const AreaCollsiion::ColGroupBucketArr& AreaCollsiion::getGroups(void) const
 	return colGroupBuckets_;
 }
 
+AreaCollsiion::GroupBucket& AreaCollsiion::getBucket(physics::GroupFlags flags)
+{
+	for (auto& b : colGroupBuckets_)
+	{
+		if (b.getGroupFlags() == flags)
+		{
+			return b;
+		}
+	}
+
+	// add a new one :O
+	colGroupBuckets_.emplace_back(flags, colGroupBuckets_.getArena());
+
+	return colGroupBuckets_.back();
+}
+
 // ----------------------------
 
 
