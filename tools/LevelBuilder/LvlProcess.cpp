@@ -6,6 +6,7 @@
 
 #include "MapTypes.h"
 #include "MapLoader.h"
+#include "ModelCache.h"
 
 namespace
 {
@@ -263,12 +264,7 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 bool LvlBuilder::LoadDefaultModel(void)
 {
-	if (!model::Util::GetModelAABB(core::string(model::MODEL_DEFAULT_NAME), defaultModelBounds_))
-	{
-		X_ERROR("Lvl","Failed to load default model info");
-		return false;
-	}
-	return true;
+	return pModelCache_->loadDefaultModel();
 }
 
 void LvlBuilder::calculateLvlBounds(void)

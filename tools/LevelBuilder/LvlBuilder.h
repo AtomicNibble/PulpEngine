@@ -7,10 +7,15 @@ X_NAMESPACE_DECLARE(physics,
 	struct IPhysicsCooking;
 );
 
+X_NAMESPACE_DECLARE(lvl,
+	class ModelCache;
+);
+
 #include "MaterialManager.h"
 #include "LvlTypes.h"
 
 #include <array>
+
 
 class LvlBuilder
 {
@@ -68,8 +73,6 @@ private:
 	// void CollectStaticModels(void);
 
 private:
-	AABB defaultModelBounds_;
-
 	StaticModelsArr staticModels_;
 
 	LvlEntsArr	entities_;
@@ -87,6 +90,7 @@ private:
 	
 	mapfile::XMapFile* pMap_;
 	physics::IPhysicsCooking* pPhysCooking_;
+	lvl::ModelCache* pModelCache_;
 	lvl::MatManager matMan_;
 
 	LvlStats stats_;
