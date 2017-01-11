@@ -13,6 +13,7 @@
 #include <Math\XWinding.h>
 
 #include <Containers\HashMap.h>
+#include <Containers\FixedArray.h>
 
 #include "StringPair.h"
 

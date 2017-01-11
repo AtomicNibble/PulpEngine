@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "LvlBuilder.h"
 
-#include <Containers\FixedArray.h>
 #include <IModel.h>
 
 #include "MapTypes.h"
