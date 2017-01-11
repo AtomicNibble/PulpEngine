@@ -34,6 +34,12 @@ bool AreaCollsiion::TriMeshData::cook(physics::IPhysicsCooking* pCooking)
 		return false;
 	}
 
+	if (cookedData.size() > level::MAP_MAX_AREA_COL_DATA_SIZE)
+	{
+		X_ERROR("TriMesh", "cooked mesh is too big: %" PRIuS " bytes. max: %" PRIu32, cookedData.size(), level::MAP_MAX_AREA_COL_DATA_SIZE);
+		return false;
+	}
+
 	return true;
 }
 
