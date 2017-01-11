@@ -73,6 +73,8 @@ private:
 	// void CollectStaticModels(void);
 
 private:
+	core::MemoryArenaBase* arena_;
+
 	StaticModelsArr staticModels_;
 
 	LvlEntsArr	entities_;

@@ -185,6 +185,7 @@ namespace
 
 
 LvlBuilder::LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArenaBase* arena) :
+	arena_(arena),
 	staticModels_(arena),
 	entities_(arena),
 	areas_(arena),
