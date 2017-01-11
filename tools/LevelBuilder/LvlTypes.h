@@ -9,7 +9,6 @@
 
 #include "BSPTypes.h"
 
-#include <set>
 
 
 X_NAMESPACE_DECLARE(mapfile,
