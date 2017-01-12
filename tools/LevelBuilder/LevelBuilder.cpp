@@ -2,7 +2,6 @@
 #include "LvlBuilder.h"
 #include "EngineApp.h"
 
-#include <tchar.h>
 
 #include <IFileSys.h>
 #include <ITimer.h>

@@ -5,6 +5,8 @@
 #include <EngineCommon.h>
 
 #include "resource.h"
+#include <tchar.h>
+
 
 #include <String\Lexer.h>
 #include <String\StrRef.h>
