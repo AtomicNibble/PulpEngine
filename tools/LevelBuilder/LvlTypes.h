@@ -191,6 +191,13 @@ struct AreaCollsiion
 
 		bool cook(physics::IPhysicsCooking* pCooking);
 
+		X_INLINE void AddVert(const level::Vertex& vert) {
+			verts.append(vert);
+		}
+		X_INLINE void AddFace(const model::Face& face) {
+			faces.append(face);
+		}
+
 		core::Array<level::Vertex> verts;
 		core::Array<model::Face> faces;
 		core::Array<uint8_t> cookedData;
