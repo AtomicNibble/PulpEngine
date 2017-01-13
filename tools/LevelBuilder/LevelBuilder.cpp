@@ -89,18 +89,18 @@ X_FORCE_LINK_FACTORY("XConverterLib_Phys")
 #endif // !X_LIB
 
 
-void CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking)
+bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking)
 {
 	if (!pPhysCooking)
 	{
 		X_ERROR("Level", "Physics cooking is null");
-		return;
+		return false;
 	}
 
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{
 		X_ERROR("Map", "extension is not valid, must be .map");
-		return;
+		return false;
 	}
 
 	X_LOG0("Map", "Loading: \"%s\"", path.fileName());
@@ -129,36 +129,43 @@ void CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 			}
 
 			// all loaded time to get naked.
-			if (lvl.LoadFromMap(&map))
+			if (!lvl.LoadFromMap(&map))
 			{
-				if (lvl.ProcessModels())
-				{
-					core::StopWatch timer;
-
-					if (lvl.save(path.fileName()))
-					{
-						core::TimeVal saveElapsed = timer.GetTimeVal();
-
-						X_LOG0("Level", "Success. saved in: ^6%gms",
-							saveElapsed.GetMilliSeconds());
-						//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
-					}
-					else
-					{
-						X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
-					}
-				}
+				return false;
 			}
 
+			if (!lvl.ProcessModels())
+			{
+				return false;
+			}
+
+			core::StopWatch timer;
+
+			if (lvl.save(path.fileName()))
+			{
+				core::TimeVal saveElapsed = timer.GetTimeVal();
+
+				X_LOG0("Level", "Success. saved in: ^6%gms",
+					saveElapsed.GetMilliSeconds());
+				//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
+			}
+			else
+			{
+				X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
+				return false;
+			}
 
 			elapsed = stopwatch.GetTimeVal();
 			X_LOG0("Info", "Total Time: ^6%.4fms", elapsed.GetMilliSeconds());
+			return true;
 		}
 		else
 		{
 			X_ERROR("Map", "Failed to parse map file");
 		}
 	}
+
+	return false;
 }
 
 
@@ -171,6 +178,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 	g_hInstance = hInstance;
 	// compile my anus.
+
+	int res = -1;
 
 	{
 		core::MallocFreeAllocator allocator;
@@ -236,7 +245,14 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				name.setFileName("portal_test.map");
 				name.setFileName("entity_test.map");
 				
-				CompileLevel(name, engine.GetPhysCooking());
+				if (CompileLevel(name, engine.GetPhysCooking()))
+				{
+					res = 0;
+				}
+				else
+				{
+					res = -1;
+				}
 
 				X_LOG0("Level", "Operation Complete...");
 			}
@@ -247,7 +263,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_bspFaceAllocator = nullptr;
 	g_bspNodeAllocator = nullptr;
 
-	return 0;
+	return res;
 }
 
 
