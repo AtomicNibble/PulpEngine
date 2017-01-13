@@ -37,6 +37,7 @@
 
 #include <Memory\MemInfo.h>
 #include <Platform\Module.h>
+#include <Platform\MessageBox.h>
 
 
 #include "PotatoFactoryRegistryImpl.h"
@@ -331,9 +332,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 		if (!bIsWindowsXPorLater)
 		{
-			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd), 
-				L"Versions of windows older than and including XP are not supported.",
-				L"Critial Error", MB_OK);
+			core::msgbox::show(L"Versions of windows older than and including XP are not supported.",
+				X_WIDEN(X_ENGINE_NAME) L" Start Error",
+				core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+				core::msgbox::Buttons::OK);
 			return false;
 		}
 	}

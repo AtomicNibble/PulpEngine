@@ -7,7 +7,7 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Threading\CriticalSection.h>
-
+#include <Platform\MessageBox.h>
 
 // Google Test
 #if X_DEBUG == 1
@@ -70,7 +70,11 @@ void InitRootDir(void)
 	path.removeTrailingSlash();
 
 	if (!SetCurrentDirectoryW(path.c_str())) {
-		::MessageBoxW(0, L"Failed to set current directory", L"Error", MB_OK);
+		core::msgbox::show("Failed to set current directory",
+			X_ENGINE_NAME " Fatal Error",
+			core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+			core::msgbox::Buttons::OK);
+
 		ExitProcess(static_cast<uint32_t>(-1));
 	}
 #endif

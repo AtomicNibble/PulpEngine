@@ -14,7 +14,7 @@ X_ENABLE_WARNING(4091)
 
 #include <Time\DateStamp.h>
 #include <Time\TimeStamp.h>
-
+#include <Platform\MessageBox.h>
 
 #if X_ENABLE_UNHANDLED_EXCEPTION_HANDLER
 
@@ -310,7 +310,10 @@ namespace exceptionHandler
 				X_LOG0( "ExceptionHandler", "Quitting the application." );		
 			}
 
-			MessageBoxA( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
+			core::msgbox::show("Unhandled exception! The program will now close.",
+				X_ENGINE_NAME " Fatal Error",
+				core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+				core::msgbox::Buttons::OK);
 		}
 
 		return 1;
@@ -489,8 +492,10 @@ namespace exceptionHandler
 				X_LOG0( "ExceptionHandler", "Quitting the application." );
 			}
 
-
-			MessageBoxA( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
+			core::msgbox::show("Unhandled exception! The program will now close.",
+				X_ENGINE_NAME " Fatal Error",
+				core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+				core::msgbox::Buttons::OK);
 		}
 		return 1;
 	}

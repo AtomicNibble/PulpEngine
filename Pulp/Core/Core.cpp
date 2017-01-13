@@ -19,6 +19,7 @@
 #include <Platform\Console.h>
 #include <Platform\SystemInfo.h>
 #include <Platform\Module.h>
+#include <Platform\MessageBox.h>
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\CallStack.h>
 #include <Memory\VirtualMem.h>
@@ -465,12 +466,13 @@ void XCore::OnFatalError(const char* format, va_list args)
 	
 	X_LOG0("FatalError", "CallStack:\n%s", Dsc);
 
-
 	core::LoggerBase::Line Line;
 	vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
 
-	::MessageBoxA(NULL, Line, X_ENGINE_NAME" Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
-
+	core::msgbox::show(Line,
+		X_ENGINE_NAME " Fatal Error",
+		core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+		core::msgbox::Buttons::OK);
 
 	X_BREAKPOINT;
 
