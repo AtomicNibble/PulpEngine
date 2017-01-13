@@ -145,7 +145,7 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 	mat.assignProps(hdr);
 
 
-	return false;
+	return true;
 }
 
 
