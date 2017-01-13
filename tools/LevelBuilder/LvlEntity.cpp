@@ -185,7 +185,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 	X_LOG0("LvlEntity", "Building face list");
 
 	if (!this->pBspFaces) {
-		X_LOG0("LvlEntity", "Face list empty.");
+		X_ERROR("LvlEntity", "Face list empty.");
 		return false;
 	}
 
