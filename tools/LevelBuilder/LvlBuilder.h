@@ -28,6 +28,8 @@ public:
 	LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArenaBase* arena);
 	~LvlBuilder();
 
+	bool init(void);
+
 	bool LoadFromMap(mapfile::XMapFile* map);
 	bool ProcessModels(void);
 

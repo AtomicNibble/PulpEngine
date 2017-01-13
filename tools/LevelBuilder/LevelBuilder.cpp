@@ -116,6 +116,12 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 		mapfile::XMapFile map;
 		LvlBuilder lvl(pPhysCooking, g_arena);
 
+		if (!lvl.init())
+		{
+			X_ERROR("Map", "FAiled to init level builder");
+			return false;
+		}
+
 		//	parse the map file.
 		if (map.Parse(file->getBufferStart(), safe_static_cast<size_t, uint64_t>(file->getSize())))
 		{

@@ -203,8 +203,6 @@ LvlBuilder::LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArena
 {
 	core::zero_object(stats_);
 
-	matMan_.Init();
-
 	pModelCache_ = X_NEW(lvl::ModelCache, arena, "LvlModelCache")(arena);
 }
 
@@ -217,7 +215,15 @@ LvlBuilder::~LvlBuilder()
 	}
 }
 
+bool LvlBuilder::init(void)
+{
+	if (!matMan_.Init()) {
+		return false;
+	}
+	
 
+	return true;
+}
 
 bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 {
