@@ -170,7 +170,9 @@ template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy>
 class AssetPool
 {
 public:
-	typedef core::ReferenceCountedInherit<AssetType, core::AtomicInt> AssetResource;
+	// pick a primative ref count type based on thread policy.
+	typedef typename std::conditional<std::is_same<MemoryThreadPolicy, core::SingleThreadPolicy>::value, int32_t, core::AtomicInt>::type RefCountType;
+	typedef core::ReferenceCountedInherit<AssetType, RefCountType> AssetResource;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
