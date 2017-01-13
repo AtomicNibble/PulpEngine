@@ -18,11 +18,11 @@ const engine::MaterialFlags LvlMaterial::getFlags(void) const
 // ==========================================
 
 LvlBrushSide::LvlBrushSide() : 
-planenum(0), 
-visible(true),
-culled(false),
-pWinding(nullptr), 
-pVisibleHull(nullptr)
+	planenum(0), 
+	visible(true),
+	culled(false),
+	pWinding(nullptr), 
+	pVisibleHull(nullptr)
 {
 	core::zero_object(__pad);
 }
@@ -125,8 +125,8 @@ LvlEntity::~LvlEntity()
 
 
 LvlBrush::LvlBrush() :
-pOriginal(nullptr),
-sides(g_arena)
+	pOriginal(nullptr),
+	sides(g_arena)
 {
 	entityNum = -1;
 	brushNum = -1;
@@ -138,7 +138,7 @@ sides(g_arena)
 }
 
 LvlBrush::LvlBrush(const LvlBrush& oth) :
-sides(g_arena)
+	sides(g_arena)
 {
 	pOriginal = oth.pOriginal;
 
