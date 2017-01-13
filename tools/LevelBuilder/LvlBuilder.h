@@ -45,7 +45,6 @@ private:
 	bool removeDuplicateBrushPlanes(LvlBrush& pBrush);
 
 private:	
-	bool LoadDefaultModel(void);
 	void calculateLvlBounds(void);
 
 	bool ProcessModel(LvlEntity& ent);

@@ -261,11 +261,6 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 }
 
 
-bool LvlBuilder::LoadDefaultModel(void)
-{
-	return pModelCache_->loadDefaultModel();
-}
-
 void LvlBuilder::calculateLvlBounds(void)
 {
 	mapBounds.clear();
