@@ -770,7 +770,6 @@ void Array<T, Allocator>::ensureSize(size_type size)
 	if (size > size_)
 	{
 		Type* pOldList;
-		size_type	i;
 		size_type	newsize;
 
 		newsize = bitUtil::RoundUpToMultiple(size, granularity_);
@@ -782,8 +781,7 @@ void Array<T, Allocator>::ensureSize(size_type size)
 		// copy old items over.
 		if (pOldList)
 		{
-			for (i = 0; i < num_; i++)
-				Mem::Construct(&list_[i], pOldList[i]);
+			Mem::CopyArrayUninitialized(list_, pOldList, pOldList + num_);
 
 			// delete old.
 			DeleteArr(pOldList);
