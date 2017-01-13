@@ -68,6 +68,7 @@ public:
 
 	// assigns the material props but name styas same etc.
 	MATLIB_EXPORT void assignProps(const Material& oth);
+	MATLIB_EXPORT void assignProps(const MaterialHeader& hdr);
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);

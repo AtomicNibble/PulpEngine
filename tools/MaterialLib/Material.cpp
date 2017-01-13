@@ -26,6 +26,19 @@ void Material::assignProps(const Material& oth)
 	textures_ = oth.textures_;
 }
 
+void Material::assignProps(const MaterialHeader& hdr)
+{
+	X_ASSERT(hdr.isValid(), "Header must be valid")(hdr.isValid());
+
+	cat_ = hdr.cat;
+	usage_ = hdr.usage;
+	surfaceType_ = hdr.surfaceType;
+	coverage_ = hdr.coverage;
+	mountType_ = hdr.mountType;
+	flags_ = hdr.flags;
+	tiling_ = hdr.tiling;
+}
+
 
 #else
 
