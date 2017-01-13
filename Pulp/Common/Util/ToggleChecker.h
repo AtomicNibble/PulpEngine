@@ -6,10 +6,16 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_PACK_PUSH(1)
+
+// used for asserting if some logic is correctly toggling between states
 class ToggleChecker
 {
 public:
-	ToggleChecker(bool inital_state) : current_(inital_state) {}
+	ToggleChecker(bool inital_state) : 
+		current_(inital_state) 
+	{
+	}
 
 	X_INLINE bool operator=(bool value) {
 
@@ -30,7 +36,7 @@ private:
 private:
 	bool current_;
 };
-
+X_PACK_POP
 
 X_NAMESPACE_END
 
