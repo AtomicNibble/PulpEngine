@@ -169,7 +169,7 @@ public:
 	TrisArr patches;
 	LvlInterPortalArr interPortals;
 	// bsp data.
-	bspFace* bspFaces;
+	bspFace* pBspFaces;
 	bspTree bspTree;
 
 	size_t numAreas;

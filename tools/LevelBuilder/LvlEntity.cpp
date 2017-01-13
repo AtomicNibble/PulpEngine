@@ -120,7 +120,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 bool LvlEntity::MakeStructuralFaceList(void)
 {
 	X_LOG0("LvlEnt", "MakeStructuralFaceList");
-	X_ASSERT(bspFaces == nullptr, "bspFace already allocated")(bspFaces);
+	X_ASSERT(pBspFaces == nullptr, "bspFace already allocated")(pBspFaces);
 
 #if 1 // reverse toggle.
 	size_t i, x;
@@ -166,13 +166,13 @@ bool LvlEntity::MakeStructuralFaceList(void)
 			bspFace* pFace = X_NEW(bspFace, g_arena, "BspFace");
 			pFace->planenum = side.planenum & ~1;
 			pFace->w = side.pWinding->Copy(g_arena);
-			pFace->pNext = bspFaces;
+			pFace->pNext = pBspFaces;
 
 			if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
 				pFace->portal = true;
 			}
 
-			bspFaces = pFace;
+			pBspFaces = pFace;
 		}
 	}
 
@@ -184,7 +184,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 {
 	X_LOG0("LvlEntity", "Building face list");
 
-	if (!this->bspFaces) {
+	if (!this->pBspFaces) {
 		X_LOG0("LvlEntity", "Face list empty.");
 		return false;
 	}
@@ -195,7 +195,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 
 	size_t numFaces = 0;
 
-	bspFace* pFace = bspFaces;
+	bspFace* pFace = pBspFaces;
 	for (; pFace; pFace = pFace->pNext)
 	{
 		numFaces++;
@@ -216,13 +216,13 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 
 	FaceTreeBuilder treeBuilder(planeSet);
 
-	if (!treeBuilder.Build(root.headnode, bspFaces)) {
+	if (!treeBuilder.Build(root.headnode, pBspFaces)) {
 		X_LOG0("LvlEntity", "failed to build tree");
 		return false;
 	}
 
 	// the have all been deleted
-	bspFaces = nullptr;
+	pBspFaces = nullptr;
 
 	X_LOG0("LvlEntity", "num leafs: ^8%i", treeBuilder.getNumLeafs());
 	return true;

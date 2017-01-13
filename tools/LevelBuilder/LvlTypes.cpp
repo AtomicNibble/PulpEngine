@@ -103,16 +103,16 @@ interPortals(g_arena),
 numAreas(0)
 {
 	classType = level::ClassType::UNKNOWN;
-	bspFaces = nullptr;
+	pBspFaces = nullptr;
 	mapEntity = nullptr;
 }
 
 LvlEntity::~LvlEntity()
 {
-	if (bspFaces)
+	if (pBspFaces)
 	{
 		// it's a linked list of nodes.
-		bspFace* pFace = bspFaces;
+		bspFace* pFace = pBspFaces;
 		bspFace* pNext = nullptr;
 		for (; pFace; pFace = pNext)
 		{
