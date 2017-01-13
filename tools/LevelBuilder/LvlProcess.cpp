@@ -885,18 +885,26 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// make structural face list.
 	// which is the planes and windings of all the structual faces.
 	// Portals become part of this.
-	ent.MakeStructuralFaceList();
+	if (!ent.MakeStructuralFaceList()) {
+		return false;
+	}
 	// we create a tree from the FaceList
 	// this is done by spliting the nodes multiple time.
 	// we end up with a binary tree.
-	ent.FacesToBSP(planes);
+	if(!ent.FacesToBSP(planes)) {
+		return false;
+	}
 	// next we want to make a portal that covers the whole map.
 	// this is the outside_node of the bspTree
-	ent.MakeTreePortals(planes);
+	if(!ent.MakeTreePortals(planes)) {
+		return false;
+	}
 	// Mark the leafs as opaque and areaportals and put brush
 	// fragments in each leaf so portal surfaces can be matched
 	// to materials
-	ent.FilterBrushesIntoTree(planes);
+	if(!ent.FilterBrushesIntoTree(planes)) {
+		return false;
+	}
 
 	// take the entities and use them to floor the node portals.
 	// so that all inside leafs are marked.
@@ -906,27 +914,39 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	}
 	// anything that is not inside or opaque must
 	// be none visable / outside.
-	ent.FillOutside();
+	if(!ent.FillOutside()) {
+		return false;
+	}
 	// get minimum convex hulls for each visible side
 	// this must be done before creating area portals,
 	// because the visible hull is used as the portal
-	ent.ClipSidesByTree(planes);
+	if(!ent.ClipSidesByTree(planes)) {
+		return false;
+	}
 	// determine areas before clipping tris into the
 	// tree, so tris will never cross area boundaries
-	ent.FloodAreas();
+	if(!ent.FloodAreas()) {
+		return false;
+	}
 	// we now have a BSP tree with solid and non-solid leafs marked with areas
 	// all primitives will now be clipped into this, throwing away
 	// fragments in the solid areas
-	PutPrimitivesInAreas(ent);
+	if(!PutPrimitivesInAreas(ent)) {
+		return false;
+	}
 
 	// prune the nodes, so that we only have one leaf per a area.
 	// we also number the nodes at this point also.
-	ent.PruneNodes();
-
+	if(!ent.PruneNodes()) {
+		return false;
+	}
 
 	// work out which ents belong to which area.
 //	ent.PutEntsInAreas(planes, entities_, map_);
-	CreateEntAreaRefs(ent);
+	if(!CreateEntAreaRefs(ent)) {
+		return false;
+	}
+
  	return true;
 }
 
