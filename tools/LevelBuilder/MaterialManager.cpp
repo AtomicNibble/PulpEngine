@@ -7,9 +7,8 @@ X_NAMESPACE_BEGIN(lvl)
 
 MatManager::MatManager(core::MemoryArenaBase* arena) :
 	arena_(arena),
-	materials_(arena, 2048),
-	pDefaultMtl_(nullptr),
-	pFileSys_(nullptr)
+	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u, X_ALIGN_OF(MaterialResource))),
+	pDefaultMtl_(nullptr)
 {
 }
 
@@ -21,9 +20,6 @@ MatManager::~MatManager()
 bool MatManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pFileSys);
-
-	pFileSys_ = gEnv->pFileSys;
 
 	return loadDefaultMaterial();
 }
@@ -31,42 +27,33 @@ bool MatManager::Init(void)
 void MatManager::ShutDown(void)
 {
 	// clear everything up.
+	releaseMaterial(pDefaultMtl_);
 
-	auto it = materials_.begin();
-	for (; it != materials_.end();)
-	{
-		MatResource* pMatRes = it->second;
-
-		++it;
-
-		if (!pMatRes) {
-			continue;
-		}
-
-		// tell them off?
-		X_WARNING("MtlMan", "Dangling material \"%s\" refs: %" PRIi32,
-			pMatRes->getName().c_str(), pMatRes->getRefCount());
-
-		X_DELETE(pMatRes, g_arena);
-	}
+	freeDanglingMaterials();
 }
 
 bool MatManager::loadDefaultMaterial(void)
 {
-	core::string defaultName(engine::MTL_DEFAULT_NAME);
+	if (!pDefaultMtl_)
+	{
+		pDefaultMtl_ = createMaterial_Internal(core::string(engine::MTL_DEFAULT_NAME));
 
-	pDefaultMtl_ = createMatResource(defaultName);
-	if (!pDefaultMtl_) {
-		X_ERROR("MtlMan", "Failed to create default material");
-		return false;
-	}
-
-	if (!loadMatFromFile(*pDefaultMtl_, defaultName)) {
-		X_ERROR("MtlMan", "Failed to load default material");
-		return false;
+		// it's default :|
+		pDefaultMtl_->setFlags(engine::MaterialFlag::DEFAULT);
 	}
 
 	return true;
+}
+
+void MatManager::freeDanglingMaterials(void)
+{
+	auto it = materials_.begin();
+	for (; it != materials_.end(); ++it) {
+		auto matRes = it->second;
+		X_WARNING("MtlMan", "\"%s\" was not deleted. refs: %" PRIi32, matRes->getName(), matRes->getRefCount());
+	}
+
+	materials_.free();
 }
 
 engine::Material* MatManager::getDefaultMaterial(void) const
@@ -89,14 +76,14 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 	}
 
 	// try find it.
-	MatResource* pMatRes = findMatResource(name);
+	MaterialResource* pMatRes = findMaterial_Internal(name);
 	if (pMatRes) {
 		pMatRes->addReference();
 		return pMatRes;
 	}
 
 	// create a new material.
-	pMatRes = createMatResource(name);
+	pMatRes = createMaterial_Internal(name);
 
 	// now we need to load it.
 	if (loadMatFromFile(*pMatRes, name)) {
@@ -116,15 +103,15 @@ void MatManager::releaseMaterial(engine::Material* pMat)
 {
 	X_ASSERT_NOT_NULL(pMat);
 
-	MatResource* pMatRes = reinterpret_cast<MatResource*>(pMat);
+	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
 	if (pMatRes->removeReference() == 0)
 	{
-		materials_.erase(pMat->getName());
+		materials_.releaseAsset(pMatRes);
 	}
 }
 
 
-bool MatManager::loadMatFromFile(MatResource& mat, const core::string& name)
+bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name)
 {
 	core::XFileScoped file;
 	core::Path<char> path;
@@ -132,45 +119,52 @@ bool MatManager::loadMatFromFile(MatResource& mat, const core::string& name)
 	path.setFileName(name);
 	path.setExtension(engine::MTL_B_FILE_EXTENSION);
 
-	if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
+	if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
-//		if (mat.load(file.GetFile()))
-		{
-			return true;
-		}
+		return false;
 	}
 
-	X_ERROR("MatMan", "Failed to load material \"%s\"", name.c_str());
+	engine::MaterialHeader hdr;
+
+
+	if (file.readObj(hdr) != sizeof(hdr)) {
+		return false;
+	}
+
+	if (!hdr.isValid()) {
+		return false;
+	}
+
+	if (hdr.numSamplers > engine::MTL_MAX_SAMPLERS) {
+		return false;
+	}
+
+	// i might move this into material lib dunno yet.
+	// not sure how simular this and runtime material loader will be.
+	// still ironing out the format.
+	mat.assignProps(hdr);
+
+
 	return false;
 }
 
-MatManager::MatResource* MatManager::createMatResource(const core::string& name)
+
+MatManager::MaterialResource* MatManager::createMaterial_Internal(const core::string& name)
 {
-	X_ASSERT(materials_.find(name) == materials_.end(), "mat already exists")();
+	// internal create expects you to know no duplicates
+	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
 
-	// create a new material.
-	auto pMatRes = X_NEW(MatResource, arena_, "MaterialRes")(arena_);
-	materials_.insert(MaterialMap::value_type(name, pMatRes));
-
-	// check we have correct default.
-	X_ASSERT(pMatRes->getRefCount() == 1, "Invalid ref count")();
-
-	pMatRes->setName(name.c_str());
+	auto pMatRes = materials_.createAsset(name, arena_);
+	pMatRes->setName(name);
 
 	return pMatRes;
 }
 
-
-MatManager::MatResource* MatManager::findMatResource(const core::string& name)
+MatManager::MaterialResource* MatManager::findMaterial_Internal(const core::string& name) const
 {
-	auto it = materials_.find(name);
-	if (it != materials_.end()) {
-		return it->second;
-	}
-
-	return nullptr;
+	return materials_.findAsset(name);
 }
+
 
 
 

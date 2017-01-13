@@ -5,6 +5,7 @@
 #define X_LVL_BUILDER_MAT_MANAGER_H_
 
 #include <Util\ReferenceCounted.h>
+#include <Assets\AssertContainer.h>
 
 #include <../../tools/MaterialLib/MatLib.h>
 
@@ -13,8 +14,8 @@ X_NAMESPACE_BEGIN(lvl)
 
 class MatManager
 {
-	typedef core::ReferenceCountedInherit<engine::Material, core::AtomicInt> MatResource;
-	typedef core::HashMap<core::string, MatResource*> MaterialMap;
+	typedef core::AssetContainer<engine::Material, engine::MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
+	typedef MaterialContainer::Resource MaterialResource;
 
 public:
 	MatManager(core::MemoryArenaBase* arena);
@@ -30,21 +31,21 @@ public:
 
 private:
 	bool loadDefaultMaterial(void);
-
+	void freeDanglingMaterials(void);
+	
 private:
-	bool loadMatFromFile(MatResource& mat, const core::string& name);
+	bool loadMatFromFile(MaterialResource& mat, const core::string& name);
 
 	// only call if you know don't exsists in map.
-	MatResource* createMatResource(const core::string& name);
-	MatResource* findMatResource(const core::string& name);
+	MaterialResource* createMaterial_Internal(const core::string& name);
+	MaterialResource* findMaterial_Internal(const core::string& name) const;
 
 
 private:
 	core::MemoryArenaBase* arena_;
-	MaterialMap	materials_;
+	MaterialContainer materials_;
 
-	MatResource* pDefaultMtl_;
-	core::IFileSys* pFileSys_;
+	MaterialResource* pDefaultMtl_;
 };
 
 
