@@ -119,8 +119,7 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 	path.setFileName(name);
 	path.setExtension(engine::MTL_B_FILE_EXTENSION);
 
-	if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
-	{
+	if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
 		return false;
 	}
 
