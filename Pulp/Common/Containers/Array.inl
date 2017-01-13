@@ -354,8 +354,9 @@ X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t)
 		ensureSize(newNum);
 
 		// construct the new items.
-		for (i = num_; i < newNum; i++)
+		for (i = num_; i < newNum; i++) {
 			Mem::Construct<T>(&list_[i], t);
+		}
 	}
 
 	// set num
