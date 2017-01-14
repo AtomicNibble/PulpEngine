@@ -1387,15 +1387,15 @@ void XWindow::drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawR
 					pDrawCon->drawRectSS(drawRect, borderColor_);
 					break;
 				case WindowBorderStyle::HORZ:
-					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), borderColor_,
+					pDrawCon->drawLineSS(drawRect.getUpperLeft(), borderColor_,
 						drawRect.getUpperRight(), borderColor_);
-					pDrawCon->drawLineColorSS(drawRect.getLowerLeft(), borderColor_,
+					pDrawCon->drawLineSS(drawRect.getLowerLeft(), borderColor_,
 						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::VERT:
-					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), borderColor_,
+					pDrawCon->drawLineSS(drawRect.getUpperLeft(), borderColor_,
 						drawRect.getLowerLeft(), borderColor_);
-					pDrawCon->drawLineColorSS(drawRect.getUpperRight(), borderColor_,
+					pDrawCon->drawLineSS(drawRect.getUpperRight(), borderColor_,
 						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::GRADIENT:
@@ -1411,16 +1411,16 @@ void XWindow::drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawR
 					BRColor.shade(-30.f);
 
 					// top
-					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getUpperRight(), LTColor);
 					// bottom
-					pDrawCon->drawLineColorSS(drawRect.getLowerLeft(), BRColor,
+					pDrawCon->drawLineSS(drawRect.getLowerLeft(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					// left
-					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getLowerLeft(), LTColor);
 					// right
-					pDrawCon->drawLineColorSS(drawRect.getUpperRight(), BRColor,
+					pDrawCon->drawLineSS(drawRect.getUpperRight(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					
 					break;
@@ -1433,16 +1433,16 @@ void XWindow::drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawR
 					LTColor.shade(-30.f);
 
 					// top
-					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getUpperRight(), LTColor);
 					// bottom
-					pDrawCon->drawLineColorSS(drawRect.getLowerLeft(), BRColor,
+					pDrawCon->drawLineSS(drawRect.getLowerLeft(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					// left
-					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getLowerLeft(), LTColor);
 					// right
-					pDrawCon->drawLineColorSS(drawRect.getUpperRight(), BRColor,
+					pDrawCon->drawLineSS(drawRect.getUpperRight(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					
 					break;
