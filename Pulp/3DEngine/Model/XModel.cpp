@@ -6,12 +6,12 @@
 #include "Memory\MemCursor.h"
 
 #include <IRender.h>
-#include <IRenderAux.h>
 #include <IConsole.h>
 #include <IShader.h>
 
 #include <Threading\JobSystem2.h>
 
+#include "Drawing\PrimativeContext.h"
 
 X_NAMESPACE_BEGIN(model)
 
@@ -108,10 +108,8 @@ void XModel::Render(void)
 }
 
 
-void XModel::RenderBones(const Matrix44f& modelMat)
+void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat)
 {
-	using namespace render;
-
 	// should move this out tbh.
 	// save a call for every model when this is disabled.
 	// check should be done once for a collection
@@ -119,23 +117,10 @@ void XModel::RenderBones(const Matrix44f& modelMat)
 		return;
 	}
 
-#if 1
-	X_UNUSED(modelMat);
-#else
 	if (numBones() > 0)
 	{
-		render::IRenderAux* pAux = this->getRender()->GetIRenderAuxGeo();
-
-		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
-		flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
-		flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
-		flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
-
-		pAux->setRenderFlags(flags);
-
-		int32_t num = numBones();
-
-		Color8u col = model_bones_col;
+		const int32_t num = numBones();
+		const Color8u col = model_bones_col;
 
 		for (int32_t i = 0; i < num; i++)
 		{
@@ -150,17 +135,15 @@ void XModel::RenderBones(const Matrix44f& modelMat)
 				QuatTransf qTrans;
 				qTrans.quat = angle.asQuat();
 				qTrans.trans = modelMat * pos;
-			
 
 				QuatTransf qTransPar;
 				qTransPar.quat = parAngle.asQuat();
 				qTransPar.trans = modelMat * parPos;
 
-				pAux->drawBone(qTransPar, qTrans, col);
+				pPrimContex->drawBone(qTransPar, qTrans, col);
 			}
 		}
 	}
-#endif
 }
 
 // ~IModel

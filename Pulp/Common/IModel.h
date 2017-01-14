@@ -584,7 +584,6 @@ struct IModel
 
 	// temp.
 	virtual void Render(void) X_ABSTRACT;
-	virtual void RenderBones(const Matrix44f& modelMax) X_ABSTRACT;
 };
 
 #if 0 // don't see the need for this anymore, why you need model outside 3degnine? :| !

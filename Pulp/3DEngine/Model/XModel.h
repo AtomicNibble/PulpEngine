@@ -21,6 +21,10 @@ class IoRequestData;
 struct XFileAsync;
 )
 
+X_NAMESPACE_DECLARE(engine,
+	class PrimativeContext;
+)
+
 X_NAMESPACE_BEGIN(model)
 
 
@@ -47,9 +51,10 @@ public:
 	virtual const Sphere& boundingSphere(size_t lodIdx) const X_FINAL;
 
 	virtual void Render(void) X_FINAL;
-	virtual void RenderBones(const Matrix44f& modelMat) X_FINAL;
-
 	// ~IModel
+
+	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat);
+
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
