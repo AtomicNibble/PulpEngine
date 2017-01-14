@@ -26,9 +26,8 @@ namespace V2 {
 }
 )
 
-
-X_NAMESPACE_DECLARE(render,
-struct IRenderAux;
+X_NAMESPACE_DECLARE(engine,
+	class PrimativeContext;
 )
 
 
@@ -157,6 +156,7 @@ public:
 
 	static bool registerVars(void);
 
+	bool init(void);
 	void update(void);
 
 	void free(void);
@@ -274,7 +274,7 @@ private:
 	core::ITimer* pTimer_;
 	core::IFileSys* pFileSys_;
 	core::V2::JobSystem* pJobSys_;
-	render::IRenderAux* pAux_;
+	engine::PrimativeContext* pPrimContex_;
 
 private:
 	// vars

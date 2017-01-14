@@ -8,8 +8,7 @@
 
 #include <Memory\MemCursor.h>
 #include <Math\XWinding.h>
-#include <IRenderAux.h>
-
+#include "Drawing\PrimativeContext.h"
 
 X_NAMESPACE_BEGIN(level)
 
@@ -362,6 +361,7 @@ void Level::DrawPortalDebug(void) const
 
 	if (s_var_drawPortals_ > 0 && !outsideWorld_)
 	{
+#if 0
 		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
 
 		// 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt
@@ -384,8 +384,9 @@ void Level::DrawPortalDebug(void) const
 		}
 
 		flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
+#endif
 
-		pAux_->setRenderFlags(flags);
+	//	pAux_->setRenderFlags(flags);
 
 
 		// draw the portals.
@@ -404,13 +405,13 @@ void Level::DrawPortalDebug(void) const
 #if 1
 				if (IsAreaVisible(areas_[portal.areaTo]))
 				{
-					pAux_->drawTriangle(portal.debugVerts.ptr(),
-						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(0.f, 1.f, 0.f, 0.35f));
+					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
+						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
 				}
 				else
 				{
-					pAux_->drawTriangle(portal.debugVerts.ptr(),
-						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(1.f, 0.f, 0.f, 0.3f));
+					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
+						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
 				}
 #else
 		
