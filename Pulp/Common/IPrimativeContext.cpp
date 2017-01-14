@@ -480,26 +480,84 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 	// the prim contex impl will handle the instanced drawing.
 	X_UNUSED(drawShaded);
 
-	Matrix33f scale = Matrix33f::createScale(sphere.radius());
-	Matrix34f trans = Matrix34f::createTranslation(sphere.center());
+	if (sphere.radius() > 0.0f)
+	{
+		Matrix33f scale = Matrix33f::createScale(sphere.radius());
+		Matrix34f trans = Matrix34f::createTranslation(sphere.center());
 
-	ObjectParam* pObj = addObject(ObjectType::Sphere);
-	pObj->matWorld = trans * scale;
-	pObj->color = col;
-	pObj->size = sphere.radius();
+		ObjectParam* pObj = addObject(ObjectType::Sphere);
+		pObj->matWorld = trans * scale;
+		pObj->color = col;
+		pObj->size = sphere.radius();
+	}
 }
 
 void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded)
 {
 	X_UNUSED(drawShaded);
 
-	Matrix33f scale = Matrix33f::createScale(sphere.radius());
-	Matrix34f trans = Matrix34f::createTranslation(mat * sphere.center());
+	if (sphere.radius() > 0.0f)
+	{
+		Matrix33f scale = Matrix33f::createScale(sphere.radius());
+		Matrix34f trans = Matrix34f::createTranslation(mat * sphere.center());
 
-	ObjectParam* pObj = addObject(ObjectType::Sphere);
-	pObj->matWorld = trans * scale;
-	pObj->color = col;
-	pObj->size = sphere.radius();
+		ObjectParam* pObj = addObject(ObjectType::Sphere);
+		pObj->matWorld = trans * scale;
+		pObj->color = col;
+		pObj->size = sphere.radius();
+	}
+}
+
+// Cone
+void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded)
+{
+	X_UNUSED(drawShaded);
+
+	if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f)
+	{
+		Vec3f direction(dir.normalized());
+		Vec3f orthogonal(direction.getOrthogonal().normalized());
+
+		Matrix33f matRot;
+		matRot.setToIdentity();
+		matRot.setColumn(0, orthogonal);
+		matRot.setColumn(1, direction);
+		matRot.setColumn(2, orthogonal.cross(direction));
+
+		Matrix33f scale = Matrix33f::createScale(Vec3f(radius, height, radius));
+		Matrix34f trans = Matrix34f::createTranslation(pos);
+
+		ObjectParam* pObj = addObject(ObjectType::Cone);
+		pObj->matWorld = trans * matRot * scale;
+		pObj->color = col;
+		pObj->size = core::Max(radius, height * 0.5f);
+	}
+}
+
+// Cylinder
+void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded)
+{
+	X_UNUSED(drawShaded);
+
+	if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f)
+	{
+		Vec3f direction(dir.normalized());
+		Vec3f orthogonal(direction.getOrthogonal().normalized());
+
+		Matrix33f matRot;
+		matRot.setToIdentity();
+		matRot.setColumn(0, orthogonal);
+		matRot.setColumn(1, direction);
+		matRot.setColumn(2, orthogonal.cross(direction));
+
+		Matrix33f scale = Matrix33f::createScale(Vec3f(radius, height, radius));
+		Matrix34f trans = Matrix34f::createTranslation(pos);
+
+		ObjectParam* pObj = addObject(ObjectType::Cone);
+		pObj->matWorld = trans * matRot * scale;
+		pObj->color = col;
+		pObj->size = core::Max(radius, height * 0.5f);
+	}
 }
 
 
