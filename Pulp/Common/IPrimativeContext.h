@@ -33,6 +33,7 @@ public:
 	};
 
 	X_ENSURE_SIZE(ObjectParam, 56);
+
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
 	static const auto VERTEX_FMT = render::shader::VertexFormat::P3F_T2S_C4B;
@@ -97,6 +98,11 @@ public:
 
 	// AABB
 	void drawAABB(const AABB& aabb, bool solid, const Color8u& col);
+
+	// Sphere
+	void drawSphere(const Sphere& sphere, const Color8u& col, bool drawShaded = true);
+	void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded = true);
+
 
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);

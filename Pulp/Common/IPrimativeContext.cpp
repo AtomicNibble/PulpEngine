@@ -469,6 +469,40 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& co
 	}
 }
 
+// Sphere
+void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, bool drawShaded)
+{
+	// fuck a goat with a flag pole.
+	// this really needs to be implemented with premade sphere mesh that is just instanced.
+	// we can also get fancy and do lods based on distance.
+	// in order todo instance the prim contex should create the render shapes itself and handle the instancing.
+	// so i will make a seperate api for adding these, that deals with specific shapes.
+	// the prim contex impl will handle the instanced drawing.
+	X_UNUSED(drawShaded);
+
+	Matrix33f scale = Matrix33f::createScale(sphere.radius());
+	Matrix34f trans = Matrix34f::createTranslation(sphere.center());
+
+	ObjectParam* pObj = addObject(ObjectType::Sphere);
+	pObj->matWorld = trans * scale;
+	pObj->color = col;
+	pObj->size = sphere.radius();
+}
+
+void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded)
+{
+	X_UNUSED(drawShaded);
+
+	Matrix33f scale = Matrix33f::createScale(sphere.radius());
+	Matrix34f trans = Matrix34f::createTranslation(mat * sphere.center());
+
+	ObjectParam* pObj = addObject(ObjectType::Sphere);
+	pObj->matWorld = trans * scale;
+	pObj->color = col;
+	pObj->size = sphere.radius();
+}
+
+
 
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
 	Material* pMaterial, const float* s, const float* t,
