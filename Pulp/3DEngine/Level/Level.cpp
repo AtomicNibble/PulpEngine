@@ -163,12 +163,12 @@ int Level::s_var_cullEnts_ = 0;
 // --------------------------------
 
 Level::Level() :
-areas_(g_3dEngineArena),
-areaNodes_(g_3dEngineArena),
-stringTable_(g_3dEngineArena),
-entRefs_(g_3dEngineArena),
-modelRefs_(g_3dEngineArena),
-staticModels_(g_3dEngineArena)
+	areas_(g_3dEngineArena),
+	areaNodes_(g_3dEngineArena),
+	stringTable_(g_3dEngineArena),
+	entRefs_(g_3dEngineArena),
+	modelRefs_(g_3dEngineArena),
+	staticModels_(g_3dEngineArena)
 {
 	canRender_ = false;
 	outsideWorld_ = true;
