@@ -79,6 +79,9 @@ public:
 		const Vec3f& v2, const Color8u& col2);
 	X_INLINE void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col);
 
+	void drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u& c0);
+	void drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u* pCol);
+
 
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);

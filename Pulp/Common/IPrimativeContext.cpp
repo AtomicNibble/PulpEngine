@@ -362,6 +362,41 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHe
 }
 
 
+void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u& c0)
+{
+	if (numPoints == 0) {
+		return;
+	}
+
+	X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")(numPoints);
+
+	// we do the case to uint32_t here just to make the interface nicer to use.
+	PrimVertex* pTri = addPrimative(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
+
+	for (size_t i = 0; i < numPoints; i++)
+	{
+		pTri[i].pos = pPoints[i];
+		pTri[i].color = c0;
+	}
+}
+
+void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u* pCol)
+{
+	if (numPoints == 0) {
+		return;
+	}
+
+	X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")(numPoints);
+
+
+	PrimVertex* pTri = addPrimative(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
+
+	for (size_t i = 0; i < numPoints; i++)
+	{
+		pTri[i].pos = pPoints[i];
+		pTri[i].color = pCol[i];
+	}
+}
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
 	Material* pMaterial, const float* s, const float* t,
 	const Colorf& col, bool filtered)
