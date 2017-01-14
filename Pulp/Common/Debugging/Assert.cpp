@@ -3,8 +3,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
-Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... ) 
-: sourceInfo_( sourceInfo )
+Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... ) :
+	sourceInfo_( sourceInfo )
 {
 	va_list ap;
 	va_start( ap, fmt );
