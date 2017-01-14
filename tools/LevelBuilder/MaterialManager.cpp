@@ -39,7 +39,8 @@ bool MatManager::loadDefaultMaterial(void)
 		pDefaultMtl_ = createMaterial_Internal(core::string(engine::MTL_DEFAULT_NAME));
 
 		// it's default :|
-		pDefaultMtl_->setFlags(engine::MaterialFlag::DEFAULT);
+		pDefaultMtl_->setFlags(engine::MaterialFlag::DEFAULT | engine::MaterialFlag::STRUCTURAL);
+		pDefaultMtl_->setCoverage(engine::MaterialCoverage::OPAQUE);
 	}
 
 	return true;
