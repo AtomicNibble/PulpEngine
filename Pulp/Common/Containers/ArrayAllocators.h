@@ -6,6 +6,65 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace growStrat
+{
+
+	class Linear
+	{
+	public:
+		typedef size_t size_type;
+
+		void setGranularity(size_type size);
+
+	protected:
+		size_type getAllocationSize(size_type currentCapacity) const {
+			return currentCapacity + granularity_;
+		}
+
+	private:
+		size_type granularity_;
+	};
+
+	template<size_t GrowSize>
+	class FixedLinear
+	{
+	public:
+		typedef size_t size_type;
+
+	protected:
+		size_type getAllocationSize(size_type currentCapacity) const {
+			return currentCapacity + GrowSize;
+		}
+	};
+
+	// fuck naming shit.
+	class Expandy
+	{
+	public:
+		typedef size_t size_type;
+
+	protected:
+		size_type getAllocationSize(size_type currentCapacity) const
+		{
+			if (currentCapacity < 0) {
+				return 16;
+			}
+
+			// if it's big grow slower.
+			if (currentCapacity > 1024 * 64) {
+				return currentCapacity * 2;
+			}
+
+			// 1.5 grow.
+			return (currentCapacity * 3 + 1) / 2;
+		}
+
+	};
+
+} // namespace growStrat
+
+
+
 template<typename T>
 class ArrayAllocator
 {
