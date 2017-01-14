@@ -113,6 +113,12 @@ public:
 	void drawBone(const QuatTransf& rParent, const QuatTransf& rBone, const Color8u& col);
 	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col);
 
+	// Frustum - Sexyyyyyyyyyy
+	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false);
+
+	// Arrow
+	void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color);
+
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pText);

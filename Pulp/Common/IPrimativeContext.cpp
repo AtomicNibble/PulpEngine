@@ -668,6 +668,64 @@ void IPrimativeContext::drawBone(const Matrix34f& rParent, const Matrix34f& rBon
 	drawBone(QuatTransf(rParent), QuatTransf(rBone), col);
 }
 
+
+
+// Frustum - Sexyyyyyyyyyy
+void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded)
+{
+	std::array<Vec3f, 8> v;
+	frustum.GetFrustumVertices(v);
+
+	if (!drawShaded)
+	{
+		PrimVertex* pLines = addPrimative(4 * 6, PrimitiveType::LINELIST);
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			pLines[0].pos = v[i];
+			pLines[0].color = farCol;
+			pLines[1].pos = v[((i + 1) & 3)];
+			pLines[1].color = farCol;
+
+			pLines[2].pos = v[i + 4];
+			pLines[2].color = nearCol;
+			pLines[3].pos = v[((i + 1) & 3) + 4];
+			pLines[3].color = nearCol;
+
+			pLines[4].pos = v[i];
+			pLines[4].color = farCol;
+			pLines[5].pos = v[i + 4];
+			pLines[5].color = nearCol;
+
+			pLines += 6;
+		}
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+}
+
+// Arrow
+void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color)
+{
+	const Vec3f t0 = (posB - posA).normalized();
+	const Vec3f a = math<float32_t>::abs(t0.x) < 0.707f ? Vec3f(1, 0, 0) : Vec3f(0, 1, 0);
+	const Vec3f t1 = t0.cross(a).normalized();
+	const Vec3f t2 = t0.cross(t1).normalized();
+
+	Vec3f points[10] = {
+		posA, posB,
+		posB, posB - t0 * 0.15f + t1 * 0.15f,
+		posB, posB - t0 * 0.15f - t1 * 0.15f,
+		posB, posB - t0 * 0.15f + t2 * 0.15f,
+		posB, posB - t0 * 0.15f - t2 * 0.15f
+	};
+
+	drawLines(points, 10, color);
+}
+
+
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
 	Material* pMaterial, const float* s, const float* t,
 	const Colorf& col, bool filtered)
