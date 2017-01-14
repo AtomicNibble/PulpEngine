@@ -293,7 +293,7 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, co
 	drawLine(tr, col, br, col);
 }
 
-void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHeights, 
+void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
 	float padding, uint32_t max, const Color& col)
 {
 	X_ASSERT_NOT_NULL(pHeights);

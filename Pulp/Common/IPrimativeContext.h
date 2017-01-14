@@ -79,13 +79,13 @@ public:
 	void drawRect(float x, float y, float width, float height, const Color& col);
 
 	// ya fucking what!
-	void drawBarChart(const Rectf& rect, uint32_t num, float* pHeights,
+	void drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
 		float padding, uint32_t max, const Color& col);
 
 	// Points
 	X_INLINE void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1);
-	X_INLINE void drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1);
-	X_INLINE void drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size = 1);
+	X_INLINE void drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1);
+	X_INLINE void drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u* pCol, uint8_t size = 1);
 
 	// Triangle
 	X_INLINE void drawTriangle(const Vec3f& v0, const Color8u& col0,

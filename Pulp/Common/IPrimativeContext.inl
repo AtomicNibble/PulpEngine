@@ -120,7 +120,7 @@ X_INLINE void IPrimativeContext::drawPoint(const Vec3f &pos, const Color8u& col,
 	pVertices->color = col;
 }
 
-X_INLINE void IPrimativeContext::drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size)
+X_INLINE void IPrimativeContext::drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size)
 {
 	X_UNUSED(size);
 
@@ -133,7 +133,7 @@ X_INLINE void IPrimativeContext::drawPoints(Vec3f* pPoints, uint32_t numPoints, 
 	}
 }
 
-X_INLINE void IPrimativeContext::drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size)
+X_INLINE void IPrimativeContext::drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u* pCol, uint8_t size)
 {
 	X_UNUSED(size);
 
