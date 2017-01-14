@@ -66,7 +66,7 @@ public:
 	};
 
 	typedef core::Array<VertexPage> VertexPagesArr;
-
+	typedef core::Array<ObjectParam> ObjectParamArr;
 
 private:
 
@@ -115,6 +115,7 @@ private:
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
+	ObjectParam* addObject(ObjectType::Enum type) X_FINAL;
 
 private:
 	render::IRender* pRender_; // we lazy create vertexBuffers for pages.
@@ -124,6 +125,8 @@ private:
 
 	int32_t currentPage_;
 	Mode mode_;
+
+	ObjectParamArr objects_[ObjectType::ENUM_COUNT];
 
 	render::PassStateHandle passHandle_;
 	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];

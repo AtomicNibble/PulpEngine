@@ -19,6 +19,20 @@ public:
 		Mode3D,
 	};
 
+	X_DECLARE_ENUM(ObjectType)(
+		Sphere,
+		Cone,
+		Cylinder // get fooked. AINT nobody got time for cylinders.
+	);
+
+	struct ObjectParam
+	{
+		Matrix34f matWorld;
+		Color8u color;
+		float size;
+	};
+
+	X_ENSURE_SIZE(ObjectParam, 56);
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
 	static const auto VERTEX_FMT = render::shader::VertexFormat::P3F_T2S_C4B;
@@ -104,6 +118,7 @@ public:
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
+	virtual ObjectParam* addObject(ObjectType::Enum type) X_ABSTRACT;
 };
 
 

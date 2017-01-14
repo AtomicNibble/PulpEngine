@@ -52,7 +52,8 @@ PrimativeContext::PrimativeContext(Mode mode, core::MemoryArenaBase* arena) :
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
 	currentPage_(-1),
-	mode_(mode)
+	mode_(mode),
+	objects_{ arena, arena, arena } 
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
@@ -210,6 +211,11 @@ void PrimativeContext::reset(void)
 	for (auto& vp : vertexPages_) {
 		vp.reset();
 	}
+
+	// if the compiler don't unroll this it should just kill itself..
+	for (uint32_t i = 0; i < ObjectType::ENUM_COUNT; i++) {
+		objects_[i].clear();
+	}
 }
 
 bool PrimativeContext::isEmpty(void) const
@@ -321,6 +327,11 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
 	return addPrimative(numVertices, primType, primMaterials_[primType]);
+}
+
+PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type)
+{
+	return &objects_[type].AddOne();
 }
 
 X_NAMESPACE_END
