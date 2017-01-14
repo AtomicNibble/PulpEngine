@@ -292,10 +292,11 @@ bool LvlBrush::calculateContents(void)
 		}
 
 		engine::Material* pMat = side.matInfo.pMaterial;
+		const auto flags = pMat->getFlags();
 
-		combinedMatFlags |= pMat->getFlags();
+		combinedMatFlags |= flags;
 
-		if (pMat->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+		if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
 			opaque = false;
 		}
 		else if (pMat->getCoverage() != engine::MaterialCoverage::OPAQUE) {
