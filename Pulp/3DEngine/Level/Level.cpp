@@ -199,7 +199,7 @@ Level::~Level()
 	free();
 }
 
-bool Level::Init(void)
+bool Level::registerVars(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
@@ -240,11 +240,8 @@ bool Level::Init(void)
 	return true;
 }
 
-void Level::ShutDown(void)
-{
 
 
-}
 
 void Level::update(void)
 {

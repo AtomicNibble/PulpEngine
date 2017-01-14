@@ -155,7 +155,7 @@ bool X3DEngine::Init(void)
 
 
 
-	level::Level::Init();
+	level::Level::registerVars();
 
 	return true;
 }
@@ -194,7 +194,6 @@ void X3DEngine::ShutDown(void)
 		X_DELETE(pCBufMan_, g_3dEngineArena);
 	}
 
-	level::Level::ShutDown();
 }
 
 void X3DEngine::release(void)

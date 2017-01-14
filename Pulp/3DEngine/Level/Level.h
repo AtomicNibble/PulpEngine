@@ -155,8 +155,7 @@ public:
 	Level();
 	~Level();	
 
-	static bool Init(void);
-	static void ShutDown(void);
+	static bool registerVars(void);
 
 	void update(void);
 
