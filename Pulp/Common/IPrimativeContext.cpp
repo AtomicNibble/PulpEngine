@@ -397,6 +397,79 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, con
 		pTri[i].color = pCol[i];
 	}
 }
+
+void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& col)
+{
+	// for now we do this none indexed
+	if (!solid)
+	{
+		const uint32_t numPoints = 24;
+
+		// so we need 4 * 3 lines.
+		PrimVertex* pLines = addPrimative(numPoints, PrimitiveType::LINELIST);
+
+		// create the 8 points.
+		const Vec3f& xyz = aabb.min;
+		const Vec3f xyZ(aabb.min.x, aabb.min.y, aabb.max.z);
+		const Vec3f xYz(aabb.min.x, aabb.max.y, aabb.min.z);
+		const Vec3f xYZ(aabb.min.x, aabb.max.y, aabb.max.z);
+		const Vec3f Xyz(aabb.max.x, aabb.min.y, aabb.min.z);
+		const Vec3f XyZ(aabb.max.x, aabb.min.y, aabb.max.z);
+		const Vec3f XYz(aabb.max.x, aabb.max.y, aabb.min.z);
+		const Vec3f& XYZ = aabb.max;
+
+		// bottom row (all lower case z's)
+		pLines[0].pos = xyz;
+		pLines[1].pos = xYz;
+		
+		pLines[2].pos = xYz;
+		pLines[3].pos = XYz;
+
+		pLines[4].pos = XYz;
+		pLines[5].pos = Xyz;
+
+		pLines[6].pos = Xyz;
+		pLines[7].pos = xyz;
+
+		// middle (all lower case z's pointing to upper Z's :D)
+		pLines[8].pos = xyz;
+		pLines[9].pos = xyZ;
+
+		pLines[10].pos = xYz;
+		pLines[11].pos = xYZ;
+
+		pLines[12].pos = XYz;
+		pLines[13].pos = XYZ;
+
+		pLines[14].pos = Xyz;
+		pLines[15].pos = XyZ;
+
+		// top row (all upper case z's)
+		pLines[16].pos = xyZ;
+		pLines[17].pos = xYZ;
+
+		pLines[18].pos = xYZ;
+		pLines[19].pos = XYZ;
+
+		pLines[20].pos = XYZ;
+		pLines[21].pos = XyZ;
+
+		pLines[22].pos = XyZ;
+		pLines[23].pos = xyZ;
+
+		// colors, maybe mix this into pos assignment, since all these verts don't fit in single cache lane ;(
+		for (uint32_t i = 0; i < numPoints; i++)
+		{
+			pLines[i].color = col;
+		}
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+}
+
+
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
 	Material* pMaterial, const float* s, const float* t,
 	const Colorf& col, bool filtered)

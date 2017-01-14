@@ -67,7 +67,6 @@ public:
 	void drawBarChart(const Rectf& rect, uint32_t num, float* pHeights,
 		float padding, uint32_t max, const Color& col);
 
-
 	// Points
 	X_INLINE void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1);
 	X_INLINE void drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1);
@@ -82,6 +81,8 @@ public:
 	void drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u& c0);
 	void drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u* pCol);
 
+	// AABB
+	void drawAABB(const AABB& aabb, bool solid, const Color8u& col);
 
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
