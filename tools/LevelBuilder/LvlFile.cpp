@@ -413,7 +413,7 @@ bool LvlBuilder::save(const char* name)
 					{
 						const auto& cooked = triMesh.cookedData;
 
-						X_ASSERT(cooked.isEmpty(), "Collision data is empty")();
+						X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")();
 
 						AreaCollisionDataHdr dataHdr;
 						dataHdr.dataSize = safe_static_cast<uint16_t>(cooked.size());
