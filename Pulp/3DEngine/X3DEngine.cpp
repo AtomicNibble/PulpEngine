@@ -32,6 +32,7 @@ render::IRender* X3DEngine::pRender_ = nullptr;
 physics::IPhysics* X3DEngine::pPhysics_ = nullptr;
 
 // 3d
+engine::I3DEngine* X3DEngine::p3DEngine_ = nullptr;
 engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
 model::XModelManager* X3DEngine::pModelManager_ = nullptr;
 
@@ -65,7 +66,7 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 
 X3DEngine::~X3DEngine()
 {
-
+	p3DEngine_ = nullptr;
 }
 
 
@@ -92,6 +93,7 @@ bool X3DEngine::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pRender);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 	X_ASSERT_NOT_NULL(gEnv->pPhysics);
+	X_ASSERT(p3DEngine_ == nullptr, "Multiple 3d engine instaces")();
 
 	pCore_ = gEnv->pCore;
 	pTimer_ = gEnv->pTimer;
@@ -99,6 +101,7 @@ bool X3DEngine::Init(void)
 	pConsole_ = gEnv->pConsole;
 	pRender_ = gEnv->pRender;
 	pPhysics_ = gEnv->pPhysics;
+	p3DEngine_ = this;
 
 	// register some file types.
 	gEnv->pHotReload->addfileType(this, "level");
