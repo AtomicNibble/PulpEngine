@@ -210,6 +210,8 @@ struct AreaCollsiion
 
 		GroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena);
 
+		bool cook(physics::IPhysicsCooking* pCooking);
+
 		physics::GroupFlags getGroupFlags(void) const;
 		const TriMesgDataArr& getTriMeshDataArr(void) const;
 		
@@ -226,6 +228,8 @@ struct AreaCollsiion
 
 public:
 	AreaCollsiion(core::MemoryArenaBase* arena);
+
+	bool cook(physics::IPhysicsCooking* pCooking);
 
 	size_t numGroups(void) const;
 	const ColGroupBucketArr& getGroups(void) const;

@@ -53,6 +53,18 @@ AreaCollsiion::GroupBucket::GroupBucket(physics::GroupFlags groupFlags, core::Me
 
 }
 
+bool AreaCollsiion::GroupBucket::cook(physics::IPhysicsCooking* pCooking)
+{
+	for (auto& tri : triMeshData_)
+	{
+		if (!tri.cook(pCooking)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 physics::GroupFlags AreaCollsiion::GroupBucket::getGroupFlags(void) const
 {
 	return groupFlags_;
@@ -84,6 +96,18 @@ AreaCollsiion::AreaCollsiion(core::MemoryArenaBase* arena) :
 	colGroupBuckets_(arena)
 {
 
+}
+
+bool AreaCollsiion::cook(physics::IPhysicsCooking* pCooking)
+{
+	for (auto& b : colGroupBuckets_)
+	{
+		if (!b.cook(pCooking)) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 size_t AreaCollsiion::numGroups(void) const
