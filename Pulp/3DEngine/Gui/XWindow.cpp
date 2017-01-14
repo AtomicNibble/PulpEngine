@@ -4,7 +4,6 @@
 
 #include <IFont.h>
 #include <IRender.h>
-#include <IRenderAux.h>
 #include <IFileSys.h>
 #include <IPrimativeContext.h>
 

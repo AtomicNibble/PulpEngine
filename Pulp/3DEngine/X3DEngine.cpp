@@ -4,7 +4,6 @@
 #include <ITimer.h>
 #include <IMaterial.h>
 #include <IRender.h>
-#include <IRenderAux.h>
 #include <IConsole.h>
 #include <IGui.h>
 #include <IPhysics.h>
