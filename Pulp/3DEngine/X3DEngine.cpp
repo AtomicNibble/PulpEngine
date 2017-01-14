@@ -49,6 +49,7 @@ engine::gui::IGui* pGui = nullptr;
 X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 	primContexts_{ 
 		{ IPrimativeContext::Mode::Mode3D, arena }, // physics
+		{ IPrimativeContext::Mode::Mode3D, arena }, // misc3d
 		{ IPrimativeContext::Mode::Mode2D, arena }, // gui
 		{ IPrimativeContext::Mode::Mode2D, arena }, // profile
 		{ IPrimativeContext::Mode::Mode2D, arena }  // console
@@ -56,6 +57,7 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 {
 	// check if the enum order was changed in a way that resulted in incorrect modes.
 	X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
+	X_ASSERT(primContexts_[PrimContext::MISC3D].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::GUI].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::PROFILE].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::CONSOLE].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
