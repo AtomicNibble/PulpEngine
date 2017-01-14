@@ -174,16 +174,16 @@ void IPrimativeContext::drawRectSS(const Rectf& rect, const Color& col)
 	// since the shader is what's important.
 
 	// Top
-	drawLineColor(tl, col, tr, col);
+	drawLine(tl, col, tr, col);
 	// bottom
-	drawLineColor(bl, col, br, col);
+	drawLine(bl, col, br, col);
 	// left down
-	drawLineColor(tl, col, bl, col);
+	drawLine(tl, col, bl, col);
 	// right down
-	drawLineColor(tr, col, br, col);
+	drawLine(tr, col, br, col);
 }
 
-void IPrimativeContext::drawLineColorSS(const Vec2f& vPos1, const Color& color1,
+void IPrimativeContext::drawLineSS(const Vec2f& vPos1, const Color& color1,
 	const Vec2f& vPos2, const Color& color2)
 {
 	Vec3f pos1, pos2;
@@ -194,7 +194,7 @@ void IPrimativeContext::drawLineColorSS(const Vec2f& vPos1, const Color& color1,
 	pos2.x = vPos2.x - 1;
 	pos2.y = 1.f - vPos2.y;
 
-	drawLineColor(pos1, color1, pos2, color2);
+	drawLine(pos1, color1, pos2, color2);
 }
 
 void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height, const Color& col)
@@ -270,28 +270,6 @@ void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col
 	}
 }
 
-void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
-{
-	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
-
-	pLine[0].pos = pos1;
-	pLine[0].color = Color::white();
-	pLine[0].st = core::XHalf2::zero();
-
-	pLine[1].pos = pos2;
-	pLine[1].color = Color::white();
-	pLine[1].st = core::XHalf2::zero();
-}
-
-void IPrimativeContext::drawLineColor(const Vec3f& pos1, const Color& color1, const Vec3f& pos2, const Color& color2)
-{
-	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
-
-	pLine[0].pos = pos1;
-	pLine[0].color = color1;
-	pLine[1].pos = pos2;
-	pLine[1].color = color2;
-}
 
 void IPrimativeContext::drawRect(float x, float y, float width, float height, const Color& col)
 {
@@ -306,13 +284,13 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, co
 	const Vec3f br(x2, y2, 0);
 
 	// Top
-	drawLineColor(tl, col, tr, col);
+	drawLine(tl, col, tr, col);
 	// bottom
-	drawLineColor(bl, col, br, col);
+	drawLine(bl, col, br, col);
 	// left down
-	drawLineColor(tl, col, bl, col);
+	drawLine(tl, col, bl, col);
 	// right down
-	drawLineColor(tr, col, br, col);
+	drawLine(tr, col, br, col);
 }
 
 void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHeights, 

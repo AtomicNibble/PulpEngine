@@ -40,7 +40,7 @@ public:
 	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color& col);
 	X_INLINE void drawRectSS(float x, float y, float width, float height, const Color& col);
 	void drawRectSS(const Rectf& rect, const Color& col);
-	void drawLineColorSS(const Vec2f& vPos1, const Color& color1,
+	void drawLineSS(const Vec2f& vPos1, const Color& color1,
 		const Vec2f& vPos2, const Color& vColor2);
 
 	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, const Color& col);
@@ -56,9 +56,10 @@ public:
 	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col);
 
 	void drawLines(Vec3f* pPoints, uint32_t num, const Color& col);
-	void drawLine(const Vec3f& pos1, const Vec3f& pos2);
-	void drawLineColor(const Vec3f& pos1, const Color& color1,
+	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);
+	X_INLINE void drawLine(const Vec3f& pos1, const Color& color1,
 		const Vec3f& pos2, const Color& color2);
+	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color& color1);
 
 	void drawRect(float x, float y, float width, float height, const Color& col);
 

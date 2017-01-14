@@ -74,6 +74,41 @@ X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float he
 	drawQuad(pos.x, pos.y, width, height, col);
 }
 
+// Line
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
+{
+	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
+
+	pLine[0].pos = pos1;
+	pLine[0].color = Color::white();
+	pLine[0].st = core::XHalf2::zero();
+
+	pLine[1].pos = pos2;
+	pLine[1].color = Color::white();
+	pLine[1].st = core::XHalf2::zero();
+}
+
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Color& color1, const Vec3f& pos2, const Color& color2)
+{
+	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
+
+	pLine[0].pos = pos1;
+	pLine[0].color = color1;
+	pLine[1].pos = pos2;
+	pLine[1].color = color2;
+}
+
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color& color1)
+{
+	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
+
+	pLine[0].pos = pos1;
+	pLine[0].color = color1;
+	pLine[1].pos = pos2;
+	pLine[1].color = color1;
+}
+
+
 // Points
 X_INLINE void IPrimativeContext::drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size)
 {
