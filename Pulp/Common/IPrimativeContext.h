@@ -109,6 +109,9 @@ public:
 	// Cylinder
 	void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true);
 
+	// Bone
+	void drawBone(const QuatTransf& rParent, const QuatTransf& rBone, const Color8u& col);
+	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col);
 
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);

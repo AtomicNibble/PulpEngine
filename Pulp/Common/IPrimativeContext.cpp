@@ -560,7 +560,113 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 	}
 }
 
+// Bone
+void IPrimativeContext::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, const Color8u& col)
+{
+	Vec3f p = rParent.getTranslation();
+	Vec3f c = rChild.getTranslation();
+	Vec3f vBoneVec = c - p;
+	float fBoneLength = vBoneVec.length();
 
+	if (fBoneLength < 1e-4) {
+		return;
+	}
+
+	Matrix33f m33 = Matrix33f::createRotationV01(Vec3f(1, 0, 0), vBoneVec / fBoneLength);
+	Matrix34f m34 = Matrix34f(m33, p);
+
+	float32_t t = fBoneLength*0.025f;
+
+	//bone points in x-direction
+	const Vec3f s = Vec3f::zero();
+	const Vec3f m0 = Vec3f(t, +t, +t);
+	const Vec3f m1 = Vec3f(t, -t, +t);
+	const Vec3f m2 = Vec3f(t, -t, -t);
+	const Vec3f m3 = Vec3f(t, +t, -t);
+	const Vec3f e = Vec3f(fBoneLength, 0, 0);
+
+	// wut. inverse color i think?
+	Color8u comp;
+	comp.r = col.r ^ 0xFF;
+	comp.r = (col.r - comp.r) / 2;
+	comp.g = col.g ^ 0xFF;
+	comp.g = (col.g - comp.g) / 2;
+	comp.b = col.b ^ 0xFF;
+	comp.b = (col.b - comp.b) / 2;
+	comp.a = col.a;
+
+	Vec3f points[6] = {
+		m34*s,
+		m34*m0,
+		m34*m1,
+		m34*m2,
+		m34*m3,
+		m34*e
+	};
+
+	// we draw some lines. :)
+
+	PrimVertex* pLines = addPrimative(12, PrimitiveType::LINELIST);
+	pLines[0].pos = points[0];
+	pLines[0].color = comp;
+	pLines[1].pos = points[1];
+	pLines[1].color = col;
+	pLines[2].pos = points[0];
+	pLines[2].color = comp;
+	pLines[3].pos = points[2];
+	pLines[3].color = col;
+	pLines[4].pos = points[0];
+	pLines[4].color = comp;
+	pLines[5].pos = points[3];
+	pLines[5].color = col;
+	pLines[6].pos = points[0];
+	pLines[6].color = comp;
+	pLines[7].pos = points[4];
+	pLines[7].color = col;
+
+	// middle
+	pLines[8].pos = points[1];
+	pLines[8].color = col;
+	pLines[9].pos = points[2];
+	pLines[9].color = col;
+	pLines[10].pos = points[2];
+	pLines[10].color = col;
+	pLines[11].pos = points[3];
+	pLines[11].color = col;
+	pLines[12].pos = points[3];
+	pLines[12].color = col;
+	pLines[13].pos = points[4];
+	pLines[13].color = col;
+	pLines[14].pos = points[4];
+	pLines[14].color = col;
+	pLines[15].pos = points[1];
+	pLines[15].color = col;
+
+	// top :D !!
+	pLines[15].pos = points[5];
+	pLines[15].color = comp;
+	pLines[16].pos = points[1];
+	pLines[16].color = col;
+	pLines[17].pos = points[5];
+	pLines[17].color = comp;
+	pLines[18].pos = points[2];
+	pLines[18].color = col;
+	pLines[19].pos = points[5];
+	pLines[19].color = comp;
+	pLines[20].pos = points[3];
+	pLines[20].color = col;
+	pLines[21].pos = points[5];
+	pLines[21].color = comp;
+	pLines[22].pos = points[4];
+	pLines[22].color = col;
+
+}
+
+void IPrimativeContext::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col)
+{
+	// just make them quat trans cus yer.
+	drawBone(QuatTransf(rParent), QuatTransf(rBone), col);
+}
 
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
 	Material* pMaterial, const float* s, const float* t,
