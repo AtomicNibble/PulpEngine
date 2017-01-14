@@ -10,8 +10,6 @@
 #include <IScriptSys.h>
 
 
-
-#include <IRenderAux.h>
 #include <IFrameData.h>
 
 #include <Threading\JobSystem2.h>
@@ -236,9 +234,6 @@ void XCore::RenderEnd(core::FrameData& frameData)
 	{
 		X_PROFILE_BEGIN("CoreRenderEnd", core::ProfileSubSys::CORE);
 
-	//	if (render::IRenderAux* pAux = env_.pRender->GetIRenderAuxGeo()) {
-	//		pAux->flush();
-	//	}
 
 		// draw me all the profile wins!
 		profileSys_.Render();
