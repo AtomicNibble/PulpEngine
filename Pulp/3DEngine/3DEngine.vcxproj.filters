@@ -64,6 +64,9 @@
     <ClCompile Include="Material\TechDefStateManager.cpp">
       <Filter>Source Files\Material</Filter>
     </ClCompile>
+    <ClCompile Include="Level\Level_debug.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">

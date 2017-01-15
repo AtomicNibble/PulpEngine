@@ -475,6 +475,7 @@
     <ClCompile Include="Gui\WinVar.cpp" />
     <ClCompile Include="Gui\XWindow.cpp" />
     <ClCompile Include="Level\Level.cpp" />
+    <ClCompile Include="Level\Level_debug.cpp" />
     <ClCompile Include="Level\Level_load.cpp" />
     <ClCompile Include="Level\Level_portal.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
