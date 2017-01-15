@@ -196,23 +196,22 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		// init the pool allocators.
 		core::GrowingPoolAllocator bspFaceAllocator(
 			sizeof(bspFace)* (1 << 20),
-			core::VirtualMem::GetPageSize() * 64,
+			core::VirtualMem::GetPageSize() * 16,
 			0,
-			sizeof(bspFace),
-			X_ALIGN_OF(bspFace),
-			0
-			);
+			PoolArena::getMemoryRequirement(sizeof(bspFace)),
+			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(bspFace)),
+			PoolArena::getMemoryOffsetRequirement()
+		);
 
 		PoolArena bspFaceArena(&bspFaceAllocator, "bspFaceArena");
 
 		core::GrowingPoolAllocator bspNodeAllocator(
 			sizeof(bspNode)* (1 << 20),
-			core::VirtualMem::GetPageSize() * 64,
+			core::VirtualMem::GetPageSize() * 16,
 			0,
-			sizeof(bspNode),
-			X_ALIGN_OF(bspNode),
-			0
-			);
+			PoolArena::getMemoryRequirement(sizeof(bspNode)),
+			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(bspNode)),
+			PoolArena::getMemoryOffsetRequirement()
 
 		PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
 
