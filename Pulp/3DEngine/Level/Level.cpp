@@ -111,6 +111,12 @@ bool Area::CullEnt(const AABB& wBounds, const Sphere& wSphere) const
 	return true; // culled
 }
 
+const AABB Area::getBounds(void) const
+{
+	X_ASSERT_NOT_NULL(pMesh);
+	return pMesh->boundingBox;
+}
+
 
 // --------------------------------
 

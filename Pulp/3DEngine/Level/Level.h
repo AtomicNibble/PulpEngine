@@ -111,6 +111,7 @@ public:
 	void destoryRenderMesh(render::IRender* pRender);
 	bool CullEnt(const AABB& bounds, const Sphere& sphere) const;
 
+	const AABB getBounds(void) const;
 
 public:
 
