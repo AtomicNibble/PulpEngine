@@ -181,19 +181,27 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		if (!frontwinding)
 		{
 			X_DELETE_AND_NULL(backwinding, g_arena);
-			if (side == 0)
+
+			if (side == 0) {
 				p->AddToNodes(b, other_node);
-			else
+			}
+			else {
 				p->AddToNodes(other_node, b);
+			}
+
 			continue;
 		}
 		if (!backwinding)
 		{
 			X_DELETE_AND_NULL(frontwinding, g_arena);
-			if (side == 0)
+
+			if (side == 0) {
 				p->AddToNodes(f, other_node);
-			else
+			}
+			else {
 				p->AddToNodes(other_node, f);
+			}
+
 			continue;
 		}
 
