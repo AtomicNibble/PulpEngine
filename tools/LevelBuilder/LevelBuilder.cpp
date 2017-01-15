@@ -212,6 +212,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			PoolArena::getMemoryRequirement(sizeof(bspNode)),
 			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(bspNode)),
 			PoolArena::getMemoryOffsetRequirement()
+		);
 
 		PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
 
