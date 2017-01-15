@@ -108,6 +108,7 @@ public:
 	ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_FINAL;
 	ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_FINAL;
 
+	ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, const Vec3f& scale = Vec3f::one()) X_FINAL;
 	ActorHandle createStaticPlane(const QuatTransf& myTrans) X_FINAL;
 	ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_FINAL;
 	ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_FINAL;

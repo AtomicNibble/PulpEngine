@@ -821,6 +821,27 @@ ActorHandle XPhysics::createBox(const QuatTransf& myTrans, const AABB& bounds, f
 
 // ------------------------------------------
 
+ActorHandle XPhysics::createStaticTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, const Vec3f& scale)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	// Looks liek they forgot const on PxDefaultMemoryInputData constructor, as the member var is a const pointer.
+	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
+	physx::PxTriangleMesh* pTriMesh = pPhysics_->createTriangleMesh(input);
+	physx::PxMeshScale meshScale;
+	meshScale.rotation = physx::PxQuat::createIdentity();
+	meshScale.scale = Px3FromVec3(scale);
+
+	auto* pShape = pPhysics_->createShape(physx::PxTriangleMeshGeometry(pTriMesh, meshScale), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	setupDefaultRigidStatic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
 ActorHandle XPhysics::createStaticPlane(const QuatTransf& myTrans)
 {
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
