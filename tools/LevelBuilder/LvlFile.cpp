@@ -38,7 +38,7 @@ namespace
 		file->writeObj(pModel->faces.ptr(), (pModel->faces.size()));
 	}
 
-	void WriteAreaModel(core::ByteStream& stream, AreaModel const* pModel)
+	void WriteAreaModel(size_t streamOffset, core::ByteStream& stream, AreaModel const* pModel)
 	{
 		stream.write(pModel->model);
 		stream.write(pModel->meshes.ptr(), (pModel->meshes.size()));
@@ -46,6 +46,22 @@ namespace
 		// write the streams.
 		core::Array<level::Vertex>::ConstIterator it = pModel->verts.begin();
 		core::Array<level::Vertex>::ConstIterator end = pModel->verts.end();
+
+
+		auto padStream = [streamOffset, &stream]()
+		{
+			const size_t curOffset = streamOffset + stream.size();
+			const size_t pad = core::bitUtil::RoundUpToMultiple<size_t>(curOffset, 16u) - curOffset;
+			for (size_t i = 0; i < pad; i++)
+			{
+				stream.write<uint8_t>(0xff);
+			}
+
+			X_ASSERT_ALIGNMENT(stream.size() + streamOffset, 16, 0);
+		};
+
+
+		// we must pad each one
 		for (; it != end; ++it) {
 			stream.write(it->pos);
 			stream.write(it->texcoord[0]);
@@ -72,6 +88,7 @@ namespace
 		numBytes += sizeof(model::SubMeshHeader) * pModel->meshes.size();
 		numBytes += sizeof(level::Vertex) * pModel->verts.size();
 		numBytes += sizeof(model::Face) * pModel->faces.size();
+		numBytes += 16 * 3; // for alignment padding :|
 
 		return numBytes;
 	}
@@ -220,20 +237,24 @@ bool LvlBuilder::save(const char* name)
 				return false;
 			}
 		}
+
 		// areas
 		{
+			const size_t streamOffset = safe_static_cast<size_t>(file.tell() - sizeof(hdr));
+
 			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_MODELS], file);
 			size_t i;
 
 			for (i = 0; i < areas_.size(); i++)
 			{
 				const AreaModel* pModel = &areas_[i].model;
-				WriteAreaModel(stream, pModel);
+				WriteAreaModel(streamOffset, stream, pModel);
 			}
 
 			// write the stream.
 			file.write(stream.begin(), stream.size());
 		}
+
 		// area portals
 		if (worldEnt.interPortals.isNotEmpty())
 		{
