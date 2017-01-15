@@ -406,7 +406,7 @@ struct StaticModel
 
 X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
-	AREAS,
+	AREA_MODELS,		// the model data for each area.
 	AREA_PORTALS,
 	AREA_ENT_REFS,		// all ents except models.
 	AREA_MODEL_REFS,	// area model refs.

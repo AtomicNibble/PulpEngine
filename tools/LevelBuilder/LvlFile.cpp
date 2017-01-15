@@ -222,7 +222,7 @@ bool LvlBuilder::save(const char* name)
 		}
 		// areas
 		{
-			ScopedNodeInfo node(hdr.nodes[FileNodes::AREAS], file);
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_MODELS], file);
 			size_t i;
 
 			for (i = 0; i < areas_.size(); i++)
