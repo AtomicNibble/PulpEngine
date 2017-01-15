@@ -202,25 +202,20 @@ private:
 	void BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
 		int32_t* pAreasOut, size_t maxAreas) const;
 
-
 	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
 		size_t numPlanes, const Planef* pPlanes);
 
 	void FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum, const Planef& farPlane,
 		const PortalStack* ps);
 
-
 	void DrawArea(const Area& area);
 	void DrawMultiAreaModels(void);
-
 	bool DrawStaticModel(const level::StaticModel& sm, int32_t areaNum);
-
 	void DrawPortalStacks(void) const;
 
 private:
 	bool ProcessHeader(void);
 	bool ProcessData(void);
-
 
 private:
 	int32_t CommonChildrenArea_r(AreaNode* pAreaNode);
@@ -230,7 +225,6 @@ private:
 	void SetAreaVisible(int32_t area);
 	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
 
-	
 private:
 //	core::JobList::JobList jobList_;
 
