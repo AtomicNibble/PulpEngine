@@ -59,7 +59,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 
 		if (face.planenum == node->planenum)
 		{
-			X_DELETE(pFace, g_arena);
+			X_DELETE(pFace, g_bspFaceAllocator);
 			continue;
 		}
 
@@ -69,7 +69,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 			face.w->Split(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding, g_arena);
 			if (frontWinding)
 			{
-				pNewFace = X_NEW(bspFace, g_arena, "bspFaceFrontWind");
+				pNewFace = X_NEW(bspFace, g_bspFaceAllocator, "bspFaceFrontWind");
 				pNewFace->w = frontWinding;
 				pNewFace->pNext = childLists[0];
 				pNewFace->planenum = pFace->planenum;
@@ -77,13 +77,13 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 			}
 			if (backWinding)
 			{
-				pNewFace = X_NEW(bspFace, g_arena, "bspFaceBackWind");
+				pNewFace = X_NEW(bspFace, g_bspFaceAllocator, "bspFaceBackWind");
 				pNewFace->w = backWinding;
 				pNewFace->pNext = childLists[1];
 				pNewFace->planenum = pFace->planenum;
 				childLists[1] = pNewFace;
 			}
-			X_DELETE(pFace, g_arena);
+			X_DELETE(pFace, g_bspFaceAllocator);
 		}
 		else if (side == PlaneSide::FRONT)
 		{
@@ -98,7 +98,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 	}
 
 	for (i = 0; i < 2; i++) {
-		node->children[i] = X_NEW(bspNode, g_arena, "bspNode");
+		node->children[i] = X_NEW(bspNode, g_bspNodeAllocator, "bspNode");
 		node->children[i]->parent = node;
 		node->children[i]->bounds = node->bounds;
 	}

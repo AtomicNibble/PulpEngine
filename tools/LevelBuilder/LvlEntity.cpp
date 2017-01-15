@@ -163,7 +163,7 @@ bool LvlEntity::MakeStructuralFaceList(void)
 				}
 			}
 
-			bspFace* pFace = X_NEW(bspFace, g_arena, "BspFace");
+			bspFace* pFace = X_NEW(bspFace, g_bspFaceAllocator, "BspFace");
 			pFace->planenum = side.planenum & ~1;
 			pFace->w = side.pWinding->Copy(g_arena);
 			pFace->pNext = pBspFaces;
@@ -191,7 +191,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 
 	struct bspTree& root = this->bspTree;
 	root.bounds.clear();
-	root.headnode = X_NEW(bspNode, g_arena, "BspNode");
+	root.headnode = X_NEW(bspNode, g_bspNodeAllocator, "BspNode");
 
 	size_t numFaces = 0;
 
