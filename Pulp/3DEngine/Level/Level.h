@@ -102,6 +102,8 @@ struct Area
 {
 	typedef core::FixedArray<Planef, PortalStack::MAX_PORTAL_PLANES + 1> PortalPlanesArr;
 	typedef core::Array<PortalPlanesArr> VisPortalsArr;
+	typedef core::Array<AreaPortal> AreaPortalArr;
+
 public:
 	Area();
 	~Area();
@@ -111,7 +113,6 @@ public:
 
 
 public:
-	typedef core::Array<AreaPortal> AreaPortalArr;
 
 	int32_t areaNum;
 	// points the the area's mesh header.
