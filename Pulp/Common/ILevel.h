@@ -17,6 +17,11 @@
 
 // forward Decs.
 class XWinding;
+
+X_NAMESPACE_DECLARE(model,
+	class XModel;
+)
+
 // ~forward Decs.
 
 
@@ -379,8 +384,9 @@ struct StaticModel
 	Sphere boundingSphere;
 
 	uint32_t modelNameIdx;
-	model::IModel* pModel;
+	model::XModel* pModel;
 };
+
 #endif
 
 

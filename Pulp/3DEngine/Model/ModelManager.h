@@ -29,15 +29,15 @@ public:
 
 	// IModelManager
 
-	IModel* findModel(const char* ModelName) const;
+	XModel* findModel(const char* ModelName) const;
 	// this only performs cpu loading, and currently loads all lods at once.
 	// as well as resolving materials, will alwyas return a instance, but might contain default data.
-	IModel* loadModel(const char* ModelName);
-	IModel* loadModelSync(const char* pModelName);
+	XModel* loadModel(const char* ModelName);
+	XModel* loadModelSync(const char* pModelName);
 
-	void releaseModel(IModel* pModel);
+	void releaseModel(XModel* pModel);
 
-	IModel* getDefaultModel(void);
+	XModel* getDefaultModel(void);
 
 	// ~IModelManager
 
@@ -54,7 +54,7 @@ private:
 
 
 private:
-	IModel*	pDefaultModel_;
+	XModel*	pDefaultModel_;
 	ModelContainer	models_;
 };
 

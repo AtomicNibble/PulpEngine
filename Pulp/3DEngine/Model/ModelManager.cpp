@@ -133,11 +133,11 @@ void XModelManager::ShutDown(void)
 }
 
 
-IModel* XModelManager::findModel(const char* pModelName) const
+XModel* XModelManager::findModel(const char* pModelName) const
 {
 	core::string name(pModelName);
 
-	IModel* pModel = findModel_Internal(name);
+	ModelResource* pModel = findModel_Internal(name);
 	if (pModel) {
 		return pModel;
 	}
@@ -152,7 +152,7 @@ XModelManager::ModelResource* XModelManager::findModel_Internal(const core::stri
 }
 
 
-IModel* XModelManager::loadModel(const char* pModelName)
+XModel* XModelManager::loadModel(const char* pModelName)
 {
 	X_ASSERT_NOT_NULL(pModelName);
 	const char* pExt;
@@ -185,7 +185,7 @@ IModel* XModelManager::loadModel(const char* pModelName)
 }
 
 
-IModel* XModelManager::loadModelSync(const char* pModelName)
+XModel* XModelManager::loadModelSync(const char* pModelName)
 {
 	X_ASSERT_NOT_NULL(pModelName);
 	const char* pExt;
@@ -229,7 +229,7 @@ IModel* XModelManager::loadModelSync(const char* pModelName)
 	return pModelRes;
 }
 
-void XModelManager::releaseModel(IModel* pModel)
+void XModelManager::releaseModel(XModel* pModel)
 {
 	ModelResource* pModelRes = static_cast<ModelResource*>(pModel);
 	if (pModelRes->removeReference() == 0)
@@ -249,7 +249,7 @@ XModelManager::ModelResource* XModelManager::createModel(const char* pModelName)
 }
 
 
-IModel* XModelManager::getDefaultModel(void)
+XModel* XModelManager::getDefaultModel(void)
 {
 	return pDefaultModel_;
 }

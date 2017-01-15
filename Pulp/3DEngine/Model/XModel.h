@@ -28,7 +28,7 @@ X_NAMESPACE_DECLARE(engine,
 X_NAMESPACE_BEGIN(model)
 
 
-class XModel : public IModel, public engine::XEngineBase
+class XModel : public engine::XEngineBase
 {
 	typedef core::string ModelName;
 
@@ -36,22 +36,20 @@ public:
 	XModel();
 	~XModel();
 
-	// IModel
-	virtual const core::string& getName(void) const X_FINAL;
-	virtual int32_t numLods(void) const X_FINAL;
-	virtual int32_t numBones(void) const X_FINAL;
-	virtual int32_t numBlankBones(void) const X_FINAL;
-	virtual int32_t numMeshTotal(void) const X_FINAL;
-	virtual int32_t numVerts(size_t lodIdx) const X_FINAL;
-	virtual bool HasLods(void) const X_FINAL;
+	const core::string& getName(void) const;
+	int32_t numLods(void) const;
+	int32_t numBones(void) const;
+	int32_t numBlankBones(void) const;
+	int32_t numMeshTotal(void) const;
+	int32_t numVerts(size_t lodIdx) const;
+	bool HasLods(void) const;
 
-	virtual const AABB& bounds(void) const X_FINAL;
-	virtual const AABB& bounds(size_t lodIdx) const X_FINAL;
+	const AABB& bounds(void) const;
+	const AABB& bounds(size_t lodIdx) const;
 
-	virtual const Sphere& boundingSphere(size_t lodIdx) const X_FINAL;
+	const Sphere& boundingSphere(size_t lodIdx) const;
 
-	virtual void Render(void) X_FINAL;
-	// ~IModel
+	void Render(void);
 
 	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat);
 

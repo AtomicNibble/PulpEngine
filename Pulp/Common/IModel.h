@@ -565,45 +565,6 @@ struct LODHeader : public MeshHeader
 };
 
 
-struct IModel
-{
-	virtual ~IModel() {}
-
-	virtual const core::string& getName(void) const X_ABSTRACT;
-	virtual int32_t numLods(void) const X_ABSTRACT;
-	virtual int32_t numBones(void) const X_ABSTRACT;
-	virtual int32_t numBlankBones(void) const X_ABSTRACT;
-	virtual int32_t numMeshTotal(void) const X_ABSTRACT;
-	virtual int32_t numVerts(size_t lodIdx) const X_ABSTRACT;
-	virtual bool HasLods(void) const X_ABSTRACT;
-
-	virtual const AABB& bounds(void) const X_ABSTRACT;
-	virtual const AABB& bounds(size_t lodIdx) const X_ABSTRACT;
-
-	virtual const Sphere& boundingSphere(size_t lodIdx) const X_ABSTRACT;
-
-	// temp.
-	virtual void Render(void) X_ABSTRACT;
-};
-
-#if 0 // don't see the need for this anymore, why you need model outside 3degnine? :| !
-struct IModelManager
-{
-	virtual ~IModelManager(){}
-
-	// returns null if not found, ref count unaffected
-	virtual IModel* findModel(const char* ModelName) const X_ABSTRACT;
-	// if material is found adds ref and returns, if not try's to load the material file.
-	// if file can't be loaded or error it return the default material.
-	virtual IModel* loadModel(const char* ModelName) X_ABSTRACT;
-	virtual IModel* loadModelSync(const char* ModelName) X_ABSTRACT;
-
-	virtual void releaseModel(IModel* pModel) X_ABSTRACT;
-
-	virtual IModel* getDefaultModel(void) X_ABSTRACT;
-};
-#endif
-
 X_PACK_PUSH(4)
 
 struct ModelHeader // File header.
