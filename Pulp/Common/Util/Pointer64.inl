@@ -42,9 +42,15 @@ Pointer64<void>& Pointer64<void>::operator +=(const Pointer64<void>& oth)
 
 template<typename T>
 template<typename Type>
-Type* Pointer64<T>::as() const
+Type* Pointer64<T>::as(void) const
 {
-	return (Type*)raw_;
+	return reinterpret_cast<Type*>(raw_);
+}
+
+template<typename T>
+void* Pointer64<T>::asVoid(void) const
+{
+	return as<void>();
 }
 
 

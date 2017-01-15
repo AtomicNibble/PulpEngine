@@ -21,10 +21,13 @@ public:
 	X_INLINE Pointer64& operator +=(const Pointer64& oth);
 
 	template<typename Type>
-	X_INLINE Type* as() const;
+	X_INLINE Type* as(void) const;
+
+	X_INLINE void* asVoid(void) const;
 
 	X_INLINE const T* operator[](int i) const;
 	X_INLINE T* operator[](int i);
+
 
 private:
 	//should be ok since same type.
