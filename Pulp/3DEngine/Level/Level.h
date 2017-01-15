@@ -226,6 +226,8 @@ private:
 	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
 
 private:
+	bool createPhysicsScene(void);
+
 
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
@@ -270,6 +272,7 @@ private:
 	core::IFileSys* pFileSys_;
 	core::V2::JobSystem* pJobSys_;
 	engine::PrimativeContext* pPrimContex_;
+	physics::IScene* pScene_; // the scene for this level.
 
 private:
 	// vars

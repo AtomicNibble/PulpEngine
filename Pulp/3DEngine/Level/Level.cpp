@@ -199,6 +199,7 @@ Level::Level() :
 	pFileSys_ = gEnv->pFileSys;
 	pJobSys_ = gEnv->pJobSys;
 	pPrimContex_ = nullptr;
+	pScene_ = nullptr;
 }
 
 Level::~Level()
@@ -289,6 +290,11 @@ void Level::free(void)
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
 		pFileData_ = nullptr;
+	}
+
+	if (pScene_) {
+		gEnv->pPhysics->releaseScene(pScene_);
+		pScene_ = nullptr;
 	}
 }
 
@@ -919,5 +925,29 @@ void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numArea
 	} while (nodeNum != 0);
 }
 
+bool Level::createPhysicsScene(void)
+{
+	if (pScene_) {
+		gEnv->pPhysics->releaseScene(pScene_);
+	}
+
+	// lets make a scene.
+	physics::SceneDesc sceneDesc;
+	core::zero_object(sceneDesc.sceneLimitHint); // zero = no limit
+	sceneDesc.gravity = Vec3f(0.f, 0.f, -9.8f);
+	sceneDesc.frictionType = physics::FrictionType::Patch;
+	sceneDesc.frictionOffsetThreshold = 0.04f;
+	sceneDesc.contractCorrelationDis = 0.025f;
+	sceneDesc.bounceThresholdVelocity = 0.2f;
+	sceneDesc.sanityBounds = AABB(Vec3f(static_cast<float>(level::MIN_WORLD_COORD)),
+		Vec3f(static_cast<float>(level::MAX_WORLD_COORD)));
+
+	pScene_ = gEnv->pPhysics->createScene(sceneDesc);
+	if (!pScene_) {
+		return false;
+	}
+
+	return true;
+}
 
 X_NAMESPACE_END
