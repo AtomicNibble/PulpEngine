@@ -226,7 +226,6 @@ private:
 	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
 
 private:
-//	core::JobList::JobList jobList_;
 
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
