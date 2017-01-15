@@ -264,6 +264,11 @@ bool Level::ProcessData(void)
 			pMesh->streams[VertexStream::COLOR] = cursor.postSeekPtr<Color8u>(pMesh->numVerts);
 			pMesh->streams[VertexStream::NORMALS] = cursor.postSeekPtr<Vec3f>(pMesh->numVerts);
 
+			// all streams should be 16byte aligned in file post header.
+			X_ASSERT_ALIGNMENT(pMesh->streams[VertexStream::VERT].asVoid(), 16, 0);
+			X_ASSERT_ALIGNMENT(pMesh->streams[VertexStream::COLOR].asVoid(), 16, 0);
+			X_ASSERT_ALIGNMENT(pMesh->streams[VertexStream::NORMALS].asVoid(), 16, 0);
+			
 			for (x = 0; x < numSub; x++)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
@@ -302,6 +307,8 @@ bool Level::ProcessData(void)
 
 			// set the mesh head pointers.
 			pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
+
+			X_ASSERT_ALIGNMENT(pMesh->indexes.asVoid(), 16, 0);
 
 			meshName.clear();
 			meshName.appendFmt("$area_mesh%i", i);
