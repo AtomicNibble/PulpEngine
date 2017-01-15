@@ -164,7 +164,6 @@ bool LvlBuilder::save(const char* name)
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 
 	core::fileModeFlags mode;
-	FileHeader hdr;
 	core::Path<char> path;
 
 	if (entities_.isEmpty()) {
@@ -176,12 +175,12 @@ bool LvlBuilder::save(const char* name)
 	mode.Set(core::fileMode::RECREATE);
 	mode.Set(core::fileMode::RANDOM_ACCESS); // we do a seek.
 
+	FileHeader hdr;
 	core::zero_object(hdr);
 	hdr.fourCC = LVL_FOURCC_INVALID;
 	hdr.version = LVL_VERSION;
 	hdr.datacrc32 = 0; 
 	hdr.modified = core::dateTimeStampSmall::systemDateTime();
-
 	hdr.numStrings = safe_static_cast<uint32_t,size_t>(stringTable_.numStrings());
 
 	path.append(name);
