@@ -68,6 +68,7 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 
 	core::string name(pMtlName);
 
+#if X_DEBUG
 	const char* pExt;
 	if ((pExt = core::strUtil::FileExtension(name.begin(), name.end())))
 	{
@@ -75,6 +76,7 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s", pExt);
 		return nullptr;
 	}
+#endif // X_DEBUG
 
 	// try find it.
 	MaterialResource* pMatRes = findMaterial_Internal(name);

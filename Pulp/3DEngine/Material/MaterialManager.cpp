@@ -163,15 +163,15 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 {
 	X_ASSERT_NOT_NULL(pMtlName);
 
+#if X_DEBUG
 	const char* pExt = core::strUtil::FileExtension(pMtlName);
 	if(pExt)
 	{
 		// engine should not make requests for materials with a extensiob
-		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s",
-			pExt);
+		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s", pExt);
 		return getDefaultMaterial();
-
 	}
+#endif // !X_DEBUG
 
 	core::string name(pMtlName);
 
