@@ -259,8 +259,7 @@ bool Level::ProcessData(void)
 			pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
 
 			// verts
-			pMesh->streams[VertexStream::VERT] = cursor.postSeekPtr<uint8_t>(pMesh->numVerts *
-				((sizeof(Vec2f)* 2) + sizeof(Vec3f)));
+			pMesh->streams[VertexStream::VERT] = cursor.postSeekPtr<uint8_t>(pMesh->numVerts * sizeof(level::VertexBase));
 			pMesh->streams[VertexStream::COLOR] = cursor.postSeekPtr<Color8u>(pMesh->numVerts);
 			pMesh->streams[VertexStream::NORMALS] = cursor.postSeekPtr<Vec3f>(pMesh->numVerts);
 
