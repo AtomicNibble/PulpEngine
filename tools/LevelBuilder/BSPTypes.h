@@ -32,6 +32,7 @@ struct FillStats
 struct bspFace
 {
 	bspFace();
+	~bspFace();
 
 	struct bspFace* pNext;
 
@@ -49,6 +50,7 @@ struct bspNode;
 struct bspPortal
 {
 	bspPortal();
+	~bspPortal();
 
 	static void MakeNodePortal(XPlaneSet& planeSet, bspNode* pNode);
 	static bool MakeTreePortals(XPlaneSet& planeSet, LvlEntity* ent);

@@ -28,6 +28,13 @@ bspFace::bspFace()
 	w = nullptr;
 }
 
+bspFace::~bspFace()
+{
+	if (w) {
+		X_DELETE(w, g_arena);
+	}
+}
+
 // ------------------------------ Portal -----------------------------------
 
 bspPortal::bspPortal()
@@ -38,10 +45,17 @@ bspPortal::bspPortal()
 	pWinding = nullptr;
 }
 
+bspPortal::~bspPortal()
+{
+	if (pWinding) {
+		X_DELETE(pWinding, g_arena);
+	}
+}
+
 // ------------------------------ Node -----------------------------------
 
 bspNode::bspNode() :
-brushes(g_arena)
+	brushes(g_arena)
 {
 	planenum = 0;
 	parent = nullptr;

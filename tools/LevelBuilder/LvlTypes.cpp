@@ -27,6 +27,16 @@ LvlBrushSide::LvlBrushSide() :
 	core::zero_object(__pad);
 }
 
+LvlBrushSide::~LvlBrushSide()
+{
+	if (pWinding) {
+		X_DELETE(pWinding, g_arena);
+	}
+	if (pVisibleHull) {
+		X_DELETE(pVisibleHull, g_arena);
+	}
+}
+
 LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) : matInfo(oth.matInfo)
 {
 	planenum = oth.planenum;
@@ -97,10 +107,10 @@ LvlInterPortal::LvlInterPortal()
 // ==========================================
 
 LvlEntity::LvlEntity() :
-brushes(g_arena),
-patches(g_arena),
-interPortals(g_arena),
-numAreas(0)
+	brushes(g_arena),
+	patches(g_arena),
+	interPortals(g_arena),
+	numAreas(0)
 {
 	classType = level::ClassType::UNKNOWN;
 	pBspFaces = nullptr;
@@ -119,6 +129,10 @@ LvlEntity::~LvlEntity()
 			pNext = pFace->pNext;
 			X_DELETE(pFace, g_arena);
 		}
+	}
+
+	if (bspTree.headnode) {
+		bspTree.headnode->FreeTree_r();
 	}
 }
 // ==========================================

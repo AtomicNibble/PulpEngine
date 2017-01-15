@@ -52,6 +52,7 @@ struct LvlBrushSide
 {
 	LvlBrushSide();
 	LvlBrushSide(const LvlBrushSide& oth);
+	~LvlBrushSide();
 
 	LvlBrushSide& operator=(const LvlBrushSide& oth);
 
