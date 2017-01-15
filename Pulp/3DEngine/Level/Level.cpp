@@ -255,10 +255,8 @@ bool Level::init(void)
 	pPrimContex_ = static_cast<engine::PrimativeContext*>(get3DEngine()->getPrimContext(engine::PrimContext::MISC3D));
 
 
-
 	return true;
 }
-
 
 void Level::update(void)
 {
@@ -324,22 +322,12 @@ bool Level::render(void)
 	// if the camera is detached always draw the frustum of it.
 	if (s_var_detechCam_ > 0) 
 	{
-#if 0
-		render::XAuxGeomRenderFlags flags = render::AuxGeom_Defaults::Def3DRenderflags;
-		flags.SetDepthWriteFlag(render::AuxGeom_DepthWrite::DepthWriteOff);
-		flags.SetDepthTestFlag(render::AuxGeom_DepthTest::DepthTestOff);
-		flags.SetCullMode(render::AuxGeom_CullMode::CullModeNone);
-		flags.SetAlphaBlendMode(render::AuxGeom_AlphaBlendMode::AlphaBlended);
-
-		pAux_->setRenderFlags(flags);
-
 		if (s_var_detechCam_ == 1) {
-			pAux_->drawFrustum(cam_, Color8u(255, 255, 255, 128), Color8u(200, 0, 0, 100), true);
+			pPrimContex_->drawFrustum(cam_, Color8u(255, 255, 255, 128), Color8u(200, 0, 0, 100), true);
 		}
 		else {
-			pAux_->drawFrustum(cam_, Color8u(255, 255, 255, 255), Color8u(200, 0, 0, 255), false);
+			pPrimContex_->drawFrustum(cam_, Color8u(255, 255, 255, 255), Color8u(200, 0, 0, 255), false);
 		}
-#endif
 	}
 
 	return true;
@@ -347,13 +335,10 @@ bool Level::render(void)
 
 void Level::DrawAreaBounds(void)
 {
-	using namespace render;
-
 	if (s_var_drawAreaBounds_)
 	{
 		Color color = Col_Red;
 
-#if 1
 		if (s_var_drawAreaBounds_ == 1 || s_var_drawAreaBounds_ == 3)
 		{
 			for (const auto& a : areas_)
@@ -372,40 +357,8 @@ void Level::DrawAreaBounds(void)
 			}
 		}
 
-
-
-
-#else
-		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
-		flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
-		flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
-		pAux_->setRenderFlags(flags);
-
-		// visible only
-		if (s_var_drawAreaBounds_ == 1 || s_var_drawAreaBounds_ == 3)
-		{
-			for (const auto& a : areas_)
-			{
-				if (IsAreaVisible(a))
-				{
-					pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
-				}
-			}
-		}
-		else // all
-		{
-			for (const auto& a : areas_)
-			{
-				pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
-			}
-		}
-
 		if (s_var_drawAreaBounds_ > 2)
 		{
-			flags.SetFillMode(AuxGeom_FillMode::FillModeSolid);
-			flags.SetAlphaBlendMode(AuxGeom_AlphaBlendMode::AlphaBlended);
-			pAux_->setRenderFlags(flags);
-
 			color.a = 0.2f;
 
 			// visible only
@@ -415,7 +368,7 @@ void Level::DrawAreaBounds(void)
 				{
 					if (IsAreaVisible(a))
 					{
-						pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+						pPrimContex_->drawAABB(a.pMesh->boundingBox, true, color);
 					}
 				}
 			}
@@ -423,11 +376,10 @@ void Level::DrawAreaBounds(void)
 			{
 				for (const auto& a : areas_)
 				{
-					pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+					pPrimContex_->drawAABB(a.pMesh->boundingBox, true, color);
 				}
 			}
 		}
-#endif
 	}
 }
 
@@ -472,11 +424,6 @@ void Level::DrawPortalStacks(void) const
 
 					windings[i] = w;
 				}
-
-				// render::XAuxGeomRenderFlags flags = render::AuxGeom_Defaults::Def3DRenderflags;
-				// flags.SetDepthWriteFlag(render::AuxGeom_DepthWrite::DepthWriteOff);
-				// flags.SetDepthTestFlag(render::AuxGeom_DepthTest::DepthTestOff);
-				// pAux_->setRenderFlags(flags);
 
 				Color8u col = Col_Limegreen;
 
@@ -734,8 +681,6 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 			{
 				if (s_var_drawModelBounds_ > 2)
 				{
-#if 1
-
 					if (s_var_drawModelBounds_ == 3)
 					{
 						pPrimContex_->drawAABB(sm.boundingBox, false, cullColor);
@@ -744,23 +689,6 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 					{
 						pPrimContex_->drawSphere(wSphere, cullColor, false);
 					}
-
-#else
-					XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
-
-					if (s_var_drawModelBounds_ == 3)
-					{
-						flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
-						pAux_->setRenderFlags(flags);
-						pAux_->drawAABB(sm.boundingBox, false, cullColor);
-					}
-					else
-					{
-						flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
-						pAux_->setRenderFlags(flags);
-						pAux_->drawSphere(wSphere, cullColor, false);
-					}
-#endif
 				}
 
 				return false;
@@ -770,47 +698,21 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 		frameStats_.visibleModels++;
 		frameStats_.visibleVerts += pModel->numVerts(0);
 
-
-
-//		render::IRender* pRender = getRender();
-//		pRender->SetModelMatrix(posMat);
-
 		pModel->Render();
 		pModel->RenderBones(pPrimContex_, posMat);
 
-//		pRender->SetModelMatrix(Matrix44f::identity());
-
 		if (s_var_drawModelBounds_)
 		{
-#if 1
-
-#else
-			XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
-
-			//	flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
-		//	flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
-		//	flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
-
-
 			// 1 == aabb 2 = sphee
 			if (s_var_drawModelBounds_ == 1 || s_var_drawModelBounds_ == 3)
 			{
-				flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
-
-				pAux_->setRenderFlags(flags);
-
-				pAux_->drawAABB(sm.boundingBox, false, visColor);
+				pPrimContex_->drawAABB(sm.boundingBox, false, visColor);
 			}
 			else
 			{
 				posMat = Matrix44f::createTranslation(pos);
-
-				flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
-				pAux_->setRenderFlags(flags);
-
-				pAux_->drawSphere(wSphere, visColor, false);
+				pPrimContex_->drawSphere(wSphere, visColor, false);
 			}
-#endif
 		}
 
 		return true;
