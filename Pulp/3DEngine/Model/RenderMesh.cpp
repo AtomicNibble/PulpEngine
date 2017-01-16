@@ -111,7 +111,8 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend,
 	const uint32_t normalStride = vertexSteamStride[VertexStream::NORMALS][vertexFmt];
 	const uint32_t tanBiStride = vertexSteamStride[VertexStream::TANGENT_BI][vertexFmt];
 
-	indexStream_ = pRend->createIndexBuffer(sizeof(model::Index), mesh.numIndexes, render::BufUsage::IMMUTABLE);
+	indexStream_ = pRend->createIndexBuffer(sizeof(model::Index), mesh.numIndexes, mesh.indexes, render::BufUsage::IMMUTABLE);
+
 
 	// we always carry vert?
 	X_ASSERT(baseVertStride > 0, "Vertex stride of zero")(baseVertStride);
