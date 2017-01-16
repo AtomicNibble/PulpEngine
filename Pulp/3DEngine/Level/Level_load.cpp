@@ -77,7 +77,7 @@ void Level::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, cor
 		// allocate buffer for the file data.
 		uint32_t dataSize = fileHdr_.totalDataSize;
 
-		pFileData_ = X_NEW_ARRAY(uint8_t, dataSize, g_3dEngineArena, "LevelBuffer");
+		pFileData_ = X_NEW_ARRAY_ALIGNED(uint8_t, dataSize, g_3dEngineArena, "LevelBuffer", 16);
 
 
 		core::IoRequestData req;
@@ -222,6 +222,8 @@ bool ProcessIAP(core::XFileFixedBuf& file, Area& area, int32_t areaTo)
 
 bool Level::ProcessData(void)
 {
+	X_ASSERT_ALIGNMENT(pFileData_, 16, 0);
+
 	// read string table.
 	{
 		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STRING_TABLE);
