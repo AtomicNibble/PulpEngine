@@ -105,9 +105,7 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend,
 {
 	X_ASSERT_NOT_NULL(pRend);
 
-	const uint32_t ibSize = mesh.numIndexes * sizeof(model::Index);
 	const uint32_t numVerts = mesh.numVerts;
-
 	const uint32_t baseVertStride = vertexSteamStride[VertexStream::VERT][vertexFmt];
 	const uint32_t colorStride = vertexSteamStride[VertexStream::COLOR][vertexFmt];
 	const uint32_t normalStride = vertexSteamStride[VertexStream::NORMALS][vertexFmt];
