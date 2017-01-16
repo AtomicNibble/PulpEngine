@@ -8,6 +8,7 @@ X_NAMESPACE_BEGIN(lvl)
 MatManager::MatManager(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u, X_ALIGN_OF(MaterialResource))),
+	nameOverRide_(arena, 64),
 	pDefaultMtl_(nullptr)
 {
 }
@@ -20,6 +21,11 @@ MatManager::~MatManager()
 bool MatManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
+
+
+	nameOverRide_.insert(std::make_pair(core::string("portal"), core::string("tool/editor/portal")));
+	nameOverRide_.insert(std::make_pair(core::string("portal_nodraw"), core::string("tool/editor/portal_nodraw")));
+
 
 	return loadDefaultMaterial();
 }
@@ -67,6 +73,12 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 	X_ASSERT_NOT_NULL(pMtlName);
 
 	core::string name(pMtlName);
+
+	auto it = nameOverRide_.find(name);
+	if (it != nameOverRide_.end())
+	{
+		name = it->second;
+	}
 
 #if X_DEBUG
 	const char* pExt;
