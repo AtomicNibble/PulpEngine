@@ -124,11 +124,11 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend,
 		vertexStreams_[VertexStream::COLOR] = pRend->createVertexBuffer(colorStride, numVerts,
 			mesh.streams[VertexStream::COLOR], render::BufUsage::IMMUTABLE);
 	}
-	if (colorStride > 0) {
+	if (normalStride > 0) {
 		vertexStreams_[VertexStream::NORMALS] = pRend->createVertexBuffer(normalStride, numVerts,
 			mesh.streams[VertexStream::NORMALS], render::BufUsage::IMMUTABLE);
 	}
-	if (colorStride > 0) {
+	if (tanBiStride > 0) {
 		vertexStreams_[VertexStream::TANGENT_BI] = pRend->createVertexBuffer(tanBiStride, numVerts,
 			mesh.streams[VertexStream::TANGENT_BI], render::BufUsage::IMMUTABLE);
 	}
