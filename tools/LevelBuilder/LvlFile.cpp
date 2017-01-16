@@ -43,10 +43,6 @@ namespace
 		stream.write(pModel->model);
 		stream.write(pModel->meshes.ptr(), (pModel->meshes.size()));
 
-		// write the streams.
-		core::Array<level::Vertex>::ConstIterator it = pModel->verts.begin();
-		core::Array<level::Vertex>::ConstIterator end = pModel->verts.end();
-
 
 		auto padStream = [streamOffset, &stream]()
 		{
@@ -60,6 +56,12 @@ namespace
 			X_ASSERT_ALIGNMENT(stream.size() + streamOffset, 16, 0);
 		};
 
+		// write the streams.
+		core::Array<level::Vertex>::ConstIterator it = pModel->verts.begin();
+		core::Array<level::Vertex>::ConstIterator end = pModel->verts.end();
+
+
+		padStream();
 
 		// we must pad each one
 		for (; it != end; ++it) {
@@ -67,14 +69,22 @@ namespace
 			stream.write(it->texcoord[0]);
 			stream.write(it->texcoord[1]);
 		}
+
+		padStream();
+
 		it = pModel->verts.begin();
 		for (; it != end; ++it) {
 			stream.write(it->color);
 		}
+
+		padStream();
+
 		it = pModel->verts.begin();
 		for (; it != end; ++it) {
 			stream.write(it->normal);
 		}
+
+		padStream();
 
 		stream.write(pModel->faces.ptr(), (pModel->faces.size()));
 	}
