@@ -100,15 +100,18 @@ public:
 
 	// you must pass cooked data :|
 	// if you don't have cooked data use getCooking() to cook it!
-	ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
-	ActorHandle createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
-	ActorHandle createHieghtField(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
-	ActorHandle createPlane(const QuatTransf& myTrans, float density) X_FINAL;
+	TriMeshHandle createTriangleMesh(const DataArr& cooked) X_FINAL;
+	ConvexHandle createConvexMesh(const DataArr& cooked) X_FINAL;
+	HieghtFieldHandle createHieghtField(const DataArr& cooked) X_FINAL;
+
+	ActorHandle createConvexMesh(const QuatTransf& myTrans, ConvexHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createTriangleMesh(const QuatTransf& myTrans, TriMeshHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
 	ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_FINAL;
 	ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_FINAL;
 	ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_FINAL;
 
-	ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;
 	ActorHandle createStaticPlane(const QuatTransf& myTrans) X_FINAL;
 	ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_FINAL;
 	ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_FINAL;

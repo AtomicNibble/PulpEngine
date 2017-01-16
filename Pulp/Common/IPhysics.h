@@ -27,6 +27,9 @@ typedef Handle MaterialHandle;
 typedef Handle RegionHandle;
 typedef Handle ActorHandle;
 typedef Handle AggregateHandle;
+typedef Handle TriMeshHandle;
+typedef Handle ConvexHandle;
+typedef Handle HieghtFieldHandle;
 
 static const Handle INVALID_HANLDE = 0;
 
@@ -838,16 +841,19 @@ struct IPhysics
 	virtual void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_ABSTRACT;
 
 
+	virtual TriMeshHandle createTriangleMesh(const DataArr& cooked) X_ABSTRACT;
+	virtual ConvexHandle createConvexMesh(const DataArr& cooked) X_ABSTRACT;
+	virtual HieghtFieldHandle createHieghtField(const DataArr& cooked) X_ABSTRACT;
 
-	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createHieghtField(const QuatTransf& myTrans, const DataArr& cooked, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createPlane(const QuatTransf& myTrans, float density) X_ABSTRACT;
+
+	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, TriMeshHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createTriangleMesh(const QuatTransf& myTrans, ConvexHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_ABSTRACT;
 	virtual ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_ABSTRACT;
 	virtual ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_ABSTRACT;
 
-	virtual ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, const DataArr& cooked, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createStaticPlane(const QuatTransf& myTrans) X_ABSTRACT;
 	virtual ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_ABSTRACT;
 	virtual ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_ABSTRACT;
