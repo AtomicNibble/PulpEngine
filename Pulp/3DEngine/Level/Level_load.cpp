@@ -260,9 +260,29 @@ bool Level::ProcessData(void)
 			// set meshHeads verts and faces.
 			pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
 
-			// verts
+			
+			// These streams are padded to 16byte align so we must seek past the
+			// the padding bytes manually.
+			
+			auto seekCursorToPad = [&cursor]()
+			{
+				// when the value is aligned we must work how much to seek by.
+				// we do this by taking a coon to market.
+				auto* pCur = cursor.getPtr<const char*>();
+				auto* pAligned = core::pointerUtil::AlignTop(pCur, 16);
+
+				const size_t diff = union_cast<size_t>(pAligned) - union_cast<size_t>(pCur);
+
+				cursor.SeekBytes(static_cast<uint32_t>(diff));
+			};
+
+			seekCursorToPad();
 			pMesh->streams[VertexStream::VERT] = cursor.postSeekPtr<uint8_t>(pMesh->numVerts * sizeof(level::VertexBase));
+		
+			seekCursorToPad();
 			pMesh->streams[VertexStream::COLOR] = cursor.postSeekPtr<Color8u>(pMesh->numVerts);
+
+			seekCursorToPad();
 			pMesh->streams[VertexStream::NORMALS] = cursor.postSeekPtr<Vec3f>(pMesh->numVerts);
 
 			// all streams should be 16byte aligned in file post header.
@@ -278,13 +298,15 @@ bool Level::ProcessData(void)
 				pSubMesh->streams[VertexStream::NORMALS] += pMesh->streams[VertexStream::NORMALS];
 			}
 
+			seekCursorToPad();
+
 			// indexes
 			for (x = 0; x < numSub; x++)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 				pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
 			}
-
+			
 			// mat names
 			for (x = 0; x < numSub; x++)
 			{
