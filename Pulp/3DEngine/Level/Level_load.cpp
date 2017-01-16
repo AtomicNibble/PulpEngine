@@ -447,6 +447,54 @@ bool Level::ProcessData(void)
 #endif
 	}
 
+	if (fileHdr_.flags.IsSet(LevelFileFlags::COLLISION))
+	{
+		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_COLLISION);
+
+		// add all the area bounds
+		for (const auto& a : areas_)
+		{
+			pScene_->addRegion(a.getBounds());
+		}
+
+		for (const auto& a : areas_)
+		{
+			X_UNUSED(a);
+
+			AreaCollisionHdr colHdr;
+			file.readObj(colHdr);
+
+			for (uint8_t i=0; i<colHdr.numGroups; i++)
+			{
+				AreaCollisionGroupHdr groupHdr;
+				file.readObj(groupHdr);
+
+				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::TriMesh]; t++)
+				{
+					AreaCollisionDataHdr dataHdr;
+					file.readObj(dataHdr);
+					
+					physics::IPhysics::DataArr data(g_3dEngineArena);
+					data.resize(dataHdr.dataSize);
+
+					file.read(data.data(), data.size());
+
+					// create the actor :O
+					auto triMeshHandle = pPhysics_->createTriangleMesh(data);
+					auto actor = pPhysics_->createStaticTriangleMesh(QuatTransf::identity(), triMeshHandle);
+
+					pScene_->addActorToScene(actor);
+				}
+
+				if (groupHdr.numTypes[CollisionDataType::HeightField] > 0) {
+					X_ASSERT_NOT_IMPLEMENTED();
+				}
+			}
+
+		}
+
+	}
+
 	{
 		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
 
