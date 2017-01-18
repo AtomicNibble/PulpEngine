@@ -18,4 +18,9 @@ X_INLINE int32_t PhysXVars::DebugDrawCullEnabled(void) const
 	return debugDrawUseCullBox_;
 }
 
+X_INLINE int32_t PhysXVars::UnifiedHeightFieldsEnabled(void) const
+{
+	return unifiedHeightFields_;
+}
+
 X_NAMESPACE_END

@@ -305,6 +305,11 @@ bool XPhysics::init(const ToleranceScale& scale)
 		return false;
 	}
 
+	if (vars_.UnifiedHeightFieldsEnabled()) {
+		PxRegisterUnifiedHeightFields(*pPhysics_);
+		X_LOG2("Physics", "Enabling unified height fields");
+	}
+
 	pCooking_ = X_NEW(PhysCooking, arena_, "RuntimePhysCooking")(arena_);
 	if (!pCooking_) {
 		X_ERROR("Physics", "CreateCooking failed!");

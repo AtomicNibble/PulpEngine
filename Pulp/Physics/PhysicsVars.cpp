@@ -20,6 +20,7 @@ PhysXVars::PhysXVars() :
 	stepperType_ = StepperType::FIXED_STEPPER;
 
 	debugDraw_ = 0;
+	unifiedHeightFields_ = 0;
 
 	core::zero_object(scaleVarNames_);
 	core::zero_object(scaleVars_);
@@ -49,6 +50,9 @@ void PhysXVars::RegisterVars(void)
 	// toggle drawing on off. seperate to the scales.
 	pVarDebugDraw_ = ADD_CVAR_REF("phys_draw_debug", debugDraw_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable drawing of physics debug shapes")->SetOnChangeCallback(del);
+
+	ADD_CVAR_REF("phys_unified_height_fields", unifiedHeightFields_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Enable unified height fields");
 
 	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugUseCullChange>(this);
 
