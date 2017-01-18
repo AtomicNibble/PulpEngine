@@ -851,6 +851,26 @@ ActorHandle XPhysics::createStaticTriangleMesh(const QuatTransf& myTrans, TriMes
 	return reinterpret_cast<ActorHandle>(pActor);
 }
 
+ActorHandle XPhysics::createStaticHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale)
+{
+	physx::PxHeightField* pHeightField = reinterpret_cast<physx::PxHeightField*>(hf);
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	auto* pShape = pPhysics_->createShape(
+		physx::PxHeightFieldGeometry(pHeightField, physx::PxMeshGeometryFlags(), heightRowColScale.x, heightRowColScale.y, heightRowColScale.z),
+		*pMaterial_,
+		true,
+		DEFALT_SHAPE_FLAGS
+	);
+
+	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
+
+	pShape->release();
+
+	setupDefaultRigidStatic(*pActor);
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
 ActorHandle XPhysics::createStaticPlane(const QuatTransf& myTrans)
 {
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);

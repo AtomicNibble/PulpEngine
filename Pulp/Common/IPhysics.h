@@ -854,6 +854,7 @@ struct IPhysics
 	virtual ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_ABSTRACT;
 
 	virtual ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createStaticHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createStaticPlane(const QuatTransf& myTrans) X_ABSTRACT;
 	virtual ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_ABSTRACT;
 	virtual ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_ABSTRACT;
