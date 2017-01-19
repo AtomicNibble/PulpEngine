@@ -488,12 +488,19 @@ bool Level::ProcessData(void)
 			AreaCollisionHdr colHdr;
 			file.readObj(colHdr);
 
+			QuatTransf trans;
+			trans.trans = colHdr.trans;
+
 			for (uint8_t i=0; i<colHdr.numGroups; i++)
 			{
 				AreaCollisionGroupHdr groupHdr;
 				file.readObj(groupHdr);
 
 				static_assert(CollisionDataType::ENUM_COUNT == 3, "Enum count changed? this code may need updating");
+				// will it help the broadphase if i make these static actors not all have idenity trans
+				// but instead process everything so it's not in wordspace but 'area space'
+				auto actor = pPhysics_->createStaticActor(trans);
+
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::TriMesh]; t++)
 				{
 					AreaCollisionDataHdr dataHdr;
@@ -506,14 +513,34 @@ bool Level::ProcessData(void)
 
 					// create the actor :O
 					auto triMeshHandle = pPhysics_->createTriangleMesh(data);
-					auto actor = pPhysics_->createStaticTriangleMesh(QuatTransf::identity(), triMeshHandle);
-
-					pScene_->addActorToScene(actor);
+					pPhysics_->addTriMesh(actor, triMeshHandle);
 				}
 
-				if (groupHdr.numTypes[CollisionDataType::HeightField] > 0) {
-					X_ASSERT_NOT_IMPLEMENTED();
+				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::HeightField]; t++)
+				{
+					AreaCollisionDataHdr dataHdr;
+					file.readObj(dataHdr);
+
+					physics::IPhysics::DataArr data(g_3dEngineArena);
+					data.resize(dataHdr.dataSize);
+
+					file.read(data.data(), data.size());
+
+					// create the actor :O
+					auto hfHandle = pPhysics_->createHieghtField(data);
+					pPhysics_->addHieghtField(actor, hfHandle);
 				}
+
+				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::Aabb]; t++)
+				{
+					AABB aabb;
+					file.readObj(aabb);
+
+					pPhysics_->addBox(actor, aabb);
+				}
+
+
+				pScene_->addActorToScene(actor);
 			}
 
 		}
