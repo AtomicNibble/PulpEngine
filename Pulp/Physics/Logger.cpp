@@ -28,6 +28,7 @@ void PhysxLogger::reportError(physx::PxErrorCode::Enum code, const char* message
 
 	case physx::PxErrorCode::eINVALID_OPERATION:
 		X_ERROR("Physx", "InvalidOp: %s file: %s line: %i", message, file, line);
+		X_BREAKPOINT;
 		break;
 
 	case physx::PxErrorCode::eOUT_OF_MEMORY:
