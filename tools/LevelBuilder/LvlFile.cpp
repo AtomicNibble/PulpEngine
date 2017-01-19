@@ -423,6 +423,7 @@ bool LvlBuilder::save(const char* name)
 
 				AreaCollisionHdr colHdr;
 				colHdr.numGroups = safe_static_cast<uint8_t>(col.numGroups());
+				colHdr.trans = Vec3f::zero();
 
 				file.writeObj(colHdr);
 

@@ -469,7 +469,9 @@ X_PACK_PUSH(1)
 struct AreaCollisionHdr
 {
 	uint8_t numGroups;
-
+	uint8_t _pad[3];
+	// all shapes are relative to this.
+	Vec3f trans; 
 };
 
 struct AreaCollisionGroupHdr
@@ -493,7 +495,7 @@ static_assert(std::numeric_limits<decltype(AreaCollisionHdr::numGroups)>::max() 
 static_assert(std::numeric_limits<std::remove_reference<decltype(AreaCollisionGroupHdr::numTypes[0])>::type>::max() >= MAP_MAX_AREA_COL_DATA, "Limit exceeds type max");
 static_assert(std::numeric_limits<decltype(AreaCollisionDataHdr::dataSize)>::max() >= MAP_MAX_AREA_COL_DATA_SIZE, "Limit exceeds type max");
 
-X_ENSURE_SIZE(AreaCollisionHdr, 1);
+X_ENSURE_SIZE(AreaCollisionHdr, 16);
 X_ENSURE_SIZE(AreaCollisionGroupHdr, 6);
 X_ENSURE_SIZE(AreaCollisionDataHdr, 2);
 
