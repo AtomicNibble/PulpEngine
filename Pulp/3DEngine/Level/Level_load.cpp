@@ -493,6 +493,7 @@ bool Level::ProcessData(void)
 				AreaCollisionGroupHdr groupHdr;
 				file.readObj(groupHdr);
 
+				static_assert(CollisionDataType::ENUM_COUNT == 3, "Enum count changed? this code may need updating");
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::TriMesh]; t++)
 				{
 					AreaCollisionDataHdr dataHdr;
