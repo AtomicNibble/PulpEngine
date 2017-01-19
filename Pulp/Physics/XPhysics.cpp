@@ -129,7 +129,6 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	pProfileZoneManager_(nullptr),
 	pPhysics_(nullptr),
 	pCooking_(nullptr),
-	pScene_(nullptr),
 	pMaterial_(nullptr),
 	pCpuDispatcher_(nullptr),
 	pScratchBlock_(nullptr),
@@ -362,8 +361,9 @@ void XPhysics::shutDown(void)
 		pPhysics_->unregisterDeletionListener(*this);
 	}
 
-	if (pScene_) {
-		releaseScene(pScene_);
+	for (auto* pScene : scenes_)
+	{
+		X_DELETE(pScene, arena_);
 	}
 
 	core::SafeRelease(pCpuDispatcher_);
@@ -396,18 +396,23 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 		pause_ = false;
 	}
 
-	if (!IsPaused() && pScene_)
+	if (!IsPaused() && activeScenes_.isNotEmpty())
 	{
-		if (vars_.DebugDrawCullEnabled()) {
-			pScene_->setVisualizationCullingBox(debugVisCullBounds);
+		if (vars_.DebugDrawCullEnabled()) 
+		{
+			for (auto pScene : activeScenes_)
+			{
+				pScene->setVisualizationCullingBox(debugVisCullBounds);
+			}
 		}
 
+		XScene* pScene = activeScenes_.front();
 		Stepper* pStepper = getStepper();
 
 		waitForResults_ = false;
 
 
-		waitForResults_ = pStepper->advance(pScene_->getPxScene(), dtime, pScratchBlock_,
+		waitForResults_ = pStepper->advance(pScene->getPxScene(), dtime, pScratchBlock_,
 			safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
 
 		// tells the stepper shape data is not going to be accessed until next frame 
@@ -419,14 +424,11 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 
 void XPhysics::onTickPostRender(float dtime)
 {
-	if (!pScene_) {
-		return;
-	}
-
-	if (!IsPaused() && waitForResults_)
+	if (!IsPaused() && waitForResults_ && activeScenes_.isNotEmpty())
 	{
+		XScene* pScene = activeScenes_.front();
 		Stepper* pStepper = getStepper();
-		pStepper->wait(pScene_->getPxScene());
+		pStepper->wait(pScene->getPxScene());
 
 		core::TimeVal simTime = pStepper->getSimulationTime();
 
@@ -442,7 +444,10 @@ void XPhysics::onTickPostRender(float dtime)
 	{
 		pDebugRender_->clear();
 		// draw debug objects for this scene
-		pScene_->drawDebug(pDebugRender_);
+		for (auto pScene : activeScenes_)
+		{
+			pScene->drawDebug(pDebugRender_);
+		}
 	}
 
 	// pause if one frame update.
@@ -474,8 +479,8 @@ IPhysicsCooking* XPhysics::getCooking(void)
 
 IScene* XPhysics::createScene(const SceneDesc& desc)
 {
-	if (pScene_) {
-		X_ERROR("Phys", "Only one scene is allowed, release the old before creating a new one");
+	if (scenes_.size() == scenes_.capacity()) {
+		X_ERROR("Phys", "Reached max scene count");
 		return nullptr;
 	}
 
@@ -532,17 +537,51 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 
 	vars_.SetScene(scene->getPxScene());
 
-	pScene_ = scene.get();
+	scenes_.push_back(scene.get());
 	return scene.release();
 }
 
-void XPhysics::releaseScene(IScene* pScene)
+void XPhysics::addSceneToSim(IScene* pScene_)
 {
-	// todo free :D!
-	X_ASSERT(pScene == pScene_, "Invalid scene pointer")(pScene, pScene_);
+	if (activeScenes_.size() == activeScenes_.capacity()) {
+		X_ERROR("Phys", "Reached max active scene count");
+		return;
+	}
 
-	pScene_ = nullptr;
-	X_DELETE(pScene, arena_);
+	XScene* pScene = static_cast<XScene*>(pScene_);
+
+	auto idx = scenes_.find(pScene);
+	if (idx != decltype(scenes_)::invalid_index)
+	{
+		activeScenes_.push_back(pScene);
+	}
+}
+
+bool XPhysics::removeSceneFromSim(IScene* pScene_)
+{
+	XScene* pScene = static_cast<XScene*>(pScene_);
+	
+	auto idx = scenes_.find(pScene);
+	if (idx != decltype(scenes_)::invalid_index)
+	{
+		return activeScenes_.removeIndex(idx);
+	}
+
+	return false;
+}
+
+void XPhysics::releaseScene(IScene* pScene_)
+{
+	if (pScene_)
+	{
+		// remove from sim if present.
+		removeSceneFromSim(pScene_);
+
+		XScene* pScene = static_cast<XScene*>(pScene_);
+		auto idx = scenes_.find(pScene);
+		scenes_.removeIndex(idx);
+		X_DELETE(pScene, arena_);
+	}
 }
 
 // ------------------------------------------

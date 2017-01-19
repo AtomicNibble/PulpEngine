@@ -8,6 +8,11 @@
 
 X_NAMESPACE_BEGIN(physics)
 
+static const uint32_t MAX_SCENES = 8; // max scenes you can create (artifical limit)
+static const uint32_t MAX_ACTIVE_SCENES = 1; // max scenes been simulated (to increase some stepper logic needs refactoring)
+
+
+
 X_DECLARE_FLAGS(GroupFlag)(
 	Default,	// nothing can pass through this
 	Player,		// can walk through AiClip and VehicleClip
@@ -808,6 +813,9 @@ struct IPhysics
 
 	// Scene stuff
 	virtual IScene* createScene(const SceneDesc& desc) X_ABSTRACT;
+	// once this is called at static geo should of been added, to prevent AABB rebuilds. (adding static stuff after is still possible tho)
+	virtual void addSceneToSim(IScene* pScene) X_ABSTRACT;
+	virtual bool removeSceneFromSim(IScene* pScene) X_ABSTRACT;
 	virtual void releaseScene(IScene* pScene) X_ABSTRACT;
 
 	// we need to make a api for creating the physc objects for use in the 3dengine.

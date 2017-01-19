@@ -51,8 +51,10 @@ class XPhysics :
 
 public:
 	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 16;
-
 	static const physx::PxShapeFlags DEFALT_SHAPE_FLAGS;
+
+	typedef core::FixedArray<XScene*, MAX_ACTIVE_SCENES> ActiveSceneListArr;
+	typedef core::FixedArray<XScene*, MAX_SCENES> SceneListArr;
 
 public:
 	XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
@@ -74,6 +76,8 @@ public:
 
 	// Scene stuff
 	IScene* createScene(const SceneDesc& desc) X_FINAL;
+	void addSceneToSim(IScene* pScene) X_FINAL;
+	bool removeSceneFromSim(IScene* pScene) X_FINAL;
 	void releaseScene(IScene* pScene) X_FINAL;
 
 	// materials
@@ -202,10 +206,10 @@ private:
 	physx::PxProfileZoneManager*	pProfileZoneManager_;
 
 	physx::PxPhysics*				pPhysics_;
-	XScene*							pScene_;
 	physx::PxMaterial*				pMaterial_;
 	physx::PxDefaultCpuDispatcher*	pCpuDispatcher_;
 	PhysCooking*					pCooking_;
+	ActiveSceneListArr				activeScenes_;
 
 	uint8_t*	pScratchBlock_;
 	size_t		scratchBlockSize_;
@@ -225,7 +229,10 @@ private:
 	InvertedFixedStepper	invertedFixedStepper_;
 	VariableStepper			variableStepper_;
 
+
 	PhysXVars vars_;
+	SceneListArr			scenes_;
+
 
 	DebugRender* pDebugRender_;
 };
