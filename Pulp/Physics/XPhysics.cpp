@@ -950,6 +950,96 @@ ActorHandle XPhysics::createStaticTrigger(const QuatTransf& myTrans, const AABB&
 	return reinterpret_cast<ActorHandle>(pTrigger);
 }
 
+// ------------------------------------------
+
+ActorHandle XPhysics::createActor(const QuatTransf& myTrans, float density)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	physx::PxRigidDynamic* pActor = pPhysics_->createRigidDynamic(trans);
+	if (pActor)
+	{
+		physx::PxRigidBodyExt::updateMassAndInertia(*pActor, density);
+		setupDefaultRigidDynamic(*pActor);
+	}
+
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+ActorHandle XPhysics::createStaticActor(const QuatTransf& myTrans)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+
+	physx::PxRigidStatic* pActor = pPhysics_->createRigidStatic(trans);
+	if (pActor)
+	{
+		setupDefaultRigidStatic(*pActor);
+	}
+
+	return reinterpret_cast<ActorHandle>(pActor);
+}
+
+// ------------------------------------------
+
+void XPhysics::addTriMesh(ActorHandle handle, TriMeshHandle tri, const Vec3f& scale)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+	physx::PxTriangleMesh* pTriMesh = reinterpret_cast<physx::PxTriangleMesh*>(tri);
+
+	physx::PxMeshScale meshScale;
+	meshScale.rotation = physx::PxQuat::createIdentity();
+	meshScale.scale = Px3FromVec3(scale);
+
+	auto* pShape = pPhysics_->createShape(physx::PxTriangleMeshGeometry(pTriMesh, meshScale), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	actor.attachShape(*pShape);
+}
+
+void XPhysics::addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+	physx::PxHeightField* pHf = reinterpret_cast<physx::PxHeightField*>(hf);
+
+	auto* pShape = pPhysics_->createShape(
+		physx::PxHeightFieldGeometry(pHf, physx::PxMeshGeometryFlags(), heightRowColScale.x, heightRowColScale.y, heightRowColScale.z),
+		*pMaterial_, 
+		true, 
+		DEFALT_SHAPE_FLAGS
+	);
+	
+	actor.attachShape(*pShape);
+}
+
+void XPhysics::addBox(ActorHandle handle, const AABB& aabb)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+	physx::PxBoxGeometry geo(Px3FromVec3(aabb.halfVec()));
+
+	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	actor.attachShape(*pShape);
+}
+
+void XPhysics::addSphere(ActorHandle handle, float radius)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	actor.attachShape(*pShape);
+}
+
+void XPhysics::addSCapsule(ActorHandle handle, float radius, float halfHeight)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	auto* pShape = pPhysics_->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	actor.attachShape(*pShape);
+}
+
+// ------------------------------------------
+
 	
 void XPhysics::setupDefaultRigidDynamic(physx::PxRigidDynamic& body, bool kinematic)
 {

@@ -118,6 +118,17 @@ public:
 	ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_FINAL;
 	ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
 	ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
+
+	// for creating a actor without any initial shape.
+	ActorHandle createActor(const QuatTransf& myTrans, float density) X_FINAL;
+	ActorHandle createStaticActor(const QuatTransf& myTrans) X_FINAL;
+
+	// adding additional shapes to a actor.
+	void addTriMesh(ActorHandle handle, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	void addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
+	void addBox(ActorHandle handle, const AABB& aabb) X_FINAL;
+	void addSphere(ActorHandle handle, float radius) X_FINAL;
+	void addSCapsule(ActorHandle handle, float radius, float halfHeight) X_FINAL;
 	// ~IPhysics
 
 private:

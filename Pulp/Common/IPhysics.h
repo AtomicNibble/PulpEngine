@@ -861,6 +861,17 @@ struct IPhysics
 	virtual ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
 	virtual ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
 
+	// for creating a actor without any initial shape.
+	virtual ActorHandle createActor(const QuatTransf& myTrans, float density) X_ABSTRACT;
+	virtual ActorHandle createStaticActor(const QuatTransf& myTrans) X_ABSTRACT;
+
+
+	// adding additional / initial shape to a actor.
+	virtual void addTriMesh(ActorHandle handle, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual void addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
+	virtual void addBox(ActorHandle handle, const AABB& aabb) X_ABSTRACT;
+	virtual void addSphere(ActorHandle handle, float radius) X_ABSTRACT;
+	virtual void addSCapsule(ActorHandle handle, float radius, float halfHeight) X_ABSTRACT;
 };
 
 
