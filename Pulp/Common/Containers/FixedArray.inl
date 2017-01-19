@@ -216,7 +216,7 @@ bool FixedArray<T, N>::remove(iterator position)
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::find(const Type& val) const
 {
-	T* pArr = begin();
+	const T* pArr = begin();
 
 	for (size_type i = 0; i < size_; i++)
 	{
