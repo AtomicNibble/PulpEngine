@@ -746,6 +746,8 @@ TriMeshHandle XPhysics::createTriangleMesh(const DataArr& cooked)
 	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
 	physx::PxTriangleMesh* pTriMesh = pPhysics_->createTriangleMesh(input);
 
+	X_ASSERT_NOT_NULL(pTriMesh);
+
 	return reinterpret_cast<TriMeshHandle>(pTriMesh);
 }
 
@@ -771,7 +773,8 @@ HieghtFieldHandle XPhysics::createHieghtField(const DataArr& cooked)
 ActorHandle XPhysics::createConvexMesh(const QuatTransf& myTrans, ConvexHandle convex, float density, const Vec3f& scale)
 {
 	physx::PxConvexMesh* pConvexMesh = reinterpret_cast<physx::PxConvexMesh*>(convex);
-	
+	X_ASSERT_NOT_NULL(pConvexMesh);
+
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
 	physx::PxMeshScale meshScale;
 	meshScale.rotation = physx::PxQuat::createIdentity();
@@ -790,6 +793,7 @@ ActorHandle XPhysics::createConvexMesh(const QuatTransf& myTrans, ConvexHandle c
 ActorHandle XPhysics::createTriangleMesh(const QuatTransf& myTrans, TriMeshHandle tri, float density, const Vec3f& scale)
 {
 	physx::PxTriangleMesh* pTriMesh = reinterpret_cast<physx::PxTriangleMesh*>(tri);
+	X_ASSERT_NOT_NULL(pTriMesh);
 
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
 	physx::PxMeshScale meshScale;
@@ -809,6 +813,7 @@ ActorHandle XPhysics::createTriangleMesh(const QuatTransf& myTrans, TriMeshHandl
 ActorHandle XPhysics::createHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale)
 {
 	physx::PxHeightField* pHeightField = reinterpret_cast<physx::PxHeightField*>(hf);
+	X_ASSERT_NOT_NULL(pHeightField);
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(
@@ -874,6 +879,7 @@ ActorHandle XPhysics::createBox(const QuatTransf& myTrans, const AABB& bounds, f
 ActorHandle XPhysics::createStaticTriangleMesh(const QuatTransf& myTrans, TriMeshHandle tri, const Vec3f& scale)
 {
 	physx::PxTriangleMesh* pTriMesh = reinterpret_cast<physx::PxTriangleMesh*>(tri);
+	X_ASSERT_NOT_NULL(pTriMesh);
 
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
 	physx::PxMeshScale meshScale;
@@ -893,6 +899,8 @@ ActorHandle XPhysics::createStaticTriangleMesh(const QuatTransf& myTrans, TriMes
 ActorHandle XPhysics::createStaticHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale)
 {
 	physx::PxHeightField* pHeightField = reinterpret_cast<physx::PxHeightField*>(hf);
+	X_ASSERT_NOT_NULL(pHeightField);
+
 	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(
