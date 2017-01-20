@@ -414,6 +414,8 @@ bool LvlBuilder::save(const char* name)
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_COLLISION], file);
 
+			hdr.flags.Set(LevelFileFlags::COLLISION);
+
 			// we want to wrtie the collision for each area out in blocks.
 			// each area can have multiple 
 			for (size_t i = 0; i < areas_.size(); i++)
