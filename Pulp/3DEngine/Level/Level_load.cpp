@@ -618,6 +618,8 @@ bool Level::ProcessData(void)
 	// 
 	CommonChildrenArea_r(&areaNodes_[0]);
 
+	// add the physics scene to the simulation.
+	pPhysics_->addSceneToSim(pScene_);
 
 	// stats.
 	loadStats_.elapse = pTimer_->GetTimeNowNoScale() - loadStats_.startTime;
