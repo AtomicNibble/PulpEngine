@@ -22,6 +22,7 @@ public:
 
 	void RegisterVars(void);
 	void SetScene(physx::PxScene* pScene);
+	void ClearScene(void);
 	void SetDebugDrawChangedDel(DebugDrawEnabledDel del);
 
 	const char* getDllOverrideStr(void) const;

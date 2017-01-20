@@ -564,6 +564,7 @@ bool XPhysics::removeSceneFromSim(IScene* pScene_)
 	auto idx = scenes_.find(pScene);
 	if (idx != decltype(scenes_)::invalid_index)
 	{
+		vars_.ClearScene();
 		return activeScenes_.removeIndex(idx);
 	}
 

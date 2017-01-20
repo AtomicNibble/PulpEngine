@@ -139,6 +139,11 @@ void PhysXVars::SetScene(physx::PxScene* pScene)
 	}
 }
 
+void PhysXVars::ClearScene(void)
+{
+	pScene_ = nullptr;
+}
+
 void PhysXVars::SetDebugDrawChangedDel(DebugDrawEnabledDel del)
 {
 	debugDrawChangedDel_ = del;
