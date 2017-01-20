@@ -553,39 +553,6 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 	return false;
 }
 
-int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
-{
-	int32_t	nums[2];
-
-	for ( int i = 0 ; i < 2 ; i++ )
-	{
-		if (pAreaNode->children[i] <= 0) {
-			nums[i] = -1 - pAreaNode->children[i];
-		} else {
-			nums[i] = CommonChildrenArea_r(&areaNodes_[pAreaNode->children[i]]);
-		}
-	}
-
-	// solid nodes will match any area
-	if (nums[0] == AreaNode::AREANUM_SOLID) {
-		nums[0] = nums[1];
-	}
-	if (nums[1] == AreaNode::AREANUM_SOLID) {
-		nums[1] = nums[0];
-	}
-
-	int32_t	common;
-	if ( nums[0] == nums[1] ) {
-		common = nums[0];
-	} else {
-		common = AreaNode::CHILDREN_HAVE_MULTIPLE_AREAS;
-	}
-
-	pAreaNode->commonChildrenArea = common;
-
-	return common;
-}
-
 void Level::clearVisableAreaFlags()
 {
 	core::zero_object(visibleAreaFlags_);
