@@ -535,8 +535,6 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 		return nullptr;
 	}
 
-	vars_.SetScene(scene->getPxScene());
-
 	scenes_.push_back(scene.get());
 	return scene.release();
 }
@@ -553,6 +551,8 @@ void XPhysics::addSceneToSim(IScene* pScene_)
 	auto idx = activeScenes_.find(pScene);
 	if (idx == decltype(scenes_)::invalid_index)
 	{
+		vars_.SetScene(pScene->getPxScene());
+
 		activeScenes_.push_back(pScene);
 	}
 }
