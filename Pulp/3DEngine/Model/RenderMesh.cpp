@@ -100,8 +100,7 @@ bool XRenderMesh::canRender(void) const
 		vertexStreams_[VertexStream::VERT] != render::INVALID_BUF_HANLDE;
 }
 
-bool XRenderMesh::createRenderBuffers(render::IRender* pRend,
-	render::shader::VertexFormat::Enum vertexFmt, const MeshHeader& mesh)
+bool XRenderMesh::createRenderBuffers(render::IRender* pRend, const MeshHeader& mesh, render::shader::VertexFormat::Enum vertexFmt)
 {
 	X_ASSERT_NOT_NULL(pRend);
 

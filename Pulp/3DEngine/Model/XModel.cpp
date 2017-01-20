@@ -152,7 +152,7 @@ bool XModel::createRenderBuffersForLod(size_t idx)
 {
 	const auto& raw = lodInfo_[idx];
 
-	return renderMeshes_[idx].createRenderBuffers(pRender_, hdr_.vertexFmt, raw);
+	return renderMeshes_[idx].createRenderBuffers(pRender_, raw, hdr_.vertexFmt);
 }
 
 void XModel::releaseLodRenderBuffers(size_t idx)

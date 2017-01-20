@@ -342,8 +342,7 @@ bool Level::ProcessData(void)
 			area.pMesh = pMesh;
 
 			// upload to gpu now.
-			area.renderMesh.createRenderBuffers(pRender_, render::shader::VertexFormat::P3F_T4F_C4B_N3F,
-				*area.pMesh);
+			area.renderMesh.createRenderBuffers(pRender_, *area.pMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F);
 		}
 
 		if (!cursor.isEof()) {

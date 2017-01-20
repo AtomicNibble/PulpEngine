@@ -24,7 +24,7 @@ public:
 
 	bool canRender(void) const;
 
-	bool createRenderBuffers(render::IRender* pRend, render::shader::VertexFormat::Enum vertexFmt, const MeshHeader& mesh);
+	bool createRenderBuffers(render::IRender* pRend, const MeshHeader& mesh, render::shader::VertexFormat::Enum vertexFmt);
 	void releaseRenderBuffers(render::IRender* pRend);
 
 	SizeInfo memoryUsage(render::IRender* pRend) const;
