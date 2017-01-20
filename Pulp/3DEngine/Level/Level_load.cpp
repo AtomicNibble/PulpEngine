@@ -131,6 +131,11 @@ bool Level::Load(const char* mapName)
 	loadStats_ = LoadStats();
 	loadStats_.startTime = pTimer_->GetTimeNowNoScale();
 
+	// create a physics scene.
+	if (!createPhysicsScene()) {
+		return false;
+	}
+
 	// clear it.
 	core::zero_object(fileHdr_);
 
