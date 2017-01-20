@@ -550,8 +550,8 @@ void XPhysics::addSceneToSim(IScene* pScene_)
 
 	XScene* pScene = static_cast<XScene*>(pScene_);
 
-	auto idx = scenes_.find(pScene);
-	if (idx != decltype(scenes_)::invalid_index)
+	auto idx = activeScenes_.find(pScene);
+	if (idx == decltype(scenes_)::invalid_index)
 	{
 		activeScenes_.push_back(pScene);
 	}
