@@ -31,7 +31,7 @@ namespace V2
 
 	// =============================================
 
-	X_INLINE DataSizeSplitter:: DataSizeSplitter(size_t size)
+	X_INLINE DataSizeSplitter::DataSizeSplitter(size_t size)
 		: size_(size)
 	{
 	}
@@ -39,7 +39,7 @@ namespace V2
 	template <typename T>
 	X_INLINE bool DataSizeSplitter::Split(size_t count) const
 	{
-		return (count*sizeof(T) > size_);
+		return (count * sizeof(T) > size_);
 	}
 
 	// =============================================
@@ -187,7 +187,7 @@ namespace V2
 
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
-		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction, 
+		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
 		typename DataT& data)
 	{
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
@@ -236,6 +236,17 @@ namespace V2
 		X_UNUSED(pData);
 
 	}
+
+	X_INLINE Job* JobSystem::CreateEmtpyJob(void)
+	{
+		return CreateJob(EmptyJob, nullptr);
+	}
+
+	X_INLINE Job* JobSystem::CreateEmtpyJobAsChild(Job* pPaerent)
+	{
+		return CreateJobAsChild(pPaerent, EmptyJob, nullptr);
+	}
+
 
 } // namespace V2
 

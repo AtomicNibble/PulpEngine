@@ -393,6 +393,10 @@ public:
 	// empty job used for sync.
 	X_INLINE static void EmptyJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
+	X_INLINE Job* CreateEmtpyJob(void);
+	X_INLINE Job* CreateEmtpyJobAsChild(Job* pPaerent);
+
+
 	void Run(Job* pJob);
 	void Wait(Job* pJob);
 	void WaitWithoutHelp(Job* pJob) const;
