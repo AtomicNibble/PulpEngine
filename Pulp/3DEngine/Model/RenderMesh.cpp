@@ -100,7 +100,7 @@ bool XRenderMesh::canRender(void) const
 		vertexStreams_[VertexStream::VERT] != render::INVALID_BUF_HANLDE;
 }
 
-bool XRenderMesh::createRenderBuffers(render::IRender* pRend, const MeshHeader& mesh, render::shader::VertexFormat::Enum vertexFmt)
+bool XRenderMesh::createRenderBuffers(render::IRender* pRend, const MeshHeader& mesh, VertexFormat::Enum vertexFmt)
 {
 	X_ASSERT_NOT_NULL(pRend);
 
@@ -111,6 +111,11 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend, const MeshHeader& 
 	const uint32_t tanBiStride = vertexSteamStride[VertexStream::TANGENT_BI][vertexFmt];
 
 	indexStream_ = pRend->createIndexBuffer(sizeof(model::Index), mesh.numIndexes, mesh.indexes, render::BufUsage::IMMUTABLE);
+
+	// do we always want to upload every stream also?
+	// i think not.
+	// on a per model bases we want to ommit certain streams.
+	// since if we are not going to use them it's wasted vram.
 
 
 	// we always carry vert?
@@ -148,6 +153,45 @@ void XRenderMesh::releaseRenderBuffers(render::IRender* pRend)
 			pRend->destoryVertexBuffer(vertexStreams_[i]);
 			vertexStreams_[i] = render::INVALID_BUF_HANLDE;
 		}
+	}
+}
+
+bool XRenderMesh::ensureRenderStream(render::IRender* pRend, const MeshHeader& mesh, VertexFormat::Enum vertexFmt, VertexStream::Enum stream)
+{
+	if (vertexStreams_[stream] != render::INVALID_BUF_HANLDE) {
+		return true;
+	}
+
+	// we need to make it :|
+	// the model should tell use what the vertex format of the streams is.
+	// so that we know the strides etc..
+
+	const uint32_t numVerts = mesh.numVerts;
+	const uint32_t stride = vertexSteamStride[stream][vertexFmt];
+
+	if (stride == 0) {
+		X_ERROR("RenderMesh", "Requested a device buffer for a vertex stream that is not present: \"%s\"", VertexStream::ToString(stream));
+		return false;
+	}
+
+	// make the stream :D !
+	vertexStreams_[stream] = pRend->createVertexBuffer(stride, numVerts, mesh.streams[stream], render::BufUsage::IMMUTABLE);
+	return true;
+}
+
+void XRenderMesh::releaseVertexBuffer(render::IRender* pRend, VertexStream::Enum stream)
+{
+	if (vertexStreams_[stream] != render::INVALID_BUF_HANLDE) {
+		pRend->destoryVertexBuffer(vertexStreams_[stream]);
+		vertexStreams_[stream] = render::INVALID_BUF_HANLDE;
+	}
+}
+
+void XRenderMesh::releaseIndexBuffer(render::IRender* pRend)
+{
+	if (indexStream_ != render::INVALID_BUF_HANLDE) {
+		pRend->destoryIndexBuffer(indexStream_);
+		indexStream_ = render::INVALID_BUF_HANLDE;
 	}
 }
 
