@@ -154,6 +154,25 @@ namespace V2
 		return job;
 	}
 
+
+	template<typename ClassType, typename DataT, typename>
+	X_INLINE Job* JobSystem::CreateMemberJob(ClassType* pInst,
+		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
+		typename DataT& data)
+	{
+		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
+
+		static_assert((sizeof(DataT) <= MemberCallerData::PAD_SIZE), " does not fit in job data, pass as void");
+		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
+
+		MemberCallerData jobData(pInst, pFunction, data);
+
+		Job* job = CreateJob<MemberCallerData>(&member_function_job_copy<MemberCallerData>, jobData);
+
+		return job;
+	}
+
+
 	template<typename ClassType>
 	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
 		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData)
