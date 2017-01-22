@@ -164,6 +164,16 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::emplace_back(ArgsT&&... a
 }
 
 template<typename T, size_t N>
+inline void FixedArray<T, N>::pop_back(void)
+{
+	if (size() > 0)
+	{
+		Mem::Destruct(end() - 1);
+		size_--;
+	}
+}
+
+template<typename T, size_t N>
 typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, const T& val)
 {
 	size_type off = position - begin();
@@ -274,6 +284,11 @@ bool FixedArray<T, N>::isNotEmpty(void) const
 	return size_ > 0;
 }
 
+template<typename T, size_t N>
+bool FixedArray<T, N>::empty(void) const
+{
+	return size_ == 0;
+}
 
 
 template<typename T, size_t N>

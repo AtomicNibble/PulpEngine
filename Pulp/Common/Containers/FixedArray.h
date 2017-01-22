@@ -60,10 +60,12 @@ public:
 	template<class... ArgsT>
 	inline size_type emplace_back(ArgsT&&... args);
 
+	// Removes the last element, it is deconstructed
+	inline void pop_back(void);
+
 	inline iterator insert(iterator position, const T& val);
 
 	bool removeIndex(size_type idx);
-
 	bool remove(iterator position);
 
 	// returns invalid_index when not found.
@@ -75,6 +77,8 @@ public:
 	// any iterms in the array
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
+	inline bool empty(void) const; // for stl
+
 
 	inline size_type size(void) const;
 	// returns number of elements allocated for
