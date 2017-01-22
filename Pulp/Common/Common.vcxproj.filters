@@ -1479,6 +1479,9 @@
     <None Include="Math\XSphereGen.inl">
       <Filter>Headers\Math</Filter>
     </None>
+    <None Include="Memory\MemUtil.inl">
+      <Filter>Headers\Memory</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

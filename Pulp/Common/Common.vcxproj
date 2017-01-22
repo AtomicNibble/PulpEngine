@@ -456,6 +456,7 @@
     <None Include="Memory\HeapArea.inl" />
     <None Include="Memory\MemoryArena.inl" />
     <None Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.inl" />
+    <None Include="Memory\MemUtil.inl" />
     <None Include="Memory\NewAndDelete.inl" />
     <None Include="Memory\ThreadPolicies\MultiThreadPolicy.inl" />
     <None Include="Platform\win32\Console.inl" />
