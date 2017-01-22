@@ -126,6 +126,29 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 			numTriangles -= triBatchSize;
 		}
 	}
+
+	// Text
+	uint32_t numText = debugRenderable.getNbTexts();
+	if (numText)
+	{
+		X_ASSERT_NOT_IMPLEMENTED(); // check this logic below is correct.
+
+		const physx::PxDebugText* X_RESTRICT texts = debugRenderable.getTexts();
+
+		font::TextDrawContext con;
+		
+		for (uint32_t i = 0; i < numText; i++)
+		{
+			const auto text = texts[i];
+
+			con.size.x = text.size;
+			con.size.y = text.size;
+			con.col = Color8u::hexA(text.color);
+
+			pPrimCon_->drawText(Vec3FromPx3(text.position), con, text.string);
+		}
+	}
+
 }
 
 void DebugRender::queueForRender(void)
