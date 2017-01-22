@@ -336,7 +336,7 @@ void CommandContext::writeBuffer(GpuResource& dest, size_t destOffset, const voi
 	X_ASSERT_ALIGNMENT(pData, 16, 0);
 
 	DynAlloc tempSpace = cpuLinearAllocator_.allocate(numBytes, 512);
-	core::SIMDMemCopy(tempSpace.getCpuData(), pData, divideByMultiple(numBytes, 16));
+	core::Mem::SIMDMemCopy(tempSpace.getCpuData(), pData, divideByMultiple(numBytes, 16));
 	copyBufferRegion(dest, destOffset, tempSpace.getBuffer(), tempSpace.getOffset(), numBytes);
 }
 
@@ -354,7 +354,7 @@ void CommandContext::fillBuffer(GpuResource& dest, size_t destOffset, Param val,
 	DynAlloc tempSpace = cpuLinearAllocator_.allocate(numBytes, 512);
 	__m128 VectorValue = _mm_set1_ps(val.fval);
 
-	core::SIMDMemFill(tempSpace.getCpuData(), VectorValue, divideByMultiple(numBytes, 16));
+	core::Mem::SIMDMemFill(tempSpace.getCpuData(), VectorValue, divideByMultiple(numBytes, 16));
 
 	copyBufferRegion(dest, destOffset, tempSpace.getBuffer(), tempSpace.getOffset(), numBytes);
 }
@@ -764,7 +764,7 @@ void GraphicsContext::setDynamicVB(uint32_t slot, size_t numVertices, size_t ver
 	size_t bufferSize = core::bitUtil::RoundUpToMultiple<size_t>(numVertices * vertexStride, 16u);
 	DynAlloc vb = cpuLinearAllocator_.allocate(bufferSize);
 
-	core::SIMDMemCopy(vb.getCpuData(), pVBData, bufferSize >> 4);
+	core::Mem::SIMDMemCopy(vb.getCpuData(), pVBData, bufferSize >> 4);
 
 	D3D12_VERTEX_BUFFER_VIEW VBView;
 	VBView.BufferLocation = vb.getGpuAddress();
@@ -782,7 +782,7 @@ void GraphicsContext::setDynamicIB(size_t indexCount, const uint16_t* pIBData)
 	size_t bufferSize = core::bitUtil::RoundUpToMultiple<size_t>(indexCount * sizeof(uint16_t), 16u);
 	DynAlloc ib = cpuLinearAllocator_.allocate(bufferSize);
 
-	core::SIMDMemCopy(ib.getCpuData(), pIBData, bufferSize >> 4);
+	core::Mem::SIMDMemCopy(ib.getCpuData(), pIBData, bufferSize >> 4);
 
 	D3D12_INDEX_BUFFER_VIEW IBView;
 	IBView.BufferLocation = ib.getGpuAddress();
@@ -800,7 +800,7 @@ void GraphicsContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const
 	DynAlloc cb = cpuLinearAllocator_.allocate(bufferSize);
 
 	bufferSize = core::bitUtil::RoundUpToMultiple<size_t>(bufferSize, 16u);
-	core::SIMDMemCopy(cb.getCpuData(), pBufferData, bufferSize >> 4);
+	core::Mem::SIMDMemCopy(cb.getCpuData(), pBufferData, bufferSize >> 4);
 
 	pCommandList_->SetGraphicsRootShaderResourceView(rootIndex, cb.getGpuAddress());
 }
@@ -882,7 +882,7 @@ void ComputeContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const 
 	X_ASSERT_ALIGNMENT(pBufferData, 16, 0);
 
 	DynAlloc cb = cpuLinearAllocator_.allocate(bufferSize);
-	core::SIMDMemCopy(cb.getCpuData(), pBufferData, core::bitUtil::RoundUpToMultiple<size_t>(bufferSize, 16u) >> 4);
+	core::Mem::SIMDMemCopy(cb.getCpuData(), pBufferData, core::bitUtil::RoundUpToMultiple<size_t>(bufferSize, 16u) >> 4);
 	pCommandList_->SetComputeRootShaderResourceView(rootIndex, cb.getGpuAddress());
 }
 

@@ -3,6 +3,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace Mem
+{
 
 // A faster version of memcopy that uses SSE instructions.  TODO:  Write an ARM variant if necessary.
 void SIMDMemCopy(void* __restrict _Dest, const void* __restrict _Source, size_t NumQuadwords)
@@ -125,6 +127,7 @@ void SIMDMemFill(void* __restrict _Dest, __m128 FillVector, size_t NumQuadwords)
 }
 
 
+} // namepsace Mem
 
 
 X_NAMESPACE_END

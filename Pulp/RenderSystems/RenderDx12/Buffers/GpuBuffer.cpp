@@ -175,7 +175,7 @@ void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMa
 
 	void* pDestAddress;
 	pUploadBuffer->Map(0, nullptr, &pDestAddress);
-	core::SIMDMemCopy(pDestAddress, pData, divideByMultiple(numBytes, 16));
+	core::Mem::SIMDMemCopy(pDestAddress, pData, divideByMultiple(numBytes, 16));
 	pUploadBuffer->Unmap(0, nullptr);
 
 
