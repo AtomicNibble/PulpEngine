@@ -13,13 +13,17 @@ class FixedArray
 {
 public:
 	typedef T  Type;
+	typedef T  value_type;
 	typedef T* TypePtr;
 	typedef const T* ConstTypePtr;
 	typedef T* iterator;
 	typedef const T* const_iterator;
 	typedef size_t size_type;
 	typedef T& Reference;
+	typedef T& reference;
 	typedef const T& ConstReference;
+	typedef const T& const_reference;
+
 
 	enum : size_type {
 		invalid_index = static_cast<size_type>(-1)
