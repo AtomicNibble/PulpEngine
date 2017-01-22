@@ -115,6 +115,8 @@ public:
 	bool removeIndex(size_type idx);
 	void remove(const T& item);
 
+	Iterator erase(ConstIterator first, ConstIterator last);
+
 	// returns invalid_index when not found.
 	size_type find(const Type& val) const;
 

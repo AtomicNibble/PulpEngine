@@ -619,6 +619,31 @@ void Array<T, Allocator>::remove(const T& item)
 }
 
 template<typename T, class Allocator>
+typename Array<T, Allocator>::Iterator Array<T, Allocator>::erase(ConstIterator _first, ConstIterator _last)
+{
+	if (_first == begin() && _last == end())
+	{
+		clear();
+	}
+	else if(_first != _last)
+	{
+		Iterator first = const_cast<Iterator>(_first);
+		Iterator last = const_cast<Iterator>(_last);
+
+		// move anything after what we are deleting down.
+		Iterator ptr = Mem::Move(last, end(), first);
+
+		// now we just need to deconstruct trailing.
+		const size_type num = end() - ptr;
+		Mem::DestructArray(ptr, num);
+
+		num_ -= num;
+	}
+
+	return const_cast<Iterator>(_first);
+}
+
+template<typename T, class Allocator>
 typename Array<T, Allocator>::size_type Array<T, Allocator>::find(const Type& val) const
 {
 	size_type i;
