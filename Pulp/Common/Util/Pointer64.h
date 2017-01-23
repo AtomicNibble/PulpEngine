@@ -25,8 +25,8 @@ public:
 
 	X_INLINE void* asVoid(void) const;
 
-	X_INLINE const T* operator[](int i) const;
-	X_INLINE T* operator[](int i);
+	X_INLINE const T* operator[](size_t i) const;
+	X_INLINE T* operator[](size_t i);
 
 
 private:

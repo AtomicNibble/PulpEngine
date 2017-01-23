@@ -55,11 +55,11 @@ void* Pointer64<T>::asVoid(void) const
 
 
 template<typename T>
-const T* Pointer64<T>::operator[](int i) const {
-	return ((T*)raw_ + i);
+const T* Pointer64<T>::operator[](size_t i) const {
+	return (as<T>() + i);
 }
 
 template<typename T>
-T* Pointer64<T>::operator[](int i) {
-	return ((T*)raw_ + i);
+T* Pointer64<T>::operator[](size_t i) {
+	return (as<T>() + i);
 }
