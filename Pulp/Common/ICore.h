@@ -223,7 +223,7 @@ struct SCoreGlobals // obbject is zerod on start.
 	core::MemoryArenaBase*		pArena;
 	core::MemoryArenaBase*		pStrArena;
 
-	uint32_t					uMainThreadId;		
+	uint32_t					mainThreadId;		
 
 	
 	ProfileScopeFunc::Pointer	profileScopeStart;

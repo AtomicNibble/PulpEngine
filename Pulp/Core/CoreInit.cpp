@@ -316,7 +316,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::StopWatch time;
 
 	// init the system baby!
-	gEnv->uMainThreadId = core::Thread::GetCurrentID();			
+	gEnv->mainThreadId = core::Thread::GetCurrentID();			
 
 	core::invalidParameterHandler::Startup(); 
 	core::exceptionHandler::Startup();
