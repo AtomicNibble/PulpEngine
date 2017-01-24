@@ -110,12 +110,13 @@ void XWinInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob
 		size = sizeof(input);
 		num = GetRawInputBuffer(input, &size, static_cast<UINT>(ENTRY_HDR_SIZE));
 
-		if (num == 0) {
-			break;
+		// log size even if empty
+		if (debug) {
+			X_LOG0("Input", "Buffer size: %i threadId: 0x%x", num, core::Thread::GetCurrentID());
 		}
 
-		if (debug) {
-			X_LOG0("Input", "Buffer size: %i", num);
+		if (num == 0) {
+			break;
 		}
 			
 		if (num == static_cast<UINT>(-1)) {
