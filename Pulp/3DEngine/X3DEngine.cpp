@@ -159,6 +159,8 @@ bool X3DEngine::Init(void)
 
 	level::Level::registerVars();
 
+	level_.init();
+
 	return true;
 }
 
@@ -222,10 +224,10 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-	level_.update();
-	if (level_.canRender()) {
-		level_.render();
-	}
+	level_.dispatchJobs();
+//	if (level_.canRender()) {
+//		level_.render();
+//	}
 
 	// draw me some gui baby
 	if (pGui) {
