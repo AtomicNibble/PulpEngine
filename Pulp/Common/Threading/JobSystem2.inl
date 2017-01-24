@@ -210,6 +210,7 @@ namespace V2
 		const int32_t count = (atomic::Increment(&ancestor->continuationCount) - 1);
 		X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
 
+		X_ASSERT(continuation->pParent != ancestor, "Contination can't have ancestor as parent")();
 
 		size_t threadIdx = GetThreadIndex();
 		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);

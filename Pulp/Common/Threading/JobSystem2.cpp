@@ -494,39 +494,40 @@ namespace V2
 	void JobSystem::Finish(Job* pJob, size_t threadIdx)
 	{
 		const int32_t unfinishedJobs = atomic::Decrement(&pJob->unfinishedJobs);
-		if (unfinishedJobs == 0
+		if (unfinishedJobs == 0)
+		{
+			// now i only run continuations after all child jobs are complete.
+			const int32_t continuationCount = pJob->continuationCount;
+			if (continuationCount != 0)
+			{
+				ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
+
+				const int32_t flags = pJob->runFlags;
+				for (int32_t i = 0; i < continuationCount; i++)
+				{
+					const Job::JobId& id = pJob->continuations[i];
+					ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(id.threadIdx);
+
+					Job* pContinuation = &pThreadAlloc->jobs[id.jobIdx];
+
+					// run inline?
+					if (flags != 0 && core::bitUtil::IsBitSet(flags, i)) {
+						Execute(pContinuation, threadIdx);
+					}
+					else {
+						queue->Push(pContinuation);
+					}
+				}
+				
+				// wake up other threads they may be all asleep.
+				cond_.NotifyAll();
+			}
+
 			// if we are child of a job, dec parents counter.
 			// when all child jobs are done the parent becomes complete.
-			&& pJob->pParent)
-		{
-			Finish(pJob->pParent, threadIdx);
-		}
-
-		const int32_t continuationCount = pJob->continuationCount;
-		if (continuationCount == 0) {
-			return;
-		}
-
-		// reset so we don't get run twice when child calls finish for parent.
-		atomic::Exchange(&pJob->continuationCount, 0);
-
-		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
-
-		const int32_t flags = pJob->runFlags;
-
-		for (int32_t i = 0; i < continuationCount; i++)
-		{
-			const Job::JobId& id = pJob->continuations[i];
-			ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(id.threadIdx);
-
-			Job* pContinuation = &pThreadAlloc->jobs[id.jobIdx];
-
-			// run inline?
-			if (flags != 0 && core::bitUtil::IsBitSet(flags, i)) {
-				Execute(pContinuation, threadIdx);
-			}
-			else {
-				queue->Push(pContinuation);
+			if (pJob->pParent)
+			{
+				Finish(pJob->pParent, threadIdx);
 			}
 		}
 	}
