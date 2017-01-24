@@ -305,24 +305,27 @@ TEST(Threading, JobSystem2Empty_continuations)
 
 		Member::JobClass inst;
 
-		Job* pJob = jobSys.CreateMemberJob<Member::JobClass>(&inst, &Member::JobClass::job, nullptr);
+		Job* pSyncJob = jobSys.CreateEmtpyJob();
+
+		Job* pJob = jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr);
 
 		// adds jobs that are run after the job above finished.
 		// they are also creatd as childs so the parent job waits for them.
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr), true);
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr), true);
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr));
 	
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr));
 
 		// if i make a job and it has child jobs
 		// how do i wait for them all to finish?
-
 		jobSys.Run(pJob);
-		jobSys.Wait(pJob);
+
+		jobSys.Run(pSyncJob);
+		jobSys.Wait(pSyncJob);
 
 		EXPECT_EQ(8, inst.GetCallCount());
 
