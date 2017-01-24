@@ -150,6 +150,9 @@ bool Level::Load(const char* mapName)
 	open.name = path_.c_str();
 
 	pFileSys_->AddIoRequestToQue(req);
+
+
+
 	return true;
 }
 
@@ -347,6 +350,7 @@ bool Level::ProcessData(void)
 			area.pMesh = pMesh;
 
 			// upload to gpu now.
+			// eventually I might delay load them etc.
 			area.renderMesh.createRenderBuffers(pRender_, *area.pMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F);
 		}
 
@@ -501,6 +505,7 @@ bool Level::ProcessData(void)
 				file.readObj(groupHdr);
 
 				static_assert(CollisionDataType::ENUM_COUNT == 3, "Enum count changed? this code may need updating");
+
 				// will it help the broadphase if i make these static actors not all have idenity trans
 				// but instead process everything so it's not in wordspace but 'area space'
 				auto actor = pPhysics_->createStaticActor(trans);
@@ -545,6 +550,7 @@ bool Level::ProcessData(void)
 
 
 				pScene_->addActorToScene(actor);
+
 			}
 
 		}
@@ -624,8 +630,8 @@ bool Level::ProcessData(void)
 	// stats.
 	loadStats_.elapse = pTimer_->GetTimeNowNoScale() - loadStats_.startTime;
 
-	// safe to render?
-	canRender_ = true;
+	// lock and load.
+	loaded_ = true;
 
 	X_LOG0("Level", "%s loaded in %gms",
 		path_.fileName(),

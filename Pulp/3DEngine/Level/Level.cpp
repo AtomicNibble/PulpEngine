@@ -7,6 +7,8 @@
 #include <IConsole.h>
 #include <I3DEngine.h>
 
+#include <Threading\JobSystem2.h>
+
 #include <Math\XWinding.h>
 #include "Drawing\PrimativeContext.h"
 
@@ -52,12 +54,27 @@ AreaPortal::~AreaPortal()
 
 // --------------------------------
 
+AreaVisiblePortal::AreaVisiblePortal() :
+	visibleEnts(g_3dEngineArena)
+{
+	
+}
+
+// --------------------------------
+
 Area::Area() : 
 	portals(g_3dEngineArena), 
-	visPortalPlanes(g_3dEngineArena)
+	visPortals(g_3dEngineArena),
+	visibleEnts(g_3dEngineArena),
+	cusVisPortalIdx(-1)
 {
 	areaNum = -1;
 	pMesh = nullptr;
+
+	// when loading the level we should set the proper max size
+	// so that we never resize post load.
+	visPortals.setGranularity(1);
+	visPortals.resize(4);
 }
 
 Area::~Area()
@@ -72,44 +89,6 @@ void Area::destoryRenderMesh(render::IRender* pRender)
 	renderMesh.releaseRenderBuffers(pRender);
 }
 
-bool Area::CullEnt(const AABB& wBounds, const Sphere& wSphere) const
-{
-	X_UNUSED(wBounds);
-	X_UNUSED(wSphere);
-	// work out if it's visible.
-	// the bounds and sphere are world space.
-
-	for (size_t x = 0; x < visPortalPlanes.size(); x++)
-	{
-		const PortalPlanesArr& portalPlanes = visPortalPlanes[x];
-
-		size_t numPlanes = portalPlanes.size();
-
-		// sphere
-		{
-			const Vec3f& center = wSphere.center();
-			const float radius = -wSphere.radius();
-
-			for (size_t i = 0; i < numPlanes; i++)
-			{
-				const Planef& plane = portalPlanes[i];
-
-				const float d = plane.distance(center);
-				if (d < radius) {
-					goto notVisible; // not visible in this stack, might be in another.
-				}
-			}
-
-			// if we get here we are visible.
-			// not culled.
-			return false; 
-		}
-
-	notVisible:;
-	}
-
-	return true; // culled
-}
 
 const AABB Area::getBounds(void) const
 {
@@ -175,10 +154,11 @@ Level::Level() :
 	stringTable_(g_3dEngineArena),
 	entRefs_(g_3dEngineArena),
 	modelRefs_(g_3dEngineArena),
-	staticModels_(g_3dEngineArena)
+	staticModels_(g_3dEngineArena),
+	visibleAreas_(g_3dEngineArena)
 {
-	canRender_ = false;
 	outsideWorld_ = true;
+	loaded_ = false;
 	headerLoaded_ = false;
 
 	pFileData_ = nullptr;
@@ -259,6 +239,51 @@ bool Level::init(void)
 	return true;
 }
 
+#if 1
+
+void Level::dispatchJobs(void)
+{
+	frameStats_.clear();
+
+	// here is where we work out if the level is loaded.
+	// if it's loaded we want to make visibility jobs.
+	// but first we need a job that works out what area we are in.
+
+	if (loaded_)
+	{
+		core::V2::Job* pSyncJob = pJobSys_->CreateEmtpyJob();
+
+		// find all the visible area's and create lists of all the visible static models in each area.
+		auto* pFindVisibleAreas = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FindVisibleArea_job, nullptr);
+
+		auto* pBuildvisFlags = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::BuildVisibleAreaFlags_job, nullptr);
+		auto* pRemoveDupeVis = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::MergeVisibilityArrs_job, nullptr);
+		auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr);
+		auto* pDrawStaticModels = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleStaticModels_job, nullptr);
+
+		// now inline build the vis flags for areas
+		pJobSys_->AddContinuation(pFindVisibleAreas, pBuildvisFlags, true);
+		// then dispatch a job to post proces the visible models, to create single visble lists for each area.
+		pJobSys_->AddContinuation(pFindVisibleAreas, pRemoveDupeVis, false);
+		// after we have visible areas we can begin drawing the area geo.
+		pJobSys_->AddContinuation(pFindVisibleAreas, pDrawAreaGeo, false);
+		// after the dupe visibility has been resolved we can start drawing the static models (we could run this after each are'as dupe have been removed)
+		pJobSys_->AddContinuation(pRemoveDupeVis, pDrawStaticModels, false);
+
+
+		pJobSys_->Run(pFindVisibleAreas);
+		pJobSys_->Run(pSyncJob);
+
+		pJobSys_->Wait(pSyncJob);
+		pSyncJob = nullptr;
+	}
+
+
+}
+
+#else
+
+
 void Level::update(void)
 {
 	frameStats_.clear();
@@ -268,12 +293,13 @@ void Level::update(void)
 //		cam_ = gEnv->pRender->GetCamera();
 	}
 }
+#endif
 
 void Level::free(void)
 {
 	X_ASSERT_NOT_NULL(pRender_);
 
-	canRender_ = false;
+	loaded_ = false;
 
 	for (auto& area : areas_) {
 		area.destoryRenderMesh(pRender_);
@@ -298,16 +324,11 @@ void Level::free(void)
 	}
 }
 
-bool Level::canRender(void)
-{
-	return canRender_;
-}
-
 bool Level::render(void)
 {
 	X_PROFILE_BEGIN("Level render", core::ProfileSubSys::ENGINE3D);
 
-	if (!canRender()) {
+	if (!loaded_) {
 		return false;
 	}
 
@@ -341,9 +362,7 @@ bool Level::render(void)
 
 void Level::DrawArea(const Area& area)
 {
-//	if (IsAreaVisible(area)) {
-//		return;
-//	}
+	X_ASSERT(IsAreaVisible(area), "Area should be visible when drawing")();
 
 	frameStats_.visibleAreas++;
 
@@ -427,9 +446,10 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 {
 	using namespace render;
 	X_UNUSED(areaNum);
+
 	if (sm.pModel)
 	{
-		model::XModel* pModel = static_cast<model::XModel*>(sm.pModel);
+		model::XModel* pModel = sm.pModel;
 
 		const Vec3f& pos = sm.pos;
 		const Quatf& angle = sm.angle;
@@ -498,11 +518,11 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 			}
 			else
 			{
-				const Area& area = areas_[areaNum];
+			//	const Area& area = areas_[areaNum];
 
 
 				// cull it with the portalstack planes.
-				if (area.CullEnt(wbounds, wSphere))
+			//	if (area.CullEnt(wbounds, wSphere))
 				{
 					frameStats_.culledModels++;
 					culled = true;
@@ -530,6 +550,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 		frameStats_.visibleModels++;
 		frameStats_.visibleVerts += pModel->numVerts(0);
 
+		// we arte rendering this model.
 		pModel->Render();
 		pModel->RenderBones(pPrimContex_, posMat);
 

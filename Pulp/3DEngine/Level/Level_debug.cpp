@@ -68,6 +68,8 @@ void Level::DrawPortalStacks(void) const
 		// we have a clipped shape, described by a collection of planes.
 		// how to i turn that into a visible shape.
 		// in order to create the shape we need to clip the planes with each other.
+
+#if 0
 		for (const auto& a : areas_)
 		{
 			if (!IsAreaVisible(a)) {
@@ -130,6 +132,8 @@ void Level::DrawPortalStacks(void) const
 				}
 			}
 		}
+
+#endif
 	}
 }
 

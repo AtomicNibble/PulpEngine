@@ -98,18 +98,33 @@ public:
 	PortalPlanesArr portalPlanes;
 };
 
-struct Area
+// data for each portal that can see into the area
+struct AreaVisiblePortal
 {
 	typedef core::FixedArray<Planef, PortalStack::MAX_PORTAL_PLANES + 1> PortalPlanesArr;
-	typedef core::Array<PortalPlanesArr> VisPortalsArr;
+	typedef core::Array<uint32_t> EntIdArr;
+	
+public:
+	AreaVisiblePortal();
+
+public:
+	EntIdArr visibleEnts;	// this list of ent's that are visible in the portal planes below.
+	PortalPlanesArr planes; // the planes pointing into area
+};
+
+struct Area
+{
+//	typedef core::FixedArray<Planef, PortalStack::MAX_PORTAL_PLANES + 1> PortalPlanesArr;
+//	typedef core::Array<PortalPlanesArr> VisPortalsArr;
+	typedef core::Array<AreaVisiblePortal> VisPortalsArr;
 	typedef core::Array<AreaPortal> AreaPortalArr;
+	typedef core::Array<uint32_t> EntIdArr;
 
 public:
 	Area();
 	~Area();
 
 	void destoryRenderMesh(render::IRender* pRender);
-	bool CullEnt(const AABB& bounds, const Sphere& sphere) const;
 
 	const AABB getBounds(void) const;
 
@@ -122,14 +137,22 @@ public:
 	model::XRenderMesh renderMesh;
 	// portals leading out this area.
 	AreaPortalArr portals;
-	// plane collections for this area.
-	VisPortalsArr visPortalPlanes;
+
+	// info for portals leading into this area from current camers.
+	// when this area is visible, this will contain all the portal planes that point in
+	// and also a list of visible ents through said portal.
+	int32_t cusVisPortalIdx;
+	VisPortalsArr visPortals;
+
+	// processed vis ents.
+	EntIdArr visibleEnts;
 };
 
 
 class Level : public engine::XEngineBase
 {
 	typedef core::Array<Area> AreaArr;
+	typedef core::Array<Area*> AreaPtrArr;
 	typedef core::Array<AreaNode> AreaNodeArr;
 	typedef core::Array<AreaEntRef> AreaRefsArr;
 	typedef core::Array<FileAreaRefHdr> AreaRefsHdrArr;
@@ -159,10 +182,11 @@ public:
 	static bool registerVars(void);
 
 	bool init(void);
-	void update(void);
+
+	// work out 
+	void dispatchJobs(void);
 
 	void free(void);
-	bool canRender(void);
 	bool render(void);
 
 	bool Load(const char* mapName);
@@ -183,6 +207,27 @@ private:
 	void ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
+private:
+	void FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void FloodThroughPortal_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin, int32_t areaNum, const Planef& farPlane,
+		const PortalStack* ps);
+
+	// marks the area visible and creats a job to cull the area's ent's
+	void SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t area, const PortalStack* ps = nullptr);
+
+	void CullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void BuildVisibleAreaFlags_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
+	void DrawVisibleAreaGeo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void DrawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	
+	void DrawAreaGeo(Area** pAreas, uint32_t num);
+	void DrawStaticModels(const uint32_t* pEntIds, uint32_t num);
+
+	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, const float distanceFromCam);
+
 public:
 	// util
 	size_t NumAreas(void) const;
@@ -202,8 +247,8 @@ private:
 	void BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
 		int32_t* pAreasOut, size_t maxAreas) const;
 
-	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
-		size_t numPlanes, const Planef* pPlanes);
+//	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
+//		size_t numPlanes, const Planef* pPlanes);
 
 	void FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum, const Planef& farPlane,
 		const PortalStack* ps);
@@ -223,7 +268,7 @@ private:
 private:
 	void clearVisableAreaFlags(void);
 	void SetAreaVisible(int32_t area);
-	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
+//	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
 
 private:
 	bool createPhysicsScene(void);
@@ -244,9 +289,11 @@ private:
 private:
 	FrameStats frameStats_;
 
+	core::Spinlock lock_;
+	AreaPtrArr visibleAreas_;
+
 private:
 	XCamera cam_;
-
 	int32_t camArea_;
 
 	// cleared each frame.
@@ -256,8 +303,8 @@ private:
 	// kept valid while lvl is loaded since mesh headers point to it.
 	uint8_t* pFileData_;
 
-	bool canRender_;
 	bool outsideWorld_;
+	bool loaded_;
 	bool headerLoaded_;
 	bool _pad[1];
 
