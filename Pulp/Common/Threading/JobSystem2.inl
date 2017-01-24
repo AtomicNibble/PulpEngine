@@ -212,6 +212,17 @@ namespace V2
 
 		X_ASSERT(continuation->pParent != ancestor, "Contination can't have ancestor as parent")();
 
+#if X_ENABLE_JOBSYS_PARENT_CHECK
+		// lets check all the way up to see if continuation is a child.
+		{
+			auto* pParent = continuation->pParent;
+			while (pParent) {
+				X_ASSERT(pParent  != ancestor, "Contination can't have ancestor as parent")();
+				pParent = pParent->pParent;
+			}
+		}
+#endif // !X_ENABLE_JOBSYS_PARENT_CHECK
+
 		size_t threadIdx = GetThreadIndex();
 		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);
 

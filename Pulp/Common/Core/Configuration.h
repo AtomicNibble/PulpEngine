@@ -93,6 +93,7 @@
 #   define X_ENABLE_FILE_STATS 1
 #	define X_ENABLE_DIR_WATCHER_LOGGING 1
 #	define X_ENABLE_PROFILER 0
+#	define X_ENABLE_JOBSYS_PARENT_CHECK 1
 #elif X_RELEASE
 #   define X_BUILD_TYPE "-release" 
 #	define X_ENABLE_SAFE_STATIC_CAST 1
@@ -112,6 +113,7 @@
 #   define X_ENABLE_FILE_STATS 0
 #	define X_ENABLE_DIR_WATCHER_LOGGING 0
 #	define X_ENABLE_PROFILER 0
+#	define X_ENABLE_JOBSYS_PARENT_CHECK 0
 #elif X_SUPER
 #   define X_BUILD_TYPE "-ship" 
 #	define X_ENABLE_SAFE_STATIC_CAST 0
@@ -131,6 +133,7 @@
 #   define X_ENABLE_FILE_STATS 0
 #	define X_ENABLE_DIR_WATCHER_LOGGING 0
 #	define X_ENABLE_PROFILER 0
+#	define X_ENABLE_JOBSYS_PARENT_CHECK 0
 #else
 #error "No Build Type Defined"
 #endif
