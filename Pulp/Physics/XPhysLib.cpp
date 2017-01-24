@@ -44,6 +44,10 @@ bool XPhysLib::init(void)
 	}
 
 	physx::PxTolerancesScale scale;
+	scale.length = physics::SCALE_LENGTH;
+	scale.mass = physics::SCALE_MASS;
+	scale.speed = physics::SCALE_SPEED;
+
 	if (!cooking_.init(scale, *pFoundation_, CookingMode::VerySlow)) {
 		X_ERROR("Physics", "Failed to init cooking");
 		return false;

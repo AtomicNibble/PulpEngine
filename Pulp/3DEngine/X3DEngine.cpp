@@ -135,9 +135,9 @@ bool X3DEngine::Init(void)
 	// init physics.
 	// this don't create a scene, that's done later..
 	physics::ToleranceScale scale;
-	scale.length = 1;
-	scale.mass = 1000;
-	scale.speed = 10;
+	scale.length = physics::SCALE_LENGTH;
+	scale.mass = physics::SCALE_MASS;
+	scale.speed = physics::SCALE_SPEED;
 
 	if (!pPhysics_->init(scale)) {
 		X_ERROR("3DEngine", "Failed to setup physics scene");
