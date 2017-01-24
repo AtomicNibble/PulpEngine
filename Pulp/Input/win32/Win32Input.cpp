@@ -105,6 +105,9 @@ void XWinInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob
 	const bool mouseEnabled = pMouse_->IsEnabled();
 	const bool keyboardEnabled = pKeyBoard_->IsEnabled();
 
+	// this only returns results for windows created on the same thread.
+	X_ASSERT(gEnv->mainThreadId == core::Thread::GetCurrentID(), "Input must be got from main thread")();
+
 	for (;;)
 	{
 		size = sizeof(input);
