@@ -222,6 +222,7 @@ namespace Commands
 		uint32_t baseVertex;
 
 		StateHandle stateHandle;
+		VertexBufferHandleArr vertexBuffers;
 		IndexBufferHandle indexBuffer;
 		ResourceStateBase resourceState;
 
