@@ -28,14 +28,22 @@ class TechSetDef;
 class TechDefState;
 class TechDef;
 
+struct TechDefPerm
+{
+	render::StateHandle stateHandle;
+	render::shader::IShaderPermatation* pShaderPerm;
+	render::shader::VertexFormat::Enum vertFmt;
+};
+
+
 struct MaterialTech
 {
 	// for lookup.
 	core::StrHash hash;
-	render::shader::VertexFormat::Enum vertFmt;
+	TechDefPerm* pPerm; // the tech perm this came from.
 
 	// for drawing.
-	render::StateHandle stateHandle;
+//	render::StateHandle stateHandle;
 	render::Commands::ResourceStateBase* pVariableState;
 };
 

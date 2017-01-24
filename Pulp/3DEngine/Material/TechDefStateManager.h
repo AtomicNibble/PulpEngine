@@ -8,14 +8,6 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-
-struct TechDefPerm
-{
-	render::shader::IShaderPermatation* pShaderPerm;
-	render::StateHandle stateHandle;
-};
-
-
 class TechDef
 {
 	typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderEntryArr;

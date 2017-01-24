@@ -290,8 +290,9 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// so once everything has it's state to render anything we just have to check
 	Material::Tech matTech;
 	matTech.hash = techNameHash;
-	matTech.vertFmt = vrtFmt;
-	matTech.stateHandle = pPerm->stateHandle;
+//	matTech.vertFmt = vrtFmt;
+	matTech.pPerm = pPerm;
+//	matTech.stateHandle = pPerm->stateHandle;
 	matTech.pVariableState = pVariableState;
 
 	pMat->addTech(matTech);

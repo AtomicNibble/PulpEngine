@@ -20,7 +20,7 @@ X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::V
 {
 	for (auto& tech : techs_)
 	{
-		if (tech.hash == hash && tech.vertFmt == vertFmt) {
+		if (tech.hash == hash && tech.pPerm->vertFmt == vertFmt) {
 			return &tech;
 		}
 	}
