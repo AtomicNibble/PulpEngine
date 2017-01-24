@@ -442,7 +442,7 @@ struct IInput
 	virtual void release(void) X_ABSTRACT;
 
 	// called with frame data and parent job calling.
-	virtual void Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData) X_ABSTRACT;
+	virtual void Update(core::FrameData& frameData) X_ABSTRACT;
 
 
 	virtual void ClearKeyState(void) X_ABSTRACT;
