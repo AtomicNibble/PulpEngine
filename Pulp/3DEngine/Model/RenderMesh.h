@@ -34,7 +34,6 @@ public:
 	// creates the device buffer for a given stream if don't already exsist
 	bool ensureRenderStream(render::IRender* pRend, const MeshHeader& mesh, VertexFormat::Enum vertexFmt, VertexStream::Enum stream);
 
-
 	// release a single stream, used to free up vram if a stream is unlikley to be used soon.
 	void releaseVertexBuffer(render::IRender* pRend, VertexStream::Enum stream);
 	void releaseIndexBuffer(render::IRender* pRend);
@@ -44,8 +43,11 @@ public:
 	X_INLINE bool hasVBStream(VertexStream::Enum type) const;
 	X_INLINE bool hasIBStream(void) const;
 
+	X_INLINE const render::VertexBufferHandleArr& getVBBuffers(void) const;
+	X_INLINE render::IndexBufferHandle getIBBuffer(void) const;
+
 private:
-	render::VertexBufferHandle vertexStreams_[VertexStream::ENUM_COUNT];
+	render::VertexBufferHandleArr vertexStreams_;
 	render::IndexBufferHandle indexStream_;
 };
 
