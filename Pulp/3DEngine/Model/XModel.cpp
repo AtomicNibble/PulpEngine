@@ -84,6 +84,19 @@ bool XModel::HasLods(void) const
 	return numLods() > 1;
 }
 
+size_t XModel::lodIdxForDistance(float distance) const
+{
+	// we select the lowest level lod that is visible
+	for (int32_t i = 0; i < numLods_; i++)
+	{
+		if (lodInfo_[i].lodDistance > distance) {
+			return i;
+		}
+	}
+
+	// lowest lod
+	return numLods_ - 1;
+}
 
 const AABB& XModel::bounds(void) const
 {

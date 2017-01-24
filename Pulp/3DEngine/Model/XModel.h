@@ -43,6 +43,8 @@ public:
 	int32_t numMeshTotal(void) const;
 	int32_t numVerts(size_t lodIdx) const;
 	bool HasLods(void) const;
+	size_t lodIdxForDistance(float distance) const;
+
 
 	const AABB& bounds(void) const;
 	const AABB& bounds(size_t lodIdx) const;
