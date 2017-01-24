@@ -42,7 +42,7 @@ public:
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 
-	virtual void Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData) X_OVERRIDE;
+	virtual void Update(core::FrameData& frameData) X_OVERRIDE;
 
 
 	virtual void ClearKeyState(void) X_OVERRIDE;

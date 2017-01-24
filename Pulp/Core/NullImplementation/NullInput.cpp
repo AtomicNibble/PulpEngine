@@ -60,10 +60,8 @@ void XNullInput::PostInit(void)
 
 }
 
-void XNullInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData)
+void XNullInput::Update(core::FrameData& frameData)
 {
-	X_UNUSED(jobSys);
-	X_UNUSED(pInputJob);
 	X_UNUSED(frameData);
 }
 

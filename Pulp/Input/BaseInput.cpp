@@ -108,11 +108,8 @@ void XBaseInput::PostInit(void)
 	}
 }
 
-void XBaseInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData)
+void XBaseInput::Update(core::FrameData& frameData)
 {
-	X_UNUSED(jobSys);
-	X_UNUSED(pInputJob);
-
 	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
 

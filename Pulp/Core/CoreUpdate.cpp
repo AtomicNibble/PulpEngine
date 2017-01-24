@@ -81,6 +81,10 @@ bool XCore::Update(void)
 
 	JobSystem& jobSys = *env_.pJobSys;
 
+	// we must call this on same thread as window.
+	if (env_.pInput) {
+		env_.pInput->Update(frameData);
+	}
 	// top job that we can use to wait for the chain of jobs to complete.
 	Job* pSyncJob = jobSys.CreateJob(&core::V2::JobSystem::EmptyJob, nullptr);
 
