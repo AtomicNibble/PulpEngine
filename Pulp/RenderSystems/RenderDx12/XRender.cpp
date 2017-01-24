@@ -597,20 +597,19 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				}
 				case Commands::Command::DRAW_INDEXED:
 				{
-#if 0
-					const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
+					const Commands::DrawIndexed* pDraw = reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
 
-					ApplyState(context, curState, draw.stateHandle, draw.vertexBuffers);
+					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
 					// don't bother looking up ib if same handle.
-					if (curState.indexBuffer != draw.indexBuffer) {
-						curState.indexBuffer = draw.indexBuffer;
-						const auto pIBuf = pBuffMan_->IBFromHandle(draw.indexBuffer);
+					if (curState.indexBuffer != pDraw->indexBuffer) {
+						curState.indexBuffer = pDraw->indexBuffer;
+						const auto pIBuf = pBuffMan_->IBFromHandle(pDraw->indexBuffer);
 						context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
 					}
 
-					context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
-#endif
+					context.drawIndexed(pDraw->indexCount, pDraw->startIndex, pDraw->baseVertex);
 					break;
 				}
 				case Commands::Command::COPY_CONST_BUF_DATA:
