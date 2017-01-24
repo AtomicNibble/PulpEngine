@@ -337,7 +337,7 @@ bool Level::ProcessData(void)
 			}
 
 			// set the mesh head pointers.
-			pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
+			pMesh->indexes = pMesh->subMeshHeads[0_sz]->indexes;
 
 			X_ASSERT_ALIGNMENT(pMesh->indexes.asVoid(), 16, 0);
 
