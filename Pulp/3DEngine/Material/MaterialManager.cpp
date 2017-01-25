@@ -508,7 +508,7 @@ bool XMaterialManager::InitDefaults(void)
 		}
 
 		// it's default :|
-		pDefaultMtl_->setFlags(MaterialFlag::DEFAULT);
+		pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
 	}
 
 	return true;
