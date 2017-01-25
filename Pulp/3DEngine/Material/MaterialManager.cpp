@@ -502,7 +502,7 @@ bool XMaterialManager::InitDefaults(void)
 	if (pDefaultMtl_ == nullptr)
 	{
 		// this will be data driven soon.
-		pDefaultMtl_ = createMaterial_Internal(core::string(MTL_DEFAULT_NAME));
+		pDefaultMtl_ = loadMaterialCompiled(core::string(MTL_DEFAULT_NAME));
 		if (!pDefaultMtl_) {
 			return false;
 		}
