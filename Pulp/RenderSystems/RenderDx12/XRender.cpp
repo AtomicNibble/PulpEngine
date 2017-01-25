@@ -1065,6 +1065,8 @@ D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderStageFlags sta
 StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm,
 	const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
 {
+	X_ASSERT_NOT_NULL(pPerm);
+
 	const PassState* pPassState = reinterpret_cast<const PassState*>(passHandle);
 
 	// permatations are currently compiled on creation.
