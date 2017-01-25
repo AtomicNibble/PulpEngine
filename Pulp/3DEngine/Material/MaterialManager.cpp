@@ -63,7 +63,9 @@ bool XMaterialManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
-	InitDefaults();
+	if (!InitDefaults()) {
+		return false;
+	}
 
 	ADD_COMMAND("listMaterials", Cmd_ListMaterials, core::VarFlag::SYSTEM, "List all the loaded materials");
 
@@ -495,16 +497,21 @@ XMaterialManager::MaterialResource* XMaterialManager::findMaterial_Internal(cons
 	return materials_.findAsset(name);
 }
 
-void XMaterialManager::InitDefaults(void)
+bool XMaterialManager::InitDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
 		// this will be data driven soon.
 		pDefaultMtl_ = createMaterial_Internal(core::string(MTL_DEFAULT_NAME));
+		if (!pDefaultMtl_) {
+			return false;
+		}
 
 		// it's default :|
 		pDefaultMtl_->setFlags(MaterialFlag::DEFAULT);
 	}
+
+	return true;
 }
 
 

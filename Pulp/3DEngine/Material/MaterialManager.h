@@ -66,7 +66,7 @@ private:
 	MaterialResource* createMaterial_Internal(const core::string& name);
 	MaterialResource* findMaterial_Internal(const core::string& name) const;
 
-	void InitDefaults(void);
+	bool InitDefaults(void);
 	void freeDanglingMaterials(void);
 
 private:
