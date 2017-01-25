@@ -66,6 +66,10 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
 	// this will result in all shaders been compiled and cbuffer info created.
 	render::shader::IShaderPermatation* pPerm = pRenderSys->createPermatation(stages);
+	if (!pPerm) {
+		X_ERROR("Tech", "Failed to create perm");
+		return false;
+	}
 
 	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDesc, nullptr, 0);
 
