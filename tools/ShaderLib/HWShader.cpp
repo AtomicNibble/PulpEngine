@@ -160,6 +160,8 @@ namespace shader
 					filterd.replaceAll(path.c_str(), "");
 				}
 
+				filterd.stripTrailing('\n');
+
 				X_ERROR("Shader", "Failed to compile(%x): %s", hr, filterd.c_str());
 			}
 			else
