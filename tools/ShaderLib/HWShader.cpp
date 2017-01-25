@@ -127,8 +127,13 @@ namespace shader
 		ID3DBlob* pErrorBlob = nullptr;
 
 		core::StopWatch timer;
-
 		core::string sourcName = name_ + ".fxcb.hlsl";
+
+		const char* pEntry = entryPoint_.c_str();
+		if (entryPoint_.isEmpty())
+		{
+			pEntry = DEFAULT_SHADER_ENTRY[type_];
+		}
 
 		HRESULT hr = D3DCompile(
 			source,
@@ -136,7 +141,7 @@ namespace shader
 			sourcName,
 			Shader_Macros, // pDefines
 			NULL, // pInclude
-			this->entryPoint_,
+			pEntry,
 			Util::getProfileFromType(type_),
 			D3DCompileflags_, // Flags
 			0, // Flags2
