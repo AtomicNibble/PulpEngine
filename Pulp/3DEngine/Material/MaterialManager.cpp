@@ -231,6 +231,10 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 	// now we have the tech we wnat to create a permatation of it supporting what we want.
 	TechDef* pTechDef = pTechDefState->getTech(techNameHash);
+	if (!pTechDef) {
+		X_ERROR("MatMan", "Tech not found");
+		return nullptr;
+	}
 
 	// we now have a permatation of the shader that we want.
 	// this gives us the pipeline state handle.
