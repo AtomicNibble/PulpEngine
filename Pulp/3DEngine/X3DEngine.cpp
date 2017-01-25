@@ -159,7 +159,10 @@ bool X3DEngine::Init(void)
 
 	level::Level::registerVars();
 
-	level_.init();
+	if (!level_.init()) {
+		X_ERROR("3DEngine", "Failed to init level");
+		return false;
+	}
 
 	return true;
 }
