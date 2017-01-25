@@ -689,9 +689,6 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 	// we want to remove vertex buffer handles we don't need.
 	const core::StrHash tech("unlit");
 
-	if(1)
-	return;
-
 	// now we render :D !
 	for (size_t subIdx = 0; subIdx < mesh.numSubMeshes; subIdx++)
 	{
