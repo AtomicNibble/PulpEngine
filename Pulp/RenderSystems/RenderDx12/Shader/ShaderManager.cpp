@@ -175,7 +175,7 @@ namespace shader
 				if (vars_.writeCompiledShaders())
 				{
 					if (!shaderBin_.saveShader(pHWShader)) {
-						X_WARNING("ShadersManager", "Failed to save shade to bin: \"%s\"", pHWShader->getName().c_str());
+						X_WARNING("ShadersManager", "Failed to save shader to bin: \"%s\"", pHWShader->getName().c_str());
 					}
 				}
 			}
