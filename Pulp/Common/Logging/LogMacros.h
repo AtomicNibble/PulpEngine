@@ -41,7 +41,7 @@
 	X_MULTILINE_MACRO_END
 
 
-#	define X_LOG_BULLET				core::ILog::Bullet X_PP_UNIQUE_NAME(bullet)(gEnv ? gEnv->pLog : 0);
+#	define X_LOG_BULLET				core::ILog::Bullet X_PP_UNIQUE_NAME(bullet)(gEnv ? gEnv->pLog : nullptr);
 
 
 #else
