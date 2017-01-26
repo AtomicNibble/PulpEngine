@@ -2787,11 +2787,15 @@ void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
 	}
 
 	// find the var
-	ICVar* cvar = GetCVar(pCmd->GetArg(1));
+	ICVar* pCvar = GetCVar(pCmd->GetArg(1));
+	if (pCvar) {
+		X_ERROR("Console", "var with name \"%s\" not found", pCmd->GetArg(1));
+		return;
+	}
 
-	cvar->Reset();
+	pCvar->Reset();
 
-	DisplayVarValue(cvar);
+	DisplayVarValue(pCvar);
 }
 
 void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
