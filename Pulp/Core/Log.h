@@ -32,8 +32,9 @@ public:
 
 	virtual const char* GetIndentation(void) X_OVERRIDE;
 
-	virtual void Indent() X_OVERRIDE;
-	virtual void UnIndent() X_OVERRIDE;
+	virtual void Indent(void) X_OVERRIDE;
+	virtual void UnIndent(void) X_OVERRIDE;
+
 
 private:
 	LoggerBase* listHead_;

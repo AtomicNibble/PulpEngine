@@ -28,12 +28,17 @@ namespace {
 		"|                                "
 
 	};
+
+	#define X_CALL_LOGGERS( pfnc ) \
+		for (LoggerBase* logger = listHead_; logger; logger = logger->GetNext()) \
+			logger->pfnc;
+
 }
 
 XLog::XLog() :
-listHead_(nullptr),
-listTail_(nullptr),
-logVerbosity_(0)
+	listHead_(nullptr),
+	listTail_(nullptr),
+	logVerbosity_(0)
 {
 	
 }
@@ -121,9 +126,6 @@ void XLog::UnIndent(void)
 	--logVerbosity_;
 }
 
-#define X_CALL_LOGGERS( pfnc ) \
-for (LoggerBase* logger = listHead_; logger; logger = logger->GetNext()) \
-	logger->pfnc;
 
 
 void XLog::Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* format, ...)
