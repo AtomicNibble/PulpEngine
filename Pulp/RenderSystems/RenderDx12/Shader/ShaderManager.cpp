@@ -149,7 +149,7 @@ namespace shader
 
 				core::string source;
 				if (!sourceBin_.getMergedSource(pHWShader->getSourceFileName(), source)) {
-					X_ERROR("ShadersManager", "Failed to get source for compiling: \"\"", pHWShader->getSourceFileName().c_str());
+					X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getSourceFileName().c_str());
 					return false;
 				}
 
@@ -175,7 +175,7 @@ namespace shader
 				if (vars_.writeCompiledShaders())
 				{
 					if (!shaderBin_.saveShader(pHWShader)) {
-						X_WARNING("ShadersManager", "Failed to save shade to bin: \"\"", pHWShader->getName().c_str());
+						X_WARNING("ShadersManager", "Failed to save shade to bin: \"%s\"", pHWShader->getName().c_str());
 					}
 				}
 			}
