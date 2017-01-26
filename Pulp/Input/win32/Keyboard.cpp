@@ -267,8 +267,9 @@ bool XKeyboard::IsCHAR(const InputEvent& event)
 	//  special case, numpad is only a input if numlock is active
 	if (Vkey >= KeyId::NUMPAD_0 && Vkey <= KeyId::NUMPAD_9)
 	{
-		if (event.modifiers.IsSet(ModifiersMasks::NUMLOCK))
+		if (event.modifiers.IsSet(ModifiersMasks::NUMLOCK)) {
 			return true;
+		}
 		return false;
 	}
 
@@ -309,8 +310,9 @@ char XKeyboard::Event2Char(const InputEvent& event)
 {
 	KeyId::Enum key = event.keyId;
 
-	if (key >= 256)
+	if (key >= 256) {
 		return '\0';
+	}
 
 	if (event.modifiers.IsSet(ModifiersMasks::NUMLOCK))
 	{
@@ -331,8 +333,9 @@ char XKeyboard::Event2Char(const InputEvent& event)
 
 	if (event.modifiers.IsSet(ModifiersMasks::CAPSLOCK))
 	{
-		if (event.modifiers.IsSet(ModifiersMasks::Shift))
+		if (event.modifiers.IsSet(ModifiersMasks::Shift)) {
 			return ascii_cache[key].alternate;
+		}
 		return ascii_cache[key].caps;
 	}
 	if (event.modifiers.IsSet(ModifiersMasks::Shift))
