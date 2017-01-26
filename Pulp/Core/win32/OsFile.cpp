@@ -39,7 +39,7 @@ mode_(mode)
 		IFileSys::fileModeFlags::Description DscFlag;
 		{
 			X_LOG_BULLET;
-			X_ERROR("File", "Failed top open file. Error: %s", lastError::ToString(Dsc));
+			X_ERROR("File", "Failed to open file. Error: %s", lastError::ToString(Dsc));
 			X_ERROR("File", "File: %ls", path);
 			X_ERROR("File", "Mode: %s", mode.ToString(DscFlag));
 		}
