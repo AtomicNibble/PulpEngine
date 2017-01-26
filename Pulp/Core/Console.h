@@ -269,7 +269,7 @@ private:
 	void ListVariables(const char* searchPatten = nullptr);
 
 	void DisplayVarValue(ICVar* pVar);
-	void DisplayVarInfo(ICVar* pVar);
+	void DisplayVarInfo(ICVar* pVar, bool full = false);
 
 	void AddInputChar(const char c);
 	void RemoveInputChar(bool bBackSpace);
@@ -408,6 +408,7 @@ private:
 	void Command_ListDvars(IConsoleCmdArgs* Cmd);
 	void Command_Echo(IConsoleCmdArgs* Cmd);
 	void Command_VarReset(IConsoleCmdArgs* Cmd);
+	void Command_VarDescribe(IConsoleCmdArgs* Cmd);
 	void Command_Bind(IConsoleCmdArgs* Cmd);
 	void Command_BindsClear(IConsoleCmdArgs* Cmd);
 	void Command_BindsList(IConsoleCmdArgs* Cmd);

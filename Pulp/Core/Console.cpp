@@ -500,6 +500,7 @@ void XConsole::RegisterCommnads(void)
 	ADD_COMMAND_MEMBER("quit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
 	ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
 	ADD_COMMAND_MEMBER("vreset", this, XConsole, &XConsole::Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
+	ADD_COMMAND_MEMBER("vdesc", this, XConsole, &XConsole::Command_VarDescribe, VarFlag::SYSTEM, "describes a variable");
 	ADD_COMMAND_MEMBER("seta", this, XConsole, &XConsole::Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
 	
 	ADD_COMMAND_MEMBER("bind", this, XConsole, &XConsole::Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
@@ -1782,7 +1783,7 @@ void XConsole::DisplayVarValue(ICVar* pVar)
 	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString(strBuf));
 }
 
-void XConsole::DisplayVarInfo(ICVar* pVar)
+void XConsole::DisplayVarInfo(ICVar* pVar, bool fullInfo)
 {
 	if (!pVar) {
 		return;
@@ -1790,9 +1791,19 @@ void XConsole::DisplayVarInfo(ICVar* pVar)
 
 	ICVar::FlagType::Description dsc;
 	core::ICVar::StrBuf strBuf;
-
-	X_LOG0("Dvar", "\"%s\" = %s [%s]", pVar->GetName(), pVar->GetString(strBuf),
-		pVar->GetFlags().ToString(dsc));
+	
+	if (fullInfo)
+	{
+		auto min = pVar->GetMin();
+		auto max = pVar->GetMax();
+		X_LOG0("Dvar", "^2\"%s\"^7 = '%s' min: %f max: %f [^1%s^7] Desc: \"%s\"", pVar->GetName(), pVar->GetString(strBuf), min, max,
+			pVar->GetFlags().ToString(dsc), pVar->GetDesc());
+	}
+	else
+	{
+		X_LOG0("Dvar", "^2\"%s\"^7 = %s [^1%s^7]", pVar->GetName(), pVar->GetString(strBuf),
+			pVar->GetFlags().ToString(dsc));
+	}
 }
 
 
@@ -2796,6 +2807,25 @@ void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
 	pCvar->Reset();
 
 	DisplayVarValue(pCvar);
+}
+
+
+void XConsole::Command_VarDescribe(IConsoleCmdArgs* pCmd)
+{
+	if (pCmd->GetArgCount() != 2)
+	{
+		X_WARNING("Console", "vdesc <var_name>");
+		return;
+	}
+
+	// find the var
+	ICVar* pCvar = GetCVar(pCmd->GetArg(1));
+	if (!pCvar) {
+		X_ERROR("Console", "var with name \"%s\" not found", pCmd->GetArg(1));
+		return;
+	}
+	
+	DisplayVarInfo(pCvar, true);
 }
 
 void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
