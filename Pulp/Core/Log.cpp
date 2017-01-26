@@ -91,29 +91,36 @@ void XLog::RemoveLogger(LoggerBase* logger)
 {
 	X_ASSERT_NOT_NULL(logger);
 
-	LoggerBase *prev = logger->GetPrevious();
-	LoggerBase *next = logger->GetNext();
+	LoggerBase* pPrev = logger->GetPrevious();
+	LoggerBase* pNext = logger->GetNext();
 
-	if (prev)
-		prev->SetNext(next);
-	else
-		listHead_ = next;
+	if (pPrev) {
+		pPrev->SetNext(pNext);
+	}
+	else {
+		listHead_ = pNext;
+	}
 
-	if (next)
-		next->SetPrevious(prev);
-	else
-		listTail_ = prev;
+	if (pNext) {
+		pNext->SetPrevious(pPrev);
+	}
+	else {
+		listTail_ = pPrev;
+	}
 }
 
 const char* XLog::GetIndentation(void)
 {
-	const char *result;
+	const char* pResult;
 
-	if (logVerbosity_ < 16)
-		result = INDENTATION_STRINGS[logVerbosity_];
-	else
-		result = 		"|                                  ";
-	return result;
+	if (logVerbosity_ < 16) {
+		pResult = INDENTATION_STRINGS[logVerbosity_];
+	}
+	else {
+		pResult = "|                                  ";
+	}
+
+	return pResult;
 }
 
 void XLog::Indent(void)

@@ -16,8 +16,8 @@ public:
 	XLog();
 	~XLog();
 
-	virtual void Init() X_FINAL;
-	virtual void ShutDown() X_FINAL;
+	virtual void Init(void) X_FINAL;
+	virtual void ShutDown(void) X_FINAL;
 
 	virtual void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, ...) X_FINAL;
 
