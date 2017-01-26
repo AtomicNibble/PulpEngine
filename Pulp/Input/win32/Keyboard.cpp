@@ -195,6 +195,14 @@ bool XKeyboard::Init(void)
 	VkeyCharCache_[KeyId::OEM_MINUS] = true;
 	VkeyCharCache_[KeyId::OEM_PERIOD] = true;
 
+	// always enable shit out outside of numpad :|
+	VkeyCharCache_[KeyId::NUMPAD_DIVIDE] = true;
+	VkeyCharCache_[KeyId::NUMPAD_MULTIPLY] = true;
+	VkeyCharCache_[KeyId::NUMPAD_SUBTRACT] = true;
+	VkeyCharCache_[KeyId::NUMPAD_ADD] = true;
+	VkeyCharCache_[KeyId::NUMPAD_DECIMAL] = true;
+
+
 	// setup ascii cache
 	initAsciiCache();
 
