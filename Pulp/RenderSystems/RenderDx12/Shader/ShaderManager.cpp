@@ -159,7 +159,7 @@ namespace shader
 					getShaderCompileSrc(pHWShader, src);
 
 					core::XFileScoped fileOut;
-					if (fileOut.openFile(src.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE))
+					if (fileOut.openFile(src.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE | core::fileModeFlags::SHARE))
 					{
 						fileOut.write(source.data(), source.length());
 					}
