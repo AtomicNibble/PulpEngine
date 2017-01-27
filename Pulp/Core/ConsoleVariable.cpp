@@ -59,9 +59,9 @@ namespace
 } // namespace 
 
 CVarBase::CVarBase(XConsole* pConsole, int nFlags, const char* desc) :
-Desc_(desc),
-Flags_(nFlags),
-pConsole_(pConsole)
+	Desc_(desc),
+	Flags_(nFlags),
+	pConsole_(pConsole)
 {
 	//	Name_ = sName;
 }
@@ -81,7 +81,7 @@ void CVarBase::SetDefault(const char* s)
 	X_UNUSED(s);
 }
 
-ICVar::FlagType CVarBase::GetFlags() const
+ICVar::FlagType CVarBase::GetFlags(void) const
 {
 	return Flags_;
 }
@@ -101,13 +101,13 @@ void CVarBase::SetModified(void)
 //	return Name_;
 //}
 
-const char* CVarBase::GetDesc() const
+const char* CVarBase::GetDesc(void) const
 {
 	return Desc_;
 }
 
 
-void CVarBase::Release()
+void CVarBase::Release(void)
 {
 	this->pConsole_->UnregisterVariable(GetName());
 }
@@ -118,18 +118,18 @@ ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 	return this;
 }
 
-ConsoleVarFunc CVarBase::GetOnChangeCallback()
+ConsoleVarFunc CVarBase::GetOnChangeCallback(void) const
 {
 	return changeFunc_;
 }
 
-void CVarBase::OnModified()
+void CVarBase::OnModified(void)
 {
 	Flags_.Set(VarFlag::MODIFIED);
 }
 
 
-void CVarBase::Reset()
+void CVarBase::Reset(void)
 {
 	// nothing to set here :D
 }

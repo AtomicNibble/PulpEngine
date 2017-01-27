@@ -69,7 +69,7 @@ float CVarString<T>::GetFloat(void) const
 }
 
 template<class T>
-const char* CVarString<T>::GetString(CVarBase::StrBuf& buf)
+const char* CVarString<T>::GetString(CVarBase::StrBuf& buf) const
 { 
 	X_UNUSED(buf);
 	return String_.c_str(); 
@@ -106,7 +106,7 @@ void CVarString<T>::Set(const int i)
 }
 
 template<class T>
-VarFlag::Enum CVarString<T>::GetType(void)
+VarFlag::Enum CVarString<T>::GetType(void) const
 {
 	return VarFlag::STRING;
 }
@@ -125,25 +125,25 @@ const char* CVarString<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-float CVarString<T>::GetMin(void)
+float CVarString<T>::GetMin(void) const
 { 
 	return 0.f; 
 }
 
 template<class T>
-float CVarString<T>::GetMax(void)
+float CVarString<T>::GetMax(void) const
 {
 	return 0.f; 
 }
 
 template<class T>
-int32_t CVarString<T>::GetMinInt(void)
+int32_t CVarString<T>::GetMinInt(void) const
 {
 	return 0;
 }
 
 template<class T>
-int32_t CVarString<T>::GetMaxInt(void)
+int32_t CVarString<T>::GetMaxInt(void) const
 {
 	return 0;
 }
@@ -187,7 +187,7 @@ float CVarInt<T>::GetFloat(void) const
 }
 
 template<class T>
-const char* CVarInt<T>::GetString(CVarBase::StrBuf& buf)
+const char* CVarInt<T>::GetString(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%d", IntValue_);
 	return buf;
@@ -235,7 +235,7 @@ void CVarInt<T>::Set(const int i)
 }
 
 template<class T>
-VarFlag::Enum CVarInt<T>::GetType(void)
+VarFlag::Enum CVarInt<T>::GetType(void) const
 { 
 	return VarFlag::INT;
 }
@@ -256,26 +256,26 @@ const char* CVarInt<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-float CVarInt<T>::GetMin(void)
+float CVarInt<T>::GetMin(void) const
 { 
 	return static_cast<float>(IntMin_); 
 }
 
 template<class T>
-float CVarInt<T>::GetMax(void)
+float CVarInt<T>::GetMax(void) const
 { 
 	return static_cast<float>(IntMax_);
 }
 
 
 template<class T>
-int32_t CVarInt<T>::GetMinInt(void)
+int32_t CVarInt<T>::GetMinInt(void) const
 {
 	return IntMin_;
 }
 
 template<class T>
-int32_t CVarInt<T>::GetMaxInt(void)
+int32_t CVarInt<T>::GetMaxInt(void) const
 {
 	return IntMax_;
 }
@@ -319,7 +319,7 @@ float CVarFloat<T>::GetFloat(void) const
 }
 
 template<class T>
-const char* CVarFloat<T>::GetString(CVarBase::StrBuf& buf)
+const char* CVarFloat<T>::GetString(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%f", fValue_);
 	return buf;
@@ -416,7 +416,7 @@ void CVarFloat<T>::Set(const int i)
 }
 
 template<class T>
-VarFlag::Enum CVarFloat<T>::GetType(void)
+VarFlag::Enum CVarFloat<T>::GetType(void) const
 { 
 	return VarFlag::FLOAT; 
 }
@@ -435,25 +435,25 @@ const char* CVarFloat<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 }
 
 template<class T> 
-float CVarFloat<T>::GetMin(void)
+float CVarFloat<T>::GetMin(void) const
 { 
 	return fMin_; 
 }
 
 template<class T>
-float CVarFloat<T>::GetMax(void)
+float CVarFloat<T>::GetMax(void) const
 { 
 	return fMax_; 
 }
 
 template<class T>
-int32_t CVarFloat<T>::GetMinInt(void)
+int32_t CVarFloat<T>::GetMinInt(void) const
 {
 	return static_cast<int32_t>(fMin_);
 }
 
 template<class T>
-int32_t CVarFloat<T>::GetMaxInt(void)
+int32_t CVarFloat<T>::GetMaxInt(void) const
 {
 	return static_cast<int32_t>(fMax_);
 }
@@ -495,7 +495,7 @@ float CVarIntRef::GetFloat(void) const
 }
 
 
-const char* CVarIntRef::GetString(CVarBase::StrBuf& buf)
+const char* CVarIntRef::GetString(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%d", GetInteger());
 	return buf;
@@ -536,7 +536,7 @@ void CVarIntRef::Set(const int i)
 }
 
 
-VarFlag::Enum CVarIntRef::GetType(void)
+VarFlag::Enum CVarIntRef::GetType(void) const
 {
 	return VarFlag::INT; 
 }
@@ -561,25 +561,25 @@ const char* CVarIntRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 }
 
 
-float CVarIntRef::GetMin(void)
+float CVarIntRef::GetMin(void) const
 { 
 	return static_cast<float>(IntMin_); 
 }
 
 
-float CVarIntRef::GetMax(void)
+float CVarIntRef::GetMax(void) const
 { 
 	return static_cast<float>(IntMax_); 
 }
 
 
-int32_t CVarIntRef::GetMinInt(void)
+int32_t CVarIntRef::GetMinInt(void) const
 {
 	return IntMin_;
 }
 
 
-int32_t CVarIntRef::GetMaxInt(void)
+int32_t CVarIntRef::GetMaxInt(void) const
 {
 	return IntMax_;
 }
@@ -622,7 +622,7 @@ float CVarFloatRef::GetFloat(void) const
 }
 
 
-const char* CVarFloatRef::GetString(CVarBase::StrBuf& buf)
+const char* CVarFloatRef::GetString(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%g", fValue_);
 	return buf;
@@ -704,7 +704,7 @@ void CVarFloatRef::Set(const int i)
 }
 
 
-VarFlag::Enum CVarFloatRef::GetType(void)
+VarFlag::Enum CVarFloatRef::GetType(void) const
 { 
 	return VarFlag::FLOAT;
 }
@@ -723,24 +723,24 @@ const char* CVarFloatRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 }
 
 
-float CVarFloatRef::GetMin(void)
+float CVarFloatRef::GetMin(void) const
 { 
 	return fMin_; 
 }
 
 
-float CVarFloatRef::GetMax(void)
+float CVarFloatRef::GetMax(void) const
 { 
 	return fMax_; 
 }
 
-int32_t CVarFloatRef::GetMinInt(void)
+int32_t CVarFloatRef::GetMinInt(void) const
 {
 	return static_cast<int32_t>(fMin_);
 }
 
 
-int32_t CVarFloatRef::GetMaxInt(void)
+int32_t CVarFloatRef::GetMaxInt(void) const
 {
 	return static_cast<int32_t>(fMax_);
 }
@@ -773,7 +773,7 @@ float CVarColRef::GetFloat(void) const
 	return 0.f; 
 }
 
-const char* CVarColRef::GetString(CVarBase::StrBuf& buf)
+const char* CVarColRef::GetString(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%g %g %g %g", ColValue_.r,
 		ColValue_.g, ColValue_.b, ColValue_.a);
@@ -813,29 +813,29 @@ void CVarColRef::Reset(void)
 	ColValue_ = ColDefault_;
 }
 
-VarFlag::Enum CVarColRef::GetType(void)
+VarFlag::Enum CVarColRef::GetType(void) const
 { 
 	return VarFlag::COLOR;
 }
 
-float CVarColRef::GetMin(void)
+float CVarColRef::GetMin(void) const
 { 
 	return 0.f; 
 }
 
-float CVarColRef::GetMax(void)
+float CVarColRef::GetMax(void) const
 { 
 	return 1.f; 
 }
 
 
-int32_t CVarColRef::GetMinInt(void)
+int32_t CVarColRef::GetMinInt(void) const
 {
 	return 0;
 }
 
 
-int32_t CVarColRef::GetMaxInt(void)
+int32_t CVarColRef::GetMaxInt(void) const
 {
 	return 1;
 }
@@ -877,7 +877,7 @@ float CVarVec3Ref::GetFloat(void) const
 	return 0.f; 
 }
 
-const char* CVarVec3Ref::GetString(CVarBase::StrBuf& buf)
+const char* CVarVec3Ref::GetString(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%g %g %g", Value_.x,
 		Value_.y, Value_.z);
@@ -915,27 +915,27 @@ void CVarVec3Ref::Reset(void)
 	Value_ = Default_;
 }
 
-VarFlag::Enum CVarVec3Ref::GetType(void)
+VarFlag::Enum CVarVec3Ref::GetType(void) const
 { 
 	return VarFlag::VECTOR; 
 }
 
-float CVarVec3Ref::GetMin(void)
+float CVarVec3Ref::GetMin(void) const
 { 
 	return 0.f; 
 }
 
-float CVarVec3Ref::GetMax(void)
+float CVarVec3Ref::GetMax(void) const
 { 
 	return 1.f; 
 }
 
-int32_t CVarVec3Ref::GetMinInt(void)
+int32_t CVarVec3Ref::GetMinInt(void) const
 {
 	return 0;
 }
 
-int32_t CVarVec3Ref::GetMaxInt(void)
+int32_t CVarVec3Ref::GetMaxInt(void) const
 {
 	return 1;
 }

@@ -144,7 +144,7 @@ struct ICVar
 
 	virtual int GetInteger(void) const X_ABSTRACT;
 	virtual float GetFloat(void) const X_ABSTRACT;
-	virtual const char* GetString(StrBuf& buf) X_ABSTRACT;
+	virtual const char* GetString(StrBuf& buf) const X_ABSTRACT;
 
 	virtual void SetDefault(const char* s) X_ABSTRACT;
 	virtual void Set(const char* s) X_ABSTRACT;
@@ -156,18 +156,18 @@ struct ICVar
 	virtual FlagType GetFlags(void) const X_ABSTRACT;
 	virtual FlagType SetFlags(FlagType flags) X_ABSTRACT;
 	virtual void SetModified(void) X_ABSTRACT;
-	virtual float GetMin(void) X_ABSTRACT;
-	virtual float GetMax(void) X_ABSTRACT;
-	virtual int32_t GetMinInt(void) X_ABSTRACT;
-	virtual int32_t GetMaxInt(void) X_ABSTRACT;
+	virtual float GetMin(void) const X_ABSTRACT;
+	virtual float GetMax(void) const X_ABSTRACT;
+	virtual int32_t GetMinInt(void) const X_ABSTRACT;
+	virtual int32_t GetMaxInt(void) const X_ABSTRACT;
 
-	virtual VarFlag::Enum GetType(void) X_ABSTRACT;
+	virtual VarFlag::Enum GetType(void) const X_ABSTRACT;
 
 	virtual void Release(void) X_ABSTRACT;
 	virtual void Reset(void) X_ABSTRACT; // reset to default value.
 
 	virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_ABSTRACT;
-	virtual ConsoleVarFunc GetOnChangeCallback(void) X_ABSTRACT;
+	virtual ConsoleVarFunc GetOnChangeCallback(void) const X_ABSTRACT;
 };
 
 
