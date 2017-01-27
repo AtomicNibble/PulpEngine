@@ -574,7 +574,7 @@ void XConsole::SaveChangedVars(void)
 	{
 		if (file.openFile(userConfigPath.c_str(), fileMode::READ | fileMode::SHARE))
 		{
-			const auto size = file.remainingBytes();
+			const auto size = safe_static_cast<size_t>(file.remainingBytes());
 
 			keep.setGranularity(32);
 			buf.resize(size);
