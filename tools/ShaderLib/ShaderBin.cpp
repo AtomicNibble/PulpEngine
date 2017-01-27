@@ -136,35 +136,39 @@ namespace shader
 		core::Path<char> path;
 		getShaderCompileDest(pShader, path);
 
+		// do the compression pre lock
+		typedef core::Array<uint8_t> DataArr;
+
+		DataArr compressed(scratchArena_);
+		const DataArr* pData = &byteCode;
+
+		if (hdr.flags.IsSet(BinFileFlag::COMPRESSED))
+		{
+			core::Compression::Compressor<core::Compression::LZ4> comp;
+
+			if (!comp.deflate(scratchArena_, byteCode, compressed, core::Compression::CompressLevel::NORMAL))
+			{
+				X_ERROR("Shader", "Failed to defalte data");
+				return false;
+			}
+
+			hdr.deflatedLength = safe_static_cast<uint32_t, size_t>(compressed.size());
+
+			pData = &compressed;
+		}
+
+		// just lock while we save, keep it simple.
+		// i don't think we'll see much contention.
+		core::CriticalSection::ScopedLock lock(cs_);
+
 		core::XFileScoped file;
 		if (file.openFile(path.c_str(), core::fileMode::WRITE | core::fileMode::RECREATE))
 		{
-			typedef core::Array<uint8_t> DataArr;
-
-			DataArr compressed(scratchArena_);
-			const DataArr* pData = &byteCode;
-
-			// need to compress before writing header.
-			if (hdr.flags.IsSet(BinFileFlag::COMPRESSED))
-			{
-				core::Compression::Compressor<core::Compression::LZ4> comp;
-
-				if (!comp.deflate(scratchArena_, byteCode, compressed, core::Compression::CompressLevel::NORMAL))
-				{
-					X_ERROR("Shader", "Failed to defalte data");
-					return false;
-				}
-
-				hdr.deflatedLength = safe_static_cast<uint32_t, size_t>(compressed.size());
-
-				pData = &compressed;
-			}
 			X_ASSERT_NOT_NULL(pData);
 
 			file.write(hdr);
 
-			for (const auto& cb : cbuffers)
-			{
+			for (const auto& cb : cbuffers) {
 				cb.SSave(file.GetFile());
 			}
 
@@ -179,7 +183,7 @@ namespace shader
 			return false;
 		}
 
-		updateCacheCrc(path, pShader->getSourceCrc32());
+		updateCacheCrc(lock, path, pShader->getSourceCrc32());
 		return true;
 	}
 
@@ -204,7 +208,7 @@ namespace shader
 		core::zero_object(hdr);
 
 		core::XFileScoped file;
-		if (file.openFile(path.c_str(), core::fileMode::READ))
+		if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
 		{
 			file.readObj(hdr);
 
@@ -311,6 +315,8 @@ namespace shader
 
 	bool ShaderBin::cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const
 	{
+		core::CriticalSection::ScopedLock lock(cs_);
+
 		auto it = cache_.find(X_CONST_STRING(path.c_str()));
 		if (it != cache_.end()) {
 			if (it->second != sourceCrc32) {
@@ -323,9 +329,15 @@ namespace shader
 
 	void ShaderBin::updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32)
 	{
-		cache_.insert(std::make_pair(core::string(path.c_str()), sourceCrc32));
+		core::CriticalSection::ScopedLock lock(cs_);
+
+		updateCacheCrc(lock, path, sourceCrc32);
 	}
 
+	void ShaderBin::updateCacheCrc(const core::CriticalSection::ScopedLock& lock, core::Path<char>& path, uint32_t sourceCrc32)
+	{
+		cache_.insert(std::make_pair(core::string(path.c_str()), sourceCrc32));
+	}
 
 	void ShaderBin::getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut)
 	{

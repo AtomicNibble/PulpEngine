@@ -29,6 +29,7 @@ namespace shader
 		// saves opening it.
 		bool cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const;
 		void updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32);
+		void updateCacheCrc(const core::CriticalSection::ScopedLock& lock, core::Path<char>& path, uint32_t sourceCrc32);
 
 	private:
 		void getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut);
@@ -41,6 +42,8 @@ namespace shader
 		// any point caching these?
 		// maybe caching the hashes might be worth it.
 		HashCacheMap cache_;
+
+		mutable core::CriticalSection cs_;
 	};
 
 } // namespace shader
