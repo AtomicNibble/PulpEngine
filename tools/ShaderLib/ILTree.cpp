@@ -6,6 +6,11 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
+	namespace
+	{
+		core::CriticalSection cs;
+	}
+
 
 	ILTreeNode::ILTreeNode() 
 	{
@@ -33,6 +38,8 @@ namespace shader
 
 	const ILTreeNode* ILTreeNode::getILTree(void)
 	{
+		core::CriticalSection::ScopedLock lock(cs);
+
 		// all the posible node types.
 		static ILTreeNode blank;
 		static ILTreeNode pos("POSITION");
@@ -68,18 +75,29 @@ namespace shader
 		// TB3F  TB10
 		//
 
-		ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
-		uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
-			AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
-			AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
-			AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
+		static bool isInit = false;
 
-		// double text coords.
-		uvBase.AddChild(uv2).
-			AddChild(col2).
-			AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM);
+		if (isInit)
+		{
+			return &blank;
+		}
+		else
+		{
+			isInit = true;
 
-		return &blank;
+			ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
+			uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
+				AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
+				AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
+				AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
+
+			// double text coords.
+			uvBase.AddChild(uv2).
+				AddChild(col2).
+				AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM);
+
+			return &blank;
+		}
 	}
 
 	void ILTreeNode::free(void)
