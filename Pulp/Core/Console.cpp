@@ -554,18 +554,76 @@ void XConsole::SaveChangedVars(void)
 	X_LOG0("Console", "Saving moified vars");
 
 	core::XFileScoped file;
-	core::fileModeFlags mode;
-
-	mode.Set(fileMode::WRITE);
-	mode.Set(fileMode::RECREATE);
 
 #if X_ENABLE_CONFIG_HOT_RELOAD
 	ignoreHotReload_ = true;
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD
 
-	if (file.openFile("config//user_config.cfg", mode))
+
+	core::Path<char> userConfigPath("config//user_config.cfg");
+
+	// we need to handle the case where a modified var is in the config
+	// but we are shutting down before that var has been registerd again.
+	// so it won't get saved out into the new one.
+	// so i'm going to parse the exsisting config and keep any var sets that are for vars that don't currently exsist.
+
+	core::Array<char> buf(g_coreArena);
+	core::Array<core::StringRange<char>> keep(g_coreArena);
+
+	if (gEnv->pFileSys->fileExists(userConfigPath.c_str()))
+	{
+		if (file.openFile(userConfigPath.c_str(), fileMode::READ | fileMode::SHARE))
+		{
+			const auto size = file.remainingBytes();
+
+			keep.setGranularity(32);
+			buf.resize(size);
+			if (file.read(buf.data(), size) != size)
+			{
+				X_ERROR("Console", "Failed to read exsisiting config file data");
+			}
+			else
+			{
+				core::StringTokenizer<char> tokenizer(buf.begin(), buf.end(), '\n');
+				StringRange<char> line(nullptr, nullptr);
+
+				// we save this file so it should only have 'seta' in but lets not error if something else.
+				while (tokenizer.ExtractToken(line))
+				{
+					core::StringTokenizer<char> lineTokenizer(line.GetStart(), line.GetEnd(), ' ');
+					StringRange<char> token(nullptr, nullptr);
+
+					if (lineTokenizer.ExtractToken(token) && core::strUtil::IsEqual(token.GetStart(), token.GetEnd(), "seta"))
+					{
+						// get the name.
+						if (lineTokenizer.ExtractToken(token))
+						{
+							// work out if we have this var.
+							core::StackString256 name(token.GetStart(), token.GetEnd());
+
+							ICVar* pVar = GetCVar(name.c_str());
+							if (!pVar)
+							{
+								keep.push_back(line);
+							}
+						}
+					}
+				}
+			}
+
+			file.close();
+		}
+	}
+
+
+	if (file.openFile(userConfigPath.c_str(), fileMode::WRITE | fileMode::RECREATE))
 	{
 		file.writeStringNNT("// auto generated\n");
+
+		for (auto& k : keep)
+		{
+			file.writeString(k.GetStart(), k.GetLength());
+		}
 
 		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
 		{
