@@ -158,6 +158,10 @@ namespace shader
 					core::Path<char> srcPath;
 					getShaderCompileSrc(pHWShader, srcPath);
 
+					// we need to lock on a per file bases ideally.
+					// but lets just global lock as it's simpler.
+					core::CriticalSection::ScopedLock lock(sourceCs_);
+
 					core::XFileScoped fileOut;
 					if (fileOut.openFile(srcPath.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE | core::fileModeFlags::SHARE))
 					{
