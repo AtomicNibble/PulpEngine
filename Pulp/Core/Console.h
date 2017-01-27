@@ -269,7 +269,7 @@ private:
 	void ListVariables(const char* searchPatten = nullptr);
 
 	void DisplayVarValue(ICVar* pVar);
-	void DisplayVarInfo(ICVar* pVar, bool full = false);
+	void DisplayVarInfo(const ICVar* pVar, bool full = false);
 
 	void AddInputChar(const char c);
 	void RemoveInputChar(bool bBackSpace);

@@ -1841,7 +1841,7 @@ void XConsole::DisplayVarValue(ICVar* pVar)
 	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString(strBuf));
 }
 
-void XConsole::DisplayVarInfo(ICVar* pVar, bool fullInfo)
+void XConsole::DisplayVarInfo(const ICVar* pVar, bool fullInfo)
 {
 	if (!pVar) {
 		return;
