@@ -947,19 +947,17 @@ void XCore::UnRegisterAssertHandler(IAssertHandler* errorHandler)
 
 void XCore::OnAssert(const core::SourceInfo& sourceInfo)
 {
-	core::Array<IAssertHandler*>::ConstIterator end = assertHandlers_.end();
-	for (core::Array<IAssertHandler*>::ConstIterator it = assertHandlers_.begin(); it != end; ++it)
+	for (auto* pHandler : assertHandlers_)
 	{
-		(*it)->OnAssert(sourceInfo);
+		pHandler->OnAssert(sourceInfo);
 	}
 }
 
 void XCore::OnAssertVariable(const core::SourceInfo& sourceInfo)
 {
-	core::Array<IAssertHandler*>::ConstIterator end = assertHandlers_.end();
-	for (core::Array<IAssertHandler*>::ConstIterator it = assertHandlers_.begin(); it != end; ++it)
+	for (auto* pHandler : assertHandlers_)
 	{
-		(*it)->OnAssertVariable(sourceInfo);
+		pHandler->OnAssertVariable(sourceInfo);
 	}
 }
 
