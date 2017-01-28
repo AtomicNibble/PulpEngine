@@ -21,6 +21,7 @@ namespace shader
 		SHADERLIB_EXPORT ShaderBin(core::MemoryArenaBase* arena);
 		SHADERLIB_EXPORT ~ShaderBin();
 
+		// this is thread safe if saveShader and loadShader are not called for the same instance, must be diffrent instances.
 		SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader);
 		SHADERLIB_EXPORT bool loadShader(XHWShader* pShader);
 
@@ -29,7 +30,6 @@ namespace shader
 		// saves opening it.
 		bool cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const;
 		void updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32);
-		void updateCacheCrc(const core::CriticalSection::ScopedLock& lock, core::Path<char>& path, uint32_t sourceCrc32);
 
 	private:
 		void getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut);

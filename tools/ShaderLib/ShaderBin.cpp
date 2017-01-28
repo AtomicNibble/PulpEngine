@@ -157,9 +157,6 @@ namespace shader
 			pData = &compressed;
 		}
 
-		// just lock while we save, keep it simple.
-		// i don't think we'll see much contention.
-		core::CriticalSection::ScopedLock lock(cs_);
 
 		core::XFileScoped file;
 		if (file.openFile(path.c_str(), core::fileMode::WRITE | core::fileMode::RECREATE))
@@ -183,7 +180,7 @@ namespace shader
 			return false;
 		}
 
-		updateCacheCrc(lock, path, pShader->getSourceCrc32());
+		updateCacheCrc(path, pShader->getSourceCrc32());
 		return true;
 	}
 
@@ -331,11 +328,6 @@ namespace shader
 	{
 		core::CriticalSection::ScopedLock lock(cs_);
 
-		updateCacheCrc(lock, path, sourceCrc32);
-	}
-
-	void ShaderBin::updateCacheCrc(const core::CriticalSection::ScopedLock& lock, core::Path<char>& path, uint32_t sourceCrc32)
-	{
 		cache_.insert(std::make_pair(core::string(path.c_str()), sourceCrc32));
 	}
 
