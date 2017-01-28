@@ -1,14 +1,18 @@
 #include "stdafx.h"
 #include "PipelineState.h"
-
 #include "RootSignature.h"
+
+#include <Threading\JobSystem2.h>
+
+#include <IConsole.h>
 
 X_NAMESPACE_BEGIN(render)
 
 
 PSODeviceCache::PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
 	pDevice_(pDevice),
-	cache_(arena, 32)
+	cache_(arena, 32),
+	helpWithWorkonPSOStall_(0)
 {
 
 }
@@ -16,6 +20,17 @@ PSODeviceCache::PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevi
 PSODeviceCache::~PSODeviceCache()
 {
 	destoryAll();
+
+	if (gEnv && gEnv->pConsole) {
+		gEnv->pConsole->UnregisterVariable("r_pso_stall_help_with_work");
+	}
+}
+
+void PSODeviceCache::registerVars(void)
+{
+	ADD_CVAR_REF("r_pso_stall_help_with_work", helpWithWorkonPSOStall_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"When waiting for a PSO to finish compiling on another thread, help process worker jobs");
+
 }
 
 void PSODeviceCache::destoryAll(void)
@@ -60,21 +75,33 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
 		HRESULT hr = pDevice_->CreateGraphicsPipelineState(&gpsoDesc, IID_PPV_ARGS(pPSO));
 		if (FAILED(hr)) {
 			X_ERROR("Dx12", "Failed to create graphics PSO: %" PRIu32, hr);
-			// if another thread is waiting below it will keep waiting.
+			
+			// so other threads waiting can find out that this failed.
+			*pPSORef = reinterpret_cast<ID3D12PipelineState*>(INVALID_PSO);
 			return false;
 		}
 
 		*pPSORef = *pPSO;
 	}
-	else
+	else // if(*pPSORef == nullptr)
 	{
-		// if might of been inserted but not finished compiling, so wait.
-		while (*pPSORef == nullptr) {
-			core::Thread::Yield();
-		}
-		*pPSO = *pPSORef;
+		// wait for it to finish compiling on another thread.
+		while (*pPSORef == nullptr)
+		{
+			if (!helpWithWorkonPSOStall_ || !gEnv->pJobSys->HelpWithWork())
+			{
+				core::Thread::Yield();
+			}
+		}	
 	}
 
+	// did it fail to compile?
+	if (reinterpret_cast<uintptr_t>(*pPSORef) == INVALID_PSO) {
+		X_ERROR("Dx12", "Failed to create graphics PSO(cache)");
+		return false;
+	}
+
+	*pPSO = *pPSORef;
 	return true;
 }
 

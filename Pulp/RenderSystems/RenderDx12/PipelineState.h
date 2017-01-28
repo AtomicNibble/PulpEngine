@@ -90,11 +90,15 @@ private:
 class PSODeviceCache
 {
 	typedef core::Hash::xxHash64::HashVal HashVal;
-	typedef core::HashMap<HashVal, ID3D12PipelineState* > PSOMap;
+	typedef core::HashMap<HashVal, ID3D12PipelineState*> PSOMap;
+
+	static const uintptr_t INVALID_PSO = std::numeric_limits<uintptr_t>::max();
+
 public:
 	PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
 	~PSODeviceCache();
 
+	void registerVars(void);
 	void destoryAll(void);
 
 	bool compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D12PipelineState** pPSO);
@@ -108,6 +112,8 @@ private:
 	core::CriticalSection cacheLock_;
 	ID3D12Device* pDevice_;
 	PSOMap cache_;
+
+	int32_t helpWithWorkonPSOStall_;
 };
 
 
