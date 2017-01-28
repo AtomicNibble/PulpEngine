@@ -78,7 +78,7 @@ namespace shader
 
 	bool XHWShader::compileFromSource(core::string& source)
 	{
-		X_LOG0("Shader", "Compiling shader: \"%s\"", name_.c_str());
+		X_LOG0("Shader", "Compiling shader: \"%s\" tid: %" PRIX32, name_.c_str(), core::Thread::GetCurrentID());
 
 		D3DCompileflags_ = 0;
 
