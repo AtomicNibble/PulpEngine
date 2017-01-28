@@ -1,4 +1,3 @@
-#pragma once
 
 X_NAMESPACE_BEGIN(core)
 
