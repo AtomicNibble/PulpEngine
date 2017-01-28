@@ -6,6 +6,7 @@
 
 
 #include <Threading\AtomicInt.h>
+#include <Threading\ScopedLock.h>
 #include <Containers\HashMap.h>
 #include <Containers\Array.h>
 #include <Containers\Fifo.h>
@@ -234,27 +235,7 @@ public:
 
 	typedef typename ResourceMap::iterator ResourceItor;
 	typedef typename ResourceMap::const_iterator ResourceConstItor;
-
-private:
-	class ScopedLock
-	{
-	public:
-		inline explicit ScopedLock(ThreadPolicy& policy) :
-			policy_(policy)
-		{
-			policy_.Enter();
-		}
-
-		inline ~ScopedLock(void) {
-			policy_.Leave();
-		}
-
-	private:
-		X_NO_COPY(ScopedLock);
-		X_NO_ASSIGN(ScopedLock);
-
-		ThreadPolicy& policy_;
-	};
+	typedef typename ThreadPolicy ThreadPolicy;
 
 public:
 	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
@@ -266,9 +247,14 @@ public:
 		list_.reserve(MaxAssets);
 	}
 
+	X_INLINE ThreadPolicy& getThreadPolicy(void) const
+	{
+		return threadPolicy_;
+	}
+
 	X_INLINE void free(void)
 	{
-		ScopedLock lock(threadPolicy_);
+		core::ScopedLock<ThreadPolicy> lock(threadPolicy_);
 
 		for (const auto& it : hash_) {
 			Pool::free(it.second);
@@ -282,8 +268,6 @@ public:
 		X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
 			"asset name has invalid slash")(name.c_str());
 	
-		ScopedLock lock(threadPolicy_);
-
 		auto it = hash_.find(name);
 		if (it != hash_.end()) {
 			return it->second;
@@ -302,8 +286,6 @@ public:
 	{
 		X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
 			"asset name has invalid slash")(name.c_str());
-
-		ScopedLock lock(threadPolicy_);
 
 		Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
 
@@ -330,10 +312,11 @@ public:
 
 	X_INLINE void releaseAsset(Resource* pRes)
 	{
+		core::ScopedLock<ThreadPolicy> lock(threadPolicy_);
+
 		X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")(pRes->getRefCount());
 
 		auto numErase = hash_.erase(pRes->getName());
-		ScopedLock lock(threadPolicy_);
 
 		// we should earse only one asset
 		X_ASSERT(numErase == 1, "Failed to erase asset correct")();
