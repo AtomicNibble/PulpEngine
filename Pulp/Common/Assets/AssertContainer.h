@@ -338,9 +338,14 @@ public:
 		// we should earse only one asset
 		X_ASSERT(numErase == 1, "Failed to erase asset correct")();
 
+		// get id before free.
+		const auto id = pRes->getID();
+
+		X_ASSERT(id >= 0 && id < list_.capacity(), "Id out of range")(id, list_.capacity());
+
 		Pool::free(pRes);
 
-		freeList_.push(pRes->getID());
+		freeList_.push(id);
 	}
 
 public:
