@@ -1194,7 +1194,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
 	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
 	)) {
-		X_DELETE(pState, arena_);
+		X_DELETE(pState, &statePool_);
 		return INVALID_STATE_HANLDE;
 	}
 
@@ -1248,7 +1248,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 
 	if (!pso.finalize(*pPSOCache_)) {
-		X_DELETE(pState, arena_);
+		X_DELETE(pState, &statePool_);
 		return INVALID_STATE_HANLDE;
 	}
 
