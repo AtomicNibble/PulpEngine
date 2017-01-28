@@ -371,6 +371,21 @@ namespace V2
 		}
 	}
 
+	bool JobSystem::HelpWithWork(void)
+	{
+		size_t threadIdx = GetThreadIndex();
+		ThreadQue& threadQue = *GetWorkerThreadQueue(threadIdx);
+
+		Job* nextJob = GetJob(threadQue);
+		if (nextJob)
+		{
+			Execute(nextJob, threadIdx);
+			return true;
+		}
+
+		return false;
+	}
+
 	/// ===============================================
 
 	Job* JobSystem::AllocateJob(void)
