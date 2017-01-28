@@ -98,8 +98,6 @@ namespace shader
 		HWShaderContainer hwShaders_;
 
 		ShaderVars vars_;
-
-		core::CriticalSection sourceCs_;
 	};
 
 
