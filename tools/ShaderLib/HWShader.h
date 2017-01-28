@@ -35,12 +35,17 @@ namespace shader
 		friend class ShaderBin;
 
 	public:
+		typedef core::Spinlock LockType;
+
+	public:
 		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
 			const core::string& sourceFile, uint32_t soruceFilecrc32, TechFlags techFlags);
 		SHADERLIB_EXPORT ~XHWShader();
 
 		X_INLINE const int32_t getID(void) const;
 		X_INLINE void setID(int32_t id);
+
+		X_INLINE LockType& getLock(void);
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE const core::string& getSourceFileName(void) const;
@@ -77,6 +82,8 @@ namespace shader
 		bool reflectShader(ID3DBlob* pshaderBlob);
 
 	protected:
+		LockType lock_;
+		
 		core::string name_;
 		core::string sourceFileName_;
 		core::string entryPoint_;
@@ -84,7 +91,7 @@ namespace shader
 		int32_t id_;
 		uint32_t sourceCrc32_; // the crc of the source this was compiled from.
 
-							   // status
+		// status
 		ShaderStatus::Enum status_;
 		// color, textured, skinned, instanced
 		TechFlags techFlags_;

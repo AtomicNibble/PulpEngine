@@ -14,6 +14,12 @@ namespace shader
 		id_ = id;
 	}
 
+
+	X_INLINE XHWShader::LockType& XHWShader::getLock(void)
+	{
+		return lock_;
+	}
+
 	X_INLINE const core::string& XHWShader::getName(void) const {
 		return name_;
 	}
