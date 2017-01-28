@@ -72,7 +72,18 @@ namespace shader
 
 	bool XHWShader::compile(core::string& source)
 	{
-		return compileFromSource(source);
+		status_ = ShaderStatus::Compiling;
+		bool res = compileFromSource(source);
+
+		if (res) {
+			status_ = ShaderStatus::ReadyToRock;
+		}
+		else
+		{
+			status_ = ShaderStatus::FailedToCompile;
+		}
+
+		return res;
 	}
 
 
@@ -222,8 +233,6 @@ namespace shader
 		core::SafeReleaseDX(pErrorBlob);
 		core::SafeReleaseDX(pBlob);
 
-
-		status_ = ShaderStatus::ReadyToRock;
 		const float elapsed = timer.GetMilliSeconds();
 		X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
 
