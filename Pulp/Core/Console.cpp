@@ -1464,19 +1464,19 @@ ICVar* XConsole::GetCVar(const char* name)
 	return nullptr;
 }
 
-void XConsole::UnregisterVariable(const char* sVarName)
+void XConsole::UnregisterVariable(const char* pVarName)
 {
 	ConsoleVarMapItor itor;
-	itor = VarMap_.find(sVarName);
+	itor = VarMap_.find(pVarName);
 
 	if (itor == VarMap_.end()) {
+		X_WARNING("Console", "Failed to find var \"%s\" for removal", pVarName);
 		return;
 	}
 
-	ICVar *pCVar = itor->second;
+	ICVar* pCVar = itor->second;
 
-	VarMap_.erase(sVarName);
-
+	VarMap_.erase(pVarName);
 	X_DELETE(pCVar, &varArena_);
 }
 
