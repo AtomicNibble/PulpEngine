@@ -318,6 +318,7 @@
     <ClInclude Include="Threading\JobList.h" />
     <ClInclude Include="Threading\JobSystem.h" />
     <ClInclude Include="Threading\JobSystem2.h" />
+    <ClInclude Include="Threading\ScopedLock.h" />
     <ClInclude Include="Threading\Semaphore.h" />
     <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
@@ -483,6 +484,7 @@
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\FiberScheduler.inl" />
     <None Include="Threading\JobSystem2.inl" />
+    <None Include="Threading\ScopedLock.inl" />
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\ThreadQue.inl" />
     <None Include="Threading\UniqueLock.inl" />

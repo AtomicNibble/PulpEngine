@@ -1183,6 +1183,9 @@
     <ClInclude Include="Threading\UniqueLock.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\ScopedLock.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1484,6 +1487,9 @@
     </None>
     <None Include="Memory\MemUtil.inl">
       <Filter>Headers\Memory</Filter>
+    </None>
+    <None Include="Threading\ScopedLock.inl">
+      <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Threading\UniqueLock.inl">
       <Filter>Headers\Threading</Filter>
