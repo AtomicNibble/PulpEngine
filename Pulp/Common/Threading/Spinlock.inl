@@ -36,19 +36,6 @@ X_INLINE void Spinlock::Leave(void)
 
 // -------------------------------------------
 
-X_INLINE Spinlock::ScopedLock::ScopedLock(Spinlock& spinlock) :
-	spinlock_(spinlock)
-{
-	spinlock.Enter();
-}
-
-X_INLINE Spinlock::ScopedLock::~ScopedLock(void)
-{
-	spinlock_.Leave();
-}
-
-// -------------------------------------------
-
 X_INLINE SpinlockRecursive::SpinlockRecursive() :
 	locked_(0),
 	threadId_(static_cast<uint32_t>(-1)),
@@ -86,16 +73,3 @@ X_INLINE void SpinlockRecursive::Leave(void)
 	}
 }
 
-
-// -------------------------------------------
-
-X_INLINE SpinlockRecursive::ScopedLock::ScopedLock(SpinlockRecursive& spinlock) :
-	spinlock_(spinlock)
-{
-	spinlock.Enter();
-}
-
-X_INLINE SpinlockRecursive::ScopedLock::~ScopedLock(void)
-{
-	spinlock_.Leave();
-}
