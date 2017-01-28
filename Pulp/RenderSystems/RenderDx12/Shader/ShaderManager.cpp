@@ -9,6 +9,7 @@
 #include <Util\UniquePointer.h>
 #include <Threading\JobSystem2.h>
 #include <Threading\UniqueLock.h>
+#include <Threading\ScopedLock.h>
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -300,6 +301,9 @@ namespace shader
 
 		core::string nameStr(name.c_str());
 
+		// we must have a single lock during the find and create otherwise we have a race.
+		core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
+
 		HWShaderResource* pHWShaderRes = hwShaders_.findAsset(nameStr);
 		if (pHWShaderRes)
 		{
@@ -348,6 +352,7 @@ namespace shader
 	{
 		X_UNUSED(pSarchPatten);
 
+		core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
 		X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", hwShaders_.size());
 		for(const auto& it : hwShaders_)
