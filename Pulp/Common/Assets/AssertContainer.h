@@ -324,7 +324,7 @@ public:
 		// get id before free.
 		const auto id = pRes->getID();
 
-		X_ASSERT(id >= 0 && id < list_.capacity(), "Id out of range")(id, list_.capacity());
+		X_ASSERT(id >= 0 && id < static_cast<decltype(id)>(list_.capacity()), "Id out of range")(id, list_.capacity());
 
 		Pool::free(pRes);
 
