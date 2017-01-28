@@ -150,15 +150,15 @@ namespace
 	struct AutoResult
 	{
 		AutoResult() : AutoResult(nullptr, nullptr, nullptr) {}
-		AutoResult(const char* name, ICVar* var, ConsoleCommand* pCmd) :
-			name(name), var(var), pCmd(pCmd) {}
+		AutoResult(const char* pName, ICVar* var, ConsoleCommand* pCmd) :
+			pName(pName), var(var), pCmd(pCmd) {}
 
 		X_INLINE bool operator<(const AutoResult& oth) {
-			return strcmp(name, oth.name) < 0;
+			return strcmp(pName, oth.pName) < 0;
 		}
 
 	public:
-		const char* name;
+		const char* pName;
 		ICVar* var;
 		ConsoleCommand* pCmd;
 	};
@@ -1277,12 +1277,12 @@ void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
 	}
 }
 
-ICVar* XConsole::RegisterString(const char* Name, const char* Value, 
+ICVar* XConsole::RegisterString(const char* pName, const char* Value, 
 	int Flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1291,173 +1291,173 @@ ICVar* XConsole::RegisterString(const char* Name, const char* Value,
 	{
 		Flags = bitUtil::ClearBitFlag(Flags, VarFlag::CPY_NAME);
 		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
-			"CVarString<H>")(this, Name, Value, Flags, desc);
+			"CVarString<H>")(this, pName, Value, Flags, desc);
 	}
 	else
 	{
 		pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, 
-			"CVarString")(this, Name, Value, Flags, desc);
+			"CVarString")(this, pName, Value, Flags, desc);
 	}
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::RegisterInt(const char* Name, int Value, int Min, 
+ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min, 
 	int Max, int Flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, Name, Value, Min, Max, Flags, desc);
+	pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, pName, Value, Min, Max, Flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::RegisterFloat(const char* Name, float Value, float Min,
+ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
 	float Max, int Flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, Name, Value, Min, Max, Flags, desc);
+	pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, pName, Value, Min, Max, Flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::ConfigRegisterString(const char* Name, const char* Value, int flags, 
+ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, int flags, 
 	const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, Name, Value, flags, desc);
+	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, pName, Value, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::ConfigRegisterInt(const char* Name, int Value, int Min, 
+ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min, 
 	int Max, int flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, Name, Value, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, pName, Value, Min, Max, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::ConfigRegisterFloat(const char* Name, float Value, float Min, 
+ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min, 
 	float Max, int flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, Name, Value, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, pName, Value, Min, Max, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 
-ICVar* XConsole::Register(const char* Name, float* src, float defaultvalue, 
+ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue, 
 	float Min, float Max, int flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, Name, src, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, pName, src, Min, Max, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::Register(const char* Name, int* src, int defaultvalue, 
+ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue, 
 	int Min, int Max, int flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, Name, src, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, pName, src, Min, Max, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
-ICVar* XConsole::Register(const char* Name, Color* src, Color defaultvalue, 
+ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue, 
 	int flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, Name, src, flags, desc);
+	pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, pName, src, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 	
 }
 
-ICVar* XConsole::Register(const char* Name, Vec3f* src, Vec3f defaultvalue, 
+ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue, 
 	int flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(Name);
+	ICVar *pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, Name, src, flags, desc);
+	pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, pName, src, flags, desc);
 	RegisterVar(pCVar);
 	return pCVar;
 
 }
 
 
-ICVar* XConsole::GetCVar(const char* name)
+ICVar* XConsole::GetCVar(const char* pName)
 {
 	ConsoleVarMapItor it;
 
-	it = VarMap_.find(name);
+	it = VarMap_.find(pName);
 	if (it != VarMap_.end()) {
 		return it->second;
 	}
@@ -1482,13 +1482,13 @@ void XConsole::UnregisterVariable(const char* pVarName)
 
 // Commands :)
 
-void XConsole::RegisterCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc)
+void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* desc)
 {
-	X_ASSERT_NOT_NULL(Name);
+	X_ASSERT_NOT_NULL(pName);
 
 	ConsoleCommand cmd;
 
-	cmd.Name = Name;
+	cmd.Name = pName;
 	cmd.Flags = Flags;
 	cmd.func = func;
 	if (desc) {
@@ -1498,16 +1498,16 @@ void XConsole::RegisterCommand(const char* Name, ConsoleCmdFunc func, int Flags,
 	// pass cmd.Name instead of Name, saves creating a second core::string
 	if (CmdMap_.find(cmd.Name) != CmdMap_.end())
 	{
-		X_WARNING("Console", "command already exsists: %s", Name);
+		X_WARNING("Console", "command already exsists: \"%s", pName);
 	}
 
 	CmdMap_.insert(std::make_pair(cmd.Name, cmd));
 }
 
 
-void XConsole::UnRegisterCommand(const char* Name)
+void XConsole::UnRegisterCommand(const char* pName)
 {
-	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(Name));
+	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(pName));
 	if (it != CmdMap_.end()) {
 		CmdMap_.erase(it);
 	}
@@ -1521,18 +1521,18 @@ void XConsole::Exec(const char* pCommand)
 	AddCmd(pCommand, ExecSource::SYSTEM, false);
 }
 
-bool XConsole::LoadAndExecConfigFile(const char* fileName)
+bool XConsole::LoadAndExecConfigFile(const char* pFileName)
 {
 	core::Path<char> path;
 
 	path = "config";
-	path /= fileName;
+	path /= pFileName;
 	path.setExtension(CONFIG_FILE_EXTENSION);
 
 	core::XFileScoped file;
 	size_t bytes;
 
-	X_LOG0("Config", "Loading config: \"%s\"", fileName);
+	X_LOG0("Config", "Loading config: \"%s\"", pFileName);
 
 	if (file.openFile(path.c_str(), fileMode::READ))
 	{
@@ -1895,18 +1895,18 @@ void XConsole::ExecuteCommand(const ConsoleCommand &cmd,
 /// ------------------------------------------------------
 
 
-ICVar* XConsole::GetCVarForRegistration(const char* Name)
+ICVar* XConsole::GetCVarForRegistration(const char* pName)
 {
 	ICVar* pCVar = nullptr;
 
-	ConsoleVarMap::const_iterator it = VarMap_.find(X_CONST_STRING(Name));
+	ConsoleVarMap::const_iterator it = VarMap_.find(X_CONST_STRING(pName));
 	if (it != VarMap_.end()) {
 		pCVar = it->second;
 	}
 
 	if (pCVar)
 	{
-		X_WARNING("Console", "var(%s) is already registerd", Name);
+		X_WARNING("Console", "var(%s) is already registerd", pName);
 	}
 	return pCVar;
 }
@@ -2157,7 +2157,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 	{
 		const char* inputBegin = InputBuffer_.begin();
 		const char* inputEnd = InputBuffer_.end();
-		const char* Name;
+		const char* pName;
 		size_t NameLen, inputLen;
 
 
@@ -2202,8 +2202,8 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 		for (; it != VarMap_.end(); ++it)
 		{
-			Name = it->second->GetName();
-			NameLen = core::strUtil::strlen(Name);
+			pName = it->second->GetName();
+			NameLen = core::strUtil::strlen(pName);
 
 			// if var name shorter than search leave it !
 			if (NameLen < inputLen) {
@@ -2211,9 +2211,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			}
 
 			// we search same length.
-			if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
+			if (pComparison(pName, pName + inputLen, inputBegin, inputEnd))
 			{
-				results.emplace_back(Name, it->second, nullptr);
+				results.emplace_back(pName, it->second, nullptr);
 			}
 
 			if (results.size() == results.capacity()) {
@@ -2227,7 +2227,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			ConsoleCmdMapItor cmdIt = CmdMap_.begin();
 			for (; cmdIt != CmdMap_.end(); ++cmdIt)
 			{
-				Name = cmdIt->second.Name.c_str();
+				pName = cmdIt->second.Name.c_str();
 				NameLen = cmdIt->second.Name.length();
 
 				// if cmd name shorter than search leave it !
@@ -2236,9 +2236,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				}
 
 				// we search same length.
-				if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
+				if (pComparison(pName, pName + inputLen, inputBegin, inputEnd))
 				{
-					results.emplace_back(Name, nullptr, &cmdIt->second);
+					results.emplace_back(pName, nullptr, &cmdIt->second);
 				}
 
 				if (results.size() == results.capacity()) {
@@ -2271,9 +2271,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		if (autoCompleteSelect_) {
 			if (InputBuffer_.find("vreset ")) {
 				InputBuffer_ = "vreset ";
-				InputBuffer_ += results[autoCompleteIdx_].name;
+				InputBuffer_ += results[autoCompleteIdx_].pName;
 			} else {
-				InputBuffer_ = results[autoCompleteIdx_].name;
+				InputBuffer_ = results[autoCompleteIdx_].pName;
 			}
 		//	if (results[autoCompleteIdx_].var) // for var only?
 				InputBuffer_ += ' '; // add a space
@@ -2304,7 +2304,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				// change the txt color to darkblue.
 				// we need to check if it's only a substring match currently.
 				core::StackString<128> temp(inputBegin, inputEnd);
-				const char* fullName = results[0].name;
+				const char* fullName = results[0].pName;
 
 				temp.trim();
 
@@ -2327,7 +2327,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					resIt = results.begin();
 					for (; resIt != results.end(); ++resIt)
 					{
-						if (core::strUtil::IsEqual(temp.c_str(), resIt->name))
+						if (core::strUtil::IsEqual(temp.c_str(), resIt->pName))
 						{
 							// ok remove / add.
 							AutoResult res = *resIt;
@@ -2503,7 +2503,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				const float box2Offset = 5.f;
 				const float descWidth = core::Max(width, pFont_->GetTextSize(descStr.begin(), descStr.end(), ctx).x) + 10.f;
 
-				width = core::Max(width, pFont_->GetTextSize(result.name, result.name + core::strUtil::strlen(result.name), ctx).x);
+				width = core::Max(width, pFont_->GetTextSize(result.pName, result.pName + core::strUtil::strlen(result.pName), ctx).x);
 				width += 10; // add a few pixels.
 				height += fCharHeight;
 
@@ -2515,7 +2515,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 				// cmd color
 				ctx.SetColor(Col_Darkblue);
-				pPrimContext_->drawText(xpos, ypos, ctx, result.name);
+				pPrimContext_->drawText(xpos, ypos, ctx, result.pName);
 
 				ypos += fCharHeight;
 				ypos += 5.f;
@@ -2532,7 +2532,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				resIt = results.begin();
 				for (; resIt != results.end(); ++resIt)
 				{
-					width = core::Max(width, pFont_->GetTextSize(resIt->name, resIt->name + core::strUtil::strlen(resIt->name), ctx).x);
+					width = core::Max(width, pFont_->GetTextSize(resIt->pName, resIt->pName + core::strUtil::strlen(resIt->pName), ctx).x);
 					height += fCharHeight;
 				}
 
@@ -2554,7 +2554,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					else
 						ctx.SetColor(Col_Darkblue);
 
-					pPrimContext_->drawText(xpos, ypos, ctx, resIt->name);
+					pPrimContext_->drawText(xpos, ypos, ctx, resIt->pName);
 
 					ypos += fCharHeight;
 				}
