@@ -122,6 +122,11 @@ namespace shader
 
 		if (!pPerm->isCompiled())
 		{
+			// this logic should be thread safe.
+			// and should not try compile the same shader from multiple threads.
+			// if two threads both want smae shader it should just wait for the result.
+			// but compiling of diffrent shaders should happen in parralel.
+
 			// we want to compile this then work out the cbuffer links.
 			const auto& stages = pPerm->getStages();
 			for (auto* pHWShader : stages)
