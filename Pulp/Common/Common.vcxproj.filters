@@ -1180,6 +1180,9 @@
     <ClInclude Include="Util\UserLiterals.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\UniqueLock.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1482,6 +1485,7 @@
     <None Include="Memory\MemUtil.inl">
       <Filter>Headers\Memory</Filter>
     </None>
+    <None Include="Threading\UniqueLock.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

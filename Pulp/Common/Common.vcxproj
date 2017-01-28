@@ -324,6 +324,7 @@
     <ClInclude Include="Threading\Thread.h" />
     <ClInclude Include="Threading\ThreadLocalStorage.h" />
     <ClInclude Include="Threading\ThreadQue.h" />
+    <ClInclude Include="Threading\UniqueLock.h" />
     <ClInclude Include="Threading\win32\ConditionVariable.h" />
     <ClInclude Include="Threading\win32\CriticalSection.h" />
     <ClInclude Include="Threading\win32\Fiber.h" />
@@ -484,6 +485,7 @@
     <None Include="Threading\JobSystem2.inl" />
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\ThreadQue.inl" />
+    <None Include="Threading\UniqueLock.inl" />
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
     <None Include="Threading\win32\ThreadLocalStorage.inl" />
