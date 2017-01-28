@@ -48,10 +48,6 @@ public:
 	void ListModels(const char* searchPatten = nullptr) const;
 	void ReloadModel(const char* pName);
 
-private:
-	ModelResource* createModel(const char* pModelName);
-	ModelResource* findModel_Internal(const core::string& name) const;
-
 
 private:
 	XModel*	pDefaultModel_;

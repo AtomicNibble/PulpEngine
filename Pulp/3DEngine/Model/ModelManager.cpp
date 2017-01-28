@@ -121,12 +121,16 @@ void XModelManager::ShutDown(void)
 		releaseModel(pDefaultModel_);
 	}
 
-	// any left?
-	for (const auto& m : models_)
 	{
-		ModelResource* pModelRes = m.second;
-		const auto& name = pModelRes->getName();
-		X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
+		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+
+		// any left?
+		for (const auto& m : models_)
+		{
+			ModelResource* pModelRes = m.second;
+			const auto& name = pModelRes->getName();
+			X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
+		}
 	}
 
 	models_.free();
@@ -137,18 +141,17 @@ XModel* XModelManager::findModel(const char* pModelName) const
 {
 	core::string name(pModelName);
 
-	ModelResource* pModel = findModel_Internal(name);
-	if (pModel) {
-		return pModel;
+	{
+		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+
+		ModelResource* pModel = models_.findAsset(name);
+		if (pModel) {
+			return pModel;
+		}
 	}
 
 	X_WARNING("ModelManager", "Failed to find model: \"%s\"", pModelName);
 	return nullptr;
-}
-
-XModelManager::ModelResource* XModelManager::findModel_Internal(const core::string& name) const
-{
-	return models_.findAsset(name);
 }
 
 
@@ -168,8 +171,10 @@ XModel* XModelManager::loadModel(const char* pModelName)
 
 	core::string name(pModelName);
 
+	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+
 	// try find it.
-	ModelResource* pModelRes = findModel_Internal(name);
+	ModelResource* pModelRes = models_.findAsset(name);
 	if (pModelRes)
 	{
 		// inc ref count.
@@ -202,15 +207,20 @@ XModel* XModelManager::loadModelSync(const char* pModelName)
 	core::string name(pModelName);
 
 	// try find it.
-	ModelResource* pModelRes = findModel_Internal(name);
-	if (pModelRes)
+	ModelResource* pModelRes = nullptr;
 	{
-		// inc ref count.
-		pModelRes->addReference();
-		return pModelRes;
-	}
+		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-	pModelRes = models_.createAsset(name);
+		pModelRes = models_.findAsset(name);
+		if (pModelRes)
+		{
+			// inc ref count.
+			pModelRes->addReference();
+			return pModelRes;
+		}
+
+		pModelRes = models_.createAsset(name);
+	}
 
 	if (!pModelRes->LoadModel(pModelName))
 	{
@@ -236,16 +246,6 @@ void XModelManager::releaseModel(XModel* pModel)
 	{
 		models_.releaseAsset(pModelRes);
 	}
-}
-
-
-XModelManager::ModelResource* XModelManager::createModel(const char* pModelName)
-{
-	core::string name(pModelName);
-
-	ModelResource* pModelRes = models_.createAsset(name);
-	pModelRes->AssignDefault();
-	return pModelRes;
 }
 
 
@@ -282,6 +282,8 @@ void XModelManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Pa
 
 void XModelManager::ListModels(const char* searchPatten) const
 {
+	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+
 	core::Array<XModel*> sorted_models(g_3dEngineArena);
 	sorted_models.setGranularity(models_.size());
 
@@ -314,7 +316,12 @@ void XModelManager::ReloadModel(const char* pModelName)
 {
 	core::string name(pModelName);
 
-	ModelResource* pModelRes = findModel_Internal(name);
+	ModelResource* pModelRes = nullptr;
+	{
+		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+		pModelRes = models_.findAsset(name);
+	}
+
 	if (pModelRes)
 	{
 		X_LOG0("Model", "Reload model: \"%s\"", name.c_str());
