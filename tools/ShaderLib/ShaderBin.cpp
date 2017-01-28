@@ -208,7 +208,7 @@ namespace shader
 		core::zero_object(hdr);
 
 		core::XFileScoped file;
-		if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE))
+		if (file.openFile(path.c_str(), core::fileMode::READ))
 		{
 			file.readObj(hdr);
 
