@@ -332,10 +332,11 @@ public:
 	{
 		X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")(pRes->getRefCount());
 
+		auto numErase = hash_.erase(pRes->getName());
 		ScopedLock lock(threadPolicy_);
 
 		// we should earse only one asset
-		X_ASSERT(hash_.erase(pRes->getName()) == 1, "Failed to erase asset correct")();
+		X_ASSERT(numErase == 1, "Failed to erase asset correct")();
 
 		Pool::free(pRes);
 
