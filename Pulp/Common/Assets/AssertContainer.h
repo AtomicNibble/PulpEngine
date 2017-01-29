@@ -172,7 +172,8 @@ template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy,
 class AssetPool
 {
 public:
-	typedef core::ReferenceCountedInherit<AssetType, ResourceRefPrim> AssetResource;
+	typedef ResourceRefPrim RefPrim;
+	typedef core::ReferenceCountedInherit<AssetType, RefPrim> AssetResource;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
