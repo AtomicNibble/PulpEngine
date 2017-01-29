@@ -31,6 +31,7 @@
 #include "Containers\HashMap.h"
 
 #include "Memory\AllocationPolicies\GrowingGenericAllocator.h"
+#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 #include "Threading\JobSystem.h"
 
@@ -93,7 +94,7 @@ core::SimpleMemoryTagging
 
 typedef core::MemoryArena<
 	core::GrowingGenericAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::Spinlock>,
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging
