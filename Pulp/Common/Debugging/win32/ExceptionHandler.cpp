@@ -203,7 +203,7 @@ namespace exceptionHandler
 
 
 		DWORD Code = ExceptionRecord->ExceptionCode;
-		const bool isNonContinuable = ExceptionRecord->ExceptionFlags == 1;
+		const bool isNonContinuable = ExceptionRecord->ExceptionFlags == EXCEPTION_NONCONTINUABLE;
 	
 		X_FATAL( "ExceptionHandler", "%s exception %s (0x%08X) occurred at address: " PRIxPTR,
 			(isNonContinuable ? "None-Continuable" : "Continuable"),
