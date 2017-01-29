@@ -45,9 +45,20 @@ namespace shader
 		arena_(arena),
 		shaderBin_(arena),
 		sourceBin_(arena),
-		hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource))
+		hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource)),
+		permHeap_(
+			core::bitUtil::RoundUpToMultiple<size_t>(
+				PoolArena::getMemoryRequirement(sizeof(ShaderPermatation)) * MAX_SHADER_PERMS,
+				core::VirtualMem::GetPageSize()
+				)
+		),
+		permAllocator_(permHeap_.start(), permHeap_.end(),
+			PoolArena::getMemoryRequirement(sizeof(SourceFile)),
+			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(ShaderPermatation)),
+			PoolArena::getMemoryOffsetRequirement()
+		),
+		permArena_(&permAllocator_, "PermPool")
 	{
-
 	}
 
 	XShaderManager::~XShaderManager()
@@ -119,7 +130,7 @@ namespace shader
 	{
 		// ok so for now when we create a permatation we also require all the shaders to be compiled.
 		// we return null if a shader fails to compile.
-		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(arena_, stages, arena_);
+		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, stages, arena_);
 
 		if (!pPerm->isCompiled())
 		{
@@ -243,7 +254,7 @@ namespace shader
 			releaseHWShader(pHWShader);
 		}
 
-		X_DELETE(pPerm, arena_);
+		X_DELETE(pPerm, &permArena_);
 	}
 
 	void XShaderManager::getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut)

@@ -97,6 +97,11 @@ namespace shader
 		// ref counted resources
 		HWShaderContainer hwShaders_;
 
+		// allocator for source objects.
+		core::HeapArea      permHeap_;
+		core::PoolAllocator permAllocator_;
+		PoolArena			permArena_;
+
 		ShaderVars vars_;
 	};
 
