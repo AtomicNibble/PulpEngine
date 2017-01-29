@@ -240,9 +240,8 @@ namespace shader
 					return false;
 				}
 
-				// clear status, as we edit members.
-				pShader->status_ = ShaderStatus::NotCompiled;
 
+				X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")(pShader->status_);
 
 				auto& cbufs = pShader->getCBuffers();
 				cbufs.resize(hdr.numCBufs, cbufs.getArena());
