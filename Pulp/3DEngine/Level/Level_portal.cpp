@@ -697,6 +697,10 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 		engine::Material* pMat = pSubMesh->pMat;
 		engine::MaterialTech* pTech = pMaterialManager_->getTechForMaterial(pMat, tech, render::shader::VertexFormat::P3F_T2F_C4B);
 
+		if (!pTech) {
+			continue;
+		}
+
 		const auto* pPerm = pTech->pPerm;
 		const auto stateHandle = pPerm->stateHandle;
 		const auto* pVariableState = pTech->pVariableState;
