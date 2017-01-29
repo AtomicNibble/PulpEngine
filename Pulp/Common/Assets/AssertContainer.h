@@ -225,9 +225,13 @@ private:
 };
 
 template<typename AssetType, size_t MaxAssets, class ThreadPolicy>
-class AssetContainer : private AssetPool<AssetType, MaxAssets, core::SingleThreadPolicy>
+class AssetContainer : private AssetPool<AssetType, MaxAssets, core::SingleThreadPolicy, core::AtomicInt>
 {
-	typedef AssetPool<AssetType, MaxAssets, core::SingleThreadPolicy> Pool;
+	typedef AssetPool<AssetType, 
+		MaxAssets, 
+		core::SingleThreadPolicy,
+		core::AtomicInt				// i've made this atmoic so that asset refs can be modified without having to take a lock on container.
+	> Pool;
 public:
 	typedef Pool::AssetResource Resource;
 	typedef core::HashMap<core::string, Resource*> ResourceMap;
