@@ -320,6 +320,7 @@
     <ClInclude Include="Threading\JobSystem2.h" />
     <ClInclude Include="Threading\ScopedLock.h" />
     <ClInclude Include="Threading\Semaphore.h" />
+    <ClInclude Include="Threading\SharedLock.h" />
     <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
     <ClInclude Include="Threading\Thread.h" />
@@ -330,6 +331,7 @@
     <ClInclude Include="Threading\win32\CriticalSection.h" />
     <ClInclude Include="Threading\win32\Fiber.h" />
     <ClInclude Include="Threading\win32\Semaphore.h" />
+    <ClInclude Include="Threading\win32\SharedLock.h" />
     <ClInclude Include="Threading\win32\Signal.h" />
     <ClInclude Include="Threading\win32\Thread.h" />
     <ClInclude Include="Threading\win32\ThreadLocalStorage.h" />
@@ -490,6 +492,7 @@
     <None Include="Threading\UniqueLock.inl" />
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
+    <None Include="Threading\win32\SharedLock.inl" />
     <None Include="Threading\win32\ThreadLocalStorage.inl" />
     <None Include="Time\StopWatch.inl" />
     <None Include="Time\TimeVal.inl" />

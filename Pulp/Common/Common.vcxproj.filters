@@ -1186,6 +1186,12 @@
     <ClInclude Include="Threading\ScopedLock.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\SharedLock.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\win32\SharedLock.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1493,6 +1499,9 @@
     </None>
     <None Include="Threading\UniqueLock.inl">
       <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\win32\SharedLock.inl">
+      <Filter>Headers\Threading\win32</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
