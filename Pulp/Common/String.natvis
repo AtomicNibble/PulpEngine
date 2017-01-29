@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::core::StringRef&lt;*&gt;">
+    <Expand>
+      <Item Name="[str]" ExcludeView="simple">str_</Item>
+      <Item Name="[length]" ExcludeView="simple">(*(int*)((char*)str_ - 4))</Item>
+      <Item Name="[capacity]" ExcludeView="simple">(*(int*)((char*)str_ - 8))</Item>
+      <Item Name="[refs]" ExcludeView="simple">(*(int*)((char*)str_ - 12))</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
