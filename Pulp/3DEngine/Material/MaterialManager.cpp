@@ -240,6 +240,11 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// this gives us the pipeline state handle.
 	// we just now need to make variable state.
 	TechDefPerm* pPerm = pTechDef->getOrCreatePerm(vrtFmt);
+	if (!pPerm) {
+		X_ERROR("MatMan", "Failed to get tech perm");
+		return nullptr;
+	}
+
 
 	render::shader::IShaderPermatation* pShaderPerm = pPerm->pShaderPerm;
 
