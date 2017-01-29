@@ -326,6 +326,10 @@ public:
 
 		X_ASSERT(id >= 0 && id < static_cast<decltype(id)>(list_.capacity()), "Id out of range")(id, list_.capacity());
 
+#if X_DEBUG
+		list_[id] = nullptr;
+#endif // |X_DEBUG
+
 		Pool::free(pRes);
 
 		freeList_.push(id);
