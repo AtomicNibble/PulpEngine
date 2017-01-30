@@ -183,17 +183,20 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
 
 // IAkIOHookDeferred
 
-void IOhook::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
+void IOhook::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
 	X_UNUSED(fileSys);
 	X_UNUSED(pFile);
 
-	AkAsyncIOTransferInfo* transferInfo = reinterpret_cast<AkAsyncIOTransferInfo*>(request.readInfo.pUserData);
+	X_ASSERT(pRequest->getType() == core::IoRequest::READ || pRequest->getType() == core::IoRequest::WRITE, "Invalid request type")(pRequest->getType());
+
+	const core::IoRequestRead* pReq = static_cast<const core::IoRequestRead*>(pRequest);
+	AkAsyncIOTransferInfo* transferInfo = reinterpret_cast<AkAsyncIOTransferInfo*>(pReq->pUserData);
 
 	AKRESULT eResult = AK_Fail;
 
-	if (request.readInfo.dataSize == bytesTransferred) {
+	if (pReq->dataSize == bytesTransferred) {
 		eResult = AK_Success;
 	}
 
@@ -210,18 +213,15 @@ AKRESULT IOhook::Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,
 
 	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
-	core::IoRequestData req;
-	req.setType(core::IoRequest::READ);
-	req.callback.Bind<IOhook, &IOhook::IoRequestCallback>(this);
-
-	core::IoRequestRead& read = req.readInfo;
+	core::IoRequestRead read;
+	read.callback.Bind<IOhook, &IOhook::IoRequestCallback>(this);
 	read.dataSize = transferInfo.uRequestedSize;
 	read.offset = transferInfo.uFilePosition;
 	read.pBuf = transferInfo.pBuffer;
 	read.pFile = pFile;
 	read.pUserData = &transferInfo;
 
-	pFileSys_->AddIoRequestToQue(req);
+	pFileSys_->AddIoRequestToQue(read);
 
 	return AK_Success;
 }
@@ -237,18 +237,16 @@ AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics,
 
 	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
-	core::IoRequestData req;
-	req.setType(core::IoRequest::WRITE);
-	req.callback.Bind<IOhook, &IOhook::IoRequestCallback>(this);
 
-	core::IoRequestRead& write = req.writeInfo;
+	core::IoRequestWrite write;
+	write.callback.Bind<IOhook, &IOhook::IoRequestCallback>(this);
 	write.dataSize = transferInfo.uRequestedSize;
 	write.offset = transferInfo.uFilePosition;
 	write.pBuf = transferInfo.pBuffer;
 	write.pFile = pFile;
 	write.pUserData = &transferInfo;
 
-	pFileSys_->AddIoRequestToQue(req);
+	pFileSys_->AddIoRequestToQue(write);
 
 	return AK_Success;
 }

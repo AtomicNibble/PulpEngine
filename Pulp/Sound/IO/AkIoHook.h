@@ -5,7 +5,7 @@
 
 X_NAMESPACE_DECLARE(core,
 struct XFileAsync;
-class IoRequestData;
+struct IoRequestBase;
 )
 
 X_NAMESPACE_BEGIN(sound)
@@ -63,7 +63,7 @@ public:
 
 	// ~IAkIOHookDeferred
 private:
-	void IOhook::IoRequestCallback(core::IFileSys& pFileSys, core::IoRequestData& request,
+	void IOhook::IoRequestCallback(core::IFileSys& pFileSys, const core::IoRequestBase* pRequest,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 private:

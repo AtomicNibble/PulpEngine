@@ -16,10 +16,10 @@
 X_NAMESPACE_BEGIN(level)
 
 
-void Level::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
+void Level::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-	core::IoRequest::Enum requestType = request.getType();
+	core::IoRequest::Enum requestType = pRequest->getType();
 
 	if (requestType == core::IoRequest::OPEN)
 	{
@@ -28,17 +28,14 @@ void Level::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& requ
 			return;
 		}
 		
-		core::IoRequestData req;
-		req.setType(core::IoRequest::READ);
-		req.callback.Bind<Level, &Level::IoRequestCallback>(this);
-
-		core::IoRequestRead& read = req.readInfo;
+		core::IoRequestRead read;
+		read.callback.Bind<Level, &Level::IoRequestCallback>(this);
 		read.pFile = pFile;
 		read.dataSize = sizeof(fileHdr_);
 		read.offset = 0;
 		read.pBuf = &fileHdr_;
 
-		fileSys.AddIoRequestToQue(req);
+		fileSys.AddIoRequestToQue(read);
 	}
 	else if (requestType == core::IoRequest::READ)
 	{
@@ -80,18 +77,14 @@ void Level::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, cor
 		pFileData_ = X_NEW_ARRAY_ALIGNED(uint8_t, dataSize, g_3dEngineArena, "LevelBuffer", 16);
 
 
-		core::IoRequestData req;
-		req.setType(core::IoRequest::READ);
-		req.callback.Bind<Level, &Level::IoRequestCallback>(this);
-
-
-		core::IoRequestRead& read = req.readInfo;
+		core::IoRequestRead read;
+		read.callback.Bind<Level, &Level::IoRequestCallback>(this);
 		read.dataSize = dataSize;
 		read.offset = sizeof(fileHdr_);
 		read.pBuf = pFileData_;
 		read.pFile = pFile;
 
-		pFileSys_->AddIoRequestToQue(req);
+		pFileSys_->AddIoRequestToQue(read);
 	}
 }
 
@@ -110,9 +103,8 @@ void Level::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 	ProcessData();
 
 
-	core::IoRequestData req;
-	req.setType(core::IoRequest::CLOSE);
-	req.closeInfo.pFile = pFile;
+	core::IoRequestClose req;
+	req.pFile = pFile;
 	pFileSys_->AddIoRequestToQue(req);
 }
 
@@ -141,15 +133,12 @@ bool Level::Load(const char* mapName)
 
 	headerLoaded_ = false;
 
-	core::IoRequestData req;
-	req.setType(core::IoRequest::OPEN);
-	req.callback.Bind<Level, &Level::IoRequestCallback>(this);
-	core::IoRequestOpen& open = req.openInfo;
-
+	core::IoRequestOpen open;
+	open.callback.Bind<Level, &Level::IoRequestCallback>(this);
 	open.mode = core::fileMode::READ;
-	open.name = path_.c_str();
+	open.path = path_;
 
-	pFileSys_->AddIoRequestToQue(req);
+	pFileSys_->AddIoRequestToQue(open);
 
 
 

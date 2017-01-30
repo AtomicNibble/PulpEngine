@@ -269,10 +269,10 @@ void XModel::AssignDefault(void)
 // load it and set the data pointers.
 //
 
-void XModel::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
+void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-	core::IoRequest::Enum requestType = request.getType();
+	core::IoRequest::Enum requestType = pRequest->getType();
 
 	if (requestType == core::IoRequest::OPEN)
 	{
@@ -281,17 +281,14 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& req
 			return;
 		}
 
-		core::IoRequestData req;
-		req.setType(core::IoRequest::READ);
-		req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-
-		core::IoRequestRead& read = req.readInfo;
+		core::IoRequestRead read;
+		read.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
 		read.pFile = pFile;
 		read.dataSize = sizeof(hdr_);
 		read.offset = 0;
 		read.pBuf = &hdr_;
 
-		fileSys.AddIoRequestToQue(req);
+		fileSys.AddIoRequestToQue(read);
 
 	}
 	else if (requestType == core::IoRequest::READ)
@@ -299,17 +296,18 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& req
 		if (!bytesTransferred) {
 			X_ERROR("Model", "Failed to read model data for: %s", name_.c_str());
 
-			core::IoRequestData req;
-			req.setType(core::IoRequest::CLOSE);
-			req.closeInfo.pFile = pFile;
-			pFileSys_->AddIoRequestToQue(req);
+			core::IoRequestClose close;
+			close.pFile = pFile;
+			pFileSys_->AddIoRequestToQue(close);
 			return;
 		}
 
 		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
 		core::V2::Job* pJob = nullptr;
 
-		if (request.readInfo.pBuf == &hdr_) 
+		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
+
+		if (pReadReq->pBuf == &hdr_)
 		{
 			if (bytesTransferred != sizeof(hdr_)) {
 				X_ERROR("Model", "Failed to read model header. Got: 0x%x need: 0x%x",
@@ -350,26 +348,22 @@ void XModel::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, co
 
 		pData_ = pModelData;
 
-		core::IoRequestData req;
-		req.setType(core::IoRequest::READ);
-		req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-
-		core::IoRequestRead& read = req.readInfo;
+		core::IoRequestRead read;
+		read.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
 		read.dataSize = dataSize;
 		read.offset = sizeof(hdr_);
 		read.pBuf = pModelData;
 		read.pFile = pFile;
 
-		pFileSys_->AddIoRequestToQue(req);
+		pFileSys_->AddIoRequestToQue(read);
 	}
 	else
 	{
 		X_ERROR("Model", "\"%s\" model header is invalid", name_.c_str());
 
-		core::IoRequestData req;
-		req.setType(core::IoRequest::CLOSE);
-		req.closeInfo.pFile = pFile;
-		pFileSys_->AddIoRequestToQue(req);
+		core::IoRequestClose close;
+		close.pFile = pFile;
+		pFileSys_->AddIoRequestToQue(close);
 	}
 }
 
@@ -386,10 +380,9 @@ void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
 	ProcessData(const_cast<char*>(pData_));
 
-	core::IoRequestData req;
-	req.setType(core::IoRequest::CLOSE);
-	req.closeInfo.pFile = pFile;
-	pFileSys_->AddIoRequestToQue(req);
+	core::IoRequestClose close;
+	close.pFile = pFile;
+	pFileSys_->AddIoRequestToQue(close);
 
 	// temp, unassign the render meshes so new ones get made.
 	X_ASSERT_NOT_IMPLEMENTED();
@@ -409,15 +402,13 @@ bool XModel::LoadModelAsync(const char* name)
 	name_ = path.fileName();
 
 	// dispatch a read request baby!
-	core::IoRequestData req;
-	req.setType(core::IoRequest::OPEN);
-	req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
 
-	core::IoRequestOpen& open = req.openInfo;
+	core::IoRequestOpen open;
+	open.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
 	open.mode = core::fileMode::READ;
-	open.name = path.c_str();
+	open.path = path;
 
-	pFileSys_->AddIoRequestToQue(req);
+	pFileSys_->AddIoRequestToQue(open);
 
 	return true;
 }
@@ -430,15 +421,12 @@ bool XModel::ReloadAsync(void)
 	path.setExtension(".model");
 
 	// dispatch a read request baby!
-	core::IoRequestData req;
-	req.setType(core::IoRequest::OPEN);
-	req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-
-	core::IoRequestOpen& open = req.openInfo;
+	core::IoRequestOpen open;
+	open.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
 	open.mode = core::fileMode::READ;
-	open.name = path.c_str();
+	open.path = path;
 
-	pFileSys_->AddIoRequestToQue(req);
+	pFileSys_->AddIoRequestToQue(open);
 	return true;
 }
 

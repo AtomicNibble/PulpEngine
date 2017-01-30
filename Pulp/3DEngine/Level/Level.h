@@ -200,7 +200,7 @@ private:
 	void FloodVisibleAreas(void);
 	void DrawVisibleAreas(void);
 
-	void IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
+	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 

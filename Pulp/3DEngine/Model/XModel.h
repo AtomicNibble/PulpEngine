@@ -17,7 +17,7 @@ X_NAMESPACE_DECLARE(core,
 		class JobSystem;
 	}
 
-class IoRequestData;
+struct IoRequestBase;
 struct XFileAsync;
 )
 
@@ -82,7 +82,7 @@ public:
 private:
 	void ProcessData(char* pData);
 
-	void IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
+	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 	void ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* pData);
