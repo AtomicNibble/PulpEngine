@@ -2,15 +2,13 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
    <PropertyGroup>
 	<_PropertySheetDisplayName>Engine Common Lib</_PropertySheetDisplayName>
-  </PropertyGroup>   
+  </PropertyGroup>
   <ImportGroup Label="PropertySheets" />
   <ItemDefinitionGroup>
-    <ClCompile />
     <Link>
 	<AdditionalDependencies>engine_Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
 	<AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
-    <ClCompile />
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
