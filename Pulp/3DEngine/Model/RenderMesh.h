@@ -21,7 +21,7 @@ public:
 	typedef render::shader::VertexFormat VertexFormat;
 
 public:
-	XRenderMesh() = default;
+	XRenderMesh();
 	XRenderMesh(const XRenderMesh& oth) = default;
 	~XRenderMesh() = default;
 
