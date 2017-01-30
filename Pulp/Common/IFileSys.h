@@ -463,39 +463,51 @@ X_DECLARE_ENUM(IoRequest)(
 	WRITE
 );
 
-/*
-typedef core::traits::Function<void(core::IFileSys*,IoRequest::Enum, bool, XFileAsync*)> IoRequestCallback;
-typedef core::traits::Function<void(core::IFileSys*,IoRequest::Enum, bool, XFileMem*)> IoRequestMemCallback;
+// I want to pass these into filesystem with one function call.
+// but support diffrent types.
+// so many i should have a base type that contains the mode
+// and we copy it into a internal buffer
 
+struct IoRequestBase;
 
-struct IIoRequestHandler
+typedef core::Delegate<void(core::IFileSys&, const IoRequestBase*, core::XFileAsync*, uint32_t)> IoCallBack;
+
+struct IoRequestBase
 {
-	virtual void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-		core::XFileAsync* pFile, bool result) X_ABSTRACT;
-	virtual void IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-		core::XFileMem* pFile, bool result) X_ABSTRACT;
-}; 
-*/
+	X_INLINE IoRequest::Enum getType(void) const {
+		return type;
+	}
 
-struct IoRequestOpen
-{
-	core::string name;
-	fileModeFlags mode;
+	IoCallBack callback; // 8 bytes
+protected:
+	IoRequest::Enum type; // 4 bytes
 };
 
-struct IoRequestClose
+struct IoRequestOpen : public IoRequestBase
+{
+	IoRequestOpen() {
+		type = IoRequest::OPEN;
+	}
+
+	fileModeFlags mode;
+	core::Path<char> path;
+};
+
+struct IoRequestClose : public IoRequestBase
 {
 	IoRequestClose() {
 		core::zero_this(this);
+		type = IoRequest::CLOSE;
 	}
 
 	XFileAsync* pFile;
 };
 
-struct IoRequestRead
+struct IoRequestRead : public IoRequestBase
 {
 	IoRequestRead() {
 		core::zero_this(this);
+		type = IoRequest::READ;
 	}
 
 	XFileAsync* pFile;
@@ -505,96 +517,19 @@ struct IoRequestRead
 	void* pUserData;
 };
 
-typedef IoRequestRead IoRequestWrite;
-
-X_DISABLE_WARNING(4624)
-class IoRequestData
+struct IoRequestWrite : public IoRequestBase
 {
-public:
-	X_INLINE IoRequestData() {
-		type = IoRequest::CLOSE;
-	}
-	X_INLINE ~IoRequestData()
-	{
-		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
-		{
-			core::Mem::Destruct(&openInfo.name);
-		}
+	IoRequestWrite() {
+		core::zero_this(this);
+		type = IoRequest::WRITE;
 	}
 
-	X_INLINE IoRequestData(const IoRequestData& oth) {
-		type = oth.type;
-		callback = oth.callback;
-		
-		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
-		{
-			core::Mem::Construct(&openInfo.name, oth.openInfo.name);
-			openInfo.mode = oth.openInfo.mode;
-		}
-		else if (type == IoRequest::CLOSE) {
-			closeInfo = oth.closeInfo;
-		}
-		else if (type == IoRequest::READ) {
-			readInfo = oth.readInfo;
-		}
-		else if (type == IoRequest::WRITE) {
-			writeInfo = oth.writeInfo;
-		}
-	}
-
-	X_INLINE IoRequestData& operator=(const IoRequestData& oth) {
-		type = oth.type;
-		callback = oth.callback;
-
-		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
-		{
-			core::Mem::Construct(&openInfo.name, oth.openInfo.name);
-			openInfo.mode = oth.openInfo.mode;
-		}	
-		else if (type == IoRequest::CLOSE) {
-			closeInfo = oth.closeInfo;
-		}
-		else if (type == IoRequest::READ) {
-			readInfo = oth.readInfo;
-		}
-		else if (type == IoRequest::WRITE) {
-			writeInfo = oth.writeInfo;
-		}
-		return *this;
-	}
-
-	X_INLINE IoRequest::Enum getType(void) const {
-		return type;
-	}
-
-	X_INLINE void setType(IoRequest::Enum type_)
-	{
-		if (type_ == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
-		{
-			core::Mem::Construct<core::string>(&openInfo.name);
-		}
-		this->type = type_;
-	}
-
-private:
-	IoRequest::Enum type;
-
-public:
-	core::Delegate<void(core::IFileSys&, IoRequestData&,
-		core::XFileAsync*, uint32_t)> callback;
-
-	union
-	{
-		IoRequestOpen openInfo;
-		IoRequestClose closeInfo;
-		IoRequestRead readInfo;
-		IoRequestWrite writeInfo;
-	};
+	XFileAsync* pFile;
+	void* pBuf;
+	uint64_t offset;	// support files >4gb.
+	uint32_t dataSize; // don't support reading >4gb at once.
+	void* pUserData;
 };
-X_ENABLE_WARNING(4624)
-
-X_ENSURE_LE(sizeof(IoRequestData), 64, "IoRequest data should be 64 bytes or less");
-
 
 struct IFileSys
 {
@@ -674,7 +609,7 @@ struct IFileSys
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;
 
-	virtual void AddIoRequestToQue(const IoRequestData& request) X_ABSTRACT;
+	virtual void AddIoRequestToQue(const IoRequestBase& request) X_ABSTRACT;
 };
 
 class XFileMemScoped

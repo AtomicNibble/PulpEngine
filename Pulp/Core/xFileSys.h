@@ -97,6 +97,13 @@ public:
 
 	friend struct XFindData;
 
+	static const size_t MAX_REQ_SIZE = core::Max(sizeof(IoRequestOpen), core::Max(sizeof(IoRequestClose),
+		core::Max(sizeof(IoRequestRead), sizeof(IoRequestWrite))));
+	static const size_t IO_REQUEST_BUF_SIZE = MAX_REQ_SIZE * 0x100;
+	static const size_t PENDING_IO_QUE_SIZE = 0x100;
+
+	typedef std::array<uint8_t, MAX_REQ_SIZE> RequestBuffer;
+
 public:
 	xFileSys();
 	~xFileSys() X_FINAL;
@@ -172,10 +179,12 @@ public:
 
 	// IoRequest que.
 
-	void AddIoRequestToQue(const IoRequestData& request) X_FINAL;
+	void AddIoRequestToQue(const IoRequestBase& request) X_FINAL;
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);
 
+	void popRequest(RequestBuffer& buf);
+	bool tryPopRequest(RequestBuffer& buf);
 	// ~
 
 	// ThreadAbstract
@@ -222,12 +231,15 @@ private:
 	MemfileArena		memFileArena_;
 
 private:
-	static const size_t IO_QUE_SIZE = 0x200;
 
-	// io thread.
-	typedef ThreadQueBlocking<IoRequestData, core::CriticalSection> IoQue;
+	
+	// i want some sort of FIFO byte stream to store the diffrent sized requests.
+	// typedef ThreadQueBlocking<IoRequestBase*, core::CriticalSection> IoQue;
+	// IoQue ioQue_;
 
-	IoQue ioQue_;
+	core::CriticalSection requestLock_;
+	core::ConditionVariable requestCond_;
+	core::ByteStreamFifo requestData_;
 };
 
 
