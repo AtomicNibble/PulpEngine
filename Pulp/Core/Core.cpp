@@ -136,6 +136,20 @@ void XCore::ShutDown()
 	X_LOG0("Core", "Shutting Down");
 	env_.state_ = SCoreGlobals::State::CLOSING;
 
+	if (g_coreVars.core_fast_shutdown) {
+		X_LOG0("Core", "Fast shutdown, skipping cleanup");
+
+		// still save modified vars.
+		if (env_.pConsole && !initParams_.basicConsole())
+		{
+			env_.pConsole->SaveChangedVars();
+		}
+
+		moduleInterfaces_.free();
+		converterInterfaces_.free();
+		return;
+	}
+
 	core::StopWatch timer;
 
 #if X_DEBUG
