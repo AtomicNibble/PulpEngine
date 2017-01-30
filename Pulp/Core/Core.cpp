@@ -97,6 +97,8 @@ XCore::XCore() :
 	env_.pArena->addChildArena(env_.pStrArena);
 	// vars.
 
+	static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
+
 	env_.client_ = true;
 	env_.dedicated_ = false;
 	env_.profilerEnabled_ = false;
