@@ -159,6 +159,12 @@ void XCore::ShutDown()
 		env_.pConsole->freeRenderResources();
 	}
 
+	if (env_.p3DEngine)
+	{
+		env_.p3DEngine->ShutDown();
+		core::SafeRelease(env_.p3DEngine);
+	}
+
 	if (env_.pRender) {
 	//	env_.pRender->ShutDown();
 	}
@@ -201,12 +207,6 @@ void XCore::ShutDown()
 	if (pCrc32_)
 	{
 		core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
-	}
-
-	if (env_.p3DEngine)
-	{
-		env_.p3DEngine->ShutDown();
-		core::SafeRelease(env_.p3DEngine);
 	}
 
 	if (env_.pConsole && !initParams_.basicConsole())
