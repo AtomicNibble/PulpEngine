@@ -37,9 +37,12 @@ void PSODeviceCache::destoryAll(void)
 {
 	core::CriticalSection::ScopedLock lock(cacheLock_);
 
-	auto it = cache_.begin();
-	for (; it != cache_.end(); ++it) {
-		it->second->Release();
+	for (auto& pso : cache_)
+	{
+		ID3D12PipelineState* pPSO = pso.second;
+		if (reinterpret_cast<uintptr_t>(pPSO) != INVALID_PSO) {
+			pPSO->Release();
+		}
 	}
 
 	cache_.clear();
