@@ -117,7 +117,7 @@ typedef core::MemoryArena<
 
 typedef core::MemoryArena<
 	core::GrowingGenericAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::Spinlock>,
 	core::NoBoundsChecking,
 #if X_ENABLE_MEMORY_SIMPLE_TRACKING
 	core::SimpleMemoryTracking,
