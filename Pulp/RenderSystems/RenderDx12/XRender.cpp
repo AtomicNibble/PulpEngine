@@ -71,8 +71,8 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 		StatePoolArena::getMemoryOffsetRequirement()
 	),
 	statePool_(&statePoolAllocator_, "StatePool")
-{
-
+{	
+	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
 }
 
 XRender::~XRender()
