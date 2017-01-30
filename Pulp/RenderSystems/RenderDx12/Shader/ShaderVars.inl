@@ -19,6 +19,10 @@ namespace shader
 		return asyncShaderCompile_ != 0;
 	}
 
+	X_INLINE bool ShaderVars::helpWithWorkOnShaderStall(void) const
+	{
+		return helpWithWorkOnShaderStall_ != 0;
+	}
 
 } // namespace shader
 

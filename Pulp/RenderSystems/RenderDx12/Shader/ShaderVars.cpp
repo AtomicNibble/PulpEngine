@@ -15,6 +15,7 @@ namespace shader
 		writeCompiledShaders_ = 1;
 		writeMergedSource_ = 1;
 		asyncShaderCompile_ = 1;
+		helpWithWorkOnShaderStall_ = 1;
 	}
 
 	void ShaderVars::RegisterVars(void)
@@ -28,6 +29,9 @@ namespace shader
 		ADD_CVAR_REF("shader_asyncCompile", asyncShaderCompile_, asyncShaderCompile_, 0, 1,
 			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 			"Performs hardware shader compiling async");
+		ADD_CVAR_REF("shader_stall_help_with_work", helpWithWorkOnShaderStall_, helpWithWorkOnShaderStall_, 0, 1,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			"When waiting for another thread to finish compiling a shader, help process worker jobs");
 	}
 
 } // namespace shader
