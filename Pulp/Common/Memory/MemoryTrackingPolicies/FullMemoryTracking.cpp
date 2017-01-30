@@ -30,13 +30,13 @@ numAllocations_(0),
 
 heapArea_(
 	bitUtil::RoundUpToMultiple<size_t>(
-	AllocationTable::GetMemoryRequirement<LinearArena>(20000), VirtualMem::GetPageSize()
+	AllocationTable::GetMemoryRequirement<LinearArena>(40000), VirtualMem::GetPageSize()
 	)
 ),
 
 allocator_(heapArea_.start(), heapArea_.end()),
 arena_(&allocator_, "FullMemoryTracking"),
-table_(&arena_,9999)
+table_(&arena_,20000)
 {
 
 }
