@@ -39,7 +39,7 @@ public:
 	inline const T peek(void) const;
 
 	// sets the absolute position in the stream.
-	inline void seek(size_t pos);
+	inline void seekSet(size_t pos);
 
 	// skips number of items
 	template<typename T>

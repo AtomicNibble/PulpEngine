@@ -176,7 +176,7 @@ inline const T ByteStreamFifo::peek(void) const
 	return *as_type;
 }
 
-inline void ByteStreamFifo::seek(size_t pos)
+inline void ByteStreamFifo::seekSet(size_t pos)
 {
 	X_ASSERT(pos < size(), "can't seek that far")(pos, size());
 	read_ = (start_ + pos);
