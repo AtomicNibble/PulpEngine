@@ -229,6 +229,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
 
+	pPSOCache_->registerVars();
+
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	core::zero_object(swapChainDesc);
 
