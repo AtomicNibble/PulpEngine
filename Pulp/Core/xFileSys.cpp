@@ -1230,10 +1230,22 @@ void xFileSys::AddIoRequestToQue(const IoRequestBase& request)
 			IoRequest::ToString(request.getType()));
 	}
 
+	const size_t reqSize = ioReqSize[request.getType()];
+
 	CriticalSection::ScopedLock lock(requestLock_);
 
+	while (reqSize > requestData_.freeSpace())
+	{
+		requestLock_.Leave();
+
+		X_WARNING("FileSys", "IO que full, stalling util free space");
+
+		core::Thread::Sleep(1);
+		requestLock_.Enter();
+	}
+
 	// POD it like it's hot.
-	requestData_.write(&request, ioReqSize[request.getType()]);
+	requestData_.write(&request, reqSize);
 	requestCond_.NotifyOne();
 }
 
