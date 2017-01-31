@@ -199,6 +199,12 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 	// i don't think i'll bother changing the console var value for 'phys_draw_debug_scale'
 	// this can just be a slient internal change.
 
+
+	if (!pScene_) {
+		// we might not have a scene yet, when we do have one current values are transfferd to the scene.
+		return;
+	}
+
 	PHYS_SCENE_WRITE_LOCK(pScene_);
 
 	if (debugDraw_)
