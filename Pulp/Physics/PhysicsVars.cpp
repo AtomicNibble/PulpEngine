@@ -232,7 +232,7 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 void PhysXVars::Var_OnScaleChanged(core::ICVar* pVar)
 {
 	if (!pScene_) {
-		X_ERROR("Phys", "Can't update vis scale without a valid scene");
+		X_WARNING("Phys", "Can't update vis scale without a valid scene");
 		return;
 	}
 
