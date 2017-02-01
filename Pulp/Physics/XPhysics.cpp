@@ -1312,7 +1312,7 @@ void XPhysics::setScratchBlockSize(size_t size)
 	static const size_t MULTIPLE_OF = 1024 * 16;
 
 	if ((size % MULTIPLE_OF) != 0) {
-		X_ERROR("PhysicsSys", "Scratch block must be a multiple of %i. requested size: %i", MULTIPLE_OF, size);
+		X_ERROR("PhysicsSys", "Scratch block must be a multiple of %" PRIuS ". requested size: %" PRIuS, MULTIPLE_OF, size);
 		return;
 	}
 
