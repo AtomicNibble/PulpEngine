@@ -30,7 +30,7 @@ struct I3DEngine
 	virtual void release(void) X_ABSTRACT;
 
 	virtual void Update(core::FrameData& frame) X_ABSTRACT;
-	virtual void OnFrameBegin(void) X_ABSTRACT;
+	virtual void OnFrameBegin(core::FrameData& frame) X_ABSTRACT;
 
 
 
