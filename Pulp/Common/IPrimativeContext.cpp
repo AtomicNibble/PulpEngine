@@ -810,7 +810,65 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& near
 	}
 	else
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		PrimVertex* pVertices = addPrimative(6 * 2, PrimitiveType::TRIANGLELIST);
+
+		// far
+		pVertices[0].pos = v[0];
+		pVertices[0].color = farCol;
+		pVertices[1].pos = v[1];
+		pVertices[1].color = farCol;
+		pVertices[2].pos = v[2];
+		pVertices[2].color = farCol;
+
+		pVertices[3].pos = v[0];
+		pVertices[3].color = farCol;
+		pVertices[4].pos = v[2];
+		pVertices[4].color = farCol;
+		pVertices[5].pos = v[3];
+		pVertices[5].color = farCol;
+
+		// near
+		pVertices[6].pos = v[4];
+		pVertices[6].color = nearCol;
+		pVertices[7].pos = v[5];
+		pVertices[7].color = nearCol;
+		pVertices[8].pos = v[6];
+		pVertices[8].color = nearCol;
+
+		pVertices[9].pos = v[4];
+		pVertices[9].color = nearCol;
+		pVertices[10].pos = v[6];
+		pVertices[10].color = nearCol;
+		pVertices[11].pos = v[7];
+		pVertices[11].color = nearCol;
+
+		PrimVertex* pLines = addPrimative(4 * 6, PrimitiveType::LINELIST);
+
+		Color8u lineColFar(farCol);
+		Color8u lineColNear(nearCol);
+
+		lineColFar.a = 255;
+		lineColNear.a = 255;
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			pLines[0].pos = v[i];
+			pLines[0].color = lineColFar;
+			pLines[1].pos = v[((i + 1) & 3)];
+			pLines[1].color = lineColFar;
+
+			pLines[2].pos = v[i + 4];
+			pLines[2].color = lineColNear;
+			pLines[3].pos = v[((i + 1) & 3) + 4];
+			pLines[3].color = lineColNear;
+
+			pLines[4].pos = v[i];
+			pLines[4].color = lineColFar;
+			pLines[5].pos = v[i + 4];
+			pLines[5].color = lineColNear;
+
+			pLines += 6;
+		}
 	}
 }
 
