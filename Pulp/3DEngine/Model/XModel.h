@@ -119,7 +119,6 @@ private:
 	ModelHeader hdr_;
 
 private:
-	static int32_t model_bones_draw;
 	static Colorf model_bones_col;
 };
 

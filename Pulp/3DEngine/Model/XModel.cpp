@@ -17,7 +17,6 @@ X_NAMESPACE_BEGIN(model)
 
 
 
-int32_t XModel::model_bones_draw;
 Colorf XModel::model_bones_col;
 
 
@@ -123,13 +122,6 @@ void XModel::Render(void)
 
 void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat)
 {
-	// should move this out tbh.
-	// save a call for every model when this is disabled.
-	// check should be done once for a collection
-	if (!model_bones_draw) {
-		return;
-	}
-
 	if (numBones() > 0)
 	{
 		const int32_t num = numBones();
@@ -184,10 +176,6 @@ bool XModel::canRenderLod(size_t idx) const
 
 void XModel::RegisterVars(void)
 {	
-	ADD_CVAR_REF_NO_NAME(model_bones_draw, 0, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Draw model bones. 0=off 1=on");
-
 	ADD_CVAR_REF_COL_NO_NAME(model_bones_col, Color(0.7f, 0.5f, 0.f, 1.f),
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Model bone color");
 }
