@@ -370,8 +370,11 @@ namespace shader
 		{
 			const auto* pShader = it.second;
 
-			X_LOG0("Shader", "Name: ^2\"%s\"",
-				pShader->getName().c_str()
+			X_LOG0("Shader", "Name: ^2\"%s\"^7 Status: ^2%s^7 type: ^2%s^7 refs: %" PRIi32,
+				pShader->getName().c_str(), 
+				ShaderStatus::ToString(pShader->getStatus()),
+				ShaderType::ToString(pShader->getType()),
+				pShader->getRefCount()
 			);
 		}
 		X_LOG0("Shader", "------------ ^8Shaders End^7 -------------");
