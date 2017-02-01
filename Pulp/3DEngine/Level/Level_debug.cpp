@@ -211,6 +211,35 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 	}
 }
 
+void Level::DebugDraw_ModelBones(void) const
+{
+	if (s_var_drawModelBones_)
+	{
+		const Color8u visColor(255, 255, 64, 128);
+
+		for (const auto& a : areas_)
+		{
+			if (!IsAreaVisible(a)) {
+				continue;
+			}
+
+			for (const auto id : a.visibleEnts)
+			{
+				const level::StaticModel& sm = staticModels_[id - 1];
+
+				Matrix44f posMat = Matrix44f::createTranslation(sm.pos);
+				posMat.rotate(sm.angle.getAxis(), sm.angle.getAngle());
+
+				// save a call?
+				if (sm.pModel->numBones() > 0)
+				{
+					sm.pModel->RenderBones(pPrimContex_, posMat);
+				}
+			}
+		}
+	}
+}
+
 void Level::DrawStatsBlock(void) const
 {
 	if (!s_var_drawStats_) {

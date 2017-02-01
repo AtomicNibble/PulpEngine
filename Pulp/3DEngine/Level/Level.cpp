@@ -142,6 +142,7 @@ int Level::s_var_drawArea_ = -1;
 int Level::s_var_drawCurrentAreaOnly_ = 0;
 int Level::s_var_drawStats_ = 0;
 int Level::s_var_drawModelBounds_ = 0;
+int Level::s_var_drawModelBones_ = 0;
 int Level::s_var_drawPortalStacks_ = 0;
 int Level::s_var_detechCam_ = 0;
 int Level::s_var_cullEnts_ = 0;
@@ -216,6 +217,10 @@ bool Level::registerVars(void)
 	ADD_CVAR_REF("lvl_drawModelBounds", s_var_drawModelBounds_, 0, 0, 4,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
 		"Draws bounds around models. 1=visible-AABB 2=visible=Sphere 3=all-AABB 4=all-Sphere");
+
+	ADD_CVAR_REF("lvl_drawModelBones", s_var_drawModelBones_, 0, 0, 4,
+		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+		"Draw model bones. 0=off 1=on");
 
 	ADD_CVAR_REF("lvl_drawPortalStacks", s_var_drawPortalStacks_, 0, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws portal stacks");
@@ -363,6 +368,7 @@ void Level::DrawDebug(void)
 	DebugDraw_Portals();
 	DebugDraw_PortalStacks();
 	DebugDraw_StaticModelCullVis();
+	DebugDraw_ModelBones();
 }
 
 #if 0

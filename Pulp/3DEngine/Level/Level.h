@@ -197,6 +197,7 @@ private:
 	void DebugDraw_Portals(void) const;
 	void DebugDraw_PortalStacks(void) const;
 	void DebugDraw_StaticModelCullVis(void) const;
+	void DebugDraw_ModelBones(void) const;
 
 
 	// -------- below needs organising ---------
@@ -338,6 +339,7 @@ private:
 	static int s_var_drawCurrentAreaOnly_;
 	static int s_var_drawStats_;
 	static int s_var_drawModelBounds_;
+	static int s_var_drawModelBones_;
 	static int s_var_drawPortalStacks_;
 	static int s_var_detechCam_;
 	static int s_var_cullEnts_;
