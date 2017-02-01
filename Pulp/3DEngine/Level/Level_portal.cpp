@@ -493,7 +493,7 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 	{	
 		if (pArea->cusVisPortalIdx > 0)
 		{
-			const size_t total = core::accumulate(pArea->visPortals.begin(), pArea->visPortals.begin() + pArea->cusVisPortalIdx, 0_sz, [](const AreaVisiblePortal& avp) {
+			const size_t total = core::accumulate(pArea->visPortals.begin(), pArea->visPortals.begin() + pArea->cusVisPortalIdx + 1, 0_sz, [](const AreaVisiblePortal& avp) {
 				return avp.visibleEnts.size();
 			});
 
@@ -504,7 +504,7 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 			auto cmp = [](const AreaVisiblePortal::EntIdArr* lhs, const AreaVisiblePortal::EntIdArr* rhs) { return lhs->size() < rhs->size(); };
 			std::priority_queue<const AreaVisiblePortal::EntIdArr*, core::FixedArray<const AreaVisiblePortal::EntIdArr*, 16>, decltype(cmp)> que(cmp);
 
-			for (int32_t i = 0; i < pArea->cusVisPortalIdx; i++)
+			for (int32_t i = 0; i < pArea->cusVisPortalIdx + 1; i++)
 			{
 				const auto& visEnts = pArea->visPortals[i].visibleEnts;
 #if X_DEBUG
@@ -512,6 +512,8 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 #endif // X_DEBUG
 				que.push(&visEnts);
 			}
+
+			X_ASSERT(que.size() >= 2, "source code error should be atleast 2 in que")(que.size());
 
 			auto& destArr = pArea->visibleEnts;
 
