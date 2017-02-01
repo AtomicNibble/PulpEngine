@@ -169,6 +169,7 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 {
 	if(s_var_drawModelBounds_)
 	{
+		const Color8u cullColor(128, 0, 0, 128);
 		const Color8u visColor(255, 255, 64, 128);
 
 		for (const auto& a : areas_)
@@ -192,11 +193,11 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 					{
 						const level::StaticModel& sm = staticModels_[entId - 1];
 
-						pPrimContex_->drawAABB(sm.boundingBox, false, visColor);
+						pPrimContex_->drawAABB(sm.boundingBox, false, cullColor);
 					}
 				}
 			}
-			else
+			
 			{
 				// draw whats visible.
 
