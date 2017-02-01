@@ -229,7 +229,7 @@ bool Level::registerVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Detaches the camera");
 
 	ADD_CVAR_REF("lvl_cullEnts", s_var_cullEnts_, 0, 0, 2,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Culls the ent");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Perform visibility culling on entities");
 
 
 	return true;
