@@ -214,7 +214,8 @@ bool Level::registerVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws frame stats");
 
 	ADD_CVAR_REF("lvl_drawModelBounds", s_var_drawModelBounds_, 0, 0, 4,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws bounds around models. 1=visible-AABB 2=visible=Sphere 3=all-AABB 4=all-Sphere");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Draws bounds around models. 1=visible-AABB 2=visible=Sphere 3=all-AABB 4=all-Sphere");
 
 	ADD_CVAR_REF("lvl_drawPortalStacks", s_var_drawPortalStacks_, 0, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws portal stacks");
