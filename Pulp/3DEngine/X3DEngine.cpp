@@ -223,7 +223,7 @@ void X3DEngine::Update(core::FrameData& frame)
 
 }
 
-void X3DEngine::OnFrameBegin(void)
+void X3DEngine::OnFrameBegin(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 

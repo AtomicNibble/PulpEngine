@@ -233,7 +233,7 @@ void XCore::RenderBegin(core::FrameData& frameData)
 	X_UNUSED(frameData);
 
 	env_.pRender->renderBegin();
-	env_.p3DEngine->OnFrameBegin();
+	env_.p3DEngine->OnFrameBegin(frameData);
 }
 
 
