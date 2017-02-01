@@ -553,44 +553,32 @@ void XMaterialManager::freeDanglingMaterials(void)
 
 void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 {
-#if 1
-	X_UNUSED(pSearchPatten);
-	X_ASSERT_NOT_IMPLEMENTED();
-#else
-	core::Array<IMaterial*> sorted_mats(g_3dEngineArena);
+	core::Array<MaterialResource*> sorted_mats(g_3dEngineArena);
 	sorted_mats.setGranularity(materials_.size());
 
-	MaterialCon::ResourceConstItor Matit;
-
-	for (Matit = materials_.begin(); Matit != materials_.end(); ++Matit)
+	for (const auto& mat : materials_)
 	{
-		IMaterial* mat = static_cast<Material*>(Matit->second);
-
-		if (!searchPatten || core::strUtil::WildCompare(pSearchPatten, mat->getName()))
+		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, mat.first))
 		{
-			sorted_mats.push_back(mat);
+			sorted_mats.push_back(mat.second);
 		}
 	}
 
-	std::sort(sorted_mats.begin(), sorted_mats.end(), [](Material* a, Material* b) {
-		const char* nameA = a->getName();
-		const char* nameB = b->getName();
-		return strcmp(nameA, nameB) < 0;
-	}
+	std::sort(sorted_mats.begin(), sorted_mats.end(), [](MaterialResource* a, MaterialResource* b) {
+			const auto& nameA = a->getName();
+			const auto& nameB = b->getName();
+			return nameA.compareInt(nameB) < 0;
+		}
 	);
 
 	X_LOG0("Console", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
 
-	core::Array<IMaterial*>::ConstIterator it = sorted_mats.begin();
-	for (; it != sorted_mats.end(); ++it)
+	for(const auto* pMat : sorted_mats)
 	{
-		const IMaterial* mat = *it;
-		X_LOG0("Material", "^2\"%s\"^7", 
-			mat->getName());
+		X_LOG0("Material", "^2\"%s\"^7 refs: %" PRIi32, pMat->getName(), pMat->getRefCount());
 	}
 
 	X_LOG0("Console", "------------ ^8Materials End^7 -----------");
-#endif
 }
 
 
