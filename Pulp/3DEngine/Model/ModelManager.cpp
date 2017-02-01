@@ -38,18 +38,6 @@ namespace
 		pModelManager->ReloadModel(pName);
 	}
 
-	static void sortModelsByName(core::Array<XModel*>& models)
-	{
-		std::sort(models.begin(), models.end(),
-			[](XModel* a, XModel* b)
-		{
-			const char* nameA = a->getName();
-			const char* nameB = b->getName();
-			return strcmp(nameA, nameB) < 0;
-		}
-		);
-	}
-
 } // namespace
 
 
@@ -284,7 +272,7 @@ void XModelManager::ListModels(const char* searchPatten) const
 {
 	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-	core::Array<XModel*> sorted_models(g_3dEngineArena);
+	core::Array<ModelResource*> sorted_models(g_3dEngineArena);
 	sorted_models.setGranularity(models_.size());
 
 	for (const auto& model : models_)
@@ -297,15 +285,20 @@ void XModelManager::ListModels(const char* searchPatten) const
 		}
 	}
 
-	sortModelsByName(sorted_models);
+	std::sort(sorted_models.begin(), sorted_models.end(), [](ModelResource* a, ModelResource* b){
+			const auto& nameA = a->getName();
+			const auto& nameB = b->getName();
+			return nameA.compareInt(nameB) < 0;
+		}
+	);
 
 	X_LOG0("Console", "------------ ^8Models(%" PRIuS ")^7 ---------------", sorted_models.size());
 
-	for (const auto& model : sorted_models)
+	for (const auto* pModel : sorted_models)
 	{
-		X_LOG0("Model", "^2%-32s^7 Lods:^2%i^7 Bones:^2%i^7 BlankBones:^2%i^7 TotalMesh:^2%i^7",
-			model->getName(), model->numLods(), model->numBones(), model->numBlankBones(),
-			model->numMeshTotal());
+		X_LOG0("Model", "^2%-32s^7 Lods:^2%i^7 Bones:^2%i^7 BlankBones:^2%i^7 TotalMesh:^2%i^7 Refs:^2%i",
+			pModel->getName(), pModel->numLods(), pModel->numBones(), pModel->numBlankBones(),
+			pModel->numMeshTotal(), pModel->getRefCount());
 	}
 
 	X_LOG0("Console", "------------ ^8Models End^7 --------------");
