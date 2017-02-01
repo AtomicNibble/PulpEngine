@@ -6,6 +6,7 @@
 #include <ITimer.h>
 #include <IConsole.h>
 #include <I3DEngine.h>
+#include <IFrameData.h>
 
 #include <Threading\JobSystem2.h>
 
@@ -309,9 +310,14 @@ bool Level::Load(const char* mapName)
 }
 
 
-void Level::dispatchJobs(void)
+void Level::dispatchJobs(core::FrameData& frame)
 {
 	frameStats_.clear();
+
+	if (s_var_detechCam_ == 0) {
+		cam_ = frame.view.cam;
+	}
+
 
 	// here is where we work out if the level is loaded.
 	// if it's loaded we want to make visibility jobs.

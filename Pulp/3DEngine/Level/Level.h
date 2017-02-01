@@ -189,7 +189,7 @@ public:
 
 	// created jobs for the level.
 	// visibility, culling, rendering
-	void dispatchJobs(void);
+	void dispatchJobs(core::FrameData& frame);
 
 private:
 	void DrawDebug(void);

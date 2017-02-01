@@ -227,7 +227,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-	level_.dispatchJobs();
+	level_.dispatchJobs(frame);
 //	if (level_.canRender()) {
 //		level_.render();
 //	}
