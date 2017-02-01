@@ -465,7 +465,115 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& co
 	}
 	else
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		// we do this as triangles.
+		PrimVertex* pVerts = addPrimative(36, PrimitiveType::TRIANGLELIST);
+
+		const Vec3f& xyz = aabb.min;
+		const Vec3f xyZ(aabb.min.x, aabb.min.y, aabb.max.z);
+		const Vec3f xYz(aabb.min.x, aabb.max.y, aabb.min.z);
+		const Vec3f xYZ(aabb.min.x, aabb.max.y, aabb.max.z);
+		const Vec3f Xyz(aabb.max.x, aabb.min.y, aabb.min.z);
+		const Vec3f XyZ(aabb.max.x, aabb.min.y, aabb.max.z);
+		const Vec3f XYz(aabb.max.x, aabb.max.y, aabb.min.z);
+		const Vec3f& XYZ = aabb.max;
+
+		Color8u colBot(col * 0.5f);
+		Color8u colTop(col);
+		Color8u colBack(col * 0.5f);
+		Color8u colFront(col * 0.9f);
+		Color8u colLeft(col * 0.7f);
+		Color8u colRight(col * 0.8f);
+
+		// bottom
+		pVerts[0].pos = xyz;
+		pVerts[0].color = colBot;
+		pVerts[1].pos = xYz;
+		pVerts[1].color = colBot;
+		pVerts[2].pos = XYz;
+		pVerts[2].color = colBot;
+
+		pVerts[3].pos = xyz;
+		pVerts[3].color = colBot;
+		pVerts[4].pos = XYz;
+		pVerts[4].color = colBot;
+		pVerts[5].pos = Xyz;
+		pVerts[5].color = colBot;
+
+		// top
+		pVerts[6].pos = xyZ;
+		pVerts[6].color = colTop;
+		pVerts[7].pos = xYZ;
+		pVerts[7].color = colTop;
+		pVerts[8].pos = XYZ;
+		pVerts[8].color = colTop;
+
+		pVerts[9].pos = xyZ;
+		pVerts[9].color = colTop;
+		pVerts[10].pos = XYZ;
+		pVerts[10].color = colTop;
+		pVerts[11].pos = XyZ;
+		pVerts[11].color = colTop;
+
+		// back.
+		pVerts[12].pos = xyz;
+		pVerts[12].color = colBack;
+		pVerts[13].pos = Xyz;
+		pVerts[13].color = colBack;
+		pVerts[14].pos = XyZ;
+		pVerts[14].color = colBack;
+
+		pVerts[15].pos = xyz;
+		pVerts[15].color = colBack;
+		pVerts[16].pos = XyZ;
+		pVerts[16].color = colBack;
+		pVerts[17].pos = xyZ;
+		pVerts[17].color = colBack;
+
+		// front
+		pVerts[18].pos = xYz;
+		pVerts[18].color = colFront;
+		pVerts[19].pos = xYZ;
+		pVerts[19].color = colFront;
+		pVerts[20].pos = XYZ;
+		pVerts[20].color = colFront;
+
+		pVerts[21].pos = xYz;
+		pVerts[21].color = colFront;
+		pVerts[22].pos = XYZ;
+		pVerts[22].color = colFront;
+		pVerts[23].pos = XYz;
+		pVerts[23].color = colFront;
+
+		// left
+		pVerts[24].pos = xyz;
+		pVerts[24].color = colLeft;
+		pVerts[25].pos = xyZ;
+		pVerts[25].color = colLeft;
+		pVerts[26].pos = xYZ;
+		pVerts[26].color = colLeft;
+
+		pVerts[27].pos = xyz;
+		pVerts[27].color = colLeft;
+		pVerts[28].pos = xYZ;
+		pVerts[28].color = colLeft;
+		pVerts[29].pos = xYz;
+		pVerts[29].color = colLeft;
+
+		// right
+		pVerts[30].pos = Xyz;
+		pVerts[30].color = colRight;
+		pVerts[31].pos = XYz;
+		pVerts[31].color = colRight;
+		pVerts[32].pos = XYZ;
+		pVerts[32].color = colRight;
+
+		pVerts[33].pos = Xyz;
+		pVerts[33].color = colRight;
+		pVerts[34].pos = XYZ;
+		pVerts[34].color = colRight;
+		pVerts[35].pos = XyZ;
+		pVerts[35].color = colRight;
+
 	}
 }
 
