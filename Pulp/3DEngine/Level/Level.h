@@ -198,6 +198,7 @@ private:
 	void DebugDraw_PortalStacks(void) const;
 	void DebugDraw_StaticModelCullVis(void) const;
 	void DebugDraw_ModelBones(void) const;
+	void DebugDraw_DrawDetachedCam(void) const;
 
 
 	// -------- below needs organising ---------

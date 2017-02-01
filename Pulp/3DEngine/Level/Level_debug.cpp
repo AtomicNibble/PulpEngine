@@ -241,6 +241,19 @@ void Level::DebugDraw_ModelBones(void) const
 	}
 }
 
+void Level::DebugDraw_DrawDetachedCam(void) const
+{
+	if (s_var_detechCam_ > 0)
+	{
+		if (s_var_detechCam_ == 1) {
+			pPrimContex_->drawFrustum(cam_, Color8u(255, 255, 255, 128), Color8u(200, 0, 0, 100), true);
+		}
+		else {
+			pPrimContex_->drawFrustum(cam_, Color8u(255, 255, 255, 255), Color8u(200, 0, 0, 255), false);
+		}
+	}
+}
+
 void Level::DrawStatsBlock(void) const
 {
 	if (!s_var_drawStats_) {

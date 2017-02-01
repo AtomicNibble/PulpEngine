@@ -369,6 +369,8 @@ void Level::DrawDebug(void)
 	DebugDraw_PortalStacks();
 	DebugDraw_StaticModelCullVis();
 	DebugDraw_ModelBones();
+	DebugDraw_DrawDetachedCam();
+
 }
 
 #if 0
