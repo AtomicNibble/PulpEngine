@@ -553,6 +553,8 @@ void XMaterialManager::freeDanglingMaterials(void)
 
 void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 {
+	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
 	core::Array<MaterialResource*> sorted_mats(g_3dEngineArena);
 	sorted_mats.setGranularity(materials_.size());
 
