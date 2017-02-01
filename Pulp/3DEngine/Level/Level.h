@@ -182,23 +182,31 @@ public:
 	static bool registerVars(void);
 
 	bool init(void);
+	void free(void);
 
-	// work out 
+	// free currently level and create jobs for loading new level.
+	bool Load(const char* pMapName);
+
+	// created jobs for the level.
+	// visibility, culling, rendering
 	void dispatchJobs(void);
 
-	void free(void);
-	bool render(void);
+private:
+	void DrawDebug(void);
+	void DebugDraw_AreaBounds(void) const;
+	void DebugDraw_Portals(void) const;
+	void DebugDraw_PortalStacks(void) const;
+	void DebugDraw_StaticModelCullVis(void) const;
 
-	bool Load(const char* mapName);
 
-	void DrawPortalDebug(void) const;
-	void DrawAreaBounds(void);
+	// -------- below needs organising ---------
+	
 	void DrawStatsBlock(void) const;
 
 private:
 	void clearVisPortals(void);
 	void FloodVisibleAreas(void);
-	void DrawVisibleAreas(void);
+//	void DrawVisibleAreas(void);
 
 	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
@@ -253,10 +261,10 @@ private:
 	void FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum, const Planef& farPlane,
 		const PortalStack* ps);
 
-	void DrawArea(const Area& area);
-	void DrawMultiAreaModels(void);
-	bool DrawStaticModel(const level::StaticModel& sm, int32_t areaNum);
-	void DrawPortalStacks(void) const;
+//	void DrawArea(const Area& area);
+//	void DrawMultiAreaModels(void);
+//	bool DrawStaticModel(const level::StaticModel& sm, int32_t areaNum);
+//	void DrawPortalStacks(void) const;
 
 private:
 	bool ProcessHeader(void);

@@ -894,7 +894,7 @@ void Level::FloodVisibleAreas(void)
 	}
 }
 
-
+#if 0
 void Level::DrawVisibleAreas(void)
 {
 	AreaArr::ConstIterator it = areas_.begin();
@@ -908,7 +908,7 @@ void Level::DrawVisibleAreas(void)
 		}
 	}
 }
-
+#endif
 
 // ==================================================================
 
@@ -1068,86 +1068,5 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum, const Pl
 }
 
 
-void Level::DrawPortalDebug(void) const
-{
-	using namespace render;
-
-	if (s_var_drawPortals_ > 0 && !outsideWorld_)
-	{
-#if 0
-		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
-
-		// 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt
-		flags.SetAlphaBlendMode(AuxGeom_AlphaBlendMode::AlphaBlended);
-
-		if (s_var_drawPortals_ == 2 || s_var_drawPortals_ == 4)
-		{
-			flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
-		}
-
-		if (s_var_drawPortals_ == 3 || s_var_drawPortals_ == 4)
-		{
-			flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOn);
-			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOn);
-		}
-		else
-		{
-			flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
-			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
-		}
-
-		flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
-#endif
-
-	//	pAux_->setRenderFlags(flags);
-
-
-		// draw the portals.
-		AreaArr::ConstIterator areaIt = areas_.begin();
-		for (; areaIt != areas_.end(); ++areaIt)
-		{
-			if (!IsAreaVisible(*areaIt)) {
-				continue;
-			}
-
-			Area::AreaPortalArr::ConstIterator apIt = areaIt->portals.begin();
-			for (; apIt != areaIt->portals.end(); ++apIt)
-			{
-				const AreaPortal& portal = *apIt;
-
-#if 1
-				if (IsAreaVisible(areas_[portal.areaTo]))
-				{
-					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
-				}
-				else
-				{
-					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
-				}
-#else
-		
-
-				AABB box;
-				portal.pWinding->GetAABB(box);
-
-				if (areas_[portal.areaTo].frameID == frameID_)
-				{
-					pAux_->drawAABB(
-						box, Vec3f::zero(), true, Colorf(0.f, 1.f, 0.f, 0.45f)
-						);
-				}
-				else
-				{
-					pAux_->drawAABB(
-						box, Vec3f::zero(), true, Colorf(1.f, 0.f, 0.f, 1.f)
-						);
-				}
-#endif
-			}
-		}
-	}
-}
 
 X_NAMESPACE_END

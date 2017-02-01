@@ -240,61 +240,6 @@ bool Level::init(void)
 	return true;
 }
 
-#if 1
-
-void Level::dispatchJobs(void)
-{
-	frameStats_.clear();
-
-	// here is where we work out if the level is loaded.
-	// if it's loaded we want to make visibility jobs.
-	// but first we need a job that works out what area we are in.
-
-	if (loaded_)
-	{
-		core::V2::Job* pSyncJob = pJobSys_->CreateEmtpyJob();
-
-		// find all the visible area's and create lists of all the visible static models in each area.
-		auto* pFindVisibleAreas = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FindVisibleArea_job, nullptr);
-
-		auto* pBuildvisFlags = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::BuildVisibleAreaFlags_job, nullptr);
-		auto* pRemoveDupeVis = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::MergeVisibilityArrs_job, nullptr);
-		auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr);
-		auto* pDrawStaticModels = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleStaticModels_job, nullptr);
-
-		// now inline build the vis flags for areas
-		pJobSys_->AddContinuation(pFindVisibleAreas, pBuildvisFlags, true);
-		// then dispatch a job to post proces the visible models, to create single visble lists for each area.
-		pJobSys_->AddContinuation(pFindVisibleAreas, pRemoveDupeVis, false);
-		// after we have visible areas we can begin drawing the area geo.
-		pJobSys_->AddContinuation(pFindVisibleAreas, pDrawAreaGeo, false);
-		// after the dupe visibility has been resolved we can start drawing the static models (we could run this after each are'as dupe have been removed)
-		pJobSys_->AddContinuation(pRemoveDupeVis, pDrawStaticModels, false);
-
-
-		pJobSys_->Run(pFindVisibleAreas);
-		pJobSys_->Run(pSyncJob);
-
-		pJobSys_->Wait(pSyncJob);
-		pSyncJob = nullptr;
-	}
-
-
-}
-
-#else
-
-
-void Level::update(void)
-{
-	frameStats_.clear();
-
-	// don't update cam if we are deteched.
-	if (!s_var_detechCam_) {
-//		cam_ = gEnv->pRender->GetCamera();
-	}
-}
-#endif
 
 void Level::free(void)
 {
@@ -325,6 +270,102 @@ void Level::free(void)
 	}
 }
 
+
+bool Level::Load(const char* mapName)
+{
+	// does the other level file exsist?
+	path_.set(mapName);
+	path_.setExtension(level::LVL_FILE_EXTENSION);
+
+	// free it :)
+	free();
+
+	X_LOG0("Level", "Loading level: %s", mapName);
+	loadStats_ = LoadStats();
+	loadStats_.startTime = pTimer_->GetTimeNowNoScale();
+
+	// create a physics scene.
+	if (!createPhysicsScene()) {
+		return false;
+	}
+
+	// clear it.
+	core::zero_object(fileHdr_);
+
+	headerLoaded_ = false;
+
+	core::IoRequestOpen open;
+	open.callback.Bind<Level, &Level::IoRequestCallback>(this);
+	open.mode = core::fileMode::READ;
+	open.path = path_;
+
+	pFileSys_->AddIoRequestToQue(open);
+	return true;
+}
+
+
+void Level::dispatchJobs(void)
+{
+	frameStats_.clear();
+
+	// here is where we work out if the level is loaded.
+	// if it's loaded we want to make visibility jobs.
+	// but first we need a job that works out what area we are in.
+
+	if (loaded_)
+	{
+		core::V2::Job* pSyncJob = pJobSys_->CreateEmtpyJob();
+
+		// find all the visible area's and create lists of all the visible static models in each area.
+		auto* pFindVisibleAreas = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FindVisibleArea_job, nullptr);
+
+		auto* pBuildvisFlags = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::BuildVisibleAreaFlags_job, nullptr);
+		auto* pRemoveDupeVis = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::MergeVisibilityArrs_job, nullptr);
+	//	auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr);
+	//	auto* pDrawStaticModels = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleStaticModels_job, nullptr);
+
+		// now inline build the vis flags for areas
+		pJobSys_->AddContinuation(pFindVisibleAreas, pBuildvisFlags, true);
+		// then dispatch a job to post proces the visible models, to create single visble lists for each area.
+		pJobSys_->AddContinuation(pFindVisibleAreas, pRemoveDupeVis, false);
+		// after we have visible areas we can begin drawing the area geo.
+	//	pJobSys_->AddContinuation(pFindVisibleAreas, pDrawAreaGeo, false);
+		// after the dupe visibility has been resolved we can start drawing the static models (we could run this after each are'as dupe have been removed)
+	//	pJobSys_->AddContinuation(pRemoveDupeVis, pDrawStaticModels, false);
+
+
+		pJobSys_->Run(pFindVisibleAreas);
+		pJobSys_->Run(pSyncJob);
+
+		pJobSys_->Wait(pSyncJob);
+		pSyncJob = nullptr;
+	}
+
+	// this could be run as a job.
+	// but certain debug drawing can be done before others but we can't make multiple jobs
+	// since then may not run on same thread.
+	// well actually that is fine as long as they don't run in parrallel.
+	// so we need to be able to submit debug draw jobs that run at correct time but also ensure two debug jobs can't run at same time
+	DrawDebug();
+}
+
+
+void Level::DrawDebug(void)
+{
+	// we support debug drawing currently it's single threaded.
+	// things we can draw:
+	// - portals
+	// - portal stacks
+	// - static model cull results
+	// - area bounds
+
+	DebugDraw_AreaBounds();
+	DebugDraw_Portals();
+	DebugDraw_PortalStacks();
+	DebugDraw_StaticModelCullVis();
+}
+
+#if 0
 bool Level::render(void)
 {
 	X_PROFILE_BEGIN("Level render", core::ProfileSubSys::ENGINE3D);
@@ -360,7 +401,9 @@ bool Level::render(void)
 
 	return true;
 }
+#endif
 
+#if 0
 void Level::DrawArea(const Area& area)
 {
 	X_ASSERT(IsAreaVisible(area), "Area should be visible when drawing")();
@@ -574,6 +617,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 	return false;
 }
+#endif
 
 void Level::clearVisableAreaFlags()
 {

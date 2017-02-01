@@ -8,9 +8,7 @@
 X_NAMESPACE_BEGIN(level)
 
 
-
-
-void Level::DrawAreaBounds(void)
+void Level::DebugDraw_AreaBounds(void) const
 {
 	if (s_var_drawAreaBounds_)
 	{
@@ -60,7 +58,40 @@ void Level::DrawAreaBounds(void)
 	}
 }
 
-void Level::DrawPortalStacks(void) const
+void Level::DebugDraw_Portals(void) const
+{
+	if (s_var_drawPortals_ > 0 /* && !outsideWorld_ */)
+	{
+		// draw the portals.
+		AreaArr::ConstIterator areaIt = areas_.begin();
+		for (; areaIt != areas_.end(); ++areaIt)
+		{
+			if (!IsAreaVisible(*areaIt)) {
+				continue;
+			}
+
+			Area::AreaPortalArr::ConstIterator apIt = areaIt->portals.begin();
+			for (; apIt != areaIt->portals.end(); ++apIt)
+			{
+				const AreaPortal& portal = *apIt;
+
+				if (IsAreaVisible(areas_[portal.areaTo]))
+				{
+					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
+						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
+				}
+				else
+				{
+					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
+						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
+				}
+			}
+		}
+	}
+}
+
+
+void Level::DebugDraw_PortalStacks(void) const
 {
 	if (s_var_drawPortalStacks_)
 	{
@@ -69,16 +100,15 @@ void Level::DrawPortalStacks(void) const
 		// how to i turn that into a visible shape.
 		// in order to create the shape we need to clip the planes with each other.
 
-#if 0
 		for (const auto& a : areas_)
 		{
 			if (!IsAreaVisible(a)) {
 				continue;
 			}
 
-			for (size_t x = 0; x < a.visPortalPlanes.size(); x++)
+			for (const auto& vp : a.visPortals)
 			{
-				const Area::PortalPlanesArr& portalPlanes = a.visPortalPlanes[x];
+				const auto& portalPlanes = vp.planes;
 
 				XWinding* windings[PortalStack::MAX_PORTAL_PLANES] = { nullptr };
 				XWinding* w;
@@ -132,8 +162,52 @@ void Level::DrawPortalStacks(void) const
 				}
 			}
 		}
+	}
+}
 
-#endif
+void Level::DebugDraw_StaticModelCullVis(void) const
+{
+	if(s_var_drawModelBounds_)
+	{
+		const Color8u visColor(255, 255, 64, 128);
+
+		for (const auto& a : areas_)
+		{
+			if (!IsAreaVisible(a)) {
+				continue;
+			}
+
+			if (s_var_drawModelBounds_ > 2)
+			{
+				// draw what was culled.
+				const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[a.areaNum];
+				size_t i = areaModelsHdr.startIndex;
+				size_t end = i + areaModelsHdr.num;
+
+				for (; i < end; i++)
+				{
+					uint32_t entId = modelRefs_.areaRefs[i].entId;
+
+					if (!std::binary_search(a.visibleEnts.begin(), a.visibleEnts.end(), entId))
+					{
+						const level::StaticModel& sm = staticModels_[entId - 1];
+
+						pPrimContex_->drawAABB(sm.boundingBox, false, visColor);
+					}
+				}
+			}
+			else
+			{
+				// draw whats visible.
+
+				for (const auto id : a.visibleEnts)
+				{
+					const level::StaticModel& sm = staticModels_[id - 1];
+
+					pPrimContex_->drawAABB(sm.boundingBox, false, visColor);
+				}
+			}
+		}
 	}
 }
 
@@ -187,6 +261,7 @@ void Level::DrawStatsBlock(void) const
 	pRender_->Set2D(false);
 #endif
 }
+
 
 
 X_NAMESPACE_END

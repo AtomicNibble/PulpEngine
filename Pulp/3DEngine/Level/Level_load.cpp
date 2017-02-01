@@ -109,42 +109,6 @@ void Level::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 }
 
 
-
-bool Level::Load(const char* mapName)
-{
-	// does the other level file exsist?
-	path_.set(mapName);
-	path_.setExtension(level::LVL_FILE_EXTENSION);
-
-	// free it :)
-	free();
-
-	X_LOG0("Level", "Loading level: %s", mapName);
-	loadStats_ = LoadStats();
-	loadStats_.startTime = pTimer_->GetTimeNowNoScale();
-
-	// create a physics scene.
-	if (!createPhysicsScene()) {
-		return false;
-	}
-
-	// clear it.
-	core::zero_object(fileHdr_);
-
-	headerLoaded_ = false;
-
-	core::IoRequestOpen open;
-	open.callback.Bind<Level, &Level::IoRequestCallback>(this);
-	open.mode = core::fileMode::READ;
-	open.path = path_;
-
-	pFileSys_->AddIoRequestToQue(open);
-
-
-
-	return true;
-}
-
 bool Level::ProcessHeader(void)
 {
 	// is this header valid m'lady?
