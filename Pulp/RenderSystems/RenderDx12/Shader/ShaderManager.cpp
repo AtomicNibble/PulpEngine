@@ -297,7 +297,13 @@ namespace shader
 
 		core::StackString512 name;
 
-		name.appendFmt("%s@%s", pSourceFile->getName().c_str(), entry);
+		const char* pEntry = entry.c_str();
+		if (entry.isEmpty())
+		{
+			pEntry = DEFAULT_SHADER_ENTRY[type];
+		}
+
+		name.appendFmt("%s@%s", pSourceFile->getName().c_str(), pEntry);
 
 		// macros are now part of the name.
 		name.appendFmt("_%x", techFlags.ToInt());
