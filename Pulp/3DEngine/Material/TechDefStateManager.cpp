@@ -57,17 +57,17 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	render::RenderTargetFmtsArr rtfs;
 	rtfs.append(texture::Texturefmt::R8G8B8A8);
 
-	auto passHandle = pRenderSys->createPassState(rtfs);
-	if (passHandle == render::INVALID_STATE_HANLDE)
-	{
-		X_ERROR("Tech", "Failed to create passState");
-		return false;
-	}
-
 	// this will result in all shaders been compiled and cbuffer info created.
 	render::shader::IShaderPermatation* pPerm = pRenderSys->createPermatation(stages);
 	if (!pPerm) {
 		X_ERROR("Tech", "Failed to create perm");
+		return false;
+	}
+
+	auto passHandle = pRenderSys->createPassState(rtfs);
+	if (passHandle == render::INVALID_STATE_HANLDE)
+	{
+		X_ERROR("Tech", "Failed to create passState");
 		return false;
 	}
 
