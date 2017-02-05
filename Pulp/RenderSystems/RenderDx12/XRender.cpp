@@ -604,6 +604,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
+					X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
+
 					// don't bother looking up ib if same handle.
 					if (curState.indexBuffer != pDraw->indexBuffer) {
 						curState.indexBuffer = pDraw->indexBuffer;
