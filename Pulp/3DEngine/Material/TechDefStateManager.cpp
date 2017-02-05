@@ -30,6 +30,16 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// we want to lazy compile these i think.
 	// so how do we know what is supported.
 	// X_UNUSED(vertFmt);
+	for (auto& perm : perms_)
+	{
+		if (perm.vertFmt == vertFmt)
+		{
+			// we return pointer so we can't reallocate.
+			// meaning perms need to reverse memory to store all vert formats.
+			return &perm;
+		}
+	}
+
 
 	render::IRender* pRenderSys = gEnv->pRender;
 
