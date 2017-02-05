@@ -580,6 +580,17 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	{
 		CommandPacket::Packet pPacket = packets[sortedIdx[i]];
 
+#if X_DEBUG
+		// this meants the sort logic and merge logic of command bucket is not quite correct / corrupt.
+
+#if X_64
+		X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDBDBDBDBDB), "Invalid packet")(pPacket);
+#else
+		X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDB), "Invalid packet")(pPacket);
+#endif // !X_64
+
+#endif
+
 		do
 		{
 			const CommandPacket::Command::Enum cmdType = CommandPacket::loadCommandType(pPacket);
