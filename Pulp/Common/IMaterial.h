@@ -292,7 +292,7 @@ struct IMaterialManager
 	// if file can't be loaded or error it return the default material.
 	virtual Material* loadMaterial(const char* MtlName) X_ABSTRACT;
 
-	virtual MaterialTech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt) X_ABSTRACT;
+	virtual MaterialTech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, bool vertStreams = false) X_ABSTRACT;
 	virtual bool setTextureID(Material* pMat, MaterialTech* pTech, core::StrHash texNameHash, texture::TexID id) X_ABSTRACT;
 
 

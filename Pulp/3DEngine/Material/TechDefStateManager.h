@@ -19,7 +19,7 @@ public:
 	TechDef(core::MemoryArenaBase* arena);
 	~TechDef();
 
-	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt);
+	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt, bool vertStreams);
 
 	X_INLINE Shader::AliaseArr::size_type getNumAliases(void) const;
 	X_INLINE const Shader::AliaseArr& getAliases(void) const;

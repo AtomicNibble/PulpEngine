@@ -24,22 +24,24 @@ TechDef::~TechDef()
 }
 
 
-TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt)
+TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt, bool vertStreams)
 {
 	// ok so this will be called to get a permatation.
 	// we want to lazy compile these i think.
 	// so how do we know what is supported.
 	// X_UNUSED(vertFmt);
-	for (auto& perm : perms_)
 	{
-		if (perm.vertFmt == vertFmt)
+		for (auto& perm : perms_)
 		{
-			// we return pointer so we can't reallocate.
-			// meaning perms need to reverse memory to store all vert formats.
-			return &perm;
+			if (perm.vertFmt == vertFmt && perm.vertStreams == vertStreams)
+			{
+				// we return pointer so we can't reallocate.
+				// meaning perms need to reverse memory to store all vert formats.
+				return &perm;
+			}
 		}
-	}
 
+	}
 
 	render::IRender* pRenderSys = gEnv->pRender;
 
@@ -87,6 +89,10 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// only stuff like vertex format which is runtime etc..
 	decltype(stateDesc) stateDescCpy = stateDesc;
 	stateDescCpy.vertexFmt = vertFmt;
+	if (vertStreams) {
+		stateDescCpy.stateFlags.Set(render::StateFlag::VERTEX_STREAMS);
+	}
+
 	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDescCpy, nullptr, 0);
 
 	if (stateHandle == render::INVALID_STATE_HANLDE)
@@ -101,6 +107,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	perm.stateHandle = stateHandle;
 	perm.pShaderPerm = pPerm;
 	perm.vertFmt = vertFmt;
+	perm.vertStreams = vertStreams;
 
 	return &perm;
 }

@@ -33,6 +33,9 @@ struct TechDefPerm
 	render::StateHandle stateHandle;
 	render::shader::IShaderPermatation* pShaderPerm;
 	render::shader::VertexFormat::Enum vertFmt;
+	bool vertStreams;
+	uint8_t _pad[2];
+	// +  4 more pad in 64bit
 };
 
 
