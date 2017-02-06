@@ -145,7 +145,7 @@ public:
 	VisPortalsArr visPortals;
 
 	// processed vis ents.
-	EntIdArr visibleEnts;
+	EntIdArr areaVisibleEnts;
 };
 
 

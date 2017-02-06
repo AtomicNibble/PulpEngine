@@ -498,7 +498,7 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 			});
 
 			// make engouth space for them all
-			pArea->visibleEnts.reserve(total);
+			pArea->areaVisibleEnts.reserve(total);
 
 			// create a que that gives us the smallets lists first.
 			auto cmp = [](const AreaVisiblePortal::EntIdArr* lhs, const AreaVisiblePortal::EntIdArr* rhs) { return lhs->size() < rhs->size(); };
@@ -515,7 +515,7 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 
 			X_ASSERT(que.size() >= 2, "source code error should be atleast 2 in que")(que.size());
 
-			auto& destArr = pArea->visibleEnts;
+			auto& destArr = pArea->areaVisibleEnts;
 
 			// copy first two into dest then merge.
 			auto pVisEnts1 = que.top();
@@ -554,7 +554,7 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 		}
 		else
 		{
-			pArea->visibleEnts.swap(pArea->visPortals[0].visibleEnts);
+			pArea->areaVisibleEnts.swap(pArea->visPortals[0].visibleEnts);
 		}
 	}
 }
@@ -591,7 +591,7 @@ void Level::DrawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t thre
 
 	for (auto* pArea : visibleAreas_)
 	{
-		const auto& visEnts = pArea->visibleEnts;
+		const auto& visEnts = pArea->areaVisibleEnts;
 
 		auto* pJobs = jobSys.parallel_for_member_child<Level>(pJob, del, visEnts.data(), safe_static_cast<uint32_t>(visEnts.size()),
 			core::V2::CountSplitter32(16) // will likley need tweaking, props even made a var.

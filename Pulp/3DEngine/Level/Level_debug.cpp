@@ -189,7 +189,7 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 				{
 					uint32_t entId = modelRefs_.areaRefs[i].entId;
 
-					if (!std::binary_search(a.visibleEnts.begin(), a.visibleEnts.end(), entId))
+					if (!std::binary_search(a.areaVisibleEnts.begin(), a.areaVisibleEnts.end(), entId))
 					{
 						const level::StaticModel& sm = staticModels_[entId - 1];
 
@@ -201,7 +201,7 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 			{
 				// draw whats visible.
 
-				for (const auto id : a.visibleEnts)
+				for (const auto id : a.areaVisibleEnts)
 				{
 					const level::StaticModel& sm = staticModels_[id - 1];
 
@@ -224,7 +224,7 @@ void Level::DebugDraw_ModelBones(void) const
 				continue;
 			}
 
-			for (const auto id : a.visibleEnts)
+			for (const auto id : a.areaVisibleEnts)
 			{
 				const level::StaticModel& sm = staticModels_[id - 1];
 

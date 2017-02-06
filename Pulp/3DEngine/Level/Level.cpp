@@ -66,7 +66,7 @@ AreaVisiblePortal::AreaVisiblePortal() :
 Area::Area() : 
 	portals(g_3dEngineArena), 
 	visPortals(g_3dEngineArena),
-	visibleEnts(g_3dEngineArena),
+	areaVisibleEnts(g_3dEngineArena),
 	cusVisPortalIdx(-1)
 {
 	areaNum = -1;
