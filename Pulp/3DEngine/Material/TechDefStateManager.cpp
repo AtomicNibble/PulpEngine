@@ -78,6 +78,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	if (passHandle == render::INVALID_STATE_HANLDE)
 	{
 		X_ERROR("Tech", "Failed to create passState");
+		pRenderSys->releaseShaderPermatation(pPerm);
 		return false;
 	}
 
