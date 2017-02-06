@@ -367,7 +367,8 @@ bool Level::ProcessData(void)
 
 		for (auto& a : areas_)
 		{
-			a.visPortals.resize(core::Max(1, a.maxVisPortals));
+			a.maxVisPortals = core::Max(1, a.maxVisPortals);
+			a.visPortals.resize(a.maxVisPortals);
 		}
 
 		if (!file.isEof()) {
