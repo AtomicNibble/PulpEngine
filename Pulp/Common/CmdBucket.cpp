@@ -134,6 +134,27 @@ void CommandBucket<KeyT>::sort(void)
 					continue;
 				}
 
+				// we need to handle complete slots inbetween.
+				{
+					X_ASSERT(i > 0, "index must be greater than zero")(); // currently we can't reach here without i been >0
+
+					const auto& prevSlot = sortedSlots[i - 1];
+					const int32_t diff = nextSlot.offset - prevSlot.offset;
+
+					if (diff > FETCH_SIZE)
+					{
+						const int32_t numToCopy = diff - FETCH_SIZE;
+						const auto copyOffset = prevSlot.offset + FETCH_SIZE;
+
+						X_ASSERT((numToCopy % FETCH_SIZE) == 0, "Should be multiple of fetch size")(numToCopy, FETCH_SIZE);
+
+						std::memmove(&keys_[curEnd], &keys_[copyOffset], numToCopy * sizeof(KeyT));
+						std::memmove(&packets_[curEnd], &packets_[copyOffset], numToCopy * sizeof(PacketArr::Type));
+
+						curEnd += numToCopy;
+					}
+				}
+
 				total -= nextSlot.remaining;
 
 				// we have some to shit.
