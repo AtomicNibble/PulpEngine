@@ -56,7 +56,8 @@ AreaPortal::~AreaPortal()
 // --------------------------------
 
 AreaVisiblePortal::AreaVisiblePortal() :
-	visibleEnts(g_3dEngineArena)
+	visibleEnts(g_3dEngineArena),
+	areaFrom(-2)
 {
 	
 }

@@ -110,6 +110,7 @@ public:
 public:
 	EntIdArr visibleEnts;	// this list of ent's that are visible in the portal planes below.
 	PortalPlanesArr planes; // the planes pointing into area
+	int32_t areaFrom; // the area we are coming from
 };
 
 struct Area
@@ -221,11 +222,11 @@ private:
 private:
 	void FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 	void FloodThroughPortal_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	void FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin, int32_t areaNum, const Planef& farPlane,
+	void FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin, int32_t areaNum, int32_t areaFrom, const Planef& farPlane,
 		const PortalStack* ps);
 
 	// marks the area visible and creats a job to cull the area's ent's
-	void SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t area, const PortalStack* ps = nullptr);
+	void SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t area, int32_t areaFrom, const PortalStack* ps = nullptr);
 
 	void CullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 	void BuildVisibleAreaFlags_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);

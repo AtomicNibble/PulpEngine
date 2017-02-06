@@ -28,6 +28,7 @@ namespace
 		const AreaPortal& areaPortal;
 		float dis;
 		Vec3f camPos;
+		int32_t areaFrom;
 		const Planef (&camPlanes)[FrustumPlane::ENUM_COUNT];
 	};
 
@@ -68,13 +69,13 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 			// add all areas
 			for (const auto& area : areas_)
 			{
-				SetAreaVisibleAndCull(pJob, area.areaNum);
+				SetAreaVisibleAndCull(pJob, area.areaNum, -1);
 			}
 		}
 		else
 		{
 			// begin culling this area, while we work out what other area's we can potentially see.
-			SetAreaVisibleAndCull(pJob, camArea_);
+			SetAreaVisibleAndCull(pJob, camArea_, -1);
 
 			if (s_var_drawCurrentAreaOnly_ != 1)
 			{
@@ -119,7 +120,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 					}
 
 					// now create a job todo the rest of the flooding for this portal
-					PortalFloodJobData jobData = { ps, portal, dis, camPos, camPlanes };
+					PortalFloodJobData jobData = { ps, portal, dis, camPos, camArea_, camPlanes };
 					auto* pFloodJob = jobSys.CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FloodThroughPortal_job, jobData);
 					jobSys.Run(pFloodJob);
 				}
@@ -133,7 +134,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
 	{
 		// force draw just this area even if outside world.
-		SetAreaVisibleAndCull(pJob, s_var_drawArea_);
+		SetAreaVisibleAndCull(pJob, s_var_drawArea_, -1);
 	}
 
 }
@@ -156,7 +157,7 @@ void Level::FloodThroughPortal_job(core::V2::JobSystem& jobSys, size_t threadIdx
 		newStack = floodData.basePortalStack;
 		newStack.pPortal = &floodData.areaPortal;
 		newStack.pNext = &floodData.basePortalStack;
-		FloodViewThroughArea_r(pJob, floodData.camPos, floodData.areaPortal.areaTo, farPlane, &newStack);
+		FloodViewThroughArea_r(pJob, floodData.camPos, floodData.areaPortal.areaTo, floodData.areaFrom, farPlane, &newStack);
 		return;
 	}
 	
@@ -216,12 +217,12 @@ void Level::FloodThroughPortal_job(core::V2::JobSystem& jobSys, size_t threadIdx
 	// the last stack plane is the portal plane
 	newStack.portalPlanes.append(-floodData.areaPortal.plane);
 
-	FloodViewThroughArea_r(pJob, floodData.camPos, floodData.areaPortal.areaTo, farPlane, &newStack);
+	FloodViewThroughArea_r(pJob, floodData.camPos, floodData.areaPortal.areaTo, floodData.areaFrom, farPlane, &newStack);
 
 }
 
 
-void Level::FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin, int32_t areaNum, 
+void Level::FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin, int32_t areaNum, int32_t areaFrom,
 	const Planef& farPlane, const PortalStack* ps)
 {
 	X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t, size_t>(NumAreas())),
@@ -236,7 +237,7 @@ void Level::FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin
 	const Area& area = areas_[areaNum];
 
 	// add this area.
-	SetAreaVisibleAndCull(pParentJob, areaNum, ps);
+	SetAreaVisibleAndCull(pParentJob, areaNum, areaFrom, ps);
 
 	// see what portals we can see.
 
@@ -270,7 +271,7 @@ void Level::FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin
 			newStack = *ps;
 			newStack.pPortal = &portal;
 			newStack.pNext = ps;
-			FloodViewThroughArea_r(pParentJob, origin, portal.areaTo, farPlane, &newStack);
+			FloodViewThroughArea_r(pParentJob, origin, portal.areaTo, areaNum, farPlane, &newStack);
 			continue;
 		}
 
@@ -330,11 +331,11 @@ void Level::FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin
 		// the last stack plane is the portal plane
 		newStack.portalPlanes.append(-portal.plane);
 
-		FloodViewThroughArea_r(pParentJob, origin, portal.areaTo, farPlane, &newStack);
+		FloodViewThroughArea_r(pParentJob, origin, portal.areaTo, areaNum, farPlane, &newStack);
 	}
 }
 
-void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, const PortalStack* ps)
+void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, int32_t areaFrom, const PortalStack* ps)
 {
 	// this is where we "dispatch" a child job to cull this area
 	// if this area is visible from multiple portals we have two culling jobs one with each portal stack.
@@ -354,7 +355,9 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, co
 	// or have some logic for working it out :/ ?
 	const int32_t visPortalIdx = core::atomic::Increment(&area.cusVisPortalIdx);
 
-	X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, visPortalIdx, area.maxVisPortals, ps);
+	X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
+	
+	area.visPortals[visPortalIdx].areaFrom = areaFrom;
 
 	if (ps) {
 		// this is thread safe as each thread gets a diffrent idx.
