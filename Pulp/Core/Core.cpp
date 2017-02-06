@@ -36,6 +36,40 @@
 #include <conio.h>
 #endif // !X_PLATFORM_WIN32
 
+namespace
+{
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+
+	typedef core::MemoryArena<
+		core::GrowingGenericAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+	> StrArena;
+
+#else
+
+	typedef core::MemoryArena<
+		core::GrowingGenericAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+		core::NoBoundsChecking,
+#if X_ENABLE_MEMORY_SIMPLE_TRACKING
+		core::SimpleMemoryTracking,
+#else
+		core::NoMemoryTracking,
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+		core::NoMemoryTagging
+	> StrArena;
+
+#endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
+
+
+
+} // namespace
+
+
 SCoreGlobals XCore::env_;
 core::MallocFreeAllocator XCore::malloc_;
 
