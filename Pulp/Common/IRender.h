@@ -250,7 +250,9 @@ X_DECLARE_FLAGS8(StateFlag)(
 	NO_DEPTH_TEST,
 	STENCIL,
 	BLEND,
-	ALPHATEST
+	ALPHATEST,
+
+	VERTEX_STREAMS // vertex format is made from streams
 );
 
 typedef Flags8<StateFlag> StateFlags;

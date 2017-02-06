@@ -1242,8 +1242,16 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pso.setRenderTargetFormats(static_cast<uint32_t>(pPassState->rtfs.size()), RTVFormats, DXGI_FORMAT_UNKNOWN, 1, 0);
 	pso.setPrimitiveTopologyType(topoTypeFromDesc(desc));
 
-	const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
-	pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+	if (desc.stateFlags.IsSet(StateFlag::VERTEX_STREAMS))
+	{
+		const auto& inputDesc = ilStreamedDescriptions_[desc.vertexFmt];
+		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+	}
+	else
+	{
+		const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
+		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+	}
 
 	if (perm.isStageSet(shader::ShaderType::Vertex)) {
 		const auto* pVertexShader = perm.getStage(shader::ShaderType::Vertex);
