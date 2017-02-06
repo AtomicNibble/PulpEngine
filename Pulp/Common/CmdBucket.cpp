@@ -137,9 +137,10 @@ void CommandBucket<KeyT>::sort(void)
 				total -= nextSlot.remaining;
 
 				// we have some to shit.
+				// note buffers may overlap.
 				const int32_t numToShift = (FETCH_SIZE - nextSlot.remaining);
-				std::memcpy(&keys_[curEnd], &keys_[nextSlot.offset], numToShift * sizeof(KeyT));
-				std::memcpy(&packets_[curEnd], &packets_[nextSlot.offset], numToShift * sizeof(PacketArr::Type));
+				std::memmove(&keys_[curEnd], &keys_[nextSlot.offset], numToShift * sizeof(KeyT));
+				std::memmove(&packets_[curEnd], &packets_[nextSlot.offset], numToShift * sizeof(PacketArr::Type));
 
 #if X_DEBUG
 				std::memset(&keys_[nextSlot.offset], 0xDB, numToShift * sizeof(KeyT));
