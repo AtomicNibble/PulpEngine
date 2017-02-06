@@ -8,6 +8,8 @@ namespace Util
 
 	DXGI_FORMAT DXGIFormatFromTexFmt(Texturefmt::Enum fmt)
 	{
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 		switch (fmt)
 		{
 			case Texturefmt::R8G8B8:
