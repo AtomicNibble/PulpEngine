@@ -142,6 +142,7 @@ public:
 	// when this area is visible, this will contain all the portal planes that point in
 	// and also a list of visible ents through said portal.
 	int32_t cusVisPortalIdx;
+	int32_t maxVisPortals; // this is the max portals that can point into this area
 	VisPortalsArr visPortals;
 
 	// processed vis ents.

@@ -344,6 +344,9 @@ bool Level::ProcessData(void)
 			Area& area1 = areas_[a1];
 			Area& area2 = areas_[a2];
 
+			++area1.maxVisPortals;
+			++area2.maxVisPortals;
+
 			ProcessIAP(file, area1, a2);
 			ProcessIAP(file, area2, a1);
 #if 0
@@ -360,6 +363,11 @@ bool Level::ProcessData(void)
 			p2.pWinding->getPlane(p2.plane);
 			p2.areaTo = a1;
 #endif
+		}
+
+		for (auto& a : areas_)
+		{
+			a.visPortals.resize(core::Max(1, a.maxVisPortals));
 		}
 
 		if (!file.isEof()) {

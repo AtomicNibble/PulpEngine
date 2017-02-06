@@ -67,7 +67,8 @@ Area::Area() :
 	portals(g_3dEngineArena), 
 	visPortals(g_3dEngineArena),
 	areaVisibleEnts(g_3dEngineArena),
-	cusVisPortalIdx(-1)
+	cusVisPortalIdx(-1),
+	maxVisPortals(0)
 {
 	areaNum = -1;
 	pMesh = nullptr;
@@ -75,7 +76,7 @@ Area::Area() :
 	// when loading the level we should set the proper max size
 	// so that we never resize post load.
 	visPortals.setGranularity(1);
-	visPortals.resize(4);
+	// visPortals.resize(8);
 }
 
 Area::~Area()
