@@ -31,6 +31,8 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// so how do we know what is supported.
 	// X_UNUSED(vertFmt);
 	{
+		core::CriticalSection::ScopedLock lock(permLock_);
+
 		for (auto& perm : perms_)
 		{
 			if (perm.vertFmt == vertFmt && perm.vertStreams == vertStreams)
@@ -102,6 +104,8 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		pRenderSys->releaseShaderPermatation(pPerm);
 		return false;
 	}
+
+	core::CriticalSection::ScopedLock lock(permLock_);
 
 	TechDefPerm& perm = perms_.AddOne();
 	perm.stateHandle = stateHandle;

@@ -30,10 +30,12 @@ public:
 
 	render::StateDesc stateDesc;
 
+	core::CriticalSection permLock_;
+	TechDefPermArr perms_;
+
 	// the source files every perm is made from
 	ShaderEntryArr shaderEntry_;
 	ShaderSourceArr shaderSource_;
-	TechDefPermArr perms_;
 	Shader::AliaseArr aliases_;
 };
 
