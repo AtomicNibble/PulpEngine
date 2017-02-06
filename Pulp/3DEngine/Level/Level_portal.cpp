@@ -354,7 +354,7 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, co
 	// or have some logic for working it out :/ ?
 	const int32_t visPortalIdx = core::atomic::Increment(&area.cusVisPortalIdx);
 
-	X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(visPortalIdx, area.maxVisPortals);
+	X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, visPortalIdx, area.maxVisPortals, ps);
 
 	if (ps) {
 		// this is thread safe as each thread gets a diffrent idx.
