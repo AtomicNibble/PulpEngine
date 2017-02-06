@@ -73,6 +73,9 @@ class XRender : public IRender
 			texStates(arena)
 		{}
 
+#if DEVICE_STATE_STORE_CPU_DESC
+		StateDesc cpuDesc;
+#endif // !DEVICE_STATE_STORE_CPU_DESC
 
 		RootSignature rootSig; // dam rootsig is a chunky fucker.
 		ID3D12PipelineState* pPso;

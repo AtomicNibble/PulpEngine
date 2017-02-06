@@ -1119,6 +1119,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pState->pPso = nullptr;
 	pState->topo = D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
+#if DEVICE_STATE_STORE_CPU_DESC
+	pState->cpuDesc = desc;
+#endif // !DEVICE_STATE_STORE_CPU_DESC
+
 
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
