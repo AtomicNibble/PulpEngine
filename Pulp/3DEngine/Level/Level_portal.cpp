@@ -518,12 +518,12 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 			auto& destArr = pArea->areaVisibleEnts;
 
 			// copy first two into dest then merge.
-			auto pVisEnts1 = que.top();
+			auto* pVisEnts1 = que.top();
 			que.pop();
 			std::copy(pVisEnts1->begin(), pVisEnts1->end(), std::back_inserter(destArr));
 		
 			auto mergepoint = destArr.end();
-			auto pVisEnts2 = que.top();
+			auto* pVisEnts2 = que.top();
 			que.pop();
 			std::copy(pVisEnts2->begin(), pVisEnts2->end(), std::back_inserter(destArr));
 
