@@ -94,7 +94,7 @@ namespace Util
 
 	bool hasAlpha(Texturefmt::Enum fmt)
 	{
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
@@ -127,7 +127,7 @@ namespace Util
 
 	bool isDxt(Texturefmt::Enum fmt)
 	{
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
@@ -162,7 +162,7 @@ namespace Util
 
 	uint32_t bitsPerPixel(Texturefmt::Enum fmt)
 	{
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
@@ -230,6 +230,8 @@ namespace Util
 			case Texturefmt::B8G8R8A8:
 			case Texturefmt::B8G8R8A8_SRGB:
 			case Texturefmt::B8G8R8A8_TYPELESS:
+
+			case Texturefmt::R24G8_TYPELESS:
 				return 32;
 
 			case Texturefmt::R10G10B10A2:
@@ -248,7 +250,7 @@ namespace Util
 
 	uint32_t dxtBytesPerBlock(Texturefmt::Enum fmt)
 	{
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
@@ -364,7 +366,7 @@ namespace Util
 
 	size_t rowBytes(uint32_t width, uint32_t height, Texturefmt::Enum fmt)
 	{
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		size_t rowBytes = 0;
 
@@ -459,7 +461,7 @@ namespace Util
 		bool planar = false;
 		size_t bytesPerElem = 0;
 
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
@@ -555,7 +557,7 @@ namespace Util
 
 		using namespace core::Hash::Fnva1Literals;
 
-		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
 
 		switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length()))
 		{
@@ -677,6 +679,9 @@ namespace Util
 
 			case "R16G16B16A16_FLOAT"_fnv1a:
 				return Texturefmt::R16G16B16A16_FLOAT;
+
+			case "R24G8_TYPELESS"_fnv1a:
+				return Texturefmt::R24G8_TYPELESS;
 
 			default:
 				// this is here incase i've forgot to add a new format
