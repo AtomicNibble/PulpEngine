@@ -8,7 +8,7 @@ namespace Util
 
 	DXGI_FORMAT DXGIFormatFromTexFmt(Texturefmt::Enum fmt)
 	{
-		static_assert(Texturefmt::ENUM_COUNT == 54, "Added additional texture fmts? this code needs updating.");
+		static_assert(Texturefmt::ENUM_COUNT == 55, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
@@ -70,6 +70,8 @@ namespace Util
 			case Texturefmt::R24G8_TYPELESS:
 				return DXGI_FORMAT_R24G8_TYPELESS;
 
+			case Texturefmt::D24_UNORM_S8_UNIT:
+				return DXGI_FORMAT_R24G8_TYPELESS;
 
 #if X_DEBUG
 			default:
