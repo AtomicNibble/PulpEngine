@@ -499,6 +499,7 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
 
 			// make engouth space for them all
 			pArea->areaVisibleEnts.reserve(total);
+			pArea->areaVisibleEnts.clear();
 
 			// create a que that gives us the smallets lists first.
 			auto cmp = [](const AreaVisiblePortal::EntIdArr* lhs, const AreaVisiblePortal::EntIdArr* rhs) { return lhs->size() < rhs->size(); };
