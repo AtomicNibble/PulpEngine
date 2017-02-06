@@ -345,7 +345,7 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, co
 	Area& area = areas_[areaNum];
 
 	{
-		core::Spinlock::ScopedLock lock(lock_);
+		core::Spinlock::ScopedLock lock(visAreaLock_);
 		visibleAreas_.push_back(&area);
 	}
 

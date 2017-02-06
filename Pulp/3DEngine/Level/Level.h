@@ -300,7 +300,7 @@ private:
 private:
 	FrameStats frameStats_;
 
-	core::Spinlock lock_;
+	core::Spinlock visAreaLock_;
 	AreaPtrArr visibleAreas_;
 
 private:
