@@ -63,8 +63,16 @@ namespace
 		core::NoMemoryTagging
 	> StrArena;
 
+
 #endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
 
+	typedef core::MemoryArena<
+		StrArena::AllocationPolicy,
+		core::SingleThreadPolicy,
+		StrArena::BoundsCheckingPolicy,
+		StrArena::MemoryTrackingPolicy,
+		StrArena::MemoryTaggingPolicy
+	> StrArenaST;
 
 
 } // namespace
@@ -74,7 +82,6 @@ SCoreGlobals XCore::env_;
 core::MallocFreeAllocator XCore::malloc_;
 
 XCoreVars g_coreVars;
-
 
 XCore::XCore() :
 	pWindow_(nullptr),
@@ -127,11 +134,21 @@ XCore::XCore() :
 	env_.pHotReload = this;
 //	env_.pMalloc = &g_coreArena;
 	env_.pArena = g_coreArena;
-	env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_,"StrArens");
+
+	if (initParams_.bThreadSafeStringAlloc)
+	{
+		env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_, "StrArena");
+	}
+	else
+	{
+		env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
+	}
+
 	env_.pArena->addChildArena(env_.pStrArena);
 	// vars.
 
 	static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
+	static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
 
 	env_.client_ = true;
 	env_.dedicated_ = false;

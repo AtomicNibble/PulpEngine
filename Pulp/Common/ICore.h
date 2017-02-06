@@ -119,18 +119,16 @@ struct IAssertHandler
 };
 
 
-// Description:
-//  Structure passed to Init method of ISystem interface.
 struct SCoreInitParams
 {
 	void* hInstance;								
 	void* hWnd;
 	const wchar_t* pCmdLine;
 
-//	core::LoggerBase* pLog;
 	core::Console* pConsoleWnd;
 	core::MemoryArenaBase* pCoreArena;
 
+	// these should be turned into flags.
 	bool bVsLog;
 	bool bConsoleLog;
 	bool bTesting;
@@ -141,6 +139,7 @@ struct SCoreInitParams
 	bool bEnableJobSystem;
 	bool bLoadSymbols;
 	bool bFileSysWorkingDir;
+	bool bThreadSafeStringAlloc;
 
 	Vec4i seed;
 
@@ -177,6 +176,7 @@ struct SCoreInitParams
 		bEnableJobSystem(true),
 		bLoadSymbols(true),
 		bFileSysWorkingDir(false),
+		bThreadSafeStringAlloc(true),
 
 #if X_SUPER == 0
 		bConsoleLog(true),
