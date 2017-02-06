@@ -109,12 +109,12 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 		return 0;
 	}
 
-	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
+	ModuleLinkfunc::Pointer pfnModuleInitICore = reinterpret_cast<ModuleLinkfunc::Pointer>(
 		core::Module::GetProc(handle, DLL_MODULE_INIT_ICORE));
 
-	if (pfnModuleInitISystem)
+	if (pfnModuleInitICore)
 	{
-		pfnModuleInitISystem(this, dllName);
+		pfnModuleInitICore(this, dllName);
 	}
 
 	return handle;
@@ -127,11 +127,11 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 #if !defined(X_LIB)
 	core::Module::Handle handle = core::Module::Load(pDllName);
 
-	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
+	ModuleLinkfunc::Pointer pfnModuleInitICore = reinterpret_cast<ModuleLinkfunc::Pointer>(
 		core::Module::GetProc(handle, DLL_MODULE_INIT_ICORE));
 
-	if (pfnModuleInitISystem) {
-		pfnModuleInitISystem(this, pDllName);
+	if (pfnModuleInitICore) {
+		pfnModuleInitICore(this, pDllName);
 	}
 
 #endif
@@ -181,11 +181,11 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 #if !defined(X_LIB)
 	core::Module::Handle handle = core::Module::Load(pDllName);
 
-	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
+	ModuleLinkfunc::Pointer pfnModuleInitICore = reinterpret_cast<ModuleLinkfunc::Pointer>(
 		core::Module::GetProc(handle, DLL_MODULE_INIT_ICORE));
 
-	if (pfnModuleInitISystem) {
-		pfnModuleInitISystem(this, pDllName);
+	if (pfnModuleInitICore) {
+		pfnModuleInitICore(this, pDllName);
 	}
 
 #endif
