@@ -143,8 +143,14 @@ void CommandBucket<KeyT>::sort(void)
 				std::memmove(&packets_[curEnd], &packets_[nextSlot.offset], numToShift * sizeof(PacketArr::Type));
 
 #if X_DEBUG
-				std::memset(&keys_[nextSlot.offset], 0xDB, numToShift * sizeof(KeyT));
-				std::memset(&packets_[nextSlot.offset], 0xDB, numToShift * sizeof(PacketArr::Type));
+				// since buffers may overlap we can't just memset as we might overwrite valid values.
+				{
+					int32_t start = core::Max<int32_t>(curEnd + numToShift, nextSlot.offset);
+					int32_t num = numToShift - (start - nextSlot.offset);
+
+					std::memset(&keys_[start], 0xDB, num * sizeof(KeyT));
+					std::memset(&packets_[start], 0xDB, num * sizeof(PacketArr::Type));
+				}
 #endif // X_DEBUG
 
 				curEnd += numToShift;
