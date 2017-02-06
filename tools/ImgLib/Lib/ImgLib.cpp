@@ -383,6 +383,8 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
 		if (!flags.IsSet(CompileFlag::ALPHA))
 		{
+			static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 			// auto set alpha?
 			switch (src.getFormat())
 			{

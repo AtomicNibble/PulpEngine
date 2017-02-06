@@ -94,6 +94,8 @@ namespace Util
 
 	bool hasAlpha(Texturefmt::Enum fmt)
 	{
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 		switch (fmt)
 		{
 			case Texturefmt::BC3:
@@ -125,6 +127,8 @@ namespace Util
 
 	bool isDxt(Texturefmt::Enum fmt)
 	{
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 		switch (fmt)
 		{
 			case Texturefmt::BC1:
@@ -158,6 +162,8 @@ namespace Util
 
 	uint32_t bitsPerPixel(Texturefmt::Enum fmt)
 	{
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 		switch (fmt)
 		{
 			case Texturefmt::BC1:
@@ -242,6 +248,8 @@ namespace Util
 
 	uint32_t dxtBytesPerBlock(Texturefmt::Enum fmt)
 	{
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 		switch (fmt)
 		{
 			case Texturefmt::BC1:
@@ -356,6 +364,8 @@ namespace Util
 
 	size_t rowBytes(uint32_t width, uint32_t height, Texturefmt::Enum fmt)
 	{
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
+
 		size_t rowBytes = 0;
 
 		bool blockComp = false;
@@ -449,6 +459,7 @@ namespace Util
 		bool planar = false;
 		size_t bytesPerElem = 0;
 
+		static_assert(Texturefmt::ENUM_COUNT == 53, "Added additional texture fmts? this code needs updating.");
 
 		switch (fmt)
 		{
