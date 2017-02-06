@@ -81,7 +81,12 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		return false;
 	}
 
-	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDesc, nullptr, 0);
+	// make a copy of the state and alter certain states.
+	// anything that is actually defined in the techdef's should not be overriden here.
+	// only stuff like vertex format which is runtime etc..
+	decltype(stateDesc) stateDescCpy = stateDesc;
+	stateDescCpy.vertexFmt = vertFmt;
+	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDescCpy, nullptr, 0);
 
 	if (stateHandle == render::INVALID_STATE_HANLDE)
 	{
