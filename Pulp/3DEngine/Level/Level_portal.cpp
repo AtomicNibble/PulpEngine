@@ -355,6 +355,7 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, co
 	const int32_t visPortalIdx = core::atomic::Increment(&area.cusVisPortalIdx);
 
 	if (ps) {
+		// this is thread safe as each thread gets a diffrent idx.
 		area.visPortals[visPortalIdx].planes = ps->portalPlanes;
 	}
 
