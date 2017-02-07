@@ -160,6 +160,32 @@ namespace Util
 		return false;
 	}
 
+
+	bool isTypeless(Texturefmt::Enum fmt)
+	{
+		static_assert(Texturefmt::ENUM_COUNT == 55, "Added additional texture fmts? this code needs updating.");
+
+		switch (fmt)
+		{
+			case Texturefmt::R8G8_TYPELESS:
+			case Texturefmt::R16G16_TYPELESS:
+			case Texturefmt::R8G8B8A8_TYPELESS:
+			case Texturefmt::B8G8R8A8_TYPELESS:
+			case Texturefmt::BC1_TYPELESS:
+			case Texturefmt::BC2_TYPELESS:
+			case Texturefmt::BC3_TYPELESS:
+			case Texturefmt::BC4_TYPELESS:
+			case Texturefmt::BC5_TYPELESS:
+			case Texturefmt::BC6_TYPELESS:
+			case Texturefmt::BC7_TYPELESS:
+			case Texturefmt::R10G10B10A2_TYPELESS:
+			case Texturefmt::R24G8_TYPELESS:
+				return true;
+			default: break;
+		}
+		return false;
+	}
+
 	uint32_t bitsPerPixel(Texturefmt::Enum fmt)
 	{
 		static_assert(Texturefmt::ENUM_COUNT == 55, "Added additional texture fmts? this code needs updating.");
