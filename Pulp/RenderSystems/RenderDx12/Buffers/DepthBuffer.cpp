@@ -7,7 +7,12 @@ X_NAMESPACE_BEGIN(render)
 
 DepthBuffer::DepthBuffer(float32_t clearDepth, uint32_t clearStencil)
 {
-
+	hDSV_[0].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	hDSV_[1].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	hDSV_[2].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	hDSV_[3].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	hDepthSRV_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	hStencilSRV_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 }
 
 // Create a depth buffer. If an address is supplied, memory will not be allocated.
