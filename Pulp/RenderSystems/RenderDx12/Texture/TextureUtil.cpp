@@ -71,7 +71,7 @@ namespace Util
 				return DXGI_FORMAT_R24G8_TYPELESS;
 
 			case Texturefmt::D24_UNORM_S8_UNIT:
-				return DXGI_FORMAT_R24G8_TYPELESS;
+				return DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 #if X_DEBUG
 			default:
