@@ -27,7 +27,9 @@ void DepthBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
 	D3D12_CLEAR_VALUE ClearValue;
 	core::zero_object(ClearValue);
 	ClearValue.Format = format;
-
+	ClearValue.DepthStencil.Depth = clearDepth_;
+	ClearValue.DepthStencil.Stencil = safe_static_cast<uint8_t>(clearStencil_);
+	
 	createTextureResource(pDevice, resourceDesc, ClearValue, vidMemPtr);
 	createDerivedViews(pDevice, allocator, format);
 }
@@ -41,6 +43,8 @@ void DepthBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
 	D3D12_CLEAR_VALUE ClearValue;
 	core::zero_object(ClearValue);
 	ClearValue.Format = format;
+	ClearValue.DepthStencil.Depth = clearDepth_;
+	ClearValue.DepthStencil.Stencil = safe_static_cast<uint8_t>(clearStencil_);
 
 	createTextureResource(pDevice, resourceDesc, ClearValue, vidMemPtr);
 	createDerivedViews(pDevice, allocator, format);
