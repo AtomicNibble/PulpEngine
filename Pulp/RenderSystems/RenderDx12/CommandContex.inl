@@ -180,6 +180,12 @@ X_INLINE void GraphicsContext::setViewport(const XViewPort& vp)
 
 X_INLINE void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
 {
+#if X_DEBUG
+	if (vp.MinDepth == 0.f && vp.MaxDepth == 0.f) {
+		X_WARNING_EVERY_N(60, "Dx12", "Viewport min and max depth are zero is this intended?");
+	}
+#endif // !X_DEBUG
+
 	pCommandList_->RSSetViewports(1, &vp);
 }
 
