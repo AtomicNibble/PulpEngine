@@ -679,7 +679,7 @@ void GraphicsContext::clearColor(ColorBuffer& target)
 void GraphicsContext::clearDepth(DepthBuffer& Target)
 {
 	pCommandList_->ClearDepthStencilView(Target.getDSV(), D3D12_CLEAR_FLAG_DEPTH,
-		Target.getClearDepth(), Target.getClearStencil(), 0, nullptr);
+		Target.getClearDepth(), safe_static_cast<uint8_t>(Target.getClearStencil()), 0, nullptr);
 }
 
 void GraphicsContext::clearStencil(DepthBuffer& Target)
