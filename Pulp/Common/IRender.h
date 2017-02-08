@@ -350,6 +350,8 @@ struct IRender
 
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
+	virtual texture::ITexture* getDefaultTexture(void) const X_ABSTRACT;
+
 	// creates a texture for dynamic content, no data loaded from disk.
 	virtual texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
 	
