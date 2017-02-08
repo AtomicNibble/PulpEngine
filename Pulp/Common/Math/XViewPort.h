@@ -5,6 +5,14 @@
 
 #include <Math\XRect.h>
 
+#ifdef near
+#undef near
+#endif
+
+#ifdef far
+#undef far
+#endif
+
 class XViewPort
 {
 public:
