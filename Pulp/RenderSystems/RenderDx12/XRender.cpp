@@ -988,6 +988,11 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
 	return pText;
 }
 
+::texture::ITexture* XRender::getDefaultTexture(void) const
+{
+	return pTextureMan_->getDefault();
+}
+
 ::texture::ITexture* XRender::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
 	texture::Texture* pText = pTextureMan_->createTexture(pNickName, dim, fmt, pInitialData);
