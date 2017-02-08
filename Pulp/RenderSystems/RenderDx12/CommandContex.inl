@@ -175,7 +175,7 @@ X_INLINE void GraphicsContext::setViewport(const XViewPort& vp)
 	dvp.MinDepth = vp.getZNear();
 	dvp.MaxDepth = vp.getZFar();
 
-	pCommandList_->RSSetViewports(1, &dvp);
+	setViewport(dvp);
 }
 
 X_INLINE void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
@@ -186,6 +186,7 @@ X_INLINE void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
 X_INLINE void GraphicsContext::setViewport(float32_t x, float32_t y, float32_t w, float32_t h,
 	float32_t minDepth, float32_t maxDepth)
 {
+
 	D3D12_VIEWPORT vp;
 	vp.Width = w;
 	vp.Height = h;
@@ -193,7 +194,7 @@ X_INLINE void GraphicsContext::setViewport(float32_t x, float32_t y, float32_t w
 	vp.MaxDepth = maxDepth;
 	vp.TopLeftX = x;
 	vp.TopLeftY = y;
-	pCommandList_->RSSetViewports(1, &vp);
+	setViewport(vp);
 }
 
 X_INLINE void GraphicsContext::setScissor(const D3D12_RECT& rect)
@@ -230,15 +231,15 @@ X_INLINE void GraphicsContext::setViewportAndScissor(const XViewPort& vp, const 
 {
 	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
 	setViewport(vp);
-	pCommandList_->RSSetScissorRects(1, &rect);
+	setScissor(rect);
 }
 
 
 X_INLINE void GraphicsContext::setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect)
 {
 	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
-	pCommandList_->RSSetViewports(1, &vp);
-	pCommandList_->RSSetScissorRects(1, &rect);
+	setViewport(vp);
+	setScissor(rect);
 }
 
 X_INLINE void GraphicsContext::setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
