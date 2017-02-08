@@ -48,6 +48,7 @@ public:
 
 	X_INLINE size_t getFaceSize(void) const;
 	X_INLINE size_t getLevelSize(size_t mip) const;
+	X_INLINE size_t getLevelRowbytes(size_t mip) const;
 
 	X_INLINE void setSize(const Vec2<uint16_t> size);
 	X_INLINE void setWidth(const uint16_t width);

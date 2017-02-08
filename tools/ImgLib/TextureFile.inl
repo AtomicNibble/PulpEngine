@@ -300,6 +300,13 @@ X_INLINE size_t XTextureFile::getLevelSize(size_t mip) const
 	return mipOffsets_[mip + 1] - mipOffsets_[mip];
 }
 
+X_INLINE size_t XTextureFile::getLevelRowbytes(size_t mipIdx) const
+{
+	uint32_t mipWidth = core::Max<uint16_t>(size_.x >> mipIdx, 1u);
+
+	return Util::rowBytes(mipWidth, 1, getFormat());
+}
+
 
 X_INLINE void XTextureFile::setSize(const Vec2<uint16_t> size)
 { 
