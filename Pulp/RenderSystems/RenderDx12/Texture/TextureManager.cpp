@@ -414,6 +414,7 @@ X_NAMESPACE_BEGIN(texture)
 
 		if (!initializeTexture(gpuResource, imgFile.getNumMips(), texResource)) {
 			// we should mark the texture as invalid.
+			X_ERROR("Texture", "Failed to upload texture data");
 			return false;
 		}
 
