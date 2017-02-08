@@ -392,19 +392,22 @@ X_NAMESPACE_BEGIN(texture)
 			return false;
 		}
 
+		// upload img data to gpu.
+		D3D12_SUBRESOURCE_DATA texResource[texture::TEX_MAX_MIPS];
 
-		D3D12_SUBRESOURCE_DATA texResource;
+		for(size_t i=0; i< imgFile.getNumMips(); i++)
 		{
-			const size_t rowBytes = Util::rowBytes(imgFile.getWidth(), 1, imgFile.getFormat());
+			const size_t rowBytes = imgFile.getLevelRowbytes(i);
+			const size_t pitch = imgFile.getLevelSize(i);
 
-			texResource.pData = imgFile.getFace(0);
-			texResource.RowPitch = rowBytes;
-			texResource.SlicePitch = texResource.RowPitch * imgFile.getHeight();
+			texResource[i].pData = imgFile.getLevel(0, i);
+			texResource[i].RowPitch = rowBytes;
+			texResource[i].SlicePitch = pitch;
 		}
 
 		auto& gpuResource = pTex->getGpuResource();
 
-		if (!initializeTexture(gpuResource, 1, &texResource)) {
+		if (!initializeTexture(gpuResource, imgFile.getNumMips(), texResource)) {
 			// we should mark the texture as invalid.
 			return false;
 		}
