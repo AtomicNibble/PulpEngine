@@ -396,6 +396,7 @@ X_INLINE void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstan
 
 template <uint32_t maxSubresources>
 X_INLINE uint64_t CommandContext::updateSubresources(
+	ID3D12Device* pDevice,
 	GpuResource& dest,
 	ID3D12Resource* pIntermediate,
 	uint64_t intermediateOffset,
@@ -411,11 +412,8 @@ X_INLINE uint64_t CommandContext::updateSubresources(
 	ID3D12Resource* pDestinationResource = dest.getResource();
 
 	D3D12_RESOURCE_DESC Desc = pDestinationResource->GetDesc();
-	ID3D12Device* pDevice;
-	pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
 	pDevice->GetCopyableFootprints(&Desc, firstSubresource, numSubresources, intermediateOffset,
 		layouts, numRows, rowSizesInBytes, &requiredSize);
-	pDevice->Release();
 
 	return updateSubresources(dest, pIntermediate, firstSubresource, numSubresources,
 		requiredSize, layouts, numRows, rowSizesInBytes, pSrcData);

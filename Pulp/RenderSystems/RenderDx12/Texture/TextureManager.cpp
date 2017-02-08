@@ -279,7 +279,7 @@ X_NAMESPACE_BEGIN(texture)
 		}
 
 		contex.transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
-		contex.updateSubresources<1>(dest, pUploadBuffer, 0, 0, 1, &texResource);
+		contex.updateSubresources<1>(pDevice_, dest, pUploadBuffer, 0, 0, 1, &texResource);
 		contex.transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
 
 		// we have to keep this..
@@ -523,7 +523,7 @@ X_NAMESPACE_BEGIN(texture)
 
 		// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
-		pContext->updateSubresources<16>(dest, pUploadBuffer, 0, 0, numSubresources, pSubData);
+		pContext->updateSubresources<texture::TEX_MAX_MIPS>(pDevice_, dest, pUploadBuffer, 0, 0, numSubresources, pSubData);
 		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
 		pContext->finishAndFree(true);
 

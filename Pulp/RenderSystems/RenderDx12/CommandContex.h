@@ -139,7 +139,7 @@ public:
 
 
 	template <uint32_t maxSubresources>
-	X_INLINE uint64_t updateSubresources(GpuResource& dest, ID3D12Resource* pIntermediate,
+	X_INLINE uint64_t updateSubresources(ID3D12Device* pDevice, GpuResource& dest, ID3D12Resource* pIntermediate,
 		uint64_t intermediateOffset, uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSrcData);
 
 protected:
