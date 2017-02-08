@@ -5,7 +5,9 @@
 
 X_NAMESPACE_BEGIN(render)
 
-DepthBuffer::DepthBuffer(float32_t clearDepth, uint32_t clearStencil)
+DepthBuffer::DepthBuffer(float32_t clearDepth, uint32_t clearStencil) :
+	clearDepth_(clearDepth),
+	clearStencil_(clearStencil)
 {
 	hDSV_[0].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	hDSV_[1].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
