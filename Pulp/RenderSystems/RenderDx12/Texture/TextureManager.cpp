@@ -392,6 +392,11 @@ X_NAMESPACE_BEGIN(texture)
 			return false;
 		}
 
+		if (imgFile.getDepth() > 1 || imgFile.getNumFaces() > 1)
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
 		// upload img data to gpu.
 		D3D12_SUBRESOURCE_DATA texResource[texture::TEX_MAX_MIPS];
 
