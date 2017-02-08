@@ -321,7 +321,7 @@ X_NAMESPACE_BEGIN(texture)
 
 	bool TextureManager::loadDefaultTextures(void)
 	{
-		TextureFlags default_flags = TextureFlags::DONT_RESIZE;
+		TextureFlags default_flags = TextureFlags::DONT_RESIZE | TextureFlags::DONT_STREAM;
 
 		pTexDefault_ = forName(TEX_DEFAULT_DIFFUSE, default_flags);
 		pTexDefaultBump_ = forName(TEX_DEFAULT_BUMP, default_flags);
