@@ -341,10 +341,10 @@ bool AssetDB::PerformMigrations(void)
 		return true;
 	}
 
-	core::StackString<1024, wchar_t> msg(L"Performing DB migrations. it's recommended to back up the ");
-	msg.appendFmt(L"'%s' folder before pressin Ok. Cancel will skip.", ASSET_DB_FOLDER);
+	core::StackString<1024, char> msg("Performing DB migrations. it's recommended to back up the ");
+	msg.appendFmt("'%s' folder before pressin Ok. Cancel will skip.", ASSET_DB_FOLDER);
 
-	const auto res = core::msgbox::show(msg.c_str(), L"AssetDB Migratation", core::msgbox::Buttons::OKCancel);
+	const auto res = core::msgbox::show(msg.c_str(), "AssetDB Migratation", core::msgbox::Buttons::OKCancel);
 	if (res == core::msgbox::Selection::Cancel)
 	{
 		return false;
