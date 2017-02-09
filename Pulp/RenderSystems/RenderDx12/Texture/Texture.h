@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(texture)
 
 class TextureManager;
 
-	class X_ALIGNED_SYMBOL(Texture, 64) : public ::texture::ITexture
+	class X_ALIGNED_SYMBOL(Texture, 64) : public render::IPixelBuffer // ::texture::ITexture
 	{
 		friend TextureManager;
 
@@ -45,6 +45,10 @@ class TextureManager;
 		X_INLINE const TextureFlags getFlags(void) const X_FINAL;
 		X_INLINE const Texturefmt::Enum getFormat(void) const X_FINAL;
 		const DXGI_FORMAT getFormatDX(void) const;
+
+		// IPixelBuffer
+		X_INLINE render::PixelBufferType::Enum getBufferType(void) const X_OVERRIDE;
+		// ~IPixelBuffer
 
 		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
 

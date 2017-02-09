@@ -69,6 +69,14 @@ X_NAMESPACE_BEGIN(texture)
 		return format_;
 	}
 
+	// IPixelBuffer
+	X_INLINE render::PixelBufferType::Enum Texture::getBufferType(void) const
+	{
+		return render::PixelBufferType::NONE;
+	}
+
+	// ~IPixelBuffer
+
 
 	X_INLINE render::GpuResource& Texture::getGpuResource(void)
 	{
