@@ -343,12 +343,13 @@ struct IRender
 	// display res is stored as int, if you want float cast this.
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 
-	// should the render system not know about the render targets?
-	// and just do as it's told?
-	// how will we handle buffer resize?
+	// this is used for creating buffers for rendering to.
+	// for example creating depth buffers, or shadow map buffers that can then be bound to pipeline.
+	// they also support been passed to shaders, so you can take the texture id of a pixel buffer and place it in variable state.
+	// this allows you todo things like populate a depth buffer then read it from a shader (SRV)
+	virtual IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_ABSTRACT;
+	virtual IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips, texture::Texturefmt::Enum fmt) X_ABSTRACT;
 
-	virtual IRenderTarget* createRenderTarget(void) X_ABSTRACT;
-	virtual void destoryRenderTarget(IRenderTarget* pRT) X_ABSTRACT;
 	virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_ABSTRACT;
 
 	virtual VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
@@ -380,6 +381,7 @@ struct IRender
 	// Will relesse all the HWShaders in the perm for you.
 	virtual void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_ABSTRACT;
 	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
+	virtual void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_ABSTRACT;
 	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
 	virtual void destoryState(StateHandle handle) X_ABSTRACT;
 
