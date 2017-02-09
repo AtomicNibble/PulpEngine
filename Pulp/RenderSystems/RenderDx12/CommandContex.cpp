@@ -3,10 +3,12 @@
 #include "CommandListManger.h"
 #include "CommandSignature.h"
 #include "RootSignature.h"
+#include "Texture\Texture.h"
 #include "Buffers\GpuBuffer.h"
 #include "Buffers\ColorBuffer.h"
 #include "Buffers\DepthBuffer.h"
 #include "PipelineState.h"
+
 
 #include "Allocators\DynamicDescriptorHeap.h"
 
@@ -665,7 +667,7 @@ void GraphicsContext::clearUAV(ColorBuffer& target)
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
 	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
 
-	pCommandList_->ClearUnorderedAccessViewFloat(gpuVisibleHandle, target.getUAV(), target.getResource(),
+	pCommandList_->ClearUnorderedAccessViewFloat(gpuVisibleHandle, target.getUAV(), target.getGpuResource().getResource(),
 		target.getClearColor(), 1, &ClearRect);
 }
 
@@ -840,7 +842,7 @@ void ComputeContext::clearUAV(ColorBuffer& target)
 	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
 	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
 
-	pCommandList_->ClearUnorderedAccessViewFloat(GpuVisibleHandle, target.getUAV(), target.getResource(), 
+	pCommandList_->ClearUnorderedAccessViewFloat(GpuVisibleHandle, target.getUAV(), target.getGpuResource().getResource(), 
 		target.getClearColor(), 1, &ClearRect);
 }
 

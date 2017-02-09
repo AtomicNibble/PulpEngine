@@ -56,6 +56,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pRootSigCache_(nullptr),
 	pPSOCache_(nullptr),
 //	presentRS_(arena),
+	displayPlane_{ "$backbuffer_0", "$backbuffer_1", "$backbuffer_2" },
 	currentBufferIdx_(0),
 	auxQues_ {arena, arena} ,
 
@@ -488,7 +489,7 @@ void XRender::renderBegin(void)
 
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
-	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_RENDER_TARGET, true);
+	pContext->transitionResource(displayPlane_[currentBufferIdx_].getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, true);
 	pContext->clearColor(displayPlane_[currentBufferIdx_]);
 	// pContext->setRenderTargets(_countof(RTVs), RTVs);
 
@@ -510,7 +511,7 @@ void XRender::renderEnd(void)
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
 
-	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
+	pContext->transitionResource(displayPlane_[currentBufferIdx_].getGpuResource(), D3D12_RESOURCE_STATE_PRESENT);
 	pContext->finishAndFree(true);
 
 
@@ -558,7 +559,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	for (size_t i = 0; i < rtvs.size(); i++) {
 		const ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
 		RTVs[i] = rtv.getRTV();
-		RTVFormats[i] = rtv.getFormat();
+		RTVFormats[i] = rtv.getFormatDX();
 	}
 
 	// we should validate that RTVFormats matches the pass state.
@@ -568,7 +569,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 	for (size_t i = 0; i < rtvs.size(); i++) {
 		ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
-		context.transitionResource(rtv, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		context.transitionResource(rtv.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
 	context.setRenderTargets(numRtvs, RTVs);
