@@ -10,6 +10,11 @@
 #include "Allocators\DescriptorAllocator.h"
 #include "CommandContex.h"
 
+// buffers
+#include "Buffers\ColorBuffer.h"
+#include "Buffers\DepthBuffer.h"
+#include "Buffers\ShadowBuffer.h"
+
 X_NAMESPACE_BEGIN(texture)
 
 
@@ -205,6 +210,39 @@ X_NAMESPACE_BEGIN(texture)
 		return pTexRes;
 	}
 
+	render::IPixelBuffer* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+		render::PixelBufferType::Enum type, texture::Texturefmt::Enum fmt)
+	{
+		if (type == render::PixelBufferType::DEPTH)
+		{
+			X_ASSERT(fmt == texture::Texturefmt::UNKNOWN, "Depth fmt can't be set per buffer")(fmt);
+
+			render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(pNickName, 1.f, 0);
+			pDethBuf->create(pDevice_, descriptorAlloc_, dim.x, dim.y, depthFmt_);
+
+			return pDethBuf;
+		}
+		else if (type == render::PixelBufferType::COLOR)
+		{
+			X_ASSERT(fmt != texture::Texturefmt::UNKNOWN, "Can't create pixel buffer with unknown fmt")(fmt);
+
+			render::ColorBuffer* pColBuffer = X_NEW(render::ColorBuffer, arena_, "ColorBuffer")(pNickName);
+
+			pColBuffer->create(pDevice_, descriptorAlloc_, dim.x, dim.y, numMips, depthFmt_);
+
+			return pColBuffer;
+
+		}
+		else if (type == render::PixelBufferType::SHADOW)
+		{
+			X_ASSERT(fmt != texture::Texturefmt::UNKNOWN, "Can't create shadow buffer with unknown fmt")(fmt);
+
+
+		}
+
+		return nullptr;
+	}
+
 
 	Texture* TextureManager::getByID(TexID texId) const
 	{
@@ -235,6 +273,11 @@ X_NAMESPACE_BEGIN(texture)
 			
 			textures_.releaseAsset(pTexRes);
 		}
+	}
+
+	void TextureManager::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
+	{
+		X_UNUSED(pPixelBuf);
 	}
 
 	bool TextureManager::updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const

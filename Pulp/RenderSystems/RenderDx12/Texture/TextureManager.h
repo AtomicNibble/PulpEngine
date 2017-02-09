@@ -47,6 +47,10 @@ public:
 
 	Texture* forName(const char* pName, TextureFlags flags);
 	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
+	
+	// this is used for creating textures that can be used for more than just SRV's
+	render::IPixelBuffer* createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips, 
+		render::PixelBufferType::Enum type, texture::Texturefmt::Enum fmt);
 
 	Texture* getByID(TexID texId) const;
 	Texture* getDefault(void) const;
@@ -54,8 +58,10 @@ public:
 	// must not be null.
 	void releaseTexture(texture::ITexture* pTex);
 	void releaseTexture(Texture* pTex);
+	void releasePixelBuffer(render::IPixelBuffer* pPixelBuf);
 
 	bool updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const;
+
 
 private:
 	TexRes* findTexture(const char* pName);

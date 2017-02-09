@@ -900,15 +900,20 @@ Vec2<uint32_t> XRender::getDisplayRes(void) const
 	return displayRes_;
 }
 
-IRenderTarget* XRender::createRenderTarget()
+
+IPixelBuffer* XRender::createDepthBuffer(const char* pNickName, Vec2i dim)
 {
-	return nullptr;
+	IPixelBuffer* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, 1, PixelBufferType::DEPTH, texture::Texturefmt::UNKNOWN);
+
+	return pPixelBuf;
 }
 
-
-void XRender::destoryRenderTarget(IRenderTarget* pRT)
+IPixelBuffer* XRender::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+	texture::Texturefmt::Enum fmt)
 {
-	X_UNUSED(pRT);
+	IPixelBuffer* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, numMips, PixelBufferType::COLOR, fmt);
+
+	return pPixelBuf;
 }
 
 IRenderTarget* XRender::getCurBackBuffer(uint32_t* pIdx)
@@ -1037,6 +1042,10 @@ void XRender::releaseTexture(texture::ITexture* pTex)
 	pTextureMan_->releaseTexture(pTex);
 }
 
+void XRender::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
+{
+	pTextureMan_->releasePixelBuffer(pPixelBuf);
+}
 
 PassStateHandle XRender::createPassState(const RenderTargetFmtsArr& rtfs)
 {

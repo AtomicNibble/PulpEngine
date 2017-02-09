@@ -176,8 +176,10 @@ public:
 
 	Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
 
-	IRenderTarget* createRenderTarget(void) X_FINAL;
-	void destoryRenderTarget(IRenderTarget* pRT) X_FINAL;
+	IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
+	IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips, 
+		texture::Texturefmt::Enum fmt) X_FINAL;
+
 	IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_FINAL;
 
 
@@ -204,6 +206,7 @@ public:
 	// Release
 	void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;
 	void releaseTexture(texture::ITexture* pTex) X_FINAL;
+	void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_FINAL;
 	void destoryPassState(PassStateHandle handle) X_FINAL;
 	void destoryState(StateHandle handle) X_FINAL;
 
@@ -279,6 +282,7 @@ private:
 
 	ColorBuffer displayPlane_[SWAP_CHAIN_BUFFER_COUNT];
 	uint32_t currentBufferIdx_;
+
 
 #if 0
 	SamplerDesc samplerLinearWrapDesc_;
