@@ -337,9 +337,6 @@ struct IRender
 
 	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
 
-	// each enum has a instance, and you don't own the pointer.
-	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;
-
 	// display res is stored as int, if you want float cast this.
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 

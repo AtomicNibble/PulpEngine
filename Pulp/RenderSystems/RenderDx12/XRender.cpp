@@ -58,7 +58,6 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 //	presentRS_(arena),
 	displayPlane_{ "$backbuffer_0", "$backbuffer_1", "$backbuffer_2" },
 	currentBufferIdx_(0),
-	auxQues_ {arena, arena} ,
 
 	statePoolHeap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
@@ -886,12 +885,6 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 	}
 
-}
-
-
-IRenderAux* XRender::getAuxRender(AuxRenderer::Enum user)
-{
-	return &auxQues_[user];
 }
 
 

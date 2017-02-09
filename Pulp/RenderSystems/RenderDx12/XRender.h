@@ -172,8 +172,6 @@ public:
 
 	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_FINAL;
-
 	Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
 
 	IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
@@ -313,8 +311,6 @@ private:
 
 	core::StackString<128, wchar_t> deviceName_;
 	size_t dedicatedvideoMemory_;
-
-	RenderAux auxQues_[AuxRenderer::ENUM_COUNT];
 
 #if RENDER_STATS
 	Stats stats_;

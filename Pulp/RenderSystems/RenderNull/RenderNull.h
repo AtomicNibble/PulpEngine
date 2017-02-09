@@ -24,8 +24,6 @@ public:
 
 	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_FINAL;
-
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
 
 	virtual IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;

@@ -62,12 +62,6 @@ void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 }
 
-IRenderAux* RenderNull::getAuxRender(AuxRenderer::Enum user)
-{
-	X_UNUSED(user);
-	return nullptr;
-}
-
 Vec2<uint32_t> RenderNull::getDisplayRes(void) const
 {
 	return Vec2<uint32_t>::zero();
