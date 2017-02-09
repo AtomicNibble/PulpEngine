@@ -1157,7 +1157,7 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
 
 	// for now we just log that somthing left the physx world.
 	// dunno what shit to log.
-	X_ERROR("Phys", "Obbject out of bounds. Name: \"%S\"", actor.getName());
+	X_ERROR("Phys", "Obbject out of bounds. Name: \"%s\"", actor.getName());
 }
 
 void XPhysics::onObjectOutOfBounds(physx::PxAggregate& aggregate)
