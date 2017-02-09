@@ -699,7 +699,6 @@ void XMapFile::PrimtPrimMemInfo(void) const
 {
 #if MAP_LOADER_USE_POOL && X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	core::MemoryAllocatorStatistics stats = primPoolAllocator_.getStatistics();
-	X_LOG_BULLET;
 	X_LOG0("Map", "Listing map loader primative allocator stats");
 	X_LOG_BULLET;
 
