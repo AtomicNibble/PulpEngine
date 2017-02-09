@@ -286,13 +286,25 @@ struct CBState
 typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
 
 
-struct IRenderTarget
+X_DECLARE_ENUM8(PixelBufferType)(
+	NONE, // don't use.
+	DEPTH,
+	COLOR, // can be used for render targets
+	SHADOW
+);
+
+struct IPixelBuffer : public texture::ITexture
 {
-	virtual ~IRenderTarget() {};
+	virtual ~IPixelBuffer() {};
 
-
-	virtual texture::Texturefmt::Enum getFmt(void) X_ABSTRACT;
+	virtual PixelBufferType::Enum getBufferType(void) const X_ABSTRACT;
 };
+
+
+typedef IPixelBuffer IRenderTarget;
+typedef IPixelBuffer IDepthBuffer;
+
+
 
 X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
 X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
