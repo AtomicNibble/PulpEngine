@@ -10,7 +10,7 @@ ColorBuffer::ColorBuffer(const char* pName, Colorf clearCol) :
 	clearColor_(clearCol),
 	PixelBuffer(pName)
 {
-	SRVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
+	// SRVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	RTVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 
 	// set these to value of D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN
@@ -67,10 +67,10 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 		SRVDesc.Texture2D.MostDetailedMip = 0;
 	}
 
-	if (SRVHandle_.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+	if (hCpuDescriptorHandle_.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
 	{			 
 		RTVHandle_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		SRVHandle_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		hCpuDescriptorHandle_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 
@@ -78,7 +78,7 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 	pDevice->CreateRenderTargetView(getGpuResource().getResource(), &RTVDesc, RTVHandle_);
 
 	// Create the shader resource view
-	pDevice->CreateShaderResourceView(getGpuResource().getResource(), &SRVDesc, SRVHandle_);
+	pDevice->CreateShaderResourceView(getGpuResource().getResource(), &SRVDesc, hCpuDescriptorHandle_);
 
 	// Create the UAVs for each mip level (RWTexture2D)
 	D3D12_CPU_DESCRIPTOR_HANDLE* pUAVHandles = getUAVs();

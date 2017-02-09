@@ -72,8 +72,11 @@ class TextureManager;
 
 	private:
 		render::GpuResource	resource_;
-		D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptorHandle_;
 
+	protected:
+		D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptorHandle_; // SRV
+
+	protected:
 		core::string		fileName_;
 		TexID				id_;
 		Vec2<uint16_t>		dimensions_;
