@@ -11,11 +11,12 @@ RenderNull g_NullRender;
 
 
 bool RenderNull::init(HWND hWnd, 
-	uint32_t width, uint32_t hieght)
+	uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt)
 {
 	X_UNUSED(hWnd);
 	X_UNUSED(width);
 	X_UNUSED(hieght);
+	X_UNUSED(depthFmt);
 
 	return true;
 }
@@ -72,15 +73,31 @@ Vec2<uint32_t> RenderNull::getDisplayRes(void) const
 	return Vec2<uint32_t>::zero();
 }
 
-IRenderTarget* RenderNull::createRenderTarget()
+
+IPixelBuffer* RenderNull::createDepthBuffer(const char* pNickName, Vec2i dim)
 {
+	X_UNUSED(pNickName);
+	X_UNUSED(dim);
+
 	return nullptr;
 }
 
-void RenderNull::destoryRenderTarget(IRenderTarget* pRT)
+IPixelBuffer* RenderNull::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+	texture::Texturefmt::Enum fmt)
 {
-	X_UNUSED(pRT);
+	X_UNUSED(pNickName);
+	X_UNUSED(dim);
+	X_UNUSED(fmt);
+	X_UNUSED(numMips);
+
+	return nullptr;
 }
+void RenderNull::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
+{
+	X_UNUSED(pPixelBuf);
+
+}
+
 
 IRenderTarget* RenderNull::getCurBackBuffer(uint32_t* pIdx)
 {

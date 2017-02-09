@@ -10,7 +10,7 @@ class RenderNull : public IRender
 {
 public:
 
-	virtual bool init(HWND hWnd, uint32_t width, uint32_t hieght) X_OVERRIDE;
+	virtual bool init(HWND hWnd, uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt) X_OVERRIDE;
 	virtual void shutDown(void) X_OVERRIDE;
 	virtual void freeResources(void) X_OVERRIDE;
 	
@@ -28,8 +28,11 @@ public:
 
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
-	virtual IRenderTarget* createRenderTarget() X_OVERRIDE;
-	virtual void destoryRenderTarget(IRenderTarget* pRT) X_OVERRIDE;
+	virtual IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_OVERRIDE;
+	virtual IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+		texture::Texturefmt::Enum fmt) X_OVERRIDE;
+	virtual void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_OVERRIDE;
+	
 	virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_OVERRIDE;
 
 	virtual VertexBufferHandle createVertexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
