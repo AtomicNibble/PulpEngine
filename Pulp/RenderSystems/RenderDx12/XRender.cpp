@@ -1233,10 +1233,16 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	GraphicsPSO pso;
 
 	DXGI_FORMAT RTVFormats[MAX_RENDER_TARGETS];
+	DXGI_FORMAT DSVFormat = DXGI_FORMAT_UNKNOWN;
 	core::zero_object(RTVFormats);
 
 	for (size_t i = 0; i < pPassState->rtfs.size(); i++) {
 		RTVFormats[i] = texture::Util::DXGIFormatFromTexFmt(pPassState->rtfs[i]);
+	}
+
+	if (desc.stateFlags.IsSet(StateFlag::DEPTHWRITE))
+	{
+		DSVFormat = pTextureMan_->getDepthFmt();
 	}
 
 	D3D12_BLEND_DESC blendDesc;
@@ -1251,7 +1257,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pso.setRasterizerState(rasterizerDesc);
 	pso.setDepthStencilState(depthStencilDesc);
 	pso.setSampleMask(0xFFFFFFFF);
-	pso.setRenderTargetFormats(static_cast<uint32_t>(pPassState->rtfs.size()), RTVFormats, DXGI_FORMAT_UNKNOWN, 1, 0);
+	pso.setRenderTargetFormats(static_cast<uint32_t>(pPassState->rtfs.size()), RTVFormats, DSVFormat, 1, 0);
 	pso.setPrimitiveTopologyType(topoTypeFromDesc(desc));
 
 	if (desc.stateFlags.IsSet(StateFlag::VERTEX_STREAMS))
