@@ -158,7 +158,7 @@ public:
 	XRender(core::MemoryArenaBase* arena);
 	~XRender();
 
-	bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_FINAL;
+	bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void freeResources(void) X_FINAL;
 

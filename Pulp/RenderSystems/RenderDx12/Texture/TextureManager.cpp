@@ -14,10 +14,11 @@ X_NAMESPACE_BEGIN(texture)
 
 
 	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan,
-		render::DescriptorAllocator& descriptorAlloc) :
+		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt) :
 		contextMan_(contextMan),
 		pDevice_(pDevice),
 		descriptorAlloc_(descriptorAlloc),
+		depthFmt_(depthFmt),
 		arena_(arena),
 		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
 		pTexDefault_(nullptr),
@@ -114,6 +115,10 @@ X_NAMESPACE_BEGIN(texture)
 		
 	}
 
+	DXGI_FORMAT TextureManager::getDepthFmt(void) const
+	{
+		return depthFmt_;
+	}
 
 	Texture* TextureManager::forName(const char* pName, TextureFlags flags)
 	{

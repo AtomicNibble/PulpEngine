@@ -34,7 +34,7 @@ class TextureManager : public core::IXHotReload
 
 public:
 	TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		render::ContextManager& contextMan, render::DescriptorAllocator& descriptorAlloc);
+		render::ContextManager& contextMan, render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt);
 	~TextureManager();
 
 	bool init(void);
@@ -43,6 +43,7 @@ public:
 	void registerVars(void);
 	void registerCmds(void);
 
+	DXGI_FORMAT getDepthFmt(void) const;
 
 	Texture* forName(const char* pName, TextureFlags flags);
 	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
@@ -88,6 +89,7 @@ private:
 	ID3D12Device* pDevice_;
 	render::ContextManager& contextMan_;
 	render::DescriptorAllocator& descriptorAlloc_;
+	DXGI_FORMAT depthFmt_;
 
 	core::MemoryArenaBase* arena_;
 	TextureContainer textures_;

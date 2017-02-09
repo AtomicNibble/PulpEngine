@@ -751,7 +751,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 	{
 		// should never fail since it's null render system.
 		// but it may get changed later that it can fail so check.
-		if (!env_.pRender->init(NULL, 0, 0)) {
+		if (!env_.pRender->init(NULL, 0, 0, texture::Texturefmt::UNKNOWN)) {
 			X_ERROR("Core", "Failed to init render system");
 			return false;
 		}
@@ -771,7 +771,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 		// vars required pre init.
 		env_.pRender->registerVars();
 
-		if (!env_.pRender->init(hWnd, width, height)) {
+		if (!env_.pRender->init(hWnd, width, height, texture::Texturefmt::D32_FLOAT)) {
 			X_ERROR("Core", "Failed to init render system");
 			return false;
 		}
