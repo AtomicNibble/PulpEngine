@@ -13,7 +13,9 @@ X_NAMESPACE_BEGIN(texture)
 
 class TextureManager;
 
-	class X_ALIGNED_SYMBOL(Texture, 64) : public render::IPixelBuffer // ::texture::ITexture
+	// we don't align this type, the allocator aligns it.
+	// since we inherit this type.
+	class Texture : public render::IPixelBuffer // ::texture::ITexture
 	{
 		friend TextureManager;
 

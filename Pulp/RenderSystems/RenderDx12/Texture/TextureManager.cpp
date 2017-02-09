@@ -19,7 +19,7 @@ X_NAMESPACE_BEGIN(texture)
 		pDevice_(pDevice),
 		descriptorAlloc_(descriptorAlloc),
 		arena_(arena),
-		textures_(arena, sizeof(TextureResource), X_ALIGN_OF(TextureResource)),
+		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
 		pTexDefault_(nullptr),
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
