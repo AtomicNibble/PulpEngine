@@ -79,5 +79,11 @@ X_INLINE void GpuResource::setTransitioningStateState(D3D12_RESOURCE_STATES stat
 	transitioningState_ = state;
 }
 
+X_INLINE void GpuResource::setGpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress)
+{
+	gpuVirtualAddress_ = gpuVirtualAddress;
+}
+
+
 X_NAMESPACE_END
 

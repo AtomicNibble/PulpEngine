@@ -27,6 +27,7 @@ public:
 	X_INLINE D3D12_RESOURCE_STATES getTransitioningStateState(void) const;
 	X_INLINE void setUsageState(D3D12_RESOURCE_STATES state);
 	X_INLINE void setTransitioningStateState(D3D12_RESOURCE_STATES state);
+	X_INLINE void setGpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress);
 
 protected:
 	ID3D12Resource* pResource_;
