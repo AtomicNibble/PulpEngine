@@ -3,6 +3,8 @@
 
 #include "Allocators\DescriptorAllocator.h"
 
+#include "Texture\TextureUtil.h"
+
 X_NAMESPACE_BEGIN(texture)
 
 
@@ -46,6 +48,12 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		resource_.destroy();
 		hCpuDescriptorHandle_.ptr = 0;
+	}
+
+
+	const DXGI_FORMAT Texture::getFormatDX(void) const
+	{
+		return Util::DXGIFormatFromTexFmt(format_);
 	}
 
 

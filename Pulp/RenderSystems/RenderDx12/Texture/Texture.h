@@ -44,6 +44,7 @@ class TextureManager;
 		X_INLINE const TextureType::Enum getTextureType(void) const X_OVERRIDE;
 		X_INLINE const TextureFlags getFlags(void) const X_OVERRIDE;
 		X_INLINE const Texturefmt::Enum getFormat(void) const X_OVERRIDE;
+		const DXGI_FORMAT getFormatDX(void) const;
 
 		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
 
