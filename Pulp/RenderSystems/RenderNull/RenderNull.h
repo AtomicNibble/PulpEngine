@@ -47,6 +47,7 @@ public:
 	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_OVERRIDE;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
+	texture::ITexture* getDefaultTexture(void) const X_FINAL;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_OVERRIDE;
 
 	shader::IShaderSource* getShaderSource(const char* pName) X_OVERRIDE;

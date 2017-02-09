@@ -183,6 +183,11 @@ texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlag
 	return nullptr;
 }
 
+texture::ITexture* RenderNull::getDefaultTexture(void) const
+{
+	return nullptr;
+}
+
 texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
 	X_ASSERT_NOT_NULL(pNickName);
