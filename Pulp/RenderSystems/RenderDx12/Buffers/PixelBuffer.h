@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Texture\Texture.h"
 #include "GpuResource.h"
 
 X_NAMESPACE_BEGIN(render)
 
 
-class PixelBuffer : public GpuResource
+class PixelBuffer : public texture::Texture
 {
 public:
 	X_DECLARE_FLAGS(ResourceFlag) (
@@ -19,14 +20,14 @@ public:
 
 	typedef Flags<ResourceFlag> ResourceFlags;
 
-public:
-	PixelBuffer();
-	
-	X_INLINE uint32_t getWidth(void) const;
-	X_INLINE uint32_t getHeight(void) const;
-	X_INLINE uint32_t getDepth(void) const;
-	X_INLINE const DXGI_FORMAT getFormat(void) const;
+protected:
+	PixelBuffer(const char* pName);
 
+
+	// IPixelBuffer
+	X_INLINE PixelBufferType::Enum getBufferType(void) const X_OVERRIDE;
+	// ~IPixelBuffer
+	
 protected:
 
 	D3D12_RESOURCE_DESC describeTex2D(uint32_t width, uint32_t height,
@@ -39,17 +40,14 @@ protected:
 		D3D12_CLEAR_VALUE clearValue, D3D12_GPU_VIRTUAL_ADDRESS 
 		vidMemPtr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN);
 
-
+protected:
 	static DXGI_FORMAT getBaseFormat(DXGI_FORMAT Format);
 	static DXGI_FORMAT getUAVFormat(DXGI_FORMAT Format);
 	static DXGI_FORMAT getDSVFormat(DXGI_FORMAT Format);
 	static DXGI_FORMAT getDepthFormat(DXGI_FORMAT Format);
 	static DXGI_FORMAT getStencilFormat(DXGI_FORMAT Format);
 
-	uint32_t width_;
-	uint32_t height_;
-	uint32_t arraySize_; // depth
-	DXGI_FORMAT format_;
+protected:
 };
 
 

@@ -1,9 +1,12 @@
 #include "stdafx.h"
 #include "PixelBuffer.h"
 
+#include "Texture\TextureUtil.h"
+
 X_NAMESPACE_BEGIN(render)
 
-PixelBuffer::PixelBuffer()
+PixelBuffer::PixelBuffer(const char* pName) :
+	texture::Texture(pName, texture::TextureFlags())
 {
 
 }
@@ -11,10 +14,10 @@ PixelBuffer::PixelBuffer()
 D3D12_RESOURCE_DESC PixelBuffer::describeTex2D(uint32_t width, uint32_t height,
 	uint32_t depthOrArraySize, uint32_t numMips, DXGI_FORMAT format, uint32_t flags)
 {
-	width_ = width;
-	height_ = height;
-	arraySize_ = depthOrArraySize;
-	format_ = format;
+	dimensions_.x = safe_static_cast<uint16_t>(width);
+	dimensions_.y = safe_static_cast<uint16_t>(height);
+	numMips_ = safe_static_cast<uint8_t>(depthOrArraySize);
+	format_ = texture::Util::texFmtFromDXGI(format);
 
 	D3D12_RESOURCE_DESC desc;
 	core::zero_object(desc);
@@ -38,14 +41,13 @@ void PixelBuffer::associateWithResource(ID3D12Device* pDevice, ID3D12Resource* p
 	X_ASSERT_NOT_NULL(pResource);
 	D3D12_RESOURCE_DESC resourceDesc = pResource->GetDesc();
 
-	pResource_ = pResource;
-	usageState_ = currentState;
+	getGpuResource().getResourcePtrRef() = pResource;
+	getGpuResource().setUsageState(currentState);
 
-	// We don't care about large virtual textures.
-	width_ = safe_static_cast<uint32_t, uint64_t>(resourceDesc.Width);
-	height_ = resourceDesc.Height;
-	arraySize_ = resourceDesc.DepthOrArraySize;
-	format_ = resourceDesc.Format;
+	dimensions_.x = safe_static_cast<uint32_t, uint64_t>(resourceDesc.Width);
+	dimensions_.y = safe_static_cast<uint16_t>(resourceDesc.Height);
+	numMips_ = safe_static_cast<uint8_t>(resourceDesc.DepthOrArraySize);
+	format_ = texture::Util::texFmtFromDXGI(resourceDesc.Format);
 }
 
 void PixelBuffer::createTextureResource(ID3D12Device* pDevice, 
@@ -59,15 +61,16 @@ void PixelBuffer::createTextureResource(ID3D12Device* pDevice,
 	heapProps.CreationNodeMask = 1;
 	heapProps.VisibleNodeMask = 1;
 
+	auto& resource = getGpuResource();
 
 	HRESULT hr = pDevice->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&pResource_));
+		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&resource.getResourcePtrRef()));
 	if (FAILED(hr)) {
 		X_FATAL("Dx12", "Failed to create commited resource. err: %" PRIu32, hr);
 	}
 
-	usageState_ = D3D12_RESOURCE_STATE_COMMON;
-	gpuVirtualAddress_ = D3D12_GPU_VIRTUAL_ADDRESS_NULL;
+	resource.setUsageState(D3D12_RESOURCE_STATE_COMMON);
+	resource.setGpuVirtualAddress(D3D12_GPU_VIRTUAL_ADDRESS_NULL);
 }
 
 

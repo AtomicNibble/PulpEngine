@@ -10,7 +10,7 @@ class GraphicsContext;
 class ShadowBuffer : public DepthBuffer
 {
 public:
-	ShadowBuffer();
+	ShadowBuffer(const char* pName);
 
 	void create(ID3D12Device* pDevice, DescriptorAllocator& allocator, uint32_t width, uint32_t height,
 		D3D12_GPU_VIRTUAL_ADDRESS vidMemPtr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN);

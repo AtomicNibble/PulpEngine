@@ -3,14 +3,19 @@
 #include "PixelBuffer.h"
 #include <ITexture.h>
 
+#include <Util\UniquePointer.h>
+
 X_NAMESPACE_BEGIN(render)
 
 class DescriptorAllocator;
 
-class ColorBuffer : public PixelBuffer, public IRenderTarget
+class ColorBuffer : public PixelBuffer
 {
 public:
-	ColorBuffer(Colorf clearCol = Colorf::zero());
+	typedef core::FixedArray<D3D12_CPU_DESCRIPTOR_HANDLE, texture::TEX_MAX_MIPS> DescriptorHandleArr;
+
+public:
+	ColorBuffer(const char* pName, Colorf clearCol = Colorf::zero());
 
 	void createFromSwapChain(ID3D12Device* pDevice, DescriptorAllocator& allocator, ID3D12Resource* pBaseResource);
 
@@ -24,29 +29,25 @@ public:
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getRTV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getUAV(void) const;
+	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE* getUAVs(void) const;
 
 	X_INLINE void setClearColor(const Colorf& col);
 	X_INLINE Colorf getClearColor(void) const;
 
-	// IRenderTarget
-	texture::Texturefmt::Enum getFmt(void) X_FINAL;
-
-	// ~IRenderTarget
+protected:
+	X_INLINE D3D12_CPU_DESCRIPTOR_HANDLE* getUAVs(void);
 
 protected:
 	void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, DXGI_FORMAT format,
 		uint32_t rraySize, uint32_t NumMips = 1);
 
 protected:
-	Colorf clearColor_;
+	Color8u clearColor_;
 	D3D12_CPU_DESCRIPTOR_HANDLE SRVHandle_;
 	D3D12_CPU_DESCRIPTOR_HANDLE RTVHandle_;
-	D3D12_CPU_DESCRIPTOR_HANDLE UAVHandle_[texture::TEX_MAX_MIPS];
-	uint32_t numMipMaps_; // number of texture sublevels
+
+	DescriptorHandleArr UAVHandles_;
 };
-
-
-
 
 
 X_NAMESPACE_END

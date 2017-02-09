@@ -4,7 +4,8 @@
 
 X_NAMESPACE_BEGIN(render)
 
-ShadowBuffer::ShadowBuffer()
+ShadowBuffer::ShadowBuffer(const char* pName) :
+	DepthBuffer(pName)
 {
 
 }
@@ -35,7 +36,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE ShadowBuffer::getSRV(void) const
 
 void ShadowBuffer::beginRendering(GraphicsContext& context)
 {
-	context.transitionResource(*this, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+	context.transitionResource(this->getGpuResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
 	context.clearDepth(*this);
 	context.setDepthStencilTarget(getDSV());
 	context.setViewportAndScissor(viewport_, scissor_);
@@ -43,7 +44,7 @@ void ShadowBuffer::beginRendering(GraphicsContext& context)
 
 void ShadowBuffer::endRendering(GraphicsContext& context)
 {
-	context.transitionResource(*this, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	context.transitionResource(this->getGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 X_NAMESPACE_END

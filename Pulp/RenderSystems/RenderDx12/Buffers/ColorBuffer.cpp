@@ -6,16 +6,17 @@
 
 X_NAMESPACE_BEGIN(render)
 
-ColorBuffer::ColorBuffer(Colorf clearCol) :
+ColorBuffer::ColorBuffer(const char* pName, Colorf clearCol) :
 	clearColor_(clearCol),
-	numMipMaps_(0)
+	PixelBuffer(pName)
 {
 	SRVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	RTVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 
 	// set these to value of D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN
-	static_assert(D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN == -1, "Memset needs updating to set correct unkown address");
-	std::memset(UAVHandle_, 0xFF, sizeof(UAVHandle_));
+	std::fill(UAVHandles_.begin(), UAVHandles_.end(), CD3DX12_CPU_DESCRIPTOR_HANDLE());
+
+	X_ASSERT(UAVHandles_[0].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN, "Incorrect initial value")();
 }
 
 void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
@@ -24,7 +25,7 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 	X_ASSERT(arraySize == 1 || numMips == 1, "auto-mips on texture arrays not supported")(arraySize, numMips);
 	X_ASSERT(numMips < texture::TEX_MAX_MIPS, "numMips exceeds max")(numMips, texture::TEX_MAX_MIPS);
 
-	numMipMaps_ = numMips - 1;
+	this->numMips_ = numMips - 1;
 
 	D3D12_RENDER_TARGET_VIEW_DESC RTVDesc;
 	D3D12_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
@@ -74,19 +75,23 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 
 
 	// Create the render target view
-	pDevice->CreateRenderTargetView(pResource_, &RTVDesc, RTVHandle_);
+	pDevice->CreateRenderTargetView(getGpuResource().getResource(), &RTVDesc, RTVHandle_);
 
 	// Create the shader resource view
-	pDevice->CreateShaderResourceView(pResource_, &SRVDesc, SRVHandle_);
+	pDevice->CreateShaderResourceView(getGpuResource().getResource(), &SRVDesc, SRVHandle_);
 
 	// Create the UAVs for each mip level (RWTexture2D)
+	D3D12_CPU_DESCRIPTOR_HANDLE* pUAVHandles = getUAVs();
+
 	for (uint32_t i = 0; i < numMips; ++i)
 	{
-		if (UAVHandle_[i].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
-			UAVHandle_[i] = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		D3D12_CPU_DESCRIPTOR_HANDLE& pMipUAV = pUAVHandles[i];
+
+		if (pMipUAV.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
+			pMipUAV = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
-		pDevice->CreateUnorderedAccessView(pResource_, nullptr, &UAVDesc, UAVHandle_[i]);
+		pDevice->CreateUnorderedAccessView(getGpuResource().getResource(), nullptr, &UAVDesc, pMipUAV);
 
 		UAVDesc.Texture2D.MipSlice++;
 	}
@@ -98,7 +103,7 @@ void ColorBuffer::createFromSwapChain(ID3D12Device* pDevice, DescriptorAllocator
 	associateWithResource(pDevice, pBaseResource, D3D12_RESOURCE_STATE_PRESENT);
 
 	RTVHandle_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-	pDevice->CreateRenderTargetView(pResource_, nullptr, RTVHandle_);
+	pDevice->CreateRenderTargetView(getGpuResource().getResource(), nullptr, RTVHandle_);
 }
 
 void ColorBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, uint32_t width, uint32_t height, uint32_t numMips,
@@ -139,12 +144,5 @@ void ColorBuffer::createArray(ID3D12Device* pDevice, DescriptorAllocator& alloca
 	createDerivedViews(pDevice, allocator, format, arrayCount, 1);
 }
 
-
-texture::Texturefmt::Enum ColorBuffer::getFmt(void)
-{
-	auto dxgiFmt = getFormat();
-
-	return texture::Util::texFmtFromDXGI(dxgiFmt);
-}
 
 X_NAMESPACE_END
