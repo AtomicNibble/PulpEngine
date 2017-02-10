@@ -12,11 +12,6 @@ ColorBuffer::ColorBuffer(const char* pName, Colorf clearCol) :
 {
 	// SRVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	RTVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
-
-	// set these to value of D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN
-	std::fill(UAVHandles_.begin(), UAVHandles_.end(), CD3DX12_CPU_DESCRIPTOR_HANDLE());
-
-	X_ASSERT(UAVHandles_[0].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN, "Incorrect initial value")();
 }
 
 void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
@@ -79,6 +74,11 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 
 	// Create the shader resource view
 	pDevice->CreateShaderResourceView(getGpuResource().getResource(), &SRVDesc, hCpuDescriptorHandle_);
+
+	UAVHandles_.resize(numMips);
+	std::fill(UAVHandles_.begin(), UAVHandles_.end(), CD3DX12_CPU_DESCRIPTOR_HANDLE());
+
+	X_ASSERT(UAVHandles_[0].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN, "Incorrect initial value")();
 
 	// Create the UAVs for each mip level (RWTexture2D)
 	D3D12_CPU_DESCRIPTOR_HANDLE* pUAVHandles = getUAVs();
