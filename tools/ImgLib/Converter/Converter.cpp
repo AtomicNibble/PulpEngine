@@ -533,39 +533,122 @@ namespace Converter
 
 				uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
 
+				auto subBlockConvert = [&]() {
+					X_ASSERT(inputImg.height < 4, "Height should be below 4")(inputImg.height);
+
+					// we need to pad this up into a 4x4 block for converting.
+					// we should fill that pixels we don't plan to use with real pixels
+					// that way the block format is able to make a better pallet.
+					std::array<uint8_t, 4> block[4 * 4];
+
+					for (int32_t y = 0; y < 4; y++)
+					{
+						for (int32_t x = 0; x <4; x++)
+						{
+							int32_t srcY = core::Min(y, inputImg.height);
+							int32_t srcX = core::Min(x, inputImg.width);
+							uint8_t* pSrcPixel = &inputImg.ptr[srcX * srcY];
+
+							auto& dest = block[(y * 4) + x];
+
+							std::memcpy(dest.data(), pSrcPixel, 4);
+						}
+					}
+
+					ispc::rgba_surface surface;
+					surface.ptr = block[0].data();
+					surface.width = 4;
+					surface.height = 4;
+					surface.stride = 4 * 4;
+					pFunc(&surface, pOut);
+				};
+
 				if (pRootJob)
 				{
 					const int32_t targetJobCount = 32;
-					const int32_t linesPerJob = (inputImg.height + targetJobCount - 1) / targetJobCount;
+					const int32_t rowsPerJob = (((inputImg.height / 4) + targetJobCount - 1) / targetJobCount) * 4;
 					const int32_t bytesPerBlock = Util::dxtBytesPerBlock(targetFmt);
-
 					const int32_t numJobs = core::Min(targetJobCount, inputImg.height);
 
+					X_ASSERT((rowsPerJob % 4) == 0, "Rows to process should be multiple of 4")(rowsPerJob);
+
+					if (!core::bitUtil::IsPowerOfTwo(inputImg.height) || !core::bitUtil::IsPowerOfTwo(inputImg.height)) {
+						X_ASSERT_NOT_IMPLEMENTED();
+					}
+
+					if (rowsPerJob == 0)
+					{
+						subBlockConvert();
+					}
+					else
+					{
+						int32_t currentRow = 0;
+
+						while (currentRow < inputImg.height)
+						{
+							int32_t y_start = currentRow;
+							int32_t y_end = currentRow + rowsPerJob;
+
+							// start + rows might bexceed height
+							if (y_end > inputImg.height) {
+								y_end = inputImg.height;
+							}
+
+							const int32_t numRowsToProcess = y_end - y_start;
+
+							X_ASSERT(numRowsToProcess > 0, "Invalid range")(y_end, y_start, numRowsToProcess);
+							X_ASSERT((numRowsToProcess % 4) == 0, "Rows to process should be multiple of 4")(numRowsToProcess);
+							X_ASSERT((y_start % 4) == 0, "Start row should be a multiple of 4")(y_start);
+							X_ASSERT((y_end % 4) == 0, "End row should be a multiple of 4")(y_end);
+
+							JobData data;
+							data.pCompressFunc = pFunc;
+							data.surface.ptr = inputImg.ptr + y_start * inputImg.stride;
+							data.surface.width = inputImg.width;
+							data.surface.height = numRowsToProcess;
+							data.surface.stride = inputImg.stride;
+							data.pOut = pOut + (y_start / 4) * (inputImg.width / 4) * bytesPerBlock;
+
+							currentRow += numRowsToProcess;
+
+							core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data);
+							jobSys.Run(pJob);
+						}
+					}
+#if 0
 					// add job for each row?
 					for(int32_t jobIdx = 0; jobIdx < numJobs; jobIdx++)
 					{
-						const int32_t y_start = (linesPerJob*jobIdx) / 4 * 4;
-						int32_t y_end = (linesPerJob*(jobIdx + 1)) / 4 * 4;
-
-						if (y_start > inputImg.height) {
-							continue;
-						}
-
-						if (y_end > inputImg.height) {
-							y_end = inputImg.height;
-						}
-
-						if ((y_end - y_start) == 0) {
-							continue;
-						}
-
 						JobData data;
 						data.pCompressFunc = pFunc;
-						data.surface.ptr = inputImg.ptr + y_start * inputImg.stride;
-						data.surface.width = inputImg.width;
-						data.surface.height = y_end - y_start;
-						data.surface.stride = inputImg.stride;
-						data.pOut = pOut + (y_start / 4) * (inputImg.width / 4) * bytesPerBlock;
+
+						if (inputImg.height < 4 || inputImg.width < 4)
+						{
+							int goat1 = 0;
+							goat1 = 1;
+
+						}
+						else
+						{
+							const int32_t y_start = (linesPerJob*jobIdx) / 4 * 4;
+							int32_t y_end = (linesPerJob*(jobIdx + 1)) / 4 * 4;
+
+							if (y_start > inputImg.height) {
+								continue;
+							}
+
+							if (y_end > inputImg.height) {
+								y_end = inputImg.height;
+							}
+
+							X_ASSERT((y_end - y_start) > 0, "Invalid range")(y_end, y_start);
+
+							data.surface.ptr = inputImg.ptr + y_start * inputImg.stride;
+							data.surface.width = inputImg.width;
+							data.surface.height = y_end - y_start;
+							data.surface.stride = inputImg.stride;
+							data.pOut = pOut + (y_start / 4) * (inputImg.width / 4) * bytesPerBlock;
+						}
 
 						X_ASSERT(data.surface.height >= 1, "Invalid height")(data.surface.height);
 						X_ASSERT(data.surface.width >= 1, "Invalid width")(data.surface.width);
@@ -573,10 +656,18 @@ namespace Converter
 						core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data);
 						jobSys.Run(pJob);
 					}
+#endif
 				}
 				else
 				{
-					pFunc(&inputImg, pOut);
+					if (inputImg.height < 4)
+					{
+						subBlockConvert();
+					}
+					else
+					{
+						pFunc(&inputImg, pOut);
+					}
 				}
 
 				size.x >>= 1;
