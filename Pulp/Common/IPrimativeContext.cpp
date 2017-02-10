@@ -592,9 +592,10 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 	{
 		Matrix33f scale = Matrix33f::createScale(sphere.radius());
 		Matrix34f trans = Matrix34f::createTranslation(sphere.center());
+		Matrix34f transMat = trans * scale;
 
 		ObjectParam* pObj = addObject(ObjectType::Sphere);
-		pObj->matWorld = trans * scale;
+		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = sphere.radius();
 	}
@@ -608,9 +609,10 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, c
 	{
 		Matrix33f scale = Matrix33f::createScale(sphere.radius());
 		Matrix34f trans = Matrix34f::createTranslation(mat * sphere.center());
+		Matrix34f transMat = trans * scale;
 
 		ObjectParam* pObj = addObject(ObjectType::Sphere);
-		pObj->matWorld = trans * scale;
+		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = sphere.radius();
 	}
@@ -634,9 +636,10 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 
 		Matrix33f scale = Matrix33f::createScale(Vec3f(radius, height, radius));
 		Matrix34f trans = Matrix34f::createTranslation(pos);
+		Matrix34f transMat = trans * matRot * scale;
 
 		ObjectParam* pObj = addObject(ObjectType::Cone);
-		pObj->matWorld = trans * matRot * scale;
+		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = core::Max(radius, height * 0.5f);
 	}
@@ -660,9 +663,10 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 
 		Matrix33f scale = Matrix33f::createScale(Vec3f(radius, height, radius));
 		Matrix34f trans = Matrix34f::createTranslation(pos);
+		Matrix34f transMat = trans * matRot * scale;
 
 		ObjectParam* pObj = addObject(ObjectType::Cone);
-		pObj->matWorld = trans * matRot * scale;
+		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = core::Max(radius, height * 0.5f);
 	}

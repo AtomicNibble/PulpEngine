@@ -27,12 +27,12 @@ public:
 
 	struct ObjectParam
 	{
-		Matrix34f matWorld;
+		Transformf trans;
 		Color8u color;
 		float size;
 	};
 
-	X_ENSURE_SIZE(ObjectParam, 56);
+	X_ENSURE_SIZE(ObjectParam, 36);
 
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
