@@ -145,43 +145,7 @@ private:
 	}
 };
 
-// both members or extend?
-// humm
-template<typename T>
-class QuatTrans  
-{
-public:
-	Quat<T>		quat;
-	Vec3<T>		trans;
-
-	QuatTrans();
-	QuatTrans(const Vec3<T>& vec, const Quat<T>& quat);
-
-	template <typename TOth>
-	explicit QuatTrans(const QuatTrans<TOth>& qt);
-
-	explicit QuatTrans(const Matrix34<T>& mat);
-
-	QuatTrans<T>& operator =(const QuatTrans<T>& qt);
-
-	bool operator==(const QuatTrans<T> &rhs) const;
-	bool operator!=(const QuatTrans<T> &rhs) const;
-
-	void set(const Vec3<T> &trans, const Quat<T>& qt);
-	void set(const Matrix34<T>& mat);
-
-
-	void setTranslation(const Vec3<T>& vec);
-	Vec3<T> getTranslation(void) const;
-
-	static QuatTrans<T> identity()
-	{
-		return QuatTrans();
-	}
-};
-
 #include "XQuat.inl"
-#include "XQuatTrans.inl"
 
 template<typename T>
 inline Vec3<T> operator*(const Vec3<T> &vec, const Quat<T> &q)
@@ -197,9 +161,5 @@ inline Vec3<T> operator*(const Vec3<T> &vec, const Quat<T> &q)
 
 typedef Quat<float>		Quatf;
 typedef Quat<double>	Quatd;
-
-
-typedef QuatTrans<float>	QuatTransf;
-typedef QuatTrans<double>	QuatTransd;
 
 #endif // !_X_MATH_QUAT_H_

@@ -1192,6 +1192,9 @@
     <ClInclude Include="Threading\win32\SharedLock.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Math\XTransform.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1398,9 +1401,6 @@
     <None Include="Containers\FixedRingBuffer.inl">
       <Filter>Headers\Containers</Filter>
     </None>
-    <None Include="Math\XQuatTrans.inl">
-      <Filter>Headers\Math</Filter>
-    </None>
     <None Include="Math\XFrustum.inl">
       <Filter>Headers\Math</Filter>
     </None>
@@ -1502,6 +1502,9 @@
     </None>
     <None Include="Threading\win32\SharedLock.inl">
       <Filter>Headers\Threading\win32</Filter>
+    </None>
+    <None Include="Math\XTransform.inl">
+      <Filter>Headers\Math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -210,6 +210,7 @@
     <ClInclude Include="Math\XRect.h" />
     <ClInclude Include="Math\XSphere.h" />
     <ClInclude Include="Math\XSphereGen.h" />
+    <ClInclude Include="Math\XTransform.h" />
     <ClInclude Include="Math\XVecCompressed.h" />
     <ClInclude Include="Math\XVector.h" />
     <ClInclude Include="Math\XVectorAligned.h" />
@@ -432,7 +433,7 @@
     <None Include="Logging\LoggerBase.inl" />
     <None Include="Math\XInterpolate.inl" />
     <None Include="Math\XFrustum.inl" />
-    <None Include="Math\XQuatTrans.inl" />
+    <None Include="Math\XTransform.inl" />
     <None Include="Math\XAabb.inl" />
     <None Include="Math\XColor.inl" />
     <None Include="Math\XMatrix22.inl" />
