@@ -560,6 +560,9 @@ namespace Converter
 						data.surface.stride = inputImg.stride;
 						data.pOut = pOut + (y_start / 4) * (inputImg.width / 4) * bytesPerBlock;
 
+						X_ASSERT(data.surface.height >= 1, "Invalid height")(data.surface.height);
+						X_ASSERT(data.surface.width >= 1, "Invalid width")(data.surface.width);
+
 						core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data);
 						jobSys.Run(pJob);
 					}
@@ -592,6 +595,9 @@ namespace Converter
 		X_UNUSED(pJob);
 
 		JobData* pJobData = reinterpret_cast<JobData*>(pData);
+
+		X_ASSERT(pJobData->surface.height >= 1, "Invalid height")(pJobData->surface.height);
+		X_ASSERT(pJobData->surface.width >= 1, "Invalid width")(pJobData->surface.width);
 
 		pJobData->pCompressFunc(&pJobData->surface, pJobData->pOut);
 	}
