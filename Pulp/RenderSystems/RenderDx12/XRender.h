@@ -271,36 +271,12 @@ private:
 	core::PoolAllocator statePoolAllocator_;
 	StatePoolArena		statePool_;
 
-
-//	RootSignature presentRS_;
-
 	Vec2<uint32_t> currentNativeRes_;	// the resolution we render to.
 	Vec2<uint32_t> targetNativeRes_;	// if diffrent, the render buffers we be resized to this next frame.
 	Vec2<uint32_t> displayRes_;			// the resolution of the final screen
 
 	ColorBuffer displayPlane_[SWAP_CHAIN_BUFFER_COUNT];
 	uint32_t currentBufferIdx_;
-
-
-#if 0
-	SamplerDesc samplerLinearWrapDesc_;
-	SamplerDesc samplerAnisoWrapDesc_;
-	SamplerDesc samplerShadowDesc_;
-	SamplerDesc samplerLinearClampDesc_;
-	SamplerDesc samplerVolumeWrapDesc_;
-	SamplerDesc samplerPointClampDesc_;
-	SamplerDesc samplerPointBorderDesc_;
-	SamplerDesc samplerLinearBorderDesc_;
-
-	SamplerDescriptor samplerLinearWrap_;
-	SamplerDescriptor samplerAnisoWrap_;
-	SamplerDescriptor samplerShadow_;
-	SamplerDescriptor samplerLinearClamp_;
-	SamplerDescriptor samplerVolumeWrap_;
-	SamplerDescriptor samplerPointClamp_;
-	SamplerDescriptor samplerPointBorder_;
-	SamplerDescriptor samplerLinearBorder_;
-#endif
 
 	// pre created IL descriptinos for each supported vertex format.
 	VertexFormatILArr ilDescriptions_;
