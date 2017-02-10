@@ -535,15 +535,22 @@ namespace Converter
 
 				if (pRootJob)
 				{
-					const int32_t numJobs = 32;
-					const int32_t linesPerJob = (inputImg.height + numJobs - 1) / numJobs;
+					const int32_t targetJobCount = 32;
+					const int32_t linesPerJob = (inputImg.height + targetJobCount - 1) / targetJobCount;
 					const int32_t bytesPerBlock = Util::dxtBytesPerBlock(targetFmt);
+
+					const int32_t numJobs = core::Min(targetJobCount, inputImg.height);
 
 					// add job for each row?
 					for(int32_t jobIdx = 0; jobIdx < numJobs; jobIdx++)
 					{
 						const int32_t y_start = (linesPerJob*jobIdx) / 4 * 4;
 						int32_t y_end = (linesPerJob*(jobIdx + 1)) / 4 * 4;
+
+						if (y_start > inputImg.height) {
+							continue;
+						}
+
 						if (y_end > inputImg.height) {
 							y_end = inputImg.height;
 						}
