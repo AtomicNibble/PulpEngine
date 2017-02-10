@@ -128,9 +128,6 @@ private:
 
 	ObjectParamArr objects_[ObjectType::ENUM_COUNT];
 
-	render::PassStateHandle passHandle_;
-	render::StateHandle stateCache_[PrimitiveType::ENUM_COUNT];
-
 	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
 };
 

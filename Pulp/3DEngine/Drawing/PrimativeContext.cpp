@@ -68,12 +68,6 @@ PrimativeContext::PrimativeContext(Mode mode, core::MemoryArenaBase* arena) :
 	// before setting the large granularity.
 	// that way we grow fast but if not rendering much we stay small.
 
-	passHandle_ = render::INVALID_STATE_HANLDE;
-	for (auto& h : stateCache_)
-	{
-		h = render::INVALID_STATE_HANLDE;
-	}
-
 	core::zero_object(primMaterials_);
 }
 
@@ -127,25 +121,6 @@ bool PrimativeContext::createStates(render::IRender* pRender)
 
 bool PrimativeContext::freeStates(render::IRender* pRender)
 {
-	for (auto& state : stateCache_)
-	{
-		if (state != render::INVALID_STATE_HANLDE) {
-			pRender->destoryState(state);
-		}
-	}
-
-	if (passHandle_ != render::INVALID_STATE_HANLDE) {
-		pRender->destoryPassState(passHandle_);
-	}
-
-#if X_DEBUG
-	passHandle_ = render::INVALID_STATE_HANLDE;
-	for (auto& h : stateCache_)
-	{
-		h = render::INVALID_STATE_HANLDE;
-	}
-#endif // X_DEBUG
-
 	for (auto& vp : vertexPages_) {
 		vp.destoryVB(pRender);
 	}
