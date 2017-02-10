@@ -21,11 +21,11 @@ public:
 	void raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
 		int16_t maxtouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_FINAL;
 
-	void sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+	void sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		int16_t maxTouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
 		const float32_t inflation = 0.f) const X_FINAL;
 
-	void overlap(const GeometryBase& geometry, const QuatTransf& pose, int16_t maxTouchHits) const X_FINAL;
+	void overlap(const GeometryBase& geometry, const Transformf& pose, int16_t maxTouchHits) const X_FINAL;
 
 
 

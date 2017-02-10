@@ -90,7 +90,7 @@ public:
 
 	// joints
 	IJoint* createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1,
-		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_FINAL;
+		const Transformf& localFrame0, const Transformf& localFrame1) X_FINAL;
 	void releaseJoint(IJoint* pJoint) X_FINAL;
 
 	void setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer) X_FINAL;
@@ -108,24 +108,24 @@ public:
 	ConvexHandle createConvexMesh(const DataArr& cooked) X_FINAL;
 	HieghtFieldHandle createHieghtField(const DataArr& cooked) X_FINAL;
 
-	ActorHandle createConvexMesh(const QuatTransf& myTrans, ConvexHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
-	ActorHandle createTriangleMesh(const QuatTransf& myTrans, TriMeshHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
-	ActorHandle createHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
-	ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_FINAL;
-	ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_FINAL;
-	ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_FINAL;
+	ActorHandle createConvexMesh(const Transformf& myTrans, ConvexHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createTriangleMesh(const Transformf& myTrans, TriMeshHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
+	ActorHandle createSphere(const Transformf& myTrans, float radius, float density) X_FINAL;
+	ActorHandle createCapsule(const Transformf& myTrans, float radius, float halfHeight, float density) X_FINAL;
+	ActorHandle createBox(const Transformf& myTrans, const AABB& bounds, float density) X_FINAL;
 
-	ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;
-	ActorHandle createStaticHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
-	ActorHandle createStaticPlane(const QuatTransf& myTrans) X_FINAL;
-	ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_FINAL;
-	ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_FINAL;
-	ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
-	ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_FINAL;
+	ActorHandle createStaticTriangleMesh(const Transformf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createStaticHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
+	ActorHandle createStaticPlane(const Transformf& myTrans) X_FINAL;
+	ActorHandle createStaticSphere(const Transformf& myTrans, float radius) X_FINAL;
+	ActorHandle createStaticCapsule(const Transformf& myTrans, float radius, float halfHeight) X_FINAL;
+	ActorHandle createStaticBox(const Transformf& myTrans, const AABB& bounds) X_FINAL;
+	ActorHandle createStaticTrigger(const Transformf& myTrans, const AABB& bounds) X_FINAL;
 
 	// for creating a actor without any initial shape.
-	ActorHandle createActor(const QuatTransf& myTrans, float density) X_FINAL;
-	ActorHandle createStaticActor(const QuatTransf& myTrans) X_FINAL;
+	ActorHandle createActor(const Transformf& myTrans, float density) X_FINAL;
+	ActorHandle createStaticActor(const Transformf& myTrans) X_FINAL;
 
 	// adding additional shapes to a actor.
 	void addTriMesh(ActorHandle handle, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;

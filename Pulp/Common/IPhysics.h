@@ -198,8 +198,8 @@ struct IJoint
 	virtual void setBreakForce(float32_t force, float32_t torque) X_ABSTRACT;
 	virtual void getBreakForce(float32_t& force, float32_t& torque) const X_ABSTRACT;
 
-	virtual void setLocalPose(ActorIdx actor, const QuatTransf& localPose) X_ABSTRACT;
-	virtual QuatTransf getLocalPose(ActorIdx actor) const X_ABSTRACT;
+	virtual void setLocalPose(ActorIdx actor, const Transformf& localPose) X_ABSTRACT;
+	virtual Transformf getLocalPose(ActorIdx actor) const X_ABSTRACT;
 };
 
 struct IFixedJoint : public IJoint
@@ -672,7 +672,7 @@ struct ActiveTransform
 {
 	ActorHandle		actor;				
 	void*			userData;			
-	QuatTransf		actor2World;		
+	Transformf		actor2World;		
 };
 
 // ------------------------------------------------
@@ -732,11 +732,11 @@ struct IBatchedQuery
 	virtual void raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
 		int16_t maxtouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_ABSTRACT;
 
-	virtual void sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+	virtual void sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		int16_t maxTouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
 		const float32_t inflation = 0.f) const X_ABSTRACT;
 
-	virtual void overlap(const GeometryBase& geometry, const QuatTransf& pose, int16_t maxTouchHits) const X_ABSTRACT;
+	virtual void overlap(const GeometryBase& geometry, const Transformf& pose, int16_t maxTouchHits) const X_ABSTRACT;
 
 };
 
@@ -778,11 +778,11 @@ struct IScene
 	virtual bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
 		RaycastCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_ABSTRACT;
 
-	virtual bool sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+	virtual bool sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		SweepCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
 		const float32_t inflation = 0.f) const X_ABSTRACT;
 
-	virtual bool overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const X_ABSTRACT;
+	virtual bool overlap(const GeometryBase& geometry, const Transformf& pose, OverlapCallback& hitCall) const X_ABSTRACT;
 
 	virtual	IBatchedQuery* createBatchQuery(const QueryMemory& desc) X_ABSTRACT;
 
@@ -835,7 +835,7 @@ struct IPhysics
 	// joints. I may want to return a interface for this not sure yet.
 	// localFrame's are `position and orientation of the joint relative to actor`
 	virtual IJoint* createJoint(JointType::Enum type, ActorHandle actor0, ActorHandle actor1, 
-		const QuatTransf& localFrame0, const QuatTransf& localFrame1) X_ABSTRACT;
+		const Transformf& localFrame0, const Transformf& localFrame1) X_ABSTRACT;
 	virtual void releaseJoint(IJoint* pJoint) X_ABSTRACT;
 
 	// debug name for logs, only stores the pointer you must ensure the memory outlives the actor :) !
@@ -857,24 +857,24 @@ struct IPhysics
 	virtual HieghtFieldHandle createHieghtField(const DataArr& cooked) X_ABSTRACT;
 
 
-	virtual ActorHandle createConvexMesh(const QuatTransf& myTrans, TriMeshHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createTriangleMesh(const QuatTransf& myTrans, ConvexHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createSphere(const QuatTransf& myTrans, float radius, float density) X_ABSTRACT;
-	virtual ActorHandle createCapsule(const QuatTransf& myTrans, float radius, float halfHeight, float density) X_ABSTRACT;
-	virtual ActorHandle createBox(const QuatTransf& myTrans, const AABB& bounds, float density) X_ABSTRACT;
+	virtual ActorHandle createConvexMesh(const Transformf& myTrans, TriMeshHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createTriangleMesh(const Transformf& myTrans, ConvexHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createSphere(const Transformf& myTrans, float radius, float density) X_ABSTRACT;
+	virtual ActorHandle createCapsule(const Transformf& myTrans, float radius, float halfHeight, float density) X_ABSTRACT;
+	virtual ActorHandle createBox(const Transformf& myTrans, const AABB& bounds, float density) X_ABSTRACT;
 
-	virtual ActorHandle createStaticTriangleMesh(const QuatTransf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createStaticHieghtField(const QuatTransf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createStaticPlane(const QuatTransf& myTrans) X_ABSTRACT;
-	virtual ActorHandle createStaticSphere(const QuatTransf& myTrans, float radius) X_ABSTRACT;
-	virtual ActorHandle createStaticCapsule(const QuatTransf& myTrans, float radius, float halfHeight) X_ABSTRACT;
-	virtual ActorHandle createStaticBox(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
-	virtual ActorHandle createStaticTrigger(const QuatTransf& myTrans, const AABB& bounds) X_ABSTRACT;
+	virtual ActorHandle createStaticTriangleMesh(const Transformf& myTrans, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createStaticHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createStaticPlane(const Transformf& myTrans) X_ABSTRACT;
+	virtual ActorHandle createStaticSphere(const Transformf& myTrans, float radius) X_ABSTRACT;
+	virtual ActorHandle createStaticCapsule(const Transformf& myTrans, float radius, float halfHeight) X_ABSTRACT;
+	virtual ActorHandle createStaticBox(const Transformf& myTrans, const AABB& bounds) X_ABSTRACT;
+	virtual ActorHandle createStaticTrigger(const Transformf& myTrans, const AABB& bounds) X_ABSTRACT;
 
 	// for creating a actor without any initial shape.
-	virtual ActorHandle createActor(const QuatTransf& myTrans, float density) X_ABSTRACT;
-	virtual ActorHandle createStaticActor(const QuatTransf& myTrans) X_ABSTRACT;
+	virtual ActorHandle createActor(const Transformf& myTrans, float density) X_ABSTRACT;
+	virtual ActorHandle createStaticActor(const Transformf& myTrans) X_ABSTRACT;
 
 
 	// adding additional / initial shape to a actor.

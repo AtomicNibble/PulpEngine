@@ -1193,7 +1193,7 @@ void RenderAux::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius,
 // ---------------------------- Bone ----------------------------
 
 
-void RenderAux::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, const Color8u& col)
+void RenderAux::drawBone(const Transformf& rParent, const Transformf& rChild, const Color8u& col)
 {
 	//	X_ASSERT_NOT_IMPLEMENTED();
 

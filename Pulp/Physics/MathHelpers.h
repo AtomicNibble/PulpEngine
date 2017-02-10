@@ -38,14 +38,14 @@ X_INLINE Quatf& QuatFromPxQuat(physx::PxQuat& quat)
 }
 
 
-X_INLINE const QuatTransf& QuatTransFromPxTrans(const physx::PxTransform& trans)
+X_INLINE const Transformf& QuatTransFromPxTrans(const physx::PxTransform& trans)
 {
-	return reinterpret_cast<const QuatTransf&>(trans);
+	return reinterpret_cast<const Transformf&>(trans);
 
 }
-X_INLINE QuatTransf& QuatTransFromPxTrans(physx::PxTransform& trans)
+X_INLINE Transformf& QuatTransFromPxTrans(physx::PxTransform& trans)
 {
-	return reinterpret_cast<QuatTransf&>(trans);
+	return reinterpret_cast<Transformf&>(trans);
 }
 
 
@@ -81,11 +81,11 @@ X_INLINE physx::PxQuat& PxQuatFromQuat(Quatf& quat)
 }
 
 
-X_INLINE const physx::PxTransform& PxTransFromQuatTrans(const QuatTransf& myTrans)
+X_INLINE const physx::PxTransform& PxTransFromQuatTrans(const Transformf& myTrans)
 {
 	return reinterpret_cast<const physx::PxTransform&>(myTrans);
 }
-X_INLINE physx::PxTransform& PxTransFromQuatTrans(QuatTransf& myTrans)
+X_INLINE physx::PxTransform& PxTransFromQuatTrans(Transformf& myTrans)
 {
 	return reinterpret_cast<physx::PxTransform&>(myTrans);
 }

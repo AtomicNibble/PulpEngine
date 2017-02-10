@@ -49,11 +49,11 @@ public:
 	bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
 		RaycastCallback& hitCall, HitFlags hitFlags) const X_FINAL;
 
-	bool sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+	bool sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		SweepCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
 		const float32_t inflation = 0.f) const X_FINAL;
 
-	bool overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const X_FINAL;
+	bool overlap(const GeometryBase& geometry, const Transformf& pose, OverlapCallback& hitCall) const X_FINAL;
 
 	IBatchedQuery* createBatchQuery(const QueryMemory& desc) X_FINAL;
 

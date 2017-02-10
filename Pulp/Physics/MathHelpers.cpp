@@ -10,7 +10,7 @@ namespace
 	X_ENSURE_SIZE(Vec3d, sizeof(physx::PxExtendedVec3));
 	X_ENSURE_SIZE(Quatf, sizeof(physx::PxQuat));
 	X_ENSURE_SIZE(AABB, sizeof(physx::PxBounds3));
-	X_ENSURE_SIZE(QuatTransf, sizeof(physx::PxTransform));
+	X_ENSURE_SIZE(Transformf, sizeof(physx::PxTransform));
 
 	X_ENSURE_SIZE(GeometryBase, sizeof(physx::PxGeometry));
 	X_ENSURE_SIZE(BoxGeometry, sizeof(physx::PxBoxGeometry));
@@ -36,8 +36,8 @@ namespace
 	static_assert(X_OFFSETOF(AABB, min) == X_OFFSETOF(physx::PxBounds3, minimum), "Offset don't match");
 	static_assert(X_OFFSETOF(AABB, max) == X_OFFSETOF(physx::PxBounds3, maximum), "Offset don't match");
 
-	static_assert(X_OFFSETOF(QuatTransf, quat) == X_OFFSETOF(physx::PxTransform, q), "Offset don't match");
-	static_assert(X_OFFSETOF(QuatTransf, trans) == X_OFFSETOF(physx::PxTransform, p), "Offset don't match");
+	static_assert(X_OFFSETOF(Transformf, quat) == X_OFFSETOF(physx::PxTransform, q), "Offset don't match");
+	static_assert(X_OFFSETOF(Transformf, trans) == X_OFFSETOF(physx::PxTransform, p), "Offset don't match");
 
 
 } // namespace

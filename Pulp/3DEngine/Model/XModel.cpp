@@ -137,11 +137,11 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 			const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
 
 			{
-				QuatTransf qTrans;
+				Transformf qTrans;
 				qTrans.quat = angle.asQuat();
 				qTrans.trans = modelMat * pos;
 
-				QuatTransf qTransPar;
+				Transformf qTransPar;
 				qTransPar.quat = parAngle.asQuat();
 				qTransPar.trans = modelMat * parPos;
 

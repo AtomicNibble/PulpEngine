@@ -43,7 +43,7 @@ void BatchedQuery::raycast(const Vec3f& origin, const Vec3f& unitDir, const floa
 
 }
 
-void BatchedQuery::sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+void BatchedQuery::sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 	int16_t maxTouchHits, HitFlags hitFlags, const float32_t inflation) const
 {
 	return pBatchedQuery_->sweep(
@@ -56,7 +56,7 @@ void BatchedQuery::sweep(const GeometryBase& geometry, const QuatTransf& pose, c
 	);
 }
 
-void BatchedQuery::overlap(const GeometryBase& geometry, const QuatTransf& pose, int16_t maxTouchHits) const
+void BatchedQuery::overlap(const GeometryBase& geometry, const Transformf& pose, int16_t maxTouchHits) const
 {
 	return pBatchedQuery_->overlap(
 		PxGeoFromGeo(geometry),

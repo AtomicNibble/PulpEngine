@@ -19,8 +19,8 @@ public:
 	X_INLINE void setBreakForce(float32_t force, float32_t torque) X_FINAL;
 	X_INLINE void getBreakForce(float32_t& force, float32_t& torque) const X_FINAL;
 
-	X_INLINE void setLocalPose(ActorIdx actor, const QuatTransf& localPose) X_FINAL;
-	X_INLINE QuatTransf getLocalPose(ActorIdx actor) const X_FINAL;
+	X_INLINE void setLocalPose(ActorIdx actor, const Transformf& localPose) X_FINAL;
+	X_INLINE Transformf getLocalPose(ActorIdx actor) const X_FINAL;
 
 protected:
 	X_INLINE const JointType* getJoint(void) const;

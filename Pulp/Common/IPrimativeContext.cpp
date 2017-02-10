@@ -669,7 +669,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 }
 
 // Bone
-void IPrimativeContext::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, const Color8u& col)
+void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rChild, const Color8u& col)
 {
 	Vec3f p = rParent.getTranslation();
 	Vec3f c = rChild.getTranslation();
@@ -773,7 +773,7 @@ void IPrimativeContext::drawBone(const QuatTransf& rParent, const QuatTransf& rC
 void IPrimativeContext::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col)
 {
 	// just make them quat trans cus yer.
-	drawBone(QuatTransf(rParent), QuatTransf(rBone), col);
+	drawBone(Transformf(rParent), Transformf(rBone), col);
 }
 
 

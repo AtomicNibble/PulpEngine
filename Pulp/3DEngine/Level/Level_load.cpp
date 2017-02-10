@@ -365,6 +365,8 @@ bool Level::ProcessData(void)
 #endif
 		}
 
+
+
 		for (auto& a : areas_)
 		{
 			a.maxVisPortals = core::Max(1, a.maxVisPortals);
@@ -458,7 +460,7 @@ bool Level::ProcessData(void)
 			AreaCollisionHdr colHdr;
 			file.readObj(colHdr);
 
-			QuatTransf trans;
+			Transformf trans;
 			trans.trans = colHdr.trans;
 
 			for (uint8_t i=0; i<colHdr.numGroups; i++)

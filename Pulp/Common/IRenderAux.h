@@ -192,7 +192,7 @@ struct IRenderAux
 	virtual void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true) X_ABSTRACT;
 
 	// Bone
-	virtual void drawBone(const QuatTransf& rParent, const QuatTransf& rBone, const Color8u& col) X_ABSTRACT;
+	virtual void drawBone(const Transformf& rParent, const Transformf& rBone, const Color8u& col) X_ABSTRACT;
 	virtual void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col) X_ABSTRACT;
 
 	// Frustum - Sexyyyyyyyyyy

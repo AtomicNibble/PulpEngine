@@ -367,7 +367,7 @@ bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t 
 	);
 }
 
-bool XScene::sweep(const GeometryBase& geometry, const QuatTransf& pose, const Vec3f& unitDir, const float32_t distance,
+bool XScene::sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 	SweepCallback& hitCall, HitFlags hitFlags, const float32_t inflation) const
 {
 	PHYS_SCENE_READ_LOCK(pScene_);
@@ -382,7 +382,7 @@ bool XScene::sweep(const GeometryBase& geometry, const QuatTransf& pose, const V
 	);
 }
 
-bool XScene::overlap(const GeometryBase& geometry, const QuatTransf& pose, OverlapCallback& hitCall) const
+bool XScene::overlap(const GeometryBase& geometry, const Transformf& pose, OverlapCallback& hitCall) const
 {
 	PHYS_SCENE_READ_LOCK(pScene_);
 

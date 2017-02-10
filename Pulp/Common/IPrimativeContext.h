@@ -110,7 +110,7 @@ public:
 	void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true);
 
 	// Bone
-	void drawBone(const QuatTransf& rParent, const QuatTransf& rBone, const Color8u& col);
+	void drawBone(const Transformf& rParent, const Transformf& rBone, const Color8u& col);
 	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col);
 
 	// Frustum - Sexyyyyyyyyyy

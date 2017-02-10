@@ -30,14 +30,14 @@ X_INLINE void XJoint<Base, JointType>::getBreakForce(float32_t& force, float32_t
 
 
 template<class Base, typename JointType>
-X_INLINE void XJoint<Base, JointType>::setLocalPose(ActorIdx actor, const QuatTransf& localPose)
+X_INLINE void XJoint<Base, JointType>::setLocalPose(ActorIdx actor, const Transformf& localPose)
 {
 	getJoint()->setLocalPose(getPhysxActorIndex(actor), PxTransFromQuatTrans(localPose));
 }
 
 
 template<class Base, typename JointType>
-X_INLINE QuatTransf XJoint<Base, JointType>::getLocalPose(ActorIdx actor) const
+X_INLINE Transformf XJoint<Base, JointType>::getLocalPose(ActorIdx actor) const
 {
 	auto pxTrans = getJoint()->getLocalPose(getPhysxActorIndex(actor));
 
