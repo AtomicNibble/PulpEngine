@@ -58,6 +58,11 @@ PrimativeContext::PrimativeContext(Mode mode, core::MemoryArenaBase* arena) :
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
 
+	for (auto& objectArr : objects_)
+	{
+		objectArr.setGranularity(256);
+	}
+
 	X_ASSERT(vertexPages_.isNotEmpty(), "Must have atleast one vertex page")();
 	// for the fist page we reverse something small
 	// before setting the large granularity.
