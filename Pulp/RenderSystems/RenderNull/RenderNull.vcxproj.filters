@@ -15,6 +15,9 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{c682f105-2f1c-414a-b421-d5fa32744e28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\crt">
+      <UniqueIdentifier>{4079a8bf-9818-4b0e-87cb-b50f493ba785}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -33,6 +36,9 @@
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
+    </ClCompile>
+    <ClCompile Include="crt.cpp">
+      <Filter>Source Files\crt</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

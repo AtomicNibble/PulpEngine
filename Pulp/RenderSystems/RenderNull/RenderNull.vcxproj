@@ -420,6 +420,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="crt.cpp" />
     <ClCompile Include="RenderNull.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="stdafx.cpp">
