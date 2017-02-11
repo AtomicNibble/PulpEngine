@@ -15,7 +15,6 @@
 #include "Features.h"
 
 #include "Vars\RenderVars.h"
-#include "Auxiliary\AuxRender.h"
 #include "RootSignature.h"
 
 X_NAMESPACE_DECLARE(texture,
@@ -32,7 +31,6 @@ namespace shader
 	class XShaderManager;
 } // namespace shader
 
-class RenderAuxImp;
 class ContextManager;
 class LinearAllocatorManager;
 class BufferManager;
@@ -253,7 +251,6 @@ private:
 
 	shader::XShaderManager* pShaderMan_; // might make this allocoated, just so can forward declare like tex man.
 	texture::TextureManager* pTextureMan_;
-	RenderAuxImp* pAuxRender_;
 
 	LinearAllocatorManager* pLinearAllocatorMan_;
 	ContextManager* pContextMan_;

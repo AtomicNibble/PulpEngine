@@ -6,7 +6,6 @@
 #include "Texture\TextureUtil.h"
 #include "Shader\ShaderManager.h"
 #include "Shader\ShaderPermatation.h"
-#include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"
 #include "Buffers\BufferManager.h"
@@ -46,7 +45,6 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pSwapChain_(nullptr),
 	pShaderMan_(nullptr),
 	pTextureMan_(nullptr),
-	pAuxRender_(nullptr),
 	pContextMan_(nullptr),
 	cmdListManager_(arena),
 	pBuffMan_(nullptr),
@@ -339,12 +337,6 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		return false;
 	}
 
-	pAuxRender_ = X_NEW(RenderAuxImp, arena_, "AuxRenderer")(arena_);
-	if (!pAuxRender_->init(pDevice_, *pContextMan_, descriptorAllocator)) {
-		X_ERROR("Render", "failed to init aux render system");
-		return false;
-	}
-
 	initILDescriptions();
 
 	return true;
@@ -362,11 +354,6 @@ void XRender::shutDown(void)
 	if (pTextureMan_) {
 		pTextureMan_->shutDown();
 		X_DELETE_AND_NULL(pTextureMan_, arena_);
-	}
-
-	if (pAuxRender_) {
-		pAuxRender_->shutDown();
-		X_DELETE_AND_NULL(pAuxRender_, arena_);
 	}
 
 	if (pContextMan_) {

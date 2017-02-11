@@ -399,8 +399,6 @@
     <ClInclude Include="Allocators\DescriptorAllocator.h" />
     <ClInclude Include="Allocators\DynamicDescriptorHeap.h" />
     <ClInclude Include="Allocators\LinearAllocator.h" />
-    <ClInclude Include="Auxiliary\AuxRender.h" />
-    <ClInclude Include="Auxiliary\AuxRenderImp.h" />
     <ClInclude Include="Buffers\BufferManager.h" />
     <ClInclude Include="Buffers\ColorBuffer.h" />
     <ClInclude Include="Buffers\DepthBuffer.h" />
@@ -438,9 +436,6 @@
     <ClCompile Include="Allocators\DescriptorAllocator.cpp" />
     <ClCompile Include="Allocators\DynamicDescriptorHeap.cpp" />
     <ClCompile Include="Allocators\LinearAllocator.cpp" />
-    <ClCompile Include="Auxiliary\AuxRender.cpp" />
-    <ClCompile Include="Auxiliary\AuxRenderImp.cpp" />
-    <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp" />
     <ClCompile Include="Buffers\BufferManager.cpp" />
     <ClCompile Include="Buffers\ColorBuffer.cpp" />
     <ClCompile Include="Buffers\DepthBuffer.cpp" />
@@ -487,8 +482,6 @@
     <None Include="Allocators\DescriptorAllocator.inl" />
     <None Include="Allocators\DynamicDescriptorHeap.inl" />
     <None Include="Allocators\LinearAllocator.inl" />
-    <None Include="Auxiliary\AuxRender.inl" />
-    <None Include="Auxiliary\AuxRenderImp.inl" />
     <None Include="Buffers\BufferManager.inl" />
     <None Include="Buffers\ColorBuffer.inl" />
     <None Include="Buffers\DepthBuffer.inl" />
