@@ -3,6 +3,16 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+
+X_INLINE Material* PrimativeContextSharedResources::getMaterial(PrimitiveType::Enum prim) const
+{
+	return primMaterials_[prim];
+}
+
+
+// --------------------------------------------------------
+
+
 X_INLINE PrimativeContext::PushBufferEntry::PushBufferEntry(uint16 numVertices, uint16 vertexOffs, int32_t pageIdx,
 	Material* pMaterial) :
 	numVertices(numVertices),

@@ -296,10 +296,54 @@ PrimativeContextSharedResources::Shape::Shape()
 
 PrimativeContextSharedResources::PrimativeContextSharedResources()
 {
-
+	core::zero_object(primMaterials_);
 }
 
-bool PrimativeContextSharedResources::init(void)
+
+bool PrimativeContextSharedResources::init(render::IRender* pRender)
+{
+	X_ASSERT_NOT_NULL(pRender);
+	X_ASSERT_NOT_NULL(pMaterialManager_);
+
+	if (!loadMaterials()) {
+		return false;
+	}
+	if (!createShapeBuffers(pRender)) {
+		return false;
+	}
+
+	return true;
+}
+
+bool PrimativeContextSharedResources::loadMaterials(void)
+{
+	core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
+
+	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
+	{
+		const auto primType = static_cast<PrimitiveType::Enum>(i);
+
+		matName.clear();
+		matName.appendFmt("code%c$%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType));
+		matName.toLower();
+
+		// we load the material for the primative type :D
+		// so the state and shaders used is fully data driven MMMMM.
+		Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
+
+		// we still assign even tho may be default so it get's cleaned up.
+		primMaterials_[primType] = pMat;
+
+		if (pMat->isDefault()) {
+			X_ERROR("Prim", "Error loading one of primative materials");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool PrimativeContextSharedResources::createShapeBuffers(render::IRender* pRender)
 {
 	VertArr vertArr(g_3dEngineArena);
 	IndexArr indexArr(g_3dEngineArena);
@@ -366,8 +410,6 @@ bool PrimativeContextSharedResources::init(void)
 		}
 
 		// now we make buffers for the shape.
-		render::IRender* pRender = gEnv->pRender;
-
 		shape.vertexBuf = pRender->createVertexBuffer(sizeof(VertArr::Type), safe_static_cast<uint32_t>(vertArr.size()), vertArr.data(), render::BufUsage::IMMUTABLE);
 		shape.indexbuf = pRender->createIndexBuffer(sizeof(IndexArr::Type), safe_static_cast<uint32_t>(indexArr.size()), indexArr.data(), render::BufUsage::IMMUTABLE);
 
@@ -384,10 +426,9 @@ bool PrimativeContextSharedResources::init(void)
 	return true;
 }
 
-void PrimativeContextSharedResources::releaseResources(void)
+void PrimativeContextSharedResources::releaseResources(render::IRender* pRender)
 {
-	render::IRender* pRender = gEnv->pRender;
-
+	// shapes.
 	for (auto& shape : shapes_)
 	{
 		if (shape.vertexBuf == render::INVALID_BUF_HANLDE) {
@@ -400,6 +441,16 @@ void PrimativeContextSharedResources::releaseResources(void)
 		shape.vertexBuf = render::INVALID_BUF_HANLDE;
 		shape.indexbuf = render::INVALID_BUF_HANLDE;
 	}
+
+	// materials
+	for (auto& pMat : primMaterials_)
+	{
+		if (pMat) {
+			pMaterialManager_->releaseMaterial(pMat);
+		}
+	}
+
+	core::zero_object(primMaterials_);
 }
 
 // ---------------------------------------------------------------------------
@@ -438,7 +489,6 @@ void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
 // ---------------------------------------------------------------------------
 
 PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, core::MemoryArenaBase* arena) :
-	pRender_(nullptr),
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
 	currentPage_(-1),
@@ -458,8 +508,6 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	// for the fist page we reverse something small
 	// before setting the large granularity.
 	// that way we grow fast but if not rendering much we stay small.
-
-	core::zero_object(primMaterials_);
 }
 
 
@@ -468,64 +516,13 @@ PrimativeContext::~PrimativeContext()
 
 }
 
-bool PrimativeContext::createStates(render::IRender* pRender)
-{
-	pRender_ = pRender;
 
-	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
-	{
-		const auto primType = static_cast<PrimitiveType::Enum>(i);
-
-		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
-		matName.appendFmt("code%c$%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType));
-		matName.toLower();
-
-		// we load the material for the primative type :D
-		// so the state and shaders used is fully data driven MMMMM.
-		Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
-
-		// we still assign even tho may be default so it get's cleaned up.
-		primMaterials_[primType] = pMat;
-
-		if (pMat->isDefault()) {
-			X_ERROR("Prim", "Error loading one of primative materials");
-			return false;
-		}
-		// but i don't think a material can currently be loaded in a self contained manner.
-		// since in order for it to create a render state it needs a pass state.
-		// so i think when we make a material we should really classifily everything.
-		// work out what the shader that is going to be used and the permatation required.
-		// and then once we have that we can reflect the permatations shader and know all the cbuffers this material must have.
-		// which then means we know at compile time that material shader params are valid.
-		// does that mean we want to move shader compiling offline lol? :| :D twat! <:)
-		// 
-		// How to keep this online?
-		// We would have to know the shader but at runtime we compile the shader selecte a permatation.
-		// then work out the cbuffers of the shader and create a variable state for the material.
-		// which i think i'll do for now, and move more offline later. 
-		// 
-
-	}
-
-	return true;
-}
-
-bool PrimativeContext::freeStates(render::IRender* pRender)
+bool PrimativeContext::freePages(render::IRender* pRender)
 {
 	for (auto& vp : vertexPages_) {
 		vp.destoryVB(pRender);
 	}
 
-	for (auto& pMat : primMaterials_)
-	{
-		if (pMat) {
-			pMaterialManager_->releaseMaterial(pMat);
-		}
-	}	
-
-
-	// clear the member render pointer, nothing should be trying to use it after a state clear :|
-	pRender_ = nullptr;
 	return true;
 }
 
@@ -697,7 +694,7 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
-	return addPrimative(numVertices, primType, primMaterials_[primType]);
+	return addPrimative(numVertices, primType, sharedRes_.getMaterial(primType));
 }
 
 PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type)

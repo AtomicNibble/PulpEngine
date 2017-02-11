@@ -125,17 +125,9 @@ bool X3DEngine::Init(void)
 	}
 
 	// init share prim contex resources.
-	if (!primResources_.init()) {
+	if (!primResources_.init(pRender_)) {
 		X_ERROR("3DEngine", "Failed to init prim resources");
 		return false;
-	}
-
-	// init the prim context states.
-	for (auto& primcon : primContexts_)
-	{
-		if (!primcon.createStates(pRender_)) {
-			return false;
-		}
 	}
 
 	// init physics.
@@ -184,10 +176,10 @@ void X3DEngine::ShutDown(void)
 
 	for (auto& primcon : primContexts_)
 	{
-		primcon.freeStates(pRender_);
+		primcon.freePages(pRender_);
 	}
 
-	primResources_.releaseResources();
+	primResources_.releaseResources(pRender_);
 	if (pModelManager_) {
 		pModelManager_->ShutDown();
 		X_DELETE(pModelManager_, g_3dEngineArena);

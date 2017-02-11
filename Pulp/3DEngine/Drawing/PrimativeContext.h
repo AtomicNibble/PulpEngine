@@ -12,11 +12,13 @@ X_NAMESPACE_BEGIN(engine)
 
 // this stores resources that are shared between contex's.
 // like materials and shape meshes.
-class PrimativeContextSharedResources
+class PrimativeContextSharedResources : public XEngineBase
 {
 	static const int32_t SHAPES_NUM_LOD = 5;
 
+	typedef IPrimativeContext::PrimitiveType PrimitiveType;
 	typedef IPrimativeContext::ObjectType ShapeType;
+
 	typedef Vertex_P3F_T2S_C4B ShapeVertex;
 
 	typedef core::Array<ShapeVertex, core::ArrayAlignedAllocator<ShapeVertex>> VertArr;
@@ -48,8 +50,14 @@ class PrimativeContextSharedResources
 public:
 	PrimativeContextSharedResources();
 
-	bool init(void);
-	void releaseResources(void);
+	bool init(render::IRender* pRender);
+	void releaseResources(render::IRender* pRender);
+
+	X_INLINE Material* getMaterial(PrimitiveType::Enum prim) const;
+
+private:
+	bool loadMaterials(void);
+	bool createShapeBuffers(render::IRender* pRender);
 
 private:
 	static void CreateSphere(VertArr& vb, IndexArr& ib,
@@ -62,6 +70,7 @@ private:
 		float radius, float height, uint32_t sections);
 
 private:
+	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
 	Shape shapes_[ShapeType::ENUM_COUNT];
 };
 
@@ -149,8 +158,7 @@ public:
 	PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
 
-	bool createStates(render::IRender* pRender);
-	bool freeStates(render::IRender* pRender);
+	bool freePages(render::IRender* pRender);
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const;
 
@@ -174,8 +182,6 @@ private:
 	ObjectParam* addObject(ObjectType::Enum type) X_FINAL;
 
 private:
-	render::IRender* pRender_; // we lazy create vertexBuffers for pages.
-
 	PushBufferArr pushBufferArr_;
 	VertexPagesArr vertexPages_;
 
@@ -183,7 +189,6 @@ private:
 	Mode mode_;
 
 	ObjectParamArr objects_[ObjectType::ENUM_COUNT];
-	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
 
 	const PrimativeContextSharedResources& sharedRes_;
 };
