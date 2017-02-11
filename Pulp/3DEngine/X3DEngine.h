@@ -17,6 +17,7 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 
 
@@ -65,6 +66,8 @@ private:
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 };
 
+
+X_ENABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 X_NAMESPACE_END
 

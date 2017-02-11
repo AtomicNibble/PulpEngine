@@ -10,9 +10,11 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
+
 // this stores resources that are shared between contex's.
 // like materials and shape meshes.
-class PrimativeContextSharedResources : public XEngineBase
+X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 {
 	static const int32_t SHAPES_NUM_LOD = 5;
 
@@ -75,7 +77,7 @@ private:
 };
 
 
-class PrimativeContext : public IPrimativeContext, public XEngineBase
+X_ALIGNED_SYMBOL(class PrimativeContext, 64) : public IPrimativeContext, public XEngineBase
 {
 public:
 	typedef core::PointerFlags<Material, 3> MaterialWithPageIdx;
@@ -198,3 +200,6 @@ private:
 X_NAMESPACE_END
 
 #include "PrimativeContext.inl"
+
+
+X_ENABLE_WARNING(4324) //  structure was padded due to alignment specifier
