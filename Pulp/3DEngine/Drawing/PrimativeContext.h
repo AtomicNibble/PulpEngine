@@ -16,7 +16,7 @@ X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 // like materials and shape meshes.
 X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 {
-	static const int32_t SHAPES_NUM_LOD = 5;
+	static const int32_t SHAPES_NUM_LOD = IPrimativeContext::OBJECT_NUM_LOD;
 
 	typedef IPrimativeContext::PrimitiveType PrimitiveType;
 	typedef IPrimativeContext::ObjectType ShapeType;

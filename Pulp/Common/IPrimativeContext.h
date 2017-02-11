@@ -19,6 +19,7 @@ public:
 		Mode3D,
 	};
 
+	static const int32_t OBJECT_NUM_LOD = 5;
 	X_DECLARE_ENUM(ObjectType)(
 		Sphere,
 		Cone,
