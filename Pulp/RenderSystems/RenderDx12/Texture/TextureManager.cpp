@@ -310,18 +310,34 @@ X_NAMESPACE_BEGIN(texture)
 		{
 			core::string name(pTex->getName());
 			
-			if (pTex->getBufferType() != render::PixelBufferType::NONE)
+			X_ASSERT(pTex->getBufferType() == render::PixelBufferType::NONE, "PixelBuffers should not be released here")();
+
+			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
+			textures_.releaseAsset(pTexRes);
+		}
+	}
+
+	void TextureManager::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
+	{
+		TexRes* pTexRes = static_cast<TexRes*>(pPixelBuf);
+
+		if (pTexRes->removeReference() == 0)
+		{
+			core::string name(pTexRes->getName());
+
+			if (pTexRes->getBufferType() != render::PixelBufferType::NONE)
 			{
-				switch (pTex->getBufferType())
+				switch (pTexRes->getBufferType())
 				{
 					case render::PixelBufferType::COLOR:
-						X_DELETE(&pTex->getColorBuf(), arena_);
+						X_DELETE(&pTexRes->getColorBuf(), arena_);
 						break;
 					case render::PixelBufferType::DEPTH:
-						X_DELETE(&pTex->getDepthBuf(), arena_);
+						X_DELETE(&pTexRes->getDepthBuf(), arena_);
 						break;
 					case render::PixelBufferType::SHADOW:
-						X_DELETE(&pTex->getShadowBuf(), arena_);
+						X_DELETE(&pTexRes->getShadowBuf(), arena_);
 						break;
 					default:
 						X_ASSERT_UNREACHABLE();
@@ -333,11 +349,6 @@ X_NAMESPACE_BEGIN(texture)
 
 			textures_.releaseAsset(pTexRes);
 		}
-	}
-
-	void TextureManager::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
-	{
-		X_UNUSED(pPixelBuf);
 	}
 
 	bool TextureManager::updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const
