@@ -1,11 +1,14 @@
 
 X_NAMESPACE_BEGIN(render)
 
-X_INLINE PixelBufferType::Enum PixelBuffer::getBufferType(void) const
+X_INLINE::texture::Texture& PixelBuffer::getTex(void)
 {
-	X_ASSERT_UNREACHABLE();
-	return PixelBufferType::NONE;
+	return textInst_;
 }
 
+X_INLINE const ::texture::Texture& PixelBuffer::getTex(void) const
+{
+	return textInst_;
+}
 
 X_NAMESPACE_END

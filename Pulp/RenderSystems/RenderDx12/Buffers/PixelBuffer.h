@@ -1,12 +1,13 @@
 #pragma once
 
-#include "Texture\Texture.h"
-#include "GpuResource.h"
+
+X_NAMESPACE_DECLARE(texture, class Texture);
 
 X_NAMESPACE_BEGIN(render)
 
+class GpuResource;
 
-class PixelBuffer : public texture::Texture
+class PixelBuffer
 {
 public:
 	X_DECLARE_FLAGS(ResourceFlag) (
@@ -21,13 +22,15 @@ public:
 	typedef Flags<ResourceFlag> ResourceFlags;
 
 protected:
-	PixelBuffer(const char* pName);
-
-
-	// IPixelBuffer
-	X_INLINE PixelBufferType::Enum getBufferType(void) const X_OVERRIDE;
-	// ~IPixelBuffer
+	PixelBuffer(::texture::Texture& textInst);
 	
+	// these can be public
+public:
+	X_INLINE ::texture::Texture& getTex(void);
+	X_INLINE const ::texture::Texture& getTex(void) const;
+
+	render::GpuResource& getGpuResource(void);
+
 protected:
 
 	D3D12_RESOURCE_DESC describeTex2D(uint32_t width, uint32_t height,
@@ -48,6 +51,7 @@ protected:
 	static DXGI_FORMAT getStencilFormat(DXGI_FORMAT Format);
 
 protected:
+	::texture::Texture& textInst_;
 };
 
 

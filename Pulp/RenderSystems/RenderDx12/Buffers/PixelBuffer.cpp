@@ -1,23 +1,33 @@
 #include "stdafx.h"
 #include "PixelBuffer.h"
 
+#include "Texture\Texture.h"
 #include "Texture\TextureUtil.h"
 
 X_NAMESPACE_BEGIN(render)
 
-PixelBuffer::PixelBuffer(const char* pName) :
-	texture::Texture(pName, texture::TextureFlags())
+PixelBuffer::PixelBuffer(texture::Texture& textInst) :
+	textInst_(textInst)
 {
 
 }
 
+
+render::GpuResource& PixelBuffer::getGpuResource(void)
+{
+	return textInst_.getGpuResource();
+}
+
+
 D3D12_RESOURCE_DESC PixelBuffer::describeTex2D(uint32_t width, uint32_t height,
 	uint32_t depthOrArraySize, uint32_t numMips, DXGI_FORMAT format, uint32_t flags)
 {
-	dimensions_.x = safe_static_cast<uint16_t>(width);
-	dimensions_.y = safe_static_cast<uint16_t>(height);
-	numMips_ = safe_static_cast<uint8_t>(depthOrArraySize);
-	format_ = texture::Util::texFmtFromDXGI(format);
+	auto& tex = getTex();
+		
+	tex.setWidth(safe_static_cast<uint16_t>(width));
+	tex.setHeight(safe_static_cast<uint16_t>(height));
+	tex.setNumMips(safe_static_cast<uint8_t>(depthOrArraySize));
+	tex.setFormat(texture::Util::texFmtFromDXGI(format));
 
 	D3D12_RESOURCE_DESC desc;
 	core::zero_object(desc);
@@ -41,13 +51,16 @@ void PixelBuffer::associateWithResource(ID3D12Device* pDevice, ID3D12Resource* p
 	X_ASSERT_NOT_NULL(pResource);
 	D3D12_RESOURCE_DESC resourceDesc = pResource->GetDesc();
 
-	getGpuResource().getResourcePtrRef() = pResource;
-	getGpuResource().setUsageState(currentState);
+	auto& tex = getTex();
+	auto& resource = tex.getGpuResource();
 
-	dimensions_.x = safe_static_cast<uint32_t, uint64_t>(resourceDesc.Width);
-	dimensions_.y = safe_static_cast<uint16_t>(resourceDesc.Height);
-	numMips_ = safe_static_cast<uint8_t>(resourceDesc.DepthOrArraySize);
-	format_ = texture::Util::texFmtFromDXGI(resourceDesc.Format);
+	resource.getResourcePtrRef() = pResource;
+	resource.setUsageState(currentState);
+
+	tex.setWidth(safe_static_cast<uint16_t>(resourceDesc.Width));
+	tex.setHeight(safe_static_cast<uint16_t>(resourceDesc.Height));
+	tex.setNumMips(safe_static_cast<uint8_t>(resourceDesc.DepthOrArraySize));
+	tex.setFormat(texture::Util::texFmtFromDXGI(resourceDesc.Format));
 }
 
 void PixelBuffer::createTextureResource(ID3D12Device* pDevice, 
@@ -61,7 +74,7 @@ void PixelBuffer::createTextureResource(ID3D12Device* pDevice,
 	heapProps.CreationNodeMask = 1;
 	heapProps.VisibleNodeMask = 1;
 
-	auto& resource = getGpuResource();
+	auto& resource = getTex().getGpuResource();
 
 	HRESULT hr = pDevice->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
 		&resourceDesc, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&resource.getResourcePtrRef()));

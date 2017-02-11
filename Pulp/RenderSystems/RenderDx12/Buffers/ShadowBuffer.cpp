@@ -2,10 +2,12 @@
 #include "ShadowBuffer.h"
 #include "CommandContex.h"
 
+#include "Texture\Texture.h"
+
 X_NAMESPACE_BEGIN(render)
 
-ShadowBuffer::ShadowBuffer(const char* pName) :
-	DepthBuffer(pName)
+ShadowBuffer::ShadowBuffer(::texture::Texture& textInst) :
+	DepthBuffer(textInst)
 {
 
 }
@@ -36,7 +38,9 @@ D3D12_CPU_DESCRIPTOR_HANDLE ShadowBuffer::getSRV(void) const
 
 void ShadowBuffer::beginRendering(GraphicsContext& context)
 {
-	context.transitionResource(this->getGpuResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+	auto& resource = getGpuResource();
+
+	context.transitionResource(resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
 	context.clearDepth(*this);
 	context.setDepthStencilTarget(getDSV());
 	context.setViewportAndScissor(viewport_, scissor_);
@@ -44,7 +48,9 @@ void ShadowBuffer::beginRendering(GraphicsContext& context)
 
 void ShadowBuffer::endRendering(GraphicsContext& context)
 {
-	context.transitionResource(this->getGpuResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	auto& resource = getGpuResource();
+
+	context.transitionResource(resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 X_NAMESPACE_END

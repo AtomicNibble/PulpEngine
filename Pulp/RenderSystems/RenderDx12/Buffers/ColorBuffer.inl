@@ -3,11 +3,6 @@ X_NAMESPACE_BEGIN(render)
 
 
 // Get pre-created CPU-visible descriptor handles
-X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& ColorBuffer::getSRV(void) const
-{
-	return hCpuDescriptorHandle_;
-}
-
 X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& ColorBuffer::getRTV(void) const
 {
 	return RTVHandle_;

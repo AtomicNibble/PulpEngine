@@ -2,15 +2,16 @@
 #include "DepthBuffer.h"
 #include "Allocators\DescriptorAllocator.h"
 
+#include "Texture\Texture.h"
 #include "Texture\TextureUtil.h"
 
 
 X_NAMESPACE_BEGIN(render)
 
-DepthBuffer::DepthBuffer(const char* pName, float32_t clearDepth, uint32_t clearStencil) :
+DepthBuffer::DepthBuffer(::texture::Texture& textInst, float32_t clearDepth, uint32_t clearStencil) :
 	clearDepth_(clearDepth),
 	clearStencil_(clearStencil),
-	PixelBuffer(pName)
+	PixelBuffer(textInst)
 {
 	hDSV_[0].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	hDSV_[1].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
@@ -56,9 +57,12 @@ void DepthBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
 
 void DepthBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, DXGI_FORMAT format)
 {
+	auto& resource = getGpuResource();
+
 	D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc;
 	dsvDesc.Format = getDSVFormat(format);
-	if (getGpuResource()->GetDesc().SampleDesc.Count == 1)
+
+	if (resource->GetDesc().SampleDesc.Count == 1)
 	{
 		dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
 		dsvDesc.Texture2D.MipSlice = 0;
@@ -74,7 +78,7 @@ void DepthBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 		hDSV_[1] = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 	}
 
-	ID3D12Resource* pResource = getGpuResource().getResource();
+	ID3D12Resource* pResource = resource.getResource();
 
 	dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
 	pDevice->CreateDepthStencilView(pResource, &dsvDesc, hDSV_[0]);

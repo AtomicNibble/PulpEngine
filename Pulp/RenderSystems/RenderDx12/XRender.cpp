@@ -24,6 +24,43 @@ namespace
 {
 
 
+
+	// Samplers.
+#if 0
+	samplerLinearWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerLinearWrap_.create(pDevice_, descriptorAllocator, samplerLinearWrapDesc_);
+
+	samplerAnisoWrapDesc_.MaxAnisotropy = 8;
+	samplerAnisoWrap_.create(pDevice_, descriptorAllocator, samplerAnisoWrapDesc_);
+
+	samplerShadowDesc_.Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	samplerShadowDesc_.ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+	samplerShadowDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+	samplerShadow_.create(pDevice_, descriptorAllocator, samplerShadowDesc_);
+
+	samplerLinearClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerLinearClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+	samplerLinearClamp_.create(pDevice_, descriptorAllocator, samplerLinearClampDesc_);
+
+	samplerVolumeWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplerVolumeWrap_.create(pDevice_, descriptorAllocator, samplerVolumeWrapDesc_);
+
+	samplerPointClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplerPointClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+	samplerPointClamp_.create(pDevice_, descriptorAllocator, samplerPointClampDesc_);
+
+	samplerPointBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerPointBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
+	samplerPointBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
+	samplerPointBorder_.create(pDevice_, descriptorAllocator, samplerPointBorderDesc_);
+
+	samplerLinearBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplerLinearBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
+	samplerLinearBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
+	samplerLinearBorder_.create(pDevice_, descriptorAllocator, samplerLinearBorderDesc_);
+#endif
+
+
 	
 
 
@@ -54,7 +91,6 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pRootSigCache_(nullptr),
 	pPSOCache_(nullptr),
 //	presentRS_(arena),
-	displayPlane_{ "$backbuffer_0", "$backbuffer_1", "$backbuffer_2" },
 	currentBufferIdx_(0),
 
 	statePoolHeap_(
@@ -70,6 +106,8 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	),
 	statePool_(&statePoolAllocator_, "StatePool")
 {	
+	core::zero_object(pDisplayPlanes_);
+
 	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
 }
 
@@ -227,6 +265,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		return false;
 	}
 
+
 	pPSOCache_->registerVars();
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
@@ -257,6 +296,14 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		return false;
 	}
 
+	// must be after cmdListMan
+	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_, pDevice_, *pContextMan_,
+		descriptorAllocator, texture::Util::DXGIFormatFromTexFmt(depthFmt));
+	if (!pTextureMan_->init()) {
+		X_ERROR("Render", "failed to init texture system");
+		return false;
+	}
+
 	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 	hr = dxgiFactory->CreateSwapChainForHwnd(cmdListManager_.getCommandQueue(), hWnd,
 		&swapChainDesc, nullptr, nullptr, &swapChain);
@@ -272,7 +319,6 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		pSwapChain_ = swapChain3.Detach();
 	}
 
-
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
 	{
 		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
@@ -282,45 +328,15 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 			return false;
 		}
 
-		displayPlane_[i].createFromSwapChain(pDevice_, descriptorAllocator, displayPlane.Detach());
-		displayPlane_[i].setClearColor(vars_.getClearCol());
+		core::StackString512 name;
+		name.appendFmt("$backbuffer_%i", i);
+
+		pDisplayPlanes_[i] = pTextureMan_->createPixelBuffer(name.c_str(), Vec2i::zero(), 1, PixelBufferType::COLOR);
+
+		ColorBuffer& colBuf = pDisplayPlanes_[i]->getColorBuf();
+		colBuf.createFromSwapChain(pDevice_, descriptorAllocator, displayPlane.Detach());
+		colBuf.setClearColor(vars_.getClearCol());
 	}
-
-
-	// Samplers.
-#if 0
-	samplerLinearWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerLinearWrap_.create(pDevice_, descriptorAllocator, samplerLinearWrapDesc_);
-
-	samplerAnisoWrapDesc_.MaxAnisotropy = 8;
-	samplerAnisoWrap_.create(pDevice_, descriptorAllocator, samplerAnisoWrapDesc_);
-
-	samplerShadowDesc_.Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-	samplerShadowDesc_.ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
-	samplerShadowDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
-	samplerShadow_.create(pDevice_, descriptorAllocator, samplerShadowDesc_);
-
-	samplerLinearClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerLinearClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
-	samplerLinearClamp_.create(pDevice_, descriptorAllocator, samplerLinearClampDesc_);
-
-	samplerVolumeWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	samplerVolumeWrap_.create(pDevice_, descriptorAllocator, samplerVolumeWrapDesc_);
-
-	samplerPointClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	samplerPointClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
-	samplerPointClamp_.create(pDevice_, descriptorAllocator, samplerPointClampDesc_);
-
-	samplerPointBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerPointBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
-	samplerPointBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
-	samplerPointBorder_.create(pDevice_, descriptorAllocator, samplerPointBorderDesc_);
-
-	samplerLinearBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	samplerLinearBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
-	samplerLinearBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
-	samplerLinearBorder_.create(pDevice_, descriptorAllocator, samplerLinearBorderDesc_);
-#endif
 
 
 	pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
@@ -329,13 +345,6 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		return false;
 	}
 
-	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_, pDevice_, *pContextMan_, 
-		descriptorAllocator, texture::Util::DXGIFormatFromTexFmt(depthFmt));
-
-	if (!pTextureMan_->init()) {
-		X_ERROR("Render", "failed to init texture system");
-		return false;
-	}
 
 	initILDescriptions();
 
@@ -458,16 +467,18 @@ void XRender::registerCmds(void)
 
 void XRender::renderBegin(void)
 {
+	ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
+	
 	D3D12_CPU_DESCRIPTOR_HANDLE RTVs[] = {
-		displayPlane_[currentBufferIdx_].getRTV()
+		colBuf.getRTV()
 	};
 
-	displayPlane_[currentBufferIdx_].setClearColor(vars_.getClearCol());
+	colBuf.setClearColor(vars_.getClearCol());
 
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
-	pContext->transitionResource(displayPlane_[currentBufferIdx_].getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, true);
-	pContext->clearColor(displayPlane_[currentBufferIdx_]);
+	pContext->transitionResource(colBuf.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, true);
+	pContext->clearColor(colBuf);
 	// pContext->setRenderTargets(_countof(RTVs), RTVs);
 
 //	pContext->setViewportAndScissor(0, 0, currentNativeRes_.x, currentNativeRes_.y);
@@ -484,11 +495,11 @@ void XRender::renderBegin(void)
 
 void XRender::renderEnd(void)
 {
-
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
+	ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
 
-	pContext->transitionResource(displayPlane_[currentBufferIdx_].getGpuResource(), D3D12_RESOURCE_STATE_PRESENT);
+	pContext->transitionResource(colBuf.getGpuResource(), D3D12_RESOURCE_STATE_PRESENT);
 	pContext->finishAndFree(true);
 
 
@@ -534,9 +545,10 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	core::zero_object(RTVFormats);
 
 	for (size_t i = 0; i < rtvs.size(); i++) {
-		const ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
-		RTVs[i] = rtv.getRTV();
-		RTVFormats[i] = rtv.getFormatDX();
+		const texture::Texture& tex = *static_cast<const texture::Texture*>(rtvs[i]);
+		const ColorBuffer& colBuf = tex.getColorBuf();
+		RTVs[i] = colBuf.getRTV();
+		RTVFormats[i] = tex.getFormatDX();
 	}
 
 	// we should validate that RTVFormats matches the pass state.
@@ -545,8 +557,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	GraphicsContext& context = *pContext;
 
 	for (size_t i = 0; i < rtvs.size(); i++) {
-		ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
-		context.transitionResource(rtv.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+		texture::Texture& tex = *static_cast<texture::Texture*>(rtvs[i]);
+		context.transitionResource(tex.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
 	context.setRenderTargets(numRtvs, RTVs);
@@ -872,7 +884,7 @@ Vec2<uint32_t> XRender::getDisplayRes(void) const
 
 IPixelBuffer* XRender::createDepthBuffer(const char* pNickName, Vec2i dim)
 {
-	IPixelBuffer* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, 1, PixelBufferType::DEPTH, texture::Texturefmt::UNKNOWN);
+	texture::Texture* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, 1, PixelBufferType::DEPTH);
 
 	return pPixelBuf;
 }
@@ -880,9 +892,13 @@ IPixelBuffer* XRender::createDepthBuffer(const char* pNickName, Vec2i dim)
 IPixelBuffer* XRender::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
 	texture::Texturefmt::Enum fmt)
 {
-	IPixelBuffer* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, numMips, PixelBufferType::COLOR, fmt);
+	texture::Texture* pColBuf = pTextureMan_->createPixelBuffer(pNickName, dim, numMips, PixelBufferType::COLOR);
+	ColorBuffer& colBuf = pColBuf->getColorBuf();
 
-	return pPixelBuf;
+	DXGI_FORMAT dxFmt = texture::Util::DXGIFormatFromTexFmt(fmt);
+	colBuf.create(pDevice_, *pDescriptorAllocator_, dim.x, dim.y, numMips, dxFmt);
+
+	return pColBuf;
 }
 
 IRenderTarget* XRender::getCurBackBuffer(uint32_t* pIdx)
@@ -891,7 +907,7 @@ IRenderTarget* XRender::getCurBackBuffer(uint32_t* pIdx)
 		*pIdx = currentBufferIdx_;
 	}
 
-	return &displayPlane_[currentBufferIdx_];
+	return pDisplayPlanes_[currentBufferIdx_];
 }
 
 VertexBufferHandle XRender::createVertexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag)
@@ -1303,7 +1319,9 @@ void XRender::destoryState(StateHandle handle)
 bool XRender::freeSwapChainResources(void)
 {
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
-		displayPlane_[i].destroy();
+		if (pDisplayPlanes_[i]) {
+			pDisplayPlanes_[i]->destroy();
+		}
 	}
 
 	return true;
@@ -1593,7 +1611,8 @@ bool XRender::resize(uint32_t width, uint32_t height)
 			return false;
 		}
 
-		displayPlane_[i].createFromSwapChain(pDevice_, *pDescriptorAllocator_, pDisplayPlane);
+		ColorBuffer& colBuf = pDisplayPlanes_[i]->getColorBuf();
+		colBuf.createFromSwapChain(pDevice_, *pDescriptorAllocator_, pDisplayPlane);
 	}
 
 	// post a event.

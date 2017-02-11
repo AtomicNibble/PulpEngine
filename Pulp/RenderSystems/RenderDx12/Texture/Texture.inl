@@ -72,10 +72,28 @@ X_NAMESPACE_BEGIN(texture)
 	// IPixelBuffer
 	X_INLINE render::PixelBufferType::Enum Texture::getBufferType(void) const
 	{
-		return render::PixelBufferType::NONE;
+		return pixelBufType_;
 	}
 
 	// ~IPixelBuffer
+
+	X_INLINE render::ColorBuffer& Texture::getColorBuf(void) const
+	{
+		X_ASSERT(pixelBufType_ == render::PixelBufferType::COLOR, "Not a color pixel buffer")(pixelBufType_);
+		return *pColorBuf_;
+	}
+
+	X_INLINE render::DepthBuffer& Texture::getDepthBuf(void) const
+	{
+		X_ASSERT(pixelBufType_ == render::PixelBufferType::DEPTH, "Not a depth pixel buffer")(pixelBufType_);
+		return *pDepthBuf_;
+	}
+
+	X_INLINE render::ShadowBuffer& Texture::getShadowBuf(void) const
+	{
+		X_ASSERT(pixelBufType_ == render::PixelBufferType::SHADOW, "Not a shadow pixel buffer")(pixelBufType_);
+		return *pShadowBuf_;
+	}
 
 
 	X_INLINE render::GpuResource& Texture::getGpuResource(void)

@@ -20,6 +20,9 @@ X_NAMESPACE_BEGIN(texture)
 		numMips_ = 0;
 		depth_ = 0;
 		numFaces_ = 0;
+
+		pixelBufType_ = render::PixelBufferType::NONE;
+		pPixelBufVoid_ = nullptr;
 	}
 
 	Texture::Texture(core::string name, TextureFlags flags) :
@@ -34,6 +37,9 @@ X_NAMESPACE_BEGIN(texture)
 		numMips_ = 0;
 		depth_ = 0;
 		numFaces_ = 0;
+
+		pixelBufType_ = render::PixelBufferType::NONE;
+		pPixelBufVoid_ = nullptr;
 	}
 
 
@@ -54,6 +60,14 @@ X_NAMESPACE_BEGIN(texture)
 	const DXGI_FORMAT Texture::getFormatDX(void) const
 	{
 		return Util::DXGIFormatFromTexFmt(format_);
+	}
+
+	void Texture::setPixelBuffer(render::PixelBufferType::Enum type, void* pInst)
+	{
+		X_ASSERT(pixelBufType_ == render::PixelBufferType::NONE, "Already has a pixel buffer")(pixelBufType_);
+
+		pixelBufType_ = type;
+		pPixelBufVoid_ = pInst;
 	}
 
 

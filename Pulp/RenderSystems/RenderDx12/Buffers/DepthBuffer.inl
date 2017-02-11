@@ -43,14 +43,4 @@ X_INLINE uint32_t DepthBuffer::getClearStencil(void) const
 }
 
 
-// IPixelBuffer
-
-X_INLINE PixelBufferType::Enum DepthBuffer::getBufferType(void) const
-{
-	return PixelBufferType::DEPTH;
-}
-
-// ~IPixelBuffer
-
-
 X_NAMESPACE_END

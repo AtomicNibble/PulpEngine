@@ -665,7 +665,7 @@ void GraphicsContext::clearUAV(ColorBuffer& target)
 	// a shader to set all of the values).
 
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
-	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
+	CD3DX12_RECT ClearRect(0, 0, target.getTex().getWidth(), target.getTex().getHeight());
 
 	pCommandList_->ClearUnorderedAccessViewFloat(gpuVisibleHandle, target.getUAV(), target.getGpuResource().getResource(),
 		target.getClearColor(), 1, &ClearRect);
@@ -840,7 +840,7 @@ void ComputeContext::clearUAV(ColorBuffer& target)
 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
 	// a shader to set all of the values).
 	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
-	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
+	CD3DX12_RECT ClearRect(0, 0, target.getTex().getWidth(), target.getTex().getHeight());
 
 	pCommandList_->ClearUnorderedAccessViewFloat(GpuVisibleHandle, target.getUAV(), target.getGpuResource().getResource(), 
 		target.getClearColor(), 1, &ClearRect);

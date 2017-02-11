@@ -7,6 +7,10 @@
 
 X_NAMESPACE_DECLARE(render,
 	class DescriptorAllocator;
+	class PixelBuffer;
+	class ColorBuffer;
+	class DepthBuffer;
+	class ShadowBuffer;
 );
 
 X_NAMESPACE_BEGIN(texture)
@@ -18,6 +22,10 @@ class TextureManager;
 	class Texture : public render::IPixelBuffer // ::texture::ITexture
 	{
 		friend TextureManager;
+		friend class render::PixelBuffer;
+		friend class render::ColorBuffer;
+		friend class render::DepthBuffer;
+		friend class render::ShadowBuffer;
 
 	public:
 		Texture(const char* pName, TextureFlags flags);
@@ -49,7 +57,7 @@ class TextureManager;
 		const DXGI_FORMAT getFormatDX(void) const;
 
 		// IPixelBuffer
-		X_INLINE render::PixelBufferType::Enum getBufferType(void) const X_OVERRIDE;
+		X_INLINE render::PixelBufferType::Enum getBufferType(void) const X_FINAL;
 		// ~IPixelBuffer
 
 		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
@@ -58,6 +66,13 @@ class TextureManager;
 		X_INLINE void setID(TexID id);
 
 		X_INLINE render::GpuResource& getGpuResource(void);
+
+		// pixel buffers.
+		X_INLINE render::PixelBuffer& getPixelBuf(void) const;
+		X_INLINE render::ColorBuffer& getColorBuf(void) const;
+		X_INLINE render::DepthBuffer& getDepthBuf(void) const;
+		X_INLINE render::ShadowBuffer& getShadowBuf(void) const;
+
 	protected:
 		X_INLINE void setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv);
 
@@ -69,6 +84,7 @@ class TextureManager;
 		X_INLINE void setNumFaces(uint8_t faces);
 		X_INLINE void setNumMips(uint8_t mips);
 
+		void setPixelBuffer(render::PixelBufferType::Enum type, void* pInst);
 
 	private:
 		render::GpuResource	resource_;
@@ -87,9 +103,19 @@ class TextureManager;
 		uint8_t				numMips_;
 		uint8_t				depth_;
 		uint8_t				numFaces_;
+
+
+		render::PixelBufferType::Enum pixelBufType_;
+		union {
+			render::ColorBuffer* pColorBuf_;
+			render::DepthBuffer* pDepthBuf_;
+			render::ShadowBuffer* pShadowBuf_;
+			void* pPixelBufVoid_;
+		};
 	};
 
 
+	static const size_t goat = sizeof(Texture);
 
 X_NAMESPACE_END
 

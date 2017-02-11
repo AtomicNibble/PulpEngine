@@ -15,7 +15,7 @@ public:
 	typedef core::FixedArray<D3D12_CPU_DESCRIPTOR_HANDLE, texture::TEX_MAX_MIPS> DescriptorHandleArr;
 
 public:
-	ColorBuffer(const char* pName, Colorf clearCol = Colorf::zero());
+	ColorBuffer(::texture::Texture& textInst, Colorf clearCol = Colorf::zero());
 
 	void createFromSwapChain(ID3D12Device* pDevice, DescriptorAllocator& allocator, ID3D12Resource* pBaseResource);
 
@@ -26,7 +26,7 @@ public:
 
 
 	// Get pre-created CPU-visible descriptor handles
-	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
+	const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getRTV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getUAV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE* getUAVs(void) const;

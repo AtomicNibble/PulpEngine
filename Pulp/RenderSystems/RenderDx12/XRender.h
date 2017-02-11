@@ -272,7 +272,7 @@ private:
 	Vec2<uint32_t> targetNativeRes_;	// if diffrent, the render buffers we be resized to this next frame.
 	Vec2<uint32_t> displayRes_;			// the resolution of the final screen
 
-	ColorBuffer displayPlane_[SWAP_CHAIN_BUFFER_COUNT];
+	texture::Texture* pDisplayPlanes_[SWAP_CHAIN_BUFFER_COUNT];
 	uint32_t currentBufferIdx_;
 
 	// pre created IL descriptinos for each supported vertex format.

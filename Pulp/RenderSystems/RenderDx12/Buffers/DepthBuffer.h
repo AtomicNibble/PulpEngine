@@ -11,7 +11,7 @@ class DescriptorAllocator;
 class DepthBuffer : public PixelBuffer
 {
 public:
-	DepthBuffer(const char* pName, float32_t clearDepth = 1.0f, uint32_t clearStencil = 0);
+	DepthBuffer(::texture::Texture& textInst, float32_t clearDepth = 1.0f, uint32_t clearStencil = 0);
 
 	// Create a depth buffer. If an address is supplied, memory will not be allocated.
 	// The vmem address allows you to alias buffers.
@@ -32,12 +32,6 @@ public:
 
 	X_INLINE float32_t getClearDepth(void) const;
 	X_INLINE uint32_t getClearStencil(void) const;
-
-
-	// IPixelBuffer
-	X_INLINE PixelBufferType::Enum getBufferType(void) const X_OVERRIDE;
-	// ~IPixelBuffer
-
 
 private:
 	void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, DXGI_FORMAT format);

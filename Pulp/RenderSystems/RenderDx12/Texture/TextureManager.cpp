@@ -18,6 +18,7 @@
 X_NAMESPACE_BEGIN(texture)
 
 
+
 	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan,
 		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt) :
 		contextMan_(contextMan),
@@ -30,6 +31,7 @@ X_NAMESPACE_BEGIN(texture)
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
 	{
+		X_ENSURE_LE(sizeof(TextureResource), 128, "Texture with ref count should be 128 bytes or less");
 	}
 
 	TextureManager::~TextureManager()
@@ -210,37 +212,54 @@ X_NAMESPACE_BEGIN(texture)
 		return pTexRes;
 	}
 
-	render::IPixelBuffer* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
-		render::PixelBufferType::Enum type, texture::Texturefmt::Enum fmt)
+	Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+		render::PixelBufferType::Enum type)
 	{
-		if (type == render::PixelBufferType::DEPTH)
+		core::string name(pNickName);
+
+		//
+		//	For pixel buffers we store them in the same texture pool / hash
+		//	This has a number of benfits in that pixel buffers are listed in texture list.
+		//	it also makes it more simple to read from a pixel buffer as they can be passed to the pipeline as if they just normal textures.
+		//	
+		//
+
+		TexRes* pTexRes = findTexture(name);
+		if (pTexRes)
 		{
-			X_ASSERT(fmt == texture::Texturefmt::UNKNOWN, "Depth fmt can't be set per buffer")(fmt);
-
-			render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(pNickName, 1.f, 0);
-			pDethBuf->create(pDevice_, descriptorAlloc_, dim.x, dim.y, depthFmt_);
-
-			return pDethBuf;
+			// do we want to allow ref counted pixelBuffers?
+			X_WARNING("TexMan", "Pixel buffer already exsists: \"%s\"", name.c_str());
+			pTexRes->addReference();
 		}
-		else if (type == render::PixelBufferType::COLOR)
+		else
 		{
-			X_ASSERT(fmt != texture::Texturefmt::UNKNOWN, "Can't create pixel buffer with unknown fmt")(fmt);
+			pTexRes = textures_.createAsset(name, name, TextureFlags());
 
-			render::ColorBuffer* pColBuffer = X_NEW(render::ColorBuffer, arena_, "ColorBuffer")(pNickName);
+			// okay now we create the buffer resource.
+			if (type == render::PixelBufferType::DEPTH)
+			{
+				render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(*pTexRes, 1.f, 0);
+				pDethBuf->create(pDevice_, descriptorAlloc_, dim.x, dim.y, depthFmt_);
+				pTexRes->setPixelBuffer(type, pDethBuf);
+			}
+			else if (type == render::PixelBufferType::COLOR)
+			{
+				render::ColorBuffer* pColBuffer = X_NEW(render::ColorBuffer, arena_, "ColorBuffer")(*pTexRes);
+				pTexRes->setPixelBuffer(type, pColBuffer);
+			}
+			else if (type == render::PixelBufferType::SHADOW)
+			{
 
-			pColBuffer->create(pDevice_, descriptorAlloc_, dim.x, dim.y, numMips, depthFmt_);
-
-			return pColBuffer;
-
+				X_ASSERT_NOT_IMPLEMENTED();
+			}
+			
+			// check we have a pixel buf.
+			X_ASSERT_NOT_NULL(pTexRes->pPixelBufVoid_);
+			X_ASSERT(pTexRes->getBufferType() != render::PixelBufferType::NONE, "Type not set")();
 		}
-		else if (type == render::PixelBufferType::SHADOW)
-		{
-			X_ASSERT(fmt != texture::Texturefmt::UNKNOWN, "Can't create shadow buffer with unknown fmt")(fmt);
 
 
-		}
-
-		return nullptr;
+		return pTexRes;
 	}
 
 
@@ -271,6 +290,25 @@ X_NAMESPACE_BEGIN(texture)
 		{
 			core::string name(pTex->getName());
 			
+			if (pTex->getBufferType() != render::PixelBufferType::NONE)
+			{
+				switch (pTex->getBufferType())
+				{
+					case render::PixelBufferType::COLOR:
+						X_DELETE(&pTex->getColorBuf(), arena_);
+						break;
+					case render::PixelBufferType::DEPTH:
+						X_DELETE(&pTex->getDepthBuf(), arena_);
+						break;
+					case render::PixelBufferType::SHADOW:
+						X_DELETE(&pTex->getShadowBuf(), arena_);
+						break;
+					default:
+						X_ASSERT_UNREACHABLE();
+						break;
+				}
+			}
+
 			textures_.releaseAsset(pTexRes);
 		}
 	}
