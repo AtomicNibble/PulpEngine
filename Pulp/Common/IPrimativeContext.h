@@ -20,6 +20,7 @@ public:
 	};
 
 	static const int32_t OBJECT_NUM_LOD = 5;
+
 	X_DECLARE_ENUM(ObjectType)(
 		Sphere,
 		Cone,
@@ -31,9 +32,10 @@ public:
 		Transformf trans;
 		Color8u color;
 		float size;
+		uint32_t lodIdx;
 	};
 
-	X_ENSURE_SIZE(ObjectParam, 36);
+	X_ENSURE_SIZE(ObjectParam, 40);
 
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;

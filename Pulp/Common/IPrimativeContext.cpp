@@ -598,6 +598,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = sphere.radius();
+		pObj->lodIdx = 0;
 	}
 }
 
@@ -615,6 +616,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, c
 		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = sphere.radius();
+		pObj->lodIdx = 0;
 	}
 }
 
@@ -642,6 +644,7 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = core::Max(radius, height * 0.5f);
+		pObj->lodIdx = 0;
 	}
 }
 
@@ -669,6 +672,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 		pObj->trans.set(transMat);
 		pObj->color = col;
 		pObj->size = core::Max(radius, height * 0.5f);
+		pObj->lodIdx = 0;
 	}
 }
 
