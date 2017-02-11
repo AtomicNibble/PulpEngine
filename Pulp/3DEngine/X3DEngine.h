@@ -55,13 +55,13 @@ private:
 	void Command_Map(core::IConsoleCmdArgs* Cmd);
 	void Command_DevMap(core::IConsoleCmdArgs* Cmd);
 
-
+private:
 	//~
 	gui::XGuiManager guisMan_;
 
 	level::Level level_;
 
-
+	PrimativeContextSharedResources primResources_;
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 };
 

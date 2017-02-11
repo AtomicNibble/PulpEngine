@@ -48,11 +48,11 @@ engine::gui::IGui* pGui = nullptr;
 
 X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 	primContexts_{ 
-		{ IPrimativeContext::Mode::Mode3D, arena }, // physics
-		{ IPrimativeContext::Mode::Mode3D, arena }, // misc3d
-		{ IPrimativeContext::Mode::Mode2D, arena }, // gui
-		{ IPrimativeContext::Mode::Mode2D, arena }, // profile
-		{ IPrimativeContext::Mode::Mode2D, arena }  // console
+		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // physics
+		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // misc3d
+		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // gui
+		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // profile
+		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }  // console
 	}
 {
 	// check if the enum order was changed in a way that resulted in incorrect modes.
@@ -124,6 +124,12 @@ bool X3DEngine::Init(void)
 		return false;
 	}
 
+	// init share prim contex resources.
+	if (!primResources_.init()) {
+		X_ERROR("3DEngine", "Failed to init prim resources");
+		return false;
+	}
+
 	// init the prim context states.
 	for (auto& primcon : primContexts_)
 	{
@@ -181,6 +187,7 @@ void X3DEngine::ShutDown(void)
 		primcon.freeStates(pRender_);
 	}
 
+	primResources_.releaseResources();
 	if (pModelManager_) {
 		pModelManager_->ShutDown();
 		X_DELETE(pModelManager_, g_3dEngineArena);
