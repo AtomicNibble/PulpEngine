@@ -14,7 +14,9 @@ namespace Commands
 		COPY_INDEXES_BUF_DATA,
 		COPY_VERTEX_BUF_DATA,
 		UPDATE_TEXTUTE_BUF_DATA,
-		UPDATE_TEXTUTE_SUB_BUF_DATA
+		UPDATE_TEXTUTE_SUB_BUF_DATA,
+		CLEAR_DEPTH_STENCIL,
+		CLEAR_COLOR
 	);
 
 	// how to pass these states in nice way.
@@ -275,6 +277,21 @@ namespace Commands
 		uint32_t size;
 		Recti rect; // the rect to update.
 	};
+
+	struct ClearDepthStencil
+	{
+		static const Command::Enum CMD = Command::CLEAR_DEPTH_STENCIL;
+
+		IPixelBuffer* pDepthBuffer;
+	};
+
+	struct ClearColor
+	{
+		static const Command::Enum CMD = Command::CLEAR_COLOR;
+
+		IPixelBuffer* pColorBuffer;
+	};
+
 	//~
 
 	X_PACK_POP

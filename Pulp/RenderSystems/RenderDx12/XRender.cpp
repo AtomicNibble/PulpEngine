@@ -671,7 +671,31 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				}
 				break;
 
+				case Commands::Command::CLEAR_DEPTH_STENCIL:
+				{
+					const Commands::ClearDepthStencil& clearDepth = *reinterpret_cast<const Commands::ClearDepthStencil*>(pCmd);
+					texture::Texture* pTexture = static_cast<texture::Texture*>(clearDepth.pDepthBuffer);
 
+					X_ASSERT(pTexture->getBufferType() == PixelBufferType::DEPTH, "Invalid buffer passed to clear depth")();
+
+					DepthBuffer& depthBuf = pTexture->getDepthBuf();
+
+					context.clearDepth(depthBuf);
+				}
+				break;
+
+				case Commands::Command::CLEAR_COLOR:
+				{
+					const Commands::ClearColor& clearColor = *reinterpret_cast<const Commands::ClearColor*>(pCmd);
+					texture::Texture* pTexture = static_cast<texture::Texture*>(clearColor.pColorBuffer);
+
+					X_ASSERT(pTexture->getBufferType() == PixelBufferType::COLOR, "Invalid buffer passed to clear color")();
+
+					ColorBuffer& colBuf = pTexture->getColorBuf();
+
+					context.clearColor(colBuf);
+				}
+				break;
 
 				default:
 #if X_DEBUG
