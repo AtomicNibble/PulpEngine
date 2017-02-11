@@ -1,4 +1,6 @@
 #include "stdafx.h"
+
+#define X_NO_DEBUG_HANDLERS
 #include <ModuleExports.h>
 
 #include <ICore.h>
