@@ -18,8 +18,6 @@ render::IRender* CreateRender(ICore *pCore)
 {
 	LinkModule(pCore, "RenderNull");
 
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pArena);
 
 	render::IRender* pRender = &render::g_NullRender;
 
@@ -42,8 +40,6 @@ class XEngineModule_Render : public IEngineModule
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals& env, const SCoreInitParams& initParams) X_OVERRIDE
 	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
@@ -57,8 +53,6 @@ class XEngineModule_Render : public IEngineModule
 
 	virtual bool ShutDown(void) X_OVERRIDE
 	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
 		return true;
 	}
 };

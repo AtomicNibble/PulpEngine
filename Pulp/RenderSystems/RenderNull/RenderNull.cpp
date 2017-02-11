@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "RenderNull.h"
 
-#include <IFont.h> // XTextDrawConect
 
 X_NAMESPACE_BEGIN(render)
 
@@ -187,7 +186,7 @@ void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
 
 texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlags flags)
 {
-	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(path);
 	X_UNUSED(path);
 	X_UNUSED(flags);
 
@@ -201,7 +200,7 @@ texture::ITexture* RenderNull::getDefaultTexture(void) const
 
 texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
-	X_ASSERT_NOT_NULL(pNickName);
+	X_UNUSED(pNickName);
 	X_UNUSED(dim);
 	X_UNUSED(fmt);
 	X_UNUSED(pInitialData);
