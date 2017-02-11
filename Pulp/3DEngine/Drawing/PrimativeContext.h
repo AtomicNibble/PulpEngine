@@ -134,6 +134,7 @@ public:
 
 	typedef core::Array<VertexPage> VertexPagesArr;
 	typedef core::Array<ObjectParam> ObjectParamArr;
+	typedef std::array<ObjectParamArr, ObjectType::ENUM_COUNT> ObjectTypesParamArr; // come up with better name for this?
 
 private:
 
@@ -170,8 +171,10 @@ public:
 	
 	bool isEmpty(void) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
+	const ObjectTypesParamArr& getObjectArrayBuffers(void) const;
 	VertexPageHandlesArr getVertBufHandles(void) const;
 
+public:
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
@@ -190,7 +193,7 @@ private:
 	int32_t currentPage_;
 	Mode mode_;
 
-	ObjectParamArr objects_[ObjectType::ENUM_COUNT];
+	ObjectTypesParamArr objectArrays_;
 
 	const PrimativeContextSharedResources& sharedRes_;
 };

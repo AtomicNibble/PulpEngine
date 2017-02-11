@@ -493,13 +493,13 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	vertexPages_(arena, MAX_PAGES, arena),
 	currentPage_(-1),
 	mode_(mode),
-	objects_{ arena, arena, arena } ,
+	objectArrays_{ arena, arena, arena } ,
 	sharedRes_(sharedRes)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
 
-	for (auto& objectArr : objects_)
+	for (auto& objectArr : objectArrays_)
 	{
 		objectArr.setGranularity(256);
 	}
@@ -582,18 +582,34 @@ void PrimativeContext::reset(void)
 
 	// if the compiler don't unroll this it should just kill itself..
 	for (uint32_t i = 0; i < ObjectType::ENUM_COUNT; i++) {
-		objects_[i].clear();
+		objectArrays_[i].clear();
 	}
 }
 
 bool PrimativeContext::isEmpty(void) const
 {
-	return pushBufferArr_.isEmpty();
+	if (pushBufferArr_.isNotEmpty()) {
+		return false;
+	}
+
+	for (const auto& objectArr : objectArrays_)
+	{
+		if (objectArr.isNotEmpty()) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void) const
 {
 	return pushBufferArr_;
+}
+
+const PrimativeContext::ObjectTypesParamArr& PrimativeContext::getObjectArrayBuffers(void) const
+{
+	return objectArrays_;
 }
 
 PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void) const
@@ -699,7 +715,7 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 
 PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type)
 {
-	return &objects_[type].AddOne();
+	return &objectArrays_[type].AddOne();
 }
 
 X_NAMESPACE_END
