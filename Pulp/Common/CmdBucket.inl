@@ -11,7 +11,10 @@ X_INLINE void CommandBucketBase::appendRenderTarget(IRenderTarget* pRTV)
 	rtvs_.push_back(pRTV);
 }
 
-
+X_INLINE void CommandBucketBase::setDepthStencil(render::IPixelBuffer* pPB)
+{
+	pDepthStencil_ = pPB;
+}
 
 X_INLINE const Matrix44f& CommandBucketBase::getViewMatrix(void) const
 {
@@ -26,6 +29,11 @@ X_INLINE const Matrix44f& CommandBucketBase::getProjMatrix(void) const
 X_INLINE const XViewPort& CommandBucketBase::getViewport(void) const
 {
 	return viewport_;
+}
+
+X_INLINE render::IPixelBuffer* CommandBucketBase::getDepthStencil(void) const
+{
+	return pDepthStencil_;
 }
 
 X_INLINE const CommandBucketBase::RenderTargetsArr& CommandBucketBase::getRTVS(void) const

@@ -109,6 +109,7 @@ public:
 	// Maybe allowing diffrent index's to be set is better idea.
 	// and what ever is not null is set.
 	X_INLINE void appendRenderTarget(IRenderTarget* pRTV);
+	X_INLINE void setDepthStencil(render::IPixelBuffer* pPB);
 
 	X_INLINE const Matrix44f& getViewMatrix(void) const;
 	X_INLINE const Matrix44f& getProjMatrix(void) const;
@@ -116,6 +117,7 @@ public:
 	
 	
 	X_INLINE const RenderTargetsArr& getRTVS(void) const;
+	X_INLINE render::IPixelBuffer* getDepthStencil(void) const;
 	X_INLINE const SortedIdxArr& getSortedIdx(void) const;
 	X_INLINE const PacketArr& getPackets(void) const;
 
@@ -125,6 +127,7 @@ protected:
 	Matrix44f proj_;
 	XViewPort viewport_;
 	RenderTargetsArr rtvs_;
+	render::IPixelBuffer* pDepthStencil_;
 
 	core::AtomicInt current_;
 	PacketArr packets_;

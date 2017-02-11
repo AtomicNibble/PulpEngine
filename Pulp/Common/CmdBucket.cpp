@@ -64,6 +64,7 @@ CmdPacketAllocator::ThreadAllocator::ThreadAllocator(void* pStart, void* pEnd) :
 // -------------------------------------------------------
 
 CommandBucketBase::CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam, const XViewPort& viewport) :
+	pDepthStencil_(nullptr),
 	current_(0),
 	packets_(arena, size),
 	sortedIdx_(arena, size),
