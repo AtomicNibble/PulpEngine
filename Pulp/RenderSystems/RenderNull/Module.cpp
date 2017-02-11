@@ -16,8 +16,8 @@ X_NAMESPACE_BEGIN(render)
 
 render::IRender* CreateRender(ICore *pCore)
 {
+	X_UNUSED(pCore);
 	LinkModule(pCore, "RenderNull");
-
 
 	render::IRender* pRender = &render::g_NullRender;
 
@@ -42,12 +42,7 @@ class XEngineModule_Render : public IEngineModule
 	{
 		X_UNUSED(initParams);
 
-		ICore* pCore = env.pCore;
-		render::IRender *pRender = 0;
-
-		pRender = CreateRender(pCore);
-
-		env.pRender = pRender;
+		env.pRender = CreateRender(env.pCore);
 		return true;
 	}
 
