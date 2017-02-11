@@ -131,15 +131,22 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		core::string name(pName);
 
-		TexRes* pTexRes = findTexture(name);
+		auto& threadPolicy = textures_.getThreadPolicy();
+		threadPolicy.Enter();
+
+		TexRes* pTexRes = textures_.findAsset(name);
 
 		if (pTexRes)
 		{
+			threadPolicy.Leave();
+
 			pTexRes->addReference();
 		}
 		else
 		{
 			pTexRes = textures_.createAsset(name, name, flags);
+
+			threadPolicy.Leave();
 
 			if (pTexRes->IsStreamable() && flags.IsSet(TexFlag::DONT_STREAM)) {
 				stream(pTexRes);
@@ -161,10 +168,15 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		core::string name(pNickName);
 
-		TexRes* pTexRes = findTexture(name);
+		auto& threadPolicy = textures_.getThreadPolicy();
+		threadPolicy.Enter();
+
+		TexRes* pTexRes = textures_.findAsset(name);
 
 		if (pTexRes)
 		{
+			threadPolicy.Leave();
+
 			pTexRes->addReference();
 
 			X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%s\"", pNickName);
@@ -175,6 +187,8 @@ X_NAMESPACE_BEGIN(texture)
 		else
 		{
 			pTexRes = textures_.createAsset(name, name, TexFlag::DONT_STREAM | TexFlag::DONT_RESIZE | TexFlag::NOMIPS);
+
+			threadPolicy.Leave();
 
 			pTexRes->setDepth(1);
 			pTexRes->setNumFaces(1);
@@ -223,10 +237,14 @@ X_NAMESPACE_BEGIN(texture)
 		//	it also makes it more simple to read from a pixel buffer as they can be passed to the pipeline as if they just normal textures.
 		//	
 		//
+		auto& threadPolicy = textures_.getThreadPolicy();
+		threadPolicy.Enter();
 
-		TexRes* pTexRes = findTexture(name);
+		TexRes* pTexRes = textures_.findAsset(name);
 		if (pTexRes)
 		{
+			threadPolicy.Leave();
+
 			// do we want to allow ref counted pixelBuffers?
 			X_WARNING("TexMan", "Pixel buffer already exsists: \"%s\"", name.c_str());
 			pTexRes->addReference();
@@ -234,6 +252,8 @@ X_NAMESPACE_BEGIN(texture)
 		else
 		{
 			pTexRes = textures_.createAsset(name, name, TextureFlags());
+
+			threadPolicy.Leave();
 
 			// okay now we create the buffer resource.
 			if (type == render::PixelBufferType::DEPTH)
@@ -265,8 +285,8 @@ X_NAMESPACE_BEGIN(texture)
 
 	Texture* TextureManager::getByID(TexID texId) const
 	{
-	//	X_UNUSED(texId);
-	//	X_ASSERT_NOT_IMPLEMENTED();
+		core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
 		return textures_.findAsset(texId);
 	}
 
@@ -308,6 +328,8 @@ X_NAMESPACE_BEGIN(texture)
 						break;
 				}
 			}
+
+			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
 			textures_.releaseAsset(pTexRes);
 		}
@@ -382,6 +404,8 @@ X_NAMESPACE_BEGIN(texture)
 
 	TextureManager::TexRes* TextureManager::findTexture(const core::string& name)
 	{
+		core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
 		return textures_.findAsset(name);
 	}
 
@@ -443,10 +467,14 @@ X_NAMESPACE_BEGIN(texture)
 
 	void TextureManager::releaseDanglingTextures(void)
 	{
-		auto it = textures_.begin();
-		for (; it != textures_.end(); ++it) {
-			auto texRes = it->second;
-			X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, texRes->getName(), texRes->getRefCount());
+		{
+			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
+			auto it = textures_.begin();
+			for (; it != textures_.end(); ++it) {
+				auto texRes = it->second;
+				X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, texRes->getName(), texRes->getRefCount());
+			}
 		}
 
 		textures_.free();
