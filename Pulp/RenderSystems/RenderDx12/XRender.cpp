@@ -85,7 +85,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 	X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
 
 	if (hWnd == static_cast<HWND>(0)) {
-		X_ERROR("dx10", "target window is not valid");
+		X_ERROR("Dx12", "target window is not valid");
 		return false;
 	}
 
