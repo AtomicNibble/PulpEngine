@@ -10,6 +10,62 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+// this stores resources that are shared between contex's.
+// like materials and shape meshes.
+class PrimativeContextSharedResources
+{
+	static const int32_t SHAPES_NUM_LOD = 5;
+
+	typedef IPrimativeContext::ObjectType ShapeType;
+	typedef Vertex_P3F_T2S_C4B ShapeVertex;
+
+	typedef core::Array<ShapeVertex, core::ArrayAlignedAllocator<ShapeVertex>> VertArr;
+	typedef core::Array<uint16_t, core::ArrayAlignedAllocator<uint16_t>> IndexArr;
+
+	struct ShapeLod
+	{
+		ShapeLod();
+
+		uint16_t indexCount;
+		uint16_t startIndex;
+		uint16_t baseVertex;
+	};
+
+	typedef std::array<ShapeLod, SHAPES_NUM_LOD> ShapeLodArr;
+
+	// we put all the lods for a given shape in a single buffer.
+	// that way we don't need to switch when rendering same shape with diffrent active lods.
+	// potentialy doing something else might work out better in pratice, like all shapes of given lod index in same buffer etc..
+	struct Shape
+	{
+		Shape();
+
+		ShapeLodArr lods;
+		render::VertexBufferHandle vertexBuf;
+		render::IndexBufferHandle indexbuf;
+	};
+
+public:
+	PrimativeContextSharedResources();
+
+	bool init(void);
+	void releaseResources(void);
+
+private:
+	static void CreateSphere(VertArr& vb, IndexArr& ib,
+		float radius, uint32_t rings, uint32_t sections);
+
+	static void CreateCone(VertArr& vb, IndexArr& ib,
+		float radius, float height, uint32_t sections);
+
+	static void CreateCylinder(VertArr& vb, IndexArr& ib,
+		float radius, float height, uint32_t sections);
+
+private:
+	Shape shapes_[ShapeType::ENUM_COUNT];
+};
+
+
 class PrimativeContext : public IPrimativeContext, public XEngineBase
 {
 public:
@@ -90,7 +146,7 @@ private:
 
 
 public:
-	PrimativeContext(Mode mode, core::MemoryArenaBase* arena);
+	PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, core::MemoryArenaBase* arena);
 	~PrimativeContext() X_OVERRIDE;
 
 	bool createStates(render::IRender* pRender);
@@ -127,8 +183,9 @@ private:
 	Mode mode_;
 
 	ObjectParamArr objects_[ObjectType::ENUM_COUNT];
-
 	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
+
+	const PrimativeContextSharedResources& sharedRes_;
 };
 
 
