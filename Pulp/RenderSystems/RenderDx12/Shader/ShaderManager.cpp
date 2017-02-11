@@ -365,16 +365,32 @@ namespace shader
 		return true;
 	}
 
-	void XShaderManager::listHWShaders(const char* pSarchPatten)
+	void XShaderManager::listHWShaders(const char* pSearchPattern)
 	{
-		X_UNUSED(pSarchPatten);
-
 		core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
-		X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", hwShaders_.size());
-		for(const auto& it : hwShaders_)
+		core::Array<HWShaderContainer::Resource*> sorted_shaders(arena_);
+		sorted_shaders.reserve(hwShaders_.size());
+
+		for (const auto& shader : hwShaders_)
 		{
-			const auto* pShader = it.second;
+			if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, shader.first))
+			{
+				sorted_shaders.emplace_back(shader.second);
+			}
+		}
+
+		std::sort(sorted_shaders.begin(), sorted_shaders.end(), [](HWShaderContainer::Resource* a, HWShaderContainer::Resource* b) {
+				const auto& nameA = a->getName();
+				const auto& nameB = b->getName();
+				return nameA.compareInt(nameB) < 0;
+			}
+		);
+
+		X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", hwShaders_.size());
+		for(const auto& it : sorted_shaders)
+		{
+			const auto* pShader = it;
 
 			X_LOG0("Shader", "Name: ^2\"%s\"^7 Status: ^2%s^7 type: ^2%s^7 refs: %" PRIi32,
 				pShader->getName().c_str(), 
