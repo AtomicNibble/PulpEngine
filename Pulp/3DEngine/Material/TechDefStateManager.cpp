@@ -7,9 +7,11 @@
 X_NAMESPACE_BEGIN(engine)
 
 TechDef::TechDef(core::MemoryArenaBase* arena) :
+	permArena_(arena),
 	perms_(arena),
 	aliases_(arena)
 {
+	perms_.setGranularity(8);
 	shaderSource_.fill(nullptr);
 }
 
@@ -17,9 +19,10 @@ TechDef::~TechDef()
 {
 	render::IRender* pRenderSys = gEnv->pRender;
 
-	for (auto& perm : perms_)
+	for (auto* pPerm : perms_)
 	{
-		pRenderSys->releaseShaderPermatation(perm.pShaderPerm);
+		pRenderSys->releaseShaderPermatation(pPerm->pShaderPerm);
+		X_DELETE(pPerm, permArena_);
 	}
 }
 
@@ -29,22 +32,59 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// ok so this will be called to get a permatation.
 	// we want to lazy compile these i think.
 	// so how do we know what is supported.
-	// X_UNUSED(vertFmt);
+	
+	TechDefPerm* pCompilingPerm = nullptr;
+	bool notCompiled = false;
+
 	{
 		core::CriticalSection::ScopedLock lock(permLock_);
 
-		for (auto& perm : perms_)
+		// ry find it.
+		for (auto& pPerm : perms_)
 		{
-			if (perm.vertFmt == vertFmt && perm.vertStreams == vertStreams)
+			if (pPerm->vertFmt == vertFmt && pPerm->vertStreams == vertStreams)
 			{
-				// we return pointer so we can't reallocate.
-				// meaning perms need to reverse memory to store all vert formats.
-				return &perm;
+				// we found one is it compiled?
+				if (pPerm->compiled) {
+					return pPerm;
+				}
+
+				// we must wait for it to become compiled.
+				pCompilingPerm = pPerm;
+				break;
 			}
 		}
 
+		if (!pCompilingPerm)
+		{
+			notCompiled = true;
+
+			// we don't have a perm, another thread might be compiling it tho.
+			pCompilingPerm = X_NEW(TechDefPerm, permArena_, "TechDefPerm");
+			pCompilingPerm->compiled = false;
+			pCompilingPerm->vertStreams = vertStreams;
+			pCompilingPerm->vertFmt = vertFmt;
+			perms_.append(pCompilingPerm);
+		}
+		else
+		{
+			X_ASSERT(notCompiled == false, "Perm is already compiling")(notCompiled);
+		}
 	}
 
+	// now we have left lock scope we wait for the perm to compile.
+	// only if we are not the thread that is compiling it.
+	if (!notCompiled)
+	{
+		while (!pCompilingPerm->compiled)
+		{
+			core::Thread::Yield();
+		}
+
+		return pCompilingPerm;
+	}
+
+	// compile the perm.
 	render::IRender* pRenderSys = gEnv->pRender;
 
 	// for now just make one :|
@@ -105,15 +145,10 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		return false;
 	}
 
-	core::CriticalSection::ScopedLock lock(permLock_);
-
-	TechDefPerm& perm = perms_.AddOne();
-	perm.stateHandle = stateHandle;
-	perm.pShaderPerm = pPerm;
-	perm.vertFmt = vertFmt;
-	perm.vertStreams = vertStreams;
-
-	return &perm;
+	pCompilingPerm->stateHandle = stateHandle;
+	pCompilingPerm->pShaderPerm = pPerm;
+	pCompilingPerm->compiled = true; // any other threads waiting on this can now return.
+	return pCompilingPerm;
 }
 
 

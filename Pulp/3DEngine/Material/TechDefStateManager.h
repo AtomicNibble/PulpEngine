@@ -13,7 +13,7 @@ class TechDef
 	typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderEntryArr;
 
 	typedef render::shader::ShaderSourceArr ShaderSourceArr;
-	typedef core::Array<TechDefPerm> TechDefPermArr;
+	typedef core::Array<TechDefPerm*> TechDefPermArr;
 
 public:
 	TechDef(core::MemoryArenaBase* arena);
@@ -25,6 +25,7 @@ public:
 	X_INLINE const Shader::AliaseArr& getAliases(void) const;
 
 public:
+	core::MemoryArenaBase* permArena_;
 	core::StrHash nameHash;
 	core::string name;
 
