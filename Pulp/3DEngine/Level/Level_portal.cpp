@@ -115,7 +115,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 
 					// make sure this portal is facing away from the view (early out)
 					float dis = portal.plane.distance(camPos);
-					if (dis < -0.1f) {
+					if (dis < -0.0f) {
 						continue;
 					}
 
@@ -248,7 +248,7 @@ void Level::FloodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin
 
 		// make sure this portal is facing away from the view
 		dis = portal.plane.distance(origin);
-		if (dis < -0.1f) {
+		if (dis < -0.0f) {
 			continue;
 		}
 
