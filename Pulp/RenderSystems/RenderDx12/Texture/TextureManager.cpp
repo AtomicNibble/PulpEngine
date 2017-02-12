@@ -314,8 +314,6 @@ X_NAMESPACE_BEGIN(texture)
 			
 			X_ASSERT(pTex->getBufferType() == render::PixelBufferType::NONE, "PixelBuffers should not be released here")();
 
-			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
-
 			textures_.releaseAsset(pTexRes);
 		}
 	}
@@ -346,8 +344,6 @@ X_NAMESPACE_BEGIN(texture)
 						break;
 				}
 			}
-
-			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
 			textures_.releaseAsset(pTexRes);
 		}
