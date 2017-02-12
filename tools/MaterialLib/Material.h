@@ -124,6 +124,8 @@ protected:
 
 	int32_t id_;
 
+	core::Spinlock techLock_;
+
 	core::string name_;
 
 	// 4

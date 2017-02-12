@@ -18,6 +18,8 @@ X_INLINE Material::Material(core::MemoryArenaBase* arena) :
 
 X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt)
 {
+	core::Spinlock::ScopedLock lock(techLock_);
+
 	for (auto& tech : techs_)
 	{
 		if (tech.hash == hash && tech.pPerm->vertFmt == vertFmt) {
@@ -30,8 +32,9 @@ X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::V
 
 X_INLINE void Material::addTech(const Tech& tech)
 {
-	techs_.append(tech);
+	core::Spinlock::ScopedLock lock(techLock_);
 
+	techs_.append(tech);
 }
 
 X_INLINE const int32_t Material::getID(void) const
