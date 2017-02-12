@@ -360,10 +360,6 @@ void XRender::shutDown(void)
 		X_DELETE_AND_NULL(pBuffMan_, arena_);
 	}
 
-	if (pTextureMan_) {
-		pTextureMan_->shutDown();
-		X_DELETE_AND_NULL(pTextureMan_, arena_);
-	}
 
 	if (pContextMan_) {
 		pContextMan_->destroyAllContexts();
@@ -392,9 +388,15 @@ void XRender::shutDown(void)
 		X_DELETE_AND_NULL(pShaderMan_, arena_);
 	}
 
+	freeSwapChainResources();
+
+	if (pTextureMan_) {
+		pTextureMan_->shutDown();
+		X_DELETE_AND_NULL(pTextureMan_, arena_);
+	}
+
 	cmdListManager_.shutdown();
 
-	freeSwapChainResources();
 
 	if (pDescriptorAllocator_) {
 		pDescriptorAllocator_->destoryAllHeaps();
@@ -1345,9 +1347,12 @@ bool XRender::freeSwapChainResources(void)
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
 		if (pDisplayPlanes_[i]) {
 			pDisplayPlanes_[i]->destroy();
+
+			pTextureMan_->releasePixelBuffer(pDisplayPlanes_[i]);
 		}
 	}
 
+	core::zero_object(pDisplayPlanes_);
 	return true;
 }
 
@@ -1622,7 +1627,11 @@ bool XRender::resize(uint32_t width, uint32_t height)
 	displayRes_.y = height;
 	vars_.setRes(displayRes_);
 
-	freeSwapChainResources();
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
+		if (pDisplayPlanes_[i]) {
+			pDisplayPlanes_[i]->destroy();
+		}
+	}
 
 	pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
 
