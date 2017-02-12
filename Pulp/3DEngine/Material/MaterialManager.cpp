@@ -573,14 +573,14 @@ void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 		}
 	);
 
-	X_LOG0("Console", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
+	X_LOG0("Material", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
 
 	for(const auto* pMat : sorted_mats)
 	{
 		X_LOG0("Material", "^2\"%s\"^7 refs: %" PRIi32, pMat->getName(), pMat->getRefCount());
 	}
 
-	X_LOG0("Console", "------------ ^8Materials End^7 -----------");
+	X_LOG0("Material", "------------ ^8Materials End^7 -----------");
 }
 
 
