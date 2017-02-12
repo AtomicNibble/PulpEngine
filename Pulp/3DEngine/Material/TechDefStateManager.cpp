@@ -45,8 +45,12 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 			if (pPerm->vertFmt == vertFmt && pPerm->vertStreams == vertStreams)
 			{
 				// we found one is it compiled?
-				if (pPerm->compiled) {
+				if (pPerm->status == TechStatus::COMPILED) {
 					return pPerm;
+				}
+
+				if (pPerm->status == TechStatus::ERROR) {
+					return nullptr;
 				}
 
 				// we must wait for it to become compiled.
@@ -61,7 +65,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
 			// we don't have a perm, another thread might be compiling it tho.
 			pCompilingPerm = X_NEW(TechDefPerm, permArena_, "TechDefPerm");
-			pCompilingPerm->compiled = false;
+			pCompilingPerm->status = TechStatus::NOT_COMPILED;
 			pCompilingPerm->vertStreams = vertStreams;
 			pCompilingPerm->vertFmt = vertFmt;
 			perms_.append(pCompilingPerm);
@@ -76,9 +80,13 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// only if we are not the thread that is compiling it.
 	if (!notCompiled)
 	{
-		while (!pCompilingPerm->compiled)
+		while (pCompilingPerm->status == TechStatus::NOT_COMPILED)
 		{
 			core::Thread::Yield();
+		}
+
+		if (pCompilingPerm->status == TechStatus::ERROR) {
+			return nullptr;
 		}
 
 		return pCompilingPerm;
@@ -115,6 +123,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	render::shader::IShaderPermatation* pPerm = pRenderSys->createPermatation(stages);
 	if (!pPerm) {
 		X_ERROR("Tech", "Failed to create perm");
+		pCompilingPerm->status = TechStatus::ERROR;
 		return false;
 	}
 
@@ -123,6 +132,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	{
 		X_ERROR("Tech", "Failed to create passState");
 		pRenderSys->releaseShaderPermatation(pPerm);
+		pCompilingPerm->status = TechStatus::ERROR;
 		return false;
 	}
 
@@ -142,12 +152,13 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		X_ERROR("Tech", "Failed to create state");
 		pRenderSys->destoryPassState(passHandle);
 		pRenderSys->releaseShaderPermatation(pPerm);
+		pCompilingPerm->status = TechStatus::ERROR;
 		return false;
 	}
 
 	pCompilingPerm->stateHandle = stateHandle;
 	pCompilingPerm->pShaderPerm = pPerm;
-	pCompilingPerm->compiled = true; // any other threads waiting on this can now return.
+	pCompilingPerm->status = TechStatus::COMPILED; // any other threads waiting on this can now return.
 	return pCompilingPerm;
 }
 

@@ -28,13 +28,20 @@ class TechSetDef;
 class TechDefState;
 class TechDef;
 
+X_DECLARE_ENUM8(TechStatus)(
+	NOT_COMPILED,
+	COMPILED,
+	ERROR
+);
+
 struct TechDefPerm
 {
+	TechStatus::Enum status;
+	bool vertStreams;
+	render::shader::VertexFormat::Enum vertFmt;
+	uint8_t _pad[1];
 	render::StateHandle stateHandle;
 	render::shader::IShaderPermatation* pShaderPerm;
-	render::shader::VertexFormat::Enum vertFmt;
-	bool vertStreams;
-	uint8_t _pad[2];
 	// +  4 more pad in 64bit
 };
 
