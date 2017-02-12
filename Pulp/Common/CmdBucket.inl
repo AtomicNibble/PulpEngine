@@ -11,9 +11,11 @@ X_INLINE void CommandBucketBase::appendRenderTarget(IRenderTarget* pRTV)
 	rtvs_.push_back(pRTV);
 }
 
-X_INLINE void CommandBucketBase::setDepthStencil(render::IPixelBuffer* pPB)
+X_INLINE void CommandBucketBase::setDepthStencil(render::IPixelBuffer* pPB, DepthBindFlags bindFlags)
 {
-	pDepthStencil_ = pPB;
+	X_ASSERT_ALIGNMENT(pPB, 1 << PixelBufferWithFlags::BIT_COUNT, 0);
+
+	pDepthStencil_.CopyPointer(pPB, bindFlags.ToInt());
 }
 
 X_INLINE const Matrix44f& CommandBucketBase::getViewMatrix(void) const
@@ -34,6 +36,13 @@ X_INLINE const XViewPort& CommandBucketBase::getViewport(void) const
 X_INLINE render::IPixelBuffer* CommandBucketBase::getDepthStencil(void) const
 {
 	return pDepthStencil_;
+}
+
+X_INLINE DepthBindFlags CommandBucketBase::getDepthBindFlags(void) const
+{
+	uintptr_t bits = pDepthStencil_.GetBits();
+
+	return DepthBindFlags(safe_static_cast<uint8_t>(bits));
 }
 
 X_INLINE const CommandBucketBase::RenderTargetsArr& CommandBucketBase::getRTVS(void) const
