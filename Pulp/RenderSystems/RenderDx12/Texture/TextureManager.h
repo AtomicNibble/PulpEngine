@@ -86,10 +86,12 @@ private:
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
+	void listTextures(const char* pSearchPattern);
 
 private:
 	void Cmd_ReloadTextures(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ReloadTexture(core::IConsoleCmdArgs* pCmd);
+	void Cmd_ListTextures(core::IConsoleCmdArgs* pCmd);
 
 private:
 	ID3D12Device* pDevice_;
