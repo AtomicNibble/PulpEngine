@@ -36,6 +36,11 @@ X_INLINE void PointerFlags<T, BIT_COUNT>::CopyPointer(const T* ptr)
 	pointer_ = union_cast<T*>(union_cast<uintptr_t>(ptr) | bits);
 }
 
+template <class T, uintptr_t BIT_COUNT>
+X_INLINE void PointerFlags<T, BIT_COUNT>::CopyPointer(const T* ptr, uintptr_t bits)
+{
+	pointer_ = union_cast<T*>(union_cast<uintptr_t>(ptr) | bits);
+}
 
 template <class T, uintptr_t BIT_COUNT>
 X_INLINE void PointerFlags<T, BIT_COUNT>::CopyPointer(const PointerFlags<T, BIT_COUNT>& rhs)

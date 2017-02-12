@@ -22,6 +22,7 @@ public:
 	X_INLINE PointerFlags(const PointerFlags<T, BIT_COUNT>& rhs);
 
 	X_INLINE void CopyPointer(const T* ptr);
+	X_INLINE void CopyPointer(const T* ptr, uintptr_t bits);
 	X_INLINE void CopyPointer(const PointerFlags<T, BIT_COUNT>& rhs);
 
 	X_INLINE uintptr_t GetBits(void) const;
