@@ -347,7 +347,11 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, in
 
 	{
 		core::Spinlock::ScopedLock lock(visAreaLock_);
-		visibleAreas_.push_back(&area);
+
+		if (std::find(visibleAreas_.begin(), visibleAreas_.end(), &area) == visibleAreas_.end())
+		{
+			visibleAreas_.push_back(&area);
+		}
 	}
 
 	// we need to work out which visible portal index to use.
