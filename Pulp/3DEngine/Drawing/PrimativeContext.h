@@ -49,6 +49,10 @@ X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 		render::IndexBufferHandle indexbuf;
 	};
 
+	typedef std::array<Material*, PrimitiveType::ENUM_COUNT> PrimMaterialArr;
+	typedef std::array<Shape, PrimitiveType::ENUM_COUNT> PrimShapeArr;
+	
+
 public:
 	PrimativeContextSharedResources();
 
@@ -72,8 +76,9 @@ private:
 		float radius, float height, uint32_t sections);
 
 private:
-	Material* primMaterials_[PrimitiveType::ENUM_COUNT];
-	Shape shapes_[ShapeType::ENUM_COUNT];
+	PrimMaterialArr primMaterials_;
+	PrimMaterialArr primMaterialsDepth_;
+	PrimShapeArr shapes_;
 };
 
 
