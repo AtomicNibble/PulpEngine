@@ -431,10 +431,10 @@ void PrimativeContextSharedResources::releaseResources(render::IRender* pRender)
 	// shapes.
 	for (auto& shape : shapes_)
 	{
-		if (shape.vertexBuf == render::INVALID_BUF_HANLDE) {
+		if (shape.vertexBuf != render::INVALID_BUF_HANLDE) {
 			pRender->destoryVertexBuffer(shape.vertexBuf);
 		}
-		if (shape.indexbuf == render::INVALID_BUF_HANLDE) {
+		if (shape.indexbuf != render::INVALID_BUF_HANLDE) {
 			pRender->destoryIndexBuffer(shape.indexbuf);
 		}
 
