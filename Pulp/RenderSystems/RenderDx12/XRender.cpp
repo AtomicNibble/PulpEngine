@@ -959,21 +959,29 @@ IndexBufferHandle XRender::createIndexBuffer(uint32_t elementSize, uint32_t numE
 
 void XRender::destoryVertexBuffer(VertexBufferHandle handle)
 {
+	X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
+
 	pBuffMan_->freeVB(handle);
 }
 
 void XRender::destoryIndexBuffer(IndexBufferHandle handle)
 {
+	X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
+
 	pBuffMan_->freeIB(handle);
 }
 
 void XRender::getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
 {
+	X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
+
 	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
 }
 
 void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
 {
+	X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
+
 	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
 }
 
