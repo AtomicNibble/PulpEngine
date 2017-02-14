@@ -9,6 +9,10 @@ X_INLINE Material* PrimativeContextSharedResources::getMaterial(PrimitiveType::E
 	return primMaterials_[prim];
 }
 
+X_INLINE Material* PrimativeContextSharedResources::getMaterialDepthTest(PrimitiveType::Enum prim) const
+{
+	return primMaterialsDepth_[prim];
+}
 
 // --------------------------------------------------------
 

@@ -297,6 +297,7 @@ PrimativeContextSharedResources::Shape::Shape()
 PrimativeContextSharedResources::PrimativeContextSharedResources()
 {
 	core::zero_object(primMaterials_);
+	core::zero_object(primMaterialsDepth_);
 }
 
 
@@ -317,27 +318,36 @@ bool PrimativeContextSharedResources::init(render::IRender* pRender)
 
 bool PrimativeContextSharedResources::loadMaterials(void)
 {
-	core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
-
-	for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
+	auto loadMaterials = [](PrimMaterialArr& primMaterials, const char* pSuffix) -> bool
 	{
-		const auto primType = static_cast<PrimitiveType::Enum>(i);
+		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
 
-		matName.clear();
-		matName.appendFmt("code%c$%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType));
-		matName.toLower();
+		for (size_t i = 0; i < PrimitiveType::ENUM_COUNT; i++)
+		{
+			const auto primType = static_cast<PrimitiveType::Enum>(i);
 
-		// we load the material for the primative type :D
-		// so the state and shaders used is fully data driven MMMMM.
-		Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
+			matName.clear();
+			matName.appendFmt("code%c$%s%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType), pSuffix);
+			matName.toLower();
 
-		// we still assign even tho may be default so it get's cleaned up.
-		primMaterials_[primType] = pMat;
+			Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
 
-		if (pMat->isDefault()) {
-			X_ERROR("Prim", "Error loading one of primative materials");
-			return false;
+			// we still assign even tho may be default so it get's cleaned up.
+			primMaterials[primType] = pMat;
+
+			if (pMat->isDefault()) {
+				X_ERROR("Prim", "Error loading one of primative materials");
+				return false;
+			}
 		}
+		return true;
+	};
+
+	if (!loadMaterials(primMaterials_, "")) {
+		return false;
+	}
+	if (!loadMaterials(primMaterialsDepth_, "_depth")) {
+		return false;
 	}
 
 	return true;
@@ -443,14 +453,19 @@ void PrimativeContextSharedResources::releaseResources(render::IRender* pRender)
 	}
 
 	// materials
-	for (auto& pMat : primMaterials_)
-	{
-		if (pMat) {
-			pMaterialManager_->releaseMaterial(pMat);
+	auto releaseMaterials = [](PrimMaterialArr& primMaterials) {
+		for (auto& pMat : primMaterials)
+		{
+			if (pMat) {
+				pMaterialManager_->releaseMaterial(pMat);
+			}
 		}
-	}
 
-	core::zero_object(primMaterials_);
+		core::zero_object(primMaterials);
+	};
+
+	releaseMaterials(primMaterials_);
+	releaseMaterials(primMaterialsDepth_);
 }
 
 // ---------------------------------------------------------------------------

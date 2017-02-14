@@ -60,6 +60,7 @@ public:
 	void releaseResources(render::IRender* pRender);
 
 	X_INLINE Material* getMaterial(PrimitiveType::Enum prim) const;
+	X_INLINE Material* getMaterialDepthTest(PrimitiveType::Enum prim) const;
 
 private:
 	bool loadMaterials(void);
