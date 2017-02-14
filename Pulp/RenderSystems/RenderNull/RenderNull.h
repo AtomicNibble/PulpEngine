@@ -10,7 +10,7 @@ class RenderNull : public IRender
 {
 public:
 
-	virtual bool init(HWND hWnd, uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt) X_FINAL;
+	virtual bool init(HWND hWnd, uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
 	virtual void shutDown(void) X_FINAL;
 	virtual void freeResources(void) X_FINAL;
 	

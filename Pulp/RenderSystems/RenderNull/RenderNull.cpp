@@ -10,12 +10,13 @@ RenderNull g_NullRender;
 
 
 bool RenderNull::init(HWND hWnd, 
-	uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt)
+	uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
 	X_UNUSED(hWnd);
 	X_UNUSED(width);
 	X_UNUSED(hieght);
 	X_UNUSED(depthFmt);
+	X_UNUSED(reverseZ);
 
 	return true;
 }

@@ -118,7 +118,7 @@ XRender::~XRender()
 	}
 }
 
-bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt)
+bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
 	X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
 
@@ -298,7 +298,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
 	// must be after cmdListMan
 	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_, pDevice_, *pContextMan_,
-		descriptorAllocator, texture::Util::DXGIFormatFromTexFmt(depthFmt));
+		descriptorAllocator, texture::Util::DXGIFormatFromTexFmt(depthFmt), reverseZ);
 	if (!pTextureMan_->init()) {
 		X_ERROR("Render", "failed to init texture system");
 		return false;

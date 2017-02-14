@@ -33,8 +33,8 @@ class TextureManager : public core::IXHotReload
 	typedef core::FixedArray<ITextureFmt*, 8> TextureLoadersArr;
 
 public:
-	TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		render::ContextManager& contextMan, render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt);
+	TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan, 
+		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt, bool reverseZ);
 	~TextureManager();
 
 	bool init(void);
@@ -106,6 +106,7 @@ private:
 	ITextureFmt* pCILoader_;
 	TextureLoadersArr textureLoaders_;
 
+	float clearDepthVal_;
 private:
 	Texture* pTexDefault_;
 	Texture* pTexDefaultBump_;

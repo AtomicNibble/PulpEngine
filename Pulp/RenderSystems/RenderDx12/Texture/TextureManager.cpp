@@ -20,7 +20,7 @@ X_NAMESPACE_BEGIN(texture)
 
 
 	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan,
-		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt) :
+		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt, bool reverseZ) :
 		contextMan_(contextMan),
 		pDevice_(pDevice),
 		descriptorAlloc_(descriptorAlloc),
@@ -28,11 +28,13 @@ X_NAMESPACE_BEGIN(texture)
 		arena_(arena),
 		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
 		pCILoader_(nullptr),
+		clearDepthVal_(reverseZ ? 0.f : 1.f),
 		pTexDefault_(nullptr),
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
 	{
 		X_ENSURE_LE(sizeof(TextureResource), 128, "Texture with ref count should be 128 bytes or less");
+
 	}
 
 	TextureManager::~TextureManager()
@@ -261,7 +263,7 @@ X_NAMESPACE_BEGIN(texture)
 			// okay now we create the buffer resource.
 			if (type == render::PixelBufferType::DEPTH)
 			{
-				render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(*pTexRes, 1.f, 0);
+				render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(*pTexRes, clearDepthVal_, 0);
 				pDethBuf->create(pDevice_, descriptorAlloc_, dim.x, dim.y, depthFmt_);
 				pTexRes->setPixelBuffer(type, pDethBuf);
 			}
