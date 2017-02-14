@@ -747,7 +747,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 		return false;
 	}
 
-	const bool reverseZ = true;
+	const bool reverseZ = render::DEPTH_REVERSE_Z;
 
 	if (initParams.bTesting)
 	{
