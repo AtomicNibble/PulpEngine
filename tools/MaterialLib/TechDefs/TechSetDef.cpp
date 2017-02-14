@@ -540,8 +540,19 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 {
 	MaterialPolygonOffset::Enum polyOffset;
 
+	// defaults.
 	state.topo = render::TopoType::TRIANGLELIST;
 	state.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
+	state.stateFlags.Set(render::StateFlag::DEPTHWRITE);
+	
+	if (render::DEPTH_REVERSE_Z)
+	{
+		state.depthFunc = render::DepthFunc::GEQUAL;
+	}
+	else
+	{
+		state.depthFunc = render::DepthFunc::LEQUAL;
+	}
 
 	if (!lex.ExpectTokenString("{")) {
 		return false;
