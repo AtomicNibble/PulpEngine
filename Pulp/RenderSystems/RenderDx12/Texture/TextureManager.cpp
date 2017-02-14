@@ -27,6 +27,7 @@ X_NAMESPACE_BEGIN(texture)
 		depthFmt_(depthFmt),
 		arena_(arena),
 		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
+		pCILoader_(nullptr),
 		pTexDefault_(nullptr),
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
