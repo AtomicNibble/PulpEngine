@@ -648,6 +648,9 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 				if (depthWrite) {
 					state.stateFlags.Set(render::StateFlag::DEPTHWRITE);
 				}
+				else {
+					state.stateFlags.Remove(render::StateFlag::DEPTHWRITE);
+				}
 				break;
 			}
 			case "wireframe"_fnv1a:
