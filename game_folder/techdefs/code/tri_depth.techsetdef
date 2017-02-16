@@ -1,0 +1,22 @@
+#include <states>
+
+
+
+Technique( "unlit" )
+{
+	state = State() : "blend + nocull"
+	{
+		primitiveType = "tristrip"
+	}
+
+	source = "Prim.hlsl"
+
+	vs = VertexShader()
+	{
+		entry = "PrimVS"
+	}
+	ps = PixelShader()
+	{
+		entry = "PrimPS"
+	}
+}
