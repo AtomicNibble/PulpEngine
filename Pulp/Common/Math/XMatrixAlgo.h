@@ -385,10 +385,12 @@ X_INLINE void MatrixLookAtRH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At,
 	pMat->m21 = zaxis.y;
 	pMat->m22 = zaxis.z;
 
+	// eye is bottom row.
 	pMat->m03 = -xaxis.dot(Eye);
 	pMat->m13 = -yaxis.dot(Eye);
 	pMat->m23 = -zaxis.dot(Eye);
 
+	// last colum.
 	pMat->m30 = 0;
 	pMat->m31 = 0;
 	pMat->m32 = 0;
