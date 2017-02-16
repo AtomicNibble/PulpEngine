@@ -174,7 +174,8 @@ public:
 	size_t maxVertsPerPrim(void) const X_FINAL;
 	Mode getMode(void) const X_FINAL;
 	void reset(void) X_FINAL;
-	
+	void setDepthTest(bool enabled) X_FINAL;
+
 	bool isEmpty(void) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	const ObjectTypesParamArr& getObjectArrayBuffers(void) const;
@@ -196,6 +197,7 @@ private:
 	PushBufferArr pushBufferArr_;
 	VertexPagesArr vertexPages_;
 
+	int32_t depthPrim_;
 	int32_t currentPage_;
 	Mode mode_;
 

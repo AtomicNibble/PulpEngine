@@ -506,6 +506,7 @@ void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
 PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, core::MemoryArenaBase* arena) :
 	pushBufferArr_(arena),
 	vertexPages_(arena, MAX_PAGES, arena),
+	depthPrim_(0),
 	currentPage_(-1),
 	mode_(mode),
 	objectArrays_{ arena, arena, arena } ,
@@ -599,6 +600,11 @@ void PrimativeContext::reset(void)
 	for (uint32_t i = 0; i < ObjectType::ENUM_COUNT; i++) {
 		objectArrays_[i].clear();
 	}
+}
+
+void PrimativeContext::setDepthTest(bool enabled)
+{
+	depthPrim_ = enabled ? 1 : 0;
 }
 
 bool PrimativeContext::isEmpty(void) const
@@ -725,7 +731,9 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
-	return addPrimative(numVertices, primType, sharedRes_.getMaterial(primType));
+	auto* pMat = depthPrim_ ? sharedRes_.getMaterialDepthTest(primType) : sharedRes_.getMaterial(primType);
+
+	return addPrimative(numVertices, primType, pMat);
 }
 
 PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type)
