@@ -445,7 +445,7 @@ X_INLINE void D3DXMatrixPerspectiveRH(Matrix44f* pMat, float32_t w, float32_t h,
 X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t aspect, 
 	float32_t zn, float32_t zf )
 {
-	float32_t yScale = 1.0f / math<float32_t>::tan(fovY / 2.0f);
+	float32_t yScale = 1.0f / math<float32_t>::tan(fovY * 0.5f);
 	float32_t xScale = yScale / aspect;
 
 
