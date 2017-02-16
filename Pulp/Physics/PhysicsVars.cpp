@@ -216,6 +216,12 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 
 			// maybe I should actuall always update 'phys_draw_debug_scale' to 1 here.
 			// since you are toggling drawing :/
+			// i think if it's zero set to 1, that way we don't override any custom scale, if set.
+			if (scale == 0.f) {
+				scale = 1.0f;
+			}
+
+
 			pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, scale);
 		}
 	}
