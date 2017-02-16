@@ -754,6 +754,7 @@ struct IScene
 
 	// you must add a region before adding actors that reside in the region.
 	// best to just make all regions for level on load before adding any actors to scene.
+	// regions can overlap but none overlapping is best for performance.
 	virtual RegionHandle addRegion(const AABB& bounds) X_ABSTRACT;
 	// removes the region, anything that stil resides in this regions bounds and another region don't overlap
 	// will be reported as out of bounds.
