@@ -540,20 +540,6 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 {
 	MaterialPolygonOffset::Enum polyOffset;
 
-	// defaults.
-	state.topo = render::TopoType::TRIANGLELIST;
-	state.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
-	state.stateFlags.Set(render::StateFlag::DEPTHWRITE);
-	
-	if (render::DEPTH_REVERSE_Z)
-	{
-		state.depthFunc = render::DepthFunc::GEQUAL;
-	}
-	else
-	{
-		state.depthFunc = render::DepthFunc::LEQUAL;
-	}
-
 	if (!lex.ExpectTokenString("{")) {
 		return false;
 	}
@@ -2097,7 +2083,18 @@ StencilState& TechSetDef::addStencilState(const core::string& name, const core::
 
 render::StateDesc& TechSetDef::addState(const core::string& name, const core::string& parentName)
 {
-	return addHelper(states_, name, parentName, "state");
+	auto& state =  addHelper(states_, name, parentName, "state");
+
+	if (parentName.isEmpty())
+	{
+		// defaults.
+		state.topo = render::TopoType::TRIANGLELIST;
+		state.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
+		state.stateFlags.Set(render::StateFlag::NO_DEPTH_TEST);
+		state.depthFunc = render::DepthFunc::ALWAYS;
+	}
+
+	return state;
 }
 
 Shader& TechSetDef::addShader(const core::string& name, const core::string& parentName, render::shader::ShaderType::Enum type)
