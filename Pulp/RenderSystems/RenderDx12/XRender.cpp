@@ -9,6 +9,7 @@
 
 #include "Allocators\LinearAllocator.h"
 #include "Buffers\BufferManager.h"
+#include "Buffers\DepthBuffer.h"
 #include "CommandContex.h"
 #include "PipelineState.h"
 
@@ -563,7 +564,43 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 		context.transitionResource(tex.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
 	}
 
-	context.setRenderTargets(numRtvs, RTVs);
+	if (cmdBucket.getDepthStencil())
+	{
+		render::IPixelBuffer* pDethStencil = static_cast<render::IPixelBuffer*>(cmdBucket.getDepthStencil());
+		render::DepthBindFlags bindFlags = cmdBucket.getDepthBindFlags();
+		if (pDethStencil->getBufferType() != PixelBufferType::DEPTH)
+		{
+			X_ERROR("Render", "Pixel buffer of type: \"%s\" can't be set as depthStencil", 
+				PixelBufferType::ToString(pDethStencil->getBufferType()));
+			return;
+		}
+
+		texture::Texture& tex = *static_cast<texture::Texture*>(pDethStencil);
+		DepthBuffer& depthBuf = tex.getDepthBuf();
+
+		if (bindFlags.IsSet(DepthBindFlag::WRITE))
+		{
+			context.transitionResource(depthBuf.getGpuResource(), D3D12_RESOURCE_STATE_DEPTH_WRITE, true);
+		}
+		else
+		{
+			context.transitionResource(depthBuf.getGpuResource(), D3D12_RESOURCE_STATE_DEPTH_READ, true);
+		}
+
+		if (bindFlags.IsSet(DepthBindFlag::CLEAR))
+		{
+			context.clearDepth(depthBuf);
+		}
+		
+		D3D12_CPU_DESCRIPTOR_HANDLE dsv = bindFlags.IsSet(DepthBindFlag::WRITE) ? depthBuf.getDSV() : depthBuf.getDSV_ReadOnly();
+
+		context.setRenderTargets(numRtvs, RTVs, dsv);
+	}
+	else
+	{
+		context.setRenderTargets(numRtvs, RTVs);
+	}
+	
 	context.setViewportAndScissor(viewport);
 
 	State curState;
