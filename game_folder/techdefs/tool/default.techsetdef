@@ -31,7 +31,7 @@ Technique( "depth prepass" )
 Technique( "lit" )
 {
     state = "forward opaque"
-    source = "techsetdef_prepass.hlsl"
+    source = "techsetdef_unlit.hlsl"
 
     vs = VertexShader()
     {
@@ -44,12 +44,14 @@ Technique( "lit" )
 Technique( "unlit" )
 {
     state = "replace + depth"
-    source = "techsetdef_prepass.hlsl"
+    source = "techsetdef_unlit.hlsl"
 
     vs = VertexShader()
     {
     }
     ps = PixelShader()
     {
+
+    fontCache = CodeTexture( "codeTexture0" )
     }
 }
