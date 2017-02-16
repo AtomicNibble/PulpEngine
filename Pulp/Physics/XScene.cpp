@@ -323,13 +323,13 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		physx::PxCapsuleControllerDesc pxDesc;
 		copycontrollerDesc(pxDesc, desc);
 
-		const CapsuleControllerDesc& boxDesc = static_cast<const CapsuleControllerDesc&>(desc);
-		pxDesc.radius = boxDesc.radius;
-		pxDesc.height = boxDesc.height;
-		if (boxDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
+		const CapsuleControllerDesc& capsulDesc = static_cast<const CapsuleControllerDesc&>(desc);
+		pxDesc.radius = capsulDesc.radius;
+		pxDesc.height = capsulDesc.height;
+		if (capsulDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
 			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eEASY;
 		}
-		else if (boxDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Constrained) {
+		else if (capsulDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Constrained) {
 			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eCONSTRAINED;
 		}
 		else {
