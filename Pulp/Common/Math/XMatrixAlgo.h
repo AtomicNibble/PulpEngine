@@ -443,11 +443,28 @@ X_INLINE void D3DXMatrixPerspectiveRH(Matrix44f* pMat, float32_t w, float32_t h,
 
 
 X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t aspect, 
-	float32_t zn, float32_t zf )
+	float32_t zn, float32_t zf, bool reverseZ)
 {
 	float32_t yScale = 1.0f / math<float32_t>::tan(fovY * 0.5f);
 	float32_t xScale = yScale / aspect;
 
+	float32_t q1, q2;
+	float32_t depth;
+
+	if (reverseZ)
+	{
+		depth = (zf - zn);
+
+		q1 = zn / depth;
+		q2 = zf * q1;
+	}
+	else
+	{
+		depth = (zn - zf);
+
+		q1 = zf / depth;
+		q2 = zn * q1;
+	}
 
 	pMat->m00 = xScale;
 	pMat->m10 = 0;
@@ -461,12 +478,12 @@ X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t 
 
 	pMat->m02 = 0;
 	pMat->m12 = 0;
-	pMat->m22 = zf / (zn - zf);
+	pMat->m22 = q1;
 	pMat->m32 = -1;
 
 	pMat->m03 = 0;
 	pMat->m13 = 0;
-	pMat->m23 = zn*zf / (zn - zf);
+	pMat->m23 = q2;
 	pMat->m33 = 0;
 }
 
