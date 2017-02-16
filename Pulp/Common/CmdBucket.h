@@ -94,7 +94,7 @@ private:
 
 
 X_DECLARE_FLAGS8(DepthBindFlag)(
-	READ,	// can perform depth test but not write.
+	CLEAR,	// clears on bind.
 	WRITE	// can perform depth test and write.
 );
 
