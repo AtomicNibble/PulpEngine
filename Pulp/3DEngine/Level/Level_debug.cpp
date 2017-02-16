@@ -70,6 +70,11 @@ void Level::DebugDraw_Portals(void) const
 				continue;
 			}
 
+			if (s_var_drawPortals_ > 1)
+			{
+				pPrimContex_->setDepthTest(1);
+			}
+
 			Area::AreaPortalArr::ConstIterator apIt = areaIt->portals.begin();
 			for (; apIt != areaIt->portals.end(); ++apIt)
 			{
@@ -85,6 +90,11 @@ void Level::DebugDraw_Portals(void) const
 					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
 						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
 				}
+			}
+
+			if (s_var_drawPortals_ > 1)
+			{
+				pPrimContex_->setDepthTest(0);
 			}
 		}
 	}
