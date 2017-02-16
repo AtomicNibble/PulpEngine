@@ -204,9 +204,9 @@ bool Level::registerVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
 		"Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
 
-	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, 
+	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 2, 
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
+		"Draws the inter area portals. 0=off 1=solid 2=solid_dt");
 
 	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS,
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Draws the selected area index. -1 = disable");
