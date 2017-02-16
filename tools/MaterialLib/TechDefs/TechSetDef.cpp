@@ -669,6 +669,8 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 				if (!parseDepthTest(lex, state.depthFunc)) {
 					return false;
 				}
+
+				state.stateFlags.Remove(render::StateFlag::NO_DEPTH_TEST);
 				break;
 			case "polygonOffset"_fnv1a:
 				if (!parsePolyOffset(lex, polyOffset)) {
