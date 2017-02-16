@@ -158,7 +158,7 @@ State( "invmultiply" )
 State( "replace + depth" ) : "replace"
 {
 	depthWrite     = true
-	depthTest      = less_equal
+	depthTest      = greater_equal
 }
 
 State( "replace + depth write + nocull" ) : "replace"
@@ -186,7 +186,7 @@ State( "replace + depth + nocull + clear stencil" ) : "replace + depth + nocull"
 
 State( "disable + depth" ) : "disable"
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = true
 }
 
@@ -203,7 +203,7 @@ State( "fallback + depth" ) : "disable + depth"
 State( "disable + depthTestOnly" ) : "disable"
 {
 	blendState = "disable"
-	depthTest  = less_equal
+	depthTest  = greater_equal
 }
 
 State( "nocolor + depthTestOnly" ) : "disable + depthTestOnly"
@@ -267,13 +267,13 @@ State( "disable + depth + nocull" ) : "disable + depth"
 
 State( "blend + depth" ) : "blend"
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = false
 }
 
 State( "premul + depth" ) : "premul"
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = false
 }
 
@@ -294,7 +294,7 @@ State( "premul + depth + nocull" ) : "premul + depth"
 
 State( "premul color + depth" ) : "premul color"
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = false
 }
 
@@ -305,7 +305,7 @@ State( "premul color + depth + weapon impact" ) : "premul color + depth"
 
 State( "add + depth" ) : "add"
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = false
 }
 
@@ -316,7 +316,7 @@ State( "add + depth + nocull" ) : "add + depth"
 
 State( "multiply + depth" ) : "multiply"
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = false
 }
 
@@ -549,7 +549,7 @@ BlendState( "gbuffer gloss blend" )
 
 State( "gbuffer decal" )
 {
-	depthTest      = less_equal
+	depthTest      = greater_equal
 	depthWrite     = false
 	polygonOffset  = "static_decal"
 
@@ -621,7 +621,7 @@ State( "sky" ) : "disable + depthTestOnly"
 State( "forward opaque" ) : "disable"
 {
 	depthWrite     = false
-	depthTest      = less_equal
+	depthTest      = greater_equal
 }
 
 State( "forward opaque sss" ) : "forward opaque"
@@ -633,7 +633,7 @@ State( "forward opaque sss" ) : "forward opaque"
 State( "forward opaque depth write" ) : "replace"
 {
 	depthWrite     = true
-	depthTest      = less_equal
+	depthTest      = greater_equal
 }
 
 State( "forward opaque + nocull" ) : "forward opaque"
