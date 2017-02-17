@@ -95,6 +95,7 @@ namespace
 		pxDesc.density = desc.density;
 		pxDesc.scaleCoeff = desc.scaleCoeff;
 		pxDesc.volumeGrowth = desc.volumeGrowth;
+		pxDesc.material = reinterpret_cast<physx::PxMaterial*>(desc.material);
 		if (desc.nonWalkableMode == ControllerDesc::NonWalkableMode::PreventClimbing) {
 			pxDesc.nonWalkableMode = physx::PxControllerNonWalkableMode::ePREVENT_CLIMBING;
 		}
@@ -304,6 +305,11 @@ void XScene::removeAggregate(AggregateHandle handle)
 
 ICharacterController* XScene::createCharacterController(const ControllerDesc& desc)
 {
+	if (desc.material == INVALID_HANLDE) {
+		X_ERROR("Phys", "Controller missing material");
+		return nullptr;
+	}
+
 	if (desc.shape == ControllerDesc::ShapeType::Box)
 	{
 		physx::PxBoxControllerDesc pxDesc;

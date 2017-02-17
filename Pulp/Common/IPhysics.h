@@ -283,6 +283,7 @@ protected:
 		density = 10.0f;
 		scaleCoeff = 0.8f;
 		volumeGrowth = 1.5f;
+		material = INVALID_HANLDE;
 		nonWalkableMode = NonWalkableMode::PreventClimbing;
 	}
 
@@ -298,6 +299,7 @@ public:
 	float32_t density;
 	float32_t scaleCoeff;
 	float32_t volumeGrowth;
+	MaterialHandle material;
 	NonWalkableMode nonWalkableMode;
 };
 
