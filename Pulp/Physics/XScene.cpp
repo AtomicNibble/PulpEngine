@@ -318,7 +318,15 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 			X_ERROR("Phys", "Box controller desc is invalid");
 			return nullptr;
 		}
-		auto* pController = pControllerManager_->createController(pxDesc);
+
+		physx::PxController* pController = nullptr;
+		{
+			PHYS_SCENE_WRITE_LOCK(pScene_);
+
+			pController = pControllerManager_->createController(pxDesc);
+		}
+
+		X_ASSERT_NOT_NULL(pController);
 
 		return X_NEW(XBoxCharController, arena_, "BoxCharController")(static_cast<physx::PxBoxController*>(pController));
 	}
@@ -344,7 +352,15 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 			X_ERROR("Phys", "Capsule controller desc is invalid");
  			return nullptr;
 		}
-		auto* pController = pControllerManager_->createController(pxDesc);
+
+		physx::PxController* pController = nullptr;
+		{
+			PHYS_SCENE_WRITE_LOCK(pScene_);
+
+			pController = pControllerManager_->createController(pxDesc);
+		}
+
+		X_ASSERT_NOT_NULL(pController);
 
 		return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
 	}
