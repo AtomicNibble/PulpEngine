@@ -21,6 +21,10 @@ public:
 	void drawDebug(DebugRender* pDebugRender) const;
 	void setVisualizationCullingBox(const AABB& box);
 
+	// locking
+	LockHandle lock(bool write = false) X_FINAL;
+	void UnLock(LockHandle lock) X_FINAL;
+
 	// some runtime tweaks.
 	void setGravity(const Vec3f& gravity) X_FINAL;
 	void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_FINAL;

@@ -38,6 +38,8 @@ typedef Handle AggregateHandle;
 typedef Handle TriMeshHandle;
 typedef Handle ConvexHandle;
 typedef Handle HieghtFieldHandle;
+typedef Handle LockHandle;
+
 
 static const Handle INVALID_HANLDE = 0;
 
@@ -763,6 +765,10 @@ struct IScene
 	virtual void setGravity(const Vec3f& gravity) X_ABSTRACT;
 	virtual void setBounceThresholdVelocity(float32_t bounceThresholdVelocity) X_ABSTRACT;
 	// ~
+
+	// locking
+	virtual LockHandle lock(bool write = false) X_ABSTRACT;
+	virtual void UnLock(LockHandle lock) X_ABSTRACT;
 
 	// you must add a region before adding actors that reside in the region.
 	// best to just make all regions for level on load before adding any actors to scene.

@@ -181,6 +181,46 @@ void XScene::setVisualizationCullingBox(const AABB& box)
 
 // ------------------------------------------
 
+LockHandle XScene::lock(bool write)
+{
+#if PHYSX_SCENE_REQUIRES_LOCK
+
+	if (write)
+	{
+		pScene_->lockWrite(__FILE__, __LINE__);
+	}
+	else
+	{
+		pScene_->lockRead(__FILE__, __LINE__);
+	}
+
+#else
+	X_UNUSED(write);
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
+
+	return static_cast<LockHandle>(write);
+}
+
+void XScene::UnLock(LockHandle lock)
+{
+#if PHYSX_SCENE_REQUIRES_LOCK
+	const bool writeLock = lock != 0;
+
+	if (writeLock)
+	{
+		pScene_->unlockWrite();
+	}
+	else
+	{
+		pScene_->unlockRead();
+	}
+#else
+	X_UNUSED(lock);
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
+}
+
+// ------------------------------------------
+
 void XScene::setGravity(const Vec3f& gravity)
 {
 	vars_.SetGravityVecValue(gravity);
