@@ -151,7 +151,14 @@ bool XScene::createPxScene(const physx::PxSceneDesc& pxDesc)
 		return false;
 	}
 
-	pControllerManager_ = PxCreateControllerManager(*pScene_);
+#if PHYSX_SCENE_REQUIRES_LOCK
+	const bool lock = false; // this don't result in scene lock so we get api errors :/
+#else
+	const bool lock = false;
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
+
+
+	pControllerManager_ = PxCreateControllerManager(*pScene_, lock);
 	if (!pControllerManager_) {
 		X_ERROR("PhysScene", "Failed to create controller manager");
 		return false;
