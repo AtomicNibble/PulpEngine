@@ -201,7 +201,7 @@ LockHandle XScene::lock(bool write)
 	return static_cast<LockHandle>(write);
 }
 
-void XScene::UnLock(LockHandle lock)
+void XScene::unLock(LockHandle lock)
 {
 #if PHYSX_SCENE_REQUIRES_LOCK
 	const bool writeLock = lock != 0;

@@ -23,7 +23,7 @@ public:
 
 	// locking
 	LockHandle lock(bool write = false) X_FINAL;
-	void UnLock(LockHandle lock) X_FINAL;
+	void unLock(LockHandle lock) X_FINAL;
 
 	// some runtime tweaks.
 	void setGravity(const Vec3f& gravity) X_FINAL;

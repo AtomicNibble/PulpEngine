@@ -768,7 +768,7 @@ struct IScene
 
 	// locking
 	virtual LockHandle lock(bool write = false) X_ABSTRACT;
-	virtual void UnLock(LockHandle lock) X_ABSTRACT;
+	virtual void unLock(LockHandle lock) X_ABSTRACT;
 
 	// you must add a region before adding actors that reside in the region.
 	// best to just make all regions for level on load before adding any actors to scene.
