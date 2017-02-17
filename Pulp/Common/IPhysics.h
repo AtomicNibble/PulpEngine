@@ -813,6 +813,21 @@ struct IScene
 
 };
 
+struct ScopedLock
+{
+	ScopedLock(IScene* pScene, bool write = false) : pScene_(pScene) {
+		lock_ = pScene->lock(write);
+	}
+
+	~ScopedLock() {
+		pScene_->unLock(lock_);
+	}
+
+private:
+	LockHandle lock_;
+	IScene* pScene_;
+};
+
 // ------------------------------------------------
 
 struct IPhysics
