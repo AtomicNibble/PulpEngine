@@ -125,7 +125,13 @@ XScene::~XScene()
 		pScene_->fetchResults(true);
 	}
 
-	core::SafeRelease(pControllerManager_);
+	// we need a read, maybe write lock here.
+	if(pScene_)
+	{
+		PHYS_SCENE_WRITE_LOCK(pScene_);
+		core::SafeRelease(pControllerManager_);
+	}
+
 	core::SafeRelease(pScene_);
 }
 
