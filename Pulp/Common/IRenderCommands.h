@@ -10,6 +10,8 @@ namespace Commands
 	X_DECLARE_ENUM(Command)(
 		DRAW,
 		DRAW_INDEXED,
+		DRAW_INSTANCED,
+		DRAW_INSTANCED_INDEXED, 
 		COPY_CONST_BUF_DATA,
 		COPY_INDEXES_BUF_DATA,
 		COPY_VERTEX_BUF_DATA,
@@ -227,8 +229,39 @@ namespace Commands
 		VertexBufferHandleArr vertexBuffers;
 		IndexBufferHandle indexBuffer;
 		ResourceStateBase resourceState;
-
 	};
+
+	struct DrawInstanced
+	{
+		static const Command::Enum CMD = Command::DRAW_INSTANCED;
+
+		uint32_t vertexCountPerInstance;
+		uint32_t instanceCount;
+		uint32_t startVertexLocation;
+		uint32_t startInstanceLocation;
+
+		StateHandle stateHandle;
+		VertexBufferHandleArr vertexBuffers;
+		ResourceStateBase resourceState;
+	};
+
+	struct DrawInstancedIndexed
+	{
+		static const Command::Enum CMD = Command::DRAW_INSTANCED_INDEXED;
+
+		uint32_t indexCountPerInstance;
+		uint32_t instanceCount;
+		uint32_t startIndexLocation;
+		uint32_t baseVertexLocation;
+		uint32_t startInstanceLocation;
+
+		StateHandle stateHandle;
+		VertexBufferHandleArr vertexBuffers;
+		IndexBufferHandle indexBuffer;
+		ResourceStateBase resourceState;
+	};
+
+
 
 	struct CopyConstantBufferData
 	{
