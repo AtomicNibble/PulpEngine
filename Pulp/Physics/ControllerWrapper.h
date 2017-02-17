@@ -30,6 +30,9 @@ public:
 			 
 	X_INLINE void resize(float32_t height) X_FINAL;
 
+	X_INLINE void getState(ControllerState& state) X_FINAL;
+	X_INLINE void getStats(ControllerStats& stats) X_FINAL;
+
 protected:
 	X_INLINE const ControllerType* getController(void) const;
 	X_INLINE ControllerType* getController(void);

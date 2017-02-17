@@ -92,6 +92,33 @@ X_INLINE void XCharController<Base, ControllerType>::resize(float32_t height)
 
 
 template<class Base, typename ControllerType>
+X_INLINE void XCharController<Base, ControllerType>::getState(ControllerState& stats)
+{
+	physx::PxControllerState pxState;
+	getController()->getState(pxState);
+
+	stats.deltaXP = Vec3FromPx3(pxState.deltaXP);
+	stats.touchedActor = reinterpret_cast<ActorHandle>(pxState.touchedActor);
+	stats.collisionFlags = pxState.collisionFlags;
+	stats.standOnAnotherCCT = pxState.standOnAnotherCCT;
+	stats.standOnObstacle = pxState.standOnObstacle;
+	stats.isMovingUp = pxState.isMovingUp;
+}
+
+template<class Base, typename ControllerType>
+X_INLINE void XCharController<Base, ControllerType>::getStats(ControllerStats& states)
+{
+	physx::PxControllerStats pxStats;
+	getController()->getStats(pxStats);
+
+	states.nbIterations = pxStats.nbIterations;
+	states.nbFullUpdates = pxStats.nbFullUpdates;
+	states.nbPartialUpdates = pxStats.nbPartialUpdates;
+	states.nbTessellation = pxStats.nbTessellation;
+}
+
+
+template<class Base, typename ControllerType>
 X_INLINE const ControllerType* XCharController<Base, ControllerType>::getController(void) const
 {
 	return pController_;

@@ -348,6 +348,25 @@ X_DECLARE_FLAGS8(CharacterColFlag)(
 
 typedef Flags8<CharacterColFlag> CharacterColFlags;
 
+struct ControllerState
+{
+	Vec3f				deltaXP;			//!< delta position vector for the object the CCT is standing/riding on. Not always match the CCT delta when variable timesteps are used.
+	ActorHandle			touchedActor;		//!< Actor owning 'touchedShape'
+	CharacterColFlags	collisionFlags;		//!< Last known collision flags 
+	bool				standOnAnotherCCT;	//!< Are we standing on another CCT?
+	bool				standOnObstacle;	//!< Are we standing on a user-defined obstacle?
+	bool				isMovingUp;			//!< is CCT moving up or not? (i.e. explicit jumping)
+};
+
+struct ControllerStats
+{
+	uint16_t nbIterations;
+	uint16_t nbFullUpdates;
+	uint16_t nbPartialUpdates;
+	uint16_t nbTessellation;
+};
+
+
 struct ICharacterController
 {
 	typedef CharacterColFlag ColFlag;
@@ -369,6 +388,10 @@ struct ICharacterController
 	virtual	float32_t getStepOffset(void) const X_ABSTRACT;
 
 	virtual	void resize(float32_t height) X_ABSTRACT;
+
+	virtual void getState(ControllerState& state) X_ABSTRACT;
+	virtual void getStats(ControllerStats& stats) X_ABSTRACT;
+
 };
 
 struct IBoxCharacterController : public ICharacterController
