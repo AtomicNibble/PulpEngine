@@ -340,15 +340,18 @@ struct CapsuleControllerDesc : public ControllerDesc
 	ClimbingMode climbingMode;
 };
 
+X_DECLARE_FLAGS8(CharacterColFlag)(
+	SIDES,
+	UP,
+	DOWN
+);
+
+typedef Flags8<CharacterColFlag> CharacterColFlags;
+
 struct ICharacterController
 {
-	X_DECLARE_FLAGS8(ColFlag)(
-		SIDES,
-		UP,
-		DOWN
-	);
-
-	typedef Flags8<ColFlag> ColFlags;
+	typedef CharacterColFlag ColFlag;
+	typedef CharacterColFlags ColFlags;
 
 	virtual ~ICharacterController() {}
 
