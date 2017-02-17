@@ -826,6 +826,7 @@ struct IPhysics
 
 	// we need to make a api for creating the physc objects for use in the 3dengine.
 	virtual MaterialHandle createMaterial(MaterialDesc& desc) X_ABSTRACT;
+	virtual MaterialHandle getDefaultMaterial(void) X_ABSTRACT;
 
 	// An aggregate is a collection of actors.
 	// which in turn allows optimized spatial data operations.

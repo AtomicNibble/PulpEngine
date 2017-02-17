@@ -594,6 +594,10 @@ MaterialHandle XPhysics::createMaterial(MaterialDesc& desc)
 	return reinterpret_cast<MaterialHandle>(pMaterial);
 }
 
+MaterialHandle XPhysics::getDefaultMaterial(void)
+{
+	return reinterpret_cast<MaterialHandle>(pMaterial_);
+}
 
 // ------------------------------------------
 

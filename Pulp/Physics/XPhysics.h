@@ -82,6 +82,7 @@ public:
 
 	// materials
 	MaterialHandle createMaterial(MaterialDesc& desc) X_FINAL;
+	MaterialHandle getDefaultMaterial(void) X_FINAL;
 
 	// aggregates's
 	AggregateHandle createAggregate(uint32_t maxActors, bool selfCollisions) X_FINAL;
