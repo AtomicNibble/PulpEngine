@@ -13,9 +13,14 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(core)
 
+X_DECLARE_ENUM(Timer)(
+	GAME,
+	UI
+);
+
 struct ITimer
 {
-	X_DECLARE_ENUM(Timer)(GAME, UI);
+	typedef Timer Timer;
 
 	virtual ~ITimer() {};
 
