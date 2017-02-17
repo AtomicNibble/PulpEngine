@@ -656,6 +656,34 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					context.drawIndexed(pDraw->indexCount, pDraw->startIndex, pDraw->baseVertex);
 					break;
 				}
+				case Commands::Command::DRAW_INSTANCED:
+				{
+					const Commands::DrawInstanced* pDraw = reinterpret_cast<const Commands::DrawInstanced*>(pCmd);
+
+					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
+
+					context.drawInstanced(pDraw->vertexCountPerInstance, pDraw->instanceCount, 
+						pDraw->startVertexLocation, pDraw->startInstanceLocation);
+					break;
+				}
+				case Commands::Command::DRAW_INSTANCED_INDEXED:
+				{
+					const Commands::DrawInstancedIndexed* pDraw = reinterpret_cast<const Commands::DrawInstancedIndexed*>(pCmd);
+
+					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
+
+					if (curState.indexBuffer != pDraw->indexBuffer) {
+						curState.indexBuffer = pDraw->indexBuffer;
+						const auto pIBuf = pBuffMan_->IBFromHandle(pDraw->indexBuffer);
+						context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
+					}
+
+					context.drawIndexedInstanced(pDraw->indexCountPerInstance, pDraw->instanceCount,
+						pDraw->startIndexLocation, pDraw->baseVertexLocation, pDraw->startInstanceLocation);
+					break;
+				}
 				case Commands::Command::COPY_CONST_BUF_DATA:
 				{
 					const Commands::CopyConstantBufferData& updateCB = *reinterpret_cast<const Commands::CopyConstantBufferData*>(pCmd);
