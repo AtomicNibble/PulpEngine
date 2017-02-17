@@ -314,6 +314,10 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		pxDesc.halfSideExtent = boxDesc.halfSideExtent;
 		pxDesc.halfForwardExtent = boxDesc.halfForwardExtent;
 
+		if (!pxDesc.isValid()) {
+			X_ERROR("Phys", "Box controller desc is invalid");
+			return nullptr;
+		}
 		auto* pController = pControllerManager_->createController(pxDesc);
 
 		return X_NEW(XBoxCharController, arena_, "BoxCharController")(static_cast<physx::PxBoxController*>(pController));
@@ -336,6 +340,10 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 			X_ASSERT_UNREACHABLE();
 		}
 
+		if (!pxDesc.isValid()) {
+			X_ERROR("Phys", "Capsule controller desc is invalid");
+ 			return nullptr;
+		}
 		auto* pController = pControllerManager_->createController(pxDesc);
 
 		return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
