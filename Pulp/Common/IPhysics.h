@@ -340,9 +340,19 @@ struct CapsuleControllerDesc : public ControllerDesc
 
 struct ICharacterController
 {
+	X_DECLARE_FLAGS8(ColFlag)(
+		SIDES,
+		UP,
+		DOWN
+	);
+
+	typedef Flags8<ColFlag> ColFlags;
+
 	virtual ~ICharacterController() {}
 
 	virtual ControllerDesc::ShapeType getType(void) const X_ABSTRACT;
+
+	virtual ColFlags move(const Vec3f& disp, float32_t minDist, float32_t elapsedTime) X_ABSTRACT;
 
 	virtual	bool setPosition(const Vec3d& position) X_ABSTRACT;
 	virtual Vec3d getPosition(void) const X_ABSTRACT;

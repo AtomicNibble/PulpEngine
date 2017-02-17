@@ -9,13 +9,15 @@ template<class Base, typename ControllerType>
 class XCharController : public Base
 {
 	typedef typename ControllerType ControllerType;
-
+	typedef typename ICharacterController::ColFlags ColFlags;
 protected:
 	X_INLINE XCharController(ControllerType* pController);
 public:
 	X_INLINE ~XCharController() X_OVERRIDE;
 
 	X_INLINE ControllerDesc::ShapeType getType(void) const X_FINAL;
+
+	X_INLINE virtual ColFlags move(const Vec3f& disp, float32_t minDist, float32_t elapsedTime) X_FINAL;
 
 	X_INLINE bool setPosition(const Vec3d& position) X_FINAL;
 	X_INLINE Vec3d getPosition(void) const X_FINAL;

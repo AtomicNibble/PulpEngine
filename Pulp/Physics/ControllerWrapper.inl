@@ -30,6 +30,18 @@ X_INLINE ControllerDesc::ShapeType XCharController<Base, ControllerType>::getTyp
 	return ControllerDesc::ShapeType::Box;
 }
 
+template<class Base, typename ControllerType>
+X_INLINE ICharacterController::ColFlags XCharController<Base, ControllerType>::move(const Vec3f& disp, float32_t minDist,
+	float32_t elapsedTime)
+{
+	physx::PxControllerCollisionFlags flags = getController()->move(Px3FromVec3(disp), minDist, elapsedTime, physx::PxControllerFilters(), nullptr);
+
+	static_assert(physx::PxControllerCollisionFlag::eCOLLISION_SIDES == ColFlags::SIDES, "Flags don't match");
+	static_assert(physx::PxControllerCollisionFlag::eCOLLISION_UP == ColFlags::UP, "Flags don't match");
+	static_assert(physx::PxControllerCollisionFlag::eCOLLISION_DOWN == ColFlags::DOWN, "Flags don't match");
+	
+	return ColFlags(flags);
+}
 
 template<class Base, typename ControllerType>
 X_INLINE bool XCharController<Base, ControllerType>::setPosition(const Vec3d& position) 
