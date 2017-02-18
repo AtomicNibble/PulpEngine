@@ -187,6 +187,7 @@ public:
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	const ObjectParamLodTypeArr& getObjectArrayBuffers(void) const;
 	VertexPageHandlesArr getVertBufHandles(void) const;
+	const PrimativeContextSharedResources::Shape& getShapeResources(ObjectType::Enum shape) const;
 
 public:
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;

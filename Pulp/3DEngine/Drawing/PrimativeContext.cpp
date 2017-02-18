@@ -661,6 +661,11 @@ PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void)
 	return handles;
 }
 
+const PrimativeContextSharedResources::Shape& PrimativeContext::getShapeResources(ObjectType::Enum shape) const
+{
+	return sharedRes_.getShapeResources(shape);
+}
+
 
 void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
