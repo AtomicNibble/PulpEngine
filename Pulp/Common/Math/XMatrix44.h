@@ -31,8 +31,12 @@ public:
 	static const size_t DIM_SQ	= DIM*DIM;
 	static const size_t MEM_LEN	= sizeof(T)*DIM_SQ;
 
-	//
+	// 
 	// This class is OpenGL friendly and stores the m as how OpenGL would expect it.
+	//
+	// This data is Colum major.
+	//  so coloum 0 is x col 1 is y etc.
+	//
 	// m[i,j]:
 	// | m[0,0] m[0,1] m[0,2] m[0,3] |
 	// | m[1,0] m[1,1] m[1,2] m[1,3] |
