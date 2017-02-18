@@ -339,25 +339,56 @@ X_INLINE void MatrixPerspectivOffCenterRH(Matrix44f* pMat, float32_t left, float
 X_INLINE void MatrixOrthoOffCenterRH(Matrix44f* pMat, float32_t left, float32_t right,
 	float32_t bottom, float32_t top, float32_t zn, float32_t zf)
 {
-
+	// x col
 	pMat->m00 = 2.0f / (right - left);
+	pMat->m10 = 0;
+	pMat->m20 = 0;
+	pMat->m30 = (left + right) / (left - right);
+
+	// y col
+	pMat->m01 = 0;
+	pMat->m11 = 2.0f / (top - bottom);
+	pMat->m21 = 0;
+	pMat->m31 = (top + bottom) / (bottom - top);
+
+	// z col
+	pMat->m02 = 0;
+	pMat->m12 = 0;
+	pMat->m22 = 1.0f / (zf - zn);
+	pMat->m32 = zn / (zn - zf);
+	
+	// w col
+	pMat->m03 = 0;
+	pMat->m13 = 0;
+	pMat->m23 = 0;
+	pMat->m33 = 1.0f;
+}
+
+X_INLINE void MatrixOrthoRH(Matrix44f* pMat, float32_t width, float32_t height,
+	float32_t zn, float32_t zf)
+{
+	// x col
+	pMat->m00 = 2.0f / width;
 	pMat->m10 = 0;
 	pMat->m20 = 0;
 	pMat->m30 = 0;
 
+	// y col
 	pMat->m01 = 0;
-	pMat->m11 = 2.0f / (top - bottom);
+	pMat->m11 = 2.0f / height;
 	pMat->m21 = 0;
 	pMat->m31 = 0;
 
+	// z col
 	pMat->m02 = 0;
 	pMat->m12 = 0;
 	pMat->m22 = 1.0f / (zf - zn);
-	pMat->m32 = 0;
+	pMat->m32 = zn / (zn - zf);
 
-	pMat->m03 = (left + right) / (left - right);
-	pMat->m13 = (top + bottom) / (bottom - top);
-	pMat->m23 = zn / (zn - zf);
+	// w col
+	pMat->m03 = 0;
+	pMat->m13 = 0;
+	pMat->m23 = 0;
 	pMat->m33 = 1.0f;
 }
 
@@ -369,27 +400,29 @@ X_INLINE void MatrixLookAtRH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At,
 	Vec3f xaxis = (Up.cross(zaxis)).normalized();
 	Vec3f yaxis = zaxis.cross(xaxis);
 
+
+	// x col
 	pMat->m00 = xaxis.x;
-	pMat->m01 = xaxis.y;
-	pMat->m02 = xaxis.z;
+	pMat->m10 = xaxis.y;
+	pMat->m20 = xaxis.z;
+	pMat->m30 = -xaxis.dot(Eye);
 
-	pMat->m10 = yaxis.x;
+	// y col
+	pMat->m01 = yaxis.x;
 	pMat->m11 = yaxis.y;
-	pMat->m12 = yaxis.z;
+	pMat->m21 = yaxis.z;
+	pMat->m31 = -yaxis.dot(Eye);
 
-	pMat->m20 = zaxis.x;
-	pMat->m21 = zaxis.y;
+	// z col
+	pMat->m02 = zaxis.x;
+	pMat->m12 = zaxis.y;
 	pMat->m22 = zaxis.z;
-
-	// eye is bottom row.
-	pMat->m03 = -xaxis.dot(Eye);
-	pMat->m13 = -yaxis.dot(Eye);
-	pMat->m23 = -zaxis.dot(Eye);
+	pMat->m32 = -zaxis.dot(Eye);
 
 	// last colum.
-	pMat->m30 = 0;
-	pMat->m31 = 0;
-	pMat->m32 = 0;
+	pMat->m03 = 0;
+	pMat->m13 = 0;
+	pMat->m23 = 0;
 	pMat->m33 = 1;
 }
 
@@ -447,6 +480,15 @@ X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t 
 	float32_t q1, q2;
 	float32_t depth;
 
+	/*
+		Matrix44f reveresZ(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, -1, 1,
+			0, 0, 1, 0
+		);
+	*/
+
 	if (reverseZ)
 	{
 		depth = (zf - zn);
@@ -462,24 +504,28 @@ X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t 
 		q2 = zn * q1;
 	}
 
+	// x col
 	pMat->m00 = xScale;
 	pMat->m10 = 0;
 	pMat->m20 = 0;
 	pMat->m30 = 0;
 
+	// y col
 	pMat->m01 = 0;
 	pMat->m11 = yScale;
 	pMat->m21 = 0;
 	pMat->m31 = 0;
 
+	// z col.
 	pMat->m02 = 0;
 	pMat->m12 = 0;
 	pMat->m22 = q1;
-	pMat->m32 = -1;
+	pMat->m32 = q2;
 
+	// w col
 	pMat->m03 = 0;
 	pMat->m13 = 0;
-	pMat->m23 = q2;
+	pMat->m23 = -1;
 	pMat->m33 = 0;
 }
 
