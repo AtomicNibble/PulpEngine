@@ -50,7 +50,7 @@ X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 	};
 
 	typedef std::array<Material*, PrimitiveType::ENUM_COUNT> PrimMaterialArr;
-	typedef std::array<Shape, PrimitiveType::ENUM_COUNT> PrimShapeArr;
+	typedef std::array<Shape, ShapeType::ENUM_COUNT> PrimShapeArr;
 	
 
 public:
