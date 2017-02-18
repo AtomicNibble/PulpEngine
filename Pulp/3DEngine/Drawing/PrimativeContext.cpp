@@ -563,6 +563,7 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 		auto* pUpdateVb = bucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
 		pUpdateVb->pData = vp.verts.data();
 		pUpdateVb->size = vp.getVertBufBytes();
+		pUpdateVb->dstOffset = 0;
 		pUpdateVb->vertexBuffer = vp.vertexBufHandle;
 	}
 
