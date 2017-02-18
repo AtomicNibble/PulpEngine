@@ -27,7 +27,7 @@ public:
 		Cylinder // get fooked. AINT nobody got time for cylinders.
 	);
 
-	typedef InstancedData_MAT44_C4F ShapeParam;
+	typedef InstancedData_MAT44_C4F ShapeInstanceData;
 
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
@@ -135,7 +135,7 @@ public:
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
-	virtual ShapeParam* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_ABSTRACT;
+	virtual ShapeInstanceData* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_ABSTRACT;
 };
 
 

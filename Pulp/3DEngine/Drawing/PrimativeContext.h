@@ -19,6 +19,7 @@ X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 	static const int32_t SHAPES_NUM_LOD = IPrimativeContext::SHAPE_NUM_LOD;
 
 	typedef IPrimativeContext::PrimitiveType PrimitiveType;
+	typedef IPrimativeContext::ShapeInstanceData ShapeInstanceData;
 	typedef IPrimativeContext::ShapeType ShapeType;
 
 	typedef Vertex_P3F_T2S_C4B ShapeVertex;
@@ -142,7 +143,7 @@ public:
 	};
 
 	typedef core::Array<VertexPage> VertexPagesArr;
-	typedef core::Array<ShapeParam> ShapeParamArr;
+	typedef core::Array<ShapeInstanceData> ShapeParamArr;
 
 	// we have diffrent arrays for each lod of each shape.
 	// just makes submission more simple.
@@ -199,7 +200,7 @@ private:
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
-	ShapeParam* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_FINAL;
+	ShapeInstanceData* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_FINAL;
 
 private:
 	PushBufferArr pushBufferArr_;
