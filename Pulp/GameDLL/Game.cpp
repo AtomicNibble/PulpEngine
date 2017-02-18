@@ -99,7 +99,7 @@ bool XGame::update(core::FrameData& frame)
 
 	// orth
 	Matrix44f orthoProj;
-	MatrixOrthoOffCenterRH(&orthoProj, 0, 1680, 1050, 0, -1e10f, 1e10);
+	MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
 
 	frame.view.viewMatrixOrtho = Matrix44f::identity();
 	frame.view.projMatrixOrtho = orthoProj;
