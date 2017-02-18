@@ -135,7 +135,7 @@ public:
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
-	virtual ObjectParam* addObject(ObjectType::Enum type) X_ABSTRACT;
+	virtual ObjectParam* addObject(ObjectType::Enum type, int32_t lodIdx = 0) X_ABSTRACT;
 };
 
 

@@ -143,7 +143,11 @@ public:
 
 	typedef core::Array<VertexPage> VertexPagesArr;
 	typedef core::Array<ObjectParam> ObjectParamArr;
-	typedef std::array<ObjectParamArr, ObjectType::ENUM_COUNT> ObjectTypesParamArr; // come up with better name for this?
+
+	// we have diffrent arrays for each lod of each shape.
+	// just makes submission more simple.
+	typedef std::array<ObjectParamArr, OBJECT_NUM_LOD> OpbectTypeLodArr; // come up with better name for this?
+	typedef std::array<OpbectTypeLodArr, ObjectType::ENUM_COUNT> ObjectParamLodTypeArr; // come up with better name for this?
 
 private:
 
@@ -181,7 +185,7 @@ public:
 
 	bool isEmpty(void) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
-	const ObjectTypesParamArr& getObjectArrayBuffers(void) const;
+	const ObjectParamLodTypeArr& getObjectArrayBuffers(void) const;
 	VertexPageHandlesArr getVertBufHandles(void) const;
 
 public:
@@ -194,7 +198,7 @@ private:
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
-	ObjectParam* addObject(ObjectType::Enum type) X_FINAL;
+	ObjectParam* addObject(ObjectType::Enum type, int32_t lodIdx = 0) X_FINAL;
 
 private:
 	PushBufferArr pushBufferArr_;
@@ -204,7 +208,7 @@ private:
 	int32_t currentPage_;
 	Mode mode_;
 
-	ObjectTypesParamArr objectArrays_;
+	ObjectParamLodTypeArr objectLodArrays_;
 
 	const PrimativeContextSharedResources& sharedRes_;
 };

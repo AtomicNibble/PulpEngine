@@ -509,15 +509,22 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	depthPrim_(0),
 	currentPage_(-1),
 	mode_(mode),
-	objectArrays_{ arena, arena, arena } ,
+	objectLodArrays_{ 
+		arena, arena, arena, arena, arena,
+		arena, arena, arena, arena, arena,
+		arena, arena, arena, arena, arena,
+	},
 	sharedRes_(sharedRes)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
 
-	for (auto& objectArr : objectArrays_)
+	for (auto& lod : objectLodArrays_)
 	{
-		objectArr.setGranularity(256);
+		for (auto& objectArr : lod)
+		{
+			objectArr.setGranularity(128);
+		}
 	}
 
 	X_ASSERT(vertexPages_.isNotEmpty(), "Must have atleast one vertex page")();
@@ -597,8 +604,13 @@ void PrimativeContext::reset(void)
 	}
 
 	// if the compiler don't unroll this it should just kill itself..
-	for (uint32_t i = 0; i < ObjectType::ENUM_COUNT; i++) {
-		objectArrays_[i].clear();
+	for (uint32_t i = 0; i < ObjectType::ENUM_COUNT; i++) 
+	{
+		OpbectTypeLodArr& lod = objectLodArrays_[i];
+		for (auto& arr : lod)
+		{
+			arr.clear();
+		}
 	}
 }
 
@@ -613,10 +625,13 @@ bool PrimativeContext::isEmpty(void) const
 		return false;
 	}
 
-	for (const auto& objectArr : objectArrays_)
+	for (const auto& lod : objectLodArrays_)
 	{
-		if (objectArr.isNotEmpty()) {
-			return false;
+		for (auto& objectArr : lod)
+		{
+			if (objectArr.isNotEmpty()) {
+				return false;
+			}
 		}
 	}
 
@@ -628,9 +643,9 @@ const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void)
 	return pushBufferArr_;
 }
 
-const PrimativeContext::ObjectTypesParamArr& PrimativeContext::getObjectArrayBuffers(void) const
+const PrimativeContext::ObjectParamLodTypeArr& PrimativeContext::getObjectArrayBuffers(void) const
 {
-	return objectArrays_;
+	return objectLodArrays_;
 }
 
 PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void) const
@@ -736,9 +751,9 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 	return addPrimative(numVertices, primType, pMat);
 }
 
-PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type)
+PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type, int32_t lodIdx)
 {
-	return &objectArrays_[type].AddOne();
+	return &objectLodArrays_[type][lodIdx].AddOne();
 }
 
 X_NAMESPACE_END
