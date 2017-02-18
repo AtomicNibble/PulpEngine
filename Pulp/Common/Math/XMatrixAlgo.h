@@ -346,50 +346,6 @@ X_INLINE void MatrixLookAtRH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At,
 	pMat->m33 = 1;
 }
 
-X_INLINE void D3DXMatrixPerspectiveRH(Matrix44f* pMat, float32_t w, float32_t h,
-	float32_t zn, float32_t zf)
-{
-	X_UNUSED(zf);
-
-
-	float32_t xmin, xmax, ymin, ymax;
-	float32_t width = w;
-	float32_t height = h;
-
-	const float fov_x = 90.0f;
-	const float fov_y = 2 * toDegrees(atan(h / w));
-//	const float fov_y1 = 2 * atan(h / w) * (180.0f / PIf);
-
-	ymax = zn * tan(fov_y* PIf / 360.0f);
-	ymin = -ymax;
-
-	xmax = zn * tan(fov_x* PIf / 360.0f);
-	xmin = -xmax;
-
-	width = xmax - xmin;
-	height = ymax - ymin;
-
-	pMat->m00 = 2 * zn / width;
-	pMat->m01 = 0;
-	pMat->m02 = (xmax + xmin) / width;
-	pMat->m03 = 0;
-
-	pMat->m10 = 0;
-	pMat->m11 = 2 * zn / height;
-	pMat->m12 = (ymax + ymin) / height;
-	pMat->m13 = 0;
-
-	pMat->m20 = 0;
-	pMat->m21 = 0;
-	pMat->m22 = -0.999f; // make sure it dose not go over
-	pMat->m23 = -2.0f * zn;
-
-	pMat->m30 = 0;
-	pMat->m31 = 0;
-	pMat->m32 = -1;
-	pMat->m33 = 0;
-}
-
 
 X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t aspect, 
 	float32_t zn, float32_t zf, bool reverseZ)
