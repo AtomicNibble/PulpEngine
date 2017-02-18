@@ -26,6 +26,7 @@ X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 	typedef core::Array<ShapeVertex, core::ArrayAlignedAllocator<ShapeVertex>> VertArr;
 	typedef core::Array<uint16_t, core::ArrayAlignedAllocator<uint16_t>> IndexArr;
 
+public:
 	struct ShapeLod
 	{
 		ShapeLod();
@@ -61,6 +62,8 @@ public:
 
 	X_INLINE Material* getMaterial(PrimitiveType::Enum prim) const;
 	X_INLINE Material* getMaterialDepthTest(PrimitiveType::Enum prim) const;
+
+	X_INLINE const Shape& getShapeResources(ShapeType::Enum shape) const;
 
 private:
 	bool loadMaterials(void);

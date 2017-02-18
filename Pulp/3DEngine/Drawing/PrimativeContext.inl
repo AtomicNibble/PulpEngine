@@ -14,6 +14,11 @@ X_INLINE Material* PrimativeContextSharedResources::getMaterialDepthTest(Primiti
 	return primMaterialsDepth_[prim];
 }
 
+X_INLINE const PrimativeContextSharedResources::Shape& PrimativeContextSharedResources::getShapeResources(ShapeType::Enum shape) const
+{
+	return shapes_[shape];
+}
+
 // --------------------------------------------------------
 
 
