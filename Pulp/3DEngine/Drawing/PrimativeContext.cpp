@@ -561,10 +561,10 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
 		X_ASSERT(vp.vertexBufHandle != render::INVALID_BUF_HANLDE, "Vertex buffer handle should be valid")();
 
 		auto* pUpdateVb = bucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
+		pUpdateVb->vertexBuffer = vp.vertexBufHandle;
 		pUpdateVb->pData = vp.verts.data();
 		pUpdateVb->size = vp.getVertBufBytes();
 		pUpdateVb->dstOffset = 0;
-		pUpdateVb->vertexBuffer = vp.vertexBufHandle;
 	}
 
 #if X_DEBUG // check that a page was not 'skipped' or not reset correct.
