@@ -103,7 +103,8 @@ bool XGame::update(core::FrameData& frame)
 
 	frame.view.viewMatrixOrtho = Matrix44f::identity();
 	frame.view.projMatrixOrtho = orthoProj;
-	frame.view.viewProjMatrixOrth =  orthoProj;
+	frame.view.viewProjMatrixOrth = frame.view.viewMatrixOrtho * orthoProj;
+
 
 
 
