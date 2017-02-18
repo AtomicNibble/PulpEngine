@@ -509,7 +509,7 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	depthPrim_(0),
 	currentPage_(-1),
 	mode_(mode),
-	objectLodArrays_{ 
+	shapeLodArrays_{
 		arena, arena, arena, arena, arena,
 		arena, arena, arena, arena, arena,
 		arena, arena, arena, arena, arena,
@@ -519,7 +519,7 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
 
-	for (auto& lod : objectLodArrays_)
+	for (auto& lod : shapeLodArrays_)
 	{
 		for (auto& objectArr : lod)
 		{
@@ -604,9 +604,9 @@ void PrimativeContext::reset(void)
 	}
 
 	// if the compiler don't unroll this it should just kill itself..
-	for (uint32_t i = 0; i < ObjectType::ENUM_COUNT; i++) 
+	for (uint32_t i = 0; i < ShapeType::ENUM_COUNT; i++) 
 	{
-		OpbectTypeLodArr& lod = objectLodArrays_[i];
+		auto& lod = shapeLodArrays_[i];
 		for (auto& arr : lod)
 		{
 			arr.clear();
@@ -625,9 +625,9 @@ bool PrimativeContext::isEmpty(void) const
 		return false;
 	}
 
-	for (const auto& lod : objectLodArrays_)
+	for (const auto& lod : shapeLodArrays_)
 	{
-		for (auto& objectArr : lod)
+		for (const auto& objectArr : lod)
 		{
 			if (objectArr.isNotEmpty()) {
 				return false;
@@ -643,9 +643,9 @@ const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void)
 	return pushBufferArr_;
 }
 
-const PrimativeContext::ObjectParamLodTypeArr& PrimativeContext::getObjectArrayBuffers(void) const
+const PrimativeContext::ShapeParamLodTypeArr& PrimativeContext::getShapeArrayBuffers(void) const
 {
-	return objectLodArrays_;
+	return shapeLodArrays_;
 }
 
 PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void) const
@@ -661,7 +661,7 @@ PrimativeContext::VertexPageHandlesArr PrimativeContext::getVertBufHandles(void)
 	return handles;
 }
 
-const PrimativeContextSharedResources::Shape& PrimativeContext::getShapeResources(ObjectType::Enum shape) const
+const PrimativeContextSharedResources::Shape& PrimativeContext::getShapeResources(ShapeType::Enum shape) const
 {
 	return sharedRes_.getShapeResources(shape);
 }
@@ -756,9 +756,9 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 	return addPrimative(numVertices, primType, pMat);
 }
 
-PrimativeContext::ObjectParam* PrimativeContext::addObject(ObjectType::Enum type, int32_t lodIdx)
+PrimativeContext::ShapeParam* PrimativeContext::addShape(ShapeType::Enum type, int32_t lodIdx)
 {
-	return &objectLodArrays_[type][lodIdx].AddOne();
+	return &shapeLodArrays_[type][lodIdx].AddOne();
 }
 
 X_NAMESPACE_END

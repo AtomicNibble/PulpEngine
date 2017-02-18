@@ -16,10 +16,10 @@ X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 // like materials and shape meshes.
 X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
 {
-	static const int32_t SHAPES_NUM_LOD = IPrimativeContext::OBJECT_NUM_LOD;
+	static const int32_t SHAPES_NUM_LOD = IPrimativeContext::SHAPE_NUM_LOD;
 
 	typedef IPrimativeContext::PrimitiveType PrimitiveType;
-	typedef IPrimativeContext::ObjectType ShapeType;
+	typedef IPrimativeContext::ShapeType ShapeType;
 
 	typedef Vertex_P3F_T2S_C4B ShapeVertex;
 
@@ -142,12 +142,12 @@ public:
 	};
 
 	typedef core::Array<VertexPage> VertexPagesArr;
-	typedef core::Array<ObjectParam> ObjectParamArr;
+	typedef core::Array<ShapeParam> ShapeParamArr;
 
 	// we have diffrent arrays for each lod of each shape.
 	// just makes submission more simple.
-	typedef std::array<ObjectParamArr, OBJECT_NUM_LOD> OpbectTypeLodArr; // come up with better name for this?
-	typedef std::array<OpbectTypeLodArr, ObjectType::ENUM_COUNT> ObjectParamLodTypeArr; // come up with better name for this?
+	typedef std::array<ShapeParamArr, SHAPE_NUM_LOD> ShapeTypeLodArr; // come up with better name for this?
+	typedef std::array<ShapeTypeLodArr, ShapeType::ENUM_COUNT> ShapeParamLodTypeArr; // come up with better name for this?
 
 private:
 
@@ -185,9 +185,9 @@ public:
 
 	bool isEmpty(void) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
-	const ObjectParamLodTypeArr& getObjectArrayBuffers(void) const;
+	const ShapeParamLodTypeArr& getShapeArrayBuffers(void) const;
 	VertexPageHandlesArr getVertBufHandles(void) const;
-	const PrimativeContextSharedResources::Shape& getShapeResources(ObjectType::Enum shape) const;
+	const PrimativeContextSharedResources::Shape& getShapeResources(ShapeType::Enum shape) const;
 
 public:
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
@@ -199,7 +199,7 @@ private:
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
-	ObjectParam* addObject(ObjectType::Enum type, int32_t lodIdx = 0) X_FINAL;
+	ShapeParam* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_FINAL;
 
 private:
 	PushBufferArr pushBufferArr_;
@@ -209,7 +209,7 @@ private:
 	int32_t currentPage_;
 	Mode mode_;
 
-	ObjectParamLodTypeArr objectLodArrays_;
+	ShapeParamLodTypeArr shapeLodArrays_;
 
 	const PrimativeContextSharedResources& sharedRes_;
 };

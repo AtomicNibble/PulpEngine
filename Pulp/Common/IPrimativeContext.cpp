@@ -594,7 +594,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 		Matrix44f trans = Matrix44f::createTranslation(sphere.center());
 		Matrix44f transMat = scale * trans;
 
-		ObjectParam* pObj = addObject(ObjectType::Sphere);
+		ShapeParam* pObj = addShape(ShapeType::Sphere);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
@@ -610,7 +610,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, c
 		Matrix44f trans = Matrix44f::createTranslation(mat * sphere.center());
 		Matrix44f transMat = scale * trans;
 
-		ObjectParam* pObj = addObject(ObjectType::Sphere);
+		ShapeParam* pObj = addShape(ShapeType::Sphere);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
@@ -636,7 +636,7 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 		Matrix44f trans = Matrix44f::createTranslation(pos);
 		Matrix44f transMat = scale * matRot * trans;
 
-		ObjectParam* pObj = addObject(ObjectType::Cone);
+		ShapeParam* pObj = addShape(ShapeType::Cone);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
@@ -662,7 +662,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 		Matrix44f trans = Matrix44f::createTranslation(pos);
 		Matrix44f transMat = scale * matRot * trans;
 
-		ObjectParam* pObj = addObject(ObjectType::Cone);
+		ShapeParam* pObj = addShape(ShapeType::Cone);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
