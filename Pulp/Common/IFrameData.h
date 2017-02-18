@@ -48,6 +48,8 @@ struct FrameView
 	// for 2d
 	X_ALIGN16_MATRIX44F(viewMatrixOrtho);
 	X_ALIGN16_MATRIX44F(projMatrixOrtho);
+	X_ALIGN16_MATRIX44F(viewProjMatrixOrth);
+
 
 };
 
