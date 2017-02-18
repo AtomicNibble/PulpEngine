@@ -708,7 +708,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					X_ASSERT(pIBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
 
-					context.writeBuffer(pIBuf->getBuf(), 0, updateIB.pData, updateIB.size);
+					context.writeBuffer(pIBuf->getBuf(), updateIB.dstOffset, updateIB.pData, updateIB.size);
 				}
 				break;
 				case Commands::Command::COPY_VERTEX_BUF_DATA:
@@ -718,7 +718,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
 
-					context.writeBuffer(pVBuf->getBuf(), 0, updateVB.pData, updateVB.size);
+					context.writeBuffer(pVBuf->getBuf(), updateVB.dstOffset, updateVB.pData, updateVB.size);
 				}
 				break;
 

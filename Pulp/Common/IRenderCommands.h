@@ -281,6 +281,7 @@ namespace Commands
 		IndexBufferHandle indexBuffer;
 		const void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
+		uint32_t dstOffset;
 	};
 
 	struct CopyVertexBufferData
@@ -290,6 +291,7 @@ namespace Commands
 		VertexBufferHandle vertexBuffer;
 		const void* pData; // you own this, safe to clear after submitCommandPackets
 		uint32_t size;
+		uint32_t dstOffset;
 	};
 
 	struct CopyTextureBufferData
