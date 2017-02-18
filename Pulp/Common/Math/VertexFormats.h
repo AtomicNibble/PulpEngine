@@ -94,6 +94,17 @@ struct Vertex_P3F_T4F_C4B_N3F : public Vertex_P3F_T4F
 };
 
 
+struct InstancedData_MAT44_C4F
+{
+	Matrix44f mat;
+	Colorf color;
+};
+
+static_assert(((sizeof(InstancedData_MAT44_C4F) * 8) % 128) == 0, "should be a multiple of 128bits for gpu performance");
+
+X_ENSURE_SIZE(InstancedData_MAT44_C4F, 80);
+
+
 
 typedef Vertex_P3F_T2F_C4B XAuxVertex;
 

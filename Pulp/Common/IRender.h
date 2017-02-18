@@ -253,7 +253,8 @@ X_DECLARE_FLAGS8(StateFlag)(
 	BLEND,
 	ALPHATEST,
 
-	VERTEX_STREAMS // vertex format is made from streams
+	VERTEX_STREAMS, // vertex format is made from streams
+	INSTANCED_POS_COLOR // a stream of postions and colors is provided.
 );
 
 typedef Flags8<StateFlag> StateFlags;
