@@ -12,6 +12,9 @@ class Matrix34;
 template <class T>
 class Matrix44;
 
+
+#define X_ALIGN16_MATRIX44F( VAR ) X_ALIGNED_SYMBOL(Matrix44f,16) VAR
+
 #include "XMath.h"
 #include "XMatrix22.h"
 #include "XMatrixAffine2.h"

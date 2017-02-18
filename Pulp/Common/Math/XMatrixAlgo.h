@@ -11,10 +11,6 @@
 
 #if defined( X_PLATFORM_WIN32 )
 
-#if defined( X_PLATFORM_WIN32 )
-	#define X_ALIGN16_MATRIX44F( VAR ) \
-		X_ALIGNED_SYMBOL(Matrix44f,16) VAR
-#endif
 
 inline Matrix44f SseMultiply( const Matrix44f& mat0, const Matrix44f& mat1 ) 
 {
