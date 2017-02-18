@@ -590,15 +590,13 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 
 	if (sphere.radius() > 0.0f)
 	{
-		Matrix33f scale = Matrix33f::createScale(sphere.radius());
-		Matrix34f trans = Matrix34f::createTranslation(sphere.center());
-		Matrix34f transMat = trans * scale;
+		Matrix44f scale = Matrix44f::createScale(sphere.radius());
+		Matrix44f trans = Matrix44f::createTranslation(sphere.center());
+		Matrix44f transMat = scale * trans;
 
 		ObjectParam* pObj = addObject(ObjectType::Sphere);
-		pObj->trans.set(transMat);
+		pObj->mat = transMat;
 		pObj->color = col;
-		pObj->size = sphere.radius();
-		pObj->lodIdx = 0;
 	}
 }
 
@@ -608,15 +606,13 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, c
 
 	if (sphere.radius() > 0.0f)
 	{
-		Matrix33f scale = Matrix33f::createScale(sphere.radius());
-		Matrix34f trans = Matrix34f::createTranslation(mat * sphere.center());
-		Matrix34f transMat = trans * scale;
+		Matrix44f scale = Matrix44f::createScale(sphere.radius());
+		Matrix44f trans = Matrix44f::createTranslation(mat * sphere.center());
+		Matrix44f transMat = scale * trans;
 
 		ObjectParam* pObj = addObject(ObjectType::Sphere);
-		pObj->trans.set(transMat);
+		pObj->mat = transMat;
 		pObj->color = col;
-		pObj->size = sphere.radius();
-		pObj->lodIdx = 0;
 	}
 }
 
@@ -630,21 +626,19 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 		Vec3f direction(dir.normalized());
 		Vec3f orthogonal(direction.getOrthogonal().normalized());
 
-		Matrix33f matRot;
+		Matrix44f matRot;
 		matRot.setToIdentity();
 		matRot.setColumn(0, orthogonal);
 		matRot.setColumn(1, direction);
 		matRot.setColumn(2, orthogonal.cross(direction));
 
-		Matrix33f scale = Matrix33f::createScale(Vec3f(radius, height, radius));
-		Matrix34f trans = Matrix34f::createTranslation(pos);
-		Matrix34f transMat = trans * matRot * scale;
+		Matrix44f scale = Matrix44f::createScale(Vec3f(radius, height, radius));
+		Matrix44f trans = Matrix44f::createTranslation(pos);
+		Matrix44f transMat = scale * matRot * trans;
 
 		ObjectParam* pObj = addObject(ObjectType::Cone);
-		pObj->trans.set(transMat);
+		pObj->mat = transMat;
 		pObj->color = col;
-		pObj->size = core::Max(radius, height * 0.5f);
-		pObj->lodIdx = 0;
 	}
 }
 
@@ -658,21 +652,19 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 		Vec3f direction(dir.normalized());
 		Vec3f orthogonal(direction.getOrthogonal().normalized());
 
-		Matrix33f matRot;
+		Matrix44f matRot;
 		matRot.setToIdentity();
 		matRot.setColumn(0, orthogonal);
 		matRot.setColumn(1, direction);
 		matRot.setColumn(2, orthogonal.cross(direction));
 
-		Matrix33f scale = Matrix33f::createScale(Vec3f(radius, height, radius));
-		Matrix34f trans = Matrix34f::createTranslation(pos);
-		Matrix34f transMat = trans * matRot * scale;
+		Matrix44f scale = Matrix44f::createScale(Vec3f(radius, height, radius));
+		Matrix44f trans = Matrix44f::createTranslation(pos);
+		Matrix44f transMat = scale * matRot * trans;
 
 		ObjectParam* pObj = addObject(ObjectType::Cone);
-		pObj->trans.set(transMat);
+		pObj->mat = transMat;
 		pObj->color = col;
-		pObj->size = core::Max(radius, height * 0.5f);
-		pObj->lodIdx = 0;
 	}
 }
 

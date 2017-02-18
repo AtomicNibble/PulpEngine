@@ -27,15 +27,7 @@ public:
 		Cylinder // get fooked. AINT nobody got time for cylinders.
 	);
 
-	struct ObjectParam
-	{
-		Transformf trans;
-		Color8u color;
-		float size;
-		uint32_t lodIdx;
-	};
-
-	X_ENSURE_SIZE(ObjectParam, 40);
+	typedef InstancedData_MAT44_C4F ObjectParam;
 
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
