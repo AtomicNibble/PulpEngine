@@ -4,6 +4,8 @@
 #include <Platform\Compiler.h>
 
 #include "Math\XMatrix44.h"
+#include <Math\XMatrixAlgo.h>
+
 
 X_USING_NAMESPACE;
 

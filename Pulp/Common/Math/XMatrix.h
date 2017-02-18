@@ -21,7 +21,6 @@ class Matrix44;
 #include "XMatrix33.h"
 #include "XMatrix44.h"
 #include "XMatrix34.h" // must be last since it uses 33 & 44
-#include "XMatrixAlgo.h"
 
 
 

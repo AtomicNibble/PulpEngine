@@ -5,6 +5,7 @@
 #include <IConsole.h>
 #include <IFrameData.h>
 
+#include <Math\XMatrixAlgo.h>
 X_NAMESPACE_BEGIN(game)
 
 namespace

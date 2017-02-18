@@ -4,6 +4,7 @@
 
 #include <EngineCommon.h>
 
+#include <Math\XMatrixAlgo.h>
 
 #define IPRENDERSYS_EXPORTS
 

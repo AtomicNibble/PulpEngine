@@ -3,6 +3,9 @@
 
 #include <IRender.h>
 
+#include <Math\XMatrixAlgo.h>
+
+
 void XCamera::UpdateFrustum(void)
 {
 	XFrustum::UpdateFrustum();
