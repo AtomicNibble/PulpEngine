@@ -89,14 +89,23 @@ bool XGame::update(core::FrameData& frame)
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
 
+
+	// Pro
 	frame.view.cam = cam_;
 	frame.view.projMatrix = cam_.getProjectionMatrix();
 	frame.view.viewMatrix = cam_.getViewMatrix();
-	frame.view.viewProjMatrix = frame.view.projMatrix * frame.view.viewMatrix;
+	frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
 	frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
 
+	// orth
+	Matrix44f orthoProj;
+	MatrixOrthoOffCenterRH(&orthoProj, 0, 1680, 1050, 0, -1e10f, 1e10);
 
-//	pRender_->SetCamera(cam_);
+	frame.view.viewMatrixOrtho = Matrix44f::identity();
+	frame.view.projMatrixOrtho = orthoProj;
+	frame.view.viewProjMatrixOrth =  orthoProj;
+
+
 
 	return true;
 }
