@@ -120,7 +120,7 @@ void XGame::registerVars(void)
 	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::CHEAT,
 		"camera angle(radians)");
 
-	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.0001f, ::toDegrees(PIf),
+	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(PIf),
 		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
 
 	core::ConsoleVarFunc del;
