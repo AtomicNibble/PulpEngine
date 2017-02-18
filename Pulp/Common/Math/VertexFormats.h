@@ -108,7 +108,10 @@ X_ENSURE_SIZE(InstancedData_MAT44_C4F, 80);
 
 typedef Vertex_P3F_T2F_C4B XAuxVertex;
 
-X_DECLARE_ENUM8(VertexStream)(VERT, COLOR, NORMALS, TANGENT_BI);
+X_DECLARE_ENUM8(VertexStream)(VERT, COLOR, NORMALS, TANGENT_BI, HWSKIN, INSTANCE);
+
+// hwskin and instanced are runtime only.
+static const size_t VERT_RUNTIME_STREAM_COUNT = 2;
 
 // check sizes.
 X_ENSURE_SIZE(Vertex_P3F_T3F, 24);

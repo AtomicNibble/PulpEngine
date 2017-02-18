@@ -476,7 +476,7 @@ struct SubMeshHeader
 	uint32_t startIndex; // 8
 
 	// needs to be void, since we have diffrent vertex formats.
-	core::Pointer64<void>		streams[VertexStream::ENUM_COUNT]; // 8
+	core::Pointer64<void>		streams[VertexStream::ENUM_COUNT - VERT_RUNTIME_STREAM_COUNT]; // 8
 	core::Pointer64<Index>		indexes; // 8
 
 
@@ -541,7 +541,7 @@ struct MeshHeader
 	core::Pointer64<Index>		indexes; // 8
 
 	// 16
-	core::Pointer64<void>       streams[VertexStream::ENUM_COUNT];
+	core::Pointer64<void>       streams[VertexStream::ENUM_COUNT - VERT_RUNTIME_STREAM_COUNT];
 
 	// 24
 	AABB boundingBox;	
