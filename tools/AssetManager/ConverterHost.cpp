@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(assman)
 
 
 ConverterHost::ConverterHost(assetDb::AssetDB& db, core::MemoryArenaBase* arena) :
-	que_(arena, 16),
+	que_(arena, 1024), // need to be dynamic really.
 	con_(db, arena)
 {
 
