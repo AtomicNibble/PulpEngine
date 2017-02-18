@@ -220,21 +220,23 @@ void CVarColRef::Set(const char* s)
 {
 	X_ASSERT_NOT_NULL(s);
 
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	Color col;
 
-	if (!ColorFromString(s, col, false))
+	if (!ColorFromString(s, col, false)) {
 		return;
+	}
 
 	// any diffrent?
-	if (ColValue_.compare(col, 0.001f))
+	if (ColValue_.compare(col, 0.001f)) {
 		return;
+	}
 
 	// assign
 	ColValue_ = col;
-
 	OnModified();
 
 	if (changeFunc_) {
@@ -293,21 +295,23 @@ void CVarVec3Ref::Set(const char* s)
 {
 	X_ASSERT_NOT_NULL(s);
 
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	Vec3f vec;
 
-	if (!Vec3FromString(s, vec, false))
+	if (!Vec3FromString(s, vec, false)) {
 		return;
+	}
 
 	// any diffrent?
-	if (Value_.compare(vec, 0.001f))
+	if (Value_.compare(vec, 0.001f)) {
 		return;
+	}
 
 	// assign
 	Value_ = vec;
-
 	OnModified();
 
 	if (changeFunc_) {

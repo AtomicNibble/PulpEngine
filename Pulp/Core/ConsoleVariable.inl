@@ -76,15 +76,19 @@ const char* CVarString<T>::GetString(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-void CVarString<T>::Set(const char* s)
+void CVarString<T>::Set(const char* pStr)
 {
-	if (Flags_.IsSet(VarFlag::READONLY) || !s) {
+	if (Flags_.IsSet(VarFlag::READONLY) || !pStr) {
+		return;
+	}
+
+	// check if same?
+	if (String_.compare(pStr)) {
 		return;
 	}
 
 	OnModified();
-
-	String_ = s;
+	String_ = pStr;
 
 	if (changeFunc_) {
 		changeFunc_.Invoke(this); // change callback.
@@ -209,25 +213,22 @@ void CVarInt<T>::Set(const float f)
 template<class T>
 void CVarInt<T>::Set(const int i)
 {
-	if (i == IntValue_) {
-		return;
-	}
 	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
-	OnModified();
-
-	IntValue_ = i;
+	int iVal = i;
 
 	// min bigger than max disables the check.
-	if (IntMin_ <= IntMax_)
-	{
-		if (IntValue_ < IntMin_)
-			IntValue_ = IntMin_;
-		else if (IntValue_ > IntMax_)
-			IntValue_ = IntMax_;
+	if (IntMin_ <= IntMax_) {
+		iVal = math<int32_t>::clamp(iVal, IntMin_, IntMax_);
 	}
+
+	if (iVal == IntValue_) {
+		return;
+	}
+	OnModified();
+	IntValue_ = iVal;
 
 	if (changeFunc_) {
 		changeFunc_.Invoke(this); // change callback.	
@@ -344,45 +345,29 @@ void CVarFloat<T>::Set(const char* s)
 		fValue = core::strUtil::StringToFloat<float>(s);
 	}
 
-	// cap it before check :D
-	if (fMin_ <= fMax_)
-	{
-		if (fValue_ < fMin_)
-			fValue_ = fMin_;
-		else if (fValue_ > fMax_)
-			fValue_ = fMax_;
-	}
-
-	if (fValue == fValue_) {
-		return;
-	}
-
-	OnModified();
-	fValue_ = fValue;
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	Set(fValue);
 }
 
 template<class T>
 void CVarFloat<T>::Set(const float f)
 {
-	if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
+	if (Flags_.IsSet(VarFlag::READONLY)) {
+		return;
+	}
+
+	float fVal = f;
+
+	// cap it sally.
+	if (fMin_ <= fMax_) {
+		fVal = math<float>::clamp(fVal, fMin_, fMax_);
+	}
+
+	if (fVal == fValue_) {
 		return;
 	}
 
 	OnModified();
-	fValue_ = f;
-
-	// cap it sally.
-	if (fMin_ <= fMax_)
-	{
-		if (fValue_ < fMin_)
-			fValue_ = fMin_;
-		else if (fValue_ > fMax_)
-			fValue_ = fMax_;
-	}
+	fValue_ = fVal;
 
 	if (changeFunc_) {
 		changeFunc_.Invoke(this); // change callback.	
@@ -392,27 +377,7 @@ void CVarFloat<T>::Set(const float f)
 template<class T>
 void CVarFloat<T>::Set(const int i)
 {
-	const float fVal = static_cast<float>(i);
-
-	if (fVal == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
-		return;
-	}
-
-	OnModified();
-	fValue_ = fVal;
-
-	// cap it sally.
-	if (fMin_ <= fMax_)
-	{
-		if (fValue_ < fMin_)
-			fValue_ = fMin_;
-		else if (fValue_ > fMax_)
-			fValue_ = fMax_;
-	}
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	Set(static_cast<float>(i));
 }
 
 template<class T>
@@ -510,25 +475,24 @@ void CVarIntRef::Set(const float f)
 
 void CVarIntRef::Set(const int i)
 {
-	if (i == IntValue_) {
-		return;
-	} 
 	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
-	OnModified();
+	int iVal = i;
 
 	// cap it sally.
-	IntValue_ = i;
-
-	if (IntMin_ <= IntMax_)
-	{
-		if (IntValue_ < IntMin_)
-			IntValue_ = IntMin_;
-		else if (IntValue_ > IntMax_)
-			IntValue_ = IntMax_;
+	if (IntMin_ <= IntMax_) {
+		iVal = math<int32_t>::clamp(i, IntMin_, IntMax_);
 	}
+
+	if (iVal == IntValue_) {
+		return;
+	}
+
+	OnModified();
+	IntValue_ = iVal;
+
 
 	if (changeFunc_) {
 		changeFunc_.Invoke(this); // change callback.	
@@ -640,32 +604,23 @@ void CVarFloatRef::Set(const char* s)
 		fValue = core::strUtil::StringToFloat<float>(s);
 	}
 
-	if (fValue == fValue_) {
-		return;
-	}
-
-	OnModified();
-
-	// cap it sally.
-	if (fMin_ <= fMax_)
-	{
-		if (fValue_ < fMin_)
-			fValue_ = fMin_;
-		else if (fValue_ > fMax_)
-			fValue_ = fMax_;
-	}
-
-	fValue_ = fValue;
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	Set(fValue);
 }
 
 
 void CVarFloatRef::Set(const float f)
 {
-	if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
+	if (Flags_.IsSet(VarFlag::READONLY)) {
+		return;
+	}
+
+	float fVal = f;
+
+	if (fMin_ <= fMax_) {
+		fVal = math<float>::clamp(fVal, fMin_, fMax_);
+	}
+
+	if (fVal == fValue_) {
 		return;
 	}
 
@@ -680,27 +635,7 @@ void CVarFloatRef::Set(const float f)
 
 void CVarFloatRef::Set(const int i)
 {
-	const float fVal = static_cast<float>(i);
-	if (fVal == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
-		return;
-	}
-
-	OnModified();
-
-	fValue_ = fVal;
-
-	// cap it sally.
-	if (fMin_ <= fMax_)
-	{
-		if (fValue_ < fMin_)
-			fValue_ = fMin_;
-		else if (fValue_ > fMax_)
-			fValue_ = fMax_;
-	}
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	Set(static_cast<float>(i));
 }
 
 
