@@ -140,7 +140,10 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// only stuff like vertex format which is runtime etc..
 	decltype(stateDesc) stateDescCpy = stateDesc;
 	stateDescCpy.vertexFmt = vertFmt;
-	if (vertStreams) {
+
+	// come up with better way to send this data to render?
+	// or does it just make sense to be part of state..?
+	if (permFlags.IsSet(PermatationFlags::VertStreams)) {
 		stateDescCpy.stateFlags.Set(render::StateFlag::VERTEX_STREAMS);
 	}
 
