@@ -226,13 +226,6 @@ shader::IHWShader* RenderNull::createHWShader(shader::ShaderType::Enum type, con
 	return nullptr;
 }
 
-shader::IShaderPermatation* RenderNull::createPermatation(shader::IHWShader* pVertex, shader::IHWShader* pPixel)
-{
-	X_UNUSED(pVertex);
-	X_UNUSED(pPixel);
-
-	return nullptr;
-}
 
 shader::IShaderPermatation* RenderNull::createPermatation(const shader::ShaderStagesArr& stages)
 {
