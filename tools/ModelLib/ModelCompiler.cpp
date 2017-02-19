@@ -70,12 +70,14 @@ namespace
 
 } // namesace 
 
+
+
 const float ModelCompiler::MERGE_VERTEX_ELIPSION = 0.05f;
 const float ModelCompiler::MERGE_TEXCOORDS_ELIPSION = 0.02f;
 const float ModelCompiler::JOINT_WEIGHT_THRESHOLD = 0.005f;
 const int32_t ModelCompiler::VERTEX_MAX_WEIGHTS = model::MODEL_MAX_VERT_BINDS;
-const ModelCompiler::CompileFlags ModelCompiler::DEFAULT_FLAGS = ModelCompiler::CompileFlag::WHITE_VERT_COL |
-	ModelCompiler::CompileFlag::MERGE_MESH;
+const ModelCompiler::CompileFlags ModelCompiler::DEFAULT_FLAGS = ModelCompiler::CompileFlags(ModelCompiler::CompileFlag::WHITE_VERT_COL |
+	ModelCompiler::CompileFlag::MERGE_MESH);
 
 
 
