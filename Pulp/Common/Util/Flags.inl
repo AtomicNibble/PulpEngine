@@ -14,6 +14,12 @@ inline Flags<T>::Flags(Enum flag)
 {
 }
 
+template <class T>
+inline Flags<T>::Flags(const Flags& oth)
+	: flags_(oth.flags_)
+{
+}
+
 
 template <class T>
 inline Flags<T>::Flags(uint32_t flags)
@@ -78,7 +84,6 @@ inline Flags<T>& Flags<T>::operator|=(Flags<T> other)
 	return *this;
 }
 
-
 template <class T>
 inline Flags<T> Flags<T>::operator&(Flags other) const
 {
@@ -89,6 +94,21 @@ template <class T>
 inline Flags<T>& Flags<T>::operator&=(Flags other)
 {
 	flags_ &= other.flags_;
+	return *this;
+}
+
+
+template <class T>
+inline Flags<T>& Flags<T>::operator=(Enum e)
+{
+	flags_ = e;
+	return *this;
+}
+
+template <class T>
+inline Flags<T>& Flags<T>::operator=(const Flags& oth)
+{
+	flags_ = oth.flags_;
 	return *this;
 }
 
@@ -152,6 +172,13 @@ inline Flags8<T>::Flags8(Enum flag)
 
 
 template <class T>
+inline Flags8<T>::Flags8(const Flags8& oth)
+	: flags_(oth.flags_)
+{
+}
+
+
+template <class T>
 inline Flags8<T>::Flags8(uint8_t flags)
 : flags_(flags)
 {
@@ -199,21 +226,32 @@ inline bool Flags8<T>::AreAllSet(void) const
 	return (flags_ == ((1ull << T::FLAGS_COUNT) - 1u));
 }
 
+template <class T>
+inline bool Flags8<T>::operator==(const Flags8 other) const
+{
+	return flags_ == other.flags_;
+}
 
 template <class T>
-inline Flags8<T> Flags8<T>::operator|(Flags8<T> other) const
+inline bool Flags8<T>::operator!=(const Flags8 other) const
+{
+	return flags_ != other.flags_;
+}
+
+
+template <class T>
+inline Flags8<T> Flags8<T>::operator|(Flags8 other) const
 {
 	return Flags8<T>(flags_ | other.flags_);
 }
 
 
 template <class T>
-inline Flags8<T>& Flags8<T>::operator|=(Flags8<T> other)
+inline Flags8<T>& Flags8<T>::operator|=(Flags8 other)
 {
 	flags_ |= other.flags_;
 	return *this;
 }
-
 
 template <class T>
 inline Flags8<T> Flags8<T>::operator&(Flags8 other) const
@@ -225,6 +263,21 @@ template <class T>
 inline Flags8<T>& Flags8<T>::operator&=(Flags8 other)
 {
 	flags_ &= other.flags_;
+	return *this;
+}
+
+
+template <class T>
+inline Flags8<T>& Flags8<T>::operator=(Enum e)
+{
+	flags_ = e;
+	return *this;
+}
+
+template <class T>
+inline Flags8<T>& Flags8<T>::operator=(const Flags8& oth)
+{
+	flags_ = oth.flags_;
 	return *this;
 }
 
