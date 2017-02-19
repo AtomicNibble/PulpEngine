@@ -1278,7 +1278,7 @@ void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
 }
 
 ICVar* XConsole::RegisterString(const char* pName, const char* Value, 
-	int Flags, const char* desc)
+	VarFlags Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1287,9 +1287,9 @@ ICVar* XConsole::RegisterString(const char* pName, const char* Value,
 		return pCVar;
 	}
 
-	if (bitUtil::IsBitFlagSet(Flags, VarFlag::CPY_NAME))
+	if (Flags.IsSet(VarFlag::CPY_NAME))
 	{
-		Flags = bitUtil::ClearBitFlag(Flags, VarFlag::CPY_NAME);
+		Flags.Remove(VarFlag::CPY_NAME);
 		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
 			"CVarString<H>")(this, pName, Value, Flags, desc);
 	}
@@ -1303,7 +1303,7 @@ ICVar* XConsole::RegisterString(const char* pName, const char* Value,
 }
 
 ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min, 
-	int Max, int Flags, const char* desc)
+	int Max, VarFlags Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1318,7 +1318,7 @@ ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min,
 }
 
 ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
-	float Max, int Flags, const char* desc)
+	float Max, VarFlags Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1332,7 +1332,7 @@ ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
 	return pCVar;
 }
 
-ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, int flags, 
+ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarFlags flags,
 	const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
@@ -1348,7 +1348,7 @@ ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, int 
 }
 
 ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min, 
-	int Max, int flags, const char* desc)
+	int Max, VarFlags flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1363,7 +1363,7 @@ ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min,
 }
 
 ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min, 
-	float Max, int flags, const char* desc)
+	float Max, VarFlags flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1379,7 +1379,7 @@ ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min,
 
 
 ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue, 
-	float Min, float Max, int flags, const char* desc)
+	float Min, float Max, VarFlags flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1397,7 +1397,7 @@ ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue,
 }
 
 ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue, 
-	int Min, int Max, int flags, const char* desc)
+	int Min, int Max, VarFlags flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1415,7 +1415,7 @@ ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue,
 }
 
 ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue, 
-	int flags, const char* desc)
+	VarFlags flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1434,7 +1434,7 @@ ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue,
 }
 
 ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue, 
-	int flags, const char* desc)
+	VarFlags flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1482,7 +1482,7 @@ void XConsole::UnregisterVariable(const char* pVarName)
 
 // Commands :)
 
-void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* desc)
+void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -2991,16 +2991,16 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 			// using the End var is safe since we the condition above checks parsing was valid.
 			if (math<float>::fmod(valf, 1.f) == 0.f && !strUtil::Find(start, End, '.'))
 			{
-				ConfigRegisterInt(Cmd->GetArg(1), static_cast<int>(valf), 1, 0, 0, "");
+				ConfigRegisterInt(Cmd->GetArg(1), static_cast<int>(valf), 1, 0, VarFlags(), "");
 			}
 			else
 			{
-				ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, 0, "");
+				ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, VarFlags(), "");
 			}
 		}
 		else
 		{
-			ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), 0, "");
+			ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), VarFlags(), "");
 		}
 
 	}

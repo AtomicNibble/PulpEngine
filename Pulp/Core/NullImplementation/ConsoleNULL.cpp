@@ -66,7 +66,7 @@ consoleState::Enum XConsoleNULL::getVisState(void) const
 	return consoleState::CLOSED;
 }
 
-ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Flags,
+ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, VarFlags Flags,
 	const char* desc)
 {
 	X_UNUSED(Name);
@@ -77,7 +77,7 @@ ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Fla
 }
 
 ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max,
-	int Flags, const char* desc)
+	VarFlags Flags, const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -89,7 +89,7 @@ ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max,
 }
 
 ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, float Max,
-	int flags, const char* desc)
+	VarFlags flags, const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -101,7 +101,7 @@ ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, flo
 }
 
 
-ICVar* XConsoleNULL::ConfigRegisterString(const char* Name, const char* Value, int flags,
+ICVar* XConsoleNULL::ConfigRegisterString(const char* Name, const char* Value, VarFlags flags,
 	const char* desc)
 {
 	X_UNUSED(Name);
@@ -112,7 +112,7 @@ ICVar* XConsoleNULL::ConfigRegisterString(const char* Name, const char* Value, i
 }
 
 ICVar* XConsoleNULL::ConfigRegisterInt(const char* Name, int Value, int Min, int Max,
-	int flags, const char* desc)
+	VarFlags flags, const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -124,7 +124,7 @@ ICVar* XConsoleNULL::ConfigRegisterInt(const char* Name, int Value, int Min, int
 }
 
 ICVar* XConsoleNULL::ConfigRegisterFloat(const char* Name, float Value, float Min,
-	float Max, int flags, const char* desc)
+	float Max, VarFlags flags, const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -139,7 +139,7 @@ ICVar* XConsoleNULL::ConfigRegisterFloat(const char* Name, float Value, float Mi
 
 // refrenced based, these are useful if we want to use the value alot so we just register it's address.
 ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
-	float Min, float Max, int flags, const char* desc)
+	float Min, float Max, VarFlags flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -153,7 +153,7 @@ ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
 }
 
 ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue,
-	int Min, int Max, int flags, const char* desc)
+	int Min, int Max, VarFlags flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -167,7 +167,7 @@ ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue,
 }
 
 ICVar* XConsoleNULL::Register(const char* name, Color* src, Color defaultvalue,
-	int flags, const char* desc)
+	VarFlags flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -179,7 +179,7 @@ ICVar* XConsoleNULL::Register(const char* name, Color* src, Color defaultvalue,
 }
 
 ICVar* XConsoleNULL::Register(const char* name, Vec3f* src, Vec3f defaultvalue,
-	int flags, const char* desc)
+	VarFlags flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -205,7 +205,7 @@ void XConsoleNULL::UnregisterVariable(const char* sVarName)
 }
 
 
-void XConsoleNULL::RegisterCommand(const char* Name, ConsoleCmdFunc func, int Flags,
+void XConsoleNULL::RegisterCommand(const char* Name, ConsoleCmdFunc func, VarFlags Flags,
 	const char* desc)
 {
 	X_UNUSED(Name);

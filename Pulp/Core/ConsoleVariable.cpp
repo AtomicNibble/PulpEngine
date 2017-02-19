@@ -58,7 +58,7 @@ namespace
 
 } // namespace 
 
-CVarBase::CVarBase(XConsole* pConsole, int nFlags, const char* desc) :
+CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, const char* desc) :
 	Desc_(desc),
 	Flags_(nFlags),
 	pConsole_(pConsole)

@@ -100,26 +100,26 @@ struct IConsole
 	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
 	// Register variables.
-	virtual ICVar* RegisterString(const char* pName, const char* Value, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_ABSTRACT;
 
-	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_ABSTRACT;
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_ABSTRACT;
 
 
 	virtual ICVar* GetCVar(const char* pName) X_ABSTRACT;
 
 	virtual void UnregisterVariable(const char* pVarName) X_ABSTRACT;
 
-	virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* desc) X_ABSTRACT;
+	virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_ABSTRACT;
 	virtual void UnRegisterCommand(const char* pName) X_ABSTRACT;
 
 	virtual void Exec(const char* pCommand) X_ABSTRACT;

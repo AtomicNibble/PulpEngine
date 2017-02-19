@@ -206,27 +206,27 @@ public:
 	virtual bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
 
 
-	virtual ICVar* RegisterString(const char* pName, const char* Value, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
 
-	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
 
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc) X_FINAL;
-	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc) X_FINAL;
-	virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, int nFlags, const char* desc) X_FINAL;
-	virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
 
 
 	virtual ICVar* GetCVar(const char* pName) X_FINAL;
 
 	virtual void UnregisterVariable(const char* pVarName) X_FINAL;
 
-	virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* pDesc) X_FINAL;
+	virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
 	virtual void UnRegisterCommand(const char* pName) X_FINAL;
 
 	virtual void Exec(const char* pCommand) X_FINAL;
