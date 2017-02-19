@@ -99,7 +99,7 @@ X_INLINE void XCharController<Base, ControllerType>::getState(ControllerState& s
 
 	stats.deltaXP = Vec3FromPx3(pxState.deltaXP);
 	stats.touchedActor = reinterpret_cast<ActorHandle>(pxState.touchedActor);
-	stats.collisionFlags = pxState.collisionFlags;
+	stats.collisionFlags = CharacterColFlags(pxState.collisionFlags);
 	stats.standOnAnotherCCT = pxState.standOnAnotherCCT;
 	stats.standOnObstacle = pxState.standOnObstacle;
 	stats.isMovingUp = pxState.isMovingUp;
