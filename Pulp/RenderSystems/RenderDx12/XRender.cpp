@@ -646,12 +646,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
 
-					// don't bother looking up ib if same handle.
-					if (curState.indexBuffer != pDraw->indexBuffer) {
-						curState.indexBuffer = pDraw->indexBuffer;
-						const auto pIBuf = pBuffMan_->IBFromHandle(pDraw->indexBuffer);
-						context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
-					}
+					ApplyIndexBuffer(context, curState, pDraw->indexBuffer);
 
 					context.drawIndexed(pDraw->indexCount, pDraw->startIndex, pDraw->baseVertex);
 					break;
@@ -674,11 +669,9 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
-					if (curState.indexBuffer != pDraw->indexBuffer) {
-						curState.indexBuffer = pDraw->indexBuffer;
-						const auto pIBuf = pBuffMan_->IBFromHandle(pDraw->indexBuffer);
-						context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
-					}
+					X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
+
+					ApplyIndexBuffer(context, curState, pDraw->indexBuffer);
 
 					context.drawIndexedInstanced(pDraw->indexCountPerInstance, pDraw->instanceCount,
 						pDraw->startIndexLocation, pDraw->baseVertexLocation, pDraw->startInstanceLocation);
@@ -964,6 +957,17 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 	}
 
+}
+
+void XRender::ApplyIndexBuffer(GraphicsContext& context, State& curState, IndexBufferHandle ib)
+{
+	if (curState.indexBuffer != ib) {
+		curState.indexBuffer = ib;
+		const auto pIBuf = pBuffMan_->IBFromHandle(ib);
+
+		context.transitionResource(pIBuf->getBuf(), D3D12_RESOURCE_STATE_INDEX_BUFFER);
+		context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
+	}
 }
 
 

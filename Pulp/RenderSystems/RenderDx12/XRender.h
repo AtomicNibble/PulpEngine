@@ -220,6 +220,8 @@ private:
 		const VertexHandleArr& vertexBuffers,
 		const Commands::ResourceStateBase& resourceState, const char* pStateData);
 
+	void ApplyIndexBuffer(GraphicsContext& context, State& curState, IndexBufferHandle ib);
+
 private:
 	bool freeSwapChainResources(void);
 
