@@ -1363,28 +1363,35 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 		// we take positions as matrix.
 		// which are 4 float4's
-		D3D12_INPUT_ELEMENT_DESC elem_pos = {
+		D3D12_INPUT_ELEMENT_DESC elem_vec4 = {
 			"POSITION",
 			1,
 			DXGI_FORMAT_R32G32B32_FLOAT,
-			maxSlot->InputSlot + 1,
+			VertexStream::INSTANCE,
 			0,
 			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
 			1 // one pos per instance 
 		};
 
-		D3D12_INPUT_ELEMENT_DESC elem_col8888 = {
+		D3D12_INPUT_ELEMENT_DESC elem_col32 = {
 			"COLOR",
 			1,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			maxSlot->InputSlot + 2,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			VertexStream::INSTANCE,
 			0,
 			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
 			1 // one color per instance
 		};
 
-		inputDesc.append(elem_pos);
-		inputDesc.append(elem_col8888);
+		for (uint32_t i = 0; i < 4; i++)
+		{
+			elem_vec4.SemanticIndex = i + 1;
+			elem_vec4.AlignedByteOffset = i * sizeof(Vec4f);
+			inputDesc.append(elem_vec4);
+		}
+
+		elem_col32.AlignedByteOffset = 4 * sizeof(Vec4f);
+		inputDesc.append(elem_col32);
 
 		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
 	};
