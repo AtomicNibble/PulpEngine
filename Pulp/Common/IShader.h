@@ -318,6 +318,16 @@ struct IShader
 };
 
 
+// ------------------ new..  ------------------------------------------
+
+X_DECLARE_FLAGS8(Permatation)(
+	VertStreams,
+	HwSkin,
+	Instanced
+);
+
+typedef Flags8<Permatation> PermatationFlags;
+
 
 struct IHWShader
 {
