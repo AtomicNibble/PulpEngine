@@ -12,20 +12,25 @@
 
 X_NAMESPACE_BEGIN(model)
 
+X_DECLARE_FLAGS(CompileFlag)(
+	ZERO_ORIGIN,
+	WHITE_VERT_COL,
+	MERGE_MESH,
+	MERGE_VERTS,
+	EXT_WEIGHTS, // allow 8 inf per vert.
+	OPTERMIZE_FACES,
+	COOK_PHYS_MESH // cooks convex mesh, spheres and AABB are always converted.
+);
+
+typedef Flags<CompileFlag> CompileFlags;
+X_DECLARE_FLAG_OPERATORS(CompileFlags);
+
+
 class ModelCompiler : public RawModel::Model
 {
 public:
-	X_DECLARE_FLAGS(CompileFlag)(
-		ZERO_ORIGIN,
-		WHITE_VERT_COL,
-		MERGE_MESH,
-		MERGE_VERTS,
-		EXT_WEIGHTS, // allow 8 inf per vert.
-		OPTERMIZE_FACES,
-		COOK_PHYS_MESH // cooks convex mesh, spheres and AABB are always converted.
-	);
-
-	typedef Flags<CompileFlag> CompileFlags;
+	typedef CompileFlag CompileFlag;
+	typedef CompileFlags CompileFlags;
 
 private:
 	static const float MERGE_VERTEX_ELIPSION;
