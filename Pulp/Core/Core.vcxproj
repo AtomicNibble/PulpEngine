@@ -438,13 +438,13 @@
   <ItemGroup>
     <ClInclude Include="..\Common\ModuleExports.h" />
     <ClInclude Include="Console.h" />
-    <ClInclude Include="ConsoleNULL.h" />
     <ClInclude Include="ConsoleVariable.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CoreEventDispatcher.h" />
     <ClInclude Include="DiskFile.h" />
     <ClInclude Include="DiskFileAsync.h" />
     <ClInclude Include="FileSysVars.h" />
+    <ClInclude Include="NullImplementation\ConsoleNULL.h" />
     <ClInclude Include="PathUtil.h" />
     <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />

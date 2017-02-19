@@ -119,7 +119,7 @@
     <ClInclude Include="win32\PathUtil.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
-    <ClInclude Include="ConsoleNULL.h">
+    <ClInclude Include="NullImplementation\ConsoleNULL.h">
       <Filter>NullImplementation</Filter>
     </ClInclude>
   </ItemGroup>
