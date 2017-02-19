@@ -220,7 +220,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	X_ASSERT_NOT_NULL(pMat);
 
 	// the material holds all it's techs like a cache, but when it don't have one we must create it.
-	auto* pTech = pMat->getTech(techNameHash, vrtFmt);
+	auto* pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
 	if (pTech) {
 		return pTech;
 	}

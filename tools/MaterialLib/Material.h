@@ -81,7 +81,7 @@ public:
 	X_INLINE Material(core::MemoryArenaBase* arena);
 	~Material() = default;
 
-	X_INLINE Tech* getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt);
+	X_INLINE Tech* getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags);
 	X_INLINE void addTech(const Tech& tech);
 
 	// assigns the material props but name styas same etc.

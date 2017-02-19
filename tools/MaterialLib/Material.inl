@@ -16,13 +16,13 @@ X_INLINE Material::Material(core::MemoryArenaBase* arena) :
 	cat_ = MaterialCat::CODE;
 }
 
-X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt)
+X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags)
 {
 	core::Spinlock::ScopedLock lock(techLock_);
 
 	for (auto& tech : techs_)
 	{
-		if (tech.hash == hash && tech.pPerm->vertFmt == vertFmt) {
+		if (tech.hash == hash && tech.pPerm->vertFmt == vertFmt && tech.pPerm->permFlags == permFlags) {
 			return &tech;
 		}
 	}
