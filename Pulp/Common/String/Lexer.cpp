@@ -1003,11 +1003,11 @@ bool XLexer::ReadString(XLexToken& token, int quote)
 				Warning("literal is not one character long");
 			}
 		}
-		token.subtype_ = token.begin()[0];
+		token.subtype_ = TokenSubTypeFlags(token.begin()[0]);
 	}
 	else {
 		// the sub type is the length of the string
-		token.subtype_ = safe_static_cast<int,size_t>(token.length());
+		token.subtype_ = TokenSubTypeFlags(safe_static_cast<int32_t>(token.length()));
 	}
 
 	return true;
