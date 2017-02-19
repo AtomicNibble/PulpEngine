@@ -1348,15 +1348,71 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pso.setRenderTargetFormats(static_cast<uint32_t>(pPassState->rtfs.size()), RTVFormats, DSVFormat, 1, 0);
 	pso.setPrimitiveTopologyType(topoTypeFromDesc(desc));
 
+
+	auto addInstanceStreams = [&pso](VertexLayoutDescArr inputDesc) {
+
+		auto maxSlot = std::max_element(std::begin(inputDesc), std::end(inputDesc),
+			[](const D3D12_INPUT_ELEMENT_DESC& a, const D3D12_INPUT_ELEMENT_DESC& b) {
+			return a.InputSlot < b.InputSlot;
+		}
+		);
+
+		// we take positions as matrix.
+		// which are 4 float4's
+		D3D12_INPUT_ELEMENT_DESC elem_pos = {
+			"POSITION",
+			1,
+			DXGI_FORMAT_R32G32B32_FLOAT,
+			maxSlot->InputSlot + 1,
+			0,
+			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
+			1 // one pos per instance 
+		};
+
+		D3D12_INPUT_ELEMENT_DESC elem_col8888 = {
+			"COLOR",
+			1,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
+			maxSlot->InputSlot + 2,
+			0,
+			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
+			1 // one color per instance
+		};
+
+		inputDesc.append(elem_pos);
+		inputDesc.append(elem_col8888);
+
+		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+	};
+
 	if (desc.stateFlags.IsSet(StateFlag::VERTEX_STREAMS))
 	{
-		const auto& inputDesc = ilStreamedDescriptions_[desc.vertexFmt];
-		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+		if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
+		{
+			// make a copy and append instanced descriptions.
+			// for now it's always pos & col.
+			addInstanceStreams(ilStreamedDescriptions_[desc.vertexFmt]);
+		}
+		else
+		{
+			const auto& inputDesc = ilStreamedDescriptions_[desc.vertexFmt];
+			pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+		}
 	}
 	else
 	{
-		const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
-		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+		if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
+		{
+			// we add 'streams' even tho streams are not enabled.
+			// since it just means the base data is not in streamed.
+			// passing instanced data merged it just dumb anyway.
+			addInstanceStreams(ilDescriptions_[desc.vertexFmt]);
+		}
+		else
+		{
+			const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
+			pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+		}
 	}
 
 	if (perm.isStageSet(shader::ShaderType::Vertex)) {
