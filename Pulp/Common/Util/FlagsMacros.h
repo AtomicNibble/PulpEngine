@@ -100,11 +100,19 @@ struct Bits																															\
 		}																																	\
 	}
 
+
+
+
 #define X_DECLARE_FLAGS(name)									struct name X_DECLARE_FLAGS_IMPL
-#define X_DECLARE_FLAGS8(name)									struct name X_DECLARE_FLAGS8_IMPL
+#define X_DECLARE_FLAGS8(name)									struct name X_DECLARE_FLAGS8_IMPL 
 
 
 
+// can't seam to find a way to have this define by X_DECLARE_FLAGS
+#define X_DECLARE_FLAG_OPERATORS(FlagsType) \
+		X_INLINE FlagsType operator|(FlagsType::Enum a, FlagsType::Enum b) { \
+			FlagsType r(a); r.Set(b); return r; \
+		}
 
 
 
