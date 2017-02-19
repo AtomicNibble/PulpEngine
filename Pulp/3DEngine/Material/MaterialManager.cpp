@@ -214,7 +214,8 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 	}
 }
 
-Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt , bool vertStreams)
+Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt,
+	PermatationFlags permFlags)
 {
 	X_ASSERT_NOT_NULL(pMat);
 
@@ -239,11 +240,6 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// we now have a permatation of the shader that we want.
 	// this gives us the pipeline state handle.
 	// we just now need to make variable state.
-	PermatationFlags permFlags;
-	if (vertStreams) {
-		permFlags.Set(Permatation::VertStreams);
-	}
-
 	TechDefPerm* pPerm = pTechDef->getOrCreatePerm(vrtFmt, permFlags);
 	if (!pPerm) {
 		X_ERROR("MatMan", "Failed to get tech perm");

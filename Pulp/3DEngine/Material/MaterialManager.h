@@ -43,7 +43,8 @@ public:
 
 	void releaseMaterial(Material* pMat);
 
-	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, bool vertStreams = false) X_FINAL;
+	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, 
+		PermatationFlags permFlags = PermatationFlags()) X_FINAL;
 	bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
 
 	X_INLINE virtual Material* getDefaultMaterial(void) const X_FINAL;
