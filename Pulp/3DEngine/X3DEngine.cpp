@@ -556,6 +556,8 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 			context.reset();
 		}
 	}
+
+	primResources_.resetInstancePages();
 }
 
 
