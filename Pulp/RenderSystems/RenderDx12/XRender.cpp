@@ -1366,7 +1366,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		D3D12_INPUT_ELEMENT_DESC elem_vec4 = {
 			"POSITION",
 			1,
-			DXGI_FORMAT_R32G32B32_FLOAT,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
 			VertexStream::INSTANCE,
 			0,
 			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
@@ -1376,7 +1376,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		D3D12_INPUT_ELEMENT_DESC elem_col32 = {
 			"COLOR",
 			1,
-			DXGI_FORMAT_R32G32B32_FLOAT,
+			DXGI_FORMAT_R32G32B32A32_FLOAT,
 			VertexStream::INSTANCE,
 			0,
 			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
