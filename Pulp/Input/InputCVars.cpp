@@ -25,10 +25,10 @@ XInputCVars::~XInputCVars()
 
 void XInputCVars::registerVars(void)
 {
-	ADD_CVAR_REF_NO_NAME(input_debug, 0, 0, 3, 0,
+	ADD_CVAR_REF_NO_NAME(input_debug, 0, 0, 3, core::VarFlags::SYSTEM,
 		"Input debugging");
 
-	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, 0,
+	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, core::VarFlags::SYSTEM,
 		"Input mouse position debugging");
 
 }
