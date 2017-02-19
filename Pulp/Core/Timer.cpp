@@ -54,11 +54,11 @@ bool XTimer::Init(ICore* pCore)
 
 	Reset();
 
-	ADD_CVAR_REF("time_debug", debugTime_, 0, 0, 1, 0, "Time debugging");
-	core::ICVar* pVar = ADD_CVAR_FLOAT("time_max_frametime", 0.20f, 0.f, 10000.f, 0, "max time a frame can take (unscaled)");
-	ADD_CVAR_REF("time_scale", timeScale_, 1.f, 0, 2000.f, 0, "scale time of each frame");
-	ADD_CVAR_REF("time_scale_ui", timeScaleUi_, 1.f, 0, 2000.f, 0, "scale time of each UI frame");
-	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
+	ADD_CVAR_REF("time_debug", debugTime_, 0, 0, 1, VarFlag::SYSTEM, "Time debugging");
+	core::ICVar* pVar = ADD_CVAR_FLOAT("time_max_frametime", 0.20f, 0.f, 10000.f, VarFlag::SYSTEM, "max time a frame can take (unscaled)");
+	ADD_CVAR_REF("time_scale", timeScale_, 1.f, 0, 2000.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED | VarFlag::CHEAT, "scale time of each frame");
+	ADD_CVAR_REF("time_scale_ui", timeScaleUi_, 1.f, 0, 2000.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED | VarFlag::CHEAT, "scale time of each UI frame");
+	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Max fps 0=unlimated");
 
 
 	if (pVar)
