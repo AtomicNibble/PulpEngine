@@ -9,7 +9,7 @@ namespace internal
 {
 	/// \ingroup Types
 	/// \brief A struct representing possible alignment modes, used in conjunction with the flags class.
-	struct AlignmentFlags
+	struct Alignment
 	{
 		/// \brief The number of alignment modes.
 		static const unsigned int FLAGS_COUNT = 8;
@@ -78,7 +78,10 @@ namespace internal
 
 #include "Util/Flags.h"
 
-typedef Flags<internal::AlignmentFlags> Alignment;
+typedef internal::Alignment Alignment;
+typedef Flags<Alignment> AlignmentFlags;
+
+X_DECLARE_FLAG_OPERATORS(AlignmentFlags);
 
 
 #endif // !_X_MATH_ALIGNMENT_H_

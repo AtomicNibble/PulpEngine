@@ -224,7 +224,7 @@ void RectT<T>::include(const RectT<T> &rect)
 }
 
 template<typename T>
-RectT<T>& RectT<T>::Align(const RectT& other, Alignment alignment)
+RectT<T>& RectT<T>::Align(const RectT& other, AlignmentFlags alignment)
 {
 	Vec2<T> pos = getUpperLeft();
 	Vec2<T> posOth = other.getUpperLeft();

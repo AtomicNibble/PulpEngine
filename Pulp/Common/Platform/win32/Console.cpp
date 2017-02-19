@@ -238,7 +238,7 @@ void Console::MoveTo(const Position& position)
 }
 
 /// Aligns the console window to any xRect.
-void Console::AlignTo(const Rect& xRect, Alignment alignment)
+void Console::AlignTo(const Rect& xRect, AlignmentFlags alignment)
 {
 	MoveTo( GetRect().Align( xRect, alignment ).getUpperLeft() );
 }

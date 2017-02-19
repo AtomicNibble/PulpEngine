@@ -24,7 +24,7 @@ public:
 
 public:
 	/// Types for position size etc.
-	typedef Alignment xAlign;
+	typedef AlignmentFlags AlignmentFlags;
 	typedef Vec2i Position;
 	typedef Recti Rect;
 
@@ -70,7 +70,7 @@ public:
 	
 	virtual void MoveTo(int x, int y);
 	virtual void MoveTo(const Position& position);
-	virtual void AlignTo(const Rect& Rect, xAlign alignment);
+	virtual void AlignTo(const Rect& Rect, AlignmentFlags alignment);
 
 	void SetTitle(const char* str);
 

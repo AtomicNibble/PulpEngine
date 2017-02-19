@@ -47,7 +47,7 @@ public:
 	void MoveTo(const Position& position);
 
 	/// Aligns the console window to any xRect.
-	void AlignTo(const Rect& xRect, Alignment alignment);
+	void AlignTo(const Rect& xRect, AlignmentFlags alignment);
 
 	/// Returns the console xRect, in pixel units.
 	Rect GetRect(void) const;

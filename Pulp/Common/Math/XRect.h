@@ -87,7 +87,7 @@ public:
 	void		include(const RectT &rect);
 
 	// align
-	RectT&		Align(const RectT& other, Alignment alignment);
+	RectT&		Align(const RectT& other, AlignmentFlags alignment);
 
 
 	const RectT<T>		operator+(const Vec2<T> &o) const { return this->getOffset(o); }
