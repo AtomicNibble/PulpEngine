@@ -28,6 +28,7 @@ namespace shader
 		sourceCrc32_(soruceFilecrc32),
 		entryPoint_(entry),
 		status_(ShaderStatus::NotCompiled),
+		techFlags_(techFlags),
 		type_(type),
 		IlFmt_(InputLayoutFormat::Invalid),
 		numInputParams_(0),
