@@ -37,9 +37,9 @@ X_DECLARE_ENUM8(TechStatus)(
 struct TechDefPerm
 {
 	TechStatus::Enum status;
-	bool vertStreams;
-	render::shader::VertexFormat::Enum vertFmt;
+	PermatationFlags permFlags;
 	uint8_t _pad[1];
+	render::shader::VertexFormat::Enum vertFmt;
 	render::StateHandle stateHandle;
 	render::shader::IShaderPermatation* pShaderPerm;
 	// +  4 more pad in 64bit

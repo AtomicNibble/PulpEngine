@@ -27,7 +27,7 @@ TechDef::~TechDef()
 }
 
 
-TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt, bool vertStreams)
+TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags)
 {
 	// ok so this will be called to get a permatation.
 	// we want to lazy compile these i think.
@@ -42,7 +42,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		// ry find it.
 		for (auto& pPerm : perms_)
 		{
-			if (pPerm->vertFmt == vertFmt && pPerm->vertStreams == vertStreams)
+			if (pPerm->vertFmt == vertFmt && pPerm->permFlags == permFlags)
 			{
 				// we found one is it compiled?
 				if (pPerm->status == TechStatus::COMPILED) {
@@ -66,7 +66,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 			// we don't have a perm, another thread might be compiling it tho.
 			pCompilingPerm = X_NEW(TechDefPerm, permArena_, "TechDefPerm");
 			pCompilingPerm->status = TechStatus::NOT_COMPILED;
-			pCompilingPerm->vertStreams = vertStreams;
+			pCompilingPerm->permFlags = permFlags;
 			pCompilingPerm->vertFmt = vertFmt;
 			perms_.append(pCompilingPerm);
 		}
