@@ -461,13 +461,13 @@ namespace shader
 				pShaderReflection->GetInputParameterDesc(n, &InputDsc);
 
 				// how many?
-				// uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
 				// i only do sematic checks now, since i don't give a flying fuck about the format.
+
 				pILnode = pILnode->GetChildWithSemtaic(InputDsc.SemanticName);
 				if (!pILnode)
 				{
-					X_ERROR("Shader", "input layout invalid.");
-					return true;
+					X_ERROR("Shader", "Input layout invalid.");
+					return false;
 				}
 			}
 
