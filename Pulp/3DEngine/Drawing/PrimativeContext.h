@@ -53,7 +53,37 @@ public:
 
 	typedef std::array<Material*, PrimitiveType::ENUM_COUNT> PrimMaterialArr;
 	typedef std::array<Shape, ShapeType::ENUM_COUNT> PrimShapeArr;
-	
+
+
+	// pages for instanced data.
+	static const uint32_t NUM_INSTANCE_PER_PAGE = 0x100;
+	static const uint32_t INSTANCE_PAGE_BYTES = NUM_INSTANCE_PER_PAGE * sizeof(ShapeInstanceData);
+	static const uint32_t MAX_PAGES = 16;
+	static const uint32_t MAX_INSTANCE_TOTAL = NUM_INSTANCE_PER_PAGE * MAX_PAGES;
+
+	struct InstancedPage
+	{
+		InstancedPage();
+
+		void createVB(render::IRender* pRender);
+		void destoryVB(render::IRender* pRender);
+
+		X_INLINE void reset(void);
+
+		X_INLINE bool isVbValid(void) const;
+
+		X_INLINE uint32_t curOffset(void) const;
+		X_INLINE uint32_t curOffsetBytes(void) const;
+		X_INLINE size_t spaceLeft(void) const;
+		X_INLINE size_t spaceLeftBytes(void) const;
+		X_INLINE void incOffset(uint32_t num);
+
+	public:
+		uint32_t currentOffset;
+		render::VertexBufferHandle instBufHandle;
+	};
+
+	typedef core::FixedArray<InstancedPage, MAX_PAGES> InstancedPageArr;
 
 public:
 	PrimativeContextSharedResources();
@@ -65,6 +95,8 @@ public:
 	X_INLINE Material* getMaterialDepthTest(PrimitiveType::Enum prim) const;
 
 	X_INLINE const Shape& getShapeResources(ShapeType::Enum shape) const;
+
+	bool getFreeInstancePage(InstancedPage& out);
 
 private:
 	bool loadMaterials(void);
@@ -84,6 +116,9 @@ private:
 	PrimMaterialArr primMaterials_;
 	PrimMaterialArr primMaterialsDepth_;
 	PrimShapeArr shapes_;
+
+	int32_t currentInstacePageIdx_;
+	InstancedPageArr shapeInstancePages_;
 };
 
 

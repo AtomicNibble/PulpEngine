@@ -3,6 +3,47 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+// --------------------------------------------------------
+
+X_INLINE void PrimativeContextSharedResources::InstancedPage::reset(void)
+{
+	currentOffset = 0;
+}
+
+X_INLINE bool PrimativeContextSharedResources::InstancedPage::isVbValid(void) const
+{
+	return instBufHandle != render::INVALID_BUF_HANLDE;
+}
+
+X_INLINE uint32_t PrimativeContextSharedResources::InstancedPage::curOffset(void) const
+{
+	return currentOffset;
+}
+
+X_INLINE uint32_t PrimativeContextSharedResources::InstancedPage::curOffsetBytes(void) const
+{
+	return currentOffset * sizeof(ShapeInstanceData);
+}
+
+X_INLINE size_t PrimativeContextSharedResources::InstancedPage::spaceLeft(void) const
+{
+	return NUM_INSTANCE_PER_PAGE - currentOffset;
+}
+
+X_INLINE size_t PrimativeContextSharedResources::InstancedPage::spaceLeftBytes(void) const
+{
+	return spaceLeft() * sizeof(ShapeInstanceData);
+}
+
+X_INLINE void PrimativeContextSharedResources::InstancedPage::incOffset(uint32_t num)
+{
+	currentOffset += num;
+}
+
+
+// --------------------------------------------------------
+
+
 
 X_INLINE Material* PrimativeContextSharedResources::getMaterial(PrimitiveType::Enum prim) const
 {

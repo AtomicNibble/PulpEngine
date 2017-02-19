@@ -294,7 +294,37 @@ PrimativeContextSharedResources::Shape::Shape()
 // ---------------------------------------------------------------------------
 
 
-PrimativeContextSharedResources::PrimativeContextSharedResources()
+PrimativeContextSharedResources::InstancedPage::InstancedPage() :
+	currentOffset(0),
+	instBufHandle(render::INVALID_BUF_HANLDE)
+{
+
+}
+
+void PrimativeContextSharedResources::InstancedPage::createVB(render::IRender* pRender)
+{
+	X_ASSERT(instBufHandle == render::INVALID_BUF_HANLDE, "Instanced buffer already valid")();
+
+	instBufHandle = pRender->createVertexBuffer(
+		sizeof(IPrimativeContext::ShapeInstanceData),
+		NUM_INSTANCE_PER_PAGE,
+		render::BufUsage::DYNAMIC,
+		render::CpuAccess::WRITE
+	);
+}
+
+
+void PrimativeContextSharedResources::InstancedPage::destoryVB(render::IRender* pRender)
+{
+	if (isVbValid()) {
+		pRender->destoryVertexBuffer(instBufHandle);
+	}
+}
+
+// ---------------------------------------------------------------------------
+
+PrimativeContextSharedResources::PrimativeContextSharedResources() :
+	currentInstacePageIdx_(-1)
 {
 	core::zero_object(primMaterials_);
 	core::zero_object(primMaterialsDepth_);
@@ -313,6 +343,28 @@ bool PrimativeContextSharedResources::init(render::IRender* pRender)
 		return false;
 	}
 
+	return true;
+}
+
+bool PrimativeContextSharedResources::getFreeInstancePage(InstancedPage& out)
+{
+	// re use a page?
+	if (currentInstacePageIdx_ < shapeInstancePages_.size()) {
+		out = shapeInstancePages_[currentInstacePageIdx_++];
+		return true;
+	}
+
+	// we need to allocate a page, do we have space?
+	if (shapeInstancePages_.size() == MAX_PAGES) {
+		return false;
+	}
+
+	auto& newPage = shapeInstancePages_.AddOne();
+
+	// create new gpu buffer.
+	newPage.createVB(pRender_);
+
+	out = newPage;
 	return true;
 }
 
