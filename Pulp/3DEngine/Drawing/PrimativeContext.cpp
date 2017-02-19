@@ -575,6 +575,7 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	{
 		for (auto& objectArr : lod)
 		{
+			objectArr.getAllocator().setBaseAlignment(16);
 			objectArr.setGranularity(128);
 		}
 	}

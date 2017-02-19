@@ -178,7 +178,7 @@ public:
 	};
 
 	typedef core::Array<VertexPage> VertexPagesArr;
-	typedef core::Array<ShapeInstanceData> ShapeParamArr;
+	typedef core::Array<ShapeInstanceData, core::ArrayAlignedAllocator<ShapeInstanceData>> ShapeParamArr;
 
 	// we have diffrent arrays for each lod of each shape.
 	// just makes submission more simple.
