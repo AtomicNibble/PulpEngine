@@ -324,7 +324,7 @@ void PrimativeContextSharedResources::InstancedPage::destoryVB(render::IRender* 
 // ---------------------------------------------------------------------------
 
 PrimativeContextSharedResources::PrimativeContextSharedResources() :
-	currentInstacePageIdx_(-1)
+	currentInstacePageIdx_(0)
 {
 	core::zero_object(primMaterials_);
 	core::zero_object(primMaterialsDepth_);
@@ -346,19 +346,31 @@ bool PrimativeContextSharedResources::init(render::IRender* pRender)
 	return true;
 }
 
+void PrimativeContextSharedResources::resetInstancePages(void)
+{
+	currentInstacePageIdx_ = 0;
+
+	for (auto& page : shapeInstancePages_)
+	{
+		page.reset();
+	}
+}
+
 bool PrimativeContextSharedResources::getFreeInstancePage(InstancedPage& out)
 {
+	if (currentInstacePageIdx_ == MAX_PAGES) {
+		return false;
+	}
+
 	// re use a page?
-	if (currentInstacePageIdx_ < shapeInstancePages_.size()) {
+	if (currentInstacePageIdx_ < safe_static_cast<int32_t>(shapeInstancePages_.size())) {
 		out = shapeInstancePages_[currentInstacePageIdx_++];
 		return true;
 	}
 
-	// we need to allocate a page, do we have space?
-	if (shapeInstancePages_.size() == MAX_PAGES) {
-		return false;
-	}
+	++currentInstacePageIdx_;
 
+	// new page.
 	auto& newPage = shapeInstancePages_.AddOne();
 
 	// create new gpu buffer.

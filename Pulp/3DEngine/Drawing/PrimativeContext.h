@@ -96,6 +96,7 @@ public:
 
 	X_INLINE const Shape& getShapeResources(ShapeType::Enum shape) const;
 
+	void resetInstancePages(void);
 	bool getFreeInstancePage(InstancedPage& out);
 
 private:
