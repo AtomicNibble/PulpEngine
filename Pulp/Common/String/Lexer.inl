@@ -122,7 +122,7 @@ void XLexToken::Init(void)
 	floatvalue_ = 0.f;
 
 	type_ = TokenType::INVALID;
-	subtype_ = 0;
+	subtype_.Clear();
 }
 
 

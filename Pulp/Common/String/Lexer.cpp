@@ -293,7 +293,8 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive, core::strin
 	curLine_ = 0;
 	lastLine_ = 0;
 
-	flags_ = 0;
+	// default inits itself.
+	// flags_ = 0;
 
 	SetPunctuations(nullptr);
 
@@ -1049,7 +1050,7 @@ bool XLexer::ReadNumber(XLexToken& token)
 	char c, c2;
 
 	token.SetType(TokenType::NUMBER);
-	token.subtype_ = 0;
+	token.subtype_.Clear();
 	token.intvalue_ = 0;
 	token.floatvalue_ = 0;
 
