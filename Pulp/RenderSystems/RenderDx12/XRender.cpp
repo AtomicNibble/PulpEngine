@@ -1099,12 +1099,10 @@ shader::IShaderSource* XRender::getShaderSource(const char* pSourceName)
 	return pShaderMan_->sourceforName(pSourceName);
 }
 
-shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile)
+shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const core::string& entry, 
+	shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
 {
-	return pShaderMan_->createHWShader(type, entry, pSourceFile);
-}
-
-{
+	return pShaderMan_->createHWShader(type, entry, pSourceFile, permFlags);
 }
 
 shader::IShaderPermatation* XRender::createPermatation(const shader::ShaderStagesArr& stages)

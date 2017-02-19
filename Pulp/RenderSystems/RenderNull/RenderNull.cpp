@@ -217,11 +217,13 @@ shader::IShaderSource* RenderNull::getShaderSource(const char* pName)
 	return nullptr;
 }
 
-shader::IHWShader* RenderNull::createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile)
+shader::IHWShader* RenderNull::createHWShader(shader::ShaderType::Enum type, const core::string& entry,
+	shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
 {
 	X_UNUSED(type);
 	X_UNUSED(entry);
 	X_UNUSED(pSourceFile);
+	X_UNUSED(permFlags);
 
 	return nullptr;
 }

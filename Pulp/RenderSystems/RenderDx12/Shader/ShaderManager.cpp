@@ -114,8 +114,10 @@ namespace shader
 		return true;
 	}
 
-	IHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile)
+	IHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, 
+		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
 	{
+		X_UNUSED(permFlags);
 
 		XHWShader* pHW = hwForName(type, entry, static_cast<SourceFile*>(pSourceFile), TechFlags(), ILFlags());
 

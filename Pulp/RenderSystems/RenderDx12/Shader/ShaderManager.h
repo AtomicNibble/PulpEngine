@@ -54,7 +54,8 @@ namespace shader
 		bool shutDown(void);
 		
 		IShaderSource* sourceforName(const char* pSourceName);
-		IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile);
+		IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, 
+			shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags);
 		void releaseHWShader(IHWShader* pHWSHader);
 
 		shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
