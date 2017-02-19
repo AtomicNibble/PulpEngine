@@ -233,6 +233,11 @@ typedef Flags8<ModelFlag> ModelFlags;
 typedef Flags<MeshFlag> MeshFlags;
 typedef Flags8<StreamType> StreamTypeFlags;
 
+X_DECLARE_FLAG_OPERATORS(ModelFlags);
+X_DECLARE_FLAG_OPERATORS(MeshFlags);
+X_DECLARE_FLAG_OPERATORS(StreamTypeFlags);
+
+
 X_PACK_PUSH(1)
 
 struct bindWeight

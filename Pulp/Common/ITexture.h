@@ -163,6 +163,8 @@ X_DECLARE_FLAGS(TexFlag)(
 
 typedef Flags<TexFlag> TextureFlags;
 
+X_DECLARE_FLAG_OPERATORS(TextureFlags);
+
 
 X_DECLARE_ENUM(ImgFileFormat) (
 	CI,

@@ -24,6 +24,8 @@ X_DECLARE_ENUM(VirtualDirectory)(GAME, MOD);
 
 typedef Flags<fileMode> fileModeFlags;
 
+X_DECLARE_FLAG_OPERATORS(fileModeFlags);
+
 
 struct XFileStats
 {

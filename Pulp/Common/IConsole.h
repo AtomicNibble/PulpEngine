@@ -44,6 +44,10 @@ TOOL,			// tool related
 CPY_NAME		// makes a copy of the name
 );
 
+typedef Flags<VarFlag> VarFlags;
+
+X_DECLARE_FLAG_OPERATORS(VarFlags);
+
 X_DECLARE_ENUM(consoleState)(
 	CLOSED,
 	OPEN,
@@ -133,7 +137,7 @@ struct IConsole
 
 struct ICVar
 {
-	typedef Flags<VarFlag> FlagType;
+	typedef VarFlags FlagType;
 	typedef char StrBuf[128];
 
 	virtual ~ICVar() {}

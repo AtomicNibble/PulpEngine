@@ -76,7 +76,7 @@ struct ConsoleCommand
 {
 	ConsoleCommand(); 
 
-	typedef Flags<VarFlag> FlagType;
+	typedef VarFlags FlagType;
 
 	string Name;	// the name of the command.
 	string Desc;	// descption text for the command

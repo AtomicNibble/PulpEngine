@@ -38,6 +38,9 @@ namespace msgbox
 		Error
 	};
 
+	X_DECLARE_FLAG_OPERATORS(StyleFlags);
+
+
 	const StyleFlags DEFAULT_STYLE = Style::Info;
 	const Buttons DEFAULT_BUTTONS = Buttons::OK;
 

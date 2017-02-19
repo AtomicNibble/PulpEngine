@@ -66,6 +66,8 @@ namespace IPC
 	};
 
 
+	X_DECLARE_FLAG_OPERATORS(Pipe::OpenModeFlags);
+
 } // namespace IPC
 
 X_NAMESPACE_END

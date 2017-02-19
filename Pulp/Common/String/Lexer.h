@@ -27,6 +27,9 @@ X_DECLARE_FLAGS(LexFlag)(
 	ONLYSTRINGS					// parse as whitespace deliminated strings (quoted strings keep quotes)
 );
 
+typedef Flags<LexFlag> LexFlags;
+
+X_DECLARE_FLAG_OPERATORS(LexFlags);
 
 X_DECLARE_ENUM(TokenType)(
 	STRING,
@@ -64,6 +67,10 @@ X_DECLARE_FLAGS(TokenSubType)(
 	IPPORT,
 	VALUESVALID
 );
+
+typedef Flags<TokenSubType> TokenSubTypeFlags;
+
+X_DECLARE_FLAG_OPERATORS(TokenSubTypeFlags);
 
 struct PunctuationId
 {
@@ -148,7 +155,7 @@ class XLexer;
 class XLexToken
 {
 public:
-	typedef Flags<TokenSubType> TokenSubTypeFlags;
+	typedef TokenSubTypeFlags TokenSubTypeFlags;
 
 public:
 	X_INLINE XLexToken();
@@ -223,7 +230,7 @@ public:
 	);
 
 public:
-	typedef Flags<LexFlag> LexFlags;
+	typedef LexFlags LexFlags;
 
 	XLexer();
 	XLexer(const char* startInclusive, const char* endExclusive);

@@ -30,6 +30,8 @@ X_DECLARE_FLAGS(GroupFlag)(
 
 typedef Flags<GroupFlag> GroupFlags;
 
+X_DECLARE_FLAG_OPERATORS(GroupFlags);
+
 typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
 typedef Handle RegionHandle;
@@ -526,6 +528,8 @@ X_DECLARE_FLAGS(HitFlag)(
 );
 
 typedef Flags<HitFlag> HitFlags;
+
+X_DECLARE_FLAG_OPERATORS(HitFlags);
 
 struct ActorShape
 {

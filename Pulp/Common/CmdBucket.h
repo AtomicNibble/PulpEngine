@@ -100,6 +100,8 @@ X_DECLARE_FLAGS8(DepthBindFlag)(
 
 typedef Flags8<DepthBindFlag> DepthBindFlags;
 
+X_DECLARE_FLAG_OPERATORS(DepthBindFlags);
+
 class CommandBucketBase
 {
 	X_NO_COPY(CommandBucketBase);

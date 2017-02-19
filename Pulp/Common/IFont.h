@@ -56,6 +56,8 @@ X_DECLARE_FLAGS(DrawTextFlag)(
 
 typedef Flags<DrawTextFlag> DrawTextFlags;
 
+X_DECLARE_FLAG_OPERATORS(DrawTextFlags);
+
 struct XTextDrawConect
 {
 	Color8u	col;  // 4

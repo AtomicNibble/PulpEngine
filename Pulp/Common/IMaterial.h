@@ -87,6 +87,7 @@ X_DECLARE_FLAGS(MaterialFlag)(
 
 typedef Flags<MaterialFlag> MaterialFlags;
 
+X_DECLARE_FLAG_OPERATORS(MaterialFlags);
 
 X_DECLARE_ENUM8(MaterialMountType)(
 	NONE,

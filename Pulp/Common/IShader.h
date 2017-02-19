@@ -228,6 +228,8 @@ static const char* DEFAULT_SHADER_ENTRY[ShaderStage::FLAGS_COUNT] = {
 X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 typedef Flags<ILFlag> ILFlags;
 
+X_DECLARE_FLAG_OPERATORS(ILFlags);
+
 X_DECLARE_ENUM8(InputLayoutFormat)(
 	Invalid,
 
