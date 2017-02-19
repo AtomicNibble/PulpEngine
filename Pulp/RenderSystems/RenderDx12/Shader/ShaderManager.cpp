@@ -119,7 +119,21 @@ namespace shader
 	{
 		X_UNUSED(permFlags);
 
-		XHWShader* pHW = hwForName(type, entry, static_cast<SourceFile*>(pSourceFile), TechFlags(), ILFlags());
+
+		TechFlags techFlags;
+		// copy them across.
+		// i think i will phase out techFlags.
+		// just gonna see how it evolves.
+		// the thing that's diffrent about permatation flags is that is also has things that relate to render state.
+		// but i think that's okay.
+		if (permFlags.IsSet(shader::Permatation::Instanced)) {
+			techFlags.Set(TechFlag::Instanced);
+		}
+		if (permFlags.IsSet(shader::Permatation::HwSkin)) {
+			techFlags.Set(TechFlag::Skinned);
+		}
+
+		XHWShader* pHW = hwForName(type, entry, static_cast<SourceFile*>(pSourceFile), techFlags, ILFlags());
 
 		return pHW;
 	}
