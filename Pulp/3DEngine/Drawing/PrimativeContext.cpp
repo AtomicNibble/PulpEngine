@@ -678,17 +678,22 @@ bool PrimativeContext::isEmpty(void) const
 		return false;
 	}
 
+	return !hasShapeData();
+}
+
+bool PrimativeContext::hasShapeData(void) const
+{
 	for (const auto& lod : shapeLodArrays_)
 	{
 		for (const auto& objectArr : lod)
 		{
 			if (objectArr.isNotEmpty()) {
-				return false;
+				return true;
 			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void) const

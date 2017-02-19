@@ -220,6 +220,7 @@ public:
 	void setDepthTest(bool enabled) X_FINAL;
 
 	bool isEmpty(void) const;
+	bool hasShapeData(void) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	const ShapeParamLodTypeArr& getShapeArrayBuffers(void) const;
 	VertexPageHandlesArr getVertBufHandles(void) const;
