@@ -30,6 +30,7 @@ void PrimativeContextSharedResources::CreateSphere(VertArr& vb, IndexArr& ib,
 
 	// 1st pole vertex
 	VertArr::Type vert;
+	vert.color = Col_White;
 	vert.pos = Vec3f(0.0f, 0.0f, radius);
 	vb.emplace_back(vert);
 
@@ -104,6 +105,7 @@ void PrimativeContextSharedResources::CreateCone(VertArr& vb, IndexArr& ib,
 
 	// center vertex
 	VertArr::Type vert;
+	vert.color = Col_White;
 	vert.pos = Vec3f(0.0f, 0.0f, 0.0f);
 	vb.emplace_back(vert);
 
@@ -180,6 +182,8 @@ void PrimativeContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
 	float sectionSlice = toRadians(360.0f / (float)sections);
 
 	VertArr::Type vert;
+	vert.color = Col_White;
+
 	// bottom cap
 	{
 		// center bottom vertex
