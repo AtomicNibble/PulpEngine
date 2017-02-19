@@ -308,7 +308,9 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	matTech.pVariableState = pVariableState;
 
 	pMat->addTech(matTech);
-	return pMat->getTech(techNameHash, vrtFmt);
+
+	pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
+	return pTech;
 }
 
 bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id)
