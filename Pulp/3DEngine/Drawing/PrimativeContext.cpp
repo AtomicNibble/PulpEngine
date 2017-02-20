@@ -179,6 +179,8 @@ void PrimativeContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
 	vb.reserve(vb.size() + numVertices);
 	ib.reserve(ib.size() + numIndices);
 
+	IndexArr::Type vIdxBase = safe_static_cast<IndexArr::Type>(vb.size());
+
 	float sectionSlice = toRadians(360.0f / (float)sections);
 
 	VertArr::Type vert;
@@ -213,7 +215,7 @@ void PrimativeContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
 
 	// side
 	{
-		uint16_t vIdx = safe_static_cast<uint16_t, size_t>(vb.size());
+		IndexArr::Type vIdx = safe_static_cast<IndexArr::Type>(vb.size()) - vIdxBase;
 
 		uint32 i;
 		for (i = 0; i <= sections; ++i)
@@ -248,14 +250,14 @@ void PrimativeContextSharedResources::CreateCylinder(VertArr& vb, IndexArr& ib,
 
 	// top cap
 	{
-		uint16_t vIdx = safe_static_cast<IndexArr::Type>(vb.size());
+		IndexArr::Type vIdx = safe_static_cast<IndexArr::Type>(vb.size()) - vIdxBase;
 
 		// center top vertex
 		vert.pos = Vec3f(0.0f, 0.5f * height, 0.0f);
 		vb.emplace_back(vert);
 
 		// create circle around it
-		uint16_t i;
+		IndexArr::Type i;
 		for (i = 0; i <= sections; ++i)
 		{
 			Vec3f v;
