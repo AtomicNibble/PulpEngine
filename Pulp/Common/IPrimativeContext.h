@@ -19,7 +19,7 @@ public:
 		Mode3D,
 	};
 
-	static const int32_t SHAPE_NUM_LOD = 5;
+	static const int32_t SHAPE_NUM_LOD = 4;
 
 	X_DECLARE_ENUM(ShapeType)(
 		Sphere,
