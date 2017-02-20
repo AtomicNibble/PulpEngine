@@ -97,7 +97,8 @@ struct Vertex_P3F_T4F_C4B_N3F : public Vertex_P3F_T4F
 struct InstancedData_MAT44_C4F
 {
 	Matrix44f mat;
-	Colorf color;
+	Color8u color;
+	uint8_t pad[12]; // TODO see if worth it.
 };
 
 static_assert(((sizeof(InstancedData_MAT44_C4F) * 8) % 128) == 0, "should be a multiple of 128bits for gpu performance");

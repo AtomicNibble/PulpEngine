@@ -1373,10 +1373,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 			1 // one pos per instance 
 		};
 
-		D3D12_INPUT_ELEMENT_DESC elem_col32 = {
+		D3D12_INPUT_ELEMENT_DESC elem_col8888 = {
 			"COLOR",
 			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
+			DXGI_FORMAT_R8G8B8A8_UNORM,
 			VertexStream::INSTANCE,
 			0,
 			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
@@ -1390,8 +1390,8 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 			inputDesc.append(elem_vec4);
 		}
 
-		elem_col32.AlignedByteOffset = 4 * sizeof(Vec4f);
-		inputDesc.append(elem_col32);
+		elem_col8888.AlignedByteOffset = 4 * sizeof(Vec4f);
+		inputDesc.append(elem_col8888);
 
 		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
 	};
