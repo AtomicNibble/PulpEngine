@@ -279,6 +279,7 @@ private:
 	// pre created IL descriptinos for each supported vertex format.
 	VertexFormatILArr ilDescriptions_;
 	VertexFormatILArr ilStreamedDescriptions_;
+	VertexLayoutDescArr ilInstanced_;
 
 	D3D_FEATURE_LEVEL featureLvl_;
 	GpuFeatures features_;

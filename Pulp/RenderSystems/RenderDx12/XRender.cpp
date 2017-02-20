@@ -1352,78 +1352,27 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pso.setRenderTargetFormats(static_cast<uint32_t>(pPassState->rtfs.size()), RTVFormats, DSVFormat, 1, 0);
 	pso.setPrimitiveTopologyType(topoTypeFromDesc(desc));
 
-
-	auto addInstanceStreams = [&pso](VertexLayoutDescArr inputDesc) {
-
-		auto maxSlot = std::max_element(std::begin(inputDesc), std::end(inputDesc),
-			[](const D3D12_INPUT_ELEMENT_DESC& a, const D3D12_INPUT_ELEMENT_DESC& b) {
-			return a.InputSlot < b.InputSlot;
-		}
-		);
-
-		// we take positions as matrix.
-		// which are 4 float4's
-		D3D12_INPUT_ELEMENT_DESC elem_vec4 = {
-			"POSITION",
-			1,
-			DXGI_FORMAT_R32G32B32A32_FLOAT,
-			VertexStream::INSTANCE,
-			0,
-			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
-			1 // one pos per instance 
-		};
-
-		D3D12_INPUT_ELEMENT_DESC elem_col8888 = {
-			"COLOR",
-			1,
-			DXGI_FORMAT_R8G8B8A8_UNORM,
-			VertexStream::INSTANCE,
-			0,
-			D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
-			1 // one color per instance
-		};
-
-		for (uint32_t i = 0; i < 4; i++)
-		{
-			elem_vec4.SemanticIndex = i + 1;
-			elem_vec4.AlignedByteOffset = i * sizeof(Vec4f);
-			inputDesc.append(elem_vec4);
-		}
-
-		elem_col8888.AlignedByteOffset = 4 * sizeof(Vec4f);
-		inputDesc.append(elem_col8888);
-
-		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
-	};
-
+	VertexLayoutDescArr* pInputLayout = &ilDescriptions_[desc.vertexFmt];
 	if (desc.stateFlags.IsSet(StateFlag::VERTEX_STREAMS))
 	{
-		if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
-		{
-			// make a copy and append instanced descriptions.
-			// for now it's always pos & col.
-			addInstanceStreams(ilStreamedDescriptions_[desc.vertexFmt]);
+		pInputLayout = &ilStreamedDescriptions_[desc.vertexFmt];
+	}
+
+	X_ASSERT_NOT_NULL(pInputLayout);
+
+	if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
+	{
+		// make a copy and append instanced descriptions.
+		VertexLayoutDescArr inputDesc(*pInputLayout);
+		for (const auto& il : ilInstanced_) {
+			inputDesc.append(il);
 		}
-		else
-		{
-			const auto& inputDesc = ilStreamedDescriptions_[desc.vertexFmt];
-			pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
-		}
+
+		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
 	}
 	else
 	{
-		if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
-		{
-			// we add 'streams' even tho streams are not enabled.
-			// since it just means the base data is not in streamed.
-			// passing instanced data merged it just dumb anyway.
-			addInstanceStreams(ilDescriptions_[desc.vertexFmt]);
-		}
-		else
-		{
-			const auto& inputDesc = ilDescriptions_[desc.vertexFmt];
-			pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
-		}
+		pso.setInputLayout(pInputLayout->size(), pInputLayout->ptr());
 	}
 
 	if (perm.isStageSet(shader::ShaderType::Vertex)) {
@@ -1739,7 +1688,36 @@ void XRender::initILDescriptions(void)
 		}
 	}
 
+	// instanced streams
+	D3D12_INPUT_ELEMENT_DESC elem_inst_vec4 = {
+		"POSITION",
+		1,
+		DXGI_FORMAT_R32G32B32A32_FLOAT,
+		VertexStream::INSTANCE,
+		0,
+		D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
+		1 // one pos per instance 
+	};
 
+	D3D12_INPUT_ELEMENT_DESC elem_inst_col8888 = {
+		"COLOR",
+		1,
+		DXGI_FORMAT_R8G8B8A8_UNORM,
+		VertexStream::INSTANCE,
+		0,
+		D3D12_INPUT_CLASSIFICATION_PER_INSTANCE_DATA,
+		1 // one color per instance
+	};
+
+	for (uint32_t i = 0; i < 4; i++)
+	{
+		elem_inst_vec4.SemanticIndex = i + 1;
+		elem_inst_vec4.AlignedByteOffset = i * sizeof(Vec4f);
+		ilInstanced_.append(elem_inst_vec4);
+	}
+
+	elem_inst_col8888.AlignedByteOffset = 4 * sizeof(Vec4f);
+	ilInstanced_.append(elem_inst_col8888);
 }
 
 bool XRender::initRenderBuffers(Vec2<uint32_t> res)
