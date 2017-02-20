@@ -590,12 +590,11 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 
 	if (sphere.radius() > 0.0f)
 	{
-		Matrix44f scale = Matrix44f::createScale(sphere.radius());
-		Matrix44f trans = Matrix44f::createTranslation(sphere.center());
-		Matrix44f transMat = scale * trans;
+		Matrix44f mat = Matrix44f::createScale(Vec3f(sphere.radius()));
+		mat.setTranslate(sphere.center());
 
 		ShapeInstanceData* pObj = addShape(ShapeType::Sphere);
-		pObj->mat = transMat;
+		pObj->mat = mat;
 		pObj->color = col;
 	}
 }
