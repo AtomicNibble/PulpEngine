@@ -608,7 +608,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, c
 	{
 		Matrix44f scale = Matrix44f::createScale(sphere.radius());
 		Matrix44f trans = Matrix44f::createTranslation(mat * sphere.center());
-		Matrix44f transMat = scale * trans;
+		Matrix44f transMat = trans * scale;
 
 		ShapeInstanceData* pObj = addShape(ShapeType::Sphere);
 		pObj->mat = transMat;
@@ -634,7 +634,7 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 
 		Matrix44f scale = Matrix44f::createScale(Vec3f(radius, height, radius));
 		Matrix44f trans = Matrix44f::createTranslation(pos);
-		Matrix44f transMat = scale * matRot * trans;
+		Matrix44f transMat = trans * matRot * scale;
 
 		ShapeInstanceData* pObj = addShape(ShapeType::Cone);
 		pObj->mat = transMat;
@@ -660,7 +660,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 
 		Matrix44f scale = Matrix44f::createScale(Vec3f(radius, height, radius));
 		Matrix44f trans = Matrix44f::createTranslation(pos);
-		Matrix44f transMat = scale * matRot * trans;
+		Matrix44f transMat = trans * matRot * scale;
 
 		ShapeInstanceData* pObj = addShape(ShapeType::Cone);
 		pObj->mat = transMat;
