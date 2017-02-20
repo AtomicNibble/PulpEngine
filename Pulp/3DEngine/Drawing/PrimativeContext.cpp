@@ -833,8 +833,9 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 	return addPrimative(numVertices, primType, pMat);
 }
 
-PrimativeContext::ShapeInstanceData* PrimativeContext::addShape(ShapeType::Enum type, int32_t lodIdx)
+PrimativeContext::ShapeInstanceData* PrimativeContext::addShape(ShapeType::Enum type, bool solid, int32_t lodIdx)
 {
+	X_UNUSED(solid);
 	return &shapeLodArrays_[type][lodIdx].AddOne();
 }
 

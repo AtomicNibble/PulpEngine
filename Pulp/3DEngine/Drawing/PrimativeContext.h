@@ -237,7 +237,7 @@ private:
 private:
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_FINAL;
 	PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_FINAL;
-	ShapeInstanceData* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_FINAL;
+	ShapeInstanceData* addShape(ShapeType::Enum type, bool solid, int32_t lodIdx = 0) X_FINAL;
 
 private:
 	PushBufferArr pushBufferArr_;

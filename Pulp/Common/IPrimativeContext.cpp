@@ -578,7 +578,7 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& co
 }
 
 // Sphere
-void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, bool drawShaded)
+void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, bool solid, int32_t lodIdx)
 {
 	// fuck a goat with a flag pole.
 	// this really needs to be implemented with premade sphere mesh that is just instanced.
@@ -586,40 +586,36 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 	// in order todo instance the prim contex should create the render shapes itself and handle the instancing.
 	// so i will make a seperate api for adding these, that deals with specific shapes.
 	// the prim contex impl will handle the instanced drawing.
-	X_UNUSED(drawShaded);
 
 	if (sphere.radius() > 0.0f)
 	{
 		Matrix44f mat = Matrix44f::createScale(Vec3f(sphere.radius()));
 		mat.setTranslate(sphere.center());
 
-		ShapeInstanceData* pObj = addShape(ShapeType::Sphere);
+		ShapeInstanceData* pObj = addShape(ShapeType::Sphere, solid, lodIdx);
 		pObj->mat = mat;
 		pObj->color = col;
 	}
 }
 
-void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded)
+void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool solid, int32_t lodIdx)
 {
-	X_UNUSED(drawShaded);
-
 	if (sphere.radius() > 0.0f)
 	{
 		Matrix44f scale = Matrix44f::createScale(sphere.radius());
 		Matrix44f trans = Matrix44f::createTranslation(mat * sphere.center());
 		Matrix44f transMat = trans * scale;
 
-		ShapeInstanceData* pObj = addShape(ShapeType::Sphere);
+		ShapeInstanceData* pObj = addShape(ShapeType::Sphere, solid, lodIdx);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
 }
 
 // Cone
-void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded)
+void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, 
+	const Color8u& col, bool solid, int32_t lodIdx)
 {
-	X_UNUSED(drawShaded);
-
 	if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f)
 	{
 		Vec3f direction(dir.normalized());
@@ -635,17 +631,16 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 		Matrix44f trans = Matrix44f::createTranslation(pos);
 		Matrix44f transMat = trans * matRot * scale;
 
-		ShapeInstanceData* pObj = addShape(ShapeType::Cone);
+		ShapeInstanceData* pObj = addShape(ShapeType::Cone, solid, lodIdx);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
 }
 
 // Cylinder
-void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded)
+void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, 
+	const Color8u& col, bool solid, int32_t lodIdx)
 {
-	X_UNUSED(drawShaded);
-
 	if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f)
 	{
 		Vec3f direction(dir.normalized());
@@ -661,7 +656,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 		Matrix44f trans = Matrix44f::createTranslation(pos);
 		Matrix44f transMat = trans * matRot * scale;
 
-		ShapeInstanceData* pObj = addShape(ShapeType::Cone);
+		ShapeInstanceData* pObj = addShape(ShapeType::Cylinder, solid, lodIdx);
 		pObj->mat = transMat;
 		pObj->color = col;
 	}
@@ -778,12 +773,12 @@ void IPrimativeContext::drawBone(const Matrix34f& rParent, const Matrix34f& rBon
 
 
 // Frustum - Sexyyyyyyyyyy
-void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded)
+void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool solid)
 {
 	std::array<Vec3f, 8> v;
 	frustum.GetFrustumVertices(v);
 
-	if (!drawShaded)
+	if (!solid)
 	{
 		PrimVertex* pLines = addPrimative(4 * 6, PrimitiveType::LINELIST);
 

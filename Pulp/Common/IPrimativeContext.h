@@ -96,21 +96,21 @@ public:
 	void drawAABB(const AABB& aabb, bool solid, const Color8u& col);
 
 	// Sphere
-	void drawSphere(const Sphere& sphere, const Color8u& col, bool drawShaded = true);
-	void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded = true);
+	void drawSphere(const Sphere& sphere, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
+	void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
 
 	// Cone
-	void drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true);
+	void drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
 
 	// Cylinder
-	void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true);
+	void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
 
 	// Bone
 	void drawBone(const Transformf& rParent, const Transformf& rBone, const Color8u& col);
 	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col);
 
 	// Frustum - Sexyyyyyyyyyy
-	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false);
+	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool solid = false);
 
 	// Arrow
 	void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color);
@@ -135,7 +135,7 @@ public:
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type) X_ABSTRACT;
 
-	virtual ShapeInstanceData* addShape(ShapeType::Enum type, int32_t lodIdx = 0) X_ABSTRACT;
+	virtual ShapeInstanceData* addShape(ShapeType::Enum type, bool solid, int32_t lodIdx = 0) X_ABSTRACT;
 };
 
 
