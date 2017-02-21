@@ -334,7 +334,7 @@ void Level::dispatchJobs(core::FrameData& frame)
 
 		auto* pBuildvisFlags = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::BuildVisibleAreaFlags_job, nullptr);
 		auto* pRemoveDupeVis = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::MergeVisibilityArrs_job, nullptr);
-	//	auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr);
+		auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr);
 	//	auto* pDrawStaticModels = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleStaticModels_job, nullptr);
 
 		// now inline build the vis flags for areas
@@ -342,7 +342,7 @@ void Level::dispatchJobs(core::FrameData& frame)
 		// then dispatch a job to post proces the visible models, to create single visble lists for each area.
 		pJobSys_->AddContinuation(pFindVisibleAreas, pRemoveDupeVis, false);
 		// after we have visible areas we can begin drawing the area geo.
-	//	pJobSys_->AddContinuation(pFindVisibleAreas, pDrawAreaGeo, false);
+		pJobSys_->AddContinuation(pFindVisibleAreas, pDrawAreaGeo, false);
 		// after the dupe visibility has been resolved we can start drawing the static models (we could run this after each are'as dupe have been removed)
 	//	pJobSys_->AddContinuation(pRemoveDupeVis, pDrawStaticModels, false);
 
