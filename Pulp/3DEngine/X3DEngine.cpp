@@ -372,6 +372,205 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 						std::memcpy(pAuxData, pVariableState->getDataStart(), pVariableState->getStateSize());
 					}
 				}
+
+				// shapes
+				if (!context.hasShapeData()) {
+					continue;
+				}
+
+
+				// shapeData
+				//	this code is a little elabrate, but makes drawing primative shapes pretty cheap.
+				//	it copyies all the instance data for all shapes for all lod's to a series of instance data pages.
+				//	all the buffer copying is done before any drawing to give gpu some time to copy instance data
+				//	then all the shapes are drawn with instance calls, meaning drawing 1000 spheres of variang sizes and color
+				//	will result in about 4 page data copyies followed by 4 draw calls.
+				//  which is kinda nice as the first draw call can begin before the instance data for the other 3 have finished
+				{
+					// what material to draw with?
+					Material* pMat = primResources_.getMaterial(render::TopoType::TRIANGLELIST);
+
+					auto& objShapeLodBufs = context.getShapeArrayBuffers();
+
+					// sort them all. in parrell if you like,
+					for (size_t x = 0; x < objShapeLodBufs.size(); x++)
+					{
+						objShapeLodBufs[x].sort();
+					}
+
+					auto& instPages = primResources_.getInstancePages();
+					const uint32_t maxPerPage = PrimativeContextSharedResources::NUM_INSTANCE_PER_PAGE;
+
+					render::Commands::CopyVertexBufferData* pBufUpdateCommand = nullptr;
+
+					// buffer copy commands.
+					{
+						// we need to keep trac of space left, so we can merge all shapes into single inst pages.
+						uint32_t curPageSpace = maxPerPage;
+						size_t curInstPage = 0;
+
+						if (!instPages[curInstPage].isVbValid()) {
+							instPages[curInstPage].createVB(pRender_);
+						}
+
+						for (size_t x = 0; x < objShapeLodBufs.size(); x++)
+						{
+							PrimativeContext::ShapeType::Enum shapeType = static_cast<PrimativeContext::ShapeType::Enum>(x);
+							auto& shapeBuf = objShapeLodBufs[x];
+
+							if (shapeBuf.isEmpty()) {
+								continue;
+							}
+
+							uint32_t numInstLeft = safe_static_cast<uint32_t>(shapeBuf.size());
+							auto& instData = shapeBuf.getData();
+							auto* pInstData = instData.data();
+
+							while (numInstLeft > 0 && curInstPage < instPages.size())
+							{
+								if (curPageSpace == 0)
+								{
+									++curInstPage;
+
+									if (curInstPage >= instPages.size()) {
+										continue;
+									}
+
+									// make page buffer if required.
+									auto& instPage = instPages[curInstPage];
+									if (!instPage.isVbValid()) {
+										instPage.createVB(pRender_);
+									}
+
+									curPageSpace = maxPerPage;
+								}
+
+								uint32_t batchSize = core::Min(numInstLeft, curPageSpace);
+								const uint32_t batchOffset = maxPerPage - curPageSpace;
+
+								numInstLeft -= batchSize;
+								curPageSpace -= batchSize;
+
+								const auto& instPage = instPages[curInstPage];
+
+								render::Commands::CopyVertexBufferData* pUpdateBuf = nullptr;
+								if (!pBufUpdateCommand) {
+									pUpdateBuf = primBucket.addCommand<render::Commands::CopyVertexBufferData>(100000, 0);
+								}
+								else {
+									pUpdateBuf = primBucket.appendCommand<render::Commands::CopyVertexBufferData>(pBufUpdateCommand, 0);
+								}
+								pUpdateBuf->vertexBuffer = instPage.instBufHandle;
+								pUpdateBuf->pData = pInstData;
+								pUpdateBuf->size = batchSize * sizeof(IPrimativeContext::ShapeInstanceData);
+								pUpdateBuf->dstOffset = batchOffset * sizeof(IPrimativeContext::ShapeInstanceData);
+
+								// chain them
+								pBufUpdateCommand = pUpdateBuf;
+
+								pInstData += batchSize;
+							}
+
+							// can we draw them all?
+							if (numInstLeft > 0)
+							{
+								X_WARNING("Engine", "Not enougth pages to draw all primative %s's. total: %" PRIuS " dropped: %" PRIu32,
+									IPrimativeContext::ShapeType::ToString(shapeType), instData.size(), numInstLeft);
+							}
+						}
+					}
+
+					// now we draw all shapes.
+					{
+						uint32_t curPageSpace = maxPerPage;
+						size_t curInstPage = 0;
+
+						for (size_t x = 0; x < objShapeLodBufs.size(); x++)
+						{
+							PrimativeContext::ShapeType::Enum shapeType = static_cast<PrimativeContext::ShapeType::Enum>(x);
+							const auto& shapeRes = context.getShapeResources(shapeType);
+							auto& shapeBuf = objShapeLodBufs[x];
+							auto& shapeCnts = shapeBuf.getShapeCounts();
+
+							for (size_t solidIdx = 0; solidIdx < shapeCnts.size(); ++solidIdx)
+							{
+								// index 1 is solid shapes.
+								core::StrHash tech = solidIdx == 0 ? core::StrHash("wireframe") : core::StrHash("unlit");
+
+								const auto* pTech = pMaterialManager_->getTechForMaterial(
+									pMat, 
+									tech,
+									IPrimativeContext::VERTEX_FMT, 
+									PermatationFlags::Instanced
+								);
+
+								const auto* pPerm = pTech->pPerm;
+								const auto* pVariableState = pTech->pVariableState;
+								auto variableStateSize = pVariableState->getStateSize();
+
+
+								const auto& lodCounts = shapeCnts[solidIdx];
+								for (int32_t lodIdx = 0; lodIdx < lodCounts.size(); lodIdx++)
+								{
+									uint32_t numShapes = lodCounts[lodIdx];
+									if (numShapes == 0) {
+										continue;
+									}
+
+									const auto& lodRes = shapeRes.lods[lodIdx];
+
+									// dispatch N draw calls for this shapes lod.
+									// it's more than one draw call if the instance data for a single shapes lod
+									// spans multiple instance data pages.
+									while (numShapes > 0)
+									{
+										if (curPageSpace == 0)
+										{
+											++curInstPage;
+
+											if (curInstPage >= instPages.size()) {
+												numShapes = 0;
+												continue;
+											}
+
+											curPageSpace = maxPerPage;
+										}
+
+										const uint32_t batchSize = core::Min<uint32_t>(curPageSpace, numShapes);
+										const uint32_t batchOffset = maxPerPage - curPageSpace;
+
+										numShapes -= batchSize;
+										curPageSpace -= batchSize;
+
+										// the page we are drawing from.
+										auto& instPage = instPages[curInstPage];
+
+										auto* pDrawInstanced = primBucket.addCommand<render::Commands::DrawInstancedIndexed>(100000 + 1, variableStateSize);
+										pDrawInstanced->startInstanceLocation = batchOffset;
+										pDrawInstanced->instanceCount = batchSize;
+										pDrawInstanced->startIndexLocation = lodRes.startIndex;
+										pDrawInstanced->baseVertexLocation = lodRes.baseVertex;
+										pDrawInstanced->indexCountPerInstance = lodRes.indexCount;
+										pDrawInstanced->stateHandle = pPerm->stateHandle;
+										core::zero_object(pDrawInstanced->vertexBuffers);
+										pDrawInstanced->vertexBuffers[VertexStream::VERT] = shapeRes.vertexBuf;
+										pDrawInstanced->vertexBuffers[VertexStream::INSTANCE] = instPage.instBufHandle;
+										pDrawInstanced->indexBuffer = shapeRes.indexbuf;
+										pDrawInstanced->resourceState = *pVariableState; // slice it in.
+
+										if (variableStateSize)
+										{
+											char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDrawInstanced);
+											std::memcpy(pAuxData, pVariableState->getDataStart(), pVariableState->getStateSize());
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+				// ~shapeData
+
 			}
 		}
 #endif
