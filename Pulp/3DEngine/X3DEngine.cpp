@@ -295,9 +295,8 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 	{
 
 		XCamera cam;
-		XViewPort viewPort;
+		XViewPort viewPort = frame.view.viewport;
 
-		viewPort.set(1680, 1050);
 
 		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 256);
 		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
