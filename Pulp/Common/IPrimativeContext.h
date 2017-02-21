@@ -27,7 +27,22 @@ public:
 		Cylinder // get fooked. AINT nobody got time for cylinders.
 	);
 
-	typedef InstancedData_MAT44_C4F ShapeInstanceData;
+	// typedef InstancedData_MAT44_C4F ShapeInstanceData;
+	X_ALIGNED_SYMBOL(struct ShapeInstanceData, 16) : public InstancedData_MAT44_C4F
+	{
+		// not much point making a move assign op.
+		X_INLINE ShapeInstanceData& operator=(const ShapeInstanceData& oth) {
+			mat = oth.mat;
+			color = oth.color;
+			lodIdx = oth.lodIdx;
+			solid = oth.solid;
+			return *this;
+		}
+
+		int32_t lodIdx;
+		int32_t solid;
+		uint8_t _pad[4];
+	};
 
 public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;

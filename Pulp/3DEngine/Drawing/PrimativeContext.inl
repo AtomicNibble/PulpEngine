@@ -5,39 +5,9 @@ X_NAMESPACE_BEGIN(engine)
 
 // --------------------------------------------------------
 
-X_INLINE void PrimativeContextSharedResources::InstancedPage::reset(void)
-{
-	currentOffset = 0;
-}
-
 X_INLINE bool PrimativeContextSharedResources::InstancedPage::isVbValid(void) const
 {
 	return instBufHandle != render::INVALID_BUF_HANLDE;
-}
-
-X_INLINE uint32_t PrimativeContextSharedResources::InstancedPage::curOffset(void) const
-{
-	return currentOffset;
-}
-
-X_INLINE uint32_t PrimativeContextSharedResources::InstancedPage::curOffsetBytes(void) const
-{
-	return currentOffset * sizeof(ShapeInstanceData);
-}
-
-X_INLINE size_t PrimativeContextSharedResources::InstancedPage::spaceLeft(void) const
-{
-	return NUM_INSTANCE_PER_PAGE - currentOffset;
-}
-
-X_INLINE size_t PrimativeContextSharedResources::InstancedPage::spaceLeftBytes(void) const
-{
-	return spaceLeft() * sizeof(ShapeInstanceData);
-}
-
-X_INLINE void PrimativeContextSharedResources::InstancedPage::incOffset(uint32_t num)
-{
-	currentOffset += num;
 }
 
 
@@ -104,5 +74,43 @@ X_INLINE const uint32_t PrimativeContext::VertexPage::freeSpace(void) const
 
 // --------------------------------------------------------
 
+
+X_INLINE void PrimativeContext::ShapeInstanceDataContainer::clear(void)
+{
+	data_.clear();
+	core::zero_object(shapeCounts_);
+}
+
+X_INLINE bool PrimativeContext::ShapeInstanceDataContainer::isEmpty(void) const
+{
+	return data_.isEmpty();
+}
+
+X_INLINE size_t PrimativeContext::ShapeInstanceDataContainer::size(void) const
+{
+	return data_.size();
+}
+
+X_INLINE const PrimativeContext::ShapeInstanceDataContainer::ShapeCountArr& PrimativeContext::ShapeInstanceDataContainer::getShapeCounts(void) const
+{
+	return shapeCounts_;
+}
+
+X_INLINE PrimativeContext::ShapeInstanceData* PrimativeContext::ShapeInstanceDataContainer::addShape(bool solid, int32_t lodIdx)
+{
+	// we count how many of each type we have in the buffer
+	// this way we know the index ranges of each group post sort.
+	++shapeCounts_[solid][lodIdx];
+
+	ShapeInstanceData* pInstData = &data_.AddOne();
+	pInstData->lodIdx = lodIdx;
+	pInstData->solid = solid ? 1 : 0;
+	return pInstData;
+}
+
+X_INLINE const PrimativeContext::ShapeParamArr& PrimativeContext::ShapeInstanceDataContainer::getData(void) const
+{
+	return data_;
+}
 
 X_NAMESPACE_END

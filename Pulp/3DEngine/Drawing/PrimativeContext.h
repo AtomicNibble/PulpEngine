@@ -68,22 +68,13 @@ public:
 		void createVB(render::IRender* pRender);
 		void destoryVB(render::IRender* pRender);
 
-		X_INLINE void reset(void);
-
 		X_INLINE bool isVbValid(void) const;
 
-		X_INLINE uint32_t curOffset(void) const;
-		X_INLINE uint32_t curOffsetBytes(void) const;
-		X_INLINE size_t spaceLeft(void) const;
-		X_INLINE size_t spaceLeftBytes(void) const;
-		X_INLINE void incOffset(uint32_t num);
-
 	public:
-		uint32_t currentOffset;
 		render::VertexBufferHandle instBufHandle;
 	};
 
-	typedef core::FixedArray<InstancedPage, MAX_PAGES> InstancedPageArr;
+	typedef std::array<InstancedPage, MAX_PAGES> InstancedPageArr;
 
 public:
 	PrimativeContextSharedResources();
@@ -96,8 +87,7 @@ public:
 
 	X_INLINE const Shape& getShapeResources(ShapeType::Enum shape) const;
 
-	void resetInstancePages(void);
-	bool getFreeInstancePage(InstancedPage& out);
+	InstancedPageArr& getInstancePages(void);
 
 private:
 	bool loadMaterials(void);
@@ -181,10 +171,31 @@ public:
 	typedef core::Array<VertexPage> VertexPagesArr;
 	typedef core::Array<ShapeInstanceData, core::ArrayAlignedAllocator<ShapeInstanceData>> ShapeParamArr;
 
-	// we have diffrent arrays for each lod of each shape.
-	// just makes submission more simple.
-	typedef std::array<ShapeParamArr, SHAPE_NUM_LOD> ShapeTypeLodArr; // come up with better name for this?
-	typedef std::array<ShapeTypeLodArr, ShapeType::ENUM_COUNT> ShapeParamLodTypeArr; // come up with better name for this?
+	struct ShapeInstanceDataContainer
+	{
+		typedef std::array<uint16_t, SHAPE_NUM_LOD> LodCounts;
+		typedef std::array<LodCounts, 2> ShapeCountArr;
+
+
+	public:
+		ShapeInstanceDataContainer(core::MemoryArenaBase* arena);
+
+		void sort(void);
+
+		X_INLINE void clear(void);
+		X_INLINE bool isEmpty(void) const;
+		X_INLINE size_t size(void) const;
+		X_INLINE const ShapeCountArr& getShapeCounts(void) const;
+		X_INLINE ShapeInstanceData* addShape(bool solid, int32_t lodIdx);
+		X_INLINE const ShapeParamArr& getData(void) const;
+	private:
+
+		ShapeParamArr data_;
+		ShapeCountArr shapeCounts_;
+	};
+
+
+	typedef std::array<ShapeInstanceDataContainer, ShapeType::ENUM_COUNT> ShapeParamLodTypeArr; // come up with better name for this?
 
 private:
 
@@ -224,6 +235,7 @@ public:
 	bool hasShapeData(void) const;
 	const PushBufferArr& getUnsortedBuffer(void) const;
 	const ShapeParamLodTypeArr& getShapeArrayBuffers(void) const;
+	ShapeParamLodTypeArr& getShapeArrayBuffers(void);
 	VertexPageHandlesArr getVertBufHandles(void) const;
 	const PrimativeContextSharedResources::Shape& getShapeResources(ShapeType::Enum shape) const;
 
@@ -246,6 +258,8 @@ private:
 	int32_t depthPrim_;
 	int32_t currentPage_;
 	Mode mode_;
+
+	uint16_t shapeCounts_[ShapeType::ENUM_COUNT][2][SHAPE_NUM_LOD];
 
 	ShapeParamLodTypeArr shapeLodArrays_;
 

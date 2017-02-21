@@ -301,7 +301,6 @@ PrimativeContextSharedResources::Shape::Shape()
 
 
 PrimativeContextSharedResources::InstancedPage::InstancedPage() :
-	currentOffset(0),
 	instBufHandle(render::INVALID_BUF_HANLDE)
 {
 
@@ -352,39 +351,12 @@ bool PrimativeContextSharedResources::init(render::IRender* pRender)
 	return true;
 }
 
-void PrimativeContextSharedResources::resetInstancePages(void)
-{
-	currentInstacePageIdx_ = 0;
 
-	for (auto& page : shapeInstancePages_)
-	{
-		page.reset();
-	}
+PrimativeContextSharedResources::InstancedPageArr& PrimativeContextSharedResources::getInstancePages(void)
+{
+	return shapeInstancePages_;
 }
 
-bool PrimativeContextSharedResources::getFreeInstancePage(InstancedPage& out)
-{
-	if (currentInstacePageIdx_ == MAX_PAGES) {
-		return false;
-	}
-
-	// re use a page?
-	if (currentInstacePageIdx_ < safe_static_cast<int32_t>(shapeInstancePages_.size())) {
-		out = shapeInstancePages_[currentInstacePageIdx_++];
-		return true;
-	}
-
-	++currentInstacePageIdx_;
-
-	// new page.
-	auto& newPage = shapeInstancePages_.AddOne();
-
-	// create new gpu buffer.
-	newPage.createVB(pRender_);
-
-	out = newPage;
-	return true;
-}
 
 bool PrimativeContextSharedResources::loadMaterials(void)
 {
@@ -522,6 +494,16 @@ void PrimativeContextSharedResources::releaseResources(render::IRender* pRender)
 		shape.indexbuf = render::INVALID_BUF_HANLDE;
 	}
 
+	// shape inst pages.
+	for (auto& instPage : shapeInstancePages_)
+	{
+		if (instPage.isVbValid())
+		{
+			pRender->destoryIndexBuffer(instPage.instBufHandle);
+			instPage.instBufHandle = render::INVALID_BUF_HANLDE;
+		}
+	}
+
 	// materials
 	auto releaseMaterials = [](PrimMaterialArr& primMaterials) {
 		for (auto& pMat : primMaterials)
@@ -570,6 +552,25 @@ void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
 	}
 }
 
+// ---------------------------------------------------------------------------
+
+PrimativeContext::ShapeInstanceDataContainer::ShapeInstanceDataContainer(core::MemoryArenaBase* arena) :
+	data_(arena)
+{
+	data_.getAllocator().setBaseAlignment(16); // render system only accepts 16byte aligned buffers, and wwe submit this directly post sort.
+	data_.setGranularity(128);
+
+	core::zero_object(shapeCounts_);
+}
+
+void PrimativeContext::ShapeInstanceDataContainer::sort(void)
+{
+	std::sort(data_.begin(), data_.end(), [](const ShapeInstanceData& a, const ShapeInstanceData& b) {
+		return a.solid < b.solid && a.lodIdx < b.lodIdx;
+	});
+}
+
+
 
 // ---------------------------------------------------------------------------
 
@@ -580,23 +581,15 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
 	currentPage_(-1),
 	mode_(mode),
 	shapeLodArrays_{
-		arena, arena, arena, arena, // arena,
-		arena, arena, arena, arena, // arena,
-		arena, arena, arena, arena, // arena,
+		arena, // arena, arena, arena, // arena,
+		arena, // arena, arena, arena, // arena,
+		arena, // arena, arena, arena, // arena,
 	},
 	sharedRes_(sharedRes)
 {
 	pushBufferArr_.reserve(64);
 	pushBufferArr_.setGranularity(512);
 
-	for (auto& lod : shapeLodArrays_)
-	{
-		for (auto& objectArr : lod)
-		{
-			objectArr.getAllocator().setBaseAlignment(16);
-			objectArr.setGranularity(128);
-		}
-	}
 
 	X_ASSERT(vertexPages_.isNotEmpty(), "Must have atleast one vertex page")();
 	// for the fist page we reverse something small
@@ -678,11 +671,8 @@ void PrimativeContext::reset(void)
 	// if the compiler don't unroll this it should just kill itself..
 	for (uint32_t i = 0; i < ShapeType::ENUM_COUNT; i++) 
 	{
-		auto& lod = shapeLodArrays_[i];
-		for (auto& arr : lod)
-		{
-			arr.clear();
-		}
+		auto& shapeDataCon = shapeLodArrays_[i];
+		shapeDataCon.clear();
 	}
 }
 
@@ -702,13 +692,10 @@ bool PrimativeContext::isEmpty(void) const
 
 bool PrimativeContext::hasShapeData(void) const
 {
-	for (const auto& lod : shapeLodArrays_)
+	for (const auto& shapeDataCon : shapeLodArrays_)
 	{
-		for (const auto& objectArr : lod)
-		{
-			if (objectArr.isNotEmpty()) {
-				return true;
-			}
+		if (!shapeDataCon.isEmpty()) {
+			return true;
 		}
 	}
 
@@ -721,6 +708,11 @@ const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void)
 }
 
 const PrimativeContext::ShapeParamLodTypeArr& PrimativeContext::getShapeArrayBuffers(void) const
+{
+	return shapeLodArrays_;
+}
+
+PrimativeContext::ShapeParamLodTypeArr& PrimativeContext::getShapeArrayBuffers(void)
 {
 	return shapeLodArrays_;
 }
@@ -835,8 +827,8 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 
 PrimativeContext::ShapeInstanceData* PrimativeContext::addShape(ShapeType::Enum type, bool solid, int32_t lodIdx)
 {
-	X_UNUSED(solid);
-	return &shapeLodArrays_[type][lodIdx].AddOne();
+	ShapeInstanceDataContainer& con = shapeLodArrays_[type];
+	return con.addShape(solid, lodIdx);
 }
 
 X_NAMESPACE_END
