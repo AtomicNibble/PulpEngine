@@ -12,11 +12,6 @@ X_INLINE bool RenderVars::enableDebugLayer(void) const
 	return debugLayer_ != 0;
 }
 
-X_INLINE bool RenderVars::drawAux(void) const
-{
-	return drawAux_ != 0;
-}
-
 X_INLINE const Colorf& RenderVars::getClearCol(void) const
 {
 	return clearColor_;
