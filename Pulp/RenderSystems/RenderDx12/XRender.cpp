@@ -627,6 +627,16 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 			switch (cmdType)
 			{
+				case Commands::Command::NOP:
+				{
+#if X_DEBUG
+					// lets check we actually using this for chaining.
+					if (CommandPacket::loadNextCommandPacket(pPacket) == nullptr)
+					{
+						X_WARNING("Dx12", "NOP command without any child commands");
+					}
+#endif // X_DEBUG
+					break;
 				case Commands::Command::DRAW:
 				{
 					const Commands::Draw* pDraw = reinterpret_cast<const Commands::Draw*>(pCmd);

@@ -8,6 +8,7 @@ X_NAMESPACE_BEGIN(render)
 namespace Commands
 {
 	X_DECLARE_ENUM(Command)(
+		NOP, // used for simplyfing chaining logic.
 		DRAW,
 		DRAW_INDEXED,
 		DRAW_INSTANCED,
@@ -199,6 +200,12 @@ namespace Commands
 	// not sure if i want to pack these down close or have each command start aligned.
 	// I currently support them been 8 bute aligned.
 	X_PACK_PUSH(1)
+
+	struct Nop
+	{
+		static const Command::Enum CMD = Command::NOP;
+
+	};
 
 	struct Draw
 	{
