@@ -58,6 +58,9 @@ namespace shader
 	X_INLINE int32_t XHWShader::getNumInputParams(void) const {
 		return numInputParams_;
 	}
+	X_INLINE int32_t XHWShader::getNumInstructions(void) const {
+		return numInstructions_;
+	}
 	X_INLINE int32_t XHWShader::getSourceCrc32(void) const {
 		return sourceCrc32_;
 	}

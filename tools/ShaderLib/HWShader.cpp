@@ -35,6 +35,7 @@ namespace shader
 		numRenderTargets_(0),
 		numSamplers_(0),
 		numTextures_(0),
+		numInstructions_(0),
 		cbuffers_(arena),
 		bytecode_(arena),
 		D3DCompileflags_(0),
@@ -505,6 +506,7 @@ namespace shader
 			numRenderTargets_ = 0;
 		}
 
+		numInstructions_ = safe_static_cast<int32_t>(shaderDesc.InstructionCount);
 		numInputParams_ = safe_static_cast<int32_t>(shaderDesc.InputParameters);
 		return true;
 	}

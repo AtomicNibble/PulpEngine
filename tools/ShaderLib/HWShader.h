@@ -58,6 +58,7 @@ namespace shader
 		X_INLINE int32_t getNumTextures(void) const;
 		X_INLINE int32_t getNumConstantBuffers(void) const;
 		X_INLINE int32_t getNumInputParams(void) const;
+		X_INLINE int32_t getNumInstructions(void) const;
 		X_INLINE int32_t getSourceCrc32(void) const;
 		X_INLINE int32_t getD3DCompileFlags(void) const;
 
@@ -105,6 +106,7 @@ namespace shader
 		int32_t numRenderTargets_;
 		int32_t numSamplers_;
 		int32_t numTextures_;
+		int32_t numInstructions_;
 		// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
 		uint32_t D3DCompileflags_;
 

@@ -27,7 +27,7 @@ namespace shader
 		struct ShaderBinHeader
 		{
 			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-			static const uint32_t X_SHADER_BIN_VERSION = 1; // change this to force all shaders to be recompiled.
+			static const uint32_t X_SHADER_BIN_VERSION = 2; // change this to force all shaders to be recompiled.
 
 
 			uint32_t forcc;
@@ -50,7 +50,8 @@ namespace shader
 			uint8_t numTextures;
 			// 
 			uint8_t numCBufs;
-			uint8_t __pad[3];
+			uint8_t __pad[1];
+			uint16_t numInsttructions;
 
 			// 4
 			TechFlags techFlags;
