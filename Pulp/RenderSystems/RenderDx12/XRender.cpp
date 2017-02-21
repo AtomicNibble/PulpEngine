@@ -637,6 +637,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					}
 #endif // X_DEBUG
 					break;
+				}
+
 				case Commands::Command::DRAW:
 				{
 					const Commands::Draw* pDraw = reinterpret_cast<const Commands::Draw*>(pCmd);
