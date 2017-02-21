@@ -98,12 +98,7 @@ struct InstancedData_MAT44_C4F
 {
 	Matrix44f mat;
 	Color8u color;
-	uint8_t pad[12]; // TODO see if worth it.
 };
-
-static_assert(((sizeof(InstancedData_MAT44_C4F) * 8) % 128) == 0, "should be a multiple of 128bits for gpu performance");
-
-X_ENSURE_SIZE(InstancedData_MAT44_C4F, 80);
 
 
 
@@ -125,6 +120,7 @@ X_ENSURE_SIZE(Vertex_P3F_T2S_C4B_N10_TB10, 32);
 X_ENSURE_SIZE(Vertex_P3F_T2F_C4B, 24);
 X_ENSURE_SIZE(Vertex_P3F_T4F_C4B_N3F, 44);
 
+X_ENSURE_SIZE(InstancedData_MAT44_C4F, 68);
 
 
 #endif // !X_VERTEX_FORMATS_H_
