@@ -1,19 +1,22 @@
 
 #include "Vertexbase.inc"
-
-/*
-cbuffer ObjectConstants  : register(b0)
-{
-	float4x4 worldToScreenMatrix;
-	float4x4 worldViewProjectionMatrix;
-};
-*/
+#include "Util.inc"
 
 struct VS_INPUT
 {
-    float3 osPosition           	: POSITION;
+    float3 osPosition           	: POSITION0;
     float2 tex 			: TEXCOORD0; // not used, but added so vertex layout can be shared.
     float4 color                	: COLOR0;
+
+#if X_INSTANCED
+    float4 instPos1             : POSITION1;
+    float4 instPos2            : POSITION2;
+    float4 instPos3             : POSITION3;
+    float4 instPos4             : POSITION4;
+    float4 instColor           : COLOR1;
+
+    // uint instanceID : SV_InstanceID;
+#endif // !X_INSTANCED
 };
 
 struct VS_OUTPUT
@@ -34,12 +37,19 @@ struct PS_OUTPUT
 };
 
 
-
 VS_OUTPUT PrimVS( VS_INPUT IN )
 {
   VS_OUTPUT OUT;
-  OUT.ssPosition = mul( float4(IN.osPosition, 1.0), worldToScreenMatrix );
-  OUT.color =  IN.color;
+
+#if X_INSTANCED
+    float4x4 instPos = CreateMatrixFromRows(IN.instPos1, IN.instPos2, IN.instPos3, IN.instPos4);
+    float4x4 mat = mul(instPos, worldToScreenMatrix);
+    OUT.ssPosition = mul( float4(IN.osPosition, 1.0), mat );
+    OUT.color =  IN.color  * IN.instColor;
+#else
+    OUT.ssPosition = mul( float4(IN.osPosition, 1.0), worldToScreenMatrix );
+    OUT.color =  IN.color;
+#endif // !X_INSTANCED
   return OUT;
 }
 
