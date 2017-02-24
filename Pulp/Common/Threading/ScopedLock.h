@@ -18,6 +18,21 @@ private:
 	ThreadPolicy& policy_;
 };
 
+template<class ThreadPolicy>
+class ScopedLockShared
+{
+public:
+	inline explicit ScopedLockShared(ThreadPolicy& policy);
+	inline ~ScopedLockShared(void);
+
+private:
+	X_NO_COPY(ScopedLockShared);
+	X_NO_ASSIGN(ScopedLockShared);
+
+	ThreadPolicy& policy_;
+};
+
+
 
 X_NAMESPACE_END
 

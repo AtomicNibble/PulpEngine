@@ -15,5 +15,20 @@ ScopedLock<ThreadPolicy>::~ScopedLock(void)
 	policy_.Leave();
 }
 
+// -----------------------------------------------------
+
+template<class ThreadPolicy>
+ScopedLockShared<ThreadPolicy>::ScopedLockShared(ThreadPolicy& policy) :
+	policy_(policy)
+{
+	policy_.EnterShared();
+}
+
+template<class ThreadPolicy>
+ScopedLockShared<ThreadPolicy>::~ScopedLockShared(void)
+{
+	policy_.LeaveShared();
+}
+
 
 X_NAMESPACE_END
