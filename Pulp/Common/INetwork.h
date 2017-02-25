@@ -117,14 +117,26 @@ private:
 class NetGUID 
 {
 public:
-	NetGUID();
-	explicit NetGUID(uint64_t d);
+	X_INLINE NetGUID() : val_(0), sysIdx_(0) {}
+	X_INLINE explicit NetGUID(uint64_t d) : val_(d), sysIdx_(0) {}
 
 
-	X_INLINE bool operator==(const NetGUID& rhs) const;
-	X_INLINE bool operator!=(const NetGUID& rhs) const;
-	X_INLINE bool operator > (const NetGUID& rhs) const;
-	X_INLINE bool operator < (const NetGUID& rhs) const;
+	X_INLINE bool operator==(const NetGUID& rhs) const
+	{
+		return val_ == rhs.val_;
+	}
+	X_INLINE bool operator!=(const NetGUID& rhs) const
+	{
+		return val_ != rhs.val_;
+	}
+	X_INLINE bool operator > (const NetGUID& rhs) const
+	{
+		return val_ > rhs.val_;
+	}
+	X_INLINE bool operator < (const NetGUID& rhs) const
+	{
+		return val_ < rhs.val_;
+	}
 
 
 private:
