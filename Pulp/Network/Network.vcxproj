@@ -426,6 +426,7 @@
     <ClCompile Include="XPeer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Sockets\win32\Socket.inl" />
     <None Include="SystemAdd.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

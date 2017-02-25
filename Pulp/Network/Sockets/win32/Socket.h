@@ -58,6 +58,8 @@ public:
 	BindResult::Enum bind(BindParameters& bindParameters);
 	SendResult::Enum send(SendParameters& sendParameters);
 	
+	X_INLINE const SystemAdd& getBoundAdd(void) const;
+
 private:
 	void setNonBlockingSocket(bool nonblocking);
 	void setSocketOptions(void);
@@ -72,3 +74,5 @@ private:
 
 
 X_NAMESPACE_END
+
+#include "Socket.inl"
