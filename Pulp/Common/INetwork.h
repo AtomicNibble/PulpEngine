@@ -62,6 +62,12 @@ X_DECLARE_ENUM(IpVersion)(
 	Ipv6
 );
 
+X_DECLARE_ENUM(SocketFamily)(
+	INet,
+	INet6
+);
+
+
 typedef uint16_t SystemIndex;
 typedef uint16_t Port;
 typedef uint8_t MessageID;
@@ -103,24 +109,33 @@ class SocketDescriptor
 {
 public:
 	X_INLINE SocketDescriptor() : 
-		port_(0) 
+		port_(0),
+		socketFamily_(SocketFamily::INet)
 	{
 	}
 	X_INLINE SocketDescriptor(uint16_t port) : 
-		port_(port) 
+		port_(port),
+		socketFamily_(SocketFamily::INet)
 	{
 	}
 	X_INLINE SocketDescriptor(uint16_t port, HostAddStr hostAddress) : 
 		port_(port), 
+		socketFamily_(SocketFamily::INet),
 		hostAddress_(hostAddress)
 	{
+	}
+
+	X_INLINE void setSocketFamiley(SocketFamily::Enum socketFamily) {
+		socketFamily_ = socketFamily;
 	}
 
 
 	X_INLINE uint16_t getPort(void) const {
 		return port_;
 	}
-
+	X_INLINE SocketFamily::Enum getSocketFamiley(void) const {
+		return socketFamily_;
+	}
 	X_INLINE const HostAddStr& getHostAdd(void) const {
 		return hostAddress_;
 	}
@@ -128,6 +143,7 @@ public:
 
 private:
 	uint16_t port_;
+	SocketFamily::Enum socketFamily_;
 	HostAddStr hostAddress_;
 };
 
