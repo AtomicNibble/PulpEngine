@@ -427,7 +427,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl" />
-    <None Include="SystemAdd.inl" />
+    <None Include="Util\SystemAdd.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

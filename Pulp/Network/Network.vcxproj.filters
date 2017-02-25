@@ -102,11 +102,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SystemAdd.inl">
-      <Filter>Header Files\Util</Filter>
-    </None>
     <None Include="Sockets\win32\Socket.inl">
       <Filter>Header Files\Socket\win32</Filter>
+    </None>
+    <None Include="Util\SystemAdd.inl">
+      <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
 </Project>
