@@ -174,7 +174,7 @@ struct ISystemAdd
 
 	virtual uint16_t getPort(void) const X_ABSTRACT;
 
-	virtual IpVersion::Enum getIPVersion(void) X_ABSTRACT;
+	virtual IpVersion::Enum getIPVersion(void) const X_ABSTRACT;
 	virtual bool IsLoopBack(void) const X_ABSTRACT;
 	virtual bool IsLanAddress(void) const X_ABSTRACT;
 
