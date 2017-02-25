@@ -18,8 +18,8 @@ public:
 
 	// IPeer
 
-	StartupResult::Enum init(uint32_t maxConnections, SocketDescriptor* pSocketDescriptors,
-		uint32_t socketDescriptorCount) X_FINAL;
+	StartupResult::Enum init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
+		size_t socketDescriptorCount) X_FINAL;
 	void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
 		PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_FINAL;
 

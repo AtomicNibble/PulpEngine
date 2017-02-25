@@ -27,8 +27,8 @@ XPeer::~XPeer()
 
 }
 
-StartupResult::Enum XPeer::init(uint32_t maxConnections, SocketDescriptor* pSocketDescriptors,
-	uint32_t socketDescriptorCount)
+StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
+	size_t socketDescriptorCount)
 {
 	if (maxConnections < 1) {
 		return StartupResult::InvalidMaxCon;
@@ -46,7 +46,7 @@ StartupResult::Enum XPeer::init(uint32_t maxConnections, SocketDescriptor* pSock
 	bindParam.IPHdrIncl = false;
 	bindParam.broadCast = true;
 
-	for (uint32_t i = 0; i < socketDescriptorCount; i++)
+	for (size_t i = 0; i < socketDescriptorCount; i++)
 	{
 		SocketDescriptor& socketDiscriptor = pSocketDescriptors[i];
 
