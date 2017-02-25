@@ -5,14 +5,20 @@
 
 X_NAMESPACE_BEGIN(net)
 
-const char* SystemAdd::IPV6_LOOPBACK = "::1";
-const char* SystemAdd::IPV4_LOOPBACK = "127.0.0.1";
+const char* SystemAdd::IP_LOOPBACK[IpVersion::ENUM_COUNT] = {
+	"127.0.0.1",
+	"::1"
+};
 
 SystemAdd::SystemAdd()
 {
 	address_.addr4.sin_family = AF_INET;
 	core::zero_object(address_);
 	systemIndex_ = std::numeric_limits<SystemIndex>::max();
+
+#if X_DEBUG
+	portPeekVal_ = 0;
+#endif // !X_DEBUG
 }
 
 SystemAdd::SystemAdd(const char* pAddressStr)
@@ -33,6 +39,61 @@ SystemAdd::SystemAdd(const char* pAddressStr, uint16_t port)
 SystemAdd::~SystemAdd()
 {
 
+}
+
+void SystemAdd::setFromSocket(SocketHandle socket)
+{
+	platform::socklen_t slen;
+	platform::sockaddr_storage ss;
+	slen = sizeof(ss);
+
+	if (platform::getsockname(socket, (struct platform::sockaddr*)&ss, &slen) != 0)
+	{
+		lastError::Description Dsc;
+		X_FATAL("Net", "Failed to get socket name for socket: %" PRIu32 " Error: \"%s\"", lastError::ToString(Dsc));
+		return;
+	}
+
+	const size_t ipv4AddSize = sizeof(address_.addr4.sin_addr);
+	const size_t ipv6AddSize = sizeof(address_.addr6.sin6_addr);
+
+	uint8_t zeroBuf[core::Max(ipv4AddSize, ipv6AddSize)];
+	core::zero_object(zeroBuf);
+
+	if (ss.ss_family == AF_INET)
+	{
+		std::memcpy(&address_.addr4, &ss, sizeof(platform::sockaddr_in));
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+#endif // !X_DEBUG
+
+		if (std::memcmp(&address_.addr4.sin_addr.s_addr, zeroBuf, ipv4AddSize) == 0) {
+			setToLoopback(IpVersion::Ipv4);
+		}
+	}
+	else
+	{
+		std::memcpy(&address_.addr6, &ss, sizeof(platform::sockaddr_in6));
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr6.sin6_port);
+#endif // !X_DEBUG
+
+		if (std::memcmp(&address_.addr6.sin6_addr, zeroBuf, ipv6AddSize) == 0) {
+			setToLoopback(IpVersion::Ipv6);
+		}
+	}
+}
+
+void SystemAdd::setToLoopback(void)
+{
+	setToLoopback(getIPVersion());
+}
+
+void SystemAdd::setToLoopback(IpVersion::Enum ipVersion)
+{
+	fromString(IP_LOOPBACK[ipVersion], '\0', ipVersion);
 }
 
 const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
@@ -161,6 +222,10 @@ bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersi
 	{
 		uint16_t port = core::strUtil::StringToInt<uint16_t>(portPart.c_str());
 		address_.addr4.sin_port = platform::htons(port);
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+#endif // !X_DEBUG
 	}
 	else
 	{
@@ -179,6 +244,10 @@ bool SystemAdd::fromStringExplicitPort(const char* pAddressStr, uint16_t port, I
 	}
 
 	address_.addr4.sin_port = platform::htons(port);
+
+#if X_DEBUG
+	portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+#endif // !X_DEBUG
 	return true;
 }
 

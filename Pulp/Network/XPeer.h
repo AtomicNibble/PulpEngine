@@ -1,12 +1,20 @@
 #pragma once
 
+#include <Containers\Array.h>
+#include "Sockets\Socket.h"
+
 X_NAMESPACE_BEGIN(net)
 
 
 class XPeer : public IPeer
 {
+	static const uint32_t MAX_INTERNAL_IDS = 8;
+	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+	typedef core::Array<NetSocket> SocketsArr;
+
+
 public:
-	XPeer();
+	XPeer(core::MemoryArenaBase* arena);
 	~XPeer() X_FINAL;
 
 	// IPeer
@@ -59,12 +67,20 @@ public:
 
 	// ~IPeer
 
+private:
+	void populateIpList(void);
 
 private:
 	NetGUID guid_;
 
 	core::TimeVal defaultTimeOut_;
+	core::TimeVal unreliableTimeOut_;
 	int32_t defaultMTU_;
+	int32_t maxIncommingConnections_;
+	int32_t maxPeers_;
+
+	SystemAddArr ipList_;
+	SocketsArr sockets_;
 };
 
 

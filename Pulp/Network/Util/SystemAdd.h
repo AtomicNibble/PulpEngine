@@ -8,8 +8,7 @@ class SystemAdd : public ISystemAdd
 {
 public:
 
-	static const char* IPV6_LOOPBACK;
-	static const char* IPV4_LOOPBACK;
+	static const char* IP_LOOPBACK[IpVersion::ENUM_COUNT];
 	static const char PORT_DELINEATOR = '|';
 
 public:
@@ -17,6 +16,10 @@ public:
 	SystemAdd(const char* pAddressStr);
 	SystemAdd(const char* pAddressStr, uint16_t port);
 	~SystemAdd() X_FINAL;
+
+	void setFromSocket(SocketHandle socket);
+	void setToLoopback(void);
+	void setToLoopback(IpVersion::Enum ipVersion);
 
 	X_INLINE uint16_t getPort(void) const X_FINAL;
 	
@@ -47,7 +50,9 @@ private:
 		platform::sockaddr_in addr4;
 	} address_;
 
-
+#if X_DEBUG
+	uint16_t portPeekVal_; // in host byte order just for debugging.
+#endif // !X_DEBUG
 	SystemIndex systemIndex_;
 };
 

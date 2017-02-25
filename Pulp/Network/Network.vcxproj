@@ -389,6 +389,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Sockets\Socket.h" />
+    <ClInclude Include="Sockets\win32\Socket.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Constants.h" />
@@ -401,6 +403,7 @@
     <ClInclude Include="XPeer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sockets\win32\Socket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>

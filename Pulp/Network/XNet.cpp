@@ -2,6 +2,8 @@
 #include "XNet.h"
 #include "XPeer.h"
 
+#include "Util\LibaryStartup.h"
+
 #include <Time\DateStamp.h>
 #include <ITimer.h>
 
@@ -33,13 +35,14 @@ void XNet::registerCmds(void)
 
 bool XNet::init(void)
 {
-
+	PlatLib::addRef();
 
 	return true;
 }
 
 void XNet::shutDown(void)
 {
+	PlatLib::deRef();
 
 }
 
@@ -51,7 +54,7 @@ void XNet::release(void)
 
 IPeer* XNet::createPeer(void)
 {
-	return X_NEW(XPeer, arena_, "Peer")();
+	return X_NEW(XPeer, arena_, "Peer")(arena_);
 }
 
 void XNet::deletePeer(IPeer* pPeer)

@@ -1,11 +1,22 @@
 #include "stdafx.h"
 #include "XPeer.h"
+#include "XNet.h"
 
+#include "Sockets\Socket.h"
 
 X_NAMESPACE_BEGIN(net)
 
-XPeer::XPeer()
+XPeer::XPeer(core::MemoryArenaBase* arena) :
+	sockets_(arena)
 {
+	guid_ = XNet::generateGUID();
+
+	defaultTimeOut_ = core::TimeVal::fromMS(1000);
+	unreliableTimeOut_ = core::TimeVal::fromMS(1000 * 10);
+
+	maxIncommingConnections_ = 0;
+	maxPeers_ = 0;
+
 
 }
 
@@ -17,7 +28,44 @@ XPeer::~XPeer()
 StartupResult::Enum XPeer::init(uint32_t maxConnections, SocketDescriptor* pSocketDescriptors,
 	uint32_t socketDescriptorCount)
 {
+	if (maxConnections < 1) {
+		return StartupResult::InvalidMaxCon;
+	}
+	if (!pSocketDescriptors || socketDescriptorCount < 1) {
+		return StartupResult::InvalidSocketDescriptors;
+	}
+	
+	BindParameters bindParam;
+	bindParam.nonBlockingSocket = false;
+	bindParam.IPHdrIncl = false;
+	bindParam.broadCast = true;
 
+
+	for (uint32_t i = 0; i < socketDescriptorCount; i++)
+	{
+		SocketDescriptor& socketDiscriptor = pSocketDescriptors[i];
+
+		NetSocket socket;
+		bindParam.hostAdd = socketDiscriptor.getHostAdd();
+		bindParam.port = socketDiscriptor.getPort();
+
+		BindResult::Enum res = socket.bind(bindParam);
+		if (res != BindResult::Success)
+		{
+			if (res != BindResult::FailedToBind)
+			{
+				return StartupResult::SocketFailedToBind;
+			}
+			if (res != BindResult::SendTestFailed)
+			{
+				return StartupResult::SocketFailedToTestSend;
+			}
+
+			X_ASSERT_UNREACHABLE();
+		}
+
+		sockets_.emplace_back(socket);
+	}
 
 	return StartupResult::Error;
 }
@@ -172,6 +220,12 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 
 // ~IPeer
+
+void XPeer::populateIpList(void)
+{
+
+
+}
 
 
 X_NAMESPACE_END

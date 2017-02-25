@@ -48,9 +48,12 @@ namespace platform
 
 X_LINK_LIB("Ws2_32.lib");
 
+
 #endif // X_PLATFORM_WIN32
 
 } // namespace platform
+
+typedef platform::SOCKET SocketHandle;
 
 X_NAMESPACE_END
 
