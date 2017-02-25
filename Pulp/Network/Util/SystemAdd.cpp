@@ -86,6 +86,26 @@ void SystemAdd::setFromSocket(SocketHandle socket)
 	}
 }
 
+void SystemAdd::setFromAddInfo(platform::addrinfo* pAddInfo)
+{
+	if (pAddInfo->ai_family == AF_INET)
+	{
+		std::memcpy(&address_.addr4, pAddInfo->ai_addr, sizeof(address_.addr4));
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+#endif // !X_DEBUG
+	}
+	else
+	{
+		std::memcpy(&address_.addr6, pAddInfo->ai_addr, sizeof(address_.addr6));
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr6.sin6_port);
+#endif // !X_DEBUG
+	}
+}
+
 void SystemAdd::setToLoopback(void)
 {
 	setToLoopback(getIPVersion());

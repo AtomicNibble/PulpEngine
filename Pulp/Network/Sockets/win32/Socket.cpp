@@ -6,6 +6,41 @@ X_NAMESPACE_BEGIN(net)
 
 namespace
 {
+
+	int32_t getRawIpProto(IpVersion::Enum ipVer)
+	{
+		switch (ipVer)
+		{
+			case IpVersion::Ipv4:
+				return IPPROTO_IP;
+			case IpVersion::Ipv6:
+				return platform::IPPROTO_IPV6;
+
+			default:
+				X_ASSERT_UNREACHABLE();
+				break;
+		}
+
+		return IPPROTO_IP;
+	}
+
+	int32_t getRawSocketFamily(SocketFamily::Enum family)
+	{
+		switch (family)
+		{
+			case SocketFamily::INet:
+				return AF_INET;
+			case SocketFamily::INet6:
+				return AF_INET6;
+			
+			default:
+				X_ASSERT_UNREACHABLE();
+				break;
+		}
+
+		return AF_INET;
+	}
+
 	int32_t getRawSocketType(SocketType::Enum type)
 	{
 		switch (type)
@@ -66,7 +101,7 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 	socketType_ = bindParameters.socketType;
 
 	core::zero_object(hints);
-	hints.ai_family = AF_INET;
+	hints.ai_family = getRawSocketFamily(bindParameters.socketFamily);
 	hints.ai_socktype = getRawSocketType(socketType_);
 	hints.ai_flags = AI_PASSIVE;
 
@@ -107,7 +142,23 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 			}
 
 			platform::freeaddrinfo(pResult);
-			return BindResult::SendTestFailed;
+
+			// send a test.
+			uint32_t temp = 0;
+
+			SendParameters sendParam;
+			sendParam.pData = reinterpret_cast<uint8_t*>(&temp);
+			sendParam.length = 4;
+			sendParam.systemAddress = boundAdd_;
+			sendParam.ttl = 0;
+
+			auto sendRes = send(sendParam);
+			if (!sendRes)
+			{
+				return BindResult::SendTestFailed;
+			}
+
+			return BindResult::Success;
 		}
 		else
 		{
@@ -123,13 +174,90 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 	return BindResult::FailedToBind;
 }
 
-SendResult::Enum NetSocket::send(SendParameters& sendParameters)
+SendResult NetSocket::send(SendParameters& sendParameters)
 {
+	X_ASSERT(sendParameters.length > 0, "Can't send empty buffer")();
 
+	// eat it you slag!
+	int32_t oldTtl = -1;
 
-	return SendResult::Success;
+	const auto ipVer = sendParameters.systemAddress.getIPVersion();
+	if (sendParameters.ttl > 0)
+	{
+		if(getTTL(ipVer, oldTtl))
+		{
+			setTTL(ipVer, sendParameters.ttl);
+		}
+	}
+
+	int32_t	len;
+	do
+	{
+		len = platform::sendto(socket_,
+			reinterpret_cast<const char*>(sendParameters.pData),
+			sendParameters.length,
+			0,
+			&sendParameters.systemAddress.getSocketAdd(),
+			sendParameters.systemAddress.getSocketAddSize()
+		);
+
+		if (len < 0)
+		{
+			lastError::Description Dsc;
+			X_ERROR("Net", "Failed to sendto, length: %" PRIi32 ". Error: \"%s\"", sendParameters.length, lastError::ToString(Dsc));
+		}
+
+	} while (len == 0); // keep trying, while not sent anything and not had a error.
+
+	if (oldTtl != -1) {
+		setTTL(ipVer, oldTtl);
+	}
+
+	return len;
 }
 
+bool NetSocket::getMyIPs(SystemAddArr& addresses)
+{
+	int32_t res;
+	char hostName[80];
+	res = platform::gethostname(hostName, sizeof(hostName));
+	if (res != 0)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Net", "Failed to get hostname. Error: \"%s\"", lastError::ToString(Dsc));
+		return false;
+	}
+
+	struct platform::addrinfo* pResult = nullptr;
+	struct platform::addrinfo* pPtr = nullptr;
+	struct platform::addrinfo hints;
+
+	core::zero_object(hints);
+	hints.ai_socktype = SOCK_DGRAM;
+	hints.ai_flags = AI_PASSIVE;
+
+	res = getaddrinfo(hostName, "", &hints, &pResult);
+	if (res != 0)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Net", "Failed to get address info for local hostname. Error: \"%s\"", lastError::ToString(Dsc));
+		return false;
+	}
+	
+	for (pPtr = pResult; pPtr != nullptr; pPtr = pPtr->ai_next)
+	{
+		if (addresses.size() == addresses.capacity()) {
+			X_WARNING("Net", "Found more local ips that supported ignoring remaning addresses");
+			break;
+		}
+
+		auto& sysAdd = addresses.AddOne();
+		sysAdd.setFromAddInfo(pPtr);
+	}
+
+	platform::freeaddrinfo(pResult);
+	return true;
+}
 
 void NetSocket::setNonBlockingSocket(bool nonblocking)
 {
@@ -167,6 +295,7 @@ void NetSocket::setSocketOptions(void)
 		X_ERROR("Net", "Failed to set max sndbuf on socket. Error: \"%s\"", lastError::ToString(Dsc));
 	}
 
+#if 0
 	// don't linger on close if un-sent data present.
 	sock_opt = 0;
 	res = platform::setsockopt(socket_, SOL_SOCKET, SO_LINGER, (char*)&sock_opt, sizeof(sock_opt));
@@ -174,6 +303,7 @@ void NetSocket::setSocketOptions(void)
 	{
 		X_WARNING("Net", "Failed to set linger mode on socket. Error: \"%s\"", lastError::ToString(Dsc));
 	}
+#endif
 }
 
 void NetSocket::setBroadcastSocket(bool broadcast)
@@ -211,6 +341,36 @@ void NetSocket::setIPHdrIncl(bool ipHdrIncl)
 		lastError::Description Dsc;
 		X_ERROR("Net", "Failed to set hdrincl on socket. Error: \"%s\"", lastError::ToString(Dsc));
 	}
+}
+
+void NetSocket::setTTL(IpVersion::Enum ipVer, int32_t ttl)
+{
+	int32_t res;
+
+	// enable / disable broadcast.
+	res = platform::setsockopt(socket_, getRawIpProto(ipVer), IP_TTL, (char*)&ttl, sizeof(ttl));
+	if (res != 0)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Net", "Failed to set TTL on socket. Error: \"%s\"", lastError::ToString(Dsc));
+	}
+}
+
+bool NetSocket::getTTL(IpVersion::Enum ipVer, int32_t& ttl)
+{
+	int32_t res;
+	int32_t len = sizeof(ttl);
+
+	// enable / disable broadcast.
+	res = platform::getsockopt(socket_, getRawIpProto(ipVer), IP_TTL, (char*)&ttl, &len);
+	if (res != 0)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Net", "Failed to get TTL on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		return false;
+	}
+
+	return true;
 }
 
 X_NAMESPACE_END

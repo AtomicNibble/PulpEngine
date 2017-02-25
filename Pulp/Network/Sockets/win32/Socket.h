@@ -10,10 +10,6 @@ X_DECLARE_ENUM(BindResult)(
 	SendTestFailed
 );
 
-X_DECLARE_ENUM(SendResult)(
-	Success
-);
-
 X_DECLARE_ENUM(SocketType)(
 	Stream,				// stream	
 	Dgram,				// datagram
@@ -23,6 +19,9 @@ X_DECLARE_ENUM(SocketType)(
 	Invalid
 );
 
+// anyhing negative is error.
+typedef int32_t SendResult;
+
 
 struct BindParameters
 {
@@ -30,6 +29,7 @@ struct BindParameters
 
 	HostAddStr hostAdd;
 	uint16_t port;
+	SocketFamily::Enum socketFamily;
 	SocketType::Enum socketType;
 
 	bool nonBlockingSocket;
@@ -52,19 +52,28 @@ struct SendParameters
 class NetSocket
 {
 public:
+	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+
+public:
 	NetSocket();
 	~NetSocket();
 
 	BindResult::Enum bind(BindParameters& bindParameters);
-	SendResult::Enum send(SendParameters& sendParameters);
+	SendResult send(SendParameters& sendParameters);
 	
 	X_INLINE const SystemAdd& getBoundAdd(void) const;
+
+public:
+	static bool getMyIPs(SystemAddArr& addresses);
 
 private:
 	void setNonBlockingSocket(bool nonblocking);
 	void setSocketOptions(void);
 	void setBroadcastSocket(bool broadcast);
 	void setIPHdrIncl(bool ipHdrIncl);
+
+	void setTTL(IpVersion::Enum ipVer, int32_t ttl);
+	bool getTTL(IpVersion::Enum ipVer, int32_t& ttl);
 
 private:
 	SocketType::Enum socketType_;

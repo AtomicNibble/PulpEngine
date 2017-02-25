@@ -9,6 +9,8 @@ X_NAMESPACE_BEGIN(net)
 XPeer::XPeer(core::MemoryArenaBase* arena) :
 	sockets_(arena)
 {
+	sockets_.setGranularity(4);
+
 	guid_ = XNet::generateGUID();
 
 	defaultTimeOut_ = core::TimeVal::fromMS(1000);
@@ -34,12 +36,15 @@ StartupResult::Enum XPeer::init(uint32_t maxConnections, SocketDescriptor* pSock
 	if (!pSocketDescriptors || socketDescriptorCount < 1) {
 		return StartupResult::InvalidSocketDescriptors;
 	}
+
+	if (!populateIpList()) {
+		return StartupResult::Error;
+	}
 	
 	BindParameters bindParam;
 	bindParam.nonBlockingSocket = false;
 	bindParam.IPHdrIncl = false;
 	bindParam.broadCast = true;
-
 
 	for (uint32_t i = 0; i < socketDescriptorCount; i++)
 	{
@@ -48,6 +53,8 @@ StartupResult::Enum XPeer::init(uint32_t maxConnections, SocketDescriptor* pSock
 		NetSocket socket;
 		bindParam.hostAdd = socketDiscriptor.getHostAdd();
 		bindParam.port = socketDiscriptor.getPort();
+		bindParam.socketFamily = socketDiscriptor.getSocketFamiley();
+		bindParam.socketType = SocketType::Dgram;
 
 		BindResult::Enum res = socket.bind(bindParam);
 		if (res != BindResult::Success)
@@ -221,10 +228,13 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 // ~IPeer
 
-void XPeer::populateIpList(void)
+bool XPeer::populateIpList(void)
 {
+	if (!NetSocket::getMyIPs(ipList_)) {
+		return false;
+	}
 
-
+	return true;
 }
 
 

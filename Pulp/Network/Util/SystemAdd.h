@@ -3,7 +3,6 @@
 
 X_NAMESPACE_BEGIN(net)
 
-
 class SystemAdd : public ISystemAdd
 {
 public:
@@ -18,18 +17,25 @@ public:
 	~SystemAdd() X_FINAL;
 
 	void setFromSocket(SocketHandle socket);
+	void setFromAddInfo(platform::addrinfo* pAddInfo);
+
 	void setToLoopback(void);
 	void setToLoopback(IpVersion::Enum ipVersion);
 
 	void setPortFromHostByteOrder(uint16_t port);
 	void setPortFromNetworkByteOrder(uint16_t port);
 
+	X_INLINE const platform::sockaddr& getSocketAdd(void) const;
+	X_INLINE int32_t getSocketAddSize(void) const;
+
+	// ISystemAdd
 	X_INLINE uint16_t getPort(void) const X_FINAL;
-	X_INLINE IpVersion::Enum getIPVersion(void) X_FINAL;
+	X_INLINE IpVersion::Enum getIPVersion(void) const X_FINAL;
 	X_INLINE bool IsLoopBack(void) const X_FINAL;
 	X_INLINE bool IsLanAddress(void) const X_FINAL;
 
 	const char* toString(AddressStr& strBuf, bool incPort = true) X_FINAL;
+	// ~ISystemAdd
 
 	// comparrision operators.
 	X_INLINE SystemAdd& operator=(const SystemAdd& oth);

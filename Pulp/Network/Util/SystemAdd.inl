@@ -1,12 +1,32 @@
 
 X_NAMESPACE_BEGIN(net)
 
-uint16_t SystemAdd::getPort(void) const
+
+X_INLINE const platform::sockaddr& SystemAdd::getSocketAdd(void) const
 {
-	return 0;
+	if (getIPVersion() == IpVersion::Ipv4) {
+		return reinterpret_cast<const platform::sockaddr&>(address_.addr4);
+	}
+
+	return reinterpret_cast<const platform::sockaddr&>(address_.addr6);
 }
 
-IpVersion::Enum SystemAdd::getIPVersion(void)
+X_INLINE int32_t SystemAdd::getSocketAddSize(void) const
+{
+	if (getIPVersion() == IpVersion::Ipv4) {
+		return sizeof(platform::sockaddr_in);
+	}
+
+	return sizeof(platform::sockaddr_in6);
+}
+
+
+uint16_t SystemAdd::getPort(void) const
+{
+	return platform::ntohs(address_.addr4.sin_port);
+}
+
+IpVersion::Enum SystemAdd::getIPVersion(void) const
 {
 	if (address_.addr4.sin_family == AF_INET) {
 		return IpVersion::Ipv4;
@@ -29,6 +49,7 @@ X_INLINE SystemAdd& SystemAdd::operator=(const SystemAdd& oth)
 {
 	memcpy(&address_, &oth.address_, sizeof(address_));
 	systemIndex_ = oth.systemIndex_;
+	return *this;
 }
 
 X_INLINE bool SystemAdd::operator==(const SystemAdd& rhs) const

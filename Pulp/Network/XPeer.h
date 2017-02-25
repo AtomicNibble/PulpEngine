@@ -8,7 +8,6 @@ X_NAMESPACE_BEGIN(net)
 
 class XPeer : public IPeer
 {
-	static const uint32_t MAX_INTERNAL_IDS = 8;
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef core::Array<NetSocket> SocketsArr;
 
@@ -68,7 +67,7 @@ public:
 	// ~IPeer
 
 private:
-	void populateIpList(void);
+	bool populateIpList(void);
 
 private:
 	NetGUID guid_;
