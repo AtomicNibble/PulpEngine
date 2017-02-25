@@ -69,7 +69,7 @@ X_USING_NAMESPACE;
 #define DLL_3D_ENGINE		"Engine_3DEngine"
 #define DLL_GAME_DLL		"Engine_GameDLL"
 #define DLL_PHYSICS			"Engine_Physics"
-#define DLL_NET				"Engine_Net"
+#define DLL_NET				"Engine_Network"
 
 
 
@@ -718,7 +718,7 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
 
 bool XCore::InitNet(const SCoreInitParams& initParams)
 {
-	if (!IntializeEngineModule(DLL_NET, "Engine_Net", initParams)) {
+	if (!IntializeEngineModule(DLL_NET, "Engine_Network", initParams)) {
 		return false;
 	}
 
