@@ -6,6 +6,7 @@
 
 #include <Extension\XExtensionMacros.h>
 
+#include "XNet.h"
 
 X_USING_NAMESPACE;
 
@@ -46,9 +47,9 @@ class XEngineModule_Network : public IEngineModule
 
 		// kinky shit.
 		g_NetworkArena = X_NEW(NetworkArena, gEnv->pArena, "NetworkArena")(&g_NetworkAlloc, "NetworkArena");
+		auto* pNet = X_NEW(net::XNet, g_NetworkArena, "XNet")(g_NetworkArena);
 
-
-
+		env.pNet = pNet;
 		return true;
 	}
 

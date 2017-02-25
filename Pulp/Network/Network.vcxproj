@@ -390,6 +390,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\Config.h" />
+    <ClInclude Include="Util\Constants.h" />
+    <ClInclude Include="Util\LastError.h" />
+    <ClInclude Include="Util\LibaryStartup.h" />
+    <ClInclude Include="Util\SystemAdd.h" />
+    <ClInclude Include="Util\win32\LastError.h" />
+    <ClInclude Include="Util\win32\LibaryStartup.h" />
+    <ClInclude Include="XNet.h" />
+    <ClInclude Include="XPeer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -407,6 +416,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="Util\SystemAdd.cpp" />
+    <ClCompile Include="Util\win32\LastError.cpp" />
+    <ClCompile Include="Util\win32\LibaryStartup.cpp" />
+    <ClCompile Include="XNet.cpp" />
+    <ClCompile Include="XPeer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SystemAdd.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

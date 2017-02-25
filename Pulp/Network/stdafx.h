@@ -23,3 +23,42 @@ typedef core::MemoryArena<
 > NetworkArena;
 
 extern NetworkArena* g_NetworkArena;
+
+#include <INetwork.h>
+
+X_NAMESPACE_BEGIN(net)
+
+namespace platform
+{
+
+#if X_PLATFORM_WIN32
+
+#ifndef NEAR
+#define NEAR
+#endif
+
+#ifndef FAR
+#define FAR
+#endif
+
+
+#include <WinSock2.h>
+#include <Ws2tcpip.h>
+
+
+X_LINK_LIB("Ws2_32.lib");
+
+#endif // X_PLATFORM_WIN32
+
+} // namespace platform
+
+X_NAMESPACE_END
+
+
+
+#include "Util\Config.h"
+#include "Util\Constants.h"
+#include "Util\LastError.h"
+#include "Util\SystemAdd.h"
+
+

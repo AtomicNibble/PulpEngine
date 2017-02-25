@@ -12,10 +12,49 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{c8279908-3f12-45c3-b8e0-dcbc206a789d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{a85e29dd-2fcd-47ee-a01e-0aa95faa7ee1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{a75aa885-2b94-4894-bcd9-7a4ee761b3ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util\win32">
+      <UniqueIdentifier>{116d8cfe-ba14-48cb-b219-3ade8c333c99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util\win32">
+      <UniqueIdentifier>{2dadf351-f595-4667-a0a6-8b8ccf3c3de3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Constants.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SystemAdd.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\LastError.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\win32\LastError.h">
+      <Filter>Header Files\Util\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="XNet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XPeer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\LibaryStartup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\win32\LibaryStartup.h">
+      <Filter>Header Files\Util\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -25,5 +64,25 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
+    <ClCompile Include="Util\SystemAdd.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\LastError.cpp">
+      <Filter>Source Files\Util\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="XNet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XPeer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\LibaryStartup.cpp">
+      <Filter>Source Files\Util\win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SystemAdd.inl">
+      <Filter>Header Files\Util</Filter>
+    </None>
   </ItemGroup>
 </Project>

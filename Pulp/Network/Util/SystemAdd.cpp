@@ -1,0 +1,185 @@
+#include "stdafx.h"
+#include "SystemAdd.h"
+#include "LibaryStartup.h"
+
+
+X_NAMESPACE_BEGIN(net)
+
+const char* SystemAdd::IPV6_LOOPBACK = "::1";
+const char* SystemAdd::IPV4_LOOPBACK = "127.0.0.1";
+
+SystemAdd::SystemAdd()
+{
+	address_.addr4.sin_family = AF_INET;
+	core::zero_object(address_);
+	systemIndex_ = std::numeric_limits<SystemIndex>::max();
+}
+
+SystemAdd::SystemAdd(const char* pAddressStr)
+{
+	address_.addr4.sin_family = AF_INET;
+	fromString(pAddressStr);
+	systemIndex_ = std::numeric_limits<SystemIndex>::max();
+}
+
+SystemAdd::SystemAdd(const char* pAddressStr, uint16_t port)
+{
+	address_.addr4.sin_family = AF_INET;
+	fromStringExplicitPort(pAddressStr, port);
+	systemIndex_ = std::numeric_limits<SystemIndex>::max();
+}
+
+
+SystemAdd::~SystemAdd()
+{
+
+}
+
+const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
+{
+	int ret;
+
+	core::zero_object(strBuf);
+
+	if (address_.addr4.sin_family == AF_INET)
+	{
+		ret = platform::getnameinfo((struct platform::sockaddr*)&address_.addr4, 
+			sizeof(struct platform::sockaddr_in),
+			strBuf, 
+			sizeof(strBuf),
+			nullptr, 
+			0, 
+			NI_NUMERICHOST
+		);
+	}
+	else
+	{
+		ret = platform::getnameinfo((struct platform::sockaddr*)
+			&address_.addr6, 
+			sizeof(struct platform::sockaddr_in6), 
+			strBuf, 
+			sizeof(strBuf), // INET6_ADDRSTRLEN, 
+			nullptr,
+			0, 
+			NI_NUMERICHOST
+		);
+	}
+
+	if (ret != 0) {
+		lastError::Description Dsc;
+		X_ERROR("Net", "Failed to get name info. Error: \"%s\"", lastError::ToString(Dsc));
+		return strBuf;
+	}
+
+	
+	return strBuf;
+}
+
+
+bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersion::Enum ipVersion)
+{
+	X_ASSERT_NOT_NULL(pAddressStr);
+
+	core::StackString<INET6_ADDRSTRLEN, char> ipPart;
+	core::StackString<32, char> portPart;
+
+	const char* pPort = core::strUtil::Find(pAddressStr, portDelineator);
+	if (pPort)
+	{
+		ipPart.set(pAddressStr, pPort);
+		portPart.set(pPort);
+	}
+	else
+	{
+		ipPart.set(pAddressStr);
+	}
+
+	PlatLib::ScopedRef libRef;
+
+	platform::addrinfo hints, *servinfo = nullptr;
+	memset(&hints, 0, sizeof hints);
+	hints.ai_socktype = SOCK_DGRAM;
+
+	if (ipVersion == IpVersion::Ipv4) {
+		hints.ai_family = AF_INET;
+	}
+	else if (ipVersion == IpVersion::Ipv6) {
+		hints.ai_family = AF_INET6;
+	}
+	else {
+		hints.ai_family = AF_UNSPEC;
+	}
+
+	platform::getaddrinfo(ipPart.c_str(), "", &hints, &servinfo);
+	if (servinfo == 0)
+	{
+		// if ipv6 try it as ipv4.
+		if (ipVersion == IpVersion::Ipv6) 
+		{
+			ipVersion = IpVersion::Ipv4;
+			hints.ai_family = AF_INET;
+
+			platform::getaddrinfo(ipPart.c_str(), "", &hints, &servinfo);
+			if (servinfo == 0)
+			{
+				// failed still
+				lastError::Description Dsc;
+				X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastError::ToString(Dsc));
+				return false;
+			}
+			else
+			{
+				X_WARNING("Net", "Address passed as Ipv6, but is a valid Ipv4 address. add: \"%s\"", pAddressStr);
+			}
+		}
+		else
+		{
+			lastError::Description Dsc;
+			X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastError::ToString(Dsc));
+			return false;
+		}
+	}
+
+	X_ASSERT(servinfo != 0, "ServerInfo not valid")(servinfo);
+
+	uint16_t oldPort = address_.addr4.sin_port;
+
+	if (servinfo->ai_family == AF_INET)
+	{
+		address_.addr4.sin_family = AF_INET;
+		std::memcpy(&address_.addr4, (struct platform::sockaddr_in *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in));
+	}
+	else
+	{
+		address_.addr4.sin_family = AF_INET6;
+		std::memcpy(&address_.addr6, (struct platform::sockaddr_in6 *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in6));
+	}
+
+	platform::freeaddrinfo(servinfo); // free the linked list
+
+	if (portPart.isNotEmpty())
+	{
+		uint16_t port = core::strUtil::StringToInt<uint16_t>(portPart.c_str());
+		address_.addr4.sin_port = platform::htons(port);
+	}
+	else
+	{
+		address_.addr4.sin_port = oldPort;
+	}
+
+	return true;
+}
+
+bool SystemAdd::fromStringExplicitPort(const char* pAddressStr, uint16_t port, IpVersion::Enum ipVersion)
+{
+	X_ASSERT_NOT_NULL(pAddressStr);
+	
+	if (!fromString(pAddressStr, PORT_DELINEATOR, ipVersion)) {
+		return false;
+	}
+
+	address_.addr4.sin_port = platform::htons(port);
+	return true;
+}
+
+X_NAMESPACE_END
