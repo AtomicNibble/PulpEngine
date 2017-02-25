@@ -2,6 +2,10 @@
 #include "XNet.h"
 #include "XPeer.h"
 
+#include <Time\DateStamp.h>
+#include <ITimer.h>
+
+#include <Hashing\sha1.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -29,6 +33,7 @@ void XNet::registerCmds(void)
 
 bool XNet::init(void)
 {
+
 
 	return true;
 }
@@ -65,6 +70,23 @@ ISystemAdd* XNet::createSysAddress(const char* pAddressStr, uint16_t port)
 }
 // ~INet
 
+NetGUID XNet::generateGUID(void)
+{
+	// this needs to be unique as much as possible.
+	// even if game started with same seed needs t obe diffrent so clients are still unique.
+	core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
+	core::DateStamp date = core::DateStamp::GetSystemDate();
+
+	core::Hash::SHA1 sha1;
+	sha1.Init();
+	sha1.update(date);
+	sha1.update(now.GetValue());
+	auto digest = sha1.finalize();
+
+	uint64_t val = digest.data[0] | digest.data[1];
+
+	return NetGUID(val);
+}
 
 X_NAMESPACE_END
 

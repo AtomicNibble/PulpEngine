@@ -25,6 +25,8 @@ public:
 	ISystemAdd* createSysAddress(const char* pAddressStr, uint16_t port) X_FINAL;
 	// ~INet
 
+	static NetGUID generateGUID(void);
+
 private:
 	core::MemoryArenaBase* arena_;
 };
