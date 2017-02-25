@@ -109,6 +109,20 @@ void SystemAdd::setPortFromNetworkByteOrder(uint16_t port)
 	portPeekVal_ = platform::ntohs(port);
 }
 
+bool SystemAdd::equalExcludingPort(const SystemAdd& oth) const
+{
+	bool ipv4Equal = (address_.addr4.sin_family == AF_INET && address_.addr4.sin_addr.s_addr == oth.address_.addr4.sin_addr.s_addr);
+
+#if NET_IPv6_SUPPORT
+	bool ipv6Equal = (address_.addr4.sin_family == AF_INET6 && std::memcmp(address_.addr6.sin6_addr.s6_addr,
+		oth.address_.addr6.sin6_addr.s6_addr, sizeof(address_.addr6.sin6_addr.s6_addr)) == 0);
+
+	return ipv4Equal || ipv6Equal;
+#endif // !NET_IPv6_SUPPORT
+		
+	return ipv4Equal;
+}
+
 
 const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
 {

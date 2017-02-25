@@ -33,7 +33,7 @@ X_INLINE SystemAdd& SystemAdd::operator=(const SystemAdd& oth)
 
 X_INLINE bool SystemAdd::operator==(const SystemAdd& rhs) const
 {
-	return address_.addr4.sin_port == rhs.address_.addr4.sin_port;
+	return address_.addr4.sin_port == rhs.address_.addr4.sin_port && equalExcludingPort(rhs);
 }
 
 X_INLINE bool SystemAdd::operator!=(const SystemAdd& rhs) const
@@ -43,14 +43,44 @@ X_INLINE bool SystemAdd::operator!=(const SystemAdd& rhs) const
 
 X_INLINE bool SystemAdd::operator > (const SystemAdd& rhs) const
 {
+	if (address_.addr4.sin_port == rhs.address_.addr4.sin_port)
+	{
+#if NET_IPv6_SUPPORT
+		if (address_.addr4.sin_family == AF_INET) {
+			return address_.addr4.sin_addr.s_addr > rhs.address_.addr4.sin_addr.s_addr;
+		}
 
-	return false;
+		return std::memcmp(address_.addr6.sin6_addr.s6_addr, rhs.address_.addr6.sin6_addr.s6_addr,
+			sizeof(address_.addr6.sin6_addr.s6_addr)) > 0;
+
+#else
+		return address_.addr4.sin_addr.s_addr > rhs.address_.addr4.sin_addr.s_addr;
+#endif // !NET_IPv6_SUPPORT
+
+	}
+
+	return address_.addr4.sin_port > rhs.address_.addr4.sin_port;
 }
 
 X_INLINE bool SystemAdd::operator < (const SystemAdd& rhs) const
 {
+	if (address_.addr4.sin_port == rhs.address_.addr4.sin_port)
+	{
+#if NET_IPv6_SUPPORT
+		if (address_.addr4.sin_family == AF_INET) {
+			return address_.addr4.sin_addr.s_addr < rhs.address_.addr4.sin_addr.s_addr;
+		}
 
-	return false;
+		return std::memcmp(address_.addr6.sin6_addr.s6_addr, rhs.address_.addr6.sin6_addr.s6_addr,
+			sizeof(address_.addr6.sin6_addr.s6_addr)) < 0;
+
+#else
+		return address_.addr4.sin_addr.s_addr < rhs.address_.addr4.sin_addr.s_addr;
+#endif // !NET_IPv6_SUPPORT
+
+	}
+
+	return address_.addr4.sin_port < rhs.address_.addr4.sin_port;
 }
 
 
