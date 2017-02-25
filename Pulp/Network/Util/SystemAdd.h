@@ -21,8 +21,10 @@ public:
 	void setToLoopback(void);
 	void setToLoopback(IpVersion::Enum ipVersion);
 
+	void setPortFromHostByteOrder(uint16_t port);
+	void setPortFromNetworkByteOrder(uint16_t port);
+
 	X_INLINE uint16_t getPort(void) const X_FINAL;
-	
 	X_INLINE IpVersion::Enum getIPVersion(void) X_FINAL;
 	X_INLINE bool IsLoopBack(void) const X_FINAL;
 	X_INLINE bool IsLanAddress(void) const X_FINAL;

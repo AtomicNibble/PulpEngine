@@ -96,6 +96,20 @@ void SystemAdd::setToLoopback(IpVersion::Enum ipVersion)
 	fromString(IP_LOOPBACK[ipVersion], '\0', ipVersion);
 }
 
+
+void SystemAdd::setPortFromHostByteOrder(uint16_t port)
+{
+	address_.addr4.sin_port = platform::htons(port);
+	portPeekVal_ = port;
+}
+
+void SystemAdd::setPortFromNetworkByteOrder(uint16_t port)
+{
+	address_.addr4.sin_port = port;
+	portPeekVal_ = platform::ntohs(port);
+}
+
+
 const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
 {
 	int ret;
