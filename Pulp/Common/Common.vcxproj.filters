@@ -214,6 +214,9 @@
     <Filter Include="SourceFiles\Compression\lz5">
       <UniqueIdentifier>{3e48d229-8b1a-413b-bd7e-72565dbbfb79}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Network">
+      <UniqueIdentifier>{28afd16b-0eb3-43fa-8748-2462fdd0b569}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1194,6 +1197,9 @@
     </ClInclude>
     <ClInclude Include="Math\XTransform.h">
       <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="INetwork.h">
+      <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
