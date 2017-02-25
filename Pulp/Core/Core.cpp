@@ -12,6 +12,7 @@
 #include <IFont.h>
 #include <IGame.h>
 #include <IPhysics.h>
+#include <INetwork.h>
 #include <IEngineModule.h>
 
 #include <Hashing\crc32.h>
@@ -258,6 +259,12 @@ void XCore::ShutDown()
 	{
 		env_.pScriptSys->ShutDown();
 		core::SafeRelease(env_.pScriptSys);
+	}
+
+	if (env_.pNet)
+	{
+		env_.pNet->shutDown();
+		core::SafeRelease(env_.pNet);
 	}
 
 	if (pWindow_)

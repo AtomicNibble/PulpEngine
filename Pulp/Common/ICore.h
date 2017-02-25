@@ -66,6 +66,9 @@ struct IGame;
 X_NAMESPACE_DECLARE(physics,
 	struct IPhysics;
 )
+X_NAMESPACE_DECLARE(net,
+	struct INet;
+)
 
 X_USING_NAMESPACE;
 
@@ -212,6 +215,7 @@ struct SCoreGlobals // obbject is zerod on start.
 	engine::I3DEngine*			p3DEngine;
 	physics::IPhysics*			pPhysics;
 	game::IGame*				pGame;
+	net::INet*					pNet;
 //	core::IJobSystem*			pJobSys;
 	core::V2::JobSystem*		pJobSys;
 

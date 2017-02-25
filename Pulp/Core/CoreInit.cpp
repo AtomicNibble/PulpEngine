@@ -69,6 +69,7 @@ X_USING_NAMESPACE;
 #define DLL_3D_ENGINE		"Engine_3DEngine"
 #define DLL_GAME_DLL		"Engine_GameDLL"
 #define DLL_PHYSICS			"Engine_Physics"
+#define DLL_NET				"Engine_Net"
 
 
 
@@ -449,6 +450,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitPhysics(startupParams))
 			return false;
 
+		// #------------------------- Physics -------------------------
+		if (!InitNet(startupParams))
+			return false;
+
 		// #------------------------- ScriptSys -------------------------
 		if (!InitScriptSys(startupParams))
 			return false;
@@ -708,6 +713,16 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
 	}
 
 	return env_.pPhysics != nullptr;
+}
+
+
+bool XCore::InitNet(const SCoreInitParams& initParams)
+{
+	if (!IntializeEngineModule(DLL_NET, "Engine_Net", initParams)) {
+		return false;
+	}
+
+	return env_.pNet != nullptr;
 }
 
 bool XCore::InitScriptSys(const SCoreInitParams& initParams)

@@ -172,6 +172,7 @@ private:
 	bool Init3DEngine(const SCoreInitParams &startupParams);
 	bool InitGameDll(const SCoreInitParams &startupParams);
 	bool InitPhysics(const SCoreInitParams &startupParams);
+	bool InitNet(const SCoreInitParams &startupParams);
 	
 	
 	void CreateSystemVars(void);
