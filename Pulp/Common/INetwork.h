@@ -97,18 +97,37 @@ public:
 
 // ---------------------------------
 
+typedef core::StackString<512, char> HostAddStr;
+
 class SocketDescriptor
 {
-	typedef core::StackString<32, char> HostAddStr;
-
 public:
-	X_INLINE SocketDescriptor();
-	X_INLINE SocketDescriptor(uint16_t port, HostAddStr hostAddress);
+	X_INLINE SocketDescriptor() : 
+		port_(0) 
+	{
+	}
+	X_INLINE SocketDescriptor(uint16_t port) : 
+		port_(port) 
+	{
+	}
+	X_INLINE SocketDescriptor(uint16_t port, HostAddStr hostAddress) : 
+		port_(port), 
+		hostAddress_(hostAddress)
+	{
+	}
+
+
+	X_INLINE uint16_t getPort(void) const {
+		return port_;
+	}
+
+	X_INLINE const HostAddStr& getHostAdd(void) const {
+		return hostAddress_;
+	}
 
 
 private:
 	uint16_t port_;
-	uint16_t socketFamily_;
 	HostAddStr hostAddress_;
 };
 
