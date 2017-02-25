@@ -120,13 +120,17 @@ void SystemAdd::setToLoopback(IpVersion::Enum ipVersion)
 void SystemAdd::setPortFromHostByteOrder(uint16_t port)
 {
 	address_.addr4.sin_port = platform::htons(port);
+#if X_DEBUG
 	portPeekVal_ = port;
+#endif // !X_DEBUG
 }
 
 void SystemAdd::setPortFromNetworkByteOrder(uint16_t port)
 {
 	address_.addr4.sin_port = port;
+#if X_DEBUG
 	portPeekVal_ = platform::ntohs(port);
+#endif // !X_DEBUG
 }
 
 bool SystemAdd::equalExcludingPort(const SystemAdd& oth) const
