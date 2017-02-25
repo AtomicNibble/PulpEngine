@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(net)
 namespace PlatLib
 {
 
-	void addRef(void);
+	bool addRef(void);
 	void deRef(void);
 
 	class ScopedRef

@@ -35,7 +35,9 @@ void XNet::registerCmds(void)
 
 bool XNet::init(void)
 {
-	PlatLib::addRef();
+	if (!PlatLib::addRef()) {
+		return false;
+	}
 
 	return true;
 }

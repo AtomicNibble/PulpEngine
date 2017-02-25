@@ -13,7 +13,7 @@ namespace PlatLib
 	} // namespace
 
 
-	void addRef(void)
+	bool addRef(void)
 	{
 		++refCount;
 
@@ -23,9 +23,12 @@ namespace PlatLib
 			if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0)
 			{
 				lastError::Description Dsc;
-				X_FATAL("Net", "Failed to init winsock. Error: \"%s\"", lastError::ToString(Dsc));
+				X_ERROR("Net", "Failed to init winsock. Error: \"%s\"", lastError::ToString(Dsc));
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	void deRef(void)
