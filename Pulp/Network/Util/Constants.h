@@ -13,5 +13,6 @@ static const SocketHandle INVALID_SOCKET = SocketHandle(~0);
 const SystemAdd UNASSIGNED_SYSTEM_ADDRESS;
 
 static const uint32_t MAX_INTERNAL_IDS = 8;
+static const uint32_t MAX_ORDERED_STREAMS = 255;
 
 X_NAMESPACE_END

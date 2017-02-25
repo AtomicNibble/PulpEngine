@@ -1,16 +1,75 @@
 #pragma once
 
 #include <Containers\Array.h>
+#include <Threading\ThreadQue.h>
+
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
+#include <Memory\HeapArea.h>
+
 #include "Sockets\Socket.h"
 
 X_NAMESPACE_BEGIN(net)
 
+struct BufferdCommand
+{
+	uint8_t* pData;
+
+	// 4
+	BitSizeT numberOfBitsToSend;
+
+	// 4
+	PacketPriority::Enum priority;
+	PacketReliability::Enum reliability;
+	uint8_t orderingChannel;
+	bool broadcast;
+
+	// ?
+	AddressOrGUID systemIdentifier;
+	
+	// 4
+	uint32_t receipt;
+};
+
+X_ENSURE_SIZE(BufferdCommand, 56) // just to keep track of it's size for memory bandwidth consierations
 
 class XPeer : public IPeer
 {
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
-	typedef core::Array<NetSocket> SocketsArr;
+	typedef core::Array<NetSocket> SocketsArr;	
+	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
 
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> PoolArena;
+
+	typedef core::MemoryArena<
+		core::GrowingBlockAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> BlockAlocArena;
+
+
+	static const size_t MAX_POOL_ALLOC = 2048; // packets and buffered commands
 
 public:
 	XPeer(core::MemoryArenaBase* arena);
@@ -35,13 +94,17 @@ public:
 	void cancelConnectionAttempt(const ISystemAdd* pTarget) X_FINAL;
 
 
-	uint32_t send(const char* pData, const size_t length, PacketPriority::Enum priority,
+	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
+
+
 
 	// connection limits
 	void setMaximumIncomingConnections(uint16_t numberAllowed) X_FINAL;
 	uint16_t getMaximumIncomingConnections(void) const X_FINAL;
 	uint16_t numberOfConnections(void) const X_FINAL;
+
+	uint32_t getMaximunNumberOfPeers(void) const X_FINAL;
 
 	// Ping 
 	void ping(const ISystemAdd* pTarget) X_FINAL;
@@ -66,6 +129,32 @@ public:
 
 	// ~IPeer
 
+	void setUnreliableTimeout(core::TimeVal timeout);
+
+
+private:
+	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
+	void sendLoopback(const uint8_t* pData, size_t lengthBytes);
+
+	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
+
+	// adds packet to back of receive qeue
+	void pushBackPacket(Packet* pPacket, bool pushAtHead = false);
+
+	Packet* allocPacket(size_t lengthBytes);
+	void freePacket(Packet* pPacket);
+
+	BufferdCommand* allocBufferdCmd(size_t lengthBytes);
+	void freebufferdCmd(BufferdCommand* pBufCmd);
+
+
+	uint8_t* allocPacketData(size_t lengthBytes);
+	void freePacketData(uint8_t* pPacketData);
+
+	uint32_t nextSendReceipt(void);
+	uint32_t incrementNextSendReceipt(void);
+
 private:
 	bool populateIpList(void);
 
@@ -77,9 +166,21 @@ private:
 	int32_t defaultMTU_;
 	int32_t maxIncommingConnections_;
 	int32_t maxPeers_;
+	core::AtomicInt sendReceiptSerial_;
 
 	SystemAddArr ipList_;
 	SocketsArr sockets_;
+
+	// ques.
+	BufferdCommandQue bufferdCmds_;
+
+	// allocators
+	core::HeapArea      poolHeap_;
+	core::PoolAllocator poolAllocator_;
+	PoolArena			poolArena_;
+
+	core::GrowingBlockAllocator blockAlloc_;
+	BlockAlocArena		blockArena_;
 };
 
 

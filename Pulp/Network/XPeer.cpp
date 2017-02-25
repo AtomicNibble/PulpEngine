@@ -2,12 +2,42 @@
 #include "XPeer.h"
 #include "XNet.h"
 
+#include <Memory\VirtualMem.h>
+
 #include "Sockets\Socket.h"
 
 X_NAMESPACE_BEGIN(net)
 
+namespace
+{
+
+	template<typename T>
+	T bitsToBytes(T bits)
+	{
+		return (bits + 7) >> 3;
+	}
+
+	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
+	static const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
+
+} // namespace 
+
 XPeer::XPeer(core::MemoryArenaBase* arena) :
-	sockets_(arena)
+	sockets_(arena),
+	bufferdCmds_(arena),
+	poolHeap_(
+		core::bitUtil::RoundUpToMultiple<size_t>(
+			PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * MAX_POOL_ALLOC,
+			core::VirtualMem::GetPageSize()
+		)
+	),
+	poolAllocator_(poolHeap_.start(), poolHeap_.end(),
+		PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE),
+		PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
+		PoolArena::getMemoryOffsetRequirement()
+	),
+	poolArena_(&poolAllocator_, "PoolArena"),
+	blockArena_(&blockAlloc_, "blockArena")
 {
 	sockets_.setGranularity(4);
 
@@ -39,6 +69,15 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 
 	if (!populateIpList()) {
 		return StartupResult::Error;
+	}
+
+	if (maxPeers_ == 0)
+	{
+		if (maxIncommingConnections_ > maxConnections) {
+			maxIncommingConnections_ = maxConnections;
+		}
+
+		maxPeers_ = maxIncommingConnections_;
 	}
 	
 	BindParameters bindParam;
@@ -74,7 +113,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		sockets_.emplace_back(socket);
 	}
 
-	return StartupResult::Error;
+	return StartupResult::Started;
 }
 
 void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
@@ -118,33 +157,164 @@ void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
 
 
 
-uint32_t XPeer::send(const char* pData, const size_t length, PacketPriority::Enum priority,
+uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, 
 	const AddressOrGUID systemIdentifier, bool broadcast,
 	uint32_t forceReceiptNumber)
 {
+	if (!lengthBytes) {
+		return 0;
+	}
 
+	X_ASSERT_NOT_NULL(pData);
 
-	return 0;
+	uint32_t usedSendReceipt;
+
+	if (forceReceiptNumber) {
+		usedSendReceipt = forceReceiptNumber;
+	}
+	else {
+		usedSendReceipt = incrementNextSendReceipt();
+	}
+
+	if (!broadcast && isLoopbackAddress(systemIdentifier, true))
+	{
+		sendLoopback(pData, lengthBytes);
+
+		if (reliability == PacketReliability::UnReliableWithAck)
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+		return usedSendReceipt;
+	}
+
+	sendBuffered(
+		pData, 
+		safe_static_cast<BitSizeT>(lengthBytes * 8),
+		priority, 
+		reliability,
+		orderingChannel,
+		systemIdentifier, 
+		broadcast, 
+		usedSendReceipt
+	);
+
+	return usedSendReceipt;
 }
 
+
+void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt)
+{
+	X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
+
+	BufferdCommand* pCmd = allocBufferdCmd(bitsToBytes(numberOfBitsToSend));
+	std::memcpy(pCmd->pData, pData, bitsToBytes(numberOfBitsToSend));
+	pCmd->numberOfBitsToSend = numberOfBitsToSend;
+	pCmd->priority = priority;
+	pCmd->reliability = reliability;
+	pCmd->orderingChannel = orderingChannel;
+	pCmd->broadcast = broadcast;
+	pCmd->systemIdentifier = systemIdentifier;
+	pCmd->receipt = receipt;
+
+	bufferdCmds_.push(pCmd);
+}
+
+void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
+{
+	Packet* pPacket = allocPacket(lengthBytes);
+	std::memcpy(pPacket->pData, pData, lengthBytes);
+	pPacket->guid = getMyGUID();
+
+	pushBackPacket(pPacket, false);
+}
+
+
+bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const
+{
+	X_UNUSED(systemIdentifier);
+	X_UNUSED(matchPort);
+
+	return false;
+}
+
+void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
+{
+
+
+}
+
+Packet* XPeer::allocPacket(size_t lengthBytes)
+{
+	Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
+	pPacket->pData = allocPacketData(lengthBytes);
+	return pPacket;
+}
+
+void XPeer::freePacket(Packet* pPacket)
+{
+	freePacketData(pPacket->pData);
+	X_DELETE(pPacket, &poolArena_);
+}
+
+BufferdCommand* XPeer::allocBufferdCmd(size_t lengthBytes)
+{
+	BufferdCommand* pCmd = X_NEW(BufferdCommand, &poolArena_, "BufferdCmd");
+	pCmd->pData = allocPacketData(lengthBytes);
+	return pCmd;
+}
+
+void XPeer::freebufferdCmd(BufferdCommand* pBufCmd)
+{
+	freePacketData(pBufCmd->pData);
+	X_DELETE(pBufCmd, &poolArena_);
+}
+
+uint8_t* XPeer::allocPacketData(size_t lengthBytes)
+{
+	return X_NEW_ARRAY_ALIGNED(uint8_t, lengthBytes, &blockArena_, "PacketData", 16);
+}
+
+void XPeer::freePacketData(uint8_t* pPacketData)
+{
+	X_DELETE_ARRAY(pPacketData, &blockArena_);
+}
+
+
+uint32_t XPeer::nextSendReceipt(void)
+{
+	return sendReceiptSerial_;
+}
+
+uint32_t XPeer::incrementNextSendReceipt(void)
+{
+	return ++sendReceiptSerial_;
+}
 
 // connection limits
 void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
 {
-
+	maxIncommingConnections_ = numberAllowed;
 }
 
 uint16_t XPeer::getMaximumIncomingConnections(void) const
 {
-	return 0;
+	return maxIncommingConnections_;
 
 }
 
 uint16_t XPeer::numberOfConnections(void) const
 {
-
+	// number of open connections.
+	X_ASSERT_NOT_IMPLEMENTED();
 	return 0;
+}
+
+uint32_t XPeer::getMaximunNumberOfPeers(void) const
+{
+	return maxPeers_;
 }
 
 
@@ -205,6 +375,10 @@ core::TimeVal XPeer::getTimeoutTime(const ISystemAdd* pTarget)
 	return defaultTimeOut_;
 }
 
+void XPeer::setUnreliableTimeout(core::TimeVal timeout)
+{
+	unreliableTimeOut_ = timeout;
+}
 
 // MTU for a given system
 int XPeer::getMTUSize(const ISystemAdd* pTarget)

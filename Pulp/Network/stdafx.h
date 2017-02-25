@@ -58,10 +58,9 @@ typedef platform::SOCKET SocketHandle;
 X_NAMESPACE_END
 
 
-
 #include "Util\Config.h"
 #include "Util\SystemAdd.h"
 #include "Util\Constants.h"
 #include "Util\LastError.h"
-
+#include "Util\MessageIds.h"
 

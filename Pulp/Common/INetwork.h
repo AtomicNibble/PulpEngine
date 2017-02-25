@@ -70,7 +70,7 @@ X_DECLARE_ENUM(SocketFamily)(
 
 typedef uint16_t SystemIndex;
 typedef uint16_t Port;
-typedef uint8_t MessageID;
+// typedef uint8_t MessageID;
 typedef uint32_t BitSizeT;
 
 // ---------------------------------
@@ -201,8 +201,38 @@ struct ISystemAdd
 
 struct AddressOrGUID
 {
+	X_INLINE AddressOrGUID() : 
+		pSystemAddress(nullptr) 
+	{
+	}
+	X_INLINE AddressOrGUID(const AddressOrGUID& oth) :
+		netGuid(oth.netGuid), 
+		pSystemAddress(oth.pSystemAddress) 
+	{		
+	}
+	X_INLINE AddressOrGUID(const NetGUID& guid) : netGuid(guid), pSystemAddress(nullptr)
+	{
+	}
+	X_INLINE AddressOrGUID(const ISystemAdd* pSysAdd) : pSystemAddress(pSysAdd)
+	{
+
+	}
+	X_INLINE bool operator==(const AddressOrGUID& oth) {
+		return netGuid == oth.netGuid && pSystemAddress == oth.pSystemAddress;
+	}
+	X_INLINE AddressOrGUID& operator=(const AddressOrGUID& rhs) {
+		netGuid = rhs.netGuid;
+		pSystemAddress = rhs.pSystemAddress;
+		return *this;
+	}
+
+	X_INLINE bool isAddressValid(void) const {
+		return pSystemAddress != 0;
+	}
+
+
 	NetGUID netGuid;
-	ISystemAdd* pSystemAddress;
+	const ISystemAdd* pSystemAddress;
 };
 
 // ---------------------------------
@@ -218,6 +248,7 @@ struct Packet
 	uint8_t* pData; // data from sender.
 };
 
+X_ENSURE_SIZE(Packet, 40)
 
 // ---------------------------------
 
@@ -242,13 +273,15 @@ struct IPeer
 	virtual void cancelConnectionAttempt(const ISystemAdd* pTarget) X_ABSTRACT;
 
 
-	virtual uint32_t send(const char* pData, const size_t length, PacketPriority::Enum priority,
+	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
 
 	// connection limits
 	virtual void setMaximumIncomingConnections(uint16_t numberAllowed) X_ABSTRACT;
 	virtual uint16_t getMaximumIncomingConnections(void) const X_ABSTRACT;
-	virtual uint16_t numberOfConnections(void) const X_ABSTRACT;
+	virtual uint16_t numberOfConnections(void) const X_ABSTRACT; // current number of connected peers.
+
+	virtual uint32_t getMaximunNumberOfPeers(void) const X_ABSTRACT;
 
 	// Ping 
 	virtual void ping(const ISystemAdd* pTarget) X_ABSTRACT;

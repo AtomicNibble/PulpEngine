@@ -396,6 +396,7 @@
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\LastError.h" />
     <ClInclude Include="Util\LibaryStartup.h" />
+    <ClInclude Include="Util\MessageIds.h" />
     <ClInclude Include="Util\SystemAdd.h" />
     <ClInclude Include="Util\win32\LastError.h" />
     <ClInclude Include="Util\win32\LibaryStartup.h" />
