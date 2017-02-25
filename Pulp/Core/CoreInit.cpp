@@ -30,6 +30,7 @@
 #include <IFileSys.h>
 #include <IGame.h>
 #include <IJobSystem.h>
+#include <INetwork.h>
 
 #include <Extension\IPotatoUnknown.h>
 #include <Extension\IPotatoFactory.h>
@@ -719,6 +720,14 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
 bool XCore::InitNet(const SCoreInitParams& initParams)
 {
 	if (!IntializeEngineModule(DLL_NET, "Engine_Network", initParams)) {
+		return false;
+	}
+
+	env_.pNet->registerVars();
+	env_.pNet->registerCmds();
+
+	if (!env_.pNet->init()) {
+		X_ERROR("Font", "failed to init network system");
 		return false;
 	}
 
