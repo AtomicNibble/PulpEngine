@@ -10,5 +10,7 @@ X_NAMESPACE_BEGIN(net)
 
 static const SocketHandle INVALID_SOCKET = SocketHandle(~0);
 
+const SystemAdd UNASSIGNED_SYSTEM_ADDRESS;
+
 
 X_NAMESPACE_END
