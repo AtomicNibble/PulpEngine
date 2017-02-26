@@ -68,12 +68,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			{
 				pServer->setMaximumIncomingConnections(16);
 
-				net::Packet* pPacket = nullptr;
-				for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
+				uint8_t testData[64];
+				core::zero_object(testData);
+
+				while (1)
 				{
+					net::Packet* pPacket = nullptr;
+					for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
+					{
 
-					X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
+						X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
 
+					}
+
+					pServer->sendLoopback(testData, sizeof(testData));
+
+					// sleep, as other thread will handle incoming requests and buffer then for us.
+					core::Thread::Sleep(50);
 				}
 
 				pNet->deletePeer(pServer);
