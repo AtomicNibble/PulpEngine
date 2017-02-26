@@ -321,6 +321,17 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 
 Packet* XPeer::receive(void)
 {
+	if (packetQue_.isEmpty()) {
+		return nullptr;
+	}
+
+	Packet* pPacket = nullptr;
+
+	if (packetQue_.tryPop(pPacket))
+	{
+		X_ASSERT_NOT_NULL(pPacket->pData);
+		return pPacket;
+	}
 
 	return nullptr;
 }
