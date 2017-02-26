@@ -6,6 +6,7 @@
 #include <Debugging\DebuggerConnection.h>
 #include <Platform\Module.h>
 #include <Platform\MessageBox.h>
+#include <Platform\Console.h>
 
 
 extern HINSTANCE g_hInstance;

@@ -2,8 +2,11 @@
 
 
 #include <ICore.h>
-#include <Platform\Console.h>
 #include <Platform\Module.h>
+
+X_NAMESPACE_DECLARE(core,
+	class Console;
+);
 
 class EngineApp : public IAssertHandler
 {

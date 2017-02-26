@@ -2,6 +2,7 @@
 #include "EngineApp.h"
 
 #include <Platform\Pipe.h>
+#include <Platform\Console.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
