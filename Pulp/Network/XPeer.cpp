@@ -45,6 +45,7 @@ XPeer::XPeer(core::MemoryArenaBase* arena) :
 	sockets_(arena),
 	remoteSystems_(arena),
 	bufferdCmds_(arena),
+	arena_(arena),
 	poolHeap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
 			PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * MAX_POOL_ALLOC,

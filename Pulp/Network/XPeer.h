@@ -234,6 +234,8 @@ private:
 	RemoteSystemArr		remoteSystems_;
 
 	// allocators
+	core::MemoryArenaBase* arena_; // gen purpose.
+
 	core::HeapArea      poolHeap_;
 	core::PoolAllocator poolAllocator_;
 	PoolArena			poolArena_;
