@@ -156,9 +156,8 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 
 
 // connection api
-ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
-	uint32_t connectionSocketIndex, uint32_t sendConnectionAttemptCount, 
-	uint32_t timeBetweenSendConnectionAttemptsMS, core::TimeVal timeoutTime)
+ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort, uint32_t retryCount,
+	core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
 
 
