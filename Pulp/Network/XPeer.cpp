@@ -3,6 +3,7 @@
 #include "XNet.h"
 
 #include <Memory\VirtualMem.h>
+#include <ITimer.h>
 
 #include "Sockets\Socket.h"
 
