@@ -106,6 +106,27 @@ void SystemAdd::setFromAddInfo(platform::addrinfo* pAddInfo)
 	}
 }
 
+void SystemAdd::setFromAddStorage(const platform::sockaddr_storage& addStorage)
+{
+	if (addStorage.ss_family == AF_INET)
+	{
+		std::memcpy(&address_.addr4, &addStorage, sizeof(address_.addr4));
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+#endif // !X_DEBUG
+	}
+	else
+	{
+		std::memcpy(&address_.addr6, &addStorage, sizeof(address_.addr6));
+
+#if X_DEBUG
+		portPeekVal_ = platform::ntohs(address_.addr6.sin6_port);
+#endif // !X_DEBUG
+	}
+}
+
+
 void SystemAdd::setToLoopback(void)
 {
 	setToLoopback(getIPVersion());

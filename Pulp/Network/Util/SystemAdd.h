@@ -18,6 +18,7 @@ public:
 
 	void setFromSocket(SocketHandle socket);
 	void setFromAddInfo(platform::addrinfo* pAddInfo);
+	void setFromAddStorage(const platform::sockaddr_storage& addStorage);
 
 	void setToLoopback(void);
 	void setToLoopback(IpVersion::Enum ipVersion);
