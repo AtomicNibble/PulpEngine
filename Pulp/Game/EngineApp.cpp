@@ -70,6 +70,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 	params.pCmdLine = sInCmdLine;
 	params.hInstance = g_hInstance;
 	params.bSkipInput = false;
+	params.bEnableNetowrking = true;
 
 	// enable loggers
 	params.bVsLog = core::debugging::IsDebuggerConnected();
