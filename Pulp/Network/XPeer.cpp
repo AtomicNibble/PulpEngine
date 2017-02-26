@@ -485,8 +485,13 @@ void XPeer::onConnectionRequest(RemoteSystem* pRemoteSystem, core::TimeStamp inc
 
 void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
 {
+	X_ASSERT_NOT_NULL(pPacket);
 
+	if (pushAtHead) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
 
+	packetQue_.push(pPacket);
 }
 
 Packet* XPeer::allocPacket(size_t lengthBits)
