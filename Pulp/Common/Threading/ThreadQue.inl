@@ -66,8 +66,9 @@ bool ThreadQue<T, SynchronizationPrimitive>::tryPop(T& value)
 {
 	SynchronizationPrimitive::ScopedLock lock(primitive_);
 
-	if (que_.isEmpty())
+	if (que_.isEmpty()) {
 		return false;
+	}
 
 	value = que_.peek();
 	que_.pop();
