@@ -209,7 +209,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 void XPeer::closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
 	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
@@ -363,6 +363,8 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 
 
 	}
+
+	X_ASSERT_NOT_IMPLEMENTED();
 
 	return true;
 }
@@ -543,12 +545,12 @@ size_t XPeer::getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const
 
 void XPeer::parseConnectionRequestPacket(RemoteSystem* pRemoteSystem, const SystemAdd& systemAddress, const uint8_t* pData, size_t byteSize)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void XPeer::onConnectionRequest(RemoteSystem* pRemoteSystem, core::TimeStamp incomingTimestamp)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
@@ -649,7 +651,7 @@ void XPeer::ping(const ISystemAdd* pTarget)
 bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
 	uint32_t connectionSocketIndex)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 
 	return false;
 }
@@ -690,7 +692,7 @@ void XPeer::setTimeoutTime(core::TimeVal time, const ISystemAdd* pTarget)
 core::TimeVal XPeer::getTimeoutTime(const ISystemAdd* pTarget)
 {
 	if (pTarget) {
-
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 	return defaultTimeOut_;
@@ -705,7 +707,7 @@ void XPeer::setUnreliableTimeout(core::TimeVal timeout)
 int XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
 	if (pTarget) {
-
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 
