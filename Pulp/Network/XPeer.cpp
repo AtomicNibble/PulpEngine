@@ -86,6 +86,10 @@ XPeer::~XPeer()
 StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
 	size_t socketDescriptorCount)
 {
+	bufferdCmds_.reserve(256);
+	packetQue_.reserve(256);
+	connectionReqs_.reserve(64);
+
 	if (maxConnections < 1) {
 		return StartupResult::InvalidMaxCon;
 	}
