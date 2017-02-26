@@ -69,7 +69,25 @@ public:
 	ConnectMode::Enum connectMode;
 };
 
-X_ENSURE_SIZE(BufferdCommand, 56) // just to keep track of it's size for memory bandwidth consierations
+struct RequestConnection
+{
+	SystemAdd systemAddress;
+
+	core::TimeVal nextRequestTime;
+	core::TimeVal timeoutTime;
+	core::TimeVal retryDelay;
+
+	uint8_t numRequestsMade;
+	uint8_t retryCount;
+	uint8_t socketIdx;
+	uint8_t _pad[1];
+};
+
+// just to keep track of it's size for memory bandwidth consierations
+X_ENSURE_SIZE(BufferdCommand, 56) 
+X_ENSURE_SIZE(RemoteSystem, 464)
+X_ENSURE_SIZE(RequestConnection, 72)
+
 
 class XPeer : public IPeer
 {
