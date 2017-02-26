@@ -346,6 +346,7 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {
 	Thread* pThis = reinterpret_cast<Thread*>(threadInstance);
+	X_ASSERT_NOT_NULL(pThis);
 
 	uint32_t ret = pThis->function_(*pThis);
 	pThis->state_ = State::FINISHED;
