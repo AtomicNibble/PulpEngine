@@ -24,6 +24,43 @@ namespace
 		return safe_static_cast<BitSizeT>(bits << 3);
 	}
 
+	// returns if ip is matched by the pattern.
+	bool ipWildMatch(const IPStr& pattern, const IPStr& ip)
+	{
+		// do lame matching?
+		// 127.1.*.*
+		// 127.1.25.255
+		// so make sure we match untill we reach a *, then just check we only have '.' && '*' left.
+
+		// simple case where match
+		if (pattern == ip) {
+			return true;
+		}
+
+		// do wild matching.
+		int32_t idx = 0;
+		while (idx < pattern.length() && idx < ip.length())
+		{
+			if (pattern[idx] == ip[idx])
+			{
+				++idx;
+			}
+			else if (pattern[idx] == '*')
+			{
+				// check the rest of the pattern is not digits.
+				while (idx < pattern.length()) {
+					if (pattern[idx] != '.' && pattern[idx] != '*') {
+						X_WARNING("Net", "Potential ip matching error: \"%s\" - \"%s\"", pattern.c_str(), ip.c_str());
+					}
+				}
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
 	static const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
 
@@ -54,6 +91,7 @@ XPeer::XPeer(core::MemoryArenaBase* arena) :
 	bufferdCmds_(arena),
 	packetQue_(arena),
 	connectionReqs_(arena),
+	bans_(arena),
 	arena_(arena),
 	poolHeap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
@@ -651,6 +689,82 @@ bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAccepti
 	X_ASSERT_NOT_IMPLEMENTED();
 
 	return false;
+}
+
+// bans at connection level.
+void XPeer::addToBanList(const char* pIP, core::TimeVal timeout)
+{
+	IPStr ip(pIP);
+
+	if (ip.isEmpty()) {
+		return;
+	}
+
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+	auto assignBanTime = [timeNow](Ban& ban, core::TimeVal timeout) {
+		if (timeout.GetValue() == 0ll) {
+			ban.timeOut.SetValue(0ll);
+		}
+		else {
+			ban.timeOut = timeNow + timeout;
+		}
+	};
+
+	for (auto& ban : bans_)
+	{
+		if (ban.ip == ip)
+		{
+			assignBanTime(ban, timeout);
+			return;
+		}
+	}
+
+	auto& ban = bans_.AddOne();
+	ban.ip = ip;
+	assignBanTime(ban, timeout);
+}
+
+void XPeer::removeFromBanList(const char* pIP)
+{
+	IPStr ip(pIP);
+
+	if (ip.isEmpty()) {
+		return;
+	}
+	
+	auto findBanIP = [&ip](const Ban& oth) {
+		return oth.ip == ip;
+	};
+
+	auto it = std::find_if(bans_.begin(), bans_.end(), findBanIP);
+	if (it != bans_.end())
+	{
+		bans_.erase(it);
+	}
+}
+
+bool XPeer::isBanned(const char* pIP)
+{
+	if (bans_.isEmpty()) {
+		return false;
+	}
+
+	IPStr ip(pIP);
+
+	for (auto& ban : bans_)
+	{
+		if (ipWildMatch(ban.ip, ip))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void XPeer::clearBanList(void)
+{
+	bans_.clear();
 }
 
 

@@ -73,6 +73,9 @@ typedef uint16_t Port;
 // typedef uint8_t MessageID;
 typedef uint32_t BitSizeT;
 
+typedef core::StackString<512, char> HostAddStr;
+typedef core::StackString<45, char> IPStr;
+
 // ---------------------------------
 
 struct NetStatistics
@@ -103,7 +106,7 @@ public:
 
 // ---------------------------------
 
-typedef core::StackString<512, char> HostAddStr;
+
 
 class SocketDescriptor
 {
@@ -293,6 +296,12 @@ struct IPeer
 	virtual void ping(const ISystemAdd* pTarget) X_ABSTRACT;
 	virtual bool ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
 		uint32_t connectionSocketIndex = 0) X_ABSTRACT;
+
+	// bans at connection level.
+	virtual void addToBanList(const char* pIP, core::TimeVal timeout = core::TimeVal()) X_ABSTRACT;
+	virtual void removeFromBanList(const char* pIP) X_ABSTRACT;
+	virtual bool isBanned(const char* pIP) X_ABSTRACT;
+	virtual void clearBanList(void) X_ABSTRACT;
 
 
 	virtual int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;

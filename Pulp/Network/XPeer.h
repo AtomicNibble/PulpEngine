@@ -99,6 +99,12 @@ struct RequestConnection
 	uint8_t _pad[1];
 };
 
+struct Ban
+{
+	IPStr ip;
+	core::TimeVal timeOut; // 0 = never.
+};
+
 // just to keep track of it's size for memory bandwidth consierations
 
 #if X_64
@@ -122,6 +128,7 @@ class XPeer : public IPeer
 	typedef core::ThreadQue<Packet*, core::CriticalSection> PacketQue;
 
 	typedef core::Array<RequestConnection*> RequestConnectionArr;
+	typedef core::Array<Ban> BanArr;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -196,6 +203,11 @@ public:
 	bool ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
 		uint32_t connectionSocketIndex = 0) X_FINAL;
 
+	// bans at connection level.
+	void addToBanList(const char* pIP, core::TimeVal timeout = core::TimeVal()) X_FINAL;
+	void removeFromBanList(const char* pIP) X_FINAL;
+	bool isBanned(const char* pIP) X_FINAL;
+	void clearBanList(void) X_FINAL;
 
 	int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_FINAL;
 	int32_t getLastPing(const AddressOrGUID systemIdentifier) const X_FINAL;
@@ -276,6 +288,8 @@ private:
 	
 	core::CriticalSection connectionReqsCS_;
 	RequestConnectionArr connectionReqs_;
+
+	BanArr				bans_;
 
 	// rmeote systems
 	RemoteSystemArr		remoteSystems_;
