@@ -2,7 +2,7 @@
 #include "EngineApp.h"
 
 #include <Platform\Console.h>
-
+#include <INetwork.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -65,8 +65,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (engine.Init(lpCmdLine, Console))
 		{
-	
-			
+			net::INet* pNet = gEnv->pNet;
+			net::IPeer* pServer = pNet->createPeer();
+
+			net::SocketDescriptor sd(60000);
+			auto res = pServer->init(16, &sd, 1);
+			if (res != net::StartupResult::Error)
+			{
+				pServer->setMaximumIncomingConnections(16);
+
+				net::Packet* pPacket = nullptr;
+				for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
+				{
+
+					X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
+
+				}
+
+				pNet->deletePeer(pServer);
+			}
 
 		}
 
