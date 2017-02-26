@@ -1319,6 +1319,8 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 		pItem->SetNewProp();
 
 		if (type != AssetProperty::PropertyType::LABEL) {
+			pItem->SetModified(true); // if it's a new prop show that the props need saving for this new props to get added to db.
+	
 			 // CONNECT :D !
 			connect(pItem, SIGNAL(modified(void)), this, SLOT(propModified(void)));
 		}
