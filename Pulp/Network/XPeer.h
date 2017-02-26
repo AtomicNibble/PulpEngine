@@ -94,7 +94,10 @@ class XPeer : public IPeer
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef core::Array<NetSocket> SocketsArr;	
 	typedef core::Array<RemoteSystem, core::ArrayAlignedAllocator<RemoteSystem>> RemoteSystemArr;
+	// thead que's
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
+	typedef core::ThreadQue<Packet*, core::CriticalSection> PacketQue;
+	typedef core::ThreadQue<RequestConnection*, core::CriticalSection> RequestConnectionQue;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -246,7 +249,9 @@ private:
 	SocketsArr sockets_;
 
 	// ques.
-	BufferdCommandQue bufferdCmds_;
+	BufferdCommandQue	bufferdCmds_;
+	PacketQue			packetQue_;
+	RequestConnectionQue connectionReqs_;
 
 	// rmeote systems
 	RemoteSystemArr		remoteSystems_;

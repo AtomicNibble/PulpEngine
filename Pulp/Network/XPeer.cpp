@@ -45,6 +45,8 @@ XPeer::XPeer(core::MemoryArenaBase* arena) :
 	sockets_(arena),
 	remoteSystems_(arena),
 	bufferdCmds_(arena),
+	packetQue_(arena),
+	connectionReqs_(arena),
 	arena_(arena),
 	poolHeap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
