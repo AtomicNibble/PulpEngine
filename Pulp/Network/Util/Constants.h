@@ -18,5 +18,7 @@ static const uint32_t MAX_ORDERED_STREAMS = 255;
 static const uint32_t MAX_MTU_SIZE = 1492;
 static const uint32_t MIN_MTU_SIZE = 400;
 
+static const uint16_t UNDEFINED_PING = std::numeric_limits<uint16_t>::max();
+
 
 X_NAMESPACE_END
