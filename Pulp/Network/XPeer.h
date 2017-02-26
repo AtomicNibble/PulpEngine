@@ -54,9 +54,9 @@ public:
 
 	bool isActive;
 
-	SystemAdd systemAddress;
-	SystemAdd myExternalSystemAddress;
-	SystemAddArr thierInternalSystemAddress;
+	SystemAdd systemAddress;				// add remote system
+	SystemAdd myExternalSystemAddress;		// my add from the point of view of remote system
+	SystemAddArr thierInternalSystemAddress; // copy of the peers internal local sys add.
 	
 	core::TimeVal nextPingTime;
 	core::TimeVal lastReliableSend;
