@@ -232,7 +232,7 @@ ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdenti
 		}
 	}
 
-	RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
 	if (!pRemoteSys) {
 		return ConnectionState::NotConnected;
 	}
@@ -429,7 +429,7 @@ bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchP
 	return false;
 }
 
-RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive)
+const RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive) const
 {
 	if (systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
 		return getRemoteSystem(systemIdentifier.netGuid, onlyActive);
@@ -440,7 +440,7 @@ RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool 
 	return getRemoteSystem(*pSysAdd, onlyActive);
 }
 
-RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive)
+const RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive) const
 {
 	if (systemAddress == UNASSIGNED_SYSTEM_ADDRESS) {
 		X_WARNING("Net", "Tried to get remote for unassigned address");
@@ -475,7 +475,7 @@ RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyAc
 	return nullptr;
 }
 
-RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
+const RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive) const
 {
 	if (guid == UNASSIGNED_NET_GUID) {
 		X_WARNING("Net", "Tried to get remote for unassigned guid");

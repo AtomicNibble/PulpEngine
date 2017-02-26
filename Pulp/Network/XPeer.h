@@ -211,9 +211,9 @@ private:
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
 
 	// Remote Sys
-	RemoteSystem* getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive);
-	RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive);
-	RemoteSystem* getRemoteSystem(const NetGUID guid, bool onlyActive);
+	const RemoteSystem* getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive) const;
+	const RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive) const;
+	const RemoteSystem* getRemoteSystem(const NetGUID guid, bool onlyActive) const;
 	size_t getRemoteSystemIndex(const SystemAdd& systemAddress) const;
 	size_t getRemoteSystemIndex(const NetGUID& guid) const;
 	size_t getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const;
