@@ -109,7 +109,7 @@ namespace Mem
 				*dest = std::move(*first);
 			}
 
-			return _Dest;
+			return dest;
 		}
 
 		template<class _InIt, class _OutIt> 
