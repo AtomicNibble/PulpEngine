@@ -35,6 +35,9 @@ void XNet::registerCmds(void)
 
 bool XNet::init(void)
 {
+	X_LOG0("Net", "Starting");
+
+
 	if (!PlatLib::addRef()) {
 		return false;
 	}
@@ -44,6 +47,8 @@ bool XNet::init(void)
 
 void XNet::shutDown(void)
 {
+	X_LOG0("Net", "Shutting Down");
+
 	PlatLib::deRef();
 
 }
