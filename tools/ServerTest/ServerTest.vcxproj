@@ -199,10 +199,12 @@
     <Import Project="..\..\solutions\_engine_dll.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">
+    <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_win32_super.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">
+    <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_win64_super.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
   </ImportGroup>
