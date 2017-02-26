@@ -295,9 +295,9 @@ struct IPeer
 		uint32_t connectionSocketIndex = 0) X_ABSTRACT;
 
 
-	virtual int getAveragePing(const AddressOrGUID systemIdentifier) X_ABSTRACT;
-	virtual int getLastPing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
-	virtual int getLowestPing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
+	virtual int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
+	virtual int32_t getLastPing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
+	virtual int32_t getLowestPing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
 
 
 	virtual const NetGUID& getMyGUID(void) const X_ABSTRACT;

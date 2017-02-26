@@ -197,9 +197,9 @@ public:
 		uint32_t connectionSocketIndex = 0) X_FINAL;
 
 
-	int getAveragePing(const AddressOrGUID systemIdentifier) X_FINAL;
-	int getLastPing(const AddressOrGUID systemIdentifier) const X_FINAL;
-	int getLowestPing(const AddressOrGUID systemIdentifier) const X_FINAL;
+	int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_FINAL;
+	int32_t getLastPing(const AddressOrGUID systemIdentifier) const X_FINAL;
+	int32_t getLowestPing(const AddressOrGUID systemIdentifier) const X_FINAL;
 
 
 	const NetGUID& getMyGUID(void) const X_FINAL;
