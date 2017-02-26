@@ -42,6 +42,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.bCoreOnly = true;
 	params.bEnableBasicConsole = false;
 	params.bEnableJobSystem = false;
+	params.bEnableNetowrking = true;
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
 	params.bFileSysWorkingDir = true;
