@@ -45,10 +45,9 @@ public:
 	X_INLINE bool operator < (const SystemAdd& rhs) const;
 
 	bool equalExcludingPort(const SystemAdd& oth) const;
-
-private:
 	bool fromString(const char* pAddressStr, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Ipv4);
 	bool fromStringExplicitPort(const char* pAddressStr, uint16_t port, IpVersion::Enum ipVersion = IpVersion::Ipv4);
+
 
 private:
 	union// In6OrIn4
