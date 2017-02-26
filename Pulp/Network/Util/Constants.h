@@ -7,6 +7,9 @@
 
 X_NAMESPACE_BEGIN(net)
 
+static const uint32_t PROTO_VERSION_MAJOR = 1;
+static const uint32_t PROTO_VERSION_MINOR = 0;
+
 
 static const SocketHandle INVALID_SOCKET = SocketHandle(~0);
 
