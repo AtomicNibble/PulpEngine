@@ -159,9 +159,46 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort, uint32_t retryCount,
 	core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
+	uint8_t socketIdx = 0; // hard coded socket idx for now
 
+	if (socketIdx >= sockets_.size()) {
+		return ConnectionAttemptResult::InvalidParam;
+	}
 
-	return ConnectionAttemptResult::FailedToResolve;
+	// work out what ip version this socket is, if the address is ipv4 and socket is ipv6 it's okay.
+	auto ipVer = sockets_[socketIdx].getBoundAdd().getIPVersion();
+
+	// need to work out the address.
+	SystemAdd systemAddress;
+	if (!systemAddress.fromStringExplicitPort(pHost, remotePort, ipVer)) {
+		return ConnectionAttemptResult::FailedToResolve;
+	}
+
+	// are we already connected?
+	if (getRemoteSystem(systemAddress, true)) {
+		return ConnectionAttemptResult::AlreadyConnected;
+	}
+
+	RequestConnection* pConReq = X_NEW(RequestConnection, arena_, "ConRequest");
+	pConReq->systemAddress = systemAddress;
+	pConReq->nextRequestTime = gEnv->pTimer->GetTimeNowReal();
+	pConReq->timeoutTime = timeoutTime;
+	pConReq->retryDelay = retryDelay;
+	pConReq->numRequestsMade = 0;
+	pConReq->retryCount = retryCount;
+	pConReq->socketIdx = socketIdx;
+
+	// only push if not trying to connect already.
+	auto matchSysAddFunc = [&systemAddress](const RequestConnection* pOth) {
+		return pOth->systemAddress == systemAddress;
+	};
+
+	if (!connectionReqs_.push_unique_if(pConReq, matchSysAddFunc)) {
+		X_DELETE(pConReq, arena_);
+		return ConnectionAttemptResult::AlreadyInProgress;
+	}
+	
+	return ConnectionAttemptResult::Started;
 }
 
 void XPeer::closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
