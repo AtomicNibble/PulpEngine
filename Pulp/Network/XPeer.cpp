@@ -493,15 +493,6 @@ RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
 	return nullptr;
 }
 
-RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress)
-{
-	size_t remoteSystemIndex = getRemoteSystemIndex(systemAddress);
-	if (remoteSystemIndex == std::numeric_limits<size_t>::max()) {
-		return nullptr;
-	}
-
-	return &remoteSystems_[remoteSystemIndex];
-}
 
 size_t XPeer::getRemoteSystemIndex(const SystemAdd& systemAddress) const
 {
