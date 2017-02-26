@@ -17,6 +17,12 @@ namespace
 		return (bits + 7) >> 3;
 	}
 
+	template<typename T>
+	BitSizeT bytesToBits(T bits)
+	{
+		return safe_static_cast<BitSizeT>(bits << 3);
+	}
+
 	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
 	static const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
 
