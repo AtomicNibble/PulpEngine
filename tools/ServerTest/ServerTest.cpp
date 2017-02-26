@@ -44,7 +44,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
- 
+	X_UNUSED(hPrevInstance);
+	X_UNUSED(nCmdShow);
+
+
 	g_hInstance = hInstance;
 
 	{
@@ -57,8 +60,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		core::MallocFreeAllocator allocator;
 		ServerTestArena arena(&allocator, "AssetServerTestArena");
 		g_arena = &arena;
-
-		bool res = false;
 
 		EngineApp engine;
 
