@@ -166,7 +166,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 }
 
 void XPeer::closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
-	uint8_t orderingChannel, PacketPriority::Enum disconnectionNotificationPriority)
+	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
 
 }

@@ -146,7 +146,7 @@ public:
 		uint32_t connectionSocketIndex = 0, uint32_t sendConnectionAttemptCount = 12, uint32_t
 		timeBetweenSendConnectionAttemptsMS = 500, core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
 	void closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
-		uint8_t orderingChannel = 0, PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_FINAL;
+		uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_FINAL;
 
 	// connection util
 	ConnectionState::Enum getConnectionState(const AddressOrGUID systemIdentifier) X_FINAL;

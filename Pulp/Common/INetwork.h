@@ -266,7 +266,7 @@ struct IPeer
 		uint32_t connectionSocketIndex = 0, uint32_t sendConnectionAttemptCount = 12, uint32_t 
 		timeBetweenSendConnectionAttemptsMS = 500, core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
 	virtual void closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification, 
-		uint8_t orderingChannel = 0, PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_ABSTRACT;
+		uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
 
 	// connection util
 	virtual ConnectionState::Enum getConnectionState(const AddressOrGUID systemIdentifier) X_ABSTRACT;
