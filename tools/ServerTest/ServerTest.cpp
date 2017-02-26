@@ -10,6 +10,18 @@
 
 HINSTANCE g_hInstance = 0;
 
+#ifdef X_LIB
+
+struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
+
+X_LINK_LIB("engine_Core")
+X_LINK_LIB("engine_RenderNull")
+
+X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
+
+#endif // !X_LIB
+
+
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
