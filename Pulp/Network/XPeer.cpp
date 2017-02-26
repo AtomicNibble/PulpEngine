@@ -22,8 +22,22 @@ namespace
 
 } // namespace 
 
+
+RemoteSystem::RemoteSystem()
+{
+	isActive = false;
+
+	connectMode = ConnectMode::NoAction;
+	MTUSize = MAX_MTU_SIZE;
+
+}
+
+
+// -----------------------------------
+
 XPeer::XPeer(core::MemoryArenaBase* arena) :
 	sockets_(arena),
+	remoteSystems_(arena),
 	bufferdCmds_(arena),
 	poolHeap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
@@ -39,6 +53,9 @@ XPeer::XPeer(core::MemoryArenaBase* arena) :
 	poolArena_(&poolAllocator_, "PoolArena"),
 	blockArena_(&blockAlloc_, "blockArena")
 {
+	remoteSystems_.getAllocator().setBaseAlignment(16);
+	remoteSystems_.setGranularity(1);
+
 	sockets_.setGranularity(4);
 
 	guid_ = XNet::generateGUID();
@@ -46,9 +63,9 @@ XPeer::XPeer(core::MemoryArenaBase* arena) :
 	defaultTimeOut_ = core::TimeVal::fromMS(1000);
 	unreliableTimeOut_ = core::TimeVal::fromMS(1000 * 10);
 
+	defaultMTU_ = MAX_MTU_SIZE;
 	maxIncommingConnections_ = 0;
 	maxPeers_ = 0;
-
 
 }
 
@@ -78,6 +95,8 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		}
 
 		maxPeers_ = maxIncommingConnections_;
+
+		remoteSystems_.resize(maxPeers_);
 	}
 	
 	BindParameters bindParam;
@@ -222,6 +241,26 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 	bufferdCmds_.push(pCmd);
 }
 
+bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast,
+	bool useCallerDataAllocation, core::TimeStamp currentTime, uint32_t receipt)
+{
+
+	size_t remoteIdx = getRemoteSystemIndex(systemIdentifier);
+
+	if (!broadcast)
+	{
+
+	}
+	else
+	{
+
+
+	}
+
+	return true;
+}
+
 void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 {
 	Packet* pPacket = allocPacket(lengthBytes);
@@ -231,14 +270,170 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 	pushBackPacket(pPacket, false);
 }
 
+Packet* XPeer::receive(void)
+{
+
+	return nullptr;
+}
 
 bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const
 {
-	X_UNUSED(systemIdentifier);
-	X_UNUSED(matchPort);
+	if (systemIdentifier.netGuid == getMyGUID()) {
+		X_ASSERT(getMyGUID() != UNASSIGNED_NET_GUID, "My guid should not be invalid")();
+		return true;
+	}
 
+	if (!systemIdentifier.isAddressValid()) {
+		return false;
+	}
+
+	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
+
+	if (matchPort)
+	{
+		for (const auto& local : ipList_) {
+			if (local == sysAdd) {
+				return true;
+			}
+		}
+	}
+	else
+	{
+		for (const auto& local : ipList_) {
+			if (local.equalExcludingPort(sysAdd)) {
+				return true;
+			}
+		}
+	}
+
+	// nope.
 	return false;
 }
+
+RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive)
+{
+	if (systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
+		return getRemoteSystemFromGUID(systemIdentifier.netGuid, onlyActive);
+	}
+
+	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
+	X_ASSERT_NOT_NULL(pSysAdd);
+	return getRemoteSystemFromSystemAddress(*pSysAdd, onlyActive);
+}
+
+RemoteSystem* XPeer::getRemoteSystemFromSystemAddress(const SystemAdd& systemAddress, bool onlyActive)
+{
+	if (systemAddress == UNASSIGNED_SYSTEM_ADDRESS) {
+		X_WARNING("Net", "Tried to get remote for unassigned address");
+		return nullptr;
+	}
+
+	int32_t deadConIdx = -1;
+
+	for (size_t i = 0; i < remoteSystems_.size(); i++)
+	{
+		auto& rs = remoteSystems_[i];
+
+		if (rs.systemAddress == systemAddress)
+		{
+			if (rs.isActive)
+			{
+				return &rs;
+			}
+			else
+			{
+				// see if any active ones in list before returning this.
+				deadConIdx = safe_static_cast<int32_t>(i);
+			}
+		}
+
+		if (deadConIdx && !onlyActive)
+		{
+			return &remoteSystems_[deadConIdx];
+		}
+	}
+
+	return nullptr;
+}
+
+RemoteSystem* XPeer::getRemoteSystemFromGUID(const NetGUID guid, bool onlyActive)
+{
+	if (guid == UNASSIGNED_NET_GUID) {
+		X_WARNING("Net", "Tried to get remote for unassigned guid");
+		return nullptr;
+	}
+
+	for (auto& rs : remoteSystems_)
+	{
+		if (rs.guid == guid && (!onlyActive || rs.isActive))
+		{
+			return &rs;
+		}
+	}
+
+	return nullptr;
+}
+
+RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress)
+{
+	size_t remoteSystemIndex = getRemoteSystemIndex(systemAddress);
+	if (remoteSystemIndex == std::numeric_limits<size_t>::max()) {
+		return nullptr;
+	}
+
+	return &remoteSystems_[remoteSystemIndex];
+}
+
+size_t XPeer::getRemoteSystemIndex(const SystemAdd& systemAddress) const
+{
+	for (size_t i = 0; i < remoteSystems_.size(); i++)
+	{
+		auto& rs = remoteSystems_[i];
+
+		if (rs.systemAddress == systemAddress)
+		{
+			return i;
+		}
+	}
+
+	return std::numeric_limits<size_t>::max();
+}
+
+size_t XPeer::getRemoteSystemIndex(const NetGUID& guid) const
+{
+	for (size_t i = 0; i < remoteSystems_.size(); i++)
+	{
+		auto& rs = remoteSystems_[i];
+
+		if (rs.guid == guid)
+		{
+			return i;
+		}
+	}
+
+	return std::numeric_limits<size_t>::max();
+}
+
+
+size_t XPeer::getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const
+{
+	if (systemIdentifier.isAddressValid()) {
+		return getRemoteSystemIndex(systemIdentifier.pSystemAddress);
+	}
+
+	return getRemoteSystemIndex(systemIdentifier.netGuid);
+}
+
+void XPeer::parseConnectionRequestPacket(RemoteSystem* pRemoteSystem, const SystemAdd& systemAddress, const uint8_t* pData, size_t byteSize)
+{
+
+}
+
+void XPeer::onConnectionRequest(RemoteSystem* pRemoteSystem, core::TimeStamp incomingTimestamp)
+{
+
+}
+
 
 void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
 {
@@ -258,6 +453,7 @@ void XPeer::freePacket(Packet* pPacket)
 	freePacketData(pPacket->pData);
 	X_DELETE(pPacket, &poolArena_);
 }
+
 
 BufferdCommand* XPeer::allocBufferdCmd(size_t lengthBytes)
 {

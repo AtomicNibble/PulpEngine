@@ -8,9 +8,22 @@
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Memory\HeapArea.h>
 
+#include <Time\TimeStamp.h>
+
 #include "Sockets\Socket.h"
 
 X_NAMESPACE_BEGIN(net)
+
+X_DECLARE_ENUM(ConnectMode)(
+	NoAction,
+	DisconnectAsap,
+	DisconnectAsapSilent,
+	DisconnectOnNoAck,
+	RequestedConnection,
+	HandlingConnectionRequest,
+	UnverifiedSender,
+	Connected
+);
 
 struct BufferdCommand
 {
@@ -32,12 +45,37 @@ struct BufferdCommand
 	uint32_t receipt;
 };
 
+struct RemoteSystem
+{
+	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+
+public:
+	RemoteSystem();
+
+	bool isActive;
+
+	SystemAdd systemAddress;
+	SystemAdd myExternalSystemAddress;
+	SystemAddArr thierInternalSystemAddress;
+	
+	core::TimeVal nextPingTime;
+	core::TimeVal lastReliableSend;
+	core::TimeVal connectionTime;
+
+	NetGUID guid;
+
+	uint16_t lowestPing;
+	uint16_t MTUSize;
+	ConnectMode::Enum connectMode;
+};
+
 X_ENSURE_SIZE(BufferdCommand, 56) // just to keep track of it's size for memory bandwidth consierations
 
 class XPeer : public IPeer
 {
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef core::Array<NetSocket> SocketsArr;	
+	typedef core::Array<RemoteSystem, core::ArrayAlignedAllocator<RemoteSystem>> RemoteSystemArr;
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
 
 	typedef core::MemoryArena<
@@ -97,6 +135,9 @@ public:
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
 
+	void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
+
+	Packet* receive(void) X_FINAL;
 
 
 	// connection limits
@@ -135,15 +176,30 @@ public:
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
-	void sendLoopback(const uint8_t* pData, size_t lengthBytes);
+	bool sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority, 
+		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, 
+		bool useCallerDataAllocation, core::TimeStamp currentTime, uint32_t receipt);
 
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
+
+	// Remote Sys
+	RemoteSystem* getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive);
+	RemoteSystem* getRemoteSystemFromSystemAddress(const SystemAdd& systemAddress, bool onlyActive);
+	RemoteSystem* getRemoteSystemFromGUID(const NetGUID guid, bool onlyActive);
+	RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress);
+	size_t getRemoteSystemIndex(const SystemAdd& systemAddress) const;
+	size_t getRemoteSystemIndex(const NetGUID& guid) const;
+	size_t getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const;
+
+	void parseConnectionRequestPacket(RemoteSystem* pRemoteSystem, const SystemAdd& systemAddress, const uint8_t* pData, size_t byteSize);
+	void onConnectionRequest(RemoteSystem* pRemoteSystem, core::TimeStamp incomingTimestamp);
+
 
 	// adds packet to back of receive qeue
 	void pushBackPacket(Packet* pPacket, bool pushAtHead = false);
 
 	Packet* allocPacket(size_t lengthBytes);
-	void freePacket(Packet* pPacket);
+	void freePacket(Packet* pPacket) X_FINAL;
 
 	BufferdCommand* allocBufferdCmd(size_t lengthBytes);
 	void freebufferdCmd(BufferdCommand* pBufCmd);
@@ -173,6 +229,9 @@ private:
 
 	// ques.
 	BufferdCommandQue bufferdCmds_;
+
+	// rmeote systems
+	RemoteSystemArr		remoteSystems_;
 
 	// allocators
 	core::HeapArea      poolHeap_;

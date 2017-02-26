@@ -272,9 +272,16 @@ struct IPeer
 	virtual ConnectionState::Enum getConnectionState(const AddressOrGUID systemIdentifier) X_ABSTRACT;
 	virtual void cancelConnectionAttempt(const ISystemAdd* pTarget) X_ABSTRACT;
 
-
+	// send some data :)
 	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
+
+	// send to self.
+	virtual void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_ABSTRACT;
+
+	virtual Packet* receive(void) X_ABSTRACT;
+	virtual void freePacket(Packet* pPacket) X_ABSTRACT;
+
 
 	// connection limits
 	virtual void setMaximumIncomingConnections(uint16_t numberAllowed) X_ABSTRACT;
