@@ -48,6 +48,20 @@ void ThreadQue<T, SynchronizationPrimitive>::push(T const& value)
 }
 
 template<typename T, typename SynchronizationPrimitive>
+template<class UnaryPredicate>
+bool ThreadQue<T, SynchronizationPrimitive>::push_unique_if(T const& value, UnaryPredicate p)
+{
+	SynchronizationPrimitive::ScopedLock lock(primitive_);
+
+	if (!que_.contains_if(p)) {
+		que_.push(value);
+		return true;
+	}
+
+	return false;
+}
+
+template<typename T, typename SynchronizationPrimitive>
 bool ThreadQue<T, SynchronizationPrimitive>::tryPop(T& value)
 {
 	SynchronizationPrimitive::ScopedLock lock(primitive_);

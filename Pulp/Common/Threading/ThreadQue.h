@@ -29,6 +29,11 @@ public:
 	void clear(void);
 
 	void push(T const& value);
+	// pushes if predicate don't match.
+	// true if pushed.
+	template<class UnaryPredicate>
+	bool push_unique_if(T const& value, UnaryPredicate p);
+
 	bool tryPop(T& value);
 
 	size_type size(void) const;
