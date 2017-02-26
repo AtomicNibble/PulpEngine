@@ -451,13 +451,17 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitPhysics(startupParams))
 			return false;
 
-		// #------------------------- Physics -------------------------
-		if (!InitNet(startupParams))
-			return false;
-
 		// #------------------------- ScriptSys -------------------------
 		if (!InitScriptSys(startupParams))
 			return false;
+	}
+
+	if (startupParams.bEnableNetowrking)
+	{
+		// #------------------------- Networking -------------------------
+		if (!InitNet(startupParams)) {
+			return false;
+		}
 	}
 
 
