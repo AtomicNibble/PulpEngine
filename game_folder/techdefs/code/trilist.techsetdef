@@ -20,3 +20,23 @@ Technique( "unlit" )
 		entry = "PrimPS"
 	}
 }
+
+Technique( "wireframe" )
+{
+	state = State() : "blend + nocull"
+	{
+		primitiveType = "trilist"
+		wireframe      = true
+	}
+
+	source = "Prim.hlsl"
+
+	vs = VertexShader()
+	{
+		entry = "PrimVS"
+	}
+	ps = PixelShader()
+	{
+		entry = "PrimPS"
+	}
+}
