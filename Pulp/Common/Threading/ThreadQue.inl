@@ -98,7 +98,7 @@ bool ThreadQue<T, SynchronizationPrimitive>::isNotEmpty(void) const
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQueBlocking<T, SynchronizationPrimitive>::push(T const& value)
 {
-	ThreadQue<T, SynchronizationPrimitive>::Add(item);
+	ThreadQue<T, SynchronizationPrimitive>::push(value);
 	signal_.raise();
 }
 
