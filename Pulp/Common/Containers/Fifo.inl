@@ -200,6 +200,37 @@ const T& Fifo<T>::peek(void) const
 	return *read_;
 }
 
+
+template<typename T>
+bool Fifo<T>::contains(const T& oth) const
+{
+	auto endIt = end();
+	for (auto it = begin(); it != endIt; ++it)
+	{
+		if (*it == oth) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+template<typename T>
+template<class UnaryPredicate>
+bool Fifo<T>::contains_if(UnaryPredicate p) const
+{
+	auto endIt = end();
+	for (auto it = begin(); it != endIt; ++it)
+	{
+		if (p(*it)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 template<typename T>
 void Fifo<T>::reserve(size_type num)
 {

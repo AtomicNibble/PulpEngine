@@ -99,6 +99,11 @@ public:
 	// returns the topmost value
 	X_INLINE const T& peek(void) const;
 
+	X_INLINE bool contains(const T& oth) const;
+
+	template<class UnaryPredicate>
+	X_INLINE bool contains_if(UnaryPredicate p) const;
+
 	// sets the size of the buffer
 	X_INLINE void reserve(size_type num);
 
