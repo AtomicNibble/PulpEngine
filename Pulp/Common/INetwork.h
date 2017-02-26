@@ -11,7 +11,7 @@ X_DECLARE_ENUM(ConnectionState)(
 	Connecting,
 	Connected,
 	Disconnecting,
-	SilentlyDisconnecting,
+	DisconnectingSilently,
 	Disconnected,
 	NotConnected
 );
