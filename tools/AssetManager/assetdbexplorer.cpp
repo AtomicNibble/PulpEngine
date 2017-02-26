@@ -649,7 +649,12 @@ void AssetExplorer::deleteAsset(void)
 			return;
 		}
 
-		dlg.exec();
+		if (dlg.exec() == QDialog::Accepted)
+		{
+		//	FolderNode* pFolder = pFileNode->parentFolderNode();
+
+		//	pFolder->removeFile(dlg.getName(), dlg.getType());
+		}
 	}
 }
 
@@ -691,7 +696,16 @@ void AssetExplorer::addNewAsset(void)
 		dialog.setPrefredMod(pProject->displayName());
 	}
 
-	dialog.exec();
+	auto res = dialog.exec();
+	if (res == QDialog::Accepted)
+	{
+		// update the tree.
+		// we need the types folder.
+		// we i guess we should really get the mod it was placed in then
+		// delegate adding to that.
+
+		//pAssetTypeFolder->addFile(dialog.getName(), dialog.getType());
+	}
 }
 
 void AssetExplorer::addNewAssetType(void)
