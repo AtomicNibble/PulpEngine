@@ -511,7 +511,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 
 
 								const auto& lodCounts = shapeCnts[solidIdx];
-								for (int32_t lodIdx = 0; lodIdx < lodCounts.size(); lodIdx++)
+								for (size_t lodIdx = 0; lodIdx < lodCounts.size(); lodIdx++)
 								{
 									uint32_t numShapes = lodCounts[lodIdx];
 									if (numShapes == 0) {
