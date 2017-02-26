@@ -25,7 +25,7 @@ AddAssetDialog::AddAssetDialog(QWidget *parent, assetDb::AssetDB& db) :
 	{
 		pAssetName_ = new QLineEdit();
 
-		QRegularExpression re(QString("[\\%1]?[a-z0-9_\\%2]*").arg(QChar(assetDb::ASSET_NAME_PREFIX)).arg(QChar(assetDb::ASSET_NAME_SLASH)));
+		QRegularExpression re(QString("[a-z0-9_\\%1\\%2]*").arg(QChar(assetDb::ASSET_NAME_PREFIX)).arg(QChar(assetDb::ASSET_NAME_SLASH)));
 
 		pAssetName_->setMaxLength(assetDb::ASSET_NAME_MAX_LENGTH);
 		pAssetName_->setValidator(new QRegularExpressionValidator(re));
