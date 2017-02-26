@@ -7,9 +7,6 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
-
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -47,9 +44,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	X_UNUSED(hPrevInstance);
 	X_UNUSED(nCmdShow);
 
-
-	g_hInstance = hInstance;
-
 	{
 
 		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Server Test Client");
@@ -63,7 +57,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		EngineApp engine;
 
-		if (engine.Init(lpCmdLine, Console))
+		if (engine.Init(hInstance, lpCmdLine, Console))
 		{
 			net::INet* pNet = gEnv->pNet;
 			net::IPeer* pServer = pNet->createPeer();
