@@ -194,10 +194,14 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 		return pOth->systemAddress == systemAddress;
 	};
 
-	if (!connectionReqs_.push_unique_if(pConReq, matchSysAddFunc)) {
+	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+	if (std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc) != connectionReqs_.end()) {
 		X_DELETE(pConReq, arena_);
 		return ConnectionAttemptResult::AlreadyInProgress;
 	}
+
+	connectionReqs_.emplace_back(pConReq);
 	
 	return ConnectionAttemptResult::Started;
 }
@@ -220,8 +224,20 @@ ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdenti
 void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
 {
 	X_ASSERT_NOT_NULL(pTarget);
+	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(pTarget);
 
+	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
+	auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
+		return pOth->systemAddress == sysAdd;
+	};
+
+	auto it = std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc);
+	if(it != connectionReqs_.end())
+	{
+		X_DELETE(*it, arena_);
+		connectionReqs_.erase(it);
+	}
 }
 
 

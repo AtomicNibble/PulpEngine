@@ -104,7 +104,8 @@ class XPeer : public IPeer
 	// thead que's
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
 	typedef core::ThreadQue<Packet*, core::CriticalSection> PacketQue;
-	typedef core::ThreadQue<RequestConnection*, core::CriticalSection> RequestConnectionQue;
+
+	typedef core::Array<RequestConnection*> RequestConnectionArr;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -257,7 +258,9 @@ private:
 	// ques.
 	BufferdCommandQue	bufferdCmds_;
 	PacketQue			packetQue_;
-	RequestConnectionQue connectionReqs_;
+	
+	core::CriticalSection connectionReqsCS_;
+	RequestConnectionArr connectionReqs_;
 
 	// rmeote systems
 	RemoteSystemArr		remoteSystems_;
