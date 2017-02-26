@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Socket.h"
 
+#include <ITimer.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -214,6 +215,41 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 	}
 
 	return len;
+}
+
+void NetSocket::recv(RecvData& dataOut)
+{
+	platform::sockaddr_storage senderAddr;
+	platform::socklen_t senderAddLen;
+	core::zero_object(senderAddr);
+
+	const int32_t flags = 0;
+	senderAddLen = sizeof(senderAddr);
+
+	int32_t bytesRead = platform::recvfrom(
+		socket_,
+		reinterpret_cast<char*>(dataOut.data), 
+		sizeof(dataOut.data), 
+		flags, 
+		reinterpret_cast<platform::sockaddr*>(&senderAddr),
+		&senderAddLen
+	);
+
+	if (bytesRead < 0)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastError::ToString(Dsc));
+	}
+
+	// zero bytes!
+	if (bytesRead == 0) {
+		return;
+	}
+
+	dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
+
+	// decode address.
+	dataOut.systemAdd.setFromAddStorage(senderAddr);
 }
 
 bool NetSocket::getMyIPs(SystemAddArr& addresses)

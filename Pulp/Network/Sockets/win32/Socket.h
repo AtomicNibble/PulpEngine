@@ -48,6 +48,13 @@ struct SendParameters
 	SystemAdd systemAddress;
 };
 
+struct RecvData
+{
+	uint8_t data[MAX_MTU_SIZE];
+	int32_t bytesRead;
+	core::TimeVal timeRead;
+	SystemAdd systemAdd;
+};
 
 class NetSocket
 {
@@ -60,6 +67,7 @@ public:
 
 	BindResult::Enum bind(BindParameters& bindParameters);
 	SendResult send(SendParameters& sendParameters);
+	void recv(RecvData& dataOut);
 	
 	X_INLINE const SystemAdd& getBoundAdd(void) const;
 
