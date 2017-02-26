@@ -18,7 +18,7 @@ X_DECLARE_ENUM(ConnectionState)(
 
 X_DECLARE_ENUM(ConnectionAttemptResult)(
 	Started,
-	InvalidPAram,
+	InvalidParam,
 	FailedToResolve,
 	AlreadyConnected,
 	AlreadyInProgress,
