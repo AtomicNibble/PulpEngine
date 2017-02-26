@@ -234,9 +234,8 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 {
 	X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
 
-	BufferdCommand* pCmd = allocBufferdCmd(bitsToBytes(numberOfBitsToSend));
+	BufferdCommand* pCmd = allocBufferdCmd(numberOfBitsToSend);
 	std::memcpy(pCmd->pData, pData, bitsToBytes(numberOfBitsToSend));
-	pCmd->numberOfBitsToSend = numberOfBitsToSend;
 	pCmd->priority = priority;
 	pCmd->reliability = reliability;
 	pCmd->orderingChannel = orderingChannel;
@@ -269,7 +268,7 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 
 void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 {
-	Packet* pPacket = allocPacket(lengthBytes);
+	Packet* pPacket = allocPacket(bytesToBits(lengthBytes));
 	std::memcpy(pPacket->pData, pData, lengthBytes);
 	pPacket->guid = getMyGUID();
 
@@ -447,10 +446,12 @@ void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
 
 }
 
-Packet* XPeer::allocPacket(size_t lengthBytes)
+Packet* XPeer::allocPacket(size_t lengthBits)
 {
 	Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
-	pPacket->pData = allocPacketData(lengthBytes);
+	pPacket->pData = allocPacketData(bitsToBytes(lengthBits));
+	pPacket->length = safe_static_cast<uint32_t>(bitsToBytes(lengthBits));
+	pPacket->bitLength = safe_static_cast<uint32_t>(lengthBits);
 	return pPacket;
 }
 
@@ -461,10 +462,11 @@ void XPeer::freePacket(Packet* pPacket)
 }
 
 
-BufferdCommand* XPeer::allocBufferdCmd(size_t lengthBytes)
+BufferdCommand* XPeer::allocBufferdCmd(size_t lengthBits)
 {
 	BufferdCommand* pCmd = X_NEW(BufferdCommand, &poolArena_, "BufferdCmd");
-	pCmd->pData = allocPacketData(lengthBytes);
+	pCmd->pData = allocPacketData(bitsToBytes(lengthBits));
+	pCmd->numberOfBitsToSend = safe_static_cast<BitSizeT>(lengthBits);
 	return pCmd;
 }
 

@@ -198,10 +198,10 @@ private:
 	// adds packet to back of receive qeue
 	void pushBackPacket(Packet* pPacket, bool pushAtHead = false);
 
-	Packet* allocPacket(size_t lengthBytes);
+	Packet* allocPacket(size_t lengthBits);
 	void freePacket(Packet* pPacket) X_FINAL;
 
-	BufferdCommand* allocBufferdCmd(size_t lengthBytes);
+	BufferdCommand* allocBufferdCmd(size_t lengthBits);
 	void freebufferdCmd(BufferdCommand* pBufCmd);
 
 
