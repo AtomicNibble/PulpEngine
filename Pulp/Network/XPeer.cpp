@@ -655,21 +655,51 @@ bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAccepti
 
 
 
-int XPeer::getAveragePing(const AddressOrGUID systemIdentifier)
+int32_t XPeer::getAveragePing(const AddressOrGUID systemIdentifier) const
 {
-	return 0;
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	if (!pRemoteSys) {
+		return -1;
+	}
+
+	int32_t sum = 0;
+	int32_t num = 0;
+
+	for (auto& ping : pRemoteSys->pings)
+	{
+		if (ping.isValid())
+		{
+			sum += ping.pingTime;
+			++num;
+		}
+	}
+
+	if (num) {
+		return sum / num;
+	}
+
+	return -1;
 }
 
-int XPeer::getLastPing(const AddressOrGUID systemIdentifier) const
+int32_t XPeer::getLastPing(const AddressOrGUID systemIdentifier) const
 {
-	return 0;
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	if (!pRemoteSys) {
+		return -1;
+	}
+
+	return pRemoteSys->lowestPing;
 
 }
 
-int XPeer::getLowestPing(const AddressOrGUID systemIdentifier) const
+int32_t XPeer::getLowestPing(const AddressOrGUID systemIdentifier) const
 {
-	return 0;
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	if (!pRemoteSys) {
+		return -1;
+	}
 
+	return pRemoteSys->pings[pRemoteSys->lastPingIdx].pingTime;
 }
 
 
