@@ -14,7 +14,7 @@
 
 X_NAMESPACE_BEGIN(net)
 
-X_DECLARE_ENUM(ConnectMode)(
+X_DECLARE_ENUM(ConnectState)(
 	NoAction,
 	DisconnectAsap,
 	DisconnectAsapSilent,
@@ -66,7 +66,7 @@ public:
 
 	uint16_t lowestPing;
 	uint16_t MTUSize;
-	ConnectMode::Enum connectMode;
+	ConnectState::Enum connectState;
 };
 
 struct RequestConnection

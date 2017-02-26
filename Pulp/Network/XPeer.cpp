@@ -34,7 +34,7 @@ RemoteSystem::RemoteSystem()
 {
 	isActive = false;
 
-	connectMode = ConnectMode::NoAction;
+	connectState = ConnectState::NoAction;
 	MTUSize = MAX_MTU_SIZE;
 
 }
