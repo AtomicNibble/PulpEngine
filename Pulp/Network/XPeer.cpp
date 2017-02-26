@@ -848,9 +848,15 @@ void XPeer::setUnreliableTimeout(core::TimeVal timeout)
 int XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
 	if (pTarget) {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+		const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(pTarget);
+		auto* pRemoteSys = getRemoteSystem(*pSysAdd, false);
+	
+		if (pRemoteSys) {
+			return pRemoteSys->MTUSize;
+		}
 
+	//	return -1;
+	}
 
 	return defaultMTU_;
 }
