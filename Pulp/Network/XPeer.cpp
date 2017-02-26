@@ -216,7 +216,48 @@ void XPeer::closeConnection(const AddressOrGUID target, bool sendDisconnectionNo
 // connection util
 ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdentifier)
 {
+	if (systemIdentifier.isAddressValid())
+	{
+		// pending?
+		const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
 
+		auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
+			return pOth->systemAddress == sysAdd;
+		};
+
+		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+		if (std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc) != connectionReqs_.end()) {
+			return ConnectionState::Pending;
+		}
+	}
+
+	RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	if (!pRemoteSys) {
+		return ConnectionState::NotConnected;
+	}
+
+	if (!pRemoteSys->isActive) {
+		return ConnectionState::Disconnected;
+	}
+
+	static_assert(ConnectState::ENUM_COUNT == 8, "Additional states? this logic needs updating");
+	switch (pRemoteSys->connectState)
+	{
+		case ConnectState::DisconnectAsap:
+		case ConnectState::DisconnectOnNoAck:
+			return ConnectionState::Disconnecting;
+		case ConnectState::DisconnectAsapSilent:
+			return ConnectionState::DisconnectingSilently;
+
+		case ConnectState::RequestedConnection:
+		case ConnectState::HandlingConnectionRequest:
+		case ConnectState::UnverifiedSender:
+			return ConnectionState::Connecting;
+
+		case ConnectState::Connected:
+			return ConnectionState::Connected;
+	}
 
 	return ConnectionState::Disconnected;
 }
