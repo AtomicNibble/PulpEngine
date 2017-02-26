@@ -52,13 +52,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	{
 
-		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - AssetServer Test Client");
+		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Server Test Client");
 		Console.RedirectSTD();
 		Console.SetSize(60, 40, 2000);
 		Console.MoveTo(10, 10);
 
 		core::MallocFreeAllocator allocator;
-		ServerTestArena arena(&allocator, "AssetServerTestArena");
+		ServerTestArena arena(&allocator, "ServerTestArena");
 		g_arena = &arena;
 
 		EngineApp engine;

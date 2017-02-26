@@ -83,7 +83,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	pICore_->RegisterAssertHandler(this);
 
-	LinkModule(pICore_, "AssetClientServer");
+	LinkModule(pICore_, "ServerTest");
 
 	return true;
 }
