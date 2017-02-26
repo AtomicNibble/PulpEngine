@@ -84,16 +84,23 @@ struct RequestConnection
 };
 
 // just to keep track of it's size for memory bandwidth consierations
+
+#if X_64
 X_ENSURE_SIZE(BufferdCommand, 56) 
 X_ENSURE_SIZE(RemoteSystem, 464)
 X_ENSURE_SIZE(RequestConnection, 72)
-
+#else
+X_ENSURE_SIZE(BufferdCommand, 56)
+X_ENSURE_SIZE(RemoteSystem, 416)
+X_ENSURE_SIZE(RequestConnection, 72)
+#endif // !X_64
 
 class XPeer : public IPeer
 {
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef core::Array<NetSocket> SocketsArr;	
 	typedef core::Array<RemoteSystem, core::ArrayAlignedAllocator<RemoteSystem>> RemoteSystemArr;
+
 	// thead que's
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
 	typedef core::ThreadQue<Packet*, core::CriticalSection> PacketQue;
