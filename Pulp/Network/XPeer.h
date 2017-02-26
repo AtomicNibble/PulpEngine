@@ -184,8 +184,8 @@ private:
 
 	// Remote Sys
 	RemoteSystem* getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive);
-	RemoteSystem* getRemoteSystemFromSystemAddress(const SystemAdd& systemAddress, bool onlyActive);
-	RemoteSystem* getRemoteSystemFromGUID(const NetGUID guid, bool onlyActive);
+	RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive);
+	RemoteSystem* getRemoteSystem(const NetGUID guid, bool onlyActive);
 	RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress);
 	size_t getRemoteSystemIndex(const SystemAdd& systemAddress) const;
 	size_t getRemoteSystemIndex(const NetGUID& guid) const;

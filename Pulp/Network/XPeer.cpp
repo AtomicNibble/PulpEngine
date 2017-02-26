@@ -319,15 +319,15 @@ bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchP
 RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive)
 {
 	if (systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
-		return getRemoteSystemFromGUID(systemIdentifier.netGuid, onlyActive);
+		return getRemoteSystem(systemIdentifier.netGuid, onlyActive);
 	}
 
 	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
 	X_ASSERT_NOT_NULL(pSysAdd);
-	return getRemoteSystemFromSystemAddress(*pSysAdd, onlyActive);
+	return getRemoteSystem(*pSysAdd, onlyActive);
 }
 
-RemoteSystem* XPeer::getRemoteSystemFromSystemAddress(const SystemAdd& systemAddress, bool onlyActive)
+RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive)
 {
 	if (systemAddress == UNASSIGNED_SYSTEM_ADDRESS) {
 		X_WARNING("Net", "Tried to get remote for unassigned address");
@@ -362,7 +362,7 @@ RemoteSystem* XPeer::getRemoteSystemFromSystemAddress(const SystemAdd& systemAdd
 	return nullptr;
 }
 
-RemoteSystem* XPeer::getRemoteSystemFromGUID(const NetGUID guid, bool onlyActive)
+RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
 {
 	if (guid == UNASSIGNED_NET_GUID) {
 		X_WARNING("Net", "Tried to get remote for unassigned guid");
