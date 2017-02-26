@@ -45,9 +45,22 @@ struct BufferdCommand
 	uint32_t receipt;
 };
 
+struct PingAndClockDifferential
+{
+	PingAndClockDifferential();
+
+	X_INLINE bool isValid(void) const;
+
+	uint16_t pingTime;
+	core::TimeVal clockDifferential;
+};
+
 struct RemoteSystem
 {
+	static const size_t PING_HISTORY_COUNT = 3;
+
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+	typedef std::array<PingAndClockDifferential, PING_HISTORY_COUNT> PingArr;
 
 public:
 	RemoteSystem();
@@ -61,6 +74,9 @@ public:
 	core::TimeVal nextPingTime;
 	core::TimeVal lastReliableSend;
 	core::TimeVal connectionTime;
+
+	PingArr pings;
+	uint32_t lastPingIdx;
 
 	NetGUID guid;
 
@@ -87,11 +103,11 @@ struct RequestConnection
 
 #if X_64
 X_ENSURE_SIZE(BufferdCommand, 56) 
-X_ENSURE_SIZE(RemoteSystem, 464)
+X_ENSURE_SIZE(RemoteSystem, 520)
 X_ENSURE_SIZE(RequestConnection, 72)
 #else
 X_ENSURE_SIZE(BufferdCommand, 56)
-X_ENSURE_SIZE(RemoteSystem, 416)
+X_ENSURE_SIZE(RemoteSystem, 472)
 X_ENSURE_SIZE(RequestConnection, 72)
 #endif // !X_64
 
@@ -279,3 +295,4 @@ private:
 
 X_NAMESPACE_END
 
+#include "XPeer.inl"

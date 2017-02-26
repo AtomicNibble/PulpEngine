@@ -29,6 +29,12 @@ namespace
 
 } // namespace 
 
+PingAndClockDifferential::PingAndClockDifferential()
+{
+	pingTime = UNDEFINED_PING;
+}
+
+// -----------------------------------
 
 RemoteSystem::RemoteSystem()
 {

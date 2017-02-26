@@ -111,5 +111,8 @@
     <None Include="Util\SystemAdd.inl">
       <Filter>Header Files\Util</Filter>
     </None>
+    <None Include="XPeer.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
