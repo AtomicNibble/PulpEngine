@@ -24,7 +24,7 @@ namespace
 	};
 	X_PACK_POP;
 
-	void SetThreadName(DWORD dwThreadID, const char* threadName)
+	void setThreadName(DWORD dwThreadID, const char* threadName)
 	{
 		THREADNAME_INFO info;
 		info.dwType = 0x1000;
@@ -41,14 +41,15 @@ namespace
 
 		}
 	}
-}
+
+} // namespace
 
 
 Thread::Thread(void) :
-handle_(NULL),
-id_(0),
-function_(nullptr),
-state_(State::NOT_CREATED)
+	handle_(NULL),
+	id_(0),
+	function_(nullptr),
+	state_(State::NOT_CREATED)
 {
 
 }
@@ -58,12 +59,11 @@ Thread::~Thread(void)
 
 }
 
-void Thread::Create(const char* name, uint32_t stackSize )
+void Thread::Create(const char* pName, uint32_t stackSize )
 {
-	handle_ = CreateThread(NULL, stackSize, (LPTHREAD_START_ROUTINE)ThreadFunction_, 
-					this, CREATE_SUSPENDED, (LPDWORD)&id_);
+	handle_ = createThreadInternal(stackSize, (LPTHREAD_START_ROUTINE)ThreadFunction_);
 
-	name_.set(name);
+	name_.set(pName);
 
 	if (handle_ == NULL)
 	{
@@ -92,7 +92,7 @@ void Thread::Start(Function::Pointer function)
 		X_ERROR("Thread", "failed to start thread. Erorr: %s", lastError::ToString(Dsc));
 	}
 
-	SetThreadName(GetID(), name_.c_str());
+	setThreadName(GetID(), name_.c_str());
 }
 
 void Thread::Stop(void)
@@ -207,7 +207,7 @@ uint32_t Thread::GetCurrentID(void)
 
 void Thread::SetName(uint32_t threadId, const char* name)
 {
-	SetThreadName(threadId, name);
+	setThreadName(threadId, name);
 }
 
 void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
@@ -343,6 +343,11 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 	CloseHandle(hThread);
 }
 
+HANDLE Thread::createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func)
+{
+	return ::CreateThread(NULL, stackSize, func, this, CREATE_SUSPENDED, (LPDWORD)&id_);
+}
+
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {
 	Thread* pThis = reinterpret_cast<Thread*>(threadInstance);
@@ -354,6 +359,7 @@ uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 }
 
 // ~static
+
 
 // -------------------------------------------------------------------------------
 

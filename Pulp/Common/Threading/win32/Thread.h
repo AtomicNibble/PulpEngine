@@ -5,6 +5,7 @@
 #define _X_THREAD_H_
 
 #include <Traits/FunctionTraits.h>
+#include <Util\Delegate.h>
 
 #include <String\StackString.h>
 
@@ -54,6 +55,7 @@ X_DISABLE_WARNING(4324)
 
 X_ALIGNED_SYMBOL(class Thread, 64)
 {
+public:
 	struct State
 	{
 		enum Enum
@@ -84,7 +86,7 @@ public:
 	Thread(void); // no thread is created.
 	~Thread(void); /// Calls Destroy() to stop and join the thread.
 
-	void Create(const char* name, uint32_t stackSize = 0);
+	void Create(const char* pName, uint32_t stackSize = 0);
 
 	/// \brief Destroys the OS thread by calling Stop() and Join().
 	/// \remark A new OS thread must be created before the thread can be started again.
@@ -104,13 +106,8 @@ public:
 
 	void CancelSynchronousIo(void);
 
-	X_INLINE void setData(void* pData) {
-		pData_ = pData;
-	}
-
-	X_INLINE void* getData() const {
-		return pData_;
-	}
+	X_INLINE void setData(void* pData);
+	X_INLINE void* getData(void) const;
 
 	static void Sleep(uint32_t milliSeconds);
 	static void Yield(void);
@@ -121,9 +118,13 @@ public:
 
 	static void SetFPE(uint32_t threadId, FPE::Enum fpe);
 
+protected:
+	HANDLE createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func);
+
 private:
 	static uint32_t __stdcall ThreadFunction_(void* threadInstance);
 
+protected:
 	HANDLE handle_;
 	uint32_t id_;
 	Function::Pointer function_;
@@ -131,6 +132,40 @@ private:
 	void* pData_;
 
 	core::StackString<64> name_;
+};
+
+template<class T>
+class ThreadMember : private Thread
+{
+public:
+	typedef core::Delegate<ReturnValue(const Thread&)> FunctionDelagate;
+
+public:
+	using Thread::Thread;
+
+	X_INLINE void Create(const char* pName, uint32_t stackSize = 0);
+	X_INLINE void Start(FunctionDelagate delagate);
+
+	X_INLINE void Stop(void); // tells the thread to stop dose not wait.
+	X_INLINE void Join(void); // waits till thread has finished.
+
+	X_INLINE bool ShouldRun(void) const volatile;
+	X_INLINE bool HasFinished(void) const volatile;
+
+	X_INLINE bool SetThreadAffinity(const AffinityFlags flags);
+	X_INLINE void SetFPE(FPE::Enum fpe);
+
+	X_INLINE uint32_t GetID(void) const;
+
+	X_INLINE void setData(void* pData);
+	X_INLINE void* getData(void) const;
+
+private:
+	static uint32_t __stdcall ThreadFunctionDel_(void* threadInstance);
+
+
+private:
+	FunctionDelagate delagate_;
 };
 
 X_ENABLE_WARNING(4324)
@@ -161,5 +196,6 @@ private:
 
 X_NAMESPACE_END
 
+#include <Threading\Thread.inl>
 
 #endif // !_X_THREAD_H_

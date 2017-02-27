@@ -1512,6 +1512,9 @@
     <None Include="Math\XTransform.inl">
       <Filter>Headers\Math</Filter>
     </None>
+    <None Include="Threading\Thread.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

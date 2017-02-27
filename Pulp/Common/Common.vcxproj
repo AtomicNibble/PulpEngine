@@ -490,6 +490,7 @@
     <None Include="Threading\JobSystem2.inl" />
     <None Include="Threading\ScopedLock.inl" />
     <None Include="Threading\Spinlock.inl" />
+    <None Include="Threading\Thread.inl" />
     <None Include="Threading\ThreadQue.inl" />
     <None Include="Threading\UniqueLock.inl" />
     <None Include="Threading\win32\CriticalSection.inl" />
