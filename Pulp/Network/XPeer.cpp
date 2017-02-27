@@ -781,10 +781,22 @@ bool XPeer::isBanned(const char* pIP)
 
 	IPStr ip(pIP);
 
-	for (auto& ban : bans_)
-	{
-		if (ipWildMatch(ban.ip, ip))
-		{
+	for (auto& ban : bans_) {
+		if (ipWildMatch(ban.ip, ip)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool XPeer::isBanned(const IPStr& ip)
+{
+	if (bans_.isEmpty()) {
+		return false;
+	}
+
+	for (auto& ban : bans_) {
+		if (ipWildMatch(ban.ip, ip)) {
 			return true;
 		}
 	}

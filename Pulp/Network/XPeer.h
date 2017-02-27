@@ -208,6 +208,7 @@ public:
 	void addToBanList(const char* pIP, core::TimeVal timeout = core::TimeVal()) X_FINAL;
 	void removeFromBanList(const char* pIP) X_FINAL;
 	bool isBanned(const char* pIP) X_FINAL;
+	bool isBanned(const IPStr& ip);
 	void clearBanList(void) X_FINAL;
 
 	int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_FINAL;
