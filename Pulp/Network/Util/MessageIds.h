@@ -58,6 +58,10 @@ X_DECLARE_ENUM8(MessageID)(
 	// a timestamp from remote system.
 	/// action: 
 	TimeStamp,
+	// send test on socket.
+	/// action: ignore
+	SendTest,
+
 
 	// ----- Nat ----- 
 
