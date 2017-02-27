@@ -82,6 +82,10 @@ private:
 
 	void setTTL(IpVersion::Enum ipVer, int32_t ttl);
 	bool getTTL(IpVersion::Enum ipVer, int32_t& ttl);
+	
+private:
+	X_NO_COPY(NetSocket);
+	X_NO_ASSIGN(NetSocket);
 
 private:
 	SocketType::Enum socketType_;
