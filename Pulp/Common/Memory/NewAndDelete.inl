@@ -217,6 +217,28 @@ namespace Mem
 		return as_T;
 	}
 
+	// ---------------------------------------------------------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------------------------------------------
+	template <typename T>
+	inline T* MoveArrayUninitialized(void* where, T* fromBegin, T* fromEnd)
+	{
+		X_ASSERT_NOT_NULL(where);
+		// begin / end can be null.
+		T* as_T = union_cast<T*>(where);
+
+		if (std::is_trivially_move_constructible<T>::value)
+		{
+			std::memmove(as_T, fromBegin, (fromEnd - fromBegin) * sizeof(T));
+		}
+		else
+		{
+			for (; fromBegin != fromEnd; ++fromBegin, ++as_T) {
+				new (as_T) T(std::move(*fromBegin));
+			}
+		}
+
+		return as_T;
+	}
 
 	// ---------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------
