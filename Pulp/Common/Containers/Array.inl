@@ -284,10 +284,10 @@ X_INLINE void Array<T, Allocator>::shrinkToFit(void)
 		// new list, do i want to make it a multiple of gran tho?
 		list_ = Allocate(num_);
 
-		// copy old items over.
+		// move old items over.
 		if (pOldList)
 		{
-			Mem::CopyArrayUninitialized(list_, pOldList, pOldList + num_);
+			Mem::MoveArrayUninitialized(list_, pOldList, pOldList + num_);
 
 			// delete old.
 			Mem::DestructArray(pOldList, num_);
@@ -822,10 +822,10 @@ void Array<T, Allocator>::ensureSize(size_type size)
 		// new array baby!
 		list_ = Allocate(newsize);
 
-		// copy old items over.
+		// move old items over.
 		if (pOldList)
 		{
-			Mem::CopyArrayUninitialized(list_, pOldList, pOldList + num_);
+			Mem::MoveArrayUninitialized(list_, pOldList, pOldList + num_);
 
 			// delete old.
 			DeleteArr(pOldList);
