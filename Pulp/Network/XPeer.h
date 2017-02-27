@@ -126,6 +126,7 @@ class XPeer : public IPeer
 	// thead que's
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
 	typedef core::ThreadQue<Packet*, core::CriticalSection> PacketQue;
+	typedef core::ThreadQue<RecvData*, core::CriticalSection> RecvDataQue;
 
 	typedef core::Array<RequestConnection*> RequestConnectionArr;
 	typedef core::Array<Ban> BanArr;
@@ -265,8 +266,7 @@ private:
 	void freePacketData(uint8_t* pPacketData);
 
 	RecvData* allocRecvData(void);
-	void freeRecvData(RecvData* pPacketData);
-
+	void freeRecvData(RecvData* pRecvData);
 
 	uint32_t nextSendReceipt(void);
 	uint32_t incrementNextSendReceipt(void);
@@ -297,7 +297,8 @@ private:
 	// ques.
 	BufferdCommandQue	bufferdCmds_;
 	PacketQue			packetQue_;
-	
+	RecvDataQue			recvDataQue_;
+
 	core::CriticalSection connectionReqsCS_;
 	RequestConnectionArr connectionReqs_;
 

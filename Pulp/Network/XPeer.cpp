@@ -91,6 +91,7 @@ XPeer::XPeer(core::MemoryArenaBase* arena) :
 	remoteSystems_(arena),
 	bufferdCmds_(arena),
 	packetQue_(arena),
+	recvDataQue_(arena),
 	connectionReqs_(arena),
 	bans_(arena),
 	arena_(arena),
@@ -134,7 +135,9 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 {
 	bufferdCmds_.reserve(256);
 	packetQue_.reserve(256);
-	connectionReqs_.reserve(64);
+	recvDataQue_.reserve(256);
+	
+	connectionReqs_.setGranularity(8);
 
 	if (maxConnections < 1) {
 		return StartupResult::InvalidMaxCon;
@@ -664,9 +667,9 @@ RecvData* XPeer::allocRecvData(void)
 	return X_NEW(RecvData, arena_, "RecvData");
 }
 
-void XPeer::freeRecvData(RecvData* pPacketData)
+void XPeer::freeRecvData(RecvData* pRecvData)
 {
-	X_DELETE(pPacketData, arena_);
+	X_DELETE(pRecvData, arena_);
 
 }
 
@@ -917,8 +920,7 @@ void XPeer::onSocketRecv(RecvData* pData)
 	// we own this pointer
 	X_ASSERT_NOT_NULL(pData);
 
-
-	freeRecvData(pData);
+	recvDataQue_.push(pData);
 }
 
 
