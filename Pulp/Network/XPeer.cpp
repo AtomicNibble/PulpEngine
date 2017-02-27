@@ -187,7 +187,9 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 			X_ASSERT_UNREACHABLE();
 		}
 
-		sockets_.emplace_back(socket);
+		sockets_.emplace_back(std::move(socket));
+	}
+
 	}
 
 	return StartupResult::Started;
