@@ -87,6 +87,7 @@ RemoteSystem::RemoteSystem()
 
 XPeer::XPeer(core::MemoryArenaBase* arena) :
 	sockets_(arena),
+	socketThreads_(arena),
 	remoteSystems_(arena),
 	bufferdCmds_(arena),
 	packetQue_(arena),
@@ -190,6 +191,21 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		sockets_.emplace_back(std::move(socket));
 	}
 
+	socketThreads_.resize(sockets_.size());
+	for (size_t i=0; i<socketThreads_.size(); i++)
+	{
+		auto& socket = sockets_[i];
+		auto& socketThread = socketThreads_[i];
+
+		core::StackString256 threadName;
+		threadName.appendFmt("netSocketRecv_%i", i);
+
+		ThreadArr::Type::FunctionDelagate del;
+		del.Bind<XPeer, &XPeer::socketRecvThreadProc>(this);
+
+		socketThread.Create(threadName.c_str(), 1024 * 4);
+		socketThread.setData(&socket);
+		socketThread.Start(del);
 	}
 
 	return StartupResult::Started;
@@ -643,6 +659,17 @@ void XPeer::freePacketData(uint8_t* pPacketData)
 }
 
 
+RecvData* XPeer::allocRecvData(void)
+{
+	return X_NEW(RecvData, arena_, "RecvData");
+}
+
+void XPeer::freeRecvData(RecvData* pPacketData)
+{
+	X_DELETE(pPacketData, arena_);
+
+}
+
 uint32_t XPeer::nextSendReceipt(void)
 {
 	return sendReceiptSerial_;
@@ -819,7 +846,6 @@ int32_t XPeer::getLowestPing(const AddressOrGUID systemIdentifier) const
 }
 
 
-
 const NetGUID& XPeer::getMyGUID(void) const
 {
 	return guid_;
@@ -873,6 +899,39 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 
 // ~IPeer
+
+void XPeer::onSocketRecv(RecvData* pData)
+{
+	// we own this pointer
+	X_ASSERT_NOT_NULL(pData);
+
+
+	freeRecvData(pData);
+}
+
+
+core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread)
+{
+	NetSocket* pSocket = reinterpret_cast<NetSocket*>(thread.getData());
+	X_ASSERT_NOT_NULL(pSocket);
+
+	RecvData* pData = allocRecvData();
+
+	while (thread.ShouldRun())
+	{
+		pSocket->recv(*pData);
+
+		if (pData->bytesRead > 0)
+		{
+			onSocketRecv(pData);
+
+			// get new data block.
+			pData = allocRecvData();
+		}
+	}
+
+	return core::Thread::ReturnValue(0);
+}
 
 bool XPeer::populateIpList(void)
 {

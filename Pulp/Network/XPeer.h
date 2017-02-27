@@ -129,6 +129,7 @@ class XPeer : public IPeer
 
 	typedef core::Array<RequestConnection*> RequestConnectionArr;
 	typedef core::Array<Ban> BanArr;
+	typedef core::Array<core::ThreadMember<XPeer>> ThreadArr;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -259,12 +260,21 @@ private:
 	BufferdCommand* allocBufferdCmd(size_t lengthBits);
 	void freebufferdCmd(BufferdCommand* pBufCmd);
 
-
 	uint8_t* allocPacketData(size_t lengthBytes);
 	void freePacketData(uint8_t* pPacketData);
 
+	RecvData* allocRecvData(void);
+	void freeRecvData(RecvData* pPacketData);
+
+
 	uint32_t nextSendReceipt(void);
 	uint32_t incrementNextSendReceipt(void);
+
+private:
+	void onSocketRecv(RecvData* pData);
+
+	core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
+
 
 private:
 	bool populateIpList(void);
@@ -281,6 +291,7 @@ private:
 
 	SystemAddArr ipList_;
 	SocketsArr sockets_;
+	ThreadArr socketThreads_;
 
 	// ques.
 	BufferdCommandQue	bufferdCmds_;
