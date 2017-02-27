@@ -257,6 +257,8 @@ void NetSocket::recv(RecvData& dataOut)
 		&senderAddLen
 	);
 
+	dataOut.bytesRead = bytesRead;
+
 	if (bytesRead < 0)
 	{
 		lastError::Description Dsc;
