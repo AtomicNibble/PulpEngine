@@ -147,7 +147,7 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 		{
 			X_ERROR("Net", "Failed to open socket. Error: \"%s\"", lastError::ToString(Dsc));
 			platform::freeaddrinfo(pResult);
-			return BindResult::SendTestFailed;
+			return BindResult::FailedToBind;
 		}
 
 		// bind it like it's hot.
