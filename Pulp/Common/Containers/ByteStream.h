@@ -26,7 +26,7 @@ public:
 public:
 	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
-	inline ByteStream(MemoryArenaBase* arena, size_t numBytes);
+	inline ByteStream(MemoryArenaBase* arena, size_type numBytes);
 	inline ByteStream(const ByteStream& oth);
 	inline ByteStream(ByteStream&& oth);
 	inline ~ByteStream();
@@ -39,7 +39,7 @@ public:
 	inline void write(const T& val);
 	// writes the type * num to the stream.
 	template<typename T>
-	inline void write(const T* val, size_t num);
+	inline void write(const T* val, size_type num);
 	// removes and returns the top object off the stream.
 	template<typename T>
 	inline T read(void);
@@ -47,10 +47,10 @@ public:
 	template<typename T>
 	inline T peek(void) const;
 	// sets the absolute position in the stream.
-	inline void seek(size_t pos);
+	inline void seek(size_type pos);
 
 	// resizes the object
-	inline void resize(size_t numBytes);
+	inline void resize(size_type numBytes);
 	// clears the stream setting the cursor back to the start.
 	// no memory is freed
 	inline void reset(void);
@@ -58,11 +58,11 @@ public:
 	inline void free(void);
 
 	// returns how many bytes are currently stored in the stream.
-	inline size_t size(void) const;
+	inline size_type size(void) const;
 	// returns the capacity of the byte stream.
-	inline size_t capacity(void) const;
+	inline size_type capacity(void) const;
 	// returns the amount of bytes that can be added.
-	inline size_t freeSpace(void) const;
+	inline size_type freeSpace(void) const;
 	// returns true if the stream is full.
 	inline bool isEos(void) const;
 
@@ -86,7 +86,7 @@ protected:
 
 	// for easy memory allocation changes later.
 	inline void Delete(char* pData) const;
-	inline char* Allocate(size_t num) const;
+	inline char* Allocate(size_type num) const;
 
 	Type* current_;
 	Type* start_;

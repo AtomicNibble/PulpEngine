@@ -11,7 +11,7 @@ ByteStream::ByteStream(MemoryArenaBase* arena) :
 	X_ASSERT_NOT_NULL(arena);
 }
 
-ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes) :
+ByteStream::ByteStream(MemoryArenaBase* arena, size_type numBytes) :
 	current_(nullptr),
 	start_(nullptr),
 	end_(nullptr),
@@ -109,7 +109,7 @@ inline void ByteStream::write(const T& val)
 
 
 template<typename T>
-inline void ByteStream::write(const T* val, size_t num)
+inline void ByteStream::write(const T* val, size_type num)
 {
 	X_ASSERT(((sizeof(T) * num) <= freeSpace()), "can't write %" PRIuS " objects of size: %" PRIuS,
 		num, sizeof(T)) (sizeof(T), freeSpace());
@@ -121,7 +121,7 @@ inline void ByteStream::write(const T* val, size_t num)
 
 	as_char = current_;
 
-	size_t i;
+	size_type i;
 	for (i = 0; i < num; i++)
 	{
 		*as_type = val[i];
@@ -160,7 +160,7 @@ inline T ByteStream::peek(void) const
 	return as_type[-1];
 }
 
-inline void ByteStream::seek(size_t pos)
+inline void ByteStream::seek(size_type pos)
 {
 	X_ASSERT(pos < size(), "can't seek that far")(pos, size());
 	current_ = (start_ + pos);
@@ -168,13 +168,13 @@ inline void ByteStream::seek(size_t pos)
 
 
 // resizes the object
-inline void ByteStream::resize(size_t numBytes)
+inline void ByteStream::resize(size_type numBytes)
 {
 	if (numBytes > capacity()) 
 	{
 		// copy of old memory.
 		char* pOld = start_;
-		size_t currentBytes = this->size();
+		size_type currentBytes = this->size();
 
 		// allocate new
 		start_ = Allocate(numBytes);
@@ -216,21 +216,21 @@ inline void ByteStream::free(void)
 
 
 // returns how many bytes are currently stored in the stream.
-inline size_t ByteStream::size(void) const
+inline typename ByteStream::size_type ByteStream::size(void) const
 {
-	return static_cast<size_t>(current_ - start_);
+	return union_cast<size_type>(current_ - start_);
 }
 
 // returns the capacity of the byte stream.
-inline size_t ByteStream::capacity(void) const
+inline typename ByteStream::size_type ByteStream::capacity(void) const
 {
-	return static_cast<size_t>(end_ - start_);
+	return union_cast<size_type>(end_ - start_);
 }
 
 // returns the amount of bytes that can be added.
-inline size_t ByteStream::freeSpace(void) const
+inline typename ByteStream::size_type ByteStream::freeSpace(void) const
 {
-	return static_cast<size_t>(end_ - current_);
+	return union_cast<size_type>(end_ - current_);
 }
 
 // returns true if the stream is full.
@@ -308,7 +308,7 @@ inline void ByteStream::Delete(char* pData) const
 	X_DELETE_ARRAY(pData, arena_);
 }
 
-inline char* ByteStream::Allocate(size_t num) const
+inline char* ByteStream::Allocate(size_type num) const
 {
 	return X_NEW_ARRAY(char, num, arena_, "ByteStream");
 }
