@@ -17,6 +17,7 @@
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
       <AdditionalOptions>/std:c++latest%(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
 		<TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
