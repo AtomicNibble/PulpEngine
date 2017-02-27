@@ -187,7 +187,6 @@ private:
 // and address, not necissarialy a unique identifier.
 struct ISystemAdd
 {
-	typedef char AddressStr[256];
 
 	virtual ~ISystemAdd() {}
 
@@ -197,7 +196,7 @@ struct ISystemAdd
 	virtual bool IsLoopBack(void) const X_ABSTRACT;
 	virtual bool IsLanAddress(void) const X_ABSTRACT;
 
-	virtual const char* toString(AddressStr& strBuf, bool incPort = true) X_ABSTRACT;
+	virtual const char* toString(IPStr& strBuf, bool incPort = true) X_ABSTRACT;
 };
 
 // ---------------------------------

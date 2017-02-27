@@ -6,7 +6,6 @@ X_NAMESPACE_BEGIN(net)
 class SystemAdd : public ISystemAdd
 {
 public:
-
 	static const char* IP_LOOPBACK[IpVersion::ENUM_COUNT];
 	static const char PORT_DELINEATOR = '|';
 
@@ -35,7 +34,7 @@ public:
 	X_INLINE bool IsLoopBack(void) const X_FINAL;
 	X_INLINE bool IsLanAddress(void) const X_FINAL;
 
-	const char* toString(AddressStr& strBuf, bool incPort = true) X_FINAL;
+	const char* toString(IPStr& strBuf, bool incPort = true) X_FINAL;
 	// ~ISystemAdd
 
 	// comparrision operators.

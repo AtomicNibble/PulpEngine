@@ -169,18 +169,18 @@ bool SystemAdd::equalExcludingPort(const SystemAdd& oth) const
 }
 
 
-const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
+const char* SystemAdd::toString(IPStr& strBuf, bool incPort)
 {
-	int ret;
+	int32_t ret;
 
-	core::zero_object(strBuf);
+	char tmpBuf[IPStr::BUF_SIZE];
 
 	if (address_.addr4.sin_family == AF_INET)
 	{
 		ret = platform::getnameinfo((struct platform::sockaddr*)&address_.addr4, 
 			sizeof(struct platform::sockaddr_in),
-			strBuf, 
-			sizeof(strBuf),
+			tmpBuf,
+			sizeof(tmpBuf),
 			nullptr, 
 			0, 
 			NI_NUMERICHOST
@@ -191,8 +191,8 @@ const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
 		ret = platform::getnameinfo((struct platform::sockaddr*)
 			&address_.addr6, 
 			sizeof(struct platform::sockaddr_in6), 
-			strBuf, 
-			sizeof(strBuf), // INET6_ADDRSTRLEN, 
+			tmpBuf,
+			sizeof(tmpBuf), // INET6_ADDRSTRLEN, 
 			nullptr,
 			0, 
 			NI_NUMERICHOST
@@ -202,11 +202,13 @@ const char* SystemAdd::toString(AddressStr& strBuf, bool incPort)
 	if (ret != 0) {
 		lastError::Description Dsc;
 		X_ERROR("Net", "Failed to get name info. Error: \"%s\"", lastError::ToString(Dsc));
-		return strBuf;
+		strBuf.clear();
+		return strBuf.c_str();
 	}
 
+	strBuf.set(tmpBuf);
 	
-	return strBuf;
+	return strBuf.c_str();
 }
 
 
