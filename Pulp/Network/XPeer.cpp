@@ -985,6 +985,10 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 			// get new data block.
 			pData = allocRecvData();
 		}
+		else
+		{
+			core::Thread::Sleep(0);
+		}
 	}
 
 	return core::Thread::ReturnValue(0);
