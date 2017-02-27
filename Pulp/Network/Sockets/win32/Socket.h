@@ -48,12 +48,15 @@ struct SendParameters
 	SystemAdd systemAddress;
 };
 
+class NetSocket;
+
 struct RecvData
 {
 	uint8_t data[MAX_MTU_SIZE];
 	int32_t bytesRead;
 	core::TimeVal timeRead;
 	SystemAdd systemAdd;
+	NetSocket* pSrcSocket;
 };
 
 class NetSocket

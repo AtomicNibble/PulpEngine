@@ -269,9 +269,8 @@ void NetSocket::recv(RecvData& dataOut)
 	}
 
 	dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
-
-	// decode address.
 	dataOut.systemAdd.setFromAddStorage(senderAddr);
+	dataOut.pSrcSocket = this;
 }
 
 bool NetSocket::getMyIPs(SystemAddArr& addresses)
