@@ -85,12 +85,34 @@ NetSocket::NetSocket()
 	socket_ = INVALID_SOCKET;
 }
 
+NetSocket::NetSocket(NetSocket&& oth)
+{
+	socketType_ = oth.socketType_;
+	socket_ = oth.socket_;
+	boundAdd_ = oth.boundAdd_;
+
+	oth.socket_ = INVALID_SOCKET;
+}
+
 NetSocket::~NetSocket()
 {
 	if (socket_ != INVALID_SOCKET)
 	{
 		platform::closesocket(socket_);
 	}
+}
+
+NetSocket& NetSocket::operator=(NetSocket&& oth)
+{
+	if (this != &oth)
+	{
+		socketType_ = oth.socketType_;
+		socket_ = oth.socket_;
+		boundAdd_ = oth.boundAdd_;
+
+		oth.socket_ = INVALID_SOCKET;
+	}
+	return *this;
 }
 
 BindResult::Enum NetSocket::bind(BindParameters& bindParameters)

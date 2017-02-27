@@ -63,7 +63,11 @@ public:
 
 public:
 	NetSocket();
+	NetSocket(NetSocket&& oth);
 	~NetSocket();
+
+	NetSocket& operator=(NetSocket&& oth);
+
 
 	BindResult::Enum bind(BindParameters& bindParameters);
 	SendResult send(SendParameters& sendParameters);
