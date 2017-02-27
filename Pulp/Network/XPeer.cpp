@@ -915,6 +915,49 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 // ~IPeer
 
+void XPeer::processRecvData(void)
+{
+	RecvData* pRecvData = nullptr;
+	while (recvDataQue_.tryPop(pRecvData))
+	{
+		processRecvData(pRecvData);
+
+		freeRecvData(pRecvData);
+	}
+}
+
+
+void XPeer::processRecvData(RecvData* pData)
+{
+	X_ASSERT_NOT_NULL(pData);
+	X_ASSERT_NOT_NULL(pData->pSrcSocket);
+
+	SystemAdd& sysAdd = pData->systemAdd;
+	NetSocket& socket = *pData->pSrcSocket;
+
+	IPStr strBuf;
+	pData->systemAdd.toString(strBuf, false);
+
+	core::BitStream bs(arena_, MAX_MTU_SIZE);
+
+	if (isBanned(strBuf))
+	{
+		// you fucking twat!
+
+
+
+		SendParameters sp;
+		sp.setData(bs);
+		sp.systemAddress = pData->systemAdd;
+
+		pData->pSrcSocket->send(sp);
+		return;
+	}
+
+
+}
+
+
 void XPeer::onSocketRecv(RecvData* pData)
 {
 	// we own this pointer

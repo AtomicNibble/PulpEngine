@@ -272,6 +272,10 @@ private:
 	uint32_t incrementNextSendReceipt(void);
 
 private:
+	void processRecvData(void);
+	void processRecvData(RecvData* pRecvData);
+
+
 	void onSocketRecv(RecvData* pData);
 
 	core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
