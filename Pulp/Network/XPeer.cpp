@@ -38,7 +38,7 @@ namespace
 		}
 
 		// do wild matching.
-		int32_t idx = 0;
+		size_t idx = 0;
 		while (idx < pattern.length() && idx < ip.length())
 		{
 			if (pattern[idx] == ip[idx])
