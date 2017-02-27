@@ -1,19 +1,19 @@
 #include "BitStream.h"
 
 BitStream::BitStream(MemoryArenaBase* arena) :
-bitIdx_(0),
-capacity_(0),
-start_(0),
-arena_(arena)
+	bitIdx_(0),
+	capacity_(0),
+	start_(0),
+	arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 }
 
-BitStream::BitStream(MemoryArenaBase* arena, size_t numBits) :
-bitIdx_(0),
-capacity_(0),
-start_(0),
-arena_(arena)
+BitStream::BitStream(MemoryArenaBase* arena, size_type numBits) :
+	bitIdx_(0),
+	capacity_(0),
+	start_(0),
+	arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 	resize(numBits);
@@ -27,7 +27,7 @@ BitStream::BitStream(const BitStream& oth)
 	resize(oth.capacity_);
 
 	// copy stored bits.
-	size_t numBytes = bytesRequired(oth.bitIdx_);
+	size_type numBytes = numBytesForBits(oth.bitIdx_);
 	::memcpy(start_, oth.start_, numBytes);
 
 	bitIdx_ = oth.bitIdx_;
@@ -62,7 +62,7 @@ BitStream & BitStream::operator=(const BitStream & oth)
 		resize(oth.capacity_);
 
 		// copy stored bits.
-		size_t numBytes = bytesRequired(oth.bitIdx_);
+		size_type numBytes = numBytesForBits(oth.bitIdx_);
 		::memcpy(start_, oth.start_, numBytes);
 
 		bitIdx_ = oth.bitIdx_;
@@ -94,8 +94,8 @@ inline void BitStream::write(bool bit)
 {
 	X_ASSERT(freeSpace() > 0, "can't write bit to stream.")(freeSpace(), capacity());
 
-	size_t byteIdx = bitIdx_ >> 3; // val / 8
-	int32 bitpos = safe_static_cast<int32,size_t>(7 - (bitIdx_ & 7));
+	size_type byteIdx = bitIdx_ >> 3; // val / 8
+	int32 bitpos = safe_static_cast<int32>(7 - (bitIdx_ & 7));
 	int32 bitval = 1 << bitpos;
 
 	if (bit)
@@ -113,7 +113,7 @@ inline bool BitStream::read(void)
 
 	bitIdx_--; // take of a bit.
 
-	size_t byteIdx = bitIdx_ >> 3; // val / 8
+	size_type byteIdx = bitIdx_ >> 3; // val / 8
 	uint32 bitpos = (7 - (bitIdx_ & 7));
 
 	return (start_[byteIdx] & (1 << bitpos)) != 0;
@@ -124,16 +124,16 @@ inline bool BitStream::peek(void) const
 {
 	X_ASSERT(size() > 0, "can't peek bit from stream.")(size());
 
-	size_t idx = bitIdx_ - 1;
+	size_type idx = bitIdx_ - 1;
 
-	size_t byteIdx = (idx) >> 3; // val / 8
+	size_type byteIdx = (idx) >> 3; // val / 8
 	uint32 bitpos = (7 - (idx & 7));
 
 	return (start_[byteIdx] & (1 << bitpos)) != 0;;
 }
 
 // sets the absolute position in the stream.
-inline void BitStream::seek(size_t pos)
+inline void BitStream::seek(size_type pos)
 {
 	X_ASSERT(pos <= capacity(), "can't skeep to that position")(pos, capacity());
 	bitIdx_ = pos;
@@ -142,16 +142,16 @@ inline void BitStream::seek(size_t pos)
 
 
 // resizes the object
-inline void BitStream::resize(size_t numBits) 
+inline void BitStream::resize(size_type numBits)
 {
 	if (numBits > capacity())
 	{
 		// save local copy of old array and it's size.
-		char* pOld = start_;
-		size_t bytesAllocated = bytesRequired(capacity_);
+		Type* pOld = start_;
+		size_type bytesAllocated = numBytesForBits(capacity_);
 
 		// allocate the new one.
-		start_ = Allocate(numBits);
+		start_ = Allocate(bytesAllocated);
 
 		// copy over.
 		if(pOld)
@@ -183,19 +183,19 @@ inline void BitStream::free(void)
 
 
 // returns how many bits are currently stored in the stream.
-inline size_t BitStream::size(void) const
+inline typename BitStream::size_type BitStream::size(void) const
 {
 	return bitIdx_;
 }
 
 // returns the capacity
-inline size_t BitStream::capacity(void) const
+inline typename BitStream::size_type BitStream::capacity(void) const
 {
 	return capacity_;
 }
 
 // returns the amount of bits that can be added.
-inline size_t BitStream::freeSpace(void) const
+inline typename BitStream::size_type BitStream::freeSpace(void) const
 {
 	return capacity_ - bitIdx_;
 }
@@ -206,23 +206,72 @@ inline bool BitStream::isEos(void) const
 	return bitIdx_ == capacity_;
 }
 
-inline size_t BitStream::bytesRequired(size_t numBits) const
+
+inline typename BitStream::TypePtr BitStream::ptr(void)
 {
-	// align so that all the bits fit.
-	numBits = bitUtil::RoundUpToMultiple<size_t>(numBits, 8);
-	numBits >>= 3; // to bytes
-	return numBits;
+	return start_;
 }
 
+inline typename BitStream::ConstTypePtr BitStream::ptr(void) const
+{
+	return start_;
+}
+
+inline typename BitStream::TypePtr BitStream::data(void)
+{
+	return start_;
+}
+
+inline typename BitStream::ConstTypePtr BitStream::data(void) const
+{
+	return start_;
+}
+
+
+inline typename BitStream::Iterator BitStream::begin(void)
+{
+	return start_;
+}
+
+inline typename BitStream::ConstIterator BitStream::begin(void) const
+{
+	return start_;
+}
+
+inline typename BitStream::Iterator BitStream::end(void)
+{
+	return start_ + numBytesForBits(bitIdx_);
+}
+
+inline typename BitStream::ConstIterator BitStream::end(void) const
+{
+	return start_ + numBytesForBits(bitIdx_);
+}
+
+
+
+// ----------------------------
+
+inline typename BitStream::size_type BitStream::numBytesForBits(size_t numBits) const
+{
+	// align so that all the bits fit.
+	return (numBits + 7) >> 3;
+}
+
+
+inline typename BitStream::size_type BitStream::numBitsForBytes(size_t numBytes) const
+{
+	return numBytes << 3;
+}
+
+
 // for easy memory allocation changes later.
-inline void BitStream::Delete(char* pData) const
+inline void BitStream::Delete(Type* pData) const
 {
 	X_DELETE_ARRAY(pData,arena_);
 }
 
-inline char* BitStream::Allocate(size_t numbits) const
+inline typename BitStream::Type* BitStream::Allocate(size_type numBytes) const
 {
-	size_t numBytes = bytesRequired(numbits);
-
-	return X_NEW_ARRAY(char, numBytes, arena_, "BitStream");
+	return X_NEW_ARRAY(Type, numBytes, arena_, "BitStream");
 }
