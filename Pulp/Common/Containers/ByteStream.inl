@@ -240,6 +240,66 @@ inline bool ByteStream::isEos(void) const
 }
 
 
+inline typename ByteStream::TypePtr ByteStream::ptr(void)
+{
+	return start_;
+}
+
+inline typename ByteStream::ConstTypePtr ByteStream::ptr(void) const
+{
+	return start_;
+}
+
+inline typename ByteStream::TypePtr ByteStream::data(void)
+{
+	return start_;
+}
+
+inline typename ByteStream::ConstTypePtr ByteStream::data(void) const
+{
+	return start_;
+}
+
+
+inline typename ByteStream::Iterator ByteStream::begin(void)
+{
+	return start_;
+}
+
+inline typename ByteStream::ConstIterator ByteStream::begin(void) const
+{
+	return start_;
+}
+
+inline typename ByteStream::Iterator ByteStream::end(void)
+{
+	return current_;
+}
+
+inline typename ByteStream::ConstIterator ByteStream::end(void) const
+{
+	return current_;
+}
+
+inline typename ByteStream::Reference ByteStream::front(void)
+{
+	return *start_;
+}
+
+inline typename ByteStream::ConstReference ByteStream::front(void) const
+{
+	return *start_;
+}
+
+inline typename ByteStream::Reference ByteStream::back(void)
+{
+	return *end();
+}
+
+inline typename ByteStream::ConstReference ByteStream::back(void) const
+{
+	return *end();
+}
 
 
 // for easy memory allocation changes later.

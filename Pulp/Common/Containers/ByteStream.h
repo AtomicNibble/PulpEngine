@@ -11,6 +11,19 @@ X_NAMESPACE_BEGIN(core)
 class ByteStream
 {
 public:
+	typedef char Type;
+	typedef Type value_type;
+	typedef Type* TypePtr;
+	typedef const Type* ConstTypePtr;
+	typedef Type* Iterator;
+	typedef const Type* ConstIterator;
+	typedef size_t size_type;
+	typedef Type& Reference;
+	typedef Type& reference;
+	typedef const Type& ConstReference;
+	typedef const Type& const_reference;
+
+public:
 	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
 	inline ByteStream(MemoryArenaBase* arena, size_t numBytes);
@@ -53,21 +66,31 @@ public:
 	// returns true if the stream is full.
 	inline bool isEos(void) const;
 
-	inline char* begin(void) const {
-		return start_;
-	}
+
+	inline TypePtr ptr(void);
+	inline ConstTypePtr ptr(void) const;
+	inline TypePtr data(void);
+	inline ConstTypePtr data(void) const;
+
+
+	inline Iterator begin(void);
+	inline ConstIterator begin(void) const;
+	inline Iterator end(void);
+	inline ConstIterator end(void) const;
+	inline Reference front(void);
+	inline ConstReference front(void) const;
+	inline Reference back(void);
+	inline ConstReference back(void) const;
 
 protected:
-//	X_NO_COPY(ByteStream);
-//	X_NO_ASSIGN(ByteStream);
 
 	// for easy memory allocation changes later.
 	inline void Delete(char* pData) const;
 	inline char* Allocate(size_t num) const;
 
-	char* current_;
-	char* start_;
-	char* end_;
+	Type* current_;
+	Type* start_;
+	Type* end_;
 
 	MemoryArenaBase* arena_;
 };
