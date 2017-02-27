@@ -167,11 +167,11 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 			platform::freeaddrinfo(pResult);
 
 			// send a test.
-			uint32_t temp = 0;
+			MessageID::Enum msgId = MessageID::SendTest;
 
 			SendParameters sendParam;
-			sendParam.pData = reinterpret_cast<uint8_t*>(&temp);
-			sendParam.length = 4;
+			sendParam.pData = reinterpret_cast<uint8_t*>(&msgId);
+			sendParam.length = sizeof(msgId);
 			sendParam.systemAddress = boundAdd_;
 			sendParam.ttl = 0;
 
