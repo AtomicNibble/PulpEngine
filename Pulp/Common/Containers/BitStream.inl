@@ -86,12 +86,12 @@ inline void BitStream::alignReadToByteBoundry(void)
 // returns how many bits are currently stored in the stream.
 inline typename BitStream::size_type BitStream::size(void) const
 {
-	return bitIdx_;
+	return bitIdx_ - readBitIdx_;
 }
 
 inline typename BitStream::size_type BitStream::sizeInBytes(void) const
 {
-	return numBytesForBits(bitIdx_);
+	return numBytesForBits(size());
 }
 
 // returns the capacit
@@ -105,13 +105,13 @@ inline typename BitStream::size_type BitStream::capacity(void) const
 // returns the amount of bits that can be added.
 inline typename BitStream::size_type BitStream::freeSpace(void) const
 {
-	return capacity_ - bitIdx_;
+	return capacity() - size();
 }
 
 // returns true if the stream is full.
 inline bool BitStream::isEos(void) const
 {
-	return bitIdx_ == capacity_;
+	return size() == capacity();
 }
 
 
