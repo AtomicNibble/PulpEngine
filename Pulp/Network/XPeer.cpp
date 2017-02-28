@@ -334,18 +334,7 @@ void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
 	X_ASSERT_NOT_NULL(pTarget);
 	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(pTarget);
 
-	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
-
-	auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
-		return pOth->systemAddress == sysAdd;
-	};
-
-	auto it = std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc);
-	if(it != connectionReqs_.end())
-	{
-		X_DELETE(*it, arena_);
-		connectionReqs_.erase(it);
-	}
+	removeConnectionRequest(sysAdd);
 }
 
 
@@ -744,6 +733,25 @@ uint32_t XPeer::incrementNextSendReceipt(void)
 {
 	return ++sendReceiptSerial_;
 }
+
+
+
+void XPeer::removeConnectionRequest(const SystemAdd& sysAdd)
+{
+	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+	auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
+		return pOth->systemAddress == sysAdd;
+	};
+
+	auto it = std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc);
+	if (it != connectionReqs_.end())
+	{
+		X_DELETE(*it, arena_);
+		connectionReqs_.erase(it);
+	}
+}
+
 
 // connection limits
 void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)

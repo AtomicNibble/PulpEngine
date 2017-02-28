@@ -277,6 +277,8 @@ private:
 	uint32_t nextSendReceipt(void);
 	uint32_t incrementNextSendReceipt(void);
 
+	void removeConnectionRequest(const SystemAdd& sysAdd);
+
 private:
 	void processRecvData(void);
 	void processRecvData(RecvData* pRecvData);
