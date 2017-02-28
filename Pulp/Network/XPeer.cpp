@@ -877,18 +877,7 @@ void XPeer::removeFromBanList(const char* pIP)
 
 bool XPeer::isBanned(const char* pIP)
 {
-	if (bans_.isEmpty()) {
-		return false;
-	}
-
-	IPStr ip(pIP);
-
-	for (auto& ban : bans_) {
-		if (ipWildMatch(ban.ip, ip)) {
-			return true;
-		}
-	}
-	return false;
+	return isBanned(IPStr(pIP));
 }
 
 bool XPeer::isBanned(const IPStr& ip)
