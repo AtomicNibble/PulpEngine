@@ -1201,6 +1201,9 @@
     <ClInclude Include="INetwork.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\FixedBitStream.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1514,6 +1517,9 @@
     </None>
     <None Include="Threading\Thread.inl">
       <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Containers\FixedBitStream.inl">
+      <Filter>Headers\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
