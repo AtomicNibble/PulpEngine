@@ -44,7 +44,7 @@ struct SendParameters
 
 	X_INLINE void setData(core::BitStream& bs) {
 		pData = bs.data();
-		length = safe_static_cast<int32_t>(bs.size());
+		length = safe_static_cast<int32_t>(bs.sizeInBytes());
 	}
 
 	uint8_t* pData;
