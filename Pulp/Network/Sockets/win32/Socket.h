@@ -3,6 +3,7 @@
 
 X_NAMESPACE_BEGIN(net)
 
+class NetVars;
 
 X_DECLARE_ENUM(BindResult)(
 	Success,
@@ -70,7 +71,7 @@ public:
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 
 public:
-	NetSocket();
+	NetSocket(NetVars& vars);
 	NetSocket(NetSocket&& oth);
 	~NetSocket();
 
@@ -100,6 +101,8 @@ private:
 	X_NO_ASSIGN(NetSocket);
 
 private:
+	NetVars& vars_;
+
 	SocketType::Enum socketType_;
 	SocketHandle socket_;
 	SystemAdd boundAdd_;

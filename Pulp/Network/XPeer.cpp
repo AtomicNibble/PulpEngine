@@ -175,7 +175,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 	{
 		SocketDescriptor& socketDiscriptor = pSocketDescriptors[i];
 
-		NetSocket socket;
+		NetSocket socket(vars_);
 		bindParam.hostAdd = socketDiscriptor.getHostAdd();
 		bindParam.port = socketDiscriptor.getPort();
 		bindParam.socketFamily = socketDiscriptor.getSocketFamiley();

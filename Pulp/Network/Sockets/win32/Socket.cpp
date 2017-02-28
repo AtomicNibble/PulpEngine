@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Socket.h"
 
+#include "Vars\NetVars.h"
+
 #include <ITimer.h>
 
 X_NAMESPACE_BEGIN(net)
@@ -79,13 +81,15 @@ BindParameters::BindParameters()
 
 // -----------------------
 
-NetSocket::NetSocket()
+NetSocket::NetSocket(NetVars& vars) :
+	vars_(vars)
 {
 	socketType_ = SocketType::Invalid;
 	socket_ = INVALID_SOCKET;
 }
 
-NetSocket::NetSocket(NetSocket&& oth)
+NetSocket::NetSocket(NetSocket&& oth) :
+	vars_(oth.vars_)
 {
 	socketType_ = oth.socketType_;
 	socket_ = oth.socket_;
@@ -106,6 +110,7 @@ NetSocket& NetSocket::operator=(NetSocket&& oth)
 {
 	if (this != &oth)
 	{
+		vars_ = oth.vars_;
 		socketType_ = oth.socketType_;
 		socket_ = oth.socket_;
 		boundAdd_ = oth.boundAdd_;
