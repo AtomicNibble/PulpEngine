@@ -5,6 +5,7 @@
 
 X_NAMESPACE_BEGIN(net)
 
+static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
 
 X_DECLARE_ENUM(ConnectionState)(
 	Pending,
