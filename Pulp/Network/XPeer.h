@@ -298,7 +298,8 @@ private:
 
 	// ------
 
-	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, NetSocket* pSrcSocket, SystemAdd bindingAdd);
+	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
+		NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state);
 	bool isIpConnectSpamming(const SystemAdd& sysAdd);
 
 	// ------

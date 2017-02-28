@@ -1234,7 +1234,7 @@ void XPeer::handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
 			}
 			else
 			{
-				auto* pRemoteSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd);
+				auto* pRemoteSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
 				X_UNUSED(pRemoteSys);
 
 				bsOut.write(MessageID::OpenConnectionResponseStage2);
@@ -1275,7 +1275,7 @@ void XPeer::handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs)
 				if (!pSys)
 				{
 					// add systen
-					pSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd);
+					pSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
 				}
 
 				
@@ -1314,7 +1314,8 @@ void XPeer::handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs)
 	removeConnectionRequest(pData->systemAdd);
 }
 
-RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, NetSocket* pSrcSocket, SystemAdd bindingAdd)
+RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
+	NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state)
 {
 	// hello hello.
 
@@ -1338,7 +1339,7 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 			remoteSys.guid = guid;
 			remoteSys.lowestPing = UNDEFINED_PING;
 			remoteSys.MTUSize = remoteMTU;
-			remoteSys.connectState = ConnectState::UnverifiedSender;
+			remoteSys.connectState = state;
 			remoteSys.pNetSocket = pSrcSocket;
 
 			if (pSrcSocket->getBoundAdd() != bindingAdd)
