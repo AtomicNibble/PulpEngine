@@ -1860,6 +1860,9 @@
     <ClCompile Include="Platform\win32\MessageBox.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
+    <ClCompile Include="Containers\BitStream.cpp">
+      <Filter>SourceFiles\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">
