@@ -264,20 +264,26 @@ char Console::ReadKey(void) const
 
 	if( GetNumberOfConsoleInputEvents( consoleInput_, &NumEvents ) )
 	{
-		if( NumEvents > 0 )
+		if (NumEvents > 0)
 		{
-			INPUT_RECORD InputInfo;
+			for (DWORD i = 0; i < NumEvents; i++)
+			{
+				INPUT_RECORD InputInfo;
+				DWORD NumEventsRead;
 
-			if( ReadConsoleInput( consoleInput_, &InputInfo, 1, &NumEvents ) )
-			{
-				if( InputInfo.EventType == KEY_EVENT )
+				if (ReadConsoleInputW(consoleInput_, &InputInfo, 1, &NumEventsRead))
 				{
-					return safe_static_cast<char,WORD>( InputInfo.Event.KeyEvent.wVirtualKeyCode );
+					X_ASSERT(NumEventsRead == 1, "Should only get one event")(NumEventsRead);
+
+					if (NumEventsRead >= 1 &&InputInfo.EventType == KEY_EVENT)
+					{
+						return safe_static_cast<char, WORD>(InputInfo.Event.KeyEvent.wVirtualKeyCode);
+					}
 				}
-			}
-			else
-			{
-				X_ERROR( "Console", "Cannot read console input. Error: %s", lastError::ToString( Dsc ) );
+				else
+				{
+					X_ERROR("Console", "Cannot read console input. Error: %s", lastError::ToString(Dsc));
+				}
 			}
 		}
 	}
