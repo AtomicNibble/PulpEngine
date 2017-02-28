@@ -972,7 +972,7 @@ int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
 			return pRemoteSys->MTUSize;
 		}
 
-	//	return -1;
+		X_WARNING("Net", "Failed to find remote system for MTU size returning default");
 	}
 
 	return defaultMTU_;
@@ -1090,6 +1090,8 @@ void XPeer::handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageI
 
 	Packet* pPacket = nullptr;
 
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection failure: \"%s\"", MessageID::ToString(failureType));
+
 	// rip connection.
 	if (failureType == MessageID::ConnectionRateLimited)
 	{
@@ -1114,6 +1116,10 @@ void XPeer::handleconnectionRequest(RecvData* pData, RecvBitStream& bs)
 	// hello, pleb.
 	uint8_t protoVersionMajor = bs.read<uint8_t>();
 	uint8_t protoVersionMinor = bs.read<uint8_t>();
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request from client with proto version: %" PRIu8 ".%" PRIu8, 
+		protoVersionMinor, protoVersionMajor );
+
 
 	if (protoVersionMajor != PROTO_VERSION_MAJOR || protoVersionMinor != PROTO_VERSION_MINOR)
 	{
@@ -1152,6 +1158,8 @@ void XPeer::handleconnectionResponse(RecvData* pData, RecvBitStream& bs)
 	bs.read(serverGuid);
 	bs.read(mtu);
 
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection response");
+
 	// find this fuck.
 	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
@@ -1189,6 +1197,8 @@ void XPeer::handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
 	bs.read(clientGuid);
 	bs.read(bindingAdd);
 	bs.read(mtu);
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request2");
 
 	// right lets check the list.
 	const RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
@@ -1263,6 +1273,9 @@ void XPeer::handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs)
 	bs.read(bindingAdd);
 	bs.read(mtu);
 
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection response2");
+
+
 	// find it.
 	{
 		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
@@ -1318,6 +1331,8 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 	NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state)
 {
 	// hello hello.
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Adding remote system");
 
 	for (auto& remoteSys : remoteSystems_)
 	{
