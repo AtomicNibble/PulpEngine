@@ -238,6 +238,7 @@ public:
 	void setUnreliableTimeout(core::TimeVal timeout);
 	void setConnectionRateLimit(core::TimeVal time);
 
+	bool accpetingIncomingConnections(void) const;
 
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,

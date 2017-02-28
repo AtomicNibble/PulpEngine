@@ -954,6 +954,12 @@ void XPeer::setConnectionRateLimit(core::TimeVal time)
 {
 	connectionRateLimitTime_ = time;
 }
+
+bool XPeer::accpetingIncomingConnections(void) const
+{
+	return getMaximumIncomingConnections() < numberOfConnections();
+}
+
 // MTU for a given system
 int XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
