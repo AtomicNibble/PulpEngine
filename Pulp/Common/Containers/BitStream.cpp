@@ -189,7 +189,7 @@ void BitStream::writeBits(const Type* pBuf, size_type numBits)
 
 	// copy full bytes if we can.
 	// trailing bits are handled after.
-	if (bitsMod8 == 0)
+	if (bitsMod8 == 0 && numBits >= 8)
 	{
 		size_type bitsToCopy = numBits - srcTrailingBits;
 		std::memcpy(start_ + byteIndex(), pBuf, numBytesForBits(bitsToCopy));
@@ -282,7 +282,7 @@ void BitStream::readBits(Type* pBuf, size_type numBits)
 
 	// copy full bytes if we can.
 	// trailing bits are handled after.
-	if (bitsMod8 == 0)
+	if (bitsMod8 == 0 && numBits >= 8)
 	{
 		size_type bitsToCopy = numBits - srcTrailingBits;
 		std::memcpy(pBuf, start_ + readByteIndex(), numBytesForBits(bitsToCopy));
