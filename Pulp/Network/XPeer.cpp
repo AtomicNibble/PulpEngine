@@ -217,9 +217,11 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 	}
 	if (vars_.debugEnabled() > 1)
 	{
+		NetGuidStr guidStr;
 		X_LOG0("Net", "ProtoVersion: ^5%" PRIu8 ".%" PRIu8, PROTO_VERSION_MAJOR, PROTO_VERSION_MINOR);
 		X_LOG0("Net", "Max peers: ^5%" PRIi32, maxPeers_);
 		X_LOG0("Net", "Max incomming connections: ^5%" PRIi32, maxIncommingConnections_);
+		X_LOG0("Net", "GUID: ^5%s", guid_.toString(guidStr));
 		X_LOG0("Net", "Listening on ^5%" PRIuS " endpoints", sockets_.size());
 		X_LOG_BULLET;
 
@@ -1165,8 +1167,9 @@ void XPeer::handleOpenConnectionRequest(RecvData* pData, RecvBitStream& bs)
 	uint8_t protoVersionMajor = bs.read<uint8_t>();
 	uint8_t protoVersionMinor = bs.read<uint8_t>();
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request from client with proto version: %" PRIu8 ".%" PRIu8, 
-		protoVersionMinor, protoVersionMajor );
+	IPStr ipStr;
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request from \"%s\" with proto version: ^5%" PRIu8 ".%" PRIu8, 
+		pData->systemAdd.toString(ipStr), protoVersionMinor, protoVersionMajor);
 
 
 	if (protoVersionMajor != PROTO_VERSION_MAJOR || protoVersionMinor != PROTO_VERSION_MINOR)
@@ -1206,7 +1209,7 @@ void XPeer::handleOpenConnectionResponse(RecvData* pData, RecvBitStream& bs)
 	bs.read(serverGuid);
 	bs.read(mtu);
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection response");
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection response");
 
 	// find this fuck.
 	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
@@ -1246,7 +1249,7 @@ void XPeer::handleOpenConnectionRequestStage2(RecvData* pData, RecvBitStream& bs
 	bs.read(bindingAdd);
 	bs.read(mtu);
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request2");
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request2");
 
 	// right lets check the list.
 	const RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
@@ -1379,8 +1382,11 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 	NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state)
 {
 	// hello hello.
+	IPStr ipStr;
+	NetGuidStr guidStr;
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Adding remote system");
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "^6Adding remote system^7 sysAdd: \"%s\" guid: ^5%s",
+		sysAdd.toString(ipStr), guid.toString(guidStr));
 
 	for (auto& remoteSys : remoteSystems_)
 	{
