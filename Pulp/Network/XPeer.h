@@ -120,7 +120,7 @@ X_ENSURE_SIZE(RemoteSystem, 528)
 X_ENSURE_SIZE(RequestConnection, 72)
 #else
 X_ENSURE_SIZE(BufferdCommand, 56)
-X_ENSURE_SIZE(RemoteSystem, 476)
+X_ENSURE_SIZE(RemoteSystem, 480)
 X_ENSURE_SIZE(RequestConnection, 72)
 #endif // !X_64
 
