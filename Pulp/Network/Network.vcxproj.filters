@@ -42,6 +42,12 @@
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{569ddfb0-cead-4dfd-a431-8536caa3ed40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Reliability">
+      <UniqueIdentifier>{e5326eb1-07b1-42fa-ae26-3f72af22421e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Reliability">
+      <UniqueIdentifier>{1bbdd2bc-a6ae-43f8-9d23-bb58def7f615}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -86,6 +92,9 @@
     <ClInclude Include="Vars\NetVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="Reliability\ReliabilityLayer.h">
+      <Filter>Header Files\Reliability</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -115,6 +124,9 @@
     <ClCompile Include="Vars\NetVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
+    <ClCompile Include="Reliability\ReliabilityLayer.cpp">
+      <Filter>Source Files\Reliability</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl">
@@ -128,6 +140,9 @@
     </None>
     <None Include="Vars\NetVars.inl">
       <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="Reliability\ReliabilityLayer.inl">
+      <Filter>Header Files\Reliability</Filter>
     </None>
   </ItemGroup>
 </Project>

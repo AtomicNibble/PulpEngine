@@ -389,6 +389,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Reliability\ReliabilityLayer.h" />
     <ClInclude Include="Sockets\Socket.h" />
     <ClInclude Include="Sockets\win32\Socket.h" />
     <ClInclude Include="stdafx.h" />
@@ -405,6 +406,7 @@
     <ClInclude Include="XPeer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Reliability\ReliabilityLayer.cpp" />
     <ClCompile Include="Sockets\win32\Socket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -429,6 +431,7 @@
     <ClCompile Include="XPeer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Reliability\ReliabilityLayer.inl" />
     <None Include="Sockets\win32\Socket.inl" />
     <None Include="Util\SystemAdd.inl" />
     <None Include="Vars\NetVars.inl" />
