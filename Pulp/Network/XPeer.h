@@ -232,6 +232,7 @@ public:
 	// ~IPeer
 
 	void setUnreliableTimeout(core::TimeVal timeout);
+	void setConnectionRateLimit(core::TimeVal time);
 
 
 private:
@@ -293,6 +294,7 @@ private:
 
 	core::TimeVal defaultTimeOut_;
 	core::TimeVal unreliableTimeOut_;
+	core::TimeVal connectionRateLimitTime_;
 	int32_t defaultMTU_;
 	int32_t maxIncommingConnections_;
 	int32_t maxPeers_;

@@ -117,6 +117,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 
 	guid_ = XNet::generateGUID();
 
+	connectionRateLimitTime_ = core::TimeVal::fromMS(500);
 	defaultTimeOut_ = core::TimeVal::fromMS(1000);
 	unreliableTimeOut_ = core::TimeVal::fromMS(1000 * 10);
 
@@ -888,6 +889,10 @@ void XPeer::setUnreliableTimeout(core::TimeVal timeout)
 	unreliableTimeOut_ = timeout;
 }
 
+void XPeer::setConnectionRateLimit(core::TimeVal time)
+{
+	connectionRateLimitTime_ = time;
+}
 // MTU for a given system
 int XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
