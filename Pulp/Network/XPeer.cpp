@@ -652,16 +652,6 @@ size_t XPeer::getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const
 	return getRemoteSystemIndex(systemIdentifier.netGuid);
 }
 
-void XPeer::parseConnectionRequestPacket(RemoteSystem* pRemoteSystem, const SystemAdd& systemAddress, const uint8_t* pData, size_t byteSize)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-}
-
-void XPeer::onConnectionRequest(RemoteSystem* pRemoteSystem, core::TimeStamp incomingTimestamp)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-}
-
 
 void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
 {

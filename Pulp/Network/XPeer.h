@@ -257,10 +257,6 @@ private:
 	size_t getRemoteSystemIndex(const NetGUID& guid) const;
 	size_t getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const;
 
-	void parseConnectionRequestPacket(RemoteSystem* pRemoteSystem, const SystemAdd& systemAddress, const uint8_t* pData, size_t byteSize);
-	void onConnectionRequest(RemoteSystem* pRemoteSystem, core::TimeStamp incomingTimestamp);
-
-
 	// adds packet to back of receive qeue
 	void pushBackPacket(Packet* pPacket, bool pushAtHead = false);
 
