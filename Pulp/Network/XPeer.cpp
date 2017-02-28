@@ -215,6 +215,23 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		socketThread.setData(&socket);
 		socketThread.Start(del);
 	}
+	if (vars_.debugEnabled() > 1)
+	{
+		X_LOG0("Net", "ProtoVersion: ^5%" PRIu8 ".%" PRIu8, PROTO_VERSION_MAJOR, PROTO_VERSION_MINOR);
+		X_LOG0("Net", "Max peers: ^5%" PRIi32, maxPeers_);
+		X_LOG0("Net", "Max incomming connections: ^5%" PRIi32, maxIncommingConnections_);
+		X_LOG0("Net", "Listening on ^5%" PRIuS " endpoints", sockets_.size());
+		X_LOG_BULLET;
+
+		for (auto& s : sockets_)
+		{
+			IPStr boundAddStr;
+			s.getBoundAdd().toString(boundAddStr);
+
+			X_LOG0("Net", "bound address: \"%s\"", boundAddStr.c_str());
+
+		}
+	}
 
 	return StartupResult::Started;
 }
@@ -270,6 +287,8 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 		X_DELETE(pConReq, arena_);
 		return ConnectionAttemptResult::AlreadyInProgress;
 	}
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Started Connection request to host: \"%s\" port: ^5%" PRIu16, pHost, remotePort);
 
 	connectionReqs_.emplace_back(pConReq);
 	
@@ -336,6 +355,11 @@ void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
 {
 	X_ASSERT_NOT_NULL(pTarget);
 	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(pTarget);
+
+	IPStr addStr;
+	sysAdd.toString(addStr);
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Canceling Connection request to host: \"%s\"", addStr);
 
 	removeConnectionRequest(sysAdd);
 }
@@ -751,12 +775,13 @@ void XPeer::removeConnectionRequest(const SystemAdd& sysAdd)
 void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
 {
 	maxIncommingConnections_ = numberAllowed;
+
+	X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "Set maxIncomingconnections to: ^5%" PRIu16, numberAllowed);
 }
 
 uint16_t XPeer::getMaximumIncomingConnections(void) const
 {
 	return maxIncommingConnections_;
-
 }
 
 uint16_t XPeer::numberOfConnections(void) const
@@ -796,6 +821,8 @@ void XPeer::addToBanList(const char* pIP, core::TimeVal timeout)
 		return;
 	}
 
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Adding ban: \"%s\" timeout: %" PRIi64 "ms", ip, timeout.GetMilliSecondsAsInt64());
+
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	auto assignBanTime = [timeNow](Ban& ban, core::TimeVal timeout) {
@@ -828,6 +855,8 @@ void XPeer::removeFromBanList(const char* pIP)
 	if (ip.isEmpty()) {
 		return;
 	}
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Removing ban: \"%s\"", ip);
 	
 	auto findBanIP = [&ip](const Ban& oth) {
 		return oth.ip == ip;
@@ -837,6 +866,10 @@ void XPeer::removeFromBanList(const char* pIP)
 	if (it != bans_.end())
 	{
 		bans_.erase(it);
+	} 
+	else
+	{
+		X_LOG0_IF(vars_.debugEnabled(), "Net", "Failed to remove ban, no entry for \"%s\" found", ip);
 	}
 }
 
