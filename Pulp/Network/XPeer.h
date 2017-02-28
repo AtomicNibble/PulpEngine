@@ -244,6 +244,9 @@ public:
 	void setConnectionRateLimit(core::TimeVal time);
 
 	bool accpetingIncomingConnections(void) const;
+	// the number of remote connections to us.
+	// excludes connections made by us.
+	size_t getNumRemoteInitiatedConnections(void) const;
 
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,

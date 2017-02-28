@@ -994,6 +994,21 @@ bool XPeer::accpetingIncomingConnections(void) const
 	return getMaximumIncomingConnections() < numberOfConnections();
 }
 
+size_t XPeer::getNumRemoteInitiatedConnections(void) const
+{
+	size_t num = 0;
+
+	for (auto rc : remoteSystems_)
+	{
+		if (rc.connectState == ConnectState::Connected && rc.isActive && !rc.weStartedconnection)
+		{
+			++num;
+		}
+	}
+
+	return num;
+}
+
 // MTU for a given system
 int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
