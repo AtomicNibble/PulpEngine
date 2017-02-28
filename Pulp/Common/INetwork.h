@@ -74,7 +74,7 @@ typedef uint16_t Port;
 typedef uint32_t BitSizeT;
 
 typedef core::StackString<512, char> HostAddStr;
-typedef core::StackString<45, char> IPStr;
+typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 64 bytes for x64.
 
 // ---------------------------------
 

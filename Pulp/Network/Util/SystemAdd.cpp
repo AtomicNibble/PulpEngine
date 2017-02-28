@@ -207,7 +207,11 @@ const char* SystemAdd::toString(IPStr& strBuf, bool incPort) const
 	}
 
 	strBuf.set(tmpBuf);
-	
+
+	if (incPort) {
+		strBuf.appendFmt(" %" PRIu16, platform::ntohs(address_.addr4.sin_port));
+	}
+
 	return strBuf.c_str();
 }
 
