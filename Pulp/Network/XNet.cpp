@@ -25,7 +25,7 @@ XNet::~XNet()
 // INet
 void XNet::registerVars(void)
 {
-
+	vars_.registerVars();
 }
 
 void XNet::registerCmds(void)

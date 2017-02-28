@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vars\NetVars.h"
 
 X_NAMESPACE_BEGIN(net)
 
@@ -29,6 +30,8 @@ public:
 
 private:
 	core::MemoryArenaBase* arena_;
+
+	NetVars vars_;
 };
 
 
