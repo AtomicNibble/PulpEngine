@@ -161,7 +161,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 			maxIncommingConnections_ = maxConnections;
 		}
 
-		maxPeers_ = maxIncommingConnections_;
+		maxPeers_ = maxConnections;
 
 		remoteSystems_.resize(maxPeers_);
 	}
