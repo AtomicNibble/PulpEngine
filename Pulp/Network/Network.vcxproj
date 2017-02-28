@@ -400,6 +400,7 @@
     <ClInclude Include="Util\SystemAdd.h" />
     <ClInclude Include="Util\win32\LastError.h" />
     <ClInclude Include="Util\win32\LibaryStartup.h" />
+    <ClInclude Include="Vars\NetVars.h" />
     <ClInclude Include="XNet.h" />
     <ClInclude Include="XPeer.h" />
   </ItemGroup>
@@ -423,12 +424,14 @@
     <ClCompile Include="Util\SystemAdd.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp" />
     <ClCompile Include="Util\win32\LibaryStartup.cpp" />
+    <ClCompile Include="Vars\NetVars.cpp" />
     <ClCompile Include="XNet.cpp" />
     <ClCompile Include="XPeer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl" />
     <None Include="Util\SystemAdd.inl" />
+    <None Include="Vars\NetVars.inl" />
     <None Include="XPeer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

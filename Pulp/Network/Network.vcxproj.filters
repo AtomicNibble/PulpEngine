@@ -36,6 +36,12 @@
     <Filter Include="Source Files\Socket\win32">
       <UniqueIdentifier>{c6b08c4b-0465-4f7f-b40f-170ef5820cc8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{52606670-ddd6-4282-976b-259ded57d2ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{569ddfb0-cead-4dfd-a431-8536caa3ed40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -77,6 +83,9 @@
     <ClInclude Include="Util\MessageIds.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\NetVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -103,6 +112,9 @@
     <ClCompile Include="Sockets\win32\Socket.cpp">
       <Filter>Source Files\Socket\win32</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\NetVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl">
@@ -113,6 +125,9 @@
     </None>
     <None Include="XPeer.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="Vars\NetVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>
