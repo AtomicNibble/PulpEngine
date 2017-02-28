@@ -3,6 +3,81 @@
 
 X_NAMESPACE_BEGIN(net)
 
+
+//
+//	Connection process:
+//
+//		send -> OpenConnectionRequest
+//				protoColVersion
+//
+//		recive <- OpenConnectionResponse
+//				remoteGuid
+//				mtu
+//
+//		send -> OpenConnectionRequestStage2
+//				clientGuid
+//				bidingAdd
+//				mtu
+//
+//				we try to add the client as a remote system here.
+//				remoteMode -> UnverifiedSender
+//
+//		recive <- OpenConnectionResponseStage2
+//				remoteGuid
+//				bindingAdd
+//				mtu
+//
+//				we try to add the client as a remote (marking it as a conection we opened)
+//				remoteMode -> UnverifiedSender
+//
+//		send -> ConnectionRequest
+//				guid
+//				timeStamp
+//				password?
+//				remoteMode -> RequestedConnection
+//		
+//		recive <- ConnectionRequestAccepted
+//				systemAddres server see's for us
+//				systemIndex
+//				listofLocalBindings
+//				ConnectionRequest::timeStamp
+//				serverTimeStamp
+//				remoteMode -> HandlingConnectionRequest
+//
+//		send -> ConnectionRequestHandshake	
+//				systemAddres of server from our point of view
+//				listOfLocalBindings
+//				ConnectionRequestAccepted::serverTimeStamp
+//				timeStamp
+//				remoteMode -> Connected
+// 
+//		Server recives -> ConnectionRequestHandshake
+//				updates remote info
+//				remoteMode -> Connected
+// 
+//		connection is complete.	
+//		Ping pong commences
+// 
+// 
+//	Messages accepted for various remote modes:
+//
+//		UnverifiedSender:
+//			ConnectionRequest
+//
+//		RequestedConnection:
+//			ConnectionRequestAccepted
+//
+//		HandlingConnectionRequest:
+//			ConnectionRequestHandshake
+//
+//		Connected:
+//
+//
+//
+//		
+//
+//
+
 X_DECLARE_ENUM8(MessageID)(
 
 	// the remote systems protcol version is incompatible
@@ -41,8 +116,11 @@ X_DECLARE_ENUM8(MessageID)(
 	/// action: respond with ConnectionRequestAccepted || ConnectionRequestFailed
 	ConnectionRequest,
 	// connection to server accepted.
-	/// action: 
+	/// action: respond with ConnectionRequestHandShake
 	ConnectionRequestAccepted,
+	// client responded to connection accepted
+	/// action: mark client as connected
+	ConnectionRequestHandShake,
 	// connection to server failed. (reasons this can happen: ..?)
 	/// action: 
 	ConnectionRequestFailed,
