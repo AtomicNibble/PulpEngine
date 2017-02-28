@@ -35,6 +35,75 @@ typedef core::MemoryArena<
 
 core::MemoryArenaBase* g_arena = nullptr;
 
+namespace
+{
+	static const net::Port SERVER_PORT = 60000;
+
+	void run(net::IPeer* pPeer, bool isServer)
+	{
+		if (isServer)
+		{
+			X_LOG0("ServerTest", "Starting as server");
+
+			net::SocketDescriptor sd(SERVER_PORT);
+			auto res = pPeer->init(16, &sd, 1);
+			if (res != net::StartupResult::Started)
+			{
+
+				return;
+			}
+
+			pPeer->setMaximumIncomingConnections(16);
+
+		
+		}
+		else
+		{
+			X_LOG0("ServerTest", "Starting as client");
+
+			net::SocketDescriptor sd;
+			auto res = pPeer->init(1, &sd, 1);
+
+			if (res != net::StartupResult::Started)
+			{
+
+				return;
+			}
+			
+			// connect to server.
+			auto connectRes = pPeer->connect("127.0.0.1", SERVER_PORT);
+			if (connectRes != net::ConnectionAttemptResult::Started)
+			{
+
+				return;
+			}
+		}
+
+		X_LOG0("ServerTest", "Waiting for packets..");
+
+		uint8_t testData[64];
+		core::zero_object(testData);
+
+		while (1)
+		{
+			net::Packet* pPacket = nullptr;
+			for (pPacket = pPeer->receive(); pPacket; pPeer->freePacket(pPacket), pPacket = pPeer->receive())
+			{
+				X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
+
+
+
+			}
+
+			//	pServer->sendLoopback(testData, sizeof(testData));
+
+			// sleep, as other thread will handle incoming requests and buffer then for us.
+			core::Thread::Sleep(50);
+		}
+
+	}
+
+}
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -60,36 +129,29 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		if (engine.Init(hInstance, lpCmdLine, Console))
 		{
 			net::INet* pNet = gEnv->pNet;
-			net::IPeer* pServer = pNet->createPeer();
+			net::IPeer* pPeer = pNet->createPeer();
 
-			net::SocketDescriptor sd(60000);
-			auto res = pServer->init(16, &sd, 1);
-			if (res != net::StartupResult::Error)
+			bool isServer = true;
+
+			X_LOG0("ServerTest", "Press enter for server mode or c+enter for client");
+			char key = Console.ReadKeyBlocking();
+			if (key == 'C' || key == 'c')
 			{
-				pServer->setMaximumIncomingConnections(16);
-
-				uint8_t testData[64];
-				core::zero_object(testData);
-
-				while (1)
-				{
-					net::Packet* pPacket = nullptr;
-					for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
-					{
-
-						X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
-
-					}
-
-					pServer->sendLoopback(testData, sizeof(testData));
-
-					// sleep, as other thread will handle incoming requests and buffer then for us.
-					core::Thread::Sleep(50);
-				}
-
-				pNet->deletePeer(pServer);
+				isServer = false;
 			}
 
+			if (isServer)
+			{
+				Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Server");
+			}
+			else
+			{
+				Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
+			}
+
+			run(pPeer, isServer);
+		
+			pNet->deletePeer(pPeer);
 		}
 
 		Console.PressToContinue();
