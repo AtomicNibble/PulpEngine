@@ -24,7 +24,8 @@ typedef core::MemoryArena<
 > LinearArea;
 
 
-TEST(BitStreamTest, Genral)
+
+TEST(DISABLED_BitStreamTest, Genral)
 {
 	BitStream stream(g_arena);
 
@@ -69,7 +70,7 @@ TEST(BitStreamTest, Genral)
 
 }
 
-TEST(BitStreamTest, Small)
+TEST(DISABLED_BitStreamTest, Small)
 {
 	BitStream stream(g_arena);
 
