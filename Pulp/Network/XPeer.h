@@ -14,6 +14,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+class NetVars;
+
 X_DECLARE_ENUM(ConnectState)(
 	NoAction,
 	DisconnectAsap,
@@ -164,7 +166,7 @@ class XPeer : public IPeer
 	static const size_t MAX_POOL_ALLOC = 2048; // packets and buffered commands
 
 public:
-	XPeer(core::MemoryArenaBase* arena);
+	XPeer(NetVars& vars, core::MemoryArenaBase* arena);
 	~XPeer() X_FINAL;
 
 	// IPeer
@@ -285,6 +287,8 @@ private:
 	bool populateIpList(void);
 
 private:
+	NetVars& vars_;
+
 	NetGUID guid_;
 
 	core::TimeVal defaultTimeOut_;

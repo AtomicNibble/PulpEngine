@@ -85,7 +85,8 @@ RemoteSystem::RemoteSystem()
 
 // -----------------------------------
 
-XPeer::XPeer(core::MemoryArenaBase* arena) :
+XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
+	vars_(vars),
 	sockets_(arena),
 	socketThreads_(arena),
 	remoteSystems_(arena),

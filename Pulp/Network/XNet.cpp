@@ -61,7 +61,7 @@ void XNet::release(void)
 
 IPeer* XNet::createPeer(void)
 {
-	return X_NEW(XPeer, arena_, "Peer")(arena_);
+	return X_NEW(XPeer, arena_, "Peer")(vars_, arena_);
 }
 
 void XNet::deletePeer(IPeer* pPeer)
