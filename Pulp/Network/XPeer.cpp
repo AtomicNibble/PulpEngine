@@ -982,7 +982,7 @@ void XPeer::setConnectionRateLimit(core::TimeVal time)
 
 bool XPeer::accpetingIncomingConnections(void) const
 {
-	return getMaximumIncomingConnections() < numberOfConnections();
+	return getNumRemoteInitiatedConnections() < getMaximumIncomingConnections();
 }
 
 size_t XPeer::getNumRemoteInitiatedConnections(void) const
