@@ -1187,8 +1187,8 @@ void XPeer::handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
 	uint16_t mtu;
 
 	bs.read(clientGuid);
-	bs.read(mtu);
 	bs.read(bindingAdd);
+	bs.read(mtu);
 
 	// right lets check the list.
 	const RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
