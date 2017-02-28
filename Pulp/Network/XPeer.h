@@ -12,6 +12,7 @@
 
 #include "Sockets\Socket.h"
 
+
 X_NAMESPACE_BEGIN(net)
 
 class NetVars;
@@ -137,6 +138,10 @@ class XPeer : public IPeer
 	typedef core::Array<RequestConnection*> RequestConnectionArr;
 	typedef core::Array<Ban> BanArr;
 	typedef core::Array<core::ThreadMember<XPeer>> ThreadArr;
+
+	// a bit stream that don't own the memory.
+	// we just read directly off the recived buffer.
+	typedef core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> RecvBitStream;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -282,11 +287,23 @@ private:
 
 private:
 	void processRecvData(void);
-	void processRecvData(RecvData* pRecvData);
+	void processRecvData(RecvData* pRecvData, int32_t byteOffset);
 
+	// some msg handlers.
+	void handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);
+	void handleconnectionRequest(RecvData* pData, RecvBitStream& bs);
+	void handleconnectionResponse(RecvData* pData, RecvBitStream& bs);
+	void handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs);
+	void handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs);
+
+	// ------
+
+	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, NetSocket* pSrcSocket, SystemAdd bindingAdd);
+	bool isIpConnectSpamming(const SystemAdd& sysAdd);
+
+	// ------
 
 	void onSocketRecv(RecvData* pData);
-
 	core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
 
 

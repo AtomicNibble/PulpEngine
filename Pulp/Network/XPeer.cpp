@@ -994,17 +994,18 @@ void XPeer::processRecvData(void)
 	RecvData* pRecvData = nullptr;
 	while (recvDataQue_.tryPop(pRecvData))
 	{
-		processRecvData(pRecvData);
+		processRecvData(pRecvData, 0);
 
 		freeRecvData(pRecvData);
 	}
 }
 
 
-void XPeer::processRecvData(RecvData* pData)
+void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 {
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT_NOT_NULL(pData->pSrcSocket);
+	X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")(pData, pData->bytesRead);
 
 	SystemAdd& sysAdd = pData->systemAdd;
 	NetSocket& socket = *pData->pSrcSocket;
@@ -1017,18 +1018,360 @@ void XPeer::processRecvData(RecvData* pData)
 	if (isBanned(strBuf))
 	{
 		// you fucking twat!
-
+		bs.write(MessageID::ConnectionBanned);
+		bs.write(guid_);
 
 
 		SendParameters sp;
 		sp.setData(bs);
 		sp.systemAddress = pData->systemAdd;
-
 		pData->pSrcSocket->send(sp);
 		return;
 	}
 
+	// create a fixed bitstrem around the recvData to make it easy to read the data.
+	RecvBitStream stream(pData->data + byteOffset, pData->data + pData->bytesRead, true);
 
+	X_ASSERT(stream.size() > 0, "Stream is empty")(stream.size(), stream.capacity());
+
+	MessageID::Enum msgId = stream.read<MessageID::Enum>();
+	// external data, check enum in range.
+	if (msgId >= MessageID::ENUM_COUNT) {
+		X_ERROR("Net", "Message contains invalid msgId: %" PRIi32, static_cast<int32_t>(msgId));
+		return;
+	}
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived messageId: \"%s\"", MessageID::ToString(msgId));
+
+	switch(msgId)
+	{
+		case MessageID::ProtcolVersionIncompatible:
+		case MessageID::ConnectionRequestFailed:
+		case MessageID::ConnectionBanned:
+		case MessageID::ConnectionNoFreeSlots:
+		case MessageID::ConnectionRateLimited:
+			handleConnectionFailure(pData, stream, msgId);
+			break;
+
+		case MessageID::OpenConnectionRequest:
+			handleconnectionRequest(pData, stream);
+			break;
+		case MessageID::OpenConnectionRequestStage2:
+			handleconnectionRequestStage2(pData, stream);
+			break;
+		case MessageID::OpenConnectionResponse:
+			handleconnectionResponse(pData, stream);
+			break;
+		case MessageID::OpenConnectionResponseStage2:
+			handleconnectionResponseStage2(pData, stream);
+			break;
+
+		// hello.
+		case MessageID::SendTest:
+			return;
+
+		// one day.
+		case MessageID::StuNotFnd:
+			return;
+
+			break;
+		default:
+			X_ERROR("Net", "Unhandled message: \"%s\"", MessageID::ToString(msgId));
+			break;
+	}
+
+}
+
+
+void XPeer::handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType)
+{
+	NetGUID guid;
+	bs.read(guid);
+
+	Packet* pPacket = nullptr;
+
+	// rip connection.
+	if (failureType == MessageID::ConnectionRateLimited)
+	{
+		uint32_t waitMS = bs.read<uint32_t>();
+
+		pPacket = allocPacket(8 + 32);
+		std::memcpy(pPacket->pData + 1, &waitMS, sizeof(waitMS));	
+	}
+	else
+	{
+		pPacket = allocPacket(8);
+	}
+
+	pPacket->pData[0] = failureType;
+	pPacket->pSystemAddress = nullptr; // fuck
+	pPacket->guid = guid;
+	pushBackPacket(pPacket);
+}
+
+void XPeer::handleconnectionRequest(RecvData* pData, RecvBitStream& bs)
+{
+	// hello, pleb.
+	uint8_t protoVersionMajor = bs.read<uint8_t>();
+	uint8_t protoVersionMinor = bs.read<uint8_t>();
+
+	if (protoVersionMajor != PROTO_VERSION_MAJOR || protoVersionMinor != PROTO_VERSION_MINOR)
+	{
+		// we don't support you.
+		core::BitStream bsOut(arena_, MAX_MTU_SIZE);
+		bsOut.write(MessageID::ProtcolVersionIncompatible);
+		bsOut.write<uint8_t>(PROTO_VERSION_MAJOR);
+		bsOut.write<uint8_t>(PROTO_VERSION_MINOR);
+		bsOut.write(guid_);
+
+		SendParameters sp;
+		sp.setData(bsOut);
+		sp.systemAddress = pData->systemAdd;
+		pData->pSrcSocket->send(sp);
+		return;
+	}
+	
+	// hey i like you!
+	core::BitStream bsOut(arena_, MAX_MTU_SIZE);
+	bsOut.write(MessageID::OpenConnectionResponse);
+	bsOut.write(guid_);
+	bsOut.write<uint16_t>(MAX_MTU_SIZE); // i'll show you mine if you show me your's...
+
+	SendParameters sp;
+	sp.setData(bsOut);
+	sp.systemAddress = pData->systemAdd;
+	pData->pSrcSocket->send(sp);
+}
+
+void XPeer::handleconnectionResponse(RecvData* pData, RecvBitStream& bs)
+{
+	// hello almighty server.
+	NetGUID serverGuid;
+	uint16_t mtu;
+
+	bs.read(serverGuid);
+	bs.read(mtu);
+
+	// find this fuck.
+	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+	for (auto& pReq : connectionReqs_)
+	{
+		if (pReq->systemAddress == pData->systemAdd)
+		{
+			// oh it was me, send stage2
+			core::BitStream bsOut(arena_, MAX_MTU_SIZE);
+			bsOut.write(MessageID::OpenConnectionRequestStage2);
+			bsOut.write(guid_);
+			bsOut.write(pReq->systemAddress);
+			bsOut.write<uint16_t>(MAX_MTU_SIZE); 
+
+			SendParameters sp;
+			sp.setData(bsOut);
+			sp.systemAddress = pData->systemAdd;
+			pData->pSrcSocket->send(sp);
+			return;
+		}
+	}
+
+	IPStr remoteStr;
+	pData->systemAdd.toString(remoteStr);
+	X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr);
+}
+
+void XPeer::handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
+{
+	// you stull here ? jesus christ.
+	SystemAdd bindingAdd;
+	NetGUID clientGuid;
+	uint16_t mtu;
+
+	bs.read(clientGuid);
+	bs.read(mtu);
+	bs.read(bindingAdd);
+
+	// right lets check the list.
+	const RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
+	const RemoteSystem* pSysGuid = getRemoteSystem(clientGuid, true);
+
+	// response matrix:
+	// IPAddrInUse GuidInUse	response
+	// true		   true	 		already connected
+	// false       true     	already connected.
+	// true		   false	 	already connected
+	// false	   false	 	allow connection
+
+	core::BitStream bsOut(arena_, MAX_MTU_SIZE);
+
+	if (pSys && pSysGuid)
+	{
+		// you stupid twat.
+		bsOut.write(MessageID::AlreadyConnected);
+		bsOut.write(guid_);
+	}
+	else
+	{
+		if (!accpetingIncomingConnections())
+		{
+			// stuff like reserved slots needs to be handled outside network layer.
+			bsOut.write(MessageID::ConnectionNoFreeSlots);
+			bsOut.write(guid_);
+		}
+		else
+		{
+			// is this peer a grade F twat?
+			if (isIpConnectSpamming(pData->systemAdd))
+			{
+				// you noob, can you even coun to 10?
+				// NO!
+
+				// i don't care if this ratelimit is allmost over and you could technically connect again sooner.
+				uint32_t timeMs = safe_static_cast<uint32_t>(connectionRateLimitTime_.GetMilliSecondsAsInt64());
+
+				bsOut.write(MessageID::ConnectionRateLimited);
+				bsOut.write(guid_);
+				bsOut.write(timeMs);
+			}
+			else
+			{
+				auto* pRemoteSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd);
+				X_UNUSED(pRemoteSys);
+
+				bsOut.write(MessageID::OpenConnectionResponseStage2);
+				bsOut.write(guid_);
+				bsOut.write(pData->systemAdd);
+				bsOut.write<uint16_t>(mtu);
+			}
+		}
+	}
+
+	SendParameters sp;
+	sp.setData(bsOut);
+	sp.systemAddress = pData->systemAdd;
+	pData->pSrcSocket->send(sp);
+}
+
+void XPeer::handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs)
+{
+	// meow.
+	// if we here the response was valid annd == OpenConnectionResponseStage2
+	SystemAdd bindingAdd;
+	NetGUID clientGuid;
+	uint16_t mtu;
+
+	bs.read(clientGuid);
+	bs.read(bindingAdd);
+	bs.read(mtu);
+
+	// find it.
+	{
+		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+		for (auto& pReq : connectionReqs_)
+		{
+			if (pReq->systemAddress == pData->systemAdd)
+			{
+				RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
+				if (!pSys)
+				{
+					// add systen
+					pSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd);
+				}
+
+				
+				if (pSys)
+				{
+					pSys->connectState = ConnectState::RequestedConnection;
+					pSys->weStartedconnection = true;
+
+					core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+					// send connectionRequest now.
+					core::BitStream bsOut(arena_, MAX_MTU_SIZE);
+					bsOut.write(MessageID::ConnectionRequest);
+					bsOut.write(guid_);
+					bsOut.write(timeNow.GetMilliSecondsAsInt64());
+					// password?
+					// : 123456
+
+					// send the request to the remote.
+
+				}
+				else
+				{
+					// out connection to remote failed.
+					Packet* pPacket = allocPacket(8);
+					pPacket->pData[0] = MessageID::ConnectionRequestFailed;
+					pPacket->pSystemAddress = nullptr; // fuck
+					pPacket->guid = clientGuid;
+					pushBackPacket(pPacket);
+				}
+			}
+		}
+	}
+
+	// remove the req.
+	removeConnectionRequest(pData->systemAdd);
+}
+
+RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, NetSocket* pSrcSocket, SystemAdd bindingAdd)
+{
+	// hello hello.
+
+	for (auto& remoteSys : remoteSystems_)
+	{
+		if (!remoteSys.isActive)
+		{
+			core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+			remoteSys.systemAddress = sysAdd;
+			remoteSys.myExternalSystemAddress = UNASSIGNED_SYSTEM_ADDRESS;
+			remoteSys.thierInternalSystemAddress.clear();
+
+			remoteSys.nextPingTime = core::TimeVal(0ll);
+			remoteSys.lastReliableSend = timeNow;
+			remoteSys.connectionTime = timeNow;
+
+			remoteSys.pings.fill(PingAndClockDifferential());
+			remoteSys.lastPingIdx = 0;
+
+			remoteSys.guid = guid;
+			remoteSys.lowestPing = UNDEFINED_PING;
+			remoteSys.MTUSize = remoteMTU;
+			remoteSys.connectState = ConnectState::UnverifiedSender;
+			remoteSys.pNetSocket = pSrcSocket;
+
+			if (pSrcSocket->getBoundAdd() != bindingAdd)
+			{
+				// print warning.
+				X_WARNING("Net", "Binding address is diffrent to source socket");
+			}
+
+			return &remoteSys;
+		}
+	}
+
+	// warning?
+	return nullptr;
+}
+
+bool XPeer::isIpConnectSpamming(const SystemAdd& sysAdd)
+{
+	for (auto& remoteSys : remoteSystems_)
+	{
+		if (remoteSys.isActive && remoteSys.systemAddress.equalExcludingPort(sysAdd))
+		{
+			core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+			core::TimeVal connectionAttemptDelta = timeNow - remoteSys.connectionTime;
+
+			if (connectionAttemptDelta > connectionRateLimitTime_)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 
