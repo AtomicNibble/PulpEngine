@@ -80,6 +80,7 @@ RemoteSystem::RemoteSystem()
 	connectState = ConnectState::NoAction;
 	MTUSize = MAX_MTU_SIZE;
 
+	pNetSocket = nullptr;
 }
 
 

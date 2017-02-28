@@ -85,6 +85,8 @@ public:
 	uint16_t lowestPing;
 	uint16_t MTUSize;
 	ConnectState::Enum connectState;
+
+	NetSocket* pNetSocket;
 };
 
 struct RequestConnection
