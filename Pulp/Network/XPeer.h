@@ -68,6 +68,8 @@ public:
 	RemoteSystem();
 
 	bool isActive;
+	bool weStartedconnection;
+	bool _pad[2];
 
 	SystemAdd systemAddress;				// add remote system
 	SystemAdd myExternalSystemAddress;		// my add from the point of view of remote system
@@ -113,11 +115,11 @@ struct Ban
 
 #if X_64
 X_ENSURE_SIZE(BufferdCommand, 56) 
-X_ENSURE_SIZE(RemoteSystem, 520)
+X_ENSURE_SIZE(RemoteSystem, 528)
 X_ENSURE_SIZE(RequestConnection, 72)
 #else
 X_ENSURE_SIZE(BufferdCommand, 56)
-X_ENSURE_SIZE(RemoteSystem, 472)
+X_ENSURE_SIZE(RemoteSystem, 476)
 X_ENSURE_SIZE(RequestConnection, 72)
 #endif // !X_64
 

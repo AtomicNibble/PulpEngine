@@ -76,6 +76,7 @@ PingAndClockDifferential::PingAndClockDifferential()
 RemoteSystem::RemoteSystem()
 {
 	isActive = false;
+	weStartedconnection = false;
 
 	connectState = ConnectState::NoAction;
 	lowestPing = UNDEFINED_PING;
