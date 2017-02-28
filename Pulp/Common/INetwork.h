@@ -75,6 +75,7 @@ typedef uint32_t BitSizeT;
 
 typedef core::StackString<512, char> HostAddStr;
 typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 64 bytes for x64.
+typedef core::StackString<46, char> NetGuidStr;
 
 // ---------------------------------
 
@@ -155,6 +156,9 @@ private:
 class NetGUID 
 {
 public:
+	typedef NetGuidStr StrBuf;
+
+public:
 	X_INLINE NetGUID() : val_(0), sysIdx_(0) {}
 	X_INLINE explicit NetGUID(uint64_t d) : val_(d), sysIdx_(0) {}
 
@@ -176,6 +180,10 @@ public:
 		return val_ < rhs.val_;
 	}
 
+	X_INLINE const char* toString(StrBuf& buf) {
+		buf.appendFmt("%" PRIu64, val_);
+		return buf.c_str();
+	}
 
 private:
 	uint64_t val_;
