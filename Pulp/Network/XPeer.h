@@ -291,10 +291,11 @@ private:
 
 	// some msg handlers.
 	void handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);
-	void handleconnectionRequest(RecvData* pData, RecvBitStream& bs);
-	void handleconnectionResponse(RecvData* pData, RecvBitStream& bs);
-	void handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs);
-	void handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs);
+	// connection open msg's
+	void handleOpenConnectionRequest(RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionResponse(RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionRequestStage2(RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionResponseStage2(RecvData* pData, RecvBitStream& bs);
 
 	// ------
 

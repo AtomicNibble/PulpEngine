@@ -1054,16 +1054,16 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 			break;
 
 		case MessageID::OpenConnectionRequest:
-			handleconnectionRequest(pData, stream);
+			handleOpenConnectionRequest(pData, stream);
 			break;
 		case MessageID::OpenConnectionRequestStage2:
-			handleconnectionRequestStage2(pData, stream);
+			handleOpenConnectionRequestStage2(pData, stream);
 			break;
 		case MessageID::OpenConnectionResponse:
-			handleconnectionResponse(pData, stream);
+			handleOpenConnectionResponse(pData, stream);
 			break;
 		case MessageID::OpenConnectionResponseStage2:
-			handleconnectionResponseStage2(pData, stream);
+			handleOpenConnectionResponseStage2(pData, stream);
 			break;
 
 		// hello.
@@ -1111,7 +1111,7 @@ void XPeer::handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageI
 	pushBackPacket(pPacket);
 }
 
-void XPeer::handleconnectionRequest(RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionRequest(RecvData* pData, RecvBitStream& bs)
 {
 	// hello, pleb.
 	uint8_t protoVersionMajor = bs.read<uint8_t>();
@@ -1149,7 +1149,7 @@ void XPeer::handleconnectionRequest(RecvData* pData, RecvBitStream& bs)
 	pData->pSrcSocket->send(sp);
 }
 
-void XPeer::handleconnectionResponse(RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionResponse(RecvData* pData, RecvBitStream& bs)
 {
 	// hello almighty server.
 	NetGUID serverGuid;
@@ -1187,7 +1187,7 @@ void XPeer::handleconnectionResponse(RecvData* pData, RecvBitStream& bs)
 	X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr);
 }
 
-void XPeer::handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
 {
 	// you stull here ? jesus christ.
 	SystemAdd bindingAdd;
@@ -1261,7 +1261,7 @@ void XPeer::handleconnectionRequestStage2(RecvData* pData, RecvBitStream& bs)
 	pData->pSrcSocket->send(sp);
 }
 
-void XPeer::handleconnectionResponseStage2(RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionResponseStage2(RecvData* pData, RecvBitStream& bs)
 {
 	// meow.
 	// if we here the response was valid annd == OpenConnectionResponseStage2
