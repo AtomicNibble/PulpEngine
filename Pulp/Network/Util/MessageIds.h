@@ -23,12 +23,23 @@ X_DECLARE_ENUM8(MessageID)(
 	// a Pong from a un-connected system
 	/// action: reply, skip timestamp update.
 	UnConnectedPong,
-	// request to connect.
-	/// action: 
+	// request to OPEN connection.
+	/// action: respond with OpenConnectionResponse
 	OpenConnectionRequest,
-	// a connection response.
-	/// action: 
+	// request to OPEN connection stage2.
+	/// action:  respond with OpenConnectionResponseStage2
+	OpenConnectionRequestStage2,
+	// a connection OPEN response.
+	/// action: send a OpenConnectionRequestStage2
 	OpenConnectionResponse,
+	// a connection OPEN response stage 2.
+	/// action: send ConnectionRequest
+	OpenConnectionResponseStage2,
+
+	// send after we have performed openConnection stages 1 && 2
+	// we can send this to finaly open the connection.
+	/// action: respond with ConnectionRequestAccepted || ConnectionRequestFailed
+	ConnectionRequest,
 	// connection to server accepted.
 	/// action: 
 	ConnectionRequestAccepted,
@@ -48,12 +59,16 @@ X_DECLARE_ENUM8(MessageID)(
 	ConnectionBanned,
 	// the remote system has not accepting any more connections at this time.
 	/// action: give up or try again later
-	ConnectionNoFreeNoSlots,
+	ConnectionNoFreeSlots,
 	// the remote system has rejected the connection for a given amount of time.
 	/// action: read the ratelimit time, and try again after elapsed.
 	ConnectionRateLimited,
 
 	// ----- Misc ----- 
+
+	// a remote system reposts stu as still missing
+	/// action: keep searching.
+	StuNotFnd,
 
 	// a timestamp from remote system.
 	/// action: 
