@@ -341,7 +341,7 @@ void BitStream::resize(size_type numBits)
 	{
 		// save local copy of old array and it's size.
 		Type* pOld = start_;
-		size_type bytesAllocated = numBytesForBits(capacity_);
+		size_type bytesAllocated = numBytesForBits(numBits);
 
 		// allocate the new one.
 		start_ = Allocate(bytesAllocated);
