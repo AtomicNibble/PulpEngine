@@ -53,7 +53,6 @@ TEST(BitStreamTest, Genral)
 	for (int i = 1023; i >= 0; i--)
 	{
 		bool is_true = (i % 4) == 0;
-		EXPECT_EQ(is_true, stream.peek());
 		EXPECT_EQ(is_true, stream.read());
 	}
 
@@ -99,7 +98,6 @@ TEST(BitStreamTest, Small)
 	for (int i = 5; i >= 0; i--)
 	{
 		bool is_true = (i % 2) == 0;
-		EXPECT_EQ(is_true, stream.peek());
 		EXPECT_EQ(is_true, stream.read());
 	}
 
