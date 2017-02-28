@@ -209,6 +209,10 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 	// eat it you slag!
 	int32_t oldTtl = -1;
 
+	X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "^2socket::send:^7 pData ^5%p^7 length: ^5%" PRIi32 "^7 ttl: ^5%" PRIi32,
+		sendParameters.pData, sendParameters.length, sendParameters.ttl);
+
+
 	const auto ipVer = sendParameters.systemAddress.getIPVersion();
 	if (sendParameters.ttl > 0)
 	{
@@ -263,6 +267,9 @@ void NetSocket::recv(RecvData& dataOut)
 	);
 
 	dataOut.bytesRead = bytesRead;
+
+	X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "^2socket::^1recv:^7 length: ^5%" PRIi32, bytesRead);
+
 
 	if (bytesRead < 0)
 	{
