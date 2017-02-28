@@ -301,8 +301,8 @@ void BitStream::readBits(Type* pBuf, size_type numBits)
 		Type srcByte = *(start_ + readByteIndex());
 		Type* pDst = pBuf++;
 
-		*(pDst) |= srcByte >> bitsMod8;
-		*(pDst + 1) |= (srcByte << (8 - bitsMod8));
+		*(pDst) |= (srcByte >> bitsMod8) & 0xff;
+		*(pDst + 1) |= (srcByte << (8 - bitsMod8)) & 0xff;
 
 		numBits -= 8;
 		readBitIdx_ += 8;
@@ -313,7 +313,7 @@ void BitStream::readBits(Type* pBuf, size_type numBits)
 		Type srcByte = *(start_ + readByteIndex());
 		Type* pDst = pBuf;
 
-		*(pDst) |= (srcByte << (8 - bitsMod8));
+		*(pDst) |= (srcByte << (8 - bitsMod8)) & 0xff;
 
 		readBitIdx_ += numBits;
 	}
