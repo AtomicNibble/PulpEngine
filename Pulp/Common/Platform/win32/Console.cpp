@@ -295,6 +295,26 @@ char Console::ReadKey(void) const
 	return 0;
 }
 
+char Console::ReadKeyBlocking(void) const
+{
+	INPUT_RECORD InputInfo;
+	DWORD NumEventsRead;
+
+	while (ReadConsoleInputW(consoleInput_, &InputInfo, 1, &NumEventsRead))
+	{
+		X_ASSERT(NumEventsRead == 1, "Should only get one event")(NumEventsRead);
+
+		if (NumEventsRead >= 1 && InputInfo.EventType == KEY_EVENT)
+		{
+			return safe_static_cast<char, WORD>(InputInfo.Event.KeyEvent.wVirtualKeyCode);
+		}
+	}
+
+	lastError::Description Dsc;
+	X_ERROR("Console", "Cannot read console input. Error: %s", lastError::ToString(Dsc));
+	return 0;
+}
+
 /// Shows/hides the console window.
 void Console::Show(bool show)
 {

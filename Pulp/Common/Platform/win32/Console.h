@@ -55,6 +55,8 @@ public:
 	/// \brief Tries to read a key from the console, and returns its virtual key-code.
 	/// \details Returns 0 if no key has been pressed.
 	char ReadKey(void) const;
+	/// blocks untill gets a key from console
+	char ReadKeyBlocking(void) const;
 
 	/// Shows/hides the console window.
 	void Show(bool show);
