@@ -5,6 +5,7 @@ X_NAMESPACE_BEGIN(core)
 
 BitStream::BitStream(MemoryArenaBase* arena) :
 	bitIdx_(0),
+	readBitIdx_(0),
 	capacity_(0),
 	start_(0),
 	arena_(arena)
@@ -14,6 +15,7 @@ BitStream::BitStream(MemoryArenaBase* arena) :
 
 BitStream::BitStream(MemoryArenaBase* arena, size_type numBits) :
 	bitIdx_(0),
+	readBitIdx_(0),
 	capacity_(0),
 	start_(0),
 	arena_(arena)
@@ -34,18 +36,21 @@ BitStream::BitStream(const BitStream& oth)
 	::memcpy(start_, oth.start_, numBytes);
 
 	bitIdx_ = oth.bitIdx_;
+	readBitIdx_ = oth.readBitIdx_;
 }
 
 BitStream::BitStream(BitStream&& oth)
 {
 	capacity_ = oth.capacity_;
 	bitIdx_ = oth.bitIdx_;
+	readBitIdx_ = oth.readBitIdx_;
 	start_ = oth.start_;
 	arena_ = oth.arena_;
 
 	// clear oth.
 	oth.capacity_ = 0;
 	oth.bitIdx_ = 0;
+	oth.readBitIdx_ = 0;
 	oth.start_ = nullptr;
 }
 
@@ -68,6 +73,7 @@ BitStream & BitStream::operator=(const BitStream & oth)
 		size_type numBytes = numBytesForBits(oth.bitIdx_);
 		::memcpy(start_, oth.start_, numBytes);
 
+		readBitIdx_ = oth.readBitIdx_;
 		bitIdx_ = oth.bitIdx_;
 	}
 	return *this;
@@ -80,12 +86,14 @@ BitStream & BitStream::operator=(BitStream && oth)
 		free();
 
 		capacity_ = oth.capacity_;
+		readBitIdx_ = oth.readBitIdx_;
 		bitIdx_ = oth.bitIdx_;
 		start_ = oth.start_;
 		arena_ = oth.arena_;
 
 		// clear oth.
 		oth.capacity_ = 0;
+		oth.readBitIdx_ = 0;
 		oth.bitIdx_ = 0;
 		oth.start_ = nullptr;
 	}
@@ -353,6 +361,7 @@ void BitStream::resize(size_type numBits)
 void BitStream::reset(void)
 {
 	bitIdx_ = 0;
+	readBitIdx_ = 0;
 }
 // resets the cursor and clears all memory.
 void BitStream::free(void)
@@ -361,7 +370,7 @@ void BitStream::free(void)
 		Delete(start_);
 	}
 	start_ = nullptr;
-	bitIdx_ = capacity_ = 0;
+	bitIdx_ = readBitIdx_ = capacity_ = 0;
 }
 
 
