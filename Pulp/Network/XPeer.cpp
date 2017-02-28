@@ -1204,6 +1204,9 @@ void XPeer::handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageI
 		pPacket = allocPacket(8);
 	}
 
+	// remove connection request.
+	removeConnectionRequest(pData->systemAdd);
+
 	pPacket->pData[0] = failureType;
 	pPacket->pSystemAddress = nullptr; // fuck
 	pPacket->guid = guid;
