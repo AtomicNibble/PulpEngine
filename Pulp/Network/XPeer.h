@@ -229,7 +229,7 @@ public:
 	core::TimeVal getTimeoutTime(const ISystemAdd* pTarget = nullptr) X_FINAL;
 
 	// MTU for a given system
-	int getMTUSize(const ISystemAdd* pTarget = nullptr) X_FINAL;
+	int32_t getMTUSize(const ISystemAdd* pTarget = nullptr) X_FINAL;
 
 	bool getStatistics(const ISystemAdd* pTarget, NetStatistics& stats) X_FINAL;
 

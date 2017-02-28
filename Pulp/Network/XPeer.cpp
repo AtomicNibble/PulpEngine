@@ -613,6 +613,7 @@ RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
 }
 
 
+
 size_t XPeer::getRemoteSystemIndex(const SystemAdd& systemAddress) const
 {
 	for (size_t i = 0; i < remoteSystems_.size(); i++)
@@ -961,7 +962,7 @@ bool XPeer::accpetingIncomingConnections(void) const
 }
 
 // MTU for a given system
-int XPeer::getMTUSize(const ISystemAdd* pTarget)
+int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
 	if (pTarget) {
 		const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(pTarget);
