@@ -519,7 +519,6 @@ const RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool 
 	for (size_t i = 0; i < remoteSystems_.size(); i++)
 	{
 		auto& rs = remoteSystems_[i];
-
 		if (rs.systemAddress == systemAddress)
 		{
 			if (rs.isActive)
@@ -533,8 +532,7 @@ const RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool 
 			}
 		}
 
-		if (deadConIdx && !onlyActive)
-		{
+		if (deadConIdx && !onlyActive) {
 			return &remoteSystems_[deadConIdx];
 		}
 	}
@@ -551,8 +549,70 @@ const RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive) 
 
 	for (auto& rs : remoteSystems_)
 	{
-		if (rs.guid == guid && (!onlyActive || rs.isActive))
+		if (rs.guid == guid && (!onlyActive || rs.isActive)) {
+			return &rs;
+		}
+	}
+
+	return nullptr;
+}
+
+
+
+RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive)
+{
+	if (systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
+		return getRemoteSystem(systemIdentifier.netGuid, onlyActive);
+	}
+
+	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
+	X_ASSERT_NOT_NULL(pSysAdd);
+	return getRemoteSystem(*pSysAdd, onlyActive);
+}
+
+RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive)
+{
+	if (systemAddress == UNASSIGNED_SYSTEM_ADDRESS) {
+		X_WARNING("Net", "Tried to get remote for unassigned address");
+		return nullptr;
+	}
+
+	int32_t deadConIdx = -1;
+
+	for (size_t i = 0; i < remoteSystems_.size(); i++)
+	{
+		auto& rs = remoteSystems_[i];
+		if (rs.systemAddress == systemAddress)
 		{
+			if (rs.isActive)
+			{
+				return &rs;
+			}
+			else
+			{
+				// see if any active ones in list before returning this.
+				deadConIdx = safe_static_cast<int32_t>(i);
+			}
+		}
+
+		if (deadConIdx && !onlyActive) {
+			return &remoteSystems_[deadConIdx];
+		}
+	}
+
+	return nullptr;
+}
+
+RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
+{
+	if (guid == UNASSIGNED_NET_GUID) {
+		X_WARNING("Net", "Tried to get remote for unassigned guid");
+		return nullptr;
+	}
+
+	for (auto& rs : remoteSystems_)
+	{
+		if (rs.guid == guid && (!onlyActive || rs.isActive)) {
 			return &rs;
 		}
 	}
