@@ -1040,6 +1040,66 @@ void XPeer::processRecvData(void)
 }
 
 
+void XPeer::processConnectionRequests(void)
+{
+	// are we wanting to connect to some slutty peers?
+	if (connectionReqs_.isNotEmpty())
+	{
+		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+		core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+		for (auto it = connectionReqs_.begin(); it != connectionReqs_.end(); /* ++it */)
+		{
+			RequestConnection& cr = *(*it);
+
+			// time for a reuest?
+			if (cr.nextRequestTime > timeNow) {
+				++it;
+				continue;
+			}
+
+			IPStr addStr;
+
+			// give up?
+			if (cr.numRequestsMade == cr.retryCount)
+			{
+				X_LOG0_IF(vars_.debugEnabled(), "Net", "Reached max connection retry count for: \"%s\"", cr.systemAddress.toString(addStr));
+				it = connectionReqs_.erase(it);
+
+				// send packet.
+				Packet* pPacket = allocPacket(8);
+				pPacket->pData[0] = MessageID::ConnectionRequestFailed;
+				pPacket->pSystemAddress = nullptr; // fuck
+				pushBackPacket(pPacket);
+
+				continue;
+			}
+
+			X_LOG0_IF(vars_.debugEnabled(), "Net", "Dispatching open connection request(%" PRIu8 "): \"%s\"", 
+				cr.numRequestsMade, cr.systemAddress.toString(addStr));
+
+			++cr.numRequestsMade;
+			cr.nextRequestTime = timeNow + cr.retryDelay;
+
+			core::BitStream bsOut(arena_, MAX_MTU_SIZE);
+			bsOut.write(MessageID::OpenConnectionRequest);
+			bsOut.write<uint8_t>(PROTO_VERSION_MAJOR);
+			bsOut.write<uint8_t>(PROTO_VERSION_MINOR);
+
+			NetSocket& socket = sockets_[cr.socketIdx];
+
+			SendParameters sp;
+			sp.setData(bsOut);
+			sp.systemAddress = cr.systemAddress;
+			socket.send(sp);
+
+			++it;
+		}
+	}
+}
+
+
 void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 {
 	X_ASSERT_NOT_NULL(pData);

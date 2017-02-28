@@ -290,6 +290,8 @@ private:
 
 private:
 	void processRecvData(void);
+	void processConnectionRequests(void);
+
 	void processRecvData(RecvData* pRecvData, int32_t byteOffset);
 
 	// some msg handlers.
