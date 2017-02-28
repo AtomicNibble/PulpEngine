@@ -78,6 +78,7 @@ RemoteSystem::RemoteSystem()
 	isActive = false;
 
 	connectState = ConnectState::NoAction;
+	lowestPing = UNDEFINED_PING;
 	MTUSize = MAX_MTU_SIZE;
 
 	pNetSocket = nullptr;
