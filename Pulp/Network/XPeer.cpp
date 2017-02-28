@@ -73,7 +73,8 @@ PingAndClockDifferential::PingAndClockDifferential()
 
 // -----------------------------------
 
-RemoteSystem::RemoteSystem()
+RemoteSystem::RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool) :
+	relLayer(vars, arena, packetPool)
 {
 	isActive = false;
 	weStartedconnection = false;
@@ -85,6 +86,26 @@ RemoteSystem::RemoteSystem()
 	pNetSocket = nullptr;
 }
 
+
+bool RemoteSystem::canSend(void) const
+{
+	if (!isActive) {
+		return false;
+	}
+
+	// in a mode we want to send to?
+	switch (connectState)
+	{
+		case ConnectState::DisconnectAsap:
+		case ConnectState::DisconnectAsapSilent:
+		case ConnectState::DisconnectOnNoAck:
+			return false;
+		default:
+			break;
+	}
+
+	return true;
+}
 
 // -----------------------------------
 
@@ -163,7 +184,10 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 
 		maxPeers_ = maxConnections;
 
-		remoteSystems_.resize(maxPeers_);
+		// todo create a pool for packets to share between rel layers.
+		core::MemoryArenaBase* packetPool = arena_;
+
+		remoteSystems_.resize(maxPeers_, RemoteSystem(vars_, arena_, packetPool));
 	}
 	
 	BindParameters bindParam;
@@ -215,6 +239,9 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		socketThread.setData(&socket);
 		socketThread.Start(del);
 	}
+		
+	// X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived messageId: \"%s\"", MessageID::ToString(msgId));
+
 	if (vars_.debugEnabled() > 1)
 	{
 		NetGuidStr guidStr;
@@ -234,6 +261,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 
 		}
 	}
+
 
 	return StartupResult::Started;
 }
@@ -434,25 +462,69 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 
 bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast,
-	bool useCallerDataAllocation, core::TimeStamp currentTime, uint32_t receipt)
+	core::TimeVal currentTime, uint32_t receipt)
 {
+	RemoteSystem* pRemoteSystem = getRemoteSystem(systemIdentifier, true);
+	if (!pRemoteSystem) {
 
-	size_t remoteIdx = getRemoteSystemIndex(systemIdentifier);
-
-	if (!broadcast)
-	{
-
+		return false;
 	}
-	else
-	{
+	
+	if (!pRemoteSystem->canSend()) {
 
-
+		return false;
 	}
 
-	X_ASSERT_NOT_IMPLEMENTED();
+	if (broadcast) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	pRemoteSystem->relLayer.send(
+		pData,
+		numberOfBitsToSend,
+		currentTime,
+		pRemoteSystem->MTUSize,
+		priority,
+		reliability,
+		orderingChannel,
+		receipt
+	);
+
 
 	return true;
 }
+
+// -------------------------------------------
+
+void XPeer::processBufferdCommand(BufferdCommand& cmd)
+{
+	RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+	if (!pRemoteSystem) {
+		return;
+	}
+
+	if (!pRemoteSystem->canSend()) {
+		return;
+	}
+
+	if (cmd.broadcast) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	pRemoteSystem->relLayer.send(
+		cmd.pData,
+		cmd.numberOfBitsToSend,
+		core::TimeVal(),
+		pRemoteSystem->MTUSize,
+		cmd.priority,
+		cmd.reliability,
+		cmd.orderingChannel,
+		cmd.receipt
+	);
+}
+
+
+// -------------------------------------------
 
 void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 {
@@ -465,6 +537,10 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 
 Packet* XPeer::receive(void)
 {
+	processRecvData();
+	processConnectionRequests();
+	processBufferdCommands();
+
 	if (packetQue_.isEmpty()) {
 		return nullptr;
 	}
@@ -1099,6 +1175,23 @@ void XPeer::processConnectionRequests(void)
 	}
 }
 
+void XPeer::processBufferdCommands(void)
+{
+	if (bufferdCmds_.isEmpty()) {
+		return;
+	}
+
+	BufferdCommand* pBufCmd;
+	while (bufferdCmds_.tryPop(pBufCmd))
+	{
+		X_ASSERT_NOT_NULL(pBufCmd); // no null ref plz!
+		processBufferdCommand(*pBufCmd);
+
+		freebufferdCmd(pBufCmd);
+	}
+
+}
+
 
 void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 {
@@ -1163,6 +1256,16 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 			break;
 		case MessageID::OpenConnectionResponseStage2:
 			handleOpenConnectionResponseStage2(pData, stream);
+			break;
+
+		case MessageID::ConnectionRequest:
+			handleConnectionRequest(pData, stream);
+			break;
+		case MessageID::ConnectionRequestAccepted:
+			handleConnectionRequestAccepted(pData, stream);
+			break;
+		case MessageID::ConnectionRequestHandShake:
+			handleConnectionRequestHandShake(pData, stream);
 			break;
 
 		// hello.
@@ -1411,7 +1514,17 @@ void XPeer::handleOpenConnectionResponseStage2(RecvData* pData, RecvBitStream& b
 					// : 123456
 
 					// send the request to the remote.
-
+					sendImmediate(
+						bsOut.data(), 
+						safe_static_cast<BitSizeT>(bsOut.size()),
+						PacketPriority::Immediate, 
+						PacketReliability::Reliable,
+						0, 
+						AddressOrGUID(&pData->systemAdd), 
+						false, 
+						timeNow, 
+						0
+					);
 				}
 				else
 				{
@@ -1429,6 +1542,41 @@ void XPeer::handleOpenConnectionResponseStage2(RecvData* pData, RecvBitStream& b
 	// remove the req.
 	removeConnectionRequest(pData->systemAdd);
 }
+
+void XPeer::handleConnectionRequest(RecvData* pData, RecvBitStream& bs)
+{
+	NetGUID clientGuid;
+	uint64_t timeStamp;
+
+	bs.read(clientGuid);
+	bs.read(timeStamp);
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request");
+
+	// we only allow connection requests if we are in connectState UnverifiedSender.
+
+
+
+}
+
+void XPeer::handleConnectionRequestAccepted(RecvData* pData, RecvBitStream& bs)
+{
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request accepted");
+
+}
+
+void XPeer::handleConnectionRequestHandShake(RecvData* pData, RecvBitStream& bs)
+{
+
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request handshake");
+
+
+
+}
+
+
+// -------------------------------------------
 
 RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
 	NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state)

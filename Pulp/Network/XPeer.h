@@ -11,6 +11,7 @@
 #include <Time\TimeStamp.h>
 
 #include "Sockets\Socket.h"
+#include "Reliability\ReliabilityLayer.h"
 
 
 X_NAMESPACE_BEGIN(net)
@@ -66,8 +67,11 @@ struct RemoteSystem
 	typedef std::array<PingAndClockDifferential, PING_HISTORY_COUNT> PingArr;
 
 public:
-	RemoteSystem();
+	RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
 
+	bool canSend(void) const;
+
+public:
 	bool isActive;
 	bool weStartedconnection;
 	bool _pad[2];
@@ -90,6 +94,8 @@ public:
 	ConnectState::Enum connectState;
 
 	NetSocket* pNetSocket;
+
+	ReliabilityLayer relLayer;
 };
 
 struct RequestConnection
@@ -116,11 +122,11 @@ struct Ban
 
 #if X_64
 X_ENSURE_SIZE(BufferdCommand, 56) 
-X_ENSURE_SIZE(RemoteSystem, 528)
+X_ENSURE_SIZE(RemoteSystem, 528 + sizeof(ReliabilityLayer))
 X_ENSURE_SIZE(RequestConnection, 72)
 #else
 X_ENSURE_SIZE(BufferdCommand, 56)
-X_ENSURE_SIZE(RemoteSystem, 480)
+X_ENSURE_SIZE(RemoteSystem, 480 + sizeof(ReliabilityLayer))
 X_ENSURE_SIZE(RequestConnection, 72)
 #endif // !X_64
 
@@ -253,7 +259,10 @@ private:
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
 	bool sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority, 
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, 
-		bool useCallerDataAllocation, core::TimeStamp currentTime, uint32_t receipt);
+		core::TimeVal currentTime, uint32_t receipt);
+
+	void processBufferdCommand(BufferdCommand& cmd);
+
 
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
 
@@ -291,6 +300,7 @@ private:
 private:
 	void processRecvData(void);
 	void processConnectionRequests(void);
+	void processBufferdCommands(void);
 
 	void processRecvData(RecvData* pRecvData, int32_t byteOffset);
 
@@ -301,6 +311,14 @@ private:
 	void handleOpenConnectionResponse(RecvData* pData, RecvBitStream& bs);
 	void handleOpenConnectionRequestStage2(RecvData* pData, RecvBitStream& bs);
 	void handleOpenConnectionResponseStage2(RecvData* pData, RecvBitStream& bs);
+	// connection request
+	void handleConnectionRequest(RecvData* pData, RecvBitStream& bs);
+	void handleConnectionRequestAccepted(RecvData* pData, RecvBitStream& bs);
+	void handleConnectionRequestHandShake(RecvData* pData, RecvBitStream& bs);
+
+	// ------
+
+
 
 	// ------
 
@@ -309,6 +327,7 @@ private:
 	bool isIpConnectSpamming(const SystemAdd& sysAdd);
 
 	// ------
+
 
 	void onSocketRecv(RecvData* pData);
 	core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
