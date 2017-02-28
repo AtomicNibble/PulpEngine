@@ -196,7 +196,7 @@ struct ISystemAdd
 	virtual bool IsLoopBack(void) const X_ABSTRACT;
 	virtual bool IsLanAddress(void) const X_ABSTRACT;
 
-	virtual const char* toString(IPStr& strBuf, bool incPort = true) X_ABSTRACT;
+	virtual const char* toString(IPStr& strBuf, bool incPort = true) const X_ABSTRACT;
 };
 
 // ---------------------------------

@@ -169,7 +169,7 @@ bool SystemAdd::equalExcludingPort(const SystemAdd& oth) const
 }
 
 
-const char* SystemAdd::toString(IPStr& strBuf, bool incPort)
+const char* SystemAdd::toString(IPStr& strBuf, bool incPort) const
 {
 	int32_t ret;
 

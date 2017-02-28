@@ -34,7 +34,7 @@ public:
 	X_INLINE bool IsLoopBack(void) const X_FINAL;
 	X_INLINE bool IsLanAddress(void) const X_FINAL;
 
-	const char* toString(IPStr& strBuf, bool incPort = true) X_FINAL;
+	const char* toString(IPStr& strBuf, bool incPort = true) const X_FINAL;
 	// ~ISystemAdd
 
 	// comparrision operators.
