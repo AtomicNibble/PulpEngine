@@ -26,7 +26,7 @@ public:
 		readBitIdx_(0),
 		bitIdx_(0)
 	{
-		numBits_ = core::bitUtil::RoundUpToMultiple<size_type>(union_cast<size_type>(pEnd - pBegin), 8_sz);
+		numBits_ = core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin));
 
 		if (dataInit) {
 			bitIdx_ = numBits_;
