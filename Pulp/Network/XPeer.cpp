@@ -301,6 +301,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 	pConReq->numRequestsMade = 0;
 	pConReq->retryCount = retryCount;
 	pConReq->socketIdx = socketIdx;
+	pConReq->MTUIdxShift = 0;
 
 	// only push if not trying to connect already.
 	auto matchSysAddFunc = [&systemAddress](const RequestConnection* pOth) {
@@ -1159,12 +1160,39 @@ void XPeer::processConnectionRequests(void)
 			bsOut.write<uint8_t>(PROTO_VERSION_MAJOR);
 			bsOut.write<uint8_t>(PROTO_VERSION_MINOR);
 
-			NetSocket& socket = sockets_[cr.socketIdx];
+			// devide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
+			size_t mtuIdx = cr.numRequestsMade / (cr.retryCount / MTUSizesArr.size());
+			mtuIdx = core::Min(mtuIdx + cr.MTUIdxShift, MTUSizesArr.size() - 1);
+			
+			size_t MTUSize = MTUSizesArr[mtuIdx] - UDP_HEADER_SIZE;
+			bsOut.zeroPadToLength(MTUSize);
 
+			core::TimeVal timeSend = gEnv->pTimer->GetTimeNowReal();
+
+			NetSocket& socket = sockets_[cr.socketIdx];
 			SendParameters sp;
 			sp.setData(bsOut);
 			sp.systemAddress = cr.systemAddress;
-			socket.send(sp);
+			if (socket.send(sp) == -WSAEMSGSIZE) // A message sent on a datagram socket was larger than the internal message buffer 
+			{
+				// skip this MTU size.
+				cr.MTUIdxShift++;
+				cr.nextRequestTime = timeNow;
+
+				X_LOG0_IF(vars_.debugEnabled(), "Net", "Moving to next MTU size for connection request");
+			}
+			else
+			{
+				core::TimeVal timeSendFin = gEnv->pTimer->GetTimeNowReal();
+				core::TimeVal timeToSend = timeSendFin - timeSend;
+				if (timeToSend > core::TimeVal::fromMS(100))
+				{
+					// if you took more than 100ms drop, to lowest MTU size.
+					cr.MTUIdxShift = safe_static_cast<uint8_t>(MTUSizesArr.size() - 1);
+
+					X_LOG0_IF(vars_.debugEnabled(), "Net", "Moving to last MTU size for connection request");
+				}
+			}
 
 			++it;
 		}

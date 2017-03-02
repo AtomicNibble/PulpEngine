@@ -109,7 +109,7 @@ struct RequestConnection
 	uint8_t numRequestsMade;
 	uint8_t retryCount;
 	uint8_t socketIdx;
-	uint8_t _pad[1];
+	uint8_t MTUIdxShift;
 };
 
 struct Ban
