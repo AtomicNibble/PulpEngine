@@ -334,6 +334,9 @@
     <ClCompile Include="UT_LZ5.cpp">
       <Filter>Source Files\tests\Compression</Filter>
     </ClCompile>
+    <ClCompile Include="UT_C_FixedBitStream.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
