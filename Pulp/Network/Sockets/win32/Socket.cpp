@@ -236,7 +236,9 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 		if (len < 0)
 		{
 			lastError::Description Dsc;
-			X_ERROR("Net", "Failed to sendto, length: %" PRIi32 ". Error: \"%s\"", sendParameters.length, lastError::ToString(Dsc));
+			int32_t lastErr = lastError::Get();
+			len = -lastErr; // pass back the last err but negative
+			X_ERROR("Net", "Failed to sendto, length: %" PRIi32 ". Error: \"%s\"", sendParameters.length, lastError::ToString(lastErr, Dsc));
 		}
 
 	} while (len == 0); // keep trying, while not sent anything and not had a error.
