@@ -103,6 +103,8 @@ bool RemoteSystem::canSend(void) const
 
 // -----------------------------------
 
+std::array<uint32_t, 3> XPeer::MTUSizesArr = { MAX_MTU_SIZE, 1200, 576 };
+
 XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	vars_(vars),
 	sockets_(arena),

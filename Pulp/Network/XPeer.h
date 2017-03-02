@@ -180,6 +180,7 @@ class XPeer : public IPeer
 
 	static const size_t MAX_POOL_ALLOC = 2048; // packets and buffered commands
 
+	static std::array<uint32_t, 3> MTUSizesArr;
 public:
 	XPeer(NetVars& vars, core::MemoryArenaBase* arena);
 	~XPeer() X_FINAL;
