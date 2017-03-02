@@ -316,6 +316,21 @@ void FixedBitStream<StorageType>::skipBits(size_type numBits)
 }
 
 template<class StorageType>
+void FixedBitStream<StorageType>::zeroPadToLength(size_type numBytes)
+{
+	if (sizeInBytes() < numBytes)
+	{
+		const size_t numBits = numBitsForBytes(numBytes);
+		alignWriteToByteBoundry();
+		std::memset(pBegin_ + byteIndex(), 0, numBytes);
+		bitIdx_ += numBits;
+	}
+}
+
+// -------------------------------
+
+
+template<class StorageType>
 void FixedBitStream<StorageType>::reset(void)
 {
 	bitIdx_ = 0;
