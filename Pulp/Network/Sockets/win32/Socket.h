@@ -47,6 +47,11 @@ struct SendParameters
 		pData = bs.data();
 		length = safe_static_cast<int32_t>(bs.sizeInBytes());
 	}
+	template<typename StorageType>
+	X_INLINE void setData(core::FixedBitStream<StorageType>& bs) {
+		pData = bs.data();
+		length = safe_static_cast<int32_t>(bs.sizeInBytes());
+	}
 
 	uint8_t* pData;
 	int32_t length;
