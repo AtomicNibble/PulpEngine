@@ -48,7 +48,7 @@ void FixedBitStream<StorageType>::write(const T* pVal, size_type num)
 template<class StorageType>
 void FixedBitStream<StorageType>::write(const Type* pBuf, size_type numBytes)
 {
-	writedBits(pBuf, numBitsForBytes(numBytes));
+	writeBits(pBuf, numBitsForBytes(numBytes));
 }
 
 // read bits from stream
