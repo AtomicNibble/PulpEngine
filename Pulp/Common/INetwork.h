@@ -10,7 +10,7 @@ static const uint32_t MAX_SUPPORTED_PEERS = 1 << 10; // go nuts.
 static const uint32_t MAX_BAN_ENTRIES = 256; // max bans entries you can add, wildcards supported.
 
 
-X_DECLARE_ENUM(ConnectionState)(
+X_DECLARE_ENUM8(ConnectionState)(
 	Pending,
 	Connecting,
 	Connected,
@@ -43,14 +43,14 @@ X_DECLARE_ENUM(StartupResult)(
 );
 
 
-X_DECLARE_ENUM(PacketPriority)(
+X_DECLARE_ENUM8(PacketPriority)(
 	Immediate, // send immediate, no buffering  or aggregating with other packets.
 	High,
 	Medium,
 	Low
 );
 
-X_DECLARE_ENUM(PacketReliability)(
+X_DECLARE_ENUM8(PacketReliability)(
 	UnReliable,
 	UnReliableSequenced,
 	Reliable,
