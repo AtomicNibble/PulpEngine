@@ -319,7 +319,17 @@ void BitStream::readBits(Type* pBuf, size_type numBits)
 	}
 }
 
-
+void BitStream::zeroPadToLength(size_t numBytes)
+{
+	if (sizeInBytes() < numBytes)
+	{
+		const size_t numBits = numBitsForBytes(numBytes);
+		alignWriteToByteBoundry();
+		ensureSpace(numBits);
+		std::memset(start_ + byteIndex(), 0, numBytes);
+		bitIdx_ += numBits;
+	}
+}
 
 // sets the absolute position in the stream.
 void BitStream::skipBytes(size_type numBytes)

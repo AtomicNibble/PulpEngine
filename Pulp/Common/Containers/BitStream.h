@@ -84,11 +84,13 @@ public:
 	void alignWriteToByteBoundry(void);
 	void alignReadToByteBoundry(void);
 
-
 	// sets the absolute bit position in the stream.
 	void skipBytes(size_type numBytes);
 	void skipBits(size_type numBits);
 
+	// pads the bit stream until the stream length is equal to length.
+	// will not trucate.
+	void zeroPadToLength(size_t numBytes);
 
 	// resizes the object to holx X bits
 	void resize(size_type numBits);
