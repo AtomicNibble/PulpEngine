@@ -1606,6 +1606,7 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 			remoteSys.MTUSize = remoteMTU;
 			remoteSys.connectState = state;
 			remoteSys.pNetSocket = pSrcSocket;
+			remoteSys.isActive = true; // diverts all packets to reliabilty layer.
 
 			if (pSrcSocket->getBoundAdd() != bindingAdd)
 			{
