@@ -97,7 +97,7 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 		return;
 	}
 
-	X_ASSERT(bitsMod8 != 0, "Logic here is for unone byte aligned writes")(bitsMod8);
+	X_ASSERT(bitsMod8 != 0, "Logic here is for none byte aligned writes")(bitsMod8);
 
 	// okay now we are left with data we can't do simple byte copy on.
 	// shift away!
@@ -230,7 +230,7 @@ void FixedBitStream<StorageType>::readBits(Type* pBuf, size_type numBits)
 		return;
 	}
 
-	X_ASSERT(bitsMod8 != 0, "Logic here is for unone byte aligned writes")(bitsMod8);
+	X_ASSERT(bitsMod8 != 0, "Logic here is for none byte aligned writes")(bitsMod8);
 
 	while (numBits >= 8)
 	{
