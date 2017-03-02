@@ -13,15 +13,9 @@ namespace
 {
 
 	template<typename T>
-	T bitsToBytes(T bits)
+	BitSizeT bytesToBits(T bytes)
 	{
-		return (bits + 7) >> 3;
-	}
-
-	template<typename T>
-	BitSizeT bytesToBits(T bits)
-	{
-		return safe_static_cast<BitSizeT>(bits << 3);
+		return safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(bytes));
 	}
 
 	// returns if ip is matched by the pattern.
@@ -449,7 +443,7 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 	X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
 
 	BufferdCommand* pCmd = allocBufferdCmd(numberOfBitsToSend);
-	std::memcpy(pCmd->pData, pData, bitsToBytes(numberOfBitsToSend));
+	std::memcpy(pCmd->pData, pData, core::bitUtil::bitsToBytes(numberOfBitsToSend));
 	pCmd->priority = priority;
 	pCmd->reliability = reliability;
 	pCmd->orderingChannel = orderingChannel;
@@ -771,8 +765,8 @@ void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
 Packet* XPeer::allocPacket(size_t lengthBits)
 {
 	Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
-	pPacket->pData = allocPacketData(bitsToBytes(lengthBits));
-	pPacket->length = safe_static_cast<uint32_t>(bitsToBytes(lengthBits));
+	pPacket->pData = allocPacketData(core::bitUtil::bitsToBytes(lengthBits));
+	pPacket->length = safe_static_cast<uint32_t>(core::bitUtil::bitsToBytes(lengthBits));
 	pPacket->bitLength = safe_static_cast<uint32_t>(lengthBits);
 	return pPacket;
 }
@@ -787,7 +781,7 @@ void XPeer::freePacket(Packet* pPacket)
 BufferdCommand* XPeer::allocBufferdCmd(size_t lengthBits)
 {
 	BufferdCommand* pCmd = X_NEW(BufferdCommand, &poolArena_, "BufferdCmd");
-	pCmd->pData = allocPacketData(bitsToBytes(lengthBits));
+	pCmd->pData = allocPacketData(core::bitUtil::bitsToBytes(lengthBits));
 	pCmd->numberOfBitsToSend = safe_static_cast<BitSizeT>(lengthBits);
 	return pCmd;
 }
