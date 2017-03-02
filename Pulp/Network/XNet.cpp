@@ -93,7 +93,9 @@ NetGUID XNet::generateGUID(void)
 	sha1.update(now.GetValue());
 	auto digest = sha1.finalize();
 
-	uint64_t val = digest.data[0] | digest.data[1];
+	uint64_t val = digest.data[0];
+	val <<= 32;
+	val |= digest.data[1];
 
 	return NetGUID(val);
 }
