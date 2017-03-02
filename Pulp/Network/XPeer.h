@@ -121,11 +121,11 @@ struct Ban
 // just to keep track of it's size for memory bandwidth consierations
 
 #if X_64
-X_ENSURE_SIZE(BufferdCommand, 56) 
+X_ENSURE_SIZE(BufferdCommand, 48) 
 X_ENSURE_SIZE(RemoteSystem, 528 + sizeof(ReliabilityLayer))
 X_ENSURE_SIZE(RequestConnection, 72)
 #else
-X_ENSURE_SIZE(BufferdCommand, 56)
+X_ENSURE_SIZE(BufferdCommand, 48)
 X_ENSURE_SIZE(RemoteSystem, 480 + sizeof(ReliabilityLayer))
 X_ENSURE_SIZE(RequestConnection, 72)
 #endif // !X_64
