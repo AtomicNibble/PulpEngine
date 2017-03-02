@@ -114,6 +114,12 @@ namespace bitUtil
 	// sign util
 	template<typename T>
 	inline bool isSignBitNotSet(T value);
+
+
+	template<typename T>
+	constexpr T bitsToBytes(T numBits);
+	template<typename T>
+	constexpr T bytesToBits(T numBytes);
 }
 
 #include "BitUtil.inl"

@@ -681,4 +681,17 @@ namespace bitUtil
 	{
 		return internal::Implementation<sizeof(T)>::isSignBitNotSet(value);
 	}
+
+	template<typename T>
+	inline constexpr T bitsToBytes(T numBits)
+	{
+		return (numBits + 7) >> 3;
+	}
+
+	template<typename T>
+	inline constexpr T bytesToBits(T numBytes)
+	{
+		return numBytes << 3;
+	}
+
 }
