@@ -694,4 +694,9 @@ namespace bitUtil
 		return numBytes << 3;
 	}
 
+	template<typename T>
+	inline constexpr T bitsNeededForValue(T n)
+	{
+		return n <= 1 ? 1 : 1 + bitsNeededForValue((n + 1) / 2);
+	}
 }

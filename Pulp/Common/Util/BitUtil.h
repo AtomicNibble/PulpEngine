@@ -120,6 +120,11 @@ namespace bitUtil
 	constexpr T bitsToBytes(T numBits);
 	template<typename T>
 	constexpr T bytesToBits(T numBytes);
+
+
+	// how many bits are needed to store this value?
+	template<typename T>
+	constexpr T bitsNeededForValue(T n);
 }
 
 #include "BitUtil.inl"
