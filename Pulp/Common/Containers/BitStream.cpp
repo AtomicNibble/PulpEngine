@@ -319,7 +319,7 @@ void BitStream::readBits(Type* pBuf, size_type numBits)
 	}
 }
 
-void BitStream::zeroPadToLength(size_t numBytes)
+void BitStream::zeroPadToLength(size_type numBytes)
 {
 	if (sizeInBytes() < numBytes)
 	{

@@ -90,7 +90,7 @@ public:
 
 	// pads the bit stream until the stream length is equal to length.
 	// will not trucate.
-	void zeroPadToLength(size_t numBytes);
+	void zeroPadToLength(size_type numBytes);
 
 	// resizes the object to holx X bits
 	void resize(size_type numBits);
