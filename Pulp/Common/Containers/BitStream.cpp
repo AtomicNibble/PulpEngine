@@ -211,10 +211,10 @@ void BitStream::writeBits(const Type* pBuf, size_type numBits)
 		Type srcByte = *(pBuf++);
 
 		// we place first part of srcbyte, is last bit of dst byte.
-		*(pDst) |= srcByte >> bitsMod8;
+		*(pDst) |= (srcByte >> bitsMod8) & 0xff;
 		
 		// we shift lower bits up to start of dst byte.
-		*(pDst + 1) |= (srcByte << (8 - bitsMod8));
+		*(pDst + 1) |= (srcByte << (8 - bitsMod8)) & 0xff;
 
 		numBits -= 8;
 		bitIdx_ += 8;
@@ -227,7 +227,7 @@ void BitStream::writeBits(const Type* pBuf, size_type numBits)
 		Type* pDst = start_ + byteIndex();
 		Type srcByte = *pBuf;
 
-		*(pDst) |= (srcByte << (8 - bitsMod8));
+		*(pDst) |= (srcByte << (8 - bitsMod8)) & 0xff;
 
 		bitIdx_ += numBits;
 	}
