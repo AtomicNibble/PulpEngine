@@ -143,14 +143,14 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 template<class StorageType>
 void FixedBitStream<StorageType>::writeAligned(const Type* pBuf, size_type numBytes)
 {
-	alignReadToByteBoundry();
+	alignWriteToByteBoundry();
 	write(pBuf, numBytes);
 }
 
 template<class StorageType>
 void FixedBitStream<StorageType>::writeBitsAligned(const Type* pBuf, size_type numBits)
 {
-	alignReadToByteBoundry();
+	alignWriteToByteBoundry();
 	writeBits(pBuf, numBits);
 }
 
