@@ -121,7 +121,7 @@ public:
 
 public:
 	FixedBitStreamStackPolicy() :
-		numBits_(0),
+		numBits_(core::bitUtil::bytesToBits(N)),
 		readBitIdx_(0),
 		bitIdx_(0)
 	{
