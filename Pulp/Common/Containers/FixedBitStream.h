@@ -4,13 +4,13 @@
 X_NAMESPACE_BEGIN(core)
 
 
-class FixedBitStreamNoneOwningPolicy
+class FixedStreamBase
 {
 public:
+	typedef size_t size_type;
 	typedef uint8_t Type;
 	typedef Type* TypePtr;
 	typedef Type value_type;
-	typedef size_t size_type;
 	typedef const Type* ConstTypePtr;
 	typedef Type* Iterator;
 	typedef const Type* ConstIterator;
@@ -19,15 +19,37 @@ public:
 	typedef const Type& ConstReference;
 	typedef const Type& const_reference;
 
-public:
-	FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
-		pBegin_(pBegin),
-		pEnd_(pEnd),
+protected:
+	FixedStreamBase(size_type numBits) :
+		numBits_(0),
 		readBitIdx_(0),
 		bitIdx_(0)
 	{
-		numBits_ = core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin));
 
+	}
+
+public:
+
+	size_type capacity(void) const {
+		return numBits_;
+	}
+
+
+protected:
+	size_type numBits_;
+	size_type readBitIdx_;
+	size_type bitIdx_;
+};
+
+class FixedBitStreamNoneOwningPolicy : public FixedStreamBase
+{
+
+public:
+	FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
+		FixedStreamBase(core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin))),
+		pBegin_(pBegin),
+		pEnd_(pEnd)
+	{
 		if (dataInit) {
 			bitIdx_ = numBits_;
 		}
@@ -36,44 +58,22 @@ public:
 
 	}
 
-	size_type capacity(void) const {
-		return numBits_;
-	}
-
 protected:
 	TypePtr dataBegin(void) {
 		return pBegin_;
 	}
 
 protected:
-	size_type numBits_;
-	size_type readBitIdx_;
-	size_type bitIdx_;
 	Type* pBegin_;
 	Type* pEnd_;
 };
 
-class FixedBitStreamOwningPolicy
+class FixedBitStreamOwningPolicy : public FixedStreamBase
 {
 public:
-	typedef uint8_t Type;
-	typedef Type* TypePtr;
-	typedef Type value_type;
-	typedef size_t size_type;
-	typedef const Type* ConstTypePtr;
-	typedef Type* Iterator;
-	typedef const Type* ConstIterator;
-	typedef Type& Reference;
-	typedef Type& reference;
-	typedef const Type& ConstReference;
-	typedef const Type& const_reference;
-
-public:
 	FixedBitStreamOwningPolicy(core::MemoryArenaBase* arena, size_type numBits) :
-		arena_(arena),
-		numBits_(0),
-		readBitIdx_(0),
-		bitIdx_(0)
+		FixedStreamBase(numBits),
+		arena_(arena)
 	{
 		size_type numBytes = core::bitUtil::RoundUpToMultiple(numBits, 8_sz);
 		pBegin_ = X_NEW_ARRAY(Type, numBytes, arena_, "FixedBitStream");
@@ -82,10 +82,6 @@ public:
 
 	~FixedBitStreamOwningPolicy() {
 		X_DELETE_ARRAY(pBegin_, arena_);
-	}
-
-	size_type capacity(void) const {
-		return numBits_;
 	}
 
 protected:
@@ -104,26 +100,11 @@ private:
 };
 
 template<size_t N>
-class FixedBitStreamStackPolicy
+class FixedBitStreamStackPolicy : public FixedStreamBase
 {
 public:
-	typedef uint8_t Type;
-	typedef Type* TypePtr;
-	typedef Type value_type;
-	typedef size_t size_type;
-	typedef const Type* ConstTypePtr;
-	typedef Type* Iterator;
-	typedef const Type* ConstIterator;
-	typedef Type& Reference;
-	typedef Type& reference;
-	typedef const Type& ConstReference;
-	typedef const Type& const_reference;
-
-public:
 	FixedBitStreamStackPolicy() :
-		numBits_(core::bitUtil::bytesToBits(N)),
-		readBitIdx_(0),
-		bitIdx_(0)
+		FixedStreamBase(core::bitUtil::bytesToBits(N))
 	{
 	}
 
@@ -131,9 +112,6 @@ public:
 
 	}
 
-	size_type capacity(void) const {
-		return numBits_;
-	}
 
 protected:
 	TypePtr dataBegin(void) {
@@ -141,10 +119,6 @@ protected:
 	}
 
 protected:
-	size_type numBits_;
-	size_type readBitIdx_;
-	size_type bitIdx_;
-
 	Type buf_[N];
 };
 
