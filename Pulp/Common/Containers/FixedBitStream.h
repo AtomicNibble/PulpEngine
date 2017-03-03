@@ -25,6 +25,55 @@ protected:
 
 
 public:
+	void write(bool bit);
+	void write0(void);
+	void write1(void);
+
+	template<typename T>
+	void write(const T& val);
+	// writes the type * num to the stream.
+	template<typename T>
+	void write(const T* pVal, size_type num);
+
+	// writes bytes to stream, will stich in if not currently on byte boundary, unlike writeAligned.
+	void write(const Type* pBuf, size_type numBytes);
+	// write bits to stream
+	void writeBits(const Type* pBuf, size_type numBits);
+
+	// pads the stream to byte boundry before writing.
+	void writeAligned(const Type* pBuf, size_type numBytes);
+	void writeBitsAligned(const Type* pBuf, size_type numBits);
+
+
+	// convience helper.
+	template<typename T>
+	T read(void);
+
+	template<typename T>
+	void read(T& val);
+	// read the type * num from the stream.
+	template<typename T>
+	void read(T* pVal, size_type num);
+
+	void read(Type* pBuf, size_type numBytes);
+	// read bits from stream
+	void readBits(Type* pBuf, size_type numBits);
+
+	// pads the stream to byte boundry before read.
+	void readAligned(Type* pBuf, size_type numBytes);
+	void readBitsAligned(Type* pBuf, size_type numBits);
+
+	void alignWriteToByteBoundry(void);
+	void alignReadToByteBoundry(void);
+
+	// skips forwward in read pointer.
+	void skipBytes(size_type numBytes);
+	void skipBits(size_type numBits);
+
+	// pads the bit stream until the stream length is equal to length.
+	// will not trucate.
+	void zeroPadToLength(size_type numBytes);
+
 
 	// clears the stream setting the cursor back to the start.
 	void reset(void);
@@ -141,54 +190,7 @@ public:
 public:
 	using StorageType::StorageType;
 
-	void write(bool bit);
-	void write0(void);
-	void write1(void);
 
-	template<typename T>
-	void write(const T& val);
-	// writes the type * num to the stream.
-	template<typename T>
-	void write(const T* pVal, size_type num);
-
-	// writes bytes to stream, will stich in if not currently on byte boundary, unlike writeAligned.
-	void write(const Type* pBuf, size_type numBytes);
-	// write bits to stream
-	void writeBits(const Type* pBuf, size_type numBits);
-
-	// pads the stream to byte boundry before writing.
-	void writeAligned(const Type* pBuf, size_type numBytes);
-	void writeBitsAligned(const Type* pBuf, size_type numBits);
-
-
-	// convience helper.
-	template<typename T>
-	T read(void);
-
-	template<typename T>
-	void read(T& val);
-	// read the type * num from the stream.
-	template<typename T>
-	void read(T* pVal, size_type num);
-
-	void read(Type* pBuf, size_type numBytes);
-	// read bits from stream
-	void readBits(Type* pBuf, size_type numBits);
-
-	// pads the stream to byte boundry before read.
-	void readAligned(Type* pBuf, size_type numBytes);
-	void readBitsAligned(Type* pBuf, size_type numBits);
-
-	void alignWriteToByteBoundry(void);
-	void alignReadToByteBoundry(void);
-
-	// skips forwward in read pointer.
-	void skipBytes(size_type numBytes);
-	void skipBits(size_type numBits);
-
-	// pads the bit stream until the stream length is equal to length.
-	// will not trucate.
-	void zeroPadToLength(size_type numBytes);
 };
 
 X_NAMESPACE_END
