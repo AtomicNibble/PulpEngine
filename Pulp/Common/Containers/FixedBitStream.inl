@@ -5,6 +5,49 @@ X_NAMESPACE_BEGIN(core)
 
 // -------------------------------
 
+
+inline FixedBitStreamNoneOwningPolicy::FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
+	FixedStreamBase(pBegin, core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin)))
+{
+	if (dataInit) {
+		bitIdx_ = numBits_;
+	}
+}
+
+inline FixedBitStreamNoneOwningPolicy::~FixedBitStreamNoneOwningPolicy()
+{
+
+}
+
+inline FixedBitStreamOwningPolicy::FixedBitStreamOwningPolicy(core::MemoryArenaBase* arena, size_type numBits) :
+	FixedStreamBase(numBits),
+	arena_(arena)
+{
+	size_type numBytes = core::bitUtil::RoundUpToMultiple(numBits, 8_sz);
+	pBegin_ = X_NEW_ARRAY(Type, numBytes, arena_, "FixedBitStream");
+}
+
+inline FixedBitStreamOwningPolicy::~FixedBitStreamOwningPolicy() 
+{
+	X_DELETE_ARRAY(pBegin_, arena_);
+}
+
+template<size_t N>
+inline FixedBitStreamStackPolicy<N>::FixedBitStreamStackPolicy() :
+	FixedStreamBase(buf_, core::bitUtil::bytesToBits(N))
+{
+}
+
+template<size_t N>
+inline FixedBitStreamStackPolicy<N>::~FixedBitStreamStackPolicy() 
+{
+
+}
+
+
+// -------------------------------
+
+
 inline FixedStreamBase::FixedStreamBase(size_type numBits) :
 	pBegin_(nullptr),
 	numBits_(0),
@@ -22,8 +65,6 @@ inline FixedStreamBase::FixedStreamBase(TypePtr pBegin, size_type numBits) :
 {
 
 }
-
-
 
 // -------------------------------------------------------------------------
 

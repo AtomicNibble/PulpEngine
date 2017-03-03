@@ -119,32 +119,15 @@ class FixedBitStreamNoneOwningPolicy : public FixedStreamBase
 {
 
 public:
-	FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
-		FixedStreamBase(pBegin, core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin)))
-	{
-		if (dataInit) {
-			bitIdx_ = numBits_;
-		}
-	}
-	~FixedBitStreamNoneOwningPolicy() {
-
-	}
+	FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit);
+	~FixedBitStreamNoneOwningPolicy();
 };
 
 class FixedBitStreamOwningPolicy : public FixedStreamBase
 {
 public:
-	FixedBitStreamOwningPolicy(core::MemoryArenaBase* arena, size_type numBits) :
-		FixedStreamBase(numBits),
-		arena_(arena)
-	{
-		size_type numBytes = core::bitUtil::RoundUpToMultiple(numBits, 8_sz);
-		pBegin_ = X_NEW_ARRAY(Type, numBytes, arena_, "FixedBitStream");
-	}
-
-	~FixedBitStreamOwningPolicy() {
-		X_DELETE_ARRAY(pBegin_, arena_);
-	}
+	FixedBitStreamOwningPolicy(core::MemoryArenaBase* arena, size_type numBits);
+	~FixedBitStreamOwningPolicy();
 
 private:
 	core::MemoryArenaBase* arena_;
@@ -154,14 +137,8 @@ template<size_t N>
 class FixedBitStreamStackPolicy : public FixedStreamBase
 {
 public:
-	FixedBitStreamStackPolicy() :
-		FixedStreamBase(buf_, core::bitUtil::bytesToBits(N))
-	{
-	}
-
-	~FixedBitStreamStackPolicy() {
-
-	}
+	FixedBitStreamStackPolicy();
+	~FixedBitStreamStackPolicy();
 
 protected:
 	Type buf_[N];
