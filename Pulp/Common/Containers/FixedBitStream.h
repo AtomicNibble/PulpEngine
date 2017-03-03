@@ -20,25 +20,50 @@ public:
 	typedef const Type& const_reference;
 
 protected:
-	FixedStreamBase(size_type numBits) :
-		numBits_(0),
-		readBitIdx_(0),
-		bitIdx_(0)
-	{
+	FixedStreamBase(size_type numBits);
+	FixedStreamBase(TypePtr pBegin, size_type numBits);
 
-	}
 
 public:
 
-	size_type capacity(void) const {
-		return numBits_;
-	}
+	// clears the stream setting the cursor back to the start.
+	void reset(void);
 
+	size_type capacity(void) const;
+	size_type size(void) const;
+	size_type sizeInBytes(void) const;
+
+	// returns the amount of bits that can be added.
+	size_type freeSpace(void) const;
+	// returns true if the stream is full.
+	bool isEos(void) const;
+
+
+	TypePtr ptr(void);
+	ConstTypePtr ptr(void) const;
+	TypePtr data(void);
+	ConstTypePtr data(void) const;
+
+	Iterator begin(void);
+	ConstIterator begin(void) const;
+	Iterator end(void);
+	ConstIterator end(void) const;
+
+protected:
+	size_type byteIndex(void) const;
+	size_type readByteIndex(void) const;
+
+	static size_type numBytesForBits(size_type numBits);
+	static size_type numBitsForBytes(size_type numBytes);
+
+	TypePtr dataBegin(void);
+	ConstTypePtr dataBegin(void) const;
 
 protected:
 	size_type numBits_;
 	size_type readBitIdx_;
 	size_type bitIdx_;
+	Type* pBegin_;
 };
 
 class FixedBitStreamNoneOwningPolicy : public FixedStreamBase
@@ -46,8 +71,7 @@ class FixedBitStreamNoneOwningPolicy : public FixedStreamBase
 
 public:
 	FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
-		FixedStreamBase(core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin))),
-		pBegin_(pBegin)
+		FixedStreamBase(pBegin, core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin)))
 	{
 		if (dataInit) {
 			bitIdx_ = numBits_;
@@ -56,14 +80,6 @@ public:
 	~FixedBitStreamNoneOwningPolicy() {
 
 	}
-
-protected:
-	TypePtr dataBegin(void) {
-		return pBegin_;
-	}
-
-protected:
-	Type* pBegin_;
 };
 
 class FixedBitStreamOwningPolicy : public FixedStreamBase
@@ -81,16 +97,6 @@ public:
 		X_DELETE_ARRAY(pBegin_, arena_);
 	}
 
-protected:
-	TypePtr dataBegin(void) {
-		return pBegin_;
-	}
-
-protected:
-	size_type numBits_;
-	size_type readBitIdx_;
-	size_type bitIdx_;
-	Type* pBegin_;
 private:
 	core::MemoryArenaBase* arena_;
 };
@@ -100,18 +106,12 @@ class FixedBitStreamStackPolicy : public FixedStreamBase
 {
 public:
 	FixedBitStreamStackPolicy() :
-		FixedStreamBase(core::bitUtil::bytesToBits(N))
+		FixedStreamBase(buf_, core::bitUtil::bytesToBits(N))
 	{
 	}
 
 	~FixedBitStreamStackPolicy() {
 
-	}
-
-
-protected:
-	TypePtr dataBegin(void) {
-		return buf_;
 	}
 
 protected:
@@ -189,35 +189,6 @@ public:
 	// pads the bit stream until the stream length is equal to length.
 	// will not trucate.
 	void zeroPadToLength(size_type numBytes);
-
-	// clears the stream setting the cursor back to the start.
-	void reset(void);
-
-	size_type size(void) const;
-	size_type sizeInBytes(void) const;
-
-	// returns the amount of bits that can be added.
-	size_type freeSpace(void) const;
-	// returns true if the stream is full.
-	bool isEos(void) const;
-
-	TypePtr ptr(void);
-	ConstTypePtr ptr(void) const;
-	TypePtr data(void);
-	ConstTypePtr data(void) const;
-
-	Iterator begin(void);
-	ConstIterator begin(void) const;
-	Iterator end(void);
-	ConstIterator end(void) const;
-
-
-private:
-	size_type byteIndex(void) const;
-	size_type readByteIndex(void) const;
-
-	size_type numBytesForBits(size_type numBits) const;
-	size_type numBitsForBytes(size_type numBytes) const;
 };
 
 X_NAMESPACE_END

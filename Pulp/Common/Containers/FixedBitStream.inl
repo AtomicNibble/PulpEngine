@@ -5,6 +5,136 @@ X_NAMESPACE_BEGIN(core)
 
 // -------------------------------
 
+inline FixedStreamBase::FixedStreamBase(size_type numBits) :
+	pBegin_(nullptr),
+	numBits_(0),
+	readBitIdx_(0),
+	bitIdx_(0)
+{
+
+}
+
+inline FixedStreamBase::FixedStreamBase(TypePtr pBegin, size_type numBits) :
+	pBegin_(pBegin),
+	numBits_(0),
+	readBitIdx_(0),
+	bitIdx_(0)
+{
+
+}
+
+inline void FixedStreamBase::reset(void)
+{
+	bitIdx_ = 0;
+	readBitIdx_ = 0;
+}
+
+inline typename FixedStreamBase::size_type typename FixedStreamBase::capacity(void) const
+{
+	return numBits_;
+}
+
+
+inline typename FixedStreamBase::size_type typename FixedStreamBase::size(void) const
+{
+	return bitIdx_ - readBitIdx_;
+}
+
+inline typename FixedStreamBase::size_type typename FixedStreamBase::sizeInBytes(void) const
+{
+	return numBytesForBits(size());
+}
+
+inline typename FixedStreamBase::size_type FixedStreamBase::freeSpace(void) const
+{
+	return capacity() - bitIdx_;
+}
+
+inline bool FixedStreamBase::isEos(void) const
+{
+	return size() == 0;
+}
+
+
+// --------------------
+
+inline typename FixedStreamBase::TypePtr FixedStreamBase::ptr(void)
+{
+	return dataBegin();
+}
+
+inline typename FixedStreamBase::ConstTypePtr FixedStreamBase::ptr(void) const
+{
+	return dataBegin();
+}
+
+inline typename FixedStreamBase::TypePtr FixedStreamBase::data(void)
+{
+	return dataBegin();
+}
+
+inline typename FixedStreamBase::ConstTypePtr FixedStreamBase::data(void) const
+{
+	return dataBegin();
+}
+
+inline typename FixedStreamBase::Iterator FixedStreamBase::begin(void)
+{
+	return dataBegin();
+}
+
+inline typename FixedStreamBase::ConstIterator FixedStreamBase::begin(void) const
+{
+	return dataBegin();
+}
+
+inline typename FixedStreamBase::Iterator FixedStreamBase::end(void)
+{
+	return dataBegin() + size();
+}
+
+inline typename FixedStreamBase::ConstIterator FixedStreamBase::end(void) const
+{
+	return dataBegin() + size();
+}
+
+// --------------------
+
+inline typename FixedStreamBase::size_type FixedStreamBase::byteIndex(void) const
+{
+	return bitIdx_ >> 3;
+}
+
+inline typename FixedStreamBase::size_type FixedStreamBase::readByteIndex(void) const
+{
+	return readBitIdx_ >> 3;
+}
+
+inline typename FixedStreamBase::size_type FixedStreamBase::numBytesForBits(size_type numBits)
+{
+	// align so that all the bits fit.
+	return (numBits + 7) >> 3;
+}
+
+inline typename FixedStreamBase::size_type FixedStreamBase::numBitsForBytes(size_type numBytes) 
+{
+	return numBytes << 3;
+}
+
+inline typename FixedStreamBase::TypePtr FixedStreamBase::dataBegin(void)
+{
+	return pBegin_;
+}
+
+inline typename FixedStreamBase::ConstTypePtr FixedStreamBase::dataBegin(void) const
+{
+	return pBegin_;
+}
+
+
+
+// -------------------------------------------------------------------------
+
 template<class StorageType>
 void FixedBitStream<StorageType>::write(bool bit)
 {
@@ -332,118 +462,12 @@ void FixedBitStream<StorageType>::zeroPadToLength(size_type numBytes)
 	}
 }
 
-// -------------------------------
-
-
-template<class StorageType>
-void FixedBitStream<StorageType>::reset(void)
-{
-	bitIdx_ = 0;
-	readBitIdx_ = 0;
-}
 
 // -------------------------------
-template<class StorageType>
-typename FixedBitStream<StorageType>::size_type typename FixedBitStream<StorageType>::size(void) const
-{
-	return bitIdx_ - readBitIdx_;
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::size_type typename FixedBitStream<StorageType>::sizeInBytes(void) const
-{
-	return numBytesForBits(size());
-}
-
-template<class StorageType>
-inline typename FixedBitStream<StorageType>::size_type FixedBitStream<StorageType>::freeSpace(void) const
-{
-	return capacity() - bitIdx_;
-}
-
-template<class StorageType>
-inline bool FixedBitStream<StorageType>::isEos(void) const
-{
-	return size() == 0;
-}
 
 
 // -------------------------------
 
-template<class StorageType>
-typename FixedBitStream<StorageType>::TypePtr FixedBitStream<StorageType>::ptr(void)
-{
-	return dataBegin();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::ConstTypePtr FixedBitStream<StorageType>::ptr(void) const
-{
-	return dataBegin();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::TypePtr FixedBitStream<StorageType>::data(void)
-{
-	return ptr();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::ConstTypePtr FixedBitStream<StorageType>::data(void) const
-{
-	return data();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::Iterator FixedBitStream<StorageType>::begin(void)
-{
-	return data();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::ConstIterator FixedBitStream<StorageType>::begin(void) const
-{
-	return begin();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::Iterator FixedBitStream<StorageType>::end(void)
-{
-	return pBegin_ + size();
-}
-
-template<class StorageType>
-typename FixedBitStream<StorageType>::ConstIterator FixedBitStream<StorageType>::end(void) const
-{
-	return pBegin_ + size();
-}
-
-// -------------------------------
-
-template<class StorageType>
-inline typename FixedBitStream<StorageType>::size_type FixedBitStream<StorageType>::byteIndex(void) const
-{
-	return bitIdx_ >> 3;
-}
-
-template<class StorageType>
-inline typename FixedBitStream<StorageType>::size_type FixedBitStream<StorageType>::readByteIndex(void) const
-{
-	return readBitIdx_ >> 3;
-}
-
-template<class StorageType>
-inline typename FixedBitStream<StorageType>::size_type FixedBitStream<StorageType>::numBytesForBits(size_type numBits) const
-{
-	// align so that all the bits fit.
-	return (numBits + 7) >> 3;
-}
-
-template<class StorageType>
-inline typename FixedBitStream<StorageType>::size_type FixedBitStream<StorageType>::numBitsForBytes(size_type numBytes) const
-{
-	return numBytes << 3;
-}
 
 
 
