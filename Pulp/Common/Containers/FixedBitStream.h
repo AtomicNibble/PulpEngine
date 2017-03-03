@@ -41,6 +41,11 @@ public:
 	}
 
 protected:
+	TypePtr dataBegin(void) {
+		return pBegin_;
+	}
+
+protected:
 	size_type numBits_;
 	size_type readBitIdx_;
 	size_type bitIdx_;
@@ -84,6 +89,11 @@ public:
 	}
 
 protected:
+	TypePtr dataBegin(void) {
+		return pBegin_;
+	}
+
+protected:
 	size_type numBits_;
 	size_type readBitIdx_;
 	size_type bitIdx_;
@@ -91,6 +101,51 @@ protected:
 	Type* pEnd_;
 private:
 	core::MemoryArenaBase* arena_;
+};
+
+template<size_t N>
+class FixedBitStreamStackPolicy
+{
+public:
+	typedef uint8_t Type;
+	typedef Type* TypePtr;
+	typedef Type value_type;
+	typedef size_t size_type;
+	typedef const Type* ConstTypePtr;
+	typedef Type* Iterator;
+	typedef const Type* ConstIterator;
+	typedef Type& Reference;
+	typedef Type& reference;
+	typedef const Type& ConstReference;
+	typedef const Type& const_reference;
+
+public:
+	FixedBitStreamStackPolicy() :
+		numBits_(0),
+		readBitIdx_(0),
+		bitIdx_(0)
+	{
+	}
+
+	~FixedBitStreamStackPolicy() {
+
+	}
+
+	size_type capacity(void) const {
+		return numBits_;
+	}
+
+protected:
+	TypePtr dataBegin(void) {
+		return buf_;
+	}
+
+protected:
+	size_type numBits_;
+	size_type readBitIdx_;
+	size_type bitIdx_;
+
+	Type buf_[N];
 };
 
 template<class StorageType>

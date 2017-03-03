@@ -73,7 +73,7 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 		{
 			size_type bitsToCopy = numBits - srcTrailingBits;
 			size_type bytesToCopy = numBytesForBits(bitsToCopy);
-			std::memcpy(pBegin_ + byteIndex(), pBuf, bytesToCopy);
+			std::memcpy(dataBegin() + byteIndex(), pBuf, bytesToCopy);
 			bitIdx_ += bitsToCopy;
 
 			if (srcTrailingBits == 0) {
@@ -90,7 +90,7 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 		// okay so just one byte left and we on a boundary.
 		// just flip the byte to be left aligned.
 		// and assign.
-		Type* pDst = pBegin_ + byteIndex();
+		Type* pDst = dataBegin() + byteIndex();
 		Type srcByte = *pBuf;
 
 		srcByte <<= 8 - numBits;
@@ -106,7 +106,7 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 	// shift away!
 	while (numBits >= 8)
 	{
-		Type* pDst = pBegin_ + byteIndex();
+		Type* pDst = dataBegin() + byteIndex();
 		Type srcByte = *(pBuf++);
 
 		// we place first part of srcbyte, is last bit of dst byte.
@@ -123,7 +123,7 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 	// handle last few bits
 	if (numBits)
 	{
-		Type* pDst = pBegin_ + byteIndex();
+		Type* pDst = dataBegin() + byteIndex();
 		Type srcByte = *pBuf;
 		
 		// shift them over.
@@ -373,13 +373,13 @@ inline bool FixedBitStream<StorageType>::isEos(void) const
 template<class StorageType>
 typename FixedBitStream<StorageType>::TypePtr FixedBitStream<StorageType>::ptr(void)
 {
-	return pBegin_;
+	return dataBegin();
 }
 
 template<class StorageType>
 typename FixedBitStream<StorageType>::ConstTypePtr FixedBitStream<StorageType>::ptr(void) const
 {
-	return pBegin_;
+	return dataBegin();
 }
 
 template<class StorageType>
