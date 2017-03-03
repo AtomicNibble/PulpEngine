@@ -1869,6 +1869,9 @@
     <ClCompile Include="Containers\BitStream.cpp">
       <Filter>SourceFiles\Containers</Filter>
     </ClCompile>
+    <ClCompile Include="Containers\FixedBitStream.cpp">
+      <Filter>SourceFiles\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">

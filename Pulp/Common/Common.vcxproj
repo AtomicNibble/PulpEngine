@@ -580,6 +580,7 @@
     <ClCompile Include="Compression\LZ5.cpp" />
     <ClCompile Include="Compression\Store.cpp" />
     <ClCompile Include="Containers\BitStream.cpp" />
+    <ClCompile Include="Containers\FixedBitStream.cpp" />
     <ClCompile Include="Hashing\xxHash.cpp" />
     <ClCompile Include="Math\MatrixStack.cpp" />
     <ClCompile Include="Math\XAabb.cpp" />
