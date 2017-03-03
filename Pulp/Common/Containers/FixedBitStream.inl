@@ -353,13 +353,13 @@ typename FixedBitStream<StorageType>::size_type typename FixedBitStream<StorageT
 template<class StorageType>
 inline typename FixedBitStream<StorageType>::size_type FixedBitStream<StorageType>::freeSpace(void) const
 {
-	return capacity() - size();
+	return capacity() - bitIdx_;
 }
 
 template<class StorageType>
 inline bool FixedBitStream<StorageType>::isEos(void) const
 {
-	return size() == capacity();
+	return size() == 0;
 }
 
 
