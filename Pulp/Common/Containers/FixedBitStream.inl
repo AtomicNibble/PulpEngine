@@ -59,6 +59,9 @@ void FixedBitStream<StorageType>::writeBits(const Type* pBuf, size_type numBits)
 		return;
 	}
 
+	X_ASSERT(numBits <= freeSpace(), "Tried to write more bits than avalible space")(numBits, size(), freeSpace(), isEos());
+
+
 	size_type bitsMod8 = bitIdx_ & 7;
 	size_type srcTrailingBits = numBits & 7;
 
@@ -194,6 +197,8 @@ void FixedBitStream<StorageType>::readBits(Type* pBuf, size_type numBits)
 	if (!numBits) {
 		return;
 	}
+
+	X_ASSERT(numBits <= size(), "Tried to read more bits than avalible")(numBits, size(), freeSpace(), isEos());
 
 	size_type bitsMod8 = readBitIdx_ & 7;
 	size_type srcTrailingBits = numBits & 7;
