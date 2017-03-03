@@ -50,7 +50,7 @@ inline FixedBitStreamStackPolicy<N>::~FixedBitStreamStackPolicy()
 
 inline FixedStreamBase::FixedStreamBase(size_type numBits) :
 	pBegin_(nullptr),
-	numBits_(0),
+	numBits_(numBits),
 	readBitIdx_(0),
 	bitIdx_(0)
 {
@@ -59,7 +59,7 @@ inline FixedStreamBase::FixedStreamBase(size_type numBits) :
 
 inline FixedStreamBase::FixedStreamBase(TypePtr pBegin, size_type numBits) :
 	pBegin_(pBegin),
-	numBits_(0),
+	numBits_(numBits),
 	readBitIdx_(0),
 	bitIdx_(0)
 {
