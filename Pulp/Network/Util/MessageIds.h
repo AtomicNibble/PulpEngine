@@ -95,6 +95,9 @@ X_DECLARE_ENUM8(MessageID)(
 	// a Ping from a un-connected system
 	/// action: reply, skip timestamp update.
 	UnConnectedPing,
+	// a Ping from a un-connected system
+	/// action: reply if we have open connections, skip timestamp update.
+	UnConnectedPingOpenConnections,
 	// a Pong from a un-connected system
 	/// action: reply, skip timestamp update.
 	UnConnectedPong,
