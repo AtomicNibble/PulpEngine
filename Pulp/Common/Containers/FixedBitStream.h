@@ -47,8 +47,7 @@ class FixedBitStreamNoneOwningPolicy : public FixedStreamBase
 public:
 	FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
 		FixedStreamBase(core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin))),
-		pBegin_(pBegin),
-		pEnd_(pEnd)
+		pBegin_(pBegin)
 	{
 		if (dataInit) {
 			bitIdx_ = numBits_;
@@ -65,7 +64,6 @@ protected:
 
 protected:
 	Type* pBegin_;
-	Type* pEnd_;
 };
 
 class FixedBitStreamOwningPolicy : public FixedStreamBase
@@ -77,7 +75,6 @@ public:
 	{
 		size_type numBytes = core::bitUtil::RoundUpToMultiple(numBits, 8_sz);
 		pBegin_ = X_NEW_ARRAY(Type, numBytes, arena_, "FixedBitStream");
-		pEnd_ = pBegin_ + numBytes;
 	}
 
 	~FixedBitStreamOwningPolicy() {
@@ -94,7 +91,6 @@ protected:
 	size_type readBitIdx_;
 	size_type bitIdx_;
 	Type* pBegin_;
-	Type* pEnd_;
 private:
 	core::MemoryArenaBase* arena_;
 };
