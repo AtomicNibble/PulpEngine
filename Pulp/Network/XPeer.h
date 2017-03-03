@@ -31,7 +31,15 @@ X_DECLARE_ENUM(ConnectState)(
 
 struct BufferdCommand
 {
+	X_DECLARE_ENUM(Cmd) (
+		Send,
+		CloseConnection
+	);
+
 	uint8_t* pData;
+
+	// 4
+	Cmd::Enum cmd;
 
 	// 4
 	BitSizeT numberOfBitsToSend;
@@ -70,6 +78,13 @@ public:
 	RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
 
 	bool canSend(void) const;
+
+	void disconnect(void);
+
+	void onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
+		core::TimeVal sendPingTime, core::TimeVal sendPongTime);
+
+	void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
 public:
 	bool isActive;
@@ -119,16 +134,10 @@ struct Ban
 };
 
 // just to keep track of it's size for memory bandwidth consierations
+// X_ENSURE_SIZE(BufferdCommand, 40) 
+// X_ENSURE_SIZE(RemoteSystem, 520 + sizeof(ReliabilityLayer))
+// X_ENSURE_SIZE(RequestConnection, 72)
 
-#if X_64
-X_ENSURE_SIZE(BufferdCommand, 48) 
-X_ENSURE_SIZE(RemoteSystem, 528 + sizeof(ReliabilityLayer))
-X_ENSURE_SIZE(RequestConnection, 72)
-#else
-X_ENSURE_SIZE(BufferdCommand, 48)
-X_ENSURE_SIZE(RemoteSystem, 480 + sizeof(ReliabilityLayer))
-X_ENSURE_SIZE(RequestConnection, 72)
-#endif // !X_64
 
 class XPeer : public IPeer
 {
@@ -181,6 +190,7 @@ class XPeer : public IPeer
 	static const size_t MAX_POOL_ALLOC = 2048; // packets and buffered commands
 
 	static std::array<uint32_t, 3> MTUSizesArr;
+
 public:
 	XPeer(NetVars& vars, core::MemoryArenaBase* arena);
 	~XPeer() X_FINAL;
@@ -202,14 +212,12 @@ public:
 	ConnectionState::Enum getConnectionState(const AddressOrGUID systemIdentifier) X_FINAL;
 	void cancelConnectionAttempt(const ISystemAdd* pTarget) X_FINAL;
 
-
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
 
 	void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 
 	Packet* receive(void) X_FINAL;
-
 
 	// connection limits
 	void setMaximumIncomingConnections(uint16_t numberAllowed) X_FINAL;
@@ -262,6 +270,10 @@ private:
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, 
 		core::TimeVal currentTime, uint32_t receipt);
 
+	void sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate);
+	void closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
+		bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
+
 	void processBufferdCommand(BufferdCommand& cmd);
 
 
@@ -284,7 +296,7 @@ private:
 	Packet* allocPacket(size_t lengthBits);
 	void freePacket(Packet* pPacket) X_FINAL;
 
-	BufferdCommand* allocBufferdCmd(size_t lengthBits);
+	BufferdCommand* allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits);
 	void freebufferdCmd(BufferdCommand* pBufCmd);
 
 	uint8_t* allocPacketData(size_t lengthBytes);
@@ -302,22 +314,30 @@ private:
 	void processRecvData(void);
 	void processConnectionRequests(void);
 	void processBufferdCommands(void);
+	void peerReliabilityTick(void);
+
 
 	void processRecvData(RecvData* pRecvData, int32_t byteOffset);
 
 	// some msg handlers.
-	void handleConnectionFailure(RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);
+	void handleConnectionFailure(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);
 	// connection open msg's
-	void handleOpenConnectionRequest(RecvData* pData, RecvBitStream& bs);
-	void handleOpenConnectionResponse(RecvData* pData, RecvBitStream& bs);
-	void handleOpenConnectionRequestStage2(RecvData* pData, RecvBitStream& bs);
-	void handleOpenConnectionResponseStage2(RecvData* pData, RecvBitStream& bs);
-	// connection request
-	void handleConnectionRequest(RecvData* pData, RecvBitStream& bs);
-	void handleConnectionRequestAccepted(RecvData* pData, RecvBitStream& bs);
-	void handleConnectionRequestHandShake(RecvData* pData, RecvBitStream& bs);
-
+	void handleOpenConnectionRequest(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionResponse(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionRequestStage2(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionResponseStage2(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
 	// ------
+	void handleUnConnectedPing(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired);
+	void handleUnConnectedPong(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+
+	// conencted handlers
+	void handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectionRequestAccepted(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectionRequestHandShake(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+
+	void handleConnectedPing(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+
 
 
 
@@ -325,7 +345,7 @@ private:
 
 	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
 		NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state);
-	bool isIpConnectSpamming(const SystemAdd& sysAdd);
+	bool isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOut = nullptr);
 
 	// ------
 

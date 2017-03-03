@@ -12,51 +12,71 @@ typedef uint32_t SplitPacketIndex;
 typedef uint16_t MessageNumber;
 typedef uint16_t OrderingIndex;
 
+typedef core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> FixedBitStream;
 
-struct PacketHeader
+
+struct ReliablePacket
 {
+	ReliablePacket();
+
+	void writeToBitStream(FixedBitStream& bs) const;
+	bool fromBitStream(FixedBitStream& bs);
+
 	MessageNumber reliableMessageNumber;
 	OrderingIndex orderingIndex;
 	OrderingIndex sequencingIndex;
 
+	PacketReliability::Enum reliability;
+	PacketPriority::Enum priority;
+	uint8_t sendAttemps;
+
 	uint8_t orderingChannel;
 	SplitPacketId splitPacketId;
 	SplitPacketIndex splitPacketIndex;
-	SplitPacketIndex splitPacketCount;;
-	BitSizeT dataBitLength;
-	PacketReliability::Enum reliability;
-};
-
-struct RelPacket : public PacketHeader
-{
+	SplitPacketIndex splitPacketCount;
 
 	core::TimeVal creationTime;			// 
 	core::TimeVal nextActionTime;		// 
 	core::TimeVal retransmissionTime;	// 
 
-	uint8_t sendAttemps;
-	PacketPriority::Enum priority;
+	BitSizeT dataBitLength;
+	uint8_t* pData;
 };
 
-static_assert(core::compileTime::IsPOD<PacketHeader>::Value, "Packet header should be POD");
+static const size_t goat = sizeof(ReliablePacket);
+// static_assert(core::compileTime::IsPOD<RelPacket>::Value, "Packet header should be POD");
+
 
 class ReliabilityLayer
 {
 	typedef std::array<OrderingIndex, MAX_ORDERED_STREAMS> OrdereIndexArr;
-	typedef core::Fifo<RelPacket*> PacketQeue;
+	typedef core::Fifo<ReliablePacket*> PacketQeue;
+
+public:
+	struct PacketData
+	{
+		uint8_t* pData;
+		BitSizeT numBits;
+	};
 
 public:
 	ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
 	~ReliabilityLayer();
 
-
-
+	// que some data for sending, reliability is handled.
 	bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
 		PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel,  uint32_t receipt);
 
+	// pass data from socket for processing
+	bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,
+		SystemAdd& systemAddress, core::TimeVal time, uint32_t mtuSize);
 
-	void update(NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize, 
+	// update internal logic, re-send packets / other reliability actions.
+	void update(FixedBitStream& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
 		core::TimeVal time, size_t bitsPerSecondLimit);
+
+	// pop any packets that have arrived.
+	bool recive(PacketData& dataOut);
 
 
 	X_INLINE void setTimeout(core::TimeVal timeout);
@@ -66,7 +86,10 @@ public:
 	X_INLINE core::TimeVal getUnreliableMsgTimeout(void);
 
 private:
-	RelPacket* allocPacket(void);
+	void sendBitStream(NetSocket& socket, FixedBitStream& bs, SystemAdd& systemAddress);
+
+	ReliablePacket* allocPacket(void);
+	void freePacket(ReliablePacket* pPacker);
 
 
 private:
@@ -85,6 +108,7 @@ private:
 
 
 	PacketQeue outGoingPackets_;
+	PacketQeue recivedPackets_;
 };
 
 X_NAMESPACE_END

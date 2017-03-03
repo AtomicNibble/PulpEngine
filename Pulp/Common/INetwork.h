@@ -163,8 +163,8 @@ public:
 	typedef NetGuidStr StrBuf;
 
 public:
-	X_INLINE NetGUID() : val_(0), sysIdx_(0) {}
-	X_INLINE explicit NetGUID(uint64_t d) : val_(d), sysIdx_(0) {}
+	X_INLINE NetGUID() : val_(0) {}
+	X_INLINE explicit NetGUID(uint64_t d) : val_(d) {}
 
 
 	X_INLINE bool operator==(const NetGUID& rhs) const
@@ -191,7 +191,7 @@ public:
 
 private:
 	uint64_t val_;
-	SystemIndex sysIdx_;
+	// SystemIndex sysIdx_;
 };
 
 // ---------------------------------
@@ -262,7 +262,7 @@ struct Packet
 	uint8_t* pData; // data from sender.
 };
 
-X_ENSURE_SIZE(Packet, 40)
+X_ENSURE_SIZE(Packet, 32)
 
 // ---------------------------------
 
