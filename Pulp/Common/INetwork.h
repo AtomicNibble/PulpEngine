@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(net)
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
 static const uint32_t MAX_SUPPORTED_PEERS = 1 << 10; // go nuts.
 static const uint32_t MAX_BAN_ENTRIES = 256; // max bans entries you can add, wildcards supported.
-
+static const uint32_t MAX_PASSWORD_LEN = 64;
 
 X_DECLARE_ENUM8(ConnectionState)(
 	Pending,
@@ -80,6 +80,7 @@ typedef uint32_t BitSizeT;
 typedef core::StackString<512, char> HostAddStr;
 typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 64 bytes for x64.
 typedef core::StackString<46, char> NetGuidStr;
+typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
 
 // ---------------------------------
 
