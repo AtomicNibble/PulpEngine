@@ -145,6 +145,18 @@ X_DECLARE_ENUM8(MessageID)(
 	/// action: read the ratelimit time, and try again after elapsed.
 	ConnectionRateLimited,
 
+	// the remote system has disconnected from us. if we client server has closed. if server, client has left.
+	/// action: panic!
+	DisconnectNotification,
+
+	InvalidPassword,
+
+	// ----------------
+
+	SndReceiptAcket,
+	SndReceiptLost,
+
+
 	// ----- Misc ----- 
 
 	// a remote system reposts stu as still missing
