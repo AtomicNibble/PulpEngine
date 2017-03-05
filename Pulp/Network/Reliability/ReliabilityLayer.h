@@ -12,15 +12,13 @@ typedef uint32_t SplitPacketIndex;
 typedef uint16_t MessageNumber;
 typedef uint16_t OrderingIndex;
 
-typedef core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> FixedBitStream;
-
 
 struct ReliablePacket
 {
 	ReliablePacket();
 
-	void writeToBitStream(FixedBitStream& bs) const;
-	bool fromBitStream(FixedBitStream& bs);
+	void writeToBitStream(core::FixedBitStreamBase& bs) const;
+	bool fromBitStream(core::FixedBitStreamBase& bs);
 
 	MessageNumber reliableMessageNumber;
 	OrderingIndex orderingIndex;
@@ -72,7 +70,7 @@ public:
 		SystemAdd& systemAddress, core::TimeVal time, uint32_t mtuSize);
 
 	// update internal logic, re-send packets / other reliability actions.
-	void update(FixedBitStream& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
+	void update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
 		core::TimeVal time, size_t bitsPerSecondLimit);
 
 	// pop any packets that have arrived.
@@ -93,7 +91,7 @@ public:
 
 
 private:
-	void sendBitStream(NetSocket& socket, FixedBitStream& bs, SystemAdd& systemAddress);
+	void sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
 
 	ReliablePacket* allocPacket(void);
 	void freePacket(ReliablePacket* pPacker);

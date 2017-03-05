@@ -21,21 +21,21 @@ namespace
 
 	struct DatagramHdr
 	{
-		void writeToBitStream(FixedBitStream& bs) const;
-		void fromBitStream(FixedBitStream& bs);
+		void writeToBitStream(core::FixedBitStreamBase& bs) const;
+		void fromBitStream(core::FixedBitStreamBase& bs);
 
 		uint16_t number;
 		DatagramFlags flags;
 	};
 
-	void DatagramHdr::writeToBitStream(FixedBitStream& bs) const
+	void DatagramHdr::writeToBitStream(core::FixedBitStreamBase& bs) const
 	{
 		bs.write(number);
 		bs.write(flags);
 		bs.alignWriteToByteBoundry();
 	}
 
-	void DatagramHdr::fromBitStream(FixedBitStream& bs)
+	void DatagramHdr::fromBitStream(core::FixedBitStreamBase& bs)
 	{
 		bs.read(number);
 		bs.read(flags);
@@ -59,7 +59,7 @@ ReliablePacket::ReliablePacket()
 }
 
 
-void ReliablePacket::writeToBitStream(FixedBitStream& bs) const
+void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
 
 	bs.writeBits(reinterpret_cast<const uint8_t*>(&reliability), core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT));
@@ -96,7 +96,7 @@ void ReliablePacket::writeToBitStream(FixedBitStream& bs) const
 }
 
 
-bool ReliablePacket::fromBitStream(FixedBitStream& bs)
+bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 {
 	uint8_t rel;
 	uint16_t bits;
@@ -242,7 +242,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 	return true;
 }
 
-void ReliabilityLayer::update(FixedBitStream& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
+void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
 	core::TimeVal time, size_t bitsPerSecondLimit)
 {
 	bs.reset();
@@ -286,7 +286,7 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	return true;
 }
 
-void ReliabilityLayer::sendBitStream(NetSocket& socket, FixedBitStream& bs, SystemAdd& systemAddress)
+void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
 {
 	SendParameters sp;
 	sp.setData(bs);
