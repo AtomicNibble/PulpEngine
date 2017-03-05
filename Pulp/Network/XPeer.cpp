@@ -1477,8 +1477,23 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 
 		if (disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut)
 		{
-			IPStr ipStr;
-			X_LOG0_IF(vars_.debugEnabled(), "Net", "Closing connection for remote system: \"%s\"", rs.systemAddress.toString(ipStr));
+			if (vars_.debugEnabled())
+			{
+				const char* pCloseReason = "<ukn>";
+
+				if (disconnectingNoData) {
+					pCloseReason = "Disconnection request";
+				}
+				else if (connectionOpenTimeout) {
+					pCloseReason = "Partial connection timeout";
+				}
+				else if (dissconectAckTimedOut) {
+					pCloseReason = "Discconect ack timeout";
+				}
+
+				IPStr ipStr;
+				X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
+			}
 
 			// ya cunt!
 			Packet* pPacket = allocPacket(8);
