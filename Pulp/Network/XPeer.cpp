@@ -2337,6 +2337,8 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 			remoteSys.pings.fill(PingAndClockDifferential());
 			remoteSys.lastPingIdx = 0;
 
+			remoteSys.relLayer.reset(remoteMTU);
+
 			remoteSys.guid = guid;
 			remoteSys.lowestPing = UNDEFINED_PING;
 			remoteSys.MTUSize = remoteMTU;
