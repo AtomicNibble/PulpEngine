@@ -1328,7 +1328,18 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 {
 	X_ASSERT_NOT_NULL(pTarget);
 
-	return false;
+	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(pTarget);
+	auto* pRemoteSys = getRemoteSystem(*pSysAdd, false);
+
+	if (pRemoteSys) {
+		X_WARNING("Net", "Failed to find remote system for stat retrival");
+		return false;
+	}
+
+	stats.connectionStartTime = pRemoteSys->connectionTime;
+
+	pRemoteSys->relLayer.getStatistics(stats);
+	return true;
 }
 
 
