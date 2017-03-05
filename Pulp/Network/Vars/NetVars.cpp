@@ -36,7 +36,7 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_partial_connection_timeout", dropPartialConnectionsMS_, 3000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"The amount of time in MS before dropping a incomplete connection");
 	
-	ADD_CVAR_REF("net_debug", pingTimeMS_, 5000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("net_ping_interval", pingTimeMS_, 1000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Min amount of time between pings");
 
 
