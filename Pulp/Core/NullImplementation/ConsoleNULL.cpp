@@ -149,6 +149,8 @@ ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
 	X_UNUSED(flags);
 	X_UNUSED(desc);
 
+	*src = defaultvalue;
+
 	return nullptr;
 }
 
@@ -162,6 +164,8 @@ ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue,
 	X_UNUSED(Max);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
+
+	*src = defaultvalue;
 
 	return nullptr;
 }
@@ -186,6 +190,8 @@ ICVar* XConsoleNULL::Register(const char* name, Vec3f* src, Vec3f defaultvalue,
 	X_UNUSED(defaultvalue);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
+
+	*src = defaultvalue;
 
 	return nullptr;
 }
