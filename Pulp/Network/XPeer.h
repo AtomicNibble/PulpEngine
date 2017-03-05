@@ -158,7 +158,8 @@ class XPeer : public IPeer
 
 	// a bit stream that don't own the memory.
 	// we just read directly off the recived buffer.
-	typedef core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> RecvBitStream;
+	typedef core::FixedBitStreamBase RecvBitStream;
+	typedef core::FixedBitStreamBase UpdateBitStream;
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -236,7 +237,7 @@ public:
 		uint32_t connectionSocketIndex = 0) X_FINAL;
 
 	// bans at connection level.
-	void addToBanList(const char* pIP, core::TimeVal timeout = core::TimeVal()) X_FINAL;
+	void addToBanList(const IPStr& ip, core::TimeVal timeout = core::TimeVal()) X_FINAL;
 	void removeFromBanList(const char* pIP) X_FINAL;
 	bool isBanned(const char* pIP) X_FINAL;
 	bool isBanned(const IPStr& ip);
@@ -260,7 +261,6 @@ public:
 	// ~IPeer
 
 	void setUnreliableTimeout(core::TimeVal timeout);
-	void setConnectionRateLimit(core::TimeVal time);
 
 	bool accpetingIncomingConnections(void) const;
 	// the number of remote connections to us.
@@ -321,29 +321,30 @@ private:
 	void peerReliabilityTick(void);
 
 
-	void processRecvData(RecvData* pRecvData, int32_t byteOffset);
+	void processRecvData(UpdateBitStream& updateBS, RecvData* pRecvData, int32_t byteOffset);
+	void processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData, UpdateBitStream& stream, MessageID::Enum msgId);
 
 	// some msg handlers.
-	void handleConnectionFailure(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);
+	void handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);
 	// connection open msg's
-	void handleOpenConnectionRequest(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
-	void handleOpenConnectionResponse(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
-	void handleOpenConnectionRequestStage2(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
-	void handleOpenConnectionResponseStage2(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionRequest(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionResponse(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionRequestStage2(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleOpenConnectionResponseStage2(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
 	// ------
-	void handleUnConnectedPing(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired);
-	void handleUnConnectedPong(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
+	void handleUnConnectedPing(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired);
+	void handleUnConnectedPong(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
 
 	// conencted handlers
-	void handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
-	void handleConnectionRequestAccepted(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
-	void handleConnectionRequestHandShake(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
-	void handleConnectedPing(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
-	void handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectedPong(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
-	void handleDisconnectNotification(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
-	void handleInvalidPassword(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleDisconnectNotification(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleInvalidPassword(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
 
 
@@ -371,7 +372,6 @@ private:
 
 	core::TimeVal defaultTimeOut_;
 	core::TimeVal unreliableTimeOut_;
-	core::TimeVal connectionRateLimitTime_;
 	int32_t defaultMTU_;
 	int32_t maxIncommingConnections_;
 	int32_t maxPeers_;

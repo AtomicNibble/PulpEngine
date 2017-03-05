@@ -194,7 +194,6 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 
 	guid_ = XNet::generateGUID();
 
-	connectionRateLimitTime_ = core::TimeVal::fromMS(500);
 	defaultTimeOut_ = core::TimeVal::fromMS(1000);
 	unreliableTimeOut_ = core::TimeVal::fromMS(1000 * 10);
 
@@ -1049,8 +1048,6 @@ void XPeer::sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool 
 {
 	core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
 
-	core::FixedStreamBase* pPlz = &bsOut;
-	
 	core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 	bsOut.write(MessageID::ConnectedPing);
 	bsOut.write(now.GetValue());
@@ -1083,11 +1080,10 @@ void XPeer::sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool 
 
 
 // bans at connection level.
-void XPeer::addToBanList(const char* pIP, core::TimeVal timeout)
+void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
 {
-	IPStr ip(pIP);
-
 	if (ip.isEmpty()) {
+		X_WARNING("Net", "Passed empty ip to ban list");
 		return;
 	}
 
@@ -1154,11 +1150,29 @@ bool XPeer::isBanned(const IPStr& ip)
 		return false;
 	}
 
-	for (auto& ban : bans_) {
-		if (ipWildMatch(ban.ip, ip)) {
+	for (auto it = bans_.begin(); it != bans_.end(); /* ++it */)
+	{
+		auto& ban = (*it);
+
+		if (ipWildMatch(ban.ip, ip)) 
+		{
+			// expired?
+			if (ban.timeOut.GetValue() != 0)
+			{
+				core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
+				if (time > ban.timeOut)
+				{
+					it = bans_.erase(it);
+					continue;
+				}
+			}
+
 			return true;
 		}
+
+		++it;
 	}
+
 	return false;
 }
 
@@ -1243,11 +1257,6 @@ void XPeer::setUnreliableTimeout(core::TimeVal timeout)
 	unreliableTimeOut_ = timeout;
 }
 
-void XPeer::setConnectionRateLimit(core::TimeVal time)
-{
-	connectionRateLimitTime_ = time;
-}
-
 bool XPeer::accpetingIncomingConnections(void) const
 {
 	return getNumRemoteInitiatedConnections() < getMaximumIncomingConnections();
@@ -1296,19 +1305,6 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 // ~IPeer
 
-void XPeer::processRecvData(void)
-{
-	RecvData* pRecvData = nullptr;
-	while (recvDataQue_.tryPop(pRecvData))
-	{
-		// OFFLINE_MSG_ID
-
-		processRecvData(pRecvData, 0);
-
-		freeRecvData(pRecvData);
-	}
-}
-
 
 void XPeer::processConnectionRequests(void)
 {
@@ -1342,7 +1338,6 @@ void XPeer::processConnectionRequests(void)
 				pPacket->pData[0] = MessageID::ConnectionRequestFailed;
 				pPacket->pSystemAddress = nullptr; // fuck
 				pushBackPacket(pPacket);
-
 				continue;
 			}
 
@@ -1431,16 +1426,6 @@ void XPeer::peerReliabilityTick(void)
 
 		rs.relLayer.update(bs, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, time, 1000);
 
-		if (rs.connectState == ConnectState::Connected && time > rs.nextPingTime)
-		{
-			rs.nextPingTime = time + core::TimeVal::fromMS(5000);
-			sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
-
-		}
-
-		core::TimeVal dropCon = core::TimeVal::fromMS(5000);
-
-
 		const bool deadConnection = rs.relLayer.isConnectionDead();
 		const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
 		const bool disconnectingAfterAck = rs.connectState == ConnectState::DisconnectOnNoAck;
@@ -1449,9 +1434,10 @@ void XPeer::peerReliabilityTick(void)
 										  rs.connectState == ConnectState::UnverifiedSender;
 
 		// has this connection not completed yet?
-		bool connectionOpenTimeout = (waitingforConnection && time > (rs.connectionTime + dropCon));
-		bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
-		bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
+		const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
+		const bool connectionOpenTimeout = (waitingforConnection && time > (rs.connectionTime + dropCon));
+		const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
+		const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
 
 		if (disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut)
 		{
@@ -1476,6 +1462,13 @@ void XPeer::peerReliabilityTick(void)
 
 
 			closeConnectionInternal(AddressOrGUID(&rs.systemAddress), false, true, 0, PacketPriority::Low);
+			continue;
+		}
+
+		if (rs.connectState == ConnectState::Connected && time > rs.nextPingTime)
+		{
+			rs.nextPingTime = time + core::TimeVal::fromMS(vars_.pingTimeMS());
+			sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
 		}
 
 
@@ -1489,7 +1482,7 @@ void XPeer::peerReliabilityTick(void)
 				continue;
 			}
 
-			RecvBitStream stream(data.pData, data.pData + core::bitUtil::bitsToBytes(data.numBits), true);
+			core::FixedBitStreamNoneOwning stream(data.pData, data.pData + core::bitUtil::bitsToBytes(data.numBits), true);
 			MessageID::Enum msgId = stream.read<MessageID::Enum>();
 
 			if (msgId >= MessageID::ENUM_COUNT) {
@@ -1500,8 +1493,7 @@ void XPeer::peerReliabilityTick(void)
 			X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
 
 			// okay process the msg!
-			uint8_t buffer1[MAX_MTU_SIZE];
-			FixedBitStream tmpBs(buffer1, buffer1 + MAX_MTU_SIZE, false);
+			core::FixedBitStreamStack<MAX_MTU_SIZE> tmpBs;
 
 			switch (msgId)
 			{
@@ -1542,37 +1534,47 @@ void XPeer::peerReliabilityTick(void)
 }
 
 
-void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
+void XPeer::processRecvData(void)
+{
+	// use a single BS instance for processing all the data, to try improve cache hits.
+	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+
+	RecvData* pRecvData = nullptr;
+	while (recvDataQue_.tryPop(pRecvData))
+	{
+		updateBS.reset();
+		processRecvData(updateBS, pRecvData, 0);
+
+		freeRecvData(pRecvData);
+	}
+}
+
+
+void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData, int32_t byteOffset)
 {
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT_NOT_NULL(pData->pSrcSocket);
 	X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")(pData, pData->bytesRead);
 
-	SystemAdd& sysAdd = pData->systemAdd;
-	NetSocket& socket = *pData->pSrcSocket;
+	IPStr ipStr;
+	pData->systemAdd.toString(ipStr, false);
 
-	IPStr strBuf;
-	pData->systemAdd.toString(strBuf, false);
-
-	uint8_t buf[MAX_MTU_SIZE];
-	FixedBitStream bsOut(buf, buf + sizeof(buf), false);
-
-	if (isBanned(strBuf))
+	if (isBanned(ipStr))
 	{
 		// you fucking twat!
-		bsOut.write(MessageID::ConnectionBanned);
-		bsOut.write(OFFLINE_MSG_ID);
-		bsOut.write(guid_);
+		updateBS.write(MessageID::ConnectionBanned);
+		updateBS.write(OFFLINE_MSG_ID);
+		updateBS.write(guid_);
 
 		SendParameters sp;
-		sp.setData(bsOut);
+		sp.setData(updateBS);
 		sp.systemAddress = pData->systemAdd;
 		pData->pSrcSocket->send(sp);
 		return;
 	}
 
 	// create a fixed bitstrem around the recvData to make it easy to read the data.
-	RecvBitStream stream(pData->data + byteOffset, pData->data + pData->bytesRead, true);
+	core::FixedBitStreamNoneOwning stream(pData->data + byteOffset, pData->data + pData->bytesRead, true);
 
 	X_ASSERT(stream.size() > 0, "Stream is empty")(stream.size(), stream.capacity());
 
@@ -1583,6 +1585,7 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 		return;
 	}
 
+	// ignore?
 	if (msgId == MessageID::SendTest) {
 		return;
 	}
@@ -1600,26 +1603,36 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 	if (!offlineMsg) {
 		RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAdd, true);
 		if (!pRemoteSys) {
+			X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", ipStr);
 
+			// temp ban them.
+			addToBanList(ipStr, defaultTimeOut_);
 			return;
 		}
 
 		pRemoteSys->relLayer.recv(
-			pData->data + byteOffset, 
-			pData->bytesRead, 
-			*pData->pSrcSocket, 
+			pData->data + byteOffset,
+			pData->bytesRead,
+			*pData->pSrcSocket,
 			pData->systemAdd,
-			pData->timeRead, 
+			pData->timeRead,
 			pRemoteSys->MTUSize
 		);
 		return;
 	}
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived offline messageId: \"%s\"", MessageID::ToString(msgId));
-
 	stream.skipBytes(OFFLINE_MSG_ID.size());
 
-	switch(msgId)
+	processOfflineMsg(updateBS, pData, stream, msgId);
+
+}
+
+void XPeer::processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData,
+	RecvBitStream& stream, MessageID::Enum msgId)
+{
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived offline messageId: \"%s\"", MessageID::ToString(msgId));
+
+	switch (msgId)
 	{
 		case MessageID::ProtcolVersionIncompatible:
 		case MessageID::ConnectionRequestFailed:
@@ -1627,34 +1640,34 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 		case MessageID::ConnectionNoFreeSlots:
 		case MessageID::ConnectionRateLimited:
 		case MessageID::InvalidPassword:
-			handleConnectionFailure(bsOut, pData, stream, msgId);
+			handleConnectionFailure(updateBS, pData, stream, msgId);
 			break;
 
 		case MessageID::OpenConnectionRequest:
-			handleOpenConnectionRequest(bsOut, pData, stream);
+			handleOpenConnectionRequest(updateBS, pData, stream);
 			break;
 		case MessageID::OpenConnectionRequestStage2:
-			handleOpenConnectionRequestStage2(bsOut, pData, stream);
+			handleOpenConnectionRequestStage2(updateBS, pData, stream);
 			break;
 		case MessageID::OpenConnectionResponse:
-			handleOpenConnectionResponse(bsOut, pData, stream);
+			handleOpenConnectionResponse(updateBS, pData, stream);
 			break;
 		case MessageID::OpenConnectionResponseStage2:
-			handleOpenConnectionResponseStage2(bsOut, pData, stream);
+			handleOpenConnectionResponseStage2(updateBS, pData, stream);
 			break;
 
 			// hello.
 		case MessageID::UnConnectedPing:
 		case MessageID::UnConnectedPingOpenConnections:
-			handleUnConnectedPing(bsOut, pData, stream, msgId == MessageID::UnConnectedPingOpenConnections);
+			handleUnConnectedPing(updateBS, pData, stream, msgId == MessageID::UnConnectedPingOpenConnections);
 			return;
 
 
-		// hello.
+			// hello.
 		case MessageID::SendTest:
 			return;
 
-		// one day.
+			// one day.
 		case MessageID::StuNotFnd:
 			return;
 
@@ -1663,11 +1676,10 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 			X_ERROR("Net", "Unhandled message: \"%s\"", MessageID::ToString(msgId));
 			break;
 	}
-
 }
 
 
-void XPeer::handleConnectionFailure(FixedBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType)
+void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType)
 {
 	NetGUID guid;
 	bs.read(guid);
@@ -1698,7 +1710,7 @@ void XPeer::handleConnectionFailure(FixedBitStream& bsBuf, RecvData* pData, Recv
 	pushBackPacket(pPacket);
 }
 
-void XPeer::handleOpenConnectionRequest(FixedBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
 	// hello, pleb.
 	uint8_t protoVersionMajor = bs.read<uint8_t>();
@@ -1737,7 +1749,7 @@ void XPeer::handleOpenConnectionRequest(FixedBitStream& bsOut, RecvData* pData, 
 	pData->pSrcSocket->send(sp);
 }
 
-void XPeer::handleOpenConnectionResponse(FixedBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
 	// hello almighty server.
 	NetGUID serverGuid;
@@ -1775,7 +1787,7 @@ void XPeer::handleOpenConnectionResponse(FixedBitStream& bsOut, RecvData* pData,
 	X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr);
 }
 
-void XPeer::handleOpenConnectionRequestStage2(FixedBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
 	// you stull here ? jesus christ.
 	SystemAdd bindingAdd;
@@ -1819,7 +1831,7 @@ void XPeer::handleOpenConnectionRequestStage2(FixedBitStream& bsOut, RecvData* p
 		{
 			// is this peer a grade F twat?
 			core::TimeVal lastConnectDelta;
-			if (isIpConnectSpamming(pData->systemAdd, &lastConnectDelta))
+			if (vars_.rlConnectionsPerIP() && isIpConnectSpamming(pData->systemAdd, &lastConnectDelta))
 			{
 				// you noob, can you even coun to 10?
 				// NO!
@@ -1829,7 +1841,7 @@ void XPeer::handleOpenConnectionRequestStage2(FixedBitStream& bsOut, RecvData* p
 
 
 				// i don't care if this ratelimit is allmost over and you could technically connect again sooner.
-				uint32_t timeMs = safe_static_cast<uint32_t>(connectionRateLimitTime_.GetMilliSecondsAsInt64());
+				uint32_t timeMs = vars_.rlConnectionsPerIPBanTimeMS();
 
 				bsOut.write(MessageID::ConnectionRateLimited);
 				bsOut.write(OFFLINE_MSG_ID);
@@ -1856,7 +1868,7 @@ void XPeer::handleOpenConnectionRequestStage2(FixedBitStream& bsOut, RecvData* p
 	pData->pSrcSocket->send(sp);
 }
 
-void XPeer::handleOpenConnectionResponseStage2(FixedBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
+void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
 	// meow.
 	// if we here the response was valid annd == OpenConnectionResponseStage2
@@ -1936,7 +1948,7 @@ void XPeer::handleOpenConnectionResponseStage2(FixedBitStream& bsOut, RecvData* 
 }
 
 
-void XPeer::handleUnConnectedPing(FixedBitStream& bsOut, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired)
+void XPeer::handleUnConnectedPing(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs, bool openConnectionsRequired)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived unConnectedPing");
 
@@ -1962,7 +1974,7 @@ void XPeer::handleUnConnectedPing(FixedBitStream& bsOut, RecvData* pData, RecvBi
 	pData->pSrcSocket->send(sp);
 }
 
-void XPeer::handleUnConnectedPong(FixedBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
+void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived unConnectedPong");
 
@@ -1986,7 +1998,7 @@ void XPeer::handleUnConnectedPong(FixedBitStream& bsOut, RecvData* pData, RecvBi
 
 // ----------------------------------------------------
 
-void XPeer::handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	NetGUID clientGuid;
 	int64_t timeStamp;
@@ -2000,7 +2012,8 @@ void XPeer::handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, Re
 		closeConnectionInternal(AddressOrGUID(&rs.systemAddress), false, true, 0, PacketPriority::Low);
 
 		IPStr ipStr;
-		addToBanList(rs.systemAddress.toString(ipStr), rs.relLayer.getTimeout());
+		rs.systemAddress.toString(ipStr);
+		addToBanList(ipStr, rs.relLayer.getTimeout());
 		return;
 	}
 
@@ -2067,7 +2080,7 @@ void XPeer::handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, Re
 }
 
 
-void XPeer::handleConnectionRequestAccepted(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request accepted");
 
@@ -2131,7 +2144,7 @@ void XPeer::handleConnectionRequestAccepted(FixedBitStream& bsOut, RecvBitStream
 	pushBackPacket(pPacket);
 }
 
-void XPeer::handleConnectionRequestHandShake(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request handshake");
 
@@ -2171,7 +2184,7 @@ void XPeer::handleConnectionRequestHandShake(FixedBitStream& bsOut, RecvBitStrea
 
 // ----------------------------------
 
-void XPeer::handleConnectedPing(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived ping");
 
@@ -2200,7 +2213,7 @@ void XPeer::handleConnectedPing(FixedBitStream& bsOut, RecvBitStream& bs, Remote
 }
 
 
-void XPeer::handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectedPong(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived pong");
 
@@ -2214,7 +2227,7 @@ void XPeer::handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, Remote
 }
 
 
-void XPeer::handleDisconnectNotification(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleDisconnectNotification(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived Desconnect notification");
 
@@ -2223,7 +2236,7 @@ void XPeer::handleDisconnectNotification(FixedBitStream& bsOut, RecvBitStream& b
 }
 
 
-void XPeer::handleInvalidPassword(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleInvalidPassword(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived invalid password notification");
 
@@ -2300,8 +2313,9 @@ bool XPeer::isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOu
 		{
 			core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 			core::TimeVal connectionAttemptDelta = timeNow - remoteSys.connectionTime;
+			core::TimeVal rateLimitThresh = core::TimeVal::fromMS(vars_.rlConnectionsPerIPThreshMS());
 
-			if (connectionAttemptDelta < connectionRateLimitTime_)
+			if (connectionAttemptDelta < rateLimitThresh)
 			{
 				if (pDeltaOut) {
 					*pDeltaOut = connectionAttemptDelta;
