@@ -315,10 +315,10 @@ private:
 	void removeConnectionRequest(const SystemAdd& sysAdd);
 
 private:
-	void processRecvData(void);
-	void processConnectionRequests(void);
-	void processBufferdCommands(void);
-	void peerReliabilityTick(void);
+	void processRecvData(UpdateBitStream& updateBS);
+	void processConnectionRequests(UpdateBitStream& updateBS);
+	void processBufferdCommands(UpdateBitStream& updateBS);
+	void peerReliabilityTick(UpdateBitStream& updateBS);
 
 
 	void processRecvData(UpdateBitStream& updateBS, RecvData* pRecvData, int32_t byteOffset);

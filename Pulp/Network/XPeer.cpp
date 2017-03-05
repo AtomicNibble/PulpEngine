@@ -655,10 +655,12 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 
 Packet* XPeer::receive(void)
 {
-	processRecvData();
-	processConnectionRequests();
-	processBufferdCommands();
-	peerReliabilityTick();
+	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+
+	processRecvData(updateBS);
+	processConnectionRequests(updateBS);
+	processBufferdCommands(updateBS);
+	peerReliabilityTick(updateBS);
 
 	if (packetQue_.isEmpty()) {
 		return nullptr;
@@ -1333,7 +1335,7 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 // ~IPeer
 
 
-void XPeer::processConnectionRequests(void)
+void XPeer::processConnectionRequests(UpdateBitStream& updateBS)
 {
 	// are we wanting to connect to some slutty peers?
 	if (connectionReqs_.isNotEmpty())
@@ -1374,26 +1376,24 @@ void XPeer::processConnectionRequests(void)
 			++cr.numRequestsMade;
 			cr.nextRequestTime = timeNow + cr.retryDelay;
 
-			uint8_t buf[MAX_MTU_SIZE];
-			FixedBitStream bsOut(buf, buf + sizeof(buf), false);
-
-			bsOut.write(MessageID::OpenConnectionRequest);
-			bsOut.write(OFFLINE_MSG_ID);
-			bsOut.write<uint8_t>(PROTO_VERSION_MAJOR);
-			bsOut.write<uint8_t>(PROTO_VERSION_MINOR);
+			updateBS.reset();
+			updateBS.write(MessageID::OpenConnectionRequest);
+			updateBS.write(OFFLINE_MSG_ID);
+			updateBS.write<uint8_t>(PROTO_VERSION_MAJOR);
+			updateBS.write<uint8_t>(PROTO_VERSION_MINOR);
 
 			// devide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
 			size_t mtuIdx = cr.numRequestsMade / (cr.retryCount / MTUSizesArr.size());
 			mtuIdx = core::Min(mtuIdx + cr.MTUIdxShift, MTUSizesArr.size() - 1);
 			
 			size_t MTUSize = MTUSizesArr[mtuIdx] - UDP_HEADER_SIZE;
-			bsOut.zeroPadToLength(MTUSize);
+			updateBS.zeroPadToLength(MTUSize);
 
 			core::TimeVal timeSend = gEnv->pTimer->GetTimeNowReal();
 
 			NetSocket& socket = sockets_[cr.socketIdx];
 			SendParameters sp;
-			sp.setData(bsOut);
+			sp.setData(updateBS);
 			sp.systemAddress = cr.systemAddress;
 			if (socket.send(sp) == -WSAEMSGSIZE) // A message sent on a datagram socket was larger than the internal message buffer 
 			{
@@ -1421,7 +1421,7 @@ void XPeer::processConnectionRequests(void)
 	}
 }
 
-void XPeer::processBufferdCommands(void)
+void XPeer::processBufferdCommands(UpdateBitStream& updateBS)
 {
 	if (bufferdCmds_.isEmpty()) {
 		return;
@@ -1438,10 +1438,8 @@ void XPeer::processBufferdCommands(void)
 
 }
 
-void XPeer::peerReliabilityTick(void)
+void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 {
-	uint8_t buffer[MAX_MTU_SIZE];
-	FixedBitStream bs(buffer, buffer + MAX_MTU_SIZE, false);
 
 	for (auto& rs : remoteSystems_)
 	{
@@ -1451,7 +1449,7 @@ void XPeer::peerReliabilityTick(void)
 
 		core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
 
-		rs.relLayer.update(bs, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, time, 1000);
+		rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, time, 1000);
 
 		const bool deadConnection = rs.relLayer.isConnectionDead();
 		const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
@@ -1561,11 +1559,9 @@ void XPeer::peerReliabilityTick(void)
 }
 
 
-void XPeer::processRecvData(void)
+void XPeer::processRecvData(UpdateBitStream& updateBS)
 {
 	// use a single BS instance for processing all the data, to try improve cache hits.
-	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
-
 	RecvData* pRecvData = nullptr;
 	while (recvDataQue_.tryPop(pRecvData))
 	{
