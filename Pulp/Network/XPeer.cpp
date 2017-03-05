@@ -554,7 +554,7 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	pRemoteSystem->relLayer.send(
+	bool res = pRemoteSystem->relLayer.send(
 		pData,
 		numberOfBitsToSend,
 		currentTime,
@@ -565,7 +565,7 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 		receipt
 	);
 
-	return true;
+	return res;
 }
 
 void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
@@ -616,7 +616,7 @@ void XPeer::processBufferdCommand(BufferdCommand& cmd)
 			X_ASSERT_NOT_IMPLEMENTED();
 		}
 
-		pRemoteSystem->relLayer.send(
+		bool res = pRemoteSystem->relLayer.send(
 			cmd.pData,
 			cmd.numberOfBitsToSend,
 			core::TimeVal(),
@@ -626,6 +626,10 @@ void XPeer::processBufferdCommand(BufferdCommand& cmd)
 			cmd.orderingChannel,
 			cmd.receipt
 		);
+
+		if (!res) {
+			// TODO
+		}
 	}
 	else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
 	{
@@ -1039,8 +1043,8 @@ bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAccepti
 		return false;
 	}
 
-	socket.send(sp);
-	return false;
+	auto result = socket.send(sp);
+	return result > 0;
 }
 
 
@@ -1633,7 +1637,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 			return;
 		}
 
-		pRemoteSys->relLayer.recv(
+		bool res = pRemoteSys->relLayer.recv(
 			pData->data + byteOffset,
 			pData->bytesRead,
 			*pData->pSrcSocket,
@@ -1641,6 +1645,10 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 			pData->timeRead,
 			pRemoteSys->MTUSize
 		);
+
+		if (!res) {
+			// TODO
+		}
 		return;
 	}
 
