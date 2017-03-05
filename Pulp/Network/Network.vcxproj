@@ -393,6 +393,7 @@
     <ClInclude Include="Sockets\Socket.h" />
     <ClInclude Include="Sockets\win32\Socket.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\BPSTracker.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\LastError.h" />
@@ -423,6 +424,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="Util\BPSTracker.cpp" />
     <ClCompile Include="Util\SystemAdd.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp" />
     <ClCompile Include="Util\win32\LibaryStartup.cpp" />
@@ -433,6 +435,7 @@
   <ItemGroup>
     <None Include="Reliability\ReliabilityLayer.inl" />
     <None Include="Sockets\win32\Socket.inl" />
+    <None Include="Util\BPSTracker.inl" />
     <None Include="Util\SystemAdd.inl" />
     <None Include="Vars\NetVars.inl" />
     <None Include="XPeer.inl" />

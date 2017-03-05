@@ -95,6 +95,9 @@
     <ClInclude Include="Reliability\ReliabilityLayer.h">
       <Filter>Header Files\Reliability</Filter>
     </ClInclude>
+    <ClInclude Include="Util\BPSTracker.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -127,6 +130,9 @@
     <ClCompile Include="Reliability\ReliabilityLayer.cpp">
       <Filter>Source Files\Reliability</Filter>
     </ClCompile>
+    <ClCompile Include="Util\BPSTracker.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl">
@@ -143,6 +149,9 @@
     </None>
     <None Include="Reliability\ReliabilityLayer.inl">
       <Filter>Header Files\Reliability</Filter>
+    </None>
+    <None Include="Util\BPSTracker.inl">
+      <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
 </Project>
