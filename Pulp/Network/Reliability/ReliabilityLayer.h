@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Util\BPSTracker.h"
+
 #include <Containers\Fifo.h>
 
 X_NAMESPACE_BEGIN(net)
@@ -61,6 +63,8 @@ public:
 	ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
 	~ReliabilityLayer();
 
+	void reset(int32_t MTUSize);
+
 	// que some data for sending, reliability is handled.
 	bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
 		PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel,  uint32_t receipt);
@@ -75,6 +79,9 @@ public:
 
 	// pop any packets that have arrived.
 	bool recive(PacketData& dataOut);
+
+
+	void getStatistics(NetStatistics& stats) const;
 
 	X_INLINE void setTimeout(core::TimeVal timeout);
 	X_INLINE core::TimeVal getTimeout(void);
@@ -105,6 +112,7 @@ private:
 	core::TimeVal timeOut_;
 	core::TimeVal unreliableTimeOut_;
 	core::TimeVal timeLastDatagramArrived_;
+	core::TimeVal lastBSPUpdate_;
 
 
 	OrdereIndexArr orderedWriteIndex_;				// inc for every ordered msg sent
@@ -117,6 +125,12 @@ private:
 	PacketQeue recivedPackets_;
 
 	bool connectionDead_;
+	bool _pad[3];
+
+	BPSTracker bps_[NetStatistics::Metric::ENUM_COUNT];
+
+	NetStatistics::PriorityMsgCountsArr msgInSendBuffers_;
+	NetStatistics::PriorityByteCountsArr bytesInSendBuffers_;
 };
 
 X_NAMESPACE_END

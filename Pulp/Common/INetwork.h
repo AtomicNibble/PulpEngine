@@ -97,17 +97,24 @@ struct NetStatistics
 		ActualBytesReceived
 	);
 
+	typedef std::array<uint32_t, PacketPriority::ENUM_COUNT> PriorityMsgCountsArr;
+	typedef std::array<uint64_t, PacketPriority::ENUM_COUNT> PriorityByteCountsArr;
+
 public:
-	core::DateStamp connectionStartTime;
+	core::TimeVal connectionStartTime;
 
 	uint64_t lastSecondMetrics[Metric::ENUM_COUNT];
 	uint64_t runningMetrics[Metric::ENUM_COUNT];
 
-	uint32_t msgInSendBuffers[PacketPriority::ENUM_COUNT];
-	uint64_t bytesInSendBuffers[PacketPriority::ENUM_COUNT];
+	PriorityMsgCountsArr msgInSendBuffers;
+	PriorityByteCountsArr bytesInSendBuffers;
 
 	float packetLossLastSecond;
 	float packetLossTotal;
+
+	bool isLimitedByCongestionControl;
+	bool isLimitedByOutgoingBadwidthLimit;
+
 }; 
 
 // ---------------------------------

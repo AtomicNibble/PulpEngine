@@ -146,7 +146,8 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	packetPool_(packetPool),
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
-	connectionDead_(false)
+	connectionDead_(false),
+	bps_{ arena, arena, arena, arena, arena, arena, arena }
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
@@ -158,6 +159,20 @@ ReliabilityLayer::~ReliabilityLayer()
 }
 
 
+void ReliabilityLayer::reset(int32_t MTUSize)
+{
+	X_UNUSED(MTUSize);
+
+	connectionDead_ = false;
+
+	msgInSendBuffers_.fill(0);
+	bytesInSendBuffers_.fill(0);
+
+	for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++) {
+		bps_[i].reset();
+	}
+}
+
 
 bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
 	PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, uint32_t receipt)
@@ -165,10 +180,11 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
 
-
 	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "%s msg added. numbits: %" PRIu32, 
 		PacketReliability::ToString(reliability), lengthBits);
 	
+	auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
+
 	ReliablePacket* pPacket = allocPacket();
 	pPacket->reliableMessageNumber = 0;
 	pPacket->creationTime = time;
@@ -183,9 +199,9 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	pPacket->splitPacketCount = 0;
 	
 	pPacket->dataBitLength = lengthBits;
-	pPacket->pData = X_NEW_ARRAY(uint8_t, core::bitUtil::bitsToBytes(lengthBits), g_NetworkArena, "PacketBytes");
+	pPacket->pData = X_NEW_ARRAY(uint8_t, lengthBytes, g_NetworkArena, "PacketBytes");
 
-	std::memcpy(pPacket->pData, pData, core::bitUtil::bitsToBytes(lengthBits));
+	std::memcpy(pPacket->pData, pData, lengthBytes);
 	// pPacket->pData = const_cast<uint8_t*>(pData);
 
 	// sequenced packets
@@ -212,6 +228,11 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	}
 	
 	outGoingPackets_.push(pPacket);
+
+	bps_[NetStatistics::Metric::BytesPushed].add(time, lengthBytes);
+
+	++msgInSendBuffers_[priority];
+	bytesInSendBuffers_[priority] += lengthBytes;
 	return true;
 }
 
@@ -223,7 +244,9 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 	// last time we got data.
 	timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
 
-	FixedBitStream bs(pData, pData + length, true);
+	bps_[NetStatistics::Metric::ActualBytesReceived].add(time, length);
+
+	core::FixedBitStreamNoneOwning bs(pData, pData + length, true);
 
 	DatagramHdr dgh;
 	dgh.fromBitStream(bs);
@@ -247,6 +270,16 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 {
 	bs.reset();
 
+	if ((lastBSPUpdate_ + core::TimeVal::fromMS(1000)) < lastBSPUpdate_)
+	{
+		for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++)
+		{
+			bps_[i].update(time);
+		}
+
+		lastBSPUpdate_ = time;
+	}
+
 	// false promises, broken dreams.
 	// no reliabilty here hehehe
 	
@@ -266,7 +299,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		pPacket->writeToBitStream(bs);
 
 
-		sendBitStream(socket, bs, systemAddress);
+		sendBitStream(socket, bs, systemAddress, time);
 
 		freePacket(pPacket);
 	}
@@ -288,10 +321,11 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 
 void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
 {
+	bps_[NetStatistics::Metric::ActualBytesSent].add(time, bs.sizeInBytes());
+
 	SendParameters sp;
 	sp.setData(bs);
 	sp.systemAddress = systemAddress;
-
 	socket.send(sp);
 }
 
@@ -305,6 +339,23 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacker)
 	X_DELETE(pPacker, packetPool_);
 }
 
+void ReliabilityLayer::getStatistics(NetStatistics& stats) const
+{
+	for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++)
+	{
+		stats.lastSecondMetrics[i] = bps_[i].getBPS();
+		stats.runningMetrics[i] = bps_[i].getTotal();
+	}
+
+	stats.msgInSendBuffers = msgInSendBuffers_;
+	stats.bytesInSendBuffers = bytesInSendBuffers_;
+
+	stats.packetLossLastSecond = 0.f;
+	stats.packetLossTotal = 0.f;
+
+	stats.isLimitedByCongestionControl = false;
+	stats.isLimitedByOutgoingBadwidthLimit = false;
+}
 
 
 X_NAMESPACE_END
