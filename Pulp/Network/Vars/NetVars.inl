@@ -39,5 +39,14 @@ X_INLINE int32_t NetVars::pingTimeMS(void) const
 	return pingTimeMS_;
 }
 
+X_INLINE int32_t NetVars::unreliableTimeoutMS(void) const
+{
+	return unreliableTimeoutMS_;
+}
+
+X_INLINE int32_t NetVars::connectionBSPLimit(void) const
+{
+	return connectionBSPLimit_;
+}
 
 X_NAMESPACE_END
