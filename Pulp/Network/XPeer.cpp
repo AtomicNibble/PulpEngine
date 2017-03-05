@@ -326,8 +326,13 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 }
 
 
+void XPeer::setPassword(const PasswordStr& pass)
+{
+	password_ = pass;
+}
+
 // connection api
-ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort, uint32_t retryCount,
+ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort, const PasswordStr& password, uint32_t retryCount,
 	core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
 	uint8_t socketIdx = 0; // hard coded socket idx for now
@@ -359,6 +364,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 	pConReq->retryCount = retryCount;
 	pConReq->socketIdx = socketIdx;
 	pConReq->MTUIdxShift = 0;
+	pConReq->password = password;
 
 	// only push if not trying to connect already.
 	auto matchSysAddFunc = [&systemAddress](const RequestConnection* pOth) {
@@ -1464,6 +1470,10 @@ void XPeer::peerReliabilityTick(void)
 					handleConnectedPong(tmpBs, stream, rs);
 					break;
 
+				case MessageID::InvalidPassword:
+					handleInvalidPassword(tmpBs, stream, rs);
+					break;
+					
 
 				default:
 					X_ERROR("Net", "Unhandled reliable message: \"%s\"", MessageID::ToString(msgId));
@@ -1560,6 +1570,7 @@ void XPeer::processRecvData(RecvData* pData, int32_t byteOffset)
 		case MessageID::ConnectionBanned:
 		case MessageID::ConnectionNoFreeSlots:
 		case MessageID::ConnectionRateLimited:
+		case MessageID::InvalidPassword:
 			handleConnectionFailure(bsOut, pData, stream, msgId);
 			break;
 
@@ -1827,12 +1838,16 @@ void XPeer::handleOpenConnectionResponseStage2(FixedBitStream& bsOut, RecvData* 
 
 					core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
+					static_assert(std::numeric_limits<uint8_t>::max() > MAX_PASSWORD_LEN, "Can't represent max password len");
+
 					// send connectionRequest now.
 					bsOut.write(MessageID::ConnectionRequest);
 					bsOut.write(guid_);
 					bsOut.write(timeNow.GetValue());
-					// password?
-					// : 123456
+					bsOut.write(safe_static_cast<uint8_t>(pReq->password.length()));
+					if (pReq->password.isNotEmpty()) {
+						bsOut.write(pReq->password.c_str(), pReq->password.length());
+					}
 
 					// send the request to the remote.
 					sendImmediate(
@@ -1919,6 +1934,7 @@ void XPeer::handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, Re
 {
 	NetGUID clientGuid;
 	int64_t timeStamp;
+	uint8_t passwordLen;
 
 	// must be a unverified sender trying to connect.
 	if (rs.connectState != ConnectState::UnverifiedSender)
@@ -1931,13 +1947,43 @@ void XPeer::handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, Re
 
 	bs.read(clientGuid);
 	bs.read(timeStamp);
+	bs.read(passwordLen);
+
+	char passwordBuf[MAX_PASSWORD_LEN];
+	if (passwordLen) {
+		bs.read(passwordBuf, passwordLen);
+	}
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request. timeStamp: %" PRId64, timeStamp);
 
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+	// corrent password?
+	PasswordStr pass(passwordBuf, passwordBuf + passwordLen);
+	if (password_ != pass)
+	{
+		bsOut.write(MessageID::InvalidPassword);
+		bsOut.write(guid_);
+
+		sendImmediate(
+			bsOut.data(),
+			safe_static_cast<BitSizeT>(bsOut.size()),
+			PacketPriority::Immediate,
+			PacketReliability::Reliable,
+			0,
+			AddressOrGUID(&rs.systemAddress),
+			false,
+			timeNow,
+			0
+		);
+
+		rs.connectState = ConnectState::DisconnectAsapSilent;
+		return;
+	}
+
+
 	// hey hey!
 	rs.connectState = ConnectState::HandlingConnectionRequest;
-
-	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	bsOut.write(MessageID::ConnectionRequestAccepted);
 	bsOut.write(rs.systemAddress);
@@ -2109,6 +2155,19 @@ void XPeer::handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, Remote
 }
 
 
+void XPeer::handleInvalidPassword(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+{
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived invalid password notification");
+
+	// tell the game.
+	Packet* pPacket = allocPacket(8);
+	pPacket->pData[0] = MessageID::InvalidPassword;
+	pPacket->pSystemAddress = &rs.systemAddress; // fuck
+	pPacket->guid = rs.guid;
+	pushBackPacket(pPacket);
+
+	rs.connectState = ConnectState::DisconnectAsapSilent;
+}
 
 
 // ----------------------------------

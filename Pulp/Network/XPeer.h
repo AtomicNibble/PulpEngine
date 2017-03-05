@@ -125,6 +125,8 @@ struct RequestConnection
 	uint8_t retryCount;
 	uint8_t socketIdx;
 	uint8_t MTUIdxShift;
+
+	PasswordStr password;
 };
 
 struct Ban
@@ -202,8 +204,10 @@ public:
 	void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
 		PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_FINAL;
 
+	void setPassword(const PasswordStr& pass) X_FINAL;
+
 	// connection api
-	ConnectionAttemptResult::Enum connect(const char* pHost, Port remotePort, uint32_t retryCount = 12,
+	ConnectionAttemptResult::Enum connect(const char* pHost, Port remotePort, const PasswordStr& password, uint32_t retryCount = 12,
 		core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
 	void closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
 		uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_FINAL;
@@ -338,6 +342,7 @@ private:
 	void handleConnectedPing(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 	void handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
+	void handleInvalidPassword(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
 
 
@@ -396,6 +401,8 @@ private:
 
 	core::GrowingBlockAllocator blockAlloc_;
 	BlockAlocArena		blockArena_;
+
+	PasswordStr password_;
 };
 
 
