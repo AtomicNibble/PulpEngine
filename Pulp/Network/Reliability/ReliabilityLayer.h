@@ -78,12 +78,19 @@ public:
 	// pop any packets that have arrived.
 	bool recive(PacketData& dataOut);
 
-
 	X_INLINE void setTimeout(core::TimeVal timeout);
 	X_INLINE core::TimeVal getTimeout(void);
 
 	X_INLINE void setUnreliableMsgTimeout(core::TimeVal timeout);
 	X_INLINE core::TimeVal getUnreliableMsgTimeout(void);
+
+	X_INLINE bool pendingOutgoingData(void) const;
+	X_INLINE bool isWaitingForAcks(void) const;
+	X_INLINE bool isConnectionDead(void) const;
+	X_INLINE void killConnection(void);
+
+
+
 
 private:
 	void sendBitStream(NetSocket& socket, FixedBitStream& bs, SystemAdd& systemAddress);
@@ -99,6 +106,7 @@ private:
 
 	core::TimeVal timeOut_;
 	core::TimeVal unreliableTimeOut_;
+	core::TimeVal timeLastDatagramArrived_;
 
 
 	OrdereIndexArr orderedWriteIndex_;				// inc for every ordered msg sent
@@ -109,6 +117,8 @@ private:
 
 	PacketQeue outGoingPackets_;
 	PacketQeue recivedPackets_;
+
+	bool connectionDead_;
 };
 
 X_NAMESPACE_END

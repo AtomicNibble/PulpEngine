@@ -602,29 +602,40 @@ void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool 
 
 void XPeer::processBufferdCommand(BufferdCommand& cmd)
 {
-	RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
-	if (!pRemoteSystem) {
-		return;
-	}
+	if (cmd.cmd == BufferdCommand::Cmd::Send)
+	{
+		RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+		if (!pRemoteSystem) {
+			return;
+		}
 
-	if (!pRemoteSystem->canSend()) {
-		return;
-	}
+		if (!pRemoteSystem->canSend()) {
+			return;
+		}
 
-	if (cmd.broadcast) {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+		if (cmd.broadcast) {
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
 
-	pRemoteSystem->relLayer.send(
-		cmd.pData,
-		cmd.numberOfBitsToSend,
-		core::TimeVal(),
-		pRemoteSystem->MTUSize,
-		cmd.priority,
-		cmd.reliability,
-		cmd.orderingChannel,
-		cmd.receipt
-	);
+		pRemoteSystem->relLayer.send(
+			cmd.pData,
+			cmd.numberOfBitsToSend,
+			core::TimeVal(),
+			pRemoteSystem->MTUSize,
+			cmd.priority,
+			cmd.reliability,
+			cmd.orderingChannel,
+			cmd.receipt
+		);
+	}
+	else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
+	{
+		closeConnectionInternal(cmd.systemIdentifier, false, true, cmd.orderingChannel, cmd.priority);
+	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
 }
 
 
@@ -1427,6 +1438,47 @@ void XPeer::peerReliabilityTick(void)
 
 		}
 
+		core::TimeVal dropCon = core::TimeVal::fromMS(5000);
+
+
+		const bool deadConnection = rs.relLayer.isConnectionDead();
+		const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
+		const bool disconnectingAfterAck = rs.connectState == ConnectState::DisconnectOnNoAck;
+		const bool waitingforConnection = rs.connectState == ConnectState::RequestedConnection || 
+										  rs.connectState == ConnectState::HandlingConnectionRequest ||
+										  rs.connectState == ConnectState::UnverifiedSender;
+
+		// has this connection not completed yet?
+		bool connectionOpenTimeout = (waitingforConnection && time > (rs.connectionTime + dropCon));
+		bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
+		bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
+
+		if (disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut)
+		{
+			IPStr ipStr;
+			X_LOG0_IF(vars_.debugEnabled(), "Net", "Closing connection for remote system: \"%s\"", rs.systemAddress.toString(ipStr));
+
+			// ya cunt!
+			Packet* pPacket = allocPacket(8);
+			if (rs.connectState == ConnectState::RequestedConnection) {
+				pPacket->pData[0] = MessageID::ConnectionRequestFailed;
+			}
+			else if (rs.connectState == ConnectState::Connected) {
+				pPacket->pData[0] = MessageID::ConnectionLost;
+			}
+			else  {
+				pPacket->pData[0] = MessageID::DisconnectNotification;
+			}
+
+			pPacket->pSystemAddress = nullptr; // fuck
+			pPacket->guid = rs.guid;
+			pushBackPacket(pPacket);
+
+
+			closeConnectionInternal(AddressOrGUID(&rs.systemAddress), false, true, 0, PacketPriority::Low);
+		}
+
+
 		// do we have any packets?
 		ReliabilityLayer::PacketData data;
 		while (rs.relLayer.recive(data))
@@ -1468,6 +1520,10 @@ void XPeer::peerReliabilityTick(void)
 					break;
 				case MessageID::ConnectedPong:
 					handleConnectedPong(tmpBs, stream, rs);
+					break;
+
+				case MessageID::DisconnectNotification:
+					handleDisconnectNotification(tmpBs, stream, rs);
 					break;
 
 				case MessageID::InvalidPassword:
@@ -1829,8 +1885,6 @@ void XPeer::handleOpenConnectionResponseStage2(FixedBitStream& bsOut, RecvData* 
 					// add systen
 					pSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
 				}
-
-				
 				if (pSys)
 				{
 					pSys->connectState = ConnectState::RequestedConnection;
@@ -1864,7 +1918,9 @@ void XPeer::handleOpenConnectionResponseStage2(FixedBitStream& bsOut, RecvData* 
 				}
 				else
 				{
-					// out connection to remote failed.
+					// failed to add remote sys.
+					X_ERROR("Net", "Failed to add new remote system to internal list");
+
 					Packet* pPacket = allocPacket(8);
 					pPacket->pData[0] = MessageID::ConnectionRequestFailed;
 					pPacket->pSystemAddress = nullptr; // fuck
@@ -1941,7 +1997,10 @@ void XPeer::handleConnectionRequest(FixedBitStream& bsOut, RecvBitStream& bs, Re
 	{
 		X_ERROR("Net", "Recived unexpected connection request from client, ignoring.");
 		// ban the slut :D !
+		closeConnectionInternal(AddressOrGUID(&rs.systemAddress), false, true, 0, PacketPriority::Low);
 
+		IPStr ipStr;
+		addToBanList(rs.systemAddress.toString(ipStr), rs.relLayer.getTimeout());
 		return;
 	}
 
@@ -2152,6 +2211,15 @@ void XPeer::handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, Remote
 	bs.read(sendPongTime);
 
 	rs.onPong(core::TimeVal(sendPingTime), core::TimeVal(sendPongTime));
+}
+
+
+void XPeer::handleDisconnectNotification(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+{
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived Desconnect notification");
+
+	// if ack never sends disconnect.
+	rs.connectState = ConnectState::DisconnectOnNoAck;
 }
 
 

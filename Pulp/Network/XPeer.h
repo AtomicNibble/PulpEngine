@@ -342,7 +342,9 @@ private:
 	void handleConnectedPing(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 	void handleConnectedPong(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
+	void handleDisconnectNotification(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 	void handleInvalidPassword(FixedBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+
 
 
 

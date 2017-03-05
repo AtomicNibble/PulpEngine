@@ -24,4 +24,26 @@ X_INLINE core::TimeVal ReliabilityLayer::getUnreliableMsgTimeout(void)
 }
 
 
+
+X_INLINE bool ReliabilityLayer::pendingOutgoingData(void) const
+{
+	return outGoingPackets_.isNotEmpty();
+}
+
+X_INLINE bool ReliabilityLayer::isWaitingForAcks(void) const
+{
+	return false;
+}
+
+X_INLINE bool ReliabilityLayer::isConnectionDead(void) const
+{
+	return connectionDead_;
+}
+
+X_INLINE void ReliabilityLayer::killConnection(void)
+{
+	connectionDead_ = true;
+}
+
+
 X_NAMESPACE_END

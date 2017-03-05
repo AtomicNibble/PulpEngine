@@ -145,7 +145,8 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	vars_(vars),
 	packetPool_(packetPool),
 	outGoingPackets_(arena),
-	recivedPackets_(arena)
+	recivedPackets_(arena),
+	connectionDead_(false)
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
@@ -217,7 +218,10 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& socket,
 	SystemAdd& systemAddress, core::TimeVal time, uint32_t mtuSize)
 {
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Recived reliable packet size: %" PRIuS, length);
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Recived reliable packet numbits: %" PRIuS, core::bitUtil::bytesToBits(length));
+
+	// last time we got data.
+	timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
 
 	FixedBitStream bs(pData, pData + length, true);
 
