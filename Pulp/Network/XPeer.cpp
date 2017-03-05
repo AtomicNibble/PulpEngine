@@ -1239,14 +1239,37 @@ const NetGUID& XPeer::getMyGUID(void) const
 
 void XPeer::setTimeoutTime(core::TimeVal time, const ISystemAdd* pTarget)
 {
-	X_ASSERT_NOT_NULL(pTarget);
+	if (pTarget) {
+		const SystemAdd* sysAdd = static_cast<const SystemAdd*>(pTarget);
+		RemoteSystem* pRemoteSys = getRemoteSystem(*sysAdd, true);
+		if (!pRemoteSys) {
+			X_ERROR("Net", "Failed to set timeout system not found");
+			return;
+		}
 
+		pRemoteSys->relLayer.setTimeout(time);
+		return;
+	}
+
+	for (auto rs : remoteSystems_)
+	{
+		rs.relLayer.setTimeout(time);
+	}
+
+	defaultTimeOut_ = time;
 }
 
 core::TimeVal XPeer::getTimeoutTime(const ISystemAdd* pTarget)
 {
 	if (pTarget) {
-		X_ASSERT_NOT_IMPLEMENTED();
+		const SystemAdd* sysAdd = static_cast<const SystemAdd*>(pTarget);
+		RemoteSystem* pRemoteSys = getRemoteSystem(*sysAdd, true);
+		if (!pRemoteSys) {
+			X_ERROR("Net", "Failed toget timeout system not found");
+			return core::TimeVal(0ll);
+		}
+
+		return pRemoteSys->relLayer.getTimeout();
 	}
 
 	return defaultTimeOut_;
