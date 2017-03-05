@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(core)
 
 
 inline FixedBitStreamNoneOwningPolicy::FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
-	FixedStreamBase(pBegin, core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin)))
+	FixedBitStreamBase(pBegin, core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin)))
 {
 	if (dataInit) {
 		bitIdx_ = numBits_;
@@ -20,7 +20,7 @@ inline FixedBitStreamNoneOwningPolicy::~FixedBitStreamNoneOwningPolicy()
 }
 
 inline FixedBitStreamOwningPolicy::FixedBitStreamOwningPolicy(core::MemoryArenaBase* arena, size_type numBits) :
-	FixedStreamBase(numBits),
+	FixedBitStreamBase(numBits),
 	arena_(arena)
 {
 	size_type numBytes = core::bitUtil::RoundUpToMultiple(numBits, 8_sz);
@@ -34,7 +34,7 @@ inline FixedBitStreamOwningPolicy::~FixedBitStreamOwningPolicy()
 
 template<size_t N>
 inline FixedBitStreamStackPolicy<N>::FixedBitStreamStackPolicy() :
-	FixedStreamBase(buf_, core::bitUtil::bytesToBits(N))
+	FixedBitStreamBase(buf_, core::bitUtil::bytesToBits(N))
 {
 }
 
@@ -48,7 +48,7 @@ inline FixedBitStreamStackPolicy<N>::~FixedBitStreamStackPolicy()
 // -------------------------------
 
 
-inline FixedStreamBase::FixedStreamBase(size_type numBits) :
+inline FixedBitStreamBase::FixedBitStreamBase(size_type numBits) :
 	pBegin_(nullptr),
 	numBits_(numBits),
 	readBitIdx_(0),
@@ -57,7 +57,7 @@ inline FixedStreamBase::FixedStreamBase(size_type numBits) :
 
 }
 
-inline FixedStreamBase::FixedStreamBase(TypePtr pBegin, size_type numBits) :
+inline FixedBitStreamBase::FixedBitStreamBase(TypePtr pBegin, size_type numBits) :
 	pBegin_(pBegin),
 	numBits_(numBits),
 	readBitIdx_(0),
@@ -68,7 +68,7 @@ inline FixedStreamBase::FixedStreamBase(TypePtr pBegin, size_type numBits) :
 
 // -------------------------------------------------------------------------
 
-inline void FixedStreamBase::write(bool bit)
+inline void FixedBitStreamBase::write(bool bit)
 {
 	if (bit) {
 		write0();
@@ -78,45 +78,45 @@ inline void FixedStreamBase::write(bool bit)
 	}
 }
 
-inline void FixedStreamBase::write0(void)
+inline void FixedBitStreamBase::write0(void)
 {
 	uint8_t val = 0;
 	readBits(reinterpret_cast<Type*>(&val), 1);
 }
 
-inline void FixedStreamBase::write1(void)
+inline void FixedBitStreamBase::write1(void)
 {
 	uint8_t val = 1;
 	readBits(reinterpret_cast<Type*>(&val), 1);
 }
 
 template<typename T>
-inline void FixedStreamBase::write(const T& val)
+inline void FixedBitStreamBase::write(const T& val)
 {
 	writeBits(reinterpret_cast<const Type*>(&val), sizeof(T) << 3);
 }
 
 // read the type * num from the stream.
 template<typename T>
-inline void FixedStreamBase::write(const T* pVal, size_type num)
+inline void FixedBitStreamBase::write(const T* pVal, size_type num)
 {
 	writeBits(reinterpret_cast<const Type*>(pVal), (sizeof(T) * num) << 3);
 }
 
-inline void FixedStreamBase::write(const Type* pBuf, size_type numBytes)
+inline void FixedBitStreamBase::write(const Type* pBuf, size_type numBytes)
 {
 	writeBits(pBuf, numBitsForBytes(numBytes));
 }
 
 
 // pads the stream to byte boundry before read.
-inline void FixedStreamBase::writeAligned(const Type* pBuf, size_type numBytes)
+inline void FixedBitStreamBase::writeAligned(const Type* pBuf, size_type numBytes)
 {
 	alignWriteToByteBoundry();
 	write(pBuf, numBytes);
 }
 
-inline void FixedStreamBase::writeBitsAligned(const Type* pBuf, size_type numBits)
+inline void FixedBitStreamBase::writeBitsAligned(const Type* pBuf, size_type numBits)
 {
 	alignWriteToByteBoundry();
 	writeBits(pBuf, numBits);
@@ -126,7 +126,7 @@ inline void FixedStreamBase::writeBitsAligned(const Type* pBuf, size_type numBit
 // -------------------------------
 
 template<typename T>
-inline T FixedStreamBase::read(void)
+inline T FixedBitStreamBase::read(void)
 {
 	T val;
 	readBits(reinterpret_cast<Type*>(&val), sizeof(T) << 3);
@@ -134,32 +134,32 @@ inline T FixedStreamBase::read(void)
 }
 
 template<typename T>
-inline void FixedStreamBase::read(T& val)
+inline void FixedBitStreamBase::read(T& val)
 {
 	readBits(reinterpret_cast<Type*>(&val), sizeof(T) << 3);
 }
 
 // read the type * num from the stream.
 template<typename T>
-inline void FixedStreamBase::read(T* pVal, size_type num)
+inline void FixedBitStreamBase::read(T* pVal, size_type num)
 {
 	readBits(reinterpret_cast<Type*>(pVal), (sizeof(T) * num) << 3);
 }
 
-inline void FixedStreamBase::read(Type* pBuf, size_type numBytes)
+inline void FixedBitStreamBase::read(Type* pBuf, size_type numBytes)
 {
 	readBits(pBuf, numBitsForBytes(numBytes));
 }
 
 
 // pads the stream to byte boundry before read.
-inline void FixedStreamBase::readAligned(Type* pBuf, size_type numBytes)
+inline void FixedBitStreamBase::readAligned(Type* pBuf, size_type numBytes)
 {
 	alignReadToByteBoundry();
 	read(pBuf, numBytes);
 }
 
-inline void FixedStreamBase::readBitsAligned(Type* pBuf, size_type numBits)
+inline void FixedBitStreamBase::readBitsAligned(Type* pBuf, size_type numBits)
 {
 	alignReadToByteBoundry();
 	readBits(pBuf, numBits);
@@ -168,30 +168,30 @@ inline void FixedStreamBase::readBitsAligned(Type* pBuf, size_type numBits)
 
 // -------------------------------
 
-inline void FixedStreamBase::alignWriteToByteBoundry(void)
+inline void FixedBitStreamBase::alignWriteToByteBoundry(void)
 {
 	bitIdx_ = core::bitUtil::RoundUpToMultiple(bitIdx_, 8_sz);
 }
 
 
-inline void FixedStreamBase::alignReadToByteBoundry(void)
+inline void FixedBitStreamBase::alignReadToByteBoundry(void)
 {
 	readBitIdx_ = core::bitUtil::RoundUpToMultiple(readBitIdx_, 8_sz);
 }
 
 // -------------------------------
 
-inline void FixedStreamBase::skipBytes(size_type numBytes)
+inline void FixedBitStreamBase::skipBytes(size_type numBytes)
 {
 	readBitIdx_ += numBitsForBytes(numBytes);
 }
 
-inline void FixedStreamBase::skipBits(size_type numBits)
+inline void FixedBitStreamBase::skipBits(size_type numBits)
 {
 	readBitIdx_ += numBits;
 }
 
-inline void FixedStreamBase::zeroPadToLength(size_type numBytes)
+inline void FixedBitStreamBase::zeroPadToLength(size_type numBytes)
 {
 	if (sizeInBytes() < numBytes)
 	{
@@ -204,34 +204,34 @@ inline void FixedStreamBase::zeroPadToLength(size_type numBytes)
 
 // -------------------------------------------
 
-inline void FixedStreamBase::reset(void)
+inline void FixedBitStreamBase::reset(void)
 {
 	bitIdx_ = 0;
 	readBitIdx_ = 0;
 }
 
-inline typename FixedStreamBase::size_type typename FixedStreamBase::capacity(void) const
+inline typename FixedBitStreamBase::size_type typename FixedBitStreamBase::capacity(void) const
 {
 	return numBits_;
 }
 
 
-inline typename FixedStreamBase::size_type typename FixedStreamBase::size(void) const
+inline typename FixedBitStreamBase::size_type typename FixedBitStreamBase::size(void) const
 {
 	return bitIdx_ - readBitIdx_;
 }
 
-inline typename FixedStreamBase::size_type typename FixedStreamBase::sizeInBytes(void) const
+inline typename FixedBitStreamBase::size_type typename FixedBitStreamBase::sizeInBytes(void) const
 {
 	return numBytesForBits(size());
 }
 
-inline typename FixedStreamBase::size_type FixedStreamBase::freeSpace(void) const
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::freeSpace(void) const
 {
 	return capacity() - bitIdx_;
 }
 
-inline bool FixedStreamBase::isEos(void) const
+inline bool FixedBitStreamBase::isEos(void) const
 {
 	return size() == 0;
 }
@@ -239,75 +239,75 @@ inline bool FixedStreamBase::isEos(void) const
 
 // --------------------
 
-inline typename FixedStreamBase::TypePtr FixedStreamBase::ptr(void)
+inline typename FixedBitStreamBase::TypePtr FixedBitStreamBase::ptr(void)
 {
 	return dataBegin();
 }
 
-inline typename FixedStreamBase::ConstTypePtr FixedStreamBase::ptr(void) const
+inline typename FixedBitStreamBase::ConstTypePtr FixedBitStreamBase::ptr(void) const
 {
 	return dataBegin();
 }
 
-inline typename FixedStreamBase::TypePtr FixedStreamBase::data(void)
+inline typename FixedBitStreamBase::TypePtr FixedBitStreamBase::data(void)
 {
 	return dataBegin();
 }
 
-inline typename FixedStreamBase::ConstTypePtr FixedStreamBase::data(void) const
+inline typename FixedBitStreamBase::ConstTypePtr FixedBitStreamBase::data(void) const
 {
 	return dataBegin();
 }
 
-inline typename FixedStreamBase::Iterator FixedStreamBase::begin(void)
+inline typename FixedBitStreamBase::Iterator FixedBitStreamBase::begin(void)
 {
 	return dataBegin();
 }
 
-inline typename FixedStreamBase::ConstIterator FixedStreamBase::begin(void) const
+inline typename FixedBitStreamBase::ConstIterator FixedBitStreamBase::begin(void) const
 {
 	return dataBegin();
 }
 
-inline typename FixedStreamBase::Iterator FixedStreamBase::end(void)
+inline typename FixedBitStreamBase::Iterator FixedBitStreamBase::end(void)
 {
 	return dataBegin() + size();
 }
 
-inline typename FixedStreamBase::ConstIterator FixedStreamBase::end(void) const
+inline typename FixedBitStreamBase::ConstIterator FixedBitStreamBase::end(void) const
 {
 	return dataBegin() + size();
 }
 
 // --------------------
 
-inline typename FixedStreamBase::size_type FixedStreamBase::byteIndex(void) const
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::byteIndex(void) const
 {
 	return bitIdx_ >> 3;
 }
 
-inline typename FixedStreamBase::size_type FixedStreamBase::readByteIndex(void) const
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::readByteIndex(void) const
 {
 	return readBitIdx_ >> 3;
 }
 
-inline typename FixedStreamBase::size_type FixedStreamBase::numBytesForBits(size_type numBits)
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::numBytesForBits(size_type numBits)
 {
 	// align so that all the bits fit.
 	return (numBits + 7) >> 3;
 }
 
-inline typename FixedStreamBase::size_type FixedStreamBase::numBitsForBytes(size_type numBytes) 
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::numBitsForBytes(size_type numBytes) 
 {
 	return numBytes << 3;
 }
 
-inline typename FixedStreamBase::TypePtr FixedStreamBase::dataBegin(void)
+inline typename FixedBitStreamBase::TypePtr FixedBitStreamBase::dataBegin(void)
 {
 	return pBegin_;
 }
 
-inline typename FixedStreamBase::ConstTypePtr FixedStreamBase::dataBegin(void) const
+inline typename FixedBitStreamBase::ConstTypePtr FixedBitStreamBase::dataBegin(void) const
 {
 	return pBegin_;
 }

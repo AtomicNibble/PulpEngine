@@ -4,7 +4,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-class FixedStreamBase
+class FixedBitStreamBase
 {
 public:
 	typedef size_t size_type;
@@ -20,8 +20,8 @@ public:
 	typedef const Type& const_reference;
 
 protected:
-	FixedStreamBase(size_type numBits);
-	FixedStreamBase(TypePtr pBegin, size_type numBits);
+	FixedBitStreamBase(size_type numBits);
+	FixedBitStreamBase(TypePtr pBegin, size_type numBits);
 
 
 public:
@@ -115,7 +115,7 @@ protected:
 	Type* pBegin_;
 };
 
-class FixedBitStreamNoneOwningPolicy : public FixedStreamBase
+class FixedBitStreamNoneOwningPolicy : public FixedBitStreamBase
 {
 
 public:
@@ -123,7 +123,7 @@ public:
 	~FixedBitStreamNoneOwningPolicy();
 };
 
-class FixedBitStreamOwningPolicy : public FixedStreamBase
+class FixedBitStreamOwningPolicy : public FixedBitStreamBase
 {
 public:
 	FixedBitStreamOwningPolicy(core::MemoryArenaBase* arena, size_type numBits);
@@ -134,7 +134,7 @@ private:
 };
 
 template<size_t N>
-class FixedBitStreamStackPolicy : public FixedStreamBase
+class FixedBitStreamStackPolicy : public FixedBitStreamBase
 {
 public:
 	FixedBitStreamStackPolicy();
@@ -150,6 +150,9 @@ class FixedBitStream : public StorageType
 public:
 	typedef FixedBitStreamNoneOwningPolicy NoneOwningPolicy;
 	typedef FixedBitStreamOwningPolicy OwningPolicy;
+
+	template<size_t N>
+	using StackPolicy = FixedBitStream<FixedBitStreamStackPolicy<N>>;
 
 public:
 	typedef typename StorageType::Type Type;
@@ -169,6 +172,12 @@ public:
 
 
 };
+
+typedef FixedBitStream<FixedBitStreamOwningPolicy> FixedBitStreamOwning;
+typedef FixedBitStream<FixedBitStreamNoneOwningPolicy> FixedBitStreamNoneOwning;
+
+template<size_t N>
+using FixedBitStreamStack = FixedBitStream<FixedBitStreamStackPolicy<N>>;
 
 X_NAMESPACE_END
 

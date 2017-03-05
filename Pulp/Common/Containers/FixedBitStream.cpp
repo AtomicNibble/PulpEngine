@@ -4,7 +4,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-void FixedStreamBase::writeBits(const Type* pBuf, size_type numBits)
+void FixedBitStreamBase::writeBits(const Type* pBuf, size_type numBits)
 {
 	if (!numBits) {
 		return;
@@ -94,7 +94,7 @@ void FixedStreamBase::writeBits(const Type* pBuf, size_type numBits)
 }
 
 
-void FixedStreamBase::readBits(Type* pBuf, size_type numBits)
+void FixedBitStreamBase::readBits(Type* pBuf, size_type numBits)
 {
 	if (!numBits) {
 		return;
