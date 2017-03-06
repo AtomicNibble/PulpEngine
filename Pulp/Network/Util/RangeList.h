@@ -13,6 +13,7 @@ class RangeList
 public:
 	struct RangeNode
 	{
+		RangeNode() : min(0), max(0) {}
 		RangeNode(T min, T max) : 
 			min(min), max(max)
 		{
@@ -26,10 +27,17 @@ public:
 	typedef T RangeType;
 	typedef core::Array<RangeNode> RangeArr;
 
+	typedef typename RangeArr::Iterator Iterator;
+	typedef typename RangeArr::ConstIterator ConstIterator;
+	typedef typename RangeArr::Reference Reference;
+	typedef typename RangeArr::ConstReference ConstReference;
+	typedef typename RangeArr::size_type size_type;
 
 public:
 	RangeList(core::MemoryArenaBase* arena);
 
+	size_t writeToBitStream(core::FixedBitStreamBase& bs, BitSizeT maxBits, bool removeAdded);
+	bool fromBitStream(core::FixedBitStreamBase& bs);
 
 	void add(RangeType val);
 
@@ -45,9 +53,17 @@ public:
 	X_INLINE void clear(void);
 	X_INLINE void free(void);
 
-	X_INLINE typename RangeArr::size_type size(void);
-	X_INLINE typename RangeArr::size_type capacity(void);
+	X_INLINE size_type size(void);
+	X_INLINE size_type capacity(void);
 
+	X_INLINE Iterator begin(void);
+	X_INLINE ConstIterator begin(void) const;
+	X_INLINE Iterator end(void);
+	X_INLINE ConstIterator end(void) const;
+	X_INLINE Reference front(void);
+	X_INLINE ConstReference front(void) const;
+	X_INLINE Reference back(void);
+	X_INLINE ConstReference back(void) const;
 
 private:
 	RangeArr ranges_;

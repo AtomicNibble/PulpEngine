@@ -11,6 +11,56 @@ RangeList<T>::RangeList(core::MemoryArenaBase* arena) :
 }
 
 template<typename T>
+size_t RangeList<T>::writeToBitStream(core::FixedBitStreamBase& bs, BitSizeT maxBits, bool removeAdded)
+{
+	bs.alignWriteToByteBoundry(); // make sure we write on boundry.
+
+	// make sure we won't end up negative.
+	if (maxBits < bs.size() + sizeof(uint16_t)) {
+		return 0;
+	}
+
+	const size_t spaceLeft = maxBits - (bs.size() + sizeof(uint16_t));
+	const size_t numFit = spaceLeft / core::bitUtil::bytesToBits(sizeof(RangeNode));
+	if (!numFit) {
+		return 0;
+	}
+
+	bs.write(safe_static_cast<uint16_t>(numFit));
+	bs.write<RangeNode>(ranges_.data(), numFit);
+
+	if (removeAdded) {
+		std::rotate(ranges_.begin(), ranges_.begin() + numFit, ranges_.end());
+		ranges_.resize(ranges_.size() - numFit);
+	}
+
+	return numFit;
+}
+
+
+
+template<typename T>
+bool RangeList<T>::fromBitStream(core::FixedBitStreamBase& bs)
+{
+	clear();
+
+	// meow
+	uint16_t num;
+	bs.readAligned(num);
+
+	size_t bitsRequired = num * core::bitUtil::bytesToBits(sizeof(RangeNode));
+	if (bitsRequired < bs.size()) {
+		return false;
+	}
+
+	ranges_.resize(num);
+
+	bs.read<RangeNode>(ranges_.data(), num);
+	return true;
+}
+
+
+template<typename T>
 void RangeList<T>::add(RangeType val)
 {
 	// find a range to expand / potentially merge ranges if it joins them.
@@ -154,15 +204,64 @@ X_INLINE void RangeList<T>::free(void)
 }
 
 template<typename T>
-X_INLINE typename RangeList<T>::RangeArr::size_type RangeList<T>::size(void)
+X_INLINE typename RangeList<T>::size_type RangeList<T>::size(void)
 {
 	return ranges_.size();
 }
 
 template<typename T>
-X_INLINE typename RangeList<T>::RangeArr::size_type RangeList<T>::capacity(void)
+X_INLINE typename RangeList<T>::size_type RangeList<T>::capacity(void)
 {
 	return ranges_.capacity();
+}
+
+
+template<typename T>
+X_INLINE typename RangeList<T>::Iterator RangeList<T>::begin(void)
+{
+	return ranges_.begin();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::ConstIterator RangeList<T>::begin(void) const
+{
+	return ranges_.begin();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::Iterator RangeList<T>::end(void)
+{
+	return ranges_.end();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::ConstIterator RangeList<T>::end(void) const
+{
+	return ranges_.end();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::Reference RangeList<T>::front(void)
+{
+	return ranges_.front();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::ConstReference RangeList<T>::front(void) const
+{
+	return ranges_.front();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::Reference RangeList<T>::back(void)
+{
+	return ranges_.back();
+}
+
+template<typename T>
+X_INLINE typename RangeList<T>::ConstReference RangeList<T>::back(void) const
+{
+	return ranges_.back();
 }
 
 X_NAMESPACE_END
