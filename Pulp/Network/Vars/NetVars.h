@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ICompression.h>
 
 
 X_NAMESPACE_DECLARE(core,
@@ -24,10 +25,20 @@ public:
 	X_INLINE int32_t rlConnectionsPerIPThreshMS(void) const;
 	X_INLINE int32_t rlConnectionsPerIPBanTimeMS(void) const;
 
+	X_INLINE int32_t defaultTimeoutMS(void) const;
 	X_INLINE int32_t dropPartialConnectionsMS(void) const;
 	X_INLINE int32_t pingTimeMS(void) const;
 	X_INLINE int32_t unreliableTimeoutMS(void) const;
+	X_INLINE int32_t unexpectedMsgBanTime(void) const;
 	X_INLINE int32_t connectionBSPLimit(void) const;
+
+	X_INLINE int32_t artificalPacketLoss(void) const;
+	X_INLINE int32_t artificalPing(void) const;
+	X_INLINE int32_t artificalPingVariance(void) const;
+	X_INLINE bool ignorePasswordFromClientIfNotRequired(void) const;
+
+	X_INLINE core::Compression::Algo::Enum ackCompAlgo(void) const;
+	X_INLINE core::Compression::Algo::Enum compAlgo(void) const;
 
 
 
@@ -38,11 +49,20 @@ private:
 	int32_t rlconnectionsPerIpThreshMS_;
 	int32_t rlconnectionsPerIpBanTimeMS_;
 
+	int32_t defaultTimeoutMS_;
 	int32_t dropPartialConnectionsMS_;
 	int32_t pingTimeMS_;
 	int32_t unreliableTimeoutMS_;
+	int32_t unexpectedMsgBanTime_;
 	int32_t connectionBSPLimit_;
 
+	int32_t artificalPacketLoss_;
+	int32_t artificalPing_;
+	int32_t artificalPingVariance_;
+	int32_t ignorePasswordFromClientIfNotRequired_;
+
+	int32_t ackCompAlgo_;
+	int32_t compAlgo_;
 };
 
 
