@@ -110,6 +110,20 @@ inline void FixedBitStreamBase::write(const Type* pBuf, size_type numBytes)
 
 
 // pads the stream to byte boundry before read.
+template<typename T>
+inline void FixedBitStreamBase::writeAligned(const T& val)
+{
+	alignWriteToByteBoundry();
+	write<T>(val);
+}
+
+template<typename T>
+inline void FixedBitStreamBase::writeAligned(const T* pVal, size_type num)
+{
+	alignWriteToByteBoundry();
+	write<T>(pVal, num);
+}
+
 inline void FixedBitStreamBase::writeAligned(const Type* pBuf, size_type numBytes)
 {
 	alignWriteToByteBoundry();
@@ -153,6 +167,21 @@ inline void FixedBitStreamBase::read(Type* pBuf, size_type numBytes)
 
 
 // pads the stream to byte boundry before read.
+// pads the stream to byte boundry before read.
+template<typename T>
+inline void FixedBitStreamBase::readAligned(T& val)
+{
+	alignReadToByteBoundry();
+	read<T>(val);
+}
+
+template<typename T>
+inline void FixedBitStreamBase::readAligned(T* pVal, size_type num)
+{
+	alignReadToByteBoundry();
+	read<T>(pVal, num);
+}
+
 inline void FixedBitStreamBase::readAligned(Type* pBuf, size_type numBytes)
 {
 	alignReadToByteBoundry();

@@ -41,6 +41,10 @@ public:
 	void writeBits(const Type* pBuf, size_type numBits);
 
 	// pads the stream to byte boundry before writing.
+	template<typename T>
+	void writeAligned(const T& val);
+	template<typename T>
+	void writeAligned(const T* pVal, size_type num);
 	void writeAligned(const Type* pBuf, size_type numBytes);
 	void writeBitsAligned(const Type* pBuf, size_type numBits);
 
@@ -59,7 +63,13 @@ public:
 	// read bits from stream
 	void readBits(Type* pBuf, size_type numBits);
 
+
 	// pads the stream to byte boundry before read.
+	template<typename T>
+	void readAligned(T& val);
+	template<typename T>
+	void readAligned(T* pVal, size_type num);
+
 	void readAligned(Type* pBuf, size_type numBytes);
 	void readBitsAligned(Type* pBuf, size_type numBits);
 
