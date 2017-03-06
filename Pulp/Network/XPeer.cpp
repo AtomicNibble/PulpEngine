@@ -578,7 +578,7 @@ void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool 
 		return;
 	}
 
-	if (performImmediate)
+	if (!performImmediate)
 	{
 		BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
 		pCmd->priority = notificationPriority;
