@@ -98,6 +98,9 @@
     <ClInclude Include="Util\BPSTracker.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Util\RangeList.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -133,6 +136,9 @@
     <ClCompile Include="Util\BPSTracker.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="Util\RangeList.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl">
@@ -151,6 +157,9 @@
       <Filter>Header Files\Reliability</Filter>
     </None>
     <None Include="Util\BPSTracker.inl">
+      <Filter>Header Files\Util</Filter>
+    </None>
+    <None Include="Util\RangeList.inl">
       <Filter>Header Files\Util</Filter>
     </None>
   </ItemGroup>
