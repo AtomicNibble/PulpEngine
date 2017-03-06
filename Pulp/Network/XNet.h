@@ -4,8 +4,11 @@
 
 X_NAMESPACE_BEGIN(net)
 
+class XPeer;
 class XNet : public INet
 {
+	typedef core::FixedArray<XPeer*, MAX_PEERS> PeerArr;
+
 public:
 	XNet(core::MemoryArenaBase* arena);
 	~XNet() X_FINAL;
@@ -31,6 +34,7 @@ public:
 private:
 	core::MemoryArenaBase* arena_;
 
+	PeerArr peers_;
 	NetVars vars_;
 };
 

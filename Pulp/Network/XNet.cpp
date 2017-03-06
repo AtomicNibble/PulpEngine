@@ -49,6 +49,11 @@ void XNet::shutDown(void)
 {
 	X_LOG0("Net", "Shutting Down");
 
+	for (auto* pPeer : peers_)
+	{
+		X_DELETE(pPeer, arena_);
+	}
+
 	PlatLib::deRef();
 
 }
@@ -61,11 +66,26 @@ void XNet::release(void)
 
 IPeer* XNet::createPeer(void)
 {
-	return X_NEW(XPeer, arena_, "Peer")(vars_, arena_);
+	if (peers_.size() == peers_.capacity()) {
+		return nullptr;
+	}
+
+	XPeer* pPeer = X_NEW(XPeer, arena_, "Peer")(vars_, arena_);
+	peers_.append(pPeer);
+	return pPeer;
 }
 
-void XNet::deletePeer(IPeer* pPeer)
+void XNet::deletePeer(IPeer* pIPeer)
 {
+	if (!pIPeer) {
+		return;
+	}
+
+	XPeer* pPeer = static_cast<XPeer*>(pIPeer);
+
+	auto idx = peers_.find(pPeer);
+	X_ASSERT(idx != PeerArr::invalid_index, "Failed to find peer instance")();
+	peers_.removeIndex(idx);
 	X_DELETE(pPeer, arena_);
 }
 
