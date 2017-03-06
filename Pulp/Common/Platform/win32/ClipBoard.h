@@ -9,14 +9,14 @@ X_NAMESPACE_BEGIN(core)
 
 namespace clipboard
 {
-	// not thread safe
-	bool setText(const char* pStr);
+	typedef char ClipBoardBuffer[4096];
 
-	// not thread safe
-	const char* getText(void);
 
-}
+	bool setText(const char* pBegin, const char* pEnd);
 
+	const char* getText(ClipBoardBuffer& bufOut);
+
+} // namespace clipboard
 
 X_NAMESPACE_END
 

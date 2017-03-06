@@ -2725,19 +2725,20 @@ void XConsole::ListVariables(const char* searchPatten)
 
 void XConsole::Copy(void)
 {
-	core::clipboard::setText(InputBuffer_.c_str());
+	core::clipboard::setText(InputBuffer_.begin(), InputBuffer_.end());
 }
 
 void XConsole::Paste(void)
 {
-	const char* txt = core::clipboard::getText();
+	core::clipboard::ClipBoardBuffer buffer;
+	const char* pTxt = core::clipboard::getText(buffer);
 
-	if (txt)
+	if (pTxt)
 	{
 		// insert it at current pos.
-		InputBuffer_.insert(CursorPos_, txt);
+		InputBuffer_.insert(CursorPos_, pTxt);
 		// add to length
-		CursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(txt));
+		CursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(pTxt));
 	}
 	else
 	{

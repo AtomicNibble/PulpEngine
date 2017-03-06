@@ -6,23 +6,16 @@ X_NAMESPACE_BEGIN(core)
 
 namespace clipboard
 {
-	namespace{
 
-		char g_buf[4096];
-	}
-
-	bool setText(const char* pStr)
+	bool setText(const char* pBegin, const char* pEnd)
 	{
 		core::lastError::Description Dsc;
-		size_t strLen;
-		HGLOBAL hMem;
-		LPSTR pDst;
 
-		strLen = strlen(pStr) + 1;
-		hMem = GlobalAlloc(GMEM_MOVEABLE, strLen);
-		pDst = (LPSTR)GlobalLock(hMem);
+		const size_t strLen = pEnd - pBegin;
+		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, strLen);
+		LPSTR pDst = (LPSTR)GlobalLock(hMem);
 
-		memcpy(pDst, pStr, strLen);
+		std::memcpy(pDst, pBegin, strLen);
 
 		if (GlobalUnlock(hMem) != 0 && core::lastError::Get() != ERROR_NOT_LOCKED) {
 			X_WARNING("Clipboard", "failed to unlock clipboard memory. Error: %s", core::lastError::ToString(Dsc));
@@ -43,21 +36,25 @@ namespace clipboard
 
 		if (!SetClipboardData(CF_TEXT, hMem)) {
 			X_WARNING("Clipboard", "failed to SetClipboardData. Error: %s", core::lastError::ToString(Dsc));
+			CloseClipboard();
 			return false;
 		}
 
-		if (!CloseClipboard())
+		if (!CloseClipboard()) {
 			X_WARNING("Clipboard", "failed to CloseClipboard. Error: %s", core::lastError::ToString(Dsc));
+		}
 
-		X_LOG1("Clipboard", "set cliboard: %s", pStr);
+		if (strLen > 512) {
+			X_LOG1("Clipboard", "set cliboard: %.*s...", 512, pBegin);
+		}
+		else {
+			X_LOG1("Clipboard", "set cliboard: %.*s", strLen, pBegin);
+		}
 		return true;
 	}
 
-	const char* getText(void)
+	const char* getText(ClipBoardBuffer& bufOut)
 	{
-		HGLOBAL hGlobal;
-		void*  pGlobal;
-		size_t strLength;
 		core::lastError::Description Dsc;
 
 		if (!IsClipboardFormatAvailable(CF_TEXT)) {
@@ -70,35 +67,36 @@ namespace clipboard
 			return nullptr;
 		}
 
-		hGlobal = GetClipboardData(CF_TEXT);
-
-		if (!hGlobal)
+		HGLOBAL hGlobal = GetClipboardData(CF_TEXT);
+		if (!hGlobal) {
+			X_WARNING("Clipboard", "failed to get clipboard data. Error: %s", core::lastError::ToString(Dsc));
 			return nullptr;
-
-		pGlobal = GlobalLock(hGlobal);
-
-		strLength = strlen((char*)pGlobal);
-
-		if (strLength > sizeof(g_buf)-1){
-			X_WARNING("Clipboard", "Clipboard text data is over %i bytes. truncating string", sizeof(g_buf));
 		}
 
-		strLength = core::Min(sizeof(g_buf)-1, strLength);
+		void* pGlobal = GlobalLock(hGlobal);
+
+		size_t strLength = strlen((char*)pGlobal);
+		if (strLength > sizeof(bufOut)-1){
+			X_WARNING("Clipboard", "Clipboard text data is over %i bytes. truncating string", sizeof(bufOut));
+		}
+
+		strLength = core::Min(sizeof(bufOut)-1, strLength);
 
 		// make sure it's null termed.
-		g_buf[strLength] = '\0';
+		bufOut[strLength] = '\0';
 
 		// copy it shit face.
-		strncpy(g_buf, (char*)pGlobal, strLength);
+		strncpy(bufOut, (char*)pGlobal, strLength);
 
-
-		if(!GlobalUnlock(hGlobal))
+		if (!GlobalUnlock(hGlobal)) {
 			X_WARNING("Clipboard", "failed to unlock global data. Error: %s", core::lastError::ToString(Dsc));
+		}
 		
-		if(!CloseClipboard())
+		if (!CloseClipboard()) {
 			X_WARNING("Clipboard", "failed to CloseClipboard. Error: %s", core::lastError::ToString(Dsc));
+		}
 
-		return g_buf;
+		return bufOut;
 	}
 
 
