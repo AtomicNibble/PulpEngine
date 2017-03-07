@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Util\BPSTracker.h"
+#include "Util\RangeList.h"
 
 #include <Containers\Fifo.h>
 
@@ -13,6 +14,7 @@ typedef uint16_t SplitPacketId;
 typedef uint32_t SplitPacketIndex;
 typedef uint16_t MessageNumber;
 typedef uint16_t OrderingIndex;
+typedef uint16_t DataGramSequenceNumber;
 
 
 struct ReliablePacket
@@ -59,6 +61,9 @@ public:
 		BitSizeT numBits;
 	};
 
+	typedef RangeList<DataGramSequenceNumber> DataGramNumberRangeList;
+
+
 public:
 	ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
 	~ReliabilityLayer();
@@ -75,7 +80,7 @@ public:
 
 	// update internal logic, re-send packets / other reliability actions.
 	void update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
-		core::TimeVal time, size_t bitsPerSecondLimit);
+		core::TimeVal time);
 
 	// pop any packets that have arrived.
 	bool recive(PacketData& dataOut);
@@ -83,23 +88,23 @@ public:
 
 	void getStatistics(NetStatistics& stats) const;
 
-	X_INLINE void setTimeout(core::TimeVal timeout);
-	X_INLINE core::TimeVal getTimeout(void);
-
-	X_INLINE void setUnreliableMsgTimeout(core::TimeVal timeout);
-	X_INLINE core::TimeVal getUnreliableMsgTimeout(void);
-
 	X_INLINE bool pendingOutgoingData(void) const;
 	X_INLINE bool isWaitingForAcks(void) const;
 	X_INLINE bool isConnectionDead(void) const;
 	X_INLINE void killConnection(void);
 
 
-
+private:
+	X_INLINE void addAck(DataGramSequenceNumber messageNumber);
 
 private:
+	bool hasTimedOut(core::TimeVal time);
+
+	void sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
+	void sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
 	void sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
 
+	ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
 	ReliablePacket* allocPacket(void);
 	void freePacket(ReliablePacket* pPacker);
 
@@ -109,8 +114,8 @@ private:
 
 	core::MemoryArenaBase* packetPool_;
 
-	core::TimeVal timeOut_;
-	core::TimeVal unreliableTimeOut_;
+	int32_t MTUSize_;
+
 	core::TimeVal timeLastDatagramArrived_;
 	core::TimeVal lastBSPUpdate_;
 
@@ -120,9 +125,12 @@ private:
 	OrdereIndexArr orderedReadIndex_;				// next 'expected' ordered index
 	OrdereIndexArr highestSequencedReadIndex_;		// higest value received for sequencedWriteIndex
 
-
 	PacketQeue outGoingPackets_;
 	PacketQeue recivedPackets_;
+
+	DataGramNumberRangeList incomingAcks_;
+	DataGramNumberRangeList naks_;
+	DataGramNumberRangeList acks_;
 
 	bool connectionDead_;
 	bool _pad[3];

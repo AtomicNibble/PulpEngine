@@ -63,7 +63,7 @@ void XNet::shutDown(void)
 
 void XNet::release(void)
 {
-
+	X_DELETE(this, g_NetworkArena);
 }
 
 

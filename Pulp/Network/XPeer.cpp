@@ -1447,7 +1447,7 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 
 		core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
 
-		rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, time, 1000);
+		rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, time);
 
 		const bool deadConnection = rs.relLayer.isConnectionDead();
 		const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
@@ -1568,8 +1568,6 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 					X_ERROR("Net", "Unhandled reliable message: \"%s\"", MessageID::ToString(msgId));
 					break;
 			}
-
-
 		}
 	}
 }

@@ -1,10 +1,13 @@
 #include "stdafx.h"
+
+#include <Memory\AllocationPolicies\StackAllocator.h>
+#include <ITimer.h>
+
 #include "ReliabilityLayer.h"
 
 #include "Sockets\Socket.h"
 #include "Vars\NetVars.h"
 
-#include <ITimer.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -19,6 +22,7 @@ namespace
 
 	typedef Flags<DatagramFlag> DatagramFlags;
 
+	X_PACK_PUSH(1)
 	struct DatagramHdr
 	{
 		void writeToBitStream(core::FixedBitStreamBase& bs) const;
@@ -27,6 +31,7 @@ namespace
 		uint16_t number;
 		DatagramFlags flags;
 	};
+	X_PACK_POP;
 
 	void DatagramHdr::writeToBitStream(core::FixedBitStreamBase& bs) const
 	{
@@ -143,10 +148,14 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 
 ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool) :
 	vars_(vars),
+	MTUSize_(0),
 	packetPool_(packetPool),
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
 	connectionDead_(false),
+	incomingAcks_(arena),
+	naks_(arena),
+	acks_(arena),
 	bps_{ arena, arena, arena, arena, arena, arena, arena }
 {
 	outGoingPackets_.reserve(128);
@@ -161,7 +170,9 @@ ReliabilityLayer::~ReliabilityLayer()
 
 void ReliabilityLayer::reset(int32_t MTUSize)
 {
-	X_UNUSED(MTUSize);
+	MTUSize_ = MTUSize;
+
+	timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
 
 	connectionDead_ = false;
 
@@ -180,8 +191,8 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
 
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "%s msg added. numbits: %" PRIu32, 
-		PacketReliability::ToString(reliability), lengthBits);
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "'%s' msg added. Pri: \"%s\" numbits: %" PRIu32, 
+		PacketReliability::ToString(reliability), PacketPriority::ToString(priority), lengthBits);
 	
 	auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
 
@@ -251,26 +262,109 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 	DatagramHdr dgh;
 	dgh.fromBitStream(bs);
 
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel","DataGram number: %" PRIu16, dgh.number);
+	if (vars_.debugEnabled())
+	{
+		DatagramFlags::Description Dsc;
+		X_LOG0("NetRel", "DataGram number: %" PRIu16 "Flags: \"%s\"", dgh.number, dgh.flags.ToString(Dsc));
+	}
 
-	ReliablePacket* pPacket = allocPacket();
-	pPacket->creationTime = gEnv->pTimer->GetTimeNowReal();
-	
-	// read in data from steam :D
-	pPacket->fromBitStream(bs);
+	if (dgh.flags.IsSet(DatagramFlag::Ack))
+	{
+		// ack, ack, ack!
+		incomingAcks_.clear();
 
-	X_ASSERT(bs.isEos(), "Unprocssed bytes")(bs.isEos(), bs.size(), bs.capacity());
+		if (!incomingAcks_.fromBitStream(bs)) {
+			X_ERROR("NetRel", "Failed to process incomming ack's");
+			return false;
+		}
 
-	recivedPackets_.push(pPacket);
+		for (auto& ackRange : incomingAcks_)
+		{
+			// we want to mark all these messages as recived so we don't resend like a pleb.
+
+
+		}
+
+	}
+	else if (dgh.flags.IsSet(DatagramFlag::Nack))
+	{
+		// nick nack pady wack
+		X_ALIGNED_SYMBOL(char allocBuf[core::bitUtil::RoundUpToMultiple(MAX_MTU_SIZE, 256u)], 16) = {};
+
+		core::StackAllocator allocator(allocBuf, allocBuf + sizeof(allocBuf));
+
+		typedef core::MemoryArena<
+			core::StackAllocator,
+			core::SingleThreadPolicy,
+			core::NoBoundsChecking,
+			core::NoMemoryTracking,
+			core::NoMemoryTagging
+		> StackArena;
+
+		// we don't get many of these sluts.
+		StackArena arena(&allocator, "NackArena");
+		DataGramNumberRangeList incomingNacks(&arena);
+
+		if (!incomingNacks.fromBitStream(bs)) {
+			X_ERROR("NetRel", "Failed to process incomming nacks's");
+			return false;
+		}
+
+		for (auto& nackRange : incomingNacks)
+		{
+			// mark all the msg's for resend immediatly.
+
+
+
+
+		}
+	}
+	else
+	{
+		// I GOT IT !
+		// we ack for unreliable also, but never resend if no ack recived,
+		addAck(dgh.number);
+
+		// we can have multiple goat packets in a single MTU.
+		// so we keep processing the bitStream untill it's empty.
+
+		ReliablePacket* pPacket = packetFromBS(bs, time);
+		while (pPacket)
+		{
+			// i don't trust you!
+
+			if (pPacket->reliability == PacketReliability::ReliableSequenced ||
+				pPacket->reliability == PacketReliability::ReliableOrdered ||
+				pPacket->reliability == PacketReliability::UnReliableSequenced)
+			{
+				if (pPacket->orderingChannel > MAX_ORDERED_STREAMS)
+				{
+					// bitch who you think you are.
+					goto tryNextPacket;
+				}
+			}
+
+
+
+
+			recivedPackets_.push(pPacket);
+
+		tryNextPacket:
+			pPacket = packetFromBS(bs, time);
+		}
+
+		X_ASSERT(bs.isEos(), "Unprocessed bytes")(bs.isEos(), bs.size(), bs.capacity());
+	}
+
 	return true;
 }
 
 void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
-	core::TimeVal time, size_t bitsPerSecondLimit)
+	core::TimeVal time)
 {
 	bs.reset();
 
-	if ((lastBSPUpdate_ + core::TimeVal::fromMS(1000)) < lastBSPUpdate_)
+	if ((lastBSPUpdate_ + core::TimeVal::fromMS(1000)) < time)
 	{
 		for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++)
 		{
@@ -280,9 +374,32 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		lastBSPUpdate_ = time;
 	}
 
-	// false promises, broken dreams.
-	// no reliabilty here hehehe
-	
+	const int32_t bitsPerSecondLimit = vars_.connectionBSPLimit();
+
+	// HELLLLOOOO annnnyboddy.
+	if (hasTimedOut(time)) {
+		X_ERROR("NetRel", "Connection timed out");
+		connectionDead_ = true;
+		return;
+	}
+
+	// send acks.
+	if (acks_.isNotEmpty()) {
+		sendACKs(socket, bs, systemAddress, time);
+	}
+
+	// send naks.
+	if (naks_.isNotEmpty()) {
+		sendNAKs(socket, bs, systemAddress, time);
+	}
+
+	// resend packets.
+
+
+	// send new packets.
+
+
+
 	while (outGoingPackets_.isNotEmpty())
 	{
 		ReliablePacket* pPacket = outGoingPackets_.peek();
@@ -305,7 +422,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 	}
 }
 
-
+// called from peer to get recived packets back from ReliabilityLayer.
 bool ReliabilityLayer::recive(PacketData& dataOut)
 {
 	if (recivedPackets_.isEmpty()) {
@@ -319,6 +436,69 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	return true;
 }
 
+bool ReliabilityLayer::hasTimedOut(core::TimeVal time)
+{
+	core::TimeVal elapsed = time - timeLastDatagramArrived_;
+	
+	if (elapsed > core::TimeVal::fromMS(vars_.defaultTimeoutMS()))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
+{
+	// we want to pack all the acks into packets.
+	const BitSizeT maxPacketBytes = MTUSize_ - sizeof(DatagramHdr);
+	const BitSizeT maxPacketBits = core::bitUtil::bytesToBits(maxPacketBytes);
+
+	while (acks_.isNotEmpty())
+	{
+		bs.reset();
+
+		DatagramHdr dgh;
+		dgh.number = 0;
+		dgh.flags.Set(DatagramFlag::Nack);
+		dgh.writeToBitStream(bs);
+
+		// return instead of infinate loop, but if this happens dunno how we'd recover :Z
+		// but it never 'should' happen.
+		if (acks_.writeToBitStream(bs, maxPacketBits, true) == 0) {
+			X_ERROR("NetRel", "Failed to write any ack's to stream");
+			return;
+		}
+
+		// Weeeeeee!
+		sendBitStream(socket, bs, systemAddress, time);
+	}
+}
+
+void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
+{
+	// we want to pack all the acks into packets.
+	const BitSizeT maxPacketBytes = MTUSize_ - sizeof(DatagramHdr);
+	const BitSizeT maxPacketBits = core::bitUtil::bytesToBits(maxPacketBytes);
+
+	while (naks_.isNotEmpty())
+	{
+		bs.reset();
+
+		DatagramHdr dgh;
+		dgh.number = 0;
+		dgh.flags.Set(DatagramFlag::Nack);
+		dgh.writeToBitStream(bs);
+
+		if (naks_.writeToBitStream(bs, maxPacketBits, true) == 0) {
+			X_ERROR("NetRel", "Failed to write any nack's to stream");
+			return;
+		}
+
+		sendBitStream(socket, bs, systemAddress, time);
+	}
+}
+
 void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
 {
 	bps_[NetStatistics::Metric::ActualBytesSent].add(time, bs.sizeInBytes());
@@ -327,6 +507,23 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
 	sp.setData(bs);
 	sp.systemAddress = systemAddress;
 	socket.send(sp);
+}
+
+ReliablePacket* ReliabilityLayer::packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time)
+{
+	// meow.
+	if (bs.isEos()) {
+		return nullptr;
+	}
+
+	ReliablePacket* pPacket = allocPacket();
+	pPacket->creationTime = time;
+	if (!pPacket->fromBitStream(bs)) {
+		freePacket(pPacket);
+		return nullptr;
+	}
+
+	return pPacket;
 }
 
 ReliablePacket* ReliabilityLayer::allocPacket(void)
