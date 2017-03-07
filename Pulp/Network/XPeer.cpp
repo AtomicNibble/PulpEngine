@@ -1480,13 +1480,16 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 		const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
 		const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
 
-		if (disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut)
+		if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut)
 		{
 			if (vars_.debugEnabled())
 			{
 				const char* pCloseReason = "<ukn>";
 
-				if (disconnectingNoData) {
+				if (deadConnection) {
+					pCloseReason = "Connection timeout";
+				}
+				else if (disconnectingNoData) {
 					pCloseReason = "Disconnection request";
 				}
 				else if (connectionOpenTimeout) {
