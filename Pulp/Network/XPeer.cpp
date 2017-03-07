@@ -106,6 +106,33 @@ bool RemoteSystem::canSend(void) const
 	return true;
 }
 
+ConnectionState::Enum RemoteSystem::getConnectionState(void) const
+{
+	if (!isActive) {
+		return ConnectionState::Disconnected;
+	}
+
+	static_assert(ConnectState::ENUM_COUNT == 8, "Additional states? this logic needs updating");
+	switch (connectState)
+	{
+		case ConnectState::DisconnectAsap:
+		case ConnectState::DisconnectOnNoAck:
+			return ConnectionState::Disconnecting;
+		case ConnectState::DisconnectAsapSilent:
+			return ConnectionState::DisconnectingSilently;
+
+		case ConnectState::RequestedConnection:
+		case ConnectState::HandlingConnectionRequest:
+		case ConnectState::UnverifiedSender:
+			return ConnectionState::Connecting;
+
+		case ConnectState::Connected:
+			return ConnectionState::Connected;
+	}
+
+	return ConnectionState::Disconnected;
+}
+
 void RemoteSystem::disconnect(void)
 {
 	isActive = false;
@@ -431,29 +458,7 @@ ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdenti
 		return ConnectionState::NotConnected;
 	}
 
-	if (!pRemoteSys->isActive) {
-		return ConnectionState::Disconnected;
-	}
-
-	static_assert(ConnectState::ENUM_COUNT == 8, "Additional states? this logic needs updating");
-	switch (pRemoteSys->connectState)
-	{
-		case ConnectState::DisconnectAsap:
-		case ConnectState::DisconnectOnNoAck:
-			return ConnectionState::Disconnecting;
-		case ConnectState::DisconnectAsapSilent:
-			return ConnectionState::DisconnectingSilently;
-
-		case ConnectState::RequestedConnection:
-		case ConnectState::HandlingConnectionRequest:
-		case ConnectState::UnverifiedSender:
-			return ConnectionState::Connecting;
-
-		case ConnectState::Connected:
-			return ConnectionState::Connected;
-	}
-
-	return ConnectionState::Disconnected;
+	return pRemoteSys->getConnectionState();
 }
 
 void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)

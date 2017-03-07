@@ -78,6 +78,7 @@ public:
 	RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
 
 	bool canSend(void) const;
+	ConnectionState::Enum getConnectionState(void) const;
 
 	void disconnect(void);
 
