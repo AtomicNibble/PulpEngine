@@ -111,11 +111,13 @@ void RangeList<T>::add(RangeType val)
 		}
 	}
 
+	const T one = T(1);
+
 	// not found
 	if (rangeIdx == ranges_.size())
 	{
 		// extend end if possible.
-		if (ranges_[rangeIdx - 1].max + 1 == val) {
+		if (ranges_[rangeIdx - 1].max + one == val) {
 			ranges_[rangeIdx - 1].max++;
 		}
 		else {
@@ -126,16 +128,16 @@ void RangeList<T>::add(RangeType val)
 
 	auto& range = ranges_[rangeIdx];
 
-	if (val < range.min - 1)
+	if (val < range.min - one)
 	{
 		ranges_.insert(RangeArr::Type(val, val), rangeIdx);
 		return;
 	}
-	else if (val == range.min - 1)
+	else if (val == range.min - one)
 	{
 		--range.min;
 		// merge?
-		if (rangeIdx > 0 && (ranges_[rangeIdx - 1].max + 1) == range.min) {
+		if (rangeIdx > 0 && (ranges_[rangeIdx - 1].max + one) == range.min) {
 			ranges_[rangeIdx - 1].max = range.max;
 			ranges_.removeIndex(rangeIdx);
 		}
@@ -146,11 +148,11 @@ void RangeList<T>::add(RangeType val)
 	{
 		return;
 	}
-	else if (val == range.max + 1)
+	else if (val == range.max + one)
 	{
 		++range.max;
 		// merge?
-		if ((rangeIdx + 1) < ranges_.size() && ranges_[rangeIdx + 1].min == range.max + 1) {
+		if ((rangeIdx + 1) < safe_static_cast<int32_t>(ranges_.size()) && ranges_[rangeIdx + 1].min == range.max + one) {
 			ranges_[rangeIdx].max = ranges_[rangeIdx + 1].max;
 			ranges_.removeIndex(rangeIdx + 1);
 		}
