@@ -2,6 +2,11 @@
 
 #include "Vars\NetVars.h"
 
+X_NAMESPACE_DECLARE(core,
+struct ICVar;
+struct IConsoleCmdArgs;
+)
+
 X_NAMESPACE_BEGIN(net)
 
 class XPeer;
@@ -32,8 +37,11 @@ public:
 	static NetGUID generateGUID(void);
 
 private:
-	core::MemoryArenaBase* arena_;
+	void listRemoteSystems(core::IConsoleCmdArgs* pCmd);
 
+private:
+	core::MemoryArenaBase* arena_;
+	
 	PeerArr peers_;
 	NetVars vars_;
 };

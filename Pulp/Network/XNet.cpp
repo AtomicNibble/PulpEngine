@@ -6,6 +6,7 @@
 
 #include <Time\DateStamp.h>
 #include <ITimer.h>
+#include <IConsole.h>
 
 #include <Hashing\sha1.h>
 
@@ -30,6 +31,8 @@ void XNet::registerVars(void)
 
 void XNet::registerCmds(void)
 {
+	ADD_COMMAND_MEMBER("net_list_remotes", this, XNet, &XNet::listRemoteSystems, core::VarFlag::SYSTEM,
+		"List all the connected systems for each peer");
 
 }
 
@@ -118,6 +121,19 @@ NetGUID XNet::generateGUID(void)
 	val |= digest.data[1];
 
 	return NetGUID(val);
+}
+
+void XNet::listRemoteSystems(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+
+	int32_t idx = 0;
+	for (auto* pPeer : peers_)
+	{
+		X_LOG0("Net", "Peer%" PRIi32" remote systems", idx++);
+		X_LOG_BULLET;
+		pPeer->listRemoteSystems();
+	}
 }
 
 X_NAMESPACE_END
