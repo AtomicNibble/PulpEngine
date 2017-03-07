@@ -2093,7 +2093,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 
 	// corrent password?
 	PasswordStr pass(passwordBuf, passwordBuf + passwordLen);
-	if (password_ != pass)
+	if (password_ != pass && (password_.isNotEmpty() && vars_.ignorePasswordFromClientIfNotRequired()))
 	{
 		bsOut.write(MessageID::InvalidPassword);
 		bsOut.write(guid_);
