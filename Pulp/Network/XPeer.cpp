@@ -1663,7 +1663,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 			X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", ipStr);
 
 			// temp ban them.
-			addToBanList(ipStr, defaultTimeOut_);
+			addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 			return;
 		}
 
@@ -2074,7 +2074,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 
 		IPStr ipStr;
 		rs.systemAddress.toString(ipStr);
-		addToBanList(ipStr, rs.relLayer.getTimeout());
+		addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 		return;
 	}
 
