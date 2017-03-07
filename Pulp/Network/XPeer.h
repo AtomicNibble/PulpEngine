@@ -251,9 +251,6 @@ public:
 
 	const NetGUID& getMyGUID(void) const X_FINAL;
 
-	void setTimeoutTime(core::TimeVal time, const ISystemAdd* pTarget) X_FINAL;
-	core::TimeVal getTimeoutTime(const ISystemAdd* pTarget = nullptr) X_FINAL;
-
 	// MTU for a given system
 	int32_t getMTUSize(const ISystemAdd* pTarget = nullptr) X_FINAL;
 
@@ -267,6 +264,8 @@ public:
 	// the number of remote connections to us.
 	// excludes connections made by us.
 	size_t getNumRemoteInitiatedConnections(void) const;
+
+	void listRemoteSystems(void) const;
 
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,

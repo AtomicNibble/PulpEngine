@@ -333,9 +333,6 @@ struct IPeer
 
 	virtual const NetGUID& getMyGUID(void) const X_ABSTRACT;
 
-	virtual void setTimeoutTime(core::TimeVal time, const ISystemAdd* pTarget = nullptr) X_ABSTRACT;
-	virtual core::TimeVal getTimeoutTime(const ISystemAdd* pTarget = nullptr) X_ABSTRACT;
-
 	// MTU for a given system
 	virtual int getMTUSize(const ISystemAdd* pTarget = nullptr) X_ABSTRACT;
 

@@ -1247,70 +1247,6 @@ const NetGUID& XPeer::getMyGUID(void) const
 	return guid_;
 }
 
-
-void XPeer::setTimeoutTime(core::TimeVal time, const ISystemAdd* pTarget)
-{
-	if (pTarget) {
-		const SystemAdd* sysAdd = static_cast<const SystemAdd*>(pTarget);
-		RemoteSystem* pRemoteSys = getRemoteSystem(*sysAdd, true);
-		if (!pRemoteSys) {
-			X_ERROR("Net", "Failed to set timeout system not found");
-			return;
-		}
-
-		pRemoteSys->relLayer.setTimeout(time);
-		return;
-	}
-
-	for (auto rs : remoteSystems_)
-	{
-		rs.relLayer.setTimeout(time);
-	}
-
-	defaultTimeOut_ = time;
-}
-
-core::TimeVal XPeer::getTimeoutTime(const ISystemAdd* pTarget)
-{
-	if (pTarget) {
-		const SystemAdd* sysAdd = static_cast<const SystemAdd*>(pTarget);
-		RemoteSystem* pRemoteSys = getRemoteSystem(*sysAdd, true);
-		if (!pRemoteSys) {
-			X_ERROR("Net", "Failed toget timeout system not found");
-			return core::TimeVal(0ll);
-		}
-
-		return pRemoteSys->relLayer.getTimeout();
-	}
-
-	return defaultTimeOut_;
-}
-
-void XPeer::setUnreliableTimeout(core::TimeVal timeout)
-{
-	unreliableTimeOut_ = timeout;
-}
-
-bool XPeer::accpetingIncomingConnections(void) const
-{
-	return getNumRemoteInitiatedConnections() < getMaximumIncomingConnections();
-}
-
-size_t XPeer::getNumRemoteInitiatedConnections(void) const
-{
-	size_t num = 0;
-
-	for (auto rc : remoteSystems_)
-	{
-		if (rc.connectState == ConnectState::Connected && rc.isActive && !rc.weStartedconnection)
-		{
-			++num;
-		}
-	}
-
-	return num;
-}
-
 // MTU for a given system
 int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
 {
@@ -1349,6 +1285,52 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 
 // ~IPeer
+
+
+void XPeer::setUnreliableTimeout(core::TimeVal timeout)
+{
+	unreliableTimeOut_ = timeout;
+}
+
+bool XPeer::accpetingIncomingConnections(void) const
+{
+	return getNumRemoteInitiatedConnections() < getMaximumIncomingConnections();
+}
+
+size_t XPeer::getNumRemoteInitiatedConnections(void) const
+{
+	size_t num = 0;
+
+	for (auto rc : remoteSystems_)
+	{
+		if (rc.connectState == ConnectState::Connected && rc.isActive && !rc.weStartedconnection)
+		{
+			++num;
+		}
+	}
+
+	return num;
+}
+
+void XPeer::listRemoteSystems(void) const
+{
+	auto timeNow = gEnv->pTimer->GetTimeNowReal();
+
+	for (auto rs : remoteSystems_)
+	{
+		if (!rs.isActive) {
+			continue;
+		}
+
+		auto connectionElapsed = timeNow - rs.connectionTime;
+		
+		IPStr ipStr;
+		X_LOG0("Net", "Host: \"%s\" connectionTime: %g sec state: %s", 
+			rs.systemAddress.toString(ipStr), 
+			connectionElapsed.GetSeconds(),
+			ConnectionState::ToString(rs.getConnectionState()));
+	}
+}
 
 
 void XPeer::processConnectionRequests(UpdateBitStream& updateBS)
