@@ -242,11 +242,11 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
 
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "'%s' msg added. Pri: \"%s\" numbits: %" PRIu32, 
-		PacketReliability::ToString(reliability), PacketPriority::ToString(priority), lengthBits);
-	
 	auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
 
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "\"%s\" msg added. Pri: \"%s\" size: ^5" PRIu32 "^7 numbits: ^5%" PRIu32, 
+		PacketReliability::ToString(reliability), PacketPriority::ToString(priority), lengthBytes, lengthBits);
+	
 	ReliablePacket* pPacket = allocPacket();
 	pPacket->reliableMessageNumber = 0;
 	pPacket->creationTime = time;
@@ -301,7 +301,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& socket,
 	SystemAdd& systemAddress, core::TimeVal time, uint32_t mtuSize)
 {
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Recived reliable packet numbits: %" PRIuS, core::bitUtil::bytesToBits(length));
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Recived packet size: ^5%" PRIuS "^7 numbits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
 
 	// last time we got data.
 	timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
@@ -316,7 +316,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 	if (vars_.debugEnabled())
 	{
 		DatagramFlags::Description Dsc;
-		X_LOG0("NetRel", "DataGram number: %" PRIu16 "Flags: \"%s\"", dgh.number, dgh.flags.ToString(Dsc));
+		X_LOG0("NetRel", "DataGram number: ^5%" PRIu16 "^7 Flags: \"%s\"", dgh.number, dgh.flags.ToString(Dsc));
 	}
 
 	if (dgh.flags.IsSet(DatagramFlag::Ack))
@@ -332,6 +332,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 		for (auto& ackRange : incomingAcks_)
 		{
 			// we want to mark all these messages as recived so we don't resend like a pleb.
+			X_LOG0("NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
 
 
 		}
