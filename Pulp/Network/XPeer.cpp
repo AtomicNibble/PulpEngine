@@ -266,7 +266,10 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		// todo create a pool for packets to share between rel layers.
 		core::MemoryArenaBase* packetPool = arena_;
 
-		remoteSystems_.resize(maxPeers_, RemoteSystem(vars_, arena_, packetPool));
+		remoteSystems_.reserve(maxPeers_);
+		for (int32_t i = 0; i < maxPeers_; i++) {
+			remoteSystems_.emplace_back(vars_, arena_, packetPool);
+		}
 	}
 	
 	BindParameters bindParam;
