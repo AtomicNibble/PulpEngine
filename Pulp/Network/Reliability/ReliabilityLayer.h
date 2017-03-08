@@ -38,8 +38,8 @@ struct ReliablePacket
 	SplitPacketIndex splitPacketCount;
 
 	core::TimeVal creationTime;			// 
-	core::TimeVal nextActionTime;		// 
 	core::TimeVal retransmissionTime;	// 
+	core::TimeVal nextActionTime;		// 
 
 	BitSizeT dataBitLength;
 	uint8_t* pData;
