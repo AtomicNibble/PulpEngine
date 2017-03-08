@@ -86,6 +86,9 @@ public:
 	X_INLINE Fifo& operator=(const Fifo& oth);
 	X_INLINE Fifo& operator=(Fifo&& oth);
 
+	X_INLINE T& operator[](size_type idx);
+	X_INLINE const T& operator[](size_type idx) const;
+
 	X_INLINE void setArena(MemoryArenaBase* arena);
 
 	// push a item on to the internal ring buffer

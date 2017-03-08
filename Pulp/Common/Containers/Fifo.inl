@@ -120,6 +120,32 @@ void Fifo<T>::setArena(MemoryArenaBase* arena)
 }
 
 template<typename T>
+X_INLINE T& Fifo<T>::operator[](size_type idx)
+{
+	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
+
+	if (read_ + idx > end_) {
+		size_type left = end_ - read_;
+		return *(start_ + (idx - left));
+	}
+
+	return *(read_ + idx);
+}
+
+template<typename T>
+X_INLINE const T& Fifo<T>::operator[](size_type idx) const
+{
+	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
+
+	if (read_ + idx > end_) {
+		size_type left = end_ - read_;
+		return *(start_ + (idx - left));
+	}
+
+	return *(read_ + idx);
+}
+
+template<typename T>
 void Fifo<T>::push(const T& v)
 {
 	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
