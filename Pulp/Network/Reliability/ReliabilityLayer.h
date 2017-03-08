@@ -55,7 +55,10 @@ static const size_t goat = sizeof(ReliablePacket);
 
 class ReliabilityLayer
 {
+	static const size_t RESEND_BUF_LENGTH = 256;
+
 	typedef std::array<OrderingIndex, MAX_ORDERED_STREAMS> OrdereIndexArr;
+	typedef std::array<ReliablePacket*, RESEND_BUF_LENGTH> ResendArr;
 	typedef core::Fifo<ReliablePacket*> PacketQeue;
 
 public:
@@ -141,6 +144,10 @@ private:
 	DataGramNumberRangeList naks_;
 	DataGramNumberRangeList acks_;
 
+	MessageNumber reliableMessageNumberIdx_; // current rel msg number index.
+	MessageNumber dagramSeqNumber_; 
+
+
 	bool connectionDead_;
 	bool _pad[3];
 
@@ -148,6 +155,10 @@ private:
 
 	NetStatistics::PriorityMsgCountsArr msgInSendBuffers_;
 	NetStatistics::PriorityByteCountsArr bytesInSendBuffers_;
+	size_t bytesInReSendBuffers_;
+	size_t msgInReSendBuffers_;
+
+	ResendArr resendBuf_;
 };
 
 X_NAMESPACE_END

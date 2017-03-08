@@ -207,10 +207,18 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	incomingAcks_(arena),
 	naks_(arena),
 	acks_(arena),
-	bps_{ arena, arena, arena, arena, arena, arena, arena }
+	reliableMessageNumberIdx_(0),
+	dagramSeqNumber_(0),
+	bps_{ arena, arena, arena, arena, arena, arena, arena },
+	bytesInReSendBuffers_(0),
+	msgInReSendBuffers_(0)
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
+
+#if X_DEBUG
+	resendBuf_.fill(nullptr);
+#endif // !X_DEBUG
 }
 
 ReliabilityLayer::~ReliabilityLayer()
@@ -286,7 +294,6 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 		pPacket->orderingChannel = std::numeric_limits<decltype(pPacket->orderingChannel)>::max();
 		pPacket->orderingIndex = std::numeric_limits<OrderingIndex>::max();
 		pPacket->sequencingIndex = std::numeric_limits<OrderingIndex>::max();
-	
 	}
 	
 	outGoingPackets_.push(pPacket);
@@ -449,28 +456,127 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 
 	// send new packets.
+	if (outGoingPackets_.isEmpty()) {
+		return;
+	}
+
+	core::Array<ReliablePacket*> packetsThisFrame(g_NetworkArena); // all the packets we want to send
+	core::Array<size_t> packetsThisFrameBoundaries(g_NetworkArena); // essentially range lists for MTUs.
 
 
-
-	while (outGoingPackets_.isNotEmpty())
+	while (1)
 	{
-		ReliablePacket* pPacket = outGoingPackets_.peek();
-		outGoingPackets_.pop();
+		// fill a packet.
+		size_t currentDataGramSizeBits = 0;
+		const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
 
-		// send it like a slut.
+
+		while (outGoingPackets_.isNotEmpty())
+		{
+			ReliablePacket* pPacket = outGoingPackets_.peek();
+
+			// meow.
+			X_ASSERT_NOT_NULL(pPacket->pData);
+			X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")();
+
+			const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+			const size_t totalBitSize = pPacket->getHeaderLengthBits() + pPacket->dataBitLength;
+
+			if ((currentDataGramSizeBits + totalBitSize) > maxDataGramSizeBits)
+			{
+				// can't fit.
+				X_ASSERT(maxDataGramSizeBits > 0, "Packet is too big to fit in single datagram")(maxDataGramSizeBits, totalBitSize);
+				break;
+			}
+
+			outGoingPackets_.pop();
+
+			// stats
+			--msgInSendBuffers_[pPacket->priority];
+			bytesInSendBuffers_[pPacket->priority] -= byteLength;
+			// ~
+
+			bool reliabile = pPacket->isReliable();
+
+			if (reliabile)
+			{
+				pPacket->reliableMessageNumber = reliableMessageNumberIdx_;
+				pPacket->retransmissionTime = core::TimeVal::fromMS(2000);
+				pPacket->nextActionTime = time + pPacket->retransmissionTime;
+
+				resendBuf_[pPacket->reliableMessageNumber] = pPacket;
+
+				++reliableMessageNumberIdx_;
+
+				// stats
+				bytesInReSendBuffers_ += byteLength;
+				++msgInReSendBuffers_;
+				// ~
+			}
+			else if(pPacket->reliability == PacketReliability::UnReliableWithAck)
+			{
+				// ack me!
+			
+			}
+			else
+			{
+				// ...
+			}
+
+			++pPacket->sendAttemps;
+
+			// stats
+			bps_[NetStatistics::Metric::BytesSent].add(time, byteLength);
+
+			// add packet.
+			currentDataGramSizeBits += totalBitSize;
+			packetsThisFrame.emplace_back(pPacket);
+		}
+
+		// datagram is empty?
+		if (currentDataGramSizeBits == 0) {
+			break;
+		}
+
+		// add datagram.
+		packetsThisFrameBoundaries.push_back(packetsThisFrame.size());
+	}
+
+	for (size_t i = 0; i < packetsThisFrameBoundaries.size(); i++)
+	{
+		size_t begin, end;
+
+		if (i == 0)
+		{
+			begin = 0;
+			end = packetsThisFrameBoundaries[i];
+		}
+		else
+		{
+			begin = packetsThisFrameBoundaries[i - 1];
+			end = packetsThisFrameBoundaries[i];
+		}
+
+		// here we pack the packet range into BS.
 		bs.reset();
 
 		DatagramHdr dgh;
-		dgh.number = 0;
+		dgh.number = dagramSeqNumber_++;
 		dgh.flags.Clear();
-
 		dgh.writeToBitStream(bs);
-		pPacket->writeToBitStream(bs);
 
+		while (begin < end)
+		{
+			ReliablePacket* pPacket = packetsThisFrame[begin];
+
+			pPacket->writeToBitStream(bs);
+
+			++begin;
+		}
+
+		// send it.
 
 		sendBitStream(socket, bs, systemAddress, time);
-
-		freePacket(pPacket);
 	}
 }
 
