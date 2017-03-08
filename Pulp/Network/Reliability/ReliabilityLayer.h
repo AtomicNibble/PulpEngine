@@ -55,10 +55,9 @@ static const size_t goat = sizeof(ReliablePacket);
 
 class ReliabilityLayer
 {
-	static const size_t RESEND_BUF_LENGTH = 256;
 
 	typedef std::array<OrderingIndex, MAX_ORDERED_STREAMS> OrdereIndexArr;
-	typedef std::array<ReliablePacket*, RESEND_BUF_LENGTH> ResendArr;
+	typedef std::array<ReliablePacket*, REL_RESEND_BUF_LENGTH> ResendArr;
 	typedef core::Fifo<ReliablePacket*> PacketQeue;
 
 public:
