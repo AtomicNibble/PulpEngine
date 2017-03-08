@@ -21,7 +21,7 @@ size_t RangeList<T>::writeToBitStream(core::FixedBitStreamBase& bs, BitSizeT max
 	}
 
 	const size_t spaceLeft = maxBits - (bs.size() + sizeof(uint16_t));
-	const size_t numFit = spaceLeft / core::bitUtil::bytesToBits(sizeof(RangeNode));
+	const size_t numFit = core::Min(spaceLeft / core::bitUtil::bytesToBits(sizeof(RangeNode)), ranges_.size());
 	if (!numFit) {
 		return 0;
 	}
