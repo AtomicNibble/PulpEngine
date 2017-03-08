@@ -503,8 +503,7 @@ bool ReliabilityLayer::hasTimedOut(core::TimeVal time)
 void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
 {
 	// we want to pack all the acks into packets.
-	const BitSizeT maxPacketBytes = MTUSize_ - sizeof(DatagramHdr);
-	const BitSizeT maxPacketBits = core::bitUtil::bytesToBits(maxPacketBytes);
+	const BitSizeT maxPacketBits = maxDataGramSizeExcHdrBits();
 
 	while (acks_.isNotEmpty())
 	{
@@ -530,8 +529,7 @@ void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs,
 void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
 {
 	// we want to pack all the acks into packets.
-	const BitSizeT maxPacketBytes = MTUSize_ - sizeof(DatagramHdr);
-	const BitSizeT maxPacketBits = core::bitUtil::bytesToBits(maxPacketBytes);
+	const BitSizeT maxPacketBits = maxDataGramSizeExcHdrBits();
 
 	while (naks_.isNotEmpty())
 	{
