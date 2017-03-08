@@ -1301,7 +1301,7 @@ size_t XPeer::getNumRemoteInitiatedConnections(void) const
 {
 	size_t num = 0;
 
-	for (auto rc : remoteSystems_)
+	for (const auto& rc : remoteSystems_)
 	{
 		if (rc.connectState == ConnectState::Connected && rc.isActive && !rc.weStartedconnection)
 		{
@@ -1316,7 +1316,7 @@ void XPeer::listRemoteSystems(void) const
 {
 	auto timeNow = gEnv->pTimer->GetTimeNowReal();
 
-	for (auto rs : remoteSystems_)
+	for (const auto& rs : remoteSystems_)
 	{
 		if (!rs.isActive) {
 			continue;
