@@ -322,7 +322,7 @@ private:
 
 
 	void processRecvData(UpdateBitStream& updateBS, RecvData* pRecvData, int32_t byteOffset);
-	void processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData, UpdateBitStream& stream, MessageID::Enum msgId);
+	void processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData, uint8_t* pBegin, uint8_t* pEnd);
 
 	// some msg handlers.
 	void handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs, MessageID::Enum failureType);

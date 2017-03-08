@@ -1610,67 +1610,66 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 		return;
 	}
 
-	// create a fixed bitstrem around the recvData to make it easy to read the data.
-	core::FixedBitStreamNoneOwning stream(pData->data + byteOffset, pData->data + pData->bytesRead, true);
 
-	X_ASSERT(stream.size() > 0, "Stream is empty")(stream.size(), stream.capacity());
+	uint8_t* pBegin = (pData->data + byteOffset);
+	uint8_t* pEnd = (pData->data + pData->bytesRead);
+	X_ASSERT(pBegin < pEnd, "Stream is empty")(pBegin, pEnd);
 
-	MessageID::Enum msgId = stream.read<MessageID::Enum>();
-	// external data, check enum in range.
-	if (msgId >= MessageID::ENUM_COUNT) {
-		X_ERROR("Net", "Message contains invalid msgId: %" PRIi32, static_cast<int32_t>(msgId));
-		return;
-	}
+	size_t dataLength = union_cast<size_t>(pEnd - pBegin);
 
-	// ignore?
-	if (msgId == MessageID::SendTest) {
-		return;
-	}
-
-	bool offlineMsg = false;
 	// is this a offline msg.
-	if (stream.sizeInBytes() >= OFFLINE_MSG_ID.size())
+	if (dataLength == 1)
 	{
-		if (std::memcmp(pData->data + byteOffset + 1, OFFLINE_MSG_ID.data(), OFFLINE_MSG_ID.size()) == 0)
-		{
-			offlineMsg = true;
-		}
-	}
-
-	if (!offlineMsg) {
-		RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAdd, true);
-		if (!pRemoteSys) {
-			X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", ipStr);
-
-			// temp ban them.
-			addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
+		if (static_cast<MessageID::Enum>(*pBegin) == MessageID::SendTest) {
 			return;
 		}
-
-		bool res = pRemoteSys->relLayer.recv(
-			pData->data + byteOffset,
-			pData->bytesRead,
-			*pData->pSrcSocket,
-			pData->systemAdd,
-			pData->timeRead,
-			pRemoteSys->MTUSize
-		);
-
-		if (!res) {
-			// TODO
+	}
+	else if (dataLength >= OFFLINE_MSG_ID.size())
+	{
+		if (std::memcmp(pBegin + 1, OFFLINE_MSG_ID.data(), OFFLINE_MSG_ID.size()) == 0)
+		{
+			processOfflineMsg(updateBS, pData, pBegin, pEnd);
+			return;
 		}
+		// fall through
+	}
+
+
+	RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAdd, true);
+	if (!pRemoteSys) {
+		X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", ipStr);
+
+		// temp ban them.
+		addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 		return;
 	}
 
-	stream.skipBytes(OFFLINE_MSG_ID.size());
+	bool res = pRemoteSys->relLayer.recv(
+		pData->data + byteOffset,
+		pData->bytesRead,
+		*pData->pSrcSocket,
+		pData->systemAdd,
+		pData->timeRead,
+		pRemoteSys->MTUSize
+	);
 
-	processOfflineMsg(updateBS, pData, stream, msgId);
+	if (!res) {
+		// TODO
+	}
+	return;
 
 }
 
 void XPeer::processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData,
-	RecvBitStream& stream, MessageID::Enum msgId)
+	uint8_t* pBegin, uint8_t* pEnd)
 {
+	core::FixedBitStreamNoneOwning stream(pBegin, pEnd, true);
+	X_ASSERT(stream.sizeInBytes() > OFFLINE_MSG_ID.size(), "Called with too small buffer")(stream.sizeInBytes());
+
+	MessageID::Enum msgId = stream.read<MessageID::Enum>();
+	stream.skipBytes(OFFLINE_MSG_ID.size());
+	X_ASSERT(msgId < MessageID::ENUM_COUNT, "Invalid msg id")(msgId);
+
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived offline messageId: \"%s\"", MessageID::ToString(msgId));
 
 	switch (msgId)
