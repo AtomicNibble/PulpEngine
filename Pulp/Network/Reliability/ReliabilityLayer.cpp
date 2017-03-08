@@ -219,9 +219,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	recivedPackets_.reserve(128);
 	dataGramHistory_.reserve(REL_DATAGRAM_HISTORY_LENGTH);
 
-#if X_DEBUG
 	resendBuf_.fill(nullptr);
-#endif // !X_DEBUG
 }
 
 ReliabilityLayer::~ReliabilityLayer()
