@@ -40,7 +40,9 @@ public:
 	X_INLINE core::Compression::Algo::Enum ackCompAlgo(void) const;
 	X_INLINE core::Compression::Algo::Enum compAlgo(void) const;
 
-
+private:
+	void Var_OnDefaultTimeoutChanged(core::ICVar* pVar);
+	void Var_OnPingTimeChanged(core::ICVar* pVar);
 
 private:
 	int32_t debug_;

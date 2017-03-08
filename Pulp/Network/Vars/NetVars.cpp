@@ -14,6 +14,7 @@ NetVars::NetVars()
 
 void NetVars::registerVars(void)
 {
+	core::ConsoleVarFunc del;
 
 	ADD_CVAR_REF("net_debug", debug_, 0, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable net debug msg's 1=enabled 2=verbose");
@@ -21,8 +22,10 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_socket_debug", debugSockets_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable socket debug logging");
 
+	del.Bind<NetVars, &NetVars::Var_OnDefaultTimeoutChanged>(this);
+
 	ADD_CVAR_REF("net_default_timeout", defaultTimeoutMS_, 5000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"The default timeout for connections in MS");
+		"The default timeout for connections in MS")->SetOnChangeCallback(del);
 
 	ADD_CVAR_REF("net_rl_connections_per_ip", rlconnectionsPerIp_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Rate limits connection requests from the same ip");
@@ -36,8 +39,10 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_partial_connection_timeout", dropPartialConnectionsMS_, 3000, 0, std::numeric_limits<int32_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"The amount of time in MS before dropping a incomplete connection");
 	
+	del.Bind<NetVars, &NetVars::Var_OnPingTimeChanged>(this);
+
 	ADD_CVAR_REF("net_ping_interval", pingTimeMS_, 1000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Min amount of time between pings");
+		"Min amount of time between pings")->SetOnChangeCallback(del);
 
 	ADD_CVAR_REF("net_unreliable_timeout", unreliableTimeoutMS_, 0, 0, std::numeric_limits<int32_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Time in MS before not sending a unreliable msg. 0=never");
@@ -81,6 +86,25 @@ void NetVars::registerVars(void)
 
 	ADD_CVAR_REF("net_comp_packet_algo", compAlgo_, 0, 0, core::Compression::Algo::ENUM_COUNT - 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Compression algo used for data packets. 0=none, 1=lz4, 2=lz4hc, 3=lzma, 4=zlib, 5=lz5, 6=lz6hc");
+}
+
+void NetVars::Var_OnDefaultTimeoutChanged(core::ICVar* pVar)
+{
+	// below ping time?
+	int32_t val = pVar->GetInteger();
+
+	if (val < pingTimeMS_) {
+		X_WARNING("Net", "New default timeout time is shorter than ping time");
+	}
+}
+
+void NetVars::Var_OnPingTimeChanged(core::ICVar* pVar)
+{
+	int32_t val = pVar->GetInteger();
+
+	if (val > defaultTimeoutMS_) {
+		X_WARNING("Net", "New min ping time is longer than default timeout time");
+	}
 }
 
 X_NAMESPACE_END
