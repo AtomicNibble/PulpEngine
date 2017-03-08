@@ -2244,7 +2244,7 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
 		bsOut.data(),
 		safe_static_cast<BitSizeT>(bsOut.size()),
 		PacketPriority::Immediate,
-		PacketReliability::Reliable,
+		PacketReliability::UnReliable,
 		0,
 		AddressOrGUID(&rs.systemAddress),
 		false,
