@@ -19,25 +19,28 @@ public:
 
 	~XLinkIntrusive();
 	XLinkIntrusive();
+	XLinkIntrusive(XLinkIntrusive&& oth) = default;
 	XLinkIntrusive(size_t offset);
 
-	bool isLinked() const;
-	void unlink();
+	XLinkIntrusive& operator=(XLinkIntrusive&& rhs) = default;
 
-	type* prev();
-	type* next();
-	const type* prev() const;
-	const type* next() const;
+	bool isLinked(void) const;
+	void unlink(void);
+
+	type* prev(void);
+	type* next(void);
+	const type* prev(void) const;
+	const type* next(void) const;
 
 	void setOffset(size_t offset);
-	selfT* nextLink();
-	selfT* prevLink();
+	selfT* nextLink(void);
+	selfT* prevLink(void);
 
 	void insertBefore(type* node, selfT* nextLink);
 	void insertAfter(type* node, selfT* prevLink);
 
 private:
-	void removeFromList();
+	void removeFromList(void);
 
 	X_NO_COPY(XLinkIntrusive);
 	X_NO_ASSIGN(XLinkIntrusive);
@@ -55,20 +58,23 @@ class XListIntrusive
 public:
 	typedef T type;
 
+private:
+	XListIntrusive(size_t offset);
+public:
 	XListIntrusive();
-	XListIntrusive(core::MemoryArenaBase* arena);
+	XListIntrusive(XListIntrusive&& oth) = default;
 	~XListIntrusive();
 
-	void setArena(core::MemoryArenaBase* arena);
+	XListIntrusive& operator=(XListIntrusive&& rhs) = default;
 
-	bool isEmpty() const;
+	bool isEmpty(void) const;
 	void unlinkAll();
-	void deleteAll();
+	void deleteAll(core::MemoryArenaBase* arena);
 
-	T* head();
-	T* tail();
-	const T* head() const;
-	const T* tail() const;
+	T* head(void);
+	T* tail(void);
+	const T* head(void) const;
+	const T* tail(void) const;
 
 	T* prev(T* node);
 	T* next(T* node);
@@ -81,12 +87,12 @@ public:
 	void insertAfter(T* node, T* after);
 
 private:
+	XLinkIntrusive<T>* getLinkFromNode(const T* node) const;
+
+private:
 	XLinkIntrusive<T>    link_;
 	size_t				 offset_;
-	core::MemoryArenaBase* arena_;
 
-	XListIntrusive(size_t offset);
-	XLinkIntrusive<T>* getLinkFromNode(const T* node) const;
 
 	template<class T, size_t offset> 
 	friend class XListIntrusiveDeclare;

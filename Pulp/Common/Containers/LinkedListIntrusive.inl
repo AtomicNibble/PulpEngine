@@ -156,25 +156,16 @@ X_INLINE const T* XLinkIntrusive<T>::next() const
 template<class T>
 XListIntrusive<T>::XListIntrusive() :
 link_(),
-offset_((size_t)-1),
-arena_(nullptr)
+offset_((size_t)-1)
 {
 }
 
-template<class T>
-XListIntrusive<T>::XListIntrusive(core::MemoryArenaBase* arena) :
-link_(),
-offset_((size_t)-1)
-arena_(arena)
-{
-}
 
 
 template<class T>
 XListIntrusive<T>::XListIntrusive(size_t offset) :
 link_(offset),
-offset_(offset),
-arena_(nullptr)
+offset_(offset)
 {
 }
 
@@ -184,14 +175,6 @@ XListIntrusive<T>::~XListIntrusive()
 {
 	unlinkAll();
 }
-
-
-template<class T>
-void XListIntrusive<T>::setArena(core::MemoryArenaBase* arena)
-{
-	arena_ = arena;
-}
-
 
 template<class T>
 bool XListIntrusive<T>::isEmpty() const
@@ -205,19 +188,21 @@ void XListIntrusive<T>::unlinkAll()
 {
 	for (;;) {
 		XLinkIntrusive<T>* link = link_.prevLink();
-		if (link == &link_)
+		if (link == &link_) {
 			break;
+		}
 		link->unlink();
 	}
 }
 
 
 template<class T>
-void XListIntrusive<T>::deleteAll() 
+void XListIntrusive<T>::deleteAll(core::MemoryArenaBase* arena)
 {
-	X_ASSERT_NOT_NULL(arena_);
-	while (T* node = link_.next())
-		X_DELETE(node, arena_);
+	X_ASSERT_NOT_NULL(arena);
+	while (T* node = link_.next()) {
+		X_DELETE(node, arena);
+	}
 }
 
 
@@ -298,7 +283,7 @@ void XListIntrusive<T>::insertBefore(T* node, T* before)
 	getLinkFromNode(node)->insertBefore(
 		node,
 		before ? getLinkFromNode(before) : &link_
-		);
+	);
 }
 
 
@@ -310,7 +295,7 @@ void XListIntrusive<T>::insertAfter(T* node, T* after)
 	getLinkFromNode(node)->insertAfter(
 		node,
 		after ? getLinkFromNode(after) : &link_
-		);
+	);
 }
 
 

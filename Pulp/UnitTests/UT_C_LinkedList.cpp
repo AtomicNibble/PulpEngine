@@ -56,9 +56,6 @@ TEST(LinkedList, Intrusive)
 	INTRUSIVE_LIST_DECLARE(Data, forward) forward;
 	INTRUSIVE_LIST_DECLARE(Data, reverse) reverse;
 
-	forward.setArena(g_arena);
-	reverse.setArena(g_arena);
-
 	for (unsigned j = 0; j < 100; ++j)
 	{
 		const unsigned COUNT = 10;
@@ -111,7 +108,7 @@ TEST(LinkedList, Intrusive)
 		EXPECT_TRUE(forward.isEmpty());
 
 		EXPECT_TRUE(!reverse.isEmpty());
-		reverse.deleteAll();
+		reverse.deleteAll(g_arena);
 		EXPECT_TRUE(reverse.isEmpty());
 	}
 
@@ -125,9 +122,6 @@ TEST(LinkedList, RandomInsert)
 	{
 		INTRUSIVE_LIST_DECLARE(Data, forward) forward;
 		INTRUSIVE_LIST_DECLARE(Data, reverse) reverse;
-
-		forward.setArena(g_arena);
-		reverse.setArena(g_arena);
 
 		// Insert random items sequentially
 		for (unsigned i = 0; i < 20; ++i)
@@ -145,7 +139,7 @@ TEST(LinkedList, RandomInsert)
 			EXPECT_GE(r->value, prev->value);
 
 		// Cleanup
-		forward.deleteAll();
+		forward.deleteAll(g_arena);
 		EXPECT_TRUE(reverse.isEmpty());
 	}
 }
