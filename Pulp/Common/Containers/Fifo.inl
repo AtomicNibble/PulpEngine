@@ -348,25 +348,32 @@ typename Fifo<T>::const_iterator Fifo<T>::end(void) const
 template<typename T>
 typename Fifo<T>::Reference Fifo<T>::front(void)
 {
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")(isNotEmpty());
+
 	return *read_;
 }
 
 template<typename T>
 typename Fifo<T>::ConstReference Fifo<T>::front(void) const
 {
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")(isNotEmpty());
+
 	return *read_;
 }
 
 template<typename T>
 typename Fifo<T>::Reference Fifo<T>::back(void)
 {
-	return *(write_ - 1);
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
 
+	return *(write_ - 1);
 }
 
 template<typename T>
 typename Fifo<T>::ConstReference Fifo<T>::back(void) const
 {
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
+
 	return *(write_ - 1);
 }
 
