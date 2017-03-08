@@ -21,9 +21,13 @@ struct ReliablePacket
 {
 	ReliablePacket();
 
+	bool isReliable(void) const;
+	size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's diffrent depending on priority types etc.
+
 	void writeToBitStream(core::FixedBitStreamBase& bs) const;
 	bool fromBitStream(core::FixedBitStreamBase& bs);
 
+public:
 	MessageNumber reliableMessageNumber;
 	OrderingIndex orderingIndex;
 	OrderingIndex sequencingIndex;

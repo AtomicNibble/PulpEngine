@@ -63,6 +63,57 @@ ReliablePacket::ReliablePacket()
 	pData = nullptr;
 }
 
+bool ReliablePacket::isReliable(void) const
+{
+	switch (reliability)
+	{
+		case PacketReliability::Reliable:
+		case PacketReliability::ReliableOrdered:
+		case PacketReliability::ReliableOrderedWithAck:
+		case PacketReliability::ReliableSequenced:
+		case PacketReliability::ReliableWithAck:
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+size_t ReliablePacket::getHeaderLengthBits(void) const
+{
+	size_t bits = 0;
+
+	bits += core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT);
+	bits += core::bitUtil::bytesToBits(sizeof(uint16_t));
+
+	if (reliability == PacketReliability::Reliable ||
+		reliability == PacketReliability::ReliableOrdered ||
+		reliability == PacketReliability::ReliableSequenced ||
+		reliability == PacketReliability::ReliableOrderedWithAck ||
+		reliability == PacketReliability::ReliableWithAck)
+	{
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(reliableMessageNumber)));
+	}
+
+	// sequenced.
+	if (reliability == PacketReliability::UnReliableSequenced ||
+		reliability == PacketReliability::ReliableSequenced)
+	{
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(sequencingIndex)));
+	}
+
+	// ordered
+	if (reliability == PacketReliability::UnReliableSequenced ||
+		reliability == PacketReliability::ReliableSequenced ||
+		reliability == PacketReliability::ReliableOrdered ||
+		reliability == PacketReliability::ReliableOrderedWithAck)
+	{
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(orderingIndex)));
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel)));
+	}
+
+	return bits;
+}
 
 void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
