@@ -29,5 +29,15 @@ X_INLINE void ReliabilityLayer::addAck(DataGramSequenceNumber messageNumber)
 	acks_.add(messageNumber);
 }
 
+X_INLINE BitSizeT ReliabilityLayer::maxDataGramSizeBits(void) const
+{
+	return safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(maxDataGramSize()));
+}
+
+X_INLINE BitSizeT ReliabilityLayer::maxDataGramSizeExcHdrBits(void) const
+{
+	return safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(maxDataGramSizeExcHdr()));
+}
+
 
 X_NAMESPACE_END

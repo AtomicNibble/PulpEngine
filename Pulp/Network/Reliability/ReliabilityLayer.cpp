@@ -606,5 +606,14 @@ void ReliabilityLayer::getStatistics(NetStatistics& stats) const
 	stats.isLimitedByOutgoingBadwidthLimit = false;
 }
 
+size_t ReliabilityLayer::maxDataGramSize(void) const
+{
+	return MTUSize_;
+}
+
+size_t ReliabilityLayer::maxDataGramSizeExcHdr(void) const
+{
+	return maxDataGramSize() - sizeof(DatagramHdr);
+}
 
 X_NAMESPACE_END

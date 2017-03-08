@@ -100,6 +100,11 @@ public:
 
 private:
 	X_INLINE void addAck(DataGramSequenceNumber messageNumber);
+	size_t maxDataGramSize(void) const;
+	size_t maxDataGramSizeExcHdr(void) const;
+
+	X_INLINE BitSizeT maxDataGramSizeBits(void) const;
+	X_INLINE BitSizeT maxDataGramSizeExcHdrBits(void) const;
 
 private:
 	bool hasTimedOut(core::TimeVal time);
