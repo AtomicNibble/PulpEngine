@@ -52,12 +52,25 @@ public:
 static const size_t goat = sizeof(ReliablePacket);
 // static_assert(core::compileTime::IsPOD<RelPacket>::Value, "Packet header should be POD");
 
+struct DataGramHistory
+{
+	typedef core::FixedArray<MessageNumber, MAX_PACKETS_PER_DATAGRAM> MesgNumberArr;
+
+public:
+	DataGramHistory(core::TimeVal timesent) : timeSent(timesent)
+	{}
+
+	core::TimeVal timeSent;
+	MesgNumberArr messagenumbers;
+};
+
 
 class ReliabilityLayer
 {
 
 	typedef std::array<OrderingIndex, MAX_ORDERED_STREAMS> OrdereIndexArr;
 	typedef std::array<ReliablePacket*, REL_RESEND_BUF_LENGTH> ResendArr;
+	typedef core::Fifo<DataGramHistory> DataGramHistoryQeue;
 	typedef core::Fifo<ReliablePacket*> PacketQeue;
 
 public:
@@ -124,6 +137,12 @@ private:
 	ReliablePacket* allocPacket(void);
 	void freePacket(ReliablePacket* pPacker);
 
+private:
+	// these are created each time a data gram is sent.
+	// so if a packet gets resent a new one will be sent.
+	DataGramHistory* createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time);
+	DataGramHistory* getDataGramHistory(DataGramSequenceNumber number);
+	bool clearDataGramHistory(DataGramSequenceNumber number);
 
 private:
 	NetVars& vars_;
@@ -143,6 +162,8 @@ private:
 
 	PacketQeue outGoingPackets_;
 	PacketQeue recivedPackets_;
+	DataGramHistoryQeue dataGramHistory_;
+	DataGramSequenceNumber dataGramHistoryPopCnt_;
 
 	DataGramNumberRangeList incomingAcks_;
 	DataGramNumberRangeList naks_;

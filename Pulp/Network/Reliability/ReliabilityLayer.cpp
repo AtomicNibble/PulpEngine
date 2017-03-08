@@ -203,6 +203,8 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	packetPool_(packetPool),
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
+	dataGramHistory_(arena),
+	dataGramHistoryPopCnt_(0),
 	connectionDead_(false),
 	incomingAcks_(arena),
 	naks_(arena),
@@ -215,6 +217,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
+	dataGramHistory_.reserve(REL_DATAGRAM_HISTORY_LENGTH);
 
 #if X_DEBUG
 	resendBuf_.fill(nullptr);
