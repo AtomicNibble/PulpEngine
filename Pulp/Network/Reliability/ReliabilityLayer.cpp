@@ -344,7 +344,23 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			// we want to mark all these messages as recived so we don't resend like a pleb.
 			X_LOG0("NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
 
+			for (DataGramSequenceNumber dataGramIdx = ackRange.min; dataGramIdx <= ackRange.max; dataGramIdx++)
+			{
+				// get the info for this data gram and mark all the packets it contained as sent.
+				DataGramHistory* pHistory = getDataGramHistory(dataGramIdx);
+				if (!pHistory) {
+					X_WARNING("NetRel", "Failed to get dataGram history for idx: %" PRIu16 " will result in resend", dataGramIdx);
+					continue;
+				}
 
+				// mark each as sent.
+				for (auto msgNum : pHistory->messagenumbers)
+				{
+					removePacketFromResendList(msgNum);
+				}
+
+				pHistory->messagenumbers.clear();
+			}
 		}
 
 	}
@@ -455,94 +471,145 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		sendNAKs(socket, bs, systemAddress, time);
 	}
 
-	// resend packets.
-
-
-	// send new packets.
-	if (outGoingPackets_.isEmpty()) {
-		return;
-	}
-
 	core::Array<ReliablePacket*> packetsThisFrame(g_NetworkArena); // all the packets we want to send
 	core::Array<size_t> packetsThisFrameBoundaries(g_NetworkArena); // essentially range lists for MTUs.
 
-
-	while (1)
+	// resend packets.
+	if (!isResendListEmpty())
 	{
-		// fill a packet.
-		size_t currentDataGramSizeBits = 0;
-		const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
-
-
-		while (outGoingPackets_.isNotEmpty())
+		while (1)
 		{
-			ReliablePacket* pPacket = outGoingPackets_.peek();
+			// look at all the packets in resend list.
+			// and build dataGrams untill we reach a packet who's nextaction time has not yet been reached.
+			size_t currentDataGramSizeBits = 0;
+			const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
 
-			// meow.
-			X_ASSERT_NOT_NULL(pPacket->pData);
-			X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")();
-
-			const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-			const size_t totalBitSize = pPacket->getHeaderLengthBits() + pPacket->dataBitLength;
-
-			if ((currentDataGramSizeBits + totalBitSize) > maxDataGramSizeBits)
+			while (!isResendListEmpty())
 			{
-				// can't fit.
-				X_ASSERT(maxDataGramSizeBits > 0, "Packet is too big to fit in single datagram")(maxDataGramSizeBits, totalBitSize);
-				break;
-			}
+				ReliablePacket* pPacket = resendList_.head();
 
-			outGoingPackets_.pop();
+				if (pPacket->nextActionTime > time) {
+					break;
+				}
 
-			// stats
-			--msgInSendBuffers_[pPacket->priority];
-			bytesInSendBuffers_[pPacket->priority] -= byteLength;
-			// ~
+				// will it fit ;) ?
+				const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+				const size_t totalBitSize = pPacket->getHeaderLengthBits() + pPacket->dataBitLength;
 
-			bool reliabile = pPacket->isReliable();
+				if ((currentDataGramSizeBits + totalBitSize) > maxDataGramSizeBits) {
+					break;
+				}
 
-			if (reliabile)
-			{
-				pPacket->reliableMessageNumber = reliableMessageNumberIdx_;
+				// remove from head, and place back in at tail.
+				// so the list stays sorted based on action time.
+				movePacketToTailOfResendList(pPacket);
+
+				X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resending packet: ^5%" PRIu32 "^7 attemp: ^5%" PRIu8, 
+					pPacket->reliableMessageNumber, pPacket->sendAttemps);
+
+				// resending.
+				bps_[NetStatistics::Metric::BytesResent].add(time, byteLength);
+
+				++pPacket->sendAttemps;
+
 				pPacket->retransmissionTime = core::TimeVal::fromMS(2000);
 				pPacket->nextActionTime = time + pPacket->retransmissionTime;
 
-				resendBuf_[pPacket->reliableMessageNumber] = pPacket;
+			}
 
-				++reliableMessageNumberIdx_;
+			// datagram is empty?
+			if (currentDataGramSizeBits == 0) {
+				break;
+			}
+
+			// add datagram.
+			packetsThisFrameBoundaries.push_back(packetsThisFrame.size());
+		}
+	}
+
+	// send new packets.
+	if (!outGoingPackets_.isEmpty())
+	{
+		while (!isResendBufferFull())
+		{
+			// fill a packet.
+			size_t currentDataGramSizeBits = 0;
+			const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
+
+			while (outGoingPackets_.isNotEmpty() && !isResendBufferFull())
+			{
+				ReliablePacket* pPacket = outGoingPackets_.peek();
+
+				// meow.
+				X_ASSERT_NOT_NULL(pPacket->pData);
+				X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")();
+
+				const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+				const size_t totalBitSize = pPacket->getHeaderLengthBits() + pPacket->dataBitLength;
+
+				if ((currentDataGramSizeBits + totalBitSize) > maxDataGramSizeBits)
+				{
+					// can't fit.
+					X_ASSERT(maxDataGramSizeBits > 0, "Packet is too big to fit in single datagram")(maxDataGramSizeBits, totalBitSize);
+					break;
+				}
+
+				outGoingPackets_.pop();
 
 				// stats
-				bytesInReSendBuffers_ += byteLength;
-				++msgInReSendBuffers_;
+				--msgInSendBuffers_[pPacket->priority];
+				bytesInSendBuffers_[pPacket->priority] -= byteLength;
 				// ~
-			}
-			else if(pPacket->reliability == PacketReliability::UnReliableWithAck)
-			{
-				// ack me!
-			
-			}
-			else
-			{
-				// ...
+
+				bool reliabile = pPacket->isReliable();
+
+				if (reliabile)
+				{
+					pPacket->reliableMessageNumber = reliableMessageNumberIdx_;
+					pPacket->retransmissionTime = core::TimeVal::fromMS(2000);
+					pPacket->nextActionTime = time + pPacket->retransmissionTime;
+
+					const auto resizeBufIdx = pPacket->reliableMessageNumber % resendBuf_.max_size();
+					X_ASSERT(resendBuf_[resizeBufIdx] == nullptr, "Resent buffer has valid data already in it")();
+					resendBuf_[resizeBufIdx] = pPacket;
+
+					++reliableMessageNumberIdx_;
+
+					insertPacketToResendList(pPacket);
+
+					// stats
+					bytesInReSendBuffers_ += byteLength;
+					++msgInReSendBuffers_;
+					// ~
+				}
+				else if (pPacket->reliability == PacketReliability::UnReliableWithAck)
+				{
+					// ack me!
+
+				}
+				else
+				{
+					// ...
+				}
+
+				++pPacket->sendAttemps;
+
+				// stats
+				bps_[NetStatistics::Metric::BytesSent].add(time, byteLength);
+
+				// add packet.
+				currentDataGramSizeBits += totalBitSize;
+				packetsThisFrame.emplace_back(pPacket);
 			}
 
-			++pPacket->sendAttemps;
+			// datagram is empty?
+			if (currentDataGramSizeBits == 0) {
+				break;
+			}
 
-			// stats
-			bps_[NetStatistics::Metric::BytesSent].add(time, byteLength);
-
-			// add packet.
-			currentDataGramSizeBits += totalBitSize;
-			packetsThisFrame.emplace_back(pPacket);
+			// add datagram.
+			packetsThisFrameBoundaries.push_back(packetsThisFrame.size());
 		}
-
-		// datagram is empty?
-		if (currentDataGramSizeBits == 0) {
-			break;
-		}
-
-		// add datagram.
-		packetsThisFrameBoundaries.push_back(packetsThisFrame.size());
 	}
 
 	for (size_t i = 0; i < packetsThisFrameBoundaries.size(); i++)
@@ -568,11 +635,18 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		dgh.flags.Clear();
 		dgh.writeToBitStream(bs);
 
+		DataGramHistory* pHistory = createDataGramHistory(dgh.number, time);
+
 		while (begin < end)
 		{
 			ReliablePacket* pPacket = packetsThisFrame[begin];
 
 			pPacket->writeToBitStream(bs);
+
+			// only if reliable add to history.
+			if (pPacket->isReliable()) {
+				pHistory->messagenumbers.append(pPacket->reliableMessageNumber);
+			}
 
 			++begin;
 		}
@@ -694,6 +768,90 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacker)
 {
 	X_DELETE(pPacker, packetPool_);
 }
+
+// -----------------------------------------
+
+DataGramHistory* ReliabilityLayer::createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time)
+{
+	if (dataGramHistory_.size() == dataGramHistory_.capacity())
+	{
+		dataGramHistory_.peek().messagenumbers.clear();
+		dataGramHistory_.pop();
+		++dataGramHistoryPopCnt_;
+
+		X_WARNING("NetRel", "Datagram history buffer full dropping trailing history");
+	}
+
+	dataGramHistory_.emplace(time);
+
+	return &dataGramHistory_.back();
+}
+
+DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber number)
+{
+	DataGramSequenceNumber offset = number - dataGramHistoryPopCnt_;
+	if (offset >= dataGramHistory_.size()) {
+		return nullptr;
+	}
+
+	return &dataGramHistory_[offset];
+}
+
+bool ReliabilityLayer::clearDataGramHistory(DataGramSequenceNumber number)
+{
+	DataGramSequenceNumber offset = number - dataGramHistoryPopCnt_;
+	if (offset > dataGramHistory_.size()) {
+		return false;
+	}
+
+	dataGramHistory_[offset].messagenumbers.clear();
+	return true;
+}
+
+// -----------------------------------------
+
+
+void ReliabilityLayer::insertPacketToResendList(ReliablePacket* pPacket)
+{
+	resendList_.insertTail(pPacket);
+}
+
+void ReliabilityLayer::movePacketToTailOfResendList(ReliablePacket* pPacket)
+{
+	pPacket->reliableLink.unlink();
+
+	resendList_.insertTail(pPacket);
+}
+
+void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
+{
+	const auto resendBufIdx = msgNum % resendBuf_.max_size();
+
+	ReliablePacket* pPacket = resendBuf_[resendBufIdx];
+	if (pPacket && pPacket->reliableMessageNumber == msgNum)
+	{
+		resendBuf_[resendBufIdx] = nullptr;
+
+		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Ack msgId: %" PRIu16, msgNum);
+
+		// stats
+		--msgInReSendBuffers_;
+		bytesInReSendBuffers_ -= core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+		// ~
+
+		// now we need to remove.
+		pPacket->reliableLink.unlink();
+
+		// free it.
+		freePacket(pPacket);
+	}
+	else
+	{
+		X_WARNING("NetRel", "Failed to packet from resend buffer for removal msgIdx: %" PRIu16, msgNum);
+	}
+}
+
+// -----------------------------------------
 
 void ReliabilityLayer::getStatistics(NetStatistics& stats) const
 {

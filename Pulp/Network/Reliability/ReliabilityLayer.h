@@ -4,6 +4,8 @@
 #include "Util\RangeList.h"
 
 #include <Containers\Fifo.h>
+#include <Containers\FixedFifo.h>
+#include <Containers\LinkedListIntrusive.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -47,6 +49,8 @@ public:
 
 	BitSizeT dataBitLength;
 	uint8_t* pData;
+
+	INTRUSIVE_LIST_LINK(ReliablePacket) reliableLink;
 };
 
 static const size_t goat = sizeof(ReliablePacket);
@@ -145,6 +149,15 @@ private:
 	bool clearDataGramHistory(DataGramSequenceNumber number);
 
 private:
+	X_INLINE bool isResendBufferFull(void) const; // checks if current index is occupied.
+	X_INLINE bool isResendListEmpty(void) const;
+	void insertPacketToResendList(ReliablePacket* pPacket);
+	void movePacketToTailOfResendList(ReliablePacket* pPacket);
+	void removePacketFromResendList(MessageNumber msgNum);
+
+	INTRUSIVE_LIST_DECLARE(ReliablePacket, reliableLink) resendList_;
+
+private:
 	NetVars& vars_;
 
 	core::MemoryArenaBase* packetPool_;
@@ -153,7 +166,6 @@ private:
 
 	core::TimeVal timeLastDatagramArrived_;
 	core::TimeVal lastBSPUpdate_;
-
 
 	OrdereIndexArr orderedWriteIndex_;				// inc for every ordered msg sent
 	OrdereIndexArr sequencedWriteIndex_;			// inc for every sequenced msg sent
@@ -172,7 +184,6 @@ private:
 	MessageNumber reliableMessageNumberIdx_; // current rel msg number index.
 	MessageNumber dagramSeqNumber_; 
 
-
 	bool connectionDead_;
 	bool _pad[3];
 
@@ -183,7 +194,7 @@ private:
 	size_t bytesInReSendBuffers_;
 	size_t msgInReSendBuffers_;
 
-	ResendArr resendBuf_;
+	ResendArr resendBuf_; // max in transit
 };
 
 X_NAMESPACE_END
