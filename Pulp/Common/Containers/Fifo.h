@@ -130,9 +130,6 @@ public:
 	const_iterator end(void) const;
 
 
-private:
-//	X_NO_COPY(Fifo);
-//	X_NO_ASSIGN(Fifo);
 
 	// for easy memory allocation changes later.
 	X_INLINE void Delete(T* pData);
