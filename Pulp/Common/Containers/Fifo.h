@@ -72,6 +72,10 @@ public:
 	typedef size_t size_type;
 	typedef _FifoIterator<T> iterator;
 	typedef _FifoConstIterator<T> const_iterator;
+	typedef T& Reference;
+	typedef T& reference;
+	typedef const T& ConstReference;
+	typedef const T& const_reference;
 
 	X_INLINE Fifo(MemoryArenaBase* arena);
 	X_INLINE Fifo(MemoryArenaBase* arena, size_type size);
@@ -129,8 +133,13 @@ public:
 	const_iterator begin(void) const;
 	const_iterator end(void) const;
 
+	Reference front(void);
+	ConstReference front(void) const;
+	Reference back(void);
+	ConstReference back(void) const;
 
 
+private:
 	// for easy memory allocation changes later.
 	X_INLINE void Delete(T* pData);
 	X_INLINE T* Allocate(size_type num);

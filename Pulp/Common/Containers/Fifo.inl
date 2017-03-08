@@ -317,7 +317,36 @@ typename Fifo<T>::const_iterator Fifo<T>::end(void) const
 	return const_iterator(start_, end_, write_, num_);
 }
 
-/// ------------------------------------------------------
+/// ------------------------------------------------------c
+
+template<typename T>
+typename Fifo<T>::Reference Fifo<T>::front(void)
+{
+	return *read_;
+}
+
+template<typename T>
+typename Fifo<T>::ConstReference Fifo<T>::front(void) const
+{
+	return *read_;
+}
+
+template<typename T>
+typename Fifo<T>::Reference Fifo<T>::back(void)
+{
+	return *(write_ - 1);
+
+}
+
+template<typename T>
+typename Fifo<T>::ConstReference Fifo<T>::back(void) const
+{
+	return *(write_ - 1);
+}
+
+/// ------------------------------------------------------c
+
+
 
 template<typename T>
 inline const T& Fifo<T>::iterator::operator*(void) const
