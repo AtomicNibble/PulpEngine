@@ -511,7 +511,7 @@ void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs,
 
 		DatagramHdr dgh;
 		dgh.number = 0;
-		dgh.flags.Set(DatagramFlag::Nack);
+		dgh.flags.Set(DatagramFlag::Ack);
 		dgh.writeToBitStream(bs);
 
 		// return instead of infinate loop, but if this happens dunno how we'd recover :Z
