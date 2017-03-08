@@ -69,10 +69,15 @@ public:
 
 	typedef RangeList<DataGramSequenceNumber> DataGramNumberRangeList;
 
+	X_NO_COPY(ReliabilityLayer);
+	X_NO_ASSIGN(ReliabilityLayer);
 
 public:
 	ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
+	ReliabilityLayer(ReliabilityLayer&& oth) = default;
 	~ReliabilityLayer();
+
+	ReliabilityLayer& operator=(ReliabilityLayer&& rhs) = default;
 
 	void reset(int32_t MTUSize);
 
