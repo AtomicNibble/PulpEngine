@@ -74,8 +74,14 @@ struct RemoteSystem
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef std::array<PingAndClockDifferential, PING_HISTORY_COUNT> PingArr;
 
+	X_NO_COPY(RemoteSystem);
+	X_NO_ASSIGN(RemoteSystem);
+
 public:
 	RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
+	RemoteSystem(RemoteSystem&& oth) = default;
+
+	RemoteSystem& operator=(RemoteSystem&& rhs) = default;
 
 	bool canSend(void) const;
 	ConnectionState::Enum getConnectionState(void) const;
