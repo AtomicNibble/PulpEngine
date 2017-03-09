@@ -62,7 +62,15 @@ struct DataGramHistory
 
 public:
 	DataGramHistory(core::TimeVal timesent) : timeSent(timesent)
-	{}
+	{
+#if X_DEBUG
+		magic = 0x12345678;
+#endif // X_DEBUG
+	}
+
+#if X_DEBUG
+	uint32_t magic;
+#endif // X_DEBUG
 
 	core::TimeVal timeSent;
 	MesgNumberArr messagenumbers;

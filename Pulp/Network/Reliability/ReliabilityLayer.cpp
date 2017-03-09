@@ -792,7 +792,11 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
 		return nullptr;
 	}
 
-	return &dataGramHistory_[offset];
+	DataGramHistory* pHistory = &dataGramHistory_[offset];
+#if X_DEBUG
+	X_ASSERT(pHistory->magic == 0x12345678, "MAgic not match, corrupt item?")();
+#endif // X_DEBUG
+	return pHistory;
 }
 
 bool ReliabilityLayer::clearDataGramHistory(DataGramSequenceNumber number)
