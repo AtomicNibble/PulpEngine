@@ -112,6 +112,8 @@ size_t ReliablePacket::getHeaderLengthBits(void) const
 		bits += core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel)));
 	}
 
+	bits = core::bitUtil::RoundUpToMultiple(bits, 8_sz);
+
 	return bits;
 }
 
