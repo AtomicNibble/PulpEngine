@@ -253,7 +253,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 
 	auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
 
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "\"%s\" msg added. Pri: \"%s\" size: ^5" PRIu32 "^7 numbits: ^5%" PRIu32, 
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "\"%s\" msg added. Pri: \"%s\" size: ^5%" PRIu32 "^7 numbits: ^5%" PRIu32, 
 		PacketReliability::ToString(reliability), PacketPriority::ToString(priority), lengthBytes, lengthBits);
 	
 	ReliablePacket* pPacket = allocPacket();
