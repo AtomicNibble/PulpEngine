@@ -147,6 +147,12 @@ inline T FixedBitStreamBase::read(void)
 	return val;
 }
 
+template<>
+inline bool FixedBitStreamBase::read<bool>(void)
+{
+	return readBool();
+}
+
 inline bool FixedBitStreamBase::readBool(void)
 {
 	uint8_t val = 0;
@@ -154,11 +160,20 @@ inline bool FixedBitStreamBase::readBool(void)
 	return val != 0;
 }
 
+
 template<typename T>
 inline void FixedBitStreamBase::read(T& val)
 {
 	readBits(reinterpret_cast<Type*>(&val), sizeof(T) << 3);
 }
+
+
+template<>
+inline void FixedBitStreamBase::read(bool& val)
+{
+	val = readBool();
+}
+
 
 // read the type * num from the stream.
 template<typename T>
