@@ -7,7 +7,6 @@ Fifo<T>::Fifo(MemoryArenaBase* arena) :
 	end_(nullptr),
 	read_(nullptr),
 	write_(nullptr),
-	num_(0),
 	arena_(arena)
 {
 
@@ -19,7 +18,6 @@ Fifo<T>::Fifo(MemoryArenaBase* arena, size_type size) :
 	end_(nullptr),
 	read_(nullptr),
 	write_(nullptr),
-	num_(0),
 	arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
@@ -33,10 +31,9 @@ Fifo<T>::Fifo(const Fifo& oth) :
 	// support nonePod
 	Mem::CopyArrayUninitialized(start_, oth.start_, oth.start_ + oth.size());
 
-	// set read/write/num
+	// set read/write
 	read_ = start_ + (oth.read_ - oth.start_);
 	write_ = start_ + (oth.write_ - oth.start_);
-	num_ = oth.num_;
 }
 
 template<typename T>
@@ -47,7 +44,6 @@ Fifo<T>::Fifo(Fifo&& oth)
 	read_ = oth.read_;
 	write_ = oth.write_;
 
-	num_ = oth.num_;
 
 	arena_ = oth.arena_;
 	
@@ -56,7 +52,6 @@ Fifo<T>::Fifo(Fifo&& oth)
 	oth.end_ = nullptr;
 	oth.read_ = nullptr;
 	oth.write_ = nullptr;
-	oth.num_ = 0;
 }
 
 template<typename T>
@@ -78,10 +73,9 @@ Fifo<T>& Fifo<T>::operator = (const Fifo<T>& oth)
 
 		Mem::CopyArrayUninitialized(start_, oth.start_, oth.start_ + oth.size());
 
-		// set read/write/num
+		// set read/write
 		read_ = start_ + (oth.read_ - oth.start_);
 		write_ = start_ + (oth.write_ - oth.start_);
-		num_ = oth.num_;
 	}
 	return *this;
 }
@@ -98,7 +92,6 @@ Fifo<T>& Fifo<T>::operator = (Fifo<T>&& oth)
 		read_ = oth.read_;
 		write_ = oth.write_;
 
-		num_ = oth.num_;
 
 		arena_ = oth.arena_;
 
@@ -107,7 +100,6 @@ Fifo<T>& Fifo<T>::operator = (Fifo<T>&& oth)
 		oth.end_ = nullptr;
 		oth.read_ = nullptr;
 		oth.write_ = nullptr;
-		oth.num_ = 0;
 	}
 	return *this;
 }
@@ -149,17 +141,20 @@ X_INLINE const T& Fifo<T>::operator[](size_type idx) const
 template<typename T>
 void Fifo<T>::push(const T& v)
 {
-	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
-
+	if (!start_) {
+		expand();
+	}
 
 	Mem::Construct<T>(write_, v);
 
 	++write_;
 
-	num_ = core::Min(++num_, capacity());
-
 	if (write_ == end_) {
 		write_ = start_;
+	}
+
+	if (write_ == read_) {
+		expand();
 	}
 }
 
@@ -167,16 +162,20 @@ void Fifo<T>::push(const T& v)
 template<typename T>
 void Fifo<T>::push(T&& v)
 {
-	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
+	if (!start_) {
+		expand();
+	}
 
 	Mem::Construct<T>(write_, std::forward<T>(v));
 
 	++write_;
 
-	num_ = core::Min(++num_, capacity());
-
 	if (write_ == end_) {
 		write_ = start_;
+	}
+
+	if (write_ == read_) {
+		expand();
 	}
 }
 
@@ -184,16 +183,20 @@ template<typename T>
 template<class... ArgsT>
 void Fifo<T>::emplace(ArgsT&&... args)
 {
-	X_ASSERT(size() < capacity(), "Cannot emplace another value into an already full FIFO.")(size(), capacity());
+	if (!start_) {
+		expand();
+	}
 
 	Mem::Construct<T>(write_, std::forward<ArgsT>(args)...);
 
 	++write_;
 
-	num_ = core::Min(++num_, capacity());
-
 	if (write_ == end_) {
 		write_ = start_;
+	}
+
+	if (write_ == read_) {
+		expand();
 	}
 }
 
@@ -206,7 +209,6 @@ void Fifo<T>::pop(void)
 	Mem::Destruct<T>(read_);
 
 	++read_;
-	--num_;
 
 	if (read_ == end_) {
 		read_ = start_;
@@ -264,7 +266,6 @@ void Fifo<T>::reserve(size_type num)
 	X_ASSERT(start_ == nullptr, "Cannot reserve additional memory. free() the FIFO first.")(
 		size(), capacity(), start_, end_, num);
 
-
 	start_ = Allocate(num);
 	end_ = start_ + num;
 	read_ = start_;
@@ -274,11 +275,11 @@ void Fifo<T>::reserve(size_type num)
 template<typename T>
 void Fifo<T>::clear(void)
 {
-	while (size() > 0) {
+	size_type num = size();
+	for (size_type i = 0; i < num; i++) {
 		pop();
 	}
 
-	num_ = 0;
 	read_ = start_;
 	write_ = start_;
 }
@@ -298,7 +299,12 @@ void Fifo<T>::free(void)
 template<typename T>
 typename Fifo<T>::size_type Fifo<T>::size(void) const
 {
-	return num_;
+	if (read_ <= write_) {
+		return write_ - read_;
+	}
+
+	// looped back. so write is lower than read
+	return capacity() - (read_ - write_);
 }
 
 template<typename T>
@@ -310,13 +316,13 @@ typename Fifo<T>::size_type Fifo<T>::capacity(void) const
 template<typename T>
 bool Fifo<T>::isEmpty(void) const
 {
-	return num_ == 0;
+	return size() == 0;
 }
 
 template<typename T>
 bool Fifo<T>::isNotEmpty(void) const
 {
-	return num_ != 0;
+	return size() != 0;
 }
 // ----------------------------------------------
 
@@ -330,7 +336,7 @@ typename Fifo<T>::iterator Fifo<T>::begin(void)
 template<typename T>
 typename Fifo<T>::iterator Fifo<T>::end(void)
 {
-	return iterator(start_, end_, write_, num_);
+	return iterator(start_, end_, write_, size());
 }
 
 template<typename T>
@@ -342,7 +348,7 @@ typename Fifo<T>::const_iterator Fifo<T>::begin(void) const
 template<typename T>
 typename Fifo<T>::const_iterator Fifo<T>::end(void) const
 {
-	return const_iterator(start_, end_, write_, num_);
+	return const_iterator(start_, end_, write_, size());
 }
 
 /// ------------------------------------------------------c
@@ -381,6 +387,49 @@ typename Fifo<T>::ConstReference Fifo<T>::back(void) const
 
 
 /// ----------------------------
+
+template<typename T>
+void Fifo<T>::expand(void)
+{
+	X_ASSERT(write_ == read_, "This should only be called when we are full.")(write_, read_);
+
+	// we want to allocate a new aaray like a slut.
+	if (capacity() == 0)
+	{
+		reserve(16);
+		return;
+	}
+
+	X_ASSERT_NOT_NULL(start_);
+
+	// allocate a new array twice size.
+	size_t curSize = capacity();
+	size_t newSize = capacity() << 1;
+	T* pData = Allocate(newSize);
+	T* pDataCur = pData;
+
+	// need to move the old items over, but need to take into account wrapping.
+	while (read_ < end_) {
+		Mem::Construct(pDataCur++, std::forward<T>(*read_++));
+	}
+
+	read_ = start_;
+
+	while (read_ < write_) {
+		Mem::Construct(pDataCur++, std::forward<T>(*read_++));
+	}
+
+	// make sure copy expected amount.
+	X_ASSERT(pData + curSize == pDataCur, "Failed to move all items")(pData, pDataCur, curSize);
+
+	// delete old and update pointers.
+	Delete(start_);
+
+	start_ = pData;
+	end_ = pData + newSize;
+	read_ = start_; // read always moves back to start, when we grow.
+	write_ = read_ + curSize;
+}
 
 template<typename T>
 void Fifo<T>::Delete(T* pData)
@@ -436,13 +485,13 @@ inline typename Fifo<T>::iterator Fifo<T>::iterator::operator++(int)
 template<typename T>
 inline bool Fifo<T>::iterator::operator==(const iterator& rhs) const
 {
-	return count_ == rhs.count_;
+	return current_ == rhs.current_;
 }
 
 template<typename T>
 inline bool Fifo<T>::iterator::operator!=(const iterator& rhs) const
 {
-	return count_ != rhs.count_;
+	return current_ != rhs.current_;
 }
 
 /// ------------------------------------------------------
@@ -482,13 +531,13 @@ inline typename Fifo<T>::const_iterator Fifo<T>::const_iterator::operator++(int)
 template<typename T>
 inline bool Fifo<T>::const_iterator::operator==(const const_iterator& rhs) const
 {
-	return count_ == rhs.count_;
+	return current_ == rhs.current_;
 }
 
 template<typename T>
 inline bool Fifo<T>::const_iterator::operator!=(const const_iterator& rhs) const
 {
-	return count_ != rhs.count_;
+	return current_ != rhs.current_;
 }
 
 

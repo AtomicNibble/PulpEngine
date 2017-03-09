@@ -143,17 +143,17 @@ public:
 
 
 private:
+	void expand(void);
+
 	// for easy memory allocation changes later.
 	X_INLINE void Delete(T* pData);
 	X_INLINE T* Allocate(size_type num);
 
-
+private:
 	T* start_;
 	T* end_;
 	T* read_;
 	T* write_;
-
-	size_type num_;
 
 	MemoryArenaBase* arena_;
 };
