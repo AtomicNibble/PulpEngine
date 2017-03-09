@@ -730,6 +730,15 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 		sendBitStream(socket, bs, systemAddress, time);
 	}
+
+	for (auto* pPacket : packetsThisFrame)
+	{
+		if (!pPacket->isReliable())
+		{
+			X_DELETE(pPacket->pData, g_NetworkArena);
+			freePacket(pPacket);
+		}
+	}
 }
 
 // called from peer to get recived packets back from ReliabilityLayer.
