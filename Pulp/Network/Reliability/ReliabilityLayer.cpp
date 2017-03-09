@@ -849,7 +849,8 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 	}
 	else
 	{
-		X_WARNING("NetRel", "Failed to packet from resend buffer for removal msgIdx: %" PRIu16, msgNum);
+		X_WARNING("NetRel", "Failed to packet from resend buffer for removal msgIdx: %" PRIu16 " bufIdx: %" PRIuS, 
+			msgNum, resendBufIdx);
 	}
 }
 
