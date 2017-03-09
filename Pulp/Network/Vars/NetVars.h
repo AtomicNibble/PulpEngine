@@ -19,6 +19,8 @@ public:
 	void registerVars(void);
 
 	X_INLINE int32_t debugEnabled(void) const;
+	X_INLINE int32_t debugAckEnabled(void) const;
+	X_INLINE int32_t debugNackEnabled(void) const;
 	X_INLINE int32_t debugSocketsEnabled(void) const;
 
 	X_INLINE bool rlConnectionsPerIP(void) const;
@@ -46,6 +48,8 @@ private:
 
 private:
 	int32_t debug_;
+	int32_t debugAck_;
+	int32_t debugNAck_;
 	int32_t debugSockets_;
 	int32_t rlconnectionsPerIp_;
 	int32_t rlconnectionsPerIpThreshMS_;
