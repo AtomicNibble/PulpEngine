@@ -157,6 +157,7 @@ private:
 	bool clearDataGramHistory(DataGramSequenceNumber number);
 
 private:
+	X_INLINE size_t resendBufferIdxForMsgNum(MessageNumber msgNum) const;
 	X_INLINE bool isResendBufferFull(void) const; // checks if current index is occupied.
 	X_INLINE bool isResendListEmpty(void) const;
 	void insertPacketToResendList(ReliablePacket* pPacket);

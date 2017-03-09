@@ -567,9 +567,9 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 					pPacket->retransmissionTime = core::TimeVal::fromMS(2000);
 					pPacket->nextActionTime = time + pPacket->retransmissionTime;
 
-					const auto resizeBufIdx = pPacket->reliableMessageNumber % resendBuf_.max_size();
-					X_ASSERT(resendBuf_[resizeBufIdx] == nullptr, "Resent buffer has valid data already in it")();
-					resendBuf_[resizeBufIdx] = pPacket;
+					const auto resendBufIdx = resendBufferIdxForMsgNum(pPacket->reliableMessageNumber);
+					X_ASSERT(resendBuf_[resendBufIdx] == nullptr, "Resent buffer has valid data already in it")();
+					resendBuf_[resendBufIdx] = pPacket;
 
 					++reliableMessageNumberIdx_;
 
@@ -825,7 +825,7 @@ void ReliabilityLayer::movePacketToTailOfResendList(ReliablePacket* pPacket)
 
 void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 {
-	const auto resendBufIdx = msgNum % resendBuf_.max_size();
+	const auto resendBufIdx = resendBufferIdxForMsgNum(msgNum);
 
 	ReliablePacket* pPacket = resendBuf_[resendBufIdx];
 	if (pPacket && pPacket->reliableMessageNumber == msgNum)

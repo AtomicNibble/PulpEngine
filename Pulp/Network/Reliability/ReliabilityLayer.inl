@@ -39,9 +39,14 @@ X_INLINE BitSizeT ReliabilityLayer::maxDataGramSizeExcHdrBits(void) const
 	return safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(maxDataGramSizeExcHdr()));
 }
 
+X_INLINE size_t ReliabilityLayer::resendBufferIdxForMsgNum(MessageNumber msgNum) const
+{
+	return msgNum % resendBuf_.max_size();
+}
+
 X_INLINE bool ReliabilityLayer::isResendBufferFull(void) const
 {
-	const auto curIdx = reliableMessageNumberIdx_ % resendBuf_.max_size();
+	const auto curIdx = resendBufferIdxForMsgNum(reliableMessageNumberIdx_);
 
 	return resendBuf_[curIdx] != nullptr;
 }
