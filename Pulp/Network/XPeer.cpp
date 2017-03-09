@@ -60,6 +60,10 @@ namespace
 		0x00, 0x35, 0x33, 0x24, 0xbb, 0xa5, 0x38, 0x85
 	};
 
+	static const size_t POOL2_ALLOCATION_SIZE = sizeof(ReliablePacket);
+	static const size_t POOL2_ALLOCATION_ALIGN = X_ALIGN_OF(ReliablePacket);
+	static const size_t MAX_INTERNAL_PACKET = 8096;
+
 	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
 	static const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
 
@@ -212,6 +216,18 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 		PoolArena::getMemoryOffsetRequirement()
 	),
 	poolArena_(&poolAllocator_, "PoolArena"),
+	pool2Heap_(
+		core::bitUtil::RoundUpToMultiple<size_t>(
+			PoolArena::getMemoryRequirement(POOL2_ALLOCATION_SIZE) * MAX_INTERNAL_PACKET,
+			core::VirtualMem::GetPageSize()
+		)
+	),
+	pool2Allocator_(pool2Heap_.start(), pool2Heap_.end(),
+		PoolArena::getMemoryRequirement(POOL2_ALLOCATION_SIZE),
+		PoolArena::getMemoryAlignmentRequirement(POOL2_ALLOCATION_ALIGN),
+		PoolArena::getMemoryOffsetRequirement()
+	),
+	pool2Arena_(&pool2Allocator_, "PoolArena"),
 	blockArena_(&blockAlloc_, "blockArena")
 {
 	remoteSystems_.getAllocator().setBaseAlignment(16);
@@ -264,7 +280,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		maxPeers_ = maxConnections;
 
 		// todo create a pool for packets to share between rel layers.
-		core::MemoryArenaBase* packetPool = arena_;
+		core::MemoryArenaBase* packetPool = &pool2Arena_;
 
 		remoteSystems_.reserve(maxPeers_);
 		for (int32_t i = 0; i < maxPeers_; i++) {

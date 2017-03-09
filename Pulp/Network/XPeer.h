@@ -407,6 +407,10 @@ private:
 	core::PoolAllocator poolAllocator_;
 	PoolArena			poolArena_;
 
+	core::HeapArea      pool2Heap_;
+	core::PoolAllocator pool2Allocator_;
+	PoolArena			pool2Arena_;
+
 	core::GrowingBlockAllocator blockAlloc_;
 	BlockAlocArena		blockArena_;
 
