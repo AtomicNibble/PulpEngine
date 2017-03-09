@@ -340,7 +340,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 		for (auto& ackRange : incomingAcks_)
 		{
 			// we want to mark all these messages as recived so we don't resend like a pleb.
-			X_LOG0("NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
+			X_LOG0_IF(vars_.debugAckEnabled(), "NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
 
 			for (DataGramSequenceNumber dataGramIdx = ackRange.min; dataGramIdx <= ackRange.max; dataGramIdx++)
 			{
@@ -832,7 +832,7 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 	{
 		resendBuf_[resendBufIdx] = nullptr;
 
-		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Ack msgId: %" PRIu16, msgNum);
+		X_LOG0_IF(vars_.debugAckEnabled(), "NetRel", "Ack msgId: %" PRIu16, msgNum);
 
 		// stats
 		--msgInReSendBuffers_;
