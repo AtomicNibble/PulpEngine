@@ -690,9 +690,9 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	}
 
 	ReliablePacket* pPacket = recivedPackets_.peek();
-	dataOut.pData = pPacket->pData;
-	dataOut.numBits = pPacket->dataBitLength;
+	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, g_NetworkArena);
 	recivedPackets_.pop();
+
 	return true;
 }
 

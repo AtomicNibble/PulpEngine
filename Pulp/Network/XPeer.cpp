@@ -1538,11 +1538,11 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 		{
 			// okay we got a packet :D!
 			// the first byte should be msgId.
-			if (data.numBits < 8) {
+			if (data.getNumbBits() < 8) {
 				continue;
 			}
 
-			core::FixedBitStreamNoneOwning stream(data.pData, data.pData + core::bitUtil::bitsToBytes(data.numBits), true);
+			core::FixedBitStreamNoneOwning stream(data.begin(), data.end(), true);
 			MessageID::Enum msgId = stream.read<MessageID::Enum>();
 
 			if (msgId >= MessageID::ENUM_COUNT) {

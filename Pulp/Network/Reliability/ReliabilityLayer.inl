@@ -3,6 +3,62 @@
 X_NAMESPACE_BEGIN(net)
 
 
+X_INLINE ReliabilityLayer::PacketData::PacketData() :
+	numBits_(0),
+	pData_(nullptr),
+	arena_(nullptr)
+{
+}
+
+X_INLINE ReliabilityLayer::PacketData::~PacketData()
+{
+	if (pData_) {
+		X_DELETE_ARRAY(pData_, arena_);
+	}
+}
+
+X_INLINE void ReliabilityLayer::PacketData::setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena) 
+{
+	if (pData_) {
+		X_DELETE_ARRAY(pData_, arena_);
+	}
+
+	numBits_ = numBits;
+	pData_ = pData;
+	arena_ = arena;
+}
+
+X_INLINE BitSizeT ReliabilityLayer::PacketData::getNumbBits(void) const 
+{
+	return numBits_;
+}
+
+X_INLINE uint8_t* ReliabilityLayer::PacketData::getData(void) const 
+{
+	return pData_;
+}
+
+X_INLINE uint8_t* ReliabilityLayer::PacketData::begin(void) 
+{
+	return pData_;
+}
+
+X_INLINE uint8_t* ReliabilityLayer::PacketData::end(void) 
+{
+	return pData_ + core::bitUtil::bitsToBytes(numBits_);
+}
+
+X_INLINE const uint8_t* ReliabilityLayer::PacketData::begin(void) const
+{
+	return pData_;
+}
+
+X_INLINE const uint8_t* ReliabilityLayer::PacketData::end(void) const
+{
+	return pData_ + core::bitUtil::bitsToBytes(numBits_);
+}
+
+// --------------------------------------------------
 
 X_INLINE bool ReliabilityLayer::pendingOutgoingData(void) const
 {

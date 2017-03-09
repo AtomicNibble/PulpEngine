@@ -88,8 +88,24 @@ class ReliabilityLayer
 public:
 	struct PacketData
 	{
-		uint8_t* pData;
-		BitSizeT numBits;
+		X_INLINE PacketData();
+		X_INLINE ~PacketData();
+
+		X_INLINE void setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena);
+
+		X_INLINE BitSizeT getNumbBits(void) const;
+		X_INLINE uint8_t* getData(void) const;
+
+		X_INLINE uint8_t* begin(void);
+		X_INLINE uint8_t* end(void);
+
+		X_INLINE const uint8_t* begin(void) const;
+		X_INLINE const uint8_t* end(void) const;
+
+	private:
+		BitSizeT numBits_;
+		uint8_t* pData_;
+		core::MemoryArenaBase* arena_;
 	};
 
 	typedef RangeList<DataGramSequenceNumber> DataGramNumberRangeList;
