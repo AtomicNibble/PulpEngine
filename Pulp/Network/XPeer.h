@@ -279,6 +279,10 @@ private:
 	bool sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority, 
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, 
 		core::TimeVal currentTime, uint32_t receipt);
+	X_INLINE bool sendImmediate(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast,
+		core::TimeVal currentTime, uint32_t receipt);
+
 
 	void sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate);
 	void closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
