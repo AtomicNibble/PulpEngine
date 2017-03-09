@@ -147,6 +147,13 @@ inline T FixedBitStreamBase::read(void)
 	return val;
 }
 
+inline bool FixedBitStreamBase::readBool(void)
+{
+	uint8_t val = 0;
+	readBits(reinterpret_cast<Type*>(&val), 1);
+	return val != 0;
+}
+
 template<typename T>
 inline void FixedBitStreamBase::read(T& val)
 {

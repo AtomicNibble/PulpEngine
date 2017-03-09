@@ -53,6 +53,8 @@ public:
 	template<typename T>
 	T read(void);
 
+	bool readBool(void);
+
 	template<typename T>
 	void read(T& val);
 	// read the type * num from the stream.
