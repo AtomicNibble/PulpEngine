@@ -287,6 +287,10 @@ inline bool FixedBitStreamBase::isEos(void) const
 	return size() == 0;
 }
 
+inline bool FixedBitStreamBase::isStartOfStream(void) const
+{
+	return readBitIdx_ == 0;
+}
 
 // --------------------
 

@@ -98,7 +98,8 @@ public:
 	size_type freeSpace(void) const;
 	// returns true if the stream is full.
 	bool isEos(void) const;
-
+	// returns true if never read from stream.
+	bool isStartOfStream(void) const;
 
 	TypePtr ptr(void);
 	ConstTypePtr ptr(void) const;
