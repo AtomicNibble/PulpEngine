@@ -1889,5 +1889,8 @@
     <Natvis Include="String.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="FiFo.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

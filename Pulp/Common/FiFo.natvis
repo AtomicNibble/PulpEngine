@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::core::Fifo&lt;*&gt;">
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">size()</Item>
+      <Item Name="[capacity]" ExcludeView="simple">end_ - start_</Item>
+      <Item Name="[Start]" ExcludeView="simple">start_</Item>
+      <Item Name="[End]" ExcludeView="simple">end_</Item>
+      <Item Name="[Read]" ExcludeView="simple">read_</Item>
+      <Item Name="[Write]" ExcludeView="simple">write_</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
