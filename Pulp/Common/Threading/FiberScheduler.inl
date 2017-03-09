@@ -63,8 +63,9 @@ namespace Fiber
 	{
 		core::Spinlock::ScopedLock lock(lock_);
 
-		if (list_.isEmpty())
+		if (list_.isEmpty()) {
 			return false;
+		}
 
 		item = list_.peek();
 		list_.pop();
@@ -125,22 +126,22 @@ namespace Fiber
 	void ThreadQueBlocking<T>::Pop(T& item)
 	{
 		X_DISABLE_WARNING(4127)
-			while (true)
-				X_ENABLE_WARNING(4127)
+		while (true)
+		X_ENABLE_WARNING(4127)
+		{
+			lock_.Enter();
+			// if que empty wait
+			if (list_.isEmpty())
 			{
-				lock_.Enter();
-				// if que empty wait
-				if (list_.isEmpty())
-				{
-					lock_.Leave();
-					signal_.wait();
-					// loop around to reauire lock to check if still empty.
-				}
-				else
-				{
-					break; // break out, we still own lock
-				}
+				lock_.Leave();
+				signal_.wait();
+				// loop around to reauire lock to check if still empty.
 			}
+			else
+			{
+				break; // break out, we still own lock
+			}
+		}
 
 		item = list_.peek();
 		list_.pop();
