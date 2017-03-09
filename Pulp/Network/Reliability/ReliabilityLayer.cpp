@@ -693,6 +693,7 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, g_NetworkArena);
 	recivedPackets_.pop();
 
+	freePacket(pPacket);
 	return true;
 }
 
