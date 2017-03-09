@@ -226,15 +226,51 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 
 ReliabilityLayer::~ReliabilityLayer()
 {
-
+	free();
 }
 
 
+void ReliabilityLayer::free(void)
+{
+	while (outGoingPackets_.isNotEmpty()) {
+		freePacket(outGoingPackets_.peek());
+		outGoingPackets_.pop();
+	}
+
+	while (recivedPackets_.isNotEmpty()) {
+		freePacket(recivedPackets_.peek());
+		recivedPackets_.pop();
+	}
+
+
+}
+
 void ReliabilityLayer::reset(int32_t MTUSize)
 {
+	free();
+
 	MTUSize_ = MTUSize;
 
-	timeLastDatagramArrived_ = gEnv->pTimer->GetTimeNowReal();
+	auto timeNow = gEnv->pTimer->GetTimeNowReal();
+
+	timeLastDatagramArrived_ = timeNow;
+	lastBSPUpdate_ = timeNow;
+	orderedWriteIndex_.fill(0);
+	sequencedWriteIndex_.fill(0);
+	orderedReadIndex_.fill(0);
+	highestSequencedReadIndex_.fill(0);
+
+	outGoingPackets_.clear();
+	recivedPackets_.clear();
+	dataGramHistory_.clear();
+	dataGramHistoryPopCnt_ = 0;
+
+	incomingAcks_.clear();
+	naks_.clear();
+	acks_.clear();
+
+	reliableMessageNumberIdx_ = 0;
+	dagramSeqNumber_ = 0;
 
 	connectionDead_ = false;
 
@@ -244,6 +280,14 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 	for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++) {
 		bps_[i].reset();
 	}
+
+	msgInSendBuffers_.fill(0);
+	bytesInSendBuffers_.fill(0);
+
+	bytesInReSendBuffers_ = 0;
+	msgInReSendBuffers_ = 0;
+
+	resendBuf_.fill(nullptr);
 }
 
 

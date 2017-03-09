@@ -120,6 +120,7 @@ public:
 
 	ReliabilityLayer& operator=(ReliabilityLayer&& rhs) = default;
 
+	void free(void);
 	void reset(int32_t MTUSize);
 
 	// que some data for sending, reliability is handled.
