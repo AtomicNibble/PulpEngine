@@ -145,7 +145,7 @@ TEST(FileSys, Async)
 }
 
 
-TEST(FileSys, Find)
+TEST(DISABLED_FileSys, Find)
 {
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
