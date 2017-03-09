@@ -389,10 +389,35 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 		for (auto& nackRange : incomingNacks)
 		{
 			// mark all the msg's for resend immediatly.
+			X_LOG0_IF(vars_.debugNackEnabled(), "NetRel", "Nact Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, nackRange.min, nackRange.max);
 
+			for (DataGramSequenceNumber dataGramIdx = nackRange.min; dataGramIdx <= nackRange.max; dataGramIdx++)
+			{
+				DataGramHistory* pHistory = getDataGramHistory(dataGramIdx);
+				if (!pHistory) {
+					X_WARNING("NetRel", "Failed to get dataGram history for idx: %" PRIu16 " will result in resend", dataGramIdx);
+					continue;
+				}
 
+				// mark each as sent.
+				for (auto msgNum : pHistory->messagenumbers)
+				{
+					const auto resendBufIdx = resendBufferIdxForMsgNum(msgNum);
+					ReliablePacket* pPacket = resendBuf_[resendBufIdx];
 
+					X_LOG0_IF(vars_.debugNackEnabled(), "NetRel", "Nack msgNum: ^5 % " PRIu16, msgNum);
 
+					if (pPacket)
+					{
+						if (pPacket->nextActionTime.GetValue() != 0)
+						{
+							pPacket->nextActionTime = time;
+						}
+					}
+				}
+
+				pHistory->messagenumbers.clear();
+			}
 		}
 	}
 	else
