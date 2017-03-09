@@ -246,7 +246,7 @@ public:
 	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
 		hash_(arena, MaxAssets),
 		list_(arena),
-		freeList_(arena, 128),
+		freeList_(arena),
 		AssetPool(allocSize, allocAlign)
 	{
 		list_.reserve(MaxAssets);

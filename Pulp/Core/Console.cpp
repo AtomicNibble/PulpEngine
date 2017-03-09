@@ -348,7 +348,7 @@ XConsole::XConsole() :
 		VarPool::getMemoryOffsetRequirement()
 	),
 	varArena_(&varAllocator_,"VarArena"),
-	cmds_(g_coreArena, 64)
+	cmds_(g_coreArena)
 {
 	HistoryPos_ = -1;
 	CursorPos_ = 0;
