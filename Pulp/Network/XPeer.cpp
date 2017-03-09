@@ -2,6 +2,7 @@
 #include "XPeer.h"
 #include "XNet.h"
 
+#include <Hashing\sha1.h>
 #include <Memory\VirtualMem.h>
 #include <ITimer.h>
 
@@ -1968,9 +1969,14 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 					bsOut.write(MessageID::ConnectionRequest);
 					bsOut.write(guid_);
 					bsOut.write(timeNow.GetValue());
-					bsOut.write(safe_static_cast<uint8_t>(pReq->password.length()));
-					if (pReq->password.isNotEmpty()) {
-						bsOut.write(pReq->password.c_str(), pReq->password.length());
+					bsOut.write(pReq->password.isNotEmpty());
+					if (pReq->password.isNotEmpty()) 
+					{
+						core::Hash::SHA1 hash;
+						hash.update(pReq->password.c_str(), pReq->password.length());
+						auto digest = hash.finalize();
+
+						bsOut.writeAligned(digest);
 					}
 
 					// send the request to the remote.
@@ -2059,7 +2065,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 {
 	NetGUID clientGuid;
 	int64_t timeStamp;
-	uint8_t passwordLen;
+	bool passwordInc;
 
 	// must be a unverified sender trying to connect.
 	if (rs.connectState != ConnectState::UnverifiedSender)
@@ -2076,38 +2082,48 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 
 	bs.read(clientGuid);
 	bs.read(timeStamp);
-	bs.read(passwordLen);
+	bs.read(passwordInc);
 
-	char passwordBuf[MAX_PASSWORD_LEN];
-	if (passwordLen) {
-		bs.read(passwordBuf, passwordLen);
+	core::Hash::SHA1Digest passwordDisget;
+	if (passwordInc) {
+		bs.readAligned(passwordDisget);
 	}
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request. timeStamp: %" PRId64, timeStamp);
 
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
-	// corrent password?
-	PasswordStr pass(passwordBuf, passwordBuf + passwordLen);
-	if (password_ != pass && (password_.isNotEmpty() && vars_.ignorePasswordFromClientIfNotRequired()))
+	// optional don't allow clients that give us a password when one not required.
+	const bool clientMustNotSendPassword = !vars_.ignorePasswordFromClientIfNotRequired();
+	// if this is true will force the hash check, which will fail.
+	const bool invalidPassord = (passwordInc && clientMustNotSendPassword);
+
+
+	if (password_.isNotEmpty() || invalidPassord)
 	{
-		bsOut.write(MessageID::InvalidPassword);
-		bsOut.write(guid_);
+		core::Hash::SHA1 hash;
+		hash.update(password_.c_str(), password_.length());
+		auto serverPassDigest = hash.finalize();
 
-		sendImmediate(
-			bsOut.data(),
-			safe_static_cast<BitSizeT>(bsOut.size()),
-			PacketPriority::Immediate,
-			PacketReliability::Reliable,
-			0,
-			AddressOrGUID(&rs.systemAddress),
-			false,
-			timeNow,
-			0
-		);
+		if (passwordDisget != serverPassDigest)
+		{
+			bsOut.write(MessageID::InvalidPassword);
+			bsOut.write(guid_);
 
-		rs.connectState = ConnectState::DisconnectAsapSilent;
-		return;
+			sendImmediate(
+				bsOut,
+				PacketPriority::Immediate,
+				PacketReliability::Reliable,
+				0,
+				AddressOrGUID(&rs.systemAddress),
+				false,
+				timeNow,
+				0
+			);
+
+			rs.connectState = ConnectState::DisconnectAsapSilent;
+			return;
+		}
 	}
 
 
