@@ -8,7 +8,6 @@ BPSTracker::BPSTracker(core::MemoryArenaBase* arena) :
 	lastSec_(0),
 	values_(arena)
 {
-	values_.reserve(64);
 }
 
 
