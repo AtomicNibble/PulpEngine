@@ -101,48 +101,48 @@ TYPED_TEST(FifoTest, Types)
 
 	fifo.push(16);
 	EXPECT_EQ(1, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	fifo.push(32);
 	EXPECT_EQ(2, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	fifo.push(48);
 	EXPECT_EQ(3, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	// Pop
 
 	EXPECT_EQ(16, fifo.peek());
 	fifo.pop();
 	EXPECT_EQ(2, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 
 	EXPECT_EQ(32, fifo.peek());
 	fifo.pop();
 	EXPECT_EQ(1, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	EXPECT_EQ(48, fifo.peek());
 	fifo.pop();
 	EXPECT_EQ(0, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	// push again so we over wright.
 	fifo.push(64);
 	EXPECT_EQ(1, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	EXPECT_EQ(64, fifo.peek());
 	fifo.clear();
 	EXPECT_EQ(0, fifo.size());
-	EXPECT_LE(3, fifo.capacity());
+	EXPECT_LE(3_sz, fifo.capacity());
 
 	fifo.free();
 
 	EXPECT_EQ(0, fifo.size());
-	EXPECT_LE(0, fifo.capacity());
+	EXPECT_EQ(0, fifo.capacity());
 }
 
 TYPED_TEST(FifoTest, CopyConstruct)
@@ -249,7 +249,7 @@ TYPED_TEST(FifoTest, Assign)
 	fifo2.push(0x71);
 
 	EXPECT_EQ(1, fifo2.size());
-	EXPECT_LE(1, fifo2.capacity());
+	EXPECT_LE(1_sz, fifo2.capacity());
 
 	// assign
 	fifo2 = fifo;
@@ -393,7 +393,7 @@ TYPED_TEST(FifoTest, growing)
 	}
 
 	EXPECT_EQ(256, fifo.size());
-	ASSERT_LE(256, fifo.capacity());
+	ASSERT_LE(256_sz, fifo.capacity());
 
 	fifo.free();
 
@@ -431,7 +431,7 @@ TYPED_TEST(FifoTest, growing2)
 	}
 
 	EXPECT_EQ(256 + 3, fifo.size());
-	ASSERT_LE(256, fifo.capacity());
+	ASSERT_LE(256_sz, fifo.capacity());
 
 	// pop them all.
 	EXPECT_EQ(0x30, fifo.peek());
@@ -474,14 +474,14 @@ TYPED_TEST(FifoTest, pushEmpty)
 	// we should not of grown, size should be 3
 	// and we should of moved around.
 	EXPECT_EQ(3, fifo.size());
-	ASSERT_LE(4, fifo.capacity());
+	ASSERT_LE(4_sz, fifo.capacity());
 
 	for (size_t i = 0; i < 256; i++) {
 		fifo.push((TypeParam)i);
 	}
 
 	EXPECT_EQ(256 + 3, fifo.size());
-	ASSERT_LE(256, fifo.capacity());
+	ASSERT_LE(256_sz, fifo.capacity());
 
 	// pop them all.
 	EXPECT_EQ(0x30, fifo.peek());
@@ -582,8 +582,8 @@ TEST(FifoTest, Complex_Assign)
 		EXPECT_EQ(5, CustomTypeComplex::CONSRUCTION_COUNT);
 		EXPECT_EQ(5, CustomTypeComplex::DECONSRUCTION_COUNT);
 
-		EXPECT_EQ(1, fifo2.size());
-		EXPECT_LE(1, fifo2.capacity());
+		EXPECT_EQ(1_sz, fifo2.size());
+		EXPECT_LE(1_sz, fifo2.capacity());
 
 		// assign
 		fifo2 = fifo;
