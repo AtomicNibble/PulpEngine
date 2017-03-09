@@ -124,7 +124,7 @@ X_INLINE T& Fifo<T>::operator[](size_type idx)
 {
 	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
 
-	if (read_ + idx > end_) {
+	if (read_ + idx >= end_) {
 		size_type left = end_ - read_;
 		return *(start_ + (idx - left));
 	}
@@ -137,7 +137,7 @@ X_INLINE const T& Fifo<T>::operator[](size_type idx) const
 {
 	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
 
-	if (read_ + idx > end_) {
+	if (read_ + idx >= end_) {
 		size_type left = end_ - read_;
 		return *(start_ + (idx - left));
 	}
