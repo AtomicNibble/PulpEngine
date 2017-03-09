@@ -27,7 +27,8 @@ Fifo<T>::Fifo(MemoryArenaBase* arena, size_type size) :
 }
 
 template<typename T>
-Fifo<T>::Fifo(const Fifo& oth) : Fifo<T>(oth.arena_, oth.capacity())
+Fifo<T>::Fifo(const Fifo& oth) : 
+	Fifo<T>(oth.arena_, oth.capacity())
 {
 	// support nonePod
 	Mem::CopyArrayUninitialized(start_, oth.start_, oth.start_ + oth.size());
@@ -115,7 +116,7 @@ Fifo<T>& Fifo<T>::operator = (Fifo<T>&& oth)
 template<typename T>
 void Fifo<T>::setArena(MemoryArenaBase* arena)
 {
-	X_ASSERT(arena_ == nullptr || num_ == 0, "can't set arena on a Fifo that has items")(num_);
+	X_ASSERT(arena_ == nullptr || size() == 0, "can't set arena on a Fifo that has items")(size());
 	arena_ = arena;
 }
 
@@ -273,8 +274,9 @@ void Fifo<T>::reserve(size_type num)
 template<typename T>
 void Fifo<T>::clear(void)
 {
-	while (size() > 0)
+	while (size() > 0) {
 		pop();
+	}
 
 	num_ = 0;
 	read_ = start_;
@@ -377,6 +379,24 @@ typename Fifo<T>::ConstReference Fifo<T>::back(void) const
 	return *(write_ - 1);
 }
 
+
+/// ----------------------------
+
+template<typename T>
+void Fifo<T>::Delete(T* pData)
+{
+	// don't deconstruct
+	uint8_t* pDataPod = union_cast<uint8_t*, T*>(pData);
+
+	X_DELETE_ARRAY(pDataPod, arena_);
+}
+
+template<typename T>
+T* Fifo<T>::Allocate(size_type num)
+{
+	return reinterpret_cast<T*>(X_NEW_ARRAY(uint8_t, num * sizeof(T), arena_, "Fifo<"X_PP_STRINGIZE(T)">"));
+}
+
 /// ------------------------------------------------------c
 
 
@@ -398,8 +418,9 @@ inline typename Fifo<T>::iterator& Fifo<T>::iterator::operator++(void)
 {
 	++count_;
 	++current_;
-	if (current_ == end_)
+	if (current_ == end_) {
 		current_ = start_;
+	}
 
 	return *this;
 }
@@ -424,13 +445,6 @@ inline bool Fifo<T>::iterator::operator!=(const iterator& rhs) const
 	return count_ != rhs.count_;
 }
 
-/*
-template<typename T>
-inline Fifo<T>::iterator::operator typename Fifo<T>::iterator::const_iterator(void) const
-{
-	return const_iterator(start_, end_, current_, count_);
-}*/
-
 /// ------------------------------------------------------
 
 template<typename T>
@@ -450,8 +464,9 @@ inline typename Fifo<T>::const_iterator& Fifo<T>::const_iterator::operator++(voi
 {
 	++count_;
 	++current_;
-	if (current_ == end_)
+	if (current_ == end_) {
 		current_ = start_;
+	}
 
 	return *this;
 }
@@ -478,20 +493,3 @@ inline bool Fifo<T>::const_iterator::operator!=(const const_iterator& rhs) const
 
 
 
-
-/// ----------------------------
-
-template<typename T>
-void Fifo<T>::Delete(T* pData)
-{
-	// don't deconstruct
-	uint8_t* pDataPod = union_cast<uint8_t*, T*>(pData);
-
-	X_DELETE_ARRAY(pDataPod, arena_);
-}
-
-template<typename T>
-T* Fifo<T>::Allocate(size_type num)
-{
-	return reinterpret_cast<T*>(X_NEW_ARRAY(uint8_t, num * sizeof(T), arena_, "Fifo<"X_PP_STRINGIZE(T)">"));
-}
