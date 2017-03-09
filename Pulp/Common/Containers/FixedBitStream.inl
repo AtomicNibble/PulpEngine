@@ -71,23 +71,23 @@ inline FixedBitStreamBase::FixedBitStreamBase(TypePtr pBegin, size_type numBits)
 inline void FixedBitStreamBase::write(bool bit)
 {
 	if (bit) {
-		write0();
+		write1();
 	}
 	else {
-		write1();
+		write0();
 	}
 }
 
 inline void FixedBitStreamBase::write0(void)
 {
 	uint8_t val = 0;
-	readBits(reinterpret_cast<Type*>(&val), 1);
+	writeBits(reinterpret_cast<Type*>(&val), 1);
 }
 
 inline void FixedBitStreamBase::write1(void)
 {
 	uint8_t val = 1;
-	readBits(reinterpret_cast<Type*>(&val), 1);
+	writeBits(reinterpret_cast<Type*>(&val), 1);
 }
 
 template<typename T>
