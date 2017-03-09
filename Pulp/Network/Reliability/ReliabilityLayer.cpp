@@ -699,10 +699,14 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		// here we pack the packet range into BS.
 		bs.reset();
 
+		X_ASSERT(bs.capacity() >= maxDataGramSize(), "Provided Bs can't fit max dataGram")(bs.capacity(), maxDataGramSize());
+
 		DatagramHdr dgh;
 		dgh.number = dagramSeqNumber_++;
 		dgh.flags.Clear();
 		dgh.writeToBitStream(bs);
+
+		X_ASSERT(bs.size() == dataGramHdrSizeBits(), "Invalid size logic")(bs.size(), dataGramHdrSizeBits());
 
 		DataGramHistory* pHistory = createDataGramHistory(dgh.number, time);
 
@@ -953,5 +957,16 @@ size_t ReliabilityLayer::maxDataGramSizeExcHdr(void) const
 {
 	return maxDataGramSize() - sizeof(DatagramHdr);
 }
+
+size_t ReliabilityLayer::dataGramHdrSize(void) const
+{
+	return sizeof(DatagramHdr);
+}
+
+size_t ReliabilityLayer::dataGramHdrSizeBits(void) const
+{
+	return core::bitUtil::bytesToBits(dataGramHdrSize());
+}
+
 
 X_NAMESPACE_END

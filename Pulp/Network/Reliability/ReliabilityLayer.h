@@ -151,6 +151,8 @@ private:
 	X_INLINE void addAck(DataGramSequenceNumber messageNumber);
 	size_t maxDataGramSize(void) const;
 	size_t maxDataGramSizeExcHdr(void) const;
+	size_t dataGramHdrSize(void) const;
+	size_t dataGramHdrSizeBits(void) const;
 
 	X_INLINE BitSizeT maxDataGramSizeBits(void) const;
 	X_INLINE BitSizeT maxDataGramSizeExcHdrBits(void) const;
