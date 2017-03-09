@@ -581,10 +581,18 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 				outGoingPackets_.pop();
 
+				// add packet.
+				currentDataGramSizeBits += totalBitSize;
+				packetsThisFrame.emplace_back(pPacket);
+
 				// stats
 				--msgInSendBuffers_[pPacket->priority];
 				bytesInSendBuffers_[pPacket->priority] -= byteLength;
+
+				bps_[NetStatistics::Metric::BytesSent].add(time, byteLength);
 				// ~
+
+				++pPacket->sendAttemps;
 
 				bool reliabile = pPacket->isReliable();
 
@@ -617,14 +625,6 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 					// ...
 				}
 
-				++pPacket->sendAttemps;
-
-				// stats
-				bps_[NetStatistics::Metric::BytesSent].add(time, byteLength);
-
-				// add packet.
-				currentDataGramSizeBits += totalBitSize;
-				packetsThisFrame.emplace_back(pPacket);
 			}
 
 			// datagram is empty?
