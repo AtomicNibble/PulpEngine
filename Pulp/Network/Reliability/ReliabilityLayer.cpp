@@ -776,8 +776,6 @@ DataGramHistory* ReliabilityLayer::createDataGramHistory(DataGramSequenceNumber 
 		dataGramHistory_.peek().messagenumbers.clear();
 		dataGramHistory_.pop();
 		++dataGramHistoryPopCnt_;
-
-		X_WARNING("NetRel", "Datagram history buffer full dropping trailing history");
 	}
 
 	dataGramHistory_.emplace(time);
