@@ -217,7 +217,9 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
-	dataGramHistory_.reserve(REL_DATAGRAM_HISTORY_LENGTH);
+
+	// we will grow up to: REL_DATAGRAM_HISTORY_LENGTH
+	dataGramHistory_.reserve(16);
 
 	resendBuf_.fill(nullptr);
 }
@@ -796,7 +798,7 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacker)
 
 DataGramHistory* ReliabilityLayer::createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time)
 {
-	if (dataGramHistory_.size() == dataGramHistory_.capacity())
+	if (dataGramHistory_.size() == REL_DATAGRAM_HISTORY_LENGTH)
 	{
 		dataGramHistory_.peek().messagenumbers.clear();
 		dataGramHistory_.pop();
