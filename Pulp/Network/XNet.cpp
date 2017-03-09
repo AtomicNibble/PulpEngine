@@ -111,7 +111,6 @@ NetGUID XNet::generateGUID(void)
 	core::DateStamp date = core::DateStamp::GetSystemDate();
 
 	core::Hash::SHA1 sha1;
-	sha1.Init();
 	sha1.update(date);
 	sha1.update(now.GetValue());
 	auto digest = sha1.finalize();

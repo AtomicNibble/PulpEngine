@@ -39,7 +39,6 @@ namespace Hash
 		SHA512();
 		~SHA512();
 
-		void Init();
 		void reset(void);
 		void update(const void* buf, size_t length);
 		void update(const char* str);

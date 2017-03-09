@@ -35,8 +35,7 @@ namespace Hash
 		MD5();
 		~MD5();
 
-		void Init(void);
-
+		void reset(void);
 		void update(const uint8_t* buf, size_t length);
 		void update(const char* buf, size_t length);
 		void update(const char* str);

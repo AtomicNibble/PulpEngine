@@ -116,11 +116,6 @@ namespace Hash
 
 	}
 
-	void SHA512::Init()
-	{
-		reset();
-	}
-
 	void SHA512::reset(void)
 	{
 		zero_object(buffer_);

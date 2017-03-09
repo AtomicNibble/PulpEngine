@@ -100,7 +100,6 @@ TEST(Hash, MD5)
 	expected.data[3] = 0xcf921e78;
 
 	Hash::MD5 md5;
-	md5.Init();
 	md5.update("tickle my pickle");
 	val = md5.finalize();
 
@@ -122,7 +121,6 @@ TEST(Hash, SHA1)
 	expected.data[4] = 0xe25e92fe;
 
 	Hash::SHA1 sha1;
-	sha1.Init();
 	sha1.update("hash me baby!");
 	val = sha1.finalize();
 
@@ -144,7 +142,6 @@ TEST(Hash, SHA1_blank)
 	expected.data[4] = Endian::swap(0xafd80709);
 
 	Hash::SHA1 sha1;
-	sha1.Init();
 	sha1.update("");
 	val = sha1.finalize();
 
@@ -166,7 +163,6 @@ TEST(Hash, SHA1_896)
 	expected.data[4] = Endian::swap(0x3a04a259);
 
 	Hash::SHA1 sha1;
-	sha1.Init();
 	sha1.update("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghij"
 		"klmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu");
 	val = sha1.finalize();
@@ -193,7 +189,6 @@ TEST(Hash, SHA512_blank)
 	expected.data[7] = Endian::swap(0xa538327af927da3e);
 
 	Hash::SHA512 sha512;
-	sha512.Init();
 	sha512.update("");
 	val = sha512.finalize();
 
@@ -219,7 +214,6 @@ TEST(Hash, SHA512_abc)
 	expected.data[7] = Endian::swap(0x2a9ac94fa54ca49f);
 
 	Hash::SHA512 sha512;
-	sha512.Init();
 	sha512.update("abc");
 	val = sha512.finalize();
 
@@ -245,7 +239,6 @@ TEST(Hash, SHA512_896)
 	expected.data[7] = Endian::swap(0x5e96e55b874be909);
 
 	Hash::SHA512 sha512;
-	sha512.Init();
 	sha512.update("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhi"
 		"jklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu");
 	val = sha512.finalize();
@@ -273,7 +266,6 @@ TEST(Hash, SHA512_1000000)
 	expected.data[7] = Endian::swap(0x4eadb217ad8cc09b);
 
 	Hash::SHA512 sha512;
-	sha512.Init();
 
 	for (size_t i = 0; i < 1000000; i++)
 	{

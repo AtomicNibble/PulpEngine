@@ -103,7 +103,7 @@ const char* MD5Digest::ToString(String& buf) const
 
 MD5::MD5()
 {
-	Init();
+	reset();
 }
 
 MD5::~MD5()
@@ -111,7 +111,7 @@ MD5::~MD5()
 
 }
 
-void MD5::Init(void)
+void MD5::reset(void)
 {
 	finalized_ = false;
 
@@ -123,7 +123,6 @@ void MD5::Init(void)
 	count_[0] = 0;
 	count_[1] = 0;
 
-	// not need, but clear.
 	zero_object(buffer_);
 }
 

@@ -69,11 +69,6 @@ namespace Hash
 
 	}
 
-	void SHA1::Init()
-	{
-		reset();
-	}
-
 	void SHA1::reset(void)
 	{
 		zero_object(buffer_);
