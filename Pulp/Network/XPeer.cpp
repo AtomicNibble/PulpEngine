@@ -1084,8 +1084,7 @@ void XPeer::sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool 
 
 	if (imediate) {
 		sendImmediate(
-			bsOut.data(),
-			safe_static_cast<BitSizeT>(bsOut.size()),
+			bsOut,
 			PacketPriority::Immediate,
 			rel,
 			0,
@@ -1976,8 +1975,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 
 					// send the request to the remote.
 					sendImmediate(
-						bsOut.data(), 
-						safe_static_cast<BitSizeT>(bsOut.size()),
+						bsOut, 
 						PacketPriority::Immediate, 
 						PacketReliability::Reliable,
 						0, 
@@ -2126,8 +2124,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	bsOut.write(timeNow.GetValue());
 
 	sendImmediate(
-		bsOut.data(),
-		safe_static_cast<BitSizeT>(bsOut.size()),
+		bsOut,
 		PacketPriority::Immediate,
 		PacketReliability::Reliable,
 		0,
@@ -2182,8 +2179,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	bsOut.write(timeNow.GetValue());
 
 	sendImmediate(
-		bsOut.data(),
-		safe_static_cast<BitSizeT>(bsOut.size()),
+		bsOut,
 		PacketPriority::Immediate,
 		PacketReliability::Reliable,
 		0,
@@ -2259,8 +2255,7 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
 	bsOut.write(timeNow.GetValue());
 
 	sendImmediate(
-		bsOut.data(),
-		safe_static_cast<BitSizeT>(bsOut.size()),
+		bsOut,
 		PacketPriority::Immediate,
 		PacketReliability::UnReliable,
 		0,
