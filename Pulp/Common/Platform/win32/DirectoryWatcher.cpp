@@ -141,7 +141,8 @@ void XDirectoryWatcher::addDirectory(const wchar_t* directory)
 	info.event = CreateEventA(0,
 		FALSE, // might try using TRUE see if it helps with duplicate events. 
 		0,
-		0);
+		0
+	);
 
 	if (info.event == NULL)
 	{
@@ -325,15 +326,16 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<char>& path)
 	Info_t info(st.st_mtime, st.st_size);
 
 	Fifo<Info_t>::const_iterator it = cache_.begin();
-
 	for (; it != cache_.end(); ++it)
 	{
-		if ((*it) == info)
+		if ((*it) == info) {
 			return true;
+		}
 	}
 
-	if (cache_.capacity() == cache_.size())
+	if (cache_.capacity() == cache_.size()) {
 		cache_.pop();
+	}
 
 	cache_.push(info);
 	return false;
@@ -348,15 +350,16 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<wchar_t>& path)
 	Info_t info(st.st_mtime, st.st_size);
 
 	Fifo<Info_t>::const_iterator it = cache_.begin();
-
 	for (; it != cache_.end(); ++it)
 	{
-		if ((*it) == info)
+		if ((*it) == info) {
 			return true;
+		}
 	}
 
-	if (cache_.capacity() == cache_.size())
+	if (cache_.capacity() == cache_.size()) {
 		cache_.pop();
+	}
 
 	cache_.push(info);
 	return false;
