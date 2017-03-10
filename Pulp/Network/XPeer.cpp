@@ -2165,7 +2165,6 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	if (rs.connectState != ConnectState::RequestedConnection)
 	{
 		X_ERROR("Net", "Recived unexpected connection request accept, ignoring.");
-
 		return;
 	}
 
@@ -2231,7 +2230,6 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 	if (rs.connectState != ConnectState::HandlingConnectionRequest)
 	{
 		X_ERROR("Net", "Recived unexpected connection request handshake, ignoring.");
-
 		return;
 	}
 
