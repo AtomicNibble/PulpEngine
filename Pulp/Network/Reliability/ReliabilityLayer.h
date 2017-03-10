@@ -26,11 +26,13 @@ struct ReliablePacket
 	bool isReliable(void) const;
 	bool hasSplitPacket(void) const;
 	size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's diffrent depending on priority types etc.
-	static constexpr size_t getMaxHeaderLength(void);
-	static constexpr size_t getMaxHeaderLengthBits(void);
-
+	
 	void writeToBitStream(core::FixedBitStreamBase& bs) const;
 	bool fromBitStream(core::FixedBitStreamBase& bs);
+
+public:
+	static constexpr size_t getMaxHeaderLength(void);
+	static constexpr size_t getMaxHeaderLengthBits(void);
 
 public:
 	MessageNumber reliableMessageNumber;
