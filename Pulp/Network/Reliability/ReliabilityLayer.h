@@ -214,6 +214,7 @@ private:
 
 	MessageNumber reliableMessageNumberIdx_; // current rel msg number index.
 	MessageNumber dagramSeqNumber_; 
+	SplitPacketId splitPacketId_;
 
 	bool connectionDead_;
 	bool _pad[3];

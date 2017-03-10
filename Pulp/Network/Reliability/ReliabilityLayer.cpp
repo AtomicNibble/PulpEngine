@@ -299,6 +299,7 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	acks_(arena),
 	reliableMessageNumberIdx_(0),
 	dagramSeqNumber_(0),
+	splitPacketId_(0),
 	bps_{ arena, arena, arena, arena, arena, arena, arena },
 	bytesInReSendBuffers_(0),
 	msgInReSendBuffers_(0)
