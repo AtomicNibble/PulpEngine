@@ -317,12 +317,12 @@ namespace exceptionHandler
 					X_LOG0("ExceptionHandler", "R14 = 0x%016" PRIxPTR, ContextRecord->R14);
 					X_LOG0("ExceptionHandler", "R15 = 0x%016" PRIxPTR, ContextRecord->R15);
 #else
-					X_LOG0("ExceptionHandler", "EAX = 0x%08X", ContextRecord->Eax);
-					X_LOG0("ExceptionHandler", "EBX = 0x%08X", ContextRecord->Ebx);
-					X_LOG0("ExceptionHandler", "ECX = 0x%08X", ContextRecord->Ecx);
-					X_LOG0("ExceptionHandler", "EDX = 0x%08X", ContextRecord->Edx);
-					X_LOG0("ExceptionHandler", "ESI = 0x%08X", ContextRecord->Esi);
-					X_LOG0("ExceptionHandler", "EDI = 0x%08X", ContextRecord->Edi);
+					X_LOG0("ExceptionHandler", "EAX = 0x%08" PRIxPTR, ContextRecord->Eax);
+					X_LOG0("ExceptionHandler", "EBX = 0x%08" PRIxPTR, ContextRecord->Ebx);
+					X_LOG0("ExceptionHandler", "ECX = 0x%08" PRIxPTR, ContextRecord->Ecx);
+					X_LOG0("ExceptionHandler", "EDX = 0x%08" PRIxPTR, ContextRecord->Edx);
+					X_LOG0("ExceptionHandler", "ESI = 0x%08" PRIxPTR, ContextRecord->Esi);
+					X_LOG0("ExceptionHandler", "EDI = 0x%08" PRIxPTR, ContextRecord->Edi);
 #endif // !X_64
 				}
 			}
@@ -334,10 +334,10 @@ namespace exceptionHandler
 					X_LOG_BULLET;
 
 
-					X_LOG0("ExceptionHandler", "DS = 0x%04X", ContextRecord->SegDs );
-					X_LOG0("ExceptionHandler", "ES = 0x%04X", ContextRecord->SegEs );
-					X_LOG0("ExceptionHandler", "FS = 0x%04X", ContextRecord->SegFs );
-					X_LOG0("ExceptionHandler", "GS = 0x%04X", ContextRecord->SegGs );
+					X_LOG0("ExceptionHandler", "DS = 0x%04" PRIx32, ContextRecord->SegDs );
+					X_LOG0("ExceptionHandler", "ES = 0x%04" PRIx32, ContextRecord->SegEs );
+					X_LOG0("ExceptionHandler", "FS = 0x%04" PRIx32, ContextRecord->SegFs );
+					X_LOG0("ExceptionHandler", "GS = 0x%04" PRIx32, ContextRecord->SegGs );
 				}
 			}
 
@@ -357,12 +357,12 @@ namespace exceptionHandler
 
 #else
 
-					X_LOG0("ExceptionHandler", "EIP = 0x%08X", ContextRecord->Eip);
-					X_LOG0("ExceptionHandler", "ESP = 0x%08X", ContextRecord->Esp);
-					X_LOG0("ExceptionHandler", "EBP = 0x%08X", ContextRecord->Ebp);
-					X_LOG0("ExceptionHandler", "EFL = 0x%08X", ContextRecord->EFlags);
-					X_LOG0("ExceptionHandler", "CS = 0x%08X", ContextRecord->SegCs);
-					X_LOG0("ExceptionHandler", "SS = 0x%08X", ContextRecord->SegSs);
+					X_LOG0("ExceptionHandler", "EIP = 0x%08" PRIxPTR, ContextRecord->Eip);
+					X_LOG0("ExceptionHandler", "ESP = 0x%08" PRIxPTR, ContextRecord->Esp);
+					X_LOG0("ExceptionHandler", "EBP = 0x%08" PRIxPTR, ContextRecord->Ebp);
+					X_LOG0("ExceptionHandler", "EFL = 0x%08" PRIxPTR, ContextRecord->EFlags);
+					X_LOG0("ExceptionHandler", "CS = 0x%08" PRIxPTR, ContextRecord->SegCs);
+					X_LOG0("ExceptionHandler", "SS = 0x%08" PRIxPTR, ContextRecord->SegSs);
 
 #endif // !X_64
 
@@ -383,12 +383,12 @@ namespace exceptionHandler
 					X_LOG0("ExceptionHandler", "Dr6 = 0x%016" PRIxPTR, ContextRecord->Dr6 );
 					X_LOG0("ExceptionHandler", "Dr7 = 0x%016" PRIxPTR, ContextRecord->Dr7 );
 #else
-					X_LOG0("ExceptionHandler", "Dr0 = 0x%08X", ContextRecord->Dr0);
-					X_LOG0("ExceptionHandler", "Dr1 = 0x%08X", ContextRecord->Dr1);
-					X_LOG0("ExceptionHandler", "Dr2 = 0x%08X", ContextRecord->Dr2);
-					X_LOG0("ExceptionHandler", "Dr3 = 0x%08X", ContextRecord->Dr3);
-					X_LOG0("ExceptionHandler", "Dr6 = 0x%08X", ContextRecord->Dr6);
-					X_LOG0("ExceptionHandler", "Dr7 = 0x%08X", ContextRecord->Dr7);
+					X_LOG0("ExceptionHandler", "Dr0 = 0x%08" PRIxPTR, ContextRecord->Dr0);
+					X_LOG0("ExceptionHandler", "Dr1 = 0x%08" PRIxPTR, ContextRecord->Dr1);
+					X_LOG0("ExceptionHandler", "Dr2 = 0x%08" PRIxPTR, ContextRecord->Dr2);
+					X_LOG0("ExceptionHandler", "Dr3 = 0x%08" PRIxPTR, ContextRecord->Dr3);
+					X_LOG0("ExceptionHandler", "Dr6 = 0x%08" PRIxPTR, ContextRecord->Dr6);
+					X_LOG0("ExceptionHandler", "Dr7 = 0x%08" PRIxPTR, ContextRecord->Dr7);
 #endif // !X_64
 
 				}
@@ -429,15 +429,15 @@ namespace exceptionHandler
 				{
 					X_LOG_BULLET;
 
-					X_LOG0("ExceptionHandler", "ControlWord = 0x%08X", ContextRecord->FloatSave.ControlWord);
-					X_LOG0("ExceptionHandler", "StatusWord = 0x%08X", ContextRecord->FloatSave.StatusWord);
-					X_LOG0("ExceptionHandler", "TagWord = 0x%08X", ContextRecord->FloatSave.TagWord);
-					X_LOG0("ExceptionHandler", "ErrorOffset = 0x%08X", ContextRecord->FloatSave.ErrorOffset);
-					X_LOG0("ExceptionHandler", "ErrorSelector = 0x%08X", ContextRecord->FloatSave.ErrorSelector);
-					X_LOG0("ExceptionHandler", "DataOffset = 0x%08X", ContextRecord->FloatSave.DataOffset);
-					X_LOG0("ExceptionHandler", "DataSelector = 0x%08X", ContextRecord->FloatSave.DataSelector);
-					X_LOG0("ExceptionHandler", "Spare0 = 0x%08X", ContextRecord->FloatSave.Spare0); //Cr0NpxState );
-					X_LOG0("ExceptionHandler", "RegisterArea = 0x%08X", ContextRecord->FloatSave.RegisterArea); //Cr0NpxState );
+					X_LOG0("ExceptionHandler", "ControlWord = 0x%08" PRIxPTR, ContextRecord->FloatSave.ControlWord);
+					X_LOG0("ExceptionHandler", "StatusWord = 0x%08" PRIxPTR, ContextRecord->FloatSave.StatusWord);
+					X_LOG0("ExceptionHandler", "TagWord = 0x%08" PRIxPTR, ContextRecord->FloatSave.TagWord);
+					X_LOG0("ExceptionHandler", "ErrorOffset = 0x%08" PRIxPTR, ContextRecord->FloatSave.ErrorOffset);
+					X_LOG0("ExceptionHandler", "ErrorSelector = 0x%08" PRIxPTR, ContextRecord->FloatSave.ErrorSelector);
+					X_LOG0("ExceptionHandler", "DataOffset = 0x%08" PRIxPTR, ContextRecord->FloatSave.DataOffset);
+					X_LOG0("ExceptionHandler", "DataSelector = 0x%08" PRIxPTR, ContextRecord->FloatSave.DataSelector);
+					X_LOG0("ExceptionHandler", "Spare0 = 0x%08" PRIxPTR, ContextRecord->FloatSave.Spare0); //Cr0NpxState );
+				//	X_LOG0("ExceptionHandler", "RegisterArea = 0x%08X", ContextRecord->FloatSave.RegisterArea); //Cr0NpxState );
 				}
 			}
 #endif // !X_64
