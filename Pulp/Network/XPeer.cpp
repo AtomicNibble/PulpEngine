@@ -2181,6 +2181,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 
 	bs.read(externalSysId);
 	bs.read(numInternal);
+	X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
 	for (size_t i = 0; i < numInternal; i++) {
 		bs.read(localIps.AddOne());
 	}
@@ -2244,6 +2245,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 
 	bs.read(externalSysId);
 	bs.read(numInternal);
+	X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
 	for (size_t i = 0; i < numInternal; i++) {
 		bs.read(localIps.AddOne());
 	}
