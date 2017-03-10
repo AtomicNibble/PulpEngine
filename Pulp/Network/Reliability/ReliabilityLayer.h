@@ -24,6 +24,7 @@ struct ReliablePacket
 	ReliablePacket();
 
 	bool isReliable(void) const;
+	bool hasSplitPacket(void) const;
 	size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's diffrent depending on priority types etc.
 	static constexpr size_t getMaxHeaderLength(void);
 	static constexpr size_t getMaxHeaderLengthBits(void);

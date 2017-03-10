@@ -79,11 +79,19 @@ bool ReliablePacket::isReliable(void) const
 	}
 }
 
+bool ReliablePacket::hasSplitPacket(void) const
+{
+	// use count, id may be set with a value of 0.
+	return splitPacketCount != 0;
+}
+
 size_t ReliablePacket::getHeaderLengthBits(void) const
 {
 	size_t bits = 0;
 
 	bits += core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT);
+	bits += 1; // bool for splitPacket.
+	bits = core::bitUtil::RoundUpToMultiple(bits, 8_sz); // we align write.
 	bits += core::bitUtil::bytesToBits(sizeof(uint16_t));
 
 	if (reliability == PacketReliability::Reliable ||
@@ -112,6 +120,13 @@ size_t ReliablePacket::getHeaderLengthBits(void) const
 		bits += core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel)));
 	}
 
+	if (hasSplitPacket())
+	{
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(splitPacketId)));
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(splitPacketIndex)));
+		bits += core::bitUtil::bytesToBits(sizeof(decltype(splitPacketCount)));
+	}
+
 	bits = core::bitUtil::RoundUpToMultiple(bits, 8_sz);
 
 	X_ASSERT(bits < getMaxHeaderLengthBits(), "bit count exceeded calculated max")(bits, getMaxHeaderLengthBits());
@@ -134,16 +149,19 @@ constexpr size_t ReliablePacket::getMaxHeaderLengthBits(void)
 		core::bitUtil::bytesToBits(sizeof(decltype(reliableMessageNumber))) + 
 		core::bitUtil::bytesToBits(sizeof(decltype(sequencingIndex))) + 
 		core::bitUtil::bytesToBits(sizeof(decltype(orderingIndex))) +
-		core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel))),
+		core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel))) +
+		core::bitUtil::bytesToBits(sizeof(decltype(splitPacketId))) +
+		core::bitUtil::bytesToBits(sizeof(decltype(splitPacketIndex))) +
+		core::bitUtil::bytesToBits(sizeof(decltype(splitPacketCount))),
 		8
 	); 
 }
 
 void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
-
 	bs.writeBits(reinterpret_cast<const uint8_t*>(&reliability), core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT));
-	bs.write<uint16_t>(safe_static_cast<uint16_t>(dataBitLength)); 
+	bs.write<bool>(hasSplitPacket());
+	bs.writeAligned<uint16_t>(safe_static_cast<uint16_t>(dataBitLength)); 
 
 	// reliable types.
 	if (reliability == PacketReliability::Reliable ||
@@ -172,6 +190,13 @@ void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
 		bs.write(orderingChannel);
 	}
 
+	if (hasSplitPacket())
+	{
+		bs.write(splitPacketId);
+		bs.write(splitPacketIndex);
+		bs.write(splitPacketCount);
+	}
+
 	bs.writeAligned(pData, core::bitUtil::bitsToBytes(dataBitLength));
 }
 
@@ -181,7 +206,8 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	uint8_t rel;
 	uint16_t bits;
 	bs.readBits(&rel, core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT));
-	bs.read(bits);
+	bool splitPacket = bs.readBool();
+	bs.readAligned(bits);
 
 	reliability = static_cast<PacketReliability::Enum>(rel);
 	dataBitLength = bits;
@@ -194,6 +220,10 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 		reliability == PacketReliability::ReliableWithAck)
 	{
 		bs.read(reliableMessageNumber);
+	}
+	else
+	{
+		reliableMessageNumber = std::numeric_limits<decltype(reliableMessageNumber)>::max();
 	}
 
 	// sequenced.
@@ -212,8 +242,42 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 		bs.read(orderingIndex);
 		bs.read(orderingChannel);
 	}
+	else
+	{
+		orderingChannel = 0;
+	}
 
-	pData = X_NEW_ARRAY(uint8_t, core::bitUtil::bitsToBytes(dataBitLength), g_NetworkArena, "PacketBytes");
+	if (splitPacket)
+	{
+		bs.read(splitPacketId);
+		bs.read(splitPacketIndex);
+		bs.read(splitPacketCount);
+	}
+	else
+	{
+		splitPacketCount = 0; 
+
+		// only the count is used to know if split, so set valeus on these to try detect incorrect usage.
+#if X_DEBUG
+		splitPacketId= std::numeric_limits<decltype(splitPacketIndex)>::max();
+		splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
+#endif
+	}
+
+	// check for corruption.
+	if (dataBitLength == 0 || reliability > PacketReliability::ENUM_COUNT || orderingChannel >= MAX_ORDERED_STREAMS)
+	{
+		return false;
+	}
+	if (hasSplitPacket() && splitPacketIndex >= splitPacketCount)
+	{
+		return false;
+	}
+
+	size_t dataByteLength = core::bitUtil::bitsToBytes(dataBitLength);
+
+	pData = X_NEW_ARRAY(uint8_t, dataByteLength, g_NetworkArena, "PacketBytes");
+	pData[dataByteLength - 1] = 0; // zero last bit, as we may not have full byte.
 
 	bs.readBitsAligned(pData, dataBitLength);
 	return true;
