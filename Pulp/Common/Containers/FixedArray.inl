@@ -194,19 +194,17 @@ typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, 
 template<typename T, size_t N>
 bool FixedArray<T, N>::removeIndex(size_type idx)
 {
-	if (idx < size() && isNotEmpty())
+	if (idx < size())
 	{
 		T* pArr = begin();
+		T* pTarget = pArr + idx;
 
-		size_--; // remove first so we don't try access it.
+		auto ptr = Mem::Move(pTarget + 1, end(), pTarget);
 
-		// shift them down.
-		size_type i, num;
-		for (i = idx, num = size_; i < num; i++) {
-			pArr[i] = pArr[i + 1];
-		}
+		// now we just need to deconstruct trailing.
+		Mem::Destruct<T>(ptr);
 
-		Mem::Destruct(pArr + size_);
+		size_--; 
 		return true;
 	}
 	return false;
