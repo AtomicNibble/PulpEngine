@@ -30,6 +30,7 @@ namespace debugging
 	};
 
 	bool WriteMiniDump(const Path<char>& filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers);
+	bool WriteMiniDump(const Path<wchar_t>& filename, DumpType type, EXCEPTION_POINTERS* exceptionPointers);
 }
 
 X_NAMESPACE_END
