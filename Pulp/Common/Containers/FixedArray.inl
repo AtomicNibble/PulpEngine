@@ -78,11 +78,7 @@ const T* FixedArray<T, N>::data(void) const
 template<typename T, size_t N>
 inline void FixedArray<T, N>::clear(void)
 {
-	size_t i;
-	T* pArr = begin();
-
-	for (i = 0; i<size_; ++i)
-		Mem::Destruct(pArr + i);
+	Mem::DestructArray(begin(), size_);
 
 	size_ = 0;
 }
