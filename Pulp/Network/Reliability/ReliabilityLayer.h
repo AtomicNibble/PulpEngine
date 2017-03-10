@@ -21,6 +21,10 @@ typedef uint16_t DataGramSequenceNumber;
 
 struct ReliablePacket
 {
+	X_NO_COPY(ReliablePacket);
+	X_NO_ASSIGN(ReliablePacket);
+
+public:
 	ReliablePacket();
 
 	bool isReliable(void) const;
