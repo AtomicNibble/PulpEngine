@@ -15,6 +15,8 @@ X_ENABLE_WARNING(4091)
 #include <Time\DateStamp.h>
 #include <Time\TimeStamp.h>
 #include <Platform\MessageBox.h>
+#include <Platform\SystemInfo.h>
+#include <String\HumanSize.h>
 
 #if X_ENABLE_UNHANDLED_EXCEPTION_HANDLER
 
@@ -442,6 +444,33 @@ namespace exceptionHandler
 			}
 #endif // !X_64
 
+			{
+				core::SysInfo::UserNameStr userName;
+				core::SysInfo::LanguageStr lang;
+				core::SysInfo::MemInfo memInfo;
+				core::SysInfo::DisplayInfo displayInfo;
+
+				core::SysInfo::GetUserName(userName);
+				core::SysInfo::GetLanguage(lang);
+				core::SysInfo::GetSystemMemInfo(memInfo);
+				core::SysInfo::GetDisplayInfo(displayInfo);
+
+				core::HumanSize::Str s1, s2, s3;
+
+				X_LOG0("ExceptionHandler", "UserName: \"%ls\"", userName);
+				X_LOG0("ExceptionHandler", "Language: \"%ls\"", lang);
+				X_LOG0("ExceptionHandler", "PhysicalMem %s available %s virtual %s used %ld%%",
+					core::HumanSize::toString(s1, memInfo.TotalPhys),
+					core::HumanSize::toString(s2, memInfo.AvailPhys),
+					core::HumanSize::toString(s3, memInfo.TotalVirtual),
+					memInfo.dwMemoryLoad
+				);
+				X_LOG0("ExceptionHandler", "Display: %dx%dx%d",
+					displayInfo.pelsWidth,
+					displayInfo.pelsHeight,
+					displayInfo.bitsPerPel
+				);
+			}
 
 			{
 				TimeStamp time = TimeStamp::GetSystemTime();
