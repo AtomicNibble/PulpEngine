@@ -205,7 +205,7 @@ namespace exceptionHandler
 		DWORD Code = ExceptionRecord->ExceptionCode;
 		const bool isNonContinuable = ExceptionRecord->ExceptionFlags == EXCEPTION_NONCONTINUABLE;
 	
-		X_FATAL( "ExceptionHandler", "%s exception %s (0x%08X) occurred at address: " PRIxPTR,
+		X_ERROR( "ExceptionHandler", "%s exception %s (0x%08X) occurred at address: 0x%016" PRIxPTR,
 			(isNonContinuable ? "None-Continuable" : "Continuable"),
 			GetExceptionName(Code),
 			exceptionPointers,
@@ -223,16 +223,16 @@ namespace exceptionHandler
 				{
 					if ( ExpInfo == 1 )
 					{
-						X_ERROR( "ExceptionHandler", "Information: The thread attempted to write to an inaccessible address at virtual address: " PRIxPTR, ExceptionRecord->ExceptionAddress);
+						X_ERROR( "ExceptionHandler", "Information: The thread attempted to write to an inaccessible address at virtual address: 0x%016" PRIxPTR, ExceptionRecord->ExceptionAddress);
 					}
 					else if ( ExpInfo == 8 )
 					{
-						X_ERROR( "ExceptionHandler", "Information: The thread caused a user-mode data execution prevention (DEP) violation at virtual address: " PRIxPTR, ExceptionRecord->ExceptionAddress);
+						X_ERROR( "ExceptionHandler", "Information: The thread caused a user-mode data execution prevention (DEP) violation at virtual address: 0x%016" PRIxPTR, ExceptionRecord->ExceptionAddress);
 					}
 				}
 				else
 				{
-					X_ERROR( "ExceptionHandler", "Information: The thread attempted to read the inaccessible data at virtual address: " PRIdPTR, ExceptionRecord->ExceptionAddress);
+					X_ERROR( "ExceptionHandler", "Information: The thread attempted to read the inaccessible data at virtual address: 0x%016" PRIdPTR, ExceptionRecord->ExceptionAddress);
 				}
 
 			}
@@ -268,7 +268,7 @@ namespace exceptionHandler
 				HANDLE CurrentThread = GetCurrentThread();
 				HANDLE CurrentPro = GetCurrentProcess();
 
-				if( StackWalk64(machine, CurrentPro, CurrentThread, &stackFrame, 0, 0, SymFunctionTableAccess64, SymGetModuleBase64, 0 ) )
+				if( StackWalk64(machine, CurrentPro, CurrentThread, &stackFrame, ContextRecord, 0, SymFunctionTableAccess64, SymGetModuleBase64, 0 ) )
 				{
 					do
 					{
@@ -279,10 +279,16 @@ namespace exceptionHandler
 
 						SymbolInfo info = symbolResolution::ResolveSymbolsForAddress( (void*)stackFrame.AddrPC.Offset );
 
-						X_LOG0( "ExceptionHandler", "%s(%d): %s (0x%08llX)", info.GetFilename(), info.GetLine(), info.GetFunction(), stackFrame.AddrReturn.Offset );
+						X_LOG0( "ExceptionHandler", "%s(%" PRIu32 "): %s (0x%016" PRIx64 ")",
+							info.GetFilename(), info.GetLine(), info.GetFunction(), stackFrame.AddrReturn.Offset );
 
 					}
-					while ( StackWalk64(machine, CurrentPro, CurrentThread, &stackFrame, 0, 0, SymFunctionTableAccess64, SymGetModuleBase64, 0) );
+					while ( StackWalk64(machine, CurrentPro, CurrentThread, &stackFrame, ContextRecord, 0, SymFunctionTableAccess64, SymGetModuleBase64, 0) );
+				}
+				else
+				{
+					core::lastError::Description Dsc;
+					X_ERROR("ExceptionHandler", "Failed to walk stack: \"%s\"", core::lastError::ToString(Dsc));
 				}
 
 			} // end of call stack
@@ -296,20 +302,20 @@ namespace exceptionHandler
 					X_LOG_BULLET;
 
 #if X_64 == 1
-					X_LOG0( "ExceptionHandler", "RAX = 0x%08X", ContextRecord->Rax );
-					X_LOG0( "ExceptionHandler", "RCX = 0x%08X", ContextRecord->Rcx );
-					X_LOG0( "ExceptionHandler", "RDX = 0x%08X", ContextRecord->Rdx );
-					X_LOG0( "ExceptionHandler", "RBX = 0x%08X", ContextRecord->Rbx );
-					X_LOG0( "ExceptionHandler", "RSI = 0x%08X", ContextRecord->Rsi );
-					X_LOG0("ExceptionHandler", "RDI = 0x%08X", ContextRecord->Rdi);
-					X_LOG0("ExceptionHandler", "R8 = 0x%08X", ContextRecord->R8);
-					X_LOG0("ExceptionHandler", "R9 = 0x%08X", ContextRecord->R9);
-					X_LOG0("ExceptionHandler", "R10 = 0x%08X", ContextRecord->R10);
-					X_LOG0("ExceptionHandler", "R11 = 0x%08X", ContextRecord->R11);
-					X_LOG0("ExceptionHandler", "R12 = 0x%08X", ContextRecord->R12);
-					X_LOG0("ExceptionHandler", "R13 = 0x%08X", ContextRecord->R13);
-					X_LOG0("ExceptionHandler", "R14 = 0x%08X", ContextRecord->R14);
-					X_LOG0("ExceptionHandler", "R15 = 0x%08X", ContextRecord->R15);
+					X_LOG0("ExceptionHandler", "RAX = 0x%016" PRIxPTR, ContextRecord->Rax );
+					X_LOG0("ExceptionHandler", "RCX = 0x%016" PRIxPTR, ContextRecord->Rcx );
+					X_LOG0("ExceptionHandler", "RDX = 0x%016" PRIxPTR, ContextRecord->Rdx );
+					X_LOG0("ExceptionHandler", "RBX = 0x%016" PRIxPTR, ContextRecord->Rbx );
+					X_LOG0("ExceptionHandler", "RSI = 0x%016" PRIxPTR, ContextRecord->Rsi );
+					X_LOG0("ExceptionHandler", "RDI = 0x%016" PRIxPTR, ContextRecord->Rdi);
+					X_LOG0("ExceptionHandler", "R08 = 0x%016" PRIxPTR, ContextRecord->R8);
+					X_LOG0("ExceptionHandler", "R09 = 0x%016" PRIxPTR, ContextRecord->R9);
+					X_LOG0("ExceptionHandler", "R10 = 0x%016" PRIxPTR, ContextRecord->R10);
+					X_LOG0("ExceptionHandler", "R11 = 0x%016" PRIxPTR, ContextRecord->R11);
+					X_LOG0("ExceptionHandler", "R12 = 0x%016" PRIxPTR, ContextRecord->R12);
+					X_LOG0("ExceptionHandler", "R13 = 0x%016" PRIxPTR, ContextRecord->R13);
+					X_LOG0("ExceptionHandler", "R14 = 0x%016" PRIxPTR, ContextRecord->R14);
+					X_LOG0("ExceptionHandler", "R15 = 0x%016" PRIxPTR, ContextRecord->R15);
 #else
 					X_LOG0("ExceptionHandler", "EAX = 0x%08X", ContextRecord->Eax);
 					X_LOG0("ExceptionHandler", "EBX = 0x%08X", ContextRecord->Ebx);
@@ -327,10 +333,11 @@ namespace exceptionHandler
 				{
 					X_LOG_BULLET;
 
-					X_LOG0( "ExceptionHandler", "DS = 0x%08X", ContextRecord->SegDs );
-					X_LOG0( "ExceptionHandler", "ES = 0x%08X", ContextRecord->SegEs );
-					X_LOG0( "ExceptionHandler", "FS = 0x%08X", ContextRecord->SegFs );
-					X_LOG0( "ExceptionHandler", "GS = 0x%08X", ContextRecord->SegGs );
+
+					X_LOG0("ExceptionHandler", "DS = 0x%04X", ContextRecord->SegDs );
+					X_LOG0("ExceptionHandler", "ES = 0x%04X", ContextRecord->SegEs );
+					X_LOG0("ExceptionHandler", "FS = 0x%04X", ContextRecord->SegFs );
+					X_LOG0("ExceptionHandler", "GS = 0x%04X", ContextRecord->SegGs );
 				}
 			}
 
@@ -341,12 +348,12 @@ namespace exceptionHandler
 					X_LOG_BULLET;
 
 #if X_64 == 1
-					X_LOG0("ExceptionHandler", "RIP = 0x%08X", ContextRecord->Rip );
-					X_LOG0("ExceptionHandler", "RSP = 0x%08X", ContextRecord->Rsp);
-					X_LOG0("ExceptionHandler", "RSP = 0x%08X", ContextRecord->Rbp );
-					X_LOG0("ExceptionHandler", "EFlags = 0x%08X", ContextRecord->EFlags );
-					X_LOG0("ExceptionHandler", "CS = 0x%08X", ContextRecord->SegCs );
-					X_LOG0("ExceptionHandler", "SS = 0x%08X", ContextRecord->SegSs );
+					X_LOG0("ExceptionHandler", "RIP	  = 0x%016" PRIxPTR, ContextRecord->Rip );
+					X_LOG0("ExceptionHandler", "RSP	  = 0x%016" PRIxPTR, ContextRecord->Rsp);
+					X_LOG0("ExceptionHandler", "RSP	  = 0x%016" PRIxPTR, ContextRecord->Rbp );
+					X_LOG0("ExceptionHandler", "EFlags = 0x%016" PRIxPTR, ContextRecord->EFlags );
+					X_LOG0("ExceptionHandler", "CS	  = 0x%016" PRIxPTR, ContextRecord->SegCs );
+					X_LOG0("ExceptionHandler", "SS	  = 0x%016" PRIxPTR, ContextRecord->SegSs );
 
 #else
 
@@ -368,12 +375,22 @@ namespace exceptionHandler
 				{
 					X_LOG_BULLET;
 
-					X_LOG0( "ExceptionHandler", "Dr0 = 0x%08X", ContextRecord->Dr0 );
-					X_LOG0( "ExceptionHandler", "Dr1 = 0x%08X", ContextRecord->Dr1 );
-					X_LOG0( "ExceptionHandler", "Dr2 = 0x%08X", ContextRecord->Dr2 );
-					X_LOG0( "ExceptionHandler", "Dr3 = 0x%08X", ContextRecord->Dr3 );
-					X_LOG0( "ExceptionHandler", "Dr6 = 0x%08X", ContextRecord->Dr6 );
-					X_LOG0( "ExceptionHandler", "Dr7 = 0x%08X", ContextRecord->Dr7 );
+#if X_64 == 1
+					X_LOG0("ExceptionHandler", "Dr0 = 0x%016" PRIxPTR, ContextRecord->Dr0 );
+					X_LOG0("ExceptionHandler", "Dr1 = 0x%016" PRIxPTR, ContextRecord->Dr1 );
+					X_LOG0("ExceptionHandler", "Dr2 = 0x%016" PRIxPTR, ContextRecord->Dr2 );
+					X_LOG0("ExceptionHandler", "Dr3 = 0x%016" PRIxPTR, ContextRecord->Dr3 );
+					X_LOG0("ExceptionHandler", "Dr6 = 0x%016" PRIxPTR, ContextRecord->Dr6 );
+					X_LOG0("ExceptionHandler", "Dr7 = 0x%016" PRIxPTR, ContextRecord->Dr7 );
+#else
+					X_LOG0("ExceptionHandler", "Dr0 = 0x%08X", ContextRecord->Dr0);
+					X_LOG0("ExceptionHandler", "Dr1 = 0x%08X", ContextRecord->Dr1);
+					X_LOG0("ExceptionHandler", "Dr2 = 0x%08X", ContextRecord->Dr2);
+					X_LOG0("ExceptionHandler", "Dr3 = 0x%08X", ContextRecord->Dr3);
+					X_LOG0("ExceptionHandler", "Dr6 = 0x%08X", ContextRecord->Dr6);
+					X_LOG0("ExceptionHandler", "Dr7 = 0x%08X", ContextRecord->Dr7);
+#endif // !X_64
+
 				}
 			}
 
@@ -384,27 +401,27 @@ namespace exceptionHandler
 				X_LOG0( "ExceptionHandler", "CPU floating-point state:" );
 				{
 					X_LOG_BULLET;
-					
-					X_LOG0( "ExceptionHandler", "Xmm0 = 0x%08X",		ContextRecord->Xmm0 );
-					X_LOG0( "ExceptionHandler", "Xmm1 = 0x%08X",		ContextRecord->Xmm1 );
-					X_LOG0( "ExceptionHandler", "Xmm2 = 0x%08X",		ContextRecord->Xmm2 );
-					X_LOG0( "ExceptionHandler", "Xmm3 = 0x%08X",		ContextRecord->Xmm3 );
-					X_LOG0( "ExceptionHandler", "Xmm4 = 0x%08X",		ContextRecord->Xmm4 );
-					X_LOG0( "ExceptionHandler", "Xmm5 = 0x%08X",		ContextRecord->Xmm5 );
-					X_LOG0( "ExceptionHandler", "Xmm6 = 0x%08X",		ContextRecord->Xmm6 );
-					X_LOG0( "ExceptionHandler", "Xmm7 = 0x%08X",		ContextRecord->Xmm7 );
-					X_LOG0( "ExceptionHandler", "Xmm8 = 0x%08X",		ContextRecord->Xmm8 );
-					X_LOG0( "ExceptionHandler", "Xmm9 = 0x%08X",		ContextRecord->Xmm9 );
-					X_LOG0( "ExceptionHandler", "Xmm10 = 0x%08X",		ContextRecord->Xmm10 );
-					X_LOG0( "ExceptionHandler", "Xmm11 = 0x%08X",		ContextRecord->Xmm11 );
-					X_LOG0( "ExceptionHandler", "Xmm12 = 0x%08X",		ContextRecord->Xmm12 );
-					X_LOG0( "ExceptionHandler", "Xmm13 = 0x%08X",		ContextRecord->Xmm13 );
-					X_LOG0( "ExceptionHandler", "Xmm14 = 0x%08X",		ContextRecord->Xmm14 );
-					X_LOG0( "ExceptionHandler", "Xmm15 = 0x%08X",		ContextRecord->Xmm15 );
-				}
-			}
 
-#else
+					X_LOG0("ExceptionHandler", "Xmm0 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm0.Low, ContextRecord->Xmm0.High);
+					X_LOG0("ExceptionHandler", "Xmm1 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm1.Low, ContextRecord->Xmm1.High);
+					X_LOG0("ExceptionHandler", "Xmm2 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm2.Low, ContextRecord->Xmm2.High);
+					X_LOG0("ExceptionHandler", "Xmm3 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm3.Low, ContextRecord->Xmm3.High);
+					X_LOG0("ExceptionHandler", "Xmm4 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm4.Low, ContextRecord->Xmm4.High);
+					X_LOG0("ExceptionHandler", "Xmm5 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm5.Low, ContextRecord->Xmm5.High);
+					X_LOG0("ExceptionHandler", "Xmm6 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm6.Low, ContextRecord->Xmm6.High);
+					X_LOG0("ExceptionHandler", "Xmm7 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm7.Low, ContextRecord->Xmm7.High);
+					X_LOG0("ExceptionHandler", "Xmm8 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm8.Low, ContextRecord->Xmm8.High);
+					X_LOG0("ExceptionHandler", "Xmm9 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm9.Low, ContextRecord->Xmm9.High);
+					X_LOG0("ExceptionHandler", "Xmm10 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm10.Low, ContextRecord->Xmm10.High);
+					X_LOG0("ExceptionHandler", "Xmm11 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm11.Low, ContextRecord->Xmm11.High);
+					X_LOG0("ExceptionHandler", "Xmm12 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm12.Low, ContextRecord->Xmm12.High);
+					X_LOG0("ExceptionHandler", "Xmm13 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm13.Low, ContextRecord->Xmm13.High);
+					X_LOG0("ExceptionHandler", "Xmm14 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm14.Low, ContextRecord->Xmm14.High);
+					X_LOG0("ExceptionHandler", "Xmm15 = 0x%016" PRIx64 "%016" PRIx64, ContextRecord->Xmm15.Low, ContextRecord->Xmm15.High);
+				} 
+			} 
+				
+#else														  
 
 			if (ContextRecord->ContextFlags & 0x10008)
 			{
@@ -427,9 +444,6 @@ namespace exceptionHandler
 
 
 			{
-				X_LOG_BULLET;
-				X_LOG0( "ExceptionHandler", "Writing crash dump to a file." );
-
 				TimeStamp time = TimeStamp::GetSystemTime();
 				DateStamp date = DateStamp::GetSystemDate();
 
@@ -439,12 +453,15 @@ namespace exceptionHandler
 				Path<char> filename;
 				filename.appendFmt( "MiniDump_%s_%s.dmp", date.ToString( date_txt ), time.ToString( time_txt ) );
 
-				if( !debugging::WriteMiniDump( filename, debugging::DumpType::Medium, exceptionPointers ) )
+				X_LOG_BULLET;
+				X_LOG0("ExceptionHandler", "Writing crash dump to file: \"%s\"", filename.c_str());
+
+				if( !debugging::WriteMiniDump( filename, debugging::DumpType::Full, exceptionPointers ) )
 				{
 					X_ERROR( "ExceptionHandler", "Could not write crash dump." );
 				}
 
-				X_LOG0( "ExceptionHandler", "Quitting the application." );		
+				X_LOG0("ExceptionHandler", "Quitting the application." );		
 			}
 
 			core::msgbox::show("Unhandled exception! The program will now close.",
