@@ -348,16 +348,25 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		X_LOG0("Net", "Max peers: ^5%" PRIi32, maxPeers_);
 		X_LOG0("Net", "Max incomming connections: ^5%" PRIi32, maxIncommingConnections_);
 		X_LOG0("Net", "GUID: ^5%s", guid_.toString(guidStr));
-		X_LOG0("Net", "Listening on ^5%" PRIuS " endpoints", sockets_.size());
-		X_LOG_BULLET;
-
-		for (auto& s : sockets_)
 		{
-			IPStr boundAddStr;
-			s.getBoundAdd().toString(boundAddStr);
+			X_LOG0("Net", "Listening on ^5%" PRIuS " endpoints", sockets_.size());
+			X_LOG_BULLET;
+			for (auto& s : sockets_)
+			{
+				IPStr boundAddStr;
+				s.getBoundAdd().toString(boundAddStr);
+				X_LOG0("Net", "bound address: \"%s\"", boundAddStr.c_str());
+			}
+		}
 
-			X_LOG0("Net", "bound address: \"%s\"", boundAddStr.c_str());
-
+		{
+			X_LOG0("Net", "LocalAdd ^5%" PRIuS, ipList_.size());
+			X_LOG_BULLET;
+			for (auto& ip : ipList_)
+			{
+				IPStr addStr;
+				X_LOG0("Net", "local address: \"%s\"", ip.toString(addStr));
+			}
 		}
 	}
 
