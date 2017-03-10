@@ -180,9 +180,10 @@ typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, 
 
 	if (off < size_)
 	{
-		// move them down.
-		for (size_type i = size_; i > off; --i)
+		// move them up.
+		for (size_type i = size_; i > off; --i) {
 			pArr[i] = pArr[i - 1];
+		}
 	}
 
 	pArr[off] = val;
