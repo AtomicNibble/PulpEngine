@@ -154,6 +154,22 @@ void SystemAdd::setPortFromNetworkByteOrder(uint16_t port)
 #endif // !X_DEBUG
 }
 
+void SystemAdd::writeToBitStream(core::FixedBitStreamBase& bs) const
+{
+	bs.writeAligned(address_);
+	bs.write(systemIndex_);
+}
+
+void SystemAdd::fromBitStream(core::FixedBitStreamBase& bs)
+{
+	bs.readAligned(address_);
+	bs.read(systemIndex_);
+
+#if X_DEBUG
+	portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+#endif // !X_DEBUG
+}
+
 bool SystemAdd::equalExcludingPort(const SystemAdd& oth) const
 {
 	bool ipv4Equal = (address_.addr4.sin_family == AF_INET && address_.addr4.sin_addr.s_addr == oth.address_.addr4.sin_addr.s_addr);

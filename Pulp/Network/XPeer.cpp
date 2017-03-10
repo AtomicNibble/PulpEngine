@@ -2135,7 +2135,6 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 		}
 	}
 
-
 	// hey hey!
 	rs.connectState = ConnectState::HandlingConnectionRequest;
 
@@ -2143,7 +2142,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	bsOut.write(rs.systemAddress);
 	bsOut.write<uint8_t>(safe_static_cast<uint8_t>(ipList_.size()));
 	for (auto& ip : ipList_) {
-		bsOut.write(ip);
+		ip.writeToBitStream(bsOut);
 	}
 	bsOut.write(timeStamp);
 	bsOut.write(timeNow.GetValue());
@@ -2182,8 +2181,10 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	bs.read(externalSysId);
 	bs.read(numInternal);
 	X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
+
+	localIps.resize(numInternal);
 	for (size_t i = 0; i < numInternal; i++) {
-		bs.read(localIps.AddOne());
+		localIps[i].fromBitStream(bs);
 	}
 	bs.read(sendPingTime);
 	bs.read(sendPongTime);
@@ -2199,7 +2200,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	bsOut.write(rs.systemAddress);
 	bsOut.write<uint8_t>(safe_static_cast<uint8_t>(ipList_.size()));
 	for (auto& ip : ipList_) {
-		bsOut.write(ip);
+		ip.writeToBitStream(bsOut);
 	}
 	bsOut.write(sendPongTime);
 	bsOut.write(timeNow.GetValue());
@@ -2246,8 +2247,10 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 	bs.read(externalSysId);
 	bs.read(numInternal);
 	X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
+	localIps.resize(numInternal);
+
 	for (size_t i = 0; i < numInternal; i++) {
-		bs.read(localIps.AddOne());
+		localIps[i].fromBitStream(bs);
 	}
 	bs.read(sendPingTime); 
 	bs.read(sendPongTime); 

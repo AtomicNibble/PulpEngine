@@ -25,6 +25,10 @@ public:
 	void setPortFromHostByteOrder(uint16_t port);
 	void setPortFromNetworkByteOrder(uint16_t port);
 
+	// bs helpers.
+	void writeToBitStream(core::FixedBitStreamBase& bs) const;
+	void fromBitStream(core::FixedBitStreamBase& bs);
+
 	X_INLINE const platform::sockaddr& getSocketAdd(void) const;
 	X_INLINE int32_t getSocketAddSize(void) const;
 
