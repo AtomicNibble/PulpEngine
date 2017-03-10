@@ -1972,8 +1972,6 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 
 					core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
-					static_assert(std::numeric_limits<uint8_t>::max() > MAX_PASSWORD_LEN, "Can't represent max password len");
-
 					// send connectionRequest now.
 					bsOut.write(MessageID::ConnectionRequest);
 					bsOut.write(guid_);
