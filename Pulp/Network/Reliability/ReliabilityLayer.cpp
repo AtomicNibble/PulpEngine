@@ -114,7 +114,29 @@ size_t ReliablePacket::getHeaderLengthBits(void) const
 
 	bits = core::bitUtil::RoundUpToMultiple(bits, 8_sz);
 
+	X_ASSERT(bits < getMaxHeaderLengthBits(), "bit count exceeded calculated max")(bits, getMaxHeaderLengthBits());
 	return bits;
+}
+
+
+constexpr size_t ReliablePacket::getMaxHeaderLength(void)
+{
+	// calculated at compile time.
+	return core::bitUtil::bitsToBytes(getMaxHeaderLengthBits());
+}
+
+constexpr size_t ReliablePacket::getMaxHeaderLengthBits(void)
+{
+	// calculated at compile time.
+	return core::bitUtil::RoundUpToMultiple<size_t>(
+		core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT) +
+		core::bitUtil::bytesToBits(sizeof(uint16_t)) +
+		core::bitUtil::bytesToBits(sizeof(decltype(reliableMessageNumber))) + 
+		core::bitUtil::bytesToBits(sizeof(decltype(sequencingIndex))) + 
+		core::bitUtil::bytesToBits(sizeof(decltype(orderingIndex))) +
+		core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel))),
+		8
+	); 
 }
 
 void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
