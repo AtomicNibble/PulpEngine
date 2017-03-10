@@ -175,7 +175,7 @@ private:
 
 	ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
 	ReliablePacket* allocPacket(void);
-	void freePacket(ReliablePacket* pPacker);
+	void freePacket(ReliablePacket* pPacket);
 
 private:
 	// these are created each time a data gram is sent.

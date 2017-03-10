@@ -936,9 +936,10 @@ ReliablePacket* ReliabilityLayer::allocPacket(void)
 	return X_NEW(ReliablePacket, packetPool_, "RelPacket");
 }
 
-void ReliabilityLayer::freePacket(ReliablePacket* pPacker)
+void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
 {
-	X_DELETE(pPacker, packetPool_);
+	X_DELETE(pPacket, packetPool_);
+}
 }
 
 // -----------------------------------------
