@@ -28,7 +28,8 @@ static const uint32_t MAX_PACKETS_PER_DATAGRAM = 56; // 2bytes per entry + 16byt
 // controlls the size of the resend buffer for each connection.
 static const size_t REL_RESEND_BUF_LENGTH = 256;
 static const size_t REL_DATAGRAM_HISTORY_LENGTH = 256;
-
+static const size_t REL_MAX_RECIVE_HOLE = 16'384;
+static const size_t REL_RECIVE_HOLE_SHRINK_THRESHOLD = 256; // recvice hole must be greater than this to be considered for shrink_to_fit.
 
 static const uint16_t UNDEFINED_PING = std::numeric_limits<uint16_t>::max();
 
