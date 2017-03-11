@@ -111,7 +111,13 @@ public:
 	// insert the element at the given index
 	size_type insertAtIndex(size_type idx, const Type& obj);
 	size_type insertAtIndex(size_type idx, Type&& obj);
-	// remove the element at the given index
+
+	Iterator insert(ConstIterator pos, const Type& obj);
+	Iterator insert(ConstIterator pos, Type&& obj);
+	Iterator insert(ConstIterator pos, size_type count, const Type& obj);
+
+	template< class... Args >
+	Iterator emplace(ConstIterator pos, Args&&... args);
 	bool removeIndex(size_type idx);
 	void remove(const T& item);
 

@@ -536,19 +536,62 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIn
 	return index;
 }
 
-	}
-	else if (index > num_) {
-		index = num_;
+template<typename T, class Allocator>
+typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator pos, const Type& obj)
+{
+	return insert(pos, 1, obj);
+}
+
+template<typename T, class Allocator>
+typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator pos, Type&& obj)
+{
+	return emplace(pos, std::move(obj));
+}
+
+template<typename T, class Allocator>
+typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator _pos, size_type count, const Type& obj)
+{
+	Iterator pos = const_cast<Iterator>(_pos);
+
+	// gow
+	if (num_ == size_) 
+	{
+		size_type offset = pos - begin();
+
+		ensureSize(size_ + count);
+
+		// update pos to be valid after relocate.
+		pos = begin() + offset;
 	}
 
-	for (size_type i = num_; i > index; --i) {
-		list_[i] = list_[i - 1];
+	if (union_cast<size_type>(end() - pos) < count)
+	{
+		// spills off end.
+		// we need to move the ones before endto new end.
+		// then assing new values.
+		Mem::MoveArrayUninitialized(pos, end(), pos + count);
+
+		// tecnically we can do a uninitialized fill from old end to new pos.
+		std::uninitialized_fill<Iterator, T>(end(), pos + count, obj);
+
+		std::fill<Iterator, T>(pos, end(), obj);
+	}
+	else
+	{
+		// move before end to fresh memory, past current end.
+		Mem::MoveArrayUninitialized(end() - count, end(), end());
+
+		// move items to fill gap at end, this is moving to initialized memory.
+		std::move_backward<Iterator>(pos, end() - count, end());
+
+		// now we have a hole of pos + count to fill.
+		std::fill<Iterator, T>(pos, pos + count, obj);
 	}
 
-	num_++;
-	Mem::Construct(&list_[index], std::forward<T>(obj));
+	num_ += count;
 
-	return index;
+	return pos;
+}
 }
 
 
