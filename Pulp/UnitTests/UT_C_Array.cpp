@@ -196,7 +196,7 @@ TYPED_TEST(ArrayTest, Clear)
 	// insert some items
 	for (int i = 0; i < 64; i++)
 	{
-		EXPECT_EQ(i, list.insert(i, i * 2));
+		EXPECT_EQ(i, list.insertAtIndex(i, i * 2));
 	}
 
 	EXPECT_EQ(64, list.size());
@@ -226,7 +226,7 @@ TYPED_TEST(ArrayTest, Free)
 		// insert some items
 		for (int i = 0; i < 64; i++)
 		{
-			EXPECT_EQ(i, list.insert(i, i * 2));
+			EXPECT_EQ(i, list.insertAtIndex(i, i * 2));
 		}
 
 		EXPECT_EQ(64, list.size());
@@ -259,7 +259,7 @@ TYPED_TEST(ArrayTest, ShrinkToFit)
 		// insert some items
 		for (int i = 0; i < 64; i++)
 		{
-			EXPECT_EQ(i, list.insert(i, i * 2));
+			EXPECT_EQ(i, list.insertAtIndex(i, i * 2));
 		}
 
 		EXPECT_EQ(64, list.size());
@@ -415,7 +415,7 @@ TYPED_TEST(ArrayTest, Insert)
 	// it should resize for us.
 	for (int i = 0; i < 64; i++)
 	{
-		EXPECT_EQ(i, list.insert(i, i));
+		EXPECT_EQ(i, list.insertAtIndex(i, i));
 	}
 
 	// check contents
@@ -450,7 +450,7 @@ TYPED_TEST(ArrayTest, Remove)
 		// insert some items
 		for (int i = 0; i < 64; i++)
 		{
-			EXPECT_EQ(i, list.insert(i, i * 2));
+			EXPECT_EQ(i, list.insertAtIndex(i, i * 2));
 		}
 
 		EXPECT_EQ(64, list.size());
@@ -464,8 +464,8 @@ TYPED_TEST(ArrayTest, Remove)
 		EXPECT_EQ(60, list.size());
 		EXPECT_EQ(128, list.capacity());
 
-		list.remove(20);
-		list.remove(40);
+		list.remove(22);
+		list.remove(42);
 
 		EXPECT_EQ(58, list.size());
 		EXPECT_EQ(128, list.capacity());
