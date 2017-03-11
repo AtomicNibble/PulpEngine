@@ -98,5 +98,8 @@
 /// \endcode
 #define X_PP_REPEAT(count, op, data)			X_PP_JOIN_2(X_PP_REPEAT_, count)(op, data)
 
+#define X_PP_REPEAT_OP_COMMA(index, data) data,
+
+#define X_PP_REPEAT_COMMA_SEP(count, data)		X_PP_JOIN_2(X_PP_REPEAT_, count)(X_PP_REPEAT_OP_COMMA, data)
 
 #endif
