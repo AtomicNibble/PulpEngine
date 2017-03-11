@@ -42,7 +42,7 @@ namespace
 
 		verts = &pSubmesh->verts_[StartVert];
 
-		pSubmesh->verts_.insert(level::Vertex(), StartVert);
+		pSubmesh->verts_.insertAtIndex(StartVert, level::Vertex());
 
 		centroid = &pSubmesh->verts_[StartVert];
 		// add up the drawverts to create a centroid 
