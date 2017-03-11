@@ -67,6 +67,7 @@ ReliablePacket::ReliablePacket()
 	dataBitLength = 0;
 	pData = nullptr;
 	pRefData = nullptr;
+	arena = g_NetworkArena; // everything from this arena for now.
 }
 
 bool ReliablePacket::isReliable(void) const

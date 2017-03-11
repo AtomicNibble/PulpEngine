@@ -23,7 +23,6 @@ typedef uint16_t DataGramSequenceNumber;
 struct DataRefrence : public core::ReferenceCounted<>
 {
 	uint8_t* pData;
-	core::MemoryArenaBase* arena;
 };
 
 struct ReliablePacket
@@ -72,6 +71,7 @@ public:
 	BitSizeT dataBitLength;
 	uint8_t* pData;
 	DataRefrence* pRefData;
+	core::MemoryArenaBase* arena; // arena this memory is from. 
 
 	INTRUSIVE_LIST_LINK(ReliablePacket) reliableLink;
 };
