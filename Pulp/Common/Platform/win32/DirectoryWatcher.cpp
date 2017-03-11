@@ -371,7 +371,7 @@ void XDirectoryWatcher::registerListener(XDirectoryWatcherListener* pListener)
 {
 	X_ASSERT_NOT_NULL(pListener);
 	pListener->setMonitor(this);
-	listeners_.insert(pListener);
+	listeners_.append(pListener);
 }
 
 void XDirectoryWatcher::unregisterListener(XDirectoryWatcherListener* pListener)
