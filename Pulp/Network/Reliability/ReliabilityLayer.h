@@ -20,6 +20,27 @@ typedef uint16_t MessageNumber;
 typedef uint16_t OrderingIndex;
 typedef uint16_t DataGramSequenceNumber;
 
+struct ReliablePacket;
+
+// a channel for a split pack to reassembler itself into.
+struct SplitPacketChannel
+{
+	typedef core::Array<ReliablePacket*> PacketArr;
+
+public:
+	SplitPacketChannel(core::MemoryArenaBase* arena);
+
+	bool hasFirstPacket(void) const;
+	bool haveAllPackets(void) const;
+
+
+public:
+	SplitPacketId splitId;
+	SplitPacketIndex packetsRecived;
+	core::TimeVal lastUpdate;
+	PacketArr packets;
+};
+
 struct DataRefrence : public core::ReferenceCounted<>
 {
 	uint8_t* pData;
@@ -113,6 +134,7 @@ class ReliabilityLayer
 	typedef std::array<ReliablePacket*, REL_RESEND_BUF_LENGTH> ResendArr;
 	typedef core::Fifo<DataGramHistory> DataGramHistoryQeue;
 	typedef core::Fifo<ReliablePacket*> PacketQeue;
+	typedef core::Array<SplitPacketChannel*> SplitPacketChannelArr;
 
 public:
 	struct PacketData
@@ -254,6 +276,7 @@ private:
 	size_t msgInReSendBuffers_;
 
 	ResendArr resendBuf_; // max in transit
+	SplitPacketChannelArr splitPacketChannels_;
 };
 
 X_NAMESPACE_END

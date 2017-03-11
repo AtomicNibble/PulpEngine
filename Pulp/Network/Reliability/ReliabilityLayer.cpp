@@ -49,6 +49,33 @@ namespace
 
 } // namespace
 
+
+// ----------------------------------------------------------
+
+
+SplitPacketChannel::SplitPacketChannel(core::MemoryArenaBase* arena) :
+	splitId(0),
+	packetsRecived(0),
+	packets(arena)
+{
+
+}
+
+bool SplitPacketChannel::hasFirstPacket(void) const
+{
+	X_ASSERT(packets.isNotEmpty(), "Should not be empty")(packets.size(), packets.capacity());
+	return packets[0] != nullptr;
+}
+
+bool SplitPacketChannel::haveAllPackets(void) const
+{
+	X_ASSERT(packets.isNotEmpty(), "Should not be empty")(packets.size(), packets.capacity());
+	return hasFirstPacket() && packets[0]->splitPacketCount == packetsRecived;
+}
+
+// ----------------------------------------------------------
+
+
 ReliablePacket::ReliablePacket()
 {
 	reliableMessageNumber = std::numeric_limits<decltype(reliableMessageNumber)>::max();
@@ -373,7 +400,8 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	splitPacketId_(0),
 	bps_{ arena, arena, arena, arena, arena, arena, arena },
 	bytesInReSendBuffers_(0),
-	msgInReSendBuffers_(0)
+	msgInReSendBuffers_(0),
+	splitPacketChannels_(arena)
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
