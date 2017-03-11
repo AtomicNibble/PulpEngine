@@ -61,7 +61,10 @@ public:
 
 	void freeData(void);
 
-	bool isReliable(void) const;
+    bool isReliable(void) const;
+    bool isAckRequired(void) const;
+    bool isOrderedOrSequenced(void) const;
+    bool isSequenced(void) const;
 	bool hasSplitPacket(void) const;
 	size_t getHeaderLengthBits(void) const; // returns number of bits needed to store this header. it's diffrent depending on priority types etc.
 	

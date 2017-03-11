@@ -155,6 +155,49 @@ bool ReliablePacket::isReliable(void) const
 	}
 }
 
+bool ReliablePacket::isAckRequired(void) const
+{
+    switch (reliability)
+    {
+        case PacketReliability::UnReliableWithAck:
+        case PacketReliability::ReliableWithAck:
+        case PacketReliability::ReliableOrderedWithAck:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+bool ReliablePacket::isOrderedOrSequenced(void) const
+{
+    switch (reliability)
+    {
+        case PacketReliability::UnReliableSequenced:
+        case PacketReliability::ReliableSequenced:
+        case PacketReliability::ReliableOrdered:
+        case PacketReliability::ReliableOrderedWithAck:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+bool ReliablePacket::isSequenced(void) const
+{
+    switch (reliability)
+    {
+        case PacketReliability::UnReliableSequenced:
+        case PacketReliability::ReliableSequenced:
+            return true;
+
+        default:
+            return false;
+    }
+}
+
+
 bool ReliablePacket::hasSplitPacket(void) const
 {
 	// use count, id may be set with a value of 0.
