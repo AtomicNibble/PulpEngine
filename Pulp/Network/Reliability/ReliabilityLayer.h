@@ -47,6 +47,10 @@ public:
 	void writeToBitStream(core::FixedBitStreamBase& bs) const;
 	bool fromBitStream(core::FixedBitStreamBase& bs);
 
+	// cops values of fields excluding data ones.
+	void assignPropertiesExcData(const ReliablePacket* pOth);
+
+
 public:
 	static constexpr size_t getMaxHeaderLength(void);
 	static constexpr size_t getMaxHeaderLengthBits(void);

@@ -330,7 +330,30 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	return true;
 }
 
-// ---------------------------
+void ReliablePacket::assignPropertiesExcData(const ReliablePacket* pOth)
+{
+	reliableMessageNumber = pOth->reliableMessageNumber;
+	orderingIndex = pOth->orderingIndex;
+	sequencingIndex = pOth->sequencingIndex;
+
+	reliability = pOth->reliability;
+	priority = pOth->priority;
+	sendAttemps = 0;
+
+	orderingChannel = pOth->orderingChannel;
+	splitPacketId = splitPacketId;
+	splitPacketIndex = pOth->splitPacketIndex;
+	splitPacketCount = pOth->splitPacketCount;
+
+	creationTime = pOth->creationTime;
+	retransmissionTime = pOth->retransmissionTime;
+	nextActionTime = pOth->nextActionTime;
+
+}
+
+
+
+// ----------------------------------------------------------
 
 ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool) :
 	vars_(vars),
