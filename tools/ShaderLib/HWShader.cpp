@@ -465,6 +465,19 @@ namespace shader
 				// how many?
 				// i only do sematic checks now, since i don't give a flying fuck about the format.
 
+				if (techFlags_.IsSet(TechFlag::Instanced) && InputDsc.SemanticIndex > 0)
+				{
+					// pos and color with semantic index above 0 are ignores when instancing enabled.
+					if (core::strUtil::IsEqual("POSITION", InputDsc.SemanticName))
+					{
+						continue;
+					}
+					if (core::strUtil::IsEqual("COLOR", InputDsc.SemanticName))
+					{
+						continue;
+					}
+				}
+
 				pILnode = pILnode->GetChildWithSemtaic(InputDsc.SemanticName);
 				if (!pILnode)
 				{
