@@ -130,7 +130,7 @@ void RangeList<T>::add(RangeType val)
 
 	if (val < range.min - one)
 	{
-		ranges_.insert(RangeArr::Type(val, val), rangeIdx);
+		ranges_.insertAtIndex(rangeIdx, RangeArr::Type(val, val));
 		return;
 	}
 	else if (val == range.min - one)
