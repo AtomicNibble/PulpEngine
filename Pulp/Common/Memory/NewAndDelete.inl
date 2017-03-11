@@ -195,8 +195,9 @@ namespace Mem
 
 		// construct instances using placement new
 		const T* const onePastLast = as_T + N;
-		while (as_T < onePastLast)
+		while (as_T < onePastLast) {
 			Construct<T>(as_T++);
+		}
 
 		return (as_T - N);
 	}
