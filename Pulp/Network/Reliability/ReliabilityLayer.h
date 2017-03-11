@@ -197,6 +197,7 @@ private:
 private:
 	NetVars& vars_;
 
+	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* packetPool_;
 
 	int32_t MTUSize_;

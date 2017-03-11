@@ -288,6 +288,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool) :
 	vars_(vars),
 	MTUSize_(0),
+	arena_(arena),
 	packetPool_(packetPool),
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
