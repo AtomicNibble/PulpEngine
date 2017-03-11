@@ -381,11 +381,10 @@ template<typename T, class Allocator>
 template<class... Args>
 X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(Args&&... args)
 {
-	if (!list_)
-		reserve(granularity_);
 	// grow if needs be.
-	if (num_ == size_)
-		reserve(size_ + granularity_);
+	if (num_ == size_) {
+		ensureSize(size_ + 1);
+	}
 
 	Mem::Construct<T>(&list_[num_], std::forward<Args>(args)...);
 
@@ -396,13 +395,12 @@ X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(Args&&.
 
 
 template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T const& obj) {
-	// if list empty allocate it
-	if ( !list_ ) 
-		reserve(granularity_);
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T const& obj)
+{
 	// grow if needs be.
-	if ( num_ == size_ ) 
-		reserve(size_ + granularity_);
+	if (num_ == size_) {
+		ensureSize(size_ + 1);
+	}
 
 	Mem::Construct(&list_[num_], obj);
 	num_++;
@@ -410,13 +408,12 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T c
 }
 
 template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T&& obj) {
-	// if list empty allocate it
-	if (!list_)
-		reserve(granularity_);
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T&& obj)
+{
 	// grow if needs be.
-	if (num_ == size_)
-		reserve(size_ + granularity_);
+	if (num_ == size_) {
+		ensureSize(size_ + 1);
+	}
 
 	Mem::Construct(&list_[num_], std::forward<T>(obj));
 	num_++;
@@ -448,13 +445,9 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(con
 template<typename T, class Allocator>
 X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(T const& obj)
 {
-	// if list empty allocate it
-	if (!list_) {
-		reserve(granularity_);
-	}
 	// grow if needs be.
 	if (num_ == size_) {
-		reserve(size_ + granularity_);
+		ensureSize(size_ + 1);
 	}
 
 	Mem::Construct(&list_[num_], obj);
@@ -465,13 +458,9 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(
 template<typename T, class Allocator>
 X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(T&& obj)
 {
-	// if list empty allocate it
-	if (!list_) {
-		reserve(granularity_);
-	}
 	// grow if needs be.
 	if (num_ == size_) {
-		reserve(size_ + granularity_);
+		ensureSize(size_ + 1);
 	}
 
 	Mem::Construct(&list_[num_], std::forward<T>(obj));
@@ -483,12 +472,8 @@ template<typename T, class Allocator>
 template<class... ArgsT>
 X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::emplace_back(ArgsT&&... args)
 {
-	if (!list_) {
-		reserve(granularity_);
-	}
-
 	if (num_ == size_) {
-		reserve(size_ + granularity_);
+		ensureSize(size_ + 1);
 	}
 
 	Mem::Construct<T>(&list_[num_], std::forward<ArgsT>(args)...);
