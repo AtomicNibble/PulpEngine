@@ -62,7 +62,7 @@ template<typename T, class ContainerT, class Pr>
 template<class... _Valty>
 void PriorityQueue<T, ContainerT, Pr>::emplace(_Valty&&... val)
 {
-    container_.emplace_back(std::forward<_Valty>(val)..);
+    container_.emplace_back(std::forward<_Valty>(val)...);
     std::push_heap(container_.begin(), container_.end(), comp_);
 }
 
