@@ -536,6 +536,7 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIn
 	return index;
 }
 
+
 template<typename T, class Allocator>
 typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator pos, const Type& obj)
 {
@@ -592,8 +593,22 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator
 
 	return pos;
 }
+
+
+template<typename T, class Allocator>
+X_INLINE typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert_sorted(const Type& obj)
+{
+	auto it = std::upper_bound(begin(), end(), obj);
+	return insert(it, obj);
 }
 
+template<typename T, class Allocator>
+template<class Compare>
+X_INLINE typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert_sorted(const Type& obj, Compare comp)
+{
+	auto it = std::upper_bound(begin(), end(), obj, comp);
+	return insert(it, obj);
+}
 
 template<typename T, class Allocator>
 bool Array<T, Allocator>::removeIndex(size_type idx)

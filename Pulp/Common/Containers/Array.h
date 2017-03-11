@@ -118,6 +118,11 @@ public:
 
 	template< class... Args >
 	Iterator emplace(ConstIterator pos, Args&&... args);
+
+	// inserts keep array sorted.
+	Iterator insert_sorted(const Type& obj);
+	template<class Compare>
+	Iterator insert_sorted(const Type& obj, Compare comp);
 	bool removeIndex(size_type idx);
 	void remove(const T& item);
 
