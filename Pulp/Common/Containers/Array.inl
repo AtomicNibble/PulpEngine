@@ -717,6 +717,42 @@ typename Array<T, Allocator>::size_type Array<T, Allocator>::find(const Type& va
 }
 
 template<typename T, class Allocator>
+template<class Compare>
+typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(const Type& val, Compare comp) const
+{
+	return std::lower_bound(begin(), end(), val, comp);
+}
+
+template<typename T, class Allocator>
+template<typename KeyType, class Compare>
+typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSortedKey(const KeyType& val, Compare comp) const
+{
+	// binary search but with a key.
+	size_type count = num_;
+	size_type step;
+	ConstIterator it;
+	ConstIterator first = begin();
+
+	while (count > 0)
+	{
+		step = count / 2;
+		it = first + step;
+
+		if (comp(*it, val))
+		{
+			first = ++it;
+			count -= step + 1;
+		}
+		else
+		{
+			count = step;
+		}
+	}
+
+	return first;
+}
+
+template<typename T, class Allocator>
 void Array<T, Allocator>::swap(Array& oth)
 {
 	// swap them baby.
