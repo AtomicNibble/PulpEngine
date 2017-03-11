@@ -394,6 +394,7 @@ void Fifo<T>::expand(void)
 	X_ASSERT(write_ == read_, "This should only be called when we are full.")(write_, read_);
 
 	// we want to allocate a new aaray like a slut.
+    // if first time jump to 16.
 	if (capacity() == 0)
 	{
 		reserve(16);
@@ -402,28 +403,20 @@ void Fifo<T>::expand(void)
 
 	X_ASSERT_NOT_NULL(start_);
 
-	// allocate a new array twice size.
-	size_t curSize = capacity();
-	size_t newSize = capacity() << 1;
-	T* pData = Allocate(newSize);
-	T* pDataCur = pData;
+    size_t curSize = capacity();
+    size_t newSize = capacity() << 1;
+    T* pData = Allocate(newSize);
 
-	// need to move the old items over, but need to take into account wrapping.
-	while (read_ < end_) {
-		Mem::Construct(pDataCur++, std::forward<T>(*read_++));
-	}
+    // move to new memory.
+    Mem::MoveArrayUninitialized(pData, read_, end_);
 
-	read_ = start_;
+    // handle wrap around.
+    if (write_ < read_) {
+        Mem::MoveArrayUninitialized(pData + (end_ - read_), start_, write_);
+    }
 
-	while (read_ < write_) {
-		Mem::Construct(pDataCur++, std::forward<T>(*read_++));
-	}
-
-	// make sure copy expected amount.
-	X_ASSERT(pData + curSize == pDataCur, "Failed to move all items")(pData, pDataCur, curSize);
-
-	// delete old and update pointers.
-	Delete(start_);
+    // delete old and update pointers.
+    Delete(start_);
 
 	start_ = pData;
 	end_ = pData + newSize;
