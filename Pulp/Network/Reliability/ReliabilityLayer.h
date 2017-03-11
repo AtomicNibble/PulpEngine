@@ -129,7 +129,6 @@ public:
 
 class ReliabilityLayer
 {
-
 	typedef std::array<OrderingIndex, MAX_ORDERED_STREAMS> OrdereIndexArr;
 	typedef std::array<ReliablePacket*, REL_RESEND_BUF_LENGTH> ResendArr;
 	typedef core::Fifo<DataGramHistory> DataGramHistoryQeue;
@@ -218,6 +217,9 @@ private:
 	ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
 	ReliablePacket* allocPacket(void);
 	void freePacket(ReliablePacket* pPacket);
+	bool splitPacket(ReliablePacket* pPacket);
+	// recived split packets.
+	ReliablePacket* addIncomingSplitPacket(ReliablePacket* pPacket, core::TimeVal time);
 
 private:
 	// these are created each time a data gram is sent.
@@ -276,6 +278,7 @@ private:
 	size_t msgInReSendBuffers_;
 
 	ResendArr resendBuf_; // max in transit
+
 	SplitPacketChannelArr splitPacketChannels_;
 };
 

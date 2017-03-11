@@ -1,6 +1,8 @@
 #include "stdafx.h"
 
 #include <Memory\AllocationPolicies\StackAllocator.h>
+#include <Time\StopWatch.h>
+#include <String\HumanSize.h>
 #include <ITimer.h>
 
 #include "ReliabilityLayer.h"
@@ -490,6 +492,11 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "\"%s\" msg added. Pri: \"%s\" size: ^5%" PRIu32 "^7 numbits: ^5%" PRIu32, 
 		PacketReliability::ToString(reliability), PacketPriority::ToString(priority), lengthBytes, lengthBits);
 	
+	// can this data fit in single packet?
+	const size_t maxDataSizeBytes = maxDataGramSize() - ReliablePacket::getMaxHeaderLength();
+	const bool splitRequired = lengthBytes > maxDataSizeBytes;
+
+
 	ReliablePacket* pPacket = allocPacket();
 	pPacket->reliableMessageNumber = 0;
 	pPacket->creationTime = time;
@@ -497,17 +504,36 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	pPacket->priority = priority;
 	pPacket->reliability = reliability;
 	pPacket->sendAttemps = 0;
-
-	// split me open.
-	pPacket->splitPacketId = 0;
-	pPacket->splitPacketIndex = 0;
-	pPacket->splitPacketCount = 0;
 	
 	pPacket->dataBitLength = lengthBits;
 	pPacket->pData = X_NEW_ARRAY(uint8_t, lengthBytes, g_NetworkArena, "PacketBytes");
 
 	std::memcpy(pPacket->pData, pData, lengthBytes);
-	// pPacket->pData = const_cast<uint8_t*>(pData);
+
+	if (splitRequired)
+	{
+		// upgrade reliability as we gonna be sending in diffrent datagrams.
+		if (reliability == PacketReliability::UnReliable) {
+			pPacket->reliability = PacketReliability::Reliable;
+		}
+		else if (reliability == PacketReliability::UnReliableSequenced) {
+			pPacket->reliability = PacketReliability::ReliableSequenced;
+		}
+		else if (reliability == PacketReliability::UnReliableWithAck) {
+			pPacket->reliability = PacketReliability::ReliableWithAck;
+		}
+
+		if (pPacket->reliability != reliability) {
+			X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Upgraded reliability from \"%s\" to \"%s\"",
+				PacketReliability::ToString(reliability), PacketReliability::ToString(pPacket->reliability));
+		}
+	}
+	else
+	{
+		pPacket->splitPacketId = 0;
+		pPacket->splitPacketIndex = 0;
+		pPacket->splitPacketCount = 0;
+	}
 
 	// sequenced packets
 	if (reliability == PacketReliability::ReliableSequenced || reliability == PacketReliability::UnReliableSequenced)
@@ -531,9 +557,14 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 		pPacket->sequencingIndex = std::numeric_limits<OrderingIndex>::max();
 	}
 	
-	outGoingPackets_.push(pPacket);
-
 	bps_[NetStatistics::Metric::BytesPushed].add(time, lengthBytes);
+
+
+	if (splitRequired) {
+		return splitPacket(pPacket);
+	}
+
+	outGoingPackets_.push(pPacket);
 
 	++msgInSendBuffers_[priority];
 	bytesInSendBuffers_[priority] += lengthBytes;
@@ -667,6 +698,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 		while (pPacket)
 		{
 			// i don't trust you!
+			const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
 
 			if (pPacket->reliability == PacketReliability::ReliableSequenced ||
 				pPacket->reliability == PacketReliability::ReliableOrdered ||
@@ -675,16 +707,32 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 				if (pPacket->orderingChannel > MAX_ORDERED_STREAMS)
 				{
 					// bitch who you think you are.
-					goto tryNextPacket;
+					bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+					goto readNextPacket;
 				}
+			}
+
+			if (pPacket->hasSplitPacket())
+			{
+				// we need to keep track of these untill we have all the packets 
+				pPacket = addIncomingSplitPacket(pPacket, time);
+				if(!pPacket)
+				{
+					// still more packets.
+					goto readNextPacket;
+				}
+
+				// if here we have a split packets that's been rebuilt into original packet.
+				// all split packets should of been cleaned up and data copyied into this new packet.
 			}
 
 
 
+			bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, packetDataByteLength);
 
 			recivedPackets_.push(pPacket);
 
-		tryNextPacket:
+		readNextPacket:
 			pPacket = packetFromBS(bs, time);
 		}
 
@@ -1039,6 +1087,163 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
 {
 	X_DELETE(pPacket, packetPool_);
 }
+
+bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
+{
+	const auto lengthBytes = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+	const size_t maxDataSizeBytes = maxDataGramSize() - ReliablePacket::getMaxHeaderLength();
+	const bool splitRequired = lengthBytes > maxDataSizeBytes;
+
+	X_ASSERT(splitRequired, "Called split when no split required")(splitRequired, lengthBytes, maxDataSizeBytes);
+
+	pPacket->splitPacketCount = safe_static_cast<SplitPacketIndex>(1 + ((maxDataSizeBytes - 1) / lengthBytes));
+
+	core::HumanSize::Str sizeBuf;
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitting packet of size %s into ^5%" PRIu16 "^7 packets", 
+		core::HumanSize::toString(sizeBuf, core::bitUtil::bitsToBytes(pPacket->dataBitLength)), pPacket->splitPacketCount);
+
+	core::StopWatch timer;
+
+	// temp array.
+	core::Array<ReliablePacket*> packets(g_NetworkArena);
+	packets.resize(pPacket->splitPacketCount);
+
+	SplitPacketId splitPacketId = splitPacketId_++;
+
+	DataRefrence* pRefData = X_NEW(DataRefrence, g_NetworkArena, "SplitPacketDataRef");
+	pRefData->pData = pPacket->pData;
+
+	for (SplitPacketIndex packetIdx = 0; packetIdx < pPacket->splitPacketCount; packetIdx++)
+	{
+		ReliablePacket* pSplitPacket = allocPacket();	
+		pSplitPacket->assignPropertiesExcData(pPacket);
+		// some overrides
+		pSplitPacket->sendAttemps = 0;
+		pSplitPacket->splitPacketId = splitPacketId;
+		pSplitPacket->splitPacketIndex = packetIdx;
+
+		size_t offset = packetIdx * maxDataSizeBytes;
+		size_t packetSizeBytes = core::Min(maxDataSizeBytes, lengthBytes - offset);
+
+		// this packet refrences the data.
+		pSplitPacket->dataType = ReliablePacket::DataType::Ref;
+		pSplitPacket->pData = pPacket->pData + offset;
+		pSplitPacket->pRefData = pRefData;
+
+		pRefData->addReference();
+
+		if (packetSizeBytes == maxDataSizeBytes) {
+			pSplitPacket->dataBitLength = safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(packetSizeBytes));
+		}
+		else {
+			// work out trailing bit count.
+			pSplitPacket->dataBitLength = pPacket->dataBitLength - safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(maxDataSizeBytes) * packetIdx);
+		}
+
+		packets[packetIdx] = pSplitPacket;
+	}
+
+	// push them all.
+	const auto priority = pPacket->priority;
+	for (auto* pSplitPacket : packets)
+	{
+		outGoingPackets_.push(pSplitPacket);
+
+		++msgInSendBuffers_[priority];
+		bytesInSendBuffers_[priority] += core::bitUtil::bitsToBytes(pSplitPacket->dataBitLength);
+	}
+
+	
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitpacket took: ^5%gms", timer.GetMilliSeconds());
+
+	// we don't need this packt anymore.
+	freePacket(pPacket);
+	return true;
+}
+
+ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket, core::TimeVal time)
+{
+	// we want to get the ordering channel for this split packet.
+	auto splitId = pPacket->splitPacketId;
+
+	auto channelIt = splitPacketChannels_.findSortedKey(splitId,
+		[](const SplitPacketChannel* pB, const SplitPacketId& splitId) -> bool {
+			return pB->splitId < splitId;
+		}
+	);
+
+	SplitPacketChannel* pChannel = nullptr;
+
+	if (channelIt == splitPacketChannels_.end())
+	{
+		SplitPacketChannel* pChannel = X_NEW(SplitPacketChannel, arena_, "PacketChannel")(arena_);
+		pChannel->splitId = splitId;
+		pChannel->packets.resize(pPacket->splitPacketCount); // we know how many we gonna get.
+
+		splitPacketChannels_.insert_sorted(pChannel, [](const SplitPacketChannel* pA, const SplitPacketChannel* pB) -> bool {
+			return pA->splitId < pB->splitId;
+		});
+	}
+	else
+	{
+		pChannel = *channelIt;
+	}
+
+	X_ASSERT_NOT_NULL(pChannel);
+
+	// meow.
+	++pChannel->packetsRecived;
+	pChannel->lastUpdate = time;
+	pChannel->packets[pPacket->splitPacketIndex] = pPacket;
+	
+	// are we complete? turing :D
+	if (pChannel->haveAllPackets())
+	{
+		// okay now we need to work out total size,
+		auto& packets = pChannel->packets;
+
+		size_t totalBitLength = core::accumulate(packets.begin(), packets.end(), 0_sz, [](const ReliablePacket* p) {
+			return p->dataBitLength;
+		});
+
+		const ReliablePacket* pFirstPacket = packets[0];
+
+		// allocate a buffer with new data?
+		ReliablePacket* pRebuiltPacket = allocPacket();
+		pRebuiltPacket->assignPropertiesExcData(pFirstPacket);
+
+		// data..
+		pRebuiltPacket->dataType = ReliablePacket::DataType::Normal;
+		pRebuiltPacket->dataBitLength = safe_static_cast<BitSizeT>(totalBitLength);
+		pRebuiltPacket->pData = X_NEW_ARRAY_ALIGNED(uint8_t, core::bitUtil::bitsToBytes(totalBitLength), g_NetworkArena, "SplitPacketMergeBuf", 16);
+		pRebuiltPacket->pRefData = nullptr;
+
+		// copy pasta!
+		size_t dataBitOffset = 0;
+		for (auto* p : packets)
+		{
+			std::memcpy(pRebuiltPacket->pData + core::bitUtil::bitsToBytes(dataBitOffset), p->pData, core::bitUtil::bitsToBytes(p->dataBitLength));
+			dataBitOffset += p->dataBitLength;
+		}
+
+		for (auto* p : packets)
+		{
+			freePacket(p);
+		}
+
+		X_ASSERT(channelIt != splitPacketChannels_.end(), "Should not be merging split packs on frist packet")(channelIt);
+		splitPacketChannels_.erase(channelIt);
+		return pRebuiltPacket;
+	}
+	
+
+	// report some sort of progress?
+	{
+
+
+	}
+
+	return nullptr;
 }
 
 // -----------------------------------------
