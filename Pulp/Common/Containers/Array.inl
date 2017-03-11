@@ -28,11 +28,11 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
-granularity_(16),
-list_(nullptr),
-num_(size),
-size_(size),
-allocator_(arena)
+    granularity_(16),
+    list_(nullptr),
+    num_(size),
+    size_(size),
+    allocator_(arena)
 {
 	X_ASSERT(size > 0, "List size must be positive")(size);
 	X_ASSERT_NOT_NULL(arena);
@@ -61,11 +61,11 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_lis
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(const Array<T, Allocator>& oth) :
-allocator_(oth.allocator_),
-granularity_(16),
-list_(nullptr),
-num_(0),
-size_(0)
+    allocator_(oth.allocator_),
+    granularity_(16),
+    list_(nullptr),
+    num_(0),
+    size_(0)
 {
 	*this = oth;
 }
