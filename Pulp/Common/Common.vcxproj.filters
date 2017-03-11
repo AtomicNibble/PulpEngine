@@ -1204,6 +1204,9 @@
     <ClInclude Include="Containers\FixedBitStream.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\PriorityQueue.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1519,6 +1522,9 @@
       <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Containers\FixedBitStream.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\PriorityQueue.inl">
       <Filter>Headers\Containers</Filter>
     </None>
   </ItemGroup>

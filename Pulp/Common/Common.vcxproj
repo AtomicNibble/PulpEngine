@@ -85,6 +85,7 @@
     <ClInclude Include="Containers\HashMap.h" />
     <ClInclude Include="Containers\LinkedList.h" />
     <ClInclude Include="Containers\LinkedListIntrusive.h" />
+    <ClInclude Include="Containers\PriorityQueue.h" />
     <ClInclude Include="Containers\Stack.h" />
     <ClInclude Include="Core\Configuration.h" />
     <ClInclude Include="Core\ConfigurationWin32.h" />
@@ -426,6 +427,7 @@
     <None Include="Containers\HashMap.inl" />
     <None Include="Containers\LinkedList.inl" />
     <None Include="Containers\LinkedListIntrusive.inl" />
+    <None Include="Containers\PriorityQueue.inl" />
     <None Include="Containers\Stack.inl" />
     <None Include="Debugging\Assert.inl" />
     <None Include="Debugging\SymbolInfo.inl" />
