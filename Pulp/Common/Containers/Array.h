@@ -109,8 +109,8 @@ public:
 
 
 	// insert the element at the given index
-	size_type insert(const Type& obj, size_type index = 0);
-	size_type insert(Type&& obj, size_type index = 0);
+	size_type insertAtIndex(size_type idx, const Type& obj);
+	size_type insertAtIndex(size_type idx, Type&& obj);
 	// remove the element at the given index
 	bool removeIndex(size_type idx);
 	void remove(const T& item);

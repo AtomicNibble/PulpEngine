@@ -497,49 +497,45 @@ X_INLINE void Array<T, Allocator>::pop_back()
 // -----------------------------------------------
 
 template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insert(const Type& obj, size_type index)
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIndex(size_type index, const Type& obj)
 {
-	if (!list_) {
-		reserve(granularity_);
-	}
+	X_ASSERT(index >= 0, "index is invalid")(index);
+	X_ASSERT(index <= num_, "index is out of bounds")(index, num_);
 
 	if (num_ == size_) {
-		size_type newsize = size_ + granularity_;
-
-		reserve(newsize);
+		ensureSize(size_ + 1);
 	}
 
-	if (index < 0) {
-		index = 0;
-	}
-	else if (index > num_) {
-		index = num_;
-	}
+	Iterator pos = begin() + index;
 
-	for (size_type i = num_; i > index; --i) {
-		list_[i] = list_[i - 1];
-	}
+	// move everything up.
+	Mem::Move(pos, end(), pos + 1);
+	Mem::Construct(pos, obj);
 
-	num_++;
-	list_[index] = obj;
-
+	++num_;
 	return index;
 }
 
 template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insert(Type&& obj, size_type index)
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIndex(size_type index, Type&& obj)
 {
-	if (!list_) {
-		reserve(granularity_);
-	}
+	X_ASSERT(index >= 0, "index is invalid")(index);
+	X_ASSERT(index <= num_, "index is out of bounds")(index, num_);
 
 	if (num_ == size_) {
-		size_type newsize = size_ + granularity_;
-		reserve(newsize);
+		ensureSize(size_ + 1);
 	}
 
-	if (index < 0) {
-		index = 0;
+	Iterator pos = begin() + index;
+
+	// move everything up.
+	Mem::Move(pos, end(), pos + 1);
+	Mem::Construct(pos, std::forward<T>(obj));
+
+	++num_;
+	return index;
+}
+
 	}
 	else if (index > num_) {
 		index = num_;
