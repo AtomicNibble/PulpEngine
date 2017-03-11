@@ -70,6 +70,46 @@ ReliablePacket::ReliablePacket()
 	arena = g_NetworkArena; // everything from this arena for now.
 }
 
+
+void ReliablePacket::freeData(void)
+{
+	// MEOW.
+	if (dataType == DataType::Normal)
+	{
+		if (pData)
+		{
+			X_DELETE_ARRAY(pData, arena);
+			pData = nullptr;
+			dataBitLength = 0;
+		}
+		else
+		{
+			X_ASSERT(dataBitLength == 0, "No data buffer, when length is none zero")(dataBitLength, pData);
+		}
+	}
+	else if (dataType == DataType::Ref)
+	{
+		X_ASSERT_NOT_NULL(pRefData); // only allow ref to be set if it's valid ref
+
+		if (pRefData->removeReference() == 0)
+		{
+			// delete original allocation.
+			X_DELETE_ARRAY(pRefData->pData, arena);
+
+			X_DELETE(pRefData, g_NetworkArena);
+		}
+
+		pData = nullptr;
+		pRefData = nullptr;
+		dataBitLength = 0;
+	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+}
+
+
 bool ReliablePacket::isReliable(void) const
 {
 	switch (reliability)
