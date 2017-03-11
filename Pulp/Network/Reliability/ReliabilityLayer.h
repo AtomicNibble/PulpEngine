@@ -74,6 +74,8 @@ public:
 	// cops values of fields excluding data ones.
 	void assignPropertiesExcData(const ReliablePacket* pOth);
 
+private:
+    PacketReliability::Enum reliabilityWithoutAck(void) const;
 
 public:
 	static constexpr size_t getMaxHeaderLength(void);
