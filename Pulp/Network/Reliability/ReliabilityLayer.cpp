@@ -55,12 +55,18 @@ ReliablePacket::ReliablePacket()
 	orderingIndex = 0;
 	sequencingIndex = 0;
 
+	// leave pri / rel unassigned.
+	sendAttemps = 0;
+
 	orderingChannel = 0;
 	splitPacketId = 0;
 	splitPacketIndex = 0;
 	splitPacketCount = 0;
+
+	dataType = DataType::Normal;
 	dataBitLength = 0;
 	pData = nullptr;
+	pRefData = nullptr;
 }
 
 bool ReliablePacket::isReliable(void) const

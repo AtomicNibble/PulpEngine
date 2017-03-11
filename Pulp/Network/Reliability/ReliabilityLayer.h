@@ -7,6 +7,8 @@
 #include <Containers\FixedFifo.h>
 #include <Containers\LinkedListIntrusive.h>
 
+#include <Util\ReferenceCounted.h>
+
 X_NAMESPACE_BEGIN(net)
 
 class NetSocket;
@@ -18,9 +20,19 @@ typedef uint16_t MessageNumber;
 typedef uint16_t OrderingIndex;
 typedef uint16_t DataGramSequenceNumber;
 
+struct DataRefrence : public core::ReferenceCounted<>
+{
+	uint8_t* pData;
+	core::MemoryArenaBase* arena;
+};
 
 struct ReliablePacket
 {
+	X_DECLARE_ENUM(DataType) (
+		Normal,
+		Ref // the data is refrenced, this is so we can split large blocks into multiple packets without copyies.
+	); 
+
 	X_NO_COPY(ReliablePacket);
 	X_NO_ASSIGN(ReliablePacket);
 
@@ -56,8 +68,10 @@ public:
 	core::TimeVal retransmissionTime;	// 
 	core::TimeVal nextActionTime;		// 
 
+	DataType::Enum dataType;
 	BitSizeT dataBitLength;
 	uint8_t* pData;
+	DataRefrence* pRefData;
 
 	INTRUSIVE_LIST_LINK(ReliablePacket) reliableLink;
 };
