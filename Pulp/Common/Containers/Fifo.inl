@@ -297,6 +297,35 @@ void Fifo<T>::free(void)
 
 
 template<typename T>
+void Fifo<T>::shrinkToFit(void)
+{
+    if (capacity() > size() + 1)
+    {
+        // reallocate.
+        size_t curSize = capacity();
+        size_t newSize = size() + 1;
+        T* pData = Allocate(newSize);
+
+        // move to new memory.
+        Mem::MoveArrayUninitialized(pData, read_, end_);
+
+        // handle wrap around.
+        if (write_ < read_) {
+            Mem::MoveArrayUninitialized(pData + (end_ - read_), start_, write_);
+        }
+
+        // delete old and update pointers.
+        Delete(start_);
+
+        start_ = pData;
+        end_ = pData + newSize;
+        read_ = start_; 
+        write_ = read_ + curSize;
+    }
+}
+
+
+template<typename T>
 typename Fifo<T>::size_type Fifo<T>::size(void) const
 {
 	if (read_ <= write_) {

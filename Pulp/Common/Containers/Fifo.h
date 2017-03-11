@@ -118,6 +118,8 @@ public:
 	X_INLINE void clear(void);
 	// items are cleared and buffer is destroyed
 	X_INLINE void free(void);
+    // attempts to make capacity == size, not guaranteed.
+    X_INLINE void shrinkToFit(void);
 
 	// returns the number of items currently inside the fifo
 	X_INLINE size_type size(void) const;
