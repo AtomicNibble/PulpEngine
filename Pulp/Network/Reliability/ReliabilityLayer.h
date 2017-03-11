@@ -50,7 +50,7 @@ public:
 	uint8_t orderingChannel;
 	SplitPacketId splitPacketId;
 	SplitPacketIndex splitPacketIndex;
-	SplitPacketIndex splitPacketCount;
+	SplitPacketIndex splitPacketCount; // uses index type, so index type can represent any count value.
 
 	core::TimeVal creationTime;			// 
 	core::TimeVal retransmissionTime;	// 
