@@ -123,8 +123,13 @@ public:
 	Iterator insert_sorted(const Type& obj);
 	template<class Compare>
 	Iterator insert_sorted(const Type& obj, Compare comp);
+
+	// remove the element at the given index, none-stable
 	bool removeIndex(size_type idx);
 	void remove(const T& item);
+	// stable remove
+	bool removeIndexStable(size_type idx);
+	void removeStable(const T& item);
 
 	Iterator erase(ConstIterator first);
 	Iterator erase(ConstIterator first, ConstIterator last);
