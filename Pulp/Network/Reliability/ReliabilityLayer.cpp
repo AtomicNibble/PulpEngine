@@ -1582,6 +1582,16 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 		bytesInReSendBuffers_ -= core::bitUtil::bitsToBytes(pPacket->dataBitLength);
 		// ~
 
+		if (pPacket->isAckRequired() && (pPacket->splitPacketCount == 0 || pPacket->splitPacketIndex + 1 == pPacket->splitPacketCount))
+		{
+			ReliablePacket* pAckPacket = allocPacket();
+			pAckPacket->allocData(5, g_NetworkArena);
+			pAckPacket->pData[0] = MessageID::SndReceiptAcked;
+			std::memcpy(&pAckPacket->pData[1], &pPacket->sendReceipt, sizeof(pPacket->sendReceipt));
+
+			recivedPackets_.emplace(pAckPacket);
+		}
+
 		// now we need to remove.
 		pPacket->reliableLink.unlink();
 

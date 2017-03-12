@@ -531,7 +531,10 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 
 		if (reliability == PacketReliability::UnReliableWithAck)
 		{
-			X_ASSERT_NOT_IMPLEMENTED();
+			uint8_t tmpBuf[5];
+			tmpBuf[0] = MessageID::SndReceiptAcked;
+			std::memcpy(tmpBuf + 1, &usedSendReceipt, sizeof(usedSendReceipt));
+			sendLoopback(tmpBuf, sizeof(tmpBuf));
 		}
 
 		return usedSendReceipt;
