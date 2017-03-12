@@ -69,6 +69,8 @@ template<typename T>
 class Fifo
 {
 public:
+	typedef T  Type;
+	typedef T  value_type;
 	typedef size_t size_type;
 	typedef _FifoIterator<T> iterator;
 	typedef _FifoConstIterator<T> const_iterator;

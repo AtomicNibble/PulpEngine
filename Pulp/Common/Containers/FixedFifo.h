@@ -68,10 +68,13 @@ template<typename T, size_t N>
 class FixedFifo
 {
 public:
+	typedef T  Type;
+	typedef T  value_type;
 	typedef size_t size_type;
 	typedef _FixedFifoIterator<T,N> iterator;
 	typedef _FixedFifoConstIterator<T,N> const_iterator;
 
+public:
 	X_INLINE FixedFifo(void);
 	X_INLINE ~FixedFifo(void);
 

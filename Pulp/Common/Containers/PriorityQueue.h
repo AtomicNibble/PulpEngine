@@ -9,7 +9,8 @@ class PriorityQueue
 public:
     typedef PriorityQueue<T, ContainerT, Pr> MyType;
     typedef ContainerT container_type;
-    typedef typename ContainerT::value_type value_type;
+	typedef typename ContainerT::Type Type;
+	typedef typename ContainerT::value_type value_type;
     typedef typename ContainerT::size_type size_type;
     typedef typename ContainerT::reference reference;
     typedef typename ContainerT::const_reference const_reference;
