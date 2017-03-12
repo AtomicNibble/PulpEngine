@@ -771,8 +771,10 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			else if (result == ProcessResult::Ignored)
 			{
 				const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-
 				bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+
+				pPacket->freeData();
+				freePacket(pPacket);
 			}
 			else if (result == ProcessResult::Swallowed)
 			{
