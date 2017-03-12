@@ -507,7 +507,6 @@ void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
 }
 
 
-
 uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, 
 	const AddressOrGUID systemIdentifier, bool broadcast,
@@ -557,6 +556,45 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 	return usedSendReceipt;
 }
 
+uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, const AddressOrGUID systemIdentifier)
+{
+	if (!lengthBytes) {
+		return 0;
+	}
+
+	X_ASSERT_NOT_NULL(pData);
+
+	uint32_t usedSendReceipt = incrementNextSendReceipt();
+
+	if (isLoopbackAddress(systemIdentifier, true))
+	{
+		sendLoopback(pData, lengthBytes);
+
+		if (reliability == PacketReliability::UnReliableWithAck)
+		{
+			uint8_t tmpBuf[5];
+			tmpBuf[0] = MessageID::SndReceiptAcked;
+			std::memcpy(tmpBuf + 1, &usedSendReceipt, sizeof(usedSendReceipt));
+			sendLoopback(tmpBuf, sizeof(tmpBuf));
+		}
+
+		return usedSendReceipt;
+	}
+
+	sendBuffered(
+		pData,
+		safe_static_cast<BitSizeT>(lengthBytes * 8),
+		priority,
+		reliability,
+		0,
+		systemIdentifier,
+		false,
+		usedSendReceipt
+	);
+
+	return usedSendReceipt;
+}
 
 void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt)

@@ -223,7 +223,10 @@ public:
 	void cancelConnectionAttempt(const ISystemAdd* pTarget) X_FINAL;
 
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
+		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, 
+		bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
+	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, const AddressOrGUID systemIdentifier) X_FINAL;
 
 	void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 

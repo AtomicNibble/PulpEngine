@@ -299,7 +299,10 @@ struct IPeer
 
 	// send some data :)
 	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
+		PacketReliability::Enum reliability, uint8_t orderingChannel, 
+		const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
+	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, const AddressOrGUID systemIdentifier) X_ABSTRACT;
 
 	// send to self.
 	virtual void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_ABSTRACT;
