@@ -380,7 +380,6 @@ private:
 
 	NetGUID guid_;
 
-	core::TimeVal defaultTimeOut_;
 	core::TimeVal unreliableTimeOut_;
 	int32_t defaultMTU_;
 	int32_t maxIncommingConnections_;

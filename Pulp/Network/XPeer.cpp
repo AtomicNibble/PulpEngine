@@ -238,7 +238,6 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 
 	guid_ = XNet::generateGUID();
 
-	defaultTimeOut_ = core::TimeVal::fromMS(1000);
 	unreliableTimeOut_ = core::TimeVal::fromMS(1000 * 10);
 
 	defaultMTU_ = MAX_MTU_SIZE;
