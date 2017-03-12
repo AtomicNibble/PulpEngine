@@ -1040,8 +1040,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		sendNAKs(socket, bs, systemAddress, time);
 	}
 
-	core::Array<ReliablePacket*> packetsThisFrame(g_NetworkArena); // all the packets we want to send
-	core::Array<size_t> packetsThisFrameBoundaries(g_NetworkArena); // essentially range lists for MTUs.
+	core::Array<ReliablePacket*> packetsThisFrame(arena_); // all the packets we want to send
+	core::Array<size_t> packetsThisFrameBoundaries(arena_); // essentially range lists for MTUs.
 
 	// resend packets.
 	if (!isResendListEmpty())
