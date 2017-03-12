@@ -21,7 +21,7 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerTest.h">
+    <ClInclude Include="NetWorkTests.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EngineApp.h">
@@ -32,7 +32,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ServerTest.cpp">
+    <ClCompile Include="NetWorkTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EngineApp.cpp">
@@ -40,7 +40,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ServerTest.rc">
+    <ResourceCompile Include="NetWorkTests.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -48,7 +48,7 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="ServerTest.ico">
+    <Image Include="NetWorkTests.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
