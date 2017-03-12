@@ -124,14 +124,25 @@ NetGUID XNet::generateGUID(void)
 
 void XNet::listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 {
-	X_UNUSED(pCmd);
+	bool verbose = false;
+
+	if (pCmd->GetArgCount() == 2)
+	{
+		const char* pVerboseStr = pCmd->GetArg(1);
+		if (core::strUtil::IsNumeric(pVerboseStr)) {
+			verbose = core::strUtil::StringToInt<int32_t>(pVerboseStr) == 1;
+		}
+		else {
+			verbose = core::strUtil::IsEqualCaseInsen(pVerboseStr, "true");
+		}
+	}
 
 	int32_t idx = 0;
 	for (auto* pPeer : peers_)
 	{
 		X_LOG0("Net", "Peer%" PRIi32" remote systems", idx++);
 		X_LOG_BULLET;
-		pPeer->listRemoteSystems();
+		pPeer->listRemoteSystems(verbose);
 	}
 }
 

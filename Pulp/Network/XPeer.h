@@ -270,7 +270,7 @@ public:
 	// excludes connections made by us.
 	size_t getNumRemoteInitiatedConnections(void) const;
 
-	void listRemoteSystems(void) const;
+	void listRemoteSystems(bool verbose) const;
 
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,

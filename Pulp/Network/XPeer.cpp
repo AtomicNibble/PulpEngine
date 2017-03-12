@@ -4,6 +4,8 @@
 
 #include <Hashing\sha1.h>
 #include <Memory\VirtualMem.h>
+#include <String\HumanDuration.h>
+#include <String\HumanSize.h>
 #include <ITimer.h>
 
 #include "Sockets\Socket.h"
@@ -1371,7 +1373,7 @@ size_t XPeer::getNumRemoteInitiatedConnections(void) const
 	return num;
 }
 
-void XPeer::listRemoteSystems(void) const
+void XPeer::listRemoteSystems(bool verbose) const
 {
 	auto timeNow = gEnv->pTimer->GetTimeNowReal();
 
@@ -1384,10 +1386,28 @@ void XPeer::listRemoteSystems(void) const
 		auto connectionElapsed = timeNow - rs.connectionTime;
 		
 		IPStr ipStr;
-		X_LOG0("Net", "Host: \"%s\" connectionTime: %g sec state: %s", 
-			rs.systemAddress.toString(ipStr), 
-			connectionElapsed.GetSeconds(),
-			ConnectionState::ToString(rs.getConnectionState()));
+		core::HumanDuration::Str durStr;
+
+		if (!verbose)
+		{
+			X_LOG0("Net", "Host: \"%s\" connectionTime: ^5%s^7 state: ^5%s",
+				rs.systemAddress.toString(ipStr),
+				core::HumanDuration::toString(durStr, connectionElapsed.GetSeconds()),
+				ConnectionState::ToString(rs.getConnectionState()));
+		}
+		else
+		{
+			core::HumanSize::Str sizeStr;
+
+			NetStatistics stats;
+			rs.relLayer.getStatistics(stats);
+
+			X_LOG0("Net", "Host: \"%s\" connectionTime: ^5%s^7 state: ^5%s^7 memUsage: ^5%s",
+				rs.systemAddress.toString(ipStr),
+				core::HumanDuration::toString(durStr, connectionElapsed.GetSeconds()),
+				ConnectionState::ToString(rs.getConnectionState()),
+				core::HumanSize::toString(sizeStr, stats.internalMemUsage));
+		}
 	}
 }
 
