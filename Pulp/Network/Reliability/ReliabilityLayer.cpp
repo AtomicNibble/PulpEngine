@@ -815,7 +815,8 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 
 	if (pPacket->isReliable())
 	{
-		auto holeSize = (pPacket->reliableMessageNumber - recivedPacketBaseIdx_);
+		// intentional unsigned overflow.
+		DataGramSequenceNumber holeSize = static_cast<DataGramSequenceNumber>(pPacket->reliableMessageNumber - recivedPacketBaseIdx_);
 
 		if (holeSize == 0)
 		{
