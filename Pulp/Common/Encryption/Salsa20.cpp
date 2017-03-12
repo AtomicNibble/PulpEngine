@@ -307,7 +307,9 @@ namespace Encryption
 #if SALSA20_SSE
 		if (SSEnabled())
 		{
-			processBytesSSE(input, output, numBlocks * BLOCK_SIZE, 0);
+			const int64_t byteOffset = ((vector_[5] * 0xFFFFFFFF) + vector_[8]) * BLOCK_SIZE;
+
+			processBytesSSE(input, output, numBlocks * BLOCK_SIZE, byteOffset);
 			return;
 		}
 #endif // !SALSA20_SSE
@@ -333,7 +335,10 @@ namespace Encryption
 #if SALSA20_SSE
 		if (SSEnabled())
 		{
-			processBytesSSE(input, output, numBytes, 0);
+			// work out current byte offset to pass to sse version.
+			const int64_t byteOffset = ((vector_[5] * 0xFFFFFFFF) + vector_[8]) * BLOCK_SIZE;
+
+			processBytesSSE(input, output, numBytes, byteOffset);
 			return;
 		}
 #endif // !SALSA20_SSE
