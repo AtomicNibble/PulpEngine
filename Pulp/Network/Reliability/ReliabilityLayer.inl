@@ -5,33 +5,24 @@ X_NAMESPACE_BEGIN(net)
 
 X_INLINE ReliabilityLayer::PacketData::PacketData() :
 	numBits_(0),
-	pData_(nullptr),
-	arena_(nullptr)
+	data_(nullptr)
 {
 }
 
 X_INLINE ReliabilityLayer::PacketData::~PacketData()
 {
-	if (pData_) {
-		X_DELETE_ARRAY(pData_, arena_);
-	}
+
 }
 
 X_INLINE void ReliabilityLayer::PacketData::setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena) 
 {
-	if (pData_) {
-		X_DELETE_ARRAY(pData_, arena_);
-	}
-
 	numBits_ = numBits;
-	pData_ = pData;
-	arena_ = arena;
+	data_ = core::UniquePointer<uint8_t[]>(arena, pData);
 }
 
-X_INLINE void ReliabilityLayer::PacketData::releaseDataOwnership(void)
+X_INLINE core::UniquePointer<uint8_t[]>& ReliabilityLayer::PacketData::getUP(void)
 {
-	pData_ = nullptr;
-	numBits_ = 0;
+	return data_;
 }
 
 X_INLINE BitSizeT ReliabilityLayer::PacketData::getNumbBits(void) const 
@@ -41,27 +32,27 @@ X_INLINE BitSizeT ReliabilityLayer::PacketData::getNumbBits(void) const
 
 X_INLINE uint8_t* ReliabilityLayer::PacketData::getData(void) const 
 {
-	return pData_;
+	return data_.ptr();
 }
 
 X_INLINE uint8_t* ReliabilityLayer::PacketData::begin(void) 
 {
-	return pData_;
+	return data_.ptr();
 }
 
 X_INLINE uint8_t* ReliabilityLayer::PacketData::end(void) 
 {
-	return pData_ + core::bitUtil::bitsToBytes(numBits_);
+	return data_.ptr() + core::bitUtil::bitsToBytes(numBits_);
 }
 
 X_INLINE const uint8_t* ReliabilityLayer::PacketData::begin(void) const
 {
-	return pData_;
+	return data_.ptr();
 }
 
 X_INLINE const uint8_t* ReliabilityLayer::PacketData::end(void) const
 {
-	return pData_ + core::bitUtil::bitsToBytes(numBits_);
+	return data_.ptr() + core::bitUtil::bitsToBytes(numBits_);
 }
 
 // --------------------------------------------------

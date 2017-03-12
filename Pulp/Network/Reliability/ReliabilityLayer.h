@@ -10,7 +10,7 @@
 #include <Containers\PriorityQueue.h>
 
 #include <Util\ReferenceCounted.h>
-
+#include <Util\UniquePointer.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -105,7 +105,6 @@ public:
 	core::TimeVal retransmissionTime;	// 
 	core::TimeVal nextActionTime;		// 
 
-
 	DataType::Enum dataType;
 	BitSizeT dataBitLength;
 	uint8_t* pData;
@@ -185,7 +184,7 @@ public:
 		X_INLINE ~PacketData();
 
 		X_INLINE void setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena);
-		X_INLINE void releaseDataOwnership(void); // bit clunky.
+		X_INLINE core::UniquePointer<uint8_t[]>& getUP(void); 
 
 		X_INLINE BitSizeT getNumbBits(void) const;
 		X_INLINE uint8_t* getData(void) const;
@@ -198,8 +197,7 @@ public:
 
 	private:
 		BitSizeT numBits_;
-		uint8_t* pData_;
-		core::MemoryArenaBase* arena_;
+		core::UniquePointer<uint8_t[]> data_;
 	};
 
 	typedef RangeList<DataGramSequenceNumber> DataGramNumberRangeList;
