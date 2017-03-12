@@ -438,11 +438,8 @@ void Fifo<T>::expand(void)
 
     // move to new memory.
     Mem::MoveArrayUninitialized(pData, read_, end_);
-
     // handle wrap around.
-    if (write_ < read_) {
-        Mem::MoveArrayUninitialized(pData + (end_ - read_), start_, write_);
-    }
+	Mem::MoveArrayUninitialized(pData + (end_ - read_), start_, write_);
 
     // delete old and update pointers.
     Delete(start_);
