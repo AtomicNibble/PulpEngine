@@ -1214,7 +1214,6 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 	{
 		if (!pPacket->isReliable())
 		{
-			X_DELETE(pPacket->pData, g_NetworkArena);
 			freePacket(pPacket);
 		}
 	}
