@@ -1607,8 +1607,42 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 
 // -----------------------------------------
 
+size_t ReliabilityLayer::calculateMemoryUsage(void) const
+{
+	// meow meow.
+	size_t size = 0;
+
+	size += sizeof(*this);
+	size += outGoingPackets_.capacity() * sizeof(decltype(outGoingPackets_)::Type);
+	size += recivedPackets_.capacity() * sizeof(decltype(recivedPackets_)::Type);
+	size += dataGramHistory_.capacity() * sizeof(decltype(dataGramHistory_)::Type);
+	size += recivedPacketQueue_.capacity() * sizeof(decltype(recivedPacketQueue_)::Type);
+
+	size += incomingAcks_.capacity() * sizeof(decltype(incomingAcks_)::RangeNodeType);
+	size += naks_.capacity() * sizeof(decltype(naks_)::RangeNodeType);
+	size += acks_.capacity() * sizeof(decltype(acks_)::RangeNodeType);
+
+	for (const auto& q : orderingQueues_)
+	{
+		size += q.capacity() * sizeof(decltype(orderingQueues_)::value_type::Type);
+	}
+
+	for (const auto& bps : bps_)
+	{
+		size += bps.capacity() * sizeof(BPSTracker::Type);
+	}
+
+
+	size += splitPacketChannels_.capacity() * sizeof(decltype(splitPacketChannels_)::Type);
+	size += splitPacketChannels_.size() * sizeof(SplitPacketChannel);
+
+	return size;
+}
+
 void ReliabilityLayer::getStatistics(NetStatistics& stats) const
 {
+	stats.internalMemUsage = calculateMemoryUsage();
+
 	for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++)
 	{
 		stats.lastSecondMetrics[i] = bps_[i].getBPS();

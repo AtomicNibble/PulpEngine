@@ -104,6 +104,7 @@ public:
 	core::TimeVal retransmissionTime;	// 
 	core::TimeVal nextActionTime;		// 
 
+
 	DataType::Enum dataType;
 	BitSizeT dataBitLength;
 	uint8_t* pData;
@@ -227,13 +228,15 @@ public:
 	// pop any packets that have arrived.
 	bool recive(PacketData& dataOut);
 
-
 	void getStatistics(NetStatistics& stats) const;
 
 	X_INLINE bool pendingOutgoingData(void) const;
 	X_INLINE bool isWaitingForAcks(void) const;
 	X_INLINE bool isConnectionDead(void) const;
 	X_INLINE void killConnection(void);
+
+private:
+	size_t calculateMemoryUsage(void) const;
 
 private:
 	ProcessResult::Enum prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time);

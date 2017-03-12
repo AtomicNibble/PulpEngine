@@ -104,6 +104,7 @@ struct NetStatistics
 public:
 	core::TimeVal connectionStartTime;
 
+	uint64_t internalMemUsage; // rougth memory usage for overhead. don't include packet data. 
 	uint64_t lastSecondMetrics[Metric::ENUM_COUNT];
 	uint64_t runningMetrics[Metric::ENUM_COUNT];
 
