@@ -11,6 +11,11 @@ class BPSTracker
 	typedef core::Fifo<TimeVal> TimeValArr;
 
 public:
+	typedef typename TimeValArr::Type  Type;
+	typedef typename TimeValArr::value_type  value_type;
+	typedef typename TimeValArr::size_type  size_type;
+
+public:
 	BPSTracker(core::MemoryArenaBase* arena);
 
 	void update(core::TimeVal time);
@@ -19,6 +24,9 @@ public:
 	X_INLINE void add(core::TimeVal time, uint64_t val);
 	X_INLINE uint64_t getTotal(void) const;
 	X_INLINE uint64_t getBPS(void) const;
+
+	X_INLINE size_type size(void) const;
+	X_INLINE size_type capacity(void) const;
 
 private:
 	uint64_t total_;
