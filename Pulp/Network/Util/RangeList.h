@@ -25,6 +25,7 @@ public:
 	};
 
 	typedef T RangeType;
+	typedef RangeNode RangeNodeType;
 	typedef core::Array<RangeNode> RangeArr;
 
 	typedef typename RangeArr::Iterator Iterator;
@@ -53,8 +54,8 @@ public:
 	X_INLINE void clear(void);
 	X_INLINE void free(void);
 
-	X_INLINE size_type size(void);
-	X_INLINE size_type capacity(void);
+	X_INLINE size_type size(void) const;
+	X_INLINE size_type capacity(void) const;
 
 	X_INLINE Iterator begin(void);
 	X_INLINE ConstIterator begin(void) const;

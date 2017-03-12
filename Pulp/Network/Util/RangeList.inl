@@ -206,13 +206,13 @@ X_INLINE void RangeList<T>::free(void)
 }
 
 template<typename T>
-X_INLINE typename RangeList<T>::size_type RangeList<T>::size(void)
+X_INLINE typename RangeList<T>::size_type RangeList<T>::size(void) const
 {
 	return ranges_.size();
 }
 
 template<typename T>
-X_INLINE typename RangeList<T>::size_type RangeList<T>::capacity(void)
+X_INLINE typename RangeList<T>::size_type RangeList<T>::capacity(void) const
 {
 	return ranges_.capacity();
 }
