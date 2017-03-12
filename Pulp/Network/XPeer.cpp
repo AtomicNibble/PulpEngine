@@ -1236,7 +1236,22 @@ void XPeer::clearBanList(void)
 	bans_.clear();
 }
 
+void XPeer::listBans(void) const
+{
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
+	for (const auto& ban : bans_)
+	{
+		int64_t msLeft = -1;
+
+		if (ban.timeOut.GetValue() != 0)
+		{
+			msLeft = (ban.timeOut - timeNow).GetMilliSecondsAsInt64();
+		}
+
+		X_LOG0("Net", "Ban: \"%s\" timeLeftMS: ^5%" PRIi64, ban.ip.c_str(), msLeft);
+	}
+}
 
 int32_t XPeer::getAveragePing(const AddressOrGUID systemIdentifier) const
 {

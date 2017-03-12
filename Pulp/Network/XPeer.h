@@ -247,6 +247,7 @@ public:
 	bool isBanned(const char* pIP) X_FINAL;
 	bool isBanned(const IPStr& ip);
 	void clearBanList(void) X_FINAL;
+	void listBans(void) const;
 
 	int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_FINAL;
 	int32_t getLastPing(const AddressOrGUID systemIdentifier) const X_FINAL;
