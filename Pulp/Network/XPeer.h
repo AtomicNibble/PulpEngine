@@ -304,6 +304,7 @@ private:
 	size_t getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const;
 
 	// adds packet to back of receive qeue
+	void pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData& data);
 	void pushBackPacket(Packet* pPacket, bool pushAtHead = false);
 
 	Packet* allocPacket(size_t lengthBits);

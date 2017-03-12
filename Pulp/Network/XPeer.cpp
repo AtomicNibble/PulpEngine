@@ -931,6 +931,21 @@ size_t XPeer::getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const
 }
 
 
+void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData& data)
+{
+	// need to decide if i want to pass this back as up.
+	auto up = std::move(data.getUP());
+
+	// want to take ownership of the data.
+	Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
+	pPacket->pData = up.release();
+	pPacket->bitLength = data.getNumbBits();
+	pPacket->guid = rs.guid;
+
+
+	packetQue_.push(pPacket);
+}
+
 void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
 {
 	X_ASSERT_NOT_NULL(pPacket);
@@ -1643,9 +1658,9 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 					handleInvalidPassword(tmpBs, stream, rs);
 					break;
 					
-
 				default:
-					X_ERROR("Net", "Unhandled reliable message: \"%s\"", MessageID::ToString(msgId));
+					// we send this out.
+					pushBackPacket(rs, data);
 					break;
 			}
 		}
