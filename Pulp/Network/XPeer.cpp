@@ -602,6 +602,19 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 		receipt
 	);
 
+	switch (reliability)
+	{
+		case PacketReliability::Reliable:
+		case PacketReliability::ReliableOrdered:
+		case PacketReliability::ReliableOrderedWithAck:
+		case PacketReliability::ReliableSequenced:
+		case PacketReliability::ReliableWithAck:
+			pRemoteSystem->lastReliableSend = currentTime;
+			break;
+		default:
+			break;
+	}
+
 	return res;
 }
 
