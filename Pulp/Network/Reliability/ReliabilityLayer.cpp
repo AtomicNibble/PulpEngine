@@ -1227,7 +1227,7 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	}
 
 	ReliablePacket* pPacket = recivedPackets_.peek();
-	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, g_NetworkArena);
+	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, pPacket->arena);
 	recivedPackets_.pop();
 
 	// release ownership...
