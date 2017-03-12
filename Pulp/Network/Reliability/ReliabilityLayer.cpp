@@ -139,6 +139,15 @@ void ReliablePacket::freeData(void)
 	}
 }
 
+void ReliablePacket::allocData(size_t numBytes, core::MemoryArenaBase* arena)
+{
+	X_ASSERT(pData == nullptr, "Packet already has data")(pData, dataBitLength);
+
+	this->arena = arena;
+	this->dataBitLength = safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(numBytes));
+	pData = X_NEW_ARRAY(uint8_t, numBytes, arena, "PacketData");
+}
+
 
 bool ReliablePacket::isReliable(void) const
 {

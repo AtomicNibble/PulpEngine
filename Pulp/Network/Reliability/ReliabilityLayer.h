@@ -63,6 +63,7 @@ public:
 	ReliablePacket();
 
 	void freeData(void);
+	void allocData(size_t numBytes, core::MemoryArenaBase* arena);
 
     bool isReliable(void) const;
     bool isAckRequired(void) const;
