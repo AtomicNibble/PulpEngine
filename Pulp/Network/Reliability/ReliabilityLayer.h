@@ -60,10 +60,11 @@ struct ReliablePacket
 	X_NO_ASSIGN(ReliablePacket);
 
 public:
-	ReliablePacket();
+	ReliablePacket(core::MemoryArenaBase* dataArena);
 
 	void freeData(void);
-	void allocData(size_t numBytes, core::MemoryArenaBase* arena);
+	void allocData(size_t numBits);
+	core::MemoryArenaBase* getArena(void) const;
 
     bool isReliable(void) const;
     bool isAckRequired(void) const;
@@ -109,9 +110,11 @@ public:
 	BitSizeT dataBitLength;
 	uint8_t* pData;
 	DataRefrence* pRefData;
-	core::MemoryArenaBase* arena; // arena this memory is from. 
 
 	INTRUSIVE_LIST_LINK(ReliablePacket) reliableLink;
+
+private:
+	core::MemoryArenaBase* arena; // arena this memory is from. 
 };
 
 static const size_t goat = sizeof(ReliablePacket);
@@ -182,6 +185,7 @@ public:
 		X_INLINE ~PacketData();
 
 		X_INLINE void setdata(uint8_t* pData, BitSizeT numBits, core::MemoryArenaBase* arena);
+		X_INLINE void releaseDataOwnership(void); // bit clunky.
 
 		X_INLINE BitSizeT getNumbBits(void) const;
 		X_INLINE uint8_t* getData(void) const;
@@ -204,7 +208,7 @@ public:
 	X_NO_ASSIGN(ReliabilityLayer);
 
 public:
-	ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
+	ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* genArena, core::MemoryArenaBase* packetDataArena, core::MemoryArenaBase* packetPool);
 	ReliabilityLayer(ReliabilityLayer&& oth) = default;
 	~ReliabilityLayer();
 
@@ -289,6 +293,7 @@ private:
 	NetVars& vars_;
 
 	core::MemoryArenaBase* arena_;
+	core::MemoryArenaBase* packetDataArena_;
 	core::MemoryArenaBase* packetPool_;
 
 	int32_t MTUSize_;

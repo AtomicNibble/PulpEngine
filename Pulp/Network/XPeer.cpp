@@ -80,8 +80,9 @@ PingAndClockDifferential::PingAndClockDifferential()
 
 // -----------------------------------
 
-RemoteSystem::RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool) :
-	relLayer(vars, arena, packetPool)
+RemoteSystem::RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, 
+	core::MemoryArenaBase* packetDataArena, core::MemoryArenaBase* packetPool) :
+	relLayer(vars, arena, packetDataArena, packetPool)
 {
 	isActive = false;
 	weStartedconnection = false;
@@ -287,7 +288,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 
 		remoteSystems_.reserve(maxPeers_);
 		for (int32_t i = 0; i < maxPeers_; i++) {
-			remoteSystems_.emplace_back(vars_, arena_, packetPool);
+			remoteSystems_.emplace_back(vars_, arena_, &blockArena_, packetPool);
 		}
 	}
 	

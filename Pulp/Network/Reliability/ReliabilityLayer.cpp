@@ -78,7 +78,7 @@ bool SplitPacketChannel::haveAllPackets(void) const
 // ----------------------------------------------------------
 
 
-ReliablePacket::ReliablePacket()
+ReliablePacket::ReliablePacket(core::MemoryArenaBase* dataArena)
 {
 	reliableMessageNumber = std::numeric_limits<decltype(reliableMessageNumber)>::max();
 	orderingIndex = 0;
@@ -97,7 +97,7 @@ ReliablePacket::ReliablePacket()
 	dataBitLength = 0;
 	pData = nullptr;
 	pRefData = nullptr;
-	arena = g_NetworkArena; // everything from this arena for now.
+	arena = dataArena; 
 }
 
 
@@ -139,15 +139,19 @@ void ReliablePacket::freeData(void)
 	}
 }
 
-void ReliablePacket::allocData(size_t numBytes, core::MemoryArenaBase* arena)
+void ReliablePacket::allocData(size_t numBits)
 {
 	X_ASSERT(pData == nullptr, "Packet already has data")(pData, dataBitLength);
+	X_ASSERT_NOT_NULL(arena);
 
-	this->arena = arena;
-	this->dataBitLength = safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(numBytes));
-	pData = X_NEW_ARRAY(uint8_t, numBytes, arena, "PacketData");
+	dataBitLength = safe_static_cast<BitSizeT>(numBits);
+	pData = X_NEW_ARRAY_ALIGNED(uint8_t, core::bitUtil::bitsToBytes(numBits), arena, "PacketData", 16);
 }
 
+core::MemoryArenaBase* ReliablePacket::getArena(void) const
+{
+	return arena;
+}
 
 bool ReliablePacket::isReliable(void) const
 {
@@ -334,6 +338,8 @@ void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
 
 bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 {
+	X_ASSERT_NOT_NULL(arena);
+
 	uint8_t rel;
 	uint16_t bits;
 	bs.readBits(&rel, core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT));
@@ -407,7 +413,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 
 	size_t dataByteLength = core::bitUtil::bitsToBytes(dataBitLength);
 
-	pData = X_NEW_ARRAY(uint8_t, dataByteLength, g_NetworkArena, "PacketBytes");
+	pData = X_NEW_ARRAY(uint8_t, dataByteLength, arena, "PacketBytes");
 	pData[dataByteLength - 1] = 0; // zero last bit, as we may not have full byte.
 
 	bs.readBitsAligned(pData, dataBitLength);
@@ -453,10 +459,14 @@ PacketReliability::Enum ReliablePacket::reliabilityWithoutAck(void) const
 
 // ----------------------------------------------------------
 
-ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool) :
+ReliabilityLayer::ReliabilityLayer(NetVars& vars, 
+	core::MemoryArenaBase* arena,
+	core::MemoryArenaBase* packetDataArena,
+	core::MemoryArenaBase* packetPool) :
 	vars_(vars),
 	MTUSize_(0),
 	arena_(arena),
+	packetDataArena_(packetDataArena),
 	packetPool_(packetPool),
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
@@ -582,8 +592,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	pPacket->sendAttemps = 0;
 	pPacket->sendReceipt = receipt;
 
-	pPacket->dataBitLength = lengthBits;
-	pPacket->pData = X_NEW_ARRAY(uint8_t, lengthBytes, g_NetworkArena, "PacketBytes");
+	pPacket->allocData(lengthBits);
 
 	std::memcpy(pPacket->pData, pData, lengthBytes);
 
@@ -1240,7 +1249,7 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	}
 
 	ReliablePacket* pPacket = recivedPackets_.peek();
-	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, pPacket->arena);
+	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, pPacket->getArena());
 	recivedPackets_.pop();
 
 	// release ownership...
@@ -1342,7 +1351,7 @@ ReliablePacket* ReliabilityLayer::packetFromBS(core::FixedBitStreamBase& bs, cor
 
 ReliablePacket* ReliabilityLayer::allocPacket(void)
 {
-	return X_NEW(ReliablePacket, packetPool_, "RelPacket");
+	return X_NEW(ReliablePacket, packetPool_, "RelPacket")(packetDataArena_);
 }
 
 void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
@@ -1368,7 +1377,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 	core::StopWatch timer;
 
 	// temp array.
-	core::Array<ReliablePacket*> packets(g_NetworkArena);
+	core::Array<ReliablePacket*> packets(arena_);
 	packets.resize(pPacket->splitPacketCount);
 
 	SplitPacketId splitPacketId = splitPacketId_++;
@@ -1478,7 +1487,8 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 		// data..
 		pRebuiltPacket->dataType = ReliablePacket::DataType::Normal;
 		pRebuiltPacket->dataBitLength = safe_static_cast<BitSizeT>(totalBitLength);
-		pRebuiltPacket->pData = X_NEW_ARRAY_ALIGNED(uint8_t, core::bitUtil::bitsToBytes(totalBitLength), g_NetworkArena, "SplitPacketMergeBuf", 16);
+		pRebuiltPacket->allocData(totalBitLength);
+	//	pRebuiltPacket->pData = X_NEW_ARRAY_ALIGNED(uint8_t, core::bitUtil::bitsToBytes(totalBitLength), g_NetworkArena, "SplitPacketMergeBuf", 16);
 		pRebuiltPacket->pRefData = nullptr;
 
 		// copy pasta!
@@ -1585,7 +1595,7 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 		if (pPacket->isAckRequired() && (pPacket->splitPacketCount == 0 || pPacket->splitPacketIndex + 1 == pPacket->splitPacketCount))
 		{
 			ReliablePacket* pAckPacket = allocPacket();
-			pAckPacket->allocData(5, g_NetworkArena);
+			pAckPacket->allocData(5 << 3);
 			pAckPacket->pData[0] = MessageID::SndReceiptAcked;
 			std::memcpy(&pAckPacket->pData[1], &pPacket->sendReceipt, sizeof(pPacket->sendReceipt));
 
@@ -1607,8 +1617,10 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 
 // -----------------------------------------
 
+
 size_t ReliabilityLayer::calculateMemoryUsage(void) const
 {
+
 	// meow meow.
 	size_t size = 0;
 

@@ -28,6 +28,12 @@ X_INLINE void ReliabilityLayer::PacketData::setdata(uint8_t* pData, BitSizeT num
 	arena_ = arena;
 }
 
+X_INLINE void ReliabilityLayer::PacketData::releaseDataOwnership(void)
+{
+	pData_ = nullptr;
+	numBits_ = 0;
+}
+
 X_INLINE BitSizeT ReliabilityLayer::PacketData::getNumbBits(void) const 
 {
 	return numBits_;

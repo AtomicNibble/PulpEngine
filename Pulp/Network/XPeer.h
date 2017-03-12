@@ -78,7 +78,7 @@ struct RemoteSystem
 	X_NO_ASSIGN(RemoteSystem);
 
 public:
-	RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetPool);
+	RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetDataArena, core::MemoryArenaBase* packetPool);
 	RemoteSystem(RemoteSystem&& oth) = default;
 
 	RemoteSystem& operator=(RemoteSystem&& rhs) = default;
