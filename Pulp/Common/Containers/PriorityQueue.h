@@ -33,7 +33,8 @@ public:
     bool isEmpty(void) const;
     bool isNotEmpty(void) const;
 
-    size_type size(void) const;
+	size_type size(void) const;
+	size_type capacity(void) const;
     const_reference top(void) const;
 
     void swap(MyType& oth);

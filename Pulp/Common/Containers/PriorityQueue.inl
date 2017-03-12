@@ -92,6 +92,12 @@ typename PriorityQueue<T, ContainerT, Pr>::size_type PriorityQueue<T, ContainerT
 }
 
 template<typename T, class ContainerT, class Pr>
+typename PriorityQueue<T, ContainerT, Pr>::size_type PriorityQueue<T, ContainerT, Pr>::capacity(void) const
+{
+	return container_.capacity();
+}
+
+template<typename T, class ContainerT, class Pr>
 typename PriorityQueue<T, ContainerT, Pr>::const_reference PriorityQueue<T, ContainerT, Pr>::top(void) const
 {
     return container_.front();
