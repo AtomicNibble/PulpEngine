@@ -809,6 +809,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 		if (pPacket->orderingChannel >= MAX_ORDERED_STREAMS)
 		{
 			// bitch who you think you are.
+			X_ERROR("NetRel", "Recived packet with invalid channel: %" PRIu16 " ignoring.", pPacket->orderingChannel);
 			return ProcessResult::Ignored;
 		}
 	}
