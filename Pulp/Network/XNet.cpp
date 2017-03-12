@@ -31,8 +31,16 @@ void XNet::registerVars(void)
 
 void XNet::registerCmds(void)
 {
-	ADD_COMMAND_MEMBER("net_list_remotes", this, XNet, &XNet::listRemoteSystems, core::VarFlag::SYSTEM,
-		"List all the connected systems for each peer");
+	ADD_COMMAND_MEMBER("net_list_remotes", this, XNet, &XNet::Cmd_listRemoteSystems, core::VarFlag::SYSTEM,
+		"List all the connected systems for each peer. <verbose>");
+	ADD_COMMAND_MEMBER("net_bans_clear", this, XNet, &XNet::Cmd_clearBans, core::VarFlag::SYSTEM,
+		"Clears all bans");
+	ADD_COMMAND_MEMBER("net_bans_list", this, XNet, &XNet::Cmd_listBans, core::VarFlag::SYSTEM,
+		"Lists all bans");
+	ADD_COMMAND_MEMBER("net_bans_add", this, XNet, &XNet::Cmd_addBan, core::VarFlag::SYSTEM,
+		"Add a ban. <address>, <timeoutMS> (0=unlimted)");
+	ADD_COMMAND_MEMBER("net_bans_remove", this, XNet, &XNet::Cmd_removeBan, core::VarFlag::SYSTEM,
+		"Removes a ban if found. <address>");
 
 }
 
@@ -122,7 +130,7 @@ NetGUID XNet::generateGUID(void)
 	return NetGUID(val);
 }
 
-void XNet::listRemoteSystems(core::IConsoleCmdArgs* pCmd)
+void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 {
 	bool verbose = false;
 
@@ -145,6 +153,71 @@ void XNet::listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 		pPeer->listRemoteSystems(verbose);
 	}
 }
+
+void XNet::Cmd_clearBans(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+
+	for (auto* pPeer : peers_)
+	{
+		pPeer->clearBanList();
+	}
+}
+
+void XNet::Cmd_listBans(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+
+	int32_t idx = 0;
+	for (auto* pPeer : peers_)
+	{
+		X_LOG0("Net", "Peer%" PRIi32" bans", idx++);
+		X_LOG_BULLET;
+		pPeer->listBans();
+	}
+}
+
+void XNet::Cmd_addBan(core::IConsoleCmdArgs* pCmd)
+{
+	if (pCmd->GetArgCount() != 3) {
+		X_WARNING("Net", "net_bans_add <address>, <ip>");
+		return;
+	}
+
+	const char* pIP = pCmd->GetArg(1);
+	if (core::strUtil::strlen(pIP) > IPStr::BUF_SIZE) {
+		return;
+	}
+
+	IPStr ip(pIP);
+	core::TimeVal timeout;
+
+	int32_t timeoutMS = core::strUtil::StringToInt<int32_t>(pCmd->GetArg(2));
+	if (timeoutMS < 0) {
+		timeoutMS = 0;
+	}
+	
+	timeout.SetMilliSeconds(timeoutMS);
+
+	for (auto* pPeer : peers_)
+	{
+		pPeer->addToBanList(ip, timeout);
+	}
+}
+
+void XNet::Cmd_removeBan(core::IConsoleCmdArgs* pCmd)
+{
+	if (pCmd->GetArgCount() != 2) {
+		X_WARNING("Net", "net_bans_remove <address>");
+		return;
+	}
+
+	for (auto* pPeer : peers_)
+	{
+		pPeer->removeFromBanList(pCmd->GetArg(1));
+	}
+}
+
 
 X_NAMESPACE_END
 

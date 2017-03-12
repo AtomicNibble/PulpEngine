@@ -37,7 +37,11 @@ public:
 	static NetGUID generateGUID(void);
 
 private:
-	void listRemoteSystems(core::IConsoleCmdArgs* pCmd);
+	void Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd);
+	void Cmd_clearBans(core::IConsoleCmdArgs* pCmd);
+	void Cmd_listBans(core::IConsoleCmdArgs* pCmd);
+	void Cmd_addBan(core::IConsoleCmdArgs* pCmd);
+	void Cmd_removeBan(core::IConsoleCmdArgs* pCmd);
 
 private:
 	core::MemoryArenaBase* arena_;
