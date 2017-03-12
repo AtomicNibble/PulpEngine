@@ -96,6 +96,12 @@ inline void FixedBitStreamBase::write(const T& val)
 	writeBits(reinterpret_cast<const Type*>(&val), sizeof(T) << 3);
 }
 
+template<>
+inline void FixedBitStreamBase::write(const bool& val)
+{
+	write(val);
+}
+
 // read the type * num from the stream.
 template<typename T>
 inline void FixedBitStreamBase::write(const T* pVal, size_type num)
