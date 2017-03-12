@@ -153,7 +153,7 @@ X_DECLARE_ENUM8(MessageID)(
 
 	// ----------------
 
-	SndReceiptAcket,
+	SndReceiptAcked,
 	SndReceiptLost,
 
 
