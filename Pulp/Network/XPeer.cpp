@@ -936,12 +936,17 @@ void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData&
 	// need to decide if i want to pass this back as up.
 	auto up = std::move(data.getUP());
 
+	// currently we only allow data to de returned that was allocated from the blockArena.
+	// this is so i don't need to pass arena back.
+	// and we know which arena to delete the data with when we get the packet back.
+	X_ASSERT(up.getArena() == &blockArena_, "Should be block arena")(up.getArena());
+
 	// want to take ownership of the data.
 	Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
 	pPacket->pData = up.release();
 	pPacket->bitLength = data.getNumbBits();
+	pPacket->length = safe_static_cast<uint32_t>(core::bitUtil::bitsToBytes(data.getNumbBits()));
 	pPacket->guid = rs.guid;
-
 
 	packetQue_.push(pPacket);
 }
