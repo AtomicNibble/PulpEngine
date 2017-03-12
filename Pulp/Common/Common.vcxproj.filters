@@ -1207,6 +1207,9 @@
     <ClInclude Include="Containers\PriorityQueue.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="NetMsgIds.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

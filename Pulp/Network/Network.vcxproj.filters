@@ -86,9 +86,6 @@
     <ClInclude Include="Util\LibaryStartup.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\MessageIds.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="Vars\NetVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>

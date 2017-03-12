@@ -25,6 +25,7 @@ typedef core::MemoryArena<
 extern NetworkArena* g_NetworkArena;
 
 #include <INetwork.h>
+#include <NetMsgIds.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -64,6 +65,5 @@ X_NAMESPACE_END
 #include "Util\SystemAdd.h"
 #include "Util\Constants.h"
 #include "Util\LastError.h"
-#include "Util\MessageIds.h"
 
 

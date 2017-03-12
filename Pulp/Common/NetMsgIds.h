@@ -170,7 +170,6 @@ X_DECLARE_ENUM8(MessageID)(
 	/// action: ignore
 	SendTest,
 
-
 	// ----- Nat ----- 
 
 	NatPunchthroughRequest,
@@ -179,6 +178,6 @@ X_DECLARE_ENUM8(MessageID)(
 	NatTypeDetectionRequest,
 	NatTypeDetectionResult
 
-);
+	);
 
 X_NAMESPACE_END
