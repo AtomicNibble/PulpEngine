@@ -773,7 +773,6 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 				const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
 				bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
 
-				pPacket->freeData();
 				freePacket(pPacket);
 			}
 			else if (result == ProcessResult::Swallowed)
@@ -1231,6 +1230,11 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 	dataOut.setdata(pPacket->pData, pPacket->dataBitLength, g_NetworkArena);
 	recivedPackets_.pop();
 
+	// release ownership...
+	pPacket->pData = nullptr;
+	pPacket->dataBitLength = 0;
+	X_ASSERT(pPacket->dataType != ReliablePacket::DataType::Ref, "Should not have refrenced data for recived packets")();
+
 	freePacket(pPacket);
 	return true;
 }
@@ -1330,6 +1334,7 @@ ReliablePacket* ReliabilityLayer::allocPacket(void)
 
 void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
 {
+	pPacket->freeData();
 	X_DELETE(pPacket, packetPool_);
 }
 
