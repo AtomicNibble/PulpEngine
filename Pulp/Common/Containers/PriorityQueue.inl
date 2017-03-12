@@ -74,6 +74,12 @@ void PriorityQueue<T, ContainerT, Pr>::pop(void)
 }
 
 template<typename T, class ContainerT, class Pr>
+typename PriorityQueue<T, ContainerT, Pr>::const_reference PriorityQueue<T, ContainerT, Pr>::peek(void) const
+{
+	return container_.front();
+}
+
+template<typename T, class ContainerT, class Pr>
 bool PriorityQueue<T, ContainerT, Pr>::isEmpty(void) const
 {
     return container_.isEmpty();
@@ -96,13 +102,6 @@ typename PriorityQueue<T, ContainerT, Pr>::size_type PriorityQueue<T, ContainerT
 {
 	return container_.capacity();
 }
-
-template<typename T, class ContainerT, class Pr>
-typename PriorityQueue<T, ContainerT, Pr>::const_reference PriorityQueue<T, ContainerT, Pr>::top(void) const
-{
-    return container_.front();
-}
-
 
 
 X_NAMESPACE_END

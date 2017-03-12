@@ -946,9 +946,9 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 
 				
 				auto orderedQueue = orderingQueues_[channel];
-				while (orderedQueue.isNotEmpty() && orderedQueue.top().pPacket->orderingIndex == orderedReadIndex_[channel])
+				while (orderedQueue.isNotEmpty() && orderedQueue.peek().pPacket->orderingIndex == orderedReadIndex_[channel])
 				{
-					auto* pBufferedPacket = orderedQueue.top().pPacket;
+					auto* pBufferedPacket = orderedQueue.peek().pPacket;
 					orderedQueue.pop();
 
 					if (pBufferedPacket->isSequenced())
