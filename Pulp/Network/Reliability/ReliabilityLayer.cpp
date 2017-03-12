@@ -347,7 +347,6 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	bs.readAligned(bits);
 
 	reliability = static_cast<PacketReliability::Enum>(rel);
-	dataBitLength = bits;
 
 	// reliable types.
 	if (reliability == PacketReliability::Reliable ||
@@ -402,7 +401,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	}
 
 	// check for corruption.
-	if (dataBitLength == 0 || reliability > PacketReliability::ENUM_COUNT || orderingChannel >= MAX_ORDERED_STREAMS)
+	if (bits == 0 || reliability > PacketReliability::ENUM_COUNT || orderingChannel >= MAX_ORDERED_STREAMS)
 	{
 		return false;
 	}
@@ -411,12 +410,14 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 		return false;
 	}
 
-	size_t dataByteLength = core::bitUtil::bitsToBytes(dataBitLength);
 
-	pData = X_NEW_ARRAY(uint8_t, dataByteLength, arena, "PacketBytes");
-	pData[dataByteLength - 1] = 0; // zero last bit, as we may not have full byte.
+	allocData(bits);
 
-	bs.readBitsAligned(pData, dataBitLength);
+	X_ASSERT(dataBitLength == bits, "bit count not set correct")(dataBitLength, bits);
+
+	pData[core::bitUtil::bitsToBytes(bits) - 1] = 0; // zero last bit, as we may not have full byte.
+
+	bs.readBitsAligned(pData, bits);
 	return true;
 }
 
@@ -1488,8 +1489,6 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 		pRebuiltPacket->dataType = ReliablePacket::DataType::Normal;
 		pRebuiltPacket->dataBitLength = safe_static_cast<BitSizeT>(totalBitLength);
 		pRebuiltPacket->allocData(totalBitLength);
-	//	pRebuiltPacket->pData = X_NEW_ARRAY_ALIGNED(uint8_t, core::bitUtil::bitsToBytes(totalBitLength), g_NetworkArena, "SplitPacketMergeBuf", 16);
-		pRebuiltPacket->pRefData = nullptr;
 
 		// copy pasta!
 		size_t dataBitOffset = 0;
