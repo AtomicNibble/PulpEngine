@@ -1189,6 +1189,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 		X_ASSERT(bs.size() == dataGramHdrSizeBits(), "Invalid size logic")(bs.size(), dataGramHdrSizeBits());
 
+		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Sending DataGram number: ^5%" PRIu16 "^7 numPackets: ^5%" PRIuS, dgh.number, end - begin);
+
 		DataGramHistory* pHistory = createDataGramHistory(dgh.number, time);
 
 		while (begin < end)
