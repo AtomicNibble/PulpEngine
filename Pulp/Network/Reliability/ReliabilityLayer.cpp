@@ -20,12 +20,12 @@ namespace
 	X_DECLARE_FLAGS(DatagramFlag) (
 		Ack,
 		Nack
-	);
+		);
 
 	typedef Flags<DatagramFlag> DatagramFlags;
 
 	X_PACK_PUSH(1)
-	struct DatagramHdr
+		struct DatagramHdr
 	{
 		void writeToBitStream(core::FixedBitStreamBase& bs) const;
 		void fromBitStream(core::FixedBitStreamBase& bs);
@@ -157,44 +157,44 @@ bool ReliablePacket::isReliable(void) const
 
 bool ReliablePacket::isAckRequired(void) const
 {
-    switch (reliability)
-    {
-        case PacketReliability::UnReliableWithAck:
-        case PacketReliability::ReliableWithAck:
-        case PacketReliability::ReliableOrderedWithAck:
-            return true;
+	switch (reliability)
+	{
+		case PacketReliability::UnReliableWithAck:
+		case PacketReliability::ReliableWithAck:
+		case PacketReliability::ReliableOrderedWithAck:
+			return true;
 
-        default:
-            return false;
-    }
+		default:
+			return false;
+	}
 }
 
 bool ReliablePacket::isOrderedOrSequenced(void) const
 {
-    switch (reliability)
-    {
-        case PacketReliability::UnReliableSequenced:
-        case PacketReliability::ReliableSequenced:
-        case PacketReliability::ReliableOrdered:
-        case PacketReliability::ReliableOrderedWithAck:
-            return true;
+	switch (reliability)
+	{
+		case PacketReliability::UnReliableSequenced:
+		case PacketReliability::ReliableSequenced:
+		case PacketReliability::ReliableOrdered:
+		case PacketReliability::ReliableOrderedWithAck:
+			return true;
 
-        default:
-            return false;
-    }
+		default:
+			return false;
+	}
 }
 
 bool ReliablePacket::isSequenced(void) const
 {
-    switch (reliability)
-    {
-        case PacketReliability::UnReliableSequenced:
-        case PacketReliability::ReliableSequenced:
-            return true;
+	switch (reliability)
+	{
+		case PacketReliability::UnReliableSequenced:
+		case PacketReliability::ReliableSequenced:
+			return true;
 
-        default:
-            return false;
-    }
+		default:
+			return false;
+	}
 }
 
 
@@ -265,24 +265,24 @@ constexpr size_t ReliablePacket::getMaxHeaderLengthBits(void)
 	return core::bitUtil::RoundUpToMultiple<size_t>(
 		core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT) +
 		core::bitUtil::bytesToBits(sizeof(uint16_t)) +
-		core::bitUtil::bytesToBits(sizeof(decltype(reliableMessageNumber))) + 
-		core::bitUtil::bytesToBits(sizeof(decltype(sequencingIndex))) + 
+		core::bitUtil::bytesToBits(sizeof(decltype(reliableMessageNumber))) +
+		core::bitUtil::bytesToBits(sizeof(decltype(sequencingIndex))) +
 		core::bitUtil::bytesToBits(sizeof(decltype(orderingIndex))) +
 		core::bitUtil::bytesToBits(sizeof(decltype(orderingChannel))) +
 		core::bitUtil::bytesToBits(sizeof(decltype(splitPacketId))) +
 		core::bitUtil::bytesToBits(sizeof(decltype(splitPacketIndex))) +
 		core::bitUtil::bytesToBits(sizeof(decltype(splitPacketCount))),
 		8
-	); 
+		);
 }
 
 void ReliablePacket::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
-    auto rel = reliabilityWithoutAck();
+	auto rel = reliabilityWithoutAck();
 
 	bs.writeBits(reinterpret_cast<const uint8_t*>(&rel), core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT));
 	bs.write<bool>(hasSplitPacket());
-	bs.writeAligned<uint16_t>(safe_static_cast<uint16_t>(dataBitLength)); 
+	bs.writeAligned<uint16_t>(safe_static_cast<uint16_t>(dataBitLength));
 
 	// reliable types.
 	if (reliability == PacketReliability::Reliable ||
@@ -376,11 +376,11 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	}
 	else
 	{
-		splitPacketCount = 0; 
+		splitPacketCount = 0;
 
 		// only the count is used to know if split, so set valeus on these to try detect incorrect usage.
 #if X_DEBUG
-		splitPacketId= std::numeric_limits<decltype(splitPacketIndex)>::max();
+		splitPacketId = std::numeric_limits<decltype(splitPacketIndex)>::max();
 		splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
 #endif
 	}
@@ -426,18 +426,18 @@ void ReliablePacket::assignPropertiesExcData(const ReliablePacket* pOth)
 
 PacketReliability::Enum ReliablePacket::reliabilityWithoutAck(void) const
 {
-    switch (reliability)         
-    {
-        case PacketReliability::UnReliableWithAck:
-            return PacketReliability::UnReliable;
-        case PacketReliability::ReliableWithAck:
-            return PacketReliability::Reliable;
-        case PacketReliability::ReliableOrderedWithAck:
-            return PacketReliability::ReliableOrdered;
+	switch (reliability)
+	{
+		case PacketReliability::UnReliableWithAck:
+			return PacketReliability::UnReliable;
+		case PacketReliability::ReliableWithAck:
+			return PacketReliability::Reliable;
+		case PacketReliability::ReliableOrderedWithAck:
+			return PacketReliability::ReliableOrdered;
 
-        default:
-            return reliability;
-    }
+		default:
+			return reliability;
+	}
 }
 
 
@@ -452,6 +452,8 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	recivedPackets_(arena),
 	dataGramHistory_(arena),
 	dataGramHistoryPopCnt_(0),
+	recivedPacketBaseIdx_(0),
+	recivedPacketQueue_(arena),
 	connectionDead_(false),
 	incomingAcks_(arena),
 	naks_(arena),
@@ -459,7 +461,12 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars, core::MemoryArenaBase* arena, 
 	reliableMessageNumberIdx_(0),
 	dagramSeqNumber_(0),
 	splitPacketId_(0),
-	bps_{ arena, arena, arena, arena, arena, arena, arena },
+	bps_{
+		X_PP_REPEAT_COMMA_SEP(7, arena)
+	},
+	orderingQueues_{
+		X_PP_REPEAT_COMMA_SEP(16, arena)
+	},
 	bytesInReSendBuffers_(0),
 	msgInReSendBuffers_(0),
 	splitPacketChannels_(arena)
@@ -548,9 +555,9 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 
 	auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
 
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "\"%s\" msg added. Pri: \"%s\" size: ^5%" PRIu32 "^7 numbits: ^5%" PRIu32, 
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "\"%s\" msg added. Pri: \"%s\" size: ^5%" PRIu32 "^7 numbits: ^5%" PRIu32,
 		PacketReliability::ToString(reliability), PacketPriority::ToString(priority), lengthBytes, lengthBits);
-	
+
 	// can this data fit in single packet?
 	const size_t maxDataSizeBytes = maxDataGramSize() - ReliablePacket::getMaxHeaderLength();
 	const bool splitRequired = lengthBytes > maxDataSizeBytes;
@@ -563,7 +570,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	pPacket->priority = priority;
 	pPacket->reliability = reliability;
 	pPacket->sendAttemps = 0;
-	
+
 	pPacket->dataBitLength = lengthBits;
 	pPacket->pData = X_NEW_ARRAY(uint8_t, lengthBytes, g_NetworkArena, "PacketBytes");
 
@@ -604,7 +611,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	}
 	else if (reliability == PacketReliability::ReliableOrdered || reliability == PacketReliability::ReliableOrderedWithAck)
 	{
-		pPacket->orderingChannel = orderingChannel; 
+		pPacket->orderingChannel = orderingChannel;
 		pPacket->orderingIndex = orderedWriteIndex_[orderingChannel]++;
 
 		sequencedWriteIndex_[orderingChannel] = 0;
@@ -615,7 +622,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 		pPacket->orderingIndex = std::numeric_limits<OrderingIndex>::max();
 		pPacket->sequencingIndex = std::numeric_limits<OrderingIndex>::max();
 	}
-	
+
 	bps_[NetStatistics::Metric::BytesPushed].add(time, lengthBytes);
 
 
@@ -754,9 +761,39 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 		// so we keep processing the bitStream untill it's empty.
 
 		ReliablePacket* pPacket = packetFromBS(bs, time);
+
+#if 1
 		while (pPacket)
 		{
-            X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
+			auto result = prcoessIncomingPacket(pPacket, time);
+			if (result == ProcessResult::Ok)
+			{
+				addPacketToRecivedQueue(pPacket, time);
+			}
+			else if (result == ProcessResult::Ignored)
+			{
+				const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+
+				bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+			}
+			else if (result == ProcessResult::Swallowed)
+			{
+				// do nothing..
+				// it was either pushed to the que for us
+				// OR is been buffred untill it's in order.
+			}
+			else
+			{
+				X_ASSERT_UNREACHABLE();
+			}
+
+			pPacket = packetFromBS(bs, time);
+		}
+
+#else
+		while (pPacket)
+		{
+			X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
 
 
 			// i don't trust you!
@@ -764,7 +801,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 
 			if (pPacket->isOrderedOrSequenced())
 			{
-				if (pPacket->orderingChannel > MAX_ORDERED_STREAMS)
+				if (pPacket->orderingChannel >= MAX_ORDERED_STREAMS)
 				{
 					// bitch who you think you are.
 					bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
@@ -772,93 +809,93 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 				}
 			}
 
-            if (pPacket->isReliable())
-            {
-                auto holeSize = (pPacket->reliableMessageNumber - recivedPacketBaseIdx_);
+			if (pPacket->isReliable())
+			{
+				auto holeSize = (pPacket->reliableMessageNumber - recivedPacketBaseIdx_);
 
-                if (holeSize == 0)
-                {
-                    // we expected this packet.
-                    ++recivedPacketBaseIdx_;
-                    // if we had a hole at start it's now filled.
-                    if (recivedPacketQueue_.isNotEmpty()) {
-                        recivedPacketQueue_.pop();
-                    }
-                }
-                // is negative?
-                else if(holeSize > std::numeric_limits<decltype(holeSize)>::max() / 2)
-                {
-                    // duplicate packet.
-                    bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
-
-                    
-                }
-                // reviced a packet that is higer than base, but lower than highest packet we seen.
-                else if (holeSize < recivedPacketQueue_.size())
-                {
-                    if(recivedPacketQueue_[holeSize])
-                    {
-                        // this hole is already filled so it's duplicate.
-                        bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+				if (holeSize == 0)
+				{
+					// we expected this packet.
+					++recivedPacketBaseIdx_;
+					// if we had a hole at start it's now filled.
+					if (recivedPacketQueue_.isNotEmpty()) {
+						recivedPacketQueue_.pop();
+					}
+				}
+				// is negative?
+				else if (holeSize > std::numeric_limits<decltype(holeSize)>::max() / 2)
+				{
+					// duplicate packet.
+					bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
 
 
-                    }
-
-                    recivedPacketQueue_[holeSize] = true;
-
-                }
-                else
-                {
-                    // we got a packet higer than base and higer than we seen before.
-                    // impose some sort of limit on max hole, otherwise memory for hole logic grow quite large.
-                    if (holeSize > REL_MAX_RECIVE_HOLE)
-                    {
-                        bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+				}
+				// reviced a packet that is higer than base, but lower than highest packet we seen.
+				else if (holeSize < recivedPacketQueue_.size())
+				{
+					if (recivedPacketQueue_[holeSize])
+					{
+						// this hole is already filled so it's duplicate.
+						bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
 
 
+					}
 
-                    }
-    
-                    // need to example the que so it's the size of new hole.
-                    // marking new ones as holes.
-                    while (holeSize > recivedPacketQueue_.size()) {
-                        recivedPacketQueue_.push(false);
-                    }
+					recivedPacketQueue_[holeSize] = true;
 
-                    // mark last one as got aka this packet.
-                    recivedPacketQueue_.push(true);
-
-                    X_ASSERT(recivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")();
-                }
-
-                // pop any complete ones from base, moving base index up.
-                while (recivedPacketQueue_.isNotEmpty() && recivedPacketQueue_.peek())
-                {
-                    recivedPacketQueue_.pop();
-                    ++recivedPacketBaseIdx_;
-                }
+				}
+				else
+				{
+					// we got a packet higer than base and higer than we seen before.
+					// impose some sort of limit on max hole, otherwise memory for hole logic grow quite large.
+					if (holeSize > REL_MAX_RECIVE_HOLE)
+					{
+						bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
 
 
-                if (recivedPackets_.capacity() > REL_RECIVE_HOLE_SHRINK_THRESHOLD)
-                {
-                    // regain some memory if we've just come out of a large hole.
-                    const auto unusedSpace = recivedPacketQueue_.capacity() - recivedPacketQueue_.size();
-                    if (unusedSpace > recivedPacketQueue_.size() * 4)
-                    {
-                        recivedPacketQueue_.shrinkToFit();
-                    }
-                }
-            }
+
+					}
+
+					// need to example the que so it's the size of new hole.
+					// marking new ones as holes.
+					while (holeSize > recivedPacketQueue_.size()) {
+						recivedPacketQueue_.push(false);
+					}
+
+					// mark last one as got aka this packet.
+					recivedPacketQueue_.push(true);
+
+					X_ASSERT(recivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")();
+				}
+
+				// pop any complete ones from base, moving base index up.
+				while (recivedPacketQueue_.isNotEmpty() && recivedPacketQueue_.peek())
+				{
+					recivedPacketQueue_.pop();
+					++recivedPacketBaseIdx_;
+				}
+
+
+				if (recivedPackets_.capacity() > REL_RECIVE_HOLE_SHRINK_THRESHOLD)
+				{
+					// regain some memory if we've just come out of a large hole.
+					const auto unusedSpace = recivedPacketQueue_.capacity() - recivedPacketQueue_.size();
+					if (unusedSpace > recivedPacketQueue_.size() * 4)
+					{
+						recivedPacketQueue_.shrinkToFit();
+					}
+				}
+			}
 
 
 			if (pPacket->hasSplitPacket())
 			{
 				// we need to keep track of these untill we have all the packets 
 				pPacket = addIncomingSplitPacket(pPacket, time);
-				if(!pPacket)
+				if (!pPacket)
 				{
 					// still more packets.
-                    // so i want to report split parts as processed?
+					// so i want to report split parts as processed?
 					goto readNextPacket;
 				}
 
@@ -867,59 +904,120 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			}
 
 
-            if (pPacket->isOrderedOrSequenced())
-            {
+			if (pPacket->isOrderedOrSequenced())
+			{
+				const auto channel = pPacket->orderingChannel;
 
-                if (pPacket->orderingIndex == orderedReadIndex_[pPacket->orderingChannel])
-                {
-                    // ordered / sequenced handling for when ordering index matches expected.
-                    if (pPacket->isSequenced())
-                    {
-                        // we ignore any packets that are older than we have seen.
-                        if (isOlderPacket(pPacket->sequencingIndex, highestSequencedReadIndex_[pPacket->orderingChannel]))
-                        {
-                            // ignore.
-                            bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+				if (pPacket->orderingIndex == orderedReadIndex_[channel])
+				{
+					// ordered / sequenced handling for when ordering index matches expected.
+					if (pPacket->isSequenced())
+					{
+						// we ignore any packets that are older than we have seen.
+						if (isOlderPacket(pPacket->sequencingIndex, highestSequencedReadIndex_[channel]))
+						{
+							// ignore.
+							bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+
+						}
+
+						highestSequencedReadIndex_[channel] = pPacket->sequencingIndex + 1;
+					}
+					else // ordered.
+					{
+						// this packet is allowed to be sent to user.
+						recivedPackets_.push(pPacket);
+
+						++orderedReadIndex_[channel];
+						highestSequencedReadIndex_[channel] = 0; // when we move ordering index, sequenced is reset.
+
+						// we will now pop of any packets.
+						// it will be all sequenced packets for current channel.
+						// then a ordered channel.
+						// then all sequenced packets for ordering channel + 1
+						// etc..
+						auto orderedQueue = orderingQueues_[channel];
+						while (orderedQueue.isNotEmpty() && orderedQueue.top().pPacket->orderingIndex == orderedReadIndex_[channel])
+						{
+							auto* pBufferedPacket = orderedQueue.top().pPacket;
+							orderedQueue.pop();
+
+							const size_t bufferdPacketByteLength = core::bitUtil::bitsToBytes(pBufferedPacket->dataBitLength);
+							bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, bufferdPacketByteLength);
+
+							if (pBufferedPacket->isSequenced())
+							{
+								highestSequencedReadIndex_[channel] = pBufferedPacket->sequencingIndex;
+							}
+							else
+							{
+								++orderedReadIndex_[channel];
+							}
+
+							recivedPackets_.push(pBufferedPacket);
+						}
+
+						// done...
+
+					}
+				}
+				else if (!isOlderPacket(pPacket->orderingIndex, orderedReadIndex_[channel]))
+				{
+					// this packet comes later than the one we want next.
+					// so store it untill we can post them in order.
+					// for sequenced we only drop older packets than we have sent back to user
+					// so need to buffer them also so that once we get expected sequenced one we can replay buffered just like ordered.
+					// since all the sequenced index are relative to orderedIndx and we are here.
+					// it means the packet can't be replayed untill we have moved up to that orderingIndex.
+					// so we want the que to be in following layout:
+					// orderIndex: 1
+					//  sequenceIndex: 1
+					//  sequenceIndex: 2
+					//  sequenceIndex: 3
+					// orderIndex: 2
+					//  sequenceIndex: 1
+					//  sequenceIndex: 2
+					//  sequenceIndex: 3
+					// 
+					// the only problem with this is we must revice the next ordered packet before all the buffered sequenced can be released.
+					// which in pratice should be okay. since you should of sent that oreded packet before or with any sequenced that rely on it.
+					// so we only end up here for sequenced if the ordered packet was lost or going to appear later.
+
+					auto orderedQueue = orderingQueues_[channel];
+					if (orderedQueue.isEmpty()) {
+						orderingQueueIndexOffset_[channel] = orderedReadIndex_[channel];
+					}
+
+					// work out how many 
+					const WeightType orderChanelSpacing = std::numeric_limits<WeightType>::max() / std::numeric_limits<OrderingIndex>::max();
+					static_assert(orderChanelSpacing > std::numeric_limits<OrderingIndex>::max(), "Can't store max potentially sequences between ordered.");
+
+					WeightType orderedHoleCount = pPacket->orderingIndex - orderingQueueIndexOffset_[channel];
+					WeightType weight = orderedHoleCount * orderChanelSpacing;
+
+					if (pPacket->isSequenced())
+					{
+						weight += pPacket->sequencingIndex;
+					}
+					else
+					{
+						// this comes out after all the sequenced ones on this channel.
+						weight += (orderChanelSpacing - 1);
+					}
+
+					orderedQueue.emplace(weight, pPacket);
+				}
+				else
+				{
+					// this packet is older than what we expecting
+					// must of been resent.
+					// we can ignore it.
+					bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
 
 
-                        }
+				}
 
-                        
-                        highestSequencedReadIndex_[pPacket->orderingChannel] = pPacket->sequencingIndex + 1;
-                    }
-                    else // ordered.
-                    {
-                        // this packet is allowed to be sent to user.
-
-
-                        ++orderedReadIndex_[pPacket->orderingChannel];
-
-                        // now we need to see if we have any buffered for this channel that continue the order.
-                        // they can now go out.
-
-
-                    }
-                }
-                else if (!isOlderPacket(pPacket->orderingIndex, orderedReadIndex_[pPacket->orderingChannel]))
-                {
-                    // this packet comes later than the one we want next.
-                    // so store it untill we can post them in order.
-                    // for sequenced we only drop older packets than we have sent back to user
-                    // so need to buffer them also so that once we get expected sequenced one we can replay buffered just like ordered.
-
-
-                }
-                else
-                {
-                    // this packet is older than what we expecting
-                    // must of been resent.
-                    // we can ignore it.
-                    bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
-
-
-                }
-
-            }
+			}
 
 
 			bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, packetDataByteLength);
@@ -929,11 +1027,201 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 		readNextPacket:
 			pPacket = packetFromBS(bs, time);
 		}
+#endif
 
 		X_ASSERT(bs.isEos(), "Unprocessed bytes")(bs.isEos(), bs.size(), bs.capacity());
 	}
 
 	return true;
+}
+
+ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time)
+{
+	X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
+
+	// i don't trust you!
+	const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+
+	// if ordered range check channel to prevent a crash.
+	if (pPacket->isOrderedOrSequenced())
+	{
+		if (pPacket->orderingChannel >= MAX_ORDERED_STREAMS)
+		{
+			// bitch who you think you are.
+			return ProcessResult::Ignored;
+		}
+	}
+
+	if (pPacket->isReliable())
+	{
+		auto holeSize = (pPacket->reliableMessageNumber - recivedPacketBaseIdx_);
+
+		if (holeSize == 0)
+		{
+			// we expected this packet.
+			++recivedPacketBaseIdx_;
+			// if we had a hole at start it's now filled.
+			if (recivedPacketQueue_.isNotEmpty()) {
+				recivedPacketQueue_.pop();
+			}
+		}
+		else if (holeSize > std::numeric_limits<decltype(holeSize)>::max() / 2) // is negative?
+		{
+			// duplicate packet.
+			return ProcessResult::Ignored;
+		}
+		else if (holeSize < recivedPacketQueue_.size()) // reviced a packet that is higer than base, but lower than highest packet we seen.
+		{
+			if (recivedPacketQueue_[holeSize])
+			{
+				// this hole is already filled so it's duplicate.
+				return ProcessResult::Ignored;
+			}
+
+			recivedPacketQueue_[holeSize] = true;
+		}
+		else
+		{
+			// we got a packet higer than base and higer than we seen before.
+			// impose some sort of limit on max hole, otherwise memory for hole logic grow quite large.
+			if (holeSize > REL_MAX_RECIVE_HOLE)
+			{
+				return ProcessResult::Ignored;
+			}
+
+			// need to example the que so it's the size of new hole.
+			// marking new ones as holes.
+			while (holeSize > recivedPacketQueue_.size()) {
+				recivedPacketQueue_.push(false);
+			}
+
+			// mark last one as got aka this packet.
+			recivedPacketQueue_.push(true);
+
+			X_ASSERT(recivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")();
+		}
+
+		// pop any complete ones from base, moving base index up.
+		while (recivedPacketQueue_.isNotEmpty() && recivedPacketQueue_.peek())
+		{
+			recivedPacketQueue_.pop();
+			++recivedPacketBaseIdx_;
+		}
+
+		if (recivedPacketQueue_.capacity() > REL_RECIVE_HOLE_SHRINK_THRESHOLD)
+		{
+			// regain some memory if we've just come out of a large hole.
+			const auto unusedSpace = recivedPacketQueue_.capacity() - recivedPacketQueue_.size();
+			if (unusedSpace > recivedPacketQueue_.size() * 4)
+			{
+				recivedPacketQueue_.shrinkToFit();
+			}
+		}
+	}
+
+
+	if (pPacket->hasSplitPacket())
+	{
+		// we need to keep track of these untill we have all the packets 
+		pPacket = addIncomingSplitPacket(pPacket, time);
+		if (!pPacket)
+		{
+			// still more packets.
+			return ProcessResult::Swallowed;
+		}
+
+		// if here we have a split packets that's been rebuilt into original packet.
+		// all split packets should of been cleaned up and data copyied into this new packet.
+		addPacketToRecivedQueue(pPacket, time);
+		return ProcessResult::Swallowed;
+	}
+
+	if (pPacket->isOrderedOrSequenced())
+	{
+		const auto channel = pPacket->orderingChannel;
+
+		if (pPacket->orderingIndex == orderedReadIndex_[channel])
+		{
+			// ordered / sequenced handling for when ordering index matches expected.
+			if (pPacket->isSequenced())
+			{
+				// we ignore any packets that are older than we have seen.
+				if (isOlderPacket(pPacket->sequencingIndex, highestSequencedReadIndex_[channel]))
+				{
+					return ProcessResult::Ignored;
+				}
+
+				highestSequencedReadIndex_[channel] = pPacket->sequencingIndex + 1;
+			}
+			else // ordered.
+			{
+				// this packet is allowed to be sent to user.
+				addPacketToRecivedQueue(pPacket, time);
+
+				++orderedReadIndex_[channel];
+				highestSequencedReadIndex_[channel] = 0; // when we move ordering index, sequenced is reset.
+
+				
+				auto orderedQueue = orderingQueues_[channel];
+				while (orderedQueue.isNotEmpty() && orderedQueue.top().pPacket->orderingIndex == orderedReadIndex_[channel])
+				{
+					auto* pBufferedPacket = orderedQueue.top().pPacket;
+					orderedQueue.pop();
+
+					if (pBufferedPacket->isSequenced())
+					{
+						highestSequencedReadIndex_[channel] = pBufferedPacket->sequencingIndex;
+					}
+					else
+					{
+						++orderedReadIndex_[channel];
+					}
+
+					addPacketToRecivedQueue(pBufferedPacket, time);
+				}
+
+				// done...
+				return ProcessResult::Swallowed;
+			}
+		}
+		else if (!isOlderPacket(pPacket->orderingIndex, orderedReadIndex_[channel]))
+		{
+			// this packet comes later than the one we want next.
+			// so store it untill we can post them in order.
+
+			auto orderedQueue = orderingQueues_[channel];
+			if (orderedQueue.isEmpty()) {
+				orderingQueueIndexOffset_[channel] = orderedReadIndex_[channel];
+			}
+
+			// work out how many 
+			const WeightType orderChanelSpacing = std::numeric_limits<WeightType>::max() / std::numeric_limits<OrderingIndex>::max();
+			static_assert(orderChanelSpacing > std::numeric_limits<OrderingIndex>::max(), "Can't store max potentially sequences between ordered.");
+
+			WeightType orderedHoleCount = pPacket->orderingIndex - orderingQueueIndexOffset_[channel];
+			WeightType weight = orderedHoleCount * orderChanelSpacing;
+
+			if (pPacket->isSequenced())
+			{
+				weight += pPacket->sequencingIndex;
+			}
+			else
+			{
+				// this comes out after all the sequenced ones on this channel.
+				weight += (orderChanelSpacing - 1);
+			}
+
+			orderedQueue.emplace(weight, pPacket);
+		}
+		else
+		{
+			// this packet is older than what we expecting
+			// we can ignore it.
+			return ProcessResult::Ignored;
+		}
+	}
+
+	return ProcessResult::Ok;
 }
 
 void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
@@ -1003,7 +1291,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 				// so the list stays sorted based on action time.
 				movePacketToTailOfResendList(pPacket);
 
-				X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resending packet: ^5%" PRIu32 "^7 attemp: ^5%" PRIu8, 
+				X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resending packet: ^5%" PRIu32 "^7 attemp: ^5%" PRIu8,
 					pPacket->reliableMessageNumber, pPacket->sendAttemps);
 
 				// resending.
@@ -1111,6 +1399,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		}
 	}
 
+	// dispatch all the datagrams. (if any)
 	for (size_t i = 0; i < packetsThisFrameBoundaries.size(); i++)
 	{
 		size_t begin, end;
@@ -1187,7 +1476,7 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
 bool ReliabilityLayer::hasTimedOut(core::TimeVal time)
 {
 	core::TimeVal elapsed = time - timeLastDatagramArrived_;
-	
+
 	if (elapsed > core::TimeVal::fromMS(vars_.defaultTimeoutMS()))
 	{
 		return true;
@@ -1293,7 +1582,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 	pPacket->splitPacketCount = safe_static_cast<SplitPacketIndex>(1 + ((maxDataSizeBytes - 1) / lengthBytes));
 
 	core::HumanSize::Str sizeBuf;
-	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitting packet of size %s into ^5%" PRIu16 "^7 packets", 
+	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitting packet of size %s into ^5%" PRIu16 "^7 packets",
 		core::HumanSize::toString(sizeBuf, core::bitUtil::bitsToBytes(pPacket->dataBitLength)), pPacket->splitPacketCount);
 
 	core::StopWatch timer;
@@ -1309,7 +1598,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 
 	for (SplitPacketIndex packetIdx = 0; packetIdx < pPacket->splitPacketCount; packetIdx++)
 	{
-		ReliablePacket* pSplitPacket = allocPacket();	
+		ReliablePacket* pSplitPacket = allocPacket();
 		pSplitPacket->assignPropertiesExcData(pPacket);
 		// some overrides
 		pSplitPacket->sendAttemps = 0;
@@ -1347,7 +1636,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 		bytesInSendBuffers_[priority] += core::bitUtil::bitsToBytes(pSplitPacket->dataBitLength);
 	}
 
-	
+
 	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitpacket took: ^5%gms", timer.GetMilliSeconds());
 
 	// we don't need this packt anymore.
@@ -1362,8 +1651,8 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 
 	auto channelIt = splitPacketChannels_.findSortedKey(splitId,
 		[](const SplitPacketChannel* pB, const SplitPacketId& splitId) -> bool {
-			return pB->splitId < splitId;
-		}
+		return pB->splitId < splitId;
+	}
 	);
 
 	SplitPacketChannel* pChannel = nullptr;
@@ -1389,7 +1678,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 	++pChannel->packetsRecived;
 	pChannel->lastUpdate = time;
 	pChannel->packets[pPacket->splitPacketIndex] = pPacket;
-	
+
 	// are we complete? turing :D
 	if (pChannel->haveAllPackets())
 	{
@@ -1422,6 +1711,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 
 		for (auto* p : packets)
 		{
+			p->freeData();
 			freePacket(p);
 		}
 
@@ -1429,7 +1719,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 		splitPacketChannels_.erase(channelIt);
 		return pRebuiltPacket;
 	}
-	
+
 
 	// report some sort of progress?
 	{
@@ -1520,7 +1810,7 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 	}
 	else
 	{
-		X_WARNING("NetRel", "Failed to packet from resend buffer for removal msgIdx: %" PRIu16 " bufIdx: %" PRIuS, 
+		X_WARNING("NetRel", "Failed to packet from resend buffer for removal msgIdx: %" PRIu16 " bufIdx: %" PRIuS,
 			msgNum, resendBufIdx);
 	}
 }

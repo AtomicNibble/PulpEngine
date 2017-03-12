@@ -3,11 +3,14 @@
 #include "Util\BPSTracker.h"
 #include "Util\RangeList.h"
 
+#include <Containers\Array.h>
 #include <Containers\Fifo.h>
 #include <Containers\FixedFifo.h>
 #include <Containers\LinkedListIntrusive.h>
+#include <Containers\PriorityQueue.h>
 
 #include <Util\ReferenceCounted.h>
+
 
 X_NAMESPACE_BEGIN(net)
 
@@ -136,9 +139,38 @@ class ReliabilityLayer
 {
 	typedef std::array<OrderingIndex, MAX_ORDERED_STREAMS> OrdereIndexArr;
 	typedef std::array<ReliablePacket*, REL_RESEND_BUF_LENGTH> ResendArr;
-	typedef core::Fifo<DataGramHistory> DataGramHistoryQeue;
+    typedef core::Fifo<DataGramHistory> DataGramHistoryQeue;
+    typedef core::Fifo<bool> BoolQeue;
 	typedef core::Fifo<ReliablePacket*> PacketQeue;
 	typedef core::Array<SplitPacketChannel*> SplitPacketChannelArr;
+
+    typedef uint64_t WeightType;
+
+    struct PacketWithWeight
+    {
+        PacketWithWeight(WeightType wht, ReliablePacket* pPacket) :
+            weight(wht),
+            pPacket(pPacket)
+        {
+        }
+
+        bool operator<(const PacketWithWeight& rhs) const {
+            return weight < rhs.weight;
+        }
+
+        WeightType weight;
+        ReliablePacket* pPacket;
+    };
+
+    typedef core::PriorityQueue<PacketWithWeight, core::Array<PacketWithWeight>> OrderedPacketQueue;
+    typedef std::array<OrderedPacketQueue, MAX_ORDERED_STREAMS> OrderedPacketQueues;
+
+	X_DECLARE_ENUM(ProcessResult)(
+		Ok,
+		Ignored,
+		Swallowed
+	);
+
 
 public:
 	struct PacketData
@@ -201,6 +233,9 @@ public:
 	X_INLINE bool isConnectionDead(void) const;
 	X_INLINE void killConnection(void);
 
+private:
+	ProcessResult::Enum prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time);
+	X_INLINE void addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time);
 
 private:
 	X_INLINE void addAck(DataGramSequenceNumber messageNumber);
@@ -243,6 +278,8 @@ private:
 
 	INTRUSIVE_LIST_DECLARE(ReliablePacket, reliableLink) resendList_;
 
+	X_INLINE bool isOlderPacket(OrderingIndex packetIdx, OrderingIndex currentIdx);
+
 private:
 	NetVars& vars_;
 
@@ -255,14 +292,18 @@ private:
 	core::TimeVal lastBSPUpdate_;
 
 	OrdereIndexArr orderedWriteIndex_;				// inc for every ordered msg sent
-	OrdereIndexArr sequencedWriteIndex_;			// inc for every sequenced msg sent
+	OrdereIndexArr sequencedWriteIndex_;			// inc for every sequenced msg sent, reset if orderedWriteIndex_ changes.
 	OrdereIndexArr orderedReadIndex_;				// next 'expected' ordered index
-	OrdereIndexArr highestSequencedReadIndex_;		// higest value received for sequencedWriteIndex
+	OrdereIndexArr highestSequencedReadIndex_;		// higest value received for sequencedWriteIndex, for current orderedReadIndex_.
+	OrdereIndexArr orderingQueueIndexOffset_;		// used to make relative weights.
+	OrderedPacketQueues orderingQueues_; // used for storing out of order packets.
 
 	PacketQeue outGoingPackets_;
 	PacketQeue recivedPackets_;
 	DataGramHistoryQeue dataGramHistory_;
 	DataGramSequenceNumber dataGramHistoryPopCnt_;
+	DataGramSequenceNumber recivedPacketBaseIdx_; // the number we are expecting and 
+	BoolQeue recivedPacketQueue_;
 
 	DataGramNumberRangeList incomingAcks_;
 	DataGramNumberRangeList naks_;

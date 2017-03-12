@@ -112,4 +112,46 @@ X_INLINE bool ReliabilityLayer::isResendListEmpty(void) const
 	return resendList_.isEmpty();
 }
 
+X_INLINE bool ReliabilityLayer::isOlderPacket(OrderingIndex packetIdx, OrderingIndex currentIdx)
+{
+    const auto rangeMax = std::numeric_limits<OrderingIndex>::max();
+    const auto rangeHalf = std::numeric_limits<OrderingIndex>::max() / 2;
+
+    // takes into account wrap around.
+    // so once current is above hald type range.
+    // packetIdx must be higer than current in order to be older.
+
+    if (currentIdx > rangeHalf)
+    {
+        const auto shiftedCurrent = currentIdx - (rangeHalf + 1);
+
+        if (packetIdx < currentIdx && packetIdx >= shiftedCurrent)
+        {
+            return true;
+        }
+    }
+    else
+    {
+        const auto shiftedCurrent = currentIdx - (rangeHalf + 1);
+
+        if (packetIdx < currentIdx || packetIdx >= shiftedCurrent)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+X_INLINE void ReliabilityLayer::addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time)
+{
+	const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+	bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, byteLength);
+
+	recivedPackets_.push(pPacket);
+}
+
+
+
 X_NAMESPACE_END
