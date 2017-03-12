@@ -86,6 +86,7 @@ ReliablePacket::ReliablePacket()
 
 	// leave pri / rel unassigned.
 	sendAttemps = 0;
+	sendReceipt = 0;
 
 	orderingChannel = 0;
 	splitPacketId = 0;
@@ -570,6 +571,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	pPacket->priority = priority;
 	pPacket->reliability = reliability;
 	pPacket->sendAttemps = 0;
+	pPacket->sendReceipt = receipt;
 
 	pPacket->dataBitLength = lengthBits;
 	pPacket->pData = X_NEW_ARRAY(uint8_t, lengthBytes, g_NetworkArena, "PacketBytes");

@@ -92,6 +92,7 @@ public:
 	PacketReliability::Enum reliability;
 	PacketPriority::Enum priority;
 	uint8_t sendAttemps;
+	uint32_t sendReceipt;
 
 	uint8_t orderingChannel;
 	SplitPacketId splitPacketId;
