@@ -63,8 +63,9 @@ namespace
 
 	static const size_t POOL2_ALLOCATION_SIZE = sizeof(ReliablePacket);
 	static const size_t POOL2_ALLOCATION_ALIGN = X_ALIGN_OF(ReliablePacket);
-	static const size_t MAX_INTERNAL_PACKET = 8096;
+	static const size_t POOL2_ALLOC_MAX = 8096;
 
+	static const size_t POOL_ALLOC_MAX = 2048; // packets and buffered commands
 	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
 	static const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
 
@@ -207,7 +208,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	poolHeap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
-			PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * MAX_POOL_ALLOC,
+			PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * POOL_ALLOC_MAX,
 			core::VirtualMem::GetPageSize()
 		)
 	),
@@ -219,7 +220,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	poolArena_(&poolAllocator_, "PoolArena"),
 	pool2Heap_(
 		core::bitUtil::RoundUpToMultiple<size_t>(
-			PoolArena::getMemoryRequirement(POOL2_ALLOCATION_SIZE) * MAX_INTERNAL_PACKET,
+			PoolArena::getMemoryRequirement(POOL2_ALLOCATION_SIZE) * POOL2_ALLOC_MAX,
 			core::VirtualMem::GetPageSize()
 		)
 	),
