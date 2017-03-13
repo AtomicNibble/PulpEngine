@@ -36,6 +36,8 @@ public:
 	bool push_unique_if(T const& value, UnaryPredicate p);
 
 	bool tryPop(T& value);
+	template<class CallBack>
+	bool tryPopAll(CallBack func);
 
 	size_type size(void) const;
 	bool isEmpty(void) const;

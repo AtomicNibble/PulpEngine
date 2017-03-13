@@ -84,6 +84,24 @@ bool ThreadQue<T, SynchronizationPrimitive>::tryPop(T& value)
 }
 
 template<typename T, typename SynchronizationPrimitive>
+template<class CallBack>
+bool ThreadQue<T, SynchronizationPrimitive>::tryPopAll(CallBack func)
+{
+	SynchronizationPrimitive::ScopedLock lock(primitive_);
+
+	if (que_.isEmpty()) {
+		return false;
+	}
+
+	while (!que_.isEmpty()) {
+		func(que_.peek());
+		que_.pop();
+	}
+	return true;
+}
+
+
+template<typename T, typename SynchronizationPrimitive>
 size_t ThreadQue<T, SynchronizationPrimitive>::size(void) const
 {
 	return que_.size();
