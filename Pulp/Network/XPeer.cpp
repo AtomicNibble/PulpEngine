@@ -2583,6 +2583,7 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 		}
 	}
 
+	freeRecvData(pData);
 	return core::Thread::ReturnValue(0);
 }
 
