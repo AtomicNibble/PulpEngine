@@ -253,7 +253,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 
 XPeer::~XPeer()
 {
-
+	shutdown(core::TimeVal(0ll));
 }
 
 StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
