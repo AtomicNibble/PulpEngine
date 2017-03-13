@@ -483,7 +483,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
 	if (std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc) != connectionReqs_.end()) {
-		X_DELETE(pConReq, arena_);
+		freeConnectionRequest(pConReq);
 		return ConnectionAttemptResult::AlreadyInProgress;
 	}
 
