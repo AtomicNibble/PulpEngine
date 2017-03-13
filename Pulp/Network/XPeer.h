@@ -425,7 +425,7 @@ private:
 	core::GrowingBlockAllocator blockAlloc_;
 	BlockAlocArena		blockArena_;
 
-	PasswordStr password_;
+	PasswordStr password_; // 12345
 };
 
 
