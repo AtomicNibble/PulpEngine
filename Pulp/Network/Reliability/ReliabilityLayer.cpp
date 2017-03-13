@@ -536,11 +536,13 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 	sequencedWriteIndex_.fill(0);
 	orderedReadIndex_.fill(0);
 	highestSequencedReadIndex_.fill(0);
+	orderingQueueIndexOffset_.fill(0);
 
 	outGoingPackets_.clear();
 	recivedPackets_.clear();
 	dataGramHistory_.clear();
 	dataGramHistoryPopCnt_ = 0;
+	recivedPacketBaseIdx_ = 0;
 
 	incomingAcks_.clear();
 	naks_.clear();
@@ -548,6 +550,7 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 
 	reliableMessageNumberIdx_ = 0;
 	dagramSeqNumber_ = 0;
+	splitPacketId_ = 0;
 
 	connectionDead_ = false;
 
