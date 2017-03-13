@@ -7,7 +7,7 @@
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Memory\HeapArea.h>
-
+#include <Hashing\sha1.h>
 #include <Time\TimeStamp.h>
 
 #include "Sockets\Socket.h"
@@ -118,6 +118,8 @@ public:
 	NetSocket* pNetSocket;
 
 	ReliabilityLayer relLayer;
+
+	core::Hash::SHA1Digest nonce;
 };
 
 struct RequestConnection

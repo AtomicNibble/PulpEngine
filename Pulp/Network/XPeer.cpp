@@ -6,6 +6,7 @@
 #include <Memory\VirtualMem.h>
 #include <String\HumanDuration.h>
 #include <String\HumanSize.h>
+#include <Random\MultiplyWithCarry.h>
 #include <ITimer.h>
 
 #include "Sockets\Socket.h"
@@ -2036,6 +2037,17 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 				bsOut.write(guid_);
 				bsOut.write(pData->systemAdd);
 				bsOut.write<uint16_t>(mtu);
+
+				// generate a nonce, for password if requried.
+				core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+				core::Hash::SHA1 hash;
+				hash.update(timeNow);
+				for (size_t i = 0; i < 16; i++) {
+					hash.update(core::random::MultiplyWithCarry());
+				}
+				pRemoteSys->nonce = hash.finalize();
+
+				bsOut.write(pRemoteSys->nonce);
 			}
 		}
 	}
@@ -2053,10 +2065,12 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 	SystemAdd bindingAdd;
 	NetGUID clientGuid;
 	uint16_t mtu;
+	core::Hash::SHA1Digest nonce;
 
 	bs.read(clientGuid);
 	bs.read(bindingAdd);
 	bs.read(mtu);
+	bs.read(nonce);
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection response2");
 
@@ -2090,6 +2104,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 					if (pReq->password.isNotEmpty()) 
 					{
 						core::Hash::SHA1 hash;
+						hash.update(nonce);
 						hash.update(pReq->password.c_str(), pReq->password.length());
 						auto digest = hash.finalize();
 
@@ -2219,6 +2234,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	if (password_.isNotEmpty() || invalidPassord)
 	{
 		core::Hash::SHA1 hash;
+		hash.update(rs.nonce);
 		hash.update(password_.c_str(), password_.length());
 		auto serverPassDigest = hash.finalize();
 
