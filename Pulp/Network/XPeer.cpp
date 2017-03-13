@@ -382,6 +382,56 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 	PacketPriority::Enum disconnectionNotificationPriority)
 {
 
+	for (auto& socketThread : socketThreads_) {
+		socketThread.Stop();
+	}
+
+	for (size_t i = 0; i < socketThreads_.size(); i++)
+	{
+		auto& socket = sockets_[i];
+		auto& socketThread = socketThreads_[i];
+
+		if (!socketThread.HasFinished())
+		{
+			if (socket.sendSendTest()) {
+				socketThread.Join();
+			}
+			else {
+				// if the send test failed potentially the thread won't join.
+
+			}
+		}
+	}
+
+	sockets_.clear();
+	socketThreads_.clear();
+
+	{
+		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+		for (auto* pConReq : connectionReqs_) {
+			freeConnectionRequest(pConReq);
+		}
+	}
+	
+	for (auto& rs : remoteSystems_) {
+		rs.postDisconnect();
+		rs.relLayer.free();
+	}
+
+	bufferdCmds_.tryPopAll([&](BufferdCommand* pCmd) {
+		freeBufferdCmd(pCmd);
+	});
+
+	packetQue_.tryPopAll([&](Packet* pPacket) {
+		freePacket(pPacket);
+	});
+
+	recvDataQue_.tryPopAll([&](RecvData* pData) {
+		freeRecvData(pData);
+	});
+
+	ipList_.clear();
+	sendReceiptSerial_ = 0;
 }
 
 
