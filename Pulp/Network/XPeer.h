@@ -291,6 +291,9 @@ private:
 	void sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate);
 	void closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
 		bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
+	void notifyAndFlagForShutdown(RemoteSystem& rs, bool performImmediate, 
+		uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
+	
 
 	void processBufferdCommand(BufferdCommand& cmd);
 

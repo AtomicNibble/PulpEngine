@@ -381,6 +381,61 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 	PacketPriority::Enum disconnectionNotificationPriority)
 {
+	X_LOG0("Net", "Shutting down peer");
+
+	if (blockDuration.GetValue() > 0)
+	{
+		bool anyActive = false;
+
+		for (auto& rs : remoteSystems_)
+		{
+			if (rs.isActive) {
+				notifyAndFlagForShutdown(rs, true, orderingChannel, disconnectionNotificationPriority);
+				anyActive |= true;
+			}
+		}
+
+		if (anyActive)
+		{
+			// send out the packets.
+			core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+			peerReliabilityTick(updateBS);
+
+			// scale so if block is low we don't sleep much
+			auto sleepTime = safe_static_cast<uint32_t>(core::Max(blockDuration.GetMilliSecondsAsInt64() / 100, 1ll));
+			sleepTime = core::Min(50u, sleepTime);
+
+			// spin till all closed or timeout.
+			auto timeNow = gEnv->pTimer->GetTimeNowReal();
+			auto startTime = timeNow;
+			while (blockDuration > (timeNow - startTime))
+			{
+				anyActive = false;
+				for (auto& rs : remoteSystems_) {
+					anyActive |= rs.isActive;
+				}
+
+				if (!anyActive) {
+					break;
+				}
+
+				updateBS.reset();
+				peerReliabilityTick(updateBS);
+
+				core::Thread::Sleep(sleepTime);
+
+				timeNow = gEnv->pTimer->GetTimeNowReal();
+			}
+
+			if (anyActive) {
+				X_WARNING("Net", "Timed out waiting for disconnect notification dispatch.");
+			}
+			else {
+				X_LOG0_IF(vars_.debugEnabled(), "Net", "All disconnect notifications, dispatched.");
+			}
+		}
+	}
+
 
 	for (auto& socketThread : socketThreads_) {
 		socketThread.Stop();
@@ -713,10 +768,15 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
 	bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
+	RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, true);
+	if (!pRemoteSys) {
+		X_ERROR("Net", "Failed to find remote system for connection close.");
+		return;
+	}
 
 	if (sendDisconnectionNotification)
 	{
-
+		notifyAndFlagForShutdown(*pRemoteSys, performImmediate, orderingChannel, notificationPriority);
 		return;
 	}
 
@@ -730,13 +790,45 @@ void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool 
 		return;
 	}
 
-	RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, true);
-	if (!pRemoteSys) {
-
-		return;
-	}
-
 	pRemoteSys->disconnect();
+}
+
+void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, bool imediate,
+	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
+{
+	IPStr ipStr;
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "sending disconnectNotification to remoteSystem: \"%s\"", rs.systemAddress.toString(ipStr));
+
+	core::FixedBitStream<core::FixedBitStreamStackPolicy<16>> bsOut;
+	bsOut.write(MessageID::DisconnectNotification);
+
+	core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
+
+	if (imediate) {
+		sendImmediate(
+			bsOut,
+			PacketPriority::Immediate,
+			PacketReliability::ReliableOrdered,
+			0,
+			AddressOrGUID(&rs.systemAddress),
+			false,
+			now,
+			0
+		);
+
+		rs.connectState = ConnectState::DisconnectAsap;
+	}
+	else {
+		send(
+			bsOut.data(),
+			bsOut.sizeInBytes(),
+			PacketPriority::Immediate,
+			PacketReliability::ReliableOrdered,
+			0,
+			AddressOrGUID(&rs.systemAddress),
+			false
+		);
+	}
 }
 
 // -------------------------------------------
@@ -809,7 +901,6 @@ Packet* XPeer::receive(void)
 	}
 
 	Packet* pPacket = nullptr;
-
 	if (packetQue_.tryPop(pPacket))
 	{
 		X_ASSERT_NOT_NULL(pPacket->pData);
