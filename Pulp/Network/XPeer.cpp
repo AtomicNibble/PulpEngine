@@ -1652,7 +1652,7 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 
 
 		// do we have any packets?
-		ReliabilityLayer::PacketData data;
+		ReliabilityLayer::PacketData data(arena_);
 		while (rs.relLayer.recive(data))
 		{
 			// okay we got a packet :D!
