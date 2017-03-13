@@ -2,11 +2,11 @@
 
 
 template<typename T, size_t N>
-FixedFifo<T, N>::FixedFifo() :
-end_(array_ + N),
-read_(array_),
-write_(array_),
-num_(0)
+	FixedFifo<T, N>::FixedFifo() :
+	end_(array_ + N),
+	read_(array_),
+	write_(array_),
+	num_(0)
 {
 
 }
@@ -15,6 +15,32 @@ template<typename T, size_t N>
 FixedFifo<T, N>::~FixedFifo()
 {
 
+}
+
+template<typename T, size_t N>
+X_INLINE T& FixedFifo<T, N>::operator[](size_type idx)
+{
+	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
+
+	if (read_ + idx >= end_) {
+		size_type left = end_ - read_;
+		return *(start_ + (idx - left));
+	}
+
+	return *(read_ + idx);
+}
+
+template<typename T, size_t N>
+X_INLINE const T& FixedFifo<T, N>::operator[](size_type idx) const
+{
+	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
+
+	if (read_ + idx >= end_) {
+		size_type left = end_ - read_;
+		return *(start_ + (idx - left));
+	}
+
+	return *(read_ + idx);
 }
 
 
@@ -161,6 +187,42 @@ typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::end(void) const
 {
 	return const_iterator(array_, end_, write_, num_);
 }
+
+
+/// ------------------------------------------------------
+
+template<typename T, size_t N>
+typename FixedFifo<T, N>::Reference FixedFifo<T, N>::front(void)
+{
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")(isNotEmpty());
+
+	return *read_;
+}
+
+template<typename T, size_t N>
+typename FixedFifo<T, N>::ConstReference FixedFifo<T, N>::front(void) const
+{
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")(isNotEmpty());
+
+	return *read_;
+}
+
+template<typename T, size_t N>
+typename FixedFifo<T, N>::Reference FixedFifo<T, N>::back(void)
+{
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
+
+	return *(write_ - 1);
+}
+
+template<typename T, size_t N>
+typename FixedFifo<T, N>::ConstReference FixedFifo<T, N>::back(void) const
+{
+	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
+
+	return *(write_ - 1);
+}
+
 
 /// ------------------------------------------------------
 

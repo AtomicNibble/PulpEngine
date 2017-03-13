@@ -73,10 +73,17 @@ public:
 	typedef size_t size_type;
 	typedef _FixedFifoIterator<T,N> iterator;
 	typedef _FixedFifoConstIterator<T,N> const_iterator;
+	typedef T& Reference;
+	typedef T& reference;
+	typedef const T& ConstReference;
+	typedef const T& const_reference;
 
 public:
 	X_INLINE FixedFifo(void);
 	X_INLINE ~FixedFifo(void);
+
+	X_INLINE T& operator[](size_type idx);
+	X_INLINE const T& operator[](size_type idx) const;
 
 	// push a item on to the internal ring buffer
 	X_INLINE void push(const T& v);
@@ -114,6 +121,11 @@ public:
 
 	const_iterator begin(void) const;
 	const_iterator end(void) const;
+
+	Reference front(void);
+	ConstReference front(void) const;
+	Reference back(void);
+	ConstReference back(void) const;
 
 private:
 	X_NO_COPY(FixedFifo);
