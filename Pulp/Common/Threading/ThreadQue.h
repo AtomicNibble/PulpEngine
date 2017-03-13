@@ -27,6 +27,7 @@ public:
 
 	void reserve(size_type num);
 	void clear(void);
+	void free(void);
 
 	void push(T const& value);
 	// pushes if predicate don't match.

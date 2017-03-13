@@ -37,6 +37,14 @@ void ThreadQue<T, SynchronizationPrimitive>::clear(void)
 	que_.clear();
 }
 
+template<typename T, typename SynchronizationPrimitive>
+void ThreadQue<T, SynchronizationPrimitive>::free(void)
+{
+	SynchronizationPrimitive::ScopedLock lock(primitive_);
+
+	que_.free();
+}
+
 
 
 template<typename T, typename SynchronizationPrimitive>
