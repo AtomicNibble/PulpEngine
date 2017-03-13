@@ -1146,6 +1146,10 @@ void XPeer::removeConnectionRequest(const SystemAdd& sysAdd)
 		freeConnectionRequest(*it);
 		connectionReqs_.erase(it);
 	}
+	else
+	{
+		X_WARNING("Net", "Failed to find connection request for removal");
+	}
 }
 
 
