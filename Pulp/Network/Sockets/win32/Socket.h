@@ -83,6 +83,7 @@ public:
 
 
 	BindResult::Enum bind(BindParameters& bindParameters);
+	bool sendSendTest(void);
 	SendResult send(SendParameters& sendParameters);
 	void recv(RecvData& dataOut);
 	

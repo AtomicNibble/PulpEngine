@@ -172,17 +172,7 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 			platform::freeaddrinfo(pResult);
 
 			// send a test.
-			MessageID::Enum msgId = MessageID::SendTest;
-
-			SendParameters sendParam;
-			sendParam.pData = reinterpret_cast<uint8_t*>(&msgId);
-			sendParam.length = sizeof(msgId);
-			sendParam.systemAddress = boundAdd_;
-			sendParam.ttl = 0;
-
-			auto sendRes = send(sendParam);
-			if (!sendRes)
-			{
+			if (!sendSendTest()) {
 				return BindResult::SendTestFailed;
 			}
 
@@ -200,6 +190,20 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 	// Shieeeeeeeeeeet.
 	platform::freeaddrinfo(pResult);
 	return BindResult::FailedToBind;
+}
+
+bool NetSocket::sendSendTest(void)
+{
+	// send a test.
+	MessageID::Enum msgId = MessageID::SendTest;
+
+	SendParameters sendParam;
+	sendParam.pData = reinterpret_cast<uint8_t*>(&msgId);
+	sendParam.length = sizeof(msgId);
+	sendParam.systemAddress = boundAdd_;
+	sendParam.ttl = 0;
+
+	return send(sendParam) == sizeof(msgId);
 }
 
 SendResult NetSocket::send(SendParameters& sendParameters)
