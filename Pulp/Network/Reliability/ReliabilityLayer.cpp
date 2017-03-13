@@ -797,6 +797,8 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 				const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
 				bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
 
+				X_WARNING_IF(vars_.debugIgnoredEnabled(),  "NetRel", "Packet ignored");
+
 				freePacket(pPacket);
 			}
 			else if (result == ProcessResult::Swallowed)
@@ -854,6 +856,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 		else if (holeSize > std::numeric_limits<decltype(holeSize)>::max() / 2) // is negative?
 		{
 			// duplicate packet.
+			X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet");
 			return ProcessResult::Ignored;
 		}
 		else if (holeSize < recivedPacketQueue_.size()) // reviced a packet that is higer than base, but lower than highest packet we seen.
@@ -861,6 +864,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 			if (recivedPacketQueue_[holeSize])
 			{
 				// this hole is already filled so it's duplicate.
+				X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet");
 				return ProcessResult::Ignored;
 			}
 
@@ -872,6 +876,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 			// impose some sort of limit on max hole, otherwise memory for hole logic grow quite large.
 			if (holeSize > REL_MAX_RECIVE_HOLE)
 			{
+				X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived packet that has a message number greater than recive hole");
 				return ProcessResult::Ignored;
 			}
 
@@ -934,6 +939,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 				// we ignore any packets that are older than we have seen.
 				if (isOlderPacket(pPacket->sequencingIndex, highestSequencedReadIndex_[channel]))
 				{
+					X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet");
 					return ProcessResult::Ignored;
 				}
 
@@ -1003,6 +1009,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 		{
 			// this packet is older than what we expecting
 			// we can ignore it.
+			X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Recived duplicate packet");
 			return ProcessResult::Ignored;
 		}
 	}

@@ -8,6 +8,11 @@ X_INLINE int32_t NetVars::debugEnabled(void) const
 	return debug_;
 }
 
+X_INLINE int32_t NetVars::debugIgnoredEnabled(void) const
+{
+	return debugIgnored_;
+}
+
 X_INLINE int32_t NetVars::debugAckEnabled(void) const
 {
 	return debugAck_;
