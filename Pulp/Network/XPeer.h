@@ -324,6 +324,9 @@ private:
 	RecvData* allocRecvData(void);
 	void freeRecvData(RecvData* pRecvData);
 
+	RequestConnection* allocConnectionRequest(void);
+	void freeConnectionRequest(RequestConnection* pConReq);
+
 	uint32_t nextSendReceipt(void);
 	uint32_t incrementNextSendReceipt(void);
 

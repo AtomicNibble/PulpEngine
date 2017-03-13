@@ -414,7 +414,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 		return ConnectionAttemptResult::AlreadyConnected;
 	}
 
-	RequestConnection* pConReq = X_NEW(RequestConnection, arena_, "ConRequest");
+	RequestConnection* pConReq = allocConnectionRequest();
 	pConReq->systemAddress = systemAddress;
 	pConReq->nextRequestTime = gEnv->pTimer->GetTimeNowReal();
 	pConReq->timeoutTime = timeoutTime;
@@ -1057,7 +1057,17 @@ RecvData* XPeer::allocRecvData(void)
 void XPeer::freeRecvData(RecvData* pRecvData)
 {
 	X_DELETE(pRecvData, arena_);
+}
 
+
+RequestConnection* XPeer::allocConnectionRequest(void)
+{
+	return X_NEW(RequestConnection, arena_, "connectionReq");
+}
+
+void XPeer::freeConnectionRequest(RequestConnection* pConReq)
+{
+	X_DELETE(pConReq, arena_);
 }
 
 uint32_t XPeer::nextSendReceipt(void)
@@ -1083,7 +1093,7 @@ void XPeer::removeConnectionRequest(const SystemAdd& sysAdd)
 	auto it = std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc);
 	if (it != connectionReqs_.end())
 	{
-		X_DELETE(*it, arena_);
+		freeConnectionRequest(*it);
 		connectionReqs_.erase(it);
 	}
 }
@@ -1497,6 +1507,8 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS)
 			if (cr.numRequestsMade == cr.retryCount)
 			{
 				X_LOG0_IF(vars_.debugEnabled(), "Net", "Reached max connection retry count for: \"%s\"", cr.systemAddress.toString(addStr));
+
+				freeConnectionRequest(*it);
 				it = connectionReqs_.erase(it);
 
 				// send packet.
