@@ -414,7 +414,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 	}
 	
 	for (auto& rs : remoteSystems_) {
-		rs.postDisconnect();
+		rs.disconnect();
 		rs.relLayer.free();
 	}
 
