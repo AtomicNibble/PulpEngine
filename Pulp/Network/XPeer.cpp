@@ -1032,7 +1032,7 @@ BufferdCommand* XPeer::allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t le
 	return pCmd;
 }
 
-void XPeer::freebufferdCmd(BufferdCommand* pBufCmd)
+void XPeer::freeBufferdCmd(BufferdCommand* pBufCmd)
 {
 	freePacketData(pBufCmd->pData);
 	X_DELETE(pBufCmd, &poolArena_);
@@ -1570,7 +1570,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS)
 		X_ASSERT_NOT_NULL(pBufCmd); // no null ref plz!
 		processBufferdCommand(*pBufCmd);
 
-		freebufferdCmd(pBufCmd);
+		freeBufferdCmd(pBufCmd);
 	}
 
 }

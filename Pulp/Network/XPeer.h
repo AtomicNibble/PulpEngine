@@ -316,7 +316,7 @@ private:
 	void freePacket(Packet* pPacket) X_FINAL;
 
 	BufferdCommand* allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t lengthBits);
-	void freebufferdCmd(BufferdCommand* pBufCmd);
+	void freeBufferdCmd(BufferdCommand* pBufCmd);
 
 	uint8_t* allocPacketData(size_t lengthBytes);
 	void freePacketData(uint8_t* pPacketData);
