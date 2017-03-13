@@ -201,7 +201,6 @@ public:
 
 private:
 	uint64_t val_;
-	// SystemIndex sysIdx_;
 };
 
 // ---------------------------------
