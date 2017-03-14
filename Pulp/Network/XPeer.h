@@ -300,7 +300,7 @@ private:
 
 	void sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate);
 	void closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
-		bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
+		bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority = PacketPriority::Low);
 	void notifyAndFlagForShutdown(RemoteSystem& rs, bool performImmediate, 
 		uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
 	
