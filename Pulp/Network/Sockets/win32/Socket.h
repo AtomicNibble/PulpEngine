@@ -23,6 +23,11 @@ X_DECLARE_ENUM(SocketType)(
 // anyhing negative is error.
 typedef int32_t SendResult;
 
+X_DECLARE_ENUM(RecvResult)(
+	Success,
+	ConnectionReset,
+	Error
+);
 
 struct BindParameters
 {
@@ -85,7 +90,7 @@ public:
 	BindResult::Enum bind(BindParameters& bindParameters);
 	bool sendSendTest(void);
 	SendResult send(SendParameters& sendParameters);
-	void recv(RecvData& dataOut);
+	RecvResult::Enum recv(RecvData& dataOut);
 	
 	X_INLINE const SystemAdd& getBoundAdd(void) const;
 

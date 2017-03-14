@@ -254,7 +254,7 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 	return len;
 }
 
-void NetSocket::recv(RecvData& dataOut)
+RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 {
 	platform::sockaddr_storage senderAddr;
 	platform::socklen_t senderAddLen;
@@ -277,20 +277,36 @@ void NetSocket::recv(RecvData& dataOut)
 	X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 length: ^5%" PRIi32, bytesRead);
 
 
-	if (bytesRead < 0)
+	if (bytesRead <= 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastError::ToString(Dsc));
-	}
+		// this is not error, just making it so single branch if above zero.
+		if (bytesRead == 0) {
+			return RecvResult::Success;
+		}
 
-	// zero bytes!
-	if (bytesRead == 0) {
-		return;
+		// error.
+		const auto err = lastError::Get();
+		lastError::Description Dsc;
+
+		if (err == WSAECONNRESET)
+		{
+			dataOut.systemAdd.setFromAddStorage(senderAddr);
+
+			IPStr ipStr;
+			X_WARNING("Net", "Failed to recvfrom. \"%s\" Add: \"%s\"", 
+				lastError::ToString(err, Dsc), dataOut.systemAdd.toString(ipStr));
+
+			return RecvResult::ConnectionReset;
+		}
+
+		X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastError::ToString(err, Dsc));
+		return RecvResult::Error;
 	}
 
 	dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
 	dataOut.systemAdd.setFromAddStorage(senderAddr);
 	dataOut.pSrcSocket = this;
+	return RecvResult::Success;
 }
 
 bool NetSocket::getMyIPs(SystemAddArr& addresses)
