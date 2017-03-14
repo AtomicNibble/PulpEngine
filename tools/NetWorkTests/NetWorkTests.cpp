@@ -41,7 +41,7 @@ namespace
 {
 	static const net::Port SERVER_PORT = 60000;
 
-	void run(net::IPeer* pPeer, bool isServer)
+	void run(core::Console& Console, net::IPeer* pPeer, bool isServer)
 	{
 		if (isServer)
 		{
@@ -87,6 +87,7 @@ namespace
 		uint8_t testData[64];
 		core::zero_object(testData);
 
+
 		while (1)
 		{
 			net::Packet* pPacket = nullptr;
@@ -102,8 +103,14 @@ namespace
 
 			// sleep, as other thread will handle incoming requests and buffer then for us.
 			core::Thread::Sleep(50);
+
+			char key = Console.ReadKey();
+			if (key == 'X') {
+				break;
+			}
 		}
 
+		pPeer->shutdown(core::TimeVal::fromMS(500));
 	}
 
 }
@@ -152,7 +159,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
 			}
 
-			run(pPeer, isServer);
+			run(Console, pPeer, isServer);
 		
 			pNet->deletePeer(pPeer);
 		}
