@@ -2603,18 +2603,31 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 
 	while (thread.ShouldRun())
 	{
-		pSocket->recv(*pData);
+		auto res = pSocket->recv(*pData);
 
-		if (pData->bytesRead > 0)
+		if (res == RecvResult::Success)
 		{
-			onSocketRecv(pData);
-
-			// get new data block.
-			pData = allocRecvData();
+			if (pData->bytesRead > 0)
+			{
+				onSocketRecv(pData);
+				pData = allocRecvData();
+			}
+			else
+			{
+				core::Thread::Sleep(0);
+			}
 		}
-		else
+		else if (res == RecvResult::ConnectionReset)
 		{
-			core::Thread::Sleep(0);
+			// okay so we know a socket has been closed we don't need to wait for timeout.
+			// we send buffered as we on diffrent thread.
+			closeConnectionInternal(AddressOrGUID(&pData->systemAdd), false, false, 0);
+		}
+		else if (res == RecvResult::Error)
+		{
+			// ... 
+			// for now ignore, have to see what errors we get and see if want to handle them.
+			// they will get logged by socket code.
 		}
 	}
 
