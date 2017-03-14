@@ -167,9 +167,7 @@ TimeVal XTimer::GetTimeNowNoScale(void) const
 
 TimeVal XTimer::GetTimeNowReal(void) const
 {
-	int64 now = SysTimer::Get();
-
-	return TimeVal(now);
+	return TimeVal(SysTimer::Get());
 }
 
 
