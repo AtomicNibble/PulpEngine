@@ -6,6 +6,75 @@ X_INLINE bool PingAndClockDifferential::isValid(void) const
 	return pingTime != UNDEFINED_PING;
 }
 
+// --------------------------------------------------------------
+
+X_INLINE bool RemoteSystem::sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt)
+{
+	if (!canSend()) {
+		X_WARNING("Net", "Tried to send data to remote, where sending is currently disabled");
+		return false;
+	}
+
+	bool res = relLayer.send(
+		pData,
+		numberOfBitsToSend,
+		currentTime,
+		MTUSize,
+		priority,
+		reliability,
+		orderingChannel,
+		receipt
+	);
+
+	onSend(reliability, currentTime);
+
+	return res;
+}
+
+X_INLINE bool RemoteSystem::sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt)
+{
+	if (!canSend()) {
+		X_WARNING("Net", "Tried to send data to remote, where sending is currently disabled");
+		return false;
+	}
+
+	bool res = relLayer.send(
+		bs.data(),
+		safe_static_cast<BitSizeT>(bs.size()),
+		currentTime,
+		MTUSize,
+		priority,
+		reliability,
+		orderingChannel,
+		receipt
+	);
+
+	onSend(reliability, currentTime);
+
+	return res;
+}
+
+
+X_INLINE void RemoteSystem::onSend(PacketReliability::Enum reliability, core::TimeVal sendTime)
+{
+	switch (reliability)
+	{
+		case PacketReliability::Reliable:
+		case PacketReliability::ReliableOrdered:
+		case PacketReliability::ReliableOrderedWithAck:
+		case PacketReliability::ReliableSequenced:
+		case PacketReliability::ReliableWithAck:
+			lastReliableSend = sendTime;
+			break;
+		default:
+			break;
+	}
+}
+
+// --------------------------------------------------------------
+
 X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt)
 {

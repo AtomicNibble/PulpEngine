@@ -90,8 +90,15 @@ public:
 
 	void onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
 		core::TimeVal sendPingTime, core::TimeVal sendPongTime);
-
 	void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
+
+	X_INLINE bool sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt = 0);
+	X_INLINE bool sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt = 0);
+
+private:
+	X_INLINE void onSend(PacketReliability::Enum reliability, core::TimeVal sendTime);
 
 public:
 	bool isActive;
