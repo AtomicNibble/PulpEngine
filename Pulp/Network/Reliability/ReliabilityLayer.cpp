@@ -532,6 +532,7 @@ void ReliabilityLayer::free(void)
 void ReliabilityLayer::reset(int32_t MTUSize)
 {
 	clearPacketQueues();
+	freeResendList();
 
 	MTUSize_ = MTUSize;
 
@@ -1645,6 +1646,13 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 	{
 		X_WARNING("NetRel", "Failed to packet from resend buffer for removal msgIdx: %" PRIu16 " bufIdx: %" PRIuS,
 			msgNum, resendBufIdx);
+	}
+}
+
+void ReliabilityLayer::freeResendList(void)
+{
+	while (ReliablePacket* pPacket = resendList_.head()) {
+		freePacket(pPacket);
 	}
 }
 

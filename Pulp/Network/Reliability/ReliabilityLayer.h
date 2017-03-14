@@ -283,6 +283,7 @@ private:
 	void insertPacketToResendList(ReliablePacket* pPacket);
 	void movePacketToTailOfResendList(ReliablePacket* pPacket);
 	void removePacketFromResendList(MessageNumber msgNum);
+	void freeResendList(void);
 
 	INTRUSIVE_LIST_DECLARE(ReliablePacket, reliableLink) resendList_;
 
