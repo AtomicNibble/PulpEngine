@@ -721,12 +721,12 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 {
 	RemoteSystem* pRemoteSystem = getRemoteSystem(systemIdentifier, true);
 	if (!pRemoteSystem) {
-		// TODO
+		X_ERROR("Net", "Failed to find remote system for send");
 		return false;
 	}
 	
 	if (!pRemoteSystem->canSend()) {
-		// TODO
+		X_WARNING_IF(vars_.debugEnabled(), "Net", "Tried to send data to remote, where sending is currently disabled");
 		return false;
 	}
 
