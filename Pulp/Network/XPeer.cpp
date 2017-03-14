@@ -1509,7 +1509,7 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(pTarget);
 	auto* pRemoteSys = getRemoteSystem(*pSysAdd, false);
 
-	if (pRemoteSys) {
+	if (!pRemoteSys) {
 		X_WARNING("Net", "Failed to find remote system for stat retrival");
 		return false;
 	}
