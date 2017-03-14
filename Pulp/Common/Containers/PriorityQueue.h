@@ -23,6 +23,9 @@ public:
     MyType& operator=(const MyType& rhs);
     MyType& operator=(MyType&& rhs);
 
+	void clear(void);
+	void free(void);
+
     void push(const value_type& _Val);
     void push(value_type&& _Val);
     template<class... _Valty>

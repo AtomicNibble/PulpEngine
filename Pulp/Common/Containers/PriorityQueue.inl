@@ -42,6 +42,18 @@ typename PriorityQueue<T, ContainerT, Pr>::MyType& PriorityQueue<T, ContainerT, 
     return *this;
 }
 
+template<typename T, class ContainerT, class Pr>
+void PriorityQueue<T, ContainerT, Pr>::clear(void)
+{
+	container_.clear();
+}
+
+template<typename T, class ContainerT, class Pr>
+void PriorityQueue<T, ContainerT, Pr>::free(void)
+{
+	container_.free();
+}
+
 
 template<typename T, class ContainerT, class Pr>
 void PriorityQueue<T, ContainerT, Pr>::push(const value_type& _Val)
