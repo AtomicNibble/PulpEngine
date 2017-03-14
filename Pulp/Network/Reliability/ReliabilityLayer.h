@@ -322,6 +322,7 @@ private:
 	MessageNumber reliableMessageNumberIdx_; // current rel msg number index.
 	MessageNumber dagramSeqNumber_; 
 	SplitPacketId splitPacketId_;
+	SplitPacketChannelArr splitPacketChannels_;
 
 	bool connectionDead_;
 	bool _pad[3];
@@ -333,9 +334,8 @@ private:
 	size_t bytesInReSendBuffers_;
 	size_t msgInReSendBuffers_;
 
+	// this is quite fat, so left on end
 	ResendArr resendBuf_; // max in transit
-
-	SplitPacketChannelArr splitPacketChannels_;
 };
 
 X_NAMESPACE_END
