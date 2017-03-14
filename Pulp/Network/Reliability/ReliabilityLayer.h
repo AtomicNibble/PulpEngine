@@ -174,13 +174,13 @@ class ReliabilityLayer
 
     struct PacketWithWeight
     {
-        PacketWithWeight(WeightType wht, ReliablePacket* pPacket) :
+        X_INLINE PacketWithWeight(WeightType wht, ReliablePacket* pPacket) :
             weight(wht),
             pPacket(pPacket)
         {
         }
 
-        bool operator<(const PacketWithWeight& rhs) const {
+		X_INLINE  bool operator<(const PacketWithWeight& rhs) const {
             return weight < rhs.weight;
         }
 
