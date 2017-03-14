@@ -1714,8 +1714,25 @@ void ReliabilityLayer::getStatistics(NetStatistics& stats) const
 	stats.msgInSendBuffers = msgInSendBuffers_;
 	stats.bytesInSendBuffers = bytesInSendBuffers_;
 
-	stats.packetLossLastSecond = 0.f;
-	stats.packetLossTotal = 0.f;
+	if (stats.lastSecondMetrics[NetStatistics::Metric::BytesSent] || stats.lastSecondMetrics[NetStatistics::Metric::BytesResent]) {
+		double sent = static_cast<double>(stats.lastSecondMetrics[NetStatistics::Metric::BytesSent]);
+		double resent = static_cast<double>(stats.lastSecondMetrics[NetStatistics::Metric::BytesResent]);
+
+		stats.packetLossLastSecond = static_cast<float>(resent / sent);
+	}
+	else {
+		stats.packetLossLastSecond = 0.f;
+	}
+
+	if (stats.runningMetrics[NetStatistics::Metric::BytesSent] || stats.runningMetrics[NetStatistics::Metric::BytesResent]) {
+		double sent = static_cast<double>(stats.runningMetrics[NetStatistics::Metric::BytesSent]);
+		double resent = static_cast<double>(stats.runningMetrics[NetStatistics::Metric::BytesResent]);
+
+		stats.packetLossTotal = static_cast<float>(resent / sent);
+	}
+	else {
+		stats.packetLossTotal = 0.f;
+	}
 
 	stats.isLimitedByCongestionControl = false;
 	stats.isLimitedByOutgoingBadwidthLimit = false;
