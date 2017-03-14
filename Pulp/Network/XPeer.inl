@@ -6,6 +6,23 @@ X_INLINE bool PingAndClockDifferential::isValid(void) const
 	return pingTime != UNDEFINED_PING;
 }
 
+X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt)
+{
+	X_ASSERT(bs.isStartOfStream(), "Stream has been read from, potential bug?")();
+
+	sendBuffered(
+		bs.data(),
+		safe_static_cast<BitSizeT>(bs.size()),
+		priority,
+		reliability,
+		orderingChannel,
+		systemIdentifier,
+		broadcast,
+		receipt
+	);
+}
+
 
 X_INLINE bool XPeer::sendImmediate(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast,
