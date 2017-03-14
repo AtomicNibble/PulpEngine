@@ -174,7 +174,6 @@ void RemoteSystem::onConnected(const SystemAdd& externalSysId, const SystemAddAr
 	}
 }
 
-
 void RemoteSystem::onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime)
 {
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
@@ -734,32 +733,19 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	bool res = pRemoteSystem->relLayer.send(
+	bool res = pRemoteSystem->sendReliabile(
 		pData,
 		numberOfBitsToSend,
-		currentTime,
-		pRemoteSystem->MTUSize,
 		priority,
 		reliability,
 		orderingChannel,
+		currentTime,
 		receipt
 	);
 
-	switch (reliability)
-	{
-		case PacketReliability::Reliable:
-		case PacketReliability::ReliableOrdered:
-		case PacketReliability::ReliableOrderedWithAck:
-		case PacketReliability::ReliableSequenced:
-		case PacketReliability::ReliableWithAck:
-			pRemoteSystem->lastReliableSend = currentTime;
-			break;
-		default:
-			break;
-	}
-
 	return res;
 }
+
 
 void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
 	bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
@@ -801,15 +787,12 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, bool imediate,
 	core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 
 	if (imediate) {
-		sendImmediate(
+		rs.sendReliabile(
 			bsOut,
 			PacketPriority::Immediate,
 			PacketReliability::ReliableOrdered,
 			0,
-			AddressOrGUID(&rs.systemAddress),
-			false,
-			now,
-			0
+			now
 		);
 
 		rs.connectState = ConnectState::DisconnectAsap;
@@ -2204,15 +2187,12 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 					}
 
 					// send the request to the remote.
-					sendImmediate(
+					pSys->sendReliabile(
 						bsOut, 
 						PacketPriority::Immediate, 
 						PacketReliability::Reliable,
 						0, 
-						AddressOrGUID(&pData->systemAdd), 
-						false, 
-						timeNow, 
-						0
+						timeNow
 					);
 				}
 				else
@@ -2335,15 +2315,12 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 			bsOut.write(MessageID::InvalidPassword);
 			bsOut.write(guid_);
 
-			sendImmediate(
+			rs.sendReliabile(
 				bsOut,
 				PacketPriority::Immediate,
 				PacketReliability::Reliable,
 				0,
-				AddressOrGUID(&rs.systemAddress),
-				false,
-				timeNow,
-				0
+				timeNow
 			);
 
 			rs.connectState = ConnectState::DisconnectAsapSilent;
@@ -2363,15 +2340,12 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	bsOut.write(timeStamp);
 	bsOut.write(timeNow.GetValue());
 
-	sendImmediate(
+	rs.sendReliabile(
 		bsOut,
 		PacketPriority::Immediate,
 		PacketReliability::Reliable,
 		0,
-		AddressOrGUID(&rs.systemAddress),
-		false,
-		timeNow,
-		0
+		timeNow
 	);
 }
 
@@ -2420,15 +2394,12 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	bsOut.write(sendPongTime);
 	bsOut.write(timeNow.GetValue());
 
-	sendImmediate(
+	rs.sendReliabile(
 		bsOut,
 		PacketPriority::Immediate,
 		PacketReliability::Reliable,
 		0,
-		AddressOrGUID(&rs.systemAddress),
-		false,
-		timeNow,
-		0
+		timeNow
 	);
 
 	sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
@@ -2498,15 +2469,12 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
 	bsOut.write(timeStamp);
 	bsOut.write(timeNow.GetValue());
 
-	sendImmediate(
+	rs.sendReliabile(
 		bsOut,
 		PacketPriority::Immediate,
 		PacketReliability::UnReliable,
 		0,
-		AddressOrGUID(&rs.systemAddress),
-		false,
-		timeNow,
-		0
+		timeNow
 	);
 }
 
