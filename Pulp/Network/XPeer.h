@@ -304,8 +304,6 @@ private:
 	void notifyAndFlagForShutdown(RemoteSystem& rs, bool performImmediate, 
 		uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
 	
-
-	void processBufferdCommand(BufferdCommand& cmd);
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
 
 	// Remote Sys

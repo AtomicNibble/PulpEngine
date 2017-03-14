@@ -827,49 +827,6 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, bool imediate,
 	}
 }
 
-// -------------------------------------------
-
-void XPeer::processBufferdCommand(BufferdCommand& cmd)
-{
-	if (cmd.cmd == BufferdCommand::Cmd::Send)
-	{
-		RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
-		if (!pRemoteSystem) {
-			return;
-		}
-
-		if (!pRemoteSystem->canSend()) {
-			return;
-		}
-
-		if (cmd.broadcast) {
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
-
-		bool res = pRemoteSystem->relLayer.send(
-			cmd.pData,
-			cmd.numberOfBitsToSend,
-			core::TimeVal(),
-			pRemoteSystem->MTUSize,
-			cmd.priority,
-			cmd.reliability,
-			cmd.orderingChannel,
-			cmd.receipt
-		);
-
-		if (!res) {
-			// TODO
-		}
-	}
-	else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
-	{
-		closeConnectionInternal(cmd.systemIdentifier, false, true, cmd.orderingChannel, cmd.priority);
-	}
-	else
-	{
-		X_ASSERT_UNREACHABLE();
-	}
-}
 
 
 // -------------------------------------------
@@ -1672,11 +1629,42 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS)
 		return;
 	}
 
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
 	BufferdCommand* pBufCmd;
 	while (bufferdCmds_.tryPop(pBufCmd))
 	{
 		X_ASSERT_NOT_NULL(pBufCmd); // no null ref plz!
-		processBufferdCommand(*pBufCmd);
+		auto& cmd = *pBufCmd;
+
+		if (cmd.cmd == BufferdCommand::Cmd::Send)
+		{
+			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+			if (!pRemoteSystem) {
+				return;
+			}
+
+			sendImmediate(
+				cmd.pData,
+				cmd.numberOfBitsToSend,
+				cmd.priority,
+				cmd.reliability,
+				cmd.orderingChannel,
+				cmd.systemIdentifier,
+				cmd.broadcast,
+				timeNow,
+				cmd.receipt
+			);
+		}
+		else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
+		{
+			closeConnectionInternal(cmd.systemIdentifier, false, true, cmd.orderingChannel, cmd.priority);
+		}
+		else
+		{
+			X_ASSERT_UNREACHABLE();
+		}
+
 
 		freeBufferdCmd(pBufCmd);
 	}
