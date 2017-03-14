@@ -2207,6 +2207,8 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 					pPacket->guid = clientGuid;
 					pushBackPacket(pPacket);
 				}
+
+				break;
 			}
 		}
 	}
