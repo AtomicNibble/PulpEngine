@@ -341,8 +341,6 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		socketThread.Start(del);
 	}
 		
-	// X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived messageId: \"%s\"", MessageID::ToString(msgId));
-
 	if (vars_.debugEnabled() > 1)
 	{
 		NetGuidStr guidStr;
