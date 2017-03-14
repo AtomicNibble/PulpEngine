@@ -16,11 +16,7 @@ X_NAMESPACE_BEGIN(net)
 namespace
 {
 
-	template<typename T>
-	BitSizeT bytesToBits(T bytes)
-	{
-		return safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(bytes));
-	}
+
 
 	// returns if ip is matched by the pattern.
 	bool ipWildMatch(const IPStr& pattern, const IPStr& ip)
@@ -882,7 +878,7 @@ void XPeer::processBufferdCommand(BufferdCommand& cmd)
 
 void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 {
-	Packet* pPacket = allocPacket(bytesToBits(lengthBytes));
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(lengthBytes));
 	std::memcpy(pPacket->pData, pData, lengthBytes);
 	pPacket->guid = getMyGUID();
 
