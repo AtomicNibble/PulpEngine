@@ -1887,7 +1887,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 	);
 
 	if (!res) {
-		// TODO
+		X_ERROR("Net", "Error processign recived packet");
 	}
 }
 
