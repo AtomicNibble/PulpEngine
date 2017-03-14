@@ -490,13 +490,18 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
 	},
 	bytesInReSendBuffers_(0),
 	msgInReSendBuffers_(0),
-	splitPacketChannels_(arena)
+	splitPacketChannels_(arena),
+	packetsThisFrame_(arena),
+	packetsThisFrameBoundaries_(arena)
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
 
 	// we will grow up to: REL_DATAGRAM_HISTORY_LENGTH
 	dataGramHistory_.reserve(16);
+
+	packetsThisFrame_.setGranularity(64);
+	packetsThisFrameBoundaries_.setGranularity(64);
 
 	resendBuf_.fill(nullptr);
 }
@@ -527,6 +532,8 @@ void ReliabilityLayer::free(void)
 		bps_[i].free();
 	}
 
+	packetsThisFrame_.free();
+	packetsThisFrameBoundaries_.free();
 }
 
 void ReliabilityLayer::reset(int32_t MTUSize)
@@ -1076,8 +1083,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		sendNAKs(socket, bs, systemAddress, time);
 	}
 
-	core::Array<ReliablePacket*> packetsThisFrame(arena_); // all the packets we want to send
-	core::Array<size_t> packetsThisFrameBoundaries(arena_); // essentially range lists for MTUs.
+	X_ASSERT(packetsThisFrame_.isEmpty(), "Should of been previously cleared")();
+	X_ASSERT(packetsThisFrameBoundaries_.isEmpty(), "Should of been previously cleared")();
 
 	// resend packets.
 	if (!isResendListEmpty())
@@ -1092,7 +1099,6 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 			while (!isResendListEmpty())
 			{
 				ReliablePacket* pPacket = resendList_.head();
-
 				if (pPacket->nextActionTime > time) {
 					break;
 				}
@@ -1128,7 +1134,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 			}
 
 			// add datagram.
-			packetsThisFrameBoundaries.push_back(packetsThisFrame.size());
+			packetsThisFrameBoundaries_.emplace_back(safe_static_cast<int32_t>(packetsThisFrame_.size()));
 		}
 	}
 
@@ -1163,7 +1169,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 				// add packet.
 				currentDataGramSizeBits += totalBitSize;
-				packetsThisFrame.emplace_back(pPacket);
+				packetsThisFrame_.emplace_back(pPacket);
 
 				// stats
 				--msgInSendBuffers_[pPacket->priority];
@@ -1213,24 +1219,24 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 			}
 
 			// add datagram.
-			packetsThisFrameBoundaries.push_back(packetsThisFrame.size());
+			packetsThisFrameBoundaries_.emplace_back(safe_static_cast<int32_t>(packetsThisFrame_.size()));
 		}
 	}
 
 	// dispatch all the datagrams. (if any)
-	for (size_t i = 0; i < packetsThisFrameBoundaries.size(); i++)
+	for (size_t i = 0; i < packetsThisFrameBoundaries_.size(); i++)
 	{
-		size_t begin, end;
+		int32_t begin, end;
 
 		if (i == 0)
 		{
 			begin = 0;
-			end = packetsThisFrameBoundaries[i];
+			end = packetsThisFrameBoundaries_[i];
 		}
 		else
 		{
-			begin = packetsThisFrameBoundaries[i - 1];
-			end = packetsThisFrameBoundaries[i];
+			begin = packetsThisFrameBoundaries_[i - 1];
+			end = packetsThisFrameBoundaries_[i];
 		}
 
 		// here we pack the packet range into BS.
@@ -1251,7 +1257,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 		while (begin < end)
 		{
-			ReliablePacket* pPacket = packetsThisFrame[begin];
+			ReliablePacket* pPacket = packetsThisFrame_[begin];
 
 			pPacket->writeToBitStream(bs);
 
@@ -1264,17 +1270,20 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		}
 
 		// send it.
-
 		sendBitStream(socket, bs, systemAddress, time);
 	}
 
-	for (auto* pPacket : packetsThisFrame)
+	// we delete any none reliable we sent this frame.
+	for (auto* pPacket : packetsThisFrame_)
 	{
 		if (!pPacket->isReliable())
 		{
 			freePacket(pPacket);
 		}
 	}
+
+	packetsThisFrame_.clear();
+	packetsThisFrameBoundaries_.clear();
 }
 
 // called from peer to get recived packets back from ReliabilityLayer.

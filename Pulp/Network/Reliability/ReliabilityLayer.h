@@ -169,6 +169,8 @@ class ReliabilityLayer
     typedef core::Fifo<bool> BoolQeue;
 	typedef core::Fifo<ReliablePacket*> PacketQeue;
 	typedef core::Array<SplitPacketChannel*> SplitPacketChannelArr;
+	typedef core::Array<ReliablePacket*> RelPacketArr;
+	typedef core::Array<int32_t> FrameboundryArr;
 
     typedef uint64_t WeightType;
 
@@ -323,6 +325,10 @@ private:
 	MessageNumber dagramSeqNumber_; 
 	SplitPacketId splitPacketId_;
 	SplitPacketChannelArr splitPacketChannels_;
+
+	// per udate buffers, here to keep bufferes around.
+	RelPacketArr packetsThisFrame_;
+	FrameboundryArr packetsThisFrameBoundaries_;
 
 	bool connectionDead_;
 	bool _pad[3];
