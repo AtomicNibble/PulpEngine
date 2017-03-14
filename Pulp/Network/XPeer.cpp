@@ -880,7 +880,7 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 	std::memcpy(pPacket->pData, pData, lengthBytes);
 	pPacket->guid = getMyGUID();
 
-	pushBackPacket(pPacket, false);
+	pushBackPacket(pPacket);
 }
 
 Packet* XPeer::receive(void)
@@ -1127,16 +1127,6 @@ void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData&
 	packetQue_.push(pPacket);
 }
 
-void XPeer::pushBackPacket(Packet* pPacket, bool pushAtHead)
-{
-	X_ASSERT_NOT_NULL(pPacket);
-
-	if (pushAtHead) {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
-
-	packetQue_.push(pPacket);
-}
 
 Packet* XPeer::allocPacket(size_t lengthBits)
 {
@@ -1207,16 +1197,6 @@ void XPeer::freeConnectionRequest(RequestConnection* pConReq)
 	X_DELETE(pConReq, arena_);
 }
 
-uint32_t XPeer::nextSendReceipt(void)
-{
-	return sendReceiptSerial_;
-}
-
-uint32_t XPeer::incrementNextSendReceipt(void)
-{
-	return ++sendReceiptSerial_;
-}
-
 
 
 void XPeer::removeConnectionRequest(const SystemAdd& sysAdd)
@@ -1248,11 +1228,6 @@ void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
 	X_LOG0_IF(vars_.debugEnabled() > 1, "Net", "Set maxIncomingconnections to: ^5%" PRIu16, numberAllowed);
 }
 
-uint16_t XPeer::getMaximumIncomingConnections(void) const
-{
-	return maxIncommingConnections_;
-}
-
 uint16_t XPeer::numberOfConnections(void) const
 {
 	// number of open connections.
@@ -1267,12 +1242,6 @@ uint16_t XPeer::numberOfConnections(void) const
 
 	return num;
 }
-
-uint32_t XPeer::getMaximunNumberOfPeers(void) const
-{
-	return maxPeers_;
-}
-
 
 // Ping 
 void XPeer::ping(const ISystemAdd* pTarget)
@@ -1514,10 +1483,6 @@ int32_t XPeer::getLowestPing(const AddressOrGUID systemIdentifier) const
 }
 
 
-const NetGUID& XPeer::getMyGUID(void) const
-{
-	return guid_;
-}
 
 // MTU for a given system
 int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
@@ -1558,16 +1523,6 @@ bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
 
 // ~IPeer
 
-
-void XPeer::setUnreliableTimeout(core::TimeVal timeout)
-{
-	unreliableTimeOut_ = timeout;
-}
-
-bool XPeer::accpetingIncomingConnections(void) const
-{
-	return getNumRemoteInitiatedConnections() < getMaximumIncomingConnections();
-}
 
 size_t XPeer::getNumRemoteInitiatedConnections(void) const
 {
@@ -1725,12 +1680,10 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS)
 
 		freeBufferdCmd(pBufCmd);
 	}
-
 }
 
 void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 {
-
 	for (auto& rs : remoteSystems_)
 	{
 		if (!rs.isActive) {
@@ -2689,16 +2642,6 @@ bool XPeer::isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOu
 
 	return false;
 }
-
-
-void XPeer::onSocketRecv(RecvData* pData)
-{
-	// we own this pointer
-	X_ASSERT_NOT_NULL(pData);
-
-	recvDataQue_.push(pData);
-}
-
 
 core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread)
 {

@@ -236,10 +236,10 @@ public:
 
 	// connection limits
 	void setMaximumIncomingConnections(uint16_t numberAllowed) X_FINAL;
-	uint16_t getMaximumIncomingConnections(void) const X_FINAL;
+	X_INLINE uint16_t getMaximumIncomingConnections(void) const X_FINAL;
 	uint16_t numberOfConnections(void) const X_FINAL;
 
-	uint32_t getMaximunNumberOfPeers(void) const X_FINAL;
+	X_INLINE uint32_t getMaximunNumberOfPeers(void) const X_FINAL;
 
 	// Ping 
 	void ping(const ISystemAdd* pTarget) X_FINAL;
@@ -259,7 +259,7 @@ public:
 	int32_t getLowestPing(const AddressOrGUID systemIdentifier) const X_FINAL;
 
 
-	const NetGUID& getMyGUID(void) const X_FINAL;
+	X_INLINE const NetGUID& getMyGUID(void) const X_FINAL;
 
 	// MTU for a given system
 	int32_t getMTUSize(const ISystemAdd* pTarget = nullptr) X_FINAL;
@@ -268,9 +268,9 @@ public:
 
 	// ~IPeer
 
-	void setUnreliableTimeout(core::TimeVal timeout);
+	X_INLINE void setUnreliableTimeout(core::TimeVal timeout);
 
-	bool accpetingIncomingConnections(void) const;
+	X_INLINE bool accpetingIncomingConnections(void) const;
 	// the number of remote connections to us.
 	// excludes connections made by us.
 	size_t getNumRemoteInitiatedConnections(void) const;
@@ -299,8 +299,6 @@ private:
 	
 
 	void processBufferdCommand(BufferdCommand& cmd);
-
-
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
 
 	// Remote Sys
@@ -316,7 +314,7 @@ private:
 
 	// adds packet to back of receive qeue
 	void pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData& data);
-	void pushBackPacket(Packet* pPacket, bool pushAtHead = false);
+	X_INLINE void pushBackPacket(Packet* pPacket);
 
 	Packet* allocPacket(size_t lengthBits);
 	void freePacket(Packet* pPacket) X_FINAL;
@@ -333,8 +331,8 @@ private:
 	RequestConnection* allocConnectionRequest(void);
 	void freeConnectionRequest(RequestConnection* pConReq);
 
-	uint32_t nextSendReceipt(void);
-	uint32_t incrementNextSendReceipt(void);
+	X_INLINE uint32_t nextSendReceipt(void);
+	X_INLINE uint32_t incrementNextSendReceipt(void);
 
 	void removeConnectionRequest(const SystemAdd& sysAdd);
 
@@ -371,8 +369,6 @@ private:
 	void handleInvalidPassword(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
 
-
-
 	// ------
 
 	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
@@ -382,7 +378,7 @@ private:
 	// ------
 
 
-	void onSocketRecv(RecvData* pData);
+	X_INLINE void onSocketRecv(RecvData* pData);
 	core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
 
 
