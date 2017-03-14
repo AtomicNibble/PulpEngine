@@ -3,6 +3,8 @@ X_NAMESPACE_BEGIN(net)
 
 X_INLINE void BPSTracker::add(core::TimeVal time, uint64_t val)
 {
+	total_ += val;
+	lastSec_ += val;
 	values_.push(std::make_pair(time, val));
 }
 
