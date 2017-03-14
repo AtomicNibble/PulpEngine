@@ -271,7 +271,7 @@ private:
 
 private:
 	// these are created each time a data gram is sent.
-	// so if a packet gets resent a new one will be sent.
+	// so if a packet gets resent a new one of these will be made.
 	DataGramHistory* createDataGramHistory(DataGramSequenceNumber number, core::TimeVal time);
 	DataGramHistory* getDataGramHistory(DataGramSequenceNumber number);
 	bool clearDataGramHistory(DataGramSequenceNumber number);
