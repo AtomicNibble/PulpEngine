@@ -2239,8 +2239,8 @@ void XPeer::handleUnConnectedPing(UpdateBitStream& bsOut, RecvData* pData, RecvB
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived unConnectedPing");
 
-	if (openConnectionsRequired) {
-
+	if (openConnectionsRequired && !accpetingIncomingConnections()) {
+		X_LOG0_IF(vars_.debugEnabled(), "Net", "Ignoring ping, not accepting incoming connections");
 		return;
 	}
 
