@@ -155,6 +155,8 @@ void RemoteSystem::disconnect(void)
 	pNetSocket = nullptr;
 
 	guid = UNASSIGNED_NET_GUID;
+
+	relLayer.reset(MTUSize);
 }
 
 void RemoteSystem::onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
