@@ -64,7 +64,9 @@ struct PingAndClockDifferential
 	X_INLINE bool isValid(void) const;
 
 	uint16_t pingTime;
-	core::TimeVal clockDifferential;
+	// this is a rougth guess about how to translate a remotes systems relative time to our relative time
+	// this may be possitive or negative.
+	core::TimeVal clockDifferential; 
 };
 
 struct RemoteSystem
