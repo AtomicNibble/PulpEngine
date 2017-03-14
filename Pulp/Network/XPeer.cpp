@@ -1334,14 +1334,14 @@ void XPeer::sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool 
 		);
 	}
 	else {
-		send(
-			bsOut.data(),
-			bsOut.sizeInBytes(),
+		sendBuffered(
+			bsOut,
 			PacketPriority::Immediate,
 			rel,
 			0,
 			AddressOrGUID(&sysAdd),
-			false
+			false,
+			0
 		);
 	}
 }
