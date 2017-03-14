@@ -1889,8 +1889,6 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 	if (!res) {
 		// TODO
 	}
-	return;
-
 }
 
 void XPeer::processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData,
