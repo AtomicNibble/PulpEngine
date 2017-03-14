@@ -238,6 +238,7 @@ public:
 	X_INLINE void killConnection(void);
 
 private:
+	void clearPacketQueues(void);
 	size_t calculateMemoryUsage(void) const;
 
 private:

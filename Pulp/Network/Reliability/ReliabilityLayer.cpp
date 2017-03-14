@@ -509,22 +509,29 @@ ReliabilityLayer::~ReliabilityLayer()
 
 void ReliabilityLayer::free(void)
 {
-	while (outGoingPackets_.isNotEmpty()) {
-		freePacket(outGoingPackets_.peek());
-		outGoingPackets_.pop();
+	reset(MTUSize_);
+
+	outGoingPackets_.free();
+	recivedPackets_.free();
+	dataGramHistory_.free();
+
+	incomingAcks_.free();
+	naks_.free();
+	acks_.free();
+
+	for (auto& orderQue : orderingQueues_) {
+		orderQue.free();
 	}
 
-	while (recivedPackets_.isNotEmpty()) {
-		freePacket(recivedPackets_.peek());
-		recivedPackets_.pop();
+	for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++) {
+		bps_[i].free();
 	}
-
 
 }
 
 void ReliabilityLayer::reset(int32_t MTUSize)
 {
-	free();
+	clearPacketQueues();
 
 	MTUSize_ = MTUSize;
 
@@ -572,6 +579,19 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 	msgInReSendBuffers_ = 0;
 
 	resendBuf_.fill(nullptr);
+}
+
+void ReliabilityLayer::clearPacketQueues(void)
+{
+	while (outGoingPackets_.isNotEmpty()) {
+		freePacket(outGoingPackets_.peek());
+		outGoingPackets_.pop();
+	}
+
+	while (recivedPackets_.isNotEmpty()) {
+		freePacket(recivedPackets_.peek());
+		recivedPackets_.pop();
+	}
 }
 
 
