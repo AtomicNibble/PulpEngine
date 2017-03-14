@@ -392,17 +392,18 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 
 		if (anyActive)
 		{
+			auto timeNow = gEnv->pTimer->GetTimeNowReal();
+			auto startTime = timeNow;
+
 			// send out the packets.
 			core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
-			peerReliabilityTick(updateBS);
+			peerReliabilityTick(updateBS, timeNow);
 
 			// scale so if block is low we don't sleep much
 			auto sleepTime = safe_static_cast<uint32_t>(core::Max(blockDuration.GetMilliSecondsAsInt64() / 100, 1ll));
 			sleepTime = core::Min(50u, sleepTime);
 
 			// spin till all closed or timeout.
-			auto timeNow = gEnv->pTimer->GetTimeNowReal();
-			auto startTime = timeNow;
 			while (blockDuration > (timeNow - startTime))
 			{
 				anyActive = false;
@@ -414,12 +415,11 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 					break;
 				}
 
-				updateBS.reset();
-				peerReliabilityTick(updateBS);
-
 				core::Thread::Sleep(sleepTime);
 
 				timeNow = gEnv->pTimer->GetTimeNowReal();
+
+				peerReliabilityTick(updateBS, timeNow);
 			}
 
 			if (anyActive) {
@@ -826,11 +826,12 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 Packet* XPeer::receive(void)
 {
 	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
-	processRecvData(updateBS);
-	processConnectionRequests(updateBS);
-	processBufferdCommands(updateBS);
-	peerReliabilityTick(updateBS);
+	processRecvData(updateBS, timeNow);
+	processConnectionRequests(updateBS, timeNow);
+	processBufferdCommands(updateBS, timeNow);
+	peerReliabilityTick(updateBS, timeNow);
 
 	if (packetQue_.isEmpty()) {
 		return nullptr;
@@ -1518,14 +1519,12 @@ void XPeer::listRemoteSystems(bool verbose) const
 }
 
 
-void XPeer::processConnectionRequests(UpdateBitStream& updateBS)
+void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
 	// are we wanting to connect to some slutty peers?
 	if (connectionReqs_.isNotEmpty())
 	{
 		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
-
-		core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 		for (auto it = connectionReqs_.begin(); it != connectionReqs_.end(); /* ++it */)
 		{
@@ -1606,13 +1605,11 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS)
 	}
 }
 
-void XPeer::processBufferdCommands(UpdateBitStream& updateBS)
+void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
 	if (bufferdCmds_.isEmpty()) {
 		return;
 	}
-
-	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	BufferdCommand* pBufCmd;
 	while (bufferdCmds_.tryPop(pBufCmd))
@@ -1653,7 +1650,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS)
 	}
 }
 
-void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
+void XPeer::peerReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
 	for (auto& rs : remoteSystems_)
 	{
@@ -1661,9 +1658,7 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 			continue;
 		}
 
-		core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
-
-		rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, time);
+		rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, timeNow);
 
 		const bool deadConnection = rs.relLayer.isConnectionDead();
 		const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
@@ -1674,7 +1669,7 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 
 		// has this connection not completed yet?
 		const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
-		const bool connectionOpenTimeout = (waitingforConnection && time > (rs.connectionTime + dropCon));
+		const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + dropCon));
 		const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
 		const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
 		const bool socketClosed = false;
@@ -1726,9 +1721,9 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 			continue;
 		}
 
-		if (rs.connectState == ConnectState::Connected && time > rs.nextPingTime)
+		if (rs.connectState == ConnectState::Connected && timeNow > rs.nextPingTime)
 		{
-			rs.nextPingTime = time + core::TimeVal::fromMS(vars_.pingTimeMS());
+			rs.nextPingTime = timeNow + core::TimeVal::fromMS(vars_.pingTimeMS());
 			sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
 		}
 
@@ -1759,17 +1754,17 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 			switch (msgId)
 			{
 				case MessageID::ConnectionRequest:
-					handleConnectionRequest(updateBS, stream, rs);
+					handleConnectionRequest(updateBS, stream, rs, timeNow);
 					break;
 				case MessageID::ConnectionRequestAccepted:
-					handleConnectionRequestAccepted(updateBS, stream, rs);
+					handleConnectionRequestAccepted(updateBS, stream, rs, timeNow);
 					break;
 				case MessageID::ConnectionRequestHandShake:
 					handleConnectionRequestHandShake(updateBS, stream, rs);
 					break;
 
 				case MessageID::ConnectedPing:
-					handleConnectedPing(updateBS, stream, rs, time);
+					handleConnectedPing(updateBS, stream, rs, timeNow);
 					break;
 				case MessageID::ConnectedPong:
 					handleConnectedPong(updateBS, stream, rs);
@@ -1793,8 +1788,10 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 }
 
 
-void XPeer::processRecvData(UpdateBitStream& updateBS)
+void XPeer::processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
+	X_UNUSED(timeNow);
+
 	// use a single BS instance for processing all the data, to try improve cache hits.
 	RecvData* pRecvData = nullptr;
 	while (recvDataQue_.tryPop(pRecvData))
@@ -2269,7 +2266,7 @@ void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvB
 
 // ----------------------------------------------------
 
-void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow)
 {
 	NetGUID clientGuid;
 	int64_t timeStamp;
@@ -2298,8 +2295,6 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	}
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request. timeStamp: %" PRId64, timeStamp);
-
-	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	// optional don't allow clients that give us a password when one not required.
 	const bool clientMustNotSendPassword = !vars_.ignorePasswordFromClientIfNotRequired();
@@ -2354,7 +2349,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 }
 
 
-void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request accepted");
 
@@ -2386,8 +2381,6 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	rs.onConnected(externalSysId, localIps, core::TimeVal(sendPingTime), core::TimeVal(sendPongTime));
 
 	// --------- Lets shake on it.. -------------
-
-	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	bsOut.write(MessageID::ConnectionRequestHandShake);
 	bsOut.write(rs.systemAddress);

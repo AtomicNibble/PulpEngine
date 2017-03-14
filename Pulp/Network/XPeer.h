@@ -342,10 +342,10 @@ private:
 	void removeConnectionRequest(const SystemAdd& sysAdd);
 
 private:
-	void processRecvData(UpdateBitStream& updateBS);
-	void processConnectionRequests(UpdateBitStream& updateBS);
-	void processBufferdCommands(UpdateBitStream& updateBS);
-	void peerReliabilityTick(UpdateBitStream& updateBS);
+	void processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow);
+	void processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal timeNow);
+	void processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal timeNow);
+	void peerReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow);
 
 
 	void processRecvData(UpdateBitStream& updateBS, RecvData* pRecvData, int32_t byteOffset);
@@ -363,8 +363,8 @@ private:
 	void handleUnConnectedPong(UpdateBitStream& bsBuf, RecvData* pData, RecvBitStream& bs);
 
 	// conencted handlers
-	void handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
-	void handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
+	void handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow);
+	void handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow);
 	void handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs);
 
 	void handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow);
