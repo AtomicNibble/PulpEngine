@@ -145,6 +145,9 @@ void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 		}
 	}
 
+
+	X_LOG0("Console", "----------- ^8Remote Systems^7 -----------");
+
 	int32_t idx = 0;
 	for (auto* pPeer : peers_)
 	{
@@ -152,6 +155,8 @@ void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 		X_LOG_BULLET;
 		pPeer->listRemoteSystems(verbose);
 	}
+
+	X_LOG0("Console", "--------- ^8Remote Systems End^7 ---------");
 }
 
 void XNet::Cmd_clearBans(core::IConsoleCmdArgs* pCmd)

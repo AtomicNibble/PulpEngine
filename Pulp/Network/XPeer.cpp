@@ -1513,7 +1513,16 @@ void XPeer::listRemoteSystems(bool verbose) const
 				rs.systemAddress.toString(ipStr),
 				core::HumanDuration::toString(durStr, connectionElapsed.GetSeconds()),
 				ConnectionState::ToString(rs.getConnectionState()),
-				core::HumanSize::toString(sizeStr, stats.internalMemUsage));
+				core::HumanSize::toString(sizeStr, stats.internalMemUsage)
+			);
+			X_LOG_BULLET;
+			X_LOG0("Net", "bytesSent: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesSent]));
+			X_LOG0("Net", "bytesResent: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesResent]));
+			X_LOG0("Net", "bytesPushed: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesPushed]));
+			X_LOG0("Net", "bytesRecivedIngored: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesRecivedIgnored]));
+			X_LOG0("Net", "bytesRecivedProccessed: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::BytesRecivedProcessed]));
+			X_LOG0("Net", "actualBytesSent: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::ActualBytesSent]));
+			X_LOG0("Net", "actualBytesReceived: ^5%s", core::HumanSize::toString(sizeStr, stats.runningMetrics[NetStatistics::Metric::ActualBytesReceived]));
 		}
 	}
 }
