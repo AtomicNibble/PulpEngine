@@ -538,6 +538,10 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 	highestSequencedReadIndex_.fill(0);
 	orderingQueueIndexOffset_.fill(0);
 
+	for (auto& orderQue : orderingQueues_) {
+		orderQue.clear();
+	}
+
 	outGoingPackets_.clear();
 	recivedPackets_.clear();
 	dataGramHistory_.clear();
