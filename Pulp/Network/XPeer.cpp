@@ -1677,8 +1677,9 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 		const bool connectionOpenTimeout = (waitingforConnection && time > (rs.connectionTime + dropCon));
 		const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
 		const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
+		const bool socketClosed = false;
 
-		if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut)
+		if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut || socketClosed)
 		{
 			if (vars_.debugEnabled())
 			{
@@ -1695,6 +1696,9 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 				}
 				else if (dissconectAckTimedOut) {
 					pCloseReason = "Discconect ack timeout";
+				}
+				else if (dissconectAckTimedOut) {
+					pCloseReason = "Socket Closed";
 				}
 
 				IPStr ipStr;
