@@ -1749,34 +1749,34 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS)
 
 			X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
 
-			// okay process the msg!
-			core::FixedBitStreamStack<MAX_MTU_SIZE> tmpBs;
+			updateBS.reset();
 
+			// okay process the msg!
 			switch (msgId)
 			{
 				case MessageID::ConnectionRequest:
-					handleConnectionRequest(tmpBs, stream, rs);
+					handleConnectionRequest(updateBS, stream, rs);
 					break;
 				case MessageID::ConnectionRequestAccepted:
-					handleConnectionRequestAccepted(tmpBs, stream, rs);
+					handleConnectionRequestAccepted(updateBS, stream, rs);
 					break;
 				case MessageID::ConnectionRequestHandShake:
-					handleConnectionRequestHandShake(tmpBs, stream, rs);
+					handleConnectionRequestHandShake(updateBS, stream, rs);
 					break;
 
 				case MessageID::ConnectedPing:
-					handleConnectedPing(tmpBs, stream, rs);
+					handleConnectedPing(updateBS, stream, rs, time);
 					break;
 				case MessageID::ConnectedPong:
-					handleConnectedPong(tmpBs, stream, rs);
+					handleConnectedPong(updateBS, stream, rs);
 					break;
 
 				case MessageID::DisconnectNotification:
-					handleDisconnectNotification(tmpBs, stream, rs);
+					handleDisconnectNotification(updateBS, stream, rs);
 					break;
 
 				case MessageID::InvalidPassword:
-					handleInvalidPassword(tmpBs, stream, rs);
+					handleInvalidPassword(updateBS, stream, rs);
 					break;
 					
 				default:
@@ -2454,20 +2454,17 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 
 // ----------------------------------
 
-void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
+void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs, core::TimeVal timeNow)
 {
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived ping");
 
-	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
-
 	int64_t timeStamp;
-
 	bs.read(timeStamp);
 
 	// respond.
 	bsOut.write(MessageID::ConnectedPong);
 	bsOut.write(timeStamp);
-	bsOut.write(timeNow.GetValue());
+	bsOut.write(timeNow);
 
 	rs.sendReliabile(
 		bsOut,
