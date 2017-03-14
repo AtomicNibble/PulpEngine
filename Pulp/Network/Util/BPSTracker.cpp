@@ -30,4 +30,12 @@ void BPSTracker::reset(void)
 	values_.clear();
 }
 
+void BPSTracker::free(void)
+{
+	total_ = 0;
+	lastSec_ = 0;
+
+	values_.free();
+}
+
 X_NAMESPACE_END

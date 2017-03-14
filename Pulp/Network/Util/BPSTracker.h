@@ -20,6 +20,7 @@ public:
 
 	void update(core::TimeVal time);
 	void reset(void);
+	void free(void);
 
 	X_INLINE void add(core::TimeVal time, uint64_t val);
 	X_INLINE uint64_t getTotal(void) const;
