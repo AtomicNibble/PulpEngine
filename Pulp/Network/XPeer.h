@@ -54,7 +54,10 @@ struct BufferdCommand
 	AddressOrGUID systemIdentifier;
 	
 	// 4
-	uint32_t receipt;
+	union {
+		uint32_t receipt;
+		bool sendDisconnectionNotification;
+	};
 };
 
 struct PingAndClockDifferential
@@ -88,7 +91,7 @@ public:
 	bool canSend(void) const;
 	ConnectionState::Enum getConnectionState(void) const;
 
-	void disconnect(void);
+	void closeConnection(void);
 
 	void onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
 		core::TimeVal sendPingTime, core::TimeVal sendPongTime);
@@ -301,10 +304,7 @@ private:
 
 
 	void sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate);
-	void closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
-		bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority = PacketPriority::Low);
-	void notifyAndFlagForShutdown(RemoteSystem& rs, bool performImmediate, 
-		uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
+	void notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
 	
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
 

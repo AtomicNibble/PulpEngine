@@ -139,7 +139,7 @@ ConnectionState::Enum RemoteSystem::getConnectionState(void) const
 	return ConnectionState::Disconnected;
 }
 
-void RemoteSystem::disconnect(void)
+void RemoteSystem::closeConnection(void)
 {
 	isActive = false;
 	weStartedconnection = false;
@@ -385,7 +385,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 		for (auto& rs : remoteSystems_)
 		{
 			if (rs.isActive) {
-				notifyAndFlagForShutdown(rs, true, orderingChannel, disconnectionNotificationPriority);
+				notifyAndFlagForShutdown(rs, orderingChannel, disconnectionNotificationPriority);
 				anyActive |= true;
 			}
 		}
@@ -464,7 +464,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 	}
 	
 	for (auto& rs : remoteSystems_) {
-		rs.disconnect();
+		rs.closeConnection();
 		rs.relLayer.free();
 	}
 
@@ -549,7 +549,13 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 void XPeer::closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
 	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
-	closeConnectionInternal(target, sendDisconnectionNotification, false, orderingChannel, notificationPriority);
+	BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
+	pCmd->priority = notificationPriority;
+	pCmd->orderingChannel = orderingChannel;
+	pCmd->systemIdentifier = target;
+	pCmd->sendDisconnectionNotification = sendDisconnectionNotification;
+	bufferdCmds_.push(pCmd);
+	
 
 	if (!sendDisconnectionNotification && getConnectionState(target) == ConnectionState::Connected)
 	{
@@ -748,37 +754,7 @@ bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pac
 	return res;
 }
 
-
-void XPeer::closeConnectionInternal(const AddressOrGUID& systemIdentifier, bool sendDisconnectionNotification,
-	bool performImmediate, uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
-{
-	RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, true);
-	if (!pRemoteSys) {
-		X_ERROR("Net", "Failed to find remote system for connection close.");
-		return;
-	}
-
-	if (sendDisconnectionNotification)
-	{
-		notifyAndFlagForShutdown(*pRemoteSys, performImmediate, orderingChannel, notificationPriority);
-		return;
-	}
-
-	if (!performImmediate)
-	{
-		BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
-		pCmd->priority = notificationPriority;
-		pCmd->orderingChannel = orderingChannel;
-		pCmd->systemIdentifier = systemIdentifier;
-		bufferdCmds_.push(pCmd);
-		return;
-	}
-
-	pRemoteSys->disconnect();
-}
-
-void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, bool imediate,
-	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
+void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
 	IPStr ipStr;
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "sending disconnectNotification to remoteSystem: \"%s\"", rs.systemAddress.toString(ipStr));
@@ -788,28 +764,15 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, bool imediate,
 
 	core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 
-	if (imediate) {
-		rs.sendReliabile(
-			bsOut,
-			PacketPriority::Immediate,
-			PacketReliability::ReliableOrdered,
-			0,
-			now
-		);
+	rs.sendReliabile(
+		bsOut,
+		PacketPriority::Immediate,
+		PacketReliability::ReliableOrdered,
+		0,
+		now
+	);
 
-		rs.connectState = ConnectState::DisconnectAsap;
-	}
-	else {
-		send(
-			bsOut.data(),
-			bsOut.sizeInBytes(),
-			PacketPriority::Immediate,
-			PacketReliability::ReliableOrdered,
-			0,
-			AddressOrGUID(&rs.systemAddress),
-			false
-		);
-	}
+	rs.connectState = ConnectState::DisconnectAsap;
 }
 
 
@@ -1636,6 +1599,8 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 				continue;
 			}
 
+			X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
+
 			sendImmediate(
 				cmd.pData,
 				cmd.numberOfBitsToSend,
@@ -1650,7 +1615,32 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 		}
 		else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
 		{
-			closeConnectionInternal(cmd.systemIdentifier, false, true, cmd.orderingChannel, cmd.priority);
+			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+			if (!pRemoteSystem) {
+				freeBufferdCmd(pBufCmd);
+				continue;
+			}
+
+			if (cmd.sendDisconnectionNotification)
+			{
+				X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
+
+				// don't disconnect yet.
+				// send notfitication and close after.
+				notifyAndFlagForShutdown(*pRemoteSystem, cmd.orderingChannel, cmd.priority);
+			}
+			else
+			{
+				// tell the game now.
+				Packet* pPacket = allocPacket(8);
+				pPacket->pData[0] = MessageID::ConnectionLost;
+				pPacket->pSystemAddress = nullptr; // fuck
+				pPacket->guid = pRemoteSystem->guid;
+				pushBackPacket(pPacket);
+
+				// close it.
+				pRemoteSystem->closeConnection();
+			}
 		}
 		else
 		{
@@ -1728,8 +1718,7 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow
 			pPacket->guid = rs.guid;
 			pushBackPacket(pPacket);
 
-
-			closeConnectionInternal(AddressOrGUID(&rs.systemAddress), false, true, 0, PacketPriority::Low);
+			rs.closeConnection();
 			continue;
 		}
 
@@ -2290,12 +2279,12 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	if (rs.connectState != ConnectState::UnverifiedSender)
 	{
 		X_ERROR("Net", "Recived unexpected connection request from client, ignoring.");
-		// ban the slut :D !
-		closeConnectionInternal(AddressOrGUID(&rs.systemAddress), false, true, 0, PacketPriority::Low);
 
 		IPStr ipStr;
 		rs.systemAddress.toString(ipStr);
 		addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
+
+		rs.closeConnection();
 		return;
 	}
 
@@ -2632,7 +2621,10 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 		{
 			// okay so we know a socket has been closed we don't need to wait for timeout.
 			// we send buffered as we on diffrent thread.
-			closeConnectionInternal(AddressOrGUID(&pData->systemAdd), false, false, 0);
+			BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
+			pCmd->systemIdentifier = AddressOrGUID(&pData->systemAdd);
+			pCmd->sendDisconnectionNotification = false;
+			bufferdCmds_.push(pCmd);
 		}
 		else if (res == RecvResult::Error)
 		{
