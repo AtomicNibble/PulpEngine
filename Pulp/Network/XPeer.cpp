@@ -1632,7 +1632,8 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 		{
 			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
 			if (!pRemoteSystem) {
-				return;
+				freeBufferdCmd(pBufCmd);
+				continue;
 			}
 
 			sendImmediate(
