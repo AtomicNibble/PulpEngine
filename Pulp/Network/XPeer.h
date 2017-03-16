@@ -346,13 +346,17 @@ private:
 	void removeConnectionRequest(const SystemAdd& sysAdd);
 
 private:
+	void Job_remoteReliabilityTick(RemoteSystem* pRemoteSystem, uint32_t count);
+
+private:
 	void processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow);
 	void processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal timeNow);
 	void processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal timeNow);
-	void peerReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow);
+	void remoteReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow);
+	void remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, core::TimeVal timeNow);
 
 
-	void processRecvData(UpdateBitStream& updateBS, RecvData* pRecvData, int32_t byteOffset);
+	void processRecvData(UpdateBitStream& updateBS, RecvData* pData, int32_t byteOffset);
 	void processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData, uint8_t* pBegin, uint8_t* pEnd);
 
 	// some msg handlers.
@@ -396,6 +400,7 @@ private:
 
 private:
 	NetVars& vars_;
+	core::V2::JobSystem* pJobSys_;
 
 	NetGUID guid_;
 

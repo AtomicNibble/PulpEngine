@@ -7,7 +7,9 @@
 #include <String\HumanDuration.h>
 #include <String\HumanSize.h>
 #include <Random\MultiplyWithCarry.h>
+
 #include <ITimer.h>
+#include <Threading\JobSystem2.h>
 
 #include "Sockets\Socket.h"
 
@@ -246,6 +248,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	maxIncommingConnections_ = 0;
 	maxPeers_ = 0;
 
+	pJobSys_ = gEnv->pJobSys;
 }
 
 XPeer::~XPeer()
@@ -397,7 +400,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 
 			// send out the packets.
 			core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
-			peerReliabilityTick(updateBS, timeNow);
+			remoteReliabilityTick(updateBS, timeNow);
 
 			// scale so if block is low we don't sleep much
 			auto sleepTime = safe_static_cast<uint32_t>(core::Max(blockDuration.GetMilliSecondsAsInt64() / 100, 1ll));
@@ -419,7 +422,9 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 
 				timeNow = gEnv->pTimer->GetTimeNowReal();
 
-				peerReliabilityTick(updateBS, timeNow);
+				remoteReliabilityTick(updateBS, timeNow);
+
+				// re get time..?
 			}
 
 			if (anyActive) {
@@ -492,8 +497,31 @@ void XPeer::runUpdate(void)
 	processRecvData(updateBS, timeNow);
 	processConnectionRequests(updateBS, timeNow);
 	processBufferdCommands(updateBS, timeNow);
-	peerReliabilityTick(updateBS, timeNow);
 
+	// if just one remote better to not make jobs.
+	// as we can reuse current updateBS which should be hot in cache.
+	const bool singlethreadRemoteTick = remoteSystems_.size() < 2;
+
+	if (singlethreadRemoteTick || !pJobSys_)
+	{
+		remoteReliabilityTick(updateBS, timeNow);
+	}
+	else
+	{
+		// we can updae all the peers in diffrent threads.
+		core::Delegate<void(RemoteSystem*, uint32_t)> del;
+		del.Bind<XPeer, &XPeer::Job_remoteReliabilityTick>(this);
+
+		// create a job for each remtoe.
+		auto* pJob = pJobSys_->parallel_for_member<XPeer>(del,
+			remoteSystems_.data(),
+			safe_static_cast<uint32_t>(remoteSystems_.size()),
+			core::V2::CountSplitter32(1)
+		);
+
+		pJobSys_->Run(pJob);
+		pJobSys_->Wait(pJob);
+	}
 }
 
 void XPeer::setPassword(const PasswordStr& pass)
@@ -1655,7 +1683,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 	}
 }
 
-void XPeer::peerReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow)
+void XPeer::remoteReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
 	for (auto& rs : remoteSystems_)
 	{
@@ -1663,130 +1691,151 @@ void XPeer::peerReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow
 			continue;
 		}
 
-		rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, timeNow);
+		remoteReliabilityTick(rs, updateBS, timeNow);
+	}
+}
 
-		const bool deadConnection = rs.relLayer.isConnectionDead();
-		const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
-		const bool disconnectingAfterAck = rs.connectState == ConnectState::DisconnectOnNoAck;
-		const bool waitingforConnection = rs.connectState == ConnectState::RequestedConnection || 
-										  rs.connectState == ConnectState::HandlingConnectionRequest ||
-										  rs.connectState == ConnectState::UnverifiedSender;
+void XPeer::Job_remoteReliabilityTick(RemoteSystem* pRemoteSystem, uint32_t count)
+{
+	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
-		// has this connection not completed yet?
-		const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
-		const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + dropCon));
-		const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
-		const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
-		const bool socketClosed = false;
-
-		if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut || socketClosed)
-		{
-			if (vars_.debugEnabled())
-			{
-				const char* pCloseReason = "<ukn>";
-
-				if (deadConnection) {
-					pCloseReason = "Connection timeout";
-				}
-				else if (disconnectingNoData) {
-					pCloseReason = "Disconnection request";
-				}
-				else if (connectionOpenTimeout) {
-					pCloseReason = "Partial connection timeout";
-				}
-				else if (dissconectAckTimedOut) {
-					pCloseReason = "Discconect ack timeout";
-				}
-				else if (dissconectAckTimedOut) {
-					pCloseReason = "Socket Closed";
-				}
-
-				IPStr ipStr;
-				X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
-			}
-
-			// ya cunt!
-			Packet* pPacket = allocPacket(8);
-			if (rs.connectState == ConnectState::RequestedConnection) {
-				pPacket->pData[0] = MessageID::ConnectionRequestFailed;
-			}
-			else if (rs.connectState == ConnectState::Connected) {
-				pPacket->pData[0] = MessageID::ConnectionLost;
-			}
-			else  {
-				pPacket->pData[0] = MessageID::DisconnectNotification;
-			}
-
-			pPacket->pSystemAddress = nullptr; // fuck
-			pPacket->guid = rs.guid;
-			pushBackPacket(pPacket);
-
-			rs.closeConnection();
+	for (uint32_t i = 0; i < count; i++)
+	{
+		if (!pRemoteSystem[i].isActive) {
 			continue;
 		}
 
-		if (rs.connectState == ConnectState::Connected && timeNow > rs.nextPingTime)
+		remoteReliabilityTick(pRemoteSystem[i], updateBS, timeNow);
+	}
+}
+
+void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, core::TimeVal timeNow)
+{
+	X_ASSERT(rs.isActive, "System not ative")();
+
+	rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, timeNow);
+
+	const bool deadConnection = rs.relLayer.isConnectionDead();
+	const bool disconnecting = rs.connectState == ConnectState::DisconnectAsap || rs.connectState == ConnectState::DisconnectAsapSilent;
+	const bool disconnectingAfterAck = rs.connectState == ConnectState::DisconnectOnNoAck;
+	const bool waitingforConnection = rs.connectState == ConnectState::RequestedConnection ||
+		rs.connectState == ConnectState::HandlingConnectionRequest ||
+		rs.connectState == ConnectState::UnverifiedSender;
+
+	// has this connection not completed yet?
+	const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
+	const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + dropCon));
+	const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
+	const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
+	const bool socketClosed = false;
+
+	if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut || socketClosed)
+	{
+		if (vars_.debugEnabled())
 		{
-			rs.nextPingTime = timeNow + core::TimeVal::fromMS(vars_.pingTimeMS());
-			sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
+			const char* pCloseReason = "<ukn>";
+
+			if (deadConnection) {
+				pCloseReason = "Connection timeout";
+			}
+			else if (disconnectingNoData) {
+				pCloseReason = "Disconnection request";
+			}
+			else if (connectionOpenTimeout) {
+				pCloseReason = "Partial connection timeout";
+			}
+			else if (dissconectAckTimedOut) {
+				pCloseReason = "Discconect ack timeout";
+			}
+			else if (dissconectAckTimedOut) {
+				pCloseReason = "Socket Closed";
+			}
+
+			IPStr ipStr;
+			X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
 		}
 
+		// ya cunt!
+		Packet* pPacket = allocPacket(8);
+		if (rs.connectState == ConnectState::RequestedConnection) {
+			pPacket->pData[0] = MessageID::ConnectionRequestFailed;
+		}
+		else if (rs.connectState == ConnectState::Connected) {
+			pPacket->pData[0] = MessageID::ConnectionLost;
+		}
+		else {
+			pPacket->pData[0] = MessageID::DisconnectNotification;
+		}
 
-		// do we have any packets?
-		ReliabilityLayer::PacketData data(arena_);
-		while (rs.relLayer.recive(data))
+		pPacket->pSystemAddress = nullptr; // fuck
+		pPacket->guid = rs.guid;
+		pushBackPacket(pPacket);
+
+		rs.closeConnection();
+	}
+
+	if (rs.connectState == ConnectState::Connected && timeNow > rs.nextPingTime)
+	{
+		rs.nextPingTime = timeNow + core::TimeVal::fromMS(vars_.pingTimeMS());
+		sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
+	}
+
+
+	// do we have any packets?
+	ReliabilityLayer::PacketData data(arena_);
+	while (rs.relLayer.recive(data))
+	{
+		// okay we got a packet :D!
+		// the first byte should be msgId.
+		if (data.getNumbBits() < 8) {
+			continue;
+		}
+
+		core::FixedBitStreamNoneOwning stream(data.begin(), data.end(), true);
+		MessageID::Enum msgId = stream.read<MessageID::Enum>();
+
+		if (msgId >= MessageID::ENUM_COUNT) {
+			X_ERROR("Net", "Message contains invalid msgId: %" PRIi32, static_cast<int32_t>(msgId));
+			continue;
+		}
+
+		X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
+
+		updateBS.reset();
+
+		// okay process the msg!
+		switch (msgId)
 		{
-			// okay we got a packet :D!
-			// the first byte should be msgId.
-			if (data.getNumbBits() < 8) {
-				continue;
-			}
+			case MessageID::ConnectionRequest:
+				handleConnectionRequest(updateBS, stream, rs, timeNow);
+				break;
+			case MessageID::ConnectionRequestAccepted:
+				handleConnectionRequestAccepted(updateBS, stream, rs, timeNow);
+				break;
+			case MessageID::ConnectionRequestHandShake:
+				handleConnectionRequestHandShake(updateBS, stream, rs);
+				break;
 
-			core::FixedBitStreamNoneOwning stream(data.begin(), data.end(), true);
-			MessageID::Enum msgId = stream.read<MessageID::Enum>();
+			case MessageID::ConnectedPing:
+				handleConnectedPing(updateBS, stream, rs, timeNow);
+				break;
+			case MessageID::ConnectedPong:
+				handleConnectedPong(updateBS, stream, rs);
+				break;
 
-			if (msgId >= MessageID::ENUM_COUNT) {
-				X_ERROR("Net", "Message contains invalid msgId: %" PRIi32, static_cast<int32_t>(msgId));
-				continue;
-			}
+			case MessageID::DisconnectNotification:
+				handleDisconnectNotification(updateBS, stream, rs);
+				break;
 
-			X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
+			case MessageID::InvalidPassword:
+				handleInvalidPassword(updateBS, stream, rs);
+				break;
 
-			updateBS.reset();
-
-			// okay process the msg!
-			switch (msgId)
-			{
-				case MessageID::ConnectionRequest:
-					handleConnectionRequest(updateBS, stream, rs, timeNow);
-					break;
-				case MessageID::ConnectionRequestAccepted:
-					handleConnectionRequestAccepted(updateBS, stream, rs, timeNow);
-					break;
-				case MessageID::ConnectionRequestHandShake:
-					handleConnectionRequestHandShake(updateBS, stream, rs);
-					break;
-
-				case MessageID::ConnectedPing:
-					handleConnectedPing(updateBS, stream, rs, timeNow);
-					break;
-				case MessageID::ConnectedPong:
-					handleConnectedPong(updateBS, stream, rs);
-					break;
-
-				case MessageID::DisconnectNotification:
-					handleDisconnectNotification(updateBS, stream, rs);
-					break;
-
-				case MessageID::InvalidPassword:
-					handleInvalidPassword(updateBS, stream, rs);
-					break;
-					
-				default:
-					// we send this out.
-					pushBackPacket(rs, data);
-					break;
-			}
+			default:
+				// we send this out.
+				pushBackPacket(rs, data);
+				break;
 		}
 	}
 }
