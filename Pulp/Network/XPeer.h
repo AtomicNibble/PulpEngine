@@ -306,7 +306,7 @@ private:
 		core::TimeVal currentTime, uint32_t receipt);
 
 
-	void sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate);
+	void sendPing(RemoteSystem& rs, PacketReliability::Enum rel);
 	void notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
 	
 	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;

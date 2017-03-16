@@ -1191,7 +1191,21 @@ void XPeer::ping(const ISystemAdd* pTarget)
 	X_ASSERT_NOT_NULL(pTarget);
 	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(pTarget);
 
-	sendPing(sysAdd, PacketReliability::UnReliable, false);
+	core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
+
+	core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
+	bsOut.write(MessageID::ConnectedPing);
+	bsOut.write(now.GetValue());
+
+	sendBuffered(
+		bsOut,
+		PacketPriority::Immediate,
+		PacketReliability::UnReliable,
+		0,
+		AddressOrGUID(pTarget),
+		false,
+		0
+	);
 }
 
 bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
@@ -1224,7 +1238,7 @@ bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAccepti
 }
 
 
-void XPeer::sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool imediate)
+void XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
 {
 	core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
 
@@ -1232,29 +1246,13 @@ void XPeer::sendPing(const SystemAdd& sysAdd, PacketReliability::Enum rel, bool 
 	bsOut.write(MessageID::ConnectedPing);
 	bsOut.write(now.GetValue());
 
-	if (imediate) {
-		sendImmediate(
-			bsOut,
-			PacketPriority::Immediate,
-			rel,
-			0,
-			AddressOrGUID(&sysAdd),
-			false,
-			now,
-			0
-		);
-	}
-	else {
-		sendBuffered(
-			bsOut,
-			PacketPriority::Immediate,
-			rel,
-			0,
-			AddressOrGUID(&sysAdd),
-			false,
-			0
-		);
-	}
+	rs.sendReliabile(
+		bsOut,
+		PacketPriority::Immediate,
+		rel,
+		0,
+		now
+	);
 }
 
 
@@ -1778,7 +1776,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 	if (rs.connectState == ConnectState::Connected && timeNow > rs.nextPingTime)
 	{
 		rs.nextPingTime = timeNow + core::TimeVal::fromMS(vars_.pingTimeMS());
-		sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
+		sendPing(rs, PacketReliability::UnReliable);
 	}
 
 
@@ -2454,7 +2452,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 		timeNow
 	);
 
-	sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
+	sendPing(rs, PacketReliability::UnReliable);
 
 	// tell the game.
 	Packet* pPacket = allocPacket(8);
@@ -2494,7 +2492,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 
 	rs.onConnected(externalSysId, localIps, core::TimeVal(sendPingTime), core::TimeVal(sendPongTime));
 
-	sendPing(rs.systemAddress, PacketReliability::UnReliable, true);
+	sendPing(rs, PacketReliability::UnReliable);
 
 	// tell the game.
 	Packet* pPacket = allocPacket(8);
