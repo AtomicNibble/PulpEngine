@@ -484,6 +484,17 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 	sendReceiptSerial_ = 0;
 }
 
+void XPeer::runUpdate(void)
+{
+	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+	processRecvData(updateBS, timeNow);
+	processConnectionRequests(updateBS, timeNow);
+	processBufferdCommands(updateBS, timeNow);
+	peerReliabilityTick(updateBS, timeNow);
+
+}
 
 void XPeer::setPassword(const PasswordStr& pass)
 {
@@ -790,14 +801,6 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
 
 Packet* XPeer::receive(void)
 {
-	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
-	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
-
-	processRecvData(updateBS, timeNow);
-	processConnectionRequests(updateBS, timeNow);
-	processBufferdCommands(updateBS, timeNow);
-	peerReliabilityTick(updateBS, timeNow);
-
 	if (packetQue_.isEmpty()) {
 		return nullptr;
 	}

@@ -224,6 +224,8 @@ public:
 	void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
 		PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_FINAL;
 
+	void runUpdate(void) X_FINAL;
+
 	void setPassword(const PasswordStr& pass) X_FINAL;
 
 	// connection api

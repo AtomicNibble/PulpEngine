@@ -284,6 +284,8 @@ struct IPeer
 	virtual void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
 		PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_ABSTRACT;
 
+	virtual void runUpdate(void) X_ABSTRACT;
+
 	virtual void setPassword(const PasswordStr& pass) X_ABSTRACT;
 
 	// connection api
