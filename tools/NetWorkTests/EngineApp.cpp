@@ -38,7 +38,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 	params.bTesting = false;
 	params.bCoreOnly = true;
 	params.bEnableBasicConsole = true;
-	params.bEnableJobSystem = false;
+	params.bEnableJobSystem = true;
 	params.bEnableNetowrking = true;
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
