@@ -90,6 +90,8 @@ namespace
 
 		while (1)
 		{
+			pPeer->runUpdate();
+
 			net::Packet* pPacket = nullptr;
 			for (pPacket = pPeer->receive(); pPacket; pPeer->freePacket(pPacket), pPacket = pPeer->receive())
 			{
