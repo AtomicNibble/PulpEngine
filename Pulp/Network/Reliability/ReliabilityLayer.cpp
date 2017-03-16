@@ -25,7 +25,7 @@ namespace
 	typedef Flags<DatagramFlag> DatagramFlags;
 
 	X_PACK_PUSH(1)
-		struct DatagramHdr
+	struct DatagramHdr
 	{
 		void writeToBitStream(core::FixedBitStreamBase& bs) const;
 		void fromBitStream(core::FixedBitStreamBase& bs);
