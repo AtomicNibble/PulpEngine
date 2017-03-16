@@ -530,16 +530,18 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 		return pOth->systemAddress == systemAddress;
 	};
 
-	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+	{
+		core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
-	if (std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc) != connectionReqs_.end()) {
-		freeConnectionRequest(pConReq);
-		return ConnectionAttemptResult::AlreadyInProgress;
+		if (std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc) != connectionReqs_.end()) {
+			freeConnectionRequest(pConReq);
+			return ConnectionAttemptResult::AlreadyInProgress;
+		}
+
+		connectionReqs_.emplace_back(pConReq);
 	}
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Started Connection request to host: \"%s\" port: ^5%" PRIu16, pHost, remotePort);
-
-	connectionReqs_.emplace_back(pConReq);
 	
 	return ConnectionAttemptResult::Started;
 }
