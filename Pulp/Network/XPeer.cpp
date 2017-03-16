@@ -203,6 +203,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	sockets_(arena),
 	socketThreads_(arena),
 	remoteSystems_(arena),
+	activeRemoteSystems_(arena),
 	bufferdCmds_(arena),
 	packetQue_(arena),
 	recvDataQue_(arena),
@@ -288,6 +289,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		core::MemoryArenaBase* packetPool = &pool2Arena_;
 
 		remoteSystems_.reserve(maxPeers_);
+		activeRemoteSystems_.reserve(maxPeers_);
 		for (int32_t i = 0; i < maxPeers_; i++) {
 			remoteSystems_.emplace_back(vars_, arena_, &blockArena_, packetPool);
 		}
@@ -473,6 +475,9 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 		rs.relLayer.free();
 	}
 
+	remoteSystems_.clear();
+	activeRemoteSystems_.clear();
+
 	bufferdCmds_.tryPopAll([&](BufferdCommand* pCmd) {
 		freeBufferdCmd(pCmd);
 	});
@@ -500,7 +505,7 @@ void XPeer::runUpdate(void)
 
 	// if just one remote better to not make jobs.
 	// as we can reuse current updateBS which should be hot in cache.
-	const bool singlethreadRemoteTick = remoteSystems_.size() < 2;
+	const bool singlethreadRemoteTick = activeRemoteSystems_.size() < 2;
 
 	if (singlethreadRemoteTick || !pJobSys_)
 	{
@@ -509,13 +514,13 @@ void XPeer::runUpdate(void)
 	else
 	{
 		// we can updae all the peers in diffrent threads.
-		core::Delegate<void(RemoteSystem*, uint32_t)> del;
+		core::Delegate<void(RemoteSystem**, uint32_t)> del;
 		del.Bind<XPeer, &XPeer::Job_remoteReliabilityTick>(this);
 
 		// create a job for each remtoe.
 		auto* pJob = pJobSys_->parallel_for_member<XPeer>(del,
-			remoteSystems_.data(),
-			safe_static_cast<uint32_t>(remoteSystems_.size()),
+			activeRemoteSystems_.data(),
+			safe_static_cast<uint32_t>(activeRemoteSystems_.size()),
 			core::V2::CountSplitter32(1)
 		);
 
@@ -1670,7 +1675,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 				pushBackPacket(pPacket);
 
 				// close it.
-				pRemoteSystem->closeConnection();
+				disconnectRemote(*pRemoteSystem);
 			}
 		}
 		else
@@ -1685,28 +1690,23 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 
 void XPeer::remoteReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
-	for (auto& rs : remoteSystems_)
+	for (auto* pRS : activeRemoteSystems_)
 	{
-		if (!rs.isActive) {
-			continue;
-		}
-
-		remoteReliabilityTick(rs, updateBS, timeNow);
+		X_ASSERT_NOT_NULL(pRS);
+		remoteReliabilityTick(*pRS, updateBS, timeNow);
 	}
 }
 
-void XPeer::Job_remoteReliabilityTick(RemoteSystem* pRemoteSystem, uint32_t count)
+void XPeer::Job_remoteReliabilityTick(RemoteSystem** pRemoteSystems, uint32_t count)
 {
 	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	for (uint32_t i = 0; i < count; i++)
 	{
-		if (!pRemoteSystem[i].isActive) {
-			continue;
-		}
+		X_ASSERT_NOT_NULL(pRemoteSystems[i]);
 
-		remoteReliabilityTick(pRemoteSystem[i], updateBS, timeNow);
+		remoteReliabilityTick(*pRemoteSystems[i], updateBS, timeNow);
 	}
 }
 
@@ -1772,7 +1772,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 		pPacket->guid = rs.guid;
 		pushBackPacket(pPacket);
 
-		rs.closeConnection();
+		disconnectRemote(rs);
 	}
 
 	if (rs.connectState == ConnectState::Connected && timeNow > rs.nextPingTime)
@@ -2336,7 +2336,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 		rs.systemAddress.toString(ipStr);
 		addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 
-		rs.closeConnection();
+		disconnectRemote(rs);
 		return;
 	}
 
@@ -2608,6 +2608,8 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 			remoteSys.pNetSocket = pSrcSocket;
 			remoteSys.isActive = true; // diverts all packets to reliabilty layer.
 
+			activeRemoteSystems_.push_back(&remoteSys);
+
 			if (pSrcSocket->getBoundAdd() != bindingAdd)
 			{
 				// print warning.
@@ -2620,6 +2622,15 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int3
 
 	// warning?
 	return nullptr;
+}
+
+void XPeer::disconnectRemote(RemoteSystem& rs)
+{
+	rs.closeConnection();
+
+	auto it = std::find(activeRemoteSystems_.begin(), activeRemoteSystems_.end(), &rs);
+	X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove resmote system that is not active")();
+	activeRemoteSystems_.erase(it);
 }
 
 bool XPeer::isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOut)

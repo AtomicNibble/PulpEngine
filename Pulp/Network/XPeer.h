@@ -167,6 +167,7 @@ class XPeer : public IPeer
 	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef core::Array<NetSocket> SocketsArr;	
 	typedef core::Array<RemoteSystem, core::ArrayAlignedAllocator<RemoteSystem>> RemoteSystemArr;
+	typedef core::Array<RemoteSystem*> RemoteSystemPtrArr;
 
 	// thead que's
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
@@ -346,7 +347,7 @@ private:
 	void removeConnectionRequest(const SystemAdd& sysAdd);
 
 private:
-	void Job_remoteReliabilityTick(RemoteSystem* pRemoteSystem, uint32_t count);
+	void Job_remoteReliabilityTick(RemoteSystem** pRemoteSystems, uint32_t count);
 
 private:
 	void processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow);
@@ -386,6 +387,7 @@ private:
 
 	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
 		NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state);
+	void disconnectRemote(RemoteSystem& rs);
 	bool isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOut = nullptr);
 
 	// ------
@@ -426,6 +428,7 @@ private:
 
 	// rmeote systems
 	RemoteSystemArr		remoteSystems_;
+	RemoteSystemPtrArr  activeRemoteSystems_;
 
 	// allocators
 	core::MemoryArenaBase* arena_; // gen purpose.
