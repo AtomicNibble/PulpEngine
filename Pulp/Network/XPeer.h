@@ -295,15 +295,9 @@ public:
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
-	bool sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority, 
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, 
-		core::TimeVal currentTime, uint32_t receipt);
 
 	X_INLINE void sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
-	X_INLINE bool sendImmediate(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast,
-		core::TimeVal currentTime, uint32_t receipt);
 
 
 	void sendPing(RemoteSystem& rs, PacketReliability::Enum rel);

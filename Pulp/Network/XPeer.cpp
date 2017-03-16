@@ -766,37 +766,6 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 	bufferdCmds_.push(pCmd);
 }
 
-bool XPeer::sendImmediate(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast,
-	core::TimeVal currentTime, uint32_t receipt)
-{
-	RemoteSystem* pRemoteSystem = getRemoteSystem(systemIdentifier, true);
-	if (!pRemoteSystem) {
-		X_ERROR("Net", "Failed to find remote system for send");
-		return false;
-	}
-	
-	if (!pRemoteSystem->canSend()) {
-		X_WARNING_IF(vars_.debugEnabled(), "Net", "Tried to send data to remote, where sending is currently disabled");
-		return false;
-	}
-
-	if (broadcast) {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
-
-	bool res = pRemoteSystem->sendReliabile(
-		pData,
-		numberOfBitsToSend,
-		priority,
-		reliability,
-		orderingChannel,
-		currentTime,
-		receipt
-	);
-
-	return res;
-}
 
 void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
@@ -1627,25 +1596,70 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 
 		if (cmd.cmd == BufferdCommand::Cmd::Send)
 		{
-			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
-			if (!pRemoteSystem) {
-				freeBufferdCmd(pBufCmd);
-				continue;
-			}
-
 			X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
 
-			sendImmediate(
-				cmd.pData,
-				cmd.numberOfBitsToSend,
-				cmd.priority,
-				cmd.reliability,
-				cmd.orderingChannel,
-				cmd.systemIdentifier,
-				cmd.broadcast,
-				timeNow,
-				cmd.receipt
-			);
+
+			if (cmd.broadcast)
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+				
+				// for broadcast pRemoteSystem is allowed to be null.
+				// it's used for exclusions.
+				RemoteSystem* pRemoteSystem = nullptr;	
+				if (cmd.systemIdentifier.isAddressValid()) {
+					pRemoteSystem = getRemoteSystem(cmd.systemIdentifier.pSystemAddress, true);
+				}
+				else if (cmd.systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
+					pRemoteSystem = getRemoteSystem(cmd.systemIdentifier.netGuid, true);
+				}
+
+				// broadcast too all but pRemoteSystem.
+				for (auto* pRemote : activeRemoteSystems_)
+				{
+					if (pRemote == pRemoteSystem) {
+						continue;
+					}
+
+					if (!pRemoteSystem->sendReliabile(
+						cmd.pData,
+						cmd.numberOfBitsToSend,
+						cmd.priority,
+						cmd.reliability,
+						cmd.orderingChannel,
+						timeNow,
+						cmd.receipt
+					)) {
+						X_WARNING("Net", "Failed to send reliable packet, when broadcasting");
+					}
+				}
+
+			}
+			else
+			{
+				RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+				if (!pRemoteSystem) {
+					freeBufferdCmd(pBufCmd);
+					continue;
+				}
+
+				if (!pRemoteSystem->canSend()) {
+					X_WARNING_IF(vars_.debugEnabled(), "Net", "Tried to send data to remote, where sending is currently disabled");
+					freeBufferdCmd(pBufCmd);
+					continue;
+				}
+
+				if (!pRemoteSystem->sendReliabile(
+					cmd.pData,
+					cmd.numberOfBitsToSend,
+					cmd.priority,
+					cmd.reliability,
+					cmd.orderingChannel,
+					timeNow,
+					cmd.receipt
+				)) {
+					X_WARNING("Net", "Failed to send reliable packet");
+				}
+			}
 		}
 		else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
 		{
