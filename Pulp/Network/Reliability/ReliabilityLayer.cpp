@@ -1522,7 +1522,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 
 	if (channelIt == splitPacketChannels_.end())
 	{
-		SplitPacketChannel* pChannel = X_NEW(SplitPacketChannel, arena_, "PacketChannel")(arena_);
+		pChannel = X_NEW(SplitPacketChannel, arena_, "PacketChannel")(arena_);
 		pChannel->splitId = splitId;
 		pChannel->packets.resize(pPacket->splitPacketCount); // we know how many we gonna get.
 
