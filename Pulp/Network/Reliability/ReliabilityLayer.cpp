@@ -1185,7 +1185,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 				if ((currentDataGramSizeBits + totalBitSize) > maxDataGramSizeBits)
 				{
 					// check this is not first packet. otherwise it will never fit. ;)
-					X_ASSERT(maxDataGramSizeBits > 0, "Packet is too big to fit in single datagram")(maxDataGramSizeBits, totalBitSize);
+					X_ASSERT(currentDataGramSizeBits > 0, "Packet is too big to fit in single datagram")(currentDataGramSizeBits, totalBitSize);
 					break;
 				}
 
