@@ -1265,6 +1265,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 		X_ASSERT(end >= begin, "Invalid range")(begin, end);
 
+		const size_t numPackets = static_cast<size_t>(end - begin);
+
 		// here we pack the packet range into BS.
 		bs.reset();
 
@@ -1277,7 +1279,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 		X_ASSERT(bs.size() == dataGramHdrSizeBits(), "Invalid size logic")(bs.size(), dataGramHdrSizeBits());
 
-		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Sending DataGram number: ^5%" PRIu16 "^7 numPackets: ^5%" PRIuS, dgh.number, static_cast<size_t>(end - begin));
+		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Sending DataGram number: ^5%" PRIu16 "^7 numPackets: ^5%" PRIuS, dgh.number, numPackets);
 
 		DataGramHistory* pHistory = createDataGramHistory(dgh.number, time);
 
