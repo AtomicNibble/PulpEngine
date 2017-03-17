@@ -752,7 +752,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 	else if (dgh.flags.IsSet(DatagramFlag::Nack))
 	{
 		// nick nack pady wack
-		X_ALIGNED_SYMBOL(char allocBuf[core::bitUtil::RoundUpToMultiple(MAX_MTU_SIZE, 256u)], 16) = {};
+		X_ALIGNED_SYMBOL(char allocBuf[core::bitUtil::RoundUpToMultiple(MAX_MTU_SIZE, 256u) + 512], 16) = {};
 
 		core::StackAllocator allocator(allocBuf, allocBuf + sizeof(allocBuf));
 
