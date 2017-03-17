@@ -403,7 +403,13 @@ typename Fifo<T>::Reference Fifo<T>::back(void)
 {
 	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
 
-	return *(write_ - 1);
+	TypePtr pTr = write_ - 1;
+	if (write_ == start_) {
+		pTr = end_ - 1;
+	}
+
+	X_ASSERT(pTr >= start_ && pTr < end_, "Out of range")(pTr, start_, end_, size(), capacity());
+	return *pTr;
 }
 
 template<typename T>
@@ -411,7 +417,13 @@ typename Fifo<T>::ConstReference Fifo<T>::back(void) const
 {
 	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
 
-	return *(write_ - 1);
+	ConstTypePtr pTr = write_ - 1;
+	if (write_ == start_) {
+		pTr = end_ - 1;
+	}
+
+	X_ASSERT(pTr >= start_ && pTr < end_, "Out of range")(pTr, start_, end_, size(), capacity());
+	return *pTr;
 }
 
 
