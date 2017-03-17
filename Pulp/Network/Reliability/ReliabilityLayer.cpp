@@ -1434,7 +1434,7 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
 bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 {
 	const auto lengthBytes = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-	const size_t maxDataSizeBytes = maxDataGramSize() - ReliablePacket::getMaxHeaderLength();
+	const size_t maxDataSizeBytes = maxDataGramSizeExcHdr() - ReliablePacket::getMaxHeaderLength();
 	const bool splitRequired = lengthBytes > maxDataSizeBytes;
 
 	X_ASSERT(splitRequired, "Called split when no split required")(splitRequired, lengthBytes, maxDataSizeBytes);
