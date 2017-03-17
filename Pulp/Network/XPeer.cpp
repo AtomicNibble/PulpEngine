@@ -499,6 +499,10 @@ void XPeer::runUpdate(void)
 	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
+	// would be nice if we could split this into jobs.
+	// basically need to group incoming packets by target system
+	// maybe i'll have some initial single thread logic that processes all the packets by systemAddress.
+	// then once that's been done jobs can be created to pass the data to the reliability layers where the processing is actually done.
 	processRecvData(updateBS, timeNow);
 	processConnectionRequests(updateBS, timeNow);
 	processBufferdCommands(updateBS, timeNow);
