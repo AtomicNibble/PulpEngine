@@ -1478,7 +1478,9 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 		pSplitPacket->pData = pPacket->pData + offset;
 		pSplitPacket->pRefData = pRefData;
 
-		pRefData->addReference();
+		if (packetIdx > 0) {
+			pRefData->addReference();
+		}
 
 		if (packetSizeBytes == maxDataSizeBytes) {
 			pSplitPacket->dataBitLength = safe_static_cast<BitSizeT>(core::bitUtil::bytesToBits(packetSizeBytes));
