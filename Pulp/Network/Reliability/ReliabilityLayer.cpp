@@ -539,6 +539,8 @@ void ReliabilityLayer::free(void)
 		bps_[i].free();
 	}
 
+	splitPacketChannels_.free();
+
 	packetsThisFrame_.free();
 	packetsThisFrameBoundaries_.free();
 }
@@ -574,6 +576,10 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 	naks_.clear();
 	acks_.clear();
 
+	for (auto* pSplitChannel : splitPacketChannels_) {
+		freeSplitPacketChannel(pSplitChannel);
+	}
+	splitPacketChannels_.clear();
 	reliableMessageNumberIdx_ = 0;
 	dagramSeqNumber_ = 0;
 	splitPacketId_ = 0;
@@ -1433,6 +1439,16 @@ void ReliabilityLayer::freePacket(ReliablePacket* pPacket)
 	X_DELETE(pPacket, packetPool_);
 }
 
+SplitPacketChannel* ReliabilityLayer::allocSplicPacketChannel(void)
+{
+	return X_NEW(SplitPacketChannel, arena_, "PacketChannel")(arena_);
+}
+
+void ReliabilityLayer::freeSplitPacketChannel(SplitPacketChannel* pSPC)
+{
+	X_DELETE(pSPC, arena_);
+}
+
 bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 {
 	const auto lengthBytes = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
@@ -1531,7 +1547,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 
 	if (channelIt == splitPacketChannels_.end())
 	{
-		pChannel = X_NEW(SplitPacketChannel, arena_, "PacketChannel")(arena_);
+		pChannel = allocSplicPacketChannel();
 		pChannel->splitId = splitId;
 		pChannel->packets.resize(pPacket->splitPacketCount); // we know how many we gonna get.
 
@@ -1585,6 +1601,8 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 			p->freeData();
 			freePacket(p);
 		}
+
+		freeSplitPacketChannel(pChannel);
 
 		X_ASSERT(channelIt != splitPacketChannels_.end(), "Should not be merging split packs on frist packet")(channelIt);
 		splitPacketChannels_.erase(channelIt);

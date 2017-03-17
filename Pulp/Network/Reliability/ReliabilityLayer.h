@@ -267,8 +267,11 @@ private:
 
 	ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
 	ReliablePacket* allocPacket(void);
+	SplitPacketChannel* allocSplicPacketChannel(void);
 	void freePacket(ReliablePacket* pPacket);
 	bool splitPacket(ReliablePacket* pPacket);
+	void freeSplitPacketChannel(SplitPacketChannel* pSPC);
+
 	// recived split packets.
 	ReliablePacket* addIncomingSplitPacket(ReliablePacket* pPacket, core::TimeVal time);
 
