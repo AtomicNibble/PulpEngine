@@ -1680,6 +1680,13 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 				continue;
 			}
 
+			if (!pRemoteSystem->isActive || pRemoteSystem->connectState != ConnectionState::Connected) {
+				X_LOG0_IF(vars_.debugEnabled(), "Net", "Skipping closeConnection request, the remote is already disconneting/disconnected. state: \"%s\"",
+					ConnectionState::ToString(pRemoteSystem->connectState));
+				freeBufferdCmd(pBufCmd);
+				continue;
+			}
+
 			if (cmd.sendDisconnectionNotification)
 			{
 				X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
