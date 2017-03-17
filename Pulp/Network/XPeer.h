@@ -97,7 +97,7 @@ public:
 		core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 	void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
-	X_INLINE bool sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
+	X_INLINE bool sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt = 0);
 	X_INLINE bool sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt = 0);

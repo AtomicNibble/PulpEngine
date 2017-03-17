@@ -153,6 +153,13 @@ core::MemoryArenaBase* ReliablePacket::getArena(void) const
 	return arena;
 }
 
+void ReliablePacket::setArena(core::MemoryArenaBase* arena)
+{
+	X_ASSERT(pData == nullptr, "Packet already has data")(pData, dataBitLength);
+
+	this->arena = arena;
+}
+
 bool ReliablePacket::isReliable(void) const
 {
 	switch (reliability)
@@ -604,7 +611,7 @@ void ReliabilityLayer::clearPacketQueues(void)
 
 
 bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
-	PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, uint32_t receipt)
+	PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, uint32_t receipt, bool ownData)
 {
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
@@ -628,9 +635,19 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 	pPacket->sendAttemps = 0;
 	pPacket->sendReceipt = receipt;
 
-	pPacket->allocData(lengthBits);
-
-	std::memcpy(pPacket->pData, pData, lengthBytes);
+	if (ownData)
+	{
+		// can skip copy as we now own the buffer.
+		pPacket->setArena(packetDataArena_);
+		pPacket->pData = const_cast<uint8_t*>(pData);
+		pPacket->dataBitLength = lengthBits;
+	}
+	else
+	{
+		// must allocate buffer and copy.
+		pPacket->allocData(lengthBits);
+		std::memcpy(pPacket->pData, pData, lengthBytes);
+	}
 
 	if (splitRequired)
 	{
@@ -1123,6 +1140,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 				++pPacket->sendAttemps;
 
+				// TODO.
 				pPacket->retransmissionTime = core::TimeVal::fromMS(2000);
 				pPacket->nextActionTime = time + pPacket->retransmissionTime;
 

@@ -65,6 +65,7 @@ public:
 	void freeData(void);
 	void allocData(size_t numBits);
 	core::MemoryArenaBase* getArena(void) const;
+	void setArena(core::MemoryArenaBase* arena);
 
     bool isReliable(void) const;
     bool isAckRequired(void) const;
@@ -219,7 +220,7 @@ public:
 
 	// que some data for sending, reliability is handled.
 	bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
-		PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel,  uint32_t receipt);
+		PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel,  uint32_t receipt, bool ownData);
 
 	// pass data from socket for processing
 	bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,

@@ -1623,6 +1623,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 					if (!pRemoteSystem->sendReliabile(
 						cmd.pData,
 						cmd.numberOfBitsToSend,
+						true,
 						cmd.priority,
 						cmd.reliability,
 						cmd.orderingChannel,
@@ -1651,6 +1652,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 				if (!pRemoteSystem->sendReliabile(
 					cmd.pData,
 					cmd.numberOfBitsToSend,
+					true,
 					cmd.priority,
 					cmd.reliability,
 					cmd.orderingChannel,
