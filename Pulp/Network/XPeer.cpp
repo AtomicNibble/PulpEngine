@@ -1640,6 +1640,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 					}
 				}
 
+				cmd.pData = nullptr;
 			}
 			else
 			{
@@ -1666,7 +1667,9 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 					cmd.receipt
 				)) {
 					X_WARNING("Net", "Failed to send reliable packet");
-				}
+				} 
+
+				cmd.pData = nullptr;
 			}
 		}
 		else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
