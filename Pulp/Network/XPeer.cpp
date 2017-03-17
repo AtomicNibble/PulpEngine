@@ -1076,7 +1076,9 @@ BufferdCommand* XPeer::allocBufferdCmd(BufferdCommand::Cmd::Enum type, size_t le
 
 void XPeer::freeBufferdCmd(BufferdCommand* pBufCmd)
 {
-	freePacketData(pBufCmd->pData);
+	if (pBufCmd->pData) {
+		freePacketData(pBufCmd->pData);
+	}
 	X_DELETE(pBufCmd, &poolArena_);
 }
 
