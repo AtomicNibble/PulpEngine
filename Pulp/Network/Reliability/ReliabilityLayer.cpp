@@ -1257,6 +1257,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 			end = packetsThisFrameBoundaries_[i];
 		}
 
+		X_ASSERT(end >= begin, "Invalid range")(begin, end);
+
 		// here we pack the packet range into BS.
 		bs.reset();
 
