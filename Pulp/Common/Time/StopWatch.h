@@ -1,3 +1,4 @@
+#pragma once
 
 #include "Time\TimeVal.h"
 
