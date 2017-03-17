@@ -74,6 +74,8 @@ public:
 	typedef size_t size_type;
 	typedef _FifoIterator<T> iterator;
 	typedef _FifoConstIterator<T> const_iterator;
+	typedef T* TypePtr;
+	typedef const T* ConstTypePtr;
 	typedef T& Reference;
 	typedef T& reference;
 	typedef const T& ConstReference;
