@@ -1489,6 +1489,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 		packets[packetIdx] = pSplitPacket;
 	}
 
+
 	// push them all.
 	const auto priority = pPacket->priority;
 	for (auto* pSplitPacket : packets)
@@ -1501,6 +1502,10 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 
 
 	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitpacket took: ^5%gms", timer.GetMilliSeconds());
+
+	// don't free it's refrenced by the split packets.
+	pPacket->pData = nullptr;
+	pPacket->dataBitLength = 0;
 
 	// we don't need this packt anymore.
 	freePacket(pPacket);
