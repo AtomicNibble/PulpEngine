@@ -1439,7 +1439,10 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 
 	X_ASSERT(splitRequired, "Called split when no split required")(splitRequired, lengthBytes, maxDataSizeBytes);
 
-	pPacket->splitPacketCount = safe_static_cast<SplitPacketIndex>(1 + ((maxDataSizeBytes - 1) / lengthBytes));
+	pPacket->splitPacketCount = safe_static_cast<SplitPacketIndex>((lengthBytes - 1) / (maxDataSizeBytes)+1);
+
+	X_ASSERT(pPacket->splitPacketCount > 1, "Packet was not split")(pPacket->splitPacketCount, lengthBytes, maxDataSizeBytes);
+	X_ASSERT((pPacket->splitPacketCount * maxDataSizeBytes) >= lengthBytes, "Split count can't represent packet data")(pPacket->splitPacketCount, maxDataSizeBytes, lengthBytes);
 
 	core::HumanSize::Str sizeBuf;
 	X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitting packet of size %s into ^5%" PRIu16 "^7 packets",
