@@ -309,6 +309,7 @@ struct IPeer
 	virtual void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_ABSTRACT;
 
 	virtual Packet* receive(void) X_ABSTRACT;
+	virtual void clearPackets(void) X_ABSTRACT; // free's any packets in the receive que.
 	virtual void freePacket(Packet* pPacket) X_ABSTRACT;
 
 

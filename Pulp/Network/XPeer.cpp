@@ -821,6 +821,17 @@ Packet* XPeer::receive(void)
 	return nullptr;
 }
 
+void XPeer::clearPackets(void)
+{
+	if (packetQue_.isEmpty()) {
+		return;
+	}
+
+	packetQue_.tryPopAll([&](Packet* pPacket) {
+		freePacket(pPacket);
+	});
+}
+
 bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const
 {
 	if (systemIdentifier.netGuid == getMyGUID()) {

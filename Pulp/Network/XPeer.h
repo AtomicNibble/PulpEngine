@@ -248,6 +248,7 @@ public:
 	void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 
 	Packet* receive(void) X_FINAL;
+	void clearPackets(void) X_FINAL; // free's any packets in the receive que.
 
 	// connection limits
 	void setMaximumIncomingConnections(uint16_t numberAllowed) X_FINAL;
