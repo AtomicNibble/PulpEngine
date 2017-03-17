@@ -1836,12 +1836,12 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 		core::FixedBitStreamNoneOwning stream(data.begin(), data.end(), true);
 		MessageID::Enum msgId = stream.read<MessageID::Enum>();
 
-		if (msgId >= MessageID::ENUM_COUNT) {
-			X_ERROR("Net", "Message contains invalid msgId: %" PRIi32, static_cast<int32_t>(msgId));
-			continue;
+		if (msgId < MessageID::ENUM_COUNT) {
+			X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
 		}
-
-		X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived reliable messageId: \"%s\"", MessageID::ToString(msgId));
+		else {
+			// user packet data.
+		}
 
 		updateBS.reset();
 
