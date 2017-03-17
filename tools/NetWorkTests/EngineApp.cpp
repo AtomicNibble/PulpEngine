@@ -35,7 +35,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 	params.bSkipSound = true;
 	params.bVsLog = false;
 	params.bConsoleLog = true;
-	params.bTesting = false;
+	params.bTesting = true;
 	params.bCoreOnly = true;
 	params.bEnableBasicConsole = true;
 	params.bEnableJobSystem = true;

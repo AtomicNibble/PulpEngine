@@ -2,10 +2,13 @@
 #include "EngineApp.h"
 
 #include <Platform\Console.h>
-#include <INetwork.h>
+#include <String\HumanSize.h>
+#include <Time\StopWatch.h>
+
 
 #define _LAUNCHER
 #include <ModuleExports.h>
+
 
 #ifdef X_LIB
 
@@ -51,14 +54,11 @@ namespace
 			auto res = pPeer->init(16, &sd, 1);
 			if (res != net::StartupResult::Started)
 			{
-
 				return;
 			}
 
 			pPeer->setPassword(net::PasswordStr("goat"));
 			pPeer->setMaximumIncomingConnections(16);
-
-		
 		}
 		else
 		{
@@ -69,7 +69,6 @@ namespace
 
 			if (res != net::StartupResult::Started)
 			{
-
 				return;
 			}
 			
@@ -77,7 +76,6 @@ namespace
 			auto connectRes = pPeer->connect("127.0.0.1", SERVER_PORT, net::PasswordStr("goat"));
 			if (connectRes != net::ConnectionAttemptResult::Started)
 			{
-
 				return;
 			}
 		}
@@ -86,7 +84,6 @@ namespace
 
 		uint8_t testData[64];
 		core::zero_object(testData);
-
 
 		while (1)
 		{
@@ -97,11 +94,7 @@ namespace
 			{
 				X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
 
-
-
 			}
-
-			//	pServer->sendLoopback(testData, sizeof(testData));
 
 			// sleep, as other thread will handle incoming requests and buffer then for us.
 			core::Thread::Sleep(50);
@@ -115,6 +108,44 @@ namespace
 		pPeer->shutdown(core::TimeVal::fromMS(500));
 	}
 
+	void ClientServerSelector(core::Console& Console)
+	{
+		net::INet* pNet = gEnv->pNet;
+		net::IPeer* pPeer = pNet->createPeer();
+
+		bool isServer = true;
+
+		X_LOG0("ServerTest", "Press enter for server mode or c+enter for client");
+		char key = Console.ReadKeyBlocking();
+		if (key == 'C' || key == 'c')
+		{
+			isServer = false;
+		}
+
+		if (isServer)
+		{
+			Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Server");
+			Console.MoveTo(3000, 10);
+		}
+		else
+		{
+			Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
+			Console.MoveTo(3000, 800);
+
+		}
+
+		run(Console, pPeer, isServer);
+
+		pNet->deletePeer(pPeer);
+
+	}
+}
+
+const char* googleTestResTostr(int nRes)
+{
+	if (nRes == 0)
+		return "SUCCESS";
+	return "ERROR";
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -127,43 +158,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	{
 
-		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Server Test Client");
+		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Network Tests");
 		Console.RedirectSTD();
 		Console.SetSize(60, 40, 2000);
 		Console.MoveTo(10, 10);
 
 		core::MallocFreeAllocator allocator;
-		ServerTestArena arena(&allocator, "ServerTestArena");
+		ServerTestArena arena(&allocator, "NetworkTestArena");
 		g_arena = &arena;
 
 		EngineApp engine;
 
 		if (engine.Init(hInstance, lpCmdLine, Console))
 		{
-			net::INet* pNet = gEnv->pNet;
-			net::IPeer* pPeer = pNet->createPeer();
+			X_LOG0("TESTS", "Running unit tests...");
+			testing::InitGoogleTest(&__argc, __wargv);
 
-			bool isServer = true;
+			int nRes = RUN_ALL_TESTS();
 
-			X_LOG0("ServerTest", "Press enter for server mode or c+enter for client");
-			char key = Console.ReadKeyBlocking();
-			if (key == 'C' || key == 'c')
-			{
-				isServer = false;
-			}
+			X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
 
-			if (isServer)
-			{
-				Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Server");
-			}
-			else
-			{
-				Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
-			}
-
-			run(Console, pPeer, isServer);
-		
-			pNet->deletePeer(pPeer);
+		//	ClientServerSelector(Console);
+		//	MsgSize::beginTest();
 		}
 
 		Console.PressToContinue();
