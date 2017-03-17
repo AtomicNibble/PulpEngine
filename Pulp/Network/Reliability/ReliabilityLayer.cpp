@@ -861,6 +861,12 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 				X_ASSERT_UNREACHABLE();
 			}
 
+			// trailing bits.
+			if (bs.size() < 8) {
+				bs.alignReadToByteBoundry();
+				break;
+			}
+
 			pPacket = packetFromBS(bs, time);
 		}
 
