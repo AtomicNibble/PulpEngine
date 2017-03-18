@@ -236,7 +236,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	pool2Arena_(&pool2Allocator_, "PoolArena"),
 	blockArena_(&blockAlloc_, "blockArena")
 {
-	remoteSystems_.getAllocator().setBaseAlignment(16);
+	remoteSystems_.getAllocator().setBaseAlignment(core::Max(16_sz, X_ALIGN_OF(RemoteSystem)));
 	remoteSystems_.setGranularity(1);
 
 	sockets_.setGranularity(4);
