@@ -1169,6 +1169,9 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 			// add datagram.
 			packetsThisFrameBoundaries_.emplace_back(safe_static_cast<int32_t>(packetsThisFrame_.size()));
+			if (packetsThisFrameBoundaries_.size() == REL_DATAGRAM_HISTORY_LENGTH) {
+				break;
+			}
 		}
 	}
 
@@ -1254,6 +1257,9 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 			// add datagram.
 			packetsThisFrameBoundaries_.emplace_back(safe_static_cast<int32_t>(packetsThisFrame_.size()));
+			if (packetsThisFrameBoundaries_.size() == REL_DATAGRAM_HISTORY_LENGTH) {
+				break;
+			}
 		}
 	}
 
