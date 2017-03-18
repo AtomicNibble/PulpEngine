@@ -1300,6 +1300,10 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Sending DataGram number: ^5%" PRIu16 "^7 numPackets: ^5%" PRIuS, dgh.number, numPackets);
 
+		// we create dataGram history even for dataGrams not containing reliable packets.
+		// so that the datagram indexes match up.
+		// if we are sending alot of unreliable packets it may be best to change logic of ack
+		// to support datagram history with gaps.
 		DataGramHistory* pHistory = createDataGramHistory(dgh.number, time);
 
 		while (begin < end)
