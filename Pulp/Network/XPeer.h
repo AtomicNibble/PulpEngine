@@ -436,7 +436,7 @@ private:
 	core::PoolAllocator pool2Allocator_;
 	PoolArena			pool2Arena_;
 
-	core::GrowingBlockAllocator blockAlloc_;
+	BlockAlocArena::AllocationPolicy blockAlloc_;
 	BlockAlocArena		blockArena_;
 
 	PasswordStr password_; // 12345
