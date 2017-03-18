@@ -752,7 +752,10 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			// we want to mark all these messages as recived so we don't resend like a pleb.
 			X_LOG0_IF(vars_.debugAckEnabled(), "NetRel", "Act Range: ^5%" PRIu16 " ^7-^5 % " PRIu16, ackRange.min, ackRange.max);
 
-			for (DataGramSequenceNumber dataGramIdx = ackRange.min; dataGramIdx <= ackRange.max; dataGramIdx++)
+			for (DataGramSequenceNumber dataGramIdx = ackRange.min;
+				// handle wrap by checking above min, saves load of up and down casting
+				dataGramIdx >= ackRange.min && dataGramIdx <= ackRange.max; 
+				dataGramIdx++)
 			{
 				// get the info for this data gram and mark all the packets it contained as sent.
 				DataGramHistory* pHistory = getDataGramHistory(dataGramIdx);
