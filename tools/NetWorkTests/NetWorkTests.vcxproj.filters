@@ -47,6 +47,9 @@
     <ClCompile Include="tests\MsgSizeTest.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\LargePacketTest.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NetWorkTests.rc">
