@@ -374,8 +374,9 @@ private:
 	engine::IPrimativeContext* pPrimContext_;
 	input::IInput*			pInput_;
 
-
 	Cursor					cursor_;
+
+	bool					coreEventListernRegd_;
 
 #if X_ENABLE_CONFIG_HOT_RELOAD
 	bool					ignoreHotReload_;

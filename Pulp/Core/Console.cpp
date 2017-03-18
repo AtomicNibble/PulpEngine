@@ -340,15 +340,16 @@ XConsole::XConsole() :
 		bitUtil::RoundUpToMultiple<size_t>(
 			VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * VAR_MAX,
 			VirtualMem::GetPageSize()
-		)
+			)
 	),
 	varAllocator_(varHeap_.start(), varHeap_.end(),
 		VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE),
 		VarPool::getMemoryAlignmentRequirement(VAR_ALLOCATION_ALIGNMENT),
 		VarPool::getMemoryOffsetRequirement()
 	),
-	varArena_(&varAllocator_,"VarArena"),
-	cmds_(g_coreArena)
+	varArena_(&varAllocator_, "VarArena"),
+	cmds_(g_coreArena),
+	coreEventListernRegd_(false)
 {
 	HistoryPos_ = -1;
 	CursorPos_ = 0;
@@ -443,7 +444,7 @@ void XConsole::Startup(ICore* pCore, bool basic)
 
 	if (!basic)
 	{
-		pCore->GetCoreEventDispatcher()->RegisterListener(this);
+		coreEventListernRegd_ = pCore->GetCoreEventDispatcher()->RegisterListener(this);
 
 		// hot reload
 		pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
@@ -521,7 +522,9 @@ void XConsole::ShutDown(void)
 	// check if core failed to init.
 	if (pCore_)
 	{
-		pCore_->GetCoreEventDispatcher()->RemoveListener(this);
+		if (coreEventListernRegd_) {
+			pCore_->GetCoreEventDispatcher()->RemoveListener(this);
+		}
 		pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
 		pCore_->GetILog()->RemoveLogger(&logger_);
 	}
