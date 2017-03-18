@@ -1125,10 +1125,11 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		{
 			// look at all the packets in resend list.
 			// and build dataGrams untill we reach a packet who's nextaction time has not yet been reached.
+			size_t packetCntBase = packetsThisFrame_.size();
 			size_t currentDataGramSizeBits = 0;
 			const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
 
-			while (!isResendListEmpty())
+			while (!isResendListEmpty() && (packetCntBase - packetsThisFrame_.size()) < MAX_REL_PACKETS_PER_DATAGRAM)
 			{
 				ReliablePacket* pPacket = resendList_.head();
 				if (pPacket->nextActionTime > time) {
@@ -1184,10 +1185,11 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		while (!isResendBufferFull())
 		{
 			// fill a packet.
+			size_t currentReliablePackets = 0;
 			size_t currentDataGramSizeBits = 0;
 			const size_t maxDataGramSizeBits = maxDataGramSizeExcHdrBits();
 
-			while (outGoingPackets_.isNotEmpty() && !isResendBufferFull())
+			while (outGoingPackets_.isNotEmpty() && !isResendBufferFull() && currentReliablePackets < MAX_REL_PACKETS_PER_DATAGRAM)
 			{
 				ReliablePacket* pPacket = outGoingPackets_.peek();
 
@@ -1240,6 +1242,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 					bytesInReSendBuffers_ += byteLength;
 					++msgInReSendBuffers_;
 					// ~
+
+					++currentReliablePackets;
 				}
 				else if (pPacket->reliability == PacketReliability::UnReliableWithAck)
 				{
