@@ -1222,9 +1222,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
 				++pPacket->sendAttemps;
 
-				bool reliabile = pPacket->isReliable();
-
-				if (reliabile)
+				if (pPacket->isReliable())
 				{
 					pPacket->reliableMessageNumber = reliableMessageNumberIdx_;
 					pPacket->retransmissionTime = core::TimeVal::fromMS(2000);
