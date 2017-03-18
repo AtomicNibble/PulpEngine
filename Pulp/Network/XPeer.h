@@ -72,7 +72,7 @@ struct PingAndClockDifferential
 	core::TimeVal clockDifferential; 
 };
 
-struct RemoteSystem
+X_ALIGNED_SYMBOL(struct RemoteSystem, 64) // each remote can be updated on diffrent thread, prevent any false sharing.
 {
 	static const size_t PING_HISTORY_COUNT = 3;
 
