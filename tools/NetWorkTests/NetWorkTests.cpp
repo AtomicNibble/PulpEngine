@@ -171,6 +171,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (engine.Init(hInstance, lpCmdLine, Console))
 		{
+		//	::testing::GTEST_FLAG(filter) = "*LargePacketTest*";
+
 			X_LOG0("TESTS", "Running unit tests...");
 			testing::InitGoogleTest(&__argc, __wargv);
 
