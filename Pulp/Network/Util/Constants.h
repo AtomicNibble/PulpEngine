@@ -23,7 +23,7 @@ static const uint32_t UDP_HEADER_SIZE = 28;
 
 // bumpinging this increases memory useage a tiny bit for each reliable datagram. making this 128 wouldbe fine tho.
 // if we found we sent a lot of tiny packets.
-static const uint32_t MAX_PACKETS_PER_DATAGRAM = 56; // 2bytes per entry + 16bytes 
+static const uint32_t MAX_REL_PACKETS_PER_DATAGRAM = 56; // 2bytes per entry + 16bytes 
 
 // controlls the size of the resend buffer for each connection.
 static const size_t REL_RESEND_BUF_LENGTH = 256;		// this controls how many packets can be on wire at once.

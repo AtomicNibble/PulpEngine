@@ -122,7 +122,7 @@ static const size_t goat = sizeof(ReliablePacket);
 
 struct DataGramHistory
 {
-	typedef core::FixedArray<MessageNumber, MAX_PACKETS_PER_DATAGRAM> MesgNumberArr;
+	typedef core::FixedArray<MessageNumber, MAX_REL_PACKETS_PER_DATAGRAM> MesgNumberArr;
 
 public:
 	DataGramHistory(core::TimeVal timesent) : timeSent(timesent)
