@@ -1729,8 +1729,6 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 	{
 		resendBuf_[resendBufIdx] = nullptr;
 
-		X_LOG0_IF(vars_.debugAckEnabled(), "NetRel", "Ack msgId: %" PRIu16, msgNum);
-
 		// stats
 		--msgInReSendBuffers_;
 		bytesInReSendBuffers_ -= core::bitUtil::bitsToBytes(pPacket->dataBitLength);
