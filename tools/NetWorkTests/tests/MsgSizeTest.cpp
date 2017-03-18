@@ -58,8 +58,8 @@ TEST(net, msgSizeTest)
 	buf[0] = myPacketID;
 
 	size_t recivedCount = 0;
-	size_t sendCount = 100;
-	size_t testSize = 4096;
+	size_t sendCount = 10;
+	size_t testSize = 1; // starting size
 
 	size_t packetsSent = 0;
 	size_t bytesSent = 0;
@@ -183,17 +183,6 @@ TEST(net, msgSizeTest)
 			X_LOG0("ServerTest", "bytesRecived: ^5%s", core::HumanSize::toString(sizeStr, bytesRecived));
 			break;
 		}
-
-
-#if 0
-		net::Packet* pPacket = nullptr;
-		for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
-		{
-			X_LOG0("ServerTest", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
-		}
-#endif
-
-		//	core::Thread::Sleep(1);
 	}
 
 
