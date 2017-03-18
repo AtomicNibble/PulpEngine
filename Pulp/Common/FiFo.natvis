@@ -2,7 +2,8 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Potato::core::Fifo&lt;*&gt;">
     <Expand>
-      <Item Name="[size]" ExcludeView="simple">size()</Item>
+      <Item Name="[size]" ExcludeView="simple" Condition="write_ > read_">write_ - read_</Item>
+      <Item Name="[size]" ExcludeView="simple" Condition="write_ &lt;= read_">(end_ - start_)  - (read_ - write_)</Item>
       <Item Name="[capacity]" ExcludeView="simple">end_ - start_</Item>
       <Item Name="[Start]" ExcludeView="simple">start_</Item>
       <Item Name="[End]" ExcludeView="simple">end_</Item>
