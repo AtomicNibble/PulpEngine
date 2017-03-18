@@ -1650,6 +1650,23 @@ DataGramHistory* ReliabilityLayer::createDataGramHistory(DataGramSequenceNumber 
 
 DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber number)
 {
+	// so we have a sliding window for this.
+	// in that we only have history for last sent datagram - REL_DATAGRAM_HISTORY_LENGTH
+	// so if we recive a msg thats more than lastDataGram index - REL_DATAGRAM_HISTORY_LENGTH we have
+	// to ignore the ack, and it will get resent.
+	// these message indexs can also wrap around.
+	
+	if (number != dataGramHistoryPopCnt_ )
+	{
+		// work out if lower that popcnt taking into account overflow.
+		const DataGramSequenceNumber test = dataGramHistoryPopCnt_ - number;
+		const DataGramSequenceNumber dataGramhalf = std::numeric_limits<DataGramSequenceNumber>::max() / 2;
+		if (test < dataGramhalf)
+		{
+			return nullptr;
+		}
+	}
+
 	DataGramSequenceNumber offset = number - dataGramHistoryPopCnt_;
 	if (offset >= dataGramHistory_.size()) {
 		return nullptr;
