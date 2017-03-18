@@ -94,7 +94,7 @@ X_INLINE BitSizeT ReliabilityLayer::maxDataGramSizeExcHdrBits(void) const
 
 X_INLINE size_t ReliabilityLayer::resendBufferIdxForMsgNum(MessageNumber msgNum) const
 {
-	return msgNum % resendBuf_.max_size();
+	return msgNum % resendBuf_.size();
 }
 
 X_INLINE bool ReliabilityLayer::isResendBufferFull(void) const
