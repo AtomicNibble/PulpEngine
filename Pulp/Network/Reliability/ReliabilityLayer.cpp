@@ -1144,6 +1144,10 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 				// so the list stays sorted based on action time.
 				movePacketToTailOfResendList(pPacket);
 
+				// add packet.
+				currentDataGramSizeBits += totalBitSize;
+				packetsThisFrame_.emplace_back(pPacket);
+
 				X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resending packet: ^5%" PRIu32 "^7 attemp: ^5%" PRIu8,
 					pPacket->reliableMessageNumber, pPacket->sendAttemps);
 
