@@ -1266,6 +1266,10 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 				break;
 			}
 		}
+
+		if (outGoingPackets_.isNotEmpty() && isResendBufferFull()) {
+			X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resend buffer is full, postponing send of %" PRIuS " packets", outGoingPackets_.size());
+		}
 	}
 
 	// dispatch all the datagrams. (if any)
