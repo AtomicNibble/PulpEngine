@@ -504,8 +504,9 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
 
-	// we will grow up to: REL_DATAGRAM_HISTORY_LENGTH
-	dataGramHistory_.reserve(16);
+	// fifo doubles in size, so if we allocate one more than size we limit to.
+	// it won't waste memory.
+	dataGramHistory_.reserve(REL_DATAGRAM_HISTORY_LENGTH + 1);
 
 	packetsThisFrame_.setGranularity(64);
 	packetsThisFrameBoundaries_.setGranularity(64);
