@@ -19,6 +19,9 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_debug", debug_, 0, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable net debug msg's 1=enabled 2=verbose");
 
+	ADD_CVAR_REF("net_debug_datagram", debugDataGram_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable net debug msg's for datagrams");
+
 	ADD_CVAR_REF("net_debug_ignored", debugIgnored_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable debug msg's for ignored packets.");
 
