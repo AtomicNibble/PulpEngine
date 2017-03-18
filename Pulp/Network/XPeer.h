@@ -5,6 +5,7 @@
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Memory\HeapArea.h>
 #include <Hashing\sha1.h>
@@ -184,7 +185,7 @@ class XPeer : public IPeer
 	typedef core::FixedBitStreamBase UpdateBitStream;
 
 	typedef core::MemoryArena<
-		core::PoolAllocator,
+		core::GrowingPoolAllocator,
 		core::MultiThreadPolicy<core::Spinlock>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
@@ -428,12 +429,10 @@ private:
 	// allocators
 	core::MemoryArenaBase* arena_; // gen purpose.
 
-	core::HeapArea      poolHeap_;
-	core::PoolAllocator poolAllocator_;
+	PoolArena::AllocationPolicy poolAllocator_;
 	PoolArena			poolArena_;
 
-	core::HeapArea      pool2Heap_;
-	core::PoolAllocator pool2Allocator_;
+	PoolArena::AllocationPolicy pool2Allocator_;
 	PoolArena			pool2Arena_;
 
 	BlockAlocArena::AllocationPolicy blockAlloc_;
