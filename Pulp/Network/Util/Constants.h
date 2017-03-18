@@ -26,8 +26,8 @@ static const uint32_t UDP_HEADER_SIZE = 28;
 static const uint32_t MAX_REL_PACKETS_PER_DATAGRAM = 56; // 2bytes per entry + 16bytes 
 
 // controlls the size of the resend buffer for each connection.
-static const size_t REL_RESEND_BUF_LENGTH = 256;		// this controls how many packets can be on wire at once.
-static const size_t REL_DATAGRAM_HISTORY_LENGTH = 256;	// this is how much datagram history we keep. this should not be less than REL_RESEND_BUF_LENGTH.
+static const size_t REL_RESEND_BUF_LENGTH = 512;		// this controls how many packets can be on wire at once.
+static const size_t REL_DATAGRAM_HISTORY_LENGTH = 512;	// this is how much datagram history we keep. this should not be less than REL_RESEND_BUF_LENGTH.
 static const size_t REL_MAX_RECIVE_HOLE = 16'384;		// this should be above MAX_PACKETS_PER_DATAGRAM * REL_RESEND_BUF_LENGTH to prevent any packets been ignored if arrive super early as expensive of memory. (setting lower is fine)
 static const size_t REL_RECIVE_HOLE_SHRINK_THRESHOLD = 256; // when recvice hole is greater than this it's considered for shrink_to_fit. helps rake memory back if you allow large recive hole.
 
