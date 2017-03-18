@@ -600,6 +600,12 @@ void ReliabilityLayer::reset(int32_t MTUSize)
 	msgInReSendBuffers_ = 0;
 
 	resendBuf_.fill(nullptr);
+
+#if X_DEBUG && 0
+	// lets overflow soon, aint nobody got time for waiting.
+	dagramSeqNumber_ = std::numeric_limits<decltype(dagramSeqNumber_)>::max() - 1024;
+	dataGramHistoryPopCnt_ = dagramSeqNumber_;
+#endif // !dagramSeqNumber_
 }
 
 void ReliabilityLayer::clearPacketQueues(void)
