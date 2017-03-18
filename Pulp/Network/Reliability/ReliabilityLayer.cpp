@@ -1283,13 +1283,12 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		}
 
 		X_ASSERT(end >= begin, "Invalid range")(begin, end);
+		X_ASSERT(bs.capacity() >= maxDataGramSize(), "Provided Bs can't fit max dataGram")(bs.capacity(), maxDataGramSize());
 
 		const size_t numPackets = static_cast<size_t>(end - begin);
 
 		// here we pack the packet range into BS.
 		bs.reset();
-
-		X_ASSERT(bs.capacity() >= maxDataGramSize(), "Provided Bs can't fit max dataGram")(bs.capacity(), maxDataGramSize());
 
 		DatagramHdr dgh;
 		dgh.number = dagramSeqNumber_++;
@@ -1297,7 +1296,6 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 		dgh.writeToBitStream(bs);
 
 		X_ASSERT(bs.size() == dataGramHdrSizeBits(), "Invalid size logic")(bs.size(), dataGramHdrSizeBits());
-
 		X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Sending DataGram number: ^5%" PRIu16 "^7 numPackets: ^5%" PRIuS, dgh.number, numPackets);
 
 		// we create dataGram history even for dataGrams not containing reliable packets.
