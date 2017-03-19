@@ -267,7 +267,12 @@ struct Packet
 	X_INLINE MessageID::Enum getID(void) const {
 		return static_cast<MessageID::Enum>(pData[0]);
 	}
-
+	X_INLINE uint8_t* begin(void) {
+		return pData + 1;
+	}
+	X_INLINE uint8_t* end(void) {
+		return pData + core::bitUtil::bitsToBytes(bitLength);
+	}
 
 	ISystemAdd* pSystemAddress; // sender add.
 	NetGUID guid;
