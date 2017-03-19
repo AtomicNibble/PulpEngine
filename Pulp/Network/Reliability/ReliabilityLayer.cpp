@@ -284,7 +284,11 @@ constexpr size_t ReliablePacket::getMaxHeaderLengthBits(void)
 {
 	// calculated at compile time.
 	return core::bitUtil::RoundUpToMultiple<size_t>(
-		core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT) +
+		core::bitUtil::RoundUpToMultiple<size_t>(
+				core::bitUtil::bitsNeededForValue(PacketReliability::ENUM_COUNT) +
+				1,
+			8
+		) +
 		core::bitUtil::bytesToBits(sizeof(uint16_t)) +
 		core::bitUtil::bytesToBits(sizeof(decltype(reliableMessageNumber))) +
 		core::bitUtil::bytesToBits(sizeof(decltype(sequencingIndex))) +
