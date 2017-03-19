@@ -1000,8 +1000,11 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 
 		// if here we have a split packets that's been rebuilt into original packet.
 		// all split packets should of been cleaned up and data copyied into this new packet.
-		addPacketToRecivedQueue(pPacket, time);
-		return ProcessResult::Swallowed;
+
+		// we can't return here, otherwise sequenced or ordered packets that where split
+		// won't get handled correct.
+		//addPacketToRecivedQueue(pPacket, time);
+		//return ProcessResult::Swallowed;
 	}
 
 	if (pPacket->isOrderedOrSequenced())
