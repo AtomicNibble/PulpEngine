@@ -699,7 +699,6 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 		pPacket->orderingChannel = orderingChannel;
 		pPacket->orderingIndex = orderedWriteIndex_[orderingChannel];
 		pPacket->sequencingIndex = sequencedWriteIndex_[orderingChannel]++;
-
 	}
 	else if (reliability == PacketReliability::ReliableOrdered || reliability == PacketReliability::ReliableOrderedWithAck)
 	{
@@ -897,6 +896,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 
 	return true;
 }
+
 
 ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time)
 {
