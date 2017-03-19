@@ -475,6 +475,8 @@
     </ClCompile>
     <ClCompile Include="tests\LargePacketTest.cpp" />
     <ClCompile Include="tests\MsgSizeTest.cpp" />
+    <ClCompile Include="tests\OrderedTest.cpp" />
+    <ClCompile Include="tests\SequencedTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="NetWorkTests.rc" />
