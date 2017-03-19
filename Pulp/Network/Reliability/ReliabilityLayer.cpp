@@ -370,7 +370,9 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	}
 	else
 	{
+#if X_DEBUG
 		reliableMessageNumber = std::numeric_limits<decltype(reliableMessageNumber)>::max();
+#endif // !X_DEBUG
 	}
 
 	// sequenced.
@@ -408,7 +410,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 #if X_DEBUG
 		splitPacketId = std::numeric_limits<decltype(splitPacketIndex)>::max();
 		splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
-#endif
+#endif // !X_DEBUG
 	}
 
 	// check for corruption.
