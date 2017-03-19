@@ -269,7 +269,7 @@ size_t ReliablePacket::getHeaderLengthBits(void) const
 
 	bits = core::bitUtil::RoundUpToMultiple(bits, 8_sz);
 
-	X_ASSERT(bits < getMaxHeaderLengthBits(), "bit count exceeded calculated max")(bits, getMaxHeaderLengthBits());
+	X_ASSERT(bits <= getMaxHeaderLengthBits(), "bit count exceeded calculated max")(bits, getMaxHeaderLengthBits());
 	return bits;
 }
 
