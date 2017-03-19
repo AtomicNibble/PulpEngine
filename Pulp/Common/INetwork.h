@@ -3,6 +3,8 @@
 #include <Time\TimeVal.h>
 #include <Time\DateStamp.h>
 
+#include <NetMsgIds.h>
+
 X_NAMESPACE_BEGIN(net)
 
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
@@ -260,9 +262,13 @@ struct AddressOrGUID
 
 // ---------------------------------
 
-
 struct Packet
 {
+	X_INLINE MessageID::Enum getID(void) const {
+		return static_cast<MessageID::Enum>(pData[0]);
+	}
+
+
 	ISystemAdd* pSystemAddress; // sender add.
 	NetGUID guid;
 
