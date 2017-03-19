@@ -80,9 +80,7 @@ TEST(net, msgSizeTest)
 			// wait for server to get handshake
 			for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
 			{
-				net::MessageID::Enum msgId = static_cast<net::MessageID::Enum>(pPacket->pData[0]);
-
-				if (msgId == net::MessageID::ConnectionRequestHandShake)
+				if (pPacket->getID() == net::MessageID::ConnectionRequestHandShake)
 				{
 					++connectionFinishNum;
 				}
@@ -90,9 +88,7 @@ TEST(net, msgSizeTest)
 
 			for (pPacket = pPeer->receive(); pPacket; pPeer->freePacket(pPacket), pPacket = pPeer->receive())
 			{
-				net::MessageID::Enum msgId = static_cast<net::MessageID::Enum>(pPacket->pData[0]);
-
-				if (msgId == net::MessageID::ConnectionRequestAccepted)
+				if (pPacket->getID() == net::MessageID::ConnectionRequestAccepted)
 				{
 					++connectionFinishNum;
 				}
@@ -137,7 +133,7 @@ TEST(net, msgSizeTest)
 			net::Packet* pPacket = nullptr;
 			for (pPacket = pServer->receive(); pPacket; pServer->freePacket(pPacket), pPacket = pServer->receive())
 			{
-				if (pPacket->pData[0] == myPacketID)
+				if (pPacket->getID() == myPacketID)
 				{
 					// we got the packet data, check it's correct.
 					X_LOG0("ServerTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
