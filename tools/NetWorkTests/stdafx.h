@@ -12,6 +12,8 @@
 #include <String\HumanSize.h>
 #include <Time\StopWatch.h>
 
+#include <Containers\Array.h>
+#include <Containers\FixedBitStream.h>
 
 #define GTEST_HAS_TR1_TUPLE 0
 #include <gtest\gtest.h>
