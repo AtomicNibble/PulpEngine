@@ -120,7 +120,7 @@ X_INLINE bool ReliabilityLayer::isOlderPacket(OrderingIndex packetIdx, OrderingI
 
     if (currentIdx > rangeHalf)
     {
-        const auto shiftedCurrent = currentIdx - (rangeHalf + 1);
+        const OrderingIndex shiftedCurrent = currentIdx - (rangeHalf + 1);
 
         if (packetIdx < currentIdx && packetIdx >= shiftedCurrent)
         {
@@ -129,7 +129,7 @@ X_INLINE bool ReliabilityLayer::isOlderPacket(OrderingIndex packetIdx, OrderingI
     }
     else
     {
-        const auto shiftedCurrent = currentIdx - (rangeHalf + 1);
+        const OrderingIndex shiftedCurrent = currentIdx - (rangeHalf + 1);
 
         if (packetIdx < currentIdx || packetIdx >= shiftedCurrent)
         {
