@@ -48,7 +48,7 @@ TEST(net, OrderedPacketsTest)
 	const uint8_t PACKET_ID = 0x7f;
 
 	core::StopWatch timer;
-	core::TimeVal testTime = core::TimeVal::fromMS(2000);
+	core::TimeVal testTime = core::TimeVal::fromMS(5000);
 	core::TimeVal endTime = timer.GetTimeVal() + testTime;
 
 	std::array<int32_t, MAX_ORDERED_STREAMS> streamsCnts, recivedStreamCnts;
@@ -152,7 +152,7 @@ TEST(net, OrderedPacketsTest)
 				++packetsSent;
 			}
 
-			curState = State::Complete;
+			curState = State::Reciving;
 		}
 		else if (curState == State::Reciving)
 		{
@@ -207,7 +207,7 @@ TEST(net, OrderedPacketsTest)
 
 				++numTestsComplete;
 
-				if (numTestsComplete > 10) //timer.GetTimeVal() >= endTime)
+				if (timer.GetTimeVal() >= endTime)
 				{
 					curState = State::Complete;
 				}
@@ -224,6 +224,7 @@ TEST(net, OrderedPacketsTest)
 			auto elpased = timer.GetMilliSeconds();
 
 			X_LOG0("SeqTest", "test complete.");
+			X_LOG0("SeqTest", "Num sets: %" PRIi32, numTestsComplete);
 			X_LOG0("SeqTest", "elapsed: ^5%.2fms", elpased);
 			break;
 		}
