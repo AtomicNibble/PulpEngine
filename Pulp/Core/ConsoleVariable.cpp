@@ -114,7 +114,14 @@ void CVarBase::Release(void)
 
 ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 {
+	const bool wasSet = changeFunc_;
+
 	changeFunc_ = changeFunc;
+
+	if (!wasSet && Flags_.IsSet(VarFlag::MODIFIED)) {
+		changeFunc_.Invoke(this);
+	}
+
 	return this;
 }
 
