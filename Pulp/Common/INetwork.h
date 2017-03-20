@@ -353,7 +353,7 @@ struct IPeer
 	// MTU for a given system
 	virtual int getMTUSize(const ISystemAdd* pTarget = nullptr) X_ABSTRACT;
 
-	virtual bool getStatistics(const ISystemAdd* pTarget, NetStatistics& stats) X_ABSTRACT;
+	virtual bool getStatistics(const NetGUID guid, NetStatistics& stats) X_ABSTRACT;
 
 
 };

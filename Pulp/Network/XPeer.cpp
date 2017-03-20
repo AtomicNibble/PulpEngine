@@ -1427,12 +1427,9 @@ int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
 }
 
 
-bool XPeer::getStatistics(const ISystemAdd* pTarget, NetStatistics& stats)
+bool XPeer::getStatistics(const NetGUID guid, NetStatistics& stats)
 {
-	X_ASSERT_NOT_NULL(pTarget);
-
-	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(pTarget);
-	auto* pRemoteSys = getRemoteSystem(*pSysAdd, false);
+	auto* pRemoteSys = getRemoteSystem(guid, false);
 
 	if (!pRemoteSys) {
 		X_WARNING("Net", "Failed to find remote system for stat retrival");

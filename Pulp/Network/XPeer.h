@@ -282,7 +282,7 @@ public:
 	// MTU for a given system
 	int32_t getMTUSize(const ISystemAdd* pTarget = nullptr) X_FINAL;
 
-	bool getStatistics(const ISystemAdd* pTarget, NetStatistics& stats) X_FINAL;
+	bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
 
 	// ~IPeer
 
