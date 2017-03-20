@@ -1449,7 +1449,7 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
 		float randVal = core::random::MultiplyWithCarry(0.f, 100.f);
 
 		if (randVal < percent) {
-			X_LOG0("NetRel", "Dropping packet");
+			X_LOG0_IF(vars_.debugEnabled() > 2, "NetRel", "Dropping packet");
 			return;
 		}
 	}
