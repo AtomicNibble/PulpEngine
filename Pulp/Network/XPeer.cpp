@@ -472,12 +472,8 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 			freeConnectionRequest(pConReq);
 		}
 	}
-	
-	for (auto& rs : remoteSystems_) {
-		rs.closeConnection();
-		rs.relLayer.free();
-	}
 
+	// cleans up all memory for reliabiliy layers and remoteSystems.
 	remoteSystems_.clear();
 	activeRemoteSystems_.clear();
 
