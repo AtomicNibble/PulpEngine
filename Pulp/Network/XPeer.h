@@ -89,10 +89,11 @@ public:
 
 	RemoteSystem& operator=(RemoteSystem&& rhs) = default;
 
+	void free(void);
+	void closeConnection(void);
+
 	bool canSend(void) const;
 	ConnectionState::Enum getConnectionState(void) const;
-
-	void closeConnection(void);
 
 	void onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
 		core::TimeVal sendPingTime, core::TimeVal sendPongTime);

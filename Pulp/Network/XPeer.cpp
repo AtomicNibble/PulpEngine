@@ -93,6 +93,32 @@ RemoteSystem::RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena,
 	pNetSocket = nullptr;
 }
 
+void RemoteSystem::free(void)
+{
+	closeConnection();
+
+	relLayer.free();
+}
+
+
+void RemoteSystem::closeConnection(void)
+{
+	isActive = false;
+	weStartedconnection = false;
+
+	connectState = ConnectState::NoAction;
+	lowestPing = UNDEFINED_PING;
+	MTUSize = MAX_MTU_SIZE;
+
+	pNetSocket = nullptr;
+
+	guid = UNASSIGNED_NET_GUID;
+
+	// we don't reset releiability layer, memory is kept.
+	// this is so buffers can be kept for new connection.
+	// meaning new connections get warm buffers.
+}
+
 
 bool RemoteSystem::canSend(void) const
 {
@@ -139,22 +165,6 @@ ConnectionState::Enum RemoteSystem::getConnectionState(void) const
 	}
 
 	return ConnectionState::Disconnected;
-}
-
-void RemoteSystem::closeConnection(void)
-{
-	isActive = false;
-	weStartedconnection = false;
-
-	connectState = ConnectState::NoAction;
-	lowestPing = UNDEFINED_PING;
-	MTUSize = MAX_MTU_SIZE;
-
-	pNetSocket = nullptr;
-
-	guid = UNASSIGNED_NET_GUID;
-
-	relLayer.reset(MTUSize);
 }
 
 void RemoteSystem::onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
