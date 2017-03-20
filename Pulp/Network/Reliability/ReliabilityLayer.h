@@ -61,6 +61,7 @@ struct ReliablePacket
 
 public:
 	ReliablePacket(core::MemoryArenaBase* dataArena);
+	~ReliablePacket();
 
 	void freeData(void);
 	void allocData(size_t numBits);

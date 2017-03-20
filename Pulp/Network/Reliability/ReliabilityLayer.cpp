@@ -100,6 +100,10 @@ ReliablePacket::ReliablePacket(core::MemoryArenaBase* dataArena)
 	arena = dataArena; 
 }
 
+ReliablePacket::~ReliablePacket()
+{
+	X_ASSERT(pData == nullptr, "Data was not free before packet decon")(pData);
+}
 
 void ReliablePacket::freeData(void)
 {
