@@ -111,8 +111,8 @@ X_INLINE bool ReliabilityLayer::isResendListEmpty(void) const
 
 X_INLINE bool ReliabilityLayer::isOlderPacket(OrderingIndex packetIdx, OrderingIndex currentIdx)
 {
-    const auto rangeMax = std::numeric_limits<OrderingIndex>::max();
-    const auto rangeHalf = std::numeric_limits<OrderingIndex>::max() / 2;
+    const OrderingIndex rangeMax = std::numeric_limits<OrderingIndex>::max();
+    const OrderingIndex rangeHalf = std::numeric_limits<OrderingIndex>::max() / 2;
 
     // takes into account wrap around.
     // so once current is above hald type range.
