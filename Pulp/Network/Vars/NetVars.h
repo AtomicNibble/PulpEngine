@@ -48,6 +48,8 @@ public:
 private:
 	void Var_OnDefaultTimeoutChanged(core::ICVar* pVar);
 	void Var_OnPingTimeChanged(core::ICVar* pVar);
+	void Var_OnArtificalNetworkChanged(core::ICVar* pVar);
+
 
 private:
 	int32_t debug_;

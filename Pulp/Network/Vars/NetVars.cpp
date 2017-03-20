@@ -65,9 +65,11 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_connection_bandwidth_limit", connectionBSPLimit_, 0, 0, std::numeric_limits<int32_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Limits outgoing bandwidth(BPS) per connection, once the limit is reached traffic is qeued. 0=unlimited");
 
+	del.Bind<NetVars, &NetVars::Var_OnArtificalNetworkChanged>(this);
+
 	// artifical ping / packet loss.
-	ADD_CVAR_REF("net_art", artificalNetwork_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Enable artifical network. This just enabled vars like 'net_art_packet_loss'");
+	ADD_CVAR_REF("net_art", artificalNetwork_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable artifical network. This just enabled vars like 'net_art_packet_loss'")->SetOnChangeCallback(del);
 
 	ADD_CVAR_REF("net_art_packet_loss", artificalPacketLoss_, 25.f, 0.f, 100.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Introduce artifical outgoing packet loss, percentage chance.");
@@ -121,5 +123,16 @@ void NetVars::Var_OnPingTimeChanged(core::ICVar* pVar)
 		X_WARNING("Net", "New min ping time is longer than default timeout time");
 	}
 }
+
+void NetVars::Var_OnArtificalNetworkChanged(core::ICVar* pVar)
+{
+	int32_t val = pVar->GetInteger();
+	if (val) {
+		// warn that's it's enabled, hopefully it stops someone spending ages trying to debug some network issue.
+		// to find artifical network is enabled hehhe.
+		X_WARNING("Net", "Artifical network is enabled");
+	}
+}
+
 
 X_NAMESPACE_END
