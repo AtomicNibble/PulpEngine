@@ -1820,6 +1820,19 @@ size_t ReliabilityLayer::calculateMemoryUsage(void) const
 	return size;
 }
 
+
+void ReliabilityLayer::getStatistics(NetStatistics& stats)
+{
+	core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
+
+	for (uint32_t i = 0; i < NetStatistics::Metric::ENUM_COUNT; i++)
+	{
+		bps_[i].update(time);
+	}
+
+	static_cast<const ReliabilityLayer*>(this)->getStatistics(stats);
+}
+
 void ReliabilityLayer::getStatistics(NetStatistics& stats) const
 {
 	stats.internalMemUsage = calculateMemoryUsage();

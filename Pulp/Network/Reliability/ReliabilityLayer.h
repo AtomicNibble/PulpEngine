@@ -233,6 +233,7 @@ public:
 	// pop any packets that have arrived.
 	bool recive(PacketData& dataOut);
 
+	void getStatistics(NetStatistics& stats);
 	void getStatistics(NetStatistics& stats) const;
 
 	X_INLINE bool pendingOutgoingData(void) const;
