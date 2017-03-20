@@ -28,7 +28,7 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_debug_ack", debugAck_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable net ack debug msg's");
 
-	ADD_CVAR_REF("net_debug_nack", debugNAck_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("net_debug_nack", debugNACk_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable net nack msg's");
 
 	ADD_CVAR_REF("net_debug_socket", debugSockets_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,

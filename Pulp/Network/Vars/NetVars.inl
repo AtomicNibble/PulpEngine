@@ -25,7 +25,7 @@ X_INLINE int32_t NetVars::debugAckEnabled(void) const
 
 X_INLINE int32_t NetVars::debugNackEnabled(void) const
 {
-	return debugNAck_;
+	return debugNACk_;
 }
 
 X_INLINE int32_t NetVars::debugSocketsEnabled(void) const

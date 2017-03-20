@@ -53,7 +53,7 @@ private:
 	int32_t debugIgnored_;
 	int32_t debugDataGram_;
 	int32_t debugAck_;
-	int32_t debugNAck_;
+	int32_t debugNACk_;
 	int32_t debugSockets_;
 	int32_t rlconnectionsPerIp_;
 	int32_t rlconnectionsPerIpThreshMS_;
