@@ -860,7 +860,8 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			auto result = prcoessIncomingPacket(pPacket, time);
 			if (result == ProcessResult::Ok)
 			{
-				addPacketToRecivedQueue(pPacket, time);
+				// we don't add here.
+				// addPacketToRecivedQueue(pPacket, time);
 			}
 			else if (result == ProcessResult::Ignored)
 			{
@@ -1094,6 +1095,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 		}
 	}
 
+	addPacketToRecivedQueue(pPacket, time);
 	return ProcessResult::Ok;
 }
 
