@@ -3,6 +3,8 @@
 #include <Memory\AllocationPolicies\StackAllocator.h>
 #include <Time\StopWatch.h>
 #include <String\HumanSize.h>
+#include <Random\MultiplyWithCarry.h>
+
 #include <ITimer.h>
 
 #include "ReliabilityLayer.h"
@@ -1441,6 +1443,17 @@ void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs,
 
 void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
 {
+	if (vars_.artificalPacketLoss())
+	{
+		int32_t percent = vars_.artificalPacketLoss();
+		int32_t randVal = static_cast<int32_t>(core::random::MultiplyWithCarry(0u, 100u));
+
+		if (randVal < percent) {
+			X_LOG0("NetRel", "Dropping packet");
+			return;
+		}
+	}
+
 	bps_[NetStatistics::Metric::ActualBytesSent].add(time, bs.sizeInBytes());
 
 	SendParameters sp;
