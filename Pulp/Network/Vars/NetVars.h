@@ -36,7 +36,8 @@ public:
 	X_INLINE int32_t unexpectedMsgBanTime(void) const;
 	X_INLINE int32_t connectionBSPLimit(void) const;
 
-	X_INLINE int32_t artificalPacketLoss(void) const;
+	X_INLINE bool artificalNetworkEnabled(void) const;
+	X_INLINE float32_t artificalPacketLoss(void) const;
 	X_INLINE int32_t artificalPing(void) const;
 	X_INLINE int32_t artificalPingVariance(void) const;
 	X_INLINE bool ignorePasswordFromClientIfNotRequired(void) const;
@@ -66,7 +67,8 @@ private:
 	int32_t unexpectedMsgBanTime_;
 	int32_t connectionBSPLimit_;
 
-	int32_t artificalPacketLoss_;
+	int32_t artificalNetwork_;
+	float32_t artificalPacketLoss_;
 	int32_t artificalPing_;
 	int32_t artificalPingVariance_;
 	int32_t ignorePasswordFromClientIfNotRequired_;

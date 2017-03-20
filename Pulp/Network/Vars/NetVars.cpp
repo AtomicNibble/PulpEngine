@@ -66,8 +66,11 @@ void NetVars::registerVars(void)
 		"Limits outgoing bandwidth(BPS) per connection, once the limit is reached traffic is qeued. 0=unlimited");
 
 	// artifical ping / packet loss.
-	ADD_CVAR_REF("net_art_packet_loss", artificalPacketLoss_, 0, 0, 100, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Introduce artifical outgoing packet loss, percentage chance. 0=disabled");
+	ADD_CVAR_REF("net_art", artificalNetwork_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable artifical network. This just enabled vars like 'net_art_packet_loss'");
+
+	ADD_CVAR_REF("net_art_packet_loss", artificalPacketLoss_, 25.f, 0.f, 100.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Introduce artifical outgoing packet loss, percentage chance.");
 
 	ADD_CVAR_REF("net_art_ping", artificalPing_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Introduce artifical ping, all messages will have a ping of atleast this value. 0=disabled");

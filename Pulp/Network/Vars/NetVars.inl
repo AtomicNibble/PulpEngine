@@ -81,8 +81,12 @@ X_INLINE int32_t NetVars::connectionBSPLimit(void) const
 	return connectionBSPLimit_;
 }
 
+X_INLINE bool NetVars::artificalNetworkEnabled(void) const
+{
+	return artificalNetwork_ != 0;
+}
 
-X_INLINE int32_t NetVars::artificalPacketLoss(void) const
+X_INLINE float32_t NetVars::artificalPacketLoss(void) const
 {
 	return artificalPacketLoss_;
 }
