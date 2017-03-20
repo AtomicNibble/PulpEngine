@@ -145,6 +145,8 @@ void ReliablePacket::freeData(void)
 
 void ReliablePacket::allocData(size_t numBits)
 {
+	// do i just want to set dataType in here? or just assume it's always normal and check with assert :/
+	X_ASSERT(dataType == DataType::Normal, "Expected data type to by normal")(DataType::ToString(dataType));
 	X_ASSERT(pData == nullptr, "Packet already has data")(pData, dataBitLength);
 	X_ASSERT_NOT_NULL(arena);
 
