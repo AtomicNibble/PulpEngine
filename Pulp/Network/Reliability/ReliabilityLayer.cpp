@@ -1482,6 +1482,22 @@ SplitPacketChannel* ReliabilityLayer::allocSplicPacketChannel(void)
 
 void ReliabilityLayer::freeSplitPacketChannel(SplitPacketChannel* pSPC)
 {
+	X_ASSERT_NOT_NULL(pSPC);
+
+	for (auto* pPacket : pSPC->packets)
+	{
+		if (pPacket) // can be null if not complete.
+		{
+			pPacket->freeData();
+			freePacket(pPacket);
+		}
+		else
+		{
+			X_ASSERT(!pSPC->haveAllPackets(), "We think we have all packets but one is null")(pSPC, pSPC->haveAllPackets());
+		}
+	}
+
+
 	X_DELETE(pSPC, arena_);
 }
 
@@ -1630,12 +1646,6 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 		{
 			std::memcpy(pRebuiltPacket->pData + core::bitUtil::bitsToBytes(dataBitOffset), p->pData, core::bitUtil::bitsToBytes(p->dataBitLength));
 			dataBitOffset += p->dataBitLength;
-		}
-
-		for (auto* p : packets)
-		{
-			p->freeData();
-			freePacket(p);
 		}
 
 		freeSplitPacketChannel(pChannel);
