@@ -1169,7 +1169,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 				currentDataGramSizeBits += totalBitSize;
 				packetsThisFrame_.emplace_back(pPacket);
 
-				X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resending packet: ^5%" PRIu32 "^7 attemp: ^5%" PRIu8,
+				X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Resending packet: ^5%" PRIu32 "^7 attempt: ^5%" PRIu8,
 					pPacket->reliableMessageNumber, pPacket->sendAttemps);
 
 				// resending.
