@@ -196,8 +196,7 @@ class ReliabilityLayer
 
 	X_DECLARE_ENUM(ProcessResult)(
 		Ok,
-		Ignored,
-		Swallowed
+		Ignored
 	);
 
 

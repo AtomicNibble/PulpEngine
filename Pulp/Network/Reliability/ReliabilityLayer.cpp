@@ -860,8 +860,9 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			auto result = prcoessIncomingPacket(pPacket, time);
 			if (result == ProcessResult::Ok)
 			{
-				// we don't add here.
-				// addPacketToRecivedQueue(pPacket, time);
+				// do nothing..
+				// it was either pushed to the que for us
+				// OR is been buffred untill it's in order.
 			}
 			else if (result == ProcessResult::Ignored)
 			{
@@ -871,12 +872,6 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 				X_WARNING_IF(vars_.debugIgnoredEnabled(),  "NetRel", "Packet ignored");
 
 				freePacket(pPacket);
-			}
-			else if (result == ProcessResult::Swallowed)
-			{
-				// do nothing..
-				// it was either pushed to the que for us
-				// OR is been buffred untill it's in order.
 			}
 			else
 			{
@@ -996,7 +991,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 		if (!pPacket)
 		{
 			// still more packets.
-			return ProcessResult::Swallowed;
+			return ProcessResult::Ok;
 		}
 
 		// if here we have a split packets that's been rebuilt into original packet.
@@ -1004,8 +999,6 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 
 		// we can't return here, otherwise sequenced or ordered packets that where split
 		// won't get handled correct.
-		//addPacketToRecivedQueue(pPacket, time);
-		//return ProcessResult::Swallowed;
 	}
 
 	if (pPacket->isOrderedOrSequenced())
@@ -1054,7 +1047,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 				}
 
 				// done...
-				return ProcessResult::Swallowed;
+				return ProcessResult::Ok;
 			}
 		}
 		else if (!isOlderPacket(pPacket->orderingIndex, orderedReadIndex_[channel]))
