@@ -1063,7 +1063,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 			// this packet comes later than the one we want next.
 			// so store it untill we can post them in order.
 
-			auto orderedQueue = orderingQueues_[channel];
+			auto& orderedQueue = orderingQueues_[channel];
 			if (orderedQueue.isEmpty()) {
 				orderingQueueIndexOffset_[channel] = orderedReadIndex_[channel];
 			}
