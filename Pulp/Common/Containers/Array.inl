@@ -717,15 +717,27 @@ typename Array<T, Allocator>::size_type Array<T, Allocator>::find(const Type& va
 }
 
 template<typename T, class Allocator>
-template<class Compare>
-typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(const Type& val, Compare comp) const
+typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(const Type& val) const
 {
-	return std::lower_bound(begin(), end(), val, comp);
+	return findSorted(val, std::less<Type>());
 }
 
 template<typename T, class Allocator>
-template<typename KeyType, class Compare>
-typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSortedKey(const KeyType& val, Compare comp) const
+template<class Compare>
+typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(const Type& val, Compare comp) const
+{
+	auto it = std::lower_bound(begin(), end(), val, comp);
+
+	if (it != end() && !comp(val, *it)) {
+		return it;
+	}
+	return end();
+}
+
+template<typename T, class Allocator>
+template<typename KeyType, class Compare, class CompareGt>
+typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSortedKey(const KeyType& val,
+	Compare comp, CompareGt compGreater) const
 {
 	// binary search but with a key.
 	size_type count = num_;
@@ -749,7 +761,16 @@ typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSortedKey(c
 		}
 	}
 
-	return first;
+	// check if actuall found.
+	// i can't think of way todo this without requiring one of the following addition comps:
+	// left hand side value.
+	// greater than.
+	// equal
+	if (first != end() && !compGreater(*first, val)) {
+		return first;
+	}
+
+	return end();
 }
 
 template<typename T, class Allocator>

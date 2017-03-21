@@ -137,10 +137,11 @@ public:
 	// returns invalid_index when not found.
 	size_type find(const Type& val) const;
 
+	ConstIterator findSorted(const Type& val) const;
 	template<class Compare>
 	ConstIterator findSorted(const Type& val, Compare comp) const;
-	template<typename KeyType, class Compare>
-	ConstIterator findSortedKey(const KeyType& val, Compare comp) const;
+	template<typename KeyType, class Compare, class CompareGt>
+	ConstIterator findSortedKey(const KeyType& val, Compare comp, CompareGt compGreater) const;
 
 	// swaps the arrays
 	// A = B & B = A

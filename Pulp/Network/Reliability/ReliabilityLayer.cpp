@@ -1604,11 +1604,14 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 	// we want to get the ordering channel for this split packet.
 	auto splitId = pPacket->splitPacketId;
 
-	auto channelIt = splitPacketChannels_.findSortedKey(splitId,
-		[](const SplitPacketChannel* pB, const SplitPacketId& splitId) -> bool {
+	auto lessVal = [](const SplitPacketChannel* pB, const SplitPacketId& splitId) -> bool {
 		return pB->splitId < splitId;
-	}
-	);
+	};
+	auto greaterVal = [](const SplitPacketChannel* pB, const SplitPacketId& splitId) -> bool {
+		return pB->splitId > splitId;
+	};
+
+	auto channelIt = splitPacketChannels_.findSortedKey(splitId, lessVal, greaterVal);
 
 	SplitPacketChannel* pChannel = nullptr;
 
