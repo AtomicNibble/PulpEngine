@@ -598,8 +598,7 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator
 template<typename T, class Allocator>
 X_INLINE typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert_sorted(const Type& obj)
 {
-	auto it = std::upper_bound(begin(), end(), obj);
-	return insert(it, obj);
+	return insert_sorted(obj, std::less<Type>());
 }
 
 template<typename T, class Allocator>
