@@ -1631,6 +1631,8 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 	}
 
 	X_ASSERT_NOT_NULL(pChannel);
+	X_ASSERT(pChannel->splitId == splitId, "Got incorrect channel.")(splitId);
+	X_ASSERT(pChannel->packets[pPacket->splitPacketIndex] == nullptr, "Index is already occupied.")(pPacket->splitPacketIndex);
 
 	// meow.
 	++pChannel->packetsRecived;
