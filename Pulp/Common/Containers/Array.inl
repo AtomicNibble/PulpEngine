@@ -570,7 +570,7 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator
 		// spills off end.
 		// we need to move the ones before endto new end.
 		// then assing new values.
-		Mem::MoveArrayUninitialized(pos, end(), pos + count);
+		Mem::MoveArrayUninitialized(pos + count, pos, end());
 
 		// tecnically we can do a uninitialized fill from old end to new pos.
 		std::uninitialized_fill<Iterator, T>(end(), pos + count, obj);
@@ -580,7 +580,7 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator
 	else
 	{
 		// move before end to fresh memory, past current end.
-		Mem::MoveArrayUninitialized(end() - count, end(), end());
+		Mem::MoveArrayUninitialized(end(), end() - count, end());
 
 		// move items to fill gap at end, this is moving to initialized memory.
 		std::move_backward<Iterator>(pos, end() - count, end());
