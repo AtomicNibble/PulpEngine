@@ -62,6 +62,10 @@ namespace
 			return var_ == oth;
 		}
 
+		bool operator<(const CustomType& rhs) const {
+			return GetVar() < rhs.GetVar();
+		}
+
 		inline size_t GetVar(void) const {
 			return var_;
 		}
@@ -115,6 +119,10 @@ namespace
 			return *this;
 		}
 
+		bool operator<(const CustomTypeComplex& rhs) const {
+			return GetVar() < rhs.GetVar();
+		}
+
 		inline size_t GetVar(void) const {
 			return var_;
 		}
@@ -133,10 +141,13 @@ namespace
 		static int DECONSRUCTION_COUNT;
 	};
 
+
 	int CustomTypeComplex::CONSRUCTION_COUNT = 0;
 	int CustomTypeComplex::MOVE_COUNT = 0;
 	int CustomTypeComplex::DECONSRUCTION_COUNT = 0;
 }
+
+
 
 typedef core::MemoryArena<
 	core::LinearAllocator,
@@ -838,6 +849,80 @@ TYPED_TEST(ArrayTest, back_fail)
 
 	g_AssetChecker.ExpectAssertion(false);
 	core::debugging::EnableBreakpoints(true);
+}
+
+TYPED_TEST(ArrayTest, findSorted)
+{
+	Array<TypeParam> array(g_arena);
+
+	// find when empty, should return end.
+	EXPECT_EQ(array.end(), array.findSorted(3));
+	EXPECT_EQ(array.end(), array.findSorted(10));
+	EXPECT_EQ(array.end(), array.findSorted(30));
+	EXPECT_EQ(array.end(), array.findSorted(3, std::less<TypeParam>()));
+	EXPECT_EQ(array.end(), array.findSorted(10, std::less<TypeParam>()));
+	EXPECT_EQ(array.end(), array.findSorted(30, std::less<TypeParam>()));
+
+
+	array.push_back(static_cast<TypeParam>(1));
+	array.push_back(static_cast<TypeParam>(2));
+	array.push_back(static_cast<TypeParam>(5));
+	array.push_back(static_cast<TypeParam>(7));
+	array.push_back(static_cast<TypeParam>(11));
+
+	EXPECT_EQ(array.begin() + 0, array.findSorted(static_cast<TypeParam>(1)));
+	EXPECT_EQ(array.begin() + 1, array.findSorted(static_cast<TypeParam>(2)));
+	EXPECT_EQ(array.begin() + 2, array.findSorted(static_cast<TypeParam>(5)));
+	EXPECT_EQ(array.begin() + 3, array.findSorted(static_cast<TypeParam>(7)));
+	EXPECT_EQ(array.begin() + 4, array.findSorted(static_cast<TypeParam>(11)));
+	
+	EXPECT_EQ(array.end(), array.findSorted(3));
+	EXPECT_EQ(array.end(), array.findSorted(10));
+	EXPECT_EQ(array.end(), array.findSorted(30));
+
+	EXPECT_EQ(array.begin() + 0, array.findSorted(static_cast<TypeParam>(1), std::less<TypeParam>()));
+	EXPECT_EQ(array.begin() + 1, array.findSorted(static_cast<TypeParam>(2), std::less<TypeParam>()));
+	EXPECT_EQ(array.begin() + 2, array.findSorted(static_cast<TypeParam>(5), std::less<TypeParam>()));
+	EXPECT_EQ(array.begin() + 3, array.findSorted(static_cast<TypeParam>(7), std::less<TypeParam>()));
+	EXPECT_EQ(array.begin() + 4, array.findSorted(static_cast<TypeParam>(11), std::less<TypeParam>()));
+
+	EXPECT_EQ(array.end(), array.findSorted(3, std::less<TypeParam>()));
+	EXPECT_EQ(array.end(), array.findSorted(10, std::less<TypeParam>()));
+	EXPECT_EQ(array.end(), array.findSorted(30, std::less<TypeParam>()));
+}
+
+TEST(ArrayTest, findSortedKEy)
+{
+	Array<CustomType> array(g_arena);
+
+	auto lessFunc = [](const CustomType& lhs, const int32_t& val) {
+		return lhs.GetVar() < val;
+	};
+	auto greaterFunc = [](const CustomType& lhs, const int32_t& val) {
+		return lhs.GetVar() > val;
+	};
+
+	// find when empty, should return end.
+	EXPECT_EQ(array.end(), array.findSortedKey(3, lessFunc, greaterFunc));
+	EXPECT_EQ(array.end(), array.findSortedKey(10, lessFunc, greaterFunc));
+	EXPECT_EQ(array.end(), array.findSortedKey(30, lessFunc, greaterFunc));
+
+
+	array.push_back(static_cast<CustomType>(1));
+	array.push_back(static_cast<CustomType>(2));
+	array.push_back(static_cast<CustomType>(5));
+	array.push_back(static_cast<CustomType>(7));
+	array.push_back(static_cast<CustomType>(11));
+
+	EXPECT_EQ(array.begin() + 0, array.findSortedKey(1, lessFunc, greaterFunc));
+	EXPECT_EQ(array.begin() + 1, array.findSortedKey(2, lessFunc, greaterFunc));
+	EXPECT_EQ(array.begin() + 2, array.findSortedKey(5, lessFunc, greaterFunc));
+	EXPECT_EQ(array.begin() + 3, array.findSortedKey(7, lessFunc, greaterFunc));
+	EXPECT_EQ(array.begin() + 4, array.findSortedKey(11, lessFunc, greaterFunc));
+
+	EXPECT_EQ(array.end(), array.findSortedKey(3, lessFunc, greaterFunc));
+	EXPECT_EQ(array.end(), array.findSortedKey(10, lessFunc, greaterFunc));
+	EXPECT_EQ(array.end(), array.findSortedKey(30, lessFunc, greaterFunc));
 }
 
 X_PRAGMA(optimize("", on))
