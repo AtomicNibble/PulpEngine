@@ -22,7 +22,7 @@ namespace
 	X_DECLARE_FLAGS(DatagramFlag) (
 		Ack,
 		Nack
-		);
+	);
 
 	typedef Flags<DatagramFlag> DatagramFlags;
 
@@ -513,7 +513,8 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
 	msgInReSendBuffers_(0),
 	splitPacketChannels_(arena),
 	packetsThisFrame_(arena),
-	packetsThisFrameBoundaries_(arena)
+	packetsThisFrameBoundaries_(arena),
+	delayedPackets_(arena)
 {
 	outGoingPackets_.reserve(128);
 	recivedPackets_.reserve(128);
@@ -1103,6 +1104,24 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
 	core::TimeVal time)
 {
+	// delay list, these are packets that have already been sent, but are having artifical latency added.
+	if (delayedPackets_.isNotEmpty())
+	{
+		while (delayedPackets_.isNotEmpty() && delayedPackets_.peek().sendTime < time)
+		{
+			// sendy wendy.
+			auto& pDelayPacket = delayedPackets_.peek();
+
+			SendParameters sp;
+			sp.pData = pDelayPacket.data.get();
+			sp.length = safe_static_cast<int32_t>(pDelayPacket.sizeInBytes);
+			sp.systemAddress = systemAddress;
+			pDelayPacket.pSocket->send(sp);
+			
+			delayedPackets_.pop();
+		}
+	}
+
 	bs.reset();
 
 	if ((lastBSPUpdate_ + core::TimeVal::fromMS(1000)) < time)
@@ -1451,6 +1470,37 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
 		if (randVal < percent) {
 			X_LOG0_IF(vars_.debugEnabled() > 2, "NetRel", "Dropping packet");
 			return;
+		}
+
+		// pingy.
+		if (vars_.artificalPing() || vars_.artificalPingVariance())
+		{
+			uint32_t totalMsDelay = vars_.artificalPing();
+
+			// dash of spice!
+			if (vars_.artificalPingVariance()) {
+				uint32_t randomVariance = core::random::MultiplyWithCarry(0u, vars_.artificalPingVariance());	
+				totalMsDelay += randomVariance;
+			}
+
+			// delay could be zero and random variance zero.
+			if (totalMsDelay)
+			{
+				core::TimeVal delaySendTime = time + core::TimeVal::fromMS(totalMsDelay);
+
+				uint8_t* pDataCopy = X_NEW_ARRAY_ALIGNED(uint8_t, bs.sizeInBytes(), packetDataArena_, "DelayPacketData", 16);
+				std::memcpy(pDataCopy, bs.data(), bs.sizeInBytes());
+
+				delayedPackets_.emplace(
+					&socket,
+					delaySendTime,
+					bs.sizeInBytes(),
+					pDataCopy,
+					packetDataArena_
+				);
+
+				return;
+			}
 		}
 	}
 

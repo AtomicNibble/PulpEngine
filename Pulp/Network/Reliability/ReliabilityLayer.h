@@ -12,6 +12,8 @@
 #include <Util\ReferenceCounted.h>
 #include <Util\UniquePointer.h>
 
+#include <functional>
+
 X_NAMESPACE_BEGIN(net)
 
 class NetSocket;
@@ -121,6 +123,29 @@ private:
 static const size_t goat = sizeof(ReliablePacket);
 // static_assert(core::compileTime::IsPOD<RelPacket>::Value, "Packet header should be POD");
 
+struct DelayedPacket
+{
+	DelayedPacket(NetSocket* pSocket, core::TimeVal sendTime, size_t sizeInBytes, uint8_t* pData, core::MemoryArenaBase* arena) :
+		pSocket(pSocket),
+		sendTime(sendTime),
+		sizeInBytes(sizeInBytes),
+		data(arena, pData)
+	{
+	}
+
+	X_INLINE bool operator<(const DelayedPacket& oth) const {
+		return sendTime < oth.sendTime;
+	}
+	X_INLINE bool operator>(const DelayedPacket& oth) const {
+		return sendTime > oth.sendTime;
+	}
+
+	NetSocket* pSocket;
+	core::TimeVal sendTime; // time to send this.
+	size_t sizeInBytes;
+	core::UniquePointer<uint8_t[]> data;
+};
+
 struct DataGramHistory
 {
 	typedef core::FixedArray<MessageNumber, MAX_REL_PACKETS_PER_DATAGRAM> MesgNumberArr;
@@ -173,6 +198,8 @@ class ReliabilityLayer
 	typedef core::Array<SplitPacketChannel*> SplitPacketChannelArr;
 	typedef core::Array<ReliablePacket*> RelPacketArr;
 	typedef core::Array<int32_t> FrameboundryArr;
+	typedef core::PriorityQueue<DelayedPacket, core::Array<DelayedPacket>, std::greater<>> OrderedDelaysPacketQueue;
+
 
     typedef uint64_t WeightType;
 
@@ -187,6 +214,10 @@ class ReliabilityLayer
 		X_INLINE  bool operator<(const PacketWithWeight& rhs) const {
             return weight < rhs.weight;
         }
+		X_INLINE  bool operator>(const PacketWithWeight& rhs) const {
+			return weight > rhs.weight;
+		}
+
 
         WeightType weight;
         ReliablePacket* pPacket;
@@ -344,6 +375,9 @@ private:
 	NetStatistics::PriorityByteCountsArr bytesInSendBuffers_;
 	size_t bytesInReSendBuffers_;
 	size_t msgInReSendBuffers_;
+
+	// for artifical ping only.
+	OrderedDelaysPacketQueue delayedPackets_;
 
 	// this is quite fat, so left on end
 	ResendArr resendBuf_; // max in transit
