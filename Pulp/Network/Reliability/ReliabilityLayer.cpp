@@ -1085,6 +1085,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 			}
 
 			orderedQueue.emplace(weight, pPacket);
+			return ProcessResult::Ok;
 		}
 		else
 		{
