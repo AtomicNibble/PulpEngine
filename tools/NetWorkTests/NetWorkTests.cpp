@@ -171,17 +171,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (engine.Init(hInstance, lpCmdLine, Console))
 		{
-		//	::testing::GTEST_FLAG(filter) = "*LargePacketTest*";
+			if (1) // gtest
+			{
+				::testing::GTEST_FLAG(filter) = "*OrderedPacketsTest*";
 
-			X_LOG0("TESTS", "Running unit tests...");
-			testing::InitGoogleTest(&__argc, __wargv);
+				X_LOG0("TESTS", "Running unit tests...");
+				testing::InitGoogleTest(&__argc, __wargv);
 
-			int nRes = RUN_ALL_TESTS();
+				int nRes = RUN_ALL_TESTS();
 
-			X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
-
-		//	ClientServerSelector(Console);
-		//	MsgSize::beginTest();
+				X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
+			}
+			else
+			{
+				// start instance as server or client.
+				// please talk to me... :X 
+				ClientServerSelector(Console);
+			}
 		}
 
 		Console.PressToContinue();
