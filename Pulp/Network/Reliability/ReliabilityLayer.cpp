@@ -1035,8 +1035,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 				++orderedReadIndex_[channel];
 				highestSequencedReadIndex_[channel] = 0; // when we move ordering index, sequenced is reset.
 
-				
-				auto orderedQueue = orderingQueues_[channel];
+				auto& orderedQueue = orderingQueues_[channel];
 				while (orderedQueue.isNotEmpty() && orderedQueue.peek().pPacket->orderingIndex == orderedReadIndex_[channel])
 				{
 					auto* pBufferedPacket = orderedQueue.peek().pPacket;
