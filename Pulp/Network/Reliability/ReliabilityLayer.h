@@ -192,7 +192,7 @@ class ReliabilityLayer
         ReliablePacket* pPacket;
     };
 
-    typedef core::PriorityQueue<PacketWithWeight, core::Array<PacketWithWeight>> OrderedPacketQueue;
+    typedef core::PriorityQueue<PacketWithWeight, core::Array<PacketWithWeight>, std::greater<PacketWithWeight>> OrderedPacketQueue;
     typedef std::array<OrderedPacketQueue, MAX_ORDERED_STREAMS> OrderedPacketQueues;
 
 	X_DECLARE_ENUM(ProcessResult)(
