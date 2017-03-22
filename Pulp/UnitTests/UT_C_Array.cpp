@@ -895,10 +895,10 @@ TEST(ArrayTest, findSortedKEy)
 {
 	Array<CustomType> array(g_arena);
 
-	auto lessFunc = [](const CustomType& lhs, const int32_t& val) {
+	auto lessFunc = [](const CustomType& lhs, const size_t& val) {
 		return lhs.GetVar() < val;
 	};
-	auto greaterFunc = [](const CustomType& lhs, const int32_t& val) {
+	auto greaterFunc = [](const CustomType& lhs, const size_t& val) {
 		return lhs.GetVar() > val;
 	};
 
