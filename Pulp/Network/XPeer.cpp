@@ -348,6 +348,16 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		socketThread.Start(del);
 	}
 		
+	// set out local adress port as that of 1st bound socket.
+	if (sockets_.isNotEmpty())
+	{
+		auto port = sockets_.front().getBoundAdd().getPort();
+		for (auto& ip : ipList_)
+		{
+			ip.setPortFromHostByteOrder(port);
+		}
+	}
+
 	if (vars_.debugEnabled() > 1)
 	{
 		NetGuidStr guidStr;
