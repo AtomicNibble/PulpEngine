@@ -168,6 +168,28 @@ ConnectionState::Enum RemoteSystem::getConnectionState(void) const
 	return ConnectionState::Disconnected;
 }
 
+int32_t RemoteSystem::getAveragePing(void) const
+{
+	int32_t sum = 0;
+	int32_t num = 0;
+
+	for (const auto& ping : pings)
+	{
+		if (ping.isValid())
+		{
+			sum += ping.pingTime;
+			++num;
+		}
+	}
+
+	// aint no div by zero today son!
+	if (num) {
+		return sum / num;
+	}
+
+	return -1;
+}
+
 SystemHandle RemoteSystem::getHandle(void) const
 {
 	return systemHandle;
@@ -1381,23 +1403,7 @@ int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 		return -1;
 	}
 
-	int32_t sum = 0;
-	int32_t num = 0;
-
-	for (auto& ping : pRemoteSys->pings)
-	{
-		if (ping.isValid())
-		{
-			sum += ping.pingTime;
-			++num;
-		}
-	}
-
-	if (num) {
-		return sum / num;
-	}
-
-	return -1;
+	return pRemoteSys->getAveragePing();
 }
 
 int32_t XPeer::getLastPing(SystemHandle systemHandle) const
