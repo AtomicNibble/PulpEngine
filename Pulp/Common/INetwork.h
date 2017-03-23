@@ -95,6 +95,8 @@ struct AddressFamily
 
 
 typedef AddressFamily SocketFamily;
+
+typedef uint16_t SystemHandle;
 typedef uint16_t Port;
 // typedef uint8_t MessageID;
 typedef uint32_t BitSizeT;
@@ -103,6 +105,8 @@ typedef core::StackString<512, char> HostAddStr;
 typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 64 bytes for x64.
 typedef core::StackString<46, char> NetGuidStr;
 typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
+
+static const SystemHandle INVALID_SYSTEM_HANDLE = 0;
 
 // ---------------------------------
 
