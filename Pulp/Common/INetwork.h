@@ -2,6 +2,7 @@
 
 #include <Time\TimeVal.h>
 #include <Time\DateStamp.h>
+#include <Util\EndianUtil.h>
 
 #include <NetMsgIds.h>
 
@@ -102,6 +103,21 @@ typedef core::StackString<512, char> HostAddStr;
 typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 64 bytes for x64.
 typedef core::StackString<46, char> NetGuidStr;
 typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
+
+// ---------------------------------
+
+// network to host, i define this since we have no windows includes here.
+template<typename T>
+X_INLINE T hton(const T v)
+{
+	return core::Endian::swap(v);
+}
+
+template<typename T>
+X_INLINE T ntoh(const T v)
+{
+	return core::Endian::swap(v);
+}
 
 // ---------------------------------
 
