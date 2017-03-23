@@ -243,22 +243,6 @@ private:
 	uint64_t val_;
 };
 
-// ---------------------------------
-
-// and address, not necissarialy a unique identifier.
-struct ISystemAdd
-{
-
-	virtual ~ISystemAdd() {}
-
-	virtual uint16_t getPort(void) const X_ABSTRACT;
-
-	virtual IpVersion::Enum getIPVersion(void) const X_ABSTRACT;
-	virtual bool IsLoopBack(void) const X_ABSTRACT;
-	virtual bool IsLanAddress(void) const X_ABSTRACT;
-
-	virtual const char* toString(IPStr& strBuf, bool incPort = true) const X_ABSTRACT;
-};
 
 // ---------------------------------
 
@@ -413,8 +397,6 @@ struct INet
 	virtual IPeer* createPeer(void) X_ABSTRACT;
 	virtual void deletePeer(IPeer* pPeer) X_ABSTRACT;
 
-	virtual ISystemAdd* createSysAddress(const char* pAddressStr) X_ABSTRACT;
-	virtual ISystemAdd* createSysAddress(const char* pAddressStr, uint16_t port) X_ABSTRACT;
 
 
 };

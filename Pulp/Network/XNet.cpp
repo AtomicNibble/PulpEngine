@@ -100,15 +100,6 @@ void XNet::deletePeer(IPeer* pIPeer)
 	X_DELETE(pPeer, arena_);
 }
 
-ISystemAdd* XNet::createSysAddress(const char* pAddressStr)
-{
-	return X_NEW(SystemAdd, arena_, "SysAdd")(pAddressStr);
-}
-
-ISystemAdd* XNet::createSysAddress(const char* pAddressStr, uint16_t port)
-{
-	return X_NEW(SystemAdd, arena_, "SysAdd")(pAddressStr, port);
-}
 // ~INet
 
 NetGUID XNet::generateGUID(void)

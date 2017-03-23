@@ -30,8 +30,6 @@ public:
 	IPeer* createPeer(void) X_FINAL;
 	void deletePeer(IPeer* pPeer) X_FINAL;
 
-	ISystemAdd* createSysAddress(const char* pAddressStr) X_FINAL;
-	ISystemAdd* createSysAddress(const char* pAddressStr, uint16_t port) X_FINAL;
 	// ~INet
 
 	static NetGUID generateGUID(void);
