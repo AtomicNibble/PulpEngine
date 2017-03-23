@@ -35,6 +35,10 @@ TEST(net, msgSizeTest)
 	}
 
 	net::NetGUID serverGuid = pServer->getMyGUID();
+	net::NetGUID clientGuid = pPeer->getMyGUID();
+
+	net::SystemHandle serverHandle = net::INVALID_SYSTEM_HANDLE;
+	net::SystemHandle clientHandle = net::INVALID_SYSTEM_HANDLE;
 
 	enum class State
 	{
@@ -83,6 +87,11 @@ TEST(net, msgSizeTest)
 				if (pPacket->getID() == net::MessageID::ConnectionRequestHandShake)
 				{
 					++connectionFinishNum;
+
+					if (pPacket->guid == serverGuid)
+					{
+						serverHandle = pPacket->systemHandle;
+					}
 				}
 			}
 
@@ -91,12 +100,20 @@ TEST(net, msgSizeTest)
 				if (pPacket->getID() == net::MessageID::ConnectionRequestAccepted)
 				{
 					++connectionFinishNum;
+
+					if (pPacket->guid == serverGuid)
+					{
+						clientHandle = pPacket->systemHandle;
+					}
 				}
 			}
 
 			if (connectionFinishNum == 2)
 			{
 				X_LOG0("ServerTest", "Client and server are connected");
+				ASSERT_NE(net::INVALID_SYSTEM_HANDLE, serverHandle);
+				ASSERT_NE(net::INVALID_SYSTEM_HANDLE, clientHandle);
+
 				curState = State::Sending;
 
 				timer.Start();
@@ -106,7 +123,6 @@ TEST(net, msgSizeTest)
 		}
 		else if (curState == State::Sending)
 		{
-			net::AddressOrGUID serverId(serverGuid);
 
 			// send some data.
 
@@ -114,7 +130,7 @@ TEST(net, msgSizeTest)
 
 			for (size_t i = 0; i < sendCount; i++)
 			{
-				pPeer->send(buf, testSize, net::PacketPriority::High, net::PacketReliability::ReliableOrdered, serverId);
+				pPeer->send(buf, testSize, net::PacketPriority::High, net::PacketReliability::ReliableOrdered, serverHandle);
 
 				bytesSent += testSize;
 			}

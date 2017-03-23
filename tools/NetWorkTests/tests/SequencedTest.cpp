@@ -36,6 +36,9 @@ TEST(net, SequencedPacketsTest)
 
 	net::NetGUID serverGuid = pServer->getMyGUID();
 
+	net::SystemHandle serverHandle = net::INVALID_SYSTEM_HANDLE;
+	net::SystemHandle clientHandle = net::INVALID_SYSTEM_HANDLE;
+
 	enum class State
 	{
 		Connecting,
@@ -76,6 +79,11 @@ TEST(net, SequencedPacketsTest)
 				if (pPacket->getID() == net::MessageID::ConnectionRequestHandShake)
 				{
 					++connectionFinishNum;
+
+					if (pPacket->guid == serverGuid)
+					{
+						serverHandle = pPacket->systemHandle;
+					}
 				}
 			}
 
@@ -84,12 +92,20 @@ TEST(net, SequencedPacketsTest)
 				if (pPacket->getID() == net::MessageID::ConnectionRequestAccepted)
 				{
 					++connectionFinishNum;
+
+					if (pPacket->guid == serverGuid)
+					{
+						clientHandle = pPacket->systemHandle;
+					}
 				}
 			}
 
 			if (connectionFinishNum == 2)
 			{
 				X_LOG0("ServerTest", "Client and server are connected");
+				ASSERT_NE(net::INVALID_SYSTEM_HANDLE, serverHandle);
+				ASSERT_NE(net::INVALID_SYSTEM_HANDLE, clientHandle);
+
 				curState = State::Sending;
 
 				timer.Start();
@@ -99,8 +115,6 @@ TEST(net, SequencedPacketsTest)
 		}
 		else if (curState == State::Sending)
 		{
-			net::AddressOrGUID serverId(serverGuid);
-
 			// sends packets on diffrent streams.
 			uint32_t numStream = core::random::MultiplyWithCarry(1u, 10u);
 			for (uint32_t x = 0; x < numStream; x++)
@@ -120,7 +134,7 @@ TEST(net, SequencedPacketsTest)
 						static_cast<uint32_t>(data.size()));
 
 					// send the packet
-					pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverId);
+					pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverHandle);
 				}
 			}
 
@@ -140,7 +154,7 @@ TEST(net, SequencedPacketsTest)
 					static_cast<uint32_t>(data.size()));
 
 				// send the packet
-				pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverId);
+				pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverHandle);
 			}
 
 			curState = State::Reciving;
