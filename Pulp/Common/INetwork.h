@@ -66,18 +66,34 @@ X_DECLARE_ENUM8(PacketReliability)(
 	ReliableOrderedWithAck
 );
 
-X_DECLARE_ENUM(IpVersion)(
+#if NET_IPv6_SUPPORT
+
+X_DECLARE_ENUM8(IpVersion)(
 	Ipv4,
 	Ipv6
 );
 
-X_DECLARE_ENUM(SocketFamily)(
-	INet,
-	INet6
+#else
+
+X_DECLARE_ENUM8(IpVersion)(
+	Ipv4
 );
 
+#endif // !NET_IPv6_SUPPORT
 
-typedef uint16_t SystemIndex;
+struct AddressFamily
+{
+	enum Enum : uint16_t
+	{
+		INet = 2,
+#if NET_IPv6_SUPPORT
+		INet6 = 23
+#endif // !NET_IPv6_SUPPORT
+	};
+};
+
+
+typedef AddressFamily SocketFamily;
 typedef uint16_t Port;
 // typedef uint8_t MessageID;
 typedef uint32_t BitSizeT;
