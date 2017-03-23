@@ -3,7 +3,6 @@
 
 X_NAMESPACE_BEGIN(net)
 
-#define NET_IPv6_SUPPORT 1
 
 
 // build config specific values

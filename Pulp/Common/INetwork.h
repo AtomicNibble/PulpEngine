@@ -7,6 +7,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+#define NET_IPv6_SUPPORT 1
+
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
 static const uint32_t MAX_SUPPORTED_PEERS = 1 << 10; // go nuts.
 static const uint32_t MAX_BAN_ENTRIES = 256; // max bans entries you can add, wildcards supported.
