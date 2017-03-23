@@ -9,7 +9,7 @@ X_INLINE uint16_t SystemAddress::getPort(void) const
 
 X_INLINE IpVersion::Enum SystemAddress::getIPVersion(void) const
 {
-	if (family_ == AddressFamily::INet) {
+	if (address_.addr4.family == AddressFamily::INet) {
 		return IpVersion::Ipv4;
 	}
 #if NET_IPv6_SUPPORT

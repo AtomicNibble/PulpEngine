@@ -66,7 +66,6 @@ protected:
 #endif // !NET_IPv6_SUPPORT
 
 protected:
-	AddressFamily::Enum family_;
 #if X_DEBUG
 	uint16_t portPeekVal_; // host order.
 #endif // !X_DEBUG

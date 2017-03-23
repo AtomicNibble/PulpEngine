@@ -5,17 +5,22 @@
 
 X_NAMESPACE_BEGIN(net)
 
-
 // ------------------------------------------
 
 SystemAddress::SystemAddress()
 {
+#if NET_IPv6_SUPPORT
+	// check we can use the ipv4 family / port to lookup the value for ipv4 and ipv6.
+	static_assert(X_OFFSETOF(SystemAddress, address_.addr4.port) == X_OFFSETOF(SystemAddress, address_.addr6.port), 
+		"ports offsets not match");
 
+	static_assert(X_OFFSETOF(SystemAddress, address_.addr4.family) == X_OFFSETOF(SystemAddress, address_.addr6.family),
+		"ports offsets not match");
+#endif // !NET_IPv6_SUPPORT
 }
 
 SystemAddress& SystemAddress::operator=(const SystemAddress& oth)
 {
-	family_ = oth.family_;
 	address_ = oth.address_;
 
 #if X_DEBUG
