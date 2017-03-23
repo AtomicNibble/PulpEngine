@@ -16,8 +16,10 @@ namespace
 		{
 			case IpVersion::Ipv4:
 				return IPPROTO_IP;
+#if NET_IPv6_SUPPORT
 			case IpVersion::Ipv6:
 				return platform::IPPROTO_IPV6;
+#endif // !NET_IPv6_SUPPORT
 
 			default:
 				X_ASSERT_UNREACHABLE();
