@@ -1,47 +1,61 @@
 #include "stdafx.h"
-#include "SystemAdd.h"
-#include "LibaryStartup.h"
+#include "SystemAddressEx.h"
 
 
 X_NAMESPACE_BEGIN(net)
 
-const char* SystemAdd::IP_LOOPBACK[IpVersion::ENUM_COUNT] = {
-	"127.0.0.1",
-	"::1"
-};
-
-SystemAdd::SystemAdd()
+namespace
 {
-	address_.addr4.sin_family = AF_INET;
-	core::zero_object(address_);
-	systemIndex_ = std::numeric_limits<SystemIndex>::max();
 
-#if X_DEBUG
-	portPeekVal_ = 0;
-#endif // !X_DEBUG
-}
+	// just match the paltform values, if the platform valeus are diffrent i'll abstract the values.
+	static_assert(AddressFamily::INet == AF_INET, "AddressFamily enum don't match platform value");
+	
+#if NET_IPv6_SUPPORT
+	static_assert(AddressFamily::INet6 == AF_INET6, "AddressFamily enum don't match platform value");
+#endif // !NET_IPv6_SUPPORT
 
-SystemAdd::SystemAdd(const char* pAddressStr)
-{
-	address_.addr4.sin_family = AF_INET;
-	fromString(pAddressStr);
-	systemIndex_ = std::numeric_limits<SystemIndex>::max();
-}
+} // namespace
 
-SystemAdd::SystemAdd(const char* pAddressStr, uint16_t port)
-{
-	address_.addr4.sin_family = AF_INET;
-	fromStringExplicitPort(pAddressStr, port);
-	systemIndex_ = std::numeric_limits<SystemIndex>::max();
-}
-
-
-SystemAdd::~SystemAdd()
+SystemAddressEx::SystemAddressEx()
 {
 
 }
 
-void SystemAdd::setFromSocket(SocketHandle socket)
+bool SystemAddressEx::operator>(const SystemAddressEx& rhs) const
+{
+	if (address_.addr4.port == rhs.address_.addr4.port)
+	{
+#if NET_IPv6_SUPPORT
+		if (address_.addr4.family == AF_INET) {
+			return address_.addr4.addr.as_int > rhs.address_.addr4.addr.as_int;
+		}
+		return std::memcmp(&address_.addr6.addr, &rhs.address_.addr6.addr, sizeof(address_.addr6.addr)) > 0;
+#else
+		return address_.addr4.addr.as_int > rhs.address_.addr4.addr.as_int;
+#endif // !NET_IPv6_SUPPORT
+	}
+	return address_.addr4.port > rhs.address_.addr4.port;
+}
+
+bool SystemAddressEx::operator<(const SystemAddressEx& rhs) const
+{
+	if (address_.addr4.port == rhs.address_.addr4.port)
+	{
+#if NET_IPv6_SUPPORT
+		if (address_.addr4.family == AF_INET) {
+			return address_.addr4.addr.as_int < rhs.address_.addr4.addr.as_int;
+		}
+
+		return std::memcmp(&address_.addr6.addr, &rhs.address_.addr6.addr, sizeof(address_.addr6.addr)) < 0;
+#else
+		return address_.addr4.addr.as_int < rhs.address_.addr4.addr.as_int;
+#endif // !NET_IPv6_SUPPORT
+	}
+	return address_.addr4.port < rhs.address_.addr4.port;
+}
+
+
+void SystemAddressEx::setFromSocket(SocketHandle socket)
 {
 	platform::socklen_t slen;
 	platform::sockaddr_storage ss;
@@ -54,10 +68,15 @@ void SystemAdd::setFromSocket(SocketHandle socket)
 		return;
 	}
 
-	const size_t ipv4AddSize = sizeof(address_.addr4.sin_addr);
-	const size_t ipv6AddSize = sizeof(address_.addr6.sin6_addr);
+	const size_t ipv4AddSize = sizeof(address_.addr4.addr);
 
+#if NET_IPv6_SUPPORT
+	const size_t ipv6AddSize = sizeof(address_.addr6.addr);
 	uint8_t zeroBuf[core::Max(ipv4AddSize, ipv6AddSize)];
+#else
+	uint8_t zeroBuf[ipv4AddSize];
+#endif // !NET_IPv6_SUPPORT
+
 	core::zero_object(zeroBuf);
 
 	if (ss.ss_family == AF_INET)
@@ -65,133 +84,93 @@ void SystemAdd::setFromSocket(SocketHandle socket)
 		std::memcpy(&address_.addr4, &ss, sizeof(platform::sockaddr_in));
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+		portPeekVal_ = platform::ntohs(address_.addr4.port);
 #endif // !X_DEBUG
 
-		if (std::memcmp(&address_.addr4.sin_addr.s_addr, zeroBuf, ipv4AddSize) == 0) {
+		if (std::memcmp(&address_.addr4.addr, zeroBuf, ipv4AddSize) == 0) {
 			setToLoopback(IpVersion::Ipv4);
 		}
 	}
 	else
+#if NET_IPv6_SUPPORT
 	{
 		std::memcpy(&address_.addr6, &ss, sizeof(platform::sockaddr_in6));
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr6.sin6_port);
+		portPeekVal_ = platform::ntohs(address_.addr6.port);
 #endif // !X_DEBUG
 
-		if (std::memcmp(&address_.addr6.sin6_addr, zeroBuf, ipv6AddSize) == 0) {
+		if (std::memcmp(&address_.addr6.addr, zeroBuf, ipv6AddSize) == 0) {
 			setToLoopback(IpVersion::Ipv6);
 		}
 	}
+#else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+#endif // !NET_IPv6_SUPPORT
 }
 
-void SystemAdd::setFromAddInfo(platform::addrinfo* pAddInfo)
+void SystemAddressEx::setFromAddInfo(platform::addrinfo* pAddInfo)
 {
 	if (pAddInfo->ai_family == AF_INET)
 	{
 		std::memcpy(&address_.addr4, pAddInfo->ai_addr, sizeof(address_.addr4));
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+		portPeekVal_ = platform::ntohs(address_.addr4.port);
 #endif // !X_DEBUG
 	}
 	else
+#if NET_IPv6_SUPPORT
 	{
 		std::memcpy(&address_.addr6, pAddInfo->ai_addr, sizeof(address_.addr6));
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr6.sin6_port);
+		portPeekVal_ = platform::ntohs(address_.addr6.port);
 #endif // !X_DEBUG
 	}
+#else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+#endif // !NET_IPv6_SUPPORT
 }
 
-void SystemAdd::setFromAddStorage(const platform::sockaddr_storage& addStorage)
+void SystemAddressEx::setFromAddStorage(const platform::sockaddr_storage& addStorage)
 {
 	if (addStorage.ss_family == AF_INET)
 	{
 		std::memcpy(&address_.addr4, &addStorage, sizeof(address_.addr4));
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+		portPeekVal_ = platform::ntohs(address_.addr4.port);
 #endif // !X_DEBUG
 	}
 	else
+#if NET_IPv6_SUPPORT
 	{
 		std::memcpy(&address_.addr6, &addStorage, sizeof(address_.addr6));
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr6.sin6_port);
+		portPeekVal_ = platform::ntohs(address_.addr6.port);
 #endif // !X_DEBUG
 	}
-}
-
-
-void SystemAdd::setToLoopback(void)
-{
-	setToLoopback(getIPVersion());
-}
-
-void SystemAdd::setToLoopback(IpVersion::Enum ipVersion)
-{
-	fromString(IP_LOOPBACK[ipVersion], '\0', ipVersion);
-}
-
-
-void SystemAdd::setPortFromHostByteOrder(uint16_t port)
-{
-	address_.addr4.sin_port = platform::htons(port);
-#if X_DEBUG
-	portPeekVal_ = port;
-#endif // !X_DEBUG
-}
-
-void SystemAdd::setPortFromNetworkByteOrder(uint16_t port)
-{
-	address_.addr4.sin_port = port;
-#if X_DEBUG
-	portPeekVal_ = platform::ntohs(port);
-#endif // !X_DEBUG
-}
-
-void SystemAdd::writeToBitStream(core::FixedBitStreamBase& bs) const
-{
-	bs.writeAligned(address_);
-	bs.write(systemIndex_);
-}
-
-void SystemAdd::fromBitStream(core::FixedBitStreamBase& bs)
-{
-	bs.readAligned(address_);
-	bs.read(systemIndex_);
-
-#if X_DEBUG
-	portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
-#endif // !X_DEBUG
-}
-
-bool SystemAdd::equalExcludingPort(const SystemAdd& oth) const
-{
-	bool ipv4Equal = (address_.addr4.sin_family == AF_INET && address_.addr4.sin_addr.s_addr == oth.address_.addr4.sin_addr.s_addr);
-
-#if NET_IPv6_SUPPORT
-	bool ipv6Equal = (address_.addr4.sin_family == AF_INET6 && std::memcmp(address_.addr6.sin6_addr.s6_addr,
-		oth.address_.addr6.sin6_addr.s6_addr, sizeof(address_.addr6.sin6_addr.s6_addr)) == 0);
-
-	return ipv4Equal || ipv6Equal;
+#else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
 #endif // !NET_IPv6_SUPPORT
-		
-	return ipv4Equal;
 }
 
 
-const char* SystemAdd::toString(IPStr& strBuf, bool incPort) const
+const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
 {
 	int32_t ret;
 
 	char tmpBuf[IPStr::BUF_SIZE];
 
-	if (address_.addr4.sin_family == AF_INET)
+	if (address_.addr4.family == AddressFamily::INet)
 	{
 		ret = platform::getnameinfo((struct platform::sockaddr*)&address_.addr4, 
 			sizeof(struct platform::sockaddr_in),
@@ -203,6 +182,7 @@ const char* SystemAdd::toString(IPStr& strBuf, bool incPort) const
 		);
 	}
 	else
+#if NET_IPv6_SUPPORT
 	{
 		ret = platform::getnameinfo((struct platform::sockaddr*)
 			&address_.addr6, 
@@ -214,6 +194,11 @@ const char* SystemAdd::toString(IPStr& strBuf, bool incPort) const
 			NI_NUMERICHOST
 		);
 	}
+#else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+#endif // !NET_IPv6_SUPPORT
 
 	if (ret != 0) {
 		lastError::Description Dsc;
@@ -225,14 +210,14 @@ const char* SystemAdd::toString(IPStr& strBuf, bool incPort) const
 	strBuf.set(tmpBuf);
 
 	if (incPort) {
-		strBuf.appendFmt(" %" PRIu16, platform::ntohs(address_.addr4.sin_port));
+		strBuf.appendFmt(" %" PRIu16, platform::ntohs(address_.addr4.port));
 	}
 
 	return strBuf.c_str();
 }
 
 
-bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersion::Enum ipVersion)
+bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, IpVersion::Enum ipVersion)
 {
 	X_ASSERT_NOT_NULL(pAddressStr);
 
@@ -250,8 +235,6 @@ bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersi
 		ipPart.set(pAddressStr);
 	}
 
-	PlatLib::ScopedRef libRef;
-
 	platform::addrinfo hints, *servinfo = nullptr;
 	memset(&hints, 0, sizeof hints);
 	hints.ai_socktype = SOCK_DGRAM;
@@ -259,9 +242,11 @@ bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersi
 	if (ipVersion == IpVersion::Ipv4) {
 		hints.ai_family = AF_INET;
 	}
+#if NET_IPv6_SUPPORT
 	else if (ipVersion == IpVersion::Ipv6) {
 		hints.ai_family = AF_INET6;
 	}
+#endif // !NET_IPv6_SUPPORT
 	else {
 		hints.ai_family = AF_UNSPEC;
 	}
@@ -270,6 +255,7 @@ bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersi
 	if (servinfo == 0)
 	{
 		// if ipv6 try it as ipv4.
+#if NET_IPv6_SUPPORT
 		if (ipVersion == IpVersion::Ipv6) 
 		{
 			ipVersion = IpVersion::Ipv4;
@@ -289,6 +275,7 @@ bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersi
 			}
 		}
 		else
+#endif // !NET_IPv6_SUPPORT
 		{
 			lastError::Description Dsc;
 			X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastError::ToString(Dsc));
@@ -298,39 +285,46 @@ bool SystemAdd::fromString(const char* pAddressStr, char portDelineator, IpVersi
 
 	X_ASSERT(servinfo != 0, "ServerInfo not valid")(servinfo);
 
-	uint16_t oldPort = address_.addr4.sin_port;
+	uint16_t oldPort = address_.addr4.port;
 
 	if (servinfo->ai_family == AF_INET)
 	{
-		address_.addr4.sin_family = AF_INET;
+		address_.addr4.family = AddressFamily::INet;
 		std::memcpy(&address_.addr4, (struct platform::sockaddr_in *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in));
 	}
+#if NET_IPv6_SUPPORT
 	else
 	{
-		address_.addr4.sin_family = AF_INET6;
+		address_.addr4.family = AddressFamily::INet6;
 		std::memcpy(&address_.addr6, (struct platform::sockaddr_in6 *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in6));
 	}
+#else
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+#endif // !NET_IPv6_SUPPORT
 
 	platform::freeaddrinfo(servinfo); // free the linked list
 
 	if (portPart.isNotEmpty())
 	{
 		uint16_t port = core::strUtil::StringToInt<uint16_t>(portPart.c_str());
-		address_.addr4.sin_port = platform::htons(port);
+		address_.addr4.port = platform::htons(port);
 
 #if X_DEBUG
-		portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+		portPeekVal_ = platform::ntohs(address_.addr4.port);
 #endif // !X_DEBUG
 	}
 	else
 	{
-		address_.addr4.sin_port = oldPort;
+		address_.addr4.port = oldPort;
 	}
 
 	return true;
 }
 
-bool SystemAdd::fromStringExplicitPort(const char* pAddressStr, uint16_t port, IpVersion::Enum ipVersion)
+bool SystemAddressEx::fromStringExplicitPort(const char* pAddressStr, uint16_t port, IpVersion::Enum ipVersion)
 {
 	X_ASSERT_NOT_NULL(pAddressStr);
 	
@@ -338,10 +332,10 @@ bool SystemAdd::fromStringExplicitPort(const char* pAddressStr, uint16_t port, I
 		return false;
 	}
 
-	address_.addr4.sin_port = platform::htons(port);
+	address_.addr4.port = platform::htons(port);
 
 #if X_DEBUG
-	portPeekVal_ = platform::ntohs(address_.addr4.sin_port);
+	portPeekVal_ = platform::ntohs(address_.addr4.port);
 #endif // !X_DEBUG
 	return true;
 }

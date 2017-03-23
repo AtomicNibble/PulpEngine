@@ -403,7 +403,7 @@
     <ClInclude Include="Util\LastError.h" />
     <ClInclude Include="Util\LibaryStartup.h" />
     <ClInclude Include="Util\RangeList.h" />
-    <ClInclude Include="Util\SystemAdd.h" />
+    <ClInclude Include="Util\SystemAddressEx.h" />
     <ClInclude Include="Util\win32\LastError.h" />
     <ClInclude Include="Util\win32\LibaryStartup.h" />
     <ClInclude Include="Vars\NetVars.h" />
@@ -430,7 +430,7 @@
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="Util\BPSTracker.cpp" />
     <ClCompile Include="Util\RangeList.cpp" />
-    <ClCompile Include="Util\SystemAdd.cpp" />
+    <ClCompile Include="Util\SystemAddressEx.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp" />
     <ClCompile Include="Util\win32\LibaryStartup.cpp" />
     <ClCompile Include="Vars\NetVars.cpp" />
@@ -442,7 +442,7 @@
     <None Include="Sockets\win32\Socket.inl" />
     <None Include="Util\BPSTracker.inl" />
     <None Include="Util\RangeList.inl" />
-    <None Include="Util\SystemAdd.inl" />
+    <None Include="Util\SystemAddressEx.inl" />
     <None Include="Vars\NetVars.inl" />
     <None Include="XPeer.inl" />
   </ItemGroup>
