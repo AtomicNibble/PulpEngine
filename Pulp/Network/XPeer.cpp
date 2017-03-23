@@ -167,7 +167,12 @@ ConnectionState::Enum RemoteSystem::getConnectionState(void) const
 	return ConnectionState::Disconnected;
 }
 
-void RemoteSystem::onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
+SystemHandle RemoteSystem::getHandle(void) const
+{
+	return 0;
+}
+
+void RemoteSystem::onConnected(const SystemAddressEx& externalSysId, const SystemAddArr& localIps,
 	core::TimeVal sendPingTime, core::TimeVal sendPongTime)
 {
 	myExternalSystemAddress = externalSysId;
@@ -561,7 +566,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 	auto ipVer = sockets_[socketIdx].getBoundAdd().getIPVersion();
 
 	// need to work out the address.
-	SystemAdd systemAddress;
+	SystemAddressEx systemAddress;
 	if (!systemAddress.fromStringExplicitPort(pHost, remotePort, ipVer)) {
 		return ConnectionAttemptResult::FailedToResolve;
 	}
@@ -603,43 +608,37 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 	return ConnectionAttemptResult::Started;
 }
 
-void XPeer::closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
+void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
 	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
 	BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
 	pCmd->priority = notificationPriority;
 	pCmd->orderingChannel = orderingChannel;
-	pCmd->systemIdentifier = target;
+	pCmd->systemHandle = systemHandle;
 	pCmd->sendDisconnectionNotification = sendDisconnectionNotification;
 	bufferdCmds_.push(pCmd);
-	
-
-	if (!sendDisconnectionNotification && getConnectionState(target) == ConnectionState::Connected)
-	{
-		NetGUID guid = target.netGuid;
-
-		if (guid == UNASSIGNED_NET_GUID) {
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
-
-		// if not notification we need to tell game here.
-		Packet* pPacket = allocPacket(8);
-		pPacket->pData[0] = MessageID::ConnectionLost;
-		pPacket->pSystemAddress = const_cast<ISystemAdd*>(target.pSystemAddress); // fuck
-		pPacket->guid = guid;
-		pushBackPacket(pPacket);
-	}
 }
 
 
 // connection util
-ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdentifier)
+ConnectionState::Enum XPeer::getConnectionState(SystemHandle systemHandle)
 {
-	if (systemIdentifier.isAddressValid())
-	{
-		// pending?
-		const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
+	if (!pRemoteSys) {
+		return ConnectionState::NotConnected;
+	}
 
+	return pRemoteSys->getConnectionState();
+}
+
+ConnectionState::Enum XPeer::getConnectionState(const SystemAddress& systemAddress)
+{
+	const SystemAddressEx& sysAdd = static_cast<const SystemAddressEx&>(systemAddress);
+
+	// pending?
+	{
 		auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
 			return pOth->systemAddress == sysAdd;
 		};
@@ -651,7 +650,7 @@ ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdenti
 		}
 	}
 
-	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	const RemoteSystem* pRemoteSys = getRemoteSystem(sysAdd, false);
 	if (!pRemoteSys) {
 		return ConnectionState::NotConnected;
 	}
@@ -659,10 +658,9 @@ ConnectionState::Enum XPeer::getConnectionState(const AddressOrGUID systemIdenti
 	return pRemoteSys->getConnectionState();
 }
 
-void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
+void XPeer::cancelConnectionAttempt(const SystemAddress& target)
 {
-	X_ASSERT_NOT_NULL(pTarget);
-	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(pTarget);
+	const SystemAddressEx& sysAdd = static_cast<const SystemAddressEx&>(target);
 
 	IPStr addStr;
 	sysAdd.toString(addStr);
@@ -675,7 +673,7 @@ void XPeer::cancelConnectionAttempt(const ISystemAdd* pTarget)
 
 uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, 
-	const AddressOrGUID systemIdentifier, bool broadcast,
+	SystemHandle systemHandle, bool broadcast,
 	uint32_t forceReceiptNumber)
 {
 	if (!lengthBytes) {
@@ -693,7 +691,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 		usedSendReceipt = incrementNextSendReceipt();
 	}
 
-	if (!broadcast && isLoopbackAddress(systemIdentifier, true))
+	if (!broadcast && isLoopbackAddress(systemHandle, true))
 	{
 		sendLoopback(pData, lengthBytes);
 
@@ -714,7 +712,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 		priority, 
 		reliability,
 		orderingChannel,
-		systemIdentifier, 
+		systemHandle,
 		broadcast, 
 		usedSendReceipt
 	);
@@ -723,7 +721,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 }
 
 uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, const AddressOrGUID systemIdentifier)
+	PacketReliability::Enum reliability, SystemHandle systemHandle)
 {
 	if (!lengthBytes) {
 		return 0;
@@ -733,7 +731,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 
 	uint32_t usedSendReceipt = incrementNextSendReceipt();
 
-	if (isLoopbackAddress(systemIdentifier, true))
+	if (isLoopbackAddress(systemHandle, true))
 	{
 		sendLoopback(pData, lengthBytes);
 
@@ -754,7 +752,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 		priority,
 		reliability,
 		0,
-		systemIdentifier,
+		systemHandle,
 		false,
 		usedSendReceipt
 	);
@@ -763,7 +761,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 }
 
 void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt)
+	PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt)
 {
 	X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
 
@@ -773,7 +771,7 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 	pCmd->reliability = reliability;
 	pCmd->orderingChannel = orderingChannel;
 	pCmd->broadcast = broadcast;
-	pCmd->systemIdentifier = systemIdentifier;
+	pCmd->systemHandle = systemHandle;
 	pCmd->receipt = receipt;
 
 	bufferdCmds_.push(pCmd);
@@ -841,13 +839,14 @@ void XPeer::clearPackets(void)
 	});
 }
 
-bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const
+bool XPeer::isLoopbackAddress(SystemHandle systemHandle, bool matchPort) const
 {
-	if (systemIdentifier.netGuid == getMyGUID()) {
-		X_ASSERT(getMyGUID() != UNASSIGNED_NET_GUID, "My guid should not be invalid")();
-		return true;
-	}
+#if 1
+	X_UNUSED(systemHandle);
+	X_UNUSED(matchPort);
 
+	return false;
+#else
 	if (!systemIdentifier.isAddressValid()) {
 		return false;
 	}
@@ -873,20 +872,38 @@ bool XPeer::isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchP
 
 	// nope.
 	return false;
+#endif
 }
 
-const RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive) const
+const RemoteSystem* XPeer::getRemoteSystem(SystemHandle handle, bool onlyActive) const
 {
-	if (systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
-		return getRemoteSystem(systemIdentifier.netGuid, onlyActive);
+	int32_t deadConIdx = -1;
+
+	for (size_t i = 0; i < remoteSystems_.size(); i++)
+	{
+		auto& rs = remoteSystems_[i];
+		if (rs.getHandle() == handle)
+		{
+			if (rs.isActive)
+			{
+				return &rs;
+			}
+			else
+			{
+				// see if any active ones in list before returning this.
+				deadConIdx = safe_static_cast<int32_t>(i);
+			}
+		}
+
+		if (deadConIdx && !onlyActive) {
+			return &remoteSystems_[deadConIdx];
+		}
 	}
 
-	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
-	X_ASSERT_NOT_NULL(pSysAdd);
-	return getRemoteSystem(*pSysAdd, onlyActive);
+	return nullptr;
 }
 
-const RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive) const
+const RemoteSystem* XPeer::getRemoteSystem(const SystemAddressEx& systemAddress, bool onlyActive) const
 {
 	if (systemAddress == UNASSIGNED_SYSTEM_ADDRESS) {
 		X_WARNING("Net", "Tried to get remote for unassigned address");
@@ -936,20 +953,36 @@ const RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive) 
 	return nullptr;
 }
 
-
-
-RemoteSystem* XPeer::getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive)
+RemoteSystem* XPeer::getRemoteSystem(SystemHandle handle, bool onlyActive)
 {
-	if (systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
-		return getRemoteSystem(systemIdentifier.netGuid, onlyActive);
+	int32_t deadConIdx = -1;
+
+	for (size_t i = 0; i < remoteSystems_.size(); i++)
+	{
+		auto& rs = remoteSystems_[i];
+		if (rs.getHandle() == handle)
+		{
+			if (rs.isActive)
+			{
+				return &rs;
+			}
+			else
+			{
+				// see if any active ones in list before returning this.
+				deadConIdx = safe_static_cast<int32_t>(i);
+			}
+		}
+
+		if (deadConIdx && !onlyActive) {
+			return &remoteSystems_[deadConIdx];
+		}
 	}
 
-	const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
-	X_ASSERT_NOT_NULL(pSysAdd);
-	return getRemoteSystem(*pSysAdd, onlyActive);
+	return nullptr;
 }
 
-RemoteSystem* XPeer::getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive)
+
+RemoteSystem* XPeer::getRemoteSystem(const SystemAddressEx& systemAddress, bool onlyActive)
 {
 	if (systemAddress == UNASSIGNED_SYSTEM_ADDRESS) {
 		X_WARNING("Net", "Tried to get remote for unassigned address");
@@ -1001,7 +1034,7 @@ RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
 
 
 
-size_t XPeer::getRemoteSystemIndex(const SystemAdd& systemAddress) const
+size_t XPeer::getRemoteSystemIndex(const SystemAddressEx& systemAddress) const
 {
 	for (size_t i = 0; i < remoteSystems_.size(); i++)
 	{
@@ -1029,16 +1062,6 @@ size_t XPeer::getRemoteSystemIndex(const NetGUID& guid) const
 	}
 
 	return std::numeric_limits<size_t>::max();
-}
-
-
-size_t XPeer::getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const
-{
-	if (systemIdentifier.isAddressValid()) {
-		return getRemoteSystemIndex(systemIdentifier.pSystemAddress);
-	}
-
-	return getRemoteSystemIndex(systemIdentifier.netGuid);
 }
 
 
@@ -1136,7 +1159,7 @@ void XPeer::freeConnectionRequest(RequestConnection* pConReq)
 
 
 
-void XPeer::removeConnectionRequest(const SystemAdd& sysAdd)
+void XPeer::removeConnectionRequest(const SystemAddressEx& sysAdd)
 {
 	core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
@@ -1181,10 +1204,9 @@ uint16_t XPeer::numberOfConnections(void) const
 }
 
 // Ping 
-void XPeer::ping(const ISystemAdd* pTarget)
+void XPeer::ping(const SystemHandle handle)
 {
-	X_ASSERT_NOT_NULL(pTarget);
-	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(pTarget);
+	X_ASSERT(handle != INVALID_SYSTEM_HANDLE,"Invalid system handle passed")(handle);
 
 	core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
 
@@ -1197,7 +1219,7 @@ void XPeer::ping(const ISystemAdd* pTarget)
 		PacketPriority::Immediate,
 		PacketReliability::UnReliable,
 		0,
-		AddressOrGUID(pTarget),
+		handle,
 		false,
 		0
 	);
@@ -1370,9 +1392,9 @@ void XPeer::listBans(void) const
 	}
 }
 
-int32_t XPeer::getAveragePing(const AddressOrGUID systemIdentifier) const
+int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 {
-	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (!pRemoteSys) {
 		return -1;
 	}
@@ -1396,9 +1418,9 @@ int32_t XPeer::getAveragePing(const AddressOrGUID systemIdentifier) const
 	return -1;
 }
 
-int32_t XPeer::getLastPing(const AddressOrGUID systemIdentifier) const
+int32_t XPeer::getLastPing(SystemHandle system) const
 {
-	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	const RemoteSystem* pRemoteSys = getRemoteSystem(system, false);
 	if (!pRemoteSys) {
 		return -1;
 	}
@@ -1407,9 +1429,9 @@ int32_t XPeer::getLastPing(const AddressOrGUID systemIdentifier) const
 
 }
 
-int32_t XPeer::getLowestPing(const AddressOrGUID systemIdentifier) const
+int32_t XPeer::getLowestPing(SystemHandle system) const
 {
-	const RemoteSystem* pRemoteSys = getRemoteSystem(systemIdentifier, false);
+	const RemoteSystem* pRemoteSys = getRemoteSystem(system, false);
 	if (!pRemoteSys) {
 		return -1;
 	}
@@ -1420,19 +1442,18 @@ int32_t XPeer::getLowestPing(const AddressOrGUID systemIdentifier) const
 
 
 // MTU for a given system
-int32_t XPeer::getMTUSize(const ISystemAdd* pTarget)
+int32_t XPeer::getMTUSize(SystemHandle system) const
 {
-	if (pTarget) {
-		const SystemAdd* pSysAdd = static_cast<const SystemAdd*>(pTarget);
-		auto* pRemoteSys = getRemoteSystem(*pSysAdd, false);
+	if (system == INVALID_SYSTEM_HANDLE) {
+		return defaultMTU_;
+	}
 	
-		if (pRemoteSys) {
-			return pRemoteSys->MTUSize;
-		}
-
-		X_WARNING("Net", "Failed to find remote system for MTU size returning default");
+	auto* pRemoteSys = getRemoteSystem(system, false);
+	if (pRemoteSys) {
+		return pRemoteSys->MTUSize;
 	}
 
+	X_ERROR("Net", "Failed to find remote system for MTU size returning default");
 	return defaultMTU_;
 }
 
@@ -1547,10 +1568,7 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal t
 				it = connectionReqs_.erase(it);
 
 				// send packet.
-				Packet* pPacket = allocPacket(8);
-				pPacket->pData[0] = MessageID::ConnectionRequestFailed;
-				pPacket->pSystemAddress = nullptr; // fuck
-				pushBackPacket(pPacket);
+				pushPacket(MessageID::ConnectionRequestFailed, cr.systemAddress);
 				continue;
 			}
 
@@ -1628,12 +1646,9 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 				
 				// for broadcast pRemoteSystem is allowed to be null.
 				// it's used for exclusions.
-				RemoteSystem* pRemoteSystem = nullptr;	
-				if (cmd.systemIdentifier.isAddressValid()) {
-					pRemoteSystem = getRemoteSystem(cmd.systemIdentifier.pSystemAddress, true);
-				}
-				else if (cmd.systemIdentifier.netGuid != UNASSIGNED_NET_GUID) {
-					pRemoteSystem = getRemoteSystem(cmd.systemIdentifier.netGuid, true);
+				RemoteSystem* pRemoteSystem = nullptr;
+				if (cmd.systemHandle != INVALID_SYSTEM_HANDLE) {
+					pRemoteSystem = getRemoteSystem(cmd.systemHandle, true);
 				}
 
 				// broadcast too all but pRemoteSystem.
@@ -1661,7 +1676,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 			}
 			else
 			{
-				RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+				RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemHandle, true);
 				if (!pRemoteSystem) {
 					freeBufferdCmd(pBufCmd);
 					continue;
@@ -1691,7 +1706,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 		}
 		else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
 		{
-			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemIdentifier, true);
+			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemHandle, true);
 			if (!pRemoteSystem) {
 				freeBufferdCmd(pBufCmd);
 				continue;
@@ -1714,12 +1729,9 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 			}
 			else
 			{
+				X_ASSERT_NOT_NULL(pRemoteSystem);
 				// tell the game now.
-				Packet* pPacket = allocPacket(8);
-				pPacket->pData[0] = MessageID::ConnectionLost;
-				pPacket->pSystemAddress = nullptr; // fuck
-				pPacket->guid = pRemoteSystem->guid;
-				pushBackPacket(pPacket);
+				pushPacket(MessageID::ConnectionLost, *pRemoteSystem);
 
 				// close it.
 				disconnectRemote(*pRemoteSystem);
@@ -1803,21 +1815,16 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 			X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
 		}
 
-		// ya cunt!
-		Packet* pPacket = allocPacket(8);
+		MessageID::Enum msgId = MessageID::DisconnectNotification;
 		if (rs.connectState == ConnectState::RequestedConnection) {
-			pPacket->pData[0] = MessageID::ConnectionRequestFailed;
+			msgId = MessageID::ConnectionRequestFailed;
 		}
 		else if (rs.connectState == ConnectState::Connected) {
-			pPacket->pData[0] = MessageID::ConnectionLost;
-		}
-		else {
-			pPacket->pData[0] = MessageID::DisconnectNotification;
+			msgId = MessageID::ConnectionLost;
 		}
 
-		pPacket->pSystemAddress = nullptr; // fuck
-		pPacket->guid = rs.guid;
-		pushBackPacket(pPacket);
+		// ya cunt!
+		pushPacket(msgId, rs);
 
 		disconnectRemote(rs);
 	}
@@ -1911,7 +1918,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 	X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")(pData, pData->bytesRead);
 
 	IPStr ipStr;
-	pData->systemAdd.toString(ipStr, false);
+	pData->systemAddress.toString(ipStr, false);
 
 	if (isBanned(ipStr))
 	{
@@ -1922,7 +1929,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 
 		SendParameters sp;
 		sp.setData(updateBS);
-		sp.systemAddress = pData->systemAdd;
+		sp.systemAddress = pData->systemAddress;
 		pData->pSrcSocket->send(sp);
 		return;
 	}
@@ -1952,7 +1959,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 	}
 
 
-	RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAdd, true);
+	RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAddress, true);
 	if (!pRemoteSys) {
 		X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", ipStr);
 
@@ -1965,7 +1972,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 		pData->data + byteOffset,
 		pData->bytesRead,
 		*pData->pSrcSocket,
-		pData->systemAdd,
+		pData->systemAddress,
 		pData->timeRead,
 		pRemoteSys->MTUSize
 	);
@@ -2039,28 +2046,31 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
 	NetGUID guid;
 	bs.read(guid);
 
-	Packet* pPacket = nullptr;
-
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection failure: \"%s\"", MessageID::ToString(failureType));
+	
+	Packet* pPacket = nullptr;
+	if (failureType == MessageID::ConnectionRateLimited) {
+		pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(uint32_t) + sizeof(SystemAddress)));
+	}
+	else {
+		pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(SystemAddress)));
+	}
+
+	core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
+	packetBs.write(failureType);
+	pData->systemAddress.writeToBitStream(packetBs);
 
 	// rip connection.
-	if (failureType == MessageID::ConnectionRateLimited)
-	{
+	if (failureType == MessageID::ConnectionRateLimited) {
 		uint32_t waitMS = bs.read<uint32_t>();
-
-		pPacket = allocPacket(8 + 32);
-		std::memcpy(pPacket->pData + 1, &waitMS, sizeof(waitMS));	
-	}
-	else
-	{
-		pPacket = allocPacket(8);
+		packetBs.write(waitMS);
 	}
 
 	// remove connection request.
-	removeConnectionRequest(pData->systemAdd);
+	removeConnectionRequest(pData->systemAddress);
 
 	pPacket->pData[0] = failureType;
-	pPacket->pSystemAddress = nullptr; // fuck
+	pPacket->systemHandle = INVALID_SYSTEM_HANDLE; 
 	pPacket->guid = guid;
 	pushBackPacket(pPacket);
 }
@@ -2073,7 +2083,7 @@ void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData,
 
 	IPStr ipStr;
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request from \"%s\" with proto version: ^5%" PRIu8 ".%" PRIu8, 
-		pData->systemAdd.toString(ipStr), protoVersionMinor, protoVersionMajor);
+		pData->systemAddress.toString(ipStr), protoVersionMinor, protoVersionMajor);
 
 
 	if (protoVersionMajor != PROTO_VERSION_MAJOR || protoVersionMinor != PROTO_VERSION_MINOR)
@@ -2087,7 +2097,7 @@ void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData,
 
 		SendParameters sp;
 		sp.setData(bsOut);
-		sp.systemAddress = pData->systemAdd;
+		sp.systemAddress = pData->systemAddress;
 		pData->pSrcSocket->send(sp);
 		return;
 	}
@@ -2100,7 +2110,7 @@ void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData,
 
 	SendParameters sp;
 	sp.setData(bsOut);
-	sp.systemAddress = pData->systemAdd;
+	sp.systemAddress = pData->systemAddress;
 	pData->pSrcSocket->send(sp);
 }
 
@@ -2120,7 +2130,7 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 
 	for (auto& pReq : connectionReqs_)
 	{
-		if (pReq->systemAddress == pData->systemAdd)
+		if (pReq->systemAddress == pData->systemAddress)
 		{
 			// oh it was me, send stage2
 			bsOut.write(MessageID::OpenConnectionRequestStage2);
@@ -2131,21 +2141,21 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 
 			SendParameters sp;
 			sp.setData(bsOut);
-			sp.systemAddress = pData->systemAdd;
+			sp.systemAddress = pData->systemAddress;
 			pData->pSrcSocket->send(sp);
 			return;
 		}
 	}
 
 	IPStr remoteStr;
-	pData->systemAdd.toString(remoteStr);
+	pData->systemAddress.toString(remoteStr);
 	X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr);
 }
 
 void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
 	// you stull here ? jesus christ.
-	SystemAdd bindingAdd;
+	SystemAddressEx bindingAdd;
 	NetGUID clientGuid;
 	uint16_t mtu;
 
@@ -2186,13 +2196,13 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 		{
 			// is this peer a grade F twat?
 			core::TimeVal lastConnectDelta;
-			if (vars_.rlConnectionsPerIP() && isIpConnectSpamming(pData->systemAdd, &lastConnectDelta))
+			if (vars_.rlConnectionsPerIP() && isIpConnectSpamming(pData->systemAddress, &lastConnectDelta))
 			{
 				// you noob, can you even coun to 10?
 				// NO!
 				IPStr addStr;
 				X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection req from \"%s\" %gms ago, rate limiting", 
-					pData->systemAdd.toString(addStr), lastConnectDelta.GetMilliSeconds());
+					pData->systemAddress.toString(addStr), lastConnectDelta.GetMilliSeconds());
 
 
 				// i don't care if this ratelimit is allmost over and you could technically connect again sooner.
@@ -2205,13 +2215,13 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 			}
 			else
 			{
-				auto* pRemoteSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
+				auto* pRemoteSys = addRemoteSystem(pData->systemAddress, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
 				X_UNUSED(pRemoteSys);
 
 				bsOut.write(MessageID::OpenConnectionResponseStage2);
 				bsOut.write(OFFLINE_MSG_ID);
 				bsOut.write(guid_);
-				bsOut.write(pData->systemAdd);
+				bsOut.write(pData->systemAddress);
 				bsOut.write<uint16_t>(mtu);
 
 				// generate a nonce, for password if requried.
@@ -2230,7 +2240,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 
 	SendParameters sp;
 	sp.setData(bsOut);
-	sp.systemAddress = pData->systemAdd;
+	sp.systemAddress = pData->systemAddress;
 	pData->pSrcSocket->send(sp);
 }
 
@@ -2238,7 +2248,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 {
 	// meow.
 	// if we here the response was valid annd == OpenConnectionResponseStage2
-	SystemAdd bindingAdd;
+	SystemAddressEx bindingAdd;
 	NetGUID clientGuid;
 	uint16_t mtu;
 	core::Hash::SHA1Digest nonce;
@@ -2257,13 +2267,13 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 
 		for (auto& pReq : connectionReqs_)
 		{
-			if (pReq->systemAddress == pData->systemAdd)
+			if (pReq->systemAddress == pData->systemAddress)
 			{
 				RemoteSystem* pSys = getRemoteSystem(bindingAdd, true);
 				if (!pSys)
 				{
 					// add systen
-					pSys = addRemoteSystem(pData->systemAdd, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
+					pSys = addRemoteSystem(pData->systemAddress, clientGuid, mtu, pData->pSrcSocket, bindingAdd, ConnectState::UnverifiedSender);
 				}
 				if (pSys)
 				{
@@ -2301,11 +2311,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 					// failed to add remote sys.
 					X_ERROR("Net", "Failed to add new remote system to internal list");
 
-					Packet* pPacket = allocPacket(8);
-					pPacket->pData[0] = MessageID::ConnectionRequestFailed;
-					pPacket->pSystemAddress = nullptr; // fuck
-					pPacket->guid = clientGuid;
-					pushBackPacket(pPacket);
+					pushPacket(MessageID::ConnectionRequestFailed, pData->systemAddress, clientGuid);
 				}
 
 				break;
@@ -2314,7 +2320,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 	}
 
 	// remove the req.
-	removeConnectionRequest(pData->systemAdd);
+	removeConnectionRequest(pData->systemAddress);
 }
 
 
@@ -2340,7 +2346,7 @@ void XPeer::handleUnConnectedPing(UpdateBitStream& bsOut, RecvData* pData, RecvB
 
 	SendParameters sp;
 	sp.setData(bsOut);
-	sp.systemAddress = pData->systemAdd;
+	sp.systemAddress = pData->systemAddress;
 	pData->pSrcSocket->send(sp);
 }
 
@@ -2355,14 +2361,15 @@ void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvB
 	bs.read(clientGuid);
 
 	// tell the game.
-	Packet* pPacket = allocPacket(8 + sizeof(int64_t));
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(int64_t) + sizeof(SystemAddress)));
+	pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
+	pPacket->guid = clientGuid;
 
 	core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
 	packetBs.write(MessageID::UnConnectedPong);
 	packetBs.write(timeStamp);
+	pData->systemAddress.writeToBitStream(packetBs);
 
-	pPacket->pSystemAddress = nullptr;
-	pPacket->guid = clientGuid;
 	pushBackPacket(pPacket);
 }
 
@@ -2462,7 +2469,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	}
 
 	// mmmm
-	SystemAdd externalSysId;
+	SystemAddressEx externalSysId;
 	uint8_t numInternal = 0;
 	RemoteSystem::SystemAddArr localIps;
 	int64_t sendPingTime;
@@ -2504,11 +2511,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	sendPing(rs, PacketReliability::UnReliable);
 
 	// tell the game.
-	Packet* pPacket = allocPacket(8);
-	pPacket->pData[0] = MessageID::ConnectionRequestAccepted;
-	pPacket->pSystemAddress = &rs.systemAddress; // fuck
-	pPacket->guid = rs.guid;
-	pushBackPacket(pPacket);
+	pushPacket(MessageID::ConnectionRequestAccepted, rs);
 }
 
 void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStream& bs, RemoteSystem& rs)
@@ -2522,7 +2525,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 	}
 
 	// same shit as above, my face is twitching a little due to the repeating of logic :) (OCD)
-	SystemAdd externalSysId;
+	SystemAddressEx externalSysId;
 	uint8_t numInternal = 0;
 	RemoteSystem::SystemAddArr localIps;
 	int64_t sendPingTime;
@@ -2544,11 +2547,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 	sendPing(rs, PacketReliability::UnReliable);
 
 	// tell the game.
-	Packet* pPacket = allocPacket(8);
-	pPacket->pData[0] = MessageID::ConnectionRequestHandShake;
-	pPacket->pSystemAddress = &rs.systemAddress; // fuck
-	pPacket->guid = rs.guid;
-	pushBackPacket(pPacket);
+	pushPacket(MessageID::ConnectionRequestHandShake, rs);
 }
 
 // ----------------------------------
@@ -2603,11 +2602,7 @@ void XPeer::handleInvalidPassword(UpdateBitStream& bsOut, RecvBitStream& bs, Rem
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived invalid password notification");
 
 	// tell the game.
-	Packet* pPacket = allocPacket(8);
-	pPacket->pData[0] = MessageID::InvalidPassword;
-	pPacket->pSystemAddress = &rs.systemAddress; // fuck
-	pPacket->guid = rs.guid;
-	pushBackPacket(pPacket);
+	pushPacket(MessageID::InvalidPassword, rs);
 
 	rs.connectState = ConnectState::DisconnectAsapSilent;
 }
@@ -2619,8 +2614,8 @@ void XPeer::handleInvalidPassword(UpdateBitStream& bsOut, RecvBitStream& bs, Rem
 
 // -------------------------------------------
 
-RemoteSystem* XPeer::addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
-	NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state)
+RemoteSystem* XPeer::addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid, int32_t remoteMTU,
+	NetSocket* pSrcSocket, const SystemAddressEx& bindingAdd, ConnectState::Enum state)
 {
 	// hello hello.
 	IPStr ipStr;
@@ -2680,7 +2675,7 @@ void XPeer::disconnectRemote(RemoteSystem& rs)
 	activeRemoteSystems_.erase(it);
 }
 
-bool XPeer::isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOut)
+bool XPeer::isIpConnectSpamming(const SystemAddressEx& sysAdd, core::TimeVal* pDeltaOut)
 {
 	for (auto& remoteSys : remoteSystems_)
 	{
@@ -2732,7 +2727,7 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 			// okay so we know a socket has been closed we don't need to wait for timeout.
 			// we send buffered as we on diffrent thread.
 			BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
-			pCmd->systemIdentifier = AddressOrGUID(&pData->systemAdd);
+			pCmd->systemAddress = pData->systemAddress;
 			pCmd->sendDisconnectionNotification = false;
 			bufferdCmds_.push(pCmd);
 		}

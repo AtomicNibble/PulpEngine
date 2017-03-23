@@ -13,7 +13,7 @@ static const uint8_t PROTO_VERSION_MINOR = 0;
 
 static const SocketHandle INVALID_SOCKET = SocketHandle(~0);
 
-const SystemAdd UNASSIGNED_SYSTEM_ADDRESS;
+const SystemAddressEx UNASSIGNED_SYSTEM_ADDRESS;
 const NetGUID UNASSIGNED_NET_GUID(0ull);
 
 static const uint32_t MAX_INTERNAL_IDS = 8;

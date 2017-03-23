@@ -60,7 +60,7 @@ struct SendParameters
 	uint8_t* pData;
 	int32_t length;
 	int32_t ttl;
-	SystemAdd systemAddress;
+	SystemAddressEx systemAddress;
 };
 
 class NetSocket;
@@ -70,14 +70,14 @@ struct RecvData
 	uint8_t data[MAX_MTU_SIZE];
 	int32_t bytesRead;
 	core::TimeVal timeRead;
-	SystemAdd systemAdd;
+	SystemAddressEx systemAddress;
 	NetSocket* pSrcSocket;
 };
 
 class NetSocket
 {
 public:
-	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+	typedef core::FixedArray<SystemAddressEx, MAX_INTERNAL_IDS> SystemAddArr;
 
 public:
 	NetSocket(NetVars& vars);
@@ -92,7 +92,7 @@ public:
 	SendResult send(SendParameters& sendParameters);
 	RecvResult::Enum recv(RecvData& dataOut);
 	
-	X_INLINE const SystemAdd& getBoundAdd(void) const;
+	X_INLINE const SystemAddressEx& getBoundAdd(void) const;
 
 public:
 	static bool getMyIPs(SystemAddArr& addresses);
@@ -115,7 +115,7 @@ private:
 
 	SocketType::Enum socketType_;
 	SocketHandle socket_;
-	SystemAdd boundAdd_;
+	SystemAddressEx boundAdd_;
 };
 
 

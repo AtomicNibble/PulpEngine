@@ -52,7 +52,8 @@ struct BufferdCommand
 	bool broadcast;
 
 	// ?
-	AddressOrGUID systemIdentifier;
+	SystemAddressEx systemAddress;
+	SystemHandle systemHandle;
 	
 	// 4
 	union {
@@ -77,7 +78,7 @@ X_ALIGNED_SYMBOL(struct RemoteSystem, 64) // each remote can be updated on diffr
 {
 	static const size_t PING_HISTORY_COUNT = 3;
 
-	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+	typedef core::FixedArray<SystemAddressEx, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef std::array<PingAndClockDifferential, PING_HISTORY_COUNT> PingArr;
 
 	X_NO_COPY(RemoteSystem);
@@ -94,8 +95,9 @@ public:
 
 	bool canSend(void) const;
 	ConnectionState::Enum getConnectionState(void) const;
+	SystemHandle getHandle(void) const;
 
-	void onConnected(const SystemAdd& externalSysId, const SystemAddArr& localIps,
+	void onConnected(const SystemAddressEx& externalSysId, const SystemAddArr& localIps,
 		core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 	void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
@@ -112,8 +114,8 @@ public:
 	bool weStartedconnection;
 	bool _pad[2];
 
-	SystemAdd systemAddress;				// add remote system
-	SystemAdd myExternalSystemAddress;		// my add from the point of view of remote system
+	SystemAddressEx systemAddress;				// add remote system
+	SystemAddressEx myExternalSystemAddress;		// my add from the point of view of remote system
 	SystemAddArr thierInternalSystemAddress; // copy of the peers internal local sys add.
 	
 	core::TimeVal nextPingTime;
@@ -138,7 +140,7 @@ public:
 
 struct RequestConnection
 {
-	SystemAdd systemAddress;
+	SystemAddressEx systemAddress;
 
 	core::TimeVal nextRequestTime;
 	core::TimeVal timeoutTime;
@@ -166,7 +168,7 @@ struct Ban
 
 class XPeer : public IPeer
 {
-	typedef core::FixedArray<SystemAdd, MAX_INTERNAL_IDS> SystemAddArr;
+	typedef core::FixedArray<SystemAddressEx, MAX_INTERNAL_IDS> SystemAddArr;
 	typedef core::Array<NetSocket> SocketsArr;	
 	typedef core::Array<RemoteSystem, core::ArrayAlignedAllocator<RemoteSystem>> RemoteSystemArr;
 	typedef core::Array<RemoteSystem*> RemoteSystemPtrArr;
@@ -234,18 +236,19 @@ public:
 	// connection api
 	ConnectionAttemptResult::Enum connect(const char* pHost, Port remotePort, const PasswordStr& password, uint32_t retryCount = 12,
 		core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
-	void closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification,
+	void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
 		uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_FINAL;
 
 	// connection util
-	ConnectionState::Enum getConnectionState(const AddressOrGUID systemIdentifier) X_FINAL;
-	void cancelConnectionAttempt(const ISystemAdd* pTarget) X_FINAL;
+	ConnectionState::Enum getConnectionState(SystemHandle systemHandle) X_FINAL;
+	ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_FINAL;
+	void cancelConnectionAttempt(const SystemAddress& target) X_FINAL;
 
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, 
+		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle,
 		bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, const AddressOrGUID systemIdentifier) X_FINAL;
+		PacketReliability::Enum reliability, SystemHandle systemHandle) X_FINAL;
 
 	void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 
@@ -260,7 +263,7 @@ public:
 	X_INLINE uint32_t getMaximunNumberOfPeers(void) const X_FINAL;
 
 	// Ping 
-	void ping(const ISystemAdd* pTarget) X_FINAL;
+	void ping(SystemHandle handle) X_FINAL;
 	bool ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
 		uint32_t connectionSocketIndex = 0) X_FINAL;
 
@@ -272,15 +275,15 @@ public:
 	void clearBanList(void) X_FINAL;
 	void listBans(void) const;
 
-	int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_FINAL;
-	int32_t getLastPing(const AddressOrGUID systemIdentifier) const X_FINAL;
-	int32_t getLowestPing(const AddressOrGUID systemIdentifier) const X_FINAL;
+	int32_t getAveragePing(SystemHandle system) const X_FINAL;
+	int32_t getLastPing(SystemHandle system) const X_FINAL;
+	int32_t getLowestPing(SystemHandle system) const X_FINAL;
 
 
 	X_INLINE const NetGUID& getMyGUID(void) const X_FINAL;
 
 	// MTU for a given system
-	int32_t getMTUSize(const ISystemAdd* pTarget = nullptr) X_FINAL;
+	int32_t getMTUSize(SystemHandle systemHandle = INVALID_SYSTEM_HANDLE) const X_FINAL;
 
 	bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
 
@@ -297,31 +300,35 @@ public:
 
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
+		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt);
 
 	X_INLINE void sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt);
+		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt);
 
 
 	void sendPing(RemoteSystem& rs, PacketReliability::Enum rel);
 	void notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
 	
-	bool isLoopbackAddress(const AddressOrGUID& systemIdentifier, bool matchPort) const;
+	bool isLoopbackAddress(SystemHandle systemHandle, bool matchPort) const;
 
 	// Remote Sys
-	const RemoteSystem* getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive) const;
-	const RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive) const;
+	const RemoteSystem* getRemoteSystem(SystemHandle handle, bool onlyActive) const;
+	const RemoteSystem* getRemoteSystem(const SystemAddressEx& systemAddress, bool onlyActive) const;
 	const RemoteSystem* getRemoteSystem(const NetGUID guid, bool onlyActive) const;
-	RemoteSystem* getRemoteSystem(const AddressOrGUID systemIdentifier, bool onlyActive);
-	RemoteSystem* getRemoteSystem(const SystemAdd& systemAddress, bool onlyActive);
+	RemoteSystem* getRemoteSystem(SystemHandle handle, bool onlyActive);
+	RemoteSystem* getRemoteSystem(const SystemAddressEx& systemAddress, bool onlyActive);
 	RemoteSystem* getRemoteSystem(const NetGUID guid, bool onlyActive);
-	size_t getRemoteSystemIndex(const SystemAdd& systemAddress) const;
+	size_t getRemoteSystemIndex(const SystemAddressEx& systemAddress) const;
 	size_t getRemoteSystemIndex(const NetGUID& guid) const;
-	size_t getRemoteSystemIndex(const AddressOrGUID& systemIdentifier) const;
 
 	// adds packet to back of receive qeue
 	void pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData& data);
 	X_INLINE void pushBackPacket(Packet* pPacket);
+
+	// helpers that alloc packet and push it.
+	X_INLINE void pushPacket(MessageID::Enum msgId, const SystemAddressEx& sysAdd);
+	X_INLINE void pushPacket(MessageID::Enum msgId, const SystemAddressEx& sysAdd, const NetGUID& guid);
+	X_INLINE void pushPacket(MessageID::Enum msgId, const RemoteSystem& rs);
 
 	Packet* allocPacket(size_t lengthBits);
 	void freePacket(Packet* pPacket) X_FINAL;
@@ -341,7 +348,7 @@ private:
 	X_INLINE uint32_t nextSendReceipt(void);
 	X_INLINE uint32_t incrementNextSendReceipt(void);
 
-	void removeConnectionRequest(const SystemAdd& sysAdd);
+	void removeConnectionRequest(const SystemAddressEx& sysAdd);
 
 private:
 	void Job_remoteReliabilityTick(RemoteSystem** pRemoteSystems, uint32_t count);
@@ -382,10 +389,10 @@ private:
 
 	// ------
 
-	RemoteSystem* addRemoteSystem(const SystemAdd& sysAdd, NetGUID guid, int32_t remoteMTU, 
-		NetSocket* pSrcSocket, SystemAdd bindingAdd, ConnectState::Enum state);
+	RemoteSystem* addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid, int32_t remoteMTU,
+		NetSocket* pSrcSocket, const SystemAddressEx& bindingAdd, ConnectState::Enum state);
 	void disconnectRemote(RemoteSystem& rs);
-	bool isIpConnectSpamming(const SystemAdd& sysAdd, core::TimeVal* pDeltaOut = nullptr);
+	bool isIpConnectSpamming(const SystemAddressEx& sysAdd, core::TimeVal* pDeltaOut = nullptr);
 
 	// ------
 

@@ -78,7 +78,7 @@ X_INLINE void RemoteSystem::onSend(PacketReliability::Enum reliability, core::Ti
 // --------------------------------------------------------------
 
 X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, uint8_t orderingChannel, const AddressOrGUID systemIdentifier, bool broadcast, uint32_t receipt)
+	PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt)
 {
 	X_ASSERT(bs.isStartOfStream(), "Stream has been read from, potential bug?")();
 
@@ -88,7 +88,7 @@ X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPrio
 		priority,
 		reliability,
 		orderingChannel,
-		systemIdentifier,
+		systemHandle,
 		broadcast,
 		receipt
 	);
@@ -97,8 +97,38 @@ X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPrio
 X_INLINE void XPeer::pushBackPacket(Packet* pPacket)
 {
 	X_ASSERT_NOT_NULL(pPacket);
-
 	packetQue_.push(pPacket);
+}
+
+X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sysAdd)
+{
+	pushPacket(msgId, sysAdd, UNASSIGNED_NET_GUID);
+}
+
+X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sysAdd, const NetGUID& guid)
+{
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(sysAdd)));
+	pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
+	pPacket->guid = guid;
+
+	core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
+	packetBs.write(msgId);
+	sysAdd.writeToBitStream(packetBs);
+
+	packetQue_.push(pPacket); // fucking shove it right in!
+}
+
+X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const RemoteSystem& rs)
+{
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(rs.systemAddress)));
+	pPacket->systemHandle = rs.getHandle();
+	pPacket->guid = rs.guid;
+	
+	core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
+	packetBs.write(msgId);
+	rs.systemAddress.writeToBitStream(packetBs);
+
+	packetQue_.push(pPacket); // right in the pickle!
 }
 
 X_INLINE uint32_t XPeer::nextSendReceipt(void)

@@ -738,7 +738,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
 }
 
 bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& socket,
-	SystemAdd& systemAddress, core::TimeVal time, uint32_t mtuSize)
+	SystemAddressEx& systemAddress, core::TimeVal time, uint32_t mtuSize)
 {
 	X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Recived datagram size: ^5%" PRIuS "^7 numbits: ^5%" PRIuS, length, core::bitUtil::bytesToBits(length));
 
@@ -1101,7 +1101,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 	return ProcessResult::Ok;
 }
 
-void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
+void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAddressEx& systemAddress, int32_t MTUSize,
 	core::TimeVal time)
 {
 	// delay list, these are packets that have already been sent, but are having artifical latency added.
@@ -1411,7 +1411,7 @@ bool ReliabilityLayer::hasTimedOut(core::TimeVal time)
 	return false;
 }
 
-void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
+void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time)
 {
 	// we want to pack all the acks into packets.
 	const BitSizeT maxPacketBits = maxDataGramSizeExcHdrBits();
@@ -1437,7 +1437,7 @@ void ReliabilityLayer::sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs,
 	}
 }
 
-void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
+void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time)
 {
 	// we want to pack all the acks into packets.
 	const BitSizeT maxPacketBits = maxDataGramSizeExcHdrBits();
@@ -1460,7 +1460,7 @@ void ReliabilityLayer::sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs,
 	}
 }
 
-void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time)
+void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time)
 {
 	if (vars_.artificalNetworkEnabled())
 	{

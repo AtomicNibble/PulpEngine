@@ -29,19 +29,13 @@ namespace
 
 	int32_t getRawSocketFamily(SocketFamily::Enum family)
 	{
-		switch (family)
-		{
-			case SocketFamily::INet:
-				return AF_INET;
-			case SocketFamily::INet6:
-				return AF_INET6;
-			
-			default:
-				X_ASSERT_UNREACHABLE();
-				break;
-		}
+		static_assert(AddressFamily::INet == AF_INET, "AddressFamily enum don't match platform value");
 
-		return AF_INET;
+#if NET_IPv6_SUPPORT
+		static_assert(AddressFamily::INet6 == AF_INET6, "AddressFamily enum don't match platform value");
+#endif // !NET_IPv6_SUPPORT
+
+		return family;
 	}
 
 	int32_t getRawSocketType(SocketType::Enum type)
@@ -290,11 +284,11 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 
 		if (err == WSAECONNRESET)
 		{
-			dataOut.systemAdd.setFromAddStorage(senderAddr);
+			dataOut.systemAddress.setFromAddStorage(senderAddr);
 
 			IPStr ipStr;
 			X_WARNING("Net", "Failed to recvfrom. \"%s\" Add: \"%s\"", 
-				lastError::ToString(err, Dsc), dataOut.systemAdd.toString(ipStr));
+				lastError::ToString(err, Dsc), dataOut.systemAddress.toString(ipStr));
 
 			return RecvResult::ConnectionReset;
 		}
@@ -304,7 +298,7 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 	}
 
 	dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
-	dataOut.systemAdd.setFromAddStorage(senderAddr);
+	dataOut.systemAddress.setFromAddStorage(senderAddr);
 	dataOut.pSrcSocket = this;
 	return RecvResult::Success;
 }

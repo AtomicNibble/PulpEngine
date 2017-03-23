@@ -255,10 +255,10 @@ public:
 
 	// pass data from socket for processing
 	bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,
-		SystemAdd& systemAddress, core::TimeVal time, uint32_t mtuSize);
+		SystemAddressEx& systemAddress, core::TimeVal time, uint32_t mtuSize);
 
 	// update internal logic, re-send packets / other reliability actions.
-	void update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAdd& systemAddress, int32_t MTUSize,
+	void update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAddressEx& systemAddress, int32_t MTUSize,
 		core::TimeVal time);
 
 	// pop any packets that have arrived.
@@ -293,9 +293,9 @@ private:
 private:
 	bool hasTimedOut(core::TimeVal time);
 
-	void sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
-	void sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
-	void sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAdd& systemAddress, core::TimeVal time);
+	void sendACKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time);
+	void sendNAKs(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time);
+	void sendBitStream(NetSocket& socket, core::FixedBitStreamBase& bs, SystemAddressEx& systemAddress, core::TimeVal time);
 
 	ReliablePacket* packetFromBS(core::FixedBitStreamBase& bs, core::TimeVal time);
 	ReliablePacket* allocPacket(void);

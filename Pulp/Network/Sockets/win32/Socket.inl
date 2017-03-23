@@ -2,7 +2,7 @@
 
 X_NAMESPACE_BEGIN(net)
 
-X_INLINE const SystemAdd& NetSocket::getBoundAdd(void) const
+X_INLINE const SystemAddressEx& NetSocket::getBoundAdd(void) const
 {
 	return boundAdd_;
 }

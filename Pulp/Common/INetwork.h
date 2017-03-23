@@ -10,6 +10,8 @@ X_NAMESPACE_BEGIN(net)
 
 #define NET_IPv6_SUPPORT 1
 
+class SystemAddress;
+
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
 static const uint32_t MAX_SUPPORTED_PEERS = 1 << 10; // go nuts.
 static const uint32_t MAX_BAN_ENTRIES = 256; // max bans entries you can add, wildcards supported.
@@ -246,44 +248,6 @@ private:
 
 // ---------------------------------
 
-struct AddressOrGUID
-{
-	X_INLINE AddressOrGUID() : 
-		pSystemAddress(nullptr) 
-	{
-	}
-	X_INLINE AddressOrGUID(const AddressOrGUID& oth) :
-		netGuid(oth.netGuid), 
-		pSystemAddress(oth.pSystemAddress) 
-	{		
-	}
-	X_INLINE AddressOrGUID(const NetGUID& guid) : netGuid(guid), pSystemAddress(nullptr)
-	{
-	}
-	X_INLINE AddressOrGUID(const ISystemAdd* pSysAdd) : pSystemAddress(pSysAdd)
-	{
-
-	}
-	X_INLINE bool operator==(const AddressOrGUID& oth) {
-		return netGuid == oth.netGuid && pSystemAddress == oth.pSystemAddress;
-	}
-	X_INLINE AddressOrGUID& operator=(const AddressOrGUID& rhs) {
-		netGuid = rhs.netGuid;
-		pSystemAddress = rhs.pSystemAddress;
-		return *this;
-	}
-
-	X_INLINE bool isAddressValid(void) const {
-		return pSystemAddress != 0;
-	}
-
-
-	NetGUID netGuid;
-	const ISystemAdd* pSystemAddress;
-};
-
-// ---------------------------------
-
 struct Packet
 {
 	X_INLINE MessageID::Enum getID(void) const {
@@ -296,7 +260,7 @@ struct Packet
 		return pData + core::bitUtil::bitsToBytes(bitLength);
 	}
 
-	ISystemAdd* pSystemAddress; // sender add.
+	SystemHandle systemHandle; // the handle
 	NetGUID guid;
 
 	uint32_t length;
@@ -324,19 +288,20 @@ struct IPeer
 	// connection api
 	virtual ConnectionAttemptResult::Enum connect(const char* pHost, Port remotePort, const PasswordStr& password = PasswordStr(), uint32_t retryCount = 12,
 		core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
-	virtual void closeConnection(const AddressOrGUID target, bool sendDisconnectionNotification, 
+	virtual void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
 		uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
 
 	// connection util
-	virtual ConnectionState::Enum getConnectionState(const AddressOrGUID systemIdentifier) X_ABSTRACT;
-	virtual void cancelConnectionAttempt(const ISystemAdd* pTarget) X_ABSTRACT;
+	virtual ConnectionState::Enum getConnectionState(SystemHandle systemHandle) X_ABSTRACT;
+	virtual ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_ABSTRACT;
+	virtual void cancelConnectionAttempt(const SystemAddress& address) X_ABSTRACT;
 
 	// send some data :)
 	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, 
-		const AddressOrGUID systemIdentifier, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
+		SystemHandle systemHandle, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
 	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, const AddressOrGUID systemIdentifier) X_ABSTRACT;
+		PacketReliability::Enum reliability, SystemHandle systemHandle) X_ABSTRACT;
 
 	// send to self.
 	virtual void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_ABSTRACT;
@@ -354,7 +319,7 @@ struct IPeer
 	virtual uint32_t getMaximunNumberOfPeers(void) const X_ABSTRACT;
 
 	// Ping 
-	virtual void ping(const ISystemAdd* pTarget) X_ABSTRACT;
+	virtual void ping(SystemHandle systemHandle) X_ABSTRACT;
 	virtual bool ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
 		uint32_t connectionSocketIndex = 0) X_ABSTRACT;
 
@@ -365,15 +330,15 @@ struct IPeer
 	virtual void clearBanList(void) X_ABSTRACT;
 
 
-	virtual int32_t getAveragePing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
-	virtual int32_t getLastPing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
-	virtual int32_t getLowestPing(const AddressOrGUID systemIdentifier) const X_ABSTRACT;
+	virtual int32_t getAveragePing(SystemHandle systemHandle) const X_ABSTRACT;
+	virtual int32_t getLastPing(SystemHandle systemHandle) const X_ABSTRACT;
+	virtual int32_t getLowestPing(SystemHandle systemHandle) const X_ABSTRACT;
 
 
 	virtual const NetGUID& getMyGUID(void) const X_ABSTRACT;
 
 	// MTU for a given system
-	virtual int getMTUSize(const ISystemAdd* pTarget = nullptr) X_ABSTRACT;
+	virtual int getMTUSize(SystemHandle systemHandle = INVALID_SYSTEM_HANDLE) const X_ABSTRACT;
 
 	virtual bool getStatistics(const NetGUID guid, NetStatistics& stats) X_ABSTRACT;
 
