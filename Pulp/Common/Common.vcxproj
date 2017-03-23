@@ -314,6 +314,7 @@
     <ClInclude Include="String\StrRef.h" />
     <ClInclude Include="String\Xml.h" />
     <ClInclude Include="String\XParser.h" />
+    <ClInclude Include="SystemAddress.h" />
     <ClInclude Include="Threading\Atomic.h" />
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
@@ -489,6 +490,7 @@
     <None Include="String\StringUtil.inl" />
     <None Include="String\StrRef.inl" />
     <None Include="String\XParser.inl" />
+    <None Include="SystemAddress.inl" />
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\FiberScheduler.inl" />
@@ -597,6 +599,7 @@
     <ClCompile Include="IPrimativeContext.cpp" />
     <ClCompile Include="Sorting\RadixSort.cpp" />
     <ClCompile Include="String\HumanDuration.cpp" />
+    <ClCompile Include="SystemAddress.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

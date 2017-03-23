@@ -1210,6 +1210,9 @@
     <ClInclude Include="NetMsgIds.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="SystemAddress.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1529,6 +1532,9 @@
     </None>
     <None Include="Containers\PriorityQueue.inl">
       <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="SystemAddress.inl">
+      <Filter>Interfaces_h\Network</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1880,6 +1886,9 @@
     </ClCompile>
     <ClCompile Include="Containers\FixedBitStream.cpp">
       <Filter>SourceFiles\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="SystemAddress.cpp">
+      <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
