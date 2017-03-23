@@ -115,6 +115,8 @@ X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sy
 	packetBs.write(msgId);
 	sysAdd.writeToBitStream(packetBs);
 
+	X_ASSERT(packetBs.freeSpace() == 0, "Unused spawce")(packetBs.size(), packetBs.sizeInBytes(), packetBs.capacity());
+
 	packetQue_.push(pPacket); // fucking shove it right in!
 }
 
@@ -127,6 +129,8 @@ X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const RemoteSystem& rs)
 	core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
 	packetBs.write(msgId);
 	rs.systemAddress.writeToBitStream(packetBs);
+
+	X_ASSERT(packetBs.freeSpace() == 0, "Unused spawce")(packetBs.size(), packetBs.sizeInBytes(), packetBs.capacity());
 
 	packetQue_.push(pPacket); // right in the pickle!
 }
