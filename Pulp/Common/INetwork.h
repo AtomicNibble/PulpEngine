@@ -108,7 +108,7 @@ typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 
 typedef core::StackString<46, char> NetGuidStr;
 typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
 
-static const SystemHandle INVALID_SYSTEM_HANDLE = 0;
+static const SystemHandle INVALID_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max();
 
 // ---------------------------------
 
