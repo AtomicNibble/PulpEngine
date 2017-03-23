@@ -96,6 +96,7 @@ public:
 	bool canSend(void) const;
 	ConnectionState::Enum getConnectionState(void) const;
 	SystemHandle getHandle(void) const;
+	void setHandle(SystemHandle handle);
 
 	void onConnected(const SystemAddressEx& externalSysId, const SystemAddArr& localIps,
 		core::TimeVal sendPingTime, core::TimeVal sendPongTime);
@@ -112,7 +113,7 @@ private:
 public:
 	bool isActive;
 	bool weStartedconnection;
-	bool _pad[2];
+	SystemHandle systemHandle;
 
 	SystemAddressEx systemAddress;				// add remote system
 	SystemAddressEx myExternalSystemAddress;		// my add from the point of view of remote system

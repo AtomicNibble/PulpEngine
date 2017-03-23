@@ -85,6 +85,7 @@ RemoteSystem::RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena,
 {
 	isActive = false;
 	weStartedconnection = false;
+	systemHandle = INVALID_SYSTEM_HANDLE;
 
 	connectState = ConnectState::NoAction;
 	lowestPing = UNDEFINED_PING;
@@ -169,7 +170,12 @@ ConnectionState::Enum RemoteSystem::getConnectionState(void) const
 
 SystemHandle RemoteSystem::getHandle(void) const
 {
-	return 0;
+	return systemHandle;
+}
+
+void RemoteSystem::setHandle(SystemHandle handle)
+{
+	systemHandle = handle;
 }
 
 void RemoteSystem::onConnected(const SystemAddressEx& externalSysId, const SystemAddArr& localIps,
@@ -300,6 +306,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		activeRemoteSystems_.reserve(maxPeers_);
 		for (int32_t i = 0; i < maxPeers_; i++) {
 			remoteSystems_.emplace_back(vars_, arena_, &blockArena_, packetPool);
+			remoteSystems_[i].setHandle(i);
 		}
 	}
 	
