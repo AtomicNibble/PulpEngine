@@ -18,8 +18,7 @@ template<class T> X_INLINE constexpr const T& Min(const T& x, const T& y, const 
 
 
 
-#define X_TAG(a,b,c,d)	(uint32_t)((d << 24) | (c << 16) | (b << 8) | a);
-
+#define X_TAG(a,b,c,d)	(uint32_t)((d << 24) | (c << 16) | (b << 8) | a)
 
 
 template<typename T>
