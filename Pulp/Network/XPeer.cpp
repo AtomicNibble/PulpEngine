@@ -2050,10 +2050,10 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
 	
 	Packet* pPacket = nullptr;
 	if (failureType == MessageID::ConnectionRateLimited) {
-		pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(uint32_t) + sizeof(SystemAddress)));
+		pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(uint32_t) + SystemAddress::serializedSize()));
 	}
 	else {
-		pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(SystemAddress)));
+		pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + SystemAddress::serializedSize()));
 	}
 
 	core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
@@ -2136,7 +2136,7 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 			bsOut.write(MessageID::OpenConnectionRequestStage2);
 			bsOut.write(OFFLINE_MSG_ID);
 			bsOut.write(guid_);
-			bsOut.write(pReq->systemAddress);
+			pReq->systemAddress.writeToBitStream(bsOut);
 			bsOut.write<uint16_t>(MAX_MTU_SIZE); 
 
 			SendParameters sp;
@@ -2160,7 +2160,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 	uint16_t mtu;
 
 	bs.read(clientGuid);
-	bs.read(bindingAdd);
+	bindingAdd.fromBitStream(bs);
 	bs.read(mtu);
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request2");
@@ -2221,7 +2221,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 				bsOut.write(MessageID::OpenConnectionResponseStage2);
 				bsOut.write(OFFLINE_MSG_ID);
 				bsOut.write(guid_);
-				bsOut.write(pData->systemAddress);
+				pData->systemAddress.writeToBitStream(bsOut);
 				bsOut.write<uint16_t>(mtu);
 
 				// generate a nonce, for password if requried.
@@ -2254,7 +2254,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 	core::Hash::SHA1Digest nonce;
 
 	bs.read(clientGuid);
-	bs.read(bindingAdd);
+	bindingAdd.fromBitStream(bs);
 	bs.read(mtu);
 	bs.read(nonce);
 
@@ -2361,7 +2361,7 @@ void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvB
 	bs.read(clientGuid);
 
 	// tell the game.
-	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(int64_t) + sizeof(SystemAddress)));
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(int64_t) + SystemAddress::serializedSize()));
 	pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
 	pPacket->guid = clientGuid;
 
@@ -2440,7 +2440,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	rs.connectState = ConnectState::HandlingConnectionRequest;
 
 	bsOut.write(MessageID::ConnectionRequestAccepted);
-	bsOut.write(rs.systemAddress);
+	rs.systemAddress.writeToBitStream(bsOut);
 	bsOut.write<uint8_t>(safe_static_cast<uint8_t>(ipList_.size()));
 	for (auto& ip : ipList_) {
 		ip.writeToBitStream(bsOut);
@@ -2475,7 +2475,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	int64_t sendPingTime;
 	int64_t sendPongTime;
 
-	bs.read(externalSysId);
+	externalSysId.fromBitStream(bs);
 	bs.read(numInternal);
 	X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
 
@@ -2492,7 +2492,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 	// --------- Lets shake on it.. -------------
 
 	bsOut.write(MessageID::ConnectionRequestHandShake);
-	bsOut.write(rs.systemAddress);
+	rs.systemAddress.writeToBitStream(bsOut);
 	bsOut.write<uint8_t>(safe_static_cast<uint8_t>(ipList_.size()));
 	for (auto& ip : ipList_) {
 		ip.writeToBitStream(bsOut);
@@ -2531,7 +2531,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 	int64_t sendPingTime;
 	int64_t sendPongTime;
 
-	bs.read(externalSysId);
+	externalSysId.fromBitStream(bs);
 	bs.read(numInternal);
 	X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
 	localIps.resize(numInternal);

@@ -107,7 +107,7 @@ X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sy
 
 X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sysAdd, const NetGUID& guid)
 {
-	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(sysAdd)));
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sysAdd.serializedSize()));
 	pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
 	pPacket->guid = guid;
 
@@ -120,7 +120,7 @@ X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sy
 
 X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const RemoteSystem& rs)
 {
-	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(rs.systemAddress)));
+	Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + rs.systemAddress.serializedSize()));
 	pPacket->systemHandle = rs.getHandle();
 	pPacket->guid = rs.guid;
 	
