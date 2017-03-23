@@ -891,29 +891,12 @@ bool XPeer::isLoopbackAddress(SystemHandle systemHandle, bool matchPort) const
 
 const RemoteSystem* XPeer::getRemoteSystem(SystemHandle handle, bool onlyActive) const
 {
-	int32_t deadConIdx = -1;
+	auto& rs = remoteSystems_[handle];
 
-	for (size_t i = 0; i < remoteSystems_.size(); i++)
-	{
-		auto& rs = remoteSystems_[i];
-		if (rs.getHandle() == handle)
-		{
-			if (rs.isActive)
-			{
-				return &rs;
-			}
-			else
-			{
-				// see if any active ones in list before returning this.
-				deadConIdx = safe_static_cast<int32_t>(i);
-			}
-		}
-
-		if (deadConIdx && !onlyActive) {
-			return &remoteSystems_[deadConIdx];
-		}
+	if (!onlyActive || rs.isActive) {
+		return &rs;
 	}
-
+	
 	return nullptr;
 }
 
@@ -969,27 +952,10 @@ const RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive) 
 
 RemoteSystem* XPeer::getRemoteSystem(SystemHandle handle, bool onlyActive)
 {
-	int32_t deadConIdx = -1;
+	auto& rs = remoteSystems_[handle];
 
-	for (size_t i = 0; i < remoteSystems_.size(); i++)
-	{
-		auto& rs = remoteSystems_[i];
-		if (rs.getHandle() == handle)
-		{
-			if (rs.isActive)
-			{
-				return &rs;
-			}
-			else
-			{
-				// see if any active ones in list before returning this.
-				deadConIdx = safe_static_cast<int32_t>(i);
-			}
-		}
-
-		if (deadConIdx && !onlyActive) {
-			return &remoteSystems_[deadConIdx];
-		}
+	if (!onlyActive || rs.isActive) {
+		return &rs;
 	}
 
 	return nullptr;
@@ -1409,6 +1375,7 @@ void XPeer::listBans(void) const
 int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 {
 	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
 	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (!pRemoteSys) {
 		return -1;
