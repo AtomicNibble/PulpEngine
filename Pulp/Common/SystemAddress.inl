@@ -2,6 +2,11 @@
 
 X_NAMESPACE_BEGIN(net)
 
+X_INLINE constexpr size_t SystemAddress::serializedSize(void)
+{
+	return sizeof(address_);
+}
+
 X_INLINE uint16_t SystemAddress::getPort(void) const
 {
 	return ntoh(address_.addr4.port);

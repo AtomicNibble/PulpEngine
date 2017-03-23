@@ -20,6 +20,7 @@ public:
 
 	void writeToBitStream(core::FixedBitStreamBase& bs) const;
 	void fromBitStream(core::FixedBitStreamBase& bs);
+	static constexpr size_t serializedSize(void);
 
 	X_INLINE uint16_t getPort(void) const;
 	X_INLINE IpVersion::Enum getIPVersion(void) const;
