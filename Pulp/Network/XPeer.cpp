@@ -632,6 +632,8 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 // connection util
 ConnectionState::Enum XPeer::getConnectionState(SystemHandle systemHandle)
 {
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
 	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (!pRemoteSys) {
 		return ConnectionState::NotConnected;
@@ -683,6 +685,8 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 	SystemHandle systemHandle, bool broadcast,
 	uint32_t forceReceiptNumber)
 {
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
 	if (!lengthBytes) {
 		return 0;
 	}
@@ -730,6 +734,8 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, SystemHandle systemHandle)
 {
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
 	if (!lengthBytes) {
 		return 0;
 	}
@@ -771,6 +777,7 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
 	PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt)
 {
 	X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
 	BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::Send, numberOfBitsToSend);
 	std::memcpy(pCmd->pData, pData, core::bitUtil::bitsToBytes(numberOfBitsToSend));
@@ -1401,6 +1408,7 @@ void XPeer::listBans(void) const
 
 int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 {
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (!pRemoteSys) {
 		return -1;
@@ -1425,20 +1433,23 @@ int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 	return -1;
 }
 
-int32_t XPeer::getLastPing(SystemHandle system) const
+int32_t XPeer::getLastPing(SystemHandle systemHandle) const
 {
-	const RemoteSystem* pRemoteSys = getRemoteSystem(system, false);
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (!pRemoteSys) {
 		return -1;
 	}
 
 	return pRemoteSys->lowestPing;
-
 }
 
-int32_t XPeer::getLowestPing(SystemHandle system) const
+int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
 {
-	const RemoteSystem* pRemoteSys = getRemoteSystem(system, false);
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
+	const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (!pRemoteSys) {
 		return -1;
 	}
@@ -1449,13 +1460,15 @@ int32_t XPeer::getLowestPing(SystemHandle system) const
 
 
 // MTU for a given system
-int32_t XPeer::getMTUSize(SystemHandle system) const
+int32_t XPeer::getMTUSize(SystemHandle systemHandle) const
 {
-	if (system == INVALID_SYSTEM_HANDLE) {
+	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
+	if (systemHandle == INVALID_SYSTEM_HANDLE) {
 		return defaultMTU_;
 	}
 	
-	auto* pRemoteSys = getRemoteSystem(system, false);
+	auto* pRemoteSys = getRemoteSystem(systemHandle, false);
 	if (pRemoteSys) {
 		return pRemoteSys->MTUSize;
 	}
