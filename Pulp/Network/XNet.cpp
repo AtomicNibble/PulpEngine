@@ -100,6 +100,51 @@ void XNet::deletePeer(IPeer* pIPeer)
 	X_DELETE(pPeer, arena_);
 }
 
+bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion)
+{
+	SystemAddressEx sa;
+	if (!sa.fromIP(ip, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
+		return false;
+	}
+
+	out = sa;
+	return true;
+}
+
+bool XNet::systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion)
+{
+	SystemAddressEx sa;
+	if (!sa.fromIP(ip, port, ipVersion)) {
+		return false;
+	}
+
+	out = sa;
+	return true;
+}
+
+
+bool XNet::systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion)
+{
+	SystemAddressEx sa;
+	if (!sa.fromHost(host, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
+		return false;
+	}
+
+	out = sa;
+	return true;
+}
+
+bool XNet::systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion)
+{
+	SystemAddressEx sa;
+	if (!sa.fromHost(host, port, ipVersion)) {
+		return false;
+	}
+
+	out = sa;
+	return true;
+}
+
 // ~INet
 
 NetGUID XNet::generateGUID(void)
