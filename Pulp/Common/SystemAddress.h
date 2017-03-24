@@ -63,6 +63,8 @@ protected:
 			uint8_t bytes[16];
 			uint16 shorts[8];
 		}addr;
+
+		uint32_t scope_id;
 	};
 #endif // !NET_IPv6_SUPPORT
 

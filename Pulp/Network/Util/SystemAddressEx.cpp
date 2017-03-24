@@ -323,6 +323,10 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 	else
 	{
 		X_ASSERT(servinfo->ai_family == AF_INET6, "Unexpected familey")(servinfo->ai_family);
+		X_ASSERT(servinfo->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
+
+		static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
+
 		address_.addr4.family = AddressFamily::INet6;
 		std::memcpy(&address_.addr6, (struct platform::sockaddr_in6 *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in6));
 	}
