@@ -30,11 +30,11 @@ public:
 	IPeer* createPeer(void) X_FINAL;
 	void deletePeer(IPeer* pPeer) X_FINAL;
 
-	bool systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) X_FINAL;
-	bool systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) X_FINAL;
+	bool systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
+	bool systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
 
-	bool systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) X_FINAL;
-	bool systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) X_FINAL;
+	bool systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
+	bool systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
 	
 	const char* systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort = true) const X_FINAL;
 	// ~INet
