@@ -17,6 +17,13 @@ SystemAddress::SystemAddress()
 	static_assert(X_OFFSETOF(SystemAddress, address_.addr4.family) == X_OFFSETOF(SystemAddress, address_.addr6.family),
 		"ports offsets not match");
 #endif // !NET_IPv6_SUPPORT
+
+	core::zero_object(address_);
+	address_.addr4.family = AddressFamily::INet;
+
+#if X_DEBUG
+	portPeekVal_ = 0;
+#endif // !X_DEBUG
 }
 
 SystemAddress& SystemAddress::operator=(const SystemAddress& oth)
