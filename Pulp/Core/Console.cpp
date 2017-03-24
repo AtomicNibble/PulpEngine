@@ -494,6 +494,7 @@ void XConsole::RegisterInputListener(void)
 void XConsole::RegisterCommnads(void)
 {
 	ADD_COMMAND_MEMBER("exec", this, XConsole, &XConsole::Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
+	ADD_COMMAND_MEMBER("history", this, XConsole, &XConsole::Command_History, VarFlag::SYSTEM, "displays command history");
 	ADD_COMMAND_MEMBER("help", this, XConsole, &XConsole::Command_Help, VarFlag::SYSTEM, "displays help info");
 	ADD_COMMAND_MEMBER("listCmds", this, XConsole, &XConsole::Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
 	ADD_COMMAND_MEMBER("listDvars", this, XConsole, &XConsole::Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
@@ -2762,6 +2763,28 @@ void XConsole::Command_Exec(IConsoleCmdArgs* pCmd)
 	const char* pFilename = pCmd->GetArg(1);
 
 	LoadAndExecConfigFile(pFilename);
+}
+
+void XConsole::Command_History(IConsoleCmdArgs* pCmd)
+{
+	const char* pSearch = nullptr;
+	if (pCmd->GetArgCount() == 2)
+	{
+		pSearch = pCmd->GetArg(1);
+	}
+
+	X_LOG0("Console", "-------------- ^8History^7 ---------------");
+	X_LOG_BULLET;
+
+	for (auto& history : CmdHistory_)
+	{
+		if (!pSearch || history.find(pSearch))
+		{
+			X_LOG0("Console", "->	%s", history.c_str());
+		}
+	}
+	
+	X_LOG0("Console", "------------ ^8History End^7 -------------");
 }
 
 void XConsole::Command_Help(IConsoleCmdArgs* pCmd)

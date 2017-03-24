@@ -404,6 +404,7 @@ private:
 private:
 	void Command_Exit(IConsoleCmdArgs* Cmd);
 	void Command_Exec(IConsoleCmdArgs* Cmd);
+	void Command_History(IConsoleCmdArgs* Cmd);
 	void Command_Help(IConsoleCmdArgs* Cmd);
 	void Command_ListCmd(IConsoleCmdArgs* Cmd);
 	void Command_ListDvars(IConsoleCmdArgs* Cmd);
