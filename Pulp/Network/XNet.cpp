@@ -102,46 +102,42 @@ void XNet::deletePeer(IPeer* pIPeer)
 
 bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa;
+	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromIP(ip, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
 		return false;
 	}
 
-	out = sa;
 	return true;
 }
 
 bool XNet::systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa;
+	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromIP(ip, port, ipVersion)) {
 		return false;
 	}
 
-	out = sa;
 	return true;
 }
 
 
 bool XNet::systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa;
+	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromHost(host, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
 		return false;
 	}
 
-	out = sa;
 	return true;
 }
 
 bool XNet::systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa;
+	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromHost(host, port, ipVersion)) {
 		return false;
 	}
 
-	out = sa;
 	return true;
 }
 
