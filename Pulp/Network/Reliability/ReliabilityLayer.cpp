@@ -1101,6 +1101,15 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 	return ProcessResult::Ok;
 }
 
+void ReliabilityLayer::addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time)
+{
+	const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+	bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, byteLength);
+
+	recivedPackets_.push(pPacket);
+}
+
+
 void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, SystemAddressEx& systemAddress, int32_t MTUSize,
 	core::TimeVal time)
 {

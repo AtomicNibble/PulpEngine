@@ -141,14 +141,5 @@ X_INLINE bool ReliabilityLayer::isOlderPacket(OrderingIndex packetIdx, OrderingI
 }
 
 
-X_INLINE void ReliabilityLayer::addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time)
-{
-	const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-	bps_[NetStatistics::Metric::BytesRecivedProcessed].add(time, byteLength);
-
-	recivedPackets_.push(pPacket);
-}
-
-
 
 X_NAMESPACE_END
