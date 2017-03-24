@@ -27,7 +27,7 @@ TEST(net, OrderedPacketsTest)
 	}
 
 	// connect to server.
-	auto connectRes = pPeer->connect("127.0.0.1", SERVER_PORT_BASE);
+	auto connectRes = pPeer->connect(net::IPStr("127.0.0.1"), SERVER_PORT_BASE);
 	if (connectRes != net::ConnectionAttemptResult::Started) {
 		return;
 	}

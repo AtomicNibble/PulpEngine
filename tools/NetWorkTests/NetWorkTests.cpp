@@ -73,7 +73,7 @@ namespace
 			}
 			
 			// connect to server.
-			auto connectRes = pPeer->connect("127.0.0.1", SERVER_PORT, net::PasswordStr("goat"));
+			auto connectRes = pPeer->connect(net::IPStr("127.0.0.1"), SERVER_PORT, net::PasswordStr("goat"));
 			if (connectRes != net::ConnectionAttemptResult::Started)
 			{
 				return;
