@@ -126,7 +126,7 @@ TEST(net, msgSizeTest)
 
 			// send some data.
 
-			X_LOG0("ServerTest", "Sending: %" PRIuS " packets of length: %" PRIuS, sendCount, testSize);
+			X_LOG1("ServerTest", "Sending: %" PRIuS " packets of length: %" PRIuS, sendCount, testSize);
 
 			for (size_t i = 0; i < sendCount; i++)
 			{
@@ -152,7 +152,7 @@ TEST(net, msgSizeTest)
 				if (pPacket->getID() == myPacketID)
 				{
 					// we got the packet data, check it's correct.
-					X_LOG0("ServerTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
+					X_LOG2("ServerTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
 
 					X_ASSERT(pPacket->bitLength == core::bitUtil::bytesToBits(testSize), "Recived incorrect packet size")(pPacket->bitLength, testSize);
 
@@ -165,7 +165,7 @@ TEST(net, msgSizeTest)
 					++recivedCount;
 					if (recivedCount == sendCount)
 					{
-						X_LOG0("ServerTest", "Recived all packets");
+						X_LOG1("ServerTest", "Recived all packets");
 
 						if (testSize == sizeof(buf))
 						{
