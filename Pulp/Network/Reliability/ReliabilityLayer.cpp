@@ -1059,6 +1059,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 		{
 			// this packet comes later than the one we want next.
 			// so store it untill we can post them in order.
+			X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Recived out of order order/sequenced packet.");
 
 			auto& orderedQueue = orderingQueues_[channel];
 			if (orderedQueue.isEmpty()) {
