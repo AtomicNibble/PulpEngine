@@ -278,6 +278,7 @@ private:
 
 private:
 	ProcessResult::Enum prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time);
+	void ignorePacket(ReliablePacket* pPacket, core::TimeVal time);
 	void addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time);
 
 private:

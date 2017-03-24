@@ -875,12 +875,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 			}
 			else if (result == ProcessResult::Ignored)
 			{
-				const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-				bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
-
-				X_WARNING_IF(vars_.debugIgnoredEnabled(),  "NetRel", "Packet ignored");
-
-				freePacket(pPacket);
+				ignorePacket(pPacket, time);
 			}
 			else
 			{
@@ -1099,6 +1094,17 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 
 	addPacketToRecivedQueue(pPacket, time);
 	return ProcessResult::Ok;
+}
+
+
+void ReliabilityLayer::ignorePacket(ReliablePacket* pPacket, core::TimeVal time)
+{
+	const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+	bps_[NetStatistics::Metric::BytesRecivedIgnored].add(time, packetDataByteLength);
+
+	X_WARNING_IF(vars_.debugIgnoredEnabled(), "NetRel", "Packet ignored");
+
+	freePacket(pPacket);
 }
 
 void ReliabilityLayer::addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time)
