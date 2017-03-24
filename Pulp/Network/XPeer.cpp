@@ -582,9 +582,38 @@ void XPeer::setPassword(const PasswordStr& pass)
 }
 
 // connection api
-ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort, const PasswordStr& password, uint32_t retryCount,
+ConnectionAttemptResult::Enum XPeer::connect(const HostStr& host, Port remotePort, const PasswordStr& password, uint32_t retryCount,
 	core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
+	// resolve the address.
+	SystemAddressEx systemAddress;
+	if (!systemAddress.fromHost(host, remotePort)) {
+		return ConnectionAttemptResult::FailedToResolve;
+	}
+
+	// log what host resolved it?
+	// 'porky-pork-scratchings.ru'
+
+	return connect(systemAddress, password, retryCount, retryDelay, timeoutTime);
+}
+
+ConnectionAttemptResult::Enum XPeer::connect(const IPStr& ip, Port remotePort, const PasswordStr& password, uint32_t retryCount,
+	core::TimeVal retryDelay, core::TimeVal timeoutTime)
+{
+	// need to work out the address.
+	SystemAddressEx systemAddress;
+	if (!systemAddress.fromIP(ip, remotePort)) {
+		return ConnectionAttemptResult::FailedToResolve;
+	}
+
+	return connect(systemAddress, password, retryCount, retryDelay, timeoutTime);
+}
+
+ConnectionAttemptResult::Enum XPeer::connect(const SystemAddress& sysAdd, const PasswordStr& password, uint32_t retryCount,
+	core::TimeVal retryDelay, core::TimeVal timeoutTime)
+{
+	const SystemAddressEx& systemAddress = static_cast<const SystemAddressEx&>(sysAdd);
+
 	uint8_t socketIdx = 0; // hard coded socket idx for now
 
 	if (socketIdx >= sockets_.size()) {
@@ -593,12 +622,6 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 
 	// work out what ip version this socket is, if the address is ipv4 and socket is ipv6 it's okay.
 	auto ipVer = sockets_[socketIdx].getBoundAdd().getIPVersion();
-
-	// need to work out the address.
-	SystemAddressEx systemAddress;
-	if (!systemAddress.fromStringExplicitPort(pHost, remotePort, ipVer)) {
-		return ConnectionAttemptResult::FailedToResolve;
-	}
 
 	// are we already connected?
 	if (getRemoteSystem(systemAddress, true)) {
@@ -632,10 +655,15 @@ ConnectionAttemptResult::Enum XPeer::connect(const char* pHost, Port remotePort,
 		connectionReqs_.emplace_back(pConReq);
 	}
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Started Connection request to host: \"%s\" port: ^5%" PRIu16, pHost, remotePort);
-	
+	IPStr strBuf;
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Started Connection request to add: \"%s\" port: ^5%" PRIu16, systemAddress.toString(strBuf), 
+		systemAddress.getPort());
+
 	return ConnectionAttemptResult::Started;
 }
+
+
+
 
 void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
 	uint8_t orderingChannel, PacketPriority::Enum notificationPriority)

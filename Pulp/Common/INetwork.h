@@ -288,8 +288,13 @@ struct IPeer
 	virtual void setPassword(const PasswordStr& pass) X_ABSTRACT;
 
 	// connection api
-	virtual ConnectionAttemptResult::Enum connect(const char* pHost, Port remotePort, const PasswordStr& password = PasswordStr(), uint32_t retryCount = 12,
+	virtual ConnectionAttemptResult::Enum connect(const HostStr& host, Port remotePort, const PasswordStr& password = PasswordStr(), uint32_t retryCount = 12,
 		core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
+	virtual ConnectionAttemptResult::Enum connect(const IPStr& ip, Port remotePort, const PasswordStr& password = PasswordStr(), uint32_t retryCount = 12,
+		core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
+	virtual ConnectionAttemptResult::Enum connect(const SystemAddress& systemAddress, const PasswordStr& password = PasswordStr(), uint32_t retryCount = 12,
+		core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
+
 	virtual void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
 		uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
 
