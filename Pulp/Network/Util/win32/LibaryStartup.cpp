@@ -8,16 +8,14 @@ namespace PlatLib
 	namespace
 	{
 
-		static int32_t refCount = 0;
+		core::AtomicInt refCount(0);
 
 	} // namespace
 
 
 	bool addRef(void)
 	{
-		++refCount;
-
-		if (refCount == 1)
+		if (++refCount == 1)
 		{
 			platform::WSADATA winsockInfo;
 			if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0)
