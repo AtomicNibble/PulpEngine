@@ -902,8 +902,6 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 {
 	X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
 
-	// i don't trust you!
-	const size_t packetDataByteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
 
 	// if ordered range check channel to prevent a crash.
 	if (pPacket->isOrderedOrSequenced())
