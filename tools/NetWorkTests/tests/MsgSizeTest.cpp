@@ -88,9 +88,9 @@ TEST(net, msgSizeTest)
 				{
 					++connectionFinishNum;
 
-					if (pPacket->guid == serverGuid)
+					if (pPacket->guid == clientGuid)
 					{
-						serverHandle = pPacket->systemHandle;
+						clientHandle = pPacket->systemHandle;
 					}
 				}
 			}
@@ -103,7 +103,7 @@ TEST(net, msgSizeTest)
 
 					if (pPacket->guid == serverGuid)
 					{
-						clientHandle = pPacket->systemHandle;
+						serverHandle = pPacket->systemHandle;
 					}
 				}
 			}

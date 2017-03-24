@@ -35,6 +35,7 @@ TEST(net, SequencedPacketsTest)
 	}
 
 	net::NetGUID serverGuid = pServer->getMyGUID();
+	net::NetGUID clientGuid = pPeer->getMyGUID();
 
 	net::SystemHandle serverHandle = net::INVALID_SYSTEM_HANDLE;
 	net::SystemHandle clientHandle = net::INVALID_SYSTEM_HANDLE;
@@ -80,9 +81,9 @@ TEST(net, SequencedPacketsTest)
 				{
 					++connectionFinishNum;
 
-					if (pPacket->guid == serverGuid)
+					if (pPacket->guid == clientGuid)
 					{
-						serverHandle = pPacket->systemHandle;
+						clientHandle = pPacket->systemHandle;
 					}
 				}
 			}
@@ -95,7 +96,7 @@ TEST(net, SequencedPacketsTest)
 
 					if (pPacket->guid == serverGuid)
 					{
-						clientHandle = pPacket->systemHandle;
+						serverHandle = pPacket->systemHandle;
 					}
 				}
 			}

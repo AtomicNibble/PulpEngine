@@ -83,9 +83,9 @@ TEST(net, OrderedPacketsTest)
 				{
 					++connectionFinishNum;
 
-					if (pPacket->guid == serverGuid)
+					if (pPacket->guid == clientGuid)
 					{
-						serverHandle = pPacket->systemHandle;
+						clientHandle = pPacket->systemHandle;
 					}
 				}
 			}
@@ -98,7 +98,7 @@ TEST(net, OrderedPacketsTest)
 
 					if (pPacket->guid == serverGuid)
 					{
-						clientHandle = pPacket->systemHandle;
+						serverHandle = pPacket->systemHandle;
 					}
 				}
 			}
