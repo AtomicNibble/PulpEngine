@@ -247,6 +247,7 @@ XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
 	socketThreads_(arena),
 	remoteSystems_(arena),
 	activeRemoteSystems_(arena),
+	remoteSystemLookup_(arena),
 	bufferdCmds_(arena),
 	packetQue_(arena),
 	recvDataQue_(arena),
@@ -326,6 +327,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 
 		remoteSystems_.reserve(maxPeers_);
 		activeRemoteSystems_.reserve(maxPeers_);
+		remoteSystemLookup_.reserve(maxPeers_);
 		for (int32_t i = 0; i < maxPeers_; i++) {
 			remoteSystems_.emplace_back(vars_, arena_, &blockArena_, packetPool);
 			remoteSystems_[i].setHandle(i);
@@ -520,6 +522,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 	// cleans up all memory for reliabiliy layers and remoteSystems.
 	remoteSystems_.clear();
 	activeRemoteSystems_.clear();
+	remoteSystemLookup_.clear();
 
 	bufferdCmds_.tryPopAll([&](BufferdCommand* pCmd) {
 		freeBufferdCmd(pCmd);
@@ -957,26 +960,25 @@ const RemoteSystem* XPeer::getRemoteSystem(const SystemAddressEx& systemAddress,
 		return nullptr;
 	}
 
-	int32_t deadConIdx = -1;
+	if (onlyActive) // fast path for active lookup, uses more cache friendly lookup.
+	{
+		for (const auto& rslu : remoteSystemLookup_) {
+			if (rslu.systemAddress == systemAddress) {
+				return rslu.pRemoteSystem;
+			}
+		}
+
+		return nullptr;
+	}
+
 
 	for (size_t i = 0; i < remoteSystems_.size(); i++)
 	{
 		auto& rs = remoteSystems_[i];
 		if (rs.systemAddress == systemAddress)
 		{
-			if (rs.isActive)
-			{
-				return &rs;
-			}
-			else
-			{
-				// see if any active ones in list before returning this.
-				deadConIdx = safe_static_cast<int32_t>(i);
-			}
-		}
-
-		if (deadConIdx && !onlyActive) {
-			return &remoteSystems_[deadConIdx];
+			// can be active or none active.
+			return &rs;
 		}
 	}
 
@@ -990,9 +992,20 @@ const RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive) 
 		return nullptr;
 	}
 
+	if (onlyActive)
+	{
+		for (const auto& rslu : remoteSystemLookup_) {
+			if (rslu.guid == guid) {
+				return rslu.pRemoteSystem;
+			}
+		}
+
+		return nullptr;
+	}
+
 	for (auto& rs : remoteSystems_)
 	{
-		if (rs.guid == guid && (!onlyActive || rs.isActive)) {
+		if (rs.guid == guid) {
 			return &rs;
 		}
 	}
@@ -1019,26 +1032,25 @@ RemoteSystem* XPeer::getRemoteSystem(const SystemAddressEx& systemAddress, bool 
 		return nullptr;
 	}
 
-	int32_t deadConIdx = -1;
+	if (onlyActive) // fast path for active lookup, uses more cache friendly lookup.
+	{
+		for (const auto& rslu : remoteSystemLookup_) {
+			if (rslu.systemAddress == systemAddress) {
+				return rslu.pRemoteSystem;
+			}
+		}
+
+		return nullptr;
+	}
+
 
 	for (size_t i = 0; i < remoteSystems_.size(); i++)
 	{
 		auto& rs = remoteSystems_[i];
 		if (rs.systemAddress == systemAddress)
 		{
-			if (rs.isActive)
-			{
-				return &rs;
-			}
-			else
-			{
-				// see if any active ones in list before returning this.
-				deadConIdx = safe_static_cast<int32_t>(i);
-			}
-		}
-
-		if (deadConIdx && !onlyActive) {
-			return &remoteSystems_[deadConIdx];
+			// can be active or none active.
+			return &rs;
 		}
 	}
 
@@ -1052,46 +1064,25 @@ RemoteSystem* XPeer::getRemoteSystem(const NetGUID guid, bool onlyActive)
 		return nullptr;
 	}
 
+	if (onlyActive)
+	{
+		for (const auto& rslu : remoteSystemLookup_) {
+			if (rslu.guid == guid) {
+				return rslu.pRemoteSystem;
+			}
+		}
+
+		return nullptr;
+	}
+
 	for (auto& rs : remoteSystems_)
 	{
-		if (rs.guid == guid && (!onlyActive || rs.isActive)) {
+		if (rs.guid == guid) {
 			return &rs;
 		}
 	}
 
 	return nullptr;
-}
-
-
-
-size_t XPeer::getRemoteSystemIndex(const SystemAddressEx& systemAddress) const
-{
-	for (size_t i = 0; i < remoteSystems_.size(); i++)
-	{
-		auto& rs = remoteSystems_[i];
-
-		if (rs.systemAddress == systemAddress)
-		{
-			return i;
-		}
-	}
-
-	return std::numeric_limits<size_t>::max();
-}
-
-size_t XPeer::getRemoteSystemIndex(const NetGUID& guid) const
-{
-	for (size_t i = 0; i < remoteSystems_.size(); i++)
-	{
-		auto& rs = remoteSystems_[i];
-
-		if (rs.guid == guid)
-		{
-			return i;
-		}
-	}
-
-	return std::numeric_limits<size_t>::max();
 }
 
 
@@ -2673,6 +2664,13 @@ RemoteSystem* XPeer::addRemoteSystem(const SystemAddressEx& sysAdd, NetGUID guid
 
 			activeRemoteSystems_.push_back(&remoteSys);
 
+			// insert into a more cache friendly lookup.
+			RemoteSystemLookup lu;
+			lu.systemAddress = sysAdd;
+			lu.guid = guid;
+			lu.pRemoteSystem = &remoteSys;
+			remoteSystemLookup_.push_back(lu);
+
 			if (pSrcSocket->getBoundAdd() != bindingAdd)
 			{
 				// print warning.
@@ -2691,9 +2689,16 @@ void XPeer::disconnectRemote(RemoteSystem& rs)
 {
 	rs.closeConnection();
 
-	auto it = std::find(activeRemoteSystems_.begin(), activeRemoteSystems_.end(), &rs);
-	X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove resmote system that is not active")();
-	activeRemoteSystems_.erase(it);
+	{
+		auto it = std::find(activeRemoteSystems_.begin(), activeRemoteSystems_.end(), &rs);
+		X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove resmote system that is not active")();
+		activeRemoteSystems_.erase(it);
+	}
+	{
+		auto it = std::find_if(remoteSystemLookup_.begin(), remoteSystemLookup_.end(), [&rs](const RemoteSystemLookup& lu) { return lu.systemAddress == rs.systemAddress; });
+		X_ASSERT(it != remoteSystemLookup_.end(), "Tried to remove resmote system that is not active")();
+		remoteSystemLookup_.erase(it);
+	}
 }
 
 bool XPeer::isIpConnectSpamming(const SystemAddressEx& sysAdd, core::TimeVal* pDeltaOut)

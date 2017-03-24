@@ -168,6 +168,14 @@ struct Ban
 // X_ENSURE_SIZE(RemoteSystem, 520 + sizeof(ReliabilityLayer))
 // X_ENSURE_SIZE(RequestConnection, 72)
 
+struct RemoteSystemLookup
+{
+	SystemAddress systemAddress;
+	NetGUID guid;
+
+	RemoteSystem* pRemoteSystem;
+};
+
 
 class XPeer : public IPeer
 {
@@ -175,6 +183,7 @@ class XPeer : public IPeer
 	typedef core::Array<NetSocket> SocketsArr;	
 	typedef core::Array<RemoteSystem, core::ArrayAlignedAllocator<RemoteSystem>> RemoteSystemArr;
 	typedef core::Array<RemoteSystem*> RemoteSystemPtrArr;
+	typedef core::Array<RemoteSystemLookup> RemoteSystemLookupArr;
 
 	// thead que's
 	typedef core::ThreadQue<BufferdCommand*, core::CriticalSection> BufferdCommandQue;
@@ -326,8 +335,6 @@ private:
 	RemoteSystem* getRemoteSystem(SystemHandle handle, bool onlyActive);
 	RemoteSystem* getRemoteSystem(const SystemAddressEx& systemAddress, bool onlyActive);
 	RemoteSystem* getRemoteSystem(const NetGUID guid, bool onlyActive);
-	size_t getRemoteSystemIndex(const SystemAddressEx& systemAddress) const;
-	size_t getRemoteSystemIndex(const NetGUID& guid) const;
 
 	// adds packet to back of receive qeue
 	void pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData& data);
@@ -441,6 +448,7 @@ private:
 	// rmeote systems
 	RemoteSystemArr		remoteSystems_;
 	RemoteSystemPtrArr  activeRemoteSystems_;
+	RemoteSystemLookupArr remoteSystemLookup_;
 
 	// allocators
 	core::MemoryArenaBase* arena_; // gen purpose.
