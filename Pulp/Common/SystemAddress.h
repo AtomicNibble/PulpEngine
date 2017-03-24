@@ -57,7 +57,7 @@ protected:
 	{
 		AddressFamily::Enum family;
 		uint16_t port;
-		uint16_t flowInfo; // fuck you.
+		uint32_t flowInfo; // fuck you.
 
 		union {
 			uint8_t bytes[16];
