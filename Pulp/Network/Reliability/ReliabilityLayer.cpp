@@ -898,10 +898,11 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
 }
 
 
-ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time)
+ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time)
 {
-	X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
+	ReliablePacket* pPacket = pPacketInOut;
 
+	X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
 
 	// if ordered range check channel to prevent a crash.
 	if (pPacket->isOrderedOrSequenced())
@@ -1001,6 +1002,9 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 
 		// we can't return here, otherwise sequenced or ordered packets that where split
 		// won't get handled correct.
+
+		// update the inOut pointer so if we ignore correct packet is cleaned up.
+		pPacketInOut = pPacket;
 	}
 
 	if (pPacket->isOrderedOrSequenced())

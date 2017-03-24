@@ -277,7 +277,7 @@ private:
 	size_t calculateMemoryUsage(void) const;
 
 private:
-	ProcessResult::Enum prcoessIncomingPacket(ReliablePacket* pPacket, core::TimeVal time);
+	ProcessResult::Enum prcoessIncomingPacket(ReliablePacket*& pPacketInOut, core::TimeVal time);
 	void ignorePacket(ReliablePacket* pPacket, core::TimeVal time);
 	void addPacketToRecivedQueue(ReliablePacket* pPacket, core::TimeVal time);
 
