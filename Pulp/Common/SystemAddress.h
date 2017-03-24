@@ -50,6 +50,8 @@ protected:
 			uint16 shorts[2];
 			uint32_t as_int;
 		}addr;
+
+		uint8_t _zero_pad[8];
 	};
 
 #if NET_IPv6_SUPPORT

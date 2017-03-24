@@ -316,6 +316,8 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 
 	if (servinfo->ai_family == AF_INET)
 	{
+		static_assert(sizeof(address_.addr4) == sizeof(struct platform::sockaddr_in), "Potentiall buffer overrun.");
+
 		// offset lignup checks,
 		static_assert(X_OFFSETOF(addr4_in, family) == X_OFFSETOF(platform::sockaddr_in, sin_family), "offset mismatch");
 		static_assert(X_OFFSETOF(addr4_in, port) == X_OFFSETOF(platform::sockaddr_in, sin_port), "offset mismatch");
