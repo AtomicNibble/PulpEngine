@@ -379,6 +379,10 @@ struct INet
 	// this can be used to pre-resolve a host before trying to connect to it, since resolving may take a while.
 	virtual bool systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) X_ABSTRACT;
 	virtual bool systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) X_ABSTRACT;
+	// the two string logic is passed to platform abstract logic, so you do it via this interface.
+	// since the platform lib is only loaded if you have created a instanced of something deriving this interface.
+	virtual const char* systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort = true) const X_ABSTRACT;
+
 };
 
 X_NAMESPACE_END

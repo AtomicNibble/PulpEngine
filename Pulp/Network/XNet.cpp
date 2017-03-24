@@ -145,6 +145,13 @@ bool XNet::systemAddressFromHost(const HostStr& host, Port port, SystemAddress& 
 	return true;
 }
 
+const char* XNet::systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort) const
+{
+	const SystemAddressEx sa = static_cast<const SystemAddressEx&>(systemAddress);
+
+	return sa.toString(strBuf, incPort);
+}
+
 // ~INet
 
 NetGUID XNet::generateGUID(void)
