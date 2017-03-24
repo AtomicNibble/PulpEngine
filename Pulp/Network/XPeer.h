@@ -272,7 +272,7 @@ public:
 
 	// Ping 
 	void ping(SystemHandle handle) X_FINAL;
-	bool ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
+	bool ping(const HostStr& host, Port remotePort, bool onlyReplyOnAcceptingConnections,
 		uint32_t connectionSocketIndex = 0) X_FINAL;
 
 	// bans at connection level.

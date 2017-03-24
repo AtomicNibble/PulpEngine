@@ -1255,7 +1255,7 @@ void XPeer::ping(const SystemHandle handle)
 	);
 }
 
-bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
+bool XPeer::ping(const HostStr& host, Port remotePort, bool onlyReplyOnAcceptingConnections,
 	uint32_t connectionSocketIndex)
 {
 	X_ASSERT(connectionSocketIndex < sockets_.size(), "Socket index out of range")(connectionSocketIndex, sockets_.size());
@@ -1276,7 +1276,7 @@ bool XPeer::ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAccepti
 	NetSocket& socket = sockets_[connectionSocketIndex];
 	SendParameters sp;
 	sp.setData(bsOut);
-	if (!sp.systemAddress.fromStringExplicitPort(pHost, remotePort, socket.getBoundAdd().getIPVersion())) {
+	if (!sp.systemAddress.fromHost(host, remotePort, socket.getBoundAdd().getIPVersion())) {
 		return false;
 	}
 

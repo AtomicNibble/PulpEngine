@@ -327,7 +327,7 @@ struct IPeer
 
 	// Ping 
 	virtual void ping(SystemHandle systemHandle) X_ABSTRACT;
-	virtual bool ping(const char* pHost, uint16_t remotePort, bool onlyReplyOnAcceptingConnections,
+	virtual bool ping(const HostStr& host, Port remotePort, bool onlyReplyOnAcceptingConnections,
 		uint32_t connectionSocketIndex = 0) X_ABSTRACT;
 
 	// bans at connection level.
