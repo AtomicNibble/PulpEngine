@@ -102,7 +102,7 @@ void XNet::deletePeer(IPeer* pIPeer)
 
 bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
+	SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromIP(ip, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
 		return false;
 	}
@@ -112,7 +112,7 @@ bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::E
 
 bool XNet::systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
+	SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromIP(ip, port, ipVersion)) {
 		return false;
 	}
@@ -123,7 +123,7 @@ bool XNet::systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, I
 
 bool XNet::systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
+	SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromHost(host, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
 		return false;
 	}
@@ -133,7 +133,7 @@ bool XNet::systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVers
 
 bool XNet::systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
-	SystemAddressEx sa = static_cast<SystemAddressEx&>(out);
+	SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
 	if (!sa.fromHost(host, port, ipVersion)) {
 		return false;
 	}
@@ -143,7 +143,7 @@ bool XNet::systemAddressFromHost(const HostStr& host, Port port, SystemAddress& 
 
 const char* XNet::systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort) const
 {
-	const SystemAddressEx sa = static_cast<const SystemAddressEx&>(systemAddress);
+	const SystemAddressEx& sa = static_cast<const SystemAddressEx&>(systemAddress);
 
 	return sa.toString(strBuf, incPort);
 }
