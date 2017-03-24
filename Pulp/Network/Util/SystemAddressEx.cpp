@@ -316,6 +316,12 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 
 	if (servinfo->ai_family == AF_INET)
 	{
+		// offset lignup checks,
+		static_assert(X_OFFSETOF(addr4_in, family) == X_OFFSETOF(platform::sockaddr_in, sin_family), "offset mismatch");
+		static_assert(X_OFFSETOF(addr4_in, port) == X_OFFSETOF(platform::sockaddr_in, sin_port), "offset mismatch");
+		static_assert(X_OFFSETOF(addr4_in, addr) == X_OFFSETOF(platform::sockaddr_in, sin_addr), "offset mismatch");
+
+
 		address_.addr4.family = AddressFamily::INet;
 		std::memcpy(&address_.addr4, (struct platform::sockaddr_in *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in));
 	}
@@ -326,6 +332,13 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 		X_ASSERT(servinfo->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
 
 		static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
+
+		// offset lignup checks,
+		static_assert(X_OFFSETOF(addr6_in, family) == X_OFFSETOF(platform::sockaddr_in6, sin6_family), "offset mismatch");
+		static_assert(X_OFFSETOF(addr6_in, port) == X_OFFSETOF(platform::sockaddr_in6, sin6_port), "offset mismatch");
+		static_assert(X_OFFSETOF(addr6_in, flowInfo) == X_OFFSETOF(platform::sockaddr_in6, sin6_flowinfo), "offset mismatch");
+		static_assert(X_OFFSETOF(addr6_in, addr) == X_OFFSETOF(platform::sockaddr_in6, sin6_addr), "offset mismatch");
+		static_assert(X_OFFSETOF(addr6_in, scope_id) == X_OFFSETOF(platform::sockaddr_in6, sin6_scope_id), "offset mismatch");
 
 		address_.addr4.family = AddressFamily::INet6;
 		std::memcpy(&address_.addr6, (struct platform::sockaddr_in6 *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in6));
