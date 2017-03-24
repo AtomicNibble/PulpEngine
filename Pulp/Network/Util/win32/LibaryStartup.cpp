@@ -33,9 +33,7 @@ namespace PlatLib
 
 	void deRef(void)
 	{
-		++refCount;
-
-		if (refCount == 0)
+		if (--refCount == 0)
 		{
 			if (platform::WSACleanup() != 0)
 			{
