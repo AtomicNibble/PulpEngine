@@ -21,8 +21,15 @@ public:
 
 	const char* toString(IPStr& strBuf, bool incPort = true) const;
 
-	bool fromString(const char* pAddressStr, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Ipv4);
-	bool fromStringExplicitPort(const char* pAddressStr, uint16_t port, IpVersion::Enum ipVersion = IpVersion::Ipv4);
+	bool fromIP(const IPStr& ip, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Any);
+	bool fromIP(const IPStr& ip, Port port, IpVersion::Enum ipVersion = IpVersion::Any);
+
+	bool fromHost(const HostStr& host, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Any);
+	bool fromHost(const HostStr& host, Port port, IpVersion::Enum ipVersion = IpVersion::Any);
+
+private:
+	bool fromString(const char* pBegin, const char* pEnd, bool isHost, char portDelineator, IpVersion::Enum ipVersion);
+
 };
 
 

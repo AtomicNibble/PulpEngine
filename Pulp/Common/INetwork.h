@@ -73,13 +73,15 @@ X_DECLARE_ENUM8(PacketReliability)(
 
 X_DECLARE_ENUM8(IpVersion)(
 	Ipv4,
-	Ipv6
+	Ipv6,
+	Any
 );
 
 #else
 
 X_DECLARE_ENUM8(IpVersion)(
-	Ipv4
+	Ipv4,
+	Any // ipv4 only yo!
 );
 
 #endif // !NET_IPv6_SUPPORT
@@ -103,8 +105,8 @@ typedef uint16_t Port;
 // typedef uint8_t MessageID;
 typedef uint32_t BitSizeT;
 
-typedef core::StackString<512, char> HostAddStr;
-typedef core::StackString<45 + 11, char> IPStr; // 11 for port, making sizeof() 64 bytes for x64.
+typedef core::StackString<512, char> HostStr;
+typedef core::StackString<45 + 11, char> IPStr; // 11 for port. and ipv6 is 39 / 45 for ipv4 mapped notation
 typedef core::StackString<46, char> NetGuidStr;
 typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
 
@@ -178,7 +180,7 @@ public:
 		socketFamily_(SocketFamily::INet)
 	{
 	}
-	X_INLINE SocketDescriptor(uint16_t port, HostAddStr hostAddress) : 
+	X_INLINE SocketDescriptor(uint16_t port, HostStr hostAddress) :
 		port_(port), 
 		socketFamily_(SocketFamily::INet),
 		hostAddress_(hostAddress)
@@ -196,7 +198,7 @@ public:
 	X_INLINE SocketFamily::Enum getSocketFamiley(void) const {
 		return socketFamily_;
 	}
-	X_INLINE const HostAddStr& getHostAdd(void) const {
+	X_INLINE const HostStr& getHostAdd(void) const {
 		return hostAddress_;
 	}
 
@@ -204,7 +206,7 @@ public:
 private:
 	uint16_t port_;
 	SocketFamily::Enum socketFamily_;
-	HostAddStr hostAddress_;
+	HostStr hostAddress_;
 };
 
 // ---------------------------------

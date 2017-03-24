@@ -217,24 +217,46 @@ const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
 }
 
 
-bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, IpVersion::Enum ipVersion)
+bool SystemAddressEx::fromIP(const IPStr& ip, char portDelineator, IpVersion::Enum ipVersion)
 {
-	X_ASSERT_NOT_NULL(pAddressStr);
+	return fromString(ip.begin(), ip.end(), false, portDelineator, ipVersion);
+}
 
-	core::StackString<INET6_ADDRSTRLEN, char> ipPart;
-	core::StackString<32, char> portPart;
+bool SystemAddressEx::fromIP(const IPStr& ip, Port port, IpVersion::Enum ipVersion)
+{
+	bool res = fromString(ip.begin(), ip.end(), false, PORT_DELINEATOR, ipVersion);
+	setPortFromHostByteOrder(port);
+	return res;
+}
 
-	const char* pPort = core::strUtil::Find(pAddressStr, portDelineator);
-	if (pPort)
-	{
-		ipPart.set(pAddressStr, pPort);
-		portPart.set(pPort);
+bool SystemAddressEx::fromHost(const HostStr& host, char portDelineator, IpVersion::Enum ipVersion)
+{
+	return fromString(host.begin(), host.end(), true, portDelineator, ipVersion);
+}
+
+bool SystemAddressEx::fromHost(const HostStr& host, Port port, IpVersion::Enum ipVersion)
+{
+	bool res = fromString(host.begin(), host.end(), true, PORT_DELINEATOR, ipVersion);
+	setPortFromHostByteOrder(port);
+	return res;
+}
+
+
+bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHost, char portDelineator, IpVersion::Enum ipVersion)
+{
+	HostStr hostStr;
+	core::StackString<32, char> portStr;
+
+	const char* pPort = core::strUtil::Find(pBegin, pEnd, portDelineator);
+	if (pPort) {
+		hostStr.set(pBegin, pPort);
+		portStr.set(pPort, pEnd);
 	}
-	else
-	{
-		ipPart.set(pAddressStr);
+	else {
+		hostStr.set(pBegin, pEnd);
 	}
-
+	
+	// resolve 
 	platform::addrinfo hints, *servinfo = nullptr;
 	memset(&hints, 0, sizeof hints);
 	hints.ai_socktype = SOCK_DGRAM;
@@ -247,21 +269,26 @@ bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, I
 		hints.ai_family = AF_INET6;
 	}
 #endif // !NET_IPv6_SUPPORT
-	else {
+	else if (ipVersion == IpVersion::Any) {
 		hints.ai_family = AF_UNSPEC;
 	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
 
-	platform::getaddrinfo(ipPart.c_str(), "", &hints, &servinfo);
+
+	platform::getaddrinfo(hostStr.c_str(), "", &hints, &servinfo);
 	if (servinfo == 0)
 	{
 		// if ipv6 try it as ipv4.
 #if NET_IPv6_SUPPORT
-		if (ipVersion == IpVersion::Ipv6) 
+		if (ipVersion == IpVersion::Ipv6)
 		{
 			ipVersion = IpVersion::Ipv4;
 			hints.ai_family = AF_INET;
 
-			platform::getaddrinfo(ipPart.c_str(), "", &hints, &servinfo);
+			platform::getaddrinfo(hostStr.c_str(), "", &hints, &servinfo);
 			if (servinfo == 0)
 			{
 				// failed still
@@ -271,14 +298,14 @@ bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, I
 			}
 			else
 			{
-				X_WARNING("Net", "Address passed as Ipv6, but is a valid Ipv4 address. add: \"%s\"", pAddressStr);
+				X_WARNING("Net", "Address passed as Ipv6, but is a valid Ipv4 address. add: \"%s\"", hostStr.c_str());
 			}
 		}
 		else
 #endif // !NET_IPv6_SUPPORT
 		{
 			lastError::Description Dsc;
-			X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastError::ToString(Dsc));
+			X_ERROR("Net", "Failed to get address info for: \"%s\" Error: \"%s\"", hostStr.c_str(), lastError::ToString(Dsc));
 			return false;
 		}
 	}
@@ -295,6 +322,7 @@ bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, I
 #if NET_IPv6_SUPPORT
 	else
 	{
+		X_ASSERT(servinfo->ai_family == AF_INET6, "Unexpected familey")(servinfo->ai_family);
 		address_.addr4.family = AddressFamily::INet6;
 		std::memcpy(&address_.addr6, (struct platform::sockaddr_in6 *)servinfo->ai_addr, sizeof(struct platform::sockaddr_in6));
 	}
@@ -307,9 +335,10 @@ bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, I
 
 	platform::freeaddrinfo(servinfo); // free the linked list
 
-	if (portPart.isNotEmpty())
+	// port?
+	if (portStr.isNotEmpty())
 	{
-		uint16_t port = core::strUtil::StringToInt<uint16_t>(portPart.c_str());
+		uint16_t port = core::strUtil::StringToInt<uint16_t>(portStr.c_str());
 		address_.addr4.port = platform::htons(port);
 
 #if X_DEBUG
@@ -321,22 +350,6 @@ bool SystemAddressEx::fromString(const char* pAddressStr, char portDelineator, I
 		address_.addr4.port = oldPort;
 	}
 
-	return true;
-}
-
-bool SystemAddressEx::fromStringExplicitPort(const char* pAddressStr, uint16_t port, IpVersion::Enum ipVersion)
-{
-	X_ASSERT_NOT_NULL(pAddressStr);
-	
-	if (!fromString(pAddressStr, PORT_DELINEATOR, ipVersion)) {
-		return false;
-	}
-
-	address_.addr4.port = platform::htons(port);
-
-#if X_DEBUG
-	portPeekVal_ = platform::ntohs(address_.addr4.port);
-#endif // !X_DEBUG
 	return true;
 }
 
