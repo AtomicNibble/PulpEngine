@@ -50,7 +50,7 @@ bool SystemAddress::IsLoopBack(void) const
 	if (getIPVersion() == IpVersion::Ipv4)
 	{
 		// check for 1.
-		if (hton(address_.addr4.addr.as_int) == X_TAG(127, 0, 0, 1)) {
+		if (address_.addr4.addr.as_int == X_TAG(127, 0, 0, 1)) {
 			return true;
 		}
 		if (address_.addr4.addr.as_int == 0) {
@@ -80,7 +80,10 @@ void SystemAddress::setToLoopback(IpVersion::Enum ipVersion)
 {
 	if (ipVersion == IpVersion::Ipv4)
 	{
-		address_.addr4.addr.as_int = ntoh(X_TAG(127,0,0,1));
+		address_.addr4.addr.bytes[0] = 127;
+		address_.addr4.addr.bytes[1] = 0;
+		address_.addr4.addr.bytes[2] = 0;
+		address_.addr4.addr.bytes[3] = 1;
 	}
 #if NET_IPv6_SUPPORT
 	else
@@ -90,6 +93,8 @@ void SystemAddress::setToLoopback(IpVersion::Enum ipVersion)
 		std::memcpy(&address_.addr6.addr, localhost, sizeof(address_.addr6.addr));
 	}
 #endif // !NET_IPv6_SUPPORT
+
+	X_ASSERT(IsLoopBack(), "Failed to set to loopback")();
 }
 
 bool SystemAddress::operator==(const SystemAddress& rhs) const
