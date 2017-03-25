@@ -677,6 +677,7 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 	pCmd->priority = notificationPriority;
 	pCmd->orderingChannel = orderingChannel;
 	pCmd->systemHandle = systemHandle;
+	pCmd->systemAddress = UNASSIGNED_SYSTEM_ADDRESS;
 	pCmd->sendDisconnectionNotification = sendDisconnectionNotification;
 	bufferdCmds_.push(pCmd);
 }
@@ -1718,8 +1719,17 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 		}
 		else if (cmd.cmd == BufferdCommand::Cmd::CloseConnection)
 		{
-			RemoteSystem* pRemoteSystem = getRemoteSystem(cmd.systemHandle, true);
+			RemoteSystem* pRemoteSystem = nullptr;
+			
+			if (cmd.systemHandle != INVALID_SYSTEM_HANDLE) {
+				pRemoteSystem = getRemoteSystem(cmd.systemHandle, true);
+			}
+			else {
+				pRemoteSystem = getRemoteSystem(cmd.systemAddress, true);
+			}
+
 			if (!pRemoteSystem) {
+				X_WARNING("Net", "Failed to fine system for connection close");
 				freeBufferdCmd(pBufCmd);
 				continue;
 			}
@@ -2753,6 +2763,7 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 			// okay so we know a socket has been closed we don't need to wait for timeout.
 			// we send buffered as we on diffrent thread.
 			BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
+			pCmd->systemHandle = INVALID_SYSTEM_HANDLE;
 			pCmd->systemAddress = pData->systemAddress;
 			pCmd->sendDisconnectionNotification = false;
 			bufferdCmds_.push(pCmd);
