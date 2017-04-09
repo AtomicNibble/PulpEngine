@@ -116,7 +116,7 @@ bool ThreadQue<T, SynchronizationPrimitive>::isEmpty(void) const
 template<typename T, typename SynchronizationPrimitive>
 bool ThreadQue<T, SynchronizationPrimitive>::isNotEmpty(void) const
 {
-	return !que_.isEmpty();
+	return que_.isNotEmpty();
 }
 
 
