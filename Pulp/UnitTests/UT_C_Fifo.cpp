@@ -817,11 +817,13 @@ TEST(FifoTest, Complex_shrinkToFit2)
 
 		EXPECT_EQ(2, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 		fifo.shrinkToFit(); // should do nothing
 
 		EXPECT_EQ(2, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 
 		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
@@ -831,6 +833,7 @@ TEST(FifoTest, Complex_shrinkToFit2)
 		fifo.emplace(0x1416, "meow");
 		EXPECT_EQ(3, fifo.size());
 		EXPECT_LE(4_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 		// we move this intem in, then move all 3 to new memory.
 		EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
@@ -846,22 +849,27 @@ TEST(FifoTest, Complex_shrinkToFit2)
 
 		EXPECT_EQ(3, fifo.size());
 		EXPECT_LE(4_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 		EXPECT_EQ(0x1414, fifo.peek().GetVar());
 		fifo.pop();
 
 		EXPECT_EQ(2, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 		EXPECT_EQ(0x1415, fifo.peek().GetVar());
 		fifo.pop();
 
 
 		EXPECT_EQ(1, fifo.size());
 		EXPECT_LE(2_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
+
 		EXPECT_EQ(0x1416, fifo.peek().GetVar());
 		fifo.pop();
 
 		EXPECT_EQ(0, fifo.size());
 		EXPECT_LE(0_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isEmpty());
 	}
 
 	EXPECT_EQ(6, CustomTypeComplex::MOVE_COUNT);
@@ -886,6 +894,7 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 
 		EXPECT_EQ(4, fifo.size());
 		EXPECT_LE(5_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 		// pop 3
 		EXPECT_EQ(0x1414, fifo.peek().GetVar());
@@ -897,6 +906,7 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 
 		EXPECT_EQ(1, fifo.size());
 		EXPECT_LE(5_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 		// push two more.
 		fifo.emplace(0x1418, "meow");
@@ -904,6 +914,7 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 
 		EXPECT_EQ(3_sz, fifo.size());
 		EXPECT_LE(5_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
 		EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
@@ -921,6 +932,7 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 
 		EXPECT_EQ(3, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 
 		EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
 		EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
@@ -929,21 +941,25 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 		// pop the 3.
 		EXPECT_EQ(3, fifo.size());
 		EXPECT_LE(4_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 		EXPECT_EQ(0x1417, fifo.peek().GetVar());
 		fifo.pop();
 
 		EXPECT_EQ(2, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 		EXPECT_EQ(0x1418, fifo.peek().GetVar());
 		fifo.pop();
 
 		EXPECT_EQ(1, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isNotEmpty());
 		EXPECT_EQ(0x1419, fifo.peek().GetVar());
 		fifo.pop();
 
 		EXPECT_EQ(0, fifo.size());
 		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_TRUE(fifo.isEmpty());
 	}
 
 	EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
