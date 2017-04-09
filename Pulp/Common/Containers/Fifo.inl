@@ -452,8 +452,8 @@ void Fifo<T>::expand(void)
 
 	X_ASSERT_NOT_NULL(start_);
 
-    size_t curSize = capacity();
-    size_t newSize = capacity() << 1;
+    size_type curSize = capacity();
+    size_type newSize = capacity() << 1;
     T* pData = Allocate(newSize);
 
     // move to new memory.
