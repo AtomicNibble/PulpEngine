@@ -150,6 +150,12 @@ typename FixedFifo<T, N>::size_type FixedFifo<T, N>::capacity(void) const
 }
 
 template<typename T, size_t N>
+typename FixedFifo<T, N>::size_type FixedFifo<T, N>::freeSpace(void) const
+{
+	return capacity() - size();
+}
+
+template<typename T, size_t N>
 bool FixedFifo<T, N>::isEmpty(void) const
 {
 	return num_ == 0;
