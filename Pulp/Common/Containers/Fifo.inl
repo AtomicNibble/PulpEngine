@@ -361,6 +361,16 @@ bool Fifo<T>::isNotEmpty(void) const
 {
 	return size() != 0;
 }
+
+template<typename T>
+bool Fifo<T>::isWrapped(void) const
+{
+	// if read is equal or less to write we are not wrapped.
+	// we include equal since a empty buffer can't be wrapped.
+	return read_ > write_;
+}
+
+
 // ----------------------------------------------
 
 // STL iterators.

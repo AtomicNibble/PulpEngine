@@ -134,6 +134,9 @@ public:
 	X_INLINE bool isEmpty(void) const;
 	X_INLINE bool isNotEmpty(void) const;
 
+	// for debug mainly.
+	// returns true if the buffer is wrapped around.
+	X_INLINE bool isWrapped(void) const;
 
 	// STL iterators.
 	iterator begin(void);
