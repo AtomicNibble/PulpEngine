@@ -73,7 +73,7 @@ namespace Fiber
 		void Add_nolock(const T item);
 
 		bool isNotEmpty(void) const;
-		size_t numItems(void) const;
+		size_t numItems(void);
 
 	protected:
 		core::Spinlock lock_;

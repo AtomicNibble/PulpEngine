@@ -94,9 +94,10 @@ namespace Fiber
 	}
 
 	template<typename T>
-	size_t ThreadQue<T>::numItems(void) const
+	size_t ThreadQue<T>::numItems(void)
 	{
-		// any point locking for this?
+		core::Spinlock::ScopedLock lock(lock_);
+
 		return list_.size();
 	}
 
