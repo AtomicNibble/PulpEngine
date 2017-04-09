@@ -19,6 +19,7 @@ class ThreadQue
 {
 public:
 	typedef size_t size_type;
+	typedef core::Fifo<T> Que;
 
 public:
 	ThreadQue(core::MemoryArenaBase* arena);
@@ -44,8 +45,6 @@ public:
 	bool isNotEmpty(void) const;
 
 protected:
-	typedef core::Fifo<T> Que;
-
 	Que que_;
 	SynchronizationPrimitive primitive_;
 };
