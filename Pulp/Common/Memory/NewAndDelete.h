@@ -112,6 +112,9 @@ namespace Mem
 	template <typename T>
 	inline T* MoveArrayUninitialized(void* where, T* fromBegin, T* fromEnd);
 
+	template <typename T>
+	inline T* MoveArrayDestructUninitialized(void* where, T* fromBegin, T* fromEnd);
+
 	/// \brief Destructs an instance in memory.
 	/// \details The function delegates the actual destruction of the instance to the proper function based on the type of \a T.
 	template <typename T>

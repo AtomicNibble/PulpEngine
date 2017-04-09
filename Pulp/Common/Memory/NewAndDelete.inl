@@ -241,6 +241,16 @@ namespace Mem
 		return as_T;
 	}
 
+	template <typename T>
+	inline T* MoveArrayDestructUninitialized(void* where, T* fromBegin, T* fromEnd)
+	{
+		T* pRes = MoveArrayUninitialized(where, fromBegin, fromEnd);
+
+		DestructArray(fromBegin, union_cast<size_t>(fromEnd - fromBegin), compileTime::IntToType<compileTime::IsPOD<T>::Value>());
+
+		return pRes;
+	}
+
 	// ---------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------
 	template <typename T>
