@@ -868,3 +868,81 @@ TEST(FifoTest, Complex_shrinkToFit2)
 	EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
 	EXPECT_EQ(6 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
 }
+
+TEST(FifoTest, Complex_shrinkToFitWrap)
+{
+	CustomTypeComplex::MOVE_COUNT = 0;
+	CustomTypeComplex::CONSRUCTION_COUNT = 0;
+	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+
+	{
+		Fifo<CustomTypeComplex> fifo(g_arena);
+
+		fifo.reserve(5);
+		fifo.emplace(0x1414, "meow");
+		fifo.emplace(0x1415, "meow");
+		fifo.emplace(0x1416, "meow");
+		fifo.emplace(0x1417, "meow");
+
+		EXPECT_EQ(4, fifo.size());
+		EXPECT_LE(5_sz, fifo.capacity());
+
+		// pop 3
+		EXPECT_EQ(0x1414, fifo.peek().GetVar());
+		fifo.pop();
+		EXPECT_EQ(0x1415, fifo.peek().GetVar());
+		fifo.pop();
+		EXPECT_EQ(0x1416, fifo.peek().GetVar());
+		fifo.pop();
+
+		EXPECT_EQ(1, fifo.size());
+		EXPECT_LE(5_sz, fifo.capacity());
+
+		// push two more.
+		fifo.emplace(0x1418, "meow");
+		fifo.emplace(0x1419, "meow");
+
+		EXPECT_EQ(3_sz, fifo.size());
+		EXPECT_LE(5_sz, fifo.capacity());
+
+		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
+		EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
+		EXPECT_EQ(3, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+		// okay so we now have 3 elementes with atleast capacity for 5
+		// and the elements should be wrapping around.
+		// so we can shink.
+		fifo.shrinkToFit(); // should do nothing
+
+
+		EXPECT_EQ(3, fifo.size());
+		EXPECT_LE(3_sz, fifo.capacity());
+
+		EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
+		EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
+		EXPECT_EQ(3 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+		// pop the 3.
+		EXPECT_EQ(3, fifo.size());
+		EXPECT_LE(4_sz, fifo.capacity());
+		EXPECT_EQ(0x1417, fifo.peek().GetVar());
+		fifo.pop();
+
+		EXPECT_EQ(2, fifo.size());
+		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_EQ(0x1418, fifo.peek().GetVar());
+		fifo.pop();
+
+		EXPECT_EQ(1, fifo.size());
+		EXPECT_LE(3_sz, fifo.capacity());
+		EXPECT_EQ(0x1419, fifo.peek().GetVar());
+		fifo.pop();
+
+		EXPECT_EQ(0, fifo.size());
+		EXPECT_LE(3_sz, fifo.capacity());
+	}
+
+	EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(6 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+}
