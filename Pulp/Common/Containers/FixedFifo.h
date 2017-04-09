@@ -128,11 +128,16 @@ public:
 	ConstReference back(void) const;
 
 private:
+	X_INLINE T* endPtr(void);
+	X_INLINE const T* endPtr(void) const;
+
+private:
 	X_NO_COPY(FixedFifo);
 	X_NO_ASSIGN(FixedFifo);
 
-	T  array_[N];
-	T* end_;
+	// T  array_[N];
+	uint8_t	X_ALIGNED_SYMBOL(array_[N * sizeof(T)], X_ALIGN_OF(T));
+
 	T* read_;
 	T* write_;
 

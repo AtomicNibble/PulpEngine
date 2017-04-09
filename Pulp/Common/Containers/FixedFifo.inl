@@ -2,10 +2,9 @@
 
 
 template<typename T, size_t N>
-	FixedFifo<T, N>::FixedFifo() :
-	end_(array_ + N),
-	read_(array_),
-	write_(array_),
+FixedFifo<T, N>::FixedFifo() :
+	read_(reinterpret_cast<T*>(array_)),
+	write_(reinterpret_cast<T*>(array_)),
 	num_(0)
 {
 
@@ -22,8 +21,8 @@ X_INLINE T& FixedFifo<T, N>::operator[](size_type idx)
 {
 	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
 
-	if (read_ + idx >= end_) {
-		size_type left = end_ - read_;
+	if (read_ + idx >= endPtr()) {
+		size_type left = endPtr() - read_;
 		return *(start_ + (idx - left));
 	}
 
@@ -35,8 +34,8 @@ X_INLINE const T& FixedFifo<T, N>::operator[](size_type idx) const
 {
 	X_ASSERT(idx < size(), "Index out of range.")(idx, size());
 
-	if (read_ + idx >= end_) {
-		size_type left = end_ - read_;
+	if (read_ + idx >= endPtr()) {
+		size_type left = endPtr() - read_;
 		return *(start_ + (idx - left));
 	}
 
@@ -49,13 +48,12 @@ void FixedFifo<T, N>::push(const T& v)
 {
 	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
 
-
 	Mem::Construct<T>(write_, v);
 
 	++write_;
 
-	if (write_ == end_) {
-		write_ = array_;
+	if (write_ == endPtr()) {
+		write_ = reinterpret_cast<T*>(array_);
 	}
 
 	++num_;
@@ -70,8 +68,8 @@ void FixedFifo<T, N>::push(T&& v)
 
 	++write_;
 
-	if (write_ == end_) {
-		write_ = array_;
+	if (write_ == endPtr()) {
+		write_ = reinterpret_cast<T*>(array_);
 	}
 
 	++num_;
@@ -87,8 +85,8 @@ void FixedFifo<T, N>::emplace(ArgsT&&... args)
 
 	++write_;
 
-	if (write_ == end_) {
-		write_ = array_;
+	if (write_ == endPtr()) {
+		write_ = reinterpret_cast<T*>(array_);
 	}
 
 	++num_;
@@ -104,8 +102,8 @@ void FixedFifo<T, N>::pop(void)
 
 	++read_;
 
-	if (read_ == end_) {
-		read_ = array_;
+	if (read_ == endPtr()) {
+		read_ = reinterpret_cast<T*>(array_);
 	}
 
 	--num_;
@@ -135,8 +133,8 @@ void FixedFifo<T, N>::clear(void)
 	}
 
 	num_ = 0;
-	read_ = array_;
-	write_ = array_;
+	read_ = reinterpret_cast<T*>(array_);
+	write_ = reinterpret_cast<T*>(array_);
 }
 
 template<typename T, size_t N>
@@ -148,7 +146,7 @@ typename FixedFifo<T, N>::size_type FixedFifo<T, N>::size(void) const
 template<typename T, size_t N>
 typename FixedFifo<T, N>::size_type FixedFifo<T, N>::capacity(void) const
 {
-	return end_ - array_;
+	return union_cast<size_type>(endPtr() - reinterpret_cast<const T*>(array_));
 }
 
 template<typename T, size_t N>
@@ -168,25 +166,25 @@ bool FixedFifo<T, N>::isNotEmpty(void) const
 template<typename T, size_t N>
 typename FixedFifo<T, N>::iterator FixedFifo<T, N>::begin(void)
 {
-	return iterator(array_, end_, read_, 0);
+	return iterator(reinterpret_cast<T*>(array_), endPtr(), read_, 0);
 }
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::iterator FixedFifo<T, N>::end(void)
 {
-	return iterator(array_, end_, write_, num_);
+	return iterator(reinterpret_cast<T*>(array_), endPtr(), write_, num_);
 }
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::begin(void) const
 {
-	return const_iterator(array_, end_, read_, 0);
+	return const_iterator(reinterpret_cast<const T*>(array_), endPtr(), read_, 0);
 }
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::end(void) const
 {
-	return const_iterator(array_, end_, write_, num_);
+	return const_iterator(reinterpret_cast<const T*>(array_), endPtr(), write_, num_);
 }
 
 
@@ -222,6 +220,20 @@ typename FixedFifo<T, N>::ConstReference FixedFifo<T, N>::back(void) const
 	X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
 
 	return *(write_ - 1);
+}
+
+
+template<typename T, size_t N>
+X_INLINE T* FixedFifo<T, N>::endPtr(void)
+{
+	return reinterpret_cast<T*>(array_) + N;
+}
+
+
+template<typename T, size_t N>
+X_INLINE const T* FixedFifo<T, N>::endPtr(void) const
+{
+	return reinterpret_cast<const T*>(array_) + N;
 }
 
 
