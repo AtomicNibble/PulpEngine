@@ -130,8 +130,9 @@ const T& FixedFifo<T, N>::peek(void) const
 template<typename T, size_t N>
 void FixedFifo<T, N>::clear(void)
 {
-	while (size() > 0)
+	while (size() > 0) {
 		pop();
+	}
 
 	num_ = 0;
 	read_ = array_;
@@ -243,8 +244,9 @@ inline typename FixedFifo<T, N>::iterator& FixedFifo<T, N>::iterator::operator++
 {
 	++count_;
 	++current_;
-	if (current_ == end_)
+	if (current_ == end_) {
 		current_ = start_;
+	}
 
 	return *this;
 }
@@ -288,8 +290,9 @@ inline typename FixedFifo<T, N>::const_iterator& FixedFifo<T, N>::const_iterator
 {
 	++count_;
 	++current_;
-	if (current_ == end_)
+	if (current_ == end_) {
 		current_ = start_;
+	}
 
 	return *this;
 }
