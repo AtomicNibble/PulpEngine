@@ -912,6 +912,10 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 		// okay so we now have 3 elementes with atleast capacity for 5
 		// and the elements should be wrapping around.
 		// so we can shink.
+
+		// check we are actually wrapped, so that we are actually testing the case we desire.
+		EXPECT_TRUE(fifo.isWrapped());
+
 		fifo.shrinkToFit(); // should do nothing
 
 
