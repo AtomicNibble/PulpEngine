@@ -302,17 +302,23 @@ void Fifo<T>::shrinkToFit(void)
     if (capacity() > size() + 1)
     {
         // reallocate.
-        size_t curSize = capacity();
-        size_t newSize = size() + 1;
+        size_type curSize = size();
+        size_type newSize = size() + 1;
         T* pData = Allocate(newSize);
 
         // move to new memory.
-        Mem::MoveArrayUninitialized(pData, read_, end_);
-
-        // handle wrap around.
-        if (write_ < read_) {
-            Mem::MoveArrayUninitialized(pData + (end_ - read_), start_, write_);
-        }
+		if (read_ <= write_)
+		{
+			// no wrap.
+			X_ASSERT(newSize > union_cast<size_type>(write_ - read_), "Out of range")(newSize, union_cast<size_type>(write_ - read_));
+			Mem::MoveArrayDestructUninitialized(pData, read_, write_);
+		}
+		else
+		{
+			// wrap.
+			Mem::MoveArrayDestructUninitialized(pData, read_, end_);
+			Mem::MoveArrayDestructUninitialized(pData + (end_ - read_), start_, write_);
+		}
 
         // delete old and update pointers.
         Delete(start_);
@@ -321,6 +327,8 @@ void Fifo<T>::shrinkToFit(void)
         end_ = pData + newSize;
         read_ = start_; 
         write_ = read_ + curSize;
+
+		X_ASSERT(size() == curSize, "Size has changed")(size(), curSize);
     }
 }
 
