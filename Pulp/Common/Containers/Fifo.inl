@@ -337,8 +337,11 @@ template<typename T>
 typename Fifo<T>::size_type Fifo<T>::size(void) const
 {
 	if (read_ <= write_) {
+		X_ASSERT(!isWrapped(), "Should be wrapped")(isWrapped());
 		return write_ - read_;
 	}
+
+	X_ASSERT(isWrapped(), "Should be wrapped")(isWrapped());
 
 	// looped back. so write is lower than read
 	return capacity() - (read_ - write_);
