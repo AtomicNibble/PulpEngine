@@ -729,3 +729,75 @@ TEST(FifoTest, Complex_emplace)
 	EXPECT_EQ(2, CustomTypeComplex::CONSRUCTION_COUNT);
 	EXPECT_EQ(2, CustomTypeComplex::DECONSRUCTION_COUNT);
 }
+
+TEST(FifoTest, Complex_shrinkToFit)
+{
+	CustomTypeComplex::MOVE_COUNT = 0;
+	CustomTypeComplex::CONSRUCTION_COUNT = 0;
+	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+
+	{
+		Fifo<CustomTypeComplex> fifo(g_arena);
+
+		fifo.reserve(3);
+		fifo.emplace(0x1414, "meow");
+		fifo.emplace(0x1415, "meow");
+
+		EXPECT_EQ(2, fifo.size());
+		EXPECT_LE(3, fifo.capacity());
+
+		fifo.shrinkToFit(); // should do nothing
+
+		EXPECT_EQ(2, fifo.size());
+		EXPECT_LE(3, fifo.capacity());
+
+
+		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
+		EXPECT_EQ(2, CustomTypeComplex::CONSRUCTION_COUNT);
+		EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+		// push another
+		// fifo.emplace(0x1416, "meow");
+		fifo.push(CustomTypeComplex(0x1416, "meow"));
+		EXPECT_EQ(3, fifo.size());
+		EXPECT_LE(4, fifo.capacity());
+
+		// we move this intem in, then move all 3 to new memory.
+		EXPECT_EQ(1 + 3, CustomTypeComplex::MOVE_COUNT);
+		EXPECT_EQ(2 + 1, CustomTypeComplex::CONSRUCTION_COUNT); // we constructed the one we pushed
+		EXPECT_EQ(1 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+		fifo.shrinkToFit(); // should shrink.
+
+		// we moved 3.
+		EXPECT_EQ(4 + 3, CustomTypeComplex::MOVE_COUNT);
+		EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
+		EXPECT_EQ(4 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+		EXPECT_EQ(3, fifo.size());
+		EXPECT_LE(4, fifo.capacity());
+		EXPECT_EQ(0x1414, fifo.peek().GetVar());
+		fifo.pop();
+
+		EXPECT_EQ(2, fifo.size());
+		EXPECT_LE(3, fifo.capacity());
+		EXPECT_EQ(0x1415, fifo.peek().GetVar());
+		fifo.pop();
+
+
+		EXPECT_EQ(1, fifo.size());
+		EXPECT_LE(2, fifo.capacity());
+		EXPECT_EQ(0x1416, fifo.peek().GetVar());
+		fifo.pop();
+
+		EXPECT_EQ(0, fifo.size());
+		EXPECT_LE(0, fifo.capacity());
+	}
+
+	// so we emplace 2 = 2 con.
+	// we push one = 1 move.
+
+	EXPECT_EQ(7, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(7 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+}
