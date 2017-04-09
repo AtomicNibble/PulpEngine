@@ -104,7 +104,7 @@ namespace Fiber
 	template<typename T>
 	bool ThreadQue<T>::isNotEmpty(void) const
 	{
-		return !list_.isEmpty();
+		return list_.isNotEmpty();
 	}
 
 	// =============================
