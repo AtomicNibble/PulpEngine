@@ -307,7 +307,7 @@ void Fifo<T>::shrinkToFit(void)
         T* pData = Allocate(newSize);
 
         // move to new memory.
-		if (read_ <= write_)
+		if (!isWrapped())
 		{
 			// no wrap.
 			X_ASSERT(newSize > union_cast<size_type>(write_ - read_), "Out of range")(newSize, union_cast<size_type>(write_ - read_));
