@@ -130,6 +130,8 @@ public:
 	// returns the total capacity.
 	X_INLINE size_type capacity(void) const;
 
+	X_INLINE size_type freeSpace(void) const;
+
 	// any items?
 	X_INLINE bool isEmpty(void) const;
 	X_INLINE bool isNotEmpty(void) const;
