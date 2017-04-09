@@ -40,7 +40,7 @@ public:
 	template<class CallBack>
 	bool tryPopAll(CallBack func);
 
-	size_type size(void) const;
+	size_type size(void);
 	bool isEmpty(void) const;
 	bool isNotEmpty(void) const;
 

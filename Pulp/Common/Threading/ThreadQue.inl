@@ -102,8 +102,10 @@ bool ThreadQue<T, SynchronizationPrimitive>::tryPopAll(CallBack func)
 
 
 template<typename T, typename SynchronizationPrimitive>
-size_t ThreadQue<T, SynchronizationPrimitive>::size(void) const
+size_t ThreadQue<T, SynchronizationPrimitive>::size(void)
 {
+	SynchronizationPrimitive::ScopedLock lock(primitive_);
+
 	return que_.size();
 }
 
