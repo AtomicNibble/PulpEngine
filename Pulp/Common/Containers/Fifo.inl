@@ -457,9 +457,9 @@ void Fifo<T>::expand(void)
     T* pData = Allocate(newSize);
 
     // move to new memory.
-    Mem::MoveArrayUninitialized(pData, read_, end_);
+    Mem::MoveArrayDestructUninitialized(pData, read_, end_);
     // handle wrap around.
-	Mem::MoveArrayUninitialized(pData + (end_ - read_), start_, write_);
+	Mem::MoveArrayDestructUninitialized(pData + (end_ - read_), start_, write_);
 
     // delete old and update pointers.
     Delete(start_);
