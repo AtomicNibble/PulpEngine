@@ -1213,6 +1213,9 @@
     <ClInclude Include="SystemAddress.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\FixedThreadQue.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1535,6 +1538,9 @@
     </None>
     <None Include="SystemAddress.inl">
       <Filter>Interfaces_h\Network</Filter>
+    </None>
+    <None Include="Threading\FixedThreadQue.inl">
+      <Filter>Headers\Threading</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
