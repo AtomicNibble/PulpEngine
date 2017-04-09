@@ -356,13 +356,13 @@ typename Fifo<T>::size_type Fifo<T>::capacity(void) const
 template<typename T>
 bool Fifo<T>::isEmpty(void) const
 {
-	return size() == 0;
+	return read_ == write_ || (read_ == end_ && write_ == start_);
 }
 
 template<typename T>
 bool Fifo<T>::isNotEmpty(void) const
 {
-	return size() != 0;
+	return !isEmpty();
 }
 
 template<typename T>
