@@ -80,7 +80,7 @@ bool FixedThreadQue<T, N, core::CriticalSection>::tryPop(T& value)
 		return false;
 	}
 
-	value = que_.peek();
+	value = std::move(que_.peek());
 	que_.pop();
 
 	postPopCond_.NotifyOne();
@@ -97,7 +97,7 @@ void FixedThreadQue<T, N, core::CriticalSection>::pop(T& value)
 		cond_.Wait(primitive_);
 	}
 
-	value = que_.peek();
+	value = std::move(que_.peek());
 	que_.pop();
 
 	postPopCond_.NotifyOne();
@@ -114,7 +114,7 @@ T FixedThreadQue<T, N, core::CriticalSection>::pop(void)
 		cond_.Wait(primitive_);
 	}
 
-	T value = que_.peek();
+	T value = std::move(que_.peek());
 	que_.pop();
 
 	postPopCond_.NotifyOne();
