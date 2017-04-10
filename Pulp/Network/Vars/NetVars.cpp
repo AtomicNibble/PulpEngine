@@ -7,7 +7,6 @@ X_NAMESPACE_BEGIN(net)
 
 NetVars::NetVars()
 {
-	debug_ = 0;
 
 }
 
