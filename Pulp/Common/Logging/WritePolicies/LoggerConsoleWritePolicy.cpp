@@ -162,8 +162,9 @@ namespace {
 		
 		do
 		{
-			if (SectionSize >= length)
+			if (SectionSize >= length) {
 				break;
+			}
 
 			if (*(pCur + SectionSize) == L'|')
 			{
