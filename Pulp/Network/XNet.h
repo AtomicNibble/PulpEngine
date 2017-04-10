@@ -42,6 +42,7 @@ public:
 	static NetGUID generateGUID(void);
 
 private:
+	void Cmd_listLocalAddress(core::IConsoleCmdArgs* pCmd);
 	void Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd);
 	void Cmd_clearBans(core::IConsoleCmdArgs* pCmd);
 	void Cmd_listBans(core::IConsoleCmdArgs* pCmd);

@@ -31,6 +31,8 @@ void XNet::registerVars(void)
 
 void XNet::registerCmds(void)
 {
+	ADD_COMMAND_MEMBER("net_left_local_add", this, XNet, &XNet::Cmd_listLocalAddress, core::VarFlag::SYSTEM,
+		"Lists local addresses");
 	ADD_COMMAND_MEMBER("net_list_remotes", this, XNet, &XNet::Cmd_listRemoteSystems, core::VarFlag::SYSTEM,
 		"List all the connected systems for each peer. <verbose>");
 	ADD_COMMAND_MEMBER("net_bans_clear", this, XNet, &XNet::Cmd_clearBans, core::VarFlag::SYSTEM,
@@ -167,6 +169,17 @@ NetGUID XNet::generateGUID(void)
 	val |= digest.data[1];
 
 	return NetGUID(val);
+}
+
+void XNet::Cmd_listLocalAddress(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+
+	if (peers_.empty()) {
+		return;
+	}
+
+	peers_.front()->listLocalAddress();
 }
 
 void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
