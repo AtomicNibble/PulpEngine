@@ -71,7 +71,7 @@ void NetVars::registerVars(void)
 	ADD_CVAR_REF("net_art", artificalNetwork_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable artifical network. This just enabled vars like 'net_art_packet_loss'")->SetOnChangeCallback(del);
 
-	ADD_CVAR_REF("net_art_packet_loss", artificalPacketLoss_, 25.f, 0.f, 100.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("net_art_packet_loss", artificalPacketLoss_, 0.f, 0.f, 100.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Introduce artifical outgoing packet loss, percentage chance.");
 
 	ADD_CVAR_REF("net_art_ping", artificalPing_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
