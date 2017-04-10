@@ -71,6 +71,24 @@ void FixedThreadQue<T, N, core::CriticalSection>::push(T const& value)
 }
 
 template<typename T, size_t N>
+void FixedThreadQue<T, N, core::CriticalSection>::push(T&& value)
+{
+	{
+		CriticalSection::ScopedLock lock(primitive_);
+
+		while (que_.freeSpace() == 0)
+		{
+			postPopCond_.Wait(primitive_);
+		}
+
+		que_.push(std::forward<T>(value));
+	}
+
+	cond_.NotifyOne();
+}
+
+
+template<typename T, size_t N>
 bool FixedThreadQue<T, N, core::CriticalSection>::tryPop(T& value)
 {
 	CriticalSection::ScopedLock lock(primitive_);

@@ -43,6 +43,7 @@ public:
 	FixedThreadQue() = default;
 
 	void push(T const& value);
+	void push(T&& value);
 	bool tryPop(T& value);
 	void pop(T& value);
 	T pop(void);
@@ -59,6 +60,7 @@ public:
 	FixedThreadQue() = default;
 
 	void push(T const& value);
+	void push(T&& value);
 	bool tryPop(T& value);
 	void pop(T& value);
 	T pop(void);
