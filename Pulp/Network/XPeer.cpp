@@ -412,15 +412,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 			}
 		}
 
-		{
-			X_LOG0("Net", "LocalAdd ^5%" PRIuS, ipList_.size());
-			X_LOG_BULLET;
-			for (auto& ip : ipList_)
-			{
-				IPStr addStr;
-				X_LOG0("Net", "local address: \"%s\"", ip.toString(addStr));
-			}
-		}
+		listLocalAddress();
 	}
 
 
@@ -1411,6 +1403,17 @@ void XPeer::listBans(void) const
 		}
 
 		X_LOG0("Net", "Ban: \"%s\" timeLeftMS: ^5%" PRIi64, ban.ip.c_str(), msLeft);
+	}
+}
+
+void XPeer::listLocalAddress(void) const
+{
+	X_LOG0("Net", "LocalAdd ^5%" PRIuS, ipList_.size());
+	X_LOG_BULLET;
+	for (auto& ip : ipList_)
+	{
+		IPStr addStr;
+		X_LOG0("Net", "local address: \"%s\"", ip.toString(addStr));
 	}
 }
 

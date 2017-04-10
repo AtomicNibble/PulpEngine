@@ -291,6 +291,7 @@ public:
 	bool isBanned(const IPStr& ip);
 	void clearBanList(void) X_FINAL;
 	void listBans(void) const;
+	void listLocalAddress(void) const;
 
 	int32_t getAveragePing(SystemHandle system) const X_FINAL;
 	int32_t getLastPing(SystemHandle system) const X_FINAL;
