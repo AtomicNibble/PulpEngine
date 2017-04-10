@@ -981,7 +981,8 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 			const auto unusedSpace = recivedPacketQueue_.capacity() - recivedPacketQueue_.size();
 			if (unusedSpace > recivedPacketQueue_.size() * 4)
 			{
-				recivedPacketQueue_.shrinkToFit();
+				X_LOG0_IF(vars_.debugIgnoredEnabled(), "NetRel", "Shrinking packet queue");
+				recivedPacketQueue_.shrinkToFit();	
 			}
 		}
 	}
