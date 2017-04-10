@@ -159,116 +159,114 @@ namespace {
 		pCur = wMsg;
 		pMsgEnd = wMsg + length;
 
-	//	if (wMsg < &wMsg[length])
+		
+		do
 		{
-			do
+			if (SectionSize >= length)
+				break;
+
+			if (*(pCur + SectionSize) == L'|')
 			{
-				if ( SectionSize >= length )
-					break;
+				SetConsoleTextAttribute(console, CHANNEL_COLOR);
 
-				if (*(pCur + SectionSize) == L'|')
+				NumberOfCharsWritten = 0;
+				WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
+
+				SetConsoleTextAttribute(console, color);
+
+				length -= SectionSize;
+				pCur = pCur + SectionSize;
+				SectionSize = 0;
+			}
+
+
+			if (colorizeExtended)
+			{
+				wchar_t curChar = *(pCur + SectionSize);
+				if (hasCoolorCode && curChar == L'^' && SectionSize < length)
 				{
-					SetConsoleTextAttribute( console, CHANNEL_COLOR );
-
-					NumberOfCharsWritten = 0;
-					WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
-
-					SetConsoleTextAttribute(console, color);
-
-					length -= SectionSize;
-					pCur = pCur + SectionSize;
-					SectionSize = 0;
-				}
-
-
-				if (colorizeExtended)
-				{
-					wchar_t curChar = *(pCur + SectionSize);
-					if (hasCoolorCode && curChar == L'^' && SectionSize < length)
+					wchar_t colChar = *(pCur + SectionSize + 1);
+					if (core::strUtil::IsDigitW(colChar))
 					{
-						wchar_t colChar = *(pCur + SectionSize + 1);
-						if (core::strUtil::IsDigitW(colChar))
-						{
-							int colorIndex = colChar - L'0';
+						int colorIndex = colChar - L'0';
 
-							// we draw anything then change color.
-							NumberOfCharsWritten = 0;
-							WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
-
-							SetConsoleTextAttribute(console, COLOR_CODE_TABLE[colorIndex]);
-
-							ColorSet = true;
-
-							SectionSize += 2;
-
-							length -= SectionSize;
-							pCur = pCur + SectionSize;
-							SectionSize = 0;
-
-							if (length > 0 && *pCur == L'\"')
-							{
-								isString = (isString == 0);
-							}
-
-						}
-					}
-					else if (curChar == L'\"')
-					{
-						if (isString)
-						{
-							++SectionSize;
-						}
-
+						// we draw anything then change color.
 						NumberOfCharsWritten = 0;
 						WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
 
-						// still make text green.
-						if (!isString)
-						{
-							SetConsoleTextAttribute(console, STRING_COLOR);
-						}
-						else
-						{
-							SetConsoleTextAttribute(console, color);
-						}
+						SetConsoleTextAttribute(console, COLOR_CODE_TABLE[colorIndex]);
+
+						ColorSet = true;
+
+						SectionSize += 2;
 
 						length -= SectionSize;
 						pCur = pCur + SectionSize;
 						SectionSize = 0;
 
-						isString = (isString == 0);
-						if (!isString) {
-							continue; // we need to check for color code right after a closing "
-						}
-					}
-				}
-				else
-				{
-					wchar_t curChar = *(pCur + SectionSize);
-
-					// skip color codes.
-					if (hasCoolorCode && curChar == L'^' && SectionSize < length)
-					{
-						wchar_t colChar = *(pCur + SectionSize + 1);
-						if (core::strUtil::IsDigitW(colChar))
+						if (length > 0 && *pCur == L'\"')
 						{
-							// we draw anything then change color.
-							NumberOfCharsWritten = 0;
-							WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
-
-							SectionSize += 2;
-
-							length -= SectionSize;
-							pCur = pCur + SectionSize;
-							SectionSize = 0;
+							isString = (isString == 0);
 						}
+
 					}
 				}
+				else if (curChar == L'\"')
+				{
+					if (isString)
+					{
+						++SectionSize;
+					}
 
-				++SectionSize;
+					NumberOfCharsWritten = 0;
+					WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
+
+					// still make text green.
+					if (!isString)
+					{
+						SetConsoleTextAttribute(console, STRING_COLOR);
+					}
+					else
+					{
+						SetConsoleTextAttribute(console, color);
+					}
+
+					length -= SectionSize;
+					pCur = pCur + SectionSize;
+					SectionSize = 0;
+
+					isString = (isString == 0);
+					if (!isString) {
+						continue; // we need to check for color code right after a closing "
+					}
+				}
 			}
-			while (pCur < pMsgEnd);
-		}
+			else
+			{
+				wchar_t curChar = *(pCur + SectionSize);
+
+				// skip color codes.
+				if (hasCoolorCode && curChar == L'^' && SectionSize < length)
+				{
+					wchar_t colChar = *(pCur + SectionSize + 1);
+					if (core::strUtil::IsDigitW(colChar))
+					{
+						// we draw anything then change color.
+						NumberOfCharsWritten = 0;
+						WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
+
+						SectionSize += 2;
+
+						length -= SectionSize;
+						pCur = pCur + SectionSize;
+						SectionSize = 0;
+					}
+				}
+			}
+
+			++SectionSize;
+		} while (pCur < pMsgEnd);
+		
 
 		if (!ColorSet) {
 			SetConsoleTextAttribute(console, color);
