@@ -31,6 +31,7 @@ public:
 	void free(void);
 
 	void push(T const& value);
+	void push(T&& value);
 	// pushes if predicate don't match.
 	// true if pushed.
 	template<class UnaryPredicate>
@@ -58,6 +59,7 @@ public:
 	using ThreadQue<T, SynchronizationPrimitive>::ThreadQue;
 
 	void push(T const& value);
+	void push(T&& value);
 	bool tryPop(T& value);
 	void pop(T& value);
 	T pop(void);
@@ -74,6 +76,7 @@ public:
 	using ThreadQue<T, CriticalSection>::ThreadQue;
 
 	void push(T const& value);
+	void push(T&& value);
 	void pop(T& value);
 	T pop(void);
 

@@ -58,6 +58,14 @@ void ThreadQue<T, SynchronizationPrimitive>::push(T const& value)
 }
 
 template<typename T, typename SynchronizationPrimitive>
+void ThreadQue<T, SynchronizationPrimitive>::push(T&& value)
+{
+	SynchronizationPrimitive::ScopedLock lock(primitive_);
+
+	que_.push(std::forward<T>(value));
+}
+
+template<typename T, typename SynchronizationPrimitive>
 template<class UnaryPredicate>
 bool ThreadQue<T, SynchronizationPrimitive>::push_unique_if(T const& value, UnaryPredicate p)
 {
@@ -134,6 +142,14 @@ void ThreadQueBlocking<T, SynchronizationPrimitive>::push(T const& value)
 }
 
 template<typename T, typename SynchronizationPrimitive>
+void ThreadQueBlocking<T, SynchronizationPrimitive>::push(T&& value)
+{
+	ThreadQue<T, SynchronizationPrimitive>::push(std::forward<T>(value));
+	signal_.raise();
+}
+
+
+template<typename T, typename SynchronizationPrimitive>
 void ThreadQueBlocking<T, SynchronizationPrimitive>::pop(T& value)
 {
 	X_DISABLE_WARNING(4127)
@@ -200,6 +216,14 @@ template<typename T>
 void ThreadQueBlocking<T, core::CriticalSection>::push(T const& value)
 {
 	ThreadQue<T, CriticalSection>::push(value);
+	cond_.NotifyOne();
+}
+
+
+template<typename T>
+void ThreadQueBlocking<T, core::CriticalSection>::push(T&& value)
+{
+	ThreadQue<T, CriticalSection>::push(std::forward<T>(value));
 	cond_.NotifyOne();
 }
 
