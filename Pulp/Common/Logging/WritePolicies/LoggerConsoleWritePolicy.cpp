@@ -142,6 +142,7 @@ namespace {
 		bool isString = false;
 		bool hasCoolorCode = false;
 		bool ColorSet = false;
+		bool channelEnded = false;
 		const wchar_t *pCur, *pMsgEnd;
 
 		if (length < 1) {
@@ -166,8 +167,10 @@ namespace {
 				break;
 			}
 
-			if (*(pCur + SectionSize) == L'|')
+			if (!channelEnded && *(pCur + SectionSize) == L'|')
 			{
+				channelEnded = true;
+
 				SetConsoleTextAttribute(console, CHANNEL_COLOR);
 
 				NumberOfCharsWritten = 0;
