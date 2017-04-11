@@ -287,13 +287,13 @@ namespace Mem
 	// ---------------------------------------------------------------------------------------------------------------------
 
 	template <typename T>
-	inline void DestructArray(T* instances, size_t N, PODType)
+	inline void DestructArray(T* pInstances, size_t N, PODType)
 	{
-		X_UNUSED(instances);
+		X_UNUSED(pInstances);
 		X_UNUSED(N);
 
 		if (N > 0) {
-			X_ASSERT_NOT_NULL(instances);
+			X_ASSERT_NOT_NULL(pInstances);
 		}
 	}
 
@@ -301,26 +301,26 @@ namespace Mem
 	// ---------------------------------------------------------------------------------------------------------------------
 
 	template <typename T>
-	inline void DestructArray(T* instances, size_t N, NonPODType)
+	inline void DestructArray(T* pInstances, size_t N, NonPODType)
 	{
 		if (N > 0) {
-			X_ASSERT_NOT_NULL(instances);
+			X_ASSERT_NOT_NULL(pInstances);
 		}
 
 		for (size_t i = 0; i < N; ++i) {
-			instances[i].~T();
+			pInstances[i].~T();
 		}
 	}
 
 	// ---------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------
 	template <typename T>
-	inline void DestructArray(T* instances, size_t N)
+	inline void DestructArray(T* pInstances, size_t N)
 	{
 		if (N > 0) {
-			X_ASSERT_NOT_NULL(instances);
+			X_ASSERT_NOT_NULL(pInstances);
 		}
 
-		DestructArray(instances, N, compileTime::IntToType<compileTime::IsPOD<T>::Value>());
+		DestructArray(pInstances, N, compileTime::IntToType<compileTime::IsPOD<T>::Value>());
 	}
 }
