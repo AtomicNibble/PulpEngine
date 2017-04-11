@@ -21,7 +21,12 @@ namespace lastError
 			sizeof(Description),							// Number of bytes to store the message
 			NULL);
 
-		desc[size - 2] = '\0';
+		if (size > 1) {
+			desc[size - 2] = '\0';
+		}
+		else {
+			desc[0] = '\0';
+		}
 
 		return desc;
 	}
