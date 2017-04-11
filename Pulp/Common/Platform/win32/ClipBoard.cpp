@@ -13,7 +13,7 @@ namespace clipboard
 
 		const size_t strLen = pEnd - pBegin;
 		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, strLen);
-		LPSTR pDst = (LPSTR)GlobalLock(hMem);
+		LPSTR pDst = reinterpret_cast<LPSTR>(GlobalLock(hMem));
 
 		std::memcpy(pDst, pBegin, strLen);
 
@@ -75,7 +75,7 @@ namespace clipboard
 
 		void* pGlobal = GlobalLock(hGlobal);
 
-		size_t strLength = strlen((char*)pGlobal);
+		size_t strLength = strlen(reinterpret_cast<char*>(pGlobal));
 		if (strLength > sizeof(bufOut)-1){
 			X_WARNING("Clipboard", "Clipboard text data is over %i bytes. truncating string", sizeof(bufOut));
 		}
