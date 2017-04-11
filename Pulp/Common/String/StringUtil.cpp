@@ -297,6 +297,12 @@ namespace strUtil
 
 	const char* Convert(const wchar_t *input, char *output, size_t outputLength)
 	{
+		if (!outputLength) {
+			return output;
+		}
+
+		output[0] = '\0';
+
 		size_t convertedChars = 0;
 		wcstombs_s(&convertedChars, output, outputLength, input, _TRUNCATE);
 		return output;
@@ -304,6 +310,12 @@ namespace strUtil
 
 	const wchar_t* Convert(const char *input, wchar_t *output, size_t outputBytes)
 	{
+		if (!outputBytes) {
+			return output;
+		}
+
+		output[0] = L'\0';
+
 		size_t convertedChars = 0;
 		mbstowcs_s(&convertedChars, output, outputBytes / 2, input, _TRUNCATE);
 		return output;
