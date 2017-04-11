@@ -826,8 +826,9 @@ void xFrame::NCButtonDown( HWND hwnd, ULONG message, WPARAM wparam, LPARAM lpara
 	int enabled = 0;
 	lopi(4)
 	{
-		if(!Buttons_[i].Draw || Buttons_[i].Locked)
+		if (!Buttons_[i].Draw || Buttons_[i].Locked) {
 			continue;
+		}
 
 		if (GetButtonPos(enabled, width_, IsMax_).contains(mouse))
 		{
