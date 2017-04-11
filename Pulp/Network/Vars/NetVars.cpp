@@ -35,7 +35,7 @@ void NetVars::registerVars(void)
 
 	del.Bind<NetVars, &NetVars::Var_OnDefaultTimeoutChanged>(this);
 
-	ADD_CVAR_REF("net_default_timeout", defaultTimeoutMS_, 5000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("net_default_timeout", defaultTimeoutMS_, 10000, 0, 10000000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"The default timeout for connections in MS")->SetOnChangeCallback(del);
 
 	ADD_CVAR_REF("net_rl_connections_per_ip", rlconnectionsPerIp_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
