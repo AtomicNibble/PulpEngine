@@ -125,14 +125,16 @@ StackString<N, wchar_t>::StackString(const float f)
 {
 	X_ASSERT(len_ < N, "unsigned val does not fit into stackstring of size %d.", len_)(len_, N);
 
-	wchar_t text[64];
+	wchar_t text[64] = { 0 };
 
 	size_t l = swprintf_s(text, L"%f", f);
 
-	while (l > 0 && text[l - 1] == L'0')
+	while (l > 0 && text[l - 1] == L'0') {
 		text[--l] = L'\0';
-	while (l > 0 && text[l - 1] == L'.')
+	}
+	while (l > 0 && text[l - 1] == L'.') {
 		text[--l] = L'\0';
+	}
 
 	wcscpy(str_, text);
 	len_ = l;
@@ -287,8 +289,9 @@ bool StackString<N, wchar_t>::replace(const wchar_t* start, const wchar_t* origi
 	// find the position of the string to replace
 	const size_t originalLength = strUtil::strlen(original);
 	const wchar_t* pos = strUtil::Find(start, str_ + len_, original, originalLength);
-	if (!pos)
+	if (!pos) {
 		return false;
+	}
 
 	wchar_t* const replacePos = const_cast<wchar_t*>(pos);
 
@@ -316,14 +319,16 @@ bool StackString<N, wchar_t>::replace(const wchar_t* original, const wchar_t* re
 	// find the position of the string to replace
 	const size_t originalLength = strUtil::strlen(original);
 
-	if (originalLength == 0)
+	if (originalLength == 0) {
 		return true;
+	}
 
 	X_ASSERT(wcscmp(original, replacement) != 0, "Replace operation cannot be performed. Strings are identical.")(original, replacement);
 
 	const wchar_t* pos = strUtil::Find(str_, str_ + len_, original, originalLength);
-	if (!pos)
+	if (!pos) {
 		return false;
+	}
 
 	wchar_t* const replacePos = const_cast<wchar_t*>(pos);
 
@@ -367,8 +372,9 @@ size_t StackString<N, wchar_t>::replaceAll(const wchar_t* original, const wchar_
 {
 	for (size_t count = 0;; ++count)
 	{
-		if (!replace(original, replacement))
+		if (!replace(original, replacement)) {
 			return count;
+		}
 	}
 }
 
@@ -495,8 +501,9 @@ template <size_t N>
 void StackString<N, wchar_t>::trimRight(wchar_t ch)
 {
 	const wchar_t* pos = find(ch);
-	if (pos != nullptr)
+	if (pos != nullptr) {
 		trimRight(pos);
+	}
 }
 
 
