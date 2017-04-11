@@ -55,6 +55,21 @@ namespace Compression
 			return pHdr->algo;
 		}
 
+		static bool validBuffer(const core::Array<uint8_t>& data) {
+			if (data.size() < sizeof(BufferHdr)) {
+				return false;
+			}
+			const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(data.ptr());
+			if (!pHdr->IsMagicValid()) {
+				return false;
+			}
+			if (static_cast<uint32_t>(pHdr->algo) >= Algo::ENUM_COUNT) {
+				return false;
+			}
+			
+			return true;
+		}
+
 		// max source buffer size.
 		virtual size_t maxSourceSize(void) const X_ABSTRACT;
 		// buffer than source is garanted to fit into.
