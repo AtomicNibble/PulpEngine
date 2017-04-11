@@ -733,7 +733,9 @@ void xFrame::PaintButton( int Idx, FrameButton* but, HDC dc, Recti rec )
 		break;
 	}
 
-	DrawIconEx(dc, pos.x,pos.y, Img, 16, 16, 0, NULL, DI_NORMAL);
+	if (Img) {
+		DrawIconEx(dc, pos.x, pos.y, Img, 16, 16, 0, NULL, DI_NORMAL);
+	}
 }
 
 
