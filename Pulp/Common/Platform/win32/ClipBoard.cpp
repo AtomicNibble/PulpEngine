@@ -11,7 +11,9 @@ namespace clipboard
 	{
 		core::lastError::Description Dsc;
 
-		const size_t strLen = pEnd - pBegin;
+		X_ASSERT(pBegin <= pEnd, "Invalid range")(pBegin, pEnd);
+
+		const size_t strLen = union_cast<size_t>(pEnd - pBegin);
 		HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, strLen);
 		LPSTR pDst = reinterpret_cast<LPSTR>(GlobalLock(hMem));
 
