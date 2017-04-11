@@ -2736,6 +2736,11 @@ bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& 
 	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
 	core::LinearAllocator allocator(buf, buf + sizeof(buf));
 
+	if (!core::Compression::ICompressor::validBuffer(deflated)) {
+		X_ERROR("AssetDB", "Tried to invalid a invalid buffer");
+		return false;
+	}
+
 	const core::Compression::Algo::Enum algo = core::Compression::ICompressor::getAlgo(deflated);
 
 	auto* pCompressor = AllocCompressor(&allocator, algo);
