@@ -289,8 +289,9 @@ bool StackString<N, TChar>::replace(const TChar* start, const TChar* original, c
 	// find the position of the string to replace
 	const size_t originalLength = strUtil::strlen(original);
 	const TChar* pos = strUtil::Find(start, str_ + len_, original, originalLength);
-	if (!pos)
+	if (!pos) {
 		return false;
+	}
 
 	TChar* const replacePos = const_cast<TChar*>(pos);
 
@@ -318,15 +319,17 @@ bool StackString<N, TChar>::replace(const TChar* original, const TChar* replacem
 	// find the position of the string to replace
 	const size_t originalLength = strUtil::strlen(original);
 
-	if (originalLength == 0)
+	if (originalLength == 0) {
 		return true;
+	}
 
 	X_ASSERT(strcmp(original, replacement) != 0, "Replace operation cannot be performed. Strings are identical.")(original, replacement);
 
 
 	const TChar* pos = strUtil::Find(str_, str_ + len_, original, originalLength);
-	if (!pos)
+	if (!pos) {
 		return false;
+	}
 
 	TChar* const replacePos = const_cast<TChar*>(pos);
 
@@ -370,8 +373,9 @@ size_t StackString<N, TChar>::replaceAll(const TChar* original, const TChar* rep
 {
 	for (size_t count = 0;; ++count)
 	{
-		if (!replace(original, replacement))
+		if (!replace(original, replacement)) {
 			return count;
+		}
 	}
 }
 
@@ -500,8 +504,9 @@ template <size_t N, typename TChar>
 void StackString<N, TChar>::trimRight(TChar ch)
 {
 	const TChar* pos = find(ch);
-	if (pos != nullptr)
+	if (pos != nullptr) {
 		trimRight(pos);
+	}
 }
 
 
@@ -518,8 +523,9 @@ StackString<N, TChar>& StackString<N, TChar>::trimLeft(void)
 	// we just loop over the string while there is white space and we are inside the string.
 	const TChar* str = str_;
 
-	while (*str && strUtil::IsWhitespace((TChar)*str))
+	while (*str && strUtil::IsWhitespace((TChar)*str)) {
 		str++;
+	}
 
 	// if they not equal we found white space.
 	if (str != str_)
@@ -546,8 +552,9 @@ StackString<N, TChar>& StackString<N, TChar>::trimRight(void)
 	const TChar* str = this->end() - 1;
 	const TChar* start = this->begin();
 
-	while (str > start && strUtil::IsWhitespace((TChar)*str))
+	while (str > start && strUtil::IsWhitespace((TChar)*str)) {
 		--str;
+	}
 
 	if (str != end())
 	{
