@@ -253,6 +253,7 @@ private:
 	static bool ValidName(const core::string& name);
 
 	static core::Compression::ICompressor* AllocCompressor(core::LinearAllocator* pAllocator, core::Compression::Algo::Enum algo);
+	static bool InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated);
 
 private:
 	sql::SqlLiteDb db_;

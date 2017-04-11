@@ -1930,23 +1930,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 	}
 
 	// decompress it.
-	const Algo::Enum algo = ICompressor::getAlgo(compressedData);
-
-	if (algo == Algo::LZ4) {
-		Compressor<LZ4> def;
-		return def.inflate(g_AssetDBArena, compressedData, dataOut);
-	}
-	else if (algo == Algo::LZMA) {
-		Compressor<LZMA> def;
-		return def.inflate(g_AssetDBArena, compressedData, dataOut);
-	}
-	else if (algo == Algo::ZLIB) {
-		Compressor<Zlib> def;
-		return def.inflate(g_AssetDBArena, compressedData, dataOut);
-	}
-
-	X_ERROR("AssetDB", "Failed to read rawfile, unknown compression algo");
-	return false;
+	return InflateBuffer(g_AssetDBArena, compressedData, dataOut);
 }
 
 bool AssetDB::AssetHasRawFile(int32_t assetId, int32_t* pRawFileId)
@@ -2021,23 +2005,7 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbD
 	}
 
 	// decompress it.
-	Algo::Enum algo = ICompressor::getAlgo(compressedData);
-
-	if (algo == Algo::LZ4) {
-		Compressor<LZ4> def;
-		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
-	}
-	else if (algo == Algo::LZMA) {
-		Compressor<LZMA> def;
-		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
-	}
-	else if (algo == Algo::ZLIB) {
-		Compressor<Zlib> def;
-		return def.inflate(g_AssetDBArena, compressedData, thumbDataOut);
-	}
-
-	X_ERROR("AssetDB", "Failed to read thumb, unknown compression algo");
-	return false;
+ 	return InflateBuffer(g_AssetDBArena, compressedData, thumbDataOut);
 }
 
 
@@ -2763,5 +2731,24 @@ core::Compression::ICompressor* AssetDB::AllocCompressor(core::LinearAllocator* 
 	return pCom;
 }
 
+bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated)
+{
+	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
+	core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+	const core::Compression::Algo::Enum algo = core::Compression::ICompressor::getAlgo(deflated);
+
+	auto* pCompressor = AllocCompressor(&allocator, algo);
+	if (!pCompressor) {
+		X_ERROR("AssetDB", "Failed to get compressor");
+		return false;
+	}
+
+	bool result = pCompressor->inflate(scratchArena, deflated, inflated);
+
+	core::Mem::Destruct(pCompressor);
+
+	return result;
+}
 
 X_NAMESPACE_END
