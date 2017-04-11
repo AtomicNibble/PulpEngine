@@ -52,8 +52,7 @@ namespace VirtualMem
 		{
 			lastError::Description Dsc;
 			X_ERROR( "VirtualMem", "Cannot allocate %d bytes of physical memory at virtual address 0x%08p. Error: %s", 
-				size, reservedMemory,
-				lastError::ToString( Dsc ) );
+				size, reservedMemory, lastError::ToString( Dsc ) );
 		}
 
 		return pMem;
@@ -65,8 +64,7 @@ namespace VirtualMem
 		{
 			lastError::Description Dsc;
 			X_ERROR( "VirtualMem", "Cannot free %d bytes of physical memory at virtual address 0x%08p. Error: %s", 
-				size, allocatedMemory,
-				lastError::ToString( Dsc ) );
+				size, allocatedMemory, lastError::ToString( Dsc ) );
 		}
 	}
 
