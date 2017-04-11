@@ -131,7 +131,7 @@ namespace Encryption
 	}
 
 	//----------------------------------------------------------------------------------
-	void Salsa20::generateKeyStream(uint8_t output[BLOCK_SIZE])
+	void Salsa20::generateKeyStream(uint8_t pOutput[BLOCK_SIZE])
 	{
 		uint32_t x[VECTOR_SIZE];
 		memcpy(x, vector_, sizeof(vector_));
@@ -179,7 +179,7 @@ namespace Encryption
 
 		for (size_t i = 0; i < VECTOR_SIZE; ++i)
 		{
-			convert(x[i], &output[4 * i]);
+			convert(x[i], &pOutput[4 * i]);
 		}
 
 		++vector_[8];
@@ -192,7 +192,7 @@ namespace Encryption
 	// This is not very efficent but not important as it's only used to gernerate one keystream
 	// only if the byte offset of the incomming buffer is not a multiple of block size.
 	// before the buffer is passed to the sse version.
-	void Salsa20::generateKeyStreamSSEOrdering(uint8_t output[BLOCK_SIZE])
+	void Salsa20::generateKeyStreamSSEOrdering(uint8_t pOutput[BLOCK_SIZE])
 	{
 		uint32_t x[VECTOR_SIZE];
 
@@ -290,7 +290,7 @@ namespace Encryption
 
 		for (size_t i = 0; i < VECTOR_SIZE; ++i)
 		{
-			convert(x[i], &output[4 * i]);
+			convert(x[i], &pOutput[4 * i]);
 		}
 
 		++vector_[8];
@@ -299,17 +299,17 @@ namespace Encryption
 #endif // SALSA20_SSE
 
 	//----------------------------------------------------------------------------------
-	void Salsa20::processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks)
+	void Salsa20::processBlocks(const uint8_t* pInput, uint8_t* pOutput, size_t numBlocks)
 	{
-		X_ASSERT_NOT_NULL(input);
-		X_ASSERT_NOT_NULL(output);
+		X_ASSERT_NOT_NULL(pInput);
+		X_ASSERT_NOT_NULL(pOutput);
 
 #if SALSA20_SSE
 		if (SSEnabled())
 		{
 			const int64_t byteOffset = ((vector_[5] * 0xFFFFFFFF) + vector_[8]) * BLOCK_SIZE;
 
-			processBytesSSE(input, output, numBlocks * BLOCK_SIZE, byteOffset);
+			processBytesSSE(pInput, pOutput, numBlocks * BLOCK_SIZE, byteOffset);
 			return;
 		}
 #endif // !SALSA20_SSE
@@ -321,16 +321,16 @@ namespace Encryption
 			generateKeyStream(keyStream);
 
 			for (size_t j = 0; j < BLOCK_SIZE; ++j) {
-				*(output++) = keyStream[j] ^ *(input++);
+				*(pOutput++) = keyStream[j] ^ *(pInput++);
 			}
 		}
 	}
 
 	//----------------------------------------------------------------------------------
-	void Salsa20::processBytes(const uint8_t* input, uint8_t* output, size_t numBytes)
+	void Salsa20::processBytes(const uint8_t* pInput, uint8_t* pOutput, size_t numBytes)
 	{
-		X_ASSERT_NOT_NULL(input);
-		X_ASSERT_NOT_NULL(output);
+		X_ASSERT_NOT_NULL(pInput);
+		X_ASSERT_NOT_NULL(pOutput);
 
 #if SALSA20_SSE
 		if (SSEnabled())
@@ -338,7 +338,7 @@ namespace Encryption
 			// work out current byte offset to pass to sse version.
 			const int64_t byteOffset = ((vector_[5] * 0xFFFFFFFF) + vector_[8]) * BLOCK_SIZE;
 
-			processBytesSSE(input, output, numBytes, byteOffset);
+			processBytesSSE(pInput, pOutput, numBytes, byteOffset);
 			return;
 		}
 #endif // !SALSA20_SSE
@@ -352,14 +352,14 @@ namespace Encryption
 			numBytesToProcess = numBytes >= BLOCK_SIZE ? BLOCK_SIZE : numBytes;
 
 			for (size_t i = 0; i < numBytesToProcess; ++i, --numBytes) {
-				*(output++) = keyStream[i] ^ *(input++);
+				*(pOutput++) = keyStream[i] ^ *(pInput++);
 			}
 		}
 	}
 
 
 	//----------------------------------------------------------------------------------
-	void Salsa20::processBytes(const uint8_t* input, uint8_t* output,
+	void Salsa20::processBytes(const uint8_t* pInput, uint8_t* pOutput,
 		size_t numBytes, int64_t byteOffset)
 	{
 		uint8_t keyStream[BLOCK_SIZE];
@@ -381,14 +381,14 @@ namespace Encryption
 				numBytesToProcess = core::Min(numBytes, BLOCK_SIZE - streamOffset);
 
 				for (size_t i = streamOffset; i < streamOffset + numBytesToProcess; ++i, --numBytes) {
-					*(output++) = keyStream[i] ^ *(input++);
+					*(pOutput++) = keyStream[i] ^ *(pInput++);
 				}
 
 				// patch vars since we reset iv coutns in processBytesSSE
 				byteOffset += numBytesToProcess;
 			}
 
-			processBytesSSE(input, output, numBytes, byteOffset);
+			processBytesSSE(pInput, pOutput, numBytes, byteOffset);
 			return;
 		}
 #endif // !SALSA20_SSE
@@ -408,7 +408,7 @@ namespace Encryption
 			numBytesToProcess = core::Min(numBytes, BLOCK_SIZE - streamOffset);
 
 			for (size_t i = streamOffset; i < streamOffset + numBytesToProcess; ++i, --numBytes) {
-				*(output++) = keyStream[i] ^ *(input++);
+				*(pOutput++) = keyStream[i] ^ *(pInput++);
 			}
 		}
 
@@ -418,7 +418,7 @@ namespace Encryption
 			numBytesToProcess = numBytes >= BLOCK_SIZE ? BLOCK_SIZE : numBytes;
 
 			for (size_t i = 0; i < numBytesToProcess; ++i, --numBytes) {
-				*(output++) = keyStream[i] ^ *(input++);
+				*(pOutput++) = keyStream[i] ^ *(pInput++);
 			}
 		}
 	}
@@ -476,15 +476,15 @@ namespace Encryption
 	}
 
 	//----------------------------------------------------------------------------------
-	void Salsa20::processBytesSSE(const uint8_t* input, uint8_t* output,
+	void Salsa20::processBytesSSE(const uint8_t* pInput, uint8_t* pOutput,
 		size_t numBytes, int64_t byteOffset)
 	{
 		uint8_t keyStream[BLOCK_SIZE];
 		size_t bytes = numBytes;
 		size_t i;
 
-		const uint8_t* m = input;
-		uint8_t* c = output;
+		const uint8_t* m = pInput;
+		uint8_t* c = pOutput;
 		uint8_t* ctarget = c;
 
 		{
