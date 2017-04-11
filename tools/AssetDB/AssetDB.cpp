@@ -1930,7 +1930,12 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 	}
 
 	// decompress it.
-	return InflateBuffer(g_AssetDBArena, compressedData, dataOut);
+	if (!InflateBuffer(g_AssetDBArena, compressedData, dataOut)) {
+		X_ERROR("AssetDB", "Failed to read rawfile, error inflating");
+		return false;
+	}
+
+	return true;
 }
 
 bool AssetDB::AssetHasRawFile(int32_t assetId, int32_t* pRawFileId)
@@ -2005,7 +2010,12 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbD
 	}
 
 	// decompress it.
- 	return InflateBuffer(g_AssetDBArena, compressedData, thumbDataOut);
+	if (!InflateBuffer(g_AssetDBArena, compressedData, thumbDataOut)) {
+		X_ERROR("AssetDB", "Failed to read thumb, error inflating");
+		return false;
+	}
+
+	return true;
 }
 
 
