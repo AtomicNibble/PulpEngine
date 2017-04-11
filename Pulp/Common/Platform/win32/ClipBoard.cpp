@@ -86,7 +86,7 @@ namespace clipboard
 		bufOut[strLength] = '\0';
 
 		// copy it shit face.
-		strncpy(bufOut, (char*)pGlobal, strLength);
+		std::memcpy(bufOut, pGlobal, strLength);
 
 		if (!GlobalUnlock(hGlobal)) {
 			X_WARNING("Clipboard", "failed to unlock global data. Error: %s", core::lastError::ToString(Dsc));
