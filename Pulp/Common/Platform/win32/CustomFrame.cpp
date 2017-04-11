@@ -841,12 +841,12 @@ void xFrame::NCButtonDown( HWND hwnd, ULONG message, WPARAM wparam, LPARAM lpara
 				break;
 			case HTGROWBOX: // HTMAXBUTTON: 
 				{
-					if( i == 1)
+					if(i == 1 && (i+1) < sizeof(Buttons_) / sizeof(Buttons_[0]))
 					{
 						pwind->MaxiMise();
 						Buttons_[i+1].Draw = true;
 					}
-					else
+					else if(i > 0)
 					{
 						pwind->Restore();			
 						Buttons_[i-1].Draw = true;
