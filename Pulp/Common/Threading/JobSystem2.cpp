@@ -287,6 +287,7 @@ namespace V2
 		const uint32_t idx = safe_static_cast<uint32_t, size_t>(threadIdToIndex_.size());
 
 		X_ASSERT(idx < HW_THREAD_MAX, "No room for thread que")(idx, HW_THREAD_MAX);
+		X_ASSERT(pThreadQues_[idx] == nullptr, "Double init")(threadId, idx);
 
 		pThreadQues_[idx] = X_NEW(ThreadQue, gEnv->pArena, "JobThreadQue");
 		pJobAllocators_[idx] = X_NEW(ThreadJobAllocator, gEnv->pArena, "JobThreadAllocator");
