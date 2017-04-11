@@ -92,7 +92,7 @@ void xWindow::UnRegisterClass(void)
 	s_numwindows--;
 	if (s_numwindows == 0 && g_ClassRegisterd) 
 	{
-		wchar_t wTxt[256];
+		wchar_t wTxt[256] = { 0 };
 		core::strUtil::Convert(g_EngineName, wTxt);
 
 		UnregisterClassW(wTxt, GetModuleHandle(NULL));
@@ -277,7 +277,7 @@ Recti xWindow::GetDesktopRect(void)
 bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int height, xWindow::Mode::Enum mode)
 {
 	lastError::Description Dsc;
-	wchar_t wTxt[256];
+	wchar_t wTxt[256] = { 0 };
 
 	if( !g_ClassRegisterd ) {
 		X_FATAL( "Window", "You cannot create a window before xlib has been started.", Title, lastError::ToString( Dsc ) );
