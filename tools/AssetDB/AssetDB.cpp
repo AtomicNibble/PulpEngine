@@ -1512,7 +1512,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
 
-
 	return UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
 }
 
