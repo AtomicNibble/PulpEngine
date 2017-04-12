@@ -1513,6 +1513,11 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		return Result::OK;
 	}
 
+	if (!core::Compression::ICompressor::validBuffer(compressedData)) {
+		X_ERROR("AssetDB", "Passed invalid buffer to UpdateAsset");
+		return Result::ERROR;
+	}
+
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
 
