@@ -1668,7 +1668,9 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 	return Result::OK;
 }
  
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& data)
+
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim,
+	const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
 	int32_t assetId;
 
@@ -1676,21 +1678,65 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 		return Result::NOT_FOUND;
 	}
 
-	return UpdateAssetThumb(assetId, thumbDim, srcDim, data);
+	return UpdateAssetThumb(assetId, thumbDim, srcDim, data, algo, lvl);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data)
+
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
+	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
+{
+	DataArr compressed(data.getArena());
+
+	core::StopWatch timer;
+
+	if (!DeflateBuffer(g_AssetDBArena, data, compressed, algo, lvl)) {
+		X_ERROR("AssetDB", "Failed to defalte thumb data");
+		return Result::ERROR;
+	}
+
+	const auto elapsed = timer.GetMilliSeconds();
+	const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
+
+	core::HumanSize::Str sizeStr, sizeStr2;
+	X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2g%%) %gms",
+		core::HumanSize::toString(sizeStr, data.size()),
+		core::HumanSize::toString(sizeStr2, compressed.size()),
+		percentageSize,
+		elapsed
+	);
+
+	return UpdateAssetThumb(assetId, thumbDim, srcDim, compressed);
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, 
+	const DataArr& compressedData)
+{
+	int32_t assetId;
+
+	if (!AssetExsists(type, name, &assetId)) {
+		return Result::NOT_FOUND;
+	}
+
+	return UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
 {
 	// so my little floating goat, we gonna store the thumbs with hash names.
 	// that way i don't need to rename the fuckers if i rename the asset.
 	// might do same for raw assets at somepoint...
 
+	if (!core::Compression::ICompressor::validBuffer(compressedData)) {
+		X_ERROR("AssetDB", "Passed invalid buffer to UpdateAssetThumb");
+		return Result::ERROR;
+	}
+
 	core::Hash::MD5 hasher;
-	hasher.update(data.data(), data.size());
+	hasher.update(compressedData.data(), compressedData.size());
 	const auto hash = hasher.finalize();
 
 	int32_t thumbId = INVALID_THUMB_ID;
-	if (data.isNotEmpty())
+	if (compressedData.isNotEmpty())
 	{
 		ThumbInfo thumb;
 
@@ -1704,33 +1750,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 		}
 	}
 
-
-	core::StopWatch timer;
-
-	// compress the thumb with a quick pass.
-	DataArr compressed(data.getArena());
-	core::Compression::Compressor<core::Compression::LZ4> comp;
-
-	if (!comp.deflate(data.getArena(), data, compressed, core::Compression::CompressLevel::NORMAL))
-	{
-		X_ERROR("AssetDB", "Failed to defalte thumb data");
-		return Result::ERROR;
-	}
-	else
-	{
-		const auto elapsed = timer.GetMilliSeconds();
-		const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
-
-		core::HumanSize::Str sizeStr, sizeStr2;
-		X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2g%%) %gms",
-			core::HumanSize::toString(sizeStr, data.size()),
-			core::HumanSize::toString(sizeStr2, compressed.size()),
-			percentageSize,
-			elapsed);
-	}
-
 	sql::SqlLiteTransaction trans(db_);
-
 
 	// write new data.
 	{
@@ -1762,7 +1782,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 				return Result::ERROR;
 			}
 
-			if (file.write(compressed.ptr(), compressed.size()) != compressed.size()) {
+			if (file.write(compressedData.ptr(), compressedData.size()) != compressedData.size()) {
 				X_ERROR("AssetDB", "Failed to write thumb data");
 				return Result::ERROR;
 			}
@@ -1782,7 +1802,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 			cmd.bind(2, thumbDim.y);
 			cmd.bind(3, srcDim.x);
 			cmd.bind(4, srcDim.y);
-			cmd.bind(5, safe_static_cast<int32_t, size_t>(compressed.size()));
+			cmd.bind(5, safe_static_cast<int32_t, size_t>(compressedData.size()));
 			cmd.bind(6, &hash, sizeof(hash));
 
 			sql::Result::Enum res = cmd.execute();
@@ -1814,7 +1834,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 		cmd.bind(2, thumbDim.y);
 		cmd.bind(3, srcDim.x);
 		cmd.bind(4, srcDim.y);
-		cmd.bind(5, safe_static_cast<int32_t, size_t>(compressed.size()));
+		cmd.bind(5, safe_static_cast<int32_t, size_t>(compressedData.size()));
 		cmd.bind(6, &hash, sizeof(hash));
 		cmd.bind(7, thumbId);
 
