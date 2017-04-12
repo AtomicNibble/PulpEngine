@@ -1508,6 +1508,16 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
 	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData)
 {
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
+
+
+	return UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
+	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
+{
 	if (compressedData.isEmpty())
 	{
 		return Result::OK;
@@ -1518,8 +1528,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		return Result::ERROR;
 	}
 
-	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
 
 	// save the file.
 	core::Path<char> path;
