@@ -257,6 +257,8 @@ private:
 
 	static core::Compression::ICompressor* AllocCompressor(core::LinearAllocator* pAllocator, core::Compression::Algo::Enum algo);
 	static bool InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated);
+	static bool DeflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& data, DataArr& deflated, 
+		core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl);
 
 private:
 	sql::SqlLiteDb db_;

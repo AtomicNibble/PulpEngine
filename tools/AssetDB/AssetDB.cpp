@@ -2786,4 +2786,24 @@ bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& 
 	return result;
 }
 
+bool AssetDB::DeflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& data, DataArr& deflated,
+	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
+{
+	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
+	core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+	auto* pCompressor = AllocCompressor(&allocator, algo);
+	if (!pCompressor) {
+		X_ERROR("AssetDB", "Failed to get compressor");
+		return false;
+	}
+
+	bool result = pCompressor->deflate(scratchArena, data, deflated, lvl);
+
+	core::Mem::Destruct(pCompressor);
+
+	return result;
+}
+
+
 X_NAMESPACE_END
