@@ -1361,7 +1361,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 
 	{
-		auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData);
+		auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
 		if (res != Result::OK) {
 			return res;
 		}
@@ -1496,7 +1496,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
 
-	auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData);
+	auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
 	if (res != Result::OK) {
 		return res;
 	}
@@ -1504,6 +1504,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	trans.commit();
 	return Result::OK;
 }
+
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
 	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData)
