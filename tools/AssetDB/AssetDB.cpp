@@ -1336,6 +1336,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	rawId = INVALID_RAWFILE_ID;
 	if (compressedData.isNotEmpty())
 	{
+		if (!core::Compression::ICompressor::validBuffer(compressedData)) {
+			X_ERROR("AssetDB", "Passed invalid buffer to UpdateAsset");
+			return Result::ERROR;
+		}
+
 		RawFile rawData;
 
 		if (GetRawfileForId(assetId, rawData, &rawId))
