@@ -1895,8 +1895,6 @@ bool AssetDB::GetModIdForAsset(int32_t assetId, ModId& modIdOut)
 
 bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 {
-	using namespace core::Compression;
-
 	RawFile raw;
 
 	if (!GetRawfileForId(assetId, raw)) {
@@ -1976,8 +1974,6 @@ bool AssetDB::AssetHasThumb(int32_t assetId)
 
 bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut)
 {
-	using namespace core::Compression;
-
 	if (!GetThumbInfoForId(assetId, info)) {
 	// just treat it as no thumb.
 	//	X_ERROR("AssetDB", "Failed to get thumb info for data retrieval");
