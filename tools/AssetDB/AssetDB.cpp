@@ -1360,6 +1360,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
 
+	if (compressedData.isNotEmpty())
 	{
 		auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
 		if (res != Result::OK) {
@@ -1519,14 +1520,17 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
 {
 	X_UNUSED(trans); // not used just ensures you have taken one.
+	X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")(assetId);
+	X_ASSERT(name.isNotEmpty(), "Name can't be empty")(name.length());
 
-	if (compressedData.isEmpty())
-	{
-		return Result::OK;
+	// lets not allow this to be called wiht no data.
+	if (compressedData.isEmpty()) {
+		X_ERROR("AssetDB", "Passed empty buffer to UpdateRawFile");
+		return Result::ERROR;
 	}
 
 	if (!core::Compression::ICompressor::validBuffer(compressedData)) {
-		X_ERROR("AssetDB", "Passed invalid buffer to UpdateAsset");
+		X_ERROR("AssetDB", "Passed invalid buffer to UpdateRawFile");
 		return Result::ERROR;
 	}
 
