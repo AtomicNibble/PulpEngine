@@ -193,8 +193,8 @@ public:
 	// data in a compressed form.
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
 	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
-	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data);
-	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data);
+	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& compressedData);
+	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& compressedData);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
 	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& data);
 	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data);

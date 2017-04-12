@@ -1437,7 +1437,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 }
 
 
-AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& data)
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& compressedData)
 {
 	// we make use of the asset name and type, so the main logic is in that one.
 	AssetInfo info;
@@ -1446,11 +1446,11 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr
 		return Result::ERROR;
 	}
 
-	return UpdateAssetRawFile(info.type, info.name, data);
+	return UpdateAssetRawFile(info.type, info.name, compressedData);
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const core::string& name,
-	const DataArr& data)
+	const DataArr& compressedData)
 {
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Can't update asset with empty name");
@@ -1476,10 +1476,10 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")();
 
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
+	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
 
 	int32_t rawId = INVALID_RAWFILE_ID;
-	if (data.isNotEmpty())
+	if (compressedData.isNotEmpty())
 	{
 		RawFile rawData;
 
@@ -1496,7 +1496,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	// start the transaction.
 	sql::SqlLiteTransaction trans(db_);
 
-	auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, data);
+	auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData);
 	if (res != Result::OK) {
 		return res;
 	}
