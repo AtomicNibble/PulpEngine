@@ -557,7 +557,10 @@ bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim)
 		return false;
 	}
 
-	host.UpdateAssetThumb(assetId, targetDim, srcDim, buf);
+	// for png i should probs just use 'store'.
+	// or maybe save as rgb8 raw in tga or dds and lz4 high it.
+	// all depends on what i plan to view these thumbs in supports / likes.
+	host.UpdateAssetThumb(assetId, targetDim, srcDim, buf, core::Compression::Algo::LZ4, core::Compression::CompressLevel::LOW);
 	return true;
 }
 
