@@ -1506,15 +1506,15 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
-	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& data)
+	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData)
 {
-	if (data.isEmpty())
+	if (compressedData.isEmpty())
 	{
 		return Result::OK;
 	}
 
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
+	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
 
 	// save the file.
 	core::Path<char> path;
@@ -1539,7 +1539,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 			return Result::ERROR;
 		}
 
-		if (file.write(data.ptr(), data.size()) != data.size()) {
+		if (file.write(compressedData.ptr(), compressedData.size()) != compressedData.size()) {
 			X_ERROR("AssetDB", "Failed to write raw asset data");
 			return Result::ERROR;
 		}
@@ -1559,7 +1559,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		{
 			sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
 			cmd.bind(1, path.c_str());
-			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(2, safe_static_cast<int32_t, size_t>(compressedData.size()));
 			cmd.bind(3, static_cast<int32_t>(dataCrc));
 
 			sql::Result::Enum res = cmd.execute();
@@ -1587,7 +1587,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		// just update.
 		sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
 		cmd.bind(1, path.c_str());
-		cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
+		cmd.bind(2, safe_static_cast<int32_t, size_t>(compressedData.size()));
 		cmd.bind(3, static_cast<int32_t>(dataCrc));
 		cmd.bind(4, rawId);
 

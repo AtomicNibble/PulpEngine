@@ -235,7 +235,7 @@ public:
 
 private:
 	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, 
-		int32_t assetId, int32_t rawId, const DataArr& data);
+		int32_t assetId, int32_t rawId, const DataArr& compressedData);
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
