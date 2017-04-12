@@ -33,7 +33,7 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 	ModelCompiler::CompileFlags flags;
 
 	core::json::Document d;
-	d.Parse(args.c_str());
+	d.Parse(args.c_str(), args.length());
 
 
 	if (d.HasMember("zero_origin")) {
@@ -70,7 +70,7 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 	if (host.getConversionProfileData(assetDb::AssetType::MODEL, conProfile))
 	{
 		core::json::Document pd;
-		pd.Parse(conProfile.c_str());
+		pd.Parse(conProfile.c_str(), conProfile.length());
 
 		for (auto it = pd.MemberBegin(); it != pd.MemberEnd(); ++it)
 		{

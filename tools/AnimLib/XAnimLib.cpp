@@ -31,7 +31,7 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 	}
 
 	core::json::Document d;
-	d.Parse(args.c_str());
+	d.Parse(args.c_str(), args.length());
 
 	core::string modelName;
 	float posError = AnimCompiler::DEFAULT_POS_ERRR;
