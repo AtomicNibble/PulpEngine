@@ -1297,7 +1297,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
-	const DataArr& data, const core::string& argsOpt)
+	const DataArr& compressedData, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
 
@@ -1330,11 +1330,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	}
 
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
+	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
 	const uint32_t argsCrc = pCrc32->GetCRC32(args.c_str(), args.length());
 
 	rawId = INVALID_RAWFILE_ID;
-	if (data.isNotEmpty())
+	if (compressedData.isNotEmpty())
 	{
 		RawFile rawData;
 
@@ -1356,7 +1356,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 
 	{
-		auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, data);
+		auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData);
 		if (res != Result::OK) {
 			return res;
 		}

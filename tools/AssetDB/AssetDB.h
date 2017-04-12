@@ -188,7 +188,7 @@ public:
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name, const core::string& newName);
 
 	// Updating api
-	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const DataArr& data, const core::string& argsOpt);
+	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, const DataArr& compressedData, const core::string& argsOpt);
 	// will do the compression for you, saves losts of places duplicating same compressino logic in code base if they don't already have the 
 	// data in a compressed form.
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
