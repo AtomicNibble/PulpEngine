@@ -1519,6 +1519,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
 	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
 {
+	X_UNUSED(trans); // not used just ensures you have taken one.
+
 	if (compressedData.isEmpty())
 	{
 		return Result::OK;
