@@ -42,7 +42,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 
 	core::json::Document d;
-	d.Parse(args.c_str());
+	d.Parse(args.c_str(), args.length());
 
 	CompileFlags flags;
 	ScaleFactor::Enum scale = ScaleFactor::ORIGINAL;
@@ -224,11 +224,11 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
 
 	// we support global overrides.
-	core::string conProfile;
+	core::string conProfile; // this is COW, so cheap to get a copy here.
 	if (host.getConversionProfileData(assetDb::AssetType::IMG, conProfile))
 	{
 		core::json::Document pd;
-		pd.Parse(conProfile.c_str());
+		pd.Parse(conProfile.c_str(), conProfile.length());
 
 		for (auto it = pd.MemberBegin(); it != pd.MemberEnd(); ++it)
 		{
