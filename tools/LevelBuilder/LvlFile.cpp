@@ -170,12 +170,13 @@ namespace
 		ScopedNodeInfo(FileNode& node, core::XFileScoped& file) :
 			pNode_(&node), pFile_(file.GetFile())
 		{
-			node.offset = safe_static_cast<uint32_t, uint64_t>(file.tell());
-			node.offset -= sizeof(FileHeader);
+			pNode_->offset = safe_static_cast<uint32_t, uint64_t>(pFile_->tell());
+			pNode_->size = 0;
 		}
 		~ScopedNodeInfo() {
 			pNode_->size = safe_static_cast<uint32_t, uint64_t>(pFile_->tell() - pNode_->offset);
-			pNode_->size -= sizeof(FileHeader);
+			// when loading we don't offset from header, do this after working out size based on offset so that's correct.
+			pNode_->offset -= sizeof(FileHeader); 
 		}
 
 		FileNode* pNode_;
