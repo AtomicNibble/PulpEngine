@@ -1297,6 +1297,12 @@ void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Adding ban: \"%s\" timeout: %" PRIi64 "ms", ip, timeout.GetMilliSecondsAsInt64());
 
+	// check if the ip is valid format?
+	if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
+		X_ERROR("Net", "Can't add ban for \"%s\" it's a invalid address", ip.c_str());
+		return;
+	}
+
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	auto assignBanTime = [timeNow](Ban& ban, core::TimeVal timeout) {
@@ -1330,6 +1336,11 @@ void XPeer::removeFromBanList(const IPStr& ip)
 
 	X_LOG0_IF(vars_.debugEnabled(), "Net", "Removing ban: \"%s\"", ip);
 	
+	if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
+		X_ERROR("Net", "Can't remove ban for \"%s\" it's a invalid address", ip.c_str());
+		return;
+	}
+
 	auto findBanIP = [&ip](const Ban& oth) {
 		return oth.ip == ip;
 	};

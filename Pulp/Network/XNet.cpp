@@ -247,6 +247,12 @@ void XNet::Cmd_addBan(core::IConsoleCmdArgs* pCmd)
 	}
 
 	IPStr ip(pIP);
+
+	if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
+		X_ERROR("Net", "Can't add ban for \"%s\" it's a invalid address", ip.c_str());
+		return;
+	}
+
 	core::TimeVal timeout;
 
 	int32_t timeoutMS = core::strUtil::StringToInt<int32_t>(pCmd->GetArg(2));
@@ -276,6 +282,11 @@ void XNet::Cmd_removeBan(core::IConsoleCmdArgs* pCmd)
 	}
 
 	IPStr ip(pIP);
+	if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
+		X_ERROR("Net", "Can't add ban for \"%s\" it's a invalid address", ip.c_str());
+		return;
+	}
+
 	for (auto* pPeer : peers_)
 	{
 		pPeer->removeFromBanList(ip);
