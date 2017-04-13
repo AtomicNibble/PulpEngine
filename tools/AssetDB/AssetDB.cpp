@@ -110,6 +110,9 @@ AssetDB::~AssetDB()
 
 bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
 	if (open_) {
 		return true;
 	}
