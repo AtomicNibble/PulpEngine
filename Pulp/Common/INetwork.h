@@ -332,7 +332,7 @@ struct IPeer
 
 	// bans at connection level.
 	virtual void addToBanList(const IPStr& ip, core::TimeVal timeout = core::TimeVal()) X_ABSTRACT;
-	virtual void removeFromBanList(const char* pIP) X_ABSTRACT;
+	virtual void removeFromBanList(const IPStr& ip) X_ABSTRACT;
 	virtual bool isBanned(const char* pIP) X_ABSTRACT;
 	virtual void clearBanList(void) X_ABSTRACT;
 

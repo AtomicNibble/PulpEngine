@@ -286,7 +286,7 @@ public:
 
 	// bans at connection level.
 	void addToBanList(const IPStr& ip, core::TimeVal timeout = core::TimeVal()) X_FINAL;
-	void removeFromBanList(const char* pIP) X_FINAL;
+	void removeFromBanList(const IPStr& ip) X_FINAL;
 	bool isBanned(const char* pIP) X_FINAL;
 	bool isBanned(const IPStr& ip);
 	void clearBanList(void) X_FINAL;

@@ -269,9 +269,16 @@ void XNet::Cmd_removeBan(core::IConsoleCmdArgs* pCmd)
 		return;
 	}
 
+	const char* pIP = pCmd->GetArg(1);
+	if (core::strUtil::strlen(pIP) > IPStr::BUF_SIZE) {
+		X_WARNING("Net", "Ip is too long");
+		return;
+	}
+
+	IPStr ip(pIP);
 	for (auto* pPeer : peers_)
 	{
-		pPeer->removeFromBanList(pCmd->GetArg(1));
+		pPeer->removeFromBanList(ip);
 	}
 }
 

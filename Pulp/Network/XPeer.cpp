@@ -1322,10 +1322,8 @@ void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
 	assignBanTime(ban, timeout);
 }
 
-void XPeer::removeFromBanList(const char* pIP)
+void XPeer::removeFromBanList(const IPStr& ip)
 {
-	IPStr ip(pIP);
-
 	if (ip.isEmpty()) {
 		return;
 	}
