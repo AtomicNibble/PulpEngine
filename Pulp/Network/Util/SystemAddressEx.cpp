@@ -372,4 +372,30 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 	return true;
 }
 
+bool SystemAddressEx::isValidIP(const IPStr& ip, IpVersion::Enum ipVersion)
+{
+	if (ipVersion == IpVersion::Any || ipVersion == IpVersion::Ipv4)
+	{
+		platform::in_addr add;
+
+		if (platform::inet_pton(AF_INET, ip.c_str(), &add) == 1)
+		{
+			return true;
+		}
+	}
+	
+	if (ipVersion == IpVersion::Any || ipVersion == IpVersion::Ipv6)
+	{
+		platform::in6_addr add6;
+
+		if (platform::inet_pton(AF_INET, ip.c_str(), &add6) == 1)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
 X_NAMESPACE_END

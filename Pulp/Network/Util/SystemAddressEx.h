@@ -27,6 +27,7 @@ public:
 	bool fromHost(const HostStr& host, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Any);
 	bool fromHost(const HostStr& host, Port port, IpVersion::Enum ipVersion = IpVersion::Any);
 
+	static bool isValidIP(const IPStr& ip, IpVersion::Enum ipVersion = IpVersion::Any);
 private:
 	bool fromString(const char* pBegin, const char* pEnd, bool isHost, char portDelineator, IpVersion::Enum ipVersion);
 
