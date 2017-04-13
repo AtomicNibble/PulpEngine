@@ -237,9 +237,9 @@ public:
 	Result::Enum RemoveAssetParent(int32_t assetId);
 
 private:
-	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, 
+	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
 		int32_t assetId, int32_t rawId, const DataArr& compressedData);
-	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name,
+	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
 		int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc);
 
 

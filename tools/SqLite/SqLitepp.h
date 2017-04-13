@@ -319,11 +319,20 @@ public:
 	iterator end(void);
 };
 
-class DLL_EXPORT SqlLiteTransaction
+class DLL_EXPORT SqlLiteTransactionBase
+{
+protected:
+	SqlLiteTransactionBase() = default;
+	~SqlLiteTransactionBase() = default;
+
+	X_NO_COPY(SqlLiteTransactionBase);
+	X_NO_ASSIGN(SqlLiteTransactionBase);
+};
+
+class DLL_EXPORT SqlLiteTransaction : public SqlLiteTransactionBase
 {
 	X_NO_COPY(SqlLiteTransaction);
 	X_NO_ASSIGN(SqlLiteTransaction);
-
 
 public:
 	explicit SqlLiteTransaction(SqlLiteDb& db, 

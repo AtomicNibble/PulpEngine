@@ -1507,7 +1507,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 }
 
 
-AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
 	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData)
 {
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
@@ -1516,7 +1516,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 	return UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransaction& trans,
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
 	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
 {
 	X_UNUSED(trans); // not used just ensures you have taken one.
