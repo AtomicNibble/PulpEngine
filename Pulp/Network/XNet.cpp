@@ -237,7 +237,7 @@ void XNet::Cmd_listBans(core::IConsoleCmdArgs* pCmd)
 void XNet::Cmd_addBan(core::IConsoleCmdArgs* pCmd)
 {
 	if (pCmd->GetArgCount() != 3) {
-		X_WARNING("Net", "net_bans_add <address>, <ip>");
+		X_WARNING("Net", "net_bans_add <address>, <timeoutMS>");
 		return;
 	}
 
