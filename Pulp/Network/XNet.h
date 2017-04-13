@@ -48,6 +48,7 @@ private:
 	void Cmd_listBans(core::IConsoleCmdArgs* pCmd);
 	void Cmd_addBan(core::IConsoleCmdArgs* pCmd);
 	void Cmd_removeBan(core::IConsoleCmdArgs* pCmd);
+	void Cmd_resolveHost(core::IConsoleCmdArgs* pCmd);
 
 private:
 	core::MemoryArenaBase* arena_;

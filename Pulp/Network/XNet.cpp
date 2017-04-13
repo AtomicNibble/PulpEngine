@@ -3,6 +3,7 @@
 #include "XPeer.h"
 
 #include "Util\LibaryStartup.h"
+#include <Time\StopWatch.h>
 
 #include <Time\DateStamp.h>
 #include <ITimer.h>
@@ -44,6 +45,8 @@ void XNet::registerCmds(void)
 	ADD_COMMAND_MEMBER("net_bans_remove", this, XNet, &XNet::Cmd_removeBan, core::VarFlag::SYSTEM,
 		"Removes a ban if found. <address>");
 
+	ADD_COMMAND_MEMBER("net_resolve", this, XNet, &XNet::Cmd_resolveHost, core::VarFlag::SYSTEM,
+		"Resolves a given host, result is logged. <host>, <forceIpVersion(ipv4|ipv6)>");
 }
 
 bool XNet::init(void)
@@ -294,6 +297,52 @@ void XNet::Cmd_removeBan(core::IConsoleCmdArgs* pCmd)
 	}
 }
 
+void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
+{
+	if (pCmd->GetArgCount() < 2) {
+		X_WARNING("Net", "net_resolve <host>, <forceIpVersion(ipv4|ipv6)>");
+		return;
+	}
+
+	const char* pHost = pCmd->GetArg(1);
+	if (core::strUtil::strlen(pHost) > HostStr::BUF_SIZE) {
+		X_WARNING("Net", "Host name is too long");
+		return;
+	}
+
+	IpVersion::Enum ipVersion = IpVersion::Any;
+	if (pCmd->GetArgCount() > 2)
+	{
+		const char* pIpVersion = pCmd->GetArg(2);
+		if (core::strUtil::IsEqualCaseInsen(pIpVersion, "ipv4"))
+		{
+			ipVersion = IpVersion::Ipv4;
+		}
+		else if (core::strUtil::IsEqualCaseInsen(pIpVersion, "ipv6"))
+		{
+			ipVersion = IpVersion::Ipv6;
+		}
+		else
+		{
+			X_WARNING("Net", "net_resolve: Unknown ipVersion defaulting to Any");
+		}
+	}
+
+	HostStr hostStr(pHost);
+	SystemAddressEx address;
+
+	core::StopWatch timer;
+
+	if (!systemAddressFromHost(hostStr, address, ipVersion)) {
+		X_WARNING("Net", "Failed to resolve");
+		return;
+	}
+
+	IPStr ipStr;
+	address.toString(ipStr);
+
+	X_LOG0("Net", "Host: \"%s\" address: \"%s\" ^6%gms", hostStr.c_str(), ipStr.c_str(), timer.GetMilliSeconds());
+}
 
 X_NAMESPACE_END
 
