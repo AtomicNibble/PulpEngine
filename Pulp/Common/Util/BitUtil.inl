@@ -699,4 +699,25 @@ namespace bitUtil
 	{
 		return n <= 1 ? 1 : 1 + bitsNeededForValue((n + 1) / 2);
 	}
-}
+
+	// turns alpha char's into bit indexes.
+	// a = 6
+	// b = 7
+	// z = 31
+	constexpr inline uint32_t AlphaBit(char c)
+	{
+		return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
+	}
+
+	inline uint32_t AlphaBits(const char* pStr)
+	{
+		uint32 val = 0;
+
+		while (*pStr) {
+			val |= AlphaBit(*pStr++);
+		}
+
+		return val;
+	}
+
+} // namespace bitUtil

@@ -125,6 +125,14 @@ namespace bitUtil
 	// how many bits are needed to store this value?
 	template<typename T>
 	constexpr T bitsNeededForValue(T n);
+
+	// turns alpha char's into bit indexes.
+	// a = 6
+	// b = 7
+	// z = 31
+	constexpr inline uint32_t AlphaBit(char c);
+
+	inline uint32_t AlphaBits(const char* pStr);
 }
 
 #include "BitUtil.inl"

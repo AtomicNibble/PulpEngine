@@ -16,13 +16,6 @@ template class CVarInt<CVarBaseHeap>;
 
 namespace
 {
-	// turns alpha char's into bit indexes.
-	// a = 1
-	// b = 2
-	inline uint32_t AlphaBit(char c)
-	{
-		return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
-	}
 
 	inline int32_t TextToInt(const char* pStr, int32_t current, bool bitField)
 	{
@@ -39,7 +32,6 @@ namespace
 			return core::strUtil::StringToInt<int32_t>(pStr, 10);
 		}
 
-		
 		int32_t val = 0;
 		const char* pEnd = nullptr;
 
@@ -68,7 +60,7 @@ namespace
 		{
 			for (; *pEnd >= 'a'&& *pEnd <= 'z'; pEnd++)
 			{
-				val |= AlphaBit(*pEnd);
+				val |= core::bitUtil::AlphaBit(*pEnd);
 			}
 
 			if (*pEnd == '+')
