@@ -1295,13 +1295,24 @@ void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
 		return;
 	}
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Adding ban: \"%s\" timeout: %" PRIi64 "ms", ip, timeout.GetMilliSecondsAsInt64());
-
 	// check if the ip is valid format?
 	if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
 		X_ERROR("Net", "Can't add ban for \"%s\" it's a invalid address", ip.c_str());
 		return;
 	}
+
+	SystemAddressEx sysAdd;
+	if (sysAdd.fromIP(ip)) {
+		return;
+	}
+
+	addToBanList(sysAdd, timeout);
+}
+
+void XPeer::addToBanList(const SystemAddressEx& sysAdd, core::TimeVal timeout)
+{
+	IPStr ipStr;
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Adding ban: \"%s\" timeout: %" PRIi64 "ms", sysAdd.toString(ipStr, false), timeout.GetMilliSecondsAsInt64());
 
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
@@ -1316,7 +1327,7 @@ void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
 
 	for (auto& ban : bans_)
 	{
-		if (ban.ip == ip)
+		if (ban.sysAdd == sysAdd)
 		{
 			assignBanTime(ban, timeout);
 			return;
@@ -1324,7 +1335,7 @@ void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
 	}
 
 	auto& ban = bans_.AddOne();
-	ban.ip = ip;
+	ban.sysAdd = sysAdd;
 	assignBanTime(ban, timeout);
 }
 
@@ -1341,8 +1352,13 @@ void XPeer::removeFromBanList(const IPStr& ip)
 		return;
 	}
 
-	auto findBanIP = [&ip](const Ban& oth) {
-		return oth.ip == ip;
+	SystemAddressEx sysAdd;
+	if (sysAdd.fromIP(ip)) {
+		return;
+	}
+
+	auto findBanIP = [&sysAdd](const Ban& oth) {
+		return oth.sysAdd == sysAdd;
 	};
 
 	auto it = std::find_if(bans_.begin(), bans_.end(), findBanIP);
@@ -1356,12 +1372,16 @@ void XPeer::removeFromBanList(const IPStr& ip)
 	}
 }
 
-bool XPeer::isBanned(const char* pIP)
+bool XPeer::isBanned(const IPStr& ip)
 {
-	return isBanned(IPStr(pIP));
+	if (bans_.isEmpty()) {
+		return false;
+	}
+
+	return isBanned(ip);
 }
 
-bool XPeer::isBanned(const IPStr& ip)
+bool XPeer::isBanned(const SystemAddressEx& sysAdd)
 {
 	if (bans_.isEmpty()) {
 		return false;
@@ -1371,7 +1391,7 @@ bool XPeer::isBanned(const IPStr& ip)
 	{
 		auto& ban = (*it);
 
-		if (ipWildMatch(ban.ip, ip)) 
+		if (ban.sysAdd == sysAdd)
 		{
 			// expired?
 			if (ban.timeOut.GetValue() != 0)
@@ -1411,7 +1431,8 @@ void XPeer::listBans(void) const
 			msLeft = (ban.timeOut - timeNow).GetMilliSecondsAsInt64();
 		}
 
-		X_LOG0("Net", "Ban: \"%s\" timeLeftMS: ^5%" PRIi64, ban.ip.c_str(), msLeft);
+		IPStr ipStr;
+		X_LOG0("Net", "Ban: \"%s\" timeLeftMS: ^5%" PRIi64, ban.sysAdd.toString(ipStr), msLeft);
 	}
 }
 
@@ -1951,10 +1972,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 	X_ASSERT_NOT_NULL(pData->pSrcSocket);
 	X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")(pData, pData->bytesRead);
 
-	IPStr ipStr;
-	pData->systemAddress.toString(ipStr, false);
-
-	if (isBanned(ipStr))
+	if (isBanned(pData->systemAddress))
 	{
 		// you fucking twat!
 		updateBS.write(MessageID::ConnectionBanned);
@@ -1994,11 +2012,13 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 
 
 	RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAddress, true);
-	if (!pRemoteSys) {
-		X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", ipStr);
+	if (!pRemoteSys)
+	{
+		IPStr ipStr;
+		X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", pData->systemAddress.toString(ipStr, false));
 
 		// temp ban them.
-		addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
+		addToBanList(pData->systemAddress, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 		return;
 	}
 

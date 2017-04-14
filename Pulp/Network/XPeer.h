@@ -159,7 +159,7 @@ struct RequestConnection
 
 struct Ban
 {
-	IPStr ip;
+	SystemAddressEx sysAdd;
 	core::TimeVal timeOut; // 0 = never.
 };
 
@@ -286,9 +286,10 @@ public:
 
 	// bans at connection level.
 	void addToBanList(const IPStr& ip, core::TimeVal timeout = core::TimeVal()) X_FINAL;
+	void addToBanList(const SystemAddressEx& sysAdd, core::TimeVal timeout = core::TimeVal());
 	void removeFromBanList(const IPStr& ip) X_FINAL;
-	bool isBanned(const char* pIP) X_FINAL;
-	bool isBanned(const IPStr& ip);
+	bool isBanned(const IPStr& ip) X_FINAL;
+	bool isBanned(const SystemAddressEx& sysAdd);
 	void clearBanList(void) X_FINAL;
 	void listBans(void) const;
 	void listLocalAddress(void) const;
