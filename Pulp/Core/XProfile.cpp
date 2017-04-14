@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XProfile.h"
 
+#include <Time\StopWatch.h>
 #include "Profile\ProfilerTypes.h"
 
 #include <IConsole.h>
@@ -84,6 +85,10 @@ XProfileSys::~XProfileSys()
 
 void XProfileSys::Init(ICore* pCore)
 {
+	X_LOG0("ProfileSys", "Starting");
+
+	core::StopWatch time;
+
 	pCore_ = pCore;
 
 	profiles_.setArena(gEnv->pArena, 512);
@@ -139,6 +144,8 @@ void XProfileSys::Init(ICore* pCore)
 	ADD_CVAR_REF("profile_draw_frame_time_graph", s_drawFrameTimeBar_, 1, 0, 1, 
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Display profiler frame time bar");
+
+	X_LOG0("ProfileSys", "Init ^6%gms", time.GetMilliSeconds());
 }
 
 
