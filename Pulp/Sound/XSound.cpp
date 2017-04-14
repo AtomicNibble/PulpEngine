@@ -267,8 +267,6 @@ bool XSound::Init(void)
 		return false;
 	}
 
-
-
 	// Create and initialise an instance of the default stream manager.
 	stmSettings.uMemorySize = vars_.StreamManagerMemoryPoolBytes();
 	if (!StreamMgr::Create(stmSettings))
