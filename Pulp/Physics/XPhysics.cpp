@@ -1294,7 +1294,17 @@ void XPhysics::createPvdConnection(void)
 
 	//Use these flags for a clean profile trace with minimal overhead
 	const int32_t flags = vars_.getPVDFlags();
-	physx::PxVisualDebuggerConnectionFlags connectionFlags = static_cast<physx::PxVisualDebuggerConnectionFlags>(flags);
+	physx::PxVisualDebuggerConnectionFlags connectionFlags(0);
+
+	if (core::bitUtil::IsBitFlagSet(flags, core::bitUtil::AlphaBit('d'))) {
+		connectionFlags |= physx::PxVisualDebuggerConnectionFlag::eDEBUG;
+	}
+	if (core::bitUtil::IsBitFlagSet(flags, core::bitUtil::AlphaBit('p'))) {
+		connectionFlags |= physx::PxVisualDebuggerConnectionFlag::ePROFILE;
+	}
+	if (core::bitUtil::IsBitFlagSet(flags, core::bitUtil::AlphaBit('m'))) {
+		connectionFlags |= physx::PxVisualDebuggerConnectionFlag::eMEMORY;
+	}
 
 	//Create a pvd connection that writes data straight to the filesystem.  This is
 	//the fastest connection on windows for various reasons.  First, the transport is quite fast as

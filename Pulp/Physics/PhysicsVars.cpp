@@ -57,13 +57,13 @@ void PhysXVars::RegisterVars(void)
 	ADD_CVAR_REF("phys_pvd_timeout", pvdTineoutMS_, 10, 0, std::numeric_limits<uint16_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"PVD connection tomeout in MS");
 
-	const uint32_t allFlags = (physx::PxVisualDebuggerConnectionFlag::eDEBUG |
-						  physx::PxVisualDebuggerConnectionFlag::ePROFILE |
-						  physx::PxVisualDebuggerConnectionFlag::eMEMORY);
-
-	ADD_CVAR_REF("phys_pvd_flags", pvdFlags_, allFlags, 0, allFlags,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"PVD connection Falgs.");
+	ADD_CVAR_REF("phys_pvd_flags", pvdFlags_, core::bitUtil::AlphaBits("dpm"), 0, core::bitUtil::AlphaBits("dpm"),
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::BITFIELD,
+		"PVD connection Falgs. "
+		"d: Debug, "
+		"p: Profile, "
+		"m: Memory"
+	);
 
 	pVarPvdIp_ = ADD_CVAR_STRING("phys_pvd_ip", "127.0.0.1", core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"PVD connection ip");
