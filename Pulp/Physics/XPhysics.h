@@ -166,7 +166,10 @@ private:
 	virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) X_FINAL;
 	// ~PxSimulationEventCallback
 
+	void PvdSetup(void);
+	void PvdCleanup(void);
 	void togglePvdConnection(void);
+	void closePvdConnection(void);
 	void createPvdConnection(void);
 
 	void updateRenderObjectsDebug(float dtime); // update of render actors debug draw information, will be called while the simulation is NOT running

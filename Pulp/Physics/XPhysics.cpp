@@ -320,11 +320,7 @@ bool XPhysics::init(const ToleranceScale& scale)
 		return false;
 	}
 	
-	if (pPhysics_->getPvdConnectionManager()) {
-		pPhysics_->getPvdConnectionManager()->addHandler(*this);
-	}
-
-	togglePvdConnection();
+	PvdSetup();
 
 	pPhysics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
@@ -372,6 +368,8 @@ void XPhysics::shutDown(void)
 	if (pCooking_) {
 		X_DELETE(pCooking_, arena_);
 	}
+
+	PvdCleanup();
 
 	if (pPhysics_) {
 		PxCloseExtensions();
@@ -1120,9 +1118,10 @@ void XPhysics::onPvdConnected(PVD::PvdConnection& conn)
 	X_UNUSED(conn);
 
 	//setup joint visualization.  This gets piped to pvd.
-	pPhysics_->getVisualDebugger()->setVisualizeConstraints(true);
-	pPhysics_->getVisualDebugger()->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true);
-	pPhysics_->getVisualDebugger()->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true);
+	auto* pVisualDebugger = pPhysics_->getVisualDebugger();
+	pVisualDebugger->setVisualizeConstraints(true);
+	pVisualDebugger->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true);
+	pVisualDebugger->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true);
 }
 
 void XPhysics::onPvdDisconnected(PVD::PvdConnection& conn)
@@ -1229,27 +1228,72 @@ void XPhysics::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 
 }
 
+// -------------------------------
+
+void XPhysics::PvdSetup(void)
+{
+	if (!vars_.PVDEnabled()) {
+		return;
+	}
+
+	auto* pPVD = pPhysics_->getPvdConnectionManager();
+	if (!pPVD) {
+		X_WARNING("Physics", "PVD is enabled but loaded modules don't support PVD. Hint try changing: 'phys_dll_override'");
+		return;
+	}
+
+	pPVD->addHandler(*this);
+
+	// attemp to connect now.
+	togglePvdConnection();
+}
+
+void XPhysics::PvdCleanup(void)
+{
+	closePvdConnection();
+
+	auto* pPVD = pPhysics_->getPvdConnectionManager();
+	if (pPVD) {
+		pPVD->removeHandler(*this);
+	}
+}
 
 void XPhysics::togglePvdConnection(void)
 {
-	if (!pPhysics_->getPvdConnectionManager())
+	physx::PxVisualDebuggerConnectionManager* pPVD = pPhysics_->getPvdConnectionManager();
+	if (!pPVD) {
 		return;
+	}
 
-	if (pPhysics_->getPvdConnectionManager()->isConnected()) {
-		pPhysics_->getPvdConnectionManager()->disconnect();
+	if (pPVD->isConnected()) {
+		pPVD->disconnect();
 	}
 	else {
 		createPvdConnection();
 	}
 }
 
+void XPhysics::closePvdConnection(void)
+{
+	physx::PxVisualDebuggerConnectionManager* pPVD = pPhysics_->getPvdConnectionManager();
+	if (!pPVD) {
+		return;
+	}
+
+	if (pPVD->isConnected()) {
+		pPVD->disconnect();
+	}
+}
+
 void XPhysics::createPvdConnection(void)
 {
-	physx::PxVisualDebuggerConnectionManager* pvd = pPhysics_->getPvdConnectionManager();
-	if (!pvd) {
+	physx::PxVisualDebuggerConnectionManager* pPVD = pPhysics_->getPvdConnectionManager();
+	if (!pPVD) {
 		X_ERROR("PhysicsSys", "Failed to get PVD connection manager");
 		return;
 	}
+
+	X_ASSERT(!pPVD->isConnected(), "Already connected")();
 
 	//The connection flags state overall what data is to be sent to PVD.  Currently
 	//the Debug connection flag requires support from the implementation (don't send
@@ -1260,7 +1304,8 @@ void XPhysics::createPvdConnection(void)
 	physx::PxVisualDebuggerConnectionFlags theConnectionFlags(
 		physx::PxVisualDebuggerConnectionFlag::eDEBUG |
 		physx::PxVisualDebuggerConnectionFlag::ePROFILE |
-		physx::PxVisualDebuggerConnectionFlag::eMEMORY);
+		physx::PxVisualDebuggerConnectionFlag::eMEMORY
+	);
 
 	if (!pvdParams_.useFullPvdConnection) {
 		theConnectionFlags = physx::PxVisualDebuggerConnectionFlag::ePROFILE;
@@ -1277,15 +1322,24 @@ void XPhysics::createPvdConnection(void)
 	//We don't worry about the return value because we are already registered as a listener for connections
 	//and thus our onPvdConnected call will take care of setting up our basic connection state.
 
-	physx::PxVisualDebuggerConnection* pCon = physx::PxVisualDebuggerExt::createConnection(pvd, pvdParams_.ip.c_str(), pvdParams_.port, pvdParams_.timeout, theConnectionFlags);
+	physx::PxVisualDebuggerConnection* pCon = physx::PxVisualDebuggerExt::createConnection(
+		pPVD, 
+		pvdParams_.ip.c_str(),
+		pvdParams_.port, 
+		pvdParams_.timeout, 
+		theConnectionFlags
+	);
+
 	if (pCon && pCon->isConnected()) {
 		X_LOG1("PhysicsSys", "Connected to PVD");
+	}
+	else {
+		X_WARNING("PhysicsSys", "Failed to create PVD connection");
 	}
 }
 
 
 // --------------------------------------------------------
-
 
 
 
