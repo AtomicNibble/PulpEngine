@@ -148,9 +148,9 @@ void CVarBase::Reset(void)
 template<class T>
 void CVarInt<T>::Set(const char* s)
 {
-	int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
 
-	Set(nValue);
+	Set(val);
 }
 
 
@@ -158,9 +158,9 @@ void CVarInt<T>::Set(const char* s)
 
 void CVarIntRef::Set(const char* s)
 {
-	int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
 
-	Set(nValue);
+	Set(val);
 }
 
 // ========================================================
