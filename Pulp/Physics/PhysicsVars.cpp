@@ -47,6 +47,9 @@ void PhysXVars::RegisterVars(void)
 
 	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugDrawChange>(this);
 
+	ADD_CVAR_REF("phys_enable_pvd", enablePVD_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Enable PVD connections. Must be enabled before you can even attempt to connect.");
+
 	// toggle drawing on off. seperate to the scales.
 	pVarDebugDraw_ = ADD_CVAR_REF("phys_draw_debug", debugDraw_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable drawing of physics debug shapes")->SetOnChangeCallback(del);

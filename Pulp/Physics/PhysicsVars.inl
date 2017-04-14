@@ -8,6 +8,12 @@ X_INLINE StepperType::Enum PhysXVars::GetStepperType(void) const
 	return stepperType_;
 }
 
+
+X_INLINE int32_t PhysXVars::PVDEnabled(void) const
+{
+	return enablePVD_;
+}
+
 X_INLINE int32_t PhysXVars::DebugDrawEnabled(void) const
 {
 	return debugDraw_;

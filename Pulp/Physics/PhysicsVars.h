@@ -29,6 +29,7 @@ public:
 	uint32_t ScratchBufferSize(void) const;
 	X_INLINE StepperType::Enum GetStepperType(void) const;
 
+	X_INLINE int32_t PVDEnabled(void) const;
 	X_INLINE int32_t DebugDrawEnabled(void) const;
 	X_INLINE int32_t DebugDrawCullEnabled(void) const;
 	X_INLINE int32_t UnifiedHeightFieldsEnabled(void) const;
@@ -55,6 +56,7 @@ private:
 	StepperType::Enum stepperType_;
 
 	DebugDrawEnabledDel debugDrawChangedDel_;
+	int32_t enablePVD_;
 	int32_t debugDraw_;
 	int32_t debugDrawUseCullBox_;
 	int32_t unifiedHeightFields_;
