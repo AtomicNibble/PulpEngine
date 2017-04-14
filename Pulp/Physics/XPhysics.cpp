@@ -104,14 +104,6 @@ namespace
 } // namespace
 
 
-XPhysics::PvdParameters::PvdParameters() :
-	ip("127.0.0.1"),
-	port(5425),
-	timeout(10),
-	useFullPvdConnection(true)
-{
-}
-
 // ---------------------------------
 
 const physx::PxShapeFlags XPhysics::DEFALT_SHAPE_FLAGS =
@@ -1232,7 +1224,7 @@ void XPhysics::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 
 void XPhysics::PvdSetup(void)
 {
-	if (!vars_.PVDEnabled()) {
+	if (!vars_.isPVDEnabled()) {
 		return;
 	}
 
@@ -1301,15 +1293,8 @@ void XPhysics::createPvdConnection(void)
 	//are taken care of by the PVD SDK.
 
 	//Use these flags for a clean profile trace with minimal overhead
-	physx::PxVisualDebuggerConnectionFlags theConnectionFlags(
-		physx::PxVisualDebuggerConnectionFlag::eDEBUG |
-		physx::PxVisualDebuggerConnectionFlag::ePROFILE |
-		physx::PxVisualDebuggerConnectionFlag::eMEMORY
-	);
-
-	if (!pvdParams_.useFullPvdConnection) {
-		theConnectionFlags = physx::PxVisualDebuggerConnectionFlag::ePROFILE;
-	}
+	const int32_t flags = vars_.getPVDFlags();
+	physx::PxVisualDebuggerConnectionFlags connectionFlags = static_cast<physx::PxVisualDebuggerConnectionFlags>(flags);
 
 	//Create a pvd connection that writes data straight to the filesystem.  This is
 	//the fastest connection on windows for various reasons.  First, the transport is quite fast as
@@ -1324,10 +1309,10 @@ void XPhysics::createPvdConnection(void)
 
 	physx::PxVisualDebuggerConnection* pCon = physx::PxVisualDebuggerExt::createConnection(
 		pPVD, 
-		pvdParams_.ip.c_str(),
-		pvdParams_.port, 
-		pvdParams_.timeout, 
-		theConnectionFlags
+		vars_.getPVDIp(),
+		vars_.getPVDPort(),
+		vars_.getPVDTimeoutMS(),
+		connectionFlags
 	);
 
 	if (pCon && pCon->isConnected()) {

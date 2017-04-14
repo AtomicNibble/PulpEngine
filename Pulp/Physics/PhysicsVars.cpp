@@ -14,7 +14,8 @@ PhysXVars::PhysXVars() :
 	pVarDllOverride_(nullptr),
 	pVarScratchBufSize_(nullptr),
 	pVarStepperType_(nullptr),
-	pVarDebugDraw_(nullptr)
+	pVarDebugDraw_(nullptr),
+	pVarPvdIp_(nullptr)
 {
 	scratchBufferDefaultSize_ = 16; // 16 KiB
 	stepperType_ = StepperType::FIXED_STEPPER;
@@ -47,8 +48,26 @@ void PhysXVars::RegisterVars(void)
 
 	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugDrawChange>(this);
 
-	ADD_CVAR_REF("phys_enable_pvd", enablePVD_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
-		"Enable PVD connections. Must be enabled before you can even attempt to connect.");
+	ADD_CVAR_REF("phys_pvd_enable", pvdEnable_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Enable PVD connections. Must be enabled before you can even attempt to connect");
+
+	ADD_CVAR_REF("phys_pvd_port", pvdPort_, 5425, 0, std::numeric_limits<uint16_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"PVD connection port");
+
+	ADD_CVAR_REF("phys_pvd_timeout", pvdTineoutMS_, 10, 0, std::numeric_limits<uint16_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"PVD connection tomeout in MS");
+
+	const uint32_t allFlags = (physx::PxVisualDebuggerConnectionFlag::eDEBUG |
+						  physx::PxVisualDebuggerConnectionFlag::ePROFILE |
+						  physx::PxVisualDebuggerConnectionFlag::eMEMORY);
+
+	ADD_CVAR_REF("phys_pvd_flags", pvdFlags_, allFlags, 0, allFlags,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"PVD connection Falgs.");
+
+	pVarPvdIp_ = ADD_CVAR_STRING("phys_pvd_ip", "127.0.0.1", core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"PVD connection ip");
+
 
 	// toggle drawing on off. seperate to the scales.
 	pVarDebugDraw_ = ADD_CVAR_REF("phys_draw_debug", debugDraw_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
@@ -164,6 +183,15 @@ uint32_t PhysXVars::ScratchBufferSize(void) const
 {
 	X_ASSERT_NOT_NULL(pVarScratchBufSize_);
 	return safe_static_cast<uint32_t, int32_t>(pVarScratchBufSize_->GetInteger() << 10);
+}
+
+
+const char* PhysXVars::getPVDIp(void) const
+{
+	X_ASSERT_NOT_NULL(pVarPvdIp_);
+
+	static core::ICVar::StrBuf buf; // this is not actually used. and we don't need to be thread safe here.
+	return pVarPvdIp_->GetString(buf);
 }
 
 void PhysXVars::SetDebugDrawEnabled(bool enable)

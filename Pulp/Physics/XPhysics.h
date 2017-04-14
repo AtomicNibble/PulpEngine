@@ -36,16 +36,6 @@ class XPhysics :
 	public IStepperHandler
 {
 
-	struct PvdParameters
-	{
-		PvdParameters();
-
-		core::StackString<128>	ip;
-		uint32_t	port;
-		uint32_t	timeout;
-		bool	useFullPvdConnection;
-	};
-
 	X_NO_COPY(XPhysics);
 	X_NO_ASSIGN(XPhysics);
 
@@ -223,7 +213,6 @@ private:
 	bool oneFrameUpdate_;
 	bool _pad;
 
-	PvdParameters pvdParams_;
 	physx::PxTolerancesScale scale_;
 
 	// Steppers

@@ -29,7 +29,13 @@ public:
 	uint32_t ScratchBufferSize(void) const;
 	X_INLINE StepperType::Enum GetStepperType(void) const;
 
-	X_INLINE int32_t PVDEnabled(void) const;
+	X_INLINE bool isPVDEnabled(void) const;
+	X_INLINE int32_t getPVDPort(void) const;
+	X_INLINE int32_t getPVDTimeoutMS(void) const;
+	X_INLINE int32_t getPVDFlags(void) const;
+	const char* getPVDIp(void) const;
+
+
 	X_INLINE int32_t DebugDrawEnabled(void) const;
 	X_INLINE int32_t DebugDrawCullEnabled(void) const;
 	X_INLINE int32_t UnifiedHeightFieldsEnabled(void) const;
@@ -54,9 +60,15 @@ private:
 
 	int32_t scratchBufferDefaultSize_;
 	StepperType::Enum stepperType_;
+	
+	int32_t pvdEnable_;
+	int32_t pvdPort_;
+	int32_t pvdTineoutMS_;
+	int32_t pvdFlags_;
+	core::ICVar* pVarPvdIp_;
+
 
 	DebugDrawEnabledDel debugDrawChangedDel_;
-	int32_t enablePVD_;
 	int32_t debugDraw_;
 	int32_t debugDrawUseCullBox_;
 	int32_t unifiedHeightFields_;

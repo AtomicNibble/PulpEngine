@@ -9,10 +9,26 @@ X_INLINE StepperType::Enum PhysXVars::GetStepperType(void) const
 }
 
 
-X_INLINE int32_t PhysXVars::PVDEnabled(void) const
+X_INLINE bool PhysXVars::isPVDEnabled(void) const
 {
-	return enablePVD_;
+	return pvdEnable_ != 0;
 }
+
+X_INLINE int32_t PhysXVars::getPVDPort(void) const
+{
+	return pvdPort_;
+}
+
+X_INLINE int32_t PhysXVars::getPVDTimeoutMS(void) const
+{
+	return pvdTineoutMS_;
+}
+
+X_INLINE int32_t PhysXVars::getPVDFlags(void) const
+{
+	return pvdFlags_;
+}
+
 
 X_INLINE int32_t PhysXVars::DebugDrawEnabled(void) const
 {
