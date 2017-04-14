@@ -756,6 +756,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 		{
 			uint8_t tmpBuf[5];
 			tmpBuf[0] = MessageID::SndReceiptAcked;
+			static_assert(sizeof(tmpBuf) - 1 >= sizeof(usedSendReceipt), "overflow");
 			std::memcpy(tmpBuf + 1, &usedSendReceipt, sizeof(usedSendReceipt));
 			sendLoopback(tmpBuf, sizeof(tmpBuf));
 		}
@@ -798,6 +799,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 		{
 			uint8_t tmpBuf[5];
 			tmpBuf[0] = MessageID::SndReceiptAcked;
+			static_assert(sizeof(tmpBuf) - 1 >= sizeof(usedSendReceipt), "overflow");
 			std::memcpy(tmpBuf + 1, &usedSendReceipt, sizeof(usedSendReceipt));
 			sendLoopback(tmpBuf, sizeof(tmpBuf));
 		}
