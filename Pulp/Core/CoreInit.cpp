@@ -436,24 +436,29 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if(!startupParams.isCoreOnly())
 	{
 		// #------------------------- Input ------------------------
-		if (!InitInput(startupParams))
+		if (!InitInput(startupParams)) {
 			return false;
+		}
 
 		// #------------------------- Font -------------------------
-		if (!InitFont(startupParams))
+		if (!InitFont(startupParams)) {
 			return false;
+		}
 
 		// #------------------------- Sound -------------------------
-		if (!InitSound(startupParams))
+		if (!InitSound(startupParams)) {
 			return false;
+		}
 
 		// #------------------------- Physics -------------------------
-		if (!InitPhysics(startupParams))
+		if (!InitPhysics(startupParams)) {
 			return false;
+		}
 
 		// #------------------------- ScriptSys -------------------------
-		if (!InitScriptSys(startupParams))
+		if (!InitScriptSys(startupParams)) {
 			return false;
+		}
 	}
 
 	if (startupParams.bEnableNetowrking)
