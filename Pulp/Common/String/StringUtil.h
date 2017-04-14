@@ -191,14 +191,14 @@ namespace strUtil
 	template <typename T>
 	inline T StringToInt(const char* str);
 	template <typename T>
-	inline T StringToInt(const char* str);
+	inline T StringToInt(const wchar_t* str);
 
 	/// \brief Converts a string into any floating-point type.
 	/// \remark Returns 0 if the string does not represent a valid floating-point value.
 	template <typename T>
 	inline T StringToFloat(const char* str);
 	template <typename T>
-	inline T StringToFloat(const char* str);
+	inline T StringToFloat(const wchar_t* str);
 
 	bool HasFileExtension(const char* path);
 	bool HasFileExtension(const wchar_t* path);
