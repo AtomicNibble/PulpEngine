@@ -13,7 +13,11 @@ struct IProfileSys
 {
 	virtual ~IProfileSys(){};
 
-	virtual void Init(ICore* pCore) X_ABSTRACT;
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
+	virtual bool init(ICore* pCore) X_ABSTRACT;
+	virtual void shutDown(void) X_ABSTRACT;
 
 	virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
 

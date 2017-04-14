@@ -23,15 +23,20 @@ class XProfileSys : public IProfileSys
 {
 
 public:
-	XProfileSys();
+	XProfileSys(core::MemoryArenaBase* arena);
 	~XProfileSys() X_FINAL;
 
-	virtual void Init(ICore* pCore) X_FINAL;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	virtual void AddProfileData(XProfileData* pData) X_FINAL;
+	bool init(ICore* pCore) X_FINAL;
+	void shutDown(void) X_FINAL;
 
-	virtual void OnFrameBegin(void) X_FINAL;
-	virtual void OnFrameEnd(void) X_FINAL;
+
+	void AddProfileData(XProfileData* pData) X_FINAL;
+
+	void OnFrameBegin(void) X_FINAL;
+	void OnFrameEnd(void) X_FINAL;
 
 private:
 	void UpdateProfileData(void);

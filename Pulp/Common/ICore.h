@@ -38,6 +38,7 @@ struct IJobSystem;
 struct IXHotReloadManager;
 struct IXDirectoryWatcher;
 struct FrameData;
+struct IProfileSys;
 class XProfileScope;
 class Crc32;
 class CpuInfo;

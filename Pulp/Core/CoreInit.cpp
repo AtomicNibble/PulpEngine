@@ -430,7 +430,14 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 
 	// #------------------------- ProfileSys ---------------------------
-	profileSys_.Init(this);
+	pProfileSys_ = X_NEW(core::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
+
+	pProfileSys_->registerVars();
+	pProfileSys_->registerCmds();
+
+	if (!pProfileSys_->init(this)) {
+		return false;
+	}
 
 
 	if(!startupParams.isCoreOnly())

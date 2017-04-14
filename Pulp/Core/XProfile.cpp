@@ -62,12 +62,12 @@ namespace
 
 XProfileSys* XProfileSys::s_this = nullptr;
 
-XProfileSys::XProfileSys() :
+XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
 	pCore_(nullptr),
 	pRender_(nullptr),
 	pPrimCon_(nullptr),
-	profiles_(nullptr),
-	displayInfo_(nullptr),
+	profiles_(arena),
+	displayInfo_(arena),
 	// --------
 	frameStartTime_(0),
 	frameTime_(0),
@@ -75,7 +75,6 @@ XProfileSys::XProfileSys() :
 {
 	s_this = this;
 
-//	profiles_.reserve(512);
 }
 
 XProfileSys::~XProfileSys()
@@ -83,7 +82,36 @@ XProfileSys::~XProfileSys()
 
 }
 
-void XProfileSys::Init(ICore* pCore)
+void XProfileSys::registerVars(void)
+{
+	ADD_CVAR_REF("profile_draw", s_drawProfileInfo_, 0, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler info. (visible items enabled via profile_draw_* vars)");
+	ADD_CVAR_REF("profile_draw_when_console_expanded", s_drawProfileInfoWhenConsoleExpaned_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler even when console is expanded");
+	ADD_CVAR_REF("profile_draw_subsystems", s_drawSubsystems_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler subsystem block");
+	ADD_CVAR_REF("profile_draw_meminfo", s_drawMemInfo_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler mem info blocks");
+	ADD_CVAR_REF("profile_draw_stats_table", s_drawStats_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler stats table block");
+	ADD_CVAR_REF("profile_draw_frame_time_graph", s_drawFrameTimeBar_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler frame time bar");
+}
+
+void XProfileSys::registerCmds(void)
+{
+
+}
+
+
+
+bool XProfileSys::init(ICore* pCore)
 {
 	X_LOG0("ProfileSys", "Starting");
 
@@ -91,8 +119,8 @@ void XProfileSys::Init(ICore* pCore)
 
 	pCore_ = pCore;
 
-	profiles_.setArena(gEnv->pArena, 512);
-	displayInfo_.setArena(gEnv->pArena, 512);
+	profiles_.reserve(512);
+	displayInfo_.reserve(512);
 
 	gEnv->profileScopeStart = &ScopeStart;
 	gEnv->profileScopeEnd = &ScopeEnd;
@@ -124,30 +152,18 @@ void XProfileSys::Init(ICore* pCore)
 
 #endif // !X_DEBUG
 
-	// register some vars.
-	
-	ADD_CVAR_REF("profile_draw", s_drawProfileInfo_, 0, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-			"Display profiler info. (visible items enabled via profile_draw_* vars)");
-	ADD_CVAR_REF("profile_draw_when_console_expanded", s_drawProfileInfoWhenConsoleExpaned_, 1, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Display profiler even when console is expanded");
-	ADD_CVAR_REF("profile_draw_subsystems", s_drawSubsystems_, 1, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Display profiler subsystem block");
-	ADD_CVAR_REF("profile_draw_meminfo", s_drawMemInfo_, 1, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Display profiler mem info blocks");
-	ADD_CVAR_REF("profile_draw_stats_table", s_drawStats_, 1, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Display profiler stats table block");
-	ADD_CVAR_REF("profile_draw_frame_time_graph", s_drawFrameTimeBar_, 1, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Display profiler frame time bar");
 
 	X_LOG0("ProfileSys", "Init ^6%gms", time.GetMilliSeconds());
+	return true;
 }
 
+
+void XProfileSys::shutDown(void)
+{
+	// ...
+	gEnv->profileScopeStart = nullptr;
+	gEnv->profileScopeEnd = nullptr;
+}
 
 
 void XProfileSys::AddProfileData(XProfileData* pData)

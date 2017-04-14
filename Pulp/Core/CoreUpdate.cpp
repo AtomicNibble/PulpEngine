@@ -59,7 +59,9 @@ bool XCore::Update(void)
 	X_PROFILE_BEGIN("CoreUpdate", core::ProfileSubSys::CORE);
 	using namespace core::V2;
 
-	profileSys_.OnFrameBegin();
+	if (pProfileSys_) {
+		pProfileSys_->OnFrameBegin();
+	}
 
 	if (env_.pJobSys) {
 		env_.pJobSys->OnFrameBegin();
@@ -245,7 +247,9 @@ void XCore::RenderEnd(core::FrameData& frameData)
 
 
 		// draw me all the profile wins!
-		profileSys_.Render();
+		if (pProfileSys_) {
+			pProfileSys_->Render();
+		}
 
 		if (core::IConsole* pConsole = GetIConsole()) {
 			pConsole->draw(frameData.timeInfo);
@@ -253,12 +257,19 @@ void XCore::RenderEnd(core::FrameData& frameData)
 		
 		env_.pRender->renderEnd();
 	}
+
 	// End
-	profileSys_.OnFrameEnd();
+	if (pProfileSys_) {
+		pProfileSys_->OnFrameEnd();
+	}
 
 
-	bool enabled = var_profile->GetInteger() > 0;
+	// wut is this.
+	const bool enabled = var_profile->GetInteger() > 0;
 
-	profileSys_.setEnabled(enabled);
+	if (pProfileSys_) {
+		pProfileSys_->setEnabled(enabled);
+	}
+
 	env_.profilerEnabled_ = enabled;
 }

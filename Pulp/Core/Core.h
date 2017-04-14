@@ -52,6 +52,7 @@ struct IPotatoFactoryRegistryImpl;
 struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
+class XProfileSys;
 class xWindow;
 class Console;
 )
@@ -248,7 +249,7 @@ private:
 	ConverterModulesArr				converterInterfaces_;
 	ArrsetHandlersArr				assertHandlers_;
 
-	core::XProfileSys				profileSys_;
+	core::XProfileSys*				pProfileSys_;
 
 	// Hot reload stuff
 	core::XDirectoryWatcher			dirWatcher_;
