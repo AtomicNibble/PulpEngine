@@ -748,7 +748,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 		usedSendReceipt = incrementNextSendReceipt();
 	}
 
-	if (!broadcast && isLoopbackAddress(systemHandle, true))
+	if (!broadcast && isLoopbackHandle(systemHandle))
 	{
 		sendLoopback(pData, lengthBytes);
 
@@ -790,7 +790,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 
 	uint32_t usedSendReceipt = incrementNextSendReceipt();
 
-	if (isLoopbackAddress(systemHandle, true))
+	if (isLoopbackHandle(systemHandle))
 	{
 		sendLoopback(pData, lengthBytes);
 
@@ -897,42 +897,6 @@ void XPeer::clearPackets(void)
 	packetQue_.tryPopAll([&](Packet* pPacket) {
 		freePacket(pPacket);
 	});
-}
-
-bool XPeer::isLoopbackAddress(SystemHandle systemHandle, bool matchPort) const
-{
-#if 1
-	X_UNUSED(systemHandle);
-	X_UNUSED(matchPort);
-
-	return false;
-#else
-	if (!systemIdentifier.isAddressValid()) {
-		return false;
-	}
-
-	const SystemAdd& sysAdd = *static_cast<const SystemAdd*>(systemIdentifier.pSystemAddress);
-
-	if (matchPort)
-	{
-		for (const auto& local : ipList_) {
-			if (local == sysAdd) {
-				return true;
-			}
-		}
-	}
-	else
-	{
-		for (const auto& local : ipList_) {
-			if (local.equalExcludingPort(sysAdd)) {
-				return true;
-			}
-		}
-	}
-
-	// nope.
-	return false;
-#endif
 }
 
 const RemoteSystem* XPeer::getRemoteSystem(SystemHandle handle, bool onlyActive) const

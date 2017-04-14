@@ -94,6 +94,12 @@ X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPrio
 	);
 }
 
+
+X_INLINE bool XPeer::isLoopbackHandle(SystemHandle systemHandle)
+{
+	return systemHandle == LOOPBACK_SYSTEM_HANDLE;
+}
+
 X_INLINE void XPeer::pushBackPacket(Packet* pPacket)
 {
 	X_ASSERT_NOT_NULL(pPacket);

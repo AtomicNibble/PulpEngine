@@ -328,7 +328,7 @@ private:
 	void sendPing(RemoteSystem& rs, PacketReliability::Enum rel);
 	void notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
 	
-	bool isLoopbackAddress(SystemHandle systemHandle, bool matchPort) const;
+	X_INLINE static bool isLoopbackHandle(SystemHandle systemHandle);
 
 	// Remote Sys
 	const RemoteSystem* getRemoteSystem(SystemHandle handle, bool onlyActive) const;
