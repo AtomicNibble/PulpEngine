@@ -164,7 +164,6 @@
     <ClInclude Include="IProfile.h" />
     <ClInclude Include="IRender.h" />
     <ClInclude Include="I3DEngine.h" />
-    <ClInclude Include="IRenderAux.h" />
     <ClInclude Include="IRenderMesh.h" />
     <ClInclude Include="IScriptSys.h" />
     <ClInclude Include="ISerialize.h" />

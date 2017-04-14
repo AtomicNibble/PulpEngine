@@ -308,7 +308,6 @@ typedef IPixelBuffer IDepthBuffer;
 
 
 
-X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
 X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
 X_DECLARE_ENUM(BufUsage)(
 	IMMUTABLE,  // never changes

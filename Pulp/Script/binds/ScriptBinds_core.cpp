@@ -4,7 +4,6 @@
 #include <IConsole.h>
 
 #include <IRender.h>
-#include <IRenderAux.h>
 #include <ITimer.h>
 #include <IFont.h>
 

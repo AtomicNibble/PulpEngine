@@ -1114,9 +1114,6 @@
     <ClInclude Include="IRenderMesh.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
-    <ClInclude Include="IRenderAux.h">
-      <Filter>Interfaces_h\Render</Filter>
-    </ClInclude>
     <ClInclude Include="IShader.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>

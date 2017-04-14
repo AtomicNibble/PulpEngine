@@ -39,12 +39,6 @@
     <Filter Include="Source Files\Texture">
       <UniqueIdentifier>{2b92c334-4bfc-4797-bc8b-d27c649bda7d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Auxiliary">
-      <UniqueIdentifier>{a26dabc2-6f1f-4a57-91cb-2aa2ed88bacb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Auxiliary">
-      <UniqueIdentifier>{a76ee69f-2a9e-4804-84c4-03af50d9084e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Vars">
       <UniqueIdentifier>{51c0198f-eaed-42ec-967d-dd59fd4a24e8}</UniqueIdentifier>
     </Filter>
