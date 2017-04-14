@@ -16,6 +16,7 @@ static const SocketHandle INVALID_SOCKET = SocketHandle(~0);
 const SystemAddressEx UNASSIGNED_SYSTEM_ADDRESS;
 const NetGUID UNASSIGNED_NET_GUID(0ull);
 
+static const uint32_t MAX_BANS = 64;		// if need more bans than this, ill sort them so can check if banned quicker. this is basically a 'it's worth the effort now limit'.
 static const uint32_t MAX_INTERNAL_IDS = 8;
 static const uint32_t MAX_MTU_SIZE = 1492; // 1472 
 static const uint32_t MIN_MTU_SIZE = 400;

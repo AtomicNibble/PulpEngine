@@ -1334,6 +1334,12 @@ void XPeer::addToBanList(const SystemAddressEx& sysAdd, core::TimeVal timeout)
 		}
 	}
 
+	if (bans_.size() == MAX_BANS)
+	{
+		X_ERROR("Net", "Can't add ban for \"%s\" max ban limit(%" PRIu32 ") reached", sysAdd.toString(ipStr, false), MAX_BANS);
+		return;
+	}
+
 	auto& ban = bans_.AddOne();
 	ban.sysAdd = sysAdd;
 	assignBanTime(ban, timeout);
