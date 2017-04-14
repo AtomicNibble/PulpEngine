@@ -16,43 +16,76 @@ template class CVarInt<CVarBaseHeap>;
 
 namespace
 {
-
+	// turns alpha char's into bit indexes.
+	// a = 1
+	// b = 2
 	inline uint32_t AlphaBit(char c)
 	{
 		return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
 	}
 
-	inline int TextToInt(const char* s, int nCurrent, bool bBitfield)
+	inline int32_t TextToInt(const char* pStr, int32_t current, bool bitField)
 	{
-		int nValue = 0;
-		if (s)
+		if (!pStr) {
+			return current;
+		}
+
+		const size_t strLen = core::strUtil::strlen(pStr);
+		if (!strLen) {
+			return current;
+		}
+
+		if (!bitField) {
+			return core::strUtil::StringToInt<int32_t>(pStr, 10);
+		}
+
+		
+		int32_t val = 0;
+		const char* pEnd = nullptr;
+
+		// Bit manipulation.
+		if (pStr[0] == '^')
 		{
-			char* e;
-			if (bBitfield)
+			// Bit number
+			if (strLen > 1)
 			{
-				// Bit manipulation.
-				if (*s == '^')
-					// Bit number
-					nValue = 1 << strtol(++s, &e, 10);
-				else
-					// Full number
-					nValue = strtol(s, &e, 10);
-
-				// Check letter codes.
-				for (; *e >= 'a'&& *e <= 'z'; e++)
-					nValue |= AlphaBit(*e);
-
-				if (*e == '+')
-					nValue = nCurrent | nValue;
-				else if (*e == '-')
-					nValue = nCurrent & ~nValue;
-				else if (*e == '^')
-					nValue = nCurrent ^ nValue;
+				val = 1 << core::strUtil::StringToInt<int32_t>(++pStr, &pEnd, 10);
 			}
 			else
-				nValue = strtol(s, &e, 10);
+			{
+				// stupid noob.
+				val = 0;
+			}
 		}
-		return nValue;
+		else
+		{
+			// Full number
+			val = core::strUtil::StringToInt<int32_t>(pStr, &pEnd, 10);
+		}
+
+		// Check letter codes.
+		if (pEnd)
+		{
+			for (; *pEnd >= 'a'&& *pEnd <= 'z'; pEnd++)
+			{
+				val |= AlphaBit(*pEnd);
+			}
+
+			if (*pEnd == '+')
+			{
+				val = current | val;
+			}
+			else if (*pEnd == '-')
+			{
+				val = current & ~val;
+			}
+			else if (*pEnd == '^')
+			{
+				val = current ^ val;
+			}
+		}
+
+		return val;
 	}
 
 
