@@ -306,6 +306,8 @@ public:
 
 	bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
 
+	NetBandwidthStatistics getBandwidthStatistics(void) const X_FINAL;
+
 	// ~IPeer
 
 	X_INLINE void setUnreliableTimeout(core::TimeVal timeout);

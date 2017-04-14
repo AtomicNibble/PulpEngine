@@ -212,6 +212,10 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 	X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^3send:^7 pData ^5%p^7 length: ^5%" PRIi32 "^7 ttl: ^5%" PRIi32,
 		sendParameters.pData, sendParameters.length, sendParameters.ttl);
 
+#if X_ENABLE_NET_STATS
+	++stats_.numPacketsSent;
+	stats_.numBytesSent += sendParameters.length;
+#endif // !X_ENABLE_NET_STATS
 
 	const auto ipVer = sendParameters.systemAddress.getIPVersion();
 	if (sendParameters.ttl > 0)
@@ -298,6 +302,11 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 		X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastError::ToString(err, Dsc));
 		return RecvResult::Error;
 	}
+
+#if X_ENABLE_NET_STATS
+	++stats_.numPacketsRecived;
+	stats_.numBytesRecived += bytesRead;
+#endif // !X_ENABLE_NET_STATS
 
 	dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
 	dataOut.systemAddress.setFromAddStorage(senderAddr);
@@ -461,5 +470,15 @@ bool NetSocket::getTTL(IpVersion::Enum ipVer, int32_t& ttl)
 
 	return true;
 }
+
+
+#if X_ENABLE_NET_STATS
+
+NetBandwidthStatistics NetSocket::getStats(void) const
+{
+	return stats_;
+}
+
+#endif // !X_ENABLE_NET_STATS
 
 X_NAMESPACE_END

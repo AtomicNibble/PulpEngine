@@ -161,8 +161,27 @@ public:
 
 	bool isLimitedByCongestionControl;
 	bool isLimitedByOutgoingBadwidthLimit;
-
 }; 
+
+// global sats.
+struct NetBandwidthStatistics
+{
+
+	X_INLINE NetBandwidthStatistics& operator +=(const NetBandwidthStatistics& oth) {
+		numPacketsRecived += oth.numPacketsRecived;
+		numBytesRecived += oth.numBytesRecived;
+		numPacketsSent += oth.numPacketsSent;
+		numBytesSent += oth.numBytesSent;
+		return *this;
+	}
+
+	// leave signed.
+	int64_t numPacketsRecived;
+	int64_t numBytesRecived;
+
+	int64_t numPacketsSent;
+	int64_t numBytesSent;
+};
 
 // ---------------------------------
 
@@ -350,6 +369,7 @@ struct IPeer
 
 	virtual bool getStatistics(const NetGUID guid, NetStatistics& stats) X_ABSTRACT;
 
+	virtual NetBandwidthStatistics getBandwidthStatistics(void) const X_ABSTRACT;
 
 };
 

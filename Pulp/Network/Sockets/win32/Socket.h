@@ -86,13 +86,16 @@ public:
 
 	NetSocket& operator=(NetSocket&& oth);
 
-
 	BindResult::Enum bind(BindParameters& bindParameters);
 	bool sendSendTest(void);
 	SendResult send(SendParameters& sendParameters);
 	RecvResult::Enum recv(RecvData& dataOut);
 	
 	X_INLINE const SystemAddressEx& getBoundAdd(void) const;
+
+#if X_ENABLE_NET_STATS
+	NetBandwidthStatistics getStats(void) const;
+#endif // !X_ENABLE_NET_STATS
 
 public:
 	static bool getMyIPs(SystemAddArr& addresses);
@@ -116,6 +119,10 @@ private:
 	SocketType::Enum socketType_;
 	SocketHandle socket_;
 	SystemAddressEx boundAdd_;
+
+#if X_ENABLE_NET_STATS
+	NetBandwidthStatistics stats_;
+#endif // !X_ENABLE_NET_STATS
 };
 
 

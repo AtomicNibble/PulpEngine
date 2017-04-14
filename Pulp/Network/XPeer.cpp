@@ -1492,6 +1492,23 @@ bool XPeer::getStatistics(const NetGUID guid, NetStatistics& stats)
 }
 
 
+NetBandwidthStatistics XPeer::getBandwidthStatistics(void) const
+{
+	NetBandwidthStatistics stats;
+	core::zero_object(stats);
+
+#if X_ENABLE_NET_STATS
+	
+	for (const auto& socket : sockets_)
+	{
+		stats += socket.getStats();
+	}
+
+#endif // !X_ENABLE_NET_STATS
+
+	return stats;
+}
+
 // ~IPeer
 
 
