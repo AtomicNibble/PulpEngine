@@ -111,6 +111,7 @@ typedef core::StackString<46, char> NetGuidStr;
 typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
 
 static const SystemHandle INVALID_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max();
+static const SystemHandle LOOPBACK_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max() - 1;
 
 // ---------------------------------
 
