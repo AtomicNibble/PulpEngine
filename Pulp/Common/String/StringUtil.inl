@@ -92,6 +92,35 @@ namespace strUtil
 		return safe_static_cast<T>(_wtoi(str));
 	}
 
+	template <typename T>
+	inline T StringToInt(const char* str, int32_t base)
+	{
+		char* pEnd;
+		return safe_static_cast<T>(strtol(str, &pEnd, base));
+	}
+
+	template <typename T>
+	inline T StringToInt(const wchar_t* str, int32_t base)
+	{
+		wchar_t* pEnd;
+		return safe_static_cast<T>(wcstol(str, &pEnd, base));
+	}
+
+	template <typename T>
+	inline T StringToInt(const char* str, const char** pEndPtr, int32_t base)
+	{
+		X_ASSERT_NOT_NULL(pEndPtr);
+		return safe_static_cast<T>(strtol(str, const_cast<char**>(pEndPtr), base));
+	}
+
+	template <typename T>
+	inline T StringToInt(const wchar_t* str, const wchar_t** pEndPtr, int32_t base)
+	{
+		X_ASSERT_NOT_NULL(pEndPtr);
+		return safe_static_cast<T>(wcstol(str, const_cast<wchar_t**>(pEndPtr), base));
+	}
+
+
 
 	template <typename T>
 	inline T StringToFloat(const char* str)
