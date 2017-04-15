@@ -209,6 +209,6 @@ private:
 
 X_NAMESPACE_END
 
-#include <Threading\Thread.inl>
+#include "Thread.inl"
 
 #endif // !_X_THREAD_H_

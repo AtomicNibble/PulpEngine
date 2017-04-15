@@ -1524,9 +1524,6 @@
     <None Include="Math\XTransform.inl">
       <Filter>Headers\Math</Filter>
     </None>
-    <None Include="Threading\Thread.inl">
-      <Filter>Headers\Threading</Filter>
-    </None>
     <None Include="Containers\FixedBitStream.inl">
       <Filter>Headers\Containers</Filter>
     </None>
@@ -1538,6 +1535,9 @@
     </None>
     <None Include="Threading\FixedThreadQue.inl">
       <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\win32\Thread.inl">
+      <Filter>Headers\Threading\win32</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
