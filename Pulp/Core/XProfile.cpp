@@ -8,6 +8,7 @@
 
 #include "Profile\ProfilerTypes.h"
 
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -38,7 +39,8 @@ namespace
 		void CalculateCPUSpeed()
 		{
 			uint64_t start, elapsed;
-			const DWORD dwDelay = 100;
+			const uint32_t delayMS = 1;
+
 			core::Process pro = core::Process::GetCurrent();
 
 			// We want absolute maximum priority
@@ -49,15 +51,25 @@ namespace
 			core::Thread::SetPriority(core::Thread::Priority::REALTIME);
 			core::Thread::Sleep(0);	// Give up the rest of our timeslice so we don't get a context switch
 
-			start = getTicks();
-			core::Thread::Sleep(dwDelay);
-			elapsed = (getTicks() - start);
+			core::StopWatch time;
+
+			auto overhead = time.GetMilliSeconds();
+			time.Start();
+
+			start = getTicksFlush();
+			core::Thread::Sleep(delayMS);
+			elapsed = (getTicksFlush() - start);
+
+			auto elapsedTime = time.GetMilliSeconds() - (overhead);
 
 			// Reset priority and get speed
 			core::Thread::SetPriority(curThreadPri);
 			pro.SetPriorityClass(priorityClass);
 			
-			g_cpuspeed = 3200000; //  (elapsed * 100);
+			auto ticksPerMS = static_cast<uint64_t>(static_cast<double>(elapsed) / static_cast<double>(elapsedTime));
+
+			g_cpuspeed = ticksPerMS;
+			// g_cpuspeed = 3200000;
 		}
 		// 3200000000
 		// 3184599450000000
