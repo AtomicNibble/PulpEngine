@@ -2,9 +2,11 @@
 #include "XProfile.h"
 
 #include <Time\StopWatch.h>
-#include "Profile\ProfilerTypes.h"
+#include <Util\Process.h>
 
 #include <IConsole.h>
+
+#include "Profile\ProfilerTypes.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -37,11 +39,13 @@ namespace
 		{
 			uint64_t start, elapsed;
 			const DWORD dwDelay = 100;
+			core::Process pro = core::Process::GetCurrent();
 
 			// We want absolute maximum priority
-			DWORD dwPriorityClass = GetPriorityClass(GetCurrentProcess());
+			const auto priorityClass = pro.GetPriorityClass();
 			const auto curThreadPri = core::Thread::GetPriority();
-			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+			
+			pro.SetPriorityClass(core::Process::Priority::REALTIME);
 			core::Thread::SetPriority(core::Thread::Priority::REALTIME);
 			core::Thread::Sleep(0);	// Give up the rest of our timeslice so we don't get a context switch
 
@@ -51,7 +55,7 @@ namespace
 
 			// Reset priority and get speed
 			core::Thread::SetPriority(curThreadPri);
-			SetPriorityClass(GetCurrentProcess(), dwPriorityClass);
+			pro.SetPriorityClass(priorityClass);
 			
 			g_cpuspeed = 3200000; //  (elapsed * 100);
 		}
