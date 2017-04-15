@@ -1213,6 +1213,12 @@
     <ClInclude Include="Threading\FixedThreadQue.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Process.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\win32\Process.h">
+      <Filter>Headers\Util\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1892,6 +1898,9 @@
     </ClCompile>
     <ClCompile Include="SystemAddress.cpp">
       <Filter>Interfaces_h\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\Process.cpp">
+      <Filter>SourceFiles\Util\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

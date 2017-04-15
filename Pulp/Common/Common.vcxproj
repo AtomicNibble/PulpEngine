@@ -399,6 +399,7 @@
     <ClInclude Include="Util\Pointer64.h" />
     <ClInclude Include="Util\PointerFlags.h" />
     <ClInclude Include="Util\PointerUtil.h" />
+    <ClInclude Include="Util\Process.h" />
     <ClInclude Include="Util\ReferenceCounted.h" />
     <ClInclude Include="Util\ReferenceCountedOwner.h" />
     <ClInclude Include="Util\UniquePointer.h" />
@@ -408,8 +409,10 @@
     <ClInclude Include="Util\ToggleChecker.h" />
     <ClInclude Include="Util\UserLiterals.h" />
     <ClInclude Include="Util\win32\LastError.h" />
+    <ClInclude Include="Util\win32\Process.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Util\win32\Process.cpp" />
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
     <None Include="CBuffer.inl" />
