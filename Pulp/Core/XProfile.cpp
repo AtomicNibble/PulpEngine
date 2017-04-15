@@ -32,9 +32,9 @@ namespace
 
 			// We want absolute maximum priority
 			DWORD dwPriorityClass = GetPriorityClass(GetCurrentProcess());
-			int nPriority = GetThreadPriority(GetCurrentThread());
+			const auto curThreadPri = core::Thread::GetPriority();
 			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
-			SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
+			core::Thread::SetPriority(core::Thread::Priority::REALTIME);
 			core::Thread::Sleep(0);	// Give up the rest of our timeslice so we don't get a context switch
 
 			start = getTicks();
@@ -42,7 +42,7 @@ namespace
 			elapsed = (getTicks() - start);
 
 			// Reset priority and get speed
-			SetThreadPriority(GetCurrentThread(), nPriority);
+			core::Thread::SetPriority(curThreadPri);
 			SetPriorityClass(GetCurrentProcess(), dwPriorityClass);
 			
 			g_cpuspeed = 3200000; //  (elapsed * 100);
