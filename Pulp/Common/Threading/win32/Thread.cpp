@@ -210,6 +210,88 @@ void Thread::SetName(uint32_t threadId, const char* name)
 	setThreadName(threadId, name);
 }
 
+Thread::Priority::Enum Thread::GetPriority(void)
+{
+	int32_t pri = ::GetThreadPriority(::GetCurrentThread());
+	if (pri == THREAD_PRIORITY_ERROR_RETURN)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Thread", "Failed to get thread priority for id: % " PRIu32 ". Error: %s",
+			GetCurrentID(), lastError::ToString(Dsc));
+		return Priority::NORMAL;
+	}
+
+
+	switch (pri)
+	{
+		case THREAD_PRIORITY_LOWEST:
+			return Priority::LOWEST;
+		case THREAD_PRIORITY_BELOW_NORMAL:
+			return Priority::BELOW_NORMAL;
+		case THREAD_PRIORITY_NORMAL:
+			return Priority::NORMAL;
+		case THREAD_PRIORITY_ABOVE_NORMAL:
+			return Priority::ABOVE_NORMAL;
+		case THREAD_PRIORITY_HIGHEST:
+			return Priority::HIGHEST;
+		case THREAD_PRIORITY_TIME_CRITICAL:
+			return Priority::REALTIME;
+		case THREAD_PRIORITY_IDLE:
+			return Priority::IDLE;
+
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+	}
+
+	return Priority::NORMAL;
+}
+
+bool Thread::SetPriority(Priority::Enum priority)
+{
+	int pri = THREAD_PRIORITY_NORMAL;
+
+	switch (priority)
+	{
+		case Priority::LOWEST:
+			pri = THREAD_PRIORITY_LOWEST;
+			break;
+		case Priority::BELOW_NORMAL:
+			pri = THREAD_PRIORITY_BELOW_NORMAL;
+			break;
+		case Priority::NORMAL:
+			pri = THREAD_PRIORITY_NORMAL;
+			break;
+		case Priority::ABOVE_NORMAL:
+			pri = THREAD_PRIORITY_ABOVE_NORMAL;
+			break;
+		case Priority::HIGHEST:
+			pri = THREAD_PRIORITY_HIGHEST;
+			break;
+		case Priority::REALTIME:
+			pri = THREAD_PRIORITY_TIME_CRITICAL;
+			break;
+		case Priority::IDLE:
+			pri = THREAD_PRIORITY_IDLE;
+			break;
+
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+	}
+
+	if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL))
+	{
+		lastError::Description Dsc;
+		X_ERROR("Thread", "Failed to set thread priority for id: % " PRIu32 ". Error: %s", 
+			GetCurrentID(), lastError::ToString(Dsc));
+		return false;
+	}
+
+	return true;
+}
+
+
 void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 {
 	// Enable:

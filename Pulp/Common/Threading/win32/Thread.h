@@ -68,14 +68,25 @@ public:
 		};
 	};
 
-	X_DECLARE_FLAGS(CpuCore)(CORE0,CORE1,CORE2,
-		CORE3,CORE4,CORE5,CORE6,CORE7
+	X_DECLARE_FLAGS(CpuCore)(
+		CORE0,CORE1,CORE2,CORE3,
+		CORE4,CORE5,CORE6,CORE7
 	);
 
 	X_DECLARE_ENUM(FPE)(
 		NONE,	// nope . nope
 		BASIC,  // Invalid operation, Div by Zero!
 		ALL		// Invalid operation, Div by Zero, Denormalized operand, Overflow, UnuderFlow, Unexact
+	);
+
+	X_DECLARE_ENUM(Priority)(
+		LOWEST,
+		BELOW_NORMAL,
+		NORMAL,
+		ABOVE_NORMAL,
+		HIGHEST,
+		REALTIME,
+		IDLE
 	);
 
 public:
@@ -116,6 +127,8 @@ public:
 	static uint32_t GetCurrentID(void);
 	static void SetName(uint32_t threadId, const char* name);
 
+	static Priority::Enum GetPriority(void);
+	static bool SetPriority(Priority::Enum priority);
 	static void SetFPE(uint32_t threadId, FPE::Enum fpe);
 
 protected:
