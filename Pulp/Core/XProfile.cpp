@@ -16,13 +16,21 @@ namespace
 	{
 		static uint64_t g_cpuspeed = 1000000;
 
-		static inline uint64_t getTicks() {
+		X_INLINE uint64_t getTicks(void)
+		{
 			return __rdtsc();
 		}
-		static float32_t toMS(const uint64_t &t) {
-			return float32_t(t) / g_cpuspeed;
 
-		//	return float64_t(t) / float64_t(3200.0 * 1000000.0);
+		X_INLINE uint64_t getTicksFlush(void)
+		{
+			int temp[4];
+			__cpuid(temp, 0);
+			return __rdtsc();
+		}
+
+		X_INLINE float32_t toMS(const uint64_t &t) 
+		{
+			return float32_t(t) / g_cpuspeed;
 		}
 
 		void CalculateCPUSpeed()
