@@ -175,8 +175,9 @@ X_INLINE UniquePointer<T[]>::UniquePointer(UniquePointer&& oth) :
 template<typename T>
 X_INLINE UniquePointer<T[]>::~UniquePointer()
 {
-	if (get() != pointer()) {
-		deleter(get());
+	pointer ptr = get();
+	if (ptr != pointer()) {
+		deleter(ptr);
 	}
 }
 
