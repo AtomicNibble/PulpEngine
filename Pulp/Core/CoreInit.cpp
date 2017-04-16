@@ -390,7 +390,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole = X_NEW( core::XConsoleNULL, g_coreArena, "NullConsole");
 	}
 
-	if (env_.pConsole->init(this, startupParams.basicConsole()))
+	if (!env_.pConsole->init(this, startupParams.basicConsole()))
 	{
 		return false;
 	}
