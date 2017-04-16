@@ -43,13 +43,6 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(core)
 
-// do i want config files to hot reload.
-// porbs only for testing, might be anoying otherwise.
-#if X_DEBUG
-#define X_ENABLE_CONFIG_HOT_RELOAD 1
-#else
-#define X_ENABLE_CONFIG_HOT_RELOAD 0
-#endif // !X_DEBUG
 
 typedef core::MemoryArena<
 	core::PoolAllocator, 
