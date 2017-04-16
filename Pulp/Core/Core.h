@@ -35,18 +35,6 @@
 
 #include "Threading\JobSystem.h"
 
-// #include <vector>
-// #include <map>
-
-#ifdef WIN32
-typedef void* WIN_HMODULE;
-typedef void* WIN_HWND;
-typedef void* WIN_HINSTANCE;
-#else
-typedef void* WIN_HMODULE;
-typedef void* WIN_HWND;
-typedef void* WIN_HINSTANCE;
-#endif
 
 struct IPotatoFactoryRegistryImpl;
 struct IEngineModule;
