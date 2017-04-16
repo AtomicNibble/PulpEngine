@@ -73,11 +73,6 @@ class XEngineModule_Font : public IEngineModule
 			return false;
 		}
 
-		if (!pFontSys->Init()) {
-			X_DELETE(pFontSys, g_fontArena);
-			return false;
-		}
-
 		env.pFontSys = pFontSys;
 		return true;
 	}

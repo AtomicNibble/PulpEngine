@@ -25,8 +25,8 @@ public:
 	virtual void registerVars(void) X_FINAL;
 	virtual void registerCmds(void) X_FINAL;
 
-	virtual bool Init(void) X_FINAL;
-	virtual void ShutDown(void) X_FINAL;
+	virtual bool init(void) X_FINAL;
+	virtual void shutDown(void) X_FINAL;
 	virtual void release(void) X_FINAL;
 
 	virtual void Update(void) X_FINAL;

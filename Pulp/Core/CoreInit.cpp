@@ -687,23 +687,28 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 		return false;
 	}
 
-	if (!env_.pFontSys) {
+	X_ASSERT_NOT_NULL(env_.pFontSys);
+
+	env_.pFontSys->registerVars();
+	env_.pFontSys->registerCmds();
+
+	if (!env_.pFontSys->init()) {
+		X_ERROR("Font", "failed to init font system");
 		return false;
 	}
-
+ 
 	if (gEnv->IsDedicated()) { // don't need a font for dedicated.
 		return true;
 	}
 
 	// load a default font.
-	font::IFont* font = env_.pFontSys->NewFont("default");
-
-	if (font == nullptr) {
+	font::IFont* pFont = env_.pFontSys->NewFont("default");
+	if (!pFont) {
 		X_ERROR("Font", "failed to create default font");
 		return false;
 	}
 
-	if(!font->loadFont()) {
+	if(!pFont->loadFont()) {
 		X_ERROR("Font", "failed to load default font");
 		return false;
 	}
@@ -727,7 +732,7 @@ bool XCore::InitSound(const SCoreInitParams& initParams)
 	env_.pSound->registerVars();
 	env_.pSound->registerCmds();
 
-	if (!env_.pSound->Init()) {
+	if (!env_.pSound->init()) {
 		X_ERROR("Font", "failed to init sound system");
 		return false;
 	}

@@ -6,22 +6,13 @@
 
 X_NAMESPACE_BEGIN(sound)
 
-struct ISound
+struct ISound : public core::IModuleBase
 {
 	virtual ~ISound(){};
-
-	virtual void registerVars(void) X_ABSTRACT;
-	virtual void registerCmds(void) X_ABSTRACT;
-
-	virtual bool Init(void) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
-	virtual void release(void) X_ABSTRACT;
 
 	// ting tong wong, sing me a song in a thong!
 	virtual void Update(void) X_ABSTRACT;
 	virtual void StopAll(void) X_ABSTRACT;
-
-
 
 	// Shut up!
 	virtual void Mute(bool mute) X_ABSTRACT;

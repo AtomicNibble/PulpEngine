@@ -17,14 +17,10 @@ X_NAMESPACE_BEGIN(font)
 
 struct IFont;
 
-struct IFontSys
+struct IFontSys : public core::IModuleBase
 {
 	virtual ~IFontSys(){}
 	
-	virtual bool Init(void) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
-	virtual void release(void) X_ABSTRACT;
-
 	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 
 	// Summary:

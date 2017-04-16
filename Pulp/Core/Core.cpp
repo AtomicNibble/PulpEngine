@@ -246,13 +246,13 @@ void XCore::ShutDown()
 
 	if (env_.pSound)
 	{
-		env_.pSound->ShutDown();
+		env_.pSound->shutDown();
 		core::SafeRelease(env_.pSound);
 	}
 
 	if (env_.pFontSys)
 	{
-		env_.pFontSys->ShutDown();
+		env_.pFontSys->shutDown();
 		core::SafeRelease(env_.pFontSys);
 	}
 

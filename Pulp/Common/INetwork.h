@@ -375,17 +375,9 @@ struct IPeer
 
 // ---------------------------------
 
-struct INet
+struct INet : public core::IModuleBase
 {
 	virtual ~INet() {}
-
-
-	virtual void registerVars(void) X_ABSTRACT;
-	virtual void registerCmds(void) X_ABSTRACT;
-
-	virtual bool init(void) X_ABSTRACT;
-	virtual void shutDown(void) X_ABSTRACT;
-	virtual void release(void) X_ABSTRACT;
 
 	virtual IPeer* createPeer(void) X_ABSTRACT;
 	virtual void deletePeer(IPeer* pPeer) X_ABSTRACT;

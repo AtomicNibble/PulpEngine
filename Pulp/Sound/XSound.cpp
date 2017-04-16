@@ -237,7 +237,7 @@ void XSound::registerCmds(void)
 
 
 
-bool XSound::Init(void)
+bool XSound::init(void)
 {
 	X_LOG0("SoundSys", "Starting");
 
@@ -487,7 +487,7 @@ bool XSound::Init(void)
 	return true;
 }
 
-void XSound::ShutDown(void)
+void XSound::shutDown(void)
 {
 	X_LOG0("SoundSys", "Shutting Down");
 #if X_SUPER == 0

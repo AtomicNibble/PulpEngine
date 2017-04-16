@@ -20,11 +20,15 @@ public:
 	XFontSystem(ICore* pCore);
 	virtual ~XFontSystem();
 
-	// IXFont
-	virtual bool Init(void) X_FINAL;
-	virtual void ShutDown(void) X_FINAL;
+	// IModuleBase
+	virtual void registerVars(void) X_FINAL;
+	virtual void registerCmds(void) X_FINAL;
+
+	virtual bool init(void) X_FINAL;
+	virtual void shutDown(void) X_FINAL;
 	virtual void release(void) X_FINAL;
 
+	// IXFont
 	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
 	virtual IFont* NewFont(const char* pFontName) X_FINAL;

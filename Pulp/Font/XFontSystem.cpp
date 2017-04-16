@@ -68,24 +68,34 @@ void XFontSystem::release(void)
 	X_DELETE(this,g_fontArena);
 }
 
-
-bool XFontSystem::Init(void)
+void XFontSystem::registerVars(void)
 {
-	X_LOG0("FontSys", "Starting");
 
+}
+
+void XFontSystem::registerCmds(void)
+{
 	// add font commands
-	ADD_COMMAND("fontListLoaded", Command_ListFonts, core::VarFlag::SYSTEM, 
+	ADD_COMMAND("fontListLoaded", Command_ListFonts, core::VarFlag::SYSTEM,
 		"Lists all the loaded fonts");
 
 	ADD_COMMAND("fontDumpForMame", Command_DumpForName, core::VarFlag::SYSTEM,
 		"Dumps the font texture for a given font name");
+
+}
+
+
+bool XFontSystem::init(void)
+{
+	X_LOG0("FontSys", "Starting");
+
 
 	gEnv->pHotReload->addfileType(this, "font");
 
 	return true;
 }
 
-void XFontSystem::ShutDown(void)
+void XFontSystem::shutDown(void)
 {
 	X_LOG0("FontSys", "Shutting Down");
 
