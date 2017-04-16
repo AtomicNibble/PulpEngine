@@ -13,6 +13,11 @@ namespace PlatLib
 	} // namespace
 
 
+	bool isStarted(void)
+	{
+		return refCount > 0;
+	}
+
 	bool addRef(void)
 	{
 		if (++refCount == 1)
@@ -20,6 +25,8 @@ namespace PlatLib
 			platform::WSADATA winsockInfo;
 			if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0)
 			{
+				--refCount; // we don't need a matching cleanup call.
+
 				lastError::Description Dsc;
 				X_ERROR("Net", "Failed to init winsock. Error: \"%s\"", lastError::ToString(Dsc));
 				return false;
@@ -31,7 +38,8 @@ namespace PlatLib
 
 	void deRef(void)
 	{
-		if (--refCount == 0)
+		// check ref is positive.
+		if (refCount > 0 && --refCount == 0)
 		{
 			if (platform::WSACleanup() != 0)
 			{
