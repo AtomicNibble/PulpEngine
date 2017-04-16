@@ -740,6 +740,9 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
 		return false;
 	}
 
+	X_ASSERT_NOT_NULL(env_.pPhysics);
+
+
 	return env_.pPhysics != nullptr;
 }
 
@@ -769,9 +772,8 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 		return false;
 	}
 
-	if (!env_.pScriptSys) {
-		return false;
-	}
+	X_ASSERT_NOT_NULL(env_.pScriptSys);
+
 
 	if (!env_.pScriptSys->Init()) {
 		X_ERROR("Font", "failed to init script system");
@@ -846,6 +848,8 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 		return false;
 	}
 
+	X_ASSERT_NOT_NULL(env_.p3DEngine);
+
 	if (env_.p3DEngine) {
 
 		core::StopWatch timer;
@@ -869,6 +873,8 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 	if (!IntializeEngineModule(DLL_GAME_DLL, "Engine_Game", initParams)) {
 		return false;
 	}
+
+	X_ASSERT_NOT_NULL(env_.pGame);
 
 	if (env_.pGame) {
 
