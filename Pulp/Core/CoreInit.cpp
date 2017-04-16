@@ -349,7 +349,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 	}
 
-	parseSeed(startupParams.seed);
+	if (!parseSeed(startupParams.seed)) {
+		return false;
+	}
 
 	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
 	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
