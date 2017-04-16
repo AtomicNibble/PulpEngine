@@ -16,7 +16,7 @@ static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increase
 static const uint32_t MAX_SUPPORTED_PEERS = 1 << 10; // go nuts.
 static const uint32_t MAX_BAN_ENTRIES = 256; // max bans entries you can add, wildcards supported.
 static const uint32_t MAX_PASSWORD_LEN = 128;
-static const uint32_t MAX_PEERS = 8; // a server only needs 1 peer.
+static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
 
 X_DECLARE_ENUM8(ConnectionState)(
 	Pending,
