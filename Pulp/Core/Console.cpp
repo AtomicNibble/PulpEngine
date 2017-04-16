@@ -391,7 +391,7 @@ XConsole::~XConsole()
 
 }
 
-void XConsole::RegisterVars(void)
+void XConsole::registerVars(void)
 {
 	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT,
 		"Debugging for console operations. 0=off 1=on");
@@ -427,7 +427,7 @@ void XConsole::RegisterVars(void)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Skips over the color codes when moving cursor.");
 }
 
-void XConsole::registerCommnads(void)
+void XConsole::registerCmds(void)
 {
 	ADD_COMMAND_MEMBER("exec", this, XConsole, &XConsole::Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
 	ADD_COMMAND_MEMBER("history", this, XConsole, &XConsole::Command_History, VarFlag::SYSTEM, "displays command history");
@@ -455,6 +455,81 @@ void XConsole::registerCommnads(void)
 
 // ------------------------------------
 
+
+#if 1
+
+bool XConsole::init(ICore* pCore, bool basic)
+{
+	X_LOG0("Console", "Starting console");
+	pCore_ = pCore;
+
+	// dispatch command history loading.
+	if (!basic)
+	{
+		pCore_->GetILog()->AddLogger(&logger_);
+
+		coreEventListernRegd_ = pCore_->GetCoreEventDispatcher()->RegisterListener(this);
+
+		// hot reload
+		pCore_->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
+
+		if (console_save_history) {
+			LoadCmdHistory();
+		}
+	}
+	else
+	{
+		// when in basic mode, don't save out.
+		console_save_history = 0;
+	}
+
+
+	return true;
+}
+
+bool XConsole::asyncInitFinalize(void)
+{
+
+	return true;
+}
+
+bool XConsole::registerInputListener(void)
+{
+	X_ASSERT_NOT_NULL(pCore_);
+
+	pInput_ = pCore_->GetIInput();
+
+	X_ASSERT_NOT_NULL(pInput_);
+
+	// we want input events plooxx.
+	pInput_->AddConsoleEventListener(this);
+	return true;
+}
+
+
+bool XConsole::loadRenderResources(void)
+{
+	X_ASSERT_NOT_NULL(pCore_);
+	X_ASSERT_NOT_NULL(pCore_->GetIFontSys());
+	X_ASSERT_NOT_NULL(pCore_->GetIRender());
+	X_ASSERT_NOT_NULL(pCore_->Get3DEngine());
+
+	pFont_ = pCore_->GetIFontSys()->GetFont("default");
+
+	X_ASSERT_NOT_NULL(pFont_);
+
+	pRender_ = pCore_->GetIRender();
+	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
+
+	renderRes_ = pRender_->getDisplayRes();
+	return true;
+}
+
+
+// --------------------
+
+
+#else
 
 void XConsole::startup(ICore* pCore, bool basic)
 {
@@ -491,42 +566,8 @@ void XConsole::startup(ICore* pCore, bool basic)
 	}
 }
 
-bool XConsole::asyncInitFinalize(void)
-{
+#endif
 
-	return true;
-}
-
-void XConsole::LoadRenderResources(void)
-{
-	X_ASSERT_NOT_NULL(pCore_);
-	X_ASSERT_NOT_NULL(pCore_->GetIFontSys());
-	X_ASSERT_NOT_NULL(pCore_->GetIRender());
-	X_ASSERT_NOT_NULL(pCore_->Get3DEngine());
-
-
-	pFont_ = pCore_->GetIFontSys()->GetFont("default");
-
-	X_ASSERT_NOT_NULL(pFont_);
-
-	pRender_ = pCore_->GetIRender();
-	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
-
-
-	renderRes_ = pRender_->getDisplayRes();
-}
-
-void XConsole::RegisterInputListener(void)
-{
-	X_ASSERT_NOT_NULL(pCore_);
-
-	pInput_ = pCore_->GetIInput();
-
-	X_ASSERT_NOT_NULL(pInput_);
-
-	// we want input events plooxx.
-	pInput_->AddConsoleEventListener(this);
-}
 
 
 
@@ -1187,26 +1228,31 @@ void XConsole::LoadCmdHistory(void)
 		const char* pBegin = file->getBufferStart();
 		const char* pEnd = file->getBufferEnd();
 
-		core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
-		StringRange<char> range(nullptr, nullptr);
-
-		// lets not clear, we can append and just pop off end if too many in total.
-		// CmdHistory_.clear();
-
-		while (tokenizer.ExtractToken(range))
-		{
-			if (range.GetLength() > 0) {
-				CmdHistory_.emplace_front(core::string(range.GetStart(), range.GetEnd()));
-			}
-		}
-
-		// limit the history.
-		while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
-			CmdHistory_.pop_back();
-		}
-
-		ResetHistoryPos();
+		ParseCmdHistory(pBegin, pEnd);
 	}
+}
+
+void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
+{
+	core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
+	StringRange<char> range(nullptr, nullptr);
+
+	// lets not clear, we can append and just pop off end if too many in total.
+	// CmdHistory_.clear();
+
+	while (tokenizer.ExtractToken(range))
+	{
+		if (range.GetLength() > 0) {
+			CmdHistory_.emplace_front(core::string(range.GetStart(), range.GetEnd()));
+		}
+	}
+
+	// limit the history.
+	while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+		CmdHistory_.pop_back();
+	}
+
+	ResetHistoryPos();
 }
 
 void XConsole::ResetHistoryPos(void)

@@ -374,9 +374,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	// #------------------------- Create Console ----------------
 	if (!startupParams.isCoreOnly() || startupParams.basicConsole())
 	{
-		env_.pConsole = X_NEW_ALIGNED(core::XConsole, g_coreArena, "ConsoleSys",8);
+		env_.pConsole = X_NEW(core::XConsole, g_coreArena, "ConsoleSys");
 		// register the commands so they can be used before Console::Init
-		env_.pConsole->registerCommnads();
+		env_.pConsole->registerVars();
+		env_.pConsole->registerCmds();
 
 		// register system vars to the console.
 		CreateSystemVars();
@@ -389,12 +390,17 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole = X_NEW( core::XConsoleNULL, g_coreArena, "NullConsole");
 	}
 
-	dirWatcher_.Init();
+	if (env_.pConsole->init(this, startupParams.basicConsole()))
+	{
+		return false;
+	}
 
 	// register verbosity vars.
 	if (pConsoleLogger_) {
 		pConsoleLogger_->GetFilterPolicy().RegisterVars();
 	}
+
+	dirWatcher_.Init();
 
 	// register filesystemvars.
 	env_.pFileSys->registerVars();
@@ -453,6 +459,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	{
 		// #------------------------- Input ------------------------
 		if (!InitInput(startupParams)) {
+			return false;
+		}
+
+		// now we can register the console input listner
+		if (!env_.pConsole->registerInputListener()) {
 			return false;
 		}
 
@@ -522,6 +533,14 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitRenderSys(startupParams)) {
 			return false;
 		}
+
+		// console can load it's render resources now.
+		if (!startupParams.basicConsole())
+		{
+			if (!env_.pConsole->loadRenderResources()) {
+				return false;
+			}
+		}
 	}
 
 	//  #------------------------- 3DEngine -------------------------
@@ -554,6 +573,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		// Sync up any asynchronous initialization so we are fully init.
 		// This is stuff like loading default assets, that can be done in background to 
 		// minamize startup time.
+		if (!env_.pConsole->asyncInitFinalize())
+		{
+			return false;
+		}
 
 		if (env_.pNet) 
 		{
@@ -688,7 +711,8 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
-	env_.pConsole->startup(this, initParams.basicConsole());
+	X_UNUSED(initParams);
+
 	if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
 		// ...
 	}

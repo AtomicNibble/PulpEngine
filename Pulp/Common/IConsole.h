@@ -85,15 +85,22 @@ struct IConsole
 {
 	virtual ~IConsole(){}
 
+
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
+	// called at start when not much else exists, just so subsystems can register vars
+	virtual bool init(ICore* pCore, bool basic) X_ABSTRACT;
+	// finialize any async init tasks.
 	virtual bool asyncInitFinalize(void) X_ABSTRACT;
+	virtual bool registerInputListener(void) X_ABSTRACT;
+	virtual bool loadRenderResources(void) X_ABSTRACT;
 
-	virtual void registerCommnads(void) X_ABSTRACT;
 
-	virtual void startup(ICore* pCore, bool basic) X_ABSTRACT;
 	virtual void shutDown(void) X_ABSTRACT;
-	virtual void saveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 	virtual void unregisterInputListener(void) X_ABSTRACT;
 	virtual void freeRenderResources(void) X_ABSTRACT;
+	virtual void saveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 
 	// console set's it's own input repeat rate, that's timed instead of every frame.
 	virtual void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_ABSTRACT;
