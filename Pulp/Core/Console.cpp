@@ -391,7 +391,71 @@ XConsole::~XConsole()
 
 }
 
-//////////////////////////////////////////////////////////////////////////
+void XConsole::RegisterVars(void)
+{
+	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT,
+		"Debugging for console operations. 0=off 1=on");
+	ADD_CVAR_REF_NO_NAME(console_case_sensitive, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Console input auto complete is case-sensitive");
+	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Saves command history to file");
+	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Size of the log buffer");
+	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM,
+		"Draw the channel in a diffrent color. 0=disabled 1=enabled");
+	ADD_CVAR_REF_NO_NAME(console_output_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 12, 32, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Line height of log messages");
+
+	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color, Color(0.2f, 0.2f, 0.2f, 0.9f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.5f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box channel color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_color, Color(0.5f, 0.5f, 0.5f, 0.5f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar slider color");
+	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
+		" 1=expanded only 2=always");
+	ADD_CVAR_REF_NO_NAME(console_cursor_skip_color_codes, 1, 0, 1,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Skips over the color codes when moving cursor.");
+}
+
+void XConsole::RegisterCommnads(void)
+{
+	ADD_COMMAND_MEMBER("exec", this, XConsole, &XConsole::Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
+	ADD_COMMAND_MEMBER("history", this, XConsole, &XConsole::Command_History, VarFlag::SYSTEM, "displays command history");
+	ADD_COMMAND_MEMBER("help", this, XConsole, &XConsole::Command_Help, VarFlag::SYSTEM, "displays help info");
+	ADD_COMMAND_MEMBER("listCmds", this, XConsole, &XConsole::Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
+	ADD_COMMAND_MEMBER("listDvars", this, XConsole, &XConsole::Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
+	ADD_COMMAND_MEMBER("exit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
+	ADD_COMMAND_MEMBER("quit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
+	ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
+	ADD_COMMAND_MEMBER("vreset", this, XConsole, &XConsole::Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
+	ADD_COMMAND_MEMBER("vdesc", this, XConsole, &XConsole::Command_VarDescribe, VarFlag::SYSTEM, "describes a variable");
+	ADD_COMMAND_MEMBER("seta", this, XConsole, &XConsole::Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
+
+	ADD_COMMAND_MEMBER("bind", this, XConsole, &XConsole::Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
+	ADD_COMMAND_MEMBER("clearBinds", this, XConsole, &XConsole::Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
+	ADD_COMMAND_MEMBER("listBinds", this, XConsole, &XConsole::Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
+
+	ADD_COMMAND_MEMBER("saveModifiedVars", this, XConsole, &XConsole::Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
+
+	ADD_COMMAND_MEMBER("consoleShow", this, XConsole, &XConsole::Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
+	ADD_COMMAND_MEMBER("consoleHide", this, XConsole, &XConsole::Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
+	ADD_COMMAND_MEMBER("consoleToggle", this, XConsole, &XConsole::Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
+}
+
+
+// ------------------------------------
+
+
 void XConsole::Startup(ICore* pCore, bool basic)
 {
 	X_ASSERT_NOT_NULL(pCore);
@@ -408,39 +472,7 @@ void XConsole::Startup(ICore* pCore, bool basic)
 		RegisterInputListener();
 	}
 
-	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, 
-		"Debugging for console operations. 0=off 1=on");
-	ADD_CVAR_REF_NO_NAME(console_case_sensitive, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
-		"Console input auto complete is case-sensitive");
-	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
-		"Saves command history to file");
-	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
-		"Size of the log buffer");
-	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, 
-		"Draw the channel in a diffrent color. 0=disabled 1=enabled");
-	ADD_CVAR_REF_NO_NAME(console_output_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 12, 32, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
-		"Line height of log messages");
-
-	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), 
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color, Color(0.2f, 0.2f, 0.2f, 0.9f), 
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.5f), 
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box channel color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_color, Color(0.5f, 0.5f, 0.5f, 0.5f),
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f), 
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar slider color");
-	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2,
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
-		" 1=expanded only 2=always");
-	ADD_CVAR_REF_NO_NAME(console_cursor_skip_color_codes, 1, 0, 1,
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Skips over the color codes when moving cursor.");
-	
+	RegisterVars();
 
 	if (!basic)
 	{
@@ -491,30 +523,6 @@ void XConsole::RegisterInputListener(void)
 }
 
 
-void XConsole::RegisterCommnads(void)
-{
-	ADD_COMMAND_MEMBER("exec", this, XConsole, &XConsole::Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
-	ADD_COMMAND_MEMBER("history", this, XConsole, &XConsole::Command_History, VarFlag::SYSTEM, "displays command history");
-	ADD_COMMAND_MEMBER("help", this, XConsole, &XConsole::Command_Help, VarFlag::SYSTEM, "displays help info");
-	ADD_COMMAND_MEMBER("listCmds", this, XConsole, &XConsole::Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
-	ADD_COMMAND_MEMBER("listDvars", this, XConsole, &XConsole::Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
-	ADD_COMMAND_MEMBER("exit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
-	ADD_COMMAND_MEMBER("quit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
-	ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
-	ADD_COMMAND_MEMBER("vreset", this, XConsole, &XConsole::Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
-	ADD_COMMAND_MEMBER("vdesc", this, XConsole, &XConsole::Command_VarDescribe, VarFlag::SYSTEM, "describes a variable");
-	ADD_COMMAND_MEMBER("seta", this, XConsole, &XConsole::Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
-	
-	ADD_COMMAND_MEMBER("bind", this, XConsole, &XConsole::Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
-	ADD_COMMAND_MEMBER("clearBinds", this, XConsole, &XConsole::Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
-	ADD_COMMAND_MEMBER("listBinds", this, XConsole, &XConsole::Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
-	
-	ADD_COMMAND_MEMBER("saveModifiedVars", this, XConsole, &XConsole::Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
-	
-	ADD_COMMAND_MEMBER("consoleShow", this, XConsole, &XConsole::Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
-	ADD_COMMAND_MEMBER("consoleHide", this, XConsole, &XConsole::Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
-	ADD_COMMAND_MEMBER("consoleToggle", this, XConsole, &XConsole::Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
-}
 
 void XConsole::ShutDown(void)
 {
@@ -529,6 +537,7 @@ void XConsole::ShutDown(void)
 		pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
 		pCore_->GetILog()->RemoveLogger(&logger_);
 	}
+
 	unregisterInputListener();
 
 	// clear up vars.
