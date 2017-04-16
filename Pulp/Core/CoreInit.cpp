@@ -386,6 +386,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->ShutDown();
 	}
 
+	dirWatcher_.Init();
+
 	// register verbosity vars.
 	if (pConsoleLogger_) {
 		pConsoleLogger_->GetFilterPolicy().RegisterVars();
@@ -988,7 +990,6 @@ void XCore::CreateSystemVars(void)
 	ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Command_ListProgramArgs, VarFlag::SYSTEM,
 		"Lists the processed command line arguments parsed to the program");
 
-	dirWatcher_.Init();
 }
 
 void XCore::AddIgnoredHotReloadExtensions(void)
