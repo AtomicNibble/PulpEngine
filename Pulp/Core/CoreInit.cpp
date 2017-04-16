@@ -533,13 +533,14 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitRenderSys(startupParams)) {
 			return false;
 		}
+	}
 
-		// console can load it's render resources now.
-		if (!startupParams.basicConsole())
+	// sync net inits before 3d engine.
+	if (env_.pNet)
+	{
+		if (!env_.pNet->asyncInitFinalize())
 		{
-			if (!env_.pConsole->loadRenderResources()) {
-				return false;
-			}
+			return false;
 		}
 	}
 
@@ -576,14 +577,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!env_.pConsole->asyncInitFinalize())
 		{
 			return false;
-		}
-
-		if (env_.pNet) 
-		{
-			if (!env_.pNet->asyncInitFinalize())
-			{
-				return false;
-			}
 		}
 
 	}
@@ -711,7 +704,13 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
-	X_UNUSED(initParams);
+	// console can load it's render resources now.
+	if (!initParams.basicConsole())
+	{
+		if (!env_.pConsole->loadRenderResources()) {
+			return false;
+		}
+	}
 
 	if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
 		// ...
