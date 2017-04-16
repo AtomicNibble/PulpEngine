@@ -14,24 +14,30 @@ XConsoleNULL::~XConsoleNULL()
 
 }
 
-void XConsoleNULL::Startup(ICore* pCore, bool basic)
+
+void XConsoleNULL::registerCommnads(void)
+{
+
+}
+
+void XConsoleNULL::startup(ICore* pCore, bool basic)
 {
 	X_UNUSED(pCore);
 	X_UNUSED(basic);
 }
 
+bool XConsoleNULL::asyncInitFinalize(void)
+{
+	return true;
+}
 
-void XConsoleNULL::RegisterCommnads(void)
+
+void XConsoleNULL::shutDown(void)
 {
 
 }
 
-void XConsoleNULL::ShutDown(void)
-{
-
-}
-
-void XConsoleNULL::SaveChangedVars(void)
+void XConsoleNULL::saveChangedVars(void)
 {
 
 }

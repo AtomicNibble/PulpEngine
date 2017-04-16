@@ -427,7 +427,7 @@ void XConsole::RegisterVars(void)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Skips over the color codes when moving cursor.");
 }
 
-void XConsole::RegisterCommnads(void)
+void XConsole::registerCommnads(void)
 {
 	ADD_COMMAND_MEMBER("exec", this, XConsole, &XConsole::Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
 	ADD_COMMAND_MEMBER("history", this, XConsole, &XConsole::Command_History, VarFlag::SYSTEM, "displays command history");
@@ -456,7 +456,7 @@ void XConsole::RegisterCommnads(void)
 // ------------------------------------
 
 
-void XConsole::Startup(ICore* pCore, bool basic)
+void XConsole::startup(ICore* pCore, bool basic)
 {
 	X_ASSERT_NOT_NULL(pCore);
 	X_LOG0("Console", "Starting console");
@@ -489,6 +489,12 @@ void XConsole::Startup(ICore* pCore, bool basic)
 		// when in basic mode, don't save out.
 		console_save_history = 0;
 	}
+}
+
+bool XConsole::asyncInitFinalize(void)
+{
+
+	return true;
 }
 
 void XConsole::LoadRenderResources(void)
@@ -524,7 +530,7 @@ void XConsole::RegisterInputListener(void)
 
 
 
-void XConsole::ShutDown(void)
+void XConsole::shutDown(void)
 {
 	X_LOG0("Console", "Shutting Down");
 
@@ -555,7 +561,7 @@ void XConsole::ShutDown(void)
 	CmdHistory_.clear();
 }
 
-void XConsole::SaveChangedVars(void)
+void XConsole::saveChangedVars(void)
 {
 	ConsoleVarMapItor itrVar, itrVarEnd = VarMap_.end();
 
@@ -3067,7 +3073,7 @@ void XConsole::Command_SaveModifiedVars(IConsoleCmdArgs* pCmd)
 {
 	X_UNUSED(pCmd);
 
-	SaveChangedVars();
+	saveChangedVars();
 }
 
 

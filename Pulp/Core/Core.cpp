@@ -195,7 +195,7 @@ void XCore::ShutDown()
 		// still save modified vars.
 		if (env_.pConsole && !initParams_.basicConsole())
 		{
-			env_.pConsole->SaveChangedVars();
+			env_.pConsole->saveChangedVars();
 		}
 
 		moduleInterfaces_.free();
@@ -292,7 +292,7 @@ void XCore::ShutDown()
 
 	if (env_.pConsole && !initParams_.basicConsole())
 	{
-		env_.pConsole->SaveChangedVars();
+		env_.pConsole->saveChangedVars();
 	}
 
 	if (env_.pFileSys)
@@ -352,7 +352,7 @@ void XCore::ShutDown()
 
 	if (env_.pConsole)
 	{
-		env_.pConsole->ShutDown();
+		env_.pConsole->shutDown();
 		core::Mem::DeleteAndNull(env_.pConsole, g_coreArena);
 	}
 

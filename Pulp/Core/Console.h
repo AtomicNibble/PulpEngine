@@ -187,11 +187,12 @@ public:
 
 	virtual ~XConsole();
 
-	virtual void RegisterCommnads(void) X_FINAL;
+	virtual void registerCommnads(void) X_FINAL;
 
-	virtual void Startup(ICore* pCore, bool basic) X_FINAL;
-	virtual void ShutDown(void) X_FINAL;
-	virtual void SaveChangedVars(void) X_FINAL;
+	virtual void startup(ICore* pCore, bool basic) X_FINAL;
+	virtual bool asyncInitFinalize(void) X_FINAL;
+	virtual void shutDown(void) X_FINAL;
+	virtual void saveChangedVars(void) X_FINAL;
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 

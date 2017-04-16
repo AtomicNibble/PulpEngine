@@ -85,11 +85,13 @@ struct IConsole
 {
 	virtual ~IConsole(){}
 
-	virtual void RegisterCommnads(void) X_ABSTRACT;
+	virtual bool asyncInitFinalize(void) X_ABSTRACT;
 
-	virtual void Startup(ICore* pCore, bool basic) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
-	virtual void SaveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
+	virtual void registerCommnads(void) X_ABSTRACT;
+
+	virtual void startup(ICore* pCore, bool basic) X_ABSTRACT;
+	virtual void shutDown(void) X_ABSTRACT;
+	virtual void saveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 	virtual void unregisterInputListener(void) X_ABSTRACT;
 	virtual void freeRenderResources(void) X_ABSTRACT;
 

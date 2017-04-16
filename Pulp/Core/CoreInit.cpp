@@ -376,7 +376,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	{
 		env_.pConsole = X_NEW_ALIGNED(core::XConsole, g_coreArena, "ConsoleSys",8);
 		// register the commands so they can be used before Console::Init
-		env_.pConsole->RegisterCommnads();
+		env_.pConsole->registerCommnads();
 
 		// register system vars to the console.
 		CreateSystemVars();
@@ -387,7 +387,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		// for every var register command.
 		// and i'm still able to detect var registers before core is init. :)
 		env_.pConsole = X_NEW( core::XConsoleNULL, g_coreArena, "NullConsole");
-		env_.pConsole->ShutDown();
 	}
 
 	dirWatcher_.Init();
@@ -689,7 +688,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
-	env_.pConsole->Startup(this, initParams.basicConsole());
+	env_.pConsole->startup(this, initParams.basicConsole());
 	if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
 		// ...
 	}
