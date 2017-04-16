@@ -64,15 +64,6 @@ class XEngineModule_Sound : public IEngineModule
 		g_SoundArena = X_NEW(SoundArena, gEnv->pArena, "SoundArena")(&g_SoundAlloc, "SoundArena");
 		pSound = X_NEW(sound::XSound, g_SoundArena, "SoundSys");
 
-		pSound->registerVars();
-		pSound->registerCmds();
-
-		if (!pSound->Init()) {
-			pSound->ShutDown();
-			X_DELETE(pSound, g_SoundArena);
-			return false;
-		}
-
 		env.pSound = pSound;
 		return true;
 	}

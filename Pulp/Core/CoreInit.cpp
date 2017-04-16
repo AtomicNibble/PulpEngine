@@ -31,6 +31,7 @@
 #include <IGame.h>
 #include <IJobSystem.h>
 #include <INetwork.h>
+#include <ISound.h>
 
 #include <Extension\IPotatoUnknown.h>
 #include <Extension\IPotatoFactory.h>
@@ -720,7 +721,17 @@ bool XCore::InitSound(const SCoreInitParams& initParams)
 		return false;
 	}
 
-	return env_.pSound != nullptr;
+	X_ASSERT_NOT_NULL(env_.pSound);
+
+	env_.pSound->registerVars();
+	env_.pSound->registerCmds();
+
+	if (!env_.pSound->Init()) {
+		X_ERROR("Font", "failed to init sound system");
+		return false;
+	}
+
+	return true;
 }
 
 bool XCore::InitPhysics(const SCoreInitParams& initParams)
