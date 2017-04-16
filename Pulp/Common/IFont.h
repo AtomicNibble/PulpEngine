@@ -17,7 +17,7 @@ X_NAMESPACE_BEGIN(font)
 
 struct IFont;
 
-struct IFontSys : public core::IModuleBase
+struct IFontSys : public core::IEngineSysBase
 {
 	virtual ~IFontSys(){}
 	

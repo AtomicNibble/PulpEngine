@@ -20,7 +20,7 @@ public:
 	XFontSystem(ICore* pCore);
 	virtual ~XFontSystem();
 
-	// IModuleBase
+	// IEngineSysBase
 	virtual void registerVars(void) X_FINAL;
 	virtual void registerCmds(void) X_FINAL;
 

@@ -18,16 +18,10 @@ X_DECLARE_ENUM(PrimContext)(
 class IPrimativeContext;
 struct IMaterialManager;
 
-struct I3DEngine
+struct I3DEngine : public core::IEngineSysBase
 {
 	virtual ~I3DEngine(){};
 
-	virtual void registerVars(void) X_ABSTRACT;
-	virtual void registerCmds(void) X_ABSTRACT;
-
-	virtual bool Init(void) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
-	virtual void release(void) X_ABSTRACT;
 
 	virtual void Update(core::FrameData& frame) X_ABSTRACT;
 	virtual void OnFrameBegin(core::FrameData& frame) X_ABSTRACT;

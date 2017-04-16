@@ -230,7 +230,7 @@ void XCore::ShutDown()
 
 	if (env_.p3DEngine)
 	{
-		env_.p3DEngine->ShutDown();
+		env_.p3DEngine->shutDown();
 		core::SafeRelease(env_.p3DEngine);
 	}
 

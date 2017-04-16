@@ -30,8 +30,8 @@ public:
 	void registerVars(void) X_OVERRIDE;
 	void registerCmds(void) X_OVERRIDE;
 
-	bool Init(void) X_OVERRIDE;
-	void ShutDown(void) X_OVERRIDE;
+	bool init(void) X_OVERRIDE;
+	void shutDown(void) X_OVERRIDE;
 	void release(void) X_OVERRIDE;
 
 	void Update(core::FrameData& frame) X_OVERRIDE;

@@ -1219,7 +1219,7 @@
     <ClInclude Include="Util\win32\Process.h">
       <Filter>Headers\Util\win32</Filter>
     </ClInclude>
-    <ClInclude Include="IModuleBase.h">
+    <ClInclude Include="IEngineSysBase.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
   </ItemGroup>

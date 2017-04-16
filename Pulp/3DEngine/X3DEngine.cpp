@@ -83,7 +83,7 @@ void X3DEngine::registerCmds(void)
 
 }
 
-bool X3DEngine::Init(void)
+bool X3DEngine::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -166,7 +166,7 @@ bool X3DEngine::Init(void)
 	return true;
 }
 
-void X3DEngine::ShutDown(void)
+void X3DEngine::shutDown(void)
 {
 	X_LOG0("3DEngine", "Shutting Down");
 

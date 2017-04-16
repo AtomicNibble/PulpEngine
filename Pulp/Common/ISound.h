@@ -6,7 +6,7 @@
 
 X_NAMESPACE_BEGIN(sound)
 
-struct ISound : public core::IModuleBase
+struct ISound : public core::IEngineSysBase
 {
 	virtual ~ISound(){};
 

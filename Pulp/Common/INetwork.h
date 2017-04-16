@@ -375,7 +375,7 @@ struct IPeer
 
 // ---------------------------------
 
-struct INet : public core::IModuleBase
+struct INet : public core::IEngineSysBase
 {
 	virtual ~INet() {}
 

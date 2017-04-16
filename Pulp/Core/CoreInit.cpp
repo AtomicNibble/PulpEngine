@@ -864,7 +864,7 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 
 		core::StopWatch timer;
 
-		if (!env_.p3DEngine->Init()) {
+		if (!env_.p3DEngine->init()) {
 			X_ERROR("Core", "Failed to init 3DEngine");
 			return false;
 		}

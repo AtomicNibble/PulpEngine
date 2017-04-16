@@ -109,7 +109,7 @@ struct ScriptValue
 
 
 
-struct IScriptSys : public core::IModuleBase
+struct IScriptSys : public core::IEngineSysBase
 {
 	virtual ~IScriptSys(){};
 
