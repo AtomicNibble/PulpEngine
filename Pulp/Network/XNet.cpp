@@ -54,14 +54,23 @@ void XNet::registerCmds(void)
 bool XNet::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 	X_LOG0("Net", "Starting");
 
 	if (!PlatLib::addRef()) {
 		return false;
 	}
 
-	pInitJob_ = gEnv->pJobSys->CreateMemberJobAndRun<XNet>(this, &XNet::asyncInit_Job, nullptr);
+	if (gEnv->pJobSys) 
+	{
+		if (!populateIpList()) {
+			return false;
+		}
+	}
+	else
+	{
+		pInitJob_ = gEnv->pJobSys->CreateMemberJobAndRun<XNet>(this, &XNet::asyncInit_Job, nullptr);
+	}
+
 
 	return true;
 }
