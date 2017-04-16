@@ -168,10 +168,12 @@ void xFileSys::shutDown(void)
 	for (search_s* s = searchPaths_; s; ) {
 		search_s* cur = s;
 		s = cur->next_;
-		if (cur->dir)
-			X_DELETE( cur->dir, g_coreArena);
-		else
+		if (cur->dir) {
+			X_DELETE(cur->dir, g_coreArena);
+		}
+		else {
 			X_DELETE(cur->pak, g_coreArena);
+		}
 		X_DELETE(cur, g_coreArena);
 	}
 }
@@ -414,7 +416,9 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	else
 	{
 		if (location == VirtualDirectory::GAME)
+		{
 			createOSPath(gameDir_, path, real_path);
+		}
 		else
 		{
 			X_ASSERT_NOT_IMPLEMENTED();
@@ -464,8 +468,10 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 	}
 	else
 	{
-		if (location == VirtualDirectory::GAME)
+		if (location == VirtualDirectory::GAME) 
+		{
 			createOSPath(gameDir_, path, real_path);
+		}
 		else
 		{
 			X_ASSERT_NOT_IMPLEMENTED();
