@@ -108,10 +108,13 @@ public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
-	bool Init(const SCoreInitParams& params) X_FINAL;
-	bool InitWorker(void) X_FINAL;
-	void ShutDown(void) X_FINAL;
-	void CreateVars(void) X_FINAL;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
+
+	bool init(const SCoreInitParams& params) X_FINAL;
+	bool initWorker(void) X_FINAL;
+	void shutDown(void) X_FINAL;
+
 
 	bool InitDirectorys(bool workingDir);
 

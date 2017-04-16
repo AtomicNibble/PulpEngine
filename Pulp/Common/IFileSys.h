@@ -546,10 +546,12 @@ struct IFileSys
 
 	virtual ~IFileSys(){}
 
-	virtual bool Init(const SCoreInitParams& params) X_ABSTRACT;
-	virtual bool InitWorker(void) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
-	virtual void CreateVars(void) X_ABSTRACT;
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
+	virtual bool init(const SCoreInitParams& params) X_ABSTRACT;
+	virtual bool initWorker(void) X_ABSTRACT;
+	virtual void shutDown(void) X_ABSTRACT;
 
 	// folders - there is only one game dirtory.
 	// but other folders can be added with 'addModDir' to add to the virtual directory.

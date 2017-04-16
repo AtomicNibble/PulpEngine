@@ -394,7 +394,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// register filesystemvars.
-	env_.pFileSys->CreateVars();
+	env_.pFileSys->registerVars();
+	env_.pFileSys->registerCmds();
 
 	// regeister window vars.
 	core::xWindow::RegisterVars();
@@ -429,7 +430,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// #------------------------- FileSystem Workets ------------------------
 	if (startupParams.jobSystemEnabled()) {
-		env_.pFileSys->InitWorker();
+		env_.pFileSys->initWorker();
 	}
 
 
@@ -607,7 +608,7 @@ bool XCore::InitFileSys(const SCoreInitParams &initParams)
 	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8);
 
 	if (env_.pFileSys) {
-		if (!env_.pFileSys->Init(initParams)) {
+		if (!env_.pFileSys->init(initParams)) {
 			X_ERROR("Core", "Failed to init filesystem");
 			return false;
 		}

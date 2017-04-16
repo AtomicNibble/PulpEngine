@@ -103,7 +103,39 @@ xFileSys::~xFileSys()
 }
 
 
-bool xFileSys::Init(const SCoreInitParams& params)
+
+void xFileSys::registerVars(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Filesystem debug. 0=off 1=on");
+	ADD_CVAR_REF("filesys_Quedebug", vars_.QueDebug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Filesystem que debug. 0=off 1=on");
+
+	// create vars for the virtual directories which we then update with the paths once set.
+	size_t i;
+	core::StackString<64> name;
+	for (i = 0; i < MAX_VIRTUAL_DIR; i++)
+	{
+		name.set("filesys_mod_dir_");
+		name.appendFmt("%" PRIuS, i);
+		vars_.pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
+			core::VarFlag::SYSTEM |
+			core::VarFlag::READONLY |
+			core::VarFlag::CPY_NAME,
+			"Virtual mod directory");
+	}
+}
+
+
+void xFileSys::registerCmds(void)
+{
+
+}
+
+bool xFileSys::init(const SCoreInitParams& params)
 {
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_LOG0("FileSys", "Starting Filesys..");
@@ -117,7 +149,7 @@ bool xFileSys::Init(const SCoreInitParams& params)
 	return true;
 }
 
-bool xFileSys::InitWorker(void)
+bool xFileSys::initWorker(void)
 {
 	if (!StartRequestWorker()) {
 		X_ERROR("FileSys", "Failed to start io request worker");
@@ -127,7 +159,7 @@ bool xFileSys::InitWorker(void)
 	return true;
 }
 
-void xFileSys::ShutDown()
+void xFileSys::shutDown(void)
 {
 	X_LOG0("FileSys", "Shutting Down");
 
@@ -144,30 +176,6 @@ void xFileSys::ShutDown()
 	}
 }
 
-void xFileSys::CreateVars(void)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
-		"Filesystem debug. 0=off 1=on");
-	ADD_CVAR_REF("filesys_Quedebug", vars_.QueDebug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
-		"Filesystem que debug. 0=off 1=on");
-
-	// create vars for the virtual directories which we then update with the paths once set.
-	size_t i;
-	core::StackString<64> name;
-	for (i = 0; i < MAX_VIRTUAL_DIR; i++)
-	{
-		name.set("filesys_mod_dir_");
-		name.appendFmt("%" PRIuS, i);
-		vars_.pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
-			core::VarFlag::SYSTEM | 
-			core::VarFlag::READONLY |
-			core::VarFlag::CPY_NAME,
-			"Virtual mod directory");
-	}
-}
 
 bool xFileSys::InitDirectorys(bool working)
 {

@@ -297,7 +297,7 @@ void XCore::ShutDown()
 
 	if (env_.pFileSys)
 	{
-		env_.pFileSys->ShutDown();
+		env_.pFileSys->shutDown();
 		core::Mem::DeleteAndNull(env_.pFileSys, g_coreArena);
 
 	}
