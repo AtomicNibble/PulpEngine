@@ -17,14 +17,22 @@ public:
 
 	virtual ~XConsoleNULL() X_FINAL;
 
-	virtual void registerCommnads(void) X_FINAL;
+	virtual void registerVars(void) X_FINAL;
+	virtual void registerCmds(void) X_FINAL;
 
-	virtual void startup(ICore* pCore, bool basic) X_FINAL;
+	// called at start when not much else exists, just so subsystems can register vars
+	virtual bool init(ICore* pCore, bool basic) X_FINAL;
+	// finialize any async init tasks.
 	virtual bool asyncInitFinalize(void) X_FINAL;
+	// for registering once other systems exsist.
+	virtual bool registerInputListener(void) X_FINAL;
+	virtual bool loadRenderResources(void) X_FINAL;
+
 	virtual void shutDown(void) X_FINAL;
-	virtual void saveChangedVars(void) X_FINAL;
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
+	virtual void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
+
 
 	virtual void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
 	virtual void Job_runCmds(void) X_FINAL;

@@ -15,15 +15,21 @@ XConsoleNULL::~XConsoleNULL()
 }
 
 
-void XConsoleNULL::registerCommnads(void)
+void XConsoleNULL::registerVars(void)
 {
 
 }
 
-void XConsoleNULL::startup(ICore* pCore, bool basic)
+void XConsoleNULL::registerCmds(void)
+{
+
+}
+
+bool XConsoleNULL::init(ICore* pCore, bool basic)
 {
 	X_UNUSED(pCore);
 	X_UNUSED(basic);
+	return true;
 }
 
 bool XConsoleNULL::asyncInitFinalize(void)
@@ -31,13 +37,17 @@ bool XConsoleNULL::asyncInitFinalize(void)
 	return true;
 }
 
-
-void XConsoleNULL::shutDown(void)
+bool XConsoleNULL::registerInputListener(void)
 {
-
+	return true;
 }
 
-void XConsoleNULL::saveChangedVars(void)
+bool XConsoleNULL::loadRenderResources(void)
+{
+	return true;
+}
+
+void XConsoleNULL::shutDown(void)
 {
 
 }
@@ -48,6 +58,11 @@ void XConsoleNULL::unregisterInputListener(void)
 }
 
 void XConsoleNULL::freeRenderResources(void)
+{
+
+}
+
+void XConsoleNULL::saveChangedVars(void)
 {
 
 }
