@@ -60,7 +60,7 @@ bool XNet::init(void)
 		return false;
 	}
 
-	if (gEnv->pJobSys) 
+	if (!gEnv->pJobSys) 
 	{
 		if (!populateIpList()) {
 			return false;
