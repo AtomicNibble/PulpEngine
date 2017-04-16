@@ -349,7 +349,10 @@ XConsole::XConsole() :
 	),
 	varArena_(&varAllocator_, "VarArena"),
 	cmds_(g_coreArena),
-	coreEventListernRegd_(false)
+	coreEventListernRegd_(false),
+	historyFileBuf_(g_coreArena),
+	historyLoadPending_(false),
+	historyFileSize_(0)
 {
 	HistoryPos_ = -1;
 	CursorPos_ = 0;
@@ -474,7 +477,7 @@ bool XConsole::init(ICore* pCore, bool basic)
 		pCore_->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 
 		if (console_save_history) {
-			LoadCmdHistory();
+			LoadCmdHistory(true);
 		}
 	}
 	else
@@ -489,6 +492,25 @@ bool XConsole::init(ICore* pCore, bool basic)
 
 bool XConsole::asyncInitFinalize(void)
 {
+	// the history file should of loaded now, so lets parse it.
+	{
+		core::CriticalSection::ScopedLock lock(historyFileLock_);
+
+		while (historyLoadPending_) {
+			historyFileCond_.Wait(historyFileLock_);
+		}
+
+		if (historyFileSize_)
+		{
+			const char* pBegin = historyFileBuf_.get();
+			const char* pEnd = pBegin + historyFileSize_;
+
+			ParseCmdHistory(pBegin, pEnd);
+
+			historyFileBuf_.reset();
+			historyFileSize_ = 0;
+		}
+	}
 
 	return true;
 }
@@ -1212,23 +1234,74 @@ void XConsole::SaveCmdHistory(void) const
 	}
 }
 
-void XConsole::LoadCmdHistory(void)
+void XConsole::HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	X_UNUSED(fileSys);
+	X_UNUSED(bytesTransferred);
+
+	// history file loaded.
+	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
+	const core::IoRequestOpenRead* pOpenRead = static_cast<const IoRequestOpenRead*>(pRequest);
+
+	{
+		core::CriticalSection::ScopedLock lock(historyFileLock_);
+
+		historyLoadPending_ = false;
+
+		// if it faild do we care?
+		if (!pFile) {
+			X_LOG2("Console", "Failed to load history file");
+			return;
+		}
+
+		// we can't process it on this thread.
+		// so store it.
+		historyFileBuf_ = core::UniquePointer<const char[]>(pOpenRead->arena, static_cast<const char*>(pOpenRead->pBuf));
+		historyFileSize_ = pOpenRead->dataSize;
+	}
+
+	historyFileCond_.NotifyAll();
+}
+
+void XConsole::LoadCmdHistory(bool async)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-	fileModeFlags mode;
+	core::CriticalSection::ScopedLock lock(historyFileLock_);
 
+	if (historyLoadPending_) {
+		return;
+	}
+
+	fileModeFlags mode;
 	mode.Set(fileMode::READ);
 	mode.Set(fileMode::SHARE);
 
-	XFileMemScoped file;
-	if (file.openFile(CMD_HISTORY_FILE_NAME, mode))
+	if (async)
 	{
-		const char* pBegin = file->getBufferStart();
-		const char* pEnd = file->getBufferEnd();
+		// load the file async
+		historyLoadPending_ = true;
 
-		ParseCmdHistory(pBegin, pEnd);
+		core::IoRequestOpenRead open;
+		open.callback.Bind<XConsole, &XConsole::HistoryIoRequestCallback>(this);
+		open.mode = mode;
+		open.path = CMD_HISTORY_FILE_NAME;
+		open.arena = g_coreArena;
+
+		gEnv->pFileSys->AddIoRequestToQue(open);
+	}
+	else
+	{
+		XFileMemScoped file;
+		if (file.openFile(CMD_HISTORY_FILE_NAME, mode))
+		{
+			const char* pBegin = file->getBufferStart();
+			const char* pEnd = file->getBufferEnd();
+
+			ParseCmdHistory(pBegin, pEnd);
+		}
 	}
 }
 

@@ -25,6 +25,7 @@ X_ENABLE_WARNING(4702)
 #include <String\StrRef.h>
 
 #include <Time\TimeVal.h>
+#include <Util\UniquePointer.h>
 
 #include "Logging\Logger.h"
 #include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
@@ -42,6 +43,9 @@ X_NAMESPACE_DECLARE(engine,
 
 
 X_NAMESPACE_BEGIN(core)
+
+struct IoRequestBase;
+struct XFileAsync;
 
 
 typedef core::MemoryArena<
@@ -256,7 +260,6 @@ public:
 	X_INLINE void ToggleConsole(bool expand = false);
 
 private:
-
 	void AddCmd(const char* pCommand, ExecSource::Enum src, bool silent);
 	void AddCmd(const string& command, ExecSource::Enum src, bool silent);
 	void ExecuteStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands	
@@ -282,7 +285,9 @@ private:
 	void ExecuteInputBuffer(void);
 
 	void SaveCmdHistory(void) const;
-	void LoadCmdHistory(void);
+	void LoadCmdHistory(bool async);
+	void HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
 	void ParseCmdHistory(const char* pBegin, const char* pEnd);
 	void AddCmdToHistory(const char* pCommand);
 	void AddCmdToHistory(const string& command);
@@ -380,6 +385,13 @@ private:
 	Cursor					cursor_;
 
 	bool					coreEventListernRegd_;
+
+	// async history loading
+	bool					historyLoadPending_;
+	uint32_t				historyFileSize_;
+	core::UniquePointer<const char[]> historyFileBuf_;
+	core::CriticalSection	historyFileLock_;
+	core::ConditionVariable	historyFileCond_;
 
 #if X_ENABLE_CONFIG_HOT_RELOAD
 	bool					ignoreHotReload_;
