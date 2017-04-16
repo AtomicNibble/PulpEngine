@@ -35,14 +35,14 @@ namespace
 
 	constexpr const size_t ioReqSize[IoRequest::ENUM_COUNT] = {
 		sizeof(IoRequestOpen),
-		sizeof(IoRequestOpen),
+		sizeof(IoRequestOpenRead),
 		sizeof(IoRequestClose),
 		sizeof(IoRequestRead),
 		sizeof(IoRequestWrite)
 	};
 
 	static_assert(ioReqSize[IoRequest::OPEN] == sizeof(IoRequestOpen), "Enum mismtach?");
-	static_assert(ioReqSize[IoRequest::OPEN_READ_ALL] == sizeof(IoRequestOpen), "Enum mismtach?");
+	static_assert(ioReqSize[IoRequest::OPEN_READ_ALL] == sizeof(IoRequestOpenRead), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::CLOSE] == sizeof(IoRequestClose), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::WRITE] == sizeof(IoRequestWrite), "Enum mismtach?");
@@ -56,18 +56,52 @@ namespace
 		PendingOp(const IoRequestWrite& req, const XFileAsyncOperation& op) :
 			writeReq(req), op(op) {
 		}
+		PendingOp(const IoRequestOpenRead& req, const XFileAsyncOperation& op) :
+			openReadReq(req), op(op) {
+			X_ASSERT_NOT_NULL(req.arena);
+			X_ASSERT_NOT_NULL(req.pFile);
+			X_ASSERT_NOT_NULL(req.pBuf);
+		}
 
 		X_INLINE IoRequest::Enum getType(void) const {
 			return readReq.getType();
+		}
+
+		PendingOp& operator=(PendingOp&& oth)
+		{
+			op = std::move(oth.op);
+
+			switch (getType())
+			{
+				case IoRequest::READ:
+					readReq = std::move(oth.readReq);
+					break;
+				case IoRequest::WRITE:
+					writeReq = std::move(oth.writeReq);
+					break;
+				case IoRequest::OPEN_READ_ALL:
+					openReadReq = std::move(oth.openReadReq);
+					break;
+				default:
+					X_ASSERT_UNREACHABLE();
+					break;
+			}
+
+			return *this;
 		}
 
 		union
 		{
 			IoRequestRead readReq;
 			IoRequestWrite writeReq;
+			IoRequestOpenRead openReadReq; // this is a big fucker
 		};
 		XFileAsyncOperation op;
 	};
+
+
+	// X_ENSURE_SIZE(PendingOp, 104);
+	X_ENSURE_SIZE(PendingOp, 376); // with IoRequestOpenRead
 
 } // namespace
 
@@ -1331,6 +1365,7 @@ bool xFileSys::tryPopRequest(RequestBuffer& buf)
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 {
 	typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
+	
 	AsyncOps pendingOps;
 
 	gEnv->pJobSys->CreateQueForCurrentThread();
@@ -1391,6 +1426,40 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 						asyncReq.callback.Invoke(fileSys, &asyncReq, pReqFile, bytesTransferd);
 					}
+					else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL)
+					{
+						IoRequestOpenRead& asyncReq = asyncOp.openReadReq;
+						XFileAsync* pReqFile = asyncReq.pFile;
+
+						if (vars_.QueDebug)
+						{
+							uint32_t threadId = core::Thread::GetCurrentID();
+
+							X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-read request complete. "
+								"bytesTrans: 0x%x pBuf: %p",
+								threadId, IoRequest::ToString(asyncReq.getType()),
+								bytesTransferd, asyncReq.pBuf);
+						}
+
+						if (asyncReq.dataSize != bytesTransferd) 
+						{
+							X_ERROR("FileSys", "Failed to read whole file contents. requested: %" PRIu32 " got %" PRIu32,
+								asyncReq.dataSize, bytesTransferd);
+
+							X_DELETE_ARRAY(static_cast<uint8_t*>(asyncReq.pBuf), asyncReq.arena);
+							// we didnt not read the whole file, pretend we failed to open.
+							asyncReq.pBuf = nullptr;
+							asyncReq.dataSize = 0;
+							asyncReq.callback.Invoke(fileSys, &asyncReq, nullptr, 0);
+						}
+						else
+						{
+							asyncReq.callback.Invoke(fileSys, &asyncReq, pReqFile, bytesTransferd);
+						}
+
+						// close it.
+						closeFileAsync(pReqFile);
+					}
 					else
 					{
 						X_ASSERT_UNREACHABLE();
@@ -1418,13 +1487,51 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		}
 		else if (type == IoRequest::OPEN_READ_ALL)
 		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		//	IoRequestOpen& open = request.openInfo;
-		//	XFileMem* pFile = openFileMem(open.name.c_str(), open.mode);
-		//	bool operationSucced = pFile != nullptr;
+			IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
+			XFileAsync* pFile = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
 
+			// make sure it's safe to allocate the buffer in this thread.
+			X_ASSERT_NOT_NULL(pOpenRead->arena);
+			X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arenas")(pOpenRead->arena->isThreadSafe());
 
-		//	request.callback.Invoke(this, request.getType(), pFile, operationSucced);
+			if (!pOpenRead)
+			{
+				pOpenRead->callback.Invoke(fileSys, pOpenRead, pFile, 0);
+			}
+			else 
+			{
+				const uint64_t fileSize = pFile->remainingBytes();
+
+				// we don't support open and read for files over >2gb
+				// if you are trying todo that you are retarded.
+				// instead open the file and submit smaller read requests.
+				if (fileSize > std::numeric_limits<int32_t>::max())
+				{
+					X_ERROR("FileSys", "A request was made to read a entire file which is >2GB, ignoring request. File: \"%s\"",
+						pOpenRead->path.c_str());
+
+					closeFileAsync(pFile);
+					pOpenRead->callback.Invoke(fileSys, pOpenRead, nullptr, 0);
+				}
+				else
+				{
+					uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
+
+					XFileAsyncOperation operation = pFile->readAsync(
+						pData,
+						safe_static_cast<size_t>(fileSize),
+						0
+					);
+
+					// now we need to wait for the read to finish, then close the file and call the callback.
+					// just need to work out a nice way to close the file post read.
+					pOpenRead->pFile = pFile;
+					pOpenRead->pBuf = pData;
+					pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
+
+					pendingOps.emplace_back(*pOpenRead, operation);
+				}
+			}
 		}
 		else if (type == IoRequest::CLOSE)
 		{

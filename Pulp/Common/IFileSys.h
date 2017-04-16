@@ -495,6 +495,24 @@ struct IoRequestOpen : public IoRequestBase
 	core::Path<char> path;
 };
 
+struct IoRequestOpenRead : public IoRequestOpen
+{
+	IoRequestOpenRead() 
+	{
+		type = IoRequest::OPEN_READ_ALL;
+		arena = nullptr;
+		pFile = nullptr;
+		pBuf = nullptr;
+		dataSize = 0;
+	}
+
+	core::MemoryArenaBase* arena; // the arena the buffer to read the whole file into is allocated from.
+	// these are only valid if read completed.
+	XFileAsync* pFile;
+	void* pBuf;
+	uint32_t dataSize; 
+};
+
 struct IoRequestClose : public IoRequestBase
 {
 	IoRequestClose() {

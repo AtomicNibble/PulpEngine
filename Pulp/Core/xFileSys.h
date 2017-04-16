@@ -97,8 +97,13 @@ public:
 
 	friend struct XFindData;
 
-	static const size_t MAX_REQ_SIZE = core::Max(sizeof(IoRequestOpen), core::Max(sizeof(IoRequestClose),
-		core::Max(sizeof(IoRequestRead), sizeof(IoRequestWrite))));
+	static const size_t MAX_REQ_SIZE = core::Max(sizeof(IoRequestOpen), 
+		core::Max(sizeof(IoRequestOpenRead),
+		core::Max(sizeof(IoRequestClose),
+		core::Max(sizeof(IoRequestRead), 
+		sizeof(IoRequestWrite))))
+	);
+
 	static const size_t IO_REQUEST_BUF_SIZE = MAX_REQ_SIZE * 0x100;
 	static const size_t PENDING_IO_QUE_SIZE = 0x100;
 
