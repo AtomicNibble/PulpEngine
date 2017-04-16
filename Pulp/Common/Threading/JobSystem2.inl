@@ -172,6 +172,26 @@ namespace V2
 		return job;
 	}
 
+	template<typename ClassType>
+	X_INLINE Job* JobSystem::CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
+		void* pJobData)
+	{
+		Job* pJob = CreateMemberJob(pInst, pFunction, pJobData);
+		Run(pJob);
+		return pJob;
+	}
+
+
+	template<typename ClassType, typename DataT, typename>
+	X_INLINE Job* JobSystem::CreateMemberJobAndRun(ClassType* pInst,
+		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
+		typename DataT& data)
+	{
+		Job* pJob = CreateMemberJob(pInst, pFunction, data);
+		Run(pJob);
+		return pJob;
+	}
+
 
 	template<typename ClassType>
 	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,

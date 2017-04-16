@@ -381,6 +381,12 @@ public:
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
 	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction, typename DataT& jobData);
 
+	template<typename ClassType>
+	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData);
+
+	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
+	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction, typename DataT& jobData);
+
 
 	template<typename ClassType>
 	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, 
