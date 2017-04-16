@@ -231,7 +231,7 @@ class XPeer : public IPeer
 	static std::array<uint32_t, 3> MTUSizesArr;
 
 public:
-	XPeer(NetVars& vars, core::MemoryArenaBase* arena);
+	XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaBase* arena);
 	~XPeer() X_FINAL;
 
 	// IPeer
@@ -419,9 +419,6 @@ private:
 	X_INLINE void onSocketRecv(RecvData* pData);
 	core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
 
-
-private:
-	bool populateIpList(void);
 
 private:
 	NetVars& vars_;

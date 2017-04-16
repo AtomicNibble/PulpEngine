@@ -13,6 +13,8 @@ class XPeer;
 class XNet : public INet
 {
 	typedef core::FixedArray<XPeer*, MAX_PEERS> PeerArr;
+	typedef core::FixedArray<SystemAddressEx, MAX_INTERNAL_IDS> SystemAddArr;
+
 
 public:
 	XNet(core::MemoryArenaBase* arena);
@@ -42,6 +44,10 @@ public:
 	static NetGUID generateGUID(void);
 
 private:
+	bool populateIpList(void);
+
+
+private:
 	void Cmd_listLocalAddress(core::IConsoleCmdArgs* pCmd);
 	void Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd);
 	void Cmd_clearBans(core::IConsoleCmdArgs* pCmd);
@@ -53,6 +59,8 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 	
+	SystemAddArr ipList_;
+
 	PeerArr peers_;
 	NetVars vars_;
 };

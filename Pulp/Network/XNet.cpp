@@ -53,8 +53,11 @@ bool XNet::init(void)
 {
 	X_LOG0("Net", "Starting");
 
-
 	if (!PlatLib::addRef()) {
+		return false;
+	}
+
+	if (!populateIpList()) {
 		return false;
 	}
 
@@ -86,7 +89,7 @@ IPeer* XNet::createPeer(void)
 		return nullptr;
 	}
 
-	XPeer* pPeer = X_NEW(XPeer, arena_, "Peer")(vars_, arena_);
+	XPeer* pPeer = X_NEW(XPeer, arena_, "Peer")(vars_, ipList_, arena_);
 	peers_.append(pPeer);
 	return pPeer;
 }
@@ -173,6 +176,20 @@ NetGUID XNet::generateGUID(void)
 
 	return NetGUID(val);
 }
+
+
+bool XNet::populateIpList(void)
+{
+	if (!NetSocket::getMyIPs(ipList_)) {
+		return false;
+	}
+
+	return true;
+}
+
+
+// -------------------------
+
 
 void XNet::Cmd_listLocalAddress(core::IConsoleCmdArgs* pCmd)
 {

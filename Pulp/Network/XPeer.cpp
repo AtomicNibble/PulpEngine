@@ -241,8 +241,9 @@ void RemoteSystem::onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime
 
 std::array<uint32_t, 3> XPeer::MTUSizesArr = { MAX_MTU_SIZE, 1200, 576 };
 
-XPeer::XPeer(NetVars& vars, core::MemoryArenaBase* arena) :
+XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaBase* arena) :
 	vars_(vars),
+	ipList_(localAddress),
 	sockets_(arena),
 	socketThreads_(arena),
 	remoteSystems_(arena),
@@ -308,10 +309,6 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 	}
 	if (!pSocketDescriptors || socketDescriptorCount < 1) {
 		return StartupResult::InvalidSocketDescriptors;
-	}
-
-	if (!populateIpList()) {
-		return StartupResult::Error;
 	}
 
 	if (maxPeers_ == 0)
@@ -2799,15 +2796,6 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 
 	freeRecvData(pData);
 	return core::Thread::ReturnValue(0);
-}
-
-bool XPeer::populateIpList(void)
-{
-	if (!NetSocket::getMyIPs(ipList_)) {
-		return false;
-	}
-
-	return true;
 }
 
 
