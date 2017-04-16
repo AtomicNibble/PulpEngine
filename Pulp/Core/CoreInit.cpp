@@ -32,6 +32,7 @@
 #include <IJobSystem.h>
 #include <INetwork.h>
 #include <ISound.h>
+#include <IPhysics.h>
 
 #include <Extension\IPotatoUnknown.h>
 #include <Extension\IPotatoFactory.h>
@@ -742,8 +743,10 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
 
 	X_ASSERT_NOT_NULL(env_.pPhysics);
 
+	env_.pPhysics->registerVars();
+	env_.pPhysics->registerCmds();
 
-	return env_.pPhysics != nullptr;
+	return true;
 }
 
 

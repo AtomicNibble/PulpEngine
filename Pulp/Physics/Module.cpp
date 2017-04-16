@@ -57,17 +57,6 @@ class XEngineModule_Physics : public IEngineModule
 		g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
 		pPhysics = X_NEW(physics::XPhysics, g_PhysicsArena, "PhysicisSys")(8, env.pJobSys, g_PhysicsArena);
 
-		pPhysics->registerVars();
-		pPhysics->registerCmds();
-
-#if 0 // the 3d engine should call this
-		if (!pPhysics->init()) {
-			pPhysics->shutDown();
-			X_DELETE(pPhysics, g_PhysicsArena);
-			return false;
-		}
-#endif
-
 		env.pPhysics = pPhysics;
 		return true;
 	}
