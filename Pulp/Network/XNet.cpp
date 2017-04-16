@@ -56,12 +56,12 @@ bool XNet::init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_LOG0("Net", "Starting");
 
-	if (!PlatLib::addRef()) {
-		return false;
-	}
-
 	if (!gEnv->pJobSys) 
 	{
+		if (!PlatLib::addRef()) {
+			return false;
+		}
+
 		if (!populateIpList()) {
 			return false;
 		}
@@ -82,7 +82,12 @@ bool XNet::asyncInitFinalize(void)
 		pInitJob_ = nullptr;
 	}
 
+	if (!PlatLib::isStarted()) {
+		return false;
+	}
+
 	if (ipList_.isEmpty()) {
+		X_LOG0("Net", "Failed to get local addresses");
 		return false;
 	}
 
@@ -210,6 +215,10 @@ void XNet::asyncInit_Job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2
 	X_UNUSED(threadIdx);
 	X_UNUSED(pJob);
 	X_UNUSED(pData);
+
+	if (!PlatLib::addRef()) {
+		return;
+	}
 
 	populateIpList();
 }
