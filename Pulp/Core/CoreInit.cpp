@@ -739,6 +739,8 @@ bool XCore::InitNet(const SCoreInitParams& initParams)
 		return false;
 	}
 
+	X_ASSERT_NOT_NULL(env_.pNet);
+
 	env_.pNet->registerVars();
 	env_.pNet->registerCmds();
 
@@ -747,7 +749,7 @@ bool XCore::InitNet(const SCoreInitParams& initParams)
 		return false;
 	}
 
-	return env_.pNet != nullptr;
+	return true;
 }
 
 bool XCore::InitScriptSys(const SCoreInitParams& initParams)
