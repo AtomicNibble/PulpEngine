@@ -420,8 +420,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- TIMER ------------------------
-	if (!time_.Init(this))
+	if (!time_.Init(this)) {
 		return false;
+	}
 
 	// #------------------------- JOB SYSTEM ------------------------
 	if (env_.pJobSys) {
