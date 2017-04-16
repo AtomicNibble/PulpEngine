@@ -10,17 +10,19 @@ X_NAMESPACE_BEGIN(input)
 
 namespace
 {
-	unsigned char ToAscii(unsigned int vKeyCode, unsigned int uScanCode, unsigned char sKState[256])
+	uint8_t ToAscii(uint32_t vKeyCode, uint32_t scanCode, uint8_t KState[256])
 	{
-		unsigned short ascii[2] = { 0 };
-		int nResult = ToAsciiEx(vKeyCode, uScanCode, sKState, ascii, 0, GetKeyboardLayout(0));
+		uint16_t ascii[2] = { 0, 0 };
+		int32_t result = ::ToAsciiEx(vKeyCode, scanCode, KState, ascii, 0, GetKeyboardLayout(0));
 
-		if (nResult == 2)
-			return (char)(ascii[1] ? ascii[1] : (ascii[0] >> 8));
-		else if (nResult == 1)
-			return (char)ascii[0];
-		else
-			return 0;
+		if (result == 2) {
+			return static_cast<uint8_t>(ascii[1] ? ascii[1] : (ascii[0] >> 8));
+		}
+		else if (result == 1) {
+			return static_cast<uint8_t>(ascii[0]);
+		}
+		
+		return 0;
 	}
 } // namespace
 
@@ -215,21 +217,20 @@ void XKeyboard::initAsciiCache(void)
 	core::zero_object(ascii_cache);
 
 	int k;
-	unsigned char sKState[256] = { 0 };
-	//unsigned int vKeyCode;
-	unsigned int uScanCode;
+	uint8_t sKState[256] = { 0 };
+	uint32_t scanCode;
 	
 	for (k = 0; k<256; k++)
 	{
-		uScanCode = MapVirtualKey(k, 0);
+		scanCode = MapVirtualKey(k, 0);
 
 		// lower case
-		ascii_cache[k].lower = ToAscii(k, uScanCode, sKState);
+		ascii_cache[k].lower = ToAscii(k, scanCode, sKState);
 
 
 		// upper case
 		sKState[VK_SHIFT] = 0x80;
-		ascii_cache[k].upper = ToAscii(k, uScanCode, sKState);
+		ascii_cache[k].upper = ToAscii(k, scanCode, sKState);
 		sKState[VK_SHIFT] = 0;
 
 		// alternate
@@ -237,7 +238,7 @@ void XKeyboard::initAsciiCache(void)
 		sKState[VK_MENU] = 0x80;
 		sKState[VK_LCONTROL] = 0x80;
 		sKState[VK_LMENU] = 0x80;
-		ascii_cache[k].alternate = ToAscii(k, uScanCode, sKState);
+		ascii_cache[k].alternate = ToAscii(k, scanCode, sKState);
 		sKState[VK_CONTROL] = 0x0;
 		sKState[VK_MENU] = 0x0;
 		sKState[VK_LCONTROL] = 0x0;
@@ -245,11 +246,9 @@ void XKeyboard::initAsciiCache(void)
 
 		// caps lock
 		sKState[VK_CAPITAL] = 0x01;
-		ascii_cache[k].caps = ToAscii(k, uScanCode, sKState);
+		ascii_cache[k].caps = ToAscii(k, scanCode, sKState);
 		sKState[VK_CAPITAL] = 0;
 	}
-
-
 }
 
 void XKeyboard::ShutDown(void)
