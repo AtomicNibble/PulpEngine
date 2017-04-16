@@ -44,7 +44,7 @@ namespace
 	static_assert(ioReqSize[IoRequest::OPEN] == sizeof(IoRequestOpen), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::OPEN_READ_ALL] == sizeof(IoRequestOpen), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::CLOSE] == sizeof(IoRequestClose), "Enum mismtach?");
-	static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestWrite), "Enum mismtach?");
+	static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::WRITE] == sizeof(IoRequestWrite), "Enum mismtach?");
 
 
