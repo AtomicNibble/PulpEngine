@@ -316,6 +316,8 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 
 bool NetSocket::getMyIPs(SystemAddArr& addresses)
 {
+	addresses.clear();
+
 	int32_t res;
 	char hostName[256];
 	res = platform::gethostname(hostName, sizeof(hostName));
