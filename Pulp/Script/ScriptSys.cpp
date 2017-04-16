@@ -237,8 +237,6 @@ bool XScriptSys::Init()
 
 	InitCommands();
 
-	ExecuteFile("scripts/main.lua", false, false);
-
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
 
