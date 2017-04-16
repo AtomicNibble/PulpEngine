@@ -112,8 +112,11 @@ struct IScriptSys
 {
 	virtual ~IScriptSys(){};
 
-	virtual bool Init(void) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
+	virtual bool init(void) X_ABSTRACT;
+	virtual void shutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 
 	virtual void Update(void) X_ABSTRACT;

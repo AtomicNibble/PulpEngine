@@ -81,8 +81,11 @@ public:
 	// IScriptSys
 	~XScriptSys() X_OVERRIDE;
 
-	virtual bool Init(void) X_OVERRIDE;
-	virtual void ShutDown(void) X_OVERRIDE;
+	virtual void registerVars(void) X_OVERRIDE;
+	virtual void registerCmds(void) X_OVERRIDE;
+
+	virtual bool init(void) X_OVERRIDE;
+	virtual void shutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 
 	virtual void Update(void) X_OVERRIDE;
@@ -140,7 +143,6 @@ public:
 	}
 
 private:
-	void InitCommands();
 
 	bool ExecuteFile_Internal(const core::Path<char>& path, bool silent);
 	bool ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description);

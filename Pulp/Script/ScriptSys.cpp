@@ -200,11 +200,29 @@ XScriptSys::XScriptSys() :
 
 XScriptSys::~XScriptSys()
 {
-	ShutDown();
+}
+
+void XScriptSys::registerVars(void)
+{
+
+	ADD_CVAR_REF("script_draw_memory_stats", c_script_draw_memory_stats_, 0, 0, 1, core::VarFlag::SYSTEM,
+		"Draw lua memory stats on screen");
+}
+
+void XScriptSys::registerCmds(void)
+{
+	// add the shieeeeeeet.
+	ADD_COMMAND("listScipts", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
+
+	ADD_COMMAND("scriptLoad", LoadScriptCmd, core::VarFlag::SYSTEM, "Load and run a script file");
+	ADD_COMMAND("scriptList", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
+	ADD_COMMAND("scriptReload", ReloadScriptCmd, core::VarFlag::SYSTEM, "Reload a given script <filename>");
+	ADD_COMMAND("scriptDumpState", LuaDumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
+
 }
 
 
-bool XScriptSys::Init()
+bool XScriptSys::init(void)
 {
 	X_LOG0("Script", "Starting script system");
 	X_ASSERT(initialised_ == false, "Already init")(initialised_);
@@ -235,31 +253,14 @@ bool XScriptSys::Init()
 	lua_pushcfunction(L, XScriptSys::ErrorHandler);
 	g_pErrorHandlerFunc = lua_ref(L, 1);
 
-	InitCommands();
-
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
-
 
 	initialised_ = true;
 	return true;
 }
 
-void XScriptSys::InitCommands()
-{
-	// add the shieeeeeeet.
-	ADD_COMMAND("listScipts", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
-
-	ADD_COMMAND("scriptLoad", LoadScriptCmd, core::VarFlag::SYSTEM, "Load and run a script file");
-	ADD_COMMAND("scriptList", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
-	ADD_COMMAND("scriptReload", ReloadScriptCmd, core::VarFlag::SYSTEM, "Reload a given script <filename>");
-	ADD_COMMAND("scriptDumpState", LuaDumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
-	
-	ADD_CVAR_REF("script_draw_memory_stats", c_script_draw_memory_stats_, 0, 0, 1, core::VarFlag::SYSTEM,
-		"Draw lua memory stats on screen");
-}
-
-void XScriptSys::ShutDown()
+void XScriptSys::shutDown(void)
 {
 	if (!initialised_) {
 		return;
@@ -279,8 +280,9 @@ void XScriptSys::ShutDown()
 
 		++it;
 
-		if (pTable)
+		if (pTable) {
 			pTable->release();
+		}
 	}
 
 	XScriptTable::s_allTables_.clear();
@@ -296,11 +298,11 @@ void XScriptSys::ShutDown()
 
 void XScriptSys::release(void)
 {
-	X_DELETE(this,g_ScriptArena);
+	X_DELETE(this, g_ScriptArena);
 }
 
 
-void XScriptSys::Update()
+void XScriptSys::Update(void)
 {
 	X_PROFILE_BEGIN("ScriptUpdate", core::ProfileSubSys::SCRIPT);
 

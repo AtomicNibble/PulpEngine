@@ -258,7 +258,7 @@ void XCore::ShutDown()
 
 	if (env_.pScriptSys)
 	{
-		env_.pScriptSys->ShutDown();
+		env_.pScriptSys->shutDown();
 		core::SafeRelease(env_.pScriptSys);
 	}
 

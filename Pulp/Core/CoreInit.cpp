@@ -777,8 +777,10 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 
 	X_ASSERT_NOT_NULL(env_.pScriptSys);
 
+	env_.pScriptSys->registerVars();
+	env_.pScriptSys->registerCmds();
 
-	if (!env_.pScriptSys->Init()) {
+	if (!env_.pScriptSys->init()) {
 		X_ERROR("Font", "failed to init script system");
 		return false;
 	}
