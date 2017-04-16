@@ -60,7 +60,7 @@ public:
 
 private:
 	void deleter(pointer ptr) {
-		X_DELETE(ptr, getArena());
+		X_DELETE(const_cast<typename std::remove_const<T>::type*>(ptr), getArena());
 	}
 };
 
@@ -96,7 +96,7 @@ public:
 
 private:
 	void deleter(pointer ptr) {
-		X_DELETE_ARRAY(ptr, getArena());
+		X_DELETE_ARRAY(const_cast<typename std::remove_const<T>::type*>(ptr), getArena());
 	}
 };
 
