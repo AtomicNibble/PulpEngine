@@ -15,6 +15,8 @@ class XNet : public INet
 	typedef core::FixedArray<XPeer*, MAX_PEERS> PeerArr;
 	typedef core::FixedArray<SystemAddressEx, MAX_INTERNAL_IDS> SystemAddArr;
 
+	X_NO_COPY(XNet);
+	X_NO_ASSIGN(XNet);
 
 public:
 	XNet(core::MemoryArenaBase* arena);
