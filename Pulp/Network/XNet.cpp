@@ -110,6 +110,8 @@ void XNet::release(void)
 
 IPeer* XNet::createPeer(void)
 {
+	X_ASSERT(!pInitJob_, "Async init not finalized")();
+
 	if (peers_.size() == peers_.capacity()) {
 		return nullptr;
 	}
