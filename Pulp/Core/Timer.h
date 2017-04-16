@@ -22,10 +22,11 @@ public:
 	XTimer();
 	~XTimer() X_OVERRIDE = default;
 
-	bool Init(ICore *pCore) X_FINAL;
+	bool init(ICore* pCore) X_FINAL;
 
 	// reset the timers, so delta from start time is zero.
-	void Reset(void) X_FINAL;
+	void reset(void) X_FINAL;
+
 
 	void OnFrameBegin(core::FrameTimeData& frameTime) X_FINAL;
 

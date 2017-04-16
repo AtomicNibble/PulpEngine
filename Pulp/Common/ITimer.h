@@ -24,8 +24,9 @@ struct ITimer
 
 	virtual ~ITimer() {};
 
-	virtual bool Init(ICore* pCore) X_ABSTRACT;
-	virtual void Reset(void) X_ABSTRACT;
+	virtual bool init(ICore* pCore) X_ABSTRACT;
+	virtual void reset(void) X_ABSTRACT;
+
 
 	// start of frame sets the timers values.
 	virtual void OnFrameBegin(core::FrameTimeData& frameTime) X_ABSTRACT;

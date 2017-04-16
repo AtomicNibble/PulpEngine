@@ -355,8 +355,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
 
 	// #------------------------- Logging -----------------------
-	if (!InitLogging(startupParams))
+	if (!InitLogging(startupParams)) {
 		return false;
+	}
 
 	// #------------------------- JOB SYSTEM ------------------------
 	if (startupParams.jobSystemEnabled()) {
@@ -364,8 +365,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- FileSystem --------------------
-	if (!InitFileSys(startupParams))
+	if (!InitFileSys(startupParams)) {
 		return false;
+	}
 
 	// #------------------------- Create Console ----------------
 	if (!startupParams.isCoreOnly() || startupParams.basicConsole())
@@ -420,7 +422,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- TIMER ------------------------
-	if (!time_.Init(this)) {
+	if (!time_.init(this)) {
 		return false;
 	}
 
@@ -516,25 +518,29 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// #------------------------- Renderer -------------------------
 	if (!startupParams.isCoreOnly() || startupParams.bTesting) {
-		if (!InitRenderSys(startupParams))
+		if (!InitRenderSys(startupParams)) {
 			return false;
+		}
 	}
 
 	//  #------------------------- 3DEngine -------------------------
 	if (!startupParams.bTesting && !startupParams.isCoreOnly()) {
-		if (!Init3DEngine(startupParams))
-			return false;	
+		if (!Init3DEngine(startupParams)) {
+			return false;
+		}
 	}
 
 	//  #------------------------- Game Dll -------------------------
 	if (!startupParams.bTesting && !startupParams.isCoreOnly()) {
-		if (!InitGameDll(startupParams))
+		if (!InitGameDll(startupParams)) {
 			return false;
+		}
 	}
 
 	// #------------------------- Console ---------------------------
-	if (!InitConsole(startupParams))
+	if (!InitConsole(startupParams)) {
 		return false;
+	}
 
 	AddIgnoredHotReloadExtensions();
 
@@ -627,7 +633,8 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 	env_.pLog = X_NEW_ALIGNED( core::XLog, g_coreArena, "LogSystem", 8);
 
 #if X_ENABLE_LOGGING
-	if (env_.pLog) {
+	if (env_.pLog) 
+	{
 		if (initParams.bVsLog)
 		{
 			pVsLogger_ = X_NEW( VisualStudioLogger, g_coreArena, "VSLogger");
@@ -635,8 +642,9 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 		}
 		if (initParams.bConsoleLog)
 		{
-			if (initParams.pConsoleWnd)
+			if (initParams.pConsoleWnd) {
 				pConsole_ = initParams.pConsoleWnd;
+			}
 			else {
 				pConsole_ = X_NEW( core::Console, g_coreArena, "ExternalConsoleLog")(L"Engine Log");
 				pConsole_->SetSize(120, 60, 8000);
@@ -664,7 +672,7 @@ bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
 	env_.pConsole->Startup(this, initParams.basicConsole());
 	if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
-
+		// ...
 	}
 
 	return true;
