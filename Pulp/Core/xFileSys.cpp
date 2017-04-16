@@ -101,7 +101,7 @@ namespace
 
 
 	// X_ENSURE_SIZE(PendingOp, 104);
-	X_ENSURE_SIZE(PendingOp, 376); // with IoRequestOpenRead
+	// X_ENSURE_SIZE(PendingOp, 376); // with IoRequestOpenRead
 
 } // namespace
 
