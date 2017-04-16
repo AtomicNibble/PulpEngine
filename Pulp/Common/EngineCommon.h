@@ -75,6 +75,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // Common used interface 
 #include <IProfile.h>
 #include <ICore.h>
+#include <IModuleBase.h>
 
 
 // threading
