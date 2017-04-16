@@ -550,6 +550,23 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		core::symbolResolution::Refresh();
 	}
 
+	// #------------------------ Async Init --------------------------
+	{
+		// Sync up any asynchronous initialization so we are fully init.
+		// This is stuff like loading default assets, that can be done in background to 
+		// minamize startup time.
+
+		if (env_.pNet) 
+		{
+			if (!env_.pNet->asyncInitFinalize())
+			{
+				return false;
+			}
+		}
+
+	}
+
+
 	// show the window
 	if (pWindow_) {
 		pWindow_->Show();

@@ -8,13 +8,15 @@
 #include <Time\DateStamp.h>
 #include <ITimer.h>
 #include <IConsole.h>
+#include <Threading\JobSystem2.h>
 
 #include <Hashing\sha1.h>
 
 X_NAMESPACE_BEGIN(net)
 
 XNet::XNet(core::MemoryArenaBase* arena) :
-	arena_(arena)
+	arena_(arena),
+	pInitJob_(nullptr)
 {
 
 }
@@ -51,13 +53,27 @@ void XNet::registerCmds(void)
 
 bool XNet::init(void)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 	X_LOG0("Net", "Starting");
 
 	if (!PlatLib::addRef()) {
 		return false;
 	}
 
-	if (!populateIpList()) {
+	pInitJob_ = gEnv->pJobSys->CreateMemberJobAndRun<XNet>(this, &XNet::asyncInit_Job, nullptr);
+
+	return true;
+}
+
+bool XNet::asyncInitFinalize(void)
+{
+	if (pInitJob_) {
+		gEnv->pJobSys->Wait(pInitJob_);
+		pInitJob_ = nullptr;
+	}
+
+	if (ipList_.isEmpty()) {
 		return false;
 	}
 
@@ -177,6 +193,15 @@ NetGUID XNet::generateGUID(void)
 	return NetGUID(val);
 }
 
+void XNet::asyncInit_Job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+	X_UNUSED(pData);
+
+	populateIpList();
+}
 
 bool XNet::populateIpList(void)
 {

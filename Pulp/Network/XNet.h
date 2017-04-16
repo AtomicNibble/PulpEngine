@@ -7,6 +7,13 @@ struct ICVar;
 struct IConsoleCmdArgs;
 )
 
+X_NAMESPACE_DECLARE(core,
+namespace V2 {
+	struct Job;
+	class JobSystem;
+}
+)
+
 X_NAMESPACE_BEGIN(net)
 
 class XPeer;
@@ -27,6 +34,7 @@ public:
 	void registerCmds(void) X_FINAL;
 
 	bool init(void) X_FINAL;
+	bool asyncInitFinalize(void) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
@@ -45,6 +53,10 @@ public:
 
 	static NetGUID generateGUID(void);
 
+
+private:
+	void asyncInit_Job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
 private:
 	bool populateIpList(void);
 
@@ -60,7 +72,8 @@ private:
 
 private:
 	core::MemoryArenaBase* arena_;
-	
+	core::V2::Job* pInitJob_;
+
 	SystemAddArr ipList_;
 
 	PeerArr peers_;

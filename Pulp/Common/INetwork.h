@@ -379,6 +379,9 @@ struct INet : public core::IEngineSysBase
 {
 	virtual ~INet() {}
 
+	virtual bool asyncInitFinalize(void) X_ABSTRACT;
+
+
 	virtual IPeer* createPeer(void) X_ABSTRACT;
 	virtual void deletePeer(IPeer* pPeer) X_ABSTRACT;
 
