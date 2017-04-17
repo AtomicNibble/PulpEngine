@@ -14,7 +14,7 @@ using namespace xml;
 using namespace rapidxml;
 
 
-namespace 
+namespace
 {
 	void* XmlAllocate(std::size_t size)
 	{
@@ -26,171 +26,172 @@ namespace
 		char* pChar = (char*)pointer;
 		X_DELETE_ARRAY(pChar, g_fontArena);
 	}
-}
 
 
-bool ParseColValue(const char* attr, uint8_t& col)
-{
-	if (strUtil::IsNumeric(attr)) {
-		float value = strUtil::StringToFloat<float>(attr);
-		if (value >= 0.f && value <= 1.f) {
-			col = static_cast<uint8_t>(value * 255.f);
-			return true;
-		}
-	}
-	X_ERROR("Font", "color value is not a valid float beetween: 0 - 1");
-	return false;
-}
 
-
-bool ParsePassCol(xml_node<>* node, Color8u& col)
-{
-	X_ASSERT_NOT_NULL(node);
-	xml_attribute<>* attr;
-	int num = 0;
-
-	for (attr = node->first_attribute(); attr; attr = attr->next_attribute())
+	bool ParseColValue(const char* attr, uint8_t& col)
 	{
-		if (strUtil::IsEqual("r", attr->name()))
-		{
-			if (ParseColValue(attr->value(), col.r))
-				num++;
-		}
-		else if (strUtil::IsEqual("g", attr->name()))
-		{
-			if (ParseColValue(attr->value(), col.g))
-				num++;
-		}
-		else if (strUtil::IsEqual("b", attr->name()))
-		{
-			if (ParseColValue(attr->value(), col.b))
-				num++;
-		}
-		else if (strUtil::IsEqual("a", attr->name()))
-		{
-			if (ParseColValue(attr->value(), col.a))
-				num++;
-		}
-	}
-
-	if (num == 4) {
-		return true;
-	}
-	X_ERROR("Font", "invalid color node required attr: r,g,b,a");
-	return false;
-}
-
-
-bool ParsePassPos(xml_node<>* node, Vec2f& pos)
-{
-	X_ASSERT_NOT_NULL(node);
-	xml_attribute<>* attr;
-	int num = 0;
-
-	for (attr = node->first_attribute(); attr; attr = attr->next_attribute())
-	{
-		if (strUtil::IsEqual("x", attr->name())) {
-			if (strUtil::IsNumeric(attr->value())) {
-				pos.x = strUtil::StringToFloat<float>(attr->value());
-				num++;
+		if (strUtil::IsNumeric(attr)) {
+			float value = strUtil::StringToFloat<float>(attr);
+			if (value >= 0.f && value <= 1.f) {
+				col = static_cast<uint8_t>(value * 255.f);
+				return true;
 			}
 		}
-			
-		if (strUtil::IsEqual("y", attr->name())) {
-			if (strUtil::IsNumeric(attr->value())) {
-				pos.y = strUtil::StringToFloat<float>(attr->value());
-				num++;
-			}
-		}
-	}
-	if (num == 2) {
-		return true;
-	}
-	X_ERROR("Font", "invalid pos node required attr: x and y");
-	return false;
-}
-
-bool ParseEffect(xml_node<>* node, XFont::FontEffect& effect)
-{
-	X_ASSERT_NOT_NULL(node);
-	core::StackString<64> name;
-	xml_attribute<>* attr;
-	xml_node<>* passNode;
-	xml_node<>* pass;
-
-	for (attr = node->first_attribute();
-		attr; attr = attr->next_attribute())
-	{
-		if (strUtil::IsEqualCaseInsen("name", attr->name()))
-		{
-			if (attr->value_size() <= 64)
-			{
-				name.append(attr->value());
-			}
-			else
-			{
-				X_ERROR("Font", "effect name is longer then 64: %s", attr->name());
-			}
-		}
-	}
-
-	if (name.isEmpty()) {
-		X_ERROR("Font", "effect missing name attribute");
+		X_ERROR("Font", "color value is not a valid float beetween: 0 - 1");
 		return false;
 	}
 
-	effect.name = name;
 
-	for (pass = node->first_node();
-		pass; pass = pass->next_sibling())
+	bool ParsePassCol(xml_node<>* node, Color8u& col)
 	{
-		if (strUtil::IsEqualCaseInsen("pass", pass->name()))
+		X_ASSERT_NOT_NULL(node);
+		xml_attribute<>* attr;
+		int num = 0;
+
+		for (attr = node->first_attribute(); attr; attr = attr->next_attribute())
 		{
-			// add a pass, additional info is optional.		
-			XFont::FontPass effectPass;
-
-			if (effect.passes.size() == XFont::MAX_FONT_PASS) {
-				X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(XFont::MAX_FONT_PASS) " ignoring extra passes");
-				break;
-			}
-
-			for (passNode = pass->first_node();
-				passNode; passNode = passNode->next_sibling())
+			if (strUtil::IsEqual("r", attr->name()))
 			{
-				if (strUtil::IsEqualCaseInsen("color", passNode->name()))
-				{
-					// r, g, b, a nodes
-					Color8u col;
-					if (ParsePassCol(passNode, col))
-					{
-						effectPass.col = col;
-					}
-				}
-				else if (strUtil::IsEqualCaseInsen("pos", passNode->name()))
-				{
-					// x / y nodes.
-					Vec2f pos;
-					if (ParsePassPos(passNode, pos))
-					{
-						effectPass.offset = pos;
-					}
+				if (ParseColValue(attr->value(), col.r))
+					num++;
+			}
+			else if (strUtil::IsEqual("g", attr->name()))
+			{
+				if (ParseColValue(attr->value(), col.g))
+					num++;
+			}
+			else if (strUtil::IsEqual("b", attr->name()))
+			{
+				if (ParseColValue(attr->value(), col.b))
+					num++;
+			}
+			else if (strUtil::IsEqual("a", attr->name()))
+			{
+				if (ParseColValue(attr->value(), col.a))
+					num++;
+			}
+		}
+
+		if (num == 4) {
+			return true;
+		}
+		X_ERROR("Font", "invalid color node required attr: r,g,b,a");
+		return false;
+	}
+
+
+	bool ParsePassPos(xml_node<>* node, Vec2f& pos)
+	{
+		X_ASSERT_NOT_NULL(node);
+		xml_attribute<>* attr;
+		int num = 0;
+
+		for (attr = node->first_attribute(); attr; attr = attr->next_attribute())
+		{
+			if (strUtil::IsEqual("x", attr->name())) {
+				if (strUtil::IsNumeric(attr->value())) {
+					pos.x = strUtil::StringToFloat<float>(attr->value());
+					num++;
 				}
 			}
 
-			effect.passes.append(effectPass);
+			if (strUtil::IsEqual("y", attr->name())) {
+				if (strUtil::IsNumeric(attr->value())) {
+					pos.y = strUtil::StringToFloat<float>(attr->value());
+					num++;
+				}
+			}
 		}
+		if (num == 2) {
+			return true;
+		}
+		X_ERROR("Font", "invalid pos node required attr: x and y");
+		return false;
 	}
 
-	// we support effects with no passes defied.
-	// it's the same as a single empty pass.
-	if (effect.passes.isEmpty()) {
-		XFont::FontPass stdPass;
-		effect.passes.append(stdPass);
+	bool ParseEffect(xml_node<>* node, XFont::FontEffect& effect)
+	{
+		X_ASSERT_NOT_NULL(node);
+		core::StackString<64> name;
+		xml_attribute<>* attr;
+		xml_node<>* passNode;
+		xml_node<>* pass;
+
+		for (attr = node->first_attribute();
+			attr; attr = attr->next_attribute())
+		{
+			if (strUtil::IsEqualCaseInsen("name", attr->name()))
+			{
+				if (attr->value_size() <= 64)
+				{
+					name.append(attr->value());
+				}
+				else
+				{
+					X_ERROR("Font", "effect name is longer then 64: %s", attr->name());
+				}
+			}
+		}
+
+		if (name.isEmpty()) {
+			X_ERROR("Font", "effect missing name attribute");
+			return false;
+		}
+
+		effect.name = name;
+
+		for (pass = node->first_node();
+			pass; pass = pass->next_sibling())
+		{
+			if (strUtil::IsEqualCaseInsen("pass", pass->name()))
+			{
+				// add a pass, additional info is optional.		
+				XFont::FontPass effectPass;
+
+				if (effect.passes.size() == XFont::MAX_FONT_PASS) {
+					X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(XFont::MAX_FONT_PASS) " ignoring extra passes");
+					break;
+				}
+
+				for (passNode = pass->first_node();
+					passNode; passNode = passNode->next_sibling())
+				{
+					if (strUtil::IsEqualCaseInsen("color", passNode->name()))
+					{
+						// r, g, b, a nodes
+						Color8u col;
+						if (ParsePassCol(passNode, col))
+						{
+							effectPass.col = col;
+						}
+					}
+					else if (strUtil::IsEqualCaseInsen("pos", passNode->name()))
+					{
+						// x / y nodes.
+						Vec2f pos;
+						if (ParsePassPos(passNode, pos))
+						{
+							effectPass.offset = pos;
+						}
+					}
+				}
+
+				effect.passes.append(effectPass);
+			}
+		}
+
+		// we support effects with no passes defied.
+		// it's the same as a single empty pass.
+		if (effect.passes.isEmpty()) {
+			XFont::FontPass stdPass;
+			effect.passes.append(stdPass);
+		}
+
+		return true;
 	}
 
-	return true;
-}
-
+} // namespace
 
 bool XFont::loadFont()
 {
