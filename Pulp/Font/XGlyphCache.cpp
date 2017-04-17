@@ -266,12 +266,12 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* p
 			X_ERROR("Font", "Failed to cache glyph for char: '%lc'", cChar);
 			return false;
 		}
+
+		pItor = cacheTable_.find(cChar);
 	}
 
 	// should be in the cache table now.
-	pItor = cacheTable_.find(cChar);
 	X_ASSERT_NOT_NULL(pItor->second);
-
 	auto* pGlyph = pItor->second;
 
 	pGlyph->usage = usage_++;
