@@ -65,7 +65,7 @@ public:
 	void GetGradientTextureCoord(float& minU, float& minV, 
 		float& maxU, float& maxV) const;
 
-	X_INLINE const char* getName(void) const;
+	X_INLINE const FontNameStr& getName(void) const;
 	X_INLINE bool isDirty(void) const;
 	X_INLINE bool isTextureValid(void) const;
 	X_INLINE XFontTexture* getFontTexture(void) const;
@@ -114,9 +114,9 @@ private:
 	core::RequestHandle ioRequest_;
 };
 
-X_INLINE const char* XFont::getName(void) const
+X_INLINE const FontNameStr& XFont::getName(void) const
 { 
-	return name_.c_str();
+	return name_;
 }
 
 X_INLINE bool XFont::isDirty(void) const

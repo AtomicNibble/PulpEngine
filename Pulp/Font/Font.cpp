@@ -709,7 +709,7 @@ void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 bool XFont::CreateDeviceTexture(void)
 {
 	core::StackString512 name("$fontTexture_");
-	name.append(getName());
+	name.append(getName().begin(), getName().end());
 
 	const auto& buf = pFontTexture_->GetBuffer();
 

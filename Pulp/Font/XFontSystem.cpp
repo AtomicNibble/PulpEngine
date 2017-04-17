@@ -221,11 +221,11 @@ void XFontSystem::ListFonts(void) const
 	{
 		XFontTexture* pTex = it->second->getFontTexture();
 		if (pTex) {
-			X_LOG0("Fonts", "Name: %s, Size: (%i,%i), Usage: %i", it->second->getName(),
+			X_LOG0("Fonts", "Name: %s, Size: (%i,%i), Usage: %i", it->second->getName().c_str(),
 				pTex->GetWidth(), pTex->GetHeight(), pTex->GetSlotUsage());
 		}
 		else {
-			X_LOG0("Fonts", "Name: %s", it->second->getName());
+			X_LOG0("Fonts", "Name: %s", it->second->getName().c_str());
 		}
 	}
 	
