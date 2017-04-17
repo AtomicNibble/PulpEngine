@@ -54,6 +54,17 @@ typedef Flags<DrawTextFlag> DrawTextFlags;
 
 X_DECLARE_FLAG_OPERATORS(DrawTextFlags);
 
+
+X_DECLARE_ENUM(FontEncoding)(
+	// Corresponds to the Unicode character set. This value covers all versions of the Unicode repertoire,
+	// including ASCII and Latin-1. Most fonts include a Unicode charmap, but not all of them.
+	Unicode,
+	// Corresponds to the Microsoft Symbol encoding, used to encode mathematical symbols in the 32..255 character code range.
+	// For more information, see `http://www.ceviz.net/symbol.htm'.
+	MSSymbol
+);
+
+
 struct XTextDrawConect
 {
 	Color8u	col;  // 4
