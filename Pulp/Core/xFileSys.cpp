@@ -1269,6 +1269,9 @@ void xFileSys::AddIoRequestToQue(const IoRequestBase& request)
 			return;
 		}
 	}
+	else {
+		X_ASSERT(request.callback, "Callback can't be null")(IoRequest::ToString(request.getType()), request.callback);
+	}
 
 	if (vars_.QueDebug)
 	{
