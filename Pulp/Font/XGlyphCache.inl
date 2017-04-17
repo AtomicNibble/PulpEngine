@@ -3,12 +3,12 @@
 X_NAMESPACE_BEGIN(font)
 
 
-X_INLINE bool XGlyphCache::SetEncoding(FT_Encoding pEncoding)
+X_INLINE bool XGlyphCache::SetEncoding(FontEncoding::Enum encoding)
 { 
-	return fontRenderer_.SetEncoding(pEncoding);
+	return fontRenderer_.SetEncoding(encoding);
 }
 
-X_INLINE FT_Encoding XGlyphCache::GetEncoding(void) const
+X_INLINE FontEncoding::Enum XGlyphCache::GetEncoding(void) const
 {
 	return fontRenderer_.GetEncoding();
 }

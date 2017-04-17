@@ -9,9 +9,8 @@ XFontRender::XFontRender() :
 	pLibrary_(0),
 	pFace_(0),
 	pGlyph_(0), 
-	pEncoding_(ENCODING_UNICODE),
+	encoding_(FontEncoding::Unicode),
 	fSizeRatio_(0.8f),
-	// fSizeRatio_(1.0f),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
 	fileData_(g_fontArena)
@@ -25,7 +24,7 @@ XFontRender::~XFontRender()
 }
 
 
-bool XFontRender::SetRawFontBuffer(BufferArr& rawFontBuf)
+bool XFontRender::SetRawFontBuffer(BufferArr& rawFontBuf, FontEncoding::Enum encoding)
 {
 	fileData_.swap(rawFontBuf); // we need to keep this buffer in memory.
 
@@ -56,7 +55,7 @@ bool XFontRender::SetRawFontBuffer(BufferArr& rawFontBuf)
 		return false;
 	}
 
-	SetEncoding(ENCODING_UNICODE);
+	SetEncoding(encoding);
 	return true;
 }
 
@@ -129,11 +128,29 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 
 
 
-bool XFontRender::SetEncoding(FT_Encoding pEncoding)
+bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 {
-	const int32_t err = FT_Select_Charmap(pFace_, pEncoding);
+	FT_Encoding ftEncoding = FT_ENCODING_UNICODE;
+
+	static_assert(FontEncoding::ENUM_COUNT == 2, "More encoding types? this logic needs updating");
+
+	encoding_ = encoding;
+	switch (encoding) 
+	{
+		case FontEncoding::Unicode:
+			ftEncoding = FT_ENCODING_UNICODE;
+			break;
+		case FontEncoding::MSSymbol:
+			ftEncoding = FT_ENCODING_MS_SYMBOL;
+			break;
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+	}
+
+	const int32_t err = FT_Select_Charmap(pFace_, ftEncoding);
 	if (err) {
-		X_ERROR("Font", "Failed to set encode to: %i. Error(%" PRIi32 "): \"%s\"", pEncoding, err, errToStr(err));
+		X_ERROR("Font", "Failed to set encode to: %s. Error(%" PRIi32 "): \"%s\"", FontEncoding::ToString(encoding), err, errToStr(err));
 		return false;
 	}
 

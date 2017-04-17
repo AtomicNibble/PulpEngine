@@ -12,9 +12,9 @@ X_INLINE float XFontRender::GetSizeRatio(void) const
 	return fSizeRatio_; 
 }
 
-X_INLINE FT_Encoding XFontRender::GetEncoding(void) const 
+X_INLINE FontEncoding::Enum XFontRender::GetEncoding(void) const
 { 
-	return pEncoding_; 
+	return encoding_;
 }
 
 

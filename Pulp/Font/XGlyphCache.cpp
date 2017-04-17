@@ -28,7 +28,7 @@ XGlyphCache::~XGlyphCache()
 
 }
 
-bool XGlyphCache::Create(BufferArr& rawFontBuf, int32_t cacheSize, 
+bool XGlyphCache::Create(BufferArr& rawFontBuf, FontEncoding::Enum encoding, int32_t cacheSize,
 	int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
 	FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount)
 {
@@ -38,7 +38,7 @@ bool XGlyphCache::Create(BufferArr& rawFontBuf, int32_t cacheSize,
 	glyphBitmapWidth_ = glyphBitmapWidth;
 	glyphBitmapHeight_ = glyphBitmapHeight;
 
-	if (fontRenderer_.SetRawFontBuffer(rawFontBuf)) {
+	if (fontRenderer_.SetRawFontBuffer(rawFontBuf, encoding)) {
 		return false;
 	}
 

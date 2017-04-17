@@ -86,7 +86,7 @@ public:
 	XGlyphCache(core::MemoryArenaBase* arena);
 	~XGlyphCache();
 
-	bool Create(BufferArr& rawFontBuf, int32_t cacheSize, 
+	bool Create(BufferArr& rawFontBuf, FontEncoding::Enum encoding, int32_t cacheSize,
 		int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
 		FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount);
 	void Release(void);
@@ -105,8 +105,8 @@ public:
 		int8_t& charOffsetX, int8_t& charOffsetY, wchar_t cChar);
 
 
-	X_INLINE bool SetEncoding(FT_Encoding pEncoding);
-	X_INLINE FT_Encoding GetEncoding(void) const;
+	X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
+	X_INLINE FontEncoding::Enum GetEncoding(void) const;
 
 private:
 	bool CreateSlotList(size_t listSize);
