@@ -237,7 +237,7 @@ private:
 	ConverterModulesArr				converterInterfaces_;
 	ArrsetHandlersArr				assertHandlers_;
 
-	core::XProfileSys*				pProfileSys_;
+	core::IProfileSys*				pProfileSys_;
 
 	// Hot reload stuff
 	core::XDirectoryWatcher			dirWatcher_;

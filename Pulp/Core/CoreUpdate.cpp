@@ -267,9 +267,9 @@ void XCore::RenderEnd(core::FrameData& frameData)
 	// wut is this.
 	const bool enabled = var_profile->GetInteger() > 0;
 
-	if (pProfileSys_) {
-		pProfileSys_->setEnabled(enabled);
-	}
+//	if (pProfileSys_) {
+//		pProfileSys_->setEnabled(enabled);
+//	}
 
 	env_.profilerEnabled_ = enabled;
 }

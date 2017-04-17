@@ -32,11 +32,12 @@ public:
 	bool init(ICore* pCore) X_FINAL;
 	void shutDown(void) X_FINAL;
 
-
 	void AddProfileData(XProfileData* pData) X_FINAL;
 
 	void OnFrameBegin(void) X_FINAL;
 	void OnFrameEnd(void) X_FINAL;
+
+	void Render(void) X_FINAL;
 
 private:
 	void UpdateProfileData(void);
@@ -99,8 +100,6 @@ private:
 	void DisplayProfileData(void);
 
 public:
-	// Rendering (called by core)
-	void Render(void);
 
 	X_INLINE bool isEnabled(void) const {
 		return enabled_;

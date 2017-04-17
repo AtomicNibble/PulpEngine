@@ -8,6 +8,7 @@
 
 #include "NullImplementation\ConsoleNULL.h"
 #include "NullImplementation/NullInput.h"
+#include "NullImplementation\ProfileNull.h"
 
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\SymbolResolution.h>
@@ -445,7 +446,14 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 
 	// #------------------------- ProfileSys ---------------------------
-	pProfileSys_ = X_NEW(core::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
+	if (startupParams.bProfileSysEnabled)
+	{
+		pProfileSys_ = X_NEW(core::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
+	}
+	else
+	{
+		pProfileSys_ = X_NEW(core::ProfileNull, g_coreArena, "ProfileSys")();
+	}
 
 	pProfileSys_->registerVars();
 	pProfileSys_->registerCmds();
@@ -578,7 +586,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		{
 			return false;
 		}
-
 	}
 
 

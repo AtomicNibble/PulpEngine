@@ -24,6 +24,8 @@ struct IProfileSys
 	virtual void OnFrameBegin(void) X_ABSTRACT;
 	virtual void OnFrameEnd(void) X_ABSTRACT;
 
+	virtual void Render(void) X_ABSTRACT;
+
 };
 
 

@@ -445,6 +445,7 @@
     <ClInclude Include="DiskFileAsync.h" />
     <ClInclude Include="FileSysVars.h" />
     <ClInclude Include="NullImplementation\ConsoleNULL.h" />
+    <ClInclude Include="NullImplementation\ProfileNull.h" />
     <ClInclude Include="PathUtil.h" />
     <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />
@@ -474,6 +475,7 @@
     <ClCompile Include="DiskFileAsync.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="NullImplementation\ConsoleNULL.cpp" />
+    <ClCompile Include="NullImplementation\ProfileNull.cpp" />
     <ClCompile Include="PotatoFactoryRegistryImpl.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="NullImplementation\NullInput.cpp" />
