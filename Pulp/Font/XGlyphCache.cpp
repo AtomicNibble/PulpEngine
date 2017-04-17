@@ -34,7 +34,9 @@ XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	smoothAmount_(FontSmoothAmount::NONE),
 
 	slotList_(arena),
-	cacheTable_(arena, 8)
+	cacheTable_(arena, 8),
+
+	loadStatus_(LoadStatus::NotLoaded)	
 {
 
 }
@@ -53,12 +55,13 @@ void XGlyphCache::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
 	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
 	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
 
-	// ioRequest_ = core::INVALID_IO_REQ_HANDLE;
-
 	if (!pFile) {
-		X_ERROR("Font", "Failed to load font def file");
+		loadStatus_ = LoadStatus::Error;
+		X_ERROR("Font", "Error reading font data");
 		return;
 	}
+
+	loadStatus_ = LoadStatus::Processing;
 
 	JobData data;
 	data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
@@ -78,9 +81,13 @@ void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t thread
 	// we have the font data now we just need to setup the font render.
 	JobData* pJobData = static_cast<JobData*>(pData);
 
-	if (!fontRenderer_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData), pJobData->dataSize, FontEncoding::Unicode))
+	if (!fontRenderer_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData), 
+		pJobData->dataSize, 
+		FontEncoding::Unicode))
 	{
-
+		loadStatus_ = LoadStatus::Error;
+		X_ERROR("Font", "Error setting up font renderer");
+		return;
 	}
 
 	if(scaledGlyphWidth_) {
@@ -96,11 +103,17 @@ void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t thread
 	}
 
 	// now we are ready.
+	loadStatus_ = LoadStatus::Complete;
 }
 
 
 bool XGlyphCache::LoadGlyphSource(const SourceNameStr& name, bool async)
 {
+	// are we loading already?
+	if (loadStatus_ == LoadStatus::Loading || loadStatus_ == LoadStatus::Processing) {
+		return true;
+	}
+
 	core::Path<char> path;
 	path /= "Fonts/";
 	path.setFileName(name.begin(), name.end());
@@ -111,6 +124,8 @@ bool XGlyphCache::LoadGlyphSource(const SourceNameStr& name, bool async)
 
 	if (async)
 	{
+		loadStatus_ = LoadStatus::Loading;
+
 		// load the file async
 		core::IoRequestOpenRead open;
 		open.callback.Bind<XGlyphCache, &XGlyphCache::IoRequestCallback>(this);

@@ -124,6 +124,8 @@ private:
 
 	FontSmooth::Enum smoothMethod_;
 	FontSmoothAmount::Enum	smoothAmount_;
+
+	LoadStatus::Enum loadStatus_;
 };
 
 X_NAMESPACE_END

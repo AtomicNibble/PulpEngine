@@ -213,9 +213,12 @@ void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 	ioRequest_ = core::INVALID_IO_REQ_HANDLE;
 
 	if (!pFile) {
+		loadStatus_ = LoadStatus::Error;
 		X_ERROR("Font", "Failed to load font def file");
 		return;
 	}
+
+	loadStatus_ = LoadStatus::Processing;
 
 	JobData data;
 	data.pData = static_cast<char*>(pOpenRead->pBuf);
@@ -236,22 +239,21 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 	// so we have the file data just need to process it.
 	if (processXmlData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_))
 	{
-		// now we dispatch read request for font file.
-		core::fileModeFlags mode;
-		mode.Set(core::fileMode::READ);
-		mode.Set(core::fileMode::SHARE);
-
-		core::IoRequestOpenRead open;
-		open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
-		open.mode = mode;
-		open.path = sourceName_.c_str();
-		open.arena = g_fontArena;
-
-		ioRequest_ = gEnv->pFileSys->AddIoRequestToQue(open);
+		// now create a fontTexture and async load it's glyph file.
+		// as soon as we assign 'pFontTexture_' other threads might start accessing it.
+		// other threads will not access any logic other than IsReady untill after IsReady returns true.
+		pFontTexture_ = fontSys_.getFontTexture(sourceName_, true);
+		if (!pFontTexture_) {
+			loadStatus_ = LoadStatus::Error;
+		}
+		else {
+			loadStatus_ = LoadStatus::Complete;
+		}
 	}
 	else
 	{
-
+		X_ERROR("Font", "Error parsing font def file");
+		loadStatus_ = LoadStatus::Error;
 	}
 
 	X_DELETE_ARRAY(pJobData->pData, g_fontArena);
@@ -269,6 +271,12 @@ bool XFont::loadFont(bool async)
 
 bool XFont::loadFontDef(bool async)
 {
+	// are we loading already?
+	if (loadStatus_ == LoadStatus::Loading || loadStatus_ == LoadStatus::Processing) {
+		return true;
+	}
+
+
 	core::Path<char> path;
 	path = "Fonts/";
 	path.setFileName(name_.c_str());
@@ -278,14 +286,10 @@ bool XFont::loadFontDef(bool async)
 	mode.Set(fileMode::READ);
 	mode.Set(fileMode::SHARE);
 
-	if (ioRequest_ != core::INVALID_IO_REQ_HANDLE)
-	{
-		
-
-	}
-
 	if (async)
 	{
+		loadStatus_ = LoadStatus::Loading;
+
 		// load the file async
 		core::IoRequestOpenRead open;
 		open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
@@ -317,8 +321,7 @@ bool XFont::loadFontDef(bool async)
 		{
 			X_ERROR("Font", "Error loaded font file: \"%s\"", sourceName_.c_str());
 			return false;
-		}
-		
+		}	
 	}
 	
 	return true;

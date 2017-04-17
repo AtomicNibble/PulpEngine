@@ -25,6 +25,7 @@ typedef core::Array<FontEffect> EffetsArr;
 X_DECLARE_ENUM(LoadStatus) (
 	NotLoaded,
 	Loading,
+	Processing,
 	Complete,
 	Error
 );

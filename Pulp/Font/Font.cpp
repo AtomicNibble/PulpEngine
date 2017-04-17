@@ -47,7 +47,9 @@ XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
 	effects_(g_fontArena),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
-	pMaterial_(nullptr)
+	pMaterial_(nullptr),
+	loadStatus_(LoadStatus::NotLoaded),
+	ioRequest_(core::INVALID_IO_REQ_HANDLE)
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
 }
@@ -118,6 +120,11 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 {
 	const size_t textLen = (pEnd - pBegin);
 	if (!textLen) {
+		return;
+	}
+
+	// we may be async loading so must wait till we are ready.
+	if (!pFontTexture_ || !pFontTexture_->IsReady()) {
 		return;
 	}
 

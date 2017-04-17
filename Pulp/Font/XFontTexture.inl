@@ -8,6 +8,7 @@ X_INLINE const SourceNameStr& XFontTexture::GetName(void) const
 
 X_INLINE bool XFontTexture::IsReady(void) const
 {
+	// once the cache is ready we are ready.
 	return glyphCache_.IsLoaded();
 }
 

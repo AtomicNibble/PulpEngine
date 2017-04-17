@@ -110,6 +110,7 @@ private:
 	// shader and state.
 	engine::Material* pMaterial_;
 
+	LoadStatus::Enum loadStatus_;
 	core::RequestHandle ioRequest_;
 };
 

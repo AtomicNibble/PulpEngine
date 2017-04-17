@@ -5,7 +5,7 @@ X_NAMESPACE_BEGIN(font)
 
 X_INLINE bool XGlyphCache::IsLoaded(void) const
 {
-	return fontRenderer_.ValidFace();
+	return loadStatus_ == LoadStatus::Complete && fontRenderer_.ValidFace();
 }
 
 X_INLINE bool XGlyphCache::SetEncoding(FontEncoding::Enum encoding)
