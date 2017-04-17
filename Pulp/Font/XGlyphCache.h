@@ -86,12 +86,11 @@ public:
 	XGlyphCache(core::MemoryArenaBase* arena);
 	~XGlyphCache();
 
-	bool Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
-		FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio = 0.8f);
+	bool Create(BufferArr& rawFontBuf, int32_t cacheSize, 
+		int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
+		FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount);
 	void Release(void);
 
-	bool LoadFontFromMemory(BufferArr& buf);
-	void ReleaseFont(void);
 
 	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
@@ -114,16 +113,14 @@ private:
 	void ReleaseSlotList(void);
 
 private:
+	XFontRender		fontRenderer_;
+	core::UniquePointer<XGlyphBitmap> scaleBitmap_;
 
 	int32_t			glyphBitmapWidth_;
 	int32_t			glyphBitmapHeight_;
-	float			fSizeRatio_;
 
 	XCacheSlotList	slotList_;
 	XCacheTable		cacheTable_;
-
-	core::UniquePointer<XGlyphBitmap> scaleBitmap_;
-	XFontRender		fontRenderer_;
 
 	uint32_t		usage_;
 

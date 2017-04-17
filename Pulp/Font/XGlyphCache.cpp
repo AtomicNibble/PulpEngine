@@ -9,7 +9,6 @@ X_NAMESPACE_BEGIN(font)
 XGlyphCache::XGlyphCache(core::MemoryArenaBase* arena) :
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
-	fSizeRatio_(0.8f),
 
 	scaleBitmap_(arena),
 
@@ -29,19 +28,21 @@ XGlyphCache::~XGlyphCache()
 
 }
 
-bool XGlyphCache::Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
-	FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio)
+bool XGlyphCache::Create(BufferArr& rawFontBuf, int32_t cacheSize, 
+	int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
+	FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount)
 {
-	fSizeRatio_ = sizeRatio;
-
 	smoothMethod_ = smoothMethod;
 	smoothAmount_ = smoothAmount;
 
 	glyphBitmapWidth_ = glyphBitmapWidth;
 	glyphBitmapHeight_ = glyphBitmapHeight;
 
-	if (!CreateSlotList(cacheSize))
-	{
+	if (fontRenderer_.SetRawFontBuffer(rawFontBuf)) {
+		return false;
+	}
+
+	if (!CreateSlotList(cacheSize)) {
 		ReleaseSlotList();
 		return false;
 	}
@@ -93,6 +94,8 @@ bool XGlyphCache::Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t gl
 
 void XGlyphCache::Release(void)
 {
+	fontRenderer_.Release();
+
 	ReleaseSlotList();
 
 	cacheTable_.clear();
@@ -101,17 +104,6 @@ void XGlyphCache::Release(void)
 
 	glyphBitmapWidth_ = 0;
 	glyphBitmapHeight_ = 0;
-	fSizeRatio_ = 0.8f;
-}
-
-void XGlyphCache::ReleaseFont(void)
-{
-	fontRenderer_.Release();
-}
-
-bool XGlyphCache::LoadFontFromMemory(BufferArr& buf)
-{
-	return fontRenderer_.LoadFromMemory(buf);
 }
 
 
