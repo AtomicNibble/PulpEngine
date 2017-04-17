@@ -114,7 +114,6 @@ private:
 	void ReleaseSlotList(void);
 
 private:
-	core::MemoryArenaBase* arena_;
 
 	int32_t			glyphBitmapWidth_;
 	int32_t			glyphBitmapHeight_;

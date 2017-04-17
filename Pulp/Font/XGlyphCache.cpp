@@ -7,8 +7,6 @@ X_NAMESPACE_BEGIN(font)
 
 
 XGlyphCache::XGlyphCache(core::MemoryArenaBase* arena) :
-	arena_(arena),
-
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
 	fSizeRatio_(0.8f),
@@ -75,7 +73,7 @@ bool XGlyphCache::Create(int32_t cacheSize, int32_t glyphBitmapWidth, int32_t gl
 	// Scaled?
 	if (scaledGlyphWidth > 0)
 	{
-		scaleBitmap_.reset(X_NEW(XGlyphBitmap, arena_,"BitMap"));
+		scaleBitmap_.reset(X_NEW(XGlyphBitmap, scaleBitmap_.getArena(), "BitMap"));
 
 		if (!scaleBitmap_->Create(scaledGlyphWidth, scaledGlyphHeight))
 		{
