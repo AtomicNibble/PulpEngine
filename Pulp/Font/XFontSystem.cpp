@@ -78,7 +78,7 @@ void XFontSystem::registerVars(void)
 void XFontSystem::registerCmds(void)
 {
 	// add font commands
-	ADD_COMMAND("fontListLoaded", Command_ListFonts, core::VarFlag::SYSTEM,
+	ADD_COMMAND("listFonts", Command_ListFonts, core::VarFlag::SYSTEM,
 		"Lists all the loaded fonts");
 
 	ADD_COMMAND("fontDumpForMame", Command_DumpForName, core::VarFlag::SYSTEM,
