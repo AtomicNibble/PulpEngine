@@ -40,6 +40,12 @@
     <Filter Include="Source Files\Effect">
       <UniqueIdentifier>{717335ba-2c77-4a13-a3bb-5da8dedea5aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{0f643ef9-87e3-470a-8d54-67d2ec93fb78}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{802bdeb6-bc50-437b-b8ee-62ec92befd07}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -65,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="XFontSystem.h">
       <Filter>Header Files\Sys</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\FontVars.h">
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +107,9 @@
     <ClCompile Include="FontXml.cpp">
       <Filter>Source Files\Effect</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\FontVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="XFontRender.inl">
@@ -111,6 +123,9 @@
     </None>
     <None Include="XGlyphCache.inl">
       <Filter>Header Files\FontRender</Filter>
+    </None>
+    <None Include="Vars\FontVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>
