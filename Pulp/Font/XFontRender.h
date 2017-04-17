@@ -56,7 +56,7 @@ private:
 	X_NO_ASSIGN(XFontRender);
 
 private:
-	BufferArr		fileData_;
+	BufferArr		fileData_; // must stay valid for lifetime of FT_Face
 
 	FT_Library		pLibrary_;
 	FT_Face			pFace_;
