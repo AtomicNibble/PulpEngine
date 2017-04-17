@@ -220,9 +220,10 @@ void XFontSystem::ListFonts(void) const
 	for (; it != fonts_.end(); ++it)
 	{
 		XFontTexture* pTex = it->second->getFontTexture();
-		if (pTex) {
-			X_LOG0("Fonts", "Name: %s, Size: (%i,%i), Usage: %i", it->second->getName().c_str(),
-				pTex->GetWidth(), pTex->GetHeight(), pTex->GetSlotUsage());
+		if (pTex && pTex->IsReady()) {
+			X_LOG0("Fonts", "Name: %s, Size: (%" PRIi32 ",%" PRIi32 "), Usage: %" PRIi32 " CacheMiss: %" PRIi32, 
+				it->second->getName().c_str(),
+				pTex->GetWidth(), pTex->GetHeight(), pTex->GetSlotUsage(), pTex->GetCacheMisses());
 		}
 		else {
 			X_LOG0("Fonts", "Name: %s", it->second->getName().c_str());

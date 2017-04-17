@@ -111,6 +111,7 @@ public:
 	X_INLINE int32_t HeightCellCount(void) const;
 
 	X_INLINE int32_t GetSlotUsage(void);
+	X_INLINE int32_t GetCacheMisses(void);
 
 	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
 	void CreateGradientSlot(void);
@@ -160,6 +161,7 @@ private:
 	XTextureSlotTable	slotTable_;
 
 	uint16	slotUsage_;
+	uint32_t cacheMisses_;
 };
 
 

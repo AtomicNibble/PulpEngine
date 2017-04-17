@@ -57,4 +57,9 @@ X_INLINE int32_t XFontTexture::GetSlotUsage(void)
 	return slotUsage_; 
 }
 
+X_INLINE int32_t XFontTexture::GetCacheMisses(void)
+{
+	return cacheMisses_;
+}
+
 X_NAMESPACE_END

@@ -29,6 +29,7 @@ XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core
 	textureSlotCount_(0),
 
 	slotUsage_(1), // space for gradiant.
+	cacheMisses_(0),
 
 	slotList_(arena),
 	slotTable_(arena, 8)
@@ -58,6 +59,7 @@ void XFontTexture::Clear(void)
 	textureSlotCount_ = 0;
 
 	slotUsage_ = 1;
+	cacheMisses_ = 0;
 
 	ReleaseSlotList();
 }
@@ -127,6 +129,8 @@ CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wcha
 		XTextureSlot* pSlot = GetCharSlot(cChar);
 		if (!pSlot)
 		{
+			++cacheMisses_;
+
 			// get a free slot.
 			pSlot = GetLRUSlot();
 			if (!pSlot) {
