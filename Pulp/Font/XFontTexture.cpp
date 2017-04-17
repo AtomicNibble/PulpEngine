@@ -5,7 +5,8 @@
 
 X_NAMESPACE_BEGIN(font)
 
-XFontTexture::XFontTexture(core::MemoryArenaBase* arena) :
+XFontTexture::XFontTexture(XGlyphCache& glyphCache, core::MemoryArenaBase* arena) :
+	glyphCache_(glyphCache),
 	textureSlotArea_(arena),
 
 	width_(0),
@@ -31,7 +32,6 @@ XFontTexture::XFontTexture(core::MemoryArenaBase* arena) :
 
 	slotUsage_(1), // space for gradiant.
 
-	glyphCache_(arena),
 	slotList_(arena),
 	slotTable_(arena, 8)
 {
@@ -51,29 +51,10 @@ void XFontTexture::ClearBuffer(void)
 	height_ = 0;
 
 	ReleaseSlotList();
-
-	glyphCache_.Release();
-}
-
-bool XFontTexture::CreateFromMemory(BufferArr& buf, int32_t width,
-	int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
-	float sizeRatio, int32_t widthCharCount, int32_t heightCharCount)
-{
-	if (!glyphCache_.LoadFontFromMemory(buf)) {
-		ClearBuffer();
-		return false;
-	}
-
-	if (!Create(width, height, smoothMethod, smoothAmount,
-		sizeRatio, widthCharCount, heightCharCount)) {
-		return false;
-	}
-
-	return true;
 }
 
 bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
-	float sizeRatio, int32_t widthCellCount, int32_t heightCellCount)
+	int32_t widthCellCount, int32_t heightCellCount)
 {
 	textureBuffer_.resize(width * height);
 	std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0);
@@ -95,16 +76,6 @@ bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smooth
 
 	textureCellWidth_ = cellWidth_ * invWidth_;
 	textureCellHeight_ = cellHeight_ * invHeight_;
-
-	if (!glyphCache_.Create(
-		FONT_GLYPH_CACHE_SIZE,
-		cellWidth_, cellHeight_, 
-		smoothMethod_, smoothAmount_, 
-		sizeRatio))
-	{
-		ClearBuffer();
-		return false;
-	}
 
 	if (!CreateSlotList(textureSlotCount_))
 	{

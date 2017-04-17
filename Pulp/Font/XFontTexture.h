@@ -76,15 +76,13 @@ class XFontTexture
 	static const uint32_t FONT_GLYPH_CACHE_SIZE = 256; // todo make var?
 
 public:
-	XFontTexture(core::MemoryArenaBase* arena);
+	XFontTexture(XGlyphCache& glyphCache, core::MemoryArenaBase* arena);
 	~XFontTexture();
 
 	void ClearBuffer(void);
 
-	bool CreateFromMemory(BufferArr& buf, int32_t width, int32_t height, 
-		FontSmooth::Enum  smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio = 0.875f, 
+	bool Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 		int32_t widthCharCount = 16, int32_t heightCharCount = 16);
-
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
 	// pUpdated is the number of slots updated
@@ -121,15 +119,12 @@ public:
 	bool WriteToFile(const char* filename);
 
 private:
-	bool Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
-		float sizeRatio = 0.8f, int32_t widthCharCount = 16, int32_t heightCharCount = 16);
-
-private:
 	bool CreateSlotList(int32_t listSize);
 	bool ReleaseSlotList(void);
 	bool UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar);
 
 private:
+	XGlyphCache& glyphCache_;
 	core::MemoryArenaBase* textureSlotArea_;
 
 	int32_t width_;
@@ -154,7 +149,6 @@ private:
 	FontSmooth::Enum		smoothMethod_;
 	FontSmoothAmount::Enum	smoothAmount_;
 
-	XGlyphCache			glyphCache_;
 	XTextureSlotList	slotList_;
 	XTextureSlotTable	slotTable_;
 
