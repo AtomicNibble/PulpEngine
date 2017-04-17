@@ -32,7 +32,7 @@ public:
 	XFontRender();
 	~XFontRender();
 
-	bool LoadFromMemory(BufferArr& buf);
+	bool SetRawFontBuffer(BufferArr& rawFontBuf);
 	bool Release(void); 
 
 	bool GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 

@@ -25,20 +25,9 @@ XFontRender::~XFontRender()
 }
 
 
-bool XFontRender::Release(void)
+bool XFontRender::SetRawFontBuffer(BufferArr& rawFontBuf)
 {
-	FT_Done_Face(pFace_);
-	FT_Done_FreeType(pLibrary_);
-	pFace_ = nullptr;
-	pLibrary_ = nullptr;
-
-	fileData_.free();
-	return true;
-}
-
-bool XFontRender::LoadFromMemory(BufferArr& buf)
-{
-	fileData_.swap(buf); // we need to keep this buffer in memory.
+	fileData_.swap(rawFontBuf); // we need to keep this buffer in memory.
 
 	int32_t err = FT_Init_FreeType(&pLibrary_);
 	if (err)
@@ -72,42 +61,14 @@ bool XFontRender::LoadFromMemory(BufferArr& buf)
 }
 
 
-void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
+bool XFontRender::Release(void)
 {
-	glyphBitmapWidth_ = width;
-	glyphBitmapHeight_ = height;
+	FT_Done_Face(pFace_);
+	FT_Done_FreeType(pLibrary_);
+	pFace_ = nullptr;
+	pLibrary_ = nullptr;
 
-	const int32_t err = FT_Set_Pixel_Sizes(
-		pFace_, 
-		static_cast<int32_t>(glyphBitmapWidth_ * fSizeRatio_),
-		static_cast<int32_t>(glyphBitmapHeight_ * fSizeRatio_)
-	);
-
-	if (err)
-	{
-		X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
-	}
-}
-
-void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
-{
-	if (pWidth) {
-		*pWidth = glyphBitmapWidth_;
-	} 
-	if (pHeight) {
-		*pHeight = glyphBitmapHeight_;
-	}
-}
-
-
-bool XFontRender::SetEncoding(FT_Encoding pEncoding)
-{
-	const int32_t err = FT_Select_Charmap(pFace_, pEncoding);	
-	if(err) {
-		X_ERROR("Font", "Failed to set encode to: %i. Error(%" PRIi32 "): \"%s\"", pEncoding, err, errToStr(err));
-		return false;
-	}
-
+	fileData_.free();
 	return true;
 }
 
@@ -164,6 +125,47 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 	}
 
 	return true;
+}
+
+
+
+bool XFontRender::SetEncoding(FT_Encoding pEncoding)
+{
+	const int32_t err = FT_Select_Charmap(pFace_, pEncoding);
+	if (err) {
+		X_ERROR("Font", "Failed to set encode to: %i. Error(%" PRIi32 "): \"%s\"", pEncoding, err, errToStr(err));
+		return false;
+	}
+
+	return true;
+}
+
+
+void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
+{
+	glyphBitmapWidth_ = width;
+	glyphBitmapHeight_ = height;
+
+	const int32_t err = FT_Set_Pixel_Sizes(
+		pFace_,
+		static_cast<int32_t>(glyphBitmapWidth_ * fSizeRatio_),
+		static_cast<int32_t>(glyphBitmapHeight_ * fSizeRatio_)
+	);
+
+	if (err)
+	{
+		X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
+	}
+}
+
+void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
+{
+	if (pWidth) {
+		*pWidth = glyphBitmapWidth_;
+	}
+	if (pHeight) {
+		*pHeight = glyphBitmapHeight_;
+	}
 }
 
 
