@@ -768,7 +768,7 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 		return false;
 	}
 
-	if(!pFont->loadFont()) {
+	if(!pFont->loadFont(false)) {
 		X_ERROR("Font", "failed to load default font");
 		return false;
 	}

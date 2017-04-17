@@ -1,6 +1,10 @@
 
 X_NAMESPACE_BEGIN(font)
 
+X_INLINE bool XFontRender::ValidFace(void) const
+{
+	return pFace_ != nullptr;
+}
 
 X_INLINE void XFontRender::SetSizeRatio(float fSizeRatio)
 { 

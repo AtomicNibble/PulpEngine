@@ -7,6 +7,9 @@
 
 X_NAMESPACE_BEGIN(font)
 
+
+class FontVars;
+
 // the glyph spacing in font texels between characters in proportional font mode (more correct would be to take the value in the character)
 // #define X_FONT_GLYPH_PROP_SPACING		(1)
 // the size of a rendered space, this value gets multiplied by the default characted width
@@ -62,8 +65,13 @@ struct XCharCords
 	Vec2<int> offset;
 };
 
-
-class XFontTexture
+// This FontTexture creates a texter of width x height and then creates a LRU slot cache across the buffer 
+// initially the cache is completly empty.
+// 
+// The cache is then updated via calls to PreCacheString, which then copyies rendered Glyph's into our 
+// cpu texture buffer and updates the LRU slot info.
+// 
+class XFontTexture : public core::ReferenceCounted<>
 {
 	typedef core::Array<XTextureSlot>					XTextureSlotList;
 	typedef XTextureSlotList::Iterator					XTextureSlotListItor;
@@ -73,16 +81,15 @@ class XFontTexture
 	typedef XTextureSlotTable::iterator					XTextureSlotTableItor;
 	typedef XTextureSlotTable::const_iterator			XTextureSlotTableItorConst;
 
-	static const uint32_t FONT_GLYPH_CACHE_SIZE = 256; // todo make var?
-
 public:
-	XFontTexture(XGlyphCache& glyphCache, core::MemoryArenaBase* arena);
+	XFontTexture(const SourceNameStr& name, const FontVars& vars, core::MemoryArenaBase* arena);
 	~XFontTexture();
 
-	void ClearBuffer(void);
+	X_INLINE const SourceNameStr& GetName(void) const;
+	X_INLINE bool IsReady(void) const;
 
-	bool Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
-		int32_t widthCharCount = 16, int32_t heightCharCount = 16);
+	bool Create(int32_t width, int32_t height, int32_t widthCharCount, int32_t heightCharCount);
+	bool LoadGlyphSource(bool async);
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
 	// pUpdated is the number of slots updated
@@ -119,12 +126,15 @@ public:
 	bool WriteToFile(const char* filename);
 
 private:
+	void Clear(void); 
+
 	bool CreateSlotList(int32_t listSize);
 	bool ReleaseSlotList(void);
 	bool UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar);
 
 private:
-	XGlyphCache& glyphCache_;
+	const SourceNameStr name_;
+	XGlyphCache glyphCache_;
 	core::MemoryArenaBase* textureSlotArea_;
 
 	int32_t width_;
@@ -145,9 +155,6 @@ private:
 	int32_t	heightCellCount_;
 
 	int32_t	textureSlotCount_;
-
-	FontSmooth::Enum		smoothMethod_;
-	FontSmoothAmount::Enum	smoothAmount_;
 
 	XTextureSlotList	slotList_;
 	XTextureSlotTable	slotTable_;

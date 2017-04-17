@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IFont.h>
 
 X_NAMESPACE_DECLARE(core,
 	struct ICVar;
@@ -19,10 +20,16 @@ public:
 	X_INLINE int32_t glyphCacheSize(void) const;
 	X_INLINE bool glyphCachePreWarm(void) const;
 
+	X_INLINE FontSmooth::Enum fontSmoothMethod(void) const;
+	X_INLINE FontSmoothAmount::Enum fontSmoothAmount(void) const;
+
+
 private:
 	int32_t glyphCacheSize_;
 	int32_t glyphCachePreWarm_;
 	
+	int32_t fontSmoothingMethod_;
+	int32_t fontSmoothingAmount_;
 };
 
 

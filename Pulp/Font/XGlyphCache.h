@@ -4,12 +4,22 @@
 #define _X_FONT_GLYPH_CACHE_H_
 
 #include <Util\UniquePointer.h>
+#include <Util\ReferenceCounted.h>
+
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
 
 #include <Containers\HashMap.h>
 
+X_NAMESPACE_DECLARE(core,
+	struct IoRequestBase;
+	struct XFileAsync;
+);
+
+
 X_NAMESPACE_BEGIN(font)
+
+class FontVars;
 
 /*
 This is a wrap around the fontrender providing a cache.
@@ -47,34 +57,12 @@ public:
 };
 
 
-struct FontSmooth
-{
-	enum Enum
-	{
-		NONE,
-		BLUR,			// Smooth by blurring it.
-		SUPERSAMPLE		// Smooth by rendering the characters into a bigger texture, and then resize it to the normal size using bilinear filtering.
-
-	};
-};
-
-struct FontSmoothAmount
-{
-	enum Enum
-	{
-		NONE,
-		X2,
-		X4
-	};
-};
-
-
 #ifdef WIN64
 #undef GetCharWidth
 #undef GetCharHeight
 #endif
 
-class XGlyphCache
+class XGlyphCache : public core::ReferenceCounted<>
 {
 	typedef core::HashMap<uint16, XCacheSlot*>			XCacheTable;
 	typedef core::Array<XCacheSlot>						XCacheSlotList;
@@ -83,17 +71,22 @@ class XGlyphCache
 
 
 public:
-	XGlyphCache(core::MemoryArenaBase* arena);
+	XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena);
 	~XGlyphCache();
 
-	bool Create(BufferArr& rawFontBuf, FontEncoding::Enum encoding, int32_t cacheSize,
-		int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
-		FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount);
-	void Release(void);
+	X_INLINE bool IsLoaded(void) const;
 
+	X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
+	X_INLINE FontEncoding::Enum GetEncoding(void) const;
+
+	bool LoadGlyphSource(const SourceNameStr& name, bool async);
+
+	bool Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight);
+	void Release(void);
 
 	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
+	void PreWarmCache(void);
 	bool PreCacheGlyph(wchar_t cChar);
 	bool UnCacheGlyph(wchar_t cChar);
 	bool GlyphCached(wchar_t cChar);
@@ -104,28 +97,33 @@ public:
 	bool GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* pHeight,
 		int8_t& charOffsetX, int8_t& charOffsetY, wchar_t cChar);
 
-
-	X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
-	X_INLINE FontEncoding::Enum GetEncoding(void) const;
-
 private:
 	bool CreateSlotList(size_t listSize);
 	void ReleaseSlotList(void);
 
 private:
+	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
+
+	void ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
+private:
+	const FontVars& vars_;
 	XFontRender		fontRenderer_;
 	core::UniquePointer<XGlyphBitmap> scaleBitmap_;
 
 	int32_t			glyphBitmapWidth_;
 	int32_t			glyphBitmapHeight_;
+	int32_t			scaledGlyphWidth_;
+	int32_t			scaledGlyphHeight_;
 
 	XCacheSlotList	slotList_;
 	XCacheTable		cacheTable_;
 
 	uint32_t		usage_;
 
-	int32_t			smoothMethod_;
-	int32_t			smoothAmount_;
+	FontSmooth::Enum smoothMethod_;
+	FontSmoothAmount::Enum	smoothAmount_;
 };
 
 X_NAMESPACE_END

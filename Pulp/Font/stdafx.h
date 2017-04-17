@@ -14,9 +14,15 @@
 
 #include <Core\Platform.h>
 
+// some common used files.
+#include <Util\ReferenceCounted.h>
+#include <Util\UniquePointer.h>
+
 #include <IConsole.h>
 #include <IFont.h>
 
+#include "Constants.h"
+#include "FontTypes.h"
 
 #include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>

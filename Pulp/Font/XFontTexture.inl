@@ -1,6 +1,16 @@
 
 X_NAMESPACE_BEGIN(font)
 
+X_INLINE const SourceNameStr& XFontTexture::GetName(void) const
+{
+	return name_;
+}
+
+X_INLINE bool XFontTexture::IsReady(void) const
+{
+	return glyphCache_.IsLoaded();
+}
+
 X_INLINE const Vec2i XFontTexture::GetSize(void) const 
 { 
 	return Vec2i(width_, height_);

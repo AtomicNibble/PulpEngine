@@ -117,7 +117,7 @@ struct IFont
 	virtual void FreeBuffers(void) X_ABSTRACT;		// free texture buffers
 	virtual void FreeTexture(void) X_ABSTRACT;
 
-	virtual bool loadFont(void) X_ABSTRACT;
+	virtual bool loadFont(bool async) X_ABSTRACT;
 
 	// these draw the text into the primative context.
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon,

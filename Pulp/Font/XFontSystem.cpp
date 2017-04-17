@@ -51,7 +51,9 @@ namespace
 
 XFontSystem::XFontSystem(ICore* pCore) :
 	pCore_(pCore),
-	fonts_(g_fontArena, 6)
+	fonts_(g_fontArena, 6),
+	lock_(10),
+	fontTextures_(g_fontArena, 4)
 {
 	X_ASSERT_NOT_NULL(pCore);
 	X_ASSERT_NOT_NULL(g_fontArena);
@@ -104,12 +106,13 @@ void XFontSystem::shutDown(void)
 	for (; it != fonts_.end(); ++it) {
 		X_DELETE(it->second, g_fontArena);
 	}
+	fonts_.clear();
+
 
 	gEnv->pHotReload->addfileType(nullptr, "font");
 	gEnv->pHotReload->addfileType(nullptr, "ttf");
 
 
-	fonts_.clear();
 }
 
 void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
@@ -135,16 +138,79 @@ IFont* XFontSystem::NewFont(const char* pFontName)
 		}
 	}
 
-	XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(pCore_, *this, pFontName);
+	XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(*this, pFontName);
 	fonts_.insert(FontMap::value_type(core::string(pFontName), pFont));
 	return pFont;
 }
 
 IFont* XFontSystem::GetFont(const char* pFontName) const
 {
-	FontMapConstItor it = fonts_.find(X_CONST_STRING(pFontName));
-	return it != fonts_.end() ? it->second : nullptr;
+	auto it = fonts_.find(SourceNameStr(pFontName));
+	if (it != fonts_.end()) {
+		return it->second;
+	}
+
+	return nullptr;
 }
+
+XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
+{
+	core::CriticalSection::ScopedLock lock(lock_);
+
+	auto it = fontTextures_.find(name);
+	if (it != fontTextures_.end())
+	{
+		it->second->addReference();
+		return it->second;
+	}
+
+	XFontTexture* pFontTexture = X_NEW(XFontTexture, g_fontArena, "FontTexture")(name, vars_, g_fontArena);
+
+	// setup the font texture cpu buffers.
+	if (!pFontTexture->Create(512, 512, 16, 16)) 
+	{
+		X_DELETE(pFontTexture, g_fontArena);
+		return nullptr;
+	}
+
+	// the font cache's are now valid but we have not yet loaded the font glyph file into the font renderer.
+	// so we can't actually create any glyphs yet.
+	// the font file is optionally loaded in the background so it may be a few frames before this fontTexture is usable.
+	// you must check with 'IsReady'
+	if (!pFontTexture->LoadGlyphSource(async))
+	{
+		X_DELETE(pFontTexture, g_fontArena);
+		return nullptr;
+	}
+
+	if (!async)
+	{
+		X_ASSERT(pFontTexture->IsReady(), "Should be ready if loaded none async")(async, pFontTexture->IsReady());
+	}
+
+	fontTextures_.insert(std::make_pair(name, pFontTexture));
+	return pFontTexture;
+}
+
+void XFontSystem::releaseFontTexture(XFontTexture* pFontTex)
+{
+	if (!pFontTex) {
+		return;
+	}
+
+	core::CriticalSection::ScopedLock lock(lock_);
+
+	auto it = fontTextures_.find(pFontTex->GetName());
+	if (it == fontTextures_.end())
+	{
+		X_ERROR("Font", "Failed to find FontTexture for removal. name: \"%s\"", pFontTex->GetName().c_str());
+		return;
+	}
+
+
+}
+
+
 
 void XFontSystem::ListFonts(void) const
 {

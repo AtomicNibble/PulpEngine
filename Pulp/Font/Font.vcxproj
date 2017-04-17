@@ -423,7 +423,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Constants.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="FontTypes.h" />
     <ClInclude Include="Vars\FontVars.h" />
     <ClInclude Include="XFontRender.h" />
     <ClInclude Include="XGlyphBitmap.h" />
@@ -435,7 +437,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Font.cpp" />
-    <ClCompile Include="FontXml.cpp" />
+    <ClCompile Include="FontLoad.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="Vars\FontVars.cpp" />
     <ClCompile Include="XFontRender.cpp" />

@@ -5,8 +5,9 @@
 
 X_NAMESPACE_BEGIN(font)
 
-XFontTexture::XFontTexture(XGlyphCache& glyphCache, core::MemoryArenaBase* arena) :
-	glyphCache_(glyphCache),
+XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core::MemoryArenaBase* arena) :
+	name_(name),
+	glyphCache_(vars, arena),
 	textureSlotArea_(arena),
 
 	width_(0),
@@ -27,9 +28,6 @@ XFontTexture::XFontTexture(XGlyphCache& glyphCache, core::MemoryArenaBase* arena
 
 	textureSlotCount_(0),
 
-	smoothMethod_(FontSmooth::NONE),
-	smoothAmount_(FontSmoothAmount::NONE),
-
 	slotUsage_(1), // space for gradiant.
 
 	slotList_(arena),
@@ -43,18 +41,28 @@ XFontTexture::~XFontTexture()
 }
 
 
-void XFontTexture::ClearBuffer(void)
+void XFontTexture::Clear(void)
 {
 	textureBuffer_.clear();
 
 	width_ = 0;
 	height_ = 0;
+	invWidth_ = 0;
+	invHeight_ = 0;
+	cellWidth_ = 0;
+	cellHeight_ = 0;
+	textureCellWidth_ = 0;
+	textureCellHeight_ = 0;
+	widthCellCount_ = 0;
+	heightCellCount_ = 0;
+	textureSlotCount_ = 0;
+
+	slotUsage_ = 1;
 
 	ReleaseSlotList();
 }
 
-bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
-	int32_t widthCellCount, int32_t heightCellCount)
+bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount, int32_t heightCellCount)
 {
 	if (!core::bitUtil::IsPowerOfTwo(width) || !core::bitUtil::IsPowerOfTwo(height)) {
 		X_ERROR("Font", "Font texture must be pow2. width: %" PRIi32 " height: %" PRIi32, width, height);
@@ -73,22 +81,34 @@ bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smooth
 	heightCellCount_ = heightCellCount;
 	textureSlotCount_ = widthCellCount * heightCellCount;
 
-	smoothMethod_ = smoothMethod;
-	smoothAmount_ = smoothAmount;
-
 	cellWidth_ = width / widthCellCount;
 	cellHeight_ = height / heightCellCount;
 
 	textureCellWidth_ = cellWidth_ * invWidth_;
 	textureCellHeight_ = cellHeight_ * invHeight_;
 
+	if (!glyphCache_.Create(cellWidth_, cellHeight_))
+	{
+		Clear();
+		return false;
+	}
+
 	if (!CreateSlotList(textureSlotCount_))
 	{
-		ClearBuffer();
+		Clear();
 		return false;
 	}
 
 	return true;
+}
+
+bool XFontTexture::LoadGlyphSource(bool async)
+{
+	if (glyphCache_.IsLoaded()) {
+		return true;
+	}
+
+	return glyphCache_.LoadGlyphSource(name_, async);
 }
 
 

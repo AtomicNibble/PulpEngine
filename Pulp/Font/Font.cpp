@@ -2,6 +2,7 @@
 #include "Font.h"
 
 #include "XFontTexture.h"
+#include "XFontSystem.h"
 
 #include <IRender.h>
 #include <I3DEngine.h>
@@ -38,15 +39,11 @@ namespace
 	};
 } // namespace
 
-const float XFont::FONT_SPACE_SIZE = 0.2f;
-const float XFont::FONT_GLYPH_PROP_SPACING = 1.f;
 
-
-XFont::XFont(ICore* pCore, XFontSystem& fontSys, const char* pFontName) :
-	pCore_(pCore),
+XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
 	fontSys_(fontSys),
 	name_(pFontName),
-	fontTexture_(g_fontArena),
+	pFontTexture_(nullptr),
 	effects_(g_fontArena),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
@@ -78,7 +75,8 @@ void XFont::Free()
 
 void XFont::FreeBuffers()
 {
-	fontTexture_.reset();
+	fontSys_.releaseFontTexture(pFontTexture_);
+	pFontTexture_ = nullptr;
 	fontTexDirty_ = true;
 }
 
@@ -92,61 +90,6 @@ void XFont::FreeTexture()
 		gEnv->pRender->releaseTexture(pTexture_);
 		pTexture_ = nullptr;
 	}
-}
-
-
-bool XFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
-{
-	X_ASSERT_NOT_NULL(pFilePath);
-	X_LOG0("Font", "loading: \"%s\"", pFilePath);
-
-	core::Path<char> path;
-	path /= "Fonts/";
-	path.setFileName(pFilePath);
-
-	FreeBuffers();
-
-	core::Array<uint8_t> fileDataBuf(g_fontArena);
-
-	size_t filesize = 0;
-
-	core::XFileScoped file;
-	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
-	{
-		filesize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-		if (filesize > 0) {
-			fileDataBuf.resize(filesize);
-			if (file.read(fileDataBuf.data(), filesize) != filesize) {
-				X_ERROR("Font", "Error reading ttf font data");
-				return false;
-			}
-		}
-	}
-
-	if (fileDataBuf.isEmpty() || filesize == 0) {
-		X_ERROR("Font", "Error reading ttf font data");
-		return false;
-	}
-
-	if (!fontTexture_) {
-		fontTexture_.reset(X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena));
-	}
-
-	if (!fontTexture_->CreateFromMemory(fileDataBuf, width, height, FontSmooth::NONE, FontSmoothAmount::NONE)) {
-		return false;
-	}
-
-	fontTexDirty_ = true;
-
-	InitCache();
-	return true;
-}
-
-void XFont::Reload(void)
-{
-	// this is .shader reloading only for now.
-	// thought a diffrent .tff file may be set.
-	loadFont();
 }
 
 
@@ -174,7 +117,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const XTextDrawConect& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	const size_t textLen = (pEnd - pBegin);
-
 	if (!textLen) {
 		return;
 	}
@@ -347,10 +289,10 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 					break;
 			}
 
-			const int32_t charWidth = fontTexture_->GetCharacterWidth(ch);
-			const XTextureSlot* pSlot = fontTexture_->GetCharSlot(ch);
+			const int32_t charWidth = pFontTexture_->GetCharacterWidth(ch);
+			const XTextureSlot* pSlot = pFontTexture_->GetCharSlot(ch);
 			XCharCords cords;
-			fontTexture_->GetTextureCoord(pSlot, cords);
+			pFontTexture_->GetTextureCoord(pSlot, cords);
 			
 			engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
@@ -556,11 +498,11 @@ int32_t XFont::GetEffectId(const char* pEffectName) const
 
 void XFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, float& maxV) const
 {
-	const XTextureSlot* pSlot = fontTexture_->GetGradientSlot();
+	const XTextureSlot* pSlot = pFontTexture_->GetGradientSlot();
 	X_ASSERT_NOT_NULL(pSlot);
 
-	const float invWidth = 1.0f / static_cast<float>(fontTexture_->GetWidth());
-	const float invHeight = 1.0f / static_cast<float>(fontTexture_->GetHeight());
+	const float invWidth = 1.0f / static_cast<float>(pFontTexture_->GetWidth());
+	const float invHeight = 1.0f / static_cast<float>(pFontTexture_->GetHeight());
 
 	// deflate by one pixel to avoid bilinear filtering on the borders
 	minU = pSlot->texCoord[0] + invWidth;
@@ -582,7 +524,7 @@ void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 		return;
 	}
 
-	const auto& buf = fontTexture_->GetBuffer();
+	const auto& buf = pFontTexture_->GetBuffer();
 
 	// we want to submit a draw
 	render::Commands::CopyTextureBufferData* pCopyCmd = bucket.addCommand<render::Commands::CopyTextureBufferData>(0, 0);
@@ -710,7 +652,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 		float advance;
 		if (proportinal)
 		{
-			const int32_t charWidth = fontTexture_->GetCharacterWidth(ch);
+			const int32_t charWidth = pFontTexture_->GetCharacterWidth(ch);
 			advance = (charWidth + FONT_GLYPH_PROP_SPACING) * scale.x;
 		}
 		else
@@ -730,15 +672,14 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 
 bool XFont::InitCache(void)
 {
-	fontTexture_->CreateGradientSlot();
+	pFontTexture_->CreateGradientSlot();
 
-	// precache (not required but for faster printout later)
 	wchar_t buf[256];
 	wchar_t* p = buf;
 
-	wchar_t i = L' '; // even space should be there - otherwise it's created later on demand
+	wchar_t i = L' '; 
 
-	// precache all [normal] printable characters to the string (missing once are updated on demand)
+
 	for (; i <= L'~'; ++i) {
 		*p++ = i;
 	}
@@ -759,7 +700,7 @@ void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	X_PROFILE_BEGIN("FontPrepare", core::ProfileSubSys::FONT);
 
-	if (fontTexture_->PreCacheString(pBegin, pEnd) == CacheResult::UPDATED)
+	if (pFontTexture_->PreCacheString(pBegin, pEnd) == CacheResult::UPDATED)
 	{
 		fontTexDirty_ = true;
 	}
@@ -770,13 +711,13 @@ bool XFont::CreateDeviceTexture(void)
 	core::StackString512 name("$fontTexture_");
 	name.append(getName());
 
-	const auto& buf = fontTexture_->GetBuffer();
+	const auto& buf = pFontTexture_->GetBuffer();
 
 	X_ASSERT(pTexture_ == nullptr, "double init of font texture")(pTexture_);
 
 	pTexture_ = gEnv->pRender->createTexture(
 		name.c_str(),
-		fontTexture_->GetSize(),
+		pFontTexture_->GetSize(),
 		texture::Texturefmt::A8,
 		buf.data()
 	);

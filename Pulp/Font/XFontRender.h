@@ -19,8 +19,6 @@ class XGlyphBitmap;
 // uses free type to render glyphs for a font.
 class XFontRender
 {
-	typedef core::Array<uint8_t> BufferArr;
-
 	X_NO_COPY(XFontRender);
 	X_NO_ASSIGN(XFontRender);
 
@@ -28,11 +26,13 @@ public:
 	XFontRender();
 	~XFontRender();
 
-	bool SetRawFontBuffer(BufferArr& rawFontBuf, FontEncoding::Enum encoding);
+	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
 	bool Release(void); 
 
 	bool GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 
 		int8_t& iCharOffsetX, int8_t& iCharOffsetY, int32_t iX, int32_t iY, int32_t charCode);
+
+	X_INLINE bool ValidFace(void) const;
 
 	// scale the glyphs.
 	X_INLINE void SetSizeRatio(float fSizeRatio);
@@ -50,7 +50,7 @@ private:
 
 
 private:
-	BufferArr		fileData_; // must stay valid for lifetime of FT_Face
+	core::UniquePointer<uint8_t[]> data_; // must stay valid for lifetime of FT_Face
 
 	FT_Library		pLibrary_;
 	FT_Face			pFace_;

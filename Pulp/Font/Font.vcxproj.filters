@@ -37,9 +37,6 @@
     <Filter Include="Source Files\Null">
       <UniqueIdentifier>{14a6699f-2ff9-42c9-a59b-af334e1ab424}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Effect">
-      <UniqueIdentifier>{717335ba-2c77-4a13-a3bb-5da8dedea5aa}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Vars">
       <UniqueIdentifier>{0f643ef9-87e3-470a-8d54-67d2ec93fb78}</UniqueIdentifier>
     </Filter>
@@ -75,6 +72,12 @@
     <ClInclude Include="Vars\FontVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="FontTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -104,11 +107,11 @@
     <ClCompile Include="XNullfont.cpp">
       <Filter>Source Files\Null</Filter>
     </ClCompile>
-    <ClCompile Include="FontXml.cpp">
-      <Filter>Source Files\Effect</Filter>
-    </ClCompile>
     <ClCompile Include="Vars\FontVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="FontLoad.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

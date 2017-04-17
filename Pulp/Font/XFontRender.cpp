@@ -13,7 +13,7 @@ XFontRender::XFontRender() :
 	fSizeRatio_(0.8f),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
-	fileData_(g_fontArena)
+	data_(g_fontArena)
 {
 
 }
@@ -24,9 +24,9 @@ XFontRender::~XFontRender()
 }
 
 
-bool XFontRender::SetRawFontBuffer(BufferArr& rawFontBuf, FontEncoding::Enum encoding)
+bool XFontRender::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding)
 {
-	fileData_.swap(rawFontBuf); // we need to keep this buffer in memory.
+	data_ = std::move(data);
 
 	int32_t err = FT_Init_FreeType(&pLibrary_);
 	if (err)
@@ -43,8 +43,8 @@ bool XFontRender::SetRawFontBuffer(BufferArr& rawFontBuf, FontEncoding::Enum enc
 
 	err = FT_New_Memory_Face(
 		pLibrary_, 
-		fileData_.ptr(),
-		safe_static_cast<int32_t>(fileData_.size()),
+		data_.ptr(),
+		length,
 		0, 
 		&pFace_
 	);
@@ -67,7 +67,7 @@ bool XFontRender::Release(void)
 	pFace_ = nullptr;
 	pLibrary_ = nullptr;
 
-	fileData_.free();
+	data_.reset();
 	return true;
 }
 
@@ -100,7 +100,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
 	uint8_t* pBuffer = pGlyphBitmap->GetBuffer();
-	uint32 dwGlyphWidth = pGlyphBitmap->GetWidth();
+	uint32 glyphWidth = pGlyphBitmap->GetWidth();
 
 	for (uint32_t i = 0; i < pGlyph_->bitmap.rows; i++)
 	{
@@ -109,9 +109,9 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 		for (uint32_t j = 0; j < pGlyph_->bitmap.width; j++)
 		{
 			uint8_t	color =		pGlyph_->bitmap.buffer[(i * pGlyph_->bitmap.width) + j];
-			int32_t				offset = newY * dwGlyphWidth + iX + j;
+			int32_t				offset = newY * glyphWidth + iX + j;
 
-			if (offset >= static_cast<int32_t>(dwGlyphWidth * glyphBitmapHeight_)) {
+			if (offset >= static_cast<int32_t>(glyphWidth * glyphBitmapHeight_)) {
 				continue;
 			}
 
@@ -160,6 +160,8 @@ bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 
 void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
 {
+	X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")(width, height);
+
 	glyphBitmapWidth_ = width;
 	glyphBitmapHeight_ = height;
 

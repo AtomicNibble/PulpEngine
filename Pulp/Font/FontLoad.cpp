@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "Font.h"
 
+#include "XFontSystem.h"
 
 #include <IFileSys.h>
+#include <Threading\JobSystem2.h>
 
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 
@@ -110,7 +112,7 @@ namespace
 		return false;
 	}
 
-	bool ParseEffect(xml_node<>* node, XFont::FontEffect& effect)
+	bool ParseEffect(xml_node<>* node, FontEffect& effect)
 	{
 		X_ASSERT_NOT_NULL(node);
 		core::StackString<64> name;
@@ -147,10 +149,10 @@ namespace
 			if (strUtil::IsEqualCaseInsen("pass", pass->name()))
 			{
 				// add a pass, additional info is optional.		
-				XFont::FontPass effectPass;
+				FontPass effectPass;
 
-				if (effect.passes.size() == XFont::MAX_FONT_PASS) {
-					X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(XFont::MAX_FONT_PASS) " ignoring extra passes");
+				if (effect.passes.size() == MAX_FONT_PASS) {
+					X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(MAX_FONT_PASS) " ignoring extra passes");
 					break;
 				}
 
@@ -184,16 +186,88 @@ namespace
 		// we support effects with no passes defied.
 		// it's the same as a single empty pass.
 		if (effect.passes.isEmpty()) {
-			XFont::FontPass stdPass;
-			effect.passes.append(stdPass);
+			effect.passes.emplace_back(FontPass());
 		}
 
 		return true;
 	}
 
+	struct JobData
+	{
+		char* pData;
+		uint32_t dataSize;
+	};
+
 } // namespace
 
-bool XFont::loadFont()
+
+void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	X_UNUSED(fileSys);
+	X_UNUSED(bytesTransferred);
+
+	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
+	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
+
+	ioRequest_ = core::INVALID_IO_REQ_HANDLE;
+
+	if (!pFile) {
+		X_ERROR("Font", "Failed to load font def file");
+		return;
+	}
+
+	JobData data;
+	data.pData = static_cast<char*>(pOpenRead->pBuf);
+	data.dataSize = pOpenRead->dataSize;
+
+	// dispatch a job to parse it?
+	gEnv->pJobSys->CreateMemberJobAndRun<XFont>(this, &XFont::ProcessFontFile_job, data);
+}
+
+void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+
+	JobData* pJobData = static_cast<JobData*>(pData);
+
+	// so we have the file data just need to process it.
+	if (processXmlData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_))
+	{
+		// now we dispatch read request for font file.
+		core::fileModeFlags mode;
+		mode.Set(core::fileMode::READ);
+		mode.Set(core::fileMode::SHARE);
+
+		core::IoRequestOpenRead open;
+		open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
+		open.mode = mode;
+		open.path = sourceName_.c_str();
+		open.arena = g_fontArena;
+
+		ioRequest_ = gEnv->pFileSys->AddIoRequestToQue(open);
+	}
+	else
+	{
+
+	}
+
+	X_DELETE_ARRAY(pJobData->pData, g_fontArena);
+}
+
+void XFont::Reload(void)
+{
+	loadFont(true);
+}
+
+bool XFont::loadFont(bool async)
+{
+	return loadFontDef(async);
+}
+
+bool XFont::loadFontDef(bool async)
 {
 	core::Path<char> path;
 	path = "Fonts/";
@@ -204,29 +278,104 @@ bool XFont::loadFont()
 	mode.Set(fileMode::READ);
 	mode.Set(fileMode::SHARE);
 
-
-	core::XFileMemScoped file;
-	if (file.openFile(path.c_str(), mode))
+	if (ioRequest_ != core::INVALID_IO_REQ_HANDLE)
 	{
-		if (!processXmlData(file->getBufferStart(), file->getBufferEnd()))
+		
+
+	}
+
+	if (async)
+	{
+		// load the file async
+		core::IoRequestOpenRead open;
+		open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
+		open.mode = mode;
+		open.path = path;
+		open.arena = g_fontArena;
+
+		ioRequest_ = gEnv->pFileSys->AddIoRequestToQue(open);
+	}
+	else
+	{
+		core::XFileMemScoped file;
+		if (!file.openFile(path.c_str(), mode)) {
+			return false;
+		}
+
+		if (!processXmlData(file->getBufferStart(), file->getBufferEnd(), sourceName_, effects_))
 		{
+			X_ERROR("Font", "Error processing font def file: \"%s\"", path.c_str());
 			return false;
 		}
 
 		X_ASSERT(sourceName_.isNotEmpty(), "Source name is empty")(sourceName_.isEmpty());
+		X_ASSERT(pFontTexture_ == nullptr, "Fonttexture already set")(pFontTexture_);
 
-		if (!loadTTF(sourceName_.c_str(), 512, 512))
+		// now we need a glyph cache.
+		pFontTexture_ = fontSys_.getFontTexture(sourceName_, async);
+		if (!pFontTexture_)
 		{
-			X_ERROR("Font", "failed to load font source file: \"%s\"", sourceName_.c_str());
+			X_ERROR("Font", "Error loaded font file: \"%s\"", sourceName_.c_str());
 			return false;
 		}
+		
 	}
 	
 	return true;
 }
 
 
-bool XFont::processXmlData(const char* pBegin, const char* pEnd)
+#if 0
+
+bool XFont::loadFontFile(SourceNameStr& fileName)
+{
+	X_LOG0("Font", "loading: \"%s\"", fileName.c_str());
+
+	core::Path<char> path;
+	path /= "Fonts/";
+	path.setFileName(fileName.c_str());
+
+	FreeBuffers();
+
+	core::Array<uint8_t> fileDataBuf(g_fontArena);
+
+	size_t filesize = 0;
+
+	core::XFileScoped file;
+	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
+	{
+		filesize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
+		if (filesize > 0) {
+			fileDataBuf.resize(filesize);
+			if (file.read(fileDataBuf.data(), filesize) != filesize) {
+				X_ERROR("Font", "Error reading ttf font data");
+				return false;
+			}
+		}
+	}
+
+	if (fileDataBuf.isEmpty() || filesize == 0) {
+		X_ERROR("Font", "Error reading font data");
+		return false;
+	}
+
+	if (!fontTexture_) {
+//		fontTexture_.reset(X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena));
+	}
+
+//	if (!fontTexture_->CreateFromMemory(fileDataBuf, width, height, FontSmooth::NONE, FontSmoothAmount::NONE)) {
+//		return false;
+//	}
+
+	fontTexDirty_ = true;
+
+	InitCache();
+	return true;
+}
+
+#endif
+
+bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, EffetsArr& effectsOut)
 {
 	ptrdiff_t size = (pEnd - pBegin);
 	if (!size) {
@@ -241,7 +390,8 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd)
 	doc.set_allocator(XmlAllocate, XmlFree);
 	doc.parse<0>(data.data());    // 0 means default parse flags
 
-	core::StackString<128> sourceName;
+	effectsOut.clear();
+	sourceNameOut.clear();
 
 	xml_node<>* node = doc.first_node("font");
 	if (node)
@@ -250,11 +400,11 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd)
 		if (source)
 		{
 			if (source->value_size() < 128) {
-				sourceName.append(source->value());
+				sourceNameOut.append(source->value());
 			}
 		}
 
-		if (!sourceName.isEmpty())
+		if (!sourceNameOut.isEmpty())
 		{
 			// parse the nodes.
 			for (xml_node<>* child = node->first_node();
@@ -266,7 +416,7 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd)
 
 					if (ParseEffect(child, effect))
 					{
-						effects_.append(effect);
+						effectsOut.append(effect);
 					}
 				}
 				else
@@ -287,7 +437,6 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd)
 		return false;
 	}
 
-	sourceName_ = sourceName;
 	return true;
 }
 

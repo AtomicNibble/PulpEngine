@@ -1,21 +1,37 @@
 #include "stdafx.h"
 #include "XGlyphCache.h"
-
 #include "XFontTexture.h"
+
+#include "Vars\FontVars.h"
+
+#include <IFileSys.h>
+#include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(font)
 
+namespace
+{
+	struct JobData
+	{
+		uint8_t* pData;
+		uint32_t dataSize;
+	};
 
-XGlyphCache::XGlyphCache(core::MemoryArenaBase* arena) :
+} // naemspace
+
+XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
+	vars_(vars),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
+	scaledGlyphWidth_(0),
+	scaledGlyphHeight_(0),
 
 	scaleBitmap_(arena),
 
 	usage_(0),
 
-	smoothMethod_(0),
-	smoothAmount_(0),
+	smoothMethod_(FontSmooth::NONE),
+	smoothAmount_(FontSmoothAmount::NONE),
 
 	slotList_(arena),
 	cacheTable_(arena, 8)
@@ -28,27 +44,138 @@ XGlyphCache::~XGlyphCache()
 
 }
 
-bool XGlyphCache::Create(BufferArr& rawFontBuf, FontEncoding::Enum encoding, int32_t cacheSize,
-	int32_t glyphBitmapWidth, int32_t glyphBitmapHeight,
-	FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount)
+void XGlyphCache::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-	smoothMethod_ = smoothMethod;
-	smoothAmount_ = smoothAmount;
+	X_UNUSED(fileSys);
+	X_UNUSED(bytesTransferred);
+
+	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
+	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
+
+	// ioRequest_ = core::INVALID_IO_REQ_HANDLE;
+
+	if (!pFile) {
+		X_ERROR("Font", "Failed to load font def file");
+		return;
+	}
+
+	JobData data;
+	data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
+	data.dataSize = pOpenRead->dataSize;
+
+	// dispatch a job to parse it?
+	gEnv->pJobSys->CreateMemberJobAndRun<XGlyphCache>(this, &XGlyphCache::ProcessFontFile_job, data);
+}
+
+
+void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+
+	// we have the font data now we just need to setup the font render.
+	JobData* pJobData = static_cast<JobData*>(pData);
+
+	if (!fontRenderer_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData), pJobData->dataSize, FontEncoding::Unicode))
+	{
+
+	}
+
+	if(scaledGlyphWidth_) {
+		fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_);
+	}
+	else {
+		fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_);
+	}
+
+	// preform the precache in this job.
+	if (vars_.glyphCachePreWarm()) {
+		PreWarmCache();
+	}
+
+	// now we are ready.
+}
+
+
+bool XGlyphCache::LoadGlyphSource(const SourceNameStr& name, bool async)
+{
+	core::Path<char> path;
+	path /= "Fonts/";
+	path.setFileName(name.begin(), name.end());
+
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::READ);
+	mode.Set(core::fileMode::SHARE);
+
+	if (async)
+	{
+		// load the file async
+		core::IoRequestOpenRead open;
+		open.callback.Bind<XGlyphCache, &XGlyphCache::IoRequestCallback>(this);
+		open.mode = mode;
+		open.path = path;
+		open.arena = g_fontArena;
+
+		gEnv->pFileSys->AddIoRequestToQue(open);
+	}
+	else
+	{
+		core::XFileScoped file;
+
+		if (!file.openFile(path.c_str(), core::fileModeFlags::READ)) {
+			return false;
+		}
+
+		const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
+		if (!fileSize) {
+			X_ERROR("Font", "Font file is zero bytes in size");
+			return false;
+		}
+
+		core::UniquePointer<uint8_t[]> buf = core::makeUnique<uint8_t[]>(g_fontArena, fileSize);
+		if (file.read(buf.ptr(), fileSize) != fileSize) {
+			X_ERROR("Font", "Error reading font data");
+			return false;
+		}
+
+		if (!fontRenderer_.SetRawFontBuffer(std::move(buf), safe_static_cast<int32_t>(fileSize), FontEncoding::Unicode)) {
+			X_ERROR("Font", "Error setting up font renderer");
+			return false;
+		}
+
+		if (scaledGlyphWidth_) {
+			fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_);
+		}
+		else {
+			fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_);
+		}
+
+		if (vars_.glyphCachePreWarm()) {
+			PreWarmCache();
+		}
+	}
+
+	return true;
+}
+
+bool XGlyphCache::Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight)
+{
+	int32_t cacheSize = vars_.glyphCacheSize();
+
+	smoothMethod_ = vars_.fontSmoothMethod();
+	smoothAmount_ = vars_.fontSmoothAmount();
 
 	glyphBitmapWidth_ = glyphBitmapWidth;
 	glyphBitmapHeight_ = glyphBitmapHeight;
-
-	if (fontRenderer_.SetRawFontBuffer(rawFontBuf, encoding)) {
-		return false;
-	}
+	scaledGlyphWidth_ = 0;
+	scaledGlyphHeight_ = 0;
 
 	if (!CreateSlotList(cacheSize)) {
 		ReleaseSlotList();
 		return false;
 	}
-
-	int32_t scaledGlyphWidth = 0;
-	int32_t scaledGlyphHeight = 0;
 
 	switch (smoothAmount_)
 	{
@@ -57,12 +184,12 @@ bool XGlyphCache::Create(BufferArr& rawFontBuf, FontEncoding::Enum encoding, int
 			switch (smoothAmount_)
 			{
 				case FontSmoothAmount::X2:
-					scaledGlyphWidth = glyphBitmapWidth_ << 1;
-					scaledGlyphHeight = glyphBitmapHeight_ << 1;
+					scaledGlyphWidth_ = glyphBitmapWidth_ << 1;
+					scaledGlyphHeight_ = glyphBitmapHeight_ << 1;
 				break;
 				case FontSmoothAmount::X4:
-					scaledGlyphWidth = glyphBitmapWidth_ << 2;
-					scaledGlyphHeight = glyphBitmapHeight_ << 2;
+					scaledGlyphWidth_ = glyphBitmapWidth_ << 2;
+					scaledGlyphHeight_ = glyphBitmapHeight_ << 2;
 				break;
 			}
 		}
@@ -72,22 +199,17 @@ bool XGlyphCache::Create(BufferArr& rawFontBuf, FontEncoding::Enum encoding, int
 	}
 
 	// Scaled?
-	if (scaledGlyphWidth > 0)
+	if (scaledGlyphWidth_ > 0)
 	{
 		scaleBitmap_.reset(X_NEW(XGlyphBitmap, scaleBitmap_.getArena(), "BitMap"));
 
-		if (!scaleBitmap_->Create(scaledGlyphWidth, scaledGlyphHeight))
+		if (!scaleBitmap_->Create(scaledGlyphWidth_, scaledGlyphHeight_))
 		{
 			Release();
 			return false;
 		}
+	}
 
-		fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth, scaledGlyphHeight);
-	}
-	else
-	{
-		fontRenderer_.SetGlyphBitmapSize(32, 32);
-	}
 
 	return true;
 }
@@ -115,6 +237,37 @@ void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
 	if (pHeight) {
 		*pHeight = glyphBitmapHeight_;
+	}
+}
+
+void XGlyphCache::PreWarmCache(void)
+{
+	X_ASSERT(cacheTable_.empty(), "Can only be run when the cache is empty")(cacheTable_.size());
+
+	wchar_t buf[256];
+	wchar_t* p = buf;
+
+	wchar_t i = L' ';
+
+	for (; i <= L'~'; ++i) {
+		*p++ = i;
+	}
+
+	i += 35;
+
+	for (; i < 256; ++i) {
+		*p++ = i;
+	}
+
+	size_t len = (p - buf);
+	len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
+
+	X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
+
+	++usage_; // give them fake usage.
+
+	for (size_t x = 0; x < len; x++) {
+		PreCacheGlyph(buf[x]);
 	}
 }
 
@@ -188,7 +341,19 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	// Blur it baby!
 	if (smoothMethod_ == FontSmooth::BLUR)
 	{
-		pSlot->glyphBitmap.Blur(smoothAmount_);
+		int32_t iterations = 1;
+
+		switch (smoothAmount_)
+		{
+			case FontSmoothAmount::X2:
+				iterations = 2;
+				break;
+			case FontSmoothAmount::X4:
+				iterations = 4;
+				break;
+		}
+
+		pSlot->glyphBitmap.Blur(iterations);
 	}
 
 	pSlot->usage = usage_;

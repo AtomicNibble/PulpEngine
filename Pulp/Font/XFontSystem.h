@@ -5,15 +5,24 @@
 
 #include <Platform\DirectoryWatcher.h>
 #include <Containers\HashMap.h>
+#include <Util\ReferenceCounted.h>
+
 #include "Vars\FontVars.h"
 
 X_NAMESPACE_BEGIN(font)
 
 class XFont;
+class XFontTexture;
+class XGlyphCache;
 
 class XFontSystem : public IFontSys, public core::IXHotReload
 {
-	typedef core::HashMap<core::string, XFont*> FontMap;
+//	typedef core::ReferenceCountedInstance<XFontTexture*> XFontTextureRef;
+//	typedef core::ReferenceCountedInstance<XGlyphCache*> XGlyphCacheRef;
+
+	typedef core::HashMap<FontNameStr, XFont*> FontMap;
+	typedef core::HashMap<SourceNameStr, XFontTexture*> FontTextureMap;
+
 	typedef FontMap::iterator FontMapItor;
 	typedef FontMap::const_iterator FontMapConstItor;
 
@@ -42,12 +51,18 @@ public:
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
+	XFontTexture* getFontTexture(const SourceNameStr& name, bool async);
+	void releaseFontTexture(XFontTexture* pFontTex);
+
+
 private:
 	ICore* pCore_;
 	FontMap fonts_;
 
 	FontVars vars_;
 
+	core::CriticalSection lock_;
+	FontTextureMap fontTextures_;
 };
 
 X_NAMESPACE_END
