@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(font)
 
 FontVars::FontVars()
 {
-	glyphCacheSize_ = 256;
+	glyphCacheSize_ = 512;
 	glyphCachePreWarm_ = 1;
 
 	fontSmoothingMethod_ = 0;
