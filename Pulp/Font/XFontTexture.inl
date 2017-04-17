@@ -18,7 +18,7 @@ X_INLINE const int32_t XFontTexture::GetHeight(void) const
 
 X_INLINE const XFontTexture::BufferArr& XFontTexture::GetBuffer(void) const
 {
-	return buffer_;
+	return textureBuffer_;
 }
 
 X_INLINE float XFontTexture::GetTextureCellWidth(void) const

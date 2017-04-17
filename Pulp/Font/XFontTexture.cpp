@@ -10,7 +10,7 @@ XFontTexture::XFontTexture(core::MemoryArenaBase* arena) :
 
 	width_(0),
 	height_(0),
-	buffer_(arena),
+	textureBuffer_(arena),
 
 	invWidth_(0),
 	invHeight_(0),
@@ -45,7 +45,7 @@ XFontTexture::~XFontTexture()
 
 void XFontTexture::ClearBuffer(void)
 {
-	buffer_.clear();
+	textureBuffer_.clear();
 
 	width_ = 0;
 	height_ = 0;
@@ -75,8 +75,8 @@ bool XFontTexture::CreateFromMemory(BufferArr& buf, int32_t width,
 bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCellCount, int32_t heightCellCount)
 {
-	buffer_.resize(width * height);
-	std::fill(buffer_.begin(), buffer_.end(), 0);
+	textureBuffer_.resize(width * height);
+	std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0);
 	
 	width_ = width;
 	height_ = height;
@@ -282,7 +282,7 @@ bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cCh
 
 	// blit the glyp to my buffer
 	pGlyphBitmap->BlitTo8(
-		buffer_.ptr(),
+		textureBuffer_.ptr(),
 		0, // srcX
 		0, // srcY
 		width, // srcWidth
@@ -310,7 +310,7 @@ void XFontTexture::CreateGradientSlot(void)
 	const int32_t x = pSlot->textureSlot % widthCellCount_;
 	const int32_t y = pSlot->textureSlot / widthCellCount_;
 
-	uint8* pBuffer = &buffer_[x*cellWidth_ + y*cellHeight_*height_];
+	uint8* pBuffer = &textureBuffer_[x*cellWidth_ + y*cellHeight_*height_];
 
 	for (uint32 dwY = 0; dwY < pSlot->charHeight; ++dwY) {
 		for (uint32 dwX = 0; dwX < pSlot->charWidth; ++dwX) {
@@ -332,7 +332,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 	path.setFileName(filename);
 	path.setExtension(".bmp");
 
-	if (buffer_.isEmpty()) {
+	if (textureBuffer_.isEmpty()) {
 		X_WARNING("Font", "Failed to write font texture, buffer is invalid.");
 		return false;
 	}
@@ -367,7 +367,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 		{
 			for (int32_t j = 0; j < width_; j++)
 			{
-				cRGB[0] = buffer_[(i * width_) + j];
+				cRGB[0] = textureBuffer_[(i * width_) + j];
 				cRGB[1] = *cRGB;
 				cRGB[2] = *cRGB;
 

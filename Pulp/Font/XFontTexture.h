@@ -135,7 +135,7 @@ private:
 	int32_t width_;
 	int32_t height_;
 
-	BufferArr buffer_;
+	BufferArr textureBuffer_;
 
 	float	invWidth_;
 	float	invHeight_;
