@@ -56,6 +56,11 @@ void XFontTexture::ClearBuffer(void)
 bool XFontTexture::Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	int32_t widthCellCount, int32_t heightCellCount)
 {
+	if (!core::bitUtil::IsPowerOfTwo(width) || !core::bitUtil::IsPowerOfTwo(height)) {
+		X_ERROR("Font", "Font texture must be pow2. width: %" PRIi32 " height: %" PRIi32, width, height);
+		return false;
+	}
+
 	textureBuffer_.resize(width * height);
 	std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0);
 	
