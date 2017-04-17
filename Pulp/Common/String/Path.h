@@ -43,8 +43,8 @@ public:
 	inline const TChar* fileName(void) const;
 	inline const TChar* extension(bool incDot = true) const;
 
-	inline void setExtension(const TChar* extension);
-	inline void setFileName(const TChar* filename);
+	inline void setExtension(const TChar* pExtension);
+	inline void setFileName(const TChar* pFilename);
 
 	
 	inline void operator=(const TChar*);

@@ -37,7 +37,7 @@ Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 }
 
 template<typename TChar>
-Path<TChar>::Path(const TChar* const beginInclusive, const TChar* const endExclusive) : 
+Path<TChar>::Path(const TChar* const beginInclusive, const TChar* const endExclusive) :
 	StackString<MAX_PATH, TChar>(beginInclusive, endExclusive)
 {
 
@@ -54,17 +54,20 @@ const TChar* Path<TChar>::fileName(void) const
 	}
 
 	const TChar* noneNative = findLast(NON_NATIVE_SLASH);
-	// folder\ 
+	// folder
 	if (noneNative == end() - 1) {
 		return noneNative + 1;
 	}
 
-	if (!native && !noneNative)
+	if (!native && !noneNative) {
 		return str_;
-	if (!noneNative && native)
+	}
+	if (!noneNative && native) {
 		return native + 1;
-	if (noneNative && !native)
+	}
+	if (noneNative && !native) {
 		return noneNative + 1;
+	}
 
 
 	// work out which is bigger
@@ -87,30 +90,29 @@ const TChar* Path<TChar>::extension(bool incDot) const
 	}
 	return res + 1;
 }
-
 template<typename TChar>
-void Path<TChar>::setExtension(const TChar* extension)
+void Path<TChar>::setExtension(const TChar* pExtension)
 {
 	const TChar* remove = findLast('.');	// need to remvoe a extension?
-	bool has_dot = (extension[0] == '.'); // new extension got a dot?
-	bool is_blank = (extension[0] == '\0'); // 
+	bool has_dot = (pExtension[0] == '.'); // new extension got a dot?
+	bool is_blank = (pExtension[0] == '\0'); //
 
-	if (remove) { 
+	if (remove) {
 		trimRight(remove);
 	}
 
-	if (!is_blank) 
+	if (!is_blank)
 	{
 		if (!has_dot) {
 			append('.', 1);
 		}
 
-		append(extension);
+		append(pExtension);
 	}
 }
 
 template<typename TChar>
-void Path<TChar>::setFileName(const TChar* filename)
+void Path<TChar>::setFileName(const TChar* pFilename)
 {
 	// place in temp buffer otherwise
 	// the original file name would be update
@@ -120,12 +122,12 @@ void Path<TChar>::setFileName(const TChar* filename)
 
 	if (isEmpty() || (name == end()))
 	{
-		append(filename);
+		append(pFilename);
 	}
-	else 
+	else
 	{
 		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
-		temp.append(filename);
+		temp.append(pFilename);
 
 		*this = temp.c_str();
 	}
