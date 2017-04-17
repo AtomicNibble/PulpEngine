@@ -91,6 +91,7 @@ bool XFontSystem::init(void)
 
 
 	gEnv->pHotReload->addfileType(this, "font");
+	gEnv->pHotReload->addfileType(this, "ttf");
 
 	return true;
 }
@@ -105,6 +106,7 @@ void XFontSystem::shutDown(void)
 	}
 
 	gEnv->pHotReload->addfileType(nullptr, "font");
+	gEnv->pHotReload->addfileType(nullptr, "ttf");
 
 
 	fonts_.clear();
