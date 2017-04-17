@@ -13,9 +13,9 @@ XGlyphBitmap::XGlyphBitmap() :
 }
 
 XGlyphBitmap::XGlyphBitmap(int32_t width, int32_t height) :
-pBuffer_(nullptr),
-width_(0),
-height_(0)
+	pBuffer_(nullptr),
+	width_(0),
+	height_(0)
 {
 	Create(width, height);
 }

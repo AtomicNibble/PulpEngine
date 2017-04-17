@@ -81,13 +81,10 @@ public:
 
 	void ClearBuffer(void);
 
-	bool CreateFromMemory(BufferArr& buf, int32_t width,
-			int32_t height, FontSmooth::Enum  smoothMethod, FontSmoothAmount::Enum smoothAmount,
-			float sizeRatio = 0.875f, int32_t widthCharCount = 16,
-		int32_t heightCharCount = 16);
+	bool CreateFromMemory(BufferArr& buf, int32_t width, int32_t height, 
+		FontSmooth::Enum  smoothMethod, FontSmoothAmount::Enum smoothAmount, float sizeRatio = 0.875f, 
+		int32_t widthCharCount = 16, int32_t heightCharCount = 16);
 
-	bool Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
-		float sizeRatio = 0.8f, int32_t widthCharCount = 16, int32_t heightCharCount = 16);
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
 	// pUpdated is the number of slots updated
@@ -122,6 +119,10 @@ public:
 public:
 	// writes the texture to a file.
 	bool WriteToFile(const char* filename);
+
+private:
+	bool Create(int32_t width, int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
+		float sizeRatio = 0.8f, int32_t widthCharCount = 16, int32_t heightCharCount = 16);
 
 private:
 	bool CreateSlotList(int32_t listSize);

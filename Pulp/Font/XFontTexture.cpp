@@ -6,35 +6,34 @@
 X_NAMESPACE_BEGIN(font)
 
 XFontTexture::XFontTexture(core::MemoryArenaBase* arena) :
+	textureSlotArea_(arena),
 
-textureSlotArea_(arena),
+	width_(0),
+	height_(0),
+	buffer_(arena),
 
-width_(0),
-height_(0),
-buffer_(arena),
+	invWidth_(0),
+	invHeight_(0),
 
-invWidth_(0),
-invHeight_(0),
+	cellWidth_(0),
+	cellHeight_(0),
 
-cellWidth_(0),
-cellHeight_(0),
+	textureCellWidth_(0),
+	textureCellHeight_(0),
 
-textureCellWidth_(0),
-textureCellHeight_(0),
+	widthCellCount_(0),
+	heightCellCount_(0),
 
-widthCellCount_(0),
-heightCellCount_(0),
+	textureSlotCount_(0),
 
-textureSlotCount_(0),
+	smoothMethod_(FontSmooth::NONE),
+	smoothAmount_(FontSmoothAmount::NONE),
 
-smoothMethod_(FontSmooth::NONE),
-smoothAmount_(FontSmoothAmount::NONE),
+	slotUsage_(1), // space for gradiant.
 
-slotUsage_(1), // space for gradiant.
-
-glyphCache_(arena),
-slotList_(arena),
-slotTable_(arena, 8)
+	glyphCache_(arena),
+	slotList_(arena),
+	slotTable_(arena, 8)
 {
 
 }
@@ -60,8 +59,7 @@ bool XFontTexture::CreateFromMemory(BufferArr& buf, int32_t width,
 	int32_t height, FontSmooth::Enum smoothMethod, FontSmoothAmount::Enum smoothAmount,
 	float sizeRatio, int32_t widthCharCount, int32_t heightCharCount)
 {
-	if (!glyphCache_.LoadFontFromMemory(buf))
-	{
+	if (!glyphCache_.LoadFontFromMemory(buf)) {
 		ClearBuffer();
 		return false;
 	}

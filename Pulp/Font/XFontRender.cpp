@@ -77,9 +77,11 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
 	glyphBitmapWidth_ = width;
 	glyphBitmapHeight_ = height;
 
-	const int32_t err = FT_Set_Pixel_Sizes(pFace_, 
+	const int32_t err = FT_Set_Pixel_Sizes(
+		pFace_, 
 		static_cast<int32_t>(glyphBitmapWidth_ * fSizeRatio_),
-		static_cast<int32_t>(glyphBitmapHeight_ * fSizeRatio_));
+		static_cast<int32_t>(glyphBitmapHeight_ * fSizeRatio_)
+	);
 
 	if (err)
 	{

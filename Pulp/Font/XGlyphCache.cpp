@@ -7,22 +7,21 @@ X_NAMESPACE_BEGIN(font)
 
 
 XGlyphCache::XGlyphCache(core::MemoryArenaBase* arena) :
+	arena_(arena),
 
-arena_(arena),
+	glyphBitmapWidth_(0),
+	glyphBitmapHeight_(0),
+	fSizeRatio_(0.8f),
 
-glyphBitmapWidth_(0),
-glyphBitmapHeight_(0),
-fSizeRatio_(0.8f),
+	scaleBitmap_(arena),
 
-scaleBitmap_(arena),
+	usage_(0),
 
-usage_(0),
+	smoothMethod_(0),
+	smoothAmount_(0),
 
-smoothMethod_(0),
-smoothAmount_(0),
-
-slotList_(arena),
-cacheTable_(arena, 8)
+	slotList_(arena),
+	cacheTable_(arena, 8)
 {
 
 }
