@@ -5,6 +5,7 @@
 
 #include <Platform\DirectoryWatcher.h>
 #include <Containers\HashMap.h>
+#include "Vars\FontVars.h"
 
 X_NAMESPACE_BEGIN(font)
 
@@ -44,6 +45,9 @@ public:
 private:
 	ICore* pCore_;
 	FontMap fonts_;
+
+	FontVars vars_;
+
 };
 
 X_NAMESPACE_END

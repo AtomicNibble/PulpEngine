@@ -70,7 +70,7 @@ void XFontSystem::release(void)
 
 void XFontSystem::registerVars(void)
 {
-
+	vars_.registerVars();
 }
 
 void XFontSystem::registerCmds(void)
