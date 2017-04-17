@@ -1510,7 +1510,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 			// make sure it's safe to allocate the buffer in this thread.
 			X_ASSERT_NOT_NULL(pOpenRead->arena);
-			X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arenas")(pOpenRead->arena->isThreadSafe());
+			X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arena")(pOpenRead->arena->isThreadSafe());
 
 			if (!pOpenRead)
 			{
