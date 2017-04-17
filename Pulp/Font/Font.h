@@ -67,7 +67,6 @@ public:
 
 	X_INLINE const FontNameStr& getName(void) const;
 	X_INLINE bool isDirty(void) const;
-	X_INLINE bool isTextureValid(void) const;
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);
