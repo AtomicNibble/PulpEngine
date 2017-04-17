@@ -1259,19 +1259,32 @@ XFileStats& xFileSys::getStats(void) const
 
 // ----------------------- io que ---------------------------
 
-
-void xFileSys::AddIoRequestToQue(const IoRequestBase& request)
+RequestHandle xFileSys::getNextRequestHandle(void)
 {
+	RequestHandle handle = currentRequestIdx_++;
+	if (handle == INVALID_IO_REQ_HANDLE) {
+		return getNextRequestHandle();
+	}
+
+	return handle;
+}
+
+RequestHandle xFileSys::AddIoRequestToQue(const IoRequestBase& request)
+{
+	static_assert(std::is_unsigned<RequestHandle>::value, "Logic makes use of wrap around, so must be unsigned");
+
 	if (request.getType() == IoRequest::CLOSE) {
 		if (request.callback) {
 			const IoRequestClose& closeReq = static_cast<const IoRequestClose&>(request);
 			X_ERROR("FileSys", "Close request can't have a callback. pfile: %p", closeReq.pFile);
-			return;
+			return INVALID_IO_REQ_HANDLE;
 		}
 	}
 	else {
 		X_ASSERT(request.callback, "Callback can't be null")(IoRequest::ToString(request.getType()), request.callback);
 	}
+
+	RequestHandle reqHandle = getNextRequestHandle();
 
 	if (vars_.QueDebug)
 	{
@@ -1298,6 +1311,8 @@ void xFileSys::AddIoRequestToQue(const IoRequestBase& request)
 	// POD it like it's hot.
 	requestData_.write(&request, reqSize);
 	requestCond_.NotifyOne();
+
+	return reqHandle;
 }
 
 bool xFileSys::StartRequestWorker(void)

@@ -187,12 +187,16 @@ public:
 
 	// IoRequest que.
 
-	void AddIoRequestToQue(const IoRequestBase& request) X_FINAL;
+	RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_FINAL;
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);
 
+private:
 	void popRequest(RequestBuffer& buf);
 	bool tryPopRequest(RequestBuffer& buf);
+	
+	RequestHandle getNextRequestHandle(void);
+
 	// ~
 
 	// ThreadAbstract
@@ -239,15 +243,11 @@ private:
 	MemfileArena		memFileArena_;
 
 private:
-
-	
-	// i want some sort of FIFO byte stream to store the diffrent sized requests.
-	// typedef ThreadQueBlocking<IoRequestBase*, core::CriticalSection> IoQue;
-	// IoQue ioQue_;
+	RequestHandle currentRequestIdx_;
 
 	core::CriticalSection requestLock_;
 	core::ConditionVariable requestCond_;
-	core::ByteStreamFifo requestData_;
+	core::ByteStreamFifo requestData_;		// requests are serialized into this as they are of varing sizes.
 };
 
 

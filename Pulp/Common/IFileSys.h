@@ -39,7 +39,6 @@ struct XFileStats
 
 struct XFileAsync;
 
-
 struct XFileAsyncOperation
 {
 	friend struct XFileAsync;
@@ -465,6 +464,10 @@ X_DECLARE_ENUM(IoRequest)(
 	WRITE
 );
 
+typedef uint32_t RequestHandle;
+static const RequestHandle INVALID_IO_REQ_HANDLE = 0;
+
+
 // I want to pass these into filesystem with one function call.
 // but support diffrent types.
 // so many i should have a base type that contains the mode
@@ -631,7 +634,7 @@ struct IFileSys
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;
 
-	virtual void AddIoRequestToQue(const IoRequestBase& request) X_ABSTRACT;
+	virtual RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_ABSTRACT;
 };
 
 class XFileMemScoped
