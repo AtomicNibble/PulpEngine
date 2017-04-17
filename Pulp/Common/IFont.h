@@ -31,7 +31,7 @@ struct IFontSys : public core::IEngineSysBase
 	virtual IFont* GetFont(const char* pFontName) const X_ABSTRACT;
 
 	// this should really take a sink no?
-	virtual void ListFontNames(void) const X_ABSTRACT;
+	virtual void ListFonts(void) const X_ABSTRACT;
 };
 
 #ifdef GetCharWidth

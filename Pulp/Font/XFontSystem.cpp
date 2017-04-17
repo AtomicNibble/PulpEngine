@@ -16,7 +16,7 @@ namespace
 		X_UNUSED(pCmd);
 		XFontSystem* pFont = static_cast<XFontSystem*>(gEnv->pFontSys);
 
-		pFont->ListFontNames();
+		pFont->ListFonts();
 	}
 
 	void Command_DumpForName(core::IConsoleCmdArgs* pCmd)
@@ -144,7 +144,7 @@ IFont* XFontSystem::GetFont(const char* pFontName) const
 	return it != fonts_.end() ? it->second : nullptr;
 }
 
-void XFontSystem::ListFontNames(void) const
+void XFontSystem::ListFonts(void) const
 {
 	FontMapConstItor it = fonts_.begin();
 

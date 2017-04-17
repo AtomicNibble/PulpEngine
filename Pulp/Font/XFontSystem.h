@@ -34,7 +34,7 @@ public:
 
 	virtual IFont* NewFont(const char* pFontName) X_FINAL;
 	virtual IFont* GetFont(const char* pFontName) const X_FINAL;
-	virtual void ListFontNames(void) const X_FINAL;
+	virtual void ListFonts(void) const X_FINAL;
 	// ~IXFont
 
 	// IXHotReload
