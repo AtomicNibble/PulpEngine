@@ -194,103 +194,100 @@ bool ParseEffect(xml_node<>* node, XFont::FontEffect& effect)
 
 bool XFont::loadFont()
 {
-	core::XFileScoped file;
 	core::Path<char> path;
-	size_t length;
-
 	path = "Fonts/";
 	path.setFileName(name_.c_str());
 	path.setExtension(".font");
 
+	core::fileModeFlags mode;
+	mode.Set(fileMode::READ);
+	mode.Set(fileMode::SHARE);
+
+
+	core::XFileMemScoped file;
+	if (file.openFile(path.c_str(), mode))
+	{
+		if (!processXmlData(file->getBufferStart(), file->getBufferEnd()))
+		{
+			return false;
+		}
+
+		X_ASSERT(sourceName_.isNotEmpty(), "Source name is empty")(sourceName_.isEmpty());
+
+		if (!loadTTF(sourceName_.c_str(), 512, 512))
+		{
+			X_ERROR("Font", "failed to load font source file: \"%s\"", sourceName_.c_str());
+			return false;
+		}
+	}
+	
+	return true;
+}
+
+
+bool XFont::processXmlData(const char* pBegin, const char* pEnd)
+{
+	ptrdiff_t size = (pEnd - pBegin);
+	if (!size) {
+		return false;
+	}
+
+	core::Array<char> data(g_fontArena, size + 1);
+	std::memcpy(data.data(), pBegin, size);
+	data.back() = '\0';
+
+	xml_document<> doc;    // character type defaults to char
+	doc.set_allocator(XmlAllocate, XmlFree);
+	doc.parse<0>(data.data());    // 0 means default parse flags
+
 	core::StackString<128> sourceName;
 
-	// clear any loaded effects.
-	effects_.clear();
-
-	if (file.openFile(path.c_str(), core::fileMode::READ))
+	xml_node<>* node = doc.first_node("font");
+	if (node)
 	{
-		length = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-
-		core::Array<char> textbuffer(g_fontArena, length + 1);
-
-		// add a null term baby!
-		// shake that booty.
-		// mmmmmmmmmmmm
-		textbuffer[length] = '\0';
-
-		if (file.read(textbuffer.ptr(), length) == length)
+		xml_attribute<>* source = node->first_attribute("source");
+		if (source)
 		{
-			xml_document<> doc;    // character type defaults to char
-			doc.set_allocator(XmlAllocate, XmlFree);
-			doc.parse<0>(textbuffer.ptr());    // 0 means default parse flags
+			if (source->value_size() < 128) {
+				sourceName.append(source->value());
+			}
+		}
 
-			xml_node<>* node = doc.first_node("font");
-			if (node) 
+		if (!sourceName.isEmpty())
+		{
+			// parse the nodes.
+			for (xml_node<>* child = node->first_node();
+				child; child = child->next_sibling())
 			{
-				xml_attribute<>* source = node->first_attribute("source");
-				if (source) 
+				if (core::strUtil::IsEqualCaseInsen("effect", child->name()))
 				{
-					if (source->value_size() < 128) {
-						sourceName.append(source->value());
-					}
-				}
+					FontEffect effect;
 
-				if (!sourceName.isEmpty()) 
-				{
-					// parse the nodes.
-					for (xml_node<>* child = node->first_node();
-						child; child = child->next_sibling())
+					if (ParseEffect(child, effect))
 					{
-						if (core::strUtil::IsEqualCaseInsen("effect", child->name()))
-						{
-							FontEffect effect;
-
-							if (ParseEffect(child, effect))
-							{
-								effects_.append(effect);
-							}
-						}
-						else
-						{
-							// do i care?
-							// just skip them.
-
-						}
+						effects_.append(effect);
 					}
 				}
 				else
 				{
-					X_ERROR("Font", "missing source attr from <font> tag");
-					return false;
+					// do i care?
+					// just skip them.
 				}
 			}
 		}
-
+		else
+		{
+			X_ERROR("Font", "missing source attr from <font> tag");
+			return false;
+		}
 	}
 	else
 	{
-		X_ERROR("Font", "failed to load font file: %s", path.c_str());
 		return false;
-	}
-
-	if (sourceName.isEmpty())
-	{
-		X_ERROR("Font", "Font source file is emtpy for: %s", path.c_str());
-		return false;
-	}
-
-	if (sourceName_ == sourceName) {
-		return true;
 	}
 
 	sourceName_ = sourceName;
-	if (loadTTF(sourceName.c_str(), 512, 512)) {
-		return true;
-	}
-	
-
-	X_ERROR("Font", "failed to load font source file: %s", sourceName.c_str());
-	return false;
+	return true;
 }
 
 

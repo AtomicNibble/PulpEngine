@@ -87,6 +87,9 @@ public:
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);
 
 private:
+	bool processXmlData(const char* pBegin, const char* pEnd);
+
+private:
 	Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex);
 
 	bool CreateDeviceTexture(void);
