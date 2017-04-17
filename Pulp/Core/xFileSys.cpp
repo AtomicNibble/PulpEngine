@@ -123,7 +123,8 @@ xFileSys::xFileSys() :
 	),
 	filePoolArena_(&filePoolAllocator_, "FilePool"),
 	memFileArena_(&memfileAllocator_, "MemFileArena"),
-	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE)
+	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE),
+	currentRequestIdx_(0)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pArena);
