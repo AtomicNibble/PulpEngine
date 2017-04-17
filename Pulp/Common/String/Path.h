@@ -45,8 +45,8 @@ public:
 
 	inline void setExtension(const TChar* pExtension);
 	inline void setFileName(const TChar* pFilename);
+	inline void setFileName(const TChar* pFileNameBegin, const TChar* pFileNameEnd);
 
-	
 	inline void operator=(const TChar*);
 
 	inline const Path operator/(const Path<TChar>& oth) const;

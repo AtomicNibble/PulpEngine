@@ -134,6 +134,28 @@ void Path<TChar>::setFileName(const TChar* pFilename)
 }
 
 template<typename TChar>
+void Path<TChar>::setFileName(const TChar* pFileNameBegin, const TChar* pFileNameEnd)
+{
+	// place in temp buffer otherwise
+	// the original file name would be update
+	// while we are replacing.
+
+	const TChar* name = fileName();
+
+	if (isEmpty() || (name == end()))
+	{
+		append(pFileNameBegin, pFileNameEnd);
+	}
+	else
+	{
+		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
+		temp.append(pFileNameBegin, pFileNameEnd);
+
+		*this = temp.c_str();
+	}
+}
+
+template<typename TChar>
 void Path<TChar>::operator=(const TChar* str)
 {
 	len_ = strUtil::strlen(str);
