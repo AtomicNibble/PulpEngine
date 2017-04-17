@@ -71,6 +71,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 	params.hInstance = g_hInstance;
 	params.bSkipInput = false;
 	params.bEnableNetowrking = true;
+	params.bProfileSysEnabled = true;
 
 	// enable loggers
 	params.bVsLog = core::debugging::IsDebuggerConnected();

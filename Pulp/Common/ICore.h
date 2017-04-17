@@ -145,6 +145,7 @@ struct SCoreInitParams
 	bool bLoadSymbols;
 	bool bFileSysWorkingDir;
 	bool bThreadSafeStringAlloc;
+	bool bProfileSysEnabled;
 
 	Vec4i seed;
 
@@ -168,6 +169,10 @@ struct SCoreInitParams
 		return bFileSysWorkingDir;
 	}
 
+	const bool ProfileSysEnabled(void) const {
+		return bProfileSysEnabled;
+	}
+
 	SCoreInitParams() :
 		hInstance(nullptr),
 		hWnd(nullptr),
@@ -183,6 +188,7 @@ struct SCoreInitParams
 		bLoadSymbols(true),
 		bFileSysWorkingDir(false),
 		bThreadSafeStringAlloc(true),
+		bProfileSysEnabled(false),
 
 #if X_SUPER == 0
 		bConsoleLog(true),
