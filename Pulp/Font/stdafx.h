@@ -18,6 +18,10 @@
 #include <Util\ReferenceCounted.h>
 #include <Util\UniquePointer.h>
 #include <Threading\CriticalSection.h>
+#include <Threading\Signal.h>
+#include <String\StackString.h>
+#include <Containers\FixedArray.h>
+#include <Containers\Array.h>
 
 #include <IConsole.h>
 #include <IFont.h>
