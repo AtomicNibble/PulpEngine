@@ -13,7 +13,7 @@ static const int32_t FONT_TAB_CHAR_NUM = 4;
 static const float FONT_SPACE_SIZE = 0.2f;
 static const float FONT_GLYPH_PROP_SPACING = 1.f;
 
-static const wchar_t FONT_PRECACHE_STR[190] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~ΒΆΒ£Β¤Β¥Β¦Β§Β¨Β©ΒªΒ«Β¬Β­Β®Β―Β°Β±Β²Β³Β΄ΒµΒ¶Β·ΒΈΒΉΒΊΒ»ΒΌΒ½ΒΎΒΏΓ€ΓΓ‚ΓƒΓ„Γ…Γ†Γ‡ΓΓ‰ΓΓ‹ΓΓΓΓΓΓ‘Γ’Γ“Γ”Γ•Γ–Γ—ΓΓ™ΓΓ›ΓΓΓΓΓ Γ΅ΓΆΓ£Γ¤Γ¥Γ¦Γ§Γ¨Γ©ΓªΓ«Γ¬Γ­Γ®Γ―Γ°Γ±Γ²Γ³Γ΄ΓµΓ¶Γ·ΓΈΓΉΓΊΓ»ΓΌΓ½ΓΎΓΏ";
+static const wchar_t FONT_PRECACHE_STR[190] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~Ά£¤¥¦§¨©ª«¬­®―°±²³΄µ¶·ΈΉΊ»Ό½ΎΏΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡÒΣΤΥΦΧΨΩΪΫάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώÿ";
 
 
 
