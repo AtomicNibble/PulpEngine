@@ -586,6 +586,21 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		{
 			return false;
 		}
+
+		// wait for default font to fully load.
+		if (!gEnv->IsDedicated()) 
+		{
+			font::IFont* pFont = env_.pFontSys->GetFont("default");
+			if (!pFont) {
+				X_ERROR("Font", "failed to get default font");
+				return false;
+			}
+
+			if (!pFont->WaitTillReady()) {
+				X_ERROR("Font", "Error loading default font");
+				return false;
+			}
+		}
 	}
 
 
@@ -768,7 +783,7 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 		return false;
 	}
 
-	if(!pFont->loadFont(false)) {
+	if(!pFont->loadFont(true)) {
 		X_ERROR("Font", "failed to load default font");
 		return false;
 	}
