@@ -15,8 +15,14 @@ public:
 	Signal();
 	~Signal();
 
+	// sets the 'signaled' state 
 	void raise(void);
+
+	// sets the 'none-signaled' state 
 	void clear(void);
+
+	// if we waited post wake up the state is auto set to 'none-signaled' 
+	// if multiple threads are waiting only one will wake.
 	bool wait(uint32_t timeout = WAIT_INFINITE);
 
 
