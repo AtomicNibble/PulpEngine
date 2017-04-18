@@ -36,6 +36,7 @@ XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	slotList_(arena),
 	cacheTable_(arena, 8),
 
+	signal_(false),
 	loadStatus_(LoadStatus::NotLoaded)	
 {
 
@@ -44,6 +45,31 @@ XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 XGlyphCache::~XGlyphCache()
 {
 
+}
+
+bool XGlyphCache::WaitTillReady(void)
+{
+	if (IsLoaded()) {
+		return true;
+	}
+
+	while (loadStatus_ == LoadStatus::Loading)
+	{
+		// if we have job system try help with work.
+		// if no work wait...
+		if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork())
+		{
+			signal_.wait();
+		}
+	}
+
+	signal_.clear();
+
+	if (loadStatus_ == LoadStatus::Error || loadStatus_ == LoadStatus::NotLoaded) {
+		return false;
+	}
+
+	return true;
 }
 
 void XGlyphCache::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
@@ -61,7 +87,6 @@ void XGlyphCache::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
 		return;
 	}
 
-	loadStatus_ = LoadStatus::Processing;
 
 	JobData data;
 	data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
@@ -86,6 +111,7 @@ void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t thread
 		FontEncoding::Unicode))
 	{
 		loadStatus_ = LoadStatus::Error;
+		signal_.raise();
 		X_ERROR("Font", "Error setting up font renderer");
 		return;
 	}
@@ -102,15 +128,18 @@ void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t thread
 		PreWarmCache();
 	}
 
+	X_LOG2("Font", "Loaded font file into glyphcache");
+
 	// now we are ready.
 	loadStatus_ = LoadStatus::Complete;
+	signal_.raise();
 }
 
 
 bool XGlyphCache::LoadGlyphSource(const SourceNameStr& name, bool async)
 {
 	// are we loading already?
-	if (loadStatus_ == LoadStatus::Loading || loadStatus_ == LoadStatus::Processing) {
+	if (loadStatus_ == LoadStatus::Loading) {
 		return true;
 	}
 
@@ -124,6 +153,7 @@ bool XGlyphCache::LoadGlyphSource(const SourceNameStr& name, bool async)
 
 	if (async)
 	{
+		signal_.clear();
 		loadStatus_ = LoadStatus::Loading;
 
 		// load the file async

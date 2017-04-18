@@ -6,6 +6,7 @@
 #include <String\StackString.h>
 #include <Containers\FixedArray.h>
 #include <Containers\Array.h>
+#include <Threading\Signal.h>
 
 #include <Util\UniquePointer.h>
 #include <IFileSys.h>
@@ -44,7 +45,11 @@ public:
 	void FreeTexture(void) X_FINAL;
 
 	bool loadFont(bool async) X_FINAL;
-	void Reload(void);
+	void Reload(void) X_FINAL;
+
+	bool isReady(void);
+	bool WaitTillReady(void) X_FINAL;
+
 
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_FINAL;
@@ -110,8 +115,8 @@ private:
 	// shader and state.
 	engine::Material* pMaterial_;
 
+	core::Signal signal_;
 	LoadStatus::Enum loadStatus_;
-	core::RequestHandle ioRequest_;
 };
 
 X_INLINE const FontNameStr& XFont::getName(void) const

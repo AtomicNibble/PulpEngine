@@ -25,7 +25,7 @@ typedef core::Array<FontEffect> EffetsArr;
 X_DECLARE_ENUM(LoadStatus) (
 	NotLoaded,
 	Loading,
-	Processing,
+//	Processing, <- this just means we have more states to compare against, even tho it provides 'more' info on where we are in the load process.
 	Complete,
 	Error
 );

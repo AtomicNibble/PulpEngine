@@ -87,6 +87,7 @@ public:
 
 	X_INLINE const SourceNameStr& GetName(void) const;
 	X_INLINE bool IsReady(void) const;
+	X_INLINE bool WaitTillReady(void);
 
 	bool Create(int32_t width, int32_t height, int32_t widthCharCount, int32_t heightCharCount);
 	bool LoadGlyphSource(bool async);

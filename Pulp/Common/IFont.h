@@ -118,6 +118,13 @@ struct IFont
 	virtual void FreeTexture(void) X_ABSTRACT;
 
 	virtual bool loadFont(bool async) X_ABSTRACT;
+	virtual void Reload(void) X_ABSTRACT;
+
+	// blocks untill the font is ready to render.
+	// returns false if loading / setup has failed.
+	// only call this if you requested a async load, calling for sync loads is undefined.
+	virtual bool WaitTillReady(void) X_ABSTRACT;
+
 
 	// these draw the text into the primative context.
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon,

@@ -210,15 +210,12 @@ void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
 	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
 
-	ioRequest_ = core::INVALID_IO_REQ_HANDLE;
-
 	if (!pFile) {
 		loadStatus_ = LoadStatus::Error;
 		X_ERROR("Font", "Failed to load font def file");
+		signal_.raise();
 		return;
 	}
-
-	loadStatus_ = LoadStatus::Processing;
 
 	JobData data;
 	data.pData = static_cast<char*>(pOpenRead->pBuf);
@@ -244,6 +241,7 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 		// other threads will not access any logic other than IsReady untill after IsReady returns true.
 		pFontTexture_ = fontSys_.getFontTexture(sourceName_, true);
 		if (!pFontTexture_) {
+			X_ERROR("Font", "Failed to get font texture for: \"%s\"", sourceName_.c_str());
 			loadStatus_ = LoadStatus::Error;
 		}
 		else {
@@ -257,6 +255,8 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 	}
 
 	X_DELETE_ARRAY(pJobData->pData, g_fontArena);
+
+	signal_.raise();
 }
 
 void XFont::Reload(void)
@@ -272,7 +272,7 @@ bool XFont::loadFont(bool async)
 bool XFont::loadFontDef(bool async)
 {
 	// are we loading already?
-	if (loadStatus_ == LoadStatus::Loading || loadStatus_ == LoadStatus::Processing) {
+	if (loadStatus_ == LoadStatus::Loading) {
 		return true;
 	}
 
@@ -288,6 +288,7 @@ bool XFont::loadFontDef(bool async)
 
 	if (async)
 	{
+		signal_.clear();
 		loadStatus_ = LoadStatus::Loading;
 
 		// load the file async
@@ -297,7 +298,7 @@ bool XFont::loadFontDef(bool async)
 		open.path = path;
 		open.arena = g_fontArena;
 
-		ioRequest_ = gEnv->pFileSys->AddIoRequestToQue(open);
+		gEnv->pFileSys->AddIoRequestToQue(open);
 	}
 	else
 	{

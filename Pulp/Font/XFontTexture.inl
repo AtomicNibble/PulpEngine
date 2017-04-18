@@ -12,6 +12,11 @@ X_INLINE bool XFontTexture::IsReady(void) const
 	return glyphCache_.IsLoaded();
 }
 
+X_INLINE bool XFontTexture::WaitTillReady(void)
+{
+	return glyphCache_.WaitTillReady();
+}
+
 X_INLINE const Vec2i XFontTexture::GetSize(void) const 
 { 
 	return Vec2i(width_, height_);

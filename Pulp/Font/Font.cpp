@@ -48,8 +48,8 @@ XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
 	pTexture_(nullptr),
 	fontTexDirty_(false),
 	pMaterial_(nullptr),
-	loadStatus_(LoadStatus::NotLoaded),
-	ioRequest_(core::INVALID_IO_REQ_HANDLE)
+	signal_(false),
+	loadStatus_(LoadStatus::NotLoaded)
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
 }
@@ -94,6 +94,42 @@ void XFont::FreeTexture()
 	}
 }
 
+bool XFont::isReady(void)
+{
+	return (pFontTexture_ && pFontTexture_->IsReady());
+}
+
+bool XFont::WaitTillReady(void)
+{
+	if (isReady()) {
+		return true;
+	}
+
+	// if we don't have a font texture :S
+	// how do we wait!
+	if (!pFontTexture_) 
+	{
+		while (loadStatus_ == LoadStatus::Loading)
+		{
+			// if we have job system try help with work.
+			// if no work wait...
+			if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork())
+			{
+				signal_.wait();
+			}
+		}
+
+		signal_.clear();
+
+		if (loadStatus_ == LoadStatus::Error || loadStatus_ == LoadStatus::NotLoaded) {
+			return false;
+		}
+
+		X_ASSERT_NOT_NULL(pFontTexture_);
+	}
+
+	return pFontTexture_->WaitTillReady();
+}
 
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
@@ -124,7 +160,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	}
 
 	// we may be async loading so must wait till we are ready.
-	if (!pFontTexture_ || !pFontTexture_->IsReady()) {
+	if (!isReady()) {
 		return;
 	}
 

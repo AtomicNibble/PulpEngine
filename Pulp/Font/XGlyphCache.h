@@ -5,6 +5,7 @@
 
 #include <Util\UniquePointer.h>
 #include <Util\ReferenceCounted.h>
+#include <Threading\Signal.h>
 
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
@@ -75,6 +76,7 @@ public:
 	~XGlyphCache();
 
 	X_INLINE bool IsLoaded(void) const;
+	bool WaitTillReady(void);
 
 	X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
 	X_INLINE FontEncoding::Enum GetEncoding(void) const;
@@ -125,6 +127,7 @@ private:
 	FontSmooth::Enum smoothMethod_;
 	FontSmoothAmount::Enum	smoothAmount_;
 
+	core::Signal signal_;
 	LoadStatus::Enum loadStatus_;
 };
 
