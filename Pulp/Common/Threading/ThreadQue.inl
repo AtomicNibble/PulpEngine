@@ -153,22 +153,22 @@ template<typename T, typename SynchronizationPrimitive>
 void ThreadQueBlocking<T, SynchronizationPrimitive>::pop(T& value)
 {
 	X_DISABLE_WARNING(4127)
-		while (true)
-			X_ENABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
+	{
+		lock_.Enter();
+		// if que empty wait
+		if (list_.isEmpty())
 		{
-			lock_.Enter();
-			// if que empty wait
-			if (list_.isEmpty())
-			{
-				lock_.Leave();
-				signal_.wait();
-				// loop around to reauire lock to check if still empty.
-			}
-			else
-			{
-				break; // break out, we still own lock
-			}
+			lock_.Leave();
+			signal_.wait();
+			// loop around to reauire lock to check if still empty.
 		}
+		else
+		{
+			break; // break out, we still own lock
+		}
+	}
 
 	value = std::move(que_.peek());
 	que_.pop();
