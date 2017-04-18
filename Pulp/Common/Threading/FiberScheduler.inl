@@ -110,6 +110,23 @@ namespace Fiber
 	// =============================
 
 	template<typename T>
+	ThreadQueBlocking<T>::ThreadQueBlocking() :
+		ThreadQue<T>(),
+		signal_(false)
+	{
+
+	}
+
+	template<typename T>
+	ThreadQueBlocking<T>::ThreadQueBlocking(core::MemoryArenaBase* arena, size_t size) :
+		ThreadQue<T>(arena, size),
+		signal_(false)
+	{
+
+	}
+
+
+	template<typename T>
 	void ThreadQueBlocking<T>::Add(const T item)
 	{
 		ThreadQue<T>::Add(item);

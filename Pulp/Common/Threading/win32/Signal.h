@@ -12,7 +12,7 @@ public:
 	static const uint32_t WAIT_INFINITE = static_cast<uint32_t>(-1);
 
 public:
-	Signal();
+	Signal(bool autoReset);
 	~Signal();
 
 	// sets the 'signaled' state 

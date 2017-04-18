@@ -330,7 +330,9 @@ JobThread::threadJobList::threadJobList()
 	version = 0;
 }
 
-JobThread::JobThread()
+JobThread::JobThread() :
+	signalWorkerDone_(false),
+	signalMoreWorkToDo_(false)
 {
 	moreWorkToDo_ = false;
 

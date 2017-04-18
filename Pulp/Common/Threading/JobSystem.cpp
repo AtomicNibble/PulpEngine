@@ -67,7 +67,9 @@ size_t JobQue::numJobs(void) const
 
 // -------------------
 
-JobThread::JobThread()
+JobThread::JobThread() :
+	signalWorkerDone_(false),
+	signalMoreWorkToDo_(false)
 {
 	core::zero_object(ques_);
 

@@ -84,8 +84,8 @@ namespace Fiber
 	class ThreadQueBlocking : public ThreadQue<T>
 	{
 	public:
-		using ThreadQue<T>::ThreadQue;
-
+		ThreadQueBlocking();
+		ThreadQueBlocking(core::MemoryArenaBase* arena, size_t size);
 
 		void Add(const T item);
 		void Add(T* pItems, size_t numItems);

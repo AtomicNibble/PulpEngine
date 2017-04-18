@@ -5,10 +5,12 @@
 
 X_NAMESPACE_BEGIN(core)
 
-Signal::Signal() : 
+Signal::Signal(bool autoReset) :
 	hHandle_(0)
 {
-	hHandle_ = CreateEvent(NULL, FALSE, FALSE, NULL);
+	BOOL manualReset = !autoReset;
+
+	hHandle_ = CreateEvent(NULL, manualReset, FALSE, NULL);
 	if (hHandle_ == NULL) {
 		core::lastError::Description Dsc;
 		X_ERROR("Signal", "failed to create event. Error: %s", core::lastError::ToString(Dsc));
