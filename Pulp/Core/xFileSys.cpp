@@ -1513,7 +1513,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			X_ASSERT_NOT_NULL(pOpenRead->arena);
 			X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arena")(pOpenRead->arena->isThreadSafe());
 
-			if (!pOpenRead)
+			if (!pFile)
 			{
 				pOpenRead->callback.Invoke(fileSys, pOpenRead, pFile, 0);
 			}
