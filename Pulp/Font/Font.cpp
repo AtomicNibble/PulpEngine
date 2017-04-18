@@ -66,7 +66,7 @@ void XFont::Release()
 }
 
 
-void XFont::Free()
+void XFont::Free(void)
 {
 	effects_.clear();
 	effects_.free();
@@ -75,14 +75,14 @@ void XFont::Free()
 	FreeTexture();
 }
 
-void XFont::FreeBuffers()
+void XFont::FreeBuffers(void)
 {
 	fontSys_.releaseFontTexture(pFontTexture_);
 	pFontTexture_ = nullptr;
 	fontTexDirty_ = true;
 }
 
-void XFont::FreeTexture()
+void XFont::FreeTexture(void)
 {
 	if (pTexture_)
 	{
