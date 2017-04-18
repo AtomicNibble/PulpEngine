@@ -114,9 +114,6 @@ public:
 	X_INLINE int32_t GetSlotUsage(void);
 	X_INLINE int32_t GetCacheMisses(void);
 
-	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
-	void CreateGradientSlot(void);
-
 	wchar_t GetSlotChar(int32_t slot) const;
 	XTextureSlot* GetCharSlot(wchar_t cChar);
 	XTextureSlot* GetGradientSlot(void);
@@ -133,6 +130,9 @@ private:
 	bool CreateSlotList(int32_t listSize);
 	bool ReleaseSlotList(void);
 	bool UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar);
+	
+	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
+	void CreateGradientSlot(void);
 
 private:
 	const SourceNameStr name_;

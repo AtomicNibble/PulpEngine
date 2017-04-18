@@ -713,32 +713,6 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 	return Vec2f(maxW, maxH);
 }
 
-bool XFont::InitCache(void)
-{
-	pFontTexture_->CreateGradientSlot();
-
-	wchar_t buf[256];
-	wchar_t* p = buf;
-
-	wchar_t i = L' '; 
-
-
-	for (; i <= L'~'; ++i) {
-		*p++ = i;
-	}
-
-	i += 35;
-
-	for (; i < 256; ++i) {
-		*p++ = i;
-	}
-
-	const size_t len = (p - buf);
-
-	Prepare(buf, buf + len);
-	return true;
-}
-
 void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	X_PROFILE_BEGIN("FontPrepare", core::ProfileSubSys::FONT);

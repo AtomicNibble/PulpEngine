@@ -101,6 +101,7 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount,
 		return false;
 	}
 
+	CreateGradientSlot();
 	return true;
 }
 
