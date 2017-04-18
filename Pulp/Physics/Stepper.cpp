@@ -54,7 +54,8 @@ MultiThreadStepper::MultiThreadStepper() :
 	nbSubSteps_(0),
 	subStepSize_(0),
 	scratchBlock_(nullptr),
-	scratchBlockSize_(0)
+	scratchBlockSize_(0), 
+	sync_(false)
 {
 	completion0_.setStepper(this);
 	completion1_.setStepper(this);
