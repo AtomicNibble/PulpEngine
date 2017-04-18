@@ -18,6 +18,8 @@ public:
 	X_INLINE bool TryEnterShared(void);
 	X_INLINE void LeaveShared(void);
 
+	X_INLINE SRWLOCK* GetNativeObject(void);
+
 private:
 	X_NO_COPY(SharedLock);
 	X_NO_ASSIGN(SharedLock);

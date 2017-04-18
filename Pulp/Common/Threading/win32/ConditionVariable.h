@@ -6,6 +6,7 @@
 X_NAMESPACE_BEGIN(core)
 
 class CriticalSection;
+class SharedLock;
 
 class ConditionVariable
 {
@@ -19,6 +20,11 @@ public:
 
 	// releease the critical section lock, and puts thread to sleep until it is notified.
 	void Wait(CriticalSection& criticalSection);
+
+	// releease the shared lock, and puts thread to sleep until it is notified.
+	// it's up to you to know if a exlusive or shared lock was taken in the contex of this call.
+	// if the lock has been taken with 'EnterShared' you must set exclusive to false.
+	void Wait(SharedLock& sharedLock, bool isExclusive);
 
 private:
 	CONDITION_VARIABLE condVar_;

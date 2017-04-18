@@ -44,4 +44,10 @@ void SharedLock::LeaveShared(void)
 }
 
 
+SRWLOCK* SharedLock::GetNativeObject(void)
+{
+	return &smtx_;
+}
+
+
 X_NAMESPACE_END

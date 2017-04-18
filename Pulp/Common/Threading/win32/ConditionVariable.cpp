@@ -1,6 +1,7 @@
 #include <EngineCommon.h>
 
 #include "ConditionVariable.h"
+#include "SharedLock.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -25,6 +26,17 @@ void ConditionVariable::NotifyAll(void)
 void ConditionVariable::Wait(CriticalSection& criticalSection)
 {
 	SleepConditionVariableCS(&condVar_, criticalSection.GetNativeObject(), INFINITE);
+}
+
+void ConditionVariable::Wait(SharedLock& sharedLock, bool isExclusive)
+{
+	ULONG flags = CONDITION_VARIABLE_LOCKMODE_SHARED;
+
+	if (isExclusive) {
+		flags = 0;
+	}
+
+	SleepConditionVariableSRW(&condVar_, sharedLock.GetNativeObject(), INFINITE, flags);
 }
 
 
