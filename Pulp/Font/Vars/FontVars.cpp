@@ -33,7 +33,7 @@ void FontVars::registerVars(void)
 
 	ADD_CVAR_REF("font_glyph_smoothing_amount", fontSmoothingAmount_, FontSmoothAmount::NONE, 0, FontSmoothAmount::ENUM_COUNT,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
-		"How much smoothing to apply for blue/supersample. 0. none 1. x2 3. x4");
+		"How much smoothing to apply for blue/supersample. 0. none 1. x2 2. x4");
 
 }
 
