@@ -79,6 +79,7 @@ public:
 
 	/// Returns whether a given allocation belongs to this allocator.
 	X_INLINE bool containsAllocation(void* ptr) const;
+	X_INLINE bool containsAllocation(void* ptr, size_t& sizeOut) const;
 
 private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS

@@ -53,9 +53,10 @@ X_INLINE void GrowingGenericAllocator::free(void* ptr)
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE size_t GrowingGenericAllocator::getSize(void* ptr) const
 {
-	if (microAllocator_.containsAllocation(ptr))
+	size_t size;
+	if (microAllocator_.containsAllocation(ptr, size))
 	{
-		return microAllocator_.getSize(ptr);
+		return size;
 	}
 	else
 	{
