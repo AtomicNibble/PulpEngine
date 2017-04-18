@@ -128,8 +128,6 @@ void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t thread
 		PreWarmCache();
 	}
 
-	X_LOG2("Font", "Loaded font file into glyphcache");
-
 	// now we are ready.
 	loadStatus_ = LoadStatus::Complete;
 	signal_.raise();
