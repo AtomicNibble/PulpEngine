@@ -5,7 +5,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
-Signal::Signal() : hHandle_(0)
+Signal::Signal() : 
+	hHandle_(0)
 {
 	hHandle_ = CreateEvent(NULL, FALSE, FALSE, NULL);
 	if (hHandle_ == NULL) {
