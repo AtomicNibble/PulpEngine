@@ -5,6 +5,13 @@
 
 #include "XGlyphCache.h"
 
+
+X_NAMESPACE_DECLARE(core,
+	struct IoRequestBase;
+	struct XFileAsync;
+);
+
+
 X_NAMESPACE_BEGIN(font)
 
 
@@ -85,11 +92,10 @@ public:
 	XFontTexture(const SourceNameStr& name, const FontVars& vars, core::MemoryArenaBase* arena);
 	~XFontTexture();
 
-	X_INLINE const SourceNameStr& GetName(void) const;
-	X_INLINE bool IsReady(void) const;
-	X_INLINE bool WaitTillReady(void);
-
 	bool Create(int32_t width, int32_t height, int32_t widthCharCount, int32_t heightCharCount);
+	
+	X_INLINE bool IsReady(void) const;
+	bool WaitTillReady(void);
 	bool LoadGlyphSource(bool async);
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
@@ -99,7 +105,7 @@ public:
 	int32_t GetCharacterWidth(wchar_t cChar) const;
 	void GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const;
 
-
+	X_INLINE const SourceNameStr& GetName(void) const;
 	X_INLINE const Vec2i GetSize(void) const;
 	X_INLINE const int32_t GetWidth(void) const;
 	X_INLINE const int32_t GetHeight(void) const;
@@ -133,8 +139,16 @@ private:
 	
 	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
 	void CreateGradientSlot(void);
+	void PreWarmCache(void);
 
 private:
+	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
+
+	void ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
+private:
+	const FontVars& vars_;
 	const SourceNameStr name_;
 	XGlyphCache glyphCache_;
 	core::MemoryArenaBase* textureSlotArea_;
@@ -163,6 +177,9 @@ private:
 
 	uint16	slotUsage_;
 	uint32_t cacheMisses_;
+
+	core::Signal signal_;
+	LoadStatus::Enum loadStatus_;
 };
 
 

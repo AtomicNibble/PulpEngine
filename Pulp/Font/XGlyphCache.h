@@ -5,17 +5,11 @@
 
 #include <Util\UniquePointer.h>
 #include <Util\ReferenceCounted.h>
-#include <Threading\Signal.h>
 
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
 
 #include <Containers\HashMap.h>
-
-X_NAMESPACE_DECLARE(core,
-	struct IoRequestBase;
-	struct XFileAsync;
-);
 
 
 X_NAMESPACE_BEGIN(font)
@@ -81,6 +75,7 @@ public:
 	X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
 	X_INLINE FontEncoding::Enum GetEncoding(void) const;
 
+	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
 	bool LoadGlyphSource(const SourceNameStr& name, bool async);
 
 	bool Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight);
@@ -104,12 +99,6 @@ private:
 	void ReleaseSlotList(void);
 
 private:
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
-private:
 	const FontVars& vars_;
 	XFontRender		fontRenderer_;
 	core::UniquePointer<XGlyphBitmap> scaleBitmap_;
@@ -126,9 +115,6 @@ private:
 
 	FontSmooth::Enum smoothMethod_;
 	FontSmoothAmount::Enum	smoothAmount_;
-
-	core::Signal signal_;
-	LoadStatus::Enum loadStatus_;
 };
 
 X_NAMESPACE_END

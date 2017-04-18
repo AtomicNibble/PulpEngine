@@ -276,7 +276,6 @@ bool XFont::loadFontDef(bool async)
 		return true;
 	}
 
-
 	core::Path<char> path;
 	path = "Fonts/";
 	path.setFileName(name_.c_str());
@@ -322,7 +321,9 @@ bool XFont::loadFontDef(bool async)
 		{
 			X_ERROR("Font", "Error loaded font file: \"%s\"", sourceName_.c_str());
 			return false;
-		}	
+		}
+
+		loadStatus_ = LoadStatus::Complete;
 	}
 	
 	return true;

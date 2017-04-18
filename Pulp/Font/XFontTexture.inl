@@ -9,12 +9,7 @@ X_INLINE const SourceNameStr& XFontTexture::GetName(void) const
 X_INLINE bool XFontTexture::IsReady(void) const
 {
 	// once the cache is ready we are ready.
-	return glyphCache_.IsLoaded();
-}
-
-X_INLINE bool XFontTexture::WaitTillReady(void)
-{
-	return glyphCache_.WaitTillReady();
+	return loadStatus_ == LoadStatus::Complete && glyphCache_.IsLoaded();
 }
 
 X_INLINE const Vec2i XFontTexture::GetSize(void) const 

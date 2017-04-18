@@ -4,20 +4,8 @@
 
 #include "Vars\FontVars.h"
 
-#include <IFileSys.h>
-#include <Threading\JobSystem2.h>
-
 X_NAMESPACE_BEGIN(font)
 
-namespace
-{
-	struct JobData
-	{
-		uint8_t* pData;
-		uint32_t dataSize;
-	};
-
-} // naemspace
 
 XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	vars_(vars),
@@ -34,10 +22,7 @@ XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	smoothAmount_(FontSmoothAmount::NONE),
 
 	slotList_(arena),
-	cacheTable_(arena, 8),
-
-	signal_(false),
-	loadStatus_(LoadStatus::NotLoaded)	
+	cacheTable_(arena, 8)
 {
 
 }
@@ -47,157 +32,22 @@ XGlyphCache::~XGlyphCache()
 
 }
 
-bool XGlyphCache::WaitTillReady(void)
+bool XGlyphCache::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding)
 {
-	if (IsLoaded()) {
-		return true;
-	}
-
-	while (loadStatus_ == LoadStatus::Loading)
-	{
-		// if we have job system try help with work.
-		// if no work wait...
-		if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork())
-		{
-			signal_.wait();
-		}
-	}
-
-	signal_.clear();
-
-	if (loadStatus_ == LoadStatus::Error || loadStatus_ == LoadStatus::NotLoaded) {
+	if (!fontRenderer_.SetRawFontBuffer(std::move(data), length, encoding)) {
+		X_ERROR("Font", "Error setting up font renderer");
 		return false;
 	}
 
-	return true;
-}
-
-void XGlyphCache::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-	core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-	X_UNUSED(fileSys);
-	X_UNUSED(bytesTransferred);
-
-	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
-	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
-
-	if (!pFile) {
-		loadStatus_ = LoadStatus::Error;
-		X_ERROR("Font", "Error reading font data");
-		return;
-	}
-
-
-	JobData data;
-	data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
-	data.dataSize = pOpenRead->dataSize;
-
-	// dispatch a job to parse it?
-	gEnv->pJobSys->CreateMemberJobAndRun<XGlyphCache>(this, &XGlyphCache::ProcessFontFile_job, data);
-}
-
-
-void XGlyphCache::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-	X_UNUSED(jobSys);
-	X_UNUSED(threadIdx);
-	X_UNUSED(pJob);
-
-	// we have the font data now we just need to setup the font render.
-	JobData* pJobData = static_cast<JobData*>(pData);
-
-	if (!fontRenderer_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData), 
-		pJobData->dataSize, 
-		FontEncoding::Unicode))
-	{
-		loadStatus_ = LoadStatus::Error;
-		signal_.raise();
-		X_ERROR("Font", "Error setting up font renderer");
-		return;
-	}
-
-	if(scaledGlyphWidth_) {
+	if (scaledGlyphWidth_) {
 		fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_);
 	}
 	else {
 		fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_);
 	}
 
-	// preform the precache in this job.
 	if (vars_.glyphCachePreWarm()) {
 		PreWarmCache();
-	}
-
-	// now we are ready.
-	loadStatus_ = LoadStatus::Complete;
-	signal_.raise();
-}
-
-
-bool XGlyphCache::LoadGlyphSource(const SourceNameStr& name, bool async)
-{
-	// are we loading already?
-	if (loadStatus_ == LoadStatus::Loading) {
-		return true;
-	}
-
-	core::Path<char> path;
-	path /= "Fonts/";
-	path.setFileName(name.begin(), name.end());
-
-	core::fileModeFlags mode;
-	mode.Set(core::fileMode::READ);
-	mode.Set(core::fileMode::SHARE);
-
-	if (async)
-	{
-		signal_.clear();
-		loadStatus_ = LoadStatus::Loading;
-
-		// load the file async
-		core::IoRequestOpenRead open;
-		open.callback.Bind<XGlyphCache, &XGlyphCache::IoRequestCallback>(this);
-		open.mode = mode;
-		open.path = path;
-		open.arena = g_fontArena;
-
-		gEnv->pFileSys->AddIoRequestToQue(open);
-	}
-	else
-	{
-		core::XFileScoped file;
-
-		if (!file.openFile(path.c_str(), core::fileModeFlags::READ)) {
-			return false;
-		}
-
-		const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
-		if (!fileSize) {
-			X_ERROR("Font", "Font file is zero bytes in size");
-			return false;
-		}
-
-		core::UniquePointer<uint8_t[]> buf = core::makeUnique<uint8_t[]>(g_fontArena, fileSize);
-		if (file.read(buf.ptr(), fileSize) != fileSize) {
-			X_ERROR("Font", "Error reading font data");
-			return false;
-		}
-
-		if (!fontRenderer_.SetRawFontBuffer(std::move(buf), safe_static_cast<int32_t>(fileSize), FontEncoding::Unicode)) {
-			X_ERROR("Font", "Error setting up font renderer");
-			return false;
-		}
-
-		if (scaledGlyphWidth_) {
-			fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_);
-		}
-		else {
-			fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_);
-		}
-
-		if (vars_.glyphCachePreWarm()) {
-			PreWarmCache();
-		}
 	}
 
 	return true;
@@ -287,22 +137,7 @@ void XGlyphCache::PreWarmCache(void)
 {
 	X_ASSERT(cacheTable_.empty(), "Can only be run when the cache is empty")(cacheTable_.size());
 
-	wchar_t buf[256];
-	wchar_t* p = buf;
-
-	wchar_t i = L' ';
-
-	for (; i <= L'~'; ++i) {
-		*p++ = i;
-	}
-
-	i += 35;
-
-	for (; i < 256; ++i) {
-		*p++ = i;
-	}
-
-	size_t len = (p - buf);
+	size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
 	len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
 
 	X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
@@ -310,7 +145,7 @@ void XGlyphCache::PreWarmCache(void)
 	++usage_; // give them fake usage.
 
 	for (size_t x = 0; x < len; x++) {
-		PreCacheGlyph(buf[x]);
+		PreCacheGlyph(FONT_PRECACHE_STR[x]);
 	}
 }
 
