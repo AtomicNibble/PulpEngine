@@ -41,6 +41,7 @@ extern "C" void* _ReturnAddress(void);
 #define X_IMPORT									__declspec(dllimport)
 #define X_EXPORT									__declspec(dllexport)
 #define X_OFFSETOF(s,m)								offsetof(s,m)
+#define X_ARRAY_SIZE(x)								((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
 // these should not be used there is a native patch seperator define in Path<T>::
 // #define X_PATHSEPERATOR_STR						"\\"
