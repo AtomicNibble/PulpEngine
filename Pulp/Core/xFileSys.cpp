@@ -1509,6 +1509,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
 			XFileAsync* pFile = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
 
+
 			// make sure it's safe to allocate the buffer in this thread.
 			X_ASSERT_NOT_NULL(pOpenRead->arena);
 			X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arena")(pOpenRead->arena->isThreadSafe());
@@ -1516,41 +1517,41 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			if (!pFile)
 			{
 				pOpenRead->callback.Invoke(fileSys, pOpenRead, pFile, 0);
+				continue;
 			}
-			else 
+			
+			const uint64_t fileSize = pFile->remainingBytes();
+
+			// we don't support open and read for files over >2gb
+			// if you are trying todo that you are retarded.
+			// instead open the file and submit smaller read requests.
+			if (fileSize > std::numeric_limits<int32_t>::max())
 			{
-				const uint64_t fileSize = pFile->remainingBytes();
+				X_ERROR("FileSys", "A request was made to read a entire file which is >2GB, ignoring request. File: \"%s\"",
+					pOpenRead->path.c_str());
 
-				// we don't support open and read for files over >2gb
-				// if you are trying todo that you are retarded.
-				// instead open the file and submit smaller read requests.
-				if (fileSize > std::numeric_limits<int32_t>::max())
-				{
-					X_ERROR("FileSys", "A request was made to read a entire file which is >2GB, ignoring request. File: \"%s\"",
-						pOpenRead->path.c_str());
-
-					closeFileAsync(pFile);
-					pOpenRead->callback.Invoke(fileSys, pOpenRead, nullptr, 0);
-				}
-				else
-				{
-					uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
-
-					XFileAsyncOperation operation = pFile->readAsync(
-						pData,
-						safe_static_cast<size_t>(fileSize),
-						0
-					);
-
-					// now we need to wait for the read to finish, then close the file and call the callback.
-					// just need to work out a nice way to close the file post read.
-					pOpenRead->pFile = pFile;
-					pOpenRead->pBuf = pData;
-					pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
-
-					pendingOps.emplace_back(*pOpenRead, operation);
-				}
+				closeFileAsync(pFile);
+				pOpenRead->callback.Invoke(fileSys, pOpenRead, nullptr, 0);
 			}
+			else
+			{
+				uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
+
+				XFileAsyncOperation operation = pFile->readAsync(
+					pData,
+					safe_static_cast<size_t>(fileSize),
+					0
+				);
+
+				// now we need to wait for the read to finish, then close the file and call the callback.
+				// just need to work out a nice way to close the file post read.
+				pOpenRead->pFile = pFile;
+				pOpenRead->pBuf = pData;
+				pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
+
+				pendingOps.emplace_back(*pOpenRead, operation);
+			}
+			
 		}
 		else if (type == IoRequest::CLOSE)
 		{
