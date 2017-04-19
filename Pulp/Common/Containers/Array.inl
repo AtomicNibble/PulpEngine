@@ -941,7 +941,7 @@ void Array<T, Allocator>::ensureSize(size_type size)
 		// move old items over.
 		if (pOldList)
 		{
-			Mem::MoveArrayUninitialized(list_, pOldList, pOldList + num_);
+			Mem::MoveArrayDestructUninitialized(list_, pOldList, pOldList + num_);
 
 			// delete old.
 			DeleteArr(pOldList);
