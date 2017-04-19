@@ -254,6 +254,39 @@ TYPED_TEST(ArrayTest, Free)
 }
 
 
+TYPED_TEST(ArrayTest, Expand)
+{
+	resetConConters();
+
+	{
+		Array<TypeParam> list(g_arena);
+
+		list.setGranularity(16);
+
+		EXPECT_EQ(0, list.size());
+		EXPECT_EQ(0, list.capacity());
+		EXPECT_EQ(16, list.granularity());
+
+		// insert some items, that makes us 'expand'
+		for (int i = 0; i < 64; i++)
+		{
+			EXPECT_EQ(i, list.insertAtIndex(i, i * 2));
+		}
+
+		const int test = getConCount();
+
+		EXPECT_EQ(64, list.size());
+		EXPECT_EQ(64, list.capacity());
+
+		// leave this scope to check decon / construction counts are correct.
+	}
+
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
+}
+
+
+
+
 TYPED_TEST(ArrayTest, ShrinkToFit)
 {
 	resetConConters();
