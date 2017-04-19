@@ -331,15 +331,14 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::granularit
 
 // Inserts or erases elements at the end such that size is 'size'
 template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t) 
+X_INLINE void Array<T, Allocator>::resize(size_type newNum)
 {
 	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 
-	size_type	i;
-
 	// same amount of items?
-	if (newNum == num_)
+	if (newNum == num_) {
 		return;
+	}
 
 	// remove some?
 	if (newNum < num_)
@@ -354,12 +353,34 @@ X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t)
 		ensureSize(newNum);
 
 		// construct the new items.
-		for (i = num_; i < newNum; i++) {
-			Mem::Construct<T>(&list_[i], t);
-		}
+		Mem::ConstructArray<T>(&list_[num_], newNum - num_);
 	}
 
 	// set num
+	num_ = newNum;
+}
+
+// Inserts or erases elements at the end such that size is 'size'
+template<typename T, class Allocator>
+X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t) 
+{
+	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
+
+	if (newNum == num_) {
+		return;
+	}
+
+	if (newNum < num_)
+	{
+		Mem::DestructArray<T>(&list_[newNum], num_ - newNum);
+	}
+	else
+	{
+		ensureSize(newNum);
+
+		Mem::ConstructArray<T>(&list_[num_], newNum - num_, t);
+	}
+
 	num_ = newNum;
 }
 

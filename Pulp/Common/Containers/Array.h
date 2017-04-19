@@ -84,7 +84,8 @@ public:
 
 
 	// Inserts or erases elements at the end such that size is 'size'
-	void resize(size_type size, const T& t = T());
+	void resize(size_type size);
+	void resize(size_type size, const T& t);
 	// increases the capacity to the given amount, only if it's greater than current.
 	// dose not increase the amount of items.
 	void reserve(size_type size);
