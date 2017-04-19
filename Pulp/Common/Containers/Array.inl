@@ -38,10 +38,7 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, cons
 	X_ASSERT_NOT_NULL(arena);
 
 	list_ = Allocate(size);
-
-	for (size_type i = 0; i < size; ++i) {
-		Mem::Construct<T>(list_ + i, initialValue);
-	}
+	Mem::ConstructArray(list_, size, initialValue);
 }
 
 template<typename T, class Allocator>
@@ -49,12 +46,10 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_lis
 	Array(arena)
 {
 	size_t size = iList.size();
-	std::initializer_list<T>::const_iterator pList = iList.begin();
-	std::initializer_list<T>::const_iterator pListEnd = iList.end();
 
 	ensureSize(size);
 
-	Mem::CopyArrayUninitialized<T>(list_, pList, pListEnd);
+	Mem::CopyArrayUninitialized<T>(list_, iList.begin(), iList.end());
 
 	num_ = size;
 }
@@ -133,17 +128,13 @@ X_INLINE const Allocator& Array<T, Allocator>::getAllocator(void) const
 template<typename T, class Allocator>
 Array<T, Allocator>& Array<T, Allocator>::operator=(std::initializer_list<T> iList)
 {
-	size_type i;
 	free();
 
 	size_t size = iList.size();
-	std::initializer_list<T>::const_iterator pList = iList.begin();
 
 	if (size) {
 		ensureSize(size);
-		for (i = 0; i < size; i++) {
-			Mem::Construct(&list_[i], pList[i]);
-		}
+		Mem::CopyArrayUninitialized(list_, iList.begin(), iList.end());
 	}
 
 	num_ = size;
@@ -153,7 +144,6 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(std::initializer_list<T> iLi
 template<typename T, class Allocator>
 Array<T, Allocator>& Array<T, Allocator>::operator=(const Array<T, Allocator> &oth)
 {
-	size_type i;
 	free();
 
 	num_ = oth.num_;
@@ -163,9 +153,7 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(const Array<T, Allocator> &o
 
 	if (size_) {
 		list_ = Allocate(size_);
-		for (i = 0; i < num_; i++) {
-			Mem::Construct(&list_[i], oth.list_[i]);
-		}
+		Mem::CopyArrayUninitialized(list_, oth.begin(), oth.end());
 	}
 
 	return *this;
