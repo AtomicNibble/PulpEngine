@@ -1,6 +1,28 @@
 
 namespace Mem
 {
+	namespace Internal
+	{
+		template <typename T>
+		inline T* ConstructArray(void* where, size_t N, std::true_type)
+		{
+			std::memset(where, 0, N * sizeof(T));
+			return union_cast<T*>(where);
+		}
+
+		template <typename T>
+		inline T* ConstructArray(void* where, size_t N, std::false_type)
+		{
+			T* as_T = union_cast<T*>(where);
+
+			const T* const onePastLast = as_T + N;
+			while (as_T < onePastLast) {
+				Construct<T>(as_T++);
+			}
+
+			return union_cast<T*>(where);
+		}
+	}
 
 
 
@@ -191,15 +213,11 @@ namespace Mem
 	{
 		X_ASSERT_NOT_NULL(where);
 
-		T* as_T = union_cast<T*>(where);
-
-		// construct instances using placement new
-		const T* const onePastLast = as_T + N;
-		while (as_T < onePastLast) {
-			Construct<T>(as_T++);
-		}
-
-		return (as_T - N);
+		return Internal::ConstructArray<T>(where, N, std::conjunction<
+			std::is_scalar<T>,
+			std::negation<std::is_volatile<T>>,
+			std::negation<std::is_member_pointer<T>>,
+			std::is_default_constructible<T>>::type());
 	}
 
 	// ---------------------------------------------------------------------------------------------------------------------
