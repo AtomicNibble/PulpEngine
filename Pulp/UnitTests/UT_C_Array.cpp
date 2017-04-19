@@ -17,16 +17,27 @@ using namespace core;
 
 namespace 
 {
+	// init it to diffrent vlaues to make sure resetConConters is called.
+	int CONSRUCTION_COUNT = 0;
+	int DECONSRUCTION_COUNT = 5000;
+	int MOVE_COUNT = 10000;
+
+	void resetConConters(void)
+	{
+		CONSRUCTION_COUNT = 0;
+		DECONSRUCTION_COUNT = 0;
+		MOVE_COUNT = 0;
+	}
 
 	struct CustomType
 	{
-		CustomType() 
-			: var_(16) 
+		CustomType()
+			: var_(16)
 		{
 			CONSRUCTION_COUNT++;
 		}
-		CustomType(size_t val) 
-			: var_(val) 
+		CustomType(size_t val)
+			: var_(val)
 		{
 			CONSRUCTION_COUNT++;
 		}
@@ -73,8 +84,7 @@ namespace
 		size_t var_;
 
 	public:
-		static int CONSRUCTION_COUNT;
-		static int DECONSRUCTION_COUNT;
+
 	};
 
 
@@ -85,8 +95,6 @@ namespace
 		return a == b.GetVar();
 	}
 
-	int CustomType::CONSRUCTION_COUNT = 0;
-	int CustomType::DECONSRUCTION_COUNT = 0;
 
 
 	struct CustomTypeComplex
@@ -133,38 +141,33 @@ namespace
 	private:
 		size_t var_;
 		const char* pName_;
-		
-
-	public:
-		static int CONSRUCTION_COUNT;
-		static int MOVE_COUNT;
-		static int DECONSRUCTION_COUNT;
 	};
 
+	int getConCount() {
+		return CONSRUCTION_COUNT;
+	}
 
-	int CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	int CustomTypeComplex::MOVE_COUNT = 0;
-	int CustomTypeComplex::DECONSRUCTION_COUNT = 0;
-}
+	int getDeConCount() {
+		return CONSRUCTION_COUNT;
+	}
 
+	typedef core::MemoryArena<
+		core::LinearAllocator,
+		core::SingleThreadPolicy,
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+	> LinearArea;
 
+	typedef ::testing::Types<short, int, CustomType> MyTypes;
+	TYPED_TEST_CASE(ArrayTest, MyTypes);
 
-typedef core::MemoryArena<
-	core::LinearAllocator,
-	core::SingleThreadPolicy,
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
-> LinearArea;
+	template <typename T>
+	class ArrayTest : public ::testing::Test {
+	public:
+	};
 
-typedef ::testing::Types<short, int, CustomType> MyTypes;
-TYPED_TEST_CASE(ArrayTest, MyTypes);
-
-template <typename T>
-class ArrayTest : public ::testing::Test {
-public:
-};
-
+} // namespace
 
 
 TYPED_TEST(ArrayTest, Contruct)
@@ -194,9 +197,7 @@ TYPED_TEST(ArrayTest, Contruct)
 
 TYPED_TEST(ArrayTest, Clear)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
-
+	resetConConters();
 
 	Array<TypeParam> list(g_arena);
 
@@ -217,13 +218,12 @@ TYPED_TEST(ArrayTest, Clear)
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(128, list.capacity());
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(ArrayTest, Free)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Array<TypeParam> list(g_arena);
@@ -250,13 +250,13 @@ TYPED_TEST(ArrayTest, Free)
 		EXPECT_EQ(nullptr, list.ptr());
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
+
 
 TYPED_TEST(ArrayTest, ShrinkToFit)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Array<TypeParam> list(g_arena);
@@ -283,7 +283,7 @@ TYPED_TEST(ArrayTest, ShrinkToFit)
 		EXPECT_EQ(128, list.granularity());
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(ArrayTest, Move)
@@ -293,8 +293,7 @@ TYPED_TEST(ArrayTest, Move)
 	const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam>) * 2) + 
 		(sizeof(size_t) * 3); // Linear header block.
 
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
@@ -310,7 +309,7 @@ TYPED_TEST(ArrayTest, Move)
 		list.push_back(Array<TypeParam>(&arena, 64, TypeParam()));
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(ArrayTest, Append)
@@ -448,8 +447,7 @@ TYPED_TEST(ArrayTest, Insert)
 
 TYPED_TEST(ArrayTest, Remove)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Array<TypeParam> list(g_arena);
@@ -488,7 +486,7 @@ TYPED_TEST(ArrayTest, Remove)
 		EXPECT_EQ(nullptr, list.ptr());
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 
@@ -713,6 +711,8 @@ TYPED_TEST(ArrayTest, EmplaceBack)
 
 TEST(ArrayTest, EmplaceBackComplex)
 {
+	resetConConters();
+
 	Array<CustomTypeComplex> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
@@ -727,9 +727,9 @@ TEST(ArrayTest, EmplaceBackComplex)
 	ASSERT_EQ(64, list.capacity());
 	EXPECT_NE(nullptr, list.ptr());
 
-	EXPECT_EQ(0, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(0, CONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(0, DECONSRUCTION_COUNT);
 
 
 	for (int i = 0; i < 32; i++)
@@ -737,18 +737,18 @@ TEST(ArrayTest, EmplaceBackComplex)
 		list.emplace_back(i * 4, "HEllo");
 	}
 
-	EXPECT_EQ(32, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(32, CONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(0, DECONSRUCTION_COUNT);
 
 	for (int i = 32; i < 64; i++)
 	{
 		list.push_back(CustomTypeComplex(i * 4, "HEllo"));
 	}
 
-	EXPECT_EQ(64, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(32, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(32, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(64, CONSRUCTION_COUNT);
+	EXPECT_EQ(32, MOVE_COUNT);
+	EXPECT_EQ(32, DECONSRUCTION_COUNT);
 
 
 	EXPECT_EQ(64, list.size());
