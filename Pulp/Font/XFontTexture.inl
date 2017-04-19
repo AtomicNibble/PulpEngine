@@ -1,15 +1,16 @@
 
 X_NAMESPACE_BEGIN(font)
 
-X_INLINE const SourceNameStr& XFontTexture::GetName(void) const
-{
-	return name_;
-}
 
 X_INLINE bool XFontTexture::IsReady(void) const
 {
 	// once the cache is ready we are ready.
 	return loadStatus_ == LoadStatus::Complete && glyphCache_.IsLoaded();
+}
+
+X_INLINE const SourceNameStr& XFontTexture::GetName(void) const
+{
+	return name_;
 }
 
 X_INLINE const Vec2i XFontTexture::GetSize(void) const 
