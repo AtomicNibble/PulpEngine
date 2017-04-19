@@ -60,6 +60,9 @@ struct XTextureSlot
 		slotUsage = 0xffff;
 	}
 
+	X_INLINE int32_t getCharacterWidth(void) const {
+		return charWidth + 1;
+	}
 };
 
 // keep this small

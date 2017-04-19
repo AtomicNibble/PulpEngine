@@ -332,8 +332,8 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 					break;
 			}
 
-			const int32_t charWidth = pFontTexture_->GetCharacterWidth(ch);
 			const XTextureSlot* pSlot = pFontTexture_->GetCharSlot(ch);
+			const int32_t charWidth = pSlot->getCharacterWidth();
 			XCharCords cords;
 			pFontTexture_->GetTextureCoord(pSlot, cords);
 			
