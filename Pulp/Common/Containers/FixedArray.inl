@@ -9,15 +9,9 @@ FixedArray<T, N>::FixedArray() :
 
 template<typename T, size_t N>
 FixedArray<T, N>::FixedArray(const T& initial) :
-	size_(0)
+	size_(N)
 {
-	T* pArr = begin();
-
-	for (size_type i = 0; i < N; ++i) {
-		Mem::Construct(&pArr[i], initial);
-	}
-
-	size_ = N;
+	Mem::ConstructArray(begin(), N, initial);
 }
 
 
