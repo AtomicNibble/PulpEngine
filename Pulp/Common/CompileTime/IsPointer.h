@@ -12,7 +12,7 @@ namespace compileTime
 	template <typename T>
 	struct IsPointer
 	{
-		static const bool Value = std::is_pointer<T>::value;
+		static constexpr bool Value = std::is_pointer<T>::value;
 	}; 
 }
 

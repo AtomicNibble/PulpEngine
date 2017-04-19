@@ -12,46 +12,108 @@ namespace compileTime
 	template <typename T>
 	struct IsTrivial
 	{
-		static const bool Value = std::is_trivial<T>::value;
+		static constexpr bool Value = std::is_trivial<T>::value;
+	}; 
+
+
+	template <typename T>
+	struct IsCon
+	{
+		static constexpr bool Value = std::is_constructible<T>::value;
+	};
+
+	template <typename T>
+	struct IsDefaultCon
+	{
+		static constexpr bool Value = std::is_default_constructible<T>::value;
+	};
+
+
+	template <typename T>
+	struct IsCopyCon
+	{
+		static constexpr bool Value = std::is_copy_constructible<T>::value;
+	};
+
+	template <typename T>
+	struct IsMoveCon
+	{
+		static constexpr bool Value = std::is_move_constructible<T>::value;
+	};
+
+
+	// trivial
+	template <typename T>
+	struct IsTrivialCon
+	{
+		static constexpr bool Value = std::is_trivially_constructible<T>::value;
 	}; 
 
 	template <typename T>
-	struct HasTrivialCon
+	struct IsTrivialDefaultCon
 	{
-		static const bool Value = std::has_trivial_constructor<T>::value;
+		static constexpr bool Value = std::is_trivially_default_constructible<T>::value;
 	}; 
 
 	template <typename T>
-	struct HasTrivialCopy
+	struct IsTrivialCopy
 	{
-		static const bool Value = std::has_trivial_copy<T>::value;
-	}; 
+		static constexpr bool Value = std::is_trivially_copyable<T>::value;
+	};
 
 	template <typename T>
-	struct HasTrivialDefaultCon
+	struct IsTrivialCopyCon
 	{
-		static const bool Value = std::has_trivial_default_constructor<T>::value;
-	}; 
+		static constexpr bool Value = std::is_trivially_copy_constructible<T>::value;
+	};
+
+	template <typename T>
+	struct IsTrivialCopyAssign
+	{
+		static constexpr bool Value = std::is_trivially_copy_assignable<T>::value;
+	};
+
+
+
+	template <typename T>
+	struct IsTrivialMoveCon
+	{
+		static constexpr bool Value = std::is_trivially_move_constructible<T>::value;
+	};
+
+	template <typename T>
+	struct IsTrivialMoveAssign
+	{
+		static constexpr bool Value = std::is_trivially_move_assignable<T>::value;
+	};
+
 
 
 	template <typename T>
 	struct HasVirtualDestructor
 	{
-		static const bool Value = std::has_virtual_destructor<T>::value;
+		static constexpr bool Value = std::has_virtual_destructor<T>::value;
 	}; 
 
 
 	template <typename T>
 	struct IsAbstract
 	{
-		static const bool Value = std::is_abstract<T>::value;
+		static constexpr bool Value = std::is_abstract<T>::value;
 	}; 
+
+
+	template <typename T>
+	struct IsFinal
+	{
+		static constexpr bool Value = std::is_final<T>::value;
+	};
 
 
 	template <typename T>
 	struct IsPolymorphic
 	{
-		static const bool Value = std::is_polymorphic<T>::value;
+		static constexpr bool Value = std::is_polymorphic<T>::value;
 	}; 
 
 }

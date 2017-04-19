@@ -263,7 +263,7 @@ namespace Mem
 		// begin / end can be null.
 		T* as_T = union_cast<T*>(where);
 
-		if (std::is_trivially_move_constructible<T>::value)
+		if (core::compileTime::IsTrivialMoveCon<T>::Value)
 		{
 			std::memmove(as_T, fromBegin, (fromEnd - fromBegin) * sizeof(T));
 		}
