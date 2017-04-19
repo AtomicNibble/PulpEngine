@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ComplexTypes.h"
 
 #include <Containers\Fifo.h>
 
@@ -20,70 +21,21 @@ typedef core::MemoryArena<
 > LinearArea;
 
 using namespace core;
+using namespace testTypes;
 
-namespace {
+namespace
+{
+	typedef ::testing::Types<short, int32_t, int64_t, uint64_t, float, double> MyTypes;
+	TYPED_TEST_CASE(FifoTest, MyTypes);
 
-	X_ALIGNED_SYMBOL(struct CustomTypeComplex, 64)
-	{
-		CustomTypeComplex(size_t val, const char* pName) :
-			var_(val),
-			pName_(pName)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomTypeComplex(const CustomTypeComplex& oth) :
-			var_(oth.var_),
-			pName_(oth.pName_)
-		{
-			++CONSRUCTION_COUNT;
-		}
-		CustomTypeComplex(CustomTypeComplex&& oth) :
-			var_(oth.var_),
-			pName_(oth.pName_)
-		{
-			++MOVE_COUNT;
-		}
-
-		~CustomTypeComplex() {
-			DECONSRUCTION_COUNT++;
-		}
-
-		CustomTypeComplex& operator=(const CustomTypeComplex& val) {
-			var_ = val.var_;
-			return *this;
-		}
-
-		inline size_t GetVar(void) const {
-			return var_;
-		}
-		inline const char* GetName(void) const {
-			return pName_;
-		}
-
-	private:
-		size_t var_;
-		const char* pName_;
-
-
+	template <typename T>
+	class FifoTest : public ::testing::Test {
 	public:
-		static int MOVE_COUNT;
-		static int CONSRUCTION_COUNT;
-		static int DECONSRUCTION_COUNT;
 	};
 
-	int CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	int CustomTypeComplex::MOVE_COUNT = 0;
-	int CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+} // namespace
 
-}
 
-typedef ::testing::Types<short, int32_t, int64_t, uint64_t, float, double> MyTypes;
-TYPED_TEST_CASE(FifoTest, MyTypes);
-
-template <typename T>
-class FifoTest : public ::testing::Test {
-public:
-};
 
 TYPED_TEST(FifoTest, Types)
 {
@@ -509,9 +461,7 @@ TYPED_TEST(FifoTest, pushEmpty)
 
 TEST(FifoTest, Complex_CopyConstruct)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		// want the operator=(const T& oth) to be used.
@@ -524,17 +474,17 @@ TEST(FifoTest, Complex_CopyConstruct)
 		fifo.push(CustomTypeComplex(16, "meow"));
 		fifo.push(CustomTypeComplex(16, "meow"));
 
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4, CONSRUCTION_COUNT);
+		EXPECT_EQ(4, DECONSRUCTION_COUNT);
 
 		// copy con
 		Fifo<CustomTypeComplex> fifo2(fifo);
 
 		// 4 copyies made.
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4 + 4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4 + 4, CONSRUCTION_COUNT);
+		EXPECT_EQ(4, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(4, fifo2.size());
 		EXPECT_EQ(16, fifo2.capacity());
@@ -547,17 +497,15 @@ TEST(FifoTest, Complex_CopyConstruct)
 		}
 	}
 
-	EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(4 + 4, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(4 + 8, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(4, MOVE_COUNT);
+	EXPECT_EQ(4 + 4, CONSRUCTION_COUNT);
+	EXPECT_EQ(4 + 8, DECONSRUCTION_COUNT);
 }
 
 
 TEST(FifoTest, Complex_Assign)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		// want the operator=(const T& oth) to be used.
@@ -571,16 +519,16 @@ TEST(FifoTest, Complex_Assign)
 		fifo.push(CustomTypeComplex(16, "meow"));
 		fifo.push(CustomTypeComplex(16, "meow"));
 
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4, CONSRUCTION_COUNT);
+		EXPECT_EQ(4, DECONSRUCTION_COUNT);
 
 		fifo2.reserve(2);
 		fifo2.push(CustomTypeComplex(0x71, "meow"));
 
-		EXPECT_EQ(5, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(5, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(5, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(5, MOVE_COUNT);
+		EXPECT_EQ(5, CONSRUCTION_COUNT);
+		EXPECT_EQ(5, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(1_sz, fifo2.size());
 		EXPECT_LE(1_sz, fifo2.capacity());
@@ -590,9 +538,9 @@ TEST(FifoTest, Complex_Assign)
 
 		// the item in fifo should of been cleaned up.
 		// and 4 copyies made.
-		EXPECT_EQ(5, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(5 + 4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(5 + 1, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(5, MOVE_COUNT);
+		EXPECT_EQ(5 + 4, CONSRUCTION_COUNT);
+		EXPECT_EQ(5 + 1, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(4, fifo2.size());
 		EXPECT_EQ(16, fifo2.capacity());
@@ -605,18 +553,16 @@ TEST(FifoTest, Complex_Assign)
 		}
 	}
 
-	EXPECT_EQ(5, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(5 + 4, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(5 + 1 + 8, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(5, MOVE_COUNT);
+	EXPECT_EQ(5 + 4, CONSRUCTION_COUNT);
+	EXPECT_EQ(5 + 1 + 8, DECONSRUCTION_COUNT);
 }
 
 
 
 TEST(FifoTest, Complex_Clear)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -627,9 +573,9 @@ TEST(FifoTest, Complex_Clear)
 		fifo.push(CustomTypeComplex(16, "meow"));
 		fifo.push(CustomTypeComplex(16, "meow"));
 
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4, CONSRUCTION_COUNT);
+		EXPECT_EQ(4, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(4, fifo.size());
 		EXPECT_EQ(16, fifo.capacity());
@@ -640,22 +586,20 @@ TEST(FifoTest, Complex_Clear)
 		EXPECT_EQ(16, fifo.capacity());
 
 		// check they all got deconstructed
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(8, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4, CONSRUCTION_COUNT);
+		EXPECT_EQ(8, DECONSRUCTION_COUNT);
 	}
 
 	// checxk they don't get double deconstructed.
-	EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(8, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(4, MOVE_COUNT);
+	EXPECT_EQ(4, CONSRUCTION_COUNT);
+	EXPECT_EQ(8, DECONSRUCTION_COUNT);
 }
 
 TEST(FifoTest, Complex_Free)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -666,9 +610,9 @@ TEST(FifoTest, Complex_Free)
 		fifo.push(CustomTypeComplex(16, "meow"));
 		fifo.push(CustomTypeComplex(16, "meow"));
 
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4, CONSRUCTION_COUNT);
+		EXPECT_EQ(4, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(4, fifo.size());
 		EXPECT_EQ(16, fifo.capacity());
@@ -679,23 +623,21 @@ TEST(FifoTest, Complex_Free)
 		EXPECT_EQ(0, fifo.capacity());
 
 		// check they all got deconstructed
-		EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(8, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4, MOVE_COUNT);
+		EXPECT_EQ(4, CONSRUCTION_COUNT);
+		EXPECT_EQ(8, DECONSRUCTION_COUNT);
 	}
 
 	// checxk they don't get double deconstructed.
-	EXPECT_EQ(4, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(4, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(8, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(4, MOVE_COUNT);
+	EXPECT_EQ(4, CONSRUCTION_COUNT);
+	EXPECT_EQ(8, DECONSRUCTION_COUNT);
 }
 
 
 TEST(FifoTest, Complex_push_move)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -706,16 +648,14 @@ TEST(FifoTest, Complex_push_move)
 		fifo.push(CustomTypeComplex(0x1414, "meow"));
 	}
 
-	EXPECT_EQ(2, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(2, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(4, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(2, MOVE_COUNT);
+	EXPECT_EQ(2, CONSRUCTION_COUNT);
+	EXPECT_EQ(4, DECONSRUCTION_COUNT);
 }
 
 TEST(FifoTest, Complex_emplace)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -725,16 +665,14 @@ TEST(FifoTest, Complex_emplace)
 		fifo.emplace(0x1414, "meow");
 	}
 
-	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(2, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(2, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(2, CONSRUCTION_COUNT);
+	EXPECT_EQ(2, DECONSRUCTION_COUNT);
 }
 
 TEST(FifoTest, Complex_shrinkToFit)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -752,9 +690,9 @@ TEST(FifoTest, Complex_shrinkToFit)
 		EXPECT_LE(3_sz, fifo.capacity());
 
 
-		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(2, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(0, MOVE_COUNT);
+		EXPECT_EQ(2, CONSRUCTION_COUNT);
+		EXPECT_EQ(0, DECONSRUCTION_COUNT);
 
 		// push another
 		// fifo.emplace(0x1416, "meow");
@@ -763,16 +701,16 @@ TEST(FifoTest, Complex_shrinkToFit)
 		EXPECT_LE(4_sz, fifo.capacity());
 
 		// we move this intem in, then move all 3 to new memory.
-		EXPECT_EQ(1 + 3, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(2 + 1, CustomTypeComplex::CONSRUCTION_COUNT); // we constructed the one we pushed
-		EXPECT_EQ(1 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(1 + 3, MOVE_COUNT);
+		EXPECT_EQ(2 + 1, CONSRUCTION_COUNT); // we constructed the one we pushed
+		EXPECT_EQ(1 + 3, DECONSRUCTION_COUNT);
 
 		fifo.shrinkToFit(); // should shrink.
 
 		// we moved 3.
-		EXPECT_EQ(4 + 3, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(4 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(4 + 3, MOVE_COUNT);
+		EXPECT_EQ(3, CONSRUCTION_COUNT);
+		EXPECT_EQ(4 + 3, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(3, fifo.size());
 		EXPECT_LE(4_sz, fifo.capacity());
@@ -797,16 +735,14 @@ TEST(FifoTest, Complex_shrinkToFit)
 	// so we emplace 2 = 2 con.
 	// we push one = 1 move.
 
-	EXPECT_EQ(7, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(7 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(7, MOVE_COUNT);
+	EXPECT_EQ(3, CONSRUCTION_COUNT);
+	EXPECT_EQ(7 + 3, DECONSRUCTION_COUNT);
 }
 
 TEST(FifoTest, Complex_shrinkToFit2)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -826,9 +762,9 @@ TEST(FifoTest, Complex_shrinkToFit2)
 		EXPECT_TRUE(fifo.isNotEmpty());
 
 
-		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(2, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(0, MOVE_COUNT);
+		EXPECT_EQ(2, CONSRUCTION_COUNT);
+		EXPECT_EQ(0, DECONSRUCTION_COUNT);
 
 		fifo.emplace(0x1416, "meow");
 		EXPECT_EQ(3, fifo.size());
@@ -836,16 +772,16 @@ TEST(FifoTest, Complex_shrinkToFit2)
 		EXPECT_TRUE(fifo.isNotEmpty());
 
 		// we move this intem in, then move all 3 to new memory.
-		EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT); 
-		EXPECT_EQ(3, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(3, MOVE_COUNT);
+		EXPECT_EQ(3, CONSRUCTION_COUNT); 
+		EXPECT_EQ(3, DECONSRUCTION_COUNT);
 
 		fifo.shrinkToFit(); // should shrink.
 
 							// we moved 3.
-		EXPECT_EQ(3 + 3, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(3 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(3 + 3, MOVE_COUNT);
+		EXPECT_EQ(3, CONSRUCTION_COUNT);
+		EXPECT_EQ(3 + 3, DECONSRUCTION_COUNT);
 
 		EXPECT_EQ(3, fifo.size());
 		EXPECT_LE(4_sz, fifo.capacity());
@@ -872,16 +808,14 @@ TEST(FifoTest, Complex_shrinkToFit2)
 		EXPECT_TRUE(fifo.isEmpty());
 	}
 
-	EXPECT_EQ(6, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(3, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(6 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(6, MOVE_COUNT);
+	EXPECT_EQ(3, CONSRUCTION_COUNT);
+	EXPECT_EQ(6 + 3, DECONSRUCTION_COUNT);
 }
 
 TEST(FifoTest, Complex_shrinkToFitWrap)
 {
-	CustomTypeComplex::MOVE_COUNT = 0;
-	CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	CustomTypeComplex::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Fifo<CustomTypeComplex> fifo(g_arena);
@@ -916,9 +850,9 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 		EXPECT_LE(5_sz, fifo.capacity());
 		EXPECT_TRUE(fifo.isNotEmpty());
 
-		EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(3, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(0, MOVE_COUNT);
+		EXPECT_EQ(6, CONSRUCTION_COUNT);
+		EXPECT_EQ(3, DECONSRUCTION_COUNT);
 
 		// okay so we now have 3 elementes with atleast capacity for 5
 		// and the elements should be wrapping around.
@@ -934,9 +868,9 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 		EXPECT_LE(3_sz, fifo.capacity());
 		EXPECT_TRUE(fifo.isNotEmpty());
 
-		EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
-		EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
-		EXPECT_EQ(3 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+		EXPECT_EQ(3, MOVE_COUNT);
+		EXPECT_EQ(6, CONSRUCTION_COUNT);
+		EXPECT_EQ(3 + 3, DECONSRUCTION_COUNT);
 
 		// pop the 3.
 		EXPECT_EQ(3, fifo.size());
@@ -962,7 +896,7 @@ TEST(FifoTest, Complex_shrinkToFitWrap)
 		EXPECT_TRUE(fifo.isEmpty());
 	}
 
-	EXPECT_EQ(3, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(6, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(6 + 3, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(3, MOVE_COUNT);
+	EXPECT_EQ(6, CONSRUCTION_COUNT);
+	EXPECT_EQ(6 + 3, DECONSRUCTION_COUNT);
 }

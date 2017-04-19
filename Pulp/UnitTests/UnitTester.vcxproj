@@ -479,6 +479,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ComplexTypes.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="Resource.h" />
@@ -488,6 +489,7 @@
     <ClInclude Include="UT_AssertChecker.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ComplexTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="UT_AssertChecker.cpp" />

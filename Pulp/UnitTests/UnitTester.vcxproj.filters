@@ -77,6 +77,9 @@
     <ClInclude Include="Profiler.h">
       <Filter>Header Files\Profile</Filter>
     </ClInclude>
+    <ClInclude Include="ComplexTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -339,6 +342,9 @@
     </ClCompile>
     <ClCompile Include="UT_FixedThreadQueue.cpp">
       <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="ComplexTypes.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

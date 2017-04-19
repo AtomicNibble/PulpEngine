@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "ComplexTypes.h"
 
 #include <IFileSys.h>
 
@@ -12,146 +13,29 @@
 X_USING_NAMESPACE;
 
 using namespace core;
+using namespace testTypes;
 
 
 namespace
 {
 
-	struct CustomType
-	{
-		CustomType()
-			: var_(16)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomType(size_t val)
-			: var_(val)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomType(const CustomType& oth)
-			: var_(oth.var_)
-		{
-			++CONSRUCTION_COUNT;
-		}
-		CustomType(CustomType&& oth)
-			: var_(oth.var_)
-		{
-			++CONSRUCTION_COUNT;
-		}
+	typedef core::MemoryArena<
+		core::LinearAllocator,
+		core::SingleThreadPolicy,
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+	> LinearArea;
 
-		~CustomType() {
-			DECONSRUCTION_COUNT++;
-		}
+	typedef ::testing::Types<short, int, CustomType> MyTypes;
+	TYPED_TEST_CASE(AlignedArrayTest, MyTypes);
 
-
-		CustomType& operator=(const CustomType& val) {
-			var_ = val.var_;
-			return *this;
-		}
-		CustomType& operator=(size_t val) {
-			var_ = val;
-			return *this;
-		}
-
-		bool operator==(const CustomType& oth) const {
-			return var_ == oth.var_;
-		}
-		bool operator==(const size_t& oth) const {
-			return var_ == oth;
-		}
-
-		inline size_t GetVar(void) const {
-			return var_;
-		}
-	private:
-		size_t var_;
-
+	template <typename T>
+	class AlignedArrayTest : public ::testing::Test {
 	public:
-		static int CONSRUCTION_COUNT;
-		static int DECONSRUCTION_COUNT;
 	};
 
-
-	X_INLINE bool operator==(const CustomType& a, const size_t& b) {
-		return a.GetVar() == b;
-	}
-	X_INLINE bool operator==(const size_t& a, const CustomType& b) {
-		return a == b.GetVar();
-	}
-
-	int CustomType::CONSRUCTION_COUNT = 0;
-	int CustomType::DECONSRUCTION_COUNT = 0;
-
-
-	struct CustomTypeComplex
-	{
-		CustomTypeComplex(size_t val, const char* pName) :
-			var_(val),
-			pName_(pName)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomTypeComplex(const CustomTypeComplex& oth) :
-			var_(oth.var_),
-			pName_(oth.pName_)
-		{
-			++CONSRUCTION_COUNT;
-		}
-		CustomTypeComplex(CustomTypeComplex&& oth) :
-			var_(oth.var_),
-			pName_(oth.pName_)
-		{
-			++MOVE_COUNT;
-		}
-
-		~CustomTypeComplex() {
-			DECONSRUCTION_COUNT++;
-		}
-
-		CustomTypeComplex& operator=(const CustomTypeComplex& val) {
-			var_ = val.var_;
-			return *this;
-		}
-
-		inline size_t GetVar(void) const {
-			return var_;
-		}
-		inline const char* GetName(void) const {
-			return pName_;
-		}
-
-	private:
-		size_t var_;
-		const char* pName_;
-
-
-	public:
-		static int CONSRUCTION_COUNT;
-		static int MOVE_COUNT;
-		static int DECONSRUCTION_COUNT;
-	};
-
-	int CustomTypeComplex::CONSRUCTION_COUNT = 0;
-	int CustomTypeComplex::MOVE_COUNT = 0;
-	int CustomTypeComplex::DECONSRUCTION_COUNT = 0;
 }
-
-typedef core::MemoryArena<
-	core::LinearAllocator,
-	core::SingleThreadPolicy,
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
-> LinearArea;
-
-typedef ::testing::Types<short, int, CustomType> MyTypes;
-TYPED_TEST_CASE(AlignedArrayTest, MyTypes);
-
-template <typename T>
-class AlignedArrayTest : public ::testing::Test {
-public:
-};
 
 
 
@@ -182,9 +66,7 @@ TYPED_TEST(AlignedArrayTest, Contruct)
 
 TYPED_TEST(AlignedArrayTest, Clear)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
-
+	resetConConters();
 
 	Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
@@ -205,13 +87,12 @@ TYPED_TEST(AlignedArrayTest, Clear)
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(128, list.capacity());
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(AlignedArrayTest, Free)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
@@ -238,7 +119,7 @@ TYPED_TEST(AlignedArrayTest, Free)
 		EXPECT_EQ(nullptr, list.ptr());
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(AlignedArrayTest, Move)
@@ -247,9 +128,8 @@ TYPED_TEST(AlignedArrayTest, Move)
 	// meaning allocation will fail if the copy constructors are used.
 	const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>) * 2) +
 		(sizeof(size_t) * 3); // Linear header block.
-
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	
+	resetConConters();
 
 	{
 		X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
@@ -265,7 +145,7 @@ TYPED_TEST(AlignedArrayTest, Move)
 		list.push_back(Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>(&arena, 64, TypeParam()));
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(AlignedArrayTest, Append)
@@ -403,8 +283,7 @@ TYPED_TEST(AlignedArrayTest, Insert)
 
 TYPED_TEST(AlignedArrayTest, Remove)
 {
-	CustomType::CONSRUCTION_COUNT = 0;
-	CustomType::DECONSRUCTION_COUNT = 0;
+	resetConConters();
 
 	{
 		Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
@@ -448,7 +327,7 @@ TYPED_TEST(AlignedArrayTest, Remove)
 		EXPECT_EQ(nullptr, list.ptr());
 	}
 
-	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+	EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
 }
 
 
@@ -673,6 +552,8 @@ TYPED_TEST(AlignedArrayTest, EmplaceBack)
 
 TEST(AlignedArrayTest, EmplaceBackComplex)
 {
+	resetConConters();
+
 	Array<CustomTypeComplex, core::ArrayAlignedAllocator<CustomTypeComplex>> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
@@ -687,9 +568,9 @@ TEST(AlignedArrayTest, EmplaceBackComplex)
 	ASSERT_EQ(64, list.capacity());
 	EXPECT_NE(nullptr, list.ptr());
 
-	EXPECT_EQ(0, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(0, CONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(0, DECONSRUCTION_COUNT);
 
 
 	for (int i = 0; i < 32; i++)
@@ -697,18 +578,18 @@ TEST(AlignedArrayTest, EmplaceBackComplex)
 		list.emplace_back(i * 4, "HEllo");
 	}
 
-	EXPECT_EQ(32, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(32, CONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(0, DECONSRUCTION_COUNT);
 
 	for (int i = 32; i < 64; i++)
 	{
 		list.push_back(CustomTypeComplex(i * 4, "HEllo"));
 	}
 
-	EXPECT_EQ(64, CustomTypeComplex::CONSRUCTION_COUNT);
-	EXPECT_EQ(32, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(32, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(64, CONSRUCTION_COUNT);
+	EXPECT_EQ(32, MOVE_COUNT);
+	EXPECT_EQ(32, DECONSRUCTION_COUNT);
 
 
 	EXPECT_EQ(64, list.size());

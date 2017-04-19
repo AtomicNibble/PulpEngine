@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+#include "ComplexTypes.h"
 
 #include <IFileSys.h>
 
@@ -13,143 +13,11 @@
 X_USING_NAMESPACE;
 
 using namespace core;
+using namespace testTypes;
 
 
 namespace 
 {
-	// init it to diffrent vlaues to make sure resetConConters is called.
-	int CONSRUCTION_COUNT = 0;
-	int DECONSRUCTION_COUNT = 5000;
-	int MOVE_COUNT = 10000;
-
-	void resetConConters(void)
-	{
-		CONSRUCTION_COUNT = 0;
-		DECONSRUCTION_COUNT = 0;
-		MOVE_COUNT = 0;
-	}
-
-	struct CustomType
-	{
-		CustomType()
-			: var_(16)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomType(size_t val)
-			: var_(val)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomType(const CustomType& oth)
-			: var_(oth.var_)
-		{
-			++CONSRUCTION_COUNT;
-		}
-		CustomType(CustomType&& oth)
-			: var_(oth.var_)
-		{
-			++CONSRUCTION_COUNT;
-		}
-
-		~CustomType() {
-			DECONSRUCTION_COUNT++;
-		}
-
-
-		CustomType& operator=(const CustomType& val) {
-			var_ = val.var_;
-			return *this;
-		}
-		CustomType& operator=(size_t val) {
-			var_ = val;
-			return *this;
-		}
-
-		bool operator==(const CustomType& oth) const {
-			return var_ == oth.var_;
-		}
-		bool operator==(const size_t& oth) const {
-			return var_ == oth;
-		}
-
-		bool operator<(const CustomType& rhs) const {
-			return GetVar() < rhs.GetVar();
-		}
-
-		inline size_t GetVar(void) const {
-			return var_;
-		}
-	private:
-		size_t var_;
-
-	public:
-
-	};
-
-
-	X_INLINE bool operator==(const CustomType& a, const size_t& b) {
-		return a.GetVar() == b;
-	}
-	X_INLINE bool operator==(const size_t& a, const CustomType& b) {
-		return a == b.GetVar();
-	}
-
-
-
-	struct CustomTypeComplex
-	{
-		CustomTypeComplex(size_t val, const char* pName) :
-			var_(val),
-			pName_(pName)
-		{
-			CONSRUCTION_COUNT++;
-		}
-		CustomTypeComplex(const CustomTypeComplex& oth) :
-			var_(oth.var_),
-			pName_(oth.pName_)
-		{
-			++CONSRUCTION_COUNT;
-		}
-		CustomTypeComplex(CustomTypeComplex&& oth) :
-			var_(oth.var_),
-			pName_(oth.pName_)
-		{
-			++MOVE_COUNT;
-		}
-
-		~CustomTypeComplex() {
-			DECONSRUCTION_COUNT++;
-		}
-
-		CustomTypeComplex& operator=(const CustomTypeComplex& val) {
-			var_ = val.var_;
-			return *this;
-		}
-
-		bool operator<(const CustomTypeComplex& rhs) const {
-			return GetVar() < rhs.GetVar();
-		}
-
-		inline size_t GetVar(void) const {
-			return var_;
-		}
-		inline const char* GetName(void) const {
-			return pName_;
-		}
-
-	private:
-		size_t var_;
-		const char* pName_;
-	};
-
-	int getConCount() {
-		return CONSRUCTION_COUNT;
-	}
-
-	int getDeConCount() {
-		return CONSRUCTION_COUNT;
-	}
 
 	typedef core::MemoryArena<
 		core::LinearAllocator,
@@ -164,10 +32,12 @@ namespace
 
 	template <typename T>
 	class ArrayTest : public ::testing::Test {
-	public:
+		public:
 	};
 
+
 } // namespace
+
 
 
 TYPED_TEST(ArrayTest, Contruct)
@@ -272,8 +142,6 @@ TYPED_TEST(ArrayTest, Expand)
 		{
 			EXPECT_EQ(i, list.insertAtIndex(i, i * 2));
 		}
-
-		const int test = getConCount();
 
 		EXPECT_EQ(64, list.size());
 		EXPECT_EQ(64, list.capacity());
