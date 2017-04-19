@@ -234,6 +234,35 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::find(const Type& val) con
 }
 
 
+
+template<typename T, size_t N>
+void FixedArray<T, N>::resize(size_type newNum)
+{
+	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
+	X_ASSERT(newNum < N, "array size must be less or equal to capacity")(newNum, N);
+
+	if (newNum == size_) {
+		return;
+	}
+
+	T* pArr = begin();
+
+	// remove some?
+	if (newNum < size_)
+	{
+		// we don't delete memory just deconstruct.
+		Mem::DestructArray<T>(&pArr[newNum], size_ - newNum);
+	}
+	else
+	{
+		// construct the new items.
+		Mem::ConstructArray<T>(&pArr[size_], newNum - size_);
+	}
+
+	// set num
+	size_ = newNum;
+}
+
 template<typename T, size_t N>
 void FixedArray<T, N>::resize(size_type newNum, const T& t)
 {
@@ -254,12 +283,8 @@ void FixedArray<T, N>::resize(size_type newNum, const T& t)
 	}
 	else
 	{
-		size_type	i;
-
 		// construct the new items.
-		for (i = size_; i < newNum; i++) {
-			Mem::Construct<T>(&pArr[i], t);
-		}
+		Mem::ConstructArray<T>(&pArr[size_], newNum - size_, t);
 	}
 
 	// set num

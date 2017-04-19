@@ -72,7 +72,8 @@ public:
 	size_type find(const Type& val) const;
 
 	// Inserts or erases elements at the end such that size is 'size'
-	inline void resize(size_type size, const T& t = T());
+	inline void resize(size_type size);
+	inline void resize(size_type size, const T& t);
 
 	// any iterms in the array
 	inline bool isEmpty(void) const;
