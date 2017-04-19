@@ -110,9 +110,8 @@ inline void Stack<T>::reserve(size_type newSize)
 
 		if (pOldList)
 		{
-			for (size_type i = 0; i < oldSize; i++) {
-				Mem::Construct(&start_[i], pOldList[i]);
-			}
+			Mem::MoveArrayUninitialized(start_, pOldList, pOldList + oldSize);
+
 
 			Delete(pOldList);
 		}
