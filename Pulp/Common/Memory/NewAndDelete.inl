@@ -205,6 +205,24 @@ namespace Mem
 	// ---------------------------------------------------------------------------------------------------------------------
 	// ---------------------------------------------------------------------------------------------------------------------
 	template <typename T>
+	inline T* ConstructArray(void* where, size_t N, const T& what)
+	{
+		X_ASSERT_NOT_NULL(where);
+
+		T* as_T = union_cast<T*>(where);
+
+		// construct instances using placement new
+		const T* const onePastLast = as_T + N;
+		while (as_T < onePastLast) {
+			Construct<T>(as_T++, what);
+		}
+
+		return union_cast<T*>(where);
+	}
+
+	// ---------------------------------------------------------------------------------------------------------------------
+	// ---------------------------------------------------------------------------------------------------------------------
+	template <typename T>
 	inline T* CopyArrayUninitialized(void* where, const T* fromBegin, const T* fromEnd)
 	{
 		X_ASSERT_NOT_NULL(where);
