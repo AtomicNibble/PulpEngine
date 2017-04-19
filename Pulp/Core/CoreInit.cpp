@@ -588,17 +588,20 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		}
 
 		// wait for default font to fully load.
-		if (!gEnv->IsDedicated()) 
+		if (!startupParams.isCoreOnly())
 		{
-			font::IFont* pFont = env_.pFontSys->GetFont("default");
-			if (!pFont) {
-				X_ERROR("Font", "failed to get default font");
-				return false;
-			}
+			if (!gEnv->IsDedicated())
+			{
+				font::IFont* pFont = env_.pFontSys->GetFont("default");
+				if (!pFont) {
+					X_ERROR("Font", "failed to get default font");
+					return false;
+				}
 
-			if (!pFont->WaitTillReady()) {
-				X_ERROR("Font", "Error loading default font");
-				return false;
+				if (!pFont->WaitTillReady()) {
+					X_ERROR("Font", "Error loading default font");
+					return false;
+				}
 			}
 		}
 	}
