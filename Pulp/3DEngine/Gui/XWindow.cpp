@@ -1366,7 +1366,6 @@ void XWindow::drawDebug(engine::IPrimativeContext* pDrawCon)
 
 	font::TextDrawContext ctx;
 	ctx.col = Color(v, v, v);
-	ctx.flags = font::DrawTextFlag::MONOSPACE;
 
 	pDrawCon->drawText(pos, ctx, str.begin(), str.end());
 }

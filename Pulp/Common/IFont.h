@@ -47,9 +47,7 @@ X_DECLARE_FLAGS(DrawTextFlag)(
 
 	// deprecated / does nothing
 	FIXED_SIZE,	// some dumb shit.
-	MONOSPACE,	// 
-	POS_2D,		// what the actual fuck.
-	SCALE_800x600 // font system is not responsible for your scaling!
+	POS_2D		// what the actual fuck.
 );
 
 typedef Flags<DrawTextFlag> DrawTextFlags;
