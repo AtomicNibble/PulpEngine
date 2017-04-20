@@ -182,7 +182,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 
 
 	Vec2f size = ctx.size; // in pixel
-	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 
 	const auto effecIdx = ctx.GetEffectId();
@@ -207,17 +206,8 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		Vec2f baseXY(pos.x, pos.y);
 		Vec2f scale;
 
-		if (proportinal)
-		{
-			// to have backward compatible behavior (can be refactored later)
-			rcpCellWidth = (1.0f / (512.0f / 16.0f)) * size.x;
-			scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y / 32.0f);
-		}
-		else
-		{
-			rcpCellWidth = size.x / 16.0f;
-			scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y * ctx.widthScale / 16.0f);
-		}
+		rcpCellWidth = size.x / 16.0f;
+		scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y * ctx.widthScale / 16.0f);
 
 		if (drawFrame && passIdx == 0)
 		{
@@ -273,14 +263,8 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			{
 				case L' ':
 				{
-					if (proportinal) {
-						charX += size.x * FONT_SPACE_SIZE;
-					}
-					else {
-						charX += size.x * ctx.widthScale;
-					}
+					charX += size.x * ctx.widthScale;
 					continue;
-					break;
 				}
 
 				case L'^':
@@ -298,7 +282,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 						++pChar;
 					}
 					continue;
-					break;
 				}
 
 				case L'\n':
@@ -306,26 +289,18 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 					charX = baseXY.x;
 					charY += size.y;
 					continue;
-					break;
 				}
 
 				case L'\r':
 				{
 					charX = baseXY.x;
 					continue;
-					break;
 				}
 
 				case L'\t':
 				{
-					if (proportinal) {
-						charX += FONT_TAB_CHAR_NUM * size.x * FONT_SPACE_SIZE;
-					}
-					else {
-						charX += FONT_TAB_CHAR_NUM * size.x * ctx.widthScale;
-					}
+					charX += FONT_TAB_CHAR_NUM * size.x * ctx.widthScale;
 					continue;
-					break;
 				}
 
 				default:
@@ -339,17 +314,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			
 			engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
 
-			float hozAdvance = 0;
-			if (proportinal)
-			{
-				hozAdvance = (charWidth + FONT_GLYPH_PROP_SPACING) * scale.x;
-				cords.offset.x = 0;
-			}
-			else
-			{
-				hozAdvance = size.x * ctx.widthScale;
-			}
-
+			float hozAdvance = size.x * ctx.widthScale;
 			float xpos = charX + cords.offset.x * scale.x;
 			float ypos = charY + cords.offset.y * scale.y;
 			float right = xpos + cords.size.x * scale.x;
@@ -593,24 +558,9 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 
 	// Scale it?
 	Vec2f size = ctx.size; // in pixel
-	if (ctx.flags.IsSet(DrawTextFlag::SCALE_800x600))
-	{
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
 
-	const bool proportinal = ctx.flags.IsSet(DrawTextFlag::FIXED_SIZE);
-
-	if (proportinal)
-	{
-		rcpCellWidth = (1.0f / (512.0f / 16.0f)) * size.x;
-		scale = Vec2f(rcpCellWidth, size.y / 32.0f);
-	}
-	else
-	{
-		rcpCellWidth = size.x / 16.0f;
-		scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y * ctx.widthScale / 16.0f);
-	}
-
+	rcpCellWidth = size.x / 16.0f;
+	scale = Vec2f(rcpCellWidth * ctx.widthScale, size.y * ctx.widthScale / 16.0f);
 
 	float charX = 0;
 	float charY = 0 + size.y;
@@ -660,19 +610,13 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 				break;
 			case L'\t':
 			{
-				if (proportinal)
-					charX += FONT_TAB_CHAR_NUM * size.x * FONT_SPACE_SIZE;
-				else
-					charX += FONT_TAB_CHAR_NUM * size.x * ctx.widthScale;
+				charX += FONT_TAB_CHAR_NUM * size.x * ctx.widthScale;
 				continue;
 			}
 				break;
 			case L' ':
 			{
-				 if (proportinal)
-					charX += FONT_SPACE_SIZE * size.x;
-				 else
-					 charX += size.x * ctx.widthScale;
+				charX += size.x * ctx.widthScale;
 				continue;
 			}
 				break;
@@ -692,16 +636,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 				break;
 		}
 
-		float advance;
-		if (proportinal)
-		{
-			const int32_t charWidth = pFontTexture_->GetCharacterWidth(ch);
-			advance = (charWidth + FONT_GLYPH_PROP_SPACING) * scale.x;
-		}
-		else
-		{
-			advance = size.x * ctx.widthScale;
-		}
+		float advance= size.x * ctx.widthScale;
 
 		charX += advance;
 	}
