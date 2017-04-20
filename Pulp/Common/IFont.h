@@ -43,11 +43,8 @@ X_DECLARE_FLAGS(DrawTextFlag)(
 	CENTER_VER,	// the center(ver) of the text is placed at the draw pos, by default it's at the top.
 	RIGHT,		// the end of the text (hoz) is placed at draw pos. (setting this will ignore 'CENTER', but 'CENTER_VER' is still valid)
 	FRAMED,		// Draws a filled 65% opacity dark rectenagle under the text. aka a block background
-	CLIP,		// Clip the text against the provided rect, partial chars are drawn.
+	CLIP		// Clip the text against the provided rect, partial chars are drawn.
 
-	// deprecated / does nothing
-	FIXED_SIZE,	// some dumb shit.
-	POS_2D		// what the actual fuck.
 );
 
 typedef Flags<DrawTextFlag> DrawTextFlags;
