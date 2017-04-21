@@ -343,6 +343,8 @@ bool XGlyphBitmap::BlitTo8(uint8_t* pBuffer,
 {
 	int32_t ySrcOffset, yDestOffset;
 
+	X_ASSERT(srcWidth <= width_ && srcHeight <= height_, "Out of range")(srcWidth, width_, srcHeight, height_);
+
 	for (int32_t y = 0; y < srcHeight; y++)
 	{
 		ySrcOffset = (srcY + y) * width_;
@@ -367,6 +369,8 @@ bool XGlyphBitmap::BlitTo32(uint32_t* pBuffer,
 {
 	int32_t ySrcOffset, yDestOffset;
 	char cColor;
+
+	X_ASSERT(srcWidth <= width_ && srcHeight <= height_, "Out of range")(srcWidth, width_, srcHeight, height_);
 
 	for (int32_t y = 0; y < srcHeight; y++)
 	{
