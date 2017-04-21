@@ -123,6 +123,8 @@ struct IFont
 	// only call this if you requested a async load, calling for sync loads is undefined.
 	virtual bool WaitTillReady(void) X_ABSTRACT;
 
+	// draw a load of test text.
+	virtual void DrawTestText(engine::IPrimativeContext* pPrimCon) X_ABSTRACT;
 
 	// these draw the text into the primative context.
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon,

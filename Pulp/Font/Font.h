@@ -50,6 +50,7 @@ public:
 	bool isReady(void);
 	bool WaitTillReady(void) X_FINAL;
 
+	void DrawTestText(engine::IPrimativeContext* pPrimCon) X_FINAL;
 
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_FINAL;

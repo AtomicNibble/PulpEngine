@@ -131,6 +131,52 @@ bool XFont::WaitTillReady(void)
 	return pFontTexture_->WaitTillReady();
 }
 
+void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
+{
+	font::XTextDrawConect ctx;
+	ctx.pFont = this;
+	ctx.effectId = 0;
+	ctx.SetSize(Vec2f(20.f, 20.f));
+	ctx.flags = font::DrawTextFlag::FRAMED;
+
+	// going to draw various test text.
+	float posY = 30;
+	const float SpacingY = 90;
+
+	ctx.SetColor(Col_Aqua);
+	ctx.SetCharWidthScale(1.0f);
+	pPrimCon->drawText(10, posY, ctx, "Test text 20x20 1.0\tscale\nnew line 1\nnew line 2. :)");
+
+	ctx.SetColor(Col_Khaki);
+	ctx.SetCharWidthScale(0.5f);
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 20x20 0.5\tscale\nnew line 1\nnew line 2 :|");
+
+	// 
+
+	ctx.SetColor(Col_Coral);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(20.f, 10.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 20x10 1.0\tscale\nnew line 1\nnew line 2. :[");
+
+
+	ctx.SetColor(Col_Mediumpurple);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(10.f, 20.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale\nnew line 1\nnew line 2. :[");
+
+	ctx.SetColor(Col_Lime);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(10.f, 10.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale\nnew line 1\nnew line 2. :[");
+
+
+	ctx.SetColor(Col_Orangered);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(40.f, 40.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale");
+
+}
+
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const XTextDrawConect& contex, const char* pBegin, const char* pEnd)
