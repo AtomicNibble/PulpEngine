@@ -169,6 +169,8 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		UnCacheGlyph(pSlot->currentChar);
 	}
 
+	fontRenderer_.EnabledDebugRender(vars_.glyphCacheDebugRender());
+
 	// scaling 
 	if (scaleBitmap_)
 	{
@@ -187,7 +189,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		scaleBitmap_->Clear();
 
 		if (!fontRenderer_.GetGlyph(*scaleBitmap_.ptr(), &pSlot->charWidth, &pSlot->charHeight,
-				pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar, vars_.glyphCacheDebugRender()))
+				pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
 		{
 			// failed to render
 			return false;
@@ -210,7 +212,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	else
 	{
 		if (!fontRenderer_.GetGlyph(pSlot->glyphBitmap, &pSlot->charWidth, &pSlot->charHeight,
-			pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar, vars_.glyphCacheDebugRender()))
+			pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
 		{
 			// failed to render
 			return false;

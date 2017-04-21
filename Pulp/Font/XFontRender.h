@@ -28,9 +28,10 @@ public:
 	bool Release(void); 
 
 	bool GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 
-		uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode, bool debugRender = false);
+		uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode);
 
 	X_INLINE bool ValidFace(void) const;
+	X_INLINE void EnabledDebugRender(bool enable);
 
 	// scale the glyphs.
 	X_INLINE void SetSizeRatio(float sizeRatio);
@@ -55,6 +56,7 @@ private:
 	FT_GlyphSlot	pGlyph_;
 	FontEncoding::Enum encoding_;
 
+	bool			debugRender_;
 	float			sizeRatio_;
 
 	int32_t			glyphBitmapWidth_;

@@ -10,6 +10,7 @@ XFontRender::XFontRender() :
 	pFace_(0),
 	pGlyph_(0), 
 	encoding_(FontEncoding::Unicode),
+	debugRender_(false),
 	sizeRatio_(0.8f),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
@@ -73,7 +74,7 @@ bool XFontRender::Release(void)
 
 
 bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
-	uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode, bool debugRender)
+	uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode)
 { 
 	int32_t err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
 	if (err) {
@@ -133,7 +134,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 		}
 	}
 
-	if (debugRender) {
+	if (debugRender_) {
 		for (auto& p : buffer) {
 			p = p / 2 + 64;
 		}

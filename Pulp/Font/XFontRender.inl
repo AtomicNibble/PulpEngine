@@ -6,6 +6,11 @@ X_INLINE bool XFontRender::ValidFace(void) const
 	return pFace_ != nullptr;
 }
 
+X_INLINE void XFontRender::EnabledDebugRender(bool enable)
+{
+	debugRender_ = enable;
+}
+
 X_INLINE void XFontRender::SetSizeRatio(float sizeRatio)
 { 
 	sizeRatio_ = sizeRatio;
