@@ -95,7 +95,7 @@ bool XGlyphCache::Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight)
 	// Scaled?
 	if (scaledGlyphWidth_ > 0)
 	{
-		scaleBitmap_.reset(X_NEW(XGlyphBitmap, scaleBitmap_.getArena(), "BitMap"));
+		scaleBitmap_.reset(X_NEW(XGlyphBitmap, scaleBitmap_.getArena(), "BitMap")(g_fontArena));
 
 		if (!scaleBitmap_->Create(scaledGlyphWidth_, scaledGlyphHeight_))
 		{

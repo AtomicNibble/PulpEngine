@@ -99,7 +99,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 	charOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
 	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
-	uint8_t* pBuffer = pGlyphBitmap->GetBuffer();
+	auto& buffer = pGlyphBitmap->GetBuffer();
 	uint32 glyphWidth = pGlyphBitmap->GetWidth();
 
 	for (uint32_t i = 0; i < pGlyph_->bitmap.rows; i++)
@@ -116,9 +116,9 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 			}
 
 #if X_FONT_DEBUG_RENDER
-			pBuffer[offset] = color / 2 + 64;
+			buffer[offset] = color / 2 + 64;
 #else
-			pBuffer[offset] = color;
+			buffer[offset] = color;
 #endif // !X_FONT_DEBUG_RENDER
 		}
 	}

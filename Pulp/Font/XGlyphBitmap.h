@@ -8,14 +8,18 @@ X_NAMESPACE_BEGIN(font)
 class XGlyphBitmap
 {
 public:
-	XGlyphBitmap();
-	XGlyphBitmap(int32_t width, int32_t height);
+	typedef core::Array<uint8_t> DataVec;
+
+public:
+	XGlyphBitmap(core::MemoryArenaBase* arena);
+	XGlyphBitmap(core::MemoryArenaBase* arena, int32_t width, int32_t height);
 	~XGlyphBitmap();
 
 	bool Create(int32_t width, int32_t height);
 	void Release(void);
 
-	X_INLINE uint8_t* GetBuffer(void);
+	X_INLINE DataVec& GetBuffer(void);
+	X_INLINE const DataVec& GetBuffer(void) const;
 	X_INLINE int32_t GetWidth(void) const;
 	X_INLINE int32_t GetHeight(void) const;
 
@@ -24,11 +28,11 @@ public:
 	// clears the buffer, no memory free
 	void Clear(void);
 
-	bool BlitScaledTo8(uint8_t* pBuffer, int32_t srcX, int32_t srcY, int32_t srcWidth,
+	bool BlitScaledTo8(DataVec& destBuffer, int32_t srcX, int32_t srcY, int32_t srcWidth,
 		int32_t srcHeight, int32_t destX, int32_t destY, int32_t destWidth, 
 		int32_t destHeight, int32_t sestBufferWidth);
 
-	bool BlitScaledTo32(uint8_t* pBuffer, int32_t srcX, int32_t srcY, int32_t srcWidth,
+	bool BlitScaledTo32(DataVec& destBuffer, int32_t srcX, int32_t srcY, int32_t srcWidth,
 		int32_t srcHeight, int32_t destX, int32_t destY, int32_t destWidth, 
 		int32_t destHeight, int32_t sestBufferWidth);
 
@@ -40,7 +44,7 @@ public:
 
 
 private:
-	uint8_t*	pBuffer_;
+	DataVec		buffer_;
 	int32_t		width_;
 	int32_t		height_;
 };

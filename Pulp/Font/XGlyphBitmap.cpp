@@ -4,16 +4,16 @@
 
 X_NAMESPACE_BEGIN(font)
 
-XGlyphBitmap::XGlyphBitmap() :
-	pBuffer_(nullptr),
+XGlyphBitmap::XGlyphBitmap(core::MemoryArenaBase* arena) :
+	buffer_(arena),
 	width_(0),
 	height_(0)
 {
 
 }
 
-XGlyphBitmap::XGlyphBitmap(int32_t width, int32_t height) :
-	pBuffer_(nullptr),
+XGlyphBitmap::XGlyphBitmap(core::MemoryArenaBase* arena, int32_t width, int32_t height) :
+	buffer_(arena),
 	width_(0),
 	height_(0)
 {
@@ -32,12 +32,7 @@ bool XGlyphBitmap::Create(int32_t width, int32_t height)
 {
 	Release();
 
-	pBuffer_ = X_NEW_ARRAY(uint8_t, width * height, g_fontArena,"BitMapBuffer");
-
-	if (!pBuffer_) {
-		return false;
-	}
-
+	buffer_.resize(width*height);
 	width_ = width;
 	height_ = height;
 	return true;
@@ -46,11 +41,7 @@ bool XGlyphBitmap::Create(int32_t width, int32_t height)
 
 void XGlyphBitmap::Release(void)
 {
-	if (pBuffer_) {
-		X_DELETE_ARRAY(pBuffer_, g_fontArena);
-		pBuffer_ = nullptr;
-	}
-
+	buffer_.free();
 	width_ = height_ = 0;
 }
 
@@ -90,27 +81,27 @@ void XGlyphBitmap::Blur(int32_t iterations)
 			// blur a row
 			for (x = 0; x < width_; x++)
 			{
-				cSum = pBuffer_[yupOffset + x] + pBuffer_[ydownOffset + x];
+				cSum = buffer_[yupOffset + x] + buffer_[ydownOffset + x];
 
 				if (x - 1 >= 0)
 				{
-					cSum += pBuffer_[yOffset + x - 1];
+					cSum += buffer_[yOffset + x - 1];
 				}
 				else
 				{
-					cSum += pBuffer_[yOffset + x];
+					cSum += buffer_[yOffset + x];
 				}
 
 				if (x + 1 < width_)
 				{
-					cSum += pBuffer_[yOffset + x + 1];
+					cSum += buffer_[yOffset + x + 1];
 				}
 				else
 				{
-					cSum += pBuffer_[yOffset + x];
+					cSum += buffer_[yOffset + x];
 				}
 
-				pBuffer_[yOffset + x] = safe_static_cast<uint8_t, int32_t>(cSum >> 2);
+				buffer_[yOffset + x] = safe_static_cast<uint8_t, int32_t>(cSum >> 2);
 			}
 		}
 	}
@@ -119,7 +110,7 @@ void XGlyphBitmap::Blur(int32_t iterations)
 bool XGlyphBitmap::Scale(float scaleX, float scaleY)
 {
 	// anything to scale?
-	if (!pBuffer_) {
+	if (buffer_.isEmpty()) {
 		return false;
 	}
 
@@ -134,11 +125,7 @@ bool XGlyphBitmap::Scale(float scaleX, float scaleY)
 	const int32_t newWidth =  static_cast<int32_t>(width_ * scaleX);
 	const int32_t newHeight = static_cast<int32_t>(height_ * scaleY);
 
-	uint8_t* pNewBuffer = X_NEW_ARRAY(uint8_t, newWidth * newHeight, g_fontArena, "ScaleBuffer");
-
-	if (!pNewBuffer) {
-		return false;
-	}
+	DataVec newBuffer(buffer_.getArena(), newWidth * newHeight);
 
 	const float xFactor = width_ / static_cast<float>(newWidth);
 	const float yFactor = height_ / static_cast<float>(newHeight);
@@ -176,15 +163,15 @@ bool XGlyphBitmap::Scale(float scaleX, float scaleY)
 			xFraction = xFractioned - xFloor;
 			oneMinusX = 1.0f - xFraction;
 
-			c0 = pBuffer_[yFloor * width_ + xFloor];
-			c1 = pBuffer_[yFloor * width_ + xCeil];
-			c2 = pBuffer_[yCeil * width_ + xFloor];
-			c3 = pBuffer_[yCeil * width_ + xCeil];
+			c0 = buffer_[yFloor * width_ + xFloor];
+			c1 = buffer_[yFloor * width_ + xCeil];
+			c2 = buffer_[yCeil * width_ + xFloor];
+			c3 = buffer_[yCeil * width_ + xCeil];
 
 			fR0 = (oneMinusX * c0 + xFraction * c1);
 			fR1 = (oneMinusX * c2 + xFraction * c3);
 
-			pNewBuffer[yNewOffset + x] = static_cast<uint8_t>((oneMinusY * fR0) + (yFraction * fR1));
+			newBuffer[yNewOffset + x] = static_cast<uint8_t>((oneMinusY * fR0) + (yFraction * fR1));
 		}
 	}
 
@@ -192,22 +179,20 @@ bool XGlyphBitmap::Scale(float scaleX, float scaleY)
 	width_ = newWidth;
 	height_ = newHeight;
 
-	X_DELETE_ARRAY(pBuffer_, g_fontArena);
-	pBuffer_ = pNewBuffer;
-
+	buffer_.swap(newBuffer);
 	return true;
 }
 
 void XGlyphBitmap::Clear(void)
 {
-	if (pBuffer_) {
-		memset(pBuffer_, 0, width_ * height_);
+	if (buffer_.isNotEmpty()) {
+		std::memset(buffer_.data(), 0, buffer_.size());
 	}
 }
 
 
 //-------------------------------------------------------------------------------------------------
-bool XGlyphBitmap::BlitScaledTo8(uint8_t* pBuffer, 
+bool XGlyphBitmap::BlitScaledTo8(DataVec& destBuffer,
 	int32_t srcX, int32_t srcY, 
 	int32_t srcWidth, int32_t srcHeight, 
 	int32_t destX, int32_t destY, 
@@ -219,8 +204,6 @@ bool XGlyphBitmap::BlitScaledTo8(uint8_t* pBuffer,
 
 	const int32_t newWidth =  static_cast<int32_t>(destWidth);
 	const int32_t newHeight = static_cast<int32_t>(destHeight);
-
-	uint8_t* pNewBuffer = pBuffer;
 
 	const float xFactor = srcWidth / static_cast<float>(newWidth);
 	const float yFactor = srcHeight / static_cast<float>(newHeight);
@@ -264,15 +247,15 @@ bool XGlyphBitmap::BlitScaledTo8(uint8_t* pBuffer,
 				xCeil = xFloor;
 			}
 
-			c0 = pBuffer_[yFloor * width_ + xFloor];
-			c1 = pBuffer_[yFloor * width_ + xCeil];
-			c2 = pBuffer_[yCeil * width_ + xFloor];
-			c3 = pBuffer_[yCeil * width_ + xCeil];
+			c0 = buffer_[yFloor * width_ + xFloor];
+			c1 = buffer_[yFloor * width_ + xCeil];
+			c2 = buffer_[yCeil * width_ + xFloor];
+			c3 = buffer_[yCeil * width_ + xCeil];
 
 			fR0 = (oneMinusX * c0 + xFraction * c1);
 			fR1 = (oneMinusX * c2 + xFraction * c3);
 
-			pNewBuffer[yNewOffset + x + destX] = (uint8_t)((oneMinusY * fR0) + (yFraction * fR1));
+			destBuffer[yNewOffset + x + destX] = (uint8_t)((oneMinusY * fR0) + (yFraction * fR1));
 		}
 	}
 
@@ -280,7 +263,7 @@ bool XGlyphBitmap::BlitScaledTo8(uint8_t* pBuffer,
 }
 
 //------------------------------------------------------------------------------------------------- 
-bool XGlyphBitmap::BlitScaledTo32(unsigned char *pBuffer,
+bool XGlyphBitmap::BlitScaledTo32(DataVec& destBuffer,
 	int32_t srcX, int32_t srcY, 
 	int32_t srcWidth, int32_t srcHeight, 
 	int32_t destX, int32_t destY, 
@@ -292,8 +275,6 @@ bool XGlyphBitmap::BlitScaledTo32(unsigned char *pBuffer,
 
 	const int32_t newWidth = static_cast<int32_t>(destWidth);
 	const int32_t newHeight = static_cast<int32_t>(destHeight);
-
-	uint8_t* pNewBuffer = pBuffer;
 
 	const float xFactor = srcWidth / static_cast<float>(newWidth);
 	const float yFactor = srcHeight / static_cast<float>(newHeight);
@@ -337,17 +318,17 @@ bool XGlyphBitmap::BlitScaledTo32(unsigned char *pBuffer,
 				xCeil = xFloor;
 			}
 
-			c0 = pBuffer_[yFloor * width_ + xFloor];
-			c1 = pBuffer_[yFloor * width_ + xCeil];
-			c2 = pBuffer_[yCeil * width_ + xFloor];
-			c3 = pBuffer_[yCeil * width_ + xCeil];
+			c0 = buffer_[yFloor * width_ + xFloor];
+			c1 = buffer_[yFloor * width_ + xCeil];
+			c2 = buffer_[yCeil * width_ + xFloor];
+			c3 = buffer_[yCeil * width_ + xCeil];
 
 			fR0 = (oneMinusX * c0 + xFraction * c1);
 			fR1 = (oneMinusX * c2 + xFraction * c3);
 
 			cColor = static_cast<uint8_t>((oneMinusY * fR0) + (yFraction * fR1));
 
-			pNewBuffer[yNewOffset + x + destX] = safe_static_cast<uint8_t, int32_t>(0xffffff | (cColor << 24));
+			destBuffer[yNewOffset + x + destX] = safe_static_cast<uint8_t, int32_t>(0xffffff | (cColor << 24));
 		}
 	}
 
@@ -369,7 +350,7 @@ bool XGlyphBitmap::BlitTo8(uint8_t* pBuffer,
 
 		for (int32_t x = 0; x < srcWidth; x++)
 		{
-			pBuffer[yDestOffset + destX + x] = pBuffer_[ySrcOffset + srcX + x];
+			pBuffer[yDestOffset + destX + x] = buffer_[ySrcOffset + srcX + x];
 		}
 	}
 
@@ -394,7 +375,7 @@ bool XGlyphBitmap::BlitTo32(uint32_t* pBuffer,
 
 		for (int32_t x = 0; x < srcWidth; x++)
 		{
-			cColor = pBuffer_[ySrcOffset + srcX + x];
+			cColor = buffer_[ySrcOffset + srcX + x];
 
 			// solid RGB
 			pBuffer[yDestOffset + destX + x] = (cColor << 24) | (255 << 16) | (255 << 8) | 255;

@@ -24,6 +24,11 @@ giving much faster text rendering at the cost of some memory.
 
 struct XCacheSlot
 {
+	XCacheSlot() :
+		glyphBitmap(g_fontArena)
+	{
+		
+	}
 
 	X_INLINE void reset(void)
 	{
