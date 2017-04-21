@@ -187,6 +187,7 @@ bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio)
 {
 	X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")(width, height);
+	X_ASSERT(sizeRatio <= 1.f, "Size ration can't be greater than 1.f")(sizeRatio);
 
 	sizeRatio_ = sizeRatio;
 	glyphBitmapWidth_ = width;
