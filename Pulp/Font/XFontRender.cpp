@@ -116,7 +116,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 			}
 
 #if X_FONT_DEBUG_RENDER
-			pBuffer[offset] = color / 2 + 32;
+			pBuffer[offset] = color / 2 + 64;
 #else
 			pBuffer[offset] = color;
 #endif // !X_FONT_DEBUG_RENDER
