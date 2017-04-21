@@ -48,10 +48,10 @@ public:
 	int32_t			cacheSlot;
 	wchar_t			currentChar;
 
-	uint8_t			charWidth;					// size in pixel
+	uint8_t			charWidth;				// size in pixel
 	uint8_t			charHeight;				// size in pixel
-	int8_t			charOffsetX;
-	int8_t			charOffsetY;
+	uint8_t			charOffsetX;
+	uint8_t			charOffsetY;
 
 	XGlyphBitmap	glyphBitmap;
 };

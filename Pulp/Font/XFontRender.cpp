@@ -72,12 +72,12 @@ bool XFontRender::Release(void)
 }
 
 
-bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
-	int8_t& charOffsetX, int8_t& charOffsetY, int32_t iX, int32_t iY, int32_t charCode)
+bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
+	uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode)
 { 
 	int32_t err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
 	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error: \"%s\"", err, charCode, errToStr(err));
+		X_ERROR("Font", "Failed to render glyp for char: '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
 		return false;
 	}
 
@@ -85,43 +85,69 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 
 	err = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
 	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error: \"%s\"", err, charCode, errToStr(err));
+		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
 		return false;
 	}
 
+
+	charOffsetX = safe_static_cast<uint8_t>(pGlyph_->bitmap_left);
+	charOffsetY = safe_static_cast<uint8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
+
+	auto& buffer = glyphBitmap.GetBuffer();
+	const uint32 dstGlyphWidth = glyphBitmap.GetWidth();
+	const uint32 dstGlyphHeight = glyphBitmap.GetHeight();
+	const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
+
+	// does the bitmap fit into the dest are the requested offset?
+	if (dstGlyphWidth < (pGlyph_->bitmap.width + destOffsetX) || dstGlyphHeight < (pGlyph_->bitmap.rows + destOffsetY))
+	{
+		if (destOffsetX || destOffsetY)
+		{
+			X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap at offsets %" PRIi32 ", %" PRIi32 ", clipping.",
+				charCode, destOffsetX, destOffsetY);
+		}
+		else
+		{
+			X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap clipping.",charCode);
+		}
+	}
+
+
 	if (pGlyphWidth) {
-		*pGlyphWidth = safe_static_cast<uint8_t, int32_t>(pGlyph_->bitmap.width);
+		auto cappedWidth = core::Min(dstGlyphWidth, pGlyph_->bitmap.width);
+		*pGlyphWidth = safe_static_cast<uint8_t>(cappedWidth);
 	}
 	if (pGlyphHeight) {
-		*pGlyphHeight = safe_static_cast<uint8_t, int32_t>(pGlyph_->bitmap.rows);
+		auto cappedHeight = core::Min(dstGlyphHeight, pGlyph_->bitmap.rows);
+		*pGlyphHeight = safe_static_cast<uint8_t>(cappedHeight);
 	}
 
-	charOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
-	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
-
-	auto& buffer = pGlyphBitmap->GetBuffer();
-	uint32 glyphWidth = pGlyphBitmap->GetWidth();
-
-	for (uint32_t i = 0; i < pGlyph_->bitmap.rows; i++)
+	for (uint32_t row = 0; row < pGlyph_->bitmap.rows; row++)
 	{
-		const int32_t newY = i + iY;
+		const int32_t dstY = row + destOffsetY;
 
-		for (uint32_t j = 0; j < pGlyph_->bitmap.width; j++)
+		for (uint32_t col = 0; col < pGlyph_->bitmap.width; col++)
 		{
-			uint8_t	color =		pGlyph_->bitmap.buffer[(i * pGlyph_->bitmap.width) + j];
-			int32_t				offset = newY * glyphWidth + iX + j;
+			const int32_t dstX = col + destOffsetX;
+			const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
 
-			if (offset >= static_cast<int32_t>(glyphWidth * glyphBitmapHeight_)) {
+			const int32_t srcOffset = (row * pGlyph_->bitmap.width) + col;
+			const uint8_t srcColor = pGlyph_->bitmap.buffer[srcOffset];
+
+			// overflow.
+			if (dstOffset >= static_cast<int32_t>(buffer.size())) {
 				continue;
 			}
 
 #if X_FONT_DEBUG_RENDER
-			buffer[offset] = color / 2 + 64;
+			buffer[dstOffset] = srcColor / 2 + 64;
 #else
-			buffer[offset] = color;
+			buffer[dstOffset] = srcColor;
 #endif // !X_FONT_DEBUG_RENDER
 		}
 	}
+
+
 
 	return true;
 }
