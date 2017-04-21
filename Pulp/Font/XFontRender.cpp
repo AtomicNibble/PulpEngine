@@ -73,7 +73,7 @@ bool XFontRender::Release(void)
 
 
 bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
-	uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode)
+	uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode, bool debugRender)
 { 
 	int32_t err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
 	if (err) {
@@ -129,11 +129,13 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 				continue;
 			}
 
-#if X_FONT_DEBUG_RENDER
-			buffer[dstOffset] = srcColor / 2 + 64;
-#else
 			buffer[dstOffset] = srcColor;
-#endif // !X_FONT_DEBUG_RENDER
+		}
+	}
+
+	if (debugRender) {
+		for (auto& p : buffer) {
+			p = p / 2 + 64;
 		}
 	}
 

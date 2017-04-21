@@ -11,8 +11,6 @@
 
 X_NAMESPACE_BEGIN(font)
 
-#define X_FONT_DEBUG_RENDER 0
-
 
 class XGlyphBitmap;
 
@@ -30,7 +28,7 @@ public:
 	bool Release(void); 
 
 	bool GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 
-		uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode);
+		uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode, bool debugRender = false);
 
 	X_INLINE bool ValidFace(void) const;
 

@@ -187,7 +187,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		scaleBitmap_->Clear();
 
 		if (!fontRenderer_.GetGlyph(*scaleBitmap_.ptr(), &pSlot->charWidth, &pSlot->charHeight,
-				pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
+				pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar, vars_.glyphCacheDebugRender()))
 		{
 			// failed to render
 			return false;
@@ -210,7 +210,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	else
 	{
 		if (!fontRenderer_.GetGlyph(pSlot->glyphBitmap, &pSlot->charWidth, &pSlot->charHeight,
-			pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
+			pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar, vars_.glyphCacheDebugRender()))
 		{
 			// failed to render
 			return false;
