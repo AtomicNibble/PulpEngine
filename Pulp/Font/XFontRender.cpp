@@ -90,9 +90,6 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 	}
 
 
-	charOffsetX = safe_static_cast<uint8_t>(pGlyph_->bitmap_left);
-	charOffsetY = safe_static_cast<uint8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
-
 	auto& buffer = glyphBitmap.GetBuffer();
 	const uint32 dstGlyphWidth = glyphBitmap.GetWidth();
 	const uint32 dstGlyphHeight = glyphBitmap.GetHeight();
@@ -112,26 +109,19 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 		}
 	}
 
+	const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph_->bitmap.width);
+	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph_->bitmap.rows);
 
-	if (pGlyphWidth) {
-		auto cappedWidth = core::Min(dstGlyphWidth, pGlyph_->bitmap.width);
-		*pGlyphWidth = safe_static_cast<uint8_t>(cappedWidth);
-	}
-	if (pGlyphHeight) {
-		auto cappedHeight = core::Min(dstGlyphHeight, pGlyph_->bitmap.rows);
-		*pGlyphHeight = safe_static_cast<uint8_t>(cappedHeight);
-	}
-
-	for (uint32_t row = 0; row < pGlyph_->bitmap.rows; row++)
+	for (uint32_t row = 0; row < rowsToCopy; row++)
 	{
 		const int32_t dstY = row + destOffsetY;
 
-		for (uint32_t col = 0; col < pGlyph_->bitmap.width; col++)
+		for (uint32_t colum = 0; colum < colsToCopy; colum++)
 		{
-			const int32_t dstX = col + destOffsetX;
+			const int32_t dstX = colum + destOffsetX;
 			const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
 
-			const int32_t srcOffset = (row * pGlyph_->bitmap.width) + col;
+			const int32_t srcOffset = (row * pGlyph_->bitmap.pitch) + colum;
 			const uint8_t srcColor = pGlyph_->bitmap.buffer[srcOffset];
 
 			// overflow.
@@ -147,7 +137,15 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 		}
 	}
 
+	charOffsetX = safe_static_cast<uint8_t>(pGlyph_->bitmap_left);
+	charOffsetY = safe_static_cast<uint8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
+	if (pGlyphWidth) {
+		*pGlyphWidth = safe_static_cast<uint8_t>(colsToCopy);
+	}
+	if (pGlyphHeight) {
+		*pGlyphHeight = safe_static_cast<uint8_t>(rowsToCopy);
+	}
 
 	return true;
 }
