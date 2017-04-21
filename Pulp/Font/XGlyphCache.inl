@@ -18,6 +18,10 @@ X_INLINE FontEncoding::Enum XGlyphCache::GetEncoding(void) const
 	return fontRenderer_.GetEncoding();
 }
 
+X_INLINE const Metrics& XGlyphCache::GetMetrics(void) const
+{
+	return fontRenderer_.GetMetrics();
+}
 
 
 X_NAMESPACE_END

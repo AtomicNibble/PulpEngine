@@ -26,5 +26,10 @@ X_INLINE FontEncoding::Enum XFontRender::GetEncoding(void) const
 	return encoding_;
 }
 
+X_INLINE const Metrics& XFontRender::GetMetrics(void) const
+{
+	return metrics_;
+}
+
 
 X_NAMESPACE_END

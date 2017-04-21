@@ -156,7 +156,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	X_ASSERT(cacheTable_.find(cChar) == cacheTable_.end(), "Precache caleed when already in cache")();
 
 	// get the Least recently used Slot
-	XCacheSlot* pSlot = GetLRUSlot();
+	XGlyph* pSlot = GetLRUSlot();
 	if (!pSlot)
 	{
 		X_WARNING("Font", "failed to find a free slot for: %i", cChar);
@@ -188,8 +188,8 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 
 		scaleBitmap_->Clear();
 
-		if (!fontRenderer_.GetGlyph(*scaleBitmap_.ptr(), &pSlot->charWidth, &pSlot->charHeight,
-				pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
+		X_ASSERT_NOT_NULL(pSlot);
+		if (!fontRenderer_.GetGlyph(*pSlot, 0, 0, cChar))
 		{
 			// failed to render
 			return false;
@@ -211,8 +211,8 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	}
 	else
 	{
-		if (!fontRenderer_.GetGlyph(pSlot->glyphBitmap, &pSlot->charWidth, &pSlot->charHeight,
-			pSlot->charOffsetX, pSlot->charOffsetY, 0, 0, cChar))
+		X_ASSERT_NOT_NULL(pSlot);
+		if (!fontRenderer_.GetGlyph(*pSlot, 0, 0, cChar))
 		{
 			// failed to render
 			return false;
@@ -238,7 +238,6 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	}
 
 	pSlot->usage = usage_;
-	pSlot->currentChar = cChar;
 
 	cacheTable_.insert(std::make_pair(cChar, pSlot));
 	return true;
@@ -250,7 +249,7 @@ bool XGlyphCache::UnCacheGlyph(wchar_t cChar)
 
 	if (pItor != cacheTable_.end())
 	{
-		XCacheSlot* pSlot = pItor->second;
+		XGlyph* pSlot = pItor->second;
 		pSlot->reset();
 		cacheTable_.erase(pItor);
 		return true;
@@ -266,9 +265,9 @@ bool XGlyphCache::GlyphCached(wchar_t cChar)
 
 //------------------------------------------------------------------------------------------------- 
 
-XCacheSlot* XGlyphCache::GetLRUSlot(void)
+XGlyph* XGlyphCache::GetLRUSlot(void)
 {
-	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot& s1, const XCacheSlot& s2) {
+	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XGlyph& s1, const XGlyph& s2) {
 		return s1.usage < s2.usage;
 	});
 
@@ -278,9 +277,9 @@ XCacheSlot* XGlyphCache::GetLRUSlot(void)
 
 //------------------------------------------------------------------------------------------------- 
 
-XCacheSlot* XGlyphCache::GetMRUSlot(void)
+XGlyph* XGlyphCache::GetMRUSlot(void)
 {
-	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XCacheSlot& s1, const XCacheSlot& s2) {
+	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XGlyph& s1, const XGlyph& s2) {
 		return s1.usage < s2.usage;
 	});
 
@@ -290,8 +289,7 @@ XCacheSlot* XGlyphCache::GetMRUSlot(void)
 
 //------------------------------------------------------------------------------------------------- 
 
-bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* pHeight,
-	int8_t& charOffsetX, int8_t& charOffsetY, wchar_t cChar)
+XGlyphBitmap* XGlyphCache::GetGlyph(uint8_t& width, uint8_t& height, uint8_t& charOffsetX, uint8_t& charOffsetY, wchar_t cChar)
 {
 	// glyph already chached?
 	XCacheTable::iterator pItor = cacheTable_.find(cChar);
@@ -300,7 +298,7 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* p
 		if (!PreCacheGlyph(cChar))
 		{
 			X_ERROR("Font", "Failed to cache glyph for char: '%lc'", cChar);
-			return false;
+			return nullptr;
 		}
 
 		pItor = cacheTable_.find(cChar);
@@ -310,21 +308,14 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap*& pGlyphOut, int32_t* pWidth, int32_t* p
 	X_ASSERT_NOT_NULL(pItor->second);
 	auto* pGlyph = pItor->second;
 
+	// update usage for LRU
 	pGlyph->usage = usage_++;
 
-	pGlyphOut = &pGlyph->glyphBitmap;
-
-	if (pWidth) {
-		*pWidth = pGlyph->charWidth;
-	}
-
-	if (pHeight) {
-		*pHeight = pGlyph->charHeight;
-	}
-
+	width = pGlyph->charWidth;
+	height = pGlyph->charHeight;
 	charOffsetX = pGlyph->charOffsetX;
 	charOffsetY = pGlyph->charOffsetY;
-	return true;
+	return &pGlyph->glyphBitmap;
 }
 
 //------------------------------------------------------------------------------------------------- 
@@ -335,7 +326,7 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 
 	for (size_t i = 0; i < listSize; i++)
 	{
-		XCacheSlot& slot = slotList_[i];
+		XGlyph& slot = slotList_[i];
 		if (!slot.glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
 		{
 			return false;

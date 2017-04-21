@@ -359,39 +359,28 @@ bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cCh
 	pSlot->currentChar = cChar;
 
 
-	// blit the char glyph into the texture
-	const int32_t x = pSlot->textureSlot % widthCellCount_;
-	const int32_t y = pSlot->textureSlot / widthCellCount_;
+	XGlyphBitmap* pGlyphBitmap = glyphCache_.GetGlyph(pSlot->charWidth, pSlot->charHeight,
+		pSlot->charOffsetX, pSlot->charOffsetY, cChar);
 
-	int32_t width = 0;
-	int32_t height = 0;
-
-	XGlyphBitmap* pGlyphBitmap = nullptr;
-
-	if (!glyphCache_.GetGlyph(pGlyphBitmap,
-		&width, &height,
-		pSlot->charOffsetX, pSlot->charOffsetY,
-		cChar)) 
+	if(!pGlyphBitmap)
 	{
 		X_ERROR("Font", "Failed to get glyph for char: '%lc'", cChar);
 		return false;
 	}
 
-	X_ASSERT_NOT_NULL(pGlyphBitmap);
-
-	pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(width);
-	pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(height);
+	const int32_t slotBufferX = pSlot->textureSlot % widthCellCount_;
+	const int32_t slotBufferY = pSlot->textureSlot / widthCellCount_;
 
 	// blit the glyp to my buffer
 	pGlyphBitmap->BlitTo8(
 		textureBuffer_.ptr(),
-		0, // srcX
-		0, // srcY
-		width, // srcWidth
-		height,  // srcHeight
-		x * cellWidth_, // destx
-		y * cellHeight_, // desy
-		width_ // destWidth / stride
+		0,					// srcX
+		0,					// srcY
+		pSlot->charWidth,	// srcWidth
+		pSlot->charHeight,	// srcHeight
+		slotBufferX * cellWidth_,		// destx
+		slotBufferY * cellHeight_,	// desy
+		width_				// destWidth / stride
 	);
 
 	return true;

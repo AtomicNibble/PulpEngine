@@ -43,8 +43,8 @@ struct XTextureSlot
 	float		texCoord[2];		// character position in the texture (not yet half texel corrected)
 	uint8_t		charWidth;			// size in pixel
 	uint8_t		charHeight;			// size in pixel
-	int8_t		charOffsetX;
-	int8_t		charOffsetY;
+	uint8_t		charOffsetX;
+	uint8_t		charOffsetY;
 
 	X_INLINE void reset(void)
 	{
@@ -122,6 +122,8 @@ public:
 
 	X_INLINE int32_t GetSlotUsage(void);
 	X_INLINE int32_t GetCacheMisses(void);
+
+	X_INLINE const Metrics& GetMetrics(void) const;
 
 	wchar_t GetSlotChar(int32_t slot) const;
 	XTextureSlot* GetCharSlot(wchar_t cChar);

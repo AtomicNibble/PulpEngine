@@ -63,4 +63,10 @@ X_INLINE int32_t XFontTexture::GetCacheMisses(void)
 	return cacheMisses_;
 }
 
+X_INLINE const Metrics& XFontTexture::GetMetrics(void) const
+{
+	return glyphCache_.GetMetrics();
+}
+
+
 X_NAMESPACE_END

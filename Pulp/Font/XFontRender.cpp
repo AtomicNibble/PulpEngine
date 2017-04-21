@@ -1,14 +1,12 @@
 #include "stdafx.h"
 #include "XFontRender.h"
-#include "XGlyphBitmap.h"
-
+#include "XFontGlyph.h"
 
 X_NAMESPACE_BEGIN(font)
 
 XFontRender::XFontRender() : 
-	pLibrary_(0),
-	pFace_(0),
-	pGlyph_(0), 
+	pLibrary_(nullptr),
+	pFace_(nullptr),
 	encoding_(FontEncoding::Unicode),
 	debugRender_(false),
 	sizeRatio_(0.8f),
@@ -73,31 +71,60 @@ bool XFontRender::Release(void)
 }
 
 
-bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
-	uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode)
+bool XFontRender::GetGlyph(XGlyph& glphy,
+	
+	// XGlyphBitmap& glyphBitmap, uint8& glyphWidth, uint8& glyphHeight,
+	// uint8_t& charOffsetX, uint8_t& charOffsetY, 
+	int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode)
 { 
-	int32_t err = FT_Load_Char(pFace_, charCode, FT_LOAD_DEFAULT);
+	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
 	if (err) {
 		X_ERROR("Font", "Failed to render glyp for char: '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
 		return false;
 	}
 
-	pGlyph_ = pFace_->glyph;
+	FT_GlyphSlot pGlyph = pFace_->glyph;
 
-	err = FT_Render_Glyph(pGlyph_, FT_RENDER_MODE_NORMAL);
+	err = FT_Render_Glyph(pGlyph, FT_RENDER_MODE_NORMAL);
 	if (err) {
 		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
 		return false;
 	}
 
 
-	auto& buffer = glyphBitmap.GetBuffer();
-	const uint32 dstGlyphWidth = glyphBitmap.GetWidth();
-	const uint32 dstGlyphHeight = glyphBitmap.GetHeight();
+	auto& buffer = glphy.glyphBitmap.GetBuffer();
+	const uint32 dstGlyphWidth = glphy.glyphBitmap.GetWidth();
+	const uint32 dstGlyphHeight = glphy.glyphBitmap.GetHeight();
 	const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
 
+#if X_DEBUG
+
+	// make sure we not relying on zero initialize.
+	// since i only copy pixels i have.
+	std::memset(buffer.data(), 0xFF, buffer.size());
+
+	// some sanity checks for my understanding of FreeType.
+	{
+		const auto& sizeInfo = pFace_->size->metrics;
+
+		// the top of a font should not be above a ascender.
+		X_ASSERT(pGlyph->bitmap_top <= (sizeInfo.ascender / 64) + 1, "Unxpected bitmap top")(sizeInfo.ascender, sizeInfo.ascender / 64, pGlyph->bitmap_top);
+		// the top + height should not be lowest than descender.
+		// aka if we have 64height with a top of 1 and 5 rows.
+		// we have a descender of -4
+		const auto bitmapBottom = pGlyph->bitmap_top - safe_static_cast<int32_t>(pGlyph->bitmap.rows);
+		X_ASSERT(bitmapBottom >= (sizeInfo.descender / 64) - 1, "Bitmap end is lower than descender")(sizeInfo.descender, sizeInfo.descender / 64, bitmapBottom);
+		
+		// check advance
+		const auto advance = pGlyph->advance;
+		X_ASSERT(advance.x <= static_cast<float>(sizeInfo.max_advance + 64), "Advance was greater than expected")(sizeInfo.max_advance, pGlyph->advance);
+		// is the width + left less than max_advance?
+	}
+
+#endif // !X_DEBUG
+
 	// does the bitmap fit into the dest are the requested offset?
-	if (dstGlyphWidth < (pGlyph_->bitmap.width + destOffsetX) || dstGlyphHeight < (pGlyph_->bitmap.rows + destOffsetY))
+	if (dstGlyphWidth < (pGlyph->bitmap.width + destOffsetX) || dstGlyphHeight < (pGlyph->bitmap.rows + destOffsetY))
 	{
 		if (destOffsetX || destOffsetY)
 		{
@@ -110,8 +137,8 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 		}
 	}
 
-	const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph_->bitmap.width);
-	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph_->bitmap.rows);
+	const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph->bitmap.width);
+	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph->bitmap.rows);
 
 	for (uint32_t row = 0; row < rowsToCopy; row++)
 	{
@@ -122,8 +149,8 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 			const int32_t dstX = colum + destOffsetX;
 			const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
 
-			const int32_t srcOffset = (row * pGlyph_->bitmap.pitch) + colum;
-			const uint8_t srcColor = pGlyph_->bitmap.buffer[srcOffset];
+			const int32_t srcOffset = (row * pGlyph->bitmap.pitch) + colum;
+			const uint8_t srcColor = pGlyph->bitmap.buffer[srcOffset];
 
 			// overflow.
 			if (dstOffset >= static_cast<int32_t>(buffer.size())) {
@@ -140,16 +167,17 @@ bool XFontRender::GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8*
 		}
 	}
 
-	charOffsetX = safe_static_cast<uint8_t>(pGlyph_->bitmap_left);
-	charOffsetY = safe_static_cast<uint8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
-	if (pGlyphWidth) {
-		*pGlyphWidth = safe_static_cast<uint8_t>(colsToCopy);
-	}
-	if (pGlyphHeight) {
-		*pGlyphHeight = safe_static_cast<uint8_t>(rowsToCopy);
-	}
+	// the top is like from the pen.
+	// so in order to make this a Y offset it's the size minus top.
+	const auto offsetY = static_cast<uint32_t>(glyphBitmapHeight_ - pGlyph->bitmap_top);
 
+	glphy.currentChar = charCode;
+	glphy.advance = safe_static_cast<uint16_t>(pGlyph->advance.x / 64);
+	glphy.charOffsetX = safe_static_cast<uint8_t>(pGlyph->bitmap_left);
+	glphy.charOffsetY = safe_static_cast<uint8_t>(offsetY);
+	glphy.charWidth = safe_static_cast<uint8_t>(colsToCopy);
+	glphy.charHeight = safe_static_cast<uint8_t>(rowsToCopy);
 	return true;
 }
 
@@ -188,7 +216,7 @@ bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio)
 {
 	X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")(width, height);
-	X_ASSERT(sizeRatio <= 1.f, "Size ration can't be greater than 1.f")(sizeRatio);
+	X_ASSERT(sizeRatio > 0.f && sizeRatio <= 1.f, "Size ratio invalid")(sizeRatio);
 
 	sizeRatio_ = sizeRatio;
 	glyphBitmapWidth_ = width;
@@ -199,6 +227,10 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRa
 		static_cast<int32_t>(glyphBitmapWidth_ * sizeRatio_),
 		static_cast<int32_t>(glyphBitmapHeight_ * sizeRatio_)
 	);
+
+	metrics_.ascender = pFace_->size->metrics.ascender / 64;
+	metrics_.descender = pFace_->size->metrics.descender / 64;
+	metrics_.max_advance = pFace_->size->metrics.max_advance / 64;
 
 	if (err)
 	{

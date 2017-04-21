@@ -12,7 +12,7 @@
 X_NAMESPACE_BEGIN(font)
 
 
-class XGlyphBitmap;
+struct XGlyph;
 
 // uses free type to render glyphs for a font.
 class XFontRender
@@ -27,8 +27,7 @@ public:
 	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
 	bool Release(void); 
 
-	bool GetGlyph(XGlyphBitmap& glyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 
-		uint8_t& charOffsetX, uint8_t& charOffsetY, int32_t destOffsetX, int32_t destOffsetY, int32_t charCode);
+	bool GetGlyph(XGlyph& glphy, int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode);
 
 	X_INLINE bool ValidFace(void) const;
 	X_INLINE void EnabledDebugRender(bool enable);
@@ -43,6 +42,7 @@ public:
 	void SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio);
 	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
+	X_INLINE const Metrics& GetMetrics(void) const;
 
 private:
 	static const char* errToStr(FT_Error err);
@@ -53,7 +53,6 @@ private:
 
 	FT_Library		pLibrary_;
 	FT_Face			pFace_;
-	FT_GlyphSlot	pGlyph_;
 	FontEncoding::Enum encoding_;
 
 	bool			debugRender_;
@@ -61,6 +60,8 @@ private:
 
 	int32_t			glyphBitmapWidth_;
 	int32_t			glyphBitmapHeight_;
+
+	Metrics			metrics_;
 };
 
 
