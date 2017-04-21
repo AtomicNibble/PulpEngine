@@ -6,14 +6,14 @@ X_INLINE bool XFontRender::ValidFace(void) const
 	return pFace_ != nullptr;
 }
 
-X_INLINE void XFontRender::SetSizeRatio(float fSizeRatio)
+X_INLINE void XFontRender::SetSizeRatio(float sizeRatio)
 { 
-	fSizeRatio_ = fSizeRatio; 
+	sizeRatio_ = sizeRatio;
 }
 
 X_INLINE float XFontRender::GetSizeRatio(void) const 
 { 
-	return fSizeRatio_; 
+	return sizeRatio_;
 }
 
 X_INLINE FontEncoding::Enum XFontRender::GetEncoding(void) const

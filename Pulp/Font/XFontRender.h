@@ -35,13 +35,13 @@ public:
 	X_INLINE bool ValidFace(void) const;
 
 	// scale the glyphs.
-	X_INLINE void SetSizeRatio(float fSizeRatio);
+	X_INLINE void SetSizeRatio(float sizeRatio);
 	X_INLINE float GetSizeRatio(void) const;
 	
 	bool SetEncoding(FontEncoding::Enum encoding);
 	X_INLINE FontEncoding::Enum GetEncoding(void) const;
 
-	void SetGlyphBitmapSize(int32_t width, int32_t height);
+	void SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio);
 	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
 
@@ -57,7 +57,7 @@ private:
 	FT_GlyphSlot	pGlyph_;
 	FontEncoding::Enum encoding_;
 
-	float			fSizeRatio_;
+	float			sizeRatio_;
 
 	int32_t			glyphBitmapWidth_;
 	int32_t			glyphBitmapHeight_;

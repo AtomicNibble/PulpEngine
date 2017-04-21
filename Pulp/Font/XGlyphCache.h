@@ -75,7 +75,7 @@ public:
 	X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
 	X_INLINE FontEncoding::Enum GetEncoding(void) const;
 
-	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
+	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding, float sizeRatio = 0.875f);
 	bool LoadGlyphSource(const SourceNameStr& name, bool async);
 
 	bool Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight);

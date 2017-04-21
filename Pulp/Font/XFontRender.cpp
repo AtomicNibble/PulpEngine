@@ -10,7 +10,7 @@ XFontRender::XFontRender() :
 	pFace_(0),
 	pGlyph_(0), 
 	encoding_(FontEncoding::Unicode),
-	fSizeRatio_(0.8f),
+	sizeRatio_(0.8f),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
 	data_(g_fontArena)
@@ -97,7 +97,7 @@ bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8
 	}
 
 	charOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
-	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
+	charOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(glyphBitmapHeight_ * sizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
 	uint8_t* pBuffer = pGlyphBitmap->GetBuffer();
 	uint32 glyphWidth = pGlyphBitmap->GetWidth();
@@ -158,17 +158,18 @@ bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 }
 
 
-void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
+void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio)
 {
 	X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")(width, height);
 
+	sizeRatio_ = sizeRatio;
 	glyphBitmapWidth_ = width;
 	glyphBitmapHeight_ = height;
 
 	const int32_t err = FT_Set_Pixel_Sizes(
 		pFace_,
-		static_cast<int32_t>(glyphBitmapWidth_ * fSizeRatio_),
-		static_cast<int32_t>(glyphBitmapHeight_ * fSizeRatio_)
+		static_cast<int32_t>(glyphBitmapWidth_ * sizeRatio_),
+		static_cast<int32_t>(glyphBitmapHeight_ * sizeRatio_)
 	);
 
 	if (err)

@@ -32,18 +32,19 @@ XGlyphCache::~XGlyphCache()
 
 }
 
-bool XGlyphCache::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding)
+bool XGlyphCache::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding, float sizeRatio)
 {
 	if (!fontRenderer_.SetRawFontBuffer(std::move(data), length, encoding)) {
 		X_ERROR("Font", "Error setting up font renderer");
 		return false;
 	}
 
+
 	if (scaledGlyphWidth_) {
-		fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_);
+		fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_, sizeRatio);
 	}
 	else {
-		fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_);
+		fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_, sizeRatio);
 	}
 
 	if (vars_.glyphCachePreWarm()) {
