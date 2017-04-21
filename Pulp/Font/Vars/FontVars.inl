@@ -17,6 +17,12 @@ X_INLINE bool FontVars::glyphCacheDebugRender(void) const
 	return glyphDebugRender_ != 0;
 }
 
+X_INLINE bool FontVars::glyphDebugRect(void) const
+{
+	return glyphDebugRect_ != 0;
+}
+
+
 X_INLINE FontSmooth::Enum FontVars::fontSmoothMethod(void) const
 {
 	X_ASSERT(fontSmoothingMethod_ >= 0 && fontSmoothingMethod_ < FontSmooth::ENUM_COUNT, "Var out of range")(fontSmoothingMethod_);

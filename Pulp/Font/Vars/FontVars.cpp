@@ -12,6 +12,8 @@ FontVars::FontVars()
 	glyphCachePreWarm_ = 1;
 	glyphDebugRender_ = 1;
 
+	glyphDebugRect_ = 0;
+
 	fontSmoothingMethod_ = 0;
 	fontSmoothingAmount_ = 0;
 }
@@ -31,6 +33,11 @@ void FontVars::registerVars(void)
 	ADD_CVAR_REF("font_glyph_debug_render", glyphDebugRender_, glyphDebugRender_, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Alter the glyphs to have color offset so the shape of the glyph is visible");
+
+	ADD_CVAR_REF("font_glyph_debug_rect", glyphDebugRect_, glyphDebugRect_, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Draw a bounding rect around each glyph");
+
 
 	ADD_CVAR_REF("font_glyph_smoothing", fontSmoothingMethod_, FontSmooth::NONE, 0, FontSmooth::ENUM_COUNT,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
