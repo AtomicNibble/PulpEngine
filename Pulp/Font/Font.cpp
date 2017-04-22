@@ -264,9 +264,11 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	Prepare(pBegin, pEnd);
 
 
-	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 	const bool isProportional = flags_.IsSet(FontFlag::PROPORTIONAL);
+	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
+	const bool shiftedPosition = (ctx.flags & (DrawTextFlag::CENTER | DrawTextFlag::CENTER_VER | DrawTextFlag::RIGHT)).IsAnySet();
 	const bool debugRect = fontSys_.getVars().glyphDebugRect();
+	const bool debugPos = fontSys_.getVars().debugShowDrawPosition();
 	const auto effecIdx = ctx.GetEffectId();
 
 
@@ -281,6 +283,35 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const float verAdvance = ctx.size.y;
 
 
+	Vec2f textSize = Vec2f::zero();	
+	Vec2f baseXY(pos.x, pos.y);
+
+	if (debugPos)
+	{
+		pPrimCon->drawwCrosshair(Vec3f(baseXY), 10, Col_Red);
+	}
+
+	if (shiftedPosition)
+	{
+		textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
+
+		if (ctx.flags.IsSet(DrawTextFlag::RIGHT))
+		{
+			baseXY.x -= textSize.x;
+		}
+		else if (ctx.flags.IsSet(DrawTextFlag::CENTER))
+		{
+			baseXY.x -= (textSize.x / 2.f);
+		}
+
+ 		if (ctx.flags.IsSet(DrawTextFlag::CENTER_VER))
+		{
+			baseXY.y -= (textSize.y / 2.f);
+		}
+	}
+
+
+
 	FontEffect& effect = effects_[effecIdx];
 	for (auto passIdx = 0u; passIdx < effect.passes.size(); passIdx++)
 	{
@@ -289,17 +320,17 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		Color8u col = ctx.col;
 
 		float z = pos.z;
-		float charX = pos.x + pass.offset.x;
-		float charY = pos.y + pass.offset.y;
+		float charX = baseXY.x + pass.offset.x;
+		float charY = baseXY.y + pass.offset.y;
 
-		// inc pass offset in this?
-		const Vec2f baseXY(pos.x, pos.y);
 
 		if (drawFrame && passIdx == 0)
 		{
-			Vec2f textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
-			Vec2f baseOffset;
+			if (!shiftedPosition) {
+				textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
+			}
 
+			Vec2f baseOffset;
 			if (ctx.flags.IsSet(DrawTextFlag::FRAMED_SNUG)) {
 				baseOffset.y = verBase;
 			}
