@@ -259,7 +259,7 @@ void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col
 
 	PrimVertex* pLine = addPrimative(num, PrimitiveType::LINELIST);
 
-	for (uint32_t i = 0; i < num / 2; i++)
+	for (uint32_t i = 0; i < num; i += 2)
 	{
 		pLine[i].pos = pPoints[i];
 		pLine[i].color = col;
