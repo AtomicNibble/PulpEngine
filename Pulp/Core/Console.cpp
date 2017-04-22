@@ -165,7 +165,7 @@ namespace
 
 
 
-	const int32_t CONSOLE_INPUT_FONT_SIZE = 20;
+	const int32_t CONSOLE_INPUT_FONT_SIZE = 18;
 	const int32_t CONSOLE_DEFAULT_LOG_FONT_SIZE = 14;
 
 	const float CONSOLE_INPUT_LINE_HIEGHT = 1.1f;
