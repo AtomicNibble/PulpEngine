@@ -882,7 +882,7 @@ void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, const Co
 		posB, posB - t0 * 0.15f - t2 * 0.15f
 	};
 
-	drawLines(points, 10, color);
+	drawLines(points, X_ARRAY_SIZE(points), color);
 }
 
 
