@@ -547,19 +547,6 @@ bool XFontTexture::WriteToFile(const char* filename)
 //-------------------------------------------------------------------------------------------------
 
 
-int32_t XFontTexture::GetCharacterWidth(wchar_t cChar) const
-{
-	XTextureSlotTableItorConst pItor = slotTable_.find(cChar);
-	if (pItor == slotTable_.end()) {
-		X_WARNING("Font", "Failed to find char for width lookup. char: '%lc'", cChar);
-		return 0;
-	}
-
-	const XTextureSlot &rSlot = *pItor->second;
-
-	return rSlot.charWidth + 1; // extra pixel for nicer bilinear filter
-}
-
 void XFontTexture::GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const
 {
 	if (!pSlot) {

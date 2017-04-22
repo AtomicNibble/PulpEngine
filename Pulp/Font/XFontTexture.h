@@ -109,7 +109,6 @@ public:
 	// pUpdated is the number of slots updated
 	CacheResult::Enum PreCacheString(const wchar_t* pBegin, const wchar_t* pEnd, int32_t* pUpdatedOut = nullptr);
 
-	int32_t GetCharacterWidth(wchar_t cChar) const;
 	void GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const;
 
 	X_INLINE const SourceNameStr& GetName(void) const;
