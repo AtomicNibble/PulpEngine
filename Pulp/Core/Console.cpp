@@ -2683,12 +2683,15 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				
 				for (int idx = 0; resIt != results.end(); ++resIt, idx++)
 				{
-					if (autoCompleteIdx_ >= 0 && autoCompleteIdx_ == idx)
+					if (autoCompleteIdx_ >= 0 && autoCompleteIdx_ == idx) {
 						ctx.SetColor(Col_Darkturquoise);
-					else if (resIt->var)
+					}
+					else if (resIt->var) {
 						ctx.SetColor(Col_Whitesmoke);
-					else
+					}
+					else {
 						ctx.SetColor(Col_Darkblue);
+					}
 
 					pPrimContext_->drawText(xpos, ypos, ctx, resIt->pName);
 
