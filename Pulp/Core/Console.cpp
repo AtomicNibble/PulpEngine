@@ -2204,9 +2204,8 @@ void XConsole::DrawBuffer(void)
 				static_cast<float>(console_output_font_size),
 				static_cast<float>(console_output_font_size))
 			);
-		//	ctx.SetCharWidthScale(console_output_width_scale); // 0.75f);
 
-			float fCharHeight =  ctx.GetCharHeight();
+			float fCharHeight =  ctx.GetCharHeight() * console_output_font_line_height;
 
 			float xPos = 8;
 			float yPos = (height + yStart) - (fCharHeight + 10); // 15 uints up
