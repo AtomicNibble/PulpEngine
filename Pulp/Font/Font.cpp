@@ -267,11 +267,13 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 
 		if (drawFrame && passIdx == 0)
 		{
+			Vec2f textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
 			Vec2f baseOffset;
-			Vec2f textSize = GetTextSizeWInternal(pBegin, pEnd, ctx, &baseOffset);
 
-			if (!ctx.flags.IsSet(DrawTextFlag::FRAMED_SNUG)) {
-				baseOffset = Vec2f::zero();
+			if (ctx.flags.IsSet(DrawTextFlag::FRAMED_SNUG)) {
+				baseOffset.y = verBase;
+			}
+			else {
 				textSize.y = verAdvance;
 			}
 
@@ -452,7 +454,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 }
 
 
-Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& ctx, Vec2f* pBaseOffset)
+Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& ctx)
 {
 	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
 
@@ -464,12 +466,6 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
 	const float hozAdvance =  (metrics.max_advance * scaleX);
 	const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
-
-	// this is for doing a snugger vertical fit.
-	if (pBaseOffset) {
-		pBaseOffset->x = 0.f;
-		pBaseOffset->y = verBase;
-	}
 
 	// starting points.
 	float charX = 0;

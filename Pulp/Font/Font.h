@@ -90,7 +90,7 @@ private:
 	bool loadFontDef(bool async);
 
 private:
-	Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex, Vec2f* pBaseOffset = nullptr);
+	Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex);
 
 	bool CreateDeviceTexture(void);
 	void Prepare(const wchar_t* pBegin, const wchar_t* pEnd);
