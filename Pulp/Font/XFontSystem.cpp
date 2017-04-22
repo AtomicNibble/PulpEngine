@@ -206,8 +206,6 @@ void XFontSystem::releaseFontTexture(XFontTexture* pFontTex)
 		X_ERROR("Font", "Failed to find FontTexture for removal. name: \"%s\"", pFontTex->GetName().c_str());
 		return;
 	}
-
-
 }
 
 
@@ -215,18 +213,22 @@ void XFontSystem::releaseFontTexture(XFontTexture* pFontTex)
 void XFontSystem::ListFonts(void) const
 {
 	FontMapConstItor it = fonts_.begin();
+	FontFlags::Description FlagDesc;
 
 	X_LOG0("Fonts", "---------------- ^8Fonts^7 ----------------");
 	for (; it != fonts_.end(); ++it)
 	{
-		XFontTexture* pTex = it->second->getFontTexture();
-		if (pTex && pTex->IsReady()) {
-			X_LOG0("Fonts", "Name: %s, Size: (%" PRIi32 ",%" PRIi32 "), Usage: %" PRIi32 " CacheMiss: %" PRIi32, 
-				it->second->getName().c_str(),
+		XFont* pFont = it->second;
+		XFontTexture* pTex = pFont->getFontTexture();
+		if (pTex && pTex->IsReady()) 
+		{
+			X_LOG0("Fonts", "Name: \"%s\", Flags: \"%s\" Size: (%" PRIi32 ",%" PRIi32 "), Usage: %" PRIi32 " CacheMiss: %" PRIi32,
+				pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc),
 				pTex->GetWidth(), pTex->GetHeight(), pTex->GetSlotUsage(), pTex->GetCacheMisses());
 		}
-		else {
-			X_LOG0("Fonts", "Name: %s", it->second->getName().c_str());
+		else 
+		{
+			X_LOG0("Fonts", "Name: \"%s\" Flags: \"%s\"", pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc));
 		}
 	}
 	
