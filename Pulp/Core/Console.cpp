@@ -2141,16 +2141,21 @@ void XConsole::DrawBuffer(void)
 		return;
 	}
 
+
+	const Vec2f outputFontSize(static_cast<float>(console_output_font_size), static_cast<float>(console_output_font_size));
+	const Vec2f inputFontSize(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE));
+
+
 	font::XTextDrawConect ctx;
 	ctx.pFont = pFont_;
 	ctx.effectId = 0;
 	ctx.SetColor(Col_Khaki);
-	ctx.SetSize(Vec2f(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE)));
+	ctx.SetSize(inputFontSize);
 	ctx.SetCharWidthScale(1.0f);
+
 
 	Vec2f res;
 	res = pRender_->getDisplayRes();
-
 
 	const float xStart = 5.f;
 	const float yStart = 35.f;
@@ -2164,8 +2169,15 @@ void XConsole::DrawBuffer(void)
 		{
 			pPrimContext_->drawQuad(xStart, yStart, width, height, console_output_box_color, console_output_box_color_border);
 
-			if (console_output_draw_channel) {
-				pPrimContext_->drawQuad(xStart, yStart, 11.f * ctx.GetCharWidthScaled(), height, console_output_box_channel_color);
+			if (console_output_draw_channel) 
+			{
+				ctx.SetSize(outputFontSize);
+
+				const float32_t channelWidth = pFont_->GetCharWidth(L' ', 15, ctx);
+
+				pPrimContext_->drawQuad(xStart, yStart, channelWidth, height, console_output_box_channel_color);
+
+				ctx.SetSize(inputFontSize);
 			}
 
 			DrawScrollBar();
@@ -2199,11 +2211,7 @@ void XConsole::DrawBuffer(void)
 		// the log.
 		if (isExpanded())
 		{
-			ctx.SetColor(Col_White);
-			ctx.SetSize(Vec2f(// 12.f, 
-				static_cast<float>(console_output_font_size),
-				static_cast<float>(console_output_font_size))
-			);
+			ctx.SetSize(outputFontSize);
 
 			float fCharHeight =  ctx.GetCharHeight() * console_output_font_line_height;
 
@@ -2391,7 +2399,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		ctx.pFont = pFont_;
 		ctx.effectId = 0;
 		ctx.SetSize(Vec2f(14, 14));
-		ctx.SetCharWidthScale(0.65f);
+		ctx.SetCharWidthScale(1.0f);
 
 
 		// Autocomplete
