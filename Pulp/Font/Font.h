@@ -74,6 +74,7 @@ public:
 	void GetGradientTextureCoord(float& minU, float& minV, float& maxU, float& maxV) const;
 
 	X_INLINE const FontNameStr& getName(void) const;
+	X_INLINE FontFlags getFlags(void) const;
 	X_INLINE bool isDirty(void) const;
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
@@ -125,6 +126,11 @@ private:
 X_INLINE const FontNameStr& XFont::getName(void) const
 { 
 	return name_;
+}
+
+X_INLINE FontFlags XFont::getFlags(void) const
+{
+	return flags_;
 }
 
 X_INLINE bool XFont::isDirty(void) const
