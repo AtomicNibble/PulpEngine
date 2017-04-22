@@ -71,14 +71,13 @@ struct XTextDrawConect
 		pFont(nullptr)
 	{}
 
-	void Reset() { *this = XTextDrawConect(); }
-	void SetSize(const Vec2f& _size) { size = _size; }
-	void SetClip(const Rectf& rec) { clip = rec; }
-	void SetColor(const Colorf& _col) { col = _col; }
-	void SetColor(const Color8u& _col) { col = _col; }
-	void SetCharWidthScale(const float scale) { widthScale = scale; }
-	void SetEffectId(int32_t id) { effectId = id; }
-	void SetDefaultEffect(void) { effectId = 0; }
+	X_INLINE void SetSize(const Vec2f& _size) { size = _size; }
+	X_INLINE void SetClip(const Rectf& rec) { clip = rec; }
+	X_INLINE void SetColor(const Colorf& _col) { col = _col; }
+	X_INLINE void SetColor(const Color8u& _col) { col = _col; }
+	X_INLINE void SetCharWidthScale(const float scale) { widthScale = scale; }
+	X_INLINE void SetEffectId(int32_t id) { effectId = id; }
+	X_INLINE void SetDefaultEffect(void) { effectId = 0; }
 
 	X_INLINE float GetCharHeight(void) const { return size.y; }
 	X_INLINE int32_t GetEffectId(void) const { return effectId; }
