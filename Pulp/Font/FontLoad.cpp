@@ -234,7 +234,7 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 	JobData* pJobData = static_cast<JobData*>(pData);
 
 	// so we have the file data just need to process it.
-	if (processXmlData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_))
+	if (processXmlData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_, flags_))
 	{
 		// now create a fontTexture and async load it's glyph file.
 		// as soon as we assign 'pFontTexture_' other threads might start accessing it.
@@ -306,7 +306,7 @@ bool XFont::loadFontDef(bool async)
 			return false;
 		}
 
-		if (!processXmlData(file->getBufferStart(), file->getBufferEnd(), sourceName_, effects_))
+		if (!processXmlData(file->getBufferStart(), file->getBufferEnd(), sourceName_, effects_, flags_))
 		{
 			X_ERROR("Font", "Error processing font def file: \"%s\"", path.c_str());
 			return false;
@@ -330,7 +330,8 @@ bool XFont::loadFontDef(bool async)
 }
 
 
-bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, EffetsArr& effectsOut)
+bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, 
+	EffetsArr& effectsOut, FontFlags& flags)
 {
 	ptrdiff_t size = (pEnd - pBegin);
 	if (!size) {
@@ -347,6 +348,7 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& 
 
 	effectsOut.clear();
 	sourceNameOut.clear();
+	flags.Clear();
 
 	xml_node<>* node = doc.first_node("font");
 	if (node)
@@ -358,6 +360,21 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& 
 				sourceNameOut.append(source->value());
 			}
 		}
+
+		xml_attribute<>* proportional = node->first_attribute("proportional");
+		if (proportional)
+		{
+			// 'true' | '1'
+			const char* pPropBegin = proportional->value();
+			const char* pPropEnd = proportional->value() + proportional->value_size();
+
+			if (core::strUtil::IsEqualCaseInsen(pPropBegin, pPropEnd, "true") || 
+				core::strUtil::IsEqualCaseInsen(pPropBegin, pPropEnd, "1"))
+			{
+				flags.Set(FontFlag::PROPORTIONAL);
+			}
+		}
+
 
 		if (!sourceNameOut.isEmpty())
 		{

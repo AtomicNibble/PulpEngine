@@ -86,7 +86,8 @@ private:
 
 	void ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
-	static bool processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, EffetsArr& effectsOut);
+	static bool processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, 
+		EffetsArr& effectsOut, FontFlags& flags);
 
 	bool loadFontDef(bool async);
 
