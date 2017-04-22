@@ -130,6 +130,9 @@ public:
 	// Arrow
 	void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color);
 
+	// CrosssHair
+	void drawwCrosshair(const Vec3f& pos, size_t size, const Color& color);
+
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pText);
