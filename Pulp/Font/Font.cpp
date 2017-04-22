@@ -258,14 +258,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 	const bool isProportional = flags_.IsSet(FontFlag::PROPORTIONAL);
 	const bool debugRect = fontSys_.getVars().glyphDebugRect();
-
 	const auto effecIdx = ctx.GetEffectId();
-
-#if 0
-	X_UNUSED(pos);
-	X_UNUSED(pPrimCon);
-
-#else
 
 
 	const Metrics& metrics = pFontTexture_->GetMetrics();
@@ -478,7 +471,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			charX += hozAdvanceChar;
 		}
 	}
-#endif
 }
 
 
