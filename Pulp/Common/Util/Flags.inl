@@ -66,7 +66,7 @@ inline bool Flags<T>::IsAnySet(void) const
 template <class T>
 inline bool Flags<T>::AreAllSet(void) const
 {
-	return (flags_ == ((1ull << T::FLAGS_COUNT) - 1u));
+	return (flags_ == ((1u << T::FLAGS_COUNT) - 1u));
 }
 
 
