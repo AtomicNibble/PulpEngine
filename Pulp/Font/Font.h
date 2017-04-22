@@ -64,6 +64,9 @@ public:
 	Vec2f GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex) X_FINAL;
 	Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex) X_FINAL;
 
+	// size of N chars, for none monospace fonts it just uses space.
+	float32_t GetCharWidth(wchar_t cChar, size_t num, const XTextDrawConect& contex) X_FINAL;
+
 	int32_t GetEffectId(const char* pEffectName) const X_FINAL;
 
 	// ~IFont

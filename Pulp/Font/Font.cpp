@@ -673,6 +673,13 @@ Vec2f XFont::GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XText
 	return GetTextSizeWInternal(pBegin, pEnd, contex);
 }
 
+float32_t XFont::GetCharWidth(wchar_t cChar, size_t num, const XTextDrawConect& contex)
+{
+	Vec2f size = GetTextSizeWInternal(&cChar, &cChar + 1, contex);
+
+	return size.x * num;
+}
+
 // ---------------------------------------------------------
 
 
