@@ -141,7 +141,9 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.flags = font::DrawTextFlag::FRAMED;
 
 	// going to draw various test text.
+	float posX = 30;
 	float posY = 30;
+	float SpacingX = 80;
 	float SpacingY = 80;
 
 	ctx.SetColor(Col_Aqua);
@@ -205,12 +207,62 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetSize(Vec2f(16.f, 16.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
 
-	posY = 30;
+	posX = 400;
+	posY = 80;
+
+	ctx.flags.Set(DrawTextFlag::CENTER);
 
 	ctx.SetColor(Col_Steelblue);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(16.f, 16.f));
-	pPrimCon->drawText(500, posY += SpacingY, ctx, "lots\nof\nnew\nlines\nmeow\nmeow\nmeow\nyy||.");
+	pPrimCon->drawText(posX, posY, ctx, "lots\nof\nnew\nlines\nmeow\nmeow\nmeow\nyy||.");
+
+	ctx.flags.Set(DrawTextFlag::CENTER_VER);
+
+	ctx.SetColor(Col_Steelblue);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(16.f, 16.f));
+	pPrimCon->drawText(posX += SpacingX, posY, ctx, "lots\nof\nnew\nlines\nmeow\nmeow\nmeow\nyy||.");
+
+	ctx.flags.Remove(DrawTextFlag::CENTER);
+	ctx.flags.Remove(DrawTextFlag::CENTER_VER);
+	ctx.flags.Set(DrawTextFlag::RIGHT);
+
+	ctx.SetColor(Col_Steelblue);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(16.f, 16.f));
+	pPrimCon->drawText(posX += SpacingX, posY, ctx, "lots\nof\nnew\nlines\nmeow\nmeow\nmeow\nyy||.");
+
+	ctx.flags.Remove(DrawTextFlag::CENTER);
+	ctx.flags.Set(DrawTextFlag::CENTER_VER);
+	ctx.flags.Set(DrawTextFlag::RIGHT);
+
+	ctx.SetColor(Col_Steelblue);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(16.f, 16.f));
+	pPrimCon->drawText(posX += SpacingX, posY, ctx, "lots\nof\nnew\nlines\nmeow\nmeow\nmeow\nyy||.");
+
+	// draw load of centered single line vertically.
+	ctx.flags.Remove(DrawTextFlag::CENTER_VER);
+	ctx.flags.Remove(DrawTextFlag::RIGHT);
+	ctx.flags.Set(DrawTextFlag::CENTER);
+
+	SpacingY = 25;
+	posX = 450;
+	posY += 150;
+
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(16.f, 16.f));
+	ctx.SetColor(Col_Tomato);
+	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow meow meow meow meow");
+	ctx.SetColor(Col_Violet);
+	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow meow meow meow");
+	ctx.SetColor(Col_Plum);
+	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow meow meow");
+	ctx.SetColor(Col_Lightgoldenrodyellow);
+	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow meow");
+	ctx.SetColor(Col_Darksalmon);
+	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow");
 
 }
 
