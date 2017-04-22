@@ -304,7 +304,8 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 				baseOffset.y = verBase;
 			}
 			else {
-				textSize.y = verAdvance;
+			//	this won't handle multiline correct.
+			//	textSize.y = verAdvance;
 			}
 
 			const Color8u frameColor(7, 7, 7, 80); //dark grey, 65% opacity
