@@ -381,7 +381,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 	// Potato ?
 	if (virtualKey == KEYBOARD_OVERRUN_MAKE_CODE) {
 		if (g_pInputCVars->input_debug) { // debug only?
-			X_WARNING("Keyboard", "overun occured");
+			X_WARNING("Keyboard", "overrun occured");
 		}
 		return;
 	}
