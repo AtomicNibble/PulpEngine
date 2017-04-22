@@ -102,6 +102,7 @@ private:
 	XFontSystem& fontSys_;
 	FontNameStr name_;
 	SourceNameStr sourceName_;
+	FontFlags flags_;
 
 	EffetsArr effects_;
 

@@ -101,6 +101,13 @@ X_DECLARE_ENUM(FontEncoding)(
 );
 
 
+X_DECLARE_FLAGS(FontFlag)(
+	// The font is proportional, aka not monospace.
+	PROPORTIONAL
+);
+
+typedef Flags<FontFlag> FontFlags;
+
 //
 //	We support both ascii and wide char.
 //	since it's not much work to support wide char
