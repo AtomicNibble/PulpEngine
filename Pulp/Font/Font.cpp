@@ -141,7 +141,7 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 
 	// going to draw various test text.
 	float posY = 30;
-	const float SpacingY = 90;
+	const float SpacingY = 75;
 
 	ctx.SetColor(Col_Aqua);
 	ctx.SetCharWidthScale(1.0f);
@@ -151,13 +151,10 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetCharWidthScale(0.5f);
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 20x20 0.5\tscale\nnew line 1\nnew line 2 :|");
 
-	// 
-
 	ctx.SetColor(Col_Coral);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(20.f, 10.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 20x10 1.0\tscale\nnew line 1\nnew line 2. :[");
-
 
 	ctx.SetColor(Col_Mediumpurple);
 	ctx.SetCharWidthScale(1.0f);
@@ -169,12 +166,41 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetSize(Vec2f(10.f, 10.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale\nnew line 1\nnew line 2. :[");
 
-
 	ctx.SetColor(Col_Orangered);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(40.f, 40.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale");
 
+	ctx.SetColor(Col_Orangered);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(64.f, 64.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+
+	ctx.SetColor(Col_Limegreen);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(48.f, 48.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+
+	ctx.SetColor(Col_Seashell);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(48.f, 48.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu{,}()£$%10x201.0scale");
+
+	ctx.SetColor(Col_Seashell);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(48.f, 48.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "s\tc\ta\tl\te|ygf|fvsv");
+
+
+	ctx.SetColor(Col_Greenyellow);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(32.f, 32.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+
+	ctx.SetColor(Col_Steelblue);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(16.f, 16.f));
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
 }
 
 
