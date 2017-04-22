@@ -170,9 +170,6 @@ class XConsole :
 
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
-	static const size_t CONSOLE_INPUT_LINE_HIEGHT = 20;
-	static const size_t CONSOLE_DEFAULT_LOG_LINE_HIEGHT = 14;
-
 	static const size_t VAR_MAX = 4096;
 
 	static const char* CMD_HISTORY_FILE_NAME;
@@ -398,23 +395,25 @@ private:
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD
 
 private:
-	static int		console_debug;
-	static int		console_case_sensitive;
-	static int		console_save_history;
-	static Color	console_input_box_color;
-	static Color	console_input_box_color_border;
-	static Color	console_output_box_color;
-	static Color	console_output_box_color_border;
-	static Color	console_output_box_channel_color;
-	static Color	console_output_scroll_bar_color;
-	static Color	console_output_scroll_bar_slider_color;
-	static int		console_output_draw_channel;
-	static int		console_output_line_height;
-	static int		console_buffer_size;
-	static int		console_cursor_skip_color_codes;
+	int		console_debug;
+	int		console_case_sensitive;
+	int		console_save_history;
+	int		console_buffer_size;
+	int		console_output_draw_channel;
+	int		console_cursor_skip_color_codes;
+	int		console_disable_mouse;
+	// text
+	int		console_output_font_size;
+	float	console_output_font_line_height;
 
-	// some behaviour options.
-	static int		console_disable_mouse;
+	Color	console_input_box_color;
+	Color	console_input_box_color_border;
+	Color	console_output_box_color;
+	Color	console_output_box_color_border;
+	Color	console_output_box_channel_color;
+	Color	console_output_scroll_bar_color;
+	Color	console_output_scroll_bar_slider_color;
+
 
 private:
 	void Command_Exit(IConsoleCmdArgs* Cmd);

@@ -164,6 +164,13 @@ namespace
 	};
 
 
+
+	const int32_t CONSOLE_INPUT_FONT_SIZE = 20;
+	const int32_t CONSOLE_DEFAULT_LOG_FONT_SIZE = 14;
+
+	const float CONSOLE_INPUT_LINE_HIEGHT = 1.1f;
+	const float CONSOLE_DEFAULT_LOG_LINE_HIEGHT = 1.1f;
+
 } // namespace
 
 // ==================================================
@@ -292,22 +299,6 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
 const char* XConsole::CONFIG_FILE_EXTENSION = "cfg";
 
-int XConsole::console_debug = 0;
-int XConsole::console_case_sensitive = 0;
-int XConsole::console_save_history = 0;
-Color XConsole::console_input_box_color;
-Color XConsole::console_input_box_color_border;
-Color XConsole::console_output_box_color;
-Color XConsole::console_output_box_color_border;
-Color XConsole::console_output_box_channel_color;
-Color XConsole::console_output_scroll_bar_color;
-Color XConsole::console_output_scroll_bar_slider_color;
-int	  XConsole::console_output_draw_channel;
-int	  XConsole::console_output_line_height;
-int	XConsole::console_buffer_size = 0;
-int XConsole::console_disable_mouse = 0;
-int XConsole::console_cursor_skip_color_codes = 0;
-
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -404,10 +395,18 @@ void XConsole::registerVars(void)
 		"Saves command history to file");
 	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Size of the log buffer");
-	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM,
+	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Draw the channel in a diffrent color. 0=disabled 1=enabled");
-	ADD_CVAR_REF_NO_NAME(console_output_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 12, 32, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF_NO_NAME(console_cursor_skip_color_codes, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, 
+		"Skips over the color codes when moving cursor.");
+	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, 
+		"Disable mouse input when console open. 1=expanded only 2=always");
+
+	ADD_CVAR_REF_NO_NAME(console_output_font_size, CONSOLE_DEFAULT_LOG_FONT_SIZE, 1, 128, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Font size of log messages");
+	ADD_CVAR_REF_NO_NAME(console_output_font_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 1, 128, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Line height of log messages");
+
 
 	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
@@ -423,11 +422,8 @@ void XConsole::registerVars(void)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar slider color");
-	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2,
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
-		" 1=expanded only 2=always");
-	ADD_CVAR_REF_NO_NAME(console_cursor_skip_color_codes, 1, 0, 1,
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Skips over the color codes when moving cursor.");
+
+
 }
 
 void XConsole::registerCmds(void)
@@ -2131,7 +2127,8 @@ int32_t XConsole::MaxVisibleLogLines(void) const
 {
 	const int32_t height = renderRes_.y - 40;
 
-	return height / console_output_line_height;
+	const float lineSize =( console_output_font_size * console_output_font_line_height);
+	return static_cast<int32_t>(height / lineSize);
 }
 
 void XConsole::DrawBuffer(void)
@@ -2149,8 +2146,11 @@ void XConsole::DrawBuffer(void)
 	ctx.effectId = 0;
 	ctx.SetColor(Col_Khaki);
 //	ctx.SetProportional(false);
-	ctx.SetSize(Vec2f(20.f, static_cast<float>(CONSOLE_INPUT_LINE_HIEGHT)));
+	ctx.SetSize(Vec2f(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE)));
 	ctx.SetCharWidthScale(0.5f);
+//	ctx.SetCharWidthScale(1.f);
+//	ctx.flags.Set(font::DrawTextFlag::FRAMED);
+//	ctx.flags.Set(font::DrawTextFlag::FIXED_SIZE);
 //	ctx.SetScaleFrom800x600(true);
 
 	Vec2f res;
@@ -2205,8 +2205,11 @@ void XConsole::DrawBuffer(void)
 		if (isExpanded())
 		{
 			ctx.SetColor(Col_White);
-			ctx.SetSize(Vec2f(12.f, static_cast<float>(console_output_line_height)));
-			ctx.SetCharWidthScale(0.75f);
+			ctx.SetSize(Vec2f(// 12.f, 
+				static_cast<float>(console_output_font_size),
+				static_cast<float>(console_output_font_size))
+			);
+		//	ctx.SetCharWidthScale(console_output_width_scale); // 0.75f);
 
 			float fCharHeight =  ctx.GetCharHeight();
 
