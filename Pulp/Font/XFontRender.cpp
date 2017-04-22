@@ -173,9 +173,9 @@ bool XFontRender::GetGlyph(XGlyph& glphy,
 	const auto offsetY = static_cast<uint32_t>(glyphBitmapHeight_ - pGlyph->bitmap_top);
 
 	glphy.currentChar = charCode;
-	glphy.advance = safe_static_cast<uint16_t>(pGlyph->advance.x / 64);
-	glphy.charOffsetX = safe_static_cast<uint8_t>(pGlyph->bitmap_left);
-	glphy.charOffsetY = safe_static_cast<uint8_t>(offsetY);
+	glphy.advanceX = safe_static_cast<uint16_t>(pGlyph->advance.x / 64);
+	glphy.charOffsetX = safe_static_cast<decltype(glphy.charOffsetX)>(pGlyph->bitmap_left);
+	glphy.charOffsetY = safe_static_cast<decltype(glphy.charOffsetX)>(offsetY);
 	glphy.charWidth = safe_static_cast<uint8_t>(colsToCopy);
 	glphy.charHeight = safe_static_cast<uint8_t>(rowsToCopy);
 	return true;

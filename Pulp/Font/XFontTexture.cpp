@@ -360,7 +360,7 @@ bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cCh
 
 
 	XGlyphBitmap* pGlyphBitmap = glyphCache_.GetGlyph(pSlot->charWidth, pSlot->charHeight,
-		pSlot->charOffsetX, pSlot->charOffsetY, cChar);
+		pSlot->charOffsetX, pSlot->charOffsetY, pSlot->advanceX, cChar);
 
 	if(!pGlyphBitmap)
 	{

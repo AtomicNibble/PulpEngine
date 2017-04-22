@@ -21,7 +21,7 @@ struct XGlyph
 		cacheSlot = 0;
 		currentChar = static_cast<wchar_t>(~0);
 
-		advance = 0;
+		advanceX = 0;
 		charWidth = 0;
 		charHeight = 0;
 		charOffsetX = 0;
@@ -35,11 +35,11 @@ public:
 	int32_t			cacheSlot;
 	wchar_t			currentChar;
 
-	uint16_t		advance;
+	uint16_t		advanceX;
 	uint8_t			charWidth;		// size in pixel
 	uint8_t			charHeight;		// size in pixel
-	uint8_t			charOffsetX;
-	uint8_t			charOffsetY;
+	int8_t			charOffsetX;	// these can be negative.
+	int8_t			charOffsetY;
 
 	XGlyphBitmap	glyphBitmap;
 };

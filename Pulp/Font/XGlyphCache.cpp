@@ -289,7 +289,8 @@ XGlyph* XGlyphCache::GetMRUSlot(void)
 
 //------------------------------------------------------------------------------------------------- 
 
-XGlyphBitmap* XGlyphCache::GetGlyph(uint8_t& width, uint8_t& height, uint8_t& charOffsetX, uint8_t& charOffsetY, wchar_t cChar)
+XGlyphBitmap* XGlyphCache::GetGlyph(uint8_t& width, uint8_t& height, int8_t& charOffsetX, int8_t& charOffsetY,
+	uint16_t& advanceX, wchar_t cChar)
 {
 	// glyph already chached?
 	XCacheTable::iterator pItor = cacheTable_.find(cChar);
@@ -315,6 +316,7 @@ XGlyphBitmap* XGlyphCache::GetGlyph(uint8_t& width, uint8_t& height, uint8_t& ch
 	height = pGlyph->charHeight;
 	charOffsetX = pGlyph->charOffsetX;
 	charOffsetY = pGlyph->charOffsetY;
+	advanceX = pGlyph->advanceX;
 	return &pGlyph->glyphBitmap;
 }
 
