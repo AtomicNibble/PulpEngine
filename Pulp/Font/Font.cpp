@@ -70,7 +70,6 @@ void XFont::Release()
 
 void XFont::Free(void)
 {
-	effects_.clear();
 	effects_.free();
 
 	FreeBuffers();
