@@ -363,6 +363,9 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		}
 	}
 
+	// snap.
+	baseXY.x = math<float>::floor(baseXY.x);
+	baseXY.y = math<float>::floor(baseXY.y);
 
 
 	FontEffect& effect = effects_[effecIdx];
