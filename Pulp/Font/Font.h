@@ -118,6 +118,7 @@ private:
 	// shader and state.
 	engine::Material* pMaterial_;
 
+	// loading
 	core::Signal signal_;
 	LoadStatus::Enum loadStatus_;
 };
