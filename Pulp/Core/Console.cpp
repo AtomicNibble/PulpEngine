@@ -2145,13 +2145,8 @@ void XConsole::DrawBuffer(void)
 	ctx.pFont = pFont_;
 	ctx.effectId = 0;
 	ctx.SetColor(Col_Khaki);
-//	ctx.SetProportional(false);
 	ctx.SetSize(Vec2f(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE)));
-	ctx.SetCharWidthScale(0.5f);
-//	ctx.SetCharWidthScale(1.f);
-//	ctx.flags.Set(font::DrawTextFlag::FRAMED);
-//	ctx.flags.Set(font::DrawTextFlag::FIXED_SIZE);
-//	ctx.SetScaleFrom800x600(true);
+	ctx.SetCharWidthScale(1.0f);
 
 	Vec2f res;
 	res = pRender_->getDisplayRes();
