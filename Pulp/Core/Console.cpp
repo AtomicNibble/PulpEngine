@@ -2402,7 +2402,6 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		ctx.pFont = pFont_;
 		ctx.effectId = 0;
 		ctx.SetSize(Vec2f(14, 14));
-		ctx.SetCharWidthScale(1.0f);
 
 
 		// Autocomplete
