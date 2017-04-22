@@ -10,9 +10,10 @@ FontVars::FontVars()
 {
 	glyphCacheSize_ = 512;
 	glyphCachePreWarm_ = 1;
-	glyphDebugRender_ = 1;
-
+	glyphDebugRender_ = 0;
 	glyphDebugRect_ = 0;
+
+	debugShowDrawPosition_ = 1;
 
 	fontSmoothingMethod_ = 0;
 	fontSmoothingAmount_ = 0;
@@ -37,6 +38,10 @@ void FontVars::registerVars(void)
 	ADD_CVAR_REF("font_glyph_debug_rect", glyphDebugRect_, glyphDebugRect_, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Draw a bounding rect around each glyph");
+
+	ADD_CVAR_REF("font_debug_show_draw_pos", debugShowDrawPosition_, debugShowDrawPosition_, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Draws a X at the location for text was drawn from.");
 
 
 	ADD_CVAR_REF("font_glyph_smoothing", fontSmoothingMethod_, FontSmooth::NONE, 0, FontSmooth::ENUM_COUNT,
