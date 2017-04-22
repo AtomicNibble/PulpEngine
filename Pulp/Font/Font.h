@@ -71,8 +71,7 @@ public:
 
 	// ~IFont
 
-	void GetGradientTextureCoord(float& minU, float& minV, 
-		float& maxU, float& maxV) const;
+	void GetGradientTextureCoord(float& minU, float& minV, float& maxU, float& maxV) const;
 
 	X_INLINE const FontNameStr& getName(void) const;
 	X_INLINE bool isDirty(void) const;
@@ -87,8 +86,7 @@ private:
 
 	void ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
-	static bool processXmlData(const char* pBegin, const char* pEnd, 
-		SourceNameStr& sourceNameOut, EffetsArr& effectsOut);
+	static bool processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, EffetsArr& effectsOut);
 
 	bool loadFontDef(bool async);
 
