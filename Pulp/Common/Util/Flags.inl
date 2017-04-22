@@ -112,6 +112,15 @@ inline Flags<T>& Flags<T>::operator=(const Flags& oth)
 	return *this;
 }
 
+template <class T>
+inline Flags<T> Flags<T>::operator~(void) const
+{
+	// do we want to ensure bits outside setable range are not set?
+	// if not we can just do ~flags_
+	return Flags(~flags_ & ((1u << T::FLAGS_COUNT) - 1u));
+}
+
+
 
 template <class T>
 inline uint32_t Flags<T>::ToInt(void) const
