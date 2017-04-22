@@ -318,6 +318,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 
 	const bool isProportional = flags_.IsSet(FontFlag::PROPORTIONAL);
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
+	const bool clipped = ctx.flags.IsSet(DrawTextFlag::CLIP);
 	const bool shiftedPosition = (ctx.flags & (DrawTextFlag::CENTER | DrawTextFlag::CENTER_VER | DrawTextFlag::RIGHT)).IsAnySet();
 	const bool debugRect = fontSys_.getVars().glyphDebugRect();
 	const bool debugPos = fontSys_.getVars().debugShowDrawPosition();
@@ -393,10 +394,21 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 
 			const Color8u frameColor(7, 7, 7, 80); //dark grey, 65% opacity
 
-			const float x0 = baseXY.x + baseOffset.x;
-			const float y0 = baseXY.y + baseOffset.y;
-			const float x1 = baseXY.x + textSize.x;
-			const float y1 = baseXY.y + textSize.y;
+			float x0 = baseXY.x + baseOffset.x;
+			float y0 = baseXY.y + baseOffset.y;
+			float x1 = baseXY.x + textSize.x;
+			float y1 = baseXY.y + textSize.y;
+
+			// are we clipping or are we whipping!
+			if (clipped)
+			{
+				auto& clip = ctx.clip;
+
+				x0 = core::Max(x0, clip.x1);
+				y0 = core::Max(y0, clip.y1);
+				x1 = core::Min(x1, clip.x2);
+				y1 = core::Min(y1, clip.y2);
+			}
 
 			const Vec3f v0(x0, y0, z);
 			const Vec3f v2(x1, y1, z);
@@ -505,23 +517,98 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			float bottom = ypos + cords.size.y * scaleY;
 
 			// Verts
-			const Vec3f tl(xpos, ypos, z);
-			const Vec3f br(right, bottom, z);
-			const Vec3f tr(br.x, tl.y, tl.z);
-			const Vec3f bl(tl.x, br.y, tl.z);
-
-			// cords
-			const core::XHalf2 tc_tl(cords.texCoords[0], cords.texCoords[1]);
-			const core::XHalf2 tc_br(cords.texCoords[2], cords.texCoords[3]);
-			const core::XHalf2 tc_tr(tc_br.x, tc_tl.y);
-			const core::XHalf2 tc_bl(tc_tl.x, tc_br.y);
-
-			const Color8u finalCol = pass.col * col;
+			Vec3f tl(xpos, ypos, z);
+			Vec3f br(right, bottom, z);
+			Vec3f tr(br.x, tl.y, tl.z);
+			Vec3f bl(tl.x, br.y, tl.z);
 
 			float hozAdvanceChar = hozAdvance;
 			if (isProportional) {
 				hozAdvanceChar = pSlot->advanceX * scaleX;
 			}
+
+			if (clipped)
+			{
+				auto& clip = ctx.clip;
+
+				Rectf charRect(tl.x, tl.y, br.x, br.y);
+
+				// even in the rect?
+				if (!clip.intersects(charRect))
+				{
+					charX += hozAdvanceChar;
+					continue;
+				}
+
+				// are we partial?
+				if (!clip.contains(charRect))
+				{
+					// so we want to clip the verts down and adjust the uv's
+					// should just process each point.
+
+					// left
+					if (tl.x < clip.x1)
+					{
+						const float diff = clip.x1 - tl.x;
+						const float width = tr.x - tl.x;
+
+						tl.x = clip.x1;
+						bl.x = clip.x1;
+
+						// we need to find out how much we moved and lerp towards to other uv.
+						float factor = diff / width;
+						cords.texCoords[0] = lerp(cords.texCoords[0], cords.texCoords[2], factor);
+					}
+
+					// top
+					if (tl.y < clip.y1)
+					{
+						const float diff = clip.y1 - tl.y;
+						const float height = bl.y - tl.y;
+
+						tl.y = clip.y1;
+						tr.y = clip.y1;
+
+						float factor = diff / height;
+						cords.texCoords[1] = lerp(cords.texCoords[1], cords.texCoords[3], factor);
+					}
+
+					// right
+					if (tr.x > clip.x2)
+					{
+						const float diff = tr.x - clip.x2;
+						const float width = tr.x - tl.x;
+
+						tr.x = clip.x2;
+						br.x = clip.x2;
+
+						float factor = diff / width;
+						cords.texCoords[2] = lerp(cords.texCoords[2], cords.texCoords[0], factor);
+					}
+
+					// bottom
+					if (bl.y > clip.y2)
+					{
+						const float diff =  bl.y - clip.y2;
+						const float height = bl.y - tl.y;
+
+						bl.y = clip.y2;
+						br.y = clip.y2;
+
+						float factor = diff / height;
+						cords.texCoords[3] = lerp(cords.texCoords[3], cords.texCoords[1], factor);
+					}
+				}
+			}
+
+			// final cords
+			const core::XHalf2 tc_tl(cords.texCoords[0], cords.texCoords[1]);
+			const core::XHalf2 tc_br(cords.texCoords[2], cords.texCoords[3]);
+			const core::XHalf2 tc_tr(tc_br.x, tc_tl.y);
+			const core::XHalf2 tc_bl(tc_tl.x, tc_br.y);
+
+
+			const Color8u finalCol = pass.col * col;
 
 			// We need 6 since each char is not connected.
 			// so we make seprate tri's
