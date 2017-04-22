@@ -2714,9 +2714,17 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		// the input
 		if (!InputBuffer_.isEmpty())
 		{
-			ctx.SetSize(Vec2f(20, 20));
-			ctx.SetCharWidthScale(0.5f);
+			Vec2f res;
+			res = pRender_->getDisplayRes();
+
+			const float width = res.x - 10.f;
+			const Vec2f inputFontSize(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE));
+
+			ctx.SetSize(inputFontSize);
 			ctx.SetColor(txtCol);
+			ctx.flags.Set(font::DrawTextFlag::CLIP);
+			ctx.clip.set(0, 0, width, std::numeric_limits<float>::max());
+
 
 			core::string::const_str space = InputBuffer_.find(' ');
 			if (space)
