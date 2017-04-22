@@ -71,11 +71,7 @@ bool XFontRender::Release(void)
 }
 
 
-bool XFontRender::GetGlyph(XGlyph& glphy,
-	
-	// XGlyphBitmap& glyphBitmap, uint8& glyphWidth, uint8& glyphHeight,
-	// uint8_t& charOffsetX, uint8_t& charOffsetY, 
-	int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode)
+bool XFontRender::GetGlyph(XGlyph& glphy, int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode)
 { 
 	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
 	if (err) {
