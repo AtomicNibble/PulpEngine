@@ -80,10 +80,7 @@ struct XTextDrawConect
 	void SetEffectId(int32_t id) { effectId = id; }
 	void SetDefaultEffect(void) { effectId = 0; }
 
-	X_INLINE float GetCharWidth(void) const { return size.x; }
-	X_INLINE float GetCharWidthScaled(void) const { return size.x * widthScale; }
 	X_INLINE float GetCharHeight(void) const { return size.y; }
-	X_INLINE float GetCharWidthScale(void) const { return widthScale; }
 	X_INLINE int32_t GetEffectId(void) const { return effectId; }
 };
 
