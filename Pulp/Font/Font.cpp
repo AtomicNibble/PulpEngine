@@ -142,7 +142,7 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 
 	// going to draw various test text.
 	float posY = 30;
-	const float SpacingY = 75;
+	float SpacingY = 80;
 
 	ctx.SetColor(Col_Aqua);
 	ctx.SetCharWidthScale(1.0f);
@@ -166,6 +166,8 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(10.f, 10.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale\nnew line 1\nnew line 2. :[");
+
+	SpacingY = 90;
 
 	ctx.SetColor(Col_Orangered);
 	ctx.SetCharWidthScale(1.0f);
@@ -202,6 +204,14 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(16.f, 16.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+
+	posY = 30;
+
+	ctx.SetColor(Col_Steelblue);
+	ctx.SetCharWidthScale(1.0f);
+	ctx.SetSize(Vec2f(16.f, 16.f));
+	pPrimCon->drawText(500, posY += SpacingY, ctx, "lots\nof\nnew\nlines\nmeow\nmeow\nmeow\nyy||.");
+
 }
 
 
