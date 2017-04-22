@@ -264,6 +264,24 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetColor(Col_Darksalmon);
 	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow");
 
+	// do some clip test.
+	posX = 600;
+	posY = 200;
+
+	ctx.flags &= ~(DrawTextFlag::CENTER_VER | DrawTextFlag::CENTER | DrawTextFlag::RIGHT);
+	ctx.flags.Set(DrawTextFlag::CLIP);
+
+	ctx.clip.x1 = posX + 13;
+	ctx.clip.y1 = posY + 12;
+	ctx.clip.x2 = posX + 150;
+	ctx.clip.y2 = posY + 45;
+	pPrimCon->drawText(posX, posY, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow");
+
+	// same agint not clipped
+	ctx.flags.Remove(DrawTextFlag::CLIP);
+	pPrimCon->drawText(posX, posY + 100, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow");
+
+
 }
 
 
