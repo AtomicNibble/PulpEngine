@@ -2,7 +2,7 @@
 	<effect name = "normal" >
 		<!-- normal pass -->
 		<pass>
-		</pass>	
+		</pass>
 	</effect>
 	<effect name = "drop" >
 		<!-- drop shadow -->
