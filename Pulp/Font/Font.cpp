@@ -511,7 +511,8 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 				maxW = core::Max(maxW, charX);
 
 				charX = 0;
-				charY += verAdvance;
+				// really we need to advance by min of size.
+				charY += core::Min(verAdvance, ctx.size.y);
 				continue;
 			}
 			case L'\r':
