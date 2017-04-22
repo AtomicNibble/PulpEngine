@@ -2212,6 +2212,8 @@ void XConsole::DrawBuffer(void)
 		if (isExpanded())
 		{
 			ctx.SetSize(outputFontSize);
+			ctx.clip.set(0, 0, width, std::numeric_limits<float>::max());
+			ctx.flags.Set(font::DrawTextFlag::CLIP);
 
 			float fCharHeight =  ctx.GetCharHeight() * console_output_font_line_height;
 
