@@ -63,6 +63,8 @@ XFont::~XFont()
 
 void XFont::Release()
 {
+	// what is this here for?
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
