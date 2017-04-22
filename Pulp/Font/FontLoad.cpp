@@ -330,56 +330,6 @@ bool XFont::loadFontDef(bool async)
 }
 
 
-#if 0
-
-bool XFont::loadFontFile(SourceNameStr& fileName)
-{
-	X_LOG0("Font", "loading: \"%s\"", fileName.c_str());
-
-	core::Path<char> path;
-	path /= "Fonts/";
-	path.setFileName(fileName.c_str());
-
-	FreeBuffers();
-
-	core::Array<uint8_t> fileDataBuf(g_fontArena);
-
-	size_t filesize = 0;
-
-	core::XFileScoped file;
-	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
-	{
-		filesize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-		if (filesize > 0) {
-			fileDataBuf.resize(filesize);
-			if (file.read(fileDataBuf.data(), filesize) != filesize) {
-				X_ERROR("Font", "Error reading ttf font data");
-				return false;
-			}
-		}
-	}
-
-	if (fileDataBuf.isEmpty() || filesize == 0) {
-		X_ERROR("Font", "Error reading font data");
-		return false;
-	}
-
-	if (!fontTexture_) {
-//		fontTexture_.reset(X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena));
-	}
-
-//	if (!fontTexture_->CreateFromMemory(fileDataBuf, width, height, FontSmooth::NONE, FontSmoothAmount::NONE)) {
-//		return false;
-//	}
-
-	fontTexDirty_ = true;
-
-	InitCache();
-	return true;
-}
-
-#endif
-
 bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut, EffetsArr& effectsOut)
 {
 	ptrdiff_t size = (pEnd - pBegin);
