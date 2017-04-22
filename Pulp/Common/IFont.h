@@ -39,11 +39,12 @@ struct IFontSys : public core::IEngineSysBase
 #endif
 
 X_DECLARE_FLAGS(DrawTextFlag)(
-	CENTER,		// the center(hoz) of the text is placed at the draw pos, by default it's far left.
-	CENTER_VER,	// the center(ver) of the text is placed at the draw pos, by default it's at the top.
-	RIGHT,		// the end of the text (hoz) is placed at draw pos. (setting this will ignore 'CENTER', but 'CENTER_VER' is still valid)
-	FRAMED,		// Draws a filled 65% opacity dark rectenagle under the text. aka a block background
-	CLIP		// Clip the text against the provided rect, partial chars are drawn.
+	CENTER,			// the center(hoz) of the text is placed at the draw pos, by default it's far left.
+	CENTER_VER,		// the center(ver) of the text is placed at the draw pos, by default it's at the top.
+	RIGHT,			// the end of the text (hoz) is placed at draw pos. (setting this will ignore 'CENTER', but 'CENTER_VER' is still valid)
+	FRAMED,			// Draws a filled 65% opacity dark rectenagle under the text. aka a block background
+	FRAMED_SNUG,	// includes descenders and moves top to max ascender.
+	CLIP			// Clip the text against the provided rect, partial chars are drawn.
 
 );
 
@@ -107,6 +108,7 @@ X_DECLARE_FLAGS(FontFlag)(
 );
 
 typedef Flags<FontFlag> FontFlags;
+
 
 //
 //	We support both ascii and wide char.

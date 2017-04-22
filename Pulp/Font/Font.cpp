@@ -245,7 +245,10 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const float scaleY = ctx.size.y / pFontTexture_->GetCellHeight();
 	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
 	const float hozAdvance = (metrics.max_advance * scaleX);
-	const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
+	
+	// for render don't think i want to move down including descenders only for text size.
+	// const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
+	const float verAdvance = ctx.size.y;
 
 
 	FontEffect& effect = effects_[effecIdx];
@@ -265,7 +268,12 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		if (drawFrame && passIdx == 0)
 		{
 			Vec2f baseOffset;
-			const Vec2f textSize = GetTextSizeWInternal(pBegin, pEnd, ctx, &baseOffset);
+			Vec2f textSize = GetTextSizeWInternal(pBegin, pEnd, ctx, &baseOffset);
+
+			if (!ctx.flags.IsSet(DrawTextFlag::FRAMED_SNUG)) {
+				baseOffset = Vec2f::zero();
+				textSize.y = verAdvance;
+			}
 
 			const Color8u frameColor(7, 7, 7, 80); //dark grey, 65% opacity
 
