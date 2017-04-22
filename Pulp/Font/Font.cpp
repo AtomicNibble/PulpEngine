@@ -523,10 +523,6 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 				hozAdvanceChar = pSlot->advanceX * scaleX;
 			}
 
-			if (debugRect && passIdx == 0) {
-				pPrimCon->drawRect(charX, charY, hozAdvanceChar, ctx.size.y, Col_Red);
-			}
-
 			// We need 6 since each char is not connected.
 			// so we make seprate tri's
 			engine::IPrimativeContext::PrimVertex* pVerts = pPrimCon->addPrimative(6, render::TopoType::TRIANGLELIST, pMaterial_);
@@ -560,6 +556,83 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			pVerts[5].pos = tl;
 			pVerts[5].color = finalCol;
 			pVerts[5].st = tc_tl;
+
+			charX += hozAdvanceChar;
+		}
+	}
+
+	// we draw the rects after all chars are drawn, otherwise performance will tank.
+	// as all the batching goes to shit.
+	if (debugRect)
+	{
+		const FontPass& pass = effect.passes[0];
+
+		float charX = baseXY.x + pass.offset.x;
+		float charY = baseXY.y + pass.offset.y;
+
+		const wchar_t* pChar = pBegin;
+		while (wchar_t ch = *pChar++)
+		{
+			// check for special chars that alter how we render.
+			switch (ch)
+			{
+				case L'\t':
+				case L' ':
+				{
+					const int32_t numSpaces = ch == L' ' ? 1 : FONT_TAB_CHAR_NUM;
+
+					if (isProportional)
+					{
+						auto* pSlot = pFontTexture_->GetCharSlot(' ');
+						if (pSlot)
+						{
+							charX += numSpaces * (pSlot->advanceX * scaleX);
+						}
+					}
+					else
+					{
+						charX += (hozAdvance * numSpaces);
+					}
+					continue;
+				}
+
+				case L'^':
+				{
+					if (*pChar == L'^') {
+						++pChar;
+					}
+					else if (core::strUtil::IsDigitW(*pChar))
+					{
+						++pChar;
+					}
+					continue;
+				}
+
+				case L'\n':
+				{
+					charX = baseXY.x;
+					charY += verAdvance;
+					continue;
+				}
+
+				case L'\r':
+				{
+					charX = baseXY.x;
+					continue;
+				}
+
+				default:
+					break;
+			}
+
+			float hozAdvanceChar = hozAdvance;
+			if (isProportional) 
+			{
+				const XTextureSlot* pSlot = pFontTexture_->GetCharSlot(ch);
+				hozAdvanceChar = pSlot->advanceX * scaleX;
+			}
+
+			pPrimCon->drawRect(charX, charY, hozAdvanceChar, ctx.size.y, Col_Red);
 
 			charX += hozAdvanceChar;
 		}
