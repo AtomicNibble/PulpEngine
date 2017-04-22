@@ -2146,14 +2146,6 @@ void XConsole::DrawBuffer(void)
 	const Vec2f inputFontSize(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE));
 
 
-	font::XTextDrawConect ctx;
-	ctx.pFont = pFont_;
-	ctx.effectId = 0;
-	ctx.SetColor(Col_Khaki);
-	ctx.SetSize(inputFontSize);
-	ctx.SetCharWidthScale(1.0f);
-
-
 	Vec2f res;
 	res = pRender_->getDisplayRes();
 
@@ -2161,6 +2153,12 @@ void XConsole::DrawBuffer(void)
 	const float yStart = 35.f;
 	const float width = res.x - 10.f;
 	const float height = res.y - 40.f;
+
+	font::XTextDrawConect ctx;
+	ctx.pFont = pFont_;
+	ctx.effectId = 0;
+	ctx.SetColor(Col_Khaki);
+	ctx.SetSize(inputFontSize);
 
 	{
 		pPrimContext_->drawQuad(xStart, 5, width, 24, console_input_box_color, console_input_box_color_border);
