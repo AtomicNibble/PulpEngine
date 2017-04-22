@@ -117,6 +117,9 @@ public:
 	X_INLINE const int32_t GetHeight(void) const;
 	X_INLINE const BufferArr& GetBuffer(void) const;
 
+	X_INLINE int32_t GetCellWidth(void) const;
+	X_INLINE int32_t GetCellHeight(void) const;
+
 	X_INLINE float GetTextureCellWidth(void) const;
 	X_INLINE float GetTextureCellHeight(void) const;
 

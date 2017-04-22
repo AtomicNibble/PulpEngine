@@ -33,6 +33,16 @@ X_INLINE const XFontTexture::BufferArr& XFontTexture::GetBuffer(void) const
 	return textureBuffer_;
 }
 
+X_INLINE int32_t XFontTexture::GetCellWidth(void) const
+{
+	return cellWidth_;
+}
+
+X_INLINE int32_t XFontTexture::GetCellHeight(void) const
+{
+	return cellHeight_;
+}
+
 X_INLINE float XFontTexture::GetTextureCellWidth(void) const
 { 
 	return textureCellWidth_;
