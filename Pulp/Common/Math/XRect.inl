@@ -156,7 +156,7 @@ RectT<T> RectT<T>::scaled(const Vec2<T> &scale) const
 template<typename T>
 bool RectT<T>::contains(const RectT<T> &rect) const
 {
-	return(rect.x1 >= x1 && rect.y1 >= y1 && rect.x2 <= y2 && rect.y2 <= y2);
+	return(rect.x1 >= x1 && rect.y1 >= y1 && rect.x2 <= x2 && rect.y2 <= y2);
 }
 
 template<typename T>
