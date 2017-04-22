@@ -1,4 +1,4 @@
-<font source = "UbuntuMono-R.ttf">
+<font source = "consola.ttf" proportional="false">
 	<effect name = "normal" >
 		<!-- normal pass -->
 		<pass>
