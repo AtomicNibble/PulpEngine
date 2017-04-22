@@ -2180,7 +2180,6 @@ void XConsole::DrawBuffer(void)
 				ctx.SetSize(inputFontSize);
 			}
 
-			DrawScrollBar();
 		}
 	}
 
@@ -2235,6 +2234,8 @@ void XConsole::DrawBuffer(void)
 					yPos -= fCharHeight;
 				}
 			}
+
+			DrawScrollBar();
 		}
 
 		// draw the auto complete
