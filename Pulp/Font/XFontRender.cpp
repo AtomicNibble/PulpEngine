@@ -100,6 +100,8 @@ bool XFontRender::GetGlyph(XGlyph& glphy, int32_t destOffsetX, int32_t destOffse
 	std::memset(buffer.data(), 0xFF, buffer.size());
 
 	// some sanity checks for my understanding of FreeType.
+	// they are not very accurate out by few pixels in some cases so keep disabled when not testing.
+#if 0
 	{
 		const auto& sizeInfo = pFace_->size->metrics;
 
@@ -116,6 +118,7 @@ bool XFontRender::GetGlyph(XGlyph& glphy, int32_t destOffsetX, int32_t destOffse
 		X_ASSERT(advance.x <= static_cast<float>(sizeInfo.max_advance + 64), "Advance was greater than expected")(sizeInfo.max_advance, pGlyph->advance);
 		// is the width + left less than max_advance?
 	}
+#endif
 
 #endif // !X_DEBUG
 
