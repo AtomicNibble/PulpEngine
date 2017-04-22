@@ -54,6 +54,7 @@ public:
 	XFontTexture* getFontTexture(const SourceNameStr& name, bool async);
 	void releaseFontTexture(XFontTexture* pFontTex);
 
+	X_INLINE const FontVars& getVars(void) const;
 
 private:
 	ICore* pCore_;
@@ -64,6 +65,11 @@ private:
 	core::CriticalSection lock_;
 	FontTextureMap fontTextures_;
 };
+
+X_INLINE const FontVars& XFontSystem::getVars(void) const
+{
+	return vars_;
+}
 
 X_NAMESPACE_END
 
