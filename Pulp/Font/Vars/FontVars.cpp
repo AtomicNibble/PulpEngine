@@ -35,7 +35,7 @@ void FontVars::registerVars(void)
 		"Alter the glyphs to have color offset so the shape of the glyph is visible");
 
 	ADD_CVAR_REF("font_glyph_debug_rect", glyphDebugRect_, glyphDebugRect_, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Draw a bounding rect around each glyph");
 
 
