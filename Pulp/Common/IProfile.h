@@ -19,6 +19,8 @@ struct IProfileSys
 	virtual bool init(ICore* pCore) X_ABSTRACT;
 	virtual void shutDown(void) X_ABSTRACT;
 
+	virtual bool loadRenderResources(void) X_ABSTRACT;
+
 	virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
 
 	virtual void OnFrameBegin(void) X_ABSTRACT;

@@ -541,6 +541,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitRenderSys(startupParams)) {
 			return false;
 		}
+
+		if (!pProfileSys_->loadRenderResources()) {
+			return false;
+		}
 	}
 
 	// sync net inits before 3d engine.
@@ -576,6 +580,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (startupParams.loadSymbols()) {
 		core::symbolResolution::Refresh();
 	}
+
 
 	// #------------------------ Async Init --------------------------
 	{

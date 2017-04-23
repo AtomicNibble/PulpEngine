@@ -32,6 +32,8 @@ public:
 	bool init(ICore* pCore) X_FINAL;
 	void shutDown(void) X_FINAL;
 
+	bool loadRenderResources(void) X_FINAL;
+
 	void AddProfileData(XProfileData* pData) X_FINAL;
 
 	void OnFrameBegin(void) X_FINAL;
@@ -143,6 +145,7 @@ private:
 	ICore*		pCore_;
 	render::IRender* pRender_;
 	engine::IPrimativeContext* pPrimCon_;
+	font::IFont* pFont_;
 
 	Profilers	profiles_;
 	DisplayInfo displayInfo_;

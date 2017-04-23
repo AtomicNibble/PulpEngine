@@ -26,6 +26,13 @@ void ProfileNull::shutDown(void)
 
 }
 
+bool ProfileNull::loadRenderResources(void)
+{
+
+	return true;
+}
+
+
 void ProfileNull::AddProfileData(XProfileData* pData)
 {
 	X_UNUSED(pData);

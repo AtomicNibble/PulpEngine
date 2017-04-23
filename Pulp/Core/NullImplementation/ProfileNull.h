@@ -13,6 +13,8 @@ class ProfileNull : public IProfileSys
 	bool init(ICore* pCore) X_FINAL;
 	void shutDown(void) X_FINAL;
 
+	bool loadRenderResources(void) X_FINAL;
+
 	void AddProfileData(XProfileData* pData) X_FINAL;
 
 	void OnFrameBegin(void) X_FINAL;

@@ -88,6 +88,7 @@ XProfileSys* XProfileSys::s_this = nullptr;
 
 XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
 	pCore_(nullptr),
+	pFont_(nullptr),
 	pRender_(nullptr),
 	pPrimCon_(nullptr),
 	profiles_(arena),
@@ -187,6 +188,21 @@ void XProfileSys::shutDown(void)
 	// ...
 	gEnv->profileScopeStart = nullptr;
 	gEnv->profileScopeEnd = nullptr;
+}
+
+bool XProfileSys::loadRenderResources(void)
+{
+	font::IFontSys* pFontSys = pCore_->GetIFontSys();
+	if (!pFontSys) {
+		return false;
+	}
+
+	pFont_ = pFontSys->GetFont("default");
+	if (!pFont_) {
+		return false;
+	}
+
+	return true;
 }
 
 
