@@ -40,8 +40,6 @@ XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core
 	widthCellCount_(0),
 	heightCellCount_(0),
 
-	textureSlotCount_(0),
-
 	slotUsage_(1), // space for gradiant.
 	cacheMisses_(0),
 
@@ -73,7 +71,6 @@ void XFontTexture::Clear(void)
 	textureCellHeight_ = 0;
 	widthCellCount_ = 0;
 	heightCellCount_ = 0;
-	textureSlotCount_ = 0;
 
 	slotUsage_ = 1;
 	cacheMisses_ = 0;
@@ -98,7 +95,6 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount,
 
 	widthCellCount_ = widthCellCount;
 	heightCellCount_ = heightCellCount;
-	textureSlotCount_ = widthCellCount * heightCellCount;
 
 	cellWidth_ = width / widthCellCount;
 	cellHeight_ = height / heightCellCount;
@@ -112,7 +108,8 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount,
 		return false;
 	}
 
-	if (!CreateSlotList(textureSlotCount_))
+	int32_t textureSlotCount = widthCellCount * heightCellCount;
+	if (!CreateSlotList(textureSlotCount))
 	{
 		Clear();
 		return false;

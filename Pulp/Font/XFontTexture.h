@@ -181,8 +181,6 @@ private:
 	int32_t	widthCellCount_;
 	int32_t	heightCellCount_;
 
-	int32_t	textureSlotCount_;
-
 	XTextureSlotList	slotList_;
 	XTextureSlotTable	slotTable_;
 
