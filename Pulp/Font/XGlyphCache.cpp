@@ -71,7 +71,7 @@ bool XGlyphCache::Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight)
 		return false;
 	}
 
-	switch (smoothAmount_)
+	switch (smoothMethod_)
 	{
 		case FontSmooth::SUPERSAMPLE:
 		{
