@@ -311,7 +311,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
 
 	const Color8u col8(col);
 
-	PrimVertex* pQuads = addPrimative(num * 6, PrimitiveType::LINELIST);
+	PrimVertex* pQuads = addPrimative(num * 6, PrimitiveType::TRIANGLELIST);
 
 	// TL - TR - BR
 	// BR - BL - TL
