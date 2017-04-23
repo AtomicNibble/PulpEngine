@@ -315,6 +315,9 @@ bool XFontTexture::CreateSlotList(int32_t listSize)
 
 	slotList_.resize(listSize);
 
+	const float xbias = (0.5f / static_cast<float>(width_));
+	const float ybias = (0.5f / static_cast<float>(height_));
+
 	for (int32_t i = 0; i < listSize; i++)
 	{
 		XTextureSlot& slot = slotList_[i];
@@ -325,8 +328,11 @@ bool XFontTexture::CreateSlotList(int32_t listSize)
 		y = i / widthCellCount_;
 		x = i % widthCellCount_;
 
-		slot.texCoord[0] = static_cast<float>((x * textureCellWidth_) + (0.5f / static_cast<float>(width_)));
-		slot.texCoord[1] = static_cast<float>((y * textureCellHeight_) + (0.5f / static_cast<float>(height_)));
+		float u = static_cast<float>(x) * textureCellWidth_;
+		float v = static_cast<float>(y) * textureCellHeight_;
+
+		slot.texCoord[0] = u;
+		slot.texCoord[1] = v;
 	}
 
 	return true;
@@ -555,14 +561,13 @@ void XFontTexture::GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords)
 	const float slotCoord0 = pSlot->texCoord[0];
 	const float slotCoord1 = pSlot->texCoord[1];
 
-
-	cords.texCoords[0] = slotCoord0 - invWidth_;		// extra pixel for nicer bilinear filter
-	cords.texCoords[1] = slotCoord1 - invHeight_;		// extra pixel for nicer bilinear filter
+	cords.texCoords[0] = slotCoord0;
+	cords.texCoords[1] = slotCoord1;
 	cords.texCoords[2] = slotCoord0 + static_cast<float>(chWidth * invWidth_);
 	cords.texCoords[3] = slotCoord1 + static_cast<float>(chHeight * invHeight_);
 
-	cords.size[0] = chWidth + 1;		// extra pixel for nicer bilinear filter
-	cords.size[1] = chHeight + 1;		// extra pixel for nicer bilinear filter
+	cords.size[0] = chWidth;		
+	cords.size[1] = chHeight;		
 	cords.offset[0] = pSlot->charOffsetX;
 	cords.offset[1] = pSlot->charOffsetY;
 }
