@@ -13,7 +13,7 @@ FontVars::FontVars()
 	glyphDebugRender_ = 0;
 	glyphDebugRect_ = 0;
 
-	debugShowDrawPosition_ = 1;
+	debugShowDrawPosition_ = 0;
 
 	fontSmoothingMethod_ = FontSmooth::NONE;
 	fontSmoothingAmount_ = FontSmoothAmount::NONE;
