@@ -68,6 +68,7 @@ void PhysXVars::RegisterVars(void)
 
 
 	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugDrawChange>(this);
+
 	// toggle drawing on off. seperate to the scales.
 	pVarDebugDraw_ = ADD_CVAR_REF("phys_draw_debug", debugDraw_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable drawing of physics debug shapes")->SetOnChangeCallback(del);
@@ -229,6 +230,16 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 	// i don't think i'll bother changing the console var value for 'phys_draw_debug_scale'
 	// this can just be a slient internal change.
 
+	// if we don't have a scene still update scale var for when we do.
+	core::ICVar* pScaleVar = scaleVars_[physx::PxVisualizationParameter::eSCALE];
+	if (debugDraw_ && pScaleVar)
+	{
+		const  float scale = pScaleVar->GetFloat();
+		if (scale == 0.f) 
+		{
+			pScaleVar->Set(1.f);
+		}
+	}
 
 	if (!pScene_) {
 		// we might not have a scene yet, when we do have one current values are transfferd to the scene.
@@ -240,17 +251,9 @@ void PhysXVars::Var_OnDebugDrawChange(core::ICVar* pVar)
 	if (debugDraw_)
 	{
 		// check current value.
-		if (scaleVars_[physx::PxVisualizationParameter::eSCALE])
+		if (pScaleVar)
 		{
-			float scale = scaleVars_[physx::PxVisualizationParameter::eSCALE]->GetFloat();
-
-			// maybe I should actuall always update 'phys_draw_debug_scale' to 1 here.
-			// since you are toggling drawing :/
-			// i think if it's zero set to 1, that way we don't override any custom scale, if set.
-			if (scale == 0.f) {
-				scale = 1.0f;
-			}
-
+			const float scale = pScaleVar->GetFloat();
 
 			pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, scale);
 		}
