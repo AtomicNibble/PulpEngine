@@ -167,29 +167,29 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetColor(Col_Lime);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(10.f, 10.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale\nnew line 1\nnew line 2. :[");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x10 1.0\tscale\nnew line 1\nnew line 2. :[");
 
 	SpacingY = 90;
 
 	ctx.SetColor(Col_Orangered);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(40.f, 40.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 10x20 1.0\tscale");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Test text 40x40 1.0\tscale");
 
 	ctx.SetColor(Col_Orangered);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(64.f, 64.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 64x64 1.0\tscale");
 
 	ctx.SetColor(Col_Limegreen);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(48.f, 48.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 48x48 1.0\tscale");
 
 	ctx.SetColor(Col_Seashell);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(48.f, 48.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu{,}()£$%10x201.0scale");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu{,}()£$%48x481.0scale");
 
 	ctx.SetColor(Col_Seashell);
 	ctx.SetCharWidthScale(1.0f);
@@ -200,12 +200,12 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetColor(Col_Greenyellow);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(32.f, 32.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 32x32 1.0\tscale");
 
 	ctx.SetColor(Col_Steelblue);
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(16.f, 16.f));
-	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 10x20 1.0\tscale");
+	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 16x16 1.0\tscale");
 
 	posX = 400;
 	posY = 80;
