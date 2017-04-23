@@ -46,8 +46,6 @@ void PhysXVars::RegisterVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Stepper style for physics update. 0=debug, 1=fixed, 2=inverted-fixed, 3=variable.")->SetOnChangeCallback(del);
 
-	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugDrawChange>(this);
-
 	ADD_CVAR_REF("phys_pvd_enable", pvdEnable_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Enable PVD connections. Must be enabled before you can even attempt to connect");
 
@@ -69,6 +67,7 @@ void PhysXVars::RegisterVars(void)
 		"PVD connection ip");
 
 
+	del.Bind<PhysXVars, &PhysXVars::Var_OnDebugDrawChange>(this);
 	// toggle drawing on off. seperate to the scales.
 	pVarDebugDraw_ = ADD_CVAR_REF("phys_draw_debug", debugDraw_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable drawing of physics debug shapes")->SetOnChangeCallback(del);
