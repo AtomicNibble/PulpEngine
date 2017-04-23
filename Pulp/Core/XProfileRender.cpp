@@ -128,6 +128,8 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 
 	Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
 	font::XTextDrawConect con;
+	con.pFont = pFont_;
+	con.SetDefaultEffect();
 	con.col = Col_Red;
 	con.flags = font::DrawTextFlag::CENTER;
 	pPrimCon_->drawText(txtPos, con, "Sub Systems");
@@ -361,6 +363,8 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col
 {
 	Vec3f pos(x, y, 1);
 	font::TextDrawContext ctx;
+	ctx.pFont = pFont_;
+	ctx.SetDefaultEffect();
 	ctx.col = col;
 	pPrimCon_->drawText(pos, ctx, pStr);
 }
@@ -369,6 +373,8 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col
 {
 	Vec3f pos(x,y, 1);
 	font::TextDrawContext ctx;
+	ctx.pFont = pFont_;
+	ctx.SetDefaultEffect();
 	ctx.col = col;
 	ctx.flags |= flags;
 	pPrimCon_->drawText(pos, ctx, pStr);
