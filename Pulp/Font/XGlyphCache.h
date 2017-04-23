@@ -4,7 +4,6 @@
 #define _X_FONT_GLYPH_CACHE_H_
 
 #include <Util\UniquePointer.h>
-#include <Util\ReferenceCounted.h>
 
 #include "XGlyphBitmap.h"
 #include "XFontGlyph.h"
@@ -23,7 +22,7 @@ class FontVars;
 #undef GetCharHeight
 #endif
 
-class XGlyphCache : public core::ReferenceCounted<>
+class XGlyphCache
 {
 	typedef core::HashMap<uint16, XGlyph*>		XCacheTable;
 	typedef core::Array<XGlyph>					XGlyphArr;
