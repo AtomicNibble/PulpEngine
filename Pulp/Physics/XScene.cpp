@@ -430,6 +430,8 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 
 void XScene::releaseCharacterController(ICharacterController* pController)
 {
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
 	X_DELETE(pController, arena_);
 }
 
