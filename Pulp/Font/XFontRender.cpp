@@ -136,28 +136,21 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t dest
 		}
 	}
 
-	const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph->bitmap.width);
-	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph->bitmap.rows);
+	const uint32_t colsToCopy = core::Min(dstGlyphWidth, destOffsetX + pGlyph->bitmap.width);
+	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, destOffsetY + pGlyph->bitmap.rows);
 
 	for (uint32_t row = 0; row < rowsToCopy; row++)
 	{
+		const int32_t dstX = destOffsetX;
 		const int32_t dstY = row + destOffsetY;
+		const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
 
-		for (uint32_t colum = 0; colum < colsToCopy; colum++)
-		{
-			const int32_t dstX = colum + destOffsetX;
-			const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
+		const int32_t srcOffset = (row * pGlyph->bitmap.pitch);
 
-			const int32_t srcOffset = (row * pGlyph->bitmap.pitch) + colum;
-			const uint8_t srcColor = pGlyph->bitmap.buffer[srcOffset];
+		uint8_t* pDstRow = &buffer[dstOffset];
+		const uint8_t* pSrcRow = &pGlyph->bitmap.buffer[srcOffset];
 
-			// overflow.
-			if (dstOffset >= static_cast<int32_t>(buffer.size())) {
-				continue;
-			}
-
-			buffer[dstOffset] = srcColor;
-		}
+		std::memcpy(pDstRow, pSrcRow, colsToCopy);
 	}
 
 	if (debugRender_) {
