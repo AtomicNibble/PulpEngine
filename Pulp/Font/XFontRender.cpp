@@ -214,10 +214,13 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRa
 	glyphBitmapWidth_ = width;
 	glyphBitmapHeight_ = height;
 
+	const auto scaledWidth = static_cast<int32_t>(glyphBitmapWidth_ * sizeRatio_); 
+	const auto scaledHeight = static_cast<int32_t>(glyphBitmapHeight_ * sizeRatio_);
+
 	const int32_t err = FT_Set_Pixel_Sizes(
 		pFace_,
-		static_cast<int32_t>(glyphBitmapWidth_ * sizeRatio_),
-		static_cast<int32_t>(glyphBitmapHeight_ * sizeRatio_)
+		scaledWidth,
+		scaledHeight
 	);
 
 	metrics_.ascender = pFace_->size->metrics.ascender / 64;
