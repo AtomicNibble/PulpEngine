@@ -71,7 +71,7 @@ bool XFontRender::Release(void)
 }
 
 
-bool XFontRender::GetGlyph(XGlyph& glphy, int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode)
+bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode)
 { 
 	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
 	if (err) {
@@ -88,9 +88,9 @@ bool XFontRender::GetGlyph(XGlyph& glphy, int32_t destOffsetX, int32_t destOffse
 	}
 
 
-	auto& buffer = glphy.glyphBitmap.GetBuffer();
-	const uint32 dstGlyphWidth = glphy.glyphBitmap.GetWidth();
-	const uint32 dstGlyphHeight = glphy.glyphBitmap.GetHeight();
+	auto& buffer = destBitMap.GetBuffer();
+	const uint32 dstGlyphWidth = destBitMap.GetWidth();
+	const uint32 dstGlyphHeight = destBitMap.GetHeight();
 	const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
 
 #if X_DEBUG

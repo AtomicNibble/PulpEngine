@@ -189,7 +189,8 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		scaleBitmap_->Clear();
 
 		X_ASSERT_NOT_NULL(pSlot);
-		if (!fontRenderer_.GetGlyph(*pSlot, 0, 0, cChar))
+		X_ASSERT_NOT_NULL(scaleBitmap_.get());
+		if (!fontRenderer_.GetGlyph(*pSlot, *scaleBitmap_, 0, 0, cChar))
 		{
 			// failed to render
 			return false;
@@ -212,7 +213,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	else
 	{
 		X_ASSERT_NOT_NULL(pSlot);
-		if (!fontRenderer_.GetGlyph(*pSlot, 0, 0, cChar))
+		if (!fontRenderer_.GetGlyph(*pSlot, pSlot->glyphBitmap, 0, 0, cChar))
 		{
 			// failed to render
 			return false;
