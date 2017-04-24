@@ -35,6 +35,8 @@ public:
 	virtual void shutDown(void) X_FINAL;
 	virtual void release(void) X_FINAL;
 
+	virtual bool asyncInitFinalize(void) X_FINAL;
+
 	// IXFont
 	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 

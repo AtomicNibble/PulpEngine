@@ -21,6 +21,9 @@ struct IFontSys : public core::IEngineSysBase
 {
 	virtual ~IFontSys(){}
 	
+	// finish any async init tasks for all fonts.
+	virtual bool asyncInitFinalize(void) X_ABSTRACT;
+
 	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 
 	// Summary:

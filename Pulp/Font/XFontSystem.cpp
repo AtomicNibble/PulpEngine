@@ -115,6 +115,26 @@ void XFontSystem::shutDown(void)
 
 }
 
+
+bool XFontSystem::asyncInitFinalize(void)
+{
+	// potentiall we will hold this lock for a while.
+	// but we should not really see any contention.
+	core::CriticalSection::ScopedLock lock(lock_); 
+
+	bool result = true;
+
+	for (const auto& fontIt : fonts_)
+	{
+		auto* pFont = fontIt.second;
+		
+		// we call all even if one fails.
+		result &= pFont->WaitTillReady();
+	}
+
+	return result;
+}
+
 void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
 {
 	core::CriticalSection::ScopedLock lock(lock_);
