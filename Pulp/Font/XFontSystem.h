@@ -17,9 +17,6 @@ class XGlyphCache;
 
 class XFontSystem : public IFontSys, public core::IXHotReload
 {
-//	typedef core::ReferenceCountedInstance<XFontTexture*> XFontTextureRef;
-//	typedef core::ReferenceCountedInstance<XGlyphCache*> XGlyphCacheRef;
-
 	typedef core::HashMap<FontNameStr, XFont*> FontMap;
 	typedef core::HashMap<SourceNameStr, XFontTexture*> FontTextureMap;
 
