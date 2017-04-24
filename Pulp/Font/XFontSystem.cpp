@@ -206,7 +206,14 @@ void XFontSystem::releaseFontTexture(XFontTexture* pFontTex)
 		X_ERROR("Font", "Failed to find FontTexture for removal. name: \"%s\"", pFontTex->GetName().c_str());
 		return;
 	}
+
+	if (pFontTex->removeReference() == 0)
+	{
+//		fontTextures_.erase(it);
+		X_DELETE(pFontTex, g_fontArena);
+	}
 }
+
 
 
 
