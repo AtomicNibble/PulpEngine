@@ -252,6 +252,11 @@ void XCore::ShutDown()
 
 	if (env_.pFontSys)
 	{
+		// wait till any async events either fail or succeded i don't care.
+		// this is just to remove races on shutdown logic.
+		// temptedted to put this inside font shutdown so can't not call it.
+		(void)env_.pFontSys->asyncInitFinalize();
+
 		env_.pFontSys->shutDown();
 		core::SafeRelease(env_.pFontSys);
 	}
