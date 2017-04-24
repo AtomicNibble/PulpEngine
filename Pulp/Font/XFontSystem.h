@@ -59,7 +59,7 @@ private:
 
 	FontVars vars_;
 
-	core::CriticalSection lock_;
+	mutable core::CriticalSection lock_;
 	FontTextureMap fontTextures_;
 };
 

@@ -117,6 +117,8 @@ void XFontSystem::shutDown(void)
 
 void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
 {
+	core::CriticalSection::ScopedLock lock(lock_);
+
 	for (const auto& fontIt : fonts_)
 	{
 		auto* pFont = fontIt.second;
