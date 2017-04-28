@@ -63,6 +63,23 @@ namespace
 	}
 
 
+	// the raw files store compression headers with the algo's in, so verify not changed.
+	
+	// the count is not importants, and can change just flag that checks should be added for the new algo enum.
+	static_assert(core::Compression::Algo::ENUM_COUNT == 7, "More algo's added? add a additional assert here.");
+
+	static_assert(core::Compression::Algo::STORE == 0, "Compression algo index changed");
+	static_assert(core::Compression::Algo::LZ4 == 1, "Compression algo index changed");
+	static_assert(core::Compression::Algo::LZ4HC == 2, "Compression algo index changed");
+	static_assert(core::Compression::Algo::LZMA == 3, "Compression algo index changed");
+	static_assert(core::Compression::Algo::ZLIB == 4, "Compression algo index changed");
+	static_assert(core::Compression::Algo::LZ5 == 5, "Compression algo index changed");
+	static_assert(core::Compression::Algo::LZ5HC == 6, "Compression algo index changed");
+
+	// make sure not changed either.
+	X_ENSURE_SIZE(core::Compression::BufferHdr, 12);
+
+
 } // namespace
 
 
