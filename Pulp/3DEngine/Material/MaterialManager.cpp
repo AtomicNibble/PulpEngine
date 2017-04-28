@@ -545,8 +545,8 @@ void XMaterialManager::freeDanglingMaterials(void)
 {
 	auto it = materials_.begin();
 	for (; it != materials_.end(); ++it) {
-		auto matRes = it->second;
-		X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, matRes->getName(), matRes->getRefCount());
+		auto* pMatRes = it->second;
+		X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, pMatRes->getName(), pMatRes->getRefCount());
 	}
 
 	materials_.free();
