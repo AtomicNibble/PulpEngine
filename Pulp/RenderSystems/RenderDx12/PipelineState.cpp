@@ -84,6 +84,8 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
 			return false;
 		}
 
+		D3DDebug::SetDebugObjectName(*pPSO, "PSO");
+
 		*pPSORef = *pPSO;
 	}
 	else // if(*pPSORef == nullptr)
