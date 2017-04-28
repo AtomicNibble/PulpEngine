@@ -17,9 +17,6 @@ class XGlyphCache;
 
 class XFontSystem : public IFontSys, public core::IXHotReload
 {
-//	typedef core::ReferenceCountedInstance<XFontTexture*> XFontTextureRef;
-//	typedef core::ReferenceCountedInstance<XGlyphCache*> XGlyphCacheRef;
-
 	typedef core::HashMap<FontNameStr, XFont*> FontMap;
 	typedef core::HashMap<SourceNameStr, XFontTexture*> FontTextureMap;
 
@@ -37,6 +34,8 @@ public:
 	virtual bool init(void) X_FINAL;
 	virtual void shutDown(void) X_FINAL;
 	virtual void release(void) X_FINAL;
+
+	virtual bool asyncInitFinalize(void) X_FINAL;
 
 	// IXFont
 	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
@@ -62,7 +61,7 @@ private:
 
 	FontVars vars_;
 
-	core::CriticalSection lock_;
+	mutable core::CriticalSection lock_;
 	FontTextureMap fontTextures_;
 };
 

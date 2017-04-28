@@ -361,9 +361,8 @@ void XPhysics::shutDown(void)
 		X_DELETE(pCooking_, arena_);
 	}
 
-	PvdCleanup();
-
 	if (pPhysics_) {
+		PvdCleanup();
 		PxCloseExtensions();
 	}
 
