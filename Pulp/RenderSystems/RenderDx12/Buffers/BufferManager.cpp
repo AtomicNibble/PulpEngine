@@ -170,6 +170,7 @@ void BufferManager::freeIB(IndexBufferHandle IBHandle)
 	stats_.numIndexBuffers--;
 #endif // !VID_MEMORY_STATS
 
+	X_DELETE(pBuf->pBuffer_, &arena_);
 	X_DELETE(pBuf, &arena_);
 }
 
