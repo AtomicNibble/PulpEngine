@@ -108,6 +108,8 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numEle
 	pBuf->pBackingHeap_ = nullptr;
 
 	pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, numElements, elementSize, pInitialData);
+	
+	D3DDebug::SetDebugObjectName(pBuf->pBuffer_->getResource(), "VertexBuffer");
 
 	return createHandleForBuffer(pBuf);
 }
@@ -131,6 +133,7 @@ BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t numEleme
 
 	pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, numElements, elementSize, pInitialData);
 
+	D3DDebug::SetDebugObjectName(pBuf->pBuffer_->getResource(), "IndexBuffer");
 
 	return createHandleForBuffer(pBuf);
 }
@@ -150,6 +153,8 @@ BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size,
 	pBuf->pBackingHeap_ = nullptr;
 
 	pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, size, 1, pInitialData);
+
+	D3DDebug::SetDebugObjectName(pBuf->pBuffer_->getResource(), "ConstBuffer");
 
 	pBuf->rootIdx_ = rootIdx;
 
