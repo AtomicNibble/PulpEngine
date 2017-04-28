@@ -348,6 +348,10 @@ X_NAMESPACE_BEGIN(texture)
 						X_ASSERT_UNREACHABLE();
 						break;
 				}
+
+#if X_DEBUG
+				pTexRes->setPixelBuffer(render::PixelBufferType::NONE, nullptr);
+#endif // !X_DEBUG
 			}
 
 			textures_.releaseAsset(pTexRes);

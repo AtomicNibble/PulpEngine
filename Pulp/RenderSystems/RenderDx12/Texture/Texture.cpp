@@ -47,7 +47,9 @@ X_NAMESPACE_BEGIN(texture)
 
 	Texture::~Texture()
 	{
-
+#if X_DEBUG
+		X_ASSERT(!pPixelBuffer_, "Dangling pixel buffer instance")(render::PixelBufferType::ToString(pixelBufType_), pPixelBuffer_);
+#endif // !X_DEBUG
 	}
 
 	void Texture::destroy(void)
@@ -64,7 +66,8 @@ X_NAMESPACE_BEGIN(texture)
 
 	void Texture::setPixelBuffer(render::PixelBufferType::Enum type, render::PixelBuffer* pInst)
 	{
-		X_ASSERT(pixelBufType_ == render::PixelBufferType::NONE, "Already has a pixel buffer")(pixelBufType_);
+		X_ASSERT(pixelBufType_ == render::PixelBufferType::NONE || type == render::PixelBufferType::NONE,
+			"Already has a pixel buffer")(pixelBufType_);
 
 		pixelBufType_ = type;
 		pPixelBuffer_ = pInst;
