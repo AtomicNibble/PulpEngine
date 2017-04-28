@@ -13,3 +13,6 @@
 [submodule "3rdparty/Physx_libs"]
 	path = 3rdparty/Physx_libs
 	url = ../../root/Physx.git
+[submodule "game_folder/asset_db"]
+	path = game_folder/asset_db
+	url = ../../root/PotatoAssetDB.git
