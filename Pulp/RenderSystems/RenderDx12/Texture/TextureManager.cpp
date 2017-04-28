@@ -329,6 +329,8 @@ X_NAMESPACE_BEGIN(texture)
 		{
 			core::string name(pTexRes->getName());
 
+			static_assert(render::PixelBufferType::ENUM_COUNT == 4, "pixel buffer enum changed, this code need updating?");
+
 			if (pTexRes->getBufferType() != render::PixelBufferType::NONE)
 			{
 				switch (pTexRes->getBufferType())
