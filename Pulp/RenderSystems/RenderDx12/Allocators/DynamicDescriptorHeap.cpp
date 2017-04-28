@@ -31,6 +31,10 @@ void DescriptorTypeAllocatorPool::destoryAll(void)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
+	for (auto dh : descriptorHeapPool_) {
+		core::SafeReleaseDX(dh);
+	}
+
 	descriptorHeapPool_.clear();
 }
 
