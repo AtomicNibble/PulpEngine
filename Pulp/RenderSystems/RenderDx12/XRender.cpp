@@ -404,6 +404,7 @@ void XRender::shutDown(void)
 		X_DELETE_AND_NULL(pDescriptorAllocator_, arena_);
 	}
 	if (pDescriptorAllocatorPool_) {
+		pDescriptorAllocatorPool_->destoryAll();
 		X_DELETE_AND_NULL(pDescriptorAllocatorPool_, arena_);
 	}
 
