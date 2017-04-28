@@ -62,6 +62,8 @@ public:
 	void ListMaterials(const char* pSearchPatten = nullptr) const;
 
 private:
+	void releaseMaterial_internal(Material* pMat);
+
 	MaterialResource* loadMaterialCompiled(const core::string& name);
 
 	MaterialResource* createMaterial_Internal(const core::string& name);

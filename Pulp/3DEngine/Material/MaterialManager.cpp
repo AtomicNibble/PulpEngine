@@ -210,6 +210,8 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
 	if (pMatRes->removeReference() == 0)
 	{
+		releaseMaterial_internal(pMatRes);
+
 		materials_.releaseAsset(pMatRes);
 	}
 }
@@ -341,6 +343,13 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 	}
 
 	return false;
+}
+
+void XMaterialManager::releaseMaterial_internal(Material* pMat)
+{
+	// when we release the material we need to clean up somethings.
+
+
 }
 
 XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& matName)
@@ -546,6 +555,7 @@ void XMaterialManager::freeDanglingMaterials(void)
 	auto it = materials_.begin();
 	for (; it != materials_.end(); ++it) {
 		auto* pMatRes = it->second;
+		releaseMaterial_internal(pMatRes);
 		X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, pMatRes->getName(), pMatRes->getRefCount());
 	}
 
