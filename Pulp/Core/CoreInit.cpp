@@ -616,7 +616,7 @@ bool XCore::InitAsyncWait(void)
 
 
 	// wait for default font to fully load.
-	if (!gEnv->IsDedicated())
+	if (env_.pFontSys)
 	{
 		font::IFont* pFont = env_.pFontSys->GetFont("default");
 		if (!pFont) 
