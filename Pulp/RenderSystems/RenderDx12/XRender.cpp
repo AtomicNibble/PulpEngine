@@ -231,7 +231,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 			D3D12_INFO_QUEUE_FILTER NewFilter;
 			core::zero_object(NewFilter);
 
-			NewFilter.DenyList.NumSeverities = _countof(Severities);
+			NewFilter.DenyList.NumSeverities = X_ARRAY_SIZE(Severities);
 			NewFilter.DenyList.pSeverityList = Severities;
 
 			hr = pInfoQueue->PushStorageFilter(&NewFilter);
