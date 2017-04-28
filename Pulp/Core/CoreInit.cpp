@@ -608,27 +608,32 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 bool XCore::InitAsyncWait(void)
 {
-	if (!env_.pConsole->asyncInitFinalize())
-	{
-		return false;
-	}
+	// we should call all even if one fails.
+	// aka we must wait for all to finish even if some fail.
+	bool allOk = true;
+
+	allOk &= env_.pConsole->asyncInitFinalize();
+
 
 	// wait for default font to fully load.
 	if (!gEnv->IsDedicated())
 	{
 		font::IFont* pFont = env_.pFontSys->GetFont("default");
-		if (!pFont) {
+		if (!pFont) 
+		{
+			allOk = false;
 			X_ERROR("Font", "failed to get default font");
-			return false;
 		}
-
-		if (!pFont->WaitTillReady()) {
-			X_ERROR("Font", "Error loading default font");
-			return false;
+		else
+		{
+			if (!pFont->WaitTillReady()) {
+				allOk = false;
+				X_ERROR("Font", "Error loading default font");
+			}
 		}
 	}
 
-	return true;
+	return allOk;
 }
 
 
