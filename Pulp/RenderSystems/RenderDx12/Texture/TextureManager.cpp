@@ -329,30 +329,7 @@ X_NAMESPACE_BEGIN(texture)
 		{
 			core::string name(pTexRes->getName());
 
-			static_assert(render::PixelBufferType::ENUM_COUNT == 4, "pixel buffer enum changed, this code need updating?");
-
-			if (pTexRes->getBufferType() != render::PixelBufferType::NONE)
-			{
-				switch (pTexRes->getBufferType())
-				{
-					case render::PixelBufferType::COLOR:
-						X_DELETE(&pTexRes->getColorBuf(), arena_);
-						break;
-					case render::PixelBufferType::DEPTH:
-						X_DELETE(&pTexRes->getDepthBuf(), arena_);
-						break;
-					case render::PixelBufferType::SHADOW:
-						X_DELETE(&pTexRes->getShadowBuf(), arena_);
-						break;
-					default:
-						X_ASSERT_UNREACHABLE();
-						break;
-				}
-
-#if X_DEBUG
-				pTexRes->setPixelBuffer(render::PixelBufferType::NONE, nullptr);
-#endif // !X_DEBUG
-			}
+			releasePixelBuffer_internal(pTexRes);
 
 			textures_.releaseAsset(pTexRes);
 		}
@@ -412,6 +389,36 @@ X_NAMESPACE_BEGIN(texture)
 	//	pUploadBuffer->Release();
 
 		return true;
+	}
+
+	X_INLINE void TextureManager::releasePixelBuffer_internal(render::IPixelBuffer* pPixelBuf)
+	{
+		Texture* pTex = static_cast<Texture*>(pPixelBuf);
+
+		static_assert(render::PixelBufferType::ENUM_COUNT == 4, "pixel buffer enum changed, this code need updating?");
+
+		if (pTex->getBufferType() != render::PixelBufferType::NONE)
+		{
+			switch (pTex->getBufferType())
+			{
+				case render::PixelBufferType::COLOR:
+					X_DELETE(&pTex->getColorBuf(), arena_);
+					break;
+				case render::PixelBufferType::DEPTH:
+					X_DELETE(&pTex->getDepthBuf(), arena_);
+					break;
+				case render::PixelBufferType::SHADOW:
+					X_DELETE(&pTex->getShadowBuf(), arena_);
+					break;
+				default:
+					X_ASSERT_UNREACHABLE();
+					break;
+			}
+
+#if X_DEBUG
+			pTex->setPixelBuffer(render::PixelBufferType::NONE, nullptr);
+#endif // !X_DEBUG
+		}
 	}
 
 	TextureManager::TexRes* TextureManager::findTexture(const char* pName)
@@ -490,8 +497,9 @@ X_NAMESPACE_BEGIN(texture)
 
 			auto it = textures_.begin();
 			for (; it != textures_.end(); ++it) {
-				auto texRes = it->second;
-				X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, texRes->getName(), texRes->getRefCount());
+				auto* pTexRes = it->second;
+				releasePixelBuffer_internal(pTexRes);
+				X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, pTexRes->getName(), pTexRes->getRefCount());
 			}
 		}
 

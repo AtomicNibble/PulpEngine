@@ -64,6 +64,8 @@ public:
 
 
 private:
+	void releasePixelBuffer_internal(render::IPixelBuffer* pPixelBuf);
+
 	TexRes* findTexture(const char* pName);
 	TexRes* findTexture(const core::string& name);
 	bool reloadForName(const char* pName);
