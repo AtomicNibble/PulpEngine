@@ -348,7 +348,7 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 void XMaterialManager::releaseMaterial_internal(Material* pMat)
 {
 	// when we release the material we need to clean up somethings.
-
+	X_UNUSED(pMat);
 
 }
 
