@@ -243,7 +243,7 @@ bool Converter::ConvertAll(void)
 	X_LOG0("Converter", "Converting all assets...");
 
 	int32_t numAssets = 0;
-	if (db_.GetNumAssets(numAssets)) {
+	if (!db_.GetNumAssets(numAssets)) {
 		X_ERROR("Converter", "Failed to get asset count");
 		return false;
 	}
