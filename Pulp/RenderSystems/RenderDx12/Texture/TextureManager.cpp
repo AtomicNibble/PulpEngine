@@ -279,7 +279,7 @@ X_NAMESPACE_BEGIN(texture)
 			}
 			
 			// check we have a pixel buf.
-			X_ASSERT_NOT_NULL(pTexRes->pPixelBufVoid_);
+			X_ASSERT_NOT_NULL(pTexRes->pPixelBuffer_);
 			X_ASSERT(pTexRes->getBufferType() != render::PixelBufferType::NONE, "Type not set")();
 		}
 

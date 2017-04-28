@@ -84,7 +84,7 @@ class TextureManager;
 		X_INLINE void setNumFaces(uint8_t faces);
 		X_INLINE void setNumMips(uint8_t mips);
 
-		void setPixelBuffer(render::PixelBufferType::Enum type, void* pInst);
+		void setPixelBuffer(render::PixelBufferType::Enum type, render::PixelBuffer* pInst);
 
 	private:
 		render::GpuResource	resource_;
@@ -110,7 +110,7 @@ class TextureManager;
 			render::ColorBuffer* pColorBuf_;
 			render::DepthBuffer* pDepthBuf_;
 			render::ShadowBuffer* pShadowBuf_;
-			void* pPixelBufVoid_;
+			render::PixelBuffer* pPixelBuffer_;
 		};
 	};
 
