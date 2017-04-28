@@ -285,6 +285,7 @@ struct ICore
 	virtual ~ICore(){}
 
 	virtual bool Init(const SCoreInitParams &startupParams) X_ABSTRACT;
+	virtual bool InitAsyncWait(void) X_ABSTRACT; // call this if init fails, before shutting down.
 	virtual void Release(void) X_ABSTRACT;
 
 	// Update all the systems.

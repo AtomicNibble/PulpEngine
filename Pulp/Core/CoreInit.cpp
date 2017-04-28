@@ -587,27 +587,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		// Sync up any asynchronous initialization so we are fully init.
 		// This is stuff like loading default assets, that can be done in background to 
 		// minamize startup time.
-		if (!env_.pConsole->asyncInitFinalize())
+		if (!InitAsyncWait())
 		{
 			return false;
-		}
-
-		// wait for default font to fully load.
-		if (!startupParams.isCoreOnly())
-		{
-			if (!gEnv->IsDedicated())
-			{
-				font::IFont* pFont = env_.pFontSys->GetFont("default");
-				if (!pFont) {
-					X_ERROR("Font", "failed to get default font");
-					return false;
-				}
-
-				if (!pFont->WaitTillReady()) {
-					X_ERROR("Font", "Error loading default font");
-					return false;
-				}
-			}
 		}
 	}
 
@@ -623,6 +605,32 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	return true;
 }
+
+bool XCore::InitAsyncWait(void)
+{
+	if (!env_.pConsole->asyncInitFinalize())
+	{
+		return false;
+	}
+
+	// wait for default font to fully load.
+	if (!gEnv->IsDedicated())
+	{
+		font::IFont* pFont = env_.pFontSys->GetFont("default");
+		if (!pFont) {
+			X_ERROR("Font", "failed to get default font");
+			return false;
+		}
+
+		if (!pFont->WaitTillReady()) {
+			X_ERROR("Font", "Error loading default font");
+			return false;
+		}
+	}
+
+	return true;
+}
+
 
 bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 {

@@ -91,6 +91,10 @@ extern "C"
 
 		if (!pCore->Init(startupParams))
 		{
+			// wait till any async events either fail or succeded i don't care.
+			// this is just to remove races on shutdown logic.
+			(void)pCore->InitAsyncWait();
+
 			if (gEnv && gEnv->pLog) {
 				X_ERROR("Core", "Failed to init core");
 			}

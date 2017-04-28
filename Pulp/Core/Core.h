@@ -83,6 +83,7 @@ public:
 	~XCore() X_FINAL;
 
 	virtual bool Init(const SCoreInitParams &startupParams) X_FINAL;
+	virtual bool InitAsyncWait(void) X_FINAL;
 	virtual void ShutDown(void); // not part of ICore currently
 	virtual void Release(void) X_FINAL;
 
