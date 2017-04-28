@@ -413,6 +413,97 @@ bool AssetDB::PerformMigrations(void)
 		}
 	}
 
+	if (dbVersion_ < 2)
+	{
+		X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 2", dbVersion_);
+
+		using core::Compression::Algo;
+
+		typedef std::pair<uint8_t, Algo::Enum> AlgoEnumPair;
+
+		// maps from old to new.
+		const std::array<AlgoEnumPair, Algo::ENUM_COUNT> algoMap = {{
+			{ 4, Algo::STORE }, // store was 4
+			{ 0, Algo::LZ4 },
+			{ 1, Algo::LZ4HC },
+			{ 2, Algo::LZMA },
+			{ 3, Algo::ZLIB },
+			// unchanged
+			{ Algo::LZ5, Algo::LZ5 },
+			{ Algo::LZ5HC, Algo::LZ5HC },
+		}};
+
+
+		sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
+
+		auto it = qry.begin();
+		for (; it != qry.end(); ++it)
+		{
+			auto row = *it;
+
+			int32_t rawFileId = row.get<int32_t>(0);
+			RawFile rawfileInfo;
+
+			if (!GetRawfileForRawId(rawFileId, rawfileInfo))
+			{
+				X_ERROR("AssetDB", "Failed to get rawfile path");
+				return false;
+			}
+
+			core::Path<char> filePath;
+			AssetPathForRawFile(rawfileInfo, filePath);
+
+			X_LOG1("AssetDB", "Updateding compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
+
+			core::XFileScoped file;
+			if (!file.openFile(filePath.c_str(), 
+				core::fileMode::READ |
+				core::fileMode::WRITE |
+				core::fileMode::RANDOM_ACCESS |
+				core::fileMode::SHARE))
+			{
+				X_ERROR("AssetDB", "Failed to open rawfile");
+				return false;
+			}
+
+			core::Compression::BufferHdr hdr;
+
+			if (file.readObj(hdr) != sizeof(hdr))
+			{
+				X_ERROR("AssetDB", "Failed to rawfile read header");
+				return false;
+			}
+
+			if (!hdr.IsMagicValid())
+			{
+				X_ERROR("AssetDB", "Rawfile has a invalid header");
+				return false;
+			}
+
+
+			auto it = std::find_if(algoMap.begin(), algoMap.end(), [&hdr](const AlgoEnumPair& ap) -> bool { 
+				return hdr.algo == ap.first;
+			});
+			
+			if (it == algoMap.end())
+			{
+				// failed to map algo
+				X_ERROR("AssetDB", "Failed to map algo: \"%s\"", Algo::ToString(hdr.algo));
+				return false;
+			}
+
+			// update algo.
+			hdr.algo = it->second;
+
+			file.seek(0, core::SeekMode::SET);
+			if (file.writeObj(hdr) != sizeof(hdr))
+			{
+				X_ERROR("AssetDB", "Failed to write updated rawFile header");
+				return false;
+			}
+		}
+	}
+
 	return true;
 }
 
