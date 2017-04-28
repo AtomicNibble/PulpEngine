@@ -396,7 +396,7 @@ bool AssetDB::PerformMigrations(void)
 				// build old path by removing hash from name.
 				oldFilePath.set(newFilePath.begin(), newFilePath.end() - hashLenStr.length());
 
-				X_LOG1("AssetDB", "Renaming raw_file %" PRIi32 "from \"%s\" to \"%s\"", rawFileId, oldFilePath.c_str(), newFilePath.c_str());
+				X_LOG1("AssetDB", "Renaming raw_file %" PRIi32 " from \"%s\" to \"%s\"", rawFileId, oldFilePath.c_str(), newFilePath.c_str());
 
 				// make sure dir tree for new name is valid.
 				// not really needed here since renaming in same folder but it's not hurting anything.
