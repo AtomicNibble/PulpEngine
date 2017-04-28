@@ -65,7 +65,7 @@ namespace Compression
 		X_UNUSED(lvl);
 
 		if (destBufLen != srcBufLen) {
-			X_ERROR("Store", "Dest buf size does not match src");
+			X_ERROR("Store", "Dest buf size does not match src. srcLen: %" PRIuS " destLen: %" PRIuS, srcBufLen, destBufLen);
 			return false;
 		}
 
@@ -81,7 +81,7 @@ namespace Compression
 		X_UNUSED(arena);
 
 		if (destBufLen != srcBufLen) {
-			X_ERROR("Store", "Dest buf size does not match src");
+			X_ERROR("Store", "Dest buf size does not match src. srcLen: %" PRIuS " destLen: %" PRIuS, srcBufLen, destBufLen);
 			return false;
 		}
 
