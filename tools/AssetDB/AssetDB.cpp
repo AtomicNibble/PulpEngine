@@ -128,7 +128,9 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 
 	dbPath.append(DB_NAME);
 
-	if (!gEnv->pFileSys->fileExists(dbPath.c_str())) {
+	const bool dbExsists = gEnv->pFileSys->fileExists(dbPath.c_str());
+
+	if (!dbExsists) {
 		X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
 	}
 
@@ -139,16 +141,27 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 		return false;
 	}
 
-	if (!getDBVersion(dbVersion_)) {
-		return false;
-	}
-
-	if (dbVersion_ != DB_VERSION) {
-		if (!PerformMigrations()) {
-			X_ERROR("AssetDB", "Failed to perform DB migrations");
+	if (dbExsists)
+	{
+		if (!getDBVersion(dbVersion_)) {
 			return false;
 		}
 
+		if (dbVersion_ != DB_VERSION) {
+			if (!PerformMigrations()) {
+				X_ERROR("AssetDB", "Failed to perform DB migrations");
+				return false;
+			}
+
+			if (!setDBVersion(DB_VERSION)) {
+				X_ERROR("AssetDB", "Failed to set new DB version to %" PRIi32 " it's recommend you do it manually as migrations passed", DB_VERSION);
+				return false;
+			}
+		}
+	}
+	else
+	{
+		// new db set the version.
 		if (!setDBVersion(DB_VERSION)) {
 			X_ERROR("AssetDB", "Failed to set new DB version to %" PRIi32 " it's recommend you do it manually as migrations passed", DB_VERSION);
 			return false;
