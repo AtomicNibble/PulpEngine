@@ -152,14 +152,6 @@ protected:
 
 	TechArr techs_;
 	TextureArr textures_;
-	// this is old now, even tho never really used :D
-	// since the techs will store states for us.
-	// this makes it alot nicer since we will only have like maybe 200 techs max.
-	// so that results in only 200 calls to render system to make states.
-	// instead of having to ask the render system for every material.
-	// we also get the advantage of state livetime is not tied to the materials.
-	// so we can load/unload materials without having to re ask for states.
-	// this will also potentially make shader hot reloading more easy.
 };
 
 X_NAMESPACE_END
