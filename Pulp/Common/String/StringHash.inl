@@ -85,7 +85,7 @@ X_INLINE StrHash::StrHash(const T& str) :
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline StrHash::StrHash(const char* str, size_t length) :
+X_INLINE StrHash::StrHash(const char* str, size_t length) :
 	hash_(
 		Hash::Fnv1aHash(str, length)
 	)

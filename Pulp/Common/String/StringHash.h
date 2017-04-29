@@ -46,7 +46,7 @@ public:
 	template <typename T>
 	X_INLINE StrHash(const T& str);
 	
-	inline StrHash(const char* str, size_t length);	/// Constructs a StringHash from a string with a certain length.
+	X_INLINE StrHash(const char* str, size_t length);	/// Constructs a StringHash from a string with a certain length.
 
 	X_INLINE operator Type(void) const;	/// Cast operator, returning the string's hash.
 
