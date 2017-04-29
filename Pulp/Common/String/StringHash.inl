@@ -60,9 +60,9 @@ namespace internal
 	/// \brief Generates a hash for non-constant strings.
 	/// \remark The NonStringLiteral argument is never used, and serves only as a type used in overload resolution
 	/// in the type-based dispatch mechanism.
-	inline StrHash::Type GenerateHash(const char* str, NonStringLiteral)
+	inline StrHash::Type GenerateHash(const char* pStr, NonStringLiteral)
 	{
-		return Hash::Fnv1aHash(str, strUtil::strlen(str));
+		return Hash::Fnv1aHash(pStr, strUtil::strlen(pStr));
 	}
 }
 
@@ -85,11 +85,27 @@ X_INLINE StrHash::StrHash(const T& str) :
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-X_INLINE StrHash::StrHash(const char* str, size_t length) :
+X_INLINE StrHash::StrHash(const char* pStr, size_t length) :
 	hash_(
-		Hash::Fnv1aHash(str, length)
+		Hash::Fnv1aHash(pStr, length)
 	)
 {
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+X_INLINE StrHash::StrHash(const char* pBegin, const char* pEnd) :
+	hash_(
+		Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pBegin - pEnd))
+	)
+{
+
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+X_INLINE StrHash::StrHash(Type hash) :
+	hash_(hash)
+{
+
 }
 
 
