@@ -52,8 +52,6 @@ struct MaterialTech
 	core::StrHash hash;
 	TechDefPerm* pPerm; // the tech perm this came from.
 
-	// for drawing.
-//	render::StateHandle stateHandle;
 	render::Commands::ResourceStateBase* pVariableState;
 };
 
