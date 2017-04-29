@@ -303,7 +303,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// we just add this to the materials local store, so it don't have to ask us for this next time.
 	// so once everything has it's state to render anything we just have to check
 	Material::Tech matTech;
-	matTech.hash = techNameHash;
+	matTech.hashVal = techNameHash;
 	matTech.pPerm = pPerm;
 	matTech.pVariableState = pVariableState;
 
@@ -317,7 +317,7 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 {
 	TechDefState* pTechDefState = pMat->getTechDefState();
 
-	TechDef* pTechDef = pTechDefState->getTech(pTech->hash);
+	TechDef* pTechDef = pTechDefState->getTech(core::StrHash(pTech->hashVal));
 
 	if (pTechDef->getNumAliases() < 1) {
 		return false;

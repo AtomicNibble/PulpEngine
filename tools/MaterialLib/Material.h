@@ -49,7 +49,7 @@ struct TechDefPerm
 struct MaterialTech
 {
 	// for lookup.
-	core::StrHash hash;
+	core::StrHash::Type hashVal;
 	TechDefPerm* pPerm; // the tech perm this came from.
 
 	render::Commands::ResourceStateBase* pVariableState;

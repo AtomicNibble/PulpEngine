@@ -22,7 +22,7 @@ X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::V
 
 	for (auto& tech : techs_)
 	{
-		if (tech.hash == hash && tech.pPerm->vertFmt == vertFmt && tech.pPerm->permFlags == permFlags) {
+		if (tech.hashVal == hash && tech.pPerm->vertFmt == vertFmt && tech.pPerm->permFlags == permFlags) {
 			return &tech;
 		}
 	}
