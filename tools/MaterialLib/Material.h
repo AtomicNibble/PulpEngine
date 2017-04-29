@@ -60,7 +60,6 @@ struct MaterialTech
 class Material
 {
 public:
-	typedef MaterialTech Tech;
 
 	struct Texture
 	{
@@ -74,6 +73,7 @@ public:
 
 	typedef core::FixedArray<Texture, MTL_MAX_TEXTURES> FixedTextureArr;
 
+	typedef MaterialTech Tech;
 	typedef core::Array<Tech> TechArr;
 	typedef core::Array<Texture> TextureArr;
 
