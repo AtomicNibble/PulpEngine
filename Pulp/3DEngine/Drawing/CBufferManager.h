@@ -44,7 +44,7 @@ X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
 
 class CBufferManager
 {
-	typedef core::ReferenceCountedInstance<render::shader::XCBuffer*> RefCountedCBuf;
+	typedef core::ReferenceCountedInstance<const render::shader::XCBuffer*> RefCountedCBuf;
 
 	struct hash
 	{
@@ -75,8 +75,8 @@ public:
 	bool autoUpdateBuffer(render::shader::XCBuffer& cbuf);
 
 	// create a device cbuffer.
-	render::ConstantBufferHandle createCBuffer(render::shader::XCBuffer& cbuf);
-	void destoryConstBuffer(render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
+	render::ConstantBufferHandle createCBuffer(const render::shader::XCBuffer& cbuf);
+	void destoryConstBuffer(const render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
 
 private:
 	X_INLINE void setTime(core::TimeVal time);

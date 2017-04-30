@@ -186,7 +186,7 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 	return true;
 }
 
-render::ConstantBufferHandle CBufferManager::createCBuffer(render::shader::XCBuffer& cbuf)
+render::ConstantBufferHandle CBufferManager::createCBuffer(const render::shader::XCBuffer& cbuf)
 {
 	// so this manager should be responsible for merging duplicate cbuffers.
 	// if a cbuffer is the same in everyway we can share it.
@@ -216,7 +216,7 @@ render::ConstantBufferHandle CBufferManager::createCBuffer(render::shader::XCBuf
 	return handle;
 }
 
-void CBufferManager::destoryConstBuffer(render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle)
+void CBufferManager::destoryConstBuffer(const render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle)
 {
 	// we need ref counting in order to know when we can free the device buffer.
 	// we should have the ref couting implemented here.
