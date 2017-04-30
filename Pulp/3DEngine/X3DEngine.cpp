@@ -219,8 +219,8 @@ void X3DEngine::Update(core::FrameData& frame)
 
 	
 
-	pCBufMan_->update(frame);
 
+	pCBufMan_->update(frame, false);
 }
 
 void X3DEngine::OnFrameBegin(core::FrameData& frame)
