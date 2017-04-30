@@ -270,11 +270,16 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	auto* pCBHandles = pVariableState->getCBs();
 	for (size_t i = 0; i < cbLinks.size(); i++)
 	{
-		auto& cb = cbLinks[i];
-		
-		pCBufMan_->autoUpdateBuffer(*cb.pCBufer);
+		auto& cbLink = cbLinks[i];
+		auto& cb = *cbLink.pCBufer;
 
-		auto cbHandle = pCBufMan_->createCBuffer(*cb.pCBufer);
+		if (!cb.requireManualUpdate())
+		{
+			// might as well provide intial data.
+		//	pCBufMan_->autoUpdateBuffer(cb);
+		}
+
+		auto cbHandle = pCBufMan_->createCBuffer(cb);
 
 		pCBHandles[i] = cbHandle;
 	}
