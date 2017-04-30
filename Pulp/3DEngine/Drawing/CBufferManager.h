@@ -54,6 +54,8 @@ class CBufferManager
 
 	typedef core::Array<RefCountedCBuf> CBufRefArr;
 
+	static const size_t MAX_PER_FRAME_CBUF = 16;
+
 public:
 	CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender);
 	~CBufferManager();

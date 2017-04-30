@@ -204,6 +204,11 @@ render::ConstantBufferHandle CBufferManager::createCBuffer(const render::shader:
 			return it->handle;
 		}
 
+		if (perFrameCbs_.size() >= MAX_PER_FRAME_CBUF)
+		{
+			X_WARNING("Cbuf", "Per frame cbuffer counts exceeded limit of %" PRIuS " current: %" PRIuS, MAX_PER_FRAME_CBUF, perFrameCbs_.size());
+		}
+
 		auto handle = pRender_->createConstBuffer(cbuf, render::BufUsage::DYNAMIC);
 
 		perFrameCbs_.emplace_back(const_cast<std::add_pointer_t<Unqualified<decltype(cbuf)>>>(&cbuf), handle);
