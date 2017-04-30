@@ -256,7 +256,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 {
 	// lets check asset will fit.
 	// I don't do this in IMaterial just to save including IAssetDb.h in the header.
-	static_assert(assetDb::ASSET_NAME_MAX_LENGTH <= std::numeric_limits<decltype(MaterialTexture::nameLen)>::max(),
+	static_assert(assetDb::ASSET_NAME_MAX_LENGTH <= std::numeric_limits<decltype(MaterialTextureHdr::nameLen)>::max(),
 		"Material only supports 255 max name len");
 
 	X_ASSERT(cat_ != MaterialCat::UNKNOWN, "MatCat can't be unknown")();

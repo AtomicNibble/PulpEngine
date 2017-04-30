@@ -409,7 +409,7 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 #else
 
 	// we also have texture info.
-	core::FixedArray<MaterialTexture, MTL_MAX_TEXTURES> texInfo;
+	core::FixedArray<MaterialTextureHdr, MTL_MAX_TEXTURES> texInfo;
 	core::FixedArray<const char*, MTL_MAX_TEXTURES> texNames;
 	texInfo.resize(hdr.numTextures);
 

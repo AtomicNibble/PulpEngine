@@ -249,7 +249,7 @@ struct MaterialHeader
 };
 
 
-struct MaterialTexture
+struct MaterialTextureHdr
 {
 	uint8_t nameLen;
 	render::FilterType::Enum filterType;
@@ -276,7 +276,7 @@ X_ENSURE_SIZE(MaterialMountType::Enum, 1);
 
 
 X_ENSURE_SIZE(MaterialHeader, 44);
-X_ENSURE_SIZE(MaterialTexture, 4);
+X_ENSURE_SIZE(MaterialTextureHdr, 4);
 
 class Material;
 struct MaterialTech;
