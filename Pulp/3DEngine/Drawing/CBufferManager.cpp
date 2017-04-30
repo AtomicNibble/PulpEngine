@@ -79,6 +79,8 @@ void CBufferManager::update(core::FrameData& frame, bool othro)
 	}
 
 	++frameIdx_;
+
+	updatePerFrameCBs();
 }
 
 void CBufferManager::setMatrixes(const Matrix44f& view, const Matrix44f& proj)
@@ -291,5 +293,14 @@ X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type
 			break;
 	}
 }
+
+void CBufferManager::updatePerFrameCBs(void)
+{
+	for (auto& cbRef : perFrameCbs_)
+	{
+		autoUpdateBuffer(*cbRef.pCBuf);
+	}
+}
+
 
 X_NAMESPACE_END

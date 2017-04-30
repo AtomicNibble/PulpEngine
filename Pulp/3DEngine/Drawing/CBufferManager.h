@@ -82,6 +82,7 @@ public:
 
 private:
 	void setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst);
+	void updatePerFrameCBs(void);
 
 	X_INLINE void setTime(core::TimeVal time);
 	X_INLINE void setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal time);
