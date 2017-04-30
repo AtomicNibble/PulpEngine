@@ -167,9 +167,10 @@ bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint
 {
 	X_ASSERT(dstLen >= cbuf.getBindSize(), "Dest buffer is too small")(dstLen, cbuf.getBindSize());
 
-	// would be nice if cbuffer had flags on what types of update freq it contains.
-	// so if there are no auto update params we can early out.
-
+	// skip if this cbuffer don't have any per frame param
+	if (!cbuf.containsUpdateFreqs(render::shader::UpdateFreq::FRAME)) {
+		return false;
+	}
 
 	for (int32_t i = 0; i < cbuf.getParamCount(); i++)
 	{
