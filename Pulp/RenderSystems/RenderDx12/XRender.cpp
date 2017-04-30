@@ -1068,7 +1068,7 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 }
 
 // cb's
-ConstantBufferHandle XRender::createConstBuffer(shader::XCBuffer& cb, BufUsage::Enum usage)
+ConstantBufferHandle XRender::createConstBuffer(const shader::XCBuffer& cb, BufUsage::Enum usage)
 {
 	// so we need to create a allocation and maybe also store some info about the cbuf?
 	// potentially we just store a copy of the cbuffer :/

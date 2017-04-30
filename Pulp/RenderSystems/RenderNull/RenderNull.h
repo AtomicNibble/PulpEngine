@@ -44,7 +44,7 @@ public:
 	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 
-	virtual ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
+	virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
 	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;

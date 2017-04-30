@@ -185,7 +185,7 @@ public:
 	IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
 
 	// cb's
-	ConstantBufferHandle createConstBuffer(shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
+	ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
 	texture::ITexture* getDefaultTexture(void) const X_FINAL;
