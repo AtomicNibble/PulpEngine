@@ -84,7 +84,7 @@ X_INLINE void Material::addTech(Tech&& tech)
 {
 	core::Spinlock::ScopedLock lock(techLock_);
 
-	techs_.emplace_back(std::forward<Tech>(tech));
+	techs_.append(std::forward<Tech>(tech));
 }
 
 X_INLINE const int32_t Material::getID(void) const
