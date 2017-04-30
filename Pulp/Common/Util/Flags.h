@@ -31,14 +31,21 @@ public:
 	inline bool AreAllSet(void) const;
 
 	// compare
-	inline bool operator==(const Flags other) const;
-	inline bool operator!=(const Flags other) const;
+	inline bool operator==(const Flags& other) const;
+	inline bool operator!=(const Flags& other) const;
 
 	// Bitwise operators.
 	inline Flags operator|(Flags other) const;
 	inline Flags& operator|=(Flags other);
 	inline Flags operator&(Flags other) const;
 	inline Flags& operator&=(Flags other);
+	inline Flags operator^(Flags other) const;
+	inline Flags& operator^=(Flags other);
+
+	// enum only versions.
+	inline Flags operator^(Enum e) const;
+	inline Flags& operator^=(Enum e);
+
 
 	inline Flags& operator=(Enum e);
 	inline Flags& operator=(const Flags& oth);
@@ -88,14 +95,21 @@ public:
 	inline bool AreAllSet(void) const;
 
 	// compare
-	inline bool operator==(const Flags8 other) const;
-	inline bool operator!=(const Flags8 other) const;
+	inline bool operator==(const Flags8& other) const;
+	inline bool operator!=(const Flags8& other) const;
 
 	inline Flags8 operator|(Flags8 other) const;
 	inline Flags8& operator|=(Flags8 other);
 	inline Flags8 operator&(Flags8 other) const;
 	inline Flags8& operator&=(Flags8 other);
+	inline Flags8 operator^(Flags8 other) const;
+	inline Flags8& operator^=(Flags8 other);
 
+	// enum only versions.
+	inline Flags8 operator^(Enum e) const;
+	inline Flags8& operator^=(Enum e);
+
+	// taking just enum.
 	inline Flags8& operator=(Enum e);
 	inline Flags8& operator=(const Flags8& oth);
 

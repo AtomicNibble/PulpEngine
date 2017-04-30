@@ -97,6 +97,33 @@ inline Flags<T>& Flags<T>::operator&=(Flags other)
 	return *this;
 }
 
+template <class T>
+inline Flags<T> Flags<T>::operator^(Flags other) const
+{
+	return Flags<T>(flags_ ^ other.flags_);
+}
+
+template <class T>
+inline Flags<T>& Flags<T>::operator^=(Flags other)
+{
+	flags_ ^= other.flags_;
+	return *this;
+}
+
+// enum only versions.
+template <class T>
+inline Flags<T> Flags<T>::operator^(Enum e) const
+{
+	return Flags<T>(flags_ ^ e);
+}
+
+template <class T>
+inline Flags<T>& Flags<T>::operator^=(Enum e)
+{
+	flags_ ^= e;
+	return *this;
+}
+
 
 template <class T>
 inline Flags<T>& Flags<T>::operator=(Enum e)
@@ -151,13 +178,13 @@ const char* Flags<T>::ToString(Description& description) const
 }
 
 template <class T>
-inline bool Flags<T>::operator==(const Flags other) const
+inline bool Flags<T>::operator==(const Flags& other) const
 {
 	return flags_ == other.flags_;
 }
 
 template <class T>
-inline bool Flags<T>::operator!=(const Flags other) const
+inline bool Flags<T>::operator!=(const Flags& other) const
 {
 	return flags_ != other.flags_;
 }
@@ -236,13 +263,13 @@ inline bool Flags8<T>::AreAllSet(void) const
 }
 
 template <class T>
-inline bool Flags8<T>::operator==(const Flags8 other) const
+inline bool Flags8<T>::operator==(const Flags8& other) const
 {
 	return flags_ == other.flags_;
 }
 
 template <class T>
-inline bool Flags8<T>::operator!=(const Flags8 other) const
+inline bool Flags8<T>::operator!=(const Flags8& other) const
 {
 	return flags_ != other.flags_;
 }
@@ -274,6 +301,34 @@ inline Flags8<T>& Flags8<T>::operator&=(Flags8 other)
 	flags_ &= other.flags_;
 	return *this;
 }
+
+template <class T>
+inline Flags8<T> Flags8<T>::operator^(Flags8 other) const
+{
+	return Flags8<T>(flags_ ^ other.flags_);
+}
+
+template <class T>
+inline Flags8<T>& Flags8<T>::operator^=(Flags8 other)
+{
+	flags_ ^= other.flags_;
+	return *this;
+}
+
+// enum only versions.
+template <class T>
+inline Flags8<T> Flags8<T>::operator^(Enum e) const
+{
+	return Flags8<T>(flags_ ^ e);
+}
+
+template <class T>
+inline Flags8<T>& Flags8<T>::operator^=(Enum e)
+{
+	flags_ ^= e;
+	return *this;
+}
+
 
 
 template <class T>
