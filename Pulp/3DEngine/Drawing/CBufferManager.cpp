@@ -185,50 +185,6 @@ bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint
 	return true;
 }
 
-X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst)
-{
-	using render::shader::ParamType;
-
-	static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
-
-	switch (type)
-	{
-		case ParamType::PF_worldToScreenMatrix:
-			std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
-			break;
-		case ParamType::PF_screenToWorldMatrix:
-			std::memcpy(pDst, &viewProjInv_, sizeof(viewProjInv_));
-			break;
-		case ParamType::PF_worldToCameraMatrix:
-			std::memcpy(pDst, &view_, sizeof(view_));
-			break;
-		case ParamType::PF_cameraToWorldMatrix:
-			std::memcpy(pDst, &inView_, sizeof(inView_));
-			break;
-
-		case ParamType::PF_Time:
-			std::memcpy(pDst, &time_, sizeof(time_));
-			break;
-		case ParamType::PF_FrameTime:
-			std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
-			break;
-		case ParamType::PF_FrameTimeUI:
-			std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
-			break;
-		case ParamType::PF_ScreenSize:
-			std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
-			break;
-
-
-		case ParamType::Unknown:
-			// need to be manually set.
-			break;
-
-		default:
-			X_ASSERT_NOT_IMPLEMENTED();
-			break;
-	}
-}
 
 render::ConstantBufferHandle CBufferManager::createCBuffer(const render::shader::XCBuffer& cbuf)
 {
@@ -284,6 +240,51 @@ void CBufferManager::destoryConstBuffer(const render::shader::XCBuffer& cbuf, re
 	}
 
 	pRender_->destoryConstBuffer(handle);
+}
+
+X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst)
+{
+	using render::shader::ParamType;
+
+	static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
+
+	switch (type)
+	{
+		case ParamType::PF_worldToScreenMatrix:
+			std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
+			break;
+		case ParamType::PF_screenToWorldMatrix:
+			std::memcpy(pDst, &viewProjInv_, sizeof(viewProjInv_));
+			break;
+		case ParamType::PF_worldToCameraMatrix:
+			std::memcpy(pDst, &view_, sizeof(view_));
+			break;
+		case ParamType::PF_cameraToWorldMatrix:
+			std::memcpy(pDst, &inView_, sizeof(inView_));
+			break;
+
+		case ParamType::PF_Time:
+			std::memcpy(pDst, &time_, sizeof(time_));
+			break;
+		case ParamType::PF_FrameTime:
+			std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
+			break;
+		case ParamType::PF_FrameTimeUI:
+			std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
+			break;
+		case ParamType::PF_ScreenSize:
+			std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
+			break;
+
+
+		case ParamType::Unknown:
+			// need to be manually set.
+			break;
+
+		default:
+			X_ASSERT_NOT_IMPLEMENTED();
+			break;
+	}
 }
 
 X_NAMESPACE_END
