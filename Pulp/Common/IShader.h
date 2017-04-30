@@ -63,7 +63,7 @@ static const uint32_t MAX_SHADER_PERMS = 512;
 // MP = Morph data
 */
 
-X_DECLARE_ENUM8(UpdateFreq) (
+X_DECLARE_FLAGS8(UpdateFreq) (
 	// these need to be ordered in update freq high to low.
 	FRAME,
 	BATCH,
@@ -72,6 +72,8 @@ X_DECLARE_ENUM8(UpdateFreq) (
 	SKINDATA,
 	UNKNOWN		// unknow is assumed worse case.
 );
+
+typedef Flags8<UpdateFreq> UpdateFreqFlags;
 
 
 // param can have multiple flags set eg: (Float & matrix)

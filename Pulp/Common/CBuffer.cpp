@@ -18,7 +18,7 @@ namespace shader
 			static_assert(UpdateFreq::UNKNOWN > UpdateFreq::SKINDATA, "enum order not increasing");
 
 			// add more static asserts yo.
-			static_assert(UpdateFreq::ENUM_COUNT == 6, "Enum count changed this code need updating?");
+			static_assert(UpdateFreq::FLAGS_COUNT == 6, "Enum count changed this code need updating?");
 
 			return core::Max(lhs, rhs);
 		}
@@ -204,6 +204,7 @@ namespace shader
 	{
 		pFile->writeString(name_);
 		pFile->writeObj(hash_);
+		pFile->writeObj(updateFeqFlags_);
 		pFile->writeObj(updateRate_);
 		pFile->writeObj(size_);
 		pFile->writeObj(bindPoint_);
@@ -224,6 +225,7 @@ namespace shader
 	{
 		pFile->readString(name_);
 		pFile->readObj(hash_);
+		pFile->readObj(updateFeqFlags_);
 		pFile->readObj(updateRate_);
 		pFile->readObj(size_);
 		pFile->readObj(bindPoint_);
@@ -263,11 +265,13 @@ namespace shader
 
 	void XCBuffer::computeFlags(void)
 	{
+		updateFeqFlags_.Clear();
 		paramFlags_.Clear();
 
 		for (const auto& p : params_)
 		{
 			paramFlags_.Set(p.getType());
+			updateFeqFlags_.Set(p.getUpdateRate());
 		}
 	}
 
@@ -277,6 +281,7 @@ namespace shader
 
 		hasher.reset(0);
 		hasher.update(name_.c_str(), name_.length());
+		hasher.update(updateFeqFlags_.ToInt());
 		hasher.update(updateRate_);
 		hasher.update(size_);
 		hasher.update(bindPoint_);

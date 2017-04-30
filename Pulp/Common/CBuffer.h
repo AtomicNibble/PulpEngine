@@ -140,7 +140,7 @@ namespace shader
 
 		// 4
 		UpdateFreq::Enum updateRate_;
-		int8_t  _pad;
+		UpdateFreqFlags updateFeqFlags_; // tells me what type fo flags this cbuffer is made up of.
 		int16_t size_;
 
 		// 4
