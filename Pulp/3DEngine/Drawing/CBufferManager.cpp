@@ -59,7 +59,7 @@ void CBufferManager::shutDown(void)
 #endif
 }
 
-void CBufferManager::update(core::FrameData& frame)
+void CBufferManager::update(core::FrameData& frame, bool othro)
 {
 	using render::shader::ParamType;
 
@@ -73,32 +73,55 @@ void CBufferManager::update(core::FrameData& frame)
 	// view
 	setViewPort(frame.view.viewport);
 
-	if (view_ != frame.view.viewMatrix) {
-		view_ = frame.view.viewMatrix;
-		inView_ = frame.view.viewMatrix.inverted();
+	if (!othro)
+	{
+		setMatrixes(frame.view.viewMatrix, frame.view.projMatrix,
+			frame.view.viewProjMatrix, frame.view.viewProjInvMatrix);
+	}
+	else
+	{
+		setMatrixes(frame.view.viewMatrixOrtho, frame.view.projMatrixOrtho,
+			frame.view.viewProjMatrixOrth, frame.view.viewProjMatrixOrth.inverted());
+	}
+
+	++frameIdx_;
+}
+
+void CBufferManager::setMatrixes(const Matrix44f& view, const Matrix44f& proj)
+{
+	setMatrixes(view, proj, 
+		view * proj, (view * proj).inverted());
+}
+
+void CBufferManager::setMatrixes(const Matrix44f& view, const Matrix44f& proj, 
+	const Matrix44f& viewProj, const Matrix44f& viewProjInv)
+{
+	using render::shader::ParamType;
+
+	if (view_ != view) {
+		view_ = view;
+		inView_ = view.inverted();
 
 		dirtyFlags_.Set(ParamType::PF_viewMatrix);
 		dirtyFlags_.Set(ParamType::PF_cameraToWorldMatrix);
 	}
-	if (proj_ != frame.view.projMatrix) {
-		proj_ = frame.view.projMatrix;
+	if (proj_ != proj) {
+		proj_ = proj;
 
 		dirtyFlags_.Set(ParamType::PF_projectionMatrix);
 	}
 
-	if (viewProj_ != frame.view.viewProjMatrix) {
-		viewProj_ = frame.view.viewProjMatrix;
+	if (viewProj_ != viewProj) {
+		viewProj_ = viewProj;
 
 		dirtyFlags_.Set(ParamType::PF_worldToScreenMatrix);
 	}
 
-	if (viewProjInv_ != frame.view.viewProjInvMatrix) {
-		viewProjInv_ = frame.view.viewProjInvMatrix;
+	if (viewProjInv_ != viewProjInv) {
+		viewProjInv_ = viewProjInv;
 
 		dirtyFlags_.Set(ParamType::PF_screenToWorldMatrix);
 	}
-
-	++frameIdx_;
 }
 
 bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)

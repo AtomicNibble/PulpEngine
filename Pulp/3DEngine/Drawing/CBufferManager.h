@@ -69,7 +69,11 @@ public:
 
 	void shutDown(void);
 
-	void update(core::FrameData& frame);
+	void update(core::FrameData& frame, bool othro);
+
+	void setMatrixes(const Matrix44f& view, const Matrix44f& proj);
+	void setMatrixes(const Matrix44f& view, const Matrix44f& proj,
+		const Matrix44f& viewProj, const Matrix44f& viewProjInv);
 
 	// returns true if stale.
 	bool autoUpdateBuffer(render::shader::XCBuffer& cbuf);
