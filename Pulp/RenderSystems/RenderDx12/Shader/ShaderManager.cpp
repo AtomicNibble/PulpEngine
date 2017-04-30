@@ -179,6 +179,7 @@ namespace shader
 				// the others should wait for results if the want same shader.
 				if (pHWShader->getLock().TryEnter())
 				{
+					// we adopt the lock we have from tryEnter this is not a re-lock.
 					core::UniqueLock<XHWShader::LockType> lock(pHWShader->getLock(), core::adopt_lock);
 
 					// try load it from cache.
