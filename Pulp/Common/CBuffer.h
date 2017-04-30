@@ -15,10 +15,10 @@ namespace shader
 
 	struct CBufferLink
 	{
-		CBufferLink(ShaderStage::Enum stage, XCBuffer* pCBufer);
+		CBufferLink(ShaderStage::Enum stage, const XCBuffer* pCBufer);
 
 		ShaderStageFlags stages;
-		XCBuffer* pCBufer;
+		const XCBuffer* pCBufer;
 	};
 
 	typedef core::Array<CBufferLink> CBufLinksArr;
