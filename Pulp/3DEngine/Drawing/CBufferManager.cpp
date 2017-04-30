@@ -43,8 +43,8 @@ void CBufferManager::shutDown(void)
 	{
 		for (auto& cbRef : perFrameCbs_)
 		{
-			const auto* pCB = cbRef.pCBuf;
-			X_WARNING("CBufMan", "Dangling device cbuffer: \"%s\" refs: %" PRIi32, pCB->getName().c_str(), cbRef.getRefCount());
+			// pCBuf is not valid here
+			X_WARNING("CBufMan", "Dangling device cbuffer refs: %" PRIi32, cbRef.getRefCount());
 
 			pRender_->destoryConstBuffer(cbRef.handle);
 		}
