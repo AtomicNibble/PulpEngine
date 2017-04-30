@@ -44,24 +44,15 @@ X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
 
 class CBufferManager
 {
-	typedef core::ReferenceCountedInstance<const render::shader::XCBuffer*> RefCountedCBuf;
-
-	struct hash
+	struct RefCountedCBuf : public core::ReferenceCounted<>
 	{
-		size_t operator()(const RefCountedCBuf& cbh) const;
+		RefCountedCBuf(render::shader::XCBuffer* pCBuf, render::ConstantBufferHandle handle);
+
+		render::shader::XCBuffer* pCBuf;
+		render::ConstantBufferHandle handle;
 	};
 
-	struct equal_to
-	{
-		bool operator()(const RefCountedCBuf& lhs, const RefCountedCBuf& rhs) const;
-	};
-
-	typedef core::HashMap<
-		RefCountedCBuf,
-		render::ConstantBufferHandle,
-		hash,
-		equal_to
-	> ConstBufferCacheMap;
+	typedef core::Array<RefCountedCBuf> CBufRefArr;
 
 public:
 	CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender);
@@ -96,7 +87,7 @@ private:
 
 private:
 	render::IRender* pRender_;
-	ConstBufferCacheMap cbMap_;
+	CBufRefArr perFrameCbs_;
 
 	int32_t frameIdx_;
 

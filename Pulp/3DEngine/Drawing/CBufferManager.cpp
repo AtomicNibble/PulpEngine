@@ -7,28 +7,29 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-
-
-size_t CBufferManager::hash::operator()(const RefCountedCBuf& cbh) const
+namespace 
 {
-	auto* pCuf = *cbh.instance();
-	return static_cast<size_t>(pCuf->getHash() & 0xFFFFFFFF); // drop top 32MSB's in 32bit
+
+	template <typename T>
+	using Unqualified = std::remove_cv_t<std::remove_reference_t<T>>;
+
+} // namespace
+
+
+CBufferManager::RefCountedCBuf::RefCountedCBuf(render::shader::XCBuffer* pCBuf, render::ConstantBufferHandle handle) :
+	pCBuf(pCBuf),
+	handle(handle)
+{
 }
 
-bool CBufferManager::equal_to::operator()(const RefCountedCBuf& lhs, const RefCountedCBuf& rhs) const
-{
-	auto* pCuflhs = *lhs.instance();
-	auto* pCufrhs = *rhs.instance();
 
-	return pCuflhs->isEqual(*pCufrhs);
-}
 
 CBufferManager::CBufferManager(core::MemoryArenaBase* arena, render::IRender* pRender) :
 	pRender_(pRender),
-	cbMap_(arena, 128),
+	perFrameCbs_(arena),
 	frameIdx_(0)
 {
-
+	perFrameCbs_.setGranularity(4);
 }
 
 CBufferManager::~CBufferManager()
@@ -38,25 +39,18 @@ CBufferManager::~CBufferManager()
 
 void CBufferManager::shutDown(void)
 {
-#if 1
-	// we don't own the cbuffer instances, the hardware shaders do.
-	// so freeing the hardware shaders will clean them all up.
-	cbMap_.clear();
-#else
-	if (!cbMap_.empty())
+	if (perFrameCbs_.isNotEmpty())
 	{
-		for (auto it = cbMap_.begin(); it != cbMap_.end(); ++it)
+		for (auto& cbRef : perFrameCbs_)
 		{
-			const auto& cb = it->first;
-			const render::shader::XCBuffer* pCB = *cb.instance();
-			X_WARNING("CBuf", "Dangling cbuffer: \"%s\" refs: %" PRIi32, pCB->getName(), cb.getRefCount());
+			const auto* pCB = cbRef.pCBuf;
+			X_WARNING("CBufMan", "Dangling device cbuffer: \"%s\" refs: %" PRIi32, pCB->getName(), cbRef.getRefCount());
 
-			pRender_->destoryConstBuffer(it->second);
+			pRender_->destoryConstBuffer(cbRef.handle);
 		}
-	
-		cbMap_.clear();
+
+		perFrameCbs_.clear();
 	}
-#endif
 }
 
 void CBufferManager::update(core::FrameData& frame, bool othro)
@@ -237,59 +231,58 @@ X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type
 
 render::ConstantBufferHandle CBufferManager::createCBuffer(const render::shader::XCBuffer& cbuf)
 {
-	// so this manager should be responsible for merging duplicate cbuffers.
-	// if a cbuffer is the same in everyway we can share it.
-	// 1. reduces memory usage on gpu.
-	// 2. reduces amount of updates required.
-	// This is the responsibility of the 3dengine so that each render system don't have to implement this logic.
-	// we can have a map that checks the camels twice.
 	X_ASSERT(cbuf.getHash() != 0, "Hash is not calculated")();
 	
-	RefCountedCBuf key(&cbuf);
-
-	auto it = cbMap_.find(key);
-	if (it != cbMap_.end())
+	// we only share cb's that are composed of just per frame params.
+	if (cbuf.containsOnlyFreq(render::shader::UpdateFreq::FRAME)) 
 	{
-		it->first.addReference();
-		return it->second;
+		// we can share this..
+		auto it = std::find_if(perFrameCbs_.begin(), perFrameCbs_.end(), [&cbuf](const RefCountedCBuf& oth) -> bool {
+			return cbuf.getHash() == oth.pCBuf->getHash() && oth.pCBuf->isEqual(cbuf);
+		});
+
+		if (it != perFrameCbs_.end())
+		{
+			it->addReference();
+			return it->handle;
+		}
+
+		auto handle = pRender_->createConstBuffer(cbuf, render::BufUsage::DYNAMIC);
+
+		perFrameCbs_.emplace_back(const_cast<std::add_pointer_t<Unqualified<decltype(cbuf)>>>(&cbuf), handle);
+
+		return handle;
 	}
 
 	auto handle = pRender_->createConstBuffer(cbuf, render::BufUsage::DYNAMIC);
-
-	// we starting to get into this odd place where alot of things
-	// keep pointers to the cbuffer instances.
-	// and i don't think ref counting is a good solution in this case.
-	// as the life of the cbuffer should be tied to the shader, not who uses it last.
-	cbMap_.insert(std::make_pair(key, handle));
 
 	return handle;
 }
 
 void CBufferManager::destoryConstBuffer(const render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle)
 {
-	// we need ref counting in order to know when we can free the device buffer.
-	// we should have the ref couting implemented here.
-	// so the value needs to contain a ref count.
-
-	// how do we find the cbuffer instnace for the given handle tho?
-	// i need a way to get back to the cbuffer pointer that was used to make the cbuffer.
-	// should i just require the cbuffer isntance also?
-
-	RefCountedCBuf key(&cbuf);
-
-	auto it = cbMap_.find(key);
-	if (it == cbMap_.end())
+	if (cbuf.containsOnlyFreq(render::shader::UpdateFreq::FRAME))
 	{
-		X_ASSERT_UNREACHABLE();
+		auto it = std::find_if(perFrameCbs_.begin(), perFrameCbs_.end(), [&cbuf](const RefCountedCBuf& oth) -> bool {
+			return cbuf.getHash() == oth.pCBuf->getHash() && oth.pCBuf->isEqual(cbuf);
+		});
+
+		if (it == perFrameCbs_.end()) {
+			X_ASSERT_UNREACHABLE();
+		}
+
+		X_ASSERT(it->handle == handle, "Destory CB called with a handle that was not created from the provided CB")();
+
+		if (it->removeReference() == 0)
+		{
+			pRender_->destoryConstBuffer(it->handle);
+			perFrameCbs_.erase(it);
+		}
+
+		return;
 	}
 
-	X_ASSERT(it->second == handle, "Destory CB called with a handle that was not created from the provided CB")();
-
-	if (it->first.removeReference() == 0)
-	{
-		pRender_->destoryConstBuffer(it->second);
-		cbMap_.erase(it);
-	}
+	pRender_->destoryConstBuffer(handle);
 }
 
 X_NAMESPACE_END
