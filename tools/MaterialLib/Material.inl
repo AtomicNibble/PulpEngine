@@ -1,18 +1,27 @@
 X_NAMESPACE_BEGIN(engine)
 
 X_INLINE MaterialTech::MaterialTech(core::MemoryArenaBase* arena) :
+	hashVal(0),
+	pPerm(nullptr),
+	pVariableState(nullptr),
 	materialCbs(arena)
 {
 
 }
 
 X_INLINE MaterialTech::MaterialTech(const MaterialTech& oth) :
+	hashVal(oth.hashVal),
+	pPerm(oth.pPerm),
+	pVariableState(oth.pVariableState),
 	materialCbs(oth.materialCbs)
 {
 
 }
 
 X_INLINE MaterialTech::MaterialTech(MaterialTech&& oth) :
+	hashVal(std::move(oth.hashVal)),
+	pPerm(std::move(oth.pPerm)),
+	pVariableState(std::move(oth.pVariableState)),
 	materialCbs(std::move(oth.materialCbs))
 {
 
