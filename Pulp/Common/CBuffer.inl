@@ -112,11 +112,6 @@ namespace shader
 		params_.setGranularity(varGran);
 	}
 
-	X_INLINE void XCBuffer::setRootIdx(int8_t idx)
-	{
-		rootIdx_ = idx;
-	}
-
 	X_INLINE void XCBuffer::setCpuDataVersion(int32_t version)
 	{
 		cpuDataVersion_ = version;
@@ -158,11 +153,6 @@ namespace shader
 	X_INLINE int32_t XCBuffer::getParamCount(void) const
 	{
 		return safe_static_cast<int32_t>(params_.size());
-	}
-
-	X_INLINE int8_t XCBuffer::getRootIdx(void) const
-	{
-		return rootIdx_;
 	}
 
 	X_INLINE typename XCBuffer::Hasher::HashVal XCBuffer::getHash(void) const

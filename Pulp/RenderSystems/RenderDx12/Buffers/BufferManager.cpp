@@ -138,7 +138,7 @@ BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t numEleme
 	return createHandleForBuffer(pBuf);
 }
 
-BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size, uint32_t rootIdx, const void* pInitialData,
+BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size, const void* pInitialData,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	ConstBuffer* pBuf = Int_CreateCB(size);
@@ -155,8 +155,6 @@ BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size,
 	pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, size, 1, pInitialData);
 
 	D3DDebug::SetDebugObjectName(pBuf->pBuffer_->getResource(), "ConstBuffer");
-
-	pBuf->rootIdx_ = rootIdx;
 
 	return createHandleForBuffer(pBuf);
 }

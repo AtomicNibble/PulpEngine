@@ -30,11 +30,6 @@ X_INLINE uint32_t X3DBuffer::getSize(void) const
 // ------------------------------------------
 
 
-X_INLINE uint32_t ConstBuffer::getRootIdx(void) const
-{
-	return rootIdx_;
-}
-
 
 // ------------------------------------------
 

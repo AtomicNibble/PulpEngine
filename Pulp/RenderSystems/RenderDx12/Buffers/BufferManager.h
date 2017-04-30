@@ -52,12 +52,7 @@ public:
 
 struct ConstBuffer : X3DBuffer
 {
-
-	X_INLINE uint32_t getRootIdx(void) const;
-
-
-public:
-	uint32_t rootIdx_;
+	// ...
 };
 
 
@@ -118,7 +113,7 @@ public:
 
 	VertexBufferHandle createVertexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 	IndexBufferHandle createIndexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
-	ConstantBufferHandle createConstBuf(uint32_t size, uint32_t rootIdx, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
+	ConstantBufferHandle createConstBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 
 	// free from ID
 	void freeIB(IndexBufferHandle IBHandle);
