@@ -167,7 +167,7 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 
 bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint8_t* pDataDst, size_t dstLen)
 {
-	X_ASSERT(dstLen >= cbuf.getBindSize(), "Dest buffer is too small")(dstLen, cbuf.getBindSize());
+	X_ASSERT(dstLen >= static_cast<size_t>(cbuf.getBindSize()), "Dest buffer is too small")(dstLen, cbuf.getBindSize());
 
 	// skip if this cbuffer don't have any per frame param
 	if (!cbuf.containsUpdateFreqs(render::shader::UpdateFreq::FRAME)) {
