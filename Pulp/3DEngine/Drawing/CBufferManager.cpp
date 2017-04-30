@@ -131,12 +131,6 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 	for (int32_t i = 0; i < cbuf.getParamCount(); i++)
 	{
 		const auto& p = cbuf[i];
-		uint8_t* pDst = &cpuData[p.getBindPoint()];
-
-		using render::shader::ParamType;
-
-		static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
-
 		const auto type = p.getType();
 
 		// we can skip the copy if not changed.
@@ -144,46 +138,78 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 			continue;
 		}
 
-		switch (type)
-		{
-			case ParamType::PF_worldToScreenMatrix:
-				std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
-				break;
-			case ParamType::PF_screenToWorldMatrix:
-				std::memcpy(pDst, &viewProjInv_, sizeof(viewProjInv_));
-				break;
-			case ParamType::PF_worldToCameraMatrix:
-				std::memcpy(pDst, &view_, sizeof(view_));
-				break;
-			case ParamType::PF_cameraToWorldMatrix:
-				std::memcpy(pDst, &inView_, sizeof(inView_));
-				break;
+		uint8_t* pDst = &cpuData[p.getBindPoint()];
 
-			case ParamType::PF_Time:
-				std::memcpy(pDst, &time_, sizeof(time_));
-				break;
-			case ParamType::PF_FrameTime:
-				std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
-				break;
-			case ParamType::PF_FrameTimeUI:
-				std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
-				break;
-			case ParamType::PF_ScreenSize:
-				std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
-				break;
-
-
-			case ParamType::Unknown:
-				// need to be manually set.
-				break;
-
-			default:
-				X_ASSERT_NOT_IMPLEMENTED();
-				break;
-		}
+		setParamValue(type, pDst);
 	}
 
 	return true;
+}
+
+bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint8_t* pDataDst, size_t dstLen)
+{
+	X_ASSERT(dstLen >= cbuf.getBindSize(), "Dest buffer is too small")(dstLen, cbuf.getBindSize());
+
+	// would be nice if cbuffer had flags on what types of update freq it contains.
+	// so if there are no auto update params we can early out.
+
+
+	for (int32_t i = 0; i < cbuf.getParamCount(); i++)
+	{
+		const auto& p = cbuf[i];
+		const auto type = p.getType();
+
+		uint8_t* pDst = &pDataDst[p.getBindPoint()];
+
+		setParamValue(type, pDst);
+	}
+
+	return true;
+}
+
+X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst)
+{
+	using render::shader::ParamType;
+
+	static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
+
+	switch (type)
+	{
+		case ParamType::PF_worldToScreenMatrix:
+			std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
+			break;
+		case ParamType::PF_screenToWorldMatrix:
+			std::memcpy(pDst, &viewProjInv_, sizeof(viewProjInv_));
+			break;
+		case ParamType::PF_worldToCameraMatrix:
+			std::memcpy(pDst, &view_, sizeof(view_));
+			break;
+		case ParamType::PF_cameraToWorldMatrix:
+			std::memcpy(pDst, &inView_, sizeof(inView_));
+			break;
+
+		case ParamType::PF_Time:
+			std::memcpy(pDst, &time_, sizeof(time_));
+			break;
+		case ParamType::PF_FrameTime:
+			std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
+			break;
+		case ParamType::PF_FrameTimeUI:
+			std::memcpy(pDst, &frameTime_[core::ITimer::Timer::GAME], sizeof(frameTime_[core::ITimer::Timer::GAME]));
+			break;
+		case ParamType::PF_ScreenSize:
+			std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
+			break;
+
+
+		case ParamType::Unknown:
+			// need to be manually set.
+			break;
+
+		default:
+			X_ASSERT_NOT_IMPLEMENTED();
+			break;
+	}
 }
 
 render::ConstantBufferHandle CBufferManager::createCBuffer(const render::shader::XCBuffer& cbuf)

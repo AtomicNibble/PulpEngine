@@ -73,12 +73,19 @@ public:
 
 	// returns true if stale.
 	bool autoUpdateBuffer(render::shader::XCBuffer& cbuf);
+	// if the cbuffer contains any auto update params
+	// the values are placed into pDst at the correct bind offsets.
+	// no dirty checks are performed
+	bool autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint8_t* pDst, size_t dstLen);
 
 	// create a device cbuffer.
 	render::ConstantBufferHandle createCBuffer(const render::shader::XCBuffer& cbuf);
 	void destoryConstBuffer(const render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
 
+
 private:
+	void setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst);
+
 	X_INLINE void setTime(core::TimeVal time);
 	X_INLINE void setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal time);
 	X_INLINE void setViewPort(const XViewPort& viewport);
