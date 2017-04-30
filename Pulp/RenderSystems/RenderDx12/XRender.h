@@ -69,7 +69,9 @@ class XRender : public IRender
 		DeviceState(core::MemoryArenaBase* arena) :
 			rootSig(arena),
 			texStates(arena)
-		{}
+		{
+			cbRootIdxBase = std::numeric_limits<decltype(cbRootIdxBase)>::max();
+		}
 
 #if DEVICE_STATE_STORE_CPU_DESC
 		StateDesc cpuDesc;
@@ -79,6 +81,9 @@ class XRender : public IRender
 		ID3D12PipelineState* pPso;
 
 		D3D12_PRIMITIVE_TOPOLOGY topo;
+
+		uint8_t cbRootIdxBase; // root index base for cbuffers
+		uint8_t _pad[3];
 
 		// we want to store also the textures and samplers you want to use slut.
 		// this won't stay as vector, just no point doing it fast way as might refactor before done.

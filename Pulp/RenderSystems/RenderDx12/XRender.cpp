@@ -942,6 +942,10 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 			{
 				const ConstantBufferHandle* pCBVs = resourceState.getCBs(pStateData);
 
+				const DeviceState& newState = *reinterpret_cast<const DeviceState*>(handle);
+
+				X_ASSERT(newState.cbRootIdxBase != std::numeric_limits<decltype(newState.cbRootIdxBase)>::max(), "CB rootIdx base is invalid")();
+
 				for (int32_t t = 0; t < resourceState.getNumCBs(); t++)
 				{
 					ConstantBufferHandle cbh = pCBVs[t];
@@ -956,9 +960,10 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 					// we need to know the index this cb should be bound to.
 					auto* pCbuf = pBuffMan_->CBFromHandle(cbh);
 					auto& buf = pCbuf->getBuf();
+					uint32_t rootIdx = newState.cbRootIdxBase + t;
 
 					context.transitionResource(buf, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
-					context.setConstantBuffer(pCbuf->getRootIdx(), buf.getGpuVirtualAddress());
+					context.setConstantBuffer(rootIdx, buf.getGpuVirtualAddress());
 				}
 			}
 		}
@@ -1272,16 +1277,20 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	rootSig.reset(numParams, 0);
 
 	uint32_t currentParamIdx = 0;
-	for (size_t i=0; i<cbufLinks.size(); i++)
-	{
-		const auto& cbLink = cbufLinks[i];
-		auto vis = stageFlagsToStageVisibility(cbLink.stages);
-		auto& cb = *cbLink.pCBufer;
-		auto bindPoint = cb.getBindPoint();
 
-		// tell the render system what root index this needs to be bound at.
-		cb.setRootIdx(currentParamIdx);
-		rootSig.getParamRef(currentParamIdx++).initAsCBV(bindPoint, vis);
+	if (cbufLinks.isNotEmpty())
+	{
+		pState->cbRootIdxBase = currentParamIdx;
+
+		for (size_t i = 0; i < cbufLinks.size(); i++)
+		{
+			const auto& cbLink = cbufLinks[i];
+			auto vis = stageFlagsToStageVisibility(cbLink.stages);
+			auto& cb = *cbLink.pCBufer;
+			auto bindPoint = cb.getBindPoint();
+
+			rootSig.getParamRef(currentParamIdx++).initAsCBV(bindPoint, vis);
+		}
 	}
 
 	if (perm.isStageSet(shader::ShaderType::Pixel))
