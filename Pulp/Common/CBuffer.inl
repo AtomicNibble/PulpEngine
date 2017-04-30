@@ -129,6 +129,16 @@ namespace shader
 		return paramFlags_.IsSet(ParamType::Unknown);
 	}
 
+	X_INLINE bool XCBuffer::containsUpdateFreqs(UpdateFreqFlags flags) const
+	{
+		return (updateFeqFlags_ & flags).IsAnySet();
+	}
+
+	X_INLINE bool XCBuffer::containsKnownParams(void) const
+	{
+		return (paramFlags_ ^ ParamTypeFlags::Unknown).IsAnySet();
+	}
+
 	X_INLINE UpdateFreq::Enum XCBuffer::getUpdateFreg(void) const
 	{
 		return updateRate_;
