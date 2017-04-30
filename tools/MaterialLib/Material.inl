@@ -1,5 +1,46 @@
 X_NAMESPACE_BEGIN(engine)
 
+X_INLINE MaterialTech::MaterialTech(core::MemoryArenaBase* arena) :
+	materialCbs(arena)
+{
+
+}
+
+X_INLINE MaterialTech::MaterialTech(const MaterialTech& oth) :
+	materialCbs(oth.materialCbs)
+{
+
+}
+
+X_INLINE MaterialTech::MaterialTech(MaterialTech&& oth) :
+	materialCbs(std::move(oth.materialCbs))
+{
+
+}
+
+X_INLINE MaterialTech& MaterialTech::operator=(const MaterialTech& oth)
+{
+	if (&oth != this)
+	{
+		hashVal = oth.hashVal;
+		pPerm = oth.pPerm;
+		pVariableState = oth.pVariableState;
+		materialCbs = oth.materialCbs;
+	}
+
+	return *this;
+}
+
+X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
+{
+	hashVal = std::move(oth.hashVal);
+	pPerm = std::move(oth.pPerm);
+	pVariableState = std::move(oth.pVariableState);
+	materialCbs = std::move(oth.materialCbs);
+	return *this;
+}
+
+// -------------------------------------------------------------------------------
 
 X_INLINE Material::Material(core::MemoryArenaBase* arena) :
 	techs_(arena),
@@ -30,11 +71,11 @@ X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::V
 	return nullptr;
 }
 
-X_INLINE void Material::addTech(const Tech& tech)
+X_INLINE void Material::addTech(Tech&& tech)
 {
 	core::Spinlock::ScopedLock lock(techLock_);
 
-	techs_.append(tech);
+	techs_.emplace_back(std::forward<Tech>(tech));
 }
 
 X_INLINE const int32_t Material::getID(void) const

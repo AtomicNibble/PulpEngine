@@ -6,6 +6,8 @@
 #include <IMaterial.h>
 #include <IRender.h>
 #include <IRenderCommands.h>
+#include <CBuffer.h>
+
 
 #include <String\StringHash.h>
 
@@ -48,11 +50,22 @@ struct TechDefPerm
 
 struct MaterialTech
 {
+	typedef core::Array<render::shader::XCBuffer> CBufferARr;
+
+	MaterialTech(core::MemoryArenaBase* arena);
+	MaterialTech(const MaterialTech& oth);
+	MaterialTech(MaterialTech&& oth);
+
+	MaterialTech& operator=(const MaterialTech& oth);
+	MaterialTech& operator=(MaterialTech&& oth);
+
 	// for lookup.
 	core::StrHash::Type hashVal;
 	TechDefPerm* pPerm; // the tech perm this came from.
 
 	render::Commands::ResourceStateBase* pVariableState;
+
+	CBufferARr materialCbs;
 };
 
 struct MaterialTexture
@@ -76,7 +89,7 @@ public:
 	~Material() = default;
 
 	X_INLINE Tech* getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags);
-	X_INLINE void addTech(const Tech& tech);
+	X_INLINE void addTech(Tech&& tech);
 
 	// assigns the material props but name styas same etc.
 	MATLIB_EXPORT void assignProps(const Material& oth);

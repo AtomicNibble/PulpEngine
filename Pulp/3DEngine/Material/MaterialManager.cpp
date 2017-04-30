@@ -302,12 +302,12 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// we now have a material tech that contains the pipeline state needed and what variable state also needs to be set 
 	// we just add this to the materials local store, so it don't have to ask us for this next time.
 	// so once everything has it's state to render anything we just have to check
-	Material::Tech matTech;
+	Material::Tech matTech(arena_);
 	matTech.hashVal = techNameHash;
 	matTech.pPerm = pPerm;
 	matTech.pVariableState = pVariableState;
 
-	pMat->addTech(matTech);
+	pMat->addTech(std::move(matTech));
 
 	pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
 	return pTech;
