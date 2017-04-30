@@ -129,6 +129,13 @@ namespace shader
 		return paramFlags_.IsSet(ParamType::Unknown);
 	}
 
+	X_INLINE bool XCBuffer::containsOnlyFreq(UpdateFreq::Enum freq) const
+	{
+		auto flags = updateFeqFlags_;
+		flags.Remove(freq);
+		return updateFeqFlags_.IsSet(freq) && !flags.IsAnySet();
+	}
+
 	X_INLINE bool XCBuffer::containsUpdateFreqs(UpdateFreqFlags flags) const
 	{
 		return (updateFeqFlags_ & flags).IsAnySet();
@@ -136,7 +143,9 @@ namespace shader
 
 	X_INLINE bool XCBuffer::containsKnownParams(void) const
 	{
-		return (paramFlags_ ^ ParamTypeFlags::Unknown).IsAnySet();
+		auto flags = paramFlags_;
+		flags.Remove(ParamTypeFlags::Unknown);
+		return flags.IsAnySet();
 	}
 
 	X_INLINE UpdateFreq::Enum XCBuffer::getUpdateFreg(void) const

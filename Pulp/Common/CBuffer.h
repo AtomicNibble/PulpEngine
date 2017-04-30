@@ -107,8 +107,9 @@ namespace shader
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE bool requireManualUpdate(void) const;
-		X_INLINE bool containsUpdateFreqs(UpdateFreqFlags freqFlags) const;
-		X_INLINE bool containsKnownParams(void) const;
+		X_INLINE bool containsOnlyFreq(UpdateFreq::Enum freq) const; // must contains some of 'freq' && not contain others.
+		X_INLINE bool containsUpdateFreqs(UpdateFreqFlags freqFlags) const; // contains any of the provided 'freqFlags'
+		X_INLINE bool containsKnownParams(void) const; // contains some known params.
 		X_INLINE UpdateFreq::Enum getUpdateFreg(void) const;
 		X_INLINE int16_t getBindSize(void) const; // this is size in bytes cb should be.
 		X_INLINE int16_t getBindPoint(void) const;
