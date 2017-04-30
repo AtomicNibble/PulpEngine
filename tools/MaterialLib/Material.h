@@ -55,25 +55,21 @@ struct MaterialTech
 	render::Commands::ResourceStateBase* pVariableState;
 };
 
+struct MaterialTexture
+{
+	texture::TexID texId;
+	render::FilterType::Enum filterType;
+	render::TexRepeat::Enum texRepeat;
+};
+
 class Material
 {
 public:
-
-	struct Texture
-	{
-		texture::TexID texId;
-		render::FilterType::Enum filterType;
-		render::TexRepeat::Enum texRepeat;
-	};
-
-	// god dam name hash even tho just int has a constructor.
-//	static_assert(core::compileTime::IsPOD<Tech>::Value, "Tech should be POD");
-
-	typedef core::FixedArray<Texture, MTL_MAX_TEXTURES> FixedTextureArr;
-
 	typedef MaterialTech Tech;
+	typedef MaterialTexture Texture;
 	typedef core::Array<Tech> TechArr;
 	typedef core::Array<Texture> TextureArr;
+	typedef core::FixedArray<Texture, MTL_MAX_TEXTURES> FixedTextureArr;
 
 public:
 	X_INLINE Material(core::MemoryArenaBase* arena);
