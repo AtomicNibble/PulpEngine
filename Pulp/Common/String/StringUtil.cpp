@@ -751,6 +751,31 @@ namespace strUtil
 		return nullptr;
 	}
 
+	bool StringToBool(const char* str)
+	{
+		return StringToBool(str, str + strUtil::strlen(str));
+	}
+
+	bool StringToBool(const char* startInclusive, const char* endExclusive)
+	{
+		// we support numeric and:'true', 'false' 
+		
+		if (IsNumeric(startInclusive, endExclusive))
+		{
+			// TODO: respect range.
+			int32_t val = StringToInt<int32_t>(startInclusive);
+			// anything not zero is true.
+			return val != 0;
+		}
+		
+		if (core::strUtil::IsEqualCaseInsen(startInclusive, endExclusive, "true")) {
+			return true;
+		}
+
+		return false;
+	}
+
+
 	bool HasFileExtension(const char* path)
 	{
 		return FileExtension(path) != nullptr;

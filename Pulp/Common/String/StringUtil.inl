@@ -67,6 +67,35 @@ namespace strUtil
 		return true;
 	}
 
+	inline bool IsNumeric(const char* startInclusive, const char* endExclusive)
+	{
+		X_ASSERT(endExclusive > startInclusive, "string can't be empty")(startInclusive, endExclusive);
+
+		if (*startInclusive == '-') {
+			startInclusive++;
+		}
+
+		bool dotFnd = false;
+
+		while (startInclusive < endExclusive)
+		{
+			if (!IsDigit(*startInclusive))
+			{
+				if (*startInclusive == ',' && !dotFnd)
+				{
+					dotFnd = true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+
+			++startInclusive;
+		}
+
+		return true;
+	}
 
 	template <size_t N>
 	inline const char* Convert(const wchar_t* input, char (&output)[N])
@@ -121,7 +150,6 @@ namespace strUtil
 	}
 
 
-
 	template <typename T>
 	inline T StringToFloat(const char* str)
 	{
@@ -132,5 +160,29 @@ namespace strUtil
 	inline T StringToFloat(const wchar_t* str)
 	{
 		return static_cast<T>(_wtof(str));
+	}
+
+	template <>
+	inline float StringToFloat(const char* str, const char** pEndPtr)
+	{
+		return strtof(str, const_cast<char**>(pEndPtr));
+	}
+
+	template <>
+	inline double StringToFloat(const char* str, const char** pEndPtr)
+	{
+		return strtod(str, const_cast<char**>(pEndPtr));
+	}
+
+	template <>
+	inline float StringToFloat(const wchar_t* str, const wchar_t** pEndPtr)
+	{
+		return wcstof(str, const_cast<wchar_t**>(pEndPtr));
+	}
+
+	template <>
+	inline double StringToFloat(const wchar_t* str, const wchar_t** pEndPtr)
+	{
+		return wcstod(str, const_cast<wchar_t**>(pEndPtr));
 	}
 }

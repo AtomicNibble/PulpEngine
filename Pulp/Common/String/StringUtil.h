@@ -48,6 +48,7 @@ namespace strUtil
 	inline bool IsDigitW(const wchar_t character);
 
 	inline bool IsNumeric(const char* str);
+	inline bool IsNumeric(const char* startInclusive, const char* endExclusive);
 
 	bool IsLower(const char character);
 	bool IsLowerW(const wchar_t character);
@@ -209,6 +210,15 @@ namespace strUtil
 	inline T StringToFloat(const char* str);
 	template <typename T>
 	inline T StringToFloat(const wchar_t* str);
+
+	template <typename T>
+	inline T StringToFloat(const char* str, const char** pEndPtr);
+	template <typename T>
+	inline T StringToFloat(const wchar_t* str, const wchar_t** pEndPtr);
+
+
+	bool StringToBool(const char* str);
+	bool StringToBool(const char* startInclusive, const char* endExclusive);
 
 	bool HasFileExtension(const char* path);
 	bool HasFileExtension(const wchar_t* path);
