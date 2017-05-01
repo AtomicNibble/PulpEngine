@@ -197,8 +197,7 @@ X_DECLARE_ENUM(ParamType)(
 	Float4,
 	Int,
 	Bool,
-	Color,
-	Texture
+	Color
 );
 
 /*

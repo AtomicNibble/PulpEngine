@@ -21,6 +21,13 @@ class MaterialCompiler
 		render::TexRepeat::Enum texRepeat;
 	};
 
+	struct Texture
+	{
+		core::string name;
+		core::string value;
+		render::TextureSlot::Enum texSlot;
+	};
+
 	struct Param
 	{
 		core::string name;
@@ -29,6 +36,7 @@ class MaterialCompiler
 	};
 
 	typedef core::Array<Sampler> SamplerArr;
+	typedef core::Array<Texture> TextureArr;
 	typedef core::Array<Param> ParamArr;
 
 public:
@@ -65,6 +73,7 @@ private:
 	core::string techType_;
 
 	SamplerArr samplers_;
+	TextureArr textures_;
 	ParamArr params_;
 
 	engine::TechSetDef* pTechDef_;

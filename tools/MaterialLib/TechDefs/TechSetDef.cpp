@@ -27,7 +27,7 @@ Param::Param(const Param& oth)
 
 Param& Param::operator=(const Param& oth)
 {
-	static_assert(ParamType::ENUM_COUNT == 7, "Added additional ParamType? this code needs updating.");
+	static_assert(ParamType::ENUM_COUNT == 6, "Added additional ParamType? this code needs updating.");
 
 	if (this != &oth)
 	{
@@ -36,11 +36,6 @@ Param& Param::operator=(const Param& oth)
 
 		switch (type)
 		{
-			case ParamType::Texture:
-				img = oth.img;
-				texSlot = oth.texSlot;
-				break;
-
 			case ParamType::Float1:
 			case ParamType::Float2:
 			case ParamType::Float4:
@@ -68,6 +63,7 @@ TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	techs_(arena, 8),
 	prims_(arena, 6),
 	params_(arena, 8),
+	textures_(arena, 8),
 	samplers_(arena, 8)
 {
 
@@ -1345,28 +1341,55 @@ bool TechSetDef::parseParamBool(core::XParser& lex)
 
 bool TechSetDef::parseParamTexture(core::XParser& lex)
 {
-	using namespace core::Hash::Fnva1Literals;
+	core::string name, parentName;
 
-	return parseParamHelper(lex, ParamType::Texture, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
-			switch (hash)
-			{
-				case "image"_fnv1a:
-					if (!parseParamImageData(lex, param.img)) {
-						return false;
-					}
-					break;
-				case "semantic"_fnv1a:
-					if (!parseParamTextureSlot(lex, param.texSlot)) {
-						return false;
-					}
-					break;
-				default:
-					X_ERROR("TechDef", "Unknown Texture prop: \"%.*s\"", token.length(), token.begin());
-					return false;
-			}
+	// we have the name.
+	if (!parseName(lex, name, parentName)) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	if (samplerExsists(name)) {
+		X_ERROR("TechDef", "Texture with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
+		return false;
+	}
+
+	auto& texture = addTexture(name, parentName);
+
+	// parse it.
+	// this is texture specific fields.
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
 			return true;
-		}	
-	);
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		{
+			case "image"_fnv1a:
+				if (!parseParamTextureData(lex, texture)) {
+					return false;
+				}
+				break;
+			case "semantic"_fnv1a:
+				if (!parseParamTextureSlot(lex, texture.texSlot)) {
+					return false;
+				}
+				break;
+			default:
+				X_ERROR("TechDef", "Unknown Texture prop: \"%.*s\"", token.length(), token.begin());
+				return false;
+		}
+	}
+
+	// failed to read token
+	return false;
 }
 
 
@@ -1433,7 +1456,7 @@ bool TechSetDef::parseParamTextureSlot(core::XParser& lex, render::TextureSlot::
 	return true;
 }
 
-bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
+bool TechSetDef::parseParamTextureData(core::XParser& lex, Texture& texture)
 {
 	if (!lex.ExpectTokenString("=")) {
 		return false;
@@ -1465,7 +1488,7 @@ bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
 		if (token.GetType() == core::TokenType::NAME || token.GetType() == core::TokenType::STRING)
 		{
 			// this is just hard coded image name.
-			img.default = core::string(token.begin(), token.end());
+			texture.default = core::string(token.begin(), token.end());
 		}
 		else if(token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::LOGIC_LESS)
 		{
@@ -1477,7 +1500,7 @@ bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
 				return false;
 			}
 
-			img.propName = core::string(token.begin(), token.end());
+			texture.propName = core::string(token.begin(), token.end());
 
 			// now we have optional default value.
 			{
@@ -1496,7 +1519,7 @@ bool TechSetDef::parseParamImageData(core::XParser& lex, Image& img)
 						return false;
 					}
 
-					img.default = core::string(token.begin(), token.end());
+					texture.default = core::string(token.begin(), token.end());
 				}
 				else
 				{
@@ -2068,6 +2091,11 @@ bool TechSetDef::paramExsists(const core::string& name, Param* pParam)
 	return findHelper(params_, name, pParam);
 }
 
+bool TechSetDef::textureExsists(const core::string& name, Texture* pTexture)
+{
+	return findHelper(textures_, name, pTexture);
+}
+
 bool TechSetDef::samplerExsists(const core::string& name, Sampler* pSampler)
 {
 	return findHelper(samplers_, name, pSampler);
@@ -2124,6 +2152,12 @@ Param& TechSetDef::addParam(const core::string& name, const core::string& parent
 	auto& p = addHelper(params_, name, parentName, ParamType::ToString(type));
 	p.type = type;
 	return p;
+}
+
+Texture& TechSetDef::addTexture(const core::string& name, const core::string& parentName)
+{
+	auto& t = addHelper(textures_, name, parentName, "Texture");
+	return t;
 }
 
 Sampler& TechSetDef::addSampler(const core::string& name, const core::string& parentName)

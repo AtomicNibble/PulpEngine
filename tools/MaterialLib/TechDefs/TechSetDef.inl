@@ -32,6 +32,21 @@ X_INLINE TechSetDef::ParamMap::const_iterator TechSetDef::paramEnd(void) const
 	return params_.end();
 }
 
+X_INLINE TechSetDef::TextureMap::size_type TechSetDef::numTexture(void) const
+{
+	return textures_.size();
+}
+
+X_INLINE TechSetDef::TextureMap::const_iterator TechSetDef::textureBegin(void) const
+{
+	return textures_.begin();
+}
+
+X_INLINE TechSetDef::TextureMap::const_iterator TechSetDef::textureEnd(void) const
+{
+	return textures_.end();
+}
+
 X_INLINE TechSetDef::SamplerMap::size_type TechSetDef::numSampler(void) const
 {
 	return samplers_.size();

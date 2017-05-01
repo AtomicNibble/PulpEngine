@@ -66,12 +66,6 @@ struct AssManProps
 	core::string default;
 };
 
-struct Image
-{
-	core::string propName;
-	core::string default;
-};
-
 
 struct Param
 {
@@ -88,13 +82,22 @@ struct Param
 	Vec4f vec4;
 	core::string vec4Props[4];
 
-	// texture stuff
-	render::TextureSlot::Enum texSlot;
-	Image img;
-
 	// for assetManager
 	AssManProps assProps;
 };
+
+struct Texture
+{
+	Texture() = default;
+
+	core::string propName;
+	core::string default;
+
+	render::TextureSlot::Enum texSlot;
+
+	AssManProps assProps;
+};
+
 
 struct Sampler
 {
@@ -129,6 +132,7 @@ class TechSetDef
 	typedef core::HashMap<core::string, Shader> ShaderMap;
 	typedef core::HashMap<core::string, render::TopoType::Enum> PrimMap;
 	typedef core::HashMap<core::string, Param> ParamMap;
+	typedef core::HashMap<core::string, Texture> TextureMap;
 	typedef core::HashMap<core::string, Sampler> SamplerMap;
 
 	typedef core::Array<char> FileBuf;
@@ -151,6 +155,10 @@ public:
 	X_INLINE ParamMap::size_type numParams(void) const;
 	X_INLINE ParamMap::const_iterator paramBegin(void) const;
 	X_INLINE ParamMap::const_iterator paramEnd(void) const;
+
+	X_INLINE TextureMap::size_type numTexture(void) const;
+	X_INLINE TextureMap::const_iterator textureBegin(void) const;
+	X_INLINE TextureMap::const_iterator textureEnd(void) const;
 
 	X_INLINE SamplerMap::size_type numSampler(void) const;
 	X_INLINE SamplerMap::const_iterator samplerBegin(void) const;
@@ -225,7 +233,7 @@ private:
 	bool parseAssPropsData(core::XParser& lex, AssManProps& props);
 	static bool parseParamFloat(core::XParser& lex, core::string& propsName, float& val);
 	static bool parseParamTextureSlot(core::XParser& lex, render::TextureSlot::Enum& texSlot);
-	static bool parseParamImageData(core::XParser& lex, Image& props);
+	static bool parseParamTextureData(core::XParser& lex, Texture& texture);
 	static bool parsePropName(core::XParser& lex, core::string& str, bool& isExplicit);
 
 	bool parseParamHelper(core::XParser& lex, ParamType::Enum type, ParamParseFunction parseFieldsFunc);
@@ -251,6 +259,7 @@ private:
 	bool techniqueExsists(const core::string& name);
 	bool primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
 	bool paramExsists(const core::string& name, Param* pParam = nullptr);
+	bool textureExsists(const core::string& name, Texture* pTexture = nullptr);
 	bool samplerExsists(const core::string& name, Sampler* pSampler= nullptr);
 
 	render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
@@ -260,6 +269,7 @@ private:
 	Technique& addTechnique(const core::string& name, const core::string& parentName);
 	render::TopoType::Enum& addPrimType(const core::string& name, const core::string& parentName);
 	Param& addParam(const core::string& name, const core::string& parentName, ParamType::Enum type);
+	Texture& addTexture(const core::string& name, const core::string& parentName);
 	Sampler& addSampler(const core::string& name, const core::string& parentName);
 
 	template<typename T>
@@ -281,6 +291,7 @@ private:
 	TechniqueMap techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
 	PrimMap prims_;
 	ParamMap params_;
+	TextureMap textures_;
 	SamplerMap samplers_;
 };
 

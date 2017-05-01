@@ -18,6 +18,7 @@ X_NAMESPACE_BEGIN(engine)
 MaterialCompiler::MaterialCompiler(TechSetDefs& techDefs) :
 	techDefs_(techDefs),
 	params_(g_MatLibArena),
+	textures_(g_MatLibArena),
 	samplers_(g_MatLibArena),
 	pTechDef_(nullptr)
 {
@@ -103,111 +104,106 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		const auto& propName = it->first;
 		const auto& param = it->second;
 
-#if 1
-		if (param.type == ParamType::Texture)
+		auto& p = params_.AddOne();
+		p.name = propName;
+		p.type = param.type;
+
+		const bool isVec = (p.type == ParamType::Float1 || p.type == ParamType::Float2 || p.type == ParamType::Float4);
+
+		// if it's a vec the params values is made from multiple props
+		if (isVec)
 		{
-			// ok my little fat nigerna spoon.
-			const auto& img = param.img;
+			size_t num = 1; // i could take enum value and left shift, but feels too fragile
 
-			if (img.propName.isNotEmpty())
-			{
-				// we need to look for the texture value in props.
-				if (!d.HasMember(img.propName))
-				{
-					// if we have a default texture we just use that.
-					if (img.default.isNotEmpty())
-					{
-					//	auto& p = params_.AddOne();
-					//	p.name = img.propName;
-					//	p.val = img.default;
-					}
-					else
-					{
-						X_ERROR("Mat", "Required texture property is missing: \"%s\"", img.propName.c_str());
-						return false;
-					}
-				}
-				else
-				{
-				//	const char* pValue = d[img.propName.c_str()].GetString();
-				//
-				//	auto& p = params_.AddOne();
-				//	p.name = img.propName;
-				//	p.val = pValue;
-				}
+			if (p.type == ParamType::Float2) {
+				num = 2;
 			}
-		}
-		else
-#endif
-		{
-
-			auto& p = params_.AddOne();
-			p.name = propName;
-			p.type = param.type;
-
-			const bool isVec = (p.type == ParamType::Float1 || p.type == ParamType::Float2 || p.type == ParamType::Float4);
-
-			// if it's a vec the params values is made from multiple props
-			if (isVec)
-			{
-				size_t num = 1; // i could take enum value and left shift, but feels too fragile
-
-				if (p.type == ParamType::Float2) {
-					num = 2;
-				}
-				if (p.type == ParamType::Float4) {
-					num = 4;
-				}
-
-				for (size_t i = 0; i < num; i++)
-				{
-					const auto& vecPropName = param.vec4Props[i];
-
-					if (!d.HasMember(vecPropName)) {
-						X_ERROR("Mat", "Missing required value: \"%s\"", vecPropName.c_str());
-						return false;
-					}
-
-					const char* pValue = d[vecPropName.c_str()].GetString();
-
-					p.val[i] = core::strUtil::StringToBool(pValue);
-				}
-
+			if (p.type == ParamType::Float4) {
+				num = 4;
 			}
-			else
+
+			for (size_t i = 0; i < num; i++)
 			{
-				if (!d.HasMember(propName)) {
-					X_ERROR("Mat", "Missing required value: \"%s\"", propName.c_str());
+				const auto& vecPropName = param.vec4Props[i];
+
+				if (!d.HasMember(vecPropName)) {
+					X_ERROR("Mat", "Missing required value: \"%s\"", vecPropName.c_str());
 					return false;
 				}
 
-				const char* pValue = d[propName.c_str()].GetString();
+				const char* pValue = d[vecPropName.c_str()].GetString();
 
-				switch (param.type)
+				p.val[i] = core::strUtil::StringToBool(pValue);
+			}
+
+		}
+		else
+		{
+			if (!d.HasMember(propName)) {
+				X_ERROR("Mat", "Missing required value: \"%s\"", propName.c_str());
+				return false;
+			}
+
+			const char* pValue = d[propName.c_str()].GetString();
+
+			switch (param.type)
+			{
+				case ParamType::Bool:
+					p.val[0] = static_cast<float>(core::strUtil::StringToBool(pValue));
+					std::fill(&p.val[1], &p.val[3], p.val[0]);
+					break;
+				case ParamType::Int:
+					p.val[0] = static_cast<float>(core::strUtil::StringToInt<int32_t>(pValue));
+					std::fill(&p.val[1], &p.val[3], p.val[0]);
+					break;
+				case ParamType::Color:
 				{
-					case ParamType::Bool:
-						p.val[0] = static_cast<float>(core::strUtil::StringToBool(pValue));
-						std::fill(&p.val[1], &p.val[3], p.val[0]);
-						break;
-					case ParamType::Int:
-						p.val[0] = static_cast<float>(core::strUtil::StringToInt<int32_t>(pValue));
-						std::fill(&p.val[1], &p.val[3], p.val[0]);
-						break;
-					case ParamType::Color:
-					{
-						// this is space seperated floats. "1 1 1 1"
-						const char* pEnd = nullptr;
-						p.val[0] = core::strUtil::StringToFloat<float32_t>(pValue, &pEnd);
-						p.val[1] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
-						p.val[2] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
-						p.val[3] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
-						break;
-					}
-
-					default:
-						X_ASSERT_UNREACHABLE();
-						break;
+					// this is space seperated floats. "1 1 1 1"
+					const char* pEnd = nullptr;
+					p.val[0] = core::strUtil::StringToFloat<float32_t>(pValue, &pEnd);
+					p.val[1] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+					p.val[2] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+					p.val[3] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+					break;
 				}
+
+				default:
+					X_ASSERT_UNREACHABLE();
+					break;
+			}
+		}
+	}
+
+	// process textures.
+	for (auto it = pTechDef_->textureBegin(); it != pTechDef_->textureEnd(); ++it)
+	{
+		const auto& texName = it->first;
+		const auto& textureDesc = it->second;
+
+		auto& tex = textures_.AddOne();
+		tex.name = texName;
+		tex.texSlot = textureDesc.texSlot;
+
+		if (textureDesc.propName.isNotEmpty())
+		{
+			// we need to look for the texture value in props.
+			if (!d.HasMember(textureDesc.propName))
+			{
+				// if we have a default texture we just use that.
+				if (textureDesc.default.isNotEmpty())
+				{
+					tex.value = textureDesc.default;
+				}
+				else
+				{
+					X_ERROR("Mat", "Required texture property is missing: \"%s\"", textureDesc.propName.c_str());
+					return false;
+				}
+			}
+			else
+			{
+				const char* pValue = d[textureDesc.propName.c_str()].GetString();
+				tex.value = pValue;
 			}
 		}
 	}
@@ -373,6 +369,13 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 		pFile->writeObj(p.val);
 		pFile->writeObj(p.type);
 		pFile->writeString(p.name);
+	}
+
+	for (const auto& t : textures_)
+	{
+		pFile->writeObj(t.texSlot);
+		pFile->writeString(t.name);
+		pFile->writeString(t.value);
 	}
 
 	return true;
