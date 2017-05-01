@@ -18,6 +18,11 @@ namespace shader
 		Sampler(const char* pName, int16_t bindPoint, int16_t bindCount);
 		Sampler(core::string& name, int16_t bindPoint, int16_t bindCount);
 
+		X_INLINE void setName(const core::string& name);
+		X_INLINE void setName(const char* pName);
+
+		X_INLINE const core::string& getName(void) const;
+
 		bool SSave(core::XFile* pFile) const;
 		bool SLoad(core::XFile* pFile);
 
@@ -31,3 +36,5 @@ namespace shader
 } // namespace shader
 
 X_NAMESPACE_END
+
+#include "Sampler.inl"

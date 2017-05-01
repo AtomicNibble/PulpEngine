@@ -1551,6 +1551,9 @@
     <None Include="Threading\win32\Thread.inl">
       <Filter>Headers\Threading\win32</Filter>
     </None>
+    <None Include="Sampler.inl">
+      <Filter>Interfaces_h\Render</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

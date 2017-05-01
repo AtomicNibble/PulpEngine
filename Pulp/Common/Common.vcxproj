@@ -485,6 +485,7 @@
     <ClInclude Include="String\CmdArgs.inl">
       <FileType>Document</FileType>
     </ClInclude>
+    <None Include="Sampler.inl" />
     <None Include="String\GrowingStringTable.inl" />
     <None Include="String\Lexer.inl" />
     <None Include="String\StackString.inl" />
