@@ -392,7 +392,16 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 					// change the update freq.
 					// potentially and param that's unkown could just be default marked as material param.
 					// would make some things more simple.
-					matCb[link.cbParamIdx].setUpdateRate(render::shader::UpdateFreq::MATERIAL);
+					auto& cpuData = matCb.getCpuData();
+					auto& cbParam = matCb[link.cbParamIdx];
+					const auto& matParam = params[link.paramIdx];
+
+					cbParam.setUpdateRate(render::shader::UpdateFreq::MATERIAL);
+
+					// we should assign the value of the materials param here.
+					// always vec4? humm.
+					X_ASSERT(cpuData.size() >= (cbParam.getBindPoint() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")();
+					std::memcpy(&cpuData[cbParam.getBindPoint()], &matParam.value, sizeof(matParam.value));
 				}
 
 				// might be better to not store these material cb instance for each tech and instead share them within a material
