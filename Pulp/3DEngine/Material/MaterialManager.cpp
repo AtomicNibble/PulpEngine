@@ -85,8 +85,9 @@ void XMaterialManager::ShutDown(void)
 	gEnv->pHotReload->addfileType(nullptr, MTL_FILE_EXTENSION);
 	gEnv->pHotReload->addfileType(nullptr, MTL_B_FILE_EXTENSION);
 
-
-	releaseMaterial(pDefaultMtl_);
+	if (pDefaultMtl_) {
+		releaseMaterial(pDefaultMtl_);
+	}
 
 	freeDanglingMaterials();
 
