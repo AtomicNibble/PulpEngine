@@ -165,7 +165,7 @@ namespace shader
 		DataArr cpuData_;
 	};
 
-	// X_ENSURE_SIZE(XShaderParam, 24);
+	// X_ENSURE_SIZE(XCBuffer, 128);
 
 	// these are used as flags and enum so 32bit meaning we can have 32max. instead of 255.
 	static_assert(ParamType::FLAGS_COUNT, "ParamType must be flags not enum");
