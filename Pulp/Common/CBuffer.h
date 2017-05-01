@@ -134,7 +134,9 @@ namespace shader
 		bool SLoad(core::XFile* pFile);
 
 		// create hash / flags.
+		void postParamModify(void);
 		void postPopulate(void);
+		void recalculateUpdateRate(void);
 
 	private:
 		void computeFlags(void);

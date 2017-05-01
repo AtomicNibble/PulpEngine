@@ -246,6 +246,11 @@ namespace shader
 		return true;
 	}
 
+	void XCBuffer::postParamModify(void)
+	{
+		postPopulate();
+		recalculateUpdateRate();
+	}
 
 	void XCBuffer::postPopulate(void)
 	{
@@ -261,6 +266,16 @@ namespace shader
 
 		const uint32_t trailingSpace = size_ - (requiredVecs * sizeof(Vec4f));
 		X_UNUSED(trailingSpace);
+	}
+
+	void XCBuffer::recalculateUpdateRate(void)
+	{
+		updateRate_ = UpdateFreq::FRAME;
+
+		for (const auto& p : params_)
+		{
+			updateRate_ = updateFreqMax(updateRate_, p.getUpdateRate());
+		}
 	}
 
 	void XCBuffer::computeFlags(void)
