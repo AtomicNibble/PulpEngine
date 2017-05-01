@@ -103,6 +103,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		const auto& propName = it->first;
 		const auto& param = it->second;
 
+#if 1
 		if (param.type == ParamType::Texture)
 		{
 			// ok my little fat nigerna spoon.
@@ -116,9 +117,9 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 					// if we have a default texture we just use that.
 					if (img.default.isNotEmpty())
 					{
-						auto& p = params_.AddOne();
-						p.name = img.propName;
-						p.val = img.default;
+					//	auto& p = params_.AddOne();
+					//	p.name = img.propName;
+					//	p.val = img.default;
 					}
 					else
 					{
@@ -128,28 +129,84 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 				}
 				else
 				{
-					const char* pValue = d[img.propName.c_str()].GetString();
-
-					auto& p = params_.AddOne();
-					p.name = img.propName;
-					p.val = pValue;
+				//	const char* pValue = d[img.propName.c_str()].GetString();
+				//
+				//	auto& p = params_.AddOne();
+				//	p.name = img.propName;
+				//	p.val = pValue;
 				}
 			}
 		}
 		else
+#endif
 		{
-			if (!d.HasMember(propName)) {
-				X_ERROR("Mat", "Missing required value: \"%s\"", propName.c_str());
-				return false;
-			}
-
-			// meow de meow.
-			// get the value.
-			const char* pValue = d[propName.c_str()].GetString();
 
 			auto& p = params_.AddOne();
 			p.name = propName;
-			p.val = pValue;
+			p.type = param.type;
+
+			const bool isVec = (p.type == ParamType::Float1 || p.type == ParamType::Float2 || p.type == ParamType::Float4);
+
+			// if it's a vec the params values is made from multiple props
+			if (isVec)
+			{
+				size_t num = 1; // i could take enum value and left shift, but feels too fragile
+
+				if (p.type == ParamType::Float2) {
+					num = 2;
+				}
+				if (p.type == ParamType::Float4) {
+					num = 4;
+				}
+
+				for (size_t i = 0; i < num; i++)
+				{
+					const auto& vecPropName = param.vec4Props[i];
+
+					if (!d.HasMember(vecPropName)) {
+						X_ERROR("Mat", "Missing required value: \"%s\"", vecPropName.c_str());
+						return false;
+					}
+
+					const char* pValue = d[vecPropName.c_str()].GetString();
+
+					p.val[i] = core::strUtil::StringToBool(pValue);
+				}
+
+			}
+			else
+			{
+				if (!d.HasMember(propName)) {
+					X_ERROR("Mat", "Missing required value: \"%s\"", propName.c_str());
+					return false;
+				}
+
+				const char* pValue = d[propName.c_str()].GetString();
+
+				switch (param.type)
+				{
+					case ParamType::Bool:
+						p.val[0] = static_cast<float>(core::strUtil::StringToBool(pValue));
+						break;
+					case ParamType::Int:
+						p.val[0] = static_cast<float>(core::strUtil::StringToInt<int32_t>(pValue));
+						break;
+					case ParamType::Color:
+					{
+						// this is space seperated floats. "1 1 1 1"
+						const char* pEnd = nullptr;
+						p.val[0] = core::strUtil::StringToFloat<float32_t>(pValue, &pEnd);
+						p.val[1] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+						p.val[2] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+						p.val[3] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+						break;
+					}
+
+					default:
+						X_ASSERT_UNREACHABLE();
+						break;
+				}
+			}
 		}
 	}
 
@@ -268,7 +325,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 
 	hdr.version = MTL_B_VERSION;
 	hdr.numSamplers = safe_static_cast<uint8_t>(samplers_.size());
-	hdr.numParams = safe_static_cast<uint8_t>(pTechDef_->numParams());
+	hdr.numParams = safe_static_cast<uint8_t>(params_.size());
 	hdr.strDataSize = 0; 
 	hdr.catTypeNameLen = 0; 
 	hdr.cat = cat_;
@@ -311,8 +368,9 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 
 	for (const auto& p : params_)
 	{
+		pFile->writeObj(p.val);
+		pFile->writeObj(p.type);
 		pFile->writeString(p.name);
-		pFile->writeString(p.val);
 	}
 
 	return true;

@@ -24,7 +24,8 @@ class MaterialCompiler
 	struct Param
 	{
 		core::string name;
-		core::string val;
+		ParamType::Enum type;
+		Vec4f val;
 	};
 
 	typedef core::Array<Sampler> SamplerArr;
