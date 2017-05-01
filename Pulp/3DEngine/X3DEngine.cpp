@@ -311,6 +311,8 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		// unless only way to draw text is with prim humm.... !
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
 
+
+		pCBufMan_->updatePerFrameCBs(primBucket);
 #if 1
 #if 0
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
