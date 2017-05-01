@@ -979,6 +979,8 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 					al.isCode = false;
 				}
 
+				X_ASSERT(token.length() > 0, "alias name is empty")(token.begin(), token.end(), token.length());
+
 				al.name = core::string(token.begin(), token.end());
 				al.nameHash = core::StrHash(token.begin(), token.length());
 
