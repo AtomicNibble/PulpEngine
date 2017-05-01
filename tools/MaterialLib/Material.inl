@@ -65,6 +65,11 @@ X_INLINE Material::Material(core::MemoryArenaBase* arena) :
 {
 	id_ = -1;
 
+	techs_.setGranularity(4);
+	params_.setGranularity(4);
+	samplers_.setGranularity(4);
+	textures_.setGranularity(4);
+
 	surfaceType_ = MaterialSurType::NONE;
 	polyOffsetType_ = MaterialPolygonOffset::NONE;
 	mountType_ = MaterialMountType::NONE;
