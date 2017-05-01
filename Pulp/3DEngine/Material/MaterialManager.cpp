@@ -503,13 +503,14 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	core::string catType;
 	file.readString(catType);
 
-	Material::SamplerArr samplers(arena_);
-	Material::ParamArr params(arena_);
+	Material::SamplerArr samplers(arena_, hdr.numSamplers);
+	Material::ParamArr params(arena_, hdr.numParams);
+
 
 	// now samplers.
 	for (uint8_t i = 0; i < hdr.numSamplers; i++)
 	{
-		MaterialSampler& sampler = samplers.AddOne();
+		MaterialSampler& sampler = samplers[i];
 
 		file.readObj(sampler.sate);
 		file.readString(sampler.name);
@@ -518,7 +519,7 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	// now params.
 	for (uint8_t i = 0; i < hdr.numParams; i++)
 	{
-		MaterialParam& param = params.AddOne();
+		MaterialParam& param = params[i];
 		file.readObj(param.value);
 		file.readObj(param.type);
 		file.readString(param.name);
