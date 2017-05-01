@@ -265,14 +265,6 @@ X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
 X_ENSURE_SIZE(MaterialSurType::Enum, 1);
 X_ENSURE_SIZE(MaterialUsage::Enum, 1);
 X_ENSURE_SIZE(MaterialMountType::Enum, 1);
-// X_ENSURE_SIZE(MaterialStateFlag::Bits, 1);
-// X_ENSURE_SIZE(MaterialStateFlags, 1);
-// X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
-// X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
-// X_ENSURE_SIZE(MaterialCullType::Enum, 1);
-// X_ENSURE_SIZE(MaterialBlendType::Enum, 1);
-//X_ENSURE_SIZE(StencilOperation::Enum, 1);
-//X_ENSURE_SIZE(StencilFunc::Enum, 1);
 
 
 X_ENSURE_SIZE(MaterialHeader, 44);
