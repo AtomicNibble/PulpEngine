@@ -4,6 +4,8 @@
 #include "CBuffer.h"
 
 #include <IFrameData.h>
+#include <CmdBucket.h>
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -79,8 +81,28 @@ void CBufferManager::update(core::FrameData& frame, bool othro)
 	}
 
 	++frameIdx_;
+}
 
-	updatePerFrameCBs();
+void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket)
+{
+	for (auto& cbRef : perFrameCbs_)
+	{
+		auto& cb = *cbRef.pCBuf;
+		
+		if (autoUpdateBuffer(cb))
+		{
+			// dam fucker needs updateing.
+			auto* pCBufUpdate = bucket.addCommand<render::Commands::CopyConstantBufferData>(0, cb.getBindSize());
+
+			char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pCBufUpdate);
+			std::memcpy(pAuxData, cb.getCpuData().data(), cb.getBindSize());
+
+			pCBufUpdate->constantBuffer = cbRef.handle;
+			pCBufUpdate->pData = pAuxData; 
+			pCBufUpdate->size = cb.getBindSize();
+			
+		}
+	}
 }
 
 void CBufferManager::setMatrixes(const Matrix44f& view, const Matrix44f& proj)
@@ -294,13 +316,6 @@ X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type
 	}
 }
 
-void CBufferManager::updatePerFrameCBs(void)
-{
-	for (auto& cbRef : perFrameCbs_)
-	{
-		autoUpdateBuffer(*cbRef.pCBuf);
-	}
-}
 
 
 X_NAMESPACE_END

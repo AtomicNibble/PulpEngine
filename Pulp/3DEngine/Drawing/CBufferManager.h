@@ -63,6 +63,7 @@ public:
 	void shutDown(void);
 
 	void update(core::FrameData& frame, bool othro);
+	void updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket);
 
 	void setMatrixes(const Matrix44f& view, const Matrix44f& proj);
 	void setMatrixes(const Matrix44f& view, const Matrix44f& proj,
@@ -82,7 +83,6 @@ public:
 
 private:
 	void setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst);
-	void updatePerFrameCBs(void);
 
 	X_INLINE void setTime(core::TimeVal time);
 	X_INLINE void setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal time);
