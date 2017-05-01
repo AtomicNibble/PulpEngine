@@ -152,11 +152,13 @@ bool XCore::Update(void)
 
 		core::StackString<128> title;
 		title.clear();
-		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %gms) Game: (x%g) UI: (x%g)",
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %gms) Game: %" PRId64 "(x%g) UI: %" PRId64 "(x%g)",
 			static_cast<int>(fps),
 			frametime.GetMilliSeconds(),
-			time_.GetScale(core::ITimer::Timer::GAME),
-			time_.GetScale(core::ITimer::Timer::UI)
+			frameData.timeInfo.deltas[core::Timer::GAME].GetMilliSecondsAsInt64(),
+			time_.GetScale(core::Timer::GAME),
+			frameData.timeInfo.deltas[core::Timer::UI].GetMilliSecondsAsInt64(),
+			time_.GetScale(core::Timer::UI)
 		);
 
 		pWindow_->SetTitle(title.c_str());
