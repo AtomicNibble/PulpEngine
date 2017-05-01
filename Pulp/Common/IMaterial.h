@@ -200,13 +200,6 @@ X_DECLARE_ENUM(ParamType)(
 	Color
 );
 
-/*
-what o do for the shader input system that i need todo for my engine.
-ineed to also add in the engine system that dose the culling and deteriming what ld to render for each model
-that means i should prbos add in amodel to be rendered into the 3d engine and then 
-it decdes what lod to render.
-*/
-
 
 struct MaterialHeader
 {
