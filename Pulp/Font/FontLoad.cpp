@@ -368,8 +368,7 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& 
 			const char* pPropBegin = proportional->value();
 			const char* pPropEnd = proportional->value() + proportional->value_size();
 
-			if (core::strUtil::IsEqualCaseInsen(pPropBegin, pPropEnd, "true") || 
-				core::strUtil::IsEqualCaseInsen(pPropBegin, pPropEnd, "1"))
+			if (core::strUtil::StringToBool(pPropBegin, pPropEnd) == true)
 			{
 				flags.Set(FontFlag::PROPORTIONAL);
 			}
