@@ -1339,67 +1339,6 @@ bool TechSetDef::parseParamBool(core::XParser& lex)
 	);
 }
 
-bool TechSetDef::parseParamTexture(core::XParser& lex)
-{
-	core::string name, parentName;
-
-	// we have the name.
-	if (!parseName(lex, name, parentName)) {
-		return false;
-	}
-
-	if (!lex.ExpectTokenString("{")) {
-		return false;
-	}
-
-	if (samplerExsists(name)) {
-		X_ERROR("TechDef", "Texture with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
-		return false;
-	}
-
-	auto& texture = addTexture(name, parentName);
-
-	// parse it.
-	// this is texture specific fields.
-	core::XLexToken token;
-	while (lex.ReadToken(token))
-	{
-		if (token.isEqual("}")) {
-			return true;
-		}
-
-		using namespace core::Hash::Fnva1Literals;
-
-		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
-		{
-			case "image"_fnv1a:
-				if (!parseParamTextureData(lex, texture)) {
-					return false;
-				}
-				break;
-			case "semantic"_fnv1a:
-				if (!parseParamTextureSlot(lex, texture.texSlot)) {
-					return false;
-				}
-				break;
-
-			case "ass"_fnv1a:
-				if (!parseAssPropsData(lex, texture.assProps)) {
-					return false;
-				}
-				break;
-
-			default:
-				X_ERROR("TechDef", "Unknown Texture prop: \"%.*s\"", token.length(), token.begin());
-				return false;
-		}
-	}
-
-	// failed to read token
-	return false;
-}
-
-
 bool TechSetDef::parseParamFloat(core::XParser& lex, core::string& propsName, float& val)
 {
 	// this is either a constant or prop name :D !
@@ -1462,6 +1401,67 @@ bool TechSetDef::parseParamTextureSlot(core::XParser& lex, render::TextureSlot::
 	texSlot = Util::TextureSlotFromStr(token.begin(), token.end());
 	return true;
 }
+
+bool TechSetDef::parseParamTexture(core::XParser& lex)
+{
+	core::string name, parentName;
+
+	// we have the name.
+	if (!parseName(lex, name, parentName)) {
+		return false;
+	}
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
+	if (samplerExsists(name)) {
+		X_ERROR("TechDef", "Texture with name \"%s\" redefined in File: %s:%" PRIi32, name.c_str(), lex.GetFileName(), lex.GetLineNumber());
+		return false;
+	}
+
+	auto& texture = addTexture(name, parentName);
+
+	// parse it.
+	// this is texture specific fields.
+	core::XLexToken token;
+	while (lex.ReadToken(token))
+	{
+		if (token.isEqual("}")) {
+			return true;
+		}
+
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
+		{
+			case "image"_fnv1a:
+				if (!parseParamTextureData(lex, texture)) {
+					return false;
+				}
+				break;
+			case "semantic"_fnv1a:
+				if (!parseParamTextureSlot(lex, texture.texSlot)) {
+					return false;
+				}
+				break;
+
+			case "ass"_fnv1a:
+				if (!parseAssPropsData(lex, texture.assProps)) {
+					return false;
+				}
+				break;
+
+			default:
+				X_ERROR("TechDef", "Unknown Texture prop: \"%.*s\"", token.length(), token.begin());
+				return false;
+		}
+	}
+
+	// failed to read token
+	return false;
+}
+
 
 bool TechSetDef::parseParamTextureData(core::XParser& lex, Texture& texture)
 {
