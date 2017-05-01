@@ -260,17 +260,18 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// the tech should tell us O_O
 	// him -> pTechDef
 	const size_t numTex = pTechDef->getNumAliases();
+	const size_t numCb = cbLinks.size();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
 		numTex, // same as numTex for now as i refactor sampler out of texState.
-		cbLinks.size()
+		numCb
 	);
 
 	// we should create the const buffers we need and set them in the variable state.
 	auto* pCBHandles = pVariableState->getCBs();
 #if X_ENABLE_ASSERTIONS
-	for (size_t i = 0; i < cbLinks.size(); i++) {
+	for (size_t i = 0; i < numCb; i++) {
 		pCBHandles[i] = render::INVALID_BUF_HANLDE;
 	}
 #endif // !X_ENABLE_ASSERTIONS
@@ -418,7 +419,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 		}
 	}
 
-	for (size_t i = 0; i < pVariableState->getNumCBs(); i++) {
+	for (size_t i = 0; i < numCb; i++) {
 		X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")();
 	}
 
