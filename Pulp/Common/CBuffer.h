@@ -88,7 +88,10 @@ namespace shader
 	public:
 		XCBuffer(core::MemoryArenaBase* arena);
 		XCBuffer(const XCBuffer& sb) = default;
+		XCBuffer(XCBuffer&& sb) = default;
+
 		XCBuffer& operator = (const XCBuffer& sb) = default;
+		XCBuffer& operator = (XCBuffer&& sb) = default;
 
 	public:
 
