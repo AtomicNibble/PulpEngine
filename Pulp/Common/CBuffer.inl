@@ -129,6 +129,7 @@ namespace shader
 		return name_;
 	}
 
+
 	X_INLINE bool XCBuffer::requireManualUpdate(void) const
 	{
 		return paramFlags_.IsSet(ParamType::Unknown);
@@ -194,12 +195,12 @@ namespace shader
 		return cpuDataVersion_;
 	}
 
-	X_INLINE const XShaderParam& XCBuffer::operator[](size_t idx) const
+	X_INLINE const XShaderParam& XCBuffer::operator[](int32_t idx) const
 	{
 		return params_[idx];
 	}
 
-	X_INLINE XShaderParam& XCBuffer::operator[](size_t idx)
+	X_INLINE XShaderParam& XCBuffer::operator[](int32_t idx)
 	{
 		return params_[idx];
 	}

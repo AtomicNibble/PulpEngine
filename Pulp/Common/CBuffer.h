@@ -120,8 +120,9 @@ namespace shader
 		X_INLINE ParamTypeFlags getParamFlags(void) const;
 		X_INLINE int32_t getCpuDataVersion(void) const;
 
-		X_INLINE const XShaderParam& operator[](size_t idx) const;
-		X_INLINE XShaderParam& operator[](size_t idx);
+		// int32_t index's to match getParamCount() return.
+		X_INLINE const XShaderParam& operator[](int32_t idx) const;
+		X_INLINE XShaderParam& operator[](int32_t idx);
 
 		X_INLINE const DataArr& getCpuData(void) const;
 		X_INLINE DataArr& getCpuData(void);
