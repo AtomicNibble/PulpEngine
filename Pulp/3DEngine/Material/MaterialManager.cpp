@@ -254,13 +254,14 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 	// from the shader perm we can see how many const buffers we need to provide.
 	const auto& cbLinks = pShaderPerm->getCbufferLinks();
+	const auto& samplers = pShaderPerm->getSamplers();
 
 	// we need to know how many textures we are going to be sending.
 	// it may be less than what the material has.
 	// the tech should tell us O_O
 	// him -> pTechDef
 	const size_t numTex = pTechDef->getNumAliases();
-	const size_t numSamplers = numTex; // same as numTex for now as i refactor sampler out of texState.
+	const size_t numSamplers = samplers.size();
 	const size_t numCb = cbLinks.size();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
@@ -286,12 +287,36 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 		texState.textureId = 0; // get FOOKED.
 	}
 
-	auto* pSamplers = pVariableState->getSamplers();
-	for (size_t i = 0; i < numSamplers; i++)
 	{
-		auto& sampler = pSamplers[i];
-		sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
-		sampler.repeat = render::TexRepeat::TILE_BOTH;
+		// so we need to map material samplers to perm samplers
+		auto* pSamplers = pVariableState->getSamplers();
+		const auto& matSamplers = pMat->getSamplers();
+
+		for (size_t i = 0; i < numSamplers; i++)
+		{
+			auto& sampler = pSamplers[i];
+			const auto& permSampler = samplers[i];
+
+			// find a sampler that matches from material
+			size_t j;
+			for (j=0; j<matSamplers.size(); j++)
+			{
+				auto& s = matSamplers[j];
+
+				if (s.name == permSampler.getName())
+				{
+					sampler = s.sate;
+					break;
+				}
+			}
+
+			if (j == matSamplers.size())
+			{
+				X_ERROR("MAterial", "Failed to find sampler values for perm sampler: \"%s\" using defaults", permSampler.getName().c_str());
+				sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
+				sampler.repeat = render::TexRepeat::TILE_BOTH;
+			}
+		}
 	}
 
 
