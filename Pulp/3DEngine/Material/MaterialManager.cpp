@@ -305,6 +305,105 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	matTech.pPerm = pPerm;
 	matTech.pVariableState = pVariableState;
 
+	// now we scan the cbuffers and try to match any material params to cbuffer params (todo: take into account techDef aliases).
+	{
+		const auto& params = pMat->getParams();
+
+		if (params.isNotEmpty())
+		{
+			auto& paramLinks = matTech.paramLinks;
+
+			core::FixedArray<int32_t, 16> cbufferIdx;
+
+			for (size_t i = 0; i < params.size(); i++)
+			{
+				auto& param = params[i];
+				auto& name = param.name;
+				core::StrHash nameHash(name.begin(), name.end());
+
+				for (size_t j = 0; j < cbLinks.size(); j++)
+				{
+					auto& cbLink = cbLinks[j];
+					auto& cb = *cbLink.pCBufer;
+
+					for (int32_t p = 0; p < cb.getParamCount(); p++)
+					{
+						auto& cbParam = cb[p];
+
+						if (cbParam.getNameHash() == nameHash && cbParam.getName() == name)
+						{
+							// okay so we found the cbuffer param that this material's param effects.
+							// this tech needs to store like a link
+							// mapping the material param to the cbuffer param.
+
+							ParamLink link;
+							link.paramIdx = safe_static_cast<int32_t>(i);
+							link.cbIdx = safe_static_cast<int32_t>(j);
+							link.cbParamIdx = safe_static_cast<int32_t>(p);
+
+							paramLinks.push_back(link);
+							// keep looking we support multiple links per single material prop.
+
+							if (std::find(cbufferIdx.begin(), cbufferIdx.end(), link.cbIdx) != cbufferIdx.end())
+							{
+								cbufferIdx.push_back(link.cbIdx);
+							}
+						}
+					}
+				}
+			}
+
+			if (paramLinks.isNotEmpty())
+			{
+				// sort them so in cb order then param order.
+				std::sort(paramLinks.begin(), paramLinks.end(), [](const ParamLink& lhs, const ParamLink& rhs) -> bool {			
+					if (lhs.cbIdx != rhs.cbIdx) {
+						return lhs.cbIdx < rhs.cbIdx;
+					}
+					return lhs.paramIdx < rhs.paramIdx;
+				});
+
+
+				int32_t currentCbIdx = -1;  
+				render::shader::XCBuffer matCb(arena_);
+
+				auto addCB = [&](render::shader::XCBuffer& matCb) {
+					matCb.postParamModify();
+					X_ASSERT(matCb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL), "Should contain per material params")();
+					matTech.materialCbs.append(std::move(matCb));
+				};
+
+				for (auto& link : paramLinks)
+				{
+					if (currentCbIdx != link.cbIdx)
+					{
+						if (currentCbIdx != -1)
+						{
+							addCB(matCb);
+						}
+
+						currentCbIdx = link.cbIdx;
+						auto& cbLink = cbLinks[link.cbIdx];
+						auto& cb = *cbLink.pCBufer;
+
+						matCb = cb; // make a copy.
+					}
+
+					// change the update freq.
+					// potentially and param that's unkown could just be default marked as material param.
+					// would make some things more simple.
+					matCb[link.cbParamIdx].setUpdateRate(render::shader::UpdateFreq::MATERIAL);
+				}
+
+				// might be better to not store these material cb instance for each tech and instead share them within a material
+				// so if a material has multiple techs that have identical material cbuffers they could share them.
+				addCB(matCb);
+			}
+
+		}
+	}
+
+
 	pMat->addTech(std::move(matTech));
 
 	pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
