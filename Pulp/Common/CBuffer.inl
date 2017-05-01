@@ -49,6 +49,11 @@ namespace shader
 		return name_;
 	}
 
+	X_INLINE const core::StrHash& XShaderParam::getNameHash(void) const
+	{
+		return nameHash_;
+	}
+
 	X_INLINE UpdateFreq::Enum XShaderParam::getUpdateRate(void) const
 	{
 		return updateRate_;

@@ -48,6 +48,7 @@ namespace shader
 		X_INLINE void setSize(int32_t size);
 
 		X_INLINE const core::string& getName(void) const;
+		X_INLINE const core::StrHash& getNameHash(void) const;
 		X_INLINE UpdateFreq::Enum getUpdateRate(void) const;
 		X_INLINE ParamType::Enum getType(void) const;
 		X_INLINE ParamFlags getFlags(void) const;
