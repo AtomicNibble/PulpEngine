@@ -187,9 +187,11 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 				{
 					case ParamType::Bool:
 						p.val[0] = static_cast<float>(core::strUtil::StringToBool(pValue));
+						std::fill(&p.val[1], &p.val[3], p.val[0]);
 						break;
 					case ParamType::Int:
 						p.val[0] = static_cast<float>(core::strUtil::StringToInt<int32_t>(pValue));
+						std::fill(&p.val[1], &p.val[3], p.val[0]);
 						break;
 					case ParamType::Color:
 					{
