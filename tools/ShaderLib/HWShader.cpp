@@ -37,6 +37,7 @@ namespace shader
 		numTextures_(0),
 		numInstructions_(0),
 		cbuffers_(arena),
+		samplers_(arena),
 		bytecode_(arena),
 		D3DCompileflags_(0),
 		id_(-1)
@@ -405,6 +406,12 @@ namespace shader
 			else if (InputBindDesc.Type == D3D_SIT_SAMPLER)
 			{
 				numSamplers_++;
+
+				samplers_.emplace_back(
+					InputBindDesc.Name,
+					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
+					safe_static_cast<int16_t>(InputBindDesc.BindCount)
+				);
 			}
 			else if (InputBindDesc.Type == D3D_SIT_TEXTURE)
 			{

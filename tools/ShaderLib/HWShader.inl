@@ -99,6 +99,16 @@ namespace shader
 		return cbuffers_;
 	}
 
+	X_INLINE const XHWShader::SamplerArr& XHWShader::getSamplers(void) const
+	{
+		return samplers_;
+	}
+
+	X_INLINE XHWShader::SamplerArr& XHWShader::getSamplers(void)
+	{
+		return samplers_;
+	}
+
 	X_INLINE const core::Array<uint8_t>& XHWShader::getShaderByteCode(void) const
 	{
 		return bytecode_;

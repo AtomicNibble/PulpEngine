@@ -27,7 +27,7 @@ namespace shader
 		struct ShaderBinHeader
 		{
 			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-			static const uint32_t X_SHADER_BIN_VERSION = 3; // change this to force all shaders to be recompiled.
+			static const uint32_t X_SHADER_BIN_VERSION = 4; // change this to force all shaders to be recompiled.
 
 
 			uint32_t forcc;
@@ -104,6 +104,7 @@ namespace shader
 
 		const auto& byteCode = pShader->getShaderByteCode();
 		const auto& cbuffers = pShader->getCBuffers();
+		const auto& samplers = pShader->getSamplers();
 
 		// for now every shader for a given type is compiled with same version.
 		// if diffrent shaders have diffrent versions this will ned changing.
@@ -168,6 +169,9 @@ namespace shader
 
 			for (const auto& cb : cbuffers) {
 				cb.SSave(file.GetFile());
+			}
+			for (const auto& s : samplers) {
+				s.SSave(file.GetFile());
 			}
 
 			if (file.write(pData->data(), pData->size()) != pData->size()) {
@@ -245,12 +249,18 @@ namespace shader
 				X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")(pShader->status_);
 
 				auto& cbufs = pShader->getCBuffers();
+				auto& samplers = pShader->getSamplers();
 				cbufs.resize(hdr.numCBufs, cbufs.getArena());
+				samplers.resize(hdr.numSamplers);
 
 				// load bind vars.
 				for (auto& cb : cbufs)
 				{
 					cb.SLoad(file.GetFile());
+				}
+				for (auto& s : samplers)
+				{
+					s.SLoad(file.GetFile());
 				}
 
 				pShader->bytecode_.resize(hdr.blobLength);

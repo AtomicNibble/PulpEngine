@@ -1222,6 +1222,9 @@
     <ClInclude Include="IEngineSysBase.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Sampler.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1904,6 +1907,9 @@
     </ClCompile>
     <ClCompile Include="Util\win32\Process.cpp">
       <Filter>SourceFiles\Util\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Sampler.cpp">
+      <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
