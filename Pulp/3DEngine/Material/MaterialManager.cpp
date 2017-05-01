@@ -11,6 +11,7 @@
 #include "TechDefStateManager.h"
 #include "Drawing\VariableStateManager.h"
 #include <CBuffer.h>
+#include <Sampler.h>
 
 #include "Drawing\CBufferManager.h"
 
