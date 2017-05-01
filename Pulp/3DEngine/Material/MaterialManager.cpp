@@ -269,13 +269,11 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 	// we should create the const buffers we need and set them in the variable state.
 	auto* pCBHandles = pVariableState->getCBs();
-	for (size_t i = 0; i < cbLinks.size(); i++)
-	{
-		auto& cbLink = cbLinks[i];
-		auto& cb = *cbLink.pCBufer;
-
-		pCBHandles[i] = pCBufMan_->createCBuffer(cb);
+#if X_ENABLE_ASSERTIONS
+	for (size_t i = 0; i < pVariableState->getNumCBs(); i++) {
+		pCBHandles[i] = render::INVALID_BUF_HANLDE;
 	}
+#endif // !X_ENABLE_ASSERTIONS
 
 	auto* pTexStates = pVariableState->getTexStates();
 	for (size_t i = 0; i < numTex; i++)
@@ -283,8 +281,6 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 		auto& texState = pTexStates[i];
 
 		// we need to select the correct texture from the material, and pass the texture id and states.
-
-
 		texState.textureId = 0; // get FOOKED.
 	}
 
@@ -307,13 +303,18 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 	// now we scan the cbuffers and try to match any material params to cbuffer params (todo: take into account techDef aliases).
 	{
+		core::FixedArray<const render::shader::XCBuffer*, render::shader::MAX_SHADER_CB_PER_PERM> cbuffers;
+		for (auto& cb : cbLinks) {
+			cbuffers.push_back(cb.pCBufer);
+		}
+
 		const auto& params = pMat->getParams();
 
 		if (params.isNotEmpty())
 		{
 			auto& paramLinks = matTech.paramLinks;
 
-			core::FixedArray<int32_t, 16> cbufferIdx;
+			core::FixedArray<int32_t, render::shader::MAX_SHADER_CB_PER_PERM> materialCBIdxs;
 
 			for (size_t i = 0; i < params.size(); i++)
 			{
@@ -332,21 +333,15 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 						if (cbParam.getNameHash() == nameHash && cbParam.getName() == name)
 						{
-							// okay so we found the cbuffer param that this material's param effects.
-							// this tech needs to store like a link
-							// mapping the material param to the cbuffer param.
-
 							ParamLink link;
 							link.paramIdx = safe_static_cast<int32_t>(i);
 							link.cbIdx = safe_static_cast<int32_t>(j);
 							link.cbParamIdx = safe_static_cast<int32_t>(p);
 
 							paramLinks.push_back(link);
-							// keep looking we support multiple links per single material prop.
 
-							if (std::find(cbufferIdx.begin(), cbufferIdx.end(), link.cbIdx) != cbufferIdx.end())
-							{
-								cbufferIdx.push_back(link.cbIdx);
+							if (std::find(materialCBIdxs.begin(), materialCBIdxs.end(), link.cbIdx) == materialCBIdxs.end()) {
+								materialCBIdxs.append(link.cbIdx);
 							}
 						}
 					}
@@ -363,23 +358,27 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 					return lhs.paramIdx < rhs.paramIdx;
 				});
 
+				// reserver so the memory address don't change when appending as we keep pointers.
+				matTech.materialCbs.setGranularity(materialCBIdxs.size());
+				matTech.materialCbs.reserve(materialCBIdxs.size());
 
 				int32_t currentCbIdx = -1;  
 				render::shader::XCBuffer matCb(arena_);
 
-				auto addCB = [&](render::shader::XCBuffer& matCb) {
+				auto addCB = [&](int32_t cbIdx, render::shader::XCBuffer& matCb) {
 					matCb.postParamModify();
 					X_ASSERT(matCb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL), "Should contain per material params")();
 					matTech.materialCbs.append(std::move(matCb));
+
+					cbuffers[cbIdx] = &matTech.materialCbs.back();
 				};
 
 				for (auto& link : paramLinks)
 				{
 					if (currentCbIdx != link.cbIdx)
 					{
-						if (currentCbIdx != -1)
-						{
-							addCB(matCb);
+						if (currentCbIdx != -1) {
+							addCB(link.cbIdx, matCb);
 						}
 
 						currentCbIdx = link.cbIdx;
@@ -398,7 +397,6 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 					cbParam.setUpdateRate(render::shader::UpdateFreq::MATERIAL);
 
-					// we should assign the value of the materials param here.
 					// always vec4? humm.
 					X_ASSERT(cpuData.size() >= (cbParam.getBindPoint() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")();
 					std::memcpy(&cpuData[cbParam.getBindPoint()], &matParam.value, sizeof(matParam.value));
@@ -406,12 +404,23 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 				// might be better to not store these material cb instance for each tech and instead share them within a material
 				// so if a material has multiple techs that have identical material cbuffers they could share them.
-				addCB(matCb);
+				addCB(currentCbIdx, matCb);
 			}
+		}
 
+		// the 'cbuffers' arr can contain a mix of cbuffer link instances and material instances.
+		X_ASSERT(cbLinks.size() == cbuffers.size(), "Links and cbuffer list should be same size")(cbLinks.size(), cbuffers.size());
+		for (size_t i = 0; i < cbuffers.size(); i++)
+		{
+			auto* pCB = cbuffers[i];
+			X_ASSERT_NOT_NULL(pCB);
+			pCBHandles[i] = pCBufMan_->createCBuffer(*pCB);
 		}
 	}
 
+	for (size_t i = 0; i < pVariableState->getNumCBs(); i++) {
+		X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")();
+	}
 
 	pMat->addTech(std::move(matTech));
 
