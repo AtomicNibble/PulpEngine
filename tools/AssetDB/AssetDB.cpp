@@ -374,7 +374,8 @@ bool AssetDB::PerformMigrations(void)
 		return true;
 	}
 
-	core::StackString<1024, char> msg("Performing DB migrations. it's recommended to back up the ");
+	core::StackString<1024, char> msg;
+	msg.appendFmt("Performing DB migrations from %" PRIi32 " -> %" PRIi32 ". it's recommended to back up the ", dbVersion_, DB_VERSION);
 	msg.appendFmt("'%s' folder before pressin Ok. Cancel will skip.", ASSET_DB_FOLDER);
 
 	const auto res = core::msgbox::show(msg.c_str(), "AssetDB Migratation", core::msgbox::Buttons::OKCancel);
