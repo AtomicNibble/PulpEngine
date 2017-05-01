@@ -95,7 +95,7 @@ X_INLINE StrHash::StrHash(const char* pStr, size_t length) :
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE StrHash::StrHash(const char* pBegin, const char* pEnd) :
 	hash_(
-		Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pBegin - pEnd))
+		Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pEnd - pBegin))
 	)
 {
 
