@@ -48,9 +48,17 @@ struct TechDefPerm
 };
 
 
+struct ParamLink
+{
+	int32_t paramIdx;
+	int32_t cbIdx;
+	int32_t cbParamIdx;
+};
+
 struct MaterialTech
 {
-	typedef core::Array<render::shader::XCBuffer> CBufferARr;
+	typedef core::Array<render::shader::XCBuffer> CBufferArr;
+	typedef core::Array<ParamLink> ParamLinkArr;
 
 	MaterialTech(core::MemoryArenaBase* arena);
 	MaterialTech(const MaterialTech& oth);
@@ -65,7 +73,8 @@ struct MaterialTech
 
 	render::Commands::ResourceStateBase* pVariableState;
 
-	CBufferARr materialCbs;
+	CBufferArr materialCbs;
+	ParamLinkArr paramLinks;
 };
 
 struct MaterialTexture
@@ -75,13 +84,32 @@ struct MaterialTexture
 	render::TexRepeat::Enum texRepeat;
 };
 
+struct MaterialParam
+{
+	core::string name;
+	ParamType::Enum type;
+	Vec4f value;
+};
+
+struct MaterialSampler
+{
+	core::string name;
+	render::SamplerState sate;
+};
+
+
 class Material
 {
 public:
 	typedef MaterialTech Tech;
 	typedef MaterialTexture Texture;
+	typedef MaterialParam Param;
+	typedef MaterialSampler Sampler;
+
 	typedef core::Array<Tech> TechArr;
 	typedef core::Array<Texture> TextureArr;
+	typedef core::Array<Param> ParamArr;
+	typedef core::Array<Sampler> SamplerArr;
 	typedef core::FixedArray<Texture, MTL_MAX_TEXTURES> FixedTextureArr;
 
 public:
@@ -109,6 +137,8 @@ public:
 	X_INLINE void setTechDefState(TechDefState* pTechDefState);
 
 	X_INLINE void setTextures(const FixedTextureArr& texArr);
+	X_INLINE void setParams(ParamArr&& params);
+	X_INLINE void setSamplers(SamplerArr&& samplers);
 
 
 	// flag helpers.
@@ -124,6 +154,9 @@ public:
 	X_INLINE MaterialMountType::Enum getMountType(void) const;
 	X_INLINE MaterialCat::Enum getCat(void) const;
 	X_INLINE TechDefState* getTechDefState(void) const;
+
+	X_INLINE const ParamArr& getParams(void) const;
+	X_INLINE const SamplerArr& getSamplers(void) const;
 
 protected:
 	X_NO_COPY(Material);
@@ -158,6 +191,8 @@ protected:
 	TechDefState* pTechDefState_;
 
 	TechArr techs_;
+	ParamArr params_;
+	SamplerArr samplers_;
 	TextureArr textures_;
 };
 

@@ -4,7 +4,8 @@ X_INLINE MaterialTech::MaterialTech(core::MemoryArenaBase* arena) :
 	hashVal(0),
 	pPerm(nullptr),
 	pVariableState(nullptr),
-	materialCbs(arena)
+	materialCbs(arena),
+	paramLinks(arena)
 {
 
 }
@@ -13,7 +14,8 @@ X_INLINE MaterialTech::MaterialTech(const MaterialTech& oth) :
 	hashVal(oth.hashVal),
 	pPerm(oth.pPerm),
 	pVariableState(oth.pVariableState),
-	materialCbs(oth.materialCbs)
+	materialCbs(oth.materialCbs),
+	paramLinks(oth.paramLinks)
 {
 
 }
@@ -22,7 +24,8 @@ X_INLINE MaterialTech::MaterialTech(MaterialTech&& oth) :
 	hashVal(std::move(oth.hashVal)),
 	pPerm(std::move(oth.pPerm)),
 	pVariableState(std::move(oth.pVariableState)),
-	materialCbs(std::move(oth.materialCbs))
+	materialCbs(std::move(oth.materialCbs)),
+	paramLinks(std::move(oth.paramLinks))
 {
 
 }
@@ -35,6 +38,7 @@ X_INLINE MaterialTech& MaterialTech::operator=(const MaterialTech& oth)
 		pPerm = oth.pPerm;
 		pVariableState = oth.pVariableState;
 		materialCbs = oth.materialCbs;
+		paramLinks = oth.paramLinks;
 	}
 
 	return *this;
@@ -46,6 +50,7 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 	pPerm = std::move(oth.pPerm);
 	pVariableState = std::move(oth.pVariableState);
 	materialCbs = std::move(oth.materialCbs);
+	paramLinks = std::move(oth.paramLinks);
 	return *this;
 }
 
@@ -53,6 +58,8 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 
 X_INLINE Material::Material(core::MemoryArenaBase* arena) :
 	techs_(arena),
+	params_(arena),
+	samplers_(arena),
 	textures_(arena),
 	pTechDefState_(nullptr)
 {
@@ -153,6 +160,16 @@ X_INLINE void Material::setTextures(const FixedTextureArr& texArr)
 	}
 }
 
+X_INLINE void Material::setParams(ParamArr&& params)
+{
+	params_ = std::move(params);
+}
+
+X_INLINE void Material::setSamplers(SamplerArr&& samplers)
+{
+	samplers_ = std::move(samplers);
+}
+
 // ---------------------------------------------
 
 X_INLINE bool Material::isDrawn(void) const
@@ -210,5 +227,14 @@ X_INLINE TechDefState* Material::getTechDefState(void) const
 	return pTechDefState_;
 }
 
+X_INLINE const Material::ParamArr& Material::getParams(void) const
+{
+	return params_;
+}
+
+X_INLINE const Material::SamplerArr& Material::getSamplers(void) const
+{
+	return samplers_;
+}
 
 X_NAMESPACE_END
