@@ -76,7 +76,7 @@ namespace shader
 
 	X_INLINE bool XHWShader::isILFmtValid(void) const
 	{
-		return 	IlFmt_ != InputLayoutFormat::Invalid;
+		return IlFmt_ != InputLayoutFormat::Invalid;
 	}
 
 	X_INLINE bool XHWShader::FailedtoCompile(void) const
@@ -88,6 +88,7 @@ namespace shader
 	{
 		return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
 	}
+
 
 	X_INLINE const XHWShader::CBufferArr& XHWShader::getCBuffers(void) const
 	{
