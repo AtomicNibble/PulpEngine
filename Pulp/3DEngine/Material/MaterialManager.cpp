@@ -492,24 +492,28 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	core::string catType;
 	file.readString(catType);
 
+	Material::SamplerArr samplers(arena_);
+	Material::ParamArr params(arena_);
+
 	// now samplers.
 	for (uint8_t i = 0; i < hdr.numSamplers; i++)
 	{
-		render::SamplerState sampler;
-		core::string samplerName;
+		MaterialSampler& sampler = samplers.AddOne();
 
-		file.readObj(sampler);
-		file.readString(samplerName);
+		file.readObj(sampler.sate);
+		file.readString(sampler.name);
 	}
 
 	// now params.
 	for (uint8_t i = 0; i < hdr.numParams; i++)
 	{
-		core::string name, val;
-
-		file.readString(name);
-		file.readString(val);
+		MaterialParam& param = params.AddOne();
+		file.readObj(param.value);
+		file.readObj(param.type);
+		file.readString(param.name);
 	}
+
+
 
 
 #else
@@ -582,6 +586,8 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 
 	MaterialResource* pMatRes = createMaterial_Internal(matName);
 	pMatRes->setTechDefState(pTechDefState);
+	pMatRes->setParams(std::move(params));
+	pMatRes->setSamplers(std::move(samplers));
 
 #if 0
 	// so my fine little goat muncher.
