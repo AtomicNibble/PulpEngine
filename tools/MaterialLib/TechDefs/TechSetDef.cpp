@@ -1382,6 +1382,13 @@ bool TechSetDef::parseParamTexture(core::XParser& lex)
 					return false;
 				}
 				break;
+
+			case "ass"_fnv1a:
+				if (!parseAssPropsData(lex, texture.assProps)) {
+					return false;
+				}
+				break;
+
 			default:
 				X_ERROR("TechDef", "Unknown Texture prop: \"%.*s\"", token.length(), token.begin());
 				return false;
