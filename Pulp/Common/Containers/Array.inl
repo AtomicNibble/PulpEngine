@@ -18,12 +18,13 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
 	size_(size),
 	allocator_(arena)
 {
-	X_ASSERT(size > 0, "List size must be positive")(size);
 	X_ASSERT_NOT_NULL(arena);
 
-	list_ = Allocate(size);
-
-	Mem::ConstructArray<T>(list_, size);
+	if (size)
+	{
+		list_ = Allocate(size);
+		Mem::ConstructArray<T>(list_, size);
+	}
 }
 
 template<typename T, class Allocator>
@@ -34,11 +35,13 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, cons
     size_(size),
     allocator_(arena)
 {
-	X_ASSERT(size > 0, "List size must be positive")(size);
 	X_ASSERT_NOT_NULL(arena);
 
-	list_ = Allocate(size);
-	Mem::ConstructArray(list_, size, initialValue);
+	if (size)
+	{
+		list_ = Allocate(size);
+		Mem::ConstructArray(list_, size, initialValue);
+	}
 }
 
 template<typename T, class Allocator>
