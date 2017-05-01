@@ -200,6 +200,7 @@ X_DECLARE_ENUM(ParamType)(
 	Color,
 	Texture
 );
+
 /*
 what o do for the shader input system that i need todo for my engine.
 ineed to also add in the engine system that dose the culling and deteriming what ld to render for each model
