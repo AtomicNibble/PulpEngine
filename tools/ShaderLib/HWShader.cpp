@@ -290,8 +290,8 @@ namespace shader
 				baseUpdateRate = UpdateFreq::INSTANCE;
 			}
 			else {
-				X_WARNING("Shader", "Unknown cbuffer name, ignoring.");
-				continue;
+				X_WARNING("Shader", "Unknown cbuffer name \"%s\", defaulting to per-frame freq.", BufferDesc.Name);
+				baseUpdateRate = UpdateFreq::FRAME;
 			}
 
 			XCBuffer& cbuf = cbuffers_.AddOne(cbuffers_.getArena());
