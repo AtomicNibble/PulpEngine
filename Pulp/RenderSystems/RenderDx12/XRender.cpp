@@ -824,6 +824,8 @@ X_INLINE void XRender::CreateVBView(GraphicsContext& context, const VertexHandle
 void XRender::ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
 	const VertexHandleArr& vertexBuffers, const Commands::ResourceStateBase& resourceState, const char* pStateData)
 {
+	const DeviceState& newState = *reinterpret_cast<const DeviceState*>(handle);
+
 	if (curState.handle != handle) // if the handle is the same, everything is the same.
 	{
 		// the render system should not have to check ever state is valid, the 3dengine should check at creation time.
@@ -831,9 +833,6 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 		X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states you cunt")(handle, INVALID_STATE_HANLDE);
 
 		curState.handle = handle;
-
-		// now we check what parts of the state are diffrent.
-		const DeviceState& newState = *reinterpret_cast<const DeviceState*>(handle);
 
 		// contains a redundant check.
 		context.setRootSignature(newState.rootSig);
@@ -887,6 +886,8 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 		{
 			if (resourceState.getNumTextStates())
 			{
+				X_ASSERT(newState.texRootIdxBase != std::numeric_limits<decltype(newState.texRootIdxBase)>::max(), "Texture rootIdx base is invalid")();
+
 				D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
 				const TextureState* pTexStates = resourceState.getTexStates(pStateData);
 
@@ -914,12 +915,14 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 				// for now assume all slots are linera and no gaps.
 				const auto count = resourceState.getNumTextStates();
-				context.setDynamicDescriptors(1, 0, count, textureSRVS);
+				context.setDynamicDescriptors(newState.texRootIdxBase, 0, count, textureSRVS);
 			}
 
 			// this may be zero even if we have samplers, if they are all static.
 			if (resourceState.getNumSamplers())
 			{
+				X_ASSERT(newState.samplerRootIdxBase != std::numeric_limits<decltype(newState.samplerRootIdxBase)>::max(), "Sampler rootIdx base is invalid")();
+
 				D3D12_CPU_DESCRIPTOR_HANDLE samplerSRVS[render::TextureSlot::ENUM_COUNT] = {};
 				const SamplerState* pSamplers = resourceState.getSamplers(pStateData);
 
@@ -935,14 +938,12 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 				}
 
 				const auto count = resourceState.getNumSamplers();
-				context.setDynamicSamplerDescriptors(2, 0, count, samplerSRVS);
+				context.setDynamicSamplerDescriptors(newState.samplerRootIdxBase, 0, count, samplerSRVS);
 			}
 
 			if (resourceState.getNumCBs())
 			{
 				const ConstantBufferHandle* pCBVs = resourceState.getCBs(pStateData);
-
-				const DeviceState& newState = *reinterpret_cast<const DeviceState*>(handle);
 
 				X_ASSERT(newState.cbRootIdxBase != std::numeric_limits<decltype(newState.cbRootIdxBase)>::max(), "CB rootIdx base is invalid")();
 
@@ -1294,10 +1295,14 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		auto numSamplers = pPixelShader->getNumSamplers();
 
 		if (numTextures > 0) {
+			pState->texRootIdxBase = currentParamIdx;
+
 			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 				0, numTextures, D3D12_SHADER_VISIBILITY_PIXEL);
 		}
 		if (numSamplers > 0) {
+			pState->samplerRootIdxBase = currentParamIdx;
+
 			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
 				0, numSamplers, D3D12_SHADER_VISIBILITY_PIXEL);
 		}
