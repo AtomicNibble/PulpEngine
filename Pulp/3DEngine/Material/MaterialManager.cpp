@@ -270,7 +270,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// we should create the const buffers we need and set them in the variable state.
 	auto* pCBHandles = pVariableState->getCBs();
 #if X_ENABLE_ASSERTIONS
-	for (size_t i = 0; i < pVariableState->getNumCBs(); i++) {
+	for (size_t i = 0; i < cbLinks.size(); i++) {
 		pCBHandles[i] = render::INVALID_BUF_HANLDE;
 	}
 #endif // !X_ENABLE_ASSERTIONS
