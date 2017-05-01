@@ -112,6 +112,32 @@ inline Flags<T>& Flags<T>::operator^=(Flags other)
 
 // enum only versions.
 template <class T>
+inline Flags<T> Flags<T>::operator|(Enum e) const
+{
+	return Flags<T>(flags_ | e);
+}
+
+template <class T>
+inline Flags<T>& Flags<T>::operator|=(Enum e)
+{
+	flags_ |= e;
+	return *this;
+}
+
+template <class T>
+inline Flags<T> Flags<T>::operator&(Enum e) const
+{
+	return Flags<T>(flags_ & e);
+}
+
+template <class T>
+inline Flags<T>& Flags<T>::operator&=(Enum e)
+{
+	flags_ &= e;
+	return *this;
+}
+
+template <class T>
 inline Flags<T> Flags<T>::operator^(Enum e) const
 {
 	return Flags<T>(flags_ ^ e);
@@ -316,6 +342,32 @@ inline Flags8<T>& Flags8<T>::operator^=(Flags8 other)
 }
 
 // enum only versions.
+template <class T>
+inline Flags8<T> Flags8<T>::operator|(Enum e) const
+{
+	return Flags8<T>(flags_ | e);
+}
+
+template <class T>
+inline Flags8<T>& Flags8<T>::operator|=(Enum e)
+{
+	flags_ |= e;
+	return *this;
+}
+
+template <class T>
+inline Flags8<T> Flags8<T>::operator&(Enum e) const
+{
+	return Flags8<T>(flags_ & e);
+}
+
+template <class T>
+inline Flags8<T>& Flags8<T>::operator&=(Enum e)
+{
+	flags_ &= e;
+	return *this;
+}
+
 template <class T>
 inline Flags8<T> Flags8<T>::operator^(Enum e) const
 {
