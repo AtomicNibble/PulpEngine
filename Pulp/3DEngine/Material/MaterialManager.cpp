@@ -260,11 +260,12 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	// the tech should tell us O_O
 	// him -> pTechDef
 	const size_t numTex = pTechDef->getNumAliases();
+	const size_t numSamplers = numTex; // same as numTex for now as i refactor sampler out of texState.
 	const size_t numCb = cbLinks.size();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
-		numTex, // same as numTex for now as i refactor sampler out of texState.
+		numSamplers, 
 		numCb
 	);
 
@@ -286,7 +287,7 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 	}
 
 	auto* pSamplers = pVariableState->getSamplers();
-	for (size_t i = 0; i < numTex; i++)
+	for (size_t i = 0; i < numSamplers; i++)
 	{
 		auto& sampler = pSamplers[i];
 		sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
