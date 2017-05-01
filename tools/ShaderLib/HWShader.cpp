@@ -516,6 +516,8 @@ namespace shader
 #endif
 		}
 
+		X_WARNING_IF(type_ != ShaderType::Pixel && numSamplers_ > 0, "Shader", "None pixel shader has samplers, currently this is not supported");
+
 		pShaderReflection->Release();
 
 		// save some data.
