@@ -32,9 +32,9 @@ namespace shader
 				XParamDB("screensize", ParamType::PF_ScreenSize, UpdateFreq::FRAME, ParamFlag::VEC4),
 				XParamDB("cameraPos", ParamType::PF_CameraPos, UpdateFreq::FRAME, ParamFlag::FLOAT),
 
-				XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
-				XParamDB("worldMatrix", ParamType::PI_worldMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
-				XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, UpdateFreq::FRAME, ParamFlag::MATRIX),
+				XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, UpdateFreq::INSTANCE, ParamFlag::MATRIX),
+				XParamDB("worldMatrix", ParamType::PI_worldMatrix, UpdateFreq::INSTANCE, ParamFlag::MATRIX),
+				XParamDB("worldViewProjectionMatrix", ParamType::PI_worldViewProjectionMatrix, UpdateFreq::INSTANCE, ParamFlag::MATRIX),
 			};
 
 		} // namespace
