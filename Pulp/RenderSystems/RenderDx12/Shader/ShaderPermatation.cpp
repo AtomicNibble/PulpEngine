@@ -81,13 +81,22 @@ namespace shader
 	{
 		cbLinks_.clear();
 
+		int32_t totalCBs = 0;
+
 		for (auto* pShader : stages_)
 		{
 			if (pShader)
 			{
 				X_ASSERT(pShader->getStatus() == ShaderStatus::ReadyToRock, "All shaders should be compiled when creating CB links")();
 				addCbufstoLink(pShader);
+
+				totalCBs += pShader->getNumConstantBuffers();
 			}
+		}
+
+		if (totalCBs > MAX_SHADER_CB_PER_PERM)
+		{
+			X_ERROR("ShaderPerm", "Exceeded max cb's per perm");
 		}
 	}
 
