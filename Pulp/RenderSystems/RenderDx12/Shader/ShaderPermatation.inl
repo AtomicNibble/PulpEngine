@@ -27,6 +27,16 @@ namespace shader
 		return cbLinks_;
 	}
 
+	X_INLINE const ShaderPermatation::SamplerArr& ShaderPermatation::getSamplers(void) const
+	{
+		if (!isStageSet(ShaderType::Pixel)) {
+			static SamplerArr nill(g_rendererArena);
+			return nill;
+		}
+
+		return getStage(ShaderType::Pixel)->getSamplers();
+	}
+
 	X_INLINE const typename ShaderPermatation::HWShaderStagesArr& ShaderPermatation::getStages(void) const
 	{
 		return stages_;

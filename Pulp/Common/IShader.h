@@ -285,15 +285,18 @@ typedef int32_t ShaderID;
 typedef uintptr_t TechHandle;
 
 struct CBufferLink;
+class Sampler;
 
 struct IShaderPermatation
 {
 	typedef core::Array<CBufferLink> CBufLinksArr;
+	typedef core::Array<Sampler> SamplerArr;
 
 	virtual ~IShaderPermatation() {}
 
 	virtual InputLayoutFormat::Enum getILFmt(void) const X_ABSTRACT;
 	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
+	virtual const SamplerArr& getSamplers(void) const X_ABSTRACT;
 };
 
 
