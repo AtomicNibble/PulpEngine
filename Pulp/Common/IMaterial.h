@@ -190,6 +190,16 @@ X_DECLARE_ENUM8(MaterialUsage)(
 
 typedef render::shader::PermatationFlags PermatationFlags;
 
+// the names of these are used directly as the define names (case sensitive)
+X_DECLARE_ENUM(ParamType)(
+	Float1,
+	Float2,
+	Float4,
+	Int,
+	Bool,
+	Color,
+	Texture
+);
 /*
 what o do for the shader input system that i need todo for my engine.
 ineed to also add in the engine system that dose the culling and deteriming what ld to render for each model

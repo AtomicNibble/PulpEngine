@@ -72,16 +72,6 @@ struct Image
 	core::string default;
 };
 
-// the names of these are used directly as the define names (case sensitive)
-X_DECLARE_ENUM(ParamType)(
-	Float1,
-	Float2,
-	Float4,
-	Int,
-	Bool,
-	Color,
-	Texture
-);
 
 struct Param
 {
