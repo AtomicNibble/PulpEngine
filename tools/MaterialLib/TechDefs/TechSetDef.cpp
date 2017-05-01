@@ -1280,7 +1280,7 @@ bool TechSetDef::parseParamColor(core::XParser& lex)
 	// for color it's just single prop.
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Color, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 		
 		bool isExplicit = false;
 		switch (hash)
@@ -1326,7 +1326,7 @@ bool TechSetDef::parseParamBool(core::XParser& lex)
 {
 	using namespace core::Hash::Fnva1Literals;
 
-	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
+	return parseParamHelper(lex, ParamType::Bool, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
 				case "value"_fnv1a:
