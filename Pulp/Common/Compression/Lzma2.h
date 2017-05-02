@@ -45,6 +45,7 @@ namespace Compression
 		X_NO_ASSIGN(LZMA);
 	};
 
+	// --------------------------------------------------------
 
 	template<typename T>
 	X_INLINE bool LZMA::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& compressed,

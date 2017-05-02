@@ -58,6 +58,8 @@ namespace Compression
 		X_NO_ASSIGN(Zlib);
 	};
 
+	// --------------------------------------------------------
+
 	template<typename T>
 	X_INLINE bool Zlib::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& compressed,
 		CompressLevel::Enum lvl)

@@ -14,12 +14,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
-	///
-	///   Zlib decompressor(CompressBuf);
-	///
-	///
-	///
-	///
 
 	class Store
 	{
@@ -53,6 +47,8 @@ namespace Compression
 		X_NO_COPY(Store);
 		X_NO_ASSIGN(Store);
 	};
+
+	// --------------------------------------------------------
 
 	template<typename T>
 	X_INLINE bool Store::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& compressed,
