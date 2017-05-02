@@ -79,6 +79,7 @@ private:
 
 private:
 #if VARIABLE_STATE_STATS
+	mutable core::Spinlock statsLock_;
 	Stats stats_;
 #endif // !VARIABLE_STATE_STATS
 };
