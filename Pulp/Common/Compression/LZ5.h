@@ -105,7 +105,7 @@ namespace Compression
 		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize);
 
 	private:
-		uint64_t decodeStream_[4];
+		size_t decodeStream_[4];
 	};
 
 	// --------------------------------------------------------
