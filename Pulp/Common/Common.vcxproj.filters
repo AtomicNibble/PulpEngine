@@ -1890,12 +1890,6 @@
     <ClCompile Include="Compression\LZ5.cpp">
       <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz5\lz5_lib.c">
-      <Filter>SourceFiles\Compression\lz5</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz5\lz5hc.c">
-      <Filter>SourceFiles\Compression\lz5</Filter>
-    </ClCompile>
     <ClCompile Include="Platform\win32\MessageBox.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
@@ -1913,6 +1907,30 @@
     </ClCompile>
     <ClCompile Include="Sampler.cpp">
       <Filter>Interfaces_h\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\lz5_compress.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\lz5_decompress.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\lz5frame.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\entropy\entropy_common.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\entropy\fse_compress.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\entropy\fse_decompress.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\entropy\huf_compress.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz5\entropy\huf_decompress.c">
+      <Filter>SourceFiles\Compression\lz5</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

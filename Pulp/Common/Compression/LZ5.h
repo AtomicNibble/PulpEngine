@@ -75,7 +75,7 @@ namespace Compression
 	class LZ5Stream
 	{
 	public:
-		LZ5Stream(core::MemoryArenaBase* arena);
+		LZ5Stream(core::MemoryArenaBase* arena, CompressLevel::Enum lvl);
 		~LZ5Stream();
 
 		// this are validated by static asset in source file.
@@ -83,12 +83,11 @@ namespace Compression
 			return 0x7E000000;
 		}
 		X_INLINE static constexpr size_t requiredDeflateDestBuf(size_t size) {
-			return (size > maxSourceSize() ? 0 : (size)+((size) / 128) + 16);
+			return (size > maxSourceSize() ? 0 : (size)+1 + 1 + ((size / (1<<17)) + 1)*4);
 		}
 
 
-		size_t compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen,
-			CompressLevel::Enum lvl = CompressLevel::NORMAL);
+		size_t compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen);
 
 
 	private:
@@ -103,8 +102,6 @@ namespace Compression
 		LZ5StreamDecode();
 		~LZ5StreamDecode();
 
-		// originalSize is the size of the decompressed data.
-		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t originalSize);
 		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize);
 
 	private:
