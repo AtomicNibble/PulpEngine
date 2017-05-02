@@ -79,9 +79,9 @@ struct MaterialTech
 
 struct MaterialTexture
 {
-	texture::TexID texId;
-	render::FilterType::Enum filterType;
-	render::TexRepeat::Enum texRepeat;
+	core::string name;
+	core::string val;
+	render::TextureSlot::Enum texSlot;
 };
 
 struct MaterialParam
@@ -110,7 +110,6 @@ public:
 	typedef core::Array<Texture> TextureArr;
 	typedef core::Array<Param> ParamArr;
 	typedef core::Array<Sampler> SamplerArr;
-	typedef core::FixedArray<Texture, MTL_MAX_TEXTURES> FixedTextureArr;
 
 public:
 	X_INLINE Material(core::MemoryArenaBase* arena);
@@ -136,7 +135,7 @@ public:
 	X_INLINE void setCat(MaterialCat::Enum cat);
 	X_INLINE void setTechDefState(TechDefState* pTechDefState);
 
-	X_INLINE void setTextures(const FixedTextureArr& texArr);
+	X_INLINE void setTextures(TextureArr&& textures);
 	X_INLINE void setParams(ParamArr&& params);
 	X_INLINE void setSamplers(SamplerArr&& samplers);
 

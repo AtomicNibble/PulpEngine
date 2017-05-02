@@ -531,6 +531,7 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 
 	Material::SamplerArr samplers(arena_, hdr.numSamplers);
 	Material::ParamArr params(arena_, hdr.numParams);
+	Material::TextureArr textures(arena_, hdr.numTextures);
 
 
 	// now samplers.
@@ -551,7 +552,14 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 		file.readString(param.name);
 	}
 
-
+	// now textures.
+	for (uint8_t i = 0; i < hdr.numTextures; i++)
+	{
+		MaterialTexture& tex = textures[i];
+		file.readObj(tex.texSlot);
+		file.readString(tex.name);
+		file.readString(tex.val);
+	}
 
 
 #else
@@ -626,6 +634,7 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	pMatRes->setTechDefState(pTechDefState);
 	pMatRes->setParams(std::move(params));
 	pMatRes->setSamplers(std::move(samplers));
+	pMatRes->setTextures(std::move(textures));
 
 #if 0
 	// so my fine little goat muncher.

@@ -155,14 +155,9 @@ X_INLINE void Material::setTechDefState(TechDefState* pTechDefState)
 	pTechDefState_ = pTechDefState;
 }
 
-X_INLINE void Material::setTextures(const FixedTextureArr& texArr)
+X_INLINE void Material::setTextures(TextureArr&& textures)
 {
-	textures_.resize(texArr.size());
-
-	for (size_t i = 0; i < texArr.size(); i++)
-	{
-		textures_[i] = texArr[i];
-	}
+	textures_ = std::move(textures);
 }
 
 X_INLINE void Material::setParams(ParamArr&& params)
