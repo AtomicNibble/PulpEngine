@@ -795,11 +795,24 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 
 	// if the last entry was the same type
 	// just merge the verts in.
-	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().material == pMaterial &&
-		(PrimitiveType::POINTLIST == primType || PrimitiveType::LINELIST == primType || PrimitiveType::TRIANGLELIST == primType))
+	if ((PrimitiveType::POINTLIST == primType || PrimitiveType::LINELIST == primType || PrimitiveType::TRIANGLELIST == primType) &&	
+		pushBufferArr_.isNotEmpty())
 	{
 		auto& lastEntry = pushBufferArr_.back();
-		lastEntry.numVertices += safe_static_cast<uint16_t>(numVertices);
+		if (lastEntry.material == pMaterial && lastEntry.material.GetBits() == currentPage_)
+		{
+			lastEntry.numVertices += safe_static_cast<uint16_t>(numVertices);
+		}
+		else
+		{
+			// could use a goto :D !!
+			pushBufferArr_.emplace_back(
+				safe_static_cast<uint16_t>(numVertices),
+				safe_static_cast<uint16_t>(vertexArr.size()),
+				currentPage_,
+				pMaterial
+			);
+		}
 	}
 	else
 	{
