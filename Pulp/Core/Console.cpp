@@ -2926,12 +2926,15 @@ void XConsole::Command_History(IConsoleCmdArgs* pCmd)
 	X_LOG0("Console", "-------------- ^8History^7 ---------------");
 	X_LOG_BULLET;
 
+	int32_t idx = 0;
 	for (auto& history : CmdHistory_)
 	{
 		if (!pSearch || history.find(pSearch))
 		{
-			X_LOG0("Console", "->	%s", history.c_str());
+			X_LOG0("Console", "> %" PRIi32 " %s", idx, history.c_str());
 		}
+
+		++idx;
 	}
 	
 	X_LOG0("Console", "------------ ^8History End^7 -------------");
