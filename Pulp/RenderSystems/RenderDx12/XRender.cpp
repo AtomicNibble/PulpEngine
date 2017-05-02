@@ -902,15 +902,6 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 					textureSRVS[t] = pTex->getSRV();
 
-					// we need to handle setting samplers...
-					// we should first get the sampler from cache.
-					// i currnetly have sampler states bound to textures.
-					// which means each texture would need a seperate sampler deifned in the shader.
-					// how do we know which index the sampler for this texture is?
-					// should we just assume they share same register index?
-					// for now i'll force them in same slot.
-					// 
-
 				}
 
 				// for now assume all slots are linera and no gaps.
