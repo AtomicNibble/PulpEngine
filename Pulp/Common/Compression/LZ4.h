@@ -56,6 +56,10 @@ namespace Compression
 			void* pDstBuf, size_t destBufLen, size_t& destLenOut,
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
+		template<typename T>
+		static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+			core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
 	private:
 		X_NO_CREATE(LZ4HC);
 		X_NO_COPY(LZ4HC);
@@ -107,7 +111,7 @@ namespace Compression
 		uint64_t decodeStream_[4];
 	};
 
-
+	// --------------------------------------------------------
 
 	template<typename T>
 	X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
@@ -135,7 +139,26 @@ namespace Compression
 		return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size() * sizeof(T));
 	}
 
-	
+	// --------------------------------------------------------
+
+	template<typename T>
+	X_INLINE bool LZ4HC::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+		core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
+	{
+		static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+
+		size_t compressedSize = 0;
+		size_t bufSize = requiredDeflateDestBuf((data.size() * sizeof(T)));
+
+		compressed.resize(bufSize);
+
+		bool res = deflate(arena, data.ptr(), data.size() * sizeof(T),
+			compressed.ptr(), compressed.size(), compressedSize, lvl);
+
+		compressed.resize(compressedSize);
+		return res;
+	}
+
 
 } // namespace Compression
 
