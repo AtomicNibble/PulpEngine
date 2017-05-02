@@ -20,7 +20,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 static const uint32_t	 MTL_MATERIAL_MAX_LEN = 64;
-static const uint32_t	 MTL_B_VERSION = 4;
+static const uint32_t	 MTL_B_VERSION = 5;
 static const uint32_t	 MTL_B_FOURCC = X_TAG('m', 't', 'l', 'b');
 static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
@@ -220,7 +220,7 @@ struct MaterialHeader
 	MaterialSurType::Enum surfaceType;
 	MaterialCoverage::Enum coverage;
 	MaterialMountType::Enum mountType;
-	uint8_t pad;
+	uint8_t numTextures;
 
 	// 4
 	MaterialFlags flags;

@@ -324,6 +324,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.version = MTL_B_VERSION;
 	hdr.numSamplers = safe_static_cast<uint8_t>(samplers_.size());
 	hdr.numParams = safe_static_cast<uint8_t>(params_.size());
+	hdr.numTextures = safe_static_cast<uint8_t>(textures_.size());
 	hdr.strDataSize = 0; 
 	hdr.catTypeNameLen = 0; 
 	hdr.cat = cat_;
