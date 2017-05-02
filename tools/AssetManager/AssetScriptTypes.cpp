@@ -625,19 +625,17 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 		const auto& propName = it->first;
 		const auto& param = it->second;
 
-		if (param.type == engine::ParamType::Texture)
-		{
-			// is this texture have a prop?
-			if(param.img.propName.isNotEmpty())
-			{
-				showProps(param.img.propName, param.assProps);
-			}
-		}
-		else
-		{
-			showProps(propName, param.assProps);
-		}
+		showProps(propName, param.assProps);
 	}
+
+	for (auto it = pTechDef->textureBegin(); it != pTechDef->textureEnd(); ++it)
+	{
+		const auto& texName = it->first;
+		const auto& tex = it->second;
+
+		showProps(texName, tex.assProps);
+	}
+
 
 	for (auto it = pTechDef->samplerBegin(); it != pTechDef->samplerEnd(); ++it)
 	{
