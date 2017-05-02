@@ -46,9 +46,17 @@ namespace
 		uint32_t meow1;
 	};
 
+	typedef ::testing::Types<LZ4, LZ4HC> CompressorTypes;
+	TYPED_TEST_CASE(LZ4Test, CompressorTypes);
+
+	template <typename T>
+	class LZ4Test : public ::testing::Test {
+	public:
+	};
+
 }
 
-TEST(LZ4, Unbuffered)
+TYPED_TEST(LZ4Test, Unbuffered)
 {
 	// none bufferd defate of single buffer.
 	const size_t srcBufSize = 4096;
@@ -59,12 +67,12 @@ TEST(LZ4, Unbuffered)
 
 	FillBufRand(pUncompressed, srcBufSize);
 
-	DestbufSize = LZ4::requiredDeflateDestBuf(srcBufSize);
+	DestbufSize = TypeParam::requiredDeflateDestBuf(srcBufSize);
 
 	uint8_t* pCompressed = X_NEW_ARRAY(uint8_t, DestbufSize, g_arena, "LZ4Compressed");
 	memset(pCompressed, 0, DestbufSize);
 
-	bool deflateOk = LZ4::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
+	bool deflateOk = TypeParam::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
 	EXPECT_TRUE(deflateOk);
 
 	if (deflateOk)
@@ -72,7 +80,7 @@ TEST(LZ4, Unbuffered)
 		uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "LZ4bUncompressed2");
 		memset(pUncompressed2, 0, srcBufSize);
 
-		bool inflateOk = LZ4::inflate(g_arena, pCompressed, deflatedSize,
+		bool inflateOk = TypeParam::inflate(g_arena, pCompressed, deflatedSize,
 			pUncompressed2, srcBufSize);
 
 		EXPECT_TRUE(inflateOk);
@@ -90,7 +98,7 @@ TEST(LZ4, Unbuffered)
 }
 
 
-TEST(LZ4, Array)
+TYPED_TEST(LZ4Test, Array)
 {
 	core::Array<uint8_t> data(g_arena);
 	core::Array<uint8_t> deflated(g_arena);
@@ -98,12 +106,12 @@ TEST(LZ4, Array)
 	data.resize(4096);
 	FillBufRand(data.ptr(), data.size());
 
-	bool deflateOk = LZ4::deflate(g_arena, data, deflated);
+	bool deflateOk = TypeParam::deflate(g_arena, data, deflated);
 	ASSERT_TRUE(deflateOk);
 
 	core::Array<uint8_t> inflated(g_arena, data.size());
 
-	bool inflateOk = LZ4::inflate(g_arena, deflated, inflated);
+	bool inflateOk = TypeParam::inflate(g_arena, deflated, inflated);
 	ASSERT_TRUE(inflateOk);
 
 	// check it's the same
@@ -111,7 +119,7 @@ TEST(LZ4, Array)
 	EXPECT_EQ(0, memcmp(data.ptr(), inflated.ptr(), inflated.size()));
 }
 
-TEST(LZ4, ArrayCustomType)
+TYPED_TEST(LZ4Test, ArrayCustomType)
 {
 
 	core::Array<PodType> data(g_arena);
@@ -120,12 +128,12 @@ TEST(LZ4, ArrayCustomType)
 	data.resize(4096);
 	FillBufRand(data.ptr(), data.size());
 
-	bool deflateOk = LZ4::deflate(g_arena, data, deflated);
+	bool deflateOk = TypeParam::deflate(g_arena, data, deflated);
 	ASSERT_TRUE(deflateOk);
 
 	core::Array<PodType> inflated(g_arena, data.size());
 
-	bool inflateOk = LZ4::inflate(g_arena, deflated, inflated);
+	bool inflateOk = TypeParam::inflate(g_arena, deflated, inflated);
 	ASSERT_TRUE(inflateOk);
 
 	// check it's the same
