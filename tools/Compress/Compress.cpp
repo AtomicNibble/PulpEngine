@@ -89,10 +89,12 @@ namespace
 
 	void PrintArgs(void)
 	{
+		static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
+
 		X_LOG0("Compressor", "Args:");
 		X_LOG0("Compressor", "^6-if^7		(input file) ^1required");
 		X_LOG0("Compressor", "^6-of^7		(output file, default: file + algo) ^9not-required");
-		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lz4hc 3:lzma 4:zlib, default: lza) ^9not-required");
+		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lz4hc 3:lz5 4:lz5hc 5:lzma 6:zlib 7:store, default: lz4) ^9not-required");
 		X_LOG0("Compressor", "^6-d^7		(deflate 1/0, default: 1) ^9not-required");
 		X_LOG0("Compressor", "^6-lvl^7		(lvl 1-9, default: 5) ^9not-required");
 	}
