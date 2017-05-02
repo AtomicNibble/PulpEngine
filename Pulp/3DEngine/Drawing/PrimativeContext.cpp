@@ -799,7 +799,7 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 		pushBufferArr_.isNotEmpty())
 	{
 		auto& lastEntry = pushBufferArr_.back();
-		if (lastEntry.material == pMaterial && lastEntry.material.GetBits() == currentPage_)
+		if (lastEntry.material == pMaterial && safe_static_cast<int32_t>(lastEntry.material.GetBits()) == currentPage_)
 		{
 			lastEntry.numVertices += safe_static_cast<uint16_t>(numVertices);
 		}
