@@ -1225,6 +1225,9 @@
     <ClInclude Include="Sampler.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1552,6 +1555,9 @@
       <Filter>Headers\Threading\win32</Filter>
     </None>
     <None Include="Sampler.inl">
+      <Filter>Interfaces_h\Render</Filter>
+    </None>
+    <None Include="Texture.inl">
       <Filter>Interfaces_h\Render</Filter>
     </None>
   </ItemGroup>
@@ -1931,6 +1937,9 @@
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\entropy\huf_decompress.c">
       <Filter>SourceFiles\Compression\lz5</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -38,6 +38,7 @@ namespace shader
 		numInstructions_(0),
 		cbuffers_(arena),
 		samplers_(arena),
+		textures_(arena),
 		bytecode_(arena),
 		D3DCompileflags_(0),
 		id_(-1)
@@ -382,6 +383,7 @@ namespace shader
 			cbuf.postPopulate();
 		}
 
+
 		D3D12_SHADER_INPUT_BIND_DESC InputBindDesc;
 		for (uint32 n = 0; n<shaderDesc.BoundResources; n++)
 		{
@@ -417,46 +419,11 @@ namespace shader
 			{
 				numTextures_++;
 
-				// we still want to find a sampler for a given textures?
-				// I will add that back in if a need it, but it would be nice to just support
-				// samplers that are shared.
-				// but thinking about it the sampling is defined per material.
-				// so in order to control the sampling for each texture based on materials we need to have sampler per texture.
-				// unless we generate a shader variant that has the correct samplers inserted...
-				core::StackString512 textureResName(InputBindDesc.Name);
-
-				for (uint32 i = 0; i < shaderDesc.BoundResources; i++)
-				{
-					pShaderReflection->GetResourceBindingDesc(i, &InputBindDesc);
-					if (InputBindDesc.Type != D3D_SIT_SAMPLER) {
-						continue;
-					}
-
-					core::StackString512 samplerResName(InputBindDesc.Name);
-
-					// if the sampler state has the same name
-					// as the texture link them.
-					if (textureResName == samplerResName)
-					{
-						// we found it's sampler.
-						break;
-					}
-
-					const size_t samplerSuffixLen = sizeof("sampler") - 1;
-					if ((textureResName.length() + samplerSuffixLen) == samplerResName.length())
-					{
-						const char* pName = samplerResName.findCaseInsen(textureResName.begin());
-						if (pName)
-						{
-							const size_t baseNameLen = textureResName.length();
-							if (core::strUtil::IsEqualCaseInsen(pName + baseNameLen, samplerResName.end(), "sampler"))
-							{
-								// we found it's sampler.
-								break;
-							}
-						}
-					}
-				}
+				textures_.emplace_back(
+					InputBindDesc.Name,
+					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
+					safe_static_cast<int16_t>(InputBindDesc.BindCount)
+				);
 			}
 
 		}

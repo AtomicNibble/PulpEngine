@@ -110,6 +110,16 @@ namespace shader
 		return samplers_;
 	}
 
+	X_INLINE const XHWShader::TextureArr& XHWShader::getTextures(void) const
+	{
+		return textures_;
+	}
+
+	X_INLINE XHWShader::TextureArr& XHWShader::getTextures(void)
+	{
+		return textures_;
+	}
+
 	X_INLINE const core::Array<uint8_t>& XHWShader::getShaderByteCode(void) const
 	{
 		return bytecode_;

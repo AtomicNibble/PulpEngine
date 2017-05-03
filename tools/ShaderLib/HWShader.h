@@ -4,6 +4,7 @@
 #include "ILTree.h"
 #include <CBuffer.h>
 #include <Sampler.h>
+#include <Texture.h>
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
@@ -32,6 +33,7 @@ namespace shader
 	{
 		typedef core::Array<XCBuffer> CBufferArr;
 		typedef core::Array<Sampler> SamplerArr;
+		typedef core::Array<Texture> TextureArr;
 		typedef core::Array<uint8_t> ByteArr;
 
 		friend class ShaderBin;
@@ -74,6 +76,8 @@ namespace shader
 		X_INLINE CBufferArr& getCBuffers(void);
 		X_INLINE const SamplerArr& getSamplers(void) const;
 		X_INLINE SamplerArr& getSamplers(void);
+		X_INLINE const TextureArr& getTextures(void) const;
+		X_INLINE TextureArr& getTextures(void);
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
@@ -116,6 +120,7 @@ namespace shader
 
 		CBufferArr cbuffers_;
 		SamplerArr samplers_;
+		TextureArr textures_;
 
 		ByteArr bytecode_;
 	};

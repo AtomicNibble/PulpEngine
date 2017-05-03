@@ -316,6 +316,7 @@
     <ClInclude Include="String\Xml.h" />
     <ClInclude Include="String\XParser.h" />
     <ClInclude Include="SystemAddress.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Threading\Atomic.h" />
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
@@ -527,6 +528,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Sampler.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
@@ -610,6 +612,7 @@
     <None Include="String\StrRef.inl" />
     <None Include="String\XParser.inl" />
     <None Include="SystemAddress.inl" />
+    <None Include="Texture.inl" />
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\FiberScheduler.inl" />

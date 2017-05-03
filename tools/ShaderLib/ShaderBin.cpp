@@ -105,6 +105,7 @@ namespace shader
 		const auto& byteCode = pShader->getShaderByteCode();
 		const auto& cbuffers = pShader->getCBuffers();
 		const auto& samplers = pShader->getSamplers();
+		const auto& textures = pShader->getTextures();
 
 		// for now every shader for a given type is compiled with same version.
 		// if diffrent shaders have diffrent versions this will ned changing.
@@ -172,6 +173,9 @@ namespace shader
 			}
 			for (const auto& s : samplers) {
 				s.SSave(file.GetFile());
+			}
+			for (const auto& t : textures) {
+				t.SSave(file.GetFile());
 			}
 
 			if (file.write(pData->data(), pData->size()) != pData->size()) {
@@ -250,8 +254,11 @@ namespace shader
 
 				auto& cbufs = pShader->getCBuffers();
 				auto& samplers = pShader->getSamplers();
+				auto& textures = pShader->getTextures();
+
 				cbufs.resize(hdr.numCBufs, cbufs.getArena());
 				samplers.resize(hdr.numSamplers);
+				textures.resize(hdr.numTextures);
 
 				// load bind vars.
 				for (auto& cb : cbufs)
@@ -261,6 +268,10 @@ namespace shader
 				for (auto& s : samplers)
 				{
 					s.SLoad(file.GetFile());
+				}
+				for (auto& t : textures)
+				{
+					t.SLoad(file.GetFile());
 				}
 
 				pShader->bytecode_.resize(hdr.blobLength);
