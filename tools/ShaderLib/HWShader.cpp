@@ -33,8 +33,6 @@ namespace shader
 		IlFmt_(InputLayoutFormat::Invalid),
 		numInputParams_(0),
 		numRenderTargets_(0),
-		numSamplers_(0),
-		numTextures_(0),
 		numInstructions_(0),
 		cbuffers_(arena),
 		samplers_(arena),
@@ -407,8 +405,6 @@ namespace shader
 			}
 			else if (InputBindDesc.Type == D3D_SIT_SAMPLER)
 			{
-				numSamplers_++;
-
 				samplers_.emplace_back(
 					InputBindDesc.Name,
 					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
@@ -417,8 +413,6 @@ namespace shader
 			}
 			else if (InputBindDesc.Type == D3D_SIT_TEXTURE)
 			{
-				numTextures_++;
-
 				textures_.emplace_back(
 					InputBindDesc.Name,
 					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
@@ -483,7 +477,7 @@ namespace shader
 #endif
 		}
 
-		X_WARNING_IF(type_ != ShaderType::Pixel && numSamplers_ > 0, "Shader", "None pixel shader has samplers, currently this is not supported");
+		X_WARNING_IF(type_ != ShaderType::Pixel && samplers_.isNotEmpty(), "Shader", "None pixel shader has samplers, currently this is not supported");
 
 		pShaderReflection->Release();
 

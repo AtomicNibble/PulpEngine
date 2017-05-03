@@ -112,8 +112,6 @@ namespace shader
 		// save info from shader reflection.
 		int32_t numInputParams_;
 		int32_t numRenderTargets_;
-		int32_t numSamplers_;
-		int32_t numTextures_;
 		int32_t numInstructions_;
 		// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
 		uint32_t D3DCompileflags_;

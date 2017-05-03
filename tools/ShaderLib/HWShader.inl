@@ -47,10 +47,10 @@ namespace shader
 		return numRenderTargets_;
 	}
 	X_INLINE int32_t XHWShader::getNumSamplers(void) const {
-		return numSamplers_;
+		return safe_static_cast<int32_t>(samplers_.size());
 	}
 	X_INLINE int32_t XHWShader::getNumTextures(void) const {
-		return numTextures_;
+		return safe_static_cast<int32_t>(textures_.size());
 	}
 	X_INLINE int32_t XHWShader::getNumConstantBuffers(void) const {
 		return safe_static_cast<int32_t>(cbuffers_.size());

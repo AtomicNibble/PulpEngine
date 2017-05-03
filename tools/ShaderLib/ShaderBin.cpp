@@ -307,8 +307,6 @@ namespace shader
 
 				pShader->numInputParams_ = hdr.numInputParams;
 				pShader->numRenderTargets_ = hdr.numRenderTargets;
-				pShader->numSamplers_ = hdr.numSamplers;
-				pShader->numTextures_ = hdr.numTextures;
 				X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")();
 
 				pShader->techFlags_ = hdr.techFlags;
