@@ -91,13 +91,13 @@ namespace Compression
 		int compressLevelToAccelerationHC(CompressLevel::Enum lvl)
 		{
 			if (lvl == CompressLevel::LOW) {
-				return 40;
+				return 30;
 			}
 			if (lvl == CompressLevel::NORMAL) {
-				return 45;
+				return 35;
 			}
 			if (lvl == CompressLevel::HIGH) {
-				return LZ5_MAX_CLEVEL;
+				return 39;
 			}
 
 			X_ASSERT_UNREACHABLE();
