@@ -2,8 +2,8 @@
 
 
 #include "ILTree.h"
-#include "CBuffer.h"
-#include "Sampler.h"
+#include <CBuffer.h>
+#include <Sampler.h>
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
