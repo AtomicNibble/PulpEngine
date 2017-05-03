@@ -36,6 +36,40 @@ namespace Compression
 			lz5 2.0 -43		28 MB/s			1101 MB/s		70955653		33.48
 			lz5 2.0 -46		6.25 MB/s		1073 MB/s		65413061		30.86
 			lz5 2.0 -49		1.27 MB/s		1064 MB/s		60679215		28.63
+
+	Results from i7 3930k:
+			Compressor name         Compress. Decompress. Compr. size  Ratio Filename
+			memcpy                   7344 MB/s  7579 MB/s   211947520 100.00 silesia.tar
+			
+			lizard 1.0 -10            388 MB/s  3147 MB/s   103402971  48.79 silesia.tar
+			lizard 1.0 -12            116 MB/s  2946 MB/s    86232422  40.69 silesia.tar
+			lizard 1.0 -15             57 MB/s  3070 MB/s    81187330  38.31 silesia.tar
+			lizard 1.0 -19           3.39 MB/s  2974 MB/s    77416400  36.53 silesia.tar
+			
+			lizard 1.0 -20            318 MB/s  2033 MB/s    96924204  45.73 silesia.tar
+			lizard 1.0 -22            130 MB/s  2057 MB/s    84866725  40.04 silesia.tar
+			lizard 1.0 -25             16 MB/s  2066 MB/s    75161667  35.46 silesia.tar
+			lizard 1.0 -29           1.54 MB/s  2059 MB/s    68694227  32.41 silesia.tar
+			
+			lizard 1.0 -30            279 MB/s  1012 MB/s    85727429  40.45 silesia.tar
+			lizard 1.0 -32            120 MB/s  1135 MB/s    78652654  37.11 silesia.tar
+			lizard 1.0 -35             61 MB/s  1590 MB/s    74563583  35.18 silesia.tar
+			lizard 1.0 -39           3.33 MB/s  1728 MB/s    69807522  32.94 silesia.tar
+
+			lizard 1.0 -40            231 MB/s  1027 MB/s    80843049  38.14 silesia.tar
+			lizard 1.0 -42            111 MB/s  1124 MB/s    73350988  34.61 silesia.tar
+			lizard 1.0 -45             15 MB/s  1286 MB/s    66692694  31.47 silesia.tar
+			lizard 1.0 -49           1.55 MB/s  1293 MB/s    60679215  28.63 silesia.tar
+
+			lz4 1.7.5                 527 MB/s  2550 MB/s   100880800  47.60 silesia.tar
+	(lz4fast is the unsafe lz4 functions.)
+			lz4fast 1.7.5 -3          625 MB/s  2583 MB/s   107066190  50.52 silesia.tar
+			lz4fast 1.7.5 -17         967 MB/s  3059 MB/s   131732802  62.15 silesia.tar
+			lz4hc 1.7.5 -1            118 MB/s  2326 MB/s    87591763  41.33 silesia.tar
+			lz4hc 1.7.5 -4             67 MB/s  2472 MB/s    79807909  37.65 silesia.tar
+			lz4hc 1.7.5 -9             28 MB/s  2539 MB/s    77892285  36.75 silesia.tar
+			lz4hc 1.7.5 -12          4.08 MB/s  2558 MB/s    77268977  36.46 silesia.tar
+
 		*/
 
 		int compressLevelToAcceleration(CompressLevel::Enum lvl)
