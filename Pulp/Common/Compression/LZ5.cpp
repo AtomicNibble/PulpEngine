@@ -203,8 +203,7 @@ namespace Compression
 		arena_(arena),
 		stream_(nullptr)
 	{
-		LZ5_stream_t* pStream = X_NEW(LZ5_stream_t, arena, "LZ5Stream");
-		LZ5_resetStream(pStream, compressLevelToAcceleration(lvl));
+		LZ5_stream_t* pStream = LZ5_createStream(compressLevelToAcceleration(lvl));
 
 		stream_ = pStream;
 	}
@@ -212,7 +211,7 @@ namespace Compression
 	LZ5Stream::~LZ5Stream()
 	{
 		if (stream_) {
-			X_DELETE(stream_, arena_);
+			LZ5_freeStream(static_cast<LZ5_stream_t*>(stream_));
 		}
 	}
 
