@@ -144,7 +144,7 @@ TYPED_TEST(LZ5Test, ArrayCustomType)
 }
 
 
-TEST(LZ5, DISABLED_Stream)
+TEST(LZ5, Stream)
 {
 	const size_t BUF_SIZE = 4096;
 	const size_t NUM = 64;
@@ -156,7 +156,10 @@ TEST(LZ5, DISABLED_Stream)
 	std::vector<uint8_t> deCompData;
 
 	{
-		char buf[2][BUF_SIZE];
+		uint8_t TAG_FRONT[4] = { 0xAF, 0xAF, 0xAF, 0xAF };
+		uint8_t TAG_BACK[4] = { 0xAF, 0xAF, 0xAF, 0xAF };
+
+		char buf[2][BUF_SIZE + (sizeof(TAG_BACK) * sizeof(TAG_FRONT))];
 		char cmpBuf[LZ5Stream::requiredDeflateDestBuf(BUF_SIZE)];
 
 		int32_t bufIdx = 0;
@@ -169,10 +172,25 @@ TEST(LZ5, DISABLED_Stream)
 
 		for (size_t i = 0; i < NUM; i++)
 		{
-			// simulate streaming it in.
-			::memcpy(buf[bufIdx], &data[i * BUF_SIZE], BUF_SIZE);
 
-			size_t compSize = stream.compressContinue(buf[bufIdx], BUF_SIZE, cmpBuf, sizeof(cmpBuf));
+			// simulate streaming it in.
+			char* pBuf = buf[bufIdx];
+			char* pTagFront = pBuf;
+			char* pData = pTagFront + sizeof(TAG_FRONT);
+			char* pTagBack = pData + BUF_SIZE;
+
+			::memcpy(pTagFront, TAG_FRONT, sizeof(TAG_FRONT));
+			::memcpy(pTagBack, TAG_BACK, sizeof(TAG_BACK));
+			::memcpy(pData, &data[i * BUF_SIZE], BUF_SIZE);
+
+			ASSERT_EQ(0, memcmp(pTagFront, TAG_FRONT, sizeof(TAG_FRONT)));
+			ASSERT_EQ(0, memcmp(pTagBack, TAG_BACK, sizeof(TAG_BACK)));
+
+			size_t compSize = stream.compressContinue(pData, BUF_SIZE, cmpBuf, sizeof(cmpBuf));
+
+			EXPECT_EQ(0, memcmp(pTagFront, TAG_FRONT, sizeof(TAG_FRONT)));
+			EXPECT_EQ(0, memcmp(pTagBack, TAG_BACK, sizeof(TAG_BACK)));
+
 
 			// write the size.
 			uint32_t size = safe_static_cast<uint32_t, size_t>(compSize);
@@ -215,5 +233,5 @@ TEST(LZ5, DISABLED_Stream)
 
 	// check same.
 	ASSERT_EQ(deCompData.size(), data.size());
-	EXPECT_TRUE(memcmp(deCompData.data(), data.ptr(), data.size()) == 0);
+	EXPECT_EQ(0, memcmp(deCompData.data(), data.ptr(), data.size()));
 }
