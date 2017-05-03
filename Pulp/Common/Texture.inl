@@ -18,6 +18,11 @@ namespace shader
 		return name_;
 	}
 
+	X_INLINE texture::TextureType::Enum Texture::getType(void) const
+	{
+		return type_;
+	}
+
 } // namespace shader
 
 X_NAMESPACE_END

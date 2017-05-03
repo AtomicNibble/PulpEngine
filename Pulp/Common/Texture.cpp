@@ -7,17 +7,19 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-	Texture::Texture(const char* pName, int16_t bindPoint, int16_t bindCount) :
+	Texture::Texture(const char* pName, int16_t bindPoint, int16_t bindCount, texture::TextureType::Enum type) :
 		name_(pName),
 		bindPoint_(bindPoint),
-		bindCount_(bindCount)
+		bindCount_(bindCount),
+		type_(type)
 	{
 	}
 
-	Texture::Texture(core::string& name, int16_t bindPoint, int16_t bindCount) :
+	Texture::Texture(core::string& name, int16_t bindPoint, int16_t bindCount, texture::TextureType::Enum type) :
 		name_(name),
 		bindPoint_(bindPoint),
-		bindCount_(bindCount)
+		bindCount_(bindCount),
+		type_(type)
 	{
 	}
 

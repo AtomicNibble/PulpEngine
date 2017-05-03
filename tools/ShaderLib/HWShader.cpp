@@ -413,10 +413,32 @@ namespace shader
 			}
 			else if (InputBindDesc.Type == D3D_SIT_TEXTURE)
 			{
+				texture::TextureType::Enum type = texture::TextureType::UNKNOWN;
+
+				switch (InputBindDesc.Dimension)
+				{
+					case D3D_SRV_DIMENSION_TEXTURE1D:
+						type = texture::TextureType::T1D;
+						break;
+					case D3D_SRV_DIMENSION_TEXTURE2D:
+						type = texture::TextureType::T2D;
+						break;
+					case D3D_SRV_DIMENSION_TEXTURE3D:
+						type = texture::TextureType::T3D;
+						break;
+					case D3D_SRV_DIMENSION_TEXTURECUBE:
+						type = texture::TextureType::TCube;
+						break;
+					default:
+						X_WARNING("Shader", "Unhandled texture dimension: %" PRIi32, InputBindDesc.Dimension);
+						break;
+				}
+
 				textures_.emplace_back(
 					InputBindDesc.Name,
 					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
-					safe_static_cast<int16_t>(InputBindDesc.BindCount)
+					safe_static_cast<int16_t>(InputBindDesc.BindCount),
+					type
 				);
 			}
 
