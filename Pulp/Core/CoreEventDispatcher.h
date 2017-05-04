@@ -14,8 +14,10 @@ X_NAMESPACE_BEGIN(core)
 
 class XCoreEventDispatcher : public ICoreEventDispatcher
 {
+	typedef core::Array<ICoreEventListener*> ListnersArr;
+
 public:
-	XCoreEventDispatcher();
+	XCoreEventDispatcher(core::MemoryArenaBase* arena);
 	~XCoreEventDispatcher() X_OVERRIDE;
 
 	virtual bool RegisterListener(ICoreEventListener* pListener) X_OVERRIDE;
@@ -24,9 +26,8 @@ public:
 	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
 
 private:
-	typedef std::set<ICoreEventListener*> Listners;
 
-	Listners Listners_;
+	ListnersArr listners_;
 };
 
 

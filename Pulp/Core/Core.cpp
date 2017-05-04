@@ -126,7 +126,7 @@ XCore::XCore() :
 
 	hotReloadExtMap_.reserve(32);
 
-	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch");
+	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(g_coreArena);
 	pEventDispatcher_->RegisterListener(this);
 
 	env_.state_ = SCoreGlobals::State::STARTING;
