@@ -89,7 +89,7 @@ private:
 	void updateStatistics(void);
 #endif
 
-	unsigned int chunkSize_;
+	uint32_t chunkSize_;
 	GrowingPoolAllocator poolAllocator8_;
 	GrowingPoolAllocator poolAllocator16_;
 	GrowingPoolAllocator poolAllocator32_;
