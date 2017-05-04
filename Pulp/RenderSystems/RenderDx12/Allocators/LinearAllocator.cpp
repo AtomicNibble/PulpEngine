@@ -19,7 +19,8 @@ DynAlloc::DynAlloc(GpuResource& baseResource, size_t offset, size_t size) :
 // --------------------------------------------------------------------
 
 
-LinearAllocationPage::LinearAllocationPage(ID3D12Resource* pResource, D3D12_RESOURCE_STATES usage) : GpuResource()
+LinearAllocationPage::LinearAllocationPage(ID3D12Resource* pResource, D3D12_RESOURCE_STATES usage) : 
+	GpuResource()
 {
 	X_ASSERT_NOT_NULL(pResource);
 
@@ -48,7 +49,9 @@ LinearAllocatorPageManager::LinearAllocatorPageManager(core::MemoryArenaBase* ar
 	pDevice_(pDevice),
 	cmdMan_(cmdMan),
 	allocationType_(type),
-	pagePool_(arena)
+	pagePool_(arena),
+	retiredPages_(arena),
+	availablePages_(arena)
 {
 
 }
@@ -62,15 +65,15 @@ LinearAllocationPage* LinearAllocatorPageManager::requestPage(void)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
-	while (!retiredPages_.empty() && cmdMan_.isFenceComplete(retiredPages_.front().first))
+	while (retiredPages_.isNotEmpty() && cmdMan_.isFenceComplete(retiredPages_.peek().first))
 	{
-		availablePages_.push(retiredPages_.front().second);
+		availablePages_.push(retiredPages_.peek().second);
 		retiredPages_.pop();
 	}
 
 	LinearAllocationPage* pPagePtr = nullptr;
 
-	if (!availablePages_.empty())
+	if (availablePages_.isNotEmpty())
 	{
 		pPagePtr = availablePages_.front();
 		availablePages_.pop();
@@ -84,7 +87,7 @@ LinearAllocationPage* LinearAllocatorPageManager::requestPage(void)
 	return pPagePtr;
 }
 
-void LinearAllocatorPageManager::discardPages(uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages)
+void LinearAllocatorPageManager::discardPages(uint64_t fenceID, const LineraAllocationPageArr& pages)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 

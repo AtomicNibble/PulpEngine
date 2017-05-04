@@ -1,7 +1,9 @@
 #pragma once
 
 #include "GpuResource.h"
-#include <queue>
+
+#include <Containers\Fifo.h>
+#include <Containers\PriorityQueue.h>
 
 class CommandListManger;
 
@@ -57,8 +59,8 @@ public:
 	static const uint64_t CPU_ALLOCATOION_PAGE_SIZE = 1024 * 1024 * 2; // 2MB
 
 	typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
-	typedef std::queue<std::pair<uint64_t, LinearAllocationPage*> > AllocationFencePageQueue;
-	typedef std::queue<LinearAllocationPage*> AllocationPageQueue;
+	typedef core::PriorityQueue<std::pair<uint64_t, LinearAllocationPage*> > AllocationFencePageQueue;
+	typedef core::Fifo<LinearAllocationPage*> AllocationPageQueue;
 
 public:
 	LinearAllocatorPageManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
@@ -66,7 +68,7 @@ public:
 	~LinearAllocatorPageManager();
 
 	LinearAllocationPage* requestPage(void);
-	void discardPages(uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages);
+	void discardPages(uint64_t fenceID, const LineraAllocationPageArr& pages);
 	void destroy(void);
 
 private:
@@ -87,13 +89,14 @@ private:
 class LinearAllocatorManager
 {
 	typedef std::array<LinearAllocatorPageManager, LinearAllocatorType::ENUM_COUNT> AllocationPageManagerArr;
+	typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
 
 public:
 	LinearAllocatorManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		CommandListManger& cmdMan);
 
 	X_INLINE LinearAllocationPage* requestPage(LinearAllocatorType::Enum type);
-	X_INLINE void discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages);
+	X_INLINE void discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const LineraAllocationPageArr& pages);
 	void destroy(void);
 
 private:

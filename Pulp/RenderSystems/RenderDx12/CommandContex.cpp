@@ -59,7 +59,8 @@ ContextManager::ContextManager(core::MemoryArenaBase* arena, ID3D12Device* pDevi
 	cmdListMan_(cmdListMan),
 	pool_(pool),
 	linAllocMan_(linAllocMan),
-	contextPool_{ arena, arena, arena, arena }
+	contextPool_{ arena, arena, arena, arena },
+	availableContexts_{ arena, arena, arena, arena }
 {
 
 }
@@ -81,7 +82,7 @@ CommandContext* ContextManager::allocateContext(D3D12_COMMAND_LIST_TYPE type)
 	auto& availableContexts = availableContexts_[type];
 
 	CommandContext* pRet = nullptr;
-	if (availableContexts.empty())
+	if (availableContexts.isEmpty())
 	{
 		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, arena_, pDevice_, pool_, linAllocMan_, type);
 		contextPool_[type].emplace_back(pRet);

@@ -2,13 +2,15 @@
 
 #include <EngineCommon.h>
 
+#include <Containers\Fifo.h>
+#include <Containers\Array.h>
+
+
 #define IPRENDER_EXPORTS
 
 #include <IRender.h>
 
-
 X_DISABLE_WARNING(4005)
-
 
 #include <../../3rdparty/source/directx/D3D12.h>
 #include <../../3rdparty/source/directx/D3D11.h>

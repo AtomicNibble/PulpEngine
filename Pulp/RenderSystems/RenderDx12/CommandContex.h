@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Containers\Fifo.h>
 
 #include "GpuResource.h"
 #include "Allocators\DynamicDescriptorHeap.h"
@@ -70,7 +71,7 @@ private:
 
 	core::CriticalSection cs_;
 	core::Array<CommandContext*> contextPool_[COMMAND_LIST_TYPE_NUM];
-	std::queue<CommandContext*> availableContexts_[COMMAND_LIST_TYPE_NUM];
+	core::Fifo<CommandContext*> availableContexts_[COMMAND_LIST_TYPE_NUM];
 };
 
 
