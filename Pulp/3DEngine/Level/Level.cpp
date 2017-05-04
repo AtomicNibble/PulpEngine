@@ -352,14 +352,14 @@ void Level::dispatchJobs(core::FrameData& frame)
 
 		pJobSys_->Wait(pSyncJob);
 		pSyncJob = nullptr;
-	}
 
-	// this could be run as a job.
-	// but certain debug drawing can be done before others but we can't make multiple jobs
-	// since then may not run on same thread.
-	// well actually that is fine as long as they don't run in parrallel.
-	// so we need to be able to submit debug draw jobs that run at correct time but also ensure two debug jobs can't run at same time
-	DrawDebug();
+		// this could be run as a job.
+		// but certain debug drawing can be done before others but we can't make multiple jobs
+		// since then may not run on same thread.
+		// well actually that is fine as long as they don't run in parrallel.
+		// so we need to be able to submit debug draw jobs that run at correct time but also ensure two debug jobs can't run at same time
+		DrawDebug();
+	}
 }
 
 
