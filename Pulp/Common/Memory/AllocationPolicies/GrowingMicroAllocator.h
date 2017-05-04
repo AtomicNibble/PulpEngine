@@ -70,6 +70,7 @@ public:
 
 	/// Frees an allocation.
 	void free( void* ptr );
+	void free(void* ptr, size_t size);
 
 	/// Returns the size of an allocation.
 	X_INLINE size_t getSize(void* ptr) const;
@@ -79,7 +80,8 @@ public:
 
 	/// Returns whether a given allocation belongs to this allocator.
 	X_INLINE bool containsAllocation(void* ptr) const;
-	X_INLINE bool containsAllocation(void* ptr, size_t& sizeOut) const;
+	X_INLINE bool containsAllocation(void* ptr, size_t sizeIn) const;
+	X_INLINE bool containsAllocation(void* ptr, size_t* pSizeOut) const;
 
 private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS

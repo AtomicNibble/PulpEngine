@@ -48,13 +48,14 @@ public:
 
 	/// \brief Empty implementation.
 	/// \remark Although this function is empty, it is expected by a MemoryArena.
-	inline void free(void* ptr);
+	X_INLINE void free(void* ptr);
+	X_INLINE void free(void* ptr, size_t size);
 
 	/// Resets the allocator to the start of its memory region.
-	inline void reset(void);
+	X_INLINE void reset(void);
 
 	/// Returns the original allocation size for an allocation.
-	inline size_t getSize(void* allocation) const;
+	X_INLINE size_t getSize(void* allocation) const;
 
 	/// Returns statistics regarding the allocations made by the allocator.
 	MemoryAllocatorStatistics getStatistics(void) const;

@@ -83,19 +83,20 @@ public:
 
 	/// \brief Allocates raw memory that satisfies the alignment requirements.
 	/// \details All arguments provided for debugging purposes are passed along to the respective policies.
-	virtual void* allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo) X_OVERRIDE;
+	virtual void* allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo) X_FINAL;
 
 	/// Frees memory previously allocated by Allocate().
-	virtual void free(void* ptr) X_OVERRIDE;
+	virtual void free(void* ptr) X_FINAL;
+	virtual void free(void* ptr, size_t size) X_FINAL;
 
-	virtual size_t getSize(void* ptr) X_OVERRIDE;
+	virtual size_t getSize(void* ptr) X_FINAL;
 
 	/// Returns statistics regarding the allocations made by the memory arena.
-	virtual MemoryArenaStatistics getStatistics(void) const X_OVERRIDE;
+	virtual MemoryArenaStatistics getStatistics(void) const X_FINAL;
 
-	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_OVERRIDE;
+	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_FINAL;
 
-	virtual bool isThreadSafe(void) const X_OVERRIDE;
+	virtual bool isThreadSafe(void) const X_FINAL;
 
 	/// \brief Freezes the memory arena.
 	/// \details When an arena is frozen, no allocations can be made or freed.

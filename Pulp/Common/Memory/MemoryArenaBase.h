@@ -26,6 +26,7 @@ public:
 
 	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_ABSTRACT;
+	virtual void free(void* ptr, size_t size) X_ABSTRACT;
 
 	/// Frees memory previously allocated by Allocate().
 	virtual size_t getSize(void* ptr) X_ABSTRACT;

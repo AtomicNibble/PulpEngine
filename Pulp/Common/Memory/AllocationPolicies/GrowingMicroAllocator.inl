@@ -36,25 +36,39 @@ X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr) const
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
-X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t& sizeOut) const
+X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t size) const
+{
+	X_UNUSED(ptr);
+
+#if X_ENABLE_ASSERTIONS
+	if (size <= MAX_ALLOCATION_SIZE) {
+		X_ASSERT(containsAllocation(ptr), "Allocation that fits in pool did not come from pool")(ptr, size);
+	}
+#endif
+
+	return size <= MAX_ALLOCATION_SIZE;
+}
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t* pSizeOut) const
 {
 	if (poolAllocator8_.containsAllocation(ptr)) {
-		sizeOut = poolAllocator8_.getSize(ptr);
+		*pSizeOut = poolAllocator8_.getSize(ptr);
 	}
 	else if (poolAllocator16_.containsAllocation(ptr)) {
-		sizeOut = poolAllocator16_.getSize(ptr);
+		*pSizeOut = poolAllocator16_.getSize(ptr);
 	}
 	else if (poolAllocator32_.containsAllocation(ptr)) {
-		sizeOut = poolAllocator32_.getSize(ptr);
+		*pSizeOut = poolAllocator32_.getSize(ptr);
 	}
 	else if (poolAllocator64_.containsAllocation(ptr)) {
-		sizeOut = poolAllocator64_.getSize(ptr);
+		*pSizeOut = poolAllocator64_.getSize(ptr);
 	}
 	else if (poolAllocator128_.containsAllocation(ptr)) {
-		sizeOut = poolAllocator128_.getSize(ptr);
+		*pSizeOut = poolAllocator128_.getSize(ptr);
 	}
 	else if (poolAllocator256_.containsAllocation(ptr)) {
-		sizeOut = poolAllocator256_.getSize(ptr);
+		*pSizeOut = poolAllocator256_.getSize(ptr);
 	}
 	else
 	{

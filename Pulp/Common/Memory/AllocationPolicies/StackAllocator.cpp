@@ -125,6 +125,12 @@ void StackAllocator::free(void* ptr)
 
 }
 
+void StackAllocator::free(void* ptr, size_t size)
+{
+	X_UNUSED(size);
+	free(ptr);
+}
+
 
 MemoryAllocatorStatistics StackAllocator::getStatistics(void) const
 {

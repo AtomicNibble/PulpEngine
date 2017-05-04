@@ -117,6 +117,11 @@ void MallocFreeAllocator::free(void* ptr)
 	::free( as_header->originalAllocation_ );
 }
 
+void MallocFreeAllocator::free(void* ptr, size_t size)
+{
+	X_UNUSED(size);
+	free(ptr);
+}
 
 
 /// Returns statistics regarding the allocations made by the allocator.

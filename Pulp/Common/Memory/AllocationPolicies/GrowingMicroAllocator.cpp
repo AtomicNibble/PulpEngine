@@ -82,6 +82,13 @@ void GrowingMicroAllocator::free( void* ptr )
 #endif
 }
 
+void GrowingMicroAllocator::free(void* ptr, size_t size)
+{
+	X_UNUSED(size);
+	free(ptr);
+}
+
+
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 void GrowingMicroAllocator::updateStatistics(void)

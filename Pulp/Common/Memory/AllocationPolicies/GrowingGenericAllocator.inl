@@ -48,13 +48,31 @@ X_INLINE void GrowingGenericAllocator::free(void* ptr)
 #endif
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+X_INLINE void GrowingGenericAllocator::free(void* ptr, size_t size)
+{
+	if (microAllocator_.containsAllocation(ptr, size))
+	{
+		microAllocator_.free(ptr, size);
+	}
+	else
+	{
+		blockAllocator_.free(ptr, size);
+	}
+
+#if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+	updateStatistics();
+#endif
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE size_t GrowingGenericAllocator::getSize(void* ptr) const
 {
 	size_t size;
-	if (microAllocator_.containsAllocation(ptr, size))
+	if (microAllocator_.containsAllocation(ptr, &size))
 	{
 		return size;
 	}

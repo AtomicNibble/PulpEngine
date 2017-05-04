@@ -118,6 +118,12 @@ void GrowingBlockAllocator::free( void* ptr )
 
 }
 
+void GrowingBlockAllocator::free(void* ptr, size_t size)
+{
+	X_UNUSED(size);
+	free(ptr);
+}
+
 
 
 MemoryAllocatorStatistics GrowingBlockAllocator::getStatistics(void) const

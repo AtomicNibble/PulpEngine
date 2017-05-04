@@ -143,6 +143,12 @@ void GrowingStackAllocator::free(void* ptr)
 #endif
 }
 
+void GrowingStackAllocator::free(void* ptr, size_t size)
+{
+	X_UNUSED(size);
+	free(ptr);
+}
+
 void GrowingStackAllocator::purge(void)
 {
 	char* start = pointerUtil::AlignTop<char>(physicalCurrent_, granularity_);

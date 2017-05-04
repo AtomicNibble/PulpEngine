@@ -58,6 +58,7 @@ public:
 
 	/// Frees an allocation.
 	X_INLINE void free(void* ptr);
+	X_INLINE void free(void* ptr, size_t size);
 
 	/// Returns the original allocation size for an allocation.
 	X_INLINE size_t getSize(void* allocation) const;

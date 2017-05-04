@@ -57,6 +57,7 @@ public:
 
 	/// Frees an allocation.
 	void free(void* ptr);
+	void free(void* ptr, size_t size);
 
 	/// Returns unused physical memory pages to the OS.
 	void purge(void);
