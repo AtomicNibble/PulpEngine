@@ -8,7 +8,7 @@
 #include <Containers\HashMap.h>
 
 X_DISABLE_WARNING(4702)
-#include <set>
+#include <unordered_set>
 X_ENABLE_WARNING(4702)
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
@@ -226,7 +226,7 @@ private:
 
 private:
 #if X_DEBUG == 1
-	typedef std::set<XFindData*> findDataSet;
+	typedef std::unordered_set<XFindData*> findDataSet;
 	findDataSet findData_;
 #endif // !X_DEBUG
 
