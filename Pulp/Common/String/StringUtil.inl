@@ -4,6 +4,18 @@
 
 namespace strUtil
 {
+	template<typename T>
+	inline size_t StringBytes(const T& str)
+	{
+		return str.length() * sizeof(T::value_type);
+	}
+
+	template<typename T>
+	inline size_t StringBytesIncNull(const T& str)
+	{
+		return (str.length() + 1) * sizeof(T::value_type);
+	}
+
 
 	inline bool IsWhitespace(const char character)
 	{

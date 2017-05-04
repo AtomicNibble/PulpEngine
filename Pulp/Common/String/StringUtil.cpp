@@ -13,62 +13,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace strUtil
 {
-	template<>
-	inline size_t StringBytes(const std::string& str)
-	{
-		return str.length();
-	}
-
-	template<>
-	inline size_t StringBytes(const std::wstring& str)
-	{
-		return str.length() * 2;
-	}
-
-	template<>
-	inline size_t StringBytes(const core::StringRef<char>& str)
-	{
-		return str.length();
-	}
-
-	template<>
-	inline size_t StringBytes(const core::StringRef<wchar_t>& str)
-	{
-		return str.length() * 2;
-	}
-
-	template<>
-	inline size_t StringBytesIncNull(const std::string& str)
-	{
-		return str.length() + 1;
-	}
-
-	template<>
-	inline size_t StringBytesIncNull(const std::wstring& str)
-	{
-		return (str.length() + 1) * 2;
-	}
-
-	template<>
-	inline size_t StringBytesIncNull(const core::StringRef<char>& str)
-	{
-		return str.length() + 1;
-	}
-
-	template<>
-	inline size_t StringBytesIncNull(const core::StringRef<wchar_t>& str)
-	{
-		return (str.length() + 1) * 2;
-	}
-
-	static const size_t initerlizer_1 = StringBytes(std::string(""));
-	static const size_t initerlizer_2 = StringBytes(std::wstring(L""));
-	static const size_t initerlizer_3 = StringBytes(core::StringRef<char>(""));
-	static const size_t initerlizer_4 = StringBytes(core::StringRef<wchar_t>(L""));
-	static const size_t initerlizer_5 = StringBytesIncNull(std::string(""));
-	static const size_t initerlizer_6 = StringBytesIncNull(std::wstring(L""));
-	static const size_t initerlizer_7 = StringBytesIncNull(core::StringRef<char>(""));
-	static const size_t initerlizer_8 = StringBytesIncNull(core::StringRef<wchar_t>(L""));
 
 	namespace
 	{
