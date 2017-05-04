@@ -84,7 +84,7 @@ namespace
 
 void* operator new(size_t sz)
 {
-	return gAlloc.allocate(sz, 4, 0);
+	return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
 void operator delete(void* m)
