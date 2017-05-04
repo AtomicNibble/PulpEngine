@@ -45,12 +45,6 @@
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{c3529064-ca71-4b49-88f4-371923a95451}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Model">
-      <UniqueIdentifier>{9c138a90-243a-45f1-aa06-7b1ee8d76e66}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Model">
-      <UniqueIdentifier>{993786c1-4f2d-4c81-b4b6-96346b673e62}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{03ad25ea-e61c-47fc-a22d-53be01adc0c2}</UniqueIdentifier>
     </Filter>
@@ -136,9 +130,6 @@
     </ClInclude>
     <ClInclude Include="Vars\RenderVars.h">
       <Filter>Header Files\Vars</Filter>
-    </ClInclude>
-    <ClInclude Include="Model\Mesh.h">
-      <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="CommandQue.h">
       <Filter>Header Files</Filter>
@@ -231,9 +222,6 @@
     </ClCompile>
     <ClCompile Include="Vars\RenderVars.cpp">
       <Filter>Source Files\Vars</Filter>
-    </ClCompile>
-    <ClCompile Include="Model\Mesh.cpp">
-      <Filter>Source Files\Model</Filter>
     </ClCompile>
     <ClCompile Include="CommandQue.cpp">
       <Filter>Source Files</Filter>

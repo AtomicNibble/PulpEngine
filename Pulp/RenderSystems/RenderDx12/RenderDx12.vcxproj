@@ -411,7 +411,6 @@
     <ClInclude Include="CommandSignature.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="GpuResource.h" />
-    <ClInclude Include="Model\Mesh.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
@@ -447,7 +446,6 @@
     <ClCompile Include="CommandQue.cpp" />
     <ClCompile Include="CommandSignature.cpp" />
     <ClCompile Include="GpuResource.cpp" />
-    <ClCompile Include="Model\Mesh.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
