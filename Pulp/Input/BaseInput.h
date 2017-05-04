@@ -19,6 +19,13 @@ class XInputCVars;
 
 class XBaseInput : public IInput, public ICoreEventListener
 {
+	// listener functionality
+	typedef core::Array<IInputDevice*>			InputDevicesArr;
+	typedef core::Array<IInputEventListner*>	InputEventListenersList;
+	typedef core::Array<InputSymbol*>			InputSymbolsArr;
+	typedef core::Array<InputEvent>				InputEventArr;
+
+
 public:
 	XBaseInput();
 	virtual ~XBaseInput() X_OVERRIDE;
@@ -75,12 +82,6 @@ private:
 	bool SendEventToListeners(const InputEvent &event);
 	void AddEventToHoldSymbols(const InputEvent &event);
 protected:
-	// listener functionality
-	typedef core::Array<IInputDevice*>		InputDevicesArr;
-	typedef std::list<IInputEventListner*>	InputEventListenersList;
-	typedef core::Array<InputSymbol*>		InputSymbolsArr;
-	typedef core::Array<InputEvent>			InputEventArr;
-
 	InputSymbolsArr						holdSymbols_;
 	InputEventListenersList				listners_;
 	InputEventListenersList				consoleListeners_;

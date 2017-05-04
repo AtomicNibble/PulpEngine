@@ -29,6 +29,8 @@ namespace {
 XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
 	devices_(g_InputArena),
+	listners_(g_InputArena),
+	consoleListeners_(g_InputArena),
 	holdSymbols_(g_InputArena),
 	clearStateEvents_(g_InputArena), 
 	enableEventPosting_(true),
@@ -81,11 +83,11 @@ void XBaseInput::ShutDown(void)
 	devices_.clear();
 
 
-	if (!listners_.empty())
+	if (listners_.isNotEmpty())
 	{
 		X_WARNING("InputSys", "%i listners still registered", listners_.size());
 	}
-	if (!consoleListeners_.empty())
+	if (consoleListeners_.isNotEmpty())
 	{
 		X_WARNING("InputSys", "%i console listners still registered", consoleListeners_.size());
 	}
@@ -170,7 +172,7 @@ void XBaseInput::AddEventListener(IInputEventListner *pListener)
 	if (std::find(listners_.begin(), listners_.end(), pListener) == listners_.end())
 	{
 		listners_.push_back(pListener);
-		listners_.sort(compareInputListener);
+		std::sort(listners_.begin(), listners_.end(), compareInputListener);
 	}
 }
 
@@ -189,7 +191,7 @@ void XBaseInput::AddConsoleEventListener(IInputEventListner *pListener)
 	if (std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener) == consoleListeners_.end())
 	{
 		consoleListeners_.push_back(pListener);
-		consoleListeners_.sort(compareInputListener);
+		std::sort(consoleListeners_.begin(), consoleListeners_.end(), compareInputListener);
 	}
 }
 
@@ -358,30 +360,31 @@ bool XBaseInput::SendEventToListeners(const InputEvent &event)
 
 	if (event.action == InputState::CHAR)
 	{
-		for (InputEventListenersList::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+		for (auto* pListener : consoleListeners_)
 		{
-			if ((*it)->OnInputEventChar(event)) {
+			if (pListener->OnInputEventChar(event)) {
 				return false;
 			}
 		}
-		for (InputEventListenersList::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
+		for (auto* pListener : listners_)
 		{
-			if ((*it)->OnInputEventChar(event)) {
+			if (pListener->OnInputEventChar(event)) {
 				break;
 			}
 		}
 	}
 	else
 	{
-		for (InputEventListenersList::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+		for (auto* pListener : consoleListeners_)
+
 		{
-			if ((*it)->OnInputEvent(event)) {
+			if (pListener->OnInputEvent(event)) {
 				return false;
 			}
 		}
-		for (InputEventListenersList::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
+		for (auto* pListener : listners_)
 		{
-			if ((*it)->OnInputEvent(event)) {
+			if (pListener->OnInputEvent(event)) {
 				break;
 			}
 		}
