@@ -43,7 +43,6 @@ public:
 	LinearAllocationPage(ID3D12Resource* pResource, D3D12_RESOURCE_STATES usage);
 	~LinearAllocationPage();
 
-
 	X_INLINE void* cpuVirtualAddress(void) const;
 
 private:
@@ -56,6 +55,10 @@ class LinearAllocatorPageManager
 public:
 	static const uint64_t GPU_ALLOCATOION_PAGE_SIZE = 1024 * 64; // 64K
 	static const uint64_t CPU_ALLOCATOION_PAGE_SIZE = 1024 * 1024 * 2; // 2MB
+
+	typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
+	typedef std::queue<std::pair<uint64_t, LinearAllocationPage*> > AllocationFencePageQueue;
+	typedef std::queue<LinearAllocationPage*> AllocationPageQueue;
 
 public:
 	LinearAllocatorPageManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
@@ -76,13 +79,15 @@ private:
 	core::CriticalSection cs_;
 
 	LinearAllocatorType::Enum allocationType_;
-	core::Array<LinearAllocationPage*> pagePool_;
-	std::queue<std::pair<uint64_t, LinearAllocationPage*> > retiredPages_;
-	std::queue<LinearAllocationPage*> availablePages_;
+	LineraAllocationPageArr pagePool_;
+	AllocationFencePageQueue retiredPages_;
+	AllocationPageQueue availablePages_;
 };
 
 class LinearAllocatorManager
 {
+	typedef std::array<LinearAllocatorPageManager, LinearAllocatorType::ENUM_COUNT> AllocationPageManagerArr;
+
 public:
 	LinearAllocatorManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		CommandListManger& cmdMan);
@@ -92,13 +97,15 @@ public:
 	void destroy(void);
 
 private:
-	std::array<LinearAllocatorPageManager, LinearAllocatorType::ENUM_COUNT> pageAllocators_;
+	AllocationPageManagerArr pageAllocators_;
 };
 
 class LinearAllocator
 {
 public:
 	static const size_t DEFAULT_ALIGN = 256;
+
+	typedef core::Array<LinearAllocationPage*> LineraAllocationPageArr;
 
 public:
 	LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorManager& manager, LinearAllocatorType::Enum Type);
@@ -112,7 +119,7 @@ private:
 	size_t pageSize_;
 	size_t curOffset_;
 	LinearAllocationPage* pCurPage_;
-	core::Array<LinearAllocationPage*> retiredPages_;
+	LineraAllocationPageArr retiredPages_;
 };
 
 
