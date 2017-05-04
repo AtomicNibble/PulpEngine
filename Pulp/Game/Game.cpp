@@ -108,17 +108,15 @@ void operator delete[](void* m)
 
 void operator delete(void* m, size_t sz)
 {
-	X_UNUSED(sz);
 	if (m) {
-		gAlloc.free(m);
+		gAlloc.free(m, sz);
 	}
 }
 
 void operator delete[](void* m, size_t sz)
 {
-	X_UNUSED(sz);
 	if (m) {
-		gAlloc.free(m);
+		gAlloc.free(m, sz);
 	}
 }
 
