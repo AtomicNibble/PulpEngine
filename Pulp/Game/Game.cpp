@@ -87,12 +87,41 @@ void* operator new(size_t sz)
 	return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
+void* operator new[](size_t sz)
+{
+	return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
+}
+
 void operator delete(void* m)
 {
 	if (m) {
 		gAlloc.free(m);
 	}
 }
+
+void operator delete[](void* m)
+{
+	if (m) {
+		gAlloc.free(m);
+	}
+}
+
+void operator delete(void* m, size_t sz)
+{
+	X_UNUSED(sz);
+	if (m) {
+		gAlloc.free(m);
+	}
+}
+
+void operator delete[](void* m, size_t sz)
+{
+	X_UNUSED(sz);
+	if (m) {
+		gAlloc.free(m);
+	}
+}
+
 
 
 
