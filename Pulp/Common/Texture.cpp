@@ -29,6 +29,7 @@ namespace shader
 		pFile->writeString(name_);
 		pFile->writeObj(bindPoint_);
 		pFile->writeObj(bindCount_);
+		pFile->writeObj(type_);
 		return true;
 	}
 
@@ -37,6 +38,7 @@ namespace shader
 		pFile->readString(name_);
 		pFile->readObj(bindPoint_);
 		pFile->readObj(bindCount_);
+		pFile->readObj(type_);
 		return true;
 	}
 
