@@ -76,6 +76,8 @@ struct IRecursiveLuaDump
 
 class XScriptSys : public IScriptSys, public core::IXHotReload
 {
+	typedef std::set<core::string> ScriptFileList;
+
 public:
 	XScriptSys();
 	// IScriptSys
@@ -157,10 +159,8 @@ private:
 	static int ErrorHandler(lua_State *L);
 
 private:
-	typedef std::set<core::string> ScriptFileList;
-
 	bool initialised_;
-	lua_State *L;
+	lua_State* L;
 
 	core::IFileSys* pFileSys_;
 	XScriptBinds binds_;
