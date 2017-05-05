@@ -242,7 +242,7 @@ namespace shader
 	}
 
 
-	bool XHWShader::reflectShader(ID3DBlob* pshaderBlob)
+	bool XHWShader::reflectShader(ID3D10Blob* pshaderBlob)
 	{
 		ID3D12ShaderReflection* pShaderReflection;
 		ID3D12ShaderReflectionConstantBuffer* pCB;

@@ -13,6 +13,7 @@ X_NAMESPACE_DECLARE(core,
 }
 )
 
+struct ID3D10Blob;
 
 X_NAMESPACE_BEGIN(render)
 
@@ -88,7 +89,7 @@ namespace shader
 
 	private:
 		bool compileFromSource(core::string& source);
-		bool reflectShader(ID3DBlob* pshaderBlob);
+		bool reflectShader(ID3D10Blob* pshaderBlob);
 
 	protected:
 		LockType lock_;
