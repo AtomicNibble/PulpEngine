@@ -12,6 +12,7 @@ TechDef::TechDef(core::MemoryArenaBase* arena) :
 	aliases_(arena)
 {
 	perms_.setGranularity(8);
+	aliases_.setGranularity(2);
 	shaderSource_.fill(nullptr);
 }
 
