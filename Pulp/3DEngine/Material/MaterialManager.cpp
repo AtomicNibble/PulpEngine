@@ -321,7 +321,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 			// find a sampler that matches from material
 			size_t j;
-			for (j=0; j<matSamplers.size(); j++)
+			for (j = 0; j < matSamplers.size(); j++)
 			{
 				auto& s = matSamplers[j];
 
