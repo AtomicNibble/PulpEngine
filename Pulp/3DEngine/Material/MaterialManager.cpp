@@ -332,6 +332,28 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 				}
 			}
 
+			// we did not find one, alias?
+			if (pTechDef->getNumAliases())
+			{
+				const auto& aliases = pTechDef->getAliases();
+				for (const auto& alias : aliases)
+				{
+					// find a alias that points to the persm resource.
+					if (alias.resourceName == permSampler.getName())
+					{
+						// okay so now we know the name of the material sampler that we want.
+						for (j = 0; j < matSamplers.size(); j++)
+						{
+							auto& s = matSamplers[j];
+							if (s.name == alias.name)
+							{
+								sampler = s.sate;
+								break;
+							}
+						}
+					}
+				}
+			}
 			if (j == matSamplers.size())
 			{
 				X_ERROR("Material", "Failed to find sampler values for perm sampler: \"%s\" using defaults", permSampler.getName().c_str());
