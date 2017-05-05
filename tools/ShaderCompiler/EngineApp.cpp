@@ -9,9 +9,6 @@
 
 
 
-extern HINSTANCE g_hInstance;
-
-
 EngineApp::EngineApp() :
 	pICore_(nullptr),
 	hSystemHandle_(NULL)
@@ -31,10 +28,10 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
-	params.hInstance = g_hInstance;
+	params.hInstance = hInstance;
 	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
 	params.bSkipSound = true;

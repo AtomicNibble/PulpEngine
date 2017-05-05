@@ -10,10 +10,6 @@
 #include <ModuleExports.h>
 
 
-
-
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -48,9 +44,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-	g_hInstance = hInstance;
-
-
 	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - ShaderCompiler");
 	Console.RedirectSTD();
 	Console.SetSize(60, 40, 2000);
@@ -63,11 +56,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	bool res = false;
 
-
 	{
 		EngineApp app; // needs to clear up before arena.
 
-		if (app.Init(lpCmdLine, Console))
+		if (app.Init(hInstance, lpCmdLine, Console))
 		{
 
 		}
