@@ -229,6 +229,27 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 		return pTech;
 	}
 
+	if (pMat->isDefault())
+	{
+		// if this is not real material and we want to return default material techs.
+		pTech = pDefaultMtl_->getTech(techNameHash, vrtFmt, permFlags);
+		if (!pTech)
+		{
+			pTech = getTechForMaterial_int(pDefaultMtl_, techNameHash, vrtFmt, permFlags);
+		}
+
+		return pTech;
+	}
+
+	return getTechForMaterial_int(pMat, techNameHash, vrtFmt, permFlags);
+
+}
+
+Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt,
+	PermatationFlags permFlags)
+{
+	X_ASSERT_NOT_NULL(pMat);
+
 	// we must get the techDef so we can select the tech definition.
 	TechDefState* pTechDefState = pMat->getTechDefState();
 
@@ -452,7 +473,8 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 
 	pMat->addTech(std::move(matTech));
 
-	pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
+	auto* pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
+
 	return pTech;
 }
 

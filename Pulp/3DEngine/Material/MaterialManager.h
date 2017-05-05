@@ -62,6 +62,9 @@ public:
 	void ListMaterials(const char* pSearchPatten = nullptr) const;
 
 private:
+	Material::Tech* getTechForMaterial_int(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
+		PermatationFlags permFlags);
+
 	void releaseMaterial_internal(Material* pMat);
 
 	MaterialResource* loadMaterialCompiled(const core::string& name);
