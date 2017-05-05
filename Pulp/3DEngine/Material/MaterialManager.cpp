@@ -334,7 +334,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 			if (j == matSamplers.size())
 			{
-				X_ERROR("MAterial", "Failed to find sampler values for perm sampler: \"%s\" using defaults", permSampler.getName().c_str());
+				X_ERROR("Material", "Failed to find sampler values for perm sampler: \"%s\" using defaults", permSampler.getName().c_str());
 				sampler.filter = render::FilterType::LINEAR_MIP_LINEAR;
 				sampler.repeat = render::TexRepeat::TILE_BOTH;
 			}
