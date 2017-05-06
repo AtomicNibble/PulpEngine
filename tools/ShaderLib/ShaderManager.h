@@ -59,9 +59,10 @@ namespace shader
 			shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags);
 		SHADERLIB_EXPORT void releaseHWShader(XHWShader* pHWSHader);
 
+		SHADERLIB_EXPORT bool compileShader(XHWShader* pHWShader, CompileFlags flags);
 		SHADERLIB_EXPORT shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
 		SHADERLIB_EXPORT void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
-
+		
 		ShaderVars& getShaderVars(void);
 		ShaderBin& getBin(void);
 

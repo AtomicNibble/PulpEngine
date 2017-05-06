@@ -147,6 +147,90 @@ namespace shader
 			hwShaders_.releaseAsset(pHWRes);
 		}
 	}
+
+	bool XShaderManager::compileShader(XHWShader* pHWShader, CompileFlags flags)
+	{
+		const auto status = pHWShader->getStatus();
+		if (status == ShaderStatus::ReadyToRock) {
+			return true;;
+		}
+
+		if (status == ShaderStatus::FailedToCompile) {
+			X_ERROR("ShadersManager", "can't compile shader, it previously failed to compile");
+			return false;
+		}
+
+		if (pHWShader->getLock().TryEnter())
+		{
+			// we adopt the lock we have from tryEnter this is not a re-lock.
+			core::UniqueLock<XHWShader::LockType> lock(pHWShader->getLock(), core::adopt_lock);
+
+			// try load it from cache.
+			if (shaderBin_.loadShader(pHWShader)) {
+				X_ASSERT(pHWShader->getStatus() == ShaderStatus::ReadyToRock, "Sahder from cache is not read to rock")();
+				return true;
+			}
+
+			core::string source;
+			if (!sourceBin_.getMergedSource(pHWShader->getSourceFileName(), source)) {
+				X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getSourceFileName().c_str());
+				return false;
+			}
+
+			if (vars_.writeMergedSource())
+			{
+				core::Path<char> srcPath;
+				getShaderCompileSrc(pHWShader, srcPath);
+
+				core::XFileScoped fileOut;
+				if (fileOut.openFile(srcPath.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE | core::fileModeFlags::SHARE))
+				{
+					fileOut.write(source.data(), source.length());
+				}
+			}
+
+			if (!pHWShader->compile(source, flags))
+			{
+				X_ERROR("ShadersManager", "Failed to compile shader");
+				return false;
+			}
+
+			// save it 
+			if (vars_.writeCompiledShaders())
+			{
+				if (!shaderBin_.saveShader(pHWShader)) {
+					X_WARNING("ShadersManager", "Failed to save shader to bin: \"%s\"", pHWShader->getName().c_str());
+				}
+			}
+		}
+		else
+		{
+			// another thread is compiling the shader.
+			// we wait for it, maybe run some jobs while we wait?
+			while (1)
+			{
+				const auto status = pHWShader->getStatus();
+				if (status == ShaderStatus::ReadyToRock)
+				{
+					break;
+				}
+				else if (status == ShaderStatus::FailedToCompile)
+				{
+					X_ERROR("ShadersManager", "Failed to compile shader");
+					return false;
+				}
+				else
+				{
+					if (!vars_.helpWithWorkOnShaderStall() || !gEnv->pJobSys->HelpWithWork())
+					{
+						// we ran no jobs, so lets yield to slow the burn.
+						core::Thread::Yield();
+					}
+				}
+			}
+		}
+
+		return true;
 	}
 
 	shader::IShaderPermatation* XShaderManager::createPermatation(const shader::ShaderStagesArr& stages)
@@ -180,88 +264,10 @@ namespace shader
 					continue;
 				}
 
-				auto status = pHWShader->getStatus();
-				
-				if (status == ShaderStatus::ReadyToRock) {
-					continue;
-				}
-				if (status == ShaderStatus::FailedToCompile) {
-					X_ERROR("ShadersManager", "can't create permatation, a hw shader failed to compile");
+				if (!compileShader(pHWShader, flags))
+				{
+					X_ERROR("ShadersManager", "Failed to compile shader for permatation");
 					return false;
-				}
-
-				// we need to compile.
-				// but only one thread should do this per a given instance
-				// the others should wait for results if the want same shader.
-				if (pHWShader->getLock().TryEnter())
-				{
-					// we adopt the lock we have from tryEnter this is not a re-lock.
-					core::UniqueLock<XHWShader::LockType> lock(pHWShader->getLock(), core::adopt_lock);
-
-					// try load it from cache.
-					if (shaderBin_.loadShader(pHWShader)) {
-						X_ASSERT(pHWShader->getStatus() == ShaderStatus::ReadyToRock, "Sahder from cache is not read to rock")();
-						continue;
-					}
-
-					core::string source;
-					if (!sourceBin_.getMergedSource(pHWShader->getSourceFileName(), source)) {
-						X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getSourceFileName().c_str());
-						return false;
-					}
-
-					if (vars_.writeMergedSource())
-					{
-						core::Path<char> srcPath;
-						getShaderCompileSrc(pHWShader, srcPath);
-
-						core::XFileScoped fileOut;
-						if (fileOut.openFile(srcPath.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE | core::fileModeFlags::SHARE))
-						{
-							fileOut.write(source.data(), source.length());
-						}
-					}
-
-					if (!pHWShader->compile(source, flags))
-					{
-						X_ERROR("ShadersManager", "Failed to compile shader for permatation");
-						return false;
-					}
-
-					// save it 
-					if (vars_.writeCompiledShaders())
-					{
-						if (!shaderBin_.saveShader(pHWShader)) {
-							X_WARNING("ShadersManager", "Failed to save shader to bin: \"%s\"", pHWShader->getName().c_str());
-						}
-					}
-				}
-				else
-				{
-					// another thread is compiling the shader.
-					// we wait for it, maybe run some jobs while we wait?
-
-					while (1)
-					{
-						const auto status = pHWShader->getStatus();
-						if (status == ShaderStatus::ReadyToRock)
-						{
-							break;
-						}
-						else if (status == ShaderStatus::FailedToCompile)
-						{
-							X_ERROR("ShadersManager", "Failed to compile shader for permatation");
-							return false;
-						}
-						else
-						{
-							if(!vars_.helpWithWorkOnShaderStall() || !gEnv->pJobSys->HelpWithWork())
-							{
-								// we ran no jobs, so lets yield to slow the burn.
-								core::Thread::Yield();
-							}
-						}
-					}
 				}
 			}
 
