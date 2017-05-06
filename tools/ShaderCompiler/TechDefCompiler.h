@@ -16,6 +16,7 @@ namespace compiler
 		bool Init(void);
 
 		void setCompileFlags(render::shader::CompileFlags flags);
+		void setForceCompile(bool force);
 
 		bool CompileAll(void);
 		bool Compile(MaterialCat::Enum cat);

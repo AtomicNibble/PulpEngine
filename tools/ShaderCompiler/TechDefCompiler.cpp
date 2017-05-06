@@ -31,6 +31,8 @@ namespace compiler
 	{
 		// max comp.
 		shaderMan_.getBin().setCompressionLvl(core::Compression::CompressLevel::HIGH);
+		shaderMan_.getShaderVars().setUseCache(true);
+		shaderMan_.getShaderVars().setWriteCompiledShaders(true);
 
 		return true;
 	}
@@ -38,6 +40,11 @@ namespace compiler
 	void TechDefCompiler::setCompileFlags(render::shader::CompileFlags flags)
 	{
 		compileFlags_ = flags;
+	}
+
+	void TechDefCompiler::setForceCompile(bool force)
+	{
+		shaderMan_.getShaderVars().setUseCache(!force);
 	}
 
 	bool TechDefCompiler::CompileAll(void)
