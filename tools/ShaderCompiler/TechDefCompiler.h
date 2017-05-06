@@ -15,12 +15,19 @@ namespace compiler
 		void PrintBanner(void);
 		bool Init(void);
 
-		bool ConvertAll(void);
+		bool CompileAll(void);
+		bool Compile(MaterialCat::Enum cat);
+		bool Compile(MaterialCat::Enum cat, const core::string& techName);
+
+		bool Clean(MaterialCat::Enum cat);
 		bool CleanAll(void);
 
 
 	private:
+		core::MemoryArenaBase* arena_;
+		engine::TechSetDefs techDefs_;
 
+		render::shader::XShaderManager shaderMan_;
 	};
 
 } // namespace compiler
