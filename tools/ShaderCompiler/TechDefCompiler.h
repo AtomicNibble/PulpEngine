@@ -15,6 +15,8 @@ namespace compiler
 		void PrintBanner(void);
 		bool Init(void);
 
+		void setCompileFlags(render::shader::CompileFlags flags);
+
 		bool CompileAll(void);
 		bool Compile(MaterialCat::Enum cat);
 		bool Compile(MaterialCat::Enum cat, const core::string& techName);
@@ -27,6 +29,7 @@ namespace compiler
 		core::MemoryArenaBase* arena_;
 		engine::TechSetDefs techDefs_;
 
+		render::shader::CompileFlags compileFlags_;
 		render::shader::XShaderManager shaderMan_;
 	};
 

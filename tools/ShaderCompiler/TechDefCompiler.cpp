@@ -10,7 +10,8 @@ namespace compiler
 		techDefs_(arena),
 		shaderMan_(arena)
 	{
-
+		compileFlags_ |= render::shader::CompileFlag::OptimizationLvl3;
+		compileFlags_ |= render::shader::CompileFlag::TreatWarningsAsErrors;
 	}
 
 	TechDefCompiler::~TechDefCompiler()
@@ -32,6 +33,10 @@ namespace compiler
 		return true;
 	}
 
+	void TechDefCompiler::setCompileFlags(render::shader::CompileFlags flags)
+	{
+		compileFlags_ = flags;
+	}
 
 	bool TechDefCompiler::CompileAll(void)
 	{
@@ -106,8 +111,7 @@ namespace compiler
 					return false;
 				}
 
-				CompileFlags flags;
-				flags = CompileFlag::OptimizationLvl3 | CompileFlag::TreatWarningsAsErrors;
+		
 
 				PermatationFlags permFlags = Permatation::VertStreams;
 
@@ -117,7 +121,7 @@ namespace compiler
 					return false;
 				}
 
-				if (!shaderMan_.compileShader(pHWShader, flags))
+				if (!shaderMan_.compileShader(pHWShader, compileFlags_))
 				{
 					X_ERROR("TechCompiler", "Failed to compile HWShader", shader.source.c_str());
 					return false;
