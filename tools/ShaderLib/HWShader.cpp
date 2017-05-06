@@ -50,28 +50,6 @@ namespace shader
 
 	}
 
-
-	bool XHWShader::invalidateIfChanged(uint32_t newSourceCrc32)
-	{
-		if (sourceCrc32_ != newSourceCrc32)
-		{
-			sourceCrc32_ = newSourceCrc32;
-
-			// what todo if the status is compiling?
-			// potentially we have a pending job that's about to run.
-			// which would still use the old source.
-			if (status_ == ShaderStatus::Compiling) {
-				X_ASSERT_NOT_IMPLEMENTED();
-			}
-
-			status_ = ShaderStatus::NotCompiled;
-			return true;
-		}
-
-		return false;
-	}
-
-
 	bool XHWShader::compile(core::string& source)
 	{
 		status_ = ShaderStatus::Compiling;

@@ -84,9 +84,6 @@ namespace shader
 	public:
 		SHADERLIB_EXPORT bool compile(core::string& source);
 
-		[[deprecated]]
-		SHADERLIB_EXPORT bool invalidateIfChanged(uint32_t newSourceCrc32);
-
 	private:
 		bool compileFromSource(core::string& source);
 		bool reflectShader(ID3D10Blob* pshaderBlob);
