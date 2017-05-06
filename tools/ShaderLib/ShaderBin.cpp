@@ -51,7 +51,7 @@ namespace shader
 			// 
 			uint8_t numCBufs;
 			uint8_t __pad[1];
-			uint16_t numInsttructions;
+			uint16_t numInstructions;
 
 			// 4
 			TechFlags techFlags;
@@ -131,6 +131,7 @@ namespace shader
 		hdr.numSamplers = pShader->getNumSamplers();
 		hdr.numTextures = pShader->getNumTextures();
 		hdr.numCBufs = pShader->getNumConstantBuffers();
+		hdr.numInstructions = pShader->getNumInstructions();
 
 		hdr.techFlags = pShader->getTechFlags();
 		hdr.type = pShader->getType();
@@ -306,6 +307,7 @@ namespace shader
 				}
 
 				pShader->numInputParams_ = hdr.numInputParams;
+				pShader->numInstructions_ = hdr.numInstructions;
 				pShader->numRenderTargets_ = hdr.numRenderTargets;
 				X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")();
 
