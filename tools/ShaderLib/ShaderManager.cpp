@@ -250,8 +250,8 @@ namespace shader
 			CompileFlags flags;
 
 
-#if X_DEBUG && 0
-			flags = CompileFlags::OptimizationLvl2 | CompileFlags::Debug;
+#if X_DEBUG
+			flags = CompileFlags::OptimizationLvl0 | CompileFlags::Debug;
 #else
 			flags = CompileFlags::OptimizationLvl2;
 #endif // !X_DEBUG
