@@ -163,7 +163,7 @@ namespace shader
 #if X_DEBUG && 0
 			flags = CompileFlags::OptimizationLvl2 | CompileFlags::Debug;
 #else
-			flags |= CompileFlags::OptimizationLvl2;
+			flags = CompileFlags::OptimizationLvl2;
 #endif // !X_DEBUG
 
 			// we want to compile this then work out the cbuffer links.
