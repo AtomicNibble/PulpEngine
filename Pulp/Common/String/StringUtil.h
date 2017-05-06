@@ -44,11 +44,15 @@ namespace strUtil
 	inline bool IsAlpha(const uint8_t str);
 
 	/// Returns whether or not the given character is a digit.
-	inline bool IsDigit(const char character);
+	template<typename CharT>
+	inline bool IsDigit(const CharT character);
 	inline bool IsDigitW(const wchar_t character);
 
-	inline bool IsNumeric(const char* str);
-	inline bool IsNumeric(const char* startInclusive, const char* endExclusive);
+	template<typename CharT>
+	inline bool IsNumeric(const CharT* str);
+	template<typename CharT>
+	inline bool IsNumeric(const CharT* startInclusive, const CharT* endExclusive);
+
 
 	bool IsLower(const char character);
 	bool IsLowerW(const wchar_t character);
@@ -219,6 +223,10 @@ namespace strUtil
 
 	bool StringToBool(const char* str);
 	bool StringToBool(const char* startInclusive, const char* endExclusive);
+
+	bool StringToBool(const wchar_t* str);
+	bool StringToBool(const wchar_t* startInclusive, const wchar_t* endExclusive);
+
 
 	bool HasFileExtension(const char* path);
 	bool HasFileExtension(const wchar_t* path);

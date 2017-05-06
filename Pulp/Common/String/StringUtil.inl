@@ -47,7 +47,8 @@ namespace strUtil
 		return isalpha(static_cast<int>(c)) != 0;
 	}
 
-	inline bool IsDigit(const char character)
+	template<typename CharT>
+	inline bool IsDigit(const CharT character)
 	{
 		return ((character >= '0') && (character <= '9'));
 	}
@@ -57,29 +58,35 @@ namespace strUtil
 		return ((character >= '0') && (character <= '9'));
 	}
 
-	inline bool IsNumeric(const char* str)
+	template<typename CharT>
+	inline bool IsNumeric(const CharT* str)
 	{
-		size_t	i;
-		bool	dot;
-
 		if ( *str == '-' ) {
 			str++;
 		}
 
-		dot = false;
-		for ( i = 0; str[i]; i++ ) {
-			if ( !IsDigit( str[i] ) ) {
-				if ( ( str[ i ] == '.' ) && !dot ) {
-					dot = true;
-					continue;
+		bool dotFnd = false;
+
+		for (size_t i = 0; str[i]; i++)
+		{
+			if (!IsDigit(str[i]))
+			{
+				if (str[i] == ',' && !dotFnd)
+				{
+					dotFnd = true;
 				}
-				return false;
+				else
+				{
+					return false;
+				}
 			}
 		}
+
 		return true;
 	}
 
-	inline bool IsNumeric(const char* startInclusive, const char* endExclusive)
+	template<typename CharT>
+	inline bool IsNumeric(const CharT* startInclusive, const CharT* endExclusive)
 	{
 		X_ASSERT(endExclusive > startInclusive, "string can't be empty")(startInclusive, endExclusive);
 
@@ -108,6 +115,7 @@ namespace strUtil
 
 		return true;
 	}
+
 
 	template <size_t N>
 	inline const char* Convert(const wchar_t* input, char (&output)[N])
