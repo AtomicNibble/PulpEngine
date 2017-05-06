@@ -101,7 +101,7 @@ namespace shader
 		}
 
 		// allow 16 flags.
-		D3D_SHADER_MACRO Shader_Macros[17] = { NULL };
+		D3D_SHADER_MACRO Shader_Macros[17] = { nullptr };
 		core::string names[16];
 
 		// i turn all set flags into strings.
@@ -152,7 +152,7 @@ namespace shader
 			source.length(),
 			sourcName,
 			Shader_Macros, // pDefines
-			NULL, // pInclude
+			nullptr, // pInclude
 			pEntry,
 			Util::getProfileFromType(type_),
 			D3DCompileflags_, // Flags
