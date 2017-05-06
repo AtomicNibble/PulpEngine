@@ -128,8 +128,9 @@ namespace
 		const wchar_t* pAssetName = gEnv->pCore->GetCommandLineArgForVarW(L"name");
 		if (pAssetName)
 		{
-			char buf[512];	
-			name = core::strUtil::Convert(pAssetName, buf);
+			core::StackString512 assetName(pAssetName);
+
+			name = assetName.c_str();
 			return true;
 		}
 
@@ -142,8 +143,9 @@ namespace
 		const wchar_t* pProfileName = gEnv->pCore->GetCommandLineArgForVarW(L"profile");
 		if (pProfileName)
 		{
-			char buf[512];
-			name = core::strUtil::Convert(pProfileName, buf);
+			core::StackString512 profileStr(pProfileName);
+
+			name = profileStr.c_str();
 			return true;
 		}
 
