@@ -31,7 +31,8 @@ inline Path<wchar_t>::Path(const Path<char>& oth)
 
 
 template<typename TChar>
-Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
+Path<TChar>::Path(const TChar* const str) : 
+	StackString<MAX_PATH, TChar>(str)
 {
 
 }
