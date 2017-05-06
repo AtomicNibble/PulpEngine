@@ -312,15 +312,6 @@ namespace shader
 	}
 
 
-	ShaderVars& XShaderManager::getShaderVars(void)
-	{
-		return vars_;
-	}
-
-	ShaderBin& XShaderManager::getBin(void)
-	{
-		return shaderBin_;
-	}
 
 
 	SourceFile* XShaderManager::loadRawSourceFile(const char* pName, bool reload)

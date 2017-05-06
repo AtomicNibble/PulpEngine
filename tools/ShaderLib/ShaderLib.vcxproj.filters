@@ -117,5 +117,11 @@
     <None Include="ShaderVars.inl">
       <Filter>Header Files\Manager</Filter>
     </None>
+    <None Include="ShaderManager.inl">
+      <Filter>Header Files\Manager</Filter>
+    </None>
+    <None Include="ShaderBin.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

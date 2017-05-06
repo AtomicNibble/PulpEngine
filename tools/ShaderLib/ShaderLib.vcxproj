@@ -434,6 +434,8 @@
   <ItemGroup>
     <None Include="HWShader.inl" />
     <None Include="ILTree.inl" />
+    <None Include="ShaderBin.inl" />
+    <None Include="ShaderManager.inl" />
     <None Include="ShaderPermatation.inl" />
     <None Include="ShaderSourceTypes.inl" />
     <None Include="ShaderVars.inl" />

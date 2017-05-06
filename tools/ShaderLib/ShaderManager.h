@@ -63,8 +63,8 @@ namespace shader
 		SHADERLIB_EXPORT shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
 		SHADERLIB_EXPORT void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
 		
-		ShaderVars& getShaderVars(void);
-		ShaderBin& getBin(void);
+		X_INLINE ShaderVars& getShaderVars(void);
+		X_INLINE ShaderBin& getBin(void);
 
 	private:
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
@@ -107,8 +107,8 @@ namespace shader
 		ShaderVars vars_;
 	};
 
-
-
 } // namespace shader
 
 X_NAMESPACE_END
+
+#include "ShaderManager.inl"
