@@ -20,23 +20,24 @@ StackString<N, TChar>::StackString(const StackString<N, TChar>& oth)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <size_t N, typename TChar>
-StackString<N, TChar>::StackString(const wchar_t* const str)
-	: len_(strUtil::strlen(str))
-{
-	str_[0] = 0;
-	X_ASSERT_UNREACHABLE();
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
-template <size_t N, typename TChar>
-StackString<N, TChar>::StackString(const char* const str)
+StackString<N, TChar>::StackString(const TChar* const str)
 	: len_(strUtil::strlen(str))
 {
 	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)(len_, N);
 	memcpy(str_, str, len_ + 1);
 }
 
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <size_t N, typename TChar>
+StackString<N, TChar>::StackString(const wchar_t* const str)
+	: len_(strUtil::strlen(str))
+{
+	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)(len_, N);
+	strUtil::Convert(str, str_, capacity());
+	str_[len_] = L'\0';
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

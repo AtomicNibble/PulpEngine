@@ -26,8 +26,9 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
-	str_[0] = 0;
-	X_ASSERT_UNREACHABLE();
+	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)(len_, N);
+	strUtil::Convert(str, str_, capacity());
+	str_[len_] = L'\0';
 }
 
 
