@@ -166,7 +166,7 @@ namespace shader
 			core::UniqueLock<XHWShader::LockType> lock(pHWShader->getLock(), core::adopt_lock);
 
 			// try load it from cache.
-			if (shaderBin_.loadShader(pHWShader)) {
+			if (vars_.useCache() && shaderBin_.loadShader(pHWShader)) {
 				X_ASSERT(pHWShader->getStatus() == ShaderStatus::ReadyToRock, "Sahder from cache is not read to rock")();
 				return true;
 			}

@@ -12,6 +12,7 @@ namespace shader
 	ShaderVars::ShaderVars()
 	{
 		// defaults
+		useCache_ = 1;
 		writeCompiledShaders_ = 1;
 		writeMergedSource_ = 1;
 	//	asyncShaderCompile_ = 1;
@@ -20,6 +21,10 @@ namespace shader
 
 	void ShaderVars::RegisterVars(void)
 	{
+		ADD_CVAR_REF("shader_loadFromCache", useCache_, useCache_, 0, 1,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			"Loads shader from shader bin if present");
+
 		ADD_CVAR_REF("shader_writeCompiledShaders", writeCompiledShaders_, writeCompiledShaders_, 0, 1,
 			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 			"Writes compiled shaders to disk for faster loading on subsequent loads (enabling does not result in retrospective writing)");
