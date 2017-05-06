@@ -171,6 +171,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						render::shader::CompileFlag::TreatWarningsAsErrors
 					);
 				}
+
 				if (!GetMode(mode)) {
 					mode = CompileMode::SINGLE;
 				}
