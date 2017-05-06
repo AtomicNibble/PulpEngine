@@ -27,12 +27,6 @@
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{c77f5de2-967d-45ba-a9a2-af4b31a51b1c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Shader">
-      <UniqueIdentifier>{b7ac7e45-6f9c-4319-b61f-ec943c143cd9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Shader">
-      <UniqueIdentifier>{3455b46d-5722-4d83-ad88-db8e4a050c30}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Texture">
       <UniqueIdentifier>{b33293fd-f26d-4e46-b888-6f4e4163a08a}</UniqueIdentifier>
     </Filter>
