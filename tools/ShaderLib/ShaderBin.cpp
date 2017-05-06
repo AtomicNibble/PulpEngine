@@ -332,6 +332,14 @@ namespace shader
 		}
 		return false;
 	}
+	
+	bool ShaderBin::clearBin(void)
+	{
+		core::Path<char> binFolder;
+		binFolder.appendFmt("shaders/compiled");
+
+		return pFileSys_->deleteDirectoryContents(binFolder.c_str());
+	}
 
 
 	bool ShaderBin::cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const

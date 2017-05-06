@@ -27,6 +27,8 @@ namespace shader
 		SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader);
 		SHADERLIB_EXPORT bool loadShader(XHWShader* pShader);
 
+		SHADERLIB_EXPORT bool clearBin(void);
+
 		X_INLINE void setCompressionLvl(core::Compression::CompressLevel::Enum lvl);
 
 	private:
