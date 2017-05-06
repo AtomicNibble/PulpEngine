@@ -129,6 +129,7 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	pause_(false),
 	oneFrameUpdate_(false),
 	stepperType_(StepperType::FIXED_STEPPER),
+	outOfBoundsObjects_(arena),
 
 	debugStepper_(0.016666660f),
 	fixedStepper_(0.016666660f, maxSubSteps),
@@ -395,11 +396,23 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 			}
 		}
 
+
 		XScene* pScene = activeScenes_.front();
 		Stepper* pStepper = getStepper();
 
-		waitForResults_ = false;
+		if(outOfBoundsObjects_.isNotEmpty())
+		{
+			auto handle = pScene->lock(true);
 
+			for (auto* pActor : outOfBoundsObjects_) {
+				pActor->release();
+			}
+			outOfBoundsObjects_.clear();
+
+			pScene->unLock(handle);
+		}
+
+		waitForResults_ = false;
 
 		waitForResults_ = pStepper->advance(pScene->getPxScene(), dtime, pScratchBlock_,
 			safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
@@ -1152,6 +1165,9 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
 	// for now we just log that somthing left the physx world.
 	// dunno what shit to log.
 	X_ERROR("Phys", "Obbject out of bounds. Name: \"%s\"", actor.getName());
+
+	// que it for removal;
+	outOfBoundsObjects_.append(&actor);
 }
 
 void XPhysics::onObjectOutOfBounds(physx::PxAggregate& aggregate)

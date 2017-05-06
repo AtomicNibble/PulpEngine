@@ -46,6 +46,8 @@ public:
 	typedef core::FixedArray<XScene*, MAX_ACTIVE_SCENES> ActiveSceneListArr;
 	typedef core::FixedArray<XScene*, MAX_SCENES> SceneListArr;
 
+	typedef core::Array<physx::PxActor*> ActorsArr;
+
 public:
 	XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
 	~XPhysics() X_OVERRIDE;
@@ -205,6 +207,8 @@ private:
 	PhysCooking*					pCooking_;
 	ActiveSceneListArr				activeScenes_;
 
+	ActorsArr						outOfBoundsObjects_;
+
 	uint8_t*	pScratchBlock_;
 	size_t		scratchBlockSize_;
 
@@ -222,10 +226,8 @@ private:
 	InvertedFixedStepper	invertedFixedStepper_;
 	VariableStepper			variableStepper_;
 
-
 	PhysXVars vars_;
 	SceneListArr			scenes_;
-
 
 	DebugRender* pDebugRender_;
 };
