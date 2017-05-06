@@ -160,30 +160,11 @@ namespace compiler
 
 	// ----------------------------------------------------
 
-	bool TechDefCompiler::Clean(MaterialCat::Enum cat)
-	{
-
-		return true;
-	}
-
-
 	bool TechDefCompiler::CleanAll(void)
 	{
 		X_LOG0("TechCompiler", "Cleaning all compiled techs");
 
-		for (int32_t i = 0; i < MaterialCat::ENUM_COUNT; i++) {
-			MaterialCat::Enum cat = static_cast<MaterialCat::Enum>(i);
-
-			if (cat == MaterialCat::UNKNOWN) {
-				continue;
-			}
-
-			if (!Clean(cat)) {
-				return false;
-			}
-		}
-
-		return true;
+		return shaderMan_.getBin().clearBin();
 	}
 
 

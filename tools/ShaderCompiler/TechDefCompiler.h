@@ -22,7 +22,6 @@ namespace compiler
 		bool Compile(MaterialCat::Enum cat);
 		bool Compile(MaterialCat::Enum cat, const core::string& techName);
 
-		bool Clean(MaterialCat::Enum cat);
 		bool CleanAll(void);
 
 
