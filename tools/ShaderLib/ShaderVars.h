@@ -20,13 +20,12 @@ namespace shader
 
 		X_INLINE bool writeCompiledShaders(void) const;
 		X_INLINE bool writeMergedSource(void) const;
-		X_INLINE bool asyncCompile(void) const;
+	//	X_INLINE bool asyncCompile(void) const;
 		X_INLINE bool helpWithWorkOnShaderStall(void) const;
 
 	private:
 		int32_t writeCompiledShaders_;
 		int32_t writeMergedSource_;
-		int32_t asyncShaderCompile_;
 		int32_t helpWithWorkOnShaderStall_;
 
 	};
