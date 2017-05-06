@@ -117,10 +117,17 @@ namespace
 		const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
 		if (pForce)
 		{
-			if (core::strUtil::StringToBool(pForce)) {
-				return false;
-			}
-			return true;
+			return core::strUtil::StringToBool(pForce);
+		}
+		return false;
+	}
+
+	bool DebugCompile(void)
+	{
+		const wchar_t* pDebug = gEnv->pCore->GetCommandLineArgForVarW(L"debug");
+		if (pDebug)
+		{
+			return core::strUtil::StringToBool(pDebug);
 		}
 		return false;
 	}
@@ -153,6 +160,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			core::string techName;
 
 			con.PrintBanner();
+			con.setForceCompile(ForceModeEnabled());
+
+			if (DebugCompile()) {
+				con.setCompileFlags(
+					render::shader::CompileFlag::Debug | 
+					render::shader::CompileFlag::OptimizationLvl0 | 
+					render::shader::CompileFlag::TreatWarningsAsErrors
+				);
+			}
 
 			if (con.Init())
 			{
