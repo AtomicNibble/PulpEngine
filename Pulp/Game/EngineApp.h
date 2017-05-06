@@ -47,7 +47,7 @@ public:
 	EngineApp();
 	~EngineApp();
 
-	bool Init(const wchar_t* sInCmdLine);
+	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine);
 	int	MainLoop();
 
 private:

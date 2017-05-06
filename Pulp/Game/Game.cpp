@@ -7,8 +7,6 @@
 #include <String\Path.h>
 #include <Platform\MessageBox.h>
 
-HINSTANCE g_hInstance = 0;
-
 #include <tchar.h>
 
 #define _LAUNCHER
@@ -131,14 +129,13 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	X_UNUSED(lpCmdLine);
 	X_UNUSED(nCmdShow);
 	InitRootDir();
-	g_hInstance = hInstance;
 
 	int nRes = 0;
 
 	{ // scope it for leak tests.
 		EngineApp engine;
 
-		if (engine.Init(lpCmdLine)) {
+		if (engine.Init(hInstance, lpCmdLine)) {
 			nRes = engine.MainLoop();
 		}
 	}

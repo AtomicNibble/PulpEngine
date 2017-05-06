@@ -9,9 +9,6 @@
 #include <Platform\MessageBox.h>
 
 
-extern HINSTANCE g_hInstance;
-
-
 AssetHandler::AssetHandler(void)
 {
 }
@@ -62,13 +59,13 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const wchar_t* sInCmdLine)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 {
 	X_UNUSED(sInCmdLine);
 
 	SCoreInitParams params;
 	params.pCmdLine = sInCmdLine;
-	params.hInstance = g_hInstance;
+	params.hInstance = hInstance;
 	params.bSkipInput = false;
 	params.bEnableNetowrking = true;
 	params.bProfileSysEnabled = true;
