@@ -160,18 +160,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			core::string techName;
 
 			con.PrintBanner();
-			con.setForceCompile(ForceModeEnabled());
-
-			if (DebugCompile()) {
-				con.setCompileFlags(
-					render::shader::CompileFlag::Debug | 
-					render::shader::CompileFlag::OptimizationLvl0 | 
-					render::shader::CompileFlag::TreatWarningsAsErrors
-				);
-			}
 
 			if (con.Init())
 			{
+				con.setForceCompile(ForceModeEnabled());
+				if (DebugCompile()) {
+					con.setCompileFlags(
+						render::shader::CompileFlag::Debug |
+						render::shader::CompileFlag::OptimizationLvl0 |
+						render::shader::CompileFlag::TreatWarningsAsErrors
+					);
+				}
 				if (!GetMode(mode)) {
 					mode = CompileMode::SINGLE;
 				}
