@@ -334,6 +334,21 @@ X_DECLARE_FLAGS8(Permatation)(
 
 typedef Flags8<Permatation> PermatationFlags;
 
+X_DECLARE_FLAGS8(CompileFlag) (
+	Debug,
+	TreatWarningsAsErrors,
+	OptimizationLvl0,
+	OptimizationLvl1,
+	OptimizationLvl2,
+	OptimizationLvl3,
+	PackMatrixRowMajor,
+	PackMatrixColumnMajor
+);
+
+typedef Flags8<CompileFlag> CompileFlags;
+
+X_DECLARE_FLAG_OPERATORS(CompileFlags);
+
 
 struct IHWShader
 {

@@ -149,12 +149,22 @@ namespace shader
 		// we return null if a shader fails to compile.
 		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, stages, arena_);
 
+
 		if (!pPerm->isCompiled())
 		{
 			// this logic should be thread safe.
 			// and should not try compile the same shader from multiple threads.
 			// if two threads both want smae shader it should just wait for the result.
 			// but compiling of diffrent shaders should happen in parralel.
+
+			CompileFlags flags;
+
+
+#if X_DEBUG && 0
+			flags = CompileFlags::OptimizationLvl2 | CompileFlags::Debug;
+#else
+			flags |= CompileFlags::OptimizationLvl2;
+#endif // !X_DEBUG
 
 			// we want to compile this then work out the cbuffer links.
 			const auto& stages = pPerm->getStages();
@@ -206,7 +216,7 @@ namespace shader
 						}
 					}
 
-					if (!pHWShader->compile(source))
+					if (!pHWShader->compile(source, flags))
 					{
 						X_ERROR("ShadersManager", "Failed to compile shader for permatation");
 						return false;

@@ -50,10 +50,10 @@ namespace shader
 
 	}
 
-	bool XHWShader::compile(core::string& source)
+	bool XHWShader::compile(core::string& source, CompileFlags flags)
 	{
 		status_ = ShaderStatus::Compiling;
-		bool res = compileFromSource(source);
+		bool res = compileFromSource(source, flags);
 
 		if (res) {
 			status_ = ShaderStatus::ReadyToRock;
@@ -67,17 +67,38 @@ namespace shader
 	}
 
 
-	bool XHWShader::compileFromSource(core::string& source)
+	bool XHWShader::compileFromSource(core::string& source, CompileFlags flags)
 	{
 		X_LOG0("Shader", "Compiling shader: \"%s\" tid: %" PRIX32, name_.c_str(), core::Thread::GetCurrentID());
 
 		D3DCompileflags_ = 0;
 
-#if X_DEBUG // todo make this a cvar
-		D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
-#else
-		D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL2;
-#endif // !X_DEBUG
+		if (flags.IsSet(CompileFlag::Debug)) {
+			D3DCompileflags_ |= D3DCOMPILE_DEBUG;
+		}
+		if (flags.IsSet(CompileFlag::TreatWarningsAsErrors)) {
+			D3DCompileflags_ |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
+		}
+
+		if (flags.IsSet(CompileFlag::OptimizationLvl3)) {
+			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+		}
+		else if (flags.IsSet(CompileFlag::OptimizationLvl2)) {
+			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL2;
+		}
+		else if (flags.IsSet(CompileFlag::OptimizationLvl1)) {
+			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
+		}
+		else if (flags.IsSet(CompileFlag::OptimizationLvl0)) {
+			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL0;
+		}
+
+		if (flags.IsSet(CompileFlag::PackMatrixRowMajor)) {
+			D3DCompileflags_ |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+		}
+		else if (flags.IsSet(CompileFlag::PackMatrixColumnMajor)) {
+			D3DCompileflags_ |= D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR;
+		}
 
 		// allow 16 flags.
 		D3D_SHADER_MACRO Shader_Macros[17] = { NULL };
