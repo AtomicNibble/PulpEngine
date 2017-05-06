@@ -437,6 +437,7 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TechDefCompiler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
@@ -455,6 +456,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TechDefCompiler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ShaderCompiler.rc" />

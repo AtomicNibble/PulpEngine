@@ -10,6 +10,8 @@
 #include <ModuleExports.h>
 
 
+#include "TechDefCompiler.h"
+
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -41,6 +43,86 @@ namespace
 
 
 
+	X_DECLARE_ENUM(CompileMode)(SINGLE, ALL, CLEAN);
+
+
+	bool GetMode(CompileMode::Enum& mode)
+	{
+		const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+		if (pMode)
+		{
+			if (core::strUtil::IsEqualCaseInsen(pMode, L"single"))
+			{
+				mode = CompileMode::SINGLE;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"all"))
+			{
+				mode = CompileMode::ALL;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean"))
+			{
+				mode = CompileMode::CLEAN;
+			}
+			else
+			{
+				X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+				return false;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	bool GetMaterialCat(engine::MaterialCat::Enum& matCat, bool slient = false)
+	{
+		const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
+		if (pAssetType)
+		{
+			core::StackString256 typeStr(pAssetType);
+
+			matCat = engine::Util::MatCatFromStr(typeStr.c_str());
+			if(matCat == engine::MaterialCat::UNKNOWN)
+			{
+				X_ERROR("Converter", "Unknown material cat: \"%ls\"", pAssetType);
+				return false;
+			}
+
+			return true;
+		}
+
+		X_ERROR_IF(!slient, "Converter", "missing material cat");
+		return false;
+	}
+
+	bool GetTechName(core::string& name, bool slient = false)
+	{
+		const wchar_t* pTechName = gEnv->pCore->GetCommandLineArgForVarW(L"name");
+		if (pTechName)
+		{
+			core::StackString512 techNameStr(pTechName);
+
+			name = techNameStr.c_str();
+			return true;
+		}
+
+		X_ERROR_IF(!slient, "Converter", "missing tech name");
+		return false;
+	}
+
+	bool ForceModeEnabled(void)
+	{
+		const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
+		if (pForce)
+		{
+			if (core::strUtil::StringToBool(pForce)) {
+				return false;
+			}
+			return true;
+		}
+		return false;
+	}
 
 }// namespace 
 
@@ -64,7 +146,43 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (app.Init(hInstance, &arena, lpCmdLine, Console))
 		{
+			engine::compiler::TechDefCompiler con(&arena);
+			engine::MaterialCat::Enum matCat;
+			CompileMode::Enum mode;
+			core::string techName;
 
+			con.PrintBanner();
+
+			if (con.Init())
+			{
+				if (!GetMode(mode)) {
+					mode = CompileMode::SINGLE;
+				}
+
+
+				if (mode == CompileMode::CLEAN)
+				{
+					con.CleanAll();
+				}
+				if (mode == CompileMode::ALL)
+				{
+					if (GetMaterialCat(matCat))
+					{
+
+					}
+					else
+					{
+
+					}
+
+				}
+				else if (GetMaterialCat(matCat) && GetTechName(techName))
+				{
+
+
+
+				}
+			}
 		}
 	}
 
