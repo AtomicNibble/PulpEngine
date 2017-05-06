@@ -236,7 +236,7 @@ namespace shader
 		core::SafeReleaseDX(pBlob);
 
 		const float elapsed = timer.GetMilliSeconds();
-		X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
+		X_LOG0("Shader", "Compile complete: ^6%.3fms", elapsed);
 
 		return true;
 	}
