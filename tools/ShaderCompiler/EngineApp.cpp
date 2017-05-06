@@ -85,11 +85,14 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 
 	LinkModule(pICore_, "ShaderCompiler");
 
-	// ConvertLib
-
 	if (!pICore_->IntializeLoadedConverterModule("Engine_MaterialLib", "Engine_MaterialLib")) {
 		return false;
 	}
+	if (!pICore_->IntializeLoadedConverterModule("Engine_ShaderLib", "Engine_ShaderLib")) {
+		return false;
+	}
+
+
 	return true;
 }
 
