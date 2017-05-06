@@ -73,7 +73,6 @@ namespace shader
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pHotReload);
-		X_ASSERT_NOT_NULL(g_rendererArena);
 		X_LOG1("ShadersManager", "Starting");
 
 		// hotreload support.
