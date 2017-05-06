@@ -181,7 +181,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				{
 					con.CleanAll();
 				}
-				if (mode == CompileMode::ALL)
+				else if (mode == CompileMode::ALL)
 				{
 					if (GetMaterialCat(matCat, true))
 					{
