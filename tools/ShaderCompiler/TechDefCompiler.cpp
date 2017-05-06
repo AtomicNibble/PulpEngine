@@ -12,6 +12,11 @@ namespace compiler
 	{
 		compileFlags_ |= render::shader::CompileFlag::OptimizationLvl3;
 		compileFlags_ |= render::shader::CompileFlag::TreatWarningsAsErrors;
+
+		// max comp.
+		shaderMan_.getBin().setCompressionLvl(core::Compression::CompressLevel::HIGH);
+		shaderMan_.getShaderVars().setUseCache(true);
+		shaderMan_.getShaderVars().setWriteCompiledShaders(true);
 	}
 
 	TechDefCompiler::~TechDefCompiler()
@@ -29,10 +34,7 @@ namespace compiler
 
 	bool TechDefCompiler::Init(void)
 	{
-		// max comp.
-		shaderMan_.getBin().setCompressionLvl(core::Compression::CompressLevel::HIGH);
-		shaderMan_.getShaderVars().setUseCache(true);
-		shaderMan_.getShaderVars().setWriteCompiledShaders(true);
+
 
 		return true;
 	}
