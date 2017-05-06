@@ -120,24 +120,32 @@ namespace compiler
 					return false;
 				}
 
-		
+				// potentially auto generate all these
+				// depends..
+				std::array<PermatationFlags, 4> perms = { {
+					{ PermatationFlags() },
+					{ PermatationFlags::HwSkin },
+					{ PermatationFlags(PermatationFlags::HwSkin | PermatationFlags::Instanced) },
+					{ PermatationFlags::Instanced }
+				} };
 
-				PermatationFlags permFlags = Permatation::VertStreams;
-
-				XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, pShaderSource, permFlags);
-				if (!pHWShader) {
-					X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
-					return false;
-				}
-
-				if (!shaderMan_.compileShader(pHWShader, compileFlags_))
+				for (auto& permFlags : perms)
 				{
-					X_ERROR("TechCompiler", "Failed to compile HWShader", shader.source.c_str());
-					return false;
-				}
+					XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, pShaderSource, permFlags);
+					if (!pHWShader) {
+						X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
+						return false;
+					}
 
-				// we don't release the hwshader, so another tech that uses same source / flags
-				// won't need to bother compiling.
+					if (!shaderMan_.compileShader(pHWShader, compileFlags_))
+					{
+						X_ERROR("TechCompiler", "Failed to compile HWShader", shader.source.c_str());
+						return false;
+					}
+
+					// we don't release the hwshader, so another tech that uses same source / flags
+					// won't need to bother compiling.
+				}
 			}
 		}
 
