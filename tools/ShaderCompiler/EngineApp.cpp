@@ -44,7 +44,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 	params.bEnableJobSystem = true; // some converters make use of the job system. 
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = arena;
-	params.bFileSysWorkingDir = true;
+	params.bFileSysWorkingDir = false;
 
 
 #ifdef X_LIB
