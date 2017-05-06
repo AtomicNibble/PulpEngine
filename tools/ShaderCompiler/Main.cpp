@@ -179,7 +179,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 				if (mode == CompileMode::CLEAN)
 				{
-					con.CleanAll();
+					if (!con.CleanAll())
+					{
+						X_ERROR("ShaderCompiler", "Failed to clean..");
+					}
 				}
 				else if (mode == CompileMode::ALL)
 				{
