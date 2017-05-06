@@ -414,9 +414,6 @@
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
-    <ClInclude Include="Shader\ShaderPermatation.h" />
-    <ClInclude Include="Shader\ShaderManager.h" />
-    <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
@@ -450,9 +447,6 @@
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SamplerDesc.cpp" />
-    <ClCompile Include="Shader\ShaderPermatation.cpp" />
-    <ClCompile Include="Shader\ShaderManager.cpp" />
-    <ClCompile Include="Shader\ShaderVars.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -493,8 +487,6 @@
     <None Include="PipelineState.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
-    <None Include="Shader\ShaderPermatation.inl" />
-    <None Include="Shader\ShaderVars.inl" />
     <None Include="Texture\Texture.inl" />
     <None Include="Texture\TextureVars.inl" />
     <None Include="Util\StateHelpers.inl" />

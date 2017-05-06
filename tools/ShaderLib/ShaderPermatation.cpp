@@ -3,9 +3,9 @@
 
 #include <ICore.h>
 
-#include "XRender.h"
+#include "ShaderSourceTypes.h"
+#include "HWShader.h"
 
-#include <../../tools/ShaderLib/ShaderSourceTypes.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -76,6 +76,16 @@ namespace shader
 
 		return true;
 	}
+
+	const ShaderPermatation::SamplerArr& ShaderPermatation::getSamplers(void) const
+	{
+		if (!isStageSet(ShaderType::Pixel)) {
+			X_ASSERT_UNREACHABLE();
+		}
+
+		return getStage(ShaderType::Pixel)->getSamplers();
+	}
+
 
 	void ShaderPermatation::createCbLinks(void)
 	{

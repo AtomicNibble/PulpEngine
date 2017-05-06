@@ -74,12 +74,6 @@
     <ClInclude Include="CommandContex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Shader\ShaderManager.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader\ShaderVars.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Util\Constants.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -146,9 +140,6 @@
     <ClInclude Include="Texture\TextureUtil.h">
       <Filter>Header Files\Texture</Filter>
     </ClInclude>
-    <ClInclude Include="Shader\ShaderPermatation.h">
-      <Filter>Header Files\Shader</Filter>
-    </ClInclude>
     <ClInclude Include="Util\StateHelpers.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -177,12 +168,6 @@
     </ClCompile>
     <ClCompile Include="CommandContex.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader\ShaderManager.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader\ShaderVars.cpp">
-      <Filter>Source Files\Shader</Filter>
     </ClCompile>
     <ClCompile Include="Texture\TextureManager.cpp">
       <Filter>Source Files\Texture</Filter>
@@ -235,9 +220,6 @@
     <ClCompile Include="Texture\TextureUtil.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Shader\ShaderPermatation.cpp">
-      <Filter>Source Files\Shader</Filter>
-    </ClCompile>
     <ClCompile Include="Util\StateHelpers.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
@@ -263,9 +245,6 @@
     </None>
     <None Include="CommandContex.inl">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="Shader\ShaderVars.inl">
-      <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Texture\Texture.inl">
       <Filter>Header Files\Texture</Filter>
@@ -308,9 +287,6 @@
     </None>
     <None Include="Buffers\BufferManager.inl">
       <Filter>Header Files\Buffers</Filter>
-    </None>
-    <None Include="Shader\ShaderPermatation.inl">
-      <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Util\StateHelpers.inl">
       <Filter>Header Files\Util</Filter>

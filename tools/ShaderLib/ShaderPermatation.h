@@ -17,6 +17,7 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
+class XHWShader;
 
 class ShaderPermatation : public IShaderPermatation
 {
@@ -24,11 +25,11 @@ public:
 	typedef std::array<XHWShader*, ShaderType::ENUM_COUNT - 1> HWShaderStagesArr;
 
 public:
-	ShaderPermatation(const ShaderStagesArr& stages, core::MemoryArenaBase* arena);
+	SHADERLIB_EXPORT ShaderPermatation(const ShaderStagesArr& stages, core::MemoryArenaBase* arena);
 
-	void generateMeta(void);
+	SHADERLIB_EXPORT void generateMeta(void);
 
-	bool isCompiled(void) const;
+	SHADERLIB_EXPORT bool isCompiled(void) const;
 
 	X_INLINE bool isStageSet(ShaderType::Enum type) const;
 	X_INLINE XHWShader* getStage(ShaderType::Enum type) const;

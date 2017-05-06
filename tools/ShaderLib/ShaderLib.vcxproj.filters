@@ -18,6 +18,12 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{4233d8a6-e713-4b8a-bcb7-aab5cafebcca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Manager">
+      <UniqueIdentifier>{36db74b6-20fe-42f8-bf80-576274d1fb86}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Manager">
+      <UniqueIdentifier>{db0b9cf8-c582-472f-9985-038abd44b7e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -46,6 +52,15 @@
     </ClInclude>
     <ClInclude Include="ShaderSourceTypes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Header Files\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderPermatation.h">
+      <Filter>Header Files\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderVars.h">
+      <Filter>Header Files\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +91,15 @@
     <ClCompile Include="ShaderSourceTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Source Files\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderPermatation.cpp">
+      <Filter>Source Files\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderVars.cpp">
+      <Filter>Source Files\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="HWShader.inl">
@@ -86,6 +110,12 @@
     </None>
     <None Include="ShaderSourceTypes.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="ShaderPermatation.inl">
+      <Filter>Header Files\Manager</Filter>
+    </None>
+    <None Include="ShaderVars.inl">
+      <Filter>Header Files\Manager</Filter>
     </None>
   </ItemGroup>
 </Project>

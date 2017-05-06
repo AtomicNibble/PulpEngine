@@ -24,4 +24,7 @@
 #include "HWShader.h"
 #include "ShaderUtil.h"
 
+#include "ShaderManager.h"
+#include "ShaderPermatation.h"
+
 #endif // !X_SHADERLIB_H_

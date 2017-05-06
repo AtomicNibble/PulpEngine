@@ -396,8 +396,11 @@
     <ClInclude Include="ShaderBin.h" />
     <ClInclude Include="ShaderLib.h" />
     <ClInclude Include="ShaderLib\ShaderLib.h" />
+    <ClInclude Include="ShaderManager.h" />
+    <ClInclude Include="ShaderPermatation.h" />
     <ClInclude Include="ShaderSourceTypes.h" />
     <ClInclude Include="ShaderUtil.h" />
+    <ClInclude Include="ShaderVars.h" />
     <ClInclude Include="SourceBin.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -407,8 +410,11 @@
     <ClCompile Include="ILTree.cpp" />
     <ClCompile Include="ShaderBin.cpp" />
     <ClCompile Include="ShaderLib\ShaderLib.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
+    <ClCompile Include="ShaderPermatation.cpp" />
     <ClCompile Include="ShaderSourceTypes.cpp" />
     <ClCompile Include="ShaderUtil.cpp" />
+    <ClCompile Include="ShaderVars.cpp" />
     <ClCompile Include="SourceBin.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -428,7 +434,9 @@
   <ItemGroup>
     <None Include="HWShader.inl" />
     <None Include="ILTree.inl" />
+    <None Include="ShaderPermatation.inl" />
     <None Include="ShaderSourceTypes.inl" />
+    <None Include="ShaderVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

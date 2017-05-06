@@ -4,8 +4,6 @@
 #include "Texture\TextureManager.h"
 #include "Texture\Texture.h"
 #include "Texture\TextureUtil.h"
-#include "Shader\ShaderManager.h"
-#include "Shader\ShaderPermatation.h"
 
 #include "Allocators\LinearAllocator.h"
 #include "Buffers\BufferManager.h"
@@ -18,6 +16,7 @@
 #include "CmdBucket.h"
 
 #include <IConsole.h>
+
 
 X_NAMESPACE_BEGIN(render)
 

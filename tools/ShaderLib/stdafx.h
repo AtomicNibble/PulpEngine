@@ -5,7 +5,6 @@
 #include <EngineCommon.h>
 
 
-
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,

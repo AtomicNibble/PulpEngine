@@ -1,6 +1,6 @@
 #pragma once
 
-
+#include <IShader.h>
 #include <IDirectoryWatcher.h>
 
 #include <Containers\HashMap.h>
@@ -9,7 +9,8 @@
 #include <Assets\AssertContainer.h>
 
 #include "ShaderVars.h"
-
+#include "ShaderBin.h"
+#include "SourceBin.h"
 
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
@@ -47,19 +48,19 @@ namespace shader
 
 
 	public:
-		XShaderManager(core::MemoryArenaBase* arena);
-		~XShaderManager();
+		SHADERLIB_EXPORT XShaderManager(core::MemoryArenaBase* arena);
+		SHADERLIB_EXPORT ~XShaderManager();
 
-		bool init(void);
-		bool shutDown(void);
+		SHADERLIB_EXPORT bool init(void);
+		SHADERLIB_EXPORT bool shutDown(void);
 		
-		IShaderSource* sourceforName(const char* pSourceName);
-		IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, 
+		SHADERLIB_EXPORT IShaderSource* sourceforName(const char* pSourceName);
+		SHADERLIB_EXPORT IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
 			shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags);
-		void releaseHWShader(IHWShader* pHWSHader);
+		SHADERLIB_EXPORT void releaseHWShader(IHWShader* pHWSHader);
 
-		shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
-		void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
+		SHADERLIB_EXPORT shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
+		SHADERLIB_EXPORT void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
 
 		ShaderVars& getShaderVars(void);
 		ShaderBin& getBin(void);

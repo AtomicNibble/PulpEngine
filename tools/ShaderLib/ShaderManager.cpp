@@ -14,7 +14,8 @@
 #include <IConsole.h>
 #include <IFileSys.h>
 
-#include <../../tools/ShaderLib/ShaderSourceTypes.h>
+#include "ShaderSourceTypes.h"
+#include "HWShader.h"
 
 X_NAMESPACE_BEGIN(render)
 
