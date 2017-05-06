@@ -218,7 +218,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				{
 					con.CleanAll();
 				}
-				if (mode == ConvertMode::GEN_THUMBS)
+				else if (mode == ConvertMode::GEN_THUMBS)
 				{
 					con.GenerateThumbs();
 				}
