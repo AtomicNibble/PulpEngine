@@ -55,9 +55,9 @@ namespace shader
 		SHADERLIB_EXPORT bool shutDown(void);
 		
 		SHADERLIB_EXPORT IShaderSource* sourceforName(const char* pSourceName);
-		SHADERLIB_EXPORT IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
+		SHADERLIB_EXPORT XHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
 			shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags);
-		SHADERLIB_EXPORT void releaseHWShader(IHWShader* pHWSHader);
+		SHADERLIB_EXPORT void releaseHWShader(XHWShader* pHWSHader);
 
 		SHADERLIB_EXPORT shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
 		SHADERLIB_EXPORT void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
@@ -70,7 +70,6 @@ namespace shader
 
 		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry,
 			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
-		void releaseHWShader(XHWShader* pHWSHader);
 
 	private:
 		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);

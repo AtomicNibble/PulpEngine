@@ -114,7 +114,7 @@ namespace shader
 		return true;
 	}
 
-	IHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, 
+	XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry,
 		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
 	{
 		X_UNUSED(permFlags);
@@ -138,9 +138,15 @@ namespace shader
 		return pHW;
 	}
 
-	void XShaderManager::releaseHWShader(IHWShader* pHWSHader)
+	void XShaderManager::releaseHWShader(XHWShader* pHWSHader)
 	{
-		releaseHWShader(static_cast<XHWShader*>(pHWSHader));
+		HWShaderResource* pHWRes = static_cast<HWShaderResource*>(pHWSHader);
+
+		if (pHWRes->removeReference() == 0)
+		{
+			hwShaders_.releaseAsset(pHWRes);
+		}
+	}
 	}
 
 	shader::IShaderPermatation* XShaderManager::createPermatation(const shader::ShaderStagesArr& stages)
@@ -369,16 +375,6 @@ namespace shader
 
 
 		return pHWShaderRes;
-	}
-
-	void XShaderManager::releaseHWShader(XHWShader* pHWSHader)
-	{
-		HWShaderResource* pHWRes = static_cast<HWShaderResource*>(pHWSHader);
-
-		if (pHWRes->removeReference() == 0)
-		{
-			hwShaders_.releaseAsset(pHWRes);
-		}
 	}
 
 	bool XShaderManager::freeSourcebin(void)
