@@ -158,10 +158,7 @@ namespace
 		const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
 		if (pForce)
 		{
-			if (core::strUtil::StringToBool(pForce)) {
-				return false;
-			}
-			return true;
+			return core::strUtil::StringToBool(pForce);
 		}
 		return false;
 	}
