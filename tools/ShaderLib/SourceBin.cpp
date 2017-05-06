@@ -361,7 +361,7 @@ namespace shader
 
 	void SourceBin::listShaderSources(const char* pSearchPatten)
 	{
-		X_LOG0("Shader", "--------- ^8Shader Sources(%" PRIuS ")^7 ---------", source_.size());
+		X_LOG0("Shader", "--------- ^8Shader Sources(%" PRIuS ")^7 ----------", source_.size());
 
 		auto printfunc = [](const SourceFile* pSource) {
 			X_LOG0("Shader", "Name: ^2\"%s\"^7 crc: ^10x%08x^7",
