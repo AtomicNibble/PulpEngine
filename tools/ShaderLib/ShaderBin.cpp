@@ -73,7 +73,8 @@ namespace shader
 
 	ShaderBin::ShaderBin(core::MemoryArenaBase* arena) :
 		scratchArena_(arena),
-		cache_(arena, 32)
+		cache_(arena, 32),
+		compLvl_(core::Compression::CompressLevel::NORMAL)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pFileSys);
@@ -151,7 +152,7 @@ namespace shader
 		{
 			core::Compression::Compressor<core::Compression::LZ4> comp;
 
-			if (!comp.deflate(scratchArena_, byteCode, compressed, core::Compression::CompressLevel::NORMAL))
+			if (!comp.deflate(scratchArena_, byteCode, compressed, compLvl_))
 			{
 				X_ERROR("Shader", "Failed to defalte data");
 				return false;

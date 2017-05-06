@@ -4,6 +4,8 @@
 #ifndef X_SHADER_BIN_H_
 #define X_SHADER_BIN_H_
 
+#include <ICompression.h>
+
 #include <Time\CompressedStamps.h>
 #include <Containers\HashMap.h>
 
@@ -25,6 +27,8 @@ namespace shader
 		SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader);
 		SHADERLIB_EXPORT bool loadShader(XHWShader* pShader);
 
+		X_INLINE void setCompressionLvl(core::Compression::CompressLevel::Enum lvl);
+
 	private:
 		// returns true if we know the file has a diffrent crc32.
 		// saves opening it.
@@ -44,10 +48,15 @@ namespace shader
 		HashCacheMap cache_;
 
 		mutable core::CriticalSection cs_;
+
+		core::Compression::CompressLevel::Enum compLvl_;
 	};
+
 
 } // namespace shader
 
 X_NAMESPACE_END
+
+#include "ShaderBin.inl"
 
 #endif // !X_SHADER_BIN_H_
