@@ -5,6 +5,7 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Platform\Console.h>
+#include <Time\StopWatch.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -159,6 +160,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					mode = CompileMode::SINGLE;
 				}
 
+				core::StopWatch timer;
 
 				if (mode == CompileMode::CLEAN)
 				{
@@ -166,23 +168,45 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				}
 				if (mode == CompileMode::ALL)
 				{
-					if (GetMaterialCat(matCat))
+					if (GetMaterialCat(matCat, true))
 					{
-
+						if (!con.Compile(matCat)) {
+							X_ERROR("ShaderCompiler", "Compile failed..");
+						}
+						else {
+							res = true;
+						}
 					}
 					else
 					{
-
+						if (!con.CompileAll()) {
+							X_ERROR("ShaderCompiler", "Compile failed..");
+						}
+						else {
+							res = true;
+						}
 					}
 
 				}
 				else if (GetMaterialCat(matCat) && GetTechName(techName))
 				{
-
-
-
+					if (!con.Compile(matCat, techName)) {
+						X_ERROR("ShaderCompiler", "Compile failed..");
+					}
+					else {
+						res = true;
+					}
 				}
+
+				X_LOG0("ShaderCompiler", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+
 			}
+			else
+			{
+				X_ERROR("ShaderCompiler", "Failed to init compiler");
+			}
+
+			Console.PressToContinue();
 		}
 	}
 
