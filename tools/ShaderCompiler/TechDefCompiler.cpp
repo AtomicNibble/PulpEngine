@@ -29,6 +29,8 @@ namespace compiler
 
 	bool TechDefCompiler::Init(void)
 	{
+		// max comp.
+		shaderMan_.getBin().setCompressionLvl(core::Compression::CompressLevel::HIGH);
 
 		return true;
 	}
