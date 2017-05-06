@@ -38,7 +38,6 @@ namespace shader
 		samplers_(arena),
 		textures_(arena),
 		bytecode_(arena),
-		D3DCompileflags_(0),
 		id_(-1)
 	{
 
@@ -50,10 +49,10 @@ namespace shader
 
 	}
 
-	bool XHWShader::compile(core::string& source, CompileFlags flags)
+	bool XHWShader::compile(core::string& source, CompileFlags compileFlags)
 	{
 		status_ = ShaderStatus::Compiling;
-		bool res = compileFromSource(source, flags);
+		bool res = compileFromSource(source, compileFlags);
 
 		if (res) {
 			status_ = ShaderStatus::ReadyToRock;
@@ -71,33 +70,35 @@ namespace shader
 	{
 		X_LOG0("Shader", "Compiling shader: \"%s\" tid: %" PRIX32, name_.c_str(), core::Thread::GetCurrentID());
 
-		D3DCompileflags_ = 0;
+		compileFlags_ = flags;
+
+		DWORD D3DCompileflags = 0;
 
 		if (flags.IsSet(CompileFlag::Debug)) {
-			D3DCompileflags_ |= D3DCOMPILE_DEBUG;
+			D3DCompileflags |= D3DCOMPILE_DEBUG;
 		}
 		if (flags.IsSet(CompileFlag::TreatWarningsAsErrors)) {
-			D3DCompileflags_ |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
+			D3DCompileflags |= D3DCOMPILE_WARNINGS_ARE_ERRORS;
 		}
 
 		if (flags.IsSet(CompileFlag::OptimizationLvl3)) {
-			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+			D3DCompileflags |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
 		}
 		else if (flags.IsSet(CompileFlag::OptimizationLvl2)) {
-			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL2;
+			D3DCompileflags |= D3DCOMPILE_OPTIMIZATION_LEVEL2;
 		}
 		else if (flags.IsSet(CompileFlag::OptimizationLvl1)) {
-			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
+			D3DCompileflags |= D3DCOMPILE_OPTIMIZATION_LEVEL1;
 		}
 		else if (flags.IsSet(CompileFlag::OptimizationLvl0)) {
-			D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL0;
+			D3DCompileflags |= D3DCOMPILE_OPTIMIZATION_LEVEL0;
 		}
 
 		if (flags.IsSet(CompileFlag::PackMatrixRowMajor)) {
-			D3DCompileflags_ |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+			D3DCompileflags |= D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
 		}
 		else if (flags.IsSet(CompileFlag::PackMatrixColumnMajor)) {
-			D3DCompileflags_ |= D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR;
+			D3DCompileflags |= D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR;
 		}
 
 		// allow 16 flags.
@@ -155,7 +156,7 @@ namespace shader
 			nullptr, // pInclude
 			pEntry,
 			Util::getProfileFromType(type_),
-			D3DCompileflags_, // Flags
+			D3DCompileflags, // Flags
 			0, // Flags2
 			&pBlob,
 			&pErrorBlob

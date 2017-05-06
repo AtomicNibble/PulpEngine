@@ -40,7 +40,7 @@ namespace shader
 			uint32_t sourceCRC32;
 			uint32_t blobLength;
 			uint32_t deflatedLength;
-			uint32_t compileFlags;
+			uint32_t ___pad;
 			core::dateTimeStampSmall modifed;
 
 			// i now save reflection info.
@@ -58,7 +58,8 @@ namespace shader
 			// 4
 			ShaderType::Enum type;
 			InputLayoutFormat::Enum ILFmt;
-			uint8_t _pad[2];
+			CompileFlags compileFlags;
+			uint8_t _pad[1];
 
 
 			X_INLINE const bool isValid(void) const {
@@ -121,7 +122,7 @@ namespace shader
 		hdr.modifed = core::dateTimeStampSmall::systemDateTime();
 		hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
 		hdr.sourceCRC32 = pShader->getSourceCrc32();
-		hdr.compileFlags = pShader->getD3DCompileFlags();
+		hdr.compileFlags = pShader->getCompileFlags();
 		hdr.blobLength = safe_static_cast<uint32_t>(byteCode.size());
 		hdr.deflatedLength = 0;
 
@@ -306,6 +307,7 @@ namespace shader
 					}
 				}
 
+				pShader->compileFlags_ = hdr.compileFlags;
 				pShader->numInputParams_ = hdr.numInputParams;
 				pShader->numInstructions_ = hdr.numInstructions;
 				pShader->numRenderTargets_ = hdr.numRenderTargets;

@@ -65,7 +65,7 @@ namespace shader
 		X_INLINE int32_t getNumInputParams(void) const;
 		X_INLINE int32_t getNumInstructions(void) const;
 		X_INLINE int32_t getSourceCrc32(void) const;
-		X_INLINE int32_t getD3DCompileFlags(void) const;
+		X_INLINE CompileFlags getCompileFlags(void) const;
 
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
 		X_INLINE bool isValid(void) const;
@@ -82,10 +82,10 @@ namespace shader
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
-		SHADERLIB_EXPORT bool compile(core::string& source, CompileFlags flags);
+		SHADERLIB_EXPORT bool compile(core::string& source, CompileFlags compileFlags);
 
 	private:
-		bool compileFromSource(core::string& source, CompileFlags flags);
+		bool compileFromSource(core::string& source, CompileFlags compileFlags);
 		bool reflectShader(ID3D10Blob* pshaderBlob);
 
 	protected:
@@ -111,8 +111,7 @@ namespace shader
 		int32_t numInputParams_;
 		int32_t numRenderTargets_;
 		int32_t numInstructions_;
-		// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
-		uint32_t D3DCompileflags_;
+		CompileFlags compileFlags_;
 
 		CBufferArr cbuffers_;
 		SamplerArr samplers_;

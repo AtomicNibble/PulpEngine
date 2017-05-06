@@ -64,8 +64,8 @@ namespace shader
 	X_INLINE int32_t XHWShader::getSourceCrc32(void) const {
 		return sourceCrc32_;
 	}
-	X_INLINE int32_t XHWShader::getD3DCompileFlags(void) const {
-		return D3DCompileflags_;
+	X_INLINE CompileFlags XHWShader::getCompileFlags(void) const {
+		return compileFlags_;
 	}
 
 
