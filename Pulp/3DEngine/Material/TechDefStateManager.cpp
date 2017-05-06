@@ -19,6 +19,7 @@ TechDef::TechDef(core::MemoryArenaBase* arena) :
 TechDef::~TechDef()
 {
 	render::IRender* pRenderSys = gEnv->pRender;
+	X_ASSERT_NOT_NULL(pRenderSys);
 
 	for (auto* pPerm : perms_)
 	{
