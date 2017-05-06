@@ -72,6 +72,7 @@ namespace compiler
 	bool TechDefCompiler::Compile(MaterialCat::Enum cat)
 	{
 		// so we want to get all techs for given cat and compile.
+		X_LOG0("TechCompiler", "Compiling cat: \"%s\"", MaterialCat::ToString(cat));
 
 		engine::TechSetDefs::CatTypeArr types(arena_);
 		if (!engine::TechSetDefs::getTechCatTypes(cat, types)) {
@@ -93,10 +94,12 @@ namespace compiler
 
 	bool TechDefCompiler::Compile(MaterialCat::Enum cat, const core::string& techName)
 	{
+		X_LOG0("TechCompiler", "Compiling cat: \"%s\" tech: \"%s\"", MaterialCat::ToString(cat), techName.c_str());
+
 		// now we need the techDef.
 		engine::TechSetDef* pTechDef = nullptr;
 		if (!techDefs_.getTechDef(cat, techName.c_str(), pTechDef)) {
-			X_ERROR("TechCompiler", "Failed to get tech def for cat:  \"%s\" tech: \"%s\"", MaterialCat::ToString(cat), techName.c_str());
+			X_ERROR("TechCompiler", "Failed to get tech def for cat: \"%s\" tech: \"%s\"", MaterialCat::ToString(cat), techName.c_str());
 			return false;
 		}
 
