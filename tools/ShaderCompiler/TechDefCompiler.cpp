@@ -52,8 +52,14 @@ namespace compiler
 		X_LOG0("TechCompiler", "Compiling all techs...");
 
 		for (int32_t i = 0; i < MaterialCat::ENUM_COUNT; i++) {
-			if (!Compile(static_cast<MaterialCat::Enum>(i))) {
-				X_ERROR("TechCompiler", "Failed to compile cat: \"%s\"", MaterialCat::ToString(i));
+			MaterialCat::Enum cat = static_cast<MaterialCat::Enum>(i);
+			
+			if (cat == MaterialCat::UNKNOWN) {
+				continue;
+			}
+
+			if (!Compile(cat)) {
+				X_ERROR("TechCompiler", "Failed to compile cat: \"%s\"", MaterialCat::ToString(cat));
 				return false;
 			}
 		}
@@ -166,7 +172,13 @@ namespace compiler
 		X_LOG0("TechCompiler", "Cleaning all compiled techs");
 
 		for (int32_t i = 0; i < MaterialCat::ENUM_COUNT; i++) {
-			if (!Clean(static_cast<MaterialCat::Enum>(i))) {
+			MaterialCat::Enum cat = static_cast<MaterialCat::Enum>(i);
+
+			if (cat == MaterialCat::UNKNOWN) {
+				continue;
+			}
+
+			if (!Clean(cat)) {
 				return false;
 			}
 		}
