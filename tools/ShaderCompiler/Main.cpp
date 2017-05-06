@@ -21,23 +21,28 @@ X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSinglet
 
 #endif // !X_LIB
 
+namespace
+{
 
-typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+	typedef core::MemoryArena<
+		core::MallocFreeAllocator,
+		core::SingleThreadPolicy,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-> ConverterArena;
+	> CompilerArena;
 
-core::MemoryArenaBase* g_arena = nullptr;
 
+
+
+
+}// namespace 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -49,17 +54,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Console.SetSize(60, 40, 2000);
 	Console.MoveTo(10, 10);
 
-
 	core::MallocFreeAllocator allocator;
-	ConverterArena arena(&allocator, "ShaderCompilerArena");
-	g_arena = &arena;
+	CompilerArena arena(&allocator, "ShaderCompilerArena");
 
 	bool res = false;
 
 	{
 		EngineApp app; // needs to clear up before arena.
 
-		if (app.Init(hInstance, lpCmdLine, Console))
+		if (app.Init(hInstance, &arena, lpCmdLine, Console))
 		{
 
 		}

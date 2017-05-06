@@ -28,7 +28,8 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, 
+	const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
 	params.hInstance = hInstance;
@@ -42,7 +43,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 	params.bEnableBasicConsole = false;
 	params.bEnableJobSystem = true; // some converters make use of the job system. 
 	params.pConsoleWnd = &Console;
-	params.pCoreArena = g_arena;
+	params.pCoreArena = arena;
 	params.bFileSysWorkingDir = true;
 
 
