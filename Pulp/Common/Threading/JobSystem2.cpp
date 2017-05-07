@@ -374,6 +374,8 @@ namespace V2
 
 	bool JobSystem::HelpWithWork(void)
 	{
+		X_ASSERT(CurrentThreadHasWorkerQueue(), "HelpWithWork called on thread that has no que")(core::Thread::GetCurrentID());
+
 		size_t threadIdx = GetThreadIndex();
 		ThreadQue& threadQue = *GetWorkerThreadQueue(threadIdx);
 
