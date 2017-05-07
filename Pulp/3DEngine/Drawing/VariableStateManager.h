@@ -12,8 +12,6 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(engine)
 
-#define VARIABLE_STATE_STATS 1
-
 class VariableStateManager
 {
 	typedef core::MemoryArena<
@@ -78,10 +76,10 @@ private:
 	render::Commands::ResourceStateBase* pEmtpyState_;
 
 private:
-#if VARIABLE_STATE_STATS
+#if X_ENABLE_VARIABLE_STATE_STATS
 	mutable core::Spinlock statsLock_;
 	Stats stats_;
-#endif // !VARIABLE_STATE_STATS
+#endif // !X_ENABLE_VARIABLE_STATE_STATS
 };
 
 

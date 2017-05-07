@@ -126,6 +126,9 @@
     <ClInclude Include="Material\TechDefStateManager.h">
       <Filter>Header Files\Material</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -166,6 +169,9 @@
     </Filter>
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{01ba8cbc-4be9-4335-b3b3-936c4abb977e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{c746e8c0-59ff-4cb6-95ac-19eeec401dfc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

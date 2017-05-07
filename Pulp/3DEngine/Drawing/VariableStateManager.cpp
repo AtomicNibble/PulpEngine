@@ -90,7 +90,7 @@ void VariableStateManager::releaseVariableState(render::Commands::ResourceStateB
 {
 	X_ASSERT_NOT_NULL(pVS);
 
-#if VARIABLE_STATE_STATS
+#if X_ENABLE_VARIABLE_STATE_STATS
 	{
 		core::ScopedLock<decltype(statsLock_)> lock(statsLock_);
 
@@ -99,7 +99,7 @@ void VariableStateManager::releaseVariableState(render::Commands::ResourceStateB
 		stats_.numSamplers += pVS->getNumSamplers();
 		stats_.numCBS += pVS->getNumCBs();
 	}
-#endif // !VARIABLE_STATE_STATS
+#endif // !X_ENABLE_VARIABLE_STATE_STATS
 
 	X_DELETE(pVS, &statePool_);
 }
@@ -108,7 +108,7 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState_I
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
 
-#if VARIABLE_STATE_STATS
+#if X_ENABLE_VARIABLE_STATE_STATS
 	{
 		core::ScopedLock<decltype(statsLock_)> lock(statsLock_);
 
@@ -118,7 +118,7 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState_I
 		stats_.numSamplers += numSamp;
 		stats_.numCBS += numCBs;
 	}
-#endif // !VARIABLE_STATE_STATS
+#endif // !X_ENABLE_VARIABLE_STATE_STATS
 
 
 	const size_t requiredBytes = allocSize(numTexStates, numSamp, numCBs);
@@ -141,14 +141,14 @@ X_INLINE constexpr size_t VariableStateManager::allocSize(int8_t numTexStates, i
 
 VariableStateManager::Stats VariableStateManager::getStats(void) const
 {
-#if VARIABLE_STATE_STATS
+#if X_ENABLE_VARIABLE_STATE_STATS
 	core::ScopedLock<decltype(statsLock_)> lock(statsLock_);
 
 	return stats_;
 #else
 	static Stats stats;
 	return stats;
-#endif // !VARIABLE_STATE_STATS
+#endif // !X_ENABLE_VARIABLE_STATE_STATS
 }
 
 X_NAMESPACE_END

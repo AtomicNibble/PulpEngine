@@ -8,8 +8,7 @@
 
 #define IPRENDERSYS_EXPORTS
 
-
-#include "IMaterial.h"
+#include <IMaterial.h>
 #include "Material\MaterialManager.h"
 
 
@@ -19,3 +18,5 @@ X_LINK_LIB("engine_MaterialLib");
 
 
 extern core::MemoryArenaBase* g_3dEngineArena;
+
+#include "Util\Config.h"

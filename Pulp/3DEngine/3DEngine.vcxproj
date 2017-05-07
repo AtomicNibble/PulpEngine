@@ -460,6 +460,7 @@
     <ClInclude Include="Model\ModelManager.h" />
     <ClInclude Include="Model\RenderMesh.h" />
     <ClInclude Include="Model\XModel.h" />
+    <ClInclude Include="Util\Config.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
