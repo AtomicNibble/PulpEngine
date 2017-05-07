@@ -18,12 +18,21 @@ public:
 
 	X_INLINE int32_t operator=(int32_t value) volatile;
 	X_INLINE int32_t operator=(int32_t value);
-	X_INLINE int32_t operator+=(int32_t value) volatile;
-	X_INLINE int32_t operator+=(int32_t value);
 	X_INLINE int32_t operator++(void) volatile;
 	X_INLINE int32_t operator++(void);
 	X_INLINE int32_t operator--(void) volatile;
 	X_INLINE int32_t operator--(void);
+
+	X_INLINE int32_t operator+=(int32_t value) volatile;
+	X_INLINE int32_t operator+=(int32_t value);
+	X_INLINE int32_t operator-=(int32_t value) volatile;
+	X_INLINE int32_t operator-=(int32_t value);
+	X_INLINE int32_t operator&=(int32_t value) volatile;
+	X_INLINE int32_t operator&=(int32_t value);
+	X_INLINE int32_t operator|=(int32_t value) volatile;
+	X_INLINE int32_t operator|=(int32_t value);
+
+
 
 	X_INLINE operator int32_t(void) const volatile;
 	X_INLINE operator int32_t(void) const;

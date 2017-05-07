@@ -22,6 +22,16 @@ namespace atomic
 	template<typename T>
 	X_INLINE T Add(volatile T* memory, T value);
 
+	template<typename T>
+	X_INLINE T Subtract(volatile T* memory, T value);
+
+	template<typename T>
+	X_INLINE T And(volatile T* memory, T value);
+
+	template<typename T>
+	X_INLINE T Or(volatile T* memory, T value);
+
+
 	/// \brief Atomically exchanges the integer at location \a memory with the given value, and returns the integer's initial value.
 	/// \remark \a memory must be aligned to a 32-bit boundary.
 	template<typename T>

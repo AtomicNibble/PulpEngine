@@ -1,4 +1,5 @@
 
+
 namespace atomic
 {
 	#pragma intrinsic (_InterlockedIncrement)
@@ -105,6 +106,30 @@ namespace atomic
 			}
 
 			template <typename T>
+			static inline T Subtract(volatile T* memory, T value)
+			{
+				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				X_ASSERT_ALIGNMENT(memory, 4, 0);
+				return static_cast<T>(InterlockedExchangeSubtract(reinterpret_cast<volatile unsigned long*>(memory), static_cast<unsigned long>(value)));
+			}
+
+			template <typename T>
+			static inline T And(volatile T* memory, T value)
+			{
+				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				X_ASSERT_ALIGNMENT(memory, 4, 0);
+				return static_cast<T>(_InterlockedAnd(reinterpret_cast<volatile long*>(memory), static_cast<long>(value)));
+			}
+
+			template <typename T>
+			static inline T Or(volatile T* memory, T value)
+			{
+				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				X_ASSERT_ALIGNMENT(memory, 4, 0);
+				return static_cast<T>(_InterlockedOr(reinterpret_cast<volatile long*>(memory), static_cast<long>(value)));
+			}
+
+			template <typename T>
 			static inline T Exchange(volatile T* memory, T value)
 			{
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
@@ -186,6 +211,24 @@ namespace atomic
 	X_INLINE T Add(volatile T* memory, T value)
 	{
 		return internal::Implementation<sizeof(T)>::Add(memory, value);
+	}
+
+	template<typename T>
+	X_INLINE T Subtract(volatile T* memory, T value)
+	{
+		return internal::Implementation<sizeof(T)>::Subtract(memory, value);
+	}
+
+	template<typename T>
+	X_INLINE T And(volatile T* memory, T value)
+	{
+		return internal::Implementation<sizeof(T)>::And(memory, value);
+	}
+
+	template<typename T>
+	X_INLINE T Or(volatile T* memory, T value)
+	{
+		return internal::Implementation<sizeof(T)>::Or(memory, value);
 	}
 
 	template<typename T>
