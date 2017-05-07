@@ -17,6 +17,14 @@
 
 #include <Util\Delegate.h>
 
+
+#if X_ENABLE_JOBSYS_PROFILER
+#include <Time\TimeVal.h>
+
+#include <Containers\Array.h>
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
+
 X_NAMESPACE_BEGIN(core)
 
 namespace V2
@@ -91,6 +99,58 @@ static_assert(core::compileTime::IsPOD<Job>::Value, "Job must POD");
 
 X_ENSURE_SIZE(Job, 128);
 
+
+
+#if X_ENABLE_JOBSYS_PROFILER
+
+X_DECLARE_ENUM(ProfilerEvent)(
+	JobStarted,
+	JobComplete,
+
+	JobStolen,	 // job was stolen, the thread that stole stores this
+
+	WorkerAwake, // the worker woke up
+	WorkerUsed	 // the worker actually ran a job
+);
+
+struct JobSystemStats
+{
+	core::AtomicInt jobsStolen;			// total jobs stolen
+	core::AtomicInt jobsRun;			// total jobs run
+	core::AtomicInt jobsAssited;		// total jobs run via WaitWithHelp
+	core::AtomicInt workerUsedMask;		// mask of which workers ran jobs
+	core::AtomicInt workerAwokenMask;	// mask of which works where awoken
+};
+
+class JobQueueHistory
+{
+public:
+	struct Entry
+	{
+		// 16
+		core::TimeVal start;
+		core::TimeVal end;
+
+		Job::JobId id; // 2 
+		ProfileSubSys::Enum subsystem; // 1
+		uint8_t _pad[5];
+	};
+
+	X_ENSURE_SIZE(Entry, 24);
+
+	typedef core::Array<Entry> EntryArr;
+public:
+	JobQueueHistory(core::MemoryArenaBase* arena);
+	~JobQueueHistory();
+
+
+private:
+	EntryArr entries_;
+};
+
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
+
 X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
@@ -109,6 +169,11 @@ public:
 private:
 	long bottom_;
 	long top_;
+
+
+#if X_ENABLE_JOBSYS_PROFILER
+	JobQueueHistory history_;
+#endif // !X_ENABLE_JOBSYS_PROFILER
 
 	Job* jobs_[MAX_NUMBER_OF_JOBS];
 };
@@ -479,6 +544,10 @@ private:
 
 	ThreadLocalStorage ThreadQue_;
 	ThreadLocalStorage ThreadAllocator_;
+
+#if X_ENABLE_JOBSYS_PROFILER
+	JobSystemStats stats_;
+#endif // !X_ENABLE_JOBSYS_PROFILER
 };
 
 X_ENABLE_WARNING(4324)

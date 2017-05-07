@@ -7,6 +7,8 @@
 #include "Util\Cpu.h"
 #include <Memory\VirtualMem.h>
 
+#include <atomic>
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -475,6 +477,11 @@ namespace V2
 				return nullptr;
 			}
 
+
+#if X_ENABLE_JOBSYS_PROFILER
+			++stats_.jobsStolen;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 			return stolenJob;
 		}
 
@@ -496,6 +503,11 @@ namespace V2
 
 			Job* stolenJob = stealQueue->Steal();
 			if (!IsEmptyJob(stolenJob)) {
+
+#if X_ENABLE_JOBSYS_PROFILER
+				++stats_.jobsStolen;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 				return stolenJob;
 			}
 		}
@@ -620,6 +632,11 @@ namespace V2
 
 		int32_t backoff = 0;
 
+
+		std::atomic<int> goat;
+
+		goat &= 1;
+
 		while (thread.ShouldRun())
 		{
 			Job* pJob = GetJob(threadQue);
@@ -645,6 +662,12 @@ namespace V2
 					else {
 						CriticalSection::ScopedLock lock(condCS_);
 						cond_.Wait(condCS_);
+					
+
+#if X_ENABLE_JOBSYS_PROFILER
+						stats_.workerAwokenMask |= static_cast<int32_t>(threadIdx);
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 					}
 				}
 			}
