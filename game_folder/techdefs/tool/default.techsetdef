@@ -38,6 +38,7 @@ Technique( "lit" )
     }
     ps = PixelShader()
     {
+        diffuseSampler = "colorSampler"
     }
 }
 
@@ -51,7 +52,7 @@ Technique( "unlit" )
     }
     ps = PixelShader()
     {
-
-    fontCache = CodeTexture( "codeTexture0" )
+        diffuseSampler = "colorSampler"
+  //  fontCache = CodeTexture( "codeTexture0" )
     }
 }

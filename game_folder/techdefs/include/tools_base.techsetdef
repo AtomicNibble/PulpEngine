@@ -25,10 +25,10 @@ Texture( "colorMap" )
 
 VertexShader( "vs_default" )
 {
-    source = "effect_cloud_simple.hlsl"
+    source = "techsetdef_unlit.hlsl"
 }
 
 PixelShader( "ps_default" )
 {
-    source = "effect_cloud_simple.hlsl"
+    source = "techsetdef_unlit.hlsl"
 }
