@@ -54,27 +54,27 @@ namespace V2
 		return pJob->unfinishedJobs == 0;
 	}
 
-	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, void* pData)
+	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, void* pData JOB_SYS_SUB_PARAM)
 	{
-		Job* job = CreateJob(function);
+		Job* job = CreateJob(function JOB_SYS_SUB_PASS(subSystem));
 		job->pArgData = pData;
 		return job;
 	}
 
-	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData)
+	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData JOB_SYS_SUB_PARAM)
 	{
-		Job* job = CreateJobAsChild(pParent, function);
+		Job* job = CreateJobAsChild(pParent, function JOB_SYS_SUB_PASS(subSystem));
 		job->pArgData = pData;
 		return job;
 	}
 
 	template<typename DataT, typename>
-	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, const DataT& data)
+	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, const DataT& data JOB_SYS_SUB_PARAM)
 	{
 		static_assert((sizeof(DataT) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
 		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
 
-		Job* job = CreateJob(function);
+		Job* job = CreateJob(function JOB_SYS_SUB_PASS(subSystem));
 		job->pArgData = &job->pad;
 		::memcpy(job->pad, &data, sizeof(DataT));
 		return job;
@@ -82,12 +82,12 @@ namespace V2
 
 
 	template<typename DataT, typename>
-	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data)
+	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data JOB_SYS_SUB_PARAM)
 	{
 		static_assert((sizeof(DataT) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
 		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
 
-		Job* job = CreateJobAsChild(pParent, function);
+		Job* job = CreateJobAsChild(pParent, function JOB_SYS_SUB_PASS(subSystem));
 		job->pArgData = &job->pad;
 		::memcpy(job->pad, &data, sizeof(DataT));
 		return job;
@@ -96,60 +96,60 @@ namespace V2
 
 	template <typename T, typename SplitterT>
 	X_INLINE Job* JobSystem::parallel_for(T* data, size_t count,
-		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter)
+		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter JOB_SYS_SUB_PARAM)
 	{
 		typedef parallel_for_job_data<T, SplitterT> JobData;
 		JobData jobData(data, count, function, splitter);
 
-		Job* job = CreateJob<JobData>(&parallel_for_job<JobData>, jobData);
+		Job* job = CreateJob<JobData>(&parallel_for_job<JobData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
 
 	template <typename T, typename SplitterT>
 	X_INLINE Job* JobSystem::parallel_for_child(Job* pParent, T* data, size_t count,
-		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter)
+		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter JOB_SYS_SUB_PARAM)
 	{
 		typedef parallel_for_job_data<T, SplitterT> JobData;
 		JobData jobData(data, count, function, splitter);
 
-		Job* job = CreateJobAsChild<JobData>(pParent, &parallel_for_job<JobData>, jobData);
+		Job* job = CreateJobAsChild<JobData>(pParent, &parallel_for_job<JobData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
 
 	template <typename ClassType, typename T, typename SplitterT>
 	X_INLINE Job* JobSystem::parallel_for_member(typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del,
-		T* data, uint32_t count, const SplitterT& splitter)
+		T* data, uint32_t count, const SplitterT& splitter JOB_SYS_SUB_PARAM)
 	{
 		typedef parallel_for_member_job_data<ClassType, T, SplitterT> JobData;
 		JobData jobData(del, data, count, splitter);
 
-		Job* job = CreateJob<JobData>(&parallel_for_member_job<JobData>, jobData);
+		Job* job = CreateJob<JobData>(&parallel_for_member_job<JobData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
 
 	template <typename ClassType, typename T, typename SplitterT>
 	X_INLINE Job* JobSystem::parallel_for_member_child(Job* pParent, typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del,
-		T* data, uint32_t count, const SplitterT& splitter)
+		T* data, uint32_t count, const SplitterT& splitter JOB_SYS_SUB_PARAM)
 	{
 		typedef parallel_for_member_job_data<ClassType, T, SplitterT> JobData;
 		JobData jobData(del, data, count, splitter);
 
-		Job* job = CreateJobAsChild<JobData>(pParent, &parallel_for_member_job<JobData>, jobData);
+		Job* job = CreateJobAsChild<JobData>(pParent, &parallel_for_member_job<JobData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
 
 	template<typename ClassType>
 	X_INLINE Job* JobSystem::CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
-		void* pJobData)
+		void* pJobData JOB_SYS_SUB_PARAM)
 	{
 		typedef member_function_job_data<ClassType> MemberCallerData;
 		MemberCallerData jobData(pInst, pFunction, pJobData);
 
-		Job* job = CreateJob<MemberCallerData>(&member_function_job<MemberCallerData>, jobData);
+		Job* job = CreateJob<MemberCallerData>(&member_function_job<MemberCallerData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
@@ -158,7 +158,7 @@ namespace V2
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJob(ClassType* pInst,
 		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& data)
+		typename DataT& data JOB_SYS_SUB_PARAM)
 	{
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
 
@@ -167,16 +167,16 @@ namespace V2
 
 		MemberCallerData jobData(pInst, pFunction, data);
 
-		Job* job = CreateJob<MemberCallerData>(&member_function_job_copy<MemberCallerData>, jobData);
+		Job* job = CreateJob<MemberCallerData>(&member_function_job_copy<MemberCallerData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
 
 	template<typename ClassType>
 	X_INLINE Job* JobSystem::CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
-		void* pJobData)
+		void* pJobData JOB_SYS_SUB_PARAM)
 	{
-		Job* pJob = CreateMemberJob(pInst, pFunction, pJobData);
+		Job* pJob = CreateMemberJob(pInst, pFunction, pJobData JOB_SYS_SUB_PASS(subSystem));
 		Run(pJob);
 		return pJob;
 	}
@@ -185,9 +185,9 @@ namespace V2
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJobAndRun(ClassType* pInst,
 		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& data)
+		typename DataT& data JOB_SYS_SUB_PARAM)
 	{
-		Job* pJob = CreateMemberJob(pInst, pFunction, data);
+		Job* pJob = CreateMemberJob(pInst, pFunction, data JOB_SYS_SUB_PASS(subSystem));
 		Run(pJob);
 		return pJob;
 	}
@@ -195,12 +195,12 @@ namespace V2
 
 	template<typename ClassType>
 	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
-		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData)
+		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData JOB_SYS_SUB_PARAM)
 	{
 		typedef member_function_job_data<ClassType> MemberCallerData;
 		MemberCallerData jobData(pInst, pFunction, pJobData);
 
-		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job<MemberCallerData>, jobData);
+		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job<MemberCallerData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
@@ -208,7 +208,7 @@ namespace V2
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
 		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& data)
+		typename DataT& data JOB_SYS_SUB_PARAM)
 	{
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
 
@@ -217,7 +217,7 @@ namespace V2
 
 		MemberCallerData jobData(pInst, pFunction, data);
 
-		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job_copy<MemberCallerData>, jobData);
+		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job_copy<MemberCallerData>, jobData JOB_SYS_SUB_PASS(subSystem));
 
 		return job;
 	}
@@ -269,14 +269,14 @@ namespace V2
 
 	}
 
-	X_INLINE Job* JobSystem::CreateEmtpyJob(void)
+	X_INLINE Job* JobSystem::CreateEmtpyJob(JOB_SYS_SUB_PARAM_SINGLE)
 	{
-		return CreateJob(EmptyJob, nullptr);
+		return CreateJob(EmptyJob, nullptr JOB_SYS_SUB_PASS(subSystem));
 	}
 
-	X_INLINE Job* JobSystem::CreateEmtpyJobAsChild(Job* pPaerent)
+	X_INLINE Job* JobSystem::CreateEmtpyJobAsChild(Job* pPaerent JOB_SYS_SUB_PARAM)
 	{
-		return CreateJobAsChild(pPaerent, EmptyJob, nullptr);
+		return CreateJobAsChild(pPaerent, EmptyJob, nullptr JOB_SYS_SUB_PASS(subSystem));
 	}
 
 

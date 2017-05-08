@@ -371,7 +371,7 @@ namespace V2
 	/// ===============================================
 
 
-	Job* JobSystem::CreateJob(JobFunction::Pointer function)
+	Job* JobSystem::CreateJob(JobFunction::Pointer function JOB_SYS_SUB_PARAM)
 	{
 		Job* job = AllocateJob();
 		job->pFunction = function;
@@ -382,6 +382,10 @@ namespace V2
 		atomic::Exchange(&job->continuationCount, 0); 
 		job->runFlags = 0;
 
+#if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+		job->subSystem = subSystem;
+#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+
 #if X_DEBUG
 		core::zero_object(job->continuations);
 #endif // X_DEBUG
@@ -389,7 +393,7 @@ namespace V2
 		return job;
 	}
 
-	Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function)
+	Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function JOB_SYS_SUB_PARAM)
 	{
 		atomic::Increment(&pParent->unfinishedJobs);
 
@@ -399,6 +403,10 @@ namespace V2
 		atomic::Exchange(&job->unfinishedJobs, 1);
 		atomic::Exchange(&job->continuationCount, 0);
 		job->runFlags = 0;
+
+#if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+		job->subSystem = subSystem;
+#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 #if X_DEBUG
 		core::zero_object(job->continuations);
@@ -414,7 +422,7 @@ namespace V2
 		ThreadQue* queue = GetWorkerThreadQueue();
 		queue->Push(pJob);
 
-		cond_.NotifyAll();
+		cond_.NotifyOne();
 	}
 
 	void JobSystem::Wait(Job* pJob)
@@ -627,6 +635,10 @@ namespace V2
 		pEntry->id.threadIdx = pJob->origThreadIdx;
 		pEntry->id.jobIdx = safe_static_cast<uint16_t>(jobIdx);
 
+#if X_ENABLE_JOBSYS_PROFILER
+		pEntry->subsystem = pJob->subSystem;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 		++stats_.jobsRun;
 		stats_.workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
 
@@ -664,7 +676,7 @@ namespace V2
 				}
 				
 				// wake up other threads they may be all asleep.
-				cond_.NotifyAll();
+				cond_.NotifyOne();
 			}
 
 			// if we are child of a job, dec parents counter.

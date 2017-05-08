@@ -222,7 +222,7 @@ void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 	data.dataSize = pOpenRead->dataSize;
 
 	// dispatch a job to parse it?
-	gEnv->pJobSys->CreateMemberJobAndRun<XFont>(this, &XFont::ProcessFontFile_job, data);
+	gEnv->pJobSys->CreateMemberJobAndRun<XFont>(this, &XFont::ProcessFontFile_job, data JOB_SYS_SUB_ARG(core::ProfileSubSys::FONT));
 }
 
 void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)

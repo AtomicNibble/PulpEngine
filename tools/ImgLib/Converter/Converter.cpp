@@ -315,7 +315,7 @@ namespace Converter
 
 		if (multiThread_) 
 		{
-			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob);
+			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
 
 			bool results[TEX_MAX_FACES] = { false };
 
@@ -323,7 +323,7 @@ namespace Converter
 			{
 				MipFaceJobData jobData = { swapArena_, srcImg_, params, filter, wrap, alpha, results[face], face };
 
-				core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, generateMipsJob, jobData);
+				core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, generateMipsJob, jobData JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
 				jobSys.Run(pJob);
 			}
 
@@ -513,7 +513,7 @@ namespace Converter
 
 		if (multiThread_) 
 		{
-			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob);
+			pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
 		}
 
 		CompressionFunc::Pointer pFunc = getCompressionFunc(targetFmt, profile, keepAlpha);
@@ -611,7 +611,7 @@ namespace Converter
 
 							currentRow += numRowsToProcess;
 
-							core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data);
+							core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
 							jobSys.Run(pJob);
 						}
 					}

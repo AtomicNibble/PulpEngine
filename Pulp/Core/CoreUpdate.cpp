@@ -90,28 +90,26 @@ bool XCore::Update(void)
 	}
 
 	// top job that we can use to wait for the chain of jobs to complete.
-	Job* pSyncJob = jobSys.CreateEmtpyJob();
+	Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::ProfileSubSys::CORE));
 	{
 		// start a job to handler any file chnages and create relaod child jobs.
-		Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr);
+		Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
 		jobSys.Run(pDirectoryWatchProcess);
 
 		// create a job for syncing all input related jobs.
-		Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob);
+		Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
 		{
 
-			Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData);
-			Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo);
+			Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
+			Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
 
 			// we run console updates after input events have been posted.
 			jobSys.AddContinuation(pPostInputFrame, pConsoleUpdates);
-
 
 			jobSys.Run(pPostInputFrame);
 		}
 
 		jobSys.Run(pInputSync);
-
 	}
 
 	jobSys.Run(pSyncJob);

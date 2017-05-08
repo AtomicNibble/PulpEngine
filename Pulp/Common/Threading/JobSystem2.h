@@ -78,6 +78,7 @@ X_ALIGNED_SYMBOL(struct Job, 64)
 		+ sizeof(void*)
 		+ (sizeof(core::AtomicInt) * 2)
 		+ (sizeof(JobId) * MAX_CONTINUATIONS)
+		+ sizeof(ProfileSubSys::Enum)
 		+ sizeof(uint8_t)
 		+ sizeof(uint8_t)));
 
@@ -93,6 +94,12 @@ public:
 		char pad[PAD_SIZE];
 	};
 
+#if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+	ProfileSubSys::Enum subSystem;
+#else 
+	uint8_t _subSysPad;
+#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+
 	uint8_t origThreadIdx;
 	uint8_t runFlags;
 	JobId continuations[MAX_CONTINUATIONS];
@@ -103,6 +110,26 @@ static_assert(core::compileTime::IsPOD<Job>::Value, "Job must POD");
 X_ENSURE_SIZE(Job, 128);
 
 
+
+#if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+
+#define JOB_SYS_SUB_ARG_SINGLE(sub) sub
+#define JOB_SYS_SUB_ARG(sub) , sub
+
+#define JOB_SYS_SUB_PARAM , ProfileSubSys::Enum subSystem
+#define JOB_SYS_SUB_PARAM_SINGLE ProfileSubSys::Enum subSystem
+#define JOB_SYS_SUB_PASS(sub) , sub
+
+#else 
+
+#define JOB_SYS_SUB_ARG_SINGLE(sub) 
+#define JOB_SYS_SUB_ARG(sub)
+
+#define JOB_SYS_SUB_PARAM 
+#define JOB_SYS_SUB_PARAM_SINGLE 
+#define JOB_SYS_SUB_PASS(sub) 
+
+#endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 #if X_ENABLE_JOBSYS_PROFILER
 
@@ -167,8 +194,6 @@ private:
 	FrameHistory frameHistory_[HISTORY_COUNT];
 };
 X_ENABLE_WARNING(4324)
-
-
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
@@ -249,12 +274,12 @@ static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* jo
 		// split in two
 		const size_t leftCount = data->count_ / 2u;
 		const JobData leftData(data->data_, leftCount, data->pFunction_, splitter);
-		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
+		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, leftData JOB_SYS_SUB_PASS(job->subSystem));
 		jobSys.Run(left);
 
 		const size_t rightCount = data->count_ - leftCount;
 		const JobData rightData(data->data_ + leftCount, rightCount, data->pFunction_, splitter);
-		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
+		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, rightData JOB_SYS_SUB_PASS(job->subSystem));
 		jobSys.Run(right);
 	}
 	else
@@ -299,12 +324,12 @@ static inline void parallel_for_member_job(JobSystem& jobSys, size_t threadIdx, 
 		// split in two
 		const uint32_t leftCount = data->count_ / 2u;
 		const JobData leftData(data->delagte_, data->data_, leftCount, splitter);
-		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData);
+		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData JOB_SYS_SUB_PASS(job->subSystem));
 		jobSys.Run(left);
 
 		const uint32_t rightCount = data->count_ - leftCount;
 		const JobData rightData(data->delagte_, data->data_ + leftCount, rightCount, splitter);
-		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData);
+		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData JOB_SYS_SUB_PASS(job->subSystem));
 		jobSys.Run(right);
 	}
 	else
@@ -429,62 +454,66 @@ private:
 
 
 public:
-	Job* CreateJob(JobFunction::Pointer function);
-	Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function);
+	Job* CreateJob(JobFunction::Pointer function JOB_SYS_SUB_PARAM);
+	Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function JOB_SYS_SUB_PARAM);
 
-	X_INLINE Job* CreateJob(JobFunction::Pointer function, void* pData);
-	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData);
+	X_INLINE Job* CreateJob(JobFunction::Pointer function, void* pData JOB_SYS_SUB_PARAM);
+	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData JOB_SYS_SUB_PARAM);
 
 	template<typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
-	X_INLINE Job* CreateJob(JobFunction::Pointer function, const DataT& data);
+	X_INLINE Job* CreateJob(JobFunction::Pointer function, const DataT& data JOB_SYS_SUB_PARAM);
 	template<typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
-	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data);
+	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data JOB_SYS_SUB_PARAM);
 
 	template <typename T, typename SplitterT>
 	X_INLINE Job* parallel_for(T* data, size_t count, 
-		typename parallel_for_job_data<T,SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter);
+		typename parallel_for_job_data<T,SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter JOB_SYS_SUB_PARAM);
 
 	template <typename T, typename SplitterT>
 	X_INLINE Job* parallel_for_child(Job* pParent, T* data, size_t count,
-		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter);
+		typename parallel_for_job_data<T, SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter JOB_SYS_SUB_PARAM);
 
 
 	template <typename ClassType, typename T, typename SplitterT>
 	X_INLINE Job* parallel_for_member(typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del, 
-		T* data, uint32_t count, const SplitterT& splitter);
+		T* data, uint32_t count, const SplitterT& splitter JOB_SYS_SUB_PARAM);
 
 	template <typename ClassType, typename T, typename SplitterT>
 	X_INLINE Job* parallel_for_member_child(Job* pParent, typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del,
-		T* data, uint32_t count, const SplitterT& splitter);
+		T* data, uint32_t count, const SplitterT& splitter JOB_SYS_SUB_PARAM);
 
 	template<typename ClassType>
-	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData);
+	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
+		void* pJobData JOB_SYS_SUB_PARAM);
 
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
-	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction, typename DataT& jobData);
+	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
+		typename DataT& jobData JOB_SYS_SUB_PARAM);
 
 	template<typename ClassType>
-	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData);
+	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
+		void* pJobData JOB_SYS_SUB_PARAM);
 
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
-	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction, typename DataT& jobData);
+	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
+		typename DataT& jobData JOB_SYS_SUB_PARAM);
 
 
 	template<typename ClassType>
 	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, 
-		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData);
+		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData JOB_SYS_SUB_PARAM);
 
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
 	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, 
-		typename member_function_job_copy_data<ClassType,DataT>::MemberFunctionPtr pFunction, typename DataT& jobData);
+		typename member_function_job_copy_data<ClassType,DataT>::MemberFunctionPtr pFunction, typename DataT& jobData JOB_SYS_SUB_PARAM);
 
 	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
 	// empty job used for sync.
 	X_INLINE static void EmptyJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
-	X_INLINE Job* CreateEmtpyJob(void);
-	X_INLINE Job* CreateEmtpyJobAsChild(Job* pPaerent);
+	X_INLINE Job* CreateEmtpyJob(JOB_SYS_SUB_PARAM_SINGLE);
+	X_INLINE Job* CreateEmtpyJobAsChild(Job* pPaerent JOB_SYS_SUB_PARAM);
 
 
 	void Run(Job* pJob);

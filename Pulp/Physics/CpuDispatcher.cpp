@@ -14,7 +14,7 @@ PhysxCpuDispacher::PhysxCpuDispacher(core::V2::JobSystem& jobSystem) :
 
 void PhysxCpuDispacher::submitTask(physx::PxBaseTask& task)
 {
-	core::V2::Job* pJob = jobSystem_.CreateJob(RunTask,&task);
+	core::V2::Job* pJob = jobSystem_.CreateJob(RunTask, &task JOB_SYS_SUB_ARG(core::ProfileSubSys::PHYSICS));
 
 	jobSystem_.Run(pJob);
 }
