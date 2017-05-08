@@ -433,6 +433,7 @@ void XConsole::registerCmds(void)
 	ADD_COMMAND_MEMBER("help", this, XConsole, &XConsole::Command_Help, VarFlag::SYSTEM, "displays help info");
 	ADD_COMMAND_MEMBER("listCmds", this, XConsole, &XConsole::Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
 	ADD_COMMAND_MEMBER("listDvars", this, XConsole, &XConsole::Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
+	ADD_COMMAND_MEMBER("listDvarValues", this, XConsole, &XConsole::Command_ListDvarsValues, VarFlag::SYSTEM, "Same as 'listDvars' but showing values");
 	ADD_COMMAND_MEMBER("exit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
 	ADD_COMMAND_MEMBER("quit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
 	ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
@@ -1965,14 +1966,14 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 
 }
 
-void XConsole::DisplayVarValue(ICVar* pVar)
+void XConsole::DisplayVarValue(const ICVar* pVar)
 {
 	if (!pVar) {
 		return;
 	}
 
 	core::ICVar::StrBuf strBuf;
-	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString(strBuf));
+	X_LOG0("Dvar", "^2\"%s\"^7 = ^6%s", pVar->GetName(), pVar->GetString(strBuf));
 }
 
 void XConsole::DisplayVarInfo(const ICVar* pVar, bool fullInfo)
@@ -2872,6 +2873,35 @@ void XConsole::ListVariables(const char* searchPatten)
 	X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
 
+void XConsole::ListVariablesValues(const char* searchPatten)
+{
+	// i'm not storing the vars in a ordered map since it's slow to get them.
+	// and i only need order when priting them.
+	// so it's not biggy doing the sorting here.
+	core::Array<ICVar*> sorted_vars(g_coreArena);
+	sorted_vars.setGranularity(VarMap_.size());
+
+	for(const auto& it : VarMap_)
+	{
+		ICVar* var = it.second;
+
+		if (!searchPatten || strUtil::WildCompare(searchPatten, var->GetName()))
+		{
+			sorted_vars.emplace_back(var);
+		}
+	}
+
+	sortVarsByName(sorted_vars);
+
+	X_LOG0("Console", "-------------- ^8Vars(%" PRIuS ")^7 --------------", sorted_vars.size());
+
+	for (const auto* pVar : sorted_vars)
+	{
+		DisplayVarValue(pVar);
+	}
+
+	X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
+}
 
 void XConsole::Copy(void)
 {
@@ -2969,6 +2999,18 @@ void XConsole::Command_ListDvars(IConsoleCmdArgs* pCmd)
 	}
 
 	ListVariables(searchPatten);
+}
+
+void XConsole::Command_ListDvarsValues(IConsoleCmdArgs* pCmd)
+{
+	// optional search criteria
+	const char* searchPatten = nullptr;
+
+	if (pCmd->GetArgCount() >= 2) {
+		searchPatten = pCmd->GetArg(1);
+	}
+
+	ListVariablesValues(searchPatten);
 }
 
 void XConsole::Command_Exit(IConsoleCmdArgs* pCmd)
