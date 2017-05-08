@@ -19,6 +19,8 @@ public:
 	X_INLINE float GetSeconds(void) const;
 	X_INLINE float GetMilliSeconds(void) const;
 	X_INLINE TimeVal GetTimeVal(void) const;
+	X_INLINE TimeVal GetStart(void) const;
+	X_INLINE TimeVal GetEnd(void) const;
 
 private:
 

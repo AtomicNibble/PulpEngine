@@ -1,7 +1,7 @@
 
 
 X_INLINE StopWatch::StopWatch(void) :
-start_(SysGet())
+	start_(SysGet())
 {
 	
 }
@@ -33,4 +33,14 @@ X_INLINE TimeVal StopWatch::GetTimeVal(void) const
 {
 	int64_t time = GetCount();
 	return TimeVal(time);
+}
+
+X_INLINE TimeVal StopWatch::GetStart(void) const
+{
+	return TimeVal(start_);
+}
+
+X_INLINE TimeVal StopWatch::GetEnd(void) const
+{
+	return TimeVal(SysGet());
 }
