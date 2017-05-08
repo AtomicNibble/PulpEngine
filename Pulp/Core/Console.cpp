@@ -2842,18 +2842,15 @@ void XConsole::ListCommands(const char* searchPatten)
 
 void XConsole::ListVariables(const char* searchPatten)
 {
-	ConsoleVarMapItor itrVar, itrVarEnd = VarMap_.end();
-	ICVar::FlagType::Description dsc;
-
 	// i'm not storing the vars in a ordered map since it's slow to get them.
 	// and i only need order when priting them.
 	// so it's not biggy doing the sorting here.
 	core::Array<ICVar*> sorted_vars(g_coreArena);
 	sorted_vars.setGranularity(VarMap_.size());
 
-	for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
+	for (const auto& it : VarMap_)
 	{
-		ICVar* var = itrVar->second;
+		ICVar* var = it.second;
 
 		if (!searchPatten || strUtil::WildCompare(searchPatten, var->GetName()))
 		{
@@ -2865,10 +2862,9 @@ void XConsole::ListVariables(const char* searchPatten)
 
 	X_LOG0("Console", "-------------- ^8Vars(%" PRIuS ")^7 --------------", sorted_vars.size());
 
-	core::Array<ICVar*>::ConstIterator it = sorted_vars.begin();
-	for (; it != sorted_vars.end(); ++it)
+	ICVar::FlagType::Description dsc;
+	for (const auto& var : sorted_vars)
 	{
-		const ICVar* var = *it;
 		X_LOG0("Dvar", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", var->GetName(), var->GetFlags().ToString(dsc), var->GetDesc());
 	}
 
@@ -2953,7 +2949,6 @@ void XConsole::Command_Help(IConsoleCmdArgs* pCmd)
 
 void XConsole::Command_ListCmd(IConsoleCmdArgs* pCmd)
 {
-
 	// optional search criteria
 	const char* searchPatten = nullptr;
 
@@ -2966,7 +2961,6 @@ void XConsole::Command_ListCmd(IConsoleCmdArgs* pCmd)
 
 void XConsole::Command_ListDvars(IConsoleCmdArgs* pCmd)
 {
-
 	// optional search criteria
 	const char* searchPatten = nullptr;
 
@@ -2984,10 +2978,12 @@ void XConsole::Command_Exit(IConsoleCmdArgs* pCmd)
 	// we want to exit I guess.
 	// dose this check even make sense?
 	// it might for dedicated server.
-	if (gEnv && gEnv->pCore && gEnv->pCore->GetGameWindow())
+	if (gEnv && gEnv->pCore && gEnv->pCore->GetGameWindow()) {
 		gEnv->pCore->GetGameWindow()->Close();
-	else
+	}
+	else {
 		X_ERROR("Cmd", "Failed to exit game");
+	}
 }
 
 void XConsole::Command_Echo(IConsoleCmdArgs* pCmd)
