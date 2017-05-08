@@ -43,9 +43,11 @@ namespace V2
 
 	}
 
-	void JobQueueHistory::onFrameBegin(void)
+	void JobQueueHistory::onFrameBegin(bool pause)
 	{
-		currentIdx_ = (currentIdx_ + 1) & (HISTORY_COUNT - 1);
+		if (!pause) {
+			currentIdx_ = (currentIdx_ + 1) & (HISTORY_COUNT - 1);
+		}
 
 		atomic::Exchange<long>(&frameHistory_[currentIdx_].bottom_, 0);
 	}
@@ -262,10 +264,12 @@ namespace V2
 	{
 #if X_ENABLE_JOBSYS_PROFILER
 
+		const bool profilerPaused = false;
+
 		for (uint32_t i = 0; i < HW_THREAD_MAX; i++)
 		{
 			if (pTimeLines_[i]) {
-				pTimeLines_[i]->onFrameBegin();
+				pTimeLines_[i]->onFrameBegin(profilerPaused);
 			}
 		}
 

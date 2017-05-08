@@ -183,7 +183,7 @@ public:
 	JobQueueHistory();
 	~JobQueueHistory();
 
-	void onFrameBegin(void);
+	void onFrameBegin(bool pause);
 
 	// called from one thread.
 	Entry* addEntry(void);
