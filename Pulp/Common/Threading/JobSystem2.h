@@ -58,8 +58,9 @@ typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunctio
 
 X_ALIGNED_SYMBOL(struct Job, 64)
 {
-	static const size_t THREAD_IDX_BITS = 4; // 16 threads
+	static const size_t THREAD_IDX_BITS = 4; // 12 threads
 	static const size_t JOB_IDX_BITS = 12;  // 4096
+	static const uint32_t MAX_NUMBER_OF_JOBS = 1 << JOB_IDX_BITS;
 
 	X_PACK_PUSH(2)
 	struct JobId
@@ -77,6 +78,7 @@ X_ALIGNED_SYMBOL(struct Job, 64)
 		+ sizeof(void*)
 		+ (sizeof(core::AtomicInt) * 2)
 		+ (sizeof(JobId) * MAX_CONTINUATIONS)
+		+ sizeof(uint8_t)
 		+ sizeof(uint8_t)));
 
 public:
@@ -91,6 +93,7 @@ public:
 		char pad[PAD_SIZE];
 	};
 
+	uint8_t origThreadIdx;
 	uint8_t runFlags;
 	JobId continuations[MAX_CONTINUATIONS];
 };
@@ -103,15 +106,7 @@ X_ENSURE_SIZE(Job, 128);
 
 #if X_ENABLE_JOBSYS_PROFILER
 
-X_DECLARE_ENUM(ProfilerEvent)(
-	JobStarted,
-	JobComplete,
-
-	JobStolen,	 // job was stolen, the thread that stole stores this
-
-	WorkerAwake, // the worker woke up
-	WorkerUsed	 // the worker actually ran a job
-);
+static const uint32_t MASK = 16;
 
 struct JobSystemStats
 {
@@ -122,8 +117,14 @@ struct JobSystemStats
 	core::AtomicInt workerAwokenMask;	// mask of which works where awoken
 };
 
+
+X_DISABLE_WARNING(4324)
 class JobQueueHistory
 {
+	static const uint32_t HISTORY_COUNT = 16;
+	static const uint32_t MAX_NUMBER_OF_JOBS = Job::MAX_NUMBER_OF_JOBS;
+	static const uint32_t MASK = MAX_NUMBER_OF_JOBS - 1u;
+
 public:
 	struct Entry
 	{
@@ -138,15 +139,36 @@ public:
 
 	X_ENSURE_SIZE(Entry, 24);
 
-	typedef core::Array<Entry> EntryArr;
+	//  24 * 4096 = 98304
+	// 98304 / 1024 = 96kb
+	// 96kb * 12 = 1.1MB
+	// so about 1MB per frame if data for 12 threads.
+	X_ALIGNED_SYMBOL(struct FrameHistory, 64)
+	{
+		FrameHistory();
+
+		long bottom_;
+
+		Entry entryes_[MAX_NUMBER_OF_JOBS];
+	};
+
 public:
-	JobQueueHistory(core::MemoryArenaBase* arena);
+	JobQueueHistory();
 	~JobQueueHistory();
 
+	void onFrameBegin(void);
+
+	// called from one thread.
+	Entry* addEntry(void);
 
 private:
-	EntryArr entries_;
+	long currentIdx_;
+
+	FrameHistory frameHistory_[HISTORY_COUNT];
 };
+X_ENABLE_WARNING(4324)
+
+
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
@@ -155,9 +177,9 @@ X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
 public:
-	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << Job::JOB_IDX_BITS;
+	static const uint32_t MAX_NUMBER_OF_JOBS = Job::MAX_NUMBER_OF_JOBS;
 private:
-	static const unsigned int MASK = MAX_NUMBER_OF_JOBS - 1u;
+	static const uint32_t MASK = MAX_NUMBER_OF_JOBS - 1u;
 
 public:
 	ThreadQue();
@@ -169,11 +191,6 @@ public:
 private:
 	long bottom_;
 	long top_;
-
-
-#if X_ENABLE_JOBSYS_PROFILER
-	JobQueueHistory history_;
-#endif // !X_ENABLE_JOBSYS_PROFILER
 
 	Job* jobs_[MAX_NUMBER_OF_JOBS];
 };
@@ -546,6 +563,8 @@ private:
 	ThreadLocalStorage ThreadAllocator_;
 
 #if X_ENABLE_JOBSYS_PROFILER
+	JobQueueHistory* pTimeLines_[HW_THREAD_MAX];
+
 	JobSystemStats stats_;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 };

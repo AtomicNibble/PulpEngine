@@ -246,9 +246,9 @@ namespace V2
 		size_t threadIdx = GetThreadIndex();
 		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);
 
-		size_t jobIdx = continuation - pThreadAlloc->jobs;
+		ptrdiff_t jobIdx = continuation - pThreadAlloc->jobs;
 
-		X_ASSERT(jobIdx < ThreadQue::MAX_NUMBER_OF_JOBS, "Job index is invalid")(jobIdx, ThreadQue::MAX_NUMBER_OF_JOBS);
+		X_ASSERT(jobIdx >= 0 && jobIdx < ThreadQue::MAX_NUMBER_OF_JOBS, "Job index is invalid")(jobIdx, ThreadQue::MAX_NUMBER_OF_JOBS);
 
 		Job::JobId id;
 		id.threadIdx = threadIdx;

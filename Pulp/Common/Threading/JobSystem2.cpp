@@ -9,6 +9,8 @@
 
 #include <atomic>
 
+#include <Time\StopWatch.h>
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -20,7 +22,45 @@ namespace V2
 		#define COMPILER_BARRIER_W _WriteBarrier();
 		#define COMPILER_BARRIER_RW _ReadWriteBarrier();
 
+	} // namespace
+
+	// ===================================
+
+#if X_ENABLE_JOBSYS_PROFILER
+
+	JobQueueHistory::FrameHistory::FrameHistory()
+	{
+		bottom_ = 0;
 	}
+
+	JobQueueHistory::JobQueueHistory() 
+	{
+		currentIdx_ = 0;
+	}
+
+	JobQueueHistory::~JobQueueHistory()
+	{
+
+	}
+
+	void JobQueueHistory::onFrameBegin(void)
+	{
+		currentIdx_ = (currentIdx_ + 1) & (HISTORY_COUNT - 1);
+
+		atomic::Exchange<long>(&frameHistory_[currentIdx_].bottom_, 0);
+	}
+
+	X_INLINE JobQueueHistory::Entry* JobQueueHistory::addEntry(void)
+	{
+		FrameHistory& history = frameHistory_[currentIdx_];
+		Entry* pEntry = &history.entryes_[history.bottom_ & MASK];
+
+		++history.bottom_;
+
+		return pEntry;
+	}
+
+#endif // !X_ENABLE_JOBSYS_PROFILER
 
 
 	// ===================================
@@ -134,6 +174,9 @@ namespace V2
 		numQues_ = 0;
 		core::zero_object(pThreadQues_);
 		core::zero_object(pJobAllocators_);
+#if X_ENABLE_JOBSYS_PROFILER
+		core::zero_object(pTimeLines_);
+#endif // !X_ENABLE_JOBSYS_PROFILER
 	}
 
 	JobSystem::~JobSystem()
@@ -193,12 +236,22 @@ namespace V2
 			if (pJobAllocators_[i]) {
 				X_DELETE(pJobAllocators_[i], gEnv->pArena);
 			}
+#if X_ENABLE_JOBSYS_PROFILER
+			if (pTimeLines_[i]) {
+				X_DELETE(pTimeLines_[i], gEnv->pArena);
+			}
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 		}
 
 		threadIdToIndex_.clear();
 
 		core::zero_object(pThreadQues_);
 		core::zero_object(pJobAllocators_);
+#if X_ENABLE_JOBSYS_PROFILER
+		core::zero_object(pTimeLines_);
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 
 		// clear main thread tls values also.
 		ThreadQue_.SetValue(nullptr);
@@ -207,7 +260,16 @@ namespace V2
 
 	void JobSystem::OnFrameBegin(void)
 	{
+#if X_ENABLE_JOBSYS_PROFILER
 
+		for (uint32_t i = 0; i < HW_THREAD_MAX; i++)
+		{
+			if (pTimeLines_[i]) {
+				pTimeLines_[i]->onFrameBegin();
+			}
+		}
+
+#endif // !X_ENABLE_JOBSYS_PROFILER
 
 	}
 
@@ -298,6 +360,10 @@ namespace V2
 		X_ASSERT_ALIGNMENT(pThreadQues_[idx], 64, 0);
 		X_ASSERT_ALIGNMENT(&pJobAllocators_[idx]->jobs, 64, 0);
 
+#if X_ENABLE_JOBSYS_PROFILER
+		pTimeLines_[idx] = X_NEW(JobQueueHistory, gEnv->pArena, "JobThreadTimeline");
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 		numQues_ = idx + 1;
 	}
 
@@ -361,6 +427,10 @@ namespace V2
 			Job* nextJob = GetJob(threadQue);
 			if (nextJob)
 			{
+#if X_ENABLE_JOBSYS_PROFILER
+				++stats_.jobsAssited;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 				Execute(nextJob, threadIdx);
 			}
 		}
@@ -384,6 +454,11 @@ namespace V2
 		Job* nextJob = GetJob(threadQue);
 		if (nextJob)
 		{
+
+#if X_ENABLE_JOBSYS_PROFILER
+			++stats_.jobsAssited;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 			Execute(nextJob, threadIdx);
 			return true;
 		}
@@ -398,7 +473,16 @@ namespace V2
 		ThreadJobAllocator* pAllocator = GetWorkerThreadAllocator();
 
 		const uint32_t index = pAllocator->allocated++;
+
+#if X_ENABLE_JOBSYS_PROFILER
+		size_t threadIdx = GetThreadIndex();
+
+		Job* pJob = &pAllocator->jobs[index & (JobSystem::MAX_JOBS - 1u)];
+		pJob->origThreadIdx = safe_static_cast<uint8_t>(threadIdx);
+		return pJob;
+#else
 		return &pAllocator->jobs[index & (JobSystem::MAX_JOBS - 1u)];
+#endif // !X_ENABLE_JOBSYS_PROFILER
 	}
 
 	Job* JobSystem::AllocateJob(size_t threadIdx)
@@ -406,7 +490,14 @@ namespace V2
 		ThreadJobAllocator* pAllocator = GetWorkerThreadAllocator(threadIdx);
 
 		const uint32_t index = pAllocator->allocated++;
+
+#if X_ENABLE_JOBSYS_PROFILER
+		Job* pJob = &pAllocator->jobs[index & (JobSystem::MAX_JOBS - 1u)];
+		pJob->origThreadIdx = safe_static_cast<uint8_t>(threadIdx);
+		return pJob;
+#else
 		return &pAllocator->jobs[index & (JobSystem::MAX_JOBS - 1u)];
+#endif // !X_ENABLE_JOBSYS_PROFILER
 	}
 
 	void JobSystem::FreeJob(Job* pJob)
@@ -477,7 +568,6 @@ namespace V2
 				return nullptr;
 			}
 
-
 #if X_ENABLE_JOBSYS_PROFILER
 			++stats_.jobsStolen;
 #endif // !X_ENABLE_JOBSYS_PROFILER
@@ -517,7 +607,31 @@ namespace V2
 
 	void JobSystem::Execute(Job* pJob, size_t threadIdx)
 	{
+#if X_ENABLE_JOBSYS_PROFILER
+		auto* pTimeLine = pTimeLines_[threadIdx];
+		auto* pEntry = pTimeLine->addEntry();
+
+		core::StopWatch timer;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 		(pJob->pFunction)(*this, threadIdx, pJob, pJob->pArgData);
+
+#if X_ENABLE_JOBSYS_PROFILER
+		pEntry->start = timer.GetStart();
+		pEntry->end = timer.GetEnd();
+
+		// work out the id.
+		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(pJob->origThreadIdx);
+		ptrdiff_t jobIdx = (pJob - pThreadAlloc->jobs);
+
+		pEntry->id.threadIdx = pJob->origThreadIdx;
+		pEntry->id.jobIdx = safe_static_cast<uint16_t>(jobIdx);
+
+		++stats_.jobsRun;
+		stats_.workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
+
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 		Finish(pJob, threadIdx);
 	}
 
@@ -632,10 +746,14 @@ namespace V2
 
 		int32_t backoff = 0;
 
+		{
+			CriticalSection::ScopedLock lock(condCS_);
+			cond_.Wait(condCS_);
 
-		std::atomic<int> goat;
-
-		goat &= 1;
+#if X_ENABLE_JOBSYS_PROFILER
+			stats_.workerAwokenMask |= static_cast<int32_t>(BIT(threadIdx));
+#endif // !X_ENABLE_JOBSYS_PROFILER
+		}
 
 		while (thread.ShouldRun())
 		{
@@ -655,19 +773,15 @@ namespace V2
 					// if we not had a job for a while, ensure all que's are empty
 					// if so wait on the consition.
 					pJob = GetJobCheckAllQues(threadQue);
-					if (pJob) {
+					if (pJob)
+					{
 						backoff = 0;
 						Execute(pJob, threadIdx);
 					}
-					else {
+					else 
+					{
 						CriticalSection::ScopedLock lock(condCS_);
 						cond_.Wait(condCS_);
-					
-
-#if X_ENABLE_JOBSYS_PROFILER
-						stats_.workerAwokenMask |= static_cast<int32_t>(threadIdx);
-#endif // !X_ENABLE_JOBSYS_PROFILER
-
 					}
 				}
 			}
