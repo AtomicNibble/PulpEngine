@@ -164,6 +164,8 @@ bool XProfileSys::init(ICore* pCore)
 	subSystemInfo_[ProfileSubSys::PHYSICS].name = "Physics";
 	subSystemInfo_[ProfileSubSys::NETWORK].name = "Network";
 	subSystemInfo_[ProfileSubSys::UNCLASSIFIED].name = "UnClassified";
+	subSystemInfo_[ProfileSubSys::TOOL].name = "Tool";
+	subSystemInfo_[ProfileSubSys::UNITTEST].name = "UnitTests";
 
 #if X_DEBUG
 	// check i've not forgot to add one.

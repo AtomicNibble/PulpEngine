@@ -37,7 +37,9 @@ X_DECLARE_ENUM8(ProfileSubSys)(
 	SOUND, 
 	GAME, 
 	PHYSICS, 
-	NETWORK
+	NETWORK,
+	TOOL,
+	UNITTEST
 );
 
 
