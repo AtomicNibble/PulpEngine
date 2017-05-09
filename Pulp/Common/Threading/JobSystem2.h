@@ -456,6 +456,8 @@ public:
 	ThreadIdArray getThreadIds(void);
 
 #if X_ENABLE_JOBSYS_PROFILER
+	X_INLINE int32_t getCurrentProfilerIdx(void) const;
+
 	X_INLINE const ProfilerThreadTimelinesArr& GetTimeLines(void) const;
 	X_INLINE const ProfilerStatsArr& GetStats(void) const;
 #endif // !X_ENABLE_JOBSYS_PROFILER

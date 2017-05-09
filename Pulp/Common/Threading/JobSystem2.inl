@@ -282,6 +282,12 @@ namespace V2
 
 
 #if X_ENABLE_JOBSYS_PROFILER
+
+	X_INLINE int32_t JobSystem::getCurrentProfilerIdx(void) const
+	{
+		return currentHistoryIdx_;
+	}
+
 	X_INLINE const JobSystem::ProfilerThreadTimelinesArr& JobSystem::GetTimeLines(void) const
 	{
 		return pTimeLines_;
@@ -291,6 +297,7 @@ namespace V2
 	{
 		return stats_;
 	}
+
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 
