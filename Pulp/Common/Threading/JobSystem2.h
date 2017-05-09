@@ -135,7 +135,7 @@ X_ENSURE_SIZE(Job, 128);
 
 static const uint32_t MASK = 16;
 
-static const uint32_t PROFILER_HISTORY_COUNT = 16;
+static const uint32_t JOBSYS_HISTORY_COUNT = 16;
 
 struct JobSystemStats
 {
@@ -184,7 +184,7 @@ public:
 	JobQueueHistory();
 	~JobQueueHistory();
 
-	void onFrameBegin(bool pause);
+	void sethistoryIndex(int32_t historyIdx);
 
 	// called from one thread.
 	Entry* addEntry(void);
@@ -192,7 +192,7 @@ public:
 private:
 	long currentIdx_;
 
-	FrameHistory frameHistory_[PROFILER_HISTORY_COUNT];
+	FrameHistory frameHistory_[JOBSYS_HISTORY_COUNT];
 };
 X_ENABLE_WARNING(4324)
 
@@ -439,7 +439,7 @@ public:
 	typedef core::FixedArray<uint32_t, HW_THREAD_MAX > ThreadIdArray;
 
 #if X_ENABLE_JOBSYS_PROFILER
-	typedef std::array<JobSystemStats, PROFILER_HISTORY_COUNT> ProfilerStatsArr;
+	typedef std::array<JobSystemStats, JOBSYS_HISTORY_COUNT> ProfilerStatsArr;
 	typedef std::array<JobQueueHistory*, HW_THREAD_MAX> ProfilerThreadTimelinesArr;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 

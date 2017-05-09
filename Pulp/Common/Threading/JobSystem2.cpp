@@ -43,11 +43,10 @@ namespace V2
 
 	}
 
-	void JobQueueHistory::onFrameBegin(bool pause)
+	// void JobQueueHistory::onFrameBegin(bool pause)
+	void JobQueueHistory::sethistoryIndex(int32_t historyIdx)
 	{
-		if (!pause) {
-			currentIdx_ = (currentIdx_ + 1) & (PROFILER_HISTORY_COUNT - 1);
-		}
+		currentIdx_ = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
 
 		atomic::Exchange<long>(&frameHistory_[currentIdx_].bottom_, 0);
 	}
@@ -263,14 +262,14 @@ namespace V2
 	void JobSystem::OnFrameBegin(bool isProfilerPaused)
 	{
 #if X_ENABLE_JOBSYS_PROFILER
-		if (isProfilerPaused) {
-			currentHistoryIdx_ = (currentHistoryIdx_ + 1) & (PROFILER_HISTORY_COUNT - 1);
+		if (!isProfilerPaused) {
+			currentHistoryIdx_ = (currentHistoryIdx_ + 1) & (JOBSYS_HISTORY_COUNT - 1);
 		}
 
 		for (uint32_t i = 0; i < HW_THREAD_MAX; i++)
 		{
 			if (pTimeLines_[i]) {
-				pTimeLines_[i]->onFrameBegin(isProfilerPaused);
+				pTimeLines_[i]->sethistoryIndex(currentHistoryIdx_);
 			}
 		}
 
