@@ -28,6 +28,17 @@ namespace V2
 
 #if X_ENABLE_JOBSYS_PROFILER
 
+	void JobSystemStats::clear(void)
+	{
+		jobsStolen = 0;			
+		jobsRun = 0;
+		jobsAssited = 0;
+		workerUsedMask = 0;
+		workerAwokenMask = 0;
+	}
+
+	// ===================================
+
 	JobQueueHistory::FrameHistory::FrameHistory()
 	{
 		bottom_ = 0;
@@ -262,8 +273,11 @@ namespace V2
 	void JobSystem::OnFrameBegin(bool isProfilerPaused)
 	{
 #if X_ENABLE_JOBSYS_PROFILER
-		if (!isProfilerPaused) {
+		if (!isProfilerPaused) 
+		{
 			currentHistoryIdx_ = (currentHistoryIdx_ + 1) & (JOBSYS_HISTORY_COUNT - 1);
+
+			stats_[currentHistoryIdx_].clear();
 		}
 
 		for (uint32_t i = 0; i < HW_THREAD_MAX; i++)

@@ -139,6 +139,8 @@ static const uint32_t JOBSYS_HISTORY_COUNT = 16;
 
 struct JobSystemStats
 {
+	void clear(void);
+
 	core::AtomicInt jobsStolen;			// total jobs stolen
 	core::AtomicInt jobsRun;			// total jobs run
 	core::AtomicInt jobsAssited;		// total jobs run via WaitWithHelp
@@ -180,11 +182,14 @@ public:
 		Entry entryes_[MAX_NUMBER_OF_JOBS];
 	};
 
+	typedef std::array<FrameHistory, JOBSYS_HISTORY_COUNT> FrameHistoryArr;
+
 public:
 	JobQueueHistory();
 	~JobQueueHistory();
 
 	void sethistoryIndex(int32_t historyIdx);
+	X_INLINE const FrameHistoryArr& getHistory(void) const;
 
 	// called from one thread.
 	Entry* addEntry(void);
@@ -192,7 +197,7 @@ public:
 private:
 	long currentIdx_;
 
-	FrameHistory frameHistory_[JOBSYS_HISTORY_COUNT];
+	FrameHistoryArr frameHistory_;
 };
 X_ENABLE_WARNING(4324)
 
