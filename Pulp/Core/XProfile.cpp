@@ -115,6 +115,9 @@ namespace profiler
 		X_LOG0("ProfileSys", "Starting");
 		X_UNUSED(pCore);
 
+		pCore->GetCoreEventDispatcher()->RegisterListener(this);
+
+
 		return true;
 	}
 
@@ -154,6 +157,16 @@ namespace profiler
 
 
 
+	}
+
+
+	void XProfileSys::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+	{
+		if (event == CoreEvent::RENDER_RES_CHANGED)
+		{
+			renderRes_.x = static_cast<int32_t>(wparam);
+			renderRes_.y = static_cast<int32_t>(lparam);
+		}
 	}
 
 	void XProfileSys::Render(void)

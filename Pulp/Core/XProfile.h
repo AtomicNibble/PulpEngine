@@ -22,7 +22,9 @@ X_NAMESPACE_BEGIN(core)
 namespace profiler
 {
 
-	class XProfileSys : public IProfileReg
+	class XProfileSys : 
+		public IProfileReg,
+		public ICoreEventListener
 	{
 
 	public:
@@ -47,8 +49,16 @@ namespace profiler
 		X_INLINE const ProfilerVars& getVars(void) const;
 
 	private:
+		// ICoreEventListener		
+		void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam);
+
+
+	private:
 		ProfilerVars vars_;
 
+
+		// rendering stuff
+		Vec2i renderRes_;
 	};
 
 } // namespace profiler
