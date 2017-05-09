@@ -123,6 +123,16 @@ inline constexpr float PercentageOf(const T& sub, const T2& of)
 	return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
 }
 
+
+template<class InputIt, class T>
+inline T accumulate(InputIt first, InputIt last, T init)
+{
+	for (; first != last; ++first) {
+		init = init + *first;
+	}
+	return init;
+}
+
 template<class InputIt, class T, class BinaryOperation>
 inline T accumulate(InputIt first, InputIt last, T init, BinaryOperation op)
 {
