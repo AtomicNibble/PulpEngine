@@ -23,7 +23,6 @@ X_NAMESPACE_BEGIN(core)
 // 
 // 
 
-#define X_PROFILE_ENABLE_THREADS 1
 #define X_PROFILE_HISTORY_SIZE 64
 
 X_DECLARE_ENUM8(ProfileSubSys)(
@@ -50,21 +49,18 @@ public:
 
 	T getAvg(void) const 
 	{
-		T avg = (T)0;
-		const_iterator it = begin();
-		for (; it != end(); ++it) 
-			avg += (*it);
-			
-		return avg / (T)size();
+		return core::accumulate(begin(), end(), 0) / size();
 	}
 
 	T getMin(void) const 
 	{
 		T min = (T)0;
 		const_iterator it = begin();
-		for (min = (*it); it != end(); ++it)
-			if (min > (*it))
+		for (min = (*it); it != end(); ++it) {
+			if (min > (*it)) {
 				min = (*it);
+			}
+		}
 		return min;
 	}
 
@@ -72,9 +68,11 @@ public:
 	{
 		T max = (T)0;
 		const_iterator it = begin();
-		for (max = (*it); it != end(); ++it)
-			if (max < (*it))
+		for (max = (*it); it != end(); ++it) {
+			if (max < (*it)) {
 				max = (*it);
+			}
+		}
 		return max;
 	}
 };
@@ -93,18 +91,16 @@ public:
 		nickName_(nick),
 		functionName_(function),
 		pCore_(pCore),
-		callCount_(0)
-#ifdef X_PROFILE_ENABLE_THREADS
-		, threadID_(0)
-#endif
-		, hasChildren_(0)
-		, subSystem_(sys)
+		callCount_(0),
+		threadID_(0),
+		hasChildren_(0),
+		subSystem_(sys)
 	{
-		X_ASSERT_NOT_NULL(pCore);
-		X_ASSERT_NOT_NULL(pCore->GetIProfileSys());
+	//	X_ASSERT_NOT_NULL(pCore);
+	//	X_ASSERT_NOT_NULL(pCore->GetIProfileSys());
 
 		// add it.
-		pCore->GetIProfileSys()->AddProfileData(this);
+	//	pCore->GetIProfileSys()->AddProfileData(this);
 	}
 
 	friend class XProfileSys;
@@ -126,9 +122,7 @@ protected:
 	XProfileData*	pParent_;			// parent node
 
 	int				callCount_;			// reset each frame
-#ifdef X_PROFILE_ENABLE_THREADS
 	int				threadID_;			
-#endif // X_PROFILE_ENABLE_THREADS
 
 	uint8			hasChildren_;
 	ProfileSubSys::Enum subSystem_;
@@ -155,7 +149,7 @@ public:
 		// we are best sending this to the profile system since we need more
 		// info than we have in current scope.
 		// like stack :D	
-		if (gEnv->IsProfilerEnabled())
+		if (gEnv->profileScopeStart)
 		{
 			pData_ = pData;
 			gEnv->profileScopeStart(this);
@@ -167,8 +161,9 @@ public:
 
 	~XProfileScope()
 	{
-		if (pData_)
+		if (pData_) {
 			gEnv->profileScopeEnd(this);
+		}
 	}
 
 	friend class XProfileSys;
@@ -189,9 +184,14 @@ private:
 	static core::XProfileData __Profiledata(gEnv->pCore, __FUNCTION__, nickname, sys); \
 	core::XProfileScope       __ProfileLogCall(&__Profiledata);
 
+#define X_PROFILE_STARTUP_BEGIN(nickname, sys) \
+	static core::XProfileData __Profiledata(gEnv->pCore, __FUNCTION__, nickname, sys); \
+	core::XProfileScope       __ProfileLogCall(&__Profiledata);
+
 #else
 
 #define X_PROFILE_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
+#define X_PROFILE_STARTUP_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 
 
 #endif // !X_ENABLE_PROFILER

@@ -89,7 +89,8 @@ XCore::XCore() :
 	pConsole_(nullptr),
 	pCpuInfo_(nullptr),
 	pCrc32_(nullptr),
-	pProfileSys_(nullptr),
+	pProfiler_(nullptr),
+	pProfileRegister_(nullptr),
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
 	pEventDispatcher_(nullptr),
@@ -154,7 +155,6 @@ XCore::XCore() :
 
 	env_.client_ = true;
 	env_.dedicated_ = false;
-	env_.profilerEnabled_ = false;
 
 	// created in coreInit.
 	//	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
@@ -284,10 +284,15 @@ void XCore::ShutDown()
 		core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
 	}
 
-	if (pProfileSys_)
+	if (pProfileRegister_ && pProfileRegister_ != pProfiler_)
 	{
-		pProfileSys_->shutDown();
-		core::Mem::DeleteAndNull(pProfileSys_, g_coreArena);
+		core::Mem::DeleteAndNull(pProfileRegister_, g_coreArena);
+	}
+
+	if (pProfiler_)
+	{
+		pProfiler_->shutDown();
+		core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
 	}
 
 	if (env_.pConsole && !initParams_.basicConsole())

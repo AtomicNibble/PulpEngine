@@ -5,8 +5,7 @@
 
 #include <Containers\Array.h>
 
-#include <IRender.h>
-#include <IFont.h>
+#include "Vars\ProfilerVars.h"
 
 X_NAMESPACE_DECLARE(render, struct IRender);
 
@@ -15,9 +14,46 @@ X_NAMESPACE_DECLARE(engine,
 );
 
 
-#define X_PROFILE_FRAME_TIME_HISTORY_SIZE 64
 
 X_NAMESPACE_BEGIN(core)
+
+#if 1
+
+namespace profiler
+{
+
+	class XProfileSys : public IProfileReg
+	{
+
+	public:
+		XProfileSys(core::MemoryArenaBase* arena);
+		~XProfileSys() X_FINAL;
+
+		void registerVars(void);
+		void registerCmds(void);
+
+		bool init(ICore* pCore);
+		bool loadRenderResources(void);
+		void shutDown(void);
+
+		void AddStartupProfileData(XProfileData* pData) X_FINAL;
+		void AddProfileData(XProfileData* pData) X_FINAL;
+
+		void OnFrameBegin(void);
+		void OnFrameEnd(void);
+
+		void Render(void);
+
+		X_INLINE const ProfilerVars& getVars(void) const;
+
+	private:
+		ProfilerVars vars_;
+
+	};
+
+} // namespace profiler
+
+#else
 
 class XProfileSys : public IProfileSys
 {
@@ -139,7 +175,7 @@ private:
 	typedef core::Array<XProfileData*>	Profilers;
 	typedef core::Array<ProfileDisplayInfo>	DisplayInfo;
 
-	typedef core::ProfilerHistory<float, X_PROFILE_FRAME_TIME_HISTORY_SIZE> FrameTimes;
+	typedef core::ProfilerHistory<float, X_PROFILE_HISTORY_SIZE> FrameTimes;
 
 
 	ICore*		pCore_;
@@ -171,9 +207,11 @@ private:
 	int s_drawFrameTimeBar_;
 };
 
-
+#endif
 
 X_NAMESPACE_END
+
+#include "XProfile.inl"
 
 #endif // !_X_PROFILE_H_
 

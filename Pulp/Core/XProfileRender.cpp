@@ -21,6 +21,7 @@ namespace
 
 }
 
+#if 0
 
 void XProfileSys::Render(void)
 {
@@ -437,5 +438,6 @@ void XProfileSys::ClearSubSystems(void)
 	}
 }
 
+#endif
 
 X_NAMESPACE_END

@@ -326,6 +326,21 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::invalidParameterHandler::Startup(); 
 	core::exceptionHandler::Startup();
 
+	if (startupParams.bProfileSysEnabled)
+	{
+		pProfiler_ = X_NEW(core::profiler::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
+
+		if (!pProfiler_->init(this)) {
+			return false;
+		}
+
+		pProfileRegister_ = pProfiler_;
+	}
+	else
+	{
+		pProfileRegister_ = X_NEW(core::profiler::ProfileNull, g_coreArena, "ProfileSys")();
+	}
+
 	if (startupParams.loadSymbols()) {
 		core::symbolResolution::Startup();
 	}
@@ -396,6 +411,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 	}
 
+	// reg profiler vars.
+	if (pProfiler_)	{
+		pProfiler_->registerVars();
+		pProfiler_->registerCmds();
+	}
+
+
 	// register verbosity vars.
 	if (pConsoleLogger_) {
 		pConsoleLogger_->GetFilterPolicy().RegisterVars();
@@ -443,25 +465,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (startupParams.jobSystemEnabled()) {
 		env_.pFileSys->initWorker();
 	}
-
-
-	// #------------------------- ProfileSys ---------------------------
-	if (startupParams.bProfileSysEnabled)
-	{
-		pProfileSys_ = X_NEW(core::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
-	}
-	else
-	{
-		pProfileSys_ = X_NEW(core::ProfileNull, g_coreArena, "ProfileSys")();
-	}
-
-	pProfileSys_->registerVars();
-	pProfileSys_->registerCmds();
-
-	if (!pProfileSys_->init(this)) {
-		return false;
-	}
-
 
 	if(!startupParams.isCoreOnly())
 	{
@@ -542,9 +545,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;
 		}
 
-		if (!pProfileSys_->loadRenderResources()) {
-			return false;
-		}
+	//	if (!pProfileSys_->loadRenderResources()) {
+	//		return false;
+	//	}
 	}
 
 	// sync net inits before 3d engine.

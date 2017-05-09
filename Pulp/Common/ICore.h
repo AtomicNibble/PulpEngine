@@ -19,7 +19,6 @@
 #endif
 
 #include <ILog.h>
-#include <IProfile.h>
 
 struct ICore;
 struct IPotatoFactoryRegistry;
@@ -38,7 +37,6 @@ struct IJobSystem;
 struct IXHotReloadManager;
 struct IXDirectoryWatcher;
 struct FrameData;
-struct IProfileSys;
 class XProfileScope;
 class Crc32;
 class CpuInfo;
@@ -218,7 +216,6 @@ struct SCoreGlobals // obbject is zerod on start.
 	font::IFontSys*				pFontSys;
 	sound::ISound*				pSound;
 	core::ILog*					pLog;
-//	core::IProfileSys*			pProfileSys;
 	script::IScriptSys*			pScriptSys;
 	render::IRender*			pRender;
 	engine::I3DEngine*			p3DEngine;
@@ -265,17 +262,13 @@ struct SCoreGlobals // obbject is zerod on start.
 #endif // defined(X_DEDICATED_SERVER)
 	}
 
-	X_INLINE const bool IsProfilerEnabled(void) const {
-		return profilerEnabled_;
-	}
-
 
 protected:
 	friend class XCore;
 
 	bool client_;
 	bool dedicated_;			// Engine is in dedicated 
-	bool profilerEnabled_;
+	bool _pad;
 	State::Enum state_; 
 };
 
@@ -315,7 +308,7 @@ struct ICore
 	virtual font::IFontSys* GetIFontSys(void) X_ABSTRACT;
 	virtual core::V2::JobSystem* GetJobSystem(void) X_ABSTRACT;
 	virtual physics::IPhysics* GetPhysics(void) X_ABSTRACT;
-	virtual core::IProfileSys* GetIProfileSys(void) X_ABSTRACT;
+	virtual core::profiler::IProfileReg* GetIProfileReg(void) X_ABSTRACT;
 	virtual core::ILog* GetILog(void) X_ABSTRACT;
 	virtual core::IXDirectoryWatcher* GetDirWatcher(void) X_ABSTRACT;
 	virtual core::IXHotReloadManager* GetHotReloadMan(void) X_ABSTRACT;

@@ -4,25 +4,18 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
-class ProfileNull : public IProfileSys
+namespace profiler
 {
-	void registerVars(void) X_FINAL;
-	void registerCmds(void) X_FINAL;
 
-	bool init(ICore* pCore) X_FINAL;
-	void shutDown(void) X_FINAL;
+	class ProfileNull : public IProfileReg
+	{
+		~ProfileNull() X_FINAL = default;
 
-	bool loadRenderResources(void) X_FINAL;
+		void AddStartupProfileData(XProfileData* pData) X_FINAL;
+		void AddProfileData(XProfileData* pData) X_FINAL;
+	};
 
-	void AddProfileData(XProfileData* pData) X_FINAL;
-
-	void OnFrameBegin(void) X_FINAL;
-	void OnFrameEnd(void) X_FINAL;
-
-	void Render(void) X_FINAL;
-};
-
+} // namespace profiler
 
 X_NAMESPACE_END
 

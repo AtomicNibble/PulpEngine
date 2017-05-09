@@ -57,10 +57,9 @@ X_INLINE physics::IPhysics* XCore::GetPhysics(void)
 	return env_.pPhysics;
 }
 
-
-X_INLINE core::IProfileSys* XCore::GetIProfileSys(void)
+X_INLINE core::profiler::IProfileReg* XCore::GetIProfileReg(void)
 {
-	return pProfileSys_;
+	return pProfileRegister_;
 }
 
 X_INLINE core::IXDirectoryWatcher* XCore::GetDirWatcher(void)

@@ -515,6 +515,7 @@
     <None Include="Core.inl" />
     <None Include="Vars\ProfilerVars.inl" />
     <None Include="win32\SystemTimer.inl" />
+    <None Include="XProfile.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

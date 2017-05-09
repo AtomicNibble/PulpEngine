@@ -84,6 +84,91 @@ namespace
 
 };
 
+#if 1
+
+namespace profiler
+{
+
+	XProfileSys::XProfileSys(core::MemoryArenaBase* arena)
+	{
+		X_UNUSED(arena);
+	}
+
+	XProfileSys::~XProfileSys()
+	{
+
+	}
+
+	void XProfileSys::registerVars(void)
+	{
+		vars_.RegisterVars();
+	}
+
+	void XProfileSys::registerCmds(void)
+	{
+
+	}
+
+
+	bool XProfileSys::init(ICore* pCore)
+	{
+		X_LOG0("ProfileSys", "Starting");
+		X_UNUSED(pCore);
+
+		return true;
+	}
+
+
+	void XProfileSys::shutDown(void)
+	{
+		// ...
+		gEnv->profileScopeStart = nullptr;
+		gEnv->profileScopeEnd = nullptr;
+	}
+
+	bool XProfileSys::loadRenderResources(void)
+	{
+
+		return true;
+	}
+
+
+	void XProfileSys::AddStartupProfileData(XProfileData* pData)
+	{
+		X_UNUSED(pData);
+	}
+
+	void XProfileSys::AddProfileData(XProfileData* pData)
+	{
+		X_UNUSED(pData);
+
+	}
+
+	void XProfileSys::OnFrameBegin(void)
+	{
+	
+	}
+
+	void XProfileSys::OnFrameEnd(void)
+	{
+
+
+
+	}
+
+	void XProfileSys::Render(void)
+	{
+
+
+
+	}
+
+} // namespace profiler
+
+
+#else
+
+
 XProfileSys* XProfileSys::s_this = nullptr;
 
 XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
@@ -363,6 +448,7 @@ void XProfileSys::ScopeEnd(XProfileScope* pProScope)
 
 // ~Static
 
+#endif
 
 
 X_NAMESPACE_END

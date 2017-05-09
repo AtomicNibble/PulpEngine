@@ -4,55 +4,20 @@
 
 X_NAMESPACE_BEGIN(core)
 
-void ProfileNull::registerVars(void)
+namespace profiler
 {
 
-}
+	void ProfileNull::AddStartupProfileData(XProfileData* pData)
+	{
+		X_UNUSED(pData);
+	}
 
-void ProfileNull::registerCmds(void)
-{
+	void ProfileNull::AddProfileData(XProfileData* pData)
+	{
+		X_UNUSED(pData);
+	}
 
-}
-
-bool ProfileNull::init(ICore* pCore)
-{
-	X_UNUSED(pCore);
-
-	return true;
-}
-
-void ProfileNull::shutDown(void)
-{
-
-}
-
-bool ProfileNull::loadRenderResources(void)
-{
-
-	return true;
-}
-
-
-void ProfileNull::AddProfileData(XProfileData* pData)
-{
-	X_UNUSED(pData);
-}
-
-void ProfileNull::OnFrameBegin(void)
-{
-
-}
-
-void ProfileNull::OnFrameEnd(void)
-{
-
-}
-
-void ProfileNull::Render(void)
-{
-
-
-}
+} // namespace profiler
 
 X_NAMESPACE_END
 

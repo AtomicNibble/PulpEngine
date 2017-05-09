@@ -7,29 +7,21 @@ struct ICore;
 
 X_NAMESPACE_BEGIN(core)
 
+namespace profiler
+{
+
+
 class XProfileData;
 
-struct IProfileSys
+struct IProfileReg
 {
-	virtual ~IProfileSys(){};
+	virtual ~IProfileReg(){};
 
-	virtual void registerVars(void) X_ABSTRACT;
-	virtual void registerCmds(void) X_ABSTRACT;
-
-	virtual bool init(ICore* pCore) X_ABSTRACT;
-	virtual void shutDown(void) X_ABSTRACT;
-
-	virtual bool loadRenderResources(void) X_ABSTRACT;
-
+	virtual void AddStartupProfileData(XProfileData* pData) X_ABSTRACT;
 	virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
-
-	virtual void OnFrameBegin(void) X_ABSTRACT;
-	virtual void OnFrameEnd(void) X_ABSTRACT;
-
-	virtual void Render(void) X_ABSTRACT;
-
 };
 
+} // namespace profielr
 
 X_NAMESPACE_END
 

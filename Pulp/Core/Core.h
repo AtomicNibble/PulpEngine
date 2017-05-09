@@ -40,7 +40,6 @@ struct IPotatoFactoryRegistryImpl;
 struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
-class XProfileSys;
 class xWindow;
 class Console;
 )
@@ -107,7 +106,7 @@ public:
 	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_FINAL;
 	X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
 
-	X_INLINE core::IProfileSys* GetIProfileSys(void) X_FINAL;
+	X_INLINE core::profiler::IProfileReg* GetIProfileReg(void) X_FINAL;
 	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
 	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
 	
@@ -238,7 +237,8 @@ private:
 	ConverterModulesArr				converterInterfaces_;
 	ArrsetHandlersArr				assertHandlers_;
 
-	core::IProfileSys*				pProfileSys_;
+	core::profiler::XProfileSys*	pProfiler_;
+	core::profiler::IProfileReg*	pProfileRegister_;
 
 	// Hot reload stuff
 	core::XDirectoryWatcher			dirWatcher_;
