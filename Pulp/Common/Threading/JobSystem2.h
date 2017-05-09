@@ -135,6 +135,8 @@ X_ENSURE_SIZE(Job, 128);
 
 static const uint32_t MASK = 16;
 
+static const uint32_t PROFILER_HISTORY_COUNT = 16;
+
 struct JobSystemStats
 {
 	core::AtomicInt jobsStolen;			// total jobs stolen
@@ -148,7 +150,6 @@ struct JobSystemStats
 X_DISABLE_WARNING(4324)
 class JobQueueHistory
 {
-	static const uint32_t HISTORY_COUNT = 16;
 	static const uint32_t MAX_NUMBER_OF_JOBS = Job::MAX_NUMBER_OF_JOBS;
 	static const uint32_t MASK = MAX_NUMBER_OF_JOBS - 1u;
 
@@ -191,7 +192,7 @@ public:
 private:
 	long currentIdx_;
 
-	FrameHistory frameHistory_[HISTORY_COUNT];
+	FrameHistory frameHistory_[PROFILER_HISTORY_COUNT];
 };
 X_ENABLE_WARNING(4324)
 
@@ -436,17 +437,28 @@ public:
 	static_assert(ThreadQue::MAX_NUMBER_OF_JOBS == MAX_JOBS, "ThreadQue max jobs is not equal");
 
 	typedef core::FixedArray<uint32_t, HW_THREAD_MAX > ThreadIdArray;
+
+#if X_ENABLE_JOBSYS_PROFILER
+	typedef std::array<JobSystemStats, PROFILER_HISTORY_COUNT> ProfilerStatsArr;
+	typedef std::array<JobQueueHistory*, HW_THREAD_MAX> ProfilerThreadTimelinesArr;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
 public:
 	JobSystem();
 	~JobSystem();
 
 	bool StartUp(void);
 	void ShutDown(void);
-	void OnFrameBegin(void);
+	void OnFrameBegin(bool isProfilerPaused);
 
 	void CreateQueForCurrentThread(void);
 	uint32_t GetThreadCount(void) const;
 	ThreadIdArray getThreadIds(void);
+
+#if X_ENABLE_JOBSYS_PROFILER
+	X_INLINE const ProfilerThreadTimelinesArr& GetTimeLines(void) const;
+	X_INLINE const ProfilerStatsArr& GetStats(void) const;
+#endif // !X_ENABLE_JOBSYS_PROFILER
 
 private:
 	bool StartThreads(void);
@@ -592,9 +604,10 @@ private:
 	ThreadLocalStorage ThreadAllocator_;
 
 #if X_ENABLE_JOBSYS_PROFILER
-	JobQueueHistory* pTimeLines_[HW_THREAD_MAX];
+	ProfilerThreadTimelinesArr pTimeLines_;
 
-	JobSystemStats stats_;
+	core::AtomicInt currentHistoryIdx_;
+	ProfilerStatsArr stats_;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 };
 

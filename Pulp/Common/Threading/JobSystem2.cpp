@@ -46,7 +46,7 @@ namespace V2
 	void JobQueueHistory::onFrameBegin(bool pause)
 	{
 		if (!pause) {
-			currentIdx_ = (currentIdx_ + 1) & (HISTORY_COUNT - 1);
+			currentIdx_ = (currentIdx_ + 1) & (PROFILER_HISTORY_COUNT - 1);
 		}
 
 		atomic::Exchange<long>(&frameHistory_[currentIdx_].bottom_, 0);
@@ -260,18 +260,23 @@ namespace V2
 		ThreadAllocator_.SetValue(nullptr);
 	}
 
-	void JobSystem::OnFrameBegin(void)
+	void JobSystem::OnFrameBegin(bool isProfilerPaused)
 	{
 #if X_ENABLE_JOBSYS_PROFILER
-
-		const bool profilerPaused = false;
+		if (isProfilerPaused) {
+			currentHistoryIdx_ = (currentHistoryIdx_ + 1) & (PROFILER_HISTORY_COUNT - 1);
+		}
 
 		for (uint32_t i = 0; i < HW_THREAD_MAX; i++)
 		{
 			if (pTimeLines_[i]) {
-				pTimeLines_[i]->onFrameBegin(profilerPaused);
+				pTimeLines_[i]->onFrameBegin(isProfilerPaused);
 			}
 		}
+
+#else
+		X_UNUSED(isProfilerPaused);
+
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
@@ -440,7 +445,7 @@ namespace V2
 			if (nextJob)
 			{
 #if X_ENABLE_JOBSYS_PROFILER
-				++stats_.jobsAssited;
+				++stats_[currentHistoryIdx_].jobsAssited;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 				Execute(nextJob, threadIdx);
@@ -468,7 +473,7 @@ namespace V2
 		{
 
 #if X_ENABLE_JOBSYS_PROFILER
-			++stats_.jobsAssited;
+			++stats_[currentHistoryIdx_].jobsAssited;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 			Execute(nextJob, threadIdx);
@@ -581,7 +586,7 @@ namespace V2
 			}
 
 #if X_ENABLE_JOBSYS_PROFILER
-			++stats_.jobsStolen;
+			++stats_[currentHistoryIdx_].jobsStolen;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 			return stolenJob;
@@ -607,7 +612,7 @@ namespace V2
 			if (!IsEmptyJob(stolenJob)) {
 
 #if X_ENABLE_JOBSYS_PROFILER
-				++stats_.jobsStolen;
+				++stats_[currentHistoryIdx_].jobsStolen;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 				return stolenJob;
@@ -643,8 +648,8 @@ namespace V2
 		pEntry->subsystem = pJob->subSystem;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
-		++stats_.jobsRun;
-		stats_.workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
+		++stats_[currentHistoryIdx_].jobsRun;
+		stats_[currentHistoryIdx_].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
@@ -767,7 +772,7 @@ namespace V2
 			cond_.Wait(condCS_);
 
 #if X_ENABLE_JOBSYS_PROFILER
-			stats_.workerAwokenMask |= static_cast<int32_t>(BIT(threadIdx));
+			stats_[currentHistoryIdx_].workerAwokenMask |= static_cast<int32_t>(BIT(threadIdx));
 #endif // !X_ENABLE_JOBSYS_PROFILER
 		}
 

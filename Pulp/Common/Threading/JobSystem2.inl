@@ -280,6 +280,20 @@ namespace V2
 	}
 
 
+
+#if X_ENABLE_JOBSYS_PROFILER
+	X_INLINE const JobSystem::ProfilerThreadTimelinesArr& JobSystem::GetTimeLines(void) const
+	{
+		return pTimeLines_;
+	}
+
+	X_INLINE const JobSystem::ProfilerStatsArr& JobSystem::GetStats(void) const
+	{
+		return stats_;
+	}
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
+
 } // namespace V2
 
 X_NAMESPACE_END
