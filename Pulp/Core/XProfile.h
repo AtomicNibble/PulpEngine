@@ -26,6 +26,14 @@ namespace profiler
 		public IProfileReg,
 		public ICoreEventListener
 	{
+		struct SubSystemInfo
+		{
+			const char* pName;
+			Colorf col;
+		};
+
+		typedef std::array<SubSystemInfo, ProfileSubSys::ENUM_COUNT> SubSystemInfoArr;
+
 
 	public:
 		XProfileSys(core::MemoryArenaBase* arena);
@@ -56,6 +64,7 @@ namespace profiler
 	private:
 		ProfilerVars vars_;
 
+		SubSystemInfoArr subSystemInfo_;
 
 		// rendering stuff
 		Vec2i renderRes_;
