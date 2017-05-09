@@ -203,4 +203,28 @@ X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDraw
 }
 
 
+X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pFormat, va_list args)
+{
+	core::StackString<2048, wchar_t> temp;
+	temp.appendFmt(pFormat, args);
+
+	drawText(pos, con, temp.begin(), temp.end());
+}
+
+X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pText)
+{
+	drawText(pos, con, pText, pText + core::strUtil::strlen(pText));
+}
+
+X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText)
+{
+	drawText(Vec3f(x, y, 1), con, pText, pText + core::strUtil::strlen(pText));
+}
+
+X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText, const wchar_t* pEnd)
+{
+	drawText(Vec3f(x, y, 1), con, pText, pEnd);
+}
+
+
 X_NAMESPACE_END
