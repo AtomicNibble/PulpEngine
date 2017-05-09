@@ -59,6 +59,8 @@ namespace profiler
 
 		// rendering stuff
 		Vec2i renderRes_;
+		font::IFont* pFont_;
+
 	};
 
 } // namespace profiler

@@ -89,7 +89,8 @@ namespace
 namespace profiler
 {
 
-	XProfileSys::XProfileSys(core::MemoryArenaBase* arena)
+	XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
+		pFont_(nullptr)
 	{
 		X_UNUSED(arena);
 	}
@@ -131,8 +132,9 @@ namespace profiler
 
 	bool XProfileSys::loadRenderResources(void)
 	{
+		pFont_ = gEnv->pFontSys->GetFont("default");
 
-		return true;
+		return pFont_ != nullptr;
 	}
 
 
