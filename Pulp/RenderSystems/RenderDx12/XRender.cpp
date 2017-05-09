@@ -348,6 +348,9 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
 	initILDescriptions();
 
+	// send a event for initial size.
+	gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::RENDER_RES_CHANGED, displayRes_.x, displayRes_.y);
+
 	return true;
 }
 
