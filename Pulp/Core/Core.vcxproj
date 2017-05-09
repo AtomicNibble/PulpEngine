@@ -454,6 +454,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Vars\ProfilerVars.h" />
     <ClInclude Include="win32\OsFile.h" />
     <ClInclude Include="win32\OsFileAsync.h" />
     <ClInclude Include="win32\OsFileAsyncOperation.h" />
@@ -495,6 +496,7 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="ConsoleVariable.cpp" />
+    <ClCompile Include="Vars\ProfilerVars.cpp" />
     <ClCompile Include="win32\OsFile.cpp" />
     <ClCompile Include="win32\OsFileAsync.cpp" />
     <ClInclude Include="win32\OsFileAsyncOperation.inl">
@@ -511,6 +513,7 @@
     <None Include="Console.inl" />
     <None Include="ConsoleVariable.inl" />
     <None Include="Core.inl" />
+    <None Include="Vars\ProfilerVars.inl" />
     <None Include="win32\SystemTimer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -39,6 +39,12 @@
     <Filter Include="Source Files\FileSys">
       <UniqueIdentifier>{c16af5aa-9d77-466b-b4a8-f296de522ba7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{f6f4ce34-7c35-458f-9e8f-f582e246db14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{989165e9-7a08-469d-a3c7-b16ff7556e3a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -125,6 +131,9 @@
     <ClInclude Include="NullImplementation\ProfileNull.h">
       <Filter>NullImplementation</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\ProfilerVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -202,6 +211,9 @@
     <ClCompile Include="NullImplementation\ProfileNull.cpp">
       <Filter>NullImplementation</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\ProfilerVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\SystemTimer.inl">
@@ -215,6 +227,9 @@
     </None>
     <None Include="Core.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="Vars\ProfilerVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>
