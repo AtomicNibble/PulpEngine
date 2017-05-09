@@ -330,10 +330,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	{
 		pProfiler_ = X_NEW(core::profiler::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
 
-		if (!pProfiler_->init(this)) {
-			return false;
-		}
-
 		pProfileRegister_ = pProfiler_;
 	}
 	else
@@ -415,6 +411,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (pProfiler_)	{
 		pProfiler_->registerVars();
 		pProfiler_->registerCmds();
+
+		if (!pProfiler_->init(this)) {
+			return false;
+		}
 	}
 
 
@@ -545,9 +545,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;
 		}
 
-	//	if (!pProfileSys_->loadRenderResources()) {
-	//		return false;
-	//	}
+		if(pProfiler_) {
+			if (!pProfiler_->loadRenderResources()) {
+				return false;
+			}
+		}
 	}
 
 	// sync net inits before 3d engine.
