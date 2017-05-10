@@ -106,7 +106,7 @@ public:
 
 
 //	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-//		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
+//		const wchar_t* pStr, const font::TextDrawContext& ctx) const X_OVERRIDE;
 
 	void Draw2dText(float posX, float posY,const char* pStr, const XDrawTextInfo& ti);
 	// ~font

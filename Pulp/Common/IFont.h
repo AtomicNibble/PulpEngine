@@ -55,7 +55,7 @@ typedef Flags<DrawTextFlag> DrawTextFlags;
 
 X_DECLARE_FLAG_OPERATORS(DrawTextFlags);
 
-struct XTextDrawConect
+struct TextDrawContext
 {
 	Color8u	col;  // 4
 	Vec2f	size; // 8
@@ -66,7 +66,7 @@ struct XTextDrawConect
 	DrawTextFlags flags;
 	IFont* pFont;
 
-	XTextDrawConect() :
+	TextDrawContext() :
 		widthScale(1.f),
 		size(16.f,16.f),
 		effectId(-1),
@@ -87,7 +87,6 @@ struct XTextDrawConect
 };
 
 
-typedef XTextDrawConect TextDrawContext;
 
 
 
@@ -136,20 +135,20 @@ struct IFont
 
 	// these draw the text into the primative context.
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon,
-		const Vec3f& pos, const XTextDrawConect& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
+		const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon,
-		const Vec3f& pos, const XTextDrawConect& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
+		const Vec3f& pos, const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 
 
 	virtual size_t GetTextLength(const char* pBegin, const char* pEnd, const bool asciiMultiLine) const X_ABSTRACT;
 	virtual size_t GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bool asciiMultiLine) const X_ABSTRACT;
 
 	// calculate the size.
-	virtual Vec2f GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex) X_ABSTRACT;
-	virtual Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex) X_ABSTRACT;
+	virtual Vec2f GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex) X_ABSTRACT;
+	virtual Vec2f GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex) X_ABSTRACT;
 
 	// size of N chars, for none monospace fonts it just uses space.
-	virtual float32_t GetCharWidth(wchar_t cChar, size_t num, const XTextDrawConect& contex) X_ABSTRACT;
+	virtual float32_t GetCharWidth(wchar_t cChar, size_t num, const TextDrawContext& contex) X_ABSTRACT;
 
 	virtual int32_t GetEffectId(const char* pEffectName) const X_ABSTRACT;
 

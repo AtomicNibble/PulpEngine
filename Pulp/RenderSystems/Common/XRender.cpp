@@ -269,7 +269,7 @@ int XRender::FontCreateTexture(const Vec2i& size, BYTE *pData,
 }
 
 void XRender::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
-	const wchar_t* pStr, const font::XTextDrawConect& ctx) const
+	const wchar_t* pStr, const font::TextDrawContext& ctx) const
 {
 
 	pFont->RenderCallback(pos, pStr, ctx);
@@ -393,7 +393,7 @@ void XRender::Draw2dText(float posX, float posY, const char* pStr, const XDrawTe
 		return;
 
 
-	font::XTextDrawConect ctx;
+	font::TextDrawContext ctx;
 	ctx.SetColor(ti.col);
 	ctx.SetCharWidthScale(1.0f);
 

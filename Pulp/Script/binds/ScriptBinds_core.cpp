@@ -332,7 +332,7 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 	}
 
 
-	font::XTextDrawConect ctx;
+	font::TextDrawContext ctx;
 	ctx.SetColor(Color(r, g, b, a));
 	ctx.SetSize(Vec2f(size, size));
 //	ctx.SetProportional(true);

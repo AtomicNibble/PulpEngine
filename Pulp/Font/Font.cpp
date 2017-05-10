@@ -134,7 +134,7 @@ bool XFont::WaitTillReady(void)
 
 void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 {
-	font::XTextDrawConect ctx;
+	font::TextDrawContext ctx;
 	ctx.pFont = this;
 	ctx.effectId = 0;
 	ctx.SetSize(Vec2f(20.f, 20.f));
@@ -286,7 +286,7 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-	const XTextDrawConect& contex, const char* pBegin, const char* pEnd)
+	const TextDrawContext& contex, const char* pBegin, const char* pEnd)
 {
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -305,7 +305,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 }
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-	const XTextDrawConect& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
+	const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	const size_t textLen = (pEnd - pBegin);
 	if (!textLen) {
@@ -748,7 +748,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 }
 
 
-Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& ctx)
+Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& ctx)
 {
 	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
 
@@ -954,7 +954,7 @@ size_t XFont::GetTextLength(const wchar_t* pBegin, const wchar_t* pEnd, const bo
 
 
 // calculate the size.
-Vec2f XFont::GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSize(const char* pBegin, const char* pEnd, const TextDrawContext& contex)
 {
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -963,12 +963,12 @@ Vec2f XFont::GetTextSize(const char* pBegin, const char* pEnd, const XTextDrawCo
 	return GetTextSizeWInternal(strW, strW + len, contex);
 }
 
-Vec2f XFont::GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const XTextDrawConect& contex)
+Vec2f XFont::GetTextSize(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex)
 {
 	return GetTextSizeWInternal(pBegin, pEnd, contex);
 }
 
-float32_t XFont::GetCharWidth(wchar_t cChar, size_t num, const XTextDrawConect& contex)
+float32_t XFont::GetCharWidth(wchar_t cChar, size_t num, const TextDrawContext& contex)
 {
 	Vec2f size = GetTextSizeWInternal(&cChar, &cChar + 1, contex);
 

@@ -128,7 +128,7 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
-	font::XTextDrawConect con;
+	font::TextDrawContext con;
 	con.pFont = pFont_;
 	con.SetDefaultEffect();
 	con.col = Col_Red;

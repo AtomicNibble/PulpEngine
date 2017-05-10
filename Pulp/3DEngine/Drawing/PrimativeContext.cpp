@@ -7,6 +7,7 @@
 #include <IShader.h>
 #include <CBuffer.h>
 #include <IAssetDb.h>
+#include <IFont.h>
 
 #include "CmdBucket.h"
 #include "VariableStateManager.h"

@@ -5,6 +5,7 @@
 #include <Util\Process.h>
 
 #include <IConsole.h>
+#include <IFont.h>
 
 #include "Profile\ProfilerTypes.h"
 

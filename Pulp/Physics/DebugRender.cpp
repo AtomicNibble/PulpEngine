@@ -3,6 +3,7 @@
 #include "MathHelpers.h"
 
 #include <IPrimativeContext.h>
+#include <IFont.h>
 
 X_NAMESPACE_BEGIN(physics)
 

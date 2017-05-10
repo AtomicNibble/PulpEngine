@@ -18,6 +18,7 @@
 #include <IFileSys.h>
 #include <IFrameData.h>
 #include <IPrimativeContext.h>
+#include <IFont.h>
 #include <I3DEngine.h>
 
 #include "Platform\Window.h"
@@ -2155,7 +2156,7 @@ void XConsole::DrawBuffer(void)
 	const float width = res.x - 10.f;
 	const float height = res.y - 40.f;
 
-	font::XTextDrawConect ctx;
+	font::TextDrawContext ctx;
 	ctx.pFont = pFont_;
 	ctx.effectId = 0;
 	ctx.SetColor(Col_Khaki);
@@ -2397,7 +2398,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		std::sort(results.begin(), results.end());
 
 		// Font contex
-		font::XTextDrawConect ctx;
+		font::TextDrawContext ctx;
 		ctx.pFont = pFont_;
 		ctx.effectId = 0;
 		ctx.SetSize(Vec2f(14, 14));

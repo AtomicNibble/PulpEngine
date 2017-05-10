@@ -3,7 +3,8 @@
 struct Vertex_P3F_T2F_C4B;
 
 #include <IRender.h>
-#include <IFont.h>
+
+X_NAMESPACE_DECLARE(font, struct TextDrawContext);
 
 X_NAMESPACE_BEGIN(engine)
 
