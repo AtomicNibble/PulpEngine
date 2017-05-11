@@ -1517,7 +1517,7 @@ void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, floa
 	float x = x_;
 	float y = y_;
 
-	font::XTextDrawConect contex;
+	font::TextDrawContext contex;
 	contex.widthScale = 1.0f;
 	contex.col = Colorf(foreColor_);
 
