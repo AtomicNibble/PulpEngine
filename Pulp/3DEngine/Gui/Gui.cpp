@@ -7,6 +7,7 @@
 #include <IFileSys.h>
 #include <IRender.h>
 #include <IPrimativeContext.h>
+#include <IFont.h>
 
 #include "GuiManger.h"
 

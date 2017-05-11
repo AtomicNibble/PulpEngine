@@ -8,6 +8,7 @@
 #include <IGui.h>
 #include <IPhysics.h>
 #include <IFrameData.h>
+#include <IFont.h>
 
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
