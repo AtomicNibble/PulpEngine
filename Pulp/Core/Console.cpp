@@ -540,8 +540,6 @@ bool XConsole::loadRenderResources(void)
 
 	pRender_ = pCore_->GetIRender();
 	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
-
-	renderRes_ = pRender_->getDisplayRes();
 	return true;
 }
 
@@ -2147,9 +2145,7 @@ void XConsole::DrawBuffer(void)
 	const Vec2f outputFontSize(static_cast<float>(console_output_font_size), static_cast<float>(console_output_font_size));
 	const Vec2f inputFontSize(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE));
 
-
-	Vec2f res;
-	res = pRender_->getDisplayRes();
+	const Vec2i& res = renderRes_;
 
 	const float xStart = 5.f;
 	const float yStart = 35.f;
@@ -2252,18 +2248,17 @@ void XConsole::DrawScrollBar(void)
 	if(pFont_ && pPrimContext_ && pRender_)
 	{
 		// oooo shit nuggger wuggger.
-		Vec2f res;
-		res = pRender_->getDisplayRes();
+		const Vec2i& res = renderRes_;
 
-		const float width = res.x - 10;
-		const float height = res.y - 40;
+		const float width = res.x - 10.f;
+		const float height = res.y - 40.f;
 
-		const float barWidth = 6;
-		const float marging = 5;
-		const float sliderHeight = 20;
+		const float barWidth = 6.f;
+		const float marging = 5.f;
+		const float sliderHeight = 20.f;
 
 		float start_x = (width + 5) - (barWidth + marging);
-		float start_y = 35 + marging;
+		float start_y = 35.f + marging;
 		float barHeight = height - (marging * 2);
 
 		float slider_x = start_x;
@@ -2713,8 +2708,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		// the input
 		if (!InputBuffer_.isEmpty())
 		{
-			Vec2f res;
-			res = pRender_->getDisplayRes();
+			const Vec2i& res = renderRes_;
 
 			const float width = res.x - 10.f;
 			const Vec2f inputFontSize(static_cast<float>(CONSOLE_INPUT_FONT_SIZE), static_cast<float>(CONSOLE_INPUT_FONT_SIZE));
