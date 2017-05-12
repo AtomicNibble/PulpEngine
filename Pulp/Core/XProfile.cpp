@@ -92,7 +92,11 @@ namespace profiler
 
 	XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
 		pFont_(nullptr),
-		profilerData_(arena)
+		profilerData_(arena),
+		profilerHistoryData_(arena),
+		frameStartTime_(0),
+		frameTime_(0),
+		totalTime_(0)
 	{
 		
 	}
@@ -172,9 +176,17 @@ namespace profiler
 
 	void XProfileSys::AddProfileData(XProfileData* pData)
 	{
-		X_ASSERT(profilerData_.find(pData) == decltype(profilerData_)::invalid_index, "Data node already added")();
-
-		profilerData_.emplace_back(pData);
+		if (pData->getType() == XProfileData::Type::SingleShot)
+		{
+			X_ASSERT(profilerData_.find(pData) == decltype(profilerData_)::invalid_index, "Data node already added")();
+			profilerData_.emplace_back(pData);
+		}
+		else
+		{
+			auto* pDataHistory = static_cast<decltype(profilerHistoryData_)::Type>(pData);
+			X_ASSERT(profilerHistoryData_.find(pDataHistory) == decltype(profilerHistoryData_)::invalid_index, "Data node already added")();
+			profilerHistoryData_.emplace_back(pDataHistory);
+		}
 	}
 
 
@@ -192,14 +204,26 @@ namespace profiler
 
 	void XProfileSys::OnFrameBegin(void)
 	{
-	
+		if (vars_.isPaused()) {
+			return;
+		}
+
+		frameStartTime_ = ProfileTimer::getTicks();
 	}
 
 	void XProfileSys::OnFrameEnd(void)
 	{
+		if (vars_.isPaused()) {
+			return;
+		}
 
+		uint64_t end = ProfileTimer::getTicks();
 
+		// update some time stats.
+		frameTime_ = end - frameStartTime_;
+		totalTime_ += frameTime_;
 
+		UpdateProfileData();
 	}
 
 
@@ -209,6 +233,14 @@ namespace profiler
 		{
 			renderRes_.x = static_cast<int32_t>(wparam);
 			renderRes_.y = static_cast<int32_t>(lparam);
+		}
+	}
+
+	void XProfileSys::UpdateProfileData(void)
+	{
+		for(auto* pData : profilerHistoryData_)
+		{
+			pData->onFrameBegin();
 		}
 	}
 

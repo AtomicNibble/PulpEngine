@@ -34,6 +34,7 @@ namespace profiler
 
 		typedef std::array<SubSystemInfo, profiler::SubSys::ENUM_COUNT> SubSystemInfoArr;
 		typedef core::Array<XProfileData*>	ProfilerDataPtrArr;
+		typedef core::Array<XProfileDataHistory*>	ProfilerDataHistoryPtrArr;
 
 
 	public:
@@ -65,6 +66,10 @@ namespace profiler
 		// ICoreEventListener		
 		void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam);
 
+	private:
+		void UpdateProfileData(void);
+
+
 
 	private:
 		ProfilerVars vars_;
@@ -76,6 +81,11 @@ namespace profiler
 		font::IFont* pFont_;
 
 		ProfilerDataPtrArr profilerData_;
+		ProfilerDataHistoryPtrArr profilerHistoryData_;
+
+		uint64_t frameStartTime_;
+		uint64_t frameTime_;
+		uint64_t totalTime_;
 	};
 
 } // namespace profiler
