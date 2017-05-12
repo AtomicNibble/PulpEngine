@@ -118,7 +118,7 @@ namespace profiler
 
 		X_INLINE Type::Enum getType(void);
 
-	protected:
+	public:
 		core::SourceInfo sourceInfo_;
 		const char*		 pNickName_;
 
@@ -134,6 +134,7 @@ namespace profiler
 
 		uint8			hasChildren_;
 		SubSys::Enum	subSystem_;
+	protected:
 		Type::Enum		type_;
 	};
 
@@ -214,11 +215,11 @@ namespace profiler
 			}
 		}
 
-	private:
+	public:
 		uint64_t	start_;
 		uint64_t	excludeTime_;
 
-		XProfileScope*		pParent_;
+	//	XProfileScope*		pParent_;
 		XProfileData*		pData_;
 	};
 

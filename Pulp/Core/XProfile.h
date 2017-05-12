@@ -51,8 +51,8 @@ namespace profiler
 		// IProfiler
 		void AddProfileData(XProfileData* pData) X_FINAL;
 
-		void ScopeBegin(XProfileScope* pData) X_FINAL;
-		void ScopeEnd(XProfileScope* pData) X_FINAL;
+		void ScopeBegin(XProfileScope* pScope) X_FINAL;
+		void ScopeEnd(XProfileScope* pScope) X_FINAL;
 		// ~IProfiler
 
 		void OnFrameBegin(void);

@@ -190,16 +190,43 @@ namespace profiler
 	}
 
 
-	void XProfileSys::ScopeBegin(XProfileScope* pData)
+	void XProfileSys::ScopeBegin(XProfileScope* pScope)
 	{
-		X_UNUSED(pData);
-
+		pScope->start_ = ProfileTimer::getTicks();
+		pScope->excludeTime_ = 0llu;
 	}
 
-	void XProfileSys::ScopeEnd(XProfileScope* pData)
+	void XProfileSys::ScopeEnd(XProfileScope* pScope)
 	{
-		X_UNUSED(pData);
+		XProfileData* data = pScope->pData_;
 
+		uint64_t end = ProfileTimer::getTicks();
+		uint64_t totalTime = (end - pScope->start_);
+
+		uint64_t selftime = totalTime - pScope->excludeTime_;
+
+		data->time_ += totalTime;
+		data->timeSelf_ += selftime;
+		data->callCount_++;
+
+		// in order to support callstacks i would need to make thread specific stacks.
+		// otherwise shit will get messy.
+		// for now i just won't bother with stacks.
+
+#if 0
+		if (pScope->pParent_)
+		{
+			XProfileScope* pScopeParent = pScope->pParent_;
+
+			// If we have parent, add this counter total time to parent exclude time.
+			pScopeParent->excludeTime_ += totalTime;
+			if (!data->pParent_ && pScopeParent->pData_)
+			{
+				pScopeParent->pData_->hasChildren_ = 1;
+				data->pParent_ = pScopeParent->pData_;
+			}
+		}
+#endif
 	}
 
 	void XProfileSys::OnFrameBegin(void)

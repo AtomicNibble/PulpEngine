@@ -19,8 +19,8 @@ namespace profiler
 
 		virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
 
-		virtual void ScopeBegin(XProfileScope* pData) X_ABSTRACT;
-		virtual void ScopeEnd(XProfileScope* pData) X_ABSTRACT;
+		virtual void ScopeBegin(XProfileScope* pScope) X_ABSTRACT;
+		virtual void ScopeEnd(XProfileScope* pScope) X_ABSTRACT;
 	};
 
 } // namespace profielr
