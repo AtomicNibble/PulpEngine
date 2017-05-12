@@ -172,9 +172,9 @@ namespace profiler
 
 	void XProfileSys::AddProfileData(XProfileData* pData)
 	{
-		X_UNUSED(pData);
-		profilerData_.emplace_back(pData);
+		X_ASSERT(profilerData_.find(pData) == decltype(profilerData_)::invalid_index, "Data node already added")();
 
+		profilerData_.emplace_back(pData);
 	}
 
 
