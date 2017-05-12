@@ -85,7 +85,14 @@ namespace profiler
 	class XProfileData
 	{
 	public:
-		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
+		X_DECLARE_ENUM8(Type) (
+			SingleShot,
+			History
+		);
+
+	protected:
+		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys,
+			Type::Enum type) :
 			pCore_(pCore),
 			pNickName_(pNickName),
 			sourceInfo_(sourceInfo),
@@ -93,16 +100,23 @@ namespace profiler
 			timeSelf_(0),
 			pParent_(nullptr),
 			callCount_(0),
-			threadID_(0),
 			hasChildren_(0),
-			subSystem_(sys)
+			subSystem_(sys),
+			threadID_(core::Thread::GetCurrentID()),
+			type_(type)
 		{
-			threadID_ = core::Thread::GetCurrentID();
+		}
 
+	public:
+		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
+			XProfileData(pCore, sourceInfo, pNickName, sys, Type::SingleShot)
+		{
 			if (gEnv->pProfiler) {
 				gEnv->pProfiler->AddProfileData(this);
 			}
 		}
+
+		X_INLINE Type::Enum getType(void);
 
 	protected:
 		core::SourceInfo sourceInfo_;
@@ -120,10 +134,15 @@ namespace profiler
 
 		uint8			hasChildren_;
 		SubSys::Enum	subSystem_;
-		uint16_t		_pad;
+		Type::Enum		type_;
 	};
 
 	X_ENSURE_SIZE(SubSys::Enum, 1);
+	
+	X_INLINE XProfileData::Type::Enum XProfileData::getType(void)
+	{
+		return type_;
+	}
 
 
 	class XProfileDataHistory : public XProfileData
@@ -134,9 +153,11 @@ namespace profiler
 
 	public:
 		XProfileDataHistory(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
-			XProfileData(pCore, sourceInfo, pNickName, sys)
+			XProfileData(pCore, sourceInfo, pNickName, sys, Type::History)
 		{
-
+			if (gEnv->pProfiler) {
+				gEnv->pProfiler->AddProfileData(this);
+			}
 		}
 
 	protected:
