@@ -78,7 +78,7 @@ X_ALIGNED_SYMBOL(struct Job, 64)
 		+ sizeof(void*)
 		+ (sizeof(core::AtomicInt) * 2)
 		+ (sizeof(JobId) * MAX_CONTINUATIONS)
-		+ sizeof(ProfileSubSys::Enum)
+		+ sizeof(profiler::SubSys::Enum)
 		+ sizeof(uint8_t)
 		+ sizeof(uint8_t)));
 
@@ -95,7 +95,7 @@ public:
 	};
 
 #if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
-	ProfileSubSys::Enum subSystem;
+	profiler::SubSys::Enum subSystem;
 #else 
 	uint8_t _subSysPad;
 #endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
@@ -116,8 +116,8 @@ X_ENSURE_SIZE(Job, 128);
 #define JOB_SYS_SUB_ARG_SINGLE(sub) sub
 #define JOB_SYS_SUB_ARG(sub) , sub
 
-#define JOB_SYS_SUB_PARAM , ProfileSubSys::Enum subSystem
-#define JOB_SYS_SUB_PARAM_SINGLE ProfileSubSys::Enum subSystem
+#define JOB_SYS_SUB_PARAM , profiler::SubSys::Enum subSystem
+#define JOB_SYS_SUB_PARAM_SINGLE profiler::SubSys::Enum subSystem
 #define JOB_SYS_SUB_PASS(sub) , sub
 
 #else 
@@ -163,7 +163,7 @@ public:
 		core::TimeVal end;
 
 		Job::JobId id; // 2 
-		ProfileSubSys::Enum subsystem; // 1
+		profiler::SubSys::Enum subsystem; // 1
 		uint8_t _pad[5];
 	};
 

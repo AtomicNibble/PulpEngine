@@ -46,10 +46,10 @@ TEST(Threading, JobSystem2Empty)
 
 		size_t i;
 
-		Job* root = jobSys.CreateJob(&EmptyJob JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+		Job* root = jobSys.CreateJob(&EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 		for (i = 0; i < numJobs; ++i)
 		{
-			Job* job = jobSys.CreateJobAsChild(root, &EmptyJob JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+			Job* job = jobSys.CreateJobAsChild(root, &EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 			jobSys.Run(job);
 		}
 
@@ -104,11 +104,11 @@ namespace Data
 			const unsigned int rightCount = data->count - leftCount;
 
 			const parallel_for_job_data leftData(data->data, leftCount, data->function);
-			Job* left = jobSys.CreateJobAsChild(pJob, parallel_for_job, leftData JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+			Job* left = jobSys.CreateJobAsChild(pJob, parallel_for_job, leftData JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 			jobSys.Run(left);
 
 			const parallel_for_job_data rightData(data->data, leftCount, data->function);
-			Job* right = jobSys.CreateJobAsChild(pJob, parallel_for_job, rightData JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+			Job* right = jobSys.CreateJobAsChild(pJob, parallel_for_job, rightData JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 			jobSys.Run(right);
 		}
 		else
@@ -135,7 +135,7 @@ TEST(Threading, JobSystem2Empty_parallel_data)
 		Data::Goat* data = nullptr;
 
 		const Data::parallel_for_job_data jobData = { data, count, Data::UpdateGoat };
-		Job* root = jobSys.CreateJob(&Data::parallel_for_job, jobData JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+		Job* root = jobSys.CreateJob(&Data::parallel_for_job, jobData JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 		jobSys.Run(root);
 		jobSys.Wait(root);
 
@@ -167,12 +167,12 @@ namespace NoData
 
 
 			Job* left = jobSys.CreateJobAsChild(pJob, parallel_for_job,
-				union_cast<void*, uintptr_t>(leftCount) JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+				union_cast<void*, uintptr_t>(leftCount) JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 
 			jobSys.Run(left);
 
 			Job* right = jobSys.CreateJobAsChild(pJob, parallel_for_job,
-				union_cast<void*, uintptr_t>(rightCount) JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+				union_cast<void*, uintptr_t>(rightCount) JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 
 			jobSys.Run(right);
 		}
@@ -197,7 +197,7 @@ TEST(Threading, JobSystem2Empty_parallel)
 	{
 		timer.Start();
 
-		Job* root = jobSys.CreateJob(&NoData::parallel_for_job, reinterpret_cast<void*>(numJobs) JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+		Job* root = jobSys.CreateJob(&NoData::parallel_for_job, reinterpret_cast<void*>(numJobs) JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 		jobSys.Run(root);
 		jobSys.Wait(root);
 
@@ -224,7 +224,7 @@ TEST(Threading, JobSystem2Empty_parallel_for)
 		uint32_t* pCamels = nullptr;
 
 		Job* job = jobSys.parallel_for(pCamels, 100000,
-			&UpdateCamel, DataSizeSplitter(1024) JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+			&UpdateCamel, DataSizeSplitter(1024) JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 
 		jobSys.Run(job);
 		jobSys.Wait(job);
@@ -275,7 +275,7 @@ TEST(Threading, JobSystem2Empty_member_func)
 
 		Member::JobClass inst;
 
-		Job* job = jobSys.CreateMemberJob<Member::JobClass>(&inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+		Job* job = jobSys.CreateMemberJob<Member::JobClass>(&inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 
 		jobSys.Run(job);
 		jobSys.Wait(job);
@@ -305,20 +305,20 @@ TEST(Threading, JobSystem2Empty_continuations)
 
 		Member::JobClass inst;
 
-		Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::ProfileSubSys::UNITTEST));
+		Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::UNITTEST));
 
-		Job* pJob = jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST));
+		Job* pJob = jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
 
 		// adds jobs that are run after the job above finished.
 		// they are also creatd as childs so the parent job waits for them.
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)), true);
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)));
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)), true);
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)));
 	
-		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::UNITTEST)));
+		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pSyncJob, &inst, &Member::JobClass::job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)));
 
 		// if i make a job and it has child jobs
 		// how do i wait for them all to finish?

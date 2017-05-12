@@ -25,28 +25,26 @@ X_NAMESPACE_BEGIN(core)
 
 #define X_PROFILE_HISTORY_SIZE 64
 
-X_DECLARE_ENUM8(ProfileSubSys)(
-	UNCLASSIFIED,
-	CORE, 
-	ENGINE3D, 
-	FONT, 
-	INPUT, 
-	RENDER, 
-	SCRIPT, 
-	SOUND, 
-	GAME, 
-	PHYSICS, 
-	NETWORK,
-	TOOL,
-	UNITTEST
-);
-
-
-
-
-
 namespace profiler
 {
+
+	X_DECLARE_ENUM8(SubSys)(
+		UNCLASSIFIED,
+		CORE,
+		ENGINE3D,
+		FONT,
+		INPUT,
+		RENDER,
+		SCRIPT,
+		SOUND,
+		GAME,
+		PHYSICS,
+		NETWORK,
+		TOOL,
+		UNITTEST
+	);
+
+
 
 	template<typename T, size_t N>
 	class ProfilerHistory : public core::FixedRingBuffer<T, N>
@@ -87,7 +85,7 @@ namespace profiler
 	class XProfileData
 	{
 	public:
-		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, ProfileSubSys::Enum sys) :
+		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
 			pCore_(pCore),
 			pNickName_(pNickName),
 			sourceInfo_(sourceInfo),
@@ -121,9 +119,12 @@ namespace profiler
 		int32_t			threadID_;
 
 		uint8			hasChildren_;
-		ProfileSubSys::Enum subSystem_;
+		SubSys::Enum	subSystem_;
 		uint16_t		_pad;
 	};
+
+	X_ENSURE_SIZE(SubSys::Enum, 1);
+
 
 	class XProfileDataHistory : public XProfileData
 	{
@@ -132,7 +133,7 @@ namespace profiler
 		typedef ProfilerHistory<int, X_PROFILE_HISTORY_SIZE> CallCounts;
 
 	public:
-		XProfileDataHistory(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, ProfileSubSys::Enum sys) :
+		XProfileDataHistory(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
 			XProfileData(pCore, sourceInfo, pNickName, sys)
 		{
 
@@ -181,7 +182,6 @@ namespace profiler
 
 } // namespace profiler
 
-X_ENSURE_SIZE(ProfileSubSys::Enum,1);
 
 
 

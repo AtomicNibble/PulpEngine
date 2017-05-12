@@ -647,7 +647,7 @@ void XTexture::shutDown(void)
 
 void XTexture::update(void)
 {
-	X_PROFILE_BEGIN("TextureUpdate", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("TextureUpdate", core::profiler::SubSys::RENDER);
 
 
 }

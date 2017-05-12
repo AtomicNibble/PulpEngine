@@ -68,7 +68,7 @@ bool XNet::init(void)
 	}
 	else
 	{
-		pInitJob_ = gEnv->pJobSys->CreateMemberJobAndRun<XNet>(this, &XNet::asyncInit_Job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::NETWORK));
+		pInitJob_ = gEnv->pJobSys->CreateMemberJobAndRun<XNet>(this, &XNet::asyncInit_Job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::NETWORK));
 	}
 
 

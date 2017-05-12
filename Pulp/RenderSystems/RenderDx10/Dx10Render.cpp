@@ -608,7 +608,7 @@ void DX11XRender::FreeDynamicBuffers(void)
 
 void DX11XRender::RenderBegin(void)
 {
-	X_PROFILE_BEGIN("DXRenderBegin", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("DXRenderBegin", core::profiler::SubSys::RENDER);
 
 	XRender::RenderBegin();
 
@@ -627,7 +627,7 @@ void DX11XRender::RenderBegin(void)
 
 void DX11XRender::RenderEnd(void)
 {
-	X_PROFILE_BEGIN("DXRenderEnd", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("DXRenderEnd", core::profiler::SubSys::RENDER);
 	XRender::RenderEnd();
 
 

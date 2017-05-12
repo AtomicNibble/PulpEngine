@@ -754,7 +754,7 @@ namespace RawModel
 			{
 				data[i].pMesh = &pMesh[i];
 
-				core::V2::Job* pJob = pJobSys_->CreateJob(&WriteMeshDataJob, static_cast<void*>(&data[i]) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+				core::V2::Job* pJob = pJobSys_->CreateJob(&WriteMeshDataJob, static_cast<void*>(&data[i]) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 				pJobSys_->Run(pJob);
 				
 				data[i].pJob = pJob;

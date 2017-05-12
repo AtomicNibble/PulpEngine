@@ -211,7 +211,7 @@ void X3DEngine::release(void)
 
 void X3DEngine::Update(core::FrameData& frame)
 {
-	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
+	X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);
 
 
 //	Matrix44f view = Matrix44f::identity();
@@ -226,7 +226,7 @@ void X3DEngine::Update(core::FrameData& frame)
 
 void X3DEngine::OnFrameBegin(core::FrameData& frame)
 {
-	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
+	X_PROFILE_BEGIN("3DFrameBegin", core::profiler::SubSys::ENGINE3D);
 
 	level_.dispatchJobs(frame);
 //	if (level_.canRender()) {

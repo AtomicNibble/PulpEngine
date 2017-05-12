@@ -307,7 +307,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 void XDirectoryWatcher::tick(void)
 {
-	X_PROFILE_BEGIN("DirectoryWatcher", core::ProfileSubSys::CORE);
+	X_PROFILE_BEGIN("DirectoryWatcher", core::profiler::SubSys::CORE);
 	// check all the directorys.
 	Directorys::Iterator it = dirs_.begin();
 

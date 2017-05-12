@@ -331,7 +331,7 @@ void XBaseInput::AddClearEvents(core::FrameInput& inputFrame)
 // Hold symbols shizzz
 void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
 {
-	X_PROFILE_BEGIN("PostHoldEvents", core::ProfileSubSys::INPUT);
+	X_PROFILE_BEGIN("PostHoldEvents", core::profiler::SubSys::INPUT);
 
 	size_t count = holdSymbols_.size();
 

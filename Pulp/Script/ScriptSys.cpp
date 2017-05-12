@@ -304,14 +304,14 @@ void XScriptSys::release(void)
 
 void XScriptSys::Update(void)
 {
-	X_PROFILE_BEGIN("ScriptUpdate", core::ProfileSubSys::SCRIPT);
+	X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
 
 	float time = 0.f; //  gEnv->pTimer->GetCurrTime();
 
 	SetGlobalValue("_time", time);
 
 	{
-		X_PROFILE_BEGIN("Lua GC", core::ProfileSubSys::SCRIPT);
+		X_PROFILE_BEGIN("Lua GC", core::profiler::SubSys::SCRIPT);
 
 		// LUA_GCSTEP: performs an incremental step of garbage collection.
 		// The step "size" is controlled by data(larger values mean more steps) 

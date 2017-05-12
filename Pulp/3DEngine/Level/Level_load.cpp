@@ -46,10 +46,10 @@ void Level::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 		core::V2::Job* pJob = nullptr;
 
 		if (!headerLoaded_) {
-			pJob = pJobSys_->CreateMemberJob<Level>(this, &Level::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+			pJob = pJobSys_->CreateMemberJob<Level>(this, &Level::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		}
 		else {
-			pJob = pJobSys_->CreateMemberJob<Level>(this, &Level::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+			pJob = pJobSys_->CreateMemberJob<Level>(this, &Level::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		}
 		
 		pJobSys_->Run(pJob);

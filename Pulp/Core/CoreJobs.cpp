@@ -130,7 +130,7 @@ bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 		pData->name.set(name);
 
 		core::V2::JobSystem& jobSys = *env_.pJobSys;
-		core::V2::Job* pJob = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_OnFileChange, pData  JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
+		core::V2::Job* pJob = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_OnFileChange, pData  JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
 		jobSys.Run(pJob);
 	}
 

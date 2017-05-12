@@ -32,7 +32,7 @@ namespace profiler
 			Colorf col;
 		};
 
-		typedef std::array<SubSystemInfo, ProfileSubSys::ENUM_COUNT> SubSystemInfoArr;
+		typedef std::array<SubSystemInfo, profiler::SubSys::ENUM_COUNT> SubSystemInfoArr;
 		typedef core::Array<XProfileData*>	ProfilerDataPtrArr;
 
 
@@ -217,7 +217,7 @@ private:
 	uint64_t	frameTime_;
 	uint64_t	totalTime_;
 
-	XSubSystemInfo subSystemInfo_[ProfileSubSys::ENUM_COUNT];
+	XSubSystemInfo subSystemInfo_[profiler::SubSys::ENUM_COUNT];
 	float subSystemTotal_;
 
 	bool enabled_;

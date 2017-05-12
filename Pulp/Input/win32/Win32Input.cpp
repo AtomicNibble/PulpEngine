@@ -85,7 +85,7 @@ void XWinInput::release(void)
 
 void XWinInput::Update(core::FrameData& frameData)
 {
-	X_PROFILE_BEGIN("Win32RawInput", core::ProfileSubSys::INPUT);
+	X_PROFILE_BEGIN("Win32RawInput", core::profiler::SubSys::INPUT);
 	X_ASSERT_NOT_NULL(pMouse_);
 	X_ASSERT_NOT_NULL(pKeyBoard_);
 

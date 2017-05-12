@@ -106,7 +106,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 				// work out what other areas we can see from this one.
 				const Area& area = areas_[camArea_];
 
-				auto* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::ProfileSubSys::ENGINE3D));
+				auto* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::ENGINE3D));
 
 				Area::AreaPortalArr::ConstIterator apIt = area.portals.begin();
 				for (; apIt != area.portals.end(); ++apIt)
@@ -121,7 +121,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 
 					// now create a job todo the rest of the flooding for this portal
 					PortalFloodJobData jobData = { ps, portal, dis, camPos, camArea_, camPlanes };
-					auto* pFloodJob = jobSys.CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FloodThroughPortal_job, jobData JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+					auto* pFloodJob = jobSys.CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FloodThroughPortal_job, jobData JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 					jobSys.Run(pFloodJob);
 				}
 
@@ -369,7 +369,7 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, in
 	}
 
 	AreaCullJobData data = { areaNum, visPortalIdx };
-	auto* pJob = pJobSys_->CreateMemberJobAsChild<Level>(pParentJob, this, &Level::CullArea_job, data JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+	auto* pJob = pJobSys_->CreateMemberJobAsChild<Level>(pParentJob, this, &Level::CullArea_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 
 	pJobSys_->Run(pJob);
 }
@@ -583,7 +583,7 @@ void Level::DrawVisibleAreaGeo_job(core::V2::JobSystem& jobSys, size_t threadIdx
 	del.Bind<Level, &Level::DrawAreaGeo>(this);
 
 	auto* pJobs = jobSys.parallel_for_member_child<Level, Area*>(pJob, del, visibleAreas_.data(), 
-		safe_static_cast<uint32_t>(visibleAreas_.size()), core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+		safe_static_cast<uint32_t>(visibleAreas_.size()), core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 
 	jobSys.Run(pJobs);
 }
@@ -608,7 +608,7 @@ void Level::DrawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t thre
 
 		auto* pJobs = jobSys.parallel_for_member_child<Level>(pJob, del, visEnts.data(), safe_static_cast<uint32_t>(visEnts.size()),
 			core::V2::CountSplitter32(16) // will likley need tweaking, props even made a var.
-			JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D)
+			JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D)
 		);
 
 		jobSys.Run(pJobs);

@@ -1288,7 +1288,7 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 // Drawing
 void XWindow::reDraw(engine::IPrimativeContext* pDrawCon)
 {
-	X_PROFILE_BEGIN("GuiDraw", core::ProfileSubSys::ENGINE3D);
+	X_PROFILE_BEGIN("GuiDraw", core::profiler::SubSys::ENGINE3D);
 	X_ASSERT_NOT_IMPLEMENTED();
 
 	core::TimeVal time = core::TimeVal(0ll); // pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);

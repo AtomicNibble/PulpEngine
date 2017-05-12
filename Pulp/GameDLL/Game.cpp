@@ -68,7 +68,7 @@ bool XGame::shutDown(void)
 
 bool XGame::update(core::FrameData& frame)
 {
-	X_PROFILE_BEGIN("Update", core::ProfileSubSys::GAME);
+	X_PROFILE_BEGIN("Update", core::profiler::SubSys::GAME);
 	X_UNUSED(frame);
 	// how todo this camera move shit.
 	// when the input frames are been called

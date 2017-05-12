@@ -561,7 +561,7 @@ void XPeer::runUpdate(void)
 			activeRemoteSystems_.data(),
 			safe_static_cast<uint32_t>(activeRemoteSystems_.size()),
 			core::V2::CountSplitter32(1)
-			JOB_SYS_SUB_ARG(core::ProfileSubSys::NETWORK)
+			JOB_SYS_SUB_ARG(core::profiler::SubSys::NETWORK)
 		);
 
 		pJobSys_->Run(pJob);

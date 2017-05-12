@@ -120,7 +120,7 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 	Vec2f sizeOut;
 
 	sizeOut.x = width;
-	sizeOut.y = (item_height + item_padding) * (ProfileSubSys::ENUM_COUNT - 1);
+	sizeOut.y = (item_height + item_padding) * (profiler::SubSys::ENUM_COUNT - 1);
 	sizeOut.y += item_padding; // bottom badding
 	sizeOut.y += title_height;
 
@@ -144,7 +144,7 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 	item_x = pos.x + item_padding;
 	item_y = pos.y + item_padding + title_height;
 
-	for (i = 0; i < ProfileSubSys::ENUM_COUNT - 1; i++)
+	for (i = 0; i < profiler::SubSys::ENUM_COUNT - 1; i++)
 	{
 		const XSubSystemInfo& sub = subSystemInfo_[i];
 
@@ -422,7 +422,7 @@ void XProfileSys::UpdateSubSystemInfo(void)
 {
 	uint32_t i;
 	subSystemTotal_ = 0;
-	for (i = 0; i < ProfileSubSys::ENUM_COUNT - 1; i++)
+	for (i = 0; i < profiler::SubSys::ENUM_COUNT - 1; i++)
 	{
 		subSystemInfo_[i].calAvg();
 		subSystemTotal_ += subSystemInfo_[i].avg;
@@ -433,7 +433,7 @@ void XProfileSys::ClearSubSystems(void)
 {
 	// reset
 	uint32_t i;
-	for (i = 0; i < ProfileSubSys::ENUM_COUNT; i++) {
+	for (i = 0; i < profiler::SubSys::ENUM_COUNT; i++) {
 		subSystemInfo_[i].selfTime = 0.f;
 	}
 }

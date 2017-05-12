@@ -750,7 +750,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 
 Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& ctx)
 {
-	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
+	X_PROFILE_BEGIN("FontTextSize", core::profiler::SubSys::FONT);
 
 	const bool isProportional = flags_.IsSet(FontFlag::PROPORTIONAL);
 	const Metrics& metrics = pFontTexture_->GetMetrics();
@@ -1042,7 +1042,7 @@ void XFont::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 
 void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 {
-	X_PROFILE_BEGIN("FontPrepare", core::ProfileSubSys::FONT);
+	X_PROFILE_BEGIN("FontPrepare", core::profiler::SubSys::FONT);
 
 	if (pFontTexture_->PreCacheString(pBegin, pEnd) == CacheResult::UPDATED)
 	{

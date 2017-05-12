@@ -173,7 +173,7 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 	if (!CV_r_auxGeom_)
 		return;
 
-	X_PROFILE_BEGIN("AuxGeom", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("AuxGeom", core::profiler::SubSys::RENDER);
 
 	X_ASSERT_NOT_NULL(data.pData_);
 

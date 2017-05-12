@@ -47,7 +47,7 @@ bool XCore::RunGameLoop(void)
 
 	while (PumpMessages())
 	{
-		X_PROFILE_BEGIN("GameLoop", core::ProfileSubSys::GAME);
+		X_PROFILE_BEGIN("GameLoop", core::profiler::SubSys::GAME);
 
 		Update();
 	}
@@ -56,7 +56,7 @@ bool XCore::RunGameLoop(void)
 
 bool XCore::Update(void)
 {
-	X_PROFILE_BEGIN("CoreUpdate", core::ProfileSubSys::CORE);
+	X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
 	using namespace core::V2;
 
 	if (pProfiler_) {
@@ -97,18 +97,18 @@ bool XCore::Update(void)
 	}
 
 	// top job that we can use to wait for the chain of jobs to complete.
-	Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::ProfileSubSys::CORE));
+	Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
 	{
 		// start a job to handler any file chnages and create relaod child jobs.
-		Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
+		Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
 		jobSys.Run(pDirectoryWatchProcess);
 
 		// create a job for syncing all input related jobs.
-		Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
+		Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
 		{
 
-			Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
-			Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::ProfileSubSys::CORE));
+			Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
+			Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
 
 			// we run console updates after input events have been posted.
 			jobSys.AddContinuation(pPostInputFrame, pConsoleUpdates);
@@ -239,7 +239,7 @@ bool XCore::Update(void)
 
 void XCore::RenderBegin(core::FrameData& frameData)
 {
-	X_PROFILE_BEGIN("CoreRenderBegin", core::ProfileSubSys::CORE);
+	X_PROFILE_BEGIN("CoreRenderBegin", core::profiler::SubSys::CORE);
 	X_UNUSED(frameData);
 
 	env_.pRender->renderBegin();
@@ -250,7 +250,7 @@ void XCore::RenderBegin(core::FrameData& frameData)
 void XCore::RenderEnd(core::FrameData& frameData)
 {
 	{
-		X_PROFILE_BEGIN("CoreRenderEnd", core::ProfileSubSys::CORE);
+		X_PROFILE_BEGIN("CoreRenderEnd", core::profiler::SubSys::CORE);
 
 
 		// draw me all the profile wins!

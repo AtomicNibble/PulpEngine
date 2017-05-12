@@ -303,14 +303,14 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBas
 				return;
 			}
 
-			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		}
 		else {
 			
 			// pData_ should not be null as we are reading into it.
 			X_ASSERT_NOT_NULL(pData_);
 
-			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		}
 
 		pJobSys->Run(pJob);

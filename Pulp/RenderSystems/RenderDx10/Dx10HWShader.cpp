@@ -1296,7 +1296,7 @@ void XHWShader_Dx10::commitConstBuffer(ConstbufType::Enum buf_type, ShaderType::
 
 void XHWShader_Dx10::comitParamsGlobal(void)
 {
-	X_PROFILE_BEGIN("setParamsGlobal", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("setParamsGlobal", core::profiler::SubSys::RENDER);
 
 	setParamsGlobal();
 
@@ -1306,7 +1306,7 @@ void XHWShader_Dx10::comitParamsGlobal(void)
 
 void XHWShader_Dx10::comitParams(void)
 {
-	X_PROFILE_BEGIN("setParams", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("setParams", core::profiler::SubSys::RENDER);
 
 //	setParams();
 

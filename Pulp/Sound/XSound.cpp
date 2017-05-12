@@ -536,7 +536,7 @@ void XSound::release(void)
 
 void XSound::Update(void)
 {
-	X_PROFILE_BEGIN("SoundUpdate", core::ProfileSubSys::SOUND);
+	X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
 
 	if (AK::SoundEngine::IsInitialized())
 	{

@@ -708,7 +708,7 @@ void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 void DX11XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 	PrimitiveTypePublic::Enum type)
 {
-	X_PROFILE_BEGIN("drawVB", core::ProfileSubSys::RENDER);
+	X_PROFILE_BEGIN("drawVB", core::profiler::SubSys::RENDER);
 
 	X_ASSERT_NOT_NULL(pVertBuffer);
 

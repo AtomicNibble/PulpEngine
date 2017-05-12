@@ -1621,7 +1621,7 @@ bool ModelCompiler::DropWeights(void)
 	for (size_t i=0; i<lods_.size(); i++)
 	{
 		auto& lod = lods_[i];
-		pLodJobs[i] = pJobSys_->CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+		pLodJobs[i] = pJobSys_->CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
 		for (auto& mesh : lod.meshes_)
 		{
@@ -1629,7 +1629,7 @@ bool ModelCompiler::DropWeights(void)
 			const uint32_t numVerts = safe_static_cast<uint32_t>(mesh.verts_.size());
 
 			core::V2::Job* pJob = pJobSys_->parallel_for_member_child<ModelCompiler>(pLodJobs[i], del, pVerts, numVerts,
-				core::V2::CountSplitter32(batchSize) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+				core::V2::CountSplitter32(batchSize) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
 			pJobSys_->Run(pJob);
 		}
@@ -1730,7 +1730,7 @@ bool ModelCompiler::CreateData(void)
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for(jobData[i].ptr(), numMesh,
-			&CreateDataJob, core::V2::CountSplitter(1) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+			&CreateDataJob, core::V2::CountSplitter(1) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
 		pJobSys_->Run(pJobs[i]);
 	}
@@ -1787,7 +1787,7 @@ bool ModelCompiler::SortVerts(void)
 		uint32_t numMesh = safe_static_cast<uint32_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
-		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh,core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh,core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
 		pJobSys_->Run(pJobs[i]);
 	}
@@ -1845,7 +1845,7 @@ bool ModelCompiler::CreateBindData(void)
 		const uint32_t numMesh = safe_static_cast<uint32_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
-		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 		pJobSys_->Run(pJobs[i]);
 	}
 
@@ -1881,7 +1881,7 @@ bool ModelCompiler::MergVerts(void)
 		const uint32_t numMesh = safe_static_cast<uint32_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
-		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 		pJobSys_->Run(pJobs[i]);
 	}
 
@@ -1917,7 +1917,7 @@ bool ModelCompiler::ScaleModel(void)
 		const uint32_t numVerts = safe_static_cast<uint32_t>(m.verts_.size());
 
 		core::V2::Job* pJob = pJobSys_->parallel_for_member_child<ModelCompiler>(pParent, del,
-			pVerts, numVerts, core::V2::CountSplitter32(batchSize) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+			pVerts, numVerts, core::V2::CountSplitter32(batchSize) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
 		pJobSys_->Run(pJob);
 
@@ -1930,7 +1930,7 @@ bool ModelCompiler::ScaleModel(void)
 	{
 		auto& lod = compiledLods_[i];
 
-		pLodJobs[i] = pJobSys_->CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+		pLodJobs[i] = pJobSys_->CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
 		for (auto& mesh : lod.meshes_)
 		{
@@ -2092,7 +2092,7 @@ bool ModelCompiler::UpdateMeshBounds(void)
 		uint32_t numMesh = safe_static_cast<uint32_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
-		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::ProfileSubSys::TOOL));
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1) JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 		pJobSys_->Run(pJobs[i]);
 	}
 

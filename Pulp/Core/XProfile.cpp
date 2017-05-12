@@ -122,33 +122,33 @@ namespace profiler
 
 
 		core::zero_object(subSystemInfo_);
-		subSystemInfo_[ProfileSubSys::CORE].pName = "Core";
-		subSystemInfo_[ProfileSubSys::ENGINE3D].pName = "3DEngine";
-		subSystemInfo_[ProfileSubSys::FONT].pName = "Font";
-		subSystemInfo_[ProfileSubSys::INPUT].pName = "Input";
-		subSystemInfo_[ProfileSubSys::RENDER].pName = "Render";
-		subSystemInfo_[ProfileSubSys::SCRIPT].pName = "Script";
-		subSystemInfo_[ProfileSubSys::SOUND].pName = "Sound";
-		subSystemInfo_[ProfileSubSys::GAME].pName = "Game";
-		subSystemInfo_[ProfileSubSys::PHYSICS].pName = "Physics";
-		subSystemInfo_[ProfileSubSys::NETWORK].pName = "Network";
-		subSystemInfo_[ProfileSubSys::UNCLASSIFIED].pName = "UnClassified";
-		subSystemInfo_[ProfileSubSys::TOOL].pName = "Tool";
-		subSystemInfo_[ProfileSubSys::UNITTEST].pName = "UnitTests";
+		subSystemInfo_[profiler::SubSys::CORE].pName = "Core";
+		subSystemInfo_[profiler::SubSys::ENGINE3D].pName = "3DEngine";
+		subSystemInfo_[profiler::SubSys::FONT].pName = "Font";
+		subSystemInfo_[profiler::SubSys::INPUT].pName = "Input";
+		subSystemInfo_[profiler::SubSys::RENDER].pName = "Render";
+		subSystemInfo_[profiler::SubSys::SCRIPT].pName = "Script";
+		subSystemInfo_[profiler::SubSys::SOUND].pName = "Sound";
+		subSystemInfo_[profiler::SubSys::GAME].pName = "Game";
+		subSystemInfo_[profiler::SubSys::PHYSICS].pName = "Physics";
+		subSystemInfo_[profiler::SubSys::NETWORK].pName = "Network";
+		subSystemInfo_[profiler::SubSys::UNCLASSIFIED].pName = "UnClassified";
+		subSystemInfo_[profiler::SubSys::TOOL].pName = "Tool";
+		subSystemInfo_[profiler::SubSys::UNITTEST].pName = "UnitTests";
 
-		subSystemInfo_[ProfileSubSys::CORE].col = Col_Red;
-		subSystemInfo_[ProfileSubSys::ENGINE3D].col = Col_Firebrick;
-		subSystemInfo_[ProfileSubSys::FONT].col = Col_Yellow;
-		subSystemInfo_[ProfileSubSys::INPUT].col = Col_Brown;
-		subSystemInfo_[ProfileSubSys::RENDER].col = Col_Lawngreen;
-		subSystemInfo_[ProfileSubSys::SCRIPT].col = Col_Orange;
-		subSystemInfo_[ProfileSubSys::SOUND].col = Col_Mediumpurple;
-		subSystemInfo_[ProfileSubSys::GAME].col = Col_Maroon;
-		subSystemInfo_[ProfileSubSys::PHYSICS].col = Col_Salmon;
-		subSystemInfo_[ProfileSubSys::NETWORK].col = Col_Oldlace;
-		subSystemInfo_[ProfileSubSys::UNCLASSIFIED].col = Col_Orangered;
-		subSystemInfo_[ProfileSubSys::TOOL].col = Col_Tomato;
-		subSystemInfo_[ProfileSubSys::UNITTEST].col = Col_Whitesmoke;
+		subSystemInfo_[profiler::SubSys::CORE].col = Col_Red;
+		subSystemInfo_[profiler::SubSys::ENGINE3D].col = Col_Firebrick;
+		subSystemInfo_[profiler::SubSys::FONT].col = Col_Yellow;
+		subSystemInfo_[profiler::SubSys::INPUT].col = Col_Brown;
+		subSystemInfo_[profiler::SubSys::RENDER].col = Col_Lawngreen;
+		subSystemInfo_[profiler::SubSys::SCRIPT].col = Col_Orange;
+		subSystemInfo_[profiler::SubSys::SOUND].col = Col_Mediumpurple;
+		subSystemInfo_[profiler::SubSys::GAME].col = Col_Maroon;
+		subSystemInfo_[profiler::SubSys::PHYSICS].col = Col_Salmon;
+		subSystemInfo_[profiler::SubSys::NETWORK].col = Col_Oldlace;
+		subSystemInfo_[profiler::SubSys::UNCLASSIFIED].col = Col_Orangered;
+		subSystemInfo_[profiler::SubSys::TOOL].col = Col_Tomato;
+		subSystemInfo_[profiler::SubSys::UNITTEST].col = Col_Whitesmoke;
 
 		return true;
 	}
