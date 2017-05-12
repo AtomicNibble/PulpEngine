@@ -426,7 +426,7 @@ namespace profiler
 				threadInfoY + (i * threadInfoEntryHeight),
 				threadInfoWidth,
 				threadInfoEntryHeight - (padding * 2),
-				timeLines[i]->getHistory()[i]
+				timeLines[i]->getHistory()[profileIdx]
 			);
 		}
 
