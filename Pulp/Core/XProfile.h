@@ -4,6 +4,7 @@
 #define _X_PROFILE_H_
 
 #include <Containers\Array.h>
+#include <Threading\JobSystem2.h>
 
 #include "Vars\ProfilerVars.h"
 
@@ -16,6 +17,8 @@ X_NAMESPACE_DECLARE(engine,
 
 
 X_NAMESPACE_BEGIN(core)
+
+struct FrameTimeData;
 
 #if 1
 
@@ -58,9 +61,10 @@ namespace profiler
 		void OnFrameBegin(void);
 		void OnFrameEnd(void);
 
-		void Render(void);
+		void Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys);
 
 		X_INLINE const ProfilerVars& getVars(void) const;
+
 
 	private:
 		// ICoreEventListener		
@@ -70,6 +74,12 @@ namespace profiler
 		void UpdateProfileData(void);
 
 
+#if X_ENABLE_JOBSYS_PROFILER
+		void RenderJobSystem(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
+		void DrawThreadInfo(const FrameTimeData& frameTimeInfo, engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+			const core::V2::JobQueueHistory::FrameHistory& history);
+
+#endif // !X_ENABLE_JOBSYS_PROFILER
 
 	private:
 		ProfilerVars vars_;

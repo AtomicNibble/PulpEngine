@@ -4,7 +4,9 @@
 #include <Time\StopWatch.h>
 #include <Util\Process.h>
 
-#include <IConsole.h>
+#include <IFrameData.h>
+#include <I3DEngine.h>
+#include <IPrimativeContext.h>
 #include <IFont.h>
 
 #include "Profile\ProfilerTypes.h"
@@ -271,12 +273,201 @@ namespace profiler
 		}
 	}
 
-	void XProfileSys::Render(void)
+	void XProfileSys::Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys)
 	{
+		if (pJobSys && vars_.drawProfileInfo())
+		{
+#if X_ENABLE_JOBSYS_PROFILER
+
+			int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
+
+			// so we want to draw one before the current index.
+			if (profilerIdx == 0) {
+				profilerIdx =core::V2::JOBSYS_HISTORY_COUNT - 1;
+			}
+			profilerIdx = math<int32_t>::clamp(profilerIdx - 1, 0, core::V2::JOBSYS_HISTORY_COUNT);
+
+			RenderJobSystem(frameTimeInfo, pJobSys, profilerIdx);
+#else
 
 
+#endif // !X_ENABLE_JOBSYS_PROFILER
+		}
+	}
+
+#if X_ENABLE_JOBSYS_PROFILER
+
+	void XProfileSys::RenderJobSystem(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx)
+	{
+		X_UNUSED(pJobSys);
+		X_UNUSED(profileIdx);
+		auto& stats = pJobSys->GetStats();
+		auto& frameStats = stats[profileIdx];
+		auto& timeLines = pJobSys->GetTimeLines();
+
+		// well my goaty pickle trimmer.
+		// i want something sorta full screen and sexy.
+		// give me the dimensions!
+		const float border = 15;
+		const float padding = 10;
+		const float yOffset = 30;
+
+		const float xStart = border;
+		const float yStart = border + yOffset;
+		const float width = renderRes_.x - (border * 2);
+		const float height = (renderRes_.y - (border * 2) - yOffset);
+	
+		font::TextDrawContext ctx;
+		ctx.pFont = pFont_;
+		ctx.effectId = 0;
+		ctx.SetColor(Col_White);
+		ctx.SetSize(Vec2f(16.f,16.f));
+
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+
+		pPrim->drawQuad(xStart, yStart, width, height, Color(0.1f, 0.1f, 0.1f, 0.8f));
+
+		core::StackString512 txt;
+		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32, 
+			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
+
+		ctx.flags.Set(font::DrawTextFlag::CENTER);
+		pPrim->drawText(xStart + (width / 2), yStart + padding, ctx, L"Profiler");
+		ctx.flags.Remove(font::DrawTextFlag::CENTER);
+		pPrim->drawText(xStart + padding, yStart + padding, ctx, txt.begin(), txt.end());
+
+		// draw the color key table.
+		float keyHeight = 30.f;
+
+		{
+			float keyBegin = yStart + (height - keyHeight);
+			float keyY = keyBegin;
+			float keyX = xStart + padding;
+
+			for (uint32_t i = 0; i < core::profiler::SubSys::ENUM_COUNT; i++)
+			{
+				if (i == core::profiler::SubSys::UNITTEST) {
+					continue;
+				}
+
+				ctx.col = subSystemInfo_[i].col;
+
+				const char* pBegin = subSystemInfo_[i].pName;
+				const char* pEnd = pBegin + core::strUtil::strlen(subSystemInfo_[i].pName);
+
+				auto txtSize = pFont_->GetTextSize(pBegin, pEnd, ctx);
+
+				pPrim->drawText(keyX, keyY, ctx, subSystemInfo_[i].pName);
+
+				keyX += txtSize.x + 10.f;
+			}
+		}
+
+		const size_t visibleMS = 16;
+		const uint32_t numThread = pJobSys->GetThreadCount() + 1;
+		const float threadInfoXOffset = 85.f;
+		const float threadInfoX = xStart + padding + threadInfoXOffset;
+		const float threadInfoY = yStart + ctx.size.y + (padding * 2);
+		const float threadInfoHeight = (height - (ctx.size.y + padding) - (keyHeight + padding)) - 20;
+		const float threadInfoWidth = (width - (padding * 2)) - threadInfoXOffset;
+
+
+		const float widthPerMS = threadInfoWidth / visibleMS;
+		const float threadInfoEntryHeight = threadInfoHeight / numThread;
+
+		// draw a gird spliting up the horizontal space in to time.
+		{
+
+			for (size_t i = 0; i < visibleMS + 1; i++)
+			{
+				Vec3f top(threadInfoX + (i * widthPerMS), threadInfoY, 1);
+				Vec3f bottom(threadInfoX + (i * widthPerMS), threadInfoY + threadInfoHeight, 1);
+
+				pPrim->drawLine(top, bottom, Colorf(0.2f, 0.2f, 0.2f));
+			}
+
+			X_DISABLE_WARNING(4127)
+
+			ctx.col = Col_Dimgray;
+
+			core::StackString<64> str;
+			for (size_t i = 1; i < visibleMS; i++)
+			{
+				if (visibleMS > 16)
+				{
+					if (!(i & 1) || (i + 1) == visibleMS) {
+						continue;
+					}
+				}
+
+				str.setFmt("%ims", i);
+				pPrim->drawText(threadInfoX + (i * widthPerMS), threadInfoY + threadInfoHeight, ctx, str.c_str());
+			}
+
+			for (size_t i = 0; i < numThread; i++)
+			{
+				str.setFmt("Thread %i", i);
+				pPrim->drawText(threadInfoX - threadInfoXOffset, threadInfoY + (i* threadInfoEntryHeight), ctx, str.c_str());
+			}
+
+			X_ENABLE_WARNING(4127)
+		}
+
+		for (uint32_t i = 0; i < numThread; i++)
+		{		
+			if (!timeLines[i]) {
+				continue;
+			}
+
+			DrawThreadInfo(
+				frameTimeInfo,
+				pPrim,
+				threadInfoX,
+				threadInfoY + (i * threadInfoEntryHeight),
+				threadInfoWidth,
+				threadInfoEntryHeight - (padding * 2),
+				timeLines[i]->getHistory()[i]
+			);
+		}
 
 	}
+
+	void XProfileSys::DrawThreadInfo(const FrameTimeData& frameTimeInfo, 
+		engine::IPrimativeContext* pPrim , float xStart, float yStart, float width, float height,
+		const core::V2::JobQueueHistory::FrameHistory& history)
+	{
+		pPrim->drawQuad(xStart, yStart, width, height, Color(0.55f, 0.35f, 0.35f, 0.1f));
+
+		X_UNUSED(frameTimeInfo);
+		X_UNUSED(history);
+
+		if (history.bottom_ == 0) {
+			return;
+		}
+	
+		const size_t visibleMS = 16;
+		const float widthPerMS = width / visibleMS;
+		const float quadsize = 15.f;
+
+		// i want to draw the history of this thread at correct based on start time relative to
+		// start time, so that I can visualize 'bubbles'.
+		// this means i need to know when the frame started.
+
+		const auto frameStartTime = history.start;
+
+		for (int32_t idx = 0; idx < history.bottom_; idx++)
+		{
+			const auto& entry = history.entryes_[idx];
+			const auto timeOffset = entry.start - frameStartTime;
+
+			float entryStart = timeOffset.GetMilliSeconds() * widthPerMS;
+			float entryWidth = (entry.end - entry.start).GetMilliSeconds() * widthPerMS;
+
+			pPrim->drawQuad(xStart + entryStart, yStart, entryWidth, quadsize, subSystemInfo_[entry.subsystem].col);
+		}
+	}
+
+#endif // !X_ENABLE_JOBSYS_PROFILER
 
 } // namespace profiler
 

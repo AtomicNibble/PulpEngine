@@ -255,7 +255,7 @@ void XCore::RenderEnd(core::FrameData& frameData)
 
 		// draw me all the profile wins!
 		if (pProfiler_) {
-			pProfiler_->Render();
+			pProfiler_->Render(frameData.timeInfo, env_.pJobSys);
 		}
 
 
