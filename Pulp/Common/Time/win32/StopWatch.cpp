@@ -113,6 +113,11 @@ namespace
 } // namespace
 
 
+TimeVal StopWatch::GetTimeNow(void)
+{
+	return TimeVal(g_sysTimer.Get());
+}
+
 int64_t StopWatch::SysGet(void)
 {
 	return g_sysTimer.Get();

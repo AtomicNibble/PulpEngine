@@ -22,6 +22,8 @@ public:
 	X_INLINE TimeVal GetStart(void) const;
 	X_INLINE TimeVal GetEnd(void) const;
 
+	static TimeVal GetTimeNow(void);
+
 private:
 
 	static int64_t SysGet(void);
