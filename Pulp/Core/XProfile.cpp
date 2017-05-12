@@ -290,6 +290,7 @@ namespace profiler
 
 			RenderJobSystem(frameTimeInfo, pJobSys, profilerIdx);
 #else
+			X_UNUSED(frameTimeInfo);
 
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
