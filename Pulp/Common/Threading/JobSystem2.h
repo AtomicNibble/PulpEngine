@@ -179,6 +179,7 @@ public:
 
 		long bottom_;
 
+		core::TimeVal start;
 		Entry entryes_[MAX_NUMBER_OF_JOBS];
 	};
 

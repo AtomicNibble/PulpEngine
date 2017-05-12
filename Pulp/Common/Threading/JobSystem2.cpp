@@ -59,7 +59,10 @@ namespace V2
 	{
 		currentIdx_ = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
 
-		atomic::Exchange<long>(&frameHistory_[currentIdx_].bottom_, 0);
+		auto& history = frameHistory_[currentIdx_];
+
+		history.start = core::StopWatch::GetTimeNow();
+		atomic::Exchange<long>(&history.bottom_, 0);
 	}
 
 	X_INLINE JobQueueHistory::Entry* JobQueueHistory::addEntry(void)
