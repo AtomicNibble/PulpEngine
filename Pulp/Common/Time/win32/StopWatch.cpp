@@ -77,32 +77,31 @@ namespace
 		thousandOverFrequency_ = static_cast<float>(resolution * 1000.0);
 	}
 
-	int64_t SysTimer::Get(void)
+	X_INLINE int64_t SysTimer::Get(void)
 	{
 		return pUpdateFunc_();
 	}
 
-	float SysTimer::ToSeconds(int64_t count)
+	X_INLINE float SysTimer::ToSeconds(int64_t count)
 	{
 		return static_cast<float>(count * oneOverFrequency_);
 	}
 
-
-	float SysTimer::ToMilliSeconds(int64_t count)
+	X_INLINE float SysTimer::ToMilliSeconds(int64_t count)
 	{
 		return static_cast<float>(count * thousandOverFrequency_);
 	}
 
 	// ===================================================
 
-	int64_t SysTimer::PerformanceCounterTime(void)
+	X_INLINE int64_t SysTimer::PerformanceCounterTime(void)
 	{
 		LARGE_INTEGER now = {};
 		QueryPerformanceCounter(&now);
 		return static_cast<int64_t>(now.QuadPart);
 	}
 
-	int64_t SysTimer::MMTimeGet(void)
+	X_INLINE int64_t SysTimer::MMTimeGet(void)
 	{
 		return static_cast<int64_t>(timeGetTime());
 	}
