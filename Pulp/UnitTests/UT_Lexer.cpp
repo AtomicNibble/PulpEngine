@@ -99,8 +99,6 @@ protected:
 
 XMapPatch* XMapPatch::Parse(XLexer &src, const Vec3f &origin)
 {
-	X_PROFILE_BEGIN("parse mesh", core::ProfileSubSys::CORE);
-
 	// goaty meshes!
 	XLexToken token;
 	core::StackString<64> mat_name, light_map;
@@ -266,8 +264,6 @@ XMapEntity::~XMapEntity(void)
 
 bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
 {
-	X_PROFILE_BEGIN("parse brush material", core::ProfileSubSys::CORE);
-
 	XLexToken token;
 
 	// read the material name
@@ -293,9 +289,6 @@ bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
 
 XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
 {
-	X_PROFILE_BEGIN("parse brush", core::ProfileSubSys::CORE);
-
-//	int i;
 	Vec3f planepts[3];
 	XLexToken token;
 	XMapBrushSide* side;
@@ -385,8 +378,6 @@ XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
 
 XMapEntity*	XMapEntity::Parse(XLexer &src, bool worldSpawn)
 {
-	X_PROFILE_BEGIN("parse entity", core::ProfileSubSys::CORE);
-
 	XLexToken token;
 	XMapEntity *mapEnt;
 	XMapBrush *mapBrush;
