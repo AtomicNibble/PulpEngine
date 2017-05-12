@@ -106,7 +106,7 @@ public:
 	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_FINAL;
 	X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
 
-	X_INLINE core::profiler::IProfileReg* GetIProfileReg(void) X_FINAL;
+	X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
 	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
 	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
 	
@@ -238,7 +238,6 @@ private:
 	ArrsetHandlersArr				assertHandlers_;
 
 	core::profiler::XProfileSys*	pProfiler_;
-	core::profiler::IProfileReg*	pProfileRegister_;
 
 	// Hot reload stuff
 	core::XDirectoryWatcher			dirWatcher_;

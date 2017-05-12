@@ -128,9 +128,6 @@
     <ClInclude Include="NullImplementation\ConsoleNULL.h">
       <Filter>NullImplementation</Filter>
     </ClInclude>
-    <ClInclude Include="NullImplementation\ProfileNull.h">
-      <Filter>NullImplementation</Filter>
-    </ClInclude>
     <ClInclude Include="Vars\ProfilerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
@@ -207,9 +204,6 @@
     </ClCompile>
     <ClCompile Include="XFindData.cpp">
       <Filter>Source Files\FileSys</Filter>
-    </ClCompile>
-    <ClCompile Include="NullImplementation\ProfileNull.cpp">
-      <Filter>NullImplementation</Filter>
     </ClCompile>
     <ClCompile Include="Vars\ProfilerVars.cpp">
       <Filter>Source Files\Vars</Filter>

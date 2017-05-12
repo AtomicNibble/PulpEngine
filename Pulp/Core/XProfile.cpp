@@ -91,9 +91,10 @@ namespace profiler
 {
 
 	XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
-		pFont_(nullptr)
+		pFont_(nullptr),
+		profilerData_(arena)
 	{
-		X_UNUSED(arena);
+		
 	}
 
 	XProfileSys::~XProfileSys()
@@ -156,24 +157,34 @@ namespace profiler
 	void XProfileSys::shutDown(void)
 	{
 		// ...
-		gEnv->profileScopeStart = nullptr;
-		gEnv->profileScopeEnd = nullptr;
 	}
 
 	bool XProfileSys::loadRenderResources(void)
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pFontSys);
+
 		pFont_ = gEnv->pFontSys->GetFont("default");
 
 		return pFont_ != nullptr;
 	}
 
 
-	void XProfileSys::AddStartupProfileData(XProfileData* pData)
+	void XProfileSys::AddProfileData(XProfileData* pData)
 	{
 		X_UNUSED(pData);
+		profilerData_.emplace_back(pData);
+
 	}
 
-	void XProfileSys::AddProfileData(XProfileData* pData)
+
+	void XProfileSys::ScopeBegin(XProfileScope* pData)
+	{
+		X_UNUSED(pData);
+
+	}
+
+	void XProfileSys::ScopeEnd(XProfileScope* pData)
 	{
 		X_UNUSED(pData);
 

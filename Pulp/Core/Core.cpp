@@ -90,7 +90,6 @@ XCore::XCore() :
 	pCpuInfo_(nullptr),
 	pCrc32_(nullptr),
 	pProfiler_(nullptr),
-	pProfileRegister_(nullptr),
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
 	pEventDispatcher_(nullptr),
@@ -282,11 +281,6 @@ void XCore::ShutDown()
 	if (pCrc32_)
 	{
 		core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
-	}
-
-	if (pProfileRegister_ && pProfileRegister_ != pProfiler_)
-	{
-		core::Mem::DeleteAndNull(pProfileRegister_, g_coreArena);
 	}
 
 	if (pProfiler_)

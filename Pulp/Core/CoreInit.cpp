@@ -7,8 +7,7 @@
 #include <String\HumanSize.h>
 
 #include "NullImplementation\ConsoleNULL.h"
-#include "NullImplementation/NullInput.h"
-#include "NullImplementation\ProfileNull.h"
+#include "NullImplementation\NullInput.h"
 
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\SymbolResolution.h>
@@ -329,13 +328,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (startupParams.bProfileSysEnabled)
 	{
 		pProfiler_ = X_NEW(core::profiler::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
+		
+		env_.pProfiler = pProfiler_;
+	}
 
-		pProfileRegister_ = pProfiler_;
-	}
-	else
-	{
-		pProfileRegister_ = X_NEW(core::profiler::ProfileNull, g_coreArena, "ProfileSys")();
-	}
 
 	if (startupParams.loadSymbols()) {
 		core::symbolResolution::Startup();

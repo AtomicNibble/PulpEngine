@@ -23,7 +23,7 @@ namespace profiler
 {
 
 	class XProfileSys : 
-		public IProfileReg,
+		public IProfiler,
 		public ICoreEventListener
 	{
 		struct SubSystemInfo
@@ -33,6 +33,7 @@ namespace profiler
 		};
 
 		typedef std::array<SubSystemInfo, ProfileSubSys::ENUM_COUNT> SubSystemInfoArr;
+		typedef core::Array<XProfileData*>	ProfilerDataPtrArr;
 
 
 	public:
@@ -46,8 +47,12 @@ namespace profiler
 		bool loadRenderResources(void);
 		void shutDown(void);
 
-		void AddStartupProfileData(XProfileData* pData) X_FINAL;
+		// IProfiler
 		void AddProfileData(XProfileData* pData) X_FINAL;
+
+		void ScopeBegin(XProfileScope* pData) X_FINAL;
+		void ScopeEnd(XProfileScope* pData) X_FINAL;
+		// ~IProfiler
 
 		void OnFrameBegin(void);
 		void OnFrameEnd(void);
@@ -70,6 +75,7 @@ namespace profiler
 		Vec2i renderRes_;
 		font::IFont* pFont_;
 
+		ProfilerDataPtrArr profilerData_;
 	};
 
 } // namespace profiler

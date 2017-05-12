@@ -10,16 +10,18 @@ X_NAMESPACE_BEGIN(core)
 namespace profiler
 {
 
+	class XProfileData;
+	class XProfileScope;
 
-class XProfileData;
+	struct IProfiler
+	{
+		virtual ~IProfiler(){};
 
-struct IProfileReg
-{
-	virtual ~IProfileReg(){};
+		virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
 
-	virtual void AddStartupProfileData(XProfileData* pData) X_ABSTRACT;
-	virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
-};
+		virtual void ScopeBegin(XProfileScope* pData) X_ABSTRACT;
+		virtual void ScopeEnd(XProfileScope* pData) X_ABSTRACT;
+	};
 
 } // namespace profielr
 

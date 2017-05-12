@@ -5,7 +5,6 @@
 
 #include <Core\Platform.h>
 #include <Traits\FunctionSignatureTraits.h>
-// #include <Util/SourceInfo.h>
 
 #include <Math\XVector.h>
 
@@ -37,7 +36,7 @@ struct IJobSystem;
 struct IXHotReloadManager;
 struct IXDirectoryWatcher;
 struct FrameData;
-class XProfileScope;
+// class XProfileScope;
 class Crc32;
 class CpuInfo;
 class Console;
@@ -48,6 +47,10 @@ class MemoryArenaBase;
 namespace V2 {
 	class JobSystem;
 	struct Job;
+}
+namespace profiler {
+	struct IProfiler;
+	class XProfileStartupScope;
 }
 )
 X_NAMESPACE_DECLARE(font, struct IFontSys; struct IFont)
@@ -72,7 +75,6 @@ X_NAMESPACE_DECLARE(net,
 X_USING_NAMESPACE;
 
 
-typedef core::traits::Function<void(class core::XProfileScope* pProScope)> ProfileScopeFunc;
 
 X_DECLARE_ENUM(CoreEvent)(
 	CHANGE_FOCUS,
@@ -222,9 +224,8 @@ struct SCoreGlobals // obbject is zerod on start.
 	physics::IPhysics*			pPhysics;
 	game::IGame*				pGame;
 	net::INet*					pNet;
-//	core::IJobSystem*			pJobSys;
 	core::V2::JobSystem*		pJobSys;
-
+	core::profiler::IProfiler*  pProfiler;
 
 	core::IXDirectoryWatcher*   pDirWatcher;
 	core::IXHotReloadManager*   pHotReload;
@@ -234,10 +235,6 @@ struct SCoreGlobals // obbject is zerod on start.
 	core::MemoryArenaBase*		pStrArena;
 
 	uint32_t					mainThreadId;		
-
-	
-	ProfileScopeFunc::Pointer	profileScopeStart;
-	ProfileScopeFunc::Pointer	profileScopeEnd;
 
 	X_INLINE const bool isStarting(void) const {
 		return state_ != State::STARTING;
@@ -308,7 +305,7 @@ struct ICore
 	virtual font::IFontSys* GetIFontSys(void) X_ABSTRACT;
 	virtual core::V2::JobSystem* GetJobSystem(void) X_ABSTRACT;
 	virtual physics::IPhysics* GetPhysics(void) X_ABSTRACT;
-	virtual core::profiler::IProfileReg* GetIProfileReg(void) X_ABSTRACT;
+	virtual core::profiler::IProfiler* GetProfiler(void) X_ABSTRACT;
 	virtual core::ILog* GetILog(void) X_ABSTRACT;
 	virtual core::IXDirectoryWatcher* GetDirWatcher(void) X_ABSTRACT;
 	virtual core::IXHotReloadManager* GetHotReloadMan(void) X_ABSTRACT;
