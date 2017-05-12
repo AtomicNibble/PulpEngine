@@ -327,14 +327,14 @@ void Level::dispatchJobs(core::FrameData& frame)
 
 	if (loaded_)
 	{
-		core::V2::Job* pSyncJob = pJobSys_->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::ProfileSubSys::ENGINE3D));
+		core::V2::Job* pSyncJob = pJobSys_->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::ENGINE3D));
 
 		// find all the visible area's and create lists of all the visible static models in each area.
-		auto* pFindVisibleAreas = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FindVisibleArea_job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+		auto* pFindVisibleAreas = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::FindVisibleArea_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 
-		auto* pBuildvisFlags = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::BuildVisibleAreaFlags_job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
-		auto* pRemoveDupeVis = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::MergeVisibilityArrs_job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
-		auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr JOB_SYS_SUB_ARG(core::ProfileSubSys::ENGINE3D));
+		auto* pBuildvisFlags = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::BuildVisibleAreaFlags_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
+		auto* pRemoveDupeVis = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::MergeVisibilityArrs_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
+		auto* pDrawAreaGeo = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleAreaGeo_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 	//	auto* pDrawStaticModels = pJobSys_->CreateMemberJobAsChild<Level>(pSyncJob, this, &Level::DrawVisibleStaticModels_job, nullptr);
 
 		// now inline build the vis flags for areas
@@ -384,7 +384,7 @@ void Level::DrawDebug(void)
 #if 0
 bool Level::render(void)
 {
-	X_PROFILE_BEGIN("Level render", core::ProfileSubSys::ENGINE3D);
+	X_PROFILE_BEGIN("Level render", core::profiler::SubSys::ENGINE3D);
 
 	if (!loaded_) {
 		return false;
