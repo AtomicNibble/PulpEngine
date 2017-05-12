@@ -122,7 +122,8 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 		}
 	}
 
-	frameTime.startTimeReal.SetValue(currentTime_);
+	frameTime.startTimeReal.SetValue(now);
+	frameTime.startTimeRealative.SetValue(currentTime_);
 
 	// set the unscaled timers
 	frameTime.unscaledDeltas[Timer::GAME].SetValue(frameDeltaCapped);
