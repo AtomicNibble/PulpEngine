@@ -72,6 +72,9 @@ public:
 	void set(const TChar* str);
 	void set(const TChar* const beginInclusive, const TChar* const endExclusive);
 
+	void setFmt(const TChar* format, ...);
+	void setFmt(const TChar* format, va_list args);
+
 	/// \brief Replaces part of the string.
 	/// \remark Returns whether the string was found and replaced.
 	bool replace(const TChar* original, const TChar* replacement);
@@ -199,6 +202,9 @@ public:
 
 	void set(const wchar_t* str);
 	void set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
+
+	void setFmt(const wchar_t* format, ...);
+	void setFmt(const wchar_t* format, va_list args);
 
 	/// \brief Replaces part of the string.
 	/// \remark Returns whether the string was found and replaced.

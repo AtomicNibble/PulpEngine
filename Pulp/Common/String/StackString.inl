@@ -277,6 +277,52 @@ void StackString<N, TChar>::set(const TChar* const beginInclusive, const TChar* 
 	str_[len_] = 0;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <size_t N, typename TChar>
+void StackString<N, TChar>::setFmt(const TChar* format, ...)
+{
+	str_[0] = '\0';
+	len_ = 0;
+
+	va_list args;
+	va_start(args, format);
+
+	const int charactersWritten = _vsnprintf_s(str_, N, _TRUNCATE, format, args);
+	if (charactersWritten < 0)
+	{
+		X_WARNING("StackString", "String truncation occurred during append operation.");
+		len_ = N - 1;
+		str_[len_] = 0;
+	}
+	else
+	{
+		len_ += charactersWritten;
+	}
+
+	va_end(args);
+}
+
+template <size_t N, typename TChar>
+void StackString<N, TChar>::setFmt(const TChar* format, va_list args)
+{
+	str_[0] = '\0';
+	len_ = 0;
+
+	const int charactersWritten = _vsnprintf_s(str_, N, _TRUNCATE, format, args);
+	if (charactersWritten < 0)
+	{
+		X_WARNING("StackString", "String truncation occurred during append operation.");
+		len_ = N - 1;
+		str_[len_] = 0;
+	}
+	else
+	{
+		len_ += charactersWritten;
+	}
+}
+
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
