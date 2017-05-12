@@ -1167,7 +1167,9 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
 	X_ERROR("Phys", "Obbject out of bounds. Name: \"%s\"", actor.getName());
 
 	// que it for removal;
-	outOfBoundsObjects_.append(&actor);
+	if (outOfBoundsObjects_.find(&actor) == ActorsArr::invalid_index) {
+		outOfBoundsObjects_.append(&actor);
+	}
 }
 
 void XPhysics::onObjectOutOfBounds(physx::PxAggregate& aggregate)
