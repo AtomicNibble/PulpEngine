@@ -207,6 +207,9 @@ private:
 	PhysCooking*					pCooking_;
 	ActiveSceneListArr				activeScenes_;
 
+#if PHYSX_SCENE_REQUIRES_LOCK
+	core::CriticalSection			outofBoundsCS_;
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
 	ActorsArr						outOfBoundsObjects_;
 
 	uint8_t*	pScratchBlock_;

@@ -402,6 +402,10 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 
 		if(outOfBoundsObjects_.isNotEmpty())
 		{
+#if PHYSX_SCENE_REQUIRES_LOCK
+			core::ScopedLock<decltype(outofBoundsCS_)> lock(outofBoundsCS_);
+
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
 			auto handle = pScene->lock(true);
 
 			for (auto* pActor : outOfBoundsObjects_) {
@@ -1165,6 +1169,10 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
 	// for now we just log that somthing left the physx world.
 	// dunno what shit to log.
 	X_ERROR("Phys", "Obbject out of bounds. Name: \"%s\"", actor.getName());
+
+#if PHYSX_SCENE_REQUIRES_LOCK
+	core::ScopedLock<decltype(outofBoundsCS_)> lock(outofBoundsCS_);
+#endif // !PHYSX_SCENE_REQUIRES_LOCK
 
 	// que it for removal;
 	if (outOfBoundsObjects_.find(&actor) == ActorsArr::invalid_index) {
