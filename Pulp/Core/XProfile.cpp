@@ -323,60 +323,37 @@ namespace profiler
 		ctx.SetColor(Col_White);
 		ctx.SetSize(Vec2f(16.f,16.f));
 
-		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
-
-		pPrim->drawQuad(xStart, yStart, width, height, Color(0.1f, 0.1f, 0.1f, 0.8f));
-
 		core::StackString512 txt;
-		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32, 
+		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
 			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
 
-		ctx.flags.Set(font::DrawTextFlag::CENTER);
-		pPrim->drawText(xStart + (width / 2), yStart + padding, ctx, L"Profiler");
-		ctx.flags.Remove(font::DrawTextFlag::CENTER);
-		pPrim->drawText(xStart + padding, yStart + padding, ctx, txt.begin(), txt.end());
-
-		// draw the color key table.
 		float keyHeight = 30.f;
-
-		{
-			float keyBegin = yStart + (height - keyHeight);
-			float keyY = keyBegin;
-			float keyX = xStart + padding;
-
-			for (uint32_t i = 0; i < core::profiler::SubSys::ENUM_COUNT; i++)
-			{
-				if (i == core::profiler::SubSys::UNITTEST) {
-					continue;
-				}
-
-				ctx.col = subSystemInfo_[i].col;
-
-				const char* pBegin = subSystemInfo_[i].pName;
-				const char* pEnd = pBegin + core::strUtil::strlen(subSystemInfo_[i].pName);
-
-				auto txtSize = pFont_->GetTextSize(pBegin, pEnd, ctx);
-
-				pPrim->drawText(keyX, keyY, ctx, subSystemInfo_[i].pName);
-
-				keyX += txtSize.x + 10.f;
-			}
-		}
+		const float maxHeightPerThread = 50.f;
 
 		const size_t visibleMS = 16;
 		const uint32_t numThread = pJobSys->GetThreadCount() + 1;
 		const float threadInfoXOffset = 85.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
 		const float threadInfoY = yStart + ctx.size.y + (padding * 2);
-		const float threadInfoHeight = (height - (ctx.size.y + padding) - (keyHeight + padding)) - 20;
+		const float threadInfoHeight = core::Min<float>((height - (ctx.size.y + padding) - (keyHeight + padding)) - 20, maxHeightPerThread * numThread);
 		const float threadInfoWidth = (width - (padding * 2)) - threadInfoXOffset;
-
 
 		const float widthPerMS = threadInfoWidth / visibleMS;
 		const float threadInfoEntryHeight = threadInfoHeight / numThread;
 
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+
 		// draw a gird spliting up the horizontal space in to time.
 		{
+			// background
+			pPrim->drawQuad(
+				xStart, 
+				yStart, 
+				width, 
+				threadInfoHeight + (threadInfoY - yStart) + (keyHeight * 2),
+				Color(0.1f, 0.1f, 0.1f, 0.8f)
+			);
+
 
 			for (size_t i = 0; i < visibleMS + 1; i++)
 			{
@@ -409,6 +386,34 @@ namespace profiler
 				str.setFmt("Thread %i", i);
 				pPrim->drawText(threadInfoX - threadInfoXOffset, threadInfoY + (i* threadInfoEntryHeight), ctx, str.c_str());
 			}
+
+			{
+				float keyY = threadInfoY + (threadInfoHeight + keyHeight);
+				float keyX = threadInfoX + padding;
+
+				for (uint32_t i = 0; i < core::profiler::SubSys::ENUM_COUNT; i++)
+				{
+					if (i == core::profiler::SubSys::UNITTEST) {
+						continue;
+					}
+
+					ctx.col = subSystemInfo_[i].col;
+
+					const char* pBegin = subSystemInfo_[i].pName;
+					const char* pEnd = pBegin + core::strUtil::strlen(subSystemInfo_[i].pName);
+
+					auto txtSize = pFont_->GetTextSize(pBegin, pEnd, ctx);
+
+					pPrim->drawText(keyX, keyY, ctx, subSystemInfo_[i].pName);
+
+					keyX += txtSize.x + 10.f;
+				}
+			}
+
+			ctx.flags.Set(font::DrawTextFlag::CENTER);
+			pPrim->drawText(xStart + (width / 2), yStart + padding, ctx, L"Profiler");
+			ctx.flags.Remove(font::DrawTextFlag::CENTER);
+			pPrim->drawText(xStart + padding, yStart + padding, ctx, txt.begin(), txt.end());
 
 			X_ENABLE_WARNING(4127)
 		}
