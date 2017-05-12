@@ -191,14 +191,14 @@ X_ENSURE_SIZE(ProfileSubSys::Enum,1);
 	static core::profiler::XProfileDataHistory		__Profiledata(gEnv->pCore, X_SOURCE_INFO, pNickName, sys); \
 	core::profiler::XProfileScope					__ProfileLogCall(&__Profiledata);
 
-#define X_PROFILE_STARTUP_BEGIN(pNickName, sys) \
+#define X_PROFILE_NO_HISTORY_BEGIN(pNickName, sys) \
 	static core::profiler::XProfileData				__Profiledata(gEnv->pCore, X_SOURCE_INFO, pNickName, sys); \
 	core::profiler::XProfileScope					__ProfileLogCall(&__Profiledata);
 
 #else
 
 #define X_PROFILE_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
-#define X_PROFILE_STARTUP_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
+#define X_PROFILE_NO_HISTORY_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 
 
 #endif // !X_ENABLE_PROFILER
