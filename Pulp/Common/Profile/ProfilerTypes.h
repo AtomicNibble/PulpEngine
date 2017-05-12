@@ -147,9 +147,9 @@ namespace profiler
 
 	class XProfileDataHistory : public XProfileData
 	{
-		typedef ProfilerHistory<float, X_PROFILE_HISTORY_SIZE> TotalTimes;
-		typedef ProfilerHistory<float, X_PROFILE_HISTORY_SIZE> SelfTimes;
-		typedef ProfilerHistory<int, X_PROFILE_HISTORY_SIZE> CallCounts;
+		typedef ProfilerHistory<uint64_t, X_PROFILE_HISTORY_SIZE> TotalTimes;
+		typedef ProfilerHistory<uint64_t, X_PROFILE_HISTORY_SIZE> SelfTimes;
+		typedef ProfilerHistory<int32_t, X_PROFILE_HISTORY_SIZE> CallCounts;
 
 	public:
 		XProfileDataHistory(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys) :
@@ -160,12 +160,34 @@ namespace profiler
 			}
 		}
 
+		X_INLINE void onFrameBegin(void);
+
 	protected:
+		uint64_t		sumTime_;			// sum of each frame value
+		uint64_t		sumTimeSelf_;		// ''
+
 		TotalTimes totalTimeHistory_;
 		SelfTimes selfTimeHistory_;
 		CallCounts callCountHistory_;
 	};
 
+
+	X_INLINE void XProfileDataHistory::onFrameBegin(void)
+	{
+		// add frame values
+		sumTime_ += time_;
+		sumTimeSelf_ += timeSelf_;
+
+		// log values.
+		totalTimeHistory_.append(time_);
+		selfTimeHistory_.append(timeSelf_);
+		callCountHistory_.append(callCount_);
+
+		// clear frame values
+		time_ = 0llu;
+		timeSelf_ = 0llu;
+		callCount_ = 0;
+	}
 
 	class XProfileScope
 	{
