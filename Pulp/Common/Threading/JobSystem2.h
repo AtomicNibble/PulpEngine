@@ -133,9 +133,9 @@ X_ENSURE_SIZE(Job, 128);
 
 #if X_ENABLE_JOBSYS_PROFILER
 
-static const uint32_t MASK = 16;
-
+// static const uint32_t MASK = 16;
 static const uint32_t JOBSYS_HISTORY_COUNT = 16;
+static const uint32_t JOBSYS_HISTORY_MASK = JOBSYS_HISTORY_COUNT - 1;
 
 struct JobSystemStats
 {
