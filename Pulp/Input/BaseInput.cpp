@@ -13,18 +13,14 @@ namespace {
 		X_ASSERT_NOT_NULL(pListenerA);
 		X_ASSERT_NOT_NULL(pListenerB);
 
-		if (!pListenerA || !pListenerB)
-			return false;
-
-		if (pListenerA->GetPriority() > pListenerB->GetPriority())
-		{
+		if (pListenerA->GetInputPriority() > pListenerB->GetInputPriority()) {
 			return true;
 		}
 
 		return false;
 	}
 
-}
+} // namespace
 
 XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
