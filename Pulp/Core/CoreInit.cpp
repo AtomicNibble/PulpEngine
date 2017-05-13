@@ -407,12 +407,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (pProfiler_)	{
 		pProfiler_->registerVars();
 		pProfiler_->registerCmds();
-
-		if (!pProfiler_->init(this)) {
-			return false;
-		}
 	}
-
 
 	// register verbosity vars.
 	if (pConsoleLogger_) {
@@ -494,6 +489,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;
 		}
 	}
+
+	if (pProfiler_) {
+		if (!pProfiler_->init(this)) {
+			return false;
+		}
+	}
+
 
 	if (startupParams.bEnableNetowrking)
 	{
