@@ -636,13 +636,13 @@ void XCore::LogSystemInfo(void) const
 
 	X_LOG0("SysInfo", "UserName: \"%ls\"", userName);
 	X_LOG0("SysInfo", "Language: \"%ls\"", lang);
-	X_LOG0("SysInfo", "PhysicalMem %s available %s virtual %s used %ld%%",
+	X_LOG0("SysInfo", "PhysicalMem ^6%s^7 available ^6%s^7 virtual ^6%s^7 used ^6%" PRIu32 "%%",
 		core::HumanSize::toString(s1, memInfo.TotalPhys),
 		core::HumanSize::toString(s2, memInfo.AvailPhys),
 		core::HumanSize::toString(s3, memInfo.TotalVirtual),
 		memInfo.dwMemoryLoad
 	);
-	X_LOG0("SysInfo", "Display: %dx%dx%d",
+	X_LOG0("SysInfo", "Display: ^6%d^7x^6%d^7x^6%d",
 		displayInfo.pelsWidth,
 		displayInfo.pelsHeight,
 		displayInfo.bitsPerPel
