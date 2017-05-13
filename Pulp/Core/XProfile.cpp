@@ -330,7 +330,7 @@ namespace profiler
 		return false;
 	}
 
-	int32_t XProfileSys::GetPriority(void) const
+	int32_t XProfileSys::GetInputPriority(void) const
 	{
 		return 1;
 	}

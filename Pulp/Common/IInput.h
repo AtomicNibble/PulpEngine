@@ -386,7 +386,8 @@ struct IInputEventListner
 	virtual bool OnInputEvent(const InputEvent& event) X_ABSTRACT;
 	virtual bool OnInputEventChar(const InputEvent& event) { X_UNUSED(event); return false; };
 
-	virtual int32_t GetPriority(void) const { return 0; }
+	// higer priority is sent event first.
+	virtual int32_t GetInputPriority(void) const { return 0; }
 };
 
 struct IInputDevice
