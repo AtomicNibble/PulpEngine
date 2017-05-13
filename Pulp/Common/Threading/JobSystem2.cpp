@@ -811,7 +811,7 @@ namespace V2
 				ThreadBackOff(backoff);
 				backoff++;
 
-				if (backoff > 10)
+				if (backoff > 25)
 				{
 					// if we not had a job for a while, ensure all que's are empty
 					// if so wait on the consition.
