@@ -341,8 +341,8 @@ namespace profiler
 
 
 		core::StackString512 txt;
-		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32 " NumThread: %" PRIi32 " NumThreadQeues: %" PRIi32,
-			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited, numThread, numThreadQueues);
+		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
+			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
 
 		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
