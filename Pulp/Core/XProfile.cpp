@@ -292,7 +292,6 @@ namespace profiler
 #else
 			X_UNUSED(frameTimeInfo);
 
-
 #endif // !X_ENABLE_JOBSYS_PROFILER
 		}
 	}
@@ -325,23 +324,25 @@ namespace profiler
 		ctx.SetColor(Col_White);
 		ctx.SetSize(Vec2f(16.f,16.f));
 
-		core::StackString512 txt;
-		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
-			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
-
 		float keyHeight = 30.f;
 		const float maxHeightPerThread = 50.f;
 
-		const size_t visibleMS = 16;
-		const uint32_t numThread = pJobSys->GetThreadCount() + 1;
+		const int32_t visibleMS = vars_.jobSysThreadMS();
+		const uint32_t numThread = pJobSys->GetThreadCount();
+		const uint32_t numThreadQueues = pJobSys->GetQeueCount();
 		const float threadInfoXOffset = 85.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
 		const float threadInfoY = yStart + ctx.size.y + (padding * 2);
-		const float threadInfoHeight = core::Min<float>((height - (ctx.size.y + padding) - (keyHeight + padding)) - 20, maxHeightPerThread * numThread);
+		const float threadInfoHeight = core::Min<float>((height - (ctx.size.y + padding) - (keyHeight + padding)) - 20, maxHeightPerThread * numThreadQueues);
 		const float threadInfoWidth = (width - (padding * 2)) - threadInfoXOffset;
 
 		const float widthPerMS = threadInfoWidth / visibleMS;
-		const float threadInfoEntryHeight = threadInfoHeight / numThread;
+		const float threadInfoEntryHeight = threadInfoHeight / numThreadQueues;
+
+
+		core::StackString512 txt;
+		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32 " NumThread: %" PRIi32 " NumThreadQeues: %" PRIi32,
+			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited, numThread, numThreadQueues);
 
 		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
@@ -383,7 +384,7 @@ namespace profiler
 				pPrim->drawText(threadInfoX + (i * widthPerMS), threadInfoY + threadInfoHeight, ctx, str.c_str());
 			}
 
-			for (size_t i = 0; i < numThread; i++)
+			for (size_t i = 0; i < numThreadQueues; i++)
 			{
 				str.setFmt("Thread %i", i);
 				pPrim->drawText(threadInfoX - threadInfoXOffset, threadInfoY + (i* threadInfoEntryHeight), ctx, str.c_str());
@@ -420,7 +421,7 @@ namespace profiler
 			X_ENABLE_WARNING(4127)
 		}
 
-		for (uint32_t i = 0; i < numThread; i++)
+		for (uint32_t i = 0; i < numThreadQueues; i++)
 		{		
 			if (!timeLines[i]) {
 				continue;
@@ -452,7 +453,7 @@ namespace profiler
 			return;
 		}
 	
-		const size_t visibleMS = 16;
+		const int32_t visibleMS = vars_.jobSysThreadMS();
 		const float widthPerMS = width / visibleMS;
 		const float quadsize = 15.f;
 
