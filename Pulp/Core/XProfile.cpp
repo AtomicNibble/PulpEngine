@@ -289,6 +289,11 @@ namespace profiler
 			return false;
 		}
 
+#if !X_ENABLE_JOBSYS_PROFILER
+		X_UNUSED(event);
+
+		return false;
+#else
 		if (event.action == input::InputState::RELEASED) {
 			repeatEvent_.keyId = input::KeyId::UNKNOWN;
 		}
@@ -320,8 +325,8 @@ namespace profiler
 				break;
 		}
 		
-
 		return true;
+#endif // !X_ENABLE_JOBSYS_PROFILER
 	}
 
 	bool XProfileSys::OnInputEventChar(const input::InputEvent& event)
