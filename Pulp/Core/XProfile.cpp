@@ -332,7 +332,7 @@ namespace profiler
 
 	int32_t XProfileSys::GetPriority(void) const
 	{
-		return 0;
+		return 1;
 	}
 	// ~IInputEventListner
 
