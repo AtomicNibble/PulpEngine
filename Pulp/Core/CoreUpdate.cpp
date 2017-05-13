@@ -59,27 +59,6 @@ bool XCore::Update(void)
 	X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
 	using namespace core::V2;
 
-	if (pProfiler_) {
-		pProfiler_->OnFrameBegin();
-	}
-
-	if (env_.pJobSys) 
-	{
-		bool paused = false;
-
-		if (pProfiler_) {
-			paused = pProfiler_->getVars().isPaused();
-		}
-
-		env_.pJobSys->OnFrameBegin(paused);
-	}
-
-#if 1
-
-	// Core events like windows move or resize & focus will have been dispatched during PumpMessages
-	// so the happen at a defined time before a frame starts.
-
-
 	core::FrameData frameData;
 	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
 	frameData.view.viewport.set(1680, 1050);
@@ -88,8 +67,27 @@ bool XCore::Update(void)
 	// get time deltas for this frame.
 	time_.OnFrameBegin(frameData.timeInfo);
 
+	if (pProfiler_) {
+		pProfiler_->OnFrameBegin(frameData.timeInfo);
+	}
 
 	JobSystem& jobSys = *env_.pJobSys;
+
+	{
+		bool paused = false;
+
+		if (pProfiler_) {
+			paused = pProfiler_->getVars().isPaused();
+		}
+
+		jobSys.OnFrameBegin(paused);
+	}
+
+#if 1
+
+	// Core events like windows move or resize & focus will have been dispatched during PumpMessages
+	// so the happen at a defined time before a frame starts.
+
 
 	// we must call this on same thread as window.
 	if (env_.pInput) {
