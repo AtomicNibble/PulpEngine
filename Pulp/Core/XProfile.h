@@ -97,7 +97,7 @@ namespace profiler
 		int32_t frameOffset_;
 
 		X_DISABLE_WARNING(4324);
-		input::InputEvent		repeatEvent_;
+		input::InputEvent repeatEvent_;
 		X_ENABLE_WARNING(4324);
 
 		TimeVal repeatEventInterval_;
