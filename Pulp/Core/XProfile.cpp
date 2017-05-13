@@ -346,6 +346,17 @@ namespace profiler
 
 		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
+		std::array<int32_t, V2::JobSystem::HW_THREAD_MAX> jobCounts;
+
+		for (uint32_t i = 0; i < numThreadQueues; i++)
+		{
+			if (!timeLines[i]) {
+				continue;
+			}
+
+			jobCounts[i] = timeLines[i]->getHistory()[profileIdx].bottom_;
+		}
+
 		// draw a gird spliting up the horizontal space in to time.
 		{
 			// background
@@ -384,12 +395,22 @@ namespace profiler
 				pPrim->drawText(threadInfoX + (i * widthPerMS), threadInfoY + threadInfoHeight, ctx, str.c_str());
 			}
 
-			for (size_t i = 0; i < numThreadQueues; i++)
+			// draw how many jobs each thread ran
 			{
-				str.setFmt("Thread %i", i);
-				pPrim->drawText(threadInfoX - threadInfoXOffset, threadInfoY + (i* threadInfoEntryHeight), ctx, str.c_str());
+				ctx.flags.Set(font::DrawTextFlag::RIGHT);
+
+				for (size_t i = 0; i < numThreadQueues; i++)
+				{
+					str.setFmt("%i", jobCounts[i]);
+					pPrim->drawText(threadInfoX - padding, threadInfoY + (i* threadInfoEntryHeight), ctx, str.c_str());
+				}
+
+				ctx.flags.Remove(font::DrawTextFlag::RIGHT);
+
+
 			}
 
+			// draw the color key
 			{
 				float keyY = threadInfoY + (threadInfoHeight + keyHeight);
 				float keyX = threadInfoX + padding;
