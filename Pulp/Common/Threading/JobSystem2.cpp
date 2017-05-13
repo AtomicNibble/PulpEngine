@@ -275,15 +275,15 @@ namespace V2
 	void JobSystem::OnFrameBegin(bool isProfilerPaused)
 	{
 #if X_ENABLE_JOBSYS_PROFILER
-		if (!isProfilerPaused) 
+
+		if (!isProfilerPaused)
 		{
 			currentHistoryIdx_ = (currentHistoryIdx_ + 1) & (JOBSYS_HISTORY_COUNT - 1);
-
-			stats_[currentHistoryIdx_].clear();
 		}
 
-		for (uint32_t i = 0; i < HW_THREAD_MAX; i++)
-		{
+		stats_[currentHistoryIdx_].clear();
+
+		for (uint32_t i = 0; i < HW_THREAD_MAX; i++) {
 			if (pTimeLines_[i]) {
 				pTimeLines_[i]->sethistoryIndex(currentHistoryIdx_);
 			}
