@@ -9,6 +9,7 @@
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <IFont.h>
+#include <IConsole.h>
 
 #include "Profile\ProfilerTypes.h"
 
@@ -257,7 +258,6 @@ namespace profiler
 			if (repeatEventTimer_.GetValue() < 0)
 			{
 				OnInputEvent(repeatEvent_);
-
 				repeatEventTimer_ = repeatEventInterval_;
 			}
 		}
@@ -292,7 +292,7 @@ namespace profiler
 	// IInputEventListner
 	bool XProfileSys::OnInputEvent(const input::InputEvent& event)
 	{
-		if (!vars_.drawProfileInfo()) {
+		if (!vars_.drawProfiler()) {
 			return false;
 		}
 
@@ -353,7 +353,15 @@ namespace profiler
 
 	void XProfileSys::Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys)
 	{
-		if (pJobSys && vars_.drawProfileInfo())
+		bool draw = vars_.drawProfiler();
+		if (!vars_.drawProfilerConsoleExpanded())
+		{
+			if (gEnv->pConsole) {
+				draw = gEnv->pConsole->getVisState() != core::consoleState::EXPANDED;
+			}
+		}
+
+		if (pJobSys && draw)
 		{
 #if X_ENABLE_JOBSYS_PROFILER
 
