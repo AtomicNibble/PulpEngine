@@ -168,7 +168,7 @@ void XBaseInput::AddEventListener(IInputEventListner *pListener)
 	if (std::find(listners_.begin(), listners_.end(), pListener) == listners_.end())
 	{
 		listners_.push_back(pListener);
-		std::sort(listners_.begin(), listners_.end(), compareInputListener);
+		std::stable_sort(listners_.begin(), listners_.end(), compareInputListener);
 	}
 }
 
@@ -187,7 +187,7 @@ void XBaseInput::AddConsoleEventListener(IInputEventListner *pListener)
 	if (std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener) == consoleListeners_.end())
 	{
 		consoleListeners_.push_back(pListener);
-		std::sort(consoleListeners_.begin(), consoleListeners_.end(), compareInputListener);
+		std::stable_sort(consoleListeners_.begin(), consoleListeners_.end(), compareInputListener);
 	}
 }
 
