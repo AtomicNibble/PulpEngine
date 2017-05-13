@@ -483,7 +483,7 @@ namespace profiler
 				}
 			}
 
-			for (size_t i = 0; i < visibleMS + 1; i++)
+			for (int32_t i = 0; i < visibleMS + 1; i++)
 			{
 				Vec3f top(threadInfoX + (i * widthPerMS), threadInfoY, 1);
 				Vec3f bottom(threadInfoX + (i * widthPerMS), threadInfoY + threadInfoHeight, 1);
@@ -496,7 +496,7 @@ namespace profiler
 			ctx.col = Col_Dimgray;
 
 			core::StackString<64> str;
-			for (size_t i = 1; i < visibleMS; i++)
+			for (int32_t i = 1; i < visibleMS; i++)
 			{
 				if (visibleMS > 16)
 				{
@@ -513,7 +513,7 @@ namespace profiler
 			{
 				ctx.flags.Set(font::DrawTextFlag::RIGHT);
 
-				for (size_t i = 0; i < numThreadQueues; i++)
+				for (uint32_t i = 0; i < numThreadQueues; i++)
 				{
 					str.setFmt("%i", jobCounts[i]);
 					pPrim->drawText(threadInfoX - padding, threadInfoY + (i* threadInfoEntryHeight), ctx, str.c_str());
