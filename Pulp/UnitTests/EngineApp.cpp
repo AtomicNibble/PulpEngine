@@ -61,6 +61,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.bConsoleLog = true;
 	params.bTesting = true;
 	params.bCoreOnly = true;
+	params.bEnableJobSystem = false;
+	params.bProfileSysEnabled = false;
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
 
