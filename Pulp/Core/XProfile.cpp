@@ -154,7 +154,7 @@ namespace profiler
 		subSystemInfo_[profiler::SubSys::INPUT].col = Col_Lime;
 		subSystemInfo_[profiler::SubSys::RENDER].col = Col_Green;
 		subSystemInfo_[profiler::SubSys::SCRIPT].col = Col_Cyan;
-		subSystemInfo_[profiler::SubSys::SOUND].col = Col_Blue;
+		subSystemInfo_[profiler::SubSys::SOUND].col = Color8u(67, 133, 255);
 		subSystemInfo_[profiler::SubSys::GAME].col = Col_Purple;
 		subSystemInfo_[profiler::SubSys::PHYSICS].col = Col_Magenta;
 		subSystemInfo_[profiler::SubSys::NETWORK].col = Col_Pink;
