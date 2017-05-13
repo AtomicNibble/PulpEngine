@@ -54,7 +54,6 @@ namespace V2
 
 	}
 
-	// void JobQueueHistory::onFrameBegin(bool pause)
 	void JobQueueHistory::sethistoryIndex(int32_t historyIdx)
 	{
 		int32_t newIdx = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
