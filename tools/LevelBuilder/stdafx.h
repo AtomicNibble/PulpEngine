@@ -27,12 +27,6 @@
 
 X_USING_NAMESPACE;
 
-
-// #include <vector>
-// #include <map>
-
-// using namespace std;
-
 #include "Globals.h"
 #include "Settings.h"
 #include "PlaneSet.h"

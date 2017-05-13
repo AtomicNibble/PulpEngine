@@ -16,8 +16,6 @@
 #include <ITexture.h>
 #include <IShader.h>
 
-// #include <vector> // temp
-
 
 X_NAMESPACE_DECLARE(core,
 struct IConsoleCmdArgs;
