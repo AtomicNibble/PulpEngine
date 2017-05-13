@@ -245,9 +245,6 @@ namespace profiler
 
 	void XProfileSys::OnFrameBegin(const FrameTimeData& frameTimeInfo)
 	{
-		if (vars_.isPaused()) {
-			return;
-		}
 
 		frameStartTime_ = ProfileTimer::getTicks();
 
@@ -261,6 +258,12 @@ namespace profiler
 				repeatEventTimer_ = repeatEventInterval_;
 			}
 		}
+
+		if (vars_.isPaused()) {
+			return;
+		}
+
+		// ...
 	}
 
 	void XProfileSys::OnFrameEnd(void)
