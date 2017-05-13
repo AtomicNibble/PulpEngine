@@ -108,9 +108,6 @@ namespace profiler
 		ProfilerDataPtrArr profilerData_;
 		ProfilerDataHistoryPtrArr profilerHistoryData_;
 
-		uint64_t frameStartTime_;
-		uint64_t frameTime_;
-		uint64_t totalTime_;
 	};
 
 } // namespace profiler

@@ -97,10 +97,7 @@ namespace profiler
 		pFont_(nullptr),
 		frameOffset_(0),
 		profilerData_(arena),
-		profilerHistoryData_(arena),
-		frameStartTime_(0),
-		frameTime_(0),
-		totalTime_(0)
+		profilerHistoryData_(arena)
 	{
 		repeatEventTimer_ = TimeVal(0ll);
 		repeatEventInterval_ = TimeVal(0.05f);
@@ -245,9 +242,6 @@ namespace profiler
 
 	void XProfileSys::OnFrameBegin(const FrameTimeData& frameTimeInfo)
 	{
-
-		frameStartTime_ = ProfileTimer::getTicks();
-
 		if (repeatEvent_.keyId != input::KeyId::UNKNOWN)
 		{
 			repeatEventTimer_ -= frameTimeInfo.unscaledDeltas[ITimer::Timer::UI];
@@ -272,12 +266,8 @@ namespace profiler
 			return;
 		}
 
-		uint64_t end = ProfileTimer::getTicks();
 
 		// update some time stats.
-		frameTime_ = end - frameStartTime_;
-		totalTime_ += frameTime_;
-
 		UpdateProfileData();
 	}
 
