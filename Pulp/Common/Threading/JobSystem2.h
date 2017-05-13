@@ -459,6 +459,7 @@ public:
 
 	void CreateQueForCurrentThread(void);
 	uint32_t GetThreadCount(void) const;
+	uint32_t GetQeueCount(void) const;
 	ThreadIdArray getThreadIds(void);
 
 #if X_ENABLE_JOBSYS_PROFILER

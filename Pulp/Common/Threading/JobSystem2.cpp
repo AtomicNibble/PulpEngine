@@ -324,6 +324,11 @@ namespace V2
 		return numThreads_;
 	}
 
+	uint32_t JobSystem::GetQeueCount(void) const
+	{
+		return numQues_;
+	}
+
 	JobSystem::ThreadIdArray JobSystem::getThreadIds(void)
 	{
 		ThreadIdArray arr;
