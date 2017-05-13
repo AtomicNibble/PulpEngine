@@ -100,9 +100,9 @@ namespace profiler
 		input::InputEvent		repeatEvent_;
 		X_ENABLE_WARNING(4324);
 
-		TimeVal					repeatEventInterval_;
-		TimeVal					repeatEventInitialDelay_;
-		TimeVal					repeatEventTimer_; // the time a repeat event will be trigger.
+		TimeVal repeatEventInterval_;
+		TimeVal repeatEventInitialDelay_;
+		TimeVal repeatEventTimer_; // the time a repeat event will be trigger.
 
 
 		ProfilerDataPtrArr profilerData_;
