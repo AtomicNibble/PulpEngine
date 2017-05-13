@@ -7,13 +7,11 @@
 X_NAMESPACE_BEGIN(input)
 
 
-XInputCVars* g_pInputCVars = 0;
-
 XInputCVars::XInputCVars()
 {
-	input_debug = 0;
-	input_mouse_pos_debug = 0;
-	scrollLines = 1;
+	inputDebug_ = 0;
+	inputMousePosDebug_ = 0;
+	scrollLines_ = 1;
 }
 
 XInputCVars::~XInputCVars()
@@ -25,10 +23,10 @@ XInputCVars::~XInputCVars()
 
 void XInputCVars::registerVars(void)
 {
-	ADD_CVAR_REF_NO_NAME(input_debug, 0, 0, 3, core::VarFlags::SYSTEM,
+	ADD_CVAR_REF_NO_NAME(inputDebug_, 0, 0, 3, core::VarFlags::SYSTEM,
 		"Input debugging");
 
-	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, core::VarFlags::SYSTEM,
+	ADD_CVAR_REF_NO_NAME(inputMousePosDebug_, 0, 0, 1, core::VarFlags::SYSTEM,
 		"Input mouse position debugging");
 
 }

@@ -16,9 +16,23 @@ class XWinInput;
 
 class XKeyboard : public XInputDeviceWin32
 {
+	struct AsciiVal
+	{
+		char lower;
+		char upper;
+		char caps;
+		char alternate; // used for like number buttons, when caps lock is on and shit pressed EG: (caps + shift + 9) = (
+	};
+
+	typedef std::array<AsciiVal, 256> AsciiValArr;
+	typedef std::array<bool, 256> BoolArr;
+	typedef std::array<InputSymbol*, 256> InputSymbolPtrArr;
+
+	X_NO_ASSIGN(XKeyboard);
+	X_NO_COPY(XKeyboard);
 
 public:
-	XKeyboard(XWinInput& input);
+	XKeyboard(XWinInput& input, XInputCVars& vars);
 	~XKeyboard() X_OVERRIDE;
 
 	// IInputDevice overrides
@@ -40,22 +54,10 @@ private:
 
 	void ProcessKeyboardData(const RAWKEYBOARD& rawKb, core::FrameInput& inputFrame);
 
-	struct AsciiVal
-	{
-		char lower;
-		char upper;
-		char caps;
-		char alternate; // used for like number buttons, when caps lock is on and shit pressed EG: (caps + shift + 9) = (
-	};
-
-	AsciiVal ascii_cache[256];
-
-	static bool VkeyCharCache_[256];
-	static InputSymbol*	Symbol[256];
-
 private:
-	X_NO_ASSIGN(XKeyboard);
-	X_NO_COPY(XKeyboard);
+	AsciiValArr asciiCache_;
+	BoolArr VkeyCharCache_;
+	InputSymbolPtrArr pSymbol_;
 };
 
 

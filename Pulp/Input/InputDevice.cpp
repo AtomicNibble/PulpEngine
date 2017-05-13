@@ -4,9 +4,10 @@
 X_NAMESPACE_BEGIN(input)
 
 
-XInputDevice::XInputDevice(IInput& input, const char* deviceName) :
+XInputDevice::XInputDevice(IInput& input, XInputCVars& vars, const char* pDeviceName) :
 	input_(input),
-	deviceName_(deviceName),
+	vars_(vars),
+	deviceName_(pDeviceName),
 	deviceType_(InputDeviceType::UNKNOWN),
 	enabled_(true),
 	idToInfo_(g_InputArena, 256)
@@ -43,13 +44,12 @@ InputSymbol* XInputDevice::LookupSymbol(KeyId::Enum id) const
 
 InputSymbol* XInputDevice::IdToSymbol(KeyId::Enum id) const
 {
-	TIdToSymbolMap::const_iterator i = idToInfo_.find(id);
-	if (i != idToInfo_.end()) {
-		return (*i).second;
+	auto it = idToInfo_.find(id);
+	if (it != idToInfo_.end()) {
+		return (*it).second;
 	}
-	else {
-		return 0;
-	}
+	
+	return nullptr;
 }
 
 X_NAMESPACE_END

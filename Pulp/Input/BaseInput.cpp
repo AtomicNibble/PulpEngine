@@ -22,20 +22,17 @@ namespace {
 
 } // namespace
 
-XBaseInput::XBaseInput() :
-	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
-	devices_(g_InputArena),
-	listners_(g_InputArena),
-	consoleListeners_(g_InputArena),
-	holdSymbols_(g_InputArena),
-	clearStateEvents_(g_InputArena), 
+XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
+	pCVars_(X_NEW(XInputCVars, arena,"InputCvars")),
+	devices_(arena),
+	listners_(arena),
+	consoleListeners_(arena),
+	holdSymbols_(arena),
+	clearStateEvents_(arena),
 	enableEventPosting_(true),
 	hasFocus_(false),
 	retriggering_(false)
 {
-	X_ASSERT(g_pInputCVars == nullptr, "InputCvars pointer not null")();
-	g_pInputCVars = pCVars_;
-
 	holdSymbols_.setGranularity(32);
 	holdSymbols_.reserve(64);
 	clearStateEvents_.reserve(16);
@@ -45,9 +42,18 @@ XBaseInput::XBaseInput() :
 
 XBaseInput::~XBaseInput(void)
 {
-	X_DELETE(pCVars_, g_InputArena);
-	pCVars_ = nullptr;
-	g_pInputCVars = nullptr;
+	X_DELETE_AND_NULL(pCVars_, arena_);
+}
+
+
+void XBaseInput::registerVars(void)
+{
+	pCVars_->registerVars();
+}
+
+void XBaseInput::registerCmds(void)
+{
+
 }
 
 
@@ -55,12 +61,10 @@ bool XBaseInput::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
-	X_ASSERT_NOT_NULL(g_pInputCVars);
 
-	// register even listner.
+	// register event listner.
 	gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
 	
-	g_pInputCVars->registerVars();
 
 	return true;
 }
@@ -124,7 +128,7 @@ void XBaseInput::Update(core::FrameData& frameData)
 
 void XBaseInput::ClearKeyState(void)
 {
-	if (g_pInputCVars->input_debug)
+	if (pCVars_->inputDebug_)
 	{
 		X_LOG0("Input", "clearing key states.");
 	}
@@ -218,7 +222,7 @@ bool XBaseInput::AddInputDevice(IInputDevice* pDevice)
 void XBaseInput::EnableEventPosting(bool bEnable)
 {
 	enableEventPosting_ = bEnable;
-	if (g_pInputCVars->input_debug)
+	if (pCVars_->inputDebug_)
 	{
 		X_LOG0("Input", "Eventposting: %s", bEnable ? "true" : "false");
 	}
@@ -228,7 +232,7 @@ void XBaseInput::EnableEventPosting(bool bEnable)
 bool XBaseInput::PostInputEvent(const InputEvent &event)
 {
 	if (event.keyId == KeyId::UNKNOWN) {
-		if (g_pInputCVars->input_debug > 1) {
+		if (pCVars_->inputDebug_ > 1) {
 			X_WARNING("Input", "Ingoring unknown event key from device: %s", InputDeviceType::ToString(event.deviceType));
 		}
 		return false;
@@ -303,7 +307,7 @@ void XBaseInput::AddClearEvents(core::FrameInput& inputFrame)
 	}
 
 	size_t num = clearStateEvents_.size();
-	if (g_pInputCVars->input_debug > 0)
+	if (pCVars_->inputDebug_ > 0)
 	{
 		X_LOG0("Input", "posting %i clear events", num);
 	}
@@ -331,7 +335,7 @@ void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
 
 	size_t count = holdSymbols_.size();
 
-	if (g_pInputCVars->input_debug > 2)
+	if (pCVars_->inputDebug_ > 2)
 	{ 
 		X_LOG0("Input", "posting %i hold symbols", count);
 	}

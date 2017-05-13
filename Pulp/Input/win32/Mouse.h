@@ -15,14 +15,19 @@ class XWinInput;
 
 class XMouse : public XInputDeviceWin32
 {
-	const static int MAX_MOUSE_SYMBOLS = KeyId::MOUSE_LAST - KeyId::INPUT_MOUSE_BASE;
+	const static int32_t MAX_MOUSE_SYMBOLS = KeyId::MOUSE_LAST - KeyId::INPUT_MOUSE_BASE;
+
+	typedef std::array<InputSymbol*, MAX_MOUSE_SYMBOLS> InputSymbolPtrArr;
+
+	X_NO_ASSIGN(XMouse);
+	X_NO_COPY(XMouse);
 
 public:
-	XMouse(XWinInput& input);
+	XMouse(XWinInput& input, XInputCVars& vars);
 	~XMouse() X_OVERRIDE;
 
 	// IInputDevice overrides
-	X_INLINE int32_t GetDeviceIndex() const X_OVERRIDE; 
+	X_INLINE int32_t GetDeviceIndex(void) const X_OVERRIDE; 
 	bool Init(void) X_OVERRIDE;
 	void ShutDown(void) X_OVERRIDE;
 	void Update(core::FrameData& frameData) X_OVERRIDE;
@@ -44,11 +49,7 @@ private:
 
 private:
 	float mouseWheel_;
-	static InputSymbol*	Symbol_[MAX_MOUSE_SYMBOLS];
-
-private:
-	X_NO_ASSIGN(XMouse);
-	X_NO_COPY(XMouse);
+	InputSymbolPtrArr pSymbol_;
 };
 
 X_NAMESPACE_END

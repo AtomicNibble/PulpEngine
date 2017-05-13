@@ -8,10 +8,6 @@
 
 #include <Containers\Array.h>
 
-
-#include <list>
-// #include <vector>
-
 X_NAMESPACE_BEGIN(input)
 
 struct IInputEventListner;
@@ -27,17 +23,20 @@ class XBaseInput : public IInput, public ICoreEventListener
 
 
 public:
-	XBaseInput();
+	XBaseInput(core::MemoryArenaBase* arena);
 	virtual ~XBaseInput() X_OVERRIDE;
 
 	// IInput
-	// stub implementation
+	void registerVars(void) X_OVERRIDE;
+	void registerCmds(void) X_OVERRIDE;
+
 	bool Init(void) X_OVERRIDE;
 	void PostInit(void) X_OVERRIDE;
 	void Update(core::FrameData& frameData) X_OVERRIDE;
 	void ShutDown(void) X_OVERRIDE;
 	void release(void) X_OVERRIDE;
 		 
+
 	void ClearKeyState(void) X_OVERRIDE;
 	void RetriggerKeyState(void) X_OVERRIDE;
 	X_INLINE bool Retriggering(void) const X_OVERRIDE;
@@ -81,7 +80,9 @@ private:
 	void ClearHoldEvent(InputSymbol* pSymbol);
 	bool SendEventToListeners(const InputEvent &event);
 	void AddEventToHoldSymbols(const InputEvent &event);
+
 protected:
+	core::MemoryArenaBase*				arena_;
 	InputSymbolsArr						holdSymbols_;
 	InputEventListenersList				listners_;
 	InputEventListenersList				consoleListeners_;

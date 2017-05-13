@@ -14,17 +14,14 @@
 
 X_NAMESPACE_BEGIN(input)
 
-
-
-XWinInput::XWinInput(ICore* pSystem, HWND hWnd) :
-	XBaseInput(),
+XWinInput::XWinInput(core::MemoryArenaBase* arena, HWND hWnd) :
+	XBaseInput(arena),
 	isWow64_(FALSE),
 	hWnd_(hWnd),
 	pKeyBoard_(nullptr),
 	pMouse_(nullptr),
 	pJobSystem_(nullptr)
 {
-	pJobSystem_ = pSystem->GetJobSystem();
 
 	devices_.reserve(2);
 };
@@ -34,9 +31,26 @@ XWinInput::~XWinInput()
 }
 
 
+void XWinInput::registerVars(void)
+{
+	XBaseInput::registerVars();
+
+}
+
+void XWinInput::registerCmds(void)
+{
+	XBaseInput::registerCmds();
+
+}
+
+
 bool XWinInput::Init(void)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("InputInit", core::profiler::SubSys::INPUT);
+
 	XBaseInput::Init();
+
+	pJobSystem_ = gEnv->pJobSys;
 
 	// work out if WOW64.
 	if (!::IsWow64Process(::GetCurrentProcess(), &isWow64_)) {
@@ -45,8 +59,8 @@ bool XWinInput::Init(void)
 		return false;
 	}
 
-	pKeyBoard_ = X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this);
-	pMouse_ = X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this);
+	pKeyBoard_ = X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this, *pCVars_);
+	pMouse_ = X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this, *pCVars_);
 
 
 	// o baby!
@@ -99,7 +113,7 @@ void XWinInput::Update(core::FrameData& frameData)
 	UINT size;
 	size_t num;
 
-	const bool debug = (g_pInputCVars->input_debug > 1);
+	const bool debug = (pCVars_->inputDebug_ > 1);
 	const bool mouseEnabled = pMouse_->IsEnabled();
 	const bool keyboardEnabled = pKeyBoard_->IsEnabled();
 

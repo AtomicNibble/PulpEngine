@@ -22,12 +22,15 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{c31632cd-ccb7-4c27-9ae3-db74f90a2b00}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{52171fc6-21ef-4490-8996-f22b80c61d90}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{8b80c884-2ca2-4118-9e4b-ef5375372a65}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="InputCVars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BaseInput.h">
@@ -48,12 +51,12 @@
     <ClInclude Include="win32\Win32Input.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
+    <ClInclude Include="InputCVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InputCVars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BaseInput.cpp">
@@ -76,6 +79,9 @@
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
+    </ClCompile>
+    <ClCompile Include="InputCVars.cpp">
+      <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

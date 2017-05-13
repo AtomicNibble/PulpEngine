@@ -49,6 +49,15 @@ bool XNullInput::Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData
 	return false;
 }
 
+void XNullInput::registerVars(void)
+{
+
+}
+
+void XNullInput::registerCmds(void)
+{
+
+}
 
 bool XNullInput::Init(void)
 {

@@ -69,11 +69,11 @@ class XEngineModule_Input : public IEngineModule
 
 		if (!gEnv->IsDedicated())
 		{
-			pInput = X_NEW_ALIGNED(input::XWinInput, g_InputArena, "Win32Input", 8)(pCore, static_cast<PLATFORM_HWND>(initParams.hWnd));
+			pInput = X_NEW_ALIGNED(input::XWinInput, g_InputArena, "Win32Input", 8)(g_InputArena, static_cast<PLATFORM_HWND>(initParams.hWnd));
 		}
 		else
 		{
-			pInput = X_NEW_ALIGNED(input::XBaseInput, g_InputArena, "XBaseInput", 8);
+			pInput = X_NEW_ALIGNED(input::XBaseInput, g_InputArena, "XBaseInput", 8)(g_InputArena);
 		}		
 
 		env.pInput = pInput;

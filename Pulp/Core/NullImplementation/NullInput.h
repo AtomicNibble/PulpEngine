@@ -29,7 +29,9 @@ public:
 	virtual void release(void) X_OVERRIDE;
 	virtual void Update(core::FrameData& frameData) X_OVERRIDE;
 
-	
+	virtual void registerVars(void) X_OVERRIDE;
+	virtual void registerCmds(void) X_OVERRIDE;
+
 	virtual void ClearKeyState(void) X_OVERRIDE;
 
 	virtual void RetriggerKeyState(void) X_OVERRIDE;

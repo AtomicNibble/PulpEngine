@@ -3,8 +3,6 @@
 
 X_NAMESPACE_BEGIN(input)
 
-
-
 class XInputCVars
 {
 public:
@@ -15,12 +13,11 @@ public:
 	void registerVars(void);
 
 public:
-	int32_t	input_debug;
-	int32_t	input_mouse_pos_debug;
-	int32_t	scrollLines;
+	int32_t	inputDebug_;
+	int32_t	inputMousePosDebug_;
+	int32_t	scrollLines_;
 };
 
-extern XInputCVars* g_pInputCVars;
 
 X_NAMESPACE_END
 

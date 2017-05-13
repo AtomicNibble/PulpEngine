@@ -7,14 +7,14 @@
 
 X_NAMESPACE_BEGIN(input)
 
-InputSymbol*	XMouse::Symbol_[MAX_MOUSE_SYMBOLS] = { 0 };
 
-
-XMouse::XMouse(XWinInput& input) :
-	XInputDeviceWin32(input, "mouse")
+XMouse::XMouse(XWinInput& input, XInputCVars& vars) :
+	XInputDeviceWin32(input, vars, "mouse")
 {
 	deviceType_ = InputDeviceType::MOUSE;
 	mouseWheel_ = 0.f;
+
+	pSymbol_.fill(nullptr);
 }
 
 XMouse::~XMouse()
@@ -26,8 +26,6 @@ XMouse::~XMouse()
 ///////////////////////////////////////////
 bool XMouse::Init(void)
 {
-	X_ASSERT_NOT_NULL(g_pInputCVars);
-
 	RAWINPUTDEVICE Mouse;
 	Mouse.hwndTarget = 0;
 	Mouse.usUsagePage = 0x1;
@@ -47,19 +45,19 @@ bool XMouse::Init(void)
 	UINT LinesToScroll;
 	if (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &LinesToScroll, 0))
 	{
-		ADD_CVAR_REF("mouse_scroll_linenum", g_pInputCVars->scrollLines, LinesToScroll, 0, 1920,
+		ADD_CVAR_REF("mouse_scroll_linenum", vars_.scrollLines_, LinesToScroll, 0, 1920,
 			core::VarFlag::SYSTEM, "The number of lines to scroll at a time");
 	}
 	else
 	{
-		X_WARNING("Mouse", "Failed to retrieve sys scroll settings, defaulting to: %i", g_pInputCVars->scrollLines);
+		X_WARNING("Mouse", "Failed to retrieve sys scroll settings, defaulting to: %i", vars_.scrollLines_);
 	}
 
 	IInput& input = GetIInput();
 
 	// init the symbols
 #define DEFINE_SYM(id,name) \
-	Symbol_[id - KeyId::INPUT_MOUSE_BASE] = input.DefineSymbol(InputDeviceType::MOUSE, id, name);
+	pSymbol_[id - KeyId::INPUT_MOUSE_BASE] = input.DefineSymbol(InputDeviceType::MOUSE, id, name);
 
 	DEFINE_SYM(KeyId::MOUSE_LEFT, "MOUSE LEFT");
 	DEFINE_SYM(KeyId::MOUSE_MIDDLE, "MOUSE_MIDDLE");
@@ -152,7 +150,7 @@ void XMouse::OnButtonDown(KeyId::Enum id, core::FrameInput& inputFrame)
 	pSymbol->value = 1.f;
 	pSymbol->state = InputState::PRESSED;
 
-	if (g_pInputCVars->input_debug)
+	if (vars_.inputDebug_)
 	{
 		X_LOG0("Mouse", "Button Down: \"%s\"", pSymbol->name.c_str());
 	}
@@ -167,7 +165,7 @@ void XMouse::OnButtonUP(KeyId::Enum id, core::FrameInput& inputFrame)
 	pSymbol->value = 0.f;
 	pSymbol->state = InputState::RELEASED;
 
-	if (g_pInputCVars->input_debug)
+	if (vars_.inputDebug_)
 	{
 		X_LOG0("Mouse", "Button Up: \"%s\"", pSymbol->name.c_str());
 	}
@@ -243,7 +241,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
 		// if the value is positive post a single up event.
 		newState = (mouseWheel_ > 0.0f) ? InputState::PRESSED : InputState::RELEASED;
 
-		if (g_pInputCVars->input_debug && newState == InputState::PRESSED)
+		if (vars_.inputDebug_ && newState == InputState::PRESSED)
 		{
 			X_LOG0("Mouse", "ScrollUp(%g)", mouseWheel_);
 		}
@@ -252,7 +250,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
 
 		newState = (mouseWheel_ < 0.0f) ? InputState::PRESSED : InputState::RELEASED;
 
-		if (g_pInputCVars->input_debug && newState == InputState::PRESSED)
+		if (vars_.inputDebug_ && newState == InputState::PRESSED)
 		{
 			X_LOG0("Mouse", "ScrollDown(%g)", mouseWheel_);
 		}
@@ -278,7 +276,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
 			pSymbol->value = (float)mouse.lLastX;
 			pSymbol->state = InputState::CHANGED;
 
-			if (g_pInputCVars->input_mouse_pos_debug)
+			if (vars_.inputMousePosDebug_)
 			{
 				X_LOG0("Mouse", "posX: \"%g\"", pSymbol->value);
 			}
@@ -292,7 +290,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
 			pSymbol->value = (float)mouse.lLastY;
 			pSymbol->state = InputState::CHANGED;
 
-			if (g_pInputCVars->input_mouse_pos_debug)
+			if (vars_.inputMousePosDebug_)
 			{
 				X_LOG0("Mouse", "posY: \"%g\"", pSymbol->value);
 			}

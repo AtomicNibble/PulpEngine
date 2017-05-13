@@ -33,23 +33,25 @@ class XWinInput : public XBaseInput
 	typedef core::FixedArray<const RAWMOUSE*, MAX_ENTRIES_IN_BUF> MouseDataArr;
 
 public:
-	XWinInput(ICore* pCore, HWND hWnd);
-	virtual ~XWinInput() X_OVERRIDE;
+	XWinInput(core::MemoryArenaBase* arena, HWND hWnd);
+	~XWinInput() X_FINAL;
 
 	// IInput overrides
-	virtual bool Init(void) X_OVERRIDE;
-	virtual void PostInit(void) X_OVERRIDE;
-	virtual void ShutDown(void) X_OVERRIDE;
-	virtual void release(void) X_OVERRIDE;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	virtual void Update(core::FrameData& frameData) X_OVERRIDE;
+	bool Init(void) X_FINAL;
+	void PostInit(void) X_FINAL;
+	void ShutDown(void) X_FINAL;
+	void release(void) X_FINAL;
 
+	void Update(core::FrameData& frameData) X_FINAL;
 
-	virtual void ClearKeyState(void) X_OVERRIDE;
+	void ClearKeyState(void) X_FINAL;
 	// ~IInput
 
-	virtual bool AddInputDevice(IInputDevice* pDevice) X_OVERRIDE;
-	virtual bool AddInputDevice(XInputDeviceWin32* pDevice);
+	bool AddInputDevice(IInputDevice* pDevice) X_FINAL;
+	bool AddInputDevice(XInputDeviceWin32* pDevice);
 
 	X_INLINE HWND GetHWnd(void) const;
 

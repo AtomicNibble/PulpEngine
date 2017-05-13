@@ -16,7 +16,7 @@ X_NAMESPACE_BEGIN(input)
 class XInputDeviceWin32 : public XInputDevice
 {
 public:
-	XInputDeviceWin32(IInput& input, const char* deviceName);
+	XInputDeviceWin32(IInput& input, XInputCVars& vars, const char* pDeviceName);
 	virtual ~XInputDeviceWin32() X_OVERRIDE;
 
 

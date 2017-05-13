@@ -18,7 +18,7 @@ bool XMouse::IsOfDeviceType(InputDeviceType::Enum type) const
 
 InputSymbol* XMouse::GetSymbol(KeyId::Enum id)
 {
-	return Symbol_[id - KeyId::INPUT_MOUSE_BASE];
+	return pSymbol_[id - KeyId::INPUT_MOUSE_BASE];
 }
 
 

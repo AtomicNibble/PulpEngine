@@ -5,8 +5,8 @@ X_NAMESPACE_BEGIN(input)
 
 
 
-XInputDeviceWin32::XInputDeviceWin32(IInput& input, const char* deviceName) 
-: XInputDevice(input, deviceName)
+XInputDeviceWin32::XInputDeviceWin32(IInput& input, XInputCVars& vars, const char* pDeviceName) :
+	XInputDevice(input, vars, pDeviceName)
 {
 
 }

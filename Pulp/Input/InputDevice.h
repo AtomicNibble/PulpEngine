@@ -4,21 +4,18 @@
 #define _X_INPUTDEVICE_H_
 
 #include <IInput.h>
-
-//#include <string>
-//#include <map>
-
 #include <Containers\HashMap.h>
 
 X_NAMESPACE_BEGIN(input)
 
+class XInputCVars;
 
 class XInputDevice : public IInputDevice
 {
 	typedef core::HashMap<KeyId::Enum, InputSymbol*> TIdToSymbolMap;
 
 public:
-	XInputDevice(IInput& input, const char* deviceName);
+	XInputDevice(IInput& input, XInputCVars& vars, const char* pDeviceName);
 	virtual ~XInputDevice() X_OVERRIDE;
 
 	// IInputDevice
@@ -42,11 +39,10 @@ protected:
 	InputDeviceType::Enum		deviceType_;
 	bool						enabled_;
 
+	XInputCVars&				vars_;
 private:
 	IInput&						input_;		// point to input system in use
 	core::string				deviceName_;	// name of the device (used for input binding)
-
-private:
 	TIdToSymbolMap				idToInfo_;
 
 private:
