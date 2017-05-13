@@ -5,6 +5,7 @@
 
 #include <Containers\Array.h>
 #include <Threading\JobSystem2.h>
+#include <Time\TimeVal.h>
 
 #include "Vars\ProfilerVars.h"
 
