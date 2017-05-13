@@ -274,7 +274,9 @@ namespace V2
 
 	void JobSystem::OnFrameBegin(bool isProfilerPaused)
 	{
-#if X_ENABLE_JOBSYS_PROFILER
+#if !X_ENABLE_JOBSYS_PROFILER
+		X_UNUSED(isProfilerPaused);
+#else
 
 		if (!isProfilerPaused)
 		{
@@ -288,9 +290,6 @@ namespace V2
 				pTimeLines_[i]->sethistoryIndex(currentHistoryIdx_);
 			}
 		}
-
-#else
-		X_UNUSED(isProfilerPaused);
 
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
