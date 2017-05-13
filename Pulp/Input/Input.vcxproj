@@ -406,7 +406,6 @@
     <ClInclude Include="BaseInput.h" />
     <ClInclude Include="InputCVars.h" />
     <ClInclude Include="InputDevice.h" />
-    <ClInclude Include="IPInput.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="win32\InputDeviceWin32.h" />
     <ClInclude Include="win32\Keyboard.h" />

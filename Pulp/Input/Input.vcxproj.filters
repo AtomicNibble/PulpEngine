@@ -27,9 +27,6 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IPInput.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InputCVars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
