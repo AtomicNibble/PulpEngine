@@ -18,6 +18,7 @@ namespace profiler
 	{
 		profilerPause_ = 0;
 		drawProfileInfo_ = 0;
+		jobSysThreadMS_ = 16;
 
 	}
 
@@ -30,6 +31,9 @@ namespace profiler
 		ADD_CVAR_REF("profile_draw", drawProfileInfo_, drawProfileInfo_, 0, 1,
 			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 			"Display profiler info. (visible items enabled via profile_draw_* vars)");
+
+		ADD_CVAR_REF("profile_vis_ms", jobSysThreadMS_, jobSysThreadMS_, 1, 48, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			"Number of MS to visualize");
 
 	}
 

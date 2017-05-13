@@ -16,6 +16,11 @@ namespace profiler
 		return drawProfileInfo_ != 0;
 	}
 
+	X_INLINE int32_t ProfilerVars::jobSysThreadMS(void) const
+	{
+		return jobSysThreadMS_;
+	}
+
 
 } // namespace profiler
 

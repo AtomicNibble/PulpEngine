@@ -16,11 +16,13 @@ namespace profiler
 
 		X_INLINE bool isPaused(void) const;
 		X_INLINE bool drawProfileInfo(void) const;
+		X_INLINE int32_t jobSysThreadMS(void) const;
 
 
 	private:
 		int32_t profilerPause_;
 		int32_t drawProfileInfo_;
+		int32_t jobSysThreadMS_;
 
 
 		int32_t drawProfileInfoWhenConsoleExpaned_;
