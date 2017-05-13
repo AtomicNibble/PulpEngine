@@ -9,16 +9,7 @@
 #include <IDirectoryWatcher.h>
 
 X_DISABLE_WARNING(4702)
-#include <map>
-
-// #include <string>
-// #include <vector>
-#include <list>
 #include <deque>
-#include <algorithm> 
-#include <functional> 
-#include <cctype>
-#include <locale>
 X_ENABLE_WARNING(4702)
 
 
