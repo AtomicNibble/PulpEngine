@@ -990,18 +990,15 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 
 	X_ASSERT_NOT_NULL(env_.pGame);
 
-	if (env_.pGame) {
+	env_.pGame->registerVars();
+	env_.pGame->registerCmds();
 
-		env_.pGame->registerVars();
-		env_.pGame->registerCmds();
-
-		if (!env_.pGame->init()) {
-			X_ERROR("Core", "Failed to init Game");
-			return false;
-		}
+	if (!env_.pGame->init()) {
+		X_ERROR("Core", "Failed to init Game");
+		return false;
 	}
 
-	return env_.pGame != nullptr;
+	return true;
 }
 
 
