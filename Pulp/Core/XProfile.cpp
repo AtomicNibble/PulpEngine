@@ -94,13 +94,16 @@ namespace profiler
 
 	XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
 		pFont_(nullptr),
+		frameOffset_(0),
 		profilerData_(arena),
 		profilerHistoryData_(arena),
 		frameStartTime_(0),
 		frameTime_(0),
 		totalTime_(0)
 	{
-		
+		repeatEventTimer_ = TimeVal(0ll);
+		repeatEventInterval_ = TimeVal(0.05f);
+		repeatEventInitialDelay_ = TimeVal(0.5f);
 	}
 
 	XProfileSys::~XProfileSys()
@@ -125,6 +128,7 @@ namespace profiler
 		X_UNUSED(pCore);
 
 		pCore->GetCoreEventDispatcher()->RegisterListener(this);
+		pCore->GetIInput()->AddEventListener(this);
 
 		ProfileTimer::CalculateCPUSpeed();
 
@@ -163,7 +167,13 @@ namespace profiler
 
 	void XProfileSys::shutDown(void)
 	{
+		X_LOG0("ProfileSys", "Shutting Down");
+
 		// ...
+		auto* pCore = gEnv->pCore;
+		pCore->GetCoreEventDispatcher()->RemoveListener(this);
+		pCore->GetIInput()->RemoveEventListener(this);
+
 	}
 
 	bool XProfileSys::loadRenderResources(void)
@@ -232,13 +242,25 @@ namespace profiler
 #endif
 	}
 
-	void XProfileSys::OnFrameBegin(void)
+	void XProfileSys::OnFrameBegin(const FrameTimeData& frameTimeInfo)
 	{
 		if (vars_.isPaused()) {
 			return;
 		}
 
 		frameStartTime_ = ProfileTimer::getTicks();
+
+		if (repeatEvent_.keyId != input::KeyId::UNKNOWN)
+		{
+			repeatEventTimer_ -= frameTimeInfo.unscaledDeltas[ITimer::Timer::UI];
+
+			if (repeatEventTimer_.GetValue() < 0)
+			{
+				OnInputEvent(repeatEvent_);
+
+				repeatEventTimer_ = repeatEventInterval_;
+			}
+		}
 	}
 
 	void XProfileSys::OnFrameEnd(void)
@@ -256,7 +278,7 @@ namespace profiler
 		UpdateProfileData();
 	}
 
-
+	// ICoreEventListener		
 	void XProfileSys::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 	{
 		if (event == CoreEvent::RENDER_RES_CHANGED)
@@ -265,6 +287,61 @@ namespace profiler
 			renderRes_.y = static_cast<int32_t>(lparam);
 		}
 	}
+
+
+	// IInputEventListner
+	bool XProfileSys::OnInputEvent(const input::InputEvent& event)
+	{
+		if (!vars_.drawProfileInfo()) {
+			return false;
+		}
+
+		if (event.action == input::InputState::RELEASED) {
+			repeatEvent_.keyId = input::KeyId::UNKNOWN;
+		}
+
+		if (event.action != input::InputState::PRESSED) {
+			return false;
+		}
+
+		if (event.keyId != input::KeyId::LEFT_ARROW &&
+			event.keyId != input::KeyId::RIGHT_ARROW) {
+			return false;
+		}
+
+		repeatEvent_ = event;
+		repeatEventTimer_ = repeatEventInitialDelay_;
+
+		switch (event.keyId)
+		{
+			case input::KeyId::LEFT_ARROW:
+				frameOffset_ = (frameOffset_ + 1) & core::V2::JOBSYS_HISTORY_MASK;
+				break;
+			case input::KeyId::RIGHT_ARROW:
+				if (frameOffset_ == 0) {
+					frameOffset_ = (core::V2::JOBSYS_HISTORY_COUNT - 1);
+				}
+				else {
+					--frameOffset_;
+				}
+				break;
+		}
+		
+
+		return true;
+	}
+
+	bool XProfileSys::OnInputEventChar(const input::InputEvent& event)
+	{
+		X_UNUSED(event);
+		return false;
+	}
+
+	int32_t XProfileSys::GetPriority(void) const
+	{
+		return 0;
+	}
+	// ~IInputEventListner
 
 	void XProfileSys::UpdateProfileData(void)
 	{
@@ -282,11 +359,18 @@ namespace profiler
 
 			int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
 
-			// so we want to draw one before the current index.
-			if (profilerIdx == 0) {
-				profilerIdx =core::V2::JOBSYS_HISTORY_COUNT - 1;
+			// 0-15
+			// we want one before
+			int32_t historyOffset = frameOffset_ + 1;
+			if (historyOffset > profilerIdx)
+			{
+				int32_t backNum = (historyOffset - profilerIdx);
+				profilerIdx = core::V2::JOBSYS_HISTORY_COUNT - backNum;
 			}
-			profilerIdx = math<int32_t>::clamp(profilerIdx - 1, 0, core::V2::JOBSYS_HISTORY_COUNT);
+			else
+			{
+				profilerIdx -= historyOffset;
+			}
 
 			RenderJobSystem(frameTimeInfo, pJobSys, profilerIdx);
 #else
@@ -330,7 +414,7 @@ namespace profiler
 		const int32_t visibleMS = vars_.jobSysThreadMS();
 		const uint32_t numThread = pJobSys->GetThreadCount();
 		const uint32_t numThreadQueues = pJobSys->GetQeueCount();
-		const float threadInfoXOffset = 85.f;
+		const float threadInfoXOffset = 40.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
 		const float threadInfoY = yStart + ctx.size.y + (padding * 2);
 		const float threadInfoHeight = core::Min<float>((height - (ctx.size.y + padding) - (keyHeight + padding)) - 20, maxHeightPerThread * numThreadQueues);
@@ -368,6 +452,35 @@ namespace profiler
 				Color(0.1f, 0.1f, 0.1f, 0.8f)
 			);
 
+			// draw a box showing what history index we on.
+			{
+				// should we only show offset instead of index?
+				const float barWidth = 4.f;
+				const float barSpacing = 2.f;
+				const float barStartX = ((xStart + width) - (V2::JOBSYS_HISTORY_COUNT * (barWidth + barSpacing)) - padding);
+				const float barStartY = yStart + padding;
+
+				int invOffset = V2::JOBSYS_HISTORY_MASK - frameOffset_;
+
+				for (int32_t i = 0; i < V2::JOBSYS_HISTORY_COUNT; i++)
+				{
+					Color col = Color(0.3f, 0.3f, 0.3f);
+					if (i == invOffset) {
+						col = Col_Darkred;
+					}
+					else if (i == 0) {
+						col = Color(0.2f, 0.2f, 0.2f);
+					}
+
+					pPrim->drawQuad(
+						barStartX + (i * (barWidth + barSpacing)),
+						barStartY,
+						barWidth,
+						16,
+						col
+					);
+				}
+			}
 
 			for (size_t i = 0; i < visibleMS + 1; i++)
 			{
@@ -406,8 +519,6 @@ namespace profiler
 				}
 
 				ctx.flags.Remove(font::DrawTextFlag::RIGHT);
-
-
 			}
 
 			// draw the color key
@@ -433,6 +544,8 @@ namespace profiler
 					keyX += txtSize.x + 10.f;
 				}
 			}
+
+			ctx.SetColor(Col_Mintcream);
 
 			ctx.flags.Set(font::DrawTextFlag::CENTER);
 			pPrim->drawText(xStart + (width / 2), yStart + padding, ctx, L"Profiler");
