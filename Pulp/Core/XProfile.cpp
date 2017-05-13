@@ -603,6 +603,24 @@ namespace profiler
 
 			float entryStart = timeOffset.GetMilliSeconds() * widthPerMS;
 			float entryWidth = (entry.end - entry.start).GetMilliSeconds() * widthPerMS;
+			float entryEnd = entryStart + entryWidth;
+
+			if (entryEnd > width)
+			{
+				// make it clear it's overflowing time res.
+				if (entryStart > width)
+				{
+					entryStart = width;
+					entryWidth = 5.f;
+				}
+				else
+				{
+					entryWidth = (width - entryStart) + 5.f;
+				}
+			}
+
+			entryWidth = core::Max(entryWidth, 1.f);
+
 
 			pPrim->drawQuad(xStart + entryStart, yStart, entryWidth, quadsize, subSystemInfo_[entry.subsystem].col);
 		}
