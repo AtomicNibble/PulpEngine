@@ -27,11 +27,6 @@ namespace profiler
 		int32_t jobSysThreadMS_;
 
 
-		int32_t drawProfileInfoWhenConsoleExpaned_;
-		int32_t drawSubsystems_;
-		int32_t drawMemInfo_;
-		int32_t drawStats_;
-		int32_t drawFrameTimeBar_;
 	};
 
 
