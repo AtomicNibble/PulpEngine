@@ -967,22 +967,19 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 
 	X_ASSERT_NOT_NULL(env_.p3DEngine);
 
-	if (env_.p3DEngine) {
+	core::StopWatch timer;
 
-		core::StopWatch timer;
-
-		if (!env_.p3DEngine->init()) {
-			X_ERROR("Core", "Failed to init 3DEngine");
-			return false;
-		}
-
-		env_.p3DEngine->registerVars();
-		env_.p3DEngine->registerCmds();
-
-		X_LOG0("Core", "3DEngine init: ^6%gms", timer.GetMilliSeconds());
+	if (!env_.p3DEngine->init()) {
+		X_ERROR("Core", "Failed to init 3DEngine");
+		return false;
 	}
 
-	return env_.p3DEngine != nullptr;
+	env_.p3DEngine->registerVars();
+	env_.p3DEngine->registerCmds();
+
+	X_LOG0("Core", "3DEngine init: ^6%gms", timer.GetMilliSeconds());
+
+	return true;
 }
 
 bool XCore::InitGameDll(const SCoreInitParams& initParams)
