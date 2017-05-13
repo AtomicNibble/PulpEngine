@@ -305,9 +305,9 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 	core::GetProcessMemInfo(memEnd);
 	int64 memUsed = static_cast<int64_t>(memEnd.WorkingSetSize) - static_cast<int64_t>(memStart.WorkingSetSize);
 	core::HumanSize::Str sizeStr;
-	X_LOG0("Engine", "Init \"%s\", MemUsage=%s ^6%gms", name ? (name+1) : dllName, core::HumanSize::toString(sizeStr, memUsed), time.GetMilliSeconds());
+	X_LOG0("Engine", "ModuleInit \"%s\", MemUsage=%s ^6%gms", name ? (name+1) : dllName, core::HumanSize::toString(sizeStr, memUsed), time.GetMilliSeconds());
 #else
-	X_LOG0("Engine", "Init \"%s\": %s ^6%gms", name ? (name + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
+	X_LOG0("Engine", "ModuleInit \"%s\": %s ^6%gms", name ? (name + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
 #endif // #if !defined(X_LIB) 
 
 	return res;
