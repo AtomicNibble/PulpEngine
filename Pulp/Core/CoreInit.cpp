@@ -777,7 +777,15 @@ bool XCore::InitInput(const SCoreInitParams &initParams)
 		return false;
 	}
 
-	return env_.pInput != nullptr;
+	X_ASSERT_NOT_NULL(env_.pInput);
+
+	if (!env_.pInput->Init()) {
+		X_ERROR("Font", "failed to init input system");
+		return false;
+	}
+
+
+	return true;
 }
 
 bool XCore::InitFont(const SCoreInitParams &initParams)

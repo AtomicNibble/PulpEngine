@@ -76,13 +76,6 @@ class XEngineModule_Input : public IEngineModule
 			pInput = X_NEW_ALIGNED(input::XBaseInput, g_InputArena, "XBaseInput", 8);
 		}		
 
-		if (!pInput->Init())
-		{
-			pInput->ShutDown();
-			X_DELETE(pInput, g_InputArena);
-			return false;
-		}
-
 		env.pInput = pInput;
 		return true;
 	}
