@@ -57,22 +57,22 @@ namespace V2
 	// void JobQueueHistory::onFrameBegin(bool pause)
 	void JobQueueHistory::sethistoryIndex(int32_t historyIdx)
 	{
-		currentIdx_ = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
+		int32_t newIdx = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
 
-		auto& history = frameHistory_[currentIdx_];
+		auto start = core::StopWatch::GetTimeNow();
 
-		history.start = core::StopWatch::GetTimeNow();
+		auto& history = frameHistory_[newIdx];
+		history.start = start;
 		atomic::Exchange<long>(&history.bottom_, 0);
+
+		COMPILER_BARRIER_W;
+
+		currentIdx_ = newIdx;
 	}
 
-	X_INLINE JobQueueHistory::Entry* JobQueueHistory::addEntry(void)
+	X_INLINE JobQueueHistory::FrameHistory& JobQueueHistory::getCurFrameHistory(void)
 	{
-		FrameHistory& history = frameHistory_[currentIdx_];
-		Entry* pEntry = &history.entryes_[history.bottom_ & MASK];
-
-		++history.bottom_;
-
-		return pEntry;
+		return frameHistory_[currentIdx_];
 	}
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
@@ -647,7 +647,9 @@ namespace V2
 	{
 #if X_ENABLE_JOBSYS_PROFILER
 		auto* pTimeLine = pTimeLines_[threadIdx];
-		auto* pEntry = pTimeLine->addEntry();
+
+		auto& history = pTimeLine->getCurFrameHistory();
+		auto* pEntry = &history.entryes_[history.bottom_ & JobQueueHistory::MASK];
 
 		core::StopWatch timer;
 #endif // !X_ENABLE_JOBSYS_PROFILER
@@ -664,10 +666,11 @@ namespace V2
 
 		pEntry->id.threadIdx = pJob->origThreadIdx;
 		pEntry->id.jobIdx = safe_static_cast<uint16_t>(jobIdx);
-
-#if X_ENABLE_JOBSYS_PROFILER
 		pEntry->subsystem = pJob->subSystem;
-#endif // !X_ENABLE_JOBSYS_PROFILER
+
+		COMPILER_BARRIER_W;
+
+		++history.bottom_;
 
 		++stats_[currentHistoryIdx_].jobsRun;
 		stats_[currentHistoryIdx_].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));

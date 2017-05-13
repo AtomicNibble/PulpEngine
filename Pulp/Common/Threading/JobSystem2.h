@@ -152,6 +152,7 @@ struct JobSystemStats
 X_DISABLE_WARNING(4324)
 class JobQueueHistory
 {
+public:
 	static const uint32_t MAX_NUMBER_OF_JOBS = Job::MAX_NUMBER_OF_JOBS;
 	static const uint32_t MASK = MAX_NUMBER_OF_JOBS - 1u;
 
@@ -193,7 +194,7 @@ public:
 	X_INLINE const FrameHistoryArr& getHistory(void) const;
 
 	// called from one thread.
-	Entry* addEntry(void);
+	FrameHistory& getCurFrameHistory(void);
 
 private:
 	long currentIdx_;
