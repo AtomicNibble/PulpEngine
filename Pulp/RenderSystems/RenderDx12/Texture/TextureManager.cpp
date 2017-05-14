@@ -114,9 +114,9 @@ X_NAMESPACE_BEGIN(texture)
 	void TextureManager::registerCmds(void)
 	{
 
-		ADD_COMMAND_MEMBER("imageReloadAll", this, TextureManager, &TextureManager::Cmd_ReloadTextures, core::VarFlag::SYSTEM,
+		ADD_COMMAND_MEMBER("imgReloadAll", this, TextureManager, &TextureManager::Cmd_ReloadTextures, core::VarFlag::SYSTEM,
 			"Reload all textures");
-		ADD_COMMAND_MEMBER("imageReload", this, TextureManager, &TextureManager::Cmd_ReloadTexture, core::VarFlag::SYSTEM,
+		ADD_COMMAND_MEMBER("imgReload", this, TextureManager, &TextureManager::Cmd_ReloadTexture, core::VarFlag::SYSTEM,
 			"Reload a textures <name>");
 
 		ADD_COMMAND_MEMBER("listImages", this, TextureManager, &TextureManager::Cmd_ListTextures, core::VarFlag::SYSTEM,
