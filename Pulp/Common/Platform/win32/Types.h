@@ -43,16 +43,6 @@
 #endif
 
 
-#if X_64
-typedef void* WIN_HMODULE;
-typedef void* WIN_HWND;
-typedef void* WIN_HINSTANCE;
-#else
-typedef void* WIN_HMODULE;
-typedef void* WIN_HWND;
-typedef void* WIN_HINSTANCE;
-#endif // !X_64
-
 typedef HWND PLATFORM_HWND;
 
 

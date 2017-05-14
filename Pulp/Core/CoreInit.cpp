@@ -39,7 +39,6 @@
 #include <Extension\PotatoCreateClass.h>
 
 #include <Memory\MemInfo.h>
-#include <Platform\Module.h>
 #include <Platform\MessageBox.h>
 
 
@@ -88,26 +87,17 @@ X_USING_NAMESPACE;
 
 namespace
 {
-	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
+	typedef core::traits::Function<void*(ICore*, const char*)> ModuleLinkfunc;
 
 } // namespace
 
 //////////////////////////////////////////////////////////////////////////
 #if !defined(X_LIB)
-WIN_HMODULE XCore::LoadDynamiclibrary(const char *dllName) const
+
+core::Module::Handle XCore::LoadDLL(const char* pDllName)
 {
-	WIN_HMODULE handle = NULL;
 
-	handle = core::Module::Load(dllName);
-
-	return handle;
-}
-
-
-WIN_HMODULE XCore::LoadDLL(const char *dllName)
-{
-	WIN_HMODULE handle = LoadDynamiclibrary(dllName);
-
+	core::Module::Handle handle = core::Module::Load(pDllName);
 	if (!handle)
 	{
 		return 0;
@@ -118,7 +108,7 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 
 	if (pfnModuleInitICore)
 	{
-		pfnModuleInitICore(this, dllName);
+		pfnModuleInitICore(this, pDllName);
 	}
 
 	return handle;
@@ -272,7 +262,7 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 #endif // #if !defined(X_LIB)
 
 #if !defined(X_LIB) 
-	WIN_HMODULE hModule = LoadDLL(path.c_str());
+	auto hModule = LoadDLL(path.c_str());
 	if (!hModule) {
 		if (gEnv && gEnv->pLog) {
 			X_ERROR("Core", "Failed to load engine module: %s", path.c_str());
@@ -360,9 +350,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (!parseSeed(startupParams.seed)) {
 		return false;
 	}
-
-	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
-	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
 
 	// #------------------------- Logging -----------------------
 	if (!InitLogging(startupParams)) {

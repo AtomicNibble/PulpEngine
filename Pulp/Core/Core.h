@@ -25,7 +25,8 @@
 #include "Logging\WritePolicies\LoggerDebuggerWritePolicy.h"
 #include "Logging\WritePolicies\LoggerConsoleWritePolicy.h"
 
-#include "Platform\DirectoryWatcher.h"
+#include <Platform\DirectoryWatcher.h>
+#include <Platform\Module.h>
 #include "IDirectoryWatcher.h"
 
 #include "Containers\HashMap.h"
@@ -33,7 +34,6 @@
 #include "Memory\AllocationPolicies\GrowingGenericAllocator.h"
 #include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
-#include "Threading\JobSystem.h"
 
 
 struct IPotatoFactoryRegistryImpl;
@@ -140,11 +140,9 @@ private:
 	void RenderBegin(core::FrameData& frameData);
 	void RenderEnd(core::FrameData& frameData);
 
+	core::Module::Handle LoadDLL(const char* pDllName);
 
-	WIN_HMODULE LoadDynamiclibrary(const char *dllName) const;
-	WIN_HMODULE LoadDLL(const char *dllName);
-
-	bool IntializeEngineModule(const char *dllName, const char *moduleClassName,
+	bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName,
 		const SCoreInitParams &initParams);
 	
 	bool ParseCmdArgs(const wchar_t* pArgs);
@@ -210,7 +208,7 @@ private:
 	};
 
 private:
-	typedef core::Array<WIN_HMODULE> ModuleHandlesArr;
+	typedef core::Array<core::Module::Handle> ModuleHandlesArr;
 	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
 	typedef core::Array<ConverterModule> ConverterModulesArr;
 	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
@@ -250,10 +248,6 @@ private:
 	hotRelodIgnoreArr hotReloadIgnores_;
 #endif // !X_DEBUG
 	// ~Hotreload
-
-
-	WIN_HWND		hWnd_;
-	WIN_HINSTANCE	hInst_;
 
 	SCoreInitParams initParams_;
 
