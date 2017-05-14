@@ -35,7 +35,7 @@ namespace
 		Color8u(255, 145, 50),		// ^6 orange
 		Color8u(255, 255, 255),		// ^7 white
 		Color8u(0, 255, 0),			// ^8 green
-		Color8u(255, 0, 255)
+		Color8u(255, 0, 255)		// ^9 pink
 	};
 } // namespace
 
