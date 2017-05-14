@@ -67,19 +67,16 @@ namespace shader
 
 	}
 
-
-
-	bool XShaderManager::init(void)
+	void XShaderManager::registerVars(void)
 	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pCore);
-		X_ASSERT_NOT_NULL(gEnv->pHotReload);
-		X_LOG1("ShadersManager", "Starting");
+		vars_.RegisterVars();
 
-		// hotreload support.
-		gEnv->pHotReload->addfileType(this, "hlsl");
-		gEnv->pHotReload->addfileType(this, "inc");
-		gEnv->pHotReload->addfileType(this, "fxcb");
+
+	}
+
+	void XShaderManager::registerCmds(void)
+	{
+
 
 		ADD_COMMAND_MEMBER("ShaderListHw", this, XShaderManager, &XShaderManager::Cmd_ListHWShaders, core::VarFlag::SYSTEM,
 			"lists the loaded shaders");
@@ -92,7 +89,20 @@ namespace shader
 		ADD_COMMAND_MEMBER("listShaderSource", this, XShaderManager, &XShaderManager::Cmd_ListShaderSources, core::VarFlag::SYSTEM,
 			"lists the loaded shaders sources");
 
-		vars_.RegisterVars();
+	}
+
+	bool XShaderManager::init(void)
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pHotReload);
+		X_LOG1("ShadersManager", "Starting");
+		X_PROFILE_NO_HISTORY_BEGIN("ShaderMan", core::profiler::SubSys::RENDER);
+
+		// hotreload support.
+		gEnv->pHotReload->addfileType(this, "hlsl");
+		gEnv->pHotReload->addfileType(this, "inc");
+		gEnv->pHotReload->addfileType(this, "fxcb");
+
 
 		return true;
 	}

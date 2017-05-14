@@ -51,6 +51,9 @@ namespace shader
 		SHADERLIB_EXPORT XShaderManager(core::MemoryArenaBase* arena);
 		SHADERLIB_EXPORT ~XShaderManager();
 
+		SHADERLIB_EXPORT void registerVars(void);
+		SHADERLIB_EXPORT void registerCmds(void);
+
 		SHADERLIB_EXPORT bool init(void);
 		SHADERLIB_EXPORT bool shutDown(void);
 		
