@@ -254,7 +254,7 @@ private:
 	// runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
 	void ExecuteCommand(const ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const; 
 
-	ICVar* GetCVarForRegistration(const char* Name);
+	ICVar* GetCVarForRegistration(const char* Name, const char* pDesc);
 
 	void RegisterVar(ICVar* pCVar);
 
