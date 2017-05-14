@@ -35,7 +35,6 @@
 #include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 
-
 struct IPotatoFactoryRegistryImpl;
 struct IEngineModule;
 
@@ -56,8 +55,6 @@ struct XCoreVars
 	int win_height;
 
 };
-
-extern XCoreVars g_coreVars;
 
 typedef core::Logger<
 core::LoggerNoFilterPolicy,
@@ -220,6 +217,7 @@ private:
 	void WindowCustomFrameVarChange(core::ICVar* pVar);
 
 private:
+	XCoreVars						vars_;
 	core::xWindow*				    pWindow_;
 	core::Console*					pConsole_;
 

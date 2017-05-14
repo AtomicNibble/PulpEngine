@@ -519,8 +519,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		;
 
 		if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW),
-			g_coreVars.win_x_pos, g_coreVars.win_y_pos, 
-			g_coreVars.win_width, g_coreVars.win_height, core::xWindow::Mode::APPLICATION))
+			vars_.win_x_pos, vars_.win_y_pos,
+			vars_.win_width, vars_.win_height, core::xWindow::Mode::APPLICATION))
 		{
 			return false;
 		}
@@ -1007,8 +1007,8 @@ void XCore::WindowPosVarChange(core::ICVar* pVar)
 {
 	X_UNUSED(pVar);
 
-	int x_pos = g_coreVars.win_x_pos;
-	int y_pos = g_coreVars.win_y_pos;
+	int x_pos = vars_.win_x_pos;
+	int y_pos = vars_.win_y_pos;
 
 	core::xWindow* pWin = GetGameWindow();
 	if (pWin) {
@@ -1042,19 +1042,19 @@ void XCore::CreateSystemVars(void)
 
 	core::xWindow::Rect desktop = core::xWindow::GetDesktopRect();
 
-	ADD_CVAR_REF("core_fast_shutdown", g_coreVars.core_fast_shutdown, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("core_fast_shutdown", vars_.core_fast_shutdown, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Skips most cleanup logic for faster shutdown, when off everything is correctly shutdown and released before exit. 0=off 1=on");
 
-	ADD_CVAR_REF("core_event_debug", g_coreVars.core_event_debug, 0, 0, 1, VarFlag::SYSTEM,
+	ADD_CVAR_REF("core_event_debug", vars_.core_event_debug, 0, 0, 1, VarFlag::SYSTEM,
 		"Debug messages for core events. 0=off 1=on");
 
-	var_win_pos_x = ADD_CVAR_REF("win_x_pos", g_coreVars.win_x_pos, 10, 0, desktop.getWidth(), 
+	var_win_pos_x = ADD_CVAR_REF("win_x_pos", vars_.win_x_pos, 10, 0, desktop.getWidth(),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position x");
-	var_win_pos_y = ADD_CVAR_REF("win_y_pos", g_coreVars.win_y_pos, 10, 0, desktop.getHeight(), 
+	var_win_pos_y = ADD_CVAR_REF("win_y_pos", vars_.win_y_pos, 10, 0, desktop.getHeight(),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position y");
-	var_win_width = ADD_CVAR_REF("win_width", g_coreVars.win_width, 800, 800, 1, 
+	var_win_width = ADD_CVAR_REF("win_width", vars_.win_width, 800, 800, 1,
 		VarFlag::SYSTEM , "Game window width");
-	var_win_height = ADD_CVAR_REF("win_height", g_coreVars.win_height, 600, 600, 1, 
+	var_win_height = ADD_CVAR_REF("win_height", vars_.win_height, 600, 600, 1,
 		VarFlag::SYSTEM , "Game window height");
 
 	core::ConsoleVarFunc del;

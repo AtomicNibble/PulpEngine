@@ -5,7 +5,8 @@
 X_NAMESPACE_BEGIN(core)
 
 
-XCoreEventDispatcher::XCoreEventDispatcher(core::MemoryArenaBase* arena) :
+XCoreEventDispatcher::XCoreEventDispatcher(XCoreVars& coreVars, core::MemoryArenaBase* arena) :
+	coreVars_(coreVars),
 	listners_(arena)
 {
 
@@ -51,7 +52,7 @@ bool XCoreEventDispatcher::RemoveListener(ICoreEventListener* pListener)
 
 void XCoreEventDispatcher::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-	if (g_coreVars.core_event_debug) {
+	if (coreVars_.core_event_debug) {
 		X_LOG0("CoreEvent", "---- CoreEvent: %s ----", CoreEvent::ToString(event));
 	}
 

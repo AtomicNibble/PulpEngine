@@ -82,8 +82,6 @@ namespace
 SCoreGlobals XCore::env_;
 core::MallocFreeAllocator XCore::malloc_;
 
-XCoreVars g_coreVars;
-
 XCore::XCore() :
 	pWindow_(nullptr),
 	pConsole_(nullptr),
@@ -126,7 +124,7 @@ XCore::XCore() :
 
 	hotReloadExtMap_.reserve(32);
 
-	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(g_coreArena);
+	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
 	pEventDispatcher_->RegisterListener(this);
 
 	env_.state_ = SCoreGlobals::State::STARTING;
@@ -188,7 +186,7 @@ void XCore::ShutDown()
 	X_LOG0("Core", "Shutting Down");
 	env_.state_ = SCoreGlobals::State::CLOSING;
 
-	if (g_coreVars.core_fast_shutdown) {
+	if (vars_.core_fast_shutdown) {
 		X_LOG0("Core", "Fast shutdown, skipping cleanup");
 
 		// still save modified vars.
@@ -426,8 +424,8 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 		{
 			core::xWindow::Rect rect = pWindow_->GetRect();
 
-			g_coreVars.win_x_pos = rect.getX1();
-			g_coreVars.win_y_pos = rect.getY1();
+			vars_.win_x_pos = rect.getX1();
+			vars_.win_y_pos = rect.getY1();
 
 			if (var_win_pos_x) {
 				var_win_pos_x->SetModified();
@@ -441,8 +439,8 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 		{
 			core::xWindow::Rect rect = pWindow_->GetClientRect();
 
-			g_coreVars.win_height = rect.getHeight();
-			g_coreVars.win_width = rect.getWidth();
+			vars_.win_height = rect.getHeight();
+			vars_.win_width = rect.getWidth();
 
 			if (var_win_width) {
 				var_win_width->SetModified();
