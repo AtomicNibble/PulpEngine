@@ -1466,51 +1466,6 @@ ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
 	return pCVar;
 }
 
-ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarFlags flags)
-{
-	X_ASSERT_NOT_NULL(pName);
-
-	ICVar* pCVar = GetCVarForRegistration(pName);
-	if (pCVar) {
-		return pCVar;
-	}
-
-	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, pName, Value, flags, "");
-	RegisterVar(pCVar);
-	return pCVar;
-}
-
-ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min, 
-	int Max, VarFlags flags)
-{
-	X_ASSERT_NOT_NULL(pName);
-
-	ICVar* pCVar = GetCVarForRegistration(pName);
-	if (pCVar) {
-		return pCVar;
-	}
-
-	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, pName, Value, Min, Max, flags, "");
-	RegisterVar(pCVar);
-	return pCVar;
-}
-
-ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min, 
-	float Max, VarFlags flags)
-{
-	X_ASSERT_NOT_NULL(pName);
-
-	ICVar* pCVar = GetCVarForRegistration(pName);
-	if (pCVar) {
-		return pCVar;
-	}
-
-	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, pName, Value, Min, Max, flags, "");
-	RegisterVar(pCVar);
-	return pCVar;
-}
-
-
 ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue, 
 	float Min, float Max, VarFlags flags, const char* pDesc)
 {
@@ -2095,7 +2050,6 @@ void XConsole::Job_runCmds(void)
 		ExecuteStringInternal(cmds_.peek());
 		cmds_.pop();
 	}
-
 }
 
 
@@ -3153,7 +3107,9 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 		return;
 	}
 
-	if (ICVar* pCBar = GetCVar(Cmd->GetArg(1)))
+	const char* pVarName = Cmd->GetArg(1);
+
+	if (ICVar* pCBar = GetCVar(pVarName))
 	{
 		VarFlag::Enum type = pCBar->GetType();
 		if (type == VarFlag::COLOR || type == VarFlag::VECTOR)
@@ -3166,7 +3122,6 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 				merged.append(Cmd->GetArg(i));
 				merged.append(" ");
 			}
-
 
 			pCBar->Set(merged.c_str());
 		}
@@ -3185,31 +3140,26 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 	}
 	else
 	{
-		// we need to work out what kinda value it is.
-		// int, float, string.
-		const char* start = Cmd->GetArg(2);
-		char* End;
-		// long int val = strtol(Cmd->GetArg(2), &End, 0);
-		float valf = strtof(start, &End);
+		core::string merged;
 
-
-		if (valf != 0)
+		for (size_t i = 2; i < Num; i++)
 		{
-			// using the End var is safe since we the condition above checks parsing was valid.
-			if (math<float>::fmod(valf, 1.f) == 0.f && !strUtil::Find(start, End, '.'))
-			{
-				ConfigRegisterInt(Cmd->GetArg(1), static_cast<int>(valf), 1, 0, VarFlags());
-			}
-			else
-			{
-				ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, VarFlags());
-			}
+			merged.append(Cmd->GetArg(i));
+			merged.append(" ");
+		}
+
+		merged.trimRight();
+
+		// we just add it to config cmd map
+		auto it = configCmds_.find(X_CONST_STRING(pVarName));
+		if (it == configCmds_.end())
+		{
+			configCmds_.insert(ConfigCmdsMap::iterator::value_type(pVarName, merged));
 		}
 		else
 		{
-			ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), VarFlags());
+			it->second = merged;
 		}
-
 	}
 }
 
