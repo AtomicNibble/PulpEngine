@@ -244,24 +244,24 @@ void XFontSystem::ListFonts(void) const
 	FontMapConstItor it = fonts_.begin();
 	FontFlags::Description FlagDesc;
 
-	X_LOG0("Fonts", "---------------- ^8Fonts^7 ----------------");
+	X_LOG0("Fonts", "---------------- ^8Fonts^7 ---------------");
 	for (; it != fonts_.end(); ++it)
 	{
 		XFont* pFont = it->second;
 		XFontTexture* pTex = pFont->getFontTexture();
 		if (pTex && pTex->IsReady()) 
 		{
-			X_LOG0("Fonts", "Name: \"%s\", Flags: \"%s\" Size: (%" PRIi32 ",%" PRIi32 "), Usage: %" PRIi32 " CacheMiss: %" PRIi32,
+			X_LOG0("Fonts", "Name: ^2\"%s\"^7 Flags: [^1%s^7] Size: ^2(%" PRIi32 ",%" PRIi32 ")^7 Usage: ^2%" PRIi32 " ^7CacheMiss: ^2%" PRIi32,
 				pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc),
 				pTex->GetWidth(), pTex->GetHeight(), pTex->GetSlotUsage(), pTex->GetCacheMisses());
 		}
 		else 
 		{
-			X_LOG0("Fonts", "Name: \"%s\" Flags: \"%s\"", pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc));
+			X_LOG0("Fonts", "Name: ^2\"%s\"^7 Flags: [^1%s^7]", pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc));
 		}
 	}
 	
-	X_LOG0("Fonts", "-------------- ^8Fonts End^7 --------------");
+	X_LOG0("Fonts", "------------- ^8Fonts End^7 --------------");
 }
 
 void XFontSystem::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
