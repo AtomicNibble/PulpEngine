@@ -164,6 +164,7 @@ ICVar* XConsoleNULL::Register(const char* name, Color* src, Color defaultvalue,
 	X_UNUSED(flags);
 	X_UNUSED(desc);
 
+	*src = defaultvalue;
 	return nullptr;
 }
 
