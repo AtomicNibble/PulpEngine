@@ -384,16 +384,14 @@ namespace shader
 		return pHWShaderRes;
 	}
 
-	bool XShaderManager::freeSourcebin(void)
+	void XShaderManager::freeSourcebin(void)
 	{
 		sourceBin_.free();
-		return true;
 	}
 
-	bool XShaderManager::freeHwShaders(void)
+	void XShaderManager::freeHwShaders(void)
 	{
 		hwShaders_.free();
-		return true;
 	}
 
 	void XShaderManager::listHWShaders(const char* pSearchPattern)

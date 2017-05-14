@@ -79,8 +79,8 @@ namespace shader
 		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);
 
 
-		bool freeSourcebin(void);
-		bool freeHwShaders(void);
+		void freeSourcebin(void);
+		void freeHwShaders(void);
 		void listHWShaders(const char* pSarchPatten = nullptr);
 		void listShaderSources(const char* pSarchPatten = nullptr);
 
