@@ -783,7 +783,7 @@ X_NAMESPACE_BEGIN(texture)
 		}
 		);
 
-		X_LOG0("Texture", "------------ ^8Textures(%" PRIuS ")^7 ------------", sorted_texs.size());
+		X_LOG0("Texture", "------------- ^8Textures(%" PRIuS ")^7 ------------", sorted_texs.size());
 
 		for (const auto* pTex : sorted_texs)
 		{
@@ -792,7 +792,7 @@ X_NAMESPACE_BEGIN(texture)
 				Texturefmt::ToString(pTex->getFormat()), pTex->getRefCount());
 		}
 
-		X_LOG0("Texture", "------------ ^8Textures End^7 -----------");
+		X_LOG0("Texture", "------------ ^8Textures End^7 ------------");
 	}
 
 	// -----------------------------------

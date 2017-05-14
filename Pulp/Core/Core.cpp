@@ -576,7 +576,7 @@ void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
 
 void XCore::HotReloadListExts(void)
 {
-	X_LOG0("HotReload", "------- ^8Registerd Extensions^7 -------");
+	X_LOG0("HotReload", "-------- ^8Registerd Extensions^7 --------");
 
 	hotReloadMap::const_iterator it;
 
@@ -584,17 +584,18 @@ void XCore::HotReloadListExts(void)
 
 	for (; it != hotReloadExtMap_.end(); ++it)
 	{
-		X_LOG0("HotReload", "^1%s", it->first);
+		X_LOG0("HotReload", "^2%s", it->first);
 	}
 
-	X_LOG0("HotReload", "----- ^8Registerd Extensions End^7 -----");
+	X_LOG0("HotReload", "------ ^8Registerd Extensions End^7 ------");
+
 }
 
 void XCore::ListProgramArgs(void)
 {
 	size_t i, num = args_.size();
 
-	X_LOG0("AppArgs", "------ ^8Program Args(%" PRIuS ")^7 ------", num);
+	X_LOG0("AppArgs", "----------- ^8Program Args(%" PRIuS ")^7 ----------", num);
 
 	core::StackString<1024 + 128> merged;
 
@@ -607,7 +608,7 @@ void XCore::ListProgramArgs(void)
 
 		for (j = 0; j < argsNum; j++)
 		{
-			merged.appendFmt("^1%ls^7", arg.getArgv(j));
+			merged.appendFmt("^2%ls^7", arg.getArgv(j));
 			if ((j+1) < argsNum) {
 				merged.append(" -> ");
 			}
@@ -616,7 +617,7 @@ void XCore::ListProgramArgs(void)
 		X_LOG0("AppArgs", "%s", merged.c_str());
 	}
 
-	X_LOG0("AppArgs", "------ ^8Program Args End^7 -----");
+	X_LOG0("AppArgs", "---------- ^8Program Args End^7 ----------");
 }
 
 
