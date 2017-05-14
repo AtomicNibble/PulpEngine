@@ -155,6 +155,7 @@ struct ICVar
 	virtual const char* GetName(void) const X_ABSTRACT;
 	virtual const char* GetDesc(void) const X_ABSTRACT;
 	virtual const char* GetDefaultStr(StrBuf& buf) const X_ABSTRACT;
+	virtual void SetDesc(const char* pDesc) X_ABSTRACT;
 
 	virtual int GetInteger(void) const X_ABSTRACT;
 	virtual float GetFloat(void) const X_ABSTRACT;

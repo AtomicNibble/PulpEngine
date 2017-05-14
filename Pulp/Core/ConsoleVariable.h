@@ -22,6 +22,7 @@ public:
 
 	// interface ICvar 
 	virtual const char* GetDesc(void) const X_OVERRIDE;
+	virtual void SetDesc(const char* pDesc) X_OVERRIDE;
 
 	virtual FlagType GetFlags(void) const X_OVERRIDE;
 	virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;

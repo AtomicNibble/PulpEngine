@@ -131,6 +131,11 @@ const char* CVarBase::GetDesc(void) const
 	return pDesc_;
 }
 
+void CVarBase::SetDesc(const char* pDesc)
+{
+	pDesc_ = pDesc;
+}
+
 
 void CVarBase::Release(void)
 {
