@@ -27,19 +27,19 @@ X_NAMESPACE_BEGIN(texture)
 
 
 		ADD_CVAR_REF("img_fmt_dds", allowFmtDDS_, allowFmtDDS_, 0, 1,
-			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 			"Enable loading of dds textures");
 		ADD_CVAR_REF("img_fmt_png", allowFmtPNG_, allowFmtPNG_, 0, 1,
-			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 			"Enable loading of png textures");
 		ADD_CVAR_REF("img_fmt_jpg", allowFmtJPG_, allowFmtJPG_, 0, 1,
-			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 			"Enable loading of jpg textures");
 		ADD_CVAR_REF("img_fmt_psd", allowFmtPSD_, allowFmtPSD_, 0, 1,
-			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 			"Enable loading of psd textures");
 		ADD_CVAR_REF("img_fmt_tga", allowFmtTGA_, allowFmtTGA_, 0, 1,
-			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 			"Enable loading of tga textures");
 	}
 
