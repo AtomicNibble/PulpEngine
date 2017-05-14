@@ -3,13 +3,69 @@
 #ifndef X_MEMORYALLOCATORSTATISTICS_H_
 #define X_MEMORYALLOCATORSTATISTICS_H_
 
+#include <String\HumanSize.h>
 
 X_NAMESPACE_BEGIN(core)
 
 
-
 struct MemoryAllocatorStatistics
 {
+	typedef core::StackString512 Str;
+
+	void Clear(void) 
+	{
+		// don't clear the char pointer.
+		memset(&allocationCount_, 0, sizeof(MemoryAllocatorStatistics) - sizeof(type_));
+	}
+
+	const char* toString(Str& str, bool incMax = false) const
+	{
+		core::HumanSize::Str temp;
+
+		str.clear();
+		str.appendFmt("Num: ^6%" PRIuS "^~\n", allocationCount_);
+		str.appendFmt("Num(Max): ^6%" PRIuS "^~\n", allocationCountMax_);
+		str.appendFmt("Physical: ^6%s^~\n", core::HumanSize::toString(temp, physicalMemoryAllocated_));
+		str.appendFmt("Physical(Used): ^6%s^~\n", core::HumanSize::toString(temp, physicalMemoryUsed_));
+		str.appendFmt("Virtual(Res): ^6%s^~\n", core::HumanSize::toString(temp, virtualMemoryReserved_));
+		str.appendFmt("WasteAlign: ^6%s^~\n", core::HumanSize::toString(temp, wasteAlignment_));
+		str.appendFmt("WasteUnused: ^6%s^~\n", core::HumanSize::toString(temp, wasteUnused_));
+		str.appendFmt("Overhead: ^6%s^~\n", core::HumanSize::toString(temp, internalOverhead_));
+
+		if (incMax)
+		{
+			str.appendFmt("Physical(Max): ^6%s^~\n", core::HumanSize::toString(temp, physicalMemoryAllocatedMax_));
+			str.appendFmt("Physical(used-Max): ^6%s^~\n", core::HumanSize::toString(temp, physicalMemoryUsedMax_));
+			str.appendFmt("WasteAlign(Max): ^6%s^~\n", core::HumanSize::toString(temp, wasteAlignmentMax_));
+			str.appendFmt("WasteUnused(Max): ^6%s^~\n", core::HumanSize::toString(temp, wasteUnusedMax_));
+			str.appendFmt("Overhead(Max): ^6%s", core::HumanSize::toString(temp, internalOverheadMax_));
+		}
+
+		return str.c_str();
+	}
+
+	MemoryAllocatorStatistics& operator +=(const MemoryAllocatorStatistics& oth)
+	{
+		allocationCount_ += oth.allocationCount_;
+		allocationCountMax_ += oth.allocationCountMax_;
+
+		virtualMemoryReserved_ += oth.virtualMemoryReserved_;
+
+		physicalMemoryAllocated_ += oth.physicalMemoryAllocated_;
+		physicalMemoryAllocatedMax_ += oth.physicalMemoryAllocatedMax_;
+		physicalMemoryUsed_ += oth.physicalMemoryUsed_;
+		physicalMemoryUsedMax_ += oth.physicalMemoryUsedMax_;
+
+		wasteAlignment_ += oth.wasteAlignment_;
+		wasteAlignmentMax_ += oth.wasteAlignmentMax_;
+		wasteUnused_ += oth.wasteUnused_;
+		wasteUnusedMax_ += oth.wasteUnusedMax_;
+		internalOverhead_ += oth.internalOverhead_;
+		internalOverheadMax_ += oth.internalOverheadMax_;
+		return *this;
+	}
+
+
 	// general
 	const char* type_;									///< A human-readable string describing the type of allocator.
 
@@ -33,34 +89,6 @@ struct MemoryAllocatorStatistics
 	size_t wasteUnusedMax_;							///< The maximum amount of memory that could not be used for satisfying allocation requests.
 	size_t internalOverhead_;							///< The internal overhead caused by book-keeping information.
 	size_t internalOverheadMax_;						///< The maximum amount of internal overhead that was caused by book-keeping information.
-
-	void Clear() {
-		// don't clear the char pointer.
-		memset( &allocationCount_, 0, sizeof( MemoryAllocatorStatistics ) - sizeof( type_ ) );
-	}
-
-	MemoryAllocatorStatistics& operator +=(const MemoryAllocatorStatistics& oth) {
-
-		allocationCount_ += oth.allocationCount_;
-		allocationCountMax_ += oth.allocationCountMax_;
-
-		virtualMemoryReserved_ += oth.virtualMemoryReserved_;
-
-		physicalMemoryAllocated_ += oth.physicalMemoryAllocated_;
-		physicalMemoryAllocatedMax_ += oth.physicalMemoryAllocatedMax_;
-		physicalMemoryUsed_ += oth.physicalMemoryUsed_;
-		physicalMemoryUsedMax_ += oth.physicalMemoryUsedMax_;
-
-		wasteAlignment_ += oth.wasteAlignment_;
-		wasteAlignmentMax_ += oth.wasteAlignmentMax_;
-		wasteUnused_ += oth.wasteUnused_;
-		wasteUnusedMax_ += oth.wasteUnusedMax_;
-		internalOverhead_ += oth.internalOverhead_;
-		internalOverheadMax_ += oth.internalOverheadMax_;
-
-
-		return *this;
-	}
 };
 
 X_NAMESPACE_END
