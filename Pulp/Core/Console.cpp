@@ -1897,6 +1897,7 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 		if (itrCmd != CmdMap_.end())
 		{
 			value.set(range.GetStart(), range.GetEnd());
+			value.trim();
 			ExecuteCommand((itrCmd->second), value);
 			continue;
 		}
