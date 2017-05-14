@@ -13,6 +13,10 @@
 #define PRIuS "Iu"
 #endif
 
+
+#define PRns "S"	// print a narrow string (when passed with a wide format string)
+#define PRws "ls"	// print a wide string (when passed with a narrow format string)
+
 #else
 
 #error "format macros not defined for this platform."
