@@ -424,6 +424,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!env_.pConsole->LoadAndExecConfigFile("default.cfg")) {
 			return false;
 		}
+
+		if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
+			// this is not required.
+		}
 	}
 
 	// #------------------------- CPU Info ----------------------
@@ -756,10 +760,6 @@ bool XCore::InitConsole(const SCoreInitParams &initParams)
 		}
 	}
 
-	if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
-		// ...
-	}
-
 	return true;
 }
 
@@ -784,7 +784,6 @@ bool XCore::InitInput(const SCoreInitParams &initParams)
 		X_ERROR("Font", "failed to init input system");
 		return false;
 	}
-
 
 	return true;
 }
