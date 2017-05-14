@@ -1416,7 +1416,7 @@ ICVar* XConsole::RegisterString(const char* pName, const char* Value,
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1441,7 +1441,7 @@ ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min,
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1456,7 +1456,7 @@ ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1471,7 +1471,7 @@ ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarF
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1486,7 +1486,7 @@ ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min,
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1501,7 +1501,7 @@ ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min,
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1518,7 +1518,7 @@ ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue,
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1536,7 +1536,7 @@ ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue,
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1554,7 +1554,7 @@ ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue,
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
@@ -1573,7 +1573,7 @@ ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue,
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
 
-	ICVar *pCVar = GetCVarForRegistration(pName);
+	ICVar* pCVar = GetCVarForRegistration(pName);
 	if (pCVar) {
 		return pCVar;
 	}
