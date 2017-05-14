@@ -11,9 +11,9 @@ namespace profiler
 		return profilerPause_ != 0;
 	}
 
-	X_INLINE bool ProfilerVars::drawProfiler(void) const
+	X_INLINE int32_t ProfilerVars::getProlfilerDrawFlags(void) const
 	{
-		return drawProfiler_ != 0;
+		return profilerDrawFlags_;
 	}
 
 	X_INLINE bool ProfilerVars::drawProfilerConsoleExpanded(void) const

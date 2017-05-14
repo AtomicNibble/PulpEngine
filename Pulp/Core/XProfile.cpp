@@ -285,7 +285,7 @@ namespace profiler
 	// IInputEventListner
 	bool XProfileSys::OnInputEvent(const input::InputEvent& event)
 	{
-		if (!vars_.drawProfiler()) {
+		if (!vars_.getProlfilerDrawFlags()) {
 			return false;
 		}
 
@@ -351,22 +351,25 @@ namespace profiler
 
 	void XProfileSys::Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys)
 	{
-		bool draw = vars_.drawProfiler();
+		int32_t drawFlags = vars_.getProlfilerDrawFlags();
 		if (!vars_.drawProfilerConsoleExpanded())
 		{
 			if (gEnv->pConsole) {
-				draw = gEnv->pConsole->getVisState() != core::consoleState::EXPANDED;
+				if (gEnv->pConsole->getVisState() == core::consoleState::EXPANDED) {
+					drawFlags = 0;
+				}
 			}
 		}
 
-		if (draw)
+		if (drawFlags)
 		{
 			const float padding = 10;
 			const float yOffset = 30;
 
 			Vec2f pos(padding, yOffset + padding);
+			Vec2f area;
 
-			if (pJobSys && 1)
+			if (pJobSys &&core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('j')))
 			{
 #if X_ENABLE_JOBSYS_PROFILER
 				int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
@@ -384,8 +387,7 @@ namespace profiler
 					profilerIdx -= historyOffset;
 				}
 
-				Vec2f area = RenderJobSystem(pos, frameTimeInfo, pJobSys, profilerIdx);
-
+				area = RenderJobSystem(pos, frameTimeInfo, pJobSys, profilerIdx);
 				pos.y += area.y + padding;
 #else
 				X_UNUSED(frameTimeInfo);
@@ -393,12 +395,15 @@ namespace profiler
 
 			}
 
-			if (1)
+			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s')))
+			{
+				area = RenderStartupData(pos);
+			}
+
+			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('m')))
 			{
 				auto strAllocStats = gEnv->pStrArena->getAllocatorStatistics();
 				auto allocStats = gEnv->pArena->getAllocatorStatistics(true);
-
-				Vec2f area = RenderStartupData(pos);
 
 				pos.x += area.x + padding;
 				area = RenderMemoryInfo(pos, L"String Mem", strAllocStats);
@@ -406,6 +411,7 @@ namespace profiler
 				pos.x += area.x + padding;
 				RenderMemoryInfo(pos, L"Combined Mem", allocStats);
 			}
+		
 		}
 	}
 
