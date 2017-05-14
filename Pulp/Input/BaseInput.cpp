@@ -23,6 +23,7 @@ namespace {
 } // namespace
 
 XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	pCVars_(X_NEW(XInputCVars, arena,"InputCvars")),
 	devices_(arena),
 	listners_(arena),
@@ -42,7 +43,7 @@ XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
 
 XBaseInput::~XBaseInput(void)
 {
-	X_DELETE_AND_NULL(pCVars_, arena_);
+	X_DELETE(pCVars_, arena_);
 }
 
 
