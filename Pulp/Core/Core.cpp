@@ -87,7 +87,9 @@ XCore::XCore() :
 	pConsole_(nullptr),
 	pCpuInfo_(nullptr),
 	pCrc32_(nullptr),
+#if X_ENABLE_PROFILER
 	pProfiler_(nullptr),
+#endif //!X_ENABLE_PROFILER
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
 	pEventDispatcher_(nullptr),
@@ -281,11 +283,13 @@ void XCore::ShutDown()
 		core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
 	}
 
+#if X_ENABLE_PROFILER
 	if (pProfiler_)
 	{
 		pProfiler_->shutDown();
 		core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
 	}
+#endif // !X_ENABLE_PROFILER
 
 	if (env_.pConsole && !initParams_.basicConsole())
 	{

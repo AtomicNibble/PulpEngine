@@ -123,6 +123,7 @@ public:
 	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_FINAL;
 	X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
 
+
 	X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
 	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
 	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
@@ -234,7 +235,9 @@ private:
 	ConverterModulesArr				converterInterfaces_;
 	ArrsetHandlersArr				assertHandlers_;
 
+#if X_ENABLE_PROFILER
 	core::profiler::XProfileSys*	pProfiler_;
+#endif // !X_ENABLE_PROFILER
 
 	// Hot reload stuff
 	core::XDirectoryWatcher			dirWatcher_;

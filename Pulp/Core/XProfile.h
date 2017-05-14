@@ -2,6 +2,7 @@
 
 #ifndef _X_PROFILE_H_
 #define _X_PROFILE_H_
+#if X_ENABLE_PROFILER
 
 #include <Containers\Array.h>
 #include <Threading\JobSystem2.h>
@@ -117,6 +118,7 @@ X_NAMESPACE_END
 
 #include "XProfile.inl"
 
+#endif //!X_ENABLE_PROFILER
 #endif // !_X_PROFILE_H_
 
 

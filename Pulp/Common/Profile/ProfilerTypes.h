@@ -45,6 +45,7 @@ namespace profiler
 	);
 
 
+#if X_ENABLE_PROFILER 
 
 	template<typename T, size_t N>
 	class ProfilerHistory : public core::FixedRingBuffer<T, N>
@@ -223,10 +224,9 @@ namespace profiler
 		XProfileData*		pData_;
 	};
 
+#endif // !#X_ENABLE_PROFILER 
 
 } // namespace profiler
-
-
 
 
 #if X_ENABLE_PROFILER 
@@ -244,8 +244,8 @@ namespace profiler
 #define X_PROFILE_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 #define X_PROFILE_NO_HISTORY_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 
-
 #endif // !X_ENABLE_PROFILER
+
 
 X_NAMESPACE_END
 

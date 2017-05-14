@@ -59,7 +59,11 @@ X_INLINE physics::IPhysics* XCore::GetPhysics(void)
 
 X_INLINE core::profiler::IProfiler* XCore::GetProfiler(void)
 {
+#if X_ENABLE_PROFILER
 	return pProfiler_;
+#else
+	return nullptr;
+#endif // !X_ENABLE_PROFILER
 }
 
 X_INLINE core::IXDirectoryWatcher* XCore::GetDirWatcher(void)

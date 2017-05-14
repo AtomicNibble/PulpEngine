@@ -324,9 +324,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	if (startupParams.bProfileSysEnabled)
 	{
+#if X_ENABLE_PROFILER
 		pProfiler_ = X_NEW(core::profiler::XProfileSys, g_coreArena, "ProfileSys")(g_coreArena);
 		
 		env_.pProfiler = pProfiler_;
+#endif // !X_ENABLE_PROFILER
 	}
 
 
@@ -399,11 +401,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 	}
 
+#if X_ENABLE_PROFILER
 	// reg profiler vars.
 	if (pProfiler_)	{
 		pProfiler_->registerVars();
 		pProfiler_->registerCmds();
 	}
+#endif // !X_ENABLE_PROFILER
 
 	// register verbosity vars.
 	if (pConsoleLogger_) {
@@ -490,12 +494,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		}
 	}
 
+#if X_ENABLE_PROFILER
 	if (pProfiler_) {
 		if (!pProfiler_->init(this)) {
 			return false;
 		}
 	}
-
+#endif // !X_ENABLE_PROFILER
 
 	if (startupParams.bEnableNetowrking)
 	{
@@ -543,11 +548,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;
 		}
 
+#if X_ENABLE_PROFILER
 		if(pProfiler_) {
 			if (!pProfiler_->loadRenderResources()) {
 				return false;
 			}
 		}
+#endif // !X_ENABLE_PROFILER
 	}
 
 	// sync net inits before 3d engine.

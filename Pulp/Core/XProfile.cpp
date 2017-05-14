@@ -1,4 +1,7 @@
 #include "stdafx.h"
+
+#if X_ENABLE_PROFILER
+
 #include "XProfile.h"
 
 #include <Time\StopWatch.h>
@@ -838,3 +841,5 @@ namespace profiler
 
 
 X_NAMESPACE_END
+
+#endif // !X_ENABLE_PROFILER

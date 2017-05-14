@@ -67,18 +67,22 @@ bool XCore::Update(void)
 	// get time deltas for this frame.
 	time_.OnFrameBegin(frameData.timeInfo);
 
+#if X_ENABLE_PROFILER
 	if (pProfiler_) {
 		pProfiler_->OnFrameBegin(frameData.timeInfo);
 	}
+#endif // !X_ENABLE_PROFILER
 
 	JobSystem& jobSys = *env_.pJobSys;
 
 	{
 		bool paused = false;
 
+#if X_ENABLE_PROFILER
 		if (pProfiler_) {
 			paused = pProfiler_->getVars().isPaused();
 		}
+#endif // !X_ENABLE_PROFILER
 
 		jobSys.OnFrameBegin(paused);
 	}
@@ -250,13 +254,14 @@ void XCore::RenderEnd(core::FrameData& frameData)
 	{
 		X_PROFILE_BEGIN("CoreRenderEnd", core::profiler::SubSys::CORE);
 
+#if X_ENABLE_PROFILER
 
 		// draw me all the profile wins!
 		if (pProfiler_) {
 			pProfiler_->Render(frameData.timeInfo, env_.pJobSys);
 		}
 
-
+#endif // !X_ENABLE_PROFILER
 
 		if (core::IConsole* pConsole = GetIConsole()) {
 			pConsole->draw(frameData.timeInfo);
@@ -265,9 +270,12 @@ void XCore::RenderEnd(core::FrameData& frameData)
 		env_.pRender->renderEnd();
 	}
 
+#if X_ENABLE_PROFILER
+	
 	// End
 	if (pProfiler_) {
 		pProfiler_->OnFrameEnd();
 	}
 
+#endif // !X_ENABLE_PROFILER
 }
