@@ -359,36 +359,228 @@ namespace profiler
 			}
 		}
 
-		if (pJobSys && draw)
+		if (draw)
 		{
+			const float padding = 10;
+			const float yOffset = 30;
+
+			Vec2f pos(padding, yOffset + padding);
+
+			if (pJobSys && 1)
+			{
 #if X_ENABLE_JOBSYS_PROFILER
+				int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
 
-			int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
+				// 0-15
+				// we want one before
+				int32_t historyOffset = frameOffset_ + 1;
+				if (historyOffset > profilerIdx)
+				{
+					int32_t backNum = (historyOffset - profilerIdx);
+					profilerIdx = core::V2::JOBSYS_HISTORY_COUNT - backNum;
+				}
+				else
+				{
+					profilerIdx -= historyOffset;
+				}
 
-			// 0-15
-			// we want one before
-			int32_t historyOffset = frameOffset_ + 1;
-			if (historyOffset > profilerIdx)
-			{
-				int32_t backNum = (historyOffset - profilerIdx);
-				profilerIdx = core::V2::JOBSYS_HISTORY_COUNT - backNum;
-			}
-			else
-			{
-				profilerIdx -= historyOffset;
-			}
+				Vec2f area = RenderJobSystem(pos, frameTimeInfo, pJobSys, profilerIdx);
 
-			RenderJobSystem(frameTimeInfo, pJobSys, profilerIdx);
+				pos.y += area.y + padding;
 #else
-			X_UNUSED(frameTimeInfo);
-
+				X_UNUSED(frameTimeInfo);
 #endif // !X_ENABLE_JOBSYS_PROFILER
+
+			}
+
+			if (1)
+			{
+				auto strAllocStats = gEnv->pStrArena->getAllocatorStatistics();
+				auto allocStats = gEnv->pArena->getAllocatorStatistics(true);
+
+				Vec2f area = RenderStartupData(pos);
+
+				pos.x += area.x + padding;
+				area = RenderMemoryInfo(pos, L"String Mem", strAllocStats);
+
+				pos.x += area.x + padding;
+				RenderMemoryInfo(pos, L"Combined Mem", allocStats);
+			}
 		}
 	}
 
+	Vec2f XProfileSys::RenderStartupData(Vec2f pos)
+	{
+		size_t maxNickNameWidth = 0;
+		for (size_t i = 0; i < profilerData_.size(); ++i)
+		{
+			const auto* pData = profilerData_[i];
+			maxNickNameWidth = core::Max(maxNickNameWidth, core::strUtil::strlen(pData->pNickName_));
+		}
+
+		// pad it 
+		maxNickNameWidth = core::Max(maxNickNameWidth + 2_sz, 5_sz);
+
+		core::StackStringW512 text;
+		text.setFmt(L"#%*s\t%5s\t%12s\t%8s", maxNickNameWidth, L"Name", L"Calls", L"Time(cs)", L"Time(ms)");
+
+		font::TextDrawContext ctx;
+		ctx.pFont = pFont_;
+		ctx.effectId = 0;
+		ctx.SetColor(Col_White);
+		ctx.SetSize(Vec2f(16.f, 16.f));
+
+		Vec2f titleSize = pFont_->GetTextSize(text.begin(), text.end(), ctx);
+
+		const float padding = 10;
+
+		const float titleStartX = pos.x + padding;
+		const float titleStartY = pos.y;
+		const float titleHeight = 16.f + padding;
+
+		const float colHdrStartX = pos.x;
+		const float colHdrStartY = titleStartY + titleHeight;
+		const float colHdrHeight = 22.f;
+
+		const float entryStartX = pos.x + padding;
+		const float entryStartY = colHdrStartY + colHdrHeight;
+		const float entryOffset = (ctx.size.y + 2.f);
+
+		const float width = titleSize.x + (padding * 2);
+		const float height = titleHeight + colHdrHeight + (profilerData_.size() * entryOffset) + (padding * 2);
+
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+
+		// background.
+		pPrim->drawQuad(
+			pos.x,
+			pos.y,
+			width,
+			height,
+			Color(0.1f, 0.1f, 0.1f, 0.8f)
+		);
+
+		// draw background for coloum headers
+		pPrim->drawQuad(
+			colHdrStartX,
+			colHdrStartY,
+			width, 
+			20.f,
+			Color(0.2f, 0.2f, 0.2f, 0.6f),
+			Color(0.01f, 0.01f, 0.01f, 0.8f)
+		);
+
+		// system cubes.
+		std::sort(profilerData_.begin(), profilerData_.end(), [](const XProfileData* pLhs, const XProfileData* pRhs) {
+			return pLhs->time_ > pRhs->time_;
+		});
+
+		for (size_t i = 0; i < profilerData_.size(); ++i)
+		{
+			const auto* pData = profilerData_[i];
+
+			pPrim->drawQuad(
+				entryStartX, 
+				entryStartY + (i * entryOffset),
+				6.f, // intended as y
+				ctx.size.y,
+				subSystemInfo_[pData->subSystem_].col
+			);
+		}
+
+		// headers
+		ctx.SetColor(Col_Mintcream);
+		ctx.flags.Set(font::DrawTextFlag::CENTER);
+
+		pPrim->drawText(pos.x + (width / 2), titleStartY, ctx, L"Startup Timmings");
+
+		ctx.SetColor(Col_Dimgray);
+		ctx.flags.Remove(font::DrawTextFlag::CENTER);
+
+		pPrim->drawText(entryStartX, colHdrStartY, ctx, text.begin(), text.end());
+
+		ctx.SetColor(Col_Dimgray);
+
+		for (size_t i=0; i<profilerData_.size(); ++i)
+		{
+			const auto* pData = profilerData_[i];
+			
+			text.setFmt(L"%*" PRns "\t%5" PRIi32 "\t%12" PRIu64 "\t%8.2f",
+				maxNickNameWidth + 1,
+				pData->pNickName_,
+				pData->callCount_,
+				pData->time_,
+				ProfileTimer::toMS(pData->time_));
+
+			pPrim->drawText(entryStartX, entryStartY + (i * entryOffset), ctx, text.begin(), text.end());
+		}
+
+		return Vec2f(width, height);
+	}
+
+	Vec2f XProfileSys::RenderMemoryInfo(Vec2f pos, const wchar_t* pTitle, const core::MemoryAllocatorStatistics& stats)
+	{
+		core::MemoryAllocatorStatistics::Str str;
+		stats.toString(str);
+
+		font::TextDrawContext ctx;
+		ctx.pFont = pFont_;
+		ctx.effectId = 0;
+		ctx.SetColor(Col_White);
+		ctx.SetSize(Vec2f(16.f, 16.f));
+
+		Vec2f size = pFont_->GetTextSize(str.begin(), str.end(), ctx);
+
+		const float padding = 10;
+		const float titleStartX = pos.x + padding;
+		const float titleStartY = pos.y ;
+		const float titleHeight = 20.f;
+		const float memInfoStartX = pos.x + padding;
+		const float memInfoStartY = titleStartY + titleHeight;
+		const float width = size.x + (padding * 2);
+		const float height = titleHeight + size.y + (padding * 1);
+
+		// okay so we have the stats should we just compute the full size?
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+
+		// background.
+		pPrim->drawQuad(
+			pos.x,
+			pos.y,
+			width,
+			height,
+			Color(0.1f, 0.1f, 0.1f, 0.8f)
+		);
+
+		pPrim->drawQuad(
+			pos.x,
+			pos.y,
+			width,
+			20.f,
+			Color(0.2f, 0.2f, 0.2f, 0.6f),
+			Color(0.01f, 0.01f, 0.01f, 0.8f)
+		);
+
+		ctx.SetColor(Col_Mintcream);
+		ctx.flags.Set(font::DrawTextFlag::CENTER);
+		pPrim->drawText(pos.x + (width / 2), titleStartY, ctx, pTitle);
+
+		ctx.SetColor(Col_Dimgray);
+		ctx.flags.Remove(font::DrawTextFlag::CENTER);
+		pPrim->drawText(
+			memInfoStartX,
+			memInfoStartY,
+			ctx, 
+			str.begin(), str.end()
+		);
+
+		return Vec2f(width, height);
+	}
+
+
 #if X_ENABLE_JOBSYS_PROFILER
 
-	void XProfileSys::RenderJobSystem(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx)
+	Vec2f XProfileSys::RenderJobSystem(Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx)
 	{
 		X_UNUSED(pJobSys);
 		X_UNUSED(profileIdx);
@@ -396,17 +588,14 @@ namespace profiler
 		auto& frameStats = stats[profileIdx];
 		auto& timeLines = pJobSys->GetTimeLines();
 
-		// well my goaty pickle trimmer.
-		// i want something sorta full screen and sexy.
-		// give me the dimensions!
-		const float border = 15;
-		const float padding = 10;
-		const float yOffset = 30;
 
-		const float xStart = border;
-		const float yStart = border + yOffset;
+		const float padding = 10;
+		const float border = 15;
+
+		const float xStart = pos.x;
+		// const float yStart = pos.y;
 		const float width = renderRes_.x - (border * 2);
-		const float height = (renderRes_.y - (border * 2) - yOffset);
+		const float maxHeight = (renderRes_.y - (border * 2) - pos.y);
 	
 		font::TextDrawContext ctx;
 		ctx.pFont = pFont_;
@@ -422,17 +611,14 @@ namespace profiler
 		const uint32_t numThreadQueues = pJobSys->GetQeueCount();
 		const float threadInfoXOffset = 40.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
-		const float threadInfoY = yStart + ctx.size.y + (padding * 2);
-		const float threadInfoHeight = core::Min<float>((height - (ctx.size.y + padding) - (keyHeight + padding)) - 20, maxHeightPerThread * numThreadQueues);
+		const float threadInfoY = pos.y + ctx.size.y + (padding * 2);
+		const float threadInfoHeight = core::Min<float>((maxHeight - (ctx.size.y + padding) - (keyHeight + padding)) - 20, maxHeightPerThread * numThreadQueues);
 		const float threadInfoWidth = (width - (padding * 2)) - threadInfoXOffset;
 
 		const float widthPerMS = threadInfoWidth / visibleMS;
 		const float threadInfoEntryHeight = threadInfoHeight / numThreadQueues;
 
-
-		core::StackString512 txt;
-		txt.appendFmt("JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
-			frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
+		const float height = threadInfoHeight + (threadInfoY - pos.y) + (keyHeight * 2);
 
 		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
@@ -451,10 +637,10 @@ namespace profiler
 		{
 			// background
 			pPrim->drawQuad(
-				xStart, 
-				yStart, 
+				pos.x,
+				pos.y,
 				width, 
-				threadInfoHeight + (threadInfoY - yStart) + (keyHeight * 2),
+				height,
 				Color(0.1f, 0.1f, 0.1f, 0.8f)
 			);
 
@@ -464,9 +650,9 @@ namespace profiler
 				const float barWidth = 4.f;
 				const float barSpacing = 2.f;
 				const float barStartX = ((xStart + width) - (V2::JOBSYS_HISTORY_COUNT * (barWidth + barSpacing)) - padding);
-				const float barStartY = yStart + padding;
+				const float barStartY = pos.y + padding;
 
-				int invOffset = V2::JOBSYS_HISTORY_MASK - frameOffset_;
+				int32_t invOffset = V2::JOBSYS_HISTORY_MASK - frameOffset_;
 
 				for (int32_t i = 0; i < V2::JOBSYS_HISTORY_COUNT; i++)
 				{
@@ -551,12 +737,16 @@ namespace profiler
 				}
 			}
 
-			ctx.SetColor(Col_Mintcream);
+			core::StackStringW512 txt;
+			txt.appendFmt(L"JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
+				frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
 
+			ctx.SetColor(Col_Mintcream);
 			ctx.flags.Set(font::DrawTextFlag::CENTER);
-			pPrim->drawText(xStart + (width / 2), yStart + padding, ctx, L"Profiler");
+			pPrim->drawText(xStart + (width / 2), pos.y + padding, ctx, L"Profiler");
+
 			ctx.flags.Remove(font::DrawTextFlag::CENTER);
-			pPrim->drawText(xStart + padding, yStart + padding, ctx, txt.begin(), txt.end());
+			pPrim->drawText(xStart + padding, pos.y + padding, ctx, txt.begin(), txt.end());
 
 			X_ENABLE_WARNING(4127)
 		}
@@ -578,6 +768,8 @@ namespace profiler
 			);
 		}
 
+
+		return Vec2f(width, height);
 	}
 
 	void XProfileSys::DrawThreadInfo(const FrameTimeData& frameTimeInfo, 
