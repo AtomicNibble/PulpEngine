@@ -1940,16 +1940,14 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 			value.trim();
 
 			auto it = configCmds_.find(X_CONST_STRING(name.c_str()));
-			if (it == configCmds_.end()) {
-
-				configCmds_.insert(ConfigCmdsMap::iterator::value_type(name.c_str(),
-					string(value.begin(), value.end())));
-
+			if (it == configCmds_.end())
+			{
+				configCmds_.insert(ConfigCmdsMap::iterator::value_type(name.c_str(), string(value.begin(), value.end())));
 			}
-			else {
+			else 
+			{
 				it->second = string(value.begin(), value.end());
 			}
-
 		}
 
 		if (!cmd.silentMode)
