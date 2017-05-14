@@ -172,10 +172,9 @@ void PhysXVars::SetDebugDrawChangedDel(DebugDrawEnabledDel del)
 }
 
 
-const char* PhysXVars::getDllOverrideStr(void) const
+const char* PhysXVars::getDllOverrideStr(StrBuf& buf) const
 {
 	X_ASSERT_NOT_NULL(pVarDllOverride_);
-	static core::ICVar::StrBuf buf;
 	return pVarDllOverride_->GetString(buf);
 }
 
@@ -186,11 +185,9 @@ uint32_t PhysXVars::ScratchBufferSize(void) const
 }
 
 
-const char* PhysXVars::getPVDIp(void) const
+const char* PhysXVars::getPVDIp(StrBuf& buf) const
 {
 	X_ASSERT_NOT_NULL(pVarPvdIp_);
-
-	static core::ICVar::StrBuf buf; // this is not actually used. and we don't need to be thread safe here.
 	return pVarPvdIp_->GetString(buf);
 }
 

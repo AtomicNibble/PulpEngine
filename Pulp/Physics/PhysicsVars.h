@@ -15,6 +15,7 @@ class PhysXVars
 public:
 	typedef core::Delegate<void(bool)> DebugDrawEnabledDel;
 
+	typedef char StrBuf[128];
 
 public:
 	PhysXVars();
@@ -25,7 +26,7 @@ public:
 	void ClearScene(void);
 	void SetDebugDrawChangedDel(DebugDrawEnabledDel del);
 
-	const char* getDllOverrideStr(void) const;
+	const char* getDllOverrideStr(StrBuf& buf) const;
 	uint32_t ScratchBufferSize(void) const;
 	X_INLINE StepperType::Enum GetStepperType(void) const;
 
@@ -33,7 +34,7 @@ public:
 	X_INLINE int32_t getPVDPort(void) const;
 	X_INLINE int32_t getPVDTimeoutMS(void) const;
 	X_INLINE int32_t getPVDFlags(void) const;
-	const char* getPVDIp(void) const;
+	const char* getPVDIp(StrBuf& buf) const;
 
 
 	X_INLINE int32_t DebugDrawEnabled(void) const;

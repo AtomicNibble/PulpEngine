@@ -197,7 +197,8 @@ bool XPhysics::init(const ToleranceScale& scale)
 #endif
 
 	{
-		const char* pDllOverrideStr = vars_.getDllOverrideStr();
+		PhysXVars::StrBuf buf;
+		const char* pDllOverrideStr = vars_.getDllOverrideStr(buf);
 		const size_t len = core::strUtil::strlen(pDllOverrideStr);
 
 		// i might move this str to enum logic into PhysicsVars.cpp 
@@ -1341,10 +1342,11 @@ void XPhysics::createPvdConnection(void)
 	//The normal way to connect to pvd.  PVD needs to be running at the time this function is called.
 	//We don't worry about the return value because we are already registered as a listener for connections
 	//and thus our onPvdConnected call will take care of setting up our basic connection state.
+	PhysXVars::StrBuf buf;
 
 	physx::PxVisualDebuggerConnection* pCon = physx::PxVisualDebuggerExt::createConnection(
 		pPVD, 
-		vars_.getPVDIp(),
+		vars_.getPVDIp(buf),
 		vars_.getPVDPort(),
 		vars_.getPVDTimeoutMS(),
 		connectionFlags
