@@ -88,7 +88,7 @@ CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, const char* desc) :
 	Flags_(nFlags),
 	pConsole_(pConsole)
 {
-	//	Name_ = sName;
+
 }
 
 CVarBase::~CVarBase()
@@ -121,10 +121,7 @@ void CVarBase::SetModified(void)
 {
 	Flags_.Set(VarFlag::MODIFIED);
 }
-//const char* CVarBase::GetName() const
-//{
-//	return Name_;
-//}
+
 
 const char* CVarBase::GetDesc(void) const
 {
