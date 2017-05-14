@@ -497,6 +497,10 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 					if (*pChar == L'^') {
 						++pChar;
 					}
+					else if (*pChar == L'~') { // resets to contex col
+						col = ctx.col; 
+						++pChar;
+					}
 					else if (core::strUtil::IsDigitW(*pChar))
 					{
 						const int32_t colorIndex = (*pChar) - L'0';
