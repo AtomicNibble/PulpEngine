@@ -77,6 +77,26 @@ class XCore :
 	public ICoreEventListener
 {
 	static const size_t MAX_CMD_ARS = 16;
+
+	struct ConverterModule : public core::ReferenceCounted<int32_t>
+	{
+		core::string dllName;
+		core::string moduleClassName;
+		IConverter* pConverter;
+		std::shared_ptr<IConverterModule> pConModule;
+	};
+
+	typedef core::Array<core::Module::Handle> ModuleHandlesArr;
+	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
+	typedef core::Array<ConverterModule> ConverterModulesArr;
+	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
+	// I think i can just use stack strings, since all handlers are hard coded.
+	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
+	typedef core::Array<core::string> hotRelodIgnoreArr;
+	typedef core::CmdArgs<1024, wchar_t> CmdArg;
+	typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
+
+
 public:
 	XCore();
 	~XCore() X_FINAL;
@@ -199,26 +219,7 @@ private:
 	void WindowSizeVarChange(core::ICVar* pVar);
 	void WindowCustomFrameVarChange(core::ICVar* pVar);
 
-	struct ConverterModule : public core::ReferenceCounted<int32_t>
-	{
-		core::string dllName;
-		core::string moduleClassName;
-		IConverter* pConverter;
-		std::shared_ptr<IConverterModule> pConModule;
-	};
-
 private:
-	typedef core::Array<core::Module::Handle> ModuleHandlesArr;
-	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
-	typedef core::Array<ConverterModule> ConverterModulesArr;
-	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
-	// I think i can just use stack strings, since all handlers are hard coded.
-	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
-	typedef core::Array<core::string> hotRelodIgnoreArr;
-	typedef core::CmdArgs<1024, wchar_t> CmdArg;
-	typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
-
-
 	core::xWindow*				    pWindow_;
 	core::Console*					pConsole_;
 
