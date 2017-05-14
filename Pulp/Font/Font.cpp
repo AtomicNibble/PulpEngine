@@ -31,7 +31,7 @@ namespace
 		Color8u(0, 0, 255),			// ^3 blue
 		Color8u(0, 125, 255),		// ^4 light blue
 	//	Color8u(255, 0, 220),		// ^5 pink
-		Color8u(255, 170, 155),		// ^5 pink
+		Color8u(255, 170, 155),		// ^5 light pink
 		Color8u(255, 145, 50),		// ^6 orange
 		Color8u(255, 255, 255),		// ^7 white
 		Color8u(0, 255, 0),			// ^8 green
