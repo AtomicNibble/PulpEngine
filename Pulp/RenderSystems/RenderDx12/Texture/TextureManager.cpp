@@ -100,10 +100,10 @@ X_NAMESPACE_BEGIN(texture)
 		releaseDefaultTextures();
 		releaseDanglingTextures();
 
-		for (auto tl : textureLoaders_) {
-			X_DELETE(tl, arena_);
+		for (auto* pTexLoader : textureLoaders_) {
+			X_DELETE(pTexLoader, arena_);
 		}
-
+		textureLoaders_.clear();
 		return true;
 	}
 
