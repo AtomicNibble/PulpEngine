@@ -240,6 +240,7 @@ void XSound::registerCmds(void)
 bool XSound::init(void)
 {
 	X_LOG0("SoundSys", "Starting");
+	X_PROFILE_NO_HISTORY_BEGIN("SoundInit", core::profiler::SubSys::SOUND);
 
 	AkMemSettings memSettings;
 

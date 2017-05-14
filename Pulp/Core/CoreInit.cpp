@@ -96,6 +96,7 @@ namespace
 
 core::Module::Handle XCore::LoadDLL(const char* pDllName)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("LoadDll", core::profiler::SubSys::CORE);
 
 	core::Module::Handle handle = core::Module::Load(pDllName);
 	if (!handle)
@@ -118,6 +119,8 @@ core::Module::Handle XCore::LoadDLL(const char* pDllName)
 
 bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("EngModuleInit", core::profiler::SubSys::CORE);
+
 #if !defined(X_LIB)
 	core::Module::Handle handle = core::Module::Load(pDllName);
 
@@ -154,6 +157,8 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName, 
 	IConverterModule** pConvertModuleOut, IConverter** pConverterInstance)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("ConModuleInit", core::profiler::SubSys::CORE);
+
 	for (auto& c : converterInterfaces_)
 	{
 		if (c.dllName == pDllName && c.moduleClassName == pModuleClassName)
@@ -251,6 +256,8 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
 
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("ModuleInit", core::profiler::SubSys::CORE);
+
 	core::Path<char> path(dllName);
 	path.setExtension(".dll");
 
@@ -322,6 +329,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pProfiler = pProfiler_;
 	}
 
+
+	X_PROFILE_NO_HISTORY_BEGIN("CoreInit", core::profiler::SubSys::CORE);
 
 	if (startupParams.loadSymbols()) {
 		core::symbolResolution::Startup();
@@ -598,6 +607,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 bool XCore::InitAsyncWait(void)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("AsyncInitFin", core::profiler::SubSys::CORE);
+
 	// we should call all even if one fails.
 	// aka we must wait for all to finish even if some fail.
 	bool allOk = true;

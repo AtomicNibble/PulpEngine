@@ -131,6 +131,7 @@ XRender::~XRender()
 bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
 	X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
+	X_PROFILE_NO_HISTORY_BEGIN("RenderInit", core::profiler::SubSys::RENDER);
 
 	if (hWnd == static_cast<HWND>(0)) {
 		X_ERROR("Dx12", "target window is not valid");

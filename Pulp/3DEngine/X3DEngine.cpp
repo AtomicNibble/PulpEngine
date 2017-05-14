@@ -86,6 +86,8 @@ void X3DEngine::registerCmds(void)
 
 bool X3DEngine::init(void)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("3DEngineInit", core::profiler::SubSys::ENGINE3D);
+
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_ASSERT_NOT_NULL(gEnv->pTimer);

@@ -55,6 +55,8 @@ bool XNet::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_LOG0("Net", "Starting");
+	X_PROFILE_NO_HISTORY_BEGIN("NetInit", core::profiler::SubSys::NETWORK);
+
 
 	if (!gEnv->pJobSys) 
 	{

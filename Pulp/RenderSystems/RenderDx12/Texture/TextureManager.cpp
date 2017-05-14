@@ -49,6 +49,7 @@ X_NAMESPACE_BEGIN(texture)
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_LOG1("TextureManager", "Starting");
+		X_PROFILE_NO_HISTORY_BEGIN("TextureMan", core::profiler::SubSys::RENDER);
 
 		auto hotReload = gEnv->pHotReload;
 		hotReload->addfileType(this, "ci");

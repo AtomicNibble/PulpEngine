@@ -206,6 +206,7 @@ namespace V2
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
+		X_PROFILE_NO_HISTORY_BEGIN("JobSysInit", core::profiler::SubSys::CORE);
 
 		ICore* pCore = gEnv->pCore;
 		CpuInfo* pCpu = pCore->GetCPUInfo();

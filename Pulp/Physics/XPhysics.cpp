@@ -184,7 +184,7 @@ void XPhysics::registerCmds(void)
 bool XPhysics::init(const ToleranceScale& scale)
 {
 	X_LOG0("PhysicsSys", "Starting");
-
+	X_PROFILE_NO_HISTORY_BEGIN("PhysicsInit", core::profiler::SubSys::PHYSICS);
 
 #if X_DEBUG
 	gDelayLoadHook.forceConfig(DelayLoadHook::Config::Checked);
