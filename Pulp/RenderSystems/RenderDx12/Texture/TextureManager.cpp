@@ -110,7 +110,6 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 
-
 	void TextureManager::registerCmds(void)
 	{
 

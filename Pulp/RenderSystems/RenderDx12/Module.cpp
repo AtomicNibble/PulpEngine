@@ -79,7 +79,6 @@ class XEngineModule_Render : public IEngineModule
 
 		LinkModule(pCore, "Render");
 
-
 		g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
 		g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
 
