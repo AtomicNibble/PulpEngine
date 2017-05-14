@@ -44,11 +44,6 @@ public:
 	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, VarFlags Flags, const char* desc) X_FINAL;
 	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, VarFlags Flags, const char* desc) X_FINAL;
 
-	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, VarFlags Flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, VarFlags Flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, VarFlags Flags, const char* desc) X_FINAL;
-
-
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
 	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, VarFlags nFlags, const char* desc) X_FINAL;
 	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, VarFlags nFlags, const char* desc) X_FINAL;

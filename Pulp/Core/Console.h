@@ -206,11 +206,6 @@ public:
 	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
 	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
 
-	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
-
-
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
 	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
 	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
@@ -248,6 +243,10 @@ public:
 	X_INLINE void ToggleConsole(bool expand = false);
 
 private:
+	ICVar* ConfigRegisterString(const char* pName, const char* Value, VarFlags flags);
+	ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags);
+	ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags);
+
 	void AddCmd(const char* pCommand, ExecSource::Enum src, bool silent);
 	void AddCmd(const string& command, ExecSource::Enum src, bool silent);
 	void ExecuteStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands	

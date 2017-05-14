@@ -122,42 +122,6 @@ ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, flo
 }
 
 
-ICVar* XConsoleNULL::ConfigRegisterString(const char* Name, const char* Value, VarFlags flags,
-	const char* desc)
-{
-	X_UNUSED(Name);
-	X_UNUSED(Value);
-	X_UNUSED(flags);
-	X_UNUSED(desc);
-	return nullptr;
-}
-
-ICVar* XConsoleNULL::ConfigRegisterInt(const char* Name, int Value, int Min, int Max,
-	VarFlags flags, const char* desc)
-{
-	X_UNUSED(Name);
-	X_UNUSED(Value);
-	X_UNUSED(Min);
-	X_UNUSED(Max);
-	X_UNUSED(flags);
-	X_UNUSED(desc);
-	return nullptr;
-}
-
-ICVar* XConsoleNULL::ConfigRegisterFloat(const char* Name, float Value, float Min,
-	float Max, VarFlags flags, const char* desc)
-{
-	X_UNUSED(Name);
-	X_UNUSED(Value);
-	X_UNUSED(Min);
-	X_UNUSED(Max);
-	X_UNUSED(flags);
-	X_UNUSED(desc);
-	return nullptr;
-}
-
-
-
 // refrenced based, these are useful if we want to use the value alot so we just register it's address.
 ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
 	float Min, float Max, VarFlags flags, const char* desc)

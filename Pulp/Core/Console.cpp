@@ -1466,47 +1466,46 @@ ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
 	return pCVar;
 }
 
-ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarFlags flags,
-	const char* pDesc)
+ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarFlags flags)
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar* pCVar = GetCVarForRegistration(pName, pDesc);
+	ICVar* pCVar = GetCVarForRegistration(pName, "");
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, pName, Value, flags, pDesc);
+	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, pName, Value, flags, "");
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min, 
-	int Max, VarFlags flags, const char* pDesc)
+	int Max, VarFlags flags)
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar* pCVar = GetCVarForRegistration(pName, pDesc);
+	ICVar* pCVar = GetCVarForRegistration(pName, "");
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, pName, Value, Min, Max, flags, pDesc);
+	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, pName, Value, Min, Max, flags, "");
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min, 
-	float Max, VarFlags flags, const char* pDesc)
+	float Max, VarFlags flags)
 {
 	X_ASSERT_NOT_NULL(pName);
 
-	ICVar* pCVar = GetCVarForRegistration(pName, pDesc);
+	ICVar* pCVar = GetCVarForRegistration(pName, "");
 	if (pCVar) {
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, pName, Value, Min, Max, flags, pDesc);
+	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, pName, Value, Min, Max, flags, "");
 	RegisterVar(pCVar);
 	return pCVar;
 }
@@ -3206,16 +3205,16 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 			// using the End var is safe since we the condition above checks parsing was valid.
 			if (math<float>::fmod(valf, 1.f) == 0.f && !strUtil::Find(start, End, '.'))
 			{
-				ConfigRegisterInt(Cmd->GetArg(1), static_cast<int>(valf), 1, 0, VarFlags(), "");
+				ConfigRegisterInt(Cmd->GetArg(1), static_cast<int>(valf), 1, 0, VarFlags());
 			}
 			else
 			{
-				ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, VarFlags(), "");
+				ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, VarFlags());
 			}
 		}
 		else
 		{
-			ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), VarFlags(), "");
+			ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), VarFlags());
 		}
 
 	}
