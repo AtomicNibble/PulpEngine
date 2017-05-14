@@ -3,9 +3,9 @@
 X_NAMESPACE_BEGIN(core)
 
 
-CVarBaseConst::CVarBaseConst(XConsole* pConsole, const char* Name, VarFlags Flags, const char* desc) :
-	CVarBase(pConsole, Flags, desc), 
-	Name_(Name) 
+CVarBaseConst::CVarBaseConst(XConsole* pConsole, const char* pName, VarFlags Flags, const char* pDesc) :
+	CVarBase(pConsole, Flags, pDesc), 
+	pName_(pName) 
 {
 }
 
@@ -16,16 +16,16 @@ CVarBaseConst::~CVarBaseConst()
 
 const char* CVarBaseConst::GetName(void) const 
 {
-	return Name_;
+	return pName_;
 }
 
 
 // ------------------------------------------------------------
 
 
-CVarBaseHeap::CVarBaseHeap(XConsole* pConsole, const char* Name, VarFlags Flags, const char* desc) :
-	CVarBase(pConsole, Flags, desc),
-	Name_(Name)
+CVarBaseHeap::CVarBaseHeap(XConsole* pConsole, const char* pName, VarFlags Flags, const char* pDesc) :
+	CVarBase(pConsole, Flags, pDesc),
+	name_(pName)
 {
 
 }
@@ -37,15 +37,15 @@ CVarBaseHeap::~CVarBaseHeap()
 
 const char* CVarBaseHeap::GetName(void) const 
 {
-	return Name_.c_str();
+	return name_.c_str();
 }
 
 // ------------------------------------------------------------
 
 template<class T>
-CVarString<T>::CVarString(XConsole* pConsole, const char* Name, const char* Default,
-	VarFlags Flags, const char* desc)
-	: T(pConsole, Name, Flags | VarFlag::STRING, desc),
+CVarString<T>::CVarString(XConsole* pConsole, const char* pName, const char* Default,
+	VarFlags Flags, const char* pDesc)
+	: T(pConsole, pName, Flags | VarFlag::STRING, pDesc),
 	String_(Default)
 {
 }
@@ -155,9 +155,9 @@ int32_t CVarString<T>::GetMaxInt(void) const
 // ------------------------------------------------------------
 
 template<class T>
-CVarInt<T>::CVarInt(XConsole* pConsole, const char* Name, const int iDefault, 
-	int Min, int Max, VarFlags Flags, const char* desc)
-	: T(pConsole, Name, Flags | VarFlag::INT, desc),
+CVarInt<T>::CVarInt(XConsole* pConsole, const char* pName, const int iDefault, 
+	int Min, int Max, VarFlags Flags, const char* pDesc)
+	: T(pConsole, pName, Flags | VarFlag::INT, pDesc),
 	IntValue_(iDefault),
 	IntMin_(Min), 
 	IntMax_(Max), 
@@ -284,9 +284,9 @@ int32_t CVarInt<T>::GetMaxInt(void) const
 // ------------------------------------------------------------
 
 template<class T>
-CVarFloat<T>::CVarFloat(XConsole* pConsole, const char* Name, const float fDefault,
-	float Min, float Max, VarFlags nFlags, const char* desc)
-	: T(pConsole, Name, nFlags | VarFlag::FLOAT, desc),
+CVarFloat<T>::CVarFloat(XConsole* pConsole, const char* pName, const float fDefault,
+	float Min, float Max, VarFlags nFlags, const char* pDesc)
+	: T(pConsole, pName, nFlags | VarFlag::FLOAT, pDesc),
 	fValue_(fDefault), 
 	fMin_(Min),
 	fMax_(Max), 
@@ -426,9 +426,9 @@ int32_t CVarFloat<T>::GetMaxInt(void) const
 // ------------------------------------------------------------
 
 
-CVarIntRef::CVarIntRef(XConsole* pConsole, const char* Name, int* pVar, 
-	int Min, int Max, VarFlags nFlags, const char* desc)
-	: CVarBaseConst(pConsole, Name, nFlags | VarFlag::INT, desc),
+CVarIntRef::CVarIntRef(XConsole* pConsole, const char* pName, int* pVar, 
+	int Min, int Max, VarFlags nFlags, const char* pDesc)
+	: CVarBaseConst(pConsole, pName, nFlags | VarFlag::INT, pDesc),
 	IntValue_(*pVar),
 	IntMin_(Min), 
 	IntMax_(Max), 
@@ -552,9 +552,9 @@ int32_t CVarIntRef::GetMaxInt(void) const
 // ------------------------------------------------------------
 
 
-CVarFloatRef::CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal,
-	float Min, float Max, VarFlags nFlags, const char* desc)
-	: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT, desc), 
+CVarFloatRef::CVarFloatRef(XConsole* pConsole, const char* pName, float* pVal,
+	float Min, float Max, VarFlags nFlags, const char* pDesc)
+	: CVarBaseConst(pConsole, pName, nFlags | VarFlag::FLOAT, pDesc), 
 	fValue_(*pVal),
 	fMin_(Min), 
 	fMax_(Max),
@@ -685,9 +685,9 @@ int32_t CVarFloatRef::GetMaxInt(void) const
 // ------------------------------------------------------------
 
 
-CVarColRef::CVarColRef(XConsole* pConsole, const char* Name, Color* pVal,
-	VarFlags nFlags, const char* desc)
-	: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT | VarFlag::COLOR, desc),
+CVarColRef::CVarColRef(XConsole* pConsole, const char* pName, Color* pVal,
+	VarFlags nFlags, const char* pDesc)
+	: CVarBaseConst(pConsole, pName, nFlags | VarFlag::FLOAT | VarFlag::COLOR, pDesc),
 	ColValue_(*pVal), 
 	ColDefault_(*pVal)
 {
@@ -789,9 +789,9 @@ const Color& CVarColRef::GetDefaultColor(void) const
 // ------------------------------------------------------------
 
 // constructor
-CVarVec3Ref::CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal, 
-	VarFlags nFlags, const char* desc) :
-	CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT | VarFlag::VECTOR, desc),
+CVarVec3Ref::CVarVec3Ref(XConsole* pConsole, const char* pName, Vec3f* pVal, 
+	VarFlags nFlags, const char* pDesc) :
+	CVarBaseConst(pConsole, pName, nFlags | VarFlag::FLOAT | VarFlag::VECTOR, pDesc),
 	Value_(*pVal), 
 	Default_(*pVal)
 {

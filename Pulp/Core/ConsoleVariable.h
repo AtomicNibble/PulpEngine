@@ -16,7 +16,7 @@ class XConsole;
 class CVarBase : public ICVar
 {
 public:
-	CVarBase(XConsole* pConsole, VarFlags flags, const char* desc);
+	CVarBase(XConsole* pConsole, VarFlags flags, const char* pDesc);
 
 	virtual ~CVarBase();
 
@@ -42,7 +42,7 @@ public:
 
 
 protected:
-	const char*				Desc_;
+	const char*				pDesc_;
 
 	FlagType				Flags_;
 
@@ -54,28 +54,28 @@ protected:
 class CVarBaseConst : public CVarBase
 {
 public:
-	X_INLINE CVarBaseConst(XConsole* pConsole, const char* Name, VarFlags flags, const char* desc);
+	X_INLINE CVarBaseConst(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
 
 	X_INLINE ~CVarBaseConst() X_OVERRIDE;
 
 	X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
 
 protected:
-	const char*	Name_;
+	const char*	pName_;
 };
 
 
 class CVarBaseHeap : public CVarBase
 {
 public:
-	X_INLINE CVarBaseHeap(XConsole* pConsole, const char* Name, VarFlags flags, const char* desc);
+	X_INLINE CVarBaseHeap(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
 
 	X_INLINE ~CVarBaseHeap() X_OVERRIDE;
 
 	X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
 
 protected:
-	string Name_;
+	string name_;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -84,8 +84,8 @@ template<class T>
 class CVarString : public T
 {
 public:
-	X_INLINE CVarString(XConsole* pConsole, const char* Name, const char* Default,
-		VarFlags flags, const char* desc);
+	X_INLINE CVarString(XConsole* pConsole, const char* pName, const char* Default,
+		VarFlags flags, const char* pDesc);
 
 	X_INLINE ~CVarString() X_OVERRIDE;
 
@@ -116,8 +116,8 @@ class CVarInt : public T
 {
 public:
 	// constructor
-	X_INLINE CVarInt(XConsole* pConsole, const char* Name, const int iDefault,
-		int Min, int Max, VarFlags Flags, const char* desc);
+	X_INLINE CVarInt(XConsole* pConsole, const char* pName, const int iDefault,
+		int Min, int Max, VarFlags Flags, const char* pDesc);
 
 	X_INLINE ~CVarInt() X_OVERRIDE;
 
@@ -151,8 +151,8 @@ class CVarFloat : public T
 {
 public:
 	// constructor
-	CVarFloat(XConsole* pConsole, const char* Name, const float fDefault,
-		float Min, float Max, VarFlags nFlags, const char* desc);
+	CVarFloat(XConsole* pConsole, const char* pName, const float fDefault,
+		float Min, float Max, VarFlags nFlags, const char* pDesc);
 
 	X_INLINE ~CVarFloat() X_OVERRIDE;
 
@@ -185,8 +185,8 @@ class CVarIntRef : public CVarBaseConst
 {
 public:
 	// constructor
-	X_INLINE CVarIntRef(XConsole* pConsole, const char* Name, int* pVar,
-		int Min, int Max, VarFlags nFlags, const char* desc);
+	X_INLINE CVarIntRef(XConsole* pConsole, const char* pName, int* pVar,
+		int Min, int Max, VarFlags nFlags, const char* pDesc);
 
 	X_INLINE ~CVarIntRef() X_OVERRIDE;
 
@@ -220,8 +220,8 @@ class CVarFloatRef : public CVarBaseConst
 {
 public:
 	// constructor
-	X_INLINE CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal,
-		float Min, float Max, VarFlags nFlags, const char* desc);
+	X_INLINE CVarFloatRef(XConsole* pConsole, const char* pName, float* pVal,
+		float Min, float Max, VarFlags nFlags, const char* pDesc);
 
 	X_INLINE ~CVarFloatRef() X_OVERRIDE;
 
@@ -257,7 +257,7 @@ class CVarColRef : public CVarBaseConst
 public:
 	// constructor
 	X_INLINE CVarColRef(XConsole* pConsole, 
-		const char* Name, Color* pVal, VarFlags nFlags, const char* desc);
+		const char* pName, Color* pVal, VarFlags nFlags, const char* pDesc);
 
 	X_INLINE ~CVarColRef() X_OVERRIDE;
 
@@ -295,8 +295,8 @@ class CVarVec3Ref : public CVarBaseConst
 {
 public:
 	// constructor
-	X_INLINE CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal,
-		VarFlags nFlags, const char* desc);
+	X_INLINE CVarVec3Ref(XConsole* pConsole, const char* pName, Vec3f* pVal,
+		VarFlags nFlags, const char* pDesc);
 
 	X_INLINE ~CVarVec3Ref() X_OVERRIDE;
 

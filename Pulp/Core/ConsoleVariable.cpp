@@ -84,7 +84,7 @@ namespace
 } // namespace 
 
 CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, const char* desc) :
-	Desc_(desc),
+	pDesc_(desc),
 	Flags_(nFlags),
 	pConsole_(pConsole)
 {
@@ -128,7 +128,7 @@ void CVarBase::SetModified(void)
 
 const char* CVarBase::GetDesc(void) const
 {
-	return Desc_;
+	return pDesc_;
 }
 
 
