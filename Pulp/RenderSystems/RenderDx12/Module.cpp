@@ -82,25 +82,25 @@ class XEngineModule_Render : public IEngineModule
 
 		g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
 		g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
-		pRender = X_NEW(XRender, g_rendererArena, "XRender")(g_rendererArena);
 
-		if (!pRender) {
-			return false;
-		}
-
+		// call these before render construction.
 		if (!pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
 			X_ERROR("Render", "Failed to init imgLib");
-
 			X_DELETE(pRender, g_rendererArena);
 			return false;
 		}
 
 		if (!pCore->IntializeLoadedConverterModule("Engine_ShaderLib", "Engine_ShaderLib")) {
 			X_ERROR("Render", "Failed to init shaderLib");
-
 			X_DELETE(pRender, g_rendererArena);
 			return false;
 		}
+	
+		pRender = X_NEW(XRender, g_rendererArena, "XRender")(g_rendererArena);
+		if (!pRender) {
+			return false;
+		}
+
 
 		env.pRender = pRender;
 		return true;
