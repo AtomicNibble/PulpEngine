@@ -76,10 +76,7 @@ namespace shader
 		cache_(arena, 32),
 		compLvl_(core::Compression::CompressLevel::NORMAL)
 	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-		pFileSys_ = gEnv->pFileSys;
 	}
 
 	ShaderBin::~ShaderBin()
@@ -208,7 +205,7 @@ namespace shader
 			return false;
 		}
 
-		if (!pFileSys_->fileExists(path.c_str())) {
+		if (!gEnv->pFileSys->fileExists(path.c_str())) {
 			X_LOG1("Shader", "no cache exsits for: \"%s\"", path.c_str());
 			return false;
 		}
@@ -338,7 +335,7 @@ namespace shader
 		core::Path<char> binFolder;
 		binFolder.appendFmt("shaders/compiled");
 
-		return pFileSys_->deleteDirectoryContents(binFolder.c_str());
+		return gEnv->pFileSys->deleteDirectoryContents(binFolder.c_str());
 	}
 
 
@@ -369,7 +366,7 @@ namespace shader
 		destOut.appendFmt("shaders/compiled/%s.fxcb", pShader->getName().c_str());
 
 		// make sure the directory is created.
-		pFileSys_->createDirectoryTree(destOut.c_str());
+		gEnv->pFileSys->createDirectoryTree(destOut.c_str());
 	}
 
 

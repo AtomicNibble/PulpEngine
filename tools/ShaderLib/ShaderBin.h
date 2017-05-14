@@ -43,7 +43,6 @@ namespace shader
 
 	private:
 		core::MemoryArenaBase* scratchArena_;
-		core::IFileSys* pFileSys_;
 
 		// any point caching these?
 		// maybe caching the hashes might be worth it.
