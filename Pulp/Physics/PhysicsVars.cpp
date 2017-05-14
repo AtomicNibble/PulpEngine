@@ -57,7 +57,7 @@ void PhysXVars::RegisterVars(void)
 
 	ADD_CVAR_REF("phys_pvd_flags", pvdFlags_, core::bitUtil::AlphaBits("dpm"), 0, core::bitUtil::AlphaBits("dpm"),
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::BITFIELD,
-		"PVD connection Falgs. "
+		"PVD connection Flags. "
 		"d: Debug, "
 		"p: Profile, "
 		"m: Memory"
