@@ -1412,7 +1412,7 @@ void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
 }
 
 ICVar* XConsole::RegisterString(const char* pName, const char* Value, 
-	VarFlags Flags, const char* desc)
+	VarFlags Flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1425,19 +1425,19 @@ ICVar* XConsole::RegisterString(const char* pName, const char* Value,
 	{
 		Flags.Remove(VarFlag::CPY_NAME);
 		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
-			"CVarString<H>")(this, pName, Value, Flags, desc);
+			"CVarString<H>")(this, pName, Value, Flags, pDesc);
 	}
 	else
 	{
 		pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, 
-			"CVarString")(this, pName, Value, Flags, desc);
+			"CVarString")(this, pName, Value, Flags, pDesc);
 	}
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min, 
-	int Max, VarFlags Flags, const char* desc)
+	int Max, VarFlags Flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1446,13 +1446,13 @@ ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min,
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, pName, Value, Min, Max, Flags, desc);
+	pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, pName, Value, Min, Max, Flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
-	float Max, VarFlags Flags, const char* desc)
+	float Max, VarFlags Flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1461,13 +1461,13 @@ ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, pName, Value, Min, Max, Flags, desc);
+	pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, pName, Value, Min, Max, Flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarFlags flags,
-	const char* desc)
+	const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1476,13 +1476,13 @@ ICVar* XConsole::ConfigRegisterString(const char* pName, const char* Value, VarF
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, pName, Value, flags, desc);
+	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, pName, Value, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min, 
-	int Max, VarFlags flags, const char* desc)
+	int Max, VarFlags flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1491,13 +1491,13 @@ ICVar* XConsole::ConfigRegisterInt(const char* pName, int Value, int Min,
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, pName, Value, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, pName, Value, Min, Max, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min, 
-	float Max, VarFlags flags, const char* desc)
+	float Max, VarFlags flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1506,14 +1506,14 @@ ICVar* XConsole::ConfigRegisterFloat(const char* pName, float Value, float Min,
 		return pCVar;
 	}
 
-	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, pName, Value, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, pName, Value, Min, Max, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 
 ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue, 
-	float Min, float Max, VarFlags flags, const char* desc)
+	float Min, float Max, VarFlags flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1525,13 +1525,13 @@ ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue,
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, pName, src, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, pName, src, Min, Max, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue, 
-	int Min, int Max, VarFlags flags, const char* desc)
+	int Min, int Max, VarFlags flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1543,13 +1543,13 @@ ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue,
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, pName, src, Min, Max, flags, desc);
+	pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, pName, src, Min, Max, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue, 
-	VarFlags flags, const char* desc)
+	VarFlags flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1561,14 +1561,14 @@ ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue,
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, pName, src, flags, desc);
+	pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, pName, src, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 	
 }
 
 ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue, 
-	VarFlags flags, const char* desc)
+	VarFlags flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 	X_ASSERT_NOT_NULL(src);
@@ -1580,7 +1580,7 @@ ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue,
 
 	*src = defaultvalue;
 
-	pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, pName, src, flags, desc);
+	pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, pName, src, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
 
@@ -1616,7 +1616,7 @@ void XConsole::UnregisterVariable(const char* pVarName)
 
 // Commands :)
 
-void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* desc)
+void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc)
 {
 	X_ASSERT_NOT_NULL(pName);
 
@@ -1625,8 +1625,8 @@ void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
 	cmd.Name = pName;
 	cmd.Flags = Flags;
 	cmd.func = func;
-	if (desc) {
-		cmd.Desc = desc;
+	if (pDesc) {
+		cmd.Desc = pDesc;
 	}
 
 	// pass cmd.Name instead of Name, saves creating a second core::string
