@@ -338,7 +338,8 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const bool drawFrame = ctx.flags.IsSet(DrawTextFlag::FRAMED);
 	const bool clipped = ctx.flags.IsSet(DrawTextFlag::CLIP);
 	const bool shiftedPosition = (ctx.flags & (DrawTextFlag::CENTER | DrawTextFlag::CENTER_VER | DrawTextFlag::RIGHT)).IsAnySet();
-	const bool debugRect = fontSys_.getVars().glyphDebugRect();
+	const bool debugGlyphRect = fontSys_.getVars().glyphDebugRect();
+	const bool debugRect = fontSys_.getVars().debugRect();
 	const bool debugPos = fontSys_.getVars().debugShowDrawPosition();
 	const auto effecIdx = ctx.GetEffectId();
 
@@ -676,6 +677,15 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	// we draw the rects after all chars are drawn, otherwise performance will tank.
 	// as all the batching goes to shit.
 	if (debugRect)
+	{
+		if (!shiftedPosition) {
+			textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
+		}
+
+		pPrimCon->drawRect(baseXY.x, baseXY.y, textSize.x, textSize.y, Col_Red);
+	}
+
+	if (debugGlyphRect)
 	{
 		const FontPass& pass = effect.passes[0];
 

@@ -21,6 +21,7 @@ public:
 	X_INLINE bool glyphCachePreWarm(void) const;
 	X_INLINE bool glyphCacheDebugRender(void) const;
 	X_INLINE bool glyphDebugRect(void) const;
+	X_INLINE bool debugRect(void) const;
 	X_INLINE bool debugShowDrawPosition(void) const;
 
 
@@ -33,6 +34,7 @@ private:
 	int32_t glyphCachePreWarm_;
 	int32_t glyphDebugRender_;
 	int32_t glyphDebugRect_;
+	int32_t debugRect_;
 	int32_t debugShowDrawPosition_;
 
 	int32_t fontSmoothingMethod_;

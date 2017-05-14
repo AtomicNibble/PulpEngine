@@ -22,6 +22,11 @@ X_INLINE bool FontVars::glyphDebugRect(void) const
 	return glyphDebugRect_ != 0;
 }
 
+X_INLINE bool FontVars::debugRect(void) const
+{
+	return debugRect_ != 0;
+}
+
 X_INLINE bool FontVars::debugShowDrawPosition(void) const
 {
 	return debugShowDrawPosition_ != 0;
