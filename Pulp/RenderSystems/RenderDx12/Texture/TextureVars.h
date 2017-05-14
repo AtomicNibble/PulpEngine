@@ -14,7 +14,7 @@ X_NAMESPACE_BEGIN(texture)
 		TextureVars();
 		~TextureVars() = default;
 
-		void RegisterVars(void);
+		void registerVars(void);
 
 		X_INLINE bool allowRawImgLoading(void) const;
 		X_INLINE bool allowFmtDDS(void) const;

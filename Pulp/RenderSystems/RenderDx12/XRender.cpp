@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XRender.h"
 
+#include "Texture\TextureVars.h"
 #include "Texture\TextureManager.h"
 #include "Texture\Texture.h"
 #include "Texture\TextureUtil.h"
@@ -109,12 +110,21 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	core::zero_object(pDisplayPlanes_);
 
 	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
+
+	pTexVars_ = X_NEW(texture::TextureVars, arena_, "TextVars");
+	pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
 }
 
 XRender::~XRender()
 {
+	if (pTexVars_) {
+		X_DELETE(pTexVars_, arena_);
+	}
 	if (pTextureMan_) {
 		X_DELETE(pTextureMan_, arena_);
+	}
+	if (pShaderMan_) {
+		X_DELETE(pShaderMan_, arena_);
 	}
 }
 
@@ -297,7 +307,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 	}
 
 	// must be after cmdListMan
-	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_, pDevice_, *pContextMan_,
+	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_, pDevice_, *pTexVars_, *pContextMan_,
 		descriptorAllocator, texture::Util::DXGIFormatFromTexFmt(depthFmt), reverseZ);
 	if (!pTextureMan_->init()) {
 		X_ERROR("Render", "failed to init texture system");
@@ -338,8 +348,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		colBuf.setClearColor(vars_.getClearCol());
 	}
 
-
-	pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
+	X_ASSERT_NOT_NULL(pShaderMan_);
 	if (!pShaderMan_->init()) {
 		X_ERROR("Render", "failed to init shader system");
 		return false;
@@ -362,7 +371,6 @@ void XRender::shutDown(void)
 		pBuffMan_->shutDown();
 		X_DELETE_AND_NULL(pBuffMan_, arena_);
 	}
-
 
 	if (pContextMan_) {
 		pContextMan_->destroyAllContexts();
@@ -449,25 +457,28 @@ void XRender::release(void)
 
 void XRender::registerVars(void)
 {
+	X_ASSERT_NOT_NULL(pTexVars_);
+	X_ASSERT_NOT_NULL(pShaderMan_);
+
 	vars_.registerVars();
-
-
 	vars_.setNativeRes(currentNativeRes_);
 	vars_.setRes(displayRes_);
 
-	if (pTextureMan_) {
-		pTextureMan_->registerVars();
-	}
+	pTexVars_->registerVars();
+	pShaderMan_->registerVars();
 }
 
 void XRender::registerCmds(void)
 {
-
 	ADD_COMMAND_MEMBER("r_list_device_features", this, XRender, &XRender::Cmd_ListDeviceFeatures,
 		core::VarFlag::SYSTEM, "List the gpu devices features");
 
 	if (pTextureMan_) {
 		pTextureMan_->registerCmds();
+	}
+
+	if (pShaderMan_) {
+		pShaderMan_->registerCmds();
 	}
 }
 

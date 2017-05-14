@@ -19,9 +19,11 @@ X_NAMESPACE_BEGIN(texture)
 
 
 
-	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan,
-		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt, bool reverseZ) :
+	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+			texture::TextureVars texVars, render::ContextManager& contextMan,
+			render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt, bool reverseZ) :
 		contextMan_(contextMan),
+		vars_(texVars),
 		pDevice_(pDevice),
 		descriptorAlloc_(descriptorAlloc),
 		depthFmt_(depthFmt),
@@ -108,10 +110,6 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 
-	void TextureManager::registerVars(void)
-	{
-		vars_.RegisterVars();
-	}
 
 	void TextureManager::registerCmds(void)
 	{

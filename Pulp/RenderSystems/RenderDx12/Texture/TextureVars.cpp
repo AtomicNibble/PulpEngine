@@ -18,7 +18,7 @@ X_NAMESPACE_BEGIN(texture)
 		allowFmtTGA_ = 1;
 	}
 
-	void TextureVars::RegisterVars(void)
+	void TextureVars::registerVars(void)
 	{
 		ADD_CVAR_REF("img_allowRawLoading", allowRawImgLoading_, allowRawImgLoading_, 0, 1,
 			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,

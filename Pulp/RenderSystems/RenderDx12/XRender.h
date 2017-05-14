@@ -19,6 +19,7 @@
 
 X_NAMESPACE_DECLARE(texture,
 	class TextureManager;
+	class TextureVars;
 )
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
@@ -256,6 +257,7 @@ private:
 	IDXGISwapChain3* pSwapChain_;
 
 	RenderVars vars_;
+	texture::TextureVars* pTexVars_;
 
 	shader::XShaderManager* pShaderMan_; // might make this allocoated, just so can forward declare like tex man.
 	texture::TextureManager* pTextureMan_;
