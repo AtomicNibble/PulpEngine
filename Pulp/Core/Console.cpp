@@ -2465,9 +2465,28 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 				if (pCvar->GetType() == VarFlag::INT)
 				{
-					domain.appendFmt("Domain is any interger between: %d and %d",
-						pCvar->GetMinInt(),
-						pCvar->GetMaxInt());
+					if (flags.IsSet(VarFlag::BITFIELD))
+					{
+						// need to work out all bits that are set in max.
+						int32_t max = pCvar->GetMaxInt();
+
+						core::StackString<48> alphaBits;
+						for (uint32_t b = 1; b < sizeof(max) * 8; b++)
+						{
+							if (core::bitUtil::IsBitSet(max, b))
+							{
+								alphaBits.append(core::bitUtil::BitToAlphaChar(b), 1);
+							}
+						}
+
+						domain.appendFmt("Domain is bitfield of the following: '%s' commands: b, b+, b-, b^", alphaBits.c_str());
+					}
+					else
+					{
+						domain.appendFmt("Domain is any interger between: %d and %d",
+							pCvar->GetMinInt(),
+							pCvar->GetMaxInt());
+					}
 				}
 				else if (pCvar->GetType() == VarFlag::FLOAT)
 				{
