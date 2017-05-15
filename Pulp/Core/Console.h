@@ -137,15 +137,9 @@ class XConsole :
 
 	// members.
 	typedef core::HashMap<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap;		// key points into string stored in ICVar or in .exe/.dll
-	typedef ConsoleVarMap::iterator ConsoleVarMapItor;
-
 	typedef core::HashMap<string, ConsoleCommand, core::hash<const char*>, equal_to_case_insen> ConsoleCmdMap;
-	typedef ConsoleCmdMap::iterator ConsoleCmdMapItor;
-
 	typedef core::HashMap<string, string, core::hash<const char*>, equal_to_case_insen> ConfigCmdsMap;
-
 	typedef core::HashMap<string, string> ConsoleBindMap;
-	typedef ConsoleBindMap::iterator ConsoleBindMapItor;
 
 	typedef core::Fifo<ExecCommand> ExecCmdList;
 

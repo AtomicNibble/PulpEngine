@@ -622,7 +622,7 @@ void XConsole::shutDown(void)
 
 void XConsole::saveChangedVars(void)
 {
-	ConsoleVarMapItor itrVar, itrVarEnd = VarMap_.end();
+	auto itrVarEnd = VarMap_.end();
 
 	if (VarMap_.empty()) {
 		X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
@@ -703,7 +703,7 @@ void XConsole::saveChangedVars(void)
 			file.writeString(k.GetStart(), k.GetLength());
 		}
 
-		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
+		for (auto itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
 		{
 			ICVar* pVar = itrVar->second;
 			ICVar::FlagType flags = pVar->GetFlags();
@@ -1379,18 +1379,18 @@ void XConsole::AddBind(const char* key, const char* cmd)
 			X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", key, Old, cmd);
 		}
 
-		ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
+		auto it = Binds_.find(X_CONST_STRING(key));
 		it->second = cmd;
 	}
 
-	Binds_.insert(ConsoleBindMapItor::value_type(core::string(key), core::string(cmd)));
+	Binds_.insert(ConsoleBindMap::value_type(core::string(key), core::string(cmd)));
 }
 
 // returns the command for a given key
 // returns null if no bind found
 const char* XConsole::FindBind(const char* key)
 {
-	ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
+	auto it = Binds_.find(X_CONST_STRING(key));
 	if (it != Binds_.end()) {
 		return it->second.c_str();
 	}
@@ -1536,15 +1536,12 @@ ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue,
 	pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, pName, src, flags, pDesc);
 	RegisterVar(pCVar);
 	return pCVar;
-
 }
 
 
 ICVar* XConsole::GetCVar(const char* pName)
 {
-	ConsoleVarMapItor it;
-
-	it = VarMap_.find(pName);
+	auto it = VarMap_.find(pName);
 	if (it != VarMap_.end()) {
 		return it->second;
 	}
@@ -1553,8 +1550,7 @@ ICVar* XConsole::GetCVar(const char* pName)
 
 void XConsole::UnregisterVariable(const char* pVarName)
 {
-	ConsoleVarMapItor itor;
-	itor = VarMap_.find(pVarName);
+	auto itor = VarMap_.find(pVarName);
 
 	if (itor == VarMap_.end()) {
 		X_WARNING("Console", "Failed to find var \"%s\" for removal", pVarName);
@@ -1594,7 +1590,7 @@ void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
 
 void XConsole::UnRegisterCommand(const char* pName)
 {
-	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(pName));
+	auto it = CmdMap_.find(X_CONST_STRING(pName));
 	if (it != CmdMap_.end()) {
 		CmdMap_.erase(it);
 	}
@@ -2006,7 +2002,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
 		X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
 	}
 
-	VarMap_.insert(ConsoleVarMapItor::value_type(pCVar->GetName(), pCVar));
+	VarMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
 }
 
 
@@ -2284,7 +2280,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		}
 
 		// try find and cmd's / dvars that match the current input.
-		ConsoleVarMapItor it = VarMap_.begin();
+		auto it = VarMap_.begin();
 
 		for (; it != VarMap_.end(); ++it)
 		{
@@ -2310,7 +2306,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		if (results.size() < results.capacity())
 		{
 			// do the commands baby!
-			ConsoleCmdMapItor cmdIt = CmdMap_.begin();
+			auto cmdIt = CmdMap_.begin();
 			for (; cmdIt != CmdMap_.end(); ++cmdIt)
 			{
 				pName = cmdIt->second.Name.c_str();
@@ -2778,19 +2774,16 @@ int32_t XConsole::getLineCount(void) const
 
 ///////////////////////////////////////////////////////////
 
-void XConsole::ListCommands(const char* searchPatten)
+void XConsole::ListCommands(const char* pSearchPatten)
 {
-	ConsoleCmdMapItor itrCmd, itrCmdEnd = CmdMap_.end();
-	ConsoleCommand::FlagType::Description dsc;
-
 	core::Array<ConsoleCommand*> sorted_cmds(g_coreArena);
 	sorted_cmds.setGranularity(CmdMap_.size());
 
-	for (itrCmd = CmdMap_.begin(); itrCmd != itrCmdEnd; ++itrCmd)
+	for (auto itrCmd = CmdMap_.begin(); itrCmd != CmdMap_.end(); ++itrCmd)
 	{
 		ConsoleCommand &cmd = itrCmd->second;
 
-		if (!searchPatten || strUtil::WildCompare(searchPatten, cmd.Name))
+		if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.Name))
 		{
 			sorted_cmds.append(&cmd);
 		}
@@ -2800,12 +2793,11 @@ void XConsole::ListCommands(const char* searchPatten)
 
 	X_LOG0("Console", "------------ ^8Commands(%" PRIuS ")^7 ------------", sorted_cmds.size());
 
-	core::Array<ConsoleCommand*>::ConstIterator it = sorted_cmds.begin();
-	for (; it != sorted_cmds.end(); ++it)
+	ConsoleCommand::FlagType::Description dsc;
+	for (const auto* pCmd : sorted_cmds)
 	{
-		const ConsoleCommand* cmd = *it;
-		X_LOG0("Command", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", cmd->Name.c_str(), 
-			cmd->Flags.ToString(dsc), cmd->Desc.c_str());
+		X_LOG0("Command", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", pCmd->Name.c_str(),
+			pCmd->Flags.ToString(dsc), pCmd->Desc.c_str());
 	}
 
 	X_LOG0("Console", "------------ ^8Commands End^7 ------------");
@@ -2813,7 +2805,7 @@ void XConsole::ListCommands(const char* searchPatten)
 
 
 
-void XConsole::ListVariables(const char* searchPatten)
+void XConsole::ListVariables(const char* pSearchPatten)
 {
 	// i'm not storing the vars in a ordered map since it's slow to get them.
 	// and i only need order when priting them.
@@ -2825,7 +2817,7 @@ void XConsole::ListVariables(const char* searchPatten)
 	{
 		ICVar* var = it.second;
 
-		if (!searchPatten || strUtil::WildCompare(searchPatten, var->GetName()))
+		if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, var->GetName()))
 		{
 			sorted_vars.emplace_back(var);
 		}
@@ -2844,7 +2836,7 @@ void XConsole::ListVariables(const char* searchPatten)
 	X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
 
-void XConsole::ListVariablesValues(const char* searchPatten)
+void XConsole::ListVariablesValues(const char* pSearchPatten)
 {
 	// i'm not storing the vars in a ordered map since it's slow to get them.
 	// and i only need order when priting them.
@@ -2856,7 +2848,7 @@ void XConsole::ListVariablesValues(const char* searchPatten)
 	{
 		ICVar* var = it.second;
 
-		if (!searchPatten || strUtil::WildCompare(searchPatten, var->GetName()))
+		if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, var->GetName()))
 		{
 			sorted_vars.emplace_back(var);
 		}
@@ -2951,37 +2943,37 @@ void XConsole::Command_Help(IConsoleCmdArgs* pCmd)
 void XConsole::Command_ListCmd(IConsoleCmdArgs* pCmd)
 {
 	// optional search criteria
-	const char* searchPatten = nullptr;
+	const char* pSearchPatten = nullptr;
 
 	if (pCmd->GetArgCount() >= 2) {
-		searchPatten = pCmd->GetArg(1);
+		pSearchPatten = pCmd->GetArg(1);
 	}
 
-	ListCommands(searchPatten);
+	ListCommands(pSearchPatten);
 }
 
 void XConsole::Command_ListDvars(IConsoleCmdArgs* pCmd)
 {
 	// optional search criteria
-	const char* searchPatten = nullptr;
+	const char* pSearchPatten = nullptr;
 
 	if (pCmd->GetArgCount() >= 2) {
-		searchPatten = pCmd->GetArg(1);
+		pSearchPatten = pCmd->GetArg(1);
 	}
 
-	ListVariables(searchPatten);
+	ListVariables(pSearchPatten);
 }
 
 void XConsole::Command_ListDvarsValues(IConsoleCmdArgs* pCmd)
 {
 	// optional search criteria
-	const char* searchPatten = nullptr;
+	const char* pSearchPatten = nullptr;
 
 	if (pCmd->GetArgCount() >= 2) {
-		searchPatten = pCmd->GetArg(1);
+		pSearchPatten = pCmd->GetArg(1);
 	}
 
-	ListVariablesValues(searchPatten);
+	ListVariablesValues(pSearchPatten);
 }
 
 void XConsole::Command_Exit(IConsoleCmdArgs* pCmd)
