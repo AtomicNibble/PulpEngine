@@ -2468,18 +2468,31 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					if (flags.IsSet(VarFlag::BITFIELD))
 					{
 						// need to work out all bits that are set in max.
-						int32_t max = pCvar->GetMaxInt();
 
-						core::StackString<48> alphaBits;
-						for (uint32_t b = 1; b < sizeof(max) * 8; b++)
+						auto intToalphaBits = [](int32_t val, core::StackString<48>& strOut)
 						{
-							if (core::bitUtil::IsBitSet(max, b))
+							strOut.clear();
+							for (uint32_t b = 1; b < sizeof(val) * 8; b++)
 							{
-								alphaBits.append(core::bitUtil::BitToAlphaChar(b), 1);
+								if (core::bitUtil::IsBitSet(val, b))
+								{
+									strOut.append(core::bitUtil::BitToAlphaChar(b), 1);
+								}
 							}
-						}
+						};
 
-						domain.appendFmt("Domain is bitfield of the following: '%s' commands: b, b+, b-, b^", alphaBits.c_str());
+
+						core::StackString<48> allBitsStr;
+						core::StackString<48> valueBitsStr;
+						core::StackString<48> defaultBitsStr;
+
+						intToalphaBits(pCvar->GetMaxInt(), allBitsStr);
+						intToalphaBits(pCvar->GetInteger(), valueBitsStr);
+						intToalphaBits(pCvar->GetDefaultInt(), defaultBitsStr);
+
+						value.appendFmt(" (%s)", valueBitsStr.c_str());
+						defaultValue.appendFmt(" (%s)", defaultBitsStr.c_str());
+						domain.appendFmt("Domain is bitfield of the following: '%s' commands: b, b+, b-, b^", allBitsStr.c_str());
 					}
 					else
 					{
