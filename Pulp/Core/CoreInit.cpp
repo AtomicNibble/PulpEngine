@@ -424,7 +424,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::xWindow::RegisterVars();
 
 	// Load the default config.
-	if (!startupParams.isCoreOnly()) {
+	if (!startupParams.isCoreOnly()) 
+	{
+		X_PROFILE_NO_HISTORY_BEGIN("ConfigLoad", core::profiler::SubSys::CORE);
+
 		if (!env_.pConsole->LoadAndExecConfigFile("default.cfg")) {
 			return false;
 		}
