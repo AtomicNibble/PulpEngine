@@ -152,6 +152,12 @@ int32_t CVarString<T>::GetMaxInt(void) const
 	return 0;
 }
 
+template<class T>
+int32_t CVarString<T>::GetDefaultInt(void) const
+{
+	return 0;
+}
+
 // ------------------------------------------------------------
 
 template<class T>
@@ -280,6 +286,13 @@ int32_t CVarInt<T>::GetMaxInt(void) const
 {
 	return IntMax_;
 }
+
+template<class T>
+int32_t CVarInt<T>::GetDefaultInt(void) const
+{
+	return IntDefault_;
+}
+
 
 // ------------------------------------------------------------
 
@@ -423,6 +436,12 @@ int32_t CVarFloat<T>::GetMaxInt(void) const
 	return static_cast<int32_t>(fMax_);
 }
 
+template<class T>
+int32_t CVarFloat<T>::GetDefaultInt(void) const
+{
+	return static_cast<int32_t>(fDefault_);
+}
+
 // ------------------------------------------------------------
 
 
@@ -548,6 +567,11 @@ int32_t CVarIntRef::GetMaxInt(void) const
 	return IntMax_;
 }
 
+
+int32_t CVarIntRef::GetDefaultInt(void) const
+{
+	return DefaultVal_;
+}
 
 // ------------------------------------------------------------
 
@@ -680,6 +704,10 @@ int32_t CVarFloatRef::GetMaxInt(void) const
 	return static_cast<int32_t>(fMax_);
 }
 
+int32_t CVarFloatRef::GetDefaultInt(void) const
+{
+	return static_cast<int32_t>(fDefault_);
+}
 
 
 // ------------------------------------------------------------
@@ -771,6 +799,12 @@ int32_t CVarColRef::GetMinInt(void) const
 
 
 int32_t CVarColRef::GetMaxInt(void) const
+{
+	return 1;
+}
+
+
+int32_t CVarColRef::GetDefaultInt(void) const
 {
 	return 1;
 }
@@ -871,6 +905,11 @@ int32_t CVarVec3Ref::GetMinInt(void) const
 }
 
 int32_t CVarVec3Ref::GetMaxInt(void) const
+{
+	return 1;
+}
+
+int32_t CVarVec3Ref::GetDefaultInt(void) const
 {
 	return 1;
 }

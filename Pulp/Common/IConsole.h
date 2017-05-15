@@ -171,6 +171,7 @@ struct ICVar
 	virtual float GetMax(void) const X_ABSTRACT;
 	virtual int32_t GetMinInt(void) const X_ABSTRACT;
 	virtual int32_t GetMaxInt(void) const X_ABSTRACT;
+	virtual int32_t GetDefaultInt(void) const X_ABSTRACT;
 
 	virtual VarFlag::Enum GetType(void) const X_ABSTRACT;
 
