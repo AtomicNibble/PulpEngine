@@ -36,16 +36,16 @@ namespace SysTimer
 
 	namespace
 	{
-		static int64_t PerformanceCounterTime(void)
+		int64_t PerformanceCounterTime(void)
 		{
 			LARGE_INTEGER now = {};
 			QueryPerformanceCounter(&now);
 			return static_cast<int64_t>(now.QuadPart);
 		}
 
-		static int64_t MMTimeGet(void)
+		int64_t MMTimeGet(void)
 		{
-			return  static_cast<int64_t>(timeGetTime());
+			return static_cast<int64_t>(timeGetTime());
 		}
 	}
 
