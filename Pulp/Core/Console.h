@@ -332,6 +332,7 @@ private:
 	ConsoleCmdMap			CmdMap_;
 	ConsoleBindMap			Binds_; // support sexy bind.
 	ConfigCmdsMap			configCmds_;
+	ConfigCmdsMap			varArchive_;
 
 	ExecCmdList				cmds_;
 

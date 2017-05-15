@@ -328,6 +328,7 @@ XConsole::XConsole() :
 	CmdMap_(g_coreArena),
 	Binds_(g_coreArena),
 	configCmds_(g_coreArena),
+	varArchive_(g_coreArena),
 	varHeap_(
 		bitUtil::RoundUpToMultiple<size_t>(
 			VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * VAR_MAX,
@@ -369,7 +370,8 @@ XConsole::XConsole() :
 	VarMap_.reserve(4096);
 	CmdMap_.reserve(1024);
 	Binds_.reserve(128);
-	configCmds_.reserve(128);
+	configCmds_.reserve(64);
+	varArchive_.reserve(64);
 
 
 	repeatEventTimer_ = TimeVal(0ll);
@@ -2002,6 +2004,19 @@ void XConsole::RegisterVar(ICVar* pCVar)
 		X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
 	}
 
+	it = varArchive_.find(X_CONST_STRING(pCVar->GetName()));
+	if (it != varArchive_.end())
+	{
+		if (CvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
+			pCVar->Set(it->second);
+		}
+
+		// mark as archive.
+		pCVar->SetFlags(pCVar->GetFlags() | VarFlag::ARCHIVE);
+
+		X_LOG2("Console", "Var \"%s\" was set by seta on registeration", pCVar->GetName());
+	}
+
 	VarMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
 }
 
@@ -3171,10 +3186,10 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 		merged.trimRight();
 
 		// we just add it to config cmd map
-		auto it = configCmds_.find(X_CONST_STRING(pVarName));
-		if (it == configCmds_.end())
+		auto it = varArchive_.find(X_CONST_STRING(pVarName));
+		if (it == varArchive_.end())
 		{
-			configCmds_.insert(ConfigCmdsMap::iterator::value_type(pVarName, merged));
+			varArchive_.insert(ConfigCmdsMap::iterator::value_type(pVarName, merged));
 		}
 		else
 		{
