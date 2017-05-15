@@ -1997,10 +1997,8 @@ ICVar* XConsole::GetCVarForRegistration(const char* pName)
 void XConsole::RegisterVar(ICVar* pCVar)
 {
 	auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
-	if (it != configCmds_.end()) {
-
-		ICVar::FlagType flags = pCVar->GetFlags();
-
+	if (it != configCmds_.end()) 
+	{
 		if (CvarModifyBegin(pCVar, ExecSource::CONFIG)) {
 			pCVar->Set(it->second);
 		}
