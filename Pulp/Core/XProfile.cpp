@@ -372,7 +372,7 @@ namespace profiler
 			Vec2f pos(padding, yOffset + padding);
 			Vec2f area;
 
-			if (pJobSys &&core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('j')))
+			if (pJobSys && core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('j')))
 			{
 #if X_ENABLE_JOBSYS_PROFILER
 				int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
