@@ -408,7 +408,10 @@ namespace profiler
 				auto strAllocStats = gEnv->pStrArena->getAllocatorStatistics();
 				auto allocStats = gEnv->pArena->getAllocatorStatistics(true);
 
-				pos.x += area.x + padding;
+				if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s'))) {
+					pos.x += area.x + padding;
+				}
+
 				area = RenderMemoryInfo(pos, L"String Mem", strAllocStats);
 
 				pos.x += area.x + padding;
