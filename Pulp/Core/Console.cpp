@@ -1423,7 +1423,6 @@ ICVar* XConsole::RegisterString(const char* pName, const char* Value,
 
 	if (Flags.IsSet(VarFlag::CPY_NAME))
 	{
-		Flags.Remove(VarFlag::CPY_NAME);
 		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
 			"CVarString<H>")(this, pName, Value, Flags, pDesc);
 	}
@@ -2843,7 +2842,6 @@ void XConsole::ListVariables(const char* searchPatten)
 	{
 		X_LOG0("Dvar", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", var->GetName(), var->GetFlags().ToString(dsc), var->GetDesc());
 	}
-
 
 	X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
