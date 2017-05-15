@@ -35,25 +35,8 @@ namespace
 		int32_t val = 0;
 		const char* pEnd = nullptr;
 
-		// Bit manipulation.
-		if (pStr[0] == '^')
-		{
-			// Bit number
-			if (strLen > 1)
-			{
-				val = 1 << core::strUtil::StringToInt<int32_t>(++pStr, &pEnd, 10);
-			}
-			else
-			{
-				// stupid noob.
-				val = 0;
-			}
-		}
-		else
-		{
-			// Full number
-			val = core::strUtil::StringToInt<int32_t>(pStr, &pEnd, 10);
-		}
+		// Full number
+		val = core::strUtil::StringToInt<int32_t>(pStr, &pEnd, 10);
 
 		// Check letter codes.
 		if (pEnd)
