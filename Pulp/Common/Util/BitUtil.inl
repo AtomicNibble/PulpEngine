@@ -709,6 +709,13 @@ namespace bitUtil
 		return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
 	}
 
+
+	constexpr inline char BitToAlphaChar(uint32_t bit)
+	{
+		// index 6 is 'a'
+		return static_cast<char>(bit >= 0 && bit < 32 ? ('a' + bit) - 6 : '0');
+	}
+
 	inline uint32_t AlphaBits(const char* pStr)
 	{
 		uint32 val = 0;

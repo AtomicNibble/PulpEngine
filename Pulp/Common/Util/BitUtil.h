@@ -132,6 +132,8 @@ namespace bitUtil
 	// z = 31
 	constexpr inline uint32_t AlphaBit(char c);
 
+	constexpr inline char BitToAlphaChar(uint32_t bit);
+
 	inline uint32_t AlphaBits(const char* pStr);
 }
 
