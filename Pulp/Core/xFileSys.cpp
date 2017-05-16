@@ -1251,12 +1251,15 @@ bool xFileSys::isDebug(void) const
 
 // ----------------------- stats ---------------------------
 
+#if X_ENABLE_FILE_STATS
+
 
 XFileStats& xFileSys::getStats(void) const
 {
 	return OsFile::fileStats();
 }
 
+#endif // !X_ENABLE_FILE_STATS
 
 // ----------------------- io que ---------------------------
 

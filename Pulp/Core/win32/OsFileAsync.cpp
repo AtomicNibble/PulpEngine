@@ -180,16 +180,12 @@ bool OsFileAsync::valid(void) const
 	return (file_ != INVALID_HANDLE_VALUE);
 }
 
+#if X_ENABLE_FILE_STATS
 XFileStats& OsFileAsync::fileStats(void)
 {
-#if X_ENABLE_FILE_STATS
 	return s_stats;
-#else
-	static XFileStats blank;
-	core::zero_object(blank);
-	return blank;
-#endif // !X_ENABLE_FILE_STATS
 }
+#endif // !X_ENABLE_FILE_STATS
 
 void OsFileAsync::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 {

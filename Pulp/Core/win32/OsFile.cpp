@@ -21,8 +21,8 @@ XFileStats OsFile::s_stats = {0};
 
 
 OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
-file_(INVALID_HANDLE_VALUE), 
-mode_(mode)
+	file_(INVALID_HANDLE_VALUE), 
+	mode_(mode)
 {
 	DWORD access = mode::GetAccess(mode);
 	DWORD share = mode::GetShareMode(mode);
@@ -213,16 +213,12 @@ bool OsFile::valid(void) const
 	return (file_ != INVALID_HANDLE_VALUE);
 }
 
+#if X_ENABLE_FILE_STATS
 XFileStats& OsFile::fileStats(void)
 {
-#if X_ENABLE_FILE_STATS
 	return s_stats;
-#else
-	static XFileStats blank;
-	core::zero_object(blank);
-	return blank;
-#endif // !X_ENABLE_FILE_STATS
 }
+#endif // !X_ENABLE_FILE_STATS
 
 
 bool OsFile::getDiskInfo(const wchar_t* pDevie, DiskInfo& info)

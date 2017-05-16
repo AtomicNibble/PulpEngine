@@ -179,14 +179,16 @@ public:
 	size_t getMinimumSectorSize(void) const X_FINAL;
 
 	// settings baby
-	const XFileSysVars* getVars(void) const { return &vars_; }
+	const XFileSysVars& getVars(void) const { return vars_; }
 
+#if X_ENABLE_FILE_STATS
 	// stats
 	virtual XFileStats& getStats(void) const X_FINAL;
+#endif // !X_ENABLE_FILE_STATS
+
 
 
 	// IoRequest que.
-
 	RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_FINAL;
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);

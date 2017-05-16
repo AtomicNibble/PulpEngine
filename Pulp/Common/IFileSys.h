@@ -26,7 +26,7 @@ typedef Flags<fileMode> fileModeFlags;
 
 X_DECLARE_FLAG_OPERATORS(fileModeFlags);
 
-
+#if X_ENABLE_FILE_STATS
 struct XFileStats
 {
 	size_t NumBytesRead;
@@ -36,6 +36,7 @@ struct XFileStats
 	size_t NumTells;
 	size_t NumByteLeftChecks;
 };
+#endif // !X_ENABLE_FILE_STATS
 
 struct XFileAsync;
 
@@ -631,8 +632,11 @@ struct IFileSys
 	// yet drive B has a larger sector size, it will return the largest.
 	virtual size_t getMinimumSectorSize(void) const X_ABSTRACT;
 
+#if X_ENABLE_FILE_STATS
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;
+#endif // !X_ENABLE_FILE_STATS
+
 
 	virtual RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_ABSTRACT;
 };

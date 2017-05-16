@@ -34,15 +34,20 @@ public:
 
 	bool valid(void) const;
 
-	static XFileStats& fileStats(void);
-
 	static bool getDiskInfo(const wchar_t* pDevie, DiskInfo& info);
+
+
+#if X_ENABLE_FILE_STATS
+	static XFileStats& fileStats(void);
+#endif // !X_ENABLE_FILE_STATS
 
 private:
 	IFileSys::fileModeFlags mode_;
 	HANDLE file_;
 
+#if X_ENABLE_FILE_STATS
 	static XFileStats s_stats;
+#endif // !X_ENABLE_FILE_STATS
 };
 
 X_NAMESPACE_END

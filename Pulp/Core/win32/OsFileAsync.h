@@ -23,8 +23,9 @@ struct OsFileAsync
 
 	bool valid(void) const;
 
+#if X_ENABLE_FILE_STATS
 	static XFileStats& fileStats(void);
-
+#endif // !X_ENABLE_FILE_STATS
 private:
 	void seek(int64_t position, IFileSys::SeekMode::Enum origin);
 
@@ -32,7 +33,9 @@ private:
 	IFileSys::fileModeFlags mode_;
 	HANDLE file_;
 
+#if X_ENABLE_FILE_STATS
 	static XFileStats s_stats;
+#endif // !X_ENABLE_FILE_STATS
 };
 
 X_NAMESPACE_END
