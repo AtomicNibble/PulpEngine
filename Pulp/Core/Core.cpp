@@ -210,6 +210,12 @@ void XCore::ShutDown()
 
 	dirWatcher_.ShutDown();
 
+	// save the vars before we start deleting things.
+	if (env_.pConsole && !initParams_.basicConsole())
+	{
+		env_.pConsole->saveChangedVars();
+	}
+
 	if (env_.pJobSys)
 	{
 		env_.pJobSys->ShutDown();
@@ -290,11 +296,6 @@ void XCore::ShutDown()
 		core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
 	}
 #endif // !X_ENABLE_PROFILER
-
-	if (env_.pConsole && !initParams_.basicConsole())
-	{
-		env_.pConsole->saveChangedVars();
-	}
 
 	if (env_.pFileSys)
 	{
