@@ -8,11 +8,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-#ifndef MAKEQWORD
-#define MAKEQWORD(a,b) ((QWORD)( ((QWORD) ((DWORD) (a))) << 32 | ((DWORD) (b))))
-#endif
-
-
 
 #if X_ENABLE_FILE_STATS
 XFileStats OsFileAsync::s_stats = { 0 };
@@ -157,7 +152,10 @@ uint64_t OsFileAsync::remainingBytes(void) const
 		X_ERROR("AsyncFile", "Can't Get file information. Error: %s", lastError::ToString(dsc));
 	}
 
-	return MAKEQWORD(info.nFileSizeHigh, info.nFileSizeLow) - tell();
+	uint64_t fileSize = (static_cast<uint64_t>(info.nFileSizeHigh) << 32) | static_cast<uint64_t>(info.nFileSizeLow);
+	uint64_t offset = tell();
+	X_ASSERT(fileSize >= offset, "File offset is larger than file size")(fileSize, offset);
+	return fileSize - offset;
 }
 
 void OsFileAsync::setSize(int64_t numBytes)
