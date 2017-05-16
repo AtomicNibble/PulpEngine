@@ -16,6 +16,7 @@
 
 #include "Profile\ProfilerTypes.h"
 
+#include "xFileSys.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -412,12 +413,40 @@ namespace profiler
 					pos.x += area.x + padding;
 				}
 
-				area = RenderMemoryInfo(pos, L"String Mem", strAllocStats);
+				core::MemoryAllocatorStatistics::Str str;
+				strAllocStats.toString(str);
 
+				area = RenderStr(pos, L"String Mem", str);
 				pos.x += area.x + padding;
-				RenderMemoryInfo(pos, L"Combined Mem", allocStats);
+
+				allocStats.toString(str);
+
+				RenderStr(pos, L"Combined Mem", str);
+				pos.x += area.x + padding;
 			}
 		
+#if X_ENABLE_FILE_STATS
+
+			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('f')))
+			{
+				core::xFileSys* pFileSys = static_cast<core::xFileSys*>(gEnv->pFileSys);
+
+				core::XFileStats::Str str1, str2;
+				pFileSys->getStats().toString(str1);
+				pFileSys->getStatsAsync().toString(str2);
+				core::IOQueueStats::Str str3;
+				pFileSys->getIOQueueStats().toString(str3);
+
+				area = RenderStr(pos, L"IO Stats", str1);
+				pos.x += area.x + padding;
+
+				area = RenderStr(pos, L"IO Stats (Async)", str2);
+				pos.x += area.x + padding;
+
+				area = RenderStr(pos, L"IO Qeue Stats", str3);
+				pos.x += area.x + padding;
+			}
+#endif // !X_ENABLE_FILE_STATS
 		}
 	}
 
@@ -530,22 +559,18 @@ namespace profiler
 		return Vec2f(width, height);
 	}
 
-	Vec2f XProfileSys::RenderMemoryInfo(Vec2f pos, const wchar_t* pTitle, const core::MemoryAllocatorStatistics& stats)
+	Vec2f XProfileSys::RenderStr(Vec2f pos, const wchar_t* pTitle, const core::StackString512& str)
 	{
-		core::MemoryAllocatorStatistics::Str str;
-		stats.toString(str);
-
 		font::TextDrawContext ctx;
 		ctx.pFont = pFont_;
 		ctx.effectId = 0;
-		ctx.SetColor(Col_White);
 		ctx.SetSize(Vec2f(16.f, 16.f));
 
 		Vec2f size = pFont_->GetTextSize(str.begin(), str.end(), ctx);
 
 		const float padding = 10;
 		const float titleStartX = pos.x + padding;
-		const float titleStartY = pos.y ;
+		const float titleStartY = pos.y;
 		const float titleHeight = 20.f;
 		const float memInfoStartX = pos.x + padding;
 		const float memInfoStartY = titleStartY + titleHeight;
@@ -569,7 +594,7 @@ namespace profiler
 			pos.y,
 			width,
 			20.f,
-			Color(0.2f, 0.2f, 0.2f, 0.6f),
+			Color(0.2f, 0.2f, 0.2f, 0.8f),
 			Color(0.01f, 0.01f, 0.01f, 0.8f)
 		);
 
@@ -582,7 +607,7 @@ namespace profiler
 		pPrim->drawText(
 			memInfoStartX,
 			memInfoStartY,
-			ctx, 
+			ctx,
 			str.begin(), str.end()
 		);
 

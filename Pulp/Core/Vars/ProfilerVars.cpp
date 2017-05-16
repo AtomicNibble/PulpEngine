@@ -28,12 +28,13 @@ namespace profiler
 		ADD_CVAR_REF("profile_pause", profilerPause_, profilerPause_, 0, 1, core::VarFlag::SYSTEM,
 			"Pause the profiler collection");
 
-		ADD_CVAR_REF("profile_draw", profilerDrawFlags_, core::bitUtil::AlphaBits("jsm"), 0, core::bitUtil::AlphaBits("jsm"),
+		ADD_CVAR_REF("profile_draw", profilerDrawFlags_, core::bitUtil::AlphaBits("jsmf"), 0, core::bitUtil::AlphaBits("jsmf"),
 			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::BITFIELD,
 			"Display profiler Flags. "
 			"j: JobSys, "
 			"s: Startup, "
 			"m: Memory "
+			"f: FileSys"
 		);
 
 		ADD_CVAR_REF("profile_draw_con_exp", drawProfilerConsoleExpanded_, drawProfilerConsoleExpanded_, 0, 1,

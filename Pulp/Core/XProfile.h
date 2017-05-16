@@ -22,6 +22,7 @@ X_NAMESPACE_DECLARE(engine,
 X_NAMESPACE_BEGIN(core)
 
 struct FrameTimeData;
+struct XFileStats;
 
 namespace profiler
 {
@@ -80,7 +81,7 @@ namespace profiler
 	private:
 		void UpdateProfileData(void);
 		Vec2f RenderStartupData(Vec2f pos);
-		Vec2f RenderMemoryInfo(Vec2f pos, const wchar_t* pTitle, const core::MemoryAllocatorStatistics& stats);
+		Vec2f RenderStr(Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
 
 #if X_ENABLE_JOBSYS_PROFILER
 		Vec2f RenderJobSystem(Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
