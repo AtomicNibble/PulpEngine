@@ -3,10 +3,10 @@
 #ifndef _X_FILE_SYSTEM_OSFILE_H_
 #define _X_FILE_SYSTEM_OSFILE_H_
 
-#include "IFileSys.h"
+#include <IFileSys.h>
+#include <IFileSysStats.h>
 
 X_NAMESPACE_BEGIN(core)
-
 
 
 class OsFile

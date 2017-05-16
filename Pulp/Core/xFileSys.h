@@ -18,6 +18,8 @@ X_ENABLE_WARNING(4702)
 #include "Threading\ThreadQue.h"
 #include "Threading\Thread.h"
 
+#include <IFileSysStats.h>
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -46,9 +48,6 @@ struct search_s
 
 
 struct XFindData;
-
-
-
 
 class xFileSys : public IFileSys, private core::ThreadAbstract
 {
@@ -183,7 +182,9 @@ public:
 
 #if X_ENABLE_FILE_STATS
 	// stats
-	virtual XFileStats& getStats(void) const X_FINAL;
+	XFileStats getStats(void) const;
+	XFileStats getStatsAsync(void) const;
+	IOQueueStats getIOQueueStats(void) const;
 #endif // !X_ENABLE_FILE_STATS
 
 
@@ -250,6 +251,10 @@ private:
 	core::CriticalSection requestLock_;
 	core::ConditionVariable requestCond_;
 	core::ByteStreamFifo requestData_;		// requests are serialized into this as they are of varing sizes.
+
+#if X_ENABLE_FILE_STATS
+	IOQueueStats stats_;
+#endif // !X_ENABLE_FILE_STATS
 };
 
 

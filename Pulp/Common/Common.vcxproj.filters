@@ -1228,6 +1228,9 @@
     <ClInclude Include="Texture.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
+    <ClInclude Include="IFileSysStats.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

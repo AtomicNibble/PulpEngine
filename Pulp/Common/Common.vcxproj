@@ -142,6 +142,7 @@
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="ICi.h" />
     <ClInclude Include="IEngineSysBase.h" />
+    <ClInclude Include="IFileSysStats.h" />
     <ClInclude Include="INetwork.h" />
     <ClInclude Include="IRenderCommands.h" />
     <ClInclude Include="ICompression.h" />

@@ -2,7 +2,6 @@
 #include "OsFile.h"
 #include "OsFileModeFlags.h"
 
-#include "IFileSys.h"
 
 #include <String\HumanSize.h>
 
@@ -12,7 +11,7 @@ X_NAMESPACE_BEGIN(core)
 
 
 #if X_ENABLE_FILE_STATS
-XFileStats OsFile::s_stats = {0};
+XFileStats OsFile::s_stats;
 #endif // !X_ENABLE_FILE_STATS
 
 

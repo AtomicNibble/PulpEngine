@@ -2,15 +2,13 @@
 #include "OsFileAsync.h"
 #include "OsFileModeFlags.h"
 
-
 #include <String\HumanSize.h>
-
 
 X_NAMESPACE_BEGIN(core)
 
 
 #if X_ENABLE_FILE_STATS
-XFileStats OsFileAsync::s_stats = { 0 };
+XFileStats OsFileAsync::s_stats;
 #endif // !X_ENABLE_FILE_STATS
 
 
@@ -79,7 +77,9 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
 	if (::ReadFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
-
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesRead += length;
+#endif // !X_ENABLE_FILE_STATS
 	}
 	else if (lastError::Get() != ERROR_IO_PENDING)
 	{
@@ -106,7 +106,9 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 
 	if (::WriteFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
-
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesWrite += length;
+#endif // !X_ENABLE_FILE_STATS
 	}
 	else if (lastError::Get() != ERROR_IO_PENDING)
 	{

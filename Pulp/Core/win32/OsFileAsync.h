@@ -3,7 +3,8 @@
 #ifndef _X_FILE_SYSTEM_OSFILE_ASYNC_H_
 #define _X_FILE_SYSTEM_OSFILE_ASYNC_H_
 
-#include "IFileSys.h"
+#include <IFileSys.h>
+#include <IFileSysStats.h>
 
 #include "OsFileAsyncOperation.h"
 

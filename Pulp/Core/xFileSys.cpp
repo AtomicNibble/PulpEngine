@@ -1254,9 +1254,19 @@ bool xFileSys::isDebug(void) const
 #if X_ENABLE_FILE_STATS
 
 
-XFileStats& xFileSys::getStats(void) const
+XFileStats xFileSys::getStats(void) const
 {
 	return OsFile::fileStats();
+}
+
+XFileStats xFileSys::getStatsAsync(void) const
+{
+	return OsFileAsync::fileStats();
+}
+
+IOQueueStats xFileSys::getIOQueueStats(void) const
+{
+	return stats_;
 }
 
 #endif // !X_ENABLE_FILE_STATS
@@ -1500,8 +1510,16 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 		const auto type = pRequest->getType();
 
+#if X_ENABLE_FILE_STATS
+		++stats_.RequestCounts[type];
+#endif // !X_ENABLE_FILE_STATS
+
 		if (type == IoRequest::OPEN)
 		{
+#if X_ENABLE_FILE_STATS
+			++stats_.NumFilesOpened;
+#endif // !X_ENABLE_FILE_STATS
+
 			IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
 			XFileAsync* pFile =	openFileAsync(pOpen->path.c_str(), pOpen->mode);
 
@@ -1509,6 +1527,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		}
 		else if (type == IoRequest::OPEN_READ_ALL)
 		{
+#if X_ENABLE_FILE_STATS
+			++stats_.NumFilesOpened;
+#endif // !X_ENABLE_FILE_STATS
+
 			IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
 			XFileAsync* pFile = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
 
@@ -1538,6 +1560,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			}
 			else
 			{
+#if X_ENABLE_FILE_STATS
+				stats_.NumBytesRead += fileSize;
+#endif // !X_ENABLE_FILE_STATS
+
 				uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
 
 				XFileAsyncOperation operation = pFile->readAsync(
@@ -1573,6 +1599,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			IoRequestRead* pRead = static_cast<IoRequestRead*>(pRequest);
 			XFileAsync* pFile = pRead->pFile;
 
+#if X_ENABLE_FILE_STATS
+			stats_.NumBytesRead += pRead->dataSize;
+#endif // !X_ENABLE_FILE_STATS
+
 			XFileAsyncOperation operation = pFile->readAsync(
 				pRead->pBuf,
 				pRead->dataSize,
@@ -1585,6 +1615,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		{
 			IoRequestWrite* pWrite = static_cast<IoRequestWrite*>(pRequest);
 			XFileAsync* pFile = pWrite->pFile;
+
+#if X_ENABLE_FILE_STATS
+			stats_.NumBytesWrite += pWrite->dataSize;
+#endif // !X_ENABLE_FILE_STATS
 
 			XFileAsyncOperation operation = pFile->writeAsync(
 				pWrite->pBuf,
