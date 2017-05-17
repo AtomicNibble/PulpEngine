@@ -18,6 +18,11 @@ X_INLINE XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HA
 
 X_INLINE bool XOsFileAsyncOperation::hasFinished(uint32_t* pNumBytes) const
 {
+	// early out with fast check.
+	if (!HasOverlappedIoCompleted(overlapped_->instance())) {
+		return false;
+	}
+
 	DWORD bytesTransferred = 0;
 	if (::GetOverlappedResult(hFile_, overlapped_->instance(), &bytesTransferred, false)) {
 		if (pNumBytes) {
@@ -71,8 +76,6 @@ X_INLINE void XOsFileAsyncOperation::cancel(void)
 			{
 				core::lastError::Description Dsc;
 				X_ERROR("AsyncFile", "Failed to wait for cancelled async operation to finsihed. Error: %s", core::lastError::ToString(Dsc));
-
-
 			}
 		}
 	}
