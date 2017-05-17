@@ -69,6 +69,7 @@ struct IOQueueStats
 		buf.appendFmt("Read: ^6%s^~\n", core::HumanSize::toString(str, NumBytesRead));
 		buf.appendFmt("Write: ^6%s^~\n", core::HumanSize::toString(str, NumBytesWrite));
 		buf.appendFmt("FilesOpened: ^6%" PRIuS "^~\n", NumFilesOpened);
+		buf.appendFmt("PendingOps: ^6%" PRIuS "^~\n", PendingOps);
 		
 		for (uint32_t i = 0; i < IoRequest::ENUM_COUNT; i++)
 		{
@@ -82,6 +83,7 @@ struct IOQueueStats
 	uint64_t NumBytesRead;
 	uint64_t NumBytesWrite;
 	size_t NumFilesOpened;
+	size_t PendingOps;
 	size_t RequestCounts[IoRequest::ENUM_COUNT];
 };
 

@@ -1389,6 +1389,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 	while (thread.ShouldRun())
 	{
+#if X_ENABLE_FILE_STATS
+		stats_.PendingOps = pendingOps.size();
+#endif // !X_ENABLE_FILE_STATS
+
 		if (pendingOps.isEmpty())
 		{
 			popRequest(requestBuffer);
