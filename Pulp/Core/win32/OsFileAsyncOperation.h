@@ -8,7 +8,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-struct XOsFileAsyncOperation
+class XOsFileAsyncOperation
 {
 	typedef ReferenceCountedInstance<OVERLAPPED> ReferenceCountedOverlapped;
 

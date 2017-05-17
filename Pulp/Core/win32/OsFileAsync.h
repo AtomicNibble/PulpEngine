@@ -10,13 +10,15 @@
 
 X_NAMESPACE_BEGIN(core)
 
-struct OsFileAsync
+class OsFileAsync
 {
+public:
 	OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~OsFileAsync(void);
 
 	XOsFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position);
 	XOsFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position);
+
 
 	uint64_t tell(void) const;
 	uint64_t remainingBytes(void) const;
