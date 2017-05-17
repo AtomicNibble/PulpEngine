@@ -31,19 +31,15 @@ struct XFileAsync;
 
 struct XFileAsyncOperation
 {
-	friend struct XFileAsync;
-
 	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, void* pBuffer) :
 		operation_(operation),
-		pReadBuffer_(pBuffer),
-		isReadOperation_(true)
+		pReadBuffer_(pBuffer)
 	{
 
 	}
 	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, const void* pBuffer) :
 		operation_(operation),
-		pWriteBuffer_(pBuffer),
-		isReadOperation_(false)
+		pWriteBuffer_(pBuffer)
 	{
 
 	}
@@ -58,21 +54,6 @@ struct XFileAsyncOperation
 		operation_.cancel();
 	}
 
-	inline bool isReadOperation(void) const {
-		return isReadOperation_;
-	}
-
-private:
-	inline void* getReadBuffer(void) const {
-		X_ASSERT(isReadOperation(), "can't get read buffer from a read operation")(isReadOperation());
-		return pReadBuffer_;
-	}
-	inline const void* getWriteBuffer(void) const {
-		X_ASSERT(!isReadOperation(), "can't get write buffer from a read operation")(isReadOperation());
-		return pWriteBuffer_;
-	}
-
-
 private:
 	core::XOsFileAsyncOperation operation_;
 
@@ -82,8 +63,6 @@ private:
 		void* pReadBuffer_;
 		const void* pWriteBuffer_;
 	};
-
-	bool isReadOperation_;
 };
 
 
