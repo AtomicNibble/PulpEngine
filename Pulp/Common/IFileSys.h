@@ -83,7 +83,6 @@ private:
 		const void* pWriteBuffer_;
 	};
 
-//	void* pFileData_;
 	bool isReadOperation_;
 };
 
