@@ -178,7 +178,7 @@ public:
 	size_t getMinimumSectorSize(void) const X_FINAL;
 
 	// settings baby
-	const XFileSysVars& getVars(void) const { return vars_; }
+	X_INLINE const XFileSysVars& getVars(void) const { return vars_; }
 
 #if X_ENABLE_FILE_STATS
 	// stats
