@@ -4,23 +4,26 @@
 #define _X_FILE_SYSTEM_VARS_H_
 
 #include <IFileSys.h>
-#include <IConsole.h>
 
-struct XFileSysVars
+X_NAMESPACE_BEGIN(core)
+
+struct ICVar;
+
+class XFileSysVars
 {
-	XFileSysVars() :
-		debug(0),
-		QueDebug(0),
-		numVirtualDir(0)
-	{
-		core::zero_object(pVirtualDirs);
-	}
+public:
+	XFileSysVars();
 
+	void registerVars(void);
+
+public:
 	int32_t debug;
 	int32_t QueDebug;
 	int32_t numVirtualDir;
 	
 	core::ICVar* pVirtualDirs[core::FS_MAX_VIRTUAL_DIR];
 };
+
+X_NAMESPACE_END
 
 #endif // !_X_FILE_SYSTEM_VARS_H_
