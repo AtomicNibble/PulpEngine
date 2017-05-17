@@ -1629,61 +1629,63 @@ bool XConsole::LoadAndExecConfigFile(const char* pFileName)
 			data.getAllocator().setBaseAlignment(16);
 			data.resize(bytes + 2);
 
-			if (file.read(data.data(), bytes) == bytes)
+			if (file.read(data.data(), bytes) != bytes)
 			{
-				// 2 bytes at end so the multiline search can be more simple.
-				// and not have to worrie about reading out of bounds.
-				data[bytes] = '\0';
-				data[bytes + 1] = '\0';
-
-				// execute all the data in the file.
-				// it's parsed in memory.
-				// remove comments here.
-				char* begin = data.begin();
-				char* end = begin + bytes;
-				const char* pComment;
-
-				// we support // and /* */ so loook for a '/'
-				while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr)
-				{
-					// wee need atleast 1 more char.
-					if (pComment >= (end - 1)) {
-						break;
-					}
-
-					begin = const_cast<char*>(++pComment);
-
-					if (*begin == '*')
-					{
-						begin[-1] = ' ';
-						*begin++ = ' ';
-
-
-						while (*begin != '*' && begin[1] != '/' && begin < end)
-						{
-							*begin++ = ' ';
-						}
-					}
-					else if (*begin == '/')
-					{
-						// signle line.
-						begin[-1] = ' ';
-						*begin++ = ' ';
-
-						while (*begin != '\n' && begin < end)
-						{
-							*begin++ = ' ';
-						}
-					}
-					else
-					{
-						++begin;
-					}
-				}
-
-				ConfigExec(data.begin(), data.begin() + bytes);
+				X_ERROR("Config", "failed to read: \"%s\"", path.c_str());
+				return false;
 			}
 
+			// 2 bytes at end so the multiline search can be more simple.
+			// and not have to worrie about reading out of bounds.
+			data[bytes] = '\0';
+			data[bytes + 1] = '\0';
+
+			// execute all the data in the file.
+			// it's parsed in memory.
+			// remove comments here.
+			char* begin = data.begin();
+			char* end = begin + bytes;
+			const char* pComment;
+
+			// we support // and /* */ so loook for a '/'
+			while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr)
+			{
+				// wee need atleast 1 more char.
+				if (pComment >= (end - 1)) {
+					break;
+				}
+
+				begin = const_cast<char*>(++pComment);
+
+				if (*begin == '*')
+				{
+					begin[-1] = ' ';
+					*begin++ = ' ';
+
+
+					while (*begin != '*' && begin[1] != '/' && begin < end)
+					{
+						*begin++ = ' ';
+					}
+				}
+				else if (*begin == '/')
+				{
+					// signle line.
+					begin[-1] = ' ';
+					*begin++ = ' ';
+
+					while (*begin != '\n' && begin < end)
+					{
+						*begin++ = ' ';
+					}
+				}
+				else
+				{
+					++begin;
+				}
+			}
+
+			ConfigExec(data.begin(), data.begin() + bytes);
 		}
 	}
 	else
