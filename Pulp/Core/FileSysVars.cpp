@@ -10,6 +10,12 @@ XFileSysVars::XFileSysVars() :
 	QueDebug(0),
 	numVirtualDir(0)
 {
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+	artOpenDelay = 3000;
+	artReadDelay = 0;
+	artWriteDelay = 0;
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
 	core::zero_object(pVirtualDirs);
 }
 
@@ -22,6 +28,17 @@ void XFileSysVars::registerVars(void)
 		"Filesystem debug. 0=off 1=on");
 	ADD_CVAR_REF("filesys_Quedebug", QueDebug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Filesystem que debug. 0=off 1=on");
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+	ADD_CVAR_REF("filesys_art_open_delay", artOpenDelay, artOpenDelay, 0, 100000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Introduce artificial file Open delay(ms)");
+
+	ADD_CVAR_REF("filesys_art_read_delay", artReadDelay, artReadDelay, 0, 10000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Introduce artificial file read delay(ms)");
+	
+	ADD_CVAR_REF("filesys_art_write_delay", artWriteDelay, artWriteDelay, 0, 100000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Introduce artificial file write delay(ms)");
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 	// create vars for the virtual directories which we then update with the paths once set.
 	for (size_t i = 0; i < FS_MAX_VIRTUAL_DIR; i++)

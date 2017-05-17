@@ -20,7 +20,14 @@ public:
 	int32_t debug;
 	int32_t QueDebug;
 	int32_t numVirtualDir;
-	
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+	// artificial delays
+	int32_t artOpenDelay;
+	int32_t artReadDelay;
+	int32_t artWriteDelay;
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
 	core::ICVar* pVirtualDirs[core::FS_MAX_VIRTUAL_DIR];
 private:
 	core::StackString<64> virDirVarsNames[core::FS_MAX_VIRTUAL_DIR];
