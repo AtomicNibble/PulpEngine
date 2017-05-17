@@ -85,5 +85,15 @@ X_INLINE void XOsFileAsyncOperation::cancel(void)
 }
 
 
+X_INLINE OVERLAPPED* XOsFileAsyncOperation::getOverlapped(void)
+{
+	return overlapped_->instance();
+}
+
+X_INLINE const OVERLAPPED* XOsFileAsyncOperation::getOverlapped(void) const
+{
+	return overlapped_->instance();
+}
+
 
 X_NAMESPACE_END

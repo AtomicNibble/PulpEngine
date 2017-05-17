@@ -12,26 +12,20 @@ struct XOsFileAsyncOperation
 {
 	typedef ReferenceCountedInstance<OVERLAPPED> ReferenceCountedOverlapped;
 
-
 public:
-	XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
+	X_INLINE XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
 
-
-	bool hasFinished(uint32_t* pNumBytes = nullptr) const;
+	X_INLINE bool hasFinished(uint32_t* pNumBytes = nullptr) const;
 
 	// Waits until the asynchronous operation has finished
 	// returns the number of transferred bytes.
-	uint32_t waitUntilFinished(void) const;
+	X_INLINE uint32_t waitUntilFinished(void) const;
 
-	void cancel(void);
+	X_INLINE void cancel(void);
 
+	X_INLINE OVERLAPPED* getOverlapped(void);
+	X_INLINE const OVERLAPPED* getOverlapped(void) const;
 
-	X_INLINE OVERLAPPED* getOverlapped(void) {
-		return overlapped_->instance();
-	}
-	X_INLINE const OVERLAPPED* getOverlapped(void) const {
-		return overlapped_->instance();
-	}
 private:
 	HANDLE hFile_;
 	mutable ReferenceCountedOwner<ReferenceCountedOverlapped> overlapped_;
