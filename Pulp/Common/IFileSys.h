@@ -48,16 +48,10 @@ struct XFileAsyncOperation
 
 	}
 
-#if X_64
-	inline bool hasFinished(size_t* pNumBytes = nullptr) const {
-		return operation_.hasFinished(pNumBytes);
-	}
-#endif // !X_64
-
 	inline bool hasFinished(uint32_t* pNumBytes = nullptr) const {
 		return operation_.hasFinished(pNumBytes);
 	}
-	inline size_t waitUntilFinished(void) const {
+	inline uint32_t waitUntilFinished(void) const {
 		return operation_.waitUntilFinished();
 	}
 	inline void cancel(void) {
