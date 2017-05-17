@@ -6,8 +6,8 @@
 X_NAMESPACE_BEGIN(core)
 
 X_INLINE XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, uint64_t position) :
-hFile_(hFile),
-overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
+	hFile_(hFile),
+	overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
 {
 	LPOVERLAPPED pOverlapped = getOverlapped();
 	core::zero_this(pOverlapped);
