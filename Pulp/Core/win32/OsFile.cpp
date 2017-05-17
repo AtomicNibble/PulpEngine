@@ -2,8 +2,11 @@
 #include "OsFile.h"
 #include "OsFileModeFlags.h"
 
-
 #include <String\HumanSize.h>
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+#include "xFileSys.h"
+#endif
 
 #include <WinIoCtl.h>
 
@@ -24,9 +27,19 @@ OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 	DWORD dispo = mode::GetCreationDispo(mode);
 	DWORD flags = mode::GetFlagsAndAtt(mode, false);
 
-
 	// lets open you up.
 	file_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+	
+	const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
+	int32_t delay = pFileSys->getVars().artOpenDelay;
+	if (delay) {
+		core::Thread::Sleep(delay);
+	}
+
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
 
 	if (!valid())
 	{
@@ -85,6 +98,17 @@ size_t OsFile::read(void* buffer, size_t length)
 		s_stats.NumBytesRead += NumRead;
 #endif // !X_ENABLE_FILE_STATS
 
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+
+		const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
+		int32_t delay = pFileSys->getVars().artReadDelay;
+		if (delay) {
+			core::Thread::Sleep(delay);
+		}
+
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
 		return NumRead;
 	}
 	else
@@ -117,6 +141,16 @@ size_t OsFile::write(const void* buffer, size_t length)
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += NumWrite;
 #endif // !X_ENABLE_FILE_STATS
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+
+		const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
+		int32_t delay = pFileSys->getVars().artWriteDelay;
+		if (delay) {
+			core::Thread::Sleep(delay);
+		}
+
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 		return NumWrite;
 	}

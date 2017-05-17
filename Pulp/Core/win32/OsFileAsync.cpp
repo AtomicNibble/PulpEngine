@@ -4,6 +4,11 @@
 
 #include <String\HumanSize.h>
 
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+#include "xFileSys.h"
+#endif
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -27,6 +32,15 @@ mode_(mode)
 	// lets open you up.
 	file_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
 
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+
+	const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
+	int32_t delay = pFileSys->getVars().artOpenDelay;
+	if (delay) {
+		core::Thread::Sleep(delay);
+	}
+
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 	if (!valid())
 	{

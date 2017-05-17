@@ -1507,13 +1507,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
 			XFileAsync* pFile =	openFileAsync(pOpen->path.c_str(), pOpen->mode);
 
-#if X_ENABLE_FILE_ARTIFICAIL_DELAY
-			// we block the request queue as that's what would happen if the open request took ages.
-			if (vars_.artOpenDelay) {
-				core::Thread::Sleep(vars_.artOpenDelay);
-			}
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
-
 			pOpen->callback.Invoke(fileSys, pOpen, pFile, 0);
 		}
 		else if (type == IoRequest::OPEN_READ_ALL)
@@ -1524,12 +1517,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 			IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
 			XFileAsync* pFile = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
-
-#if X_ENABLE_FILE_ARTIFICAIL_DELAY
-			if (vars_.artOpenDelay) {
-				core::Thread::Sleep(vars_.artOpenDelay);
-			}
-#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 			// make sure it's safe to allocate the buffer in this thread.
 			X_ASSERT_NOT_NULL(pOpenRead->arena);
