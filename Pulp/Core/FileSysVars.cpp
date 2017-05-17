@@ -11,7 +11,7 @@ XFileSysVars::XFileSysVars() :
 	numVirtualDir(0)
 {
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
-	artOpenDelay = 3000;
+	artOpenDelay = 0;
 	artReadDelay = 0;
 	artWriteDelay = 0;
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
