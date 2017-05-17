@@ -22,6 +22,8 @@ public:
 	int32_t numVirtualDir;
 	
 	core::ICVar* pVirtualDirs[core::FS_MAX_VIRTUAL_DIR];
+private:
+	core::StackString<64> virDirVarsNames[core::FS_MAX_VIRTUAL_DIR];
 };
 
 X_NAMESPACE_END

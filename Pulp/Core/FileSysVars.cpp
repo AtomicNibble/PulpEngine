@@ -24,16 +24,13 @@ void XFileSysVars::registerVars(void)
 		"Filesystem que debug. 0=off 1=on");
 
 	// create vars for the virtual directories which we then update with the paths once set.
-	size_t i;
-	core::StackString<64> name;
-	for (i = 0; i < FS_MAX_VIRTUAL_DIR; i++)
+	for (size_t i = 0; i < FS_MAX_VIRTUAL_DIR; i++)
 	{
-		name.set("filesys_mod_dir_");
-		name.appendFmt("%" PRIuS, i);
-		pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
+		virDirVarsNames[i].set("filesys_mod_dir_");
+		virDirVarsNames[i].appendFmt("%" PRIuS, i);
+		pVirtualDirs[i] = ADD_CVAR_STRING(virDirVarsNames[i].c_str(), "",
 			core::VarFlag::SYSTEM |
-			core::VarFlag::READONLY |
-			core::VarFlag::CPY_NAME,
+			core::VarFlag::READONLY,
 			"Virtual mod directory");
 	}
 }
