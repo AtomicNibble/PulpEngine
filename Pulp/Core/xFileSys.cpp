@@ -22,14 +22,12 @@ X_NAMESPACE_BEGIN(core)
 namespace
 {
 	// might need more since memory files will be from pool.
-	static const size_t MAX_FILE_HANDLES = 1024;
+	const size_t MAX_FILE_HANDLES = 1024;
 
-
-	static const size_t FILE_ALLOCATION_SIZE = core::Max(sizeof(XDiskFile),
+	const size_t FILE_ALLOCATION_SIZE = core::Max(sizeof(XDiskFile),
 		core::Max(sizeof(XDiskFileAsync), sizeof(XFileMem)));
 
-
-	static const size_t FILE_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(XDiskFile),
+	const size_t FILE_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(XDiskFile),
 		core::Max(X_ALIGN_OF(XDiskFileAsync), X_ALIGN_OF(XFileMem)));
 
 
