@@ -13,6 +13,7 @@
 #undef YieldProcessor
 #endif // !YieldProcessor
 
+
 X_NAMESPACE_BEGIN(core)
 
 /// \code
@@ -89,6 +90,8 @@ public:
 		IDLE
 	);
 
+	static const uint32_t INFINITE_SLEEP = INFINITE;
+
 public:
 	typedef Flags<CpuCore> AffinityFlags;
 	typedef uint32_t ReturnValue;
@@ -121,6 +124,7 @@ public:
 	X_INLINE void* getData(void) const;
 
 	static void Sleep(uint32_t milliSeconds);
+	static bool SleepAlertable(uint32_t milliSeconds = INFINITE_SLEEP); // returns true if alerted
 	static void Yield(void);
 	static void YieldProcessor(void);
 	static void Join(uint32_t threadId);

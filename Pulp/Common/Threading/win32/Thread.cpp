@@ -166,6 +166,20 @@ void Thread::Sleep(uint32_t milliSeconds)
 	::Sleep(milliSeconds);
 }
 
+bool Thread::SleepAlertable(uint32_t milliSeconds)
+{
+	DWORD res = ::SleepEx(milliSeconds, TRUE);
+	if (res == WAIT_IO_COMPLETION) {
+		return true;
+	}
+	else if (res != 0) {
+		lastError::Description Dsc;
+		X_ERROR("Thread", "SleepEx. Error: %s", lastError::ToString(res, Dsc));
+	}
+
+	return false;
+}
+
 void Thread::Yield(void)
 {
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms686352(v=vs.85).aspx
