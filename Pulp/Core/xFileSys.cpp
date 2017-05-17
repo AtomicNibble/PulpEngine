@@ -109,15 +109,15 @@ xFileSys::xFileSys() :
 	gameDir_(nullptr),
 
 	filePoolHeap_(
-	bitUtil::RoundUpToMultiple<size_t>(
-	FilePoolArena::getMemoryRequirement(FILE_ALLOCATION_SIZE) * MAX_FILE_HANDLES,
-	VirtualMem::GetPageSize()
-	)
+		bitUtil::RoundUpToMultiple<size_t>(
+			FilePoolArena::getMemoryRequirement(FILE_ALLOCATION_SIZE) * MAX_FILE_HANDLES,
+			VirtualMem::GetPageSize()
+		)
 	),
 	filePoolAllocator_(filePoolHeap_.start(), filePoolHeap_.end(),
-	FilePoolArena::getMemoryRequirement(FILE_ALLOCATION_SIZE),
-	FilePoolArena::getMemoryAlignmentRequirement(FILE_ALLOCATION_ALIGN),
-	FilePoolArena::getMemoryOffsetRequirement()
+		FilePoolArena::getMemoryRequirement(FILE_ALLOCATION_SIZE),
+		FilePoolArena::getMemoryAlignmentRequirement(FILE_ALLOCATION_ALIGN),
+		FilePoolArena::getMemoryOffsetRequirement()
 	),
 	filePoolArena_(&filePoolAllocator_, "FilePool"),
 	memFileArena_(&memfileAllocator_, "MemFileArena"),
