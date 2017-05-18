@@ -12,7 +12,7 @@ public:
 	EngineApp();
 	~EngineApp() X_OVERRIDE;
 
-	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
+	bool Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* sInCmdLine, core::Console& Console);
 	bool ShutDown(void);
 	bool PumpMessages(void);
 

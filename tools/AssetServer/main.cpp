@@ -6,9 +6,6 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
-
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -39,7 +36,6 @@ typedef core::MemoryArena<
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > AssertServerArena;
 
-core::MemoryArenaBase* g_arena = nullptr;
 
 X_USING_NAMESPACE;
 
@@ -68,9 +64,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-	g_hInstance = hInstance;
-
-
 	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - AssetServer");
 	Console.RedirectSTD();
 	Console.SetSize(60, 40, 2000);
@@ -78,14 +71,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	core::MallocFreeAllocator allocator;
 	AssertServerArena arena(&allocator, "AssetServerArena");
-	g_arena = &arena;
 
 	bool res = false;
 
 	{
 		EngineApp engine;
 
-		if (engine.Init(lpCmdLine, Console))
+		if (engine.Init(hInstance, &arena, lpCmdLine, Console))
 		{
 #if X_PLATFORM_WIN32
 			pEngine = &engine;
@@ -94,7 +86,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			}
 #endif // !X_PLATFORM_WIN32
 
-			assetServer::AssetServer as;
+			assetServer::AssetServer as(&arena);
 
 			as.Run(false);
 

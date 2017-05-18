@@ -6,4 +6,3 @@
 
 
 
-extern core::MemoryArenaBase* g_arena;

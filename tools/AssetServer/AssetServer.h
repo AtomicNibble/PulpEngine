@@ -27,7 +27,7 @@ class AssetServer : public core::ThreadAbstract
 	class Client
 	{
 	public:
-		Client(AssetServer& as);
+		Client(AssetServer& as, core::MemoryArenaBase* arena);
 		~Client() = default;
 
 	public:
@@ -44,12 +44,13 @@ class AssetServer : public core::ThreadAbstract
 		bool writeAndFlushBuf(const uint8_t* pBuf, size_t len);
 
 	private:
+		core::MemoryArenaBase* arena_;
 		AssetServer& as_;
 		core::IPC::Pipe pipe_;
 	};
 
 public:
-	AssetServer();
+	AssetServer(core::MemoryArenaBase* arena);
 	~AssetServer();
 
 	void Run(bool blocking = true);
@@ -65,6 +66,7 @@ private:
 	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res);
 
 private:
+	core::MemoryArenaBase* arena_;
 	core::CriticalSection lock_;
 	assetDb::AssetDB db_;
 

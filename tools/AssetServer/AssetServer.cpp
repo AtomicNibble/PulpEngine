@@ -147,7 +147,8 @@ namespace
 
 
 
-AssetServer::Client::Client(AssetServer& as) :
+AssetServer::Client::Client(AssetServer& as, core::MemoryArenaBase* arena) :
+	arena_(arena),
 	as_(as)
 {
 }
@@ -213,7 +214,7 @@ bool AssetServer::Client::listen(void)
 		{
 			// not sure where is best place to put this is.
 			// here or inside UpdateAsset() :Z
-			core::Array<uint8_t> buf(g_arena);
+			core::Array<uint8_t> buf(arena_);
 			if (request.update().has_datasize()) 
 			{
 				uint32_t dataSize = request.update().datasize();
@@ -367,7 +368,8 @@ bool AssetServer::Client::writeAndFlushBuf(const uint8_t* pBuf, size_t len)
 // -------------------------------------------
 
 
-AssetServer::AssetServer() :
+AssetServer::AssetServer(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	lock_(50),
 	threadStarted_(false)
 {
@@ -410,7 +412,7 @@ void AssetServer::Run_Internal(void)
 
 	while (1)
 	{
-		Client client(*this);
+		Client client(*this, arena_);
 
 		client.connect();
 		client.listen();
@@ -429,7 +431,7 @@ core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 
 	while (thread.ShouldRun())
 	{
-		Client client(*this);
+		Client client(*this, arena_);
 
 		client.connect();
 		client.listen();
