@@ -101,17 +101,11 @@ namespace
 
 } // namespace 
 
-core::MemoryArenaBase* g_arena = nullptr;
-HINSTANCE g_hInstance = 0;
-
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-	g_hInstance = hInstance;
-
 	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Compressor");
 	Console.RedirectSTD();
 	Console.SetSize(100, 40, 2000);
@@ -120,7 +114,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	core::MallocFreeAllocator allocator;
 	CompressorArena arena(&allocator, "CompressorArena");
-	g_arena = &arena;
 
 	// this tool is just going to wrap engine compression functionality.
 	// basically just glue code, can be useful.
@@ -134,7 +127,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	EngineApp app;
 
-	if (!app.Init(lpCmdLine, Console)) {
+	if (!app.Init(hInstance, &arena, lpCmdLine, Console)) {
 		return -1;
 	}
 
@@ -226,8 +219,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		return 1;
 	}
 
-	core::Array<uint8_t> inFileData(g_arena);
-	core::Array<uint8_t> outfileData(g_arena);
+	core::Array<uint8_t> inFileData(&arena);
+	core::Array<uint8_t> outfileData(&arena);
 
 	core::StopWatch timer;
 
@@ -251,43 +244,43 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	switch (algo)
 	{
 		case Algo::LZ4:
-			pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4>, &arena, "LZ4");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".lz4";
 			}
 			break;
 		case Algo::LZ4HC:
-			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, &arena, "LZ4HC");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".lz4";
 			}
 			break;
 		case Algo::LZ5:
-			pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4>, &arena, "LZ4");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".lz4";
 			}
 			break;
 		case Algo::LZ5HC:
-			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
+			pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, &arena, "LZ4HC");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".lz4";
 			}
 			break;
 		case Algo::LZMA:
-			pCompressor = X_NEW(Compressor<core::Compression::LZMA>, g_arena, "LZMA");
+			pCompressor = X_NEW(Compressor<core::Compression::LZMA>, &arena, "LZMA");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".lzma";
 			}
 			break;
 		case Algo::ZLIB:
-			pCompressor = X_NEW(Compressor<core::Compression::Zlib>, g_arena, "ZLIB");
+			pCompressor = X_NEW(Compressor<core::Compression::Zlib>, &arena, "ZLIB");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".zlib";
 			}
 			break;
 		case Algo::STORE:
-			pCompressor = X_NEW(Compressor<core::Compression::Store>, g_arena, "Store");
+			pCompressor = X_NEW(Compressor<core::Compression::Store>, &arena, "Store");
 			if (defalte && outFile.empty()) {
 				outFile = inFile + L".store";
 			}
@@ -302,10 +295,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	timer.Start();
 
 	if (defalte) {
-		res = pCompressor->deflate(g_arena, inFileData, outfileData, lvl);
+		res = pCompressor->deflate(&arena, inFileData, outfileData, lvl);
 	}
 	else {
-		res = pCompressor->inflate(g_arena, inFileData, outfileData);
+		res = pCompressor->inflate(&arena, inFileData, outfileData);
 	}
 
 	const float compressTime = timer.GetMilliSeconds();
@@ -327,6 +320,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	X_LOG0("Compress", "writeTime: ^2%fms", writeTime);
 
 
-	X_DELETE(pCompressor, g_arena);
+	X_DELETE(pCompressor, &arena);
     return 0;
 }
