@@ -433,6 +433,7 @@ class JobSystem
 {
 	struct ThreadJobAllocator;
 
+
 public:
 	static const uint32_t AUTO_THREAD_COUNT = 0;
 	static const uint32_t HW_THREAD_MAX = core::Min(1 << Job::THREAD_IDX_BITS, 12); // max even if hardware supports more.
@@ -450,6 +451,17 @@ public:
 	typedef std::array<JobSystemStats, JOBSYS_HISTORY_COUNT> ProfilerStatsArr;
 	typedef std::array<JobQueueHistory*, HW_THREAD_MAX> ProfilerThreadTimelinesArr;
 #endif // !X_ENABLE_JOBSYS_PROFILER
+
+private:
+	typedef core::FixedArray<std::pair<uint32_t, size_t>, HW_THREAD_MAX > ThreadIdToIndex;
+
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		core::SingleThreadPolicy,
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+	> JobArena;
 
 public:
 	JobSystem();
@@ -573,14 +585,6 @@ private:
 	Thread::ReturnValue ThreadRun(const Thread& thread);
 
 private:
-	typedef core::FixedArray<std::pair<uint32_t, size_t>, HW_THREAD_MAX > ThreadIdToIndex;
-	typedef core::MemoryArena<
-		core::PoolAllocator,
-		core::SingleThreadPolicy,
-		core::NoBoundsChecking,
-		core::NoMemoryTracking,
-		core::NoMemoryTagging> JobArena;
-
 	Thread threads_[HW_THREAD_MAX];
 	ThreadIdToIndex threadIdToIndex_;
 	uint32_t numThreads_;
