@@ -214,7 +214,7 @@ namespace V2
 			CpuInfo* pCpu = pCore->GetCPUInfo();
 
 			uint32_t numCores = pCpu->GetCoreCount();
-			numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
+			numThreads_ = math<uint32_t>::clamp(numCores - HW_THREAD_NUM_DELTA, 1u, HW_THREAD_MAX);
 		}
 		else
 		{
@@ -222,10 +222,7 @@ namespace V2
 		}
 
 		// main and IO job list space.
-		if ((numThreads_ + 2) >= HW_THREAD_MAX) {
-			X_WARNING("Scheduler", "Thread count of %" PRIu32 " too large capping to %" PRIu32, numThreads_, HW_THREAD_MAX);
-			numThreads_ = HW_THREAD_MAX - 2;
-		}
+		numThreads_ = math<uint32_t>::clamp(numThreads_, 1u, HW_THREAD_MAX - 2);
 
 		if (!StartThreads()) {
 			X_ERROR("Scheduler", "Failed to start worker threads");
