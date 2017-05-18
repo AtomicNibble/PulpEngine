@@ -16,6 +16,11 @@ public:
 	void updateWinDim(int32_t width, int32_t height);
 
 	
+	X_INLINE core::ICVar* getWinPosX(void);
+	X_INLINE core::ICVar* getWinPosY(void);
+	X_INLINE core::ICVar* getWinWidth(void);
+	X_INLINE core::ICVar* getWinHeight(void);
+	X_INLINE core::ICVar* getWinCustomFrame(void);
 
 public:
 	int32_t schedulerNumThreads_;
@@ -35,5 +40,6 @@ private:
 	core::ICVar* pWinCustomFrame_;
 };
 
-
 X_NAMESPACE_END
+
+#include "CoreVars.inl"

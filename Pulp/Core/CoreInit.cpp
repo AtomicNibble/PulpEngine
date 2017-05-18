@@ -1024,7 +1024,18 @@ void XCore::registerVars(void)
 {
 	vars_.registerVars();
 
+	core::ConsoleVarFunc del;
 
+	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
+	vars_.getWinPosX()->SetOnChangeCallback(del);
+	vars_.getWinPosY()->SetOnChangeCallback(del);
+
+	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
+	vars_.getWinWidth()->SetOnChangeCallback(del);
+	vars_.getWinHeight()->SetOnChangeCallback(del);
+
+	del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
+	vars_.getWinCustomFrame()->SetOnChangeCallback(del);
 }
 
 void XCore::registerCmds(void)

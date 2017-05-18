@@ -39,27 +39,6 @@ void CoreVars::registerVars(void)
 	pWinHeight_ = ADD_CVAR_REF("win_height", winHeight_, 600, 600, 1,
 		VarFlag::SYSTEM, "Game window height");
 
-#if 0
-	core::ConsoleVarFunc del;
-	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
-	var_win_pos_x->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
-	var_win_pos_y->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
-	var_win_width->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
-	var_win_height->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
-	var_win_custom_Frame->SetOnChangeCallback(del);
-
-
-
-#endif
-
 	pWinCustomFrame_ = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
 

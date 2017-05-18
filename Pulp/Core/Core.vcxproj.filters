@@ -237,5 +237,8 @@
     <None Include="XProfile.inl">
       <Filter>Header Files\Profile</Filter>
     </None>
+    <None Include="Vars\CoreVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
   </ItemGroup>
 </Project>

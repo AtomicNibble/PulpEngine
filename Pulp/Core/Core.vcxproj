@@ -514,6 +514,7 @@
     <None Include="Console.inl" />
     <None Include="ConsoleVariable.inl" />
     <None Include="Core.inl" />
+    <None Include="Vars\CoreVars.inl" />
     <None Include="Vars\ProfilerVars.inl" />
     <None Include="win32\SystemTimer.inl" />
     <None Include="XProfile.inl" />
