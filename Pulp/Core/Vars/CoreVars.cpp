@@ -22,7 +22,7 @@ void CoreVars::registerVars(void)
 {
 	ADD_CVAR_REF("core_fast_shutdown", coreFastShutdown_, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Skips most cleanup logic for faster shutdown, when off everything is correctly shutdown and released before exit. 0=off 1=on");
-	ADD_CVAR_REF("core_event_debug", coreEventDebug_, 0, 0, 1, VarFlag::SYSTEM,
+	ADD_CVAR_REF("core_event_debug", coreEventDebug_, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Debug messages for core events. 0=off 1=on");
 
 	core::xWindow::Rect desktop = core::xWindow::GetDesktopRect();
