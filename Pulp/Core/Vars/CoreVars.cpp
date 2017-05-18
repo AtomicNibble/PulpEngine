@@ -4,7 +4,7 @@
 #include "Platform\Window.h"
 
 #include <IConsole.h>
-
+#include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -20,6 +20,9 @@ CoreVars::CoreVars() :
 
 void CoreVars::registerVars(void)
 {
+	ADD_CVAR_REF("core_scheduler_threads", schedulerNumThreads_, 0, 0, core::V2::JobSystem::HW_THREAD_MAX, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Number of threads to create for scheduler. 0=auto");
+
 	ADD_CVAR_REF("core_fast_shutdown", coreFastShutdown_, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Skips most cleanup logic for faster shutdown, when off everything is correctly shutdown and released before exit. 0=off 1=on");
 	ADD_CVAR_REF("core_event_debug", coreEventDebug_, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
@@ -59,7 +62,6 @@ void CoreVars::registerVars(void)
 
 	pWinCustomFrame_ = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
-
 
 	const char* pVersionStr = (X_ENGINE_NAME "Engine " X_PLATFORM_STR "-" X_CPUSTRING " Version " X_ENGINE_VERSION_STR);
 	ADD_CVAR_STRING("version", pVersionStr,

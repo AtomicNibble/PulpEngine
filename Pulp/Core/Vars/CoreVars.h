@@ -18,6 +18,7 @@ public:
 	
 
 public:
+	int32_t schedulerNumThreads_;
 	int32_t coreFastShutdown_;
 	int32_t coreEventDebug_;
 

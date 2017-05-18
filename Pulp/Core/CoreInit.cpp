@@ -460,7 +460,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// #------------------------- JOB SYSTEM ------------------------
 	if (env_.pJobSys) {
-		env_.pJobSys->StartUp();
+		env_.pJobSys->StartUp(vars_.schedulerNumThreads_);
 	}
 
 	// #------------------------- FileSystem Workets ------------------------
