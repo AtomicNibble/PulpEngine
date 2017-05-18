@@ -12,7 +12,11 @@ X_NAMESPACE_BEGIN(core)
 
 class MemoryArenaBase
 {
-	static const int MAX_ARENA_CHILDREN = 16;
+	static const int MAX_ARENA_CHILDREN = 20;
+
+public:
+	typedef core::FixedArray<MemoryArenaBase*, MAX_ARENA_CHILDREN> ArenaArr;
+
 public:
 	/// Empty destructor.
 	virtual ~MemoryArenaBase(void) {}
@@ -38,17 +42,22 @@ public:
 
 	virtual bool isThreadSafe(void) const X_ABSTRACT;
 
+	inline const ArenaArr& getChildrenAreas(void) const {
+		return children_;
+	}
+
 	// adds it baby.
-	void addChildArena(MemoryArenaBase* arena) {
-		if (children_.size() == MAX_ARENA_CHILDREN)
+	inline void addChildArena(MemoryArenaBase* arena) {
+		if (children_.size() == MAX_ARENA_CHILDREN) {
 			X_WARNING("Memory", "can't add child arena exceeded max: %i", MAX_ARENA_CHILDREN);
-		else
+		}
+		else {
 			children_.append(arena);
+		}
 	}
 
 protected:
-
-	core::FixedArray<MemoryArenaBase*, MAX_ARENA_CHILDREN> children_;
+	ArenaArr children_;
 };
 
 X_NAMESPACE_END
