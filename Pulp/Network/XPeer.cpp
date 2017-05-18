@@ -262,7 +262,7 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 		PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
 		PoolArena::getMemoryOffsetRequirement()
 	),
-	poolArena_(&poolAllocator_, "PoolArena"),
+	poolArena_(&poolAllocator_, "PacketPool"),
 	pool2Allocator_(
 		PoolArena::getMemoryRequirement(POOL2_ALLOCATION_SIZE) * POOL2_ALLOC_MAX,
 		core::VirtualMem::GetPageSize() * 4,
@@ -271,8 +271,8 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 		PoolArena::getMemoryAlignmentRequirement(POOL2_ALLOCATION_ALIGN),
 		PoolArena::getMemoryOffsetRequirement()
 	),
-	pool2Arena_(&pool2Allocator_, "PoolArena"),
-	blockArena_(&blockAlloc_, "blockArena")
+	pool2Arena_(&pool2Allocator_, "ReliablePool"),
+	blockArena_(&blockAlloc_, "BlockArena")
 {
 	arena->addChildArena(&poolArena_);
 	arena->addChildArena(&pool2Arena_);

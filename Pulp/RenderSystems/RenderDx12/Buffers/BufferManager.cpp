@@ -49,7 +49,7 @@ BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice
 		PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
 		PoolArena::getMemoryOffsetRequirement()
 	),
-	arena_(&pool_, "VidMemBuffer")
+	arena_(&pool_, "VidMemHandlePool")
 {
 	arena->addChildArena(&arena_);
 }

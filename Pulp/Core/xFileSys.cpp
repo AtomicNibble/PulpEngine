@@ -121,7 +121,7 @@ xFileSys::xFileSys() :
 		FilePoolArena::getMemoryAlignmentRequirement(FILE_ALLOCATION_ALIGN),
 		FilePoolArena::getMemoryOffsetRequirement()
 	),
-	filePoolArena_(&filePoolAllocator_, "FilePool"),
+	filePoolArena_(&filePoolAllocator_, "FileHandlePool"),
 	// ..
 	asyncOpPoolHeap_(
 		bitUtil::RoundUpToMultiple<size_t>(
@@ -134,9 +134,9 @@ xFileSys::xFileSys() :
 		AsyncOpPoolArena::getMemoryAlignmentRequirement(ASYNC_OP_ALLOCATION_ALIGN),
 		AsyncOpPoolArena::getMemoryOffsetRequirement()
 	),
-	asyncOpPoolArena_(&asyncOpPoolAllocator_, "asyncOpPool"),
+	asyncOpPoolArena_(&asyncOpPoolAllocator_, "AsyncOpPool"),
 	// ..
-	memFileArena_(&memfileAllocator_, "MemFileArena"),
+	memFileArena_(&memfileAllocator_, "MemFileData"),
 	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE),
 	currentRequestIdx_(0),
 	requestSignal_(true)
