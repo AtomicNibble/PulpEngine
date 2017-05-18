@@ -138,7 +138,8 @@ xFileSys::xFileSys() :
 	// ..
 	memFileArena_(&memfileAllocator_, "MemFileArena"),
 	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE),
-	currentRequestIdx_(0)
+	currentRequestIdx_(0),
+	requestSignal_(true)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pArena);
@@ -1318,7 +1319,7 @@ RequestHandle xFileSys::AddIoRequestToQue(const IoRequestBase& request)
 
 	// POD it like it's hot.
 	requestData_.write(&request, reqSize);
-	requestCond_.NotifyOne();
+	requestSignal_.raise();
 
 	return reqHandle;
 }
@@ -1346,10 +1347,9 @@ void xFileSys::ShutDownRequestWorker(void)
 		for (size_t i = 0; i < 10; i++) {
 			requestData_.write(&closeRequest, sizeof(closeRequest));
 		}
-
-		requestCond_.NotifyOne();
 	}
-	
+		
+	requestSignal_.raise();
 	ThreadAbstract::Join();
 }
 
@@ -1357,12 +1357,14 @@ void xFileSys::popRequest(RequestBuffer& buf)
 {
 	CriticalSection::ScopedLock lock(requestLock_);
 
-	while (requestData_.isEmpty()) {
-		requestCond_.Wait(requestLock_);
+	while (requestData_.isEmpty()) 
+	{
+		requestLock_.Leave();
+		requestSignal_.wait();
+		requestLock_.Enter();
 	}
 
 	// read the request you dirty little grass hoper.
-
 	IoRequestBase& base = requestData_.peek<IoRequestBase>();
 	const size_t reqSize = ioReqSize[base.getType()];
 
@@ -1378,6 +1380,9 @@ bool xFileSys::tryPopRequest(RequestBuffer& buf)
 	if (requestData_.isEmpty()) {
 		return false;
 	}
+
+	// if we got one make sure signal is cleared.
+	requestSignal_.clear();
 
 	IoRequestBase& base = requestData_.peek<IoRequestBase>();
 	const size_t reqSize = ioReqSize[base.getType()];
@@ -1508,13 +1513,14 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		}
 		else
 		{
-			// we sleep untill we get woken by either a completed async request or more requests to process.
-			core::Thread::SleepAlertable();
-
-			// might not be any, if not just come back around to SleepAlertable.
-			if (!tryPopRequest(requestBuffer)) {
-				continue;
+			// wait for any requests in a alertable state.
+			// so we wake for either async op completing or new requests need processing
+			while(!tryPopRequest(requestBuffer)) 
+			{
+				requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
 			}
+
+			// we have a request.
 		}
 
 		const auto type = pRequest->getType();

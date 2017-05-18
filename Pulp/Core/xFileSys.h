@@ -294,7 +294,7 @@ private:
 	RequestHandle currentRequestIdx_;
 
 	core::CriticalSection requestLock_;
-	core::ConditionVariable requestCond_;
+	core::Signal requestSignal_;
 	core::ByteStreamFifo requestData_;		// requests are serialized into this as they are of varing sizes.
 
 	AsyncOps pendingOps_;
