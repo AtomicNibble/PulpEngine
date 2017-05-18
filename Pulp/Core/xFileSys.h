@@ -228,6 +228,7 @@ public:
 
 	// IoRequest que.
 	RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_FINAL;
+	void CancelRequest(RequestHandle handle);
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);
 

@@ -1324,6 +1324,12 @@ RequestHandle xFileSys::AddIoRequestToQue(const IoRequestBase& request)
 	return reqHandle;
 }
 
+void xFileSys::CancelRequest(RequestHandle handle)
+{
+	X_UNUSED(handle);
+	X_ASSERT_NOT_IMPLEMENTED();
+}
+
 bool xFileSys::StartRequestWorker(void)
 {
 	ThreadAbstract::Create("IoWorker", 1024 * 128); // small stack
