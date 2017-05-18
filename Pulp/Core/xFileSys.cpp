@@ -1503,10 +1503,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 	while (thread.ShouldRun())
 	{
-#if X_ENABLE_FILE_STATS
-		stats_.PendingOps = pendingOps_.size();
-#endif // !X_ENABLE_FILE_STATS
-
 		if (pendingOps_.isEmpty())
 		{
 			popRequest(requestBuffer);
@@ -1518,6 +1514,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			while(!tryPopRequest(requestBuffer)) 
 			{
 				requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
+
+#if X_ENABLE_FILE_STATS
+				stats_.PendingOps = pendingOps_.size();
+#endif // !X_ENABLE_FILE_STATS
 			}
 
 			// we have a request.
