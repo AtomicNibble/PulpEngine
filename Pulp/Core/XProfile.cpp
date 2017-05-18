@@ -645,7 +645,7 @@ namespace profiler
 
 		const int32_t visibleMS = vars_.jobSysThreadMS();
 		const uint32_t numThread = pJobSys->GetThreadCount();
-		const uint32_t numThreadQueues = pJobSys->GetQeueCount();
+		const uint32_t numThreadQueues = pJobSys->GetQueueCount();
 		const float threadInfoXOffset = 40.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
 		const float threadInfoY = pos.y + ctx.size.y + (padding * 2);

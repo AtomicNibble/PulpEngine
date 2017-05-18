@@ -185,7 +185,7 @@ namespace V2
 	JobSystem::JobSystem()
 	{
 		numThreads_ = 0;
-		numQues_ = 0;
+		numQueue_ = 0;
 		core::zero_object(pThreadQues_);
 		core::zero_object(pJobAllocators_);
 #if X_ENABLE_JOBSYS_PROFILER
@@ -328,9 +328,9 @@ namespace V2
 		return numThreads_;
 	}
 
-	uint32_t JobSystem::GetQeueCount(void) const
+	uint32_t JobSystem::GetQueueCount(void) const
 	{
-		return numQues_;
+		return numQueue_;
 	}
 
 	JobSystem::ThreadIdArray JobSystem::getThreadIds(void)
@@ -398,7 +398,7 @@ namespace V2
 		pTimeLines_[idx] = X_NEW(JobQueueHistory, gEnv->pArena, "JobThreadTimeline");
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
-		numQues_ = idx + 1;
+		numQueue_ = idx + 1;
 	}
 
 
@@ -593,7 +593,7 @@ namespace V2
 		if (IsEmptyJob(pJob))
 		{
 			// this is not a valid job because our own queue is empty, so try stealing from some other queue
-			uint32_t randomIndex = random::MultiplyWithCarry(0u, numQues_);
+			uint32_t randomIndex = random::MultiplyWithCarry(0u, numQueue_);
 
 			ThreadQue* stealQueue = pThreadQues_[randomIndex];
 			if (stealQueue == &queue)
@@ -626,7 +626,7 @@ namespace V2
 		if (!IsEmptyJob(pJob)) {
 			return pJob;
 		}
-		for (uint32_t i = 0; i < numQues_; i++)
+		for (uint32_t i = 0; i < numQueue_; i++)
 		{
 			ThreadQue* stealQueue = pThreadQues_[i];
 			if (stealQueue == &queue) {

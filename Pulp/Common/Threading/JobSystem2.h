@@ -461,7 +461,7 @@ public:
 
 	void CreateQueForCurrentThread(void);
 	uint32_t GetThreadCount(void) const;
-	uint32_t GetQeueCount(void) const;
+	uint32_t GetQueueCount(void) const;
 	ThreadIdArray getThreadIds(void);
 
 #if X_ENABLE_JOBSYS_PROFILER
@@ -584,7 +584,7 @@ private:
 	Thread threads_[HW_THREAD_MAX];
 	ThreadIdToIndex threadIdToIndex_;
 	uint32_t numThreads_;
-	uint32_t numQues_;
+	uint32_t numQueue_;
 
 	core::ConditionVariable cond_;
 	core::CriticalSection condCS_;
