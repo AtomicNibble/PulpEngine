@@ -131,6 +131,9 @@
     <ClInclude Include="Vars\ProfilerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\CoreVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -210,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="FileSysVars.cpp">
       <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\CoreVars.cpp">
+      <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

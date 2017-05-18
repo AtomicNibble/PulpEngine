@@ -108,15 +108,8 @@ XCore::XCore() :
 
 	strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2, 
 	StrArena::getMemoryAlignmentRequirement(8), 
-	StrArena::getMemoryOffsetRequirement() + 12),
+	StrArena::getMemoryOffsetRequirement() + 12)
 
-	var_win_pos_x(nullptr),
-	var_win_pos_y(nullptr),
-	var_win_width(nullptr),
-	var_win_height(nullptr),
-	var_win_custom_Frame(nullptr),
-
-	var_profile(nullptr)
 {
 	X_ASSERT_NOT_NULL(g_coreArena);
 
@@ -188,7 +181,7 @@ void XCore::ShutDown()
 	X_LOG0("Core", "Shutting Down");
 	env_.state_ = SCoreGlobals::State::CLOSING;
 
-	if (vars_.core_fast_shutdown) {
+	if (vars_.coreFastShutdown_) {
 		X_LOG0("Core", "Fast shutdown, skipping cleanup");
 
 		// still save modified vars.
@@ -429,30 +422,14 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 		{
 			core::xWindow::Rect rect = pWindow_->GetRect();
 
-			vars_.win_x_pos = rect.getX1();
-			vars_.win_y_pos = rect.getY1();
-
-			if (var_win_pos_x) {
-				var_win_pos_x->SetModified();
-			}
-			if (var_win_pos_x) {
-				var_win_pos_y->SetModified();
-			}
+			vars_.updateWinPos(rect.getX1(), rect.getY1());
 		}
 		break;
 		case CoreEvent::RESIZE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetClientRect();
 
-			vars_.win_height = rect.getHeight();
-			vars_.win_width = rect.getWidth();
-
-			if (var_win_width) {
-				var_win_width->SetModified();
-			}
-			if (var_win_height) {
-				var_win_height->SetModified();
-			}
+			vars_.updateWinDim(rect.getWidth(), rect.getHeight());
 		}
 		break;
 		case CoreEvent::ACTIVATE:
@@ -560,6 +537,35 @@ void XCore::OnFatalError(const char* format, va_list args)
 	X_BREAKPOINT;
 
 	_exit(1);
+}
+
+
+void XCore::WindowPosVarChange(core::ICVar* pVar)
+{
+	X_UNUSED(pVar);
+
+	int x_pos = vars_.winXPos_;
+	int y_pos = vars_.winYPos_;
+
+	core::xWindow* pWin = GetGameWindow();
+	if (pWin) {
+		pWin->MoveTo(x_pos, y_pos);
+	}
+}
+
+void XCore::WindowSizeVarChange(core::ICVar* pVar)
+{
+	X_UNUSED(pVar);
+
+}
+
+void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
+{
+	bool enabled = (pVar->GetInteger() == 1);
+
+	if (pWindow_) {
+		pWindow_->CustomFrame(enabled);
+	}
 }
 
 

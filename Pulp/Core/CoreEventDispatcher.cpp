@@ -1,11 +1,12 @@
 #include "stdafx.h"
 #include "CoreEventDispatcher.h"
-#include "Core.h"
+
+#include "Vars\CoreVars.h"
 
 X_NAMESPACE_BEGIN(core)
 
 
-XCoreEventDispatcher::XCoreEventDispatcher(XCoreVars& coreVars, core::MemoryArenaBase* arena) :
+XCoreEventDispatcher::XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArenaBase* arena) :
 	coreVars_(coreVars),
 	listners_(arena)
 {
@@ -52,7 +53,7 @@ bool XCoreEventDispatcher::RemoveListener(ICoreEventListener* pListener)
 
 void XCoreEventDispatcher::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-	if (coreVars_.core_event_debug) {
+	if (coreVars_.coreEventDebug_) {
 		X_LOG0("CoreEvent", "---- CoreEvent: %s ----", CoreEvent::ToString(event));
 	}
 

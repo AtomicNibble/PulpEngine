@@ -6,16 +6,17 @@
 #include <ICore.h>
 #include <Containers\Array.h>
 
-struct XCoreVars;
 
 X_NAMESPACE_BEGIN(core)
+
+class CoreVars;
 
 class XCoreEventDispatcher : public ICoreEventDispatcher
 {
 	typedef core::Array<ICoreEventListener*> ListnersArr;
 
 public:
-	XCoreEventDispatcher(XCoreVars& coreVars, core::MemoryArenaBase* arena);
+	XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArenaBase* arena);
 	~XCoreEventDispatcher() X_OVERRIDE;
 
 	virtual bool RegisterListener(ICoreEventListener* pListener) X_OVERRIDE;
@@ -24,7 +25,7 @@ public:
 	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
 
 private:
-	XCoreVars& coreVars_;
+	CoreVars& coreVars_;
 	ListnersArr listners_;
 };
 

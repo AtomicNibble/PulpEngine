@@ -6,6 +6,8 @@
 #include <ICore.h>
 #include <IConsole.h>
 
+#include "Vars\CoreVars.h"
+
 #include "Timer.h"
 #include "Util\Cpu.h"
 #include "XProfile.h"
@@ -44,17 +46,6 @@ class Console;
 )
 
 
-struct XCoreVars
-{
-	int core_fast_shutdown;
-	int core_event_debug;
-
-	int win_x_pos;
-	int win_y_pos;
-	int win_width;
-	int win_height;
-
-};
 
 typedef core::Logger<
 core::LoggerNoFilterPolicy,
@@ -180,7 +171,9 @@ private:
 	bool InitNet(const SCoreInitParams &startupParams);
 	
 	
-	void CreateSystemVars(void);
+	void registerVars(void);
+	void registerCmds(void);
+
 	void AddIgnoredHotReloadExtensions(void);
 
 	void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
@@ -218,7 +211,7 @@ private:
 	void WindowCustomFrameVarChange(core::ICVar* pVar);
 
 private:
-	XCoreVars						vars_;
+	core::CoreVars					vars_;
 	core::xWindow*				    pWindow_;
 	core::Console*					pConsole_;
 
@@ -257,15 +250,6 @@ private:
 
 	// args
 	CmdArgs args_;
-
-private:
-	core::ICVar* var_win_pos_x;
-	core::ICVar* var_win_pos_y;
-	core::ICVar* var_win_width;
-	core::ICVar* var_win_height;
-	core::ICVar* var_win_custom_Frame;
-
-	core::ICVar* var_profile;
 };
 
 X_NAMESPACE_BEGIN(core)

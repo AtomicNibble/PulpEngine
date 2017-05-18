@@ -453,6 +453,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Vars\CoreVars.h" />
     <ClInclude Include="Vars\ProfilerVars.h" />
     <ClInclude Include="win32\OsFile.h" />
     <ClInclude Include="win32\OsFileAsync.h" />
@@ -495,6 +496,7 @@
     </ClCompile>
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="ConsoleVariable.cpp" />
+    <ClCompile Include="Vars\CoreVars.cpp" />
     <ClCompile Include="Vars\ProfilerVars.cpp" />
     <ClCompile Include="win32\OsFile.cpp" />
     <ClCompile Include="win32\OsFileAsync.cpp" />

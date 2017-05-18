@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Console.h"
 #include "Core.h"
+
 #include "Log.h"
 
 #include <String\CmdArgs.h>
@@ -388,7 +389,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->registerCmds();
 
 		// register system vars to the console.
-		CreateSystemVars();
+		registerVars();
+		registerCmds();
 	}
 	else
 	{
@@ -529,8 +531,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		;
 
 		if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW),
-			vars_.win_x_pos, vars_.win_y_pos,
-			vars_.win_width, vars_.win_height, core::xWindow::Mode::APPLICATION))
+			vars_.winXPos_, vars_.winYPos_,
+			vars_.winWidth_, vars_.winHeight_, core::xWindow::Mode::APPLICATION))
 		{
 			return false;
 		}
@@ -1016,93 +1018,26 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
-void XCore::WindowPosVarChange(core::ICVar* pVar)
+
+
+void XCore::registerVars(void)
 {
-	X_UNUSED(pVar);
+	vars_.registerVars();
 
-	int x_pos = vars_.win_x_pos;
-	int y_pos = vars_.win_y_pos;
-
-	core::xWindow* pWin = GetGameWindow();
-	if (pWin) {
-		pWin->MoveTo(x_pos, y_pos);
-	}
-}
-
-void XCore::WindowSizeVarChange(core::ICVar* pVar)
-{
-	X_UNUSED(pVar);
 
 }
 
-void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
-{
-	bool enabled = (pVar->GetInteger() == 1);
-
-	if (pWindow_) {
-		pWindow_->CustomFrame(enabled);
-	}
-}
-
-
-
-void XCore::CreateSystemVars(void)
+void XCore::registerCmds(void)
 {
 	using namespace core;
-
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-	core::xWindow::Rect desktop = core::xWindow::GetDesktopRect();
-
-	ADD_CVAR_REF("core_fast_shutdown", vars_.core_fast_shutdown, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
-		"Skips most cleanup logic for faster shutdown, when off everything is correctly shutdown and released before exit. 0=off 1=on");
-
-	ADD_CVAR_REF("core_event_debug", vars_.core_event_debug, 0, 0, 1, VarFlag::SYSTEM,
-		"Debug messages for core events. 0=off 1=on");
-
-	var_win_pos_x = ADD_CVAR_REF("win_x_pos", vars_.win_x_pos, 10, 0, desktop.getWidth(),
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position x");
-	var_win_pos_y = ADD_CVAR_REF("win_y_pos", vars_.win_y_pos, 10, 0, desktop.getHeight(),
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position y");
-	var_win_width = ADD_CVAR_REF("win_width", vars_.win_width, 800, 800, 1,
-		VarFlag::SYSTEM , "Game window width");
-	var_win_height = ADD_CVAR_REF("win_height", vars_.win_height, 600, 600, 1,
-		VarFlag::SYSTEM , "Game window height");
-
-	core::ConsoleVarFunc del;
-	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
-	var_win_pos_x->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
-	var_win_pos_y->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
-	var_win_width->SetOnChangeCallback(del);
-
-	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
-	var_win_height->SetOnChangeCallback(del);
-
-	var_win_custom_Frame = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
-		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
-
-	del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
-	var_win_custom_Frame->SetOnChangeCallback(del);
-
-
-	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");
-
-
-	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
-	ADD_CVAR_STRING("build_ref", X_STRINGIZE(X_ENGINE_BUILD_REF), VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
 
 	ADD_COMMAND_MEMBER("filesysHotReloadEtxList", this, XCore, &XCore::Command_HotReloadListExts, VarFlag::SYSTEM,
 		"Display all registered file extensions in the hotreload system");
 	
 	ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Command_ListProgramArgs, VarFlag::SYSTEM,
 		"Lists the processed command line arguments parsed to the program");
-
 }
+
 
 void XCore::AddIgnoredHotReloadExtensions(void)
 {
