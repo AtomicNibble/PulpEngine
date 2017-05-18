@@ -34,7 +34,7 @@ private:
 
 private:
 	IFileSys::fileModeFlags mode_;
-	HANDLE file_;
+	HANDLE hFile_;
 
 #if X_ENABLE_FILE_STATS
 	static XFileStats s_stats;

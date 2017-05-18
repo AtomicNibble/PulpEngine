@@ -30,7 +30,7 @@ OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
 
 
 	// lets open you up.
-	file_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
+	hFile_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
@@ -67,13 +67,13 @@ OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
 OsFileAsync::~OsFileAsync(void)
 {
 	if (valid()) {
-		CloseHandle(file_);
+		CloseHandle(hFile_);
 	}
 }
 
 XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
-	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
+	XOsFileAsyncOperation op(gEnv->pArena, hFile_, position);
 
 	LPOVERLAPPED pOverlapped = op.getOverlapped();
 	LARGE_INTEGER large;
@@ -90,7 +90,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 		return op;
 	}
 
-	if (::ReadFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
+	if (::ReadFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesRead += length;
@@ -109,7 +109,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
 XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
 {
-	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
+	XOsFileAsyncOperation op(gEnv->pArena, hFile_, position);
 
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
@@ -119,7 +119,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 		return op;
 	}
 
-	if (::WriteFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
+	if (::WriteFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += length;
@@ -146,7 +146,7 @@ uint64_t OsFileAsync::tell(void) const
 	s_stats.NumTells++;
 #endif // !X_ENABLE_FILE_STATS
 
-	if (!SetFilePointerEx(file_, Move, &current, FILE_CURRENT))
+	if (!SetFilePointerEx(hFile_, Move, &current, FILE_CURRENT))
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Failed to tell() file. Error: %s", lastError::ToString(dsc));
@@ -163,7 +163,7 @@ uint64_t OsFileAsync::remainingBytes(void) const
 	s_stats.NumByteLeftChecks++;
 #endif // !X_ENABLE_FILE_STATS
 
-	if (!GetFileInformationByHandle(file_, &info))
+	if (!GetFileInformationByHandle(hFile_, &info))
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Can't Get file information. Error: %s", lastError::ToString(dsc));
@@ -181,7 +181,7 @@ void OsFileAsync::setSize(int64_t numBytes)
 
 	seek(numBytes, SeekMode::SET);
 
-	if (!::SetEndOfFile(file_))
+	if (!::SetEndOfFile(hFile_))
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Failed to setSize: %Iu. Error: %s", numBytes, lastError::ToString(dsc));
@@ -192,7 +192,7 @@ void OsFileAsync::setSize(int64_t numBytes)
 
 bool OsFileAsync::valid(void) const
 {
-	return (file_ != INVALID_HANDLE_VALUE);
+	return (hFile_ != INVALID_HANDLE_VALUE);
 }
 
 #if X_ENABLE_FILE_STATS
@@ -218,7 +218,7 @@ void OsFileAsync::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 	LARGE_INTEGER move;
 	move.QuadPart = position;
 
-	if (!SetFilePointerEx(file_, move, 0, mode::GetSeekValue(origin)))
+	if (!SetFilePointerEx(hFile_, move, 0, mode::GetSeekValue(origin)))
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Failed to seek to position %d, mode %d. Error: %s", position, origin, lastError::ToString(dsc));
