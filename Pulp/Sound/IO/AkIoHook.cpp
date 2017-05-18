@@ -246,8 +246,10 @@ AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics,
 	write.pFile = pFile;
 	write.pUserData = &transferInfo;
 
-	pFileSys_->AddIoRequestToQue(write);
+	auto reqHandle = pFileSys_->AddIoRequestToQue(write);
 
+	static_assert(sizeof(reqHandle) <= sizeof(void*), "Can't fit handle in user data");
+	transferInfo.pUserData = reinterpret_cast<void*>(safe_static_cast<uintptr_t>(reqHandle));
 	return AK_Success;
 }
 
@@ -255,6 +257,7 @@ AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics,
 void IOhook::Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& transferInfo,
 	bool& bCancelAllTransfersForThisFile)
 {
+
 	X_UNUSED(transferInfo);
 	X_ASSERT_NOT_NULL(fileDesc.hFile);
 //	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
