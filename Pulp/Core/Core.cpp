@@ -139,8 +139,6 @@ XCore::XCore() :
 		env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
 	}
 
-	env_.pArena->addChildArena(env_.pStrArena);
-	// vars.
 
 	static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
 	static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
