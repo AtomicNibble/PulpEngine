@@ -1400,7 +1400,7 @@ void XPhysics::setScratchBlockSize(size_t size)
 		X_DELETE_ARRAY(pScratchBlock_, g_PhysicsArena);
 	}
 
-	pScratchBlock_ = X_NEW_ARRAY_ALIGNED(uint8_t, size, g_PhysicsArena, "ScratchBlock", 16);
+	pScratchBlock_ = X_NEW_ARRAY_ALIGNED(uint8_t, size, g_PhysicsArena, "ScratchBlock", 64);
 	scratchBlockSize_ = size;
 }
 
