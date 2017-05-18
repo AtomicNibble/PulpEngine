@@ -29,8 +29,6 @@ public:
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 	core::ICVar* pVirtualDirs[core::FS_MAX_VIRTUAL_DIR];
-private:
-	core::StackString<64> virDirVarsNames[core::FS_MAX_VIRTUAL_DIR];
 };
 
 X_NAMESPACE_END

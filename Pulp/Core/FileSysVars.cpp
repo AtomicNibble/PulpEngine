@@ -41,13 +41,16 @@ void XFileSysVars::registerVars(void)
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 	// create vars for the virtual directories which we then update with the paths once set.
-	for (size_t i = 0; i < FS_MAX_VIRTUAL_DIR; i++)
+	size_t i;
+	core::StackString<64> name;
+	for (i = 0; i < FS_MAX_VIRTUAL_DIR; i++)
 	{
-		virDirVarsNames[i].set("filesys_mod_dir_");
-		virDirVarsNames[i].appendFmt("%" PRIuS, i);
-		pVirtualDirs[i] = ADD_CVAR_STRING(virDirVarsNames[i].c_str(), "",
+		name.set("filesys_mod_dir_");
+		name.appendFmt("%" PRIuS, i);
+		pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
 			core::VarFlag::SYSTEM |
-			core::VarFlag::READONLY,
+			core::VarFlag::READONLY |
+			core::VarFlag::CPY_NAME,
 			"Virtual mod directory");
 	}
 }
