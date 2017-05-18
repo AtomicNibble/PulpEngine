@@ -33,12 +33,16 @@ void Signal::clear(void)
 	ResetEvent(hHandle_);
 }
 
-bool Signal::wait(uint32_t timeout)
+bool Signal::wait(uint32_t timeout, bool alertable)
 {
-	DWORD result = WaitForSingleObject(hHandle_, timeout == Signal::WAIT_INFINITE ? INFINITE : timeout);
+	DWORD result = WaitForSingleObjectEx(hHandle_, timeout == Signal::WAIT_INFINITE ? INFINITE : timeout, alertable);
 
 	if (result != WAIT_OBJECT_0)
 	{
+		if (alertable && result == WAIT_IO_COMPLETION) {
+			return true;
+		}
+
 		core::lastError::Description Dsc;
 		if (timeout == Signal::WAIT_INFINITE) {
 			X_ERROR("Signal", "WaitForObject infinite error: %s", core::lastError::ToString(Dsc));
