@@ -17,8 +17,6 @@ X_LINK_LIB("engine_ConverterLib")
 X_LINK_LIB("engine_assetDB")
 
 
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -46,9 +44,6 @@ typedef core::MemoryArena<
 	core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > ConverterArena;
-
-core::MemoryArenaBase* g_arena = nullptr;
-
 
 
 namespace
@@ -171,9 +166,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR    lpCmdLine,
 	_In_ int       nCmdShow)
 {
-	g_hInstance = hInstance;
-
-
 	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Converter");
 	Console.RedirectSTD();
 	Console.SetSize(60, 40, 2000);
@@ -182,18 +174,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	core::MallocFreeAllocator allocator;
 	ConverterArena arena(&allocator, "ConverterArena");
-	g_arena = &arena;
 
 	bool res = false;
 
 	{
 		EngineApp app; // needs to clear up before arena.
 
-		if (app.Init(lpCmdLine, Console))
+		if (app.Init(hInstance, &arena, lpCmdLine, Console))
 		{
 			assetDb::AssetDB db;
 
-			converter::Converter con(db, g_arena);
+			converter::Converter con(db, &arena);
 			converter::AssetType::Enum assType;
 			ConvertMode::Enum mode;
 			core::string assName;

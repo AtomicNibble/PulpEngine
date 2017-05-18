@@ -9,7 +9,6 @@
 
 
 
-extern HINSTANCE g_hInstance;
 
 EngineApp::EngineApp() :
 	pICore_(nullptr),
@@ -30,10 +29,11 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
+	const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
-	params.hInstance = g_hInstance;
+	params.hInstance = hInstance;
 	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
 	params.bSkipSound = true;
@@ -44,7 +44,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.bEnableBasicConsole = false;
 	params.bEnableJobSystem = true; // some converters make use of the job system. 
 	params.pConsoleWnd = &Console;
-	params.pCoreArena = g_arena;
+	params.pCoreArena = arena;
 	params.bFileSysWorkingDir = true;
 
 
