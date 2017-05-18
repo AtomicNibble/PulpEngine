@@ -85,13 +85,11 @@ class XEngineModule_Render : public IEngineModule
 		// call these before render construction.
 		if (!pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
 			X_ERROR("Render", "Failed to init imgLib");
-			X_DELETE(pRender, g_rendererArena);
 			return false;
 		}
 
 		if (!pCore->IntializeLoadedConverterModule("Engine_ShaderLib", "Engine_ShaderLib")) {
 			X_ERROR("Render", "Failed to init shaderLib");
-			X_DELETE(pRender, g_rendererArena);
 			return false;
 		}
 	
