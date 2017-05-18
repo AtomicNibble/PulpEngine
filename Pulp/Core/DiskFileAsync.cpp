@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(core)
 
 
 XDiskFileAsync::XDiskFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
-file_(path,mode)
+	file_(path,mode)
 {
 
 }
