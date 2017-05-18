@@ -672,6 +672,8 @@ namespace V2
 		pEntry->id.jobIdx = safe_static_cast<uint16_t>(jobIdx);
 #if X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 		pEntry->subsystem = pJob->subSystem;
+#else
+		pEntry->subsystem = core::profiler::SubSys::UNCLASSIFIED;
 #endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
 		COMPILER_BARRIER_W;
