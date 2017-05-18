@@ -18,8 +18,8 @@ XFileStats OsFileAsync::s_stats;
 
 
 OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
-file_(INVALID_HANDLE_VALUE),
-mode_(mode)
+	hFile_(INVALID_HANDLE_VALUE),
+	mode_(mode)
 {
 	X_ASSERT_NOT_NULL(path);
 
@@ -66,8 +66,9 @@ mode_(mode)
 
 OsFileAsync::~OsFileAsync(void)
 {
-	if (valid())
+	if (valid()) {
 		CloseHandle(file_);
+	}
 }
 
 XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
