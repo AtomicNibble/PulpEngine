@@ -223,6 +223,7 @@ namespace V2
 
 		// main and IO job list space.
 		if ((numThreads_ + 2) >= HW_THREAD_MAX) {
+			X_WARNING("Scheduler", "Thread count of %" PRIu32 " too large capping to %" PRIu32, numThreads_, HW_THREAD_MAX);
 			numThreads_ = HW_THREAD_MAX - 2;
 		}
 
