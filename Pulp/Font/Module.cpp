@@ -47,7 +47,7 @@ class XEngineModule_Font : public IEngineModule
 		LinkModule(pCore, "XFont");
 
 		// kinky shit.
-		g_fontArena = X_NEW(FontArena, gEnv->pArena, "InputArena")(&g_fontAlloc, "InputArena");
+		g_fontArena = X_NEW(FontArena, gEnv->pArena, "FontArena")(&g_fontAlloc, "FontArena");
 
 
 		font::IFontSys* pFontSys = nullptr;
