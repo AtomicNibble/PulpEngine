@@ -51,7 +51,7 @@ BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice
 	),
 	arena_(&pool_, "VidMemBuffer")
 {
-	X_UNUSED(arena);
+	arena->addChildArena(&arena_);
 }
 
 BufferManager::~BufferManager()

@@ -274,6 +274,10 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 	pool2Arena_(&pool2Allocator_, "PoolArena"),
 	blockArena_(&blockAlloc_, "blockArena")
 {
+	arena->addChildArena(&poolArena_);
+	arena->addChildArena(&pool2Arena_);
+	arena->addChildArena(&blockArena_);
+
 	remoteSystems_.getAllocator().setBaseAlignment(core::Max(16_sz, X_ALIGN_OF(RemoteSystem)));
 	remoteSystems_.setGranularity(1);
 

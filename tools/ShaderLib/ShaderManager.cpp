@@ -60,6 +60,7 @@ namespace shader
 		),
 		permArena_(&permAllocator_, "PermPool")
 	{
+		arena->addChildArena(&permArena_);
 	}
 
 	XShaderManager::~XShaderManager()

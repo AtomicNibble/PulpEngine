@@ -53,6 +53,7 @@ VariableStateManager::VariableStateManager() :
 	statePool_(&statePoolAllocator_, "StatePool"),
 	pEmtpyState_(nullptr)
 {
+	g_3dEngineArena->addChildArena(&statePool_);
 
 	pEmtpyState_ = createVariableState_Interal(0,0,0);
 

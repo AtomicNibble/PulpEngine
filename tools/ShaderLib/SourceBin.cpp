@@ -109,6 +109,8 @@ namespace shader
 		),
 		sourcePoolArena_(&sourcePoolAllocator_, "ShaderSourcePool")
 	{
+		arena->addChildArena(&sourcePoolArena_);
+
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 
