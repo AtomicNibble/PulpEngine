@@ -145,6 +145,8 @@ xFileSys::xFileSys() :
 	X_ASSERT_NOT_NULL(gEnv->pArena);
 
 	gEnv->pArena->addChildArena(&filePoolArena_);
+	gEnv->pArena->addChildArena(&asyncOpPoolArena_);
+	gEnv->pArena->addChildArena(&memFileArena_);
 }
 
 xFileSys::~xFileSys()
