@@ -200,7 +200,7 @@ namespace V2
 
 
 
-	bool JobSystem::StartUp(void)
+	bool JobSystem::StartUp(uint32_t threadCount)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
@@ -208,11 +208,18 @@ namespace V2
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_PROFILE_NO_HISTORY_BEGIN("JobSysInit", core::profiler::SubSys::CORE);
 
-		ICore* pCore = gEnv->pCore;
-		CpuInfo* pCpu = pCore->GetCPUInfo();
+		if (threadCount == AUTO_THREAD_COUNT)
+		{
+			ICore* pCore = gEnv->pCore;
+			CpuInfo* pCpu = pCore->GetCPUInfo();
 
-		uint32_t numCores = pCpu->GetCoreCount();
-		numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
+			uint32_t numCores = pCpu->GetCoreCount();
+			numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
+		}
+		else
+		{
+			numThreads_ = threadCount;
+		}
 
 		// main and IO job list space.
 		if ((numThreads_ + 2) >= HW_THREAD_MAX) {

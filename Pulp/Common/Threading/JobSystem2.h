@@ -434,6 +434,7 @@ class JobSystem
 	struct ThreadJobAllocator;
 
 public:
+	static const uint32_t AUTO_THREAD_COUNT = 0;
 	static const uint32_t HW_THREAD_MAX = core::Min(1 << Job::THREAD_IDX_BITS, 12); // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 	static const size_t MAX_JOBS = 1 << Job::JOB_IDX_BITS;
@@ -454,7 +455,7 @@ public:
 	JobSystem();
 	~JobSystem();
 
-	bool StartUp(void);
+	bool StartUp(uint32_t threadCount = AUTO_THREAD_COUNT);
 	void ShutDown(void);
 	void OnFrameBegin(bool isProfilerPaused);
 
