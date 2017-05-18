@@ -1559,7 +1559,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				continue;
 			}
 			
-			const uint64_t fileSize = pFile->remainingBytes();
+			const uint64_t fileSize = pFile->fileSize();
 
 			// we don't support open and read for files over >2gb
 			// if you are trying todo that you are retarded.

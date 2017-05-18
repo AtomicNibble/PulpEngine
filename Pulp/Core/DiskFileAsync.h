@@ -32,7 +32,7 @@ public:
 	// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
 	X_INLINE size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_FINAL;
 	
-	uint64_t remainingBytes(void) const X_FINAL;
+	uint64_t fileSize(void) const X_FINAL;
 
 	void setSize(int64_t numBytes) X_FINAL;
 

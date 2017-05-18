@@ -127,7 +127,7 @@ AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
 		}
 
 		outFileDesc.hFile = pFile;
-		outFileDesc.iFileSize = pFile->remainingBytes();
+		outFileDesc.iFileSize = pFile->fileSize();
 		outFileDesc.uSector = 0;
 		outFileDesc.deviceID = deviceID_;
 		outFileDesc.pCustomParam = (eOpenMode == AK_OpenModeRead) ? nullptr : (void*)1;

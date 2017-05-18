@@ -238,7 +238,7 @@ uint64_t OsFileAsync::tell(void) const
 	return current.QuadPart;
 }
 
-uint64_t OsFileAsync::remainingBytes(void) const
+uint64_t OsFileAsync::fileSize(void) const
 {
 	_BY_HANDLE_FILE_INFORMATION info;
 

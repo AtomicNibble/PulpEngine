@@ -38,9 +38,9 @@ XFileAsyncOperationCompiltion XDiskFileAsync::writeAsync(void* pBuffer, size_t l
 	return file_.writeAsync(pBuffer, length, position, callBack);
 }
 
-uint64_t XDiskFileAsync::remainingBytes(void) const
+uint64_t XDiskFileAsync::fileSize(void) const
 {
-	return file_.remainingBytes();
+	return file_.fileSize();
 }
 
 void XDiskFileAsync::setSize(int64_t numBytes)
