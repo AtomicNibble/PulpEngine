@@ -5,8 +5,8 @@ X_NAMESPACE_BEGIN(core)
 
 
 
-XDiskFileAsync::XDiskFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
-	file_(path,mode)
+XDiskFileAsync::XDiskFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* asyncOpArena) :
+	file_(path, mode, asyncOpArena)
 {
 
 }
@@ -19,22 +19,23 @@ XDiskFileAsync::~XDiskFileAsync()
 
 XFileAsyncOperation XDiskFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
-	return XFileAsyncOperation(file_.readAsync(pBuffer, length, position), pBuffer);
+	return file_.readAsync(pBuffer, length, position);
 }
 
 XFileAsyncOperation XDiskFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
 {
-	return XFileAsyncOperation(file_.writeAsync(pBuffer, length, position), pBuffer);
+	return file_.writeAsync(pBuffer, length, position);
 }
 
-// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
-size_t XDiskFileAsync::WaitUntilFinished(const XFileAsyncOperation& operation)
+
+XFileAsyncOperationCompiltion XDiskFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
 {
-	size_t numBytes = operation.waitUntilFinished();
+	return file_.readAsync(pBuffer, length, position, callBack);
+}
 
-	// could do some genral shit now we know the operation is complete :D
-
-	return numBytes;
+XFileAsyncOperationCompiltion XDiskFileAsync::writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
+{
+	return file_.writeAsync(pBuffer, length, position, callBack);
 }
 
 uint64_t XDiskFileAsync::remainingBytes(void) const

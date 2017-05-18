@@ -26,54 +26,21 @@ typedef Flags<fileMode> fileModeFlags;
 
 X_DECLARE_FLAG_OPERATORS(fileModeFlags);
 
-
-struct XFileAsync;
-
-struct XFileAsyncOperation
-{
-	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, void* pBuffer) :
-		operation_(operation),
-		pReadBuffer_(pBuffer)
-	{
-
-	}
-	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, const void* pBuffer) :
-		operation_(operation),
-		pWriteBuffer_(pBuffer)
-	{
-
-	}
-
-	inline bool hasFinished(uint32_t* pNumBytes = nullptr) const {
-		return operation_.hasFinished(pNumBytes);
-	}
-	inline uint32_t waitUntilFinished(void) const {
-		return operation_.waitUntilFinished();
-	}
-	inline void cancel(void) {
-		operation_.cancel();
-	}
-
-private:
-	core::XOsFileAsyncOperation operation_;
-
-	// an operation can either be a read operation, or a write operation, but not both
-	union
-	{
-		void* pReadBuffer_;
-		const void* pWriteBuffer_;
-	};
-};
-
+typedef core::XOsFileAsyncOperation XFileAsyncOperation;
+typedef core::XOsFileAsyncOperationCompiltion XFileAsyncOperationCompiltion;
 
 struct XFileAsync
 {
+	typedef XOsFileAsyncOperation::ComplitionRotinue ComplitionRotinue;
+
 	virtual ~XFileAsync() {};
 
 	virtual XFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position) X_ABSTRACT;
-
-	/// Asynchronously writes from a buffer into the file.
 	virtual XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position) X_ABSTRACT;
+
+	virtual XFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_ABSTRACT;
+	virtual XFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_ABSTRACT;
+
 
 	/// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
 	virtual size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;

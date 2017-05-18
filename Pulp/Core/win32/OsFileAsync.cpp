@@ -12,12 +12,31 @@
 X_NAMESPACE_BEGIN(core)
 
 
+namespace
+{
+
+	VOID CALLBACK s_CompiletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
+	{
+		X_UNUSED(dwErrorCode);
+		X_UNUSED(dwNumberOfBytesTransfered);
+
+		// okay so we are sexy and kinky.
+		// we need to run the callback.
+		XOsFileAsyncOperation::AsyncOp* pOverlap = static_cast<XOsFileAsyncOperation::AsyncOp*>(lpOverlap);
+		X_ASSERT(pOverlap->callback, "Callback not valid")();
+
+		pOverlap->callback.Invoke(pOverlap, static_cast<uint32_t>(dwNumberOfBytesTransfered));
+	}
+
+} // namespace
+
 #if X_ENABLE_FILE_STATS
 XFileStats OsFileAsync::s_stats;
 #endif // !X_ENABLE_FILE_STATS
 
 
-OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
+OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
+	overlappedArena_(overlappedArena),
 	hFile_(INVALID_HANDLE_VALUE),
 	mode_(mode)
 {
@@ -59,9 +78,6 @@ OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode) :
 		s_stats.NumFilesOpened++;
 #endif // !X_ENABLE_FILE_STATS
 	}
-
-
-
 }
 
 OsFileAsync::~OsFileAsync(void)
@@ -73,7 +89,7 @@ OsFileAsync::~OsFileAsync(void)
 
 XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
-	XOsFileAsyncOperation op(gEnv->pArena, hFile_, position);
+	XOsFileAsyncOperation op(overlappedArena_, hFile_, position);
 
 	LPOVERLAPPED pOverlapped = op.getOverlapped();
 	LARGE_INTEGER large;
@@ -109,7 +125,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
 XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
 {
-	XOsFileAsyncOperation op(gEnv->pArena, hFile_, position);
+	XOsFileAsyncOperation op(overlappedArena_, hFile_, position);
 
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
@@ -120,6 +136,73 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 	}
 
 	if (::WriteFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
+	{
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesWrite += length;
+#endif // !X_ENABLE_FILE_STATS
+	}
+	else if (lastError::Get() != ERROR_IO_PENDING)
+	{
+		lastError::Description dsc;
+		X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
+			length, position, lastError::ToString(dsc));
+
+	}
+
+	return op;
+}
+
+
+XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position,
+	XOsFileAsyncOperation::ComplitionRotinue callBack)
+{
+	XOsFileAsyncOperationCompiltion op(overlappedArena_, hFile_, position, callBack);
+	auto* pOverlapped = op.getOverlapped();
+
+	LARGE_INTEGER large;
+	large.QuadPart = position;
+
+	pOverlapped->Offset = large.LowPart;
+	pOverlapped->OffsetHigh = large.HighPart;
+
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return op;
+	}
+
+	if (::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutine))
+	{
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesRead += length;
+#endif // !X_ENABLE_FILE_STATS
+	}
+	else if (lastError::Get() != ERROR_IO_PENDING)
+	{
+		lastError::Description dsc;
+		X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
+			length, position, lastError::ToString(dsc));
+
+	}
+
+	return op;
+}
+
+XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack)
+{
+	XOsFileAsyncOperationCompiltion op(overlappedArena_, hFile_, position, callBack);
+
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return op;
+	}
+
+	if (::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutine))
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += length;

@@ -13,11 +13,14 @@ X_NAMESPACE_BEGIN(core)
 class OsFileAsync
 {
 public:
-	OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode);
+	OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena);
 	~OsFileAsync(void);
 
 	XOsFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position);
 	XOsFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position);
+
+	XOsFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
+	XOsFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
 
 
 	uint64_t tell(void) const;
@@ -29,10 +32,12 @@ public:
 #if X_ENABLE_FILE_STATS
 	static XFileStats& fileStats(void);
 #endif // !X_ENABLE_FILE_STATS
+
 private:
 	void seek(int64_t position, IFileSys::SeekMode::Enum origin);
 
 private:
+	core::MemoryArenaBase* overlappedArena_;
 	IFileSys::fileModeFlags mode_;
 	HANDLE hFile_;
 

@@ -8,28 +8,63 @@
 
 X_NAMESPACE_BEGIN(core)
 
-class XOsFileAsyncOperation
+
+class XOsFileAsyncOperationBase
 {
-	typedef ReferenceCountedInstance<OVERLAPPED> ReferenceCountedOverlapped;
+public:
+	struct MyOVERLAPPED;
+	
+	typedef core::Delegate<void(MyOVERLAPPED*, uint32_t)> ComplitionRotinue;
+
+	struct MyOVERLAPPED : public OVERLAPPED, public ReferenceCounted<>
+	{
+		// we need callback to call.
+		ComplitionRotinue callback;
+	};
 
 public:
-	X_INLINE XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
+	typedef MyOVERLAPPED AsyncOp;
+
+public:
+	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
+	XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
+	XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth) = default;
+
+	XOsFileAsyncOperationBase& operator=(XOsFileAsyncOperationBase&& oth) = default;
+	XOsFileAsyncOperationBase& operator=(const XOsFileAsyncOperationBase& oth) = default;
+
+	X_INLINE bool operator==(const XOsFileAsyncOperationBase& oth) const;
+	X_INLINE bool ownsAsyncOp(const AsyncOp* pOp) const;
+
+	X_INLINE void cancel(void);
 
 	X_INLINE bool hasFinished(uint32_t* pNumBytes = nullptr) const;
+
+	X_INLINE AsyncOp* getOverlapped(void);
+	X_INLINE const AsyncOp* getOverlapped(void) const;
+
+protected:
+	HANDLE hFile_;
+	mutable ReferenceCountedOwner<AsyncOp> overlapped_;
+};
+
+class XOsFileAsyncOperationCompiltion : public XOsFileAsyncOperationBase
+{
+public:
+	X_INLINE XOsFileAsyncOperationCompiltion(MemoryArenaBase* arena, HANDLE hFile, uint64_t position, ComplitionRotinue callBack);
+
+};
+
+class XOsFileAsyncOperation : public XOsFileAsyncOperationBase
+{
+public:
+	using XOsFileAsyncOperationBase::XOsFileAsyncOperationBase;
 
 	// Waits until the asynchronous operation has finished
 	// returns the number of transferred bytes.
 	X_INLINE uint32_t waitUntilFinished(void) const;
-
-	X_INLINE void cancel(void);
-
-	X_INLINE OVERLAPPED* getOverlapped(void);
-	X_INLINE const OVERLAPPED* getOverlapped(void) const;
-
-private:
-	HANDLE hFile_;
-	mutable ReferenceCountedOwner<ReferenceCountedOverlapped> overlapped_;
 };
+
 
 
 X_NAMESPACE_END

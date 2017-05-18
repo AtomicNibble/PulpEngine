@@ -23,12 +23,17 @@ namespace
 {
 	// might need more since memory files will be from pool.
 	const size_t MAX_FILE_HANDLES = 1024;
+	const size_t MAX_ASYNC_OP = 1024;
 
 	const size_t FILE_ALLOCATION_SIZE = core::Max(sizeof(XDiskFile),
 		core::Max(sizeof(XDiskFileAsync), sizeof(XFileMem)));
 
 	const size_t FILE_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(XDiskFile),
 		core::Max(X_ALIGN_OF(XDiskFileAsync), X_ALIGN_OF(XFileMem)));
+
+
+	const size_t ASYNC_OP_ALLOCATION_SIZE = sizeof(XOsFileAsyncOperation::AsyncOp);
+	const size_t ASYNC_OP_ALLOCATION_ALIGN = X_ALIGN_OF(XOsFileAsyncOperation::AsyncOp);
 
 
 	constexpr const size_t ioReqSize[IoRequest::ENUM_COUNT] = {
@@ -45,69 +50,66 @@ namespace
 	static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::WRITE] == sizeof(IoRequestWrite), "Enum mismtach?");
 
-
-	struct PendingOp
-	{
-		PendingOp(const IoRequestRead& req, const XFileAsyncOperation& op) :
-			readReq(req), op(op) {
-		}
-		PendingOp(const IoRequestWrite& req, const XFileAsyncOperation& op) :
-			writeReq(req), op(op) {
-		}
-		PendingOp(const IoRequestOpenRead& req, const XFileAsyncOperation& op) :
-			openReadReq(req), op(op) {
-			X_ASSERT_NOT_NULL(req.arena);
-			X_ASSERT_NOT_NULL(req.pFile);
-			X_ASSERT_NOT_NULL(req.pBuf);
-		}
-
-		X_INLINE IoRequest::Enum getType(void) const {
-			return readReq.getType();
-		}
-
-		PendingOp& operator=(PendingOp&& oth)
-		{
-			op = std::move(oth.op);
-
-			switch (getType())
-			{
-				case IoRequest::READ:
-					readReq = std::move(oth.readReq);
-					break;
-				case IoRequest::WRITE:
-					writeReq = std::move(oth.writeReq);
-					break;
-				case IoRequest::OPEN_READ_ALL:
-					openReadReq = std::move(oth.openReadReq);
-					break;
-				default:
-					X_ASSERT_UNREACHABLE();
-					break;
-			}
-
-			return *this;
-		}
-
-		union
-		{
-			IoRequestRead readReq;
-			IoRequestWrite writeReq;
-			IoRequestOpenRead openReadReq; // this is a big fucker
-		};
-		XFileAsyncOperation op;
-	};
-
-
-	// X_ENSURE_SIZE(PendingOp, 104);
-	// X_ENSURE_SIZE(PendingOp, 376); // with IoRequestOpenRead
-
 } // namespace
+
+
+
+xFileSys::PendingOp::PendingOp(const IoRequestRead& req, const XFileAsyncOperationCompiltion& op) :
+	readReq(req),
+	op(op)
+{
+}
+
+xFileSys::PendingOp::PendingOp(const IoRequestWrite& req, const XFileAsyncOperationCompiltion& op) :
+	writeReq(req),
+	op(op)
+{
+}
+
+xFileSys::PendingOp::PendingOp(const IoRequestOpenRead& req, const XFileAsyncOperationCompiltion& op) :
+	openReadReq(req),
+	op(op)
+{
+	X_ASSERT_NOT_NULL(req.arena);
+	X_ASSERT_NOT_NULL(req.pFile);
+	X_ASSERT_NOT_NULL(req.pBuf);
+}
+
+X_INLINE IoRequest::Enum xFileSys::PendingOp::getType(void) const
+{
+	return readReq.getType();
+}
+
+xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
+{
+	op = std::move(oth.op);
+
+	switch (getType())
+	{
+		case IoRequest::READ:
+			readReq = std::move(oth.readReq);
+			break;
+		case IoRequest::WRITE:
+			writeReq = std::move(oth.writeReq);
+			break;
+		case IoRequest::OPEN_READ_ALL:
+			openReadReq = std::move(oth.openReadReq);
+			break;
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+	}
+
+	return *this;
+}
+
+// --------------------------------------------------------------
 
 
 xFileSys::xFileSys() :
 	searchPaths_(nullptr),
 	gameDir_(nullptr),
-
+	// ..
 	filePoolHeap_(
 		bitUtil::RoundUpToMultiple<size_t>(
 			FilePoolArena::getMemoryRequirement(FILE_ALLOCATION_SIZE) * MAX_FILE_HANDLES,
@@ -120,6 +122,20 @@ xFileSys::xFileSys() :
 		FilePoolArena::getMemoryOffsetRequirement()
 	),
 	filePoolArena_(&filePoolAllocator_, "FilePool"),
+	// ..
+	asyncOpPoolHeap_(
+		bitUtil::RoundUpToMultiple<size_t>(
+			AsyncOpPoolArena::getMemoryRequirement(ASYNC_OP_ALLOCATION_SIZE) * MAX_ASYNC_OP,
+			VirtualMem::GetPageSize()
+		)
+	),
+	asyncOpPoolAllocator_(asyncOpPoolHeap_.start(), asyncOpPoolHeap_.end(),
+		AsyncOpPoolArena::getMemoryRequirement(ASYNC_OP_ALLOCATION_SIZE),
+		AsyncOpPoolArena::getMemoryAlignmentRequirement(ASYNC_OP_ALLOCATION_ALIGN),
+		AsyncOpPoolArena::getMemoryOffsetRequirement()
+	),
+	asyncOpPoolArena_(&asyncOpPoolAllocator_, "asyncOpPool"),
+	// ..
 	memFileArena_(&memfileAllocator_, "MemFileArena"),
 	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE),
 	currentRequestIdx_(0)
@@ -412,7 +428,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 			FindData.getOSPath(real_path, &findinfo);
 
 			// TODO: pool allocations.
-			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 
 			if (!pFile->valid()) {
 				closeFileAsync(pFile);
@@ -437,7 +453,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 			X_ASSERT_NOT_IMPLEMENTED();
 		}
 
-		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 
 		if (!pFile->valid()) {
 			closeFileAsync(pFile);
@@ -465,7 +481,7 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 			FindData.getOSPath(real_path, &findinfo);
 
 			// TODO: pool allocations.
-			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 
 			if (!pFile->valid()) {
 				closeFileAsync(pFile);
@@ -490,7 +506,7 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 			X_ASSERT_NOT_IMPLEMENTED();
 		}
 
-		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 
 		if (!pFile->valid()) {
 			closeFileAsync(pFile);
@@ -1372,12 +1388,103 @@ bool xFileSys::tryPopRequest(RequestBuffer& buf)
 	return true;
 }
 
+void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
+{
+	if (asyncOp.getType() == IoRequest::READ)
+	{
+		const IoRequestRead& asyncReq = asyncOp.readReq;
+		XFileAsync* pReqFile = asyncReq.pFile;
+
+		if (vars_.QueDebug)
+		{
+			uint32_t threadId = core::Thread::GetCurrentID();
+
+			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async read request complete. "
+				"bytesTrans: 0x%x pBuf: %p",
+				threadId, IoRequest::ToString(asyncReq.getType()),
+				bytesTransferd, asyncReq.pBuf);
+		}
+
+		asyncReq.callback.Invoke(*this, &asyncReq, pReqFile, bytesTransferd);
+	}
+	else if (asyncOp.getType() == IoRequest::WRITE)
+	{
+		const IoRequestWrite& asyncReq = asyncOp.writeReq;
+		XFileAsync* pReqFile = asyncReq.pFile;
+
+		if (vars_.QueDebug)
+		{
+			uint32_t threadId = core::Thread::GetCurrentID();
+
+			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async write request complete. "
+				"bytesTrans: 0x%x pBuf: %p",
+				threadId, IoRequest::ToString(asyncReq.getType()),
+				bytesTransferd, asyncReq.pBuf);
+		}
+
+		asyncReq.callback.Invoke(*this, &asyncReq, pReqFile, bytesTransferd);
+	}
+	else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL)
+	{
+		IoRequestOpenRead& asyncReq = asyncOp.openReadReq;
+		XFileAsync* pReqFile = asyncReq.pFile;
+
+		if (vars_.QueDebug)
+		{
+			uint32_t threadId = core::Thread::GetCurrentID();
+
+			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-read request complete. "
+				"bytesTrans: 0x%x pBuf: %p",
+				threadId, IoRequest::ToString(asyncReq.getType()),
+				bytesTransferd, asyncReq.pBuf);
+		}
+
+		if (asyncReq.dataSize != bytesTransferd)
+		{
+			X_ERROR("FileSys", "Failed to read whole file contents. requested: %" PRIu32 " got %" PRIu32,
+				asyncReq.dataSize, bytesTransferd);
+
+			X_DELETE_ARRAY(static_cast<uint8_t*>(asyncReq.pBuf), asyncReq.arena);
+			// we didnt not read the whole file, pretend we failed to open.
+			asyncReq.pBuf = nullptr;
+			asyncReq.dataSize = 0;
+			asyncReq.callback.Invoke(*this, &asyncReq, nullptr, 0);
+		}
+		else
+		{
+			asyncReq.callback.Invoke(*this, &asyncReq, pReqFile, bytesTransferd);
+		}
+
+		// close it.
+		closeFileAsync(pReqFile);
+	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+}
+
+
+void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd)
+{
+	X_ASSERT(pendingOps_.isNotEmpty(), "Recived a unexpected Async complition")(pOperation, bytesTransferd);
+
+	for (size_t i = 0; i < pendingOps_.size(); i++)
+	{
+		PendingOp& asyncOp = pendingOps_[i];
+
+		if (asyncOp.op.ownsAsyncOp(pOperation))
+		{
+			onOpFinsihed(asyncOp, bytesTransferd);
+
+			pendingOps_.removeIndex(i);
+			break;
+		}
+	}
+}
+
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 {
-	typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
-	
-	AsyncOps pendingOps;
-
 	gEnv->pJobSys->CreateQueForCurrentThread();
 
 	xFileSys& fileSys = *this;
@@ -1385,107 +1492,27 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 	RequestBuffer X_ALIGNED_SYMBOL(requestBuffer, 16);
 	IoRequestBase* pRequest = reinterpret_cast<IoRequestBase*>(&requestBuffer);
 
+	XOsFileAsyncOperation::ComplitionRotinue compRoutine;
+	compRoutine.Bind<xFileSys, &xFileSys::AsyncIoCompletetionRoutine>(this);
+
+
 	while (thread.ShouldRun())
 	{
 #if X_ENABLE_FILE_STATS
-		stats_.PendingOps = pendingOps.size();
+		stats_.PendingOps = pendingOps_.size();
 #endif // !X_ENABLE_FILE_STATS
 
-		if (pendingOps.isEmpty())
+		if (pendingOps_.isEmpty())
 		{
 			popRequest(requestBuffer);
 		}
 		else
 		{
-			// poll the pending io requests to see if any have finished.
-			AsyncOps::size_type i;
-			for (i = 0; i < pendingOps.size(); i++)
-			{
-				PendingOp& asyncOp = pendingOps[i];
+			// we sleep untill we get woken by either a completed async request or more requests to process.
+			core::Thread::SleepAlertable();
 
-				uint32_t bytesTransferd = 0;
-				if (asyncOp.op.hasFinished(&bytesTransferd))
-				{
-					if (asyncOp.getType() == IoRequest::READ)
-					{
-						const IoRequestRead& asyncReq = asyncOp.readReq;
-						XFileAsync* pReqFile = asyncReq.pFile;
-
-						if (vars_.QueDebug)
-						{
-							uint32_t threadId = core::Thread::GetCurrentID();
-
-							X_LOG0("FileSys", "IoRequest(0x%x) '%s' async read request complete. "
-								"bytesTrans: 0x%x pBuf: %p",
-								threadId, IoRequest::ToString(asyncReq.getType()),
-								bytesTransferd, asyncReq.pBuf);
-						}
-
-						asyncReq.callback.Invoke(fileSys, &asyncReq, pReqFile, bytesTransferd);
-					}
-					else if (asyncOp.getType() == IoRequest::WRITE)
-					{
-						const IoRequestWrite& asyncReq = asyncOp.writeReq;
-						XFileAsync* pReqFile = asyncReq.pFile;
-
-						if (vars_.QueDebug)
-						{
-							uint32_t threadId = core::Thread::GetCurrentID();
-
-							X_LOG0("FileSys", "IoRequest(0x%x) '%s' async write request complete. "
-								"bytesTrans: 0x%x pBuf: %p",
-								threadId, IoRequest::ToString(asyncReq.getType()),
-								bytesTransferd, asyncReq.pBuf);
-						}
-
-						asyncReq.callback.Invoke(fileSys, &asyncReq, pReqFile, bytesTransferd);
-					}
-					else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL)
-					{
-						IoRequestOpenRead& asyncReq = asyncOp.openReadReq;
-						XFileAsync* pReqFile = asyncReq.pFile;
-
-						if (vars_.QueDebug)
-						{
-							uint32_t threadId = core::Thread::GetCurrentID();
-
-							X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-read request complete. "
-								"bytesTrans: 0x%x pBuf: %p",
-								threadId, IoRequest::ToString(asyncReq.getType()),
-								bytesTransferd, asyncReq.pBuf);
-						}
-
-						if (asyncReq.dataSize != bytesTransferd) 
-						{
-							X_ERROR("FileSys", "Failed to read whole file contents. requested: %" PRIu32 " got %" PRIu32,
-								asyncReq.dataSize, bytesTransferd);
-
-							X_DELETE_ARRAY(static_cast<uint8_t*>(asyncReq.pBuf), asyncReq.arena);
-							// we didnt not read the whole file, pretend we failed to open.
-							asyncReq.pBuf = nullptr;
-							asyncReq.dataSize = 0;
-							asyncReq.callback.Invoke(fileSys, &asyncReq, nullptr, 0);
-						}
-						else
-						{
-							asyncReq.callback.Invoke(fileSys, &asyncReq, pReqFile, bytesTransferd);
-						}
-
-						// close it.
-						closeFileAsync(pReqFile);
-					}
-					else
-					{
-						X_ASSERT_UNREACHABLE();
-					}
-
-					pendingOps.removeIndex(i);
-				}
-			}
-
-			// got any requests?
+			// might not be any, if not just come back around to SleepAlertable.
 			if (!tryPopRequest(requestBuffer)) {
-				core::Thread::Sleep(0);
 				continue;
 			}
 		}
@@ -1547,10 +1574,11 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 				uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
 
-				XFileAsyncOperation operation = pFile->readAsync(
+				XFileAsyncOperationCompiltion operation = pFile->readAsync(
 					pData,
 					safe_static_cast<size_t>(fileSize),
-					0
+					0,
+					compRoutine
 				);
 
 				// now we need to wait for the read to finish, then close the file and call the callback.
@@ -1559,7 +1587,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				pOpenRead->pBuf = pData;
 				pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
 
-				pendingOps.emplace_back(*pOpenRead, operation);
+				pendingOps_.emplace_back(*pOpenRead, operation);
 			}
 			
 		}
@@ -1584,13 +1612,16 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			stats_.NumBytesRead += pRead->dataSize;
 #endif // !X_ENABLE_FILE_STATS
 
-			XFileAsyncOperation operation = pFile->readAsync(
+			XFileAsyncOperationCompiltion operation = pFile->readAsync(
 				pRead->pBuf,
 				pRead->dataSize,
-				pRead->offset
+				pRead->offset,
+				compRoutine
 			);
 
-			pendingOps.emplace_back(*pRead,operation);
+			operation.hasFinished();
+
+			pendingOps_.emplace_back(*pRead,operation);
 		}
 		else if (type == IoRequest::WRITE)
 		{
@@ -1601,13 +1632,14 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			stats_.NumBytesWrite += pWrite->dataSize;
 #endif // !X_ENABLE_FILE_STATS
 
-			XFileAsyncOperation operation = pFile->writeAsync(
+			XFileAsyncOperationCompiltion operation = pFile->writeAsync(
 				pWrite->pBuf,
 				pWrite->dataSize,
-				pWrite->offset
+				pWrite->offset,
+				compRoutine
 			);
 
-			pendingOps.emplace_back(*pWrite, operation);
+			pendingOps_.emplace_back(*pWrite, operation);
 		}
 	}
 

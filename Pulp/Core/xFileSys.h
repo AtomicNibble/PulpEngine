@@ -48,9 +48,30 @@ struct search_s
 
 
 struct XFindData;
+struct PendingOp;
 
 class xFileSys : public IFileSys, private core::ThreadAbstract
 {
+	struct PendingOp
+	{
+		PendingOp(const IoRequestRead& req, const XFileAsyncOperationCompiltion& op);
+		PendingOp(const IoRequestWrite& req, const XFileAsyncOperationCompiltion& op);
+		PendingOp(const IoRequestOpenRead& req, const XFileAsyncOperationCompiltion& op);
+
+		IoRequest::Enum getType(void) const;
+
+		PendingOp& operator=(PendingOp&& oth);
+
+		union
+		{
+			IoRequestRead readReq;
+			IoRequestWrite writeReq;
+			IoRequestOpenRead openReadReq; // this is a big fucker
+		};
+		XFileAsyncOperationCompiltion op;
+	};
+
+
 	typedef core::MemoryArena<
 		core::PoolAllocator,
 		core::MultiThreadPolicy<core::Spinlock>,
@@ -64,6 +85,21 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 		core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> FilePoolArena;
+
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> AsyncOpPoolArena;
+
 
 	typedef core::MemoryArena<
 		core::MallocFreeAllocator,
@@ -107,6 +143,7 @@ public:
 	static const size_t PENDING_IO_QUE_SIZE = 0x100;
 
 	typedef std::array<uint8_t, MAX_REQ_SIZE> RequestBuffer;
+	typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
 
 public:
 	xFileSys();
@@ -197,7 +234,10 @@ public:
 private:
 	void popRequest(RequestBuffer& buf);
 	bool tryPopRequest(RequestBuffer& buf);
-	
+	void onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd);
+
+	void AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd);
+
 	RequestHandle getNextRequestHandle(void);
 
 	// ~
@@ -242,6 +282,11 @@ private:
 	core::PoolAllocator filePoolAllocator_;
 	FilePoolArena		filePoolArena_;
 
+	// pool for async ops.
+	core::HeapArea      asyncOpPoolHeap_;
+	core::PoolAllocator asyncOpPoolAllocator_;
+	AsyncOpPoolArena	asyncOpPoolArena_;
+
 	core::MallocFreeAllocator memfileAllocator_;
 	MemfileArena		memFileArena_;
 
@@ -251,6 +296,8 @@ private:
 	core::CriticalSection requestLock_;
 	core::ConditionVariable requestCond_;
 	core::ByteStreamFifo requestData_;		// requests are serialized into this as they are of varing sizes.
+
+	AsyncOps pendingOps_;
 
 #if X_ENABLE_FILE_STATS
 	IOQueueStats stats_;
