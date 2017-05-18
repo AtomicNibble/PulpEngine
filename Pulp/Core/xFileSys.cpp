@@ -1483,9 +1483,12 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
 			onOpFinsihed(asyncOp, bytesTransferd);
 
 			pendingOps_.removeIndex(i);
-			break;
+			return;
 		}
 	}
+
+	// failed to fine the op ;(
+	X_ASSERT_UNREACHABLE();
 }
 
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
