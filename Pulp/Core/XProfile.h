@@ -81,6 +81,7 @@ namespace profiler
 	private:
 		void UpdateProfileData(void);
 		Vec2f RenderStartupData(Vec2f pos);
+		Vec2f RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena);
 		Vec2f RenderStr(Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
 
 #if X_ENABLE_JOBSYS_PROFILER

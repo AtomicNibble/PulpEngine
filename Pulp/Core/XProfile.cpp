@@ -447,8 +447,115 @@ namespace profiler
 				pos.x += area.x + padding;
 			}
 #endif // !X_ENABLE_FILE_STATS
+
+	size_t RenderArenaTree_r(engine::IPrimativeContext* pPrim, font::TextDrawContext& ctx, Vec2f pos, 
+		int32_t treeIndent, core::MemoryArenaBase* arena)
+	{
+		auto arenaStats = arena->getStatistics();
+		auto& allocStats = arenaStats.allocatorStatistics_;
+
+		core::StackString<64, char> name;
+		core::StackStringW256 str;
+		core::HumanSize::Str strBuf, strBuf2;
+
+		name.append(' ', treeIndent * 4);
+		name.append(arenaStats.arenaName_);
+
+		str.appendFmt(L"%-30" PRns "^6%6" PRIuS "%11" PRns "%11" PRns, 
+			name.c_str(),
+			allocStats.allocationCount_,
+			core::HumanSize::toString(strBuf, allocStats.physicalMemoryUsed_),
+			core::HumanSize::toString(strBuf2, allocStats.physicalMemoryAllocated_)
+		);
+
+		pPrim->drawText(pos.x, pos.y, ctx, str.begin(), str.end());
+
+		size_t numChildren = 0;
+
+		auto& children = arena->getChildrenAreas();
+		for (size_t i = 0; i < children.size(); i++)
+		{
+			auto* pChildArena = children[i];
+
+			++numChildren;
+
+			Vec2f p = pos;
+			p.y += numChildren * 20.f;
+			numChildren += RenderArenaTree_r(pPrim, ctx, p, treeIndent + 1, pChildArena);
 		}
+
+		return numChildren;
 	}
+
+	size_t countChildren_r(core::MemoryArenaBase* arena)
+	{
+		auto& children = arena->getChildrenAreas();
+		return core::accumulate(children.begin(), children.end(), 1_sz, [](core::MemoryArenaBase* arena) -> size_t {
+			return countChildren_r(arena);
+		});
+	};
+
+
+	Vec2f XProfileSys::RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena)
+	{
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+		
+		font::TextDrawContext ctx;
+		ctx.pFont = pFont_;
+		ctx.effectId = 0;
+		ctx.SetColor(Col_White);
+		ctx.SetSize(Vec2f(16.f, 16.f));
+
+		const float padding = 10;
+		const float treeIndent = 10.f;
+		const float spacing = 20.f;
+
+		const float colHdrStartX = pos.x;
+		const float colHdrStartY = pos.y;
+		const float colHdrHeight = 22.f;
+
+		const float treeStartX = pos.x + padding;
+		const float treeStartY = colHdrStartY + colHdrHeight;
+		const float treeOffset = (ctx.size.y + 2.f);
+
+		size_t numItems = countChildren_r(arena);
+
+		const float width = 580;
+		const float height = (20.f * numItems) + colHdrHeight;
+
+		// background.
+		pPrim->drawQuad(
+			pos.x,
+			pos.y,
+			width,
+			height,
+			Color(0.1f, 0.1f, 0.1f, 0.8f)
+		);
+
+		// draw background for coloum headers
+		pPrim->drawQuad(
+			colHdrStartX,
+			colHdrStartY,
+			width,
+			20.f,
+			Color(0.2f, 0.2f, 0.2f, 0.6f),
+			Color(0.01f, 0.01f, 0.01f, 0.8f)
+		);
+
+		// titles.
+		core::StackStringW256 str;
+		str.appendFmt(L"%-30" PRns "%6" PRns "%11" PRns "%11" PRns,
+			"Memory Arena Name", "Num", "Phys(U)", "Phys"
+		);
+
+		pPrim->drawText(treeStartX, pos.y, ctx, str.begin(), str.end());
+
+		RenderArenaTree_r(pPrim, ctx, Vec2f(treeStartX, treeStartY), 0, arena);
+
+		return Vec2f(0.f, 0.f);
+	}
+
+
 
 	Vec2f XProfileSys::RenderStartupData(Vec2f pos)
 	{
