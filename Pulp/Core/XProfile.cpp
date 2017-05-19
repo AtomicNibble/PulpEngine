@@ -458,10 +458,10 @@ namespace profiler
 		core::StackStringW256 str;
 		core::HumanSize::Str strBuf, strBuf2;
 
-		name.append(' ', treeIndent * 4);
+		name.append(' ', treeIndent * 2);
 		name.append(arenaStats.arenaName_);
 
-		str.appendFmt(L"%-30" PRns "^6%6" PRIuS "%11" PRns "%11" PRns, 
+		str.appendFmt(L"%-25" PRns "^6%6" PRIuS "%11" PRns "%11" PRns, 
 			name.c_str(),
 			allocStats.allocationCount_,
 			core::HumanSize::toString(strBuf, allocStats.physicalMemoryUsed_),
@@ -498,14 +498,6 @@ namespace profiler
 
 	Vec2f XProfileSys::RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena)
 	{
-		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
-		
-		font::TextDrawContext ctx;
-		ctx.pFont = pFont_;
-		ctx.effectId = 0;
-		ctx.SetColor(Col_White);
-		ctx.SetSize(Vec2f(16.f, 16.f));
-
 		const float padding = 10;
 		const float treeIndent = 10.f;
 		const float spacing = 20.f;
@@ -516,12 +508,13 @@ namespace profiler
 
 		const float treeStartX = pos.x + padding;
 		const float treeStartY = colHdrStartY + colHdrHeight;
-		const float treeOffset = (ctx.size.y + 2.f);
 
 		size_t numItems = countChildren_r(arena);
 
-		const float width = 580;
+		const float width = 520;
 		const float height = (20.f * numItems) + colHdrHeight;
+
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
 		// background.
 		pPrim->drawQuad(
@@ -544,12 +537,18 @@ namespace profiler
 
 		// titles.
 		core::StackStringW256 str;
-		str.appendFmt(L"%-30" PRns "%6" PRns "%11" PRns "%11" PRns,
+		str.appendFmt(L"%-25" PRns "%6" PRns "%11" PRns "%11" PRns,
 			"Memory Arena Name", "Num", "Phys(U)", "Phys"
 		);
 
+		font::TextDrawContext ctx;
+		ctx.pFont = pFont_;
+		ctx.effectId = 0;
+		ctx.SetColor(Col_White);
+		ctx.SetSize(Vec2f(16.f, 16.f));
 		pPrim->drawText(treeStartX, pos.y, ctx, str.begin(), str.end());
 
+		ctx.SetColor(Col_Dimgray);
 		RenderArenaTree_r(pPrim, ctx, Vec2f(treeStartX, treeStartY), 0, arena);
 
 		return Vec2f(0.f, 0.f);
