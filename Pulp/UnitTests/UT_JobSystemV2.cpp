@@ -34,7 +34,7 @@ namespace
 
 TEST(Threading, JobSystem2Empty)
 {
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 	const size_t numJobs = 4000;
@@ -124,7 +124,7 @@ TEST(Threading, JobSystem2Empty_parallel_data)
 {
 	unsigned int count = 4000;
 
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 	core::TimeVal MultiElapsed;
@@ -189,7 +189,7 @@ TEST(Threading, JobSystem2Empty_parallel)
 {
 	const size_t numJobs = 4000;
 
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 	core::TimeVal MultiElapsed;
@@ -211,7 +211,7 @@ TEST(Threading, JobSystem2Empty_parallel)
 
 TEST(Threading, JobSystem2Empty_parallel_for)
 {
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 	numJobsRan = 0;
@@ -264,7 +264,7 @@ namespace Member
 
 TEST(Threading, JobSystem2Empty_member_func)
 {
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 
@@ -294,7 +294,7 @@ TEST(Threading, JobSystem2Empty_member_func)
 
 TEST(Threading, JobSystem2Empty_continuations)
 {
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 
