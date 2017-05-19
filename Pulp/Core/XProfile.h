@@ -84,6 +84,8 @@ namespace profiler
 		Vec2f RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena);
 		Vec2f RenderStr(Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
 
+		static size_t countChildren_r(core::MemoryArenaBase* arena);
+
 #if X_ENABLE_JOBSYS_PROFILER
 		Vec2f RenderJobSystem(Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
 		void DrawThreadInfo(const FrameTimeData& frameTimeInfo, engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,

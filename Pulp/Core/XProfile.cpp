@@ -448,6 +448,16 @@ namespace profiler
 			}
 #endif // !X_ENABLE_FILE_STATS
 
+			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('t')))
+			{
+				area = RenderArenaTree(pos, gEnv->pArena);
+
+			}
+		}
+	}
+
+
+
 	size_t RenderArenaTree_r(engine::IPrimativeContext* pPrim, font::TextDrawContext& ctx, Vec2f pos, 
 		int32_t treeIndent, core::MemoryArenaBase* arena)
 	{
@@ -487,7 +497,7 @@ namespace profiler
 		return numChildren;
 	}
 
-	size_t countChildren_r(core::MemoryArenaBase* arena)
+	size_t XProfileSys::countChildren_r(core::MemoryArenaBase* arena)
 	{
 		auto& children = arena->getChildrenAreas();
 		return core::accumulate(children.begin(), children.end(), 1_sz, [](core::MemoryArenaBase* arena) -> size_t {
