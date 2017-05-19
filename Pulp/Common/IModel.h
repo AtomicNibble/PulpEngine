@@ -181,7 +181,7 @@ static const uint32_t	 MODEL_MESH_COL_MAX_MESH = 8; // max col mesh per a mesh. 
 
 
 
-static const uint32_t	 MODEL_MAX_LOADED = 1 << 13; // max models that can be loaded.
+static const uint32_t	 MODEL_MAX_LOADED = 1 << 10; // max models that can be loaded.
 
 
 
