@@ -20,25 +20,6 @@ X_NAMESPACE_BEGIN(engine)
 
 using namespace render::shader;
 
-namespace 
-{
-
-	// Commands
-
-	void Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
-	{
-		// optional search criteria
-		const char* pSearchPatten = nullptr;
-
-		if (Cmd->GetArgCount() >= 2) {
-			pSearchPatten = Cmd->GetArg(1);
-		}
-
-		(static_cast<XMaterialManager*>(XEngineBase::getMaterialManager()))->ListMaterials(pSearchPatten);
-	}
-
-
-} // namespace
 
 XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan) :
 	arena_(arena),
@@ -68,7 +49,8 @@ bool XMaterialManager::Init(void)
 		return false;
 	}
 
-	ADD_COMMAND("listMaterials", Cmd_ListMaterials, core::VarFlag::SYSTEM, "List all the loaded materials");
+	ADD_COMMAND_MEMBER("listMaterials", this, XMaterialManager, &XMaterialManager::Cmd_ListMaterials, 
+		core::VarFlag::SYSTEM, "List all the loaded materials");
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
@@ -796,6 +778,19 @@ void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 
 	X_LOG0("Material", "------------ ^8Materials End^7 -----------");
 }
+
+void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
+{
+	// optional search criteria
+	const char* pSearchPatten = nullptr;
+
+	if (Cmd->GetArgCount() >= 2) {
+		pSearchPatten = Cmd->GetArg(1);
+	}
+
+	ListMaterials(pSearchPatten);
+}
+
 
 
 X_NAMESPACE_END

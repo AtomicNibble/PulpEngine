@@ -12,6 +12,10 @@
 
 #include <Assets\AssertContainer.h>
 
+X_NAMESPACE_DECLARE(core, 
+	struct IConsoleCmdArgs;
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 class TechSetDefs;
@@ -74,6 +78,10 @@ private:
 
 	bool InitDefaults(void);
 	void freeDanglingMaterials(void);
+
+private:
+	void Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd);
+
 
 private:
 	core::MemoryArenaBase* arena_;
