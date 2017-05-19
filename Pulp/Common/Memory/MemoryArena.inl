@@ -2,10 +2,10 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::MemoryArena(AllocationPolicy* allocator, const char* name)
-	: allocator_(allocator)
-	, name_(name)
-	, isFrozen_(false)
+MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::MemoryArena(AllocationPolicy* allocator, const char* name) :
+	allocator_(allocator),
+	name_(name),
+	isFrozen_(false)
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
 	statistics_.arenaName_ = name;
