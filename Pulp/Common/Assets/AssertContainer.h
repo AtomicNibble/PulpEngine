@@ -191,7 +191,7 @@ public:
 	> AssetPoolArena;
 
 public:
-	AssetPool(size_t allocSize, size_t allocAlign) :
+	AssetPool(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
 		assetPoolHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
 				AssetPoolArena::getMemoryRequirement(allocSize) * MaxAssets,
@@ -205,6 +205,7 @@ public:
 		),
 		assetPoolArena_(&assetPoolAllocator_, "AssetPoolArena")
 	{
+		arena->addChildArena(&assetPoolArena_);
 	}
 
 	template<class... Args>
@@ -247,7 +248,7 @@ public:
 		hash_(arena, MaxAssets),
 		list_(arena),
 		freeList_(arena),
-		AssetPool(allocSize, allocAlign)
+		AssetPool(arena, allocSize, allocAlign)
 	{
 		list_.reserve(MaxAssets);
 	}
