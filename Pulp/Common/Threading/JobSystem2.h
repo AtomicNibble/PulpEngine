@@ -464,7 +464,7 @@ private:
 	> JobArena;
 
 public:
-	JobSystem();
+	JobSystem(core::MemoryArenaBase* arena);
 	~JobSystem();
 
 	bool StartUp(uint32_t threadCount = AUTO_THREAD_COUNT);
@@ -585,6 +585,7 @@ private:
 	Thread::ReturnValue ThreadRun(const Thread& thread);
 
 private:
+	core::MemoryArenaBase* arena_;
 	Thread threads_[HW_THREAD_MAX];
 	ThreadIdToIndex threadIdToIndex_;
 	uint32_t numThreads_;

@@ -182,7 +182,8 @@ namespace V2
 		allocated = 0;
 	}
 
-	JobSystem::JobSystem()
+	JobSystem::JobSystem(core::MemoryArenaBase* arena) :
+		arena_(arena)
 	{
 		numThreads_ = 0;
 		numQueue_ = 0;
@@ -203,7 +204,6 @@ namespace V2
 	bool JobSystem::StartUp(uint32_t threadCount)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_PROFILE_NO_HISTORY_BEGIN("JobSysInit", core::profiler::SubSys::CORE);
@@ -251,14 +251,14 @@ namespace V2
 		for (i = 0; i < HW_THREAD_MAX; i++)
 		{
 			if (pThreadQues_[i]) {
-				X_DELETE(pThreadQues_[i], gEnv->pArena);
+				X_DELETE(pThreadQues_[i], arena_);
 			}
 			if (pJobAllocators_[i]) {
-				X_DELETE(pJobAllocators_[i], gEnv->pArena);
+				X_DELETE(pJobAllocators_[i], arena_);
 			}
 #if X_ENABLE_JOBSYS_PROFILER
 			if (pTimeLines_[i]) {
-				X_DELETE(pTimeLines_[i], gEnv->pArena);
+				X_DELETE(pTimeLines_[i], arena_);
 			}
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
@@ -387,15 +387,15 @@ namespace V2
 		X_ASSERT(idx < HW_THREAD_MAX, "No room for thread que")(idx, HW_THREAD_MAX);
 		X_ASSERT(pThreadQues_[idx] == nullptr, "Double init")(threadId, idx);
 
-		pThreadQues_[idx] = X_NEW(ThreadQue, gEnv->pArena, "JobThreadQue");
-		pJobAllocators_[idx] = X_NEW(ThreadJobAllocator, gEnv->pArena, "JobThreadAllocator");
+		pThreadQues_[idx] = X_NEW(ThreadQue, arena_, "JobThreadQue");
+		pJobAllocators_[idx] = X_NEW(ThreadJobAllocator, arena_, "JobThreadAllocator");
 		threadIdToIndex_.push_back(std::make_pair(threadId, idx));
 
 		X_ASSERT_ALIGNMENT(pThreadQues_[idx], 64, 0);
 		X_ASSERT_ALIGNMENT(&pJobAllocators_[idx]->jobs, 64, 0);
 
 #if X_ENABLE_JOBSYS_PROFILER
-		pTimeLines_[idx] = X_NEW(JobQueueHistory, gEnv->pArena, "JobThreadTimeline");
+		pTimeLines_[idx] = X_NEW(JobQueueHistory, arena_, "JobThreadTimeline");
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 		numQueue_ = idx + 1;

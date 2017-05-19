@@ -372,7 +372,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// #------------------------- JOB SYSTEM ------------------------
 	if (startupParams.jobSystemEnabled()) {
-		env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
+		env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem")(g_coreArena);
 	}
 
 	// #------------------------- FileSystem --------------------
