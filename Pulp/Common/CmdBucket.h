@@ -107,6 +107,7 @@ class CommandBucketBase
 	X_NO_COPY(CommandBucketBase);
 	X_NO_ASSIGN(CommandBucketBase);
 
+public:
 	typedef core::Array<CommandPacket::Packet> PacketArr;
 	typedef core::Array<uint32_t> SortedIdxArr;
 	typedef core::FixedArray<IRenderTarget*, MAX_RENDER_TARGETS> RenderTargetsArr;
