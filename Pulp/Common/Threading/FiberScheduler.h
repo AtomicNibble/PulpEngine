@@ -4,15 +4,14 @@
 #include "Containers\Array.h"
 
 #include "Traits\FunctionTraits.h"
-#include "Threading\AtomicInt.h"
-#include "Threading\Spinlock.h"
-#include "Threading\Signal.h"
-#include "Threading\ThreadLocalStorage.h"
+#include "Thread.h"
+#include "ThreadQue.h"
+#include "AtomicInt.h"
+#include "Spinlock.h"
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\HeapArea.h>
-
 
 #include "Fiber.h"
 	
@@ -51,49 +50,6 @@ namespace Fiber
 		int32_t val;
 	};
 
-	template<typename T>
-	class ThreadQue
-	{
-	public:
-		ThreadQue();
-		ThreadQue(core::MemoryArenaBase* arena, size_t size);
-		~ThreadQue();
-
-		void setArena(core::MemoryArenaBase* arena, size_t size);
-		void setArena(core::MemoryArenaBase* arena);
-
-
-		void Add(const T item);
-		void Add(T* pItems, size_t numItems);
-		bool tryPop(T& item);
-
-		// for batch adding
-		void Lock(void);
-		void Unlock(void);
-		void Add_nolock(const T item);
-
-		bool isNotEmpty(void) const;
-		size_t numItems(void);
-
-	protected:
-		core::Spinlock lock_;
-		core::Fifo<T> list_;
-	};
-
-	template<typename T>
-	class ThreadQueBlocking : public ThreadQue<T>
-	{
-	public:
-		ThreadQueBlocking();
-		ThreadQueBlocking(core::MemoryArenaBase* arena, size_t size);
-
-		void Add(const T item);
-		void Add(T* pItems, size_t numItems);
-		void Pop(T& item);
-
-	private:
-		core::Signal signal_;
-	};
 
 	X_DECLARE_ENUM(JobPriority)(HIGH, NORMAL, NONE);
 
@@ -101,7 +57,7 @@ namespace Fiber
 
 	class Scheduler
 	{
-		static const uint32_t HW_THREAD_MAX = 32; // max even if hardware supports more.
+		static const uint32_t HW_THREAD_MAX = 12; // max even if hardware supports more.
 		static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 		static const uint32_t FIBER_POOL_SIZE = 64;
 
@@ -157,16 +113,16 @@ namespace Fiber
 		FiberHandle GetSwitchFiberForThread(void) const;
 		FiberHandle GetWaitFiberForThread(void) const;
 
-		static Thread::ReturnValue ThreadRun(const Thread& thread);
+		static core::Thread::ReturnValue ThreadRun(const core::Thread& thread);
 
 		static void __stdcall FiberStart(void* pArg);
 		static void __stdcall FiberSwitchStart(void* pArg);
 		static void __stdcall CounterWaitStart(void* pArg);
 
 	private:
-		typedef ThreadQue<TaskBundle> TaskQue;
+		typedef core::ThreadQue<TaskBundle, core::CriticalSection> TaskQue;
 		typedef core::Array<WaitingTask> WaitingTaskArr;
-		typedef ThreadQueBlocking<FiberHandle> FiberPool;
+		typedef core::ThreadQueBlocking<FiberHandle, core::CriticalSection> FiberPool;
 		typedef core::Array<std::pair<uint32_t, size_t>> FiberIndexArr;
 		typedef core::Array<FiberHandle> FiberArr;
 
@@ -177,9 +133,9 @@ namespace Fiber
 		TaskQue tasks_[JobPriority::ENUM_COUNT];
 
 		WaitingTaskArr waitingTasks_;
-		Spinlock waitingTaskLock_;
+		core::Spinlock waitingTaskLock_;
 
-		Thread threads_[HW_THREAD_MAX];
+		core::Thread threads_[HW_THREAD_MAX];
 		FiberPool fibers_;
 
 		// used to turn thread ID into fiber index.
