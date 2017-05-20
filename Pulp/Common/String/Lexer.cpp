@@ -1380,7 +1380,7 @@ void XLexer::Warning(const char* str, ...)
 
 	va_list args;
 	va_start(args, str);
-	vsprintf(&temp[0], str, args);
+	temp.appendFmt(str, args);
 	va_end(args);
 
 	X_WARNING("Lex", temp.c_str());
