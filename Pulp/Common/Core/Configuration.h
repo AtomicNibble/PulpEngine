@@ -61,7 +61,11 @@
 	#endif
 #endif // WIN32
 
-
+#ifdef __clang__
+#define X_COMPILER clang
+#else
+#define X_COMPILER msvc
+#endif
 
 
 #define X_ENGINE_NAME			"Potato"
