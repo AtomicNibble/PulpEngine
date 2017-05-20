@@ -443,7 +443,7 @@ namespace bitUtil
 			template <typename T>
 			static inline constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
 			{
-				static_assert(sizeof(T) == 2 "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
 
 				return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
 			}
