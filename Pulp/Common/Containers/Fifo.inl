@@ -504,7 +504,7 @@ void Fifo<T>::Delete(T* pData)
 template<typename T>
 T* Fifo<T>::Allocate(size_type num)
 {
-	return reinterpret_cast<T*>(X_NEW_ARRAY(uint8_t, num * sizeof(T), arena_, "Fifo<"X_PP_STRINGIZE(T)">"));
+	return reinterpret_cast<T*>(X_NEW_ARRAY(uint8_t, num * sizeof(T), arena_, "Fifo<" X_PP_STRINGIZE(T) ">"));
 }
 
 /// ------------------------------------------------------c
@@ -512,19 +512,19 @@ T* Fifo<T>::Allocate(size_type num)
 
 
 template<typename T>
-inline const T& Fifo<T>::iterator::operator*(void) const
+inline const T& FifoIterator<T>::operator*(void) const
 {
 	return *current_;
 }
 
 template<typename T>
-inline const T* Fifo<T>::iterator::operator->(void) const
+inline const T* FifoIterator<T>::operator->(void) const
 {
 	return current_;
 }
 
 template<typename T>
-inline typename Fifo<T>::iterator& Fifo<T>::iterator::operator++(void)
+inline typename FifoIterator<T>& FifoIterator<T>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -536,7 +536,7 @@ inline typename Fifo<T>::iterator& Fifo<T>::iterator::operator++(void)
 }
 
 template<typename T>
-inline typename Fifo<T>::iterator Fifo<T>::iterator::operator++(int)
+inline typename FifoIterator<T> FifoIterator<T>::operator++(int)
 {
 	iterator tmp = *this;
 	++(*this); // call the function above.
@@ -544,13 +544,13 @@ inline typename Fifo<T>::iterator Fifo<T>::iterator::operator++(int)
 }
 
 template<typename T>
-inline bool Fifo<T>::iterator::operator==(const iterator& rhs) const
+inline bool FifoIterator<T>::operator==(const FifoIterator& rhs) const
 {
 	return current_ == rhs.current_;
 }
 
 template<typename T>
-inline bool Fifo<T>::iterator::operator!=(const iterator& rhs) const
+inline bool FifoIterator<T>::operator!=(const FifoIterator& rhs) const
 {
 	return current_ != rhs.current_;
 }
@@ -558,19 +558,19 @@ inline bool Fifo<T>::iterator::operator!=(const iterator& rhs) const
 /// ------------------------------------------------------
 
 template<typename T>
-inline const T& Fifo<T>::const_iterator::operator*(void) const
+inline const T& FifoConstIterator<T>::operator*(void) const
 {
 	return *current_;
 }
 
 template<typename T>
-inline const T* Fifo<T>::const_iterator::operator->(void) const
+inline const T* FifoConstIterator<T>::operator->(void) const
 {
 	return current_;
 }
 
 template<typename T>
-inline typename Fifo<T>::const_iterator& Fifo<T>::const_iterator::operator++(void)
+inline typename FifoConstIterator<T>& FifoConstIterator<T>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -582,7 +582,7 @@ inline typename Fifo<T>::const_iterator& Fifo<T>::const_iterator::operator++(voi
 }
 
 template<typename T>
-inline typename Fifo<T>::const_iterator Fifo<T>::const_iterator::operator++(int)
+inline typename FifoConstIterator<T> FifoConstIterator<T>::operator++(int)
 {
 	const_iterator tmp = *this;
 	++(*this); // call the function above.
@@ -590,13 +590,13 @@ inline typename Fifo<T>::const_iterator Fifo<T>::const_iterator::operator++(int)
 }
 
 template<typename T>
-inline bool Fifo<T>::const_iterator::operator==(const const_iterator& rhs) const
+inline bool FifoConstIterator<T>::operator==(const FifoConstIterator<T>& rhs) const
 {
 	return current_ == rhs.current_;
 }
 
 template<typename T>
-inline bool Fifo<T>::const_iterator::operator!=(const const_iterator& rhs) const
+inline bool FifoConstIterator<T>::operator!=(const FifoConstIterator<T>& rhs) const
 {
 	return current_ != rhs.current_;
 }
