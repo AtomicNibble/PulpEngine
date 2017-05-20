@@ -4,7 +4,7 @@
 #ifndef X_IMGLIB_H_
 #define X_IMGLIB_H_
 
-#include <Platform\Compiler.h>
+#include <Core\Compiler.h>
 
 #ifndef IMGLIB_EXPORT
 #ifdef X_LIB
