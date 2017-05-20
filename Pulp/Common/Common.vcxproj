@@ -220,7 +220,6 @@
     <ClInclude Include="Math\XTransform.h" />
     <ClInclude Include="Math\XVecCompressed.h" />
     <ClInclude Include="Math\XVector.h" />
-    <ClInclude Include="Math\XVectorAligned.h" />
     <ClInclude Include="Math\XViewPort.h" />
     <ClInclude Include="Math\XWinding.h" />
     <ClInclude Include="Memory\AllocationPolicies\GrowingBlockAllocator.h" />
@@ -997,7 +996,6 @@
     <ClCompile Include="Math\XSphere.cpp" />
     <ClCompile Include="Math\XWinding.cpp" />
     <ClCompile Include="Math\XFrustum.cpp" />
-    <ClCompile Include="Math\XVectorAligned.cpp" />
     <ClCompile Include="Memory\AllocationPolicies\GrowingBlockAllocator.cpp" />
     <ClCompile Include="Memory\AllocationPolicies\GrowingGenericAllocator.cpp" />
     <ClCompile Include="Memory\AllocationPolicies\GrowingMicroAllocator.cpp" />

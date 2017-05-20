@@ -132,7 +132,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // Math
 #include <Math\XMath.h>
 #include <Math\XVector.h>
-#include <Math\XVectorAligned.h> // Vec3 SSE
 #include <Math\XMatrix.h>
 
 #include <Math\XColor.h>

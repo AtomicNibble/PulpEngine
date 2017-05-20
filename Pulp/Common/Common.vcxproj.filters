@@ -805,9 +805,6 @@
     <ClInclude Include="String\Lexer.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
-    <ClInclude Include="Math\XVectorAligned.h">
-      <Filter>Headers\Math</Filter>
-    </ClInclude>
     <ClInclude Include="Math\VertexFormats.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
@@ -1733,9 +1730,6 @@
     </ClCompile>
     <ClCompile Include="String\Lexer.cpp">
       <Filter>SourceFiles\String</Filter>
-    </ClCompile>
-    <ClCompile Include="Math\XVectorAligned.cpp">
-      <Filter>SourceFiles\Math</Filter>
     </ClCompile>
     <ClCompile Include="Platform\win32\DirectoryWatcher.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
