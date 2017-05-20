@@ -1194,10 +1194,12 @@ int XParser::ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxpar
 
 				t = X_NEW(XLexToken, arena_, "Token")(token);
 				t->pNext_ = nullptr;
-				if (last) 
+				if (last) {
 					last->pNext_ = t;
-				else 
+				}
+				else  {
 					parms[numparms] = t;
+				}
 				last = t;
 			}
 		}
