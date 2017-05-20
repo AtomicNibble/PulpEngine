@@ -10,12 +10,12 @@
 #	define X_WARNING(channel, format, ...)						( gEnv == nullptr ? X_UNUSED(true) : gEnv->pLog->Warning(X_SOURCE_INFO, channel, format, ## __VA_ARGS__))
 #	define X_ERROR(channel, format, ...)						( gEnv == nullptr ? X_UNUSED(true) : gEnv->pLog->Error(X_SOURCE_INFO, channel, format, ## __VA_ARGS__))
 #	define X_FATAL(channel, format, ...)						( gEnv == nullptr ? X_UNUSED(true) : gEnv->pLog->Fatal(X_SOURCE_INFO, channel, format, ## __VA_ARGS__))
-#	define X_LOG0_IF(condition, channel, format, ...)			((condition) ? X_LOG0(channel, format, __VA_ARGS__) : X_UNUSED(true))
-#	define X_LOG1_IF(condition, channel, format, ...)			((condition) ? X_LOG1(channel, format, __VA_ARGS__) : X_UNUSED(true))
-#	define X_LOG2_IF(condition, channel, format, ...)			((condition) ? X_LOG2(channel, format, __VA_ARGS__) : X_UNUSED(true))
-#	define X_WARNING_IF(condition, channel, format, ...)		((condition) ? X_WARNING(channel, format, __VA_ARGS__) : X_UNUSED(true))
-#	define X_ERROR_IF(condition, channel, format, ...)			((condition) ? X_ERROR(channel, format, __VA_ARGS__) : X_UNUSED(true))
-#	define X_FATAL_IF(condition, channel, format, ...)			((condition) ? X_FATAL(channel, format, __VA_ARGS__) : X_UNUSED(true))
+#	define X_LOG0_IF(condition, channel, format, ...)			((condition) ? X_LOG0(channel, format, ## __VA_ARGS__) : X_UNUSED(true))
+#	define X_LOG1_IF(condition, channel, format, ...)			((condition) ? X_LOG1(channel, format, ## __VA_ARGS__) : X_UNUSED(true))
+#	define X_LOG2_IF(condition, channel, format, ...)			((condition) ? X_LOG2(channel, format, ## __VA_ARGS__) : X_UNUSED(true))
+#	define X_WARNING_IF(condition, channel, format, ...)		((condition) ? X_WARNING(channel, format, ## __VA_ARGS__) : X_UNUSED(true))
+#	define X_ERROR_IF(condition, channel, format, ...)			((condition) ? X_ERROR(channel, format, ## __VA_ARGS__) : X_UNUSED(true))
+#	define X_FATAL_IF(condition, channel, format, ...)			((condition) ? X_FATAL(channel, format, ## __VA_ARGS__) : X_UNUSED(true))
 #	define X_LOG0_EVERY_N(N, channel, format, ...)																		\
 	X_MULTILINE_MACRO_BEGIN																							\
 	static unsigned int autoLogCount = 0;																			\
