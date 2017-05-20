@@ -61,13 +61,14 @@
 	#endif
 #endif // WIN32
 
-#ifdef __clang__
-#define X_COMPILER clang
-#define X_COMPILER_CLANG 1
+#if defined(__clang__)
+	#define X_COMPILER clang
+	#define X_COMPILER_CLANG 1
+#elif defined(_MSC_VER)
+	#define X_COMPILER msvc
+	#define X_COMPILER_MSCV 1
 #else
-#define X_COMPILER msvc
-#define X_COMPILER_MSCV 1
-
+	#error Unknown compiler.
 #endif
 
 
