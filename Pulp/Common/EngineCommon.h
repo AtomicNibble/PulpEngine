@@ -4,9 +4,9 @@
 #define _X_ENGINE_COMMON_INCLUDES_H
 
 #include <Core\Configuration.h>
+#include <Core\Compiler.h>
 #include <Core\Platform.h>
 
-#include <Platform\Compiler.h>
 #include <Platform\Types.h>
 
 X_DISABLE_WARNING(4714) // __forceinline not inlined.

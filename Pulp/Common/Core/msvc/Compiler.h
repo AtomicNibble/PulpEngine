@@ -1,8 +1,10 @@
-
 #pragma once
+
 #ifndef X_COMPILER_H
 #define X_COMPILER_H
 
+#include <cstddef>
+#include <type_traits>
 
 // _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
 // fancy a dance?
@@ -10,7 +12,7 @@ extern "C" void* _ReturnAddress(void);
 #pragma intrinsic(_ReturnAddress)
 
 
-#define X_ABSTRACT									= 0
+#define X_ABSTRACT									abstract
 #define X_OVERRIDE									override
 #define X_FINAL										override final 
 
@@ -32,7 +34,6 @@ extern "C" void* _ReturnAddress(void);
 #define X_INLINE									__forceinline
 #define X_NO_INLINE									__declspec(noinline)
 #define X_HINT(hint)								__assume(hint)
-#define X_NO_SWITCH_DEFAULT							X_HINT(0)
 #define X_RETURN_ADDRESS()							_ReturnAddress()
 #define X_FORCE_SYMBOL_LINK(symbolName)				X_PRAGMA(comment(linker, X_PP_JOIN("/include:", symbolName)))
 #define X_LINK_LIB(libName)							X_PRAGMA(comment(lib, libName))
@@ -42,6 +43,7 @@ extern "C" void* _ReturnAddress(void);
 #define X_EXPORT									__declspec(dllexport)
 #define X_OFFSETOF(s,m)								offsetof(s,m)
 #define X_ARRAY_SIZE(x)								((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
+#define X_NO_SWITCH_DEFAULT							X_HINT(0)
 
 // these should not be used there is a native patch seperator define in Path<T>::
 // #define X_PATHSEPERATOR_STR						"\\"
@@ -65,7 +67,6 @@ struct check_size_static : std::true_type
 	static_assert(ExpectedSize == RealSize, "type has a incorrect size");
 };
 
-// static const check_size_static<type, size> X_PP_UNIQUE_NAME(size_check);
 
 #define X_ENSURE_SIZE(type,size) \
 	static_assert(check_size_static<type, size>::value, "Size check fail");

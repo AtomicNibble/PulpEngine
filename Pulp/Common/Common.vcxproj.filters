@@ -217,6 +217,12 @@
     <Filter Include="Interfaces_h\Network">
       <UniqueIdentifier>{28afd16b-0eb3-43fa-8748-2462fdd0b569}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Core\clang">
+      <UniqueIdentifier>{1671c476-d8fa-45ac-b8b0-d848eebafb15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Core\msvc">
+      <UniqueIdentifier>{23f7a4fb-4236-4275-9c53-644b911a2fb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -342,9 +348,6 @@
     </ClInclude>
     <ClInclude Include="ICore.h">
       <Filter>Interfaces_h</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\win32\Compiler.h">
-      <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
     <ClInclude Include="IEngineModule.h">
       <Filter>Interfaces_h</Filter>
@@ -627,9 +630,6 @@
     </ClInclude>
     <ClInclude Include="Debugging\win32\CallStack.h">
       <Filter>Headers\Debugging\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform\Compiler.h">
-      <Filter>Headers\Platform</Filter>
     </ClInclude>
     <ClInclude Include="Containers\ByteStream.h">
       <Filter>Headers\Containers</Filter>
@@ -1230,6 +1230,15 @@
     </ClInclude>
     <ClInclude Include="IFileSysStats.h">
       <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Compiler.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\msvc\Compiler.h">
+      <Filter>Headers\Core\msvc</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\clang\Compiler.h">
+      <Filter>Headers\Core\clang</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

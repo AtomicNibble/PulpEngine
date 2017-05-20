@@ -87,8 +87,11 @@
     <ClInclude Include="Containers\LinkedListIntrusive.h" />
     <ClInclude Include="Containers\PriorityQueue.h" />
     <ClInclude Include="Containers\Stack.h" />
+    <ClInclude Include="Core\clang\Compiler.h" />
+    <ClInclude Include="Core\Compiler.h" />
     <ClInclude Include="Core\Configuration.h" />
     <ClInclude Include="Core\ConfigurationWin32.h" />
+    <ClInclude Include="Core\msvc\Compiler.h" />
     <ClInclude Include="Core\Platform.h" />
     <ClInclude Include="Core\PlatformWin32.h" />
     <ClInclude Include="Debugging\AbortHandler.h" />
@@ -253,7 +256,6 @@
     <ClInclude Include="Memory\VirtualMem.h" />
     <ClInclude Include="NetMsgIds.h" />
     <ClInclude Include="Platform\ClipBoard.h" />
-    <ClInclude Include="Platform\Compiler.h" />
     <ClInclude Include="Platform\Console.h" />
     <ClInclude Include="Platform\DirectoryWatcher.h" />
     <ClInclude Include="Platform\MessageBox.h" />
@@ -263,7 +265,6 @@
     <ClInclude Include="Platform\TrayIcon.h" />
     <ClInclude Include="Platform\Types.h" />
     <ClInclude Include="Platform\win32\ClipBoard.h" />
-    <ClInclude Include="Platform\win32\Compiler.h" />
     <ClInclude Include="Platform\win32\Console.h" />
     <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />

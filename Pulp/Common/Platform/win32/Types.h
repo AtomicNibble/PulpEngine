@@ -3,8 +3,6 @@
 #ifndef _X_TYPES_H_
 #define _X_TYPES_H_
 
-#include "Compiler.h"
-
 
 #ifdef DWORD
 #undef DWORD
