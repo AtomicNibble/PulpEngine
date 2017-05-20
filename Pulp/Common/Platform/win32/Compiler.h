@@ -52,8 +52,8 @@ extern "C" void* _ReturnAddress(void);
 #define X_PACK_PUSH(val)							X_PRAGMA(pack(push,val))
 #define X_PACK_POP									X_PRAGMA(pack(pop))
 
-#define X_ENSURE_GE(val1,val2,msg)	static_assert(val1 >= val2, msg);
-#define X_ENSURE_LE(val1,val2,msg)	static_assert(val1 <= val2, msg);
+#define X_ENSURE_GE(val1,val2,msg)					static_assert(val1 >= val2, msg);
+#define X_ENSURE_LE(val1,val2,msg)					static_assert(val1 <= val2, msg);
 
 #if 1 // shows the current size(template args are wrote to log), so i don't have to check.
 
