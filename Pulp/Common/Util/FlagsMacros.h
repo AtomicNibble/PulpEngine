@@ -70,7 +70,6 @@
 				X_PP_EXPAND_ARGS(X_DECLARE_FLAGS_IMPL_TO_STRING, __VA_ARGS__)												\
 				default:																													\
 					X_NO_SWITCH_DEFAULT;																									\
-					return "<err>";																											\
 			}																																\
 		}																																	\
 	}
@@ -97,7 +96,6 @@
 				X_PP_EXPAND_ARGS(X_DECLARE_FLAGS_IMPL_TO_STRING, __VA_ARGS__)												\
 				default:																													\
 					X_NO_SWITCH_DEFAULT;																									\
-					return "<err>";																											\
 			}																																\
 		}																																	\
 	}
