@@ -1119,7 +1119,7 @@ int XParser::ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxpar
 	int i, done, lastcomma, numparms, indent;
 
 	if (!ReadSourceToken(token)) {
-		Error("define '%s' missing parameters", pDefine->name);
+		Error("define '%s' missing parameters", pDefine->name.c_str());
 		return false;
 	}
 
@@ -1134,13 +1134,13 @@ int XParser::ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxpar
 	// if no leading "("
 	if (!token.isEqual("(")) {
 		UnreadSourceToken(token);
-		Error("define '%s' missing parameters", pDefine->name);
+		Error("define '%s' missing parameters", pDefine->name.c_str());
 		return false;
 	}
 	// read the define parameters
 	for (done = 0, numparms = 0, indent = 1; !done;) {
 		if (numparms >= maxparms) {
-			Error("define '%s' with too many parameters", pDefine->name);
+			Error("define '%s' with too many parameters", pDefine->name.c_str());
 			return false;
 		}
 		parms[numparms] = nullptr;
@@ -1149,7 +1149,7 @@ int XParser::ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxpar
 		while (!done) {
 
 			if (!ReadSourceToken(token)) {
-				Error("define '%s' incomplete", pDefine->name);
+				Error("define '%s' incomplete", pDefine->name.c_str());
 				return false;
 			}
 
