@@ -55,6 +55,8 @@ protected:
 template<typename T, typename SynchronizationPrimitive>
 class ThreadQueBlocking : public ThreadQue<T, SynchronizationPrimitive>
 {
+	typedef ThreadQue<T, SynchronizationPrimitive> BaseQue;
+
 public:
 	using ThreadQue<T, SynchronizationPrimitive>::ThreadQue;
 
@@ -72,6 +74,8 @@ private:
 template<typename T>
 class ThreadQueBlocking<T, core::CriticalSection> : public ThreadQue<T, core::CriticalSection>
 {
+	typedef ThreadQue<T, core::CriticalSection> BaseQue;
+
 public:
 	using ThreadQue<T, CriticalSection>::ThreadQue;
 
