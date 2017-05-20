@@ -16,6 +16,7 @@ public:
 	typedef typename T* pointer;
 
 	X_INLINE UniquePointerBase(core::MemoryArenaBase* arena, T* pInstance);
+	X_INLINE UniquePointerBase(UniquePointerBase&& oth);
 
 	X_INLINE core::MemoryArenaBase* getArena(void) const;
 	X_INLINE pointer& ptr(void);

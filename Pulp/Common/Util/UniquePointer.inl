@@ -9,6 +9,16 @@ X_INLINE UniquePointerBase<T>::UniquePointerBase(core::MemoryArenaBase* arena, T
 
 }
 
+template<typename T>
+X_INLINE UniquePointerBase<T>::UniquePointerBase(UniquePointerBase&& oth) :
+	pInstance_(oth.pInstance_),
+	arena_(oth.arena_)
+{
+	oth.pInstance_ = nullptr;
+}
+
+
+
 
 template<typename T>
 X_INLINE core::MemoryArenaBase* UniquePointerBase<T>::getArena(void) const
@@ -54,8 +64,7 @@ X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, T* pInsta
 
 template<typename T>
 X_INLINE UniquePointer<T>::UniquePointer(UniquePointer&& oth) :
-	pInstance_(oth.release()),
-	arena_(oth.arena_)
+	Mybase(std::move(oth))
 {
 }
 
