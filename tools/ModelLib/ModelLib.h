@@ -3,7 +3,7 @@
 #ifndef X_MODELLIB_H_
 #define X_MODELLIB_H_
 
-#include <Platform\Compiler.h>
+#include <Core\Compiler.h>
 
 #ifndef MODELLIB_EXPORT
 #ifdef X_LIB

@@ -5,7 +5,7 @@
 #ifndef X_MATLIB_H_
 #define X_MATLIB_H_
 
-#include <Platform\Compiler.h>
+#include <Core\Compiler.h>
 
 #ifndef MATLIB_EXPORT
 #ifdef X_LIB
