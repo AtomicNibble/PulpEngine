@@ -61,7 +61,7 @@ public:
 
 private:
 	void deleter(pointer ptr) {
-		X_DELETE(const_cast<typename std::remove_const<T>::type*>(ptr), getArena());
+		X_DELETE(const_cast<typename std::remove_const<T>::type*>(ptr), Mybase::getArena());
 	}
 };
 
