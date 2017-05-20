@@ -42,6 +42,8 @@ namespace profiler
 		typedef core::Array<XProfileData*>	ProfilerDataPtrArr;
 		typedef core::Array<XProfileDataHistory*>	ProfilerDataHistoryPtrArr;
 
+		typedef ProfilerHistory<int64_t, 64> FrameTimes;
+
 
 	public:
 		XProfileSys(core::MemoryArenaBase* arena);
@@ -111,6 +113,10 @@ namespace profiler
 		TimeVal repeatEventInitialDelay_;
 		TimeVal repeatEventTimer_; // the time a repeat event will be trigger.
 
+		uint64_t frameStartTime_;
+		uint64_t frameTime_;
+		uint64_t totalTime_;
+		FrameTimes frameTimeHistory_;
 
 		ProfilerDataPtrArr profilerData_;
 		ProfilerDataHistoryPtrArr profilerHistoryData_;
