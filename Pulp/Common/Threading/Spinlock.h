@@ -1,9 +1,6 @@
 #pragma once
 
 
-#ifndef _X_THREADING_SPINLOCK_H_
-#define _X_THREADING_SPINLOCK_H_
-
 #include "Atomic.h"
 #include "Thread.h"
 #include "ScopedLock.h"
@@ -46,10 +43,8 @@ private:
 };
 
 
-#include "Spinlock.inl"
 
 X_NAMESPACE_END
 
-
-#endif // !_X_THREADING_SPINLOCK_H_
+#include "Spinlock.inl"
 

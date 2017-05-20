@@ -1,4 +1,5 @@
 
+X_NAMESPACE_BEGIN(core)
 
 
 X_INLINE Spinlock::Spinlock() :
@@ -9,8 +10,9 @@ X_INLINE Spinlock::Spinlock() :
 X_INLINE void Spinlock::Enter(void)
 {
 	for (;;) {
-		if (atomic::CompareExchange(&locked_, 1, 0) == 0)
+		if (atomic::CompareExchange(&locked_, 1, 0) == 0) {
 			break;
+		}
 	}
 }
 
@@ -22,8 +24,9 @@ X_INLINE bool Spinlock::TryEnter(void)
 X_INLINE bool Spinlock::TryEnter(unsigned int tries)
 {
 	while (tries > 0) {
-		if (atomic::CompareExchange(&locked_, 1, 0) == 0)
+		if (atomic::CompareExchange(&locked_, 1, 0) == 0) {
 			return true;
+		}
 		tries++;
 	}
 	return false;
@@ -50,8 +53,9 @@ X_INLINE void SpinlockRecursive::Enter(void)
 	if (threadId != threadId_)
 	{
 		for (;;) {
-			if (atomic::CompareExchange(&locked_, 1, 0) == 0)
+			if (atomic::CompareExchange(&locked_, 1, 0) == 0) {
 				break;
+			}
 		}
 
 		threadId_ = threadId;
@@ -73,3 +77,5 @@ X_INLINE void SpinlockRecursive::Leave(void)
 	}
 }
 
+
+X_NAMESPACE_END
