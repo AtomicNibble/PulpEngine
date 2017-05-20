@@ -10,7 +10,7 @@ extern "C" void* _ReturnAddress(void);
 #pragma intrinsic(_ReturnAddress)
 
 
-#define X_ABSTRACT									abstract
+#define X_ABSTRACT									= 0
 #define X_OVERRIDE									override
 #define X_FINAL										override final 
 
