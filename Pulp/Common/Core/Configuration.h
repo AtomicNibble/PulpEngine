@@ -63,8 +63,11 @@
 
 #ifdef __clang__
 #define X_COMPILER clang
+#define X_COMPILER_CLANG 1
 #else
 #define X_COMPILER msvc
+#define X_COMPILER_MSCV 1
+
 #endif
 
 
