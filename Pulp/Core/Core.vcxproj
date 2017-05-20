@@ -508,7 +508,6 @@
     <ClCompile Include="xFileSys.cpp" />
     <ClCompile Include="XFindData.cpp" />
     <ClCompile Include="XProfile.cpp" />
-    <ClCompile Include="XProfileRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Console.inl" />
