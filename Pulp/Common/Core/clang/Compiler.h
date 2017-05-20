@@ -45,10 +45,6 @@ extern "C" void* _ReturnAddress(void);
 #define X_ARRAY_SIZE(x)								((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 #define X_NO_SWITCH_DEFAULT							__builtin_unreachable()
 
-// these should not be used there is a native patch seperator define in Path<T>::
-// #define X_PATHSEPERATOR_STR						"\\"
-// #define X_PATHSEPERATOR_CHAR						'\\'
-
 
 
 #define X_PACK_PUSH(val)							X_PRAGMA(pack(push,val))
