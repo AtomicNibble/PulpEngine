@@ -7,13 +7,13 @@ namespace strUtil
 	template<typename T>
 	inline size_t StringBytes(const T& str)
 	{
-		return str.length() * sizeof(T::value_type);
+		return str.length() * sizeof(typename T::value_type);
 	}
 
 	template<typename T>
 	inline size_t StringBytesIncNull(const T& str)
 	{
-		return (str.length() + 1) * sizeof(T::value_type);
+		return (str.length() + 1) * sizeof(typename T::value_type);
 	}
 
 
