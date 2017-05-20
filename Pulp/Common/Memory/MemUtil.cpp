@@ -90,7 +90,7 @@ void SIMDMemFill(void* __restrict _Dest, __m128 FillVector, size_t NumQuadwords)
 {
 	X_ASSERT_ALIGNMENT(_Dest, 16, 0);
 
-	register const __m128i Source = _mm_castps_si128(FillVector);
+	const __m128i Source = _mm_castps_si128(FillVector);
 	__m128i* __restrict pDest = (__m128i* __restrict)_Dest;
 
 	switch (((size_t)pDest >> 4) & 3)
