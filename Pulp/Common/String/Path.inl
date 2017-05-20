@@ -8,7 +8,7 @@ Path<TChar>::Path()
 template<typename TChar>
 Path<TChar>::Path(const Path& oth)
 {
-	append(oth.c_str(), oth.length());
+	BaseType::append(oth.c_str(), oth.length());
 }
 
 template<>
@@ -221,14 +221,14 @@ const Path<TChar> Path<TChar>::operator+(const TChar* str) const
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator+=(const Path<TChar>& oth)
 {
-	append(oth.c_str(), oth.length());
+	BaseType::append(oth.c_str(), oth.length());
 	return *this;
 }
 
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator+=(const TChar* str)
 {
-	append(str);
+	BaseType::append(str);
 	return *this;
 }
 
@@ -238,8 +238,8 @@ template<typename TChar>
 inline void Path<TChar>::ensureSlash(void)
 {
 	if (this->len_ > 0) {
-		stripTrailing(NATIVE_SLASH);
-		append(NATIVE_SLASH, 1);
+		BaseType::stripTrailing(NATIVE_SLASH);
+		BaseType::append(NATIVE_SLASH, 1);
 	}
 }
 
@@ -287,7 +287,7 @@ template<typename TChar>
 inline void Path<TChar>::removeTrailingSlash(void)
 {
 	replaceSeprators();
-	stripTrailing(NATIVE_SLASH);
+	BaseType::stripTrailing(NATIVE_SLASH);
 }
 
 template<typename TChar>
