@@ -57,9 +57,7 @@ public:
 	// removes a refrence from the string, delete if == 0
 	~StringRef();
 
-	enum npos_type {
-		npos = (size_type)~0
-	};
+	static const size_type npos = std::numeric_limits<size_type>::max();
 
 protected:
 	// used by the charwrapper for allocation free construction.
