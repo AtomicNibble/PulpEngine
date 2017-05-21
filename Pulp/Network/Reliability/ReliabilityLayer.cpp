@@ -453,7 +453,7 @@ void ReliablePacket::assignPropertiesExcData(const ReliablePacket* pOth)
 	sendAttemps = 0;
 
 	orderingChannel = pOth->orderingChannel;
-	splitPacketId = splitPacketId;
+	splitPacketId = pOth->splitPacketId;
 	splitPacketIndex = pOth->splitPacketIndex;
 	splitPacketCount = pOth->splitPacketCount;
 
