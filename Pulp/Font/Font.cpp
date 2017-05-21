@@ -771,7 +771,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 
 	const float scaleX = ctx.size.x / pFontTexture_->GetCellWidth();
 	const float scaleY = ctx.size.y / pFontTexture_->GetCellHeight();
-	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
+//	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
 	const float hozAdvance =  (metrics.max_advance * scaleX);
 	const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
 
