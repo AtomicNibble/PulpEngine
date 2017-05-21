@@ -18,7 +18,7 @@ struct dateStampSmall
 	}
 
 	void setDate(int year, int month, int day){
-		date_ = ((year << 9) && 0x7F) | ((month << 5) & 0xF) << (day & 0x1F);
+		date_ = ((year << 9) & 0x7F) | ((month << 5) & 0xF) << (day & 0x1F);
 	}
 
 	int year(void) const { return (date_ >> 9) + 1980; }
