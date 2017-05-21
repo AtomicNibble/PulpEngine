@@ -39,6 +39,10 @@ namespace
 		return (*h)(evcode, p1, p2, dbname, tvname);
 	}
 
+	struct SqlitePrintfDeleter {
+		void operator()(char* pStr) { sqlite3_free(pStr); }
+	};
+
 } // namespace
 
 
@@ -250,7 +254,7 @@ bool SqlLiteDb::executeFmt(const char* sql, ...)
 {
 	va_list ap;
 	va_start(ap, sql);
-	std::shared_ptr<char> msql(sqlite3_vmprintf(sql, ap), sqlite3_free);
+	std::unique_ptr<char, SqlitePrintfDeleter> msql(sqlite3_vmprintf(sql, ap));
 	va_end(ap);
 
 	return execute(msql.get());
@@ -271,7 +275,7 @@ Result::Enum SqlLiteDb::executeFmtRes(const char* sql, ...)
 {
 	va_list ap;
 	va_start(ap, sql);
-	std::shared_ptr<char> msql(sqlite3_vmprintf(sql, ap), sqlite3_free);
+	std::unique_ptr<char, SqlitePrintfDeleter> msql(sqlite3_vmprintf(sql, ap));
 	va_end(ap);
 
 	return executeRes(msql.get());
