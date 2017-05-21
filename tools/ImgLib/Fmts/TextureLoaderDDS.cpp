@@ -423,6 +423,8 @@ namespace DDS
 						case dxt_format::BC7_UNORM:
 						case dxt_format::BC7_UNORM_SRGB:
 							return true;
+						default:
+							break;
 					}
 				default: break;
 				}
@@ -473,6 +475,9 @@ namespace DDS
 						case dxt_format::BC7_UNORM:
 						case dxt_format::BC7_UNORM_SRGB:
 							return 16;
+
+						default:
+							break;
 					}
 
 				default:
@@ -522,7 +527,12 @@ namespace DDS
 							return Texturefmt::BC7;
 						case dxt_format::BC7_UNORM_SRGB:
 							return Texturefmt::BC7_SRGB;
+						default:
+							break;
 					}
+
+				default:
+					break;
 				}
 
 				return Texturefmt::UNKNOWN;
