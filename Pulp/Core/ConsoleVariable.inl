@@ -87,12 +87,8 @@ void CVarString<T>::Set(const char* pStr)
 		return;
 	}
 
-	OnModified();
 	String_ = pStr;
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.
-	}
+	OnModified();
 }
 
 template<class T>
@@ -233,12 +229,9 @@ void CVarInt<T>::Set(const int i)
 	if (iVal == IntValue_) {
 		return;
 	}
-	OnModified();
-	IntValue_ = iVal;
 
-	if (CVarBase::changeFunc_) {
-		CVarBase::changeFunc_.Invoke(this); // change callback.	
-	}
+	IntValue_ = iVal;
+	OnModified();
 }
 
 template<class T>
@@ -379,12 +372,8 @@ void CVarFloat<T>::Set(const float f)
 		return;
 	}
 
-	OnModified();
 	fValue_ = fVal;
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	OnModified();
 }
 
 template<class T>
@@ -509,13 +498,8 @@ void CVarIntRef::Set(const int i)
 		return;
 	}
 
-	OnModified();
 	IntValue_ = iVal;
-
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	OnModified();
 }
 
 
@@ -648,12 +632,8 @@ void CVarFloatRef::Set(const float f)
 		return;
 	}
 
-	OnModified();
 	fValue_ = f;
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+	OnModified();
 }
 
 

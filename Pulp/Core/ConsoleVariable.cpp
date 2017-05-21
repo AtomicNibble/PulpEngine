@@ -143,6 +143,10 @@ ConsoleVarFunc CVarBase::GetOnChangeCallback(void) const
 void CVarBase::OnModified(void)
 {
 	flags_.Set(VarFlag::MODIFIED);
+
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
+	}
 }
 
 
@@ -255,10 +259,6 @@ void CVarColRef::Set(const char* s)
 	// assign
 	ColValue_ = col;
 	OnModified();
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.
-	}
 }
 
 
@@ -330,10 +330,6 @@ void CVarVec3Ref::Set(const char* s)
 	// assign
 	Value_ = vec;
 	OnModified();
-
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
 }
 
 
