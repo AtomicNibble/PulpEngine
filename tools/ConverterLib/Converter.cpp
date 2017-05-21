@@ -594,7 +594,7 @@ IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
 	if (!EnsureLibLoaded(assType)) {
 		X_ERROR("Converter", "Failed to load convert for asset type: \"%s\"", AssetType::ToString(assType));
-		return false;
+		return nullptr;
 	}
 
 	return converters_[assType];
