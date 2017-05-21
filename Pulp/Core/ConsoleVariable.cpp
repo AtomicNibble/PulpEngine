@@ -68,7 +68,7 @@ namespace
 
 CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, const char* desc) :
 	pDesc_(desc),
-	Flags_(nFlags),
+	flags_(nFlags),
 	pConsole_(pConsole)
 {
 
@@ -162,7 +162,7 @@ void CVarBase::Reset(void)
 template<class T>
 void CVarInt<T>::Set(const char* s)
 {
-	int32_t val = TextToInt(s, IntValue_, flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(s, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
 	Set(val);
 }
@@ -172,7 +172,7 @@ void CVarInt<T>::Set(const char* s)
 
 void CVarIntRef::Set(const char* s)
 {
-	int32_t val = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(s, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
 	Set(val);
 }
@@ -241,7 +241,7 @@ void CVarColRef::Set(const char* s)
 {
 	X_ASSERT_NOT_NULL(s);
 
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
