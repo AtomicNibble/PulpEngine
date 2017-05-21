@@ -241,7 +241,7 @@ public:
 
 	typedef typename ResourceMap::iterator ResourceItor;
 	typedef typename ResourceMap::const_iterator ResourceConstItor;
-	typedef typename ThreadPolicy ThreadPolicy;
+	typedef ThreadPolicy ThreadPolicy;
 
 public:
 	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
