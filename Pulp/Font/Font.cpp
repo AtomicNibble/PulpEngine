@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Font.h"
 
-#include "XFontTexture.h"
-#include "XFontSystem.h"
+#include "FontRender\XFontTexture.h"
+#include "Sys\XFontSystem.h"
 
 #include <IRender.h>
 #include <I3DEngine.h>

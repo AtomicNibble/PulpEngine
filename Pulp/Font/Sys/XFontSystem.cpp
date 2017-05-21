@@ -2,7 +2,7 @@
 
 #include "XFontSystem.h"
 #include "Font.h"
-#include "XFontTexture.h"
+#include "FontRender\XFontTexture.h"
 
 #include <IConsole.h>
 

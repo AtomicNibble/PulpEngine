@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Font.h"
 
-#include "XFontSystem.h"
+#include "Sys\XFontSystem.h"
 
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
