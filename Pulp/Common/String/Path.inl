@@ -159,9 +159,9 @@ void Path<TChar>::setFileName(const TChar* pFileNameBegin, const TChar* pFileNam
 template<typename TChar>
 void Path<TChar>::operator=(const TChar* str)
 {
-	len_ = strUtil::strlen(str);
-	len_ = core::Min<size_t>(len_, MAX_PATH);
-	memcpy(str_, str, (len_ + 1) * sizeof(TChar));
+	BaseType::len_ = strUtil::strlen(str);
+	BaseType::len_ = core::Min<size_t>(BaseType::len_, MAX_PATH);
+	memcpy(BaseType::str_, str, (BaseType::len_ + 1) * sizeof(TChar));
 }
 
 // -----------------------------------------------
