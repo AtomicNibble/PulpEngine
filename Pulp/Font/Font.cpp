@@ -43,8 +43,8 @@ namespace
 XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
 	fontSys_(fontSys),
 	name_(pFontName),
-	pFontTexture_(nullptr),
 	effects_(g_fontArena),
+	pFontTexture_(nullptr),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
 	pMaterial_(nullptr),

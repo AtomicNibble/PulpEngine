@@ -133,8 +133,6 @@ struct SCoreInitParams
 	core::MemoryArenaBase* pCoreArena;
 
 	// these should be turned into flags.
-	bool bVsLog;
-	bool bConsoleLog;
 	bool bTesting;
 	bool bSkipInput;
 	bool bSkipSound;
@@ -146,6 +144,8 @@ struct SCoreInitParams
 	bool bFileSysWorkingDir;
 	bool bThreadSafeStringAlloc;
 	bool bProfileSysEnabled;
+	bool bVsLog;
+	bool bConsoleLog;
 
 	Vec4i seed;
 
@@ -193,18 +193,19 @@ struct SCoreInitParams
 		bThreadSafeStringAlloc(true),
 		bProfileSysEnabled(false),
 
-#if X_SUPER == 0
-		bConsoleLog(true),
+#if X_DEBUG 
+		bVsLog(true),
 #else
-		bConsoleLog(false),
+		bVsLog(false),
 #endif
 
-#if X_DEBUG 
-		bVsLog(true)
+#if X_SUPER == 0
+		bConsoleLog(true)
 #else
-		bVsLog(false)
+		bConsoleLog(false)
 #endif
-	{}
+	{
+	}
 };
 
 
