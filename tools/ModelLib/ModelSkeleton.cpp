@@ -107,7 +107,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 		char TagNameBuf[model::MODEL_MAX_BONE_NAME_LENGTH * model::MODEL_MAX_BONES];
 
 		file.seek(tagNameOffset, core::SeekMode::SET);
-		if (!file.read(TagNameBuf, hdr.tagNameDataSize) != hdr.tagNameDataSize) {
+		if (file.read(TagNameBuf, hdr.tagNameDataSize) != hdr.tagNameDataSize) {
 			X_ERROR("Model", "failed to read tag buf");
 			return false;
 		}
