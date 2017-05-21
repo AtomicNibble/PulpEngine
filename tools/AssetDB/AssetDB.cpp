@@ -675,7 +675,7 @@ bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut)
 
 // --------------------------------------------------------
 
-AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>& outDir)
+AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, const core::Path<char>& outDir)
 {
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Mod with empty name not allowed");

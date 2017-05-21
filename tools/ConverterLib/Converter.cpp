@@ -312,7 +312,7 @@ bool Converter::CleanAll(int32_t modId)
 	return CleanMod(modId, mod.name, mod.outDir);
 }
 
-bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
+bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, const core::Path<char>& outDir)
 {
 	// mark all the assets for this mod stale.
 	if (!db_.MarkAssetsStale(modId)) {

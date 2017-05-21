@@ -115,7 +115,7 @@ public:
 	typedef core::Array<uint8_t> DataArr;
 
 	// callbacks.
-	typedef core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> ModDelegate;
+	typedef core::Delegate<bool(ModId id, const core::string& name, const core::Path<char>& outDir)> ModDelegate;
 	typedef core::Delegate<bool(AssetType::Enum, const core::string& name)> AssetDelegate;
 
 	typedef sql::SqlLiteDb::ThreadMode ThreadMode;
@@ -143,7 +143,7 @@ public:
 
 
 	// Mod api
-	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);	
+	Result::Enum AddMod(const core::string& name, const core::Path<char>& outDir);
 	bool SetMod(const core::string& name); // must exsists.
 	bool SetMod(ModId id);
 	bool ModExsists(const core::string& name, ModId* pModId = nullptr);

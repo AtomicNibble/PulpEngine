@@ -74,7 +74,7 @@ private:
 	bool loadConversionProfiles(const core::string& profileName);
 	void clearConversionProfiles(void);
 
-	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir);
+	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, const core::Path<char>& outDir);
 
 	bool GenerateThumb(AssetType::Enum assType, const core::string& name);
 	bool Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut);
