@@ -18,6 +18,10 @@
 
 #include "FileSys/xFileSys.h"
 
+#if X_COMPILER_CLANG
+#include <cpuid.h> 
+#endif // !X_COMPILER_CLANG
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -36,7 +40,13 @@ namespace
 		X_INLINE uint64_t getTicksFlush(void)
 		{
 			int temp[4];
+
+#if X_COMPILER_CLANG
+			__cpuid(temp, temp[0], temp[1], temp[2], temp[3]);
+#else
 			__cpuid(temp, 0);
+#endif // !X_COMPILER_CLANG
+
 			return __rdtsc();
 		}
 
