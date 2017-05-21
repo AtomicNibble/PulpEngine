@@ -132,7 +132,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 	// now we need to scale each of the timers.
 	{
 		const int64_t gameTime = scaleTime(frameDeltaCapped, timeScale_);
-		frameTime.deltas[Timer::GAME].SetValue(frameDeltaCapped);
+		frameTime.deltas[Timer::GAME].SetValue(gameTime);
 	}
 	{
 		const int64_t uiTime = scaleTime(frameDeltaCapped, timeScaleUi_);
