@@ -524,7 +524,7 @@ inline const T* FifoIterator<T>::operator->(void) const
 }
 
 template<typename T>
-inline typename FifoIterator<T>& FifoIterator<T>::operator++(void)
+inline FifoIterator<T>& FifoIterator<T>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -536,7 +536,7 @@ inline typename FifoIterator<T>& FifoIterator<T>::operator++(void)
 }
 
 template<typename T>
-inline typename FifoIterator<T> FifoIterator<T>::operator++(int)
+inline FifoIterator<T> FifoIterator<T>::operator++(int)
 {
 	iterator tmp = *this;
 	++(*this); // call the function above.
@@ -570,7 +570,7 @@ inline const T* FifoConstIterator<T>::operator->(void) const
 }
 
 template<typename T>
-inline typename FifoConstIterator<T>& FifoConstIterator<T>::operator++(void)
+inline FifoConstIterator<T>& FifoConstIterator<T>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -582,7 +582,7 @@ inline typename FifoConstIterator<T>& FifoConstIterator<T>::operator++(void)
 }
 
 template<typename T>
-inline typename FifoConstIterator<T> FifoConstIterator<T>::operator++(int)
+inline FifoConstIterator<T> FifoConstIterator<T>::operator++(int)
 {
 	const_iterator tmp = *this;
 	++(*this); // call the function above.
