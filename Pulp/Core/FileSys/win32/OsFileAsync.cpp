@@ -37,8 +37,8 @@ XFileStats OsFileAsync::s_stats;
 
 OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
 	overlappedArena_(overlappedArena),
-	hFile_(INVALID_HANDLE_VALUE),
-	mode_(mode)
+	mode_(mode),
+	hFile_(INVALID_HANDLE_VALUE)
 {
 	X_ASSERT_NOT_NULL(path);
 

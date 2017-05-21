@@ -19,8 +19,8 @@ XFileStats OsFile::s_stats;
 
 
 OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
-	file_(INVALID_HANDLE_VALUE), 
-	mode_(mode)
+	mode_(mode),
+	file_(INVALID_HANDLE_VALUE)
 {
 	DWORD access = mode::GetAccess(mode);
 	DWORD share = mode::GetShareMode(mode);

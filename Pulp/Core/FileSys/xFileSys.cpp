@@ -107,8 +107,8 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 
 
 xFileSys::xFileSys() :
-	searchPaths_(nullptr),
 	gameDir_(nullptr),
+	searchPaths_(nullptr),
 	// ..
 	filePoolHeap_(
 		bitUtil::RoundUpToMultiple<size_t>(
@@ -137,9 +137,9 @@ xFileSys::xFileSys() :
 	asyncOpPoolArena_(&asyncOpPoolAllocator_, "AsyncOpPool"),
 	// ..
 	memFileArena_(&memfileAllocator_, "MemFileData"),
-	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE),
 	currentRequestIdx_(0),
-	requestSignal_(true)
+	requestSignal_(true),
+	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pArena);

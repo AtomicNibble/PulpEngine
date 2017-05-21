@@ -100,11 +100,11 @@ namespace profiler
 	XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
 		pFont_(nullptr),
 		frameOffset_(0),
-		profilerData_(arena),
-		profilerHistoryData_(arena),
 		frameStartTime_(0),
 		frameTime_(0),
-		totalTime_(0)
+		totalTime_(0),
+		profilerData_(arena),
+		profilerHistoryData_(arena)
 	{
 		repeatEventTimer_ = TimeVal(0ll);
 		repeatEventInterval_ = TimeVal(0.05f);
