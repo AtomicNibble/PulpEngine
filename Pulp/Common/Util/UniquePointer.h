@@ -13,7 +13,7 @@ template<typename T>
 class UniquePointerBase
 {
 public:
-	typedef typename T* pointer;
+	typedef T* pointer;
 
 	X_INLINE UniquePointerBase(core::MemoryArenaBase* arena, T* pInstance);
 	X_INLINE UniquePointerBase(UniquePointerBase&& oth);
