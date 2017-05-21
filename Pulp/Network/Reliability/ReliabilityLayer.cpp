@@ -1155,6 +1155,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 	}
 
 	const int32_t bitsPerSecondLimit = vars_.connectionBSPLimit();
+	X_UNUSED(bitsPerSecondLimit);
 
 	// HELLLLOOOO annnnyboddy.
 	if (hasTimedOut(time)) {
