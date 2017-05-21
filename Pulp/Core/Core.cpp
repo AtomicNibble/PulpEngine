@@ -85,21 +85,25 @@ core::MallocFreeAllocator XCore::malloc_;
 XCore::XCore() :
 	pWindow_(nullptr),
 	pConsole_(nullptr),
-	pCpuInfo_(nullptr),
-	pCrc32_(nullptr),
-#if X_ENABLE_PROFILER
-	pProfiler_(nullptr),
-#endif //!X_ENABLE_PROFILER
+	
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
-	pEventDispatcher_(nullptr),
-//	arena_(&malloc_, "GlobalMalloc"),
-	
+
+	pCpuInfo_(nullptr),
+	pCrc32_(nullptr),
+
 	moduleDLLHandles_(g_coreArena),
 	moduleInterfaces_(g_coreArena),
 	converterInterfaces_(g_coreArena),
 	assertHandlers_(g_coreArena),
+
+#if X_ENABLE_PROFILER
+	pProfiler_(nullptr),
+#endif //!X_ENABLE_PROFILER
+
 	dirWatcher_(g_coreArena),
+	
+	pEventDispatcher_(nullptr),
 	hotReloadExtMap_(g_coreArena),
 
 #if X_DEBUG
