@@ -333,42 +333,42 @@ X_INLINE CullResult::Enum XFrustum::cullOBB_ExactT(const OBB& obb) const
 	float32_t t0, t1, t2, t3, t4, t5;
 	bool mt0, mt1, mt2, mt3, mt4, mt5;
 
-	if (mt0 = (t0 = planes_[FrustumPlane::NEAR].distance(p)) > 0.0f) {
+	if ((mt0 = (t0 = planes_[FrustumPlane::NEAR].distance(p)) > 0.0f)) {
 		if (t0 > (math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | ay) +
 			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | az)))
 			return CullResult::EXCLUSION;
 	}
 
-	if (mt1 = (t1 = planes_[FrustumPlane::FAR].distance(p)) > 0.0f)	{
+	if ((mt1 = (t1 = planes_[FrustumPlane::FAR].distance(p)) > 0.0f))	{
 		if (t1 > (math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | ay) +
 			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | az)))
 			return CullResult::EXCLUSION;
 	}
 
-	if (mt2 = (t2 = planes_[FrustumPlane::RIGHT].distance(p)) > 0.0f) {
+	if ((mt2 = (t2 = planes_[FrustumPlane::RIGHT].distance(p)) > 0.0f)) {
 		if (t2 > (math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | ay) +
 			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | az)))
 			return CullResult::EXCLUSION;
 	}
 
-	if (mt3 = (t3 = planes_[FrustumPlane::LEFT].distance(p)) > 0.0f)	{
+	if ((mt3 = (t3 = planes_[FrustumPlane::LEFT].distance(p)) > 0.0f))	{
 		if (t3 > (math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | ay) +
 			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | az)))
 			return CullResult::EXCLUSION;
 	}
 
-	if (mt4 = (t4 = planes_[FrustumPlane::TOP].distance(p)) > 0.0f) {
+	if ((mt4 = (t4 = planes_[FrustumPlane::TOP].distance(p)) > 0.0f)) {
 		if (t4 > (math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | ay) +
 			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | az)))
 			return CullResult::EXCLUSION;
 	}
 
-	if (mt5 = (t5 = planes_[FrustumPlane::BOTTOM].distance(p)) > 0.0f) {
+	if ((mt5 = (t5 = planes_[FrustumPlane::BOTTOM].distance(p)) > 0.0f)) {
 		if (t5 > (math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ax) + 
 			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ay) + 
 			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | az)))
