@@ -72,7 +72,7 @@ void RangeList<T>::add(RangeType val)
 	// we want to find the first node that we can merge into.
 	// in order to merge into a list the min / max needs to be off by one.
 	// we also need to correctly select the range that mathes
-	auto compare = [](const RangeArr::Type& range, RangeType val) -> size_t {
+	auto compare = [](const typename RangeArr::Type& range, RangeType val) -> size_t {
 
 		// lower?
 		if (val < range.min - 1) {
@@ -130,7 +130,7 @@ void RangeList<T>::add(RangeType val)
 
 	if (val < range.min - one)
 	{
-		ranges_.insertAtIndex(rangeIdx, RangeArr::Type(val, val));
+		ranges_.insertAtIndex(rangeIdx, typename RangeArr::Type(val, val));
 		return;
 	}
 	else if (val == range.min - one)
