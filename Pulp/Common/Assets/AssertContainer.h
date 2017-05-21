@@ -168,7 +168,7 @@ public:
 
 
 template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy, 
-	typename ResourceRefPrim = std::conditional<std::is_same<MemoryThreadPolicy, core::SingleThreadPolicy>::value, int32_t, core::AtomicInt>::type>
+	typename ResourceRefPrim = typename std::conditional<std::is_same<MemoryThreadPolicy, core::SingleThreadPolicy>::value, int32_t, core::AtomicInt>::type>
 class AssetPool
 {
 public:
@@ -234,7 +234,7 @@ class AssetContainer : private AssetPool<AssetType, MaxAssets, core::SingleThrea
 		core::AtomicInt				// i've made this atmoic so that asset refs can be modified without having to take a lock on container.
 	> Pool;
 public:
-	typedef Pool::AssetResource Resource;
+	typedef typename Pool::AssetResource Resource;
 	typedef core::HashMap<core::string, Resource*> ResourceMap;
 	typedef core::Array<Resource*> ResourceList;
 	typedef core::Fifo<int32_t> IndexList;

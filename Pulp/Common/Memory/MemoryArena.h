@@ -56,19 +56,19 @@ class MemoryArena : public MemoryArenaBase
 {
 public:
 	/// A simple typedef that introduces the template type into this class.
-	typedef typename AllocationPolicy AllocationPolicy;
+	typedef AllocationPolicy AllocationPolicy;
 
 	/// A simple typedef that introduces the template type into this class.
-	typedef typename ThreadPolicy ThreadPolicy;
+	typedef ThreadPolicy ThreadPolicy;
 
 	/// A simple typedef that introduces the template type into this class.
-	typedef typename BoundsCheckingPolicy BoundsCheckingPolicy;
+	typedef BoundsCheckingPolicy BoundsCheckingPolicy;
 
 	/// A simple typedef that introduces the template type into this class.
-	typedef typename MemoryTrackingPolicy MemoryTrackingPolicy;
+	typedef MemoryTrackingPolicy MemoryTrackingPolicy;
 
 	/// A simple typedef that introduces the template type into this class.
-	typedef typename MemoryTaggingPolicy MemoryTaggingPolicy;
+	typedef MemoryTaggingPolicy MemoryTaggingPolicy;
 
 	static const bool IS_THREAD_SAFE = ThreadPolicy::IS_THREAD_SAFE;
 

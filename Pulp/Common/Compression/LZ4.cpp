@@ -151,7 +151,7 @@ namespace Compression
 	LZ4Stream::~LZ4Stream()
 	{
 		if (stream_) {
-			X_DELETE(stream_, arena_);
+			X_DELETE(reinterpret_cast<LZ4_stream_t*>(stream_), arena_);
 		}
 	}
 

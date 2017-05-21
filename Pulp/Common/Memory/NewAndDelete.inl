@@ -213,7 +213,7 @@ namespace Mem
 	{
 		X_ASSERT_NOT_NULL(where);
 
-		return Internal::ConstructArray<T>(where, N, std::conjunction<
+		return Internal::ConstructArray<T>(where, N, typename std::conjunction<
 			std::is_scalar<T>,
 			std::negation<std::is_volatile<T>>,
 			std::negation<std::is_member_pointer<T>>,

@@ -30,7 +30,7 @@ public:
 
 
 	struct Mode {
-		enum Enum {
+		enum Enum : uint32_t {
 			FULLSCREEN = WS_POPUP,									///< Fullscreen window.
 			APPLICATION = WS_OVERLAPPEDWINDOW,						///< Application window (windowed mode with standard icons)
 			TOOL = WS_THICKFRAME | WS_CAPTION | WS_OVERLAPPED		///< Tool window (windowed mode with no icons)

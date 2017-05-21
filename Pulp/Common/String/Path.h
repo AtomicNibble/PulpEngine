@@ -11,6 +11,8 @@ X_NAMESPACE_BEGIN(core)
 template<typename TChar = char>
 class Path : public StackString<MAX_PATH, TChar>
 {
+	typedef StackString<MAX_PATH, TChar> BaseType;
+
 public:
 #ifdef X_PLATFORM_WIN32
 	static const TChar NATIVE_SLASH = '\\';

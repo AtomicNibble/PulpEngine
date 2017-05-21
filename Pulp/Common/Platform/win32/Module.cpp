@@ -39,7 +39,7 @@ namespace Module
 
 	Proc GetProc(Handle module, const char* pName)
 	{
-		return ::GetProcAddress(reinterpret_cast<HMODULE>(module), pName);
+		return reinterpret_cast<Proc>(::GetProcAddress(reinterpret_cast<HMODULE>(module), pName));
 	}
 
 	bool UnLoad(Handle module)

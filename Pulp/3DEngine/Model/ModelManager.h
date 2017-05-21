@@ -8,12 +8,16 @@
 
 #include <Assets\AssertContainer.h>
 
+
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs;
+)
+
 X_NAMESPACE_BEGIN(model)
 
 class XModel;
 
 class XModelManager :
-//	public IModelManager,
 	public engine::XEngineBase,
 	public core::IXHotReload
 {
@@ -48,6 +52,10 @@ public:
 	void ListModels(const char* searchPatten = nullptr) const;
 	void ReloadModel(const char* pName);
 
+private:
+
+	void Cmd_ListModels(core::IConsoleCmdArgs* Cmd);
+	void Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd);
 
 private:
 	XModel*	pDefaultModel_;

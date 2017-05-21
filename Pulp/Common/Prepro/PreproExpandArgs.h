@@ -102,7 +102,11 @@
 /// Note that no matter how many arguments we provide, the macro to use is always \ref X_PP_EXPAND_ARGS. Because
 /// the provided \a op argument can itself be a macro, the \ref X_PP_EXPAND_ARGS macro offers a powerful facility for
 /// e.g. chaining an unlimited amount of calls, as used by the assertion system.
-#define X_PP_EXPAND_ARGS(op, ...)		X_PP_JOIN_2(X_PP_EXPAND_ARGS_, X_PP_NUM_ARGS(__VA_ARGS__)) X_PP_PASS_ARGS(op, __VA_ARGS__)
 
+#if X_COMPILER_CLANG
+#define X_PP_EXPAND_ARGS(op, ...)		X_PP_JOIN_2(X_PP_EXPAND_ARGS_, X_PP_NUM_ARGS(__VA_ARGS__))(op, __VA_ARGS__)
+#else
+#define X_PP_EXPAND_ARGS(op, ...)		X_PP_JOIN_2(X_PP_EXPAND_ARGS_, X_PP_NUM_ARGS(__VA_ARGS__)) X_PP_PASS_ARGS(op, __VA_ARGS__)
+#endif // !X_COMPILER_CLANG
 
 #endif // X_PREPROCESSOREXPANDARGS_H_

@@ -147,65 +147,60 @@ template <class Key,
 class HashMap : public HashBase<Key, std::pair<const Key, Value>, HashFn, EqualKey>
 {
 public:
-	typedef HashBase<Key, std::pair<const Key, Value>, HashFn, EqualKey> _base;
+	typedef HashBase<Key, std::pair<const Key, Value>, HashFn, EqualKey> BaseType;
 
-	typedef typename _base::key_type key_type;
-	typedef Value data_type;
-	typedef Value mapped_type;
-	typedef typename _base::value_type value_type;
-	typedef typename _base::hasher hasher;
-	typedef typename _base::key_equal key_equal;
+	typedef typename BaseType::key_type				key_type;
+	typedef Value									data_type;
+	typedef Value									mapped_type;
+	typedef typename BaseType::value_type			value_type;
+	typedef typename BaseType::hasher				hasher;
+	typedef typename BaseType::key_equal			key_equal;
 
 
-	typedef typename _base::size_type size_type;
-	typedef typename _base::reference reference;
-	typedef typename _base::const_reference const_reference;
-	typedef typename _base::pointer pointer;
-	typedef typename _base::const_pointer const_pointer;
+	typedef typename BaseType::size_type			size_type;
+	typedef typename BaseType::reference			reference;
+	typedef typename BaseType::const_reference		const_reference;
+	typedef typename BaseType::pointer				pointer;
+	typedef typename BaseType::const_pointer		const_pointer;
 
-	typedef typename _base::iterator			iterator;
-	typedef typename _base::const_iterator		const_iterator;
+	typedef typename BaseType::iterator				iterator;
+	typedef typename BaseType::const_iterator		const_iterator;
+	typedef typename BaseType::const_iterator		const_iterator;
+	typedef typename BaseType::Node					Node;
 
 	/// A constant defining the size of a single entry when stored in the hash map.
-	static const size_t PER_ENTRY_SIZE = _base::PER_ENTRY_SIZE;
+	static const size_t PER_ENTRY_SIZE = BaseType::PER_ENTRY_SIZE;
 	
-
-
-private:
-//	typedef HashMap_node<value_type> _Node;
-
 public:
-	HashMap(MemoryArenaBase* arena) : HashBase(arena) {}
-	explicit HashMap(MemoryArenaBase* arena, size_type num) : HashBase(arena, num) {}
+	HashMap(MemoryArenaBase* arena) : BaseType(arena) {}
+	explicit HashMap(MemoryArenaBase* arena, size_type num) : BaseType(arena, num) {}
 
-	std::pair<iterator, bool> insert(const value_type& obj )
+	std::pair<iterator, bool> insert(const value_type& obj)
 	{
-		ensureSize(numElements_ + 1);
-		return insertUniqueNoResize(obj);
+		BaseType::ensureSize(BaseType::numElements_ + 1);
+		return BaseType::insertUniqueNoResize(obj);
 	}
 
 	// reserver a number of elements
 	void reserve(size_type num)
 	{
-		ensureSize(num + 1);
+		BaseType::ensureSize(num + 1);
 	}
 
 
 	data_type& operator[](const key_type& key) {
-		return find(key)->second;
+		return BaseType::find(key)->second;
 	}
 
 	bool contains(const key_type& key) {
-		return find(key) != end();
+		return BaseType::find(key) != end();
 	}
 
 	template <class MemoryArenaT>
 	static inline size_t GetMemoryRequirement(size_t capacity)
 	{
-	//	size_type size = next_size(capacity);
-
-		return (MemoryArenaT::getMemoryRequirement(sizeof(_Node)*capacity) +
-			MemoryArenaT::getMemoryRequirement(sizeof(_Node*)*capacity));
+		return (MemoryArenaT::getMemoryRequirement(sizeof(Node)*capacity) +
+			MemoryArenaT::getMemoryRequirement(sizeof(Node*)*capacity));
 	}
 
 public:

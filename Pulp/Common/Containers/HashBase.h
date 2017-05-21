@@ -69,14 +69,14 @@ struct _HashBase_iterator
 	typedef _HashBase_iterator<Key, Value, HashFn, EqualKey>		iterator;
 	typedef _HashBase_const_iterator<Key, Value, HashFn, EqualKey>	const_iterator;
 
-	typedef HashBase_node<Value>	_Node;
+	typedef HashBase_node<Value>	Node;
 	typedef Value					value_type;
 	typedef ptrdiff_t				difference_type;
 	typedef size_t					size_type;
 	typedef Value&					reference;
 	typedef Value*					pointer;
 
-	_HashBase_iterator(_Node* n, _HashMap* _map) : cur_(n), hm_(_map) {}
+	_HashBase_iterator(Node* n, _HashMap* _map) : cur_(n), hm_(_map) {}
 	_HashBase_iterator() {}
 
 	reference operator*() const { return cur_->val_; }
@@ -92,7 +92,7 @@ struct _HashBase_iterator
 	}
 
 public:
-	_Node* cur_;
+	Node* cur_;
 	_HashMap* hm_;
 };
 
@@ -104,14 +104,14 @@ struct _HashBase_const_iterator
 	typedef _HashBase_iterator<Key, Value, HashFn, EqualKey>		iterator;
 	typedef _HashBase_const_iterator<Key, Value, HashFn, EqualKey>	const_iterator;
 
-	typedef HashBase_node<Value>	_Node;
+	typedef HashBase_node<Value>	Node;
 	typedef Value					value_type;
 	typedef ptrdiff_t				difference_type;
 	typedef size_t					size_type;
-	typedef const Value&					reference;
-	typedef const Value*					pointer;
+	typedef const Value&			reference;
+	typedef const Value*			pointer;
 
-	_HashBase_const_iterator(const _Node* n, const _HashMap* _map) : cur_(n), hm_(_map) {}
+	_HashBase_const_iterator(const Node* n, const _HashMap* _map) : cur_(n), hm_(_map) {}
 	_HashBase_const_iterator() {}
 	_HashBase_const_iterator(const iterator& it) : cur_(it.cur_), hm_(it.hm_) {}
 
@@ -128,7 +128,7 @@ struct _HashBase_const_iterator
 	}
 
 public:
-	const _Node* cur_;
+	const Node* cur_;
 	const _HashMap* hm_;
 };
 
@@ -146,11 +146,11 @@ public:
 	typedef EqualKey key_equal;
 
 
-	typedef typename size_t size_type;
-	typedef typename value_type& reference;
-	typedef typename const Value& const_reference;
-	typedef typename value_type* pointer;
-	typedef typename const value_type* const_pointer;
+	typedef size_t size_type;
+	typedef value_type& reference;
+	typedef const Value& const_reference;
+	typedef value_type* pointer;
+	typedef const value_type* const_pointer;
 
 	typedef _HashBase_iterator<Key, value_type, HashFn, EqualKey>			iterator;
 	typedef _HashBase_const_iterator<Key, value_type, HashFn, EqualKey>		const_iterator;
@@ -158,12 +158,11 @@ public:
 	friend struct _HashBase_iterator<Key, value_type, HashFn, EqualKey>;
 	friend struct _HashBase_const_iterator<Key, value_type, HashFn, EqualKey>;
 
-protected:
-	typedef HashBase_node<value_type> _Node;
+	typedef HashBase_node<value_type> Node;
 
 public:
 
-	static const size_t PER_ENTRY_SIZE = sizeof(_Node)+sizeof(_Node*);
+	static const size_t PER_ENTRY_SIZE = sizeof(Node) + sizeof(Node*);
 
 
 	HashBase(MemoryArenaBase* arena) : 
@@ -208,7 +207,7 @@ public:
 	iterator find(const key_type& key)
 	{
 		size_type idx = bkt_num_key(key);
-		_Node* firstNode;
+		Node* firstNode;
 		for (firstNode = buckets_[idx];
 			firstNode && !equals_(getKey(firstNode->val_), key);
 			firstNode = firstNode->next_)
@@ -219,7 +218,7 @@ public:
 
 	const_iterator find(const key_type& key) const{
 		size_type idx = bkt_num_key(key);
-		_Node* firstNode;
+		Node* firstNode;
 		for (firstNode = buckets_[idx];
 			firstNode && !equals_(getKey(firstNode->val_), key);
 			firstNode = firstNode->next_)
@@ -250,9 +249,11 @@ public:
 	// Iterators.
 	iterator begin()
 	{
-		for (size_type i = 0; i < buckets_.size(); ++i)
-			if (buckets_[i])
+		for (size_type i = 0; i < buckets_.size(); ++i) {
+			if (buckets_[i]) {
 				return iterator(buckets_[i], this);
+			}
+		}
 		return end();
 	}
 
@@ -260,9 +261,11 @@ public:
 
 	const_iterator begin() const
 	{
-		for (size_type i = 0; i < buckets_.size(); ++i)
-			if (buckets_[i])
+		for (size_type i = 0; i < buckets_.size(); ++i) {
+			if (buckets_[i]) {
 				return const_iterator(buckets_[i], this);
+			}
+		}
 		return end();
 	}
 
@@ -273,10 +276,8 @@ protected:
 	// insert 
 	std::pair<iterator, bool> insertUniqueNoResize(const value_type& obj);
 
-
-
 	// Resize util
-	void ensureSize(size_type _size);
+	void ensureSize(size_type size);
 
 	size_type next_size(size_type num) const {
 		return (size_type)map_next_prime((unsigned long)num);
@@ -316,16 +317,16 @@ protected:
 	}
 
 	// create / delete
-	_Node* newNode(const value_type& obj)
+	Node* newNode(const value_type& obj)
 	{
-		_Node* node = X_NEW(_Node, arena_, "HashBase<" X_PP_STRINGIZE(Key) "," X_PP_STRINGIZE(Value)">")(obj);
-	//	_Node* node = (_Node*)_aligned_malloc(sizeof(_Node), 16);
+		Node* node = X_NEW(Node, arena_, "HashBase<" X_PP_STRINGIZE(Key) "," X_PP_STRINGIZE(Value)">")(obj);
+	//	Node* node = (Node*)_aligned_malloc(sizeof(Node), 16);
 //		Mem::Construct(&node->val_, obj);
 		node->next_ = 0;
 		return node;
 	}
 
-	void deleteNode(_Node* pNode)
+	void deleteNode(Node* pNode)
 	{
 		X_DELETE(pNode,arena_);
 	//	core::Mem::Destruct(pNode);
@@ -337,7 +338,7 @@ protected:
 		const size_type __n_buckets = __n; // next_size(__n);
 	//	buckets_.reserve(__n_buckets);
 		buckets_.resize(__n_buckets);
-	//	buckets_.insert(buckets_.end(), __n_buckets, (_Node*)0);
+	//	buckets_.insert(buckets_.end(), __n_buckets, (Node*)0);
 	//	buckets_.insert(buckets_.end(), __n_buckets);
 		numElements_ = 0;
 	}
@@ -347,7 +348,7 @@ protected:
 	key_equal				equals_;
 	HashFn					hasher_;
 
-	core::Array<_Node*>		buckets_;
+	core::Array<Node*>		buckets_;
 	size_type				numElements_;
 
 	MemoryArenaBase*		arena_;
@@ -359,9 +360,9 @@ void HashBase<Key, Value, HashFn, EqualKey>::clear()
 	// delete all the nodes.
 	for (size_type i = 0; i < buckets_.size(); i++)
 	{
-		_Node* node = buckets_[i];
+		Node* node = buckets_[i];
 		while(node) {
-			_Node* next = node->next_;
+			Node* next = node->next_;
 			deleteNode(node);
 			node = next;
 		}
@@ -384,13 +385,15 @@ HashBase<Key, Value, HashFn, EqualKey>::
 insertUniqueNoResize(const value_type& obj)
 {
 	const size_type idx = buketIndex(obj);
-	_Node* first = buckets_[idx];
+	Node* first = buckets_[idx];
 
-	for (_Node* cur = first; cur; cur = cur->next_)
-	if (equals_(getKey(cur->val_), getKey(obj)))
-		return std::pair<iterator, bool>(iterator(cur, this), false);
+	for (Node* cur = first; cur; cur = cur->next_) {
+		if (equals_(getKey(cur->val_), getKey(obj))) {
+			return std::pair<iterator, bool>(iterator(cur, this), false);
+		}
+	}
 
-	_Node* tmp = newNode(obj);
+	Node* tmp = newNode(obj);
 	tmp->next_ = first;
 	buckets_[idx] = tmp;
 
@@ -409,12 +412,12 @@ void HashBase<Key, Value, HashFn, EqualKey>::ensureSize(size_type _size)
 		// calculate the new size
 		const size_type size = next_size(_size);
 
-	//	core::Array<_Node*> tmp(size, (_Node*)(0));
-		core::Array<_Node*> tmp(arena_, size, (_Node*)(0));
+	//	core::Array<Node*> tmp(size, (Node*)(0));
+		core::Array<Node*> tmp(arena_, size, (Node*)(0));
 
 		for (size_type bucket = 0; bucket < curent_size; ++bucket)
 		{
-			_Node* firstNode = buckets_[bucket];
+			Node* firstNode = buckets_[bucket];
 			while (firstNode)
 			{
 				size_type new_bucket = buketIndex(firstNode->val_, size);
@@ -442,12 +445,12 @@ typename HashBase<Key, Value, HashFn, EqualKey>::size_type
 HashBase<Key, Value, HashFn, EqualKey>::erase(const key_type& key)
 {
 	const size_type idx = bkt_num_key(key);
-	_Node* first = buckets_[idx];
+	Node* first = buckets_[idx];
 	size_type erased = 0;
 
 	if (first) {
-		_Node* cur = first;
-		_Node* next = cur->next_;
+		Node* cur = first;
+		Node* next = cur->next_;
 		while (next) {
 			if (equals_(getKey(next->val_), key)) {
 				cur->next_ = next->next_;
@@ -478,13 +481,14 @@ template <class Key, class Value, class HashFn, class EqualKey>
 _HashBase_iterator<Key, Value, HashFn, EqualKey>&
 _HashBase_iterator<Key, Value, HashFn, EqualKey>::operator++()
 {
-	const _Node* Old = cur_;
+	const Node* Old = cur_;
 
 	cur_ = cur_->next_;
 	if (!cur_) {
 		size_type buketIdx = hm_->buketIndex(Old->val_);
-		while (!cur_ && ++buketIdx < hm_->buckets_.size())
+		while (!cur_ && ++buketIdx < hm_->buckets_.size()) {
 			cur_ = hm_->buckets_[buketIdx];
+		}
 	}
 	return *this;
 }
@@ -505,13 +509,14 @@ template <class Key, class Value, class HashFn, class EqualKey>
 _HashBase_const_iterator<Key, Value, HashFn, EqualKey>&
 _HashBase_const_iterator<Key, Value, HashFn, EqualKey>::operator++()
 {
-	const _Node* Old = cur_;
+	const Node* Old = cur_;
 
 	cur_ = cur_->next_;
 	if (!cur_) {
 		size_type buketIdx = hm_->buketIndex(Old->val_);
-		while (!cur_ && ++buketIdx < hm_->buckets_.size())
+		while (!cur_ && ++buketIdx < hm_->buckets_.size()) {
 			cur_ = hm_->buckets_[buketIdx];
+		}
 	}
 	return *this;
 }

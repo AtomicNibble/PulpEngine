@@ -4,9 +4,9 @@
 #define _X_ENGINE_COMMON_INCLUDES_H
 
 #include <Core\Configuration.h>
+#include <Core\Compiler.h>
 #include <Core\Platform.h>
 
-#include <Platform\Compiler.h>
 #include <Platform\Types.h>
 
 X_DISABLE_WARNING(4714) // __forceinline not inlined.
@@ -132,7 +132,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // Math
 #include <Math\XMath.h>
 #include <Math\XVector.h>
-#include <Math\XVectorAligned.h> // Vec3 SSE
 #include <Math\XMatrix.h>
 
 #include <Math\XColor.h>

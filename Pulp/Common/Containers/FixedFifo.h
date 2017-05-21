@@ -10,26 +10,26 @@ template<typename T, size_t N>
 class FixedFifo;
 
 template<typename T, size_t N>
-struct _FixedFifoIterator;
+struct FixedFifoIterator;
 
 template<typename T, size_t N>
-struct _FixedFifoConstIterator;
+struct FixedFifoConstIterator;
 
 
 template<typename T, size_t N>
-struct _FixedFifoIterator
+struct FixedFifoIterator
 {
-	typedef _FixedFifoConstIterator<T,N> const_iterator;
+	typedef FixedFifoConstIterator<T,N> const_iterator;
 
-	_FixedFifoIterator(T* start, T* end, T* cur, size_t count)
+	FixedFifoIterator(T* start, T* end, T* cur, size_t count)
 		: start_(start), end_(end), current_(cur), count_(count) {}
 
 	inline const T& operator*(void) const;
 	inline const T* operator->(void) const;
-	inline _FixedFifoIterator& operator++(void);
-	inline _FixedFifoIterator operator++(int);
-	inline bool operator==(const _FixedFifoIterator& rhs) const;
-	inline bool operator!=(const _FixedFifoIterator& rhs) const;
+	inline FixedFifoIterator& operator++(void);
+	inline FixedFifoIterator operator++(int);
+	inline bool operator==(const FixedFifoIterator& rhs) const;
+	inline bool operator!=(const FixedFifoIterator& rhs) const;
 
 	inline operator const_iterator(void) const {
 		return const_iterator(start_, end_, current_, count_);
@@ -42,17 +42,17 @@ private:
 };
 
 template<typename T, size_t N>
-struct _FixedFifoConstIterator
+struct FixedFifoConstIterator
 {
-	_FixedFifoConstIterator(T* start, T* end, T* cur, size_t count)
+	FixedFifoConstIterator(T* start, T* end, T* cur, size_t count)
 	: start_(start), end_(end), current_(cur), count_(count) {}
 
 	inline const T& operator*(void) const;
 	inline const T* operator->(void) const;
-	inline _FixedFifoConstIterator& operator++(void);
-	inline _FixedFifoConstIterator operator++(int);
-	inline bool operator==(const _FixedFifoConstIterator& rhs) const;
-	inline bool operator!=(const _FixedFifoConstIterator& rhs) const;
+	inline FixedFifoConstIterator& operator++(void);
+	inline FixedFifoConstIterator operator++(int);
+	inline bool operator==(const FixedFifoConstIterator& rhs) const;
+	inline bool operator!=(const FixedFifoConstIterator& rhs) const;
 
 private:
 	T* start_;
@@ -71,8 +71,8 @@ public:
 	typedef T  Type;
 	typedef T  value_type;
 	typedef size_t size_type;
-	typedef _FixedFifoIterator<T,N> iterator;
-	typedef _FixedFifoConstIterator<T,N> const_iterator;
+	typedef FixedFifoIterator<T,N> iterator;
+	typedef FixedFifoConstIterator<T,N> const_iterator;
 	typedef T& Reference;
 	typedef T& reference;
 	typedef const T& ConstReference;

@@ -65,7 +65,12 @@
 /// \endcode
 /// Note that no matter how many arguments we provide, the macro to use is always \ref X_PP_JOIN. This offers a powerful
 /// facility for concatenating an unlimited amount of tokens.
+
+#if X_COMPILER_CLANG
+#define X_PP_JOIN(...)							X_PP_JOIN_IMPL(X_PP_JOIN_, X_PP_VA_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
+#else
 #define X_PP_JOIN(...)							X_PP_JOIN_IMPL(X_PP_JOIN_, X_PP_VA_NUM_ARGS(__VA_ARGS__)) X_PP_PASS_ARGS(__VA_ARGS__)
+#endif // X_COMPILER_CLANG
 
 
 #endif

@@ -11,26 +11,26 @@ template<typename T>
 class Fifo;
 
 template<typename T>
-struct _FifoIterator;
+struct FifoIterator;
 
 template<typename T>
-struct _FifoConstIterator;
+struct FifoConstIterator;
 
 
 template<typename T>
-struct _FifoIterator
+struct FifoIterator
 {
-	typedef _FifoConstIterator<T> const_iterator;
+	typedef FifoConstIterator<T> const_iterator;
 
-	_FifoIterator(T* start, T* end, T* cur, size_t count) 
+	FifoIterator(T* start, T* end, T* cur, size_t count)
 		: start_(start), end_(end), current_(cur), count_(count) {}
 
 	inline const T& operator*(void) const;
 	inline const T* operator->(void) const;
-	inline _FifoIterator& operator++(void);
-	inline _FifoIterator operator++(int);
-	inline bool operator==(const _FifoIterator& rhs) const;
-	inline bool operator!=(const _FifoIterator& rhs) const;
+	inline FifoIterator& operator++(void);
+	inline FifoIterator operator++(int);
+	inline bool operator==(const FifoIterator& rhs) const;
+	inline bool operator!=(const FifoIterator& rhs) const;
 
 	inline operator const_iterator(void) const {
 		return const_iterator(start_, end_, current_, count_);
@@ -43,17 +43,17 @@ private:
 };
 
 template<typename T>
-struct _FifoConstIterator
+struct FifoConstIterator
 {
-	_FifoConstIterator(T* start, T* end, T* cur, size_t count) 
+	FifoConstIterator(T* start, T* end, T* cur, size_t count)
 	: start_(start), end_(end), current_(cur), count_(count) {}
 
 	inline const T& operator*(void) const;
 	inline const T* operator->(void) const;
-	inline _FifoConstIterator& operator++(void);
-	inline _FifoConstIterator operator++(int);
-	inline bool operator==(const _FifoConstIterator& rhs) const;
-	inline bool operator!=(const _FifoConstIterator& rhs) const;
+	inline FifoConstIterator& operator++(void);
+	inline FifoConstIterator operator++(int);
+	inline bool operator==(const FifoConstIterator& rhs) const;
+	inline bool operator!=(const FifoConstIterator& rhs) const;
 
 private:
 	T* start_;
@@ -72,8 +72,8 @@ public:
 	typedef T  Type;
 	typedef T  value_type;
 	typedef size_t size_type;
-	typedef _FifoIterator<T> iterator;
-	typedef _FifoConstIterator<T> const_iterator;
+	typedef FifoIterator<T> iterator;
+	typedef FifoConstIterator<T> const_iterator;
 	typedef T* TypePtr;
 	typedef const T* ConstTypePtr;
 	typedef T& Reference;

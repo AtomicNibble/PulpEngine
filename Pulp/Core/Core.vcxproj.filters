@@ -166,9 +166,6 @@
     <ClCompile Include="XProfile.cpp">
       <Filter>Source Files\Profile</Filter>
     </ClCompile>
-    <ClCompile Include="XProfileRender.cpp">
-      <Filter>Source Files\Profile</Filter>
-    </ClCompile>
     <ClCompile Include="win32\SystemTimer.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>

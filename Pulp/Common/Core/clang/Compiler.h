@@ -1,8 +1,10 @@
-
 #pragma once
+
 #ifndef X_COMPILER_H
 #define X_COMPILER_H
 
+#include <cstddef>
+#include <type_traits>
 
 // _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
 // fancy a dance?
@@ -10,7 +12,7 @@ extern "C" void* _ReturnAddress(void);
 #pragma intrinsic(_ReturnAddress)
 
 
-#define X_ABSTRACT									abstract
+#define X_ABSTRACT									= 0
 #define X_OVERRIDE									override
 #define X_FINAL										override final 
 
@@ -26,13 +28,12 @@ extern "C" void* _ReturnAddress(void);
 #define X_RESTRICT_RV								__declspec(restrict)
 #define X_NO_ALIAS									__declspec(noalias)
 #define X_UNUSED_IMPL(symExpr, n)					, (void)(symExpr)
-#define X_UNUSED(...)								(void)(true) X_PP_EXPAND_ARGS X_PP_PASS_ARGS(X_UNUSED_IMPL, __VA_ARGS__)
+#define X_UNUSED(x)									(void)(x) // (void)(true) X_PP_EXPAND_ARGS(X_UNUSED_IMPL, __VA_ARGS__)
 #define X_ALIGNED_SYMBOL(symbol, alignment)			__declspec(align(alignment)) symbol
 #define X_ALIGN_OF(type)							__alignof(type)
 #define X_INLINE									__forceinline
 #define X_NO_INLINE									__declspec(noinline)
 #define X_HINT(hint)								__assume(hint)
-#define X_NO_SWITCH_DEFAULT							X_HINT(0)
 #define X_RETURN_ADDRESS()							_ReturnAddress()
 #define X_FORCE_SYMBOL_LINK(symbolName)				X_PRAGMA(comment(linker, X_PP_JOIN("/include:", symbolName)))
 #define X_LINK_LIB(libName)							X_PRAGMA(comment(lib, libName))
@@ -42,18 +43,15 @@ extern "C" void* _ReturnAddress(void);
 #define X_EXPORT									__declspec(dllexport)
 #define X_OFFSETOF(s,m)								offsetof(s,m)
 #define X_ARRAY_SIZE(x)								((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-
-// these should not be used there is a native patch seperator define in Path<T>::
-// #define X_PATHSEPERATOR_STR						"\\"
-// #define X_PATHSEPERATOR_CHAR						'\\'
+#define X_NO_SWITCH_DEFAULT							__builtin_unreachable()
 
 
 
 #define X_PACK_PUSH(val)							X_PRAGMA(pack(push,val))
 #define X_PACK_POP									X_PRAGMA(pack(pop))
 
-#define X_ENSURE_GE(val1,val2,msg)	static_assert(val1 >= val2, msg);
-#define X_ENSURE_LE(val1,val2,msg)	static_assert(val1 <= val2, msg);
+#define X_ENSURE_GE(val1,val2,msg)					static_assert(val1 >= val2, msg);
+#define X_ENSURE_LE(val1,val2,msg)					static_assert(val1 <= val2, msg);
 
 #if 1 // shows the current size(template args are wrote to log), so i don't have to check.
 
@@ -65,7 +63,6 @@ struct check_size_static : std::true_type
 	static_assert(ExpectedSize == RealSize, "type has a incorrect size");
 };
 
-// static const check_size_static<type, size> X_PP_UNIQUE_NAME(size_check);
 
 #define X_ENSURE_SIZE(type,size) \
 	static_assert(check_size_static<type, size>::value, "Size check fail");

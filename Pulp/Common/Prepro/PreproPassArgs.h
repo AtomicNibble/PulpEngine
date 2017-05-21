@@ -12,6 +12,10 @@
 /// See https://connect.microsoft.com/VisualStudio/feedback/details/521844/variadic-macro-treating-va-args-as-a-single-parameter-for-other-macros#details
 /// for details.
 /// \sa X_PP_NUM_ARGS
+#if X_COMPILER_CLANG
+
+#else
+
 #if _MSC_VER >= 1400
 #	define X_PP_PASS_ARGS_LEFT (
 #	define X_PP_PASS_ARGS_RIGHT )
@@ -20,5 +24,6 @@
 #	define X_PP_PASS_ARGS(...)							(__VA_ARGS__)
 #endif
 
+#endif // X_COMPILER_CLANG
 
 #endif

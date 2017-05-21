@@ -1,5 +1,6 @@
 #include <EngineCommon.h>
 #include "FiberScheduler.h"
+#include "ThreadLocalStorage.h"
 
 #include "Util\Cpu.h"
 
@@ -12,10 +13,10 @@ namespace Fiber
 	namespace
 	{
 
-		ThreadLocalStorage tlsDestFiber;
-		ThreadLocalStorage tlsOriginFiber;
-		ThreadLocalStorage tlsWaitCounter;
-		ThreadLocalStorage tlsWaitValue;
+		core::ThreadLocalStorage tlsDestFiber;
+		core::ThreadLocalStorage tlsOriginFiber;
+		core::ThreadLocalStorage tlsWaitCounter;
+		core::ThreadLocalStorage tlsWaitValue;
 
 
 		void ThreadBackOff(int32_t& backoff)
@@ -106,7 +107,8 @@ namespace Fiber
 			CounterArena::getMemoryAlignmentRequirement(FCOUNTER_ALLOCATION_ALIGN),
 			CounterArena::getMemoryOffsetRequirement()
 		),
-		counterPoolArena_(&counterPoolAllocator_, "CounterPool")
+		counterPoolArena_(&counterPoolAllocator_, "CounterPool"), 
+		tasks_{ gEnv->pArena, gEnv->pArena, gEnv->pArena }
 	{
 
 	}
@@ -123,12 +125,6 @@ namespace Fiber
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-
-		for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
-			tasks_[i].setArena(gEnv->pArena, MAX_TASKS_PER_QUE);
-		}
-
 
 		// get the num HW threads
 		ICore* pCore = gEnv->pCore;
@@ -174,7 +170,7 @@ namespace Fiber
 
 			// wait for them to exit out.
 			while (activeWorkers_ > 0) {
-				Thread::Yield();
+				core::Thread::Yield();
 			}
 
 			// call join on any that are not this one.
@@ -227,7 +223,7 @@ namespace Fiber
 	{
 		X_ASSERT_NOT_NULL(pCounterOut);
 
-		if ((tasks_[priority].numItems() + 1) > MAX_TASKS_PER_QUE) {
+		if ((tasks_[priority].size() + 1) > MAX_TASKS_PER_QUE) {
 			X_ERROR("Scheduler", "Failed to add task, not enough space in task que: %s",
 				JobPriority::ToString(priority));
 			return;
@@ -242,7 +238,7 @@ namespace Fiber
 
 
 		TaskBundle bundle = { task, *pCounterOut };
-		tasks_[priority].Add(bundle);
+		tasks_[priority].push(bundle);
 	}
 
 
@@ -261,7 +257,7 @@ namespace Fiber
 			return;
 		}
 
-		if ((tasks_[priority].numItems() + numTasks) > MAX_TASKS_PER_QUE) {
+		if ((tasks_[priority].size() + numTasks) > MAX_TASKS_PER_QUE) {
 			X_ERROR("Scheduler", "Failed to add %i tasks, not enough space in task que: %s", 
 				numTasks, JobPriority::ToString(priority));
 			return;
@@ -269,7 +265,14 @@ namespace Fiber
 
 		core::AtomicInt* pCounter = *pCounterOut;
 
+#if 1
+		for (size_t i = 0; i < numTasks; i++)
+		{
+			TaskBundle bundle = { pTasks[i], pCounter };
+			tasks_[priority].push(bundle);
+		}
 
+#else
 		// ok potentially holding the lock the whole time we are adding a large batch could starve the workers.
 		// since they can't get any work out.
 		// this also helps when there are no jobs, as it means the jobs can start been worked on a tiny tiny bit quicker ;)
@@ -298,6 +301,7 @@ namespace Fiber
 				core::Thread::YieldProcessor();
 			}
 		}
+#endif
 	}
 
 	void Scheduler::WaitForCounter(core::AtomicInt* pCounter, int32_t value)
@@ -309,7 +313,7 @@ namespace Fiber
 		{
 			// switch to a new fiber to do some other work.
 			FiberHandle newFiber;
-			fibers_.Pop(newFiber);
+			fibers_.pop(newFiber);
 
 			FiberHandle curFiber = Fiber::GetCurrentFiber();
 
@@ -333,7 +337,7 @@ namespace Fiber
 		{
 			// switch to a new fiber to do some other work.
 			FiberHandle newFiber;
-			fibers_.Pop(newFiber);
+			fibers_.pop(newFiber);
 
 			FiberHandle curFiber = Fiber::GetCurrentFiber();
 
@@ -366,7 +370,7 @@ namespace Fiber
 			Fiber::FiberHandle newFiber = Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_RESERVE_SIZE, FiberStart,
 				reinterpret_cast<void*>(this));
 
-			fibers_.Add(newFiber);
+			fibers_.push(newFiber);
 		}
 
 		for (i = 0; i < numThreads_; i++)
@@ -378,7 +382,7 @@ namespace Fiber
 		mainThreadFiber_ = Fiber::ConvertThreadToFiber(nullptr);
 
 		// make switch fibers for main thread
-		CreateFibersForThread(Thread::GetCurrentID());
+		CreateFibersForThread(core::Thread::GetCurrentID());
 
 		return mainThreadFiber_ != Fiber::InvalidFiberHandle;
 	}
@@ -453,7 +457,7 @@ namespace Fiber
 
 	size_t Scheduler::GetCurrentThreadIndex(void) const
 	{
-		uint32_t threadId = Thread::GetCurrentID();
+		uint32_t threadId = core::Thread::GetCurrentID();
 
 		for (size_t i = 0; i < threadToFiberIndex_.size(); i++)
 		{
@@ -480,9 +484,9 @@ namespace Fiber
 		return counterWaitingFibers_[idx];
 	}
 
-	Thread::ReturnValue Scheduler::ThreadRun(const Thread& thread)
+	core::Thread::ReturnValue Scheduler::ThreadRun(const core::Thread& thread)
 	{
-		Thread::ReturnValue retVal = Thread::ReturnValue(0);
+		core::Thread::ReturnValue retVal = Thread::ReturnValue(0);
 
 		// convert to fiber
 		Fiber::ConvertThreadToFiber(nullptr);
@@ -511,7 +515,7 @@ namespace Fiber
 				bool waitingTaskReady = false;
 
 				{
-					Spinlock::ScopedLock lock(pScheduler->waitingTaskLock_);
+					core::Spinlock::ScopedLock lock(pScheduler->waitingTaskLock_);
 
 					WaitingTaskArr::Iterator it = waitingTasks.begin();
 					for (; it != waitingTasks.end(); ++it)
@@ -593,7 +597,7 @@ namespace Fiber
 			FiberHandle destFiber = tlsDestFiber.GetValue<FiberHandle>();
 
 			// it's not safe to place the fiber we just left into the pool of useable fibers.
-			pScheduler->fibers_.Add(originFiber);
+			pScheduler->fibers_.push(originFiber);
 
 			Fiber::SwitchToFiber(destFiber);
 		}

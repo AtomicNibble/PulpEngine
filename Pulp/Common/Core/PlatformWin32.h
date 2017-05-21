@@ -3,7 +3,7 @@
 #ifndef _X_PLATFORM_WIN32_H_
 #define _X_PLATFORM_WIN32_H_
 
-#include "Platform\win32\Compiler.h"
+#include "Core\Compiler.h"
 
 #if X_64 == 0
 #ifndef _CPU_X86

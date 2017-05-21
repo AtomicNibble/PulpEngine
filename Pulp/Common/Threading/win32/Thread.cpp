@@ -335,13 +335,15 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 
 	if (threadId == 0 || threadId == GetCurrentID())
 	{
-		_controlfp(_DN_FLUSH, _MCW_DN);
+		uint32_t current = 0;
+
+		_controlfp_s(&current, _DN_FLUSH, _MCW_DN);
 		_mm_setcsr(_mm_getcsr() | _MM_FLUSH_ZERO_ON);
 
 		if (fpe == FPE::NONE)
 		{
 			// mask all floating exceptions off.
-			_controlfp(_MCW_EM, _MCW_EM);
+			_controlfp_s(&current, _MCW_EM, _MCW_EM);
 			_mm_setcsr(_mm_getcsr() | _MM_MASK_MASK);
 		}
 		else
@@ -351,13 +353,13 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 
 			if (fpe == FPE::BASIC)
 			{
-				_controlfp(BASIC_DISABLE, _MCW_EM);
+				_controlfp_s(&current, BASIC_DISABLE, _MCW_EM);
 				_mm_setcsr((_mm_getcsr() & ~_MM_MASK_MASK) | BASIC_MM_DISABLE);
 			}
 
 			if (fpe == FPE::ALL)
 			{
-				_controlfp(ALL_DISABLE, _MCW_EM);
+				_controlfp_s(&current, ALL_DISABLE, _MCW_EM);
 				_mm_setcsr((_mm_getcsr() & ~_MM_MASK_MASK) | ALL_MM_DISABLE);
 			}
 		}

@@ -4,7 +4,7 @@
 #ifndef X_SHADERLIB_H_
 #define X_SHADERLIB_H_
 
-#include <Platform\Compiler.h>
+#include <Core\Compiler.h>
 
 #ifndef SHADERLIB_EXPORT
 #ifdef X_LIB

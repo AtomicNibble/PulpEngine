@@ -246,19 +246,19 @@ X_INLINE const T* FixedFifo<T, N>::endPtr(void) const
 /// ------------------------------------------------------
 
 template<typename T, size_t N>
-inline const T& FixedFifo<T, N>::iterator::operator*(void) const
+inline const T& FixedFifoIterator<T, N>::operator*(void) const
 {
 	return *current_;
 }
 
 template<typename T, size_t N>
-inline const T* FixedFifo<T, N>::iterator::operator->(void) const
+inline const T* FixedFifoIterator<T, N>::operator->(void) const
 {
 	return current_;
 }
 
 template<typename T, size_t N>
-inline typename FixedFifo<T, N>::iterator& FixedFifo<T, N>::iterator::operator++(void)
+inline typename FixedFifoIterator<T, N>& FixedFifoIterator<T, N>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -270,7 +270,7 @@ inline typename FixedFifo<T, N>::iterator& FixedFifo<T, N>::iterator::operator++
 }
 
 template<typename T, size_t N>
-inline typename FixedFifo<T, N>::iterator FixedFifo<T, N>::iterator::operator++(int)
+inline typename FixedFifoIterator<T, N> FixedFifoIterator<T, N>::operator++(int)
 {
 	iterator tmp = *this;
 	++(*this); // call the function above.
@@ -278,13 +278,13 @@ inline typename FixedFifo<T, N>::iterator FixedFifo<T, N>::iterator::operator++(
 }
 
 template<typename T, size_t N>
-inline bool FixedFifo<T, N>::iterator::operator==(const iterator& rhs) const
+inline bool FixedFifoIterator<T, N>::operator==(const FixedFifoIterator& rhs) const
 {
 	return count_ == rhs.count_;
 }
 
 template<typename T, size_t N>
-inline bool FixedFifo<T, N>::iterator::operator!=(const iterator& rhs) const
+inline bool FixedFifoIterator<T, N>::operator!=(const FixedFifoIterator& rhs) const
 {
 	return count_ != rhs.count_;
 }
@@ -292,19 +292,19 @@ inline bool FixedFifo<T, N>::iterator::operator!=(const iterator& rhs) const
 /// ------------------------------------------------------
 
 template<typename T, size_t N>
-inline const T& FixedFifo<T, N>::const_iterator::operator*(void) const
+inline const T& FixedFifoConstIterator<T, N>::operator*(void) const
 {
 	return *current_;
 }
 
 template<typename T, size_t N>
-inline const T* FixedFifo<T, N>::const_iterator::operator->(void) const
+inline const T* FixedFifoConstIterator<T, N>::operator->(void) const
 {
 	return current_;
 }
 
 template<typename T, size_t N>
-inline typename FixedFifo<T, N>::const_iterator& FixedFifo<T, N>::const_iterator::operator++(void)
+inline typename FixedFifoConstIterator<T, N>& FixedFifoConstIterator<T, N>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -316,21 +316,21 @@ inline typename FixedFifo<T, N>::const_iterator& FixedFifo<T, N>::const_iterator
 }
 
 template<typename T, size_t N>
-inline typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::const_iterator::operator++(int)
+inline typename FixedFifoConstIterator<T, N> FixedFifoConstIterator<T, N>::operator++(int)
 {
-	const_iterator tmp = *this;
+	FixedFifoConstIterator tmp = *this;
 	++(*this); // call the function above.
 	return tmp;
 }
 
 template<typename T, size_t N>
-inline bool FixedFifo<T, N>::const_iterator::operator==(const const_iterator& rhs) const
+inline bool FixedFifoConstIterator<T, N>::operator==(const FixedFifoConstIterator& rhs) const
 {
 	return count_ == rhs.count_;
 }
 
 template<typename T, size_t N>
-inline bool FixedFifo<T, N>::const_iterator::operator!=(const const_iterator& rhs) const
+inline bool FixedFifoConstIterator<T, N>::operator!=(const FixedFifoConstIterator& rhs) const
 {
 	return count_ != rhs.count_;
 }

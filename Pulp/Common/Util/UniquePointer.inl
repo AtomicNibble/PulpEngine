@@ -9,6 +9,16 @@ X_INLINE UniquePointerBase<T>::UniquePointerBase(core::MemoryArenaBase* arena, T
 
 }
 
+template<typename T>
+X_INLINE UniquePointerBase<T>::UniquePointerBase(UniquePointerBase&& oth) :
+	pInstance_(oth.pInstance_),
+	arena_(oth.arena_)
+{
+	oth.pInstance_ = nullptr;
+}
+
+
+
 
 template<typename T>
 X_INLINE core::MemoryArenaBase* UniquePointerBase<T>::getArena(void) const
@@ -45,7 +55,7 @@ X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, nullptr_t
 }
 
 template<typename T>
-X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, T* pInstance) :
+X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, pointer pInstance) :
 	Mybase(arena, pInstance)
 {
 	X_ASSERT_NOT_NULL(pInstance);
@@ -54,8 +64,7 @@ X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, T* pInsta
 
 template<typename T>
 X_INLINE UniquePointer<T>::UniquePointer(UniquePointer&& oth) :
-	pInstance_(oth.release()),
-	arena_(oth.arena_)
+	Mybase(std::move(oth))
 {
 }
 
@@ -105,7 +114,7 @@ X_INLINE typename UniquePointer<T>::pointer UniquePointer<T>::operator-> () cons
 template<typename T>
 X_INLINE typename UniquePointer<T>::pointer UniquePointer<T>::get(void) const
 {
-	return ptr();
+	return Mybase::ptr();
 }
 
 template<typename T>
@@ -119,7 +128,7 @@ X_INLINE typename UniquePointer<T>::pointer UniquePointer<T>::release(void)
 {
 	// yield ownership of pointer
 	pointer pAns = get();
-	ptr() = pointer();
+	Mybase::ptr() = pointer();
 	return pAns;
 }
 
@@ -128,7 +137,7 @@ X_INLINE void UniquePointer<T>::reset(pointer ptr_)
 {
 	// establish new pointer
 	pointer pOld = get();
-	ptr() = ptr_;
+	Mybase::ptr() = ptr_;
 	if (pOld != pointer()) {
 		deleter(pOld);
 	}
@@ -159,7 +168,7 @@ X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena, nullptr
 }
 
 template<typename T>
-X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena, T* pInstance) :
+X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena, pointer pInstance) :
 	Mybase(arena, pInstance)
 {
 	X_ASSERT_NOT_NULL(pInstance);

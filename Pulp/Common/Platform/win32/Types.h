@@ -3,8 +3,6 @@
 #ifndef _X_TYPES_H_
 #define _X_TYPES_H_
 
-#include "Compiler.h"
-
 
 #ifdef DWORD
 #undef DWORD
@@ -64,10 +62,12 @@ typedef unsigned __int64	QWORD;
 typedef signed char int8_t;
 typedef short int16_t;
 typedef int int32_t;
+typedef long long int64_t;
 
 typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef unsigned int uint32_t;
+typedef unsigned long long uint64_t;
 
 typedef signed char int_least8_t;
 typedef short int_least16_t;
@@ -98,7 +98,6 @@ typedef unsigned __int64   uint64;
 typedef signed __int64     int64;
 
 
-
 // typedef int INT_PTR, *PINT_PTR;
 // typedef unsigned int UINT_PTR, *PUINT_PTR;
 
@@ -108,32 +107,6 @@ typedef signed __int64     int64;
 #else
 
 
-#define _LONGLONG	__int64
-#define _ULONGLONG	unsigned __int64
-#define _LLONG_MAX	0x7fffffffffffffff
-#define _ULLONG_MAX	0xffffffffffffffff
-
-/* INTEGER PROPERTIES */
-#define _C2				1	/* 0 if not 2's complement */
-
-#define _MAX_EXP_DIG	8	/* for parsing numerics */
-#define _MAX_INT_DIG	32
-#define _MAX_SIG_DIG	36
-
-typedef _LONGLONG _Longlong;
-typedef _ULONGLONG _ULonglong;
-
-typedef _Longlong int64_t;
-typedef _ULonglong uint64_t;
-
-typedef _Longlong int_least64_t;
-typedef _ULonglong uint_least64_t;
-
-typedef _Longlong int_fast64_t;
-typedef _ULonglong uint_fast64_t;
-
-typedef _Longlong intmax_t;
-typedef _ULonglong uintmax_t;
 
 #endif // !_MSC_FULL_VER < 190023506
 

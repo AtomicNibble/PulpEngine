@@ -267,18 +267,18 @@ inline void FixedBitStreamBase::reset(void)
 	readBitIdx_ = 0;
 }
 
-inline typename FixedBitStreamBase::size_type typename FixedBitStreamBase::capacity(void) const
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::capacity(void) const
 {
 	return numBits_;
 }
 
 
-inline typename FixedBitStreamBase::size_type typename FixedBitStreamBase::size(void) const
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::size(void) const
 {
 	return bitIdx_ - readBitIdx_;
 }
 
-inline typename FixedBitStreamBase::size_type typename FixedBitStreamBase::sizeInBytes(void) const
+inline typename FixedBitStreamBase::size_type FixedBitStreamBase::sizeInBytes(void) const
 {
 	return numBytesForBits(size());
 }

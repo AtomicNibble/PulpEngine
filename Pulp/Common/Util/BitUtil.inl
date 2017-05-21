@@ -443,7 +443,7 @@ namespace bitUtil
 			template <typename T>
 			static inline constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
 			{
-				static_assert(sizeof(T) == 2 "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
 
 				return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
 			}
@@ -713,7 +713,7 @@ namespace bitUtil
 	constexpr inline char BitToAlphaChar(uint32_t bit)
 	{
 		// index 6 is 'a'
-		return static_cast<char>(bit >= 0 && bit < 32 ? ('a' + bit) - 6 : '0');
+		return static_cast<char>(bit < 32 ? ('a' + bit) - 6 : '0');
 	}
 
 	inline uint32_t AlphaBits(const char* pStr)

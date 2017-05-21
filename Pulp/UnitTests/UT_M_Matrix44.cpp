@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 
-#include <Platform\Compiler.h>
+#include <Core\Compiler.h>
 
 #include "Math\XMatrix44.h"
 #include <Math\XMatrixAlgo.h>

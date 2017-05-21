@@ -8,7 +8,7 @@ Path<TChar>::Path()
 template<typename TChar>
 Path<TChar>::Path(const Path& oth)
 {
-	append(oth.c_str(), oth.length());
+	BaseType::append(oth.c_str(), oth.length());
 }
 
 template<>
@@ -32,14 +32,14 @@ inline Path<wchar_t>::Path(const Path<char>& oth)
 
 template<typename TChar>
 Path<TChar>::Path(const TChar* const str) : 
-	StackString<MAX_PATH, TChar>(str)
+	BaseType(str)
 {
 
 }
 
 template<typename TChar>
 Path<TChar>::Path(const TChar* const beginInclusive, const TChar* const endExclusive) :
-	StackString<MAX_PATH, TChar>(beginInclusive, endExclusive)
+	BaseType(beginInclusive, endExclusive)
 {
 
 }
@@ -48,20 +48,20 @@ Path<TChar>::Path(const TChar* const beginInclusive, const TChar* const endExclu
 template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
-	const TChar* native = findLast(NATIVE_SLASH);
+	const TChar* native = BaseType::findLast(NATIVE_SLASH);
 	// folder//
-	if (native == end() - 1) {
+	if (native == BaseType::end() - 1) {
 		return native + 1;
 	}
 
-	const TChar* noneNative = findLast(NON_NATIVE_SLASH);
+	const TChar* noneNative = BaseType::findLast(NON_NATIVE_SLASH);
 	// folder
-	if (noneNative == end() - 1) {
+	if (noneNative == BaseType::end() - 1) {
 		return noneNative + 1;
 	}
 
 	if (!native && !noneNative) {
-		return str_;
+		return BaseType::begin();
 	}
 	if (!noneNative && native) {
 		return native + 1;
@@ -80,7 +80,7 @@ const TChar* Path<TChar>::fileName(void) const
 template<typename TChar>
 const TChar* Path<TChar>::extension(bool incDot) const
 {
-	const TChar* res = findLast('.');
+	const TChar* res = BaseType::findLast('.');
 
 	if (!res) {
 		return str_;
@@ -94,21 +94,21 @@ const TChar* Path<TChar>::extension(bool incDot) const
 template<typename TChar>
 void Path<TChar>::setExtension(const TChar* pExtension)
 {
-	const TChar* remove = findLast('.');	// need to remvoe a extension?
+	const TChar* remove = BaseType::findLast('.');	// need to remvoe a extension?
 	bool has_dot = (pExtension[0] == '.'); // new extension got a dot?
 	bool is_blank = (pExtension[0] == '\0'); //
 
 	if (remove) {
-		trimRight(remove);
+		BaseType::trimRight(remove);
 	}
 
 	if (!is_blank)
 	{
 		if (!has_dot) {
-			append('.', 1);
+			BaseType::append('.', 1);
 		}
 
-		append(pExtension);
+		BaseType::append(pExtension);
 	}
 }
 
@@ -121,13 +121,13 @@ void Path<TChar>::setFileName(const TChar* pFilename)
 
 	const TChar* name = fileName();
 
-	if (isEmpty() || (name == end()))
+	if (isEmpty() || (name == BaseType::end()))
 	{
-		append(pFilename);
+		BaseType::append(pFilename);
 	}
 	else
 	{
-		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
+		BaseType temp(str_, name); // want the text before filename
 		temp.append(pFilename);
 
 		*this = temp.c_str();
@@ -149,7 +149,7 @@ void Path<TChar>::setFileName(const TChar* pFileNameBegin, const TChar* pFileNam
 	}
 	else
 	{
-		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
+		BaseType temp(str_, name); // want the text before filename
 		temp.append(pFileNameBegin, pFileNameEnd);
 
 		*this = temp.c_str();
@@ -221,14 +221,14 @@ const Path<TChar> Path<TChar>::operator+(const TChar* str) const
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator+=(const Path<TChar>& oth)
 {
-	append(oth.c_str(), oth.length());
+	BaseType::append(oth.c_str(), oth.length());
 	return *this;
 }
 
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator+=(const TChar* str)
 {
-	append(str);
+	BaseType::append(str);
 	return *this;
 }
 
@@ -238,8 +238,8 @@ template<typename TChar>
 inline void Path<TChar>::ensureSlash(void)
 {
 	if (this->len_ > 0) {
-		stripTrailing(NATIVE_SLASH);
-		append(NATIVE_SLASH, 1);
+		BaseType::stripTrailing(NATIVE_SLASH);
+		BaseType::append(NATIVE_SLASH, 1);
 	}
 }
 
@@ -287,7 +287,7 @@ template<typename TChar>
 inline void Path<TChar>::removeTrailingSlash(void)
 {
 	replaceSeprators();
-	stripTrailing(NATIVE_SLASH);
+	BaseType::stripTrailing(NATIVE_SLASH);
 }
 
 template<typename TChar>

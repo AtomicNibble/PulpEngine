@@ -1,11 +1,9 @@
 #include "stdafx.h"
 
 
-
-
 X_USING_NAMESPACE;
 
-using namespace core;
+#if 0
 
 // duplicate the size check.
 X_ENSURE_SIZE(Vec3fA, 16);
@@ -202,3 +200,5 @@ TEST(XVectorAligned, Equality)
 	EXPECT_TRUE(a4 == a4);
 	EXPECT_TRUE(d4 == d4);
 }
+
+#endif

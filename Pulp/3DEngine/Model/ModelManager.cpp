@@ -10,37 +10,6 @@
 
 X_NAMESPACE_BEGIN(model)
 
-namespace
-{
-
-	void Cmd_ListModels(core::IConsoleCmdArgs* Cmd)
-	{
-		// optional search criteria
-		const char* searchPatten = nullptr;
-
-		if (Cmd->GetArgCount() >= 2) {
-			searchPatten = Cmd->GetArg(1);
-		}
-
-		(static_cast<XModelManager*>(engine::XEngineBase::getModelManager()))->ListModels(searchPatten);
-	}
-
-	void Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd)
-	{
-		if (pCmd->GetArgCount() < 2) {
-			X_WARNING("Model", "reloadModel <name>");
-			return;
-		}
-		
-		XModelManager* pModelManager = (static_cast<XModelManager*>(engine::XEngineBase::getModelManager()));
-		const char* pName = pCmd->GetArg(1);
-
-		pModelManager->ReloadModel(pName);
-	}
-
-} // namespace
-
-
 /*
 
 I need to redesign this so that models are returned instantly and loaded later.
@@ -77,8 +46,8 @@ bool XModelManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 
-	ADD_COMMAND("listModels", Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
-	ADD_COMMAND("modelReload", Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
+	ADD_COMMAND_MEMBER("listModels", this, XModelManager, &XModelManager::Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
+	ADD_COMMAND_MEMBER("modelReload", this, XModelManager, &XModelManager::Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
 
 	XModel::RegisterVars();
 
@@ -268,7 +237,7 @@ void XModelManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Pa
 #endif
 }
 
-void XModelManager::ListModels(const char* searchPatten) const
+void XModelManager::ListModels(const char* pSearchPatten) const
 {
 	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
@@ -279,7 +248,7 @@ void XModelManager::ListModels(const char* searchPatten) const
 	{
 		auto* pModelRes = model.second;
 
-		if (!searchPatten || core::strUtil::WildCompare(searchPatten, pModelRes->getName()))
+		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pModelRes->getName()))
 		{
 			sorted_models.push_back(pModelRes);
 		}
@@ -324,6 +293,30 @@ void XModelManager::ReloadModel(const char* pModelName)
 	{
 		X_WARNING("Model", "\"%s\" is not loaded skipping reload", name.c_str());
 	}
+}
+
+void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* Cmd)
+{
+	// optional search criteria
+	const char* pSearchPatten = nullptr;
+
+	if (Cmd->GetArgCount() >= 2) {
+		pSearchPatten = Cmd->GetArg(1);
+	}
+
+	ListModels(pSearchPatten);
+}
+
+void XModelManager::Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd)
+{
+	if (pCmd->GetArgCount() < 2) {
+		X_WARNING("Model", "reloadModel <name>");
+		return;
+	}
+
+	const char* pName = pCmd->GetArg(1);
+
+	ReloadModel(pName);
 }
 
 X_NAMESPACE_END

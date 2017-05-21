@@ -26,7 +26,7 @@ ThreadQue<T, SynchronizationPrimitive>::~ThreadQue()
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQue<T, SynchronizationPrimitive>::reserve(size_t num)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	que_.reserve(num);
 }
@@ -34,7 +34,7 @@ void ThreadQue<T, SynchronizationPrimitive>::reserve(size_t num)
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQue<T, SynchronizationPrimitive>::clear(void)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	que_.clear();
 }
@@ -42,7 +42,7 @@ void ThreadQue<T, SynchronizationPrimitive>::clear(void)
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQue<T, SynchronizationPrimitive>::free(void)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	que_.free();
 }
@@ -52,7 +52,7 @@ void ThreadQue<T, SynchronizationPrimitive>::free(void)
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQue<T, SynchronizationPrimitive>::push(T const& value)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	que_.push(value);
 }
@@ -60,7 +60,7 @@ void ThreadQue<T, SynchronizationPrimitive>::push(T const& value)
 template<typename T, typename SynchronizationPrimitive>
 void ThreadQue<T, SynchronizationPrimitive>::push(T&& value)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	que_.push(std::forward<T>(value));
 }
@@ -69,7 +69,7 @@ template<typename T, typename SynchronizationPrimitive>
 template<class UnaryPredicate>
 bool ThreadQue<T, SynchronizationPrimitive>::push_unique_if(T const& value, UnaryPredicate p)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	if (!que_.contains_if(p)) {
 		que_.push(value);
@@ -82,7 +82,7 @@ bool ThreadQue<T, SynchronizationPrimitive>::push_unique_if(T const& value, Unar
 template<typename T, typename SynchronizationPrimitive>
 bool ThreadQue<T, SynchronizationPrimitive>::tryPop(T& value)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	if (que_.isEmpty()) {
 		return false;
@@ -97,7 +97,7 @@ template<typename T, typename SynchronizationPrimitive>
 template<class CallBack>
 bool ThreadQue<T, SynchronizationPrimitive>::tryPopAll(CallBack func)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	if (que_.isEmpty()) {
 		return false;
@@ -114,7 +114,7 @@ bool ThreadQue<T, SynchronizationPrimitive>::tryPopAll(CallBack func)
 template<typename T, typename SynchronizationPrimitive>
 size_t ThreadQue<T, SynchronizationPrimitive>::size(void)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
 	return que_.size();
 }
@@ -231,30 +231,30 @@ void ThreadQueBlocking<T, core::CriticalSection>::push(T&& value)
 template<typename T>
 void ThreadQueBlocking<T, core::CriticalSection>::pop(T& value)
 {
-	CriticalSection::ScopedLock lock(primitive_);
+	CriticalSection::ScopedLock lock(BaseQue::primitive_);
 
-	while (que_.isEmpty())
+	while (BaseQue::que_.isEmpty())
 	{
-		cond_.Wait(primitive_);
+		cond_.Wait(BaseQue::primitive_);
 	}
 
-	value = std::move(que_.peek());
-	que_.pop();
+	value = std::move(BaseQue::que_.peek());
+	BaseQue::que_.pop();
 }
 
 
 template<typename T>
 T ThreadQueBlocking<T, core::CriticalSection>::pop(void)
 {
-	CriticalSection::ScopedLock lock(primitive_);
+	CriticalSection::ScopedLock lock(BaseQue::primitive_);
 
-	while (que_.isEmpty())
+	while (BaseQue::que_.isEmpty())
 	{
-		cond_.Wait(primitive_);
+		cond_.Wait(BaseQue::primitive_);
 	}
 
-	T value = std::move(que_.peek());
-	que_.pop();
+	T value = std::move(BaseQue::que_.peek());
+	BaseQue::que_.pop();
 	return value;
 }
 

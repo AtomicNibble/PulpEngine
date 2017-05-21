@@ -61,13 +61,21 @@
 	#endif
 #endif // WIN32
 
-
+#if defined(__clang__)
+	#define X_COMPILER clang
+	#define X_COMPILER_CLANG 1
+#elif defined(_MSC_VER)
+	#define X_COMPILER msvc
+	#define X_COMPILER_MSCV 1
+#else
+	#error Unknown compiler.
+#endif
 
 
 #define X_ENGINE_NAME			"Potato"
 #define X_ENGINE_VERSION		0.1
 #define X_ENGINE_VERSION_STR	X_STRINGIZE(X_ENGINE_VERSION)
-#define	X_BUILD_STRING			X_PLATFORM_STR"-"X_CPUSTRING
+#define	X_BUILD_STRING			X_PLATFORM_STR "-" X_CPUSTRING
 #define X_ENGINE_BUILD_REF		-1 // branch-ref
 
 #define X_INCLUDE(path)			X_STRINGIZE(path)

@@ -33,7 +33,7 @@ namespace Compression
 		{
 			core::MemoryArenaBase* pArena = reinterpret_cast<core::MemoryArenaBase*>(opaque);
 
-			X_DELETE(address, pArena);
+			X_DELETE(reinterpret_cast<uint8_t*>(address), pArena);
 		}
 
 

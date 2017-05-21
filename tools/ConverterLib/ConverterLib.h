@@ -3,7 +3,7 @@
 #ifndef X_CONVERTER_LIB_H_
 #define X_CONVERTER_LIB_H_
 
-#include <Platform\Compiler.h>
+#include <Core\Compiler.h>
 
 #ifndef CONVERTERLIB_EXPORT
 #ifdef X_LIB
