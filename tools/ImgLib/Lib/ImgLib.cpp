@@ -412,6 +412,9 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 				X_LOG2("Img", "Setting alpha flag due to import format: %s", Texturefmt::ToString(src.getFormat()));
 				flags.Set(CompileFlag::ALPHA);
 				break;
+
+			default:
+				break;
 			}
 		}	
 
