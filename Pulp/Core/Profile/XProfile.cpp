@@ -521,8 +521,8 @@ namespace profiler
 	Vec2f XProfileSys::RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena)
 	{
 		const float padding = 10;
-		const float treeIndent = 10.f;
-		const float spacing = 20.f;
+	//	const float treeIndent = 10.f;
+	//	const float spacing = 20.f;
 
 		const float colHdrStartX = pos.x;
 		const float colHdrStartY = pos.y;
@@ -603,7 +603,7 @@ namespace profiler
 
 		const float padding = 10;
 
-		const float titleStartX = pos.x + padding;
+	//	const float titleStartX = pos.x + padding;
 		const float titleStartY = pos.y;
 		const float titleHeight = 16.f + padding;
 
@@ -697,7 +697,7 @@ namespace profiler
 		Vec2f size = pFont_->GetTextSize(str.begin(), str.end(), ctx);
 
 		const float padding = 10;
-		const float titleStartX = pos.x + padding;
+	//	const float titleStartX = pos.x + padding;
 		const float titleStartY = pos.y;
 		const float titleHeight = 20.f;
 		const float memInfoStartX = pos.x + padding;
@@ -772,7 +772,7 @@ namespace profiler
 		const float maxHeightPerThread = 50.f;
 
 		const int32_t visibleMS = vars_.jobSysThreadMS();
-		const uint32_t numThread = pJobSys->GetThreadCount();
+	//	const uint32_t numThread = pJobSys->GetThreadCount();
 		const uint32_t numThreadQueues = pJobSys->GetQueueCount();
 		const float threadInfoXOffset = 40.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
