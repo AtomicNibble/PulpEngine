@@ -322,7 +322,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	}
 
 	if (effects_.isEmpty()) {
-		X_WARNING("Font", "\"%s\" has no effects.", getName());
+		X_WARNING("Font", "\"%s\" has no effects.", getName().c_str());
 		return;
 	}
 
