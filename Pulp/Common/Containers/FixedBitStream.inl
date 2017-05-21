@@ -49,19 +49,19 @@ inline FixedBitStreamStackPolicy<N>::~FixedBitStreamStackPolicy()
 
 
 inline FixedBitStreamBase::FixedBitStreamBase(size_type numBits) :
-	pBegin_(nullptr),
 	numBits_(numBits),
 	readBitIdx_(0),
-	bitIdx_(0)
+	bitIdx_(0),
+	pBegin_(nullptr)
 {
 
 }
 
 inline FixedBitStreamBase::FixedBitStreamBase(TypePtr pBegin, size_type numBits) :
-	pBegin_(pBegin),
 	numBits_(numBits),
 	readBitIdx_(0),
-	bitIdx_(0)
+	bitIdx_(0),
+	pBegin_(pBegin)
 {
 
 }

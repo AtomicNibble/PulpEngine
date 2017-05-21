@@ -4,12 +4,6 @@
 #define X_COMPILER_H
 
 
-// _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
-// fancy a dance?
-extern "C" void* _ReturnAddress(void);
-#pragma intrinsic(_ReturnAddress)
-
-
 #define X_ABSTRACT									abstract
 #define X_OVERRIDE									override
 #define X_FINAL										override final 
@@ -19,6 +13,7 @@ extern "C" void* _ReturnAddress(void);
 #define X_POP_WARNING_LEVEL							X_PRAGMA(warning(pop))
 #define X_DISABLE_WARNING(number)					X_PRAGMA(warning(disable:number))
 #define X_ENABLE_WARNING(number)					X_PRAGMA(warning(default:number))
+#define X_INTRINSIC(func)							X_PRAGMA(intrinsic(func))
 
 #define X_DISABLE_EMPTY_FILE_WARNING				namespace { char NoEmptyFileDummy##__LINE__; }
 
@@ -49,6 +44,12 @@ extern "C" void* _ReturnAddress(void);
 
 #define X_ENSURE_GE(val1,val2,msg)					static_assert(val1 >= val2, msg);
 #define X_ENSURE_LE(val1,val2,msg)					static_assert(val1 <= val2, msg);
+
+
+// _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
+extern "C" void* _ReturnAddress(void); 
+X_INTRINSIC(_ReturnAddress)
+
 
 #if 1 // shows the current size(template args are wrote to log), so i don't have to check.
 

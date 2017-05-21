@@ -3,20 +3,20 @@
 
 
 ByteStreamFifo::ByteStreamFifo(MemoryArenaBase* arena) :
-write_(nullptr),
-read_(nullptr),
-start_(nullptr),
-end_(nullptr),
-arena_(X_ASSERT_NOT_NULL(arena))
+	read_(nullptr),
+	write_(nullptr),
+	start_(nullptr),
+	end_(nullptr),
+	arena_(X_ASSERT_NOT_NULL(arena))
 {
 }
 
 ByteStreamFifo::ByteStreamFifo(MemoryArenaBase* arena, size_t numBytes) :
-write_(nullptr),
-read_(nullptr),
-start_(nullptr),
-end_(nullptr),
-arena_(X_ASSERT_NOT_NULL(arena))
+	read_(nullptr),
+	write_(nullptr),
+	start_(nullptr),
+	end_(nullptr),
+	arena_(X_ASSERT_NOT_NULL(arena))
 {
 	resize(numBytes);
 }

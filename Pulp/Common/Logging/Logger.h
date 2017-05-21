@@ -11,9 +11,9 @@ template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 class Logger : public LoggerBase
 {
 public:
-	typedef typename FilterPolicy FilterPolicy;
-	typedef typename FormatPolicy FormatPolicy;
-	typedef typename WritePolicy WritePolicy;
+	typedef FilterPolicy FilterPolicy;
+	typedef FormatPolicy FormatPolicy;
+	typedef WritePolicy WritePolicy;
 
 	Logger(void);
 	Logger(const FilterPolicy& filter, const FormatPolicy& formatter, const WritePolicy& writer);

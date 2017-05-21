@@ -292,7 +292,7 @@ namespace TGA
 			// check all data is valid for the face.
 			if (pCur != pEnd) {
 				const size_t bytesLeft = pEnd - pCur;
-				X_ERROR("TextureTGA", "Failed to correctly read rle incoded image. bytes left: %" PRIuS);
+				X_ERROR("TextureTGA", "Failed to correctly read rle incoded image. bytes left: %" PRIuS, bytesLeft);
 				return false;
 			}
 		}

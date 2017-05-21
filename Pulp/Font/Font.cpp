@@ -43,8 +43,8 @@ namespace
 XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
 	fontSys_(fontSys),
 	name_(pFontName),
-	pFontTexture_(nullptr),
 	effects_(g_fontArena),
+	pFontTexture_(nullptr),
 	pTexture_(nullptr),
 	fontTexDirty_(false),
 	pMaterial_(nullptr),
@@ -322,7 +322,7 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	}
 
 	if (effects_.isEmpty()) {
-		X_WARNING("Font", "\"%s\" has no effects.", getName());
+		X_WARNING("Font", "\"%s\" has no effects.", getName().c_str());
 		return;
 	}
 
@@ -771,7 +771,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
 
 	const float scaleX = ctx.size.x / pFontTexture_->GetCellWidth();
 	const float scaleY = ctx.size.y / pFontTexture_->GetCellHeight();
-	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
+//	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
 	const float hozAdvance =  (metrics.max_advance * scaleX);
 	const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
 

@@ -63,7 +63,7 @@ struct AssManProps
 {
 	core::string cat; // the assetScript cat.
 	core::string title;
-	core::string default;
+	core::string defaultVal;
 };
 
 
@@ -91,7 +91,7 @@ struct Texture
 	Texture() = default;
 
 	core::string propName;
-	core::string default;
+	core::string defaultName;
 
 	render::TextureSlot::Enum texSlot;
 

@@ -85,21 +85,25 @@ core::MallocFreeAllocator XCore::malloc_;
 XCore::XCore() :
 	pWindow_(nullptr),
 	pConsole_(nullptr),
-	pCpuInfo_(nullptr),
-	pCrc32_(nullptr),
-#if X_ENABLE_PROFILER
-	pProfiler_(nullptr),
-#endif //!X_ENABLE_PROFILER
+	
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
-	pEventDispatcher_(nullptr),
-//	arena_(&malloc_, "GlobalMalloc"),
-	
+
+	pCpuInfo_(nullptr),
+	pCrc32_(nullptr),
+
 	moduleDLLHandles_(g_coreArena),
 	moduleInterfaces_(g_coreArena),
 	converterInterfaces_(g_coreArena),
 	assertHandlers_(g_coreArena),
+
+#if X_ENABLE_PROFILER
+	pProfiler_(nullptr),
+#endif //!X_ENABLE_PROFILER
+
 	dirWatcher_(g_coreArena),
+	
+	pEventDispatcher_(nullptr),
 	hotReloadExtMap_(g_coreArena),
 
 #if X_DEBUG
@@ -409,34 +413,31 @@ bool XCore::PumpMessages()
 
 void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-//	X_UNUSED(event);
 	X_UNUSED(wparam);
 	X_UNUSED(lparam);
-
 
 	switch (event)
 	{
 		case CoreEvent::MOVE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetRect();
-
 			vars_.updateWinPos(rect.getX1(), rect.getY1());
 		}
 		break;
 		case CoreEvent::RESIZE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetClientRect();
-
 			vars_.updateWinDim(rect.getWidth(), rect.getHeight());
 		}
 		break;
 		case CoreEvent::ACTIVATE:
-		{
 			if (pWindow_) {
 				pWindow_->ClipCursorToWindow();
 			}
-		}
 		break;
+
+		default:
+			break;
 	}
 }
 

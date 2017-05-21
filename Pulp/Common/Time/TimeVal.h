@@ -29,9 +29,10 @@ public:
 	X_INLINE void SetSeconds(const float infSec);
 	X_INLINE void SetSeconds(const double infSec);
 	X_INLINE void SetSeconds(const TimeType indwSec);
-	X_INLINE void SetMilliSeconds(const int iniMilliSec);
+	X_INLINE void SetMilliSeconds(const int32_t iniMilliSec);
 	X_INLINE void SetMilliSeconds(const double indMilliSec);
 	X_INLINE void SetMilliSeconds(const TimeType indwMilliSec);
+	X_INLINE void SetMicroSeconds(const TimeType indwNanoSec);
 	X_INLINE void SetNanoSeconds(const TimeType indwNanoSec);
 	// Use only for relative value, absolute values suffer a lot from precision loss.
 	X_INLINE float GetMilliSeconds(void) const;

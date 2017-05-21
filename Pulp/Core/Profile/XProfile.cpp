@@ -18,11 +18,15 @@
 
 #include "FileSys/xFileSys.h"
 
+#if X_COMPILER_CLANG
+#include <cpuid.h> 
+#endif // !X_COMPILER_CLANG
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
 {
-	#pragma intrinsic(__rdtsc)
+	X_INTRINSIC(__rdtsc)
 
 	namespace ProfileTimer
 	{
@@ -36,7 +40,13 @@ namespace
 		X_INLINE uint64_t getTicksFlush(void)
 		{
 			int temp[4];
+
+#if X_COMPILER_CLANG
+			__cpuid(temp, temp[0], temp[1], temp[2], temp[3]);
+#else
 			__cpuid(temp, 0);
+#endif // !X_COMPILER_CLANG
+
 			return __rdtsc();
 		}
 
@@ -100,11 +110,11 @@ namespace profiler
 	XProfileSys::XProfileSys(core::MemoryArenaBase* arena) :
 		pFont_(nullptr),
 		frameOffset_(0),
-		profilerData_(arena),
-		profilerHistoryData_(arena),
 		frameStartTime_(0),
 		frameTime_(0),
-		totalTime_(0)
+		totalTime_(0),
+		profilerData_(arena),
+		profilerHistoryData_(arena)
 	{
 		repeatEventTimer_ = TimeVal(0ll);
 		repeatEventInterval_ = TimeVal(0.05f);
@@ -337,6 +347,8 @@ namespace profiler
 					--frameOffset_;
 				}
 				break;
+			default:
+				break;
 		}
 		
 		return true;
@@ -519,8 +531,8 @@ namespace profiler
 	Vec2f XProfileSys::RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena)
 	{
 		const float padding = 10;
-		const float treeIndent = 10.f;
-		const float spacing = 20.f;
+	//	const float treeIndent = 10.f;
+	//	const float spacing = 20.f;
 
 		const float colHdrStartX = pos.x;
 		const float colHdrStartY = pos.y;
@@ -601,7 +613,7 @@ namespace profiler
 
 		const float padding = 10;
 
-		const float titleStartX = pos.x + padding;
+	//	const float titleStartX = pos.x + padding;
 		const float titleStartY = pos.y;
 		const float titleHeight = 16.f + padding;
 
@@ -695,7 +707,7 @@ namespace profiler
 		Vec2f size = pFont_->GetTextSize(str.begin(), str.end(), ctx);
 
 		const float padding = 10;
-		const float titleStartX = pos.x + padding;
+	//	const float titleStartX = pos.x + padding;
 		const float titleStartY = pos.y;
 		const float titleHeight = 20.f;
 		const float memInfoStartX = pos.x + padding;
@@ -770,7 +782,7 @@ namespace profiler
 		const float maxHeightPerThread = 50.f;
 
 		const int32_t visibleMS = vars_.jobSysThreadMS();
-		const uint32_t numThread = pJobSys->GetThreadCount();
+	//	const uint32_t numThread = pJobSys->GetThreadCount();
 		const uint32_t numThreadQueues = pJobSys->GetQueueCount();
 		const float threadInfoXOffset = 40.f;
 		const float threadInfoX = xStart + padding + threadInfoXOffset;
@@ -902,7 +914,7 @@ namespace profiler
 
 			core::StackStringW512 txt;
 			txt.appendFmt(L"JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
-				frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
+				int32_t(frameStats.jobsRun), int32_t(frameStats.jobsStolen), int32_t(frameStats.jobsAssited));
 
 			ctx.SetColor(Col_Mintcream);
 			ctx.flags.Set(font::DrawTextFlag::CENTER);

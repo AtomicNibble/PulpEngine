@@ -416,7 +416,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 
 		// only the count is used to know if split, so set valeus on these to try detect incorrect usage.
 #if X_DEBUG
-		splitPacketId = std::numeric_limits<decltype(splitPacketIndex)>::max();
+		splitPacketId = std::numeric_limits<decltype(splitPacketId)>::max();
 		splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
 #endif // !X_DEBUG
 	}
@@ -453,7 +453,7 @@ void ReliablePacket::assignPropertiesExcData(const ReliablePacket* pOth)
 	sendAttemps = 0;
 
 	orderingChannel = pOth->orderingChannel;
-	splitPacketId = splitPacketId;
+	splitPacketId = pOth->splitPacketId;
 	splitPacketIndex = pOth->splitPacketIndex;
 	splitPacketCount = pOth->splitPacketCount;
 
@@ -482,38 +482,39 @@ PacketReliability::Enum ReliablePacket::reliabilityWithoutAck(void) const
 // ----------------------------------------------------------
 
 ReliabilityLayer::ReliabilityLayer(NetVars& vars, 
-	core::MemoryArenaBase* arena,
-	core::MemoryArenaBase* packetDataArena,
-	core::MemoryArenaBase* packetPool) :
+		core::MemoryArenaBase* arena,
+		core::MemoryArenaBase* packetDataArena,
+		core::MemoryArenaBase* packetPool) :
 	vars_(vars),
-	MTUSize_(0),
 	arena_(arena),
 	packetDataArena_(packetDataArena),
 	packetPool_(packetPool),
+	MTUSize_(0),
+	orderingQueues_{
+		X_PP_REPEAT_COMMA_SEP(16, arena)
+	},
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
 	dataGramHistory_(arena),
 	dataGramHistoryPopCnt_(0),
 	recivedPacketBaseIdx_(0),
 	recivedPacketQueue_(arena),
-	connectionDead_(false),
 	incomingAcks_(arena),
 	naks_(arena),
 	acks_(arena),
 	reliableMessageNumberIdx_(0),
 	dagramSeqNumber_(0),
+
 	splitPacketId_(0),
-	bps_{
-		X_PP_REPEAT_COMMA_SEP(7, arena)
-	},
-	orderingQueues_{
-		X_PP_REPEAT_COMMA_SEP(16, arena)
-	},
-	bytesInReSendBuffers_(0),
-	msgInReSendBuffers_(0),
 	splitPacketChannels_(arena),
 	packetsThisFrame_(arena),
 	packetsThisFrameBoundaries_(arena),
+	connectionDead_(false),
+	bps_{
+		X_PP_REPEAT_COMMA_SEP(7, arena)
+	},
+	bytesInReSendBuffers_(0),
+	msgInReSendBuffers_(0),
 	delayedPackets_(arena)
 {
 	outGoingPackets_.reserve(128);
@@ -1154,6 +1155,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 	}
 
 	const int32_t bitsPerSecondLimit = vars_.connectionBSPLimit();
+	X_UNUSED(bitsPerSecondLimit);
 
 	// HELLLLOOOO annnnyboddy.
 	if (hasTimedOut(time)) {

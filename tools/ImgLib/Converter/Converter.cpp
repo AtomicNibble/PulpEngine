@@ -195,10 +195,12 @@ namespace Converter
 		{
 		case ScaleFactor::EIGHTH:
 			srcImg_.dropTopMip();
-		case ScaleFactor::QUARTER:
+		case ScaleFactor::FOURTH:
 			srcImg_.dropTopMip();
 		case ScaleFactor::HALF:
 			srcImg_.dropTopMip();
+			break;
+		default:
 			break;
 		}
 	}
@@ -568,7 +570,7 @@ namespace Converter
 					const int32_t targetJobCount = 32;
 					const int32_t rowsPerJob = (((inputImg.height / 4) + targetJobCount - 1) / targetJobCount) * 4;
 					const int32_t bytesPerBlock = Util::dxtBytesPerBlock(targetFmt);
-					const int32_t numJobs = core::Min(targetJobCount, inputImg.height);
+				//	const int32_t numJobs = core::Min(targetJobCount, inputImg.height);
 
 					X_ASSERT((rowsPerJob % 4) == 0, "Rows to process should be multiple of 4")(rowsPerJob);
 

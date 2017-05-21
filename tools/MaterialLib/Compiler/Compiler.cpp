@@ -17,9 +17,9 @@ X_NAMESPACE_BEGIN(engine)
 
 MaterialCompiler::MaterialCompiler(TechSetDefs& techDefs) :
 	techDefs_(techDefs),
-	params_(g_MatLibArena),
-	textures_(g_MatLibArena),
 	samplers_(g_MatLibArena),
+	textures_(g_MatLibArena),
+	params_(g_MatLibArena),
 	pTechDef_(nullptr)
 {
 
@@ -190,9 +190,9 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			if (!d.HasMember(textureDesc.propName))
 			{
 				// if we have a default texture we just use that.
-				if (textureDesc.default.isNotEmpty())
+				if (textureDesc.defaultName.isNotEmpty())
 				{
-					tex.value = textureDesc.default;
+					tex.value = textureDesc.defaultName;
 				}
 				else
 				{

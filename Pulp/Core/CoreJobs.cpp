@@ -68,7 +68,7 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
 		}
 	}
 
-	X_DELETE(pData, g_coreArena);
+	X_DELETE(pFileChangeData, g_coreArena);
 }
 
 

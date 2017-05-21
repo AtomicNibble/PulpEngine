@@ -222,7 +222,7 @@ namespace PNG
 
 		if (!hdr.isValid()) {
 			X_ERROR("TexturePNG", "invalid png header.");
-			return nullptr;
+			return false;
 		}
 
 		// ihdr length
@@ -566,7 +566,8 @@ namespace PNG
 
 		// now we write the data.
 		const int32_t srcSize = safe_static_cast<int32_t>(imgFile.getFaceSize());
-		const uint8_t* pSrc = imgFile.getFace(0);
+		const uint8_t* const pSrc = imgFile.getFace(0);
+		const uint8_t* pSrcCur = pSrc;
 
 		using namespace core::Compression;
 
@@ -607,7 +608,7 @@ namespace PNG
 
 			// deflate row.
 			const bool lastRow = (row + 1) == rows;
-			res = zlib.Deflate(pSrc, rowBytes, lastRow);
+			res = zlib.Deflate(pSrcCur, rowBytes, lastRow);
 
 			if (lastRow) {
 				if (res != ZlibDefalte::Result::DONE) {
@@ -622,7 +623,9 @@ namespace PNG
 				}
 			}
 
-			pSrc += rowBytes;
+			pSrcCur += rowBytes;
+
+			X_ASSERT(pSrcCur <= (pSrc + srcSize), "Out of range")(pSrcCur, pSrc, srcSize);
 		}
 
 

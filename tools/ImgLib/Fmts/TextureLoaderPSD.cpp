@@ -211,16 +211,18 @@ namespace PSD
 
 				uint16_t shift = getShiftFromChannel(static_cast<uint8_t>(channel), header);
 
-				if (shift != -1)
+				if (shift != 0)
 				{
 					uint32_t mask = 0xffu << static_cast<uint32_t>(shift);
 
-					for (uint32_t x = 0; x<header.width; ++x)
-					for (uint32_t y = 0; y<header.height; ++y)
+					for (uint32_t x = 0; x < header.width; ++x)
 					{
-						uint32_t index = x + y*header.width;
-						imageData[index] = ~(~imageData[index] | mask);
-						imageData[index] |= tmpData[index] << shift;
+						for (uint32_t y = 0; y < header.height; ++y)
+						{
+							uint32_t index = x + y*header.width;
+							imageData[index] = ~(~imageData[index] | mask);
+							imageData[index] |= tmpData[index] << shift;
+						}
 					}
 				}
 			}
@@ -233,22 +235,22 @@ namespace PSD
 		{
 			core::Array<uint8_t> tmpData(swapArena, header.width * header.height);
 
-			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
+			for (int32_t channel = 0; channel < header.channels && channel < 3; ++channel)
 			{
 				if (!file->read(tmpData.ptr(), sizeof(uint8_t) * header.width * header.height))
 				{
-					X_ERROR("TexturePSD","failed to read color channel");
+					X_ERROR("TexturePSD", "failed to read color channel");
 					break;
 				}
 
 				uint16_t shift = getShiftFromChannel(static_cast<uint8_t>(channel), header);
-				if (shift != -1)
+				if (shift != 0)
 				{
 					uint32_t mask = 0xffu << static_cast<uint32_t>(shift);
 
-					for (uint32_t x = 0; x<header.width; ++x)
+					for (uint32_t x = 0; x < header.width; ++x)
 					{
-						for (uint32_t y = 0; y<header.height; ++y)
+						for (uint32_t y = 0; y < header.height; ++y)
 						{
 							uint32_t index = x + y * header.width;
 							imageData[index] = ~(~imageData[index] | mask);

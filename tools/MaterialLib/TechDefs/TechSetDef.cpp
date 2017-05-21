@@ -1495,7 +1495,7 @@ bool TechSetDef::parseParamTextureData(core::XParser& lex, Texture& texture)
 		if (token.GetType() == core::TokenType::NAME || token.GetType() == core::TokenType::STRING)
 		{
 			// this is just hard coded image name.
-			texture.default = core::string(token.begin(), token.end());
+			texture.defaultName = core::string(token.begin(), token.end());
 		}
 		else if(token.GetType() == core::TokenType::PUNCTUATION && token.GetPuncId() == core::PunctuationId::LOGIC_LESS)
 		{
@@ -1526,7 +1526,7 @@ bool TechSetDef::parseParamTextureData(core::XParser& lex, Texture& texture)
 						return false;
 					}
 
-					texture.default = core::string(token.begin(), token.end());
+					texture.defaultName = core::string(token.begin(), token.end());
 				}
 				else
 				{

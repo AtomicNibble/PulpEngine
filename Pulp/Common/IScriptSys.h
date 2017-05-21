@@ -607,6 +607,10 @@ X_INLINE bool ScriptValue::operator == (const ScriptValue& rhs) const
 			case Type::HANDLE: result = ptr == rhs.ptr; break;
 			case Type::FUNCTION: result = gEnv->pScriptSys->CompareFuncRef(pFunction, rhs.pFunction); break;
 				//		case Type::USERDATA: result = ud.nRef == rhs.ud.nRef && ud.ptr == rhs.ud.ptr; break;
+
+			default:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
 		}
 	}
 	return result;

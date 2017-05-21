@@ -106,7 +106,7 @@ public:
 
 	// fast id maps to index.
 	XBaseAsset* findAsset(uint32_t id) {
-		if (id < 0 || id > list.size()) // needed for release?
+		if (id > list.size()) // needed for release?
 			return nullptr; // O'Deer
 		return list[id];
 	}
@@ -241,7 +241,7 @@ public:
 
 	typedef typename ResourceMap::iterator ResourceItor;
 	typedef typename ResourceMap::const_iterator ResourceConstItor;
-	typedef typename ThreadPolicy ThreadPolicy;
+	typedef ThreadPolicy ThreadPolicy;
 
 public:
 	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :

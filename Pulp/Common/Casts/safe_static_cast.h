@@ -20,7 +20,7 @@ X_INLINE TO safe_static_cast(FROM from)
 {
 #if X_ENABLE_SAFE_STATIC_CAST
 	// delegate the call to the proper helper class, depending on the signedness of both types
-	return X_NAMESPACE(core)::internal::safe_static_cast_helper<std::numeric_limits<FROM>::is_signed, std::numeric_limits<TO>::is_signed>::cast<TO>(from);
+	return X_NAMESPACE(core)::internal::safe_static_cast_helper<std::numeric_limits<FROM>::is_signed, std::numeric_limits<TO>::is_signed>:: template cast<TO>(from);
 #else
 	return static_cast<TO>(from);
 #endif

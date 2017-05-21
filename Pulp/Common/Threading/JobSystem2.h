@@ -523,7 +523,7 @@ public:
 
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
 	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& jobData JOB_SYS_SUB_PARAM);
+		DataT& jobData JOB_SYS_SUB_PARAM);
 
 	template<typename ClassType>
 	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
@@ -531,7 +531,7 @@ public:
 
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
 	X_INLINE Job* CreateMemberJobAndRun(ClassType* pInst, typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& jobData JOB_SYS_SUB_PARAM);
+		DataT& jobData JOB_SYS_SUB_PARAM);
 
 
 	template<typename ClassType>
@@ -540,7 +540,7 @@ public:
 
 	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
 	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, 
-		typename member_function_job_copy_data<ClassType,DataT>::MemberFunctionPtr pFunction, typename DataT& jobData JOB_SYS_SUB_PARAM);
+		typename member_function_job_copy_data<ClassType,DataT>::MemberFunctionPtr pFunction, DataT& jobData JOB_SYS_SUB_PARAM);
 
 	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 

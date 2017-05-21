@@ -609,9 +609,9 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 			{
 				pProp->SetTitle(std::string(assProps.title));
 			}
-			if (assProps.default.isNotEmpty())
+			if (assProps.defaultVal.isNotEmpty())
 			{
-				pProp->SetDefaultValue(std::string(assProps.default));
+				pProp->SetDefaultValue(std::string(assProps.defaultVal));
 			}
 		}
 		else

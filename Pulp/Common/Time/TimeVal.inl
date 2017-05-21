@@ -61,23 +61,38 @@ X_INLINE void TimeVal::SetSeconds(const TimeType indwSec)
 	time_ = indwSec*PRECISION;
 }
 
-X_INLINE void TimeVal::SetMilliSeconds(const int iniMilliSec)
+X_INLINE void TimeVal::SetMilliSeconds(const int32_t iniMilliSec)
 {
-	time_ = iniMilliSec*(PRECISION / 1000);
+	const float scale = (PRECISION / 1000);
+
+	time_ = static_cast<TimeType>(iniMilliSec * scale);
 }
 X_INLINE void TimeVal::SetMilliSeconds(const double indMilliSec)
 {
-	time_ = ((TimeType)indMilliSec)*(PRECISION / 1000);
+	const double scale = (PRECISION / 1000);
+
+	time_ = static_cast<TimeType>(indMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMilliSeconds(const TimeType indwMilliSec)
 {
-	time_ = indwMilliSec*(PRECISION / 1000);
+	const double scale = (PRECISION / 1000);
+
+	time_ = static_cast<TimeType>(indwMilliSec * scale);
+}
+
+X_INLINE void TimeVal::SetMicroSeconds(const TimeType indwMicroSec)
+{
+	const double scale = (PRECISION / (1000 * 1000));
+
+	time_ = static_cast<TimeType>(indwMicroSec * scale);
 }
 
 X_INLINE void TimeVal::SetNanoSeconds(const TimeType indwNanoSec)
 {
-	time_ = indwNanoSec / (1000000 / PRECISION);
+	const double scale = (PRECISION / (1000 * 1000 * 1000));
+
+	time_ = static_cast<TimeType>(indwNanoSec * scale);
 }
 
 // Use only for relative value, absolute values suffer a lot from precision loss.

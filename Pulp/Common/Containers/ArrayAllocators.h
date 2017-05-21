@@ -46,7 +46,7 @@ namespace growStrat
 	protected:
 		size_type getAllocationSize(size_type currentCapacity) const
 		{
-			if (currentCapacity < 0) {
+			if (currentCapacity == 0) {
 				return 16;
 			}
 

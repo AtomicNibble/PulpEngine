@@ -449,12 +449,12 @@ namespace CommandPacket
 		*getNextCommandPacket<CommandT>(command) = nextPacket;
 	}
 
-	X_INLINE Packet* CommandPacket::getNextCommandPacket(Packet pPacket)
+	X_INLINE Packet* getNextCommandPacket(Packet pPacket)
 	{
 		return union_cast<Packet*>(reinterpret_cast<char*>(pPacket) + OFFSET_NEXT_COMMAND_PACKET);
 	}
 
-	X_INLINE Command::Enum* CommandPacket::getCommandType(Packet pPacket)
+	X_INLINE Command::Enum* getCommandType(Packet pPacket)
 	{
 		return union_cast<Command::Enum*>(reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND_TYPE);
 	}

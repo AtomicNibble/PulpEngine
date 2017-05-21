@@ -38,7 +38,7 @@ namespace AssetExplorer {
 		bool delayedInit(void);
 		bool loadMods(void);
 		bool restoreSession(void);
-		bool addMod(int32_t modId, const core::string& name, core::Path<char>& outDir);
+		bool addMod(int32_t modId, const core::string& name, const core::Path<char>& outDir);
 
 		static Project* currentProject(void);
 		Node* currentNode(void) const;

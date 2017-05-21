@@ -57,11 +57,11 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 // -------------------------------------------------------------------------------
 
 X_INLINE Material::Material(core::MemoryArenaBase* arena) :
+	pTechDefState_(nullptr),
 	techs_(arena),
 	params_(arena),
 	samplers_(arena),
-	textures_(arena),
-	pTechDefState_(nullptr)
+	textures_(arena)
 {
 	id_ = -1;
 

@@ -324,11 +324,6 @@ XConsole::Cursor::Cursor() :
 //////////////////////////////////////////////////////////////////////////
 
 XConsole::XConsole() :
-	VarMap_(g_coreArena),
-	CmdMap_(g_coreArena),
-	Binds_(g_coreArena),
-	configCmds_(g_coreArena),
-	varArchive_(g_coreArena),
 	varHeap_(
 		bitUtil::RoundUpToMultiple<size_t>(
 			VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * VAR_MAX,
@@ -341,11 +336,16 @@ XConsole::XConsole() :
 		VarPool::getMemoryOffsetRequirement()
 	),
 	varArena_(&varAllocator_, "VarArena"),
+	VarMap_(g_coreArena),
+	CmdMap_(g_coreArena),
+	Binds_(g_coreArena),
+	configCmds_(g_coreArena),
+	varArchive_(g_coreArena),
 	cmds_(g_coreArena),
 	coreEventListernRegd_(false),
-	historyFileBuf_(g_coreArena),
 	historyLoadPending_(false),
-	historyFileSize_(0)
+	historyFileSize_(0),
+	historyFileBuf_(g_coreArena)
 {
 	HistoryPos_ = -1;
 	CursorPos_ = 0;

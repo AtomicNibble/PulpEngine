@@ -13,7 +13,7 @@ template<typename T>
 class UniquePointerBase
 {
 public:
-	typedef typename T* pointer;
+	typedef T* pointer;
 
 	X_INLINE UniquePointerBase(core::MemoryArenaBase* arena, T* pInstance);
 	X_INLINE UniquePointerBase(UniquePointerBase&& oth);
@@ -21,6 +21,9 @@ public:
 	X_INLINE core::MemoryArenaBase* getArena(void) const;
 	X_INLINE pointer& ptr(void);
 	X_INLINE const pointer& ptr(void) const;
+
+protected:
+	X_INLINE void swap(UniquePointerBase& oth);
 
 private:
 	pointer pInstance_;
@@ -97,7 +100,7 @@ public:
 
 private:
 	void deleter(pointer ptr) {
-		X_DELETE_ARRAY(const_cast<typename std::remove_const<T>::type*>(ptr), getArena());
+		X_DELETE_ARRAY(const_cast<typename std::remove_const<T>::type*>(ptr), Mybase::getArena());
 	}
 };
 

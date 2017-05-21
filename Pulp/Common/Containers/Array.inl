@@ -1,10 +1,10 @@
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena) :
-	granularity_( 16 ),
 	list_( nullptr ),
 	num_( 0 ),
 	size_( 0 ),
+	granularity_( 16 ),
 	allocator_(arena)
 {
 }
@@ -12,10 +12,10 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena) :
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
-	granularity_(16),
 	list_(nullptr),
 	num_(size),
 	size_(size),
+	granularity_(16),
 	allocator_(X_ASSERT_NOT_NULL(arena))
 {
 	if (size)
@@ -27,10 +27,10 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
-    granularity_(16),
     list_(nullptr),
     num_(size),
     size_(size),
+    granularity_(16),
     allocator_(X_ASSERT_NOT_NULL(arena))
 {
 	if (size)
@@ -55,11 +55,11 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_lis
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(const Array<T, Allocator>& oth) :
-    allocator_(oth.allocator_),
-    granularity_(16),
     list_(nullptr),
     num_(0),
-    size_(0)
+    size_(0),
+    granularity_(16),
+    allocator_(oth.allocator_)
 {
 	*this = oth;
 }
@@ -67,11 +67,11 @@ X_INLINE Array<T, Allocator>::Array(const Array<T, Allocator>& oth) :
 
 template<typename T, class Allocator>
 X_INLINE Array<T, Allocator>::Array(Array<T, Allocator>&& oth) :
-	allocator_(oth.allocator_),
-	granularity_(oth.granularity_),
 	list_(oth.list_),
 	num_(oth.num_),
-	size_(oth.size_)
+	size_(oth.size_),
+	granularity_(oth.granularity_),
+	allocator_(oth.allocator_)
 {
 	// clear other.
 	oth.list_ = nullptr;

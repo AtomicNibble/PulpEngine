@@ -287,7 +287,7 @@ bool AssetExplorer::init(void)
 
 bool AssetExplorer::loadMods(void)
 {
-	core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
+	assetDb::AssetDB::ModDelegate func;
 	func.Bind<AssetExplorer, &AssetExplorer::addMod>(this);
 	if (!db_.IterateMods(func)) {
 		X_ERROR("AssetExplor", "Failed to iterate mods");
@@ -312,7 +312,7 @@ bool AssetExplorer::restoreSession(void)
 
 
 
-bool AssetExplorer::addMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
+bool AssetExplorer::addMod(assetDb::AssetDB::ModId modId, const core::string& name, const core::Path<char>& outDir)
 {
 	X_UNUSED(outDir);
 

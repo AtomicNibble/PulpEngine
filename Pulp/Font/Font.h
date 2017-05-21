@@ -3,7 +3,8 @@
 #ifndef _X_FONT_SYS_H_
 #define _X_FONT_SYS_H_
 
-#include <String\StackString.h>
+#include "FontTypes.h"
+
 #include <Containers\FixedArray.h>
 #include <Containers\Array.h>
 #include <Threading\Signal.h>

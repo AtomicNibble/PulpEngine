@@ -691,7 +691,7 @@ public:
 class CapsuleGeometry : public GeometryBase
 {
 public:
-	X_INLINE CapsuleGeometry() : GeometryBase(GeometryType::Capsule), radius_(0) {}
+	X_INLINE CapsuleGeometry() : GeometryBase(GeometryType::Capsule), radius_(0), halfHeight_(0) {}
 	X_INLINE CapsuleGeometry(float32_t radius, float32_t halfHeight): GeometryBase(GeometryType::Capsule), radius_(radius), halfHeight_(halfHeight) {}
 
 private:

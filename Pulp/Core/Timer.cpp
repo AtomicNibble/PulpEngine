@@ -33,8 +33,8 @@ XTimer::XTimer() :
 	timeScaleUi_(1.f),
 	maxFrameTimeDelta_(0),
 	ticksPerSec_(0),
-	maxFps_(0),
 	debugTime_(0),
+	maxFps_(0),
 	deltaBufIdx_(0)
 {
 
@@ -132,7 +132,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 	// now we need to scale each of the timers.
 	{
 		const int64_t gameTime = scaleTime(frameDeltaCapped, timeScale_);
-		frameTime.deltas[Timer::GAME].SetValue(frameDeltaCapped);
+		frameTime.deltas[Timer::GAME].SetValue(gameTime);
 	}
 	{
 		const int64_t uiTime = scaleTime(frameDeltaCapped, timeScaleUi_);

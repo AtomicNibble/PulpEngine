@@ -153,7 +153,7 @@ bool Converter::Convert(int32_t modId)
 	
 	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
-	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	assetDb::AssetDB::AssetDelegate func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
 	core::StopWatch timer;
@@ -188,7 +188,7 @@ bool Converter::Convert(int32_t modId, AssetType::Enum assType)
 	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
 
-	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	assetDb::AssetDB::AssetDelegate func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
 	core::StopWatch timer;
@@ -221,7 +221,7 @@ bool Converter::Convert(AssetType::Enum assType)
 	
 	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
-	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	assetDb::AssetDB::AssetDelegate func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
 	core::StopWatch timer;
@@ -250,7 +250,7 @@ bool Converter::ConvertAll(void)
 
 	X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 
-	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	assetDb::AssetDB::AssetDelegate func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
 	core::StopWatch timer;
@@ -294,7 +294,7 @@ bool Converter::CleanAll(const char* pMod)
 		return CleanMod(modId, mod.name, mod.outDir);
 	}
 
-	core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
+	assetDb::AssetDB::ModDelegate func;
 	func.Bind<Converter, &Converter::CleanMod>(this);
 
 	return db_.IterateMods(func);
@@ -312,7 +312,7 @@ bool Converter::CleanAll(int32_t modId)
 	return CleanMod(modId, mod.name, mod.outDir);
 }
 
-bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
+bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, const core::Path<char>& outDir)
 {
 	// mark all the assets for this mod stale.
 	if (!db_.MarkAssetsStale(modId)) {
@@ -386,7 +386,7 @@ bool Converter::GenerateThumbs(void)
 
 		X_LOG0("Converter", "Generating %" PRIi32 " thumb(s)", numAssets);
 
-		core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+		assetDb::AssetDB::AssetDelegate func;
 		func.Bind<Converter, &Converter::GenerateThumb>(this);
 
 		core::StopWatch timer;
@@ -594,7 +594,7 @@ IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
 	if (!EnsureLibLoaded(assType)) {
 		X_ERROR("Converter", "Failed to load convert for asset type: \"%s\"", AssetType::ToString(assType));
-		return false;
+		return nullptr;
 	}
 
 	return converters_[assType];

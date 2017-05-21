@@ -166,8 +166,8 @@ public:
 
 
 	HashBase(MemoryArenaBase* arena) : 
+		buckets_(arena),
 		numElements_(0),
-		buckets_(arena_),
 		arena_(arena)
 	{
 

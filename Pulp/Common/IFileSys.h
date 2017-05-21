@@ -140,7 +140,10 @@ struct XFile
 struct XFileMem : public XFile
 {
 	XFileMem(char* begin, char* end, core::MemoryArenaBase* arena) : 
-	begin_(begin), current_(begin), end_(end), arena_(arena)
+		arena_(arena),
+		begin_(begin), 
+		current_(begin), 
+		end_(end)
 	{
 		X_ASSERT_NOT_NULL(begin);
 		X_ASSERT_NOT_NULL(end);
@@ -151,7 +154,7 @@ struct XFileMem : public XFile
 		X_DELETE_ARRAY(begin_,arena_);
 	}
 
-	virtual size_t read(void* pBuf, size_t Len) X_FINAL{
+	virtual size_t read(void* pBuf, size_t Len) X_FINAL {
 		size_t size = core::Min<size_t>(Len, safe_static_cast<size_t, uint64_t>(remainingBytes()));
 
 		memcpy(pBuf, current_, size);

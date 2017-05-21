@@ -31,36 +31,6 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 #endif // !X_LIB
 
 
-//////////////////////////////////////////////////////////////////////////
-struct XSystemEventListner_Core : public ICoreEventListener
-{
-public:
-	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE
-	{
-		X_UNUSED(wparam);
-		X_UNUSED(lparam);
-		switch (event)
-		{
-			case CoreEvent::LEVEL_UNLOAD:
-				break;
-
-			case CoreEvent::LEVEL_LOAD_START:
-			case CoreEvent::LEVEL_LOAD_END:
-			{
-				break;
-			}
-
-			case CoreEvent::LEVEL_POST_UNLOAD:
-			{
-
-				break;
-			}
-		}
-	}
-};
-
-static XSystemEventListner_Core g_core_event_listener_system;
-
 extern "C"
 {
 	IPCORE_API ICore* CreateCoreInterface(const SCoreInitParams &startupParams)
@@ -102,8 +72,6 @@ extern "C"
 			X_DELETE(pCore, startupParams.pCoreArena);
 			return nullptr;
 		}
-
-		pCore->GetCoreEventDispatcher()->RegisterListener(&g_core_event_listener_system);
 
 		return pCore;
 	}

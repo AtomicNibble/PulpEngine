@@ -10,8 +10,8 @@ X_NAMESPACE_BEGIN(core)
 XFindData::XFindData(const wchar_t* path, xFileSys* pFileSys) :
 	path_(path),
 	handle_(-1),
-	pFileSys_(pFileSys),
-	current_(pFileSys->searchPaths_)
+	current_(pFileSys->searchPaths_),
+	pFileSys_(pFileSys)
 {
 	folder_ = path_;
 	folder_.removeFileName();
@@ -21,8 +21,8 @@ XFindData::XFindData(const wchar_t* path, xFileSys* pFileSys) :
 
 XFindData::XFindData(const char* path, xFileSys* pFileSys) :
 	handle_(-1),
-	pFileSys_(pFileSys),
-	current_(pFileSys->searchPaths_)
+	current_(pFileSys->searchPaths_),
+	pFileSys_(pFileSys)
 {
 	wchar_t pathW[512];
 

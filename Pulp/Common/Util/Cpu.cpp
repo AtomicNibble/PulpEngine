@@ -4,30 +4,39 @@
 #include <Util\BitUtil.h>
 
 
+#if X_COMPILER_CLANG
+#include <cpuid.h> 
+#else
 #include <intrin.h>
+#endif // !X_COMPILER_CLANG
 
 
 X_NAMESPACE_BEGIN(core)
 
 namespace
 {
-	void cpuid(void* CPUInfo, int InfoType)
+	void cpuid(void* pCPUInfo, int infoType)
 	{
+#if X_COMPILER_CLANG
+		int* pInts = reinterpret_cast<int*>(pCPUInfo);
+		__cpuid(infoType, pInts[0], pInts[1], pInts[2], pInts[3]);
+#else
 #ifdef _WIN64
-		__cpuid((int*)CPUInfo, InfoType);
+		__cpuid(reinterpret_cast<int*>(pCPUInfo), infoType);
 #else
 		__asm
 		{
-			mov    esi, CPUInfo
-				mov    eax, InfoType
-				xor    ecx, ecx
-				cpuid
-				mov    dword ptr[esi], eax
-				mov    dword ptr[esi + 4], ebx
-				mov    dword ptr[esi + 8], ecx
-				mov    dword ptr[esi + 0Ch], edx
+			mov    esi, pCPUInfo
+			mov    eax, infoType
+			xor    ecx, ecx
+			cpuid
+			mov    dword ptr[esi], eax
+			mov    dword ptr[esi + 4], ebx
+			mov    dword ptr[esi + 8], ecx
+			mov    dword ptr[esi + 0Ch], edx
 		}
 #endif
+#endif // !X_COMPILER_CLANG
 	}
 
 	DWORD NumExtended()
@@ -38,8 +47,8 @@ namespace
 		__asm
 		{
 			mov    eax, 0x80000000
-				cpuid
-				xor	   eax, 0x80000000
+			cpuid
+			xor	   eax, 0x80000000
 		}
 #endif
 	}

@@ -6,11 +6,6 @@
 #include <cstddef>
 #include <type_traits>
 
-// _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
-// fancy a dance?
-extern "C" void* _ReturnAddress(void);
-#pragma intrinsic(_ReturnAddress)
-
 
 #define X_ABSTRACT									= 0
 #define X_OVERRIDE									override
@@ -21,6 +16,7 @@ extern "C" void* _ReturnAddress(void);
 #define X_POP_WARNING_LEVEL							X_PRAGMA(warning(pop))
 #define X_DISABLE_WARNING(number)					X_PRAGMA(warning(disable:number))
 #define X_ENABLE_WARNING(number)					X_PRAGMA(warning(default:number))
+#define X_INTRINSIC(func)							
 
 #define X_DISABLE_EMPTY_FILE_WARNING				namespace { char NoEmptyFileDummy##__LINE__; }
 
@@ -34,7 +30,7 @@ extern "C" void* _ReturnAddress(void);
 #define X_INLINE									__forceinline
 #define X_NO_INLINE									__declspec(noinline)
 #define X_HINT(hint)								__assume(hint)
-#define X_RETURN_ADDRESS()							_ReturnAddress()
+#define X_RETURN_ADDRESS()							__builtin_return_address()
 #define X_FORCE_SYMBOL_LINK(symbolName)				X_PRAGMA(comment(linker, X_PP_JOIN("/include:", symbolName)))
 #define X_LINK_LIB(libName)							X_PRAGMA(comment(lib, libName))
 #define X_MULTILINE_MACRO_BEGIN						X_DISABLE_WARNING(4127) do {

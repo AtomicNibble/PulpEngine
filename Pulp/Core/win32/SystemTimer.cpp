@@ -31,6 +31,8 @@ namespace SysTimer
 
 	float g_MilliToValueSingle;
 	double g_MilliToValueDouble;
+	double g_MicroToValueDouble;
+	double g_NanoToValueDouble;
 
 	int64_t g_Frequency;
 
@@ -47,7 +49,8 @@ namespace SysTimer
 		{
 			return static_cast<int64_t>(timeGetTime());
 		}
-	}
+
+	} // namespace
 
 	void Startup(void)
 	{
@@ -72,8 +75,10 @@ namespace SysTimer
 		g_FrequencySingle = static_cast<float>(frequency.QuadPart);
 		g_FrequencyDouble = static_cast<double>(frequency.QuadPart);
 		// times it by frequency * 1000
-		g_MilliToValueSingle = static_cast<float>(g_FrequencyDouble * 1000);
-		g_MilliToValueDouble = static_cast<double>(g_FrequencyDouble * 1000);
+		g_MilliToValueSingle = static_cast<float>(g_FrequencyDouble / 1000);
+		g_MilliToValueDouble = static_cast<double>(g_FrequencyDouble / 1000);
+		g_MicroToValueDouble = static_cast<double>(g_FrequencyDouble / (1000 * 1000));
+		g_NanoToValueDouble = static_cast<double>(g_FrequencyDouble / (1000 * 1000 * 1000));
 		
 		g_oneOverFrequency = static_cast<float>(resolution);
 		g_thousandOverFrequency = static_cast<float>(resolution * 1000.0);

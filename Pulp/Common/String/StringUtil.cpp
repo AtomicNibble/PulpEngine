@@ -16,17 +16,17 @@ namespace strUtil
 
 	namespace
 	{
-#define  bswap16	_byteswap_ushort
-#define  bswap32	_byteswap_ulong
-#define  MSBF16(x)   bswap16( (*(uint16_t const __declspec(align(1))*)x) )
-#define  MSBF32(x)   bswap32( (*(uint32_t const __declspec(align(1))*)x) )
+		#define  bswap16	_byteswap_ushort
+		#define  bswap32	_byteswap_ulong
+		#define  MSBF16(x)   bswap16( (*(uint16_t const __declspec(align(1))*)x) )
+		#define  MSBF32(x)   bswap32( (*(uint32_t const __declspec(align(1))*)x) )
 
-#define  compxm(a,b) _mm_movemask_epi8(_mm_cmpeq_epi8((a), (b)))
-#define  xmload(p)   _mm_load_si128((__m128i const *)(p))
-#define  load16(p)   (*(uint16_t const*)(p))
-#define  load32(p)   (*(uint32_t const*)(p))
+		#define  compxm(a,b) _mm_movemask_epi8(_mm_cmpeq_epi8((a), (b)))
+		#define  xmload(p)   _mm_load_si128((__m128i const *)(p))
+		#define  load16(p)   (*(uint16_t const*)(p))
+		#define  load32(p)   (*(uint32_t const*)(p))
 
-		char const*scanstr2(char const *tgt, char const pat[2])
+		char const* scanstr2(char const *tgt, char const pat[2])
 		{
 			__m128i const   zero = _mm_setzero_si128();
 			__m128i const   p0 = _mm_set1_epi8(pat[0]);
@@ -59,7 +59,7 @@ namespace strUtil
 			}
 		}
 
-		char const *scanstr3(char const *tgt, char const pat[3])
+		char const* scanstr3(char const *tgt, char const pat[3])
 		{
 			__m128i const   zero = _mm_setzero_si128();
 			__m128i const   p0 = _mm_set1_epi8(pat[0]);
