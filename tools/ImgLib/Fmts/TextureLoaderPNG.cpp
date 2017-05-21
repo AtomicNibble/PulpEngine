@@ -222,7 +222,7 @@ namespace PNG
 
 		if (!hdr.isValid()) {
 			X_ERROR("TexturePNG", "invalid png header.");
-			return nullptr;
+			return false;
 		}
 
 		// ihdr length
