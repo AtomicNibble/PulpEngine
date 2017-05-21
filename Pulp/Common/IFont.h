@@ -66,13 +66,14 @@ struct TextDrawContext
 	DrawTextFlags flags;
 	IFont* pFont;
 
-	TextDrawContext() :
-		widthScale(1.f),
+	X_INLINE TextDrawContext() :
 		size(16.f,16.f),
+		widthScale(1.f),
 		effectId(-1),
 		flags(0),
 		pFont(nullptr)
-	{}
+	{
+	}
 
 	X_INLINE void SetSize(const Vec2f& _size) { size = _size; }
 	X_INLINE void SetClip(const Rectf& rec) { clip = rec; }
