@@ -33,8 +33,8 @@ XTimer::XTimer() :
 	timeScaleUi_(1.f),
 	maxFrameTimeDelta_(0),
 	ticksPerSec_(0),
-	maxFps_(0),
 	debugTime_(0),
+	maxFps_(0),
 	deltaBufIdx_(0)
 {
 
