@@ -88,7 +88,7 @@ void CVarString<T>::Set(const char* pStr)
 	}
 
 	String_ = pStr;
-	OnModified();
+	CVarBase::OnModified();
 }
 
 template<class T>
@@ -231,7 +231,7 @@ void CVarInt<T>::Set(const int i)
 	}
 
 	IntValue_ = iVal;
-	OnModified();
+	CVarBase::OnModified();
 }
 
 template<class T>
@@ -373,7 +373,7 @@ void CVarFloat<T>::Set(const float f)
 	}
 
 	fValue_ = fVal;
-	OnModified();
+	CVarBase::OnModified();
 }
 
 template<class T>
@@ -499,7 +499,7 @@ void CVarIntRef::Set(const int i)
 	}
 
 	IntValue_ = iVal;
-	OnModified();
+	CVarBase::OnModified();
 }
 
 
@@ -633,7 +633,7 @@ void CVarFloatRef::Set(const float f)
 	}
 
 	fValue_ = f;
-	OnModified();
+	CVarBase::OnModified();
 }
 
 
