@@ -1,5 +1,6 @@
 #pragma once
 
+#include <String\StackString.h>
 
 X_NAMESPACE_BEGIN(font)
 
