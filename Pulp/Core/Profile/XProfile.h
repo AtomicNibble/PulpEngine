@@ -73,7 +73,7 @@ namespace profiler
 
 	private:
 		// ICoreEventListener		
-		void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam);
+		void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
 
 		// IInputEventListner
 		bool OnInputEvent(const input::InputEvent& event) X_FINAL;
