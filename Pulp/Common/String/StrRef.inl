@@ -826,16 +826,14 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, cons
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, const_str pstr, size_type count)
 {
-	if (nIndex < 0)
-		nIndex = 0;
-
 	size_type nInsertLength = count;
 	size_type nNewLength = length();
 	if (nInsertLength > 0)
 	{
 		makeUnique();
-		if (nIndex > nNewLength)
+		if (nIndex > nNewLength) {
 			nIndex = nNewLength;
+		}
 		nNewLength += nInsertLength;
 
 		if (capacity() < nNewLength)
@@ -862,10 +860,9 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, cons
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::erase(size_type nIndex, size_type count)
 {
-	if (nIndex < 0)
-		nIndex = 0;
-	if (count < 0 || count > length() - nIndex)
+	if (count < 0 || count > length() - nIndex) {
 		count = length() - nIndex;
+	}
 	if (count > 0 && nIndex < length())
 	{
 		makeUnique();
