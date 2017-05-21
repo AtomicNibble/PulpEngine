@@ -104,7 +104,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 			scale = ScaleFactor::HALF;
 		}
 		else if (core::strUtil::IsEqualCaseInsen(pScaleFactor, "1/4")) {
-			scale = ScaleFactor::QUARTER;
+			scale = ScaleFactor::FOURTH;
 		}
 		else if (core::strUtil::IsEqualCaseInsen(pScaleFactor, "1/8")) {
 			scale = ScaleFactor::EIGHTH;
