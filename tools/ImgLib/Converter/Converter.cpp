@@ -195,10 +195,12 @@ namespace Converter
 		{
 		case ScaleFactor::EIGHTH:
 			srcImg_.dropTopMip();
-		case ScaleFactor::QUARTER:
+		case ScaleFactor::FOURTH:
 			srcImg_.dropTopMip();
 		case ScaleFactor::HALF:
 			srcImg_.dropTopMip();
+			break;
+		default:
 			break;
 		}
 	}
