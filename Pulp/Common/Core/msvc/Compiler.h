@@ -3,8 +3,6 @@
 #ifndef X_COMPILER_H
 #define X_COMPILER_H
 
-#include <cstddef>
-#include <type_traits>
 
 // _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
 // fancy a dance?
