@@ -288,7 +288,7 @@ struct KeyId
 
 		MOUSE_LAST, // used for array size.
 
-		UNKNOWN = 0xffffffff,
+		UNKNOWN,
 	};
 };
 
