@@ -63,7 +63,7 @@ struct AssManProps
 {
 	core::string cat; // the assetScript cat.
 	core::string title;
-	core::string default;
+	core::string defaultVal;
 };
 
 
