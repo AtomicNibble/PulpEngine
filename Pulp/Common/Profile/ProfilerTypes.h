@@ -92,18 +92,17 @@ namespace profiler
 		);
 
 	protected:
-		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys,
-			Type::Enum type) :
-			pCore_(pCore),
-			pNickName_(pNickName),
+		XProfileData(ICore* pCore, const core::SourceInfo& sourceInfo, const char* pNickName, SubSys::Enum sys, Type::Enum type) :
 			sourceInfo_(sourceInfo),
+			pNickName_(pNickName),
+			pCore_(pCore),
 			time_(0),
 			timeSelf_(0),
 			pParent_(nullptr),
 			callCount_(0),
+			threadID_(core::Thread::GetCurrentID()),
 			hasChildren_(0),
 			subSystem_(sys),
-			threadID_(core::Thread::GetCurrentID()),
 			type_(type)
 		{
 		}
