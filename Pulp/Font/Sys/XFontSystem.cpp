@@ -8,46 +8,6 @@
 
 X_NAMESPACE_BEGIN(font)
 
-namespace
-{
-
-	void Command_ListFonts(core::IConsoleCmdArgs* pCmd)
-	{
-		X_UNUSED(pCmd);
-		XFontSystem* pFont = static_cast<XFontSystem*>(gEnv->pFontSys);
-
-		pFont->ListFonts();
-	}
-
-	void Command_DumpForName(core::IConsoleCmdArgs* pCmd)
-	{
-		XFontSystem* pFont = static_cast<XFontSystem*>(gEnv->pFontSys);
-
-		size_t Num = pCmd->GetArgCount();
-
-		if (Num < 2)
-		{
-			X_WARNING("Console", "fonts_dump_for_name <name>");
-			return;
-		}
-
-		const char* name = pCmd->GetArg(1);
-		XFont* font = static_cast<XFont*>(pFont->GetFont(name));
-		if (font)
-		{
-			if (font->getFontTexture()->WriteToFile(name))
-			{
-				X_LOG0("Font", "^8font texture successfully dumped!");
-			}
-		}
-		else
-		{
-			X_ERROR("Font", "failed to dump font, no font exsists for name: %s",
-				name);
-		}
-	}
-
-}
 
 XFontSystem::XFontSystem(ICore* pCore) :
 	pCore_(pCore),
@@ -78,10 +38,10 @@ void XFontSystem::registerVars(void)
 void XFontSystem::registerCmds(void)
 {
 	// add font commands
-	ADD_COMMAND("listFonts", Command_ListFonts, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("listFonts", this, XFontSystem, &XFontSystem::Command_ListFonts, core::VarFlag::SYSTEM,
 		"Lists all the loaded fonts");
 
-	ADD_COMMAND("fontDumpForMame", Command_DumpForName, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("fontDumpForMame", this, XFontSystem, &XFontSystem::Command_DumpForName, core::VarFlag::SYSTEM,
 		"Dumps the font texture for a given font name");
 
 }
@@ -285,6 +245,38 @@ void XFontSystem::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path
 #else 
 	X_UNUSED(name);
 #endif
+}
+
+void XFontSystem::Command_ListFonts(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+
+	ListFonts();
+}
+
+void XFontSystem::Command_DumpForName(core::IConsoleCmdArgs* pCmd)
+{
+	size_t Num = pCmd->GetArgCount();
+
+	if (Num < 2)
+	{
+		X_WARNING("Console", "fonts_dump_for_name <name>");
+		return;
+	}
+
+	const char* pName = pCmd->GetArg(1);
+	XFont* pFont = static_cast<XFont*>(GetFont(pName));
+	if (pFont)
+	{
+		if (pFont->getFontTexture()->WriteToFile(pName))
+		{
+			X_LOG0("Font", "^8font texture successfully dumped!");
+		}
+	}
+	else
+	{
+		X_ERROR("Font", "failed to dump font, no font exsists for name: %s", pName);
+	}
 }
 
 X_NAMESPACE_END
