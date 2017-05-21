@@ -514,9 +514,9 @@ struct MeshHeader
 {
 	MeshHeader() :
 		numSubMeshes(0),
+		_blank(0),
 		numVerts(0),
 		numIndexes(0),
-		_blank(0),
 		__blank(0)
 	{
 		core::zero_object(__pad);
