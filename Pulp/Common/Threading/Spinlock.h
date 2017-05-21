@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(core)
 class Spinlock
 {
 public:
-	typedef typename ScopedLock<Spinlock> ScopedLock;
+	typedef ScopedLock<Spinlock> ScopedLock;
 
 public:
 	X_INLINE Spinlock(void);
@@ -28,7 +28,7 @@ private:
 class SpinlockRecursive
 {
 public:
-	typedef typename ScopedLock<SpinlockRecursive> ScopedLock;
+	typedef ScopedLock<SpinlockRecursive> ScopedLock;
 
 public:
 	X_INLINE SpinlockRecursive(void);
