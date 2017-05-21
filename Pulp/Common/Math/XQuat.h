@@ -29,7 +29,7 @@ public:
 	Vec3<T>		v; // axisOfRotation.normalized() * sin( angleOfRotation / 2 )
 	T			w; // cos( angleOfRotation / 2 )
 
-	Quat() : w(1), v(0, 0, 0){} // default constructor is identity quat
+	Quat() : v(0, 0, 0), w(1) {} // default constructor is identity quat
 	template<typename FromT>
 	explicit Quat(const Quat<FromT>& q) : w(static_cast<T>(q.w)), v(q.v) {}
 
