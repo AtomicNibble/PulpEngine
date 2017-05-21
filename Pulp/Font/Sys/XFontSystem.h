@@ -9,6 +9,8 @@
 
 #include "Vars\FontVars.h"
 
+X_NAMESPACE_DECLARE(core, struct IConsoleCmdArgs)
+
 X_NAMESPACE_BEGIN(font)
 
 class XFont;
@@ -54,6 +56,10 @@ public:
 	void releaseFontTexture(XFontTexture* pFontTex);
 
 	X_INLINE const FontVars& getVars(void) const;
+
+private:
+	void Command_ListFonts(core::IConsoleCmdArgs* pCmd);
+	void Command_DumpForName(core::IConsoleCmdArgs* pCmd);
 
 private:
 	ICore* pCore_;

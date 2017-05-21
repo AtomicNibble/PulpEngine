@@ -407,41 +407,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Allocator.h" />
-    <ClInclude Include="AssertHandler.h" />
     <ClInclude Include="BatchQuery.h" />
-    <ClInclude Include="Config.h" />
     <ClInclude Include="ControllerWrapper.h" />
-    <ClInclude Include="Cooking.h" />
-    <ClInclude Include="CpuDispatcher.h" />
-    <ClInclude Include="DebugRender.h" />
-    <ClInclude Include="DelayLoadHook.h" />
-    <ClInclude Include="FilterShader.h" />
+    <ClInclude Include="ConverterModule\Cooking.h" />
+    <ClInclude Include="ConverterModule\XPhysLib.h" />
+    <ClInclude Include="DebugRender\DebugRender.h" />
     <ClInclude Include="JointWrapper.h" />
-    <ClInclude Include="Logger.h" />
-    <ClInclude Include="MathHelpers.h" />
-    <ClInclude Include="PhysicsVars.h" />
-    <ClInclude Include="SceneLock.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Stepper.h" />
+    <ClInclude Include="Util\Allocator.h" />
+    <ClInclude Include="Util\AssertHandler.h" />
+    <ClInclude Include="Util\Config.h" />
+    <ClInclude Include="Util\CpuDispatcher.h" />
+    <ClInclude Include="Util\DelayLoadHook.h" />
+    <ClInclude Include="Util\FilterShader.h" />
+    <ClInclude Include="Util\Logger.h" />
+    <ClInclude Include="Util\MathHelpers.h" />
+    <ClInclude Include="Util\SceneLock.h" />
+    <ClInclude Include="Vars\PhysicsVars.h" />
     <ClInclude Include="XPhysics.h" />
-    <ClInclude Include="XPhysLib.h" />
     <ClInclude Include="XScene.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Allocator.cpp" />
-    <ClCompile Include="AssertHandler.cpp" />
     <ClCompile Include="BatchQuery.cpp" />
-    <ClCompile Include="ConverterLib.cpp" />
-    <ClCompile Include="Cooking.cpp" />
-    <ClCompile Include="CpuDispatcher.cpp" />
-    <ClCompile Include="DebugRender.cpp" />
-    <ClCompile Include="DelayLoadHook.cpp" />
-    <ClCompile Include="FilterShader.cpp" />
-    <ClCompile Include="MathHelpers.cpp" />
-    <ClCompile Include="Module.cpp" />
-    <ClCompile Include="Logger.cpp" />
-    <ClCompile Include="PhysicsVars.cpp" />
+    <ClCompile Include="ConverterModule\ConverterLib.cpp" />
+    <ClCompile Include="ConverterModule\Cooking.cpp" />
+    <ClCompile Include="ConverterModule\XPhysLib.cpp" />
+    <ClCompile Include="DebugRender\DebugRender.cpp" />
+    <ClCompile Include="EngineModule\Module.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -457,15 +450,22 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Stepper.cpp" />
+    <ClCompile Include="Util\Allocator.cpp" />
+    <ClCompile Include="Util\AssertHandler.cpp" />
+    <ClCompile Include="Util\CpuDispatcher.cpp" />
+    <ClCompile Include="Util\DelayLoadHook.cpp" />
+    <ClCompile Include="Util\FilterShader.cpp" />
+    <ClCompile Include="Util\Logger.cpp" />
+    <ClCompile Include="Util\MathHelpers.cpp" />
+    <ClCompile Include="Vars\PhysicsVars.cpp" />
     <ClCompile Include="XPhysics.cpp" />
-    <ClCompile Include="XPhysLib.cpp" />
     <ClCompile Include="XScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ControllerWrapper.inl" />
     <None Include="JointWrapper.inl" />
-    <None Include="PhysicsVars.inl" />
     <None Include="Stepper.inl" />
+    <None Include="Vars\PhysicsVars.inl" />
     <None Include="XPhysics.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

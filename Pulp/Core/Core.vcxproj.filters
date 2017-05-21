@@ -30,9 +30,6 @@
     <Filter Include="Header Files\Scheduler">
       <UniqueIdentifier>{a1311543-62ae-4fd1-a483-c4a0b9fed607}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Scheduler">
-      <UniqueIdentifier>{c0c6f97f-4828-407e-9955-ae02a257d073}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\FileSys">
       <UniqueIdentifier>{d182db23-54c6-474a-8e1b-b6764a5d0d8c}</UniqueIdentifier>
     </Filter>
@@ -44,6 +41,12 @@
     </Filter>
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{989165e9-7a08-469d-a3c7-b16ff7556e3a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileSys\win32">
+      <UniqueIdentifier>{f97fc4a4-de72-4608-8575-abc51bf01dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSys\win32">
+      <UniqueIdentifier>{a5155093-ab7e-4aed-ad3a-df9d86294760}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -86,45 +89,6 @@
     <ClInclude Include="PotatoFactoryRegistryImpl.h">
       <Filter>ExtensionSystem</Filter>
     </ClInclude>
-    <ClInclude Include="DiskFile.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="DiskFileAsync.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSysVars.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="PathUtil.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="OsFile.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="xFileSys.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="XFindData.h">
-      <Filter>Header Files\FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFile.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileAsync.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileAsyncOperation.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileAsyncOperation.inl">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileModeFlags.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\PathUtil.h">
-      <Filter>Header Files\win32</Filter>
-    </ClInclude>
     <ClInclude Include="NullImplementation\ConsoleNULL.h">
       <Filter>NullImplementation</Filter>
     </ClInclude>
@@ -133,6 +97,39 @@
     </ClInclude>
     <ClInclude Include="Vars\CoreVars.h">
       <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\DiskFile.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\DiskFileAsync.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\OsFile.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\PathUtil.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\xFileSys.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\XFindData.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\win32\OsFile.h">
+      <Filter>Header Files\FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\win32\OsFileAsync.h">
+      <Filter>Header Files\FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\win32\OsFileAsyncOperation.h">
+      <Filter>Header Files\FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\win32\OsFileModeFlags.h">
+      <Filter>Header Files\FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSys\win32\PathUtil.h">
+      <Filter>Header Files\FileSys\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -163,9 +160,6 @@
     <ClCompile Include="CoreEventDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="XProfile.cpp">
-      <Filter>Source Files\Profile</Filter>
-    </ClCompile>
     <ClCompile Include="win32\SystemTimer.cpp">
       <Filter>Source Files\win32</Filter>
     </ClCompile>
@@ -174,24 +168,6 @@
     </ClCompile>
     <ClCompile Include="PotatoFactoryRegistryImpl.cpp">
       <Filter>ExtensionSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="DiskFile.cpp">
-      <Filter>Source Files\FileSys</Filter>
-    </ClCompile>
-    <ClCompile Include="xFileSys.cpp">
-      <Filter>Source Files\FileSys</Filter>
-    </ClCompile>
-    <ClCompile Include="DiskFileAsync.cpp">
-      <Filter>Header Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\PathUtil.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\OsFileAsync.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\OsFile.cpp">
-      <Filter>Source Files\win32</Filter>
     </ClCompile>
     <ClCompile Include="CoreUpdate.cpp">
       <Filter>Source Files</Filter>
@@ -202,17 +178,38 @@
     <ClCompile Include="NullImplementation\ConsoleNULL.cpp">
       <Filter>NullImplementation</Filter>
     </ClCompile>
-    <ClCompile Include="XFindData.cpp">
-      <Filter>Source Files\FileSys</Filter>
-    </ClCompile>
     <ClCompile Include="Vars\ProfilerVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
-    <ClCompile Include="FileSysVars.cpp">
-      <Filter>Source Files\FileSys</Filter>
-    </ClCompile>
     <ClCompile Include="Vars\CoreVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\FileSysVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\DiskFile.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\DiskFileAsync.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\xFileSys.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\XFindData.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\win32\OsFile.cpp">
+      <Filter>Source Files\FileSys\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\win32\OsFileAsync.cpp">
+      <Filter>Source Files\FileSys\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\win32\PathUtil.cpp">
+      <Filter>Source Files\FileSys\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Profile\XProfile.cpp">
+      <Filter>Source Files\Profile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -236,6 +233,9 @@
     </None>
     <None Include="Vars\CoreVars.inl">
       <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="FileSys\win32\OsFileAsyncOperation.inl">
+      <Filter>Header Files\FileSys\win32</Filter>
     </None>
   </ItemGroup>
 </Project>

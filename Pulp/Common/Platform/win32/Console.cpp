@@ -329,7 +329,8 @@ void Console::RedirectSTD(void)
 	// https://connect.microsoft.com/VisualStudio/Feedback/Details/1924921
 
 	for (auto &file : { stdout, stderr }) {
-		freopen("CONOUT$", "w", file);
+		FILE* pFile = nullptr;
+		freopen_s(&pFile, "CONOUT$", "w", file);
 		setvbuf(file, nullptr, _IONBF, 0);
 	}
 

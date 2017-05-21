@@ -7,9 +7,8 @@ write_(nullptr),
 read_(nullptr),
 start_(nullptr),
 end_(nullptr),
-arena_(arena)
+arena_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
 }
 
 ByteStreamFifo::ByteStreamFifo(MemoryArenaBase* arena, size_t numBytes) :
@@ -17,9 +16,8 @@ write_(nullptr),
 read_(nullptr),
 start_(nullptr),
 end_(nullptr),
-arena_(arena)
+arena_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
 	resize(numBytes);
 }
 

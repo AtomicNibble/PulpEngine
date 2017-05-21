@@ -5,8 +5,8 @@
 #include <ICore.h>
 #include <IEngineModule.h>
 
-#include "XFontSystem.h"
-#include "XNullfont.h"
+#include "Sys\XFontSystem.h"
+#include "NUll\XNullfont.h"
 
 #include <Extension\XExtensionMacros.h>
 

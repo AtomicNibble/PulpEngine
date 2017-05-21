@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "BatchQuery.h"
-#include "MathHelpers.h"
+#include "Util/MathHelpers.h"
 
 #include <PxBatchQuery.h>
 

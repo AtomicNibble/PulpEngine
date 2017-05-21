@@ -9,19 +9,19 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... ) :
 	va_list ap;
 	va_start( ap, fmt );
 
-//	core::logDispatch::Assert( sourceInfo, fmt, ap );
-//	core::assertionDispatch::Assert( sourceInfo );
 	if (gEnv)
 	{
-		if (gEnv->pLog)
+		if (gEnv->pLog) {
 			gEnv->pLog->Assert(sourceInfo, fmt, ap);
-		if (gEnv->pCore)
+		}
+		if (gEnv->pCore) {
 			gEnv->pCore->OnAssert(sourceInfo);
+		}
 	}
-	else
+
+	if(!gEnv || !gEnv->pLog)
 	{
-		// shieeeeet
-#if X_DEBUG && X_PLATFORM_WIN32
+#if X_PLATFORM_WIN32
 		core::StackString<2048> temp;
 		temp.append("ASSERT: ");
 		temp.appendFmt(fmt, ap);
@@ -30,9 +30,10 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... ) :
 		strUtil::Convert(temp.c_str(), wTxt);
 
 		::OutputDebugStringW(wTxt);
+#endif	
 
+		// shieeeeet
 		X_BREAKPOINT;
-#endif		
 	}
 
 	va_end( ap );

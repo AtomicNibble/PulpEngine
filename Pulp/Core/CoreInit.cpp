@@ -51,7 +51,7 @@
 // window
 #include "Platform\Window.h"
 
-#include "xFileSys.h"
+#include "FileSys\xFileSys.h"
 
 #if defined(WIN32)
 

@@ -16,7 +16,7 @@
 
 #include "Profile\ProfilerTypes.h"
 
-#include "xFileSys.h"
+#include "FileSys/xFileSys.h"
 
 X_NAMESPACE_BEGIN(core)
 

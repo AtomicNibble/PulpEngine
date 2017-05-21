@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PhysicsVars.h"
-#include "MathHelpers.h"
+#include "Util/MathHelpers.h"
 
 #include <IConsole.h>
 

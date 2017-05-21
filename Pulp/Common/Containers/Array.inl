@@ -16,10 +16,8 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
 	list_(nullptr),
 	num_(size),
 	size_(size),
-	allocator_(arena)
+	allocator_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
-
 	if (size)
 	{
 		list_ = Allocate(size);
@@ -33,10 +31,8 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, cons
     list_(nullptr),
     num_(size),
     size_(size),
-    allocator_(arena)
+    allocator_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
-
 	if (size)
 	{
 		list_ = Allocate(size);

@@ -10,7 +10,7 @@
 
 #include "Timer.h"
 #include "Util\Cpu.h"
-#include "XProfile.h"
+#include "Profile\XProfile.h"
 
 #include "Util\SourceInfo.h"
 #include "Util\ReferenceCounted.h"

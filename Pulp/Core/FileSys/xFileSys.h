@@ -3,7 +3,7 @@
 #include <IFileSys.h>
 
 #include "String\Path.h"
-#include "FileSysVars.h"
+#include "Vars\FileSysVars.h"
 
 #include <Containers\HashMap.h>
 

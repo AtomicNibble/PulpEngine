@@ -47,56 +47,56 @@
     <ClInclude Include="Stepper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Allocator.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="CpuDispatcher.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Logger.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsVars.h">
-      <Filter>Header Files\Vars</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugRender.h">
-      <Filter>Header Files\DebugRender</Filter>
-    </ClInclude>
-    <ClInclude Include="MathHelpers.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="XPhysLib.h">
-      <Filter>Header Files\ConverterModule</Filter>
-    </ClInclude>
-    <ClInclude Include="Cooking.h">
-      <Filter>Header Files\ConverterModule</Filter>
-    </ClInclude>
-    <ClInclude Include="DelayLoadHook.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="JointWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ControllerWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AssertHandler.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="XScene.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Config.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneLock.h">
-      <Filter>Header Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="BatchQuery.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FilterShader.h">
+    <ClInclude Include="Util\Allocator.h">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\AssertHandler.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\CpuDispatcher.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\DelayLoadHook.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\FilterShader.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Logger.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\MathHelpers.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SceneLock.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender\DebugRender.h">
+      <Filter>Header Files\DebugRender</Filter>
+    </ClInclude>
+    <ClInclude Include="ConverterModule\Cooking.h">
+      <Filter>Header Files\ConverterModule</Filter>
+    </ClInclude>
+    <ClInclude Include="ConverterModule\XPhysLib.h">
+      <Filter>Header Files\ConverterModule</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\PhysicsVars.h">
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -109,56 +109,53 @@
     <ClCompile Include="Stepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Allocator.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="CpuDispatcher.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="Logger.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="PhysicsVars.cpp">
-      <Filter>Source Files\Vars</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugRender.cpp">
-      <Filter>Source Files\DebugRender</Filter>
-    </ClCompile>
-    <ClCompile Include="Module.cpp">
-      <Filter>Source Files\EngineModule</Filter>
-    </ClCompile>
-    <ClCompile Include="ConverterLib.cpp">
-      <Filter>Source Files\ConverterModule</Filter>
-    </ClCompile>
-    <ClCompile Include="XPhysLib.cpp">
-      <Filter>Source Files\ConverterModule</Filter>
-    </ClCompile>
-    <ClCompile Include="Cooking.cpp">
-      <Filter>Source Files\ConverterModule</Filter>
-    </ClCompile>
-    <ClCompile Include="DelayLoadHook.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="AssertHandler.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="XScene.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MathHelpers.cpp">
-      <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="BatchQuery.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FilterShader.cpp">
+    <ClCompile Include="ConverterModule\ConverterLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterModule\Cooking.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterModule\XPhysLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugRender\DebugRender.cpp">
+      <Filter>Source Files\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineModule\Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Allocator.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\AssertHandler.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\CpuDispatcher.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\DelayLoadHook.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\FilterShader.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Logger.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\MathHelpers.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\PhysicsVars.cpp">
+      <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PhysicsVars.inl">
-      <Filter>Header Files\Vars</Filter>
-    </None>
     <None Include="XPhysics.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -170,6 +167,9 @@
     </None>
     <None Include="ControllerWrapper.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="Vars\PhysicsVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>

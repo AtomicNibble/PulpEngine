@@ -43,6 +43,6 @@ typedef core::MemoryArena<
 extern core::MemoryArenaBase* g_PhysicsArena;
 
 
-#include "Config.h"
-#include "SceneLock.h"
+#include "Util/Config.h"
+#include "Util/SceneLock.h"
 

@@ -441,28 +441,27 @@
     <ClInclude Include="ConsoleVariable.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CoreEventDispatcher.h" />
-    <ClInclude Include="DiskFile.h" />
-    <ClInclude Include="DiskFileAsync.h" />
-    <ClInclude Include="FileSysVars.h" />
+    <ClInclude Include="FileSys\DiskFile.h" />
+    <ClInclude Include="FileSys\DiskFileAsync.h" />
+    <ClInclude Include="FileSys\OsFile.h" />
+    <ClInclude Include="FileSys\PathUtil.h" />
+    <ClInclude Include="FileSys\win32\OsFile.h" />
+    <ClInclude Include="FileSys\win32\OsFileAsync.h" />
+    <ClInclude Include="FileSys\win32\OsFileAsyncOperation.h" />
+    <ClInclude Include="FileSys\win32\OsFileModeFlags.h" />
+    <ClInclude Include="FileSys\win32\PathUtil.h" />
+    <ClInclude Include="FileSys\xFileSys.h" />
+    <ClInclude Include="FileSys\XFindData.h" />
     <ClInclude Include="NullImplementation\ConsoleNULL.h" />
-    <ClInclude Include="PathUtil.h" />
     <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="NullImplementation\NullInput.h" />
-    <ClInclude Include="OsFile.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vars\CoreVars.h" />
     <ClInclude Include="Vars\ProfilerVars.h" />
-    <ClInclude Include="win32\OsFile.h" />
-    <ClInclude Include="win32\OsFileAsync.h" />
-    <ClInclude Include="win32\OsFileAsyncOperation.h" />
-    <ClInclude Include="win32\OsFileModeFlags.h" />
-    <ClInclude Include="win32\PathUtil.h" />
     <ClInclude Include="win32\SystemTimer.h" />
-    <ClInclude Include="xFileSys.h" />
-    <ClInclude Include="XFindData.h" />
     <ClInclude Include="XProfile.h" />
   </ItemGroup>
   <ItemGroup>
@@ -472,14 +471,19 @@
     <ClCompile Include="CoreInit.cpp" />
     <ClCompile Include="CoreJobs.cpp" />
     <ClCompile Include="CoreUpdate.cpp" />
-    <ClCompile Include="DiskFile.cpp" />
-    <ClCompile Include="DiskFileAsync.cpp" />
     <ClCompile Include="DllMain.cpp" />
-    <ClCompile Include="FileSysVars.cpp" />
+    <ClCompile Include="FileSys\DiskFile.cpp" />
+    <ClCompile Include="FileSys\DiskFileAsync.cpp" />
+    <ClCompile Include="FileSys\win32\OsFile.cpp" />
+    <ClCompile Include="FileSys\win32\OsFileAsync.cpp" />
+    <ClCompile Include="FileSys\win32\PathUtil.cpp" />
+    <ClCompile Include="FileSys\xFileSys.cpp" />
+    <ClCompile Include="FileSys\XFindData.cpp" />
     <ClCompile Include="NullImplementation\ConsoleNULL.cpp" />
     <ClCompile Include="PotatoFactoryRegistryImpl.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="NullImplementation\NullInput.cpp" />
+    <ClCompile Include="Profile\XProfile.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -497,22 +501,15 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="ConsoleVariable.cpp" />
     <ClCompile Include="Vars\CoreVars.cpp" />
+    <ClCompile Include="Vars\FileSysVars.cpp" />
     <ClCompile Include="Vars\ProfilerVars.cpp" />
-    <ClCompile Include="win32\OsFile.cpp" />
-    <ClCompile Include="win32\OsFileAsync.cpp" />
-    <ClInclude Include="win32\OsFileAsyncOperation.inl">
-      <FileType>CppCode</FileType>
-    </ClInclude>
-    <ClCompile Include="win32\PathUtil.cpp" />
     <ClCompile Include="win32\SystemTimer.cpp" />
-    <ClCompile Include="xFileSys.cpp" />
-    <ClCompile Include="XFindData.cpp" />
-    <ClCompile Include="XProfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Console.inl" />
     <None Include="ConsoleVariable.inl" />
     <None Include="Core.inl" />
+    <None Include="FileSys\win32\OsFileAsyncOperation.inl" />
     <None Include="Vars\CoreVars.inl" />
     <None Include="Vars\ProfilerVars.inl" />
     <None Include="win32\SystemTimer.inl" />
