@@ -15,8 +15,8 @@ template<>
 template<>
 inline Path<char>::Path(const Path<wchar_t>& oth)
 {
-	strUtil::Convert(oth.c_str(), str_, capacity());
-	str_[oth.length()] = L'\0';
+	strUtil::Convert(oth.c_str(), BaseType::str_, capacity());
+	BaseType::str_[oth.length()] = L'\0';
 	len_ = oth.length();
 }
 
@@ -24,8 +24,8 @@ template<>
 template<>
 inline Path<wchar_t>::Path(const Path<char>& oth)
 {
-	strUtil::Convert(oth.c_str(), str_, capacity());
-	str_[oth.length()] = L'\0';
+	strUtil::Convert(oth.c_str(), BaseType::str_, capacity());
+	BaseType::str_[oth.length()] = L'\0';
 	len_ = oth.length();
 }
 
@@ -83,7 +83,7 @@ const TChar* Path<TChar>::extension(bool incDot) const
 	const TChar* res = BaseType::findLast('.');
 
 	if (!res) {
-		return str_;
+		return BaseType::begin();
 	}
 
 	if (incDot) {
@@ -127,7 +127,7 @@ void Path<TChar>::setFileName(const TChar* pFilename)
 	}
 	else
 	{
-		BaseType temp(str_, name); // want the text before filename
+		BaseType temp(BaseType::str_, name); // want the text before filename
 		temp.append(pFilename);
 
 		*this = temp.c_str();
@@ -149,7 +149,7 @@ void Path<TChar>::setFileName(const TChar* pFileNameBegin, const TChar* pFileNam
 	}
 	else
 	{
-		BaseType temp(str_, name); // want the text before filename
+		BaseType temp(BaseType::str_, name); // want the text before filename
 		temp.append(pFileNameBegin, pFileNameEnd);
 
 		*this = temp.c_str();
@@ -295,7 +295,7 @@ inline size_t Path<TChar>::fillSpaceWithNullTerm(void)
 {
 	const size_t space = capacity() - length();
 
-	std::memset(&str_[len_], '\0', space);
+	std::memset(&BaseType::str_[len_], '\0', space);
 
 	return space;
 }
@@ -303,16 +303,16 @@ inline size_t Path<TChar>::fillSpaceWithNullTerm(void)
 template<typename TChar>
 inline bool Path<TChar>::isAbsolute(void) const
 {
-	return	str_[0] == NATIVE_SLASH ||
-		str_[0] == NON_NATIVE_SLASH ||
-		str_[1] == ':';
+	return	BaseType::str_[0] == NATIVE_SLASH ||
+		BaseType::str_[0] == NON_NATIVE_SLASH ||
+		BaseType::str_[1] == ':';
 }
 
 template<typename TChar>
 inline int8_t Path<TChar>::getDriveNumber(void) const
 {
-	if (length() > 1 && str_[1] == ':') {
-		return safe_static_cast<int8_t,int32_t>(str_[0] - 'A');
+	if (length() > 1 && BaseType::str_[1] == ':') {
+		return safe_static_cast<int8_t,int32_t>(BaseType::str_[0] - 'A');
 	}
 
 	return -1;
