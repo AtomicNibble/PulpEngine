@@ -161,7 +161,7 @@ X_INLINE void UniquePointer<T>::swap(UniquePointer& oth)
 
 template<typename T>
 X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena) :
-	Mybase(X_ASSERT_NOT_NULL(arena)), pointer())
+	Mybase(X_ASSERT_NOT_NULL(arena), pointer())
 {
 }
 
