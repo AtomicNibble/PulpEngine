@@ -143,8 +143,8 @@ public:
 
 protected:
 	int 		IntValue_;
-	int			IntMax_;
 	int			IntMin_;
+	int			IntMax_;
 	int			IntDefault_;
 };
 
@@ -179,8 +179,8 @@ public:
 
 private:
 	float 		fValue_;
-	float		fMax_;
 	float		fMin_;
+	float		fMax_;
 	float		fDefault_;
 };
 
@@ -215,8 +215,8 @@ protected:
 	X_NO_ASSIGN(CVarIntRef);
 
 	int& 		IntValue_;
-	int			IntMax_;
 	int			IntMin_;
+	int			IntMax_;
 	int			DefaultVal_;
 };
 
@@ -251,8 +251,8 @@ private:
 	X_NO_ASSIGN(CVarFloatRef);
 
 	float& 		fValue_;
-	float		fMax_;
 	float		fMin_;
+	float		fMax_;
 	float		fDefault_;
 };
 
