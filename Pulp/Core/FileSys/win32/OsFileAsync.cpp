@@ -6,7 +6,7 @@
 
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
-#include "xFileSys.h"
+#include "FileSys/xFileSys.h"
 #endif
 
 X_NAMESPACE_BEGIN(core)

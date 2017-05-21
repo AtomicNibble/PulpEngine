@@ -11,7 +11,7 @@
 #include <Containers\Array.h>
 
 // i need the definition :|
-#include X_INCLUDE(../Core/X_PLATFORM/OsFileAsyncOperation.h)
+#include X_INCLUDE(../Core/FileSys/X_PLATFORM/OsFileAsyncOperation.h)
 
 X_NAMESPACE_BEGIN(core)
 
