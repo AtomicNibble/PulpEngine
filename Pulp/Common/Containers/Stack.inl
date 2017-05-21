@@ -16,9 +16,8 @@ Stack<T>::Stack(MemoryArenaBase* arena, size_type numElements) :
 	current_(nullptr),
 	end_(nullptr),
 	start_(nullptr),
-	arena_(arena)
+	arena_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
 	reserve(numElements);
 }
 

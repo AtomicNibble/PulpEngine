@@ -6,18 +6,16 @@ ByteStream::ByteStream(MemoryArenaBase* arena) :
 	current_(nullptr),
 	start_(nullptr),
 	end_(nullptr),
-	arena_(arena)
+	arena_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
 }
 
 ByteStream::ByteStream(MemoryArenaBase* arena, size_type numBytes) :
 	current_(nullptr),
 	start_(nullptr),
 	end_(nullptr),
-	arena_(arena)
+	arena_(X_ASSERT_NOT_NULL(arena))
 {
-	X_ASSERT_NOT_NULL(arena);
 	resize(numBytes);
 }
 
