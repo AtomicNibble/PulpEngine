@@ -22,7 +22,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace
 {
-	#pragma intrinsic(__rdtsc)
+	X_INTRINSIC(__rdtsc)
 
 	namespace ProfileTimer
 	{

@@ -2,25 +2,25 @@
 
 namespace atomic
 {
-	#pragma intrinsic (_InterlockedIncrement)
-	#pragma intrinsic (_InterlockedDecrement)
-	#pragma intrinsic (_InterlockedExchangeAdd)
-	#pragma intrinsic (_InterlockedExchange)
-	#pragma intrinsic (_InterlockedCompareExchange)
+	X_INTRINSIC (_InterlockedIncrement)
+	X_INTRINSIC (_InterlockedDecrement)
+	X_INTRINSIC (_InterlockedExchangeAdd)
+	X_INTRINSIC (_InterlockedExchange)
+	X_INTRINSIC (_InterlockedCompareExchange)
 
 #if X_64
-	#pragma intrinsic (_InterlockedIncrement64)
-	#pragma intrinsic (_InterlockedDecrement64)
-	#pragma intrinsic (_InterlockedExchangeAdd64)
-	#pragma intrinsic (_InterlockedExchange64)
-	#pragma intrinsic (_InterlockedCompareExchange64)
+	X_INTRINSIC (_InterlockedIncrement64)
+	X_INTRINSIC (_InterlockedDecrement64)
+	X_INTRINSIC (_InterlockedExchangeAdd64)
+	X_INTRINSIC (_InterlockedExchange64)
+	X_INTRINSIC (_InterlockedCompareExchange64)
 #endif // !X_64
 
-//	#pragma intrinsic (_InterlockedIncrement16)
-//	#pragma intrinsic (_InterlockedDecrement16)
-//	#pragma intrinsic (_InterlockedExchangeAdd16)
-//	#pragma intrinsic (_InterlockedExchange16)
-//	#pragma intrinsic (_InterlockedCompareExchange16)
+//	X_INTRINSIC (_InterlockedIncrement16)
+//	X_INTRINSIC (_InterlockedDecrement16)
+//	X_INTRINSIC (_InterlockedExchangeAdd16)
+//	X_INTRINSIC (_InterlockedExchange16)
+//	X_INTRINSIC (_InterlockedCompareExchange16)
 
 
 	namespace internal
