@@ -28,7 +28,6 @@ namespace Converter
 	X_DECLARE_ENUM(ScaleFactor) (
 		ORIGINAL,
 		HALF,
-		QUARTER,
 		FOURTH,
 		EIGHTH
 	);
