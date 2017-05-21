@@ -3,7 +3,7 @@
 
 #include <IPhysics.h>
 
-#include "Allocator.h"
+#include "Util/Allocator.h"
 
 X_NAMESPACE_BEGIN(physics)
 

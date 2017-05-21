@@ -5,12 +5,12 @@
 #include "extensions/PxExtensionsAPI.h"
 #include "physxvisualdebuggersdk/PvdConnectionManager.h"
 
-#include "Allocator.h"
-#include "Logger.h"
-#include "CpuDispatcher.h"
+#include "Util/Allocator.h"
+#include "Util/Logger.h"
+#include "Util/CpuDispatcher.h"
+#include "Vars/PhysicsVars.h"
+#include "DebugRender/DebugRender.h"
 #include "Stepper.h"
-#include "PhysicsVars.h"
-#include "DebugRender.h"
 
 namespace PVD {
 	using namespace physx::debugger;

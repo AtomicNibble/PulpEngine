@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "XPhysLib.h"
-#include "DelayLoadHook.h"
+#include "Util/DelayLoadHook.h"
 
 
 X_NAMESPACE_BEGIN(physics)

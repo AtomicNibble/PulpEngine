@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "XPhysics.h"
-#include "MathHelpers.h"
-#include "Cooking.h"
-#include "AssertHandler.h"
-#include "DelayLoadHook.h"
+#include "ConverterModule/Cooking.h"
+#include "Util/MathHelpers.h"
+#include "Util/AssertHandler.h"
+#include "Util/DelayLoadHook.h"
+#include "Util/FilterShader.h"
 #include "JointWrapper.h"
 #include "XScene.h"
-#include "FilterShader.h"
 
 #include <IConsole.h>
 #include <I3DEngine.h>

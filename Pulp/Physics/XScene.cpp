@@ -1,9 +1,9 @@
 #include "stdafx.h"
 #include "XScene.h"
 
-#include "MathHelpers.h"
-#include "PhysicsVars.h"
-#include "DebugRender.h"
+#include "Util/MathHelpers.h"
+#include "Vars/PhysicsVars.h"
+#include "DebugRender/DebugRender.h"
 #include "ControllerWrapper.h"
 #include "BatchQuery.h"
 
