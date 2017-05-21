@@ -163,8 +163,8 @@ X_NAMESPACE_END
 /// \sa X_ENABLE_ASSERTIONS X_ASSERT X_ASSERT_NOT_NULL X_ASSERT_UNREACHABLE X_ASSERT_NOT_IMPLEMENTED
 #if X_ENABLE_ASSERTIONS
 #	define X_ASSERT_IMPL_VAR(variable, n)						.Variable(X_PP_STRINGIZE(variable), variable)
-#	define X_ASSERT_IMPL_VARS(...)								X_PP_EXPAND_ARGS X_PP_PASS_ARGS(X_ASSERT_IMPL_VAR, __VA_ARGS__), X_BREAKPOINT)
-#	define X_ASSERT(condition, format, ...)						(condition) ? X_UNUSED(true) : (X_NAMESPACE(core)::Assert(X_SOURCE_INFO, "%s" format, "Assertion \"" #condition "\" failed. ", __VA_ARGS__) X_ASSERT_IMPL_VARS
+#	define X_ASSERT_IMPL_VARS(...)								X_PP_EXPAND_ARGS(X_ASSERT_IMPL_VAR, __VA_ARGS__), X_BREAKPOINT)
+#	define X_ASSERT(condition, format, ...)						(condition) ? X_UNUSED(true) : (X_NAMESPACE(core)::Assert(X_SOURCE_INFO, "%s" format, "Assertion \"" #condition "\" failed. ", __VA_ARGS__) X_ASSERT_IMPL_VARS 
 #	define X_ASSERT_NOT_NULL(ptr)								(ptr != nullptr) ? (ptr) : ((X_ASSERT(ptr != nullptr, "Pointer \"" #ptr "\" is null.")()), nullptr)
 #	define X_ASSERT_UNREACHABLE()								X_ASSERT(false, "Source code defect, code should never be reached.")()
 #	define X_ASSERT_NOT_IMPLEMENTED()							X_ASSERT(false, "This function is not implemented yet.")()
