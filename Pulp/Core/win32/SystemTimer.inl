@@ -22,18 +22,15 @@ namespace SysTimer
 		return count * g_thousandOverFrequency;
 	}
 
-
 	X_INLINE int64_t fromSeconds(float value)
 	{
 		// times by frequency.
 		extern float g_FrequencySingle;
-
 		return static_cast<int64_t>(value * g_FrequencySingle);
 	}
 	X_INLINE int64_t fromSeconds(double value)
 	{
 		extern double g_FrequencyDouble;
-
 		return static_cast<int64_t>(value * g_FrequencyDouble);
 	}
 
