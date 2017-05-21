@@ -409,34 +409,31 @@ bool XCore::PumpMessages()
 
 void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-//	X_UNUSED(event);
 	X_UNUSED(wparam);
 	X_UNUSED(lparam);
-
 
 	switch (event)
 	{
 		case CoreEvent::MOVE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetRect();
-
 			vars_.updateWinPos(rect.getX1(), rect.getY1());
 		}
 		break;
 		case CoreEvent::RESIZE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetClientRect();
-
 			vars_.updateWinDim(rect.getWidth(), rect.getHeight());
 		}
 		break;
 		case CoreEvent::ACTIVATE:
-		{
 			if (pWindow_) {
 				pWindow_->ClipCursorToWindow();
 			}
-		}
 		break;
+
+		default:
+			break;
 	}
 }
 
