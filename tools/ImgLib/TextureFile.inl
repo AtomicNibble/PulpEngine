@@ -56,7 +56,6 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
 	X_ASSERT(numMips_ == 1, "Mips greater than one")(numMips_);
 
 	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, mipCnt, format_);
-	const uint32_t faceSize1 = Util::dataSize(size_.x, size_.y, 1, format_);
 	const uint32_t requiredBytes = faceSize * numFaces_;
 
 	core::Array<uint8_t> newBuf(data_.getArena());
