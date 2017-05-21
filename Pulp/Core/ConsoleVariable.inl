@@ -78,7 +78,7 @@ const char* CVarString<T>::GetString(CVarBase::StrBuf& buf) const
 template<class T>
 void CVarString<T>::Set(const char* pStr)
 {
-	if (Flags_.IsSet(VarFlag::READONLY) || !pStr) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY) || !pStr) {
 		return;
 	}
 
@@ -219,7 +219,7 @@ void CVarInt<T>::Set(const float f)
 template<class T>
 void CVarInt<T>::Set(const int i)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -236,8 +236,8 @@ void CVarInt<T>::Set(const int i)
 	OnModified();
 	IntValue_ = iVal;
 
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
+	if (CVarBase::changeFunc_) {
+		CVarBase::changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -349,7 +349,7 @@ void CVarFloat<T>::SetDefault(const char* s)
 template<class T>
 void CVarFloat<T>::Set(const char* s)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -364,7 +364,7 @@ void CVarFloat<T>::Set(const char* s)
 template<class T>
 void CVarFloat<T>::Set(const float f)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -494,7 +494,7 @@ void CVarIntRef::Set(const float f)
 
 void CVarIntRef::Set(const int i)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -619,7 +619,7 @@ const char* CVarFloatRef::GetString(CVarBase::StrBuf& buf) const
 
 void CVarFloatRef::Set(const char* s)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -634,7 +634,7 @@ void CVarFloatRef::Set(const char* s)
 
 void CVarFloatRef::Set(const float f)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -753,7 +753,7 @@ const char* CVarColRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 
 void CVarColRef::Set(const float f)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -763,7 +763,7 @@ void CVarColRef::Set(const float f)
 
 void CVarColRef::Set(const int i)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
@@ -863,7 +863,7 @@ const char* CVarVec3Ref::GetDefaultStr(CVarBase::StrBuf& buf) const
 
 void CVarVec3Ref::Set(const float f)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 	X_UNUSED(f);
@@ -872,7 +872,7 @@ void CVarVec3Ref::Set(const float f)
 
 void CVarVec3Ref::Set(const int i)
 {
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 	X_UNUSED(i);

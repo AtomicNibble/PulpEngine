@@ -45,7 +45,7 @@ public:
 protected:
 	const char*				pDesc_;
 
-	FlagType				Flags_;
+	FlagType				flags_;
 
 	ConsoleVarFunc			changeFunc_;
 	XConsole*				pConsole_;

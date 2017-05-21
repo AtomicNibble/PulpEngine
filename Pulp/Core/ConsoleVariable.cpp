@@ -91,18 +91,18 @@ void CVarBase::SetDefault(const char* s)
 
 ICVar::FlagType CVarBase::GetFlags(void) const
 {
-	return Flags_;
+	return flags_;
 }
 
 ICVar::FlagType CVarBase::SetFlags(FlagType flags)
 {
-	Flags_ = flags;
-	return Flags_;
+	flags_ = flags;
+	return flags_;
 }
 
 void CVarBase::SetModified(void)
 {
-	Flags_.Set(VarFlag::MODIFIED);
+	flags_.Set(VarFlag::MODIFIED);
 }
 
 
@@ -128,7 +128,7 @@ ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 
 	changeFunc_ = changeFunc;
 
-	if (!wasSet && Flags_.IsSet(VarFlag::MODIFIED)) {
+	if (!wasSet && flags_.IsSet(VarFlag::MODIFIED)) {
 		changeFunc_.Invoke(this);
 	}
 
@@ -142,7 +142,7 @@ ConsoleVarFunc CVarBase::GetOnChangeCallback(void) const
 
 void CVarBase::OnModified(void)
 {
-	Flags_.Set(VarFlag::MODIFIED);
+	flags_.Set(VarFlag::MODIFIED);
 }
 
 
@@ -158,7 +158,7 @@ void CVarBase::Reset(void)
 template<class T>
 void CVarInt<T>::Set(const char* s)
 {
-	int32_t val = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(s, IntValue_, flags_.IsSet(VarFlag::BITFIELD));
 
 	Set(val);
 }
@@ -312,7 +312,7 @@ void CVarVec3Ref::Set(const char* s)
 {
 	X_ASSERT_NOT_NULL(s);
 
-	if (Flags_.IsSet(VarFlag::READONLY)) {
+	if (flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
