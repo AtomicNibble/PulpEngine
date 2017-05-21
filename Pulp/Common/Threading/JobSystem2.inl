@@ -4,8 +4,8 @@ X_NAMESPACE_BEGIN(core)
 
 namespace V2
 {
-	X_INLINE CountSplitter::CountSplitter(size_t count)
-		: count_(count)
+	X_INLINE CountSplitter::CountSplitter(size_t count) :
+		count_(count)
 	{
 	}
 
@@ -17,8 +17,8 @@ namespace V2
 
 	// =============================================
 
-	X_INLINE CountSplitter32::CountSplitter32(uint32_t count)
-		: count_(count)
+	X_INLINE CountSplitter32::CountSplitter32(uint32_t count) :
+		count_(count)
 	{
 	}
 
@@ -31,8 +31,8 @@ namespace V2
 
 	// =============================================
 
-	X_INLINE DataSizeSplitter::DataSizeSplitter(size_t size)
-		: size_(size)
+	X_INLINE DataSizeSplitter::DataSizeSplitter(size_t size) :
+		size_(size)
 	{
 	}
 
