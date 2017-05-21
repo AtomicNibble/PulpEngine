@@ -177,10 +177,13 @@ struct SCoreInitParams
 		hInstance(nullptr),
 		hWnd(nullptr),
 		pCmdLine(nullptr),
+
+		pConsoleWnd(nullptr),
+		pCoreArena(nullptr),
+		
+		bTesting(false),
 		bSkipInput(false),
 		bSkipSound(false),
-		pConsoleWnd(nullptr),
-		bTesting(false),
 		bCoreOnly(false),
 		bEnableBasicConsole(false),
 		bEnableJobSystem(true),
@@ -195,7 +198,6 @@ struct SCoreInitParams
 #else
 		bConsoleLog(false),
 #endif
-		pCoreArena(nullptr),
 
 #if X_DEBUG 
 		bVsLog(true)
