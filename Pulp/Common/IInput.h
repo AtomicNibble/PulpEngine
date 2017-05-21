@@ -342,17 +342,17 @@ struct InputSymbol
 	};
 
 	InputSymbol() : 
-		type(Button), 
 		value(0.f), 
-		state(InputState::UNKNOWN), 
-		keyId(KeyId::UNKNOWN)
+		type(Button), 
+		keyId(KeyId::UNKNOWN),
+		state(InputState::UNKNOWN)
 	{}
 
 	InputSymbol(const KeyName& name_, Type type_ = Type::Button) :
 		//	keyid(id_),
-		name(name_),
+		value(0.f),
 		type(type_),
-		value(0.f)
+		name(name_)
 	{
 	}
 
