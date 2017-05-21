@@ -425,26 +425,28 @@
   <ItemGroup>
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Font.h" />
+    <ClInclude Include="FontRender\XFontGlyph.h" />
+    <ClInclude Include="FontRender\XFontRender.h" />
+    <ClInclude Include="FontRender\XFontTexture.h" />
+    <ClInclude Include="FontRender\XGlyphBitmap.h" />
+    <ClInclude Include="FontRender\XGlyphCache.h" />
     <ClInclude Include="FontTypes.h" />
+    <ClInclude Include="Null\XNullfont.h" />
+    <ClInclude Include="Sys\XFontSystem.h" />
     <ClInclude Include="Vars\FontVars.h" />
-    <ClInclude Include="XFontGlyph.h" />
-    <ClInclude Include="XFontRender.h" />
-    <ClInclude Include="XGlyphBitmap.h" />
-    <ClInclude Include="XNullfont.h" />
-    <ClInclude Include="XFontSystem.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="XFontTexture.h" />
-    <ClInclude Include="XGlyphCache.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="EngineModule\Module.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontLoad.cpp" />
-    <ClCompile Include="Module.cpp" />
+    <ClCompile Include="FontRender\XFontRender.cpp" />
+    <ClCompile Include="FontRender\XFontTexture.cpp" />
+    <ClCompile Include="FontRender\XGlyphBitmap.cpp" />
+    <ClCompile Include="FontRender\XGlyphCache.cpp" />
+    <ClCompile Include="Null\XNullfont.cpp" />
+    <ClCompile Include="Sys\XFontSystem.cpp" />
     <ClCompile Include="Vars\FontVars.cpp" />
-    <ClCompile Include="XFontRender.cpp" />
-    <ClCompile Include="XGlyphBitmap.cpp" />
-    <ClCompile Include="XNullfont.cpp" />
-    <ClCompile Include="XFontSystem.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -459,15 +461,13 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="XFontTexture.cpp" />
-    <ClCompile Include="XGlyphCache.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FontRender\XFontRender.inl" />
+    <None Include="FontRender\XFontTexture.inl" />
+    <None Include="FontRender\XGlyphBitmap.inl" />
+    <None Include="FontRender\XGlyphCache.inl" />
     <None Include="Vars\FontVars.inl" />
-    <None Include="XFontRender.inl" />
-    <None Include="XFontTexture.inl" />
-    <None Include="XGlyphBitmap.inl" />
-    <None Include="XGlyphCache.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
