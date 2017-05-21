@@ -145,7 +145,7 @@ void Path<TChar>::setFileName(const TChar* pFileNameBegin, const TChar* pFileNam
 
 	if (isEmpty() || (name == end()))
 	{
-		append(pFileNameBegin, pFileNameEnd);
+		BaseType::append(pFileNameBegin, pFileNameEnd);
 	}
 	else
 	{
@@ -188,7 +188,7 @@ template<typename TChar>
 const Path<TChar>& Path<TChar>::operator/=(const Path<TChar>& oth)
 {
 	ensureSlash();
-	append(oth.c_str(), oth.length());
+	BaseType::append(oth.c_str(), oth.length());
 	return *this;
 }
 
@@ -196,7 +196,7 @@ template<typename TChar>
 const Path<TChar>& Path<TChar>::operator/=(const TChar* str)
 {
 	ensureSlash();
-	append(str);
+	BaseType::append(str);
 	return *this;
 }
 
