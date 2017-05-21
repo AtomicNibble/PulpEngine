@@ -416,7 +416,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 
 		// only the count is used to know if split, so set valeus on these to try detect incorrect usage.
 #if X_DEBUG
-		splitPacketId = std::numeric_limits<decltype(splitPacketIndex)>::max();
+		splitPacketId = std::numeric_limits<decltype(splitPacketId)>::max();
 		splitPacketIndex = std::numeric_limits<decltype(splitPacketIndex)>::max();
 #endif // !X_DEBUG
 	}
