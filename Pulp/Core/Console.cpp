@@ -343,9 +343,9 @@ XConsole::XConsole() :
 	varArena_(&varAllocator_, "VarArena"),
 	cmds_(g_coreArena),
 	coreEventListernRegd_(false),
-	historyFileBuf_(g_coreArena),
 	historyLoadPending_(false),
-	historyFileSize_(0)
+	historyFileSize_(0),
+	historyFileBuf_(g_coreArena)
 {
 	HistoryPos_ = -1;
 	CursorPos_ = 0;
