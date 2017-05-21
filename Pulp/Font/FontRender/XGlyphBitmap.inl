@@ -5,12 +5,12 @@ X_NAMESPACE_BEGIN(font)
 
 
 
-X_INLINE typename XGlyphBitmap::DataVec& XGlyphBitmap::GetBuffer(void)
+X_INLINE XGlyphBitmap::DataVec& XGlyphBitmap::GetBuffer(void)
 { 
 	return buffer_; 
 }
 
-X_INLINE typename const XGlyphBitmap::DataVec& XGlyphBitmap::GetBuffer(void) const
+X_INLINE const XGlyphBitmap::DataVec& XGlyphBitmap::GetBuffer(void) const
 {
 	return buffer_;
 }

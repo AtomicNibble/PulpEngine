@@ -158,7 +158,7 @@ namespace V2
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJob(ClassType* pInst,
 		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& data JOB_SYS_SUB_PARAM)
+		DataT& data JOB_SYS_SUB_PARAM)
 	{
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
 
@@ -185,7 +185,7 @@ namespace V2
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJobAndRun(ClassType* pInst,
 		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& data JOB_SYS_SUB_PARAM)
+		DataT& data JOB_SYS_SUB_PARAM)
 	{
 		Job* pJob = CreateMemberJob(pInst, pFunction, data JOB_SYS_SUB_PASS(subSystem));
 		Run(pJob);
@@ -208,7 +208,7 @@ namespace V2
 	template<typename ClassType, typename DataT, typename>
 	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
 		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction,
-		typename DataT& data JOB_SYS_SUB_PARAM)
+		DataT& data JOB_SYS_SUB_PARAM)
 	{
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
 
