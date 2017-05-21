@@ -904,7 +904,7 @@ namespace profiler
 
 			core::StackStringW512 txt;
 			txt.appendFmt(L"JobsRun: %" PRIi32 " JobsStolen: %" PRIi32 " JobsAssited: %" PRIi32,
-				frameStats.jobsRun, frameStats.jobsStolen, frameStats.jobsAssited);
+				int32_t(frameStats.jobsRun), int32_t(frameStats.jobsStolen), int32_t(frameStats.jobsAssited));
 
 			ctx.SetColor(Col_Mintcream);
 			ctx.flags.Set(font::DrawTextFlag::CENTER);
