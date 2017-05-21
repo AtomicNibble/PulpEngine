@@ -190,9 +190,9 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			if (!d.HasMember(textureDesc.propName))
 			{
 				// if we have a default texture we just use that.
-				if (textureDesc.default.isNotEmpty())
+				if (textureDesc.defaultName.isNotEmpty())
 				{
-					tex.value = textureDesc.default;
+					tex.value = textureDesc.defaultName;
 				}
 				else
 				{
