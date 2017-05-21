@@ -211,7 +211,7 @@ namespace PSD
 
 				uint16_t shift = getShiftFromChannel(static_cast<uint8_t>(channel), header);
 
-				if (shift != -1)
+				if (shift != 0)
 				{
 					uint32_t mask = 0xffu << static_cast<uint32_t>(shift);
 
@@ -242,7 +242,7 @@ namespace PSD
 				}
 
 				uint16_t shift = getShiftFromChannel(static_cast<uint8_t>(channel), header);
-				if (shift != -1)
+				if (shift != 0)
 				{
 					uint32_t mask = 0xffu << static_cast<uint32_t>(shift);
 
