@@ -106,7 +106,7 @@ public:
 
 	// fast id maps to index.
 	XBaseAsset* findAsset(uint32_t id) {
-		if (id < 0 || id > list.size()) // needed for release?
+		if (id > list.size()) // needed for release?
 			return nullptr; // O'Deer
 		return list[id];
 	}
