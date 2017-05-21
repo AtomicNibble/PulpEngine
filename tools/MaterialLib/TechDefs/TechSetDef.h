@@ -91,7 +91,7 @@ struct Texture
 	Texture() = default;
 
 	core::string propName;
-	core::string default;
+	core::string defaultName;
 
 	render::TextureSlot::Enum texSlot;
 
