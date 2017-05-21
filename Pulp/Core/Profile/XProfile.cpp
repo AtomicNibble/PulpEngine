@@ -337,6 +337,8 @@ namespace profiler
 					--frameOffset_;
 				}
 				break;
+			default:
+				break;
 		}
 		
 		return true;
