@@ -17,7 +17,7 @@ inline Path<char>::Path(const Path<wchar_t>& oth)
 {
 	strUtil::Convert(oth.c_str(), BaseType::str_, capacity());
 	BaseType::str_[oth.length()] = L'\0';
-	len_ = oth.length();
+	BaseType::len_ = oth.length();
 }
 
 template<>
@@ -26,7 +26,7 @@ inline Path<wchar_t>::Path(const Path<char>& oth)
 {
 	strUtil::Convert(oth.c_str(), BaseType::str_, capacity());
 	BaseType::str_[oth.length()] = L'\0';
-	len_ = oth.length();
+	BaseType::len_ = oth.length();
 }
 
 
@@ -237,7 +237,7 @@ const Path<TChar>& Path<TChar>::operator+=(const TChar* str)
 template<typename TChar>
 inline void Path<TChar>::ensureSlash(void)
 {
-	if (this->len_ > 0) {
+	if (BaseType::len_ > 0) {
 		BaseType::stripTrailing(NATIVE_SLASH);
 		BaseType::append(NATIVE_SLASH, 1);
 	}
@@ -293,9 +293,9 @@ inline void Path<TChar>::removeTrailingSlash(void)
 template<typename TChar>
 inline size_t Path<TChar>::fillSpaceWithNullTerm(void)
 {
-	const size_t space = capacity() - length();
+	const size_t space = BaseType::capacity() - BaseType::length();
 
-	std::memset(&BaseType::str_[len_], '\0', space);
+	std::memset(&BaseType::str_[BaseType::len_], '\0', space);
 
 	return space;
 }
@@ -311,7 +311,7 @@ inline bool Path<TChar>::isAbsolute(void) const
 template<typename TChar>
 inline int8_t Path<TChar>::getDriveNumber(void) const
 {
-	if (length() > 1 && BaseType::str_[1] == ':') {
+	if (BaseType::length() > 1 && BaseType::str_[1] == ':') {
 		return safe_static_cast<int8_t,int32_t>(BaseType::str_[0] - 'A');
 	}
 
