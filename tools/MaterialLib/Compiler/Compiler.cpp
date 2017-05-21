@@ -17,9 +17,9 @@ X_NAMESPACE_BEGIN(engine)
 
 MaterialCompiler::MaterialCompiler(TechSetDefs& techDefs) :
 	techDefs_(techDefs),
-	params_(g_MatLibArena),
-	textures_(g_MatLibArena),
 	samplers_(g_MatLibArena),
+	textures_(g_MatLibArena),
+	params_(g_MatLibArena),
 	pTechDef_(nullptr)
 {
 
