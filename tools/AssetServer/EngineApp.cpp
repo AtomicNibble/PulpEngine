@@ -11,8 +11,8 @@
 
 EngineApp::EngineApp() :
 	run_(true),
-	pICore_(nullptr),
-	hSystemHandle_(NULL)
+	hSystemHandle_(NULL),
+	pICore_(nullptr)
 {
 }
 
