@@ -207,6 +207,7 @@ X_ENABLE_WARNING(4324)
 
 
 X_DISABLE_WARNING(4324)
+
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
 public:
@@ -601,15 +602,9 @@ private:
 	{
 		ThreadJobAllocator();
 
-#if 0
-		core::HeapArea      jobPoolHeap;
-		core::PoolAllocator jobPoolAllocator;
-		JobArena			jobPoolArena;
-#endif
 		uint32_t allocated;
 
 		// there should be 60 byes of padding.
-
 		Job jobs[JobSystem::MAX_JOBS];
 	};
 

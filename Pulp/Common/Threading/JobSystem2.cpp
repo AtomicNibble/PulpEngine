@@ -164,20 +164,6 @@ namespace V2
 	// ===================================
 
 	JobSystem::ThreadJobAllocator::ThreadJobAllocator()
-#if 0
-		: jobPoolHeap(
-			bitUtil::RoundUpToMultiple<size_t>(
-				JobArena::getMemoryRequirement(sizeof(Job)) * MAX_JOBS,
-				VirtualMem::GetPageSize()
-				)
-		),
-		jobPoolAllocator(jobPoolHeap.start(), jobPoolHeap.end(),
-			JobArena::getMemoryRequirement(sizeof(Job)),
-			JobArena::getMemoryAlignmentRequirement(X_ALIGN_OF(Job)),
-			JobArena::getMemoryOffsetRequirement()
-		),
-		jobPoolArena(&jobPoolAllocator, "JobPool")
-#endif
 	{
 		allocated = 0;
 	}
