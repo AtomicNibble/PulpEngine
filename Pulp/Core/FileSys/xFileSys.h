@@ -146,7 +146,7 @@ public:
 	typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
 
 public:
-	xFileSys();
+	xFileSys(core::MemoryArenaBase* arena);
 	~xFileSys() X_FINAL;
 
 	void registerVars(void) X_FINAL;

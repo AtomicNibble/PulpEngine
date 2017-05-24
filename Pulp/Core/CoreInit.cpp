@@ -709,7 +709,7 @@ bool XCore::parseSeed(const Vec4i& seed)
 bool XCore::InitFileSys(const SCoreInitParams &initParams)
 {
 	X_UNUSED(initParams);
-	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8);
+	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8)(g_coreArena);
 
 	if (env_.pFileSys) {
 		if (!env_.pFileSys->init(initParams)) {

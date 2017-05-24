@@ -106,7 +106,7 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 // --------------------------------------------------------------
 
 
-xFileSys::xFileSys() :
+xFileSys::xFileSys(core::MemoryArenaBase* arena) :
 	gameDir_(nullptr),
 	searchPaths_(nullptr),
 	// ..
@@ -139,14 +139,11 @@ xFileSys::xFileSys() :
 	memFileArena_(&memfileAllocator_, "MemFileData"),
 	currentRequestIdx_(0),
 	requestSignal_(true),
-	requestData_(gEnv->pArena, IO_REQUEST_BUF_SIZE)
+	requestData_(X_ASSERT_NOT_NULL(arena), IO_REQUEST_BUF_SIZE)
 {
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pArena);
-
-	gEnv->pArena->addChildArena(&filePoolArena_);
-	gEnv->pArena->addChildArena(&asyncOpPoolArena_);
-	gEnv->pArena->addChildArena(&memFileArena_);
+	arena->addChildArena(&filePoolArena_);
+	arena->addChildArena(&asyncOpPoolArena_);
+	arena->addChildArena(&memFileArena_);
 }
 
 xFileSys::~xFileSys()
