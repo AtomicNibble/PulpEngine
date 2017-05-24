@@ -782,7 +782,7 @@ bool XCore::InitConsole(const SCoreInitParams &initParams)
 bool XCore::InitInput(const SCoreInitParams &initParams)
 {
 	if (initParams.bSkipInput) {
-		env_.pInput = X_NEW(input::XNullInput, gEnv->pArena,"NullInput");
+		env_.pInput = X_NEW(input::XNullInput, g_coreArena,"NullInput");
 		return true;
 	}
 
