@@ -61,7 +61,7 @@ class XEngineModule_Input : public IEngineModule
 //		X_ASSERT_NOT_NULL(gEnv->pMalloc);
 
 		ICore* pCore = env.pCore;
-		input::IInput *pInput = 0;
+		input::IInput* pInput = 0;
 
 		LinkModule(pCore, "Input");
 
