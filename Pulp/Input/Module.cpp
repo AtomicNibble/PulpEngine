@@ -65,15 +65,15 @@ class XEngineModule_Input : public IEngineModule
 
 		LinkModule(pCore, "Input");
 
-		g_InputArena = X_NEW_ALIGNED(InputArena, gEnv->pArena, "InputArena", 8)(&g_InputAlloc, "InputArena");
+		g_InputArena = X_NEW(InputArena, gEnv->pArena, "InputArena")(&g_InputAlloc, "InputArena");
 
 		if (!gEnv->IsDedicated())
 		{
-			pInput = X_NEW_ALIGNED(input::XWinInput, g_InputArena, "Win32Input", 8)(g_InputArena, static_cast<PLATFORM_HWND>(initParams.hWnd));
+			pInput = X_NEW(input::XWinInput, g_InputArena, "Win32Input")(g_InputArena, static_cast<PLATFORM_HWND>(initParams.hWnd));
 		}
 		else
 		{
-			pInput = X_NEW_ALIGNED(input::XBaseInput, g_InputArena, "XBaseInput", 8)(g_InputArena);
+			pInput = X_NEW(input::XBaseInput, g_InputArena, "XBaseInput")(g_InputArena);
 		}		
 
 		env.pInput = pInput;
