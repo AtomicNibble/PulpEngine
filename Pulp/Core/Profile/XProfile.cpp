@@ -443,7 +443,7 @@ namespace profiler
 
 				allocStats.toString(str);
 
-				RenderStr(pos, L"Combined Mem", str);
+				area = RenderStr(pos, L"Combined Mem", str);
 				pos.x += area.x + padding;
 			}
 		
