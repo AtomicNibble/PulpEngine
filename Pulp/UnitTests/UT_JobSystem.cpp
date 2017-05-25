@@ -39,7 +39,7 @@ namespace
 
 TEST(Threading, JobSystem)
 {
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 
 	jobSys.StartUp();
 
@@ -114,7 +114,7 @@ namespace
 
 TEST(Threading, JobSystemEmpty)
 {
-	JobSystem jobSys;
+	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
 	const size_t numJobs = 65000;

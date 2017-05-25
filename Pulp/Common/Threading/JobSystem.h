@@ -15,7 +15,7 @@
 #include "Threading\Signal.h"
 #include "Threading\AtomicInt.h"
 #include "Threading\CriticalSection.h"
-
+#include "Threading\ThreadQue.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -32,33 +32,16 @@ struct ThreadStats
 	uint64_t numExecLists;	// jobs lists execuced
 };
 
-class JobQue
-{
-public:
-	JobQue();
-	~JobQue();
-
-	void setArena(core::MemoryArenaBase* arena);
-
-	void AddJob(const JobDecl job);
-	void AddJobs(JobDecl* pJobs, size_t numJobs);
-	bool tryPop(JobDecl& job);
-
-	size_t numJobs(void) const;
-
-private:
-	core::Spinlock lock_;
-	core::Fifo<JobDecl> jobs_;
-};
-
 
 class JobThread : public ThreadAbstract
 {
 public:
+	typedef ThreadQue<JobDecl, core::Spinlock> ThreadQueue;
+public:
 	JobThread();
 	~JobThread();
 
-	void init(uint32_t idx, JobQue* pQues);
+	void init(uint32_t idx, ThreadQueue* pQues);
 
 	void SignalWork(void);
 	void Stop(void);
@@ -80,14 +63,14 @@ private:
 	ThreadStats stats_;
 	uint32_t threadIdx_;
 
-	JobQue* ques_[JobPriority::ENUM_COUNT];
+	ThreadQueue* ques_[JobPriority::ENUM_COUNT];
 	core::ITimer* pTimer_;
 };
 
 class JobSystem : public IJobSystem
 {
 public:
-	JobSystem();
+	JobSystem(core::MemoryArenaBase* arena);
 	~JobSystem() X_FINAL;
 
 	bool StartUp(void) X_FINAL;
@@ -105,7 +88,7 @@ private:
 private:
 	int32_t numThreads_; // num created.
 	JobThread threads_[HW_THREAD_MAX];
-	JobQue ques_[JobPriority::ENUM_COUNT];
+	JobThread::ThreadQueue ques_[JobPriority::ENUM_COUNT];
 public:
 	static int var_LongJobMs;
 };

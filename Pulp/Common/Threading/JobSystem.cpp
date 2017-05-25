@@ -14,56 +14,6 @@ X_NAMESPACE_BEGIN(core)
 
 int JobSystem::var_LongJobMs = 8;
 
-JobQue::JobQue() :
-jobs_(nullptr)
-{
-
-}
-
-JobQue::~JobQue()
-{
-
-}
-
-void JobQue::setArena(core::MemoryArenaBase* arena)
-{
-	jobs_.setArena(arena);
-	jobs_.reserve(0x1000);
-}
-
-void JobQue::AddJob(const JobDecl job)
-{
-	core::Spinlock::ScopedLock lock(lock_);
-
-	jobs_.push(job);
-}
-
-void JobQue::AddJobs(JobDecl* pJobs, size_t numJobs)
-{
-	core::Spinlock::ScopedLock lock(lock_);
-
-	for (size_t i = 0; i < numJobs; i++) {
-		jobs_.push(pJobs[i]);
-	}
-}
-
-bool JobQue::tryPop(JobDecl& job)
-{
-	core::Spinlock::ScopedLock lock(lock_);
-
-	if (jobs_.isEmpty())
-		return false;
-
-	job = jobs_.peek();
-	jobs_.pop();
-	return true;
-}
-
-size_t JobQue::numJobs(void) const
-{
-	// any point locking for this?
-	return jobs_.size();
-}
 
 // -------------------
 
@@ -84,7 +34,7 @@ JobThread::~JobThread()
 
 }
 
-void JobThread::init(uint32_t idx, JobQue* pQues)
+void JobThread::init(uint32_t idx, ThreadQueue* pQues)
 {
 	threadIdx_ = idx;
 
@@ -214,7 +164,9 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 // ======================================
 
-JobSystem::JobSystem() : numThreads_(0)
+JobSystem::JobSystem(core::MemoryArenaBase* arena) :
+	numThreads_(0),
+	ques_{ arena, arena, arena }
 {
 
 }
@@ -232,10 +184,6 @@ bool JobSystem::StartUp(void)
 	X_ASSERT_NOT_NULL(gEnv->pArena);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-	for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
-		ques_[i].setArena(gEnv->pArena);
-	}
 
 	// get the num HW threads
 	ICore* pCore = gEnv->pCore;
@@ -258,7 +206,7 @@ bool JobSystem::StartUp(void)
 
 void JobSystem::AddJob(const JobDecl job, JobPriority::Enum priority)
 {
-	ques_[priority].AddJob(job);
+	ques_[priority].push(job);
 
 	// signal
 	for (int32_t i = 0; i < numThreads_; i++){
@@ -270,7 +218,9 @@ void JobSystem::AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priori
 {
 	X_ASSERT_NOT_NULL(pJobs);
 
-	ques_[priority].AddJobs(pJobs, numJobs);
+	for (size_t i = 0; i < numJobs; i++) {
+		ques_[priority].push(pJobs[i]);
+	}
 
 	// signal
 	for (int32_t i = 0; i < numThreads_; i++){
@@ -282,7 +232,7 @@ void JobSystem::waitForAllJobs(void)
 {
 	int32_t i;
 	for (i = 0; i < JobPriority::ENUM_COUNT; i++) {
-		while (ques_[i].numJobs() > 0) {
+		while (ques_[i].isNotEmpty()) {
 			core::Thread::Yield();
 		}
 	}
