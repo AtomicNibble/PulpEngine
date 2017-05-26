@@ -1,4 +1,4 @@
-<font source = "consola.ttf" proportional="false">
+<font source = "LiberationMono-Regular.ttf" proportional="false">
 	<effect name = "normal" >
 		<!-- normal pass -->
 		<pass>
