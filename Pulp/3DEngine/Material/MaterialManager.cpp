@@ -306,7 +306,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 			for (j = 0; j < matSamplers.size(); j++)
 			{
 				auto& s = matSamplers[j];
-
 				if (s.name == permSampler.getName())
 				{
 					sampler = s.sate;
@@ -336,6 +335,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 					}
 				}
 			}
+
 			if (j == matSamplers.size())
 			{
 				X_ERROR("Material", "Failed to find sampler values for perm sampler: \"%s\" using defaults", permSampler.getName().c_str());
