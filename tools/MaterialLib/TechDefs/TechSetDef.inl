@@ -1,6 +1,8 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+namespace techset
+{
 
 X_INLINE TechSetDef::TechniqueMap::size_type TechSetDef::numTechs(void) const
 {
@@ -61,5 +63,8 @@ X_INLINE TechSetDef::SamplerMap::const_iterator TechSetDef::samplerEnd(void) con
 {
 	return samplers_.end();
 }
+
+} // namespace techset
+
 
 X_NAMESPACE_END

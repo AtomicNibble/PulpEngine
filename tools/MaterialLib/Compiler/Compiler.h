@@ -9,8 +9,12 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(engine)
 
-class TechSetDefs;
-class TechSetDef;
+namespace techset
+{
+	class TechSetDefs;
+	class TechSetDef;
+
+} // namespace techset
 
 class MaterialCompiler
 {
@@ -40,7 +44,7 @@ class MaterialCompiler
 	typedef core::Array<Param> ParamArr;
 
 public:
-	MaterialCompiler(TechSetDefs& techDefs);
+	MaterialCompiler(techset::TechSetDefs& techDefs);
 
 	bool loadFromJson(core::string& str);
 	bool writeToFile(core::XFile* pFile) const;
@@ -54,7 +58,7 @@ private:
 
 
 private:
-	TechSetDefs& techDefs_;
+	techset::TechSetDefs& techDefs_;
 
 	MaterialFlags flags_;
 	MaterialCat::Enum cat_;
@@ -76,7 +80,7 @@ private:
 	TextureArr textures_;
 	ParamArr params_;
 
-	engine::TechSetDef* pTechDef_;
+	techset::TechSetDef* pTechDef_;
 };
 
 

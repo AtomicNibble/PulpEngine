@@ -13,7 +13,8 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-
+namespace techset
+{
 	// ------------------------------------------------------------------------------
 
 	const char* TechSetDefs::INCLUDE_DIR = "include";
@@ -120,8 +121,7 @@ X_NAMESPACE_BEGIN(engine)
 				name.removeExtension();
 
 				typesOut.emplace_back(name.c_str());
-			} 
-			while (find.findNext());
+			} while (find.findNext());
 		}
 
 		return true;
@@ -212,6 +212,6 @@ X_NAMESPACE_BEGIN(engine)
 		return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
 	}
 
-
+} // namespace techset
 
 X_NAMESPACE_END

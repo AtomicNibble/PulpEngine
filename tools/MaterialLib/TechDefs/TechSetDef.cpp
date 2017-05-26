@@ -11,6 +11,11 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+
+namespace techset
+{
+
+
 Shader::Shader() :
 	type(render::shader::ShaderType::UnKnown),
 	aliases(g_MatLibArena)
@@ -2214,5 +2219,7 @@ X_INLINE  T& TechSetDef::addHelper(core::HashMap<core::string, T>& map,
 
 	return map[name];
 }
+
+} // namespace techset
 
 X_NAMESPACE_END

@@ -205,7 +205,7 @@ TechDefStateManager::TechDefStateManager(core::MemoryArenaBase* arena) :
 	techStates_.reserve(64);
 	techStates_.setGranularity(32);
 
-	pTechDefs_ = X_NEW(TechSetDefs, g_3dEngineArena, "MatManTechSets")(g_3dEngineArena);
+	pTechDefs_ = X_NEW(techset::TechSetDefs, g_3dEngineArena, "MatManTechSets")(g_3dEngineArena);
 
 }
 
@@ -271,7 +271,7 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 
 TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat, const core::string& name)
 {
-	TechSetDef* pTechDef = nullptr;
+	techset::TechSetDef* pTechDef = nullptr;
 	if (!pTechDefs_->getTechDef(cat, name, pTechDef)) {
 		X_ERROR("TechDefState", "Failed to get techdef definition for state creation");
 		return nullptr;

@@ -19,6 +19,9 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(engine)
 
+namespace techset
+{
+
 
 struct StencilState
 {
@@ -295,6 +298,7 @@ private:
 	SamplerMap samplers_;
 };
 
+} // namespace techset
 
 X_NAMESPACE_END
 

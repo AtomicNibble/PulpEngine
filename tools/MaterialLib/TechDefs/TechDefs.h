@@ -14,7 +14,8 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(engine)
 
-
+namespace techset
+{
 	// This is like a file format for defining states and flags that the materials can select
 	// Just makes it easy to define what state a material will have.
 	//
@@ -61,6 +62,8 @@ X_NAMESPACE_BEGIN(engine)
 		TechSetDefMap techDefs_;
 		SourceMap incSourceMap_;
 	};
+
+} // namespace techset
 
 
 X_NAMESPACE_END

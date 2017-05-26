@@ -21,8 +21,8 @@ public:
 
 	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags);
 
-	X_INLINE Shader::AliaseArr::size_type getNumAliases(void) const;
-	X_INLINE const Shader::AliaseArr& getAliases(void) const;
+	X_INLINE techset::Shader::AliaseArr::size_type getNumAliases(void) const;
+	X_INLINE const techset::Shader::AliaseArr& getAliases(void) const;
 
 public:
 	core::MemoryArenaBase* permArena_;
@@ -37,7 +37,7 @@ public:
 	// the source files every perm is made from
 	ShaderEntryArr shaderEntry_;
 	ShaderSourceArr shaderSource_;
-	Shader::AliaseArr aliases_;
+	techset::Shader::AliaseArr aliases_;
 };
 
 class TechDefState
@@ -58,7 +58,7 @@ public:
 	TechDefArr techs_;
 
 	// the tech set def we got the techs and state from.
-	TechSetDef* pTechSecDef_;
+	techset::TechSetDef* pTechSecDef_;
 };
 
 // this is to store states for each of the techSets.
@@ -85,7 +85,7 @@ private:
 	core::XHashIndex hashIndex_;
 	TechStatesArr techStates_;
 
-	TechSetDefs* pTechDefs_;
+	techset::TechSetDefs* pTechDefs_;
 };
 
 

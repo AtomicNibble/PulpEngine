@@ -26,9 +26,16 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(engine)
 
-class TechSetDef;
-class TechDefState;
+namespace techset
+{
+
+	class TechSetDef;
+
+} // namespace techset
+
 class TechDef;
+class TechDefState;
+
 
 X_DECLARE_ENUM8(TechStatus)(
 	NOT_COMPILED,
@@ -76,6 +83,7 @@ struct MaterialTech
 	CBufferArr materialCbs;
 	ParamLinkArr paramLinks;
 };
+
 
 struct MaterialTexture
 {

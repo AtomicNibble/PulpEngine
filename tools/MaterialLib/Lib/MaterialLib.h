@@ -6,7 +6,12 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-class TechSetDefs;
+namespace techset
+{
+	class TechSetDefs;
+
+} // namespace techset
+
 
 class MaterialLib : public IMaterialLib
 {
@@ -20,7 +25,7 @@ public:
 
 
 private:
-	core::UniquePointer<TechSetDefs> pTechDefs_;
+	core::UniquePointer<techset::TechSetDefs> pTechDefs_;
 };
 
 
