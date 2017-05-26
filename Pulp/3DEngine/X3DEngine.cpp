@@ -191,12 +191,12 @@ void X3DEngine::shutDown(void)
 
 	primResources_.releaseResources(pRender_);
 	if (pModelManager_) {
-		pModelManager_->ShutDown();
+		pModelManager_->shutDown();
 		X_DELETE(pModelManager_, g_3dEngineArena);
 	}
 
 	if (pMaterialManager_) {
-		pMaterialManager_->ShutDown();
+		pMaterialManager_->shutDown();
 		X_DELETE(pMaterialManager_, g_3dEngineArena);
 	}
 
