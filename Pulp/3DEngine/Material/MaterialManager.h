@@ -18,7 +18,12 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(engine)
 
-class TechSetDefs;
+namespace techset
+{
+	class TechSetDefs;
+
+} // namespace techset
+
 class VariableStateManager;
 class TechDefStateManager;
 class CBufferManager;
