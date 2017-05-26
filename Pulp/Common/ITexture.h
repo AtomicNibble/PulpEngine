@@ -23,6 +23,7 @@ static const char* TEX_DEFAULT_DIFFUSE = "imgs/default/default_col";
 static const char* TEX_DEFAULT_BUMP = "imgs/default/$identitynormal";
 static const char* TEX_DEFAULT_WHITE = "imgs/default/$white";
 
+static const uint32_t	 TEX_MIN_DIMENSIONS = 4;
 static const uint32_t	 TEX_MAX_DIMENSIONS = 4096;
 static const uint32_t	 TEX_MAX_MIPS = 13;
 static const uint32_t	 TEX_MAX_FACES = 6; // cubes (vol's not supported yet)
