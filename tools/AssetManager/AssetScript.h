@@ -7,8 +7,12 @@ class asIScriptContext;
 struct asSMessageInfo;
 
 X_NAMESPACE_DECLARE(engine,
-	class TechSetDefs
+	namespace techset
+	{
+		class TechSetDefs;
+	} // namespace techset
 );
+
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -86,7 +90,7 @@ private slots:
 private:
 	asIScriptEngine* pEngine_;
 	QFileSystemWatcher* pWatcher_;
-	engine::TechSetDefs* pTechDefs_;
+	engine::techset::TechSetDefs* pTechDefs_;
 	ScriptCacheArr cache_;
 };
 

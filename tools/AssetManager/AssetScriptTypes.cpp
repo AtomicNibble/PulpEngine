@@ -255,7 +255,7 @@ AssetScriptProperty* AssetScriptProperty::copyFactory(const AssetScriptProperty&
 // -----------------------------------------------------------
 
 
-AssetScriptProps::AssetScriptProps(AssetProperties& props, engine::TechSetDefs& techDefs) :
+AssetScriptProps::AssetScriptProps(AssetProperties& props, engine::techset::TechSetDefs& techDefs) :
 	props_(props),
 	techDefs_(techDefs),
 	refCount_(1)
@@ -532,8 +532,8 @@ std::string AssetScriptProps::getMaterialTypes(std::string& catStr)
 	const engine::MaterialCat::Enum cat = engine::Util::MatCatFromStr(catStr.data(), catStr.data() + catStr.length());
 
 	// we need to load the tech defs for this cat :|
-	engine::TechSetDefs::CatTypeArr types(g_arena);
-	if (!engine::TechSetDefs::getTechCatTypes(cat, types)) {
+	engine::techset::TechSetDefs::CatTypeArr types(g_arena);
+	if (!engine::techset::TechSetDefs::getTechCatTypes(cat, types)) {
 		X_ERROR("AssetScript", "Failed to get tech cat type");
 		return "<error>";
 	}
@@ -560,7 +560,7 @@ bool AssetScriptProps::isMaterialType(std::string& catStr, std::string& typeStr)
 		return false;
 	}
 
-	engine::TechSetDefs::CatTypeArr types(g_arena);
+	engine::techset::TechSetDefs::CatTypeArr types(g_arena);
 	if (!techDefs_.getTechCatTypes(cat, types)) {
 		return false;
 	}
@@ -583,14 +583,14 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 	// we wnat the TECH DEF!
 	// then once we have it we get all the params
 	// we just look for them and enable.
-	engine::TechSetDef* pTechDef = nullptr;
+	engine::techset::TechSetDef* pTechDef = nullptr;
 	if (!techDefs_.getTechDef(cat, typeStr.c_str(), pTechDef)) {
 		return;
 	}
 
 	// right now we just need to show the props that are part of this techSetDef.
 
-	auto showProps = [&](const core::string& propName, const engine::AssManProps& assProps) {
+	auto showProps = [&](const core::string& propName, const engine::techset::AssManProps& assProps) {
 		auto propIt = map_.find(std::string(propName));
 		if (propIt != map_.end())
 		{

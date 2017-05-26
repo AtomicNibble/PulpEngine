@@ -116,7 +116,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	}
 
 	if (!pTechDefs_) {
-		pTechDefs_ = new engine::TechSetDefs(g_arena);
+		pTechDefs_ = new engine::techset::TechSetDefs(g_arena);
 	}
 
 
