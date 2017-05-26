@@ -98,6 +98,13 @@ namespace CI
 			return false;
 		}
 
+		if (hdr.height < TEX_MIN_DIMENSIONS || hdr.width < TEX_MIN_DIMENSIONS)
+		{
+			X_ERROR("TextureCI", "invalid image dimensions. provided: %" PRIu16 "x%" PRIu16 " min: %" PRIu32 "x%" PRIu32,
+				hdr.height, hdr.width, TEX_MIN_DIMENSIONS, TEX_MIN_DIMENSIONS);
+			return false;
+		}
+
 		if (!core::bitUtil::IsPowerOfTwo(hdr.height) || !core::bitUtil::IsPowerOfTwo(hdr.width))
 		{
 			X_ERROR("TextureCI", "invalid image dimensions, must be power of two. provided: %" PRIu16 "x%" PRIu16,
