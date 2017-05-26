@@ -27,7 +27,7 @@ namespace compiler
 
 	private:
 		core::MemoryArenaBase* arena_;
-		engine::TechSetDefs techDefs_;
+		techset::TechSetDefs techDefs_;
 
 		render::shader::CompileFlags compileFlags_;
 		render::shader::XShaderManager shaderMan_;
