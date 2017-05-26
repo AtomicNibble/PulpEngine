@@ -39,17 +39,14 @@ XModelManager::~XModelManager()
 
 }
 
-bool XModelManager::Init(void)
+bool XModelManager::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 
-	ADD_COMMAND_MEMBER("listModels", this, XModelManager, &XModelManager::Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
-	ADD_COMMAND_MEMBER("modelReload", this, XModelManager, &XModelManager::Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
 
-	XModel::RegisterVars();
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);
@@ -66,7 +63,7 @@ bool XModelManager::Init(void)
 }
 
 
-void XModelManager::ShutDown(void)
+void XModelManager::shutDown(void)
 {
 	X_LOG0("ModelManager", "Shutting Down");
 
@@ -91,6 +88,20 @@ void XModelManager::ShutDown(void)
 	}
 
 	models_.free();
+}
+
+
+void XModelManager::registerCmds(void)
+{
+	ADD_COMMAND_MEMBER("listModels", this, XModelManager, &XModelManager::Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
+	ADD_COMMAND_MEMBER("modelReload", this, XModelManager, &XModelManager::Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
+
+}
+
+void XModelManager::registerVars(void)
+{
+	
+	XModel::RegisterVars();
 }
 
 

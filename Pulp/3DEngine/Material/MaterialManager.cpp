@@ -40,7 +40,7 @@ XMaterialManager::~XMaterialManager()
 }
 
 
-bool XMaterialManager::Init(void)
+bool XMaterialManager::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
@@ -49,8 +49,6 @@ bool XMaterialManager::Init(void)
 		return false;
 	}
 
-	ADD_COMMAND_MEMBER("listMaterials", this, XMaterialManager, &XMaterialManager::Cmd_ListMaterials, 
-		core::VarFlag::SYSTEM, "List all the loaded materials");
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
@@ -59,7 +57,7 @@ bool XMaterialManager::Init(void)
 	return true;
 }
 
-void XMaterialManager::ShutDown(void)
+void XMaterialManager::shutDown(void)
 {
 	X_LOG0("MtlManager", "Shutting Down");
 
@@ -77,6 +75,20 @@ void XMaterialManager::ShutDown(void)
 	if (pTechDefMan_) {
 		pTechDefMan_->shutDown();
 	}
+}
+
+void XMaterialManager::registerCmds(void)
+{
+
+	ADD_COMMAND_MEMBER("listMaterials", this, XMaterialManager, &XMaterialManager::Cmd_ListMaterials,
+		core::VarFlag::SYSTEM, "List all the loaded materials");
+
+}
+
+void XMaterialManager::registerVars(void)
+{
+
+
 }
 
 void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)

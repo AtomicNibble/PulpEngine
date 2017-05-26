@@ -28,8 +28,12 @@ public:
 	XModelManager();
 	~XModelManager();
 
-	bool Init(void);
-	void ShutDown(void);
+	bool init(void);
+	void shutDown(void);
+
+	void registerCmds(void);
+	void registerVars(void);
+
 
 	// IModelManager
 

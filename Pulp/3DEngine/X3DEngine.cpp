@@ -114,12 +114,18 @@ bool X3DEngine::init(void)
 	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
 
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_);
-	if (!pMaterialManager_->Init()) {
+	pMaterialManager_->registerCmds();
+	pMaterialManager_->registerVars();
+
+	if (!pMaterialManager_->init()) {
 		return false;
 	}
 
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
-	if (!pModelManager_->Init()) {
+	pModelManager_->registerCmds();
+	pModelManager_->registerVars();
+	
+	if (!pModelManager_->init()) {
 		return false;
 	}
 
