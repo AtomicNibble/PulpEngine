@@ -138,17 +138,6 @@ void Level::AreaRefInfo::free(void)
 
 // --------------------------------
 
-int Level::s_var_usePortals_ = 1;
-int Level::s_var_drawAreaBounds_ = 0;
-int Level::s_var_drawPortals_ = 0;
-int Level::s_var_drawArea_ = -1;
-int Level::s_var_drawCurrentAreaOnly_ = 0;
-int Level::s_var_drawStats_ = 0;
-int Level::s_var_drawModelBounds_ = 0;
-int Level::s_var_drawModelBones_ = 0;
-int Level::s_var_drawPortalStacks_ = 0;
-int Level::s_var_detechCam_ = 0;
-int Level::s_var_cullEnts_ = 0;
 
 // --------------------------------
 
@@ -191,51 +180,10 @@ Level::~Level()
 	free();
 }
 
-bool Level::registerVars(void)
+
+void Level::registerVars(void)
 {
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
-		"Use area portals when rendering the level");
-	
-	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 4,
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
-
-	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 2, 
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Draws the inter area portals. 0=off 1=solid 2=solid_dt");
-
-	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS,
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Draws the selected area index. -1 = disable");
-
-	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Draws just the current area. 0=off 1=on");
-
-	ADD_CVAR_REF("lvl_drawStats", s_var_drawStats_, 0, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws frame stats");
-
-	ADD_CVAR_REF("lvl_drawModelBounds", s_var_drawModelBounds_, 0, 0, 4,
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Draws bounds around models. 1=visible-AABB 2=visible=Sphere 3=all-AABB 4=all-Sphere");
-
-	ADD_CVAR_REF("lvl_drawModelBones", s_var_drawModelBones_, 0, 0, 4,
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Draw model bones. 0=off 1=on");
-
-	ADD_CVAR_REF("lvl_drawPortalStacks", s_var_drawPortalStacks_, 0, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws portal stacks");
-
-	ADD_CVAR_REF("lvl_detachCam", s_var_detechCam_, 0, 0, 2,
-		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Detaches the camera");
-
-	ADD_CVAR_REF("lvl_cullEnts", s_var_cullEnts_, 0, 0, 2,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Perform visibility culling on entities");
-
-
-	return true;
+	vars_.registerVars();
 }
 
 bool Level::init(void)

@@ -10,11 +10,11 @@ X_NAMESPACE_BEGIN(level)
 
 void Level::DebugDraw_AreaBounds(void) const
 {
-	if (s_var_drawAreaBounds_)
+	if (vars_.drawAreaBounds())
 	{
 		Color color = Col_Red;
 
-		if (s_var_drawAreaBounds_ == 1 || s_var_drawAreaBounds_ == 3)
+		if (vars_.drawAreaBounds() == 1 || vars_.drawAreaBounds() == 3)
 		{
 			for (const auto& a : areas_)
 			{
@@ -32,12 +32,12 @@ void Level::DebugDraw_AreaBounds(void) const
 			}
 		}
 
-		if (s_var_drawAreaBounds_ > 2)
+		if (vars_.drawAreaBounds() > 2)
 		{
 			color.a = 0.2f;
 
 			// visible only
-			if (s_var_drawAreaBounds_ == 3)
+			if (vars_.drawAreaBounds() == 3)
 			{
 				for (const auto& a : areas_)
 				{
@@ -60,7 +60,7 @@ void Level::DebugDraw_AreaBounds(void) const
 
 void Level::DebugDraw_Portals(void) const
 {
-	if (s_var_drawPortals_ > 0 /* && !outsideWorld_ */)
+	if (vars_.drawPortals() > 0 /* && !outsideWorld_ */)
 	{
 		// draw the portals.
 		AreaArr::ConstIterator areaIt = areas_.begin();
@@ -70,7 +70,7 @@ void Level::DebugDraw_Portals(void) const
 				continue;
 			}
 
-			if (s_var_drawPortals_ > 1)
+			if (vars_.drawPortals() > 1)
 			{
 				pPrimContex_->setDepthTest(1);
 			}
@@ -92,7 +92,7 @@ void Level::DebugDraw_Portals(void) const
 				}
 			}
 
-			if (s_var_drawPortals_ > 1)
+			if (vars_.drawPortals() > 1)
 			{
 				pPrimContex_->setDepthTest(0);
 			}
@@ -103,7 +103,7 @@ void Level::DebugDraw_Portals(void) const
 
 void Level::DebugDraw_PortalStacks(void) const
 {
-	if (s_var_drawPortalStacks_)
+	if (vars_.drawPortalStacks())
 	{
 		// i wanna draw me the planes!
 		// we have a clipped shape, described by a collection of planes.
@@ -177,7 +177,7 @@ void Level::DebugDraw_PortalStacks(void) const
 
 void Level::DebugDraw_StaticModelCullVis(void) const
 {
-	if(s_var_drawModelBounds_)
+	if(vars_.drawModelBounds())
 	{
 		const Color8u cullColor(128, 0, 0, 128);
 		const Color8u visColor(255, 255, 64, 128);
@@ -188,7 +188,7 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 				continue;
 			}
 
-			if (s_var_drawModelBounds_ > 2)
+			if (vars_.drawModelBounds() > 2)
 			{
 				// draw what was culled.
 				const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[a.areaNum];
@@ -224,7 +224,7 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 
 void Level::DebugDraw_ModelBones(void) const
 {
-	if (s_var_drawModelBones_)
+	if (vars_.drawModelBones())
 	{
 		const Color8u visColor(255, 255, 64, 128);
 
@@ -253,9 +253,9 @@ void Level::DebugDraw_ModelBones(void) const
 
 void Level::DebugDraw_DrawDetachedCam(void) const
 {
-	if (s_var_detechCam_ > 0)
+	if (vars_.detachCam() > 0)
 	{
-		if (s_var_detechCam_ == 1) {
+		if (vars_.detachCam() == 1) {
 			pPrimContex_->drawFrustum(cam_, Color8u(255, 255, 255, 128), Color8u(200, 0, 0, 100), true);
 		}
 		else {
@@ -266,7 +266,7 @@ void Level::DebugDraw_DrawDetachedCam(void) const
 
 void Level::DrawStatsBlock(void) const
 {
-	if (!s_var_drawStats_) {
+	if (!vars_.drawStats()) {
 		return;
 	}
 

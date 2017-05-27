@@ -12,6 +12,8 @@
 
 #include "Model\XModel.h"
 
+#include <Vars\LevelVars.h>
+
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
 )
@@ -179,7 +181,7 @@ public:
 	Level();
 	~Level();	
 
-	static bool registerVars(void);
+	void registerVars(void);
 
 	bool init(void);
 	void free(void);
@@ -332,18 +334,7 @@ private:
 	physics::IScene* pScene_; // the scene for this level.
 
 private:
-	// vars
-	static int s_var_usePortals_;
-	static int s_var_drawAreaBounds_;
-	static int s_var_drawPortals_;
-	static int s_var_drawArea_;
-	static int s_var_drawCurrentAreaOnly_;
-	static int s_var_drawStats_;
-	static int s_var_drawModelBounds_;
-	static int s_var_drawModelBones_;
-	static int s_var_drawPortalStacks_;
-	static int s_var_detechCam_;
-	static int s_var_cullEnts_;
+	LevelVars vars_;
 };
 
 

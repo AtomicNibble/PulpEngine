@@ -63,7 +63,7 @@ X3DEngine::~X3DEngine()
 
 void X3DEngine::registerVars(void)
 {
-	level::Level::registerVars();
+	level_.registerVars();
 
 }
 

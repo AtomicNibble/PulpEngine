@@ -57,7 +57,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 
 	// we want to find out what area we are in.
 	// and then dispatch jobs to recursivly find the others.
-	if (s_var_drawArea_ == -1)
+	if (vars_.drawArea() == -1)
 	{
 		const XCamera& cam = cam_;
 		const Vec3f camPos = cam.getPosition();
@@ -68,7 +68,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 
 		// if we are outside world draw all.
 		// or usePortals is off.
-		if (camArea_ < 0 || s_var_usePortals_ == 0)
+		if (camArea_ < 0 || vars_.usePortals() == 0)
 		{
 			// add all areas
 			for (const auto& area : areas_)
@@ -81,7 +81,7 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 			// begin culling this area, while we work out what other area's we can potentially see.
 			SetAreaVisibleAndCull(pJob, camArea_, -1);
 
-			if (s_var_drawCurrentAreaOnly_ != 1)
+			if (vars_.drawCurrentAreaOnly() != 1)
 			{
 				// any portals in this area?
 				if (!AreaHasPortals(camArea_)) {
@@ -135,10 +135,10 @@ void Level::FindVisibleArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 			}
 		}
 	}
-	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
+	else if (vars_.drawArea() < safe_static_cast<int, size_t>(areas_.size()))
 	{
 		// force draw just this area even if outside world.
-		SetAreaVisibleAndCull(pJob, s_var_drawArea_, -1);
+		SetAreaVisibleAndCull(pJob, vars_.drawArea(), -1);
 	}
 
 }
@@ -771,7 +771,7 @@ void Level::clearVisPortals(void)
 
 void Level::FloodVisibleAreas(void)
 {
-	if (s_var_drawArea_ == -1)
+	if (vars_.drawArea() == -1)
 	{
 		const XCamera& cam = cam_;
 		const Vec3f camPos = cam.getPosition();
@@ -782,7 +782,7 @@ void Level::FloodVisibleAreas(void)
 
 		// if we are outside world draw all.
 		// or usePortals is off.
-		if (camArea_ < 0 || s_var_usePortals_ == 0)
+		if (camArea_ < 0 || vars_.usePortals() == 0)
 		{
 			// add all areas
 			AreaArr::ConstIterator it = areas_.begin();
@@ -795,7 +795,7 @@ void Level::FloodVisibleAreas(void)
 		{
 			SetAreaVisible(camArea_);
 
-			if (s_var_drawCurrentAreaOnly_ != 1)
+			if (vars_.drawCurrentAreaOnly() != 1)
 			{
 				if (!AreaHasPortals(camArea_)) {
 					return;
@@ -908,10 +908,10 @@ void Level::FloodVisibleAreas(void)
 			}
 		}
 	}
-	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
+	else if (vars_.drawArea() < safe_static_cast<int, size_t>(areas_.size()))
 	{
 		// force draw just this area even if outside world.
-		SetAreaVisible(s_var_drawArea_);
+		SetAreaVisible(vars_.drawArea());
 	}
 }
 
