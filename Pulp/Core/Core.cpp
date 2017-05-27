@@ -183,6 +183,10 @@ void XCore::ShutDown()
 	X_LOG0("Core", "Shutting Down");
 	env_.state_ = SCoreGlobals::State::CLOSING;
 
+#if X_DEBUG
+	hotReloadIgnores_.free();
+#endif // !X_DEBUG
+
 	if (vars_.coreFastShutdown_) {
 		X_LOG0("Core", "Fast shutdown, skipping cleanup");
 
@@ -198,10 +202,6 @@ void XCore::ShutDown()
 	}
 
 	core::StopWatch timer;
-
-#if X_DEBUG
-	hotReloadIgnores_.free();
-#endif // !X_DEBUG
 
 	dirWatcher_.ShutDown();
 
