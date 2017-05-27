@@ -270,7 +270,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 	// from the shader perm we can see how many const buffers we need to provide.
 	const auto& cbLinks = pShaderPerm->getCbufferLinks();
-	const auto& samplers = pShaderPerm->getSamplers();
+	const auto& permSamplers = pShaderPerm->getSamplers();
 
 	// we need to know how many textures we are going to be sending.
 	// it may be less than what the material has.
@@ -278,6 +278,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	// him -> pTechDef
 	const size_t numTex = pTechDef->getNumAliases();
 	const size_t numSamplers = samplers.size();
+	const size_t numSamplers = permSamplers.size();
 	const size_t numCb = cbLinks.size();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
@@ -311,7 +312,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 		for (size_t i = 0; i < numSamplers; i++)
 		{
 			auto& sampler = pSamplers[i];
-			const auto& permSampler = samplers[i];
+			const auto& permSampler = permSamplers[i];
 
 			// find a sampler that matches from material
 			size_t j;
