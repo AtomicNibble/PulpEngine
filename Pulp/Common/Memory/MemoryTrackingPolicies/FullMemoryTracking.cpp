@@ -26,17 +26,17 @@ const char* const FullMemoryTracking::TYPE_NAME = "FullMemoryTracking";
 
 
 FullMemoryTracking::FullMemoryTracking(void) :
-numAllocations_(0),
+	numAllocations_(0),
 
-heapArea_(
-	bitUtil::RoundUpToMultiple<size_t>(
-	AllocationTable::GetMemoryRequirement<LinearArena>(40000), VirtualMem::GetPageSize()
-	)
-),
+	heapArea_(
+		bitUtil::RoundUpToMultiple<size_t>(
+		AllocationTable::GetMemoryRequirement<LinearArena>(40000), VirtualMem::GetPageSize()
+		)
+	),
 
-allocator_(heapArea_.start(), heapArea_.end()),
-arena_(&allocator_, "FullMemoryTracking"),
-table_(&arena_,20000)
+	allocator_(heapArea_.start(), heapArea_.end()),
+	arena_(&allocator_, "FullMemoryTracking"),
+	table_(&arena_,20000)
 {
 
 }
