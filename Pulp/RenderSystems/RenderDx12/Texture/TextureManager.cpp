@@ -7,6 +7,9 @@
 #include <IConsole.h>
 #include <IFileSys.h>
 
+// Img Lib
+#include <../../tools/ImgLib/ImgLib.h>
+
 #include "Allocators\DescriptorAllocator.h"
 #include "CommandContex.h"
 
@@ -14,6 +17,8 @@
 #include "Buffers\ColorBuffer.h"
 #include "Buffers\DepthBuffer.h"
 #include "Buffers\ShadowBuffer.h"
+
+
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -29,7 +34,6 @@ X_NAMESPACE_BEGIN(texture)
 		depthFmt_(depthFmt),
 		arena_(arena),
 		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
-		pCILoader_(nullptr),
 		clearDepthVal_(reverseZ ? 0.f : 1.f),
 		pTexDefault_(nullptr),
 		pTexDefaultBump_(nullptr),
@@ -51,35 +55,6 @@ X_NAMESPACE_BEGIN(texture)
 		X_LOG1("TextureManager", "Starting");
 		X_PROFILE_NO_HISTORY_BEGIN("TextureMan", core::profiler::SubSys::RENDER);
 
-		auto hotReload = gEnv->pHotReload;
-		hotReload->addfileType(this, "ci");
-		hotReload->addfileType(this, "dds");
-		hotReload->addfileType(this, "png");
-		hotReload->addfileType(this, "jpg");
-		hotReload->addfileType(this, "psd");
-		hotReload->addfileType(this, "tga");
-
-		pCILoader_ = X_NEW(CI::XTexLoaderCI, arena_, "CILoader");
-		
-		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
-
-		textureLoaders_.append(pCILoader_);
-		if (vars_.allowFmtDDS()) {
-			textureLoaders_.append(X_NEW(DDS::XTexLoaderDDS, arena_, "DDSLoader"));
-		}
-		if (vars_.allowFmtJPG()) {
-			textureLoaders_.append(X_NEW(JPG::XTexLoaderJPG, arena_, "JPGLoader"));
-		}
-		if (vars_.allowFmtPNG()) {
-			textureLoaders_.append(X_NEW(PNG::XTexLoaderPNG, arena_, "PNGLoader"));
-		}
-		if (vars_.allowFmtPSD()) {
-			textureLoaders_.append(X_NEW(PSD::XTexLoaderPSD, arena_, "PSDLoader"));
-		}
-		if (vars_.allowFmtTGA()) {
-			textureLoaders_.append(X_NEW(TGA::XTexLoaderTGA, arena_, "TGALoader"));
-		}
-
 		if (!loadDefaultTextures()) {
 			X_ERROR("TextureManager", "Failed to load default textures");
 			return false;
@@ -92,21 +67,9 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		X_LOG1("TextureManager", "Shutting Down");
 
-		auto hotReload = gEnv->pHotReload;
-		hotReload->addfileType(nullptr, "ci");
-		hotReload->addfileType(nullptr, "dds");
-		hotReload->addfileType(nullptr, "png");
-		hotReload->addfileType(nullptr, "jpg");
-		hotReload->addfileType(nullptr, "psd");
-		hotReload->addfileType(nullptr, "tga");
-
 		releaseDefaultTextures();
 		releaseDanglingTextures();
 
-		for (auto* pTexLoader : textureLoaders_) {
-			X_DELETE(pTexLoader, arena_);
-		}
-		textureLoaders_.clear();
 		return true;
 	}
 
@@ -142,25 +105,12 @@ X_NAMESPACE_BEGIN(texture)
 		if (pTexRes)
 		{
 			threadPolicy.Leave();
-
 			pTexRes->addReference();
 		}
 		else
 		{
 			pTexRes = textures_.createAsset(name, name, flags);
-
 			threadPolicy.Leave();
-
-			if (pTexRes->IsStreamable() && flags.IsSet(TexFlag::DONT_STREAM)) {
-				stream(pTexRes);
-			}
-			else {
-				if (!load(pTexRes)) {
-					pTexRes->flags_.Set(TexFlag::LOAD_FAILED);
-
-					X_WARNING("Texture", "Failed to load: \"%s\"", pTexRes->fileName_.c_str());
-				}
-			}
 		}
 
 		return pTexRes;
@@ -200,7 +150,6 @@ X_NAMESPACE_BEGIN(texture)
 			pTexRes->setHeight(dim.y);
 			pTexRes->setFormat(fmt);
 			pTexRes->setType(texture::TextureType::T2D);
-
 
 			if (!createDeviceTexture(pTexRes)) {
 				X_ERROR("Texture", "Failed to create device texture");
@@ -504,23 +453,17 @@ X_NAMESPACE_BEGIN(texture)
 		textures_.free();
 	}
 
-	bool TextureManager::stream(Texture* pTex)
-	{
-		// start streaming the texture.
-		X_ASSERT_NOT_IMPLEMENTED();
 
-		return true;
-	}
-
+#if 0
 	bool TextureManager::load(Texture* pTex)
 	{
 		X_ASSERT_NOT_NULL(pTex);
 
 		XTextureFile imgFile(arena_);
 
-		if (!loadFromFile(imgFile, pTex->getName())) {
-			return false;
-		}
+//		if (!loadFromFile(imgFile, pTex->getName())) {
+//			return false;
+//		}
 
 		if (!processImgFile(pTex, imgFile)) {
 			return false;
@@ -582,6 +525,7 @@ X_NAMESPACE_BEGIN(texture)
 
 		return true;
 	}
+#endif
 
 	bool TextureManager::createDeviceTexture(Texture* pTex)
 	{
@@ -693,6 +637,7 @@ X_NAMESPACE_BEGIN(texture)
 		return requiredSize;
 	}
 
+#if 0
 	bool TextureManager::loadFromFile(XTextureFile& imgFile, const char* pPath)
 	{
 		X_ASSERT_NOT_NULL(pCILoader_);
@@ -750,6 +695,7 @@ X_NAMESPACE_BEGIN(texture)
 
 		return false;
 	}
+#endif
 
 	// -----------------------------------
 

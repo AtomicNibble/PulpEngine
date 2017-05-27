@@ -33,8 +33,6 @@ X_LINK_LIB("dxguid")
 X_LINK_LIB("d3dcompiler.lib")
 
 
-// Img Lib
-#include <../../tools/ImgLib/ImgLib.h>
 // pickle lib.
 #include <../../tools/ShaderLib/ShaderLib.h>
 

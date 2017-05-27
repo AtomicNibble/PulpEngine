@@ -83,10 +83,12 @@ class XEngineModule_Render : public IEngineModule
 		g_textureDataArena = X_NEW(TextureArena, g_rendererArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
 
 		// call these before render construction.
+#if 0
 		if (!pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
 			X_ERROR("Render", "Failed to init imgLib");
 			return false;
 		}
+#endif
 
 		if (!pCore->IntializeLoadedConverterModule("Engine_ShaderLib", "Engine_ShaderLib")) {
 			X_ERROR("Render", "Failed to init shaderLib");
