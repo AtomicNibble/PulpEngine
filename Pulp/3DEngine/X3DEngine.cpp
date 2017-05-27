@@ -194,22 +194,29 @@ void X3DEngine::shutDown(void)
 	if (pGuiManger_) {
 		pGuiManger_->Shutdown();
 		X_DELETE(pGuiManger_, g_3dEngineArena);
+
+		gEngEnv.pGuiMan_ = nullptr;
 	}
 
 	if (pModelManager_) {
 		pModelManager_->shutDown();
 		X_DELETE(pModelManager_, g_3dEngineArena);
+
+		gEngEnv.pModelMan_ = nullptr;
 	}
 
 	if (pMaterialManager_) {
 		pMaterialManager_->shutDown();
 		X_DELETE(pMaterialManager_, g_3dEngineArena);
+
+		gEngEnv.pMaterialMan_ = nullptr;
 	}
 
 	if (pTextureManager_) {
 		pTextureManager_->shutDown();
 		X_DELETE(pTextureManager_, g_3dEngineArena);
 
+		gEngEnv.pTextureMan_ = nullptr;
 	}
 
 	if (pVariableStateMan_) {
@@ -222,6 +229,7 @@ void X3DEngine::shutDown(void)
 		X_DELETE(pCBufMan_, g_3dEngineArena);
 	}
 
+	gEngEnv.p3DEngine_ = nullptr;
 }
 
 void X3DEngine::release(void)
