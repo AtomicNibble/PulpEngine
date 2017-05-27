@@ -508,7 +508,7 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 		return false;
 	}
 
-	hotReloadExtMap_.insert(hotReloadMap::value_type(extension, pHotReload));
+	hotReloadExtMap_.insert(HotReloadMap::value_type(extension, pHotReload));
 	return true;
 }
 
@@ -586,13 +586,9 @@ void XCore::HotReloadListExts(void)
 {
 	X_LOG0("HotReload", "-------- ^8Registerd Extensions^7 --------");
 
-	hotReloadMap::const_iterator it;
-
-	it = hotReloadExtMap_.begin();
-
-	for (; it != hotReloadExtMap_.end(); ++it)
+	for (const auto& hr : hotReloadExtMap_)
 	{
-		X_LOG0("HotReload", "^2%s", it->first);
+		X_LOG0("HotReload", "^2%s", hr.first);
 	}
 
 	X_LOG0("HotReload", "------ ^8Registerd Extensions End^7 ------");

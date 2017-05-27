@@ -53,8 +53,7 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
 		{
 #if X_DEBUG
 			// before we log a warning check to see if it's in the hotreload ignore list.
-			if (hotRelodIgnoreArr::invalid_index ==
-				hotReloadIgnores_.find(core::string(pExtention)))
+			if (HotRelodIgnoreArr::invalid_index == hotReloadIgnores_.find(core::string(pExtention)))
 			{
 				X_WARNING("hotReload", "file extension '%s' has no reload handle.", pExtention);
 			}

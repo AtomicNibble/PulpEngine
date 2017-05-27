@@ -79,8 +79,8 @@ class XCore :
 	typedef core::Array<ConverterModule> ConverterModulesArr;
 	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
 	// I think i can just use stack strings, since all handlers are hard coded.
-	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
-	typedef core::Array<core::string> hotRelodIgnoreArr;
+	typedef core::HashMap<const char* const, core::IXHotReload*> HotReloadMap;
+	typedef core::Array<core::string> HotRelodIgnoreArr;
 	typedef core::CmdArgs<1024, wchar_t> CmdArg;
 	typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
 
@@ -237,10 +237,10 @@ private:
 
 	ICoreEventDispatcher*			pEventDispatcher_;
 
-	hotReloadMap					hotReloadExtMap_;
+	HotReloadMap					hotReloadExtMap_;
 
 #if X_DEBUG
-	hotRelodIgnoreArr hotReloadIgnores_;
+	HotRelodIgnoreArr hotReloadIgnores_;
 #endif // !X_DEBUG
 	// ~Hotreload
 
