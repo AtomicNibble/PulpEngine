@@ -111,8 +111,8 @@ namespace
 
 XScene::XScene(PhysXVars& vars, physx::PxPhysics* pPhysics, core::MemoryArenaBase* arena) :
 	vars_(vars),
-	arena_(arena),
-	pPhysics_(pPhysics),
+	arena_(X_ASSERT_NOT_NULL(arena)),
+	pPhysics_(X_ASSERT_NOT_NULL(pPhysics)),
 	pScene_(nullptr),
 	pControllerManager_(nullptr)
 {
