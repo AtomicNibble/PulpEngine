@@ -191,7 +191,7 @@ public:
 
 	// created jobs for the level.
 	// visibility, culling, rendering
-	void dispatchJobs(core::FrameData& frame);
+	void dispatchJobs(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket);
 
 private:
 	void DrawDebug(void);
@@ -285,6 +285,8 @@ private:
 private:
 	bool createPhysicsScene(void);
 
+private:
+	render::CommandBucket<uint32_t>* pBucket_;
 
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;

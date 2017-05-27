@@ -260,8 +260,10 @@ bool Level::Load(const char* mapName)
 }
 
 
-void Level::dispatchJobs(core::FrameData& frame)
+void Level::dispatchJobs(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket)
 {
+	pBucket_ = &bucket;
+
 	frameStats_.clear();
 
 	if (vars_.detachCam() == 0) {
