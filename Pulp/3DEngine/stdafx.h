@@ -4,6 +4,8 @@
 
 #include <EngineCommon.h>
 
+#include <array>
+
 #include <Math\XMatrixAlgo.h>
 
 #include <Memory\MemoryArena.h>

@@ -6,7 +6,6 @@
 
 #include <Ilevel.h>
 #include <Time\TimeVal.h>
-#include <array>
 
 #include "String\GrowingStringTable.h"
 #include "Threading\JobList.h"
