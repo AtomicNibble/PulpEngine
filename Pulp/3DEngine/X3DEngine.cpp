@@ -136,6 +136,7 @@ bool X3DEngine::init(void)
 		return false;
 	}
 
+#if 0
 	// init physics.
 	// this don't create a scene, that's done later..
 	physics::ToleranceScale scale;
