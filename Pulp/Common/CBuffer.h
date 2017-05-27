@@ -13,8 +13,9 @@ namespace shader
 {
 	class XCBuffer;
 
-	struct CBufferLink
+	class CBufferLink
 	{
+	public:
 		CBufferLink(ShaderStage::Enum stage, const XCBuffer* pCBufer);
 
 		ShaderStageFlags stages;
@@ -23,7 +24,7 @@ namespace shader
 
 	typedef core::Array<CBufferLink> CBufLinksArr;
 
-	struct XShaderParam
+	class XShaderParam
 	{
 		typedef core::Hash::xxHash64 Hasher;
 
@@ -78,7 +79,7 @@ namespace shader
 	};
 
 
-	class XCBuffer // : core::ISerialize
+	class XCBuffer 
 	{
 		typedef core::Array<XShaderParam> ParamArr;
 		typedef core::Array<uint8_t, core::ArrayAlignedAllocator<uint8_t>> DataArr;

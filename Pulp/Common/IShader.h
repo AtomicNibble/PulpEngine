@@ -284,7 +284,7 @@ typedef Flags<TechFlag> TechFlags;
 typedef int32_t ShaderID;
 typedef uintptr_t TechHandle;
 
-struct CBufferLink;
+class CBufferLink;
 class Sampler;
 
 struct IShaderPermatation
