@@ -28,7 +28,6 @@ public:
 	SHADERLIB_EXPORT ShaderPermatation(const ShaderStagesArr& stages, core::MemoryArenaBase* arena);
 
 	SHADERLIB_EXPORT void generateMeta(void);
-
 	SHADERLIB_EXPORT bool isCompiled(void) const;
 
 	X_INLINE bool isStageSet(ShaderType::Enum type) const;
