@@ -67,6 +67,10 @@ class XEngineModule_3DEngine : public IEngineModule
 			X_DELETE(pEngine, g_3dEngineArena);
 			return false;
 		}
+		if (!gEnv->pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
+			X_ERROR("3DEngine", "Failed to init ImgLib");
+			return false;
+		}
 
 		env.p3DEngine = pEngine;
 		return true;
