@@ -55,22 +55,18 @@ class XEngineModule_3DEngine : public IEngineModule
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_UNUSED(initParams);
 
-		engine::I3DEngine* pEngine = nullptr;
-
 		g_3dEngineArena = X_NEW_ALIGNED(Engine3DArena, gEnv->pArena, "3DEngineArena", 8)(&g_3dEngineAlloc, "3DEngineArena");
-
-		pEngine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
-
 
 		if (!gEnv->pCore->IntializeLoadedConverterModule("Engine_MaterialLib", "Engine_MaterialLib")) {
 			X_ERROR("3DEngine", "Failed to init MaterialLib");
-			X_DELETE(pEngine, g_3dEngineArena);
 			return false;
 		}
 		if (!gEnv->pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
 			X_ERROR("3DEngine", "Failed to init ImgLib");
 			return false;
 		}
+
+		auto* pEngine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
 
 		env.p3DEngine = pEngine;
 		return true;
