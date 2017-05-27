@@ -19,7 +19,7 @@ LevelVars::LevelVars()
 	drawModelBounds_ = 0;
 	drawModelBones_ = 0;
 	drawPortalStacks_ = 0;
-	detechCam_ = 0;
+	detachCam_ = 0;
 	cullEnts_ = 0;
 }
 
@@ -57,7 +57,7 @@ void LevelVars::registerVars(void)
 	ADD_CVAR_REF("lvl_drawPortalStacks", drawPortalStacks_, 0, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws portal stacks");
 
-	ADD_CVAR_REF("lvl_detachCam", detechCam_, 0, 0, 2,
+	ADD_CVAR_REF("lvl_detachCam", detachCam_, 0, 0, 2,
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Detaches the camera");
 
 	ADD_CVAR_REF("lvl_cullEnts", cullEnts_, 0, 0, 2,

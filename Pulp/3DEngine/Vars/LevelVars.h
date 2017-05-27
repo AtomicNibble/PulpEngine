@@ -16,7 +16,17 @@ public:
 
 	void registerVars(void);
 
-
+	X_INLINE int32_t usePortals(void) const;
+	X_INLINE int32_t drawAreaBounds(void) const;
+	X_INLINE int32_t drawPortals(void) const;
+	X_INLINE int32_t drawArea(void) const;
+	X_INLINE int32_t drawCurrentAreaOnly(void) const;
+	X_INLINE int32_t drawStats(void) const;
+	X_INLINE int32_t drawModelBounds(void) const;
+	X_INLINE int32_t drawModelBones(void) const;
+	X_INLINE int32_t drawPortalStacks(void) const;
+	X_INLINE int32_t detachCam(void) const;
+	X_INLINE int32_t cullEnts(void) const;
 
 private:
 	int32_t usePortals_;
@@ -28,7 +38,7 @@ private:
 	int32_t drawModelBounds_;
 	int32_t drawModelBones_;
 	int32_t drawPortalStacks_;
-	int32_t detechCam_;
+	int32_t detachCam_;
 	int32_t cullEnts_;
 };
 
