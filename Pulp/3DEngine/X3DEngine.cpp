@@ -75,6 +75,8 @@ void X3DEngine::registerCmds(void)
 
 }
 
+render::IPixelBuffer* pDepthStencil = nullptr;
+
 bool X3DEngine::init(void)
 {
 	X_PROFILE_NO_HISTORY_BEGIN("3DEngineInit", core::profiler::SubSys::ENGINE3D);
@@ -229,9 +231,8 @@ void X3DEngine::Update(core::FrameData& frame)
 //	MatrixOrthoOffCenterRH(&viewProj, 0, 1680, 1050, 0, -1e10f, 1e10);
 
 	
-
-
-	pCBufMan_->update(frame, false);
+	X_UNUSED(frame);
+//	pCBufMan_->update(frame, false);
 }
 
 void X3DEngine::OnFrameBegin(core::FrameData& frame)
@@ -275,7 +276,39 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 	testBucket.submit();
 #endif
 
+	{
+		// we need a buffer for the depth.
+	//	render::IPixelBuffer* pDepthStencil = pRender_->createPixelBuffer("$depth_buffer", Vec2i(1680, 1050),
+	//		texture::Texturefmt::R24G8_TYPELESS, render::PixelBufferType::DEPTH);
 
+
+		XCamera cam;
+		XViewPort viewPort = frame.view.viewport;
+
+		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 8096 * 12);
+		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+		render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, cam, viewPort);
+		
+		geoBucket.appendRenderTarget(pRender->getCurBackBuffer());
+		geoBucket.setDepthStencil(pDepthStencil, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
+
+		if (pCBufMan_->update(frame, false))
+		{
+			render::Commands::Nop* pNop = geoBucket.addCommand<render::Commands::Nop>(0, 0);
+
+			pCBufMan_->updatePerFrameCBs(geoBucket, pNop);
+		}
+
+	//	pCBufMan_->update(frame, false);
+
+		level_.dispatchJobs(frame, geoBucket);
+
+
+		geoBucket.sort();
+
+		pRender->submitCommandPackets(geoBucket);
+
+	}
 
 	// ok so lets dump out the primative context.
 	// I will need to have some sort of known time that it's 
@@ -294,8 +327,14 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		if (!context.isEmpty())
 		{
 			const auto& elems = context.getUnsortedBuffer();
+			const auto& objBufs = context.getShapeArrayBuffers();
 
 			totalElems += elems.size();
+
+			for (auto& objBuf : objBufs)
+			{
+				totalElems += objBuf.size();
+			}
 		}
 	}
 
@@ -305,28 +344,35 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		XCamera cam;
 		XViewPort viewPort = frame.view.viewport;
 
-
-		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 256);
+		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 1024);
 		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems + 512, cam, viewPort);
+		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, cam, viewPort);
 
 
 		primBucket.appendRenderTarget(pRender->getCurBackBuffer());
+		primBucket.setDepthStencil(pDepthStencil, render::DepthBindFlag::WRITE);
 
 		// the updating of dirty font buffers should happen regardless of
 		// prim drawing.
 		// unless only way to draw text is with prim humm.... !
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
 
-
-		pCBufMan_->updatePerFrameCBs(primBucket);
 #if 1
-#if 0
+#if 1
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 		{
 			auto& context = primContexts_[i];
 			if (!context.isEmpty())
 			{
+				const bool is2d = context.getMode() == IPrimativeContext::Mode::Mode2D;
+
+				if (pCBufMan_->update(frame, is2d))
+				{
+					render::Commands::Nop* pNop = primBucket.addCommand<render::Commands::Nop>(static_cast<uint32_t>(i * 500), 0);
+
+					pCBufMan_->updatePerFrameCBs(primBucket, pNop);
+				}
+
 				// create a command(s) to update the VB data.
 				context.appendDirtyBuffers(primBucket);
 
@@ -362,11 +408,50 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 					// lets just get it functional and see what is causing most of the delays.
 					const auto* pTech = pMaterialManager_->getTechForMaterial(pMat, tech, IPrimativeContext::VERTEX_FMT);
 
-					const auto stateHandle = pTech->stateHandle;
+					const auto* pPerm = pTech->pPerm;
+					const auto stateHandle = pPerm->stateHandle;
 					const auto* pVariableState = pTech->pVariableState;
 					auto variableStateSize = pVariableState->getStateSize();
 
-					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>(x + 10), variableStateSize);
+					// we must update cb's BEFORE adding a draw command.
+					if (variableStateSize)
+					{
+#if 0
+						const auto numCBs = pTech->pVariableState->getNumCBs();
+						if (numCBs)
+						{
+							const auto* pCBHandles = pTech->pVariableState->getCBs();
+							const auto& cbLinks = pPerm->pShaderPerm->getCbufferLinks();
+
+							for (int8_t j = 0; j < numCBs; j++)
+							{
+								auto& cbLink = cbLinks[j];
+								auto& cb = *cbLink.pCBufer;
+
+								if (!cb.requireManualUpdate())
+								{
+									// might as well provide intial data.
+									if (pCBufMan_->autoUpdateBuffer(cb))
+									{
+										auto* pCBufUpdate = primBucket.addCommand<render::Commands::CopyConstantBufferData>(
+											static_cast<uint32_t>((i * 500) + x + 1 + j),
+											cb.getBindSize()
+											);
+
+										char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pCBufUpdate);
+										std::memcpy(pAuxData, cb.getCpuData().data(), cb.getBindSize());
+
+										pCBufUpdate->constantBuffer = pCBHandles[j];
+										pCBufUpdate->pData = pAuxData; // cb.getCpuData().data();
+										pCBufUpdate->size = cb.getBindSize();
+									}
+								}
+							}
+						}
+#endif
+					}
+
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>((i * 500) + x + 10), variableStateSize);
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
 					pDraw->stateHandle = stateHandle;
@@ -750,6 +835,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 
 #endif
 
+		//primBucket.sort();
 		primBucket.sort();
 
 		pRender->submitCommandPackets(primBucket);
