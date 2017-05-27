@@ -171,7 +171,7 @@ private:
 	bool InitNet(const SCoreInitParams &startupParams);
 	
 	
-	void registerVars(void);
+	void registerVars(const SCoreInitParams& initParams);
 	void registerCmds(void);
 
 	void AddIgnoredHotReloadExtensions(void);

@@ -388,8 +388,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->registerVars();
 		env_.pConsole->registerCmds();
 
-		// register system vars to the console.
-		registerVars();
+		// register commands
 		registerCmds();
 	}
 	else
@@ -399,6 +398,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		// and i'm still able to detect var registers before core is init. :)
 		env_.pConsole = X_NEW( core::XConsoleNULL, g_coreArena, "NullConsole");
 	}
+
+	// we always register the vars even if console null.
+	registerVars(startupParams);
 
 	if (!env_.pConsole->init(this, startupParams.basicConsole()))
 	{
@@ -1020,22 +1022,25 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
 
 
-void XCore::registerVars(void)
+void XCore::registerVars(const SCoreInitParams& initParams)
 {
 	vars_.registerVars();
 
-	core::ConsoleVarFunc del;
+	if (!initParams.isCoreOnly() || initParams.basicConsole())
+	{
+		core::ConsoleVarFunc del;
 
-	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
-	vars_.getWinPosX()->SetOnChangeCallback(del);
-	vars_.getWinPosY()->SetOnChangeCallback(del);
+		del.Bind<XCore, &XCore::WindowPosVarChange>(this);
+		vars_.getWinPosX()->SetOnChangeCallback(del);
+		vars_.getWinPosY()->SetOnChangeCallback(del);
 
-	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
-	vars_.getWinWidth()->SetOnChangeCallback(del);
-	vars_.getWinHeight()->SetOnChangeCallback(del);
+		del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
+		vars_.getWinWidth()->SetOnChangeCallback(del);
+		vars_.getWinHeight()->SetOnChangeCallback(del);
 
-	del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
-	vars_.getWinCustomFrame()->SetOnChangeCallback(del);
+		del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
+		vars_.getWinCustomFrame()->SetOnChangeCallback(del);
+	}
 }
 
 void XCore::registerCmds(void)
