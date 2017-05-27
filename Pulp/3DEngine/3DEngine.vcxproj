@@ -463,6 +463,7 @@
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
     <ClInclude Include="Util\Config.h" />
+    <ClInclude Include="Vars\LevelVars.h" />
     <ClInclude Include="Vars\TextureVars.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
@@ -504,6 +505,7 @@
     </ClCompile>
     <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
+    <ClCompile Include="Vars\LevelVars.cpp" />
     <ClCompile Include="Vars\TextureVars.cpp" />
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
@@ -517,6 +519,7 @@
     <None Include="Model\RenderMesh.inl" />
     <None Include="Model\XModel.inl" />
     <None Include="Texture\Texture.inl" />
+    <None Include="Vars\LevelVars.inl" />
     <None Include="Vars\TextureVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
