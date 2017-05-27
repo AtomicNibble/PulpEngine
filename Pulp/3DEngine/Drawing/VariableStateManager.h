@@ -3,6 +3,7 @@
 #include <IShader.h>
 
 
+
 X_NAMESPACE_DECLARE(render,
 	namespace Commands
 	{

@@ -196,7 +196,7 @@ XModel* XModelManager::loadModelSync(const char* pModelName)
 			releaseModel(pModelRes);
 			return nullptr;
 		}
-		pModelRes->AssignDefault();
+		pModelRes->AssignDefault(getDefaultModel());
 		X_WARNING("ModelManager", "Failed to load model: \"%s\"", pModelName);
 	}
 	else

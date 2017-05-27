@@ -8,14 +8,18 @@
 #include <ITimer.h>
 
 #include <Threading\JobSystem2.h>
-
 #include <Memory\MemCursor.h>
 #include <Math\XWinding.h>
+
+#include "Material\MaterialManager.h"
 #include "Drawing\PrimativeContext.h"
+#include "Drawing\CBufferManager.h"
 
 #include <CmdBucket.h>
+#include <CBuffer.h>
 
 #include <queue>
+
 
 X_NAMESPACE_BEGIN(level)
 
@@ -711,7 +715,8 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 		const model::SubMeshHeader* pSubMesh = mesh.subMeshHeads[subIdx];
 
 		engine::Material* pMat = pSubMesh->pMat;
-		engine::MaterialTech* pTech = pMaterialManager_->getTechForMaterial(pMat, tech, render::shader::VertexFormat::P3F_T2F_C4B);
+		engine::MaterialTech* pTech = engine::gEngEnv.pMaterialMan_->getTechForMaterial(pMat, tech, render::shader::VertexFormat::P3F_T4F_C4B_N3F, 
+			engine::PermatationFlags::VertStreams);
 
 		if (!pTech) {
 			continue;

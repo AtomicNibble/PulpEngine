@@ -4,24 +4,24 @@
 #define _X_RENDER_SYS_H_
 
 #include "I3DEngine.h"
-#include "EngineBase.h"
 #include "Level\Level.h"
 
 #include <IModel.h>
 #include <IRenderMesh.h>
 
-#include "Gui\GuiManger.h"
-
 #include "Drawing\PrimativeContext.h"
+
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs;
+)
 
 X_NAMESPACE_BEGIN(engine)
 
-
 X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
+class TextureManager;
 
-
-class X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReload
+class X3DEngine : public I3DEngine, public core::IXHotReload
 {
 public:
 	X3DEngine(core::MemoryArenaBase* arena);
@@ -57,13 +57,20 @@ private:
 	void Command_DevMap(core::IConsoleCmdArgs* Cmd);
 
 private:
-	//~
-	gui::XGuiManager guisMan_;
+	XMaterialManager* pMaterialManager_;
+	TextureManager* pTextureManager_;
+	model::XModelManager* pModelManager_;
 
-	level::Level level_;
+	gui::XGuiManager* pGuiManger_;
 
+	CBufferManager* pCBufMan_;
+	VariableStateManager* pVariableStateMan_;
+
+	// ---
 	PrimativeContextSharedResources primResources_;
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
+	
+	level::Level level_;
 };
 
 

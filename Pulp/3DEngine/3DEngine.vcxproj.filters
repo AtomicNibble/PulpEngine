@@ -102,9 +102,6 @@
     <ClInclude Include="X3DEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="EngineBase.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -146,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="Texture\Texture.h">
       <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineEnv.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

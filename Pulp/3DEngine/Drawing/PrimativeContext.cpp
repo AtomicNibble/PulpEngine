@@ -11,6 +11,7 @@
 
 #include "CmdBucket.h"
 #include "VariableStateManager.h"
+#include "Material\MaterialManager.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -337,12 +338,11 @@ PrimativeContextSharedResources::PrimativeContextSharedResources() :
 }
 
 
-bool PrimativeContextSharedResources::init(render::IRender* pRender)
+bool PrimativeContextSharedResources::init(render::IRender* pRender, XMaterialManager* pMatMan)
 {
 	X_ASSERT_NOT_NULL(pRender);
-	X_ASSERT_NOT_NULL(pMaterialManager_);
 
-	if (!loadMaterials()) {
+	if (!loadMaterials(pMatMan)) {
 		return false;
 	}
 	if (!createShapeBuffers(pRender)) {
@@ -359,9 +359,9 @@ PrimativeContextSharedResources::InstancedPageArr& PrimativeContextSharedResourc
 }
 
 
-bool PrimativeContextSharedResources::loadMaterials(void)
+bool PrimativeContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
 {
-	auto loadMaterials = [](PrimMaterialArr& primMaterials, const char* pSuffix) -> bool
+	auto loadMaterials = [pMatMan](PrimMaterialArr& primMaterials, const char* pSuffix) -> bool
 	{
 		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH, char> matName;
 
@@ -373,7 +373,7 @@ bool PrimativeContextSharedResources::loadMaterials(void)
 			matName.appendFmt("code%c$%s%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType), pSuffix);
 			matName.toLower();
 
-			Material* pMat = pMaterialManager_->loadMaterial(matName.c_str());
+			Material* pMat = pMatMan->loadMaterial(matName.c_str());
 
 			// we still assign even tho may be default so it get's cleaned up.
 			primMaterials[primType] = pMat;
@@ -479,7 +479,7 @@ bool PrimativeContextSharedResources::createShapeBuffers(render::IRender* pRende
 	return true;
 }
 
-void PrimativeContextSharedResources::releaseResources(render::IRender* pRender)
+void PrimativeContextSharedResources::releaseResources(render::IRender* pRender, XMaterialManager* pMatMan)
 {
 	// shapes.
 	for (auto& shape : shapes_)
@@ -506,11 +506,11 @@ void PrimativeContextSharedResources::releaseResources(render::IRender* pRender)
 	}
 
 	// materials
-	auto releaseMaterials = [](PrimMaterialArr& primMaterials) {
+	auto releaseMaterials = [pMatMan](PrimMaterialArr& primMaterials) {
 		for (auto& pMat : primMaterials)
 		{
 			if (pMat) {
-				pMaterialManager_->releaseMaterial(pMat);
+				pMatMan->releaseMaterial(pMat);
 			}
 		}
 
@@ -780,7 +780,7 @@ PrimativeContext::VertexPage& PrimativeContext::getPage(size_t requiredVerts)
 	if(!newPage.isVbValid()) {
 		// virgin page, need a good slapping..
 		// renderSys support creating vertexBuffers in parralel from multiple threads so this is fine.
-		newPage.createVB(pRender_);
+		newPage.createVB(gEnv->pRender);
 	}
 
 	return newPage;

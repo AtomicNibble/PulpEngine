@@ -3,7 +3,6 @@
 #ifndef X_GUI_H_
 #define X_GUI_H_
 
-#include "EngineBase.h"
 
 #include <IGui.h>
 #include <IInput.h>
@@ -24,11 +23,10 @@ namespace gui
 
 	// This is a interface container.
 	// it has a baser menu which may have multiple childs menus.
-	class XGui : public IGui,
-		public engine::XEngineBase
+	class XGui : public IGui
 	{
 	public:
-		XGui();
+		XGui(XGuiManager& guiMan);
 		~XGui() X_FINAL;
 
 		const char*	getName(void) const X_FINAL;
@@ -64,6 +62,7 @@ namespace gui
 		bool isDeskTopValid(void) const;
 
 	private:
+		XGuiManager& guiMan_;
 		core::string name_;
 		Vec2f cursorPos_;
 

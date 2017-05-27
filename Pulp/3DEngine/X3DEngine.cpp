@@ -2,53 +2,43 @@
 #include "X3DEngine.h"
 
 #include <ITimer.h>
-#include <IMaterial.h>
 #include <IRender.h>
 #include <IConsole.h>
 #include <IGui.h>
 #include <IPhysics.h>
+#include <CBuffer.h>
 #include <IFrameData.h>
 #include <IFont.h>
 
+#include <Time\StopWatch.h>
+#include <String\StringHash.h>
+#include <Random\XorShift.h>
+
 #include "Material\MaterialManager.h"
+#include "Texture\TextureManager.h"
 #include "Model\ModelManager.h"
+#include "Gui\GuiManger.h"
 
 #include "CmdBucket.h"
 
 #include "Drawing\CBufferManager.h"
 #include "Drawing\VariableStateManager.h"
 
-#include <Time\StopWatch.h>
-#include <String\StringHash.h>
-
 
 X_NAMESPACE_BEGIN(engine)
 
-ICore* X3DEngine::pCore_ = nullptr;
-
-core::ITimer* X3DEngine::pTimer_ = nullptr;
-core::IFileSys* X3DEngine::pFileSys_ = nullptr;
-core::IConsole* X3DEngine::pConsole_ = nullptr;
-render::IRender* X3DEngine::pRender_ = nullptr;
-physics::IPhysics* X3DEngine::pPhysics_ = nullptr;
-
-// 3d
-engine::I3DEngine* X3DEngine::p3DEngine_ = nullptr;
-engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
-model::XModelManager* X3DEngine::pModelManager_ = nullptr;
-
-gui::XGuiManager* X3DEngine::pGuiManger_ = nullptr;
-
-CBufferManager* X3DEngine::pCBufMan_ = nullptr;
-
-VariableStateManager* X3DEngine::pVariableStateMan_ = nullptr;
-
+EngineEnv gEngEnv;
 
 //------------------------------------------
-engine::gui::IGui* pGui = nullptr;
 
 
 X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
+	pMaterialManager_(nullptr),
+	pTextureManager_(nullptr),
+	pModelManager_(nullptr),
+	pGuiManger_(nullptr),
+	pCBufMan_(nullptr),
+	pVariableStateMan_(nullptr),
 	primContexts_{ 
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // physics
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // misc3d
@@ -67,12 +57,13 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 
 X3DEngine::~X3DEngine()
 {
-	p3DEngine_ = nullptr;
+	
 }
 
 
 void X3DEngine::registerVars(void)
 {
+	level::Level::registerVars();
 
 }
 
@@ -96,46 +87,51 @@ bool X3DEngine::init(void)
 	X_ASSERT_NOT_NULL(gEnv->pRender);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 	X_ASSERT_NOT_NULL(gEnv->pPhysics);
-	X_ASSERT(p3DEngine_ == nullptr, "Multiple 3d engine instaces")();
 
-	pCore_ = gEnv->pCore;
-	pTimer_ = gEnv->pTimer;
-	pFileSys_ = gEnv->pFileSys;
-	pConsole_ = gEnv->pConsole;
-	pRender_ = gEnv->pRender;
-	pPhysics_ = gEnv->pPhysics;
-	p3DEngine_ = this;
+	auto* pRender = gEnv->pRender;
 
 	// register some file types.
 	gEnv->pHotReload->addfileType(this, "level");
 	gEnv->pHotReload->addfileType(this, "map");
 
-	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender_);
+	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender);
 	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
 
-	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_);
+	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
+	pTextureManager_ = X_NEW(engine::TextureManager, g_3dEngineArena, "TextureManager")(g_3dEngineArena);
+	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
+	
+	pGuiManger_ = X_NEW(gui::XGuiManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
+	
+
 	pMaterialManager_->registerCmds();
 	pMaterialManager_->registerVars();
+	pTextureManager_->registerCmds();
+	pTextureManager_->registerVars();
+	pModelManager_->registerCmds();
+	pModelManager_->registerVars();
+
 
 	if (!pMaterialManager_->init()) {
 		return false;
 	}
-
-	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
-	pModelManager_->registerCmds();
-	pModelManager_->registerVars();
-	
+	if (!pTextureManager_->init()) {
+		return false;
+	}
 	if (!pModelManager_->init()) {
 		return false;
 	}
-
-	pGuiManger_ = &guisMan_;
-	if (!guisMan_.Init()) {
+	if (!pGuiManger_->Init()) {
 		return false;
 	}
 
+	gEngEnv.pMaterialMan_ = pMaterialManager_;
+	gEngEnv.pTextureMan_ = pTextureManager_;
+	gEngEnv.pModelMan_ = pModelManager_;
+	gEngEnv.p3DEngine_ = this;
+
 	// init share prim contex resources.
-	if (!primResources_.init(pRender_)) {
+	if (!primResources_.init(pRender, pMaterialManager_)) {
 		X_ERROR("3DEngine", "Failed to init prim resources");
 		return false;
 	}
@@ -162,15 +158,15 @@ bool X3DEngine::init(void)
 	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Player, false);
 	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Ai, false);
 	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
+#endif
 
-
-
-	level::Level::registerVars();
 
 	if (!level_.init()) {
 		X_ERROR("3DEngine", "Failed to init level");
 		return false;
 	}
+
+	pDepthStencil = pRender->createDepthBuffer("$depth_buffer", Vec2i(1680, 1050));
 
 	return true;
 }
@@ -182,14 +178,19 @@ void X3DEngine::shutDown(void)
 	gEnv->pHotReload->addfileType(nullptr, "level");
 	gEnv->pHotReload->addfileType(nullptr, "map");
 
-	guisMan_.Shutdown();
+	auto* pRender = gEnv->pRender;
 
-	for (auto& primcon : primContexts_)
-	{
-		primcon.freePages(pRender_);
+	for (auto& primcon : primContexts_) {
+		primcon.freePages(pRender);
 	}
 
-	primResources_.releaseResources(pRender_);
+	primResources_.releaseResources(pRender, pMaterialManager_);
+
+	if (pGuiManger_) {
+		pGuiManger_->Shutdown();
+		X_DELETE(pGuiManger_, g_3dEngineArena);
+	}
+
 	if (pModelManager_) {
 		pModelManager_->shutDown();
 		X_DELETE(pModelManager_, g_3dEngineArena);
@@ -214,7 +215,7 @@ void X3DEngine::shutDown(void)
 
 void X3DEngine::release(void)
 {
-	X_DELETE(this,g_3dEngineArena);
+	X_DELETE(this, g_3dEngineArena);
 }
 
 void X3DEngine::Update(core::FrameData& frame)
@@ -236,16 +237,12 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::profiler::SubSys::ENGINE3D);
 
-	level_.dispatchJobs(frame);
 //	if (level_.canRender()) {
 //		level_.render();
 //	}
 
-	// draw me some gui baby
-	if (pGui) {
-	//	pRender_->setGUIShader();
-	//	pGui ->Redraw();
-	}
+	auto* pRender = gEnv->pRender;
+
 
 #if 0
 	XCamera cam;
@@ -313,7 +310,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems + 512, cam, viewPort);
 
 
-		primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
+		primBucket.appendRenderTarget(pRender->getCurBackBuffer());
 
 		// the updating of dirty font buffers should happen regardless of
 		// prim drawing.
@@ -422,7 +419,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 						size_t curInstPage = 0;
 
 						if (!instPages[curInstPage].isVbValid()) {
-							instPages[curInstPage].createVB(pRender_);
+							instPages[curInstPage].createVB(pRender);
 						}
 
 						for (size_t x = 0; x < objShapeLodBufs.size(); x++)
@@ -451,7 +448,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 									// make page buffer if required.
 									auto& instPage = instPages[curInstPage];
 									if (!instPage.isVbValid()) {
-										instPage.createVB(pRender_);
+										instPage.createVB(pRender);
 									}
 
 									curPageSpace = maxPerPage;
@@ -754,8 +751,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 
 		primBucket.sort();
 
-		pRender_->submitCommandPackets(primBucket);
-
+		pRender->submitCommandPackets(primBucket);
 	}
 
 	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)

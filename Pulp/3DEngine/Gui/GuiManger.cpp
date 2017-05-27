@@ -1,13 +1,10 @@
 #include "stdafx.h"
 #include "GuiManger.h"
 
-#include "EngineBase.h"
-
 #include <IConsole.h>
 #include <IRender.h>
 
-#include <algorithm>
-
+#include "Material\MaterialManager.h"
 
 X_NAMESPACE_BEGIN(engine)                                                                                                                                        
 
@@ -22,32 +19,20 @@ namespace gui
 		{
 			using namespace std;
 
-			std::sort(vars.begin(), vars.end(),
-				[](XGui* a, XGui* b) {
-				return ::strcmp(a->getName(), b->getName()) < 0;
-			}
+			std::sort(vars.begin(), vars.end(), [](XGui* a, XGui* b) {
+					return ::strcmp(a->getName(), b->getName()) < 0;
+				}
 			);
 		}
 
 
 	}
 
-	void Command_ListUis(core::IConsoleCmdArgs* pArgs)
-	{
-		// we support wildcards
-		const char* pSearchString = nullptr;
-		if (pArgs->GetArgCount() > 1)
-		{
-			pSearchString = pArgs->GetArg(1);
-		}
 
-
-		engine::XEngineBase::getGuiManager()->listGuis(pSearchString);
-	}
-
-
-	XGuiManager::XGuiManager() :
-		guis_(g_3dEngineArena),
+	XGuiManager::XGuiManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan) :
+		arena_(arena),
+		pMatMan_(pMatMan),
+		guis_(arena),
 		pCursorArrow_(nullptr)
 	{
 		screenRect_.set(0, 0, 800, 600);
@@ -71,8 +56,8 @@ namespace gui
 		X_ASSERT_NOT_NULL(gEnv->pRender);
 		X_LOG0("Gui", "Starting GUI System");
 
-		ADD_COMMAND("uiList", Command_ListUis, core::VarFlags::SYSTEM, "List the loaded ui's <search-filter>");
-		ADD_COMMAND("listUi", Command_ListUis, core::VarFlags::SYSTEM, "List the loaded ui's <search-filter>");
+		ADD_COMMAND_MEMBER("uiList", this, XGuiManager, &XGuiManager::Command_ListUis, core::VarFlags::SYSTEM, "List the loaded ui's <search-filter>");
+		ADD_COMMAND_MEMBER("listUi", this, XGuiManager, &XGuiManager::Command_ListUis, core::VarFlags::SYSTEM, "List the loaded ui's <search-filter>");
 
 		ADD_CVAR_REF("ui_DrawDebug", var_showDebug_, 1, 0, 1, core::VarFlag::SYSTEM, "draw debug info over gui");
 
@@ -82,7 +67,7 @@ namespace gui
 		gEnv->pInput->AddEventListener(this);
 
 		// what you pointing at? rude..
-		pCursorArrow_ = pMaterialManager_->loadMaterial("ui/cursor");
+		pCursorArrow_ = pMatMan_->loadMaterial("ui/cursor");
 		if (!pCursorArrow_) {
 			// if we load a material how we force texture loads :|
 			X_FATAL("Gui", "failed to load main cursor");
@@ -109,8 +94,8 @@ namespace gui
 
 		gEnv->pInput->RemoveEventListener(this);
 
-		if (pMaterialManager_ && pCursorArrow_) {
-			pMaterialManager_->releaseMaterial(pCursorArrow_);
+		if (pMatMan_ && pCursorArrow_) {
+			pMatMan_->releaseMaterial(pCursorArrow_);
 		}
 	}
 
@@ -125,14 +110,14 @@ namespace gui
 		}
 
 		// try load it :|
-		pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
+		pGui = X_NEW(XGui, arena_, "GuiInterface")(*this);
 
 		if (pGui->InitFromFile(name)) {
 			guis_.append(pGui);
 			return pGui;
 		}
 
-		X_DELETE(pGui, g_3dEngineArena);
+		X_DELETE(pGui, arena_);
 		return nullptr;
 	}
 
@@ -250,6 +235,20 @@ namespace gui
 		return false;
 	}
 	// ~IInputEventListner
+
+
+	void XGuiManager::Command_ListUis(core::IConsoleCmdArgs* pArgs)
+	{
+		// we support wildcards
+		const char* pSearchString = nullptr;
+		if (pArgs->GetArgCount() > 1)
+		{
+			pSearchString = pArgs->GetArg(1);
+		}
+
+		listGuis(pSearchString);
+	}
+
 
 } // namespace gui
 

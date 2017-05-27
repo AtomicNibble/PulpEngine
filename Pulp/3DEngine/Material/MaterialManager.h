@@ -4,11 +4,6 @@
 #define X_3D_MATERIAL_MAN_H_
 
 #include <String\StrRef.h>
-#include <IDirectoryWatcher.h>
-
-#include "EngineBase.h"
-
-#include <../../tools/MaterialLib/MatLib.h>
 
 #include <Assets\AssertContainer.h>
 
@@ -32,14 +27,13 @@ class Material;
 class XMaterialManager : 
 	public IMaterialManager, 
 	public ICoreEventListener, 
-	public XEngineBase,
 	public core::IXHotReload
 {
 	typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
 	typedef MaterialContainer::Resource MaterialResource;
 
 public:
-	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan);
+	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan);
 	virtual ~XMaterialManager();
 
 	bool init(void);
@@ -94,6 +88,7 @@ private:
 
 private:
 	core::MemoryArenaBase* arena_;
+	CBufferManager& cBufMan_;
 	VariableStateManager& vsMan_;
 	TechDefStateManager* pTechDefMan_;
 

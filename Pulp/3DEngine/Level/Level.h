@@ -3,7 +3,6 @@
 #ifndef X_BSP_LOADER_H_
 #define X_BSP_LOADER_H_
 
-#include "EngineBase.h"
 
 #include <Ilevel.h>
 #include <Time\TimeVal.h>
@@ -151,7 +150,7 @@ public:
 };
 
 
-class Level : public engine::XEngineBase
+class Level
 {
 	typedef core::Array<Area> AreaArr;
 	typedef core::Array<Area*> AreaPtrArr;

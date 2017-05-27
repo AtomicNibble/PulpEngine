@@ -5,6 +5,7 @@
 
 #include "Vars\TextureVars.h"
 
+
 X_NAMESPACE_BEGIN(engine)
 
 class Texture;
@@ -28,6 +29,11 @@ public:
 	void registerVars(void);
 
 	Texture* forName(const char* pName, texture::TextureFlags flags);
+
+private:
+	bool loadFromFile(texture::XTextureFile& imgFile, const char* pPath);
+	bool processImgFile(Texture* pTex, texture::XTextureFile& imgFile);
+
 
 private:
 	// IXHotReload

@@ -3,7 +3,6 @@
 #ifndef X_GUI_WINDOW_H_
 #define X_GUI_WINDOW_H_
 
-#include "EngineBase.h"
 
 #include <IGui.h>
 #include <ITimer.h>
@@ -62,7 +61,7 @@ namespace gui
 		VAR_INT,
 		VAR_BOOL,
 		COND
-		);
+	);
 
 	struct xOpt
 	{
@@ -114,10 +113,12 @@ namespace gui
 
 	class XGui;
 	class XWindowSimple;
-	class XWindow : public engine::XEngineBase
+	class XWindow 
 	{
 	public:
 		typedef Flags<WindowFlag> WindowFlags;
+		typedef core::Array<XWindow*> Children;
+		typedef Children::Iterator Childit;
 
 		X_DECLARE_ENUM(ScriptFunction) (
 			MOUSE_ENTER,
@@ -127,7 +128,7 @@ namespace gui
 			OPEN,
 			CLOSE,
 			ACTION // when you click it baby
-			);
+		);
 
 		static const char*	s_ScriptNames[ScriptFunction::ENUM_COUNT];
 
@@ -250,8 +251,7 @@ namespace gui
 		bool RunScript(ScriptFunction::Enum func);
 
 	protected:
-		typedef core::Array<XWindow*> Children;
-		typedef Children::Iterator Childit;
+
 
 		Rectf rectDraw_;
 		Rectf rectClient_;

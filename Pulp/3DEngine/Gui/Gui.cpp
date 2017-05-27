@@ -23,10 +23,12 @@ using namespace input;
 namespace gui
 {
 
-	XGui::XGui() :
-		pDesktop_(nullptr)
+	XGui::XGui(XGuiManager& guiMan) :
+		guiMan_(guiMan),
+		pDesktop_(nullptr),
+		sourceCrc32_(0)
 	{
-		sourceCrc32_ = 0;
+
 	}
 
 	XGui::~XGui()
@@ -49,8 +51,8 @@ namespace gui
 		// so that multiple gui's can share the same pointer.
 		// or maybe Gui should own it and it's just ref counted.
 
-		auto* pCursorArrow = getGuiManager()->GetCursor();
-		render::IRender* pRender = getRender();
+		auto* pCursorArrow = guiMan_.GetCursor();
+		auto* pRender = gEnv->pRender;
 
 		core::StackString<64> posStr;
 		posStr.appendFmt("Pos: %g x %g", cursorPos_.x, cursorPos_.y);

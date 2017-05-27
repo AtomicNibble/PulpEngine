@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Level.h"
-#include "Model\ModelManager.h"
 
 #include <IFileSys.h>
 #include <IRender.h>
@@ -8,10 +7,12 @@
 #include <ITimer.h>
 
 #include <Memory\MemCursor.h>
-
 #include <Math\XWinding.h>
-
 #include <Threading\JobSystem2.h>
+
+#include "Model\ModelManager.h"
+#include "Material\MaterialManager.h"
+
 
 X_NAMESPACE_BEGIN(level)
 
@@ -286,7 +287,7 @@ bool Level::ProcessData(void)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 
-				pSubMesh->pMat = pMaterialManager_->loadMaterial(pSubMesh->materialName);
+				pSubMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(pSubMesh->materialName);
 			}
 
 			// set the mesh head pointers.
@@ -304,7 +305,7 @@ bool Level::ProcessData(void)
 
 			// upload to gpu now.
 			// eventually I might delay load them etc.
-			area.renderMesh.createRenderBuffers(pRender_, *area.pMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F);
+			area.renderMesh.createRenderBuffers(gEnv->pRender, *area.pMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F);
 		}
 
 		if (!cursor.isEof()) {
@@ -472,7 +473,7 @@ bool Level::ProcessData(void)
 
 				// will it help the broadphase if i make these static actors not all have idenity trans
 				// but instead process everything so it's not in wordspace but 'area space'
-				auto actor = pPhysics_->createStaticActor(trans);
+				auto actor = gEnv->pPhysics->createStaticActor(trans);
 
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::TriMesh]; t++)
 				{
@@ -485,8 +486,8 @@ bool Level::ProcessData(void)
 					file.read(data.data(), data.size());
 
 					// create the actor :O
-					auto triMeshHandle = pPhysics_->createTriangleMesh(data);
-					pPhysics_->addTriMesh(actor, triMeshHandle);
+					auto triMeshHandle = gEnv->pPhysics->createTriangleMesh(data);
+					gEnv->pPhysics->addTriMesh(actor, triMeshHandle);
 				}
 
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::HeightField]; t++)
@@ -500,8 +501,8 @@ bool Level::ProcessData(void)
 					file.read(data.data(), data.size());
 
 					// create the actor :O
-					auto hfHandle = pPhysics_->createHieghtField(data);
-					pPhysics_->addHieghtField(actor, hfHandle);
+					auto hfHandle = gEnv->pPhysics->createHieghtField(data);
+					gEnv->pPhysics->addHieghtField(actor, hfHandle);
 				}
 
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::Aabb]; t++)
@@ -509,7 +510,7 @@ bool Level::ProcessData(void)
 					AABB aabb;
 					file.readObj(aabb);
 
-					pPhysics_->addBox(actor, aabb);
+					gEnv->pPhysics->addBox(actor, aabb);
 				}
 
 
@@ -545,7 +546,7 @@ bool Level::ProcessData(void)
 				// models need to be loaded at some point.
 
 				const char* modelName = stringTable_.getString(sm.modelNameIdx);
-				model::XModel* pModel = getModelManager()->loadModel(modelName);
+				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(modelName);
 				
 		//		X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
 		//			sm.pos[0], sm.pos[1], sm.pos[2]);

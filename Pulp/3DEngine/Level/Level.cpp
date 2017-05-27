@@ -242,7 +242,7 @@ bool Level::init(void)
 {
 	// get a prim contex to draw all the level debug into :)
 	// cast to impl type, for potential de virtulisation..
-	pPrimContex_ = static_cast<engine::PrimativeContext*>(get3DEngine()->getPrimContext(engine::PrimContext::MISC3D));
+	pPrimContex_ = static_cast<engine::PrimativeContext*>(engine::gEngEnv.p3DEngine_->getPrimContext(engine::PrimContext::MISC3D));
 
 
 	return true;
@@ -251,12 +251,12 @@ bool Level::init(void)
 
 void Level::free(void)
 {
-	X_ASSERT_NOT_NULL(pRender_);
+	X_ASSERT_NOT_NULL(gEnv->pRender);
 
 	loaded_ = false;
 
 	for (auto& area : areas_) {
-		area.destoryRenderMesh(pRender_);
+		area.destoryRenderMesh(gEnv->pRender);
 	}
 
 	areas_.free();

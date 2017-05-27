@@ -1,7 +1,5 @@
 #pragma once
 
-#include "EngineBase.h"
-
 #include <IRenderCommands.h>
 #include "IPrimativeContext.h"
 
@@ -9,12 +7,13 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+class XMaterialManager;
 
 X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 // this stores resources that are shared between contex's.
 // like materials and shape meshes.
-X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) : public XEngineBase
+X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64) 
 {
 	static const int32_t SHAPES_NUM_LOD = IPrimativeContext::SHAPE_NUM_LOD;
 
@@ -79,8 +78,8 @@ public:
 public:
 	PrimativeContextSharedResources();
 
-	bool init(render::IRender* pRender);
-	void releaseResources(render::IRender* pRender);
+	bool init(render::IRender* pRender, XMaterialManager* pMatMan);
+	void releaseResources(render::IRender* pRender, XMaterialManager* pMatMan);
 
 	X_INLINE Material* getMaterial(PrimitiveType::Enum prim) const;
 	X_INLINE Material* getMaterialDepthTest(PrimitiveType::Enum prim) const;
@@ -90,7 +89,7 @@ public:
 	InstancedPageArr& getInstancePages(void);
 
 private:
-	bool loadMaterials(void);
+	bool loadMaterials(XMaterialManager* pMatMan);
 	bool createShapeBuffers(render::IRender* pRender);
 
 private:
@@ -113,7 +112,7 @@ private:
 };
 
 
-X_ALIGNED_SYMBOL(class PrimativeContext, 64) : public IPrimativeContext, public XEngineBase
+X_ALIGNED_SYMBOL(class PrimativeContext, 64) : public IPrimativeContext
 {
 public:
 	typedef core::PointerFlags<Material, 3> MaterialWithPageIdx;

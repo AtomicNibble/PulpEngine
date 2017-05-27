@@ -6,10 +6,17 @@
 
 #include <Math\XMatrixAlgo.h>
 
+#include <Memory\MemoryArena.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Memory\VirtualMem.h>
+
+#include <Containers\Array.h>
+
 #define IPRENDERSYS_EXPORTS
 
 #include <IMaterial.h>
-#include "Material\MaterialManager.h"
+#include <IDirectoryWatcher.h>
 
 
 // Img Lib
@@ -24,3 +31,6 @@ X_LINK_LIB("engine_MaterialLib");
 extern core::MemoryArenaBase* g_3dEngineArena;
 
 #include "Util\Config.h"
+
+
+#include "EngineEnv.h"

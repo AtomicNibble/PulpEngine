@@ -5,7 +5,6 @@
 
 #include <IModel.h>
 #include "Assets\AssertContainer.h"
-#include "EngineBase.h"
 
 #include "RenderMesh.h"
 // #include <IRenderMesh.h>
@@ -28,7 +27,7 @@ X_NAMESPACE_DECLARE(engine,
 X_NAMESPACE_BEGIN(model)
 
 
-class XModel : public engine::XEngineBase
+class XModel
 {
 	typedef core::string ModelName;
 
@@ -72,7 +71,7 @@ public:
 	const MeshHeader& getLodMeshHdr(size_t idx) const;
 	const SubMeshHeader* getMeshHead(size_t idx) const;
 
-	void AssignDefault(void);
+	void AssignDefault(XModel* pDefault);
 
 	bool LoadModelAsync(const char* name);
 	bool ReloadAsync(void);

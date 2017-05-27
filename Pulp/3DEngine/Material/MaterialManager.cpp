@@ -21,15 +21,15 @@ X_NAMESPACE_BEGIN(engine)
 using namespace render::shader;
 
 
-XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan) :
+XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan) :
 	arena_(arena),
 	pTechDefMan_(nullptr),
+	cBufMan_(cBufMan),
 	vsMan_(vsMan),
 	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u,X_ALIGN_OF(MaterialResource))),
 	pDefaultMtl_(nullptr)
 {
 	pTechDefMan_ = X_NEW(TechDefStateManager, arena, "TechDefStateManager")(arena);
-
 }
 
 XMaterialManager::~XMaterialManager()
@@ -479,7 +479,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 		{
 			auto* pCB = cbuffers[i];
 			X_ASSERT_NOT_NULL(pCB);
-			pCBHandles[i] = pCBufMan_->createCBuffer(*pCB);
+			pCBHandles[i] = cBufMan_.createCBuffer(*pCB);
 		}
 	}
 

@@ -2,15 +2,15 @@
 #include "XModel.h"
 #include "ModelManager.h"
 
-#include "IFileSys.h"
-#include "Memory\MemCursor.h"
 
+#include <Memory\MemCursor.h>
+#include <IFileSys.h>
 #include <IRender.h>
 #include <IConsole.h>
 #include <IShader.h>
-
 #include <Threading\JobSystem2.h>
 
+#include "Material\MaterialManager.h"
 #include "Drawing\PrimativeContext.h"
 
 X_NAMESPACE_BEGIN(model)
@@ -157,14 +157,14 @@ bool XModel::createRenderBuffersForLod(size_t idx)
 {
 	const auto& raw = lodInfo_[idx];
 
-	return renderMeshes_[idx].createRenderBuffers(pRender_, raw, hdr_.vertexFmt);
+	return renderMeshes_[idx].createRenderBuffers(gEnv->pRender, raw, hdr_.vertexFmt);
 }
 
 void XModel::releaseLodRenderBuffers(size_t idx)
 {
 	auto& renderInfo = renderMeshes_[idx];
 
-	renderInfo.releaseRenderBuffers(pRender_);
+	renderInfo.releaseRenderBuffers(gEnv->pRender);
 }
 
 bool XModel::canRenderLod(size_t idx) const
@@ -205,10 +205,8 @@ const SubMeshHeader* XModel::getMeshHead(size_t idx) const
 }
 
 
-void XModel::AssignDefault(void)
+void XModel::AssignDefault(XModel* pDefault)
 {
-	XModel* pDefault = static_cast<XModel*>(getModelManager()->getDefaultModel());
-
 	pTagNames_ = pDefault->pTagNames_;
 	pTagTree_ = pDefault->pTagTree_;
 	pBoneAngles_ = pDefault->pBoneAngles_;
@@ -286,7 +284,7 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBas
 
 			core::IoRequestClose close;
 			close.pFile = pFile;
-			pFileSys_->AddIoRequestToQue(close);
+			fileSys.AddIoRequestToQue(close);
 			return;
 		}
 
@@ -343,7 +341,7 @@ void XModel::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, co
 		read.pBuf = pModelData;
 		read.pFile = pFile;
 
-		pFileSys_->AddIoRequestToQue(read);
+		gEnv->pFileSys->AddIoRequestToQue(read);
 	}
 	else
 	{
@@ -351,7 +349,7 @@ void XModel::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, co
 
 		core::IoRequestClose close;
 		close.pFile = pFile;
-		pFileSys_->AddIoRequestToQue(close);
+		gEnv->pFileSys->AddIoRequestToQue(close);
 	}
 }
 
@@ -370,7 +368,7 @@ void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
 	core::IoRequestClose close;
 	close.pFile = pFile;
-	pFileSys_->AddIoRequestToQue(close);
+	gEnv->pFileSys->AddIoRequestToQue(close);
 
 	// temp, unassign the render meshes so new ones get made.
 	X_ASSERT_NOT_IMPLEMENTED();
@@ -379,7 +377,7 @@ void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
 bool XModel::LoadModelAsync(const char* name)
 {
-	AssignDefault();
+	// AssignDefault();
 
 	core::Path<char> path;
 	path /= "models";
@@ -396,7 +394,7 @@ bool XModel::LoadModelAsync(const char* name)
 	open.mode = core::fileMode::READ;
 	open.path = path;
 
-	pFileSys_->AddIoRequestToQue(open);
+	gEnv->pFileSys->AddIoRequestToQue(open);
 
 	return true;
 }
@@ -414,7 +412,7 @@ bool XModel::ReloadAsync(void)
 	open.mode = core::fileMode::READ;
 	open.path = path;
 
-	pFileSys_->AddIoRequestToQue(open);
+	gEnv->pFileSys->AddIoRequestToQue(open);
 	return true;
 }
 
@@ -680,7 +678,7 @@ void XModel::ProcessData(char* pData)
 	{
 		SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&pMeshHeads_[i]);
 
-		pMesh->pMat = getMaterialManager()->loadMaterial(pMesh->materialName);
+		pMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(pMesh->materialName);
 	}
 
 	// copy lod info activating the data.

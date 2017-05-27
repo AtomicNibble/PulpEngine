@@ -3,7 +3,6 @@
 #ifndef X_MODEL_MANAGER_H_
 #define X_MODEL_MANAGER_H_
 
-#include "EngineBase.h"
 #include <IModel.h>
 
 #include <Assets\AssertContainer.h>
@@ -18,7 +17,6 @@ X_NAMESPACE_BEGIN(model)
 class XModel;
 
 class XModelManager :
-	public engine::XEngineBase,
 	public core::IXHotReload
 {
 	typedef core::AssetContainer<XModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;

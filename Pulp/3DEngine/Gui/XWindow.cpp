@@ -9,6 +9,8 @@
 #include <IFont.h>
 
 #include "GuiManger.h"
+#include "Material\MaterialManager.h"
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -62,14 +64,14 @@ bool XWindow::s_registerIsTemporary[MAX_EXPRESSION_REGISTERS];
 
 
 XWindow::XWindow(XGui* pGui) :
-children_(g_3dEngineArena),
-drawWindows_(g_3dEngineArena),
-timeLineEvents_(g_3dEngineArena),
-transitions_(g_3dEngineArena),
-ops_(g_3dEngineArena),
-expressionRegisters_(g_3dEngineArena),
-init_(false),
-pGui_(pGui)
+	children_(g_3dEngineArena),
+	drawWindows_(g_3dEngineArena),
+	timeLineEvents_(g_3dEngineArena),
+	transitions_(g_3dEngineArena),
+	ops_(g_3dEngineArena),
+	expressionRegisters_(g_3dEngineArena),
+	init_(false),
+	pGui_(pGui)
 {
 	X_ASSERT_NOT_NULL(pGui);
 	init();
@@ -153,7 +155,7 @@ void XWindow::clear(void)
 
 	// release mat.
 	if (pBackgroundMat_) {
-		pMaterialManager_->releaseMaterial(pBackgroundMat_);
+		gEngEnv.pMaterialMan_->releaseMaterial(pBackgroundMat_);
 	}
 
 	init_ = false;
@@ -403,7 +405,7 @@ void XWindow::SetupFromState(void)
 	}
 
 	if (style_ == WindowStyle::SHADER) {
-		pBackgroundMat_ = pMaterialManager_->loadMaterial(background_.c_str());
+		pBackgroundMat_ = gEngEnv.pMaterialMan_->loadMaterial(background_.c_str());
 	
 #if 0
 		engine::MaterialCat::Enum cat = pBackgroundMat_->getType();
@@ -1310,9 +1312,9 @@ void XWindow::reDraw(engine::IPrimativeContext* pDrawCon)
 		// check if the dvar has changed.
 		if (!core::strUtil::IsEqual(pBackgroundMat_->getName(),background_.getName()))
 		{
-			pMaterialManager_->releaseMaterial(pBackgroundMat_);
+			gEngEnv.pMaterialMan_->releaseMaterial(pBackgroundMat_);
 			// this might cause a material to be loaded from disk.
-			pBackgroundMat_ = getMaterialManager()->loadMaterial(background_.c_str());
+			pBackgroundMat_ = gEngEnv.pMaterialMan_->loadMaterial(background_.c_str());
 		}
 	}
 
@@ -1324,7 +1326,7 @@ void XWindow::reDraw(engine::IPrimativeContext* pDrawCon)
 
 	draw(pDrawCon, time, rectClient_.x1, rectClient_.y1);
 
-	if (getGuiManager()->ShowDeubug()) {
+	if (gEngEnv.pGuiMan_->ShowDeubug()) {
 		drawDebug(pDrawCon);
 	}
 
@@ -1465,8 +1467,8 @@ void XWindow::calcClientRect(void)
 {
 	const Rectf& rect = rect_;
 
-	const float width = static_cast<float>(pRender_->getDisplayRes().x);
-	const float height = static_cast<float>(pRender_->getDisplayRes().y);
+	const float width = static_cast<float>(gEnv->pRender->getDisplayRes().x);
+	const float height = static_cast<float>(gEnv->pRender->getDisplayRes().y);
 
 	// 800x600 virtual.
 	const float scale_x = width / 800;
