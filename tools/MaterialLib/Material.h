@@ -191,10 +191,6 @@ protected:
 	// if AUTO_TILING the textures dim's are used.
 	Vec2<int16_t> tiling_;
 
-	// 4
-	uint8_t numTextures_;
-	uint8_t __pad[3];
-
 	TechDefState* pTechDefState_;
 
 	TechArr techs_;

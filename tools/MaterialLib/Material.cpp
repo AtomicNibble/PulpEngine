@@ -17,7 +17,6 @@ void Material::assignProps(const Material& oth)
 	cat_ = oth.cat_;
 	
 	tiling_ = oth.tiling_;
-	numTextures_ = oth.numTextures_;
 	pTechDefState_ = oth.pTechDefState_;
 	techs_ = oth.techs_;
 	textures_ = oth.textures_;
