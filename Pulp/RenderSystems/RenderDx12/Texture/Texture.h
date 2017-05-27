@@ -63,7 +63,7 @@ class TextureManager;
 		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
 
 		X_INLINE const int32_t getID(void) const;
-		X_INLINE void setID(TexID id);
+		X_INLINE void setID(int32_t id);
 
 		X_INLINE render::GpuResource& getGpuResource(void);
 

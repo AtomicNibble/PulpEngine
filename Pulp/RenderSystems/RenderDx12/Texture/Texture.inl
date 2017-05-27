@@ -112,7 +112,7 @@ X_NAMESPACE_BEGIN(texture)
 		return id_;
 	}
 
-	X_INLINE void Texture::setID(TexID id)
+	X_INLINE void Texture::setID(int32_t id)
 	{
 		id_ = id;
 	}
