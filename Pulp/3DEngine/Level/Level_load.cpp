@@ -589,8 +589,34 @@ bool Level::ProcessData(void)
 	// 
 	CommonChildrenArea_r(&areaNodes_[0]);
 
-	// add the physics scene to the simulation.
-	pPhysics_->addSceneToSim(pScene_);
+	{
+		physics::CapsuleControllerDesc desc;
+		desc.position = Vec3f(-325, 768, 127);
+		desc.height = 32;
+		desc.radius = 16.f;
+		desc.stepOffset = 16.f;
+		desc.material = gEnv->pPhysics->getDefaultMaterial();
+
+		pChar_ = pScene_->createCharacterController(desc);
+
+		Transformf trans;
+		trans.trans = desc.position + Vec3d(50, 0, 0);
+		auto actor = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), 20.f), 1.f);
+
+		pScene_->addActorToScene(actor);
+
+		trans.trans = desc.position + Vec3d(50, 50, 0);
+		actor = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), 20.f), 1.f);
+		pScene_->addActorToScene(actor);
+
+
+		trans.trans = desc.position + Vec3d(50, 50, 200);
+		actor = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), 20.f), 1.f);
+		pScene_->addActorToScene(actor);
+
+		// add the physics scene to the simulation.
+		gEnv->pPhysics->addSceneToSim(pScene_);
+	}
 
 	// stats.
 	loadStats_.elapse = pTimer_->GetTimeNowNoScale() - loadStats_.startTime;
