@@ -113,6 +113,11 @@ bool X3DEngine::init(void)
 	pModelManager_->registerCmds();
 	pModelManager_->registerVars();
 
+	gEngEnv.pGuiMan_ = pGuiManger_;
+	gEngEnv.pMaterialMan_ = pMaterialManager_;
+	gEngEnv.pTextureMan_ = pTextureManager_;
+	gEngEnv.pModelMan_ = pModelManager_;
+	gEngEnv.p3DEngine_ = this;
 
 	if (!pMaterialManager_->init()) {
 		return false;
@@ -127,10 +132,7 @@ bool X3DEngine::init(void)
 		return false;
 	}
 
-	gEngEnv.pMaterialMan_ = pMaterialManager_;
-	gEngEnv.pTextureMan_ = pTextureManager_;
-	gEngEnv.pModelMan_ = pModelManager_;
-	gEngEnv.p3DEngine_ = this;
+
 
 	// init share prim contex resources.
 	if (!primResources_.init(pRender, pMaterialManager_)) {
