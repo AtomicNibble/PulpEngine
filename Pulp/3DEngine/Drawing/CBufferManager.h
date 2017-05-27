@@ -62,8 +62,8 @@ public:
 
 	void shutDown(void);
 
-	void update(core::FrameData& frame, bool othro);
-	void updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket);
+	bool update(core::FrameData& frame, bool othro);
+	void updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket, render::Commands::Nop* pNop);
 
 	void setMatrixes(const Matrix44f& view, const Matrix44f& proj);
 	void setMatrixes(const Matrix44f& view, const Matrix44f& proj,

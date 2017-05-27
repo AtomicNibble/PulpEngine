@@ -55,7 +55,7 @@ void CBufferManager::shutDown(void)
 	}
 }
 
-void CBufferManager::update(core::FrameData& frame, bool othro)
+bool CBufferManager::update(core::FrameData& frame, bool othro)
 {
 	using render::shader::ParamType;
 
@@ -81,9 +81,11 @@ void CBufferManager::update(core::FrameData& frame, bool othro)
 	}
 
 	++frameIdx_;
+
+	return dirtyFlags_.IsAnySet();
 }
 
-void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket)
+void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket, render::Commands::Nop* pNop)
 {
 	for (auto& cbRef : perFrameCbs_)
 	{
@@ -92,7 +94,7 @@ void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket)
 		if (autoUpdateBuffer(cb))
 		{
 			// dam fucker needs updateing.
-			auto* pCBufUpdate = bucket.addCommand<render::Commands::CopyConstantBufferData>(0, cb.getBindSize());
+			auto* pCBufUpdate = bucket.appendCommand<render::Commands::CopyConstantBufferData>(pNop, cb.getBindSize());
 
 			char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pCBufUpdate);
 			std::memcpy(pAuxData, cb.getCpuData().data(), cb.getBindSize());
