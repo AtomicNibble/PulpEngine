@@ -460,7 +460,10 @@
     <ClInclude Include="Model\ModelManager.h" />
     <ClInclude Include="Model\RenderMesh.h" />
     <ClInclude Include="Model\XModel.h" />
+    <ClInclude Include="Texture\Texture.h" />
+    <ClInclude Include="Texture\TextureManager.h" />
     <ClInclude Include="Util\Config.h" />
+    <ClInclude Include="Vars\TextureVars.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -499,6 +502,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Texture\Texture.cpp" />
+    <ClCompile Include="Texture\TextureManager.cpp" />
+    <ClCompile Include="Vars\TextureVars.cpp" />
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -510,6 +516,8 @@
     <None Include="Material\TechDefStateManager.inl" />
     <None Include="Model\RenderMesh.inl" />
     <None Include="Model\XModel.inl" />
+    <None Include="Texture\Texture.inl" />
+    <None Include="Vars\TextureVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

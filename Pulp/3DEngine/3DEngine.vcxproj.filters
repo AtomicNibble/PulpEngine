@@ -67,6 +67,15 @@
     <ClCompile Include="Level\Level_debug.cpp">
       <Filter>Source Files\Level</Filter>
     </ClCompile>
+    <ClCompile Include="Texture\TextureManager.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\TextureVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\Texture.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -129,6 +138,15 @@
     <ClInclude Include="Util\Config.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\TextureManager.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\TextureVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture\Texture.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -173,6 +191,18 @@
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{c746e8c0-59ff-4cb6-95ac-19eeec401dfc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Texture">
+      <UniqueIdentifier>{f73413da-8ba8-4833-80f4-53e3c5944654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Texture">
+      <UniqueIdentifier>{5e323390-8040-46e1-b59a-6868e2420b13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{69baf4f3-4375-49a8-9960-ffbcbbfac06e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{41f474c8-58fd-4c6f-8f8c-ced3decc3fc3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Gui\XWindow.inl">
@@ -198,6 +228,12 @@
     </None>
     <None Include="Material\MaterialManager.inl">
       <Filter>Header Files\Material</Filter>
+    </None>
+    <None Include="Vars\TextureVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="Texture\Texture.inl">
+      <Filter>Header Files\Texture</Filter>
     </None>
   </ItemGroup>
 </Project>
