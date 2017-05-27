@@ -25,24 +25,24 @@ class X3DEngine : public I3DEngine, public core::IXHotReload
 {
 public:
 	X3DEngine(core::MemoryArenaBase* arena);
-	virtual ~X3DEngine() X_OVERRIDE;
+	virtual ~X3DEngine() X_FINAL;
 
-	void registerVars(void) X_OVERRIDE;
-	void registerCmds(void) X_OVERRIDE;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	bool init(void) X_OVERRIDE;
-	void shutDown(void) X_OVERRIDE;
-	void release(void) X_OVERRIDE;
+	bool init(void) X_FINAL;
+	void shutDown(void) X_FINAL;
+	void release(void) X_FINAL;
 
-	void Update(core::FrameData& frame) X_OVERRIDE;
-	void OnFrameBegin(core::FrameData& frame) X_OVERRIDE;
+	void Update(core::FrameData& frame) X_FINAL;
+	void OnFrameBegin(core::FrameData& frame) X_FINAL;
 
 
-	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_OVERRIDE;
-	IMaterialManager* getMaterialManager(void) X_OVERRIDE;
+	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
+	IMaterialManager* getMaterialManager(void) X_FINAL;
 
 	// IXHotReload
-	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
+	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
 private:
