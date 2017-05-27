@@ -206,6 +206,12 @@ void X3DEngine::shutDown(void)
 		X_DELETE(pMaterialManager_, g_3dEngineArena);
 	}
 
+	if (pTextureManager_) {
+		pTextureManager_->shutDown();
+		X_DELETE(pTextureManager_, g_3dEngineArena);
+
+	}
+
 	if (pVariableStateMan_) {
 		pVariableStateMan_->shutDown();
 		X_DELETE(pVariableStateMan_, g_3dEngineArena);
