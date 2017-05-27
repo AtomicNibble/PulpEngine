@@ -286,17 +286,20 @@ typedef uintptr_t TechHandle;
 
 class CBufferLink;
 class Sampler;
+class Texture;
 
 struct IShaderPermatation
 {
 	typedef core::Array<CBufferLink> CBufLinksArr;
 	typedef core::Array<Sampler> SamplerArr;
+	typedef core::Array<Texture> TexutreArr;
 
 	virtual ~IShaderPermatation() {}
 
 	virtual InputLayoutFormat::Enum getILFmt(void) const X_ABSTRACT;
 	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
 	virtual const SamplerArr& getSamplers(void) const X_ABSTRACT;
+	virtual const TexutreArr& getTextures(void) const X_ABSTRACT;
 };
 
 

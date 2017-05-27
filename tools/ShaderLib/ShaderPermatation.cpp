@@ -86,6 +86,15 @@ namespace shader
 		return getStage(ShaderType::Pixel)->getSamplers();
 	}
 
+	const ShaderPermatation::TexutreArr& ShaderPermatation::getTextures(void) const
+	{
+		if (!isStageSet(ShaderType::Pixel)) {
+			X_ASSERT_UNREACHABLE();
+		}
+
+		return getStage(ShaderType::Pixel)->getTextures();
+	}
+
 
 	void ShaderPermatation::createCbLinks(void)
 	{
