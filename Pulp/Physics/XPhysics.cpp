@@ -486,6 +486,11 @@ IPhysicsCooking* XPhysics::getCooking(void)
 
 IScene* XPhysics::createScene(const SceneDesc& desc)
 {
+	if (!pPhysics_) {
+		X_ERROR("Phys", "Failed to create scene, physics system has not be setup");
+		return nullptr;
+	}
+
 	if (scenes_.size() == scenes_.capacity()) {
 		X_ERROR("Phys", "Reached max scene count");
 		return nullptr;
