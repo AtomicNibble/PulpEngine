@@ -264,7 +264,7 @@ void Level::dispatchJobs(core::FrameData& frame)
 {
 	frameStats_.clear();
 
-	if (s_var_detechCam_ == 0) {
+	if (vars_.detachCam() == 0) {
 		cam_ = frame.view.cam;
 	}
 

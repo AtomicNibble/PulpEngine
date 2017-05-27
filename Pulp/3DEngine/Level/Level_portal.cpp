@@ -411,7 +411,7 @@ void Level::CullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2
 				auto type = cam_.cullSphere_ExactT(sm.boundingSphere);
 				if (type == CullResult::OVERLAP)
 				{
-					if (s_var_cullEnts_ > 1)
+					if (vars_.cullEnts() > 1)
 					{
 						// sphere test says overlap.
 						// see if we can cull it with AABB.
