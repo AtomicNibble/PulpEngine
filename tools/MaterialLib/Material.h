@@ -164,6 +164,7 @@ public:
 
 	X_INLINE const ParamArr& getParams(void) const;
 	X_INLINE const SamplerArr& getSamplers(void) const;
+	X_INLINE const TextureArr& getTextures(void) const;
 
 protected:
 	X_NO_COPY(Material);

@@ -237,4 +237,9 @@ X_INLINE const Material::SamplerArr& Material::getSamplers(void) const
 	return samplers_;
 }
 
+X_INLINE const Material::TextureArr& Material::getTextures(void) const
+{
+	return textures_;
+}
+
 X_NAMESPACE_END
