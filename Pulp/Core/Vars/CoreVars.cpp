@@ -15,28 +15,36 @@ CoreVars::CoreVars() :
 	pWinHeight_(nullptr),
 	pWinCustomFrame_(nullptr)
 {
+	// defaults.
+	schedulerNumThreads_ = 0;
+	coreFastShutdown_ = 0;
+	coreEventDebug_ = 0;
 
+	winXPos_ = 10;
+	winYPos_ = 10;
+	winWidth_ = 800;
+	winHeight_ = 600;
 }
 
 void CoreVars::registerVars(void)
 {
-	ADD_CVAR_REF("core_scheduler_threads", schedulerNumThreads_, 0, 0, core::V2::JobSystem::HW_THREAD_MAX, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("core_scheduler_threads", schedulerNumThreads_, schedulerNumThreads_, 0, core::V2::JobSystem::HW_THREAD_MAX, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Number of threads to create for scheduler. 0=auto");
 
-	ADD_CVAR_REF("core_fast_shutdown", coreFastShutdown_, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("core_fast_shutdown", coreFastShutdown_, coreFastShutdown_, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Skips most cleanup logic for faster shutdown, when off everything is correctly shutdown and released before exit. 0=off 1=on");
-	ADD_CVAR_REF("core_event_debug", coreEventDebug_, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("core_event_debug", coreEventDebug_, coreEventDebug_, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Debug messages for core events. 0=off 1=on");
 
 	core::xWindow::Rect desktop = core::xWindow::GetDesktopRect();
 
-	pWinPosX_ = ADD_CVAR_REF("win_x_pos", winXPos_, 10, 0, desktop.getWidth(),
+	pWinPosX_ = ADD_CVAR_REF("win_x_pos", winXPos_, winXPos_, 0, desktop.getWidth(),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position x");
-	pWinPosY_ = ADD_CVAR_REF("win_y_pos", winYPos_, 10, 0, desktop.getHeight(),
+	pWinPosY_ = ADD_CVAR_REF("win_y_pos", winYPos_, winYPos_, 0, desktop.getHeight(),
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position y");
-	pWinWidth_ = ADD_CVAR_REF("win_width", winWidth_, 800, 800, 1,
+	pWinWidth_ = ADD_CVAR_REF("win_width", winWidth_, winWidth_, 800, 1,
 		VarFlag::SYSTEM, "Game window width");
-	pWinHeight_ = ADD_CVAR_REF("win_height", winHeight_, 600, 600, 1,
+	pWinHeight_ = ADD_CVAR_REF("win_height", winHeight_, winHeight_, 600, 1,
 		VarFlag::SYSTEM, "Game window height");
 
 	pWinCustomFrame_ = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
@@ -47,8 +55,6 @@ void CoreVars::registerVars(void)
 		VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
 	ADD_CVAR_STRING("build_ref", X_STRINGIZE(X_ENGINE_BUILD_REF), 
 		VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
-
-
 }
 
 void CoreVars::updateWinPos(int32_t x, int32_t y)
