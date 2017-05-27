@@ -10,10 +10,13 @@
 
 #include "TechDefStateManager.h"
 #include "Drawing\VariableStateManager.h"
+#include "Drawing\CBufferManager.h"
+#include "Texture\Texture.h"
+#include "Texture\TextureManager.h"
+
 #include <CBuffer.h>
 #include <Sampler.h>
-
-#include "Drawing\CBufferManager.h"
+#include <Texture.h>
 
 
 X_NAMESPACE_BEGIN(engine)
@@ -271,13 +274,13 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	// from the shader perm we can see how many const buffers we need to provide.
 	const auto& cbLinks = pShaderPerm->getCbufferLinks();
 	const auto& permSamplers = pShaderPerm->getSamplers();
+	const auto& permTextures = pShaderPerm->getTextures();
 
 	// we need to know how many textures we are going to be sending.
 	// it may be less than what the material has.
 	// the tech should tell us O_O
 	// him -> pTechDef
-	const size_t numTex = pTechDef->getNumAliases();
-	const size_t numSamplers = samplers.size();
+	const size_t numTex = permTextures.size();
 	const size_t numSamplers = permSamplers.size();
 	const size_t numCb = cbLinks.size();
 
@@ -295,13 +298,51 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	}
 #endif // !X_ENABLE_ASSERTIONS
 
-	auto* pTexStates = pVariableState->getTexStates();
-	for (size_t i = 0; i < numTex; i++)
-	{
-		auto& texState = pTexStates[i];
+	// pRender_->createTexture();
 
-		// we need to select the correct texture from the material, and pass the texture id and states.
-		texState.textureId = 0; // get FOOKED.
+	{
+		// need to map material textures to perm textures.
+		// some textures have default values.
+		// but we have the compiler set them, so always provided in material.
+		// but some textures are set by code.
+		auto* pTexStates = pVariableState->getTexStates();
+		const auto& matTextures = pMat->getTextures();
+
+		X_UNUSED(matTextures);
+
+
+		texture::TextureFlags texFlags = texture::TextureFlags();
+
+		for (size_t i = 0; i < numTex; i++)
+		{
+			auto& texState = pTexStates[i];
+			const auto& permTexture = permTextures[i];
+
+			// find texture that matches from material.
+			size_t j;
+			for (j = 0; j < matTextures.size(); j++)
+			{
+				auto& t = matTextures[j];
+				if (t.name == permTexture.getName())
+				{
+					// create the texture instance.
+					// might get default back, etc..
+					auto* pTexture = gEngEnv.pTextureMan_->forName(t.name.c_str(), texFlags);
+
+					texState.textureId = pTexture->getID();
+					break;
+				}
+			}
+
+			// find one?
+			if (j == matTextures.size())
+			{
+				X_ERROR("Material", "Failed to find texture values for perm texture: \"%s\" using default", permTexture.getName().c_str());
+				auto* pDefaultTex = gEnv->pRender->getDefaultTexture();
+
+				texState.textureId = pDefaultTex->getTexID();
+			}
+		}
 	}
 
 	{
