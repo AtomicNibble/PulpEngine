@@ -12,8 +12,12 @@
 #include "Material\MaterialManager.h"
 
 
+// Img Lib
+#include <../../tools/ImgLib/ImgLib.h>
+// Mat Lib
 #include <../../tools/MaterialLib/MatLib.h>
 
+X_LINK_LIB("engine_ImgLib");
 X_LINK_LIB("engine_MaterialLib");
 
 
