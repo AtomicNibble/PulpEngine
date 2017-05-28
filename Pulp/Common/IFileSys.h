@@ -414,6 +414,7 @@ struct IoRequestBase
 	}
 
 	IoCallBack callback; // 8 bytes
+	void* pUserData;
 protected:
 	IoRequest::Enum type; // 4 bytes
 };
@@ -421,6 +422,7 @@ protected:
 struct IoRequestOpen : public IoRequestBase
 {
 	IoRequestOpen() {
+		pUserData = nullptr;
 		type = IoRequest::OPEN;
 	}
 
@@ -432,6 +434,7 @@ struct IoRequestOpenRead : public IoRequestOpen
 {
 	IoRequestOpenRead() 
 	{
+		pUserData = nullptr;
 		type = IoRequest::OPEN_READ_ALL;
 		arena = nullptr;
 		pFile = nullptr;
