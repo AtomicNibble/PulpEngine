@@ -58,7 +58,7 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
 	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, mipCnt, format_);
 	const uint32_t requiredBytes = faceSize * numFaces_;
 
-	core::Array<uint8_t> newBuf(data_.getArena());
+	DataArrAligned newBuf(data_.getArena());
 	newBuf.resize(requiredBytes);
 
 	// copy top mip, for each face.

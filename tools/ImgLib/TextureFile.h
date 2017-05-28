@@ -13,6 +13,8 @@ X_NAMESPACE_BEGIN(texture)
 
 class XTextureFile
 {
+	typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 16>> DataArrAligned;
+
 public:
 	X_INLINE XTextureFile(core::MemoryArenaBase* arena);
 	X_INLINE ~XTextureFile();
@@ -84,8 +86,7 @@ private:
 	bool				sizeValid_;
 	uint8_t				_PAD[2];
 
-	core::Array<uint8_t> data_;
-
+	DataArrAligned data_;
 	// pad to 128 bytes.
 //	uint8_t				__PAD[12];
 
