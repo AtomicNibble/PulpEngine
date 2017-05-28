@@ -31,6 +31,31 @@ XGame::~XGame()
 
 }
 
+void XGame::registerVars(void)
+{
+
+	// register some vars
+	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::CHEAT,
+		"camera position");
+	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::CHEAT,
+		"camera angle(radians)");
+
+	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(PIf),
+		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
+
+	core::ConsoleVarFunc del;
+	del.Bind<XGame, &XGame::OnFovChanged>(this);
+	pFovVar_->SetOnChangeCallback(del);
+
+
+}
+
+void XGame::registerCmds(void)
+{
+
+}
+
+
 bool XGame::init(void)
 {
 	X_LOG0("Game", "init");
@@ -64,6 +89,11 @@ bool XGame::shutDown(void)
 	}
 
 	return true;
+}
+
+void XGame::release(void)
+{
+	X_DELETE(this, g_gameArena);
 }
 
 bool XGame::update(core::FrameData& frame)
@@ -109,37 +139,6 @@ bool XGame::update(core::FrameData& frame)
 
 
 	return true;
-}
-
-
-void XGame::registerVars(void)
-{
-
-	// register some vars
-	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::CHEAT,
-		"camera position");
-	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::CHEAT,
-		"camera angle(radians)");
-
-	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(PIf),
-		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
-
-	core::ConsoleVarFunc del;
-	del.Bind<XGame, &XGame::OnFovChanged>(this);
-	pFovVar_->SetOnChangeCallback(del);
-
-
-}
-
-void XGame::registerCmds(void)
-{
-
-}
-
-
-void XGame::release(void)
-{
-	X_DELETE(this, g_gameArena);
 }
 
 

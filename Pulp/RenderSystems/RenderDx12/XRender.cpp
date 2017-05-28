@@ -128,6 +128,34 @@ XRender::~XRender()
 	}
 }
 
+
+void XRender::registerVars(void)
+{
+	X_ASSERT_NOT_NULL(pTexVars_);
+	X_ASSERT_NOT_NULL(pShaderMan_);
+
+	vars_.registerVars();
+	vars_.setNativeRes(currentNativeRes_);
+	vars_.setRes(displayRes_);
+
+	pTexVars_->registerVars();
+	pShaderMan_->registerVars();
+}
+
+void XRender::registerCmds(void)
+{
+	ADD_COMMAND_MEMBER("r_list_device_features", this, XRender, &XRender::Cmd_ListDeviceFeatures,
+		core::VarFlag::SYSTEM, "List the gpu devices features");
+
+	if (pTextureMan_) {
+		pTextureMan_->registerCmds();
+	}
+
+	if (pShaderMan_) {
+		pShaderMan_->registerCmds();
+	}
+}
+
 bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
 	X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
@@ -456,32 +484,6 @@ void XRender::release(void)
 	X_DELETE(this, g_rendererArena);
 }
 
-void XRender::registerVars(void)
-{
-	X_ASSERT_NOT_NULL(pTexVars_);
-	X_ASSERT_NOT_NULL(pShaderMan_);
-
-	vars_.registerVars();
-	vars_.setNativeRes(currentNativeRes_);
-	vars_.setRes(displayRes_);
-
-	pTexVars_->registerVars();
-	pShaderMan_->registerVars();
-}
-
-void XRender::registerCmds(void)
-{
-	ADD_COMMAND_MEMBER("r_list_device_features", this, XRender, &XRender::Cmd_ListDeviceFeatures,
-		core::VarFlag::SYSTEM, "List the gpu devices features");
-
-	if (pTextureMan_) {
-		pTextureMan_->registerCmds();
-	}
-
-	if (pShaderMan_) {
-		pShaderMan_->registerCmds();
-	}
-}
 
 void XRender::renderBegin(void)
 {

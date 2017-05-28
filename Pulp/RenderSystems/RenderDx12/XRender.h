@@ -164,14 +164,13 @@ public:
 	XRender(core::MemoryArenaBase* arena);
 	~XRender();
 
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
+
 	bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void freeResources(void) X_FINAL;
-
 	void release(void) X_FINAL;
-
-	void registerVars(void) X_FINAL;
-	void registerCmds(void) X_FINAL;
 
 	void renderBegin(void) X_FINAL;
 	void renderEnd(void) X_FINAL;

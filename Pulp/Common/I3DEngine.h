@@ -22,10 +22,11 @@ struct I3DEngine : public core::IEngineSysBase
 {
 	virtual ~I3DEngine(){};
 
+	// finish any async init tasks for all fonts.
+	virtual bool asyncInitFinalize(void) X_ABSTRACT;
 
 	virtual void Update(core::FrameData& frame) X_ABSTRACT;
 	virtual void OnFrameBegin(core::FrameData& frame) X_ABSTRACT;
-
 
 
 	// each enum has a instance, and you don't own the pointer.

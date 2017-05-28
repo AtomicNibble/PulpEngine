@@ -324,14 +324,14 @@ struct IRender
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
 	virtual ~IRender() {};
 
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
 	virtual bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_ABSTRACT;
 	virtual void shutDown(void) X_ABSTRACT;
 	virtual void freeResources(void) X_ABSTRACT;
-
 	virtual void release(void) X_ABSTRACT;
 
-	virtual void registerVars(void) X_ABSTRACT;
-	virtual void registerCmds(void) X_ABSTRACT;
 
 	virtual void renderBegin(void) X_ABSTRACT;
 	virtual void renderEnd(void) X_ABSTRACT;
