@@ -112,7 +112,7 @@ public:
 		alignment_ = alignment;
 	}
 
-	X_INLINE size_t setBaseAlignment(void) const {
+	X_INLINE size_t getBaseAlignment(void) const {
 		return alignment_;
 	}
 
