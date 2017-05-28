@@ -8,7 +8,7 @@
 
 X_NAMESPACE_BEGIN(physics)
 
-static const uint32_t MAX_SCENES = 8; // max scenes you can create (artifical limit)
+static const uint32_t MAX_SCENES = 4; // max scenes you can create (artifical limit)
 static const uint32_t MAX_ACTIVE_SCENES = 1; // max scenes been simulated (to increase some stepper logic needs refactoring)
 
 static const float SCALE_LENGTH = 1;
