@@ -19,6 +19,7 @@ namespace CI
 		X_ENSURE_LE(TEX_MAX_MIPS, CI_MAX_MIPS, "TEX_MAX_MIPS exceeds what CI image can store");
 		X_ENSURE_LE(TEX_MAX_FACES, CI_MAX_FACES, "TEX_MAX_FACES exceeds what CI image can store");
 
+		// if you change these, need to bump CI version, to force all iamges to be re-compiled.
 		static_assert(TexFlag::NOMIPS == BIT(0), "Flag value changed, CI images need rebuilding");
 		static_assert(TexFlag::FORCE_MIPS == BIT(1), "Flag value changed, CI images need rebuilding");
 		static_assert(TexFlag::DONT_RESIZE == BIT(2), "Flag value changed, CI images need rebuilding");
