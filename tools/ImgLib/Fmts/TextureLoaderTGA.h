@@ -23,11 +23,11 @@ namespace TGA
 		static bool isValidData(const DataVec& fileData);
 
 		// ITextureFmt
-		virtual const char* getExtension(void) const X_OVERRIDE;
-		virtual ImgFileFormat::Enum getSrcFmt(void) const X_OVERRIDE;
-		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
-		virtual bool canLoadFile(const DataVec& fileData) const X_OVERRIDE;
-		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
+		virtual const char* getExtension(void) const X_FINAL;
+		virtual ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
+		virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
+		virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
+		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
 
 		// ~ITextureFmt
 
