@@ -29,6 +29,8 @@ namespace CI
 		virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
 		virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
 		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
+		bool loadTexture(core::XFile* file, XTextureFile& imgFile);
+
 		virtual bool canWrite(void) const X_FINAL { return true; }
 		virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
 

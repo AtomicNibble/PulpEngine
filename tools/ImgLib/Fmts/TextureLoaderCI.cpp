@@ -64,10 +64,16 @@ namespace CI
 
 	bool XTexLoaderCI::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
+		X_UNUSED(swapArena);
+
+		return loadTexture(file, imgFile);
+	}
+
+	bool XTexLoaderCI::loadTexture(core::XFile* file, XTextureFile& imgFile)
+	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pLog);
 		X_ASSERT_NOT_NULL(file);
-		X_UNUSED(swapArena);
 
 		CITexureHeader hdr;
 
