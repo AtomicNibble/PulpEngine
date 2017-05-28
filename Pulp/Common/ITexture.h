@@ -138,9 +138,9 @@ X_DECLARE_ENUM8(Texturefmt) (
 
 X_DECLARE_FLAGS(TexFlag)(
 	NOMIPS, 
-	LOAD_FAILED, 
-	DONT_RESIZE,
 	FORCE_MIPS,
+	DONT_RESIZE,
+	
 	ALPHA,
 	NORMAL, 
 
@@ -149,16 +149,20 @@ X_DECLARE_FLAGS(TexFlag)(
 	HI_MIP_STREAMING,	// only high mips can be streamed.
 	FORCE_STREAM,		// force stream even if only one mip
 
-
-	TEX_FONT, 
-	FILTER_POINT, FILTER_LINEAR, FILTER_BILINEAR, FILTER_TRILINEAR, 
-	RENDER_TARGET, 
-	CI_IMG,
-
-
 	// can be used to force a img that would normaly be stream to be sync loaded.
 	// useful for enforcing sync loads for required assets.
-	DONT_STREAM
+	DONT_STREAM,
+
+	CI_IMG,
+
+	// ------- runtime only ---------
+
+	RENDER_TARGET, 
+
+	// neither are set before loading starts.
+	// and only one of these we get set.
+	LOADED,
+	LOAD_FAILED
 );
 
 typedef Flags<TexFlag> TextureFlags;
