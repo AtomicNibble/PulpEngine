@@ -131,6 +131,38 @@ private:
 	size_t alignment_;
 };
 
+template<typename T, size_t alignment>
+class ArrayAlignedAllocatorFixed
+{
+public:
+	X_INLINE ArrayAlignedAllocatorFixed(MemoryArenaBase* arena) :
+		arena_(arena)
+	{
+		static_assert(alignment >= X_ALIGN_OF(T), "Fixed alignment don't satisfy type alignment");
+	}
+
+	X_INLINE void setArena(MemoryArenaBase* arena) {
+		arena_ = arena;
+	}
+	X_INLINE MemoryArenaBase* getArena(void) const {
+		return arena_;
+	}
+
+	X_INLINE size_t getBaseAlignment(void) const {
+		return alignment;
+	}
+
+	X_INLINE T* allocate(size_t num) {
+		return  static_cast<T*>(arena_->allocate(sizeof(T)*num, alignment, 0, "Array", "T[]", X_SOURCE_INFO));
+	}
+
+	X_INLINE void free(void* pArr) {
+		arena_->free(pArr);
+	}
+
+private:
+	MemoryArenaBase* arena_;
+};
 
 X_NAMESPACE_END
 
