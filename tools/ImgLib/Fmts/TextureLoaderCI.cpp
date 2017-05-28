@@ -18,6 +18,19 @@ namespace CI
 		X_ENSURE_LE(TEX_MAX_DIMENSIONS, CI_MAX_DIMENSIONS, "TEX_MAX_DIMENSIONS exceeds what CI image can store");
 		X_ENSURE_LE(TEX_MAX_MIPS, CI_MAX_MIPS, "TEX_MAX_MIPS exceeds what CI image can store");
 		X_ENSURE_LE(TEX_MAX_FACES, CI_MAX_FACES, "TEX_MAX_FACES exceeds what CI image can store");
+
+		static_assert(TexFlag::NOMIPS == BIT(0), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::FORCE_MIPS == BIT(1), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::DONT_RESIZE == BIT(2), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::ALPHA == BIT(3), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::NORMAL == BIT(4), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::STREAMING == BIT(5), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::STREAMABLE == BIT(6), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::HI_MIP_STREAMING == BIT(7), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::FORCE_STREAM == BIT(8), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::DONT_STREAM == BIT(9), "Flag value changed, CI images need rebuilding");
+		static_assert(TexFlag::CI_IMG == BIT(10), "Flag value changed, CI images need rebuilding");
+
 	}
 
 	XTexLoaderCI::XTexLoaderCI()
