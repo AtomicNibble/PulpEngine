@@ -46,7 +46,6 @@ X_NAMESPACE_BEGIN(texture)
 	X_INLINE const bool Texture::isLoaded(void) const
 	{
 		return !flags_.IsSet(TextureFlags::LOAD_FAILED);
-
 	}
 
 	X_INLINE const bool Texture::IsStreamable(void) const
