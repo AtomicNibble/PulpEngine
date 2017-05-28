@@ -418,7 +418,7 @@ X_NAMESPACE_BEGIN(texture)
 			return false;
 		}
 
-		ptexMipMapDebug_ = forName("imgs/debug/mipmaplevels", default_flags | TextureFlags::FILTER_BILINEAR);
+		ptexMipMapDebug_ = forName("imgs/debug/mipmaplevels", default_flags);
 
 
 		return true;
