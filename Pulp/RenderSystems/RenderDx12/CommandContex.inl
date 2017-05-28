@@ -329,6 +329,13 @@ X_INLINE void GraphicsContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t
 X_INLINE void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count,
 	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
 {
+#if X_ENABLE_ASSERTIONS
+	for (uint32_t i = 0; i < count; i++)
+	{
+		X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
+	}
+#endif // !X_ENABLE_ASSERTIONS
+
 	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
 }
 
@@ -341,6 +348,13 @@ X_INLINE void GraphicsContext::setDynamicSamplerDescriptor(uint32_t rootIndex, u
 X_INLINE void GraphicsContext::setDynamicSamplerDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count,
 	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
 {
+#if X_ENABLE_ASSERTIONS
+	for (uint32_t i = 0; i < count; i++)
+	{
+		X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
+	}
+#endif // !X_ENABLE_ASSERTIONS
+
 	dynamicSamplerDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
 }
 
