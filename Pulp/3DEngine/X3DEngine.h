@@ -34,9 +34,11 @@ public:
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
+	bool asyncInitFinalize(void) X_FINAL;
+
+
 	void Update(core::FrameData& frame) X_FINAL;
 	void OnFrameBegin(core::FrameData& frame) X_FINAL;
-
 
 	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
 	IMaterialManager* getMaterialManager(void) X_FINAL;

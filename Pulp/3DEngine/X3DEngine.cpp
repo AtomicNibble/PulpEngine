@@ -241,6 +241,13 @@ void X3DEngine::release(void)
 	X_DELETE(this, g_3dEngineArena);
 }
 
+bool X3DEngine::asyncInitFinalize(void)
+{
+
+
+	return true;
+}
+
 void X3DEngine::Update(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);

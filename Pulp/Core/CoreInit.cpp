@@ -655,6 +655,11 @@ bool XCore::InitAsyncWait(void)
 		}
 	}
 
+	if (env_.p3DEngine)
+	{
+		allOk &= env_.p3DEngine->asyncInitFinalize();
+	}
+
 	return allOk;
 }
 
