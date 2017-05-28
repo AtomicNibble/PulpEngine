@@ -218,7 +218,7 @@ void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 	}
 
 	JobData data;
-	data.pData = static_cast<char*>(pOpenRead->pBuf);
+	data.pData = reinterpret_cast<char*>(pOpenRead->pBuf);
 	data.dataSize = pOpenRead->dataSize;
 
 	// dispatch a job to parse it?

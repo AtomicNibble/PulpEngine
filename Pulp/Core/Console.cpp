@@ -1255,7 +1255,7 @@ void XConsole::HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoR
 
 		// we can't process it on this thread.
 		// so store it.
-		historyFileBuf_ = core::UniquePointer<const char[]>(pOpenRead->arena, static_cast<const char*>(pOpenRead->pBuf));
+		historyFileBuf_ = core::UniquePointer<const char[]>(pOpenRead->arena, reinterpret_cast<const char*>(pOpenRead->pBuf));
 		historyFileSize_ = pOpenRead->dataSize;
 	}
 
