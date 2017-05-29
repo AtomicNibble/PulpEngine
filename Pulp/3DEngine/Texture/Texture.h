@@ -27,6 +27,10 @@ public:
 	X_INLINE const int32_t getNumMips(void) const;
 	X_INLINE const int32_t getDataSize(void) const;
 
+	X_INLINE const bool isLoaded(void) const;
+	X_INLINE const bool isLoading(void) const;
+	X_INLINE const bool loadedFailed(void) const;
+
 	X_INLINE const texture::TextureType::Enum getTextureType(void) const;
 	X_INLINE const texture::Texturefmt::Enum getFormat(void) const;
 	X_INLINE const texture::TextureFlags getFlags(void) const;

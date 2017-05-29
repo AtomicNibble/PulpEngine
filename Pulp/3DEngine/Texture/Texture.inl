@@ -60,6 +60,24 @@ X_INLINE const int32_t Texture::getDataSize(void) const
 	return 0;
 }
 
+
+X_INLINE const bool Texture::isLoaded(void) const
+{
+	return flags_.IsSet(texture::TextureFlags::LOADED);
+}
+
+X_INLINE const bool Texture::isLoading(void) const
+{
+	// neither flags are set.
+	return !isLoaded() && !loadedFailed();
+}
+
+X_INLINE const bool Texture::loadedFailed(void) const
+{
+	return flags_.IsSet(texture::TextureFlags::LOAD_FAILED);
+}
+
+
 X_INLINE const texture::TextureType::Enum Texture::getTextureType(void) const
 {
 	return type_;
@@ -80,6 +98,7 @@ X_INLINE texture::TextureFlags& Texture::flags(void)
 {
 	return flags_;
 }
+
 
 
 X_NAMESPACE_END
