@@ -10,42 +10,42 @@ class RenderNull : public IRender
 {
 public:
 
-	virtual bool init(HWND hWnd, uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
-	virtual void shutDown(void) X_FINAL;
-	virtual void freeResources(void) X_FINAL;
+	bool init(HWND hWnd, uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
+	void shutDown(void) X_FINAL;
+	void freeResources(void) X_FINAL;
 	
-	virtual void release(void) X_FINAL;
+	void release(void) X_FINAL;
 
-	virtual void registerVars(void) X_FINAL;
-	virtual void registerCmds(void) X_FINAL;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	virtual void renderBegin(void) X_FINAL;
-	virtual void renderEnd(void) X_FINAL;
+	void renderBegin(void) X_FINAL;
+	void renderEnd(void) X_FINAL;
 
-	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
+	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-	virtual Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
+	Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
 
-	virtual IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
-	virtual IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+	IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
+	IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
 		texture::Texturefmt::Enum fmt) X_FINAL;
-	virtual void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_FINAL;
+	void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_FINAL;
 	
-	virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_FINAL;
+	IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_FINAL;
 
-	virtual VertexBufferHandle createVertexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
-	virtual VertexBufferHandle createVertexBuffer(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
-	virtual IndexBufferHandle createIndexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
-	virtual IndexBufferHandle createIndexBuffer(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	VertexBufferHandle createVertexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	VertexBufferHandle createVertexBuffer(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	IndexBufferHandle createIndexBuffer(uint32_t numElements, uint32_t elementSize, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
+	IndexBufferHandle createIndexBuffer(uint32_t numElements, uint32_t elementSize, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_FINAL;
 
-	virtual void destoryVertexBuffer(VertexBufferHandle handle) X_FINAL;
-	virtual void destoryIndexBuffer(IndexBufferHandle handle) X_FINAL;
+	void destoryVertexBuffer(VertexBufferHandle handle) X_FINAL;
+	void destoryIndexBuffer(IndexBufferHandle handle) X_FINAL;
 
-	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
-	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
+	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
+	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 
-	virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
-	virtual void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
+	ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
+	void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
 
 	texture::ITexture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload = false) X_FINAL;
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
