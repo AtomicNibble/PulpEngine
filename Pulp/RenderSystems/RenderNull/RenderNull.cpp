@@ -184,9 +184,9 @@ void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
 }
 
 
-texture::ITexture* RenderNull::getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload)
+texture::ITexture* RenderNull::getDeviceTexture(int32_t id)
 {
-	X_UNUSED(id, imgFile, upload);
+	X_UNUSED(id);
 
 	return nullptr;
 }
@@ -211,6 +211,20 @@ texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, t
 
 	return nullptr;
 }
+
+
+bool RenderNull::initDeviceTexture(texture::ITexture* pTex)
+{
+	X_UNUSED(pTex);
+	return false;
+}
+
+bool RenderNull::initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile)
+{
+	X_UNUSED(pTex, imgFile);
+	return false;
+}
+
 
 
 shader::IShaderSource* RenderNull::getShaderSource(const char* pName)
