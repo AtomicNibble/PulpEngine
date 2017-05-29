@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Containers\HashMap.h>
-#include <IDirectoryWatcher.h>
 
 #include "TextureVars.h"
 
@@ -24,7 +23,7 @@ X_NAMESPACE_BEGIN(texture)
 class Texture;
 class XTextureFile;
 
-class TextureManager : public core::IXHotReload
+class TextureManager
 {
 	typedef core::AssetContainer<Texture, TEX_MAX_LOADED_IMAGES, core::MultiThreadPolicy<core::Spinlock>> TextureContainer;
 	typedef TextureContainer::Resource TextureResource;
@@ -80,15 +79,9 @@ private:
 
 	void releaseDanglingTextures(void);
 
-	// IXHotReload
-	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
-	// ~IXHotReload
-
 	void listTextures(const char* pSearchPattern);
 
 private:
-	void Cmd_ReloadTextures(core::IConsoleCmdArgs* pCmd);
-	void Cmd_ReloadTexture(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ListTextures(core::IConsoleCmdArgs* pCmd);
 
 private:

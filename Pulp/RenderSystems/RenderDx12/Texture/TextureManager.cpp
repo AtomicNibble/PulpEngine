@@ -68,15 +68,8 @@ X_NAMESPACE_BEGIN(texture)
 
 	void TextureManager::registerCmds(void)
 	{
-
-		ADD_COMMAND_MEMBER("imgReloadAll", this, TextureManager, &TextureManager::Cmd_ReloadTextures, core::VarFlag::SYSTEM,
-			"Reload all textures");
-		ADD_COMMAND_MEMBER("imgReload", this, TextureManager, &TextureManager::Cmd_ReloadTexture, core::VarFlag::SYSTEM,
-			"Reload a textures <name>");
-
-		ADD_COMMAND_MEMBER("listImages", this, TextureManager, &TextureManager::Cmd_ListTextures, core::VarFlag::SYSTEM,
-			"List all the loaded textures");
-
+		ADD_COMMAND_MEMBER("listDeviceImages", this, TextureManager, &TextureManager::Cmd_ListTextures, core::VarFlag::SYSTEM,
+			"List all the device textures");
 		
 	}
 
@@ -587,16 +580,6 @@ X_NAMESPACE_BEGIN(texture)
 		textures_.free();
 	}
 
-
-	// -----------------------------------
-
-	void TextureManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
-	{
-		X_UNUSED(jobSys);
-		X_UNUSED(name);
-
-	}
-
 	// -----------------------------------
 
 	void TextureManager::listTextures(const char* pSearchPattern)
@@ -634,25 +617,6 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 	// -----------------------------------
-
-	void TextureManager::Cmd_ReloadTextures(core::IConsoleCmdArgs* pCmd)
-	{
-		X_UNUSED(pCmd);
-
-
-	}
-
-	void TextureManager::Cmd_ReloadTexture(core::IConsoleCmdArgs* pCmd)
-	{
-		if (pCmd->GetArgCount() < 2) {
-			X_ERROR("Texture", "imageReload <filename>");
-			return;
-		}
-
-		const char* pName = pCmd->GetArg(1);
-
-		reloadForName(pName);
-	}
 
 	void TextureManager::Cmd_ListTextures(core::IConsoleCmdArgs* pCmd)
 	{
