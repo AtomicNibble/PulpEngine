@@ -18,6 +18,8 @@ struct XFileStats
 		NumBytesRead += oth.NumBytesRead;
 		NumBytesWrite += oth.NumBytesWrite;
 		NumFilesOpened += oth.NumFilesOpened;
+		NumReads += oth.NumReads;
+		NumWrties += oth.NumWrties;
 		NumSeeks += oth.NumSeeks;
 		NumTells += oth.NumTells;
 		NumByteLeftChecks += oth.NumByteLeftChecks;
@@ -35,8 +37,8 @@ struct XFileStats
 		core::HumanSize::Str str;
 
 		buf.clear();
-		buf.appendFmt("Read: ^6%s^~\n", core::HumanSize::toString(str, NumBytesRead));
-		buf.appendFmt("Write: ^6%s^~\n", core::HumanSize::toString(str, NumBytesWrite));
+		buf.appendFmt("Read: ^6%s (%" PRIuS ")^~\n", core::HumanSize::toString(str, NumBytesRead), NumReads);
+		buf.appendFmt("Write: ^6%s (%" PRIuS ")^~\n", core::HumanSize::toString(str, NumBytesWrite), NumWrties);
 		buf.appendFmt("FilesOpened: ^6%" PRIuS "^~\n", NumFilesOpened);
 		buf.appendFmt("Seeks: ^6%" PRIuS "^~\n", NumSeeks);
 		buf.appendFmt("TellRequests: ^6%" PRIuS "^~\n", NumTells);
@@ -48,6 +50,8 @@ struct XFileStats
 	uint64_t NumBytesRead;
 	uint64_t NumBytesWrite;
 	size_t NumFilesOpened;
+	size_t NumReads;
+	size_t NumWrties;
 	size_t NumSeeks;
 	size_t NumTells;
 	size_t NumByteLeftChecks;

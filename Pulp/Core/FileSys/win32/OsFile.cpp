@@ -54,7 +54,7 @@ OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 	}
 	else {
 #if X_ENABLE_FILE_STATS
-		s_stats.NumFilesOpened++;
+		++s_stats.NumFilesOpened;
 #endif // !X_ENABLE_FILE_STATS
 
 		if (mode.IsSet(IFileSys::fileModeFlags::APPEND)) {
@@ -96,6 +96,7 @@ size_t OsFile::read(void* buffer, size_t length)
 	if (::ReadFile(file_, buffer, length32, &NumRead, 0)) {
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesRead += NumRead;
+		++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 
 
@@ -140,6 +141,7 @@ size_t OsFile::write(const void* buffer, size_t length)
 	if (::WriteFile(file_, buffer, length32, &NumWrite, 0)) {
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += NumWrite;
+		++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY

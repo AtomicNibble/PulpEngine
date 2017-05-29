@@ -110,6 +110,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesRead += length;
+		++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 	}
 	else if (lastError::Get() != ERROR_IO_PENDING)
@@ -139,6 +140,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += length;
+		++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 	}
 	else if (lastError::Get() != ERROR_IO_PENDING)
@@ -177,6 +179,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesRead += length;
+		++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 	}
 	else if (lastError::Get() != ERROR_IO_PENDING)
@@ -206,6 +209,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += length;
+		++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 	}
 	else if (lastError::Get() != ERROR_IO_PENDING)
