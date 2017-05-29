@@ -111,11 +111,11 @@ bool TextureManager::asyncInitFinalize(void)
 		loadComplete_.wait();
 	}
 
-	if (pTexDefault_->isLoading()) {
+	if (pTexDefault_->loadFailed()) {
 		X_ERROR("Texture", "failed to load default texture: %s", texture::TEX_DEFAULT_DIFFUSE);
 		return false;
 	}
-	if (pTexDefaultBump_->isLoading()) {
+	if (pTexDefaultBump_->loadFailed()) {
 		X_ERROR("Texture", "failed to load default bump texture: %s", texture::TEX_DEFAULT_BUMP);
 		return false;
 	}
