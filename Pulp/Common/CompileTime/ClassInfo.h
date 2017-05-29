@@ -50,6 +50,13 @@ namespace compileTime
 	}; 
 
 	template <typename T>
+	struct IsTrivialDestruct
+	{
+		static constexpr bool Value = std::is_trivially_destructible<T>::value;
+	};
+
+
+	template <typename T>
 	struct IsTrivialDefaultCon
 	{
 		static constexpr bool Value = std::is_trivially_default_constructible<T>::value;
