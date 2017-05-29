@@ -281,67 +281,6 @@ void TextureManager::processCIFile(Texture* pTexture, const uint8_t* pData, size
 }
 
 
-#if 0
-bool TextureManager::loadFromFile(texture::XTextureFile& imgFile, const char* pPath)
-{
-	X_ASSERT_NOT_NULL(pCILoader_);
-	X_ASSERT_NOT_NULL(pPath);
-
-	core::IFileSys* pFileSys = gEnv->pFileSys;
-
-	core::IFileSys::fileModeFlags mode;
-	mode.Set(core::IFileSys::fileMode::READ);
-	mode.Set(core::IFileSys::fileMode::SHARE);
-
-	core::Path<char> path(pPath);
-	path.toLower(); // lower case file names only.
-	path.setExtension(texture::CI_FILE_EXTENSION);
-
-	if (pFileSys->fileExists(path.c_str()))
-	{
-		core::XFileScoped file;
-
-		if (file.openFile(path.c_str(), mode))
-		{
-			if (!pCILoader_->loadTexture(file.GetFile(), imgFile, arena_)) {
-				X_ERROR("Texture", "Error loading: \"%s\"", pPath);
-				return false;
-			}
-
-			return true;
-		}
-	}
-
-	if (!vars_.allowRawImgLoading()) {
-		return false;
-	}
-
-	// try loading none compiled.
-	for (auto pLoader : textureLoaders_)
-	{
-		path.setExtension(pLoader->getExtension());
-
-		if (pFileSys->fileExists(path.c_str()))
-		{
-			core::XFileScoped file;
-
-			if (file.openFile(path.c_str(), mode))
-			{
-				if (!pLoader->loadTexture(file.GetFile(), imgFile, arena_)) {
-					X_ERROR("Texture", "Error loading: \"%s\"", pPath);
-					return false;
-				}
-			}
-
-			return true;
-		}
-	}
-
-	return false;
-}
-#endif
-
-
 bool TextureManager::loadDefaultTextures(void)
 {
 	using namespace texture;
