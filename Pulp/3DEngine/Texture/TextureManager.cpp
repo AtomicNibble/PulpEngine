@@ -117,6 +117,9 @@ void TextureManager::shutDown(void)
 		X_DELETE(pTexLoader, arena_);
 	}
 	textureLoaders_.clear();
+
+	releaseDefaultTextures();
+	releaseDanglingTextures();
 }
 
 bool TextureManager::asyncInitFinalize(void)
