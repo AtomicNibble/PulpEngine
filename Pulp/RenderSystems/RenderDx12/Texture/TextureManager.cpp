@@ -135,28 +135,13 @@ X_NAMESPACE_BEGIN(texture)
 
 			pTexRes->setProperties(imgFile);
 
-			if (!createDeviceTexture(pTexRes)) {
+			if (!initDeviceTexture(pTexRes)) {
 				return nullptr;
 			}
 
 			if (upload)
 			{
-				// upload img data to gpu.
-				D3D12_SUBRESOURCE_DATA texResource[texture::TEX_MAX_MIPS];
-
-				for (size_t i = 0; i < imgFile.getNumMips(); i++)
-				{
-					const size_t rowBytes = imgFile.getLevelRowbytes(i);
-					const size_t pitch = imgFile.getLevelSize(i);
-
-					texResource[i].pData = imgFile.getLevel(0, i);
-					texResource[i].RowPitch = rowBytes;
-					texResource[i].SlicePitch = pitch;
-				}
-
-				auto& gpuResource = pTexRes->getGpuResource();
-
-				if (!initializeTexture(gpuResource, imgFile.getNumMips(), texResource)) {
+				if (!updateTextureData(pTexRes, imgFile)) {
 					// we should mark the texture as invalid.
 					X_ERROR("Texture", "Failed to upload texture data");
 					return nullptr;
@@ -225,7 +210,7 @@ X_NAMESPACE_BEGIN(texture)
 			pTexRes->setFormat(fmt);
 			pTexRes->setType(texture::TextureType::T2D);
 
-			if (!createDeviceTexture(pTexRes)) {
+			if (!initDeviceTexture(pTexRes)) {
 				X_ERROR("Texture", "Failed to create device texture");
 			}
 
@@ -241,9 +226,7 @@ X_NAMESPACE_BEGIN(texture)
 					texResource.SlicePitch = texResource.RowPitch * pTexRes->getHeight();
 				}
 
-				auto& gpuResource = pTexRes->getGpuResource();
-
-				if (!initializeTexture(gpuResource, 1, &texResource)) {
+				if (!updateTextureData(pTexRes, 1, &texResource)) {
 					// we should mark the texture as invalid.
 				}
 			}
@@ -349,7 +332,72 @@ X_NAMESPACE_BEGIN(texture)
 		}
 	}
 
-	bool TextureManager::updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const
+	bool TextureManager::initDeviceTexture(Texture* pTex, const texture::XTextureFile& imgFile) const
+	{
+		if (!initDeviceTexture(pTex)) {
+			return false;
+		}
+
+		if (!updateTextureData(pTex, imgFile)) {
+			X_ERROR("Texture", "Failed to upload texture data");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool TextureManager::initDeviceTexture(Texture* pTex) const
+	{
+		if (pTex->getFormat() == texture::Texturefmt::UNKNOWN) {
+			X_ERROR("Texture", "Failed to create resource for texture. format unknown");
+			return false;
+		}
+
+		auto fmt = Util::DXGIFormatFromTexFmt(pTex->getFormat());
+		auto& gpuResource = pTex->getGpuResource();
+
+		D3D12_RESOURCE_DESC texDesc;
+		core::zero_object(texDesc);
+		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+		texDesc.Width = pTex->getWidth();
+		texDesc.Height = pTex->getHeight();
+		texDesc.DepthOrArraySize = pTex->getDepth();
+		texDesc.MipLevels = pTex->getNumMips();
+		texDesc.Format = fmt;
+		texDesc.SampleDesc.Count = 1;
+		texDesc.SampleDesc.Quality = 0;
+		texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+		texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		D3D12_HEAP_PROPERTIES heapProps;
+		heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
+		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProps.CreationNodeMask = 1;
+		heapProps.VisibleNodeMask = 1;
+
+		HRESULT hr = pDevice_->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
+			gpuResource.getUsageState(), nullptr, IID_PPV_ARGS(&gpuResource.getResourcePtrRef()));
+		if (FAILED(hr)) {
+			X_ERROR("Texture", "Failed to create resource for texture. err: %" PRIu32, hr);
+			return false;
+		}
+
+
+		if (pTex->getSRV().ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
+			D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptor = descriptorAlloc_.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+			pTex->setSRV(cpuDescriptor);
+		}
+
+		pDevice_->CreateShaderResourceView(gpuResource.getResource(), nullptr, pTex->getSRV());
+
+		render::D3DDebug::SetDebugObjectName(gpuResource.getResource(), pTex->getName());
+
+		return true;
+	}
+
+	bool TextureManager::updateTextureData(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const
 	{
 		Texture* pTex = getByID(texId);
 		auto& dest = pTex->getGpuResource();
@@ -360,7 +408,7 @@ X_NAMESPACE_BEGIN(texture)
 		texResource.pData = pSrc;
 		texResource.RowPitch = rowBytes;
 		texResource.SlicePitch = texResource.RowPitch * pTex->getHeight();
-		
+
 		const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, 1);
 
 		D3D12_HEAP_PROPERTIES heapProps;
@@ -400,10 +448,106 @@ X_NAMESPACE_BEGIN(texture)
 		contex.transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
 
 		// we have to keep this..
-	//	pUploadBuffer->Release();
+		//	pUploadBuffer->Release();
 
 		return true;
 	}
+
+	X_INLINE bool TextureManager::updateTextureData(Texture* pTex, const texture::XTextureFile& imgFile) const
+	{
+		X_ASSERT_NOT_NULL(pTex);
+
+		D3D12_SUBRESOURCE_DATA texResource[texture::TEX_MAX_MIPS];
+
+		for (size_t i = 0; i < imgFile.getNumMips(); i++)
+		{
+			const size_t rowBytes = imgFile.getLevelRowbytes(i);
+			const size_t pitch = imgFile.getLevelSize(i);
+
+			texResource[i].pData = imgFile.getLevel(0, i);
+			texResource[i].RowPitch = rowBytes;
+			texResource[i].SlicePitch = pitch;
+		}
+
+		auto& gpuResource = pTex->getGpuResource();
+
+		return updateTextureData(gpuResource, imgFile.getNumMips(), texResource);
+	}
+
+	X_INLINE bool TextureManager::updateTextureData(Texture* pTex, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const
+	{
+		X_ASSERT_NOT_NULL(pTex);
+
+		auto& gpuResource = pTex->getGpuResource();
+
+		return updateTextureData(gpuResource, numSubresources, pSubData);
+	}
+
+	bool TextureManager::updateTextureData(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const
+	{
+		const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, numSubresources);
+
+		D3D12_HEAP_PROPERTIES heapProps;
+		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		heapProps.CreationNodeMask = 1;
+		heapProps.VisibleNodeMask = 1;
+
+		D3D12_RESOURCE_DESC bufferDesc;
+		bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+		bufferDesc.Alignment = 0;
+		bufferDesc.Width = uploadBufSize;
+		bufferDesc.Height = 1;
+		bufferDesc.DepthOrArraySize = 1;
+		bufferDesc.MipLevels = 1;
+		bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+		bufferDesc.SampleDesc.Count = 1;
+		bufferDesc.SampleDesc.Quality = 0;
+		bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+		bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+		ID3D12Resource* pUploadBuffer;
+
+		HRESULT hr = pDevice_->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
+			&bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&pUploadBuffer));
+
+		if (FAILED(hr))
+		{
+			// if we fail we can handle it by just showing default texture, without much trouble.
+			X_ERROR("Texture", "Failed to create commited resource for uploading. res: %" PRIu32, hr);
+			return false;
+		}
+
+		// we going todo this sync, but could keep hold of the resource and release when done.
+		render::CommandContext* pContext = contextMan_.allocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+		// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
+		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
+		pContext->updateSubresources<texture::TEX_MAX_MIPS>(pDevice_, dest, pUploadBuffer, 0, 0, numSubresources, pSubData);
+		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
+		pContext->finishAndFree(true);
+
+		pUploadBuffer->Release();
+		return true;
+	}
+
+	uint64_t TextureManager::getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
+		uint32_t firstSubresource, uint32_t numSubresources) const
+	{
+		const D3D12_RESOURCE_DESC desc = pDestinationResource->GetDesc();
+		uint64_t requiredSize = 0;
+
+		ID3D12Device* pDevice;
+		pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
+		pDevice->GetCopyableFootprints(&desc, firstSubresource, numSubresources, 0, nullptr, nullptr, nullptr, &requiredSize);
+		pDevice->Release();
+
+		return requiredSize;
+	}
+
+	// -------------------------------------------
+
 
 	X_INLINE void TextureManager::releasePixelBuffer_internal(render::IPixelBuffer* pPixelBuf)
 	{
@@ -482,172 +626,6 @@ X_NAMESPACE_BEGIN(texture)
 		}
 
 		textures_.free();
-	}
-
-
-#if 0
-	bool TextureManager::load(Texture* pTex)
-	{
-		X_ASSERT_NOT_NULL(pTex);
-
-		XTextureFile imgFile(arena_);
-
-//		if (!loadFromFile(imgFile, pTex->getName())) {
-//			return false;
-//		}
-
-		if (!processImgFile(pTex, imgFile)) {
-			return false;
-		}
-
-		if (!createDeviceTexture(pTex)) {
-			return false;
-		}
-
-		if (imgFile.getDepth() > 1 || imgFile.getNumFaces() > 1)
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
-
-		// upload img data to gpu.
-		D3D12_SUBRESOURCE_DATA texResource[texture::TEX_MAX_MIPS];
-
-		for(size_t i=0; i< imgFile.getNumMips(); i++)
-		{
-			const size_t rowBytes = imgFile.getLevelRowbytes(i);
-			const size_t pitch = imgFile.getLevelSize(i);
-
-			texResource[i].pData = imgFile.getLevel(0, i);
-			texResource[i].RowPitch = rowBytes;
-			texResource[i].SlicePitch = pitch;
-		}
-
-		auto& gpuResource = pTex->getGpuResource();
-
-		if (!initializeTexture(gpuResource, imgFile.getNumMips(), texResource)) {
-			// we should mark the texture as invalid.
-			X_ERROR("Texture", "Failed to upload texture data");
-			return false;
-		}
-
-		return true;
-	}
-
-#endif
-
-	bool TextureManager::createDeviceTexture(Texture* pTex)
-	{
-		if (pTex->getFormat() == texture::Texturefmt::UNKNOWN) {
-			X_ERROR("Texture", "Failed to create resource for texture. format unknown");
-			return false;
-		}
-
-		auto fmt = Util::DXGIFormatFromTexFmt(pTex->getFormat());
-		auto& gpuResource = pTex->getGpuResource();
-
-		D3D12_RESOURCE_DESC texDesc;
-		core::zero_object(texDesc);
-		texDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-		texDesc.Width = pTex->getWidth();
-		texDesc.Height = pTex->getHeight();
-		texDesc.DepthOrArraySize = pTex->getDepth();
-		texDesc.MipLevels = pTex->getNumMips();
-		texDesc.Format = fmt;
-		texDesc.SampleDesc.Count = 1;
-		texDesc.SampleDesc.Quality = 0;
-		texDesc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-		texDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-		D3D12_HEAP_PROPERTIES heapProps;
-		heapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		heapProps.CreationNodeMask = 1;
-		heapProps.VisibleNodeMask = 1;
-
-		HRESULT hr = pDevice_->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &texDesc,
-			gpuResource.getUsageState(), nullptr, IID_PPV_ARGS(&gpuResource.getResourcePtrRef()));
-		if (FAILED(hr)) {
-			X_ERROR("Texture", "Failed to create resource for texture. err: %" PRIu32, hr);
-			return false;
-		}
-
-
-		if (pTex->getSRV().ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
-			D3D12_CPU_DESCRIPTOR_HANDLE cpuDescriptor = descriptorAlloc_.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-		
-			pTex->setSRV(cpuDescriptor);
-		}
-
-		pDevice_->CreateShaderResourceView(gpuResource.getResource(), nullptr, pTex->getSRV());
-
-		render::D3DDebug::SetDebugObjectName(gpuResource.getResource(), pTex->getName());
-
-		return true;
-	}
-
-	bool TextureManager::initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData)
-	{
-		const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, numSubresources);
-
-		D3D12_HEAP_PROPERTIES heapProps;
-		heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-		heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
-		heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
-		heapProps.CreationNodeMask = 1;
-		heapProps.VisibleNodeMask = 1;
-
-		D3D12_RESOURCE_DESC bufferDesc;
-		bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-		bufferDesc.Alignment = 0;
-		bufferDesc.Width = uploadBufSize;
-		bufferDesc.Height = 1;
-		bufferDesc.DepthOrArraySize = 1;
-		bufferDesc.MipLevels = 1;
-		bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
-		bufferDesc.SampleDesc.Count = 1;
-		bufferDesc.SampleDesc.Quality = 0;
-		bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
-		bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
-
-		ID3D12Resource* pUploadBuffer;
-
-		HRESULT hr = pDevice_->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
-			&bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&pUploadBuffer));
-
-		if (FAILED(hr))
-		{
-			// if we fail we can handle it by just showing default texture, without much trouble.
-			X_ERROR("Texture", "Failed to create commited resource for uploading. res: %" PRIu32, hr);
-			return false;
-		}
-
-		// we going todo this sync, but could keep hold of the resource and release when done.
-		render::CommandContext* pContext = contextMan_.allocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
-
-		// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
-		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
-		pContext->updateSubresources<texture::TEX_MAX_MIPS>(pDevice_, dest, pUploadBuffer, 0, 0, numSubresources, pSubData);
-		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
-		pContext->finishAndFree(true);
-
-		pUploadBuffer->Release();
-
-		return true;
-	}
-
-	uint64_t TextureManager::getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
-		uint32_t firstSubresource, uint32_t numSubresources) const
-	{
-		const D3D12_RESOURCE_DESC desc = pDestinationResource->GetDesc();
-		uint64_t requiredSize = 0;
-
-		ID3D12Device* pDevice;
-		pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
-		pDevice->GetCopyableFootprints(&desc, firstSubresource, numSubresources, 0, nullptr, nullptr, nullptr, &requiredSize);
-		pDevice->Release();
-
-		return requiredSize;
 	}
 
 

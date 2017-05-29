@@ -59,8 +59,18 @@ public:
 	void releaseTexture(Texture* pTex);
 	void releasePixelBuffer(render::IPixelBuffer* pPixelBuf);
 
-	bool updateTexture(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const;
+	bool initDeviceTexture(Texture* pTex) const;
+	bool initDeviceTexture(Texture* pTex, const texture::XTextureFile& imgFile) const;
+	
+	bool updateTextureData(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const;
 
+private:
+	X_INLINE bool updateTextureData(Texture* pTex, const texture::XTextureFile& imgFile) const;
+	X_INLINE bool updateTextureData(Texture* pTex, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const;
+	bool updateTextureData(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const;
+
+	uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
+		uint32_t firstSubresource, uint32_t numSubresources) const;
 
 private:
 	void releasePixelBuffer_internal(render::IPixelBuffer* pPixelBuf);
@@ -70,12 +80,6 @@ private:
 	bool reloadForName(const char* pName);
 
 	void releaseDanglingTextures(void);
-
-	bool createDeviceTexture(Texture* pTex);
-	bool initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData);
-
-	uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
-		uint32_t firstSubresource, uint32_t numSubresources) const;
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;

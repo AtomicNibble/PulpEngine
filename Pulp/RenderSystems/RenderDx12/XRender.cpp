@@ -748,7 +748,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				{
 					const Commands::CopyTextureBufferData& updateTex = *reinterpret_cast<const Commands::CopyTextureBufferData*>(pCmd);
 					
-					pTextureMan_->updateTexture(context, updateTex.textureId, static_cast<const uint8_t*>(updateTex.pData), updateTex.size);
+					pTextureMan_->updateTextureData(context, updateTex.textureId, static_cast<const uint8_t*>(updateTex.pData), updateTex.size);
 				}
 				break;
 
@@ -756,7 +756,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				{
 					const Commands::CopyTextureSubRegionBufferData& updateSubTex = *reinterpret_cast<const Commands::CopyTextureSubRegionBufferData*>(pCmd);
 				
-					pTextureMan_->updateTexture(context, updateSubTex.textureId, static_cast<const uint8_t*>(updateSubTex.pData), updateSubTex.size);
+					pTextureMan_->updateTextureData(context, updateSubTex.textureId, static_cast<const uint8_t*>(updateSubTex.pData), updateSubTex.size);
 				}
 				break;
 
@@ -1124,6 +1124,15 @@ texture::ITexture* XRender::getDeviceTexture(int32_t id, const texture::XTexture
 	return pText;
 }
 
+bool XRender::initDeviceTexture(texture::ITexture* pTex)
+{
+	return pTextureMan_->initDeviceTexture(static_cast<texture::Texture*>(pTex));
+}
+
+bool XRender::initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile)
+{
+	return pTextureMan_->initDeviceTexture(static_cast<texture::Texture*>(pTex), imgFile);
+}
 
 
 shader::IShaderSource* XRender::getShaderSource(const char* pSourceName)

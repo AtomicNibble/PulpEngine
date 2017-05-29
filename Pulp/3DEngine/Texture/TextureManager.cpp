@@ -246,6 +246,8 @@ void TextureManager::processCIImageData(Texture* pTexture, const uint8_t* pData,
 	pTexture->setProperties(imgFile);
 
 	// we need to upload the texture data.
+	gEnv->pRender->initDeviceTexture(pTexture->getDeviceTexture(), imgFile);
+
 
 	flags.Set(texture::TexFlag::LOADED);
 }

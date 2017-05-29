@@ -108,4 +108,9 @@ X_INLINE void Texture::setProperties(const texture::XTextureFile& imgFile)
 	pDeviceTexture_->setProperties(imgFile);
 }
 
+X_INLINE texture::ITexture* Texture::getDeviceTexture(void) const
+{
+	return pDeviceTexture_;
+}
+
 X_NAMESPACE_END

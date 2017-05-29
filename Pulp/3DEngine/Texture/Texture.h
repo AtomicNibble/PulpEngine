@@ -39,7 +39,7 @@ public:
 
 public:
 	X_INLINE void setProperties(const texture::XTextureFile& imgFile);
-
+	X_INLINE texture::ITexture* getDeviceTexture(void) const;
 
 private:
 	core::string				fileName_;

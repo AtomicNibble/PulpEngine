@@ -198,6 +198,9 @@ public:
 	texture::ITexture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload = false) X_FINAL;
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
+	
+	bool initDeviceTexture(texture::ITexture* pTex) X_FINAL;
+	bool initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile) X_FINAL;
 
 	shader::IShaderSource* getShaderSource(const char* pName) X_FINAL;
 	shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags) X_FINAL;
