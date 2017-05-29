@@ -3,8 +3,9 @@
 #include "Texture.h"
 
 #include <Threading\JobSystem2.h>
-#include <IFileSys.h>
+#include <IConsole.h>
 #include <ICi.h>
+#include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -45,6 +46,8 @@ TextureManager::~TextureManager()
 
 void TextureManager::registerCmds(void)
 {
+	ADD_COMMAND_MEMBER("listImages", this, TextureManager, &TextureManager::Cmd_ListTextures, core::VarFlag::SYSTEM,
+		"List all the textures");
 
 }
 
@@ -394,5 +397,52 @@ void TextureManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::P
 
 }
 
+// -----------------------------------
+
+void TextureManager::listTextures(const char* pSearchPattern)
+{
+	core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
+	core::Array<TextureContainer::Resource*> sorted_texs(arena_);
+	sorted_texs.reserve(textures_.size());
+
+	for (const auto& mat : textures_)
+	{
+		if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, mat.first))
+		{
+			sorted_texs.push_back(mat.second);
+		}
+	}
+
+	std::sort(sorted_texs.begin(), sorted_texs.end(), [](TextureContainer::Resource* a, TextureContainer::Resource* b) {
+			const auto& nameA = a->getName();
+			const auto& nameB = b->getName();
+			return nameA.compareInt(nameB) < 0;
+		}
+	);
+
+	X_LOG0("Texture", "------------- ^8Textures(%" PRIuS ")^7 ------------", sorted_texs.size());
+
+	for (const auto* pTex : sorted_texs)
+	{
+		X_LOG0("Texture", "^2\"%s\"^7 dim: ^2%" PRIi32 "x%" PRIi32 " ^7mips: ^2%" PRIi32 " ^7refs: ^2%" PRIi32,
+			pTex->getName(), pTex->getWidth(), pTex->getHeight(), pTex->getNumMips(), pTex->getRefCount());
+	}
+
+	X_LOG0("Texture", "------------ ^8Textures End^7 ------------");
+}
+
+// -----------------------------------
+
+void TextureManager::Cmd_ListTextures(core::IConsoleCmdArgs* pCmd)
+{
+	const char* pSearchPattern = nullptr;
+
+	if (pCmd->GetArgCount() >= 2) {
+		pSearchPattern = pCmd->GetArg(1);
+	}
+
+	listTextures(pSearchPattern);
+}
 
 X_NAMESPACE_END

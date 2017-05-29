@@ -18,6 +18,7 @@ X_NAMESPACE_DECLARE(core,
 
 	struct IoRequestBase;
 	struct XFileAsync;
+	struct IConsoleCmdArgs;
 )
 
 X_NAMESPACE_DECLARE(texture,
@@ -25,6 +26,8 @@ X_NAMESPACE_DECLARE(texture,
 		class XTexLoaderCI;
 	}	
 )
+
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -108,6 +111,11 @@ private:
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
+
+	void listTextures(const char* pSearchPattern);
+
+private:
+	void Cmd_ListTextures(core::IConsoleCmdArgs* pCmd);
 
 private:
 	core::MemoryArenaBase* arena_;
