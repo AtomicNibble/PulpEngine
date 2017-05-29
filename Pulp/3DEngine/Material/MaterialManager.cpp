@@ -640,7 +640,7 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 
 	MaterialHeader hdr;
 
-	core::XFileScoped file;
+	core::XFileMemScoped file;
 	if (!file.openFile(path.c_str(), core::fileMode::READ)) {
 		return false;
 	}
