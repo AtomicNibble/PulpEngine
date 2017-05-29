@@ -301,8 +301,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	}
 #endif // !X_ENABLE_ASSERTIONS
 
-	// pRender_->createTexture();
-
 	{
 		// need to map material textures to perm textures.
 		// some textures have default values.
