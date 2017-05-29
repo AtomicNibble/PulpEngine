@@ -248,6 +248,8 @@ void TextureManager::processCIFile_job(core::V2::JobSystem& jobSys, size_t threa
 
 	processCIFile(pJobData->pTexture, pJobData->pData, pJobData->length);
 
+	X_DELETE_ARRAY(pJobData->pData, &blockArena_);
+
 	loadComplete_.raise();
 }
 
