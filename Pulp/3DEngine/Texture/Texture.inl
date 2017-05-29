@@ -100,5 +100,17 @@ X_INLINE texture::TextureFlags& Texture::flags(void)
 }
 
 
+// --------------------------------------
+
+X_INLINE void Texture::setDeviceTexture(texture::ITexture* pTex)
+{
+	pDeviceTexture_ = pTex;
+}
+
+X_INLINE void Texture::setProperties(const texture::XTextureFile& imgFile)
+{
+	X_ASSERT_NOT_NULL(pDeviceTexture_);
+	pDeviceTexture_->setProperties(imgFile);
+}
 
 X_NAMESPACE_END

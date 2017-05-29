@@ -37,6 +37,11 @@ public:
 
 	X_INLINE texture::TextureFlags& flags(void);
 
+public:
+	X_INLINE void setDeviceTexture(texture::ITexture* pTex);
+	X_INLINE void setProperties(const texture::XTextureFile& imgFile);
+
+
 private:
 	core::string				fileName_;
 	int32_t						id_;
@@ -49,7 +54,6 @@ private:
 	uint8_t						depth_;
 	uint8_t						numFaces_;
 
-public:
 	texture::ITexture*			pDeviceTexture_;
 };
 
