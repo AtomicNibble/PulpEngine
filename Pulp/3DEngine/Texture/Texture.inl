@@ -69,10 +69,10 @@ X_INLINE const bool Texture::isLoaded(void) const
 X_INLINE const bool Texture::isLoading(void) const
 {
 	// neither flags are set.
-	return !isLoaded() && !loadedFailed();
+	return !isLoaded() && !loadFailed();
 }
 
-X_INLINE const bool Texture::loadedFailed(void) const
+X_INLINE const bool Texture::loadFailed(void) const
 {
 	return flags_.IsSet(texture::TextureFlags::LOAD_FAILED);
 }

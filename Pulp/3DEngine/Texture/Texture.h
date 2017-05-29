@@ -29,7 +29,7 @@ public:
 
 	X_INLINE const bool isLoaded(void) const;
 	X_INLINE const bool isLoading(void) const;
-	X_INLINE const bool loadedFailed(void) const;
+	X_INLINE const bool loadFailed(void) const;
 
 	X_INLINE const texture::TextureType::Enum getTextureType(void) const;
 	X_INLINE const texture::Texturefmt::Enum getFormat(void) const;
