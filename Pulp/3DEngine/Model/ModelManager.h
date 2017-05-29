@@ -34,10 +34,10 @@ public:
 
 	bool asyncInitFinalize(void);
 
-	XModel* findModel(const char* ModelName) const;
+	XModel* findModel(const char* pModelName) const;
 	// this only performs cpu loading, and currently loads all lods at once.
 	// as well as resolving materials, will alwyas return a instance, but might contain default data.
-	XModel* loadModel(const char* ModelName);
+	XModel* loadModel(const char* pModelName);
 	XModel* loadModelSync(const char* pModelName);
 
 	void releaseModel(XModel* pModel);
@@ -49,12 +49,12 @@ public:
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
-	void ListModels(const char* searchPatten = nullptr) const;
+	void ListModels(const char* pSearchPatten = nullptr) const;
 	void ReloadModel(const char* pName);
 
 private:
 
-	void Cmd_ListModels(core::IConsoleCmdArgs* Cmd);
+	void Cmd_ListModels(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd);
 
 private:

@@ -305,13 +305,13 @@ void XModelManager::ReloadModel(const char* pModelName)
 	}
 }
 
-void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* Cmd)
+void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* pCmd)
 {
 	// optional search criteria
 	const char* pSearchPatten = nullptr;
 
-	if (Cmd->GetArgCount() >= 2) {
-		pSearchPatten = Cmd->GetArg(1);
+	if (pCmd->GetArgCount() >= 2) {
+		pSearchPatten = pCmd->GetArg(1);
 	}
 
 	ListModels(pSearchPatten);
