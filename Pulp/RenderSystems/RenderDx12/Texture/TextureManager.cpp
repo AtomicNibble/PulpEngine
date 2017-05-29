@@ -304,8 +304,6 @@ X_NAMESPACE_BEGIN(texture)
 
 		if (pTexRes->removeReference() == 0)
 		{
-			core::string name(pTex->getName());
-			
 			X_ASSERT(pTex->getBufferType() == render::PixelBufferType::NONE, "PixelBuffers should not be released here")();
 
 			textures_.releaseAsset(pTexRes);
