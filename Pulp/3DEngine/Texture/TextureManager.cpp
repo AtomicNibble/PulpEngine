@@ -2,10 +2,23 @@
 #include "TextureManager.h"
 #include "Texture.h"
 
+#include <Threading\JobSystem2.h>
 #include <IFileSys.h>
 #include <ICi.h>
 
 X_NAMESPACE_BEGIN(engine)
+
+namespace
+{
+	struct CIFileJobData
+	{
+		Texture* pTexture;
+		const uint8_t* pData;
+		size_t length;
+	};
+
+
+} // namespace 
 
 
 TextureManager::TextureManager(core::MemoryArenaBase* arena) :
@@ -202,7 +215,6 @@ void TextureManager::dispatchRead(Texture* pTexture)
 	gEnv->pFileSys->AddIoRequestToQue(req);
 }
 
-
 void TextureManager::IoRequestCallback(core::IFileSys&, const core::IoRequestBase* pReqBase, core::XFileAsync* pFile, uint32_t bytesRead)
 {
 	// who is this?
@@ -216,21 +228,30 @@ void TextureManager::IoRequestCallback(core::IFileSys&, const core::IoRequestBas
 		if (!pFile || !bytesRead)
 		{
 			flags.Set(texture::TexFlag::LOAD_FAILED);
-		}
-		else
-		{
-			// we don't really want to do this in the UI thread.
-			processCIImageData(pTexture, pReq->pBuf, pReq->dataSize);
+			loadComplete_.raise();
 		}
 
-		// raise that we just loaded a image.
-		loadComplete_.raise();
+		// YOU WANT A JOB?
+		// 3 fiddy a hour.
+		CIFileJobData data{ pTexture, pReq->pBuf, pReq->dataSize };
 
+		gEnv->pJobSys->CreateMemberJobAndRun<TextureManager>(this, &TextureManager::processCIFile_job,
+			data JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 	}
 
 }
 
-void TextureManager::processCIImageData(Texture* pTexture, const uint8_t* pData, size_t length)
+void TextureManager::processCIFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys, threadIdx, pJob);
+	CIFileJobData* pJobData = static_cast<CIFileJobData*>(pData);
+
+	processCIFile(pJobData->pTexture, pJobData->pData, pJobData->length);
+
+	loadComplete_.raise();
+}
+
+void TextureManager::processCIFile(Texture* pTexture, const uint8_t* pData, size_t length)
 {
 	auto& flags = pTexture->flags();
 
@@ -247,7 +268,6 @@ void TextureManager::processCIImageData(Texture* pTexture, const uint8_t* pData,
 
 	// we need to upload the texture data.
 	gEnv->pRender->initDeviceTexture(pTexture->getDeviceTexture(), imgFile);
-
 
 	flags.Set(texture::TexFlag::LOADED);
 }

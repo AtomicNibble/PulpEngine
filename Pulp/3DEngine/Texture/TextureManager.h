@@ -76,8 +76,6 @@ public:
 private:
 	void dispatchRead(Texture* pTexture);
 
-//	bool loadFromFile(texture::XTextureFile& imgFile, const char* pPath);
-//	bool processImgFile(Texture* pTex, texture::XTextureFile& imgFile);
 
 	bool loadDefaultTextures(void);
 	void releaseDefaultTextures(void);
@@ -86,7 +84,9 @@ private:
 private:
 	void IoRequestCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
 	
-	void processCIImageData(Texture* pTexture, const uint8_t* pData, size_t length);
+	void processCIFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void processCIFile(Texture* pTexture, const uint8_t* pData, size_t length);
+
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
