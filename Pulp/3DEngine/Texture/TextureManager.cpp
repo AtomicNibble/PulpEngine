@@ -21,6 +21,18 @@ TextureManager::~TextureManager()
 
 }
 
+
+void TextureManager::registerCmds(void)
+{
+
+}
+
+void TextureManager::registerVars(void)
+{
+	vars_.registerVars();
+}
+
+
 bool TextureManager::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
@@ -81,15 +93,6 @@ void TextureManager::shutDown(void)
 }
 
 
-void TextureManager::registerCmds(void)
-{
-
-}
-
-void TextureManager::registerVars(void)
-{
-	vars_.registerVars();
-}
 
 
 Texture* TextureManager::forName(const char* pName, texture::TextureFlags flags)
