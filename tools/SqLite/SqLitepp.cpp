@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "SqLitepp.h"
 
-#include <../../3rdparty/source/sqlite-3.10.1/sqlite3.h>
-// #include <../../3rdparty/source/sqlite-3.10.1/sqlite3ext.h>
+
+#include <../../3rdparty/source/sqlite-3.19.2/sqlite3.h>
 
 
 X_NAMESPACE_BEGIN(sql)
