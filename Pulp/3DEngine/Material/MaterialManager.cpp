@@ -659,16 +659,12 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 
 	// we need to poke the goat.
 	// so now materials store the cat and type which we can use to get techdef info.
-
-#if 1
-
 	core::string catType;
 	file.readString(catType);
 
 	Material::SamplerArr samplers(arena_, hdr.numSamplers);
 	Material::ParamArr params(arena_, hdr.numParams);
 	Material::TextureArr textures(arena_, hdr.numTextures);
-
 
 	// now samplers.
 	for (uint8_t i = 0; i < hdr.numSamplers; i++)
@@ -698,44 +694,6 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	}
 
 
-#else
-
-	// we also have texture info.
-	core::FixedArray<MaterialTextureHdr, MTL_MAX_TEXTURES> texInfo;
-	core::FixedArray<const char*, MTL_MAX_TEXTURES> texNames;
-	texInfo.resize(hdr.numTextures);
-
-	if (file.readObjs(texInfo.data(), hdr.numTextures) != hdr.numTextures) {
-		return false;
-	}
-
-
-#if 1
-	core::string catType;
-
-	file.readString(catType);
-
-#else
-	// now we have strings
-	core::string catType;
-	char nameBuffer[assetDb::ASSET_NAME_MAX_LENGTH * MTL_MAX_TEXTURES];
-
-	file.read(nameBuffer, hdr.strDataSize);
-
-
-	catType = nameBuffer;
-
-	const char* pNameCur = nameBuffer + hdr.catTypeNameLen;
-
-	for (const auto& tex : texInfo)
-	{
-		texNames.append(pNameCur);
-		pNameCur += tex.nameLen;
-	}
-#endif
-#endif
-
-
 #if X_DEBUG
 	const auto left = file.remainingBytes();
 	X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
@@ -759,38 +717,12 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 		return false;
 	}
 
-	// ok for a material we need to create all the techs now.
-
-//	auto* pTech = pTechDefState->getTech(core::StrHash("unlit"));
-//	pTech = nullptr;
-
-
 
 	MaterialResource* pMatRes = createMaterial_Internal(matName);
 	pMatRes->setTechDefState(pTechDefState);
 	pMatRes->setParams(std::move(params));
 	pMatRes->setSamplers(std::move(samplers));
 	pMatRes->setTextures(std::move(textures));
-
-#if 0
-	// so my fine little goat muncher.
-	// we need to slap textures for the goats that fly towards us.
-	core::FixedArray<Material::Texture, MTL_MAX_TEXTURES> processedInfo;
-	processedInfo.resize(texInfo.size());
-
-	for (size_t i=0; i<texInfo.size(); i++)
-	{
-		auto* pITexture = pRender_->getTexture(texNames[i], texture::TextureFlags::STREAMABLE);
-
-
-		Material::Texture tex;
-		tex.texId = pITexture->getTexID();
-		tex.filterType = texInfo[i].filterType;
-		tex.texRepeat = texInfo[i].texRepeat;
-	}
-
-	pMatRes->setTextures(processedInfo);
-#endif
 
 	return pMatRes;
 }
