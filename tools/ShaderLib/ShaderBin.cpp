@@ -213,7 +213,7 @@ namespace shader
 		ShaderBinHeader hdr;
 		core::zero_object(hdr);
 
-		core::XFileScoped file;
+		core::XFileMemScoped file;
 		if (file.openFile(path.c_str(), core::fileMode::READ))
 		{
 			file.readObj(hdr);
