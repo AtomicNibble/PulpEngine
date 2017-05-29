@@ -140,6 +140,9 @@ bool TextureManager::asyncInitFinalize(void)
 void TextureManager::scheduleStreaming(void)
 {
 	// we work out what to start streaming.
+	if (streamQueue_.isEmpty()) {
+		return;
+	}
 
 }
 

@@ -3,6 +3,7 @@
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Assets\AssertContainer.h>
 #include <Containers\Fifo.h>
+#include <Containers\PriorityQueue.h>
 #include <Threading\Signal.h>
 
 #include <ITexture.h>
@@ -37,7 +38,6 @@ class TextureManager : public core::IXHotReload
 
 	typedef std::array<Texture*, render::TextureSlot::ENUM_COUNT> TextureSlotArr;
 	typedef core::FixedArray<texture::ITextureFmt*, 8> TextureLoadersArr;
-	typedef core::Fifo<Texture*> TextureQueue;
 
 	typedef core::MemoryArena<
 		core::MallocFreeAllocator,
@@ -52,6 +52,23 @@ class TextureManager : public core::IXHotReload
 		core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
 	> BlockArena;
+
+	struct StreamRequest
+	{
+		X_INLINE bool operator<(const StreamRequest& oth) const {
+			return priority < oth.priority;
+		}
+		X_INLINE bool operator>(const StreamRequest& oth) const {
+			return priority > oth.priority;
+		}
+
+		int32_t priority;
+		Texture* pTexture;
+	};
+
+
+	typedef core::PriorityQueue<StreamRequest> StreamReqQueue;
+
 
 public:
 	TextureManager(core::MemoryArenaBase* arena);
@@ -105,7 +122,7 @@ private:
 	BlockArena::AllocationPolicy blockAlloc_;
 	BlockArena blockArena_;
 
-	TextureQueue streamQueue_;
+	StreamReqQueue streamQueue_;
 
 	core::Signal loadComplete_;
 
