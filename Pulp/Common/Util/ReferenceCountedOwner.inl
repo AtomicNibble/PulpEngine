@@ -1,8 +1,8 @@
 
 template <class T>
-ReferenceCountedOwner<T>::ReferenceCountedOwner(T* instance, MemoryArenaBase* arena)
-	: instance_(instance)
-	, arena_(arena)
+ReferenceCountedOwner<T>::ReferenceCountedOwner(T* instance, MemoryArenaBase* arena) :
+	instance_(instance),
+	arena_(arena)
 {
 	// makes the refrence counting not work correct.
 	// a instance should start with ref count of 1.
@@ -15,11 +15,10 @@ ReferenceCountedOwner<T>::ReferenceCountedOwner(T* instance, MemoryArenaBase* ar
 	//instance_->addReference();
 }
 
-
 template <class T>
-ReferenceCountedOwner<T>::ReferenceCountedOwner(const ReferenceCountedOwner<T>& other)
-	: instance_(other.instance_)
-	, arena_(other.arena_)
+ReferenceCountedOwner<T>::ReferenceCountedOwner(const ReferenceCountedOwner<T>& other) :
+	instance_(other.instance_),
+	arena_(other.arena_)
 {
 	instance_->addReference();
 }
