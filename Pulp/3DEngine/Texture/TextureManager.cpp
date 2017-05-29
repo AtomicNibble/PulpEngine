@@ -105,8 +105,7 @@ void TextureManager::shutDown(void)
 bool TextureManager::asyncInitFinalize(void)
 {
 	// we need to know that the default textures have finished loading and are ready.
-
-	while (pTexDefault_->isLoading() && pTexDefaultBump_->isLoading())
+	while(std::any_of(defaultLookup_.begin(), defaultLookup_.end(), [](Texture* pTex) { return pTex->isLoading(); }))
 	{
 		loadComplete_.wait();
 	}
@@ -120,7 +119,7 @@ bool TextureManager::asyncInitFinalize(void)
 		return false;
 	}
 
-	return true;
+	return std::all_of(defaultLookup_.begin(), defaultLookup_.end(), [](Texture* pTex) { return pTex->isLoaded(); });
 }
 
 
