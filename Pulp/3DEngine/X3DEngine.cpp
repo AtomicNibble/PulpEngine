@@ -103,17 +103,15 @@ bool X3DEngine::init(void)
 	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender);
 	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
 
-	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
 	pTextureManager_ = X_NEW(engine::TextureManager, g_3dEngineArena, "TextureManager")(g_3dEngineArena);
+	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
-	
 	pGuiManger_ = X_NEW(gui::XGuiManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
 	
-
-	pMaterialManager_->registerCmds();
-	pMaterialManager_->registerVars();
 	pTextureManager_->registerCmds();
 	pTextureManager_->registerVars();
+	pMaterialManager_->registerCmds();
+	pMaterialManager_->registerVars();
 	pModelManager_->registerCmds();
 	pModelManager_->registerVars();
 
@@ -123,10 +121,10 @@ bool X3DEngine::init(void)
 	gEngEnv.pModelMan_ = pModelManager_;
 	gEngEnv.p3DEngine_ = this;
 
-	if (!pMaterialManager_->init()) {
+	if (!pTextureManager_->init()) {
 		return false;
 	}
-	if (!pTextureManager_->init()) {
+	if (!pMaterialManager_->init()) {
 		return false;
 	}
 	if (!pModelManager_->init()) {
@@ -137,8 +135,6 @@ bool X3DEngine::init(void)
 	}
 
 
-
-	// init share prim contex resources.
 	if (!primResources_.init(pRender, pMaterialManager_)) {
 		X_ERROR("3DEngine", "Failed to init prim resources");
 		return false;
