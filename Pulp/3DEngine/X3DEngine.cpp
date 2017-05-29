@@ -242,11 +242,25 @@ void X3DEngine::release(void)
 
 bool X3DEngine::asyncInitFinalize(void)
 {
+	bool allOk = true;
+
+	// all init okay?
+	// we must allways call asyncInitFinalize on all instances.
+	// so shutdown is safe.
+
 	if (!pTextureManager_ || !pTextureManager_->asyncInitFinalize()) {
-		return false;
+		allOk = false;
 	}
 
-	return true;
+	if (!pMaterialManager_ || !pMaterialManager_->asyncInitFinalize()) {
+		allOk = false;
+	}
+
+	if (!pModelManager_ || !pModelManager_->asyncInitFinalize()) {
+		allOk = false;
+	}
+
+	return allOk;
 }
 
 void X3DEngine::Update(core::FrameData& frame)

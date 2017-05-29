@@ -103,6 +103,14 @@ void XModelManager::shutDown(void)
 	models_.free();
 }
 
+bool XModelManager::asyncInitFinalize(void)
+{
+
+
+	
+	return true;
+}
+
 
 XModel* XModelManager::findModel(const char* pModelName) const
 {

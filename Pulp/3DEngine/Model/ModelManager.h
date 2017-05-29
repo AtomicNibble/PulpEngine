@@ -32,6 +32,8 @@ public:
 	bool init(void);
 	void shutDown(void);
 
+	bool asyncInitFinalize(void);
+
 	XModel* findModel(const char* ModelName) const;
 	// this only performs cpu loading, and currently loads all lods at once.
 	// as well as resolving materials, will alwyas return a instance, but might contain default data.

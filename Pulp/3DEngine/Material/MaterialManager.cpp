@@ -94,6 +94,12 @@ void XMaterialManager::shutDown(void)
 	}
 }
 
+bool XMaterialManager::asyncInitFinalize(void)
+{
+
+	return true;
+}
+
 
 void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {

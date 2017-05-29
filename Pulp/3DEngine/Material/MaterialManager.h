@@ -42,6 +42,8 @@ public:
 	bool init(void);
 	void shutDown(void);
 
+	bool asyncInitFinalize(void);
+
 	// IMaterialManager
 	virtual Material* createMaterial(const char* pMtlName) X_FINAL;
 	virtual Material* findMaterial(const char* pMtlName) const X_FINAL;
