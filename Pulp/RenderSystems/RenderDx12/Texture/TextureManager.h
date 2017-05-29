@@ -70,8 +70,6 @@ private:
 
 	void releaseDanglingTextures(void);
 
-//	bool load(Texture* pTex);
-	bool processImgFile(Texture* pTex, const XTextureFile& imgFile);
 	bool createDeviceTexture(Texture* pTex);
 	bool initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData);
 

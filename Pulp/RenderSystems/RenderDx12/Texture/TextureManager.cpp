@@ -108,7 +108,7 @@ X_NAMESPACE_BEGIN(texture)
 			pTexRes = textures_.createAsset(name, name, imgFile.getFlags());
 			threadPolicy.Leave();
 
-			processImgFile(pTexRes, imgFile);
+			pTexRes->setProperties(imgFile);
 
 			if (!createDeviceTexture(pTexRes)) {
 				return nullptr;
@@ -509,30 +509,6 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 #endif
-
-	bool TextureManager::processImgFile(Texture* pTex, const XTextureFile& imgFile)
-	{
-		// ummm check shit like generating mip maps and limits?
-		// or converting a format if it's not support :S ?
-		pTex->setFormat(imgFile.getFormat());
-		pTex->setType(imgFile.getType());
-		pTex->setWidth(imgFile.getWidth());
-		pTex->setHeight(imgFile.getHeight());
-		pTex->setDepth(imgFile.getDepth());
-		pTex->setNumFaces(imgFile.getNumFaces());
-		pTex->setNumMips(imgFile.getNumMips());
-
-		const auto flags = pTex->getFlags();
-		if (flags.IsSet(TextureFlags::FORCE_MIPS))
-		{
-			// we could just load the img lib and process this.
-			// but fuck you.
-			X_ASSERT_NOT_IMPLEMENTED();
-			return false;
-		}
-
-		return true;
-	}
 
 	bool TextureManager::createDeviceTexture(Texture* pTex)
 	{
