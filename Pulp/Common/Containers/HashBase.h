@@ -435,8 +435,32 @@ void HashBase<Key, Value, HashFn, EqualKey>::ensureSize(size_type _size)
 template <class Key, class Value, class HashFn, class EqualKey>
 void HashBase<Key, Value, HashFn, EqualKey>::erase(iterator pos)
 {
-	X_UNUSED(pos);
-	X_ASSERT_UNREACHABLE();
+	Node* pNode = pos.cur_;
+	if (pNode) {
+		const size_type n = buketIndex(pNode->val_);
+		Node* pCurNode = buckets_[n];
+
+		if (pCurNode == pNode) {
+			buckets_[n] = pCurNode->next_;
+			deleteNode(pCurNode);
+			--numElements_;
+		}
+		else {
+			Node* pNext = pCurNode->next_;
+			while (pNext) {
+				if (pNext == pNode) {
+					pCurNode->next_ = pNext->next_;
+					deleteNode(pNext);
+					--numElements_;
+					break;
+				}
+				else {
+					pCurNode = pNext;
+					pNext = pCurNode->next_;
+				}
+			}
+		}
+	}
 }
 
 
