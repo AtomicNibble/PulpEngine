@@ -4,10 +4,8 @@
 #define X_MODEL_H_
 
 #include <IModel.h>
-#include "Assets\AssertContainer.h"
 
 #include "RenderMesh.h"
-// #include <IRenderMesh.h>
 #include <IRender.h>
 
 X_NAMESPACE_DECLARE(core,
