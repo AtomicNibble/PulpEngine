@@ -206,8 +206,8 @@ namespace gui
 	{
 		virtual ~IGuiManger() {};
 
-		virtual bool Init(void) X_ABSTRACT;
-		virtual void Shutdown(void) X_ABSTRACT;
+		virtual bool init(void) X_ABSTRACT;
+		virtual void shutdown(void) X_ABSTRACT;
 
 		virtual IGui* loadGui(const char* name) X_ABSTRACT;
 		virtual IGui* findGui(const char* name) X_ABSTRACT;

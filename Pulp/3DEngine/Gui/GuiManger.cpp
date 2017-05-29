@@ -47,7 +47,7 @@ namespace gui
 	}
 
 
-	bool XGuiManager::Init(void)
+	bool XGuiManager::init(void)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -84,7 +84,7 @@ namespace gui
 		return true;
 	}
 
-	void XGuiManager::Shutdown(void)
+	void XGuiManager::shutdown(void)
 	{
 		X_LOG0("Gui", "Shutting Down");
 

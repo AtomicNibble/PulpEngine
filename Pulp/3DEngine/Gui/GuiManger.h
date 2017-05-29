@@ -28,8 +28,8 @@ namespace gui
 		~XGuiManager() X_FINAL;
 
 		//IGuiManger
-		bool Init(void) X_FINAL;
-		void Shutdown(void) X_FINAL;
+		bool init(void) X_FINAL;
+		void shutdown(void) X_FINAL;
 
 		IGui* loadGui(const char* name) X_FINAL;
 		IGui* findGui(const char* name) X_FINAL;

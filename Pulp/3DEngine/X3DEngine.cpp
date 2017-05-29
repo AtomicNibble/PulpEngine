@@ -129,7 +129,7 @@ bool X3DEngine::init(void)
 	if (!pModelManager_->init()) {
 		return false;
 	}
-	if (!pGuiManger_->Init()) {
+	if (!pGuiManger_->init()) {
 		return false;
 	}
 
@@ -191,7 +191,7 @@ void X3DEngine::shutDown(void)
 	primResources_.releaseResources(pRender, pMaterialManager_);
 
 	if (pGuiManger_) {
-		pGuiManger_->Shutdown();
+		pGuiManger_->shutdown();
 		X_DELETE(pGuiManger_, g_3dEngineArena);
 
 		gEngEnv.pGuiMan_ = nullptr;
