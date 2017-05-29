@@ -5,6 +5,10 @@
 
 #include "Texture\TextureUtil.h"
 
+
+// Img Lib
+#include <../../tools/ImgLib/ImgLib.h>
+
 X_NAMESPACE_BEGIN(texture)
 
 
@@ -58,6 +62,18 @@ X_NAMESPACE_BEGIN(texture)
 		hCpuDescriptorHandle_.ptr = 0;
 	}
 
+	void Texture::setProperties(const XTextureFile& imgFile)
+	{
+		// ummm check shit like generating mip maps and limits?
+		// or converting a format if it's not support :S ?
+		format_ = imgFile.getFormat();
+		type_ = imgFile.getType();
+		dimensions_.x = imgFile.getWidth();
+		dimensions_.y = imgFile.getHeight();
+		depth_ = imgFile.getDepth();
+		numFaces_ = imgFile.getNumFaces();
+		numMips_ =imgFile.getNumMips();
+	}
 
 	const DXGI_FORMAT Texture::getFormatDX(void) const
 	{

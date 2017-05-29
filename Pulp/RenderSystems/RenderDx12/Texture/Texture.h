@@ -56,6 +56,8 @@ class TextureManager;
 		X_INLINE const Texturefmt::Enum getFormat(void) const X_FINAL;
 		const DXGI_FORMAT getFormatDX(void) const;
 
+		void setProperties(const XTextureFile& imgFile) X_FINAL;
+
 		// IPixelBuffer
 		X_INLINE render::PixelBufferType::Enum getBufferType(void) const X_FINAL;
 		// ~IPixelBuffer
