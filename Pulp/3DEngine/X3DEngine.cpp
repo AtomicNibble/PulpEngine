@@ -102,7 +102,6 @@ bool X3DEngine::init(void)
 
 	pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender);
 	pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
-
 	pTextureManager_ = X_NEW(engine::TextureManager, g_3dEngineArena, "TextureManager")(g_3dEngineArena);
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
