@@ -1,6 +1,10 @@
 #pragma once
 
 
+X_NAMESPACE_DECLARE(texture,	
+	struct ITexture;
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -10,6 +14,7 @@ public:
 	Texture(core::string name, texture::TextureFlags flags);
 	~Texture() = default;
 
+	X_INLINE const int32_t getDeviceID(void) const;
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
 
@@ -37,6 +42,9 @@ private:
 	uint8_t						numMips_;
 	uint8_t						depth_;
 	uint8_t						numFaces_;
+
+public:
+	texture::ITexture*			pDeviceTexture_;
 };
 
 

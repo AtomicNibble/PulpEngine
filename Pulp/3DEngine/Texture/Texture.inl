@@ -2,6 +2,13 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+
+X_INLINE const int32_t Texture::getDeviceID(void) const
+{
+	X_ASSERT_NOT_NULL(pDeviceTexture_);
+	return pDeviceTexture_->getTexID();
+}
+
 X_INLINE const int32_t Texture::getID(void) const
 {
 	return id_;
