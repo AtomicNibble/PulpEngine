@@ -243,7 +243,9 @@ void X3DEngine::release(void)
 
 bool X3DEngine::asyncInitFinalize(void)
 {
-
+	if (!pTextureManager_ || !pTextureManager_->asyncInitFinalize()) {
+		return false;
+	}
 
 	return true;
 }
