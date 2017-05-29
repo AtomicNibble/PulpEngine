@@ -184,6 +184,13 @@ void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
 }
 
 
+texture::ITexture* RenderNull::getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload)
+{
+	X_UNUSED(id, imgFile, upload);
+
+	return nullptr;
+}
+
 
 texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlags flags)
 {
@@ -194,10 +201,6 @@ texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlag
 	return nullptr;
 }
 
-texture::ITexture* RenderNull::getDefaultTexture(void) const
-{
-	return nullptr;
-}
 
 texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
