@@ -103,7 +103,7 @@ namespace Mem
 
 		// the object has been created using placement new, hence we need to call its destructor manually
 		Destruct(object);
-		arena->free(object);
+		arena->free(const_cast<std::remove_const_t<T>*>(object));
 	}
 
 	template <typename T>
@@ -114,7 +114,7 @@ namespace Mem
 
 		// the object has been created using placement new, hence we need to call its destructor manually
 		Destruct(object);
-		arena->free(object);
+		arena->free(const_cast<std::remove_const_t<T>*>(object));
 
 		// null the pointer.
 		object = nullptr;
@@ -138,7 +138,7 @@ namespace Mem
 		X_ASSERT_NOT_NULL(arena);
 
 		// no destructors need to be called for POD types
-		arena->free(ptr); 
+		arena->free(const_cast<std::remove_const_t<T>*>(ptr)); 
 	}
 
 
