@@ -17,6 +17,7 @@ TextureManager::TextureManager(core::MemoryArenaBase* arena) :
 	blockArena_(&blockAlloc_, "TextureBlockAlloc"),
 	streamQueue_(arena),
 	loadComplete_(true),
+	currentDeviceTexId_(0),
 	pTexDefault_(nullptr),
 	pTexDefaultBump_(nullptr)
 {
@@ -146,7 +147,12 @@ Texture* TextureManager::forName(const char* pName, texture::TextureFlags flags)
 	}
 	else
 	{
-		pTexRes = textures_.createAsset(name, name, flags);
+		auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++);
+		if (!pDevicTex) {
+			return nullptr;
+		}
+
+		pTexRes = textures_.createAsset(name, name, flags, pDevicTex);
 		threadPolicy.Leave();
 	}
 
@@ -237,14 +243,11 @@ void TextureManager::processCIImageData(Texture* pTexture, const uint8_t* pData,
 		return;
 	}
 	
-	// we don't really want / need to give textures names.
-	// it really should just be the id.
-	auto* iDeviceTex = gEnv->pRender->getDeviceTexture(pTexture->getID(), imgFile, true);
+	pTexture->setProperties(imgFile);
 
-	pTexture->pDeviceTexture_ = iDeviceTex;
-	
+	// we need to upload the texture data.
+
 	flags.Set(texture::TexFlag::LOADED);
-
 }
 
 

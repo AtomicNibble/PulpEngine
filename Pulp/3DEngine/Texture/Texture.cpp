@@ -4,9 +4,10 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-Texture::Texture(core::string name, texture::TextureFlags flags) :
+Texture::Texture(core::string name, texture::TextureFlags flags, texture::ITexture* pDeviceTexture) :
 	fileName_(name),
-	flags_(flags)
+	flags_(flags),
+	pDeviceTexture_(X_ASSERT_NOT_NULL(pDeviceTexture))
 {
 	dimensions_ = Vec2<uint16_t>::zero();
 	datasize_ = 0;

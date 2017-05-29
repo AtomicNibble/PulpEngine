@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(engine)
 class Texture
 {
 public:
-	Texture(core::string name, texture::TextureFlags flags);
+	Texture(core::string name, texture::TextureFlags flags, texture::ITexture* pDeviceTexture);
 	~Texture() = default;
 
 	X_INLINE const int32_t getDeviceID(void) const;
@@ -38,7 +38,6 @@ public:
 	X_INLINE texture::TextureFlags& flags(void);
 
 public:
-	X_INLINE void setDeviceTexture(texture::ITexture* pTex);
 	X_INLINE void setProperties(const texture::XTextureFile& imgFile);
 
 

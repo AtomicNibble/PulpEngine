@@ -110,6 +110,8 @@ private:
 	core::Signal loadComplete_;
 
 private:
+	int32_t currentDeviceTexId_;
+	
 	Texture* pTexDefault_;
 	Texture* pTexDefaultBump_;
 	
