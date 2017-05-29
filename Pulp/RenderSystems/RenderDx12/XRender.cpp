@@ -1095,6 +1095,12 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
 	pBuffMan_->freeCB(handle);
 }
 
+texture::ITexture* XRender::getDeviceTexture(int32_t id)
+{
+	texture::Texture* pText = pTextureMan_->getDeviceTexture(id);
+
+	return pText;
+}
 
 texture::ITexture* XRender::getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload)
 {

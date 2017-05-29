@@ -42,6 +42,7 @@ public:
 
 	DXGI_FORMAT getDepthFmt(void) const;
 
+	Texture* getDeviceTexture(int32_t id);
 	Texture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload);
 
 	Texture* forName(const char* pName, TextureFlags flags);

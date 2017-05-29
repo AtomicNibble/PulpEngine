@@ -86,6 +86,31 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 
+	Texture* TextureManager::getDeviceTexture(int32_t id)
+	{
+		core::StackString<32, char> idStr(id);
+		core::string name("id_");
+		name.append(idStr.begin(), idStr.end());
+
+		auto& threadPolicy = textures_.getThreadPolicy();
+		threadPolicy.Enter();
+
+		TexRes* pTexRes = textures_.findAsset(name);
+
+		if (pTexRes)
+		{
+			threadPolicy.Leave();
+			pTexRes->addReference();
+		}
+		else
+		{
+			pTexRes = textures_.createAsset(name, name, TextureFlags());
+			threadPolicy.Leave();
+		}
+
+		return pTexRes;
+	}
+
 	Texture* TextureManager::getDeviceTexture(int32_t id, const XTextureFile& imgFile, bool upload)
 	{
 		// meoowW!
