@@ -512,6 +512,11 @@ X_NAMESPACE_BEGIN(texture)
 
 	bool TextureManager::createDeviceTexture(Texture* pTex)
 	{
+		if (pTex->getFormat() == texture::Texturefmt::UNKNOWN) {
+			X_ERROR("Texture", "Failed to create resource for texture. format unknown");
+			return false;
+		}
+
 		auto fmt = Util::DXGIFormatFromTexFmt(pTex->getFormat());
 		auto& gpuResource = pTex->getGpuResource();
 
