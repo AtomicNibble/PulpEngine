@@ -598,10 +598,10 @@ X_NAMESPACE_BEGIN(texture)
 		}
 
 		std::sort(sorted_texs.begin(), sorted_texs.end(), [](TextureContainer::Resource* a, TextureContainer::Resource* b) {
-			const auto& nameA = a->getName();
-			const auto& nameB = b->getName();
-			return nameA.compareInt(nameB) < 0;
-		}
+				const auto& nameA = a->getName();
+				const auto& nameB = b->getName();
+				return nameA.compareInt(nameB) < 0;
+			}
 		);
 
 		X_LOG0("Texture", "------------- ^8Textures(%" PRIuS ")^7 ------------", sorted_texs.size());
