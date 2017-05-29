@@ -29,6 +29,11 @@ ReferenceCountedOwner<T>& ReferenceCountedOwner<T>::operator=(const ReferenceCou
 {
 	if (this != &other)
 	{
+		if (instance_->removeReference() == 0)
+		{
+			X_DELETE(instance_, arena_);
+		}
+
 		instance_ = other.instance_;
 		instance_->addReference();
 
