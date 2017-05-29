@@ -6,6 +6,12 @@
 #include "Vars\TextureVars.h"
 
 
+X_NAMESPACE_DECLARE(texture,
+	namespace CI {
+		class XTexLoaderCI;
+	}	
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 class Texture;
@@ -46,7 +52,7 @@ private:
 	TextureVars vars_;
 	TextureContainer textures_;
 
-	texture::ITextureFmt* pCILoader_;
+	texture::CI::XTexLoaderCI* pCILoader_;
 	TextureLoadersArr textureLoaders_;
 };
 
