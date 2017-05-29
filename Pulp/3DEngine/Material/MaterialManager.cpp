@@ -311,6 +311,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 		X_UNUSED(matTextures);
 
+		auto* pTexMan = gEngEnv.pTextureMan_;
+		auto* pDefaultTex = pTexMan->getDefault(render::TextureSlot::DIFFUSE);
 
 		texture::TextureFlags texFlags = texture::TextureFlags();
 
@@ -330,8 +332,42 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 					// might get default back, etc..
 					auto* pTexture = gEngEnv.pTextureMan_->forName(t.name.c_str(), texFlags);
 
-					texState.textureId = pTexture->getID();
+					texState.textureId = pTexture->getDeviceID();
 					break;
+				}
+			}
+
+			if (pTechDef->getNumAliases())
+			{
+				const auto& aliases = pTechDef->getAliases();
+				for (const auto& alias : aliases)
+				{
+					// find a alias that points to the persm resource.
+					if (alias.resourceName == permTexture.getName())
+					{
+						if (alias.isCode)
+						{
+							// if we must assign the texture with code, make it default.
+							texState.textureId = pDefaultTex->getDeviceID();
+							goto texSet;
+						}
+						else
+						{
+
+							// okay so now we know the name of the material sampler that we want.
+							for (j = 0; j < matTextures.size(); j++)
+							{
+								auto& t = matTextures[j];
+								if (t.name == alias.name)
+								{
+									auto* pTexture = gEngEnv.pTextureMan_->forName(t.name.c_str(), texFlags);
+
+									texState.textureId = pTexture->getDeviceID();
+									break;
+								}
+							}
+						}
+					}
 				}
 			}
 
@@ -339,10 +375,16 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 			if (j == matTextures.size())
 			{
 				X_ERROR("Material", "Failed to find texture values for perm texture: \"%s\" using default", permTexture.getName().c_str());
-				auto* pDefaultTex = gEnv->pRender->getDefaultTexture();
+				
+				// really we should know what type of texture would be set 
+				// eg TextureSlot::Enum
+				// this way we can return defaults that would actually not look retarded.
 
-				texState.textureId = pDefaultTex->getTexID();
+
+				texState.textureId = pDefaultTex->getDeviceID();
 			}
+
+		texSet:;
 		}
 	}
 
