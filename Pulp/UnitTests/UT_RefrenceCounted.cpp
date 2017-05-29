@@ -59,6 +59,12 @@ TEST(RefCounted, ArenaObject)
 			OwnerType otherOwner = owner;
 		}
 
+		// check assignment
+		{
+			OwnerType otherOwner = owner;
+			otherOwner = owner;
+		}
+
 		// back to one.
 	}
 
