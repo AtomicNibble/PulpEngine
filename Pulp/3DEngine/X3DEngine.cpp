@@ -120,17 +120,21 @@ bool X3DEngine::init(void)
 	gEngEnv.pModelMan_ = pModelManager_;
 	gEngEnv.p3DEngine_ = this;
 
-	if (!pTextureManager_->init()) {
-		return false;
-	}
-	if (!pMaterialManager_->init()) {
-		return false;
-	}
-	if (!pModelManager_->init()) {
-		return false;
-	}
-	if (!pGuiManger_->init()) {
-		return false;
+	{
+		X_PROFILE_NO_HISTORY_BEGIN("3DManInit", core::profiler::SubSys::ENGINE3D);
+
+		if (!pTextureManager_->init()) {
+			return false;
+		}
+		if (!pMaterialManager_->init()) {
+			return false;
+		}
+		if (!pModelManager_->init()) {
+			return false;
+		}
+		if (!pGuiManger_->init()) {
+			return false;
+		}
 	}
 
 

@@ -340,6 +340,8 @@ PrimativeContextSharedResources::PrimativeContextSharedResources() :
 
 bool PrimativeContextSharedResources::init(render::IRender* pRender, XMaterialManager* pMatMan)
 {
+	X_PROFILE_NO_HISTORY_BEGIN("PrimRes", core::profiler::SubSys::ENGINE3D);
+
 	X_ASSERT_NOT_NULL(pRender);
 
 	if (!loadMaterials(pMatMan)) {
