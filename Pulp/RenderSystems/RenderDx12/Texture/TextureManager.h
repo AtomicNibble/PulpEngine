@@ -50,7 +50,6 @@ public:
 		render::PixelBufferType::Enum type);
 
 	Texture* getByID(TexID texId) const;
-	Texture* getDefault(void) const;
 
 	// must not be null.
 	void releaseTexture(texture::ITexture* pTex);
@@ -67,8 +66,6 @@ private:
 	TexRes* findTexture(const core::string& name);
 	bool reloadForName(const char* pName);
 
-	bool loadDefaultTextures(void);
-	void releaseDefaultTextures(void);
 	void releaseDanglingTextures(void);
 
 //	bool load(Texture* pTex);
@@ -102,10 +99,6 @@ private:
 	TextureVars& vars_;
 
 	float clearDepthVal_;
-private:
-	Texture* pTexDefault_;
-	Texture* pTexDefaultBump_;
-	Texture* ptexMipMapDebug_;
 };
 
 

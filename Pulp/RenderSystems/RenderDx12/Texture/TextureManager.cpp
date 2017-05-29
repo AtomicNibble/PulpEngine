@@ -34,10 +34,7 @@ X_NAMESPACE_BEGIN(texture)
 		depthFmt_(depthFmt),
 		arena_(arena),
 		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
-		clearDepthVal_(reverseZ ? 0.f : 1.f),
-		pTexDefault_(nullptr),
-		pTexDefaultBump_(nullptr),
-		ptexMipMapDebug_(nullptr)
+		clearDepthVal_(reverseZ ? 0.f : 1.f)
 	{
 		X_ENSURE_LE(sizeof(TextureResource), 128, "Texture with ref count should be 128 bytes or less");
 
@@ -55,10 +52,6 @@ X_NAMESPACE_BEGIN(texture)
 		X_LOG1("TextureManager", "Starting");
 		X_PROFILE_NO_HISTORY_BEGIN("TextureMan", core::profiler::SubSys::RENDER);
 
-		if (!loadDefaultTextures()) {
-			X_ERROR("TextureManager", "Failed to load default textures");
-			return false;
-		}
 
 		return true;
 	}
@@ -67,7 +60,6 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		X_LOG1("TextureManager", "Shutting Down");
 
-		releaseDefaultTextures();
 		releaseDanglingTextures();
 
 		return true;
@@ -242,11 +234,6 @@ X_NAMESPACE_BEGIN(texture)
 		return textures_.findAsset(texId);
 	}
 
-	Texture* TextureManager::getDefault(void) const
-	{
-		return pTexDefault_;
-	}
-
 	void TextureManager::releaseTexture(texture::ITexture* pTex)
 	{
 		return releaseTexture(static_cast<Texture*>(pTex));
@@ -399,42 +386,6 @@ X_NAMESPACE_BEGIN(texture)
 
 		X_ASSERT_NOT_IMPLEMENTED();
 		return false;
-	}
-
-	bool TextureManager::loadDefaultTextures(void)
-	{
-		TextureFlags default_flags = TextureFlags::DONT_RESIZE | TextureFlags::DONT_STREAM;
-
-		pTexDefault_ = forName(TEX_DEFAULT_DIFFUSE, default_flags);
-		pTexDefaultBump_ = forName(TEX_DEFAULT_BUMP, default_flags);
-
-		// these are required.
-		if (!pTexDefault_->isLoaded()) {
-			X_ERROR("Texture", "failed to load default texture: %s", TEX_DEFAULT_DIFFUSE);
-			return false;
-		}
-		if (!pTexDefaultBump_->isLoaded()) {
-			X_ERROR("Texture", "failed to load default bump texture: %s", TEX_DEFAULT_BUMP);
-			return false;
-		}
-
-		ptexMipMapDebug_ = forName("imgs/debug/mipmaplevels", default_flags);
-
-
-		return true;
-	}
-		
-	void TextureManager::releaseDefaultTextures(void)
-	{
-		if (pTexDefault_) {
-			releaseTexture(pTexDefault_);
-		}
-		if (pTexDefaultBump_) {
-			releaseTexture(pTexDefaultBump_);
-		}
-		if (ptexMipMapDebug_) {
-			releaseTexture(ptexMipMapDebug_);
-		}
 	}
 
 	void TextureManager::releaseDanglingTextures(void)
