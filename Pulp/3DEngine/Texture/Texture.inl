@@ -65,14 +65,20 @@ X_INLINE const texture::TextureType::Enum Texture::getTextureType(void) const
 	return type_;
 }
 
+X_INLINE const texture::Texturefmt::Enum Texture::getFormat(void) const
+{
+	return format_;
+}
+
 X_INLINE const texture::TextureFlags Texture::getFlags(void) const
 {
 	return flags_;
 }
 
-X_INLINE const texture::Texturefmt::Enum Texture::getFormat(void) const
+
+X_INLINE texture::TextureFlags& Texture::flags(void)
 {
-	return format_;
+	return flags_;
 }
 
 
