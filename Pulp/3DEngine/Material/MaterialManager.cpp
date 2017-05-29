@@ -291,10 +291,13 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	);
 
 	// we should create the const buffers we need and set them in the variable state.
-	auto* pCBHandles = pVariableState->getCBs();
 #if X_ENABLE_ASSERTIONS
-	for (size_t i = 0; i < numCb; i++) {
-		pCBHandles[i] = render::INVALID_BUF_HANLDE;
+	{
+		auto* pCBHandles = pVariableState->getCBs();
+
+		for (size_t i = 0; i < numCb; i++) {
+			pCBHandles[i] = render::INVALID_BUF_HANLDE;
+		}
 	}
 #endif // !X_ENABLE_ASSERTIONS
 
@@ -410,6 +413,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 	// now we scan the cbuffers and try to match any material params to cbuffer params (todo: take into account techDef aliases).
 	{
+		auto* pCBHandles = pVariableState->getCBs();
+
 		core::FixedArray<const render::shader::XCBuffer*, render::shader::MAX_SHADER_CB_PER_PERM> cbuffers;
 		for (auto& cb : cbLinks) {
 			cbuffers.push_back(cb.pCBufer);
@@ -525,9 +530,15 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 		}
 	}
 
-	for (size_t i = 0; i < numCb; i++) {
-		X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")();
+#if X_ENABLE_ASSERTIONS
+	{
+		auto* pCBHandles = pVariableState->getCBs();
+
+		for (size_t i = 0; i < numCb; i++) {
+			X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")();
+		}
 	}
+#endif // !X_ENABLE_ASSERTIONS
 
 	pMat->addTech(std::move(matTech));
 
