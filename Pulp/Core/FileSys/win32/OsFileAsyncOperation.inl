@@ -16,6 +16,20 @@ X_INLINE XOsFileAsyncOperationBase::XOsFileAsyncOperationBase(MemoryArenaBase* a
 	pOverlapped->OffsetHigh = safe_static_cast<DWORD>(((position >> 32) & 0xFFFFFFFF));
 }
 
+X_INLINE XOsFileAsyncOperationBase::XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth) :
+	hFile_(oth.hFile_),
+	overlapped_(std::move(oth.overlapped_))
+{
+
+}
+
+X_INLINE XOsFileAsyncOperationBase& XOsFileAsyncOperationBase::operator=(XOsFileAsyncOperationBase&& oth)
+{
+	hFile_ = std::move(oth.hFile_);
+	overlapped_ = std::move(oth.overlapped_);
+	return *this;
+}
+
 X_INLINE bool XOsFileAsyncOperationBase::operator==(const XOsFileAsyncOperationBase& oth) const
 {
 	// the overlapped instance should be enougth but check file also.

@@ -28,10 +28,10 @@ public:
 public:
 	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
 	XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
-	XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth) = default;
+	X_INLINE XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth);
 
-	XOsFileAsyncOperationBase& operator=(XOsFileAsyncOperationBase&& oth) = default;
 	XOsFileAsyncOperationBase& operator=(const XOsFileAsyncOperationBase& oth) = default;
+	X_INLINE XOsFileAsyncOperationBase& operator=(XOsFileAsyncOperationBase&& oth);
 
 	X_INLINE bool operator==(const XOsFileAsyncOperationBase& oth) const;
 	X_INLINE bool ownsAsyncOp(const AsyncOp* pOp) const;
