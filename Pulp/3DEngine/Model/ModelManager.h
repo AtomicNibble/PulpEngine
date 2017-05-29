@@ -32,8 +32,6 @@ public:
 	bool init(void);
 	void shutDown(void);
 
-	// IModelManager
-
 	XModel* findModel(const char* ModelName) const;
 	// this only performs cpu loading, and currently loads all lods at once.
 	// as well as resolving materials, will alwyas return a instance, but might contain default data.
@@ -44,7 +42,6 @@ public:
 
 	XModel* getDefaultModel(void);
 
-	// ~IModelManager
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
