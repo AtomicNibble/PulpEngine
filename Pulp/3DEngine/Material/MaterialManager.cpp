@@ -78,10 +78,8 @@ void XMaterialManager::shutDown(void)
 {
 	X_LOG0("MtlManager", "Shutting Down");
 
-
 	// hotreload support.
-	gEnv->pHotReload->addfileType(nullptr, MTL_FILE_EXTENSION);
-	gEnv->pHotReload->addfileType(nullptr, MTL_B_FILE_EXTENSION);
+	gEnv->pHotReload->unregisterListener(this);
 
 	if (pDefaultMtl_) {
 		releaseMaterial(pDefaultMtl_);
