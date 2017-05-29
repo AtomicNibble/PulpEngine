@@ -603,6 +603,109 @@ public:
 		return pFile_ != nullptr;
 	}
 
+
+	inline size_t read(void* pBuf, size_t Len) {
+		X_ASSERT_NOT_NULL(pFile_); // catch bad use of this class. "not checking open return val"
+		return pFile_->read(pBuf, Len);
+	}
+
+	template <typename T>
+	inline size_t read(T& object) {
+		return read(&object, sizeof(T));
+	}
+
+	template <typename T>
+	inline size_t readObj(T& object) {
+		return read(&object, sizeof(T));
+	}
+
+	template <typename T>
+	inline size_t readObjs(T* objects, size_t num) {
+		return read(objects, sizeof(T)* num) / sizeof(T);
+	}
+
+
+	inline size_t readString(core::string& str) {
+		return pFile_->readString(str);
+	}
+
+	inline size_t write(const void* pBuf, size_t Len) {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->write(pBuf, Len);
+	}
+
+	inline size_t writeString(core::string& str) {
+		return pFile_->writeString(str);
+	}
+	inline size_t writeString(const char* str) {
+		return pFile_->writeString(str);
+	}
+	inline size_t writeString(const char* str, size_t Length) {
+		return pFile_->writeString(str, Length);
+	}
+
+	inline size_t writeStringNNT(core::string& str) {
+		return pFile_->writeStringNNT(str);
+	}
+	inline size_t writeStringNNT(const char* str) {
+		return pFile_->writeStringNNT(str);
+	}
+
+	template <typename T>
+	inline size_t writeObj(T& object) {
+		return write(&object, sizeof(T));
+	}
+	template <typename T>
+	inline size_t writeObj(const T* objects, size_t num) {
+		return write(objects, (sizeof(T)* num));
+	}
+
+	template <typename T>
+	inline size_t writeObjs(T* objects, size_t num) {
+		return write(objects, sizeof(T)* num) / sizeof(T);
+	}
+
+	template <typename T>
+	inline size_t write(const T& object) {
+		return write(&object, sizeof(T));
+	}
+
+	size_t printf(const char *fmt, ...) {
+		char buf[2048];
+		int32_t length;
+
+		va_list argptr;
+
+		va_start(argptr, fmt);
+		length = vsnprintf_s(buf, 2048 - 1, fmt, argptr);
+		va_end(argptr);
+
+		if (length < 0) {
+			return 0;
+		}
+
+		return write(buf, length);
+	}
+
+	inline void seek(int64_t position, SeekMode::Enum origin) {
+		X_ASSERT_NOT_NULL(pFile_);
+		pFile_->seek(position, origin);
+	}
+
+	inline uint64_t tell(void) const {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->tell();
+	}
+
+	inline uint64_t remainingBytes(void) const {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->remainingBytes();
+	}
+
+	inline XFileMem* GetFile(void) const {
+		return pFile_;
+	}
+
 	X_INLINE XFileMem* operator->(void) {
 		return pFile_;
 	}
@@ -654,6 +757,10 @@ public:
 	}
 
 	inline operator bool() const {
+		return pFile_ != nullptr;
+	}
+
+	inline bool IsOpen(void) const {
 		return pFile_ != nullptr;
 	}
 
