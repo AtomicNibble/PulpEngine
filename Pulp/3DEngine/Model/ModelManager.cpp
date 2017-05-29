@@ -80,7 +80,7 @@ void XModelManager::shutDown(void)
 {
 	X_LOG0("ModelManager", "Shutting Down");
 
-	gEnv->pHotReload->addfileType(nullptr, MODEL_FILE_EXTENSION);
+	gEnv->pHotReload->unregisterListener(this);
 
 
 	// default model
@@ -132,15 +132,11 @@ XModel* XModelManager::findModel(const char* pModelName) const
 
 XModel* XModelManager::loadModel(const char* pModelName)
 {
-	X_ASSERT_NOT_NULL(pModelName);
-	const char* pExt;
-
-	pExt = core::strUtil::FileExtension(pModelName);
+	const char* pExt = core::strUtil::FileExtension(X_ASSERT_NOT_NULL(pModelName));
 	if (pExt)
 	{
 		// engine should not make requests for models with a extension
-		X_ERROR("ModelManager", "Invalid model name extension was included: %s",
-			pExt);
+		X_ERROR("ModelManager", "Invalid model name extension was included: %s", pExt);
 		return getDefaultModel();
 	}
 
@@ -167,15 +163,11 @@ XModel* XModelManager::loadModel(const char* pModelName)
 
 XModel* XModelManager::loadModelSync(const char* pModelName)
 {
-	X_ASSERT_NOT_NULL(pModelName);
-	const char* pExt;
-
-	pExt = core::strUtil::FileExtension(pModelName);
+	const char* pExt = core::strUtil::FileExtension(X_ASSERT_NOT_NULL(pModelName));
 	if (pExt)
 	{
 		// engine should not make requests for models with a extension
-		X_ERROR("ModelManager", "Invalid model name extension was included: %s",
-			pExt);
+		X_ERROR("ModelManager", "Invalid model name extension was included: %s", pExt);
 		return getDefaultModel();
 	}
 
