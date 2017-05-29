@@ -39,6 +39,7 @@ struct IXHotReloadManager
 	// needs to be done before startup finished.
 	// after that it's not thread safe.
 	virtual bool addfileType(IXHotReload* pHotReload, const char* extension) X_ABSTRACT;
+	virtual void unregisterListener(IXHotReload* pHotReload) X_ABSTRACT;
 
 protected:
 	virtual ~IXHotReloadManager() {}

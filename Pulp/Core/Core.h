@@ -191,7 +191,8 @@ private:
 private:
 
 	// IXHotReloadManager
-	bool addfileType(core::IXHotReload* pHotReload, const char* extension) X_OVERRIDE;
+	bool addfileType(core::IXHotReload* pHotReload, const char* extension) X_FINAL;
+	void unregisterListener(core::IXHotReload* pHotReload) X_FINAL;
 
 	// ~IXHotReloadManager
 

@@ -512,6 +512,18 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 	return true;
 }
 
+void XCore::unregisterListener(core::IXHotReload* pHotReload)
+{
+	for (auto it = hotReloadExtMap_.begin(); it != hotReloadExtMap_.end(); ++it)
+	{
+		if (it->second == pHotReload)
+		{
+			hotReloadExtMap_.erase(it);
+			it = hotReloadExtMap_.begin();
+		}
+	}
+}
+
 // ~IXHotReloadManager
 
 
