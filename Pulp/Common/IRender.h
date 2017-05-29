@@ -359,7 +359,8 @@ struct IRender
 	// cb's
 	virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
 
-
+	// this creates a texture for a given textureFile, the cpu data is only uploaded if requested.
+	virtual texture::ITexture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload = false) X_ABSTRACT;
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 
 	// creates a texture for dynamic content, no data loaded from disk.

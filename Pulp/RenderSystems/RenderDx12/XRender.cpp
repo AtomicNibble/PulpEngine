@@ -1096,6 +1096,13 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
 }
 
 
+texture::ITexture* XRender::getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload)
+{
+	texture::Texture* pText = pTextureMan_->getDeviceTexture(id, imgFile, upload);
+
+	return pText;
+}
+
 ::texture::ITexture* XRender::getTexture(const char* pName, texture::TextureFlags flags)
 {
 	texture::Texture* pText = pTextureMan_->forName(pName, flags);

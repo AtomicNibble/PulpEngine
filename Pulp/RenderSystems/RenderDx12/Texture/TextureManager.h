@@ -42,6 +42,8 @@ public:
 
 	DXGI_FORMAT getDepthFmt(void) const;
 
+	Texture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload);
+
 	Texture* forName(const char* pName, TextureFlags flags);
 	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
 	
@@ -70,7 +72,7 @@ private:
 
 //	bool load(Texture* pTex);
 //	bool loadFromFile(XTextureFile& imgFile, const char* pPath);
-//	bool processImgFile(Texture* pTex, XTextureFile& imgFile);
+	bool processImgFile(Texture* pTex, const XTextureFile& imgFile);
 	bool createDeviceTexture(Texture* pTex);
 	bool initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData);
 
