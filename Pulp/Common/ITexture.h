@@ -333,6 +333,7 @@ another has the API shizz, gonna have to change my folder structure a bit.
 */
 
 typedef int TexID;
+class XTextureFile;
 
 struct ITexture
 {
@@ -357,10 +358,10 @@ struct ITexture
 	virtual const TextureFlags getFlags(void) const X_ABSTRACT;
 	virtual const Texturefmt::Enum getFormat(void) const X_ABSTRACT;
 
+	virtual void setProperties(const XTextureFile& imgFile) X_ABSTRACT;
 };
 
 
-class XTextureFile;
 
 struct ITextureFmt
 {
