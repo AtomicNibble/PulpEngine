@@ -111,47 +111,6 @@ X_NAMESPACE_BEGIN(texture)
 		return pTexRes;
 	}
 
-	Texture* TextureManager::getDeviceTexture(int32_t id, const XTextureFile& imgFile, bool upload)
-	{
-		// meoowW!
-		core::StackString<32, char> idStr(id);
-		core::string name("id_");
-		name.append(idStr.begin(), idStr.end());
-
-		auto& threadPolicy = textures_.getThreadPolicy();
-		threadPolicy.Enter();
-
-		TexRes* pTexRes = textures_.findAsset(name);
-
-		if (pTexRes)
-		{
-			threadPolicy.Leave();
-			pTexRes->addReference();
-		}
-		else
-		{
-			pTexRes = textures_.createAsset(name, name, imgFile.getFlags());
-			threadPolicy.Leave();
-
-			pTexRes->setProperties(imgFile);
-
-			if (!initDeviceTexture(pTexRes)) {
-				return nullptr;
-			}
-
-			if (upload)
-			{
-				if (!updateTextureData(pTexRes, imgFile)) {
-					// we should mark the texture as invalid.
-					X_ERROR("Texture", "Failed to upload texture data");
-					return nullptr;
-				}
-			}
-		}
-
-		return pTexRes;
-	}
-
 	Texture* TextureManager::forName(const char* pName, TextureFlags flags)
 	{
 		core::string name(pName);

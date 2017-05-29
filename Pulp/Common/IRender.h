@@ -361,9 +361,7 @@ struct IRender
 
 	// this creates a texture for a given textureFile, the cpu data is only uploaded if requested.
 	virtual texture::ITexture* getDeviceTexture(int32_t id) X_ABSTRACT;
-	virtual texture::ITexture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload = false) X_ABSTRACT;
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
-
 	virtual bool initDeviceTexture(texture::ITexture* pTex) X_ABSTRACT;
 	virtual bool initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
 

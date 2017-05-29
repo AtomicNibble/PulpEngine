@@ -195,7 +195,6 @@ public:
 	ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
 
 	texture::ITexture* getDeviceTexture(int32_t id) X_FINAL;
-	texture::ITexture* getDeviceTexture(int32_t id, const texture::XTextureFile& imgFile, bool upload = false) X_FINAL;
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
 	
