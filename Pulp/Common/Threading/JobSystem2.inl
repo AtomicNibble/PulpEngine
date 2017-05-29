@@ -72,7 +72,7 @@ namespace V2
 	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, const DataT& data JOB_SYS_SUB_PARAM)
 	{
 		static_assert((sizeof(DataT) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
-		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
+		static_assert(core::compileTime::IsTrivialDestruct<DataT>::Value, " type is not trivially destructible");
 
 		Job* job = CreateJob(function JOB_SYS_SUB_PASS(subSystem));
 		job->pArgData = &job->pad;
@@ -85,7 +85,7 @@ namespace V2
 	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data JOB_SYS_SUB_PARAM)
 	{
 		static_assert((sizeof(DataT) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
-		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
+		static_assert(core::compileTime::IsTrivialDestruct<DataT>::Value, " type is not trivially destructible");
 
 		Job* job = CreateJobAsChild(pParent, function JOB_SYS_SUB_PASS(subSystem));
 		job->pArgData = &job->pad;
@@ -163,7 +163,7 @@ namespace V2
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
 
 		static_assert((sizeof(DataT) <= MemberCallerData::PAD_SIZE), " does not fit in job data, pass as void");
-		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
+		static_assert(core::compileTime::IsTrivialDestruct<DataT>::Value, " type is not trivially destructible");
 
 		MemberCallerData jobData(pInst, pFunction, data);
 
@@ -213,7 +213,7 @@ namespace V2
 		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
 
 		static_assert((sizeof(DataT) <= MemberCallerData::PAD_SIZE), " does not fit in job data, pass as void");
-		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
+		static_assert(core::compileTime::IsTrivialDestruct<DataT>::Value, " type is not trivially destructible");
 
 		MemberCallerData jobData(pInst, pFunction, data);
 
