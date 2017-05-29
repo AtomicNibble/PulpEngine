@@ -412,7 +412,6 @@ void HashBase<Key, Value, HashFn, EqualKey>::ensureSize(size_type _size)
 		// calculate the new size
 		const size_type size = next_size(_size);
 
-	//	core::Array<Node*> tmp(size, (Node*)(0));
 		core::Array<Node*> tmp(arena_, size, (Node*)(0));
 
 		for (size_type bucket = 0; bucket < curent_size; ++bucket)
