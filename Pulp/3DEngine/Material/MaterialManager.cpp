@@ -43,6 +43,20 @@ XMaterialManager::~XMaterialManager()
 }
 
 
+void XMaterialManager::registerCmds(void)
+{
+
+	ADD_COMMAND_MEMBER("listMaterials", this, XMaterialManager, &XMaterialManager::Cmd_ListMaterials,
+		core::VarFlag::SYSTEM, "List all the loaded materials");
+
+}
+
+void XMaterialManager::registerVars(void)
+{
+
+
+}
+
 bool XMaterialManager::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
@@ -80,19 +94,6 @@ void XMaterialManager::shutDown(void)
 	}
 }
 
-void XMaterialManager::registerCmds(void)
-{
-
-	ADD_COMMAND_MEMBER("listMaterials", this, XMaterialManager, &XMaterialManager::Cmd_ListMaterials,
-		core::VarFlag::SYSTEM, "List all the loaded materials");
-
-}
-
-void XMaterialManager::registerVars(void)
-{
-
-
-}
 
 void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {

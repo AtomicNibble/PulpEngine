@@ -36,12 +36,11 @@ public:
 	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan);
 	virtual ~XMaterialManager();
 
-	bool init(void);
-	void shutDown(void);
-
 	void registerCmds(void);
 	void registerVars(void);
 
+	bool init(void);
+	void shutDown(void);
 
 	// IMaterialManager
 	virtual Material* createMaterial(const char* pMtlName) X_FINAL;
