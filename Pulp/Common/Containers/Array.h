@@ -23,6 +23,8 @@ public:
 	typedef const T* ConstTypePtr;
 	typedef T* Iterator;
 	typedef const T* ConstIterator;
+	typedef T* iterator;
+	typedef const T* const_iterator;
 	typedef size_t size_type;
 	typedef T& Reference;
 	typedef T& reference;
