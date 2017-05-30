@@ -6,7 +6,6 @@
 
 
 #include <Containers\Array.h>
-#include <Containers\HashMap.h>
 
 #include <Traits\MemberFunctionTraits.h>
 #include <Util\Delegate.h>
@@ -131,15 +130,15 @@ class TechSetDef
 	template<typename T>
 	using NameArr = core::Array<std::pair<core::string, T>>;
 
-	typedef NameArr<render::BlendState> BlendStatesMap;
-	typedef NameArr<StencilState> StencilStatesMap;
-	typedef NameArr<render::StateDesc> StatesMap;
-	typedef NameArr<Technique> TechniqueMap;
-	typedef NameArr<Shader> ShaderMap;
-	typedef NameArr<render::TopoType::Enum> PrimMap;
-	typedef NameArr<Param> ParamMap;
-	typedef NameArr<Texture> TextureMap;
-	typedef NameArr<Sampler> SamplerMap;
+	typedef NameArr<render::BlendState> BlendStatesArr;
+	typedef NameArr<StencilState> StencilStatesArr;
+	typedef NameArr<render::StateDesc> StatesArr;
+	typedef NameArr<Technique> TechniqueArr;
+	typedef NameArr<Shader> ShaderArr;
+	typedef NameArr<render::TopoType::Enum> PrimArr;
+	typedef NameArr<Param> ParamArr;
+	typedef NameArr<Texture> TextureArr;
+	typedef NameArr<Sampler> SamplerArr;
 
 
 	typedef core::Array<char> FileBuf;
@@ -155,21 +154,21 @@ public:
 	~TechSetDef();
 
 	// we need a api for getting the techs.
-	X_INLINE TechniqueMap::size_type numTechs(void) const;
-	X_INLINE TechniqueMap::const_iterator techBegin(void) const;
-	X_INLINE TechniqueMap::const_iterator techEnd(void) const;
+	X_INLINE TechniqueArr::size_type numTechs(void) const;
+	X_INLINE TechniqueArr::const_iterator techBegin(void) const;
+	X_INLINE TechniqueArr::const_iterator techEnd(void) const;
 
-	X_INLINE ParamMap::size_type numParams(void) const;
-	X_INLINE ParamMap::const_iterator paramBegin(void) const;
-	X_INLINE ParamMap::const_iterator paramEnd(void) const;
+	X_INLINE ParamArr::size_type numParams(void) const;
+	X_INLINE ParamArr::const_iterator paramBegin(void) const;
+	X_INLINE ParamArr::const_iterator paramEnd(void) const;
 
-	X_INLINE TextureMap::size_type numTexture(void) const;
-	X_INLINE TextureMap::const_iterator textureBegin(void) const;
-	X_INLINE TextureMap::const_iterator textureEnd(void) const;
+	X_INLINE TextureArr::size_type numTexture(void) const;
+	X_INLINE TextureArr::const_iterator textureBegin(void) const;
+	X_INLINE TextureArr::const_iterator textureEnd(void) const;
 
-	X_INLINE SamplerMap::size_type numSampler(void) const;
-	X_INLINE SamplerMap::const_iterator samplerBegin(void) const;
-	X_INLINE SamplerMap::const_iterator samplerEnd(void) const;
+	X_INLINE SamplerArr::size_type numSampler(void) const;
+	X_INLINE SamplerArr::const_iterator samplerBegin(void) const;
+	X_INLINE SamplerArr::const_iterator samplerEnd(void) const;
 
 	bool parseFile(FileBuf& buf);
 	bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
@@ -293,15 +292,15 @@ private:
 	core::MemoryArenaBase* arena_;
 	core::string fileName_;
 
-	BlendStatesMap blendStates_;
-	StencilStatesMap stencilStates_;
-	StatesMap states_;
-	ShaderMap shaders_;
-	TechniqueMap techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
-	PrimMap prims_;
-	ParamMap params_;
-	TextureMap textures_;
-	SamplerMap samplers_;
+	BlendStatesArr blendStates_;
+	StencilStatesArr stencilStates_;
+	StatesArr states_;
+	ShaderArr shaders_;
+	TechniqueArr techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
+	PrimArr prims_;
+	ParamArr params_;
+	TextureArr textures_;
+	SamplerArr samplers_;
 };
 
 } // namespace techset
