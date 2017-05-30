@@ -61,17 +61,24 @@ Param& Param::operator=(const Param& oth)
 TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	fileName_(fileName),
-	blendStates_(arena, 32),
-	stencilStates_(arena, 16),
-	states_(arena, 128),
-	shaders_(arena, 16),
-	techs_(arena, 8),
-	prims_(arena, 6),
-	params_(arena, 8),
-	textures_(arena, 8),
-	samplers_(arena, 8)
+	blendStates_(arena),
+	stencilStates_(arena),
+	states_(arena),
+	shaders_(arena),
+	techs_(arena),
+	prims_(arena),
+	params_(arena),
+	textures_(arena),
+	samplers_(arena)
 {
+	shaders_.setGranularity(6);
+	techs_.setGranularity(6);
+	shaders_.setGranularity(6);
+	prims_.setGranularity(6);
+	textures_.setGranularity(6);
+	samplers_.setGranularity(6);
 
+	states_.reserve(64);
 }
 
 TechSetDef::~TechSetDef()
@@ -2090,7 +2097,7 @@ bool TechSetDef::shaderExsists(const core::string& name, render::shader::ShaderT
 
 bool TechSetDef::techniqueExsists(const core::string& name)
 {
-	return techs_.find(name) != techs_.end();
+	return findHelper(techs_, name) != techs_.end();
 }
 
 bool TechSetDef::primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo)
@@ -2180,11 +2187,11 @@ Sampler& TechSetDef::addSampler(const core::string& name, const core::string& pa
 
 
 template<typename T>
-X_INLINE bool TechSetDef::findHelper(core::HashMap<core::string, T>& map,
-	const core::string& name, T* pOut)
+X_INLINE bool TechSetDef::findHelper(NameArr<T>& arr, const core::string& name, T* pOut)
 {
-	auto it = map.find(name);
-	if (it != map.end()) {
+	auto it = findHelper(arr, name);
+
+	if (it != arr.end()) {
 		if (pOut) {
 			*pOut = it->second;
 		}
@@ -2194,16 +2201,26 @@ X_INLINE bool TechSetDef::findHelper(core::HashMap<core::string, T>& map,
 	return false;
 }
 
+
 template<typename T>
-X_INLINE  T& TechSetDef::addHelper(core::HashMap<core::string, T>& map,
+X_INLINE typename T::const_iterator TechSetDef::findHelper(T& arr, const core::string& name)
+{
+	return std::find_if(arr.begin(), arr.end(), [&name](const typename T::Type& inst) {
+		return inst.first == name;
+	});
+}
+
+
+template<typename T>
+X_INLINE  T& TechSetDef::addHelper(NameArr<T>& arr,
 	const core::string& name, const core::string& parentName, const char* pNick)
 {
 	if (!parentName.isEmpty())
 	{
-		auto it = map.find(parentName);
-		if (it != map.end())
+		auto it = findHelper(arr, parentName);
+		if (it != arr.end())
 		{
-			map.insert(std::make_pair(name, it->second));
+			arr.push_back(std::make_pair(name, it->second));
 		}
 		else
 		{
@@ -2214,10 +2231,10 @@ X_INLINE  T& TechSetDef::addHelper(core::HashMap<core::string, T>& map,
 	else
 	{
 	insert_default:
-		map.insert(std::make_pair(name, T()));
+		arr.emplace_back(name, T());
 	}
 
-	return map[name];
+	return arr.back().second;
 }
 
 } // namespace techset

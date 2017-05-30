@@ -128,15 +128,19 @@ struct Sampler
 
 class TechSetDef
 {
-	typedef core::HashMap<core::string, render::BlendState> BlendStatesMap;
-	typedef core::HashMap<core::string, StencilState> StencilStatesMap;
-	typedef core::HashMap<core::string, render::StateDesc> StatesMap;
-	typedef core::HashMap<core::string, Technique> TechniqueMap;
-	typedef core::HashMap<core::string, Shader> ShaderMap;
-	typedef core::HashMap<core::string, render::TopoType::Enum> PrimMap;
-	typedef core::HashMap<core::string, Param> ParamMap;
-	typedef core::HashMap<core::string, Texture> TextureMap;
-	typedef core::HashMap<core::string, Sampler> SamplerMap;
+	template<typename T>
+	using NameArr = core::Array<std::pair<core::string, T>>;
+
+	typedef NameArr<render::BlendState> BlendStatesMap;
+	typedef NameArr<StencilState> StencilStatesMap;
+	typedef NameArr<render::StateDesc> StatesMap;
+	typedef NameArr<Technique> TechniqueMap;
+	typedef NameArr<Shader> ShaderMap;
+	typedef NameArr<render::TopoType::Enum> PrimMap;
+	typedef NameArr<Param> ParamMap;
+	typedef NameArr<Texture> TextureMap;
+	typedef NameArr<Sampler> SamplerMap;
+
 
 	typedef core::Array<char> FileBuf;
 
@@ -276,12 +280,14 @@ private:
 	Sampler& addSampler(const core::string& name, const core::string& parentName);
 
 	template<typename T>
-	static bool findHelper(core::HashMap<core::string, T>& map,
-		const core::string& name, T* pOut);
+	static bool findHelper(NameArr<T>& map, const core::string& name, T* pOut);
 
 	template<typename T>
-	static T& addHelper(core::HashMap<core::string, T>& map,
-		const core::string& name, const core::string& parentName, const char* pNick);
+	static typename T::const_iterator findHelper(T& map, const core::string& name);
+
+	template<typename T>
+	static T& addHelper(NameArr<T>& map, const core::string& name, 
+		const core::string& parentName, const char* pNick);
 
 private:
 	core::MemoryArenaBase* arena_;
