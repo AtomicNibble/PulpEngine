@@ -25,7 +25,7 @@ namespace techset
 
 		typedef Flags8<BinFileFlag> BinFileFlags;
 
-		struct TechSedDefBinHeader
+		struct TechSetDefBinHeader
 		{
 			static const uint32_t FOURCC = X_TAG('X', 'T', 'S', 'D');
 			static const uint32_t VERSION = 1; 
@@ -48,7 +48,7 @@ namespace techset
 			uint8_t numSamplers;
 		};
 
-		X_ENSURE_SIZE(TechSedDefBinHeader, 20);
+		X_ENSURE_SIZE(TechSetDefBinHeader, 20);
 
 
 	} // namespace 
@@ -286,10 +286,10 @@ TechSetDef::~TechSetDef()
 
 bool TechSetDef::SSave(core::XFile* pFile) const
 {
-	TechSedDefBinHeader hdr;
+	TechSetDefBinHeader hdr;
 	core::zero_object(hdr);
-	hdr.forcc = TechSedDefBinHeader::FOURCC;
-	hdr.version = TechSedDefBinHeader::VERSION;
+	hdr.forcc = TechSetDefBinHeader::FOURCC;
+	hdr.version = TechSetDefBinHeader::VERSION;
 
 	hdr.crc32 = 0;
 	hdr.modifed = core::dateTimeStampSmall::systemDateTime();
@@ -332,7 +332,7 @@ bool TechSetDef::SSave(core::XFile* pFile) const
 
 bool TechSetDef::SLoad(core::XFile* pFile)
 {
-	TechSedDefBinHeader hdr;
+	TechSetDefBinHeader hdr;
 
 	if (pFile->readObj(hdr) != sizeof(hdr)) {
 		return false;
