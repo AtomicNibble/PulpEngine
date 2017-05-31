@@ -143,38 +143,22 @@ struct Sampler
 	AssManProps assProps;
 };
 
-class TechSetDef : core::ISerialize
+class BaseTechSetDef : core::ISerialize
 {
 	template<typename T>
 	using NameArr = core::Array<std::pair<core::string, T>>;
 
-	typedef NameArr<render::BlendState> BlendStatesArr;
-	typedef NameArr<StencilState> StencilStatesArr;
-	typedef NameArr<render::StateDesc> StatesArr;
 	typedef NameArr<Technique> TechniqueArr;
-	typedef NameArr<Shader> ShaderArr;
-	typedef NameArr<render::TopoType::Enum> PrimArr;
 	typedef NameArr<Param> ParamArr;
 	typedef NameArr<Texture> TextureArr;
 	typedef NameArr<Sampler> SamplerArr;
 
-
-	typedef core::Array<char> FileBuf;
-
 public:
-	typedef core::traits::Function<bool(core::XParser& lex, Param& param, 
-		const core::XLexToken& token, core::Hash::Fnv1aVal hash)>::Pointer ParamParseFunction;
+	BaseTechSetDef(core::string fileName, core::MemoryArenaBase* arena);
+	virtual ~BaseTechSetDef();
 
-	typedef core::Delegate<bool(core::XLexer& lex, core::string&, bool)> OpenIncludeDel;
-
-public:
-	TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
-	~TechSetDef();
-
-	// ISerialize
 	MATLIB_EXPORT bool SSave(core::XFile* pFile) const X_FINAL;
 	MATLIB_EXPORT bool SLoad(core::XFile* pFile) X_FINAL;
-	// ~ISerialize
 
 	// we need a api for getting the techs.
 	X_INLINE TechniqueArr::size_type numTechs(void) const;
@@ -192,6 +176,41 @@ public:
 	X_INLINE SamplerArr::size_type numSampler(void) const;
 	X_INLINE SamplerArr::const_iterator samplerBegin(void) const;
 	X_INLINE SamplerArr::const_iterator samplerEnd(void) const;
+
+
+protected:
+	core::MemoryArenaBase* arena_;
+	core::string fileName_;
+
+	TechniqueArr techs_; 
+	ParamArr params_;
+	TextureArr textures_;
+	SamplerArr samplers_;
+};
+
+class TechSetDef : public BaseTechSetDef
+{
+	template<typename T>
+	using NameArr = BaseTechSetDef::NameArr<T>;
+
+	typedef NameArr<render::BlendState> BlendStatesArr;
+	typedef NameArr<StencilState> StencilStatesArr;
+	typedef NameArr<render::StateDesc> StatesArr;
+	typedef NameArr<Shader> ShaderArr;
+	typedef NameArr<render::TopoType::Enum> PrimArr;
+
+	typedef core::Array<char> FileBuf;
+
+public:
+	typedef core::traits::Function<bool(core::XParser& lex, Param& param, 
+		const core::XLexToken& token, core::Hash::Fnv1aVal hash)>::Pointer ParamParseFunction;
+
+	typedef core::Delegate<bool(core::XLexer& lex, core::string&, bool)> OpenIncludeDel;
+
+public:
+	TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
+	~TechSetDef();
+
 
 	bool parseFile(FileBuf& buf);
 	bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
@@ -319,11 +338,7 @@ private:
 	StencilStatesArr stencilStates_;
 	StatesArr states_;
 	ShaderArr shaders_;
-	TechniqueArr techs_; // leaving this as map, to make supporting parents simple. otherwise id probs make this a array.
 	PrimArr prims_;
-	ParamArr params_;
-	TextureArr textures_;
-	SamplerArr samplers_;
 };
 
 } // namespace techset

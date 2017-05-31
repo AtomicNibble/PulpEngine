@@ -248,43 +248,28 @@ bool Sampler::SLoad(core::XFile* pFile)
 //-------------------------------------------------
 
 
-TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
+BaseTechSetDef::BaseTechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	fileName_(fileName),
-	blendStates_(arena),
-	stencilStates_(arena),
-	states_(arena),
-	shaders_(arena),
 	techs_(arena),
-	prims_(arena),
 	params_(arena),
 	textures_(arena),
 	samplers_(arena)
 {
-	shaders_.setGranularity(6);
 	techs_.setGranularity(6);
-	shaders_.setGranularity(6);
-	prims_.setGranularity(6);
 	textures_.setGranularity(6);
 	samplers_.setGranularity(6);
-
-	states_.reserve(64);
 }
 
-TechSetDef::~TechSetDef()
+BaseTechSetDef::~BaseTechSetDef()
 {
-	blendStates_.free();
-	stencilStates_.free();
-	states_.free();
-	shaders_.free();
 	techs_.free();
-	prims_.free();
 }
 
 
 // ISerialize
 
-bool TechSetDef::SSave(core::XFile* pFile) const
+bool BaseTechSetDef::SSave(core::XFile* pFile) const
 {
 	TechSetDefBinHeader hdr;
 	core::zero_object(hdr);
@@ -330,7 +315,7 @@ bool TechSetDef::SSave(core::XFile* pFile) const
 	return true;
 }
 
-bool TechSetDef::SLoad(core::XFile* pFile)
+bool BaseTechSetDef::SLoad(core::XFile* pFile)
 {
 	TechSetDefBinHeader hdr;
 
@@ -382,6 +367,34 @@ bool TechSetDef::SLoad(core::XFile* pFile)
 
 // ~ISerialize
 
+//-------------------------------------------------
+
+
+TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
+	BaseTechSetDef(fileName, arena),
+	arena_(arena),
+	fileName_(fileName),
+	blendStates_(arena),
+	stencilStates_(arena),
+	states_(arena),
+	shaders_(arena),
+	prims_(arena)
+{
+	shaders_.setGranularity(6);
+	shaders_.setGranularity(6);
+	prims_.setGranularity(6);
+
+	states_.reserve(64);
+}
+
+TechSetDef::~TechSetDef()
+{
+	blendStates_.free();
+	stencilStates_.free();
+	states_.free();
+	shaders_.free();
+	prims_.free();
+}
 
 
 bool TechSetDef::parseFile(FileBuf& buf)

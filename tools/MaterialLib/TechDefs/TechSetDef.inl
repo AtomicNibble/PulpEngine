@@ -4,62 +4,62 @@ X_NAMESPACE_BEGIN(engine)
 namespace techset
 {
 
-X_INLINE TechSetDef::TechniqueArr::size_type TechSetDef::numTechs(void) const
+X_INLINE BaseTechSetDef::TechniqueArr::size_type BaseTechSetDef::numTechs(void) const
 {
 	return techs_.size();
 }
 
-X_INLINE TechSetDef::TechniqueArr::const_iterator TechSetDef::techBegin(void) const
+X_INLINE BaseTechSetDef::TechniqueArr::const_iterator BaseTechSetDef::techBegin(void) const
 {
 	return techs_.begin();
 }
 
-X_INLINE TechSetDef::TechniqueArr::const_iterator TechSetDef::techEnd(void) const
+X_INLINE BaseTechSetDef::TechniqueArr::const_iterator BaseTechSetDef::techEnd(void) const
 {
 	return techs_.end();
 }
 
-X_INLINE TechSetDef::ParamArr::size_type TechSetDef::numParams(void) const
+X_INLINE BaseTechSetDef::ParamArr::size_type BaseTechSetDef::numParams(void) const
 {
 	return params_.size();
 }
 
-X_INLINE TechSetDef::ParamArr::const_iterator TechSetDef::paramBegin(void) const
+X_INLINE BaseTechSetDef::ParamArr::const_iterator BaseTechSetDef::paramBegin(void) const
 {
 	return params_.begin();
 }
 
-X_INLINE TechSetDef::ParamArr::const_iterator TechSetDef::paramEnd(void) const
+X_INLINE BaseTechSetDef::ParamArr::const_iterator BaseTechSetDef::paramEnd(void) const
 {
 	return params_.end();
 }
 
-X_INLINE TechSetDef::TextureArr::size_type TechSetDef::numTexture(void) const
+X_INLINE BaseTechSetDef::TextureArr::size_type BaseTechSetDef::numTexture(void) const
 {
 	return textures_.size();
 }
 
-X_INLINE TechSetDef::TextureArr::const_iterator TechSetDef::textureBegin(void) const
+X_INLINE BaseTechSetDef::TextureArr::const_iterator BaseTechSetDef::textureBegin(void) const
 {
 	return textures_.begin();
 }
 
-X_INLINE TechSetDef::TextureArr::const_iterator TechSetDef::textureEnd(void) const
+X_INLINE BaseTechSetDef::TextureArr::const_iterator BaseTechSetDef::textureEnd(void) const
 {
 	return textures_.end();
 }
 
-X_INLINE TechSetDef::SamplerArr::size_type TechSetDef::numSampler(void) const
+X_INLINE BaseTechSetDef::SamplerArr::size_type BaseTechSetDef::numSampler(void) const
 {
 	return samplers_.size();
 }
 
-X_INLINE TechSetDef::SamplerArr::const_iterator TechSetDef::samplerBegin(void) const
+X_INLINE BaseTechSetDef::SamplerArr::const_iterator BaseTechSetDef::samplerBegin(void) const
 {
 	return samplers_.begin();
 }
 
-X_INLINE TechSetDef::SamplerArr::const_iterator TechSetDef::samplerEnd(void) const
+X_INLINE BaseTechSetDef::SamplerArr::const_iterator BaseTechSetDef::samplerEnd(void) const
 {
 	return samplers_.end();
 }
