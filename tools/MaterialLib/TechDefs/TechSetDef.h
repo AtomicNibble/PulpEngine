@@ -42,6 +42,9 @@ struct Shader
 
 	Shader();
 
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
+
 	render::shader::ShaderType::Enum type;
 	core::string source;
 	core::string entry;
@@ -52,13 +55,16 @@ struct Shader
 
 struct Technique
 {
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
+
 	render::StateDesc state;
 
 	core::string source;
 	core::string defines;
 
 	render::shader::ShaderStageFlags stages;
-	Shader shaders[render::shader::ShaderType::ENUM_COUNT - 1];
+	std::array<Shader, render::shader::ShaderType::ENUM_COUNT - 1> shaders;
 };
 
 struct AssManProps
@@ -76,6 +82,9 @@ struct Param
 
 	Param& operator=(const Param& oth);
 
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
+
 
 	ParamType::Enum type;
 
@@ -91,6 +100,9 @@ struct Param
 struct Texture
 {
 	Texture() = default;
+
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
 
 	core::string propName;
 	core::string defaultName;
@@ -115,6 +127,9 @@ struct Sampler
 		return filter != static_cast<render::FilterType::Enum>(0xff);
 	}
 
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
+
 
 	core::string repeatStr;
 	core::string filterStr;
@@ -125,7 +140,7 @@ struct Sampler
 	AssManProps assProps;
 };
 
-class TechSetDef
+class TechSetDef : core::ISerialize
 {
 	template<typename T>
 	using NameArr = core::Array<std::pair<core::string, T>>;
@@ -152,6 +167,11 @@ public:
 public:
 	TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
 	~TechSetDef();
+
+	// ISerialize
+	MATLIB_EXPORT bool SSave(core::XFile* pFile) const X_FINAL;
+	MATLIB_EXPORT bool SLoad(core::XFile* pFile) X_FINAL;
+	// ~ISerialize
 
 	// we need a api for getting the techs.
 	X_INLINE TechniqueArr::size_type numTechs(void) const;

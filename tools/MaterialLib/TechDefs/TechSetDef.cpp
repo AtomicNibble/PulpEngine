@@ -9,11 +9,51 @@
 
 #include <IFileSys.h>
 
+#include <Time\CompressedStamps.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 
 namespace techset
 {
+
+	namespace
+	{
+		X_DECLARE_FLAGS8(BinFileFlag)(
+			COMPRESSED
+		);
+
+		typedef Flags8<BinFileFlag> BinFileFlags;
+
+		struct TechSedDefBinHeader
+		{
+			static const uint32_t FOURCC = X_TAG('X', 'T', 'S', 'D');
+			static const uint32_t VERSION = 1; 
+
+			X_INLINE const bool isValid(void) const {
+				return forcc == FOURCC;
+			}
+
+			uint32_t forcc;
+			uint8_t version;
+			BinFileFlags flags;
+			uint8_t _pad[2];
+
+			uint32_t crc32;
+			core::dateTimeStampSmall modifed;
+
+			uint8_t numTechs;
+			uint8_t numParams;
+			uint8_t numTextures;
+			uint8_t numSamplers;
+		};
+
+		X_ENSURE_SIZE(TechSedDefBinHeader, 20);
+
+
+	} // namespace 
+
+//-------------------------------------------------
 
 
 Shader::Shader() :
@@ -22,6 +62,78 @@ Shader::Shader() :
 {
 
 }
+
+
+bool Shader::SSave(core::XFile* pFile) const
+{
+	pFile->writeObj(type);
+	pFile->writeString(source);
+	pFile->writeString(entry);
+	pFile->writeString(defines);
+	pFile->writeObj(safe_static_cast<uint8_t>(aliases.size()));
+	for (const auto& a : aliases)
+	{
+		pFile->writeObj(a.isCode);
+		pFile->writeString(a.resourceName);
+		pFile->writeString(a.name);
+		pFile->writeObj(a.nameHash);
+	}
+	return true;
+}
+
+bool Shader::SLoad(core::XFile* pFile)
+{
+	pFile->readObj(type);
+	pFile->readString(source);
+	pFile->readString(entry);
+	pFile->readString(defines);
+	
+	uint8_t numAliases;
+	pFile->readObj(numAliases);
+	
+	aliases.resize(numAliases);
+	for (auto& a : aliases)
+	{
+		pFile->readObj(a.isCode);
+		pFile->readString(a.resourceName);
+		pFile->readString(a.name);
+		pFile->readObj(a.nameHash);
+	}
+	return true;
+}
+
+//-------------------------------------------------
+
+bool Technique::SSave(core::XFile* pFile) const
+{
+	pFile->writeObj(state);
+	pFile->writeString(source);
+	pFile->writeString(defines);
+	pFile->writeObj(stages);
+
+	for (const auto& s : shaders)
+	{
+		s.SSave(pFile);
+	}
+
+	return true;
+}
+
+bool Technique::SLoad(core::XFile* pFile)
+{
+	pFile->readObj(state);
+	pFile->readString(source);
+	pFile->readString(defines);
+	pFile->readObj(stages);
+
+	for (auto& s : shaders)
+	{
+		s.SLoad(pFile);
+	}
+
+	return true;
+}
+
 
 //-------------------------------------------------
 
@@ -53,6 +165,64 @@ Param& Param::operator=(const Param& oth)
 	}
 
 	return *this;
+}
+
+bool Param::SSave(core::XFile* pFile) const
+{
+	pFile->writeObj(type);
+	pFile->writeObj(vec4);
+
+	return true;
+}
+
+bool Param::SLoad(core::XFile* pFile)
+{
+	pFile->readObj(type);
+	pFile->readObj(vec4);
+
+	return true;
+}
+
+//-------------------------------------------------
+
+bool Texture::SSave(core::XFile* pFile) const
+{
+	pFile->writeString(propName);
+	pFile->writeString(defaultName);
+	pFile->writeObj(texSlot);
+
+	return true;
+}
+
+bool Texture::SLoad(core::XFile* pFile)
+{
+	pFile->readString(propName);
+	pFile->readString(defaultName);
+	pFile->readObj(texSlot);
+
+	return true;
+}
+
+//-------------------------------------------------
+
+bool Sampler::SSave(core::XFile* pFile) const
+{
+	pFile->writeString(repeatStr);
+	pFile->writeString(filterStr);
+	pFile->writeObj(repeat);
+	pFile->writeObj(filter);
+
+	return true;
+}
+
+bool Sampler::SLoad(core::XFile* pFile)
+{
+	pFile->readString(repeatStr);
+	pFile->readString(filterStr);
+	pFile->readObj(repeat);
+	pFile->readObj(filter);
+
+	return true;
 }
 
 //-------------------------------------------------
@@ -90,6 +260,104 @@ TechSetDef::~TechSetDef()
 	techs_.free();
 	prims_.free();
 }
+
+
+// ISerialize
+
+bool TechSetDef::SSave(core::XFile* pFile) const
+{
+	TechSedDefBinHeader hdr;
+	core::zero_object(hdr);
+	hdr.forcc = TechSedDefBinHeader::FOURCC;
+	hdr.version = TechSedDefBinHeader::VERSION;
+
+	hdr.crc32 = 0;
+	hdr.modifed = core::dateTimeStampSmall::systemDateTime();
+
+	hdr.numTechs = safe_static_cast<uint8_t>(techs_.size());
+	hdr.numParams = safe_static_cast<uint8_t>(params_.size());
+	hdr.numTextures = safe_static_cast<uint8_t>(textures_.size());
+	hdr.numSamplers = safe_static_cast<uint8_t>(samplers_.size());
+
+	pFile->writeObj(hdr);
+
+	for (const auto& t : techs_) {
+		pFile->writeString(t.first);
+	}
+	for (const auto& p : params_) {
+		pFile->writeString(p.first);
+	}
+	for (const auto& t : textures_) {
+		pFile->writeString(t.first);
+	}
+	for (const auto& s : samplers_) {
+		pFile->writeString(s.first);
+	}
+
+	for (const auto& t : techs_) {
+		t.second.SSave(pFile);
+	}
+	for (const auto& p : params_) {
+		p.second.SSave(pFile);
+	}
+	for (const auto& t : textures_) {
+		t.second.SSave(pFile);
+	}
+	for (const auto& s : samplers_) {
+		s.second.SSave(pFile);
+	}
+
+	return true;
+}
+
+bool TechSetDef::SLoad(core::XFile* pFile)
+{
+	TechSedDefBinHeader hdr;
+
+	if (pFile->readObj(hdr) != sizeof(hdr)) {
+		return false;
+	}
+
+	if (!hdr.isValid()) {
+		return false;
+	}
+
+	techs_.resize(hdr.numTechs);
+	params_.resize(hdr.numParams);
+	textures_.resize(hdr.numTextures);
+	samplers_.resize(hdr.numSamplers);
+
+	for (auto& t : techs_) {
+		pFile->readString(t.first);
+	}
+	for (auto& p : params_) {
+		pFile->readString(p.first);
+	}
+	for (auto& t : textures_) {
+		pFile->readString(t.first);
+	}
+	for (auto& s : samplers_) {
+		pFile->readString(s.first);
+	}
+
+	for (auto& t : techs_) {
+		t.second.SLoad(pFile);
+	}
+	for (auto& p : params_) {
+		p.second.SLoad(pFile);
+	}
+	for (auto& t : textures_) {
+		t.second.SLoad(pFile);
+	}
+	for (auto& s : samplers_) {
+		s.second.SLoad(pFile);
+	}
+
+	return true;
+}
+
+// ~ISerialize
+
 
 
 bool TechSetDef::parseFile(FileBuf& buf)
