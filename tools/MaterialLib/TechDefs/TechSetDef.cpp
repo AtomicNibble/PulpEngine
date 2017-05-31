@@ -342,6 +342,10 @@ bool TechSetDef::SLoad(core::XFile* pFile)
 		return false;
 	}
 
+	if (hdr.version != TechSetDefBinHeader::VERSION) {
+		return false;
+	}
+
 	techs_.resize(hdr.numTechs);
 	params_.resize(hdr.numParams);
 	textures_.resize(hdr.numTextures);
