@@ -69,6 +69,9 @@ struct Technique
 
 struct AssManProps
 {
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
+
 	core::string cat; // the assetScript cat.
 	core::string title;
 	core::string defaultVal;

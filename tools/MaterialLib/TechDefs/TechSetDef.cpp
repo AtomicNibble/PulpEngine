@@ -137,6 +137,26 @@ bool Technique::SLoad(core::XFile* pFile)
 
 //-------------------------------------------------
 
+bool AssManProps::SSave(core::XFile* pFile) const
+{
+	pFile->writeString(cat);
+	pFile->writeString(title);
+	pFile->writeString(defaultVal);
+
+	return true;
+}
+
+bool AssManProps::SLoad(core::XFile* pFile)
+{
+	pFile->readString(cat);
+	pFile->readString(title);
+	pFile->readString(defaultVal);
+
+	return true;
+}
+
+//-------------------------------------------------
+
 Param::Param(const Param& oth)
 {
 	*this = oth;
@@ -172,7 +192,7 @@ bool Param::SSave(core::XFile* pFile) const
 	pFile->writeObj(type);
 	pFile->writeObj(vec4);
 
-	return true;
+	return assProps.SSave(pFile);
 }
 
 bool Param::SLoad(core::XFile* pFile)
@@ -180,7 +200,7 @@ bool Param::SLoad(core::XFile* pFile)
 	pFile->readObj(type);
 	pFile->readObj(vec4);
 
-	return true;
+	return assProps.SLoad(pFile);
 }
 
 //-------------------------------------------------
@@ -191,7 +211,7 @@ bool Texture::SSave(core::XFile* pFile) const
 	pFile->writeString(defaultName);
 	pFile->writeObj(texSlot);
 
-	return true;
+	return assProps.SSave(pFile);
 }
 
 bool Texture::SLoad(core::XFile* pFile)
@@ -200,7 +220,7 @@ bool Texture::SLoad(core::XFile* pFile)
 	pFile->readString(defaultName);
 	pFile->readObj(texSlot);
 
-	return true;
+	return assProps.SLoad(pFile);
 }
 
 //-------------------------------------------------
