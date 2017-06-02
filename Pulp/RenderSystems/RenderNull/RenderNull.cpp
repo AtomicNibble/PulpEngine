@@ -192,16 +192,6 @@ texture::ITexture* RenderNull::getDeviceTexture(int32_t id)
 }
 
 
-texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlags flags)
-{
-	X_UNUSED(path);
-	X_UNUSED(path);
-	X_UNUSED(flags);
-
-	return nullptr;
-}
-
-
 texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
 	X_UNUSED(pNickName);

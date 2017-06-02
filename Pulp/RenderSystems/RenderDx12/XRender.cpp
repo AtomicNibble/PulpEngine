@@ -549,7 +549,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 	// anything to do?
 	if (sortedIdx.isEmpty()) {
-		return;
+	//	return;
 	}
 
 	// will we ever not need one?
@@ -646,7 +646,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 			{
 				case Commands::Command::NOP:
 				{
-#if X_DEBUG
+#if X_DEBUG && 0
 					// lets check we actually using this for chaining.
 					if (CommandPacket::loadNextCommandPacket(pPacket) == nullptr)
 					{
@@ -911,18 +911,21 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 				{
 					const auto& texState = pTexStates[t];
 					auto* pTex = pTextureMan_->getByID(texState.textureId);
-					
+					X_ASSERT_NOT_NULL(pTex);
+
 					auto& gpuResource = pTex->getGpuResource();
 
 					context.transitionResource(gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 					textureSRVS[t] = pTex->getSRV();
-
 				}
 
 				// for now assume all slots are linera and no gaps.
 				const auto count = resourceState.getNumTextStates();
 				context.setDynamicDescriptors(newState.texRootIdxBase, 0, count, textureSRVS);
+
+				int goat = 0;
+				goat = 1;
 			}
 
 			// this may be zero even if we have samplers, if they are all static.
@@ -1101,14 +1104,6 @@ texture::ITexture* XRender::getDeviceTexture(int32_t id)
 
 	return pText;
 }
-
-::texture::ITexture* XRender::getTexture(const char* pName, texture::TextureFlags flags)
-{
-	texture::Texture* pText = pTextureMan_->forName(pName, flags);
-
-	return pText;
-}
-
 
 ::texture::ITexture* XRender::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
@@ -1370,7 +1365,8 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		RTVFormats[i] = texture::Util::DXGIFormatFromTexFmt(pPassState->rtfs[i]);
 	}
 
-	if (desc.stateFlags.IsSet(StateFlag::DEPTHWRITE))
+// we can leave depth bound if if not testing no?
+//	if (desc.stateFlags.IsSet(StateFlag::DEPTHWRITE))
 	{
 		DSVFormat = pTextureMan_->getDepthFmt();
 	}

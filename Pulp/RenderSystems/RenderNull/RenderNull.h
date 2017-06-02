@@ -48,7 +48,6 @@ public:
 	void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
 
 	texture::ITexture* getDeviceTexture(int32_t id) X_FINAL;
-	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_FINAL;
 	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
 
 	bool initDeviceTexture(texture::ITexture* pTex) X_FINAL;
