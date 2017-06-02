@@ -62,6 +62,8 @@ bool XMaterialManager::init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
+	
+
 	if (!InitDefaults()) {
 		return false;
 	}
@@ -319,8 +321,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 		auto* pTexMan = gEngEnv.pTextureMan_;
 		auto* pDefaultTex = pTexMan->getDefault(render::TextureSlot::DIFFUSE);
 
-		texture::TextureFlags texFlags = texture::TextureFlags();
-
 		for (size_t i = 0; i < numTex; i++)
 		{
 			auto& texState = pTexStates[i];
@@ -335,9 +335,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 				{
 					// create the texture instance.
 					// might get default back, etc..
-					auto* pTexture = gEngEnv.pTextureMan_->forName(t.name.c_str(), texFlags);
-
-					texState.textureId = pTexture->getDeviceID();
+					texState.textureId = t.pTexture->getDeviceID();
 					break;
 				}
 			}
@@ -365,9 +363,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 								auto& t = matTextures[j];
 								if (t.name == alias.name)
 								{
-									auto* pTexture = gEngEnv.pTextureMan_->forName(t.name.c_str(), texFlags);
-
-									texState.textureId = pTexture->getDeviceID();
+									texState.textureId = t.pTexture->getDeviceID();
 									break;
 								}
 							}
@@ -715,6 +711,17 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, catType);
 	if (!pTechDefState) {
 		return false;
+	}
+
+	// we want to load all the textures now.
+	// so that we are not 'creating' refrences for every tech.
+	texture::TextureFlags texFlags = texture::TextureFlags();
+
+	for (auto& tex : textures)
+	{
+		auto* pTexture = gEngEnv.pTextureMan_->forName(tex.name.c_str(), texFlags);
+
+		tex.pTexture = pTexture;
 	}
 
 

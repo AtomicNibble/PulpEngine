@@ -26,6 +26,7 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(engine)
 
+
 namespace techset
 {
 
@@ -33,6 +34,7 @@ namespace techset
 
 } // namespace techset
 
+class Texture;
 class TechDef;
 class TechDefState;
 
@@ -90,6 +92,7 @@ struct MaterialTexture
 	core::string name;
 	core::string val;
 	render::TextureSlot::Enum texSlot;
+	engine::Texture* pTexture;
 };
 
 struct MaterialParam
