@@ -43,7 +43,6 @@ public:
 
 	Texture* getDeviceTexture(int32_t id);
 
-	Texture* forName(const char* pName, TextureFlags flags);
 	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
 	
 	// this is used for creating textures that can be used for more than just SRV's

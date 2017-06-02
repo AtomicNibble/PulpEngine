@@ -104,29 +104,6 @@ X_NAMESPACE_BEGIN(texture)
 		return pTexRes;
 	}
 
-	Texture* TextureManager::forName(const char* pName, TextureFlags flags)
-	{
-		core::string name(pName);
-
-		auto& threadPolicy = textures_.getThreadPolicy();
-		threadPolicy.Enter();
-
-		TexRes* pTexRes = textures_.findAsset(name);
-
-		if (pTexRes)
-		{
-			threadPolicy.Leave();
-			pTexRes->addReference();
-		}
-		else
-		{
-			pTexRes = textures_.createAsset(name, name, flags);
-			threadPolicy.Leave();
-		}
-
-		return pTexRes;
-	}
-
 	Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
 		texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 	{
