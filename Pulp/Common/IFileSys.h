@@ -85,6 +85,10 @@ struct XFile
 	inline size_t writeObj(const T& object) {
 		return write(&object, sizeof(T));
 	}
+	template <>
+	inline size_t writeObj(const core::string& str) {
+		return writeString(str);
+	}
 
 	template <typename T>
 	inline size_t writeObj(const T* objects, size_t num) {
@@ -655,6 +659,11 @@ public:
 	inline size_t writeObj(T& object) {
 		return write(&object, sizeof(T));
 	}
+	template <>
+	inline size_t writeObj(const core::string& str) {
+		return writeString(str);
+	}
+
 	template <typename T>
 	inline size_t writeObj(const T* objects, size_t num) {
 		return write(objects, (sizeof(T)* num));
@@ -815,6 +824,11 @@ public:
 	inline size_t writeObj(T& object) {
 		return write(&object, sizeof(T));
 	}
+	template <>
+	inline size_t writeObj(const core::string& str) {
+		return writeString(str);
+	}
+
 	template <typename T>
 	inline size_t writeObj(const T* objects, size_t num) {
 		return write(objects, (sizeof(T)* num));
