@@ -478,7 +478,7 @@ bool AssetDB::PerformMigrations(void)
 			core::Path<char> filePath;
 			AssetPathForRawFile(rawfileInfo, filePath);
 
-			X_LOG1("AssetDB", "Updateding compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
+			X_LOG1("AssetDB", "Updating compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
 			core::XFileScoped file;
 			if (!file.openFile(filePath.c_str(), 

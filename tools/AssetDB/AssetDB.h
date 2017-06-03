@@ -20,7 +20,7 @@ class DLL_EXPORT AssetDB
 {
 	// Version 1: stores raw files with hash after file name on disk.
 	//				In order to migrate must rename all rawfiles on disk.
-	// Version 1: correct compression algo enum, as the order changed
+	// Version 2: correct compression algo enum, as the order changed
 	//				In order to migrate must modify all raw asset compression headers to map to new algo enum.
 	static const int32_t DB_VERSION = 2;
 
