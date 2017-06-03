@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -25,26 +25,9 @@
     <ClCompile Include="..\..\..\lib\common\error_private.c" />
     <ClCompile Include="..\..\..\lib\common\xxhash.c" />
     <ClCompile Include="..\..\..\lib\common\zstd_common.c" />
-    <ClCompile Include="..\..\..\lib\common\fse_decompress.c" />
-    <ClCompile Include="..\..\..\lib\compress\fse_compress.c" />
-    <ClCompile Include="..\..\..\lib\compress\huf_compress.c" />
-    <ClCompile Include="..\..\..\lib\compress\zstd_compress.c" />
-    <ClCompile Include="..\..\..\lib\compress\zstdmt_compress.c" />
-    <ClCompile Include="..\..\..\lib\decompress\huf_decompress.c" />
-    <ClCompile Include="..\..\..\lib\decompress\zstd_decompress.c" />
-    <ClCompile Include="..\..\..\lib\deprecated\zbuff_common.c" />
-    <ClCompile Include="..\..\..\lib\deprecated\zbuff_compress.c" />
-    <ClCompile Include="..\..\..\lib\deprecated\zbuff_decompress.c" />
     <ClCompile Include="..\..\..\lib\dictBuilder\cover.c" />
     <ClCompile Include="..\..\..\lib\dictBuilder\divsufsort.c" />
     <ClCompile Include="..\..\..\lib\dictBuilder\zdict.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v01.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v02.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v03.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v04.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v05.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v06.c" />
-    <ClCompile Include="..\..\..\lib\legacy\zstd_v07.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\lib\common\pool.h" />
@@ -58,17 +41,9 @@
     <ClInclude Include="..\..\..\lib\common\xxhash.h" />
     <ClInclude Include="..\..\..\lib\deprecated\zbuff.h" />
     <ClInclude Include="..\..\..\lib\legacy\zstd_legacy.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v01.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v02.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v03.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v04.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v05.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v06.h" />
-    <ClInclude Include="..\..\..\lib\legacy\zstd_v07.h" />
     <ClInclude Include="..\..\..\lib\zstd.h" />
     <ClInclude Include="..\..\..\lib\common\zstd_internal.h" />
     <ClInclude Include="..\..\..\lib\compress\zstd_opt.h" />
-    <ClInclude Include="..\..\..\lib\compress\zstdmt_compress.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8BFD8150-94D5-4BF9-8A50-7BD9929A0850}</ProjectGuid>
@@ -82,23 +57,27 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
