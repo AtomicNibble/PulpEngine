@@ -10,6 +10,7 @@
     <ClCompile Include="lib\common\threading.c" />
     <ClCompile Include="lib\common\xxhash.c" />
     <ClCompile Include="lib\common\zstd_common.c" />
+    <ClCompile Include="lib\common\fse_decompress.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lib\dictBuilder\divsufsort.h" />
