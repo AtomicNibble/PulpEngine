@@ -72,7 +72,7 @@ namespace
 		return false;
 	}
 
-	bool WriteFileToBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf)
+	bool WriteFileFromBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf)
 	{
 		std::ofstream file(filePath, std::ios::binary | std::ios::out);
 		if (!file.is_open()) {
@@ -311,7 +311,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	timer.Start();
 
-	if (!WriteFileToBuf(outFile, outfileData)) {
+	if (!WriteFileFromBuf(outFile, outfileData)) {
 		X_ERROR("Compress", "Failed to write output file");
 		return -1;
 	}
