@@ -1237,6 +1237,9 @@
     <ClInclude Include="Core\clang\Compiler.h">
       <Filter>Headers\Core\clang</Filter>
     </ClInclude>
+    <ClInclude Include="Compression\DictBuilder.h">
+      <Filter>Headers\Compression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1946,6 +1949,9 @@
     </ClCompile>
     <ClCompile Include="Texture.cpp">
       <Filter>Interfaces_h\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\DictBuilder.cpp">
+      <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -63,6 +63,7 @@
     <ClInclude Include="CompileTime\IsPOD.h" />
     <ClInclude Include="CompileTime\IsPointer.h" />
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Compression\DictBuilder.h" />
     <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\LZ5.h" />
     <ClInclude Include="Compression\Lzma2.h" />
@@ -592,6 +593,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
+    <ClCompile Include="Compression\DictBuilder.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />
