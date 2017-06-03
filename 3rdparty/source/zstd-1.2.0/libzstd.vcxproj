@@ -26,6 +26,10 @@
     <ClCompile Include="lib\common\threading.c" />
     <ClCompile Include="lib\common\xxhash.c" />
     <ClCompile Include="lib\common\zstd_common.c" />
+    <ClCompile Include="lib\compress\fse_compress.c" />
+    <ClCompile Include="lib\compress\huf_compress.c" />
+    <ClCompile Include="lib\compress\zstdmt_compress.c" />
+    <ClCompile Include="lib\compress\zstd_compress.c" />
     <ClCompile Include="lib\dictBuilder\cover.c" />
     <ClCompile Include="lib\dictBuilder\divsufsort.c" />
     <ClCompile Include="lib\dictBuilder\zdict.c" />
@@ -41,6 +45,8 @@
     <ClInclude Include="lib\common\xxhash.h" />
     <ClInclude Include="lib\common\zstd_errors.h" />
     <ClInclude Include="lib\common\zstd_internal.h" />
+    <ClInclude Include="lib\compress\zstdmt_compress.h" />
+    <ClInclude Include="lib\compress\zstd_opt.h" />
     <ClInclude Include="lib\dictBuilder\divsufsort.h" />
     <ClInclude Include="lib\dictBuilder\zdict.h" />
     <ClInclude Include="lib\zstd.h" />
