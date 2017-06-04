@@ -40,22 +40,24 @@ namespace
 			"_"
 			"abcdefghijklmnopqrstuvwxyz";
 
+		core::random::MultiplyWithCarry rand;
+
 		const size_t charSetNum = sizeof(charSet) - 1;
-		const size_t len = core::random::MultiplyWithCarry(assetNameLenMin, assetNameLenMax);
+		const size_t len = rand.randRange(assetNameLenMin, assetNameLenMax);
 
 		core::string name;
 		name.reserve(len);
 
-		bool addSlash = (core::random::MultiplyWithCarry() % 10) == 5;
+		bool addSlash = (rand.rand() % 10) == 5;
 
 		for (size_t i = 0; i < len; i++)
 		{
-			if (addSlash && i < (len - 2) && name.length() > 2 && (core::random::MultiplyWithCarry() % 5) == 1 &&
+			if (addSlash && i < (len - 2) && name.length() > 2 && (rand.rand() % 5) == 1 &&
 				name[i-1] != ASSET_NAME_SLASH) {
 				name += ASSET_NAME_SLASH;
 			}
 			else {
-				name += charSet[core::random::MultiplyWithCarry() % charSetNum];
+				name += charSet[rand.rand() % charSetNum];
 			}
 		}
 
