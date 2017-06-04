@@ -222,7 +222,7 @@ public:
 	X_INLINE Job* Pop(void);
 	X_INLINE Job* Steal(void);
 
-	X_INLINE uint32_t randRange(uint32_t min, uint32_t max);
+	X_INLINE size_t rand(void);
 
 private:
 	long bottom_;
@@ -231,7 +231,11 @@ private:
 	// each queue has it's own rand gen, to prevent thread sharing
 	// plus they are not thread safe, so won't behave normally when called with multiple threads.
 	// i've tried padding around this and it makes it worse, so leave it in same cache lane as bottom & top.
+#if X_64
+	core::random::XorShift128 rand_;
+#else
 	core::random::XorShift rand_;
+#endif // !X_64
 
 	Job* jobs_[MAX_NUMBER_OF_JOBS];
 };
