@@ -51,7 +51,6 @@ void XModelManager::registerCmds(void)
 void XModelManager::registerVars(void)
 {
 
-	XModel::RegisterVars();
 }
 
 bool XModelManager::init(void)

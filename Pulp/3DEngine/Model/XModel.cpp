@@ -15,9 +15,27 @@
 
 X_NAMESPACE_BEGIN(model)
 
+namespace
+{
+	bool ReadHeader(ModelHeader& hdr, core::XFile* file)
+	{
+		X_ASSERT_NOT_NULL(file);
 
+		if (file->readObj(hdr) != sizeof(hdr)) {
+			return false;
+		}
 
-Colorf XModel::model_bones_col;
+		// bit more info for material info.
+		// even tho it's handled in isValid()
+		if (hdr.materialNameDataSize == 0) {
+			X_ERROR("Model", "no material data included, require atleast one material");
+			return false;
+		}
+
+		return hdr.isValid();
+	}
+
+} // namespace
 
 
 XModel::XModel()
@@ -27,11 +45,6 @@ XModel::XModel()
 	pBoneAngles_ = nullptr;
 	pBonePos_ = nullptr;
 	pMeshHeads_ = nullptr;
-
-	numLods_ = 0;
-	numBones_ = 0;
-	numBlankBones_ = 0;
-	totalMeshNum_ = 0;
 
 	pData_ = nullptr;
 }
@@ -44,88 +57,32 @@ XModel::~XModel()
 }
 
 
-// IModel
-
-const core::string& XModel::getName(void) const
+bool XModel::createRenderBuffersForLod(size_t idx)
 {
-	return name_;
+	const auto& raw = hdr_.lodInfo[idx];
+
+	return renderMeshes_[idx].createRenderBuffers(gEnv->pRender, raw, hdr_.vertexFmt);
 }
 
-int32_t XModel::numLods(void) const
+void XModel::releaseLodRenderBuffers(size_t idx)
 {
-	return numLods_;
+	auto& renderInfo = renderMeshes_[idx];
+
+	renderInfo.releaseRenderBuffers(gEnv->pRender);
 }
 
-int32_t XModel::numBones(void) const
+bool XModel::canRenderLod(size_t idx) const
 {
-	return numBones_;
+	const auto& render = renderMeshes_[idx];
+
+	return render.canRender();
 }
 
-int32_t XModel::numBlankBones(void) const
-{
-	return numBlankBones_;
-}
-
-int32_t XModel::numMeshTotal(void) const
-{
-	return totalMeshNum_;
-}
-
-int32_t XModel::numVerts(size_t lodIdx) const
-{
-	X_ASSERT(lodIdx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), lodIdx);
-
-	return lodInfo_[lodIdx].numVerts;
-}
-
-bool XModel::HasLods(void) const
-{
-	return numLods() > 1;
-}
-
-size_t XModel::lodIdxForDistance(float distance) const
-{
-	// we select the lowest level lod that is visible
-	for (int32_t i = 0; i < numLods_; i++)
-	{
-		if (lodInfo_[i].lodDistance > distance) {
-			return i;
-		}
-	}
-
-	// lowest lod
-	return numLods_ - 1;
-}
-
-const AABB& XModel::bounds(void) const
-{
-	return hdr_.boundingBox;
-}
-
-const AABB& XModel::bounds(size_t lodIdx) const
-{
-	return hdr_.lodInfo[lodIdx].boundingBox;
-}
-
-const Sphere& XModel::boundingSphere(size_t lodIdx) const
-{
-	return hdr_.lodInfo[lodIdx].boundingSphere;
-}
-
-void XModel::Render(void)
-{
-	// this will be removed soon.
-	// there will be no way to global render somthing must be slapped in a list.
-
-}
-
-
-void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat)
+void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const
 {
 	if (numBones() > 0)
 	{
 		const int32_t num = numBones();
-		const Color8u col = model_bones_col;
 
 		for (int32_t i = 0; i < num; i++)
 		{
@@ -151,59 +108,6 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 	}
 }
 
-// ~IModel
-
-bool XModel::createRenderBuffersForLod(size_t idx)
-{
-	const auto& raw = lodInfo_[idx];
-
-	return renderMeshes_[idx].createRenderBuffers(gEnv->pRender, raw, hdr_.vertexFmt);
-}
-
-void XModel::releaseLodRenderBuffers(size_t idx)
-{
-	auto& renderInfo = renderMeshes_[idx];
-
-	renderInfo.releaseRenderBuffers(gEnv->pRender);
-}
-
-bool XModel::canRenderLod(size_t idx) const
-{
-	const auto& render = renderMeshes_[idx];
-
-	return render.canRender();
-}
-
-void XModel::RegisterVars(void)
-{	
-	ADD_CVAR_REF_COL_NO_NAME(model_bones_col, Color(0.7f, 0.5f, 0.f, 1.f),
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Model bone color");
-}
-
-const LODHeader& XModel::getLod(size_t idx) const 
-{
-	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
-	return lodInfo_[idx];
-}
-
-const XRenderMesh& XModel::getLodRenderMesh(size_t idx) const
-{
-	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
-	return renderMeshes_[idx];
-}
-
-const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
-{
-	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
-	return lodInfo_[idx];
-}
-
-const SubMeshHeader* XModel::getMeshHead(size_t idx) const 
-{
-	X_ASSERT(idx < static_cast<size_t>(numMeshTotal()), "invalid mesh index")(numMeshTotal(), idx);
-	return &pMeshHeads_[idx];
-}
-
 
 void XModel::AssignDefault(XModel* pDefault)
 {
@@ -213,20 +117,11 @@ void XModel::AssignDefault(XModel* pDefault)
 	pBonePos_ = pDefault->pBonePos_;
 	pMeshHeads_ = pDefault->pMeshHeads_;
 
-
-	numLods_ = pDefault->numLods_;
-	numBones_ = pDefault->numBones_;
-	numBlankBones_ = pDefault->numBlankBones_;
-	totalMeshNum_ = pDefault->totalMeshNum_;
-
-
 	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
 		renderMeshes_[i] = pDefault->renderMeshes_[i];
 	}
-	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
-		lodInfo_[i] = pDefault->lodInfo_[i];
-	}
 
+	hdr_ = pDefault->hdr_;
 }
 
 // ==================================
@@ -680,35 +575,7 @@ void XModel::ProcessData(char* pData)
 		pMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(pMesh->materialName);
 	}
 
-	// copy lod info activating the data.
-	core::copy_object(lodInfo_, hdr_.lodInfo);
-
-	numLods_ = hdr_.numLod;
-	numBones_ = hdr_.numBones;
-	numBlankBones_ = hdr_.numBlankBones;
-	totalMeshNum_ = hdr_.numMesh;
 }
-
-
-bool XModel::ReadHeader(ModelHeader& hdr, core::XFile* file)
-{
-	X_ASSERT_NOT_NULL(file);
-
-	if (file->readObj(hdr) != sizeof(hdr)) {
-		return false;
-	}
-
-	// bit more info for material info.
-	// even tho it's handled in isValid()
-	if (hdr.materialNameDataSize == 0) {
-		X_ERROR("Model", "no material data included, require atleast one material");
-		return false;
-	}
-
-	return hdr.isValid();
-}
-
-
 
 
 /// Model functions.

@@ -244,7 +244,7 @@ void Level::DebugDraw_ModelBones(void) const
 				// save a call?
 				if (sm.pModel->numBones() > 0)
 				{
-					sm.pModel->RenderBones(pPrimContex_, posMat);
+					sm.pModel->RenderBones(pPrimContex_, posMat, Col_Royalblue);
 				}
 			}
 		}
