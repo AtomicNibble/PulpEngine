@@ -11,6 +11,10 @@
 #include <Compression\Lzma2.h>
 #include <Compression\Zlib.h>
 #include <Compression\Store.h>
+#include <Compression\DictBuilder.h>
+
+#include <String\HumanSize.h>
+#include <String\HumanDuration.h>
 
 #include <Time\StopWatch.h>
 
@@ -19,6 +23,7 @@
 #include <fstream>
 
 #include <ICompression.h>
+#include <IFileSys.h>
 
 #ifdef X_LIB
 
@@ -97,6 +102,12 @@ namespace
 		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lz4hc 3:lz5 4:lz5hc 5:lzma 6:zlib 7:store, default: lz4) ^9not-required");
 		X_LOG0("Compressor", "^6-d^7		(deflate 1/0, default: 1) ^9not-required");
 		X_LOG0("Compressor", "^6-lvl^7		(lvl 1-9, default: 5) ^9not-required");
+		X_LOG0("Compressor", "TrainArgs:");
+		X_LOG0("Compressor", "^6-train^7		enable training mode ^9not-required");
+		X_LOG0("Compressor", "^6-train-src^7	source dir for samples ^1required");
+		X_LOG0("Compressor", "^6-train-of^7		output file for dict ^1required");
+		X_LOG0("Compressor", "^6-train-md^7		max size of output dict(default: 64k) ^9not-required");
+
 	}
 
 	int DoCompression(CompressorArena& arena)
@@ -296,6 +307,122 @@ namespace
 	{
 		X_UNUSED(arena);
 
+		core::Path<wchar_t> srcDir, outFile;
+		size_t maxDictSize = std::numeric_limits<uint16_t>::max();
+
+		const wchar_t* pSrcDir = gEnv->pCore->GetCommandLineArgForVarW(L"train-src");
+		if (pSrcDir) {
+			srcDir = pSrcDir;
+			srcDir.ensureSlash();
+		}
+		const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"train-of");
+		if (pOutFile) {
+			outFile = pOutFile;
+		}
+		const wchar_t* pMaxDictSize = gEnv->pCore->GetCommandLineArgForVarW(L"train-md");
+		if (pMaxDictSize) {
+			maxDictSize = core::strUtil::StringToInt<size_t>(pMaxDictSize);
+		}
+
+		// we need to load all the files in the src directory and merge them into a single buffer.
+		// so first we should just get all the sizes.
+		core::Array<size_t> sampleSizes(&arena);
+		sampleSizes.setGranularity(256);
+
+		core::Array<uint8_t> sampleData(&arena);
+		core::Array<uint8_t> dictData(&arena);
+
+		// process the files.
+		{
+			core::Array<core::Path<wchar_t>> fileNames(&arena);
+			fileNames.setGranularity(256);
+
+			core::Path<wchar_t> pathW(pSrcDir);
+			core::Path<char> path(pathW);
+			path.ensureSlash();
+			path.append("*");
+
+			X_LOG0("Compress", "Gathering files for training dict");
+
+			core::FindFirstScoped find;
+			if (find.findfirst(path.c_str()))
+			{
+				do
+				{
+					const auto& fd = find.fileData();
+					if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
+						continue;
+					}
+
+					const size_t sampleSize = core::Min<size_t>(fd.size, core::Compression::DICT_SAMPLER_SIZE_MAX);
+					if (sampleSize == 0) {
+						continue;
+					}
+
+					sampleSizes.push_back(sampleSize);
+					fileNames.emplace_back(fd.name);
+
+				} while (find.findNext());
+			}
+
+			X_ASSERT(sampleSizes.size() == fileNames.size(), "Array sizes should match")();
+
+			if (fileNames.size() < core::Compression::DICT_SAMPLER_MIN_SAMPLES)
+			{
+				X_ERROR("Compress", "Only %" PRIuS " samples provided, atleast %" PRIuS " required",
+					fileNames.size(), core::Compression::DICT_SAMPLER_MIN_SAMPLES);
+				return -1;
+			}
+
+			const size_t totalSampleSize = core::accumulate(sampleSizes.begin(), sampleSizes.end(), 0_sz);
+			sampleData.resize(totalSampleSize);
+
+			size_t currentOffset = 0;
+
+			X_LOG0("Compress", "Loading ^6%" PRIuS "^7 file(s) data for training dict", fileNames.size());
+
+			// load all the files.
+			for(size_t i=0; i<fileNames.size(); i++)
+			{
+				core::Path<wchar_t> filePath(srcDir);
+				filePath.appendFmt(L"%s", fileNames[i].c_str());
+
+				std::ifstream file(filePath.c_str(), std::ios::binary);
+				if (!file.is_open()) {
+					X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
+					continue;
+				}
+
+				file.read(reinterpret_cast<char*>(&sampleData[currentOffset]), sampleSizes[i]);
+				currentOffset += sampleSizes[i];
+			}
+
+			X_ASSERT(currentOffset == sampleData.size(), "Error reading sample data")(currentOffset, sampleData.size());
+		}
+
+		// train.
+		core::HumanSize::Str sizeStr, sizeStr1;
+		X_LOG0("Compress", "Training dict with ^6%s^7 sample data from ^6%" PRIuS "^7 files. avg size: ^6%s", 
+			core::HumanSize::toString(sizeStr, sampleData.size()),
+			sampleSizes.size(),
+			core::HumanSize::toString(sizeStr1, sampleData.size() / sampleSizes.size()));
+
+		core::StopWatch timer;
+
+		if (!core::Compression::trainDictionary(sampleData, sampleSizes, dictData, maxDictSize))
+		{
+			X_ERROR("Compress", "Fail to train dictionary");
+			return -1;
+		}
+
+		const float trainTime = timer.GetMilliSeconds();	
+		core::HumanDuration::Str timeStr;
+		X_LOG0("Compress", "Train dict took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
+
+		if (!WriteFileFromBuf(outFile.c_str(), dictData)) {
+			X_ERROR("Compress", "Failed to write output file");
+			return -1;
+		}
 
 		return 0;
 	}
@@ -336,13 +463,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	int res = 0;
 
-	if (1)
+	const wchar_t* pTrain = gEnv->pCore->GetCommandLineArgForVarW(L"train");
+	if (pTrain && core::strUtil::StringToBool(pTrain))
 	{
-		res = DoCompression(arena);
+		res = DoTrain(arena);
 	}
 	else
 	{
-		res = DoTrain(arena);
+		res = DoCompression(arena);
 	}
 
 
