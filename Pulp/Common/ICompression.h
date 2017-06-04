@@ -19,6 +19,13 @@ namespace Compression
 		HIGH // best
 	);
 
+	X_DECLARE_FLAGS8(CompressFlag)(
+		SHARED_DICT	
+	);
+
+	typedef Flags8<CompressFlag> CompressFlags;
+	typedef uint16_t SharedDictId;
+
 	// placed at start of defalted buffers.
 	// that are made via Compressor<T>
 	struct BufferHdr
@@ -36,14 +43,39 @@ namespace Compression
 
 		Algo::Enum algo;
 		uint8_t magic[3];
+
+		CompressFlags flags;
+		uint8_t _pad;
+		SharedDictId sharedDictId;
+
 		// we don't allow hugh single deflated blocks.
 		// i see no use case.
 		uint32_t deflatedSize;
 		uint32_t inflatedSize;
 	};
 
-	X_ENSURE_SIZE(BufferHdr, 12);
+	X_ENSURE_SIZE(BufferHdr, 16);
+
+	struct SharedDictHdr
+	{
+		static const uint32_t MAGIC = 0x29C820F7;
+
+		SharedDictHdr() {
+			core::zero_this(this);
+		}
+
+		X_INLINE bool IsMagicValid(void) const {
+			return magic == MAGIC;
+		}
+
+		uint32_t magic;
+		uint32_t size;
+		SharedDictId sharedDictId;
+		uint16_t _pad[3];
+	};
 	
+	X_ENSURE_SIZE(SharedDictHdr, 16);
+
 	struct ICompressor
 	{
 		virtual ~ICompressor() {}
@@ -174,6 +206,10 @@ namespace Compression
 			return T::inflate(arena, pSrcBuf, srcBufLen, pDstBuf, destBufLen);
 		}
 	};
+
+
+
+
 
 } // namespace Compression
 
