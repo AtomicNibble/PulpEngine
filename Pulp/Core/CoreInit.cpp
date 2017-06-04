@@ -18,6 +18,7 @@
 #include <Random\XorShift.h>
 
 #include <Hashing\crc32.h>
+#include <Hashing\sha1.h>
 
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
@@ -705,10 +706,21 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 
 bool XCore::parseSeed(Vec4i seed)
 {
-	if (seed != Vec4i::zero()) {
-		core::random::MultiplyWithCarrySeed(seed);
-		core::random::XorShiftSeed(seed);
+	if (seed == Vec4i::zero()) 
+	{
+		core::XProcessMemInfo meminfo;
+		core::GetProcessMemInfo(meminfo);
+
+		core::Hash::SHA1 sha1;
+		sha1.update(core::Thread::GetCurrentID());
+		sha1.update(core::SysTimer::Get());
+		sha1.update(meminfo);
+
+		auto digest = sha1.finalize();
+		std::memcpy(&seed, digest.bytes, core::Min(sizeof(seed), sizeof(digest)));
 	}
+
+	env_.xorShift.setSeed(seed);
 
 	return true;
 }
