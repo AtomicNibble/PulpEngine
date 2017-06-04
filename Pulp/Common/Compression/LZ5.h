@@ -86,6 +86,7 @@ namespace Compression
 			return (size > maxSourceSize() ? 0 : (size)+1 + 1 + ((size / (1<<17)) + 1)*4);
 		}
 
+		bool loadDict(const uint8_t* pDict, size_t size);
 
 		size_t compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen);
 
@@ -101,6 +102,8 @@ namespace Compression
 	public:
 		LZ5StreamDecode();
 		~LZ5StreamDecode();
+
+		bool loadDict(const uint8_t* pDict, size_t size);
 
 		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize);
 

@@ -155,6 +155,35 @@ namespace Compression
 		}
 	}
 
+	bool LZ4Stream::loadDict(const uint8_t* pDict, size_t size)
+	{
+		if (size < sizeof(SharedDictHdr)) {
+			X_ERROR("LZ4", "Dictionary is too small to be valid");
+			return false;
+		}
+
+		const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
+		if (!pDictHdr->IsMagicValid()) {
+			X_ERROR("LZ4", "Dictionary header is not valid");
+			return false;
+		}
+
+		const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
+
+		int32_t dictSize = LZ4_loadDict(
+			reinterpret_cast<LZ4_stream_t*>(stream_), 
+			reinterpret_cast<const char*>(pDict), 
+			cappedSize
+		);
+
+		if (dictSize == 0 || dictSize < cappedSize) {
+			X_ERROR("LZ4", "Failed to set dictionary");
+			return false;
+		}
+
+		return true;
+	}
+
 	size_t LZ4Stream::compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen,
 		CompressLevel::Enum lvl)
 	{
@@ -194,6 +223,29 @@ namespace Compression
 #endif // !X_DEBUG
 	}
 
+	bool LZ4StreamDecode::loadDict(const uint8_t* pDict, size_t size)
+	{
+		if (size < sizeof(SharedDictHdr)) {
+			X_ERROR("LZ4", "Dictionary is too small to be valid");
+			return false;
+		}
+
+		const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
+		if (!pDictHdr->IsMagicValid()) {
+			X_ERROR("LZ4", "Dictionary header is not valid");
+			return false;
+		}
+
+		const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
+
+		int32_t res = LZ4_setStreamDecode(
+			reinterpret_cast<LZ4_streamDecode_t*>(decodeStream_),
+			reinterpret_cast<const char*>(pDict),
+			cappedSize
+		);
+
+		return res == 1;
+	}
 
 	size_t LZ4StreamDecode::decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t originalSize)
 	{

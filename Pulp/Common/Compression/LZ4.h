@@ -86,6 +86,7 @@ namespace Compression
 			return (size > maxSourceSize() ? 0 : (size)+((size) / 255) + 16);
 		}
 
+		bool loadDict(const uint8_t* pDict, size_t size);
 
 		size_t compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen,
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
@@ -102,6 +103,8 @@ namespace Compression
 	public:
 		LZ4StreamDecode();
 		~LZ4StreamDecode();
+
+		bool loadDict(const uint8_t* pDict, size_t size);
 
 		// originalSize is the size of the decompressed data.
 		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t originalSize);

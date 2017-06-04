@@ -215,6 +215,35 @@ namespace Compression
 		}
 	}
 
+	bool LZ5Stream::loadDict(const uint8_t* pDict, size_t size)
+	{
+		if (size < sizeof(SharedDictHdr)) {
+			X_ERROR("LZ4", "Dictionary is too small to be valid");
+			return false;
+		}
+
+		const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
+		if (!pDictHdr->IsMagicValid()) {
+			X_ERROR("LZ4", "Dictionary header is not valid");
+			return false;
+		}
+
+		const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
+
+		int32_t dictSize = LZ5_loadDict(
+			reinterpret_cast<LZ5_stream_t*>(stream_),
+			reinterpret_cast<const char*>(pDict),
+			cappedSize
+		);
+
+		if (dictSize == 0 || dictSize < cappedSize) {
+			X_ERROR("LZ4", "Failed to set dictionary");
+			return false;
+		}
+
+		return true;
+	}
+
 	size_t LZ5Stream::compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen)
 	{
 		X_ASSERT_NOT_NULL(stream_);
@@ -252,6 +281,30 @@ namespace Compression
 #endif // !X_DEBUG
 	}
 
+	bool LZ5StreamDecode::loadDict(const uint8_t* pDict, size_t size)
+	{
+		if (size < sizeof(SharedDictHdr)) {
+			X_ERROR("LZ4", "Dictionary is too small to be valid");
+			return false;
+		}
+
+		const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
+		if (!pDictHdr->IsMagicValid()) {
+			X_ERROR("LZ4", "Dictionary header is not valid");
+			return false;
+		}
+
+		const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
+
+		int32_t res = LZ5_setStreamDecode(
+			reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_),
+			reinterpret_cast<const char*>(pDict),
+			cappedSize
+		);
+
+		return res == 1;
+	}
+
 	size_t LZ5StreamDecode::decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize)
 	{
 		LZ5_streamDecode_t* pStream = reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_);
@@ -261,8 +314,12 @@ namespace Compression
 		int cmpSize = safe_static_cast<int, size_t>(compressedSize);
 		int maxDecSize = safe_static_cast<int, size_t>(maxDecompressedSize);
 
-
 		int res = LZ5_decompress_safe_continue(pStream, pSrc, pDst, cmpSize, maxDecSize);
+
+		if (res < 0) {
+			X_ERROR("LZ5", "Error decompressing stream");
+			return 0;
+		}
 
 		return res;
 	}
