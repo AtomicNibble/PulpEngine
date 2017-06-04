@@ -126,6 +126,15 @@ makeUnique(core::MemoryArenaBase* arena, _Types&&... _Args)
 	return core::UniquePointer<T>(arena, X_NEW(T, arena, "makeUnique<T>")(std::forward<_Types>(_Args)...));
 }
 
+
+template<typename T, class... _Types>
+X_INLINE typename std::enable_if<!std::is_array<T>::value, core::UniquePointer<T> >::type
+makeUnique(core::MemoryArenaBase* arena, const char* pID, _Types&&... _Args)
+{
+	return core::UniquePointer<T>(arena, X_NEW(T, arena, pID)(std::forward<_Types>(_Args)...));
+}
+
+
 template<typename T, class... _Types>
 X_INLINE typename std::enable_if<std::is_array<T>::value && std::extent<T>::value == 0, core::UniquePointer<T> >::type 
 makeUnique(core::MemoryArenaBase* arena, size_t size)
