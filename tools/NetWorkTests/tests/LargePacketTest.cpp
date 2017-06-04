@@ -63,7 +63,7 @@ TEST(net, LargePacketTest)
 
 	// fill it with junk
 	for (auto& b : data) {
-		b = safe_static_cast<uint8_t>(core::random::MultiplyWithCarry(0u, 255u));
+		b = safe_static_cast<uint8_t>(gEnv->xorShift.randRange(0u, 255u));
 	}
 
 	data[0] = PACKET_ID;

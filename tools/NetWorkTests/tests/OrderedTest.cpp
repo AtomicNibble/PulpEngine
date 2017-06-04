@@ -122,11 +122,11 @@ TEST(net, OrderedPacketsTest)
 			packetsRecived = 0;
 
 			// sends packets on diffrent streams.
-			uint32_t numStream = core::random::MultiplyWithCarry(1u, 10u);
+			uint32_t numStream = gEnv->xorShift.randRange(1u, 10u);
 			for (uint32_t x = 0; x < numStream; x++)
 			{
-				uint32_t stream = core::random::MultiplyWithCarry(0, MAX_ORDERED_STREAMS);
-				uint32_t num = core::random::MultiplyWithCarry(2u, 10u);
+				uint32_t stream = gEnv->xorShift.randRange(0, MAX_ORDERED_STREAMS);
+				uint32_t num = gEnv->xorShift.randRange(2u, 10u);
 
 				for (uint32_t i = 0; i < num; i++)
 				{
@@ -136,7 +136,7 @@ TEST(net, OrderedPacketsTest)
 					bs.write(stream);
 
 					// send variang sized packets.
-					uint32_t length = core::random::MultiplyWithCarry(static_cast<uint32_t>(bs.sizeInBytes()),
+					uint32_t length = gEnv->xorShift.randRange(static_cast<uint32_t>(bs.sizeInBytes()),
 						static_cast<uint32_t>(data.size()));
 
 					length = static_cast<uint32_t>(data.size());
@@ -148,10 +148,10 @@ TEST(net, OrderedPacketsTest)
 			}
 
 			// now send single packets on varing streams.
-			uint32_t numPacket = core::random::MultiplyWithCarry(1u, 10u);
+			uint32_t numPacket = gEnv->xorShift.randRange(1u, 10u);
 			for (uint32_t x = 0; x < numPacket; x++)
 			{
-				uint32_t stream = core::random::MultiplyWithCarry(0, MAX_ORDERED_STREAMS);
+				uint32_t stream = gEnv->xorShift.randRange(0, MAX_ORDERED_STREAMS);
 
 				core::FixedBitStreamNoneOwning bs(data.begin(), data.end(), false);
 				bs.write(PACKET_ID);
@@ -159,7 +159,7 @@ TEST(net, OrderedPacketsTest)
 				bs.write(stream);
 
 				// send variang sized packets.
-				uint32_t length = core::random::MultiplyWithCarry(static_cast<uint32_t>(bs.sizeInBytes()),
+				uint32_t length = gEnv->xorShift.randRange(static_cast<uint32_t>(bs.sizeInBytes()),
 					static_cast<uint32_t>(data.size()));
 
 				// send the packet
