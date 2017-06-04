@@ -47,11 +47,10 @@
 
 // Logging
 #include "Platform\Console.h"
-
-// window
 #include "Platform\Window.h"
-
 #include "FileSys\xFileSys.h"
+
+#include "SystemTimer.h"
 
 #if defined(WIN32)
 
@@ -334,6 +333,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 
 	X_PROFILE_NO_HISTORY_BEGIN("CoreInit", core::profiler::SubSys::CORE);
+
+	core::SysTimer::Startup();
 
 	if (startupParams.loadSymbols()) {
 		X_PROFILE_NO_HISTORY_BEGIN("SymRes", core::profiler::SubSys::CORE);

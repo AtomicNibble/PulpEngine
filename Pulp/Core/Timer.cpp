@@ -45,8 +45,6 @@ XTimer::XTimer() :
 bool XTimer::init(ICore* pCore)
 {
 	X_UNUSED(pCore);
-	SysTimer::Startup();
-
 	ticksPerSec_ = SysTimer::GetTickPerSec();
 	maxFrameTimeDelta_ = ticksPerSec_ / 5; // 0.2f
 	timeScale_ = 1; 
