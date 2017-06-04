@@ -127,7 +127,7 @@ TEST(LinkedList, RandomInsert)
 		for (unsigned i = 0; i < 20; ++i)
 		{
 			Data* data = X_NEW(Data, g_arena, "LinkedListtestData");
-			data->value = random::MultiplyWithCarry();
+			data->value = gEnv->xorShift.rand();
 			InsertIntoBefore(&forward, data);
 			InsertIntoAfter(&reverse, data);
 		}

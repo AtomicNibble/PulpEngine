@@ -41,11 +41,11 @@ namespace
 			{
 				int local = g_nonAtomicInt;
 				local += 64;
-				Thread::Sleep(random::XorShift() % 5);
+				Thread::Sleep(gEnv->xorShift.rand() % 5);
 				g_nonAtomicInt = local;
 			}
 
-			Thread::Sleep(random::XorShift() % 5);
+			Thread::Sleep(gEnv->xorShift.rand() % 5);
 			atomic::Add(&g_atomicInt, 64);
 		}
 		return Thread::ReturnValue(0);
@@ -58,11 +58,11 @@ namespace
 			{
 				int local = g_nonAtomicInt;
 				--local;
-				Thread::Sleep(random::XorShift() % 5);
+				Thread::Sleep(gEnv->xorShift.rand() % 5);
 				g_nonAtomicInt = local;
 			}
 
-			Thread::Sleep(random::XorShift() % 5);
+			Thread::Sleep(gEnv->xorShift.rand() % 5);
 			atomic::Decrement(&g_atomicInt);
 		}
 		return Thread::ReturnValue(0);
@@ -75,11 +75,11 @@ namespace
 			{
 				int local = g_nonAtomicInt;
 				++local;
-				Thread::Sleep(random::XorShift() % 5);
+				Thread::Sleep(gEnv->xorShift.rand() % 5);
 				g_nonAtomicInt = local;
 			}
 
-			Thread::Sleep(random::XorShift() % 5);
+			Thread::Sleep(gEnv->xorShift.rand() % 5);
 			atomic::Increment(&g_atomicInt);
 		}
 		return Thread::ReturnValue(0);
@@ -119,7 +119,7 @@ namespace
 			// make sure that the operation is not atomic
 			int local = g_nonProtectedInt;
 			++local;
-			Thread::Sleep(random::XorShift() % 5);
+			Thread::Sleep(gEnv->xorShift.rand() % 5);
 			g_nonProtectedInt = local;
 
 			{
@@ -127,7 +127,7 @@ namespace
 
 				int local = g_protectedInt;
 				++local;
-				Thread::Sleep(random::XorShift() % 5);
+				Thread::Sleep(gEnv->xorShift.rand() % 5);
 				g_protectedInt = local;
 			}
 		}
@@ -142,7 +142,7 @@ namespace
 			// make sure that the operation is not atomic
 			int local = g_nonProtectedInt;
 			++local;
-			Thread::Sleep(random::XorShift() % 5);
+			Thread::Sleep(gEnv->xorShift.rand() % 5);
 			g_nonProtectedInt = local;
 
 			{
@@ -150,7 +150,7 @@ namespace
 
 				int local = g_protectedInt;
 				++local;
-				Thread::Sleep(random::XorShift() % 5);
+				Thread::Sleep(gEnv->xorShift.rand() % 5);
 				g_protectedInt = local;
 			}
 		}
@@ -174,7 +174,7 @@ namespace
 				// the critical section is now owned by us
 				int local = g_protectedInt;
 				++local;
-				Thread::Sleep(random::XorShift() % 5);
+				Thread::Sleep(gEnv->xorShift.rand() % 5);
 				g_protectedInt = local;
 
 				g_entryCondition = 0;
