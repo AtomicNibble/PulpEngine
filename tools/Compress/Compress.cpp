@@ -352,7 +352,7 @@ namespace
 			path.ensureSlash();
 			path.append("*");
 
-			X_LOG0("Train", "Gathering files for training dict");
+			X_LOG0("Train", "Gathering files for training");
 
 			core::FindFirstScoped find;
 			if (find.findfirst(path.c_str()))
@@ -389,7 +389,7 @@ namespace
 
 			size_t currentOffset = 0;
 
-			X_LOG0("Train", "Loading ^6%" PRIuS "^7 file(s) data for training dict", fileNames.size());
+			X_LOG0("Train", "Loading ^6%" PRIuS "^7 file(s) data for training", fileNames.size());
 
 			// load all the files.
 			for(size_t i=0; i<fileNames.size(); i++)
@@ -412,7 +412,7 @@ namespace
 
 		// train.
 		core::HumanSize::Str sizeStr, sizeStr1;
-		X_LOG0("Train", "Training dict with ^6%s^7 sample data from ^6%" PRIuS "^7 files. avg size: ^6%s", 
+		X_LOG0("Train", "Training with ^6%s^7 sample data, ^6%" PRIuS "^7 files, avg size: ^6%s", 
 			core::HumanSize::toString(sizeStr, sampleData.size()),
 			sampleSizes.size(),
 			core::HumanSize::toString(sizeStr1, sampleData.size() / sampleSizes.size()));
@@ -427,7 +427,7 @@ namespace
 
 		const float trainTime = timer.GetMilliSeconds();	
 		core::HumanDuration::Str timeStr;
-		X_LOG0("Train", "Train dict took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
+		X_LOG0("Train", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 
 		if (!WriteFileFromBuf(outFile.c_str(), dictData)) {
 			X_ERROR("Train", "Failed to write output file");
