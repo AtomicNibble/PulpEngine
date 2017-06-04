@@ -45,7 +45,6 @@ public:
 	bool asyncInitFinalize(void);
 
 	// IMaterialManager
-	virtual Material* createMaterial(const char* pMtlName) X_FINAL;
 	virtual Material* findMaterial(const char* pMtlName) const X_FINAL;
 	virtual Material* loadMaterial(const char* pMtlName) X_FINAL;
 
@@ -59,29 +58,28 @@ public:
 
 	// ~IMaterialManager
 
-	// ICoreEventListener
-	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
-	// ~ICoreEventListener
-
-	// IXHotReload
-	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
-	// ~IXHotReload
-
-	void ListMaterials(const char* pSearchPatten = nullptr) const;
+	void listMaterials(const char* pSearchPatten = nullptr) const;
 
 private:
 	Material::Tech* getTechForMaterial_int(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
 		PermatationFlags permFlags);
 
-	void releaseMaterial_internal(Material* pMat);
-
 	MaterialResource* loadMaterialCompiled(const core::string& name);
-
 	MaterialResource* createMaterial_Internal(const core::string& name);
 	MaterialResource* findMaterial_Internal(const core::string& name) const;
+	void releaseMaterialResources(Material* pMat);
+
 
 	bool InitDefaults(void);
 	void freeDanglingMaterials(void);
+
+	// ICoreEventListener
+	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
+	// ~ICoreEventListener
+
+	// IXHotReload
+	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+	// ~IXHotReload
 
 private:
 	void Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd);

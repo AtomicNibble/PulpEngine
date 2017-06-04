@@ -281,9 +281,6 @@ struct IMaterialManager
 {
 	virtual ~IMaterialManager(){}
 
-	// if mat of this name exsists returns and adds refrence
-	// dose not load anything.
-	virtual Material* createMaterial(const char* MtlName) X_ABSTRACT;
 	// returns null if not found, ref count unaffected
 	virtual Material* findMaterial(const char* MtlName) const X_ABSTRACT;
 	// if material is found adds ref and returns, if not try's to load the material file.

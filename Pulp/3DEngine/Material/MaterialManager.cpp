@@ -101,58 +101,7 @@ bool XMaterialManager::asyncInitFinalize(void)
 }
 
 
-void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
-{
-	X_UNUSED(jobSys);
-#if 0
-	const char* fileExt;		
-
-	fileExt = core::strUtil::FileExtension(name);
-	if (fileExt)
-	{
-		if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
-		{
-			X_LOG0("Material", "reload material: \"%s\"", name);
-
-
-		}
-		else if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
-		{
-			//	X_LOG0("Material", "reload material: \"%s\"", name);
-
-
-		}
-	}
-	return true;
-#else
-	X_UNUSED(name);
-#endif
-}
-
-
 // IMaterialManager
-Material* XMaterialManager::createMaterial(const char* pMtlName)
-{
-	core::string name(pMtlName);
-
-	MaterialResource* pMtl = findMaterial_Internal(name);
-	if (pMtl) {
-		// add ref?
-		pMtl->addReference();
-		X_WARNING("MtlMan", "Create material called with name of exsisting material: \"%s\"", pMtlName);
-		return pMtl;
-	}
-
-	// now I kinda want the material manager to handle the creation of variable state.
-	// and the storing of all the cbuffers and permatation for the materials.
-	// basically the things we need to render something with the material.
-//	render::shader::IShader* pShader = nullptr;
-
-
-
-
-	return createMaterial_Internal(name);
-}
 
 Material* XMaterialManager::findMaterial(const char* pMtlName) const
 {
@@ -170,19 +119,9 @@ Material* XMaterialManager::findMaterial(const char* pMtlName) const
 Material* XMaterialManager::loadMaterial(const char* pMtlName)
 {
 	X_ASSERT_NOT_NULL(pMtlName);
-
-#if X_DEBUG
-	const char* pExt = core::strUtil::FileExtension(pMtlName);
-	if(pExt)
-	{
-		// engine should not make requests for materials with a extensiob
-		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s", pExt);
-		return getDefaultMaterial();
-	}
-#endif // !X_DEBUG
+	X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
 	core::string name(pMtlName);
-
 
 	// try find it.
 	MaterialResource* pMatRes = findMaterial_Internal(name);
@@ -216,7 +155,7 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
 	if (pMatRes->removeReference() == 0)
 	{
-		releaseMaterial_internal(pMatRes);
+		releaseMaterialResources(pMatRes);
 
 		materials_.releaseAsset(pMatRes);
 	}
@@ -411,7 +350,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 				}
 			}
 
-			// we did not find one, alias?
+			// do we want to lookup aliases even if we matched?
 			if (pTechDef->getNumAliases())
 			{
 				const auto& aliases = pTechDef->getAliases();
@@ -620,13 +559,6 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 	return false;
 }
 
-void XMaterialManager::releaseMaterial_internal(Material* pMat)
-{
-	// when we release the material we need to clean up somethings.
-	X_UNUSED(pMat);
-
-}
-
 XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const core::string& matName)
 {
 	core::Path<char> path;
@@ -739,7 +671,13 @@ XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(co
 	// internal create expects you to know no duplicates
 	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
 
-	auto pMatRes = materials_.createAsset(name, g_3dEngineArena);
+	MaterialResource* pMatRes;
+	{
+		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+		pMatRes = materials_.createAsset(name, g_3dEngineArena);
+	}
+
 	pMatRes->setName(name);
 
 	return pMatRes;
@@ -747,8 +685,20 @@ XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(co
 
 XMaterialManager::MaterialResource* XMaterialManager::findMaterial_Internal(const core::string& name) const
 {
+	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
 	return materials_.findAsset(name);
 }
+
+
+void XMaterialManager::releaseMaterialResources(Material* pMat)
+{
+	// when we release the material we need to clean up somethings.
+	X_UNUSED(pMat);
+
+}
+
+
 
 bool XMaterialManager::InitDefaults(void)
 {
@@ -771,32 +721,19 @@ bool XMaterialManager::InitDefaults(void)
 // ~IMaterialManager
 
 
-// ICoreEventListener
-void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
-{
-	X_UNUSED(event);
-	X_UNUSED(wparam);
-	X_UNUSED(lparam);
-
-
-
-}
-// ~ICoreEventListener
-
-
 void XMaterialManager::freeDanglingMaterials(void)
 {
 	auto it = materials_.begin();
 	for (; it != materials_.end(); ++it) {
 		auto* pMatRes = it->second;
-		releaseMaterial_internal(pMatRes);
+		releaseMaterialResources(pMatRes);
 		X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, pMatRes->getName(), pMatRes->getRefCount());
 	}
 
 	materials_.free();
 }
 
-void XMaterialManager::ListMaterials(const char* pSearchPatten) const
+void XMaterialManager::listMaterials(const char* pSearchPatten) const
 {
 	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
@@ -828,6 +765,52 @@ void XMaterialManager::ListMaterials(const char* pSearchPatten) const
 	X_LOG0("Material", "------------ ^8Materials End^7 -----------");
 }
 
+
+
+// ICoreEventListener
+void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+{
+	X_UNUSED(event);
+	X_UNUSED(wparam);
+	X_UNUSED(lparam);
+
+
+
+}
+// ~ICoreEventListener
+
+
+void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+{
+	X_UNUSED(jobSys);
+#if 0
+	const char* fileExt;
+
+	fileExt = core::strUtil::FileExtension(name);
+	if (fileExt)
+	{
+		if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
+		{
+			X_LOG0("Material", "reload material: \"%s\"", name);
+
+
+		}
+		else if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
+		{
+			//	X_LOG0("Material", "reload material: \"%s\"", name);
+
+
+		}
+	}
+	return true;
+#else
+	X_UNUSED(name);
+#endif
+}
+
+
+
+
 void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
 {
 	// optional search criteria
@@ -837,7 +820,7 @@ void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
 		pSearchPatten = Cmd->GetArg(1);
 	}
 
-	ListMaterials(pSearchPatten);
+	listMaterials(pSearchPatten);
 }
 
 
