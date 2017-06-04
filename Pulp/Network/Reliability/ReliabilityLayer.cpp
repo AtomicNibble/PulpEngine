@@ -1486,7 +1486,7 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
 	if (vars_.artificalNetworkEnabled())
 	{
 		float percent = vars_.artificalPacketLoss();
-		float randVal = core::random::MultiplyWithCarry(0.f, 100.f);
+		float randVal = gEnv->xorShift.randRange(0.f, 100.f);
 
 		if (randVal < percent) {
 			X_LOG0_IF(vars_.debugEnabled() > 2, "NetRel", "Dropping packet");
@@ -1500,7 +1500,7 @@ void ReliabilityLayer::sendBitStream(NetSocket& socket, core::FixedBitStreamBase
 
 			// dash of spice!
 			if (vars_.artificalPingVariance()) {
-				uint32_t randomVariance = core::random::MultiplyWithCarry(0u, vars_.artificalPingVariance());	
+				uint32_t randomVariance = gEnv->xorShift.randRange(0u, vars_.artificalPingVariance());
 				totalMsDelay += randomVariance;
 			}
 
