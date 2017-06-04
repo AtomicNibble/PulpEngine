@@ -117,10 +117,6 @@ XCore::XCore() :
 {
 	X_ASSERT_NOT_NULL(g_coreArena);
 
-	// make sure it's ok to null.
-	static_assert(std::is_trivially_constructible<SCoreGlobals>::value, "Global enviroment needs to be triv con");
-	core::zero_object(env_);
-
 	hotReloadExtMap_.reserve(32);
 
 	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);

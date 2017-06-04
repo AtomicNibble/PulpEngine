@@ -8,6 +8,9 @@
 
 #include <Math\XVector.h>
 
+
+#include <Random\XorShift.h>
+
 // defaults.
 // #include <Memory\MemoryArenaBase.h>
 
@@ -237,7 +240,16 @@ struct SCoreGlobals // obbject is zerod on start.
 	core::MemoryArenaBase*		pArena;
 	core::MemoryArenaBase*		pStrArena;
 
-	uint32_t					mainThreadId;		
+	uint32_t					mainThreadId;	
+
+	core::random::XorShift		xorShift;
+
+	X_INLINE SCoreGlobals() {
+		memset(this, 0, X_OFFSETOF(SCoreGlobals, xorShift));
+		client_ = false;
+		dedicated_ = false;
+		state_ = State::STARTING;;
+	}
 
 	X_INLINE const bool isStarting(void) const {
 		return state_ != State::STARTING;
