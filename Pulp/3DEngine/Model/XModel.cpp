@@ -80,30 +80,30 @@ bool XModel::canRenderLod(size_t idx) const
 
 void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const
 {
-	if (numBones() > 0)
+	const int32_t num = numBones();
+	if (!num) {
+		return;
+	}
+
+	for (int32_t i = 0; i < num; i++)
 	{
-		const int32_t num = numBones();
+		const Vec3f& pos = pBonePos_[i];
+		const XQuatCompressedf& angle = pBoneAngles_[i];
+		const uint8_t parIdx = pTagTree_[i];
 
-		for (int32_t i = 0; i < num; i++)
+		const Vec3f& parPos = pBonePos_[parIdx];
+		const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
+
 		{
-			const Vec3f& pos = pBonePos_[i];
-			const XQuatCompressedf& angle = pBoneAngles_[i];
-			const uint8_t parIdx = pTagTree_[i];
+			Transformf qTrans;
+			qTrans.quat = angle.asQuat();
+			qTrans.trans = modelMat * pos;
 
-			const Vec3f& parPos = pBonePos_[parIdx];
-			const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
+			Transformf qTransPar;
+			qTransPar.quat = parAngle.asQuat();
+			qTransPar.trans = modelMat * parPos;
 
-			{
-				Transformf qTrans;
-				qTrans.quat = angle.asQuat();
-				qTrans.trans = modelMat * pos;
-
-				Transformf qTransPar;
-				qTransPar.quat = parAngle.asQuat();
-				qTransPar.trans = modelMat * parPos;
-
-				pPrimContex->drawBone(qTransPar, qTrans, col);
-			}
+			pPrimContex->drawBone(qTransPar, qTrans, col);
 		}
 	}
 }
