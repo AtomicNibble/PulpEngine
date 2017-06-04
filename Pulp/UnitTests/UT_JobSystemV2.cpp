@@ -27,6 +27,16 @@ namespace
 		++numJobsRan;
 	}
 
+	struct Goat
+	{
+		int32_t goat;
+		int32_t boat;
+	};
+
+	void UpdateGoat(Goat*, size_t count)
+	{
+
+	}
 
 } // namespace
 
@@ -46,7 +56,8 @@ TEST(Threading, JobSystem2Empty)
 
 	for(size_t n=0; n<numRuns; n++)
 	{
-		core::TimeVal MultiElapsed;
+		core::TimeVal addTime;
+		core::TimeVal runTime;
 		{
 			timer.Start();
 
@@ -59,15 +70,17 @@ TEST(Threading, JobSystem2Empty)
 				jobSys.Run(job);
 			}
 
+			addTime = timer.GetTimeVal();
+
 			jobSys.Run(root);
 			jobSys.Wait(root);
 
-			MultiElapsed = timer.GetTimeVal();
+			runTime = timer.GetTimeVal();
 		}
 
-		times[n] = MultiElapsed.GetMilliSeconds();
+		times[n] = runTime.GetMilliSeconds();
 
-		X_LOG0("JobSystem", "%" PRIuS " empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
+		X_LOG0("JobSystem", "%" PRIuS " empty jobs: %gms addTime: %gms", numJobs, runTime.GetMilliSeconds(), addTime.GetMilliSeconds());
 	}
 
 	float total = core::accumulate(times.begin(), times.end(), 0.f);
@@ -79,84 +92,55 @@ TEST(Threading, JobSystem2Empty)
 }
 
 
-namespace Data
-{
-	struct Goat
-	{
-		int32_t goat;
-		int32_t boat;
-	};
-
-	struct parallel_for_job_data
-	{
-		parallel_for_job_data(Goat* data,
-			unsigned int count,
-			void(*function)(Goat*, unsigned int)) :
-			data(data), count(count), function(function)
-		{
-
-		}
-
-		Goat* data;
-		unsigned int count;
-		void(*function)(Goat*, unsigned int);
-	};
-
-	void UpdateGoat(Goat*, unsigned int count)
-	{
-
-	}
-
-	static void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* pJob, void* pArg)
-	{
-		const parallel_for_job_data* data = static_cast<const parallel_for_job_data*>(pArg);
-
-		if (data->count > 2)
-		{
-			// split in two
-			const unsigned int leftCount = data->count / 2u;
-			const unsigned int rightCount = data->count - leftCount;
-
-			const parallel_for_job_data leftData(data->data, leftCount, data->function);
-			Job* left = jobSys.CreateJobAsChild(pJob, parallel_for_job, leftData JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
-			jobSys.Run(left);
-
-			const parallel_for_job_data rightData(data->data, leftCount, data->function);
-			Job* right = jobSys.CreateJobAsChild(pJob, parallel_for_job, rightData JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
-			jobSys.Run(right);
-		}
-		else
-		{
-			// execute the function on the range of data
-			(data->function)(data->data, data->count);
-		}
-	}
-
-} // namespace Data
-
 TEST(Threading, JobSystem2Empty_parallel_data)
 {
-	unsigned int count = 4000;
+	size_t count = 4000;
 
 	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
-	core::TimeVal MultiElapsed;
 	core::StopWatch timer;
+
+	const size_t numJobs = 4000;
+	const size_t numRuns = 10;
+
+	std::array<float, numRuns> times;
+
+	for (size_t n = 0; n < numRuns; n++)
 	{
-		timer.Start();
-		
-		Data::Goat* data = nullptr;
+		core::TimeVal addTime;
+		core::TimeVal runTime;
+		{
+			timer.Start();
 
-		const Data::parallel_for_job_data jobData = { data, count, Data::UpdateGoat };
-		Job* root = jobSys.CreateJob(&Data::parallel_for_job, jobData JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
-		jobSys.Run(root);
-		jobSys.Wait(root);
+			Goat* pData = nullptr;
 
-		MultiElapsed = timer.GetTimeVal();
+			Job* root = jobSys.parallel_for(
+				pData,
+				count,
+				&UpdateGoat,
+				core::V2::CountSplitter(1)
+				JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST)
+			);
+
+			addTime = timer.GetTimeVal();
+
+			jobSys.Run(root);
+			jobSys.Wait(root);
+
+			runTime = timer.GetTimeVal();
+		}
+		times[n] = runTime.GetMilliSeconds();
+
+		X_LOG0("JobSystem", "%" PRIuS " empty jobs: %gms addTime: %gms", numJobs, runTime.GetMilliSeconds(), addTime.GetMilliSeconds());
 	}
 
-	X_LOG0("JobSystem", "count: %i elapsed: %gms", count, MultiElapsed.GetMilliSeconds());
+
+	float total = core::accumulate(times.begin(), times.end(), 0.f);
+	float avg = total / times.size();
+
+	X_LOG0("JobSystem", "Avg time: %gms", avg);
+
 	jobSys.ShutDown();
 }
 
