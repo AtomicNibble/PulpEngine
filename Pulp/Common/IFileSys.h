@@ -569,7 +569,9 @@ struct IFileSys
 	virtual size_t getMinimumSectorSize(void) const X_ABSTRACT;
 
 
+	virtual RequestHandle AddCloseRequestToQue(core::XFileAsync* pFile) X_ABSTRACT;
 	virtual RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_ABSTRACT;
+	
 };
 
 class XFileMemScoped

@@ -227,6 +227,7 @@ public:
 
 
 	// IoRequest que.
+	RequestHandle AddCloseRequestToQue(core::XFileAsync* pFile) X_FINAL;
 	RequestHandle AddIoRequestToQue(const IoRequestBase& request) X_FINAL;
 	void CancelRequest(RequestHandle handle);
 	bool StartRequestWorker(void);

@@ -1277,6 +1277,14 @@ RequestHandle xFileSys::getNextRequestHandle(void)
 	return handle;
 }
 
+RequestHandle xFileSys::AddCloseRequestToQue(core::XFileAsync* pFile)
+{
+	IoRequestClose closeReq;
+	closeReq.pFile = pFile;
+
+	return AddIoRequestToQue(closeReq);
+}
+
 RequestHandle xFileSys::AddIoRequestToQue(const IoRequestBase& request)
 {
 	static_assert(std::is_unsigned<RequestHandle>::value, "Logic makes use of wrap around, so must be unsigned");
