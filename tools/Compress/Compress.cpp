@@ -322,15 +322,15 @@ namespace
 		}
 
 		if (srcDir.isEmpty()) {
-			X_ERROR("Compress", "Source dir is empty");
+			X_ERROR("Train", "Source dir is empty");
 			return -1;
 		}
 		if (outFile.isEmpty()) {
-			X_ERROR("Compress", "Output file name missing.");
+			X_ERROR("Train", "Output file name missing.");
 			return -1;
 		}
 		if (maxDictSize < 256) {
-			X_ERROR("Compress", "Invalid maxDictSize must be atleast 256");
+			X_ERROR("Train", "Invalid maxDictSize must be atleast 256");
 			return -1;
 		}
 
@@ -352,7 +352,7 @@ namespace
 			path.ensureSlash();
 			path.append("*");
 
-			X_LOG0("Compress", "Gathering files for training dict");
+			X_LOG0("Train", "Gathering files for training dict");
 
 			core::FindFirstScoped find;
 			if (find.findfirst(path.c_str()))
@@ -379,7 +379,7 @@ namespace
 
 			if (fileNames.size() < core::Compression::DICT_SAMPLER_MIN_SAMPLES)
 			{
-				X_ERROR("Compress", "Only %" PRIuS " samples provided, atleast %" PRIuS " required",
+				X_ERROR("Train", "Only %" PRIuS " samples provided, atleast %" PRIuS " required",
 					fileNames.size(), core::Compression::DICT_SAMPLER_MIN_SAMPLES);
 				return -1;
 			}
@@ -389,7 +389,7 @@ namespace
 
 			size_t currentOffset = 0;
 
-			X_LOG0("Compress", "Loading ^6%" PRIuS "^7 file(s) data for training dict", fileNames.size());
+			X_LOG0("Train", "Loading ^6%" PRIuS "^7 file(s) data for training dict", fileNames.size());
 
 			// load all the files.
 			for(size_t i=0; i<fileNames.size(); i++)
@@ -399,7 +399,7 @@ namespace
 
 				std::ifstream file(filePath.c_str(), std::ios::binary);
 				if (!file.is_open()) {
-					X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
+					X_ERROR("Train", "Failed to open input file: \"%ls\"", filePath.c_str());
 					continue;
 				}
 
@@ -412,7 +412,7 @@ namespace
 
 		// train.
 		core::HumanSize::Str sizeStr, sizeStr1;
-		X_LOG0("Compress", "Training dict with ^6%s^7 sample data from ^6%" PRIuS "^7 files. avg size: ^6%s", 
+		X_LOG0("Train", "Training dict with ^6%s^7 sample data from ^6%" PRIuS "^7 files. avg size: ^6%s", 
 			core::HumanSize::toString(sizeStr, sampleData.size()),
 			sampleSizes.size(),
 			core::HumanSize::toString(sizeStr1, sampleData.size() / sampleSizes.size()));
@@ -421,16 +421,16 @@ namespace
 
 		if (!core::Compression::trainDictionary(sampleData, sampleSizes, dictData, maxDictSize))
 		{
-			X_ERROR("Compress", "Fail to train dictionary");
+			X_ERROR("Train", "Fail to train dictionary");
 			return -1;
 		}
 
 		const float trainTime = timer.GetMilliSeconds();	
 		core::HumanDuration::Str timeStr;
-		X_LOG0("Compress", "Train dict took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
+		X_LOG0("Train", "Train dict took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 
 		if (!WriteFileFromBuf(outFile.c_str(), dictData)) {
-			X_ERROR("Compress", "Failed to write output file");
+			X_ERROR("Train", "Failed to write output file");
 			return -1;
 		}
 
