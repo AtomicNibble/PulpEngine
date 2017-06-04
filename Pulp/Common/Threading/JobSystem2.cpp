@@ -767,15 +767,8 @@ namespace V2
 		else if (backoff < 28) {
 			Thread::Yield();
 		}
-		else if (backoff < 64) {
-			Thread::Sleep(0);
-		}
-		else if (backoff < 80) {
-			Thread::Sleep(1);
-		}
-		else {
-			Thread::Sleep(1);
-		}
+		
+		Thread::Sleep(0);	
 	}
 
 	Thread::ReturnValue JobSystem::ThreadRun(const Thread& thread)
