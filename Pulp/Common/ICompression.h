@@ -192,6 +192,8 @@ namespace Compression
 				pHdr->magic[0] = ((BufferHdr::MAGIC & 0xff0000) >> 16) & 0xff;
 				pHdr->magic[1] = ((BufferHdr::MAGIC & 0xff00) >> 8) & 0xff;
 				pHdr->magic[2] = (BufferHdr::MAGIC & 0xff) & 0xff;
+				pHdr->flags.Clear();
+				pHdr->sharedDictId = 0;
 
 				// inc hdr in dest len
 				destLenOut += sizeof(BufferHdr);
