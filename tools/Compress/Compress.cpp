@@ -107,7 +107,6 @@ namespace
 		X_LOG0("Compressor", "^6-train-src^7	source dir for samples ^1required");
 		X_LOG0("Compressor", "^6-train-of^7		output file for dict ^1required");
 		X_LOG0("Compressor", "^6-train-md^7		max size of output dict(default: 64k) ^9not-required");
-
 	}
 
 	int DoCompression(CompressorArena& arena)
@@ -305,8 +304,6 @@ namespace
 
 	int DoTrain(CompressorArena& arena)
 	{
-		X_UNUSED(arena);
-
 		core::Path<wchar_t> srcDir, outFile;
 		size_t maxDictSize = std::numeric_limits<uint16_t>::max();
 
@@ -322,6 +319,19 @@ namespace
 		const wchar_t* pMaxDictSize = gEnv->pCore->GetCommandLineArgForVarW(L"train-md");
 		if (pMaxDictSize) {
 			maxDictSize = core::strUtil::StringToInt<size_t>(pMaxDictSize);
+		}
+
+		if (srcDir.isEmpty()) {
+			X_ERROR("Compress", "Source dir is empty");
+			return -1;
+		}
+		if (outFile.isEmpty()) {
+			X_ERROR("Compress", "Output file name missing.");
+			return -1;
+		}
+		if (maxDictSize < 256) {
+			X_ERROR("Compress", "Invalid maxDictSize must be atleast 256");
+			return -1;
 		}
 
 		// we need to load all the files in the src directory and merge them into a single buffer.
