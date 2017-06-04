@@ -8,6 +8,7 @@
 #include <Platform\Console.h>
 
 #include <Compression\LZ4.h>
+#include <Compression\LZ5.h>
 #include <Compression\Lzma2.h>
 #include <Compression\Zlib.h>
 #include <Compression\Store.h>
