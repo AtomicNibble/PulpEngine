@@ -447,7 +447,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	// #------------------------- CPU Info ----------------------
 	pCpuInfo_ = X_NEW(core::CpuInfo, g_coreArena, "CpuInfo");
 	// #------------------------- Crc32 ----------------------
-	pCrc32_ = X_NEW( core::Crc32, g_coreArena, "Crc32");
+	pCrc32_ = X_NEW(core::Crc32, g_coreArena, "Crc32");
 
 	// Call init on objects from before so they can register vars.
 	env_.pLog->Init();
