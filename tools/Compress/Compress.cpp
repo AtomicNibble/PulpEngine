@@ -380,7 +380,7 @@ namespace
 						continue;
 					}
 
-					const size_t sampleSize = core::Min<size_t>(fd.size, core::Compression::DICT_SAMPLER_SIZE_MAX);
+					const size_t sampleSize = core::Min<size_t>(safe_static_cast<size_t>(fd.size), core::Compression::DICT_SAMPLER_SIZE_MAX);
 					if (sampleSize == 0) {
 						continue;
 					}
