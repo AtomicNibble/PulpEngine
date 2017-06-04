@@ -18,6 +18,8 @@
 
 #include <Time\StopWatch.h>
 
+#include <Util\UniquePointer.h>
+
 #include <istream>
 #include <iostream>
 #include <fstream>
@@ -56,7 +58,42 @@ namespace
 	using core::Compression::ICompressor;
 	using core::Compression::Compressor;
 
+	core::UniquePointer<ICompressor> getCompressor(core::MemoryArenaBase* arena, core::Compression::Algo::Enum algo)
+	{
+		core::UniquePointer<ICompressor> comp(arena);
 
+		static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
+
+		switch (algo)
+		{
+			case Algo::LZ4:
+				comp = core::makeUnique<Compressor<core::Compression::LZ4>>(arena, "LZ4");
+				break;
+			case Algo::LZ4HC:
+				comp = core::makeUnique<Compressor<core::Compression::LZ4HC>>(arena, "LZ4HC");
+				break;
+			case Algo::LZ5:
+				comp = core::makeUnique<Compressor<core::Compression::LZ4>>(arena, "LZ4");
+				break;
+			case Algo::LZ5HC:
+				comp = core::makeUnique<Compressor<core::Compression::LZ4HC>>(arena, "LZ4HC");
+				break;
+			case Algo::LZMA:
+				comp = core::makeUnique<Compressor<core::Compression::LZMA>>(arena, "LZMA");
+				break;
+			case Algo::ZLIB:
+				comp = core::makeUnique<Compressor<core::Compression::Zlib>>(arena, "ZLIB");
+				break;
+			case Algo::STORE:
+				comp = core::makeUnique<Compressor<core::Compression::Store>>(arena, "Store");
+				break;
+			default:
+				X_ASSERT_UNREACHABLE();
+				break;
+		}
+
+		return comp;
+	}
 
 	bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut)
 	{
@@ -215,57 +252,38 @@ namespace
 			algo = ICompressor::getAlgo(inFileData);
 		}
 
-		ICompressor* pCompressor = nullptr;
+		auto compressor = getCompressor(&arena, algo);
 
-		static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
-
-		switch (algo)
+		// auto out file name.
+		if (defalte && outFile.empty())
 		{
-			case Algo::LZ4:
-				pCompressor = X_NEW(Compressor<core::Compression::LZ4>, &arena, "LZ4");
-				if (defalte && outFile.empty()) {
+			switch (algo)
+			{
+				case Algo::LZ4:
 					outFile = inFile + L".lz4";
-				}
-				break;
-			case Algo::LZ4HC:
-				pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, &arena, "LZ4HC");
-				if (defalte && outFile.empty()) {
+					break;
+				case Algo::LZ4HC:
 					outFile = inFile + L".lz4";
-				}
-				break;
-			case Algo::LZ5:
-				pCompressor = X_NEW(Compressor<core::Compression::LZ4>, &arena, "LZ4");
-				if (defalte && outFile.empty()) {
+					break;
+				case Algo::LZ5:
 					outFile = inFile + L".lz4";
-				}
-				break;
-			case Algo::LZ5HC:
-				pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, &arena, "LZ4HC");
-				if (defalte && outFile.empty()) {
+					break;
+				case Algo::LZ5HC:
 					outFile = inFile + L".lz4";
-				}
-				break;
-			case Algo::LZMA:
-				pCompressor = X_NEW(Compressor<core::Compression::LZMA>, &arena, "LZMA");
-				if (defalte && outFile.empty()) {
+					break;
+				case Algo::LZMA:
 					outFile = inFile + L".lzma";
-				}
-				break;
-			case Algo::ZLIB:
-				pCompressor = X_NEW(Compressor<core::Compression::Zlib>, &arena, "ZLIB");
-				if (defalte && outFile.empty()) {
+					break;
+				case Algo::ZLIB:
 					outFile = inFile + L".zlib";
-				}
-				break;
-			case Algo::STORE:
-				pCompressor = X_NEW(Compressor<core::Compression::Store>, &arena, "Store");
-				if (defalte && outFile.empty()) {
+					break;
+				case Algo::STORE:
 					outFile = inFile + L".store";
-				}
-				break;
-			default:
-				X_ERROR("Compress", "unknown compression algo: %i", algo);
-				return -1;
+					break;
+				default:
+					X_ERROR("Compress", "unknown compression algo: %i", algo);
+					return -1;
+			}
 		}
 
 		bool res = false;
@@ -273,10 +291,10 @@ namespace
 		timer.Start();
 
 		if (defalte) {
-			res = pCompressor->deflate(&arena, inFileData, outfileData, lvl);
+			res = compressor->deflate(&arena, inFileData, outfileData, lvl);
 		}
 		else {
-			res = pCompressor->inflate(&arena, inFileData, outfileData);
+			res = compressor->inflate(&arena, inFileData, outfileData);
 		}
 
 		const float compressTime = timer.GetMilliSeconds();
@@ -297,8 +315,6 @@ namespace
 		const float writeTime = timer.GetMilliSeconds();
 		X_LOG0("Compress", "writeTime: ^2%fms", writeTime);
 
-
-		X_DELETE(pCompressor, &arena);
 		return 0;
 	}
 
