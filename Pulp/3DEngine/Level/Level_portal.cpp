@@ -689,7 +689,7 @@ void Level::DrawStaticModels(const uint32_t* pEntIds, uint32_t num)
 		// upload if needed.
 		if (!pModel->canRenderLod(lodIdx))
 		{
-			pModel->createRenderBuffersForLod(lodIdx);
+			pModel->createRenderBuffersForLod(lodIdx, gEnv->pRender);
 		}
 
 		const model::MeshHeader& mesh = pModel->getLodMeshHdr(lodIdx);

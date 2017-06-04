@@ -59,8 +59,8 @@ public:
 
 
 	// can upload each lod individually.
-	bool createRenderBuffersForLod(size_t idx);
-	void releaseLodRenderBuffers(size_t idx);
+	bool createRenderBuffersForLod(size_t idx, render::IRender* pRender);
+	void releaseLodRenderBuffers(size_t idx, render::IRender* pRender);
 	bool canRenderLod(size_t idx) const;
 
 	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const;

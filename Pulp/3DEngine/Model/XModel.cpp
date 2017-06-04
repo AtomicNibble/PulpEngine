@@ -57,18 +57,18 @@ XModel::~XModel()
 }
 
 
-bool XModel::createRenderBuffersForLod(size_t idx)
+bool XModel::createRenderBuffersForLod(size_t idx, render::IRender* pRender)
 {
 	const auto& raw = hdr_.lodInfo[idx];
 
-	return renderMeshes_[idx].createRenderBuffers(gEnv->pRender, raw, hdr_.vertexFmt);
+	return renderMeshes_[idx].createRenderBuffers(pRender, raw, hdr_.vertexFmt);
 }
 
-void XModel::releaseLodRenderBuffers(size_t idx)
+void XModel::releaseLodRenderBuffers(size_t idx, render::IRender* pRender)
 {
 	auto& renderInfo = renderMeshes_[idx];
 
-	renderInfo.releaseRenderBuffers(gEnv->pRender);
+	renderInfo.releaseRenderBuffers(pRender);
 }
 
 bool XModel::canRenderLod(size_t idx) const
