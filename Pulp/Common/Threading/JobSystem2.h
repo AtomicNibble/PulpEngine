@@ -230,7 +230,9 @@ private:
 
 	// each queue has it's own rand gen, to prevent thread sharing
 	// plus they are not thread safe, so won't behave normally when called with multiple threads.
+	// i've tried padding around this and it makes it worse, so leave it in same cache lane as bottom & top.
 	core::random::XorShift rand_;
+
 	Job* jobs_[MAX_NUMBER_OF_JOBS];
 };
 
