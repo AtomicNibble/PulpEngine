@@ -76,6 +76,14 @@ X_INLINE UniquePointer<T>::UniquePointer(UniquePointer&& oth) :
 }
 
 template<typename T>
+template<class T2, class>
+X_INLINE UniquePointer<T>::UniquePointer(UniquePointer<T2>&& oth) :
+	Mybase(oth.getArena(), oth.release())
+{
+}
+
+
+template<typename T>
 X_INLINE UniquePointer<T>::~UniquePointer()
 {
 	if (get() != pointer()) {
@@ -105,6 +113,14 @@ X_INLINE UniquePointer<T>& UniquePointer<T>::operator=(UniquePointer&& rhs)
 	return *this;
 }
 
+template<typename T>
+template<class T2>
+X_INLINE typename UniquePointer<T>::can_assign<T2>::type UniquePointer<T>::operator=(UniquePointer<T2>&& rhs)
+{
+	reset(rhs.release());
+	Mybase::arena_ = rhs.getArena();
+	return *this;
+}
 
 template<typename T>
 X_INLINE T& UniquePointer<T>::operator* () const
@@ -213,6 +229,7 @@ X_INLINE UniquePointer<T[]>& UniquePointer<T[]>::operator=(UniquePointer&& rhs)
 	}
 	return *this;
 }
+
 
 
 template<typename T>

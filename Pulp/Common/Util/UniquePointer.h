@@ -37,19 +37,33 @@ class UniquePointer : public UniquePointerBase<T>
 {
 	UniquePointer();
 public:
+	typedef UniquePointer<T> MyT;
 	typedef UniquePointerBase<T> Mybase;
 	typedef typename Mybase::pointer pointer;
+
+	template<typename T2>
+	using is_convertible = std::is_convertible<typename UniquePointer<T2>::pointer, pointer>;
+	template<typename T2>
+	using can_assign = std::enable_if<!std::is_array<T2>::value && is_convertible<T2>::value, MyT&>;
+
 
 	X_INLINE explicit UniquePointer(core::MemoryArenaBase* arena);
 	X_INLINE explicit UniquePointer(core::MemoryArenaBase* arena, nullptr_t);
 
 	X_INLINE UniquePointer(core::MemoryArenaBase* arena, pointer pInstance);
-
 	X_INLINE UniquePointer(UniquePointer&& oth);
+
+	template<class T2, class = typename can_assign<T2>::type>
+	X_INLINE explicit UniquePointer(UniquePointer<T2>&& oth);
+
 	X_INLINE ~UniquePointer();
 
 	X_INLINE UniquePointer& operator=(nullptr_t);
 	X_INLINE UniquePointer& operator=(UniquePointer&& rhs);
+
+	template<class T2>
+	X_INLINE typename can_assign<T2>::type
+	operator=(UniquePointer<T2>&& rhs);
 
 	X_INLINE T& operator* () const;
 	X_INLINE pointer operator-> () const;
@@ -73,6 +87,7 @@ class UniquePointer<T[]> : public UniquePointerBase<T>
 {
 	UniquePointer();
 public:
+	typedef UniquePointer<T[]> MyT;
 	typedef UniquePointerBase<T> Mybase;
 	typedef typename Mybase::pointer pointer;
 
