@@ -57,19 +57,14 @@ bool XModelManager::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
+
+	if (!initDefaults()) {
+		return false;
+	}
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);
-
-	// should load the default model.
-
-	pDefaultModel_ = loadModelSync(MODEL_DEFAULT_NAME);
-	if (!pDefaultModel_) {
-		X_ERROR("ModelManager", "Failed to load default model");
-		return false;
-	}
 
 	return true;
 }
@@ -81,25 +76,12 @@ void XModelManager::shutDown(void)
 
 	gEnv->pHotReload->unregisterListener(this);
 
-
 	// default model
 	if (pDefaultModel_) {
 		releaseModel(pDefaultModel_);
 	}
 
-	{
-		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
-
-		// any left?
-		for (const auto& m : models_)
-		{
-			ModelResource* pModelRes = m.second;
-			const auto& name = pModelRes->getName();
-			X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
-		}
-	}
-
-	models_.free();
+	freeDanglingMaterials();
 }
 
 bool XModelManager::asyncInitFinalize(void)
@@ -114,14 +96,11 @@ bool XModelManager::asyncInitFinalize(void)
 XModel* XModelManager::findModel(const char* pModelName) const
 {
 	core::string name(pModelName);
+	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-	{
-		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
-
-		ModelResource* pModel = models_.findAsset(name);
-		if (pModel) {
-			return pModel;
-		}
+	ModelResource* pModel = models_.findAsset(name);
+	if (pModel) {
+		return pModel;
 	}
 
 	X_WARNING("ModelManager", "Failed to find model: \"%s\"", pModelName);
@@ -131,19 +110,12 @@ XModel* XModelManager::findModel(const char* pModelName) const
 
 XModel* XModelManager::loadModel(const char* pModelName)
 {
-	const char* pExt = core::strUtil::FileExtension(X_ASSERT_NOT_NULL(pModelName));
-	if (pExt)
-	{
-		// engine should not make requests for models with a extension
-		X_ERROR("ModelManager", "Invalid model name extension was included: %s", pExt);
-		return getDefaultModel();
-	}
+	X_ASSERT_NOT_NULL(pModelName);
+	X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
 
 	core::string name(pModelName);
-
 	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-	// try find it.
 	ModelResource* pModelRes = models_.findAsset(name);
 	if (pModelRes)
 	{
@@ -162,13 +134,8 @@ XModel* XModelManager::loadModel(const char* pModelName)
 
 XModel* XModelManager::loadModelSync(const char* pModelName)
 {
-	const char* pExt = core::strUtil::FileExtension(X_ASSERT_NOT_NULL(pModelName));
-	if (pExt)
-	{
-		// engine should not make requests for models with a extension
-		X_ERROR("ModelManager", "Invalid model name extension was included: %s", pExt);
-		return getDefaultModel();
-	}
+	X_ASSERT_NOT_NULL(pModelName);
+	X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
 
 	core::string name(pModelName);
 
@@ -207,6 +174,12 @@ XModel* XModelManager::loadModelSync(const char* pModelName)
 	return pModelRes;
 }
 
+
+XModel* XModelManager::getDefaultModel(void)
+{
+	return pDefaultModel_;
+}
+
 void XModelManager::releaseModel(XModel* pModel)
 {
 	ModelResource* pModelRes = static_cast<ModelResource*>(pModel);
@@ -216,39 +189,56 @@ void XModelManager::releaseModel(XModel* pModel)
 	}
 }
 
-
-XModel* XModelManager::getDefaultModel(void)
+bool XModelManager::initDefaults(void)
 {
-	return pDefaultModel_;
+	pDefaultModel_ = loadModelSync(MODEL_DEFAULT_NAME);
+	if (!pDefaultModel_) {
+		X_ERROR("ModelManager", "Failed to load default model");
+		return false;
+	}
+
+	return true;
 }
 
-void XModelManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+void XModelManager::freeDanglingMaterials(void)
 {
-	X_UNUSED(jobSys);
-#if 0
-	const char* fileExt;
-
-	fileExt = core::strUtil::FileExtension(name);
-	if (fileExt)
 	{
-		if (core::strUtil::IsEqual(MODEL_FILE_EXTENSION, fileExt))
-		{
-			// all asset names need forward slashes, for the hash.
-			core::Path<char> path(name);
-			path.replaceAll('\\', '/');
-			path.removeExtension();
+		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-			ReloadModel(path.fileName());
-			return true;
+		// any left?
+		for (const auto& m : models_)
+		{
+			auto* pModelRes = m.second;
+			const auto& name = pModelRes->getName();
+			X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
 		}
 	}
-	return false;
-#else
-	X_UNUSED(name);
-#endif
+
+	models_.free();
 }
 
-void XModelManager::ListModels(const char* pSearchPatten) const
+void XModelManager::reloadModel(const char* pModelName)
+{
+	core::string name(pModelName);
+
+	ModelResource* pModelRes = nullptr;
+	{
+		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+		pModelRes = models_.findAsset(name);
+	}
+
+	if (pModelRes)
+	{
+		X_LOG0("Model", "Reload model: \"%s\"", name.c_str());
+		pModelRes->ReloadAsync();
+	}
+	else
+	{
+		X_WARNING("Model", "\"%s\" is not loaded skipping reload", name.c_str());
+	}
+}
+
+void XModelManager::listModels(const char* pSearchPatten) const
 {
 	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
@@ -285,25 +275,30 @@ void XModelManager::ListModels(const char* pSearchPatten) const
 
 }
 
-void XModelManager::ReloadModel(const char* pModelName)
+void XModelManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
-	core::string name(pModelName);
+	X_UNUSED(jobSys);
+#if 0
+	const char* fileExt;
 
-	ModelResource* pModelRes = nullptr;
+	fileExt = core::strUtil::FileExtension(name);
+	if (fileExt)
 	{
-		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
-		pModelRes = models_.findAsset(name);
-	}
+		if (core::strUtil::IsEqual(MODEL_FILE_EXTENSION, fileExt))
+		{
+			// all asset names need forward slashes, for the hash.
+			core::Path<char> path(name);
+			path.replaceAll('\\', '/');
+			path.removeExtension();
 
-	if (pModelRes)
-	{
-		X_LOG0("Model", "Reload model: \"%s\"", name.c_str());
-		pModelRes->ReloadAsync();
+			ReloadModel(path.fileName());
+			return true;
+		}
 	}
-	else
-	{
-		X_WARNING("Model", "\"%s\" is not loaded skipping reload", name.c_str());
-	}
+	return false;
+#else
+	X_UNUSED(name);
+#endif
 }
 
 void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* pCmd)
@@ -315,7 +310,7 @@ void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* pCmd)
 		pSearchPatten = pCmd->GetArg(1);
 	}
 
-	ListModels(pSearchPatten);
+	listModels(pSearchPatten);
 }
 
 void XModelManager::Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd)
@@ -327,7 +322,7 @@ void XModelManager::Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd)
 
 	const char* pName = pCmd->GetArg(1);
 
-	ReloadModel(pName);
+	reloadModel(pName);
 }
 
 X_NAMESPACE_END

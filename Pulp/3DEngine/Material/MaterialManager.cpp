@@ -62,12 +62,9 @@ bool XMaterialManager::init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
-	
-
-	if (!InitDefaults()) {
+	if (!initDefaults()) {
 		return false;
 	}
-
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
@@ -122,10 +119,9 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 	X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
 	core::string name(pMtlName);
+	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-	// try find it.
-	MaterialResource* pMatRes = findMaterial_Internal(name);
-
+	MaterialResource* pMatRes = materials_.findAsset(name);
 	if (pMatRes)
 	{
 		// inc ref count.
@@ -133,19 +129,11 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 		return pMatRes;
 	}
 
-	// only support loading compile materials now bitch!
-	pMatRes = loadMaterialCompiled(name);
-	if (pMatRes) {
-		return pMatRes;
-	}
+	pMatRes = materials_.createAsset(name, g_3dEngineArena);
+	pMatRes->setName(name);
 
-	// we want to create real instance but assign default props to it,
-	X_ERROR("MatMan", "Failed to find material: %s", pMtlName);
-
-	const auto* pDefault = getDefaultMaterial();
-
-	pMatRes = createMaterial_Internal(name);
-	pMatRes->assignProps(*pDefault);
+	// now we want to dispatch a load!
+	// do we want to have the loading login in the manager or 
 
 	return pMatRes;
 }
@@ -670,14 +658,10 @@ XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(co
 {
 	// internal create expects you to know no duplicates
 	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
+	
+	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-	MaterialResource* pMatRes;
-	{
-		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
-
-		pMatRes = materials_.createAsset(name, g_3dEngineArena);
-	}
-
+	auto* pMatRes = materials_.createAsset(name, g_3dEngineArena);
 	pMatRes->setName(name);
 
 	return pMatRes;
@@ -700,7 +684,7 @@ void XMaterialManager::releaseMaterialResources(Material* pMat)
 
 
 
-bool XMaterialManager::InitDefaults(void)
+bool XMaterialManager::initDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
@@ -723,11 +707,17 @@ bool XMaterialManager::InitDefaults(void)
 
 void XMaterialManager::freeDanglingMaterials(void)
 {
-	auto it = materials_.begin();
-	for (; it != materials_.end(); ++it) {
-		auto* pMatRes = it->second;
-		releaseMaterialResources(pMatRes);
-		X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, pMatRes->getName(), pMatRes->getRefCount());
+	{
+		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+		for (const auto& m : materials_)
+		{
+			auto* pMatRes = m.second;
+			const auto& name = pMatRes->getName();
+
+			releaseMaterialResources(pMatRes);
+			X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pMatRes->getRefCount());
+		}
 	}
 
 	materials_.free();

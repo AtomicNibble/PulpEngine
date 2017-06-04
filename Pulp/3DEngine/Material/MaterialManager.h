@@ -70,7 +70,7 @@ private:
 	void releaseMaterialResources(Material* pMat);
 
 
-	bool InitDefaults(void);
+	bool initDefaults(void);
 	void freeDanglingMaterials(void);
 
 	// ICoreEventListener
