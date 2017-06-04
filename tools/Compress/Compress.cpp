@@ -451,15 +451,15 @@ namespace
 			return -1;
 		}
 
-
-		core::Compression::SharedDictHdr hdr;
-		hdr.magic = core::Compression::SharedDictHdr::MAGIC;
-		hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
-		hdr.size = safe_static_cast<uint32_t>(dictData.size());
-
 		// make the file be the size of the requested dict.
+		core::Compression::SharedDictHdr hdr;
+
 		const auto pStart = &dictData[sizeof(hdr)];
 		const auto size = dictData.size() - sizeof(hdr);
+
+		hdr.magic = core::Compression::SharedDictHdr::MAGIC;
+		hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
+		hdr.size = safe_static_cast<uint32_t>(size);
 
 		file.write(reinterpret_cast<const char*>(&hdr), sizeof(hdr));
 		file.write(reinterpret_cast<const char*>(pStart), size);
