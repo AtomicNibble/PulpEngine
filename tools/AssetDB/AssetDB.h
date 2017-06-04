@@ -22,7 +22,8 @@ class DLL_EXPORT AssetDB
 	//				In order to migrate must rename all rawfiles on disk.
 	// Version 2: correct compression algo enum, as the order changed
 	//				In order to migrate must modify all raw asset compression headers to map to new algo enum.
-	static const int32_t DB_VERSION = 2;
+	// Version 3: compressed buffer header changed
+	static const int32_t DB_VERSION = 3;
 
 	static const char* ASSET_DB_FOLDER;
 	static const char* DB_NAME;

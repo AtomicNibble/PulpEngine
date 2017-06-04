@@ -77,7 +77,7 @@ namespace
 	static_assert(core::Compression::Algo::LZ5HC == 6, "Compression algo index changed");
 
 	// make sure not changed either.
-	X_ENSURE_SIZE(core::Compression::BufferHdr, 12);
+	X_ENSURE_SIZE(core::Compression::BufferHdr, 16);
 
 
 } // namespace
@@ -527,6 +527,106 @@ bool AssetDB::PerformMigrations(void)
 				return false;
 			}
 		}
+	}
+
+	if (dbVersion_ < 3)
+	{
+		X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 3", dbVersion_);
+
+		sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
+
+		DataArr data(g_AssetDBArena);
+
+		auto it = qry.begin();
+		for (; it != qry.end(); ++it)
+		{
+			auto row = *it;
+
+			int32_t rawFileId = row.get<int32_t>(0);
+			RawFile rawfileInfo;
+
+			if (!GetRawfileForRawId(rawFileId, rawfileInfo))
+			{
+				X_ERROR("AssetDB", "Failed to get rawfile path");
+				return false;
+			}
+
+			core::Path<char> filePath;
+			AssetPathForRawFile(rawfileInfo, filePath);
+
+			X_LOG1("AssetDB", "Updating compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
+
+			core::XFileScoped file;
+			if (!file.openFile(filePath.c_str(),
+				core::fileMode::READ |
+				core::fileMode::WRITE |
+				core::fileMode::RANDOM_ACCESS |
+				core::fileMode::SHARE))
+			{
+				X_ERROR("AssetDB", "Failed to open rawfile");
+				return false;
+			}
+
+			struct BufferHdrOld
+			{
+				X_INLINE bool IsMagicValid(void) const {
+					uint32_t val = (magic[0] << 16 | magic[1] << 8 | magic[2]);
+					return val == core::Compression::BufferHdr::MAGIC;
+				}
+
+				core::Compression::Algo::Enum algo;
+				uint8_t magic[3];
+
+				uint32_t deflatedSize;
+				uint32_t inflatedSize;
+			};
+
+			BufferHdrOld oldHdr;
+			if (file.readObj(oldHdr) != sizeof(oldHdr))
+			{
+				X_ERROR("AssetDB", "Failed to rawfile read header");
+				return false;
+			}
+
+			if (!oldHdr.IsMagicValid())
+			{
+				X_ERROR("AssetDB", "Rawfile has a invalid header");
+				return false;
+			}
+
+			data.resize(oldHdr.deflatedSize);
+
+			if (file.read(data.data(), data.size()) != data.size())
+			{
+				X_ERROR("AssetDB", "Failed to read RawFile Data");
+				return false;
+			}
+
+
+			// need to map old header to new.
+			core::Compression::BufferHdr hdr;
+			hdr.algo = oldHdr.algo;
+			std::memcpy(&hdr.magic, &oldHdr.magic, sizeof(oldHdr.magic));
+			hdr.flags.Clear();
+			hdr.sharedDictId = 0;
+			hdr.deflatedSize = oldHdr.deflatedSize;
+			hdr.inflatedSize = oldHdr.inflatedSize;
+			
+
+			file.seek(0, core::SeekMode::SET);
+			if (file.writeObj(hdr) != sizeof(hdr))
+			{
+				X_ERROR("AssetDB", "Failed to write updated rawFile header");
+				return false;
+			}
+
+			if (file.write(data.data(), data.size()) != data.size())
+			{
+				X_ERROR("AssetDB", "Failed to write RawFile data");
+				return false;
+			}
+		}
+
 	}
 
 	return true;
