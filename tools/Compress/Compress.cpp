@@ -445,10 +445,24 @@ namespace
 		core::HumanDuration::Str timeStr;
 		X_LOG0("Train", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 
-		if (!WriteFileFromBuf(outFile.c_str(), dictData)) {
-			X_ERROR("Train", "Failed to write output file");
+		std::ofstream file(outFile.c_str(), std::ios::binary | std::ios::out);
+		if (!file.is_open()) {
+			X_ERROR("Train", "Failed to open output file: \"%ls\"", outFile.c_str());
 			return -1;
 		}
+
+
+		core::Compression::SharedDictHdr hdr;
+		hdr.magic = core::Compression::SharedDictHdr::MAGIC;
+		hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
+		hdr.size = safe_static_cast<uint32_t>(dictData.size());
+
+		// make the file be the size of the requested dict.
+		const auto pStart = &dictData[sizeof(hdr)];
+		const auto size = dictData.size() - sizeof(hdr);
+
+		file.write(reinterpret_cast<const char*>(&hdr), sizeof(hdr));
+		file.write(reinterpret_cast<const char*>(pStart), size);
 
 		return 0;
 	}
