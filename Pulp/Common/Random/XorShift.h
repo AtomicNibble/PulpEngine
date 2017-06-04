@@ -8,15 +8,26 @@ X_NAMESPACE_BEGIN(core)
 
 namespace random
 {
-	void XorShiftSeed(const Vec4i& seed);
-	inline uint32_t XorShift(void);
-	inline uint32_t XorShift(uint32_t minValue, uint32_t maxValue);
-	inline float XorShift(float minValue, float maxValue);
+	class XorShift
+	{
+	public:
+		XorShift();
+		explicit XorShift(const Vec4i& seed);
+
+		void setSeed(const Vec4i& seed);
+
+		X_INLINE uint32_t rand(void);
+		X_INLINE uint32_t randRange(uint32_t minValue, uint32_t maxValue);
+		X_INLINE float randRange(float minValue, float maxValue);
+
+	private:
+		Vec4i state_;
+	};
 }
 
-#include "XorShift.inl"
-
 X_NAMESPACE_END
+
+#include "XorShift.inl"
 
 
 #endif
