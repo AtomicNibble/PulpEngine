@@ -158,7 +158,7 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBas
 	if (requestType == core::IoRequest::OPEN)
 	{
 		if (!pFile) {
-			X_ERROR("Model", "Failed to load: %s", name_.c_str());
+			X_ERROR("Model", "Failed to load: \"%s\"", name_.c_str());
 			return;
 		}
 
@@ -170,22 +170,18 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBas
 		read.pBuf = &hdr_;
 
 		fileSys.AddIoRequestToQue(read);
-
 	}
 	else if (requestType == core::IoRequest::READ)
 	{
-		if (!bytesTransferred) {
-			X_ERROR("Model", "Failed to read model data for: %s", name_.c_str());
+		if (!bytesTransferred) 
+		{
+			X_ERROR("Model", "Failed to read model data for: \"%s\"", name_.c_str());
 
-			core::IoRequestClose close;
-			close.pFile = pFile;
-			fileSys.AddIoRequestToQue(close);
+			fileSys.AddCloseRequestToQue(pFile);
 			return;
 		}
 
 		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
-		core::V2::Job* pJob = nullptr;
-
 		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
 
 		if (pReadReq->pBuf == &hdr_)
@@ -196,17 +192,15 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBas
 				return;
 			}
 
-			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
+			pJobSys->CreateMemberJobAndRun<XModel>(this, &XModel::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		}
-		else {
-			
+		else 
+		{
 			// pData_ should not be null as we are reading into it.
 			X_ASSERT_NOT_NULL(pData_);
 
-			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
+			pJobSys->CreateMemberJobAndRun<XModel>(this, &XModel::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		}
-
-		pJobSys->Run(pJob);
 	}
 }
 
@@ -242,9 +236,7 @@ void XModel::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, co
 	{
 		X_ERROR("Model", "\"%s\" model header is invalid", name_.c_str());
 
-		core::IoRequestClose close;
-		close.pFile = pFile;
-		gEnv->pFileSys->AddIoRequestToQue(close);
+		gEnv->pFileSys->AddCloseRequestToQue(pFile);
 	}
 }
 
@@ -261,36 +253,27 @@ void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core
 
 	ProcessData(const_cast<char*>(pData_));
 
-	core::IoRequestClose close;
-	close.pFile = pFile;
-	gEnv->pFileSys->AddIoRequestToQue(close);
-
-	// temp, unassign the render meshes so new ones get made.
-	X_ASSERT_NOT_IMPLEMENTED();
+	gEnv->pFileSys->AddCloseRequestToQue(pFile);
 }
 
 
-bool XModel::LoadModelAsync(const char* name)
+bool XModel::LoadModelAsync(const char* pName)
 {
-	// AssignDefault();
-
 	core::Path<char> path;
 	path /= "models";
-	path /= name;
+	path /= pName;
 	path.setExtension(".model");
 
 	// save the name
 	name_ = path.fileName();
 
 	// dispatch a read request baby!
-
 	core::IoRequestOpen open;
 	open.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
 	open.mode = core::fileMode::READ;
 	open.path = path;
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
-
 	return true;
 }
 

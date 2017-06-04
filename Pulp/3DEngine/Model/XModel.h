@@ -29,6 +29,9 @@ class XModel
 {
 	typedef core::string ModelName;
 
+	X_NO_COPY(XModel);
+	X_NO_ASSIGN(XModel);
+
 public:
 	XModel();
 	~XModel();
