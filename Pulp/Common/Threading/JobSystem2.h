@@ -222,10 +222,15 @@ public:
 	X_INLINE Job* Pop(void);
 	X_INLINE Job* Steal(void);
 
+	X_INLINE uint32_t randRange(uint32_t min, uint32_t max);
+
 private:
 	long bottom_;
 	long top_;
 
+	// each queue has it's own rand gen, to prevent thread sharing
+	// plus they are not thread safe, so won't behave normally when called with multiple threads.
+	core::random::XorShift rand_;
 	Job* jobs_[MAX_NUMBER_OF_JOBS];
 };
 

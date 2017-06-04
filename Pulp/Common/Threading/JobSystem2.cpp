@@ -160,6 +160,10 @@ namespace V2
 		}
 	}
 
+	X_INLINE uint32_t ThreadQue::randRange(uint32_t min, uint32_t max)
+	{
+		return rand_.randRange(min, max);
+	}
 
 	// ===================================
 
@@ -579,7 +583,7 @@ namespace V2
 		if (IsEmptyJob(pJob))
 		{
 			// this is not a valid job because our own queue is empty, so try stealing from some other queue
-			uint32_t randomIndex = random::MultiplyWithCarry(0u, numQueue_);
+			uint32_t randomIndex = queue.randRange(0u, numQueue_);
 
 			ThreadQue* stealQueue = pThreadQues_[randomIndex];
 			if (stealQueue == &queue)
