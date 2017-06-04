@@ -4,6 +4,7 @@
 #define ZDICT_STATIC_LINKING_ONLY
 #include <../../3rdparty/source/zstd-1.2.0/lib/dictBuilder/zdict.h>
 
+#include <Util\Cpu.h>
 
 X_LINK_LIB("libzstd" X_PP_IF(X_DEBUG, "d", ""));
 
@@ -16,11 +17,14 @@ namespace Compression
 	bool trainDictionary(const core::Array<uint8_t>& sampleData, const core::Array<size_t>& sampleSizes,
 		core::Array<uint8_t>& dictOut, size_t maxDictSize)
 	{
+		core::CpuInfo cpu;
+
 		COVER_params_t params;
 		core::zero_object(params);
-		params.k = 1024;
-		params.d = 8;
-		params.steps = 4;
+		params.k = 0;
+		params.d = 12;
+		params.steps = 128;
+		params.nbThreads = cpu.GetCoreCount();
 
 		if (sampleSizes.size() < DICT_SAMPLER_MIN_SAMPLES) {
 			X_ERROR("Dict", "Atleast %" PRIuS " samples required. %" PRIuS " provided", DICT_SAMPLER_MIN_SAMPLES, sampleSizes.size());
@@ -38,13 +42,13 @@ namespace Compression
 
 		dictOut.resize(maxDictSize);
 
-		size_t res = COVER_trainFromBuffer(
+		size_t res = COVER_optimizeTrainFromBuffer(
 				dictOut.data(),
 				maxDictSize,
 				sampleData.data(),
 				sampleSizes.data(),
 				safe_static_cast<uint32_t>(sampleSizes.size()),
-				params
+				&params
 			);
 
 		if (ZDICT_isError(res)) {
