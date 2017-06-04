@@ -703,7 +703,7 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 	return true;
 }
 
-bool XCore::parseSeed(const Vec4i& seed)
+bool XCore::parseSeed(Vec4i seed)
 {
 	if (seed != Vec4i::zero()) {
 		core::random::MultiplyWithCarrySeed(seed);

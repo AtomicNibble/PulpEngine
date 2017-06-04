@@ -155,7 +155,7 @@ private:
 		const SCoreInitParams &initParams);
 	
 	bool ParseCmdArgs(const wchar_t* pArgs);
-	bool parseSeed(const Vec4i& seed);
+	bool parseSeed(Vec4i seed);
 
 	bool InitConsole(const SCoreInitParams &initParams);
 	bool InitFileSys(const SCoreInitParams &startupParams);
