@@ -37,29 +37,43 @@ TEST(Threading, JobSystem2Empty)
 	JobSystem jobSys(g_arena);
 	jobSys.StartUp();
 
-	const size_t numJobs = 4000;
-
-	core::TimeVal MultiElapsed;
 	core::StopWatch timer;
+
+	const size_t numJobs = 4000;
+	const size_t numRuns = 10;
+
+	std::array<float, numRuns> times;
+
+	for(size_t n=0; n<numRuns; n++)
 	{
-		timer.Start();
-
-		size_t i;
-
-		Job* root = jobSys.CreateJob(&EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
-		for (i = 0; i < numJobs; ++i)
+		core::TimeVal MultiElapsed;
 		{
-			Job* job = jobSys.CreateJobAsChild(root, &EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
-			jobSys.Run(job);
+			timer.Start();
+
+			size_t i;
+
+			Job* root = jobSys.CreateJob(&EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
+			for (i = 0; i < numJobs; ++i)
+			{
+				Job* job = jobSys.CreateJobAsChild(root, &EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::UNITTEST));
+				jobSys.Run(job);
+			}
+
+			jobSys.Run(root);
+			jobSys.Wait(root);
+
+			MultiElapsed = timer.GetTimeVal();
 		}
 
-		jobSys.Run(root);
-		jobSys.Wait(root);
+		times[n] = MultiElapsed.GetMilliSeconds();
 
-		MultiElapsed = timer.GetTimeVal();
+		X_LOG0("JobSystem", "%" PRIuS " empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
 	}
 
-	X_LOG0("JobSystem", "%" PRIuS " empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
+	float total = core::accumulate(times.begin(), times.end(), 0.f);
+	float avg = total / times.size();
+
+	X_LOG0("JobSystem", "Avg time: %gms", avg);
 
 	jobSys.ShutDown();
 }
