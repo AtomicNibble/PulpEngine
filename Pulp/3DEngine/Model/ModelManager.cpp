@@ -188,6 +188,7 @@ XModel* XModelManager::loadModelSync(const char* pModelName)
 		pModelRes = models_.createAsset(name);
 	}
 
+#if 0
 	if (!pModelRes->LoadModel(pModelName))
 	{
 		if (!pDefaultModel_) { // this could be the default not failed to load.
@@ -201,6 +202,7 @@ XModel* XModelManager::loadModelSync(const char* pModelName)
 	{
 		X_LOG1("ModelManager", "Loaded model: \"%s\"", pModelName);
 	}
+#endif
 
 	return pModelRes;
 }

@@ -66,8 +66,6 @@ public:
 
 	bool LoadModelAsync(const char* pName);
 	bool ReloadAsync(void);
-	bool LoadModel(const char* pName);
-	bool LoadModel(core::XFile* pFile);
 
 private:
 	void ProcessData(char* pData);
