@@ -3,6 +3,7 @@
 #ifndef ME_XORSHIFT_H
 #define ME_XORSHIFT_H
 
+#include <limits>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -22,6 +23,22 @@ namespace random
 
 	private:
 		Vec4i state_;
+	};
+
+	class XorShift128
+	{
+	public:
+		XorShift128();
+		explicit XorShift128(const Vec4i& seed);
+
+		void setSeed(const Vec4i& seed);
+
+		X_INLINE uint64_t rand(void);
+		X_INLINE uint64_t randRange(uint64_t minValue, uint64_t maxValue);
+		X_INLINE float randRange(float minValue, float maxValue);
+
+	private:
+		uint64_t state_[2];
 	};
 }
 

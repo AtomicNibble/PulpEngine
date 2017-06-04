@@ -17,20 +17,56 @@ namespace random
 	X_INLINE uint32_t XorShift::randRange(uint32_t minValue, uint32_t maxValue)
 	{
 		X_ASSERT(minValue < maxValue, "Minimum value must be smaller than the maximum value.")(minValue, maxValue);
-		const uint32_t range = maxValue - minValue;
+		const uint32_t range = (maxValue - minValue) + 1;
 		const uint32_t randomNumber = rand();
 		return ((randomNumber % range) + minValue);
 	}
 
 	X_INLINE float XorShift::randRange(float minValue, float maxValue)
 	{
-		const float XOR_SHIFT_ONE_BY_MAX_UINT32 = 1.0f / 0xffffffff;
+		const float XOR_SHIFT_ONE_BY_MAX_UINT32 = 1.0f / std::numeric_limits<uint32_t>::max();
 
 		X_ASSERT(minValue < maxValue, "Minimum value must be smaller than the maximum value.")(minValue, maxValue);
 		const float range = maxValue - minValue;
 		const uint32_t randomNumber = rand();
 		return (static_cast<float>(randomNumber) * range * XOR_SHIFT_ONE_BY_MAX_UINT32) + minValue;
 	}
+
+	// ----------------------------------------
+
+	X_INLINE uint64_t XorShift128::rand(void)
+	{
+		uint64_t a = state_[0];
+		uint64_t b = state_[1];
+
+		state_[0] = b;
+		a ^= a << 23;
+		a ^= a >> 18;
+		a ^= b;
+		a ^= b >> 5;
+		state_[1] = a;
+
+		return a + b;
+	}
+
+	X_INLINE uint64_t XorShift128::randRange(uint64_t minValue, uint64_t maxValue)
+	{
+		X_ASSERT(minValue < maxValue, "Minimum value must be smaller than the maximum value.")(minValue, maxValue);
+		const uint64_t range = (maxValue - minValue)  + 1;
+		const uint64_t randomNumber = rand();
+		return ((randomNumber % range) + minValue);
+	}
+
+	X_INLINE float XorShift128::randRange(float minValue, float maxValue)
+	{
+		const float XOR_SHIFT_ONE_BY_MAX = 1.0f / std::numeric_limits<uint64_t>::max();
+
+		X_ASSERT(minValue < maxValue, "Minimum value must be smaller than the maximum value.")(minValue, maxValue);
+		const float range = maxValue - minValue;
+		const uint64_t randomNumber = rand();
+		return (static_cast<float>(randomNumber) * range * XOR_SHIFT_ONE_BY_MAX) + minValue;
+	}
+
 }
 
 X_NAMESPACE_END
