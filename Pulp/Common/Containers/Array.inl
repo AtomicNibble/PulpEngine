@@ -644,7 +644,7 @@ bool Array<T, Allocator>::removeIndex(size_type idx)
 	if (itemsLeft && !isLast)
 	{
 		// move end to idx we removed.
-		Mem::Construct<T>(pItem, list_[num_]);
+		Mem::Construct<T>(pItem, std::move(list_[num_]));
 		Mem::Destruct(&list_[num_]);
 	}
 
