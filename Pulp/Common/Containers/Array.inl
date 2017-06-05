@@ -655,13 +655,9 @@ template<typename T, class Allocator>
 void Array<T, Allocator>::remove(const T& item)
 {
 	size_type idx = find(item);
+	X_ASSERT(idx != invalid_index, "Item to remove could not be found.")(item, idx);
 
-	if (idx != invalid_index) {
-		removeIndex(idx);
-		return;
-	}
-
-	X_ASSERT(false, "Item to remove could not be found.")(item);
+	removeIndex(idx);
 }
 
 template<typename T, class Allocator>
