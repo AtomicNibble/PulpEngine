@@ -15,31 +15,12 @@
 
 X_NAMESPACE_BEGIN(model)
 
-namespace
+
+
+XModel::XModel(core::string& name) :
+	name_(name)
 {
-	bool ReadHeader(ModelHeader& hdr, core::XFile* file)
-	{
-		X_ASSERT_NOT_NULL(file);
-
-		if (file->readObj(hdr) != sizeof(hdr)) {
-			return false;
-		}
-
-		// bit more info for material info.
-		// even tho it's handled in isValid()
-		if (hdr.materialNameDataSize == 0) {
-			X_ERROR("Model", "no material data included, require atleast one material");
-			return false;
-		}
-
-		return hdr.isValid();
-	}
-
-} // namespace
-
-
-XModel::XModel()
-{
+	id_ = 0;
 	status_ = core::LoadStatus::NotLoaded;
 	pTagNames_ = nullptr;
 	pTagTree_ = nullptr;
@@ -47,14 +28,11 @@ XModel::XModel()
 	pBonePos_ = nullptr;
 	pMeshHeads_ = nullptr;
 
-	pData_ = nullptr;
 }
 
 XModel::~XModel()
 {
-	if (pData_) {
-		X_DELETE_ARRAY(const_cast<char*>(pData_), g_3dEngineArena);
-	}
+
 }
 
 
@@ -110,7 +88,7 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 }
 
 
-void XModel::AssignDefault(XModel* pDefault)
+void XModel::assignDefault(XModel* pDefault)
 {
 	pTagNames_ = pDefault->pTagNames_;
 	pTagTree_ = pDefault->pTagTree_;
@@ -151,191 +129,37 @@ void XModel::AssignDefault(XModel* pDefault)
 // load it and set the data pointers.
 //
 
-void XModel::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-	core::XFileAsync* pFile, uint32_t bytesTransferred)
+
+void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 {
-	core::IoRequest::Enum requestType = pRequest->getType();
-
-	if (requestType == core::IoRequest::OPEN)
-	{
-		if (!pFile) {
-			X_ERROR("Model", "Failed to load: \"%s\"", name_.c_str());
-			return;
-		}
-
-		core::IoRequestRead read;
-		read.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-		read.pFile = pFile;
-		read.dataSize = sizeof(hdr_);
-		read.offset = 0;
-		read.pBuf = &hdr_;
-
-		fileSys.AddIoRequestToQue(read);
-	}
-	else if (requestType == core::IoRequest::READ)
-	{
-		if (!bytesTransferred) 
-		{
-			X_ERROR("Model", "Failed to read model data for: \"%s\"", name_.c_str());
-
-			fileSys.AddCloseRequestToQue(pFile);
-			return;
-		}
-
-		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
-		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
-
-		if (pReadReq->pBuf == &hdr_)
-		{
-			if (bytesTransferred != sizeof(hdr_)) {
-				X_ERROR("Model", "Failed to read model header. Got: 0x%x need: 0x%x",
-					bytesTransferred, static_cast<uint32_t>(sizeof(hdr_)));
-				return;
-			}
-
-			pJobSys->CreateMemberJobAndRun<XModel>(this, &XModel::ProcessHeader_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
-		}
-		else 
-		{
-			// pData_ should not be null as we are reading into it.
-			X_ASSERT_NOT_NULL(pData_);
-
-			pJobSys->CreateMemberJobAndRun<XModel>(this, &XModel::ProcessData_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
-		}
-	}
-}
-
-
-void XModel::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-	X_UNUSED(jobSys);
-	X_UNUSED(threadIdx);
-	X_UNUSED(pJob);
-
-	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
-
-	// check if the header is correct.
-	if (hdr_.isValid())
-	{
-		// allocate buffer for the file data.
-		uint32_t dataSize = hdr_.dataSize;
-
-		char* pModelData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, g_3dEngineArena, "ModelBuffer", 8);
-
-		pData_ = pModelData;
-
-		core::IoRequestRead read;
-		read.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-		read.dataSize = dataSize;
-		read.offset = sizeof(hdr_);
-		read.pBuf = pModelData;
-		read.pFile = pFile;
-
-		gEnv->pFileSys->AddIoRequestToQue(read);
-	}
-	else
-	{
-		X_ERROR("Model", "\"%s\" model header is invalid", name_.c_str());
-
-		gEnv->pFileSys->AddCloseRequestToQue(pFile);
-	}
-}
-
-
-void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-	X_UNUSED(jobSys);
-	X_UNUSED(threadIdx);
-	X_UNUSED(pJob);
-	X_UNUSED(pData);
-	X_ASSERT_NOT_NULL(pData);
-
-	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
-
-	ProcessData(const_cast<char*>(pData_));
-
-	gEnv->pFileSys->AddCloseRequestToQue(pFile);
-}
-
-
-bool XModel::LoadModelAsync(const char* pName)
-{
-	core::Path<char> path;
-	path /= "models";
-	path /= pName;
-	path.setExtension(".model");
-
-	// save the name
-	name_ = path.fileName();
-
-	// dispatch a read request baby!
-	core::IoRequestOpen open;
-	open.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-	open.mode = core::fileMode::READ;
-	open.path = path;
-
-	gEnv->pFileSys->AddIoRequestToQue(open);
-	return true;
-}
-
-bool XModel::ReloadAsync(void)
-{
-	core::Path<char> path;
-	path /= "models";
-	path /= name_.c_str();
-	path.setExtension(".model");
-
-	// dispatch a read request baby!
-	core::IoRequestOpen open;
-	open.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
-	open.mode = core::fileMode::READ;
-	open.path = path;
-
-	gEnv->pFileSys->AddIoRequestToQue(open);
-	return true;
-}
-
-
-
-void XModel::ProcessData(char* pData)
-{
-	X_ASSERT_NOT_NULL(pData);
-	X_ASSERT_ALIGNMENT(pData, 16, 0);
-
 	int32_t i, x;
 
-	if (!pData) {
-		X_ERROR("Model", "model data is null");
-		return;
-	}
+	core::MemCursor<char> mat_name_cursor(data.get(), hdr.materialNameDataSize);
+	core::MemCursor<char> tag_name_cursor(data.get() + hdr.materialNameDataSize, hdr.tagNameDataSize);
+	core::MemCursor<char> cursor(data.get() + (hdr.dataSize - hdr.subDataSize), hdr.subDataSize);
 
-	core::MemCursor<char> mat_name_cursor(pData, hdr_.materialNameDataSize);
-	core::MemCursor<char> tag_name_cursor(pData + hdr_.materialNameDataSize, hdr_.tagNameDataSize);
-	core::MemCursor<char> cursor(pData + (hdr_.dataSize - hdr_.subDataSize), hdr_.subDataSize);
-
-	const size_t numBone = hdr_.numBones;
-	const size_t numBoneTotal = hdr_.numBones + hdr_.numBlankBones;
+	const size_t numBone = hdr.numBones;
+	const size_t numBoneTotal = hdr.numBones + hdr.numBlankBones;
 
 	pTagNames_ = cursor.postSeekPtr<uint16_t>(numBoneTotal);
 	pTagTree_ = cursor.postSeekPtr<uint8_t>(numBone);
 	pBoneAngles_ = cursor.postSeekPtr<XQuatCompressedf>(numBone);
 	pBonePos_ = cursor.postSeekPtr<Vec3f>(numBone);
 	pMeshHeads_ = cursor.getPtr<SubMeshHeader>();
-	pData_ = pData;
 
 	// we now have the mesh headers.
-	for (i = 0; i < hdr_.numLod; i++)
+	for (i = 0; i < hdr.numLod; i++)
 	{
-		LODHeader& lod = hdr_.lodInfo[i];
+		LODHeader& lod = hdr.lodInfo[i];
 
 		lod.subMeshHeads = cursor.postSeekPtr<SubMeshHeader>(lod.numSubMeshes);
 	}
 
 	// ok we now need to set vert and face pointers.
 	// for each Lod
-	for (i = 0; i < hdr_.numLod; i++)
+	for (i = 0; i < hdr.numLod; i++)
 	{
-		LODHeader& lod = hdr_.lodInfo[i];
+		LODHeader& lod = hdr.lodInfo[i];
 		// we have 3 blocks of data.
 		// Verts, Faces, Binddata
 		SubMeshHeader* meshHeads = lod.subMeshHeads;
@@ -430,7 +254,7 @@ void XModel::ProcessData(char* pData)
 	// Material name list null-term
 	{
 		core::StackString<engine::MTL_MATERIAL_MAX_LEN> name;
-		for (i = 0; i < hdr_.numMesh; i++)
+		for (i = 0; i < hdr.numMesh; i++)
 		{
 			SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&pMeshHeads_[i]);
 			// set the pointer.
@@ -449,11 +273,11 @@ void XModel::ProcessData(char* pData)
 	}
 
 	// Tag name list null-term
-	if (hdr_.flags.IsSet(ModelFlags::LOOSE) && hdr_.tagNameDataSize > 0)
+	if (hdr.flags.IsSet(ModelFlags::LOOSE) && hdr.tagNameDataSize > 0)
 	{
 		core::StackString<MODEL_MAX_BONE_NAME_LENGTH> name;
 
-		for (i = 0; i < hdr_.numBones; i++)
+		for (i = 0; i < hdr.numBones; i++)
 		{
 			while (!tag_name_cursor.isEof() && tag_name_cursor.get<char>() != '\0') {
 				name.append(tag_name_cursor.getSeek<char>(), 1);
@@ -469,13 +293,16 @@ void XModel::ProcessData(char* pData)
 	}
 
 	// load the materials.
-	for (i = 0; i < hdr_.numMesh; i++)
+	for (i = 0; i < hdr.numMesh; i++)
 	{
 		SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&pMeshHeads_[i]);
 
 		pMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(pMesh->materialName);
 	}
 
+	data_ = std::move(data);
+	hdr_ = hdr;
+	status_ = core::LoadStatus::Complete;
 }
 
 

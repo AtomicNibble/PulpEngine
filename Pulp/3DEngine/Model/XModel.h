@@ -3,10 +3,12 @@
 #ifndef X_MODEL_H_
 #define X_MODEL_H_
 
+#include <Util\UniquePointer.h>
+
 #include <IModel.h>
+#include <IRender.h>
 
 #include "RenderMesh.h"
-#include <IRender.h>
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
@@ -27,19 +29,19 @@ X_NAMESPACE_BEGIN(model)
 
 class XModel
 {
-	typedef core::string ModelName;
-
 	X_NO_COPY(XModel);
 	X_NO_ASSIGN(XModel);
 
 public:
-	XModel();
+	XModel(core::string& name);
 	~XModel();
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
 
 	X_INLINE core::LoadStatus::Enum getStatus(void) const;
+	X_INLINE bool isLoaded(void) const;
+	X_INLINE bool loadFailed(void) const;
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
 
 	X_INLINE const core::string& getName(void) const;
@@ -68,14 +70,11 @@ public:
 
 	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const;
 
-	void AssignDefault(XModel* pDefault);
+	void assignDefault(XModel* pDefault);
 
-	bool LoadModelAsync(const char* pName);
-	bool ReloadAsync(void);
+	void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data);
 
 private:
-	void ProcessData(char* pData);
-
 	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
@@ -85,8 +84,7 @@ private:
 private:
 	int32_t id_;
 	core::LoadStatus::Enum status_;
-
-	ModelName name_;
+	core::string name_;
 	XRenderMesh renderMeshes_[MODEL_MAX_LODS];
 
 	// runtime pointers.
@@ -98,7 +96,7 @@ private:
 	// sotred in lod order.
 	const SubMeshHeader*	pMeshHeads_;
 
-	const char* pData_;
+	core::UniquePointer<uint8_t[]> data_;
 	ModelHeader hdr_;
 };
 

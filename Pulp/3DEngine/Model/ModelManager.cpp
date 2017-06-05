@@ -1,12 +1,12 @@
 #include <stdafx.h>
 #include <Model\ModelManager.h>
 
-#include <IConsole.h>
-
 #include "XModel.h"
 
-#include <algorithm>
-
+#include <IConsole.h>
+#include <IFileSys.h>
+#include <Threading\JobSystem2.h>
+#include <Time\StopWatch.h>
 
 X_NAMESPACE_BEGIN(model)
 
@@ -27,11 +27,16 @@ WE have special case for default model which we want to load / setup in a synchr
 
 */
 
-XModelManager::XModelManager() : 
+XModelManager::XModelManager(core::MemoryArenaBase* arena) :
+	arena_(arena),
+	blockArena_(arena),
 	pDefaultModel_(nullptr),
-	models_(g_3dEngineArena, sizeof(ModelResource), X_ALIGN_OF(ModelResource))
+	models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource)),
+	requestQueue_(arena),
+	pendingRequests_(arena)
 {
-
+	requestQueue_.reserve(64);
+	pendingRequests_.setGranularity(32);
 }
 
 XModelManager::~XModelManager()
@@ -86,8 +91,15 @@ void XModelManager::shutDown(void)
 
 bool XModelManager::asyncInitFinalize(void)
 {
+	if (!pDefaultModel_) {
+		X_ERROR("ModelManager", "Default model is not valid");
+		return false;
+	}
 
-
+	if (!waitForLoad(pDefaultModel_)) {
+		X_ERROR("ModelManager", "Failed to load default model");
+		return false;
+	}
 	
 	return true;
 }
@@ -125,55 +137,13 @@ XModel* XModelManager::loadModel(const char* pModelName)
 	}
 
 	// we create a model and give it back
-	pModelRes = models_.createAsset(name);
-	pModelRes->LoadModelAsync(pModelName);
+	pModelRes = models_.createAsset(name, name);
+	
+	// add to list of models that need loading.
+	queueLoadRequest(pModelRes);
 
 	return pModelRes;
 }
-
-
-XModel* XModelManager::loadModelSync(const char* pModelName)
-{
-	X_ASSERT_NOT_NULL(pModelName);
-	X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
-
-	core::string name(pModelName);
-
-	// try find it.
-	ModelResource* pModelRes = nullptr;
-	{
-		core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
-
-		pModelRes = models_.findAsset(name);
-		if (pModelRes)
-		{
-			// inc ref count.
-			pModelRes->addReference();
-			return pModelRes;
-		}
-
-		pModelRes = models_.createAsset(name);
-	}
-
-#if 0
-	if (!pModelRes->LoadModel(pModelName))
-	{
-		if (!pDefaultModel_) { // this could be the default not failed to load.
-			releaseModel(pModelRes);
-			return nullptr;
-		}
-		pModelRes->AssignDefault(getDefaultModel());
-		X_WARNING("ModelManager", "Failed to load model: \"%s\"", pModelName);
-	}
-	else
-	{
-		X_LOG1("ModelManager", "Loaded model: \"%s\"", pModelName);
-	}
-#endif
-
-	return pModelRes;
-}
-
 
 XModel* XModelManager::getDefaultModel(void)
 {
@@ -191,11 +161,13 @@ void XModelManager::releaseModel(XModel* pModel)
 
 bool XModelManager::initDefaults(void)
 {
-	pDefaultModel_ = loadModelSync(MODEL_DEFAULT_NAME);
+	pDefaultModel_ = loadModel(MODEL_DEFAULT_NAME);
 	if (!pDefaultModel_) {
-		X_ERROR("ModelManager", "Failed to load default model");
+		X_ERROR("ModelManager", "Failed to create default model");
 		return false;
 	}
+
+	dispatchPendingLoads();
 
 	return true;
 }
@@ -230,7 +202,7 @@ void XModelManager::reloadModel(const char* pModelName)
 	if (pModelRes)
 	{
 		X_LOG0("Model", "Reload model: \"%s\"", name.c_str());
-		pModelRes->ReloadAsync();
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 	else
 	{
@@ -262,7 +234,7 @@ void XModelManager::listModels(const char* pSearchPatten) const
 		}
 	);
 
-	X_LOG0("Console", "------------ ^8Models(%" PRIuS ")^7 ---------------", sorted_models.size());
+	X_LOG0("Model", "------------ ^8Models(%" PRIuS ")^7 ---------------", sorted_models.size());
 
 	for (const auto* pModel : sorted_models)
 	{
@@ -271,9 +243,229 @@ void XModelManager::listModels(const char* pSearchPatten) const
 			pModel->numMeshTotal(), pModel->getRefCount());
 	}
 
-	X_LOG0("Console", "------------ ^8Models End^7 --------------");
-
+	X_LOG0("Model", "------------ ^8Models End^7 --------------");
 }
+
+void XModelManager::queueLoadRequest(ModelResource* pModel)
+{
+	X_ASSERT(pModel->getName().isNotEmpty(), "Model has no name")();
+
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+	// can we know it's not in this queue just from status?
+	// like if it's complete it could be in this status
+	auto status = pModel->getStatus();
+	if (status == core::LoadStatus::Complete || status == core::LoadStatus::Loading)
+	{
+		X_WARNING("Model", "Redundant load request requested: \"%s\"", pModel->getName().c_str());
+		return;
+	}
+
+	X_ASSERT(!requestQueue_.contains(pModel), "Queue already contains asset")(pModel);
+
+	pModel->addReference(); // prevent instance sweep
+	pModel->setStatus(core::LoadStatus::Loading);
+	requestQueue_.push(pModel);
+}
+
+
+void XModelManager::dispatchPendingLoads(void)
+{
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+	while (requestQueue_.isNotEmpty())
+	{
+		auto* pModel = requestQueue_.peek();
+		X_ASSERT(pModel->getStatus() == core::LoadStatus::Loading, "Incorrect status")(pModel->getStatus());
+		auto loadReq = core::makeUnique<ModelLoadRequest>(arena_, pModel);
+
+		// dispatch IO 
+		dispatchLoadRequest(loadReq.get());
+
+		pendingRequests_.emplace_back(loadReq.release());
+
+		requestQueue_.pop();
+	}
+}
+
+bool XModelManager::waitForLoad(XModel* pModel)
+{
+	{
+		// we lock to see if loading as the setting of loading is performed inside this lock.
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		while (pModel->getStatus() == core::LoadStatus::Loading)
+		{
+			loadCond_.Wait(loadReqLock_);
+		}
+	}
+
+	// did we fail? or never sent a dispatch?
+	auto status = pModel->getStatus();
+	if (status == core::LoadStatus::Complete)
+	{
+		return true;
+	}
+	else if( status == core::LoadStatus::Error)
+	{
+		return false;
+	}
+	else if (status == core::LoadStatus::NotLoaded)
+	{
+		// request never sent?
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return false;
+}
+
+void XModelManager::dispatchLoadRequest(ModelLoadRequest* pLoadReq)
+{
+	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
+
+	core::Path<char> path;
+	path /= "models";
+	path /= pLoadReq->pModel->getName();
+	path.setExtension(".model");
+
+	// dispatch a read request baby!
+	core::IoRequestOpen open;
+	open.callback.Bind<XModelManager, &XModelManager::IoRequestCallback>(this);
+	open.pUserData = pLoadReq;
+	open.mode = core::fileMode::READ;
+	open.path = path;
+
+	gEnv->pFileSys->AddIoRequestToQue(open);
+}
+
+void XModelManager::onLoadRequestFail(ModelLoadRequest* pLoadReq)
+{
+	if (pDefaultModel_ != pLoadReq->pModel) {
+		pLoadReq->pModel->assignDefault(pDefaultModel_);
+	}
+
+	pLoadReq->pModel->setStatus(core::LoadStatus::Error);
+
+	loadRequestCleanup(pLoadReq);
+}
+
+void XModelManager::loadRequestCleanup(ModelLoadRequest* pLoadReq)
+{
+	pLoadReq->loadTime = core::StopWatch::GetTimeNow();
+
+	X_LOG0("Model", "Model loaded in: ^6%fms", (pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds());
+	{
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		pendingRequests_.remove(pLoadReq);
+	}
+
+	if (pLoadReq->pFile) {
+		gEnv->pFileSys->AddCloseRequestToQue(pLoadReq->pFile);
+	}
+
+	// release our ref.
+	releaseModel(pLoadReq->pModel);
+
+	X_DELETE(pLoadReq, arena_);
+
+	loadCond_.NotifyAll();
+}
+
+void XModelManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	core::IoRequest::Enum requestType = pRequest->getType();
+	ModelLoadRequest* pLoadReq = pRequest->getUserData<ModelLoadRequest>();
+	XModel* pModel = pLoadReq->pModel;
+
+	if (requestType == core::IoRequest::OPEN)
+	{
+		if (!pFile) 
+		{
+			X_ERROR("Model", "Failed to load: \"%s\"", pModel->getName().c_str());
+			onLoadRequestFail(pLoadReq);
+			return;
+		}
+
+		pLoadReq->pFile = pFile;
+
+		// read the header.
+		core::IoRequestRead read;
+		read.callback.Bind<XModelManager, &XModelManager::IoRequestCallback>(this);
+		read.pUserData = pLoadReq;
+		read.pFile = pFile;
+		read.dataSize = sizeof(pLoadReq->hdr);
+		read.offset = 0;
+		read.pBuf = &pLoadReq->hdr;
+		fileSys.AddIoRequestToQue(read);
+	}
+	else if (requestType == core::IoRequest::READ)
+	{
+		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
+
+		if (pReadReq->pBuf == &pLoadReq->hdr)
+		{
+			if (bytesTransferred != sizeof(pLoadReq->hdr))
+			{
+				X_ERROR("Model", "Failed to read model header. Got: 0x%" PRIx32 " need: 0x%" PRIxS, bytesTransferred, sizeof(pLoadReq->hdr));
+				onLoadRequestFail(pLoadReq);
+				return;
+			}
+
+			if (!pLoadReq->hdr.isValid())
+			{
+				X_ERROR("Model", "\"%s\" model header is invalid", pModel->getName().c_str());
+				onLoadRequestFail(pLoadReq);
+				return;
+			}
+
+			// we need to allocate memory and dispatch a read request for it.
+			uint32_t datasize = pLoadReq->hdr.dataSize;
+			X_ASSERT(datasize > 0, "Datasize must be positive")(datasize);
+			pLoadReq->data = core::makeUnique<uint8_t[]>(blockArena_, datasize, 16);
+			
+			core::IoRequestRead read;
+			read.callback.Bind<XModelManager, &XModelManager::IoRequestCallback>(this);
+			read.pUserData = pLoadReq;
+			read.pFile = pFile;
+			read.offset = sizeof(pLoadReq->hdr);
+			read.dataSize = datasize;
+			read.pBuf = pLoadReq->data.ptr();
+			gEnv->pFileSys->AddIoRequestToQue(read);		
+		}
+		else
+		{
+			if (bytesTransferred != pLoadReq->hdr.dataSize)
+			{
+				X_ERROR("Model", "Failed to read model data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pLoadReq->hdr.dataSize);
+				onLoadRequestFail(pLoadReq);
+				return;
+			}
+
+			gEnv->pJobSys->CreateMemberJobAndRun<XModelManager>(this, &XModelManager::ProcessData_job,
+				pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
+		}
+	}
+}
+
+void XModelManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+	X_UNUSED(pData);
+	X_ASSERT_NOT_NULL(pData);
+
+	ModelLoadRequest* pLoadReq = static_cast<ModelLoadRequest*>(pData);
+	XModel* pModel = pLoadReq->pModel;
+
+
+	pModel->processData(pLoadReq->hdr, std::move(pLoadReq->data));
+
+
+	loadRequestCleanup(pLoadReq);
+}
+
+
 
 void XModelManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
