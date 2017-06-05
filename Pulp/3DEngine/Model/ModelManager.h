@@ -48,10 +48,6 @@ class XModelManager :
 	typedef core::AssetContainer<XModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
 	typedef ModelContainer::Resource ModelResource;
 
-	// we want to be able to remove at random index, and grow without memory address changing.
-	// so linked list? or array of pointers?
-	// think a intrusive linked list work well here.
-
 	typedef core::Array<ModelLoadRequest*> ModelLoadRequestArr;
 	typedef core::Fifo<ModelResource*> ModelQueue;
 
@@ -66,6 +62,7 @@ public:
 	void shutDown(void);
 
 	bool asyncInitFinalize(void);
+	void dispatchPendingLoads(void);
 
 	XModel* findModel(const char* pModelName) const;
 	XModel* loadModel(const char* pModelName);
@@ -83,7 +80,6 @@ private:
 
 
 	void queueLoadRequest(ModelResource* pModel);
-	void dispatchPendingLoads(void);
 	bool waitForLoad(XModel* pModel); // returns true if load succeed.
 	void dispatchLoadRequest(ModelLoadRequest* pLoadReq);
 
@@ -113,9 +109,9 @@ private:
 	XModel*	pDefaultModel_;
 	ModelContainer	models_;
 
+	// loading
 	core::CriticalSection loadReqLock_;
 	core::ConditionVariable loadCond_;
-
 
 	ModelQueue requestQueue_;
 	ModelLoadRequestArr pendingRequests_;
