@@ -30,15 +30,6 @@ typedef core::StackString<128> SourceNameStr;
 typedef core::Array<FontEffect> EffetsArr;
 
 
-X_DECLARE_ENUM(LoadStatus) (
-	NotLoaded,
-	Loading,
-//	Processing, <- this just means we have more states to compare against, even tho it provides 'more' info on where we are in the load process.
-	Complete,
-	Error
-);
-
-
 X_DECLARE_ENUM(FontSmooth) (
 	NONE,
 	BLUR,			// Smooth by blurring it.

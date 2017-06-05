@@ -25,6 +25,7 @@
 
 #include <IConsole.h>
 #include <IFont.h>
+#include <IAsyncLoad.h>
 
 #include "Constants.h"
 #include "FontTypes.h"

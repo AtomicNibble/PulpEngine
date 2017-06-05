@@ -49,7 +49,7 @@ XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
 	fontTexDirty_(false),
 	pMaterial_(nullptr),
 	signal_(false),
-	loadStatus_(LoadStatus::NotLoaded)
+	loadStatus_(core::LoadStatus::NotLoaded)
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
 }
@@ -110,7 +110,7 @@ bool XFont::WaitTillReady(void)
 	// how do we wait!
 	if (!pFontTexture_) 
 	{
-		while (loadStatus_ == LoadStatus::Loading)
+		while (loadStatus_ == core::LoadStatus::Loading)
 		{
 			// if we have job system try help with work.
 			// if no work wait...
@@ -122,7 +122,7 @@ bool XFont::WaitTillReady(void)
 
 		signal_.clear();
 
-		if (loadStatus_ == LoadStatus::Error || loadStatus_ == LoadStatus::NotLoaded) {
+		if (loadStatus_ == core::LoadStatus::Error || loadStatus_ == core::LoadStatus::NotLoaded) {
 			return false;
 		}
 

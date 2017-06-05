@@ -188,7 +188,7 @@ private:
 	uint32_t cacheMisses_;
 
 	core::Signal signal_;
-	LoadStatus::Enum loadStatus_;
+	core::LoadStatus::Enum loadStatus_;
 };
 
 

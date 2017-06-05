@@ -47,7 +47,7 @@ XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core
 	slotTable_(arena, 8),
 
 	signal_(false),
-	loadStatus_(LoadStatus::NotLoaded)
+	loadStatus_(core::LoadStatus::NotLoaded)
 {
 
 }
@@ -125,7 +125,7 @@ bool XFontTexture::WaitTillReady(void)
 		return true;
 	}
 
-	while (loadStatus_ == LoadStatus::Loading)
+	while (loadStatus_ == core::LoadStatus::Loading)
 	{
 		// if we have job system try help with work.
 		// if no work wait...
@@ -137,7 +137,7 @@ bool XFontTexture::WaitTillReady(void)
 
 	signal_.clear();
 
-	if (loadStatus_ == LoadStatus::Error || loadStatus_ == LoadStatus::NotLoaded) {
+	if (loadStatus_ == core::LoadStatus::Error || loadStatus_ == core::LoadStatus::NotLoaded) {
 		return false;
 	}
 
@@ -151,7 +151,7 @@ bool XFontTexture::LoadGlyphSource(bool async)
 	}
 
 	// are we loading already?
-	if (loadStatus_ == LoadStatus::Loading) {
+	if (loadStatus_ == core::LoadStatus::Loading) {
 		return true;
 	}
 
@@ -166,7 +166,7 @@ bool XFontTexture::LoadGlyphSource(bool async)
 	if (async)
 	{
 		signal_.clear();
-		loadStatus_ = LoadStatus::Loading;
+		loadStatus_ = core::LoadStatus::Loading;
 
 		// load the file async
 		core::IoRequestOpenRead open;
@@ -206,7 +206,7 @@ bool XFontTexture::LoadGlyphSource(bool async)
 			PreWarmCache();
 		}
 
-		loadStatus_ = LoadStatus::Complete;
+		loadStatus_ = core::LoadStatus::Complete;
 	}
 
 	return true;
@@ -436,7 +436,7 @@ void XFontTexture::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequ
 	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
 
 	if (!pFile) {
-		loadStatus_ = LoadStatus::Error;
+		loadStatus_ = core::LoadStatus::Error;
 		X_ERROR("Font", "Error reading font data");
 		return;
 	}
@@ -466,7 +466,7 @@ void XFontTexture::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threa
 		pJobData->dataSize,
 		FontEncoding::Unicode))
 	{
-		loadStatus_ = LoadStatus::Error;
+		loadStatus_ = core::LoadStatus::Error;
 		signal_.raise();
 		X_ERROR("Font", "Error setting up font renderer");
 		return;
@@ -478,7 +478,7 @@ void XFontTexture::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threa
 	}
 
 	// now we are ready.
-	loadStatus_ = LoadStatus::Complete;
+	loadStatus_ = core::LoadStatus::Complete;
 	signal_.raise();
 }
 

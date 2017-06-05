@@ -144,6 +144,7 @@
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetDb.h" />
     <ClInclude Include="IAssetPak.h" />
+    <ClInclude Include="IAsyncLoad.h" />
     <ClInclude Include="ICi.h" />
     <ClInclude Include="IEngineSysBase.h" />
     <ClInclude Include="IFileSysStats.h" />

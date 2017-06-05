@@ -121,7 +121,7 @@ private:
 
 	// loading
 	core::Signal signal_;
-	LoadStatus::Enum loadStatus_;
+	core::LoadStatus::Enum loadStatus_;
 };
 
 X_INLINE const FontNameStr& XFont::getName(void) const

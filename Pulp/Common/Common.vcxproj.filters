@@ -1240,6 +1240,9 @@
     <ClInclude Include="Compression\DictBuilder.h">
       <Filter>Headers\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="IAsyncLoad.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
