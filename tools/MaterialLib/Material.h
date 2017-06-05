@@ -7,7 +7,7 @@
 #include <IRender.h>
 #include <IRenderCommands.h>
 #include <CBuffer.h>
-
+#include <IAsyncLoad.h>
 
 #include <String\StringHash.h>
 
@@ -123,7 +123,7 @@ public:
 	typedef core::Array<Sampler> SamplerArr;
 
 public:
-	X_INLINE Material(core::MemoryArenaBase* arena);
+	X_INLINE Material(core::string& name, core::MemoryArenaBase* arena);
 	~Material() = default;
 
 	X_INLINE Tech* getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags);
@@ -136,8 +136,11 @@ public:
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
 
-	X_INLINE void setName(const core::string& name);
-	X_INLINE void setName(const char* pName);
+	X_INLINE core::LoadStatus::Enum getStatus(void) const;
+	X_INLINE bool isLoaded(void) const;
+	X_INLINE bool loadFailed(void) const;
+	X_INLINE void setStatus(core::LoadStatus::Enum status);
+
 	X_INLINE void setFlags(MaterialFlags flags);
 	X_INLINE void setSurfaceType(MaterialSurType::Enum surfaceType);
 	X_INLINE void setCoverage(MaterialCoverage::Enum coverage);
@@ -153,7 +156,6 @@ public:
 
 	// flag helpers.
 	X_INLINE bool isDrawn(void) const;
-	X_INLINE bool isLoaded(void) const;
 	X_INLINE bool isDefault(void) const;
 
 	X_INLINE const core::string& getName(void) const;
@@ -176,7 +178,6 @@ protected:
 	int32_t id_;
 
 	core::Spinlock techLock_;
-
 	core::string name_;
 
 	// 4
@@ -189,7 +190,7 @@ protected:
 
 	MaterialUsage::Enum usage_;
 	MaterialCat::Enum cat_;
-	uint8_t _pad[1];
+	core::LoadStatus::Enum status_;
 
 	// used for custom texture repeat.
 	// if AUTO_TILING the textures dim's are used.

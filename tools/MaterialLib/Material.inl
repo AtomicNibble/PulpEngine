@@ -56,7 +56,8 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 
 // -------------------------------------------------------------------------------
 
-X_INLINE Material::Material(core::MemoryArenaBase* arena) :
+X_INLINE Material::Material(core::string& name, core::MemoryArenaBase* arena) :
+	name_(name),
 	pTechDefState_(nullptr),
 	techs_(arena),
 	params_(arena),
@@ -110,15 +111,26 @@ X_INLINE void Material::setID(int32_t id)
 }
 
 
-X_INLINE void Material::setName(const core::string& name)
+X_INLINE core::LoadStatus::Enum Material::getStatus(void) const
 {
-	name_ = name;
+	return status_;
 }
 
-X_INLINE void Material::setName(const char* pName)
+X_INLINE bool Material::isLoaded(void) const
 {
-	name_ = pName;
+	return status_ == core::LoadStatus::Complete;
 }
+
+X_INLINE bool Material::loadFailed(void) const
+{
+	return status_ == core::LoadStatus::Error;
+}
+
+X_INLINE void Material::setStatus(core::LoadStatus::Enum status)
+{
+	status_ = status;
+}
+
 
 X_INLINE void Material::setFlags(MaterialFlags flags)
 {
@@ -175,11 +187,6 @@ X_INLINE void Material::setSamplers(SamplerArr&& samplers)
 X_INLINE bool Material::isDrawn(void) const
 {
 	return flags_.IsSet(MaterialFlag::NODRAW) == false;
-}
-
-X_INLINE bool Material::isLoaded(void) const
-{
-	return flags_.IsSet(MaterialFlag::LOAD_FAILED) == false;
 }
 
 X_INLINE bool Material::isDefault(void) const
