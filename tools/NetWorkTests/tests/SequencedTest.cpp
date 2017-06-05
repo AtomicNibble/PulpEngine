@@ -120,7 +120,7 @@ TEST(net, SequencedPacketsTest)
 			uint32_t numStream = gEnv->xorShift.randRange(1u, 10u);
 			for (uint32_t x = 0; x < numStream; x++)
 			{
-				uint32_t stream = gEnv->xorShift.randIndex(MAX_ORDERED_STREAMS);
+				size_t stream = gEnv->xorShift.randIndex(MAX_ORDERED_STREAMS);
 				uint32_t num = gEnv->xorShift.randRange(2u, 10u);
 
 				for (uint32_t i = 0; i < num; i++)
@@ -143,7 +143,7 @@ TEST(net, SequencedPacketsTest)
 			uint32_t numPacket = gEnv->xorShift.randRange(1u, 10u);
 			for (uint32_t x = 0; x < numPacket; x++)
 			{
-				uint32_t stream = gEnv->xorShift.randIndex(MAX_ORDERED_STREAMS);
+				size_t stream = gEnv->xorShift.randIndex(MAX_ORDERED_STREAMS);
 
 				core::FixedBitStreamNoneOwning bs(data.begin(), data.end(), false);
 				bs.write(PACKET_ID);
