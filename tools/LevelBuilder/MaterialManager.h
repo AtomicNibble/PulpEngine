@@ -39,7 +39,7 @@ private:
 	bool loadMatFromFile(MaterialResource& mat, const core::string& name);
 
 	// only call if you know don't exsists in map.
-	MaterialResource* createMaterial_Internal(const core::string& name);
+	MaterialResource* createMaterial_Internal(core::string& name);
 	MaterialResource* findMaterial_Internal(const core::string& name) const;
 
 

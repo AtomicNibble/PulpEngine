@@ -163,13 +163,12 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 }
 
 
-MatManager::MaterialResource* MatManager::createMaterial_Internal(const core::string& name)
+MatManager::MaterialResource* MatManager::createMaterial_Internal(core::string& name)
 {
 	// internal create expects you to know no duplicates
 	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
 
-	auto pMatRes = materials_.createAsset(name, arena_);
-	pMatRes->setName(name);
+	auto pMatRes = materials_.createAsset(name, name, arena_);
 
 	return pMatRes;
 }
