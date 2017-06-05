@@ -11,6 +11,11 @@ namespace random
 		return (z_ << 16u) + (w_ & 65535u);
 	}
 
+	X_INLINE size_t MultiplyWithCarry::randIndex(size_t size)
+	{
+		return rand() % size;
+	}
+
 	X_INLINE uint32_t MultiplyWithCarry::randRange(uint32_t minValue, uint32_t maxValue)
 	{
 		X_ASSERT(minValue < maxValue, "Minimum value must be smaller than the maximum value.")(minValue, maxValue);

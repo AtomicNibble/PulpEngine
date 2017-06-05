@@ -17,6 +17,7 @@ namespace random
 		void setSeed(const Vec4i& seed);
 
 		X_INLINE uint32_t rand(void);
+		X_INLINE size_t randIndex(size_t size);
 		X_INLINE uint32_t randRange(uint32_t minValue, uint32_t maxValue);
 		X_INLINE float randRange(float minValue, float maxValue);
 

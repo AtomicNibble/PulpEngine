@@ -14,6 +14,11 @@ namespace random
 		return state_.w;
 	}
 
+	X_INLINE size_t XorShift::randIndex(size_t size)
+	{
+		return rand() % size;
+	}
+
 	X_INLINE uint32_t XorShift::randRange(uint32_t minValue, uint32_t maxValue)
 	{
 		X_ASSERT(minValue < maxValue, "Minimum value must be smaller than the maximum value.")(minValue, maxValue);
@@ -47,6 +52,12 @@ namespace random
 		state_[1] = a;
 
 		return a + b;
+	}
+
+
+	X_INLINE size_t XorShift128::randIndex(size_t size)
+	{
+		return static_cast<size_t>(rand() % size);
 	}
 
 	X_INLINE uint64_t XorShift128::randRange(uint64_t minValue, uint64_t maxValue)
