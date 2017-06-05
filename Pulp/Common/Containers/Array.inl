@@ -649,7 +649,7 @@ bool Array<T, Allocator>::removeIndex(size_type idx)
 template<typename T, class Allocator>
 void Array<T, Allocator>::remove(ConstIterator it)
 {
-	X_ASSERT(_first >= begin() && _first < end(), "Invalid iterator")(_first, begin(), end());
+	X_ASSERT(it >= begin() && it < end(), "Invalid iterator")(it, begin(), end());
 
 	removeIndex(it - list_);
 }
