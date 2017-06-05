@@ -17,6 +17,16 @@ X_INLINE core::LoadStatus::Enum XModel::getStatus(void) const
 	return status_;
 }
 
+X_INLINE bool XModel::isLoaded(void) const
+{
+	return status_ == core::LoadStatus::Complete;
+}
+
+X_INLINE bool XModel::loadFailed(void) const
+{
+	return status_ == core::LoadStatus::Error;
+}
+
 X_INLINE void XModel::setStatus(core::LoadStatus::Enum status)
 {
 	status_ = status;
