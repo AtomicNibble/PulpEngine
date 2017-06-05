@@ -67,9 +67,11 @@ public:
 
 private:
 	int32_t id_;
-	core::LoadStatus::Enum status_;
 	core::string name_;
 	XRenderMesh renderMeshes_[MODEL_MAX_LODS];
+	
+	core::LoadStatus::Enum status_;
+	uint8_t _pad[3];
 
 	// runtime pointers.
 	const uint16_t*			pTagNames_;
