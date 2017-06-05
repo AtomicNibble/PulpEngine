@@ -6,7 +6,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-X_DECLARE_ENUM(LoadStatus) (
+X_DECLARE_ENUM8(LoadStatus) (
 	NotLoaded,
 	Loading,
 	Complete,
