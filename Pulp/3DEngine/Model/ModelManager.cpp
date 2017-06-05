@@ -339,11 +339,24 @@ void XModelManager::dispatchLoadRequest(ModelLoadRequest* pLoadReq)
 
 void XModelManager::onLoadRequestFail(ModelLoadRequest* pLoadReq)
 {
-	if (pDefaultModel_ != pLoadReq->pModel) {
-		pLoadReq->pModel->assignDefault(pDefaultModel_);
+	auto* pModel = pLoadReq->pModel;
+
+	if (pDefaultModel_ != pModel) 
+	{
+		// what if default model not loaded :| ?
+		if (!pDefaultModel_->isLoaded())
+		{
+			waitForLoad(pDefaultModel_);
+		}
+
+		// only assing if valid.
+		if (pDefaultModel_->isLoaded())
+		{
+			pModel->assignDefault(pDefaultModel_);
+		}
 	}
 
-	pLoadReq->pModel->setStatus(core::LoadStatus::Error);
+	pModel->setStatus(core::LoadStatus::Error);
 
 	loadRequestCleanup(pLoadReq);
 }
