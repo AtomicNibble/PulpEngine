@@ -143,6 +143,15 @@ makeUnique(core::MemoryArenaBase* arena, size_t size)
 	return core::UniquePointer<T>(arena, X_NEW_ARRAY(_ElemT, size, arena, "makeUnique<T[]>"));
 }
 
+template<typename T, class... _Types>
+X_INLINE typename std::enable_if<std::is_array<T>::value && std::extent<T>::value == 0, core::UniquePointer<T> >::type
+makeUnique(core::MemoryArenaBase* arena, size_t size, size_t alignment)
+{
+	typedef typename std::remove_extent<T>::type _ElemT;
+	return core::UniquePointer<T>(arena, X_NEW_ARRAY_ALIGNED(_ElemT, size, arena, "makeUnique<T[]>", alignment));
+}
+
+
 
 X_NAMESPACE_END
 
