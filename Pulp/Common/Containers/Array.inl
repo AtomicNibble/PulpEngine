@@ -620,17 +620,12 @@ X_INLINE typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert_sort
 template<typename T, class Allocator>
 bool Array<T, Allocator>::removeIndex(size_type idx)
 {
-	if (idx == (size_type)-1) {
+	if (idx == invalid_index) {
 		return false;
 	}
 
 	X_ASSERT_NOT_NULL(list_);
-	X_ASSERT(idx >= 0, "index is invalid")(idx);
 	X_ASSERT(idx < num_, "index is out of bounds")(idx, num_);
-
-	if ((idx < 0) || (idx >= num_)) {
-		return false;
-	}
 
 	T* pItem = &list_[idx];
 
