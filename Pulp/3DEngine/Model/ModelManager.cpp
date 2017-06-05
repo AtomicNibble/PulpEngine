@@ -476,9 +476,8 @@ void XModelManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadId
 	X_UNUSED(threadIdx);
 	X_UNUSED(pJob);
 	X_UNUSED(pData);
-	X_ASSERT_NOT_NULL(pData);
 
-	ModelLoadRequest* pLoadReq = static_cast<ModelLoadRequest*>(pData);
+	ModelLoadRequest* pLoadReq = static_cast<ModelLoadRequest*>(X_ASSERT_NOT_NULL(pData));
 	XModel* pModel = pLoadReq->pModel;
 
 
