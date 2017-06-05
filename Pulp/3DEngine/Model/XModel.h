@@ -10,15 +10,6 @@
 
 #include "RenderMesh.h"
 
-X_NAMESPACE_DECLARE(core,
-	namespace V2 {
-		struct Job;
-		class JobSystem;
-	}
-
-struct IoRequestBase;
-struct XFileAsync;
-)
 
 X_NAMESPACE_DECLARE(engine,
 	class PrimativeContext;
@@ -73,13 +64,6 @@ public:
 	void assignDefault(XModel* pDefault);
 
 	void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data);
-
-private:
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* pData);
-	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* pData);
 
 private:
 	int32_t id_;
