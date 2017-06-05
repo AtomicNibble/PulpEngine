@@ -3,6 +3,7 @@
 
 
 #include <EngineCommon.h>
+#include <IAsyncLoad.h>
 
 #include <array>
 
