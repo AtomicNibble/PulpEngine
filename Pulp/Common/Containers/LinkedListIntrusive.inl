@@ -155,8 +155,8 @@ X_INLINE const T* XLinkIntrusive<T>::next() const
 
 template<class T>
 XListIntrusive<T>::XListIntrusive() :
-link_(),
-offset_((size_t)-1)
+	link_(),
+	offset_((size_t)-1)
 {
 }
 
@@ -164,8 +164,8 @@ offset_((size_t)-1)
 
 template<class T>
 XListIntrusive<T>::XListIntrusive(size_t offset) :
-link_(offset),
-offset_(offset)
+	link_(offset),
+	offset_(offset)
 {
 }
 
