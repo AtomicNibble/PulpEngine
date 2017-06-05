@@ -79,6 +79,8 @@ public:
 private:
 	bool initDefaults(void);
 	void freeDanglingMaterials(void);
+	void releaseResources(XModel* pModel);
+
 
 	void queueLoadRequest(ModelResource* pModel);
 	void dispatchPendingLoads(void);

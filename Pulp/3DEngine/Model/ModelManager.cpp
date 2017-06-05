@@ -155,6 +155,8 @@ void XModelManager::releaseModel(XModel* pModel)
 	ModelResource* pModelRes = static_cast<ModelResource*>(pModel);
 	if (pModelRes->removeReference() == 0)
 	{
+		releaseResources(pModelRes);
+
 		models_.releaseAsset(pModelRes);
 	}
 }
@@ -183,10 +185,18 @@ void XModelManager::freeDanglingMaterials(void)
 			auto* pModelRes = m.second;
 			const auto& name = pModelRes->getName();
 			X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
+
+			releaseResources(pModelRes);
 		}
 	}
 
 	models_.free();
+}
+
+void XModelManager::releaseResources(XModel* pModel)
+{
+	X_UNUSED(pModel);
+
 }
 
 void XModelManager::reloadModel(const char* pModelName)
