@@ -27,9 +27,9 @@ WE have special case for default model which we want to load / setup in a synchr
 
 */
 
-XModelManager::XModelManager(core::MemoryArenaBase* arena) :
+XModelManager::XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena) :
 	arena_(arena),
-	blockArena_(arena),
+	blockArena_(blockArena),
 	pDefaultModel_(nullptr),
 	models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource)),
 	requestQueue_(arena),

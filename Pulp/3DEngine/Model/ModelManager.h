@@ -56,7 +56,7 @@ class XModelManager :
 	typedef core::Fifo<ModelResource*> ModelQueue;
 
 public:
-	XModelManager(core::MemoryArenaBase* arena);
+	XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
 	~XModelManager();
 
 	void registerCmds(void);
