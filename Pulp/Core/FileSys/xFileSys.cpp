@@ -84,7 +84,7 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 {
 	op = std::move(oth.op);
 
-	switch (getType())
+	switch (oth.getType())
 	{
 		case IoRequest::READ:
 			readReq = std::move(oth.readReq);
@@ -100,6 +100,7 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 			break;
 	}
 
+	X_ASSERT(getType() == oth.getType(), "Types don't match")();
 	return *this;
 }
 
