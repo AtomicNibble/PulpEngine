@@ -652,6 +652,14 @@ bool Array<T, Allocator>::removeIndex(size_type idx)
 }
 
 template<typename T, class Allocator>
+void Array<T, Allocator>::remove(ConstIterator it)
+{
+	X_ASSERT(_first >= begin() && _first < end(), "Invalid iterator")(_first, begin(), end());
+
+	removeIndex(it - list_);
+}
+
+template<typename T, class Allocator>
 void Array<T, Allocator>::remove(const T& item)
 {
 	size_type idx = find(item);
