@@ -67,7 +67,7 @@ private:
 	MaterialResource* loadMaterialCompiled(const core::string& name);
 	MaterialResource* createMaterial_Internal(const core::string& name);
 	MaterialResource* findMaterial_Internal(const core::string& name) const;
-	void releaseMaterialResources(Material* pMat);
+	void releaseResources(Material* pMat);
 
 
 	bool initDefaults(void);

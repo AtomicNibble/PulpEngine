@@ -143,7 +143,7 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 	MaterialResource* pMatRes = reinterpret_cast<MaterialResource*>(pMat);
 	if (pMatRes->removeReference() == 0)
 	{
-		releaseMaterialResources(pMatRes);
+		releaseResources(pMatRes);
 
 		materials_.releaseAsset(pMatRes);
 	}
@@ -675,7 +675,7 @@ XMaterialManager::MaterialResource* XMaterialManager::findMaterial_Internal(cons
 }
 
 
-void XMaterialManager::releaseMaterialResources(Material* pMat)
+void XMaterialManager::releaseResources(Material* pMat)
 {
 	// when we release the material we need to clean up somethings.
 	X_UNUSED(pMat);
@@ -715,7 +715,7 @@ void XMaterialManager::freeDanglingMaterials(void)
 			auto* pMatRes = m.second;
 			const auto& name = pMatRes->getName();
 
-			releaseMaterialResources(pMatRes);
+			releaseResources(pMatRes);
 			X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pMatRes->getRefCount());
 		}
 	}
