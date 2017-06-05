@@ -6,8 +6,18 @@
 #include <String\StrRef.h>
 
 #include <Assets\AssertContainer.h>
+#include <Util\UniquePointer.h>
+#include <Containers\Fifo.h>
+#include <Time\TimeVal.h>
 
 X_NAMESPACE_DECLARE(core, 
+	namespace V2 {
+		struct Job;
+		class JobSystem;
+	}
+
+	struct XFileAsync;
+	struct IoRequestBase;
 	struct IConsoleCmdArgs;
 )
 
@@ -24,6 +34,23 @@ class TechDefStateManager;
 class CBufferManager;
 class Material;
 
+struct MaterialLoadRequest
+{
+	MaterialLoadRequest(Material* pModel) :
+		pFile(nullptr),
+		pMaterial(pModel),
+		dataSize(0)
+	{
+	}
+	core::XFileAsync* pFile;
+	Material* pMaterial;
+	core::UniquePointer<uint8_t[]> data;
+	uint32_t dataSize;
+	core::TimeVal dispatchTime;
+	core::TimeVal loadTime;
+};
+
+
 class XMaterialManager : 
 	public IMaterialManager, 
 	public ICoreEventListener, 
@@ -31,6 +58,9 @@ class XMaterialManager :
 {
 	typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
 	typedef MaterialContainer::Resource MaterialResource;
+
+	typedef core::Array<MaterialLoadRequest*> MaterialLoadRequestArr;
+	typedef core::Fifo<MaterialResource*> MaterialQueue;
 
 public:
 	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan);
@@ -43,10 +73,12 @@ public:
 	void shutDown(void);
 
 	bool asyncInitFinalize(void);
+	void dispatchPendingLoads(void);
 
 	// IMaterialManager
-	virtual Material* findMaterial(const char* pMtlName) const X_FINAL;
-	virtual Material* loadMaterial(const char* pMtlName) X_FINAL;
+	Material* findMaterial(const char* pMtlName) const X_FINAL;
+	Material* loadMaterial(const char* pMtlName) X_FINAL;
+	Material* getDefaultMaterial(void) const X_FINAL;
 
 	void releaseMaterial(Material* pMat);
 
@@ -54,10 +86,8 @@ public:
 		PermatationFlags permFlags = PermatationFlags()) X_FINAL;
 	bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
 
-	X_INLINE virtual Material* getDefaultMaterial(void) const X_FINAL;
 
 	// ~IMaterialManager
-
 	void listMaterials(const char* pSearchPatten = nullptr) const;
 
 private:
@@ -65,14 +95,30 @@ private:
 		PermatationFlags permFlags);
 
 	MaterialResource* loadMaterialCompiled(const core::string& name);
-	MaterialResource* createMaterial_Internal(const core::string& name);
-	MaterialResource* findMaterial_Internal(const core::string& name) const;
-	void releaseResources(Material* pMat);
 
-
+private:
 	bool initDefaults(void);
 	void freeDanglingMaterials(void);
+	void releaseResources(Material* pMat);
 
+	void queueLoadRequest(MaterialResource* pMaterial);
+	bool waitForLoad(Material* pMaterial); // returns true if load succeed.
+	void dispatchLoadRequest(MaterialLoadRequest* pLoadReq);
+
+
+	// load / processing
+	void onLoadRequestFail(MaterialLoadRequest* pLoadReq);
+	void loadRequestCleanup(MaterialLoadRequest* pLoadReq);
+
+	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
+
+	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
+	bool processData(Material* pMaterial, core::XFile* pFile);
+
+
+private:
 	// ICoreEventListener
 	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
 	// ~ICoreEventListener
@@ -87,6 +133,7 @@ private:
 
 private:
 	core::MemoryArenaBase* arena_;
+	core::MemoryArenaBase* blockArena_;
 	CBufferManager& cBufMan_;
 	VariableStateManager& vsMan_;
 	TechDefStateManager* pTechDefMan_;
@@ -94,6 +141,13 @@ private:
 	MaterialContainer materials_;
 
 	Material* pDefaultMtl_;
+
+	// loading
+	core::CriticalSection loadReqLock_;
+	core::ConditionVariable loadCond_;
+
+	MaterialQueue requestQueue_;
+	MaterialLoadRequestArr pendingRequests_;
 };
 
 

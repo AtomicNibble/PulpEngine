@@ -8,6 +8,9 @@
 #include <IConsole.h>
 #include <ITexture.h>
 
+#include <Threading\JobSystem2.h>
+#include <Time\StopWatch.h>
+
 #include "TechDefStateManager.h"
 #include "Drawing\VariableStateManager.h"
 #include "Drawing\CBufferManager.h"
@@ -26,13 +29,19 @@ using namespace render::shader;
 
 XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan) :
 	arena_(arena),
+	blockArena_(arena),
 	pTechDefMan_(nullptr),
 	cBufMan_(cBufMan),
 	vsMan_(vsMan),
 	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u,X_ALIGN_OF(MaterialResource))),
-	pDefaultMtl_(nullptr)
+	pDefaultMtl_(nullptr),
+	requestQueue_(arena),
+	pendingRequests_(arena)
 {
 	pTechDefMan_ = X_NEW(TechDefStateManager, arena, "TechDefStateManager")(arena);
+
+	requestQueue_.reserve(64);
+	pendingRequests_.setGranularity(32);
 }
 
 XMaterialManager::~XMaterialManager()
@@ -75,7 +84,7 @@ bool XMaterialManager::init(void)
 
 void XMaterialManager::shutDown(void)
 {
-	X_LOG0("MtlManager", "Shutting Down");
+	X_LOG0("Material", "Shutting Down");
 
 	// hotreload support.
 	gEnv->pHotReload->unregisterListener(this);
@@ -93,6 +102,15 @@ void XMaterialManager::shutDown(void)
 
 bool XMaterialManager::asyncInitFinalize(void)
 {
+	if (!pDefaultMtl_) {
+		X_ERROR("Material", "Default Material is not valid");
+		return false;
+	}
+
+	if (!waitForLoad(pDefaultMtl_)) {
+		X_ERROR("Material", "Failed to load default Material");
+		return false;
+	}
 
 	return true;
 }
@@ -104,12 +122,14 @@ Material* XMaterialManager::findMaterial(const char* pMtlName) const
 {
 	core::string name(pMtlName);
 
-	Material* pMtl = findMaterial_Internal(name);
+	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+	Material* pMtl = materials_.findAsset(name);
 	if (pMtl) {
 		return pMtl;
 	}
 
-	X_WARNING("MatMan", "Failed to find material: \"%s\"", pMtlName);
+	X_WARNING("Material", "Failed to find material: \"%s\"", pMtlName);
 	return nullptr;
 }
 
@@ -129,11 +149,10 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 		return pMatRes;
 	}
 
-	pMatRes = materials_.createAsset(name, g_3dEngineArena);
-	pMatRes->setName(name);
+	pMatRes = materials_.createAsset(name, name, g_3dEngineArena);
 
-	// now we want to dispatch a load!
-	// do we want to have the loading login in the manager or 
+	// add to list of Materials that need loading.
+	queueLoadRequest(pMatRes);
 
 	return pMatRes;
 }
@@ -148,6 +167,391 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 		materials_.releaseAsset(pMatRes);
 	}
 }
+
+
+bool XMaterialManager::initDefaults(void)
+{
+	if (pDefaultMtl_ == nullptr)
+	{
+#if 1
+		pDefaultMtl_ = loadMaterial(MTL_DEFAULT_NAME);
+		if (!pDefaultMtl_) {
+			X_ERROR("Material", "Failed to create default material");
+			return false;
+		}
+
+		dispatchPendingLoads();
+
+#else
+		// this will be data driven soon.
+		pDefaultMtl_ = loadMaterialCompiled(core::string(MTL_DEFAULT_NAME));
+		if (!pDefaultMtl_) {
+			return false;
+		}
+
+		// it's default :|
+		pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
+#endif
+	}
+
+	return true;
+}
+
+
+void XMaterialManager::freeDanglingMaterials(void)
+{
+	{
+		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+		for (const auto& m : materials_)
+		{
+			auto* pMatRes = m.second;
+			const auto& name = pMatRes->getName();
+
+			releaseResources(pMatRes);
+			X_WARNING("Material", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pMatRes->getRefCount());
+		}
+	}
+
+	materials_.free();
+}
+
+void XMaterialManager::releaseResources(Material* pMat)
+{
+	// when we release the material we need to clean up somethings.
+	X_UNUSED(pMat);
+
+}
+
+
+void XMaterialManager::listMaterials(const char* pSearchPatten) const
+{
+	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+	core::Array<MaterialResource*> sorted_mats(g_3dEngineArena);
+	sorted_mats.setGranularity(materials_.size());
+
+	for (const auto& mat : materials_)
+	{
+		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, mat.first))
+		{
+			sorted_mats.push_back(mat.second);
+		}
+	}
+
+	std::sort(sorted_mats.begin(), sorted_mats.end(), [](MaterialResource* a, MaterialResource* b) {
+			const auto& nameA = a->getName();
+			const auto& nameB = b->getName();
+			return nameA.compareInt(nameB) < 0;
+		}
+	);
+
+	X_LOG0("Material", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
+
+	for (const auto* pMat : sorted_mats)
+	{
+		X_LOG0("Material", "^2\"%s\"^7 refs: %" PRIi32, pMat->getName(), pMat->getRefCount());
+	}
+
+	X_LOG0("Material", "------------ ^8Materials End^7 -----------");
+}
+
+
+
+void XMaterialManager::queueLoadRequest(MaterialResource* pMaterial)
+{
+	X_ASSERT(pMaterial->getName().isNotEmpty(), "Material has no name")();
+
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+	// can we know it's not in this queue just from status?
+	// like if it's complete it could be in this status
+	auto status = pMaterial->getStatus();
+	if (status == core::LoadStatus::Complete || status == core::LoadStatus::Loading)
+	{
+		X_WARNING("Material", "Redundant load request requested: \"%s\"", pMaterial->getName().c_str());
+		return;
+	}
+
+	X_ASSERT(!requestQueue_.contains(pMaterial), "Queue already contains asset")(pMaterial);
+
+	pMaterial->addReference(); // prevent instance sweep
+	pMaterial->setStatus(core::LoadStatus::Loading);
+	requestQueue_.push(pMaterial);
+}
+
+
+void XMaterialManager::dispatchPendingLoads(void)
+{
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+	while (requestQueue_.isNotEmpty())
+	{
+		auto* pMaterial = requestQueue_.peek();
+		X_ASSERT(pMaterial->getStatus() == core::LoadStatus::Loading, "Incorrect status")(pMaterial->getStatus());
+		auto loadReq = core::makeUnique<MaterialLoadRequest>(arena_, pMaterial);
+
+		// dispatch IO 
+		dispatchLoadRequest(loadReq.get());
+
+		pendingRequests_.emplace_back(loadReq.release());
+
+		requestQueue_.pop();
+	}
+}
+
+bool XMaterialManager::waitForLoad(Material* pMaterial)
+{
+	{
+		// we lock to see if loading as the setting of loading is performed inside this lock.
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		while (pMaterial->getStatus() == core::LoadStatus::Loading)
+		{
+			loadCond_.Wait(loadReqLock_);
+		}
+	}
+
+	// did we fail? or never sent a dispatch?
+	auto status = pMaterial->getStatus();
+	if (status == core::LoadStatus::Complete)
+	{
+		return true;
+	}
+	else if (status == core::LoadStatus::Error)
+	{
+		return false;
+	}
+	else if (status == core::LoadStatus::NotLoaded)
+	{
+		// request never sent?
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return false;
+}
+
+void XMaterialManager::dispatchLoadRequest(MaterialLoadRequest* pLoadReq)
+{
+	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
+
+	core::Path<char> path;
+	path /= "materials";
+	path /= pLoadReq->pMaterial->getName();
+	path.setExtension(MTL_B_FILE_EXTENSION);
+
+	// dispatch a read request baby!
+	core::IoRequestOpen open;
+	open.callback.Bind<XMaterialManager, &XMaterialManager::IoRequestCallback>(this);
+	open.pUserData = pLoadReq;
+	open.mode = core::fileMode::READ;
+	open.path = path;
+
+	gEnv->pFileSys->AddIoRequestToQue(open);
+}
+
+void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
+{
+	auto* pMaterial = pLoadReq->pMaterial;
+
+	if (pDefaultMtl_ != pMaterial)
+	{
+		// what if default Material not loaded :| ?
+		if (!pDefaultMtl_->isLoaded())
+		{
+			waitForLoad(pDefaultMtl_);
+		}
+
+		// only assing if valid.
+		if (pDefaultMtl_->isLoaded())
+		{
+			pMaterial->assignProps(*pDefaultMtl_);
+		}
+	}
+
+	pMaterial->setStatus(core::LoadStatus::Error);
+
+	loadRequestCleanup(pLoadReq);
+}
+
+void XMaterialManager::loadRequestCleanup(MaterialLoadRequest* pLoadReq)
+{
+	pLoadReq->loadTime = core::StopWatch::GetTimeNow();
+
+	X_LOG0("Material", "Material loaded in: ^6%fms", (pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds());
+	{
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		pendingRequests_.remove(pLoadReq);
+	}
+
+	if (pLoadReq->pFile) {
+		gEnv->pFileSys->AddCloseRequestToQue(pLoadReq->pFile);
+	}
+
+	// release our ref.
+	releaseMaterial(pLoadReq->pMaterial);
+
+	X_DELETE(pLoadReq, arena_);
+
+	loadCond_.NotifyAll();
+}
+
+
+void XMaterialManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	core::IoRequest::Enum requestType = pRequest->getType();
+	MaterialLoadRequest* pLoadReq = pRequest->getUserData<MaterialLoadRequest>();
+	Material* pMaterial = pLoadReq->pMaterial;
+
+	if (requestType == core::IoRequest::OPEN)
+	{
+		if (!pFile)
+		{
+			X_ERROR("Material", "Failed to load: \"%s\"", pMaterial->getName().c_str());
+			onLoadRequestFail(pLoadReq);
+			return;
+		}
+
+		pLoadReq->pFile = pFile;
+
+		// read the whole file.
+		uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
+		X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
+		pLoadReq->data = core::makeUnique<uint8_t[]>(blockArena_, fileSize, 16);
+		pLoadReq->dataSize = fileSize;
+
+		// read the header.
+		core::IoRequestRead read;
+		read.callback.Bind<XMaterialManager, &XMaterialManager::IoRequestCallback>(this);
+		read.pUserData = pLoadReq;
+		read.pFile = pFile;
+		read.dataSize = fileSize;
+		read.offset = 0;
+		read.pBuf = pLoadReq->data.ptr();
+		fileSys.AddIoRequestToQue(read);
+	}
+	else if (requestType == core::IoRequest::READ)
+	{
+		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
+
+		X_ASSERT(pLoadReq->data.ptr() == pReadReq->pBuf, "Buffers don't match")();
+
+		if (bytesTransferred != pReadReq->dataSize)
+		{
+			X_ERROR("Material", "Failed to read material data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pReadReq->dataSize);
+			onLoadRequestFail(pLoadReq);
+			return;
+		}
+
+		gEnv->pJobSys->CreateMemberJobAndRun<XMaterialManager>(this, &XMaterialManager::ProcessData_job,
+			pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));	
+	}
+}
+
+void XMaterialManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+	X_UNUSED(pData);
+
+	MaterialLoadRequest* pLoadReq = static_cast<MaterialLoadRequest*>(X_ASSERT_NOT_NULL(pData));
+	Material* pMaterial = pLoadReq->pMaterial;
+
+	core::XFileFixedBuf file(pLoadReq->data.ptr(), pLoadReq->data.ptr() + pLoadReq->dataSize);
+	
+	if (!processData(pMaterial, &file))
+	{
+		onLoadRequestFail(pLoadReq);
+	}
+	else
+	{
+		loadRequestCleanup(pLoadReq);
+	}
+}
+
+
+bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
+{
+	MaterialHeader hdr;
+	if (pFile->readObj(hdr) != sizeof(hdr)) {
+		return false;
+	}
+
+	if (!hdr.isValid()) {
+		return false;
+	}
+
+	if (hdr.numSamplers > MTL_MAX_SAMPLERS) {
+		return false;
+	}
+
+	// we need to poke the goat.
+	// so now materials store the cat and type which we can use to get techdef info.
+	core::string catType;
+	pFile->readString(catType);
+
+	Material::SamplerArr samplers(arena_, hdr.numSamplers);
+	Material::ParamArr params(arena_, hdr.numParams);
+	Material::TextureArr textures(arena_, hdr.numTextures);
+
+	// now samplers.
+	for (uint8_t i = 0; i < hdr.numSamplers; i++)
+	{
+		MaterialSampler& sampler = samplers[i];
+
+		pFile->readObj(sampler.sate);
+		pFile->readString(sampler.name);
+	}
+
+	// now params.
+	for (uint8_t i = 0; i < hdr.numParams; i++)
+	{
+		MaterialParam& param = params[i];
+		pFile->readObj(param.value);
+		pFile->readObj(param.type);
+		pFile->readString(param.name);
+	}
+
+	// now textures.
+	for (uint8_t i = 0; i < hdr.numTextures; i++)
+	{
+		MaterialTexture& tex = textures[i];
+		pFile->readObj(tex.texSlot);
+		pFile->readString(tex.name);
+		pFile->readString(tex.val);
+	}
+
+
+#if X_DEBUG
+	const auto left = pFile->remainingBytes();
+	X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
+#endif // !X_DEBUG
+
+	TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, catType);
+	if (!pTechDefState) {
+		return false;
+	}
+
+	// we want to load all the textures now.
+	// so that we are not 'creating' refrences for every tech.
+	texture::TextureFlags texFlags = texture::TextureFlags();
+
+	for (auto& tex : textures)
+	{
+		auto* pTexture = gEngEnv.pTextureMan_->forName(tex.name.c_str(), texFlags);
+		tex.pTexture = pTexture;
+	}
+
+	pMaterial->setTechDefState(pTechDefState);
+	pMaterial->setParams(std::move(params));
+	pMaterial->setSamplers(std::move(samplers));
+	pMaterial->setTextures(std::move(textures));
+	pMaterial->setStatus(core::LoadStatus::Complete);
+	return true;
+}
+
+
 
 Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt,
 	PermatationFlags permFlags)
@@ -645,115 +1049,15 @@ XMaterialManager::MaterialResource* XMaterialManager::loadMaterialCompiled(const
 	}
 
 
-	MaterialResource* pMatRes = createMaterial_Internal(matName);
-	pMatRes->setTechDefState(pTechDefState);
-	pMatRes->setParams(std::move(params));
-	pMatRes->setSamplers(std::move(samplers));
-	pMatRes->setTextures(std::move(textures));
-
-	return pMatRes;
+//	MaterialResource* pMatRes = createMaterial_Internal(matName);
+//	pMatRes->setTechDefState(pTechDefState);
+//	pMatRes->setParams(std::move(params));
+//	pMatRes->setSamplers(std::move(samplers));
+//	pMatRes->setTextures(std::move(textures));
+//	return pMatRes;
+	return nullptr;
 }
 
-XMaterialManager::MaterialResource* XMaterialManager::createMaterial_Internal(const core::string& name)
-{
-	// internal create expects you to know no duplicates
-	X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")();
-	
-	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
-
-	auto* pMatRes = materials_.createAsset(name, g_3dEngineArena);
-	pMatRes->setName(name);
-
-	return pMatRes;
-}
-
-XMaterialManager::MaterialResource* XMaterialManager::findMaterial_Internal(const core::string& name) const
-{
-	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
-
-	return materials_.findAsset(name);
-}
-
-
-void XMaterialManager::releaseResources(Material* pMat)
-{
-	// when we release the material we need to clean up somethings.
-	X_UNUSED(pMat);
-
-}
-
-
-
-bool XMaterialManager::initDefaults(void)
-{
-	if (pDefaultMtl_ == nullptr)
-	{
-		// this will be data driven soon.
-		pDefaultMtl_ = loadMaterialCompiled(core::string(MTL_DEFAULT_NAME));
-		if (!pDefaultMtl_) {
-			return false;
-		}
-
-		// it's default :|
-		pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
-	}
-
-	return true;
-}
-
-
-// ~IMaterialManager
-
-
-void XMaterialManager::freeDanglingMaterials(void)
-{
-	{
-		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
-
-		for (const auto& m : materials_)
-		{
-			auto* pMatRes = m.second;
-			const auto& name = pMatRes->getName();
-
-			releaseResources(pMatRes);
-			X_WARNING("MtlManager", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pMatRes->getRefCount());
-		}
-	}
-
-	materials_.free();
-}
-
-void XMaterialManager::listMaterials(const char* pSearchPatten) const
-{
-	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
-
-	core::Array<MaterialResource*> sorted_mats(g_3dEngineArena);
-	sorted_mats.setGranularity(materials_.size());
-
-	for (const auto& mat : materials_)
-	{
-		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, mat.first))
-		{
-			sorted_mats.push_back(mat.second);
-		}
-	}
-
-	std::sort(sorted_mats.begin(), sorted_mats.end(), [](MaterialResource* a, MaterialResource* b) {
-			const auto& nameA = a->getName();
-			const auto& nameB = b->getName();
-			return nameA.compareInt(nameB) < 0;
-		}
-	);
-
-	X_LOG0("Material", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
-
-	for(const auto* pMat : sorted_mats)
-	{
-		X_LOG0("Material", "^2\"%s\"^7 refs: %" PRIi32, pMat->getName(), pMat->getRefCount());
-	}
-
-	X_LOG0("Material", "------------ ^8Materials End^7 -----------");
-}
 
 
 
@@ -763,8 +1067,6 @@ void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_
 	X_UNUSED(event);
 	X_UNUSED(wparam);
 	X_UNUSED(lparam);
-
-
 
 }
 // ~ICoreEventListener
@@ -797,8 +1099,6 @@ void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core:
 	X_UNUSED(name);
 #endif
 }
-
-
 
 
 void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
