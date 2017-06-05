@@ -48,25 +48,27 @@ X_INLINE void UniquePointerBase<T>::swap(UniquePointerBase& oth)
 // ---------------------------------------
 
 template<typename T>
+X_INLINE UniquePointer<T>::UniquePointer() :
+	Mybase(nullptr, pointer())
+{
+}
+
+template<typename T>
 X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena) :
 	Mybase(arena, pointer())
 {
-	X_ASSERT_NOT_NULL(arena);
 }
 
 template<typename T>
 X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, nullptr_t) :
-	Mybase(arena, pointer())
+	Mybase(X_ASSERT_NOT_NULL(arena), pointer())
 {
-	X_ASSERT_NOT_NULL(arena);
 }
 
 template<typename T>
 X_INLINE UniquePointer<T>::UniquePointer(core::MemoryArenaBase* arena, pointer pInstance) :
-	Mybase(arena, pInstance)
+	Mybase(X_ASSERT_NOT_NULL(arena), X_ASSERT_NOT_NULL(pInstance))
 {
-	X_ASSERT_NOT_NULL(pInstance);
-	X_ASSERT_NOT_NULL(arena);
 }
 
 template<typename T>
@@ -176,8 +178,14 @@ X_INLINE void UniquePointer<T>::swap(UniquePointer& oth)
 // ------------------------------------------------------
 
 template<typename T>
+X_INLINE UniquePointer<T[]>::UniquePointer() :
+	Mybase(nullptr, pointer())
+{
+}
+
+template<typename T>
 X_INLINE UniquePointer<T[]>::UniquePointer(core::MemoryArenaBase* arena) :
-	Mybase(X_ASSERT_NOT_NULL(arena), pointer())
+	Mybase(arena, pointer())
 {
 }
 
