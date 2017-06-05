@@ -416,6 +416,10 @@ struct IoRequestBase
 	X_INLINE IoRequest::Enum getType(void) const {
 		return type;
 	}
+	template<typename T>
+	X_INLINE T* getUserData(void) const {
+		return reinterpret_cast<T*>(pUserData);
+	}
 
 	IoCallBack callback; // 8 bytes
 	void* pUserData;
