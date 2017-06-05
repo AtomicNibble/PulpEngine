@@ -12,6 +12,16 @@ X_INLINE void XModel::setID(int32_t id)
 	id_ = id;
 }
 
+X_INLINE core::LoadStatus::Enum XModel::getStatus(void) const
+{
+	return status_;
+}
+
+X_INLINE void XModel::setStatus(core::LoadStatus::Enum status)
+{
+	status_ = status;
+}
+
 X_INLINE const core::string& XModel::getName(void) const
 {
 	return name_;

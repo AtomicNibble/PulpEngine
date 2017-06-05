@@ -39,6 +39,9 @@ public:
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
 
+	X_INLINE core::LoadStatus::Enum getStatus(void) const;
+	X_INLINE void setStatus(core::LoadStatus::Enum status);
+
 	X_INLINE const core::string& getName(void) const;
 	X_INLINE int32_t numLods(void) const;
 	X_INLINE int32_t numBones(void) const;
@@ -81,6 +84,7 @@ private:
 
 private:
 	int32_t id_;
+	core::LoadStatus::Enum status_;
 
 	ModelName name_;
 	XRenderMesh renderMeshes_[MODEL_MAX_LODS];

@@ -40,6 +40,7 @@ namespace
 
 XModel::XModel()
 {
+	status_ = core::LoadStatus::NotLoaded;
 	pTagNames_ = nullptr;
 	pTagTree_ = nullptr;
 	pBoneAngles_ = nullptr;
