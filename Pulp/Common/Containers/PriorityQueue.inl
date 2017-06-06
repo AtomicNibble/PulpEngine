@@ -56,9 +56,9 @@ void PriorityQueue<T, ContainerT, Pr>::free(void)
 
 
 template<typename T, class ContainerT, class Pr>
-void PriorityQueue<T, ContainerT, Pr>::push(const value_type& _Val)
+void PriorityQueue<T, ContainerT, Pr>::push(const value_type& val)
 {
-    container_.push_back(std::move(val));
+    container_.push_back(val);
     std::push_heap(container_.begin(), container_.end(), comp_);
 }
 
