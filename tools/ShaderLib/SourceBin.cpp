@@ -170,7 +170,7 @@ namespace shader
 		}
 
 		core::XFileScoped file;
-		if (!file.openFile(path.c_str(), core::fileMode::READ)) {
+		if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
 
 			return nullptr;
 		}
