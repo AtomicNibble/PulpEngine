@@ -30,6 +30,7 @@ static const char*		 MTL_DEFAULT_NAME = "default/$default";
 static const uint32_t    MTL_MAX_TECHS = 16;
 static const uint32_t    MTL_MAX_TEXTURES = 8;
 static const uint32_t    MTL_MAX_SAMPLERS = 8;
+static const uint32_t    MTL_MAX_PARAMS = 16;
 
 
 static const char*		 TECH_DEFS_DIR = "techdefs";
@@ -242,6 +243,13 @@ struct MaterialHeader
 		if (version != MTL_B_VERSION) {
 			X_ERROR("Mtl", "material version is invalid. FileVer: %i RequiredVer: %i",
 				version, MTL_B_VERSION);
+		}
+
+		if (numSamplers > MTL_MAX_SAMPLERS ||
+			numTextures > MTL_MAX_TEXTURES ||
+			numParams > MTL_MAX_PARAMS) {
+			X_ERROR("Mtl", "Error material exceeds limits");
+			return false;
 		}
 
 		return version == MTL_B_VERSION &&
