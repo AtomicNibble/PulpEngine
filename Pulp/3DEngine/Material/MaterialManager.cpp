@@ -173,25 +173,15 @@ bool XMaterialManager::initDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
-#if 1
 		pDefaultMtl_ = loadMaterial(MTL_DEFAULT_NAME);
 		if (!pDefaultMtl_) {
 			X_ERROR("Material", "Failed to create default material");
 			return false;
 		}
 
-		dispatchPendingLoads();
-
-#else
-		// this will be data driven soon.
-		pDefaultMtl_ = loadMaterialCompiled(core::string(MTL_DEFAULT_NAME));
-		if (!pDefaultMtl_) {
-			return false;
-		}
-
-		// it's default :|
 		pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
-#endif
+
+		dispatchPendingLoads();
 	}
 
 	return true;
