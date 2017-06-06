@@ -77,6 +77,7 @@ X_INLINE Material::Material(core::string& name, core::MemoryArenaBase* arena) :
 
 	usage_ = MaterialUsage::NONE;
 	cat_ = MaterialCat::CODE;
+	status_ = core::LoadStatus::NotLoaded;
 }
 
 X_INLINE Material::Tech* Material::getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags)
