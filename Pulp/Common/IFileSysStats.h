@@ -60,6 +60,8 @@ struct XFileStats
 struct IOQueueStats
 {
 	typedef core::StackString512 Str;
+	typedef std::array<size_t, IoRequest::ENUM_COUNT> RequestCountsArr;
+	typedef std::array<int64_t, IoRequest::ENUM_COUNT> RequestTimsArr;
 
 	X_INLINE IOQueueStats() {
 		core::zero_this(this);
@@ -69,26 +71,30 @@ struct IOQueueStats
 
 		core::HumanSize::Str str;
 
+		size_t totalReq = core::accumulate(RequestCounts.begin(), RequestCounts.end(), 0_sz);
+
 		buf.clear();
 		buf.appendFmt("Read: ^6%s^~\n", core::HumanSize::toString(str, NumBytesRead));
 		buf.appendFmt("Write: ^6%s^~\n", core::HumanSize::toString(str, NumBytesWrite));
 		buf.appendFmt("FilesOpened: ^6%" PRIuS "^~\n", NumFilesOpened);
 		buf.appendFmt("PendingOps: ^6%" PRIuS "^~\n", PendingOps);
+		buf.appendFmt("TotalReq: ^6%" PRIuS "^~\n", totalReq);
 		
 		for (uint32_t i = 0; i < IoRequest::ENUM_COUNT; i++)
 		{
-			buf.appendFmt("Req[%s]: ^6%" PRIuS "^~\n", IoRequest::ToString(i), RequestCounts[i]);
+			float ms = core::TimeVal(RequestTime[i]).GetMilliSeconds();
+			buf.appendFmt("Req[%s]: ^6%" PRIuS " ^5%gms^~\n", IoRequest::ToString(i), RequestCounts[i], ms);
 		}
 
 		return buf.c_str();
 	}
 
-
 	uint64_t NumBytesRead;
 	uint64_t NumBytesWrite;
 	size_t NumFilesOpened;
 	size_t PendingOps;
-	size_t RequestCounts[IoRequest::ENUM_COUNT];
+	RequestCountsArr RequestCounts;
+	RequestTimsArr RequestTime;
 };
 
 #endif // !X_ENABLE_FILE_STATS
