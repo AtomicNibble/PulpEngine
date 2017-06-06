@@ -37,11 +37,11 @@ namespace
 
 
 	constexpr const size_t ioReqSize[IoRequest::ENUM_COUNT] = {
+		sizeof(IoRequestClose),
 		sizeof(IoRequestOpen),
 		sizeof(IoRequestOpenRead),
-		sizeof(IoRequestClose),
-		sizeof(IoRequestRead),
-		sizeof(IoRequestWrite)
+		sizeof(IoRequestWrite),
+		sizeof(IoRequestRead)
 	};
 
 	static_assert(ioReqSize[IoRequest::OPEN] == sizeof(IoRequestOpen), "Enum mismtach?");

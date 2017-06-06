@@ -389,13 +389,13 @@ private:
 
 // stuff for io requests
 X_DECLARE_ENUM(IoRequest)(
-	// open a file gor a given name and mode.
-	// OnSuccess: vaild async file handle.
+	// these are ordered based on priority.
+	// aka READ requests are higest priority.
+	CLOSE,
 	OPEN,
 	OPEN_READ_ALL,
-	CLOSE,
-	READ,
-	WRITE
+	WRITE,
+	READ
 );
 
 typedef uint32_t RequestHandle;
