@@ -112,6 +112,7 @@ bool XMaterialManager::asyncInitFinalize(void)
 		return false;
 	}
 
+	pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
 	return true;
 }
 
@@ -178,8 +179,6 @@ bool XMaterialManager::initDefaults(void)
 			X_ERROR("Material", "Failed to create default material");
 			return false;
 		}
-
-		pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
 
 		dispatchPendingLoads();
 	}
@@ -349,6 +348,7 @@ void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
 		if (!pDefaultMtl_->isLoaded())
 		{
 			waitForLoad(pDefaultMtl_);
+			pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
 		}
 
 		// only assing if valid.
