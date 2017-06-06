@@ -1548,10 +1548,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 		if (type == IoRequest::OPEN)
 		{
-#if X_ENABLE_FILE_STATS
-			++stats_.NumFilesOpened;
-#endif // !X_ENABLE_FILE_STATS
-
 			IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
 			XFileAsync* pFile =	openFileAsync(pOpen->path.c_str(), pOpen->mode);
 
@@ -1559,10 +1555,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		}
 		else if (type == IoRequest::OPEN_READ_ALL)
 		{
-#if X_ENABLE_FILE_STATS
-			++stats_.NumFilesOpened;
-#endif // !X_ENABLE_FILE_STATS
-
 			IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
 			XFileAsync* pFile = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
 

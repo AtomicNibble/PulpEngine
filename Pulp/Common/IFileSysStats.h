@@ -72,11 +72,12 @@ struct IOQueueStats
 		core::HumanSize::Str str;
 
 		size_t totalReq = core::accumulate(RequestCounts.begin(), RequestCounts.end(), 0_sz);
+		size_t numFilesOpened = RequestCounts[IoRequest::OPEN] + RequestCounts[IoRequest::OPEN_READ_ALL];
 
 		buf.clear();
 		buf.appendFmt("Read: ^6%s^~\n", core::HumanSize::toString(str, NumBytesRead));
 		buf.appendFmt("Write: ^6%s^~\n", core::HumanSize::toString(str, NumBytesWrite));
-		buf.appendFmt("FilesOpened: ^6%" PRIuS "^~\n", NumFilesOpened);
+		buf.appendFmt("FilesOpened: ^6%" PRIuS "^~\n", numFilesOpened);
 		buf.appendFmt("PendingOps: ^6%" PRIuS "^~\n", PendingOps);
 		buf.appendFmt("TotalReq: ^6%" PRIuS "^~\n", totalReq);
 		
@@ -91,7 +92,6 @@ struct IOQueueStats
 
 	uint64_t NumBytesRead;
 	uint64_t NumBytesWrite;
-	size_t NumFilesOpened;
 	size_t PendingOps;
 	RequestCountsArr RequestCounts;
 	RequestTimsArr RequestTime;
