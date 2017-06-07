@@ -1177,6 +1177,17 @@ bool xFileSys::isDirectoryOS(const wchar_t* pFullPath) const
 	return result;
 }
 
+bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew) const
+{
+	bool result = core::PathUtil::MoveFile(pFullPath, pFullPathNew);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "moveFile: \"%ls\" -> \"%ls\" res: ^6%s",
+			pFullPath, pFullPathNew, result ? "TRUE" : "FALSE");
+	}
+
+	return result;
+}
 
 // --------------------------------------------------
 
