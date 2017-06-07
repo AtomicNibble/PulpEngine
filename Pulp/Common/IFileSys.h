@@ -10,6 +10,10 @@
 #include <Util\Delegate.h>
 #include <Containers\Array.h>
 
+#if X_ENABLE_FILE_STATS
+#include <Time\TimeVal.h>
+#endif // !X_ENABLE_FILE_STATS
+
 // i need the definition :|
 #include X_INCLUDE(../Core/FileSys/X_PLATFORM/OsFileAsyncOperation.h)
 
@@ -421,10 +425,25 @@ struct IoRequestBase
 		return reinterpret_cast<T*>(pUserData);
 	}
 
+#if X_ENABLE_FILE_STATS
+	X_INLINE core::TimeVal getAddTime(void) const {
+		return addTime;
+	}
+
+	X_INLINE void setAddTime(core::TimeVal time) {
+		addTime = time;
+	}
+#endif // !X_ENABLE_FILE_STATS
+
+
 	IoCallBack callback; // 8 bytes
 	void* pUserData;
 protected:
 	IoRequest::Enum type; // 4 bytes
+
+#if X_ENABLE_FILE_STATS
+	core::TimeVal addTime;
+#endif // !X_ENABLE_FILE_STATS
 };
 
 struct IoRequestOpen : public IoRequestBase
