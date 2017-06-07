@@ -59,6 +59,7 @@ class XMaterialManager :
 	typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
 	typedef MaterialContainer::Resource MaterialResource;
 
+	typedef core::Array<Material*> MaterialArr;
 	typedef core::Array<MaterialLoadRequest*> MaterialLoadRequestArr;
 	typedef core::Fifo<MaterialResource*> MaterialQueue;
 
@@ -150,6 +151,7 @@ private:
 
 	MaterialQueue requestQueue_;
 	MaterialLoadRequestArr pendingRequests_;
+	MaterialArr failedLoads_;
 };
 
 

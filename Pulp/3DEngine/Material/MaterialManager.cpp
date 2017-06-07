@@ -36,7 +36,8 @@ XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateMa
 	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u,X_ALIGN_OF(MaterialResource))),
 	pDefaultMtl_(nullptr),
 	requestQueue_(arena),
-	pendingRequests_(arena)
+	pendingRequests_(arena),
+	failedLoads_(arena)
 {
 	pTechDefMan_ = X_NEW(TechDefStateManager, arena, "TechDefStateManager")(arena);
 
@@ -115,6 +116,16 @@ bool XMaterialManager::asyncInitFinalize(void)
 	}
 
 	pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
+
+	// anything that failed to load, while default material was loading
+	// assing default to it now.
+	for (auto* pMat : failedLoads_)
+	{
+		X_ASSERT(pMat->getStatus() == core::LoadStatus::Error, "Unexpected status")();
+		pMat->assignProps(*pDefaultMtl_);
+	}
+
+	failedLoads_.free();
 	return true;
 }
 
@@ -373,12 +384,13 @@ void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
 		// what if default Material not loaded :| ?
 		if (!pDefaultMtl_->isLoaded())
 		{
-			waitForLoad(pDefaultMtl_);
-			pDefaultMtl_->setFlags(pDefaultMtl_->getFlags() | MaterialFlag::DEFAULT);
-		}
+			// we can't wait for fucking IO load, since this is called by the IO thread.
+			// if it's not loaded it will never load.
+			core::CriticalSection::ScopedLock lock(loadReqLock_);
 
-		// only assing if valid.
-		if (pDefaultMtl_->isLoaded())
+			failedLoads_.push_back(pMaterial);
+		}
+		else
 		{
 			pMaterial->assignProps(*pDefaultMtl_);
 		}
