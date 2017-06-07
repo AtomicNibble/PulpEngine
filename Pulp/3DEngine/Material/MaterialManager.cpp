@@ -102,6 +102,8 @@ void XMaterialManager::shutDown(void)
 
 bool XMaterialManager::asyncInitFinalize(void)
 {
+	dispatchPendingLoads();
+
 	if (!pDefaultMtl_) {
 		X_ERROR("Material", "Default Material is not valid");
 		return false;
@@ -153,7 +155,7 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 	pMatRes = materials_.createAsset(name, name, g_3dEngineArena);
 
 	// add to list of Materials that need loading.
-	queueLoadRequest(pMatRes);
+	addLoadRequest(pMatRes);
 
 	return pMatRes;
 }
@@ -247,11 +249,28 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
 
 
 
-void XMaterialManager::queueLoadRequest(MaterialResource* pMaterial)
+void XMaterialManager::addLoadRequest(MaterialResource* pMaterial)
+{
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+	pMaterial->addReference(); // prevent instance sweep
+	pMaterial->setStatus(core::LoadStatus::Loading);
+
+	// queue it if over 16 active requests.
+	if (pendingRequests_.size() < 16)
+	{
+		dispatchLoad(pMaterial, lock);
+	}
+	else
+	{
+		queueLoadRequest(pMaterial, lock);
+	}
+}
+
+
+void XMaterialManager::queueLoadRequest(MaterialResource* pMaterial, core::CriticalSection::ScopedLock&)
 {
 	X_ASSERT(pMaterial->getName().isNotEmpty(), "Material has no name")();
-
-	core::CriticalSection::ScopedLock lock(loadReqLock_);
 
 	// can we know it's not in this queue just from status?
 	// like if it's complete it could be in this status
@@ -264,9 +283,20 @@ void XMaterialManager::queueLoadRequest(MaterialResource* pMaterial)
 
 	X_ASSERT(!requestQueue_.contains(pMaterial), "Queue already contains asset")(pMaterial);
 
-	pMaterial->addReference(); // prevent instance sweep
-	pMaterial->setStatus(core::LoadStatus::Loading);
 	requestQueue_.push(pMaterial);
+}
+
+
+void XMaterialManager::dispatchLoad(Material* pMaterial, core::CriticalSection::ScopedLock&)
+{
+	X_ASSERT(pMaterial->getStatus() == core::LoadStatus::Loading || pMaterial->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")();
+
+	auto loadReq = core::makeUnique<MaterialLoadRequest>(arena_, pMaterial);
+
+	// dispatch IO 
+	dispatchLoadRequest(loadReq.get());
+
+	pendingRequests_.emplace_back(loadReq.release());
 }
 
 
@@ -276,18 +306,14 @@ void XMaterialManager::dispatchPendingLoads(void)
 
 	while (requestQueue_.isNotEmpty())
 	{
-		auto* pMaterial = requestQueue_.peek();
-		X_ASSERT(pMaterial->getStatus() == core::LoadStatus::Loading, "Incorrect status")(pMaterial->getStatus());
-		auto loadReq = core::makeUnique<MaterialLoadRequest>(arena_, pMaterial);
+		X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
 
-		// dispatch IO 
-		dispatchLoadRequest(loadReq.get());
-
-		pendingRequests_.emplace_back(loadReq.release());
+		dispatchLoad(requestQueue_.peek(), lock);
 
 		requestQueue_.pop();
 	}
 }
+
 
 bool XMaterialManager::waitForLoad(Material* pMaterial)
 {

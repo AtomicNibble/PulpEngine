@@ -101,7 +101,9 @@ private:
 	void freeDanglingMaterials(void);
 	void releaseResources(Material* pMat);
 
-	void queueLoadRequest(MaterialResource* pMaterial);
+	void addLoadRequest(MaterialResource* pMaterial);
+	void queueLoadRequest(MaterialResource* pMaterial, core::CriticalSection::ScopedLock&);
+	void dispatchLoad(Material* pMaterial, core::CriticalSection::ScopedLock&);
 	bool waitForLoad(Material* pMaterial); // returns true if load succeed.
 	void dispatchLoadRequest(MaterialLoadRequest* pLoadReq);
 
