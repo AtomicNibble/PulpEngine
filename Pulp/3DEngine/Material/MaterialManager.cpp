@@ -469,10 +469,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 	}
 
 	if (!hdr.isValid()) {
-		return false;
-	}
-
-	if (hdr.numSamplers > MTL_MAX_SAMPLERS) {
+		X_ERROR("Material", "Header is invalid: \"%s\"", pMaterial->getName().c_str());
 		return false;
 	}
 
