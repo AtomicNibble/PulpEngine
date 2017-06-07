@@ -6,6 +6,7 @@
 #include "PathUtil.h"
 
 #include <Util\LastError.h>
+#include <Util\UniquePointer.h>
 
 #include <IConsole.h>
 #include <IDirectoryWatcher.h>
@@ -16,6 +17,7 @@
 
 #include <Memory\VirtualMem.h>
 #include <Threading\JobSystem2.h>
+#include <Time\StopWatch.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -140,7 +142,8 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
 	memFileArena_(&memfileAllocator_, "MemFileData"),
 	currentRequestIdx_(0),
 	requestSignal_(true),
-	requestData_(X_ASSERT_NOT_NULL(arena), IO_REQUEST_BUF_SIZE)
+	requests_(arena),
+	ioQueueDataArena_(arena)
 {
 	arena->addChildArena(&filePoolArena_);
 	arena->addChildArena(&asyncOpPoolArena_);
@@ -1312,32 +1315,35 @@ RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase& request)
 		X_ASSERT(request.callback, "Callback can't be null")(IoRequest::ToString(request.getType()), request.callback);
 	}
 
-	RequestHandle reqHandle = getNextRequestHandle();
 
 	if (vars_.QueDebug)
 	{
 		uint32_t threadId = core::Thread::GetCurrentID();
-
-		X_LOG0("FileSys","IoRequest(0x%x) type: %s", threadId,
-			IoRequest::ToString(request.getType()));
+		X_LOG0("FileSys","IoRequest(0x%x) type: %s", threadId, IoRequest::ToString(request.getType()));
 	}
 
 	const size_t reqSize = ioReqSize[request.getType()];
 
-	CriticalSection::ScopedLock lock(requestLock_);
-
-	while (reqSize > requestData_.freeSpace())
+	RequestHandle reqHandle;
 	{
-		requestLock_.Leave();
 
-		X_WARNING("FileSys", "IO que full, stalling util free space");
+		// we need to allocate memory for it and place pointer in que.
+		IoRequestBase* pRequest = reinterpret_cast<IoRequestBase*>(X_NEW_ARRAY(uint8_t, reqSize, ioQueueDataArena_, "IORequest"));
+		std::memcpy(pRequest, &request, reqSize);
+		
+		CriticalSection::ScopedLock lock(requestLock_);
 
-		core::Thread::Sleep(1);
-		requestLock_.Enter();
+#if X_ENABLE_FILE_STATS
+		auto addTime = core::StopWatch::GetTimeNow();
+		request.setAddTime(addTime);
+#endif // !X_ENABLE_FILE_STATS
+
+		reqHandle = getNextRequestHandle(); // syncronise.
+
+		requests_.push(pRequest);
 	}
 
-	// POD it like it's hot.
-	requestData_.write(&request, reqSize);
+	// raise after released lock.
 	requestSignal_.raise();
 
 	return reqHandle;
@@ -1361,28 +1367,26 @@ void xFileSys::ShutDownRequestWorker(void)
 {
 	ThreadAbstract::Stop();
 
-	// post a close job with a none null callback.
-	IoRequestClose closeRequest;
-	::memset(&closeRequest.callback, 1, sizeof(closeRequest.callback));
-
 	{
+		// post a close job with a none null callback.
+		IoRequestClose* pRequest = reinterpret_cast<IoRequestClose*>(X_NEW_ARRAY(uint8_t, sizeof(IoRequestClose), ioQueueDataArena_, "IORequestClose"));
+		core::Mem::Construct<IoRequestClose>(pRequest);
+		::memset(&pRequest->callback, 1, sizeof(pRequest->callback));
+		
 		CriticalSection::ScopedLock lock(requestLock_);
 
-		// push a few close jobs on to give chance for thread should run to get updated.
-		for (size_t i = 0; i < 10; i++) {
-			requestData_.write(&closeRequest, sizeof(closeRequest));
-		}
+		requests_.push(pRequest);
 	}
 		
 	requestSignal_.raise();
 	ThreadAbstract::Join();
 }
 
-void xFileSys::popRequest(RequestBuffer& buf)
+IoRequestBase* xFileSys::popRequest(void)
 {
 	CriticalSection::ScopedLock lock(requestLock_);
 
-	while (requestData_.isEmpty()) 
+	while (requests_.isEmpty())
 	{
 		requestLock_.Leave();
 		requestSignal_.wait();
@@ -1390,32 +1394,25 @@ void xFileSys::popRequest(RequestBuffer& buf)
 	}
 
 	// read the request you dirty little grass hoper.
-	IoRequestBase& base = requestData_.peek<IoRequestBase>();
-	const size_t reqSize = ioReqSize[base.getType()];
-
-	std::memcpy(buf.data(), &base, reqSize);
-
-	requestData_.skip<uint8_t>(reqSize);
+	auto* pReq = requests_.peek();
+	requests_.pop();
+	return pReq;
 }
 
-bool xFileSys::tryPopRequest(RequestBuffer& buf)
+IoRequestBase* xFileSys::tryPopRequest(void)
 {
 	CriticalSection::ScopedLock lock(requestLock_);
 
-	if (requestData_.isEmpty()) {
-		return false;
+	if (requests_.isEmpty()) {
+		return nullptr;
 	}
 
 	// if we got one make sure signal is cleared.
 	requestSignal_.clear();
 
-	IoRequestBase& base = requestData_.peek<IoRequestBase>();
-	const size_t reqSize = ioReqSize[base.getType()];
-
-	std::memcpy(buf.data(), &base, reqSize);
-
-	requestData_.skip<uint8_t>(reqSize);
-	return true;
+	auto* pReq = requests_.peek();
+	requests_.pop();
+	return pReq;
 }
 
 void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
@@ -1522,24 +1519,25 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 	xFileSys& fileSys = *this;
 
-	RequestBuffer X_ALIGNED_SYMBOL(requestBuffer, 16);
-	IoRequestBase* pRequest = reinterpret_cast<IoRequestBase*>(&requestBuffer);
+	IoRequestBase* pRequest = nullptr;
 
 	XOsFileAsyncOperation::ComplitionRotinue compRoutine;
 	compRoutine.Bind<xFileSys, &xFileSys::AsyncIoCompletetionRoutine>(this);
-
 
 	while (thread.ShouldRun())
 	{
 		if (pendingOps_.isEmpty())
 		{
-			popRequest(requestBuffer);
+			pRequest = popRequest();
 		}
 		else
 		{
-			// wait for any requests in a alertable state.
-			// so we wake for either async op completing or new requests need processing
-			while(!tryPopRequest(requestBuffer)) 
+			// we have pending requests, lets quickly enter a alertable state.
+			// then we will try get more requests, untill we get more requests
+			// we just stay in a alertable state, so that any pending requests can handled.
+			requestSignal_.wait(0, true);
+
+			while((pRequest = tryPopRequest()) == nullptr)
 			{
 				requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
 
@@ -1551,11 +1549,15 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			// we have a request.
 		}
 
-		const auto type = pRequest->getType();
+		core::UniquePointer<uint8_t[]> deleteReq(ioQueueDataArena_, reinterpret_cast<uint8_t*>(pRequest));
 
 #if X_ENABLE_FILE_STATS
-		++stats_.RequestCounts[type];
+		const auto type = pRequest->getType();
+		auto start = core::StopWatch::GetTimeNow();
 #endif // !X_ENABLE_FILE_STATS
+		
+		// auto processDelay = start - pRequest->getAddTime();
+
 
 		if (type == IoRequest::OPEN)
 		{
@@ -1576,7 +1578,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			if (!pFile)
 			{
 				pOpenRead->callback.Invoke(fileSys, pOpenRead, pFile, 0);
-				continue;
+				goto nextRequest;
 			}
 			
 			const uint64_t fileSize = pFile->fileSize();
@@ -1667,6 +1669,14 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 			pendingOps_.emplace_back(*pWrite, operation);
 		}
+
+	nextRequest:
+#if X_ENABLE_FILE_STATS
+		auto end = core::StopWatch::GetTimeNow();
+
+		++stats_.RequestCounts[type];
+		stats_.RequestTime[type] += (end - start).GetValue();
+#endif // !X_ENABLE_FILE_STATS
 	}
 
 	return Thread::ReturnValue(0);

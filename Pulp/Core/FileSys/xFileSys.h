@@ -6,6 +6,8 @@
 #include "Vars\FileSysVars.h"
 
 #include <Containers\HashMap.h>
+#include <Containers\PriorityQueue.h>
+#include <Containers\FixedFifo.h>
 
 X_DISABLE_WARNING(4702)
 #include <unordered_set>
@@ -71,6 +73,13 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 		XFileAsyncOperationCompiltion op;
 	};
 
+	struct iorequest_less
+	{
+		bool operator()(const IoRequestBase* lhs, const IoRequestBase* rhs) const
+		{
+			return (lhs->getType() < rhs->getType());
+		}
+	};
 
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -139,7 +148,6 @@ public:
 		sizeof(IoRequestWrite))))
 	);
 
-	static const size_t IO_REQUEST_BUF_SIZE = MAX_REQ_SIZE * 0x100;
 	static const size_t PENDING_IO_QUE_SIZE = 0x100;
 
 	typedef std::array<uint8_t, MAX_REQ_SIZE> RequestBuffer;
@@ -234,8 +242,8 @@ public:
 	void ShutDownRequestWorker(void);
 
 private:
-	void popRequest(RequestBuffer& buf);
-	bool tryPopRequest(RequestBuffer& buf);
+	IoRequestBase* popRequest(void);
+	IoRequestBase* tryPopRequest(void);
 	void onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd);
 
 	void AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd);
@@ -297,7 +305,9 @@ private:
 
 	core::CriticalSection requestLock_;
 	core::Signal requestSignal_;
-	core::ByteStreamFifo requestData_;		// requests are serialized into this as they are of varing sizes.
+
+	core::PriorityQueue<IoRequestBase*, core::Array<IoRequestBase*>, iorequest_less> requests_;
+	core::MemoryArenaBase* ioQueueDataArena_;
 
 	AsyncOps pendingOps_;
 
