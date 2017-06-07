@@ -393,7 +393,8 @@ void XMaterialManager::loadRequestCleanup(MaterialLoadRequest* pLoadReq)
 {
 	pLoadReq->loadTime = core::StopWatch::GetTimeNow();
 
-	X_LOG0("Material", "Material loaded in: ^6%fms", (pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds());
+	auto status = pLoadReq->pMaterial->getStatus();
+	X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
 	{
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 		pendingRequests_.remove(pLoadReq);
