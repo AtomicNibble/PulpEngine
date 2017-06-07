@@ -17,7 +17,6 @@ public:
 	//		inllValue - positive negative, absolute or relative in 1 second= PRECISION units.
 	explicit X_INLINE TimeVal(const TimeType inllValue);
 	X_INLINE TimeVal(const TimeVal &inValue);
-	X_INLINE ~TimeVal();
 
 
 	X_INLINE TimeVal& operator=(const TimeVal &inRhs);

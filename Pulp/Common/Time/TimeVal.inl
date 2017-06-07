@@ -24,12 +24,6 @@ X_INLINE TimeVal::TimeVal(const TimeVal &inValue)
 	time_ = inValue.time_;
 }
 
-X_INLINE TimeVal::~TimeVal()
-{
-
-}
-
-
 X_INLINE TimeVal& TimeVal::operator=(const TimeVal &inRhs)
 {
 	time_ = inRhs.time_;
