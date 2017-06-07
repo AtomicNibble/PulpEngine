@@ -1508,7 +1508,7 @@ void XWindow::calcClientRect(void)
 
 void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, float x_, float y_)
 {
-	X_UNUSED(pDrawCon);
+	X_UNUSED(pDrawCon, time);
 
 	// draw the text.
 	if (text_.getLength() == 0) {
