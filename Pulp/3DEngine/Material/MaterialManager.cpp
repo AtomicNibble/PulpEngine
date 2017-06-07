@@ -516,6 +516,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 
 	TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, catType);
 	if (!pTechDefState) {
+		X_ERROR("Material", "Failed to get techdefstate");
 		return false;
 	}
 
