@@ -410,7 +410,6 @@ void XMaterialManager::IoRequestCallback(core::IFileSys& fileSys, const core::Io
 		pLoadReq->data = core::makeUnique<uint8_t[]>(blockArena_, fileSize, 16);
 		pLoadReq->dataSize = fileSize;
 
-		// read the header.
 		core::IoRequestRead read;
 		read.callback.Bind<XMaterialManager, &XMaterialManager::IoRequestCallback>(this);
 		read.pUserData = pLoadReq;
