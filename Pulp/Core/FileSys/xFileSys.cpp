@@ -55,56 +55,19 @@ namespace
 } // namespace
 
 
-
-xFileSys::PendingOp::PendingOp(const IoRequestRead& req, const XFileAsyncOperationCompiltion& op) :
-	readReq(req),
+xFileSys::PendingOp::PendingOp(IoRequestBase* pReq, const XFileAsyncOperationCompiltion& op) :
+	pRequest(X_ASSERT_NOT_NULL(pReq)),
 	op(op)
 {
+
 }
 
-xFileSys::PendingOp::PendingOp(const IoRequestWrite& req, const XFileAsyncOperationCompiltion& op) :
-	writeReq(req),
-	op(op)
-{
-}
-
-xFileSys::PendingOp::PendingOp(const IoRequestOpenRead& req, const XFileAsyncOperationCompiltion& op) :
-	openReadReq(req),
-	op(op)
-{
-	X_ASSERT_NOT_NULL(req.arena);
-	X_ASSERT_NOT_NULL(req.pFile);
-	X_ASSERT_NOT_NULL(req.pBuf);
-}
 
 X_INLINE IoRequest::Enum xFileSys::PendingOp::getType(void) const
 {
-	return readReq.getType();
+	return pRequest->getType();
 }
 
-xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
-{
-	op = std::move(oth.op);
-
-	switch (oth.getType())
-	{
-		case IoRequest::READ:
-			readReq = std::move(oth.readReq);
-			break;
-		case IoRequest::WRITE:
-			writeReq = std::move(oth.writeReq);
-			break;
-		case IoRequest::OPEN_READ_ALL:
-			openReadReq = std::move(oth.openReadReq);
-			break;
-		default:
-			X_ASSERT_UNREACHABLE();
-			break;
-	}
-
-	X_ASSERT(getType() == oth.getType(), "Types don't match")();
-	return *this;
-}
 
 // --------------------------------------------------------------
 
@@ -1302,52 +1265,75 @@ RequestHandle xFileSys::AddCloseRequestToQue(core::XFileAsync* pFile)
 
 RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase& request)
 {
-	static_assert(std::is_unsigned<RequestHandle>::value, "Logic makes use of wrap around, so must be unsigned");
+	IoRequestBase* pRequest = nullptr;
 
-	if (request.getType() == IoRequest::CLOSE) {
-		if (request.callback) {
-			const IoRequestClose& closeReq = static_cast<const IoRequestClose&>(request);
-			X_ERROR("FileSys", "Close request can't have a callback. pfile: %p", closeReq.pFile);
+	switch (request.getType())
+	{
+		case IoRequest::OPEN:
+			pRequest = X_NEW(IoRequestOpen, ioQueueDataArena_, "IORequestOpen")(static_cast<IoRequestOpen&>(request));
+			break;
+		case IoRequest::OPEN_READ_ALL:
+			pRequest = X_NEW(IoRequestOpenRead, ioQueueDataArena_, "IoRequestOpenRead")(static_cast<IoRequestOpenRead&>(request));
+			break;
+		case IoRequest::READ:
+			pRequest = X_NEW(IoRequestRead, ioQueueDataArena_, "IoRequestRead")(static_cast<IoRequestRead&>(request));
+			break;
+		case IoRequest::WRITE:
+			pRequest = X_NEW(IoRequestWrite, ioQueueDataArena_, "IoRequestWrite")(static_cast<IoRequestWrite&>(request));
+			break;
+		case IoRequest::CLOSE:
+			pRequest = X_NEW(IoRequestClose, ioQueueDataArena_, "IoRequestClose")(static_cast<IoRequestClose&>(request));
+			break;
+		default:
+			X_NO_SWITCH_DEFAULT;
+			break;
+	}
+
+	return AddIoRequestToQue(pRequest);
+}
+
+RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase* pRequest)
+{
+	static_assert(std::is_unsigned<RequestHandle>::value, "Logic makes use of wrap around, so must be unsigned");
+	X_ASSERT_NOT_NULL(pRequest);
+
+	if (pRequest->getType() == IoRequest::CLOSE) {
+		if (pRequest->callback) {
+			const IoRequestClose* pCloseReq = static_cast<const IoRequestClose*>(pRequest);
+			X_ERROR("FileSys", "Close request can't have a callback. pfile: %p", pCloseReq->pFile);
 			return INVALID_IO_REQ_HANDLE;
 		}
 	}
 	else {
-		X_ASSERT(request.callback, "Callback can't be null")(IoRequest::ToString(request.getType()), request.callback);
+		X_ASSERT(pRequest->callback, "Callback can't be null")(IoRequest::ToString(pRequest->getType()), pRequest->callback);
 	}
 
 
 	if (vars_.QueDebug)
 	{
 		uint32_t threadId = core::Thread::GetCurrentID();
-		X_LOG0("FileSys","IoRequest(0x%x) type: %s", threadId, IoRequest::ToString(request.getType()));
+		X_LOG0("FileSys", "IoRequest(0x%x) type: %s", threadId, IoRequest::ToString(pRequest->getType()));
 	}
 
-	const size_t reqSize = ioReqSize[request.getType()];
 
 	RequestHandle reqHandle;
 	{
-
-		// we need to allocate memory for it and place pointer in que.
-		IoRequestBase* pRequest = reinterpret_cast<IoRequestBase*>(X_NEW_ARRAY(uint8_t, reqSize, ioQueueDataArena_, "IORequest"));
-		std::memcpy(pRequest, &request, reqSize);
-		
 		CriticalSection::ScopedLock lock(requestLock_);
 
 #if X_ENABLE_FILE_STATS
 		auto addTime = core::StopWatch::GetTimeNow();
-		request.setAddTime(addTime);
+		pRequest->setAddTime(addTime);
 #endif // !X_ENABLE_FILE_STATS
 
-		reqHandle = getNextRequestHandle(); // syncronise.
+		reqHandle = getNextRequestHandle(); 
 
 		requests_.push(pRequest);
 	}
 
-	// raise after released lock.
 	requestSignal_.raise();
-
 	return reqHandle;
 }
+
 
 void xFileSys::CancelRequest(RequestHandle handle)
 {
@@ -1369,8 +1355,7 @@ void xFileSys::ShutDownRequestWorker(void)
 
 	{
 		// post a close job with a none null callback.
-		IoRequestClose* pRequest = reinterpret_cast<IoRequestClose*>(X_NEW_ARRAY(uint8_t, sizeof(IoRequestClose), ioQueueDataArena_, "IORequestClose"));
-		core::Mem::Construct<IoRequestClose>(pRequest);
+		IoRequestClose* pRequest = X_NEW(IoRequestClose, ioQueueDataArena_, "IORequestClose");
 		::memset(&pRequest->callback, 1, sizeof(pRequest->callback));
 		
 		CriticalSection::ScopedLock lock(requestLock_);
@@ -1419,8 +1404,8 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 {
 	if (asyncOp.getType() == IoRequest::READ)
 	{
-		const IoRequestRead& asyncReq = asyncOp.readReq;
-		XFileAsync* pReqFile = asyncReq.pFile;
+		const IoRequestRead* pAsyncReq = asyncOp.as<const IoRequestRead>();
+		XFileAsync* pReqFile = pAsyncReq->pFile;
 
 		if (vars_.QueDebug)
 		{
@@ -1428,16 +1413,17 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 
 			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async read request complete. "
 				"bytesTrans: 0x%x pBuf: %p",
-				threadId, IoRequest::ToString(asyncReq.getType()),
-				bytesTransferd, asyncReq.pBuf);
+				threadId, IoRequest::ToString(pAsyncReq->getType()),
+				bytesTransferd, pAsyncReq->pBuf);
 		}
 
-		asyncReq.callback.Invoke(*this, &asyncReq, pReqFile, bytesTransferd);
+		pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
 	}
 	else if (asyncOp.getType() == IoRequest::WRITE)
 	{
-		const IoRequestWrite& asyncReq = asyncOp.writeReq;
-		XFileAsync* pReqFile = asyncReq.pFile;
+		const IoRequestWrite* pAsyncReq = asyncOp.as<const IoRequestWrite>();
+
+		XFileAsync* pReqFile = pAsyncReq->pFile;
 
 		if (vars_.QueDebug)
 		{
@@ -1445,16 +1431,17 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 
 			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async write request complete. "
 				"bytesTrans: 0x%x pBuf: %p",
-				threadId, IoRequest::ToString(asyncReq.getType()),
-				bytesTransferd, asyncReq.pBuf);
+				threadId, IoRequest::ToString(pAsyncReq->getType()),
+				bytesTransferd, pAsyncReq->pBuf);
 		}
 
-		asyncReq.callback.Invoke(*this, &asyncReq, pReqFile, bytesTransferd);
+		pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
 	}
 	else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL)
 	{
-		IoRequestOpenRead& asyncReq = asyncOp.openReadReq;
-		XFileAsync* pReqFile = asyncReq.pFile;
+		IoRequestOpenRead* pAsyncReq = asyncOp.as<IoRequestOpenRead>();
+
+		XFileAsync* pReqFile = pAsyncReq->pFile;
 
 		if (vars_.QueDebug)
 		{
@@ -1462,24 +1449,24 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 
 			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-read request complete. "
 				"bytesTrans: 0x%x pBuf: %p",
-				threadId, IoRequest::ToString(asyncReq.getType()),
-				bytesTransferd, asyncReq.pBuf);
+				threadId, IoRequest::ToString(pAsyncReq->getType()),
+				bytesTransferd, pAsyncReq->pBuf);
 		}
 
-		if (asyncReq.dataSize != bytesTransferd)
+		if (pAsyncReq->dataSize != bytesTransferd)
 		{
 			X_ERROR("FileSys", "Failed to read whole file contents. requested: %" PRIu32 " got %" PRIu32,
-				asyncReq.dataSize, bytesTransferd);
+				pAsyncReq->dataSize, bytesTransferd);
 
-			X_DELETE_ARRAY(static_cast<uint8_t*>(asyncReq.pBuf), asyncReq.arena);
+			X_DELETE_ARRAY(static_cast<uint8_t*>(pAsyncReq->pBuf), pAsyncReq->arena);
 			// we didnt not read the whole file, pretend we failed to open.
-			asyncReq.pBuf = nullptr;
-			asyncReq.dataSize = 0;
-			asyncReq.callback.Invoke(*this, &asyncReq, nullptr, 0);
+			pAsyncReq->pBuf = nullptr;
+			pAsyncReq->dataSize = 0;
+			pAsyncReq->callback.Invoke(*this, pAsyncReq, nullptr, 0);
 		}
 		else
 		{
-			asyncReq.callback.Invoke(*this, &asyncReq, pReqFile, bytesTransferd);
+			pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
 		}
 
 		// close it.
@@ -1504,6 +1491,7 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
 		{
 			onOpFinsihed(asyncOp, bytesTransferd);
 
+			X_DELETE(asyncOp.pRequest, ioQueueDataArena_);
 			pendingOps_.removeIndex(i);
 			return;
 		}
@@ -1549,15 +1537,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			// we have a request.
 		}
 
-		core::UniquePointer<uint8_t[]> deleteReq(ioQueueDataArena_, reinterpret_cast<uint8_t*>(pRequest));
+		core::UniquePointer<IoRequestBase> requestPtr(ioQueueDataArena_, pRequest);
 
 #if X_ENABLE_FILE_STATS
 		const auto type = pRequest->getType();
 		auto start = core::StopWatch::GetTimeNow();
 #endif // !X_ENABLE_FILE_STATS
 		
-		// auto processDelay = start - pRequest->getAddTime();
-
 
 		if (type == IoRequest::OPEN)
 		{
@@ -1615,7 +1601,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				pOpenRead->pBuf = pData;
 				pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
 
-				pendingOps_.emplace_back(*pOpenRead, operation);
+				pendingOps_.emplace_back(requestPtr.release(), operation);
 			}
 			
 		}
@@ -1649,7 +1635,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 			operation.hasFinished();
 
-			pendingOps_.emplace_back(*pRead,operation);
+			pendingOps_.emplace_back(requestPtr.release(), operation);
 		}
 		else if (type == IoRequest::WRITE)
 		{
@@ -1667,7 +1653,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-			pendingOps_.emplace_back(*pWrite, operation);
+			pendingOps_.emplace_back(requestPtr.release(), operation);
 		}
 
 	nextRequest:

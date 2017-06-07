@@ -56,20 +56,16 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 {
 	struct PendingOp
 	{
-		PendingOp(const IoRequestRead& req, const XFileAsyncOperationCompiltion& op);
-		PendingOp(const IoRequestWrite& req, const XFileAsyncOperationCompiltion& op);
-		PendingOp(const IoRequestOpenRead& req, const XFileAsyncOperationCompiltion& op);
+		PendingOp(IoRequestBase* pReq, const XFileAsyncOperationCompiltion& op);
 
 		IoRequest::Enum getType(void) const;
 
-		PendingOp& operator=(PendingOp&& oth);
+		template<typename T>
+		X_INLINE T* as(void) const {
+			return reinterpret_cast<T*>(pRequest);
+		}
 
-		union
-		{
-			IoRequestRead readReq;
-			IoRequestWrite writeReq;
-			IoRequestOpenRead openReadReq; // this is a big fucker
-		};
+		IoRequestBase* pRequest;
 		XFileAsyncOperationCompiltion op;
 	};
 
@@ -237,6 +233,7 @@ public:
 	// IoRequest que.
 	RequestHandle AddCloseRequestToQue(core::XFileAsync* pFile) X_FINAL;
 	RequestHandle AddIoRequestToQue(IoRequestBase& request) X_FINAL;
+	RequestHandle AddIoRequestToQue(IoRequestBase* pRequest);
 	void CancelRequest(RequestHandle handle);
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);
