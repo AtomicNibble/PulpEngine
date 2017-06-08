@@ -486,8 +486,7 @@ bool AssetDB::PerformMigrations(void)
 			if (!file.openFile(filePath.c_str(), 
 				core::fileMode::READ |
 				core::fileMode::WRITE |
-				core::fileMode::RANDOM_ACCESS |
-				core::fileMode::SHARE))
+				core::fileMode::RANDOM_ACCESS))
 			{
 				X_ERROR("AssetDB", "Failed to open rawfile");
 				return false;
@@ -565,8 +564,7 @@ bool AssetDB::PerformMigrations(void)
 			if (!file.openFile(filePath.c_str(),
 				core::fileMode::READ |
 				core::fileMode::WRITE |
-				core::fileMode::RANDOM_ACCESS |
-				core::fileMode::SHARE))
+				core::fileMode::RANDOM_ACCESS))
 			{
 				X_ERROR("AssetDB", "Failed to open rawfile");
 				return false;
@@ -2029,7 +2027,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 
 			core::fileModeFlags mode;
 			mode.Set(core::fileMode::WRITE);
-			mode.Set(core::fileMode::SHARE);
 
 			core::XFileScoped file;
 
