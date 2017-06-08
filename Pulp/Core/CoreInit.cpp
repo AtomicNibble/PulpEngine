@@ -307,7 +307,10 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 	X_LOG0("Engine", "ModuleInit \"%s\", MemUsage=%s ^6%gms", pName ? (pName +1) : dllName, core::HumanSize::toString(sizeStr, memUsed), time.GetMilliSeconds());
 #else
 
+#if X_SUPER == 0
 	X_LOG0("Engine", "ModuleInit \"%s\": %s ^6%gms", pName ? (pName + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
+#endif // !X_SUPER
+
 #endif // #if !defined(X_LIB) 
 
 	return res;
