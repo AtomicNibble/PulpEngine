@@ -664,6 +664,107 @@ bool AssetDB::PerformMigrations(void)
 	return true;
 }
 
+bool AssetDB::chkdsk(bool updateDB)
+{
+	core::StackString<1024, char> msg;
+	msg.appendFmt("Performing chkdsk for rawfiles. it's recommended to back up the ", dbVersion_, DB_VERSION);
+	msg.appendFmt("'%s' folder before pressin Ok. Cancel will skip.", ASSET_DB_FOLDER);
+
+	const auto res = core::msgbox::show(msg.c_str(), "AssetDB chkdsk", core::msgbox::Buttons::OKCancel);
+	if (res == core::msgbox::Selection::Cancel)
+	{
+		return false;
+	}
+
+
+	DataArr data(g_AssetDBArena);
+
+	// transaction for the update.
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
+
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		int32_t rawFileId = row.get<int32_t>(0);
+		RawFile rawfileInfo;
+
+		if (!GetRawfileForRawId(rawFileId, rawfileInfo))
+		{
+			X_ERROR("AssetDB", "Failed to get rawfile path");
+			return false;
+		}
+
+		core::Path<char> filePath;
+		AssetPathForRawFile(rawfileInfo, filePath);
+
+		core::XFileScoped file;
+		if (!file.openFile(filePath.c_str(),
+			core::fileMode::READ |
+			core::fileMode::WRITE |
+			core::fileMode::RANDOM_ACCESS))
+		{
+			X_ERROR("AssetDB", "Failed to open rawfile");
+			return false;
+		}
+
+		const int32_t fileSize = safe_static_cast<int32_t>(file.remainingBytes());
+		data.resize(fileSize);
+
+		if (file.read(data.data(), data.size()) != data.size())
+		{
+			X_ERROR("AssetDB", "Failed to read RawFile Data");
+			return false;
+		}
+
+		file.close();
+
+		const auto dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
+
+		if (rawfileInfo.size != fileSize || rawfileInfo.hash != dataCrc)
+		{
+			X_ERROR("AssetDB", "RawFile Data don't match RawFile Entry. size: %" PRIi32 " -> %" PRIi32 " hash: %" PRIu32 " -> %" PRIu32,
+				rawfileInfo.size, fileSize, rawfileInfo.hash, dataCrc);
+
+			if (updateDB)
+			{
+				// need to update rawFile size colum
+				sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ? WHERE file_id = ?");
+				cmd.bind(1, safe_static_cast<int32_t>(data.size()));
+				cmd.bind(2, static_cast<int32_t>(dataCrc));
+				cmd.bind(3, rawFileId);
+
+				sql::Result::Enum res = cmd.execute();
+				if (res != sql::Result::OK) {
+					X_ERROR("AssetDB", "Failed to update RawFileData");
+					return false;
+				}
+
+				if (rawfileInfo.size != fileSize)
+				{
+					// need to move file.
+					core::Path<char> filePathNew;
+					rawfileInfo.hash = dataCrc;
+					AssetPathForRawFile(rawfileInfo, filePathNew);
+
+					if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
+						X_ERROR("AssetDB", "Failed to move asset raw file");
+						return false;
+					}
+				}
+			}
+		}
+	}
+
+	trans.commit();
+	return true;
+}
+
 
 bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 {
