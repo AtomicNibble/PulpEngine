@@ -1656,7 +1656,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			pendingOps_.emplace_back(requestPtr.release(), operation);
 		}
 
-	nextRequest:
+	nextRequest:;
 #if X_ENABLE_FILE_STATS
 		auto end = core::StopWatch::GetTimeNow();
 
