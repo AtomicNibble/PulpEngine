@@ -636,7 +636,7 @@ bool AssetDB::PerformMigrations(void)
 			dataCrc = pCrc32->Finish(dataCrc);
 
 			// need to update rawFile size colum
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ?, WHERE file_id = ?");
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ? WHERE file_id = ?");
 			cmd.bind(1, safe_static_cast<int32_t>(data.size()));
 			cmd.bind(2, static_cast<int32_t>(dataCrc));
 			cmd.bind(3, rawFileId);
