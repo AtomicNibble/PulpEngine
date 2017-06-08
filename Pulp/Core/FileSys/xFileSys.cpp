@@ -1538,9 +1538,9 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		}
 
 		core::UniquePointer<IoRequestBase> requestPtr(ioQueueDataArena_, pRequest);
+		const auto type = pRequest->getType();
 
 #if X_ENABLE_FILE_STATS
-		const auto type = pRequest->getType();
 		auto start = core::StopWatch::GetTimeNow();
 #endif // !X_ENABLE_FILE_STATS
 		
