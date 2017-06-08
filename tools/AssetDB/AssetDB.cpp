@@ -2205,6 +2205,11 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 		return false;
 	}
 
+#if X_ENABLE_ASSERTIONS
+	const auto bytesLeft = file.remainingBytes();
+	X_ASSERT(bytesLeft == 0, "Failed to read whole rawAsset")(bytesLeft);
+#endif // X_ENABLE_ASSERTIONS
+
 	// decompress it.
 	if (!InflateBuffer(g_AssetDBArena, compressedData, dataOut)) {
 		X_ERROR("AssetDB", "Failed to read rawfile, error inflating");
