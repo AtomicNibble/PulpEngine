@@ -407,6 +407,12 @@ void XMaterialManager::loadRequestCleanup(MaterialLoadRequest* pLoadReq)
 
 	auto status = pLoadReq->pMaterial->getStatus();
 	X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
+
+	X_LOG0("Material", "Material loaded in: ^6%fms^7 io:^6%fms",
+		(pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds(),
+		(pLoadReq->ioTime - pLoadReq->dispatchTime).GetMilliSeconds()
+	);
+	
 	{
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 		pendingRequests_.remove(pLoadReq);
@@ -434,6 +440,8 @@ void XMaterialManager::IoRequestCallback(core::IFileSys& fileSys, const core::Io
 
 	if (requestType == core::IoRequest::OPEN)
 	{
+		pLoadReq->ioTime = core::StopWatch::GetTimeNow();
+
 		if (!pFile)
 		{
 			X_ERROR("Material", "Failed to load: \"%s\"", pMaterial->getName().c_str());
@@ -488,6 +496,7 @@ void XMaterialManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threa
 
 	core::XFileFixedBuf file(pLoadReq->data.ptr(), pLoadReq->data.ptr() + pLoadReq->dataSize);
 	
+
 	if (!processData(pMaterial, &file))
 	{
 		onLoadRequestFail(pLoadReq);

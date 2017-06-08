@@ -47,6 +47,7 @@ struct MaterialLoadRequest
 	core::UniquePointer<uint8_t[]> data;
 	uint32_t dataSize;
 	core::TimeVal dispatchTime;
+	core::TimeVal ioTime;
 	core::TimeVal loadTime;
 };
 
