@@ -615,7 +615,6 @@ bool AssetDB::PerformMigrations(void)
 			hdr.deflatedSize = oldHdr.deflatedSize;
 			hdr.inflatedSize = oldHdr.inflatedSize;
 			
-
 			file.seek(0, core::SeekMode::SET);
 			if (file.writeObj(hdr) != sizeof(hdr))
 			{
@@ -628,6 +627,8 @@ bool AssetDB::PerformMigrations(void)
 				X_ERROR("AssetDB", "Failed to write RawFile data");
 				return false;
 			}
+
+			file.close();
 
 			core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 			uint32_t dataCrc = pCrc32->Begin();
@@ -647,6 +648,15 @@ bool AssetDB::PerformMigrations(void)
 				return false;
 			}
 
+			// need to move file.
+			core::Path<char> filePathNew;
+			rawfileInfo.hash = dataCrc;
+			AssetPathForRawFile(rawfileInfo, filePathNew);
+
+			if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
+				X_ERROR("AssetDB", "Failed to move asset raw file");
+				return false;
+			}
 		}
 
 	}
