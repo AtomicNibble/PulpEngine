@@ -424,16 +424,13 @@ namespace profiler
 			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s')))
 			{
 				area = RenderStartupData(pos);
+				pos.x += area.x + padding;
 			}
 
 			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('m')))
 			{
 				auto strAllocStats = gEnv->pStrArena->getAllocatorStatistics();
 				auto allocStats = gEnv->pArena->getAllocatorStatistics(true);
-
-				if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s'))) {
-					pos.x += area.x + padding;
-				}
 
 				core::MemoryAllocatorStatistics::Str str;
 				strAllocStats.toString(str);
@@ -451,6 +448,7 @@ namespace profiler
 
 			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('f')))
 			{
+
 				core::xFileSys* pFileSys = static_cast<core::xFileSys*>(gEnv->pFileSys);
 
 				core::XFileStats::Str str1, str2;
