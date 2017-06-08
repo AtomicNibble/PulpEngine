@@ -539,6 +539,9 @@ bool AssetDB::PerformMigrations(void)
 
 		DataArr data(g_AssetDBArena);
 
+		// transaction for the update.
+		sql::SqlLiteTransaction trans(db_);
+
 		auto it = qry.begin();
 		for (; it != qry.end(); ++it)
 		{
@@ -627,6 +630,25 @@ bool AssetDB::PerformMigrations(void)
 				X_ERROR("AssetDB", "Failed to write RawFile data");
 				return false;
 			}
+
+			core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+			uint32_t dataCrc = pCrc32->Begin();
+			pCrc32->Update(&hdr, sizeof(hdr), dataCrc);
+			pCrc32->Update(data.ptr(), data.size(), dataCrc);
+			dataCrc = pCrc32->Finish(dataCrc);
+
+			// need to update rawFile size colum
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ?, WHERE file_id = ?");
+			cmd.bind(1, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(2, static_cast<int32_t>(dataCrc));
+			cmd.bind(3, rawFileId);
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				X_ERROR("AssetDB", "Failed to update RawFileData");
+				return false;
+			}
+
 		}
 
 	}
