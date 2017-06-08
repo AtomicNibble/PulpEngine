@@ -637,7 +637,7 @@ bool AssetDB::PerformMigrations(void)
 
 			// need to update rawFile size colum
 			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ?, WHERE file_id = ?");
-			cmd.bind(1, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(1, safe_static_cast<int32_t>(data.size()));
 			cmd.bind(2, static_cast<int32_t>(dataCrc));
 			cmd.bind(3, rawFileId);
 
@@ -1832,7 +1832,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		{
 			sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
 			cmd.bind(1, path.c_str());
-			cmd.bind(2, safe_static_cast<int32_t, size_t>(compressedData.size()));
+			cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
 			cmd.bind(3, static_cast<int32_t>(dataCrc));
 
 			sql::Result::Enum res = cmd.execute();
@@ -1860,7 +1860,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		// just update.
 		sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
 		cmd.bind(1, path.c_str());
-		cmd.bind(2, safe_static_cast<int32_t, size_t>(compressedData.size()));
+		cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
 		cmd.bind(3, static_cast<int32_t>(dataCrc));
 		cmd.bind(4, rawId);
 
@@ -2055,7 +2055,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 			cmd.bind(2, thumbDim.y);
 			cmd.bind(3, srcDim.x);
 			cmd.bind(4, srcDim.y);
-			cmd.bind(5, safe_static_cast<int32_t, size_t>(compressedData.size()));
+			cmd.bind(5, safe_static_cast<int32_t>(compressedData.size()));
 			cmd.bind(6, &hash, sizeof(hash));
 
 			sql::Result::Enum res = cmd.execute();
@@ -2087,7 +2087,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 		cmd.bind(2, thumbDim.y);
 		cmd.bind(3, srcDim.x);
 		cmd.bind(4, srcDim.y);
-		cmd.bind(5, safe_static_cast<int32_t, size_t>(compressedData.size()));
+		cmd.bind(5, safe_static_cast<int32_t>(compressedData.size()));
 		cmd.bind(6, &hash, sizeof(hash));
 		cmd.bind(7, thumbId);
 
