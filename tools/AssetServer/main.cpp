@@ -72,8 +72,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	core::MallocFreeAllocator allocator;
 	AssertServerArena arena(&allocator, "AssetServerArena");
 
-	bool res = false;
-
 	{
 		EngineApp engine;
 

@@ -40,10 +40,10 @@ Bone::~Bone()
 // ================================================
 
 PotatoAnimExporter::PotatoAnimExporter() : 
-	fps_(anim::ANIM_DEFAULT_FPS),
 	intermidiate_(false),
-	bones_(g_arena),
-	type_(anim::AnimType::RELATIVE)
+	fps_(anim::ANIM_DEFAULT_FPS),
+	type_(anim::AnimType::RELATIVE),
+	bones_(g_arena)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Anim ===========");
 }
