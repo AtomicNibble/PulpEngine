@@ -72,6 +72,7 @@ X_INLINE Material::Material(core::string& name, core::MemoryArenaBase* arena) :
 	textures_.setGranularity(4);
 
 	surfaceType_ = MaterialSurType::NONE;
+	coverage_ = MaterialCoverage::OPAQUE;
 	polyOffsetType_ = MaterialPolygonOffset::NONE;
 	mountType_ = MaterialMountType::NONE;
 
