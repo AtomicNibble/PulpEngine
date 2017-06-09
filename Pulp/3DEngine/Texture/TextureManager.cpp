@@ -203,8 +203,10 @@ void TextureManager::dispatchRead(Texture* pTexture)
 	// lets dispatch a IO request to read the image data.
 	// where to we store the data?
 	// we want fixed buffers for streaming.
-	core::Path<char> path(pTexture->getName());
-	path.toLower(); // lower case file names only.
+	core::Path<char> path;
+	path /= "imgs";
+	path /= pTexture->getName();
+	path.toLower(); 
 	path.setExtension(texture::CI_FILE_EXTENSION);
 
 	core::IFileSys::fileModeFlags mode;
