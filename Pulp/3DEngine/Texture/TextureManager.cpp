@@ -216,35 +216,65 @@ void TextureManager::dispatchRead(Texture* pTexture)
 	core::IoCallBack del;
 	del.Bind<TextureManager, &TextureManager::IoRequestCallback>(this);
 
-	core::IoRequestOpenRead req;
+	core::IoRequestOpen req;
 	req.callback = del;
 	req.pUserData = pTexture;
 	req.mode = mode;
 	req.path = path;
-	req.arena = &blockArena_;
 	
 	gEnv->pFileSys->AddIoRequestToQue(req);
 }
 
-void TextureManager::IoRequestCallback(core::IFileSys&, const core::IoRequestBase* pReqBase, core::XFileAsync* pFile, uint32_t bytesRead)
+void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pReqBase, core::XFileAsync* pFile, uint32_t bytesRead)
 {
 	// who is this?
-	if (pReqBase->getType() == core::IoRequest::OPEN_READ_ALL)
-	{
-		auto* pReq = static_cast<const core::IoRequestOpenRead*>(pReqBase);
-		Texture* pTexture = static_cast<Texture*>(pReq->pUserData);
-		auto& flags = pTexture->flags();
+	auto type = pReqBase->getType();
+	Texture* pTexture = pReqBase->getUserData<Texture>();
+	auto& flags = pTexture->flags();
 
-		// if we have loaded the data, we now need to process it.
-		if (!pFile || !bytesRead)
+	if (type == core::IoRequest::OPEN)
+	{
+		auto* pOpen = static_cast<const core::IoRequestOpen*>(pReqBase);
+
+		if (!pFile)
 		{
 			flags.Set(texture::TexFlag::LOAD_FAILED);
 			loadComplete_.raise();
+			return;
+		}
+
+		// hellllo..
+		// read the whole file.
+		uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
+		X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
+		uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, fileSize, &blockArena_, "TextureFileData", 16);
+
+		core::IoRequestRead read;
+		read.callback.Bind<TextureManager, &TextureManager::IoRequestCallback>(this);
+		read.pUserData = pOpen->pUserData;
+		read.pFile = pFile;
+		read.dataSize = fileSize;
+		read.offset = 0;
+		read.pBuf = pData;
+		fileSys.AddIoRequestToQue(read);
+	}
+	else if (type == core::IoRequest::READ)
+	{
+		auto* pReadReq = static_cast<const core::IoRequestRead*>(pReqBase);
+
+		fileSys.AddCloseRequestToQue(pFile);
+
+		// if we have loaded the data, we now need to process it.
+		if (bytesRead != pReadReq->dataSize)
+		{
+			flags.Set(texture::TexFlag::LOAD_FAILED);
+			loadComplete_.raise();
+			return;
 		}
 
 		// YOU WANT A JOB?
 		// 3 fiddy a hour.
-		CIFileJobData data{ pTexture, pReq->pBuf, pReq->dataSize };
+		CIFileJobData data{ pTexture, static_cast<uint8_t*>(pReadReq->pBuf), pReadReq->dataSize };
 
 		gEnv->pJobSys->CreateMemberJobAndRun<TextureManager>(this, &TextureManager::processCIFile_job,
 			data JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
