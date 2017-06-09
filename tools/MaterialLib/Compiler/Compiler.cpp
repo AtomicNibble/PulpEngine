@@ -206,6 +206,12 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 				tex.value = pValue;
 			}
 		}
+		else if(textureDesc.defaultName.isNotEmpty())
+		{
+			tex.value = textureDesc.defaultName;
+		}
+
+		X_ASSERT(tex.value.isNotEmpty(), "Texture has a empty value")();
 	}
 
 	// process samplers.
