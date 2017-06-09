@@ -388,6 +388,7 @@ void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
 			// if it's not loaded it will never load.
 			core::CriticalSection::ScopedLock lock(loadReqLock_);
 
+			pMaterial->setStatus(core::LoadStatus::Error);
 			failedLoads_.push_back(pMaterial);
 		}
 		else
@@ -395,8 +396,11 @@ void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
 			pMaterial->assignProps(*pDefaultMtl_);
 		}
 	}
+	else
+	{
+		pMaterial->setStatus(core::LoadStatus::Error);
+	}
 
-	pMaterial->setStatus(core::LoadStatus::Error);
 
 	loadRequestCleanup(pLoadReq);
 }
