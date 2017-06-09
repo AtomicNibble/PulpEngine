@@ -328,6 +328,10 @@ void XMaterialManager::dispatchPendingLoads(void)
 
 bool XMaterialManager::waitForLoad(Material* pMaterial)
 {
+	if (pMaterial->getStatus() == core::LoadStatus::Complete) {
+		return true;
+	}
+
 	{
 		// we lock to see if loading as the setting of loading is performed inside this lock.
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
@@ -335,6 +339,7 @@ bool XMaterialManager::waitForLoad(Material* pMaterial)
 		{
 			loadCond_.Wait(loadReqLock_);
 		}
+
 	}
 
 	// did we fail? or never sent a dispatch?
