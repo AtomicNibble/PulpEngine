@@ -574,6 +574,11 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 
 	for (auto& tex : textures)
 	{
+		if (tex.val.isEmpty()) {
+			X_ERROR("Material", "missing texture value");
+			return false;
+		}
+
 		auto* pTexture = gEngEnv.pTextureMan_->forName(tex.val.c_str(), texFlags);
 		tex.pTexture = pTexture;
 	}
