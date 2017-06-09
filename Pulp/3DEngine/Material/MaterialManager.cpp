@@ -574,7 +574,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 
 	for (auto& tex : textures)
 	{
-		auto* pTexture = gEngEnv.pTextureMan_->forName(tex.name.c_str(), texFlags);
+		auto* pTexture = gEngEnv.pTextureMan_->forName(tex.val.c_str(), texFlags);
 		tex.pTexture = pTexture;
 	}
 
