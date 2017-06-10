@@ -89,6 +89,10 @@ struct MaterialTech
 
 struct MaterialTexture
 {
+	X_INLINE MaterialTexture() {
+		pTexture = nullptr;
+	}
+
 	core::string name;
 	core::string val;
 	render::TextureSlot::Enum texSlot;
