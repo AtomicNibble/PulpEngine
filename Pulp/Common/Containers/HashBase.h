@@ -504,11 +504,30 @@ template <class Key, class Value, class HashFn, class EqualKey>
 _HashBase_iterator<Key, Value, HashFn, EqualKey>&
 _HashBase_iterator<Key, Value, HashFn, EqualKey>::operator++()
 {
-	const Node* Old = cur_;
+	const Node* pOld = cur_;
 
 	cur_ = cur_->next_;
-	if (!cur_) {
-		size_type buketIdx = hm_->buketIndex(Old->val_);
+	if (!cur_) 
+	{
+		size_type buketIdx = hm_->buketIndex(pOld->val_);
+
+#if X_ENABLE_ASSERTIONS
+		// this detects issues in the hash function.
+		// aka the hash is been created by a changing value like a pointer.
+		if (pOld != hm_->buckets_[buketIdx])
+		{
+			X_ASSERT_NOT_NULL(hm_->buckets_[buketIdx]);
+
+			const Node* pTemp = hm_->buckets_[buketIdx]->next_;
+			while (pTemp && pTemp != pOld)
+			{
+				pTemp = pTemp->next_;
+			}
+
+			X_ASSERT(pTemp != nullptr, "Index lookup error")();
+		}
+#endif // !X_ENABLE_ASSERTIONS
+
 		while (!cur_ && ++buketIdx < hm_->buckets_.size()) {
 			cur_ = hm_->buckets_[buketIdx];
 		}
@@ -532,11 +551,30 @@ template <class Key, class Value, class HashFn, class EqualKey>
 _HashBase_const_iterator<Key, Value, HashFn, EqualKey>&
 _HashBase_const_iterator<Key, Value, HashFn, EqualKey>::operator++()
 {
-	const Node* Old = cur_;
+	const Node* pOld = cur_;
 
 	cur_ = cur_->next_;
-	if (!cur_) {
-		size_type buketIdx = hm_->buketIndex(Old->val_);
+	if (!cur_) 
+	{
+		size_type buketIdx = hm_->buketIndex(pOld->val_);
+
+#if X_ENABLE_ASSERTIONS
+		// this detects issues in the hash function.
+		// aka the hash is been created by a changing value like a pointer.
+		if (pOld != hm_->buckets_[buketIdx])
+		{
+			X_ASSERT_NOT_NULL(hm_->buckets_[buketIdx]);
+
+			const Node* pTemp = hm_->buckets_[buketIdx]->next_;
+			while (pTemp && pTemp != pOld)
+			{
+				pTemp = pTemp->next_;
+			}
+
+			X_ASSERT(pTemp != nullptr, "Index lookup error")();
+		}
+#endif // !X_ENABLE_ASSERTIONS
+
 		while (!cur_ && ++buketIdx < hm_->buckets_.size()) {
 			cur_ = hm_->buckets_[buketIdx];
 		}
