@@ -13,6 +13,13 @@
 #include "SourceBin.h"
 
 X_NAMESPACE_DECLARE(core,
+	namespace V2 {
+		struct Job;
+		class JobSystem;
+	}
+
+	struct IoRequestBase;
+	struct XFileAsync;
 	struct IConsoleCmdArgs;
 )
 
@@ -83,6 +90,8 @@ namespace shader
 		void listShaderSources(const char* pSarchPatten = nullptr);
 
 	private:
+		void IoCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
+
 		// IXHotReload
 		void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 		// ~IXHotReload

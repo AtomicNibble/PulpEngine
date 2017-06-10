@@ -202,6 +202,7 @@ namespace shader
 				// the source memory will get cleaned up for us once complete.
 				core::IoRequestOpenWrite req(std::move(source));
 				getShaderCompileSrc(pHWShader, req.path);
+				req.callback.Bind<XShaderManager, &XShaderManager::IoCallback>(this);
 				
 				gEnv->pFileSys->AddIoRequestToQue(req);
 			}
@@ -430,6 +431,12 @@ namespace shader
 	void XShaderManager::listShaderSources(const char* pSearchPatten)
 	{
 		sourceBin_.listShaderSources(pSearchPatten);
+	}
+
+	void XShaderManager::IoCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t)
+	{
+
+
 	}
 
 	void XShaderManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
