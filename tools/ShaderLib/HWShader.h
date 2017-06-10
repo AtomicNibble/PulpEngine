@@ -82,10 +82,10 @@ namespace shader
 		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
-		SHADERLIB_EXPORT bool compile(core::string& source, CompileFlags compileFlags);
+		SHADERLIB_EXPORT bool compile(const ByteArr& source, CompileFlags compileFlags);
 
 	private:
-		bool compileFromSource(core::string& source, CompileFlags compileFlags);
+		bool compileFromSource(const ByteArr& source, CompileFlags compileFlags);
 		bool reflectShader(ID3D10Blob* pshaderBlob);
 
 	protected:

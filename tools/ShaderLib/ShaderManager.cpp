@@ -182,12 +182,13 @@ namespace shader
 				return true;
 			}
 
-			core::string source;
-			if (!sourceBin_.getMergedSource(pHWShader->getSourceFileName(), source)) {
-				X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getSourceFileName().c_str());
+			core::Array<uint8_t> source(arena_);
+			if (!sourceBin_.getMergedSource(pHWShader->getShaderSource(), source)) {
+				X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getName().c_str());
 				return false;
 			}
 
+#if 0
 			if (vars_.writeMergedSource())
 			{
 				core::Path<char> srcPath;
@@ -199,6 +200,7 @@ namespace shader
 					fileOut.write(source.data(), source.length());
 				}
 			}
+#endif
 
 			if (!pHWShader->compile(source, flags))
 			{

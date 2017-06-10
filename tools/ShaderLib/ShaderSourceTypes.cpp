@@ -45,9 +45,9 @@ namespace shader
 
 	  // -------------------------------------------------------------
 
-	SourceFile::SourceFile(const core::string& name, const core::string& fileName, core::MemoryArenaBase* arena) :
+	SourceFile::SourceFile(const core::string& name, core::MemoryArenaBase* arena) :
 		name_(name),
-		fileName_(fileName),
+		fileData_(arena),
 		includedFiles_(arena),
 		sourceCrc32_(0)
 	{
@@ -56,8 +56,10 @@ namespace shader
 
 	void SourceFile::writeSourceToFile(core::XFile* pFile) const
 	{
-		pFile->printf("\n// ======== %s ========\n\n", getFileName().c_str());
-		pFile->writeStringNNT(getFileData());
+		LockType::ScopedLockShared readLock(lock);
+
+		pFile->printf("\n// ======== %s ========\n\n", getName().c_str());
+		pFile->write(fileData_.begin(), fileData_.size());
 	}
 
 

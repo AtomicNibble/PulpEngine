@@ -48,7 +48,7 @@ namespace shader
 
 	}
 
-	bool XHWShader::compile(core::string& source, CompileFlags compileFlags)
+	bool XHWShader::compile(const ByteArr& source, CompileFlags compileFlags)
 	{
 		status_ = ShaderStatus::Compiling;
 		bool res = compileFromSource(source, compileFlags);
@@ -65,7 +65,7 @@ namespace shader
 	}
 
 
-	bool XHWShader::compileFromSource(core::string& source, CompileFlags flags)
+	bool XHWShader::compileFromSource(const ByteArr& source, CompileFlags flags)
 	{
 		X_LOG0("Shader", "Compiling shader: \"%s\" tid: %" PRIX32, name_.c_str(), core::Thread::GetCurrentID());
 
@@ -148,8 +148,8 @@ namespace shader
 		}
 
 		HRESULT hr = D3DCompile(
-			source,
-			source.length(),
+			source.data(),
+			source.size(),
 			sourcName,
 			Shader_Macros, // pDefines
 			nullptr, // pInclude

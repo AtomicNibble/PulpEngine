@@ -10,12 +10,7 @@ namespace shader
 		return name_;
 	}
 
-	X_INLINE const core::string& SourceFile::getFileName(void) const
-	{
-		return fileName_;
-	}
-
-	X_INLINE const core::string& SourceFile::getFileData(void) const
+	X_INLINE const SourceFile::ByteArr& SourceFile::getFileData(void) const
 	{
 		return fileData_;
 	}
@@ -40,22 +35,18 @@ namespace shader
 		return ILFlags_;
 	}
 
-
-//	X_INLINE void SourceFile::setName(const core::string& name)
-//	{
-//		name_ = name;
-//	}
-//
-//	X_INLINE void SourceFile::setFileName(const core::string& name)
-//	{
-//		fileName_ = name;
-//	}
-
-	X_INLINE void SourceFile::setFileData(const core::string& name, uint32_t crc)
+	X_INLINE void SourceFile::setFileData(const ByteArr& data, uint32_t crc)
 	{
-		fileData_ = name;
+		fileData_ = data;
 		sourceCrc32_ = crc;
 	}
+
+	X_INLINE void SourceFile::setFileData(ByteArr&& data, uint32_t crc)
+	{
+		fileData_ = std::move(data);
+		sourceCrc32_ = crc;
+	}
+
 
 	X_INLINE void SourceFile::setSourceCrc32(uint32_t crc)
 	{

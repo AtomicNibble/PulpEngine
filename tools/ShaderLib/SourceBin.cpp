@@ -3,6 +3,7 @@
 #include "ShaderSourceTypes.h"
 
 #include <IFileSys.h>
+#include <Threading\JobSystem2.h>
 
 #include <Hashing\crc32.h>
 #include <String\XParser.h>
@@ -89,6 +90,10 @@ namespace shader
 			return true;
 		}
 
+		static SourceFile* const INVALID_SOURCE = reinterpret_cast<SourceFile*>(std::numeric_limits<uintptr_t>::max());
+		
+
+
 	} // namespace
 
 
@@ -119,6 +124,8 @@ namespace shader
 
 	void SourceBin::free(void)
 	{
+		core::CriticalSection::ScopedLock lock(cs_);
+
 		for (auto& s : source_)
 		{
 			X_DELETE(s.second, &sourcePoolArena_);
@@ -127,81 +134,120 @@ namespace shader
 		source_.free();
 	}
 
-	bool SourceBin::getMergedSource(const core::string& name, core::string& strOut)
+	bool SourceBin::getMergedSource(const SourceFile* pSourceFile, ByteArr& merged)
 	{
-		SourceFile* pSourceFile = loadRawSourceFile(name);
+		std::vector<uint8_t> goat, goat2;
+
+		goat.insert(goat.end(), goat2.begin(), goat2.end());
 
 		if (pSourceFile)
 		{
-			size_t size = pSourceFile->getFileData().length();
-			for (const auto& f : pSourceFile->getIncludeArr())
+			// we take read locks of everything while building merged source.
+			core::ScopedLockShared<SourceFile::LockType> lock(pSourceFile->lock);
+
+			size_t size = pSourceFile->getFileData().size();
+			for (const auto* pSf : pSourceFile->getIncludeArr())
 			{
-				size += f->getFileData().length();
+				pSf->lock.EnterShared();
+				size += pSf->getFileData().size();
 			}
 
-			strOut.reserve(size);
+			merged.reserve(size);
 
-			for (const auto& f : pSourceFile->getIncludeArr())
+			for (const auto* pSf : pSourceFile->getIncludeArr())
 			{
-				strOut.append(f->getFileData());
-				strOut.append("\r\n");
+				merged.append(pSf->getFileData());
+				merged.append('\n');
+
+				pSf->lock.LeaveShared();
 			}
 
-			strOut.append(pSourceFile->getFileData());
-
+			merged.append(pSourceFile->getFileData());
 			return true;
 		}
+
 		return false;
 	}
 
 
 	SourceFile* SourceBin::loadRawSourceFile(const core::string& name, bool reload)
 	{
-		SourceFile* pSourceFile = sourceForName(name);
+		SourceFile** pSourceFileRef = nullptr;
+		bool loaded = true;
 
-		if (pSourceFile && !reload) {
-			return pSourceFile;
+		{
+			core::CriticalSection::ScopedLock lock(cs_);
+
+			auto it = source_.find(name);
+			if (it != source_.end())
+			{
+				pSourceFileRef = &it->second;
+			}
+			else
+			{
+				loaded = false;
+				auto insertIt = source_.insert(std::make_pair(name, nullptr));
+				pSourceFileRef = &insertIt.first->second;
+			}
 		}
 
+		// if already loaded, make sure it's finished loaded.
+		if (loaded)
+		{
+			// wait for it to finish loading on another thread.
+			while (*pSourceFileRef == nullptr)
+			{
+				if (!gEnv->pJobSys->HelpWithWork())
+				{
+					core::Thread::Yield();
+				}
+			}
+
+			if (*pSourceFileRef == INVALID_SOURCE) {
+				return nullptr;
+			}
+
+			if (!reload) {
+				return *pSourceFileRef;
+			}
+		}
+
+		// we must load it.
 		core::Path<char> path("shaders/");
 		path.setFileName(name);
-		if (path.extension() == path.begin()) {
-			path.setExtension("shader");
-		}
 
 		core::XFileScoped file;
 		if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
 			X_WARNING("Shader", "File not found: \"%s\"", name.c_str());
+			*pSourceFileRef = INVALID_SOURCE;
 			return nullptr;
 		}
 
 		size_t size = safe_static_cast<size_t>(file.remainingBytes());
+		ByteArr data(arena_, size);
 
-		// load into a string for now!
-		core::string str;
-		str.resize(size);
-
-		uint32_t str_len = safe_static_cast<uint32_t>(size);
-
-		if (file.read((void*)str.data(), str_len) != str_len) {
+		if (file.read(data.data(), data.size()) != data.size()) {
 			X_WARNING("Shader", "Failed to read all of file: \"%s\"", name.c_str());
+			*pSourceFileRef = INVALID_SOURCE;
 			return nullptr;
 		}
 
-		// tickle my pickle?
-		// check the crc.
-		uint32_t crc32 = pCrc32_->GetCRC32(str.data(), str.length());
+		uint32_t crc32 = pCrc32_->GetCRC32(data.data(), data.size());
 
-		if (pSourceFile)
+		if (reload)
 		{
-			// if we reloaded the file and crc32 is same
-			// don't both reparsing includes
+			auto* pSourceFile = *pSourceFileRef;
+			X_ASSERT_NOT_NULL(pSourceFile);
+
 			if (pSourceFile->getSourceCrc32() == crc32) {
-				return pSourceFile;
+				return *pSourceFileRef;
 			}
 
+			// prevent read's while re reparse the data.
+			core::ScopedLock<SourceFile::LockType> lock(pSourceFile->lock);
+
 			pSourceFile->getIncludeArr().clear();
-			pSourceFile->setFileData(str, crc32);
+			pSourceFile->setFileData(std::move(data), crc32);
 
 			// load any files it includes.
 			parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
@@ -209,20 +255,20 @@ namespace shader
 			return pSourceFile;
 		}
 
-
-		pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(name, name, arena_);
-		pSourceFile->setFileData(str, crc32);
-
-		source_.insert(std::make_pair(pSourceFile->getFileName(), pSourceFile));
+		auto* pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(name, arena_);
+		pSourceFile->setFileData(std::move(data), crc32);
 
 		// load any files it includes.
 		parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr());
 
+		*pSourceFileRef = pSourceFile;
 		return pSourceFile;
 	}
 
 	SourceFile* SourceBin::sourceForName(const core::string& name)
 	{
+		core::CriticalSection::ScopedLock lock(cs_);
+
 		auto it = source_.find(name);
 		if (it != source_.end()) {
 			return it->second;
@@ -234,14 +280,15 @@ namespace shader
 	void SourceBin::parseIncludesAndPrePro_r(SourceFile* pSourceFile, SourceRefArr& includedFiles, bool reload)
 	{
 		const auto& fileData = pSourceFile->getFileData();
+		const char* pBegin = reinterpret_cast<const char*>(fileData.begin());
+		const char* pEnd = reinterpret_cast<const char*>(fileData.end());
 
 		// any includes to process?
-		auto pos = fileData.find("#include");
-		if (!pos) {
+		if (core::strUtil::Find(pBegin, pEnd, "#include") != nullptr) {
 			return;
 		}
 
-		core::XLexer lexer(fileData.begin(), fileData.end());
+		core::XLexer lexer(pBegin, pEnd);
 		core::XLexToken token;
 		core::StackString512 fileName;
 
@@ -296,7 +343,7 @@ namespace shader
 								uint32_t mergedCrc = pCrc32_->Combine(
 									pSourceFile->getSourceCrc32(),
 									pChildSourceFile->getSourceCrc32(),
-									safe_static_cast<uint32_t>(pChildSourceFile->getFileData().length())
+									safe_static_cast<uint32_t>(pChildSourceFile->getFileData().size())
 								);
 
 								pSourceFile->setSourceCrc32(mergedCrc);
@@ -361,11 +408,13 @@ namespace shader
 
 	void SourceBin::listShaderSources(const char* pSearchPatten)
 	{
+		core::CriticalSection::ScopedLock lock(cs_);
+
 		X_LOG0("Shader", "--------- ^8Shader Sources(%" PRIuS ")^7 ----------", source_.size());
 
 		auto printfunc = [](const SourceFile* pSource) {
 			X_LOG0("Shader", "Name: ^2\"%s\"^7 crc: ^10x%08x^7",
-				pSource->getFileName().c_str(),
+				pSource->getName().c_str(),
 				pSource->getSourceCrc32());
 		};
 

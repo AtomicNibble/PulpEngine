@@ -6,6 +6,7 @@
 
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Threading\CriticalSection.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -18,6 +19,7 @@ namespace shader
 	{
 		typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
 		typedef core::Array<SourceFile*> SourceRefArr;
+		typedef core::Array<uint8_t> ByteArr;
 
 		// Shader Source
 		typedef core::MemoryArena<
@@ -40,7 +42,7 @@ namespace shader
 		SHADERLIB_EXPORT void free(void);
 
 		// returns the source of a shader with all it's includes merged.
-		SHADERLIB_EXPORT bool getMergedSource(const core::string& name, core::string& strOut);
+		SHADERLIB_EXPORT bool getMergedSource(const SourceFile* pSourceFile, ByteArr& strOut);
 
 		SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload = false);
 		SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);
@@ -61,7 +63,7 @@ namespace shader
 		core::PoolAllocator sourcePoolAllocator_;
 		PoolArena			sourcePoolArena_;
 
-
+		core::CriticalSection cs_;
 		ShaderSourceMap source_;
 	};
 
