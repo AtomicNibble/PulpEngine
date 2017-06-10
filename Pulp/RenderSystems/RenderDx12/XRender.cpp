@@ -1139,7 +1139,6 @@ shader::IShaderPermatation* XRender::createPermatation(const shader::ShaderStage
 	return pShaderMan_->createPermatation(stages);
 }
 
-
 void XRender::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
 {
 	pShaderMan_->releaseShaderPermatation(pPerm);
