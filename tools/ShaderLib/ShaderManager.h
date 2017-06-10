@@ -53,6 +53,22 @@ namespace shader
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 		> PoolArena;
 
+		struct CompileJobInfo
+		{
+			CompileJobInfo() {
+				core::zero_this(this);
+			}
+			CompileJobInfo(XHWShader* pHWShader, CompileFlags flags) :
+				pHWShader(pHWShader),
+				flags(flags),
+				result(false)
+			{
+			}
+
+			XHWShader* pHWShader;
+			CompileFlags flags;
+			bool result;
+		};
 
 	public:
 		SHADERLIB_EXPORT XShaderManager(core::MemoryArenaBase* arena);
@@ -77,12 +93,13 @@ namespace shader
 		X_INLINE ShaderBin& getBin(void);
 
 	private:
+		void compileShader_job(CompileJobInfo* pJobInfo, uint32_t num);
+
 		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry,
 			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
 
 	private:
 		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);
-
 
 		void freeSourcebin(void);
 		void freeHwShaders(void);

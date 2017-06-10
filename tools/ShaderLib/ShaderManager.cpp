@@ -245,23 +245,26 @@ namespace shader
 		return true;
 	}
 
-	shader::IShaderPermatation* XShaderManager::createPermatation(const shader::ShaderStagesArr& stages)
+	void XShaderManager::compileShader_job(CompileJobInfo* pJobInfo, uint32_t num)
+	{
+		for (uint32_t i = 0; i < num; i++)
+		{
+			auto& info = pJobInfo[i];
+			info.result = compileShader(info.pHWShader, info.flags);
+		}
+	}
+
+	shader::IShaderPermatation* XShaderManager::createPermatation(const shader::ShaderStagesArr& stagesIn)
 	{
 		// ok so for now when we create a permatation we also require all the shaders to be compiled.
 		// we return null if a shader fails to compile.
 
 		static_assert(decltype(permArena_)::IS_THREAD_SAFE, "PermArena must be thread safe");
-		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, _stages, arena_);
+		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, stagesIn, arena_);
 
 		if (!pPerm->isCompiled())
 		{
-			// this logic should be thread safe.
-			// and should not try compile the same shader from multiple threads.
-			// if two threads both want smae shader it should just wait for the result.
-			// but compiling of diffrent shaders should happen in parralel.
-
 			CompileFlags flags;
-
 
 #if X_DEBUG
 			flags = CompileFlags::OptimizationLvl0 | CompileFlags::Debug;
@@ -271,19 +274,40 @@ namespace shader
 
 			// we want to compile this then work out the cbuffer links.
 			const auto& stages = pPerm->getStages();
+			core::FixedArray<CompileJobInfo, ShaderStage::FLAGS_COUNT> jobInfo;
+
+			// dispatch jobs, to compile all da stages yo.
 			for (auto* pHWShader : stages)
 			{
 				if (!pHWShader) {
 					continue;
 				}
 
-				if (!compileShader(pHWShader, flags))
+				jobInfo.emplace_back(pHWShader, flags);
+			}
+
+			core::Delegate<void(CompileJobInfo*, uint32_t)> del;
+			del.Bind<XShaderManager, &XShaderManager::compileShader_job>(this);
+
+			auto* pJob = gEnv->pJobSys->parallel_for_member<XShaderManager>(
+				del, 
+				jobInfo.data(), 
+				static_cast<uint32_t>(jobInfo.size()), 
+				core::V2::CountSplitter(1)
+				JOB_SYS_SUB_ARG(core::profiler::SubSys::RENDER)
+			);
+		
+			gEnv->pJobSys->Run(pJob);
+			gEnv->pJobSys->Wait(pJob);
+
+			for (const auto& info : jobInfo)
+			{
+				if (!info.result)
 				{
 					X_ERROR("ShadersManager", "Failed to compile shader for permatation");
 					return false;
 				}
 			}
-
 		}
 
 		// we still need to make cb links and get ilFmt even if all the hardware shaders are compiled.
