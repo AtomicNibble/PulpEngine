@@ -232,8 +232,8 @@ X_INLINE UniquePointer<T[]>& UniquePointer<T[]>::operator=(UniquePointer&& rhs)
 	if (this != &rhs)
 	{
 		// different, do the move
-		reset(rhs.release());
 		Mybase::arena_ = rhs.arena_;
+		reset(rhs.release());
 	}
 	return *this;
 }
