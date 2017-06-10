@@ -61,53 +61,6 @@ namespace shader
 	}
 
 
-# if 0
-
-	bool ShaderSourceFileTechnique::processName(void)
-	{
-		const char* pBrace, *pCloseBrace;
-		if ((pBrace = name_.find('(')) != nullptr)
-		{
-			// if we find a () 
-			// we have diffrent compile macro's for the 
-			// technique
-			pCloseBrace = name_.find(')');
-			if (pCloseBrace < pBrace)
-			{
-				X_ERROR("Shader", "invalid name for shader: %s", name_.c_str());
-				return false;
-			}
-
-			core::StackString512 flags(pBrace + 1, pCloseBrace);
-			core::StackString512 temp;
-
-			if (flags.isNotEmpty())
-			{
-				core::StringTokenizer<char> tokens(flags.begin(), flags.end(), ',');
-				core::StringRange<char> flagName(nullptr, nullptr);
-
-				while (tokens.ExtractToken(flagName))
-				{
-					// valid tech flag?
-					temp.set(flagName.GetStart(), flagName.GetEnd());
-					if (!TechFlagFromStr(temp.c_str(), techFlags_))
-					{
-						X_WARNING("Shader", "not a valid tech flag: %s", temp.c_str());
-					}
-				}
-			}
-
-			// fix name.
-			name_ = name_.substr(nullptr, pBrace);
-
-		}
-		return true;
-	}
-
-
-#endif
-
-
 } // namespace shader
 
 X_NAMESPACE_END
