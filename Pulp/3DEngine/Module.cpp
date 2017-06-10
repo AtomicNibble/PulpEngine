@@ -15,7 +15,7 @@ X_USING_NAMESPACE;
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::Spinlock>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,
