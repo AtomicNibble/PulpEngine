@@ -1665,7 +1665,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			stats_.NumBytesWrite += pOpenWrite->data.size();
 #endif // !X_ENABLE_FILE_STATS
 
-			XFileAsyncOperationCompiltion operation = pFile->readAsync(
+			XFileAsyncOperationCompiltion operation = pFile->writeAsync(
 				pOpenWrite->data.ptr(),
 				pOpenWrite->data.size(),
 				0,
