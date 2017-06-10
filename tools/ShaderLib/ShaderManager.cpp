@@ -322,9 +322,6 @@ namespace shader
 		return sourceBin_.loadRawSourceFile(pName, false);
 	}
 
-
-
-
 	SourceFile* XShaderManager::loadRawSourceFile(const char* pName, bool reload)
 	{
 		return sourceBin_.loadRawSourceFile(pName, reload);
