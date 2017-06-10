@@ -1,11 +1,16 @@
 #pragma once
 
+#include <Threading\ScopedLock.h>
 
 X_NAMESPACE_BEGIN(core)
 
-
 class SharedLock
 {
+public:
+	typedef ScopedLock<SharedLock> ScopedLock;
+	typedef ScopedLockShared<SharedLock> ScopedLockShared;
+
+
 public:
 	X_INLINE SharedLock();
 	X_INLINE ~SharedLock();
