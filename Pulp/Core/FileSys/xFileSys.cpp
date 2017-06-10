@@ -38,15 +38,19 @@ namespace
 	const size_t ASYNC_OP_ALLOCATION_ALIGN = X_ALIGN_OF(XOsFileAsyncOperation::AsyncOp);
 
 
+	static_assert(IoRequest::ENUM_COUNT == 6, "Enum count changed? this logic needs updating");
+
 	constexpr const size_t ioReqSize[IoRequest::ENUM_COUNT] = {
 		sizeof(IoRequestClose),
 		sizeof(IoRequestOpen),
+		sizeof(IoRequestOpenWrite),
 		sizeof(IoRequestOpenRead),
 		sizeof(IoRequestWrite),
 		sizeof(IoRequestRead)
 	};
 
 	static_assert(ioReqSize[IoRequest::OPEN] == sizeof(IoRequestOpen), "Enum mismtach?");
+	static_assert(ioReqSize[IoRequest::OPEN_WRITE_ALL] == sizeof(IoRequestOpenWrite), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::OPEN_READ_ALL] == sizeof(IoRequestOpenRead), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::CLOSE] == sizeof(IoRequestClose), "Enum mismtach?");
 	static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismtach?");
@@ -1267,10 +1271,15 @@ RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase& request)
 {
 	IoRequestBase* pRequest = nullptr;
 
+	static_assert(IoRequest::ENUM_COUNT == 6, "Enum count changed? this logic needs updating");
+
 	switch (request.getType())
 	{
 		case IoRequest::OPEN:
 			pRequest = X_NEW(IoRequestOpen, ioQueueDataArena_, "IORequestOpen")(static_cast<IoRequestOpen&>(request));
+			break;
+		case IoRequest::OPEN_WRITE_ALL:
+			pRequest = X_NEW(IoRequestOpenWrite, ioQueueDataArena_, "IoRequestOpenWrite")(std::move(static_cast<IoRequestOpenWrite&>(request)));
 			break;
 		case IoRequest::OPEN_READ_ALL:
 			pRequest = X_NEW(IoRequestOpenRead, ioQueueDataArena_, "IoRequestOpenRead")(static_cast<IoRequestOpenRead&>(request));
@@ -1472,6 +1481,37 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 		// close it.
 		closeFileAsync(pReqFile);
 	}
+	else if (asyncOp.getType() == IoRequest::OPEN_WRITE_ALL)
+	{
+		IoRequestOpenWrite* pAsyncReq = asyncOp.as<IoRequestOpenWrite>();
+		XFileAsync* pReqFile = pAsyncReq->pFile;
+
+		if (vars_.QueDebug)
+		{
+			uint32_t threadId = core::Thread::GetCurrentID();
+
+			X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-write request complete. "
+				"bytesTrans: 0x%x pBuf: %p",
+				threadId, IoRequest::ToString(pAsyncReq->getType()),
+				bytesTransferd, pAsyncReq->data.ptr());
+		}
+
+		if (pAsyncReq->dataSize != bytesTransferd)
+		{
+			X_ERROR("FileSys", "Failed to write whole file contents. requested: %" PRIu32 " got %" PRIu32,
+				pAsyncReq->dataSize, bytesTransferd);
+
+			// we didnt not write the whole file, pretend we failed to open.
+			pAsyncReq->callback.Invoke(*this, pAsyncReq, nullptr, 0);
+		}
+		else
+		{
+			pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
+		}
+
+		// close it.
+		closeFileAsync(pReqFile);
+	}
 	else
 	{
 		X_ASSERT_UNREACHABLE();
@@ -1604,6 +1644,35 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				pendingOps_.emplace_back(requestPtr.release(), operation);
 			}
 			
+		}
+		else if (type == IoRequest::OPEN_WRITE_ALL)
+		{
+			IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
+			XFileAsync* pFile = openFileAsync(pOpenWrite->path.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE);
+
+			X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
+			X_ASSERT(pOpenWrite->dataSize > 0, "WriteAll called with data size 0")(pOpenWrite->dataSize);
+
+			if (!pFile)
+			{
+				pOpenWrite->callback.Invoke(fileSys, pOpenWrite, pFile, 0);
+				goto nextRequest;
+			}
+
+			pOpenWrite->pFile = pFile;
+
+#if X_ENABLE_FILE_STATS
+			stats_.NumBytesWrite += pOpenWrite->dataSize;
+#endif // !X_ENABLE_FILE_STATS
+
+			XFileAsyncOperationCompiltion operation = pFile->readAsync(
+				pOpenWrite->data.ptr(),
+				pOpenWrite->dataSize,
+				0,
+				compRoutine
+			);
+
+			pendingOps_.emplace_back(requestPtr.release(), operation);
 		}
 		else if (type == IoRequest::CLOSE)
 		{

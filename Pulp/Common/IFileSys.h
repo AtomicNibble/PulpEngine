@@ -9,6 +9,7 @@
 
 #include <Util\Delegate.h>
 #include <Containers\Array.h>
+#include <Util\UniquePointer.h>
 
 #if X_ENABLE_FILE_STATS
 #include <Time\TimeVal.h>
@@ -397,6 +398,7 @@ X_DECLARE_ENUM(IoRequest)(
 	// aka READ requests are higest priority.
 	CLOSE,
 	OPEN,
+	OPEN_WRITE_ALL,
 	OPEN_READ_ALL,
 	WRITE,
 	READ
@@ -474,6 +476,26 @@ struct IoRequestOpenRead : public IoRequestOpen
 	XFileAsync* pFile;
 	uint8_t* pBuf;
 	uint32_t dataSize; 
+};
+
+// Takes a buffer and file, and attemps to write it all to a file.
+// will then free the data after.
+// used for dispatch and forget style writes
+// mode is: RECREATE | WRITE
+struct IoRequestOpenWrite : public IoRequestBase
+{
+	IoRequestOpenWrite()
+	{
+		pUserData = nullptr;
+		type = IoRequest::OPEN_WRITE_ALL;
+		pFile = nullptr;
+		dataSize = 0;
+	}
+
+	core::Path<char> path;
+	XFileAsync* pFile;
+	core::UniquePointer<uint8_t[]> data;
+	uint32_t dataSize;
 };
 
 struct IoRequestClose : public IoRequestBase
