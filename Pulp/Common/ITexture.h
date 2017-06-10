@@ -19,7 +19,7 @@ struct XFile;
 X_NAMESPACE_BEGIN(texture)
 
 // defaults.
-static const char* TEX_DEFAULT_DIFFUSE = "default/default_col";
+static const char* TEX_DEFAULT_DIFFUSE = "default/$default";
 static const char* TEX_DEFAULT_BUMP = "default/$identitynormal";
 static const char* TEX_DEFAULT_WHITE = "default/$white";
 
