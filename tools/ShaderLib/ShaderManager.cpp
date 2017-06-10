@@ -322,11 +322,6 @@ namespace shader
 		return sourceBin_.loadRawSourceFile(core::string(pName), false);
 	}
 
-	SourceFile* XShaderManager::loadRawSourceFile(const char* pName, bool reload)
-	{
-		return sourceBin_.loadRawSourceFile(core::string(pName), reload);
-	}
-
 
 	XHWShader* XShaderManager::hwForName(ShaderType::Enum type,
 		const core::string& entry, SourceFile* pSourceFile,

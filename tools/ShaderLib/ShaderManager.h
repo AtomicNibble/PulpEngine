@@ -70,8 +70,6 @@ namespace shader
 		X_INLINE ShaderBin& getBin(void);
 
 	private:
-		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
-
 		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry,
 			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
 
