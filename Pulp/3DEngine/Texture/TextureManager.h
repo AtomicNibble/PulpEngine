@@ -100,6 +100,7 @@ private:
 	bool loadDefaultTextures(void);
 	void releaseDefaultTextures(void);
 	void releaseDanglingTextures(void);
+	void releaseResources(Texture* pTex);
 
 private:
 	void IoRequestCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);

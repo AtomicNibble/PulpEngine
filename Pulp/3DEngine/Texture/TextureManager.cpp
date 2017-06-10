@@ -192,6 +192,8 @@ void TextureManager::releaseTexture(Texture* pTex)
 
 	if (pTexRes->removeReference() == 0)
 	{
+		releaseResources(pTexRes);
+
 		textures_.releaseAsset(pTexRes);
 	}
 }
@@ -357,13 +359,21 @@ void TextureManager::releaseDanglingTextures(void)
 		auto it = textures_.begin();
 		for (; it != textures_.end(); ++it) {
 			auto* pTexRes = it->second;
-			releaseTexture(pTexRes);
+			releaseResources(pTexRes);
 			X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, pTexRes->getName(), pTexRes->getRefCount());
 		}
 	}
 
 	textures_.free();
 }
+
+void TextureManager::releaseResources(Texture* pTex)
+{
+	// when we release the material we need to clean up somethings.
+	X_UNUSED(pTex);
+
+}
+
 
 void TextureManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
