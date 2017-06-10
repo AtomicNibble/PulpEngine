@@ -360,14 +360,6 @@ namespace shader
 		if (pHWShaderRes)
 		{
 			pHWShaderRes->addReference();
-
-#if 0
-			if (pHWShaderRes->invalidateIfChanged(pSourceFile->getSourceCrc32()))
-			{
-				// we don't need to do anything currently.		
-			}
-#endif
-
 			return pHWShaderRes;
 		}
 
