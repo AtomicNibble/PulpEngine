@@ -196,6 +196,8 @@ namespace shader
 
 			if (vars_.writeMergedSource())
 			{
+				X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe, to dispatch background write")();
+
 				// just dispatch a async write request.
 				// the source memory will get cleaned up for us once complete.
 				core::IoRequestOpenWrite req(std::move(source));
