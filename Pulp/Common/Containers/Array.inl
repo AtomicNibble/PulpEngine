@@ -54,7 +54,7 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_lis
 }
 
 template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(const Array<T, Allocator>& oth) :
+X_INLINE Array<T, Allocator>::Array(const MyT& oth) :
     list_(nullptr),
     num_(0),
     size_(0),
@@ -141,7 +141,7 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(std::initializer_list<T> iLi
 }
 
 template<typename T, class Allocator>
-Array<T, Allocator>& Array<T, Allocator>::operator=(const Array<T, Allocator> &oth)
+Array<T, Allocator>& Array<T, Allocator>::operator=(const MyT& oth)
 {
 	free();
 
@@ -159,7 +159,7 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(const Array<T, Allocator> &o
 }
 
 template<typename T, class Allocator>
-Array<T, Allocator>& Array<T, Allocator>::operator=(Array<T, Allocator>&& oth)
+Array<T, Allocator>& Array<T, Allocator>::operator=(MyT&& oth)
 {
 	if (this != &oth)
 	{
@@ -429,7 +429,7 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T&&
 }
 
 template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(const Array<T, Allocator>& oth) 
+X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(const MyT& oth)
 {
 	if (this != &oth)
 	{

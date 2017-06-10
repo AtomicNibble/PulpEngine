@@ -30,7 +30,7 @@ public:
 	typedef T& reference;
 	typedef const T& ConstReference;
 	typedef const T& const_reference;
-
+	typedef Array<T, Allocator> MyT;
 
 	enum : size_type {
 		invalid_index = static_cast<size_type>(-1)
@@ -51,9 +51,9 @@ public:
 	Allocator& getAllocator(void);
 	const Allocator& getAllocator(void) const;
 
-	Array<T, Allocator>& operator=(std::initializer_list<T> iList);
-	Array<T, Allocator>& operator=(const Array<T, Allocator>& oth);
-	Array<T, Allocator>& operator=(Array<T, Allocator>&& oth);
+	MyT& operator=(std::initializer_list<T> iList);
+	MyT& operator=(const MyT& oth);
+	MyT& operator=(MyT&& oth);
 
 	// index operators
 	const T& operator[](size_type idx) const;
@@ -99,7 +99,7 @@ public:
 	size_type append(const T& obj);
 	size_type append(T&& obj);
 	// add the list
-	size_type append(const Array<T, Allocator>& oth);
+	size_type append(const MyT& oth);
 	// appends a item to the end, resizing if required.
 	size_type push_back(const T& obj);
 	size_type push_back(T&& obj);
