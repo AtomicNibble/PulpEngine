@@ -188,24 +188,20 @@ namespace shader
 				return false;
 			}
 
-#if 0
-			if (vars_.writeMergedSource())
-			{
-				core::Path<char> srcPath;
-				getShaderCompileSrc(pHWShader, srcPath);
-
-				core::XFileScoped fileOut;
-				if (fileOut.openFile(srcPath.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE))
-				{
-					fileOut.write(source.data(), source.length());
-				}
-			}
-#endif
-
 			if (!pHWShader->compile(source, flags))
 			{
 				X_ERROR("ShadersManager", "Failed to compile shader");
 				return false;
+			}
+
+			if (vars_.writeMergedSource())
+			{
+				// just dispatch a async write request.
+				// the source memory will get cleaned up for us once complete.
+				core::IoRequestOpenWrite req(std::move(source));
+				getShaderCompileSrc(pHWShader, req.path);
+				
+				gEnv->pFileSys->AddIoRequestToQue(req);
 			}
 
 			// save it 
