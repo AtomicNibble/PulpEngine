@@ -1496,10 +1496,10 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 				bytesTransferd, pAsyncReq->data.ptr());
 		}
 
-		if (pAsyncReq->dataSize != bytesTransferd)
+		if (pAsyncReq->data.size() != bytesTransferd)
 		{
 			X_ERROR("FileSys", "Failed to write whole file contents. requested: %" PRIu32 " got %" PRIu32,
-				pAsyncReq->dataSize, bytesTransferd);
+				pAsyncReq->data.size(), bytesTransferd);
 
 			// we didnt not write the whole file, pretend we failed to open.
 			pAsyncReq->callback.Invoke(*this, pAsyncReq, nullptr, 0);
@@ -1651,7 +1651,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			XFileAsync* pFile = openFileAsync(pOpenWrite->path.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE);
 
 			X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
-			X_ASSERT(pOpenWrite->dataSize > 0, "WriteAll called with data size 0")(pOpenWrite->dataSize);
+			X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());
 
 			if (!pFile)
 			{
@@ -1662,12 +1662,12 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			pOpenWrite->pFile = pFile;
 
 #if X_ENABLE_FILE_STATS
-			stats_.NumBytesWrite += pOpenWrite->dataSize;
+			stats_.NumBytesWrite += pOpenWrite->data.size();
 #endif // !X_ENABLE_FILE_STATS
 
 			XFileAsyncOperationCompiltion operation = pFile->readAsync(
 				pOpenWrite->data.ptr(),
-				pOpenWrite->dataSize,
+				pOpenWrite->data.size(),
 				0,
 				compRoutine
 			);

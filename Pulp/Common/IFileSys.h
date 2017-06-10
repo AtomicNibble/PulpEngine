@@ -9,7 +9,6 @@
 
 #include <Util\Delegate.h>
 #include <Containers\Array.h>
-#include <Util\UniquePointer.h>
 
 #if X_ENABLE_FILE_STATS
 #include <Time\TimeVal.h>
@@ -484,18 +483,17 @@ struct IoRequestOpenRead : public IoRequestOpen
 // mode is: RECREATE | WRITE
 struct IoRequestOpenWrite : public IoRequestBase
 {
-	IoRequestOpenWrite()
+	IoRequestOpenWrite(core::Array<uint8_t>&& arr) :
+		data(std::move(arr))
 	{
 		pUserData = nullptr;
 		type = IoRequest::OPEN_WRITE_ALL;
 		pFile = nullptr;
-		dataSize = 0;
 	}
 
 	core::Path<char> path;
 	XFileAsync* pFile;
-	core::UniquePointer<uint8_t[]> data;
-	uint32_t dataSize;
+	core::Array<uint8_t> data;
 };
 
 struct IoRequestClose : public IoRequestBase
