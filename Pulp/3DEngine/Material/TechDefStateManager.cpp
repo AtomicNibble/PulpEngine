@@ -175,7 +175,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 TechDefState::TechDefState(core::MemoryArenaBase* arena) :
 	techs_(arena)
 {
-
+	techs_.setGranularity(1);
 }
 
 TechDefState::~TechDefState()
@@ -277,6 +277,8 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 
 TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat, const core::string& name)
 {
+	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
+
 	core::CriticalSection::ScopedLock lock(cacheLock_);
 
 	techset::TechSetDef* pTechDef = nullptr;
@@ -288,14 +290,10 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 	// this don't cause any state to be created.
 	// permatations are created on demand.
 	core::UniquePointer<TechDefState> pTechDefState = core::makeUnique<TechDefState>(arena_, arena_);
-
 	pTechDefState->cat = cat;
 	pTechDefState->name = name;
-	pTechDefState->techs_.setGranularity(1);
 	pTechDefState->techs_.reserve(pTechDef->numTechs());
 	pTechDefState->pTechSecDef_ = pTechDef;
-
-	render::IRender* pRenderSys = gEnv->pRender;
 
 	// we process all the techs 
 	for (auto it = pTechDef->techBegin(); it != pTechDef->techEnd(); ++it)
@@ -324,7 +322,7 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 
 			// we ask for the source now, so we know we are able to atleast attempt to compile permatations later on.
 			// and don't have to ask for them each time we make a perm.
-			render::shader::IShaderSource* pShaderSource = pRenderSys->getShaderSource(shader.source.c_str());
+			render::shader::IShaderSource* pShaderSource = gEnv->pRender->getShaderSource(shader.source.c_str());
 			if (!pShaderSource) {
 				return nullptr;
 			}
