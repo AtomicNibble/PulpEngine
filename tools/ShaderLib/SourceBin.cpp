@@ -284,7 +284,7 @@ namespace shader
 		const char* pEnd = reinterpret_cast<const char*>(fileData.end());
 
 		// any includes to process?
-		if (core::strUtil::Find(pBegin, pEnd, "#include") != nullptr) {
+		if (core::strUtil::Find(pBegin, pEnd, "#include") == nullptr) {
 			return;
 		}
 
