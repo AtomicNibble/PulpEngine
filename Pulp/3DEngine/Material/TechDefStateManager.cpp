@@ -244,14 +244,18 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 	// 
 
 	auto hashVal = core::Hash::Fnv1aHash(name.c_str(), name.length());
-
-	for (auto idx = hashIndex_.first(hashVal); idx >= 0; idx = hashIndex_.next(idx))
+	
 	{
-		auto* pTechDef = techStates_[idx];
+		core::CriticalSection::ScopedLock lock(cacheLock_);
 
-		if (pTechDef->cat == cat && pTechDef->name == name)
+		for (auto idx = hashIndex_.first(hashVal); idx >= 0; idx = hashIndex_.next(idx))
 		{
-			return pTechDef;
+			auto* pTechDef = techStates_[idx];
+
+			if (pTechDef->cat == cat && pTechDef->name == name)
+			{
+				return pTechDef;
+			}
 		}
 	}
 
@@ -263,6 +267,8 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 	}
 
 	// add to cache
+	core::CriticalSection::ScopedLock lock(cacheLock_);
+
 	auto idx = techStates_.append(pTechDef);
 	hashIndex_.insertIndex(hashVal, safe_static_cast<int32_t>(idx));
 
@@ -271,6 +277,8 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 
 TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat, const core::string& name)
 {
+	core::CriticalSection::ScopedLock lock(cacheLock_);
+
 	techset::TechSetDef* pTechDef = nullptr;
 	if (!pTechDefs_->getTechDef(cat, name, pTechDef)) {
 		X_ERROR("TechDefState", "Failed to get techdef definition for state creation");

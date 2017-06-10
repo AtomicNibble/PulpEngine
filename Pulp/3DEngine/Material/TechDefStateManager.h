@@ -85,6 +85,8 @@ private:
 	core::XHashIndex hashIndex_;
 	TechStatesArr techStates_;
 
+	core::CriticalSection cacheLock_;
+
 	techset::TechSetDefs* pTechDefs_;
 };
 
