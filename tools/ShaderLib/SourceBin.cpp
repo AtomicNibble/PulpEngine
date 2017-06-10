@@ -171,7 +171,7 @@ namespace shader
 
 		core::XFileScoped file;
 		if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
-
+			X_WARNING("Shader", "File not found: \"%s\"", pName);
 			return nullptr;
 		}
 
@@ -184,7 +184,7 @@ namespace shader
 		uint32_t str_len = safe_static_cast<uint32_t>(size);
 
 		if (file.read((void*)str.data(), str_len) != str_len) {
-
+			X_WARNING("Shader", "Failed to read all of file: \"%s\"", pName);
 			return nullptr;
 		}
 
