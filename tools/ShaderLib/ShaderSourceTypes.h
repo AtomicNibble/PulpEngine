@@ -27,7 +27,7 @@ namespace shader
 		typedef std::unordered_set<core::string, core::hash<core::string>> RefrenceMap;
 
 	public:
-		SourceFile(core::MemoryArenaBase* arena);
+		SourceFile(const core::string& name, const core::string& fileName, core::MemoryArenaBase* arena);
 		~SourceFile() = default;
 
 		void writeSourceToFile(core::XFile* pFile) const;
@@ -40,9 +40,7 @@ namespace shader
 		X_INLINE IncludedSourceArr& getIncludeArr(void);
 		X_INLINE ILFlags getILFlags(void) const X_FINAL;
 
-		X_INLINE void setName(const core::string& name);
-		X_INLINE void setFileName(const core::string& name);
-		X_INLINE void setFileData(const core::string& name);
+		X_INLINE void setFileData(const core::string& name, uint32_t crc);
 		X_INLINE void setSourceCrc32(uint32_t crc);
 		X_INLINE void setILFlags(ILFlags flags);
 

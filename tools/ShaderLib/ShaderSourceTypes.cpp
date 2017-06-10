@@ -45,7 +45,9 @@ namespace shader
 
 	  // -------------------------------------------------------------
 
-	SourceFile::SourceFile(core::MemoryArenaBase* arena) :
+	SourceFile::SourceFile(const core::string& name, const core::string& fileName, core::MemoryArenaBase* arena) :
+		name_(name),
+		fileName_(fileName),
 		includedFiles_(arena),
 		sourceCrc32_(0)
 	{

@@ -42,8 +42,8 @@ namespace shader
 		// returns the source of a shader with all it's includes merged.
 		SHADERLIB_EXPORT bool getMergedSource(const core::string& name, core::string& strOut);
 
-		SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
-		SHADERLIB_EXPORT SourceFile* sourceForName(const char* pName);
+		SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload = false);
+		SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);
 
 		SHADERLIB_EXPORT void listShaderSources(const char* pSearchPatten);
 

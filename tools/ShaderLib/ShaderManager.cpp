@@ -319,12 +319,12 @@ namespace shader
 
 	IShaderSource* XShaderManager::sourceforName(const char* pName)
 	{
-		return sourceBin_.loadRawSourceFile(pName, false);
+		return sourceBin_.loadRawSourceFile(core::string(pName), false);
 	}
 
 	SourceFile* XShaderManager::loadRawSourceFile(const char* pName, bool reload)
 	{
-		return sourceBin_.loadRawSourceFile(pName, reload);
+		return sourceBin_.loadRawSourceFile(core::string(pName), reload);
 	}
 
 

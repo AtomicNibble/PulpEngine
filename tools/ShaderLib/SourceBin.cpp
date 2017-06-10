@@ -155,23 +155,23 @@ namespace shader
 	}
 
 
-	SourceFile* SourceBin::loadRawSourceFile(const char* pName, bool reload)
+	SourceFile* SourceBin::loadRawSourceFile(const core::string& name, bool reload)
 	{
-		SourceFile* pSourceFile = sourceForName(pName);
+		SourceFile* pSourceFile = sourceForName(name);
 
 		if (pSourceFile && !reload) {
 			return pSourceFile;
 		}
 
 		core::Path<char> path("shaders/");
-		path.setFileName(pName);
+		path.setFileName(name);
 		if (path.extension() == path.begin()) {
 			path.setExtension("shader");
 		}
 
 		core::XFileScoped file;
 		if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
-			X_WARNING("Shader", "File not found: \"%s\"", pName);
+			X_WARNING("Shader", "File not found: \"%s\"", name.c_str());
 			return nullptr;
 		}
 
@@ -184,7 +184,7 @@ namespace shader
 		uint32_t str_len = safe_static_cast<uint32_t>(size);
 
 		if (file.read((void*)str.data(), str_len) != str_len) {
-			X_WARNING("Shader", "Failed to read all of file: \"%s\"", pName);
+			X_WARNING("Shader", "Failed to read all of file: \"%s\"", name.c_str());
 			return nullptr;
 		}
 
@@ -200,9 +200,8 @@ namespace shader
 				return pSourceFile;
 			}
 
-			pSourceFile->setSourceCrc32(crc32);
 			pSourceFile->getIncludeArr().clear();
-			pSourceFile->setFileData(str);
+			pSourceFile->setFileData(str, crc32);
 
 			// load any files it includes.
 			parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
@@ -211,11 +210,8 @@ namespace shader
 		}
 
 
-		pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(arena_);
-		pSourceFile->setName(core::string(pName));
-		pSourceFile->setFileName(core::string(path.fileName()));
-		pSourceFile->setFileData(str);
-		pSourceFile->setSourceCrc32(crc32);
+		pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(name, name, arena_);
+		pSourceFile->setFileData(str, crc32);
 
 		source_.insert(std::make_pair(pSourceFile->getFileName(), pSourceFile));
 
@@ -225,9 +221,9 @@ namespace shader
 		return pSourceFile;
 	}
 
-	SourceFile* SourceBin::sourceForName(const char* pName)
+	SourceFile* SourceBin::sourceForName(const core::string& name)
 	{
-		auto it = source_.find(X_CONST_STRING(pName));
+		auto it = source_.find(name);
 		if (it != source_.end()) {
 			return it->second;
 		}
@@ -284,7 +280,7 @@ namespace shader
 						fileName.toLower();
 
 						// load it PLZ.
-						SourceFile* pChildSourceFile = loadRawSourceFile(fileName.c_str(), reload);
+						SourceFile* pChildSourceFile = loadRawSourceFile(core::string(fileName.begin(), fileName.end()), reload);
 						if (pChildSourceFile)
 						{
 							// is this file already included in the tree?
@@ -297,11 +293,13 @@ namespace shader
 								// add the include files crc to this one.
 								// only after parsing for child includes so that
 								// they are included.
-								pSourceFile->setSourceCrc32(pCrc32_->Combine(pSourceFile->getSourceCrc32(),
+								uint32_t mergedCrc = pCrc32_->Combine(
+									pSourceFile->getSourceCrc32(),
 									pChildSourceFile->getSourceCrc32(),
-									safe_static_cast<uint32_t, size_t>(pChildSourceFile->getFileData().length())));
+									safe_static_cast<uint32_t>(pChildSourceFile->getFileData().length())
+								);
 
-
+								pSourceFile->setSourceCrc32(mergedCrc);
 								includedFiles.append(pChildSourceFile);
 							}
 							else

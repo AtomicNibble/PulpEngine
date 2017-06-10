@@ -41,19 +41,20 @@ namespace shader
 	}
 
 
-	X_INLINE void SourceFile::setName(const core::string& name)
-	{
-		name_ = name;
-	}
+//	X_INLINE void SourceFile::setName(const core::string& name)
+//	{
+//		name_ = name;
+//	}
+//
+//	X_INLINE void SourceFile::setFileName(const core::string& name)
+//	{
+//		fileName_ = name;
+//	}
 
-	X_INLINE void SourceFile::setFileName(const core::string& name)
-	{
-		fileName_ = name;
-	}
-
-	X_INLINE void SourceFile::setFileData(const core::string& name)
+	X_INLINE void SourceFile::setFileData(const core::string& name, uint32_t crc)
 	{
 		fileData_ = name;
+		sourceCrc32_ = crc;
 	}
 
 	X_INLINE void SourceFile::setSourceCrc32(uint32_t crc)
