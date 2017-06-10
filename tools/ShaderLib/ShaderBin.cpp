@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ShaderBin.h"
 #include "ShaderUtil.h"
+#include "ShaderSourceTypes.h"
 
 #include <IFileSys.h>
 #include <Hashing\crc32.h>
@@ -119,7 +120,7 @@ namespace shader
 		hdr.flags.Set(BinFileFlag::COMPRESSED);
 		hdr.modifed = core::dateTimeStampSmall::systemDateTime();
 		hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
-		hdr.sourceCRC32 = pShader->getSourceCrc32();
+		hdr.sourceCRC32 = pShader->getShaderSource()->getSourceCrc32();
 		hdr.compileFlags = pShader->getCompileFlags();
 		hdr.blobLength = safe_static_cast<uint32_t>(byteCode.size());
 		hdr.deflatedLength = 0;
@@ -155,7 +156,7 @@ namespace shader
 				return false;
 			}
 
-			hdr.deflatedLength = safe_static_cast<uint32_t, size_t>(compressed.size());
+			hdr.deflatedLength = safe_static_cast<uint32_t>(compressed.size());
 
 			pData = &compressed;
 		}
@@ -189,7 +190,7 @@ namespace shader
 			return false;
 		}
 
-		updateCacheCrc(path, pShader->getSourceCrc32());
+		updateCacheCrc(path, pShader->getShaderSource()->getSourceCrc32());
 		return true;
 	}
 
@@ -201,7 +202,7 @@ namespace shader
 		core::Path<char> path;
 		getShaderCompileDest(pShader, path);
 
-		if (cacheNotValid(path, pShader->getSourceCrc32())) {
+		if (cacheNotValid(path, pShader->getShaderSource()->getSourceCrc32())) {
 			return false;
 		}
 
@@ -233,7 +234,7 @@ namespace shader
 					return false;
 				}
 
-				if (hdr.sourceCRC32 != pShader->getSourceCrc32())
+				if (hdr.sourceCRC32 != pShader->getShaderSource()->getSourceCrc32())
 				{
 					X_WARNING("Shader", "bin shader is stale, recompile needed.");
 					return false;

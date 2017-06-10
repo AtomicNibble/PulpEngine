@@ -23,11 +23,12 @@ namespace shader
 	X_INLINE const core::string& XHWShader::getName(void) const {
 		return name_;
 	}
-	X_INLINE const core::string& XHWShader::getSourceFileName(void) const {
-		return sourceFileName_;
-	}
 	X_INLINE const core::string& XHWShader::getEntryPoint(void) const {
 		return entryPoint_;
+	}
+
+	X_INLINE SourceFile* XHWShader::getShaderSource(void) const {
+		return pSourceFile_;
 	}
 
 	X_INLINE ShaderStatus::Enum XHWShader::getStatus(void) const {
@@ -60,9 +61,6 @@ namespace shader
 	}
 	X_INLINE int32_t XHWShader::getNumInstructions(void) const {
 		return numInstructions_;
-	}
-	X_INLINE int32_t XHWShader::getSourceCrc32(void) const {
-		return sourceCrc32_;
 	}
 	X_INLINE CompileFlags XHWShader::getCompileFlags(void) const {
 		return compileFlags_;

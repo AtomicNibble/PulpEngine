@@ -29,6 +29,7 @@ namespace shader
 
 
 	class ShaderBin;
+	class SourceFile;
 
 	X_ALIGNED_SYMBOL(class XHWShader, 64) : public IHWShader
 	{
@@ -44,7 +45,7 @@ namespace shader
 
 	public:
 		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
-			const core::string& sourceFile, uint32_t soruceFilecrc32, TechFlags techFlags);
+			SourceFile* pSourceFile, TechFlags techFlags);
 		SHADERLIB_EXPORT ~XHWShader();
 
 		X_INLINE const int32_t getID(void) const;
@@ -53,8 +54,8 @@ namespace shader
 		X_INLINE LockType& getLock(void);
 
 		X_INLINE const core::string& getName(void) const;
-		X_INLINE const core::string& getSourceFileName(void) const;
 		X_INLINE const core::string& getEntryPoint(void) const;
+		X_INLINE SourceFile* getShaderSource(void) const;
 		X_INLINE TechFlags getTechFlags(void) const;
 		X_INLINE ShaderType::Enum getType(void) const;
 		X_INLINE InputLayoutFormat::Enum getILFormat(void) const;
@@ -64,7 +65,6 @@ namespace shader
 		X_INLINE int32_t getNumConstantBuffers(void) const;
 		X_INLINE int32_t getNumInputParams(void) const;
 		X_INLINE int32_t getNumInstructions(void) const;
-		X_INLINE int32_t getSourceCrc32(void) const;
 		X_INLINE CompileFlags getCompileFlags(void) const;
 
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
@@ -92,11 +92,11 @@ namespace shader
 		LockType lock_;
 		
 		core::string name_;
-		core::string sourceFileName_;
 		core::string entryPoint_;
 
 		int32_t id_;
-		uint32_t sourceCrc32_; // the crc of the source this was compiled from.
+
+		SourceFile* pSourceFile_;
 
 		// status
 		ShaderStatus::Enum status_;

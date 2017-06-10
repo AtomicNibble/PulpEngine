@@ -370,8 +370,9 @@ namespace shader
 			return pHWShaderRes;
 		}
 
+
 		pHWShaderRes = hwShaders_.createAsset(nameStr, arena_, type,
-			name.c_str(), entry, pSourceFile->getName(), pSourceFile->getSourceCrc32(), techFlags);
+			name.c_str(), entry, pSourceFile, techFlags);
 
 
 		return pHWShaderRes;

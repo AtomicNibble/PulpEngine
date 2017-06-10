@@ -22,10 +22,9 @@ namespace shader
 	  // -------------------------------------------------------------------
 
 	XHWShader::XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
-		const core::string& sourceFile, uint32_t soruceFilecrc32, TechFlags techFlags) :
+		SourceFile* pSourceFile, TechFlags techFlags) :
 		name_(pName),
-		sourceFileName_(sourceFile),
-		sourceCrc32_(soruceFilecrc32),
+		pSourceFile_(X_ASSERT_NOT_NULL(pSourceFile)),
 		entryPoint_(entry),
 		status_(ShaderStatus::NotCompiled),
 		techFlags_(techFlags),
