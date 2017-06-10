@@ -249,8 +249,9 @@ namespace shader
 	{
 		// ok so for now when we create a permatation we also require all the shaders to be compiled.
 		// we return null if a shader fails to compile.
-		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, stages, arena_);
 
+		static_assert(decltype(permArena_)::IS_THREAD_SAFE, "PermArena must be thread safe");
+		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, _stages, arena_);
 
 		if (!pPerm->isCompiled())
 		{
