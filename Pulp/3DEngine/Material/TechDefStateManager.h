@@ -64,8 +64,34 @@ public:
 // this is to store states for each of the techSets.
 class TechDefStateManager
 {
+	typedef std::pair<MaterialCat::Enum, core::string> TechCatNamePair;
+
+	struct tech_pair_hash
+	{
+		size_t operator()(const TechCatNamePair& p) const
+		{
+			// just add the cat enum, not a great hash but should be fine for this.
+			return core::Hash::Fnv1aHash(p.second.data(), p.second.length()) + p.first;
+		}
+	};
+
 	// store pointers since we return pointers so growing of this would invalidate returned pointers.
 	typedef core::Array<TechDefState*> TechStatesArr;
+	typedef core::HashMap<TechCatNamePair, TechDefState*, tech_pair_hash> TechStatesMap;
+
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> PoolArena;
 
 public:
 	TechDefStateManager(core::MemoryArenaBase* arena);
@@ -82,11 +108,15 @@ private:
 
 private:
 	core::MemoryArenaBase* arena_;
-	core::XHashIndex hashIndex_;
-	TechStatesArr techStates_;
 
-	core::CriticalSection cacheLock_;
+	core::CriticalSection	cacheLock_;
+	TechStatesMap			techs_;
 
+	core::HeapArea			techsPoolHeap_;
+	core::PoolAllocator		techsPoolAllocator_;
+	PoolArena				techsPoolArena_;
+
+private:
 	techset::TechSetDefs* pTechDefs_;
 };
 

@@ -6,6 +6,12 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+namespace
+{
+	TechDefState* const INVALID_TECH_DEF_STATE = reinterpret_cast<TechDefState*>(std::numeric_limits<uintptr_t>::max());
+
+} // namespace
+
 TechDef::TechDef(core::MemoryArenaBase* arena) :
 	permArena_(arena),
 	perms_(arena),
@@ -199,14 +205,23 @@ TechDef* TechDefState::getTech(core::StrHash hash)
 
 TechDefStateManager::TechDefStateManager(core::MemoryArenaBase* arena) :
 	arena_(arena),
-	hashIndex_(arena, 256, 256),
-	techStates_(arena)
+	techs_(arena, TECH_DEFS_MAX),
+	techsPoolHeap_(
+		core::bitUtil::RoundUpToMultiple<size_t>(
+			PoolArena::getMemoryRequirement(sizeof(TechDefState)) * TECH_DEFS_MAX,
+			core::VirtualMem::GetPageSize()
+		)
+	),
+	techsPoolAllocator_(techsPoolHeap_.start(), techsPoolHeap_.end(),
+		PoolArena::getMemoryRequirement(sizeof(TechDefState)),
+		PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(TechDefState)),
+		PoolArena::getMemoryOffsetRequirement()
+	),
+	techsPoolArena_(&techsPoolAllocator_, "TechDefStatePool")
 {
-	techStates_.reserve(64);
-	techStates_.setGranularity(32);
+	arena->addChildArena(&techsPoolArena_);
 
-	pTechDefs_ = X_NEW(techset::TechSetDefs, g_3dEngineArena, "MatManTechSets")(g_3dEngineArena);
-
+	pTechDefs_ = X_NEW(techset::TechSetDefs, arena, "MatManTechSets")(arena);
 }
 
 TechDefStateManager::~TechDefStateManager()
@@ -216,12 +231,14 @@ TechDefStateManager::~TechDefStateManager()
 
 void TechDefStateManager::shutDown(void)
 {
-	for (auto* pTechDefState : techStates_)
+	core::CriticalSection::ScopedLock lock(cacheLock_);
+
+	for (auto& it : techs_)
 	{
-		X_DELETE(pTechDefState, arena_);
+		X_DELETE(it.second, &techsPoolArena_);
 	}
 
-	techStates_.free();
+	techs_.free();
 
 	if (pTechDefs_) {
 		X_DELETE_AND_NULL(pTechDefs_, g_3dEngineArena);
@@ -231,65 +248,73 @@ void TechDefStateManager::shutDown(void)
 
 TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, const core::string& name)
 {
-
-	// ok so we want to see if we already have the state for this tech def.
-	// if not we must load the tech def and also create state.
-	// can we do any optiomisation based on cat enum?
-	// maybe if we have all techdefs in contigious block.
-	// and then a seperate hash based index lookup.
-	// that way techdefstates reside in memory together and lookup map is only used in loading so nicer if 
-	// stored seperate so it will get purged out cache later.
-	// do i want states of simular cat to be near each other in memory?
-	// dunno.
-	// 
-
-	auto hashVal = core::Hash::Fnv1aHash(name.c_str(), name.length());
+	TechCatNamePair pair(cat, name);
 	
+	TechDefState** pTechDefRef = nullptr;
+	bool loaded = true;
 	{
 		core::CriticalSection::ScopedLock lock(cacheLock_);
 
-		for (auto idx = hashIndex_.first(hashVal); idx >= 0; idx = hashIndex_.next(idx))
+		auto it = techs_.find(pair);
+		if (it != techs_.end())
 		{
-			auto* pTechDef = techStates_[idx];
-
-			if (pTechDef->cat == cat && pTechDef->name == name)
-			{
-				return pTechDef;
-			}
+			pTechDefRef = &it->second;
 		}
+		else
+		{
+			loaded = false;
+			auto insertIt = techs_.insert(std::make_pair(pair, nullptr));
+
+			pTechDefRef = &insertIt.first->second;
+		}
+	}
+
+	if (loaded)
+	{
+		while (*pTechDefRef == nullptr) {
+			core::Thread::Yield();
+		}
+
+		if (*pTechDefRef == INVALID_TECH_DEF_STATE) {
+			return nullptr;
+		}
+
+		return *pTechDefRef;
 	}
 
 	// not in cache.
 	auto* pTechDef = loadTechDefState(cat, name);
 	if (!pTechDef) {
 		X_ERROR("TechDefState", "Failed to load tech state def: %s:%s", MaterialCat::ToString(cat), name.c_str());
+		*pTechDefRef = INVALID_TECH_DEF_STATE;
 		return nullptr;
 	}
 
-	// add to cache
-	core::CriticalSection::ScopedLock lock(cacheLock_);
-
-	auto idx = techStates_.append(pTechDef);
-	hashIndex_.insertIndex(hashVal, safe_static_cast<int32_t>(idx));
-
+	*pTechDefRef = pTechDef;
 	return pTechDef;
 }
 
 TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat, const core::string& name)
 {
 	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
+	static_assert(decltype(techsPoolArena_)::IS_THREAD_SAFE, "Arena must be thread safe");
 
-	core::CriticalSection::ScopedLock lock(cacheLock_);
 
 	techset::TechSetDef* pTechDef = nullptr;
-	if (!pTechDefs_->getTechDef(cat, name, pTechDef)) {
-		X_ERROR("TechDefState", "Failed to get techdef definition for state creation");
-		return nullptr;
+
+	{
+		core::CriticalSection::ScopedLock lock(cacheLock_);
+
+		if (!pTechDefs_->getTechDef(cat, name, pTechDef)) {
+			X_ERROR("TechDefState", "Failed to get techdef definition for state creation");
+			return nullptr;
+		}
+
 	}
 
 	// this don't cause any state to be created.
 	// permatations are created on demand.
-	core::UniquePointer<TechDefState> pTechDefState = core::makeUnique<TechDefState>(arena_, arena_);
+	core::UniquePointer<TechDefState> pTechDefState = core::makeUnique<TechDefState>(&techsPoolArena_, arena_);
 	pTechDefState->cat = cat;
 	pTechDefState->name = name;
 	pTechDefState->techs_.reserve(pTechDef->numTechs());
