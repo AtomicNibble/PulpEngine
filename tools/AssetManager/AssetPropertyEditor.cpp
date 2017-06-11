@@ -904,11 +904,11 @@ bool AssetProperties::save(QString& errorString)
 }
 
 
-bool AssetProperties::updateRawFile(const core::Array<uint8_t>& data)
+bool AssetProperties::updateRawFile(const core::Array<uint8_t>& compressedData)
 {
 	const core::string& assetName = nameNarrow();
 
-	auto res = db_.UpdateAssetRawFile(type(), assetName, data);
+	auto res = db_.UpdateAssetRawFile(type(), assetName, compressedData);
 	if (res != assetDb::AssetDB::Result::OK && res != assetDb::AssetDB::Result::UNCHANGED) {
 		X_ERROR("AssetProp", "Failed to update raw file for asset. Err: %s", assetDb::AssetDB::Result::ToString(res));
 		return false;
@@ -921,11 +921,12 @@ bool AssetProperties::updateRawFile(const core::Array<uint8_t>& data)
 }
 
 
-bool AssetProperties::updateThumb(const core::Array<uint8_t>& data, Vec2i thumbDim, Vec2i srcDim)
+bool AssetProperties::updateThumb(const core::Array<uint8_t>& data, Vec2i thumbDim, Vec2i srcDim,
+	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
 	const core::string& assetName = nameNarrow();
 
-	auto res = db_.UpdateAssetThumb(type(), assetName, thumbDim, srcDim, data);
+	auto res = db_.UpdateAssetThumb(type(), assetName, thumbDim, srcDim, data, algo, lvl);
 	if (res != assetDb::AssetDB::Result::OK && res != assetDb::AssetDB::Result::UNCHANGED) {
 		X_ERROR("AssetProp", "Failed to update thumb for asset. Err: %s", assetDb::AssetDB::Result::ToString(res));
 		return false;
@@ -1326,6 +1327,7 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 		}
 
 		keys_[key] = pItem;
+
 	}
 
 	pCur_->AddChild(pItem);

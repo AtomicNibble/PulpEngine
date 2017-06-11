@@ -497,8 +497,8 @@ void AssetTextureWidget::rawFileLoaded(void)
 	// src image data
 	pAssEntry_->updateRawFile(srcData);
 	// thumb data
-	pAssEntry_->updateThumb(thumbData, Vec2i(64, 64), srcDim);
-
+	pAssEntry_->updateThumb(thumbData, Vec2i(64, 64), srcDim, 
+		core::Compression::Algo::LZ4, core::Compression::CompressLevel::NORMAL);
 
 	// set and show dims
 	pEditDimensions_->setText(QString("%1x%2").arg(QString::number(srcDim.x), QString::number(srcDim.y)));
