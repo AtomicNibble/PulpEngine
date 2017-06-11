@@ -108,6 +108,7 @@ private:
 	void addLoadRequest(MaterialResource* pMaterial);
 	void queueLoadRequest(MaterialResource* pMaterial, core::CriticalSection::ScopedLock&);
 	void dispatchLoad(Material* pMaterial, core::CriticalSection::ScopedLock&);
+	bool dispatchPendingLoad(core::CriticalSection::ScopedLock&);
 	bool waitForLoad(Material* pMaterial); // returns true if load succeed.
 	void dispatchLoadRequest(MaterialLoadRequest* pLoadReq);
 

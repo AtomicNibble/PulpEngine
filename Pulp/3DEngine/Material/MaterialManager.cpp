@@ -311,19 +311,27 @@ void XMaterialManager::dispatchLoad(Material* pMaterial, core::CriticalSection::
 	pendingRequests_.emplace_back(loadReq.release());
 }
 
+bool XMaterialManager::dispatchPendingLoad(core::CriticalSection::ScopedLock& lock)
+{
+	int32_t maxReq = vars_.maxActiveLoadReq();
+
+	if (requestQueue_.isNotEmpty() && (maxReq == 0 || pendingRequests_.size() < maxReq))
+	{
+		X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
+		dispatchLoad(requestQueue_.peek(), lock);
+		requestQueue_.pop();
+		return true;
+	}
+
+	return false;
+}
+
 
 void XMaterialManager::dispatchPendingLoads(void)
 {
 	core::CriticalSection::ScopedLock lock(loadReqLock_);
 
-	while (requestQueue_.isNotEmpty())
-	{
-		X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
-
-		dispatchLoad(requestQueue_.peek(), lock);
-
-		requestQueue_.pop();
-	}
+	while (dispatchPendingLoad(lock));
 }
 
 
@@ -426,6 +434,9 @@ void XMaterialManager::loadRequestCleanup(MaterialLoadRequest* pLoadReq)
 	{
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 		pendingRequests_.remove(pLoadReq);
+
+		// dispatch another?
+		dispatchPendingLoad(lock);
 	}
 
 	if (pLoadReq->pFile) {
