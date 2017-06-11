@@ -259,6 +259,7 @@ private:
 	static const char* AssetTypeRawFolder(AssetType::Enum type);
 	static void AssetPathForName(AssetType::Enum type, const core::string& name, uint32_t rawDataHash, core::Path<char>& pathOut);
 	static void AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut);
+	static void RawFilePathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut);
 	static void ThumbPathForThumb(const ThumbInfo& info, core::Path<char>& pathOut);
 	static bool ValidName(const core::string& name);
 

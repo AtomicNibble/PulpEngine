@@ -1606,10 +1606,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 		if (GetRawfileForId(assetId, rawData, &rawId))
 		{
 			core::Path<char> path;
-			path = AssetTypeRawFolder(type);
-			path.toLower();
-			path /= newName;
-			path.replaceSeprators();
+			RawFilePathForName(type, newName, path);
 
 			sql::SqlLiteTransaction trans(db_);
 			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE file_id = ?");
@@ -1901,7 +1898,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 
 
 	// save the file.
-	core::Path<char> path;
 
 	{
 		core::XFileScoped file;
@@ -1929,15 +1925,12 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		}
 	}
 
+	core::Path<char> path;
+	RawFilePathForName(type, name, path);
+
 	if (rawId == INVALID_RAWFILE_ID)
 	{
 		sql::SqlLiteDb::RowId lastRowId;
-
-		path = AssetTypeRawFolder(type);
-		path.toLower();
-		path /= name;
-		path.replaceSeprators();
-		// we don't include hash here.
 
 		// insert entry
 		{
@@ -3036,6 +3029,14 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 	pathOut /= raw.path;
 	pathOut.replaceSeprators();
 	pathOut.appendFmt(".%" PRIu32, raw.hash);
+}
+
+void AssetDB::RawFilePathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut)
+{
+	pathOut = AssetTypeRawFolder(type);
+	pathOut.toLower();
+	pathOut /= name;
+	pathOut.replaceSeprators();
 }
 
 void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOut)
