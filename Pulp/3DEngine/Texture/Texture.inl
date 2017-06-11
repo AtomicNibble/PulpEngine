@@ -105,6 +105,15 @@ X_INLINE texture::TextureFlags& Texture::flags(void)
 
 X_INLINE void Texture::setProperties(const texture::XTextureFile& imgFile)
 {
+	dimensions_ = imgFile.getSize();
+	datasize_ = static_cast<uint32_t>(imgFile.getDataSize());
+	type_ = imgFile.getType();
+	flags_ = imgFile.getFlags();
+	format_ = imgFile.getFormat();
+	numMips_ = static_cast<uint8_t>(imgFile.getNumMips());
+	numFaces_ = static_cast<uint8_t>(imgFile.getNumFaces());
+	depth_ = static_cast<uint8_t>(imgFile.getDepth());
+
 	pDeviceTexture_->setProperties(imgFile);
 }
 
