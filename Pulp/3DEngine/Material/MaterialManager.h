@@ -10,6 +10,8 @@
 #include <Containers\Fifo.h>
 #include <Time\TimeVal.h>
 
+#include "Vars\MaterialVars.h"
+
 X_NAMESPACE_DECLARE(core, 
 	namespace V2 {
 		struct Job;
@@ -142,6 +144,7 @@ private:
 	VariableStateManager& vsMan_;
 	TechDefStateManager* pTechDefMan_;
 
+	MaterialVars vars_;
 	MaterialContainer materials_;
 
 	Material* pDefaultMtl_;

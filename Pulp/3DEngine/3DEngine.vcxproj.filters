@@ -79,6 +79,9 @@
     <ClCompile Include="Vars\LevelVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\MaterialVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -151,6 +154,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vars\LevelVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\MaterialVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
@@ -242,6 +248,9 @@
       <Filter>Header Files\Texture</Filter>
     </None>
     <None Include="Vars\LevelVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="Vars\MaterialVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>

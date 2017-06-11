@@ -63,7 +63,7 @@ void XMaterialManager::registerCmds(void)
 
 void XMaterialManager::registerVars(void)
 {
-
+	vars_.registerVars();
 
 }
 
