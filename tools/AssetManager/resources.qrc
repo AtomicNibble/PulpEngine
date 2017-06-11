@@ -12,6 +12,7 @@
         <file>img/File_light.png</file>
         <file>img/File_cam.png</file>
         <file>img/File_vehicle.png</file>
+        <file>img/Drop_img.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>img/vline.png</file>
