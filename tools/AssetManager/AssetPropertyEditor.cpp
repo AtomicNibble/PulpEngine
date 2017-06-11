@@ -921,6 +921,26 @@ bool AssetProperties::updateRawFile(const ByteArr& compressedData)
 }
 
 
+bool AssetProperties::getRawFile(ByteArr& rawData)
+{
+	const core::string& assetName = nameNarrow();
+
+	int32_t assetId;
+	if (!db_.AssetExsists(type(), assetName, &assetId)) {
+		X_ERROR("AssetProp", "Asset `%s` does not exsist", assetName.c_str());
+		return false;
+	}
+
+	bool res = db_.GetRawFileDataForAsset(assetId, rawData);
+	if (!res) {
+		X_ERROR("AssetProp", "Failed to get raw file for asset.");
+		return false;
+	}
+
+	return true;
+}
+
+
 bool AssetProperties::updateThumb(const ByteArr& data, Vec2i thumbDim, Vec2i srcDim,
 	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
