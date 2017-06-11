@@ -113,7 +113,7 @@ private:
 	// the cpu texture
 	XFontTexture* pFontTexture_;
 
-	texture::ITexture* pTexture_;
+	render::IDeviceTexture* pTexture_;
 	bool fontTexDirty_;
 
 	// shader and state.

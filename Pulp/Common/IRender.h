@@ -295,7 +295,34 @@ X_DECLARE_ENUM8(PixelBufferType)(
 	SHADOW
 );
 
-struct IPixelBuffer : public texture::ITexture
+typedef int32_t TexID;
+
+struct IDeviceTexture
+{
+	virtual ~IDeviceTexture() {};
+
+	// the resource id.
+	virtual const TexID getTexID(void) const X_ABSTRACT;
+
+	virtual const core::string& getName(void) const X_ABSTRACT;
+	virtual const Vec2<uint16_t> getDimensions(void) const X_ABSTRACT;
+	virtual const int getWidth(void) const X_ABSTRACT;
+	virtual const int getHeight(void) const X_ABSTRACT;
+	virtual const int getNumFaces(void) const X_ABSTRACT;
+	virtual const int getNumMips(void) const X_ABSTRACT;
+	virtual const int getDepth(void) const X_ABSTRACT;
+	virtual const int getDataSize(void) const X_ABSTRACT;
+	virtual const bool isLoaded(void) const X_ABSTRACT;
+
+	virtual const texture::TextureType::Enum getTextureType(void) const X_ABSTRACT;
+	virtual const texture::TextureFlags getFlags(void) const X_ABSTRACT;
+	virtual const texture::Texturefmt::Enum getFormat(void) const X_ABSTRACT;
+
+	virtual void setProperties(const texture::XTextureFile& imgFile) X_ABSTRACT;
+};
+
+
+struct IPixelBuffer : public IDeviceTexture
 {
 	virtual ~IPixelBuffer() {};
 
@@ -360,12 +387,12 @@ struct IRender
 	virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
 
 	// this creates a texture for a given textureFile, the cpu data is only uploaded if requested.
-	virtual texture::ITexture* getDeviceTexture(int32_t id) X_ABSTRACT;
-	virtual bool initDeviceTexture(texture::ITexture* pTex) X_ABSTRACT;
-	virtual bool initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
+	virtual IDeviceTexture* getDeviceTexture(int32_t id) X_ABSTRACT;
+	virtual bool initDeviceTexture(IDeviceTexture* pTex) X_ABSTRACT;
+	virtual bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
 
 	// creates a texture for dynamic content, no data loaded from disk.
-	virtual texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
+	virtual IDeviceTexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
 	
 	// shaders
 	// new api for creating techs in 3dengine
@@ -378,7 +405,7 @@ struct IRender
 
 	// Will relesse all the HWShaders in the perm for you.
 	virtual void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_ABSTRACT;
-	virtual void releaseTexture(texture::ITexture* pTex) X_ABSTRACT;
+	virtual void releaseTexture(IDeviceTexture* pTex) X_ABSTRACT;
 	virtual void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_ABSTRACT;
 	virtual void destoryPassState(PassStateHandle handle) X_ABSTRACT;
 	virtual void destoryState(StateHandle handle) X_ABSTRACT;

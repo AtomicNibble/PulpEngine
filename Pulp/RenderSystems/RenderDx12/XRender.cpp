@@ -1098,26 +1098,26 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
 	pBuffMan_->freeCB(handle);
 }
 
-texture::ITexture* XRender::getDeviceTexture(int32_t id)
+IDeviceTexture* XRender::getDeviceTexture(int32_t id)
 {
 	texture::Texture* pText = pTextureMan_->getDeviceTexture(id);
 
 	return pText;
 }
 
-::texture::ITexture* XRender::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+IDeviceTexture* XRender::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
 	texture::Texture* pText = pTextureMan_->createTexture(pNickName, dim, fmt, pInitialData);
 
 	return pText;
 }
 
-bool XRender::initDeviceTexture(texture::ITexture* pTex)
+bool XRender::initDeviceTexture(IDeviceTexture* pTex)
 {
 	return pTextureMan_->initDeviceTexture(static_cast<texture::Texture*>(pTex));
 }
 
-bool XRender::initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile)
+bool XRender::initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile)
 {
 	return pTextureMan_->initDeviceTexture(static_cast<texture::Texture*>(pTex), imgFile);
 }
@@ -1144,7 +1144,7 @@ void XRender::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
 	pShaderMan_->releaseShaderPermatation(pPerm);
 }
 
-void XRender::releaseTexture(texture::ITexture* pTex)
+void XRender::releaseTexture(IDeviceTexture* pTex)
 {
 	pTextureMan_->releaseTexture(pTex);
 }

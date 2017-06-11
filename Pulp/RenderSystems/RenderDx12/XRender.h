@@ -194,11 +194,11 @@ public:
 	// cb's
 	ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
 
-	texture::ITexture* getDeviceTexture(int32_t id) X_FINAL;
-	texture::ITexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
+	IDeviceTexture* getDeviceTexture(int32_t id) X_FINAL;
+	IDeviceTexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_FINAL;
 	
-	bool initDeviceTexture(texture::ITexture* pTex) X_FINAL;
-	bool initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile) X_FINAL;
+	bool initDeviceTexture(IDeviceTexture* pTex) X_FINAL;
+	bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_FINAL;
 
 	shader::IShaderSource* getShaderSource(const char* pName) X_FINAL;
 	shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags) X_FINAL;
@@ -209,7 +209,7 @@ public:
 
 	// Release
 	void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;
-	void releaseTexture(texture::ITexture* pTex) X_FINAL;
+	void releaseTexture(IDeviceTexture* pTex) X_FINAL;
 	void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_FINAL;
 	void destoryPassState(PassStateHandle handle) X_FINAL;
 	void destoryState(StateHandle handle) X_FINAL;

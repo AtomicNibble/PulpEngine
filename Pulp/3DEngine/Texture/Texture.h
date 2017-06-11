@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(engine)
 class Texture
 {
 public:
-	Texture(core::string name, texture::TextureFlags flags, texture::ITexture* pDeviceTexture);
+	Texture(core::string name, texture::TextureFlags flags, render::IDeviceTexture* pDeviceTexture);
 	~Texture() = default;
 
 	X_INLINE const int32_t getDeviceID(void) const;
@@ -39,7 +39,7 @@ public:
 
 public:
 	X_INLINE void setProperties(const texture::XTextureFile& imgFile);
-	X_INLINE texture::ITexture* getDeviceTexture(void) const;
+	X_INLINE render::IDeviceTexture* getDeviceTexture(void) const;
 
 private:
 	core::string				fileName_;
@@ -53,7 +53,7 @@ private:
 	uint8_t						depth_;
 	uint8_t						numFaces_;
 
-	texture::ITexture*			pDeviceTexture_;
+	render::IDeviceTexture*		pDeviceTexture_;
 };
 
 

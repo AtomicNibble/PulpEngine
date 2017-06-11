@@ -52,7 +52,7 @@ public:
 	Texture* getByID(TexID texId) const;
 
 	// must not be null.
-	void releaseTexture(texture::ITexture* pTex);
+	void releaseTexture(render::IDeviceTexture* pTex);
 	void releaseTexture(Texture* pTex);
 	void releasePixelBuffer(render::IPixelBuffer* pPixelBuf);
 

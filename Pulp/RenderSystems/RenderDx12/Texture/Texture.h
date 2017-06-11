@@ -36,8 +36,6 @@ class TextureManager;
 
 		// temp maybe
 		X_INLINE const TexID getTexID(void) const X_FINAL { return id_; };
-		X_INLINE const bool IsShared(void) const X_FINAL { return false; }
-
 
 		X_INLINE const core::string& getName(void) const X_FINAL;
 		X_INLINE const Vec2<uint16_t> getDimensions(void) const X_FINAL;
@@ -49,7 +47,6 @@ class TextureManager;
 		X_INLINE const int32_t getDataSize(void) const X_FINAL;
 
 		X_INLINE const bool isLoaded(void) const X_FINAL;
-		X_INLINE const bool IsStreamable(void) const X_FINAL;
 
 		X_INLINE const TextureType::Enum getTextureType(void) const X_FINAL;
 		X_INLINE const TextureFlags getFlags(void) const X_FINAL;

@@ -228,7 +228,7 @@ X_NAMESPACE_BEGIN(texture)
 		return textures_.findAsset(texId);
 	}
 
-	void TextureManager::releaseTexture(texture::ITexture* pTex)
+	void TextureManager::releaseTexture(render::IDeviceTexture* pTex)
 	{
 		return releaseTexture(static_cast<Texture*>(pTex));
 	}

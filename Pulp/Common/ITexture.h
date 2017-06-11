@@ -335,34 +335,6 @@ another has the API shizz, gonna have to change my folder structure a bit.
 typedef int TexID;
 class XTextureFile;
 
-struct ITexture
-{
-	virtual ~ITexture(){};
-
-	// the resource id.
-	virtual const TexID getTexID(void) const X_ABSTRACT;
-
-	virtual const core::string& getName(void) const X_ABSTRACT;
-	virtual const Vec2<uint16_t> getDimensions(void) const X_ABSTRACT;
-	virtual const int getWidth(void) const X_ABSTRACT;
-	virtual const int getHeight(void) const X_ABSTRACT;
-	virtual const int getNumFaces(void) const X_ABSTRACT;
-	virtual const int getNumMips(void) const X_ABSTRACT;
-	virtual const int getDepth(void) const X_ABSTRACT;
-	virtual const int getDataSize(void) const X_ABSTRACT;
-	virtual const bool isLoaded(void) const X_ABSTRACT;
-	virtual const bool IsShared(void) const X_ABSTRACT;
-	virtual const bool IsStreamable(void) const X_ABSTRACT;
-
-	virtual const TextureType::Enum getTextureType(void) const X_ABSTRACT;
-	virtual const TextureFlags getFlags(void) const X_ABSTRACT;
-	virtual const Texturefmt::Enum getFormat(void) const X_ABSTRACT;
-
-	virtual void setProperties(const XTextureFile& imgFile) X_ABSTRACT;
-};
-
-
-
 struct ITextureFmt
 {
 	typedef core::Array<uint8_t> DataVec;
