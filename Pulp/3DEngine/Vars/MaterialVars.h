@@ -17,9 +17,11 @@ public:
 
 	void registerVars(void);
 
+	X_INLINE int32_t maxActiveLoadReq(void) const;
+
 
 private:
-
+	int32_t maxActiveLoadReq_;
 };
 
 

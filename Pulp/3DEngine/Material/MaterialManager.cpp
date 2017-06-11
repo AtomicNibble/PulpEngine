@@ -268,7 +268,8 @@ void XMaterialManager::addLoadRequest(MaterialResource* pMaterial)
 	pMaterial->setStatus(core::LoadStatus::Loading);
 
 	// queue it if over 16 active requests.
-	if (pendingRequests_.size() < 16)
+	int32_t maxReq = vars_.maxActiveLoadReq();
+	if (maxReq == 0 || pendingRequests_.size() < maxReq)
 	{
 		dispatchLoad(pMaterial, lock);
 	}
