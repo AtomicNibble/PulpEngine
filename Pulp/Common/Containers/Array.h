@@ -119,6 +119,11 @@ public:
 	Iterator insert(ConstIterator pos, Type&& obj);
 	Iterator insert(ConstIterator pos, size_type count, const Type& obj);
 
+	template<typename Iter>
+	typename std::enable_if<
+		std::is_pointer<Iter>::value && std::is_same<std::remove_cv_t<std::remove_pointer_t<Iter>>, Type>::value,
+	Iterator>::type insert(ConstIterator pos, Iter first, Iter last);
+
 	template< class... Args >
 	Iterator emplace(ConstIterator pos, Args&&... args);
 
