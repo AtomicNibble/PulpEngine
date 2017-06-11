@@ -23,18 +23,15 @@ public:
 	void setPromptDialogFilter(const QString& filter);
 	QString promptDialogFilter(void) const;
 
-	QString path(void) const;
-
 private:
 	void showPreviewWidgets(bool vis);
-	void setPath(const QString& filePath);
+	void loadFile(const QString& filePath);
 	QString makeDialogTitle(const QString& title);
 	static bool fileExtensionValid(const QString& paht);
-	bool getPixMapCurPath(QPixmap& pixOut);
+	bool loadCurrentToPix(QPixmap& pixOut);
 	void setPreviewPix(QPixmap& pix);
-	bool loadImage(void);
-	void setErrorTip(const QString& tip);
-	void removeErrorTip(void);
+	bool loadImage(const QString& path);
+	void showError(const QString& msg);
 
 protected:
 	bool eventFilter(QObject* pObject, QEvent* pEvent) X_OVERRIDE;
@@ -45,9 +42,7 @@ signals:
 	void valueChanged(const std::string& value);
 
 private slots:
-	void setValue(const std::string& value);
-	void editingFinished(void);
-	void validatePath(void);
+	void loadPreview(void);
 	void showTextureDialog(void);
 	void browseClicked(void);
 
@@ -65,12 +60,9 @@ private:
 private:
 	QLabel* pPreview_;
 	QToolButton* pZoom_;
-	QLabel* pEditPathPad_; // used for layout currently.
-	QLineEdit* pEditPath_;
+	QLabel* pDropZone_; 
 	QLabel* pEditDimensions_;
-	QAction* pWarningAction_;
 
-	QString curPath_;
 	QString dialogFilter_;
 	QString dialogTitleOverride_;
 	QString initialBrowsePathOverride_;
