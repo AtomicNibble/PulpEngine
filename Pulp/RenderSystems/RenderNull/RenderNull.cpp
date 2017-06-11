@@ -184,7 +184,7 @@ void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
 }
 
 
-texture::ITexture* RenderNull::getDeviceTexture(int32_t id)
+IDeviceTexture* RenderNull::getDeviceTexture(int32_t id)
 {
 	X_UNUSED(id);
 
@@ -192,7 +192,7 @@ texture::ITexture* RenderNull::getDeviceTexture(int32_t id)
 }
 
 
-texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+IDeviceTexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
 {
 	X_UNUSED(pNickName);
 	X_UNUSED(dim);
@@ -203,13 +203,13 @@ texture::ITexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, t
 }
 
 
-bool RenderNull::initDeviceTexture(texture::ITexture* pTex)
+bool RenderNull::initDeviceTexture(IDeviceTexture* pTex)
 {
 	X_UNUSED(pTex);
 	return false;
 }
 
-bool RenderNull::initDeviceTexture(texture::ITexture* pTex, const texture::XTextureFile& imgFile)
+bool RenderNull::initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile)
 {
 	X_UNUSED(pTex, imgFile);
 	return false;
@@ -248,7 +248,7 @@ void RenderNull::releaseShaderPermatation(shader::IShaderPermatation* pPerm)
 	X_UNUSED(pPerm);
 }
 
-void RenderNull::releaseTexture(texture::ITexture* pTex)
+void RenderNull::releaseTexture(IDeviceTexture* pTex)
 {
 	X_UNUSED(pTex);
 
