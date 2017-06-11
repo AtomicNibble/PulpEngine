@@ -31,6 +31,22 @@ namespace TGA
 			uint32_t		PixelDepth;      /* 10h  Image pixel size */
 			uint32_t		ImageDescriptor; /* 11h  Image descriptor byte */
 		};
+
+		struct Tga_Footer
+		{
+			X_INLINE bool isValid(void) const {
+				return std::memcmp(signature, "TRUEVISION-XFILE", sizeof(signature)) == 0;
+			}
+
+			uint32_t extensionOffset;
+			uint32_t developerAreaOffset;
+			uint8_t signature[16];
+			uint8_t dot;
+			uint8_t null;
+		};
+
+		X_ENSURE_SIZE(Tga_Footer, 26)
+
 		X_PRAGMA(pack(pop))
 
 		struct ImageType
@@ -309,10 +325,31 @@ namespace TGA
 			}
 		}
 
-#if X_DEBUG == 1
 		uint64_t left = file->remainingBytes();
+		if (left == sizeof(Tga_Footer))
+		{
+			Tga_Footer footer;
+			if (file->readObj(footer) != sizeof(footer))
+			{
+				X_WARNING("TextureTGA", "Failed to read potentially footer");
+			}
+			else
+			{
+				if (!footer.isValid())
+				{
+					X_WARNING("TextureTGA", "Invalid footer data");
+				}
+			}
+
+#if X_DEBUG == 1
+			// update left.
+			left = file->remainingBytes();
+#endif // !X_DEBUG 
+		}
+
+#if X_DEBUG == 1
 		X_WARNING_IF(left > 0, "TextureTGA", "potential read fail, bytes left in file: %i", left);
-#endif
+#endif // !X_DEBUG 
 
 		return true;
 	}
