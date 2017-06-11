@@ -384,7 +384,8 @@ bool Converter::GenerateThumbs(void)
 			return false;
 		}
 
-		X_LOG0("Converter", "Generating %" PRIi32 " thumb(s)", numAssets);
+
+		X_LOG0("Converter", "Processing \"%s\" Generating ^6%" PRIi32 "^7 thumb(s)", AssetType::ToString(assType), numAssets);
 
 		assetDb::AssetDB::AssetDelegate func;
 		func.Bind<Converter, &Converter::GenerateThumb>(this);
