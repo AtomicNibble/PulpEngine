@@ -269,7 +269,7 @@ void XMaterialManager::addLoadRequest(MaterialResource* pMaterial)
 
 	// queue it if over 16 active requests.
 	int32_t maxReq = vars_.maxActiveLoadReq();
-	if (maxReq == 0 || pendingRequests_.size() < maxReq)
+	if (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq)
 	{
 		dispatchLoad(pMaterial, lock);
 	}
@@ -315,7 +315,7 @@ bool XMaterialManager::dispatchPendingLoad(core::CriticalSection::ScopedLock& lo
 {
 	int32_t maxReq = vars_.maxActiveLoadReq();
 
-	if (requestQueue_.isNotEmpty() && (maxReq == 0 || pendingRequests_.size() < maxReq))
+	if (requestQueue_.isNotEmpty() && (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq))
 	{
 		X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
 		dispatchLoad(requestQueue_.peek(), lock);
