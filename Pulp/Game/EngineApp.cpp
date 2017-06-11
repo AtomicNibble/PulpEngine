@@ -69,11 +69,11 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 	params.bSkipInput = false;
 	params.bEnableNetowrking = true;
 	params.bProfileSysEnabled = true;
+	params.pCoreArena = pArena_;
 
 	// enable loggers
 	params.bVsLog = core::debugging::IsDebuggerConnected();
 	params.bConsoleLog = true;
-	params.pCoreArena = pArena_;
 
 #ifdef X_LIB
 
