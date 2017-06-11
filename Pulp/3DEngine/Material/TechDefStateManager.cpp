@@ -17,6 +17,8 @@ TechDef::TechDef(core::MemoryArenaBase* arena) :
 	perms_(arena),
 	aliases_(arena)
 {
+	X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
+
 	perms_.setGranularity(8);
 	aliases_.setGranularity(2);
 	shaderSource_.fill(nullptr);
@@ -181,6 +183,8 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 TechDefState::TechDefState(core::MemoryArenaBase* arena) :
 	techs_(arena)
 {
+	X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
+
 	techs_.setGranularity(1);
 }
 
