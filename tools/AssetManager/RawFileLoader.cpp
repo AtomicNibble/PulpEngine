@@ -51,6 +51,8 @@ void RawFileLoader::run()
 	emit setProgress(0);
 
 	QFile f(path_);
+	QFileInfo fInfo(f);
+
 	if (!f.open(QFile::ReadOnly)) {
 		X_ERROR("RawFile", "Failed to load, error opening file. Err: %s", qPrintable(f.errorString()));
 		return;
@@ -131,7 +133,24 @@ void RawFileLoader::run()
 		// load a image.
 		QImage img;
 
-		if (!img.loadFromData(imgData.data(), static_cast<uint32_t>(imgData.size()))) {
+		const char* pFormat = nullptr;
+
+		// for some formats we need to help it.
+		const auto& suffix = fInfo.suffix();
+		if (suffix.compare("dds", Qt::CaseInsensitive) == 0) {
+			pFormat = "dds";
+		}
+		else if (suffix.compare("tga", Qt::CaseInsensitive) == 0) {
+			pFormat = "tga";
+		}
+		else if (suffix.compare("png", Qt::CaseInsensitive) == 0) {
+			pFormat = "png";
+		}
+		else if (suffix.compare("jpg", Qt::CaseInsensitive) == 0) {
+			pFormat = "jpg";
+		}
+
+		if (!img.loadFromData(imgData.data(), static_cast<uint32_t>(imgData.size()), pFormat)) {
 			X_ERROR("Img", "Error creating pixmap for preview");
 			return;
 		}
