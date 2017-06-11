@@ -970,9 +970,9 @@ bool AssetProperties::getThumb(ByteArr& data, Vec2i& dim)
 	}
 
 	assetDb::AssetDB::ThumbInfo info;
-	auto res = db_.GetThumbForAsset(assetId, info, data);
+	bool res = db_.GetThumbForAsset(assetId, info, data);
 	if (!res) {
-		X_WARNING("AssetProp", "Failed to get thumb for asset. Err: %s", assetDb::AssetDB::Result::ToString(res));
+		X_WARNING("AssetProp", "Failed to get thumb for asset.");
 		return false;
 	}
 	else {
