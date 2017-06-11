@@ -245,10 +245,10 @@ public:
 
 	// IAssetEntry
 	bool save(QString& errorString) X_OVERRIDE;
-	bool updateRawFile(const core::Array<uint8_t>& compressedData) X_OVERRIDE;
-	bool updateThumb(const core::Array<uint8_t>& data, Vec2i thumbDim, Vec2i srcDim,
+	bool updateRawFile(const ByteArr& compressedData) X_OVERRIDE;
+	bool updateThumb(const ByteArr& data, Vec2i thumbDim, Vec2i srcDim,
 		core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_OVERRIDE;
-	bool getThumb(core::Array<uint8_t>& data, Vec2i& dim) X_OVERRIDE;
+	bool getThumb(ByteArr& data, Vec2i& dim) X_OVERRIDE;
 
 	bool reloadUi(void) X_OVERRIDE;
 

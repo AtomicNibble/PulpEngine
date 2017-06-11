@@ -13,12 +13,15 @@ class IAssetEntry : public QObject
 	Q_OBJECT
 
 public:
+	typedef core::Array<uint8_t> ByteArr;
+
+public:
 	IAssetEntry(QObject *parent);
 	~IAssetEntry();
 
 	virtual bool save(QString& errorString) X_ABSTRACT;
-	virtual bool updateRawFile(const core::Array<uint8_t>& compressedData) X_ABSTRACT;
-	virtual bool updateThumb(const core::Array<uint8_t>& data, Vec2i thumbDim, Vec2i srcDim,
+	virtual bool updateRawFile(const ByteArr& compressedData) X_ABSTRACT;
+	virtual bool updateThumb(const ByteArr& data, Vec2i thumbDim, Vec2i srcDim,
 		core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
 	virtual bool getThumb(core::Array<uint8_t>& data, Vec2i& dim) X_ABSTRACT;
 	virtual bool reloadUi(void) X_ABSTRACT;

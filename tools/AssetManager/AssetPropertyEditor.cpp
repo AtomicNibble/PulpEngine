@@ -904,7 +904,7 @@ bool AssetProperties::save(QString& errorString)
 }
 
 
-bool AssetProperties::updateRawFile(const core::Array<uint8_t>& compressedData)
+bool AssetProperties::updateRawFile(const ByteArr& compressedData)
 {
 	const core::string& assetName = nameNarrow();
 
@@ -921,7 +921,7 @@ bool AssetProperties::updateRawFile(const core::Array<uint8_t>& compressedData)
 }
 
 
-bool AssetProperties::updateThumb(const core::Array<uint8_t>& data, Vec2i thumbDim, Vec2i srcDim,
+bool AssetProperties::updateThumb(const ByteArr& data, Vec2i thumbDim, Vec2i srcDim,
 	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
 	const core::string& assetName = nameNarrow();
@@ -939,7 +939,7 @@ bool AssetProperties::updateThumb(const core::Array<uint8_t>& data, Vec2i thumbD
 	return true;
 }
 
-bool AssetProperties::getThumb(core::Array<uint8_t>& data, Vec2i& dim)
+bool AssetProperties::getThumb(ByteArr& data, Vec2i& dim)
 {
 	const core::string& assetName = nameNarrow();
 
