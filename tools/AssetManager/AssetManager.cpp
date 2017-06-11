@@ -128,7 +128,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 2, 1, 1); // right
 	setStatusBar(pStatusBar_);
 	setCentralWidget(pLayout_);
-	setMinimumSize(600, 800);
+	setMinimumSize(400, 400);
 
 	pStatusBar_->showMessage("Ready");
 
