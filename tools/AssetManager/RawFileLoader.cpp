@@ -95,6 +95,8 @@ void RawFileLoader::run()
 		}
 	}
 
+	X_ASSERT(f.bytesAvailable() == 0, "Trailing bytes left in file")();
+
 	emit setProgressLabel("Deflating src", numChunks);
 
 	// defalte it.
