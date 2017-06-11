@@ -100,7 +100,6 @@ AssetManager::AssetManager(QWidget* pParent) :
 	// needs to be done after menu's created
 	pEditorManager_ = new EditorManager(this);
 	pEditorManager_->init();
-
 	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(*pDb_, pAssetScripts_, this));
 
 	{
