@@ -641,7 +641,7 @@ namespace V2
 	{
 #if X_ENABLE_JOBSYS_PROFILER
 		auto* pTimeLine = pTimeLines_[threadIdx];
-
+		const int32_t currentHistoryIdx = currentHistoryIdx_;
 		auto& history = pTimeLine->getCurFrameHistory();
 		auto* pEntry = &history.entryes_[history.bottom_ & JobQueueHistory::MASK];
 
@@ -670,8 +670,8 @@ namespace V2
 
 		++history.bottom_;
 
-		++stats_[currentHistoryIdx_].jobsRun;
-		stats_[currentHistoryIdx_].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
+		++stats_[currentHistoryIdx].jobsRun;
+		stats_[currentHistoryIdx].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
