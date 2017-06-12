@@ -303,17 +303,10 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
 	static_assert(decltype(techsPoolArena_)::IS_THREAD_SAFE, "Arena must be thread safe");
 
-
-	techset::TechSetDef* pTechDef = nullptr;
-
-	{
-		core::CriticalSection::ScopedLock lock(cacheLock_);
-
-		if (!pTechDefs_->getTechDef(cat, name, pTechDef)) {
-			X_ERROR("TechDefState", "Failed to get techdef definition for state creation");
-			return nullptr;
-		}
-
+	auto* pTechDef = pTechDefs_->getTechDef(cat, name);
+	if(!pTechDef) {
+		X_ERROR("TechDefState", "Failed to get techdef definition for state creation");
+		return nullptr;
 	}
 
 	// this don't cause any state to be created.

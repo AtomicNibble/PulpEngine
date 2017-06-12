@@ -7,6 +7,7 @@
 
 #include <Traits\MemberFunctionTraits.h>
 #include <Util\Delegate.h>
+#include <Threading\Signal.h>
 
 X_NAMESPACE_DECLARE(core,
 	class XLexer;
@@ -43,25 +44,35 @@ namespace techset
 
 
 		MATLIB_EXPORT static bool getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut);
-		MATLIB_EXPORT bool getTechDef(MaterialCat::Enum cat, const char* pName, TechSetDef*& pTechDefOut);
-		MATLIB_EXPORT bool getTechDef(MaterialCat::Enum cat, const core::string& name, TechSetDef*& pTechDefOut);
+		X_INLINE TechSetDef* getTechDef(MaterialCat::Enum cat, const char* pName);
+		MATLIB_EXPORT TechSetDef* getTechDef(MaterialCat::Enum cat, const core::string& name);
 
 		MATLIB_EXPORT void clearIncSrcCache(void);
 
 	private:
-		bool loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name);
+		TechSetDef* loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name);
+		
 		static bool loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut);
-
-		bool loadFile(const core::Path<char>& path, FileBuf& bufOut);
+		static bool loadFile(const core::Path<char>& path, FileBuf& bufOut);
 
 		bool includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath);
 
 	private:
 		core::MemoryArenaBase* arena_;
 
+		core::CriticalSection cacheLock_;
 		TechSetDefMap techDefs_;
+
+		core::CriticalSection sourceCacheLock_;
 		SourceMap incSourceMap_;
 	};
+
+
+	X_INLINE TechSetDef* TechSetDefs::getTechDef(const MaterialCat::Enum cat, const char* pName)
+	{
+		return getTechDef(cat, core::string(pName));
+	}
+
 
 } // namespace techset
 

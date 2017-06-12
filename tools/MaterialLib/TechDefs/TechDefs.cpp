@@ -8,6 +8,7 @@
 #include <String\XParser.h>
 #include <Hashing\Fnva1Hash.h>
 #include <Util\UniquePointer.h>
+#include <Time\StopWatch.h>
 
 #include <IFileSys.h>
 
@@ -17,6 +18,12 @@ namespace techset
 {
 	// ------------------------------------------------------------------------------
 
+	namespace
+	{
+		TechSetDef* const INVALID_TECH_SET_DEF = reinterpret_cast<TechSetDef*>(std::numeric_limits<uintptr_t>::max());
+
+	} // namespace
+
 	const char* TechSetDefs::INCLUDE_DIR = "include";
 	const wchar_t* TechSetDefs::INCLUDE_DIR_W = L"include";
 
@@ -24,7 +31,7 @@ namespace techset
 	TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
 		arena_(arena),
 		techDefs_(arena, 128),
-		incSourceMap_(arena, 128)
+		incSourceMap_(arena, 64)
 	{
 
 	}
@@ -61,12 +68,7 @@ namespace techset
 		return false;
 	}
 
-	bool TechSetDefs::getTechDef(const MaterialCat::Enum cat, const char* pName, TechSetDef*& pTechDefOut)
-	{
-		return getTechDef(cat, core::string(pName), pTechDefOut);
-	}
-
-	bool TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name, TechSetDef*& pTechDefOut)
+	TechSetDef* TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name)
 	{
 		core::Path<char> path;
 		path /= MaterialCat::ToString(cat);
@@ -75,21 +77,47 @@ namespace techset
 		path.replaceSeprators();
 		path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
-		auto it = techDefs_.find(path);
-		if (it != techDefs_.end()) {
-			pTechDefOut = it->second;
-			return true;
+		TechSetDef** pTechDefRef = nullptr;
+		bool loaded = true;
+
+		{
+			core::CriticalSection::ScopedLock lock(cacheLock_);
+
+			auto it = techDefs_.find(path);
+			if (it != techDefs_.end())
+			{
+				pTechDefRef = &it->second;
+			}
+			else
+			{
+				loaded = false;
+				auto insertIt = techDefs_.insert(std::make_pair(path, nullptr));
+				pTechDefRef = &insertIt.first->second;
+			}
 		}
 
-		if (!loadTechDef(path, cat, name)) {
-			return false;
+		if (loaded)
+		{
+			while (*pTechDefRef == nullptr)
+			{
+				core::Thread::Sleep(1);
+			}
+
+			if (*pTechDefRef == INVALID_TECH_SET_DEF) {
+				return nullptr;
+			}
+
+			return *pTechDefRef;
 		}
 
-		it = techDefs_.find(path);
-		X_ASSERT(it != techDefs_.end(), "Must be in map if load passed")();
+		auto* pTechDef = loadTechDef(path, cat, name);
+		if (!pTechDef) {
+			*pTechDefRef = INVALID_TECH_SET_DEF;
+			return nullptr;
+		}
 
-		pTechDefOut = it->second;
-		return true;
+		*pTechDefRef = pTechDef;
+		return pTechDef;
 	}
 
 	bool TechSetDefs::loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut)
@@ -127,33 +155,6 @@ namespace techset
 		return true;
 	}
 
-	bool TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
-	{
-		FileBuf fileData(arena_);
-
-		if (!loadFile(path, fileData)) {
-			return false;
-		}
-
-		core::UniquePointer<TechSetDef> pTechDef = core::makeUnique<TechSetDef>(arena_, name, arena_);
-
-		TechSetDef::OpenIncludeDel incDel;
-		incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
-
-		if (!pTechDef->parseFile(fileData, incDel)) {
-			X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), name.c_str());
-			return false;
-		}
-
-		techDefs_.insert(TechSetDefMap::value_type(path, pTechDef.release()));
-		return true;
-	}
-
-	void TechSetDefs::clearIncSrcCache(void)
-	{
-		incSourceMap_.clear();
-	}
-
 	bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
 	{
 		core::XFileScoped file;
@@ -179,6 +180,36 @@ namespace techset
 		return true;
 	}
 
+	TechSetDef* TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
+	{
+		FileBuf fileData(arena_);
+
+		if (!loadFile(path, fileData)) {
+			return nullptr;
+		}
+
+		core::UniquePointer<TechSetDef> techDef = core::makeUnique<TechSetDef>(arena_, name, arena_);
+
+		TechSetDef::OpenIncludeDel incDel;
+		incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
+
+		if (!techDef->parseFile(fileData, incDel)) {
+			X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), name.c_str());
+			return nullptr;
+		}
+
+		return techDef.release();
+	}
+
+	void TechSetDefs::clearIncSrcCache(void)
+	{
+		core::CriticalSection::ScopedLock lock(sourceCacheLock_);
+
+		incSourceMap_.clear();
+	}
+
+
+
 	bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath)
 	{
 		core::Path<char> path;
@@ -193,22 +224,33 @@ namespace techset
 
 		path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
-		auto it = incSourceMap_.find(path);
-		if (it == incSourceMap_.end())
+		SourceMap::iterator it;
 		{
-			// we need to load it.
-			FileBuf fileData(arena_);
+			core::CriticalSection::ScopedLock lock(sourceCacheLock_);
 
-			if (!loadFile(path, fileData)) {
-				return false;
+			it = incSourceMap_.find(path);
+			if (it != incSourceMap_.end())
+			{
+				FileBuf& buf = it->second;
+				return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
 			}
+		}
+
+		// load it.
+		// we allow duplicate loads currently.
+		FileBuf fileData(arena_);
+		if (!loadFile(path, fileData)) {
+			return false;
+		}
+
+		{
+			core::CriticalSection::ScopedLock lock(sourceCacheLock_);
 
 			auto insertedIt = incSourceMap_.insert(SourceMap::value_type(path, std::move(fileData)));
 			it = insertedIt.first;
 		}
 
 		FileBuf& buf = it->second;
-
 		return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
 	}
 

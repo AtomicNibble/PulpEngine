@@ -85,12 +85,11 @@ bool MaterialCompiler::loadFromJson(core::string& str)
  	// currently cat is fixed, but type is data driven.
 	techType_ = pType;
 
-	if (!techDefs_.getTechDef(cat_, techType_, pTechDef_)) {
+	pTechDef_ = techDefs_.getTechDef(cat_, techType_);
+	if(!pTechDef_) {
 		X_ERROR("Mat", "Failed to get techDef for cat: %s type: %s", pCat, pType);
 		return false;
 	}
-
-	X_ASSERT_NOT_NULL(pTechDef_);
 
 	// so now that we have a tech def you fucking TWAT!
 	// we know all the techs this material supports.

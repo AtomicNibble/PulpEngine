@@ -97,8 +97,8 @@ namespace compiler
 		X_LOG0("TechCompiler", "Compiling cat: \"%s\" tech: \"%s\"", MaterialCat::ToString(cat), techName.c_str());
 
 		// now we need the techDef.
-		techset::TechSetDef* pTechDef = nullptr;
-		if (!techDefs_.getTechDef(cat, techName.c_str(), pTechDef)) {
+		techset::TechSetDef* pTechDef = techDefs_.getTechDef(cat, techName);
+		if (!pTechDef) {
 			X_ERROR("TechCompiler", "Failed to get tech def for cat: \"%s\" tech: \"%s\"", MaterialCat::ToString(cat), techName.c_str());
 			return false;
 		}
