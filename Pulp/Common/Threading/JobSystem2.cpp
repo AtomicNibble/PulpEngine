@@ -645,6 +645,11 @@ namespace V2
 		auto& history = pTimeLine->getCurFrameHistory();
 		auto* pEntry = &history.entryes_[history.bottom_ & JobQueueHistory::MASK];
 
+		// we must write this before running the job.
+		// as the job may run another job that then runs on this thread.
+		// which will mean it will get incorrect index.
+		++history.bottom_;
+
 		core::StopWatch timer;
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
@@ -665,10 +670,6 @@ namespace V2
 #else
 		pEntry->subsystem = core::profiler::SubSys::UNCLASSIFIED;
 #endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
-
-		COMPILER_BARRIER_W;
-
-		++history.bottom_;
 
 		++stats_[currentHistoryIdx].jobsRun;
 		stats_[currentHistoryIdx].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
