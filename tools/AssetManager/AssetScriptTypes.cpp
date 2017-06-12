@@ -583,8 +583,8 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 	// we wnat the TECH DEF!
 	// then once we have it we get all the params
 	// we just look for them and enable.
-	engine::techset::TechSetDef* pTechDef = nullptr;
-	if (!techDefs_.getTechDef(cat, typeStr.c_str(), pTechDef)) {
+	auto* pTechDef = techDefs_.getTechDef(cat, typeStr.c_str());
+	if(!pTechDef) {
 		return;
 	}
 
