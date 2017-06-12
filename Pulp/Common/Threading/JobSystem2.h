@@ -177,6 +177,7 @@ public:
 	X_ALIGNED_SYMBOL(struct FrameHistory, 64)
 	{
 		FrameHistory();
+		X_INLINE const int32_t getMaxreadIdx(void) const;
 
 		long bottom_;
 

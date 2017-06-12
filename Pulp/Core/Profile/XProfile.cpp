@@ -967,7 +967,8 @@ namespace profiler
 		// this means i need to know when the frame started.
 		const auto frameStartTime = history.start;
 
-		for (int32_t idx = 0; idx < history.bottom_; idx++)
+		const int32_t num = history.getMaxreadIdx();
+		for (int32_t idx = 0; idx < num; idx++)
 		{
 			const auto& entry = history.entryes_[idx];
 			const auto timeOffset = entry.start - frameStartTime;

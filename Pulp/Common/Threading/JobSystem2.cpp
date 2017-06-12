@@ -57,7 +57,7 @@ namespace V2
 	void JobQueueHistory::sethistoryIndex(int32_t historyIdx)
 	{
 		int32_t newIdx = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
-
+		int32_t oldIdx = currentIdx_;
 		auto start = core::StopWatch::GetTimeNow();
 
 		auto& history = frameHistory_[newIdx];
@@ -67,6 +67,9 @@ namespace V2
 		COMPILER_BARRIER_W;
 
 		currentIdx_ = newIdx;
+
+		// allow the profiler to read the last entry.
+		++frameHistory_[oldIdx].bottom_;
 	}
 
 	X_INLINE JobQueueHistory::FrameHistory& JobQueueHistory::getCurFrameHistory(void)
@@ -648,6 +651,12 @@ namespace V2
 		// we must write this before running the job.
 		// as the job may run another job that then runs on this thread.
 		// which will mean it will get incorrect index.
+		// ..
+		// This reuslts in another problem tho, history entry might not of been written fully
+		// before it's read in the profiler vis.
+		// to solve this, the profiler must use getMaxreadIdx(), which returns (bottom_ - 1)
+		// and at the end of the frame we bump bottom + 1 allowing the profiler to read 
+		// the last entry.
 		++history.bottom_;
 
 		core::StopWatch timer;
