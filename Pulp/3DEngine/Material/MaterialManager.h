@@ -98,8 +98,6 @@ private:
 	Material::Tech* getTechForMaterial_int(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
 		PermatationFlags permFlags);
 
-	MaterialResource* loadMaterialCompiled(const core::string& name);
-
 private:
 	bool initDefaults(void);
 	void freeDanglingMaterials(void);
