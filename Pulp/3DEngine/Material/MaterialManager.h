@@ -133,7 +133,7 @@ private:
 	// ~IXHotReload
 
 private:
-	void Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd);
+	void Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd);
 
 
 private:

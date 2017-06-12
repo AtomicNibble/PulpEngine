@@ -1057,13 +1057,13 @@ void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core:
 }
 
 
-void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
+void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd)
 {
 	// optional search criteria
 	const char* pSearchPatten = nullptr;
 
-	if (Cmd->GetArgCount() >= 2) {
-		pSearchPatten = Cmd->GetArg(1);
+	if (pCmd->GetArgCount() >= 2) {
+		pSearchPatten = pCmd->GetArg(1);
 	}
 
 	listMaterials(pSearchPatten);
