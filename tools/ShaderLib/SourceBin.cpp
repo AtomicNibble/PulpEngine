@@ -240,7 +240,7 @@ namespace shader
 			X_ASSERT_NOT_NULL(pSourceFile);
 
 			if (pSourceFile->getSourceCrc32() == crc32) {
-				return *pSourceFileRef;
+				return pSourceFile;
 			}
 
 			// prevent read's while re reparse the data.
