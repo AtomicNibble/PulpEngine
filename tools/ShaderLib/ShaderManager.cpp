@@ -343,9 +343,9 @@ namespace shader
 		gEnv->pFileSys->createDirectoryTree(srcOut.c_str());
 	}
 
-	IShaderSource* XShaderManager::sourceforName(const char* pName)
+	IShaderSource* XShaderManager::sourceforName(const core::string& name)
 	{
-		return sourceBin_.loadRawSourceFile(core::string(pName), false);
+		return sourceBin_.loadRawSourceFile(name, false);
 	}
 
 

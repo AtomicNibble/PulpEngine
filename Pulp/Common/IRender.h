@@ -396,7 +396,7 @@ struct IRender
 	
 	// shaders
 	// new api for creating techs in 3dengine
-	virtual shader::IShaderSource* getShaderSource(const char* pName) X_ABSTRACT;
+	virtual shader::IShaderSource* getShaderSource(const core::string& name) X_ABSTRACT;
 	virtual shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags) X_ABSTRACT;
 	virtual shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_ABSTRACT;
 

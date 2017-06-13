@@ -1123,9 +1123,9 @@ bool XRender::initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFil
 }
 
 
-shader::IShaderSource* XRender::getShaderSource(const char* pSourceName)
+shader::IShaderSource* XRender::getShaderSource(const core::string& sourceName)
 {
-	return pShaderMan_->sourceforName(pSourceName);
+	return pShaderMan_->sourceforName(sourceName);
 }
 
 shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const core::string& entry, 

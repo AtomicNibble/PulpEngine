@@ -217,9 +217,9 @@ bool RenderNull::initDeviceTexture(IDeviceTexture* pTex, const texture::XTexture
 
 
 
-shader::IShaderSource* RenderNull::getShaderSource(const char* pName)
+shader::IShaderSource* RenderNull::getShaderSource(const core::string& name)
 {
-	X_UNUSED(pName);
+	X_UNUSED(name);
 
 	return nullptr;
 }

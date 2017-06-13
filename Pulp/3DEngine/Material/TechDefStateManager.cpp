@@ -344,7 +344,7 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 
 			// we ask for the source now, so we know we are able to atleast attempt to compile permatations later on.
 			// and don't have to ask for them each time we make a perm.
-			render::shader::IShaderSource* pShaderSource = gEnv->pRender->getShaderSource(shader.source.c_str());
+			render::shader::IShaderSource* pShaderSource = gEnv->pRender->getShaderSource(shader.source);
 			if (!pShaderSource) {
 				X_ERROR("TechDefState", "Failed to load shader source \"%s\" for: %s:%s",
 					shader.source.c_str(), MaterialCat::ToString(cat), name.c_str());

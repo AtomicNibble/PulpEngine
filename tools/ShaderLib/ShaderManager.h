@@ -80,7 +80,7 @@ namespace shader
 		SHADERLIB_EXPORT bool init(void);
 		SHADERLIB_EXPORT bool shutDown(void);
 		
-		SHADERLIB_EXPORT IShaderSource* sourceforName(const char* pSourceName);
+		SHADERLIB_EXPORT IShaderSource* sourceforName(const core::string& name);
 		SHADERLIB_EXPORT XHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
 			shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags);
 		SHADERLIB_EXPORT void releaseHWShader(XHWShader* pHWSHader);
