@@ -127,6 +127,7 @@ public:
 	static bool SleepAlertable(uint32_t milliSeconds = INFINITE_SLEEP); // returns true if alerted
 	X_INLINE static void Yield(void);
 	X_INLINE static void YieldProcessor(void);
+	X_INLINE static void BackOff(int32_t backoffCount);
 	X_INLINE static uint32_t GetCurrentID(void);
 	static void Join(uint32_t threadId);
 	static void SetName(uint32_t threadId, const char* name);
@@ -135,6 +136,7 @@ public:
 	static bool SetPriority(Priority::Enum priority);
 	static void SetFPE(uint32_t threadId, FPE::Enum fpe);
 
+	
 protected:
 	HANDLE createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func);
 

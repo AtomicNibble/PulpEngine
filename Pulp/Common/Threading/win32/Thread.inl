@@ -40,6 +40,28 @@ X_INLINE void Thread::YieldProcessor(void)
 #endif
 }
 
+X_INLINE void Thread::BackOff(int32_t backoff)
+{
+	if (backoff < 10 && backoff > 0) {
+		Thread::YieldProcessor();
+	}
+	else if (backoff < 20) {
+		for (size_t i = 0; i != 50; i += 1) {
+			Thread::YieldProcessor();
+		}
+	}
+	else if (backoff < 28) {
+		Thread::Yield();
+	}
+	else if (backoff < 10) {
+		Thread::Sleep(0);
+	}
+
+	// rip
+	Thread::Sleep(1);
+}
+
+
 X_INLINE uint32_t Thread::GetCurrentID(void)
 {
 	return ::GetCurrentThreadId();
