@@ -291,7 +291,7 @@ namespace shader
 
 		core::XLexer lexer(pBegin, pEnd);
 		core::XLexToken token;
-		core::StackString512 fileName;
+		core::string fileName;
 
 		lexer.setFlags(core::LexFlag::ALLOWPATHNAMES);
 
@@ -312,7 +312,7 @@ namespace shader
 						{
 							// get the file name, then remove it from the buffer
 							// to stop Dx compiler trying to include it.
-							fileName.set(token.begin(), token.end());
+							fileName.assign(token.begin(), token.end());
 							memset(const_cast<char*>(pStart), ' ', (token.end() - pStart) + 1);
 						}
 
@@ -327,13 +327,13 @@ namespace shader
 						// all source names tolower for reload reasons.
 						fileName.toLower();
 
+
 						// load it PLZ.
-						SourceFile* pChildSourceFile = loadRawSourceFile(core::string(fileName.begin(), fileName.end()), reload);
+						SourceFile* pChildSourceFile = loadRawSourceFile(fileName, reload);
 						if (pChildSourceFile)
 						{
 							// is this file already included in the tree?
-							if (std::find(includedFiles.begin(), includedFiles.end(), pChildSourceFile)
-								== includedFiles.end())
+							if (std::find(includedFiles.begin(), includedFiles.end(), pChildSourceFile) == includedFiles.end())
 							{
 								// check if for includes.
 								parseIncludesAndPrePro_r(pChildSourceFile, includedFiles);
