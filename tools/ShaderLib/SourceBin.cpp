@@ -175,10 +175,13 @@ namespace shader
 		SourceFile** pSourceFileRef = nullptr;
 		bool loaded = true;
 
+		core::string namelc(name);
+		namelc.toLower();
+
 		{
 			core::CriticalSection::ScopedLock lock(cs_);
 
-			auto it = source_.find(name);
+			auto it = source_.find(namelc);
 			if (it != source_.end())
 			{
 				pSourceFileRef = &it->second;
@@ -186,7 +189,7 @@ namespace shader
 			else
 			{
 				loaded = false;
-				auto insertIt = source_.insert(std::make_pair(name, nullptr));
+				auto insertIt = source_.insert(std::make_pair(namelc, nullptr));
 				pSourceFileRef = &insertIt.first->second;
 			}
 		}
@@ -214,11 +217,11 @@ namespace shader
 
 		// we must load it.
 		core::Path<char> path("shaders/");
-		path.setFileName(name);
+		path.setFileName(namelc.begin(), namelc.end());
 
 		core::XFileScoped file;
 		if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
-			X_WARNING("Shader", "File not found: \"%s\"", name.c_str());
+			X_WARNING("Shader", "File not found: \"%s\"", namelc.c_str());
 			*pSourceFileRef = INVALID_SOURCE;
 			return nullptr;
 		}
@@ -227,7 +230,7 @@ namespace shader
 		ByteArr data(arena_, size);
 
 		if (file.read(data.data(), data.size()) != data.size()) {
-			X_WARNING("Shader", "Failed to read all of file: \"%s\"", name.c_str());
+			X_WARNING("Shader", "Failed to read all of file: \"%s\"", namelc.c_str());
 			*pSourceFileRef = INVALID_SOURCE;
 			return nullptr;
 		}
@@ -256,7 +259,7 @@ namespace shader
 		}
 
 		X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
-		auto* pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(name, arena_);
+		auto* pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(namelc, arena_);
 		pSourceFile->setFileData(std::move(data), crc32);
 
 		// load any files it includes.
