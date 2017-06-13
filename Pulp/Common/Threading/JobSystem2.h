@@ -180,6 +180,7 @@ public:
 		X_INLINE const int32_t getMaxreadIdx(void) const;
 
 		long bottom_;
+		long top_;
 
 		core::TimeVal start;
 		Entry entryes_[MAX_NUMBER_OF_JOBS];

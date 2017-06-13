@@ -286,7 +286,7 @@ namespace V2
 
 	X_INLINE const int32_t JobQueueHistory::FrameHistory::getMaxreadIdx(void) const
 	{
-		return bottom_ - 1;
+		return top_;
 	}
 
 	X_INLINE const JobQueueHistory::FrameHistoryArr& JobQueueHistory::getHistory(void) const

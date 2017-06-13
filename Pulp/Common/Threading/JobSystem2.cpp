@@ -42,6 +42,7 @@ namespace V2
 	JobQueueHistory::FrameHistory::FrameHistory()
 	{
 		bottom_ = 0;
+		top_ = 0;
 	}
 
 	JobQueueHistory::JobQueueHistory() 
@@ -57,19 +58,16 @@ namespace V2
 	void JobQueueHistory::sethistoryIndex(int32_t historyIdx)
 	{
 		int32_t newIdx = (historyIdx) & (JOBSYS_HISTORY_COUNT - 1);
-		int32_t oldIdx = currentIdx_;
 		auto start = core::StopWatch::GetTimeNow();
 
 		auto& history = frameHistory_[newIdx];
 		history.start = start;
 		atomic::Exchange<long>(&history.bottom_, 0);
+		atomic::Exchange<long>(&history.top_, 0);
 
 		COMPILER_BARRIER_W;
 
 		currentIdx_ = newIdx;
-
-		// allow the profiler to read the last entry.
-		++frameHistory_[oldIdx].bottom_;
 	}
 
 	X_INLINE JobQueueHistory::FrameHistory& JobQueueHistory::getCurFrameHistory(void)
@@ -679,6 +677,11 @@ namespace V2
 #else
 		pEntry->subsystem = core::profiler::SubSys::UNCLASSIFIED;
 #endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
+
+		COMPILER_BARRIER_W
+
+		// mark it readable.
+		++history.top_;
 
 		++stats_[currentHistoryIdx].jobsRun;
 		stats_[currentHistoryIdx].workerUsedMask |= static_cast<int32_t>(BIT(threadIdx));
