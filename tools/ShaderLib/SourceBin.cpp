@@ -90,7 +90,7 @@ namespace shader
 			return true;
 		}
 
-		static SourceFile* const INVALID_SOURCE = reinterpret_cast<SourceFile*>(std::numeric_limits<uintptr_t>::max());
+		SourceFile* const INVALID_SOURCE = reinterpret_cast<SourceFile*>(std::numeric_limits<uintptr_t>::max());
 		
 
 
