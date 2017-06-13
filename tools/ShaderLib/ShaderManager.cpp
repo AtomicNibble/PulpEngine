@@ -219,6 +219,7 @@ namespace shader
 		{
 			// another thread is compiling the shader.
 			// we wait for it, maybe run some jobs while we wait?
+			int32_t backoff = 0;
 			while (1)
 			{
 				const auto status = pHWShader->getStatus();
@@ -233,8 +234,7 @@ namespace shader
 				}
 				else
 				{
-					//  lets yield to slow the burn.
-					core::Thread::Yield();
+					core::Thread::BackOff(backoff++);
 				}
 			}
 		}

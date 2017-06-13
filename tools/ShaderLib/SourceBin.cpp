@@ -196,10 +196,12 @@ namespace shader
 		// if already loaded, make sure it's finished loaded.
 		if (loaded)
 		{
+			int32_t backOff = 0;
+
 			// wait for it to finish loading on another thread.
 			while (*pSourceFileRef == nullptr)
 			{
-				core::Thread::Yield();
+				core::Thread::BackOff(backOff++);
 			}
 
 			if (*pSourceFileRef == INVALID_SOURCE) {

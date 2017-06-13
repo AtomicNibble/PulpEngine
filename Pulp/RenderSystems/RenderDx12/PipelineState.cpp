@@ -90,9 +90,11 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
 	else // if(*pPSORef == nullptr)
 	{
 		// wait for it to finish compiling on another thread.
+		int32_t backOff = 0;
+
 		while (*pPSORef == nullptr)
 		{
-			core::Thread::Yield();
+			core::Thread::BackOff(backOff++);
 		}	
 	}
 
