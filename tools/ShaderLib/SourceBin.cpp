@@ -330,6 +330,12 @@ namespace shader
 						// all source names tolower for reload reasons.
 						fileName.toLower();
 
+						if (fileName == pSourceFile->getName())
+						{
+							X_WARNING("Shader", "Recursive #include in: \"%s\" line: %i",
+								pSourceFile->getName().c_str(), token.GetLine());
+							return;
+						}
 
 						// load it PLZ.
 						SourceFile* pChildSourceFile = loadRawSourceFile(fileName, reload);
