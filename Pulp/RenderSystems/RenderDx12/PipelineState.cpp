@@ -2,7 +2,6 @@
 #include "PipelineState.h"
 #include "RootSignature.h"
 
-#include <Threading\JobSystem2.h>
 
 #include <IConsole.h>
 
@@ -93,10 +92,7 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
 		// wait for it to finish compiling on another thread.
 		while (*pPSORef == nullptr)
 		{
-			if (!helpWithWorkonPSOStall_ || !gEnv->pJobSys->HelpWithWork())
-			{
-				core::Thread::Yield();
-			}
+			core::Thread::Yield();
 		}	
 	}
 

@@ -3,7 +3,6 @@
 #include "ShaderSourceTypes.h"
 
 #include <IFileSys.h>
-#include <Threading\JobSystem2.h>
 
 #include <Hashing\crc32.h>
 #include <String\XParser.h>
@@ -200,10 +199,7 @@ namespace shader
 			// wait for it to finish loading on another thread.
 			while (*pSourceFileRef == nullptr)
 			{
-				if (!gEnv->pJobSys->HelpWithWork())
-				{
-					core::Thread::Yield();
-				}
+				core::Thread::Yield();
 			}
 
 			if (*pSourceFileRef == INVALID_SOURCE) {

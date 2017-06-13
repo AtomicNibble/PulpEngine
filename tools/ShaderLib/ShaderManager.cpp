@@ -233,11 +233,8 @@ namespace shader
 				}
 				else
 				{
-					if (!vars_.helpWithWorkOnShaderStall() || !gEnv->pJobSys->HelpWithWork())
-					{
-						// we ran no jobs, so lets yield to slow the burn.
-						core::Thread::Yield();
-					}
+					//  lets yield to slow the burn.
+					core::Thread::Yield();
 				}
 			}
 		}
