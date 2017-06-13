@@ -116,19 +116,19 @@ public:
 	bool SetThreadAffinity(const AffinityFlags flags);
 	void SetFPE(FPE::Enum fpe);
 
-	uint32_t GetID(void) const;
+	X_INLINE uint32_t GetID(void) const;
 
 	void CancelSynchronousIo(void);
 
 	X_INLINE void setData(void* pData);
 	X_INLINE void* getData(void) const;
 
-	static void Sleep(uint32_t milliSeconds);
+	X_INLINE static void Sleep(uint32_t milliSeconds);
 	static bool SleepAlertable(uint32_t milliSeconds = INFINITE_SLEEP); // returns true if alerted
-	static void Yield(void);
-	static void YieldProcessor(void);
+	X_INLINE static void Yield(void);
+	X_INLINE static void YieldProcessor(void);
+	X_INLINE static uint32_t GetCurrentID(void);
 	static void Join(uint32_t threadId);
-	static uint32_t GetCurrentID(void);
 	static void SetName(uint32_t threadId, const char* name);
 
 	static Priority::Enum GetPriority(void);

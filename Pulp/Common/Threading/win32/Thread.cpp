@@ -147,10 +147,6 @@ void Thread::SetFPE(FPE::Enum fpe)
 	SetFPE(GetID(), fpe);
 }
 
-uint32_t Thread::GetID(void) const
-{
-	return ::GetThreadId(handle_);
-}
 
 void Thread::CancelSynchronousIo(void)
 {
@@ -160,11 +156,6 @@ void Thread::CancelSynchronousIo(void)
 	}
 }
 
-// static
-void Thread::Sleep(uint32_t milliSeconds)
-{
-	::Sleep(milliSeconds);
-}
 
 bool Thread::SleepAlertable(uint32_t milliSeconds)
 {
@@ -179,23 +170,6 @@ bool Thread::SleepAlertable(uint32_t milliSeconds)
 
 	return false;
 }
-
-void Thread::Yield(void)
-{
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms686352(v=vs.85).aspx
-	SwitchToThread();
-}
-
-void Thread::YieldProcessor(void)
-{
-	// about a 9 cycle delay
-#if !defined(__midl) && !defined(GENUTIL) && !defined(_GENIA64_) && defined(_IA64_)
-	__yield();
-#else
-	_mm_pause();
-#endif
-}
-
 
 
 void Thread::Join(uint32_t threadId)
@@ -214,10 +188,6 @@ void Thread::Join(uint32_t threadId)
 }
 
 
-uint32_t Thread::GetCurrentID(void)
-{
-	return ::GetCurrentThreadId();
-}
 
 void Thread::SetName(uint32_t threadId, const char* name)
 {
