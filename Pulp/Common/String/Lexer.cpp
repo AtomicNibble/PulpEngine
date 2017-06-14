@@ -4,8 +4,88 @@
 
 X_NAMESPACE_BEGIN(core)
 
-#define USE_PUNCTABLE
+namespace
+{
+	//longer punctuations_ first
+	PunctuationPair s_default_punctuations_[] = {
+		//binary operators
+		{ ">>=", PunctuationId::RSHIFT_ASSIGN },
+		{ "<<=", PunctuationId::LSHIFT_ASSIGN },
+		//
+		{ "...", PunctuationId::PARMS },
+		//define merge operator
+		{ "##", PunctuationId::PRECOMPMERGE },				// pre-compiler
+															//logic operators
+		{ "&&", PunctuationId::LOGIC_AND },					// pre-compiler
+		{ "||", PunctuationId::LOGIC_OR },					// pre-compiler
+		{ ">=", PunctuationId::LOGIC_GEQ },					// pre-compiler
+		{ "<=", PunctuationId::LOGIC_LEQ },					// pre-compiler
+		{ "==", PunctuationId::LOGIC_EQ },					// pre-compiler
+		{ "!=", PunctuationId::LOGIC_UNEQ },				// pre-compiler
+															//arithmatic operators
+		{ "*=", PunctuationId::MUL_ASSIGN },
+		{ "/=", PunctuationId::DIV_ASSIGN },
+		{ "%=", PunctuationId::MOD_ASSIGN },
+		{ "+=", PunctuationId::ADD_ASSIGN },
+		{ "-=", PunctuationId::SUB_ASSIGN },
+		{ "++", PunctuationId::INC },
+		{ "--", PunctuationId::DEC },
+		//binary operators
+		{ "&=", PunctuationId::BIN_AND_ASSIGN },
+		{ "|=", PunctuationId::BIN_OR_ASSIGN },
+		{ "^=", PunctuationId::BIN_XOR_ASSIGN },
+		{ ">>", PunctuationId::RSHIFT },					// pre-compiler
+		{ "<<", PunctuationId::LSHIFT },					// pre-compiler
+															//reference operators
+		{ "->", PunctuationId::POINTERREF },
+		//C++
+		{ "::", PunctuationId::CPP1 },
+		{ ".*", PunctuationId::CPP2 },
+		//arithmatic operators
+		{ "*", PunctuationId::MUL },						// pre-compiler
+		{ "/", PunctuationId::DIV },						// pre-compiler
+		{ "%", PunctuationId::MOD },						// pre-compiler
+		{ "+", PunctuationId::ADD },						// pre-compiler
+		{ "-", PunctuationId::SUB },						// pre-compiler
+		{ "=", PunctuationId::ASSIGN },
+		//binary operators
+		{ "&", PunctuationId::BIN_AND },					// pre-compiler
+		{ "|", PunctuationId::BIN_OR },						// pre-compiler
+		{ "^", PunctuationId::BIN_XOR },					// pre-compiler
+		{ "~", PunctuationId::BIN_NOT },					// pre-compiler
+															//logic operators
+		{ "!", PunctuationId::LOGIC_NOT },					// pre-compiler
+		{ ">", PunctuationId::LOGIC_GREATER },				// pre-compiler
+		{ "<", PunctuationId::LOGIC_LESS },					// pre-compiler
+															//reference operator
+		{ ".", PunctuationId::REF },
+		//seperators
+		{ ",", PunctuationId::COMMA },						// pre-compiler
+		{ ";", PunctuationId::SEMICOLON },
+		//label indication
+		{ ":", PunctuationId::COLON },						// pre-compiler
+															//if statement
+		{ "?", PunctuationId::QUESTIONMARK },				// pre-compiler
+															//embracements
+		{ "(", PunctuationId::PARENTHESESOPEN },			// pre-compiler
+		{ ")", PunctuationId::PARENTHESESCLOSE },			// pre-compiler
+		{ "{", PunctuationId::BRACEOPEN },					// pre-compiler
+		{ "}", PunctuationId::BRACECLOSE },					// pre-compiler
+		{ "[", PunctuationId::SQBRACKETOPEN },
+		{ "]", PunctuationId::SQBRACKETCLOSE },
+		//
+		{ "\\", PunctuationId::BACKSLASH },
+		//precompiler operator
+		{ "#", PunctuationId::PRECOMP },					// pre-compiler
+		{ "$", PunctuationId::DOLLAR },
+		{ nullptr, PunctuationId::UNUSET }
+	};
 
+	int32_t s_default_punctuationtable[256];
+	int32_t s_default_nextpunctuation[sizeof(s_default_punctuations_) / sizeof(PunctuationPair)];
+
+
+} // namespace
 
 void XLexToken::NumberValue(void)
 {
@@ -190,86 +270,6 @@ void XLexToken::NumberValue(void)
 }
 
 
-//longer punctuations_ first
-PunctuationPair default_punctuations_[] = {
-	//binary operators
-	{ ">>=", PunctuationId::RSHIFT_ASSIGN },
-	{ "<<=", PunctuationId::LSHIFT_ASSIGN },
-	//
-	{ "...", PunctuationId::PARMS },
-	//define merge operator
-	{ "##", PunctuationId::PRECOMPMERGE },				// pre-compiler
-	//logic operators
-	{ "&&", PunctuationId::LOGIC_AND },					// pre-compiler
-	{ "||", PunctuationId::LOGIC_OR },					// pre-compiler
-	{ ">=", PunctuationId::LOGIC_GEQ },					// pre-compiler
-	{ "<=", PunctuationId::LOGIC_LEQ },					// pre-compiler
-	{ "==", PunctuationId::LOGIC_EQ },					// pre-compiler
-	{ "!=", PunctuationId::LOGIC_UNEQ },				// pre-compiler
-	//arithmatic operators
-	{ "*=", PunctuationId::MUL_ASSIGN },
-	{ "/=", PunctuationId::DIV_ASSIGN },
-	{ "%=", PunctuationId::MOD_ASSIGN },
-	{ "+=", PunctuationId::ADD_ASSIGN },
-	{ "-=", PunctuationId::SUB_ASSIGN },
-	{ "++", PunctuationId::INC },
-	{ "--", PunctuationId::DEC },
-	//binary operators
-	{ "&=", PunctuationId::BIN_AND_ASSIGN },
-	{ "|=", PunctuationId::BIN_OR_ASSIGN },
-	{ "^=", PunctuationId::BIN_XOR_ASSIGN },
-	{ ">>", PunctuationId::RSHIFT },					// pre-compiler
-	{ "<<", PunctuationId::LSHIFT },					// pre-compiler
-	//reference operators
-	{ "->", PunctuationId::POINTERREF },
-	//C++
-	{ "::", PunctuationId::CPP1 },
-	{ ".*", PunctuationId::CPP2 },
-	//arithmatic operators
-	{ "*", PunctuationId::MUL },						// pre-compiler
-	{ "/", PunctuationId::DIV },						// pre-compiler
-	{ "%", PunctuationId::MOD },						// pre-compiler
-	{ "+", PunctuationId::ADD },						// pre-compiler
-	{ "-", PunctuationId::SUB },						// pre-compiler
-	{ "=", PunctuationId::ASSIGN },
-	//binary operators
-	{ "&", PunctuationId::BIN_AND },					// pre-compiler
-	{ "|", PunctuationId::BIN_OR },						// pre-compiler
-	{ "^", PunctuationId::BIN_XOR },					// pre-compiler
-	{ "~", PunctuationId::BIN_NOT },					// pre-compiler
-	//logic operators
-	{ "!", PunctuationId::LOGIC_NOT },					// pre-compiler
-	{ ">", PunctuationId::LOGIC_GREATER },				// pre-compiler
-	{ "<", PunctuationId::LOGIC_LESS },					// pre-compiler
-	//reference operator
-	{ ".", PunctuationId::REF },
-	//seperators
-	{ ",", PunctuationId::COMMA },						// pre-compiler
-	{ ";", PunctuationId::SEMICOLON },
-	//label indication
-	{ ":", PunctuationId::COLON },						// pre-compiler
-	//if statement
-	{ "?", PunctuationId::QUESTIONMARK },				// pre-compiler
-	//embracements
-	{ "(", PunctuationId::PARENTHESESOPEN },			// pre-compiler
-	{ ")", PunctuationId::PARENTHESESCLOSE },			// pre-compiler
-	{ "{", PunctuationId::BRACEOPEN },					// pre-compiler
-	{ "}", PunctuationId::BRACECLOSE },					// pre-compiler
-	{ "[", PunctuationId::SQBRACKETOPEN },
-	{ "]", PunctuationId::SQBRACKETCLOSE },
-	//
-	{ "\\", PunctuationId::BACKSLASH },
-	//precompiler operator
-	{ "#", PunctuationId::PRECOMP },					// pre-compiler
-	{ "$", PunctuationId::DOLLAR },
-	{ nullptr, PunctuationId::UNUSET }
-};
-
-int default_punctuationtable[256];
-int default_nextpunctuation[sizeof(default_punctuations_) / sizeof(PunctuationPair)];
-bool default_setup = false;
-
-
 XLexer::XLexer() :
 	XLexer(nullptr, nullptr, core::string())
 {
@@ -283,7 +283,8 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive) :
 }
 
 XLexer::XLexer(const char* startInclusive, const char* endExclusive, core::string name) :
-	filename_(name)
+	filename_(name),
+	punctuations_(nullptr)
 {
 	start_ = startInclusive;
 	current_ = startInclusive;
@@ -332,79 +333,77 @@ const char* XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
 
 void XLexer::CreatePunctuationTable(const PunctuationPair* punctuations)
 {
-	int i, n, lastp;
-	const PunctuationPair *p, *newp;
+	punctuationtable_ = s_default_punctuationtable;
+	nextpunctuation_ = s_default_nextpunctuation;
 
-	//get memory for the table
-	if (punctuations == default_punctuations_) 
+	if (punctuations == s_default_punctuations_) 
 	{
-		punctuationtable_ = default_punctuationtable;
-		nextpunctuation_ = default_nextpunctuation;
-		if (default_setup) {
+		static core::CriticalSection setupcs;
+		static bool setup = false;
+
+		core::CriticalSection::ScopedLock lock(setupcs);
+
+		if (setup) {
 			return;
 		}
-		default_setup = true;
-		i = sizeof(default_punctuations_) / sizeof(PunctuationPair);
-	}
-	else
-	{
-		i = 0;
-	}
 
-	memset(punctuationtable_, 0xFF, 256 * sizeof(int));
-	memset(nextpunctuation_, 0xFF, i * sizeof(int));
+		setup = true;
+		std::memset(s_default_punctuationtable, 0xFF, sizeof(s_default_punctuationtable));
+		std::memset(s_default_nextpunctuation, 0xFF, sizeof(s_default_nextpunctuation));
 
-	//add the punctuations_ in the list to the punctuation table
-	for (i = 0; punctuations[i].pCharacter; i++)
-	{
-		newp = &punctuations[i];
-		lastp = -1;
-		//sort the punctuations_ in this table entry on length (longer punctuations_ first)
-		for (n = punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])];
-			n >= 0; n = nextpunctuation_[n]) 
+		int32_t n, lastp;
+		const PunctuationPair *p, *newp;
+
+		//add the punctuations_ in the list to the punctuation table
+		for (int32_t i = 0; punctuations[i].pCharacter; i++)
 		{
-			p = &punctuations[n];
-			if (strlen(p->pCharacter) < strlen(newp->pCharacter)) 
+			newp = &punctuations[i];
+			lastp = -1;
+
+			//sort the punctuations_ in this table entry on length (longer punctuations_ first)
+			for (n = punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])]; n >= 0; n = nextpunctuation_[n])
 			{
-				nextpunctuation_[i] = n;
+				p = &punctuations[n];
+				if (strlen(p->pCharacter) < strlen(newp->pCharacter))
+				{
+					nextpunctuation_[i] = n;
+					if (lastp >= 0) {
+						nextpunctuation_[lastp] = i;
+					}
+					else {
+						punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])] = i;
+					}
+					break;
+				}
+				lastp = n;
+			}
+			if (n < 0)
+			{
+				nextpunctuation_[i] = -1;
 				if (lastp >= 0) {
 					nextpunctuation_[lastp] = i;
 				}
 				else {
 					punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])] = i;
 				}
-				break;
-			}
-			lastp = n;
-		}
-		if (n < 0) 
-		{
-			nextpunctuation_[i] = -1;
-			if (lastp >= 0) {
-				nextpunctuation_[lastp] = i;
-			}
-			else {
-				punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])] = i;
 			}
 		}
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 }
 
 void XLexer::SetPunctuations(const PunctuationPair* p)
 {
-#ifdef USE_PUNCTABLE
 	if (p) {
 		CreatePunctuationTable(p);
-	}
-	else {
-		CreatePunctuationTable(default_punctuations_);
-	}
-#endif // !USE_PUNCTABLE
-	if (p) {
 		punctuations_ = p;
 	}
 	else {
-		punctuations_ = default_punctuations_;
+		CreatePunctuationTable(s_default_punctuations_);
+		punctuations_ = s_default_punctuations_;
 	}
 }
 
@@ -1246,17 +1245,11 @@ bool XLexer::ReadPunctuation(XLexToken& token)
 	const char* p;
 	const PunctuationPair* punc;
 
-#ifdef USE_PUNCTABLE
 	for (n = punctuationtable_[(unsigned int)*(current_)]; n >= 0; n = nextpunctuation_[n])
 	{
 		punc = &(punctuations_[n]);
-#else
-	int i;
-
-	for (i = 0; punctuations_[i].p; i++) {
-		punc = &punctuations_[i];
-#endif // !USE_PUNCTABLE
 		p = punc->pCharacter;
+
 		// check for this punctuation in the script
 		for (l = 0; p[l] && current_[l]; l++) {
 			if (current_[l] != p[l]) {
