@@ -39,6 +39,7 @@ namespace profiler
 		};
 
 		typedef std::array<SubSystemInfo, profiler::SubSys::ENUM_COUNT> SubSystemInfoArr;
+		typedef std::array<core::TimeVal::TimeType, profiler::SubSys::ENUM_COUNT> SubSystemTimeArr;
 		typedef core::Array<XProfileData*>	ProfilerDataPtrArr;
 		typedef core::Array<XProfileDataHistory*>	ProfilerDataHistoryPtrArr;
 
@@ -91,7 +92,10 @@ namespace profiler
 #if X_ENABLE_JOBSYS_PROFILER
 		Vec2f RenderJobSystem(Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
 		void DrawThreadInfo(const FrameTimeData& frameTimeInfo, engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
-			const core::V2::JobQueueHistory::FrameHistory& history);
+			const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut);
+
+		void DrawSubsysInfo(engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+			const SubSystemTimeArr& subTimes);
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 

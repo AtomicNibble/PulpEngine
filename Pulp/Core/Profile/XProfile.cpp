@@ -924,6 +924,9 @@ namespace profiler
 			X_ENABLE_WARNING(4127)
 		}
 
+		SubSystemTimeArr subTimes;
+		subTimes.fill(0);
+
 		for (uint32_t i = 0; i < numThreadQueues; i++)
 		{		
 			if (!timeLines[i]) {
@@ -937,17 +940,53 @@ namespace profiler
 				threadInfoY + (i * threadInfoEntryHeight),
 				threadInfoWidth,
 				threadInfoEntryHeight - (padding * 2),
-				timeLines[i]->getHistory()[profileIdx]
+				timeLines[i]->getHistory()[profileIdx],
+				subTimes
 			);
 		}
 
-
+		DrawSubsysInfo(
+			pPrim,
+			threadInfoX,
+			threadInfoY + threadInfoHeight + 22,
+			threadInfoWidth,
+			2,
+			subTimes
+		);
+		
 		return Vec2f(width, height);
+	}
+
+	void XProfileSys::DrawSubsysInfo(engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
+		const SubSystemTimeArr& subTimes)
+	{
+		// for a given width i want to split it up into subsystem percentages.
+		auto total = core::TimeVal(core::accumulate(subTimes.begin(), subTimes.end(), 0ll));
+		auto totalMS = total.GetMilliSeconds();
+		const float visibleMS = totalMS;
+		const float widthPerMS = width / visibleMS;
+		const float quadsize = height;
+
+		float entryStart = 0;
+
+		for (size_t i=0; i< subTimes.size(); ++i)
+		{
+			auto time = core::TimeVal(subTimes[i]);
+			auto timeMS = time.GetMilliSeconds();
+			float entryWidth = timeMS * widthPerMS;
+
+			auto col = subSystemInfo_[i].col;
+		//	col.shade(-30.f);
+
+			pPrim->drawQuad(xStart + entryStart, yStart, entryWidth, quadsize, col);
+
+			entryStart += timeMS * widthPerMS;
+		}
 	}
 
 	void XProfileSys::DrawThreadInfo(const FrameTimeData& frameTimeInfo, 
 		engine::IPrimativeContext* pPrim , float xStart, float yStart, float width, float height,
-		const core::V2::JobQueueHistory::FrameHistory& history)
+		const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut)
 	{
 		pPrim->drawQuad(xStart, yStart, width, height, Color(0.55f, 0.35f, 0.35f, 0.1f));
 
@@ -972,9 +1011,12 @@ namespace profiler
 		{
 			const auto& entry = history.entryes_[idx];
 			const auto timeOffset = entry.start - frameStartTime;
+			const auto elapsed = (entry.end - entry.start);
+
+			subTimesOut[entry.subsystem] += elapsed.GetValue();
 
 			float entryStart = timeOffset.GetMilliSeconds() * widthPerMS;
-			float entryWidth = (entry.end - entry.start).GetMilliSeconds() * widthPerMS;
+			float entryWidth = elapsed.GetMilliSeconds() * widthPerMS;
 			float entryEnd = entryStart + entryWidth;
 
 			if (entryEnd > width)
@@ -992,7 +1034,6 @@ namespace profiler
 			}
 
 			entryWidth = core::Max(entryWidth, 1.f);
-
 
 			pPrim->drawQuad(xStart + entryStart, yStart, entryWidth, quadsize, subSystemInfo_[entry.subsystem].col);
 		}
