@@ -23,12 +23,12 @@ XParser::XParser(LexFlags flags, MemoryArenaBase* arena) :
 
 XParser::XParser(const char* startInclusive, const char* endExclusive,
 	const char* name, LexFlags flags, MemoryArenaBase* arena) :
-arena_(arena),
-pTokens_(nullptr),
-macros_(arena, 4),
-idents_(arena, MAX_IDENTS),
-scriptStack_(arena, MAX_SCRIPT_STACK),
-flags_(flags)
+	arena_(arena),
+	pTokens_(nullptr),
+	macros_(arena, 4),
+	idents_(arena, MAX_IDENTS),
+	scriptStack_(arena, MAX_SCRIPT_STACK),
+	flags_(flags)
 {
 	X_ASSERT_NOT_NULL(arena);
 	core::zero_object(macroCharCache);
