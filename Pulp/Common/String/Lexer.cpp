@@ -321,9 +321,7 @@ bool XLexer::SetMemory(const char* startInclusive, const char* endExclusive, cor
 }
 
 const char* XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
-	int i;
-
-	for (i = 0; punctuations_[i].pCharacter; i++) {
+	for (int32_t i = 0; punctuations_[i].pCharacter; i++) {
 		if (punctuations_[i].id == id) {
 			return punctuations_[i].pCharacter;
 		}
@@ -409,8 +407,6 @@ void XLexer::SetPunctuations(const PunctuationPair* p)
 
 bool XLexer::ReadToken(XLexToken& token)
 {
-	int c;
-
 	token.Reset();
 
 	if (tokenavailable_) {
@@ -442,7 +438,7 @@ bool XLexer::ReadToken(XLexToken& token)
 	// clear token flags
 //	token.flags_ = 0;
 
-	c = *current_;
+	int32_t c = *current_;
 
 	// if we're keeping everything as whitespace deliminated strings
 	if (flags_.IsSet(LexFlag::ONLYSTRINGS)) {
@@ -590,7 +586,7 @@ int XLexer::ParseInt(void)
 		ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER, 
 			PunctuationId::UNUSET, token);
 
-		return -(safe_static_cast<signed int, int32_t>(token.GetIntValue()));
+		return -(safe_static_cast<signed int>(token.GetIntValue()));
 	}
 	else if (token.GetType() != TokenType::NUMBER || 
 		token.GetSubType() == TokenSubType::FLOAT) 
@@ -648,16 +644,15 @@ float XLexer::ParseFloat() {
 }
 
 
-bool XLexer::Parse1DMatrix(int x, float* m)
+bool XLexer::Parse1DMatrix(int32_t x, float* m)
 {
 	X_ASSERT_NOT_NULL(m);
-	int i;
 
 	if (!ExpectTokenString("(")) {
 		return false;
 	}
 
-	for (i = 0; i < x; i++) {
+	for (int32_t i = 0; i < x; i++) {
 		m[i] = ParseFloat();
 	}
 
@@ -668,16 +663,15 @@ bool XLexer::Parse1DMatrix(int x, float* m)
 }
 
 
-bool XLexer::Parse2DMatrix(int y, int x, float* m)
+bool XLexer::Parse2DMatrix(int32_t y, int32_t x, float* m)
 {
 	X_ASSERT_NOT_NULL(m);
-	int i;
 
 	if (!ExpectTokenString("(")) {
 		return false;
 	}
 
-	for (i = 0; i < y; i++) {
+	for (int32_t i = 0; i < y; i++) {
 		if (!Parse1DMatrix(x, m + i * x)) {
 			return false;
 		}
@@ -690,16 +684,15 @@ bool XLexer::Parse2DMatrix(int y, int x, float* m)
 }
 
 
-bool XLexer::Parse3DMatrix(int z, int y, int x, float* m)
+bool XLexer::Parse3DMatrix(int32_t z, int32_t y, int32_t x, float* m)
 {
 	X_ASSERT_NOT_NULL(m);
-	int i;
 
 	if (!ExpectTokenString("(")) {
 		return false;
 	}
 
-	for (i = 0; i < z; i++) {
+	for (int32_t i = 0; i < z; i++) {
 		if (!Parse2DMatrix(y, x, m + i * x*y)) {
 			return false;
 		}
@@ -891,7 +884,7 @@ bool XLexer::ReadEscapeCharacter(char* ch)
 	// step over the escape character or the last digit of the number
 	current_++;
 	// store the escape character
-	*ch = safe_static_cast<char,int>(c);
+	*ch = safe_static_cast<char>(c);
 	// succesfully read escape character
 	return true;
 }
@@ -902,12 +895,8 @@ Escape characters are interpretted.
 Reads two strings with only a white space between them as one string.
 ================
 */
-bool XLexer::ReadString(XLexToken& token, int quote) 
+bool XLexer::ReadString(XLexToken& token, int32_t quote)
 {
-	int tmpline;
-	const char *tmpscript_p;
-	char ch;
-
 	if (quote == '\"') {
 		token.SetType(TokenType::STRING);
 	}
@@ -927,6 +916,7 @@ bool XLexer::ReadString(XLexToken& token, int quote)
 		// if there is an escape character and escape characters are allowed
 		if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) 
 		{
+			char ch;
 			if (!ReadEscapeCharacter(&ch)) {
 				return 0;
 			}
@@ -945,8 +935,8 @@ bool XLexer::ReadString(XLexToken& token, int quote)
 				break;
 			}
 
-			tmpscript_p = current_;
-			tmpline = this->curLine_;
+			const char* tmpscript_p = current_;
+			int32_t tmpline = curLine_;
 
 			// read white space between possible two consecutive strings
 			if (!ReadWhiteSpace()) {
@@ -1093,7 +1083,8 @@ bool XLexer::ReadNumber(XLexToken& token)
 			token.subtype_ = TokenSubType::OCTAL | TokenSubType::INTEGER;
 		}
 	}
-	else {
+	else 
+	{
 		// decimal integer or floating point number or ip address
 		dot = 0;
 		negative = 0;
@@ -1245,7 +1236,7 @@ bool XLexer::ReadPunctuation(XLexToken& token)
 	const char* p;
 	const PunctuationPair* punc;
 
-	for (n = punctuationtable_[(unsigned int)*(current_)]; n >= 0; n = nextpunctuation_[n])
+	for (n = punctuationtable_[static_cast<int>(*current_)]; n >= 0; n = nextpunctuation_[n])
 	{
 		punc = &(punctuations_[n]);
 		p = punc->pCharacter;
