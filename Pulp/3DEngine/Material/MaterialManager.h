@@ -84,6 +84,7 @@ public:
 	Material* loadMaterial(const char* pMtlName) X_FINAL;
 	Material* getDefaultMaterial(void) const X_FINAL;
 
+	bool waitForLoad(Material* pMaterial) X_FINAL; // returns true if load succeed.
 	void releaseMaterial(Material* pMat);
 
 	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, 
@@ -107,7 +108,6 @@ private:
 	void queueLoadRequest(MaterialResource* pMaterial, core::CriticalSection::ScopedLock&);
 	void dispatchLoad(Material* pMaterial, core::CriticalSection::ScopedLock&);
 	bool dispatchPendingLoad(core::CriticalSection::ScopedLock&);
-	bool waitForLoad(Material* pMaterial); // returns true if load succeed.
 	void dispatchLoadRequest(MaterialLoadRequest* pLoadReq);
 
 

@@ -301,6 +301,9 @@ struct IMaterialManager
 
 
 	virtual Material* getDefaultMaterial(void) const X_ABSTRACT;
+
+	virtual bool waitForLoad(Material* pMaterial) X_ABSTRACT;
+
 };
 
 X_NAMESPACE_END
