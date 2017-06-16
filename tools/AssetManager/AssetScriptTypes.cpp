@@ -630,10 +630,10 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 
 	for (auto it = pTechDef->textureBegin(); it != pTechDef->textureEnd(); ++it)
 	{
-		const auto& texName = it->first;
+		// const auto& texName = it->first;
 		const auto& tex = it->second;
 
-		showProps(texName, tex.assProps);
+		showProps(tex.propName, tex.assProps);
 	}
 
 
