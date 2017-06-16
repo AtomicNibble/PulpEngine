@@ -5,7 +5,7 @@
 struct VS_INPUT
 {
     float3 osPosition           	: POSITION0;
-    float2 tex 			: TEXCOORD0; // not used, but added so vertex layout can be shared.
+    float2 tex 			: TEXCOORD0;
     float4 color                	: COLOR0;
 
 #if X_INSTANCED
@@ -23,12 +23,18 @@ struct VS_OUTPUT
 {
     float4 ssPosition           	: SV_POSITION;
     float4 color                	: COLOR;
+#if X_TEXTURED
+    float2 texCoord               : TEXCOORD0;
+#endif // !X_TEXTURED
 };
 
 struct PS_INPUT
 {
     float4 ssPosition           	: SV_POSITION;
     float4 color                	: COLOR0;
+#if X_TEXTURED
+    float2 texCoord               : TEXCOORD0;
+#endif // !X_TEXTURED
 };
 
 struct PS_OUTPUT
@@ -36,6 +42,11 @@ struct PS_OUTPUT
     float4 color                : SV_TARGET0;
 };
 
+#if X_TEXTURED
+Texture2D          colorMap : register(t0);
+SamplerState        colorSampler;
+
+#endif // !X_TEXTURED
 
 VS_OUTPUT PrimVS( VS_INPUT IN )
 {
@@ -50,6 +61,11 @@ VS_OUTPUT PrimVS( VS_INPUT IN )
     OUT.ssPosition = mul( float4(IN.osPosition, 1.0), worldToScreenMatrix );
     OUT.color =  IN.color;
 #endif // !X_INSTANCED
+
+#if X_TEXTURED
+    OUT.texCoord = IN.tex;
+#endif // !X_TEXTURED
+
   return OUT;
 }
 
@@ -57,5 +73,11 @@ PS_OUTPUT PrimPS( PS_INPUT IN )
 {
 	PS_OUTPUT output;
 	output.color = IN.color;
+
+#if X_TEXTURED
+          float4 texCol = colorMap.Sample(colorSampler, IN.texCoord);
+          output.color = output.color *  texCol;
+#endif // !X_TEXTURED
+
 	return output;
 }
