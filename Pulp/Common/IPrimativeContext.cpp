@@ -907,7 +907,7 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
 	X_ASSERT_NOT_NULL(t);
 	X_UNUSED(filtered);
 
-	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
+	PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);
 
 	// TL
 	pQuad[0].pos.x = xpos;
@@ -921,16 +921,22 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
 	pQuad[2].pos.x = xpos;
 	pQuad[2].pos.y = ypos + h;
 	pQuad[2].pos.z = z;
+
 	// BR
 	pQuad[3].pos.x = xpos + w;
 	pQuad[3].pos.y = ypos + h;
 	pQuad[3].pos.z = z;
 
-	for (uint32 i = 0; i<4; ++i)
+	for (uint32 i = 0; i<6; ++i)
 	{
 		pQuad[i].color = col;
 		pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
 	}
+
+	// BL
+	pQuad[4] = pQuad[2];
+	// TR
+	pQuad[5] = pQuad[1];
 }
 
 
