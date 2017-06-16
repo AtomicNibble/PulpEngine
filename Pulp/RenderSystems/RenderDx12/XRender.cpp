@@ -892,7 +892,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 	// so then we can check if bound indexes are same, if so we can just memcmp the variable sized array.
 
 	// work out if any resource state bound.
-	if (curState.variableStateSize != resourceState.getStateSize() &&
+	if (curState.variableStateSize != resourceState.getStateSize() ||
 		std::memcmp(curState.variableState, pStateData, resourceState.getStateSize()) != 0)
 	{
 		std::memcpy(curState.variableState, pStateData, resourceState.getStateSize());
