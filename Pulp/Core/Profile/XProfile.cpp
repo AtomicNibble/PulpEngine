@@ -777,7 +777,7 @@ namespace profiler
 		ctx.SetSize(Vec2f(16.f,16.f));
 
 		float keyHeight = 30.f;
-		const float maxHeightPerThread = 50.f;
+		const float maxHeightPerThread = 30.f;
 
 		const int32_t visibleMS = vars_.jobSysThreadMS();
 	//	const uint32_t numThread = pJobSys->GetThreadCount();
@@ -939,7 +939,7 @@ namespace profiler
 				threadInfoX,
 				threadInfoY + (i * threadInfoEntryHeight),
 				threadInfoWidth,
-				threadInfoEntryHeight - (padding * 2),
+				threadInfoEntryHeight - (padding * 1),
 				timeLines[i]->getHistory()[profileIdx],
 				subTimes
 			);
@@ -965,7 +965,6 @@ namespace profiler
 		auto totalMS = total.GetMilliSeconds();
 		const float visibleMS = totalMS;
 		const float widthPerMS = width / visibleMS;
-		const float quadsize = height;
 
 		float entryStart = 0;
 
@@ -978,7 +977,7 @@ namespace profiler
 			auto col = subSystemInfo_[i].col;
 		//	col.shade(-30.f);
 
-			pPrim->drawQuad(xStart + entryStart, yStart, entryWidth, quadsize, col);
+			pPrim->drawQuad(xStart + entryStart, yStart, entryWidth, height, col);
 
 			entryStart += timeMS * widthPerMS;
 		}
@@ -999,7 +998,7 @@ namespace profiler
 	
 		const int32_t visibleMS = vars_.jobSysThreadMS();
 		const float widthPerMS = width / visibleMS;
-		const float quadsize = 15.f;
+		const float quadsize = height;
 
 		// i want to draw the history of this thread at correct based on start time relative to
 		// start time, so that I can visualize 'bubbles'.
