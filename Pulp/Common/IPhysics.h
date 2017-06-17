@@ -38,7 +38,7 @@ typedef Handle RegionHandle;
 typedef Handle ActorHandle;
 typedef Handle AggregateHandle;
 typedef Handle TriMeshHandle;
-typedef Handle ConvexHandle;
+typedef Handle ConvexMeshHandle;
 typedef Handle HieghtFieldHandle;
 typedef Handle LockHandle;
 
@@ -918,12 +918,12 @@ struct IPhysics
 
 
 	virtual TriMeshHandle createTriangleMesh(const DataArr& cooked) X_ABSTRACT;
-	virtual ConvexHandle createConvexMesh(const DataArr& cooked) X_ABSTRACT;
+	virtual ConvexMeshHandle createConvexMesh(const DataArr& cooked) X_ABSTRACT;
 	virtual HieghtFieldHandle createHieghtField(const DataArr& cooked) X_ABSTRACT;
 
 
 	virtual ActorHandle createConvexMesh(const Transformf& myTrans, TriMeshHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
-	virtual ActorHandle createTriangleMesh(const Transformf& myTrans, ConvexHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual ActorHandle createTriangleMesh(const Transformf& myTrans, ConvexMeshHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
 	virtual ActorHandle createSphere(const Transformf& myTrans, float radius, float density) X_ABSTRACT;
 	virtual ActorHandle createCapsule(const Transformf& myTrans, float radius, float halfHeight, float density) X_ABSTRACT;
@@ -944,10 +944,11 @@ struct IPhysics
 
 	// adding additional / initial shape to a actor.
 	virtual void addTriMesh(ActorHandle handle, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
+	virtual void addConvexMesh(ActorHandle handle, ConvexMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
 	virtual void addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
 	virtual void addBox(ActorHandle handle, const AABB& aabb) X_ABSTRACT;
 	virtual void addSphere(ActorHandle handle, float radius) X_ABSTRACT;
-	virtual void addSCapsule(ActorHandle handle, float radius, float halfHeight) X_ABSTRACT;
+	virtual void addCapsule(ActorHandle handle, float radius, float halfHeight) X_ABSTRACT;
 };
 
 

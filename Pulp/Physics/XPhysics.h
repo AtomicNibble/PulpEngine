@@ -98,10 +98,10 @@ public:
 	// you must pass cooked data :|
 	// if you don't have cooked data use getCooking() to cook it!
 	TriMeshHandle createTriangleMesh(const DataArr& cooked) X_FINAL;
-	ConvexHandle createConvexMesh(const DataArr& cooked) X_FINAL;
+	ConvexMeshHandle createConvexMesh(const DataArr& cooked) X_FINAL;
 	HieghtFieldHandle createHieghtField(const DataArr& cooked) X_FINAL;
 
-	ActorHandle createConvexMesh(const Transformf& myTrans, ConvexHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	ActorHandle createConvexMesh(const Transformf& myTrans, ConvexMeshHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
 	ActorHandle createTriangleMesh(const Transformf& myTrans, TriMeshHandle convex, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;
 	ActorHandle createHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
 	ActorHandle createSphere(const Transformf& myTrans, float radius, float density) X_FINAL;
@@ -122,10 +122,11 @@ public:
 
 	// adding additional shapes to a actor.
 	void addTriMesh(ActorHandle handle, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;
+	void addConvexMesh(ActorHandle handle, ConvexMeshHandle con, const Vec3f& scale) X_FINAL;
 	void addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
 	void addBox(ActorHandle handle, const AABB& aabb) X_FINAL;
 	void addSphere(ActorHandle handle, float radius) X_FINAL;
-	void addSCapsule(ActorHandle handle, float radius, float halfHeight) X_FINAL;
+	void addCapsule(ActorHandle handle, float radius, float halfHeight) X_FINAL;
 	// ~IPhysics
 
 private:

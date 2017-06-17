@@ -768,12 +768,12 @@ TriMeshHandle XPhysics::createTriangleMesh(const DataArr& cooked)
 	return reinterpret_cast<TriMeshHandle>(pTriMesh);
 }
 
-ConvexHandle XPhysics::createConvexMesh(const DataArr& cooked)
+ConvexMeshHandle XPhysics::createConvexMesh(const DataArr& cooked)
 {
 	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
 	physx::PxConvexMesh* pConvexMesh = pPhysics_->createConvexMesh(input);
 	
-	return reinterpret_cast<ConvexHandle>(pConvexMesh);
+	return reinterpret_cast<ConvexMeshHandle>(pConvexMesh);
 }
 
 HieghtFieldHandle XPhysics::createHieghtField(const DataArr& cooked)
@@ -787,7 +787,7 @@ HieghtFieldHandle XPhysics::createHieghtField(const DataArr& cooked)
 // ------------------------------------------
 
 
-ActorHandle XPhysics::createConvexMesh(const Transformf& myTrans, ConvexHandle convex, float density, const Vec3f& scale)
+ActorHandle XPhysics::createConvexMesh(const Transformf& myTrans, ConvexMeshHandle convex, float density, const Vec3f& scale)
 {
 	physx::PxConvexMesh* pConvexMesh = reinterpret_cast<physx::PxConvexMesh*>(convex);
 	X_ASSERT_NOT_NULL(pConvexMesh);
@@ -1059,6 +1059,22 @@ void XPhysics::addTriMesh(ActorHandle handle, TriMeshHandle tri, const Vec3f& sc
 	actor.attachShape(*pShape);
 }
 
+
+void XPhysics::addConvexMesh(ActorHandle handle, ConvexMeshHandle con, const Vec3f& scale)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+	physx::PxConvexMesh* pConvexMesh = reinterpret_cast<physx::PxConvexMesh*>(con);
+
+	physx::PxMeshScale meshScale;
+	meshScale.rotation = physx::PxQuat::createIdentity();
+	meshScale.scale = Px3FromVec3(scale);
+
+	auto* pShape = pPhysics_->createShape(physx::PxConvexMeshGeometry(pConvexMesh, meshScale), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+
+	actor.attachShape(*pShape);
+}
+
+
 void XPhysics::addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
@@ -1093,7 +1109,7 @@ void XPhysics::addSphere(ActorHandle handle, float radius)
 	actor.attachShape(*pShape);
 }
 
-void XPhysics::addSCapsule(ActorHandle handle, float radius, float halfHeight)
+void XPhysics::addCapsule(ActorHandle handle, float radius, float halfHeight)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
