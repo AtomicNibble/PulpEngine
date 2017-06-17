@@ -1111,8 +1111,7 @@ namespace profiler
 		for (size_t i = 0; i < warningList_.size(); i++)
 		{
 			auto& warn = warningList_[i];
-
-			pPrim->drawQuadImage(5.f, 40.f + (i * 40.f), 32.f, 32.f, warn.second, Col_White);
+			pPrim->drawQuadImage(5.f, 40.f + (i * 35.f), 32.f, 32.f, warn.second, Col_White);
 		}
 	}
 
