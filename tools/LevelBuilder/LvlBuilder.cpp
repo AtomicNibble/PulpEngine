@@ -7,7 +7,7 @@
 
 namespace
 {
-	Vec3f baseaxis[18] =
+	const Vec3f baseaxis[18] =
 	{
 		{ 1.0, 0.0, 0.0 },
 		{ 0.0, -1.0, 0.0 },
@@ -38,11 +38,8 @@ namespace
 	X_DISABLE_WARNING(4244)
 	void TextureAxisFromPlane(const Vec3f& normal, Vec3f& a2, Vec3f& a3)
 	{
-		size_t axis; 
-		float largestAxis;
-
-		axis = 0;
-		largestAxis = 0.0;
+		size_t axis = 0;
+		float largestAxis = 0.0;
 
 		const float x = normal[0];
 		const float y = normal[1];
@@ -99,12 +96,8 @@ namespace
 
 	static void QuakeTextureVecs(const Planef& plane, Vec2f shift, float rotate, Vec2f scale, Vec4f mappingVecs[2])
 	{
-		Vec3f	vecs[2];
-		int		sv, tv;
-		float	ang, sinv, cosv;
-		float	ns, nt;
-		int		i, j;
 
+		Vec3f	vecs[2];
 		TextureAxisFromPlane(plane.getNormal(), vecs[0], vecs[1]);
 
 		if (!scale[0]) {
@@ -115,6 +108,7 @@ namespace
 		}
 
 		// rotate axis
+		float ang, sinv, cosv;
 		if (rotate == 0.f)
 		{
 			sinv = 0.f;
@@ -142,6 +136,7 @@ namespace
 			cosv = cos(ang);
 		}
 
+		int32_t	sv, tv;
 		if (vecs[0][0]) {
 			sv = 0;
 		}
@@ -162,15 +157,15 @@ namespace
 			tv = 2;
 		}
 
-		for (i = 0; i < 2; i++) {
-			ns = cosv * vecs[i][sv] - sinv * vecs[i][tv];
-			nt = sinv * vecs[i][sv] + cosv * vecs[i][tv];
+		for (int32_t i = 0; i < 2; i++) {
+			float ns = cosv * vecs[i][sv] - sinv * vecs[i][tv];
+			float nt = sinv * vecs[i][sv] + cosv * vecs[i][tv];
 			vecs[i][sv] = ns;
 			vecs[i][tv] = nt;
 		}
 
-		for (i = 0; i < 2; i++) {
-			for (j = 0; j < 3; j++) {
+		for (int32_t i = 0; i < 2; i++) {
+			for (int32_t j = 0; j < 3; j++) {
 				mappingVecs[i][j] = vecs[i][j] / scale[i];
 			}
 		}
@@ -250,16 +245,14 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	// calculate bouds.
 	calculateLvlBounds();
 
-
+	AABB::StrBuf boundsStr;
 	X_LOG0("Map", "Total world brush: ^8%" PRIuS, entities_[0].brushes.size());
 	X_LOG0("Map", "Total brush: ^8%" PRIi32, stats_.numBrushes);
 	X_LOG0("Map", "Total patches: ^8%" PRIi32, stats_.numPatches);
 	X_LOG0("Map", "Total entities: ^8%" PRIi32, stats_.numEntities);
 	X_LOG0("Map", "Total planes: ^8%" PRIuS, planes_.size());
 	X_LOG0("Map", "Total areaPortals: ^8%" PRIi32, stats_.numAreaPortals);
-	X_LOG0("Map", "Size: (^8%.0f,%.0f,%.0f^7) to (^8%.0f,%.0f,%.0f^7)", 
-		mapBounds_.min[0], mapBounds_.min[1], mapBounds_.min[2],
-		mapBounds_.max[0], mapBounds_.max[1], mapBounds_.max[2]);
+	X_LOG0("Map", "Size: %s", mapBounds_.toString(boundsStr));
 
 	return true;
 }
