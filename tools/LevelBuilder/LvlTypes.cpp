@@ -114,7 +114,7 @@ LvlEntity::LvlEntity() :
 {
 	classType = level::ClassType::UNKNOWN;
 	pBspFaces = nullptr;
-	mapEntity = nullptr;
+	pMapEntity = nullptr;
 }
 
 LvlEntity::~LvlEntity()
@@ -131,8 +131,8 @@ LvlEntity::~LvlEntity()
 		}
 	}
 
-	if (bspTree.headnode) {
-		bspTree.headnode->FreeTree_r();
+	if (bspTree_.headnode) {
+		bspTree_.headnode->FreeTree_r();
 	}
 }
 // ==========================================

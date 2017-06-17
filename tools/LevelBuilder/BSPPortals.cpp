@@ -77,10 +77,10 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 bool bspPortal::MakeTreePortals(XPlaneSet& planeSet, LvlEntity* pEnt)
 {
 	X_ASSERT_NOT_NULL(pEnt);
-	X_ASSERT_NOT_NULL(pEnt->bspTree.headnode);
+	X_ASSERT_NOT_NULL(pEnt->bspTree_.headnode);
 
-	MakeHeadnodePortals(pEnt->bspTree);
-	pEnt->bspTree.headnode->MakeTreePortals_r(planeSet);
+	MakeHeadnodePortals(pEnt->bspTree_);
+	pEnt->bspTree_.headnode->MakeTreePortals_r(planeSet);
 	return true;
 }
 

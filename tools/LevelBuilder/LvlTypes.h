@@ -171,13 +171,13 @@ public:
 	LvlInterPortalArr interPortals;
 	// bsp data.
 	bspFace* pBspFaces;
-	bspTree bspTree;
+	bspTree bspTree_;
 
 	size_t numAreas;
 
 	level::ClassType::Enum classType;
 
-	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
+	mapfile::XMapEntity* pMapEntity;		// points to the map data this was made from.
 };
 
 

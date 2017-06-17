@@ -581,7 +581,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		areaList.clear();
 
 		// traverse the world ent's tree
-		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree_.headnode);
 
 		size_t numRefs = areaList.size();
 		if (numRefs)
@@ -664,10 +664,9 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		worldBounds.toPoints(boundsPoints);
 
 		// traverse the world ent's tree
-		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree_.headnode);
 
 		size_t numRefs = areaList.size();
-
 		if (numRefs)
 		{
 			
@@ -747,7 +746,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 				continue;
 			}
 
-			PutWindingIntoAreas_r(ent, side.pVisibleHull, side, ent.bspTree.headnode);
+			PutWindingIntoAreas_r(ent, side.pWinding, side, ent.bspTree_.headnode);
 		}
 	}
 	
@@ -844,7 +843,7 @@ bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, cons
 	}
 
 	w = WindingForTri(tri);
-	area = worldEnt.bspTree.headnode->CheckWindingInAreas_r(planeSet, w);
+	area = worldEnt.bspTree_.headnode->CheckWindingInAreas_r(planeSet, w);
 	X_DELETE(w, g_arena);
 
 	if (area == -1) {
