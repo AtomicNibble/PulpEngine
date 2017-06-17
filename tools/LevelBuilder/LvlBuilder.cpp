@@ -224,7 +224,6 @@ bool LvlBuilder::init(void)
 	if (!pModelCache_->loadDefaultModel()) {
 		return false;
 	}
-	
 
 	return true;
 }
@@ -232,10 +231,7 @@ bool LvlBuilder::init(void)
 
 bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 {
-	X_ASSERT_NOT_NULL(map);
-	size_t i;
-
-	pMap_ = map;
+	pMap_ = X_ASSERT_NOT_NULL(map);
 
 	if (map->getNumEntities() == 0) {
 		X_ERROR("Lvl", "Map has zero entites, atleast one is required");
@@ -243,7 +239,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	}
 
 	entities_.resize(map->getNumEntities());
-	for (i = 0; i < map->getNumEntities(); i++)
+	for (size_t i = 0; i < map->getNumEntities(); i++)
 	{
 		if (!processMapEntity(entities_[i], map->getEntity(i))) {
 			X_ERROR("Lvl", "Failed to process entity: %i", i);
@@ -275,9 +271,6 @@ int32_t LvlBuilder::FindFloatPlane(const Planef& plane)
 
 bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 {
-	mapfile::XMapPrimitive* prim;
-	size_t i;
-
 	// update stats.
 	stats_.numEntities++;
 
@@ -288,18 +281,18 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	ent.brushes.reserve(mapEnt->GetNumPrimitives());
 
 	// we process brushes / patches diffrent.
-	for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
+	for (size_t i = 0; i < mapEnt->GetNumPrimitives(); i++)
 	{
-		prim = mapEnt->GetPrimitive(i);
+		auto* pPrim = mapEnt->GetPrimitive(i);
 
-		if (prim->getType() == PrimType::BRUSH)	{
-			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(prim), i)) {
+		if (pPrim->getType() == PrimType::BRUSH)	{
+			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(pPrim), i)) {
 				X_ERROR("Lvl", "failed to process brush: %i", i);
 				return false;
 			}
 		}
-		else if (prim->getType() == PrimType::PATCH) {
-			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(prim), i)) {
+		else if (pPrim->getType() == PrimType::PATCH) {
+			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(pPrim), i)) {
 				X_ERROR("Lvl", "failed to process patch: %i", i);
 				return false;
 			}
@@ -311,8 +304,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	{
 		// set the origin.
 		const core::string& value = it->second;
-		sscanf_s(value.c_str(), "%f %f %f",
-			&ent.origin.x, &ent.origin.y, &ent.origin.z);
+		sscanf_s(value.c_str(), "%f %f %f", &ent.origin.x, &ent.origin.y, &ent.origin.z);
 	}
 
 	// check for angles.
@@ -320,8 +312,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	if (it != mapEnt->epairs.end())
 	{
 		const core::string& value = it->second;
-		sscanf_s(value.c_str(), "%f %f %f",
-			&ent.angle.x, &ent.angle.y, &ent.angle.z);
+		sscanf_s(value.c_str(), "%f %f %f", &ent.angle.x, &ent.angle.y, &ent.angle.z);
 	}
 
 	ent.bounds.clear();
