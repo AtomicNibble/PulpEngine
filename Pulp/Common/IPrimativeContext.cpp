@@ -129,7 +129,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 	x2 = x1 + rect.getWidth();
 	y2 = y1 - rect.getHeight();
 
-	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
+	PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);
 
 	// TL
 	pQuad[0].pos.x = x1;
@@ -153,6 +153,11 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 		pQuad[i].color = col;
 		pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
 	}
+
+	// BL
+	pQuad[4] = pQuad[2];
+	// TR
+	pQuad[5] = pQuad[1];
 }
 
 void IPrimativeContext::drawRectSS(const Rectf& rect, const Color& col)
