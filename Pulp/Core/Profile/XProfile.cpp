@@ -13,6 +13,9 @@
 #include <IPrimativeContext.h>
 #include <IFont.h>
 #include <IConsole.h>
+#include <IMaterial.h>
+
+#include <../../tools/MaterialLib/MatLib.h>
 
 #include "Profile\ProfilerTypes.h"
 
@@ -115,6 +118,11 @@ namespace profiler
 		totalTime_(0),
 		profilerData_(arena),
 		profilerHistoryData_(arena)
+
+#if X_ENABLE_PROFILER_WARNINGS
+		,
+		warningList_(arena)
+#endif // !X_ENABLE_PROFILER_WARNINGS
 	{
 		repeatEventTimer_ = TimeVal(0ll);
 		repeatEventInterval_ = TimeVal(0.05f);
@@ -179,6 +187,31 @@ namespace profiler
 		return true;
 	}
 
+	bool XProfileSys::loadRenderResources(void)
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pFontSys);
+
+		pFont_ = gEnv->pFontSys->GetFont("default");
+		if (!pFont_) {
+			return false;
+		}
+
+
+#if X_ENABLE_PROFILER_WARNINGS
+
+		auto* pMatMan = gEnv->p3DEngine->getMaterialManager();
+
+		subSystemInfo_[SubSys::PHYSICS].pWarningMat = pMatMan->loadMaterial("code/warnings/phys");
+		subSystemInfo_[SubSys::NETWORK].pWarningMat = pMatMan->loadMaterial("code/warnings/net");
+		subSystemInfo_[SubSys::SOUND].pWarningMat = pMatMan->loadMaterial("code/warnings/sound");
+
+
+#endif // !X_ENABLE_PROFILER_WARNINGS
+
+		return true;
+	}
+
 
 	void XProfileSys::shutDown(void)
 	{
@@ -191,16 +224,19 @@ namespace profiler
 
 	}
 
-	bool XProfileSys::loadRenderResources(void)
+
+	bool XProfileSys::asyncInitFinalize(void)
 	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pFontSys);
+		for (auto& sub : subSystemInfo_)
+		{
+			if (sub.pWarningMat)
+			{
+				gEnv->p3DEngine->getMaterialManager()->waitForLoad(sub.pWarningMat);
+			}
+		}
 
-		pFont_ = gEnv->pFontSys->GetFont("default");
-
-		return pFont_ != nullptr;
+		return true;
 	}
-
 
 	void XProfileSys::AddProfileData(XProfileData* pData)
 	{
@@ -473,6 +509,10 @@ namespace profiler
 				area = RenderArenaTree(pos, gEnv->pArena);
 
 			}
+
+#if X_ENABLE_PROFILER_WARNINGS
+			drawWarnings();
+#endif // !X_ENABLE_PROFILER_WARNINGS
 		}
 	}
 
@@ -968,7 +1008,7 @@ namespace profiler
 
 		float entryStart = 0;
 
-		for (size_t i=0; i< subTimes.size(); ++i)
+		for (size_t i = 0; i < subTimes.size(); ++i)
 		{
 			auto time = core::TimeVal(subTimes[i]);
 			auto timeMS = time.GetMilliSeconds();
@@ -983,8 +1023,8 @@ namespace profiler
 		}
 	}
 
-	void XProfileSys::DrawThreadInfo(const FrameTimeData& frameTimeInfo, 
-		engine::IPrimativeContext* pPrim , float xStart, float yStart, float width, float height,
+	void XProfileSys::DrawThreadInfo(const FrameTimeData& frameTimeInfo,
+		engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
 		const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut)
 	{
 		pPrim->drawQuad(xStart, yStart, width, height, Color(0.55f, 0.35f, 0.35f, 0.1f));
@@ -995,7 +1035,7 @@ namespace profiler
 		if (history.bottom_ == 0) {
 			return;
 		}
-	
+
 		const int32_t visibleMS = vars_.jobSysThreadMS();
 		const float widthPerMS = width / visibleMS;
 		const float quadsize = height;
@@ -1039,6 +1079,47 @@ namespace profiler
 	}
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
+
+#if X_ENABLE_PROFILER_WARNINGS
+
+	void XProfileSys::drawWarnings(void)
+	{
+		if (warningList_.isEmpty()) {
+			return;
+		}
+
+
+		const core::TimeVal timeout(10.f);
+		const auto timeNow = core::StopWatch::GetTimeNow();
+
+		// remove any old warnings.
+		for (auto it = warningList_.begin(); it != warningList_.end(); )
+		{
+			if ((it->first + timeout) < timeNow)
+			{
+				it = warningList_.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+
+		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+
+
+		for (size_t i = 0; i < warningList_.size(); i++)
+		{
+			auto& warn = warningList_[i];
+
+			pPrim->drawQuadImage(5.f, 40.f + (i * 40.f), 32.f, 32.f, warn.second, Col_White);
+		}
+	}
+
+
+#endif // !X_ENABLE_PROFILER_WARNINGS
+
+
 
 } // namespace profiler
 

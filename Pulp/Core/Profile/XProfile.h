@@ -17,6 +17,7 @@ X_NAMESPACE_DECLARE(render, struct IRender);
 
 X_NAMESPACE_DECLARE(engine,
 	class IPrimativeContext;
+	class Material;
 );
 
 X_NAMESPACE_BEGIN(core)
@@ -34,9 +35,18 @@ namespace profiler
 	{
 		struct SubSystemInfo
 		{
+			SubSystemInfo() {
+				pName = nullptr;
+				pWarningMat = nullptr;
+			}
+
 			const char* pName;
+			engine::Material* pWarningMat;
 			Colorf col;
 		};
+
+		typedef std::pair<core::TimeVal, engine::Material*> WarningEntry;
+		typedef core::Array<WarningEntry> WarningArr;
 
 		typedef std::array<SubSystemInfo, profiler::SubSys::ENUM_COUNT> SubSystemInfoArr;
 		typedef std::array<core::TimeVal::TimeType, profiler::SubSys::ENUM_COUNT> SubSystemTimeArr;
@@ -56,6 +66,9 @@ namespace profiler
 		bool init(ICore* pCore);
 		bool loadRenderResources(void);
 		void shutDown(void);
+
+		bool asyncInitFinalize(void);
+		
 
 		// IProfiler
 		void AddProfileData(XProfileData* pData) X_FINAL;
@@ -99,6 +112,11 @@ namespace profiler
 
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
+
+#if X_ENABLE_PROFILER_WARNINGS
+		void drawWarnings(void);
+#endif // !X_ENABLE_PROFILER_WARNINGS
+
 	private:
 		ProfilerVars vars_;
 
@@ -124,6 +142,11 @@ namespace profiler
 
 		ProfilerDataPtrArr profilerData_;
 		ProfilerDataHistoryPtrArr profilerHistoryData_;
+
+#if X_ENABLE_PROFILER_WARNINGS
+		WarningArr warningList_;
+#endif // !X_ENABLE_PROFILER_WARNINGS
+
 	};
 
 } // namespace profiler
