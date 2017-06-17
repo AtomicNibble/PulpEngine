@@ -223,27 +223,27 @@ namespace
 
 bool LvlBuilder::ProcessModels(void)
 {
-	size_t i, numEnts = entities_.size();
-
-	for (i = 0; i < numEnts; i++)
+	for (size_t i = 0; i < entities_.size(); i++)
 	{
 		LvlEntity& entity = entities_[i];
 		if (entity.brushes.isEmpty()) {
 			continue;
 		}
 
-		X_LOG0("Entity", "^5----- entity %i -----", i);
+		X_LOG0("Entity", "^5----- entity %" PRIuS " -----", i);
 
 		if (i == 0)
 		{
 			// return false if leak.
-			if (!ProcessWorldModel(entity))
+			if (!ProcessWorldModel(entity)) {
 				return false;
+			}
 		}
 		else
 		{
-			if (!ProcessModel(entity)) 
+			if (!ProcessModel(entity)) {
 				return false;
+			}
 		}
 	}
 
@@ -255,7 +255,6 @@ bool LvlBuilder::ProcessModels(void)
 bool LvlBuilder::ProcessModel(LvlEntity& ent)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
-
 
 	return true;
 }
@@ -493,26 +492,24 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 
 bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 {
-	size_t i, numEnts;
-
 	// we go throught each ent, and work out what area's it is in.
 	// each ent is then added to the entRefts set.
 	// we then need to work out the ones that touch multiple area's
 	core::Array<int32_t> areaList(g_arena);
 	areaList.resize(this->areas_.size());
 
-	for (i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
+	for (size_t i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
 	{
 		multiRefEntLists_[i].clear();
 		multiModelRefLists_[i].clear();
 	}
 
-	numEnts = pMap_->getNumEntities();
+	size_t numEnts = pMap_->getNumEntities();
 
 	// more than enougth.
 	staticModels_.reserve(numEnts);
 
-	for (i = 0; i < numEnts; i++)
+	for (size_t i = 0; i < numEnts; i++)
 	{
 		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
@@ -586,7 +583,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		size_t numRefs = areaList.size();
 		if (numRefs)
 		{
-			X_LOG1("Lvl", "Entity(%i) has %i refs", i, numRefs);
+			X_LOG1("Lvl", "Entity(%" PRIuS ") has %" PRIuS " refs", i, numRefs);
 
 			// ok so we hold a list of unique areas ent is in.
 			if (numRefs == 1)
@@ -621,19 +618,18 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 						multiModelRefLists_[x].append(entRef);
 					}
 				}
-
 			}
 		}
 		else
 		{
 			// ent not in any area.
-			X_ERROR("Lvl", "Entity(%i) does not reside in any area: (%g,%g,%g)",
+			X_ERROR("Lvl", "Entity(%" PRIuS ") does not reside in any area: (%g,%g,%g)",
 				i, lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
 		}
 	}
 
 	// everything that is not a misc model.
-	for (i = 0; i < numEnts; i++)
+	for (size_t i = 0; i < numEnts; i++)
 	{
 		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
@@ -643,7 +639,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		}
 
 		if (lvlEnt.bounds.IsInfinate()) {
-			X_ERROR("Lvl", "Entity(%i:%s) has empty bounds at (%g,%g,%g)",
+			X_ERROR("Lvl", "Entity(%" PRIuS ":%s) has empty bounds at (%g,%g,%g)",
 				i, level::ClassType::ToString(lvlEnt.classType),
 				lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
 			continue;
@@ -670,7 +666,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		if (numRefs)
 		{
 			
-			X_LOG1("Lvl", "Entity(%i:%s) has %i refs", 
+			X_LOG1("Lvl", "Entity(%" PRIuS ":%s) has %" PRIuS " refs",
 				i, level::ClassType::ToString(lvlEnt.classType), numRefs);
 
 			// ok so we hold a list of unique areas ent is in.
@@ -712,7 +708,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		else
 		{
 			// ent not in any area.
-			X_ERROR("Lvl", "Entity(%i) does not reside in any area: (%g,%g,%g)",
+			X_ERROR("Lvl", "Entity(%" PRIuS ") does not reside in any area: (%g,%g,%g)",
 				i, lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
 		}
 	}
@@ -726,7 +722,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
-	size_t i, j;
+	size_t i;
 
 	areas_.resize(ent.numAreas);
 	for (i = 0; i < areas_.size(); i++){
@@ -738,7 +734,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 		LvlBrush& brush = ent.brushes[i];
 		// for each side that's visable.
 		
-		for (j = 0; j < brush.sides.size(); j++)
+		for (size_t j = 0; j < brush.sides.size(); j++)
 		{ 
 			LvlBrushSide& side = brush.sides[j];
 		
@@ -762,7 +758,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 		areas_[i].AreaEnd();
 
 		if (!areas_[i].model.BelowLimits()) {
-			X_ERROR("Lvl","Area %i exceeds the limits", i);
+			X_ERROR("Lvl","Area %" PRIuS " exceeds the limits", i);
 			return false;
 		}
 	}

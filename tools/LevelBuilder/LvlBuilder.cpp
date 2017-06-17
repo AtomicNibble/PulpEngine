@@ -96,7 +96,6 @@ namespace
 
 	static void QuakeTextureVecs(const Planef& plane, Vec2f shift, float rotate, Vec2f scale, Vec4f mappingVecs[2])
 	{
-
 		Vec3f	vecs[2];
 		TextureAxisFromPlane(plane.getNormal(), vecs[0], vecs[1]);
 
@@ -237,7 +236,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	for (size_t i = 0; i < map->getNumEntities(); i++)
 	{
 		if (!processMapEntity(entities_[i], map->getEntity(i))) {
-			X_ERROR("Lvl", "Failed to process entity: %i", i);
+			X_ERROR("Lvl", "Failed to process entity: %" PRIuS, i);
 			return false;
 		}
 	}
@@ -253,7 +252,6 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_LOG0("Map", "Total planes: ^8%" PRIuS, planes_.size());
 	X_LOG0("Map", "Total areaPortals: ^8%" PRIi32, stats_.numAreaPortals);
 	X_LOG0("Map", "Size: %s", mapBounds_.toString(boundsStr));
-
 	return true;
 }
 
@@ -280,13 +278,13 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 
 		if (pPrim->getType() == PrimType::BRUSH)	{
 			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(pPrim), i)) {
-				X_ERROR("Lvl", "failed to process brush: %i", i);
+				X_ERROR("Lvl", "failed to process brush: %" PRIuS, i);
 				return false;
 			}
 		}
 		else if (pPrim->getType() == PrimType::PATCH) {
 			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(pPrim), i)) {
-				X_ERROR("Lvl", "failed to process patch: %i", i);
+				X_ERROR("Lvl", "failed to process patch: %" PRIuS, i);
 				return false;
 			}
 		}
@@ -370,21 +368,15 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 bool LvlBuilder::processBrush(LvlEntity& ent,
 	mapfile::XMapBrush* mapBrush, size_t entIdx)
 {
-	const mapfile::XMapBrushSide* pMapBrushSide;
-	XWinding*	w;
-	size_t		i, numSides;
-
-
 	LvlBrush& brush = ent.brushes.AddOne();
 	brush.entityNum = stats_.numEntities;
 	brush.brushNum = safe_static_cast<int32_t, size_t>(entIdx);
 
-
-	numSides = mapBrush->GetNumSides();
-	for (i = 0; i < numSides; i++)
+	size_t numSides = mapBrush->GetNumSides();
+	for (size_t i = 0; i < numSides; i++)
 	{
 		LvlBrushSide& side = brush.sides.AddOne();
-		pMapBrushSide = mapBrush->GetSide(i);
+		auto* pMapBrushSide = mapBrush->GetSide(i);
 
 		side.planenum = FindFloatPlane(pMapBrushSide->GetPlane());
 		// material
@@ -424,16 +416,16 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		stats_.numAreaPortals++;
 	}
 
-	for (i = 0; i < brush.sides.size(); i++)
+	for (size_t i = 0; i < brush.sides.size(); i++)
 	{
 		const LvlBrushSide& side = brush.sides[i];
-		w = side.pWinding;
+		auto* pWinding = side.pWinding;
 
-		if (!w) {
+		if (!pWinding) {
 			continue;
 		}
 	
-		pMapBrushSide = mapBrush->GetSide(i);
+		auto* pMapBrushSide = mapBrush->GetSide(i);
 		const Planef& plane = pMapBrushSide->GetPlane();
 		const Vec2f& repeate = pMapBrushSide->material.matRepeate;
 		const Vec2f& shift = pMapBrushSide->material.shift;
@@ -442,10 +434,10 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		Vec4f mappingVecs[2];
 		QuakeTextureVecs(plane, shift, rotate, repeate, mappingVecs);
 
-		for (size_t j = 0; j < w->getNumPoints(); j++)
+		for (size_t j = 0; j < pWinding->getNumPoints(); j++)
 		{
 			// gets me position from 0,0 from 2d plane.
-			Vec5f& point = w->operator[](j);
+			Vec5f& point = pWinding->operator[](j);
 			Vec3f translated(point.asVec3() + ent.origin);
 
 			point.s = mappingVecs[0][3] + mappingVecs[0].dot(translated);
@@ -465,7 +457,6 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 	mapfile::XMapPatch* mapPatch, size_t entIdx)
 {
 	X_UNUSED(entIdx);
-	size_t i;
 
 	if (gSettings.noPatches) { // are these goat meshes even allowed O_0 ?
 		return false;
@@ -494,7 +485,7 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 	X_ASSERT(pMaterial->isLoaded(), "Material should be loaded?")();
 
 	// create a Primative
-	for (i = 0; i < patch.GetNumIndexes(); i += 3)
+	for (size_t i = 0; i < patch.GetNumIndexes(); i += 3)
 	{
 		LvlTris& tri = ent.patches.AddOne();
 
@@ -518,17 +509,14 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 
 bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 {
-	size_t i, j;
-
-	for (i = 1; i < brush.sides.size(); i++)
+	for (size_t i = 1; i < brush.sides.size(); i++)
 	{
 		LvlBrushSide& side = brush.sides[i];
 
 		// check for a degenerate plane
 		if (side.planenum == -1)
 		{
-			X_WARNING("Brush", "Entity %i, Brush %i, Sides %i: "
-				"degenerate plane(%i)", 
+			X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": degenerate plane(%" PRIuS ")",
 				brush.entityNum, brush.brushNum, brush.sides.size(), i);
 
 			// remove it
@@ -539,12 +527,11 @@ bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 		}
 
 		// check for duplication and mirroring
-		for (j = 0; j < i; j++) 
+		for (size_t j = 0; j < i; j++) 
 		{
 			if (side.planenum == brush.sides[j].planenum)
 			{
-				X_WARNING("Brush", "Entity %i, Brush %i, Sides %i: "
-					"duplicate plane(%i,%i)", 
+				X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": duplicate plane(%" PRIuS ",%" PRIuS ")",
 					brush.entityNum, brush.brushNum, brush.sides.size(), i, j);
 
 				// remove the second duplicate
@@ -557,8 +544,7 @@ bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 			if (side.planenum == (brush.sides[i].planenum ^ 1))
 			{
 				// mirror plane, brush is invalid
-				X_WARNING("Brush", "Entity %i, Brush %i, Sides %i: "
-					"mirrored plane(%i,%i)", 
+				X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": mirrored plane(%" PRIuS ",%" PRIuS ")",
 					brush.entityNum, brush.brushNum, brush.sides.size(), i, j);
 				return false;
 			}
