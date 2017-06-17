@@ -712,8 +712,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 		auto* pTexStates = pVariableState->getTexStates();
 		const auto& matTextures = pMat->getTextures();
 
-		X_UNUSED(matTextures);
-
 		auto* pTexMan = gEngEnv.pTextureMan_;
 		auto* pDefaultTex = pTexMan->getDefault(render::TextureSlot::DIFFUSE);
 
