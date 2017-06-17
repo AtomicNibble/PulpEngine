@@ -678,7 +678,7 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::erase(ConstIterator 
 
 	--num_;
 
-	return const_cast<Iterator>(ptr);
+	return const_cast<Iterator>(first);
 }
 
 template<typename T, class Allocator>
