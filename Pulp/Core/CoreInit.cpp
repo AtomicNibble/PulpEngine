@@ -563,14 +563,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitRenderSys(startupParams)) {
 			return false;
 		}
-
-#if X_ENABLE_PROFILER
-		if(pProfiler_) {
-			if (!pProfiler_->loadRenderResources()) {
-				return false;
-			}
-		}
-#endif // !X_ENABLE_PROFILER
 	}
 
 	// sync net inits before 3d engine.
@@ -587,6 +579,14 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!Init3DEngine(startupParams)) {
 			return false;
 		}
+
+#if X_ENABLE_PROFILER
+		if (pProfiler_) {
+			if (!pProfiler_->loadRenderResources()) {
+				return false;
+			}
+		}
+#endif // !X_ENABLE_PROFILER
 	}
 
 	//  #------------------------- Game Dll -------------------------
@@ -666,6 +666,12 @@ bool XCore::InitAsyncWait(void)
 	{
 		allOk &= env_.p3DEngine->asyncInitFinalize();
 	}
+
+#if X_ENABLE_PROFILER
+	if (pProfiler_ && !pProfiler_->asyncInitFinalize()) {
+		return false;
+	}
+#endif // !X_ENABLE_PROFILER
 
 	return allOk;
 }
