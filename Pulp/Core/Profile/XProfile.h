@@ -144,6 +144,12 @@ namespace profiler
 		ProfilerDataHistoryPtrArr profilerHistoryData_;
 
 #if X_ENABLE_PROFILER_WARNINGS
+
+		engine::Material* pWarnTotalMem_;
+		engine::Material* pWarnTextureMem_;
+		engine::Material* pWarnSndMem_;
+		engine::Material* pWarnFileSys_;
+
 		WarningArr warningList_;
 #endif // !X_ENABLE_PROFILER_WARNINGS
 

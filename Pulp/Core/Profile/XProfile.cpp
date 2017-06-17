@@ -127,6 +127,16 @@ namespace profiler
 		repeatEventTimer_ = TimeVal(0ll);
 		repeatEventInterval_ = TimeVal(0.05f);
 		repeatEventInitialDelay_ = TimeVal(0.5f);
+
+#if X_ENABLE_PROFILER_WARNINGS
+
+		pWarnTotalMem_   = nullptr;
+		pWarnTextureMem_ = nullptr;
+		pWarnSndMem_     = nullptr;
+		pWarnFileSys_    = nullptr;
+
+#endif // !X_ENABLE_PROFILER_WARNINGS
+
 	}
 
 	XProfileSys::~XProfileSys()
@@ -205,7 +215,14 @@ namespace profiler
 		subSystemInfo_[SubSys::PHYSICS].pWarningMat = pMatMan->loadMaterial("code/warnings/phys");
 		subSystemInfo_[SubSys::NETWORK].pWarningMat = pMatMan->loadMaterial("code/warnings/net");
 		subSystemInfo_[SubSys::SOUND].pWarningMat = pMatMan->loadMaterial("code/warnings/sound");
+		subSystemInfo_[SubSys::INPUT].pWarningMat = pMatMan->loadMaterial("code/warnings/input");
+		subSystemInfo_[SubSys::GAME].pWarningMat = pMatMan->loadMaterial("code/warnings/game");
+		subSystemInfo_[SubSys::ENGINE3D].pWarningMat = pMatMan->loadMaterial("code/warnings/engine3d");
 
+		pWarnTotalMem_ = pMatMan->loadMaterial("code/warnings/mem");
+		pWarnTextureMem_ = pMatMan->loadMaterial("code/warnings/texture_mem");
+		pWarnSndMem_ = pMatMan->loadMaterial("code/warnings/sound_mem");
+		pWarnFileSys_ = pMatMan->loadMaterial("code/warnings/file");
 
 #endif // !X_ENABLE_PROFILER_WARNINGS
 
@@ -227,13 +244,25 @@ namespace profiler
 
 	bool XProfileSys::asyncInitFinalize(void)
 	{
+#if X_ENABLE_PROFILER_WARNINGS
+
+		auto* pMatMan = gEnv->p3DEngine->getMaterialManager();
+
 		for (auto& sub : subSystemInfo_)
 		{
 			if (sub.pWarningMat)
 			{
-				gEnv->p3DEngine->getMaterialManager()->waitForLoad(sub.pWarningMat);
+				pMatMan->waitForLoad(sub.pWarningMat);
 			}
 		}
+
+		pMatMan->waitForLoad(pWarnTotalMem_);
+		pMatMan->waitForLoad(pWarnTextureMem_);
+		pMatMan->waitForLoad(pWarnSndMem_);
+		pMatMan->waitForLoad(pWarnFileSys_);
+
+
+#endif // !X_ENABLE_PROFILER_WARNINGS
 
 		return true;
 	}
