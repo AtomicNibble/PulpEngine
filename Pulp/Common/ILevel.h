@@ -459,7 +459,8 @@ struct FileStaticModel
 
 
 X_DECLARE_ENUM8(CollisionDataType)(
-	TriMesh,
+	TriMesh,	
+	ConvexMesh,
 	HeightField,
 	Aabb
 );
@@ -481,7 +482,6 @@ struct AreaCollisionGroupHdr
 	physics::GroupFlags groupFlags;
 	// the number of each type.
 	uint8_t numTypes[CollisionDataType::ENUM_COUNT];
-	uint8_t _pad;
 };
 
 // one for each type.
