@@ -118,7 +118,7 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 
 		if (!lvl.init())
 		{
-			X_ERROR("Map", "FAiled to init level builder");
+			X_ERROR("Map", "Failed to init level builder");
 			return false;
 		}
 
