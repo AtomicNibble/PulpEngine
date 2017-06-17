@@ -443,7 +443,7 @@ void AssetTextureWidget::rawFileLoaded(void)
 	// thumb data
 	if (thumbData.isNotEmpty()) {
 		pAssEntry_->updateThumb(thumbData, Vec2i(64, 64), srcDim,
-			core::Compression::Algo::LZ4, core::Compression::CompressLevel::NORMAL);
+			core::Compression::Algo::STORE, core::Compression::CompressLevel::NORMAL);
 	}
 
 	// set and show dims
