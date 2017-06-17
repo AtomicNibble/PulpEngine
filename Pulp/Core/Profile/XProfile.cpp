@@ -1136,7 +1136,6 @@ namespace profiler
 
 		engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
-
 		for (size_t i = 0; i < warningList_.size(); i++)
 		{
 			auto& warn = warningList_[i];
