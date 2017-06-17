@@ -205,18 +205,16 @@ LvlBrush& LvlBrush::operator = (const LvlBrush& oth)
 
 bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 {
-	size_t i, j;
-	XWinding* w;
 	const Planef* pPlane;
 	LvlBrushSide* pSide;
 
-	for (i = 0; i < sides.size(); i++)
+	for (size_t i = 0; i < sides.size(); i++)
 	{
 		pSide = &sides[i];
 		pPlane = &planes[pSide->planenum];
-		w = X_NEW(XWinding,g_arena, "BrushWinding")(*pPlane);
+		auto* pWinding = X_NEW(XWinding,g_arena, "BrushWinding")(*pPlane);
 
-		for (j = 0; j < sides.size() && w; j++)
+		for (size_t j = 0; j < sides.size() && pWinding; j++)
 		{
 			if (i == j) {
 				continue;
@@ -225,14 +223,14 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 				continue;		// back side clipaway
 			}
 
-			if(!w->clip(planes[sides[j].planenum ^ 1], 0.01f)) {
-				X_DELETE_AND_NULL(w, g_arena);
+			if(!pWinding->clip(planes[sides[j].planenum ^ 1], 0.01f)) {
+				X_DELETE_AND_NULL(pWinding, g_arena);
 			}
 		}
 		if (pSide->pWinding) {
 			X_DELETE(pSide->pWinding, g_arena);
 		}
-		pSide->pWinding = w;
+		pSide->pWinding = pWinding;
 	}
 
 	return boundBrush(planes);
@@ -240,23 +238,19 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 
 bool LvlBrush::boundBrush(const XPlaneSet& planes)
 {
-	size_t i;
-	size_t j;
-	XWinding* w;
-
 	bounds.clear();
-	for (i = 0; i < sides.size(); i++)
+	for (size_t i = 0; i < sides.size(); i++)
 	{
-		w = sides[i].pWinding;
-		if (!w) {
+		auto* pWinding = sides[i].pWinding;
+		if (!pWinding) {
 			continue;
 		}
-		for (j = 0; j < w->getNumPoints(); j++) {
-			bounds.add((*w)[j].asVec3());
+		for (size_t j = 0; j < pWinding->getNumPoints(); j++) {
+			bounds.add((*pWinding)[j].asVec3());
 		}
 	}
 
-	for (i = 0; i < 3; i++) 
+	for (size_t i = 0; i < 3; i++)
 	{
 		if (bounds.min[i] < level::MIN_WORLD_COORD || bounds.max[i] > level::MAX_WORLD_COORD
 			|| bounds.min[i] >= bounds.max[i])
@@ -281,7 +275,6 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 bool LvlBrush::calculateContents(void)
 {
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> MatName;
-	SidesArr::ConstIterator it;
 
 	if (sides.isEmpty()) {
 		return false;
@@ -295,10 +288,8 @@ bool LvlBrush::calculateContents(void)
 
 	combinedMatFlags.Clear();
 
-	for (it = sides.begin(); it != sides.end(); ++it)
+	for (const auto& side : sides)
 	{
-		const LvlBrushSide& side = *it;
-
 		if (!side.matInfo.pMaterial) {
 			X_ERROR("Brush", "material not found for brush side. ent: %i brush: %i",
 				entityNum, brushNum);
@@ -328,14 +319,9 @@ bool LvlBrush::calculateContents(void)
 
 float LvlBrush::Volume(const XPlaneSet& planes)
 {
-	size_t i;
-	XWinding* w;
-	Vec3f corner;
-	float d, area, volume;
-	const Planef* plane;
-
 	// grab the first valid point as the corner
-	w = nullptr;
+	size_t i;
+	XWinding* w = nullptr;
 	for (i = 0; i < sides.size(); i++) {
 		w = sides[i].pWinding;
 		if (w) {
@@ -346,7 +332,9 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 		return 0.f;
 	}
 
-	corner = (*w)[0].asVec3();
+	Vec3f corner = (*w)[0].asVec3();
+	float d, area, volume;
+	const Planef* plane;
 
 	// make tetrahedrons to all other faces
 	volume = 0;
@@ -369,25 +357,19 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 
 BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 {
-	size_t i;
-	size_t j;
-	XWinding* w;
-	float d, max;
-	BrushPlaneSide::Enum side;
-
-	max = 0;
-	side = BrushPlaneSide::FRONT;
-	for (i = 0; i < sides.size(); i++)
+	float max = 0;
+	BrushPlaneSide::Enum side = BrushPlaneSide::FRONT;
+	for (size_t i = 0; i < sides.size(); i++)
 	{
-		w = sides[i].pWinding;
+		auto* w = sides[i].pWinding;
 
 		if (!w) {
 			continue;
 		}
 
-		for (j = 0; j < w->getNumPoints(); j++)
+		for (size_t j = 0; j < w->getNumPoints(); j++)
 		{
-			d = plane.distance((*w)[j].asVec3());
+			float d = plane.distance((*w)[j].asVec3());
 			if (d > max)
 			{
 				max = d;
