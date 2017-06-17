@@ -255,12 +255,12 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	calculateLvlBounds();
 
 
-	X_LOG0("Map", "Total world brush: ^8%i", entities_[0].brushes.size());
-	X_LOG0("Map", "Total brush: ^8%i", stats_.numBrushes);
-	X_LOG0("Map", "Total patches: ^8%i", stats_.numPatches);
-	X_LOG0("Map", "Total entities: ^8%i", stats_.numEntities);
-	X_LOG0("Map", "Total planes: ^8%i", planes_.size());
-	X_LOG0("Map", "Total areaPortals: ^8%i", stats_.numAreaPortals);
+	X_LOG0("Map", "Total world brush: ^8%" PRIuS, entities_[0].brushes.size());
+	X_LOG0("Map", "Total brush: ^8%" PRIi32, stats_.numBrushes);
+	X_LOG0("Map", "Total patches: ^8%" PRIi32, stats_.numPatches);
+	X_LOG0("Map", "Total entities: ^8%" PRIi32, stats_.numEntities);
+	X_LOG0("Map", "Total planes: ^8%" PRIuS, planes_.size());
+	X_LOG0("Map", "Total areaPortals: ^8%" PRIi32, stats_.numAreaPortals);
 	X_LOG0("Map", "Size: (^8%.0f,%.0f,%.0f^7) to (^8%.0f,%.0f,%.0f^7)", 
 		mapBounds_.min[0], mapBounds_.min[1], mapBounds_.min[2],
 		mapBounds_.max[0], mapBounds_.max[1], mapBounds_.max[2]);
