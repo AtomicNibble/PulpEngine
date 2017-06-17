@@ -101,39 +101,52 @@ namespace shader
 		}
 
 		// allow 16 flags.
-		D3D_SHADER_MACRO Shader_Macros[17] = { nullptr };
-		core::string names[16];
+		core::FixedArray<D3D_SHADER_MACRO, 17> macros;
+		std::array<char, 2048> macroBuffer;
+		size_t macroBufIdx = 0;
 
 		// i turn all set flags into strings.
 		if (techFlags_.IsAnySet())
 		{
-			uint32_t numFlags = core::bitUtil::CountBits(techFlags_.ToInt());
-			uint32_t macroIdx = 0;
+			core::StackString<256, char> macro;
 
 			for (uint32_t i = 1; i < TechFlag::FLAGS_COUNT; i++)
 			{
-				uint32_t flag = (1 << i);
-				if (techFlags_.IsSet(static_cast<TechFlag::Enum>(flag)))
+				TechFlag::Enum flag = static_cast<TechFlag::Enum>(1 << i);
+				if (techFlags_.IsSet(flag))
 				{
-					// we "X_" prefix and upper case.
-					core::string& name = names[macroIdx];
-					name = "X_";
-					name += TechFlag::ToString(flag);
-					name.toUpper();
-					// set the pointer.
-					Shader_Macros[macroIdx].Name = name.c_str();
-					Shader_Macros[macroIdx].Definition = "1";
-					macroIdx++;
+					macro.setFmt("X_%s", TechFlag::ToString(flag));
+					macro.toUpper();
+
+					if (macroBufIdx + macro.length() > macroBuffer.size())
+					{
+						X_ERROR("Shader", "Failed to fit all macros in buffer");
+						return false;
+					}
+
+					char* pStart = &macroBuffer[macroBufIdx];
+					std::copy(macro.begin(), macro.end(), pStart);
+
+					macroBufIdx += macro.length();
+					macroBuffer[macroBufIdx++] = '\0';
+
+					macros.push_back({ pStart, "1" });
 				}
 			}
+		}
 
-			// log the macros
-			for (size_t i = 0; i < numFlags; i++)
 			{
-				X_LOG0("Shader", "Macro(%" PRIuS "): name: \"%s\" value: \"%s\"",
-					i, Shader_Macros[i].Name, Shader_Macros[i].Definition);
 			}
 		}
+
+		// log the macros
+		for (const auto& macro : macros)
+		{
+			X_LOG0("Shader", "Macro: name: \"%s\" value: \"%s\"", macro.Name, macro.Definition);
+		}
+
+		// add blank one.
+		macros.push_back({ nullptr, nullptr });
 
 		ID3DBlob* pBlob = nullptr;
 		ID3DBlob* pErrorBlob = nullptr;
@@ -151,7 +164,7 @@ namespace shader
 			source.data(),
 			source.size(),
 			sourcName,
-			Shader_Macros, // pDefines
+			macros.data(), // pDefines
 			nullptr, // pInclude
 			pEntry,
 			Util::getProfileFromType(type_),
