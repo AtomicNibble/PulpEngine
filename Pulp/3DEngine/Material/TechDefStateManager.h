@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 
 class TechDef
 {
-	typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderEntryArr;
+	typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderStageStrArr;
 
 	typedef render::shader::ShaderSourceArr ShaderSourceArr;
 	typedef core::Array<TechDefPerm*> TechDefPermArr;
@@ -35,7 +35,8 @@ public:
 	TechDefPermArr perms_;
 
 	// the source files every perm is made from
-	ShaderEntryArr shaderEntry_;
+	ShaderStageStrArr shaderDefines_;
+	ShaderStageStrArr shaderEntry_;
 	ShaderSourceArr shaderSource_;
 	techset::Shader::AliaseArr aliases_;
 };

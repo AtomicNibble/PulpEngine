@@ -81,7 +81,7 @@ namespace shader
 		SHADERLIB_EXPORT bool shutDown(void);
 		
 		SHADERLIB_EXPORT IShaderSource* sourceforName(const core::string& name);
-		SHADERLIB_EXPORT XHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
+		SHADERLIB_EXPORT XHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
 			shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags);
 		SHADERLIB_EXPORT void releaseHWShader(XHWShader* pHWSHader);
 
@@ -95,7 +95,7 @@ namespace shader
 	private:
 		void compileShader_job(CompileJobInfo* pJobInfo, uint32_t num);
 
-		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry,
+		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
 			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
 
 	private:

@@ -12,6 +12,7 @@
 #include <../../3rdparty/source/directx/D3DX9Shader.h>
 
 #include <Time\StopWatch.h>
+#include <String\StringTokenizer.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -21,11 +22,13 @@ namespace shader
 
 	  // -------------------------------------------------------------------
 
-	XHWShader::XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
+	XHWShader::XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
+		const core::string& entry, const core::string& customDefines,
 		SourceFile* pSourceFile, TechFlags techFlags) :
 		name_(pName),
 		pSourceFile_(X_ASSERT_NOT_NULL(pSourceFile)),
 		entryPoint_(entry),
+		customDefines_(customDefines),
 		status_(ShaderStatus::NotCompiled),
 		techFlags_(techFlags),
 		type_(type),
@@ -135,7 +138,28 @@ namespace shader
 			}
 		}
 
+		if (customDefines_.isNotEmpty())
+		{
+			// need to split them into defins.
+			core::StringRange<char> token(nullptr, nullptr);
+			core::StringTokenizer<char> tokens(customDefines_.begin(), customDefines_.end(), ',');
+			while (tokens.ExtractToken(token))
 			{
+				const size_t tokenLen =  token.GetLength();
+
+				if (macroBufIdx + tokenLen > macroBuffer.size())
+				{
+					X_ERROR("Shader", "Failed to fit all macros in buffer");
+					return false;
+				}
+
+				char* pStart = &macroBuffer[macroBufIdx];
+				std::copy(token.GetStart(), token.GetEnd(), pStart);
+
+				macroBufIdx += tokenLen;
+				macroBuffer[macroBufIdx++] = '\0';
+
+				macros.push_back({ pStart, "1" });
 			}
 		}
 

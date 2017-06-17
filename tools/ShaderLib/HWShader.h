@@ -44,7 +44,8 @@ namespace shader
 		typedef core::Spinlock LockType;
 
 	public:
-		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, const core::string& entry,
+		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
+			const core::string& entry, const core::string& customDefines,
 			SourceFile* pSourceFile, TechFlags techFlags);
 		SHADERLIB_EXPORT ~XHWShader();
 
@@ -93,6 +94,7 @@ namespace shader
 		
 		core::string name_;
 		core::string entryPoint_;
+		core::string customDefines_;
 
 		int32_t id_;
 

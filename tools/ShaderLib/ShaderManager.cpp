@@ -3,6 +3,7 @@
 #include "ShaderPermatation.h"
 
 #include <Hashing\crc32.h>
+#include <Hashing\sha1.h>
 #include <String\Lexer.h>
 #include <String\StringHash.h>
 
@@ -125,7 +126,7 @@ namespace shader
 		return true;
 	}
 
-	XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry,
+	XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
 		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
 	{
 		X_UNUSED(permFlags);
@@ -144,7 +145,7 @@ namespace shader
 			techFlags.Set(TechFlag::Skinned);
 		}
 
-		XHWShader* pHW = hwForName(type, entry, static_cast<SourceFile*>(pSourceFile), techFlags, ILFlags());
+		XHWShader* pHW = hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), techFlags, ILFlags());
 
 		return pHW;
 	}
@@ -347,7 +348,7 @@ namespace shader
 
 
 	XHWShader* XShaderManager::hwForName(ShaderType::Enum type,
-		const core::string& entry, SourceFile* pSourceFile,
+		const core::string& entry, const core::string& customDefines, SourceFile* pSourceFile,
 		const TechFlags techFlags, ILFlags ILFlags)
 	{
 		X_ASSERT_NOT_NULL(pSourceFile);
@@ -360,20 +361,24 @@ namespace shader
 			pEntry = DEFAULT_SHADER_ENTRY[type];
 		}
 
-		name.appendFmt("%s@%s", pSourceFile->getName().c_str(), pEntry);
+		core::Hash::SHA1 sha1;
+		core::Hash::SHA1Digest::String sha1Buf;
+		sha1.update(pEntry);
+		sha1.update(customDefines.begin(), customDefines.length());
+		sha1.update(techFlags);
+		sha1.update(ILFlags);
+		sha1.update(type); // include this?
+		auto digest = sha1.finalize();
 
-		// macros are now part of the name.
-		name.appendFmt("_%x", techFlags.ToInt());
-
-		// input layout flags are also part of the name.
-		name.appendFmt("_%x", ILFlags.ToInt());
+		name.appendFmt("%s@", pSourceFile->getName().c_str());
+		name.append(digest.ToString(sha1Buf));
 
 
 #if X_DEBUG
 		X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-		core::string nameStr(name.c_str());
+		core::string nameStr(name.begin(), name.end());
 
 		// we must have a single lock during the find and create otherwise we have a race.
 		core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
@@ -391,6 +396,7 @@ namespace shader
 			type,
 			name.c_str(), 
 			entry, 
+			customDefines,
 			pSourceFile,
 			techFlags
 		);

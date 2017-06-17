@@ -142,7 +142,7 @@ namespace compiler
 
 				for (auto& permFlags : perms)
 				{
-					XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, pShaderSource, permFlags);
+					XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, pShaderSource, permFlags);
 					if (!pHWShader) {
 						X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
 						return false;
