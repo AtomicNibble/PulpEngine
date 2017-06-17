@@ -489,7 +489,7 @@ bool LvlBuilder::save(const char* name)
 			// need to write out all the nodes.
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
-			worldEnt.bspTree.headnode->WriteNodes_r(planes,file.GetFile());
+			worldEnt.bspTree.headnode->WriteNodes_r(planes_,file.GetFile());
 		}
 
 		// update FourcCC to mark this bsp as valid.

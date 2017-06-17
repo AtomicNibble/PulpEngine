@@ -259,18 +259,18 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_LOG0("Map", "Total brush: ^8%i", stats_.numBrushes);
 	X_LOG0("Map", "Total patches: ^8%i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: ^8%i", stats_.numEntities);
-	X_LOG0("Map", "Total planes: ^8%i", this->planes.size());
+	X_LOG0("Map", "Total planes: ^8%i", planes_.size());
 	X_LOG0("Map", "Total areaPortals: ^8%i", stats_.numAreaPortals);
 	X_LOG0("Map", "Size: (^8%.0f,%.0f,%.0f^7) to (^8%.0f,%.0f,%.0f^7)", 
-		mapBounds.min[0], mapBounds.min[1], mapBounds.min[2],
-		mapBounds.max[0], mapBounds.max[1], mapBounds.max[2]);
+		mapBounds_.min[0], mapBounds_.min[1], mapBounds_.min[2],
+		mapBounds_.max[0], mapBounds_.max[1], mapBounds_.max[2]);
 
 	return true;
 }
 
 int32_t LvlBuilder::FindFloatPlane(const Planef& plane)
 {
-	return planes.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
+	return planes_.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
 }
 
 bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
@@ -427,7 +427,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	}
 
 	// create windings for sides + bounds for brush
-	if (!brush.createBrushWindings(planes)) {
+	if (!brush.createBrushWindings(planes_)) {
 		X_ERROR("Brush", "Failed to create windings for brush");
 		return false;
 	}

@@ -263,7 +263,7 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 void LvlBuilder::calculateLvlBounds(void)
 {
-	mapBounds.clear();
+	mapBounds_.clear();
 
 	// bound me baby
 	LvlEntsArr::ConstIterator it = entities_.begin();
@@ -275,7 +275,7 @@ void LvlBuilder::calculateLvlBounds(void)
 		{
 			const LvlBrush& brush = *bIt;
 
-			mapBounds.add(brush.bounds);
+			mapBounds_.add(brush.bounds);
 		}
 
 		// Pooooooches.
@@ -306,7 +306,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 			return;
 		}
 
-		pWinding->Split(planes[pNode->planenum], 
+		pWinding->Split(planes_[pNode->planenum], 
 			ON_EPSILON, &front, &back, g_arena);
 
 		PutWindingIntoAreas_r(ent, front, side, pNode->children[0]);
@@ -385,8 +385,9 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 			}
 
 			// copy normal
-			vert.normal = planes[side.planenum].getNormal();
+			vert.normal = planes_[side.planenum].getNormal();
 			vert.color = Col_White;
+
 
 			pSubMesh->AddVert(vert);
 		}
@@ -438,7 +439,7 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 		return;
 	}
 
-	const Planef& plane = planes[pCurNode->planenum];
+	const Planef& plane = planes_[pCurNode->planenum];
 	float sd = plane.distance(sphere.center());
 
 	if (sd >= sphere.radius())
@@ -755,7 +756,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 		LvlTris& tris = ent.patches[i];
 		// for each side that's visable.
 
-		AddMapTriToAreas(ent, planes, tris);
+		AddMapTriToAreas(ent, planes_, tris);
 	}
 
 	for (i = 0; i < areas_.size(); i++){
@@ -813,7 +814,7 @@ void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTr
 			}
 
 			// copy normal
-			vert.normal = planes[planeNum].getNormal();
+			vert.normal = planes_[planeNum].getNormal();
 			vert.color = Col_White;
 
 			pSubMesh->AddVert(vert);
@@ -891,24 +892,24 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// we create a tree from the FaceList
 	// this is done by spliting the nodes multiple time.
 	// we end up with a binary tree.
-	if(!ent.FacesToBSP(planes)) {
+	if(!ent.FacesToBSP(planes_)) {
 		return false;
 	}
 	// next we want to make a portal that covers the whole map.
 	// this is the outside_node of the bspTree
-	if(!ent.MakeTreePortals(planes)) {
+	if(!ent.MakeTreePortals(planes_)) {
 		return false;
 	}
 	// Mark the leafs as opaque and areaportals and put brush
 	// fragments in each leaf so portal surfaces can be matched
 	// to materials
-	if(!ent.FilterBrushesIntoTree(planes)) {
+	if(!ent.FilterBrushesIntoTree(planes_)) {
 		return false;
 	}
 
 	// take the entities and use them to floor the node portals.
 	// so that all inside leafs are marked.
-	if (!ent.FloodEntities(planes, entities_, pMap_)) {
+	if (!ent.FloodEntities(planes_, entities_, pMap_)) {
 		X_ERROR("LvlEntity", "leaked");
 		return false;
 	}
@@ -920,7 +921,7 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// get minimum convex hulls for each visible side
 	// this must be done before creating area portals,
 	// because the visible hull is used as the portal
-	if(!ent.ClipSidesByTree(planes)) {
+	if(!ent.ClipSidesByTree(planes_)) {
 		return false;
 	}
 	// determine areas before clipping tris into the
@@ -942,7 +943,7 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	}
 
 	// work out which ents belong to which area.
-//	ent.PutEntsInAreas(planes, entities_, map_);
+//	ent.PutEntsInAreas(planes_, entities_, map_);
 	if(!CreateEntAreaRefs(ent)) {
 		return false;
 	}

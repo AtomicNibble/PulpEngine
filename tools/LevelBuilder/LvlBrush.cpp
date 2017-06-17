@@ -15,7 +15,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	float			d, d_front, d_back;
 
 	*front = *back = nullptr;
-	Planef &plane = planes[planenum];
+	Planef &plane = planes_[planenum];
 
 	// check all points
 	d_front = d_back = 0;
@@ -50,7 +50,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	// create a new winding from the split plane
 	w = X_NEW(XWinding, g_arena, "Winding")(plane);
 	for (i = 0; i < brush->sides.size() && w; i++) {
-		Planef &plane2 = planes[brush->sides[i].planenum ^ 1];
+		Planef &plane2 = planes_[brush->sides[i].planenum ^ 1];
 		if (!w->clip(plane2, 0)) {
 			X_DELETE_AND_NULL(w, g_arena);
 		}
@@ -109,7 +109,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	// see if we have valid polygons on both sides
 	for (i = 0; i<2; i++)
 	{
-		if (!b[i]->boundBrush(planes)) {
+		if (!b[i]->boundBrush(planes_)) {
 			break;
 		}
 
@@ -163,7 +163,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 
 		for (i = 0; i<2; i++)
 		{
-			v1 = b[i]->Volume(planes);
+			v1 = b[i]->Volume(planes_);
 			if (v1 < 1.0)
 			{
 				X_DELETE_AND_NULL(b[i], g_arena);

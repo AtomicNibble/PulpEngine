@@ -87,8 +87,8 @@ private:
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 
 	//	BSPData		data_;
-	XPlaneSet	planes;
-	AABB		mapBounds;
+	XPlaneSet	planes_;
+	AABB		mapBounds_;
 	Vec3f		blockSize_;
 	
 	mapfile::XMapFile* pMap_;
