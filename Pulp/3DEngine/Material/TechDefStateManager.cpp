@@ -137,8 +137,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	}
 
 	auto passHandle = pRenderSys->createPassState(rtfs);
-	if (passHandle == render::INVALID_STATE_HANLDE)
-	{
+	if (passHandle == render::INVALID_STATE_HANLDE) {
 		X_ERROR("Tech", "Failed to create passState");
 		pRenderSys->releaseShaderPermatation(pPerm);
 		pCompilingPerm->status = TechStatus::ERROR;
@@ -162,8 +161,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
 	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDescCpy, nullptr, 0);
 
-	if (stateHandle == render::INVALID_STATE_HANLDE)
-	{
+	if (stateHandle == render::INVALID_STATE_HANLDE) {
 		X_ERROR("Tech", "Failed to create state");
 		pRenderSys->destoryPassState(passHandle);
 		pRenderSys->releaseShaderPermatation(pPerm);
