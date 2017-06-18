@@ -38,26 +38,17 @@ namespace
 
 }
 
-
-XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f &origin)
+bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 {
-	X_ASSERT_NOT_NULL(arena);
-
 	// goaty meshes!
-	core::XLexToken token;
 	XMapPatch* patch = nullptr;
-
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName, lightMap;
-
-	int width, height, dunno1, dunno2;
-	int x, y;
-	int c[4];
 
 	if (!src.ExpectTokenString("{")) {
 		return nullptr;
 	}
 
 	// while we have pairs get naked and skip them.
+	core::XLexToken token;
 	while (1)
 	{
 		if (!src.ReadToken(token)) {
@@ -82,7 +73,7 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 		return false;
 	}
 
-	matName = core::StackString<level::MAP_MAX_MATERIAL_LEN>(token.begin(), token.end());
+	MaterialName matName(token.begin(), token.end());
 
 	// read the light map name
 	if (!src.ReadToken(token)) {
@@ -90,14 +81,16 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 		return false;
 	}
 
-	lightMap = core::StackString<level::MAP_MAX_MATERIAL_LEN>(token.begin(), token.end());
-
+	MaterialName lightMap(token.begin(), token.end());
 
 	// sometimes we have smmothing bullshit.
 	if (src.PeekTokenString("smoothing"))
 	{
 		src.SkipRestOfLine();
 	}
+
+
+	int width, height, dunno1, dunno2;
 
 	// we now have goaty info.
 	width = src.ParseInt();
@@ -107,32 +100,29 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 	dunno1 = src.ParseInt();
 	dunno2 = src.ParseInt();
 
-	patch = X_NEW(XMapPatch,arena,"MapPatch")(width, height);
-	patch->matName_ = matName;
-	patch->lightMap_ = lightMap;
-	patch->verts_.resize(width * height);
-	patch->SetHorzSubdivisions(dunno1);
-	patch->SetVertSubdivisions(dunno2);
+	matName_ = matName;
+	lightMap_ = lightMap;
+	verts_.resize(width * height);
+	SetHorzSubdivisions(dunno1);
+	SetVertSubdivisions(dunno2);
 
 	Vec2f uv;
 	Vec2f lightMapUv;
 
 	// we now how x groups each with y entryies.
-	for (x = 0; x < width; x++)
+	for (int x = 0; x < width; x++)
 	{
 		if (!src.ExpectTokenString("(")) {
-			X_DELETE(patch, arena);
-			return nullptr;
+			return false;
 		}
 
-		for (y = 0; y < height; y++)
+		for (int y = 0; y < height; y++)
 		{
 			xVert& vert = patch->verts_[(y * width) + x];
 
 			// each line has a -v and a -t
 			if (!src.ExpectTokenString("v")) {
-				X_DELETE(patch, arena);
-				return nullptr;
+				return false;
 			}
 
 			vert.pos[0] = src.ParseFloat();
@@ -142,12 +132,12 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 			// we can have a color here.
 			if (!src.ReadToken(token)) {
 				src.Error("XMapPatch::Parse: unexpected EOF");
-				X_DELETE(patch, arena);
 				return false;
 			}
 
 			if (token.isEqual("c"))
 			{
+				int c[4];
 				c[0] = src.ParseInt();
 				c[1] = src.ParseInt();
 				c[2] = src.ParseInt();
@@ -159,14 +149,12 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 				vert.color[3] = safe_static_cast<uint8, int>(c[3]);
 
 				if (!src.ExpectTokenString("t")) {
-					X_DELETE(patch, arena);
-					return nullptr;
+					return false;
 				}
 			}
 			else if (!token.isEqual("t"))
 			{
 				src.Error("XMapPatch::Parse: expected t");
-				X_DELETE(patch, arena);
 				return false;
 			}
 			else
@@ -198,23 +186,17 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 		}
 
 		if (!src.ExpectTokenString(")")) {
-			X_DELETE(patch, arena);
-			return nullptr;
+			return false;
 		}
 	}
 
 	// read the last 2 } }
-	if (src.ExpectTokenString("}"))
+	if (!src.ExpectTokenString("}") || !src.ExpectTokenString("}"))
 	{
-		if (src.ExpectTokenString("}"))
-		{
-			// valid
-			return patch;
-		}
+		return false;
 	}
 
-	X_DELETE(patch, arena);
-	return nullptr;
+	return true;
 }
 
 
@@ -275,18 +257,16 @@ bool XMapBrushSide::ParseMatInfo(core::XLexer& src)
 	return true;
 }
 
-XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin)
+bool XMapBrush::Parse(core::XLexer& src, const Vec3f& origin)
 {
 	core::XLexToken token;
-
-	auto brush = core::makeUnique<XMapBrush>(arena);
 
 	// refactor this so less delete lines needed?
 	do
 	{
 		if (!src.ReadToken(token)) {
 			src.Error("MapBrush::Parse: unexpected EOF");
-			return nullptr;
+			return false;
 		}
 		if (token.isEqual("}")) {
 			break;
@@ -305,7 +285,7 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 			if (token.GetType() != core::TokenType::NAME) {
 				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.",
 					token.length(), token.begin());
-				return nullptr;
+				return false;
 			}
 
 			// check if layer
@@ -315,23 +295,23 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 				&& token.GetType() != core::TokenType::NAME))
 			{
 				src.Error("MapBrush::Parse: expected pair value string not found.");
-				return nullptr;
+				return false;
 			}
 
 			if (hasLayer) {			
-				brush->layer_ = core::string(token.begin(), token.end());
+				layer_ = core::string(token.begin(), token.end());
 			}
 
 			// try to read the next key
 			if (!src.ReadToken(token)) {
 				src.Error("MapBrush::Parse: unexpected EOF");
-				return nullptr;
+				return false;
 			}
 
 			if (token.isEqual(";")) {
 				if (!src.ReadToken(token)) {
 					src.Error("MapBrush::Parse: unexpected EOF");
-					return nullptr;
+					return false;
 				}
 			}
 
@@ -339,7 +319,7 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 
 		src.UnreadToken(token);
 
-		auto side = core::makeUnique<XMapBrushSide>(arena);
+		auto side = core::makeUnique<XMapBrushSide>(arena_);
 
 		Vec3f planepts[3];
 
@@ -348,7 +328,7 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 			!src.Parse1DMatrix(3, &planepts[1][0]) ||
 			!src.Parse1DMatrix(3, &planepts[2][0])) {
 			src.Error("MapBrush::Parse: unable to read brush plane definition.");
-			return nullptr;
+			return false;
 		}
 
 		planepts[0] -= origin;
@@ -358,45 +338,36 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 		side->SetPlane(Planef(planepts[0], planepts[1], planepts[2]));
 
 		if (!side->ParseMatInfo(src)) {
-			return nullptr;
+			return false;
 		}
 
-		brush->sides.push_back(side.release());
+		sides_.push_back(side.release());
 	} while (1);
 
-	return brush.release();
+	return true;
 }
 
 
-XMapEntity*	XMapEntity::Parse(core::XLexer& src, core::MemoryArenaBase* arena,
-	const IgnoreList& ignoredLayers, bool isWorldSpawn)
+bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool isWorldSpawn)
 {
 	core::XLexToken token;
-	XMapEntity* mapEnt;
-	Vec3f origin;
-	float v1, v2, v3;
-	bool worldent;
-
 	if (!src.ReadToken(token)) {
-		return nullptr;
+		return false;
 	}
 
 	if (!token.isEqual("{")) {
 		src.Error("MapEntity::Parse: { not found.");
-		return nullptr;
+		return false;
 	}
-
-	mapEnt = X_NEW(XMapEntity, arena, "MapEntity");
-	mapEnt-> primArena_ = arena;
 
 	if (isWorldSpawn) {
 		// the world spawn is the layout, so gonna be lots :D
-		mapEnt->primitives.reserve(4096 * 8);
-		mapEnt->primitives.setGranularity(4096);
+		primitives_.reserve(4096 * 8);
+		primitives_.setGranularity(4096);
 	}
 
-	worldent = false;
-	origin = Vec3f::zero();
+	bool worldent = false;
+	Vec3f origin = Vec3f::zero();
 
 	do
 	{
@@ -422,14 +393,14 @@ XMapEntity*	XMapEntity::Parse(core::XLexer& src, core::MemoryArenaBase* arena,
 
 			if (token.isEqual("mesh") || token.isEqual("curve"))
 			{
-				XMapPatch* mapPatch = XMapPatch::Parse(src, arena, origin);
-				if (!mapPatch) {
-					return nullptr;
+				auto mapPatch = core::makeUnique<XMapPatch>(arena_, arena_);
+				if (!mapPatch->Parse(src, origin)) {
+					return false;
 				}
+
 				// don't add if ignored.
 				if (mapPatch->hasLayer()) {
 					if (ignoredLayers.isIgnored(mapPatch->getLayer())) {
-						X_DELETE(mapPatch, arena);
 						continue;
 					}
 				}
@@ -438,24 +409,24 @@ XMapEntity*	XMapEntity::Parse(core::XLexer& src, core::MemoryArenaBase* arena,
 					mapPatch->SetMesh(true);
 				}
 
-				mapEnt->AddPrimitive(mapPatch);
+				AddPrimitive(mapPatch.release());
 			}
 			else
 			{
 				src.UnreadToken(token);
-				XMapBrush* mapBrush = XMapBrush::Parse(src, arena, origin);
-				if (!mapBrush) {
-					return nullptr;
+
+				auto mapBrush = core::makeUnique<XMapBrush>(arena_, arena_);
+				if (!mapBrush->Parse(src, origin)) {
+					return false;
 				}
-				// don't add if ignored.
+
 				if (mapBrush->hasLayer()) {
 					if (ignoredLayers.isIgnored(mapBrush->getLayer())) {
-						X_DELETE(mapBrush, arena);
 						continue;
 					}
 				}
 
-				mapEnt->AddPrimitive(mapBrush);
+				AddPrimitive(mapBrush.release());
 			}
 
 		}
@@ -472,15 +443,11 @@ XMapEntity*	XMapEntity::Parse(core::XLexer& src, core::MemoryArenaBase* arena,
 			value.trim();
 			key.trim();
 
-			mapEnt->epairs[core::string(key.c_str())] = value.c_str();
+			epairs[core::string(key.c_str())] = value.c_str();
 
 			if (key.isEqual("origin"))
 			{
-				v1 = v2 = v3 = 0;
-				sscanf_s(value.c_str(), "%f %f %f", &v1, &v2, &v3);
-				origin.x = v1;
-				origin.y = v2;
-				origin.z = v3;
+				sscanf_s(value.c_str(), "%f %f %f", &origin.x, &origin.y, &origin.z);
 			}
 			else if (key.isEqual("classname") && value.isEqual("worldspawn")) {
 				worldent = true;
@@ -489,7 +456,7 @@ XMapEntity*	XMapEntity::Parse(core::XLexer& src, core::MemoryArenaBase* arena,
 
 	} while (1);
 
-	return mapEnt;
+	return true;
 }
 
 // ----------------------------------
@@ -547,8 +514,6 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	}
 
 	core::XLexer lexer(pData, pData + length);
-	core::XLexToken token;
-	XMapEntity *mapEnt;
 
 	lexer.setFlags(core::LexFlag::NOSTRINGCONCAT |
 		core::LexFlag::NOSTRINGESCAPECHARS |
@@ -565,6 +530,7 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	// don't bother checking version.
 	lexer.SkipRestOfLine();
 
+	core::XLexToken token;
 	while (lexer.ReadToken(token))
 	{
 		if (token.isEqual("{"))
@@ -620,9 +586,9 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	// load all the entites.
 	while (1)
 	{
-		mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, ignoreList, entities_.isEmpty());
+		auto mapEnt = core::makeUnique<XMapEntity>(g_arena, g_arena, &primPoolArena_);
 
-		if (!mapEnt)
+		if (!mapEnt->Parse(lexer, ignoreList, entities_.isEmpty()))
 		{
 			if (lexer.GetErrorState() != core::XLexer::ErrorState::OK) {
 				X_ERROR("Map", "Failed to load map file correctly.");
@@ -643,7 +609,7 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			}
 		}
 
-		entities_.push_back(mapEnt);
+		entities_.push_back(mapEnt.release());
 	}
 
 

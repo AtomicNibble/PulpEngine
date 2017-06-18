@@ -75,8 +75,9 @@ private:
 
 class XMapBrush : public XMapPrimitive
 {
+	typedef core::Array<XMapBrushSide*> BrushSidePtrArr;
 public:
-	X_INLINE XMapBrush(void);
+	X_INLINE XMapBrush(core::MemoryArenaBase* arena);
 	X_INLINE ~XMapBrush(void) X_OVERRIDE;
 
 	X_INLINE size_t	GetNumSides(void) const;
@@ -84,17 +85,28 @@ public:
 	X_INLINE XMapBrushSide*	GetSide(size_t i) const;
 
 public:
-	static XMapBrush* Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
+	 bool Parse(core::XLexer& src, const Vec3f& origin);
 
-protected:
-	core::Array<XMapBrushSide*> sides;
+private:
+	core::MemoryArenaBase* arena_;
+	BrushSidePtrArr sides_;
 };
 
 class XMapPatch : public XMapPrimitive
 {
+	struct SurfaceEdge
+	{
+		int32_t	verts[2];	// edge vertices always with ( verts[0] < verts[1] )
+		int32_t	tris[2];	// edge triangles
+	};
+
+	typedef core::Array<xVert>			VertArr;
+	typedef core::Array<int>			IntArr;	
+	typedef core::Array<SurfaceEdge>	SurfaceEdgeArr;	
+
 public:
-	XMapPatch(void);
-	XMapPatch(int w, int h);
+	XMapPatch(core::MemoryArenaBase* arena);
+	XMapPatch(core::MemoryArenaBase* arena, int w, int h);
 	~XMapPatch(void) X_OVERRIDE;
 
 	X_INLINE void SetHorzSubdivisions(size_t num);
@@ -119,6 +131,8 @@ public:
 		bool genNormals, bool removeLinear = false);
 
 	void CreateNormalsAndIndexes(void);
+	
+	bool Parse(core::XLexer& src, const Vec3f &origin);
 
 private:
 	void PutOnCurve(void);
@@ -138,23 +152,14 @@ private:
 	void SampleSinglePatchPoint(const xVert ctrl[3][3], float u,
 		float v, xVert* out) const;
 
-public:
-	static XMapPatch* Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f &origin);
-
 protected:
-	struct surfaceEdge_t
-	{
-		int32_t	verts[2];	// edge vertices always with ( verts[0] < verts[1] )
-		int32_t	tris[2];	// edge triangles
-	};
+	VertArr			verts_;
+	IntArr			indexes_;	// 3 references to vertices for each triangle
+	SurfaceEdgeArr	edges_;		// edges
+	IntArr			edgeIndexes_;
 
-	core::Array<xVert>			verts_;
-	core::Array<int>			indexes_;	// 3 references to vertices for each triangle
-	core::Array<surfaceEdge_t>	edges_;		// edges
-	core::Array<int>			edgeIndexes_;
-
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName_;
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> lightMap_;
+	MaterialName matName_;
+	MaterialName lightMap_;
 
 	size_t width_;
 	size_t height_;
@@ -192,7 +197,7 @@ public:
 	typedef KeyPair::PairIt PairIt;
 
 public:
-	X_INLINE XMapEntity(void);
+	X_INLINE XMapEntity(core::MemoryArenaBase* arena, core::MemoryArenaBase* primArena);
 	X_INLINE ~XMapEntity(void);
 
 	X_INLINE size_t GetNumPrimitives(void) const;
@@ -200,15 +205,15 @@ public:
 	X_INLINE void AddPrimitive(XMapPrimitive* p);
 
 public:
-	static XMapEntity* Parse(core::XLexer& src, core::MemoryArenaBase* arena,
-		const IgnoreList& ignoredLayers, bool isWorldSpawn = false);
-
+	bool Parse(core::XLexer& src, const IgnoreList& ignoredLayers, 
+		bool isWorldSpawn = false);
 
 	PairMap epairs;
 
-protected:
+private:
+	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* primArena_;
-	PrimativeArry	primitives;
+	PrimativeArry primitives_;
 };
 
 

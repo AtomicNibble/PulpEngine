@@ -7,19 +7,19 @@
 
 X_NAMESPACE_BEGIN(mapfile)
 
-XMapPatch::XMapPatch(void) : 
-	XMapPatch(0,0)
+XMapPatch::XMapPatch(core::MemoryArenaBase* arena) : 
+	XMapPatch(arena, 0,0)
 {
 
 }
 
 // hello c++11: delegated constructor
-XMapPatch::XMapPatch(int w, int h) :
+XMapPatch::XMapPatch(core::MemoryArenaBase* arena, int w, int h) :
 	XMapPrimitive(PrimType::PATCH),
-	verts_(g_arena),
-	indexes_(g_arena),
-	edges_(g_arena),
-	edgeIndexes_(g_arena),
+	verts_(arena),
+	indexes_(arena),
+	edges_(arena),
+	edgeIndexes_(arena),
 	width_(w), 
 	height_(h),
 	maxWidth_(w), 
@@ -43,7 +43,7 @@ void XMapPatch::GenerateEdgeIndexes(void)
 	int i, j;
 	int i0, i1, i2, s, v0, v1, edgeNum;
 	int *index, *vertexEdges, *edgeChain;
-	surfaceEdge_t e[3];
+	SurfaceEdge e[3];
 
 	vertexEdges = reinterpret_cast<int*>(Alloca16(verts_.size() * sizeof(int)));
 	memset(vertexEdges, -1, verts_.size() * sizeof(int));
@@ -111,22 +111,20 @@ void XMapPatch::GenerateEdgeIndexes(void)
 
 void XMapPatch::PutOnCurve(void)
 {
-	size_t i, j;
+	X_ASSERT(expanded_, "needs to be exapanded")(expanded_);	
 	xVert prev, next;
 
-	X_ASSERT(expanded_, "needs to be exapanded")(expanded_);
-
 	// put all the approximating points on the curve
-	for (i = 0; i < width_; i++) {
-		for (j = 1; j < height_; j += 2) {
+	for (size_t i = 0; i < width_; i++) {
+		for (size_t j = 1; j < height_; j += 2) {
 			LerpVert(verts_[j*maxWidth_ + i], verts_[(j + 1)*maxWidth_ + i], prev);
 			LerpVert(verts_[j*maxWidth_ + i], verts_[(j - 1)*maxWidth_ + i], next);
 			LerpVert(prev, next, verts_[j*maxWidth_ + i]);
 		}
 	}
 
-	for (j = 0; j < height_; j++) {
-		for (i = 1; i < width_; i += 2) {
+	for (size_t j = 0; j < height_; j++) {
+		for (size_t i = 1; i < width_; i += 2) {
 			LerpVert(verts_[j*maxWidth_ + i], verts_[j*maxWidth_ + i + 1], prev);
 			LerpVert(verts_[j*maxWidth_ + i], verts_[j*maxWidth_ + i - 1], next);
 			LerpVert(prev, next, verts_[j*maxWidth_ + i]);
@@ -226,15 +224,14 @@ void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
 
 void XMapPatch::Collapse(void)
 {
-	size_t i, j;
-
 	if (!expanded_) {
 		X_FATAL("Patch", "patch not expanded_");
 	}
 	expanded_ = false;
+
 	if (width_ != maxWidth_) {
-		for (j = 0; j < height_; j++) {
-			for (i = 0; i < width_; i++) {
+		for (size_t j = 0; j < height_; j++) {
+			for (size_t i = 0; i < width_; i++) {
 				verts_[j*width_ + i] = verts_[j*maxWidth_ + i];
 			}
 		}
@@ -245,8 +242,6 @@ void XMapPatch::Collapse(void)
 
 void XMapPatch::Expand(void)
 {
-	int32_t i, j; // edit loop is you change this to unsigned.
-
 	if (expanded_) {
 		X_FATAL("Patch", "patch alread expanded_");
 	}
@@ -257,9 +252,10 @@ void XMapPatch::Expand(void)
 
 	if (width_ != maxWidth_) 
 	{
-		for (j = safe_static_cast<int32_t,size_t>(height_) - 1; j >= 0; j--) 
+		for (int32_t j = safe_static_cast<int32_t>(height_) - 1; j >= 0; j--)
 		{
-			for (i = safe_static_cast<int32_t, size_t>(width_) - 1; i >= 0; i--)
+			static_assert(core::compileTime::IsSigned<decltype(j)>::Value, "Must be signed");
+			for (int32_t i = safe_static_cast<int32_t>(width_) - 1; i >= 0; i--)
 			{
 				verts_[j*maxWidth_ + i] = verts_[j*width_ + i];
 			}

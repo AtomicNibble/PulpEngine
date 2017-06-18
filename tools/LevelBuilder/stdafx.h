@@ -31,6 +31,8 @@ X_USING_NAMESPACE;
 #include <IModel.h>
 #include <ILevel.h>
 
+typedef core::StackString<level::MAP_MAX_MATERIAL_LEN> MaterialName;
+
 #include "Globals.h"
 #include "Settings.h"
 #include "PlaneSet.h"

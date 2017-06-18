@@ -77,11 +77,11 @@ X_INLINE void XMapBrushSide::SetPlane(const Planef& plane)
 // ======================
 
 
-XMapBrush::XMapBrush(void) : 
+XMapBrush::XMapBrush(core::MemoryArenaBase* arena) : 
 	XMapPrimitive(PrimType::BRUSH), 
-	sides(g_arena)
+	sides_(arena)
 { 
-	sides.reserve(6); 
+	sides_.reserve(6); 
 }
 
 XMapBrush::~XMapBrush(void)
@@ -91,17 +91,17 @@ XMapBrush::~XMapBrush(void)
 
 size_t XMapBrush::GetNumSides(void) const 
 { 
-	return sides.size(); 
+	return sides_.size(); 
 }
 
 void XMapBrush::AddSide(XMapBrushSide* pSide)
 { 
-	sides.push_back(pSide);
+	sides_.push_back(pSide);
 }
 
 XMapBrushSide* XMapBrush::GetSide(size_t i) const 
 { 
-	return sides[i]; 
+	return sides_[i]; 
 }
 
 
@@ -189,38 +189,36 @@ bool IgnoreList::isIgnored(const core::string& layerName) const
 
 // ======================
 
-XMapEntity::XMapEntity(void) : 
-	primArena_(nullptr),
-	primitives(g_arena)
+XMapEntity::XMapEntity(core::MemoryArenaBase* arena, core::MemoryArenaBase* primArena) :
+	primArena_(X_ASSERT_NOT_NULL(arena)),
+	primitives_(X_ASSERT_NOT_NULL(arena))
 {
 
 }
 
 XMapEntity::~XMapEntity(void) 
 {
-	X_ASSERT_NOT_NULL(primArena_);
-
-	for (size_t i = 0; i < primitives.size(); i++)
+	for (size_t i = 0; i < primitives_.size(); i++)
 	{
-		X_DELETE(primitives[i], primArena_);
+		X_DELETE(primitives_[i], primArena_);
 	}
 
-	primitives.free();
+	primitives_.free();
 }
 
 size_t XMapEntity::GetNumPrimitives(void) const 
 { 
-	return primitives.size(); 
+	return primitives_.size(); 
 }
 
 XMapPrimitive* XMapEntity::GetPrimitive(size_t i) const
 { 
-	return primitives[i]; 
+	return primitives_[i]; 
 }
  
 void XMapEntity::AddPrimitive(XMapPrimitive* pPrim) 
 { 
-	primitives.push_back(pPrim);
+	primitives_.push_back(pPrim);
 }
 
 // ======================
