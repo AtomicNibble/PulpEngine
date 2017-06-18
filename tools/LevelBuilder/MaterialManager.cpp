@@ -158,7 +158,7 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 	// still ironing out the format.
 	mat.assignProps(hdr);
 
-
+	mat.setStatus(core::LoadStatus::Complete);
 	return true;
 }
 
