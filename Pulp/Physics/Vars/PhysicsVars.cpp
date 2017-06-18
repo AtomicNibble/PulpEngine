@@ -178,7 +178,7 @@ const char* PhysXVars::getDllOverrideStr(StrBuf& buf) const
 	return pVarDllOverride_->GetString(buf);
 }
 
-uint32_t PhysXVars::ScratchBufferSize(void) const
+uint32_t PhysXVars::scratchBufferSize(void) const
 {
 	X_ASSERT_NOT_NULL(pVarScratchBufSize_);
 	return safe_static_cast<uint32_t, int32_t>(pVarScratchBufSize_->GetInteger() << 10);

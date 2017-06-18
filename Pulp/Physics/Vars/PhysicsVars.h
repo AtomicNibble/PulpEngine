@@ -27,8 +27,8 @@ public:
 	void SetDebugDrawChangedDel(DebugDrawEnabledDel del);
 
 	const char* getDllOverrideStr(StrBuf& buf) const;
-	uint32_t ScratchBufferSize(void) const;
-	X_INLINE StepperType::Enum GetStepperType(void) const;
+	uint32_t scratchBufferSize(void) const;
+	X_INLINE StepperType::Enum getStepperType(void) const;
 
 	X_INLINE bool isPVDEnabled(void) const;
 	X_INLINE int32_t getPVDPort(void) const;

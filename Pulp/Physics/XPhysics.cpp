@@ -325,8 +325,8 @@ bool XPhysics::init(const ToleranceScale& scale)
 		return false;
 	}
 
-	stepperType_ = vars_.GetStepperType();
-	setScratchBlockSize(vars_.ScratchBufferSize());
+	stepperType_ = vars_.getStepperType();
+	setScratchBlockSize(vars_.scratchBufferSize());
 
 	// it might be init already.
 	onDebugDrawChange(vars_.DebugDrawEnabled() != 0);
@@ -381,7 +381,7 @@ void XPhysics::release(void)
 
 void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 {
-	stepperType_ = vars_.GetStepperType();
+	stepperType_ = vars_.getStepperType();
 
 	if (oneFrameUpdate_) {
 		pause_ = false;

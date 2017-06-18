@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(physics)
 
-X_INLINE StepperType::Enum PhysXVars::GetStepperType(void) const
+X_INLINE StepperType::Enum PhysXVars::getStepperType(void) const
 {
 	return stepperType_;
 }
