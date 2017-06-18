@@ -65,6 +65,11 @@ public:
 
 	inline iterator insert(iterator position, const T& val);
 
+	template<typename Iter>
+	typename std::enable_if<
+		std::is_pointer<Iter>::value && std::is_same<std::remove_cv_t<std::remove_pointer_t<Iter>>, Type>::value,
+		iterator>::type insert(const_iterator pos, Iter first, Iter last);
+
 	bool removeIndex(size_type idx);
 	bool remove(iterator position);
 
