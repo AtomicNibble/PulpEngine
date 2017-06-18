@@ -32,6 +32,13 @@ const bool XMapPrimitive::hasLayer(void) const
 
 // ======================
 
+XMapBrushSide::MaterialInfo::MaterialInfo(void)
+{
+	rotate = 0.f;
+}
+
+// ======================
+
 XMapBrushSide::XMapBrushSide(void)
 {
 
@@ -44,18 +51,24 @@ XMapBrushSide::~XMapBrushSide(void)
 
 const char*	XMapBrushSide::GetMaterialName(void) const 
 { 
-	return material.name.c_str(); 
+	return material_.name.c_str(); 
 }
 
 const Planef& XMapBrushSide::GetPlane(void) const 
 { 
-	return plane; 
+	return plane_; 
 }
 
-XMapBrushSide::MaterialInfo::MaterialInfo(void)
+X_INLINE const XMapBrushSide::MaterialInfo& XMapBrushSide::GetMaterial(void) const
 {
-	rotate = 0.f;
+	return material_;
 }
+
+X_INLINE const XMapBrushSide::MaterialInfo& XMapBrushSide::GetLightMap(void) const
+{
+	return lightMap_;
+}
+
 
 // ======================
 

@@ -2,6 +2,8 @@
 
 #include <String\Lexer.h>
 #include <String\HumanSize.h>
+#include <Util\UniquePointer.h>
+#include <Memory\VirtualMem.h>
 
 #include <IFileSys.h>
 
@@ -9,7 +11,6 @@
 #include "MapLoader.h"
 
 
-#include <Memory\VirtualMem.h>
 
 
 X_NAMESPACE_BEGIN(mapfile)
@@ -218,7 +219,7 @@ XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 
 
 
-bool XMapBrushSide::ParseMatInfo(core::XLexer& src, XMapBrushSide::MaterialInfo& info)
+bool XMapBrushSide::MaterialInfo::ParseMatInfo(core::XLexer& src)
 {
 	core::XLexToken token;
 
@@ -229,7 +230,7 @@ bool XMapBrushSide::ParseMatInfo(core::XLexer& src, XMapBrushSide::MaterialInfo&
 	}
 
 //	info.name = core::StackString<64>(token.begin(), token.end());
-	info.name.set(token.begin(), token.end());
+	name.set(token.begin(), token.end());
 
 	// repeats every X / Y
 	// if this value is 512 x 512, this means the texture repeats every
@@ -239,8 +240,8 @@ bool XMapBrushSide::ParseMatInfo(core::XLexer& src, XMapBrushSide::MaterialInfo&
 	//
 	//
 	// [0,0.5]		[0.5,0.5]
-	info.matRepeate[0] = src.ParseFloat();
-	info.matRepeate[1] = src.ParseFloat();
+	matRepeate[0] = src.ParseFloat();
+	matRepeate[1] = src.ParseFloat();
 
 	// I think it's like a vertex position offset.
 	// so a hoz shift of 64.
@@ -251,34 +252,40 @@ bool XMapBrushSide::ParseMatInfo(core::XLexer& src, XMapBrushSide::MaterialInfo&
 	//
 	//
 	// [0.25,0.5]	[0.75,0.5]
-	info.shift[0] = src.ParseFloat(); // hoz 
-	info.shift[1] = src.ParseFloat(); // vertical
+	shift[0] = src.ParseFloat(); // hoz 
+	shift[1] = src.ParseFloat(); // vertical
 
 	// rotation clockwise in degrees(neg is anti)
-	info.rotate = src.ParseFloat();
+	rotate = src.ParseFloat();
 
 	// dunno what this value is, goat value?
 	src.ParseFloat();
 	return true;
 }
 
+
+bool XMapBrushSide::ParseMatInfo(core::XLexer& src)
+{
+	if (!material_.ParseMatInfo(src)) {
+		return false;
+	}
+	if (!lightMap_.ParseMatInfo(src)) {
+		return false;
+	}
+	return true;
+}
+
 XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin)
 {
-	X_ASSERT_NOT_NULL(arena);
-
-	Vec3f planepts[3];
 	core::XLexToken token;
-	XMapBrushSide* side;
-	XMapBrush* brush;
 
-	brush = X_NEW( XMapBrush, arena, "MapBrush");
+	auto brush = core::makeUnique<XMapBrush>(arena);
 
 	// refactor this so less delete lines needed?
 	do
 	{
 		if (!src.ReadToken(token)) {
 			src.Error("MapBrush::Parse: unexpected EOF");
-			X_DELETE(brush, arena);
 			return nullptr;
 		}
 		if (token.isEqual("}")) {
@@ -298,7 +305,6 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 			if (token.GetType() != core::TokenType::NAME) {
 				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.",
 					token.length(), token.begin());
-				X_DELETE(brush, arena);
 				return nullptr;
 			}
 
@@ -309,7 +315,6 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 				&& token.GetType() != core::TokenType::NAME))
 			{
 				src.Error("MapBrush::Parse: expected pair value string not found.");
-				X_DELETE(brush, arena);
 				return nullptr;
 			}
 
@@ -320,14 +325,12 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 			// try to read the next key
 			if (!src.ReadToken(token)) {
 				src.Error("MapBrush::Parse: unexpected EOF");
-				X_DELETE(brush, arena);
 				return nullptr;
 			}
 
 			if (token.isEqual(";")) {
 				if (!src.ReadToken(token)) {
 					src.Error("MapBrush::Parse: unexpected EOF");
-					X_DELETE(brush, arena);
 					return nullptr;
 				}
 			}
@@ -336,15 +339,15 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 
 		src.UnreadToken(token);
 
-		side = X_NEW( XMapBrushSide, arena, "MapBrushSide");
-		brush->sides.push_back(side);
+		auto side = core::makeUnique<XMapBrushSide>(arena);
+
+		Vec3f planepts[3];
 
 		// read the three point plane definition
 		if (!src.Parse1DMatrix(3, &planepts[0][0]) ||
 			!src.Parse1DMatrix(3, &planepts[1][0]) ||
 			!src.Parse1DMatrix(3, &planepts[2][0])) {
 			src.Error("MapBrush::Parse: unable to read brush plane definition.");
-			X_DELETE(brush, arena);
 			return nullptr;
 		}
 
@@ -352,15 +355,16 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 		planepts[1] -= origin;
 		planepts[2] -= origin;
 
-		side->plane.set(planepts[0], planepts[1], planepts[2]);
+		side->plane_.set(planepts[0], planepts[1], planepts[2]);
 
-		XMapBrushSide::ParseMatInfo(src, side->material);
-		XMapBrushSide::ParseMatInfo(src, side->lightMap);
+		if (!side->ParseMatInfo(src)) {
+			return nullptr;
+		}
 
+		brush->sides.push_back(side.release());
 	} while (1);
 
-
-	return brush;
+	return brush.release();
 }
 
 
@@ -632,10 +636,10 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
 
 			if (prim->getType() == PrimType::BRUSH) {
-				this->numBrushes_++;
+				numBrushes_++;
 			}
 			else if (prim->getType() == PrimType::PATCH) {
-				this->numPatches_++;
+				numPatches_++;
 			}
 		}
 
@@ -680,7 +684,6 @@ void XMapFile::ListLayers(void) const
 	X_LOG_BULLET;
 
 	Layer::LayerFlags::Description Dsc;
-
 	for (const auto& layer : layers_)
 	{
 		X_LOG0("Map", "Layer: \"%s\" flags: %s", layer.name.c_str(), layer.flags.ToString(Dsc));

@@ -44,15 +44,11 @@ class XMapBrushSide
 	friend class XMapBrush;
 
 public:
-	X_INLINE XMapBrushSide(void);
-	X_INLINE ~XMapBrushSide(void);
-
-	X_INLINE const char* GetMaterialName(void) const;
-	X_INLINE const Planef& GetPlane(void) const;
-
 	struct MaterialInfo
 	{
 		X_INLINE MaterialInfo();
+
+		bool ParseMatInfo(core::XLexer& src);
 
 		core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 		Vec2f				  matRepeate;
@@ -60,14 +56,21 @@ public:
 		float				  rotate;
 	};
 
-	MaterialInfo	material;
-	MaterialInfo	lightMap;
+public:
+	X_INLINE XMapBrushSide(void);
+	X_INLINE ~XMapBrushSide(void);
+
+	X_INLINE const char* GetMaterialName(void) const;
+	X_INLINE const Planef& GetPlane(void) const;
+	X_INLINE const MaterialInfo& GetMaterial(void) const;
+	X_INLINE const MaterialInfo& GetLightMap(void) const;
+
+	bool ParseMatInfo(core::XLexer& src);
 
 protected:
-	Planef			plane;
-
-protected:
-	static bool ParseMatInfo(core::XLexer& src, MaterialInfo& mat);
+	MaterialInfo	material_;
+	MaterialInfo	lightMap_;
+	Planef			plane_;
 };
 
 

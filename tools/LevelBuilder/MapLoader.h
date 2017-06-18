@@ -16,21 +16,7 @@
 X_NAMESPACE_BEGIN(mapfile)
 
 // using the pool gives about a 75ms speed up on avg.
-// total loading time is still only like 300ms
-// so not rly worth it having 50mb pool just for loading lol.
-// the lexer is taking up most of the time :(
-// parsing all dem numbers :|
-
-// If i wanted to make faster(for fun) i would probs have to use threads and split the worldspawn.
-// since there are just so many numbers to parse.
-// 20k brushes = 20,000 * 6 * 20 = 2,400,000 string to float conversions lol.
-// and parse chunks in diffrent threads.
-
-// how would i split it tho?
-// would basically have to do a pass of the worldspawn data.
-// to find out how many ents and the locations.
-// i would of though that only take a ms.
-// something todo when i'm borded xD !
+// at the cost of more memory usage.
 
 #define MAP_LOADER_USE_POOL 1
 

@@ -380,15 +380,16 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 		side.planenum = FindFloatPlane(pMapBrushSide->GetPlane());
 		// material
-		side.matInfo.name = pMapBrushSide->material.name;
-		side.matInfo.matRepeate = pMapBrushSide->material.matRepeate;
-		side.matInfo.rotate = pMapBrushSide->material.rotate;
-		side.matInfo.shift = pMapBrushSide->material.shift;
+		const auto& sideMat = pMapBrushSide->GetMaterial();
+		side.matInfo.name = sideMat.name;
+		side.matInfo.matRepeate = sideMat.matRepeate;
+		side.matInfo.rotate = sideMat.rotate;
+		side.matInfo.shift = sideMat.shift;
 
 		// load the material.
-		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->material.name.c_str());
+		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->GetMaterialName());
 		if (!side.matInfo.pMaterial->isLoaded()) {
-			X_ERROR("Brush", "Failed to load material for brush side \"%S\"", pMapBrushSide->material.name.c_str());
+			X_ERROR("Brush", "Failed to load material for brush side \"%s\"", pMapBrushSide->GetMaterialName());
 			return false;
 		}
 	}
@@ -428,9 +429,10 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	
 		auto* pMapBrushSide = mapBrush->GetSide(i);
 		const Planef& plane = pMapBrushSide->GetPlane();
-		const Vec2f& repeate = pMapBrushSide->material.matRepeate;
-		const Vec2f& shift = pMapBrushSide->material.shift;
-		const float& rotate = pMapBrushSide->material.rotate;
+		const auto mat = pMapBrushSide->GetMaterial();
+		const Vec2f& repeate = mat.matRepeate;
+		const Vec2f& shift = mat.shift;
+		const float& rotate = mat.rotate;
 
 		Vec4f mappingVecs[2];
 		QuakeTextureVecs(plane, shift, rotate, repeate, mappingVecs);
