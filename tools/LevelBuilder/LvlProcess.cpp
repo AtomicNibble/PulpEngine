@@ -179,7 +179,7 @@ namespace
 			}
 		}
 
-		core::FixedArray<model::Face, 1024>::const_iterator it = indexes.begin();
+		auto it = indexes.begin();
 
 		model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
 

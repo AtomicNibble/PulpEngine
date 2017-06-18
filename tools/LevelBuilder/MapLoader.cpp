@@ -460,23 +460,7 @@ bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool 
 // ----------------------------------
 
 XMapFile::XMapFile(core::MemoryArenaBase* arena) :
-#if 1
 	pool_(PRIMATIVE_ALLOC_SIZE, PRIMATIVE_ALLOC_ALIGN, MAX_PRIMATIVES, MAX_PRIMATIVES / 10),
-#else
-	primPoolAllocator_(
-		core::bitUtil::NextPowerOfTwo(
-			PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * MAX_PRIMATIVES
-		),
-		core::bitUtil::NextPowerOfTwo(
-			PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * (MAX_PRIMATIVES / 10)
-		),
-		0,
-		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE),
-		PrimativePoolArena::getMemoryAlignmentRequirement(PRIMATIVE_ALLOC_ALIGN),
-		PrimativePoolArena::getMemoryOffsetRequirement()
-	),
-	primPoolArena_(&primPoolAllocator_, "PrimativePool"),
-#endif
 	entities_(arena),
 	layers_(arena),
 	arena_(arena)
