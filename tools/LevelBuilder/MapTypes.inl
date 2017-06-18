@@ -69,6 +69,10 @@ X_INLINE const XMapBrushSide::MaterialInfo& XMapBrushSide::GetLightMap(void) con
 	return lightMap_;
 }
 
+X_INLINE void XMapBrushSide::SetPlane(const Planef& plane)
+{
+	plane_ = plane;
+}
 
 // ======================
 

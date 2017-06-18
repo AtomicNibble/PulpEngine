@@ -41,8 +41,6 @@ protected:
 
 class XMapBrushSide 
 {
-	friend class XMapBrush;
-
 public:
 	struct MaterialInfo
 	{
@@ -65,6 +63,7 @@ public:
 	X_INLINE const MaterialInfo& GetMaterial(void) const;
 	X_INLINE const MaterialInfo& GetLightMap(void) const;
 
+	void SetPlane(const Planef& plane);
 	bool ParseMatInfo(core::XLexer& src);
 
 private:

@@ -355,7 +355,7 @@ XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, con
 		planepts[1] -= origin;
 		planepts[2] -= origin;
 
-		side->plane_.set(planepts[0], planepts[1], planepts[2]);
+		side->SetPlane(Planef(planepts[0], planepts[1], planepts[2]));
 
 		if (!side->ParseMatInfo(src)) {
 			return nullptr;
