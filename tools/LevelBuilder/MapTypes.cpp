@@ -112,7 +112,7 @@ void XMapPatch::GenerateEdgeIndexes(void)
 void XMapPatch::PutOnCurve(void)
 {
 	X_ASSERT(expanded_, "needs to be exapanded")(expanded_);	
-	xVert prev, next;
+	LvlVert prev, next;
 
 	// put all the approximating points on the curve
 	for (size_t i = 0; i < width_; i++) {
@@ -263,7 +263,7 @@ void XMapPatch::Expand(void)
 	}
 }
 
-void XMapPatch::LerpVert(const xVert& a, const xVert& b, xVert& out) const
+void XMapPatch::LerpVert(const LvlVert& a, const LvlVert& b, LvlVert& out) const
 {
 	out.pos = (0.5f * (a.pos + b.pos));
 	out.normal = 0.5f * (a.normal + b.normal);
@@ -478,7 +478,7 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError,
 	float maxLength, bool genNormals)
 {
 	size_t	i, j, k, l;
-	xVert	prev, next, mid;
+	LvlVert	prev, next, mid;
 	Vec3f	prevxyz, nextxyz, midxyz;
 	Vec3f	delta;
 	float	maxHorizontalErrorSqr, maxVerticalErrorSqr, maxLengthSqr;
@@ -641,7 +641,7 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError,
 }
 
 
-void XMapPatch::SampleSinglePatchPoint(const xVert ctrl[3][3], float u, float v, xVert* out) const
+void XMapPatch::SampleSinglePatchPoint(const LvlVert ctrl[3][3], float u, float v, LvlVert* out) const
 {
 	float	vCtrl[3][8];
 	int		vPoint;
@@ -700,8 +700,8 @@ void XMapPatch::SampleSinglePatchPoint(const xVert ctrl[3][3], float u, float v,
 	}
 }
 
-void XMapPatch::SampleSinglePatch(const xVert ctrl[3][3], size_t baseCol, size_t baseRow,
-	size_t width_, size_t horzSub, size_t vertSub, xVert* outVerts) const
+void XMapPatch::SampleSinglePatch(const LvlVert ctrl[3][3], size_t baseCol, size_t baseRow,
+	size_t width_, size_t horzSub, size_t vertSub, LvlVert* outVerts) const
 {
 	horzSub++;
 	vertSub++;
@@ -720,10 +720,10 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 	bool genNormals, bool removeLinear)
 {
 	size_t i, j, k, l;
-	xVert sample[3][3];
+	LvlVert sample[3][3];
 	size_t outWidth = ((width_ - 1) / 2 * horzSubdivisions) + 1;
 	size_t outHeight = ((height_ - 1) / 2 * vertSubdivisions) + 1;
-	xVert* dv = X_NEW_ARRAY(xVert, (outWidth * outHeight), g_arena, "PatchSubDivideVerts");
+	LvlVert* dv = X_NEW_ARRAY(LvlVert, (outWidth * outHeight), g_arena, "PatchSubDivideVerts");
 
 	// generate normals for the control mesh
 	if (genNormals) {

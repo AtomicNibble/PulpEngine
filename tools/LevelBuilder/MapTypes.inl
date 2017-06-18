@@ -77,9 +77,9 @@ X_INLINE void XMapBrushSide::SetPlane(const Planef& plane)
 // ======================
 
 
-XMapBrush::XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* sideArena) :
+XMapBrush::XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* primArena) :
 	XMapPrimitive(PrimType::BRUSH), 
-	sideArena_(sideArena),
+	primArena_(primArena),
 	sides_(arena)
 { 
 	sides_.reserve(6); 
@@ -87,7 +87,9 @@ XMapBrush::XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* sideAr
 
 XMapBrush::~XMapBrush(void)
 {
-
+	for (auto* pSide : sides_) {
+		X_DELETE(pSide, primArena_);
+	}
 }
 
 size_t XMapBrush::GetNumSides(void) const 
@@ -139,12 +141,12 @@ const int* XMapPatch::GetIndexes(void) const
 	return indexes_.ptr(); 
 }
 
-const xVert& XMapPatch::operator[](const int idx) const
+const LvlVert& XMapPatch::operator[](const int idx) const
 {
 	return verts_[idx];
 }
 
-xVert& XMapPatch::operator[](const int idx)
+LvlVert& XMapPatch::operator[](const int idx)
 {
 	return verts_[idx];
 }
@@ -177,15 +179,18 @@ IgnoreList::IgnoreList(IgnoreArray&& ignoreList)
 {
 }
 
+void IgnoreList::add(const core::string& layerName)
+{
+	ignoreList_.insert_sorted(layerName);
+}
+
 bool IgnoreList::isIgnored(const core::string& layerName) const
 {
-	for (const auto& name : ignoreList_)
-	{
-		if (name == layerName) {
-			return true;
-		}
+	if (ignoreList_.isEmpty()) {
+		return false;
 	}
-	return false;
+
+	return ignoreList_.findSorted(layerName) != ignoreList_.end();
 }
 
 // ======================

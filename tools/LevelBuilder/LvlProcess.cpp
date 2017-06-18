@@ -798,18 +798,18 @@ void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTr
 			level::Vertex vert;
 
 			if (j == 0) {
-				const xVert trisVert = tris.verts[0];
+				const LvlVert trisVert = tris.verts[0];
 				vert.pos = trisVert.pos;
 				vert.texcoord[0] = trisVert.uv;
 			}
 			else if (j == 1) {
-				const xVert trisVert = tris.verts[i - 1];
+				const LvlVert trisVert = tris.verts[i - 1];
 				vert.pos = trisVert.pos;
 				vert.texcoord[0] = trisVert.uv;
 			}
 			else
 			{
-				const xVert trisVert = tris.verts[i];
+				const LvlVert trisVert = tris.verts[i];
 				vert.pos = trisVert.pos;
 				vert.texcoord[0] = trisVert.uv;
 			}

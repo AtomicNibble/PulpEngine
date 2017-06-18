@@ -18,20 +18,40 @@ X_NAMESPACE_BEGIN(mapfile)
 // using the pool gives about a 75ms speed up on avg.
 // at the cost of more memory usage.
 
-#define MAP_LOADER_USE_POOL 1
-
 typedef core::MemoryArena<
-#if MAP_LOADER_USE_POOL
 	core::GrowingPoolAllocator,
-#else
-	core::MallocFreeAllocator,
-#endif
 	core::SingleThreadPolicy,
 	core::NoBoundsChecking,
-//	core::SimpleMemoryTracking,
-	core::NoMemoryTracking,
+	core::SimpleMemoryTracking,
+//	core::NoMemoryTracking,
 	core::NoMemoryTagging>
-	PrimativePoolArena;
+PrimativePoolArena;
+
+
+template<typename ArenaType>
+struct GrowingPool
+{
+	GrowingPool(size_t maxAllocsize, size_t maxAlign, size_t maxAllocs, size_t growSize)  :
+		allocator_(
+			core::bitUtil::NextPowerOfTwo(
+				ArenaType::getMemoryRequirement(maxAllocsize) * maxAllocs
+			),
+			core::bitUtil::NextPowerOfTwo(
+				ArenaType::getMemoryRequirement(growSize)
+			),
+			0,
+			ArenaType::getMemoryRequirement(maxAllocsize),
+			ArenaType::getMemoryAlignmentRequirement(maxAlign),
+			ArenaType::getMemoryOffsetRequirement()
+		),
+		arena_(&allocator_, "PoolArena")
+	{
+	}
+
+	core::GrowingPoolAllocator	allocator_;
+	ArenaType					arena_;
+};
+
 
 class XMapFile
 {
@@ -40,7 +60,7 @@ class XMapFile
 	typedef std::array<size_t, PrimType::ENUM_COUNT> PrimTypeNumArr;
 
 public:
-	XMapFile();
+	XMapFile(core::MemoryArenaBase* arena);
 	~XMapFile();
 
 	bool Parse(const char* pData, size_t length);
@@ -58,12 +78,9 @@ private:
 	void PrimtPrimMemInfo(void) const;
 
 private:
-#if MAP_LOADER_USE_POOL
-	core::GrowingPoolAllocator	primPoolAllocator_;
-#else
-	core::MallocFreeAllocator primAllocator_;
-#endif // !MAP_LOADER_USE_POOL
-	PrimativePoolArena		primPoolArena_;
+	GrowingPool<PrimativePoolArena> pool_;
+	
+	core::MemoryArenaBase* arena_;
 
 	EntityArray	entities_;
 	LayerArray layers_;

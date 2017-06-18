@@ -71,7 +71,7 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 		return false;
 	}
 
-	MaterialName matName(token.begin(), token.end());
+	core::string matName(token.begin(), token.end());
 
 	// read the light map name
 	if (!src.ReadToken(token)) {
@@ -79,7 +79,7 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 		return false;
 	}
 
-	MaterialName lightMap(token.begin(), token.end());
+	core::string lightMap(token.begin(), token.end());
 
 	// sometimes we have smmothing bullshit.
 	if (src.PeekTokenString("smoothing"))
@@ -116,7 +116,7 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 
 		for (int y = 0; y < height; y++)
 		{
-			xVert& vert = verts_[(y * width) + x];
+			LvlVert& vert = verts_[(y * width) + x];
 
 			// each line has a -v and a -t
 			if (!src.ExpectTokenString("v")) {
@@ -317,7 +317,7 @@ bool XMapBrush::Parse(core::XLexer& src, const Vec3f& origin)
 
 		src.UnreadToken(token);
 
-		auto side = core::makeUnique<XMapBrushSide>(sideArena_);
+		auto side = core::makeUnique<XMapBrushSide>(primArena_);
 
 		Vec3f planepts[3];
 
@@ -413,7 +413,7 @@ bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool 
 			{
 				src.UnreadToken(token);
 
-				auto mapBrush = core::makeUnique<XMapBrush>(primArena_, arena_, arena_);
+				auto mapBrush = core::makeUnique<XMapBrush>(primArena_, arena_, primArena_);
 				if (!mapBrush->Parse(src, origin)) {
 					return false;
 				}
@@ -459,27 +459,27 @@ bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool 
 
 // ----------------------------------
 
-XMapFile::XMapFile() :
-#if MAP_LOADER_USE_POOL
-primPoolAllocator_(
-	core::bitUtil::NextPowerOfTwo(
-		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * MAX_PRIMATIVES
-	),
-	core::bitUtil::NextPowerOfTwo(
-		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * (MAX_PRIMATIVES / 10)
-	),
-	0,
-	PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE),
-	PrimativePoolArena::getMemoryAlignmentRequirement(PRIMATIVE_ALLOC_ALIGN),
-	PrimativePoolArena::getMemoryOffsetRequirement()
-),
-primPoolArena_(&primPoolAllocator_, "PrimativePool"),
+XMapFile::XMapFile(core::MemoryArenaBase* arena) :
+#if 1
+	pool_(PRIMATIVE_ALLOC_SIZE, PRIMATIVE_ALLOC_ALIGN, MAX_PRIMATIVES, MAX_PRIMATIVES / 10),
 #else
-primPoolArena_(&primAllocator_, "PrimativePool"),
+	primPoolAllocator_(
+		core::bitUtil::NextPowerOfTwo(
+			PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * MAX_PRIMATIVES
+		),
+		core::bitUtil::NextPowerOfTwo(
+			PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * (MAX_PRIMATIVES / 10)
+		),
+		0,
+		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE),
+		PrimativePoolArena::getMemoryAlignmentRequirement(PRIMATIVE_ALLOC_ALIGN),
+		PrimativePoolArena::getMemoryOffsetRequirement()
+	),
+	primPoolArena_(&primPoolAllocator_, "PrimativePool"),
 #endif
-
-entities_(g_arena),
-layers_(g_arena)
+	entities_(arena),
+	layers_(arena),
+	arena_(arena)
 {
 	core::zero_object(primCounts_);
 
@@ -491,7 +491,7 @@ XMapFile::~XMapFile()
 {
 	for (size_t i = 0; i < entities_.size(); i++)
 	{
-		X_DELETE(entities_[i], &primPoolArena_);
+		X_DELETE(entities_[i], &pool_.arena_);
 	}
 
 	entities_.free();
@@ -534,7 +534,6 @@ bool XMapFile::Parse(const char* pData, size_t length)
 		else
 		{
 			Layer layer;
-
 			layer.name = core::string(token.begin(), token.end());
 
 			if (!lexer.ReadTokenOnLine(token)) {
@@ -550,25 +549,21 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			// read the flags
 			while (lexer.ReadTokenOnLine(token))
 			{
-				core::string flag(token.begin(), token.end());
-
-				if (flag.compare("active")) {
+				if (token.isEqual("active")) {
 					layer.flags.Set(LayerFlag::ACTIVE);
 				}
-				else if (flag.compare("expanded")) {
+				else if (token.isEqual("expanded")) {
 					layer.flags.Set(LayerFlag::EXPANDED);
 				}
-				else if (flag.compare("ignore")) {
+				else if (token.isEqual("ignore")) {
 					layer.flags.Set(LayerFlag::IGNORE);
 				}
 				else {
-					X_WARNING("Map", "Unknown layer flag: '%s'",
-						flag.c_str());
+					X_WARNING("Map", "Unknown layer flag: '%.*s'", token.length(), token.begin());
 				}
 			}
 
-			layers_.push_back(layer);
-
+			layers_.push_back(std::move(layer));
 		}
 	}
 
@@ -579,7 +574,7 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	// load all the entites.
 	while (1)
 	{
-		auto mapEnt = core::makeUnique<XMapEntity>(g_arena, g_arena, &primPoolArena_);
+		auto mapEnt = core::makeUnique<XMapEntity>(&pool_.arena_, arena_, &pool_.arena_);
 
 		if (!mapEnt->Parse(lexer, ignoreList, entities_.isEmpty()))
 		{
@@ -606,16 +601,16 @@ bool XMapFile::Parse(const char* pData, size_t length)
 // withmove semantics this aint to expensive.
 IgnoreList XMapFile::getIgnoreList(void) const
 {
-	core::Array<core::string> list(g_arena);
+	IgnoreList list(arena_);
 
 	for (const auto& layer : layers_)
 	{
 		if (layer.flags.IsSet(LayerFlag::IGNORE)) {
-			list.append(layer.name);
+			list.add(layer.name);
 		}
 	}
 
-	return IgnoreList(std::move(list));
+	return list;
 }
 
 bool XMapFile::isLayerIgnored(const core::string& layerName) const

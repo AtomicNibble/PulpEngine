@@ -5,7 +5,7 @@
 
 // vertex format used by the compiler.
 
-struct xVert
+struct LvlVert
 {
 	Vec3f pos;
 	Vec2f uv;

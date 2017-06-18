@@ -114,7 +114,7 @@ struct LvlTris
 
 	engine::Material*	  pMaterial;
 
-	xVert verts[3];
+	LvlVert verts[3];
 };
 
 struct LvlInterPortal

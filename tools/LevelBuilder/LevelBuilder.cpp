@@ -113,7 +113,7 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 
 	if (file.openFile(path.c_str(), mode))
 	{
-		mapfile::XMapFile map;
+		mapfile::XMapFile map(g_arena);
 		LvlBuilder lvl(pPhysCooking, g_arena);
 
 		if (!lvl.init())

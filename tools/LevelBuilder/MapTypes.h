@@ -77,7 +77,7 @@ class XMapBrush : public XMapPrimitive
 {
 	typedef core::Array<XMapBrushSide*> BrushSidePtrArr;
 public:
-	X_INLINE XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* sideArena);
+	X_INLINE XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* primArena);
 	X_INLINE ~XMapBrush(void) X_OVERRIDE;
 
 	X_INLINE size_t	GetNumSides(void) const;
@@ -88,7 +88,7 @@ public:
 	 bool Parse(core::XLexer& src, const Vec3f& origin);
 
 private:
-	core::MemoryArenaBase* sideArena_;
+	core::MemoryArenaBase* primArena_;
 	BrushSidePtrArr sides_;
 };
 
@@ -100,7 +100,7 @@ class XMapPatch : public XMapPrimitive
 		int32_t	tris[2];	// edge triangles
 	};
 
-	typedef core::Array<xVert>			VertArr;
+	typedef core::Array<LvlVert>			VertArr;
 	typedef core::Array<int>			IntArr;	
 	typedef core::Array<SurfaceEdge>	SurfaceEdgeArr;	
 
@@ -117,8 +117,8 @@ public:
 	X_INLINE size_t GetNumIndexes(void) const;
 	X_INLINE const int* GetIndexes(void) const;
 
-	X_INLINE const xVert& operator[](const int idx) const;
-	X_INLINE xVert& operator[](const int idx);
+	X_INLINE const LvlVert& operator[](const int idx) const;
+	X_INLINE LvlVert& operator[](const int idx);
 
 	X_INLINE void SetMesh(bool b);
 	X_INLINE const bool isMesh(void) const;
@@ -142,15 +142,15 @@ private:
 	void Collapse(void);
 	void GenerateNormals(void);
 	void GenerateIndexes(void);
-	void LerpVert(const xVert& a, const xVert& b, xVert& out) const;
+	void LerpVert(const LvlVert& a, const LvlVert& b, LvlVert& out) const;
 	void GenerateEdgeIndexes(void);
 
 	void ProjectPointOntoVector(const Vec3f& point, const Vec3f& vStart, 
 		const Vec3f& vEnd, Vec3f& vProj);
-	void SampleSinglePatch(const xVert ctrl[3][3], size_t baseCol, size_t baseRow,
-		size_t width, size_t horzSub, size_t vertSub, xVert* outVerts) const;
-	void SampleSinglePatchPoint(const xVert ctrl[3][3], float u,
-		float v, xVert* out) const;
+	void SampleSinglePatch(const LvlVert ctrl[3][3], size_t baseCol, size_t baseRow,
+		size_t width, size_t horzSub, size_t vertSub, LvlVert* outVerts) const;
+	void SampleSinglePatchPoint(const LvlVert ctrl[3][3], float u,
+		float v, LvlVert* out) const;
 
 protected:
 	VertArr			verts_;
@@ -158,8 +158,8 @@ protected:
 	SurfaceEdgeArr	edges_;		// edges
 	IntArr			edgeIndexes_;
 
-	MaterialName matName_;
-	MaterialName lightMap_;
+	core::string matName_;
+	core::string lightMap_;
 
 	size_t width_;
 	size_t height_;
@@ -182,6 +182,7 @@ public:
 	X_INLINE explicit IgnoreList(const IgnoreArray& ignoreList);
 	X_INLINE explicit IgnoreList(IgnoreArray&& ignoreList);
 
+	X_INLINE void add(const core::string& layerName);
 	X_INLINE bool isIgnored(const core::string& layerName) const;
 
 private:
