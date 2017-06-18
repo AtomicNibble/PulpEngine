@@ -94,7 +94,7 @@ namespace
 		int rotate;
 		size_t numIndexes;
 		level::Vertex* pVerts;
-		core::FixedArray<model::Face, 1024> indexes;
+		core::FixedArray<model::Face, MAX_INDEXES> indexes;
 
 		pVerts = &pSubmesh->verts_[StartVert];
 
@@ -201,11 +201,9 @@ namespace
 	}
 
 
-	XWinding* WindingForTri(const LvlTris& tri)
+	core::UniquePointer<XWinding> WindingForTri(const LvlTris& tri)
 	{
-		XWinding* w;
-
-		w = X_NEW(XWinding, g_arena, "WindingForTri")(3);
+		auto w = core::makeUnique<XWinding>(g_arena, 3);
 		w->addPoint(tri.verts[0].pos);
 		w->addPoint(tri.verts[1].pos);
 		w->addPoint(tri.verts[2].pos);
@@ -786,14 +784,12 @@ void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTr
 
 	size_t StartVert = pSubMesh->verts_.size();
 
-	int numPoints = 3;
-	int i, j;
-
 	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
 
-	for (i = 2; i < numPoints; i++)
+	const int32_t numPoints = 3;
+	for (int32_t i = 2; i < numPoints; i++)
 	{
-		for (j = 0; j < 3; j++)
+		for (int32_t j = 0; j < 3; j++)
 		{
 			level::Vertex vert;
 
@@ -835,18 +831,18 @@ void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTr
 
 bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, const LvlTris& tri)
 {
-	int32_t area;
-	XWinding* w;
-
 	// skip degenerate triangles from pinched curves
 	if (MapTriArea(tri) <= 0) {
 		X_WARNING("Tri", "degenerate tri");
 		return false;
 	}
 
-	w = WindingForTri(tri);
-	area = worldEnt.bspTree_.headnode->CheckWindingInAreas_r(planeSet, w);
-	X_DELETE(w, g_arena);
+	int32_t area;
+	
+	{
+		auto w = WindingForTri(tri);
+		area = worldEnt.bspTree_.headnode->CheckWindingInAreas_r(planeSet, w.get());
+	}
 
 	if (area == -1) {
 		return false;

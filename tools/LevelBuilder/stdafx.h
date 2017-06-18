@@ -17,6 +17,8 @@
 #include <Containers\HashMap.h>
 #include <Containers\FixedArray.h>
 
+#include <Util\UniquePointer.h>
+
 #include "StringPair.h"
 
 
