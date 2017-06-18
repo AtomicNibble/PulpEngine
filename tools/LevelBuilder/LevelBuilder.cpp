@@ -130,8 +130,12 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 				X_LOG_BULLET;
 				X_LOG0("Map", "Loaded: ^6%.4fms", elapsed.GetMilliSeconds());
 				X_LOG0("Map", "Num Entities: ^8%" PRIuS, map.getNumEntities());
-				X_LOG0("Map", "Num Brushes: ^8%" PRIuS, map.getNumBrushes());
-				X_LOG0("Map", "Num Patches: ^8%" PRIuS, map.getNumPatches());
+
+				for (uint32_t prim = 0; prim < mapfile::PrimType::ENUM_COUNT; ++prim)
+				{
+					X_LOG0("Map", "Num %s: ^8%" PRIuS, mapfile::PrimType::ToString(prim),
+						map.getPrimCounts()[prim]);
+				}
 			}
 
 			// all loaded time to get naked.

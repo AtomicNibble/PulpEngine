@@ -37,6 +37,7 @@ class XMapFile
 {
 	typedef core::Array<XMapEntity*> EntityArray;
 	typedef core::Array<Layer> LayerArray;
+	typedef std::array<size_t, PrimType::ENUM_COUNT> PrimTypeNumArr;
 
 public:
 	XMapFile();
@@ -44,11 +45,10 @@ public:
 
 	bool Parse(const char* pData, size_t length);
 
-	size_t getNumEntities(void) const { return entities_.size(); }
-	size_t getNumBrushes(void) const { return numBrushes_; }
-	size_t getNumPatches(void) const { return numPatches_; }
+	X_INLINE size_t getNumEntities(void) const { return entities_.size(); }
+	X_INLINE XMapEntity* getEntity(size_t i) const { return entities_[i]; }
 
-	XMapEntity* getEntity(size_t i) const { return entities_[i]; }
+	X_INLINE const PrimTypeNumArr& getPrimCounts(void) const { return primCounts_; }
 
 private:
 	IgnoreList getIgnoreList(void) const;
@@ -67,9 +67,7 @@ private:
 
 	EntityArray	entities_;
 	LayerArray layers_;
-
-	size_t numBrushes_;
-	size_t numPatches_;
+	PrimTypeNumArr primCounts_;
 };
 
 X_NAMESPACE_END

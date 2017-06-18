@@ -48,10 +48,10 @@ public:
 
 		bool ParseMatInfo(core::XLexer& src);
 
-		core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
-		Vec2f				  matRepeate;
-		Vec2f				  shift;
-		float				  rotate;
+		MaterialName	name;
+		Vec2f			matRepeate;
+		Vec2f			shift;
+		float			rotate;
 	};
 
 public:
@@ -195,12 +195,15 @@ public:
 	typedef core::Array<XMapPrimitive*> PrimativeArry;
 	typedef KeyPair PairMap;
 	typedef KeyPair::PairIt PairIt;
+	typedef std::array<size_t,PrimType::ENUM_COUNT> PrimTypeNumArr;
 
 public:
 	X_INLINE XMapEntity(core::MemoryArenaBase* arena, core::MemoryArenaBase* primArena);
 	X_INLINE ~XMapEntity(void);
 
 	X_INLINE size_t GetNumPrimitives(void) const;
+	X_INLINE const PrimTypeNumArr& getPrimCounts(void) const;
+
 	X_INLINE XMapPrimitive* GetPrimitive(size_t i) const;
 	X_INLINE void AddPrimitive(XMapPrimitive* p);
 
@@ -213,6 +216,7 @@ public:
 private:
 	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* primArena_;
+	PrimTypeNumArr primCounts_;
 	PrimativeArry primitives_;
 };
 

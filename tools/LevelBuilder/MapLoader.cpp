@@ -393,7 +393,7 @@ bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool 
 
 			if (token.isEqual("mesh") || token.isEqual("curve"))
 			{
-				auto mapPatch = core::makeUnique<XMapPatch>(arena_, arena_);
+				auto mapPatch = core::makeUnique<XMapPatch>(primArena_, arena_);
 				if (!mapPatch->Parse(src, origin)) {
 					return false;
 				}
@@ -415,7 +415,7 @@ bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool 
 			{
 				src.UnreadToken(token);
 
-				auto mapBrush = core::makeUnique<XMapBrush>(arena_, arena_);
+				auto mapBrush = core::makeUnique<XMapBrush>(primArena_, arena_);
 				if (!mapBrush->Parse(src, origin)) {
 					return false;
 				}
@@ -483,8 +483,7 @@ primPoolArena_(&primAllocator_, "PrimativePool"),
 entities_(g_arena),
 layers_(g_arena)
 {
-	numBrushes_ = 0;
-	numPatches_ = 0;
+	core::zero_object(primCounts_);
 
 	// we typically will have a few hundred models, a load of triggers etc.
 	// might make this 8k
@@ -597,21 +596,14 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			break;
 		}
 
-		for (size_t i = 0; i < mapEnt->GetNumPrimitives(); i++)
+		auto& primCounts = mapEnt->getPrimCounts();
+		for (uint32_t prim = 0; prim < PrimType::ENUM_COUNT; ++prim)
 		{
-			const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
-
-			if (prim->getType() == PrimType::BRUSH) {
-				numBrushes_++;
-			}
-			else if (prim->getType() == PrimType::PATCH) {
-				numPatches_++;
-			}
+			primCounts_[prim] += primCounts[prim];
 		}
 
 		entities_.push_back(mapEnt.release());
 	}
-
 
 	PrimtPrimMemInfo();
 	return true;

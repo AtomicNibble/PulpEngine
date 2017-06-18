@@ -193,7 +193,7 @@ XMapEntity::XMapEntity(core::MemoryArenaBase* arena, core::MemoryArenaBase* prim
 	primArena_(X_ASSERT_NOT_NULL(arena)),
 	primitives_(X_ASSERT_NOT_NULL(arena))
 {
-
+	core::zero_object(primCounts_);
 }
 
 XMapEntity::~XMapEntity(void) 
@@ -211,6 +211,14 @@ size_t XMapEntity::GetNumPrimitives(void) const
 	return primitives_.size(); 
 }
 
+X_INLINE const XMapEntity::PrimTypeNumArr& XMapEntity::getPrimCounts(void) const
+{
+	X_ASSERT(core::accumulate(primCounts_.begin(), primCounts_.end(), 0_sz) == primitives_.size(),
+		"Primatives size and counts don't match") ();
+
+	return primCounts_;
+}
+
 XMapPrimitive* XMapEntity::GetPrimitive(size_t i) const
 { 
 	return primitives_[i]; 
@@ -218,6 +226,7 @@ XMapPrimitive* XMapEntity::GetPrimitive(size_t i) const
  
 void XMapEntity::AddPrimitive(XMapPrimitive* pPrim) 
 { 
+	++primCounts_[pPrim->getType()];
 	primitives_.push_back(pPrim);
 }
 
