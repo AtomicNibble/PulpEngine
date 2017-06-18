@@ -149,18 +149,21 @@ const char* XMapPatch::GetMatName(void) const
 
 // ======================
 
-IgnoreList::IgnoreList(IgnoreArray& ignoreList)
+IgnoreList::IgnoreList(const IgnoreArray& ignoreList)
 	: ignoreList_(ignoreList) 
 {
+}
 
+IgnoreList::IgnoreList(IgnoreArray&& ignoreList)
+	: ignoreList_(std::move(ignoreList))
+{
 }
 
 bool IgnoreList::isIgnored(const core::string& layerName) const
 {
-	IgnoreArray::ConstIterator it = ignoreList_.begin();
-	for (; it != ignoreList_.end(); ++it)
+	for (const auto& name : ignoreList_)
 	{
-		if (*it == layerName) {
+		if (name == layerName) {
 			return true;
 		}
 	}
@@ -180,8 +183,7 @@ XMapEntity::~XMapEntity(void)
 {
 	X_ASSERT_NOT_NULL(primArena_);
 
-	PrimativeArry::size_type i;
-	for (i = 0; i < primitives.size(); i++)
+	for (size_t i = 0; i < primitives.size(); i++)
 	{
 		X_DELETE(primitives[i], primArena_);
 	}
@@ -199,9 +201,9 @@ XMapPrimitive* XMapEntity::GetPrimitive(size_t i) const
 	return primitives[i]; 
 }
  
-void XMapEntity::AddPrimitive(XMapPrimitive* p) 
+void XMapEntity::AddPrimitive(XMapPrimitive* pPrim) 
 { 
-	primitives.push_back(p); 
+	primitives.push_back(pPrim);
 }
 
 // ======================

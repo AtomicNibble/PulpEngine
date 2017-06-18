@@ -4,9 +4,7 @@
 #ifndef X_LVL_TYPES_H_
 #define X_LVL_TYPES_H_
 
-#include <IPhysics.h>
-#include <IModel.h>
-#include <ILevel.h>
+
 
 #include <String\GrowingStringTable.h>
 

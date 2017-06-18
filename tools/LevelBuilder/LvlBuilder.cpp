@@ -276,13 +276,13 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	{
 		auto* pPrim = mapEnt->GetPrimitive(i);
 
-		if (pPrim->getType() == PrimType::BRUSH)	{
+		if (pPrim->getType() == mapfile::PrimType::BRUSH)	{
 			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(pPrim), i)) {
 				X_ERROR("Lvl", "failed to process brush: %" PRIuS, i);
 				return false;
 			}
 		}
-		else if (pPrim->getType() == PrimType::PATCH) {
+		else if (pPrim->getType() == mapfile::PrimType::PATCH) {
 			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(pPrim), i)) {
 				X_ERROR("Lvl", "failed to process patch: %" PRIuS, i);
 				return false;

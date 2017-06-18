@@ -10,6 +10,7 @@ static const int PLANENUM_AREA_DIFF = -2;
 
 static const float ON_EPSILON = 0.1f;
 static const float CLIP_EPSILON = 0.1f;
+static const float COPLANAR_EPSILON = 0.1f;
 
 static const float BASE_WINDING_EPSILON	= 0.001f;
 static const float SPLIT_WINDING_EPSILON	= 0.001f;

@@ -27,6 +27,10 @@
 
 X_USING_NAMESPACE;
 
+#include <IPhysics.h>
+#include <IModel.h>
+#include <ILevel.h>
+
 #include "Globals.h"
 #include "Settings.h"
 #include "PlaneSet.h"

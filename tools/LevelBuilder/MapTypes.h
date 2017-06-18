@@ -3,16 +3,22 @@
 #ifndef X_MAP_TYPES_H_
 #define X_MAP_TYPES_H_
 
-using namespace core;
+#ifdef IGNORE
+#undef IGNORE
+#endif // !IGNORE
+
+
+
 
 X_NAMESPACE_DECLARE(core, 
-struct XFile;
+	struct XFile;
 )
 
-X_DECLARE_ENUM(PrimType)(BRUSH, PATCH, INVALID);
 
 X_NAMESPACE_BEGIN(mapfile)
 
+X_DECLARE_ENUM(PrimType)(BRUSH, PATCH, INVALID);
+X_DECLARE_FLAGS(LayerFlag)(ACTIVE, EXPANDED, IGNORE);
 
 class XMapBrush;
 
@@ -30,7 +36,7 @@ public:
 
 protected:
 	core::string layer_;
-	PrimType::Enum	type_;
+	PrimType::Enum type_;
 };
 
 class XMapBrushSide 
@@ -61,7 +67,7 @@ protected:
 	Planef			plane;
 
 protected:
-	static bool ParseMatInfo(XLexer& src, MaterialInfo& mat);
+	static bool ParseMatInfo(core::XLexer& src, MaterialInfo& mat);
 };
 
 
@@ -76,7 +82,7 @@ public:
 	X_INLINE XMapBrushSide*	GetSide(size_t i) const;
 
 public:
-	static XMapBrush* Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
+	static XMapBrush* Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
 
 protected:
 	core::Array<XMapBrushSide*> sides;
@@ -131,7 +137,7 @@ private:
 		float v, xVert* out) const;
 
 public:
-	static XMapPatch* Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec3f &origin);
+	static XMapPatch* Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f &origin);
 
 protected:
 	struct surfaceEdge_t
@@ -166,7 +172,8 @@ class IgnoreList
 	typedef core::Array<core::string> IgnoreArray;
 
 public:
-	X_INLINE IgnoreList(IgnoreArray& ignoreList);
+	X_INLINE explicit IgnoreList(const IgnoreArray& ignoreList);
+	X_INLINE explicit IgnoreList(IgnoreArray&& ignoreList);
 
 	X_INLINE bool isIgnored(const core::string& layerName) const;
 
@@ -191,7 +198,7 @@ public:
 	X_INLINE void AddPrimitive(XMapPrimitive* p);
 
 public:
-	static XMapEntity* Parse(XLexer &src, core::MemoryArenaBase* arena,
+	static XMapEntity* Parse(core::XLexer& src, core::MemoryArenaBase* arena,
 		const IgnoreList& ignoredLayers, bool isWorldSpawn = false);
 
 
@@ -202,11 +209,6 @@ protected:
 	PrimativeArry	primitives;
 };
 
-#ifdef IGNORE
-#undef IGNORE
-#endif // !IGNORE
-
-X_DECLARE_FLAGS(LayerFlag)(ACTIVE, EXPANDED, IGNORE);
 
 struct Layer
 {

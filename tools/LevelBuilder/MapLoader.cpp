@@ -38,12 +38,12 @@ namespace
 }
 
 
-XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec3f &origin)
+XMapPatch* XMapPatch::Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f &origin)
 {
 	X_ASSERT_NOT_NULL(arena);
 
 	// goaty meshes!
-	XLexToken token;
+	core::XLexToken token;
 	XMapPatch* patch = nullptr;
 
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName, lightMap;
@@ -218,9 +218,9 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 
 
 
-bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
+bool XMapBrushSide::ParseMatInfo(core::XLexer& src, XMapBrushSide::MaterialInfo& info)
 {
-	XLexToken token;
+	core::XLexToken token;
 
 	// read the material name
 	if (!src.ReadTokenOnLine(token)) {
@@ -262,12 +262,12 @@ bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
 	return true;
 }
 
-XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin)
+XMapBrush* XMapBrush::Parse(core::XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin)
 {
 	X_ASSERT_NOT_NULL(arena);
 
 	Vec3f planepts[3];
-	XLexToken token;
+	core::XLexToken token;
 	XMapBrushSide* side;
 	XMapBrush* brush;
 
@@ -295,7 +295,7 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 				break;
 			}
 			// the token should be a key string for a key/value pair
-			if (token.GetType() != TokenType::NAME) {
+			if (token.GetType() != core::TokenType::NAME) {
 				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.",
 					token.length(), token.begin());
 				X_DELETE(brush, arena);
@@ -305,8 +305,8 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 			// check if layer
 			hasLayer = token.isEqual("layer");
 
-			if (!src.ReadTokenOnLine(token) || (token.GetType() != TokenType::STRING
-				&& token.GetType() != TokenType::NAME))
+			if (!src.ReadTokenOnLine(token) || (token.GetType() != core::TokenType::STRING
+				&& token.GetType() != core::TokenType::NAME))
 			{
 				src.Error("MapBrush::Parse: expected pair value string not found.");
 				X_DELETE(brush, arena);
@@ -364,10 +364,10 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 }
 
 
-XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, 
+XMapEntity*	XMapEntity::Parse(core::XLexer& src, core::MemoryArenaBase* arena,
 	const IgnoreList& ignoredLayers, bool isWorldSpawn)
 {
-	XLexToken token;
+	core::XLexToken token;
 	XMapEntity* mapEnt;
 	Vec3f origin;
 	float v1, v2, v3;
@@ -493,10 +493,10 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 XMapFile::XMapFile() :
 #if MAP_LOADER_USE_POOL
 primPoolAllocator_(
-	bitUtil::NextPowerOfTwo(
+	core::bitUtil::NextPowerOfTwo(
 		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * MAX_PRIMATIVES
 	),
-	bitUtil::NextPowerOfTwo(
+	core::bitUtil::NextPowerOfTwo(
 		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * (MAX_PRIMATIVES / 10)
 	),
 	0,
@@ -542,14 +542,14 @@ bool XMapFile::Parse(const char* pData, size_t length)
 		return false;
 	}
 
-	XLexer lexer(pData, pData + length);
-	XLexToken token;
+	core::XLexer lexer(pData, pData + length);
+	core::XLexToken token;
 	XMapEntity *mapEnt;
 
-	lexer.setFlags(LexFlag::NOSTRINGCONCAT |
-		LexFlag::NOSTRINGESCAPECHARS |
-		LexFlag::ALLOWPATHNAMES |
-		LexFlag::ALLOWDOLLARNAMES);
+	lexer.setFlags(core::LexFlag::NOSTRINGCONCAT |
+		core::LexFlag::NOSTRINGESCAPECHARS |
+		core::LexFlag::ALLOWPATHNAMES |
+		core::LexFlag::ALLOWDOLLARNAMES);
 
 	// parce the layers and shit.
 
@@ -616,21 +616,18 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	// load all the entites.
 	while (1)
 	{
-		mapEnt = XMapEntity::Parse(lexer, &primPoolArena_,
-			ignoreList, entities_.isEmpty());
+		mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, ignoreList, entities_.isEmpty());
 
 		if (!mapEnt)
 		{
-			if (lexer.GetErrorState() != XLexer::ErrorState::OK) {
+			if (lexer.GetErrorState() != core::XLexer::ErrorState::OK) {
 				X_ERROR("Map", "Failed to load map file correctly.");
 				return false;
 			}
 			break;
 		}
 
-		size_t i;
-
-		for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
+		for (size_t i = 0; i < mapEnt->GetNumPrimitives(); i++)
 		{
 			const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
 
@@ -655,24 +652,22 @@ IgnoreList XMapFile::getIgnoreList(void) const
 {
 	core::Array<core::string> list(g_arena);
 
-	LayerArray::ConstIterator it = layers_.begin();
-	for (; it != layers_.end(); ++it)
+	for (const auto& layer : layers_)
 	{
-		if (it->flags.IsSet(LayerFlag::IGNORE)) {
-			list.append(it->name);
+		if (layer.flags.IsSet(LayerFlag::IGNORE)) {
+			list.append(layer.name);
 		}
 	}
 
-	return IgnoreList(list);
+	return IgnoreList(std::move(list));
 }
 
 bool XMapFile::isLayerIgnored(const core::string& layerName) const
 {
-	LayerArray::ConstIterator it = layers_.begin();
-	for (; it != layers_.end(); ++it)
+	for (const auto& layer : layers_)
 	{
-		if (it->name == layerName) {
-			return it->flags.IsSet(LayerFlag::IGNORE);
+		if (layer.name == layerName) {
+			return layer.flags.IsSet(LayerFlag::IGNORE);
 		}
 	}
 
@@ -681,16 +676,14 @@ bool XMapFile::isLayerIgnored(const core::string& layerName) const
 
 void XMapFile::ListLayers(void) const
 {
-	Layer::LayerFlags::Description Dsc;
-
 	X_LOG0("Map", "Listing Layers");
 	X_LOG_BULLET;
 
-	LayerArray::ConstIterator it = layers_.begin();
-	for (; it != layers_.end(); ++it)
+	Layer::LayerFlags::Description Dsc;
+
+	for (const auto& layer : layers_)
 	{
-		X_LOG0("Map", "Layer: \"%s\" flags: %s",
-			it->name.c_str(), it->flags.ToString(Dsc));
+		X_LOG0("Map", "Layer: \"%s\" flags: %s", layer.name.c_str(), layer.flags.ToString(Dsc));
 	}
 }
 
@@ -707,30 +700,30 @@ void XMapFile::PrimtPrimMemInfo(void) const
 
 #if 1 // toggle human sizes
 
-	HumanSize::Str SizeStr;
+	core::HumanSize::Str SizeStr;
 
 	X_LOG0("Map", "virtualMemoryReserved: ^6%s", 
-		HumanSize::toString(SizeStr, stats.virtualMemoryReserved_));
+		core::HumanSize::toString(SizeStr, stats.virtualMemoryReserved_));
 	X_LOG0("Map", "physicalMemoryAllocated: ^6%s",
-		HumanSize::toString(SizeStr, stats.physicalMemoryAllocated_));
+		core::HumanSize::toString(SizeStr, stats.physicalMemoryAllocated_));
 	X_LOG0("Map", "physicalMemoryAllocatedMax: ^6%s", 
-		HumanSize::toString(SizeStr, stats.physicalMemoryAllocatedMax_));
+		core::HumanSize::toString(SizeStr, stats.physicalMemoryAllocatedMax_));
 	X_LOG0("Map", "physicalMemoryUsed: ^6%s", 
-		HumanSize::toString(SizeStr, stats.physicalMemoryUsed_));
+		core::HumanSize::toString(SizeStr, stats.physicalMemoryUsed_));
 	X_LOG0("Map", "physicalMemoryUsedMax: ^6%s", 
-		HumanSize::toString(SizeStr, stats.physicalMemoryUsedMax_));
+		core::HumanSize::toString(SizeStr, stats.physicalMemoryUsedMax_));
 	X_LOG0("Map", "wasteAlignment: ^6%s", 
-		HumanSize::toString(SizeStr, stats.wasteAlignment_));
+		core::HumanSize::toString(SizeStr, stats.wasteAlignment_));
 	X_LOG0("Map", "wasteAlignmentMax: ^6%s", 
-		HumanSize::toString(SizeStr, stats.wasteAlignmentMax_));
+		core::HumanSize::toString(SizeStr, stats.wasteAlignmentMax_));
 	X_LOG0("Map", "wasteUnused: ^6%s", 
-		HumanSize::toString(SizeStr, stats.wasteUnused_));
+		core::HumanSize::toString(SizeStr, stats.wasteUnused_));
 	X_LOG0("Map", "wasteUnusedMax: ^6%s", 
-		HumanSize::toString(SizeStr, stats.wasteUnusedMax_));
+		core::HumanSize::toString(SizeStr, stats.wasteUnusedMax_));
 	X_LOG0("Map", "internalOverhead: ^6%s", 
-		HumanSize::toString(SizeStr, stats.internalOverhead_));
+		core::HumanSize::toString(SizeStr, stats.internalOverhead_));
 	X_LOG0("Map", "internalOverheadMax: ^6%s", 
-		HumanSize::toString(SizeStr, stats.internalOverheadMax_));
+		core::HumanSize::toString(SizeStr, stats.internalOverheadMax_));
 #else
 	X_LOG0("Map", "virtualMemoryReserved: ^6%i", stats.virtualMemoryReserved_);
 	X_LOG0("Map", "physicalMemoryAllocated: ^6%i", stats.physicalMemoryAllocated_);

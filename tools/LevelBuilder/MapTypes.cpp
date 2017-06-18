@@ -3,32 +3,31 @@
 
 #include <Util\BitUtil.h>
 
-namespace
-{
-
-	static const float COPLANAR_EPSILON = 0.1f;
-
-
-}
 
 
 X_NAMESPACE_BEGIN(mapfile)
 
-XMapPatch::XMapPatch(void) : XMapPatch(0,0)
+XMapPatch::XMapPatch(void) : 
+	XMapPatch(0,0)
 {
 
 }
 
 // hello c++11: delegated constructor
-XMapPatch::XMapPatch(int w, int h) : XMapPrimitive(PrimType::PATCH),
+XMapPatch::XMapPatch(int w, int h) :
+	XMapPrimitive(PrimType::PATCH),
 	verts_(g_arena),
 	indexes_(g_arena),
 	edges_(g_arena),
 	edgeIndexes_(g_arena),
-	width_(w), height_(h),
-	maxWidth_(w), maxHeight_(h),
-	horzSubdivisions_(0), vertSubdivisions_(0),
-	isMesh_(false), expanded_(false)
+	width_(w), 
+	height_(h),
+	maxWidth_(w), 
+	maxHeight_(h),
+	horzSubdivisions_(0), 
+	vertSubdivisions_(0),
+	isMesh_(false), 
+	expanded_(false)
 {
 
 }
