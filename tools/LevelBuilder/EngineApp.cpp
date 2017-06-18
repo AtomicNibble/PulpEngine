@@ -7,9 +7,6 @@
 #include <Debugging\DebuggerConnection.h>
 #include <Platform\MessageBox.h>
 
-
-extern HINSTANCE g_hInstance;
-
 EngineApp::EngineApp() :
 	pICore_(nullptr),
 	hSystemHandle_(0)
@@ -29,10 +26,10 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
-	params.hInstance = g_hInstance;
+	params.hInstance = hInstance;
 	params.pCmdLine = sInCmdLine;
 	params.bVsLog = false;
 	params.bConsoleLog = true;

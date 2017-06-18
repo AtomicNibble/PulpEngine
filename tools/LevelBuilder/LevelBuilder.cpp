@@ -19,8 +19,6 @@
 #include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\VirtualMem.h>
 
-HINSTANCE g_hInstance = 0;
-
 core::MemoryArenaBase* g_arena = nullptr;
 core::MemoryArenaBase* g_bspFaceAllocator = nullptr;
 core::MemoryArenaBase* g_bspNodeAllocator = nullptr;
@@ -59,8 +57,6 @@ X_LINK_LIB("engine_MaterialLib");
 X_LINK_LIB("engine_ModelLib");
 X_LINK_LIB("engine_Physics");
 
-
-
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
@@ -68,18 +64,6 @@ struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 X_LINK_LIB("engine_Core")
 X_LINK_LIB("engine_RenderNull")
 X_LINK_LIB("engine_Physics");
-
-
-// X_LINK_LIB("engine_3DEngine")
-// X_LINK_LIB("engine_Script")
-
-
-// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Model@@0V12@A")
-// X_FORCE_LINK_FACTORY("?factory__@XFactory@XConverterLib_Model@@0V12@A")
-
-// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
-// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
-// X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")
 
 X_FORCE_LINK_FACTORY("XConverterLib_Material")
 X_FORCE_LINK_FACTORY("XConverterLib_Model")
@@ -155,9 +139,7 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 			{
 				core::TimeVal saveElapsed = timer.GetTimeVal();
 
-				X_LOG0("Level", "Success. saved in: ^6%gms",
-					saveElapsed.GetMilliSeconds());
-				//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
+				X_LOG0("Level", "Success. saved in: ^6%gms", saveElapsed.GetMilliSeconds());
 			}
 			else
 			{
@@ -186,9 +168,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 
-	g_hInstance = hInstance;
 	// compile my anus.
-
 	int res = -1;
 
 	{
@@ -233,7 +213,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			EngineApp engine;
 
 			// we need the engine for Assets, Logging, Profiling, FileSystem.
-			if (engine.Init(lpCmdLine, Console))
+			if (engine.Init(hInstance, lpCmdLine, Console))
 			{
 				{
 					core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
