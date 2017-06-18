@@ -634,8 +634,14 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
 
-		if (lvlEnt.classType == level::ClassType::MISC_MODEL) {
-			continue;
+		switch (lvlEnt.classType)
+		{
+			case level::ClassType::MISC_MODEL:
+			case level::ClassType::WORLDSPAWN:
+			case level::ClassType::PLAYER_START:
+				continue;
+			default:
+				break;
 		}
 
 		if (lvlEnt.bounds.IsInfinate()) {
