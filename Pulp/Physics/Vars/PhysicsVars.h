@@ -28,6 +28,7 @@ public:
 
 	const char* getDllOverrideStr(StrBuf& buf) const;
 	uint32_t scratchBufferSize(void) const;
+	X_INLINE bool enableAllocTracking(void) const;
 	X_INLINE StepperType::Enum getStepperType(void) const;
 
 	X_INLINE bool isPVDEnabled(void) const;
@@ -60,6 +61,7 @@ private:
 	core::ICVar* pVarDebugDraw_;
 
 	int32_t scratchBufferDefaultSize_;
+	int32_t trackAllocations_;
 	StepperType::Enum stepperType_;
 	
 	int32_t pvdEnable_;

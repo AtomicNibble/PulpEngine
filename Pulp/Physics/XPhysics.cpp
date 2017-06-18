@@ -277,7 +277,6 @@ bool XPhysics::init(const ToleranceScale& scale)
 	}
 #endif // !X_SUPER
 
-	bool recordMemoryAllocations = true;
 
 	copyToleranceScale(scale_, scale);
 	if (!scale_.isValid()) {
@@ -286,7 +285,7 @@ bool XPhysics::init(const ToleranceScale& scale)
 	}
 
 	pPhysics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation_,
-		scale_, recordMemoryAllocations, pProfileZoneManager_);
+		scale_, vars_.enableAllocTracking(), pProfileZoneManager_);
 
 	if (!pPhysics_) {
 		X_ERROR("Physics", "PxCreatePhysics failed!");

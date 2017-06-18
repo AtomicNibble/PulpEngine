@@ -3,6 +3,11 @@
 
 X_NAMESPACE_BEGIN(physics)
 
+X_INLINE bool PhysXVars::enableAllocTracking(void) const
+{
+	return trackAllocations_ != 0;
+}
+
 X_INLINE StepperType::Enum PhysXVars::getStepperType(void) const
 {
 	return stepperType_;

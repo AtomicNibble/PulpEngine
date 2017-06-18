@@ -40,6 +40,10 @@ void PhysXVars::RegisterVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
 		"Size of the scratch buffer in kib, must be a multiple of 16.");
 
+	ADD_CVAR_REF("phys_alloc_track", trackAllocations_, trackAllocations_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Enable physics allocation tracking");
+
+
 	del.Bind<PhysXVars, &PhysXVars::Var_OnStepperStyleChange>(this);
 
 	pVarStepperType_ = ADD_CVAR_INT("phys_stepper_style", stepperType_, 0, StepperType::ENUM_COUNT - 1,
