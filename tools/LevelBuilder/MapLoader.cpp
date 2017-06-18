@@ -41,8 +41,6 @@ namespace
 bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 {
 	// goaty meshes!
-	XMapPatch* patch = nullptr;
-
 	if (!src.ExpectTokenString("{")) {
 		return nullptr;
 	}
@@ -90,7 +88,7 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 	}
 
 
-	int width, height, dunno1, dunno2;
+	int32_t width, height, dunno1, dunno2;
 
 	// we now have goaty info.
 	width = src.ParseInt();
@@ -118,7 +116,7 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 
 		for (int y = 0; y < height; y++)
 		{
-			xVert& vert = patch->verts_[(y * width) + x];
+			xVert& vert = verts_[(y * width) + x];
 
 			// each line has a -v and a -t
 			if (!src.ExpectTokenString("v")) {
@@ -137,16 +135,16 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 
 			if (token.isEqual("c"))
 			{
-				int c[4];
+				int32_t c[4];
 				c[0] = src.ParseInt();
 				c[1] = src.ParseInt();
 				c[2] = src.ParseInt();
 				c[3] = src.ParseInt();
 
-				vert.color[0] = safe_static_cast<uint8, int>(c[0]);
-				vert.color[1] = safe_static_cast<uint8, int>(c[1]);
-				vert.color[2] = safe_static_cast<uint8, int>(c[2]);
-				vert.color[3] = safe_static_cast<uint8, int>(c[3]);
+				vert.color[0] = safe_static_cast<uint8>(c[0]);
+				vert.color[1] = safe_static_cast<uint8>(c[1]);
+				vert.color[2] = safe_static_cast<uint8>(c[2]);
+				vert.color[3] = safe_static_cast<uint8>(c[3]);
 
 				if (!src.ExpectTokenString("t")) {
 					return false;
@@ -319,7 +317,7 @@ bool XMapBrush::Parse(core::XLexer& src, const Vec3f& origin)
 
 		src.UnreadToken(token);
 
-		auto side = core::makeUnique<XMapBrushSide>(arena_);
+		auto side = core::makeUnique<XMapBrushSide>(sideArena_);
 
 		Vec3f planepts[3];
 
@@ -415,7 +413,7 @@ bool XMapEntity::Parse(core::XLexer& src, const IgnoreList& ignoredLayers, bool 
 			{
 				src.UnreadToken(token);
 
-				auto mapBrush = core::makeUnique<XMapBrush>(primArena_, arena_);
+				auto mapBrush = core::makeUnique<XMapBrush>(primArena_, arena_, arena_);
 				if (!mapBrush->Parse(src, origin)) {
 					return false;
 				}
@@ -485,17 +483,13 @@ layers_(g_arena)
 {
 	core::zero_object(primCounts_);
 
-	// we typically will have a few hundred models, a load of triggers etc.
-	// might make this 8k
-	// worldspawn is 1 entity.
-	entities_.reserve(4096 * 2);
-	entities_.setGranularity(512);
+	entities_.reserve(4096);
+	entities_.setGranularity(2048);
 }
 
 XMapFile::~XMapFile()
 {
-	EntityArray::size_type i;
-	for (i = 0; i < entities_.size(); i++)
+	for (size_t i = 0; i < entities_.size(); i++)
 	{
 		X_DELETE(entities_[i], &primPoolArena_);
 	}

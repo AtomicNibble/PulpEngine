@@ -77,7 +77,7 @@ class XMapBrush : public XMapPrimitive
 {
 	typedef core::Array<XMapBrushSide*> BrushSidePtrArr;
 public:
-	X_INLINE XMapBrush(core::MemoryArenaBase* arena);
+	X_INLINE XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* sideArena);
 	X_INLINE ~XMapBrush(void) X_OVERRIDE;
 
 	X_INLINE size_t	GetNumSides(void) const;
@@ -88,7 +88,7 @@ public:
 	 bool Parse(core::XLexer& src, const Vec3f& origin);
 
 private:
-	core::MemoryArenaBase* arena_;
+	core::MemoryArenaBase* sideArena_;
 	BrushSidePtrArr sides_;
 };
 

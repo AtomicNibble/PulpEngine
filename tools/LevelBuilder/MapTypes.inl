@@ -77,8 +77,9 @@ X_INLINE void XMapBrushSide::SetPlane(const Planef& plane)
 // ======================
 
 
-XMapBrush::XMapBrush(core::MemoryArenaBase* arena) : 
+XMapBrush::XMapBrush(core::MemoryArenaBase* arena, core::MemoryArenaBase* sideArena) :
 	XMapPrimitive(PrimType::BRUSH), 
+	sideArena_(sideArena),
 	sides_(arena)
 { 
 	sides_.reserve(6); 
@@ -190,7 +191,8 @@ bool IgnoreList::isIgnored(const core::string& layerName) const
 // ======================
 
 XMapEntity::XMapEntity(core::MemoryArenaBase* arena, core::MemoryArenaBase* primArena) :
-	primArena_(X_ASSERT_NOT_NULL(arena)),
+	arena_(X_ASSERT_NOT_NULL(arena)),
+	primArena_(X_ASSERT_NOT_NULL(primArena)),
 	primitives_(X_ASSERT_NOT_NULL(arena))
 {
 	core::zero_object(primCounts_);

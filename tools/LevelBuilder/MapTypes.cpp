@@ -450,19 +450,17 @@ void XMapPatch::GenerateNormals(void)
 
 void XMapPatch::GenerateIndexes(void)
 {
-	size_t i, j, v1, v2, v3, v4, index;
-
 	indexes_.resize((width_ - 1) * (height_ - 1) * 2 * 3, false);
 
-	index = 0;
-	for (i = 0; i < width_ - 1; i++) 
+	size_t index = 0;
+	for (size_t i = 0; i < width_ - 1; i++)
 	{
-		for (j = 0; j < height_ - 1; j++) 
+		for (size_t j = 0; j < height_ - 1; j++)
 		{
-			v1 = j * width_ + i;
-			v2 = v1 + 1;
-			v3 = v1 + width_ + 1;
-			v4 = v1 + width_;
+			size_t v1 = j * width_ + i;
+			size_t v2 = v1 + 1;
+			size_t v3 = v1 + width_ + 1;
+			size_t v4 = v1 + width_;
 			indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
 			indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
 			indexes_[index++] = safe_static_cast<int32_t, size_t>(v2);
@@ -705,15 +703,13 @@ void XMapPatch::SampleSinglePatchPoint(const xVert ctrl[3][3], float u, float v,
 void XMapPatch::SampleSinglePatch(const xVert ctrl[3][3], size_t baseCol, size_t baseRow,
 	size_t width_, size_t horzSub, size_t vertSub, xVert* outVerts) const
 {
-	size_t	i, j;
-	float	u, v;
-
 	horzSub++;
 	vertSub++;
-	for (i = 0; i < horzSub; i++) {
-		for (j = 0; j < vertSub; j++) {
-			u = static_cast<float>(i) / (horzSub - 1);
-			v = static_cast<float>(j) / (vertSub - 1);
+
+	for (size_t i = 0; i < horzSub; i++) {
+		for (size_t j = 0; j < vertSub; j++) {
+			float u = static_cast<float>(i) / (horzSub - 1);
+			float v = static_cast<float>(j) / (vertSub - 1);
 			SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width_) + i + baseCol]);
 		}
 	}
