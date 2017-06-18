@@ -67,7 +67,7 @@ public:
 
 	bool ParseMatInfo(core::XLexer& src);
 
-protected:
+private:
 	MaterialInfo	material_;
 	MaterialInfo	lightMap_;
 	Planef			plane_;
