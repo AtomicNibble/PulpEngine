@@ -388,6 +388,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		// load the material.
 		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->material.name.c_str());
 		if (!side.matInfo.pMaterial->isLoaded()) {
+			X_ERROR("Brush", "Failed to load material for brush side \"%S\"", pMapBrushSide->material.name.c_str());
 			return false;
 		}
 	}
