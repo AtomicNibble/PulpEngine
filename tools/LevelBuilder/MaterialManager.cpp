@@ -71,6 +71,7 @@ engine::Material* MatManager::getDefaultMaterial(void) const
 engine::Material* MatManager::loadMaterial(const char* pMtlName)
 {
 	X_ASSERT_NOT_NULL(pMtlName);
+	X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
 	core::string name(pMtlName);
 
@@ -79,16 +80,6 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 	{
 		name = it->second;
 	}
-
-#if X_DEBUG
-	const char* pExt;
-	if ((pExt = core::strUtil::FileExtension(name.begin(), name.end())))
-	{
-		// engine should not make requests for materials with a extension
-		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s", pExt);
-		return nullptr;
-	}
-#endif // X_DEBUG
 
 	// try find it.
 	MaterialResource* pMatRes = findMaterial_Internal(name);
@@ -99,19 +90,14 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 
 	// create a new material.
 	pMatRes = createMaterial_Internal(name);
-
-	// now we need to load it.
 	if (loadMatFromFile(*pMatRes, name)) {
 		return pMatRes;
 	}
 
 	X_ERROR("MatMan", "Failed to load material: %s", pMtlName);
 
-	// we want to give back the real instacne and not the default instance
-	// so that when we hot reload stuff tha'ts default can get updated to real.
 	pMatRes->assignProps(*pDefaultMtl_);
-
-	return pMatRes->instance();
+	return pMatRes;
 }
 
 void MatManager::releaseMaterial(engine::Material* pMat)
@@ -128,19 +114,17 @@ void MatManager::releaseMaterial(engine::Material* pMat)
 
 bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name)
 {
-	core::XFileScoped file;
 	core::Path<char> path;
 	path = "materials/";
 	path.setFileName(name);
 	path.setExtension(engine::MTL_B_FILE_EXTENSION);
 
+	core::XFileScoped file;
 	if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
 		return false;
 	}
 
 	engine::MaterialHeader hdr;
-
-
 	if (file.readObj(hdr) != sizeof(hdr)) {
 		return false;
 	}
@@ -149,15 +133,7 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 		return false;
 	}
 
-	if (hdr.numSamplers > engine::MTL_MAX_SAMPLERS) {
-		return false;
-	}
-
-	// i might move this into material lib dunno yet.
-	// not sure how simular this and runtime material loader will be.
-	// still ironing out the format.
 	mat.assignProps(hdr);
-
 	mat.setStatus(core::LoadStatus::Complete);
 	return true;
 }
