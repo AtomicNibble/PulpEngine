@@ -18,6 +18,7 @@ PhysXVars::PhysXVars() :
 	pVarPvdIp_(nullptr)
 {
 	scratchBufferDefaultSize_ = 16; // 16 KiB
+	trackAllocations_ = 0;
 	stepperType_ = StepperType::FIXED_STEPPER;
 
 	debugDraw_ = 0;
