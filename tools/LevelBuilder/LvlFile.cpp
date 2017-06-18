@@ -421,8 +421,14 @@ bool LvlBuilder::save(const char* name)
 			// each area can have multiple 
 			for (size_t i = 0; i < areas_.size(); i++)
 			{
-				const LvlArea& area = areas_[i];
-				const AreaCollsiion& col = area.collision;
+				LvlArea& area = areas_[i];
+				AreaCollsiion& col = area.collision;
+
+				if (!col.cook(pPhysCooking_))
+				{
+					return false;
+				}
+
 
 				AreaCollisionHdr colHdr;
 				colHdr.numGroups = safe_static_cast<uint8_t>(col.numGroups());
@@ -459,6 +465,8 @@ bool LvlBuilder::save(const char* name)
 						file.writeObj(dataHdr);
 						file.write(cooked.data(), cooked.size());
 					}
+
+
 				}
 
 			}
