@@ -243,35 +243,33 @@ void LvlArea::AreaBegin(void)
 
 void LvlArea::AreaEnd(void)
 {
-	AreaMeshMap::const_iterator it = areaMeshes.begin();
-	for (; it != areaMeshes.end(); ++it)
+	for (const auto& it : areaMeshes)
 	{
-		const AreaSubMesh& aSub = it->second;
+		const auto& subMesh = it.second;
 
 		model::SubMeshHeader mesh;
 		mesh.boundingBox.clear();
 
-		core::Array<level::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
-		for (; vertIt != aSub.verts_.end(); ++vertIt) {
-			mesh.boundingBox.add(vertIt->pos);
+		for (const auto& vert : subMesh.verts_) {
+			mesh.boundingBox.add(vert.pos);
 		}
 
 		mesh.boundingSphere = Sphere(mesh.boundingBox);
-		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.faces_.size() * 3);
-		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
+		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(subMesh.faces_.size() * 3);
+		mesh.numVerts = safe_static_cast<uint16_t, size_t>(subMesh.verts_.size());
 		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.faces.size()  * 3);
 		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
 		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
 
-		mesh.materialName = aSub.matNameID_;
+		mesh.materialName = subMesh.matNameID_;
 		
 		X_LOG1("SubMesh", "Mat: ^3%s^7 verts: %i indexs: %i", 
-			aSub.matName_.c_str(), mesh.numVerts, mesh.numIndexes);
+			subMesh.matName_.c_str(), mesh.numVerts, mesh.numIndexes);
 
 		// faces
-		model.faces.append(aSub.faces_);
+		model.faces.append(subMesh.faces_);
 		// add verts
-		model.verts.append(aSub.verts_);
+		model.verts.append(subMesh.verts_);
 		// add the mesh
 		model.meshes.append(mesh);
 	}
@@ -289,7 +287,7 @@ void LvlArea::AreaEnd(void)
 
 AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& stringTable)
 {
-	AreaMeshMap::iterator it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
+	auto it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
 	if (it != areaMeshes.end()) {
 		return &it->second;
 	}
@@ -300,7 +298,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 	newMesh.matNameID_ = stringTable.addStringUnqiue(side.matInfo.name.c_str());
 	newMesh.matName_ = side.matInfo.name;
 
-	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
+	auto newIt = areaMeshes.insert(
 		AreaMeshMap::value_type(core::string(side.matInfo.name.c_str()), newMesh)
 	);
 
@@ -309,7 +307,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 
 AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& stringTable)
 {
-	AreaMeshMap::iterator it = areaMeshes.find(matName);
+	auto it = areaMeshes.find(matName);
 	if (it != areaMeshes.end()) {
 		return &it->second;
 	}
@@ -318,9 +316,9 @@ AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& s
 
 	// add mat name to string table.
 	newMesh.matNameID_ = stringTable.addStringUnqiue(matName);
-	newMesh.matName_ = core::StackString<level::MAP_MAX_MATERIAL_LEN>(matName.c_str());
+	newMesh.matName_ = MaterialName(matName.c_str());
 
-	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
+	auto newIt = areaMeshes.insert(
 		AreaMeshMap::value_type(matName, newMesh)
 	);
 

@@ -274,13 +274,11 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 
 bool LvlBrush::calculateContents(void)
 {
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> MatName;
-
 	if (sides.isEmpty()) {
 		return false;
 	}
 
-	MatName = sides[0].matInfo.name;
+	MaterialName matName = sides[0].matInfo.name;
 
 	// a brush is only opaque if all sides are opaque
 	opaque = true;
@@ -308,7 +306,7 @@ bool LvlBrush::calculateContents(void)
 			opaque = false;
 		}
 
-		if (MatName != side.matInfo.name) {
+		if (matName != side.matInfo.name) {
 			allsidesSameMat = false;
 		}
 	}

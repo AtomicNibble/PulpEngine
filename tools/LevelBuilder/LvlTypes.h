@@ -39,11 +39,11 @@ struct LvlMaterial
 	const engine::MaterialFlags getFlags(void) const;
 
 public:
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
-	Vec2f				  matRepeate;
-	Vec2f				  shift;
-	float				  rotate;
-	engine::Material*	  pMaterial;
+	MaterialName		name;
+	Vec2f				matRepeate;
+	Vec2f				shift;
+	float				rotate;
+	engine::Material*	pMaterial;
 };
 
 struct LvlBrushSide
@@ -62,12 +62,15 @@ struct LvlBrushSide
 
 	LvlMaterial matInfo;
 
-	XWinding*		pWinding;		// only clipped to the other sides of the brush
-	XWinding*       pVisibleHull;   // convex hull of all visible fragments 
+	XWinding*  pWinding;		// only clipped to the other sides of the brush
+	XWinding*  pVisibleHull;   // convex hull of all visible fragments 
 };
 
 struct LvlBrush
 {
+	typedef core::Array<LvlBrushSide> SidesArr;
+
+public:
 	LvlBrush();
 	LvlBrush(const LvlBrush& oth);
 
@@ -85,8 +88,6 @@ struct LvlBrush
 	void Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& pFront, LvlBrush*& pBack);
 
 public:
-	typedef core::Array<LvlBrushSide> SidesArr;
-
 	struct LvlBrush* pOriginal;
 
 	AABB bounds;
@@ -107,13 +108,11 @@ public:
 };
 
 
-
 struct LvlTris
 {
 	LvlTris();
 
-	engine::Material*	  pMaterial;
-
+	engine::Material* pMaterial;
 	LvlVert verts[3];
 };
 
@@ -131,6 +130,7 @@ struct LvlEntity
 	typedef core::Array<LvlBrush> LvlBrushArr;
 	typedef core::Array<LvlTris> TrisArr;
 	typedef core::Array<LvlInterPortal> LvlInterPortalArr;
+
 public:
 	LvlEntity();
 	~LvlEntity();
@@ -174,7 +174,6 @@ public:
 	size_t numAreas;
 
 	level::ClassType::Enum classType;
-
 	mapfile::XMapEntity* pMapEntity;		// points to the map data this was made from.
 };
 
@@ -267,7 +266,8 @@ struct AreaSubMesh
 		faces_.append(face);
 	}
 
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName_;
+public:
+	MaterialName matName_;
 	uint32_t matNameID_;
 
 	// index's for this sub mesh.
