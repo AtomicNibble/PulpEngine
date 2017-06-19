@@ -9,13 +9,13 @@
 class XPlaneSet : public core::Array<Planef>
 {
 public:
-	XPlaneSet();
+	XPlaneSet(core::MemoryArenaBase* arena);
 
-	int FindPlane(const Planef& plane, const float normalEps, const float distEps);
+	int32_t FindPlane(const Planef& plane, const float normalEps, const float distEps);
 
 private:
 
-	core::XHashIndex hash;
+	core::XHashIndex hash_;
 };
 
 

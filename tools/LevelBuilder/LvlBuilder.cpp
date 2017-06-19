@@ -193,7 +193,8 @@ LvlBuilder::LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArena
 	stringTable_(arena),
 	pMap_(nullptr),
 	pPhysCooking_(pPhysCooking),
-	matMan_(arena)
+	matMan_(arena),
+	planes_(arena)
 {
 	core::zero_object(stats_);
 
