@@ -36,7 +36,7 @@ namespace
 		core::Max(X_ALIGN_OF(XMapBrushSide),
 		X_ALIGN_OF(XMapPatch))));
 
-}
+} // namespace
 
 bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 {
@@ -108,13 +108,13 @@ bool XMapPatch::Parse(core::XLexer& src, const Vec3f &origin)
 	Vec2f lightMapUv;
 
 	// we now how x groups each with y entryies.
-	for (int x = 0; x < width; x++)
+	for (int32_t x = 0; x < width; x++)
 	{
 		if (!src.ExpectTokenString("(")) {
 			return false;
 		}
 
-		for (int y = 0; y < height; y++)
+		for (int32_t y = 0; y < height; y++)
 		{
 			LvlVert& vert = verts_[(y * width) + x];
 
@@ -624,8 +624,8 @@ void XMapFile::ListLayers(void) const
 
 void XMapFile::PrimtPrimMemInfo(void) const
 {
-#if MAP_LOADER_USE_POOL && X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	core::MemoryAllocatorStatistics stats = primPoolAllocator_.getStatistics();
+#if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+	core::MemoryAllocatorStatistics stats = pool_.allocator_.getStatistics();
 	X_LOG0("Map", "Listing map loader primative allocator stats");
 	X_LOG_BULLET;
 
@@ -671,7 +671,7 @@ void XMapFile::PrimtPrimMemInfo(void) const
 	X_LOG0("Map", "internalOverhead: ^6%i", stats.internalOverhead_);
 	X_LOG0("Map", "internalOverheadMax: ^6%i", stats.internalOverheadMax_);
 #endif 
-#endif // !MAP_LOADER_USE_POOL && X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+#endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
 
