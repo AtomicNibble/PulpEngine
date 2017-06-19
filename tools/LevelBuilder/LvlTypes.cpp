@@ -37,8 +37,16 @@ LvlBrushSide::~LvlBrushSide()
 	}
 }
 
-LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) : matInfo(oth.matInfo)
+LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) : 
+	matInfo(oth.matInfo)
 {
+	if (pWinding) {
+		X_DELETE(pWinding, g_arena);
+	}
+	if (pVisibleHull) {
+		X_DELETE(pVisibleHull, g_arena);
+	}
+
 	planenum = oth.planenum;
 
 	visible = oth.visible;

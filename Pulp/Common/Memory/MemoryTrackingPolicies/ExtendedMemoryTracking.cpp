@@ -53,13 +53,13 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 		while (true)
 		X_ENABLE_WARNING(4127)
 		{
-			if( it == end )
+			if (it == end) {
 				break;
+			}
 
 			const AllocationData& info = it->second; // m_value;
 
 			X_ERROR( "ExMemTracking", "Unfreed allocation %d at address 0x%08p:", Num, it->first );
-
 			{
 				X_LOG_BULLET;
 

@@ -494,7 +494,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	// each ent is then added to the entRefts set.
 	// we then need to work out the ones that touch multiple area's
 	core::Array<int32_t> areaList(g_arena);
-	areaList.resize(this->areas_.size());
+	areaList.resize(areas_.size());
 
 	for (size_t i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
 	{

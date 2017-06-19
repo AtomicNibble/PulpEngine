@@ -19,7 +19,6 @@ X_NAMESPACE_DECLARE(lvl,
 
 class LvlBuilder
 {
-	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
 	typedef core::Array<level::FileStaticModel> StaticModelsArr;
 	typedef std::array<core::Array<level::MultiAreaEntRef>, 
 		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;
