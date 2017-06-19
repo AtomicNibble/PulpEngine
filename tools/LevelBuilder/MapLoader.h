@@ -22,8 +22,15 @@ typedef core::MemoryArena<
 	core::GrowingPoolAllocator,
 	core::SingleThreadPolicy,
 	core::NoBoundsChecking,
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleMemoryTracking,
-//	core::NoMemoryTracking,
+	//	core::NoMemoryTracking,
+#else
+	core::NoMemoryTracking,
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+
+
 	core::NoMemoryTagging>
 PrimativePoolArena;
 
