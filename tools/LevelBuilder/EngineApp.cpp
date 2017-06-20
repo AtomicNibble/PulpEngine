@@ -26,7 +26,8 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, 
+	core::MemoryArenaBase* arena, core::Console& Console)
 {
 	SCoreInitParams params;
 	params.hInstance = hInstance;
@@ -35,7 +36,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 	params.bConsoleLog = true;
 	params.bCoreOnly = true;
 	params.pConsoleWnd = &Console;
-	params.pCoreArena = g_arena;
+	params.pCoreArena = arena;
 	params.bEnableBasicConsole = true;
 //	params.bFileSysWorkingDir = true;
 

@@ -475,6 +475,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BSPTypes.h" />
+    <ClInclude Include="Compiler.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
     <ClInclude Include="LvlTypes.h" />
@@ -494,6 +495,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Compiler.cpp" />
     <ClCompile Include="LvlArea.cpp" />
     <ClCompile Include="BSPFace.cpp" />
     <ClCompile Include="LvlFile.cpp" />
