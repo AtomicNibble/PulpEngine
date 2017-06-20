@@ -23,6 +23,7 @@ core::MemoryArenaBase* g_arena = nullptr;
 core::MemoryArenaBase* g_bspFaceArena = nullptr;
 core::MemoryArenaBase* g_bspNodeArena = nullptr;
 
+core::MemoryArenaBase* g_windingArena = nullptr;
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -203,6 +204,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		// set the pointers.
 		g_bspFaceArena = &bspFaceArena;
 		g_bspNodeArena = &bspNodeArena;
+		g_windingArena = &arena;
 
 
 		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Level Compiler");
@@ -252,6 +254,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_arena = nullptr;
 	g_bspFaceArena = nullptr;
 	g_bspNodeArena = nullptr;
+	g_windingArena = nullptr;
 
 	return res;
 }
