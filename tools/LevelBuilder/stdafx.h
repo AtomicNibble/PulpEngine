@@ -42,10 +42,11 @@ X_USING_NAMESPACE;
 
 typedef core::StackString<level::MAP_MAX_MATERIAL_LEN> MaterialName;
 
-#include "Globals.h"
+#include "Util/Config.h"
+#include "Util/Util.h"
+#include "Util/PlaneSet.h"
 #include "Settings.h"
-#include "Util\PlaneSet.h"
-#include "VertexFmt.h"
+#include "LvlVert.h"
 
 
 extern core::MemoryArenaBase* g_arena;

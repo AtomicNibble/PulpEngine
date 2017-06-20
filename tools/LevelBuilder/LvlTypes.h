@@ -104,7 +104,6 @@ public:
 	SidesArr sides;
 };
 
-
 struct LvlTris
 {
 	LvlTris();

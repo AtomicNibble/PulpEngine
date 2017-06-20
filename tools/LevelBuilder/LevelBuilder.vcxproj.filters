@@ -72,9 +72,6 @@
     <ClInclude Include="LvlTypes.h">
       <Filter>Header Files\Lvl</Filter>
     </ClInclude>
-    <ClInclude Include="Globals.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MaterialManager.h">
       <Filter>Header Files\Material</Filter>
     </ClInclude>
@@ -96,9 +93,6 @@
     <ClInclude Include="mapFile\MapFile.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="VertexFmt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -107,6 +101,15 @@
     </ClInclude>
     <ClInclude Include="util\KvPMap.h">
       <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Util.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlVert.h">
+      <Filter>Header Files\Lvl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -14,8 +14,6 @@ public:
 	bool getModelAABB(const core::string& name, AABB& bounds);
 	bool loadDefaultModel(void);
 
-private:
-
 
 private:
 	core::MemoryArenaBase* arena_;

@@ -554,10 +554,12 @@ int32_t bspNode::NumChildNodes_r(bspNode* pNode)
 
 	int32_t num = 1;
 
-	if (pNode->children[0])
+	if (pNode->children[0]) {
 		num += NumChildNodes_r(pNode->children[0]);
-	if (pNode->children[1])
+	}
+	if (pNode->children[1]) {
 		num += NumChildNodes_r(pNode->children[1]);
+	}
 
 	return num;
 }

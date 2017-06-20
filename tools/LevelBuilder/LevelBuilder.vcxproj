@@ -477,7 +477,6 @@
     <ClInclude Include="BSPTypes.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
-    <ClInclude Include="Globals.h" />
     <ClInclude Include="LvlTypes.h" />
     <ClInclude Include="mapFile\MapFile.h" />
     <ClInclude Include="mapFile\MapTypes.h" />
@@ -485,9 +484,11 @@
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
+    <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\PlaneSet.h" />
     <ClInclude Include="util\KvPMap.h" />
-    <ClInclude Include="VertexFmt.h" />
+    <ClInclude Include="Util\Util.h" />
+    <ClInclude Include="LvlVert.h" />
     <ClInclude Include="LvlBuilder.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />

@@ -104,7 +104,7 @@ class XMapPatch : public XMapPrimitive
 		int32_t	tris[2];	// edge triangles
 	};
 
-	typedef core::Array<LvlVert>			VertArr;
+	typedef core::Array<LvlVert>		VertArr;
 	typedef core::Array<int>			IntArr;	
 	typedef core::Array<SurfaceEdge>	SurfaceEdgeArr;	
 
