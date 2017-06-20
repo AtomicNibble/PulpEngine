@@ -26,7 +26,7 @@
 
 #include <Util\UniquePointer.h>
 
-#include "Util\StringPair.h"
+#include "Util\KvpMap.h"
 
 
 #include <Ilevel.h>

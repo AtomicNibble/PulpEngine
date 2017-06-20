@@ -486,7 +486,7 @@
     <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Util\PlaneSet.h" />
-    <ClInclude Include="Util\StringPair.h" />
+    <ClInclude Include="util\KvPMap.h" />
     <ClInclude Include="VertexFmt.h" />
     <ClInclude Include="LvlBuilder.h" />
     <ClInclude Include="Resource.h" />
@@ -527,6 +527,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\KvPMap.cpp" />
     <ClCompile Include="Util\PlaneSet.cpp" />
   </ItemGroup>
   <ItemGroup>
