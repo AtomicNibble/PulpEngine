@@ -69,9 +69,6 @@
     <ClInclude Include="BSPTypes.h">
       <Filter>Header Files\BSP</Filter>
     </ClInclude>
-    <ClInclude Include="MapTypes.h">
-      <Filter>Header Files\LvlFmts\MapFile</Filter>
-    </ClInclude>
     <ClInclude Include="PlaneSet.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -102,13 +99,13 @@
     <ClInclude Include="ModelCache.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
-    <ClInclude Include="MapFile.h">
+    <ClInclude Include="mapFile\Util.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="MapFile.inl">
+    <ClInclude Include="mapFile\MapTypes.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
-    <ClInclude Include="Util.h">
+    <ClInclude Include="mapFile\MapFile.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
   </ItemGroup>
@@ -121,9 +118,6 @@
     </ClCompile>
     <ClCompile Include="EngineApp.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MapTypes.cpp">
-      <Filter>Source Files\LvlFmts\MapFile</Filter>
     </ClCompile>
     <ClCompile Include="BSPTypes.cpp">
       <Filter>Source Files\BSP</Filter>
@@ -173,10 +167,13 @@
     <ClCompile Include="ModelCache.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="MapFile.cpp">
+    <ClCompile Include="mapFile\MapFile.cpp">
       <Filter>Source Files\LvlFmts\MapFile</Filter>
     </ClCompile>
-    <ClCompile Include="Util.cpp">
+    <ClCompile Include="mapFile\MapTypes.cpp">
+      <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="mapFile\Util.cpp">
       <Filter>Source Files\LvlFmts\MapFile</Filter>
     </ClCompile>
   </ItemGroup>
@@ -191,7 +188,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="MapTypes.inl">
+    <None Include="mapFile\MapTypes.inl">
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
+    </None>
+    <None Include="mapFile\MapFile.inl">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </None>
   </ItemGroup>

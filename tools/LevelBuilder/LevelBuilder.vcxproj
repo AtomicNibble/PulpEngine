@@ -478,16 +478,15 @@
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
     <ClInclude Include="Globals.h" />
-    <ClInclude Include="MapFile.inl" />
     <ClInclude Include="LvlTypes.h" />
+    <ClInclude Include="mapFile\MapFile.h" />
+    <ClInclude Include="mapFile\MapTypes.h" />
+    <ClInclude Include="mapFile\Util.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
-    <ClInclude Include="Util.h" />
     <ClInclude Include="VertexFmt.h" />
-    <ClInclude Include="MapFile.h" />
-    <ClInclude Include="MapTypes.h" />
     <ClInclude Include="PlaneSet.h" />
     <ClInclude Include="LvlBuilder.h" />
     <ClInclude Include="Resource.h" />
@@ -507,9 +506,10 @@
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="LvlBuilder.cpp" />
     <ClCompile Include="LvlTypes.cpp" />
-    <ClCompile Include="MapFile.cpp" />
-    <ClCompile Include="MapTypes.cpp" />
     <ClCompile Include="LevelBuilder.cpp" />
+    <ClCompile Include="mapFile\MapFile.cpp" />
+    <ClCompile Include="mapFile\MapTypes.cpp" />
+    <ClCompile Include="mapFile\Util.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="ModelCache.cpp" />
     <ClCompile Include="PlaneSet.cpp" />
@@ -528,7 +528,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc" />
@@ -537,7 +536,8 @@
     <Image Include="LevelBuilder.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MapTypes.inl" />
+    <None Include="mapFile\MapFile.inl" />
+    <None Include="mapFile\MapTypes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
