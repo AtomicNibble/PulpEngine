@@ -52,8 +52,6 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
 	visible = oth.visible;
 	culled = oth.culled;
 
-//	matInfo = oth.matInfo;
-
 	// null them first.
 	pWinding = nullptr;
 	pVisibleHull = nullptr;
