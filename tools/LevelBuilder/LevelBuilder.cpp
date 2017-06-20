@@ -7,7 +7,7 @@
 #include <ITimer.h>
 #include <IConsole.h>
 
-#include "MapFile.h"
+#include "mapFile\MapFile.h"
 #include "BSPTypes.h"
 
 #define _LAUNCHER

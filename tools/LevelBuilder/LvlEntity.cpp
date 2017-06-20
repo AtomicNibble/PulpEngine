@@ -4,8 +4,8 @@
 
 #include "FaceTreeBuilder.h"
 
-#include "MapTypes.h"
-#include "MapFile.h"
+#include "mapFile/MapTypes.h"
+#include "mapFile/MapFile.h"
 
 // ===================
 

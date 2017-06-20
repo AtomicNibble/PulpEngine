@@ -26,7 +26,7 @@
 
 #include <Util\UniquePointer.h>
 
-#include "StringPair.h"
+#include "Util\StringPair.h"
 
 
 #include <Ilevel.h>
@@ -44,7 +44,7 @@ typedef core::StackString<level::MAP_MAX_MATERIAL_LEN> MaterialName;
 
 #include "Globals.h"
 #include "Settings.h"
-#include "PlaneSet.h"
+#include "Util\PlaneSet.h"
 #include "VertexFmt.h"
 
 

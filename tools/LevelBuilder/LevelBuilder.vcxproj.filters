@@ -69,20 +69,8 @@
     <ClInclude Include="BSPTypes.h">
       <Filter>Header Files\BSP</Filter>
     </ClInclude>
-    <ClInclude Include="PlaneSet.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="StringPair.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="VertexFmt.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="LvlTypes.h">
       <Filter>Header Files\Lvl</Filter>
-    </ClInclude>
-    <ClInclude Include="Settings.h">
-      <Filter>Header Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
       <Filter>Header Files</Filter>
@@ -108,6 +96,18 @@
     <ClInclude Include="mapFile\MapFile.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
+    <ClInclude Include="VertexFmt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\PlaneSet.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\StringPair.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -127,9 +127,6 @@
     </ClCompile>
     <ClCompile Include="LvlBuilder.cpp">
       <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
-    <ClCompile Include="Settings.cpp">
-      <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="LvlProcess.cpp">
       <Filter>Source Files\Lvl</Filter>
@@ -158,9 +155,6 @@
     <ClCompile Include="LvlFile.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
-    <ClCompile Include="PlaneSet.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="LvlArea.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
@@ -175,6 +169,12 @@
     </ClCompile>
     <ClCompile Include="mapFile\Util.cpp">
       <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\PlaneSet.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
