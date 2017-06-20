@@ -509,7 +509,7 @@
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="LvlBuilder.cpp" />
     <ClCompile Include="LvlTypes.cpp" />
-    <ClCompile Include="LevelBuilder.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="mapFile\MapFile.cpp" />
     <ClCompile Include="mapFile\MapTypes.cpp" />
     <ClCompile Include="mapFile\Util.cpp" />
