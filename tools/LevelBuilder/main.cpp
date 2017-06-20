@@ -118,10 +118,10 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 				X_LOG0("Level", "Operation Complete...");
 			}
+
+			lvl::g_arena = nullptr;
 		}
 	}
-
-	lvl::g_arena = nullptr;
 
 	return res;
 }
