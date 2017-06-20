@@ -484,6 +484,7 @@
     <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
+    <ClInclude Include="Util.h" />
     <ClInclude Include="VertexFmt.h" />
     <ClInclude Include="MapFile.h" />
     <ClInclude Include="MapTypes.h" />
@@ -527,6 +528,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc" />
