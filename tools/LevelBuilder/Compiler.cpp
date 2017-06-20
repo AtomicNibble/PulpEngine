@@ -17,58 +17,16 @@ core::MemoryArenaBase* g_bspNodeArena = nullptr;
 core::MemoryArenaBase* g_windingArena = nullptr;
 
 
-namespace
-{
-
-	typedef core::MemoryArena<
-		core::GrowingPoolAllocator,
-		core::SingleThreadPolicy,
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
-		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging
-#else
-		core::NoBoundsChecking,
-		core::NoMemoryTracking,
-		core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-	> PoolArena;
-
-
-} // namespace
-
 Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking) :
 	arena_(arena),
-	pPhysCooking_(pPhysCooking)
+	pPhysCooking_(pPhysCooking),
+	bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8),
+	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8)
 {
 
-
-	// init the pool allocators.
-	core::GrowingPoolAllocator bspFaceAllocator(
-		sizeof(lvl::bspFace)* (1 << 20),
-		core::VirtualMem::GetPageSize() * 16,
-		0,
-		PoolArena::getMemoryRequirement(sizeof(lvl::bspFace)),
-		PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(lvl::bspFace)),
-		PoolArena::getMemoryOffsetRequirement()
-	);
-
-	PoolArena bspFaceArena(&bspFaceAllocator, "bspFaceArena");
-
-	core::GrowingPoolAllocator bspNodeAllocator(
-		sizeof(lvl::bspNode)* (1 << 20),
-		core::VirtualMem::GetPageSize() * 16,
-		0,
-		PoolArena::getMemoryRequirement(sizeof(lvl::bspNode)),
-		PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(lvl::bspNode)),
-		PoolArena::getMemoryOffsetRequirement()
-	);
-
-	PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
-
 	// set the pointers.
-	g_bspFaceArena = &bspFaceArena;
-	g_bspNodeArena = &bspNodeArena;
+	g_bspFaceArena = &bspFaceAllocator_.arena_;
+	g_bspNodeArena = &bspNodeAllocator_.arena_;
 	g_windingArena = arena_;
 }
 

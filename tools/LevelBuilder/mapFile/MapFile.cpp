@@ -425,7 +425,7 @@ namespace mapFile
 			}
 			else
 			{
-				core::StackString512 key, value;
+				core::string key, value;
 
 				// parse a key / value pair
 				key.append(token.begin(), token.end());
@@ -436,13 +436,13 @@ namespace mapFile
 				value.trim();
 				key.trim();
 
-				epairs[core::string(key.c_str())] = value.c_str();
+				epairs.insert({ key, value });
 
-				if (key.isEqual("origin"))
+				if (key == "origin")
 				{
 					sscanf_s(value.c_str(), "%f %f %f", &origin.x, &origin.y, &origin.z);
 				}
-				else if (key.isEqual("classname") && value.isEqual("worldspawn")) {
+				else if (key == "classname" && value == "worldspawn") {
 					worldent = true;
 				}
 			}

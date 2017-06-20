@@ -194,7 +194,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 
 	bspTree& root = bspTree_;
 	root.bounds.clear();
-	root.headnode = X_NEW(bspNode, g_bspFaceArena, "BspNode");
+	root.headnode = X_NEW(bspNode, g_bspNodeArena, "BspNode");
 
 	size_t numFaces = 0;
 

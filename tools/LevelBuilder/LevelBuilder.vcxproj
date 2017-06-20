@@ -486,6 +486,7 @@
     <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Util\Config.h" />
+    <ClInclude Include="Util\GrowingPool.h" />
     <ClInclude Include="Util\PlaneSet.h" />
     <ClInclude Include="util\KvPMap.h" />
     <ClInclude Include="Util\Util.h" />

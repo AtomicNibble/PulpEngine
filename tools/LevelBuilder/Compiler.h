@@ -1,10 +1,26 @@
 #pragma once
 
-X_NAMESPACE_BEGIN(lvl)
 
+#include "Util\GrowingPool.h"
+
+X_NAMESPACE_BEGIN(lvl)
 
 class Compiler
 {
+	typedef core::MemoryArena<
+		core::GrowingPoolAllocator,
+		core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> PoolArena;
+
 public:
 	Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking);
 	~Compiler();
@@ -14,6 +30,9 @@ public:
 private:
 	core::MemoryArenaBase* arena_;
 	physics::IPhysicsCooking* pPhysCooking_;
+
+	GrowingPool<PoolArena> bspFaceAllocator_;
+	GrowingPool<PoolArena> bspNodeAllocator_;
 };
 
 
