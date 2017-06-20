@@ -43,5 +43,5 @@ typedef core::StackString<level::MAP_MAX_MATERIAL_LEN> MaterialName;
 
 extern core::MemoryArenaBase* g_arena;
 // could combine these two, but be quite a bit of waste for faces.
-extern core::MemoryArenaBase* g_bspFaceAllocator;
-extern core::MemoryArenaBase* g_bspNodeAllocator;
+extern core::MemoryArenaBase* g_bspFaceArena;
+extern core::MemoryArenaBase* g_bspNodeArena;

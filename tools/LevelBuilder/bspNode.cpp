@@ -488,7 +488,7 @@ void bspNode::FreeTree_r(void)
 		children[1]->FreeTree_r();
 	}
 
-	X_DELETE(this, g_bspNodeAllocator);
+	X_DELETE(this, g_bspNodeArena);
 }
 
 void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)

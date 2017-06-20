@@ -20,8 +20,8 @@
 #include <Memory\VirtualMem.h>
 
 core::MemoryArenaBase* g_arena = nullptr;
-core::MemoryArenaBase* g_bspFaceAllocator = nullptr;
-core::MemoryArenaBase* g_bspNodeAllocator = nullptr;
+core::MemoryArenaBase* g_bspFaceArena = nullptr;
+core::MemoryArenaBase* g_bspNodeArena = nullptr;
 
 
 typedef core::MemoryArena<
@@ -201,8 +201,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
 
 		// set the pointers.
-		g_bspFaceAllocator = &bspFaceArena;
-		g_bspNodeAllocator = &bspNodeArena;
+		g_bspFaceArena = &bspFaceArena;
+		g_bspNodeArena = &bspNodeArena;
 
 
 		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Level Compiler");
@@ -250,8 +250,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	g_arena = nullptr;
-	g_bspFaceAllocator = nullptr;
-	g_bspNodeAllocator = nullptr;
+	g_bspFaceArena = nullptr;
+	g_bspNodeArena = nullptr;
 
 	return res;
 }
