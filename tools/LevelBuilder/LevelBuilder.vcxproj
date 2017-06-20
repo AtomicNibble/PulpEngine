@@ -478,13 +478,14 @@
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="MapFile.inl" />
     <ClInclude Include="LvlTypes.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
     <ClInclude Include="VertexFmt.h" />
-    <ClInclude Include="MapLoader.h" />
+    <ClInclude Include="MapFile.h" />
     <ClInclude Include="MapTypes.h" />
     <ClInclude Include="PlaneSet.h" />
     <ClInclude Include="LvlBuilder.h" />
@@ -505,7 +506,7 @@
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="LvlBuilder.cpp" />
     <ClCompile Include="LvlTypes.cpp" />
-    <ClCompile Include="MapLoader.cpp" />
+    <ClCompile Include="MapFile.cpp" />
     <ClCompile Include="MapTypes.cpp" />
     <ClCompile Include="LevelBuilder.cpp" />
     <ClCompile Include="MaterialManager.cpp" />

@@ -8,9 +8,7 @@
 #include <IFileSys.h>
 
 #include "MapTypes.h"
-#include "MapLoader.h"
-
-
+#include "MapFile.h"
 
 
 X_NAMESPACE_BEGIN(lvl)
@@ -20,12 +18,6 @@ namespace mapFile
 
 	namespace
 	{
-		// we pool brush and patches.
-		// how many as max?
-		// somthing like 256k.
-		// memory usage gonna be 200 * 250,000 = ~50mb o.o
-		// i'll test with malloc later see what the speed diffrence is, if it's worth it.
-		// or swap it for a growing pool.
 		static const size_t MAX_PRIMATIVES = 1 << 17;
 
 		static const size_t PRIMATIVE_ALLOC_SIZE = core::Max(sizeof(XMapBrush),

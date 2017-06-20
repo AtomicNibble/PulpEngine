@@ -4,13 +4,6 @@
 #define X_MAP_FILE_LOADER_H_
 
 #include "MapTypes.h"
-
-#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
-#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
-#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
-#include <Memory\AllocationPolicies\PoolAllocator.h>
-#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
-#include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 #include <Containers\Array.h>
 
 X_NAMESPACE_BEGIN(lvl)
@@ -18,23 +11,19 @@ X_NAMESPACE_BEGIN(lvl)
 namespace mapFile
 {
 
-// using the pool gives about a 75ms speed up on avg.
-// at the cost of more memory usage.
 
 typedef core::MemoryArena<
 	core::GrowingPoolAllocator,
 	core::SingleThreadPolicy,
 	core::NoBoundsChecking,
-
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleMemoryTracking,
 	//	core::NoMemoryTracking,
 #else
 	core::NoMemoryTracking,
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-
-
-	core::NoMemoryTagging>
+	core::NoMemoryTagging
+>
 PrimativePoolArena;
 
 
@@ -75,10 +64,10 @@ public:
 
 	bool Parse(const char* pData, size_t length);
 
-	X_INLINE size_t getNumEntities(void) const { return entities_.size(); }
-	X_INLINE XMapEntity* getEntity(size_t i) const { return entities_[i]; }
+	X_INLINE size_t getNumEntities(void) const;
+	X_INLINE XMapEntity* getEntity(size_t i) const;
 
-	X_INLINE const PrimTypeNumArr& getPrimCounts(void) const { return primCounts_; }
+	X_INLINE const PrimTypeNumArr& getPrimCounts(void) const;
 
 private:
 	IgnoreList getIgnoreList(void) const;
@@ -101,5 +90,7 @@ private:
 } // namespae mapFile
 
 X_NAMESPACE_END
+
+#include "MapFile.inl"
 
 #endif // X_MAP_FILE_LOADER_H_

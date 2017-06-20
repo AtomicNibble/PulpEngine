@@ -2,7 +2,7 @@
 #include "LvlBuilder.h"
 
 #include "MapTypes.h"
-#include "MapLoader.h"
+#include "MapFile.h"
 #include "ModelCache.h"
 
 X_NAMESPACE_BEGIN(lvl)

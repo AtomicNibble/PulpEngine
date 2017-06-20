@@ -19,14 +19,8 @@
     <Filter Include="Source Files\BSP">
       <UniqueIdentifier>{8372cc90-6ca3-4dc8-9c84-249d54b75926}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\MapFile">
-      <UniqueIdentifier>{1d03dafd-7f52-4023-9abf-2c547d55d9b6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{a77a343c-0d7f-4796-be4d-2a65ae44c311}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\MapFile">
-      <UniqueIdentifier>{adebf7d5-4a0b-4422-84e2-0f1d42c15234}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Lvl">
       <UniqueIdentifier>{abd30faf-34f6-42cc-aef2-4d5a59b50e67}</UniqueIdentifier>
@@ -49,6 +43,18 @@
     <Filter Include="Source Files\Model">
       <UniqueIdentifier>{bab4193c-7c73-4fb1-9aeb-7525dec17f9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\LvlFmts">
+      <UniqueIdentifier>{fd0c72f1-9a93-45b8-9d07-154fedbce9ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\LvlFmts\MapFile">
+      <UniqueIdentifier>{adebf7d5-4a0b-4422-84e2-0f1d42c15234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LvlFmts">
+      <UniqueIdentifier>{e9687486-86fd-427a-b145-84d1a1760bf6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\LvlFmts\MapFile">
+      <UniqueIdentifier>{1d03dafd-7f52-4023-9abf-2c547d55d9b6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -64,16 +70,13 @@
       <Filter>Header Files\BSP</Filter>
     </ClInclude>
     <ClInclude Include="MapTypes.h">
-      <Filter>Header Files\MapFile</Filter>
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
     <ClInclude Include="PlaneSet.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="StringPair.h">
       <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="MapLoader.h">
-      <Filter>Header Files\MapFile</Filter>
     </ClInclude>
     <ClInclude Include="VertexFmt.h">
       <Filter>Header Files\Util</Filter>
@@ -99,6 +102,12 @@
     <ClInclude Include="ModelCache.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="MapFile.h">
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="MapFile.inl">
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -110,11 +119,8 @@
     <ClCompile Include="EngineApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MapLoader.cpp">
-      <Filter>Source Files\MapFile</Filter>
-    </ClCompile>
     <ClCompile Include="MapTypes.cpp">
-      <Filter>Source Files\MapFile</Filter>
+      <Filter>Source Files\LvlFmts\MapFile</Filter>
     </ClCompile>
     <ClCompile Include="BSPTypes.cpp">
       <Filter>Source Files\BSP</Filter>
@@ -164,6 +170,9 @@
     <ClCompile Include="ModelCache.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="MapFile.cpp">
+      <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc">
@@ -177,7 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="MapTypes.inl">
-      <Filter>Header Files\MapFile</Filter>
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
     </None>
   </ItemGroup>
 </Project>

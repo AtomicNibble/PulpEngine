@@ -8,6 +8,13 @@
 #include <tchar.h>
 
 
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
+#include <Memory\AllocationPolicies\MallocFreeAllocator.h>
+
 #include <String\Lexer.h>
 #include <String\StrRef.h>
 
