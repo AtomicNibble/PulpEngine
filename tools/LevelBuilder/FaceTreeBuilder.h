@@ -1,9 +1,8 @@
 #pragma once
 
-#ifndef X_FACE_TREE_BUILDER_H_
-#define X_FACE_TREE_BUILDER_H_
-
 #include "PlaneSet.h"
+
+X_NAMESPACE_BEGIN(lvl)
 
 struct bspNode;
 struct bspFace;
@@ -28,5 +27,6 @@ private:
 	size_t numLeafs_;
 };
 
+X_NAMESPACE_END
 
-#endif // !X_FACE_TREE_BUILDER_H_
+

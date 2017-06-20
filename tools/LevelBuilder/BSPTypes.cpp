@@ -2,6 +2,8 @@
 #include "BSPTypes.h"
 
 
+X_NAMESPACE_BEGIN(lvl)
+
 FillStats::FillStats()
 {
 	core::zero_this(this);
@@ -125,3 +127,7 @@ void bspTree::Print(const XPlaneSet& planes) const
 		headnode->TreePrint_r(planes, depth);
 	}
 }
+
+
+
+X_NAMESPACE_END

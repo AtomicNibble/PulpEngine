@@ -4,20 +4,17 @@
 #ifndef X_LVL_TYPES_H_
 #define X_LVL_TYPES_H_
 
-
-
 #include <String\GrowingStringTable.h>
-
 #include "BSPTypes.h"
 
+X_NAMESPACE_BEGIN(lvl)
 
-
-X_NAMESPACE_DECLARE(mapfile,
-class XMapFile;
-class XMapEntity;
-class XMapBrush;
-class XMapPatch;
-);
+namespace mapFile {
+	class XMapFile;
+	class XMapEntity;
+	class XMapBrush;
+	class XMapPatch;
+}
 
 struct BrushPlaneSide
 {
@@ -143,7 +140,7 @@ public:
 	bool FacesToBSP(XPlaneSet& planeSet);
 	bool MakeTreePortals(XPlaneSet& planeSet);
 	bool FilterBrushesIntoTree(XPlaneSet& planeSet);
-	bool FloodEntities(XPlaneSet& planeSet, core::Array<LvlEntity>& ents, mapfile::XMapFile* pMap);
+	bool FloodEntities(XPlaneSet& planeSet, core::Array<LvlEntity>& ents, mapFile::XMapFile* pMap);
 	bool FillOutside(void);
 	bool ClipSidesByTree(XPlaneSet& planeSet);
 	bool FloodAreas(void);
@@ -174,7 +171,7 @@ public:
 	size_t numAreas;
 
 	level::ClassType::Enum classType;
-	mapfile::XMapEntity* pMapEntity;		// points to the map data this was made from.
+	mapFile::XMapEntity* pMapEntity;		// points to the map data this was made from.
 };
 
 
@@ -320,6 +317,6 @@ struct LvlStats
 	int32_t	numFaceLeafs;
 };
 
-
+X_NAMESPACE_END
 
 #endif // !X_LVL_TYPES_H_

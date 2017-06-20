@@ -6,12 +6,18 @@
 
 #include <Containers\LinkedListIntrusive.h>
 
-X_NAMESPACE_DECLARE(mapfile,
-class XMapFile;
-class XMapEntity;
-class XMapBrush;
-class XMapPatch;
-);
+// X_NAMESPACE_DECLARE(mapFile,
+// 	class XMapFile;
+// 	class XMapEntity;
+// 	class XMapBrush;
+// 	class XMapPatch;
+// );
+
+X_NAMESPACE_BEGIN(lvl)
+
+
+X_DECLARE_ENUM(DrawSurfaceType)(FACE, DECAL, PATCH);
+
 
 struct LvlBrush;
 struct LvlBrushSide;
@@ -176,14 +182,7 @@ public:
 };
 
 
-
-X_DECLARE_ENUM(DrawSurfaceType)(FACE,DECAL,PATCH);
-
-
-
-
-
-
+X_NAMESPACE_END
 
 
 #endif // X_BSP_TYPES_H_

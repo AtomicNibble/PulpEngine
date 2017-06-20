@@ -2,6 +2,7 @@
 #include "LvlTypes.h"
 
 
+X_NAMESPACE_BEGIN(lvl)
 
 AreaCollsiion::TriMeshData::TriMeshData(core::MemoryArenaBase* arena) :
 	verts(arena),
@@ -324,3 +325,6 @@ AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& s
 
 	return &newIt.first->second;
 }
+
+
+X_NAMESPACE_END

@@ -7,15 +7,22 @@ X_NAMESPACE_DECLARE(physics,
 	struct IPhysicsCooking;
 );
 
-X_NAMESPACE_DECLARE(lvl,
-	class ModelCache;
-);
 
 #include "MaterialManager.h"
 #include "LvlTypes.h"
 
 #include <array>
 
+X_NAMESPACE_BEGIN(lvl)
+
+namespace mapFile {
+	class XMapFile;
+	class XMapEntity;
+	class XMapBrush;
+	class XMapPatch;
+}
+
+class ModelCache;
 
 class LvlBuilder
 {
@@ -29,7 +36,7 @@ public:
 
 	bool init(void);
 
-	bool LoadFromMap(mapfile::XMapFile* map);
+	bool LoadFromMap(mapFile::XMapFile* map);
 	bool ProcessModels(void);
 
 	bool save(const char* filename);
@@ -37,9 +44,9 @@ public:
 private:
 	int32_t FindFloatPlane(const Planef& plane);
 
-	bool processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt);
-	bool processBrush(LvlEntity& ent, mapfile::XMapBrush* brush, size_t entIdx);
-	bool processPatch(LvlEntity& ent, mapfile::XMapPatch* brush, size_t entIdx);
+	bool processMapEntity(LvlEntity& ent, mapFile::XMapEntity* mapEnt);
+	bool processBrush(LvlEntity& ent, mapFile::XMapBrush* brush, size_t entIdx);
+	bool processPatch(LvlEntity& ent, mapFile::XMapPatch* brush, size_t entIdx);
 
 	bool removeDuplicateBrushPlanes(LvlBrush& pBrush);
 
@@ -83,14 +90,14 @@ private:
 	MultiRefArr multiRefEntLists_;
 	MultiRefArr multiModelRefLists_;
 
-	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
+	StringTableType stringTable_;
 
 	//	BSPData		data_;
 	XPlaneSet	planes_;
 	AABB		mapBounds_;
 	Vec3f		blockSize_;
 	
-	mapfile::XMapFile* pMap_;
+	mapFile::XMapFile* pMap_;
 	physics::IPhysicsCooking* pPhysCooking_;
 	lvl::ModelCache* pModelCache_;
 	lvl::MatManager matMan_;
@@ -98,5 +105,6 @@ private:
 	LvlStats stats_;
 };
 
+X_NAMESPACE_END
 
 #endif // !X_LVL_BUILDER_H_

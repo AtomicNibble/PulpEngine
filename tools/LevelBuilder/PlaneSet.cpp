@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PlaneSet.h"
 
+X_NAMESPACE_BEGIN(lvl)
 
 XPlaneSet::XPlaneSet(core::MemoryArenaBase* arena) : 
 	core::Array<Planef>(g_arena), 
@@ -42,3 +43,5 @@ int XPlaneSet::FindPlane(const Planef& plane, const float normalEps, const float
 	hash_.add(hashKey, static_cast<int32_t>(size()) - 1);
 	return static_cast<int32_t>(size() - 2);
 }
+
+X_NAMESPACE_END

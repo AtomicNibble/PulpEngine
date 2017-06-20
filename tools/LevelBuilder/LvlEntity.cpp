@@ -9,6 +9,7 @@
 
 // ===================
 
+X_NAMESPACE_BEGIN(lvl)
 
 bool LvlEntity::FindInterAreaPortals(void)
 {
@@ -266,7 +267,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 
 
 bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, 
-	mapfile::XMapFile* pMap)
+	mapFile::XMapFile* pMap)
 {
 	X_LOG0("LvlEntity", "^5----- FloodEntities -----");
 
@@ -281,7 +282,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 	// iterate the map ents.
 	for (size_t i = 1; i < pMap->getNumEntities(); i++)
 	{
-		mapfile::XMapEntity* mapEnt = pMap->getEntity(i);
+		mapFile::XMapEntity* mapEnt = pMap->getEntity(i);
 		LvlEntity& lvlEnt = ents[i];
 
 		auto it = mapEnt->epairs.find(X_CONST_STRING("origin"));
@@ -441,3 +442,4 @@ bool LvlEntity::PruneNodes(void)
 	return true;
 }
 
+X_NAMESPACE_END

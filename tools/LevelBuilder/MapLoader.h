@@ -13,7 +13,10 @@
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 #include <Containers\Array.h>
 
-X_NAMESPACE_BEGIN(mapfile)
+X_NAMESPACE_BEGIN(lvl)
+
+namespace mapFile
+{
 
 // using the pool gives about a 75ms speed up on avg.
 // at the cost of more memory usage.
@@ -93,6 +96,9 @@ private:
 	LayerArray layers_;
 	PrimTypeNumArr primCounts_;
 };
+
+
+} // namespae mapFile
 
 X_NAMESPACE_END
 

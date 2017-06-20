@@ -3,9 +3,12 @@
 
 #include "BSPTypes.h"
 
+X_NAMESPACE_BEGIN(lvl)
+
+
 FaceTreeBuilder::FaceTreeBuilder(XPlaneSet& planeset) :
-planeset_(planeset),
-numLeafs_(0)
+	planeset_(planeset),
+	numLeafs_(0)
 {
 
 }
@@ -269,3 +272,5 @@ int32_t FaceTreeBuilder::FindFloatPlane(const Planef& plane)
 {
 	return planeset_.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
 }
+
+X_NAMESPACE_END

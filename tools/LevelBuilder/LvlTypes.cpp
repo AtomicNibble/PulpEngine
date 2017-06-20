@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "LvlTypes.h"
 
+X_NAMESPACE_BEGIN(lvl)
 
 LvlMaterial::LvlMaterial()
 {
@@ -388,3 +389,5 @@ BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 	}
 	return side;
 }
+
+X_NAMESPACE_END

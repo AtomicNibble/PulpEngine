@@ -15,7 +15,11 @@ X_NAMESPACE_DECLARE(core,
 )
 
 
-X_NAMESPACE_BEGIN(mapfile)
+X_NAMESPACE_BEGIN(lvl)
+
+namespace mapFile
+{
+
 
 X_DECLARE_ENUM(PrimType)(BRUSH, PATCH);
 X_DECLARE_FLAGS(LayerFlag)(ACTIVE, EXPANDED, IGNORE);
@@ -229,6 +233,8 @@ struct Layer
 	core::string name;
 	LayerFlags flags;
 };
+
+} // namespace mapFile
 
 X_NAMESPACE_END
 

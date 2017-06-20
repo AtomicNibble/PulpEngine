@@ -7,7 +7,7 @@
 
 #include <Hashing\crc32.h>
 
-X_USING_NAMESPACE;
+X_NAMESPACE_BEGIN(lvl)
 
 using namespace level;
 
@@ -522,8 +522,4 @@ bool LvlBuilder::save(const char* name)
 }
 
 
-
-
-
-
-// X_NAMESPACE_END
+X_NAMESPACE_END

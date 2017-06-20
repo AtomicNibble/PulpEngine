@@ -3,6 +3,7 @@
 #include "LvlTypes.h"
 
 
+X_NAMESPACE_BEGIN(lvl)
 
 void bspNode::MakeTreePortals_r(XPlaneSet& planeSet)
 {
@@ -560,3 +561,6 @@ int32_t bspNode::NumChildNodes_r(bspNode* pNode)
 
 	return num;
 }
+
+
+X_NAMESPACE_END

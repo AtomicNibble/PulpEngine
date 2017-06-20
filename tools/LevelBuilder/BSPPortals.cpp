@@ -13,6 +13,8 @@ namespace
 } // namespace
 
 
+X_NAMESPACE_BEGIN(lvl)
+
 // =============================================================================
 
 void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
@@ -326,3 +328,5 @@ bool bspPortal::PortalPassable(void) const
 
 	return false;
 }
+
+X_NAMESPACE_END

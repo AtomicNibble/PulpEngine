@@ -5,6 +5,8 @@
 #include "MapLoader.h"
 #include "ModelCache.h"
 
+X_NAMESPACE_BEGIN(lvl)
+
 namespace
 {
 	const Vec3f baseaxis[18] =
@@ -224,7 +226,7 @@ bool LvlBuilder::init(void)
 }
 
 
-bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
+bool LvlBuilder::LoadFromMap(mapFile::XMapFile* map)
 {
 	pMap_ = X_ASSERT_NOT_NULL(map);
 
@@ -261,7 +263,7 @@ int32_t LvlBuilder::FindFloatPlane(const Planef& plane)
 	return planes_.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
 }
 
-bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
+bool LvlBuilder::processMapEntity(LvlEntity& ent, mapFile::XMapEntity* mapEnt)
 {
 	// update stats.
 	stats_.numEntities++;
@@ -277,21 +279,21 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	{
 		auto* pPrim = mapEnt->GetPrimitive(i);
 
-		if (pPrim->getType() == mapfile::PrimType::BRUSH)	{
-			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(pPrim), i)) {
+		if (pPrim->getType() == mapFile::PrimType::BRUSH)	{
+			if (!processBrush(ent, static_cast<mapFile::XMapBrush*>(pPrim), i)) {
 				X_ERROR("Lvl", "failed to process brush: %" PRIuS, i);
 				return false;
 			}
 		}
-		else if (pPrim->getType() == mapfile::PrimType::PATCH) {
-			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(pPrim), i)) {
+		else if (pPrim->getType() == mapFile::PrimType::PATCH) {
+			if (!processPatch(ent, static_cast<mapFile::XMapPatch*>(pPrim), i)) {
 				X_ERROR("Lvl", "failed to process patch: %" PRIuS, i);
 				return false;
 			}
 		}
 	}
 
-	mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("origin"));
+	mapFile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("origin"));
 	if (it != mapEnt->epairs.end())
 	{
 		// set the origin.
@@ -367,7 +369,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 }
 
 bool LvlBuilder::processBrush(LvlEntity& ent,
-	mapfile::XMapBrush* mapBrush, size_t entIdx)
+	mapFile::XMapBrush* mapBrush, size_t entIdx)
 {
 	LvlBrush& brush = ent.brushes.AddOne();
 	brush.entityNum = stats_.numEntities;
@@ -458,7 +460,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 
 bool LvlBuilder::processPatch(LvlEntity& ent, 
-	mapfile::XMapPatch* mapPatch, size_t entIdx)
+	mapFile::XMapPatch* mapPatch, size_t entIdx)
 {
 	X_UNUSED(entIdx);
 
@@ -466,7 +468,7 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 		return false;
 	}
 
-	mapfile::XMapPatch& patch = *mapPatch;
+	mapFile::XMapPatch& patch = *mapPatch;
 
 	// meshes not supported yet.
 //	if (mapBrush->isMesh()) {
@@ -556,3 +558,6 @@ bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 	}
 	return true;
 }
+
+
+X_NAMESPACE_END

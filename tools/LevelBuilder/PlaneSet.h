@@ -6,6 +6,8 @@
 
 #include <Containers\HashIndex.h>
 
+X_NAMESPACE_BEGIN(lvl)
+
 class XPlaneSet : public core::Array<Planef>
 {
 public:
@@ -18,5 +20,6 @@ private:
 	core::XHashIndex hash_;
 };
 
+X_NAMESPACE_END
 
 #endif // X_PLANE_SET_H_

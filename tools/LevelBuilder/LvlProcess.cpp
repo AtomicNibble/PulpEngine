@@ -7,6 +7,8 @@
 #include "MapLoader.h"
 #include "ModelCache.h"
 
+X_NAMESPACE_BEGIN(lvl)
+
 namespace
 {
 	// ---------------------------------------------
@@ -509,7 +511,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 	for (size_t i = 0; i < numEnts; i++)
 	{
-		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
+		mapFile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
 		
 		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
@@ -542,9 +544,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
 
 		{
-			mapfile::XMapEntity::PairIt it;
-
-			it = mapEnt->epairs.find(X_CONST_STRING("model"));
+			auto it = mapEnt->epairs.find(X_CONST_STRING("model"));
 			if (it == mapEnt->epairs.end()) 
 			{
 				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
@@ -629,7 +629,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	// everything that is not a misc model.
 	for (size_t i = 0; i < numEnts; i++)
 	{
-		mapfile::XMapEntity* mapEnt = pMap_->getEntity(i);
+		mapFile::XMapEntity* mapEnt = pMap_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
 
 		switch (lvlEnt.classType)
@@ -950,3 +950,4 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 
 
 
+X_NAMESPACE_END

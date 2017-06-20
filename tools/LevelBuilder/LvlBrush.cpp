@@ -2,7 +2,7 @@
 #include "LvlBuilder.h"
 
 
-
+X_NAMESPACE_BEGIN(lvl)
 
 
 void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
@@ -397,3 +397,5 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	front = b[0];
 	back = b[1];
 }
+
+X_NAMESPACE_END

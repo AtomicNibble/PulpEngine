@@ -3,6 +3,8 @@
 #ifndef X_LVL_SETTINGS_H_
 #define X_LVL_SETTINGS_H_
 
+X_NAMESPACE_BEGIN(lvl)
+
 X_DECLARE_ENUM(ShadowOpt)(NONE, MERGE_SURFACES, CULL_OCCLUDED, CLIP_OCCLUDERS, CLIP_SILS, SIL_OPTIMIZE);
 
 struct Settings
@@ -33,6 +35,9 @@ struct Settings
 };
 
 extern Settings gSettings;
+
+X_NAMESPACE_END
+
 
 
 #endif // !X_LVL_SETTINGS_H_

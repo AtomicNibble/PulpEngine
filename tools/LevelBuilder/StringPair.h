@@ -1,14 +1,21 @@
 #pragma once
 
+#include <Containers\HashMap.h>
 
-#include <map>
 
+X_NAMESPACE_BEGIN(lvl)
 
-class KeyPair : public std::map<core::string, core::string>
+class KeyPair : public core::HashMap<core::string, core::string>
 {
+	typedef core::HashMap<core::string, core::string> BaseT;
 public:
 	typedef iterator PairIt;
 	typedef const_iterator PairConstIt;
+
+public:
+	KeyPair(core::MemoryArenaBase* arena) :
+		BaseT(arena, 4)
+	{}
 
 	bool GetString(const char* key, const char* defaultString, const char **out) const {
 		PairConstIt it = find(X_CONST_STRING(key));
@@ -32,14 +39,6 @@ public:
 	}
 
 
-
-	Vec3f GetVector(const char* key, const char* defaultString = NULL) const
-	{
-		Vec3f out;
-		GetVector(key, defaultString, out);
-		return out;
-	}
-
 	bool GetVector(const char* key, const char* defaultString, Vec3f& out) const
 	{
 		bool		found;
@@ -56,3 +55,5 @@ public:
 	}
 
 };
+
+X_NAMESPACE_END

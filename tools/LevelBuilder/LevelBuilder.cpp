@@ -16,6 +16,7 @@
 #include <Time\StopWatch.h>
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
 #include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\VirtualMem.h>
 
@@ -30,7 +31,7 @@ typedef core::MemoryArena<
 	core::SingleThreadPolicy,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
+	core::FullMemoryTracking,
 	core::SimpleMemoryTagging
 #else
 	core::NoBoundsChecking,
@@ -98,8 +99,8 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 
 	if (file.openFile(path.c_str(), mode))
 	{
-		mapfile::XMapFile map(g_arena);
-		LvlBuilder lvl(pPhysCooking, g_arena);
+		lvl::mapFile::XMapFile map(g_arena);
+		lvl::LvlBuilder lvl(pPhysCooking, g_arena);
 
 		if (!lvl.init())
 		{
@@ -116,9 +117,9 @@ bool CompileLevel(core::Path<char>& path, physics::IPhysicsCooking* pPhysCooking
 				X_LOG0("Map", "Loaded: ^6%.4fms", elapsed.GetMilliSeconds());
 				X_LOG0("Map", "Num Entities: ^8%" PRIuS, map.getNumEntities());
 
-				for (uint32_t prim = 0; prim < mapfile::PrimType::ENUM_COUNT; ++prim)
+				for (uint32_t prim = 0; prim < lvl::mapFile::PrimType::ENUM_COUNT; ++prim)
 				{
-					X_LOG0("Map", "Num %s: ^8%" PRIuS, mapfile::PrimType::ToString(prim),
+					X_LOG0("Map", "Num %s: ^8%" PRIuS, lvl::mapFile::PrimType::ToString(prim),
 						map.getPrimCounts()[prim]);
 				}
 			}
@@ -180,22 +181,22 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 		// init the pool allocators.
 		core::GrowingPoolAllocator bspFaceAllocator(
-			sizeof(bspFace)* (1 << 20),
+			sizeof(lvl::bspFace)* (1 << 20),
 			core::VirtualMem::GetPageSize() * 16,
 			0,
-			PoolArena::getMemoryRequirement(sizeof(bspFace)),
-			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(bspFace)),
+			PoolArena::getMemoryRequirement(sizeof(lvl::bspFace)),
+			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(lvl::bspFace)),
 			PoolArena::getMemoryOffsetRequirement()
 		);
 
 		PoolArena bspFaceArena(&bspFaceAllocator, "bspFaceArena");
 
 		core::GrowingPoolAllocator bspNodeAllocator(
-			sizeof(bspNode)* (1 << 20),
+			sizeof(lvl::bspNode)* (1 << 20),
 			core::VirtualMem::GetPageSize() * 16,
 			0,
-			PoolArena::getMemoryRequirement(sizeof(bspNode)),
-			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(bspNode)),
+			PoolArena::getMemoryRequirement(sizeof(lvl::bspNode)),
+			PoolArena::getMemoryAlignmentRequirement(X_ALIGN_OF(lvl::bspNode)),
 			PoolArena::getMemoryOffsetRequirement()
 		);
 
@@ -236,6 +237,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				name.setFileName("boxmap.map");
 				name.setFileName("portal_test.map");
 				name.setFileName("entity_test.map");
+				name.setFileName("physics_test.map");
 				
 				if (CompileLevel(name, engine.GetPhysCooking()))
 				{
