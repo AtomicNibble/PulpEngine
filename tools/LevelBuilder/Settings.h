@@ -5,33 +5,11 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
-X_DECLARE_ENUM(ShadowOpt)(NONE, MERGE_SURFACES, CULL_OCCLUDED, CLIP_OCCLUDERS, CLIP_SILS, SIL_OPTIMIZE);
-
 struct Settings
 {
-	Settings() {
-		noPatches = false;
-		noTJunc = false;
-		nomerge = false;
-		noFlood = false;
-		noOptimize = true;
-
-		noClipSides = false;
-		noLightCarve = false;
-
-		shadowOptLevel = ShadowOpt::NONE;
-	}
+	Settings();
 
 	bool noPatches;
-	bool noTJunc;
-	bool nomerge;
-	bool noFlood;
-	bool noOptimize;
-
-	bool noClipSides;		// don't cut sides by solid leafs, use the entire thing
-	bool noLightCarve;		// extra triangle subdivision by light frustums
-
-	ShadowOpt::Enum	shadowOptLevel;
 };
 
 extern Settings gSettings;

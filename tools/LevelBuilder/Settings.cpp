@@ -3,6 +3,12 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
+Settings::Settings()
+{
+	noPatches = false;
+}
+
+
 Settings gSettings;
 
 X_NAMESPACE_END
