@@ -221,8 +221,9 @@ namespace mapFile
 		}
 #endif
 
-		for (const auto& side : brush.sides)
+		for (size_t i = 0; i < brush.sides.size(); i++)
 		{
+			const LvlBrushSide& side = brush.sides[i];
 			auto* pWinding = side.pWinding;
 
 			if (!pWinding) {
