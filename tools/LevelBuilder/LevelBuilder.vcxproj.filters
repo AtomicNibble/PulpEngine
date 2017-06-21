@@ -78,15 +78,6 @@
     <ClInclude Include="LvlBuilder.h">
       <Filter>Header Files\Lvl</Filter>
     </ClInclude>
-    <ClInclude Include="mapFile\Util.h">
-      <Filter>Header Files\LvlFmts\MapFile</Filter>
-    </ClInclude>
-    <ClInclude Include="mapFile\MapTypes.h">
-      <Filter>Header Files\LvlFmts\MapFile</Filter>
-    </ClInclude>
-    <ClInclude Include="mapFile\MapFile.h">
-      <Filter>Header Files\LvlFmts\MapFile</Filter>
-    </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -116,6 +107,15 @@
     </ClInclude>
     <ClInclude Include="Material\MaterialManager.h">
       <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlFmts\mapFile\MapFile.h">
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlFmts\mapFile\MapTypes.h">
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlFmts\mapFile\Util.h">
+      <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,15 +161,6 @@
     <ClCompile Include="LvlArea.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
-    <ClCompile Include="mapFile\MapFile.cpp">
-      <Filter>Source Files\LvlFmts\MapFile</Filter>
-    </ClCompile>
-    <ClCompile Include="mapFile\MapTypes.cpp">
-      <Filter>Source Files\LvlFmts\MapFile</Filter>
-    </ClCompile>
-    <ClCompile Include="mapFile\Util.cpp">
-      <Filter>Source Files\LvlFmts\MapFile</Filter>
-    </ClCompile>
     <ClCompile Include="Settings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -191,6 +182,15 @@
     <ClCompile Include="Model\ModelCache.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="LvlFmts\mapFile\MapFile.cpp">
+      <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlFmts\mapFile\MapTypes.cpp">
+      <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlFmts\mapFile\Util.cpp">
+      <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc">
@@ -203,10 +203,10 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <None Include="mapFile\MapTypes.inl">
+    <None Include="LvlFmts\mapFile\MapFile.inl">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </None>
-    <None Include="mapFile\MapFile.inl">
+    <None Include="LvlFmts\mapFile\MapTypes.inl">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </None>
   </ItemGroup>

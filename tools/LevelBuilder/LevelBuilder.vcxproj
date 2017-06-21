@@ -478,10 +478,10 @@
     <ClInclude Include="Compiler.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
+    <ClInclude Include="LvlFmts\mapFile\MapFile.h" />
+    <ClInclude Include="LvlFmts\mapFile\MapTypes.h" />
+    <ClInclude Include="LvlFmts\mapFile\Util.h" />
     <ClInclude Include="LvlTypes.h" />
-    <ClInclude Include="mapFile\MapFile.h" />
-    <ClInclude Include="mapFile\MapTypes.h" />
-    <ClInclude Include="mapFile\Util.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Model\ModelCache.h" />
     <ClInclude Include="Settings.h" />
@@ -505,15 +505,15 @@
     <ClCompile Include="FaceTreeBuilder.cpp" />
     <ClCompile Include="LvlBrush.cpp" />
     <ClCompile Include="LvlEntity.cpp" />
+    <ClCompile Include="LvlFmts\mapFile\MapFile.cpp" />
+    <ClCompile Include="LvlFmts\mapFile\MapTypes.cpp" />
+    <ClCompile Include="LvlFmts\mapFile\Util.cpp" />
     <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="LvlBuilder.cpp" />
     <ClCompile Include="LvlTypes.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="mapFile\MapFile.cpp" />
-    <ClCompile Include="mapFile\MapTypes.cpp" />
-    <ClCompile Include="mapFile\Util.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Model\ModelCache.cpp" />
     <ClCompile Include="Settings.cpp" />
@@ -541,8 +541,8 @@
     <Image Include="LevelBuilder.ico" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="mapFile\MapFile.inl" />
-    <None Include="mapFile\MapTypes.inl" />
+    <None Include="LvlFmts\mapFile\MapFile.inl" />
+    <None Include="LvlFmts\mapFile\MapTypes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
