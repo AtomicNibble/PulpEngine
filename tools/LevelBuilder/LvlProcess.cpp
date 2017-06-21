@@ -3,8 +3,8 @@
 
 #include <IModel.h>
 
-#include "mapFile/MapTypes.h"
-#include "mapFile/MapFile.h"
+#include "LvlFmts/mapFile/MapTypes.h"
+#include "LvlFmts/mapFile/MapFile.h"
 #include "Model/ModelCache.h"
 
 X_NAMESPACE_BEGIN(lvl)

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "LvlBuilder.h"
 
-#include "mapFile/MapFile.h"
+#include "LvlFmts/mapFile/MapFile.h"
 
 #include <IConsole.h>
 

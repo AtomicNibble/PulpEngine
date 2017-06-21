@@ -73,6 +73,7 @@ public:
 
 	LvlBrush& operator=(const LvlBrush& oth);
 
+	bool removeDuplicateBrushPlanes(void);
 	bool createBrushWindings(const XPlaneSet& planes);
 	bool boundBrush(const XPlaneSet& planes);
 	bool calculateContents(void);

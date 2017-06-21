@@ -478,6 +478,8 @@
     <ClInclude Include="Compiler.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
+    <ClInclude Include="LvlFmts\LvlSource.h" />
+    <ClInclude Include="LvlFmts\mapFile\Loader.h" />
     <ClInclude Include="LvlFmts\mapFile\MapFile.h" />
     <ClInclude Include="LvlFmts\mapFile\MapTypes.h" />
     <ClInclude Include="LvlFmts\mapFile\Util.h" />
@@ -505,6 +507,8 @@
     <ClCompile Include="FaceTreeBuilder.cpp" />
     <ClCompile Include="LvlBrush.cpp" />
     <ClCompile Include="LvlEntity.cpp" />
+    <ClCompile Include="LvlFmts\LvlSource.cpp" />
+    <ClCompile Include="LvlFmts\mapFile\Loader.cpp" />
     <ClCompile Include="LvlFmts\mapFile\MapFile.cpp" />
     <ClCompile Include="LvlFmts\mapFile\MapTypes.cpp" />
     <ClCompile Include="LvlFmts\mapFile\Util.cpp" />
@@ -541,6 +545,7 @@
     <Image Include="LevelBuilder.ico" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="LvlFmts\LvlSource.inl" />
     <None Include="LvlFmts\mapFile\MapFile.inl" />
     <None Include="LvlFmts\mapFile\MapTypes.inl" />
   </ItemGroup>

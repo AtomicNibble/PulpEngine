@@ -7,7 +7,9 @@
 #include <ITimer.h>
 #include <IConsole.h>
 
-#include "mapFile\MapFile.h"
+#include "LvlFmts\LvlSource.h"
+#include "LvlFmts/mapFile\MapFile.h"
+#include "LvlFmts/mapFile/Loader.h"
 #include "LvlBuilder.h"
 
 #include "Model/ModelCache.h"

@@ -183,7 +183,7 @@ LvlBrush::LvlBrush(const LvlBrush& oth) :
 	}
 }
 
-LvlBrush& LvlBrush::operator = (const LvlBrush& oth)
+LvlBrush& LvlBrush::operator=(const LvlBrush& oth)
 {
 	pOriginal = oth.pOriginal;
 
@@ -208,6 +208,52 @@ LvlBrush& LvlBrush::operator = (const LvlBrush& oth)
 	}
 
 	return *this;
+}
+
+bool LvlBrush::removeDuplicateBrushPlanes(void)
+{
+	for (size_t i = 1; i < sides.size(); i++)
+	{
+		LvlBrushSide& side = sides[i];
+
+		// check for a degenerate plane
+		if (side.planenum == -1)
+		{
+			X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": degenerate plane(%" PRIuS ")",
+				entityNum, brushNum, sides.size(), i);
+
+			// remove it
+			sides.removeIndex(i);
+
+			i--;
+			continue;
+		}
+
+		// check for duplication and mirroring
+		for (size_t j = 0; j < i; j++)
+		{
+			if (side.planenum == sides[j].planenum)
+			{
+				X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": duplicate plane(%" PRIuS ",%" PRIuS ")",
+					entityNum, brushNum, sides.size(), i, j);
+
+				// remove the second duplicate
+				sides.removeIndex(i);
+
+				i--;
+				break;
+			}
+
+			if (side.planenum == (sides[i].planenum ^ 1))
+			{
+				// mirror plane, brush is invalid
+				X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": mirrored plane(%" PRIuS ",%" PRIuS ")",
+					entityNum, brushNum, sides.size(), i, j);
+				return false;
+			}
+		}
+	}
+	return true;
 }
 
 bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
