@@ -8,7 +8,7 @@ X_NAMESPACE_DECLARE(physics,
 );
 
 
-#include "MaterialManager.h"
+#include "Material/MaterialManager.h"
 #include "LvlTypes.h"
 
 #include <array>

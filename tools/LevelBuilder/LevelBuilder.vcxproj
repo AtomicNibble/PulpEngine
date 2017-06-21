@@ -482,8 +482,8 @@
     <ClInclude Include="mapFile\MapFile.h" />
     <ClInclude Include="mapFile\MapTypes.h" />
     <ClInclude Include="mapFile\Util.h" />
-    <ClInclude Include="MaterialManager.h" />
-    <ClInclude Include="ModelCache.h" />
+    <ClInclude Include="Material\MaterialManager.h" />
+    <ClInclude Include="Model\ModelCache.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\GrowingPool.h" />
@@ -514,8 +514,8 @@
     <ClCompile Include="mapFile\MapFile.cpp" />
     <ClCompile Include="mapFile\MapTypes.cpp" />
     <ClCompile Include="mapFile\Util.cpp" />
-    <ClCompile Include="MaterialManager.cpp" />
-    <ClCompile Include="ModelCache.cpp" />
+    <ClCompile Include="Material\MaterialManager.cpp" />
+    <ClCompile Include="Model\ModelCache.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

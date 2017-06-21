@@ -72,17 +72,11 @@
     <ClInclude Include="LvlTypes.h">
       <Filter>Header Files\Lvl</Filter>
     </ClInclude>
-    <ClInclude Include="MaterialManager.h">
-      <Filter>Header Files\Material</Filter>
-    </ClInclude>
     <ClInclude Include="FaceTreeBuilder.h">
       <Filter>Header Files\BSP</Filter>
     </ClInclude>
     <ClInclude Include="LvlBuilder.h">
       <Filter>Header Files\Lvl</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelCache.h">
-      <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="mapFile\Util.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
@@ -117,6 +111,12 @@
     <ClInclude Include="Util\GrowingPool.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Model\ModelCache.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Material\MaterialManager.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -146,9 +146,6 @@
     <ClCompile Include="LvlBrush.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
-      <Filter>Source Files\Material</Filter>
-    </ClCompile>
     <ClCompile Include="LvlEntity.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
@@ -163,9 +160,6 @@
     </ClCompile>
     <ClCompile Include="LvlArea.cpp">
       <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelCache.cpp">
-      <Filter>Source Files\Model</Filter>
     </ClCompile>
     <ClCompile Include="mapFile\MapFile.cpp">
       <Filter>Source Files\LvlFmts\MapFile</Filter>
@@ -190,6 +184,12 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Material\MaterialManager.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\ModelCache.cpp">
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

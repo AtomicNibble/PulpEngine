@@ -5,7 +5,7 @@
 
 #include "mapFile/MapTypes.h"
 #include "mapFile/MapFile.h"
-#include "ModelCache.h"
+#include "Model/ModelCache.h"
 
 X_NAMESPACE_BEGIN(lvl)
 
