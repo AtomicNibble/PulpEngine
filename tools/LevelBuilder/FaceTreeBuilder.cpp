@@ -127,47 +127,39 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 {
 	Vec3f halfSize = node->bounds.halfVec();
-	size_t axis;
 
-	float dist;
-	Planef plane;
-	int planeNum;
-
-	for (axis = 0; axis < 3; axis++)
+	// force split any bounds that cross block size boundry.
+	// so if block size is 1024 anything crossing it we force a split on the boundry.
+	for (int32_t axis = 0; axis < 3; axis++)
 	{
+		float blockBoundry;
+
+		// if the bounds are over double boundry size split somewhere near the middle.
+		// otherwise we split at first boundry after min.
 		if (halfSize[axis] > BSP_TREE_BLOCK_SIZE)
 		{
-			// if the box is more than double the block size.
-			// then get the middle of the axis and divide by block size
-			// to work out how many blocks we can fit.
 			float middleAxis = (node->bounds.min[axis] + halfSize[axis]);
-			middleAxis /= BSP_TREE_BLOCK_SIZE;
-
-			dist = BSP_TREE_BLOCK_SIZE * (math<float>::floor(middleAxis) + 1.0f);
+			blockBoundry = middleAxis;
 		}
 		else
 		{
-			// if two blocks don't fit inside the box.
-			// then we see how many fits inside a half.
-			// and round it up to atleast one.
-			float minScaled = node->bounds.min[axis] / BSP_TREE_BLOCK_SIZE;
-
-			dist = BSP_TREE_BLOCK_SIZE * (math<float>::floor(minScaled) + 1.0f);
+			blockBoundry = node->bounds.min[axis];
 		}
 
-		// the resulting distance is always a multiple of BLOCK_SIZE
-		// and atleast 1.
+		// clamp it to nearest boundry.
+		blockBoundry /= BSP_TREE_BLOCK_SIZE;
+		blockBoundry = BSP_TREE_BLOCK_SIZE * (math<float>::floor(blockBoundry) + 1.0f);
 
-		// does the distance end inside the axis bounds?
-		if (dist > (node->bounds.min[axis] + 1.0f))
+		// does the boundry end inside the axis bounds?
+		if (blockBoundry > (node->bounds.min[axis] + 1.0f))
 		{
-			if (dist < (node->bounds.max[axis] - 1.0f))
+			if (blockBoundry < (node->bounds.max[axis] - 1.0f))
 			{
-				// create a plane on this axis with this distance
+				Planef plane;
 				plane[0] = plane[1] = plane[2] = 0.0f;
 				plane[axis] = 1.0f;
-				plane.setDistance(dist);
-				planeNum = FindFloatPlane(plane);
+				plane.setDistance(blockBoundry);
+				int32_t planeNum = FindFloatPlane(plane);
 				return planeNum;
 			}
 		}
@@ -213,7 +205,7 @@ int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 			}
 		}
 
-		plane = planeset_[face.planenum];
+		const auto& plane = planeset_[face.planenum];
 		splits = 0;
 		facing = 0;
 		front = 0;
@@ -247,7 +239,7 @@ int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 
 		// the best one is most facing and least
 		// cross planes (splits)
-		int32 value = 5 * facing - 5 * splits;
+		int32 value = (5 * facing) - (5 * splits);
 
 		if (PlaneType::isTrueAxial(plane.getType())) {
 			value += 5;
