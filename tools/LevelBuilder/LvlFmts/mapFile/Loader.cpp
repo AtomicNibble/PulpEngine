@@ -221,9 +221,8 @@ namespace mapFile
 		}
 #endif
 
-		for (size_t i = 0; i < brush.sides.size(); i++)
+		for (const auto& side : brush.sides)
 		{
-			const LvlBrushSide& side = brush.sides[i];
 			auto* pWinding = side.pWinding;
 
 			if (!pWinding) {
@@ -263,11 +262,6 @@ namespace mapFile
 		if (gSettings.noPatches) { // are these goat meshes even allowed O_0 ?
 			return false;
 		}
-
-		// meshes not supported yet.
-		//	if (mapBrush->isMesh()) {
-		//		return false;
-		//	}
 
 		if (patch.isMesh()) {
 			patch.CreateNormalsAndIndexes();
