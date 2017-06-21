@@ -10,6 +10,9 @@
 #include "mapFile\MapFile.h"
 #include "LvlBuilder.h"
 
+#include "Model/ModelCache.h"
+#include "Material/MaterialManager.h"
+
 X_NAMESPACE_BEGIN(lvl)
 
 core::MemoryArenaBase* g_bspFaceArena = nullptr;
@@ -23,6 +26,8 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 	bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8),
 	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8)
 {
+	pModelCache_ = X_NEW(ModelCache, arena, "LvlModelCache")(arena);
+	pMaterialMan_ = X_NEW(MatManager, arena, "LvlMaterialMan")(arena);
 
 	// set the pointers.
 	g_bspFaceArena = &bspFaceAllocator_.arena_;
@@ -35,6 +40,9 @@ Compiler::~Compiler()
 	g_bspFaceArena = nullptr;
 	g_bspNodeArena = nullptr;
 	g_windingArena = nullptr;
+
+	X_DELETE(pModelCache_, arena_);
+	X_DELETE(pMaterialMan_, arena_);
 }
 
 

@@ -5,6 +5,9 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
+class ModelCache;
+class MatManager;
+
 class Compiler
 {
 	typedef core::MemoryArena<
@@ -30,6 +33,8 @@ public:
 private:
 	core::MemoryArenaBase* arena_;
 	physics::IPhysicsCooking* pPhysCooking_;
+	ModelCache* pModelCache_;
+	MatManager* pMaterialMan_;
 
 	GrowingPool<PoolArena> bspFaceAllocator_;
 	GrowingPool<PoolArena> bspNodeAllocator_;
