@@ -442,7 +442,8 @@ namespace mapFile
 				{
 					sscanf_s(value.c_str(), "%f %f %f", &origin.x, &origin.y, &origin.z);
 				}
-				else if (key == "classname" && value == "worldspawn") {
+				else if (key == "classname" && value == "worldspawn") 
+				{
 					worldent = true;
 				}
 			}
