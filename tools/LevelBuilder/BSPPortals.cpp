@@ -231,7 +231,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 	{
 		bspNode* node = nodes[i];
 		node->brushes.size();
-		for (int32_t x = 0; x < node->brushes.size(); x++)
+		for (size_t x = 0; x < node->brushes.size(); x++)
 		{
 			auto* pBrush = node->brushes[x];
 
@@ -243,7 +243,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 			auto* pOrigBrush = pBrush->pOriginal;
 
 			// iterate the sides to find the portals.
-			for (int32_t j = 0; j < pOrigBrush->sides.size(); j++)
+			for (size_t j = 0; j < pOrigBrush->sides.size(); j++)
 			{
 				LvlBrushSide& side = pOrigBrush->sides[j];
 
@@ -262,7 +262,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 				}
 
 				// remove the visible hull from any other portal sides of this portal brush
-				for (int32_t k = 0; k < pBrush->sides.size(); k++)
+				for (size_t k = 0; k < pBrush->sides.size(); k++)
 				{
 					// skip self
 					if (k == j) {
