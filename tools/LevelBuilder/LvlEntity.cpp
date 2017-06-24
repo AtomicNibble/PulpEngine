@@ -237,20 +237,17 @@ bool LvlEntity::MakeTreePortals(XPlaneSet& planeSet)
 
 bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 {
-	size_t		numUnique, numClusters, r;
+	size_t		numClusters, r;
 	LvlBrush	*b, *newb;
 
 	X_LOG0("LvlEntity", "^5----- FilterBrushesIntoTree -----");
 
-	numUnique = 0;
 	numClusters = 0;
 	r = 0;
 
 	LvlEntity::LvlBrushArr::Iterator it = brushes.begin();
 	for (; it != brushes.end(); ++it)
 	{
-		numUnique++;
-
 		b = it;
 
 		newb = X_NEW(LvlBrush, g_arena, "BrushCopy")(*b);
@@ -260,7 +257,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 		numClusters += r;
 	}
 
-	X_LOG0("LvlEntity", "^8%5i^7 total brushes", numUnique);
+	X_LOG0("LvlEntity", "^8%5i^7 total brushes", brushes.size());
 	X_LOG0("LvlEntity", "^8%5i^7 cluster references", numClusters);
 	return true;
 }
