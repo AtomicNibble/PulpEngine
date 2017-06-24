@@ -51,7 +51,7 @@ class GrowingMicroAllocator
 	//X_ALIGNED_SYMBOL(struct,4)  ChunkHeader
 	struct ChunkHeader
 	{
-		size_t allocatorIndex_;
+		uint16_t allocatorIndex_;
 	};
 	//#pragma pack(pop)
 

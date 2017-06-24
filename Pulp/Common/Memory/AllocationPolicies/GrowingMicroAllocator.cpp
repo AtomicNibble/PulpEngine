@@ -19,25 +19,30 @@ GrowingMicroAllocator::GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, ui
 
 
 	// setup lookup table.
-	uint i = 0;
+	int32_t i = 0;
 
-	for( ; i<=8; i++ )
-		poolAllocators_[ i ] = &poolAllocator8_;
-	for( ; i<=0x10; i++ )
-		poolAllocators_[ i ] = &poolAllocator16_;
-	for( ; i<=0x20; i++ )
-		poolAllocators_[ i ] = &poolAllocator32_;
-	for( ; i<=0x40; i++ )
-		poolAllocators_[ i ] = &poolAllocator64_;
-	for( ; i<=0x80; i++ )
-		poolAllocators_[ i ] = &poolAllocator128_;
-	for( ; i<=0x100; i++ )
-		poolAllocators_[ i ] = &poolAllocator256_;
+	for (; i <= 8; i++) {
+		poolAllocators_[i] = &poolAllocator8_;
+	}
+	for (; i <= 0x10; i++) {
+		poolAllocators_[i] = &poolAllocator16_;
+	}
+	for (; i <= 0x20; i++) {
+		poolAllocators_[i] = &poolAllocator32_;
+	}
+	for (; i <= 0x40; i++) {
+		poolAllocators_[i] = &poolAllocator64_;
+	}
+	for (; i <= 0x80; i++) {
+		poolAllocators_[i] = &poolAllocator128_;
+	}
+	for (; i <= 0x100; i++) {
+		poolAllocators_[i] = &poolAllocator256_;
+	}
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 	zero_object( statistics_ );
-
 	statistics_.type_ = "MicroPool";
 
 #endif
@@ -50,8 +55,10 @@ void* GrowingMicroAllocator::allocate( size_t size, size_t alignment, size_t off
 		X_ASSERT( false, "Micro Can't allocate more than %d bytes", MAX_ALLOCATION_SIZE )( size );
 	}
 
+	static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= MAX_ALLOCATION_SIZE, "Can't store allocation indexes");
+
 	X_ALIGNED_SYMBOL(ChunkHeader,4) chunkHeader;
-	chunkHeader.allocatorIndex_ = size; /// safe_static_cast<uint32_t,size_t>(size);
+	chunkHeader.allocatorIndex_ = safe_static_cast<uint8_t>(size);
 
 	void* pMem = poolAllocators_[ size ]->allocate( size, alignment, offset, &chunkHeader );
 
@@ -68,12 +75,6 @@ void GrowingMicroAllocator::free( void* ptr )
 		chunkSize_, sizeof(ChunkHeader));
 
 	X_ASSERT_NOT_NULL( header );
-
-	if (header->allocatorIndex_ > 0x100)
-	{
-		size_t allocatorIndex = header->allocatorIndex_;
-		X_ASSERT( false, "Invalid allocation index" )( allocatorIndex );
-	}
 
 	poolAllocators_[header->allocatorIndex_]->free(ptr);
 
