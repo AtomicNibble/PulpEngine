@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="XWinding">
+    <Expand>
+      <Item Name="[Points]" ExcludeView="simple">numPoints_</Item>
+      <Item Name="[AllocatedSize]" ExcludeView="simple">allocedSize_</Item>
+      <ArrayItems>
+        <Size>numPoints_</Size>
+        <ValuePointer>(Vec5f*)pPoints_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>
