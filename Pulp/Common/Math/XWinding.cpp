@@ -793,7 +793,8 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 		if (sides[i] == PlaneSide::FRONT)
 		{
 			float dot = dists[i] / (dists[i] - dists[i + 1]);
-			for (int32_t j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++)
+			{
 				// avoid round off error when possible
 				if (plane.getNormal()[j] == 1.0f) {
 					mid[j] = plane.getDistance();
@@ -812,7 +813,8 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 		else 
 		{
 			float dot = dists[i + 1] / (dists[i + 1] - dists[i]);
-			for (int32_t j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++)
+			{
 				// avoid round off error when possible
 				if (plane.getNormal()[j] == 1.0f) {
 					mid[j] = plane.getDistance();
