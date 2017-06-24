@@ -65,7 +65,7 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
 	}
 }
 
-LvlBrushSide& LvlBrushSide::operator = (const LvlBrushSide& oth)
+LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 {
 	// nned to delete them if set.
 	if (pWinding) {

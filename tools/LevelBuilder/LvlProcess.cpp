@@ -287,8 +287,6 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	LvlBrushSide& side, bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
-	XWinding *front, *back;
-
 
 	if (!pWinding) {
 		return;
@@ -305,17 +303,19 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 			return;
 		}
 
-		pWinding->Split(planes_[pNode->planenum], 
-			ON_EPSILON, &front, &back, g_arena);
+		XWinding *pFront, *pBack;
 
-		PutWindingIntoAreas_r(ent, front, side, pNode->children[0]);
-		if (front) {
-			X_DELETE(front, g_arena);
+		pWinding->Split(planes_[pNode->planenum], 
+			ON_EPSILON, &pFront, &pBack, g_arena);
+
+		PutWindingIntoAreas_r(ent, pFront, side, pNode->children[0]);
+		if (pFront) {
+			X_DELETE(pFront, g_arena);
 		}
 
-		PutWindingIntoAreas_r(ent, back, side, pNode->children[1]);
-		if (back) {
-			X_DELETE(back, g_arena);
+		PutWindingIntoAreas_r(ent, pBack, side, pNode->children[1]);
+		if (pBack) {
+			X_DELETE(pBack, g_arena);
 		}
 
 		return;
