@@ -56,7 +56,7 @@ public:
 	typedef core::StackString<128,char> Description;
 
 public:
-	X_INLINE Plane() : Distance_(static_cast<T>(0)) {}
+	X_INLINE Plane() : distance_(static_cast<T>(0)) {}
 
 	X_INLINE Plane(const Vec3<T> &v1, const Vec3<T> &v2, const Vec3<T> &v3) {
 		set(v1, v2, v3);
@@ -73,52 +73,52 @@ public:
 
 	//! Defines a plane using 3 points. 
 	X_INLINE void	set(const Vec3<T> &v1, const Vec3<T> &v2, const Vec3<T> &v3) {
-		Normal_ = (v1 - v2).cross(v3 - v2);
-		Normal_.normalizeSafe();
-		Distance_ = -(Normal_ * v2);
+		normal_ = (v1 - v2).cross(v3 - v2);
+		normal_.normalizeSafe();
+		distance_ = -(normal_ * v2);
 	}
 	//! Defines a plane using a normal vector and a point.
 	X_INLINE void	set(const Vec3<T> &point, const Vec3<T> &normal) {
-		Normal_ = normal.normalized();
-		Distance_ = -(Normal_.dot(point));
+		normal_ = normal.normalized();
+		distance_ = -(normal_.dot(point));
 	}
 	//! Defines a plane using a normal and distance
 	X_INLINE void	set(const Vec3<T> &normal, const T disatnace) {
-		Normal_ = normal.normalized();
-		Distance_ = disatnace;
+		normal_ = normal.normalized();
+		distance_ = disatnace;
 	}
 	//! Defines a plane using 4 coefficients.
 	X_INLINE void	set(T a, T b, T c, T d) {
 		Vec3<T> normal(a, b, c);
 		T length = normal.length();
 
-		Normal_ = normal.normalized();
-		Distance_ = d / length;
+		normal_ = normal.normalized();
+		distance_ = d / length;
 	}
 
 	X_INLINE T					operator[](size_t idx) const;
 	X_INLINE T &				operator[](size_t idx);
 
 	X_INLINE Plane				operator-() const {
-		return Plane(-Normal_, -Distance_);
+		return Plane(-normal_, -distance_);
 	}
 
-	X_INLINE Vec3<T>			getPoint() const { return Normal_ * getDistance(); };
-	X_INLINE const Vec3<T>&		getNormal() const { return Normal_; };
-	X_INLINE void				setNormal(const Vec3<T>& normal) { Normal_ = normal; }
-	X_INLINE T					getDistance() const { return -Distance_; }
-	X_INLINE void				setDistance(const float distance) { Distance_ = -distance; }
-	X_INLINE T					distance(const Vec3<T> &p) const { return Normal_.dot(p) + Distance_; };
+	X_INLINE Vec3<T>			getPoint() const { return normal_ * getDistance(); };
+	X_INLINE const Vec3<T>&		getNormal() const { return normal_; };
+	X_INLINE void				setNormal(const Vec3<T>& normal) { normal_ = normal; }
+	X_INLINE T					getDistance() const { return -distance_; }
+	X_INLINE void				setDistance(const float distance) { distance_ = -distance; }
+	X_INLINE T					distance(const Vec3<T> &p) const { return normal_.dot(p) + distance_; };
 
-	X_INLINE Vec3<T>			reflectPoint(const Vec3<T> &p) const { return Normal_ * distance(p) * -2 + p; }
-	X_INLINE Vec3<T>			reflectVector(const Vec3<T> &v) const { return Normal_ * Normal_.dot(v) * 2 - v; }
+	X_INLINE Vec3<T>			reflectPoint(const Vec3<T> &p) const { return normal_ * distance(p) * -2 + p; }
+	X_INLINE Vec3<T>			reflectVector(const Vec3<T> &v) const { return normal_ * normal_.dot(v) * 2 - v; }
 
 	X_INLINE bool				rayIntersection(const Ray& ray, Vec3f& out);
 
 	X_INLINE bool				compare(const Plane& p, const float normalEps, const float distEps) const;
 
 	X_INLINE T					dot(Plane<T>& oth) const {
-		return Normal_.dot(oth.Normal_);
+		return normal_.dot(oth.normal_);
 	}
 
 	X_INLINE PlaneSide::Enum side(const Vec3<T>& v, const float epsilon) const
@@ -134,29 +134,29 @@ public:
 		return PlaneSide::ON;
 	}
 
-	PlaneType::Enum getType(void) const
+	X_INLINE PlaneType::Enum getType(void) const
 	{
-		if (Normal_[0] == 0.0f) 
+		if (normal_[0] == 0.0f) 
 		{
-			if (Normal_[1] == 0.0f) {
-				return Normal_[2] > 0.0f ? PlaneType::Z : PlaneType::NEGZ;
+			if (normal_[1] == 0.0f) {
+				return normal_[2] > 0.0f ? PlaneType::Z : PlaneType::NEGZ;
 			}
-			else if (Normal_[2] == 0.0f) {
-				return Normal_[1] > 0.0f ? PlaneType::Y : PlaneType::NEGY;
+			else if (normal_[2] == 0.0f) {
+				return normal_[1] > 0.0f ? PlaneType::Y : PlaneType::NEGY;
 			}
 			else {
 				return PlaneType::ZEROX;
 			}
 		}
-		else if (Normal_[1] == 0.0f) {
-			if (Normal_[2] == 0.0f) {
-				return Normal_[0] > 0.0f ? PlaneType::X : PlaneType::NEGX;
+		else if (normal_[1] == 0.0f) {
+			if (normal_[2] == 0.0f) {
+				return normal_[0] > 0.0f ? PlaneType::X : PlaneType::NEGX;
 			}
 			else {
 				return PlaneType::ZEROY;
 			}
 		}
-		else if (Normal_[2] == 0.0f) {
+		else if (normal_[2] == 0.0f) {
 			return PlaneType::ZEROZ;
 		}
 	
@@ -165,30 +165,30 @@ public:
 
 	const char* toString(Description& desc) const
 	{
-		desc.setFmt("<%g,%g,%g> - %g", Normal_.x, Normal_.y, Normal_.z, Distance_);
+		desc.setFmt("<%g,%g,%g> - %g", normal_.x, normal_.y, normal_.z, distance_);
 		return desc.c_str();
 	}
 
 
 private:
-	Vec3<T>		Normal_;
-	T			Distance_;
+	Vec3<T>		normal_;
+	T			distance_;
 };
 
 template<typename T>
 X_INLINE T Plane<T>::operator[](size_t idx) const {
-	return Normal_[idx];
+	return normal_[idx];
 }
 
 template<typename T>
 X_INLINE T& Plane<T>::operator[](size_t idx) {
-	return Normal_[idx];
+	return normal_[idx];
 }
 
 template<typename T>
 X_INLINE bool Plane<T>::rayIntersection(const Ray& ray, Vec3f& out)
 {
-	float cosine = Normal_.dot(ray.getDirection());
+	float cosine = normal_.dot(ray.getDirection());
 
 	if (cosine == 0.f) // parallel.
 		return false;
@@ -203,10 +203,10 @@ X_INLINE bool Plane<T>::rayIntersection(const Ray& ray, Vec3f& out)
 template<typename T>
 X_INLINE bool Plane<T>::compare(const Plane& p, const float normalEps, const float distEps) const
 {
-	if (math<float>::abs(Distance_ - p.Distance_) > distEps) {
+	if (math<float>::abs(distance_ - p.distance_) > distEps) {
 		return false;
 	}
-	if (!Normal_.compare(p.getNormal(), normalEps)) {
+	if (!normal_.compare(p.getNormal(), normalEps)) {
 		return false;
 	}
 	return true;
