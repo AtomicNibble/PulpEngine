@@ -28,12 +28,12 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 	{
 		Planef	plane;
 
-		if (p->nodes[0] == node)
+		if (p->nodes[Side::FRONT] == node)
 		{
 			side = 0;
 			plane = p->plane;
 		}
-		else if (p->nodes[1] == node)
+		else if (p->nodes[Side::BACK] == node)
 		{
 			side = 1;
 			plane = -p->plane;
@@ -67,7 +67,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 	new_portal->plane = planeSet[node->planenum];
 	new_portal->onNode = node;
 	new_portal->pWinding = w.release();
-	new_portal->AddToNodes(node->children[0], node->children[1]);
+	new_portal->AddToNodes(node->children[Side::FRONT], node->children[Side::BACK]);
 }
 
 
@@ -199,24 +199,24 @@ void bspPortal::RemoveFromNode(bspNode* pNode)
 			break;
 		}
 
-		if (t->nodes[0] == pNode) {
-			pp = &t->next[0];
+		if (t->nodes[Side::FRONT] == pNode) {
+			pp = &t->next[Side::FRONT];
 		}
-		else if (t->nodes[1] == pNode) {
-			pp = &t->next[1];
+		else if (t->nodes[Side::BACK] == pNode) {
+			pp = &t->next[Side::BACK];
 		}
 		else {
 			X_ERROR("BspPortal", "RemovePortalFromNode: portal not bounding leaf");
 		}
 	}
 
-	if (pPortal->nodes[0] == pNode) {
-		*pp = pPortal->next[0];
-		pPortal->nodes[0] = nullptr;
+	if (pPortal->nodes[Side::FRONT] == pNode) {
+		*pp = pPortal->next[Side::FRONT];
+		pPortal->nodes[Side::FRONT] = nullptr;
 	}
-	else if (pPortal->nodes[1] == pNode) {
-		*pp = pPortal->next[1];
-		pPortal->nodes[1] = nullptr;
+	else if (pPortal->nodes[Side::BACK] == pNode) {
+		*pp = pPortal->next[Side::BACK];
+		pPortal->nodes[Side::BACK] = nullptr;
 	}
 	else {
 		X_ERROR("Portal", "RemovePortalFromNode: mislinked");
@@ -227,7 +227,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 {
 	// scan both bordering nodes brush lists for a portal brush
 	// that shares the plane
-	for (int32_t i = 0; i < 2; i++)
+	for (int32_t i = 0; i < Side::ENUM_COUNT; i++)
 	{
 		bspNode* node = nodes[i];
 		node->brushes.size();
@@ -305,13 +305,13 @@ bool bspPortal::PortalPassable(void) const
 		return false;	// to global outsideleaf
 	}
 
-	if (nodes[0]->planenum != PLANENUM_LEAF ||
-		nodes[1]->planenum != PLANENUM_LEAF)
+	if (nodes[Side::FRONT]->planenum != PLANENUM_LEAF ||
+		nodes[Side::BACK]->planenum != PLANENUM_LEAF)
 	{
 		X_ERROR("bspPortal", "not a leaf");
 	}
 
-	if (!nodes[0]->opaque && !nodes[1]->opaque) {
+	if (!nodes[Side::FRONT]->opaque && !nodes[Side::BACK]->opaque) {
 		return true;
 	}
 

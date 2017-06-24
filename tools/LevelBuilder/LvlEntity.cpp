@@ -69,10 +69,10 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 {
 	if (node->planenum != PLANENUM_LEAF)
 	{
-		if (!FindInterAreaPortals_r(node->children[0])) {
+		if (!FindInterAreaPortals_r(node->children[Side::FRONT])) {
 			return false;
 		}
-		if (!FindInterAreaPortals_r(node->children[1])) {
+		if (!FindInterAreaPortals_r(node->children[Side::BACK])) {
 			return false;
 		}
 
@@ -93,7 +93,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 
 	for (p = node->portals; p; p = p->next[s])
 	{
-		s = (p->nodes[1] == node);
+		s = (p->nodes[Side::BACK] == node);
 		pOther = p->nodes[!s];
 
 		if (pOther->opaque) {
@@ -129,11 +129,11 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			if (pBSide == iap.pSide)
 			{
 				// area match?
-				if (p->nodes[0]->area == iap.area0 && p->nodes[1]->area == iap.area1) {
+				if (p->nodes[Side::FRONT]->area == iap.area0 && p->nodes[Side::BACK]->area == iap.area1) {
 					break;
 				}
 				// what about other direction?
-				if (p->nodes[1]->area == iap.area0 && p->nodes[0]->area == iap.area1) {
+				if (p->nodes[Side::BACK]->area == iap.area0 && p->nodes[Side::FRONT]->area == iap.area1) {
 					break;
 				}
 
@@ -149,12 +149,12 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 		LvlInterPortal& iap = interPortals.AddOne();
 
 		if (pBSide->planenum == p->onNode->planenum) {
-			iap.area0 = p->nodes[0]->area;
-			iap.area1 = p->nodes[1]->area;
+			iap.area0 = p->nodes[Side::FRONT]->area;
+			iap.area1 = p->nodes[Side::BACK]->area;
 		}
 		else {
-			iap.area0 = p->nodes[1]->area;
-			iap.area1 = p->nodes[0]->area;
+			iap.area0 = p->nodes[Side::BACK]->area;
+			iap.area1 = p->nodes[Side::FRONT]->area;
 		}
 
 		X_LOG1("Portal", "inter connection: ^8%" PRIi32 "^7 <-> ^8%" PRIi32, iap.area0, iap.area1);
@@ -359,10 +359,10 @@ bool LvlEntity::PlaceOccupant(XPlaneSet& planeSet, bspNode* pHeadNode, size_t& f
 		const Planef& plane = planeSet[pNode->planenum];
 		float d = plane.distance(origin);
 		if (d >= 0.0f) {
-			pNode = pNode->children[0];
+			pNode = pNode->children[Side::FRONT];
 		}
 		else {
-			pNode = pNode->children[1];
+			pNode = pNode->children[Side::BACK];
 		}
 	}
 

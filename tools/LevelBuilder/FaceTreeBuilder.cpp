@@ -51,8 +51,9 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 	// partition the list
 	node->planenum = splitPlaneNum;
 	Planef& plane = planeset_[splitPlaneNum];
-	childLists[0] = nullptr;
-	childLists[1] = nullptr;
+	childLists[Side::FRONT] = nullptr;
+	childLists[Side::BACK] = nullptr;
+
 
 	for (pFace = faces; pFace; pFace = pNext)
 	{
@@ -72,29 +73,29 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 			{
 				pNewFace = X_NEW(bspFace, g_bspFaceArena, "bspFaceFrontWind");
 				pNewFace->w = frontWinding;
-				pNewFace->pNext = childLists[0];
+				pNewFace->pNext = childLists[Side::FRONT];
 				pNewFace->planenum = pFace->planenum;
-				childLists[0] = pNewFace;
+				childLists[Side::FRONT] = pNewFace;
 			}
 			if (backWinding)
 			{
 				pNewFace = X_NEW(bspFace, g_bspFaceArena, "bspFaceBackWind");
 				pNewFace->w = backWinding;
-				pNewFace->pNext = childLists[1];
+				pNewFace->pNext = childLists[Side::BACK];
 				pNewFace->planenum = pFace->planenum;
-				childLists[1] = pNewFace;
+				childLists[Side::BACK] = pNewFace;
 			}
 			X_DELETE(pFace, g_bspFaceArena);
 		}
 		else if (side == PlaneSide::FRONT)
 		{
-			pFace->pNext = childLists[0];
-			childLists[0] = pFace;
+			pFace->pNext = childLists[Side::FRONT];
+			childLists[Side::FRONT] = pFace;
 		}
 		else if (side == PlaneSide::BACK)
 		{
-			pFace->pNext = childLists[1];
-			childLists[1] = pFace;
+			pFace->pNext = childLists[Side::BACK];
+			childLists[Side::BACK] = pFace;
 		}
 	}
 
@@ -110,8 +111,8 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 		float val = math<float>::abs(plane[i] - 1.f);
 		if (val < 0.001f)
 		{
-			node->children[0]->bounds.min[i] = plane.getDistance();
-			node->children[1]->bounds.max[i] = plane.getDistance();
+			node->children[Side::FRONT]->bounds.min[i] = plane.getDistance();
+			node->children[Side::BACK]->bounds.max[i] = plane.getDistance();
 			break;
 		}
 	}
@@ -154,7 +155,6 @@ int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 			if (blockBoundry < (node->bounds.max[axis] - 1.0f))
 			{
 				Planef plane;
-				plane[0] = plane[1] = plane[2] = 0.0f;
 				plane[axis] = 1.0f;
 				plane.setDistance(blockBoundry);
 				int32_t planeNum = FindFloatPlane(plane);

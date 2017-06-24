@@ -452,7 +452,7 @@ void bspNode::FreeTreePortals_r(void)
 	int32_t side;
 	for (auto* p = portals; p; p = nextp)
 	{
-		side = (p->nodes[1] == this);
+		side = (p->nodes[Side::BACK] == this);
 		nextp = p->next[side];
 
 		p->RemoveFromNode(p->nodes[!side]);

@@ -423,10 +423,10 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 	X_DELETE(this, g_arena);
 
 	if (pFront) {
-		count += pFront->FilterBrushIntoTree_r(planes, node->children[0]);
+		count += pFront->FilterBrushIntoTree_r(planes, node->children[Side::FRONT]);
 	}
 	if (pBack) {
-		count += pBack->FilterBrushIntoTree_r(planes, node->children[1]);
+		count += pBack->FilterBrushIntoTree_r(planes, node->children[Side::BACK]);
 	}
 
 	return count;
@@ -452,13 +452,15 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < static_cast<size_t>(w->getNumPoints()); j++)
+		for (j = 0; j < w->getNumPoints(); j++)
 		{
 			d = plane.distance((*w)[j].asVec3());
-			if (d > 0 && d > d_front)
+			if (d > 0 && d > d_front) {
 				d_front = d;
-			if (d < 0 && d < d_back)
+			}
+			if (d < 0 && d < d_back) {
 				d_back = d;
+			}
 		}
 	}
 	if (d_front < 0.1)
@@ -505,7 +507,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 	midwinding = w;
 
 	// split it for real
-	for (i = 0; i < 2; i++) 
+	for (i = 0; i < Side::ENUM_COUNT; i++)
 	{
 		b[i] = X_NEW(LvlBrush, g_arena, "Brush")(*this);
 		b[i]->sides.clear();
@@ -520,9 +522,9 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1], g_windingArena);
+		w->Split(plane, 0, &cw[Side::FRONT], &cw[Side::BACK], g_windingArena);
 
-		for (j = 0; j < 2; j++)
+		for (j = 0; j < Side::ENUM_COUNT; j++)
 		{
 			if (!cw[j]) {
 				continue;
@@ -535,7 +537,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 	}
 
 	// see if we have valid polygons on both sides
-	for (i = 0; i<2; i++)
+	for (i = 0; i<Side::ENUM_COUNT; i++)
 	{
 		if (!b[i]->boundBrush(planes)) {
 			break;
@@ -547,23 +549,23 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		}
 	}
 
-	if (!(b[0] && b[1]))
+	if (!(b[Side::FRONT] && b[Side::FRONT]))
 	{
-		if (!b[0] && !b[1]) {
+		if (!b[Side::FRONT] && !b[Side::BACK]) {
 			X_LOG0("bspBrush", "split removed brush");
 		}
 		else {
 			X_LOG0("bspBrush", "split not on both sides");
 		}
 
-		if (b[0])
+		if (b[Side::FRONT])
 		{
-			X_DELETE_AND_NULL(b[0], g_arena);
+			X_DELETE_AND_NULL(b[Side::FRONT], g_arena);
 			front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
 		}
-		if (b[1])
+		if (b[Side::BACK])
 		{
-			X_DELETE_AND_NULL(b[1], g_arena);
+			X_DELETE_AND_NULL(b[Side::BACK], g_arena);
 			back = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
 		}
 		return;
@@ -597,8 +599,8 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		}
 	}
 
-	front = b[0];
-	back = b[1];
+	front = b[Side::FRONT];
+	back = b[Side::BACK];
 }
 
 
