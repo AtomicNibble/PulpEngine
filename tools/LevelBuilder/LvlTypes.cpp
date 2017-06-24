@@ -226,6 +226,7 @@ LvlBrush& LvlBrush::operator=(LvlBrush&& oth)
 	return *this;
 }
 
+
 bool LvlBrush::removeDuplicateBrushPlanes(void)
 {
 	for (size_t i = 1; i < sides.size(); i++)
@@ -400,21 +401,19 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 		return 0.f;
 	}
 
-	Vec3f corner = (*w)[0].asVec3();
-	float d, area, volume;
-	const Planef* plane;
+	const Vec3f& corner = (*w)[0].asVec3();
 
 	// make tetrahedrons to all other faces
-	volume = 0;
+	float volume = 0;
 	for (; i < sides.size(); i++)
 	{
 		w = sides[i].pWinding;
 		if (!w) {
 			continue;
 		}
-		plane = &planes[sides[i].planenum];
-		d = -plane->distance(corner);
-		area = w->getArea();
+		auto& plane = planes[sides[i].planenum];
+		float d = -plane.distance(corner);
+		float area = w->getArea();
 		volume += d * area;
 	}
 
@@ -430,7 +429,6 @@ BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 	for (size_t i = 0; i < sides.size(); i++)
 	{
 		auto* w = sides[i].pWinding;
-
 		if (!w) {
 			continue;
 		}
