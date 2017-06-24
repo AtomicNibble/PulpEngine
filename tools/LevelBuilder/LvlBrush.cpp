@@ -390,14 +390,6 @@ BrushPlaneSide::Enum LvlBrush::brushMostlyOnSide(const Planef& plane) const
 
 size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 {
-	LvlBrush* pFront;
-	LvlBrush* pBack;
-	size_t count;
-
-	pFront = nullptr;
-	pBack = nullptr;
-	count = 0;
-
 	if (!this) {
 		return 0;
 	}
@@ -418,9 +410,12 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 	}
 
 	// split it by the node plane
-	this->Split(planes, node->planenum, pFront, pBack);
+	LvlBrush* pFront, *pBack;
+	Split(planes, node->planenum, pFront, pBack);
 
 	X_DELETE(this, g_arena);
+
+	size_t count = 0;
 
 	if (pFront) {
 		count += pFront->FilterBrushIntoTree_r(planes, node->children[Side::FRONT]);
@@ -435,26 +430,23 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 
 void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlBrush*& back)
 {
-	LvlBrush		*b[2];
-	size_t			i, j;
-	XWinding		*w, *cw[2], *midwinding;
-	LvlBrushSide	*s, *cs;
-	float			d, d_front, d_back;
-
 	front = back = nullptr;
-	Planef &plane = planes[planenum];
+
+	XWinding* w = nullptr;
+	const Planef& plane = planes[planenum];
 
 	// check all points
-	d_front = d_back = 0;
-	for (i = 0; i < sides.size(); i++)
+	float d_front = 0.f;
+	float d_back = 0.f;
+	for (size_t i = 0; i < sides.size(); i++)
 	{
 		w = sides[i].pWinding;
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < w->getNumPoints(); j++)
+		for (size_t j = 0; j < w->getNumPoints(); j++)
 		{
-			d = plane.distance((*w)[j].asVec3());
+			float d = plane.distance((*w)[j].asVec3());
 			if (d > 0 && d > d_front) {
 				d_front = d;
 			}
@@ -478,9 +470,9 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 
 	// create a new winding from the split plane
 	w = X_NEW(XWinding, g_windingArena, "Winding")(plane);
-	for (i = 0; i < sides.size() && w; i++) 
+	for (size_t i = 0; i < sides.size() && w; i++)
 	{
-		Planef &plane2 = planes[sides[i].planenum ^ 1];
+		Planef& plane2 = planes[sides[i].planenum ^ 1];
 		if(!w->clip(plane2, 0)) {
 			X_DELETE_AND_NULL(w, g_windingArena);
 		}
@@ -500,109 +492,108 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 	}
 
 	if (w->isHuge()) {
-		X_WARNING("LvlBrush", "SplitBrush: huge winding");
+		X_WARNING("LvlBrush", "Split: huge winding");
 		w->print();
 	}
 
-	midwinding = w;
+	auto* pMidwinding = w;
 
 	// split it for real
-	for (i = 0; i < Side::ENUM_COUNT; i++)
+	LvlBrush* pBrushes[Side::ENUM_COUNT];
+	for (uint32_t i = 0; i < Side::ENUM_COUNT; i++)
 	{
-		b[i] = X_NEW(LvlBrush, g_arena, "Brush")(*this);
-		b[i]->sides.clear();
+		pBrushes[i] = X_NEW(LvlBrush, g_arena, "Brush")(*this);
+		pBrushes[i]->sides.clear();
 	}
 
 	// split all the current windings
-	for (i = 0; i < sides.size(); i++)
+	for (size_t i = 0; i < sides.size(); i++)
 	{
-		s = &sides[i];
-		w = s->pWinding;
+		auto& s = sides[i];
+		w = s.pWinding;
 		if (!w) {
 			continue;
 		}
 
+		XWinding* cw[Side::ENUM_COUNT];
+
 		w->Split(plane, 0, &cw[Side::FRONT], &cw[Side::BACK], g_windingArena);
 
-		for (j = 0; j < Side::ENUM_COUNT; j++)
+		for (uint32_t j = 0; j < Side::ENUM_COUNT; j++)
 		{
 			if (!cw[j]) {
 				continue;
 			}
 
-			cs = &b[j]->sides.AddOne();
-			*cs = *s;
-			cs->pWinding = cw[j];
+			auto& cs = pBrushes[j]->sides.AddOne();
+			cs = s;
+			cs.pWinding = cw[j];
 		}
 	}
 
 	// see if we have valid polygons on both sides
-	for (i = 0; i<Side::ENUM_COUNT; i++)
+	for (uint32_t i = 0; i<Side::ENUM_COUNT; i++)
 	{
-		if (!b[i]->boundBrush(planes)) {
+		if (!pBrushes[i]->boundBrush(planes)) {
 			break;
 		}
 
-		if (b[i]->sides.size() < 3)
+		if (pBrushes[i]->sides.size() < 3)
 		{
-			X_DELETE_AND_NULL(b[i], g_arena);
+			X_DELETE_AND_NULL(pBrushes[i], g_arena);
 		}
 	}
 
-	if (!(b[Side::FRONT] && b[Side::FRONT]))
+	if (!(pBrushes[Side::FRONT] && pBrushes[Side::FRONT]))
 	{
-		if (!b[Side::FRONT] && !b[Side::BACK]) {
-			X_LOG0("bspBrush", "split removed brush");
+		if (!pBrushes[Side::FRONT] && !pBrushes[Side::BACK]) {
+			X_LOG0("LvlBrush", "split removed brush");
 		}
 		else {
-			X_LOG0("bspBrush", "split not on both sides");
+			X_LOG0("LvlBrush", "split not on both sides");
 		}
 
-		if (b[Side::FRONT])
+		if (pBrushes[Side::FRONT])
 		{
-			X_DELETE_AND_NULL(b[Side::FRONT], g_arena);
+			X_DELETE_AND_NULL(pBrushes[Side::FRONT], g_arena);
 			front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
 		}
-		if (b[Side::BACK])
+		if (pBrushes[Side::BACK])
 		{
-			X_DELETE_AND_NULL(b[Side::BACK], g_arena);
+			X_DELETE_AND_NULL(pBrushes[Side::BACK], g_arena);
 			back = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
 		}
 		return;
 	}
 
 	// add the midwinding to both sides
-	for (i = 0; i<2; i++)
+	for (int32_t i = 0; i<2; i++)
 	{
-		cs = &b[i]->sides.AddOne();
-
-		cs->planenum = planenum ^ static_cast<int32_t>(i) ^ 1;
+		auto& cs = pBrushes[i]->sides.AddOne();
+		cs.planenum = planenum ^ static_cast<int32_t>(i) ^ 1;
 		//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy(g_windingArena);
+			cs.pWinding = pMidwinding->Copy(g_windingArena);
 		}
 		else {
-			cs->pWinding = midwinding;
+			cs.pWinding = pMidwinding;
 		}
 	}
 
+	for (int32_t i = 0; i < 2; i++)
 	{
-		for (int32_t i = 0; i<2; i++)
+		float v1 = pBrushes[i]->volume(planes);
+		if (v1 < 1.0)
 		{
-			float v1 = b[i]->volume(planes);
-			if (v1 < 1.0)
-			{
-				X_DELETE_AND_NULL(b[i], g_arena);
-				X_WARNING("LvlBrush", "SplitBrush: tiny volume after clip");
-			}
+			X_DELETE_AND_NULL(pBrushes[i], g_arena);
+			X_WARNING("LvlBrush", "SplitBrush: tiny volume after clip");
 		}
 	}
 
-	front = b[Side::FRONT];
-	back = b[Side::BACK];
+	front = pBrushes[Side::FRONT];
+	back = pBrushes[Side::BACK];
 }
-
 
 
 X_NAMESPACE_END
