@@ -70,8 +70,10 @@ struct LvlBrush
 public:
 	LvlBrush();
 	LvlBrush(const LvlBrush& oth);
+	LvlBrush(LvlBrush&& oth);
 
 	LvlBrush& operator=(const LvlBrush& oth);
+	LvlBrush& operator=(LvlBrush&& oth);
 
 	bool removeDuplicateBrushPlanes(void);
 	bool createBrushWindings(const XPlaneSet& planes);

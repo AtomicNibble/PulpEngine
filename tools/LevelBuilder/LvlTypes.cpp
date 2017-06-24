@@ -149,64 +149,80 @@ LvlBrush::LvlBrush() :
 	pOriginal(nullptr),
 	sides(g_arena)
 {
+	bounds.clear();
 	entityNum = -1;
 	brushNum = -1;
-
-	bounds.clear();
 
 	opaque = false;
 	allsidesSameMat = true;
 }
 
 LvlBrush::LvlBrush(const LvlBrush& oth) :
-	sides(g_arena)
+	sides(oth.sides)
 {
 	pOriginal = oth.pOriginal;
 
-	// used for poviding helpful error msg's
+	bounds = oth.bounds;
 	entityNum = oth.entityNum;
 	brushNum = oth.brushNum;
 
-	bounds = oth.bounds;
 	opaque = oth.opaque;
 	allsidesSameMat = oth.allsidesSameMat;
-	//	detail = oth.detail;
+
+	combinedMatFlags = oth.combinedMatFlags;
+}
+
+LvlBrush::LvlBrush(LvlBrush&& oth) :
+	sides(std::move(oth.sides))
+{
+	pOriginal = oth.pOriginal;
+
+	bounds = oth.bounds;
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
+
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
 
 	combinedMatFlags = oth.combinedMatFlags;
 
-	sides.resize(oth.sides.size());
-
-	// cop sides
-	for (size_t i = 0; i < oth.sides.size(); i++)
-	{
-		sides[i] = oth.sides[i];
-	}
+	oth.bounds.clear();
+	oth.entityNum = -1;
+	oth.brushNum = -1;
 }
+
 
 LvlBrush& LvlBrush::operator=(const LvlBrush& oth)
 {
 	pOriginal = oth.pOriginal;
 
-	// used for poviding helpful error msg's
+	bounds = oth.bounds;
 	entityNum = oth.entityNum;
 	brushNum = oth.brushNum;
 
-	bounds = oth.bounds;
 	opaque = oth.opaque;
 	allsidesSameMat = oth.allsidesSameMat;
-	//	detail = oth.detail;
 
 	combinedMatFlags = oth.combinedMatFlags;
 
-	sides.clear();
-	sides.resize(oth.sides.size());
+	sides = oth.sides;
+	return *this;
+}
 
-	// cop sides
-	for (size_t i = 0; i < oth.sides.size(); i++)
-	{
-		sides[i] = oth.sides[i];
-	}
+LvlBrush& LvlBrush::operator=(LvlBrush&& oth)
+{
+	pOriginal = oth.pOriginal;
 
+	bounds = oth.bounds;
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
+
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
+
+	combinedMatFlags = oth.combinedMatFlags;
+
+	sides = std::move(oth.sides);
 	return *this;
 }
 
