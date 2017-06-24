@@ -47,10 +47,12 @@ GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSiz
 
 	X_ASSERT( bitUtil::IsPowerOfTwo( growSize ), "Pool Grow size must be a power-of-two." )( growSize );
 
-	if( maxSizeInBytes % growSize )
-		X_ASSERT( false, "Maximum amount of virtual address space to reserve must be a multiple of the grow size." )( growSize );
-	if( growSize % VirtualMem::GetPageSize() )
-		X_ASSERT( false, "Pool grow size must be a multiple of virtual page size." )( growSize );
+	if (maxSizeInBytes % growSize) {
+		X_ASSERT(false, "Maximum amount of virtual address space to reserve must be a multiple of the grow size.")(growSize);
+	}
+	if (growSize % VirtualMem::GetPageSize()) {
+		X_ASSERT(false, "Pool grow size must be a multiple of virtual page size.")(growSize);
+	}
 	
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -98,8 +100,7 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 
 	if( !pMem ) // we need to grow baby.
 	{
-		size_t neededPhysicalSize = bitUtil::RoundUpToMultiple<size_t>( offset + maxSize_,
-			growSize_ );
+		size_t neededPhysicalSize = bitUtil::RoundUpToMultiple<size_t>( offset + maxSize_, growSize_ );
 
 		if ( &physicalCurrent_[ neededPhysicalSize ] <= virtualEnd_ )
 		{
