@@ -674,6 +674,12 @@ XWindingT<Allocator>* XWindingT<Allocator>::Copy(core::MemoryArenaBase* arena) c
 	return X_NEW(MyType, arena, "WindingCopy")(*this);
 }
 
+template<class Allocator>
+XWindingT<Allocator>* XWindingT<Allocator>::Move(core::MemoryArenaBase* arena)
+{
+	return X_NEW(MyType, arena, "WindingCopy")(std::move(*this));
+}
+
 
 template<class Allocator>
 XWindingT<Allocator>* XWindingT<Allocator>::ReverseWinding(core::MemoryArenaBase* arena) const
@@ -837,6 +843,152 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 }
 
 
+template<class Allocator>
+PlaneSide::Enum XWindingT<Allocator>::SplitMove(const Planef& plane, const float epsilon,
+	XWindingT** pFront, XWindingT** pBack, core::MemoryArenaBase* arena)
+{
+	*pFront = *pBack = nullptr;
+
+	float	dists[MAX_POINTS_ON_WINDING + 4];
+	int32_t	sides[MAX_POINTS_ON_WINDING + 4];
+	int32_t counts[3] = {};
+
+	// determine sides for each point
+	int32_t i;
+	for (i = 0; i < numPoints_; i++) {
+		float dot = plane.distance(pPoints_[i].asVec3());
+		dists[i] = dot;
+
+		if (dot > epsilon) {
+			sides[i] = PlaneSide::FRONT;
+		}
+		else if (dot < -epsilon) {
+			sides[i] = PlaneSide::BACK;
+		}
+		else {
+			sides[i] = PlaneSide::ON;
+		}
+		counts[sides[i]]++;
+	}
+
+	sides[i] = sides[0];
+	dists[i] = dists[0];
+
+
+	// if coplanar, put on the front side if the normals match
+	if (!counts[PlaneSide::FRONT] && !counts[PlaneSide::BACK]) {
+		Planef windingPlane;
+
+		getPlane(windingPlane);
+		if (windingPlane.getNormal() * plane.getNormal() > 0.0f) {
+			*pFront = Move(arena);
+			return PlaneSide::FRONT;
+		}
+		else {
+			*pBack = Move(arena);
+			return PlaneSide::BACK;
+		}
+	}
+	// if nothing at the front of the clipping plane
+	if (!counts[PlaneSide::FRONT]) {
+		*pBack = Move(arena);
+		return PlaneSide::BACK;
+	}
+	// if nothing at the back of the clipping plane
+	if (!counts[PlaneSide::BACK]) {
+		*pFront = Move(arena);
+		return PlaneSide::FRONT;
+	}
+
+	const int32_t maxpts = numPoints_ + 4;	// cant use counts[0]+2 because of fp grouping errors
+
+	MyType *f, *b;
+	*pFront = f = X_NEW(MyType, arena, "FrontWinding")(maxpts);
+	*pBack = b = X_NEW(MyType, arena, "BackWinding")(maxpts);
+	Vec5f mid;
+
+	for (i = 0; i < numPoints_; i++)
+	{
+		const auto& p1 = pPoints_[i];
+
+		if (sides[i] == PlaneSide::ON) {
+			f->pPoints_[f->numPoints_] = p1;
+			f->numPoints_++;
+			b->pPoints_[b->numPoints_] = p1;
+			b->numPoints_++;
+			continue;
+		}
+
+		if (sides[i] == PlaneSide::FRONT) {
+			f->pPoints_[f->numPoints_] = p1;
+			f->numPoints_++;
+		}
+
+		if (sides[i] == PlaneSide::BACK) {
+			b->pPoints_[b->numPoints_] = p1;
+			b->numPoints_++;
+		}
+
+		if (sides[i + 1] == PlaneSide::ON || sides[i + 1] == sides[i]) {
+			continue;
+		}
+
+		// generate a split point
+		const auto& p2 = pPoints_[(i + 1) % numPoints_];
+
+		// always calculate the split going from the same side
+		// or minor epsilon issues can happen
+		if (sides[i] == PlaneSide::FRONT)
+		{
+			float dot = dists[i] / (dists[i] - dists[i + 1]);
+			for (int32_t j = 0; j < 3; j++) {
+				// avoid round off error when possible
+				if (plane.getNormal()[j] == 1.0f) {
+					mid[j] = plane.getDistance();
+				}
+				else if (plane.getNormal()[j] == -1.0f) {
+					mid[j] = -plane.getDistance();
+				}
+				else {
+					mid[j] = p1[j] + dot * (p2[j] - p1[j]);
+				}
+			}
+
+			mid.s = p1.s + dot * (p2.s - p1.s);
+			mid.t = p1.t + dot * (p2.t - p1.t);
+		}
+		else
+		{
+			float dot = dists[i + 1] / (dists[i + 1] - dists[i]);
+			for (int32_t j = 0; j < 3; j++) {
+				// avoid round off error when possible
+				if (plane.getNormal()[j] == 1.0f) {
+					mid[j] = plane.getDistance();
+				}
+				else if (plane.getNormal()[j] == -1.0f) {
+					mid[j] = -plane.getDistance();
+				}
+				else {
+					mid[j] = p2[j] + dot * (p1[j] - p2[j]);
+				}
+			}
+
+			mid.s = p2.s + dot * (p1.s - p2.s);
+			mid.t = p2.t + dot * (p1.t - p2.t);
+		}
+
+		f->pPoints_[f->numPoints_] = mid;
+		f->numPoints_++;
+		b->pPoints_[b->numPoints_] = mid;
+		b->numPoints_++;
+	}
+
+	if (f->numPoints_ > maxpts || b->numPoints_ > maxpts) {
+		X_WARNING("XWinding", "points exceeded estimate");
+	}
+
+	return PlaneSide::CROSS;
+}
 
 
 template<class Allocator>

@@ -95,10 +95,13 @@ public:
 	// returns false if invalid.
 	bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
 	MyType* Copy(core::MemoryArenaBase* arena) const;
+	MyType* Move(core::MemoryArenaBase* arena);
 	MyType* ReverseWinding(core::MemoryArenaBase* arena) const;
 
 	PlaneSide::Enum Split(const Planef& plane, const float epsilon,
-		MyType **front, MyType **back, core::MemoryArenaBase* arena) const;
+		MyType** pFront, MyType** pBack, core::MemoryArenaBase* arena) const;
+	PlaneSide::Enum SplitMove(const Planef& plane, const float epsilon,
+		MyType** pFront, MyType** pBack, core::MemoryArenaBase* arena);
 
 
 	void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = EPSILON);
