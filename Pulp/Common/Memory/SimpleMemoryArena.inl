@@ -3,20 +3,20 @@
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-SimpleMemoryArena<AllocationPolicy>::SimpleMemoryArena(AllocationPolicy* allocator, const char* name)
-	: m_allocator(allocator)
-	, m_name(name)
+SimpleMemoryArena<AllocationPolicy>::SimpleMemoryArena(AllocationPolicy* allocator, const char* name) :
+	allocator_(allocator),
+	name_(name)
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.m_arenaName = name;
-	m_statistics.m_arenaType = "SimpleMemoryArena";
-	m_statistics.m_threadPolicyType = "none";
-	m_statistics.m_boundsCheckingPolicyType = "none";
-	m_statistics.m_memoryTrackingPolicyType = "none";
-	m_statistics.m_memoryTaggingPolicyType = "none";
-	m_statistics.m_allocatorStatistics = allocator->GetStatistics();
-	m_statistics.m_trackingOverhead = 0;
-	m_statistics.m_boundsCheckingOverhead = 0;
+	statistics_.arenaName_ = name;
+	statistics_.arenaType_ = "SimpleMemoryArena";
+	statistics_.threadPolicyType_ = "none";
+	statistics_.boundsCheckingPolicyType_ = "none";
+	statistics_.memoryTrackingPolicyType_ = "none";
+	statistics_.memoryTaggingPolicyType_ = "none";
+	statistics_.allocatorStatistics_ = allocator->getStatistics();
+	statistics_.trackingOverhead_ = 0;
+	statistics_.boundsCheckingOverhead_ = 0;
 #endif
 }
 
@@ -32,13 +32,13 @@ SimpleMemoryArena<AllocationPolicy>::~SimpleMemoryArena(void)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-void* SimpleMemoryArena<AllocationPolicy>::Allocate(size_t size, size_t alignment, size_t offset, const char*, const char*, const SourceInfo&)
+void* SimpleMemoryArena<AllocationPolicy>::allocate(size_t size, size_t alignment, size_t offset, const char*, const char*, const SourceInfo&)
 {
-	void* memory = m_allocator->Allocate(size, alignment, offset);
-	X_ASSERT(memory != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", size, m_name)(size, alignment, offset);
+	void* memory = allocator_->allocate(size, alignment, offset);
+	X_ASSERT(memory != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", size, name_)(size, alignment, offset);
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.m_allocatorStatistics = m_allocator->GetStatistics();
+	statistics_.allocatorStatistics_ = allocator_->getStatistics();
 #endif
 
 	return memory;
@@ -48,36 +48,53 @@ void* SimpleMemoryArena<AllocationPolicy>::Allocate(size_t size, size_t alignmen
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-void SimpleMemoryArena<AllocationPolicy>::Free(void* ptr)
+void SimpleMemoryArena<AllocationPolicy>::free(void* ptr)
 {
-	X_ASSERT_NOT_NULL(ptr);
-
-	m_allocator->Free(ptr);
+	allocator_->free(X_ASSERT_NOT_NULL(ptr));
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.m_allocatorStatistics = m_allocator->GetStatistics();
+	statistics_.allocatorStatistics_ = allocator_->getStatistics();
 #endif
 }
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-MemoryArenaStatistics SimpleMemoryArena<AllocationPolicy>::GetStatistics(void) const
+void SimpleMemoryArena<AllocationPolicy>::free(void* ptr, size_t size)
+{
+	allocator_->free(X_ASSERT_NOT_NULL(ptr), size);
+
+#if X_ENABLE_MEMORY_ARENA_STATISTICS
+	statistics_.allocatorStatistics_ = allocator_->getStatistics();
+#endif
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class AllocationPolicy>
+size_t SimpleMemoryArena<AllocationPolicy>::getSize(void* ptr)
+{
+	return allocator_->getSize(ptr);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class AllocationPolicy>
+MemoryArenaStatistics SimpleMemoryArena<AllocationPolicy>::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	MemoryArenaStatistics statistics = {};
-	statistics.m_arenaName = m_name;
-	statistics.m_arenaType = "SimpleMemoryArena";
-	statistics.m_threadPolicyType = "none";
-	statistics.m_boundsCheckingPolicyType = "none";
-	statistics.m_memoryTrackingPolicyType = "none";
-	statistics.m_memoryTaggingPolicyType = "none";
-	statistics.m_allocatorStatistics = m_allocator->GetStatistics();
-	statistics.m_trackingOverhead = 0;
-	statistics.m_boundsCheckingOverhead = 0;
+	statistics.arenaName_ = name_;
+	statistics.arenaType_ = "SimpleMemoryArena";
+	statistics.threadPolicyType_ = "none";
+	statistics.boundsCheckingPolicyType_ = "none";
+	statistics.memoryTrackingPolicyType_ = "none";
+	statistics.memoryTaggingPolicyType_ = "none";
+	statistics.allocatorStatistics_ = allocator_->getStatistics();
+	statistics.trackingOverhead_ = 0;
+	statistics.boundsCheckingOverhead_ = 0;
 	return statistics;
 #endif
 }
@@ -86,7 +103,42 @@ MemoryArenaStatistics SimpleMemoryArena<AllocationPolicy>::GetStatistics(void) c
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-inline size_t SimpleMemoryArena<AllocationPolicy>::GetMemoryRequirement(size_t size)
+MemoryAllocatorStatistics SimpleMemoryArena<AllocationPolicy>::getAllocatorStatistics(bool children) const
+{
+#if X_ENABLE_MEMORY_ARENA_STATISTICS
+	MemoryAllocatorStatistics stats = statistics_.allocatorStatistics_;
+
+	if (children)
+	{
+		for (const auto& arena : children_)
+		{
+			stats += arena->getAllocatorStatistics(true);
+		}
+	}
+
+	return stats;
+#else
+	X_UNUSED(children);
+
+	MemoryAllocatorStatistics statistics;
+	core::zero_object(statistics);
+	return statistics;
+#endif
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+
+template <class AllocationPolicy>
+bool SimpleMemoryArena<AllocationPolicy>::isThreadSafe(void) const
+{
+	return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class AllocationPolicy>
+inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryRequirement(size_t size)
 {
 	return size;
 }
@@ -95,7 +147,7 @@ inline size_t SimpleMemoryArena<AllocationPolicy>::GetMemoryRequirement(size_t s
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-inline size_t SimpleMemoryArena<AllocationPolicy>::GetMemoryAlignmentRequirement(size_t alignment)
+inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryAlignmentRequirement(size_t alignment)
 {
 	return alignment;
 }
@@ -104,7 +156,7 @@ inline size_t SimpleMemoryArena<AllocationPolicy>::GetMemoryAlignmentRequirement
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-inline size_t SimpleMemoryArena<AllocationPolicy>::GetMemoryOffsetRequirement(void)
+inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryOffsetRequirement(void)
 {
 	return 0;
 }

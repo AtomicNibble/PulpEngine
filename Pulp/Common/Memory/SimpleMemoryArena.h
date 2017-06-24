@@ -8,52 +8,51 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Memory
-/// \brief Implementation of a memory arena.
-/// \details This class implements the MemoryArenaBase interface, and defers allocation requests to an allocator.
-/// Unlike the MemoryArena, this arena does not offer any debugging facilities, and can be considered a simple wrapper around
-/// an allocator in order to act like an arena.
-/// \sa MemoryArenaBase MemoryArena X_NEW X_NEW_ARRAY X_DELETE X_DELETE_ARRAY
 template <class AllocationPolicy>
 class SimpleMemoryArena : public MemoryArenaBase
 {
 public:
-	/// \brief Constructs an arena that uses a given allocator for satisfying allocation requests.
-	/// \details The \a name argument can be used to identify different memory arenas.
-	/// \remark Ownership of the provided allocator stays at the calling site.
-	/// \remark The given \a name must be a constant string/string literal.
+	static const bool IS_THREAD_SAFE = false;
+
+public:
 	SimpleMemoryArena(AllocationPolicy* allocator, const char* name);
 
 	/// Empty destructor.
 	virtual ~SimpleMemoryArena(void);
 
 	/// Allocates raw memory that satisfies the alignment requirements.
-	virtual void* Allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo) X_OVERRIDE;
+	virtual void* allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo) X_FINAL;
 
 	/// Frees memory previously allocated by Allocate().
-	virtual void Free(void* ptr) X_OVERRIDE;
+	virtual void free(void* ptr) X_FINAL;
+	virtual void free(void* ptr, size_t size) X_FINAL;
+
+	virtual size_t getSize(void* ptr) X_FINAL;
 
 	/// Returns statistics regarding the allocations made by the memory arena.
-	virtual MemoryArenaStatistics GetStatistics(void) const X_OVERRIDE;
+	virtual MemoryArenaStatistics getStatistics(void) const X_FINAL;
+	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_FINAL;
+
+	virtual bool isThreadSafe(void) const X_FINAL;
 
 	/// Returns the memory requirement for an allocation of \a size, taking into account possible overhead.
-	static inline size_t GetMemoryRequirement(size_t size);
+	static inline size_t getMemoryRequirement(size_t size);
 
 	/// Returns the alignment requirement for an allocation requiring \a alignment, taking into account possible overhead.
-	static inline size_t GetMemoryAlignmentRequirement(size_t alignment);
+	static inline size_t getMemoryAlignmentRequirement(size_t alignment);
 
 	/// Returns the offset requirement for an allocation, taking into account possible overhead.
-	static inline size_t GetMemoryOffsetRequirement(void);
+	static inline size_t getMemoryOffsetRequirement(void);
 
 private:
 	X_NO_COPY(SimpleMemoryArena);
 	X_NO_ASSIGN(SimpleMemoryArena);
 
-	AllocationPolicy* m_allocator;
-	const char* m_name;
+	AllocationPolicy* allocator_;
+	const char* name_;
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	MemoryArenaStatistics m_statistics;
+	MemoryArenaStatistics statistics_;
 #endif
 };
 
