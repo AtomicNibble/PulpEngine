@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LvlTypes.h"
+#include "LvlEntity.h"
 
 X_NAMESPACE_BEGIN(lvl)
 

@@ -170,11 +170,10 @@ bool LvlEntity::MakeStructuralFaceList(void)
 	X_ASSERT(pBspFaces == nullptr, "bspFace already allocated")(pBspFaces);
 
 #if 1 // reverse toggle.
-	size_t i, x;
+	size_t i;
 
 	for (i = 0; i < brushes.size(); i++)
 #else
-	size_t x;
 	int32_t i;
 
 	for (i = ent.brushes.size() - 1; i >= 0; i--)
@@ -192,10 +191,8 @@ bool LvlEntity::MakeStructuralFaceList(void)
 
 		const bool hasPortalSide = brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL);
 
-		for (x = 0; x < brush.sides.size(); x++)
+		for (const auto& side : brush.sides)
 		{
-			LvlBrushSide& side = brush.sides[x];
-
 			if (!side.pWinding) {
 				continue;
 			}
@@ -274,22 +271,14 @@ bool LvlEntity::MakeTreePortals(XPlaneSet& planeSet)
 
 bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 {
-	size_t		numClusters, r;
-	LvlBrush	*b, *newb;
-
 	X_LOG0("LvlEntity", "^5----- FilterBrushesIntoTree -----");
 
-	numClusters = 0;
-	r = 0;
-
-	LvlEntity::LvlBrushArr::Iterator it = brushes.begin();
-	for (; it != brushes.end(); ++it)
+	size_t numClusters = 0;
+	for (const auto& brush : brushes)
 	{
-		b = it;
+		auto* pNewb = X_NEW(LvlBrush, g_arena, "BrushCopy")(brush);
 
-		newb = X_NEW(LvlBrush, g_arena, "BrushCopy")(*b);
-
-		r = newb->FilterBrushIntoTree_r(planeSet, bspTree_.pHeadnode);
+		size_t r = pNewb->FilterBrushIntoTree_r(planeSet, bspTree_.pHeadnode);
 
 		numClusters += r;
 	}
@@ -389,10 +378,8 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 {
 	X_LOG0("LvlEntity", "^5----- ClipSidesByTree -----");
 
-	for (size_t i = 0; i < brushes.size(); i++)
+	for (LvlBrush& brush : brushes)
 	{
-		LvlBrush& brush = brushes[i];
-
 		for (LvlBrushSide& side : brush.sides)
 		{
 			if (!side.pWinding) {
@@ -401,7 +388,7 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 			side.pVisibleHull = nullptr;
 
-			XWinding* pWinding = side.pWinding->Copy(g_windingArena);
+			auto* pWinding = side.pWinding->Copy(g_windingArena);
 
 			bspTree_.pHeadnode->ClipSideByTree_r(planeSet, pWinding, side);
 		}

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "LvlTypes.h"
 #include "LvlFmts\LvlSource.h"
 
 X_NAMESPACE_BEGIN(lvl)
+
+struct LvlEntity;
 
 namespace mapFile
 {
