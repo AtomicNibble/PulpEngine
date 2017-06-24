@@ -53,6 +53,9 @@ template<typename T>
 class Plane
 {
 public:
+	typedef core::StackString<128,char> Description;
+
+public:
 	X_INLINE Plane() : Distance_(static_cast<T>(0)) {}
 
 	X_INLINE Plane(const Vec3<T> &v1, const Vec3<T> &v2, const Vec3<T> &v3) {
@@ -160,23 +163,10 @@ public:
 		return PlaneType::NONAXIAL;
 	}
 
-	typedef char Description[128];
-	const char* toString(Description& desc, int precision = 2) const
+	const char* toString(Description& desc) const
 	{
-		char format[16];
-		int i, n;
-		n = 0;
-
-		sprintf_s(format, "%%.%df", precision);
-		Vec3<T> pos = getPoint();
-		for (i = 0; i < 3; i++)
-		{
-			n += sprintf_s(desc + n, sizeof(desc) - n, format, pos[i]);	
-			if (i == 0)
-				sprintf_s(format, ", %%.%df", precision);
-		}
-
-		return desc;
+		desc.setFmt("<%g,%g,%g> - %g", Normal_.x, Normal_.y, Normal_.z, Distance_);
+		return desc.c_str();
 	}
 
 
