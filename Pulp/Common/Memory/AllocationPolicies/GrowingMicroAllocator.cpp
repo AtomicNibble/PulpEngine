@@ -57,10 +57,10 @@ void* GrowingMicroAllocator::allocate( size_t size, size_t alignment, size_t off
 
 	static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= MAX_ALLOCATION_SIZE, "Can't store allocation indexes");
 
-	X_ALIGNED_SYMBOL(ChunkHeader,4) chunkHeader;
+	ChunkHeader chunkHeader;
 	chunkHeader.allocatorIndex_ = safe_static_cast<uint8_t>(size);
 
-	void* pMem = poolAllocators_[ size ]->allocate( size, alignment, offset, &chunkHeader );
+	void* pMem = poolAllocators_[ size ]->allocate<ChunkHeader>( size, alignment, offset, chunkHeader );
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	updateStatistics();
