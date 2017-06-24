@@ -1976,5 +1976,8 @@
     <Natvis Include="FiFo.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="Winding.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>
