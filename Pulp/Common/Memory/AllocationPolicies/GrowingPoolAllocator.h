@@ -54,7 +54,8 @@ public:
 	/// \brief Allocates raw memory, and additionally fills newly allocated physical memory chunks with the given header data.
 	/// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
 	template <class T>
-	X_INLINE void* allocate(size_t size, size_t alignment, size_t offset, const T& chunkHeader);
+	X_INLINE void* allocate(size_t size, size_t alignment, size_t offset, 
+		typename std::enable_if<!core::compileTime::IsPointer<T>::Value, T>::type& chunkHeader);
 
 	/// Frees an allocation.
 	X_INLINE void free(void* ptr);
