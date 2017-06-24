@@ -7,7 +7,8 @@ XPlaneSet::XPlaneSet(core::MemoryArenaBase* arena) :
 	core::Array<Planef>(g_arena), 
 	hash_(g_arena)
 {
-	reserve(4096 * 8);
+	setGranularity(1024);
+	reserve(4096 * 4);
 }
 
 
