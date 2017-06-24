@@ -5,180 +5,389 @@
 X_NAMESPACE_BEGIN(lvl)
 
 
-void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
-	LvlBrush** front, LvlBrush** back)
+// ==========================================
+
+
+LvlBrushSide::LvlBrushSide() :
+	planenum(0),
+	visible(true),
+	culled(false),
+	pWinding(nullptr),
+	pVisibleHull(nullptr)
 {
-	LvlBrush		*b[2];
-	size_t			i, j;
-	XWinding		*w, *cw[2], *midwinding;
-	LvlBrushSide	*s, *cs;
-	float			d, d_front, d_back;
+	core::zero_object(__pad);
+}
 
-	*front = *back = nullptr;
-	Planef &plane = planes_[planenum];
+LvlBrushSide::~LvlBrushSide()
+{
+	if (pWinding) {
+		X_DELETE(pWinding, g_arena);
+	}
+	if (pVisibleHull) {
+		X_DELETE(pVisibleHull, g_arena);
+	}
+}
 
-	// check all points
-	d_front = d_back = 0;
-	for (i = 0; i < brush->sides.size(); i++)
-	{
-		w = brush->sides[i].pWinding;
-		if (!w) {
-			continue;
-		}
-		for (j = 0; j < static_cast<size_t>(w->getNumPoints()); j++) 
-		{
-			d = plane.distance((*w)[j].asVec3());
-			if (d > 0 && d > d_front)
-				d_front = d;
-			if (d < 0 && d < d_back)
-				d_back = d;
-		}
-	}
-	if (d_front < 0.1)
-	{	
-		// only on back
-		*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
-		return;
-	}
-	if (d_back > -0.1) 
-	{	
-		// only on front
-		*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
-		return;
-	}
+LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
+	matInfo(oth.matInfo)
+{
+	planenum = oth.planenum;
 
-	// create a new winding from the split plane
-	w = X_NEW(XWinding, g_arena, "Winding")(plane);
-	for (i = 0; i < brush->sides.size() && w; i++) {
-		Planef &plane2 = planes_[brush->sides[i].planenum ^ 1];
-		if (!w->clip(plane2, 0)) {
-			X_DELETE_AND_NULL(w, g_arena);
-		}
+	visible = oth.visible;
+	culled = oth.culled;
+
+	// null them first.
+	pWinding = nullptr;
+	pVisibleHull = nullptr;
+
+	if (oth.pWinding) {
+		pWinding = oth.pWinding->Copy(g_arena);
+	}
+	if (oth.pVisibleHull) {
+		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
+	}
+}
+
+LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
+{
+	// nned to delete them if set.
+	if (pWinding) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+	if (pVisibleHull) {
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	if (!w || w->isTiny()) 
-	{
-		// the brush isn't really split
-		BrushPlaneSide::Enum side;
+	planenum = oth.planenum;
 
-		side = brush->BrushMostlyOnSide(plane);
-		if (side == BrushPlaneSide::FRONT)
-			*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
-		if (side == BrushPlaneSide::BACK)
-			*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
-		return;
+	visible = oth.visible;
+	culled = oth.culled;
+
+	matInfo = oth.matInfo;
+
+	// null them first.
+	pWinding = nullptr;
+	pVisibleHull = nullptr;
+
+	if (oth.pWinding) {
+		pWinding = oth.pWinding->Copy(g_arena);
 	}
-
-	if (w->isHuge()) {
-		X_WARNING("LvlBrush", "SplitBrush: huge winding");
-		w->print();
+	if (oth.pVisibleHull) {
+		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
 	}
+	return *this;
+}
 
-	midwinding = w;
+// ==========================================
 
-	// split it for real
-	for (i = 0; i < 2; i++) {
-		b[i] = X_NEW(LvlBrush,g_arena, "Brush")(*brush);
-		b[i]->sides.clear();
-	//	b[i]->pOriginal = brush->pOriginal;
-	}
 
-	// split all the current windings
-	for (i = 0; i < brush->sides.size(); i++) 
-	{
-		s = &brush->sides[i];
-		w = s->pWinding;
-		if (!w) {
-			continue;
-		}
 
-		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
+LvlBrush::LvlBrush() :
+	pOriginal(nullptr),
+	sides(g_arena)
+{
+	bounds.clear();
+	entityNum = -1;
+	brushNum = -1;
 
-		for (j = 0; j < 2; j++) 
-		{
-			if (!cw[j]) {
-				continue;
-			}
+	opaque = false;
+	allsidesSameMat = true;
+}
 
-			cs = &b[j]->sides.AddOne();
-			*cs = *s;
-			cs->pWinding = cw[j];
-		}
-	}
+LvlBrush::LvlBrush(const LvlBrush& oth) :
+	sides(oth.sides)
+{
+	pOriginal = oth.pOriginal;
 
-	// see if we have valid polygons on both sides
-	for (i = 0; i<2; i++)
-	{
-		if (!b[i]->boundBrush(planes_)) {
-			break;
-		}
+	bounds = oth.bounds;
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
 
-		if (b[i]->sides.size() < 3)
-		{
-			X_DELETE_AND_NULL(b[i], g_arena);
-		}
-	}
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
 
-	if (!(b[0] && b[1]))
-	{
-		if (!b[0] && !b[1]) {
-			X_LOG0("bspBrush", "split removed brush");
-		}
-		else {
-			X_LOG0("bspBrush", "split not on both sides");
-		}
+	combinedMatFlags = oth.combinedMatFlags;
+}
 
-		if (b[0])
-		{
-			X_DELETE_AND_NULL(b[0], g_arena);
-			*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
-		}
-		if (b[1])
-		{
-			X_DELETE_AND_NULL(b[1], g_arena);
-			*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
-		}
-		return;
-	}
+LvlBrush::LvlBrush(LvlBrush&& oth) :
+	sides(std::move(oth.sides))
+{
+	pOriginal = oth.pOriginal;
 
-	// add the midwinding to both sides
-	for (i = 0; i<2; i++)
-	{
-		cs = &b[i]->sides.AddOne();
+	bounds = oth.bounds;
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
 
-		cs->planenum = planenum ^ static_cast<int32>(i) ^ 1;
-	//	cs->material = NULL;
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
 
-		if (i == 0) {
-			cs->pWinding = midwinding->Copy(g_arena);
-		}
-		else {
-			cs->pWinding = midwinding;
-		}
-	}
+	combinedMatFlags = oth.combinedMatFlags;
 
-	{
-		float	v1;
-		int		i;
-
-		for (i = 0; i<2; i++)
-		{
-			v1 = b[i]->Volume(planes_);
-			if (v1 < 1.0)
-			{
-				X_DELETE_AND_NULL(b[i], g_arena);
-				b[i] = NULL;
-				X_WARNING("LvlBrush", "SplitBrush: tiny volume after clip");
-			}
-		}
-	}
-
-	*front = b[0];
-	*back = b[1];
+	oth.bounds.clear();
+	oth.entityNum = -1;
+	oth.brushNum = -1;
 }
 
 
-// ===========================================
+LvlBrush& LvlBrush::operator=(const LvlBrush& oth)
+{
+	pOriginal = oth.pOriginal;
+
+	bounds = oth.bounds;
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
+
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
+
+	combinedMatFlags = oth.combinedMatFlags;
+
+	sides = oth.sides;
+	return *this;
+}
+
+LvlBrush& LvlBrush::operator=(LvlBrush&& oth)
+{
+	pOriginal = oth.pOriginal;
+
+	bounds = oth.bounds;
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
+
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
+
+	combinedMatFlags = oth.combinedMatFlags;
+
+	sides = std::move(oth.sides);
+	return *this;
+}
+
+
+bool LvlBrush::removeDuplicateBrushPlanes(void)
+{
+	for (size_t i = 1; i < sides.size(); i++)
+	{
+		LvlBrushSide& side = sides[i];
+
+		// check for a degenerate plane
+		if (side.planenum == -1)
+		{
+			X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": degenerate plane(%" PRIuS ")",
+				entityNum, brushNum, sides.size(), i);
+
+			// remove it
+			sides.removeIndex(i);
+
+			i--;
+			continue;
+		}
+
+		// check for duplication and mirroring
+		for (size_t j = 0; j < i; j++)
+		{
+			if (side.planenum == sides[j].planenum)
+			{
+				X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": duplicate plane(%" PRIuS ",%" PRIuS ")",
+					entityNum, brushNum, sides.size(), i, j);
+
+				// remove the second duplicate
+				sides.removeIndex(i);
+
+				i--;
+				break;
+			}
+
+			if (side.planenum == (sides[i].planenum ^ 1))
+			{
+				// mirror plane, brush is invalid
+				X_WARNING("Brush", "Entity %" PRIi32 ", Brush %" PRIi32 ", Sides %" PRIuS ": mirrored plane(%" PRIuS ",%" PRIuS ")",
+					entityNum, brushNum, sides.size(), i, j);
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
+{
+	const Planef* pPlane;
+	LvlBrushSide* pSide;
+
+	for (size_t i = 0; i < sides.size(); i++)
+	{
+		pSide = &sides[i];
+		pPlane = &planes[pSide->planenum];
+		auto* pWinding = X_NEW(XWinding, g_arena, "BrushWinding")(*pPlane);
+
+		for (size_t j = 0; j < sides.size() && pWinding; j++)
+		{
+			if (i == j) {
+				continue;
+			}
+			if (sides[j].planenum == (pSide->planenum ^ 1)) {
+				continue;		// back side clipaway
+			}
+
+			if (!pWinding->clip(planes[sides[j].planenum ^ 1], 0.01f)) {
+				X_DELETE_AND_NULL(pWinding, g_arena);
+			}
+		}
+		if (pSide->pWinding) {
+			X_DELETE(pSide->pWinding, g_arena);
+		}
+		pSide->pWinding = pWinding;
+	}
+
+	return boundBrush(planes);
+}
+
+bool LvlBrush::boundBrush(const XPlaneSet& planes)
+{
+	bounds.clear();
+	for (size_t i = 0; i < sides.size(); i++)
+	{
+		auto* pWinding = sides[i].pWinding;
+		if (!pWinding) {
+			continue;
+		}
+		for (size_t j = 0; j < pWinding->getNumPoints(); j++) {
+			bounds.add((*pWinding)[j].asVec3());
+		}
+	}
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		if (bounds.min[i] < level::MIN_WORLD_COORD ||
+			bounds.max[i] > level::MAX_WORLD_COORD ||
+			bounds.min[i] >= bounds.max[i])
+		{
+			// calculate a pos.
+			Planef::Description Dsc;
+			const Planef* pPlane = nullptr;
+			if (sides.size() > 0) {
+				pPlane = &planes[sides[0].planenum];
+			}
+
+			X_WARNING("LvlBrush", "Entity %i, Brush %i, Sides %i: failed "
+				"to calculate brush bounds (%s)",
+				entityNum, brushNum, sides.size(), pPlane ? pPlane->toString(Dsc) : "");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool LvlBrush::calculateContents(void)
+{
+	if (sides.isEmpty()) {
+		return false;
+	}
+
+	MaterialName matName = sides[0].matInfo.name;
+
+	// a brush is only opaque if all sides are opaque
+	opaque = true;
+	allsidesSameMat = true;
+
+	combinedMatFlags.Clear();
+
+	for (const auto& side : sides)
+	{
+		if (!side.matInfo.pMaterial) {
+			X_ERROR("Brush", "material not found for brush side. ent: %i brush: %i",
+				entityNum, brushNum);
+			return false;
+		}
+
+		engine::Material* pMat = side.matInfo.pMaterial;
+		const auto flags = pMat->getFlags();
+
+		combinedMatFlags |= flags;
+
+		if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
+			opaque = false;
+		}
+		else if (pMat->getCoverage() != engine::MaterialCoverage::OPAQUE) {
+			opaque = false;
+		}
+
+		if (matName != side.matInfo.name) {
+			allsidesSameMat = false;
+		}
+	}
+
+	return true;
+}
+
+
+float LvlBrush::volume(const XPlaneSet& planes)
+{
+	// grab the first valid point as the corner
+	size_t i;
+	XWinding* w = nullptr;
+	for (i = 0; i < sides.size(); i++) {
+		w = sides[i].pWinding;
+		if (w) {
+			break;
+		}
+	}
+	if (!w) {
+		return 0.f;
+	}
+
+	const Vec3f& corner = (*w)[0].asVec3();
+
+	// make tetrahedrons to all other faces
+	float volume = 0;
+	for (; i < sides.size(); i++)
+	{
+		w = sides[i].pWinding;
+		if (!w) {
+			continue;
+		}
+		auto& plane = planes[sides[i].planenum];
+		float d = -plane.distance(corner);
+		float area = w->getArea();
+		volume += d * area;
+	}
+
+	volume /= 3;
+	return volume;
+}
+
+
+BrushPlaneSide::Enum LvlBrush::brushMostlyOnSide(const Planef& plane) const
+{
+	float max = 0;
+	BrushPlaneSide::Enum side = BrushPlaneSide::FRONT;
+	for (size_t i = 0; i < sides.size(); i++)
+	{
+		auto* w = sides[i].pWinding;
+		if (!w) {
+			continue;
+		}
+
+		for (size_t j = 0; j < w->getNumPoints(); j++)
+		{
+			float d = plane.distance((*w)[j].asVec3());
+			if (d > max)
+			{
+				max = d;
+				side = BrushPlaneSide::FRONT;
+			}
+			if (-d > max)
+			{
+				max = -d;
+				side = BrushPlaneSide::BACK;
+			}
+		}
+	}
+	return side;
+}
+
 
 size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 {
@@ -225,8 +434,7 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 }
 
 
-void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
-	LvlBrush*& front, LvlBrush*& back)
+void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlBrush*& back)
 {
 	LvlBrush		*b[2];
 	size_t			i, j;
@@ -280,13 +488,13 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	if (!w || w->isTiny())
 	{
 		// the brush isn't really split
-		BrushPlaneSide::Enum side;
-
-		side = BrushMostlyOnSide(plane);
-		if (side == BrushPlaneSide::FRONT)
+		auto side = brushMostlyOnSide(plane);
+		if (side == BrushPlaneSide::FRONT) {
 			front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
-		if (side == BrushPlaneSide::BACK)
+		}
+		if (side == BrushPlaneSide::BACK) {
 			back = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
+		}
 		return;
 	}
 
@@ -379,12 +587,180 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	}
 
 	{
-		float	v1;
-		int		i;
-
-		for (i = 0; i<2; i++)
+		for (int32_t i = 0; i<2; i++)
 		{
-			v1 = b[i]->Volume(planes);
+			float v1 = b[i]->volume(planes);
+			if (v1 < 1.0)
+			{
+				X_DELETE_AND_NULL(b[i], g_arena);
+				X_WARNING("LvlBrush", "SplitBrush: tiny volume after clip");
+			}
+		}
+	}
+
+	front = b[0];
+	back = b[1];
+}
+
+
+
+// ==========================================
+
+void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back)
+{
+	LvlBrush		*b[2];
+	size_t			i, j;
+	XWinding		*w, *cw[2], *midwinding;
+	LvlBrushSide	*s, *cs;
+	float			d, d_front, d_back;
+
+	*front = *back = nullptr;
+	Planef &plane = planes_[planenum];
+
+	// check all points
+	d_front = d_back = 0;
+	for (i = 0; i < brush->sides.size(); i++)
+	{
+		w = brush->sides[i].pWinding;
+		if (!w) {
+			continue;
+		}
+		for (j = 0; j < static_cast<size_t>(w->getNumPoints()); j++)
+		{
+			d = plane.distance((*w)[j].asVec3());
+			if (d > 0 && d > d_front)
+				d_front = d;
+			if (d < 0 && d < d_back)
+				d_back = d;
+		}
+	}
+	if (d_front < 0.1)
+	{
+		// only on back
+		*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
+		return;
+	}
+	if (d_back > -0.1)
+	{
+		// only on front
+		*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
+		return;
+	}
+
+	// create a new winding from the split plane
+	w = X_NEW(XWinding, g_arena, "Winding")(plane);
+	for (i = 0; i < brush->sides.size() && w; i++) {
+		Planef &plane2 = planes_[brush->sides[i].planenum ^ 1];
+		if (!w->clip(plane2, 0)) {
+			X_DELETE_AND_NULL(w, g_arena);
+		}
+	}
+
+	if (!w || w->isTiny())
+	{
+		// the brush isn't really split
+		auto side = brush->brushMostlyOnSide(plane);
+		if (side == BrushPlaneSide::FRONT) {
+			*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
+		}
+		if (side == BrushPlaneSide::BACK) {
+			*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
+		}
+		return;
+	}
+
+	if (w->isHuge()) {
+		X_WARNING("LvlBrush", "SplitBrush: huge winding");
+		w->print();
+	}
+
+	midwinding = w;
+
+	// split it for real
+	for (i = 0; i < 2; i++) {
+		b[i] = X_NEW(LvlBrush, g_arena, "Brush")(*brush);
+		b[i]->sides.clear();
+		//	b[i]->pOriginal = brush->pOriginal;
+	}
+
+	// split all the current windings
+	for (i = 0; i < brush->sides.size(); i++)
+	{
+		s = &brush->sides[i];
+		w = s->pWinding;
+		if (!w) {
+			continue;
+		}
+
+		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
+
+		for (j = 0; j < 2; j++)
+		{
+			if (!cw[j]) {
+				continue;
+			}
+
+			cs = &b[j]->sides.AddOne();
+			*cs = *s;
+			cs->pWinding = cw[j];
+		}
+	}
+
+	// see if we have valid polygons on both sides
+	for (i = 0; i<2; i++)
+	{
+		if (!b[i]->boundBrush(planes_)) {
+			break;
+		}
+
+		if (b[i]->sides.size() < 3)
+		{
+			X_DELETE_AND_NULL(b[i], g_arena);
+		}
+	}
+
+	if (!(b[0] && b[1]))
+	{
+		if (!b[0] && !b[1]) {
+			X_LOG0("bspBrush", "split removed brush");
+		}
+		else {
+			X_LOG0("bspBrush", "split not on both sides");
+		}
+
+		if (b[0])
+		{
+			X_DELETE_AND_NULL(b[0], g_arena);
+			*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
+		}
+		if (b[1])
+		{
+			X_DELETE_AND_NULL(b[1], g_arena);
+			*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
+		}
+		return;
+	}
+
+	// add the midwinding to both sides
+	for (i = 0; i<2; i++)
+	{
+		cs = &b[i]->sides.AddOne();
+
+		cs->planenum = planenum ^ static_cast<int32>(i) ^ 1;
+		//	cs->material = NULL;
+
+		if (i == 0) {
+			cs->pWinding = midwinding->Copy(g_arena);
+		}
+		else {
+			cs->pWinding = midwinding;
+		}
+	}
+
+	{
+		for (int32_t i = 0; i<2; i++)
+		{
+			float v1 = b[i]->volume(planes_);
 			if (v1 < 1.0)
 			{
 				X_DELETE_AND_NULL(b[i], g_arena);
@@ -394,8 +770,8 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 		}
 	}
 
-	front = b[0];
-	back = b[1];
+	*front = b[0];
+	*back = b[1];
 }
 
 X_NAMESPACE_END

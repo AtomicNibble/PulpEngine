@@ -10,4 +10,15 @@ struct LvlVert
 	Vec4<uint8> color;
 };
 
+struct LvlTris
+{
+	X_INLINE LvlTris() {
+		pMaterial = nullptr;
+	}
+
+	engine::Material* pMaterial;
+	LvlVert verts[3];
+};
+
+
 X_NAMESPACE_END

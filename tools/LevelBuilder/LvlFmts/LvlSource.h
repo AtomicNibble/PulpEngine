@@ -21,16 +21,16 @@ struct SourceStats
 
 class LvlSource
 {
+	typedef core::Array<LvlEntity> LvlEntsArr;
+
 public:
 	LvlSource(core::MemoryArenaBase* arena, ModelCache& modelCache, MatManager& matMan);
 	virtual ~LvlSource();
-
 
 protected:
 	void calculateLvlBounds(void);
 
 	X_INLINE int32_t findFloatPlane(const Planef& plane);
-
 
 protected:
 	core::MemoryArenaBase* arena_;

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "LvlArea.h"
 #include "LvlTypes.h"
 
 

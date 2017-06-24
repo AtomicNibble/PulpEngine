@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "BSPTypes.h"
-#include "LvlTypes.h"
-
+#include "LvlBrush.h"
 
 X_NAMESPACE_BEGIN(lvl)
 
@@ -56,17 +55,13 @@ void bspNode::CalcNodeBounds(void)
 	}
 }
 
-XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
+core::UniquePointer<XWinding> bspNode::getBaseWinding(XPlaneSet& planeSet)
 {
-	XWinding*	w;
-	bspNode	*	n;
-
-	w = X_NEW(XWinding, g_arena, "WindingForNode")(planeSet[planenum]);
-
+	auto w = core::makeUnique<XWinding>(g_arena, planeSet[planenum]);
+	
 	// clip by all the parents
 	bspNode* pNode = this;
-
-	for (n = pNode->parent; n && w;)
+	for (auto* n = pNode->parent; n && w;)
 	{
 		Planef &plane = planeSet[n->planenum];
 
@@ -74,7 +69,7 @@ XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
 		{
 			// take front
 			if (!w->clip(plane, BASE_WINDING_EPSILON)) {
-				X_DELETE_AND_NULL(w, g_arena);
+				w.reset();
 			}
 		}
 		else 
@@ -82,7 +77,7 @@ XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
 			// take back
 			Planef	back = -plane;
 			if(!w->clip(back, BASE_WINDING_EPSILON)) {
-				X_DELETE_AND_NULL(w, g_arena);
+				w.reset();
 			}
 		}
 		pNode = n;
@@ -90,7 +85,6 @@ XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
 	}
 
 	return w;
-
 }
 
 void bspNode::FloodPortals_r(int32_t dist, size_t& floodedNum)
@@ -358,7 +352,7 @@ void bspNode::FindAreas_r(size_t& numAreas)
 	size_t areaFloods = 0;
 	this->FloodAreas_r(numAreas, areaFloods);
 
-	X_LOG1("Lvl", "area ^8%i^7 has ^8%i^7 leafs", numAreas, areaFloods);
+	X_LOG1("Lvl", "area ^8%" PRIuS "^7 has ^8%" PRIuS "^7 leafs", numAreas, areaFloods);
 	numAreas++;
 
 }

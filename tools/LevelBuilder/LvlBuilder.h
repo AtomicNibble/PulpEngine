@@ -9,9 +9,9 @@ X_NAMESPACE_DECLARE(physics,
 
 
 #include "Material/MaterialManager.h"
-#include "LvlTypes.h"
+#include "LvlEntity.h"
+#include "LvlArea.h"
 
-#include <array>
 
 X_NAMESPACE_BEGIN(lvl)
 
@@ -26,6 +26,9 @@ class ModelCache;
 
 class LvlBuilder
 {
+	typedef core::Array<LvlArea> LvlAreaArr;
+	typedef core::Array<LvlEntity> LvlEntsArr;
+
 	typedef core::Array<level::FileStaticModel> StaticModelsArr;
 	typedef std::array<core::Array<level::MultiAreaEntRef>, 
 		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;

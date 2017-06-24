@@ -69,9 +69,6 @@
     <ClInclude Include="BSPTypes.h">
       <Filter>Header Files\BSP</Filter>
     </ClInclude>
-    <ClInclude Include="LvlTypes.h">
-      <Filter>Header Files\Lvl</Filter>
-    </ClInclude>
     <ClInclude Include="FaceTreeBuilder.h">
       <Filter>Header Files\BSP</Filter>
     </ClInclude>
@@ -123,6 +120,18 @@
     <ClInclude Include="LvlFmts\mapFile\Loader.h">
       <Filter>Header Files\LvlFmts\MapFile</Filter>
     </ClInclude>
+    <ClInclude Include="LvlArea.h">
+      <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlBrush.h">
+      <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlMaterial.h">
+      <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlEntity.h">
+      <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -134,17 +143,11 @@
     <ClCompile Include="BSPTypes.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="LvlTypes.cpp">
-      <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
     <ClCompile Include="LvlBuilder.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
     <ClCompile Include="LvlProcess.cpp">
       <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
-    <ClCompile Include="BSPFace.cpp">
-      <Filter>Source Files\BSP</Filter>
     </ClCompile>
     <ClCompile Include="BSPPortals.cpp">
       <Filter>Source Files\BSP</Filter>
@@ -202,6 +205,9 @@
     </ClCompile>
     <ClCompile Include="LvlFmts\mapFile\Loader.cpp">
       <Filter>Source Files\LvlFmts\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlMaterial.cpp">
+      <Filter>Source Files\Lvl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

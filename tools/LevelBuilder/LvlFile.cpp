@@ -484,13 +484,13 @@ bool LvlBuilder::save(const char* name)
 
 
 		// bsp tree
-		if (worldEnt.bspTree_.headnode)
+		if (worldEnt.bspTree_.pHeadnode)
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::BSP_TREE], file);
 
 			hdr.flags.Set(LevelFileFlags::BSP_TREE);
 
-			int32_t numNodes = worldEnt.bspTree_.headnode->NumChildNodes();
+			int32_t numNodes = worldEnt.bspTree_.pHeadnode->NumChildNodes();
 
 			// set the header value.
 			hdr.numNodes = numNodes;
@@ -498,7 +498,7 @@ bool LvlBuilder::save(const char* name)
 			// need to write out all the nodes.
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
-			worldEnt.bspTree_.headnode->WriteNodes_r(planes_,file.GetFile());
+			worldEnt.bspTree_.pHeadnode->WriteNodes_r(planes_,file.GetFile());
 		}
 
 		// update FourcCC to mark this bsp as valid.

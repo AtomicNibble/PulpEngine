@@ -478,12 +478,15 @@
     <ClInclude Include="Compiler.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="FaceTreeBuilder.h" />
+    <ClInclude Include="LvlArea.h" />
+    <ClInclude Include="LvlBrush.h" />
+    <ClInclude Include="LvlEntity.h" />
     <ClInclude Include="LvlFmts\LvlSource.h" />
     <ClInclude Include="LvlFmts\mapFile\Loader.h" />
     <ClInclude Include="LvlFmts\mapFile\MapFile.h" />
     <ClInclude Include="LvlFmts\mapFile\MapTypes.h" />
     <ClInclude Include="LvlFmts\mapFile\Util.h" />
-    <ClInclude Include="LvlTypes.h" />
+    <ClInclude Include="LvlMaterial.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Model\ModelCache.h" />
     <ClInclude Include="Settings.h" />
@@ -500,7 +503,6 @@
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
     <ClCompile Include="LvlArea.cpp" />
-    <ClCompile Include="BSPFace.cpp" />
     <ClCompile Include="LvlFile.cpp" />
     <ClCompile Include="bspNode.cpp" />
     <ClCompile Include="BSPPortals.cpp" />
@@ -512,11 +514,11 @@
     <ClCompile Include="LvlFmts\mapFile\MapFile.cpp" />
     <ClCompile Include="LvlFmts\mapFile\MapTypes.cpp" />
     <ClCompile Include="LvlFmts\mapFile\Util.cpp" />
+    <ClCompile Include="LvlMaterial.cpp" />
     <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="LvlBuilder.cpp" />
-    <ClCompile Include="LvlTypes.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Model\ModelCache.cpp" />

@@ -17,6 +17,7 @@ X_NAMESPACE_BEGIN(lvl)
 
 
 X_DECLARE_ENUM(DrawSurfaceType)(FACE, DECAL, PATCH);
+X_DECLARE_ENUM(Side)(FRONT,BACK);
 
 
 struct LvlBrush;
@@ -69,7 +70,6 @@ struct bspPortal
 	// looks for a side on the portal that is a area portal.
 	const LvlBrushSide* FindAreaPortalSide(void) const;
 	bool HasAreaPortalSide(void) const;
-
 	bool PortalPassable(void) const;
 
 private:
@@ -78,10 +78,10 @@ private:
 
 public:
 	Planef plane;
-	bspNode* onNode;
-	bspNode* nodes[2];
+	bspNode* onNode; // nullptr = outside box.
+	bspNode* nodes[Side::ENUM_COUNT];
 	XWinding* pWinding;
-	bspPortal* next[2];
+	bspPortal* next[Side::ENUM_COUNT];
 };
 
 
@@ -89,20 +89,18 @@ struct bspNode
 {
 	friend struct bspTree;
 
-	typedef core::Array<LvlBrush*> lvlBrushArr;
+	typedef core::Array<LvlBrush*> LvlBrushArr;
 
 public:
 	bspNode();
 
 	void CalcNodeBounds(void);
-	XWinding* GetBaseWinding(XPlaneSet& planeSet);
+	core::UniquePointer<XWinding> getBaseWinding(XPlaneSet& planeSet);
 	void MakeTreePortals_r(XPlaneSet& planeSet);
 	void FloodPortals_r(int32_t dist, size_t& floodedNum);
 
 	void SplitPortals(XPlaneSet& planes);
-
 	void FillOutside_r(FillStats& stats);
-
 	void ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side);
 
 	// area number that the winding is in, or - 2 if it crosses multiple areas.
@@ -121,26 +119,14 @@ public:
 
 	void WriteNodes_r(XPlaneSet& planes, core::XFile* pFile);
 
-	X_INLINE bool AreaSet(void) const {
-		return area != -1;
-	}
-
-	X_INLINE bool IsLeaf(void) const {
-		return planenum == PLANENUM_LEAF;
-	}
-
-	X_INLINE bool IsAreaLeaf(void) const {
-		return IsLeaf() && AreaSet();
-	}
-	X_INLINE bool IsSolidLeaf(void) const {
-		return IsLeaf() && !AreaSet();
-	}
-
+	X_INLINE bool AreaSet(void) const;
+	X_INLINE bool IsLeaf(void) const;
+	X_INLINE bool IsAreaLeaf(void) const;
+	X_INLINE bool IsSolidLeaf(void) const;
 
 public:
 	// give each node a number.
 	static int32_t NumberNodes_r(bspNode* pNode, int32_t nextNumber);
-
 	static int32_t NumChildNodes_r(bspNode* pNode);
 
 public:
@@ -150,7 +136,7 @@ public:
 	AABB			bounds;
 
 	// nodes only
-	struct bspNode* children[2];
+	struct bspNode* children[Side::ENUM_COUNT];
 	int32_t			nodeNumber; // set on save.
 
 	// leafs only 
@@ -162,25 +148,44 @@ public:
 	int32_t area;			// for areaportals 
 	int32_t occupied;		// 1 or greater can reach entity 
 
-	lvlBrushArr brushes;
-
+	LvlBrushArr brushes;
 
 protected:
 	void TreePrint_r(const XPlaneSet& planes, size_t depth) const;
 };
-
 
 struct bspTree
 {
 	bspTree();
 
 	void Print(const XPlaneSet& planes) const;
+
 public:
-	bspNode* headnode;
+	bspNode* pHeadnode;
 	bspNode	outside_node;
 	AABB bounds;
 };
 
+
+X_INLINE bool bspNode::AreaSet(void) const
+{
+	return area != -1;
+}
+
+X_INLINE bool bspNode::IsLeaf(void) const
+{
+	return planenum == PLANENUM_LEAF;
+}
+
+X_INLINE bool bspNode::IsAreaLeaf(void) const
+{
+	return IsLeaf() && AreaSet();
+}
+
+X_INLINE bool bspNode::IsSolidLeaf(void) const
+{
+	return IsLeaf() && !AreaSet();
+}
 
 X_NAMESPACE_END
 

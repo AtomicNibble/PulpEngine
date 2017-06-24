@@ -12,9 +12,9 @@ FillStats::FillStats()
 
 void FillStats::print(void) const
 {
-	X_LOG0("FillStats", "^8%5i^7 solid leafs", numSolid);
-	X_LOG0("FillStats", "^8%5i^7 leafs filled", numOutside);
-	X_LOG0("FillStats", "^8%5i^7 inside leafs", numInside);
+	X_LOG0("FillStats", "^8%" PRIuS "^7 solid leafs", numSolid);
+	X_LOG0("FillStats", "^8%" PRIuS "^7 leafs filled", numOutside);
+	X_LOG0("FillStats", "^8%" PRIuS "^7 inside leafs", numInside);
 }
 
 // ------------------------------ Face -----------------------------------
@@ -115,16 +115,19 @@ void bspNode::TreePrint_r(const XPlaneSet& planes, size_t depth) const
 
 bspTree::bspTree()
 {
-	headnode = nullptr;
+	pHeadnode = nullptr;
 }
 
 void bspTree::Print(const XPlaneSet& planes) const
 {
 	// print me baby!
+	X_LOG0("BspTree", "Outside:");
+	outside_node.TreePrint_r(planes, -1);
+
 	X_LOG0("BspTree", "Printing tree:");
-	if (headnode) {
+	if (pHeadnode) {
 		size_t depth = 0;
-		headnode->TreePrint_r(planes, depth);
+		pHeadnode->TreePrint_r(planes, depth);
 	}
 }
 

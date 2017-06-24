@@ -6,6 +6,7 @@
 
 #include "resource.h"
 #include <tchar.h>
+#include <array>
 
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
@@ -22,19 +23,16 @@
 #include <Math\XWinding.h>
 
 #include <Containers\HashMap.h>
+#include <Containers\Array.h>
 #include <Containers\FixedArray.h>
 
 #include <Util\UniquePointer.h>
-
-#include "Util\KvpMap.h"
-
-
-#include <Ilevel.h>
 
 #include "../../tools/MaterialLib/MatLib.h"
 #include "../../tools/ModelLib/ModelLib.h"
 
 
+#include <Ilevel.h>
 #include <IPhysics.h>
 #include <IModel.h>
 #include <ILevel.h>
@@ -44,6 +42,7 @@ typedef core::StackString<level::MAP_MAX_MATERIAL_LEN> MaterialName;
 #include "Util/Config.h"
 #include "Util/Util.h"
 #include "Util/PlaneSet.h"
+#include "Util/KvpMap.h"
 #include "Settings.h"
 #include "LvlVert.h"
 
