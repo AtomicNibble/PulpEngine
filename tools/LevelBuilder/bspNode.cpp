@@ -259,7 +259,6 @@ void bspNode::FillOutside_r(FillStats& stats)
 
 void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side)
 {
-	XWinding *front, *back;
 
 	if (!w) {
 		return;
@@ -276,13 +275,14 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 			return;
 		}
 
-		w->SplitMove(planes[planenum], ON_EPSILON, &front, &back, g_arena);
+		XWinding *pFront, *pBack;
+
+		w->SplitMove(planes[planenum], ON_EPSILON, &pFront, &pBack, g_arena);
 
 		X_DELETE(w, g_arena);
 
-		children[0]->ClipSideByTree_r(planes, front, side);
-		children[1]->ClipSideByTree_r(planes, back, side);
-
+		children[0]->ClipSideByTree_r(planes, pFront, side);
+		children[1]->ClipSideByTree_r(planes, pBack, side);
 		return;
 	}
 
