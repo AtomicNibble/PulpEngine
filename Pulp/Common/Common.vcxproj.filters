@@ -1243,6 +1243,9 @@
     <ClInclude Include="IAsyncLoad.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\SimpleMemoryArena.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1574,6 +1577,9 @@
     </None>
     <None Include="Texture.inl">
       <Filter>Interfaces_h\Render</Filter>
+    </None>
+    <None Include="Memory\SimpleMemoryArena.inl">
+      <Filter>Headers\Memory</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

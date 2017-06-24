@@ -252,6 +252,7 @@
     <ClInclude Include="Memory\MemUtil.h" />
     <ClInclude Include="Memory\NewAndDelete.h" />
     <ClInclude Include="Memory\NewAndDeleteMacros.h" />
+    <ClInclude Include="Memory\SimpleMemoryArena.h" />
     <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h" />
     <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h" />
     <ClInclude Include="Memory\VirtualMem.h" />
@@ -658,6 +659,7 @@
     <None Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.inl" />
     <None Include="Memory\MemUtil.inl" />
     <None Include="Memory\NewAndDelete.inl" />
+    <None Include="Memory\SimpleMemoryArena.inl" />
     <None Include="Memory\ThreadPolicies\MultiThreadPolicy.inl" />
     <None Include="Platform\win32\Console.inl" />
     <None Include="Platform\win32\Window.inl" />
