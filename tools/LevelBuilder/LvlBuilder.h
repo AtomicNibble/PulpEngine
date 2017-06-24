@@ -64,9 +64,6 @@ private:
 	void BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs);
 
 private:
-	void SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back);
-
-private:
 	bool PutPrimitivesInAreas(LvlEntity& ent);
 	
 	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
