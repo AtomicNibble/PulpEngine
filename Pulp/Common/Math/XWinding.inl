@@ -2,104 +2,88 @@
 
 
 
-
-X_INLINE XWinding& XWinding::operator = (const XWinding& winding)
+template<class Allocator>
+X_INLINE const Vec5f& XWindingT<Allocator>::operator[](const size_t idx) const
 {
-	int i;
-
-	if (!EnsureAlloced(winding.numPoints_)) {
-		numPoints_ = 0;
-		return *this;
-	}
-	for (i = 0; i < winding.numPoints_; i++) {
-		pPoints_[i] = winding.pPoints_[i];
-	}
-	numPoints_ = winding.numPoints_;
-	return *this;
-}
-
-X_INLINE const Vec5f& XWinding::operator[](const size_t idx) const
-{
-	X_ASSERT(static_cast<int32_t>(idx) < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
+	X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")(idx, getNumPoints());
 	return pPoints_[idx];
 }
 
-X_INLINE Vec5f&	XWinding::operator[](const size_t idx)
+template<class Allocator>
+X_INLINE Vec5f&	XWindingT<Allocator>::operator[](const size_t idx)
 {
-	X_ASSERT(static_cast<int32_t>(idx) < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
+	X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")(idx, getNumPoints());
 	return pPoints_[idx];
 }
 
 
 // add a point to the end of the winding point array
-X_INLINE XWinding&XWinding::operator+=(const Vec5f& v)
+template<class Allocator>
+X_INLINE XWindingT<Allocator>& XWindingT<Allocator>::operator+=(const Vec5f& v)
 {
 	addPoint(v);
 	return *this;
 }
 
-X_INLINE XWinding&XWinding::operator+=(const Vec3f& v)
+template<class Allocator>
+X_INLINE XWindingT<Allocator>& XWindingT<Allocator>::operator+=(const Vec3f& v)
 {
 	addPoint(v);
 	return *this;
 }
 
-X_INLINE void XWinding::addPoint(const Vec5f& v)
+template<class Allocator>
+X_INLINE void XWindingT<Allocator>::addPoint(const Vec5f& v)
 {
-	if (!EnsureAlloced(numPoints_ + 1, true)) {
-		return;
-	}
+	EnsureAlloced(numPoints_ + 1, true);
 	pPoints_[numPoints_] = v;
 	numPoints_++;
 }
 
-X_INLINE void XWinding::addPoint(const Vec3f& v)
+template<class Allocator>
+X_INLINE void XWindingT<Allocator>::addPoint(const Vec3f& v)
 {
-	if (!EnsureAlloced(numPoints_ + 1, true)) {
-		return;
-	}
+	EnsureAlloced(numPoints_ + 1, true);
 	pPoints_[numPoints_] = v;
 	numPoints_++;
 }
 
-
-X_INLINE size_t XWinding::getNumPoints(void) const
+template<class Allocator>
+X_INLINE size_t XWindingT<Allocator>::getNumPoints(void) const
 {
 	return numPoints_;
 }
 
-X_INLINE size_t XWinding::getAllocatedSize(void) const
+template<class Allocator>
+X_INLINE size_t XWindingT<Allocator>::getAllocatedSize(void) const
 {
 	return allocedSize_;
 }
 
 
-
-X_INLINE bool XWinding::EnsureAlloced(size_t n, bool keep)
+template<class Allocator>
+X_INLINE void XWindingT<Allocator>::EnsureAlloced(size_t n, bool keep)
 {
 	int32_t num = safe_static_cast<int32_t, size_t>(n);
 	if (num > allocedSize_) {
-		return ReAllocate(num, keep);
+		ReAllocate(num, keep);
 	}
-	return true;
 }
 
-X_INLINE bool XWinding::ReAllocate(int32_t n, bool keep)
+template<class Allocator>
+X_INLINE void XWindingT<Allocator>::ReAllocate(int32_t num, bool keep)
 {
-	Vec5f* oldP;
-
-	oldP = pPoints_;
+	Vec5f* pOldPoints = pPoints_;
 	
-	n = core::bitUtil::RoundUpToMultiple(n, 4);
+	num = core::bitUtil::RoundUpToMultiple(num, 4);
+	pPoints_ = allocator_.alloc(num);
 
-	pPoints_ = X_NEW_ARRAY(Vec5f, n, gEnv->pArena, "WindingRealoc");
-
-	if (oldP) {
+	if (pOldPoints) {
 		if (keep) {
-			memcpy(pPoints_, oldP, numPoints_ * sizeof(pPoints_[0]));
+			memcpy(pPoints_, pOldPoints, numPoints_ * sizeof(pPoints_[0]));
 		}
-		X_DELETE_ARRAY(oldP, gEnv->pArena);
+		X_DELETE_ARRAY(pOldPoints, gEnv->pArena);
 	}
-	allocedSize_ = n;
-	return true;
+
+	allocedSize_ = num;
 }

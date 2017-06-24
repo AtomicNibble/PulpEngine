@@ -16,7 +16,12 @@
 
 
 // forward Decs.
-class XWinding;
+template<class Allocator>
+class XWindingT;
+class WindingGlobalAlloc;
+
+typedef XWindingT<WindingGlobalAlloc> XWinding;
+
 
 X_NAMESPACE_DECLARE(model,
 	class XModel;

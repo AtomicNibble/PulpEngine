@@ -4,32 +4,21 @@
 #include <IFileSys.h>
 #include <Util\FloatIEEEUtil.h>
 
-#define	EDGE_LENGTH		0.2f
 
 namespace
 {
-	static const int MAX_WORLD_COORD = (128 * 1024);
-	static const int MIN_WORLD_COORD = (-128 * 1024);
-	static const int MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
+	const float EDGE_LENGTH = 0.2f;
+	const int MAX_WORLD_COORD = (128 * 1024);
+	const int MIN_WORLD_COORD = (-128 * 1024);
+	const int MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
-#if 1
 	#define alloca16(numBytes) ((void *)((((uintptr_t)_alloca( (numBytes)+15 )) + 15) & ~15))
-#else
-	template<typename T>
-	X_INLINE T* Alloca16(size_t num)
-	{
-		void* pData = _alloca(num + 15);
-		// align.
-		pData = core::pointerUtil::AlignTop(pData, 16);
-		return reinterpret_cast<T*>(pData);
-	}
-#endif
 
 	X_DISABLE_WARNING(4756)
 
-	float InvSqrt(float x)
+	X_INLINE float InvSqrt(float x)
 	{
-		return (x > core::FloatUtil::FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITY;
+		return (x > core::FloatUtil::FLT_SMALLEST_NON_DENORMAL) ? math<float>::square(1.0f / x) : INFINITY;
 	}
 
 	X_ENABLE_WARNING(4756)
@@ -54,9 +43,10 @@ namespace
 	}
 
 
-}
+} // namespace
 
-XWinding::XWinding(void) : 
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(void) : 
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
@@ -65,7 +55,8 @@ XWinding::XWinding(void) :
 }
 
 // allocate for n points
-XWinding::XWinding(const size_t n) :
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(const size_t n) :
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
@@ -75,44 +66,33 @@ XWinding::XWinding(const size_t n) :
 
 
 // winding from points
-XWinding::XWinding(const Vec3f* verts, const size_t numVerts) :
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(const Vec3f* pVerts, const size_t numVerts) :
 pPoints_(nullptr),
-numPoints_(0),
+numPoints_(safe_static_cast<int32_t, size_t>(numVerts)),
 allocedSize_(0)
 {
-	size_t i;
-
-	if (!EnsureAlloced(numVerts)) {
-		numPoints_ = 0;
-		return;
+	EnsureAlloced(numVerts);
+	for (size_t i = 0; i < numVerts; i++) {
+		pPoints_[i] = Vec5f(pVerts[i]);
 	}
-	for (i = 0; i < numVerts; i++) {
-		pPoints_[i] = Vec5f(verts[i]);
-	}
-	numPoints_ = safe_static_cast<int32_t, size_t>(numVerts);
 }
 
 
 // winding from points
-XWinding::XWinding(const Vec5f* verts, const size_t numVerts) :
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(const Vec5f* pVerts, const size_t numVerts) :
 	pPoints_(nullptr),
-	numPoints_(0),
+	numPoints_(safe_static_cast<int32_t, size_t>(numVerts)),
 	allocedSize_(0)
 {
-	size_t i;
-
-	if (!EnsureAlloced(numVerts)) {
-		numPoints_ = 0;
-		return;
-	}
-	for (i = 0; i < numVerts; i++) {
-		pPoints_[i] = verts[i];
-	}
-	numPoints_ = safe_static_cast<int32_t, size_t>(numVerts);
+	EnsureAlloced(numVerts);
+	std::copy_n(pVerts, numVerts, pPoints_);
 }
 
 // base winding for plane
-XWinding::XWinding(const Vec3f& normal, const float dist) :
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(const Vec3f& normal, const float dist) :
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
@@ -121,7 +101,8 @@ XWinding::XWinding(const Vec3f& normal, const float dist) :
 }
 
 // base winding for plane
-XWinding::XWinding(const Planef& plane) :
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(const Planef& plane) :
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
@@ -129,43 +110,73 @@ XWinding::XWinding(const Planef& plane) :
 	baseForPlane(plane);
 }
 
-
-XWinding::XWinding(const XWinding& winding) :
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(const MyType& winding) :
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
 {
-	size_t i;
-	if (!EnsureAlloced(winding.getNumPoints())) {
-		numPoints_ = 0;
-		return;
-	}
-	for (i = 0; i < winding.getNumPoints(); i++) {
-		pPoints_[i] = winding[i];
-	}
-	numPoints_ = safe_static_cast<int32_t, size_t>(winding.getNumPoints());
+	EnsureAlloced(winding.getNumPoints());
+	numPoints_ = winding.numPoints_;
+	std::copy_n(winding.pPoints_, winding.numPoints_, pPoints_);
+}
+
+template<class Allocator>
+XWindingT<Allocator>::XWindingT(MyType&& oth) :
+	pPoints_(oth.pPoints_),
+	numPoints_(oth.numPoints_),
+	allocedSize_(oth.allocedSize_)
+{
+	oth.numPoints_ = 0;
+	oth.allocedSize_ = 0;
+	oth.pPoints_ = nullptr;
+}
+
+template<class Allocator>
+XWindingT<Allocator>::~XWindingT(void)
+{
+	free();
 }
 
 
-XWinding::~XWinding(void)
+template<class Allocator>
+XWindingT<Allocator>& XWindingT<Allocator>::operator=(const XWindingT& rhs)
 {
-	clear();
+	if (this != &rhs)
+	{
+		EnsureAlloced(rhs.getNumPoints());
+		numPoints_ = rhs.numPoints_;
+		std::copy_n(rhs.pPoints_, rhs.numPoints_, pPoints_);
+	}
+	return *this;
+}
+
+template<class Allocator>
+XWindingT<Allocator>& XWindingT<Allocator>::operator=(XWindingT&& rhs)
+{
+	numPoints_ = rhs.numPoints_;
+	allocedSize_ = rhs.allocedSize_;
+	pPoints_ = rhs.pPoints_;
+
+	rhs.numPoints_ = 0;
+	rhs.allocedSize_ = 0;
+	rhs.pPoints_ = nullptr;
+	return *this;
 }
 
 // ----------------------------------------------------------------------
 
-bool XWinding::isTiny(void) const
+template<class Allocator>
+bool XWindingT<Allocator>::isTiny(void) const
 {
-	int		i;
-	float	len;
-	Vec3f	delta;
-	int		edges;
+	int32_t edges = 0;
 
-	edges = 0;
-	for (i = 0; i < numPoints_; i++) {
-		delta = pPoints_[(i + 1) % numPoints_].asVec3() - pPoints_[i].asVec3();
-		len = delta.length();
-		if (len > EDGE_LENGTH) {
+	for (int32_t i = 0; i < numPoints_; i++) 
+	{
+		Vec3f delta = pPoints_[(i + 1) % numPoints_].asVec3() - pPoints_[i].asVec3();
+		float len = delta.length();
+		if (len > EDGE_LENGTH) 
+		{
 			if (++edges == 3) {
 				return false;
 			}
@@ -174,12 +185,11 @@ bool XWinding::isTiny(void) const
 	return true;
 }
 
-bool XWinding::isHuge(void) const
+template<class Allocator>
+bool XWindingT<Allocator>::isHuge(void) const
 {
-	int i, j;
-
-	for (i = 0; i < numPoints_; i++) {
-		for (j = 0; j < 3; j++) {
+	for (int32_t i = 0; i < numPoints_; i++) {
+		for (int32_t j = 0; j < 3; j++) {
 			if (pPoints_[i][j] <= MIN_WORLD_COORD || pPoints_[i][j] >= MAX_WORLD_COORD) {
 				return true;
 			}
@@ -189,17 +199,24 @@ bool XWinding::isHuge(void) const
 }
 
 
-void XWinding::clear(void)
+template<class Allocator>
+void XWindingT<Allocator>::clear(void)
+{
+	numPoints_ = 0;
+}
+
+template<class Allocator>
+void XWindingT<Allocator>::free(void)
 {
 	numPoints_ = 0;
 	allocedSize_ = 0;
-//	delete[] pPoints_;
-	X_DELETE_ARRAY(pPoints_, gEnv->pArena);
+	allocator_.free(pPoints_);
 	pPoints_ = nullptr;
 }
 
 
-void XWinding::print(void) const
+template<class Allocator>
+void XWindingT<Allocator>::print(void) const
 {
 	// print the bounds.
 	AABB bounds;
@@ -212,7 +229,7 @@ void XWinding::print(void) const
 	X_LOG0("Winding", "min: (^8%g,%g,%g^7)", min[0], min[1], min[2]);
 	X_LOG0("Winding", "max: (^8%g,%g,%g^7)", max[0], max[1], max[2]);
 	X_LOG0("Winding", "NumPoints: ^8%i", numPoints_);
-	for (int i = 0; i < numPoints_; i++)
+	for (int32_t i = 0; i < numPoints_; i++)
 	{
 		const Vec5f& pl = pPoints_[i];
 		X_LOG0("Winding", "P(^8%i^7): (^8%g,%g,%g^7) (^8%g,%g^7)", i,
@@ -223,7 +240,8 @@ void XWinding::print(void) const
 // ----------------------------------------------------------------------
 
 
-void XWinding::baseForPlane(const Vec3f& normal, const float dist)
+template<class Allocator>
+void XWindingT<Allocator>::baseForPlane(const Vec3f& normal, const float dist)
 {
 	Vec3f org, vright, vup;
 
@@ -243,7 +261,8 @@ void XWinding::baseForPlane(const Vec3f& normal, const float dist)
 
 }
 
-void XWinding::baseForPlane(const Planef& plane)
+template<class Allocator>
+void XWindingT<Allocator>::baseForPlane(const Planef& plane)
 {
 	baseForPlane(plane.getNormal(), plane.getDistance());
 }
@@ -251,14 +270,13 @@ void XWinding::baseForPlane(const Planef& plane)
 // ----------------------------------------------------------------------
 
 
-float XWinding::getArea(void) const
+template<class Allocator>
+float XWindingT<Allocator>::getArea(void) const
 {
-	int i;
-	float total;
 	Vec3f d1, d2, cross;
 
-	total = 0.0f;
-	for (i = 2; i < numPoints_; i++) 
+	float total = 0.0f;
+	for (int32_t i = 2; i < numPoints_; i++) 
 	{
 		d1 = pPoints_[i - 1].asVec3() - pPoints_[0].asVec3();
 		d2 = pPoints_[i].asVec3() - pPoints_[0].asVec3();
@@ -268,27 +286,25 @@ float XWinding::getArea(void) const
 	return total * 0.5f;
 }
 
-Vec3f XWinding::getCenter(void) const
+template<class Allocator>
+Vec3f XWindingT<Allocator>::getCenter(void) const
 {
-	int i;
-	Vec3f center;
-
-	center = Vec3f::zero();
-	for (i = 0; i < numPoints_; i++) {
+	Vec3f center = Vec3f::zero();
+	for (int32_t i = 0; i < numPoints_; i++) {
 		center += pPoints_[i].asVec3();
 	}
 	center *= (1.0f / numPoints_);
 	return center;
 }
 
-float XWinding::getRadius(const Vec3f& center) const
+template<class Allocator>
+float XWindingT<Allocator>::getRadius(const Vec3f& center) const
 {
-	int i;
 	float radius, r;
 	Vec3f dir;
 
 	radius = 0.0f;
-	for (i = 0; i < numPoints_; i++) {
+	for (int32_t i = 0; i < numPoints_; i++) {
 		dir = pPoints_[i].asVec3() - center;
 		r = dir * dir;
 		if (r > radius) {
@@ -298,7 +314,8 @@ float XWinding::getRadius(const Vec3f& center) const
 	return math<float>::sqrt(radius);
 }
 
-void XWinding::getPlane(Vec3f& normal, float& dist) const
+template<class Allocator>
+void XWindingT<Allocator>::getPlane(Vec3f& normal, float& dist) const
 {
 	Vec3f v1, v2, center;
 
@@ -316,7 +333,8 @@ void XWinding::getPlane(Vec3f& normal, float& dist) const
 	dist = pPoints_[0].asVec3() * normal;
 }
 
-void XWinding::getPlane(Planef& plane) const
+template<class Allocator>
+void XWindingT<Allocator>::getPlane(Planef& plane) const
 {
 	Vec3f v1, v2;
 	Vec3f center;
@@ -334,10 +352,9 @@ void XWinding::getPlane(Planef& plane) const
 	plane.setDistance(plane.getNormal() * pPoints_[0].asVec3());
 }
 
-void XWinding::GetAABB(AABB& box) const
+template<class Allocator>
+void XWindingT<Allocator>::GetAABB(AABB& box) const
 {
-	int i;
-
 	if (!numPoints_) {
 		box.clear();
 		return;
@@ -345,7 +362,7 @@ void XWinding::GetAABB(AABB& box) const
 
 	box.min = box.max = pPoints_[0].asVec3();
 
-	for (i = 1; i < numPoints_; i++) 
+	for (int32_t i = 1; i < numPoints_; i++) 
 	{
 		if (pPoints_[i].x < box.min.x) {
 			box.min.x = pPoints_[i].x;
@@ -370,18 +387,16 @@ void XWinding::GetAABB(AABB& box) const
 	}
 }
 
-float XWinding::planeDistance(const Planef& plane) const
+template<class Allocator>
+float XWindingT<Allocator>::planeDistance(const Planef& plane) const
 {
 	using namespace core::FloatUtil;
 
-	int		i;
-	float	d, min, max;
-
-	min = INFINITY;
-	max = -min;
-	for (i = 0; i < numPoints_; i++) 
+	float min = INFINITY;
+	float max = -min;
+	for (int32_t i = 0; i < numPoints_; i++) 
 	{
-		d = plane.distance(pPoints_[i].asVec3());
+		float d = plane.distance(pPoints_[i].asVec3());
 		if (d < min) {
 			min = d;
 
@@ -406,17 +421,14 @@ float XWinding::planeDistance(const Planef& plane) const
 	return 0.0f;
 }
 
-PlaneSide::Enum	XWinding::planeSide(const Planef& plane, const float epsilon) const
+template<class Allocator>
+PlaneSide::Enum	XWindingT<Allocator>::planeSide(const Planef& plane, const float epsilon) const
 {
-	bool	front, back;
-	int		i;
-	float	d;
-
-	front = false;
-	back = false;
-	for (i = 0; i < numPoints_; i++)
+	bool front = false;
+	bool back = false;
+	for (int32_t i = 0; i < numPoints_; i++)
 	{
-		d = plane.distance(pPoints_[i].asVec3());
+		float d = plane.distance(pPoints_[i].asVec3());
 		if (d < -epsilon) {
 			if (front) {
 				return PlaneSide::CROSS;
@@ -444,24 +456,18 @@ PlaneSide::Enum	XWinding::planeSide(const Planef& plane, const float epsilon) co
 
 // cuts off the part at the back side of the plane, returns true if some part was at the front
 // if there is nothing at the front the number of points is set to zero
-bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool keepOn)
+template<class Allocator>
+bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon, const bool keepOn)
 {
-	float*		dists;
-	uint8_t*	sides;
-	Vec5f*		newPoints;
-	int			newNumPoints;
-	int			counts[3];
-	float		dot;
-	int			i, j;
-	Vec5f*		p1, *p2;
-	Vec5f		mid;
-	int			maxpts;
+	int32_t i;
+	Vec5f mid;
 
 
-	dists = static_cast<float*>(_alloca((numPoints_ + 4) * sizeof(float)));
-	sides = static_cast<uint8_t*>(_alloca((numPoints_ + 4) * sizeof(uint8_t)));
+	float* dists = static_cast<float*>(_alloca((numPoints_ + 4) * sizeof(float)));
+	uint8_t* sides = static_cast<uint8_t*>(_alloca((numPoints_ + 4) * sizeof(uint8_t)));
 
-	core::zero_object(counts);
+	int32_t counts[3] = {};
+	float dot;
 
 	// determine sides for each point
 	for (i = 0; i < numPoints_; i++)
@@ -496,27 +502,27 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 		return true;
 	}
 
-	maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
+	const int32_t maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
-	newNumPoints = 0;
+	Vec5f* newPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
+	int32_t newNumPoints = 0;
 
 	for (i = 0; i < numPoints_; i++) 
 	{
-		p1 = &pPoints_[i];
+		auto& p1 = pPoints_[i];
 
 		if (newNumPoints + 1 > maxpts) {
 			return true;		// can't split -- fall back to original
 		}
 
 		if (sides[i] == PlaneSide::ON) {
-			newPoints[newNumPoints] = *p1;
+			newPoints[newNumPoints] = p1;
 			newNumPoints++;
 			continue;
 		}
 
 		if (sides[i] == PlaneSide::FRONT) {
-			newPoints[newNumPoints] = *p1;
+			newPoints[newNumPoints] = p1;
 			newNumPoints++;
 		}
 
@@ -529,10 +535,10 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 		}
 
 		// generate a split point
-		p2 = &pPoints_[(i + 1) % numPoints_];
+		auto& p2 = pPoints_[(i + 1) % numPoints_];
 
 		dot = dists[i] / (dists[i] - dists[i + 1]);
-		for (j = 0; j < 3; j++) {
+		for (int32_t j = 0; j < 3; j++) {
 			// avoid round off error when possible
 			if (plane.getNormal()[j] == 1.0f) {
 				mid[j] = plane.getDistance();
@@ -541,28 +547,26 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 				mid[j] = -plane.getDistance();
 			}
 			else {
-				mid[j] = (*p1)[j] + dot * ((*p2)[j] - (*p1)[j]);
+				mid[j] = p1[j] + dot * (p2[j] - p1[j]);
 			}
 		}
 
-		mid.s = p1->s + dot * (p2->s - p1->s);
-		mid.t = p1->t + dot * (p2->t - p1->t);
+		mid.s = p1.s + dot * (p2.s - p1.s);
+		mid.t = p1.t + dot * (p2.t - p1.t);
 
 		newPoints[newNumPoints] = mid;
 		newNumPoints++;
 	}
 
-	if (!EnsureAlloced(newNumPoints, false)) {
-		return false;
-	}
-
+	EnsureAlloced(newNumPoints, false);
 	numPoints_ = newNumPoints;
 	memcpy(pPoints_, newPoints, newNumPoints * sizeof(Vec5f));
 	return true;
 }
 
 
-bool XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
+template<class Allocator>
+bool XWindingT<Allocator>::clip(const Planef& plane, const float epsilon, const bool keepOn)
 {
 	Vec5f*		newPoints;
 	int			newNumPoints;
@@ -604,7 +608,7 @@ bool XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
 	}
 	// if nothing at the front of the clipping plane
 	if (!counts[PlaneSide::FRONT]) {
-		this->clear();
+		clear();
 		return false;
 	}
 	// if nothing at the back of the clipping plane
@@ -667,9 +671,7 @@ bool XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
 		newNumPoints++;
 	}
 
-	if (!EnsureAlloced(newNumPoints, false)) {
-		return false;
-	}
+	EnsureAlloced(newNumPoints, false);
 
 	numPoints_ = newNumPoints;
 	memcpy(pPoints_, newPoints, newNumPoints * sizeof(Vec5f));
@@ -677,40 +679,38 @@ bool XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
 }
 
 
-XWinding* XWinding::Copy(core::MemoryArenaBase* arena) const
+template<class Allocator>
+XWindingT<Allocator>* XWindingT<Allocator>::Copy(core::MemoryArenaBase* arena) const
 {
-	X_ASSERT_NOT_NULL(arena);
-
-	return X_NEW(XWinding, arena, "WindingCopy")(*this);
+	return X_NEW(MyType, arena, "WindingCopy")(*this);
 }
 
 
-XWinding* XWinding::ReverseWinding(core::MemoryArenaBase* arena) const
+template<class Allocator>
+XWindingT<Allocator>* XWindingT<Allocator>::ReverseWinding(core::MemoryArenaBase* arena) const
 {
-	X_ASSERT_NOT_NULL(arena);
+	MyType* pCopy = X_NEW(MyType, arena, "ReverseWinding");
+	pCopy->EnsureAlloced(numPoints_);
 
-	XWinding* c = X_NEW(XWinding, arena, "ReverseWinding");
-	c->EnsureAlloced(numPoints_);
-
-	for (int i = 0; i < numPoints_; i++) {
-		c->pPoints_[i] = pPoints_[numPoints_ - 1 - i];
+	for (int32_t i = 0; i < numPoints_; i++) {
+		pCopy->pPoints_[i] = pPoints_[numPoints_ - 1 - i];
 	}
-	c->numPoints_ = numPoints_;
-	return c;
+	pCopy->numPoints_ = numPoints_;
+	return pCopy;
 }
 
 
-int XWinding::Split(const Planef& plane, const float epsilon, 
-	XWinding **front, XWinding **back, core::MemoryArenaBase* arena) const
+template<class Allocator>
+PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float epsilon,
+	XWindingT **front, XWindingT **back, core::MemoryArenaBase* arena) const
 {
 	X_ASSERT_NOT_NULL(arena);
 
 	int				counts[3];
 	float			dot;
-	int				i, j;
-	const Vec5f *	p1, *p2;
+	int				i;
 	Vec5f			mid;
-	XWinding *		f, *b;
+	XWindingT *		f, *b;
 	int				maxpts;
 
 	float	dists[MAX_POINTS_ON_WINDING + 4];
@@ -765,27 +765,27 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 
 	maxpts = numPoints_ + 4;	// cant use counts[0]+2 because of fp grouping errors
 
-	*front = f = X_NEW(XWinding, arena, "fronWinding")(maxpts);
-	*back = b = X_NEW(XWinding, arena, "BackWinding")(maxpts);
+	*front = f = X_NEW(MyType, arena, "fronWinding")(maxpts);
+	*back = b = X_NEW(MyType, arena, "BackWinding")(maxpts);
 
 	for (i = 0; i < numPoints_; i++) {
-		p1 = &pPoints_[i];
+		const auto& p1 = pPoints_[i];
 
 		if (sides[i] == PlaneSide::ON) {
-			f->pPoints_[f->numPoints_] = *p1;
+			f->pPoints_[f->numPoints_] = p1;
 			f->numPoints_++;
-			b->pPoints_[b->numPoints_] = *p1;
+			b->pPoints_[b->numPoints_] = p1;
 			b->numPoints_++;
 			continue;
 		}
 
 		if (sides[i] == PlaneSide::FRONT) {
-			f->pPoints_[f->numPoints_] = *p1;
+			f->pPoints_[f->numPoints_] = p1;
 			f->numPoints_++;
 		}
 
 		if (sides[i] == PlaneSide::BACK) {
-			b->pPoints_[b->numPoints_] = *p1;
+			b->pPoints_[b->numPoints_] = p1;
 			b->numPoints_++;
 		}
 
@@ -794,13 +794,13 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 		}
 
 		// generate a split point
-		p2 = &pPoints_[(i + 1) % numPoints_];
+		const auto& p2 = pPoints_[(i + 1) % numPoints_];
 
 		// always calculate the split going from the same side
 		// or minor epsilon issues can happen
 		if (sides[i] == PlaneSide::FRONT) {
 			dot = dists[i] / (dists[i] - dists[i + 1]);
-			for (j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++) {
 				// avoid round off error when possible
 				if (plane.getNormal()[j] == 1.0f) {
 					mid[j] = plane.getDistance();
@@ -809,16 +809,16 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 					mid[j] = -plane.getDistance();
 				}
 				else {
-					mid[j] = (*p1)[j] + dot * ((*p2)[j] - (*p1)[j]);
+					mid[j] = p1[j] + dot * (p2[j] - p1[j]);
 				}
 			}
 
-			mid.s = p1->s + dot * (p2->s - p1->s);
-			mid.t = p1->t + dot * (p2->t - p1->t);
+			mid.s = p1.s + dot * (p2.s - p1.s);
+			mid.t = p1.t + dot * (p2.t - p1.t);
 		}
 		else {
 			dot = dists[i + 1] / (dists[i + 1] - dists[i]);
-			for (j = 0; j < 3; j++) {
+			for (int32_t j = 0; j < 3; j++) {
 				// avoid round off error when possible
 				if (plane.getNormal()[j] == 1.0f) {
 					mid[j] = plane.getDistance();
@@ -827,12 +827,12 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 					mid[j] = -plane.getDistance();
 				}
 				else {
-					mid[j] = (*p2)[j] + dot * ((*p1)[j] - (*p2)[j]);
+					mid[j] = p2[j] + dot * (p1[j] - p2[j]);
 				}
 			}
 
-			mid.s = p2->s + dot * (p1->s - p2->s);
-			mid.t = p2->t + dot * (p1->t - p2->t);
+			mid.s = p2.s + dot * (p1.s - p2.s);
+			mid.t = p2.t + dot * (p1.t - p2.t);
 		}
 
 		f->pPoints_[f->numPoints_] = mid;
@@ -842,7 +842,7 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 	}
 
 	if (f->numPoints_ > maxpts || b->numPoints_ > maxpts) {
-		X_WARNING("XWinding", "points exceeded estimate");
+		X_WARNING("XWindingT", "points exceeded estimate");
 	}
 
 	return PlaneSide::CROSS;
@@ -851,7 +851,8 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 
 
 
-void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, const float epsilon)
+template<class Allocator>
+void XWindingT<Allocator>::AddToConvexHull(const XWindingT* pWinding, const Vec3f &normal, const float epsilon)
 {
 	int				i, j, k;
 	Vec3f			dir;
@@ -863,35 +864,33 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 	int				numNewHullPoints;
 	Vec5f *			newHullPoints;
 
-	if (!winding) {
+	if (!pWinding) {
 		return;
 	}
 
-	maxPts = this->numPoints_ + winding->numPoints_;
+	maxPts = numPoints_ + pWinding->numPoints_;
 
-	if (!this->EnsureAlloced(maxPts, true)) {
-		return;
-	}
+	EnsureAlloced(maxPts, true);
 
 	newHullPoints = (Vec5f *)alloca16(maxPts * sizeof(Vec5f));
 	hullDirs = (Vec3f *)alloca16(maxPts * sizeof(Vec3f));
 	hullSide = (bool *)alloca16(maxPts * sizeof(bool));
 
-	for (i = 0; i < winding->numPoints_; i++)
+	for (i = 0; i < pWinding->numPoints_; i++)
 	{
-		const Vec5f &p1 = winding->pPoints_[i];
+		const Vec5f &p1 = pWinding->pPoints_[i];
 
 		// calculate hull edge vectors
-		for (j = 0; j < this->numPoints_; j++) {
-			dir = this->pPoints_[(j + 1) % this->numPoints_].asVec3() - this->pPoints_[j].asVec3();
+		for (j = 0; j < numPoints_; j++) {
+			dir = pPoints_[(j + 1) % numPoints_].asVec3() - pPoints_[j].asVec3();
 			dir.normalize();
 			hullDirs[j] = normal.cross(dir);
 		}
 
 		// calculate side for each hull edge
 		outside = false;
-		for (j = 0; j < this->numPoints_; j++) {
-			dir = p1.asVec3() - this->pPoints_[j].asVec3();
+		for (j = 0; j < numPoints_; j++) {
+			dir = p1.asVec3() - pPoints_[j].asVec3();
 			d = dir * hullDirs[j];
 			if (d >= epsilon) {
 				outside = true;
@@ -910,12 +909,12 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		}
 
 		// find the back side to front side transition
-		for (j = 0; j < this->numPoints_; j++) {
-			if (!hullSide[j] && hullSide[(j + 1) % this->numPoints_]) {
+		for (j = 0; j < numPoints_; j++) {
+			if (!hullSide[j] && hullSide[(j + 1) % numPoints_]) {
 				break;
 			}
 		}
-		if (j >= this->numPoints_) {
+		if (j >= numPoints_) {
 			continue;
 		}
 
@@ -924,31 +923,27 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		numNewHullPoints = 1;
 
 		// copy over all points that aren't double fronts
-		j = (j + 1) % this->numPoints_;
-		for (k = 0; k < this->numPoints_; k++) {
-			if (hullSide[(j + k) % this->numPoints_] && hullSide[(j + k + 1) % this->numPoints_]) {
+		j = (j + 1) % numPoints_;
+		for (k = 0; k < numPoints_; k++) {
+			if (hullSide[(j + k) % numPoints_] && hullSide[(j + k + 1) % numPoints_]) {
 				continue;
 			}
-			newHullPoints[numNewHullPoints] = this->pPoints_[(j + k + 1) % this->numPoints_];
+			newHullPoints[numNewHullPoints] = pPoints_[(j + k + 1) % numPoints_];
 			numNewHullPoints++;
 		}
 
-		this->numPoints_ = numNewHullPoints;
-		memcpy(this->pPoints_, newHullPoints, numNewHullPoints * sizeof(Vec5f));
+		numPoints_ = numNewHullPoints;
+		memcpy(pPoints_, newHullPoints, numNewHullPoints * sizeof(Vec5f));
 	}
 
 }
 
 
-void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const float epsilon) 
+template<class Allocator>
+void XWindingT<Allocator>::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const float epsilon) 
 {
 	int				j, k, numHullPoints;
 	Vec3f			dir;
-	float			d;
-	Vec3f *			hullDirs;
-	bool *			hullSide;
-	Vec5f *			hullPoints;
-	bool			outside;
 
 	switch (numPoints_)
 	{
@@ -990,8 +985,8 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		}
 	}
 
-	hullDirs = (Vec3f *)alloca16(numPoints_ * sizeof(Vec3f));
-	hullSide = (bool *)alloca16(numPoints_ * sizeof(bool));
+	Vec3f* hullDirs = (Vec3f *)alloca16(numPoints_ * sizeof(Vec3f));
+	bool* hullSide = (bool *)alloca16(numPoints_ * sizeof(bool));
 
 	// calculate hull edge vectors
 	for (j = 0; j < numPoints_; j++) {
@@ -1000,10 +995,10 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 	}
 
 	// calculate side for each hull edge
-	outside = false;
+	bool outside = false;
 	for (j = 0; j < numPoints_; j++) {
 		dir = point - pPoints_[j].asVec3();
-		d = dir * hullDirs[j];
+		float d = dir * hullDirs[j];
 		if (d >= epsilon) {
 			outside = true;
 		}
@@ -1030,7 +1025,7 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		return;
 	}
 
-	hullPoints = reinterpret_cast<Vec5f*>(alloca16((numPoints_ + 1) * sizeof(Vec5f)));
+	Vec5f* hullPoints = reinterpret_cast<Vec5f*>(alloca16((numPoints_ + 1) * sizeof(Vec5f)));
 
 	// insert the point here
 	hullPoints[0] = point;
@@ -1046,16 +1041,15 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		numHullPoints++;
 	}
 
-	if (!EnsureAlloced(numHullPoints, false)) {
-		return;
-	}
+	EnsureAlloced(numHullPoints, false);
 	numPoints_ = numHullPoints;
 	memcpy(pPoints_, hullPoints, numHullPoints * sizeof(Vec3f));
 }
 
 // ----------------------------------------------------------------------
 
-float XWinding::TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c)
+template<class Allocator>
+float XWindingT<Allocator>::TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c)
 {
 	Vec3f v1, v2;
 	Vec3f cross;
@@ -1070,62 +1064,50 @@ float XWinding::TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c)
 
 
 // ISerialize
-bool XWinding::SSave(core::XFile* pFile) const
+template<class Allocator>
+bool XWindingT<Allocator>::SSave(core::XFile* pFile) const
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	uint32_t i, num = safe_static_cast<uint32_t, size_t>(numPoints_);
+	int32_t num = safe_static_cast<int32_t>(numPoints_);
 
 	if (!pFile->writeObj(num)) {
 		X_ERROR("Winding", "Failed to save winding to file");
 		return false;
 	}
 
-	for (i = 0; i < num; i++)
-	{
-		// save each point.
-		const Vec5f& point = pPoints_[i];
-
-		if (!pFile->writeObj(point)) {
-			X_ERROR("Winding", "Failed to save winding to file");
-			return false;
-		}
+	if (!pFile->writeObj(pPoints_, num)) {
+		X_ERROR("Winding", "Failed to save winding to file");
+		return false;
 	}
 
 	return true;
 }
 
-bool XWinding::SLoad(core::XFile* pFile)
+template<class Allocator>
+bool XWindingT<Allocator>::SLoad(core::XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	uint32_t i, num;
-
+	int32_t num;
 	if (!pFile->readObj(num)) {
 		X_ERROR("Winding", "Failed to load winding from file");
 		return false;
 	}
 
-	if (!EnsureAlloced(num, false)) {
-		X_ERROR("Winding", "Failed to allocate %i points for file winding", num);
+	EnsureAlloced(num, false);
+	if (pFile->readObj(pPoints_, num)) {
+		X_ERROR("Winding", "Failed to load winding point from file");
+		clear();
 		return false;
-	}
-
-	for (i = 0; i < num; i++)
-	{
-		// save each point.
-		Vec5f& point = pPoints_[i];
-
-		if (!pFile->readObj(point)) {
-			X_ERROR("Winding", "Failed to load winding point from file");
-			this->clear();
-			return false;
-		}
 	}
 
 	numPoints_ = num;
 	return true;
 }
 // ~ISerialize
+
+template XWindingT<WindingGlobalAlloc>;
+
 
 

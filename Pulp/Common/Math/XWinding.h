@@ -18,29 +18,48 @@
 
 #include <ISerialize.h>
 
-// X_DECLARE_ENUM(PlaneSide)(ON,FRONT,BACK,CROSS);
+class WindingGlobalAlloc
+{
+public:
+	X_INLINE Vec5f* alloc(size_t num)
+	{
+		return X_NEW_ARRAY(Vec5f, num, gEnv->pArena, "WindingRealoc");;
+	}
 
-class XWinding : public core::ISerialize
+	X_INLINE void free(Vec5f* pPoints)
+	{
+		X_DELETE_ARRAY(pPoints, gEnv->pArena);
+	}
+};
+
+
+template<class Allocator = WindingGlobalAlloc>
+class XWindingT : public core::ISerialize
 {
 	static const int MAX_POINTS_ON_WINDING = 64;
+
+	typedef XWindingT<Allocator> MyType;
+
 public:
-	XWinding(void);
-	explicit XWinding(const size_t n);								// allocate for n points
-	explicit XWinding(const Vec3f* verts, const size_t numVerts);	// winding from points
-	explicit XWinding(const Vec5f* verts, const size_t numVerts);	// winding from points
-	explicit XWinding(const Vec3f& normal, const float dist);	// base winding for plane
-	explicit XWinding(const Planef& plane);						// base winding for plane
-	explicit XWinding(const XWinding& winding);
-	~XWinding(void);
+	XWindingT(void);
+	explicit XWindingT(const size_t n);								// allocate for n points
+	explicit XWindingT(const Vec3f* verts, const size_t numVerts);	// winding from points
+	explicit XWindingT(const Vec5f* verts, const size_t numVerts);	// winding from points
+	explicit XWindingT(const Vec3f& normal, const float dist);	// base winding for plane
+	explicit XWindingT(const Planef& plane);						// base winding for plane
+	explicit XWindingT(const MyType& winding);
+	explicit XWindingT(MyType&& winding);
+	~XWindingT(void);
 
 
-	X_INLINE XWinding&		operator=(const XWinding& winding);
+	X_INLINE MyType&		operator=(const MyType& winding);
+	X_INLINE MyType&		operator=(MyType&& winding);
 	X_INLINE const Vec5f&	operator[](const size_t idx) const;
 	X_INLINE Vec5f&			operator[](const size_t idx);
 
 	// add a point to the end of the winding point array
-	X_INLINE XWinding&		operator+=(const Vec5f& v);
-	X_INLINE XWinding&		operator+=(const Vec3f& v);
+	X_INLINE MyType&		operator+=(const Vec5f& v);
+	X_INLINE MyType&		operator+=(const Vec3f& v);
 	X_INLINE void			addPoint(const Vec5f& v);
 	X_INLINE void			addPoint(const Vec3f& v);
 
@@ -50,6 +69,7 @@ public:
 	bool isTiny(void) const;
 	bool isHuge(void) const;
 	void clear(void);
+	void free(void);
 	void print(void) const;
 
 
@@ -74,14 +94,14 @@ public:
 
 	// returns false if invalid.
 	bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
-	XWinding* Copy(core::MemoryArenaBase* arena) const;
-	XWinding* ReverseWinding(core::MemoryArenaBase* arena) const;
+	MyType* Copy(core::MemoryArenaBase* arena) const;
+	MyType* ReverseWinding(core::MemoryArenaBase* arena) const;
 
-	int Split(const Planef &plane, const float epsilon, 
-		XWinding **front, XWinding **back, core::MemoryArenaBase* arena) const;
+	PlaneSide::Enum Split(const Planef& plane, const float epsilon,
+		MyType **front, MyType **back, core::MemoryArenaBase* arena) const;
 
 
-	void AddToConvexHull(const XWinding *winding, const Vec3f& normal, const float epsilon = EPSILON);
+	void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = EPSILON);
 	void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
 
 	static float TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c);
@@ -91,13 +111,13 @@ public:
 	virtual bool SLoad(core::XFile* pFile) X_FINAL;
 	// ~ISerialize
 
-
 private:
 	// must be inlined to not fuck up alloca
-	X_INLINE bool EnsureAlloced(size_t num, bool keep = false);
-	X_INLINE bool ReAllocate(int32_t num, bool keep = false);
+	X_INLINE void EnsureAlloced(size_t num, bool keep = false);
+	X_INLINE void ReAllocate(int32_t num, bool keep = false);
 
 private:
+	WindingGlobalAlloc allocator_;
 	Vec5f*	pPoints_;
 	int32_t	numPoints_;
 	int32_t	allocedSize_;
@@ -105,5 +125,7 @@ private:
 
 
 #include "XWinding.inl"
+
+typedef XWindingT<WindingGlobalAlloc> XWinding;
 
 #endif // !X_WINDING_H_
