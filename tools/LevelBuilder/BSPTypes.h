@@ -6,12 +6,6 @@
 
 #include <Containers\LinkedListIntrusive.h>
 
-// X_NAMESPACE_DECLARE(mapFile,
-// 	class XMapFile;
-// 	class XMapEntity;
-// 	class XMapBrush;
-// 	class XMapPatch;
-// );
 
 X_NAMESPACE_BEGIN(lvl)
 
