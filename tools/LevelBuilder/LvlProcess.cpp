@@ -331,20 +331,6 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		return;
 	}
 
-	// skip null materials
-	if (!side.matInfo.pMaterial) {
-		X_WARNING("Lvl", "side without a material");
-		return;
-	}
-
-	// skip none visable materials.
-	if (!side.matInfo.pMaterial->isDrawn()) {
-		X_LOG1("Lvl", "Skipping visible face, material not drawn: \"%s\"",
-			side.matInfo.name.c_str());
-		return;
-	}
-
-
 	// now we add the side to the area index of the node.
 	LvlArea& area = areas_[pNode->area];
 
@@ -743,6 +729,18 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 			LvlBrushSide& side = brush.sides[j];
 		
 			if (!side.pVisibleHull) {
+				continue;
+			}
+
+			// skip null materials
+			if (!side.matInfo.pMaterial) {
+				X_WARNING("Lvl", "side without a material");
+				continue;
+			}
+
+			// skip none visable materials.
+			if (!side.matInfo.pMaterial->isDrawn()) {
+				X_LOG1("Lvl", "Skipping visible face, material not drawn: \"%s\"", side.matInfo.name.c_str());
 				continue;
 			}
 
