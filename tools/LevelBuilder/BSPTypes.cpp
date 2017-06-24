@@ -33,7 +33,7 @@ bspFace::bspFace()
 bspFace::~bspFace()
 {
 	if (w) {
-		X_DELETE(w, g_arena);
+		X_DELETE(w, g_windingArena);
 	}
 }
 
@@ -50,7 +50,7 @@ bspPortal::bspPortal()
 bspPortal::~bspPortal()
 {
 	if (pWinding) {
-		X_DELETE(pWinding, g_arena);
+		X_DELETE(pWinding, g_windingArena);
 	}
 }
 

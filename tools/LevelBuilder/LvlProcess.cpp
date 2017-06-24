@@ -205,7 +205,7 @@ namespace
 
 	core::UniquePointer<XWinding> WindingForTri(const LvlTris& tri)
 	{
-		auto w = core::makeUnique<XWinding>(g_arena, 3);
+		auto w = core::makeUnique<XWinding>(g_windingArena, 3);
 		w->addPoint(tri.verts[0].pos);
 		w->addPoint(tri.verts[1].pos);
 		w->addPoint(tri.verts[2].pos);
@@ -305,17 +305,16 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 		XWinding *pFront, *pBack;
 
-		pWinding->Split(planes_[pNode->planenum], 
-			ON_EPSILON, &pFront, &pBack, g_arena);
+		pWinding->Split(planes_[pNode->planenum], ON_EPSILON, &pFront, &pBack, g_windingArena);
 
 		PutWindingIntoAreas_r(ent, pFront, side, pNode->children[0]);
-		if (pFront) {
-			X_DELETE(pFront, g_arena);
-		}
-
 		PutWindingIntoAreas_r(ent, pBack, side, pNode->children[1]);
+
+		if (pFront) {
+			X_DELETE(pFront, g_windingArena);
+		}
 		if (pBack) {
-			X_DELETE(pBack, g_arena);
+			X_DELETE(pBack, g_windingArena);
 		}
 
 		return;

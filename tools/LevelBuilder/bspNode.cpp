@@ -55,7 +55,7 @@ void bspNode::CalcNodeBounds(void)
 
 core::UniquePointer<XWinding> bspNode::getBaseWinding(XPlaneSet& planeSet)
 {
-	auto w = core::makeUnique<XWinding>(g_arena, planeSet[planenum]);
+	auto w = core::makeUnique<XWinding>(g_windingArena, planeSet[planenum]);
 	
 	// clip by all the parents
 	bspNode* pNode = this;
@@ -147,16 +147,16 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		// cut the portal into two portals, one on each side of the cut plane
 		// this means that the 
 		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, 
-			&frontwinding, &backwinding, g_arena);
+			&frontwinding, &backwinding, g_windingArena);
 
 		if (frontwinding && frontwinding->isTiny())
 		{
-			X_DELETE_AND_NULL(frontwinding, g_arena);
+			X_DELETE_AND_NULL(frontwinding, g_windingArena);
 		}
 
 		if (backwinding && backwinding->isTiny())
 		{
-			X_DELETE_AND_NULL(backwinding, g_arena);
+			X_DELETE_AND_NULL(backwinding, g_windingArena);
 		}
 
 		if (!frontwinding && !backwinding)
@@ -168,7 +168,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 		if (!frontwinding)
 		{
-			X_DELETE_AND_NULL(backwinding, g_arena);
+			X_DELETE_AND_NULL(backwinding, g_windingArena);
 
 			if (side == 0) {
 				p->AddToNodes(b, other_node);
@@ -181,7 +181,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		}
 		if (!backwinding)
 		{
-			X_DELETE_AND_NULL(frontwinding, g_arena);
+			X_DELETE_AND_NULL(frontwinding, g_windingArena);
 
 			if (side == 0) {
 				p->AddToNodes(f, other_node);
@@ -200,7 +200,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		*new_portal = *p;
 		new_portal->pWinding = backwinding;
 		// delete the portals old winding and assing the new one.
-		X_DELETE(p->pWinding, g_arena);
+		X_DELETE(p->pWinding, g_windingArena);
 		p->pWinding = frontwinding;
 
 		if (side == 0)
@@ -264,9 +264,9 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 
 		XWinding *pFront, *pBack;
 
-		w->SplitMove(planes[planenum], ON_EPSILON, &pFront, &pBack, g_arena);
+		w->SplitMove(planes[planenum], ON_EPSILON, &pFront, &pBack, g_windingArena);
 
-		X_DELETE(w, g_arena);
+		X_DELETE(w, g_windingArena);
 
 		children[Side::FRONT]->ClipSideByTree_r(planes, pFront, side);
 		children[Side::BACK]->ClipSideByTree_r(planes, pBack, side);
@@ -277,14 +277,14 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 	if (!opaque)
 	{
 		if (!side.pVisibleHull) {
-			side.pVisibleHull = w->Move(g_arena);
+			side.pVisibleHull = w->Move(g_windingArena);
 		}
 		else {
 			side.pVisibleHull->AddToConvexHull(w, planes[side.planenum].getNormal());
 		}
 	}
 
-	X_DELETE(w, g_arena);
+	X_DELETE(w, g_windingArena);
 	return;
 }
 
@@ -294,17 +294,16 @@ int32_t bspNode::CheckWindingInAreas_r(XPlaneSet& planes, const XWinding* w)
 		return -1;
 	}
 
-	XWinding* front, *back;
 	if (planenum != PLANENUM_LEAF)
 	{
-		int32_t a1, a2;
+		XWinding* pFront, *pBack;
+		w->Split(planes[planenum], ON_EPSILON, &pFront, &pBack, g_windingArena);
 
-		w->Split(planes[planenum], ON_EPSILON, &front, &back, g_arena);
-
-		a1 = children[Side::FRONT]->CheckWindingInAreas_r(planes, front);
-		X_DELETE(front, g_arena);
-		a2 = children[Side::BACK]->CheckWindingInAreas_r(planes, back);
-		X_DELETE(back, g_arena);
+		int32_t a1 = children[Side::FRONT]->CheckWindingInAreas_r(planes, pFront);
+		int32_t a2 = children[Side::BACK]->CheckWindingInAreas_r(planes, pBack);
+		
+		X_DELETE(pFront, g_windingArena);
+		X_DELETE(pBack, g_windingArena);
 
 		if (a1 == -2 || a2 == -2) {
 			return -2;	// different
@@ -440,8 +439,6 @@ int32_t bspNode::NumChildNodes(void)
 void bspNode::FreeTreePortals_r(void)
 {
 	// free all the portals.
-	bspPortal *p, *nextp;
-	int32_t side;
 
 	// free children
 	if (planenum != PLANENUM_LEAF)
@@ -451,7 +448,9 @@ void bspNode::FreeTreePortals_r(void)
 	}
 
 	// free portals
-	for (p = portals; p; p = nextp)
+	bspPortal* nextp;
+	int32_t side;
+	for (auto* p = portals; p; p = nextp)
 	{
 		side = (p->nodes[1] == this);
 		nextp = p->next[side];

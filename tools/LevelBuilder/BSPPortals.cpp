@@ -130,7 +130,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 			}
 
 			pPortal->plane = pl;
-			pPortal->pWinding = X_NEW(XWinding, g_arena, "bspPortalWinding")(pl);
+			pPortal->pWinding = X_NEW(XWinding, g_windingArena, "bspPortalWinding")(pl);
 			pPortal->AddToNodes(pNode, &tree.outside_node);
 		}
 	}
@@ -144,7 +144,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 				continue;
 			}
 			if(!pPortals[i]->pWinding->clip(bplanes[j], ON_EPSILON)){
-				X_DELETE_AND_NULL(pPortals[i]->pWinding, g_arena);
+				X_DELETE_AND_NULL(pPortals[i]->pWinding, g_windingArena);
 			}
 		}
 	}
@@ -284,7 +284,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 					X_WARNING("BspPortal", "brush has multiple area portal sides at (%g,%g,%g)",
 						center[0], center[1], center[2]);
 
-					X_DELETE_AND_NULL(s2.pVisibleHull, g_arena);
+					X_DELETE_AND_NULL(s2.pVisibleHull, g_windingArena);
 				}
 				return &side;
 			}

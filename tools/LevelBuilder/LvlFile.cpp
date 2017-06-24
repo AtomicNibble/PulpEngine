@@ -288,17 +288,17 @@ bool LvlBuilder::save(const char* name)
 				X_ASSERT_NOT_NULL(iap.pSide->pWinding);
 
 				const XWinding* pWind = iap.pSide->pWinding;
-				XWinding* pWindRev = pWind->ReverseWinding(g_arena);
+				XWinding* pWindRev = pWind->ReverseWinding(g_windingArena);
 
 				if (!SavePortalWinding(pWind, file.GetFile()) ||
 					!SavePortalWinding(pWindRev, file.GetFile()))
 				{
 					X_ERROR("Lvl", "Failed to save inter portal info");
-					X_DELETE(pWindRev, g_arena);
+					X_DELETE(pWindRev, g_windingArena);
 					return false;
 				}
 
-				X_DELETE(pWindRev, g_arena);
+				X_DELETE(pWindRev, g_windingArena);
 			}
 		}
 

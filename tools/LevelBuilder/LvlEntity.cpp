@@ -208,7 +208,7 @@ bool LvlEntity::MakeStructuralFaceList(void)
 
 			bspFace* pFace = X_NEW(bspFace, g_bspFaceArena, "BspFace");
 			pFace->planenum = side.planenum & ~1;
-			pFace->w = side.pWinding->Copy(g_arena);
+			pFace->w = side.pWinding->Copy(g_windingArena);
 			pFace->pNext = pBspFaces;
 			pFace->portal = flags.IsSet(engine::MaterialFlag::PORTAL);
 
@@ -401,7 +401,7 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 			side.pVisibleHull = nullptr;
 
-			XWinding* pWinding = side.pWinding->Copy(g_arena);
+			XWinding* pWinding = side.pWinding->Copy(g_windingArena);
 
 			bspTree_.pHeadnode->ClipSideByTree_r(planeSet, pWinding, side);
 		}

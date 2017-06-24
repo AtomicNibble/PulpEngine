@@ -21,10 +21,10 @@ LvlBrushSide::LvlBrushSide() :
 LvlBrushSide::~LvlBrushSide()
 {
 	if (pWinding) {
-		X_DELETE(pWinding, g_arena);
+		X_DELETE(pWinding, g_windingArena);
 	}
 	if (pVisibleHull) {
-		X_DELETE(pVisibleHull, g_arena);
+		X_DELETE(pVisibleHull, g_windingArena);
 	}
 }
 
@@ -41,10 +41,10 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
 	pVisibleHull = nullptr;
 
 	if (oth.pWinding) {
-		pWinding = oth.pWinding->Copy(g_arena);
+		pWinding = oth.pWinding->Copy(g_windingArena);
 	}
 	if (oth.pVisibleHull) {
-		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
+		pVisibleHull = oth.pVisibleHull->Copy(g_windingArena);
 	}
 }
 
@@ -70,10 +70,10 @@ LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 	pVisibleHull = nullptr;
 
 	if (oth.pWinding) {
-		pWinding = oth.pWinding->Copy(g_arena);
+		pWinding = oth.pWinding->Copy(g_windingArena);
 	}
 	if (oth.pVisibleHull) {
-		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
+		pVisibleHull = oth.pVisibleHull->Copy(g_windingArena);
 	}
 	return *this;
 }
@@ -212,14 +212,13 @@ bool LvlBrush::removeDuplicateBrushPlanes(void)
 
 bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 {
-	const Planef* pPlane;
 	LvlBrushSide* pSide;
 
 	for (size_t i = 0; i < sides.size(); i++)
 	{
 		pSide = &sides[i];
-		pPlane = &planes[pSide->planenum];
-		auto* pWinding = X_NEW(XWinding, g_arena, "BrushWinding")(*pPlane);
+		const auto& plane = planes[pSide->planenum];
+		auto* pWinding = X_NEW(XWinding, g_windingArena, "BrushWinding")(plane);
 
 		for (size_t j = 0; j < sides.size() && pWinding; j++)
 		{
@@ -231,11 +230,11 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 			}
 
 			if (!pWinding->clip(planes[sides[j].planenum ^ 1], 0.01f)) {
-				X_DELETE_AND_NULL(pWinding, g_arena);
+				X_DELETE_AND_NULL(pWinding, g_windingArena);
 			}
 		}
 		if (pSide->pWinding) {
-			X_DELETE(pSide->pWinding, g_arena);
+			X_DELETE(pSide->pWinding, g_windingArena);
 		}
 		pSide->pWinding = pWinding;
 	}
@@ -476,12 +475,12 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 	}
 
 	// create a new winding from the split plane
-	w = X_NEW(XWinding, g_arena, "Winding")(plane);
+	w = X_NEW(XWinding, g_windingArena, "Winding")(plane);
 	for (i = 0; i < sides.size() && w; i++) 
 	{
 		Planef &plane2 = planes[sides[i].planenum ^ 1];
 		if(!w->clip(plane2, 0)) {
-			X_DELETE_AND_NULL(w, g_arena);
+			X_DELETE_AND_NULL(w, g_windingArena);
 		}
 	}
 
@@ -521,7 +520,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
+		w->Split(plane, 0, &cw[0], &cw[1], g_windingArena);
 
 		for (j = 0; j < 2; j++)
 		{
@@ -579,7 +578,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy(g_arena);
+			cs->pWinding = midwinding->Copy(g_windingArena);
 		}
 		else {
 			cs->pWinding = midwinding;
@@ -648,11 +647,11 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front,
 	}
 
 	// create a new winding from the split plane
-	w = X_NEW(XWinding, g_arena, "Winding")(plane);
+	w = X_NEW(XWinding, g_windingArena, "Winding")(plane);
 	for (i = 0; i < brush->sides.size() && w; i++) {
 		Planef &plane2 = planes_[brush->sides[i].planenum ^ 1];
 		if (!w->clip(plane2, 0)) {
-			X_DELETE_AND_NULL(w, g_arena);
+			X_DELETE_AND_NULL(w, g_windingArena);
 		}
 	}
 
@@ -692,7 +691,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front,
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
+		w->Split(plane, 0, &cw[0], &cw[1], g_windingArena);
 
 		for (j = 0; j < 2; j++)
 		{
@@ -750,7 +749,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front,
 		//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy(g_arena);
+			cs->pWinding = midwinding->Copy(g_windingArena);
 		}
 		else {
 			cs->pWinding = midwinding;

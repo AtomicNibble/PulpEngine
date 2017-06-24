@@ -67,7 +67,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 		side = pFace->w->planeSide(plane);
 		if (side == PlaneSide::CROSS)
 		{
-			pFace->w->SplitMove(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding, g_arena);
+			pFace->w->SplitMove(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding, g_windingArena);
 			if (frontWinding)
 			{
 				pNewFace = X_NEW(bspFace, g_bspFaceArena, "bspFaceFrontWind");
