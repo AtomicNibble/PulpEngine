@@ -459,10 +459,6 @@ PlaneSide::Enum	XWindingT<Allocator>::planeSide(const Planef& plane, const float
 template<class Allocator>
 bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon, const bool keepOn)
 {
-	int32_t i;
-	Vec5f mid;
-
-
 	float* dists = static_cast<float*>(_alloca((numPoints_ + 4) * sizeof(float)));
 	uint8_t* sides = static_cast<uint8_t*>(_alloca((numPoints_ + 4) * sizeof(uint8_t)));
 
@@ -470,6 +466,7 @@ bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon,
 	float dot;
 
 	// determine sides for each point
+	int32_t i;
 	for (i = 0; i < numPoints_; i++)
 	{
 		dists[i] = dot = plane.distance(pPoints_[i].asVec3());
@@ -504,8 +501,9 @@ bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon,
 
 	const int32_t maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	Vec5f* newPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
+	Vec5f* pNewPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
 	int32_t newNumPoints = 0;
+	Vec5f mid;
 
 	for (i = 0; i < numPoints_; i++) 
 	{
@@ -516,13 +514,13 @@ bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon,
 		}
 
 		if (sides[i] == PlaneSide::ON) {
-			newPoints[newNumPoints] = p1;
+			pNewPoints[newNumPoints] = p1;
 			newNumPoints++;
 			continue;
 		}
 
 		if (sides[i] == PlaneSide::FRONT) {
-			newPoints[newNumPoints] = p1;
+			pNewPoints[newNumPoints] = p1;
 			newNumPoints++;
 		}
 
@@ -554,13 +552,13 @@ bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon,
 		mid.s = p1.s + dot * (p2.s - p1.s);
 		mid.t = p1.t + dot * (p2.t - p1.t);
 
-		newPoints[newNumPoints] = mid;
+		pNewPoints[newNumPoints] = mid;
 		newNumPoints++;
 	}
 
 	EnsureAlloced(newNumPoints, false);
 	numPoints_ = newNumPoints;
-	memcpy(pPoints_, newPoints, newNumPoints * sizeof(Vec5f));
+	memcpy(pPoints_, pNewPoints, newNumPoints * sizeof(Vec5f));
 	return true;
 }
 
@@ -568,22 +566,14 @@ bool XWindingT<Allocator>::clipInPlace(const Planef& plane, const float epsilon,
 template<class Allocator>
 bool XWindingT<Allocator>::clip(const Planef& plane, const float epsilon, const bool keepOn)
 {
-	Vec5f*		newPoints;
-	int			newNumPoints;
-	int			counts[3];
-	float		dot;
-	int			i, j;
-	Vec5f*	p1, *p2;
-	Vec5f		mid;
-	int			maxpts;
+	float dot;
+	int32_t i;
 
 	X_ASSERT_NOT_NULL(this);
 
 	float	dists[MAX_POINTS_ON_WINDING + 4];
-	int		sides[MAX_POINTS_ON_WINDING + 4];
-
-	core::zero_object(counts);
-
+	int32_t	sides[MAX_POINTS_ON_WINDING + 4];
+	int32_t counts[3] = {};
 
 	// determine sides for each point
 	for (i = 0; i < numPoints_; i++) {
@@ -616,26 +606,26 @@ bool XWindingT<Allocator>::clip(const Planef& plane, const float epsilon, const 
 		return true;
 	}
 
-	maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
-
-	newPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
-	newNumPoints = 0;
+	const int32_t maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
+	int32_t newNumPoints = 0;
+	Vec5f* pNewPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
+	Vec5f mid;
 
 	for (i = 0; i < numPoints_; i++) {
-		p1 = &pPoints_[i];
+		auto& p1 = pPoints_[i];
 
 		if (newNumPoints + 1 > maxpts) {
 			return true;		// can't split -- fall back to original
 		}
 
 		if (sides[i] == PlaneSide::ON) {
-			newPoints[newNumPoints] = *p1;
+			pNewPoints[newNumPoints] = p1;
 			newNumPoints++;
 			continue;
 		}
 
 		if (sides[i] == PlaneSide::FRONT) {
-			newPoints[newNumPoints] = *p1;
+			pNewPoints[newNumPoints] = p1;
 			newNumPoints++;
 		}
 
@@ -648,10 +638,10 @@ bool XWindingT<Allocator>::clip(const Planef& plane, const float epsilon, const 
 		}
 
 		// generate a split point
-		p2 = &pPoints_[(i + 1) % numPoints_];
+		auto& p2 = pPoints_[(i + 1) % numPoints_];
 
 		dot = dists[i] / (dists[i] - dists[i + 1]);
-		for (j = 0; j < 3; j++) {
+		for (int32_t j = 0; j < 3; j++) {
 			// avoid round off error when possible
 			if (plane.getNormal()[j] == 1.0f) {
 				mid[j] = plane.getDistance();
@@ -660,21 +650,20 @@ bool XWindingT<Allocator>::clip(const Planef& plane, const float epsilon, const 
 				mid[j] = -plane.getDistance();
 			}
 			else {
-				mid[j] = (*p1)[j] + dot * ((*p2)[j] - (*p1)[j]);
+				mid[j] = p1[j] + dot * (p2[j] - p1[j]);
 			}
 		}
 
-		mid.s = p1->s + dot * (p2->s - p1->s);
-		mid.t = p1->t + dot * (p2->t - p1->t);
+		mid.s = p1.s + dot * (p2.s - p1.s);
+		mid.t = p1.t + dot * (p2.t - p1.t);
 
-		newPoints[newNumPoints] = mid;
+		pNewPoints[newNumPoints] = mid;
 		newNumPoints++;
 	}
 
 	EnsureAlloced(newNumPoints, false);
-
 	numPoints_ = newNumPoints;
-	memcpy(pPoints_, newPoints, newNumPoints * sizeof(Vec5f));
+	memcpy(pPoints_, pNewPoints, newNumPoints * sizeof(Vec5f));
 	return true;
 }
 
@@ -702,25 +691,19 @@ XWindingT<Allocator>* XWindingT<Allocator>::ReverseWinding(core::MemoryArenaBase
 
 template<class Allocator>
 PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float epsilon,
-	XWindingT **front, XWindingT **back, core::MemoryArenaBase* arena) const
+	XWindingT** pFront, XWindingT** pBack, core::MemoryArenaBase* arena) const
 {
-	X_ASSERT_NOT_NULL(arena);
-
-	int				counts[3];
-	float			dot;
-	int				i;
-	Vec5f			mid;
-	XWindingT *		f, *b;
-	int				maxpts;
+	*pFront = *pBack = nullptr;
 
 	float	dists[MAX_POINTS_ON_WINDING + 4];
-	int		sides[MAX_POINTS_ON_WINDING + 4];
-
-	counts[0] = counts[1] = counts[2] = 0;
+	int32_t	sides[MAX_POINTS_ON_WINDING + 4];
+	int32_t counts[3] = {};
 
 	// determine sides for each point
+	int32_t i;
 	for (i = 0; i < numPoints_; i++) {
-		dists[i] = dot = plane.distance(pPoints_[i].asVec3());
+		float dot = plane.distance(pPoints_[i].asVec3());
+		dists[i] = dot;
 
 		if (dot > epsilon) {
 			sides[i] = PlaneSide::FRONT;
@@ -733,10 +716,10 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 		}
 		counts[sides[i]]++;
 	}
+
 	sides[i] = sides[0];
 	dists[i] = dists[0];
 
-	*front = *back = nullptr;
 
 	// if coplanar, put on the front side if the normals match
 	if (!counts[PlaneSide::FRONT] && !counts[PlaneSide::BACK]) {
@@ -744,31 +727,34 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 
 		getPlane(windingPlane);
 		if (windingPlane.getNormal() * plane.getNormal() > 0.0f) {
-			*front = Copy(arena);
+			*pFront = Copy(arena);
 			return PlaneSide::FRONT;
 		}
 		else {
-			*back = Copy(arena);
+			*pBack = Copy(arena);
 			return PlaneSide::BACK;
 		}
 	}
 	// if nothing at the front of the clipping plane
 	if (!counts[PlaneSide::FRONT]) {
-		*back = Copy(arena);
+		*pBack = Copy(arena);
 		return PlaneSide::BACK;
 	}
 	// if nothing at the back of the clipping plane
 	if (!counts[PlaneSide::BACK]) {
-		*front = Copy(arena);
+		*pFront = Copy(arena);
 		return PlaneSide::FRONT;
 	}
 
-	maxpts = numPoints_ + 4;	// cant use counts[0]+2 because of fp grouping errors
+	const int32_t maxpts = numPoints_ + 4;	// cant use counts[0]+2 because of fp grouping errors
 
-	*front = f = X_NEW(MyType, arena, "fronWinding")(maxpts);
-	*back = b = X_NEW(MyType, arena, "BackWinding")(maxpts);
+	MyType *f, *b;
+	*pFront = f = X_NEW(MyType, arena, "FrontWinding")(maxpts);
+	*pBack = b = X_NEW(MyType, arena, "BackWinding")(maxpts);
+	Vec5f mid;
 
-	for (i = 0; i < numPoints_; i++) {
+	for (i = 0; i < numPoints_; i++) 
+	{
 		const auto& p1 = pPoints_[i];
 
 		if (sides[i] == PlaneSide::ON) {
@@ -798,8 +784,9 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 
 		// always calculate the split going from the same side
 		// or minor epsilon issues can happen
-		if (sides[i] == PlaneSide::FRONT) {
-			dot = dists[i] / (dists[i] - dists[i + 1]);
+		if (sides[i] == PlaneSide::FRONT)
+		{
+			float dot = dists[i] / (dists[i] - dists[i + 1]);
 			for (int32_t j = 0; j < 3; j++) {
 				// avoid round off error when possible
 				if (plane.getNormal()[j] == 1.0f) {
@@ -816,8 +803,9 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 			mid.s = p1.s + dot * (p2.s - p1.s);
 			mid.t = p1.t + dot * (p2.t - p1.t);
 		}
-		else {
-			dot = dists[i + 1] / (dists[i + 1] - dists[i]);
+		else 
+		{
+			float dot = dists[i + 1] / (dists[i + 1] - dists[i]);
 			for (int32_t j = 0; j < 3; j++) {
 				// avoid round off error when possible
 				if (plane.getNormal()[j] == 1.0f) {
@@ -842,7 +830,7 @@ PlaneSide::Enum XWindingT<Allocator>::Split(const Planef& plane, const float eps
 	}
 
 	if (f->numPoints_ > maxpts || b->numPoints_ > maxpts) {
-		X_WARNING("XWindingT", "points exceeded estimate");
+		X_WARNING("XWinding", "points exceeded estimate");
 	}
 
 	return PlaneSide::CROSS;
