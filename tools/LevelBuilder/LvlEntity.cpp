@@ -86,15 +86,12 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 
 	// iterate the nodes portals.
 	size_t s;
-	bspPortal* p = nullptr;
 	const LvlBrushSide* pBSide = nullptr;
-	XWinding* w = nullptr;
-	bspNode* pOther = nullptr;
 
-	for (p = node->portals; p; p = p->next[s])
+	for (auto* p = node->portals; p; p = p->next[s])
 	{
 		s = (p->nodes[Side::BACK] == node);
-		pOther = p->nodes[!s];
+		auto* pOther = p->nodes[!s];
 
 		if (pOther->opaque) {
 			continue;
@@ -115,7 +112,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			return false;
 		}
 
-		w = pBSide->pVisibleHull;
+		auto* w = pBSide->pVisibleHull;
 		if (!w) {
 			continue;
 		}
