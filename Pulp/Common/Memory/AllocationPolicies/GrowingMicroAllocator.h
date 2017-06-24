@@ -47,13 +47,14 @@ class GrowingMicroAllocator
 	/// \details In order to keep track of the pool allocator that satisfied an allocation request, we store the
 	/// allocator's index into the look-up table in a header. This header is accessed whenever an allocation needs
 	/// to be freed.
-	//#pragma pack(push, 4)
-	//X_ALIGNED_SYMBOL(struct,4)  ChunkHeader
+	X_PACK_PUSH(1)
 	struct ChunkHeader
 	{
 		uint16_t allocatorIndex_;
 	};
-	//#pragma pack(pop)
+	X_PACK_POP
+
+	static_assert(sizeof(ChunkHeader) == 2, "Chunkheader size is incorrect");
 
 public:
 	/// Defines the maximum allocation size that is handled by the micro allocator.
