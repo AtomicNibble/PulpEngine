@@ -276,7 +276,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 			return;
 		}
 
-		w->Split(planes[planenum], ON_EPSILON, &front, &back, g_arena);
+		w->SplitMove(planes[planenum], ON_EPSILON, &front, &back, g_arena);
 
 		X_DELETE(w, g_arena);
 
@@ -290,7 +290,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 	if (!opaque)
 	{
 		if (!side.pVisibleHull) {
-			side.pVisibleHull = w->Copy(g_arena);
+			side.pVisibleHull = w->Move(g_arena);
 		}
 		else {
 			side.pVisibleHull->AddToConvexHull(w, planes[side.planenum].getNormal());
