@@ -305,19 +305,20 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		if (bounds.min[i] < level::MIN_WORLD_COORD || bounds.max[i] > level::MAX_WORLD_COORD
-			|| bounds.min[i] >= bounds.max[i])
+		if (bounds.min[i] < level::MIN_WORLD_COORD ||
+			bounds.max[i] > level::MAX_WORLD_COORD ||
+			bounds.min[i] >= bounds.max[i])
 		{
 			// calculate a pos.
 			Planef::Description Dsc;
-			const Planef* plane = nullptr;
+			const Planef* pPlane = nullptr;
 			if (sides.size() > 0) {
-				plane = &planes[sides[0].planenum];
+				pPlane = &planes[sides[0].planenum];
 			}
 
 			X_WARNING("LvlBrush", "Entity %i, Brush %i, Sides %i: failed "
 				"to calculate brush bounds (%s)",
-				entityNum, brushNum, sides.size(), plane ? plane->toString(Dsc) : "");
+				entityNum, brushNum, sides.size(), pPlane ? pPlane->toString(Dsc) : "");
 			return false;
 		}
 	}
