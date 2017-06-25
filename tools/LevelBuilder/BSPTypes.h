@@ -125,13 +125,13 @@ public:
 
 public:
 	// leafs and nodes
-	int32_t			planenum;			// -1 = leaf node 
 	struct bspNode*	parent;
+	int32_t			planenum;			// -1 = leaf node 
 	AABB			bounds;
 
 	// nodes only
-	struct bspNode* children[Side::ENUM_COUNT];
 	int32_t			nodeNumber; // set on save.
+	struct bspNode* children[Side::ENUM_COUNT];
 
 	// leafs only 
 	struct bspPortal* portals;
