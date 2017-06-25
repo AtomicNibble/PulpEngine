@@ -114,27 +114,27 @@ namespace mapFile
 	// ======================
 
 
-	void XMapPatch::SetHorzSubdivisions(size_t num)
+	void XMapPatch::SetHorzSubdivisions(int32_t num)
 	{
 		horzSubdivisions_ = num;
 	}
 
-	void XMapPatch::SetVertSubdivisions(size_t num)
+	void XMapPatch::SetVertSubdivisions(int32_t num)
 	{
 		vertSubdivisions_ = num;
 	}
 
-	size_t XMapPatch::GetHorzSubdivisions(void) const
+	int32_t XMapPatch::GetHorzSubdivisions(void) const
 	{
 		return horzSubdivisions_;
 	}
 
-	size_t XMapPatch::GetVertSubdivisions(void) const
+	int32_t XMapPatch::GetVertSubdivisions(void) const
 	{
 		return vertSubdivisions_;
 	}
 
-	size_t XMapPatch::GetNumIndexes(void) const
+	int32_t XMapPatch::GetNumIndexes(void) const
 	{
 		return indexes_.size();
 	}

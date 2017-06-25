@@ -113,12 +113,12 @@ public:
 	XMapPatch(core::MemoryArenaBase* arena, int w, int h);
 	~XMapPatch(void) X_OVERRIDE;
 
-	X_INLINE void SetHorzSubdivisions(size_t num);
-	X_INLINE void SetVertSubdivisions(size_t num);
-	X_INLINE size_t GetHorzSubdivisions(void) const;
-	X_INLINE size_t GetVertSubdivisions(void) const;
+	X_INLINE void SetHorzSubdivisions(int32_t num);
+	X_INLINE void SetVertSubdivisions(int32_t num);
+	X_INLINE int32_t GetHorzSubdivisions(void) const;
+	X_INLINE int32_t GetVertSubdivisions(void) const;
 
-	X_INLINE size_t GetNumIndexes(void) const;
+	X_INLINE int32_t GetNumIndexes(void) const;
 	X_INLINE const int* GetIndexes(void) const;
 
 	X_INLINE const LvlVert& operator[](const int idx) const;
@@ -131,7 +131,7 @@ public:
 	// Subdived util.
 	void Subdivide(float maxHorizontalError, float maxVerticalError, 
 		float maxLength, bool genNormals = false);
-	void SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisions,
+	void SubdivideExplicit(int32_t horzSubdivisions, int32_t vertSubdivisions,
 		bool genNormals, bool removeLinear = false);
 
 	void CreateNormalsAndIndexes(void);
@@ -141,7 +141,7 @@ public:
 private:
 	void PutOnCurve(void);
 	void RemoveLinearColumnsRows(void);
-	void ResizeExpanded(size_t height, size_t width);
+	void ResizeExpanded(int32_t height, int32_t width);
 	void Expand(void);
 	void Collapse(void);
 	void GenerateNormals(void);
@@ -151,8 +151,8 @@ private:
 
 	void ProjectPointOntoVector(const Vec3f& point, const Vec3f& vStart, 
 		const Vec3f& vEnd, Vec3f& vProj);
-	void SampleSinglePatch(const LvlVert ctrl[3][3], size_t baseCol, size_t baseRow,
-		size_t width, size_t horzSub, size_t vertSub, LvlVert* outVerts) const;
+	void SampleSinglePatch(const LvlVert ctrl[3][3], int32_t baseCol, int32_t baseRow,
+		int32_t width, int32_t horzSub, int32_t vertSub, LvlVert* outVerts) const;
 	void SampleSinglePatchPoint(const LvlVert ctrl[3][3], float u,
 		float v, LvlVert* out) const;
 
@@ -165,12 +165,12 @@ protected:
 	core::string matName_;
 	core::string lightMap_;
 
-	size_t width_;
-	size_t height_;
-	size_t maxWidth_;
-	size_t maxHeight_;
-	size_t horzSubdivisions_;
-	size_t vertSubdivisions_;
+	int32_t width_;
+	int32_t height_;
+	int32_t maxWidth_;
+	int32_t maxHeight_;
+	int32_t horzSubdivisions_;
+	int32_t vertSubdivisions_;
 
 	bool isMesh_;
 	bool expanded_;		

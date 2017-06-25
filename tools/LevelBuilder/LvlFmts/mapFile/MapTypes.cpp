@@ -118,16 +118,16 @@ namespace mapFile
 		LvlVert prev, next;
 
 		// put all the approximating points on the curve
-		for (size_t i = 0; i < width_; i++) {
-			for (size_t j = 1; j < height_; j += 2) {
+		for (int32_t i = 0; i < width_; i++) {
+			for (int32_t j = 1; j < height_; j += 2) {
 				LerpVert(verts_[j*maxWidth_ + i], verts_[(j + 1)*maxWidth_ + i], prev);
 				LerpVert(verts_[j*maxWidth_ + i], verts_[(j - 1)*maxWidth_ + i], next);
 				LerpVert(prev, next, verts_[j*maxWidth_ + i]);
 			}
 		}
 
-		for (size_t j = 0; j < height_; j++) {
-			for (size_t i = 1; i < width_; i += 2) {
+		for (int32_t j = 0; j < height_; j++) {
+			for (int32_t i = 1; i < width_; i += 2) {
 				LerpVert(verts_[j*maxWidth_ + i], verts_[j*maxWidth_ + i + 1], prev);
 				LerpVert(verts_[j*maxWidth_ + i], verts_[j*maxWidth_ + i - 1], next);
 				LerpVert(prev, next, verts_[j*maxWidth_ + i]);
@@ -154,7 +154,7 @@ namespace mapFile
 	*/
 	void XMapPatch::RemoveLinearColumnsRows(void)
 	{
-		size_t i, j, k;
+		int32_t i, j, k;
 		float len, maxLength;
 		Vec3f proj, dir;
 
@@ -204,7 +204,7 @@ namespace mapFile
 		}
 	}
 
-	void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
+	void XMapPatch::ResizeExpanded(int32_t newHeight, int32_t newWidth)
 	{
 		int32_t i, j; // must be signed
 
@@ -216,8 +216,8 @@ namespace mapFile
 			verts_.resize(newHeight * newWidth);
 		}
 		// space out verts_ for new height_ and width_
-		for (j = safe_static_cast<int32_t, size_t>(maxHeight_) - 1; j >= 0; j--) {
-			for (i = safe_static_cast<int32, size_t>(maxWidth_) - 1; i >= 0; i--) {
+		for (j = safe_static_cast<int32_t>(maxHeight_) - 1; j >= 0; j--) {
+			for (i = safe_static_cast<int32>(maxWidth_) - 1; i >= 0; i--) {
 				verts_[j*newWidth + i] = verts_[j*maxWidth_ + i];
 			}
 		}
@@ -233,8 +233,8 @@ namespace mapFile
 		expanded_ = false;
 
 		if (width_ != maxWidth_) {
-			for (size_t j = 0; j < height_; j++) {
-				for (size_t i = 0; i < width_; i++) {
+			for (int32_t j = 0; j < height_; j++) {
+				for (int32_t i = 0; i < width_; i++) {
 					verts_[j*width_ + i] = verts_[j*maxWidth_ + i];
 				}
 			}
@@ -280,13 +280,13 @@ namespace mapFile
 
 	void XMapPatch::GenerateNormals(void)
 	{
-		size_t		i, j, k, dist;
+		int32_t		i, j, k, dist;
 		Vec3f		norm;
 		Vec3f		sum;
-		size_t		count;
+		int32_t		count;
 		Vec3f		base;
 		Vec3f		delta;
-		size_t		x, y;
+		int32_t		x, y;
 		Vec3f		around[8], temp;
 		bool		good[8];
 		bool		wrapWidth, wrapHeight;
@@ -455,21 +455,21 @@ namespace mapFile
 	{
 		indexes_.resize((width_ - 1) * (height_ - 1) * 2 * 3, false);
 
-		size_t index = 0;
-		for (size_t i = 0; i < width_ - 1; i++)
+		int32_t index = 0;
+		for (int32_t i = 0; i < width_ - 1; i++)
 		{
-			for (size_t j = 0; j < height_ - 1; j++)
+			for (int32_t j = 0; j < height_ - 1; j++)
 			{
-				size_t v1 = j * width_ + i;
-				size_t v2 = v1 + 1;
-				size_t v3 = v1 + width_ + 1;
-				size_t v4 = v1 + width_;
-				indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
-				indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
-				indexes_[index++] = safe_static_cast<int32_t, size_t>(v2);
-				indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
-				indexes_[index++] = safe_static_cast<int32_t, size_t>(v4);
-				indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
+				int32_t v1 = j * width_ + i;
+				int32_t v2 = v1 + 1;
+				int32_t v3 = v1 + width_ + 1;
+				int32_t v4 = v1 + width_;
+				indexes_[index++] = safe_static_cast<int32_t>(v1);
+				indexes_[index++] = safe_static_cast<int32_t>(v3);
+				indexes_[index++] = safe_static_cast<int32_t>(v2);
+				indexes_[index++] = safe_static_cast<int32_t>(v1);
+				indexes_[index++] = safe_static_cast<int32_t>(v4);
+				indexes_[index++] = safe_static_cast<int32_t>(v3);
 			}
 		}
 
@@ -480,7 +480,7 @@ namespace mapFile
 	void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError,
 		float maxLength, bool genNormals)
 	{
-		size_t	i, j, k, l;
+		int32_t	i, j, k, l;
 		LvlVert	prev, next, mid;
 		Vec3f	prevxyz, nextxyz, midxyz;
 		Vec3f	delta;
@@ -703,14 +703,14 @@ namespace mapFile
 		}
 	}
 
-	void XMapPatch::SampleSinglePatch(const LvlVert ctrl[3][3], size_t baseCol, size_t baseRow,
-		size_t width, size_t horzSub, size_t vertSub, LvlVert* outVerts) const
+	void XMapPatch::SampleSinglePatch(const LvlVert ctrl[3][3], int32_t baseCol, int32_t baseRow,
+		int32_t width, int32_t horzSub, int32_t vertSub, LvlVert* outVerts) const
 	{
 		horzSub++;
 		vertSub++;
 
-		for (size_t i = 0; i < horzSub; i++) {
-			for (size_t j = 0; j < vertSub; j++) {
+		for (int32_t i = 0; i < horzSub; i++) {
+			for (int32_t j = 0; j < vertSub; j++) {
 				float u = static_cast<float>(i) / (horzSub - 1);
 				float v = static_cast<float>(j) / (vertSub - 1);
 				SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width) + i + baseCol]);
@@ -719,13 +719,13 @@ namespace mapFile
 	}
 
 
-	void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisions,
+	void XMapPatch::SubdivideExplicit(int32_t horzSubdivisions, int32_t vertSubdivisions,
 		bool genNormals, bool removeLinear)
 	{
-		size_t i, j, k, l;
+		int32_t i, j, k, l;
 		LvlVert sample[3][3];
-		size_t outWidth = ((width_ - 1) / 2 * horzSubdivisions) + 1;
-		size_t outHeight = ((height_ - 1) / 2 * vertSubdivisions) + 1;
+		int32_t outWidth = ((width_ - 1) / 2 * horzSubdivisions) + 1;
+		int32_t outHeight = ((height_ - 1) / 2 * vertSubdivisions) + 1;
 		LvlVert* dv = X_NEW_ARRAY(LvlVert, (outWidth * outHeight), g_arena, "PatchSubDivideVerts");
 
 		// generate normals for the control mesh
@@ -733,10 +733,10 @@ namespace mapFile
 			GenerateNormals();
 		}
 
-		size_t baseCol = 0;
+		int32_t baseCol = 0;
 		for (i = 0; i + 2 < width_; i += 2)
 		{
-			size_t baseRow = 0;
+			int32_t baseRow = 0;
 			for (j = 0; j + 2 < height_; j += 2)
 			{
 				for (k = 0; k < 3; k++)

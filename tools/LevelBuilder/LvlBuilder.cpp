@@ -321,7 +321,7 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 	X_ASSERT(pMaterial->isLoaded(), "Material should be loaded?")();
 
 	// create a Primative
-	for (size_t i = 0; i < patch.GetNumIndexes(); i += 3)
+	for (int32_t i = 0; i < patch.GetNumIndexes(); i += 3)
 	{
 		LvlTris& tri = ent.patches.AddOne();
 
