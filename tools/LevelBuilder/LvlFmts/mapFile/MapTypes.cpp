@@ -17,7 +17,6 @@ namespace mapFile
 
 	}
 
-	// hello c++11: delegated constructor
 	XMapPatch::XMapPatch(core::MemoryArenaBase* arena, int w, int h) :
 		XMapPrimitive(PrimType::PATCH),
 		verts_(arena),
