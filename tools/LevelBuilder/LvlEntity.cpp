@@ -383,6 +383,10 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 				continue;
 			}
 
+			// wut?
+			if (side.pVisibleHull) {
+				X_BREAKPOINT;
+			}
 			side.pVisibleHull = nullptr;
 
 			auto* pWinding = side.pWinding->Copy(g_windingArena);
