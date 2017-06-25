@@ -87,6 +87,7 @@ struct bspNode
 
 public:
 	bspNode();
+	~bspNode();
 
 	void CalcNodeBounds(void);
 	core::UniquePointer<XWinding> getBaseWinding(XPlaneSet& planeSet);

@@ -19,6 +19,23 @@ bspNode::bspNode() :
 	area = -1;
 	occupied = 0;
 }
+
+bspNode::~bspNode() 
+{
+	if (portals)
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	for (auto* pBrush : brushes)
+	{
+		X_DELETE(pBrush, g_arena);
+	}
+}
+
+
+
+
 void bspNode::MakeTreePortals_r(XPlaneSet& planeSet)
 {
 	X_ASSERT_NOT_NULL(this);
