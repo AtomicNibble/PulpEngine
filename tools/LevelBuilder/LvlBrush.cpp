@@ -434,7 +434,7 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 
 	// split it by the node plane
 	LvlBrush* pFront, *pBack;
-	Split(planes, node->planenum, pFront, pBack);
+	Split(planes, node->planenum, &pFront, &pBack);
 
 	X_DELETE(this, g_arena);
 
@@ -451,9 +451,9 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 }
 
 
-void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlBrush*& back)
+void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, LvlBrush** pBack)
 {
-	front = back = nullptr;
+	*pFront = *pBack = nullptr;
 
 	XWinding* w = nullptr;
 	const Planef& plane = planes[planenum];
@@ -481,13 +481,13 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 	if (d_front < 0.1)
 	{
 		// only on back
-		back = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
+		*pBack = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
 		return;
 	}
 	if (d_back > -0.1)
 	{
 		// only on front
-		front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
+		*pFront = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
 		return;
 	}
 
@@ -506,10 +506,10 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		// the brush isn't really split
 		auto side = brushMostlyOnSide(plane);
 		if (side == BrushPlaneSide::FRONT) {
-			front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
+			*pFront = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
 		}
 		if (side == BrushPlaneSide::BACK) {
-			back = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
+			*pBack = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
 		}
 		return;
 	}
@@ -579,12 +579,12 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		if (pBrushes[Side::FRONT])
 		{
 			X_DELETE_AND_NULL(pBrushes[Side::FRONT], g_arena);
-			front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
+			*pFront = X_NEW(LvlBrush, g_arena, "FrontBrush")(*this);
 		}
 		if (pBrushes[Side::BACK])
 		{
 			X_DELETE_AND_NULL(pBrushes[Side::BACK], g_arena);
-			back = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
+			*pBack = X_NEW(LvlBrush, g_arena, "BackBrush")(*this);
 		}
 		return;
 	}
@@ -614,8 +614,8 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& front, LvlB
 		}
 	}
 
-	front = pBrushes[Side::FRONT];
-	back = pBrushes[Side::BACK];
+	*pFront = pBrushes[Side::FRONT];
+	*pBack = pBrushes[Side::BACK];
 }
 
 
