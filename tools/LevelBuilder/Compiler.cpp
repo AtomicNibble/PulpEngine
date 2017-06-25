@@ -18,6 +18,7 @@
 X_NAMESPACE_BEGIN(lvl)
 
 core::MemoryArenaBase* g_bspFaceArena = nullptr;
+core::MemoryArenaBase* g_bspPortalArena = nullptr;
 core::MemoryArenaBase* g_bspNodeArena = nullptr;
 core::MemoryArenaBase* g_windingArena = nullptr;
 
@@ -25,7 +26,8 @@ core::MemoryArenaBase* g_windingArena = nullptr;
 Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking) :
 	arena_(arena),
 	pPhysCooking_(pPhysCooking),
-	bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8),
+	bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8), // grow 32k at a time.
+	bspPortalAllocator_(sizeof(bspPortal), X_ALIGN_OF(bspPortal), 1 << 20, core::VirtualMem::GetPageSize() * 8),
 	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8)
 {
 	pModelCache_ = X_NEW(ModelCache, arena, "LvlModelCache")(arena);
@@ -33,6 +35,7 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 
 	// set the pointers.
 	g_bspFaceArena = &bspFaceAllocator_.arena_;
+	g_bspPortalArena = &bspPortalAllocator_.arena_;
 	g_bspNodeArena = &bspNodeAllocator_.arena_;
 	g_windingArena = arena_;
 }
@@ -40,6 +43,7 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 Compiler::~Compiler()
 {
 	g_bspFaceArena = nullptr;
+	g_bspPortalArena = nullptr;
 	g_bspNodeArena = nullptr;
 	g_windingArena = nullptr;
 

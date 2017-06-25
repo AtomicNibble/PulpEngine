@@ -37,6 +37,7 @@ private:
 	MatManager* pMaterialMan_;
 
 	GrowingPool<PoolArena> bspFaceAllocator_;
+	GrowingPool<PoolArena> bspPortalAllocator_;
 	GrowingPool<PoolArena> bspNodeAllocator_;
 };
 

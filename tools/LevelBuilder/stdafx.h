@@ -52,8 +52,8 @@ X_NAMESPACE_BEGIN(lvl)
 
 
 extern core::MemoryArenaBase* g_arena;
-// could combine these two, but be quite a bit of waste for faces.
 extern core::MemoryArenaBase* g_bspFaceArena;
+extern core::MemoryArenaBase* g_bspPortalArena;
 extern core::MemoryArenaBase* g_bspNodeArena;
 extern core::MemoryArenaBase* g_windingArena;
 
