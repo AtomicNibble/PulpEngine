@@ -22,12 +22,11 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 {
 	auto w = node->getBaseWinding(planeSet);
 	int32_t side;
+	Planef plane;
 
 	// clip the portal by all the other portals in the node
 	for (auto* p = node->portals; p && w; p = p->next[side])
 	{
-		Planef	plane;
-
 		if (p->nodes[Side::FRONT] == node)
 		{
 			side = 0;
