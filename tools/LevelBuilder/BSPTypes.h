@@ -161,6 +161,11 @@ public:
 };
 
 
+// good sizes currently.
+X_ENSURE_LE(sizeof(bspPortal), 64, "Portal is large than cache line")
+X_ENSURE_LE(sizeof(bspNode), 128, "Portal is large than two cache lines")
+
+
 X_INLINE bool bspNode::AreaSet(void) const
 {
 	return area != -1;
