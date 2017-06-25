@@ -24,7 +24,15 @@ bspNode::~bspNode()
 {
 	if (portals)
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		bspPortal* nextp;
+		for (auto* p = portals; p; p = nextp)
+		{
+			int32_t side = (p->nodes[Side::BACK] == this);
+			nextp = p->next[side];
+
+			p->RemoveFromNode(p->nodes[!side]);
+			X_DELETE(p, g_bspPortalArena);
+		}
 	}
 
 	for (auto* pBrush : brushes)
