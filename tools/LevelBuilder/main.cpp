@@ -107,13 +107,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				
 				lvl::Compiler comp(&arena, engine.GetPhysCooking());
 
-				if (comp.compileLevel(name))
+				if (comp.init())
 				{
-					res = 0;
-				}
-				else
-				{
-					res = -1;
+					if (comp.compileLevel(name))
+					{
+						res = 0;
+					}
 				}
 
 				X_LOG0("Level", "Operation Complete...");
