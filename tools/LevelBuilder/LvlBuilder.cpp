@@ -295,7 +295,7 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 	X_UNUSED(entIdx);
 
 	if (gSettings.noPatches) { // are these goat meshes even allowed O_0 ?
-		return false;
+		return true;
 	}
 
 	mapFile::XMapPatch& patch = *mapPatch;
