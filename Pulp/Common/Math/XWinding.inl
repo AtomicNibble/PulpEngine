@@ -1220,11 +1220,13 @@ bool XWindingT<Allocator>::SLoad(core::XFile* pFile)
 		return false;
 	}
 
-	EnsureAlloced(num, false);
-	if (pFile->readObj(pPoints_, num)) {
-		X_ERROR("Winding", "Failed to load winding point from file");
-		clear();
-		return false;
+	if (num) {
+		EnsureAlloced(num, false);
+		if (pFile->readObj(pPoints_, num) != (num * sizeof(pPoints_[0]))) {
+			X_ERROR("Winding", "Failed to load winding point from file");
+			clear();
+			return false;
+		}
 	}
 
 	numPoints_ = num;
