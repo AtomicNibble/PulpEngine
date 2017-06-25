@@ -5,12 +5,12 @@ X_NAMESPACE_BEGIN(lvl)
 
 
 
-LvlSource::LvlSource(core::MemoryArenaBase* arena, ModelCache& modelCache, MatManager& matMan) :
+LvlSource::LvlSource(core::MemoryArenaBase* arena, ModelCache& modelCache, MatManager& matMan, XPlaneSet& planes) :
 	arena_(arena),
 	modelCache_(modelCache),
 	matMan_(matMan),
 	entities_(arena),
-	planes_(arena)
+	planes_(planes)
 {
 
 }

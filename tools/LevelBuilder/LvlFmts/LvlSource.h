@@ -24,7 +24,7 @@ class LvlSource
 	typedef core::Array<LvlEntity> LvlEntsArr;
 
 public:
-	LvlSource(core::MemoryArenaBase* arena, ModelCache& modelCache, MatManager& matMan);
+	LvlSource(core::MemoryArenaBase* arena, ModelCache& modelCache, MatManager& matMan, XPlaneSet& planes);
 	virtual ~LvlSource();
 
 protected:
@@ -37,8 +37,8 @@ protected:
 	ModelCache& modelCache_;
 	MatManager& matMan_;
 
+	XPlaneSet&	planes_;
 	LvlEntsArr	entities_;
-	XPlaneSet	planes_;
 	AABB		mapBounds_;
 
 	SourceStats stats_;
