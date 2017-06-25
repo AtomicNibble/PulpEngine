@@ -28,6 +28,8 @@ public:
 	Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking);
 	~Compiler();
 
+	bool init(void);
+
 	bool compileLevel(core::Path<char>& path);
 
 private:

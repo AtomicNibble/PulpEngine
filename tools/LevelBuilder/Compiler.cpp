@@ -56,6 +56,21 @@ Compiler::~Compiler()
 }
 
 
+
+bool Compiler::init(void)
+{
+	if (!pMaterialMan_->Init()) {
+		return false;
+	}
+
+	if (!pModelCache_->loadDefaultModel()) {
+		return false;
+	}
+
+	return true;
+}
+
+
 bool Compiler::compileLevel(core::Path<char>& path)
 {
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
