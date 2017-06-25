@@ -16,7 +16,10 @@
 #include "XPlane.h"
 #include "XAabb.h"
 
+#include <Util\FloatIEEEUtil.h>
 #include <ISerialize.h>
+#include <IFileSys.h>
+
 
 class WindingGlobalAlloc
 {
@@ -33,10 +36,15 @@ public:
 };
 
 
-template<class Allocator = WindingGlobalAlloc>
+template<class Allocator>
 class XWindingT : public core::ISerialize
 {
 	static const int MAX_POINTS_ON_WINDING = 64;
+	const float EDGE_LENGTH = 0.2f;
+	const int MAX_WORLD_COORD = (128 * 1024);
+	const int MIN_WORLD_COORD = (-128 * 1024);
+	const int MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
+
 
 	typedef XWindingT<Allocator> MyType;
 
@@ -107,7 +115,6 @@ public:
 	void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = EPSILON);
 	void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
 
-	static float TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c);
 
 	// ISerialize
 	virtual bool SSave(core::XFile* pFile) const X_FINAL;
@@ -119,15 +126,23 @@ private:
 	X_INLINE void EnsureAlloced(size_t num, bool keep = false);
 	X_INLINE void ReAllocate(int32_t num, bool keep = false);
 
+public:
+	static float TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c);
+	static void NormalVectors(const Vec3f& vec, Vec3f &left, Vec3f &down);
+
+
 private:
-	WindingGlobalAlloc allocator_;
+	Allocator allocator_;
 	Vec5f*	pPoints_;
 	int32_t	numPoints_;
 	int32_t	allocedSize_;
 };
 
+#define alloca16(numBytes) ((void *)((((uintptr_t)_alloca( (numBytes)+15 )) + 15) & ~15))
 
 #include "XWinding.inl"
+
+#undef alloca16
 
 typedef XWindingT<WindingGlobalAlloc> XWinding;
 

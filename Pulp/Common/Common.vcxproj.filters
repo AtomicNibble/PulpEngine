@@ -1770,9 +1770,6 @@
     <ClCompile Include="String\HumanSize.cpp">
       <Filter>SourceFiles\String</Filter>
     </ClCompile>
-    <ClCompile Include="Math\XWinding.cpp">
-      <Filter>SourceFiles\Math</Filter>
-    </ClCompile>
     <ClCompile Include="Math\XSphere.cpp">
       <Filter>SourceFiles\Math</Filter>
     </ClCompile>

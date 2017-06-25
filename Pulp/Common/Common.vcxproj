@@ -999,7 +999,6 @@
     <ClCompile Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.cpp" />
     <ClCompile Include="Math\XHalf.cpp" />
     <ClCompile Include="Math\XSphere.cpp" />
-    <ClCompile Include="Math\XWinding.cpp" />
     <ClCompile Include="Math\XFrustum.cpp" />
     <ClCompile Include="Memory\AllocationPolicies\GrowingBlockAllocator.cpp" />
     <ClCompile Include="Memory\AllocationPolicies\GrowingGenericAllocator.cpp" />
