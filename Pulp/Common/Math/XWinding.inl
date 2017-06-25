@@ -1237,9 +1237,6 @@ bool XWindingT<Allocator>::SLoad(core::XFile* pFile)
 
 
 
-
-
-
 template<class Allocator>
 X_INLINE const Vec5f& XWindingT<Allocator>::operator[](const size_t idx) const
 {
