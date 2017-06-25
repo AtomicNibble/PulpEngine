@@ -46,6 +46,7 @@ public:
 	LvlBrush();
 	LvlBrush(const LvlBrush& oth);
 	LvlBrush(LvlBrush&& oth);
+	~LvlBrush();
 
 	LvlBrush& operator=(const LvlBrush& oth);
 	LvlBrush& operator=(LvlBrush&& oth);

@@ -186,6 +186,12 @@ LvlBrush& LvlBrush::operator=(LvlBrush&& oth)
 	return *this;
 }
 
+LvlBrush::~LvlBrush()
+{
+	
+
+}
+
 
 bool LvlBrush::removeDuplicateBrushPlanes(void)
 {
