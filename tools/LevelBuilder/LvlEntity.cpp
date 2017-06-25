@@ -268,7 +268,7 @@ bool LvlEntity::MakeTreePortals(XPlaneSet& planeSet)
 
 bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 {
-	X_LOG0("LvlEntity", "^5----- FilterBrushesIntoTree -----");
+	X_LOG0("LvlEntity", "^5FilterBrushesIntoTree");
 
 	size_t numClusters = 0;
 	for (const auto& brush : brushes)
@@ -288,7 +288,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 
 bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, mapFile::XMapFile* pMap)
 {
-	X_LOG0("LvlEntity", "^5----- FloodEntities -----");
+	X_LOG0("LvlEntity", "^5FloodEntities");
 
 	bspTree* tree = &bspTree_;
 	bspNode* pHeadnode = tree->pHeadnode;
@@ -364,7 +364,7 @@ bool LvlEntity::FillOutside(void)
 {
 	FillStats stats;
 
-	X_LOG0("LvlEntity", "^5----- FillOutside -----");
+	X_LOG0("LvlEntity", "^5FillOutside");
 	bspTree_.pHeadnode->FillOutside_r(stats);
 
 	stats.print();
@@ -373,7 +373,7 @@ bool LvlEntity::FillOutside(void)
 
 bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 {
-	X_LOG0("LvlEntity", "^5----- ClipSidesByTree -----");
+	X_LOG0("LvlEntity", "^5ClipSidesByTree");
 
 	for (LvlBrush& brush : brushes)
 	{
@@ -396,7 +396,7 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 bool LvlEntity::FloodAreas(void)
 {
-	X_LOG0("LvlEntity", "^5----- FloodAreas -----");
+	X_LOG0("LvlEntity", "^5FloodAreas");;
 
 	// find how many we have.
 	numAreas = 0;
@@ -428,7 +428,7 @@ bool LvlEntity::FloodAreas(void)
 
 bool LvlEntity::PruneNodes(void)
 {
-	X_LOG0("LvlEntity", "^5----- PruneNodes -----");
+	X_LOG0("LvlEntity", "^5PruneNodes");
 	
 	if (!bspTree_.pHeadnode) {
 		X_ERROR("LvlEntity", "Failed to prineNodes the tree is invalid.");

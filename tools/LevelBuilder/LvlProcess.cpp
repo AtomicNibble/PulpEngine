@@ -230,7 +230,7 @@ bool LvlBuilder::ProcessModels(void)
 			continue;
 		}
 
-		X_LOG0("Entity", "^5----- entity %" PRIuS " -----", i);
+		X_LOG0("Entity", "^5entity %" PRIuS, i);
 
 		if (i == 0)
 		{
@@ -707,7 +707,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "^5----- PutPrimitivesInAreas -----");
+	X_LOG0("Lvl", "^5PutPrimitivesInAreas");
 
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
