@@ -2,7 +2,8 @@
 
 
 #include "Util\GrowingPool.h"
-#include "Memory\SimpleMemoryArena.h"
+#include <Memory\SimpleMemoryArena.h>
+#include <Memory\AllocationPolicies\GrowingGenericAllocator.h>
 
 X_NAMESPACE_BEGIN(lvl)
 
@@ -11,6 +12,14 @@ class MatManager;
 
 class Compiler
 {
+	typedef core::MemoryArena<
+		core::GrowingGenericAllocator,
+		core::SingleThreadPolicy,
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+	> WindingDataArena;
+
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 
 	typedef core::MemoryArena<
@@ -27,6 +36,8 @@ class Compiler
 	> PoolArena;
 
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+
+
 
 public:
 	Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking);
@@ -45,6 +56,9 @@ private:
 	GrowingPool<PoolArena> bspFaceAllocator_;
 	GrowingPool<PoolArena> bspPortalAllocator_;
 	GrowingPool<PoolArena> bspNodeAllocator_;
+
+	core::GrowingGenericAllocator windingDataAllocator_;
+	WindingDataArena windingDataArena_;
 };
 
 

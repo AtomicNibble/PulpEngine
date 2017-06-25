@@ -56,5 +56,23 @@ extern core::MemoryArenaBase* g_bspFaceArena;
 extern core::MemoryArenaBase* g_bspPortalArena;
 extern core::MemoryArenaBase* g_bspNodeArena;
 extern core::MemoryArenaBase* g_windingArena;
+extern core::MemoryArenaBase* g_windingPointsArena;
+
+
+class WindingAlloc
+{
+public:
+	X_INLINE Vec5f* alloc(size_t num)
+	{
+		return X_NEW_ARRAY(Vec5f, num, g_windingPointsArena, "WindingRealoc");;
+	}
+
+	X_INLINE void free(Vec5f* pPoints)
+	{
+		X_DELETE_ARRAY(pPoints, g_windingPointsArena);
+	}
+};
+
+typedef XWindingT<WindingAlloc> Winding;
 
 X_NAMESPACE_END

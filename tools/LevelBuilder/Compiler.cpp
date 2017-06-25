@@ -21,6 +21,7 @@ core::MemoryArenaBase* g_bspFaceArena = nullptr;
 core::MemoryArenaBase* g_bspPortalArena = nullptr;
 core::MemoryArenaBase* g_bspNodeArena = nullptr;
 core::MemoryArenaBase* g_windingArena = nullptr;
+core::MemoryArenaBase* g_windingPointsArena = nullptr;
 
 
 Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking) :
@@ -28,7 +29,9 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 	pPhysCooking_(pPhysCooking),
 	bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8), // grow 32k at a time.
 	bspPortalAllocator_(sizeof(bspPortal), X_ALIGN_OF(bspPortal), 1 << 20, core::VirtualMem::GetPageSize() * 8),
-	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8)
+	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8),
+	windingDataAllocator_((1 << 20) * 10, core::VirtualMem::GetPageSize() * 8, 16, WindingDataArena::getMemoryOffsetRequirement() + 4),
+	windingDataArena_(&windingDataAllocator_, "WindingDataArena")
 {
 	pModelCache_ = X_NEW(ModelCache, arena, "LvlModelCache")(arena);
 	pMaterialMan_ = X_NEW(MatManager, arena, "LvlMaterialMan")(arena);
@@ -37,7 +40,8 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 	g_bspFaceArena = &bspFaceAllocator_.arena_;
 	g_bspPortalArena = &bspPortalAllocator_.arena_;
 	g_bspNodeArena = &bspNodeAllocator_.arena_;
-	g_windingArena = arena_;
+	g_windingArena = &bspNodeAllocator_.arena_;
+	g_windingPointsArena = &windingDataArena_;
 }
 
 Compiler::~Compiler()
@@ -46,6 +50,7 @@ Compiler::~Compiler()
 	g_bspPortalArena = nullptr;
 	g_bspNodeArena = nullptr;
 	g_windingArena = nullptr;
+	g_windingPointsArena = nullptr;
 
 	if (pMaterialMan_) {
 		pMaterialMan_->ShutDown();
