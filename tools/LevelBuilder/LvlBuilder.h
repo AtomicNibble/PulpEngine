@@ -66,7 +66,7 @@ private:
 private:
 	bool PutPrimitivesInAreas(LvlEntity& ent);
 	
-	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
+	void PutWindingIntoAreas_r(LvlEntity& ent, Winding* pWinding,
 		LvlBrushSide& side, bspNode* pNode);
 
 	bool AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, const LvlTris& tri);

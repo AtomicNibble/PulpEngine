@@ -129,7 +129,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 			}
 
 			pPortal->plane = pl;
-			pPortal->pWinding = X_NEW(XWinding, g_windingArena, "bspPortalWinding")(pl);
+			pPortal->pWinding = X_NEW(Winding, g_windingArena, "bspPortalWinding")(pl);
 			pPortal->AddToNodes(pNode, &tree.outside_node);
 		}
 	}

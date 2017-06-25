@@ -103,10 +103,10 @@ namespace
 		return numBytes;
 	}
 
-	void WindingToTri(const XWinding* pWinding, core::Array<Vec3f>& verts)
+	void WindingToTri(const Winding* pWinding, core::Array<Vec3f>& verts)
 	{
 		X_ASSERT_NOT_NULL(pWinding);
-		const XWinding* w = pWinding;
+		const Winding* w = pWinding;
 
 		size_t i, j, numPoints;
 		numPoints = w->getNumPoints();
@@ -137,7 +137,7 @@ namespace
 		}
 	}
 
-	bool SavePortalWinding(const XWinding* pWinding, core::XFile* pFile)
+	bool SavePortalWinding(const Winding* pWinding, core::XFile* pFile)
 	{
 		X_ASSERT_NOT_NULL(pWinding);
 		X_ASSERT_NOT_NULL(pFile);
@@ -287,8 +287,8 @@ bool LvlBuilder::save(const char* name)
 				X_ASSERT_NOT_NULL(iap.pSide);
 				X_ASSERT_NOT_NULL(iap.pSide->pWinding);
 
-				const XWinding* pWind = iap.pSide->pWinding;
-				XWinding* pWindRev = pWind->ReverseWinding(g_windingArena);
+				const Winding* pWind = iap.pSide->pWinding;
+				Winding* pWindRev = pWind->ReverseWinding(g_windingArena);
 
 				if (!SavePortalWinding(pWind, file.GetFile()) ||
 					!SavePortalWinding(pWindRev, file.GetFile()))

@@ -93,9 +93,9 @@ void bspNode::CalcNodeBounds(void)
 	}
 }
 
-core::UniquePointer<XWinding> bspNode::getBaseWinding(XPlaneSet& planeSet)
+core::UniquePointer<Winding> bspNode::getBaseWinding(XPlaneSet& planeSet)
 {
-	auto w = core::makeUnique<XWinding>(g_windingArena, planeSet[planenum]);
+	auto w = core::makeUnique<Winding>(g_windingArena, planeSet[planenum]);
 	
 	// clip by all the parents
 	bspNode* pNode = this;
@@ -182,7 +182,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 		// cut the portal into two portals, one on each side of the cut plane
 		// this means that the 
-		XWinding *pFront, *pBack;
+		Winding *pFront, *pBack;
 		p->pWinding->Split(plane, SPLIT_WINDING_EPSILON, &pFront, &pBack, g_windingArena);
 
 		if (pFront && pFront->isTiny())
@@ -279,7 +279,7 @@ void bspNode::FillOutside_r(FillStats& stats)
 	}
 }
 
-void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side)
+void bspNode::ClipSideByTree_r(XPlaneSet& planes, Winding* w, LvlBrushSide& side)
 {
 
 	if (!w) {
@@ -297,7 +297,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 			return;
 		}
 
-		XWinding *pFront, *pBack;
+		Winding *pFront, *pBack;
 
 		w->SplitMove(planes[planenum], ON_EPSILON, &pFront, &pBack, g_windingArena);
 
@@ -323,7 +323,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 	return;
 }
 
-int32_t bspNode::CheckWindingInAreas_r(XPlaneSet& planes, const XWinding* w)
+int32_t bspNode::CheckWindingInAreas_r(XPlaneSet& planes, const Winding* w)
 {
 	if (!w) {
 		return -1;
@@ -331,7 +331,7 @@ int32_t bspNode::CheckWindingInAreas_r(XPlaneSet& planes, const XWinding* w)
 
 	if (planenum != PLANENUM_LEAF)
 	{
-		XWinding* pFront, *pBack;
+		Winding* pFront, *pBack;
 		w->Split(planes[planenum], ON_EPSILON, &pFront, &pBack, g_windingArena);
 
 		int32_t a1 = children[Side::FRONT]->CheckWindingInAreas_r(planes, pFront);

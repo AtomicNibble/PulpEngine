@@ -247,7 +247,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 	{
 		pSide = &sides[i];
 		const auto& plane = planes[pSide->planenum];
-		auto* pWinding = X_NEW(XWinding, g_windingArena, "BrushWinding")(plane);
+		auto* pWinding = X_NEW(Winding, g_windingArena, "BrushWinding")(plane);
 
 		for (size_t j = 0; j < sides.size() && pWinding; j++)
 		{
@@ -355,7 +355,7 @@ float LvlBrush::volume(const XPlaneSet& planes)
 {
 	// grab the first valid point as the corner
 	size_t i;
-	XWinding* w = nullptr;
+	Winding* w = nullptr;
 	for (i = 0; i < sides.size(); i++) {
 		w = sides[i].pWinding;
 		if (w) {
@@ -461,7 +461,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, Lvl
 {
 	*pFront = *pBack = nullptr;
 
-	XWinding* w = nullptr;
+	Winding* w = nullptr;
 	const Planef& plane = planes[planenum];
 
 	// check all points
@@ -498,7 +498,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, Lvl
 	}
 
 	// create a new winding from the split plane
-	w = X_NEW(XWinding, g_windingArena, "Winding")(plane);
+	w = X_NEW(Winding, g_windingArena, "Winding")(plane);
 	for (size_t i = 0; i < sides.size() && w; i++)
 	{
 		Planef& plane2 = planes[sides[i].planenum ^ 1];
@@ -544,7 +544,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, Lvl
 			continue;
 		}
 
-		XWinding* cw[Side::ENUM_COUNT];
+		Winding* cw[Side::ENUM_COUNT];
 
 		w->Split(plane, 0, &cw[Side::FRONT], &cw[Side::BACK], g_windingArena);
 
@@ -629,7 +629,7 @@ void LvlBrush::SplitMove(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront,
 {
 	*pFront = *pBack = nullptr;
 
-	XWinding* w = nullptr;
+	Winding* w = nullptr;
 	const Planef& plane = planes[planenum];
 
 	// check all points
@@ -666,7 +666,7 @@ void LvlBrush::SplitMove(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront,
 	}
 
 	// create a new winding from the split plane
-	w = X_NEW(XWinding, g_windingArena, "Winding")(plane);
+	w = X_NEW(Winding, g_windingArena, "Winding")(plane);
 	for (size_t i = 0; i < sides.size() && w; i++)
 	{
 		Planef& plane2 = planes[sides[i].planenum ^ 1];
@@ -712,7 +712,7 @@ void LvlBrush::SplitMove(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront,
 			continue;
 		}
 
-		XWinding* cw[Side::ENUM_COUNT];
+		Winding* cw[Side::ENUM_COUNT];
 
 		w->Split(plane, 0, &cw[Side::FRONT], &cw[Side::BACK], g_windingArena);
 

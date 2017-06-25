@@ -234,7 +234,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 		numFaces++;
 
 		const bspFace& face = *pFace;
-		const XWinding& winding = *face.w;
+		const Winding& winding = *face.w;
 
 		for (size_t i = 0; i < winding.getNumPoints(); i++)
 		{

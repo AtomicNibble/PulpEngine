@@ -199,13 +199,13 @@ namespace
 
 
 	float MapTriArea(const LvlTris& tri) {
-		return XWinding::TriangleArea(tri.verts[0].pos, tri.verts[1].pos, tri.verts[2].pos);
+		return Winding::TriangleArea(tri.verts[0].pos, tri.verts[1].pos, tri.verts[2].pos);
 	}
 
 
-	core::UniquePointer<XWinding> WindingForTri(const LvlTris& tri)
+	core::UniquePointer<Winding> WindingForTri(const LvlTris& tri)
 	{
-		auto w = core::makeUnique<XWinding>(g_windingArena, 3);
+		auto w = core::makeUnique<Winding>(g_windingArena, 3);
 		w->addPoint(tri.verts[0].pos);
 		w->addPoint(tri.verts[1].pos);
 		w->addPoint(tri.verts[2].pos);
@@ -283,7 +283,7 @@ void LvlBuilder::calculateLvlBounds(void)
 	}
 }
 
-void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
+void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, Winding* pWinding,
 	LvlBrushSide& side, bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
@@ -303,7 +303,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 			return;
 		}
 
-		XWinding *pFront, *pBack;
+		Winding *pFront, *pBack;
 
 		pWinding->Split(planes_[pNode->planenum], ON_EPSILON, &pFront, &pBack, g_windingArena);
 
@@ -341,7 +341,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	size_t numPoints = pWinding->getNumPoints();
 	size_t i, j;
 
-	const XWinding* w = pWinding;
+	const Winding* w = pWinding;
 
 	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
 

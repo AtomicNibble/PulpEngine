@@ -34,8 +34,8 @@ public:
 
 	LvlMaterial matInfo;
 
-	XWinding*  pWinding;		// only clipped to the other sides of the brush
-	XWinding*  pVisibleHull;   // convex hull of all visible fragments 
+	Winding*  pWinding;		// only clipped to the other sides of the brush
+	Winding*  pVisibleHull;   // convex hull of all visible fragments 
 };
 
 struct LvlBrush

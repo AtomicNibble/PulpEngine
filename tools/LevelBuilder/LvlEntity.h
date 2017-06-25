@@ -64,7 +64,7 @@ private:
 
 	bool PlaceOccupant(XPlaneSet& planeSet, bspNode* node, size_t& floodedNum);
 
-	void ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node);
+	void ClipSideByTree_r(Winding* w, LvlBrushSide& side, bspNode *node);
 	void FindAreas_r(bspNode *node, size_t& numAreas);
 
 	static bool CheckAreas_r(bspNode* pNode);

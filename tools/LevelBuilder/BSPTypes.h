@@ -42,7 +42,7 @@ struct bspFace
 	bool checked;	
 	bool _pad[2];
 
-	XWinding* w;
+	Winding* w;
 };
 
 struct bspTree;
@@ -74,7 +74,7 @@ public:
 	Planef plane;
 	bspNode* onNode; // nullptr = outside box.
 	bspNode* nodes[Side::ENUM_COUNT];
-	XWinding* pWinding;
+	Winding* pWinding;
 	bspPortal* next[Side::ENUM_COUNT];
 };
 
@@ -90,16 +90,16 @@ public:
 	~bspNode();
 
 	void CalcNodeBounds(void);
-	core::UniquePointer<XWinding> getBaseWinding(XPlaneSet& planeSet);
+	core::UniquePointer<Winding> getBaseWinding(XPlaneSet& planeSet);
 	void MakeTreePortals_r(XPlaneSet& planeSet);
 	void FloodPortals_r(int32_t dist, size_t& floodedNum);
 
 	void SplitPortals(XPlaneSet& planes);
 	void FillOutside_r(FillStats& stats);
-	void ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side);
+	void ClipSideByTree_r(XPlaneSet& planes, Winding* w, LvlBrushSide& side);
 
 	// area number that the winding is in, or - 2 if it crosses multiple areas.
-	int32_t CheckWindingInAreas_r(XPlaneSet& planes, const XWinding* w);
+	int32_t CheckWindingInAreas_r(XPlaneSet& planes, const Winding* w);
 
 	void FindAreas_r(size_t& numAreas);
 	void FloodAreas_r(size_t areaNum, size_t& areaFloods);
