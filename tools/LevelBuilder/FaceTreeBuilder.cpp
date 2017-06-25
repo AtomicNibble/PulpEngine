@@ -39,8 +39,8 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 		return;
 	}
 
-	XWinding* frontWinding;
-	XWinding* backWinding;
+	Winding* frontWinding;
+	Winding* backWinding;
 
 	bspFace* childLists[Side::ENUM_COUNT];
 	bspFace* pNext, *pNewFace, *pFace;
