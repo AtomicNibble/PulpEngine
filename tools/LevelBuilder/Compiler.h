@@ -18,7 +18,8 @@ class Compiler
 		core::GrowingGenericAllocator,
 		core::SingleThreadPolicy,
 		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
+		// core::SimpleMemoryTracking,
+		core::NoMemoryTracking, 
 		core::SimpleMemoryTagging
 	> WindingDataArena;
 
@@ -26,7 +27,8 @@ class Compiler
 		core::GrowingPoolAllocator,
 		core::SingleThreadPolicy,
 		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
+		// core::SimpleMemoryTracking,
+		core::NoMemoryTracking,
 		core::SimpleMemoryTagging
 	> PoolArena;
 #else
