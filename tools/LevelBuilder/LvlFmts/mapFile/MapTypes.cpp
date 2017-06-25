@@ -704,7 +704,7 @@ namespace mapFile
 	}
 
 	void XMapPatch::SampleSinglePatch(const LvlVert ctrl[3][3], size_t baseCol, size_t baseRow,
-		size_t width_, size_t horzSub, size_t vertSub, LvlVert* outVerts) const
+		size_t width, size_t horzSub, size_t vertSub, LvlVert* outVerts) const
 	{
 		horzSub++;
 		vertSub++;
@@ -713,7 +713,7 @@ namespace mapFile
 			for (size_t j = 0; j < vertSub; j++) {
 				float u = static_cast<float>(i) / (horzSub - 1);
 				float v = static_cast<float>(j) / (vertSub - 1);
-				SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width_) + i + baseCol]);
+				SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width) + i + baseCol]);
 			}
 		}
 	}
