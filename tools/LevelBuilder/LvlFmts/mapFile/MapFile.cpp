@@ -83,11 +83,11 @@ namespace mapFile
 		}
 
 
-		int32_t width, height, dunno1, dunno2;
+		int32_t dunno1, dunno2;
 
 		// we now have goaty info.
-		width = src.ParseInt();
-		height = src.ParseInt();
+		maxWidth_ = width_ = src.ParseInt();
+		maxHeight_ = height_ = src.ParseInt();
 
 		// dunno yet
 		dunno1 = src.ParseInt();
@@ -95,7 +95,7 @@ namespace mapFile
 
 		matName_ = matName;
 		lightMap_ = lightMap;
-		verts_.resize(width * height);
+		verts_.resize(width_ * height_);
 		SetHorzSubdivisions(dunno1);
 		SetVertSubdivisions(dunno2);
 
@@ -103,15 +103,15 @@ namespace mapFile
 		Vec2f lightMapUv;
 
 		// we now how x groups each with y entryies.
-		for (int32_t x = 0; x < width; x++)
+		for (int32_t x = 0; x < width_; x++)
 		{
 			if (!src.ExpectTokenString("(")) {
 				return false;
 			}
 
-			for (int32_t y = 0; y < height; y++)
+			for (int32_t y = 0; y < height_; y++)
 			{
-				LvlVert& vert = verts_[(y * width) + x];
+				LvlVert& vert = verts_[(y * width_) + x];
 
 				// each line has a -v and a -t
 				if (!src.ExpectTokenString("v")) {
