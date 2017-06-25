@@ -2,6 +2,7 @@
 
 
 #include "Util\GrowingPool.h"
+#include "Memory\SimpleMemoryArena.h"
 
 X_NAMESPACE_BEGIN(lvl)
 
@@ -10,19 +11,22 @@ class MatManager;
 
 class Compiler
 {
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+
 	typedef core::MemoryArena<
 		core::GrowingPoolAllocator,
 		core::SingleThreadPolicy,
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
 		core::SimpleBoundsChecking,
 		core::SimpleMemoryTracking,
 		core::SimpleMemoryTagging
-#else
-		core::NoBoundsChecking,
-		core::NoMemoryTracking,
-		core::NoMemoryTagging
-#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> PoolArena;
+#else
+
+	typedef core::SimpleMemoryArena<
+		core::GrowingPoolAllocator
+	> PoolArena;
+
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 
 public:
 	Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking);
