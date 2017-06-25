@@ -45,6 +45,13 @@ TEST(Winding, ConstructorNum)
 	base.clear();
 
 	EXPECT_EQ(0, base.getNumPoints());
+	EXPECT_EQ(16, base.getAllocatedSize());
+	EXPECT_EQ(false, base.isHuge());
+	EXPECT_EQ(true, base.isTiny());
+
+	base.free();
+
+	EXPECT_EQ(0, base.getNumPoints());
 	EXPECT_EQ(0, base.getAllocatedSize());
 	EXPECT_EQ(false, base.isHuge());
 	EXPECT_EQ(true, base.isTiny());
@@ -90,6 +97,13 @@ TEST(Winding, ConstructorVerts)
 	EXPECT_EQ(Vec3f(5, 5, 10), base.getCenter());
 
 	base.clear();
+
+	EXPECT_EQ(0, base.getNumPoints());
+	EXPECT_EQ(8, base.getAllocatedSize());
+	EXPECT_EQ(false, base.isHuge());
+	EXPECT_EQ(true, base.isTiny());
+
+	base.free();
 
 	EXPECT_EQ(0, base.getNumPoints());
 	EXPECT_EQ(0, base.getAllocatedSize());
