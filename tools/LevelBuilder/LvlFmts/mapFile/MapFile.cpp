@@ -355,8 +355,8 @@ namespace mapFile
 
 		if (isWorldSpawn) {
 			// the world spawn is the layout, so gonna be lots :D
-			primitives_.reserve(4096 * 8);
-			primitives_.setGranularity(4096);
+			primitives_.reserve(4096 * 4);
+			primitives_.setGranularity(8192);
 		}
 
 		bool worldent = false;
