@@ -136,7 +136,7 @@ namespace mapFile
 
 	int32_t XMapPatch::GetNumIndexes(void) const
 	{
-		return indexes_.size();
+		return safe_static_cast<int32_t>(indexes_.size());
 	}
 
 	const int* XMapPatch::GetIndexes(void) const
