@@ -47,6 +47,10 @@ Compiler::~Compiler()
 	g_bspNodeArena = nullptr;
 	g_windingArena = nullptr;
 
+	if (pMaterialMan_) {
+		pMaterialMan_->ShutDown();
+	}
+
 	X_DELETE(pModelCache_, arena_);
 	X_DELETE(pMaterialMan_, arena_);
 }
