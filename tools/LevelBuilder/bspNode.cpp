@@ -209,7 +209,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		if (!pBack)
 		{
 			X_DELETE_AND_NULL(pFront, g_windingArena);
-			if (side == Side::BACK) {
+			if (side == Side::FRONT) {
 				p->AddToNodes(f, other_node);
 			}
 			else {
