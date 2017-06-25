@@ -30,7 +30,7 @@ bool FaceTreeBuilder::Build(bspNode* pRootNode, bspFace* pFaceList)
 
 void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 {
-	int32_t splitPlaneNum = SelectSplitPlaneNum(node, faces);
+	const int32_t splitPlaneNum = SelectSplitPlaneNum(node, faces);
 
 	// if we don't have any more faces, this is a node
 	if (splitPlaneNum == -1) {
@@ -39,21 +39,17 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 		return;
 	}
 
-	size_t i;
-	PlaneSide::Enum side;
-
 	XWinding* frontWinding;
 	XWinding* backWinding;
 
-	bspFace* childLists[2];
+	bspFace* childLists[Side::ENUM_COUNT];
 	bspFace* pNext, *pNewFace, *pFace;
 
 	// partition the list
 	node->planenum = splitPlaneNum;
-	Planef& plane = planeset_[splitPlaneNum];
+	const Planef& plane = planeset_[splitPlaneNum];
 	childLists[Side::FRONT] = nullptr;
 	childLists[Side::BACK] = nullptr;
-
 
 	for (pFace = faces; pFace; pFace = pNext)
 	{
@@ -65,7 +61,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 			continue;
 		}
 
-		side = pFace->w->planeSide(plane);
+		const auto side = pFace->w->planeSide(plane);
 		if (side == PlaneSide::CROSS)
 		{
 			pFace->w->SplitMove(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding, g_windingArena);
@@ -99,14 +95,14 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 		}
 	}
 
-	for (i = 0; i < 2; i++) {
+	for (uint32_t i = 0; i < Side::ENUM_COUNT; i++) {
 		node->children[i] = X_NEW(bspNode, g_bspNodeArena, "bspNode");
 		node->children[i]->parent = node;
 		node->children[i]->bounds = node->bounds;
 	}
 
 	// split the bounds if we have a nice axial plane
-	for (i = 0; i < 3; i++)
+	for (int32_t  i = 0; i < 3; i++)
 	{
 		float val = math<float>::abs(plane[i] - 1.f);
 		if (val < 0.001f)
@@ -117,7 +113,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 		}
 	}
 
-	for (i = 0; i < 2; i++) {
+	for (uint32_t i = 0; i < Side::ENUM_COUNT; i++) {
 		BuildFaceTree_r(node->children[i], childLists[i]);
 	}
 }
