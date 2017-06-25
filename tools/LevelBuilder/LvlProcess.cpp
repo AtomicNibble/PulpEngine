@@ -428,7 +428,7 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 
 	if (sd >= sphere.radius())
 	{
-		pCurNode = pCurNode->children[0];
+		pCurNode = pCurNode->children[Side::FRONT];
 		if (!pCurNode->IsSolidLeaf()) {
 			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
 		}
@@ -436,7 +436,7 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 	}
 	if (sd <= -sphere.radius())
 	{
-		pCurNode = pCurNode->children[1];
+		pCurNode = pCurNode->children[Side::BACK];
 		if (!pCurNode->IsSolidLeaf()) {
 			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
 		}
@@ -462,13 +462,13 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 	}
 
 	if (front) {
-		bspNode* frontChild = pCurNode->children[0];
+		bspNode* frontChild = pCurNode->children[Side::FRONT];
 		if (!frontChild->IsSolidLeaf()) {
 			AddAreaRefs_r(areaList, sphere, boundsPoints, frontChild);
 		}
 	}
 	if (back) {
-		bspNode* backChild = pCurNode->children[1];
+		bspNode* backChild = pCurNode->children[Side::BACK];
 		if (!backChild->IsSolidLeaf()) {
 			AddAreaRefs_r(areaList, sphere, boundsPoints, backChild);
 		}
