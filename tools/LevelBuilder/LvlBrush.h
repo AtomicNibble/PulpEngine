@@ -61,6 +61,7 @@ public:
 	size_t FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* pNode);
 
 	void Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, LvlBrush** pBack);
+	void SplitMove(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, LvlBrush** pBack);
 
 public:
 	struct LvlBrush* pOriginal;
