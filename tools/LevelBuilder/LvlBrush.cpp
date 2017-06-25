@@ -590,7 +590,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, Lvl
 	}
 
 	// add the midwinding to both sides
-	for (int32_t i = 0; i<2; i++)
+	for (uint32_t i = 0; i < Side::ENUM_COUNT; i++)
 	{
 		auto& cs = pBrushes[i]->sides.AddOne();
 		cs.planenum = planenum ^ static_cast<int32_t>(i) ^ 1;
@@ -604,7 +604,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum, LvlBrush** pFront, Lvl
 		}
 	}
 
-	for (int32_t i = 0; i < 2; i++)
+	for (uint32_t i = 0; i < Side::ENUM_COUNT; i++)
 	{
 		float v1 = pBrushes[i]->volume(planes);
 		if (v1 < 1.0)
