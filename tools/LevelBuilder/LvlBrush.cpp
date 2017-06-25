@@ -434,7 +434,7 @@ size_t LvlBrush::FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node)
 
 	// split it by the node plane
 	LvlBrush* pFront, *pBack;
-	Split(planes, node->planenum, &pFront, &pBack);
+	SplitMove(planes, node->planenum, &pFront, &pBack);
 
 	X_DELETE(this, g_arena);
 
