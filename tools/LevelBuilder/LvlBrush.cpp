@@ -50,24 +50,17 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
 
 LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 {
-	// nned to delete them if set.
 	if (pWinding) {
-		X_ASSERT_NOT_IMPLEMENTED();
+		X_DELETE_AND_NULL(pWinding, g_windingArena);
 	}
 	if (pVisibleHull) {
-		X_ASSERT_NOT_IMPLEMENTED();
+		X_DELETE_AND_NULL(pVisibleHull, g_windingArena);
 	}
 
 	planenum = oth.planenum;
-
 	visible = oth.visible;
 	culled = oth.culled;
-
 	matInfo = oth.matInfo;
-
-	// null them first.
-	pWinding = nullptr;
-	pVisibleHull = nullptr;
 
 	if (oth.pWinding) {
 		pWinding = oth.pWinding->Copy(g_windingArena);
@@ -77,6 +70,10 @@ LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 	}
 	return *this;
 }
+
+
+
+
 
 // ==========================================
 
