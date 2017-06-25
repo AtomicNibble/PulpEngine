@@ -120,39 +120,35 @@ void bspNode::FloodPortals_r(int32_t dist, size_t& floodedNum)
 
 void bspNode::SplitPortals(XPlaneSet& planes)
 {
-	bspPortal	*p, *next_portal, *new_portal;
-	bspNode		*f, *b, *other_node;
-	int			side;
-	Planef		*plane;
-	XWinding	*frontwinding, *backwinding;
+	bspPortal *next_portal;
 
 	// get the plane for this node.
-	plane = &planes[planenum];
+	const auto& plane = planes[planenum];
 	// front and back nodes of this node that we are going to split.
-	f = children[Side::FRONT];
-	b = children[Side::BACK];
+	auto* f = children[Side::FRONT];
+	auto* b = children[Side::BACK];
 
-	for (p = portals; p; p = next_portal)
+	for (auto* p = portals; p; p = next_portal)
 	{
 		// a portal is linked to two nodes.
 		// a node can have many portals.
 		// if we are to the left of the portal.
 		// the node is on the right.
+		Side::Enum side;
 		if (p->nodes[Side::FRONT] == this) {
-			side = 0;
+			side = Side::FRONT;
 		}
 		else if (p->nodes[Side::BACK] == this) {
-			side = 1;
+			side = Side::BACK;
 		}
 		else {
-			X_ERROR("bspNode", "SplitPortals: mislinked portal");
-			side = 0;	// quiet a compiler warning
+			X_FATAL("bspNode", "SplitPortals: mislinked portal");
 		}
 
 		// the next portal, on the same side.
 		next_portal = p->next[side];
 		// this is the node on the opposite size.
-		other_node = p->nodes[!side];
+		auto* other_node = p->nodes[!side];
 
 		// remove the portals from the nodes linked.
 		// list ready for when we added the new split nodes.
@@ -161,31 +157,30 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 		// cut the portal into two portals, one on each side of the cut plane
 		// this means that the 
-		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, 
-			&frontwinding, &backwinding, g_windingArena);
+		XWinding *pFront, *pBack;
+		p->pWinding->Split(plane, SPLIT_WINDING_EPSILON, &pFront, &pBack, g_windingArena);
 
-		if (frontwinding && frontwinding->isTiny())
+		if (pFront && pFront->isTiny())
 		{
-			X_DELETE_AND_NULL(frontwinding, g_windingArena);
+			X_DELETE_AND_NULL(pFront, g_windingArena);
 		}
 
-		if (backwinding && backwinding->isTiny())
+		if (pBack && pBack->isTiny())
 		{
-			X_DELETE_AND_NULL(backwinding, g_windingArena);
+			X_DELETE_AND_NULL(pBack, g_windingArena);
 		}
 
-		if (!frontwinding && !backwinding)
+		if (!pFront && !pBack)
 		{
 			// tiny windings on both sides
 			continue;
 		}
 
 
-		if (!frontwinding)
+		if (!pFront)
 		{
-			X_DELETE_AND_NULL(backwinding, g_windingArena);
-
-			if (side == 0) {
+			X_DELETE_AND_NULL(pBack, g_windingArena);
+			if (side == Side::FRONT) {
 				p->AddToNodes(b, other_node);
 			}
 			else {
@@ -194,11 +189,10 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 			continue;
 		}
-		if (!backwinding)
+		if (!pBack)
 		{
-			X_DELETE_AND_NULL(frontwinding, g_windingArena);
-
-			if (side == 0) {
+			X_DELETE_AND_NULL(pFront, g_windingArena);
+			if (side == Side::BACK) {
 				p->AddToNodes(f, other_node);
 			}
 			else {
@@ -211,26 +205,27 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		// the winding is split
 		// means the protal span across the current binary tree node more than the elipson.
 		// so make a new portal
-		new_portal = X_NEW(bspPortal, g_arena, "Portal");
-		*new_portal = *p;
-		new_portal->pWinding = backwinding;
+		auto* pNewPortal = X_NEW(bspPortal, g_bspPortalArena, "Portal");
+		*pNewPortal = *p;
+		pNewPortal->pWinding = pBack;
+
 		// delete the portals old winding and assing the new one.
 		X_DELETE(p->pWinding, g_windingArena);
-		p->pWinding = frontwinding;
+		p->pWinding = pFront;
 
 		if (side == 0)
 		{
 			p->AddToNodes(f, other_node);
-			new_portal->AddToNodes(b, other_node);
+			pNewPortal->AddToNodes(b, other_node);
 		}
 		else
 		{
 			p->AddToNodes(other_node, f);
-			new_portal->AddToNodes(other_node, b);
+			pNewPortal->AddToNodes(other_node, b);
 		}
 	}
 
-	portals = nullptr;
+	X_ASSERT(portals == nullptr, "Portals should be null post split")(portals);
 }
 
 void bspNode::FillOutside_r(FillStats& stats)
