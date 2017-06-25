@@ -12,6 +12,8 @@ class MatManager;
 
 class Compiler
 {
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+
 	typedef core::MemoryArena<
 		core::GrowingGenericAllocator,
 		core::SingleThreadPolicy,
@@ -19,8 +21,6 @@ class Compiler
 		core::SimpleMemoryTracking,
 		core::SimpleMemoryTagging
 	> WindingDataArena;
-
-#if X_ENABLE_MEMORY_DEBUG_POLICIES
 
 	typedef core::MemoryArena<
 		core::GrowingPoolAllocator,
@@ -32,8 +32,13 @@ class Compiler
 #else
 
 	typedef core::SimpleMemoryArena<
+		core::GrowingGenericAllocator
+	> WindingDataArena;
+
+	typedef core::SimpleMemoryArena<
 		core::GrowingPoolAllocator
 	> PoolArena;
+
 
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 
