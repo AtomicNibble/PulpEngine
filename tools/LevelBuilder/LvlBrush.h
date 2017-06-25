@@ -19,9 +19,11 @@ struct LvlBrushSide
 {
 	LvlBrushSide();
 	LvlBrushSide(const LvlBrushSide& oth);
+	LvlBrushSide(LvlBrushSide&& oth);
 	~LvlBrushSide();
 
 	LvlBrushSide& operator=(const LvlBrushSide& oth);
+	LvlBrushSide& operator=(LvlBrushSide&& oth);
 
 public:
 	int32_t	planenum;

@@ -29,17 +29,13 @@ LvlBrushSide::~LvlBrushSide()
 }
 
 LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
-	matInfo(oth.matInfo)
+	matInfo(oth.matInfo),
+	planenum(oth.planenum),
+	visible(oth.visible),
+	culled(oth.culled),
+	pWinding(nullptr),
+	pVisibleHull(nullptr)
 {
-	planenum = oth.planenum;
-
-	visible = oth.visible;
-	culled = oth.culled;
-
-	// null them first.
-	pWinding = nullptr;
-	pVisibleHull = nullptr;
-
 	if (oth.pWinding) {
 		pWinding = oth.pWinding->Copy(g_windingArena);
 	}
@@ -47,6 +43,19 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
 		pVisibleHull = oth.pVisibleHull->Copy(g_windingArena);
 	}
 }
+
+LvlBrushSide::LvlBrushSide(LvlBrushSide&& oth) :
+	matInfo(std::move(oth.matInfo)),
+	planenum(oth.planenum),
+	visible(oth.visible),
+	culled(oth.culled),
+	pWinding(oth.pWinding),
+	pVisibleHull(oth.pVisibleHull)
+{
+	oth.pWinding = nullptr;
+	oth.pVisibleHull = nullptr;
+}
+
 
 LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 {
@@ -68,6 +77,23 @@ LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 	if (oth.pVisibleHull) {
 		pVisibleHull = oth.pVisibleHull->Copy(g_windingArena);
 	}
+	return *this;
+}
+
+
+
+LvlBrushSide& LvlBrushSide::operator=(LvlBrushSide&& oth)
+{
+	planenum = oth.planenum;
+	visible = oth.visible;
+	culled = oth.culled;
+	matInfo = std::move(oth.matInfo);
+
+	pWinding = oth.pWinding;
+	pVisibleHull = oth.pVisibleHull;
+
+	oth.pWinding = nullptr;
+	oth.pVisibleHull = nullptr;
 	return *this;
 }
 
