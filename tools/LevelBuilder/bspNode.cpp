@@ -466,7 +466,7 @@ void bspNode::FreeTreePortals_r(void)
 		nextp = p->next[side];
 
 		p->RemoveFromNode(p->nodes[!side]);
-		X_DELETE(p, g_arena);
+		X_DELETE(p, g_bspPortalArena);
 	}
 	
 	portals = nullptr;

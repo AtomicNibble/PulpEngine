@@ -63,7 +63,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 		return;
 	}
 
-	auto* new_portal = X_NEW(bspPortal, g_arena, "Portal");
+	auto* new_portal = X_NEW(bspPortal, g_bspPortalArena, "Portal");
 	new_portal->plane = planeSet[node->planenum];
 	new_portal->onNode = node;
 	new_portal->pWinding = w.release();
@@ -115,7 +115,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 		{
 			const int32_t n = j * 3 + i;
 
-			auto* pPortal = X_NEW(bspPortal, g_arena, "bspHeadPortal");
+			auto* pPortal = X_NEW(bspPortal, g_bspPortalArena, "bspHeadPortal");
 			pPortals[n] = pPortal;
 
 			auto& pl = bplanes[n];
