@@ -66,6 +66,8 @@ private:
 
 	core::GrowingGenericAllocator windingDataAllocator_;
 	WindingDataArena windingDataArena_;
+
+	XPlaneSet	planes_;
 };
 
 

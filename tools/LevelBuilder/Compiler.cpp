@@ -26,7 +26,8 @@ core::MemoryArenaBase* g_windingPointsArena = nullptr;
 
 Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking) :
 	arena_(arena),
-	pPhysCooking_(pPhysCooking),
+	planes_(arena),
+	pPhysCooking_(X_ASSERT_NOT_NULL(pPhysCooking)),
 	bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8), // grow 32k at a time.
 	bspPortalAllocator_(sizeof(bspPortal), X_ALIGN_OF(bspPortal), 1 << 20, core::VirtualMem::GetPageSize() * 8),
 	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8),
