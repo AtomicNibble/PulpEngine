@@ -100,7 +100,7 @@ namespace mapFile
 
 	void QuakeTextureVecs(const Planef& plane, Vec2f shift, float rotate, Vec2f scale, Vec4f mappingVecs[2])
 	{
-		Vec3f	vecs[2];
+		Vec3f vecs[2];
 		TextureAxisFromPlane(plane.getNormal(), vecs[0], vecs[1]);
 
 		if (!scale[0]) {
