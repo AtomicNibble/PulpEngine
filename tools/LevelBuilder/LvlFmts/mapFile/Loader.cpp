@@ -50,14 +50,6 @@ namespace mapFile
 
 		// calculate bouds.
 		calculateLvlBounds();
-
-		AABB::StrBuf boundsStr;
-		X_LOG0("Map", "Total world brush: ^8%" PRIuS, entities_[0].brushes.size());
-		X_LOG0("Map", "Total brush: ^8%" PRIi32, stats_.numBrushes);
-		X_LOG0("Map", "Total patches: ^8%" PRIi32, stats_.numPatches);
-		X_LOG0("Map", "Total entities: ^8%" PRIi32, stats_.numEntities);
-		X_LOG0("Map", "Size: %s", mapBounds_.toString(boundsStr));
-
 		return true;
 	}
 
