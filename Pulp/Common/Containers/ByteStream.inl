@@ -93,55 +93,53 @@ ByteStream& ByteStream::operator=(ByteStream&& oth)
 template<typename T>
 inline void ByteStream::write(const T& val)
 {
-	X_ASSERT(sizeof(T) <= freeSpace(), "can't write a object of size: %" PRIuS, sizeof(T))(sizeof(T), freeSpace());
-
-	union {
-		char* as_char;
-		T* as_type;
-	};
-
-	as_char = current_;
-	*as_type = val;
-	current_ += sizeof(T);
+	write(reinterpret_cast<const Type*>(&val), sizeof(T));
 }
 
 
 template<typename T>
-inline void ByteStream::write(const T* val, size_type num)
+inline void ByteStream::write(const T* pVal, size_type num)
 {
-	X_ASSERT(((sizeof(T) * num) <= freeSpace()), "can't write %" PRIuS " objects of size: %" PRIuS,
-		num, sizeof(T)) (sizeof(T), freeSpace());
-
-	union {
-		char* as_char;
-		T* as_type;
-	};
-
-	as_char = current_;
-
-	size_type i;
-	for (i = 0; i < num; i++)
-	{
-		*as_type = val[i];
-		++as_type;
-	}
-
-	current_ += (sizeof(T) * num);
+	write(reinterpret_cast<const Type*>(pVal), num * sizeof(T));
 }
+
+inline void ByteStream::write(const Type* pBuf, size_type numBytes)
+{
+	ensureSpace(numBytes);
+
+	X_ASSERT(numBytes <= freeSpace(), "Not enougth space")(numBytes, freeSpace());
+
+	::memcpy(current_, pBuf, numBytes);
+	current_ += numBytes;
+}
+
 
 template<typename T>
 inline T ByteStream::read(void)
 {
-	X_ASSERT(sizeof(T) <= size(), "can't read a object of size: %" PRIuS, sizeof(T))(sizeof(T), size());
+	T val;
+	read(reinterpret_cast<Type*>(&val), sizeof(T));
+	return val;
+}
 
-	union {
-		char* as_char;
-		T* as_type;
-	};
+template<typename T>
+inline void ByteStream::read(T& val)
+{
+	read(reinterpret_cast<Type*>(&val), sizeof(T));
+}
 
-	as_char = current_;
-	current_ -= sizeof(T);
-	return as_type[-1];
+template<typename T>
+inline void ByteStream::read(T* pVal, size_type num)
+{
+	read(reinterpret_cast<Type*>(pVal), num * sizeof(T));
+}
+
+inline void ByteStream::read(Type* pBuf, size_type numBytes)
+{
+	X_ASSERT(numBytes <= size(), "can't read buffer of size: %" PRIuS, numBytes)(numBytes, size());
+
+	::memcpy(pBuf, current_ - numBytes, numBytes);
+	current_ -= numBytes;
 }
 
 template<typename T>
@@ -149,13 +147,7 @@ inline T ByteStream::peek(void) const
 {
 	X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %" PRIuS, sizeof(T))(sizeof(T), size());
 
-	union {
-		char* as_char;
-		T* as_type;
-	};
-
-	as_char = current_;
-	return as_type[-1];
+	return union_cast<T*, Type*>(current_)[-1];
 }
 
 inline void ByteStream::seek(size_type pos)
@@ -170,14 +162,11 @@ inline void ByteStream::resize(size_type numBytes)
 {
 	if (numBytes > capacity()) 
 	{
-		// copy of old memory.
-		char* pOld = start_;
-		size_type currentBytes = this->size();
+		Type* pOld = start_;
+		const size_type currentBytes = size();
 
-		// allocate new
 		start_ = Allocate(numBytes);
 
-		// copy old over.
 		if (pOld)
 		{
 			::memcpy(start_, pOld, currentBytes);
@@ -299,14 +288,42 @@ inline typename ByteStream::ConstReference ByteStream::back(void) const
 	return *end();
 }
 
+inline void ByteStream::ensureSpace(size_type num)
+{
+	if (num > capacity())
+	{
+		// copy of old memory.
+		Type* pOld = start_;
+		const size_type currentBytes = size();
+		const size_type currentCapacity = capacity();
+		const size_type newSize = core::Max(currentCapacity * 2, currentCapacity + num);
+
+		// allocate new
+		start_ = Allocate(newSize);
+
+		// copy old over.
+		if (pOld)
+		{
+			::memcpy(start_, pOld, currentBytes);
+			Delete(pOld);
+			current_ = start_ + currentBytes;
+		}
+		else
+		{
+			current_ = start_;
+		}
+
+		end_ = start_ + newSize;
+	} 
+}
 
 // for easy memory allocation changes later.
-inline void ByteStream::Delete(char* pData) const
+inline void ByteStream::Delete(Type* pData) const
 {
 	X_DELETE_ARRAY(pData, arena_);
 }
 
-inline char* ByteStream::Allocate(size_type num) const
+inline typename ByteStream::Type* ByteStream::Allocate(size_type num) const
 {
-	return X_NEW_ARRAY(char, num, arena_, "ByteStream");
+	return X_NEW_ARRAY(Type, num, arena_, "ByteStream");
 }

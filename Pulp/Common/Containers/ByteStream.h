@@ -24,7 +24,6 @@ public:
 	typedef const Type& const_reference;
 
 public:
-	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
 	inline ByteStream(MemoryArenaBase* arena, size_type numBytes);
 	inline ByteStream(const ByteStream& oth);
@@ -40,9 +39,23 @@ public:
 	// writes the type * num to the stream.
 	template<typename T>
 	inline void write(const T* val, size_type num);
+
+	inline void write(const Type* pBuf, size_type numBytes);
+
+
 	// removes and returns the top object off the stream.
 	template<typename T>
 	inline T read(void);
+
+	template<typename T>
+	inline void read(T& val);
+	// read the type * num from the stream.
+	template<typename T>
+	inline void read(T* pVal, size_type num);
+
+	inline void read(Type* pBuf, size_type numBytes);
+
+
 	// returns the top object but dose not remove it.
 	template<typename T>
 	inline T peek(void) const;
@@ -83,10 +96,11 @@ public:
 	inline ConstReference back(void) const;
 
 protected:
+	void ensureSpace(size_type num);
 
 	// for easy memory allocation changes later.
-	inline void Delete(char* pData) const;
-	inline char* Allocate(size_type num) const;
+	inline void Delete(Type* pData) const;
+	inline Type* Allocate(size_type num) const;
 
 	Type* current_;
 	Type* start_;
