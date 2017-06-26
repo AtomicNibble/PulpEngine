@@ -5,6 +5,9 @@
 #include <Memory\SimpleMemoryArena.h>
 #include <Memory\AllocationPolicies\GrowingGenericAllocator.h>
 
+#include "LvlEntity.h"
+#include "LvlArea.h"
+
 X_NAMESPACE_BEGIN(lvl)
 
 class ModelCache;
@@ -44,7 +47,11 @@ class Compiler
 
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 
-
+	typedef core::Array<LvlEntity> LvlEntsArr;
+	typedef core::Array<LvlArea> LvlAreaArr;
+	typedef core::Array<level::FileStaticModel> StaticModelsArr;
+	typedef std::array<core::Array<level::MultiAreaEntRef>,
+		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;
 
 public:
 	Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking);
@@ -68,6 +75,16 @@ private:
 	WindingDataArena windingDataArena_;
 
 	XPlaneSet	planes_;
+
+	// Compiled data
+	LvlAreaArr	areas_;
+
+	StaticModelsArr staticModels_;
+
+	MultiRefArr multiRefEntLists_;
+	MultiRefArr multiModelRefLists_;
+
+	StringTableType stringTable_;
 };
 
 

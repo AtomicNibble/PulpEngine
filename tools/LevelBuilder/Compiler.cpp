@@ -32,7 +32,17 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 	bspPortalAllocator_(sizeof(bspPortal), X_ALIGN_OF(bspPortal), 1 << 20, core::VirtualMem::GetPageSize() * 8),
 	bspNodeAllocator_(sizeof(bspNode), X_ALIGN_OF(bspNode), 1 << 20, core::VirtualMem::GetPageSize() * 8),
 	windingDataAllocator_((1 << 20) * 10, core::VirtualMem::GetPageSize() * 8, 16, WindingDataArena::getMemoryOffsetRequirement() + 4),
-	windingDataArena_(&windingDataAllocator_, "WindingDataArena")
+	windingDataArena_(&windingDataAllocator_, "WindingDataArena"),
+
+	areas_(arena),
+	staticModels_(arena),
+	multiRefEntLists_{
+		X_PP_REPEAT_COMMA_SEP( 8, arena)
+	},
+	multiModelRefLists_{
+		X_PP_REPEAT_COMMA_SEP(8, arena)
+	},
+	stringTable_(arena)
 {
 	pModelCache_ = X_NEW(ModelCache, arena, "LvlModelCache")(arena);
 	pMaterialMan_ = X_NEW(MatManager, arena, "LvlMaterialMan")(arena);
