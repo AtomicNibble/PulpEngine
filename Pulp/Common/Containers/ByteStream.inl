@@ -150,6 +150,20 @@ inline T ByteStream::peek(void) const
 	return union_cast<T*, Type*>(current_)[-1];
 }
 
+inline void ByteStream::alignWrite(size_t alignment)
+{
+	const size_t currentSize = size();
+	if ((currentSize % alignment) != 0)
+	{
+		const size_t pad = core::bitUtil::RoundUpToMultiple(currentSize, alignment) - currentSize;
+
+		ensureSpace(pad);
+
+		::memset(current_, 0xFF, pad);
+		current_ += pad;
+	}
+}
+
 inline void ByteStream::seek(size_type pos)
 {
 	X_ASSERT(pos < size(), "can't seek that far")(pos, size());

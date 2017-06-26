@@ -55,13 +55,14 @@ public:
 
 	inline void read(Type* pBuf, size_type numBytes);
 
-
 	// returns the top object but dose not remove it.
 	template<typename T>
 	inline T peek(void) const;
+
+	void alignWrite(size_t alignment);
+
 	// sets the absolute position in the stream.
 	inline void seek(size_type pos);
-
 	// resizes the object
 	inline void resize(size_type numBytes);
 	// clears the stream setting the cursor back to the start.
