@@ -561,6 +561,8 @@ struct FileHeader
 
 	FileNode nodes[FileNodes::ENUM_COUNT];
 
+	uint32_t pad; // make it multiple of 16.
+
 	const bool isValid(void) const {
 		return fourCC == LVL_FOURCC;
 	}
@@ -590,7 +592,7 @@ X_ENSURE_SIZE(MultiAreaEntRef, 8);
 // check file structure sizes also.
 X_ENSURE_SIZE(FileStaticModel, 56);
 X_ENSURE_SIZE(FileNode, 8);
-X_ENSURE_SIZE(FileHeader, 60 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
+X_ENSURE_SIZE(FileHeader, 64 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 
