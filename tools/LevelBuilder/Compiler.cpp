@@ -380,7 +380,7 @@ void Compiler::putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspN
 		return;
 	}
 
-	X_ASSERT(pNode->area != -1 && pNode->area < areas_.size(), "Leaf node has invalid area")(pNode->area);
+	X_ASSERT(pNode->area != -1 && pNode->area < safe_static_cast<int32_t>(areas_.size()), "Leaf node has invalid area")(pNode->area);
 
 	LvlArea& area = areas_[pNode->area];	
 	area.addWindingForSide(planes_, side, pWinding);
