@@ -172,14 +172,15 @@ bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
 		return false;
 	}
 
-	X_LOG0("Info", "Compile time: ^6%s", core::hum stopwatch.GetMilliSeconds());
+	core::HumanDuration::Str durStr;
+	X_LOG0("Info", "Compile time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
 	stopwatch.Start();
 
 	if (!save(ents, outPath)) {
 		return false;
 	}
 
-	X_LOG0("Info", "Save time: ^6%.4fms", stopwatch.GetMilliSeconds());
+	X_LOG0("Info", "Save time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
 	return true;
 }
 
