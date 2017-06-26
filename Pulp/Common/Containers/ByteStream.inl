@@ -290,13 +290,13 @@ inline typename ByteStream::ConstReference ByteStream::back(void) const
 
 inline void ByteStream::ensureSpace(size_type num)
 {
-	if (num > capacity())
+	if (num > freeSpace())
 	{
 		// copy of old memory.
 		Type* pOld = start_;
 		const size_type currentBytes = size();
 		const size_type currentCapacity = capacity();
-		const size_type newSize = core::Max(currentCapacity * 2, currentCapacity + num);
+		const size_type newSize = currentCapacity * 2;
 
 		// allocate new
 		start_ = Allocate(newSize);
