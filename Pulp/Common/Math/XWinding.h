@@ -16,9 +16,8 @@
 #include "XPlane.h"
 #include "XAabb.h"
 
-#include <Util\FloatIEEEUtil.h>
-#include <ISerialize.h>
 #include <IFileSys.h>
+#include <Util\FloatIEEEUtil.h>
 
 
 class WindingGlobalAlloc
@@ -37,7 +36,7 @@ public:
 
 
 template<class Allocator>
-class XWindingT : public core::ISerialize
+class XWindingT 
 {
 	static const int MAX_POINTS_ON_WINDING = 64;
 	const float EDGE_LENGTH = 0.2f;
@@ -129,6 +128,9 @@ public:
 	void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = EPSILON);
 	void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
 
+	bool SSave(core::XFile* pFile) const;
+	bool SLoad(core::XFile* pFile);
+
 	inline TypePtr ptr(void);
 	inline ConstTypePtr ptr(void) const;
 	inline TypePtr data(void);
@@ -138,10 +140,6 @@ public:
 	inline ConstIterator begin(void) const;
 	inline Iterator end(void);
 	inline ConstIterator end(void) const;
-	// ISerialize
-	virtual bool SSave(core::XFile* pFile) const X_FINAL;
-	virtual bool SLoad(core::XFile* pFile) X_FINAL;
-	// ~ISerialize
 
 private:
 	// must be inlined to not fuck up alloca

@@ -1187,8 +1187,6 @@ void XWindingT<Allocator>::NormalVectors(const Vec3f& vec, Vec3f &left, Vec3f &d
 
 // ----------------------------------------------------------------------
 
-
-// ISerialize
 template<class Allocator>
 bool XWindingT<Allocator>::SSave(core::XFile* pFile) const
 {
@@ -1232,9 +1230,6 @@ bool XWindingT<Allocator>::SLoad(core::XFile* pFile)
 	numPoints_ = num;
 	return true;
 }
-// ~ISerialize
-
-
 
 
 template<class Allocator>
