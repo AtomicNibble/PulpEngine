@@ -148,8 +148,42 @@ AreaModel::AreaModel() :
 
 }
 
+void AreaModel::writeToStream(core::ByteStream& stream) const
+{
+	stream.resize(stream.size() + serializeSize());
 
-bool AreaModel::BelowLimits(void)
+	stream.alignWrite(16);
+	for (const auto& vert : verts) {
+		stream.write(vert.pos);
+		stream.write(vert.texcoord[0]);
+		stream.write(vert.texcoord[1]);
+	}
+
+	stream.alignWrite(16);
+	for (const auto& vert : verts) {
+		stream.write(vert.color);
+	}
+
+	stream.alignWrite(16);
+	for (const auto& vert : verts) {
+		stream.write(vert.normal);
+	}
+
+	stream.alignWrite(16);
+	stream.write(faces.ptr(), faces.size());
+}
+
+size_t AreaModel::serializeSize(void) const 
+{
+	size_t numBytes = 0;
+	numBytes += sizeof(meshHeader);
+	numBytes += core::bitUtil::RoundUpToMultiple(sizeof(model::SubMeshHeader) * meshes.size(), 16_sz);
+	numBytes += core::bitUtil::RoundUpToMultiple(sizeof(level::Vertex) * verts.size(), 16_sz);
+	numBytes += core::bitUtil::RoundUpToMultiple(sizeof(model::Face) * faces.size(), 16_sz);
+	return numBytes;
+}
+
+bool AreaModel::belowLimits(void)
 {
 	if (meshes.size() > level::MAP_MAX_MODEL_SURFACES)
 	{
@@ -173,19 +207,19 @@ bool AreaModel::BelowLimits(void)
 	return true;
 }
 
-void AreaModel::BeginModel(void)
+void AreaModel::beginModel(void)
 {
 	meshes.setGranularity(4096);
 	verts.setGranularity(4096);
 	faces.setGranularity(4096);
 }
 
-void AreaModel::EndModel(void)
+void AreaModel::endModel(void)
 {
-	model.streamsFlag = model::StreamType::NORMALS | model::StreamType::COLOR;
-	model.numSubMeshes = safe_static_cast<uint32_t, size_t>(meshes.size());
-	model.numVerts = safe_static_cast<uint32_t, size_t>(verts.size());
-	model.numIndexes = safe_static_cast<uint32_t, size_t>(faces.size() * 3);
+	meshHeader.streamsFlag = model::StreamType::NORMALS | model::StreamType::COLOR;
+	meshHeader.numSubMeshes = safe_static_cast<uint32_t, size_t>(meshes.size());
+	meshHeader.numVerts = safe_static_cast<uint32_t, size_t>(verts.size());
+	meshHeader.numIndexes = safe_static_cast<uint32_t, size_t>(faces.size() * 3);
 
 	// build bounds for all the meshes.
 	// this could be done in parrell.
@@ -193,21 +227,21 @@ void AreaModel::EndModel(void)
 
 	bounds.clear();
 
-	core::Array<model::SubMeshHeader>::ConstIterator it = meshes.begin();
+	auto it = meshes.begin();
 	for (; it != meshes.end(); ++it)
 	{
 		bounds.add(it->boundingBox);
 	}
 
-	model.boundingBox = bounds;
-	model.boundingSphere = Sphere(bounds);
+	meshHeader.boundingBox = bounds;
+	meshHeader.boundingSphere = Sphere(bounds);
 
+	AABB::StrBuf buf;
 	X_LOG_BULLET;
-	X_LOG1("AreaModel", "num verts: %i", model.numVerts);
-	X_LOG1("AreaModel", "num indexes: %i", model.numIndexes);
-	X_LOG1("AreaModel", "num meshes: %i", model.numSubMeshes);
-	X_LOG1("AreaModel", "bounds: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", bounds.min[0], bounds.min[1], bounds.min[2],
-		bounds.max[0], bounds.max[1], bounds.max[2]);
+	X_LOG1("AreaModel", "num verts: %i", meshHeader.numVerts);
+	X_LOG1("AreaModel", "num indexes: %i", meshHeader.numIndexes);
+	X_LOG1("AreaModel", "num meshes: %i", meshHeader.numSubMeshes);
+	X_LOG1("AreaModel", "bounds: %s", bounds.toString(buf));
 }
 
 
@@ -239,7 +273,7 @@ void LvlArea::AreaBegin(void)
 {
 	areaMeshes.clear();
 
-	model.BeginModel();
+	model.beginModel();
 }
 
 void LvlArea::AreaEnd(void)
@@ -275,13 +309,13 @@ void LvlArea::AreaEnd(void)
 		model.meshes.append(mesh);
 	}
 
-	model.EndModel();
+	model.endModel();
 	// not needed anymore.
 	areaMeshes.clear();
 
 	// copy bounds.
-	boundingBox = model.model.boundingBox;
-	boundingSphere = model.model.boundingSphere;
+	boundingBox = model.meshHeader.boundingBox;
+	boundingSphere = model.meshHeader.boundingSphere;
 }
 
 void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding)

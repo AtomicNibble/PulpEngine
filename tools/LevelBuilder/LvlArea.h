@@ -76,15 +76,19 @@ struct AreaModel
 public:
 	AreaModel();
 
-	bool BelowLimits(void);
-	void BeginModel(void);
-	void EndModel(void);
+	void writeToStream(core::ByteStream& stream) const;
+	size_t serializeSize(void) const;
+
+
+	bool belowLimits(void);
+	void beginModel(void);
+	void endModel(void);
 
 	MeshArr meshes;
 	VertArr verts;
 	FacesArr faces;
 
-	model::MeshHeader model;
+	model::MeshHeader meshHeader;
 };
 
 // used to build up submeshes.
