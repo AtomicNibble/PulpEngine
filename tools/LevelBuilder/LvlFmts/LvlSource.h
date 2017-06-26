@@ -27,6 +27,7 @@ public:
 	LvlSource(core::MemoryArenaBase* arena, ModelCache& modelCache, MatManager& matMan, XPlaneSet& planes);
 	virtual ~LvlSource();
 
+	void printInfo(void);
 	X_INLINE const LvlEntsArr& getEntsArr(void) const;
 	X_INLINE const AABB& getBounds(void) const;
 	X_INLINE const SourceStats& getStats(void) const;

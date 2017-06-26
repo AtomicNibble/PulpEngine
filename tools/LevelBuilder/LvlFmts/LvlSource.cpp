@@ -36,4 +36,17 @@ void LvlSource::calculateLvlBounds(void)
 }
 
 
+void LvlSource::printInfo(void)
+{
+	AABB::StrBuf boundsStr;
+	if (entities_.isNotEmpty()) {
+		X_LOG0("Map", "Total world brush: ^8%" PRIuS, entities_[0].brushes.size());
+	}
+	X_LOG0("Map", "Total brush: ^8%" PRIi32, stats_.numBrushes);
+	X_LOG0("Map", "Total patches: ^8%" PRIi32, stats_.numPatches);
+	X_LOG0("Map", "Total entities: ^8%" PRIi32, stats_.numEntities);
+	X_LOG0("Map", "Total planes: ^8%" PRIuS, planes_.size());
+	X_LOG0("Map", "Bounds: %s", mapBounds_.toString(boundsStr));
+}
+
 X_NAMESPACE_END
