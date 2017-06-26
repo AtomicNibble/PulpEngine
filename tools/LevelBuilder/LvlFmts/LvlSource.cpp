@@ -46,7 +46,7 @@ void LvlSource::printInfo(void)
 	X_LOG0("Map", "Total patches: ^8%" PRIi32, stats_.numPatches);
 	X_LOG0("Map", "Total entities: ^8%" PRIi32, stats_.numEntities);
 	X_LOG0("Map", "Total planes: ^8%" PRIuS, planes_.size());
-	X_LOG0("Map", "Bounds: %s", mapBounds_.toString(boundsStr));
+	X_LOG0("Map", "Bounds: ^6%s", mapBounds_.toString(boundsStr));
 }
 
 X_NAMESPACE_END
