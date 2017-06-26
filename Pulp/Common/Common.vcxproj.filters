@@ -1982,5 +1982,8 @@
     <Natvis Include="Winding.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="ByteStream.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

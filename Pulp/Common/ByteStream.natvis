@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::core::ByteStream">
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">current_ - start_</Item>
+      <Item Name="[allocate]" ExcludeView="simple">end_ - start_</Item>
+      <Item Name="[freespace]" ExcludeView="simple">end_ - current_</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>

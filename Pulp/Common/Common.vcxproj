@@ -1134,6 +1134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis" />
+    <Natvis Include="ByteStream.natvis" />
     <Natvis Include="FiFo.natvis" />
     <Natvis Include="FixedArray.natvis" />
     <Natvis Include="Math.natvis" />
