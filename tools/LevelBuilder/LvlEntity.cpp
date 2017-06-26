@@ -286,7 +286,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 }
 
 
-bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, mapFile::XMapFile* pMap)
+bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents)
 {
 	X_LOG0("LvlEntity", "^5FloodEntities");
 
@@ -299,9 +299,8 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, mapFile::XM
 	tree->outside_node.occupied = 0;
 
 	// iterate the map ents.
-	for (size_t i = 1; i < pMap->getNumEntities(); i++)
+	for (size_t i = 1; i < ents.size(); i++)
 	{
-		mapFile::XMapEntity* mapEnt = pMap->getEntity(i);
 		LvlEntity& lvlEnt = ents[i];
 
 		if (lvlEnt.PlaceOccupant(planeSet, pHeadnode, floodedLeafs)) {

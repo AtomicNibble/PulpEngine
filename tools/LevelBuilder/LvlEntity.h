@@ -53,7 +53,7 @@ public:
 	bool FacesToBSP(XPlaneSet& planeSet);
 	bool MakeTreePortals(XPlaneSet& planeSet);
 	bool FilterBrushesIntoTree(XPlaneSet& planeSet);
-	bool FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, mapFile::XMapFile* pMap);
+	bool FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents);
 	bool FillOutside(void);
 	bool ClipSidesByTree(XPlaneSet& planeSet);
 	bool FloodAreas(void);
