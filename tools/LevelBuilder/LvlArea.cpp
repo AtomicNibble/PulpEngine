@@ -284,6 +284,56 @@ void LvlArea::AreaEnd(void)
 	boundingSphere = model.model.boundingSphere;
 }
 
+void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding)
+{
+	const auto& plane = planes[side.planenum];
+
+	AreaSubMesh* pSubMesh = meshForSide(side);
+
+	const size_t startVert = pSubMesh->verts_.size();
+	const size_t numPoints = pWinding->getNumPoints();
+	const model::Index offset = safe_static_cast<model::Index>(startVert);
+
+	for (size_t i = 2; i < numPoints; i++)
+	{
+		for (size_t j = 0; j < 3; j++)
+		{
+			level::Vertex vert;
+
+			if (j == 0) {
+				const Vec5f vec = pWinding->at(0);
+				vert.pos = vec.asVec3();
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
+			}
+			else if (j == 1) {
+				const Vec5f vec = pWinding->at(i - 1);
+				vert.pos = vec.asVec3();
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
+			}
+			else
+			{
+				const Vec5f vec = pWinding->at(i);
+				vert.pos = vec.asVec3();
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
+			}
+
+			// copy normal
+			vert.normal = plane.getNormal();
+			vert.color = Col_White;
+
+			pSubMesh->AddVert(vert);
+		}
+
+		model::Index localOffset = safe_static_cast<model::Index>((i - 2) * 3);
+
+		pSubMesh->faces_.emplace_back(
+			offset + localOffset + 0_ui16,
+			offset + localOffset + 1_ui16,
+			offset + localOffset + 2_ui16
+		);
+	}
+}
+
 
 
 AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& stringTable)
@@ -326,5 +376,22 @@ AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& s
 	return &newIt.first->second;
 }
 
+AreaSubMesh* LvlArea::meshForSide(const LvlBrushSide& side)
+{
+	auto it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
+	if (it != areaMeshes.end()) {
+		return &it->second;
+	}
+
+	AreaSubMesh newMesh;
+	newMesh.matNameID_ = 0;
+	newMesh.matName_ = side.matInfo.name;
+
+	core::string matStr(side.matInfo.name.begin(), side.matInfo.name.end());
+
+	auto newIt = areaMeshes.insert({ matStr, newMesh });
+
+	return &newIt.first->second;
+}
 
 X_NAMESPACE_END

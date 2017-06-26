@@ -117,8 +117,15 @@ public:
 
 	void AreaBegin(void);
 	void AreaEnd(void);
+	
+	void addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding);
+
 	AreaSubMesh* MeshForSide(const LvlBrushSide& side, StringTableType& stringTable);
 	AreaSubMesh* MeshForMat(const core::string& matName, StringTableType& stringTable);
+
+private:
+	AreaSubMesh* meshForSide(const LvlBrushSide& side);
+
 
 public:
 	// area has one model.
