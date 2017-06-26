@@ -332,7 +332,10 @@ X_DECLARE_FLAGS(LevelFileFlag)(
 	BSP_TREE, 
 	OCT_TREE, 
 	DEBUG_PORTAL_DATA,
-	COLLISION
+	COLLISION,
+
+	
+	COMPRESSED
 );
 
 typedef Flags<LevelFileFlag> LevelFileFlags;
