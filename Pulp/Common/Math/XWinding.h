@@ -65,6 +65,9 @@ public:
 	X_INLINE const Vec5f&	operator[](const size_t idx) const;
 	X_INLINE Vec5f&			operator[](const size_t idx);
 
+	X_INLINE const Vec5f&	at(size_t idx) const;
+	X_INLINE Vec5f&			at(size_t idx);
+
 	// add a point to the end of the winding point array
 	X_INLINE MyType&		operator+=(const Vec5f& v);
 	X_INLINE MyType&		operator+=(const Vec3f& v);
