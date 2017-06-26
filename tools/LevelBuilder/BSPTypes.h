@@ -112,7 +112,7 @@ public:
 	void FreeTreePortals_r(void);
 	void FreeTree_r(void);
 
-	void WriteNodes_r(XPlaneSet& planes, core::XFile* pFile);
+	void WriteNodes_r(XPlaneSet& planes, core::ByteStream& stream);
 
 	X_INLINE bool AreaSet(void) const;
 	X_INLINE bool IsLeaf(void) const;

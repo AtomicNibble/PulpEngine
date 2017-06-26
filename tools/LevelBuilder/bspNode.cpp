@@ -510,7 +510,7 @@ void bspNode::FreeTree_r(void)
 	X_DELETE(this, g_bspNodeArena);
 }
 
-void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
+void bspNode::WriteNodes_r(XPlaneSet& planes, core::ByteStream& stream)
 {
 	int32_t childIds[2];
 	size_t i;
@@ -533,15 +533,15 @@ void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
 	// get the plane.
 	const Planef& plane = planes[planenum];
 
-	pFile->writeObj(plane);
-	pFile->writeObj(childIds);
+	stream.write(plane);
+	stream.write(childIds);
 
 	// process the children, if they are not leafs.
 	if (childIds[Side::FRONT] > 0) {
-		children[Side::FRONT]->WriteNodes_r(planes, pFile);
+		children[Side::FRONT]->WriteNodes_r(planes, stream);
 	}
 	if (childIds[Side::BACK] > 0) {
-		children[Side::BACK]->WriteNodes_r(planes, pFile);
+		children[Side::BACK]->WriteNodes_r(planes, stream);
 	}
 }
 
