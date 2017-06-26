@@ -1314,6 +1314,55 @@ X_INLINE size_t XWindingT<Allocator>::getAllocatedSize(void) const
 
 
 template<class Allocator>
+inline typename XWindingT<Allocator>::TypePtr XWindingT<Allocator>::ptr(void)
+{
+	return pPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::ConstTypePtr XWindingT<Allocator>::ptr(void) const
+{
+	return pPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::TypePtr XWindingT<Allocator>::data(void)
+{
+	return pPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::ConstTypePtr XWindingT<Allocator>::data(void) const
+{
+	return pPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::Iterator XWindingT<Allocator>::begin(void)
+{
+	return pPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::ConstIterator XWindingT<Allocator>::begin(void) const
+{
+	return pPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::Iterator XWindingT<Allocator>::end(void)
+{
+	return pPoints_ + numPoints_;
+}
+
+template<class Allocator>
+inline typename XWindingT<Allocator>::ConstIterator XWindingT<Allocator>::end(void) const
+{
+	return pPoints_ + numPoints_;
+}
+
+
+template<class Allocator>
 X_INLINE void XWindingT<Allocator>::EnsureAlloced(size_t n, bool keep)
 {
 	int32_t num = safe_static_cast<int32_t, size_t>(n);

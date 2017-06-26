@@ -46,6 +46,17 @@ class XWindingT : public core::ISerialize
 	const int MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
 
+	typedef Vec5f Type;
+	typedef Type value_type;
+	typedef Type* TypePtr;
+	typedef const Type* ConstTypePtr;
+	typedef Type* Iterator;
+	typedef const Type* ConstIterator;
+	typedef size_t size_type;
+	typedef Type& Reference;
+	typedef Type& reference;
+	typedef const Type& ConstReference;
+	typedef const Type& const_reference;
 	typedef XWindingT<Allocator> MyType;
 
 public:
@@ -118,7 +129,15 @@ public:
 	void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = EPSILON);
 	void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
 
+	inline TypePtr ptr(void);
+	inline ConstTypePtr ptr(void) const;
+	inline TypePtr data(void);
+	inline ConstTypePtr data(void) const;
 
+	inline Iterator begin(void);
+	inline ConstIterator begin(void) const;
+	inline Iterator end(void);
+	inline ConstIterator end(void) const;
 	// ISerialize
 	virtual bool SSave(core::XFile* pFile) const X_FINAL;
 	virtual bool SLoad(core::XFile* pFile) X_FINAL;
