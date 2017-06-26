@@ -62,6 +62,14 @@ public:
 	bool compileLevel(core::Path<char>& path);
 
 private:
+	bool processModels(LvlEntsArr& ents);
+	bool processModel(LvlEntity& ent);
+	bool processWorldModel(LvlEntsArr& ents, LvlEntity& ent);
+
+	bool createAreasForPrimativates(LvlEntity& ent);
+	void putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspNode* pNode);
+
+private:
 	core::MemoryArenaBase* arena_;
 	physics::IPhysicsCooking* pPhysCooking_;
 	ModelCache* pModelCache_;
