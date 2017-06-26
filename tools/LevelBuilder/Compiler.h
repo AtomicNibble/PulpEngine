@@ -62,6 +62,7 @@ public:
 	bool compileLevel(core::Path<char>& path);
 
 private:
+	bool save(const LvlEntsArr& ent, core::Path<char>& path);
 	bool processModels(LvlEntsArr& ents);
 	bool processModel(LvlEntity& ent);
 	bool processWorldModel(LvlEntsArr& ents, LvlEntity& ent);
