@@ -58,8 +58,8 @@ public:
 	~Compiler();
 
 	bool init(void);
+	bool compileLevel(core::Path<char>& path, core::Path<char>& outPath);
 
-	bool compileLevel(core::Path<char>& path);
 
 private:
 	bool save(const LvlEntsArr& ent, core::Path<char>& path);

@@ -3,6 +3,7 @@
 
 #include <Time\StopWatch.h>
 #include <Hashing\crc32.h>
+#include <String\HumanDuration.h>
 
 #include <IFileSys.h>
 #include <ITimer.h>
@@ -140,7 +141,7 @@ bool Compiler::init(void)
 }
 
 
-bool Compiler::compileLevel(core::Path<char>& path)
+bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
 {
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{
@@ -149,62 +150,36 @@ bool Compiler::compileLevel(core::Path<char>& path)
 	}
 
 	X_LOG0("Map", "Loading: \"%s\"", path.fileName());
-
 	core::StopWatch stopwatch;
 
-	core::XFileMemScoped file;
-	if (!file.openFile(path.c_str(), core::IFileSys::fileMode::READ | core::IFileSys::fileMode::SHARE))
+	mapFile::MapFileSource source(g_arena, *pModelCache_, *pMaterialMan_, planes_);
+	if (!source.load(path))
 	{
+		X_ERROR("Map", "Failed to load source");
 		return false;
 	}
 
-	mapFile::XMapFile map(g_arena);
-	LvlBuilder lvl(pPhysCooking_, g_arena);
-
-	if (!lvl.init())
+	auto& ents = source.getEntsArr();
+	if (ents.isEmpty())
 	{
-		X_ERROR("Map", "Failed to init level builder");
+		X_ERROR("Lvl", "Map has zero entites, atleast one is required");
 		return false;
 	}
 
-		//	parse the map file.
-	if (!map.Parse(file->getBufferStart(), safe_static_cast<size_t, uint64_t>(file->getSize())))
-	{
-		X_ERROR("Map", "Failed to parse map file");
-		return false;
-	}
-	
-	core::TimeVal elapsed = stopwatch.GetTimeVal();
-	{
-		X_LOG_BULLET;
-		X_LOG0("Map", "Loaded: ^6%.4fms", elapsed.GetMilliSeconds());
-		X_LOG0("Map", "Num Entities: ^8%" PRIuS, map.getNumEntities());
+	source.printInfo();
 
-		for (uint32_t prim = 0; prim < mapFile::PrimType::ENUM_COUNT; ++prim)
-		{
-			X_LOG0("Map", "Num %s: ^8%" PRIuS, mapFile::PrimType::ToString(prim), map.getPrimCounts()[prim]);
-		}
-	}
-
-	// all loaded time to get naked.
-	if (!lvl.LoadFromMap(&map))
-	{
+	if (!processModels(ents)) {
 		return false;
 	}
 
-	if (!lvl.ProcessModels())
-	{
+	X_LOG0("Info", "Compile time: ^6%s", core::hum stopwatch.GetMilliSeconds());
+	stopwatch.Start();
+
+	if (!save(ents, outPath)) {
 		return false;
 	}
 
-	if (!lvl.save(path.fileName()))
-	{
-		X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
-		return false;
-	}
-
-	elapsed = stopwatch.GetTimeVal();
-	X_LOG0("Info", "Total Time: ^6%.4fms", elapsed.GetMilliSeconds());
+	X_LOG0("Info", "Save time: ^6%.4fms", stopwatch.GetMilliSeconds());
 	return true;
 }
 
