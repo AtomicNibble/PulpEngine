@@ -70,15 +70,19 @@ private:
 
 struct AreaModel
 {
+	typedef core::Array<model::SubMeshHeader> MeshArr;
+	typedef core::Array<level::Vertex> VertArr;
+	typedef core::Array<model::Face> FacesArr;
+public:
 	AreaModel();
 
 	bool BelowLimits(void);
 	void BeginModel(void);
 	void EndModel(void);
 
-	core::Array<model::SubMeshHeader> meshes;
-	core::Array<level::Vertex> verts;
-	core::Array<model::Face> faces;
+	MeshArr meshes;
+	VertArr verts;
+	FacesArr faces;
 
 	model::MeshHeader model;
 };
@@ -87,6 +91,10 @@ struct AreaModel
 // so faces with same materials are grouped into meshes.
 struct AreaSubMesh
 {
+	typedef core::Array<level::Vertex> VertArr;
+	typedef core::Array<model::Face> FacesArr;
+
+public:
 	AreaSubMesh();
 
 	X_INLINE void AddVert(const level::Vertex& vert) {
@@ -102,8 +110,8 @@ public:
 
 	// index's for this sub mesh.
 	// merged into AreaModel list at end.
-	core::Array<level::Vertex> verts_;
-	core::Array<model::Face> faces_;
+	VertArr verts_;
+	FacesArr faces_;
 };
 
 
