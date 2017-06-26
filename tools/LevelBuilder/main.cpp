@@ -90,26 +90,29 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 					pLogVerbosity->Set(0);
 				}		
 
-				core::Path<char> name;
-				name.set("map_source\\");
-				name.setFileName("basic - Copy.map");
-				name.setFileName("alcatraz.map");
-				name.setFileName("killzone.map");
-				name.setFileName("box.map");
-				name.setFileName("boxmap.map");
-				name.setFileName("box2.map");
-				name.setFileName("box3.map");
-				name.setFileName("box4.map");
-				name.setFileName("boxmap.map");
-				name.setFileName("portal_test.map");
-				name.setFileName("entity_test.map");
-				name.setFileName("physics_test.map");
+				core::Path<char> path;
+				path.set("map_source\\");
+				path.setFileName("basic - Copy.map");
+				path.setFileName("alcatraz.map");
+				path.setFileName("killzone.map");
+				path.setFileName("box.map");
+				path.setFileName("boxmap.map");
+				path.setFileName("box2.map");
+				path.setFileName("box3.map");
+				path.setFileName("box4.map");
+				path.setFileName("boxmap.map");
+				path.setFileName("portal_test.map");
+				path.setFileName("entity_test.map");
+				path.setFileName("physics_test.map");
 				
 				lvl::Compiler comp(&arena, engine.GetPhysCooking());
 
 				if (comp.init())
 				{
-					if (comp.compileLevel(name))
+					core::Path<char> outPath;
+					outPath.setFileName(path.fileName());
+
+					if (comp.compileLevel(path, outPath))
 					{
 						res = 0;
 					}
