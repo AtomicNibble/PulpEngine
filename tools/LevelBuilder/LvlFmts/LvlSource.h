@@ -29,6 +29,7 @@ public:
 
 	void printInfo(void);
 	X_INLINE const LvlEntsArr& getEntsArr(void) const;
+	X_INLINE LvlEntsArr& getEntsArr(void);
 	X_INLINE const AABB& getBounds(void) const;
 	X_INLINE const SourceStats& getStats(void) const;
 

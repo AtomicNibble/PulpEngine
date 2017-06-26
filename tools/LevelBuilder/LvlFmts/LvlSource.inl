@@ -12,6 +12,11 @@ X_INLINE const LvlSource::LvlEntsArr& LvlSource::getEntsArr(void) const
 	return entities_;
 }
 
+X_INLINE LvlSource::LvlEntsArr& LvlSource::getEntsArr(void) 
+{
+	return entities_;
+}
+
 X_INLINE const AABB& LvlSource::getBounds(void) const
 {
 	return mapBounds_;
