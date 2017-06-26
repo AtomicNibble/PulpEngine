@@ -758,7 +758,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	for (i = 0; i < areas_.size(); i++){
 		areas_[i].AreaEnd();
 
-		if (!areas_[i].model.BelowLimits()) {
+		if (!areas_[i].model.belowLimits()) {
 			X_ERROR("Lvl","Area %" PRIuS " exceeds the limits", i);
 			return false;
 		}

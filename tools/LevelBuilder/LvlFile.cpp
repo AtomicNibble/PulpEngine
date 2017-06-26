@@ -15,7 +15,7 @@ namespace
 {
 	void WriteAreaModel(core::XFile* file, AreaModel const* pModel)
 	{
-		file->writeObj(pModel->model);
+		file->writeObj(pModel->meshHeader);
 		file->writeObj(pModel->meshes.ptr(),(pModel->meshes.size()));
 
 		// write the streams.
@@ -40,7 +40,7 @@ namespace
 
 	void WriteAreaModel(size_t streamOffset, core::ByteStream& stream, AreaModel const* pModel)
 	{
-		stream.write(pModel->model);
+		stream.write(pModel->meshHeader);
 		stream.write(pModel->meshes.ptr(), (pModel->meshes.size()));
 
 
@@ -94,7 +94,7 @@ namespace
 	{
 		size_t numBytes = 0;
 
-		numBytes += sizeof(pModel->model);
+		numBytes += sizeof(pModel->meshHeader);
 		numBytes += sizeof(model::SubMeshHeader) * pModel->meshes.size();
 		numBytes += sizeof(level::Vertex) * pModel->verts.size();
 		numBytes += sizeof(model::Face) * pModel->faces.size();
@@ -498,7 +498,7 @@ bool LvlBuilder::save(const char* name)
 			// need to write out all the nodes.
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
-			worldEnt.bspTree_.pHeadnode->WriteNodes_r(planes_,file.GetFile());
+//			worldEnt.bspTree_.pHeadnode->WriteNodes_r(planes_,file.GetFile());
 		}
 
 		// update FourcCC to mark this bsp as valid.
