@@ -903,7 +903,7 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 
 	// take the entities and use them to floor the node portals.
 	// so that all inside leafs are marked.
-	if (!ent.FloodEntities(planes_, entities_, pMap_)) {
+	if (!ent.FloodEntities(planes_, entities_)) {
 		X_ERROR("LvlEntity", "leaked");
 		return false;
 	}
