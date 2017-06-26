@@ -325,7 +325,7 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
-X_DECLARE_FLAGS(LevelFileFlags)(
+X_DECLARE_FLAGS(LevelFileFlag)(
 	INTER_AREA_INFO,
 	AREA_ENT_REF_LISTS,
 	AREA_MODEL_REF_LISTS,
@@ -334,6 +334,9 @@ X_DECLARE_FLAGS(LevelFileFlags)(
 	DEBUG_PORTAL_DATA,
 	COLLISION
 );
+
+typedef Flags<LevelFileFlag> LevelFileFlags;
+
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -530,7 +533,7 @@ struct FileHeader
 	uint8_t  version;
 	uint8_t  blank[3];
 
-	Flags<LevelFileFlags> flags;
+	LevelFileFlags flags;
 
 	core::dateTimeStampSmall modified; // 4
 
