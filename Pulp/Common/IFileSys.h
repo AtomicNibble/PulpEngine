@@ -390,6 +390,68 @@ private:
 };
 
 
+struct XFileByteStream : public XFile
+{
+	XFileByteStream(core::ByteStream& stream) :
+		stream_(stream)
+	{
+	}
+	~XFileByteStream() X_OVERRIDE {
+	}
+
+	virtual size_t read(void* pBuf, size_t len) X_FINAL {
+		stream_.read(reinterpret_cast<char*>(pBuf), len);
+		return len;
+	}
+
+	virtual size_t write(const void* pBuf, size_t len) X_FINAL {
+		stream_.write(reinterpret_cast<const char*>(pBuf), len);
+		return len;
+	}
+
+	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL {
+		switch (origin)
+		{
+			case SeekMode::CUR:
+			{
+				size_t current = stream_.size();
+				current += safe_static_cast<size_t>(position);
+				stream_.seek(current);
+				break;
+			}
+			case SeekMode::SET:
+				stream_.seek(safe_static_cast<size_t>(position));
+				break;
+			case SeekMode::END:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
+		}
+	}
+	virtual uint64_t remainingBytes(void) const X_FINAL {
+		// so this only makes sense if reading.
+		// or you have seeked back :/
+		return 0ull;
+	}
+	virtual uint64_t tell(void) const X_FINAL {
+		// tell is the offset in file.
+		// we kinda need a read / write index rip.
+		return 0ull;
+	}
+	virtual void setSize(int64_t numBytes) X_FINAL {
+		stream_.resize(safe_static_cast<size_t>(numBytes));
+	}
+
+	inline uint64_t getSize(void) const {
+		return 0ull;
+	}
+
+	inline bool isEof(void) const X_FINAL {
+		return false;
+	}
+
+private:
+	core::ByteStream& stream_;
+};
 
 // stuff for io requests
 X_DECLARE_ENUM(IoRequest)(
