@@ -52,7 +52,7 @@ ColGroupBucket::ColGroupBucket(physics::GroupFlags groupFlags, core::MemoryArena
 	triMeshData_(arena),
 	aabbData_(arena)
 {
-
+	aabbData_.setGranularity(128);
 }
 
 bool ColGroupBucket::cook(physics::IPhysicsCooking* pCooking)
@@ -101,7 +101,7 @@ void ColGroupBucket::beginNewTriMesh(void)
 AreaCollsiion::AreaCollsiion(core::MemoryArenaBase* arena) :
 	colGroupBuckets_(arena)
 {
-
+	colGroupBuckets_.setGranularity(4);
 }
 
 bool AreaCollsiion::cook(physics::IPhysicsCooking* pCooking)
