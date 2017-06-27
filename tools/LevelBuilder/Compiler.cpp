@@ -576,13 +576,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		// each area can have multiple 
 		for (auto& area : areas_)
 		{
-			AreaCollsiion& col = area.collision;
-
-			if (!col.cook(pPhysCooking_))
-			{
-				return false;
-			}
-
+			const AreaCollsiion& col = area.collision;
 
 			AreaCollisionHdr colHdr;
 			colHdr.numGroups = safe_static_cast<uint8_t>(col.numGroups());
