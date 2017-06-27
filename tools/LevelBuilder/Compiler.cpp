@@ -593,6 +593,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 			for (const auto& group : col.getGroups())
 			{
 				const auto& triDataArr = group.getTriMeshDataArr();
+				const auto& aabbArr = group.getAABBData();
 
 				static_assert(CollisionDataType::ENUM_COUNT == 4, "Enum count changed? this code may need updating");
 
@@ -602,7 +603,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 				groupHdr.numTypes[CollisionDataType::TriMesh] = safe_static_cast<uint8_t>(triDataArr.size());
 				groupHdr.numTypes[CollisionDataType::ConvexMesh] = 0;
 				groupHdr.numTypes[CollisionDataType::HeightField] = 0;
-				groupHdr.numTypes[CollisionDataType::Aabb] = 0;
+				groupHdr.numTypes[CollisionDataType::Aabb] = safe_static_cast<uint8_t>(aabbArr.size());
 
 				stream.write(groupHdr);
 
@@ -619,6 +620,9 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 					stream.write(dataHdr);
 					stream.write(cooked.data(), cooked.size());
 				}
+
+				// write all the camels.
+				stream.write(aabbArr.data(), aabbArr.size());
 			}
 		}
 	}
