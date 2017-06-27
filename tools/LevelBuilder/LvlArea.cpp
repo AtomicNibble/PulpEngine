@@ -157,6 +157,10 @@ void AreaModel::writeToStream(core::ByteStream& stream) const
 {
 	stream.resize(stream.size() + serializeSize());
 
+	stream.write(meshHeader);
+	stream.write(meshes.ptr(), meshes.size());
+
+
 	stream.alignWrite(16);
 	for (const auto& vert : verts) {
 		stream.write(vert.pos);
