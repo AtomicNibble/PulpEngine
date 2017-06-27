@@ -21,10 +21,10 @@ public:
 
 	bool cook(physics::IPhysicsCooking* pCooking);
 
-	X_INLINE void AddVert(const level::Vertex& vert) {
+	X_INLINE void addVert(const level::Vertex& vert) {
 		verts.append(vert);
 	}
-	X_INLINE void AddFace(const model::Face& face) {
+	X_INLINE void addFace(const model::Face& face) {
 		faces.append(face);
 	}
 
@@ -46,6 +46,10 @@ public:
 	ColGroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena);
 
 	bool cook(physics::IPhysicsCooking* pCooking);
+
+	X_INLINE void addAABB(const AABB& bounds) {
+		aabbData_.append(bounds);
+	}
 
 	physics::GroupFlags getGroupFlags(void) const;
 	const ColTriMesgDataArr& getTriMeshDataArr(void) const;
