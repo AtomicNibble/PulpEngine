@@ -414,10 +414,12 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 	{
 		auto& stream = nodeStreams[FileNodes::STRING_TABLE];
 
-		// if (!stringTable_.SSave(file.GetFile())) {
-		// 	X_ERROR("Lvl", "Failed to save string table");
-		// 	return false;
-		// }
+		core::XFileByteStream file(stream);
+
+		 if (!stringTable_.SSave(&file)) {
+		 	X_ERROR("Lvl", "Failed to save string table");
+		 	return false;
+		 }
 	}
 
 	// areas
