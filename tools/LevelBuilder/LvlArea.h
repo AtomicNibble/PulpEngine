@@ -8,51 +8,64 @@ struct LvlBrushSide;
 
 typedef core::GrowingStringTableUnique<256, 16, 4, uint32_t> StringTableType;
 
+
+// Data for a single TriangleMesh. it's one mesh once cooked.
+struct ColTriMeshData
+{
+	typedef core::Array<uint8_t> DataArr;
+	typedef core::Array<level::Vertex> VertArr;
+	typedef core::Array<model::Face> FacesArr;
+
+public:
+	ColTriMeshData(core::MemoryArenaBase* arena);
+
+	bool cook(physics::IPhysicsCooking* pCooking);
+
+	X_INLINE void AddVert(const level::Vertex& vert) {
+		verts.append(vert);
+	}
+	X_INLINE void AddFace(const model::Face& face) {
+		faces.append(face);
+	}
+
+public:
+	VertArr verts;
+	FacesArr faces;
+	DataArr cookedData;
+};
+
+
+// a collision group bucket, stores all the physics data for a given physics group.
+// so for a area we may have multiple collision buckets.
+struct ColGroupBucket
+{
+	typedef core::Array<ColTriMeshData> ColTriMesgDataArr;
+	typedef core::Array<AABB> AABBArr;
+
+public:
+	ColGroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena);
+
+	bool cook(physics::IPhysicsCooking* pCooking);
+
+	physics::GroupFlags getGroupFlags(void) const;
+	const ColTriMesgDataArr& getTriMeshDataArr(void) const;
+	const AABBArr& getAABBData(void) const;
+
+	ColTriMeshData& getCurrentTriMeshData(void);
+	void beginNewTriMesh(void); // starts a new mesh.
+
+private:
+	physics::GroupFlags groupFlags_;
+
+	ColTriMesgDataArr triMeshData_;
+	AABBArr aabbData_;
+};
+
 // contains all the collision data for a area.
-// we will support tri mesh and hieght fields.
 struct AreaCollsiion
 {
-	// a single chunck of collision data.
-	struct TriMeshData
-	{
-		TriMeshData(core::MemoryArenaBase* arena);
-
-		bool cook(physics::IPhysicsCooking* pCooking);
-
-		X_INLINE void AddVert(const level::Vertex& vert) {
-			verts.append(vert);
-		}
-		X_INLINE void AddFace(const model::Face& face) {
-			faces.append(face);
-		}
-
-		core::Array<level::Vertex> verts;
-		core::Array<model::Face> faces;
-		core::Array<uint8_t> cookedData;
-	};
-
-	// a collection of collision data for a given set of group flags.
-	struct GroupBucket
-	{
-		typedef core::Array<TriMeshData> TriMesgDataArr;
-
-		GroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena);
-
-		bool cook(physics::IPhysicsCooking* pCooking);
-
-		physics::GroupFlags getGroupFlags(void) const;
-		const TriMesgDataArr& getTriMeshDataArr(void) const;
-
-		TriMeshData& getCurrentTriMeshData(void);
-		void beginNewTriMesh(void); // move to a new block of data, used to break collision data up into smaller chuncks for potential performance gains.
-
-	private:
-		physics::GroupFlags groupFlags_;
-		TriMesgDataArr triMeshData_;
-	};
-
-	typedef core::Array<GroupBucket> ColGroupBucketArr;
-
+	typedef core::Array<uint8_t> DataArr;
+	typedef core::Array<ColGroupBucket> ColGroupBucketArr;
 
 public:
 	AreaCollsiion(core::MemoryArenaBase* arena);
@@ -62,7 +75,7 @@ public:
 	size_t numGroups(void) const;
 	const ColGroupBucketArr& getGroups(void) const;
 
-	GroupBucket& getBucket(physics::GroupFlags flags);
+	ColGroupBucket& getBucket(physics::GroupFlags flags);
 
 private:
 	ColGroupBucketArr colGroupBuckets_;

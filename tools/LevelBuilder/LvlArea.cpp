@@ -4,7 +4,7 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
-AreaCollsiion::TriMeshData::TriMeshData(core::MemoryArenaBase* arena) :
+ColTriMeshData::ColTriMeshData(core::MemoryArenaBase* arena) :
 	verts(arena),
 	faces(arena),
 	cookedData(arena)
@@ -12,7 +12,7 @@ AreaCollsiion::TriMeshData::TriMeshData(core::MemoryArenaBase* arena) :
 
 }
 
-bool AreaCollsiion::TriMeshData::cook(physics::IPhysicsCooking* pCooking)
+bool ColTriMeshData::cook(physics::IPhysicsCooking* pCooking)
 {
 	using namespace physics;
 	
@@ -47,14 +47,15 @@ bool AreaCollsiion::TriMeshData::cook(physics::IPhysicsCooking* pCooking)
 // ==========================================
 
 
-AreaCollsiion::GroupBucket::GroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena) :
+ColGroupBucket::ColGroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena) :
 	groupFlags_(groupFlags),
-	triMeshData_(arena)
+	triMeshData_(arena),
+	aabbData_(arena)
 {
 
 }
 
-bool AreaCollsiion::GroupBucket::cook(physics::IPhysicsCooking* pCooking)
+bool ColGroupBucket::cook(physics::IPhysicsCooking* pCooking)
 {
 	for (auto& tri : triMeshData_)
 	{
@@ -66,18 +67,22 @@ bool AreaCollsiion::GroupBucket::cook(physics::IPhysicsCooking* pCooking)
 	return true;
 }
 
-physics::GroupFlags AreaCollsiion::GroupBucket::getGroupFlags(void) const
+physics::GroupFlags ColGroupBucket::getGroupFlags(void) const
 {
 	return groupFlags_;
 }
 
-const AreaCollsiion::GroupBucket::TriMesgDataArr& AreaCollsiion::GroupBucket::getTriMeshDataArr(void) const
+const ColGroupBucket::ColTriMesgDataArr& ColGroupBucket::getTriMeshDataArr(void) const
 {
 	return triMeshData_;
 }
 
+const ColGroupBucket::AABBArr& ColGroupBucket::getAABBData(void) const
+{
+	return aabbData_;
+}
 
-AreaCollsiion::TriMeshData& AreaCollsiion::GroupBucket::getCurrentTriMeshData(void)
+ColTriMeshData& ColGroupBucket::getCurrentTriMeshData(void)
 {
 	if (triMeshData_.isEmpty()) {
 		beginNewTriMesh();
@@ -86,7 +91,7 @@ AreaCollsiion::TriMeshData& AreaCollsiion::GroupBucket::getCurrentTriMeshData(vo
 	return triMeshData_.back();
 }
 
-void AreaCollsiion::GroupBucket::beginNewTriMesh(void)
+void ColGroupBucket::beginNewTriMesh(void)
 {
 	triMeshData_.emplace_back(triMeshData_.getArena());
 }
@@ -121,7 +126,7 @@ const AreaCollsiion::ColGroupBucketArr& AreaCollsiion::getGroups(void) const
 	return colGroupBuckets_;
 }
 
-AreaCollsiion::GroupBucket& AreaCollsiion::getBucket(physics::GroupFlags flags)
+ColGroupBucket& AreaCollsiion::getBucket(physics::GroupFlags flags)
 {
 	for (auto& b : colGroupBuckets_)
 	{
