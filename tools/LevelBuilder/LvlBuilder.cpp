@@ -8,7 +8,7 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
-
+#if 0
 
 LvlBuilder::LvlBuilder(physics::IPhysicsCooking* pPhysCooking, core::MemoryArenaBase* arena) :
 	arena_(arena),
@@ -389,5 +389,7 @@ bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 	return true;
 }
 
+
+#endif
 
 X_NAMESPACE_END

@@ -22,6 +22,7 @@ namespace mapFile {
 	class XMapPatch;
 }
 
+#if 0 
 class ModelCache;
 
 class LvlBuilder
@@ -104,6 +105,8 @@ private:
 
 	LvlStats stats_;
 };
+
+#endif
 
 X_NAMESPACE_END
 
