@@ -164,9 +164,6 @@
     <ClCompile Include="bspNode.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="LvlFile.cpp">
-      <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
     <ClCompile Include="LvlArea.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>

@@ -503,7 +503,6 @@
   <ItemGroup>
     <ClCompile Include="Compiler.cpp" />
     <ClCompile Include="LvlArea.cpp" />
-    <ClCompile Include="LvlFile.cpp" />
     <ClCompile Include="bspNode.cpp" />
     <ClCompile Include="BSPPortals.cpp" />
     <ClCompile Include="FaceTreeBuilder.cpp" />
