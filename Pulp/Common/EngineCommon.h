@@ -112,7 +112,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // Conatiners
 #include <Containers\BitStream.h>
 #include <Containers\ByteStream.h>
-#include <Containers\ByteStreamFifo.h>
 #include <Containers\Stack.h>
 #include <Containers\FixedStack.h>
 #include <Containers\Freelist.h>

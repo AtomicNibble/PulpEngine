@@ -72,7 +72,6 @@
     <ClInclude Include="Containers\ArrayAllocators.h" />
     <ClInclude Include="Containers\BitStream.h" />
     <ClInclude Include="Containers\ByteStream.h" />
-    <ClInclude Include="Containers\ByteStreamFifo.h" />
     <ClInclude Include="Containers\Fifo.h" />
     <ClInclude Include="Containers\FixedArray.h" />
     <ClInclude Include="Containers\FixedBitStream.h" />
@@ -605,7 +604,6 @@
     <None Include="CmdBucket.inl" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
-    <None Include="Containers\ByteStreamFifo.inl" />
     <None Include="Containers\Fifo.inl" />
     <None Include="Containers\FixedArray.inl" />
     <None Include="Containers\FixedBitStream.inl" />

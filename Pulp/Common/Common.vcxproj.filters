@@ -790,9 +790,6 @@
     <ClInclude Include="Util\EndianUtil.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Containers\ByteStreamFifo.h">
-      <Filter>Headers\Containers</Filter>
-    </ClInclude>
     <ClInclude Include="Debugging\AbortHandler.h">
       <Filter>Headers\Debugging</Filter>
     </ClInclude>
@@ -1433,9 +1430,6 @@
     </None>
     <None Include="Util\EndianUtil.inl">
       <Filter>Headers\Util</Filter>
-    </None>
-    <None Include="Containers\ByteStreamFifo.inl">
-      <Filter>Headers\Containers</Filter>
     </None>
     <None Include="String\StringRange.inl">
       <Filter>Headers\String</Filter>
