@@ -204,9 +204,9 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 {
 	PROFILE_MAYA_NAME("Write intermidiate:");
 
-	core::Array<uint8_t> anim(g_arena);
+	core::ByteStream stream(g_arena);
 
-	MStatus status = writeIntermidiate_int(anim);
+	MStatus status = writeIntermidiate_int(stream);
 
 	if (status)
 	{
@@ -218,7 +218,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 
 
 			core::Compression::Compressor<core::Compression::LZ4> comp;
-			if (!comp.deflate(g_arena, anim, compressed, core::Compression::CompressLevel::HIGH))
+			if (!comp.deflate(g_arena, stream.begin(), stream.end(), compressed, core::Compression::CompressLevel::HIGH))
 			{
 				X_ERROR("Anim", "Failed to defalte inter anim");
 				return MS::kFailure;
@@ -244,7 +244,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 			errno_t err = fopen_s(&f, filePath_.c_str(), "wb");
 			if (f)
 			{
-				fwrite(anim.begin(), 1, anim.size(), f);
+				fwrite(stream.begin(), 1, stream.size(), f);
 				fclose(f);
 			}
 			else
@@ -258,11 +258,11 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 	return status;
 }
 
-MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
+MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 {
 	// I will store each tags data.
 	// for each frame there will be a position and a quat.
-	const int32_t numBones = safe_static_cast<int32_t, size_t>(bones_.size());
+	const int32_t numBones = safe_static_cast<int32_t>(bones_.size());
 	const int32_t numFrames = getNumFrames();
 	const int32_t fps = static_cast<int32_t>(fps_);
 
@@ -279,7 +279,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
 	const size_t headerSize = 8096; // plenty for shiz
 	const size_t requiredSize = ((maxSizePerEntry * numFrames) * numBones) + headerSize;
 
-	core::ByteStream stream(g_arena);
+	stream.reset();
 	stream.reserve(requiredSize);
 
 	core::StackString<4096> buf;
@@ -343,8 +343,6 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
 		MayaUtil::IncProcess();
 	}
 
-	anim.resize(stream.size());
-	memcpy(anim.ptr(), stream.begin(), stream.size());
 	return MS::kSuccess;
 }
 

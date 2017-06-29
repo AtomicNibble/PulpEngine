@@ -50,7 +50,7 @@ private:
 	MStatus getAnimationData(void);
 
 	MStatus writeIntermidiate(void);
-	MStatus writeIntermidiate_int(core::Array<uint8_t>& anim);
+	MStatus writeIntermidiate_int(core::ByteStream& stream);
 
 	MStatus processArgs(const MArgList &args);
 	MString argsToJson(void) const;
