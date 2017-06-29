@@ -56,6 +56,7 @@ public:
 	bool createBrushWindings(const XPlaneSet& planes);
 	bool boundBrush(const XPlaneSet& planes);
 	bool calculateContents(void);
+	bool isRectangle(void) const;
 	float volume(const XPlaneSet& planes);
 
 	BrushPlaneSide::Enum brushMostlyOnSide(const Planef& plane) const;

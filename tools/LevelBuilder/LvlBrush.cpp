@@ -355,6 +355,22 @@ bool LvlBrush::calculateContents(void)
 	return true;
 }
 
+bool LvlBrush::isRectangle(void) const
+{
+	if (sides.size() != 6) {
+		return false;
+	}
+
+	// we want to know if all the planes are axial.
+	for (auto& side : sides)
+	{
+		if (!side.axial) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 float LvlBrush::volume(const XPlaneSet& planes)
 {
