@@ -637,6 +637,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 			for (const auto& group : col.getGroups())
 			{
 				const auto& triDataArr = group.getTriMeshDataArr();
+				const auto& conDataArr = group.getConvexMeshDataArr();
 				const auto& aabbArr = group.getAABBData();
 
 				static_assert(CollisionDataType::ENUM_COUNT == 4, "Enum count changed? this code may need updating");
@@ -645,7 +646,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 				groupHdr.groupFlags = group.getGroupFlags();
 				core::zero_object(groupHdr.numTypes);
 				groupHdr.numTypes[CollisionDataType::TriMesh] = safe_static_cast<uint8_t>(triDataArr.size());
-				groupHdr.numTypes[CollisionDataType::ConvexMesh] = 0;
+				groupHdr.numTypes[CollisionDataType::ConvexMesh] = safe_static_cast<uint8_t>(conDataArr.size());
 				groupHdr.numTypes[CollisionDataType::HeightField] = 0;
 				groupHdr.numTypes[CollisionDataType::Aabb] = safe_static_cast<uint8_t>(aabbArr.size());
 
@@ -654,13 +655,22 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 				// write all the meshess.
 				for (const auto& triMesh : triDataArr)
 				{
-					const auto& cooked = triMesh.cookedData;
-
+					const auto& cooked = triMesh.cookedData();
 					X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")();
 
 					AreaCollisionDataHdr dataHdr;
 					dataHdr.dataSize = safe_static_cast<uint16_t>(cooked.size());
+					stream.write(dataHdr);
+					stream.write(cooked.data(), cooked.size());
+				}
 
+				for (const auto& convexMesh : conDataArr)
+				{
+					const auto& cooked = convexMesh.cookedData();
+					X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")();
+
+					AreaCollisionDataHdr dataHdr;
+					dataHdr.dataSize = safe_static_cast<uint16_t>(cooked.size());
 					stream.write(dataHdr);
 					stream.write(cooked.data(), cooked.size());
 				}
