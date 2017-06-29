@@ -9,6 +9,8 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
+#if 0
+
 namespace
 {
 	// ---------------------------------------------
@@ -945,6 +947,6 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
  	return true;
 }
 
-
+#endif
 
 X_NAMESPACE_END
