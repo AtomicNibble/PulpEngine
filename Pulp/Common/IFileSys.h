@@ -410,44 +410,28 @@ struct XFileByteStream : public XFile
 	}
 
 	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL {
-		switch (origin)
-		{
-			case SeekMode::CUR:
-			{
-				size_t current = stream_.size();
-				current += safe_static_cast<size_t>(position);
-				stream_.seek(current);
-				break;
-			}
-			case SeekMode::SET:
-				stream_.seek(safe_static_cast<size_t>(position));
-				break;
-			case SeekMode::END:
-				X_ASSERT_NOT_IMPLEMENTED();
-				break;
-		}
+		X_UNUSED(position);
+		X_UNUSED(origin);
+
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 	virtual uint64_t remainingBytes(void) const X_FINAL {
-		// so this only makes sense if reading.
-		// or you have seeked back :/
-		return 0ull;
+		return stream_.size();
 	}
 	virtual uint64_t tell(void) const X_FINAL {
-		// tell is the offset in file.
-		// we kinda need a read / write index rip.
-		return 0ull;
+		return stream_.tell();
 	}
 	virtual void setSize(int64_t numBytes) X_FINAL {
 		X_UNUSED(numBytes);
-//		stream_.resize(safe_static_cast<size_t>(numBytes));
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 	inline uint64_t getSize(void) const {
-		return 0ull;
+		return stream_.tellWrite();
 	}
 
 	inline bool isEof(void) const X_FINAL {
-		return false;
+		return stream_.isEos();
 	}
 
 private:
