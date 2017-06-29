@@ -4,13 +4,81 @@
 
 X_NAMESPACE_BEGIN(lvl)
 
-ColTriMeshData::ColTriMeshData(core::MemoryArenaBase* arena) :
-	verts(arena),
-	faces(arena),
-	cookedData(arena)
+ColMeshData::ColMeshData(core::MemoryArenaBase* arena) :
+	verts_(arena),
+	cookedData_(arena)
 {
 
 }
+
+const ColMeshData::DataArr& ColMeshData::cookedData(void) const
+{
+	return cookedData_;
+}
+
+
+// ==========================================
+
+ColTriMeshData::ColTriMeshData(core::MemoryArenaBase* arena) :
+	ColMeshData(arena),
+	faces_(arena)
+{
+
+}
+
+void ColTriMeshData::addBrush(const LvlBrush& brush)
+{
+	for (auto& side : brush.sides)
+	{
+		auto* pWinding = side.pWinding;
+		const size_t numPoints = pWinding->getNumPoints();
+
+		for (size_t i = 2; i < numPoints; i++)
+		{
+			uint16_t facesIdx[3];
+
+			for (size_t j = 0; j < 3; j++)
+			{
+				Vec3f pos;
+
+				if (j == 0) {
+					const Vec5f vec = pWinding->at(0);
+					pos = vec.asVec3();
+				}
+				else if (j == 1) {
+					const Vec5f vec = pWinding->at(i - 1);
+					pos = vec.asVec3();
+				}
+				else
+				{
+					const Vec5f vec = pWinding->at(i);
+					pos = vec.asVec3();
+				}
+
+				size_t v;
+				for (v = 0; v < verts_.size(); v++)
+				{
+					if (verts_[v].compare(pos, 0.1f))
+					{
+						facesIdx[j] = safe_static_cast<model::Index>(v);
+						break;
+					}
+				}
+
+				if (v == verts_.size())
+				{
+					verts_.append(pos);
+					facesIdx[j] = safe_static_cast<model::Index>(v);
+				}
+			}
+
+			faces_.emplace_back(facesIdx[0], facesIdx[1], facesIdx[2]);
+		}
+	}
+}
+
+
+
 
 bool ColTriMeshData::cook(physics::IPhysicsCooking* pCooking)
 {
@@ -18,26 +86,26 @@ bool ColTriMeshData::cook(physics::IPhysicsCooking* pCooking)
 	
 	IPhysicsCooking::CookFlags flags;
 
-	static_assert(sizeof(decltype(faces)::Type::value_type) == 2, "No longer using 16bit indicies?");
+	static_assert(sizeof(decltype(faces_)::Type::value_type) == 2, "No longer using 16bit indicies?");
 	flags.Set(IPhysicsCooking::CookFlag::INDICES_16BIT);
 
 	TriangleMeshDesc desc;
-	desc.points.pData = verts.data();
-	desc.points.stride = sizeof(decltype(verts)::Type);
-	desc.points.count = safe_static_cast<uint32>(verts.size());
-	desc.triangles.pData = faces.data();
-	desc.triangles.stride = sizeof(decltype(faces)::Type);
-	desc.triangles.count = safe_static_cast<uint32>(faces.size());
+	desc.points.pData = verts_.data();
+	desc.points.stride = sizeof(decltype(verts_)::Type);
+	desc.points.count = safe_static_cast<uint32>(verts_.size());
+	desc.triangles.pData = faces_.data();
+	desc.triangles.stride = sizeof(decltype(faces_)::Type);
+	desc.triangles.count = safe_static_cast<uint32>(faces_.size());
 
-	if (!pCooking->cookTriangleMesh(desc, cookedData, flags))
+	if (!pCooking->cookTriangleMesh(desc, cookedData_, flags))
 	{
 		X_ERROR("TriMesh", "Failed to cook area collision");
 		return false;
 	}
 
-	if (cookedData.size() > level::MAP_MAX_AREA_COL_DATA_SIZE)
+	if (cookedData_.size() > level::MAP_MAX_AREA_COL_DATA_SIZE)
 	{
-		X_ERROR("TriMesh", "cooked mesh is too big: %" PRIuS " bytes. max: %" PRIu32, cookedData.size(), level::MAP_MAX_AREA_COL_DATA_SIZE);
+		X_ERROR("TriMesh", "cooked mesh is too big: %" PRIuS " bytes. max: %" PRIu32, cookedData_.size(), level::MAP_MAX_AREA_COL_DATA_SIZE);
 		return false;
 	}
 
@@ -46,10 +114,66 @@ bool ColTriMeshData::cook(physics::IPhysicsCooking* pCooking)
 
 // ==========================================
 
+ColConvexMeshData::ColConvexMeshData(core::MemoryArenaBase* arena) :
+	ColMeshData(arena),
+	indexes_(arena),
+	polygons_(arena)
+{
+
+}
+
+void ColConvexMeshData::addBrush(const LvlBrush& brush)
+{
+	for (auto& side : brush.sides)
+	{
+		auto* pWinding = side.pWinding;
+		const size_t numPoints = pWinding->getNumPoints();
+
+		for (size_t i = 0; i < numPoints; i++)
+		{
+			verts_.append(pWinding->at(i).asVec3());
+		}
+	}
+}
+
+bool ColConvexMeshData::cook(physics::IPhysicsCooking* pCooking)
+{
+	using namespace physics;
+
+	IPhysicsCooking::CookFlags flags;
+
+	static_assert(sizeof(decltype(indexes_)::Type) == 2, "No longer using 16bit indicies?");
+	flags.Set(IPhysicsCooking::CookFlag::INDICES_16BIT);
+	flags.Set(IPhysicsCooking::CookFlag::COMPUTE_CONVEX);
+
+	ConvexMeshDesc desc;
+	desc.points.pData = verts_.data();
+	desc.points.stride = sizeof(decltype(verts_)::Type);
+	desc.points.count = safe_static_cast<uint32>(verts_.size());
+
+	if (!pCooking->cookConvexMesh(desc, cookedData_, flags))
+	{
+		X_ERROR("ConvexMesh", "Failed to cook collision mesh");
+		return false;
+	}
+
+	if (cookedData_.size() > level::MAP_MAX_AREA_COL_DATA_SIZE)
+	{
+		X_ERROR("ConvexMesh", "Cooked mesh is too big: %" PRIuS " bytes. max: %" PRIu32, cookedData_.size(), level::MAP_MAX_AREA_COL_DATA_SIZE);
+		return false;
+	}
+
+	return true;
+}
+
+
+// ==========================================
+
 
 ColGroupBucket::ColGroupBucket(physics::GroupFlags groupFlags, core::MemoryArenaBase* arena) :
 	groupFlags_(groupFlags),
 	triMeshData_(arena),
+	convexMeshData_(arena),
 	aabbData_(arena)
 {
 	aabbData_.setGranularity(128);
@@ -64,6 +188,7 @@ bool ColGroupBucket::cook(physics::IPhysicsCooking* pCooking)
 		}
 	}
 
+
 	return true;
 }
 
@@ -77,24 +202,17 @@ const ColGroupBucket::ColTriMesgDataArr& ColGroupBucket::getTriMeshDataArr(void)
 	return triMeshData_;
 }
 
+
+const ColGroupBucket::ColConvexMeshDataArr& ColGroupBucket::getConvexMeshDataArr(void) const
+{
+	return convexMeshData_;
+}
+
 const ColGroupBucket::AABBArr& ColGroupBucket::getAABBData(void) const
 {
 	return aabbData_;
 }
 
-ColTriMeshData& ColGroupBucket::getCurrentTriMeshData(void)
-{
-	if (triMeshData_.isEmpty()) {
-		beginNewTriMesh();
-	}
-
-	return triMeshData_.back();
-}
-
-void ColGroupBucket::beginNewTriMesh(void)
-{
-	triMeshData_.emplace_back(triMeshData_.getArena());
-}
 
 // ==========================================
 
@@ -285,8 +403,10 @@ void LvlArea::AreaBegin(void)
 	model.beginModel();
 }
 
-void LvlArea::AreaEnd(void)
+void LvlArea::AreaEnd(StringTableType& stringTable)
 {
+
+
 	for (const auto& it : areaMeshes)
 	{
 		const auto& subMesh = it.second;
@@ -305,7 +425,10 @@ void LvlArea::AreaEnd(void)
 		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
 		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
 
-		mesh.materialName = subMesh.matNameID_;
+
+		auto matNameID = stringTable.addStringUnqiue(subMesh.matName_.c_str(), subMesh.matName_.length());
+
+		mesh.materialName = matNameID;
 		
 		X_LOG1("SubMesh", "Mat: ^3%s^7 verts: %i indexs: %i", 
 			subMesh.matName_.c_str(), mesh.numVerts, mesh.numIndexes);

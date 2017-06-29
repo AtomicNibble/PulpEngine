@@ -5,33 +5,60 @@
 X_NAMESPACE_BEGIN(lvl)
 
 struct LvlBrushSide;
+struct LvlBrush;
 
 typedef core::GrowingStringTableUnique<256, 16, 4, uint32_t> StringTableType;
 
 
-// Data for a single TriangleMesh. it's one mesh once cooked.
-struct ColTriMeshData
+class ColMeshData
 {
+public:
 	typedef core::Array<uint8_t> DataArr;
-	typedef core::Array<level::Vertex> VertArr;
+	typedef core::Array<Vec3f> VertArr;
 	typedef core::Array<model::Face> FacesArr;
+	
+protected:
+	ColMeshData(core::MemoryArenaBase* arena);
 
+public:
+
+	const DataArr& cookedData(void) const;
+
+protected:
+	VertArr verts_;
+	DataArr cookedData_;
+};
+
+// Data for a single TriangleMesh. it's one mesh once cooked.
+class ColTriMeshData : public ColMeshData
+{
 public:
 	ColTriMeshData(core::MemoryArenaBase* arena);
 
 	bool cook(physics::IPhysicsCooking* pCooking);
 
-	X_INLINE void addVert(const level::Vertex& vert) {
-		verts.append(vert);
-	}
-	X_INLINE void addFace(const model::Face& face) {
-		faces.append(face);
-	}
+	void addBrush(const LvlBrush& brush);
+
+private:
+	FacesArr faces_;
+};
+
+class ColConvexMeshData : public ColMeshData
+{
+public:
+	typedef core::Array<model::Index> IndexArr;
+	typedef core::Array<physics::HullPolygon> HullPolygonArr;
 
 public:
-	VertArr verts;
-	FacesArr faces;
-	DataArr cookedData;
+	ColConvexMeshData(core::MemoryArenaBase* arena);
+
+	bool cook(physics::IPhysicsCooking* pCooking);
+
+	void addBrush(const LvlBrush& brush);
+
+private:
+	IndexArr indexes_;
+	HullPolygonArr polygons_;
 };
 
 
@@ -40,6 +67,7 @@ public:
 struct ColGroupBucket
 {
 	typedef core::Array<ColTriMeshData> ColTriMesgDataArr;
+	typedef core::Array<ColConvexMeshData> ColConvexMeshDataArr;
 	typedef core::Array<AABB> AABBArr;
 
 public:
@@ -51,17 +79,24 @@ public:
 		aabbData_.append(bounds);
 	}
 
+	X_INLINE void addTriMesh(ColTriMeshData&& triMesh) {
+		triMeshData_.append(std::move(triMesh));
+	}
+	X_INLINE void addConvexMesh(ColConvexMeshData&& convexMesh) {
+		convexMeshData_.append(std::move(convexMesh));
+	}
+
 	physics::GroupFlags getGroupFlags(void) const;
 	const ColTriMesgDataArr& getTriMeshDataArr(void) const;
+	const ColConvexMeshDataArr& getConvexMeshDataArr(void) const;
 	const AABBArr& getAABBData(void) const;
 
-	ColTriMeshData& getCurrentTriMeshData(void);
-	void beginNewTriMesh(void); // starts a new mesh.
 
 private:
 	physics::GroupFlags groupFlags_;
 
 	ColTriMesgDataArr triMeshData_;
+	ColConvexMeshDataArr convexMeshData_;
 	AABBArr aabbData_;
 };
 
