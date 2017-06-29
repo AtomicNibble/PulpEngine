@@ -948,6 +948,7 @@ struct IPhysics
 	virtual void addConvexMesh(ActorHandle handle, ConvexMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_ABSTRACT;
 	virtual void addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_ABSTRACT;
 	virtual void addBox(ActorHandle handle, const AABB& aabb) X_ABSTRACT;
+	virtual void addBox(ActorHandle handle, const AABB& aabb, const Vec3f& localPose) X_ABSTRACT;
 	virtual void addSphere(ActorHandle handle, float radius) X_ABSTRACT;
 	virtual void addCapsule(ActorHandle handle, float radius, float halfHeight) X_ABSTRACT;
 };

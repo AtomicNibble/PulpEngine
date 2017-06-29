@@ -1093,6 +1093,19 @@ void XPhysics::addBox(ActorHandle handle, const AABB& aabb)
 	actor.attachShape(*pShape);
 }
 
+void XPhysics::addBox(ActorHandle handle, const AABB& aabb, const Vec3f& localPose)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+	physx::PxBoxGeometry geo(Px3FromVec3(aabb.halfVec()));
+
+	physx::PxTransform trans(Px3FromVec3(localPose));
+
+	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+	pShape->setLocalPose(trans);
+
+	actor.attachShape(*pShape);
+}
+
 void XPhysics::addSphere(ActorHandle handle, float radius)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);

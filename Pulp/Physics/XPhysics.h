@@ -125,6 +125,7 @@ public:
 	void addConvexMesh(ActorHandle handle, ConvexMeshHandle con, const Vec3f& scale) X_FINAL;
 	void addHieghtField(ActorHandle handle, HieghtFieldHandle hf, const Vec3f& heightRowColScale = Vec3f::one()) X_FINAL;
 	void addBox(ActorHandle handle, const AABB& aabb) X_FINAL;
+	void addBox(ActorHandle handle, const AABB& aabb, const Vec3f& localPose) X_FINAL;
 	void addSphere(ActorHandle handle, float radius) X_FINAL;
 	void addCapsule(ActorHandle handle, float radius, float halfHeight) X_FINAL;
 	// ~IPhysics
