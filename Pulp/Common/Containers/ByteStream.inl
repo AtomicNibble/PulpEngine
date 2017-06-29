@@ -258,12 +258,12 @@ inline typename ByteStream::ConstIterator ByteStream::end(void) const
 
 inline typename ByteStream::Reference ByteStream::front(void)
 {
-	return *start_;
+	return *begin();
 }
 
 inline typename ByteStream::ConstReference ByteStream::front(void) const
 {
-	return *start_;
+	return *begin();
 }
 
 inline typename ByteStream::Reference ByteStream::back(void)
