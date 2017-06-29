@@ -25,7 +25,6 @@ public:
 
 public:
 	inline ByteStream(MemoryArenaBase* arena);
-	inline ByteStream(MemoryArenaBase* arena, size_type numBytes);
 	inline ByteStream(const ByteStream& oth);
 	inline ByteStream(ByteStream&& oth);
 	inline ~ByteStream();
@@ -63,10 +62,8 @@ public:
 
 	// sets the absolute position in the stream.
 	inline void seek(size_type pos);
-	// resizes the object
+	// reserves memory, the size is unchanged.
 	inline void reserve(size_type numBytes);
-	// resizes the object
-	inline void resize(size_type numBytes);
 	// clears the stream setting the cursor back to the start.
 	// no memory is freed
 	inline void reset(void);

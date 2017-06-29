@@ -11,16 +11,6 @@ ByteStream::ByteStream(MemoryArenaBase* arena) :
 {
 }
 
-ByteStream::ByteStream(MemoryArenaBase* arena, size_type numBytes) :
-	read_(nullptr),
-	write_(nullptr),
-	start_(nullptr),
-	end_(nullptr),
-	arena_(X_ASSERT_NOT_NULL(arena))
-{
-	resize(numBytes);
-}
-
 ByteStream::ByteStream(const ByteStream& oth)
 {
 	read_ = nullptr;
@@ -183,36 +173,6 @@ inline void ByteStream::reserve(size_type numBytes)
 	reallocate(numBytes);
 }
 
-// resizes the object
-inline void ByteStream::resize(size_type numBytes)
-{
-	if (numBytes > capacity()) 
-	{
-		const size_type readOffset = union_cast<size_type>(read_ - start_);
-		const size_type writeOffset = union_cast<size_type>(write_ - start_);
-
-		Type* pOld = start_;
-		start_ = Allocate(numBytes);
-
-		if (pOld)
-		{
-			::memcpy(start_, pOld, writeOffset);
-			Delete(pOld); 
-
-			read_ = start_ + readOffset;
-			write_ = start_ + writeOffset;
-		}
-		else
-		{
-			write_ = read_ = start_;
-		}
-
-
-		end_ = start_ + numBytes;
-	}
-}
-
-
 // clears the stream setting the cursor back to the start.
 // no memory is freed
 inline void ByteStream::reset(void)
@@ -228,8 +188,6 @@ inline void ByteStream::free(void)
 	}
 	read_ = write_ = start_ = end_ = nullptr;
 }
-
-
 
 
 // returns how many bytes are currently stored in the stream.
