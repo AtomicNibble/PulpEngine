@@ -196,6 +196,9 @@ bool PhysCooking::cookConvexMesh(const ConvexMeshDesc& desc, DataArr& dataOut, C
 	if (flags.IsSet(CookFlag::INDICES_16BIT)) {
 		meshDesc.flags.set(physx::PxConvexFlag::e16_BIT_INDICES);
 	}
+	if (flags.IsSet(CookFlag::COMPUTE_CONVEX)) {
+		meshDesc.flags.set(physx::PxConvexFlag::eCOMPUTE_CONVEX);
+	}
 
 	if (!meshDesc.isValid()) {
 		X_ERROR("Phys", "Failed to cook convex mesh, description is invalid");

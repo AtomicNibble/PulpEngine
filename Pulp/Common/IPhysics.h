@@ -424,7 +424,8 @@ struct IPhysicsCooking
 {
 public:
 	X_DECLARE_FLAGS(CookFlag)(
-		INDICES_16BIT
+		INDICES_16BIT,
+		COMPUTE_CONVEX
 	);
 
 	typedef Flags<CookFlag> CookFlags;
