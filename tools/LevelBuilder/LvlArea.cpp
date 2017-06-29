@@ -405,8 +405,6 @@ void LvlArea::AreaBegin(void)
 
 void LvlArea::AreaEnd(StringTableType& stringTable)
 {
-
-
 	for (const auto& it : areaMeshes)
 	{
 		const auto& subMesh = it.second;

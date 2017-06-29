@@ -180,7 +180,7 @@ public:
 	LvlArea();
 
 	void AreaBegin(void);
-	void AreaEnd(void);
+	void AreaEnd(StringTableType& stringTable);
 	
 	void addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding);
 
