@@ -169,8 +169,12 @@ namespace mapFile
 		{
 			LvlBrushSide& side = brush.sides.AddOne();
 			auto* pMapBrushSide = mapBrush.GetSide(i);
+			auto& plane = pMapBrushSide->GetPlane();
+			
 
-			side.planenum = findFloatPlane(pMapBrushSide->GetPlane());
+			side.planenum = findFloatPlane(plane);
+			side.axial = plane.isTrueAxial();
+
 			// material
 			const auto& sideMat = pMapBrushSide->GetMaterial();
 			side.matInfo.name = sideMat.name;

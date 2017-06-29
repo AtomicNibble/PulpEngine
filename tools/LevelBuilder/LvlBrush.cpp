@@ -12,6 +12,7 @@ LvlBrushSide::LvlBrushSide() :
 	planenum(0),
 	visible(true),
 	culled(false),
+	axial(false),
 	pWinding(nullptr),
 	pVisibleHull(nullptr)
 {
@@ -33,6 +34,7 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) :
 	planenum(oth.planenum),
 	visible(oth.visible),
 	culled(oth.culled),
+	axial(oth.axial),
 	pWinding(nullptr),
 	pVisibleHull(nullptr)
 {
@@ -49,6 +51,7 @@ LvlBrushSide::LvlBrushSide(LvlBrushSide&& oth) :
 	planenum(oth.planenum),
 	visible(oth.visible),
 	culled(oth.culled),
+	axial(oth.axial),
 	pWinding(oth.pWinding),
 	pVisibleHull(oth.pVisibleHull)
 {
@@ -69,6 +72,7 @@ LvlBrushSide& LvlBrushSide::operator=(const LvlBrushSide& oth)
 	planenum = oth.planenum;
 	visible = oth.visible;
 	culled = oth.culled;
+	axial = oth.axial;
 	matInfo = oth.matInfo;
 
 	if (oth.pWinding) {
@@ -87,6 +91,7 @@ LvlBrushSide& LvlBrushSide::operator=(LvlBrushSide&& oth)
 	planenum = oth.planenum;
 	visible = oth.visible;
 	culled = oth.culled;
+	axial = oth.axial;
 	matInfo = std::move(oth.matInfo);
 
 	pWinding = oth.pWinding;

@@ -30,7 +30,8 @@ public:
 
 	bool visible;
 	bool culled;
-	bool __pad[2];
+	bool axial;
+	bool __pad[1];
 
 	LvlMaterial matInfo;
 
