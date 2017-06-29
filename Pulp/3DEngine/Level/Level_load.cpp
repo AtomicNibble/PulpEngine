@@ -510,14 +510,17 @@ bool Level::ProcessData(void)
 					gEnv->pPhysics->addHieghtField(actor, hfHandle);
 				}
 
+				AABB aabb;
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::Aabb]; t++)
 				{
-					AABB aabb;
 					file.readObj(aabb);
 
-					gEnv->pPhysics->addBox(actor, aabb);
-				}
+					// the AABB is world space right.
+					// but the area actor is in area space.
+					const Vec3f localPose = aabb.center() - trans.trans;
 
+					gEnv->pPhysics->addBox(actor, aabb, localPose);
+				}
 
 				pScene_->addActorToScene(actor);
 
