@@ -93,6 +93,7 @@ public:
 
 	X_INLINE PlaneSide::Enum side(const Vec3<T>& v, const float epsilon) const;
 	X_INLINE PlaneType::Enum getType(void) const;
+	X_INLINE bool isTrueAxial(void) const;
 
 	X_INLINE const char* toString(Description& desc) const;
 
@@ -306,6 +307,12 @@ X_INLINE PlaneType::Enum Plane<T>::getType(void) const
 	}
 
 	return PlaneType::NONAXIAL;
+}
+
+template<typename T>
+X_INLINE bool Plane<T>::isTrueAxial(void) const
+{
+	return getType() < PlaneType::ZEROX;
 }
 
 template<typename T>
