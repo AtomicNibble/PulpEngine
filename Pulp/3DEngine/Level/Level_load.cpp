@@ -454,6 +454,8 @@ bool Level::ProcessData(void)
 			pScene_->addRegion(a.getBounds());
 		}
 
+		physics::IPhysics::DataArr data(g_3dEngineArena);
+
 		for (const auto& a : areas_)
 		{
 			X_UNUSED(a);
@@ -471,18 +473,14 @@ bool Level::ProcessData(void)
 
 				static_assert(CollisionDataType::ENUM_COUNT == 4, "Enum count changed? this code may need updating");
 
-				// will it help the broadphase if i make these static actors not all have idenity trans
-				// but instead process everything so it's not in wordspace but 'area space'
+				AreaCollisionDataHdr dataHdr;
+
 				auto actor = gEnv->pPhysics->createStaticActor(trans);
 
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::TriMesh]; t++)
 				{
-					AreaCollisionDataHdr dataHdr;
 					file.readObj(dataHdr);
-					
-					physics::IPhysics::DataArr data(g_3dEngineArena);
 					data.resize(dataHdr.dataSize);
-
 					file.read(data.data(), data.size());
 
 					// create the actor :O
@@ -492,12 +490,8 @@ bool Level::ProcessData(void)
 
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::ConvexMesh]; t++)
 				{
-					AreaCollisionDataHdr dataHdr;
 					file.readObj(dataHdr);
-
-					physics::IPhysics::DataArr data(g_3dEngineArena);
 					data.resize(dataHdr.dataSize);
-
 					file.read(data.data(), data.size());
 
 					// create the actor :O
@@ -507,12 +501,8 @@ bool Level::ProcessData(void)
 
 				for (uint8_t t = 0; t < groupHdr.numTypes[CollisionDataType::HeightField]; t++)
 				{
-					AreaCollisionDataHdr dataHdr;
 					file.readObj(dataHdr);
-
-					physics::IPhysics::DataArr data(g_3dEngineArena);
 					data.resize(dataHdr.dataSize);
-
 					file.read(data.data(), data.size());
 
 					// create the actor :O
