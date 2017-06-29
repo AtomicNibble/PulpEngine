@@ -217,10 +217,9 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 	bindInfo_.set(bindCounts);
 
 	// work out the size of the stream
-	size_t streamSize = bindInfo_.dataSizeTotal();
+	const size_t streamSize = bindInfo_.dataSizeTotal();
 
-	stream_.free();
-	stream_.resize(streamSize);
+	stream_.reserve(streamSize);
 
 	// simple binds?
 	if (bindCounts[0] == verts.size())
@@ -486,7 +485,8 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
 			static_assert(std::is_same<decltype(VertsArr::Type::pos_), Vec3f>::value,
 				"Raw convex points need to be vec3f, convert them here is you want to change how stored in VertsArr");
 
-			core::ByteStream stream(cooked_.getArena(), requiredBytes);
+			core::ByteStream stream(cooked_.getArena());
+			stream.reserve(requiredBytes);
 
 			for (const auto& v : verts_)
 			{
@@ -1278,9 +1278,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		requiredStreamSize = compiledLods_[i].getSubDataSize(streamsFlags);
 
 		// writing this info to a stream makes write time 5x times faster.
-		stream.resize(requiredStreamSize 
-			// space for max padding.
-			+ (16 * 5));
+		stream.reserve(requiredStreamSize + (16 * 5));
 		stream.reset();
 
 		const size_t streamOffset = safe_static_cast<size_t>(file.tell() - sizeof(header));

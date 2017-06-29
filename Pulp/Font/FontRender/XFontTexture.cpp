@@ -524,7 +524,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 
 		core::ByteStream stream(g_fontArena);
 
-		stream.resize(height_ * width_* 3);
+		stream.reserve(height_ * width_* 3);
 
 		for (int32_t i = height_ - 1; i >= 0; i--)
 		{
@@ -534,9 +534,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 				cRGB[1] = *cRGB;
 				cRGB[2] = *cRGB;
 
-				stream.write(cRGB[0]);
-				stream.write(cRGB[1]);
-				stream.write(cRGB[2]);
+				stream.write(cRGB, sizeof(cRGB));
 			}
 		}
 

@@ -444,7 +444,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 	};
 
 	for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++) {
-		nodeStreams[i].resize(1024);
+		nodeStreams[i].reserve(1024);
 	}
 
 	FileHeader hdr;
@@ -477,7 +477,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 			return area.model.serializeSize();
 		});
 
-		stream.resize(requiredBytes);
+		stream.reserve(requiredBytes);
 		for (const auto& area : areas_)
 		{
 			area.model.writeToStream(stream);

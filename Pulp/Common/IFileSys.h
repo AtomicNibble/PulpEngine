@@ -438,7 +438,8 @@ struct XFileByteStream : public XFile
 		return 0ull;
 	}
 	virtual void setSize(int64_t numBytes) X_FINAL {
-		stream_.resize(safe_static_cast<size_t>(numBytes));
+		X_UNUSED(numBytes);
+//		stream_.resize(safe_static_cast<size_t>(numBytes));
 	}
 
 	inline uint64_t getSize(void) const {

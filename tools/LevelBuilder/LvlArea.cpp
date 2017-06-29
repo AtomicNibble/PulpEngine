@@ -273,7 +273,7 @@ AreaModel::AreaModel() :
 
 void AreaModel::writeToStream(core::ByteStream& stream) const
 {
-	stream.resize(stream.size() + serializeSize());
+	stream.reserve(stream.size() + serializeSize());
 
 	stream.write(meshHeader);
 	stream.write(meshes.ptr(), meshes.size());
