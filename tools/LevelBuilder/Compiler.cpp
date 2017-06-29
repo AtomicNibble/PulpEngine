@@ -414,8 +414,6 @@ bool Compiler::createCollisionData(LvlEntity& ent)
 		}
 		else
 		{
-			X_LOG0("", "none rectanlge :DDD");
-
 			ColConvexMeshData triMesh(g_arena);
 
 			// we need to make a tri mesh for the sides windings.
