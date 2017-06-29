@@ -426,7 +426,6 @@ bool Compiler::createCollisionData(LvlEntity& ent)
 
 			bucket.addConvexMesh(std::move(triMesh));
 		}
-
 	}
 	
 	return true;
@@ -672,6 +671,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 					stream.write(dataHdr);
 					stream.write(cooked.data(), cooked.size());
 				}
+
 
 				// write all the camels.
 				stream.write(aabbArr.data(), aabbArr.size());
