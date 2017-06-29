@@ -280,7 +280,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
 	const size_t requiredSize = ((maxSizePerEntry * numFrames) * numBones) + headerSize;
 
 	core::ByteStream stream(g_arena);
-	stream.resize(requiredSize);
+	stream.reserve(requiredSize);
 
 	core::StackString<4096> buf;
 	buf.clear();
