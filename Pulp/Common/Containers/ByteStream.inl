@@ -3,7 +3,8 @@
 
 
 ByteStream::ByteStream(MemoryArenaBase* arena) :
-	current_(nullptr),
+	read_(nullptr),
+	write_(nullptr),
 	start_(nullptr),
 	end_(nullptr),
 	arena_(X_ASSERT_NOT_NULL(arena))
@@ -11,7 +12,8 @@ ByteStream::ByteStream(MemoryArenaBase* arena) :
 }
 
 ByteStream::ByteStream(MemoryArenaBase* arena, size_type numBytes) :
-	current_(nullptr),
+	read_(nullptr),
+	write_(nullptr),
 	start_(nullptr),
 	end_(nullptr),
 	arena_(X_ASSERT_NOT_NULL(arena))
@@ -21,29 +23,31 @@ ByteStream::ByteStream(MemoryArenaBase* arena, size_type numBytes) :
 
 ByteStream::ByteStream(const ByteStream& oth)
 {
-	// make null incase oth is empty.
-	current_ = nullptr;
+	read_ = nullptr;
+	write_ = nullptr;
 	start_ = nullptr;
 	end_ = nullptr;
-
 	arena_ = oth.arena_;
 
-	resize(oth.capacity());
+	reallocate(oth.capacity());
 
 	::memcpy(start_, oth.start_, oth.size());
 
-	current_ = start_ + oth.size();
+	read_ = start_ + (oth.read_ - oth.start_);
+	write_ = start_ + (oth.write_ - oth.start_);
 }
 
 ByteStream::ByteStream(ByteStream&& oth)
 {
 	arena_ = oth.arena_;
-	current_ = oth.current_;
+	read_ = oth.read_;
+	write_ = oth.write_;
 	start_ = oth.start_;
 	end_ = oth.end_;
 
 	// clear other.
-	oth.current_ = nullptr;
+	oth.read_ = nullptr;
+	oth.write_ = nullptr;
 	oth.start_ = nullptr;
 	oth.end_ = nullptr;
 }
@@ -61,11 +65,12 @@ ByteStream& ByteStream::operator=(const ByteStream& oth)
 
 		arena_ = oth.arena_;
 
-		resize(oth.capacity());
+		reallocate(oth.capacity());
 
 		::memcpy(start_, oth.start_, oth.size());
 
-		current_ = start_ + oth.size();
+		read_ = start_ + (oth.read_ - oth.start_);
+		write_ = start_ + (oth.write_ - oth.start_);
 	}
 	return *this;
 }
@@ -78,12 +83,14 @@ ByteStream& ByteStream::operator=(ByteStream&& oth)
 
 		// steal buffer.
 		arena_ = oth.arena_;
-		current_ = oth.current_;
+		read_ = oth.read_;
+		write_ = oth.write_;
 		start_ = oth.start_;
 		end_ = oth.end_;
 
 		// clear other.
-		oth.current_ = nullptr;
+		oth.read_ = nullptr;
+		oth.write_ = nullptr;
 		oth.start_ = nullptr;
 		oth.end_ = nullptr;
 	}
@@ -109,8 +116,8 @@ inline void ByteStream::write(const Type* pBuf, size_type numBytes)
 
 	X_ASSERT(numBytes <= freeSpace(), "Not enougth space")(numBytes, freeSpace());
 
-	::memcpy(current_, pBuf, numBytes);
-	current_ += numBytes;
+	::memcpy(write_, pBuf, numBytes);
+	write_ += numBytes;
 }
 
 
@@ -136,10 +143,10 @@ inline void ByteStream::read(T* pVal, size_type num)
 
 inline void ByteStream::read(Type* pBuf, size_type numBytes)
 {
-	X_ASSERT(numBytes <= size(), "can't read buffer of size: %" PRIuS, numBytes)(numBytes, size());
+	X_ASSERT(read_ + numBytes <= write_, "can't read buffer of size: %" PRIuS, numBytes)(numBytes, read_, write_);
 
-	::memcpy(pBuf, current_ - numBytes, numBytes);
-	current_ -= numBytes;
+	::memcpy(pBuf, read_ , numBytes);
+	read_ += numBytes;
 }
 
 template<typename T>
@@ -147,7 +154,7 @@ inline T ByteStream::peek(void) const
 {
 	X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %" PRIuS, sizeof(T))(sizeof(T), size());
 
-	return union_cast<T*, Type*>(current_)[-1];
+	return *union_cast<T*, Type*>(read_);
 }
 
 inline void ByteStream::alignWrite(size_t alignment)
@@ -159,38 +166,47 @@ inline void ByteStream::alignWrite(size_t alignment)
 
 		ensureSpace(pad);
 
-		::memset(current_, 0xFF, pad);
-		current_ += pad;
+		::memset(write_, 0xFF, pad);
+		write_ += pad;
 	}
 }
 
 inline void ByteStream::seek(size_type pos)
 {
 	X_ASSERT(pos < size(), "can't seek that far")(pos, size());
-	current_ = (start_ + pos);
+	read_ = (start_ + pos);
 }
 
+// resizes the object
+inline void ByteStream::reserve(size_type numBytes)
+{
+	reallocate(numBytes);
+}
 
 // resizes the object
 inline void ByteStream::resize(size_type numBytes)
 {
 	if (numBytes > capacity()) 
 	{
-		Type* pOld = start_;
-		const size_type currentBytes = size();
+		const size_type readOffset = union_cast<size_type>(read_ - start_);
+		const size_type writeOffset = union_cast<size_type>(write_ - start_);
 
+		Type* pOld = start_;
 		start_ = Allocate(numBytes);
 
 		if (pOld)
 		{
-			::memcpy(start_, pOld, currentBytes);
+			::memcpy(start_, pOld, writeOffset);
 			Delete(pOld); 
-			current_ = start_ + currentBytes;
+
+			read_ = start_ + readOffset;
+			write_ = start_ + writeOffset;
 		}
 		else
 		{
-			current_ = start_;
+			write_ = read_ = start_;
 		}
+
 
 		end_ = start_ + numBytes;
 	}
@@ -201,7 +217,7 @@ inline void ByteStream::resize(size_type numBytes)
 // no memory is freed
 inline void ByteStream::reset(void)
 {
-	current_ = start_;
+	read_ = write_ = start_;
 }
 
 // resets the cursor and clears all memory.
@@ -210,7 +226,7 @@ inline void ByteStream::free(void)
 	if (start_) { // memory to free.
 		Delete(start_);
 	}
-	current_ = start_ = end_ = nullptr;
+	read_ = write_ = start_ = end_ = nullptr;
 }
 
 
@@ -219,7 +235,7 @@ inline void ByteStream::free(void)
 // returns how many bytes are currently stored in the stream.
 inline typename ByteStream::size_type ByteStream::size(void) const
 {
-	return union_cast<size_type>(current_ - start_);
+	return union_cast<size_type>(write_ - read_);
 }
 
 // returns the capacity of the byte stream.
@@ -231,55 +247,55 @@ inline typename ByteStream::size_type ByteStream::capacity(void) const
 // returns the amount of bytes that can be added.
 inline typename ByteStream::size_type ByteStream::freeSpace(void) const
 {
-	return union_cast<size_type>(end_ - current_);
+	return union_cast<size_type>(end_ - write_);
 }
 
 // returns true if the stream is full.
 inline bool ByteStream::isEos(void) const
 {
-	return current_ == end_;
+	return write_ == end_;
 }
 
 
 inline typename ByteStream::TypePtr ByteStream::ptr(void)
 {
-	return start_;
+	return read_;
 }
 
 inline typename ByteStream::ConstTypePtr ByteStream::ptr(void) const
 {
-	return start_;
+	return read_;
 }
 
 inline typename ByteStream::TypePtr ByteStream::data(void)
 {
-	return start_;
+	return read_;
 }
 
 inline typename ByteStream::ConstTypePtr ByteStream::data(void) const
 {
-	return start_;
+	return read_;
 }
 
 
 inline typename ByteStream::Iterator ByteStream::begin(void)
 {
-	return start_;
+	return read_;
 }
 
 inline typename ByteStream::ConstIterator ByteStream::begin(void) const
 {
-	return start_;
+	return read_;
 }
 
 inline typename ByteStream::Iterator ByteStream::end(void)
 {
-	return current_;
+	return write_;
 }
 
 inline typename ByteStream::ConstIterator ByteStream::end(void) const
 {
-	return current_;
+	return write_;
 }
 
 inline typename ByteStream::Reference ByteStream::front(void)
@@ -302,33 +318,46 @@ inline typename ByteStream::ConstReference ByteStream::back(void) const
 	return *end();
 }
 
-inline void ByteStream::ensureSpace(size_type num)
+inline void ByteStream::ensureSpace(size_type desiredSpace)
 {
-	if (num > freeSpace())
+	const size_type space = freeSpace();
+	// num is how much space we want.
+	if (desiredSpace > space)
 	{
-		// copy of old memory.
-		Type* pOld = start_;
-		const size_type currentBytes = size();
-		const size_type currentCapacity = capacity();
-		const size_type newSize = currentCapacity * 2;
+		// which ever bigger.
+		const size_type newSize = core::Max(capacity() * 2, desiredSpace);
 
-		// allocate new
-		start_ = Allocate(newSize);
-
-		// copy old over.
-		if (pOld)
-		{
-			::memcpy(start_, pOld, currentBytes);
-			Delete(pOld);
-			current_ = start_ + currentBytes;
-		}
-		else
-		{
-			current_ = start_;
-		}
-
-		end_ = start_ + newSize;
+		reallocate(newSize);
 	} 
+}
+
+inline void ByteStream::reallocate(size_type newSize)
+{
+	if (newSize < capacity() || newSize == 0) {
+		return;
+	}
+
+	const size_type readOffset = union_cast<size_type>(read_ - start_);
+	const size_type writeOffset = union_cast<size_type>(write_ - start_);
+
+	Type* pOld = start_;
+	start_ = Allocate(newSize);
+
+	// copy old over.
+	if (pOld)
+	{
+		::memcpy(start_, pOld, writeOffset); // copy from base to write offset.
+		Delete(pOld);
+
+		read_ = start_ + readOffset;
+		write_ = start_ + writeOffset;
+	}
+	else
+	{
+		write_ = read_ = start_;
+	}
+
+	end_ = start_ + newSize;
 }
 
 // for easy memory allocation changes later.

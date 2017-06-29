@@ -31,7 +31,7 @@ TEST(ByteStreamTest, Genral)
 	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(0, stream.freeSpace());
 
-	stream.resize(1024);
+	stream.reserve(1024);
 
 	EXPECT_EQ(1024, stream.capacity());
 	EXPECT_EQ(0, stream.size());
@@ -60,23 +60,29 @@ TEST(ByteStreamTest, Genral)
 
 	EXPECT_TRUE(stream.isEos());
 
-	for (int i = 249; i >= 0; i--)
+
+	EXPECT_EQ(1, stream.read<uint8>());
+	EXPECT_FLOAT_EQ(fval, stream.read<float>());
+	EXPECT_EQ(2, stream.read<uint8>());
+	EXPECT_EQ(Col_Aliceblue, stream.read<Colorf>());
+	EXPECT_EQ(3, stream.read<uint8>());
+	EXPECT_EQ(4, stream.read<uint8>());
+
+	EXPECT_EQ(1000, stream.size());
+
+	for (int i = 0; i < 250; i++)
 	{
 		EXPECT_EQ(i, stream.peek<int>());
 		EXPECT_EQ(i, stream.read<int>());
 	}
 
-	EXPECT_EQ(24, stream.size());
-
-
-	EXPECT_EQ(4, stream.read<uint8>());
-	EXPECT_EQ(3, stream.read<uint8>());
-	EXPECT_EQ(Col_Aliceblue, stream.read<Colorf>());
-	EXPECT_EQ(2, stream.read<uint8>());
-	EXPECT_FLOAT_EQ(fval, stream.read<float>());
-	EXPECT_EQ(1, stream.read<uint8>());
-
 	// rekt
+	EXPECT_EQ(1024, stream.capacity());
+	EXPECT_EQ(0, stream.size());
+	EXPECT_EQ(0, stream.freeSpace());
+
+	stream.reset();
+
 	EXPECT_EQ(1024, stream.capacity());
 	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(1024, stream.freeSpace());
@@ -135,26 +141,38 @@ TEST(ByteStreamTest, Grow)
 
 	EXPECT_FALSE(stream.isEos());
 
+	EXPECT_EQ(1, stream.read<uint8>());
+	EXPECT_FLOAT_EQ(fval, stream.read<float>());
+	EXPECT_EQ(2, stream.read<uint8>());
+	EXPECT_EQ(Col_Aliceblue, stream.read<Colorf>());
+	EXPECT_EQ(3, stream.read<uint8>());
+	EXPECT_EQ(4, stream.read<uint8>());
+
+	EXPECT_EQ(1000, stream.size());
+
 	// check the first items are still correct.
-	for (int i = 249; i >= 0; i--)
+	for (int i = 0; i < 250; i++)
 	{
 		EXPECT_EQ(i, stream.peek<int>());
 		EXPECT_EQ(i, stream.read<int>());
 	}
 
-	EXPECT_EQ(24, stream.size());
-
-	EXPECT_EQ(4, stream.read<uint8>());
-	EXPECT_EQ(3, stream.read<uint8>());
-	EXPECT_EQ(Col_Aliceblue, stream.read<Colorf>());
-	EXPECT_EQ(2, stream.read<uint8>());
-	EXPECT_FLOAT_EQ(fval, stream.read<float>());
-	EXPECT_EQ(1, stream.read<uint8>());
-
 	// rekt
 	EXPECT_EQ(2048, stream.capacity());
 	EXPECT_EQ(0, stream.size());
+	EXPECT_EQ(1024, stream.freeSpace());
+
+	stream.reset();
+
+	EXPECT_EQ(2048, stream.capacity());
+	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(2048, stream.freeSpace());
+
+	stream.free();
+
+	EXPECT_EQ(0, stream.capacity());
+	EXPECT_EQ(0, stream.size());
+	EXPECT_EQ(0, stream.freeSpace());
 }
 
 

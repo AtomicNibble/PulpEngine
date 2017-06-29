@@ -64,6 +64,8 @@ public:
 	// sets the absolute position in the stream.
 	inline void seek(size_type pos);
 	// resizes the object
+	inline void reserve(size_type numBytes);
+	// resizes the object
 	inline void resize(size_type numBytes);
 	// clears the stream setting the cursor back to the start.
 	// no memory is freed
@@ -97,13 +99,15 @@ public:
 	inline ConstReference back(void) const;
 
 protected:
-	void ensureSpace(size_type num);
+	void ensureSpace(size_type desiredSpace);
+	void reallocate(size_type newSize);
 
 	// for easy memory allocation changes later.
 	inline void Delete(Type* pData) const;
 	inline Type* Allocate(size_type num) const;
 
-	Type* current_;
+	Type* read_;
+	Type* write_;
 	Type* start_;
 	Type* end_;
 
