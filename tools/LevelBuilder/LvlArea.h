@@ -47,7 +47,6 @@ class ColConvexMeshData : public ColMeshData
 {
 public:
 	typedef core::Array<model::Index> IndexArr;
-	typedef core::Array<physics::HullPolygon> HullPolygonArr;
 
 public:
 	ColConvexMeshData(core::MemoryArenaBase* arena);
@@ -58,7 +57,6 @@ public:
 
 private:
 	IndexArr indexes_;
-	HullPolygonArr polygons_;
 };
 
 

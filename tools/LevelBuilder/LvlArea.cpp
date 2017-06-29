@@ -116,8 +116,7 @@ bool ColTriMeshData::cook(physics::IPhysicsCooking* pCooking)
 
 ColConvexMeshData::ColConvexMeshData(core::MemoryArenaBase* arena) :
 	ColMeshData(arena),
-	indexes_(arena),
-	polygons_(arena)
+	indexes_(arena)
 {
 
 }
