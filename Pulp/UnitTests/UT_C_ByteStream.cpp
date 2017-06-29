@@ -103,7 +103,7 @@ TEST(ByteStreamTest, Grow)
 	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(0, stream.freeSpace());
 
-	stream.resize(1024);
+	stream.reserve(1024);
 
 	EXPECT_EQ(1024, stream.capacity());
 	EXPECT_EQ(0, stream.size());
@@ -133,7 +133,7 @@ TEST(ByteStreamTest, Grow)
 	EXPECT_TRUE(stream.isEos());
 
 	// grow a bit.
-	stream.resize(2048);
+	stream.reserve(2048);
 
 	EXPECT_EQ(2048, stream.capacity());
 	EXPECT_EQ(1024, stream.size());
@@ -191,8 +191,14 @@ TEST(ByteStreamTest, Move)
 	list.reserve(2);
 
 
-	list.push_back(ByteStream(&arena, 100));
-	list.push_back(ByteStream(&arena, 64));
+	ByteStream strm(&arena);
+	strm.reserve(100);
+	list.push_back(std::move(strm));
+
+	ByteStream strm1(&arena);
+	strm1.reserve(64);
+
+	list.push_back(std::move(strm1));
 }
 
 TEST(ByteStreamTest, MoveAssign)
@@ -207,12 +213,18 @@ TEST(ByteStreamTest, MoveAssign)
 
 	// want the operator=(T&& oth) to be used.
 	ByteStream stream(&arena);
+	ByteStream stream2(&arena);
 
-	stream.resize(16);
-	stream = ByteStream(&arena, 64);
+	stream2.reserve(64);
+
+	stream.reserve(16);
+	stream = std::move(stream2);
 
 	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(64, stream.capacity());
+
+	EXPECT_EQ(0, stream2.size());
+	EXPECT_EQ(0, stream2.capacity());
 }
 
 TEST(ByteStreamTest, EmptyCopyCon)
@@ -229,7 +241,7 @@ TEST(ByteStreamTest, EmptyCopyCon)
 	ASSERT_TRUE(strm.begin() == nullptr);
 
 	strm.free();
-	strm.resize(16);
+	strm.reserve(16);
 
 	ASSERT_EQ(0, strm.size());
 	ASSERT_EQ(16, strm.capacity());
