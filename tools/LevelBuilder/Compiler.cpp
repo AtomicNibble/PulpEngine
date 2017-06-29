@@ -273,6 +273,10 @@ bool Compiler::processWorldModel(LvlEntsArr& ents, LvlEntity& ent)
 //		return false;
 //	}
 
+	if (!createCollisionData(ent)) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -384,6 +388,50 @@ void Compiler::putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspN
 
 	LvlArea& area = areas_[pNode->area];	
 	area.addWindingForSide(planes_, side, pWinding);
+}
+
+bool Compiler::createCollisionData(LvlEntity& ent)
+{
+	auto& area = areas_[0];
+
+	physics::GroupFlags flags;
+
+	auto& bucket = area.collision.getBucket(flags);
+	
+	for (size_t i = 0; i < ent.brushes.size(); i++)
+	{
+		LvlBrush& brush = ent.brushes[i];
+
+		if (!brush.opaque) {
+			continue;
+		}
+
+		if (brush.isRectangle())
+		{
+			// see if can be represented with aabb.
+			bucket.addAABB(brush.bounds);
+
+		}
+		else
+		{
+			X_LOG0("", "none rectanlge :DDD");
+
+			ColConvexMeshData triMesh(g_arena);
+
+			// we need to make a tri mesh for the sides windings.
+			triMesh.addBrush(brush);
+
+			if (!triMesh.cook(pPhysCooking_))
+			{
+				return false;
+			}
+
+			bucket.addConvexMesh(std::move(triMesh));
+		}
+
+	}
+	
+	return true;
 }
 
 

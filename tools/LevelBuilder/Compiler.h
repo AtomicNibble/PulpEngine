@@ -70,6 +70,8 @@ private:
 	bool createAreasForPrimativates(LvlEntity& ent);
 	void putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspNode* pNode);
 
+	bool createCollisionData(LvlEntity& ent);
+
 private:
 	core::MemoryArenaBase* arena_;
 	physics::IPhysicsCooking* pPhysCooking_;
