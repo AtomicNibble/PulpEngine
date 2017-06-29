@@ -76,6 +76,10 @@ public:
 	inline size_type capacity(void) const;
 	// returns the amount of bytes that can be added.
 	inline size_type freeSpace(void) const;
+	// returns the read offset from base.
+	inline size_type tell(void) const;
+	// returns the write offset from base
+	inline size_type tellWrite(void) const;
 	// returns true if the stream is full.
 	inline bool isEos(void) const;
 

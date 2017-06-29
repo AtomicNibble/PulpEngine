@@ -208,6 +208,17 @@ inline typename ByteStream::size_type ByteStream::freeSpace(void) const
 	return union_cast<size_type>(end_ - write_);
 }
 
+
+inline typename ByteStream::size_type ByteStream::tell(void) const
+{
+	return union_cast<size_type>(read_ - start_);
+}
+
+inline typename ByteStream::size_type ByteStream::tellWrite(void) const
+{
+	return union_cast<size_type>(write_ - start_);
+}
+
 // returns true if the stream is full.
 inline bool ByteStream::isEos(void) const
 {
