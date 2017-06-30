@@ -642,10 +642,10 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 				AreaCollisionGroupHdr groupHdr;
 				groupHdr.groupFlags = group.getGroupFlags();
 				core::zero_object(groupHdr.numTypes);
-				groupHdr.numTypes[CollisionDataType::TriMesh] = safe_static_cast<uint8_t>(triDataArr.size());
-				groupHdr.numTypes[CollisionDataType::ConvexMesh] = safe_static_cast<uint8_t>(conDataArr.size());
+				groupHdr.numTypes[CollisionDataType::TriMesh] = safe_static_cast<uint16_t>(triDataArr.size());
+				groupHdr.numTypes[CollisionDataType::ConvexMesh] = safe_static_cast<uint16_t>(conDataArr.size());
 				groupHdr.numTypes[CollisionDataType::HeightField] = 0;
-				groupHdr.numTypes[CollisionDataType::Aabb] = safe_static_cast<uint8_t>(aabbArr.size());
+				groupHdr.numTypes[CollisionDataType::Aabb] = safe_static_cast<uint16_t>(aabbArr.size());
 
 				stream.write(groupHdr);
 

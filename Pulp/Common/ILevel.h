@@ -492,7 +492,7 @@ struct AreaCollisionGroupHdr
 	// the flags for this group
 	physics::GroupFlags groupFlags;
 	// the number of each type.
-	uint8_t numTypes[CollisionDataType::ENUM_COUNT];
+	uint16_t numTypes[CollisionDataType::ENUM_COUNT];
 };
 
 // one for each type.
@@ -509,7 +509,7 @@ static_assert(std::numeric_limits<std::remove_reference<decltype(AreaCollisionGr
 static_assert(std::numeric_limits<decltype(AreaCollisionDataHdr::dataSize)>::max() >= MAP_MAX_AREA_COL_DATA_SIZE, "Limit exceeds type max");
 
 X_ENSURE_SIZE(AreaCollisionHdr, 16);
-X_ENSURE_SIZE(AreaCollisionGroupHdr, 8);
+X_ENSURE_SIZE(AreaCollisionGroupHdr, 12);
 X_ENSURE_SIZE(AreaCollisionDataHdr, 2);
 
 
