@@ -483,7 +483,6 @@ bool Level::ProcessData(void)
 					data.resize(dataHdr.dataSize);
 					file.read(data.data(), data.size());
 
-					// create the actor :O
 					auto triMeshHandle = gEnv->pPhysics->createTriangleMesh(data);
 					gEnv->pPhysics->addTriMesh(actor, triMeshHandle);
 				}
@@ -494,7 +493,6 @@ bool Level::ProcessData(void)
 					data.resize(dataHdr.dataSize);
 					file.read(data.data(), data.size());
 
-					// create the actor :O
 					auto convexMeshHandle = gEnv->pPhysics->createConvexMesh(data);
 					gEnv->pPhysics->addConvexMesh(actor, convexMeshHandle);
 				}
@@ -505,7 +503,6 @@ bool Level::ProcessData(void)
 					data.resize(dataHdr.dataSize);
 					file.read(data.data(), data.size());
 
-					// create the actor :O
 					auto hfHandle = gEnv->pPhysics->createHieghtField(data);
 					gEnv->pPhysics->addHieghtField(actor, hfHandle);
 				}
@@ -523,9 +520,7 @@ bool Level::ProcessData(void)
 				}
 
 				pScene_->addActorToScene(actor);
-
 			}
-
 		}
 
 	}
