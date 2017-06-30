@@ -1243,6 +1243,9 @@
     <ClInclude Include="Memory\SimpleMemoryArena.h">
       <Filter>Headers\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\FixedByteStream.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1574,6 +1577,9 @@
     </None>
     <None Include="Memory\SimpleMemoryArena.inl">
       <Filter>Headers\Memory</Filter>
+    </None>
+    <None Include="Containers\FixedByteStream.inl">
+      <Filter>Headers\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
