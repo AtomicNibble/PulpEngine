@@ -346,6 +346,9 @@
     <ClCompile Include="ComplexTypes.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UT_C_FixedByteStream.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
