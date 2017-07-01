@@ -183,9 +183,7 @@ void XScene::drawDebug(DebugRender* pDebugRender) const
 
 void XScene::setVisualizationCullingBox(const AABB& box)
 {
-	physx::PxBounds3 bounds;
-	bounds.minimum = Px3FromVec3(box.min);
-	bounds.maximum = Px3FromVec3(box.max);
+	physx::PxBounds3 bounds(Px3FromVec3(box.min), Px3FromVec3(box.max));
 
 	PHYS_SCENE_WRITE_LOCK(pScene_);
 	pScene_->setVisualizationCullingBox(bounds);
