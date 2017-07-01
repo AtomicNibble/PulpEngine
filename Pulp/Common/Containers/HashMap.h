@@ -172,8 +172,13 @@ public:
 	static const size_t PER_ENTRY_SIZE = BaseType::PER_ENTRY_SIZE;
 	
 public:
-	HashMap(MemoryArenaBase* arena) : BaseType(arena) {}
-	explicit HashMap(MemoryArenaBase* arena, size_type num) : BaseType(arena, num) {}
+	explicit HashMap(MemoryArenaBase* arena) : BaseType(arena) {}
+	HashMap(MemoryArenaBase* arena, size_type num) : BaseType(arena, num) {}
+	HashMap(const HashMap& oth) = default;
+	HashMap(HashMap&& oth) = default;
+	
+	HashMap& operator=(const HashMap& oth) = default;
+	HashMap& operator=(HashMap&& oth) = default;
 
 	std::pair<iterator, bool> insert(const value_type& obj)
 	{

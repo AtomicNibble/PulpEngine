@@ -165,7 +165,7 @@ public:
 	static const size_t PER_ENTRY_SIZE = sizeof(Node) + sizeof(Node*);
 
 
-	HashBase(MemoryArenaBase* arena) : 
+	explicit HashBase(MemoryArenaBase* arena) :
 		buckets_(arena),
 		numElements_(0),
 		arena_(arena)
@@ -173,13 +173,37 @@ public:
 
 	}
 
-	explicit HashBase(MemoryArenaBase* arena, size_type num) :
+	HashBase(MemoryArenaBase* arena, size_type num) :
 		numElements_(0),
 		buckets_(arena),
 		arena_(arena)
 	{
 		X_ASSERT_NOT_NULL(arena);
 		initialize_buckets(num);
+	}
+
+	HashBase(const HashBase& oth) = default;
+	HashBase(HashBase&& oth) :
+		equals_(oth.equals_),
+		hasher_(oth.hasher_),
+		numElements_(oth.numElements_),
+		arena_(oth.arena_),
+		buckets_(std::move(oth.buckets_))
+	{
+		oth.numElements_ = 0;
+	}
+
+	HashBase& operator=(const HashBase& oth) = default;
+	HashBase& operator=(HashBase&& oth) {
+
+		equals_ = oth.equals_;
+		hasher_ = oth.hasher_;
+		numElements_ = oth.numElements_;
+		arena_ = oth.arena_;
+		buckets_ = std::move(oth.buckets_);
+
+		oth.numElements_ = 0;
+		return *this;
 	}
 
 	~HashBase() { clear(); }
