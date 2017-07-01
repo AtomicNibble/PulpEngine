@@ -528,8 +528,9 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 	//sceneDesc.flags |= physx::PxSceneFlag::eADAPTIVE_FORCE;
 	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
 	
-	// 
+	// enables populating of getActiveTransforms() 
 	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+
 
 #if PHYSX_SCENE_REQUIRES_LOCK
 	sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
