@@ -435,7 +435,7 @@ bool Compiler::createCollisionData(LvlEntity& ent)
 bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 {
 	std::array<core::ByteStream, FileNodes::ENUM_COUNT> nodeStreams{
-		X_PP_REPEAT_COMMA_SEP(8, g_arena)
+		X_PP_REPEAT_COMMA_SEP(9, g_arena)
 	};
 
 	for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++) {

@@ -423,7 +423,8 @@ X_DECLARE_ENUM(FileNodes) (
 	AREA_MODEL_REFS,	// area model refs.
 	AREA_COLLISION,		// the collision data for each area.
 	STATIC_MODELS,		// all the static models in the map.
-	BSP_TREE
+	BSP_TREE,
+	ENTITIES
 );
 
 X_DECLARE_ENUM(ClassType) (
