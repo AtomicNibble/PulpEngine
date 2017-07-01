@@ -15,7 +15,7 @@ X_NAMESPACE_DECLARE(core,
 )
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 namespace mapFile
 {

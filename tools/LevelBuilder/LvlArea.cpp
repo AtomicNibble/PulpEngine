@@ -2,7 +2,7 @@
 #include "LvlArea.h"
 #include "LvlEntity.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 ColMeshData::ColMeshData(core::MemoryArenaBase* arena) :
 	verts_(arena),

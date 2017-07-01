@@ -7,7 +7,7 @@
 #include "LvlFmts/mapFile/MapFile.h"
 #include "Model/ModelCache.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 #if 0
 

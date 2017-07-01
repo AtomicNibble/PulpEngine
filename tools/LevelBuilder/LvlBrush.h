@@ -2,7 +2,7 @@
 
 #include "LvlMaterial.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 struct BrushPlaneSide
 {

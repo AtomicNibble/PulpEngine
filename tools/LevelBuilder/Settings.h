@@ -3,7 +3,7 @@
 #ifndef X_LVL_SETTINGS_H_
 #define X_LVL_SETTINGS_H_
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 struct Settings
 {

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PlaneSet.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 XPlaneSet::XPlaneSet(core::MemoryArenaBase* arena) : 
 	core::Array<Planef>(g_arena), 

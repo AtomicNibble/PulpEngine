@@ -2,7 +2,7 @@
 
 #include <String\GrowingStringTable.h>
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 struct LvlBrushSide;
 struct LvlBrush;

@@ -1,7 +1,7 @@
 #pragma once
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 template<typename ArenaType>
 struct GrowingPool

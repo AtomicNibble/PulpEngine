@@ -7,7 +7,7 @@
 #include <Containers\Array.h>
 #include "Util/GrowingPool.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 namespace mapFile
 {

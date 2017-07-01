@@ -17,7 +17,7 @@
 #include "Model/ModelCache.h"
 #include "Material/MaterialManager.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 namespace
 {
@@ -434,8 +434,6 @@ bool Compiler::createCollisionData(LvlEntity& ent)
 
 bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 {
-	using namespace level; // why oh why do i have lvl && level.
-
 	std::array<core::ByteStream, FileNodes::ENUM_COUNT> nodeStreams{
 		X_PP_REPEAT_COMMA_SEP(8, g_arena)
 	};

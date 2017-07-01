@@ -13,7 +13,7 @@
 #include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\VirtualMem.h>
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 core::MemoryArenaBase* g_arena = nullptr;
 
@@ -72,7 +72,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		core::MallocFreeAllocator allocator;
 		LvlBuilderArena arena(&allocator, "LevelBuilderArena");
 
-		lvl::g_arena = &arena;
+		level::g_arena = &arena;
 
 		core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Level Compiler");
 		Console.SetSize(150, 60, 8000);
@@ -105,7 +105,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				path.setFileName("entity_test.map");
 				path.setFileName("physics_test.map");
 				
-				lvl::Compiler comp(&arena, engine.GetPhysCooking());
+				level::Compiler comp(&arena, engine.GetPhysCooking());
 
 				if (comp.init())
 				{
@@ -121,7 +121,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				X_LOG0("Level", "Operation Complete...");
 			}
 
-			lvl::g_arena = nullptr;
+			level::g_arena = nullptr;
 		}
 	}
 

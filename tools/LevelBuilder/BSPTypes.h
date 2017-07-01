@@ -7,7 +7,7 @@
 #include <Containers\LinkedListIntrusive.h>
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 
 X_DECLARE_ENUM(DrawSurfaceType)(FACE, DECAL, PATCH);

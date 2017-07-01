@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "KvPMap.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 KeyPair::KeyPair(core::MemoryArenaBase* arena) :
 	BaseT(arena, 4)

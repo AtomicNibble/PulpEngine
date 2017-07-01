@@ -2,7 +2,7 @@
 #include "MaterialManager.h"
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 
 MatManager::MatManager(core::MemoryArenaBase* arena) :
@@ -74,6 +74,7 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 	X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
 	core::string name(pMtlName);
+
 
 	auto it = nameOverRide_.find(name);
 	if (it != nameOverRide_.end())

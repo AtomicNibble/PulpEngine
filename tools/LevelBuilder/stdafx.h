@@ -48,7 +48,7 @@ typedef core::StackString<level::MAP_MAX_MATERIAL_LEN> MaterialName;
 
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 
 extern core::MemoryArenaBase* g_arena;

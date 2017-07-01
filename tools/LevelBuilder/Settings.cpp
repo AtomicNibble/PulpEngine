@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Settings.h"
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 Settings::Settings()
 {

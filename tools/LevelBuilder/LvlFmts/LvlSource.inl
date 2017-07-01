@@ -1,5 +1,5 @@
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 
 X_INLINE int32_t LvlSource::findFloatPlane(const Planef& plane)

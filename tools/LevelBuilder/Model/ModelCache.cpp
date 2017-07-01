@@ -3,7 +3,7 @@
 
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 ModelCache::ModelCache(core::MemoryArenaBase* arena) :
 	arena_(arena),

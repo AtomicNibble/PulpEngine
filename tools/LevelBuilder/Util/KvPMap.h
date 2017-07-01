@@ -3,7 +3,7 @@
 #include <Containers\HashMap.h>
 
 
-X_NAMESPACE_BEGIN(lvl)
+X_NAMESPACE_BEGIN(level)
 
 class KeyPair : public core::HashMap<core::string, core::string>
 {
