@@ -48,6 +48,8 @@ namespace
 	X_ENSURE_SIZE(OverlapQueryResult, sizeof(physx::PxOverlapQueryResult));
 
 
+	X_ENSURE_SIZE(ActiveTransform, sizeof(physx::PxActiveTransform));
+
 	static_assert(X_OFFSETOF(ActorShape, actor) == X_OFFSETOF(physx::PxActorShape, actor), "Offset don't match");
 	static_assert(X_OFFSETOF(ActorShape, pShape) == X_OFFSETOF(physx::PxActorShape, shape), "Offset don't match");
 
@@ -81,6 +83,9 @@ namespace
 	static_assert(X_OFFSETOF(RaycastQueryResult, hasBlock) == X_OFFSETOF(physx::PxRaycastQueryResult, hasBlock), "Offset don't match");
 	static_assert(X_OFFSETOF(RaycastQueryResult, pad) == X_OFFSETOF(physx::PxRaycastQueryResult, pad), "Offset don't match");
 
+	static_assert(X_OFFSETOF(ActiveTransform, actor) == X_OFFSETOF(physx::PxActiveTransform, actor), "Offset don't match");
+	static_assert(X_OFFSETOF(ActiveTransform, userData) == X_OFFSETOF(physx::PxActiveTransform, userData), "Offset don't match");
+	static_assert(X_OFFSETOF(ActiveTransform, actor2World) == X_OFFSETOF(physx::PxActiveTransform, actor2World), "Offset don't match");
 
 
 	void copycontrollerDesc(physx::PxControllerDesc& pxDesc, const ControllerDesc& desc)
