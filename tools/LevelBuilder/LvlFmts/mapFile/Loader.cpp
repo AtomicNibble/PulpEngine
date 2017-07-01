@@ -58,9 +58,6 @@ namespace mapFile
 		// update stats.
 		stats_.numEntities++;
 
-		// the map ent this LvlEnt is made from.
-		ent.pMapEntity = mapEnt;
-
 		// ensure we never resize, otherwise originals pointers fuck up.
 		ent.brushes.reserve(mapEnt->GetNumPrimitives());
 
@@ -155,6 +152,7 @@ namespace mapFile
 			}
 		}
 
+		ent.epairs = std::move(mapEnt->epairs);
 		return true;
 	}
 
