@@ -318,7 +318,7 @@ bool XPhysics::init(const ToleranceScale& scale)
 	pPhysics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
 
-	pMaterial_ = pPhysics_->createMaterial(1.f, 1.f, 1.f);
+	pMaterial_ = pPhysics_->createMaterial(0.5f, 0.5f, 0.90f);
 	if (!pMaterial_) {
 		X_ERROR("Physics", "Failed to create material");
 		return false;
