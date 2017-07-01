@@ -1,6 +1,7 @@
 #pragma once 
 
 
+X_NAMESPACE_BEGIN(level)
 
 static const int PLANENUM_LEAF = -1;
 static const int PLANENUM_AREA_DIFF = -2;
@@ -22,3 +23,5 @@ static const float SPLIT_WINDING_EPSILON = 0.001f;
 
 static const float DEFAULT_CURVE_MAX_ERROR = 4.0f;
 static const float DEFAULT_CURVE_MAX_LENGTH = -1.0f;
+
+X_NAMESPACE_END
