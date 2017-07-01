@@ -41,6 +41,7 @@ public:
 
 	inline void write(const Type* pBuf, size_type numBytes);
 
+	inline void write(const ByteStream& stream);
 
 	// removes and returns the top object off the stream.
 	template<typename T>

@@ -110,6 +110,14 @@ inline void ByteStream::write(const Type* pBuf, size_type numBytes)
 	write_ += numBytes;
 }
 
+inline void ByteStream::write(const ByteStream& stream)
+{
+	size_type streamSize = stream.size();
+	if(streamSize > 0)
+	{ 
+		write(stream.read_, streamSize);
+	}
+}
 
 template<typename T>
 inline T ByteStream::read(void)
