@@ -76,9 +76,9 @@ namespace
 
 
 	static_assert(X_OFFSETOF(RaycastQueryResult, block) == X_OFFSETOF(physx::PxRaycastQueryResult, block), "Offset don't match");
-	static_assert(X_OFFSETOF(RaycastQueryResult, touches) == X_OFFSETOF(physx::PxRaycastQueryResult, touches), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, pTouches) == X_OFFSETOF(physx::PxRaycastQueryResult, touches), "Offset don't match");
 	static_assert(X_OFFSETOF(RaycastQueryResult, nbTouches) == X_OFFSETOF(physx::PxRaycastQueryResult, nbTouches), "Offset don't match");
-	static_assert(X_OFFSETOF(RaycastQueryResult, userData) == X_OFFSETOF(physx::PxRaycastQueryResult, userData), "Offset don't match");
+	static_assert(X_OFFSETOF(RaycastQueryResult, pUserData) == X_OFFSETOF(physx::PxRaycastQueryResult, userData), "Offset don't match");
 	static_assert(X_OFFSETOF(RaycastQueryResult, queryStatus) == X_OFFSETOF(physx::PxRaycastQueryResult, queryStatus), "Offset don't match");
 	static_assert(X_OFFSETOF(RaycastQueryResult, hasBlock) == X_OFFSETOF(physx::PxRaycastQueryResult, hasBlock), "Offset don't match");
 	static_assert(X_OFFSETOF(RaycastQueryResult, pad) == X_OFFSETOF(physx::PxRaycastQueryResult, pad), "Offset don't match");
@@ -491,12 +491,12 @@ IBatchedQuery* XScene::createBatchQuery(const QueryMemory& desc)
 		static_cast<physx::PxU32>(desc.overlapTouchBufferSize)
 	);
 
-	pxDesc.queryMemory.userRaycastResultBuffer	= reinterpret_cast<physx::PxRaycastQueryResult*>(desc.userRaycastResultBuffer);
-	pxDesc.queryMemory.userRaycastTouchBuffer	= reinterpret_cast<physx::PxRaycastHit*>(desc.userRaycastTouchBuffer);
-	pxDesc.queryMemory.userSweepResultBuffer	= reinterpret_cast<physx::PxSweepQueryResult*>(desc.userSweepResultBuffer);
-	pxDesc.queryMemory.userSweepTouchBuffer		= reinterpret_cast<physx::PxSweepHit*>(desc.userSweepTouchBuffer);
-	pxDesc.queryMemory.userOverlapResultBuffer	= reinterpret_cast<physx::PxOverlapQueryResult*>(desc.userOverlapResultBuffer);
-	pxDesc.queryMemory.userOverlapTouchBuffer	= reinterpret_cast<physx::PxOverlapHit*>(desc.userOverlapTouchBuffer);
+	pxDesc.queryMemory.userRaycastResultBuffer	= reinterpret_cast<physx::PxRaycastQueryResult*>(desc.pUserRaycastResultBuffer);
+	pxDesc.queryMemory.userRaycastTouchBuffer	= reinterpret_cast<physx::PxRaycastHit*>(desc.pUserRaycastTouchBuffer);
+	pxDesc.queryMemory.userSweepResultBuffer	= reinterpret_cast<physx::PxSweepQueryResult*>(desc.pUserSweepResultBuffer);
+	pxDesc.queryMemory.userSweepTouchBuffer		= reinterpret_cast<physx::PxSweepHit*>(desc.pUserSweepTouchBuffer);
+	pxDesc.queryMemory.userOverlapResultBuffer	= reinterpret_cast<physx::PxOverlapQueryResult*>(desc.pUserOverlapResultBuffer);
+	pxDesc.queryMemory.userOverlapTouchBuffer	= reinterpret_cast<physx::PxOverlapHit*>(desc.pUserOverlapTouchBuffer);
 
 	if (!pxDesc.isValid()) {
 		X_ERROR("Physics", "Batched query description is invalid");

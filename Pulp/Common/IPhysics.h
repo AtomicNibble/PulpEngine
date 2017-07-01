@@ -727,10 +727,10 @@ template<typename HitType>
 struct BatchQueryResult
 {
 	HitType			block;			//!< Holds the closest blocking hit for a single query in a batch. Only valid if hasBlock is true.
-	HitType*		touches;		//!< This pointer will either be set to NULL for 0 nbTouches or will point
+	HitType*		pTouches;		//!< This pointer will either be set to NULL for 0 nbTouches or will point
 									//!< into the user provided batch query results buffer specified in PxBatchQueryDesc.
 	uint32_t		nbTouches;		//!< Number of touching hits returned by this query, works in tandem with touches pointer.
-	void*			userData;		//!< Copy of the userData pointer specified in the corresponding query.
+	void*			pUserData;		//!< Copy of the userData pointer specified in the corresponding query.
 	uint8_t			queryStatus;	//!< Takes on values from PxBatchQueryStatus::Enum.
 	bool			hasBlock;		//!< True if there was a blocking hit.
 	uint16_t		pad;			//!< pads the struct to 16 bytes.
@@ -754,12 +754,12 @@ typedef BatchQueryResult<OverlapHit>	OverlapQueryResult;
 // all these must be 16 byte aligned.
 struct QueryMemory
 {
-	RaycastQueryResult*			userRaycastResultBuffer;
-	RaycastHit*					userRaycastTouchBuffer;
-	SweepQueryResult*			userSweepResultBuffer;
-	SweepHit*					userSweepTouchBuffer;
-	OverlapQueryResult*			userOverlapResultBuffer;
-	OverlapHit*					userOverlapTouchBuffer;
+	RaycastQueryResult*			pUserRaycastResultBuffer;
+	RaycastHit*					pUserRaycastTouchBuffer;
+	SweepQueryResult*			pUserSweepResultBuffer;
+	SweepHit*					pUserSweepTouchBuffer;
+	OverlapQueryResult*			pUserOverlapResultBuffer;
+	OverlapHit*					pUserOverlapTouchBuffer;
 
 	size_t raycastTouchBufferSize;	// Capacity in elements
 	size_t sweepTouchBufferSize;	// Capacity in elements
