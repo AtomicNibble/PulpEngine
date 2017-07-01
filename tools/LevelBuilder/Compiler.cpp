@@ -4,6 +4,7 @@
 #include <Time\StopWatch.h>
 #include <Hashing\crc32.h>
 #include <String\HumanDuration.h>
+#include <String\Json.h>
 
 #include <IFileSys.h>
 #include <ITimer.h>
@@ -68,6 +69,58 @@ namespace
 		stream.write(verts.ptr(), verts.size());
 		return true;
 	}
+
+
+	class JsonByteBuffer
+	{
+	public:
+		typedef typename char Ch;
+
+	public:
+		JsonByteBuffer(core::ByteStream& stream) :
+			stream_(stream)
+		{
+		}
+
+		JsonByteBuffer(JsonByteBuffer&& rhs) :
+			stream_(std::move(rhs.stream_))
+		{
+		}
+
+		JsonByteBuffer& operator=(JsonByteBuffer&& rhs) {
+			stream_ = std::move(rhs.stream_);
+			return *this;
+		}
+
+		void Put(Ch c) {
+			stream_.write(c);
+		}
+		void PutUnsafe(Ch c) {
+			stream_.write(c);
+		}
+
+		void Flush(void) {
+			// ...
+		}
+
+	private:
+		core::ByteStream& stream_;
+	};
+
+	struct JsonByteStreamWriter
+	{
+		JsonByteStreamWriter(core::MemoryArenaBase* arena) :
+			stream(arena),
+			jsonBuf(stream),
+			writer(jsonBuf)
+		{
+		}
+
+		core::ByteStream stream;
+		JsonByteBuffer jsonBuf;
+		core::json::Writer<JsonByteBuffer> writer;
+	};
+
 
 } // namespace
 
@@ -701,6 +754,60 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		// for none leaf nodes we will write the nodes number.
 		// for leafs nodes we write the children as the area number but negative.
 		worldEnt.bspTree_.pHeadnode->WriteNodes_r(planes_, stream);
+	}
+
+	// ents
+	{
+		auto& stream = nodeStreams[FileNodes::ENTITIES];
+
+		std::array<JsonByteStreamWriter, ClassType::ENUM_COUNT> classStreams{
+			X_PP_REPEAT_COMMA_SEP(5, g_arena)
+		};
+
+		for (auto& stream : classStreams)
+		{
+			stream.writer.SetMaxDecimalPlaces(5);
+			stream.writer.StartArray();
+		}
+
+		for (size_t i = 0; i < ents.size(); i++)
+		{
+			const auto& ent = ents[i];
+			const auto& kvps = ent.epairs;
+
+			auto& cs = classStreams[ent.classType];
+
+			cs.writer.StartObject();
+
+			for (auto it = kvps.begin(); it != kvps.end(); ++it)
+			{
+				cs.writer.Key(it->first, static_cast<core::json::SizeType>(it->first.length()));
+				cs.writer.String(it->second, static_cast<core::json::SizeType>(it->second.length()));
+			}
+
+			cs.writer.EndObject();
+		}
+
+		EnityInfoHdr entityHdr;
+		size_t totalSize = sizeof(entityHdr);
+
+		for (size_t i = 0; i < classStreams.size(); i++)
+		{
+			auto& cs = classStreams[i];
+			cs.writer.EndArray();
+
+			entityHdr.dataSize[i] = safe_static_cast<uint32_t>(cs.stream.size());
+			totalSize += cs.stream.size();
+		}
+
+		stream.reserve(totalSize);
+		stream.write(entityHdr);
+		for (auto& cs : classStreams)
+		{
+			stream.write(cs.stream);
+		}
+
+		X_ASSERT(stream.size() == totalSize, "Size calculation mismatch")(stream.size(), totalSize);
 	}
 
 	// update FourcCC to mark this bsp as valid.
