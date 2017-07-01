@@ -15,6 +15,12 @@ public:
 
 public:
 	KeyPair(core::MemoryArenaBase* arena);
+	KeyPair(const KeyPair& oth) = default;
+	KeyPair(KeyPair&& oth) = default;
+	
+	
+	KeyPair& operator=(const KeyPair& oth) = default;
+	KeyPair& operator=(KeyPair&& oth) = default;
 
 	bool GetString(const char* key, const char* defaultString, const char **out) const;
 	bool GetString(const char* key, const char* defaultString, core::string& out) const;
