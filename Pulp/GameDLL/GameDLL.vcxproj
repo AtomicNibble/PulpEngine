@@ -357,6 +357,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ECS\ComponentPool.h" />
+    <ClInclude Include="ECS\Registry.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
