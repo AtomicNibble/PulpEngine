@@ -3,8 +3,8 @@
 
 #include <EngineCommon.h>
 
-#define IPGAMEDLL_EXPORTS
 
+#define IPGAMEDLL_EXPORTS
 
 #include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
@@ -25,3 +25,8 @@ typedef core::MemoryArena<
 
 
 extern GameArena* g_gameArena;
+
+
+
+#include "ECS\ComponentPool.h"
+#include "ECS\Registry.h"
