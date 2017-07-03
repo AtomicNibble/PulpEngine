@@ -512,7 +512,7 @@ namespace ecs
 
 
 	template<typename... Components>
-	using DefaultRegistry = Registry<ComponentPool<std::uint16_t, Components...>>;
+	using DefaultRegistry = Registry<ComponentPool<uint16_t, Components...>>;
 
 
 } // namespace ecs
