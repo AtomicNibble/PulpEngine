@@ -14,11 +14,21 @@ namespace growStrat
 	public:
 		typedef size_t size_type;
 
-		void setGranularity(size_type size);
+		Linear() {
+			granularity_ = 16;
+		}
+
+		void setGranularity(size_type granularity) {
+			granularity_ = granularity;
+		}
+		size_t granularity(void) const {
+			return granularity_;
+		}
 
 	protected:
-		size_type getAllocationSize(size_type currentCapacity) const {
-			return currentCapacity + granularity_;
+		X_INLINE size_type getAllocationSize(size_type currentCapacity, size_t requestedSize) const {
+			X_UNUSED(currentCapacity);
+			return core::bitUtil::RoundUpToMultiple(requestedSize, granularity_);
 		}
 
 	private:
@@ -32,8 +42,8 @@ namespace growStrat
 		typedef size_t size_type;
 
 	protected:
-		size_type getAllocationSize(size_type currentCapacity) const {
-			return currentCapacity + GrowSize;
+		X_INLINE static size_type getAllocationSize(size_type currentCapacity, size_t requestedSize) {
+			return core::Max(currentCapacity + GrowSize, requestedSize);
 		}
 	};
 
@@ -44,19 +54,21 @@ namespace growStrat
 		typedef size_t size_type;
 
 	protected:
-		size_type getAllocationSize(size_type currentCapacity) const
+		X_INLINE static size_type getAllocationSize(size_type currentCapacity, size_t requestedSize) 
 		{
+			X_UNUSED(requestedSize);
+
 			if (currentCapacity == 0) {
-				return 16;
+				return core::Max(16_sz, requestedSize);
 			}
 
-			// if it's big grow slower.
+			// if it's big grow faster?
 			if (currentCapacity > 1024 * 64) {
-				return currentCapacity * 2;
+				return core::Max(currentCapacity * 2, requestedSize);
 			}
 
 			// 1.5 grow.
-			return (currentCapacity * 3 + 1) / 2;
+			return core::Max((currentCapacity * 3 + 1) / 2, requestedSize);
 		}
 
 	};
@@ -81,7 +93,7 @@ public:
 	}
 
 	X_INLINE T* allocate(size_t num) {
-		return  static_cast<T*>(arena_->allocate(sizeof(T)*num, X_ALIGN_OF(T), 0, "Array", "T[]", X_SOURCE_INFO));
+		return static_cast<T*>(arena_->allocate(sizeof(T)*num, X_ALIGN_OF(T), 0, "Array", "T[]", X_SOURCE_INFO));
 	}
 
 	X_INLINE void free(void* pArr) {

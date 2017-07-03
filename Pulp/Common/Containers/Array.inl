@@ -1,21 +1,19 @@
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena) :
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::Array(MemoryArenaBase* arena) :
 	list_( nullptr ),
 	num_( 0 ),
 	size_( 0 ),
-	granularity_( 16 ),
 	allocator_(arena)
 {
 }
 
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::Array(MemoryArenaBase* arena, size_type size) :
 	list_(nullptr),
 	num_(size),
 	size_(size),
-	granularity_(16),
 	allocator_(X_ASSERT_NOT_NULL(arena))
 {
 	if (size)
@@ -25,12 +23,11 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size) :
 	}
 }
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
     list_(nullptr),
     num_(size),
     size_(size),
-    granularity_(16),
     allocator_(X_ASSERT_NOT_NULL(arena))
 {
 	if (size)
@@ -40,8 +37,8 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, size_type size, cons
 	}
 }
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList) :
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList) :
 	Array(arena)
 {
 	size_t size = iList.size();
@@ -53,24 +50,24 @@ X_INLINE Array<T, Allocator>::Array(MemoryArenaBase* arena, std::initializer_lis
 	num_ = size;
 }
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(const MyT& oth) :
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::Array(const MyT& oth) :
+	GrowPolicy(oth),
     list_(nullptr),
     num_(0),
     size_(0),
-    granularity_(16),
     allocator_(oth.allocator_)
 {
 	*this = oth;
 }
 
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::Array(Array<T, Allocator>&& oth) :
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::Array(MyT&& oth) :
+	GrowPolicy(oth),
 	list_(oth.list_),
 	num_(oth.num_),
 	size_(oth.size_),
-	granularity_(oth.granularity_),
 	allocator_(oth.allocator_)
 {
 	// clear other.
@@ -80,21 +77,21 @@ X_INLINE Array<T, Allocator>::Array(Array<T, Allocator>&& oth) :
 }
 
 
-template<typename T, class Allocator>
-X_INLINE Array<T, Allocator>::~Array(void) 
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Array<T, Allocator, GrowPolicy>::~Array(void) 
 {
 	free();
 }
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::setArena(MemoryArenaBase* arena)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::setArena(MemoryArenaBase* arena)
 {
 	X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
 	allocator_.setArena(arena);
 }
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::setArena(MemoryArenaBase* arena, size_type capacity)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::setArena(MemoryArenaBase* arena, size_type capacity)
 {
 	X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
 	allocator_.setArena(arena);
@@ -102,30 +99,30 @@ X_INLINE void Array<T, Allocator>::setArena(MemoryArenaBase* arena, size_type ca
 	reserve(capacity);
 }
 
-template<typename T, class Allocator>
-X_INLINE core::MemoryArenaBase* Array<T, Allocator>::getArena(void) const
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE core::MemoryArenaBase* Array<T, Allocator, GrowPolicy>::getArena(void) const
 {
 	return allocator_.getArena();
 }
 
 // ---------------------------------------------------------
 
-template<typename T, class Allocator>
-X_INLINE Allocator& Array<T, Allocator>::getAllocator(void)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE Allocator& Array<T, Allocator, GrowPolicy>::getAllocator(void)
 {
 	return allocator_;
 }
 
-template<typename T, class Allocator>
-X_INLINE const Allocator& Array<T, Allocator>::getAllocator(void) const
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE const Allocator& Array<T, Allocator, GrowPolicy>::getAllocator(void) const
 {
 	return allocator_;
 }
 
 // ---------------------------------------------------------
 
-template<typename T, class Allocator>
-Array<T, Allocator>& Array<T, Allocator>::operator=(std::initializer_list<T> iList)
+template<typename T, class Allocator, class GrowPolicy>
+Array<T, Allocator, GrowPolicy>& Array<T, Allocator, GrowPolicy>::operator=(std::initializer_list<T> iList)
 {
 	free();
 
@@ -140,14 +137,14 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(std::initializer_list<T> iLi
 	return *this;
 }
 
-template<typename T, class Allocator>
-Array<T, Allocator>& Array<T, Allocator>::operator=(const MyT& oth)
+template<typename T, class Allocator, class GrowPolicy>
+Array<T, Allocator, GrowPolicy>& Array<T, Allocator, GrowPolicy>::operator=(const MyT& oth)
 {
 	free();
 
+	static_cast<GrowPolicy&>(*this) = static_cast<const GrowPolicy&>(oth);
 	num_ = oth.num_;
 	size_ = oth.size_;
-	granularity_ = oth.granularity_;
 	allocator_ = oth.allocator_;
 
 	if (size_) {
@@ -158,17 +155,17 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(const MyT& oth)
 	return *this;
 }
 
-template<typename T, class Allocator>
-Array<T, Allocator>& Array<T, Allocator>::operator=(MyT&& oth)
+template<typename T, class Allocator, class GrowPolicy>
+Array<T, Allocator, GrowPolicy>& Array<T, Allocator, GrowPolicy>::operator=(MyT&& oth)
 {
 	if (this != &oth)
 	{
 		free();
 
+		static_cast<GrowPolicy&>(*this) = std::move(static_cast<GrowPolicy&>(oth));
 		list_ = oth.list_;
 		num_ = oth.num_;
 		size_ = oth.size_;
-		granularity_ = oth.granularity_;
 		allocator_ = oth.allocator_;
 
 		// clear other.
@@ -179,34 +176,34 @@ Array<T, Allocator>& Array<T, Allocator>::operator=(MyT&& oth)
 	return *this;
 }
 
-template<typename T, class Allocator>
-X_INLINE const T&Array<T, Allocator>::operator[](size_type idx) const {
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE const T&Array<T, Allocator, GrowPolicy>::operator[](size_type idx) const {
 	X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
 	return list_[idx];
 }
 
 
-template<typename T, class Allocator>
-X_INLINE T&Array<T, Allocator>::operator[](size_type idx) {
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE T&Array<T, Allocator, GrowPolicy>::operator[](size_type idx) {
 	X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
 	return list_[idx];
 }
 
 // ---------------------------------------------------------
 
-template<typename T, class Allocator>
-X_INLINE T *Array<T, Allocator>::ptr(void) {
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE T *Array<T, Allocator, GrowPolicy>::ptr(void) {
 	return list_;
 }
 
 
-template<typename T, class Allocator>
-const X_INLINE T *Array<T, Allocator>::ptr(void) const {
+template<typename T, class Allocator, class GrowPolicy>
+const X_INLINE T *Array<T, Allocator, GrowPolicy>::ptr(void) const {
 	return list_;
 }
 
-template<typename T, class Allocator>
-X_INLINE T *Array<T, Allocator>::data(void) {
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE T *Array<T, Allocator, GrowPolicy>::data(void) {
 	if (isNotEmpty()) {
 		return &front();
 	}
@@ -215,8 +212,8 @@ X_INLINE T *Array<T, Allocator>::data(void) {
 }
 
 
-template<typename T, class Allocator>
-const X_INLINE T *Array<T, Allocator>::data(void) const {
+template<typename T, class Allocator, class GrowPolicy>
+const X_INLINE T *Array<T, Allocator, GrowPolicy>::data(void) const {
 	if (isNotEmpty()) {
 		return &front();
 	}
@@ -226,20 +223,20 @@ const X_INLINE T *Array<T, Allocator>::data(void) const {
 
 // ---------------------------------------------------------
 
-template<typename T, class Allocator>
-X_INLINE const bool Array<T, Allocator>::isEmpty(void) const
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE const bool Array<T, Allocator, GrowPolicy>::isEmpty(void) const
 {
 	return num_ == 0;
 }
 
-template<typename T, class Allocator>
-X_INLINE const bool Array<T, Allocator>::isNotEmpty(void) const
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE const bool Array<T, Allocator, GrowPolicy>::isNotEmpty(void) const
 {
 	return num_ > 0;
 }
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::clear(void) 
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::clear(void) 
 {
 	// properly destruct the instances
 	Mem::DestructArray(list_, size());
@@ -247,8 +244,8 @@ X_INLINE void Array<T, Allocator>::clear(void)
 	num_ = 0; // don't free any memory
 }
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::free(void)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::free(void)
 {
 	clear(); // make sure to destruct the objects.
 
@@ -261,8 +258,8 @@ X_INLINE void Array<T, Allocator>::free(void)
 	size_ = 0;
 }
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::shrinkToFit(void)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::shrinkToFit(void)
 {
 	if (capacity() > size())
 	{
@@ -287,38 +284,23 @@ X_INLINE void Array<T, Allocator>::shrinkToFit(void)
 }
 
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::size(void) const {
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::size(void) const {
 	return num_;
 }
 
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::capacity(void) const {
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::capacity(void) const {
 	return size_;
-}
-
-
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::setGranularity(size_type newgranularity)
-{
-	X_ASSERT( newgranularity >= 0, "granularity size must be positive" )( newgranularity );
-
-	granularity_ = newgranularity;
-}
-
-
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::granularity(void) const {
-	return granularity_;
 }
 
 // ---------------------------------------------------------
 
 
 // Inserts or erases elements at the end such that size is 'size'
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::resize(size_type newNum)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::resize(size_type newNum)
 {
 	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 
@@ -348,8 +330,8 @@ X_INLINE void Array<T, Allocator>::resize(size_type newNum)
 }
 
 // Inserts or erases elements at the end such that size is 'size'
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t) 
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::resize(size_type newNum, const T& t) 
 {
 	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 
@@ -375,8 +357,8 @@ X_INLINE void Array<T, Allocator>::resize(size_type newNum, const T& t)
 // --------------------------------------------------
 
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::reserve(size_type __size) 
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::reserve(size_type __size) 
 {
 	X_ASSERT(__size >= 0, "array size must be positive")(__size);
 	ensureSize(__size);
@@ -385,9 +367,9 @@ X_INLINE void Array<T, Allocator>::reserve(size_type __size)
 
 // ---------------------------------------------------------
 
-template<typename T, class Allocator>
+template<typename T, class Allocator, class GrowPolicy>
 template<class... Args>
-X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(Args&&... args)
+X_INLINE typename Array<T, Allocator, GrowPolicy>::Type& Array<T, Allocator, GrowPolicy>::AddOne(Args&&... args)
 {
 	// grow if needs be.
 	if (num_ == size_) {
@@ -402,8 +384,8 @@ X_INLINE typename Array<T, Allocator>::Type& Array<T, Allocator>::AddOne(Args&&.
 // ---------------------------------------------------------
 
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T const& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::append(T const& obj)
 {
 	// grow if needs be.
 	if (num_ == size_) {
@@ -415,8 +397,8 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T c
 	return num_ - 1;
 }
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T&& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::append(T&& obj)
 {
 	// grow if needs be.
 	if (num_ == size_) {
@@ -428,8 +410,8 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(T&&
 	return num_ - 1;
 }
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(const MyT& oth)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::append(const MyT& oth)
 {
 	if (this != &oth)
 	{
@@ -450,8 +432,8 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::append(con
 	return num_ - 1;
 }
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(T const& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::push_back(T const& obj)
 {
 	// grow if needs be.
 	if (num_ == size_) {
@@ -463,8 +445,8 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(
 	return num_ - 1;
 }
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(T&& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::push_back(T&& obj)
 {
 	// grow if needs be.
 	if (num_ == size_) {
@@ -476,9 +458,9 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::push_back(
 	return num_ - 1;
 }
 
-template<typename T, class Allocator>
+template<typename T, class Allocator, class GrowPolicy>
 template<class... ArgsT>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::emplace_back(ArgsT&&... args)
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::emplace_back(ArgsT&&... args)
 {
 	if (num_ == size_) {
 		ensureSize(size_ + 1);
@@ -492,8 +474,8 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::emplace_ba
 
 // -----------------------------------------------
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::pop_back()
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::pop_back()
 {
 	if (size() > 0)
 	{
@@ -504,8 +486,8 @@ X_INLINE void Array<T, Allocator>::pop_back()
 
 // -----------------------------------------------
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIndex(size_type index, const Type& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::insertAtIndex(size_type index, const Type& obj)
 {
 	X_ASSERT(index >= 0, "index is invalid")(index);
 	X_ASSERT(index <= num_, "index is out of bounds")(index, num_);
@@ -524,8 +506,8 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIn
 	return index;
 }
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIndex(size_type index, Type&& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::insertAtIndex(size_type index, Type&& obj)
 {
 	X_ASSERT(index >= 0, "index is invalid")(index);
 	X_ASSERT(index <= num_, "index is out of bounds")(index, num_);
@@ -545,20 +527,20 @@ X_INLINE typename Array<T, Allocator>::size_type Array<T, Allocator>::insertAtIn
 }
 
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator pos, const Type& obj)
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert(ConstIterator pos, const Type& obj)
 {
 	return insert(pos, 1, obj);
 }
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator pos, Type&& obj)
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert(ConstIterator pos, Type&& obj)
 {
 	return emplace(pos, std::move(obj));
 }
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator _pos, size_type count, const Type& obj)
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert(ConstIterator _pos, size_type count, const Type& obj)
 {
 	Iterator pos = const_cast<Iterator>(_pos);
 
@@ -603,22 +585,22 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert(ConstIterator
 }
 
 
-template<typename T, class Allocator>
-X_INLINE typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert_sorted(const Type& obj)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert_sorted(const Type& obj)
 {
 	return insert_sorted(obj, std::less<Type>());
 }
 
-template<typename T, class Allocator>
+template<typename T, class Allocator, class GrowPolicy>
 template<class Compare>
-X_INLINE typename Array<T, Allocator>::Iterator Array<T, Allocator>::insert_sorted(const Type& obj, Compare comp)
+X_INLINE typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert_sorted(const Type& obj, Compare comp)
 {
 	auto it = std::upper_bound(begin(), end(), obj, comp);
 	return insert(it, obj);
 }
 
-template<typename T, class Allocator>
-bool Array<T, Allocator>::removeIndex(size_type idx)
+template<typename T, class Allocator, class GrowPolicy>
+bool Array<T, Allocator, GrowPolicy>::removeIndex(size_type idx)
 {
 	if (idx == invalid_index) {
 		return false;
@@ -646,16 +628,16 @@ bool Array<T, Allocator>::removeIndex(size_type idx)
 	return true;
 }
 
-template<typename T, class Allocator>
-void Array<T, Allocator>::remove(ConstIterator it)
+template<typename T, class Allocator, class GrowPolicy>
+void Array<T, Allocator, GrowPolicy>::remove(ConstIterator it)
 {
 	X_ASSERT(it >= begin() && it < end(), "Invalid iterator")(it, begin(), end());
 
 	removeIndex(it - list_);
 }
 
-template<typename T, class Allocator>
-void Array<T, Allocator>::remove(const T& item)
+template<typename T, class Allocator, class GrowPolicy>
+void Array<T, Allocator, GrowPolicy>::remove(const T& item)
 {
 	size_type idx = find(item);
 	X_ASSERT(idx != invalid_index, "Item to remove could not be found.")(item, idx);
@@ -663,8 +645,8 @@ void Array<T, Allocator>::remove(const T& item)
 	removeIndex(idx);
 }
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::Iterator Array<T, Allocator>::erase(ConstIterator _first)
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::erase(ConstIterator _first)
 {
 	X_ASSERT(_first >= begin() && _first < end(), "Invalid iterator")(_first, begin(), end());
 
@@ -681,8 +663,8 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::erase(ConstIterator 
 	return const_cast<Iterator>(first);
 }
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::Iterator Array<T, Allocator>::erase(ConstIterator _first, ConstIterator _last)
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::erase(ConstIterator _first, ConstIterator _last)
 {
 	if (_first == begin() && _last == end())
 	{
@@ -706,8 +688,8 @@ typename Array<T, Allocator>::Iterator Array<T, Allocator>::erase(ConstIterator 
 	return const_cast<Iterator>(_first);
 }
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::size_type Array<T, Allocator>::find(const Type& val) const
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::find(const Type& val) const
 {
 	size_type i;
 	size_type num = num_;
@@ -722,15 +704,15 @@ typename Array<T, Allocator>::size_type Array<T, Allocator>::find(const Type& va
 	return invalid_index;
 }
 
-template<typename T, class Allocator>
-typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(const Type& val) const
+template<typename T, class Allocator, class GrowPolicy>
+typename Array<T, Allocator, GrowPolicy>::ConstIterator Array<T, Allocator, GrowPolicy>::findSorted(const Type& val) const
 {
 	return findSorted(val, std::less<Type>());
 }
 
-template<typename T, class Allocator>
+template<typename T, class Allocator, class GrowPolicy>
 template<class Compare>
-typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(const Type& val, Compare comp) const
+typename Array<T, Allocator, GrowPolicy>::ConstIterator Array<T, Allocator, GrowPolicy>::findSorted(const Type& val, Compare comp) const
 {
 	auto it = std::lower_bound(begin(), end(), val, comp);
 
@@ -740,9 +722,9 @@ typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSorted(cons
 	return end();
 }
 
-template<typename T, class Allocator>
+template<typename T, class Allocator, class GrowPolicy>
 template<typename KeyType, class Compare, class CompareGt>
-typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSortedKey(const KeyType& val,
+typename Array<T, Allocator, GrowPolicy>::ConstIterator Array<T, Allocator, GrowPolicy>::findSortedKey(const KeyType& val,
 	Compare comp, CompareGt compGreater) const
 {
 	// binary search but with a key.
@@ -779,14 +761,15 @@ typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::findSortedKey(c
 	return end();
 }
 
-template<typename T, class Allocator>
-void Array<T, Allocator>::swap(Array& oth)
+template<typename T, class Allocator, class GrowPolicy>
+void Array<T, Allocator, GrowPolicy>::swap(Array& oth)
 {
 	// swap them baby.
+	core::Swap(static_cast<GrowPolicy&>(*this), static_cast<GrowPolicy&>(oth));
+
 	core::Swap(list_, oth.list_);
 	core::Swap(num_, oth.num_);
 	core::Swap(size_, oth.size_);
-	core::Swap(granularity_, oth.granularity_);
 
 	core::Swap(allocator_, oth.allocator_);
 }
@@ -794,131 +777,72 @@ void Array<T, Allocator>::swap(Array& oth)
 
 // -----------------------------------------------
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::Iterator Array<T, Allocator>::begin(void)
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::begin(void)
 {
 	return list_;
 }
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::begin(void) const
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::ConstIterator Array<T, Allocator, GrowPolicy>::begin(void) const
 {
 	return list_;
 }
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::Iterator Array<T, Allocator>::end(void)
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::end(void)
 {
 	return list_ + num_;
 }
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::ConstIterator Array<T, Allocator>::end(void) const
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::ConstIterator Array<T, Allocator, GrowPolicy>::end(void) const
 {
 	return list_ + num_;
 }
 
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::Reference Array<T, Allocator>::front(void)
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::Reference Array<T, Allocator, GrowPolicy>::front(void)
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
 	return *list_;
 }
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::ConstReference Array<T, Allocator>::front(void) const
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::ConstReference Array<T, Allocator, GrowPolicy>::front(void) const
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
 	return *list_;
 }
 
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::Reference Array<T, Allocator>::back(void)
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::Reference Array<T, Allocator, GrowPolicy>::back(void)
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
 }
 
-template<typename T, class Allocator>
-inline typename Array<T, Allocator>::ConstReference Array<T, Allocator>::back(void) const
+template<typename T, class Allocator, class GrowPolicy>
+inline typename Array<T, Allocator, GrowPolicy>::ConstReference Array<T, Allocator, GrowPolicy>::back(void) const
 {
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
 }
 
-
-// -----------------------------------------------
-
-// ISerialize
-template<typename T, class Allocator>
-bool Array<T, Allocator>::SSave(XFile* pFile) const
-{
-	X_ASSERT_NOT_NULL(pFile);
-
-	X_DISABLE_WARNING(4127)
-	if (!compileTime::IsPOD<T>::Value) {
-		X_ERROR("Array", "Can't save a none POD type to file: %s", typeid(T).name());
-		return false;
-	}
-	X_ENABLE_WARNING(4127)
-
-	pFile->writeObj(num_);
-	pFile->writeObj(size_);
-	pFile->writeObj(granularity_);
-	pFile->writeObj(list_, num_);
-	return true;
-}
-
-template<typename T, class Allocator>
-bool Array<T, Allocator>::SLoad(XFile* pFile)
-{
-	X_ASSERT_NOT_NULL(pFile);
-
-	X_DISABLE_WARNING(4127)
-	if (!compileTime::IsPOD<T>::Value) {
-		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name()); 
-		return false;
-	}
-	X_ENABLE_WARNING(4127)
-
-	free();
-	size_type read, num, size, gran;
-
-	read = 0;
-	read += pFile->readObj(num);
-	read += pFile->readObj(size);
-	read += pFile->readObj(gran);
-	if (read != (sizeof(size_type)* 3))
-	{
-		X_ERROR("Array", "failed to read size info from file");
-		return false;
-	}
-
-	granularity_ = gran;
-	list_ = Allocate(size);
-	num_ = num;
-	size_ = size;
-
-	return pFile->readObj(list_, num_) == (num_ * sizeof(T));
-}
-
-
-// ~ISerialize
-
 // -----------------------------------------------
 
 
-template<typename T, class Allocator>
-void Array<T, Allocator>::ensureSize(size_type size)
+template<typename T, class Allocator, class GrowPolicy>
+void Array<T, Allocator, GrowPolicy>::ensureSize(size_type size)
 {
 	if (size > size_)
 	{
 		Type* pOldList;
 		size_type	newsize;
 
-		newsize = bitUtil::RoundUpToMultiple(size, granularity_);
+		newsize = getAllocationSize(size_, size);
 		pOldList = list_;
 
 		// new array baby!
@@ -939,14 +863,14 @@ void Array<T, Allocator>::ensureSize(size_type size)
 }
 
 
-template<typename T, class Allocator>
-X_INLINE void Array<T, Allocator>::DeleteArr(T* pArr)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE void Array<T, Allocator, GrowPolicy>::DeleteArr(T* pArr)
 {
 	allocator_.free(pArr);
 }
 
-template<typename T, class Allocator>
-X_INLINE T* Array<T, Allocator>::Allocate(size_type num)
+template<typename T, class Allocator, class GrowPolicy>
+X_INLINE T* Array<T, Allocator, GrowPolicy>::Allocate(size_type num)
 {
 	// we don't allocate the object type.
 	// since we don't want to construct any of them.

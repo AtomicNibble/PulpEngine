@@ -13,8 +13,8 @@ X_NAMESPACE_BEGIN(core)
 class MemoryArenaBase;
 struct XFile;
 
-template <typename T, class Allocator = ArrayAllocator<T>>
-class Array
+template <typename T, class Allocator = ArrayAllocator<T>, class GrowPolicy = growStrat::Linear>
+class Array : public GrowPolicy
 {
 public:
 	typedef T  Type;
@@ -30,7 +30,7 @@ public:
 	typedef T& reference;
 	typedef const T& ConstReference;
 	typedef const T& const_reference;
-	typedef Array<T, Allocator> MyT;
+	typedef Array<T, Allocator, GrowPolicy> MyT;
 
 	enum : size_type {
 		invalid_index = static_cast<size_type>(-1)
@@ -79,11 +79,6 @@ public:
 	size_type size(void) const;
 	// returns number of elements allocated for
 	size_type capacity(void) const;
-	// set new granularity
-	void setGranularity(size_type newgranularity);
-	// get the current granularity
-	size_type granularity(void) const;
-
 
 	// Inserts or erases elements at the end such that size is 'size'
 	void resize(size_type size);
@@ -167,10 +162,6 @@ public:
 	inline Reference back(void);
 	inline ConstReference back(void) const;
 
-	// ISerialize
-	bool SSave(XFile* pFile) const;
-	bool SLoad(XFile* pFile);
-	// ~ISerialize
 
 protected:
 	// used to make sure buffer is large enougth.
@@ -185,7 +176,6 @@ protected:
 	T*				list_;			// pointer to memory block
 	size_type		num_;			// num elemets stored in the list
 	size_type		size_;			// the current allocated size
-	size_type		granularity_;	// the allocation size stratergy
 
 	Allocator		allocator_;
 };
