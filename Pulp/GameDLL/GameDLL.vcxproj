@@ -364,6 +364,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Vars\GameVars.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Enity\EnitiySystem.cpp" />
@@ -380,6 +381,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Vars\GameVars.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vars\GameVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

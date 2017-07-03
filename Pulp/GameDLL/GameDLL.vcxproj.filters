@@ -19,6 +19,12 @@
     <Filter Include="Header Files\ECS">
       <UniqueIdentifier>{cb875e2e-f4d1-4c50-8b70-ec207bdb1e89}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{f5c90121-bbd0-4f50-8adb-2f83d7ec7b53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{3d3b1f5b-6f42-47b1-985c-2ef055121f62}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Header Files\Enity">
       <UniqueIdentifier>{d790a810-514d-4cc7-8d82-ebcd76a6fae7}</UniqueIdentifier>
     </Filter>
@@ -45,6 +51,9 @@
     <ClInclude Include="ECS\Registry.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\GameVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
     <ClInclude Include="Enity\EnityComponents.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
@@ -65,6 +74,9 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\GameVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
     <ClCompile Include="Enity\EnitiySystem.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
@@ -72,5 +84,9 @@
       <Filter>Source Files\Level</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Vars\GameVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
   </ItemGroup>
 </Project>
