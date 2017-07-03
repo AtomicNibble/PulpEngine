@@ -277,7 +277,7 @@ namespace ecs
 
 	public:
 		template<typename T>
-		using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>>;
+		using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
 
 		using pool_type = Pool<Entity, Components...>;
 		using mask_type = std::bitset<sizeof...(Components)+1>;

@@ -48,7 +48,7 @@ namespace growStrat
 	};
 
 	// fuck naming shit.
-	class Expandy
+	class Multiply
 	{
 	public:
 		typedef size_t size_type;

@@ -20,7 +20,7 @@ namespace ecs
 		using size_type = typename core::Array<component_type>::size_type;
 
 		template<typename T>
-		using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>>;
+		using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
 
 		typedef AlignedArray<component_type> CompDataArr;
 		typedef AlignedArray<pos_type> PosTypeArr;
