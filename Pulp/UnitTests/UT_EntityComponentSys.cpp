@@ -494,7 +494,6 @@ TEST(ECSRegistryBench, Construct)
 	X_LOG0("ECS", "Constructing 1000000 entities");
 
 	registry.reserve(1'000'000);
-	registry.setGranularity(1000'000);
 
 	core::StopWatch timer;
 	for (uint64_t i = 0; i < 1'000'000L; i++) {
@@ -540,8 +539,6 @@ TEST(ECSRegistryBench, IterateCreateDeleteSingleComponent)
 	registry_type registry(g_arena);
 	registry.reserve(1'000);
 	registry.availableReserve(1'000);
-	registry.setGranularity(1'000);
-	registry.setAvailableGranularity(1'000);
 
 	X_LOG0("ECS", "Looping 1000 times creating and deleting a random number of entities");
 

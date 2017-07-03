@@ -316,15 +316,6 @@ namespace ecs
 			available_.reserve(size);
 		}
 
-		void setGranularity(size_t gran) {
-			entities_.setGranularity(gran);
-			pool_.setGranularity(gran);
-		}
-
-		void setAvailableGranularity(size_t gran) {
-			available_.setGranularity(gran);
-		}
-
 
 		X_INLINE size_type size(void) const {
 			return entities_.size() - available_.size();

@@ -49,12 +49,6 @@ namespace ecs
 			direct_.reserve(size);
 		}
 
-		void setGranularity(size_t gran) {
-			data_.setGranularity(gran);
-			reverse_.setGranularity(gran);
-			direct_.setGranularity(gran);
-		}
-
 		X_INLINE bool empty(void) const {
 			return data_.isEmpty();
 		}
