@@ -7,11 +7,14 @@
 #include <IInput.h>
 #include <ITimer.h>
 
+#include "Enity\EnitiySystem.h"
+
+
 X_NAMESPACE_DECLARE(render,
-struct IRender
+	struct IRender
 );
 X_NAMESPACE_DECLARE(core,
-struct ICVar
+	struct ICVar
 );
 
 X_NAMESPACE_BEGIN(game)
@@ -20,6 +23,8 @@ class XGame :
 	public IGame,
 	public input::IInputEventListner
 {
+
+
 public:
 	XGame(ICore *pCore);
 	~XGame() X_FINAL;
@@ -52,13 +57,15 @@ private:
 	core::ITimer* pTimer_;
 	core::ICVar* pFovVar_;
 
-
 	Vec3f cameraPos_;
 	Vec3f cameraAngle_;
 
 	core::FixedArray<input::InputEvent, 256> inputEvents_;
 
 	XCamera cam_;
+
+private:
+	EnititySystem ents_;
 };
 
 X_NAMESPACE_END

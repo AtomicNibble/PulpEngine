@@ -223,6 +223,9 @@
     <Filter Include="Headers\Core\msvc">
       <UniqueIdentifier>{23f7a4fb-4236-4275-9c53-644b911a2fb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Game">
+      <UniqueIdentifier>{e5a0d8f1-21fb-4b46-b16f-5932af87e41f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -883,9 +886,6 @@
     <ClInclude Include="Util\FloatIEEEUtil.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
-    <ClInclude Include="IGame.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="IGui.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
@@ -1245,6 +1245,12 @@
     </ClInclude>
     <ClInclude Include="Containers\FixedByteStream.h">
       <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="IGame.h">
+      <Filter>Interfaces_h\Game</Filter>
+    </ClInclude>
+    <ClInclude Include="IEntity.h">
+      <Filter>Interfaces_h\Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

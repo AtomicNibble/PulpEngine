@@ -27,6 +27,11 @@ typedef core::MemoryArena<
 extern GameArena* g_gameArena;
 
 
+#include <IGame.h>
+#include <IEntity.h>
 
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
+
+
+#include "Enity\EnityComponents.h"

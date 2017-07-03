@@ -83,7 +83,7 @@ public:
 
 	size_t numAreas;
 
-	level::ClassType::Enum classType;
+	game::ClassType::Enum classType;
 	KeyPair epairs;
 };
 

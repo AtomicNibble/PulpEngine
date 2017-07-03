@@ -113,23 +113,23 @@ namespace mapFile
 		it = mapEnt->epairs.find(X_CONST_STRING("classname"));
 		if (it != mapEnt->epairs.end())
 		{
-			core::string& classname = it->second;
+			const core::string& classname = it->second;
 
 			if (classname == "worldspawn")
 			{
-				ent.classType = level::ClassType::WORLDSPAWN;
+				ent.classType = game::ClassType::WORLDSPAWN;
 			}
 			else if (classname == "misc_model")
 			{
-				ent.classType = level::ClassType::MISC_MODEL;
+				ent.classType = game::ClassType::MISC_MODEL;
 			}
 			else if (classname == "info_player_start")
 			{
-				ent.classType = level::ClassType::PLAYER_START;
+				ent.classType = game::ClassType::PLAYER_START;
 			}
 			else if (classname == "func_group")
 			{
-				ent.classType = level::ClassType::FUNC_GROUP;
+				ent.classType = game::ClassType::FUNC_GROUP;
 			}
 			else
 			{
@@ -141,7 +141,7 @@ namespace mapFile
 			X_WARNING("Lvl", "ent missing class type");
 		}
 
-		if (ent.classType == level::ClassType::MISC_MODEL)
+		if (ent.classType == game::ClassType::MISC_MODEL)
 		{
 			it = mapEnt->epairs.find(X_CONST_STRING("model"));
 			if (it == mapEnt->epairs.end())

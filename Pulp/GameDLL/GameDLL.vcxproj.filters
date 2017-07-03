@@ -19,8 +19,17 @@
     <Filter Include="Header Files\ECS">
       <UniqueIdentifier>{cb875e2e-f4d1-4c50-8b70-ec207bdb1e89}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\ECS">
+    <Filter Include="Header Files\Enity">
+      <UniqueIdentifier>{d790a810-514d-4cc7-8d82-ebcd76a6fae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity">
       <UniqueIdentifier>{102af8c7-8234-46d9-898f-7bec384fa6de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Level">
+      <UniqueIdentifier>{1bb2fc81-7c7f-49c2-affd-f303a0cff40b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Level">
+      <UniqueIdentifier>{472eaa32-2158-4064-8e80-4ad49b57ce6f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -36,6 +45,15 @@
     <ClInclude Include="ECS\Registry.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\EnityComponents.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\EnitiySystem.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Level.h">
+      <Filter>Header Files\Level</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -47,5 +65,12 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
+    <ClCompile Include="Enity\EnitiySystem.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
+  </ItemGroup>
   </ItemGroup>
 </Project>

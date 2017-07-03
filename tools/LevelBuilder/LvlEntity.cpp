@@ -30,7 +30,7 @@ LvlEntity::LvlEntity() :
 	numAreas(0),
 	epairs(g_arena)
 {
-	classType = level::ClassType::UNKNOWN;
+	classType = game::ClassType::UNKNOWN;
 	pBspFaces = nullptr;
 }
 

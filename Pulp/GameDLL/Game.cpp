@@ -6,6 +6,8 @@
 #include <IFrameData.h>
 
 #include <Math\XMatrixAlgo.h>
+
+
 X_NAMESPACE_BEGIN(game)
 
 namespace
@@ -20,7 +22,8 @@ XGame::XGame(ICore* pCore) :
 	pCore_(pCore),
 	pTimer_(nullptr),
 	pRender_(nullptr),
-	pFovVar_(nullptr)
+	pFovVar_(nullptr),
+	ents_(g_gameArena)
 {
 	X_ASSERT_NOT_NULL(pCore);
 

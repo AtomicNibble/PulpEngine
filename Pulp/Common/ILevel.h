@@ -13,7 +13,7 @@
 #include <IFileSys.h>
 #include <IPhysics.h>
 #include <IAssetDb.h>
-
+#include <IEntity.h>
 
 // forward Decs.
 template<class Allocator>
@@ -427,17 +427,10 @@ X_DECLARE_ENUM(FileNodes) (
 	ENTITIES
 );
 
-X_DECLARE_ENUM(ClassType) (
-	UNKNOWN,
-	WORLDSPAWN,
-	PLAYER_START,
-	MISC_MODEL,
-	FUNC_GROUP
-);
 
 struct EnityInfoHdr
 {
-	uint32_t dataSize[ClassType::ENUM_COUNT]; // the size of the data for the given class type.
+	uint32_t dataSize[game::ClassType::ENUM_COUNT]; // the size of the data for the given class type.
 
 };
 
@@ -598,7 +591,7 @@ struct FileHeader
 // X_ENSURE_SIZE(Portal, 0x28);
 //X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
-X_ENSURE_SIZE(EnityInfoHdr, 4 * ClassType::ENUM_COUNT);
+X_ENSURE_SIZE(EnityInfoHdr, 4 * game::ClassType::ENUM_COUNT);
 
 X_ENSURE_SIZE(FileAreaRefHdr, 8);
 X_ENSURE_SIZE(AreaEntRef, 4);

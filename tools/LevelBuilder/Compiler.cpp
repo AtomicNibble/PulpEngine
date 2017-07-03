@@ -276,7 +276,7 @@ bool Compiler::processModel(LvlEntity& ent)
 
 bool Compiler::processWorldModel(LvlEntsArr& ents, LvlEntity& ent)
 {
-	if (ent.classType != level::ClassType::WORLDSPAWN) {
+	if (ent.classType != game::ClassType::WORLDSPAWN) {
 		X_ERROR("Lvl", "World model is missing class name: 'worldspawn'");
 		return false;
 	}
@@ -760,7 +760,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 	{
 		auto& stream = nodeStreams[FileNodes::ENTITIES];
 
-		std::array<JsonByteStreamWriter, ClassType::ENUM_COUNT> classStreams{
+		std::array<JsonByteStreamWriter, game::ClassType::ENUM_COUNT> classStreams{
 			X_PP_REPEAT_COMMA_SEP(5, g_arena)
 		};
 

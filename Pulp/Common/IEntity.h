@@ -1,0 +1,19 @@
+#pragma once
+
+
+X_NAMESPACE_BEGIN(game)
+
+
+X_DECLARE_ENUM(ClassType) (
+	UNKNOWN,
+	WORLDSPAWN,
+	PLAYER_START,
+	MISC_MODEL,
+	FUNC_GROUP
+);
+
+
+
+
+
+X_NAMESPACE_END
