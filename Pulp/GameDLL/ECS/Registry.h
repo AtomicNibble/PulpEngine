@@ -291,6 +291,8 @@ namespace ecs
 		typedef AlignedArray<mask_type> MaskArr;
 		typedef AlignedArray<entity_type> EntityArr;
 
+		static const entity_type INVALID_ID = std::numeric_limits<entity_type>::max();
+
 	public:
 		template<typename... Args>
 		Registry(core::MemoryArenaBase* arena, Args&&... args) :
