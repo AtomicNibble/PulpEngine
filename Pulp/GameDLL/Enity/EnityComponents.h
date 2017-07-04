@@ -4,6 +4,9 @@
 
 X_NAMESPACE_BEGIN(game)
 
+namespace entity
+{
+
 
 struct Position
 {
@@ -47,5 +50,6 @@ struct ScriptName
 };
 
 
+} // namespace entity
 
 X_NAMESPACE_END
