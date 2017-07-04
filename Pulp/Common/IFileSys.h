@@ -312,7 +312,9 @@ private:
 struct XFileFixedBuf : public XFile
 {
 	XFileFixedBuf(const uint8_t* begin, const uint8_t* end) :
-	begin_(begin), current_(begin), end_(end)
+		begin_(begin), 
+		current_(begin), 
+		end_(end)
 	{
 		X_ASSERT_NOT_NULL(begin);
 		X_ASSERT_NOT_NULL(end);
