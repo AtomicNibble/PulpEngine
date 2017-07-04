@@ -17,10 +17,11 @@ X_DECLARE_FLAGS(FrameFlag)(
 
 struct FrameInput
 {
-	static const size_t MAX_INPUT_EVENTS_PER_FRAME = 256;
 
-	core::FixedArray<input::InputEvent, MAX_INPUT_EVENTS_PER_FRAME> events;
-
+	// this is just a buffer where this frames input events get stored.
+	// you should not read from this, but instead register a input listner.
+	// as that respects priority and filtering.
+	input::InputEventBuffer events; 
 };
 
 

@@ -10,7 +10,6 @@
 
 // #include <Util\FlagsMacros.h>
 
-
 #ifdef IPINPUT_EXPORTS
 #define IPINPUT_API DLL_EXPORT
 #else
@@ -19,12 +18,16 @@
 
 struct ICore;
 
-
 X_NAMESPACE_DECLARE(core,
 	struct FrameInput;
 );
 
 X_NAMESPACE_BEGIN(input)
+
+
+static const size_t MAX_INPUT_EVENTS_PER_FRAME = 256;
+
+
 
 // the mask's they set.
 struct ModifiersMasks
@@ -343,6 +346,11 @@ X_ALIGNED_SYMBOL(struct InputEvent,32)
 	InputSymbol*			pSymbol;		// Input symbol the event originated from.
 	char					inputchar;		// pre translate
 };
+
+
+typedef core::FixedArray<InputEvent, MAX_INPUT_EVENTS_PER_FRAME> InputEventBuffer;
+
+
 X_ENABLE_WARNING(4324);
 
 
