@@ -37,7 +37,7 @@ namespace
 	static_assert(X_OFFSETOF(AABB, max) == X_OFFSETOF(physx::PxBounds3, maximum), "Offset don't match");
 
 	static_assert(X_OFFSETOF(Transformf, quat) == X_OFFSETOF(physx::PxTransform, q), "Offset don't match");
-	static_assert(X_OFFSETOF(Transformf, trans) == X_OFFSETOF(physx::PxTransform, p), "Offset don't match");
+	static_assert(X_OFFSETOF(Transformf, pos) == X_OFFSETOF(physx::PxTransform, p), "Offset don't match");
 
 
 } // namespace

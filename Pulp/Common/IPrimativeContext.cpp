@@ -670,8 +670,8 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 // Bone
 void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rChild, const Color8u& col)
 {
-	Vec3f p = rParent.getTranslation();
-	Vec3f c = rChild.getTranslation();
+	Vec3f p = rParent.getPosition();
+	Vec3f c = rChild.getPosition();
 	Vec3f vBoneVec = c - p;
 	float fBoneLength = vBoneVec.length();
 

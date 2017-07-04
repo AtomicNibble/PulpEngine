@@ -464,7 +464,7 @@ bool Level::ProcessData(void)
 			file.readObj(colHdr);
 
 			Transformf trans;
-			trans.trans = colHdr.trans;
+			trans.pos = colHdr.trans;
 
 			for (uint8_t i=0; i<colHdr.numGroups; i++)
 			{
@@ -514,7 +514,7 @@ bool Level::ProcessData(void)
 
 					// the AABB is world space right.
 					// but the area actor is in area space.
-					const Vec3f localPose = aabb.center() - trans.trans;
+					const Vec3f localPose = aabb.center() - trans.pos;
 
 					gEnv->pPhysics->addBox(actor, aabb, localPose);
 				}

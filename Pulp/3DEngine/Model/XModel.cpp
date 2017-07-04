@@ -76,11 +76,11 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 		{
 			Transformf qTrans;
 			qTrans.quat = angle.asQuat();
-			qTrans.trans = modelMat * pos;
+			qTrans.pos = modelMat * pos;
 
 			Transformf qTransPar;
 			qTransPar.quat = parAngle.asQuat();
-			qTransPar.trans = modelMat * parPos;
+			qTransPar.pos = modelMat * parPos;
 
 			pPrimContex->drawBone(qTransPar, qTrans, col);
 		}
