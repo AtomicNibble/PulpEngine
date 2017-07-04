@@ -15,6 +15,11 @@ struct Velocity
 	Vec3f dir;
 };
 
+struct TransForm
+{
+	Transformf trans;
+};
+
 struct Health
 {
 	int32_t hp;
@@ -32,10 +37,14 @@ struct PhysicsTrigger
 
 struct CharacterController
 {
-	physics::ICapsuleCharacterController* pController;
+	physics::ICharacterController* pController;
 };
 
 
+struct ScriptName
+{
+	const char* pName;
+};
 
 
 
