@@ -276,12 +276,11 @@ X_INLINE typename UniquePointer<T[]>::pointer UniquePointer<T[]>::release(void)
 template<typename T>
 X_INLINE void UniquePointer<T[]>::reset(pointer ptr_)
 {
-	X_ASSERT_NOT_NULL(Mybase::arena_);
-
 	// establish new pointer
 	pointer pOld = get();
 	Mybase::ptr() = ptr_;
 	if (pOld != pointer()) {
+		X_ASSERT_NOT_NULL(Mybase::arena_);
 		deleter(pOld);
 	}
 }
