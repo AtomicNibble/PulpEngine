@@ -45,8 +45,9 @@ public:
 	explicit Quat(const Matrix34<T>& m) { set(m); }
 
 	template<typename Y>
-	explicit Quat(const Y &v)
-		: w(QUATCONV<Quat<typename Quat::TYPE>, Y>::getW(v)), v(QUATCONV<typename Quat::TYPE, Y>::getX(v), QUATCONV<typename Quat::TYPE, Y>::getY(v), QUATCONV<typename Quat::TYPE, Y>::getZ(v))
+	explicit Quat(const Y &v) : 
+		w(QUATCONV<Quat<typename Quat::TYPE>, Y>::getW(v)), 
+		v(QUATCONV<typename Quat::TYPE, Y>::getX(v), QUATCONV<typename Quat::TYPE, Y>::getY(v), QUATCONV<typename Quat::TYPE, Y>::getZ(v))
 	{}
 
 	// get axis-angle representation's axis
