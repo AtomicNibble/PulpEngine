@@ -96,9 +96,6 @@ public:
 	}
 
 private:
-	X_NO_COPY(MemCursor);
-	X_NO_ASSIGN(MemCursor);
-
 	void* pPointer_;
 	void* pStart_;
 	size_t size_;
