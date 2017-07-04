@@ -75,13 +75,13 @@ namespace ecs
 				pMask_{ pMask }
 			{
 				if (this->pos_) {
-					while (!valid() && --this->pos_);
+					while (!isValid() && --this->pos_);
 				}
 			}
 
 			X_INLINE ViewIterator& operator++() {
 				if (pos_) {
-					while (--pos_ && !valid());
+					while (--pos_ && !isValid());
 				}
 				return *this;
 			}
@@ -104,7 +104,7 @@ namespace ecs
 			}
 
 		private:
-			bool valid(void) const 
+			bool isValid(void) const
 			{
 				using accumulator_type = bool[];
 				auto& bitmask = pMask_[pEntities_[pos_ - 1]];
@@ -334,7 +334,7 @@ namespace ecs
 			return entities_.isEmpty();
 		}
 
-		X_INLINE bool valid(entity_type entity) const {
+		X_INLINE bool isValid(entity_type entity) const {
 			return (entity < entities_.size() && entities_[entity].test(validity_bit));
 		}
 
@@ -365,7 +365,7 @@ namespace ecs
 		}
 
 		void destroy(entity_type entity) {
-			X_ASSERT(valid(entity), "Not valid entity")();
+			X_ASSERT(isValid(entity), "Not valid entity")();
 
 			using accumulator_type = int[];
 			accumulator_type accumulator = { 0, (reset<Components>(entity), 0)... };
@@ -376,7 +376,7 @@ namespace ecs
 
 		template<typename Comp, typename... Args>
 		Comp& assign(entity_type entity, Args... args) {
-			X_ASSERT(valid(entity), "Not valid entity")();
+			X_ASSERT(isValid(entity), "Not valid entity")();
 
 			entities_[entity].set(ident<Components...>.template get<Comp>());
 			return pool_.template construct<Comp>(entity, args...);
@@ -384,7 +384,7 @@ namespace ecs
 
 		template<typename Comp>
 		void remove(entity_type entity) {
-			X_ASSERT(valid(entity), "Not valid entity")();
+			X_ASSERT(isValid(entity), "Not valid entity")();
 
 			entities_[entity].reset(ident<Components...>.template get<Comp>());
 			pool_.template destroy<Comp>(entity);
@@ -392,7 +392,7 @@ namespace ecs
 
 		template<typename... Comp>
 		bool has(entity_type entity) const {
-			X_ASSERT(valid(entity), "Not valid entity")();
+			X_ASSERT(isValid(entity), "Not valid entity")();
 
 			using accumulator_type = bool[];
 			bool all = true;
@@ -419,7 +419,7 @@ namespace ecs
 
 		template<typename Comp, typename... Args>
 		Comp& accomodate(entity_type entity, Args... args) {
-			X_ASSERT(valid(entity), "Not valid entity")();
+			X_ASSERT(isValid(entity), "Not valid entity")();
 
 			return (entities_[entity].test(ident<Components...>.template get<Comp>())
 				? this->template replace<Comp>(entity, std::forward<Args>(args)...)
@@ -427,7 +427,7 @@ namespace ecs
 		}
 
 		entity_type clone(entity_type from) {
-			X_ASSERT(valid(from), "Not valid entity")();
+			X_ASSERT(isValid(from), "Not valid entity")();
 
 			using accumulator_type = int[];
 			auto to = create();
@@ -449,7 +449,7 @@ namespace ecs
 
 		template<typename Comp>
 		void reset(entity_type entity) {
-			X_ASSERT(valid(entity), "Not valid entity")();
+			X_ASSERT(isValid(entity), "Not valid entity")();
 
 			if (entities_[entity].test(ident<Components...>.template get<Comp>())) {
 				remove<Comp>(entity);

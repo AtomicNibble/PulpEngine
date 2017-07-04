@@ -112,9 +112,9 @@ TEST(ECSRegistry, Functionalities)
 
 	registry.destroy(e3);
 
-	ASSERT_TRUE(registry.valid(e1));
-	ASSERT_TRUE(registry.valid(e2));
-	ASSERT_FALSE(registry.valid(e3));
+	ASSERT_TRUE(registry.isValid(e1));
+	ASSERT_TRUE(registry.isValid(e2));
+	ASSERT_FALSE(registry.isValid(e3));
 
 	ASSERT_EQ(registry.size(), registry_type::size_type{ 2 });
 	ASSERT_EQ(registry.capacity(), registry_type::size_type{ 3 });
