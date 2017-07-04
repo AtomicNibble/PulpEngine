@@ -760,54 +760,57 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 	{
 		auto& stream = nodeStreams[FileNodes::ENTITIES];
 
-		std::array<JsonByteStreamWriter, game::ClassType::ENUM_COUNT> classStreams{
+		std::array<
+			core::Array<const level::LvlEntity*, 
+			core::ArrayAllocator<const level::LvlEntity*>, 
+			core::growStrat::Multiply>, game::ClassType::ENUM_COUNT
+				> classEnts{
 			X_PP_REPEAT_COMMA_SEP(5, g_arena)
 		};
-
-		for (auto& stream : classStreams)
-		{
-			stream.writer.SetMaxDecimalPlaces(5);
-			stream.writer.StartArray();
-		}
 
 		for (size_t i = 0; i < ents.size(); i++)
 		{
 			const auto& ent = ents[i];
-			const auto& kvps = ent.epairs;
+			classEnts[ent.classType].push_back(&ent);
+		}
 
-			auto& cs = classStreams[ent.classType];
+		JsonByteBuffer jsonBuf(stream);
+		core::json::Writer<JsonByteBuffer> writer(jsonBuf);
 
-			cs.writer.StartObject();
+		writer.StartObject();
 
-			for (auto it = kvps.begin(); it != kvps.end(); ++it)
+		for (uint32_t i = 0; i < game::ClassType::ENUM_COUNT; i++)
+		{
+			game::ClassType::Enum type = static_cast<game::ClassType::Enum>(i);
+
+			core::StackString256 name(game::ClassType::ToString(type));
+			name.toLower();
+
+			writer.Key(name.c_str());
+			writer.StartArray();
+
+			const auto& ents = classEnts[type];
+			for (auto* pEnt : ents)
 			{
-				cs.writer.Key(it->first, static_cast<core::json::SizeType>(it->first.length()));
-				cs.writer.String(it->second, static_cast<core::json::SizeType>(it->second.length()));
+				const auto& kvps = pEnt->epairs;
+
+				writer.StartObject();
+
+				for (auto it = kvps.begin(); it != kvps.end(); ++it)
+				{
+					writer.Key(it->first, static_cast<core::json::SizeType>(it->first.length()));
+					writer.String(it->second, static_cast<core::json::SizeType>(it->second.length()));
+				}
+
+				writer.EndObject();
 			}
 
-			cs.writer.EndObject();
+			writer.EndArray();
 		}
 
-		EnityInfoHdr entityHdr;
-		size_t totalSize = sizeof(entityHdr);
+		writer.EndObject();
 
-		for (size_t i = 0; i < classStreams.size(); i++)
-		{
-			auto& cs = classStreams[i];
-			cs.writer.EndArray();
-
-			entityHdr.dataSize[i] = safe_static_cast<uint32_t>(cs.stream.size());
-			totalSize += cs.stream.size();
-		}
-
-		stream.reserve(totalSize);
-		stream.write(entityHdr);
-		for (auto& cs : classStreams)
-		{
-			stream.write(cs.stream);
-		}
-
-		X_ASSERT(stream.size() == totalSize, "Size calculation mismatch")(stream.size(), totalSize);
+		jsonBuf.Put('\0');
 	}
 
 	// update FourcCC to mark this bsp as valid.
