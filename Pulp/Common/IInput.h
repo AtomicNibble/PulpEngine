@@ -295,30 +295,34 @@ struct KeyId
 
 struct KeyName
 {
-	KeyName() : name(nullptr) {}
-	KeyName(const char* name_) { name = name_; };
+	KeyName() : 
+		pName_(nullptr)
+	{
+	}
 
-	operator const char*() const { return name; };
-	const char* c_str() const { return name; }
+	KeyName(const char* pName) :
+		pName_(pName)
+	{
+	}
 
-	const char* name;
+	operator const char*() const { 
+		return pName_; 
+	}
+	const char* c_str() const { 
+		return pName_; 
+	}
+
+private:
+	const char* pName_;
 };
 
 struct InputSymbol;
+
 X_DISABLE_WARNING(4324);
 
 X_ALIGNED_SYMBOL(struct InputEvent,32)
 {
 	typedef Flags<ModifiersMasks> ModiferType;
-
-	InputDeviceType::Enum	deviceType;		// keyboard, mouse etc
-	InputState::Enum		action;			//
-	KeyId::Enum				keyId;			// id for the event.
-	ModiferType				modifiers;		// Key modifiers enabled at the time of this event.
-	KeyName					name;			// the name
-	float					value;			// typically mouse pos.
-	InputSymbol*			pSymbol;		// Input symbol the event originated from.
-	char					inputchar;		// pre translate
 
 	InputEvent()
 	{
@@ -329,6 +333,15 @@ X_ALIGNED_SYMBOL(struct InputEvent,32)
 		value = 0.f;
 		pSymbol = nullptr;
 	}
+
+	InputDeviceType::Enum	deviceType;		// keyboard, mouse etc
+	InputState::Enum		action;			//
+	KeyId::Enum				keyId;			// id for the event.
+	ModiferType				modifiers;		// Key modifiers enabled at the time of this event.
+	KeyName					name;			// the name
+	float					value;			// typically mouse pos.
+	InputSymbol*			pSymbol;		// Input symbol the event originated from.
+	char					inputchar;		// pre translate
 };
 X_ENABLE_WARNING(4324);
 
@@ -346,7 +359,8 @@ struct InputSymbol
 		type(Button), 
 		keyId(KeyId::UNKNOWN),
 		state(InputState::UNKNOWN)
-	{}
+	{
+	}
 
 	InputSymbol(const KeyName& name_, Type type_ = Type::Button) :
 		//	keyid(id_),
