@@ -14,7 +14,7 @@ class Transform
 {
 public:
 	Quat<T>		quat;
-	Vec3<T>		trans;
+	Vec3<T>		pos;
 
 	Transform();
 	Transform(const Vec3<T>& vec, const Quat<T>& quat);
@@ -33,8 +33,9 @@ public:
 	void set(const Matrix34<T>& mat);
 
 
-	void setTranslation(const Vec3<T>& vec);
-	Vec3<T> getTranslation(void) const;
+	void setPosition(const Vec3<T>& vec);
+	Vec3<T> getPosition(void);
+	const Vec3<T>& getPosition(void) const;
 
 	static Transform<T> identity()
 	{

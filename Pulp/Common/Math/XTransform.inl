@@ -9,7 +9,7 @@ X_INLINE Transform<T>::Transform()
 template<typename T>
 X_INLINE Transform<T>::Transform(const Vec3<T>& vec_, const Quat<T>& quat_) :
 	quat(quat_),
-	trans(vec_)
+	pos(vec_)
 {
 }
 
@@ -18,7 +18,7 @@ template<typename TOth>
 X_INLINE Transform<T>::Transform(const Transform<TOth>& oth)
 {
 	quat = oth.quat;
-	trans = oth.trans;
+	pos = oth.pos;
 }
 
 template<typename T>
@@ -31,14 +31,14 @@ template<typename T>
 X_INLINE Transform<T>& Transform<T>::operator=(const Transform<T>& qt)
 {
 	quat = qt.quat;
-	trans = qt.trans;
+	pos = qt.pos;
 	return *this;
 }
 
 template<typename T>
 X_INLINE bool Transform<T>::operator==(const Transform<T> &rhs) const
 {
-	return quat = rhs.quat && trans == rhs.trans;
+	return quat = rhs.quat && pos == rhs.pos;
 }
 
 template<typename T>
@@ -48,9 +48,9 @@ X_INLINE bool Transform<T>::operator!=(const Transform<T> &rhs) const
 }
 
 template<typename T>
-X_INLINE void Transform<T>::set(const Vec3<T> &trans_, const Quat<T>& qt_)
+X_INLINE void Transform<T>::set(const Vec3<T> &pos_, const Quat<T>& qt_)
 {
-	trans = trans_;
+	pos = pos_;
 	quat = qt_;
 }
 
@@ -58,17 +58,24 @@ template<typename T>
 X_INLINE void Transform<T>::set(const Matrix34<T>& mat)
 {
 	quat = Quat<T>(mat);
-	trans = mat.getTranslate();
+	pos = mat.getTranslate();
 }
 
 template<typename T>
-void Transform<T>::setTranslation(const Vec3<T>& vec)
+X_INLINE void Transform<T>::setPosition(const Vec3<T>& vec)
 {
-	trans = vec;
+	pos = vec;
+}
+
+
+template<typename T>
+X_INLINE Vec3<T> Transform<T>::getPosition(void)
+{
+	return pos;
 }
 
 template<typename T>
-Vec3<T> Transform<T>::getTranslation(void) const
+X_INLINE const Vec3<T>& Transform<T>::getPosition(void) const
 {
-	return trans;
+	return pos;
 }
