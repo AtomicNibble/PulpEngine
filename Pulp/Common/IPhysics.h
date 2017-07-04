@@ -326,8 +326,8 @@ struct BoxControllerDesc : public ControllerDesc
 struct CapsuleControllerDesc : public ControllerDesc
 {
 	enum class ClimbingMode {
-		Easy,
-		Constrained
+		Easy,			// Standard mode, let the capsule climb over surfaces according to impact normal
+		Constrained		// Constrained mode, try to limit climbing according to the step offset
 	};
 
 	X_INLINE CapsuleControllerDesc() :
