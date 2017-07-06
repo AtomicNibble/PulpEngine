@@ -50,6 +50,20 @@ struct ScriptName
 };
 
 
+using EnitiyRegister = ecs::StandardRegistry<uint16_t,
+	Position,
+	Velocity,
+	TransForm,
+	Health,
+	PhysicsComponent,
+	PhysicsTrigger,
+	CharacterController,
+	ScriptName
+>;
+
+typedef EnitiyRegister::entity_type EntityId;
+
+
 } // namespace entity
 
 X_NAMESPACE_END
