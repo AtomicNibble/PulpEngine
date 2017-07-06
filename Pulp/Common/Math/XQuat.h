@@ -61,6 +61,7 @@ public:
 	T length() const;
 	T lengthSquared() const;
 	Vec3<T> getEuler(void) const;
+	Vec3<T> getEulerDegrees(void) const;
 
 	Quat<T>& normalize();
 	Quat<T> normalized() const;

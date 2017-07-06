@@ -58,12 +58,24 @@ X_INLINE Vec3<T> Quat<T>::getEuler(void) const
 {
 	Vec3<T> euler;
 
+	euler.x = getPitch();
+	euler.y = getYaw();
+	euler.z = getRoll();
+	return euler;
+}
+
+template<typename T>
+X_INLINE Vec3<T> Quat<T>::getEulerDegrees(void) const
+{
+	Vec3<T> euler;
+
 	euler.x = toDegrees(getPitch());
 	euler.y = toDegrees(getYaw());
 	euler.z = toDegrees(getRoll());
-
 	return euler;
 }
+
+
 
 
 template<typename T>
