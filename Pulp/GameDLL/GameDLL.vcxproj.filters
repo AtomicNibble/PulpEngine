@@ -63,6 +63,15 @@
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\InputSys.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\CameraSys.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\PhysicsSystem.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -82,6 +91,15 @@
     </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Source Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\InputSys.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\CameraSys.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\PhysicsSystem.cpp">
+      <Filter>Source Files\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
