@@ -534,7 +534,7 @@ const ActiveTransform* XScene::getActiveTransforms(size_t& numTransformsOut)
 	return reinterpret_cast<const ActiveTransform*>(pTrans);
 }
 
-const TriggerPair* XScene::getTriggerPaies(size_t& numTriggerPairs)
+const TriggerPair* XScene::getTriggerPairs(size_t& numTriggerPairs)
 {
 	numTriggerPairs = triggerPairs_.size();
 	return triggerPairs_.data();

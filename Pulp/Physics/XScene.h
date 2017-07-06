@@ -67,7 +67,7 @@ public:
 
 	// get shit that's moved.
 	const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_FINAL;
-	const TriggerPair* getTriggerPaies(size_t& numTriggerPairs) X_FINAL;
+	const TriggerPair* getTriggerPairs(size_t& numTriggerPairs) X_FINAL;
 
 	// PxSimulationEventCallback
 	virtual void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) X_FINAL;

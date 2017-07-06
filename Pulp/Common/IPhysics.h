@@ -850,7 +850,7 @@ struct IScene
 
 	// post simulation results.
 	virtual const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_ABSTRACT;
-	virtual const TriggerPair* getTriggerPaies(size_t& numTriggerPairs) X_ABSTRACT;
+	virtual const TriggerPair* getTriggerPairs(size_t& numTriggerPairs) X_ABSTRACT;
 
 };
 
