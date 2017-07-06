@@ -12,6 +12,8 @@ class XScene :
 	public IScene,
 	public physx::PxSimulationEventCallback
 {
+	typedef core::Array<TriggerPair, core::ArrayAllocator<TriggerPair>, core::growStrat::Multiply> TriggerPairArr;
+
 public:
 	XScene(PhysXVars& vars, physx::PxPhysics* pPhysics, core::MemoryArenaBase* arena);
 	~XScene() X_OVERRIDE;
@@ -65,6 +67,7 @@ public:
 
 	// get shit that's moved.
 	const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_FINAL;
+	const TriggerPair* getTriggerPaies(size_t& numTriggerPairs) X_FINAL;
 
 	// PxSimulationEventCallback
 	virtual void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) X_FINAL;
@@ -80,6 +83,8 @@ private:
 	physx::PxPhysics* pPhysics_;
 	physx::PxScene*	pScene_;
 	physx::PxControllerManager*	pControllerManager_;
+
+	TriggerPairArr triggerPairs_;
 };
 
 X_INLINE physx::PxScene* XScene::getPxScene(void)

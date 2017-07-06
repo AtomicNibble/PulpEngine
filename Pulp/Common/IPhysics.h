@@ -785,6 +785,18 @@ struct IBatchedQuery
 
 };
 
+struct TriggerPair
+{
+	X_INLINE TriggerPair(ActorHandle trigActor, ActorHandle othActor) :
+		triggerActor(trigActor),
+		otherActor(othActor)
+	{}
+
+	ActorHandle triggerActor;	//!< The actor to which triggerShape is attached
+	ActorHandle otherActor;		//!< The actor to which otherShape is attached
+};
+
+
 // ------------------------------------------------
 
 
@@ -838,6 +850,7 @@ struct IScene
 
 	// post simulation results.
 	virtual const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_ABSTRACT;
+	virtual const TriggerPair* getTriggerPaies(size_t& numTriggerPairs) X_ABSTRACT;
 
 };
 

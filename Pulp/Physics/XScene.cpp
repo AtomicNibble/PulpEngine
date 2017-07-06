@@ -119,7 +119,8 @@ XScene::XScene(PhysXVars& vars, physx::PxPhysics* pPhysics, core::MemoryArenaBas
 	arena_(X_ASSERT_NOT_NULL(arena)),
 	pPhysics_(X_ASSERT_NOT_NULL(pPhysics)),
 	pScene_(nullptr),
-	pControllerManager_(nullptr)
+	pControllerManager_(nullptr),
+	triggerPairs_(arena)
 {
 
 }
@@ -533,6 +534,12 @@ const ActiveTransform* XScene::getActiveTransforms(size_t& numTransformsOut)
 	return reinterpret_cast<const ActiveTransform*>(pTrans);
 }
 
+const TriggerPair* XScene::getTriggerPaies(size_t& numTriggerPairs)
+{
+	numTriggerPairs = triggerPairs_.size();
+	return triggerPairs_.data();
+}
+
 
 // ------------------------------------------
 
@@ -573,6 +580,17 @@ void XScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 
 	X_LOG0("Phys", "onTrigger: num: %" PRIu32, count);
 
+	for (uint32_t i = 0; i < count; i++)
+	{
+		auto& pair = pairs[i];
+		// ignore pairs when shapes have been deleted
+		if (pair.flags & (physx::PxTriggerPairFlag::eREMOVED_SHAPE_TRIGGER | physx::PxTriggerPairFlag::eREMOVED_SHAPE_OTHER)) {
+			continue;
+		}
+
+	
+		triggerPairs_.emplace_back(reinterpret_cast<ActorHandle>(pair.triggerActor), reinterpret_cast<ActorHandle>(pair.otherActor));
+	}
 }
 
 
