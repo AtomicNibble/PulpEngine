@@ -497,7 +497,7 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 
 	physx::PxSceneDesc sceneDesc(scale_);
 	sceneDesc.broadPhaseCallback = this;
-	sceneDesc.simulationEventCallback = this;
+	sceneDesc.simulationEventCallback = nullptr;
 #if 1
 	sceneDesc.filterShader = filter::FilterShader;
 #else
@@ -1233,46 +1233,6 @@ void XPhysics::onSubstepSetup(float dtime, physx::PxBaseTask* cont)
 {
 	X_UNUSED(dtime);
 	X_UNUSED(cont);
-
-}
-
-
-void XPhysics::onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count)
-{
-	X_UNUSED(constraints);
-	X_UNUSED(count);
-}
-
-void XPhysics::onWake(physx::PxActor** actors, physx::PxU32 count)
-{
-	X_UNUSED(actors);
-	X_UNUSED(count);
-	X_LOG0("Phys", "onWake: num: %" PRIu32, count);
-}
-
-void XPhysics::onSleep(physx::PxActor** actors, physx::PxU32 count)
-{
-	X_UNUSED(actors);
-	X_UNUSED(count);
-
-	X_LOG0("Phys", "onSleep: num: %" PRIu32, count);
-}
-
-void XPhysics::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 count)
-{
-	X_UNUSED(pairHeader);
-	X_UNUSED(pairs);
-	X_UNUSED(count);
-
-	X_LOG0("Phys", "onContact: num: %" PRIu32, count);
-}
-
-void XPhysics::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
-{
-	X_UNUSED(pairs);
-	X_UNUSED(count);
-
-	X_LOG0("Phys", "onTrigger: num: %" PRIu32, count);
 
 }
 

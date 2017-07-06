@@ -140,21 +140,25 @@ XScene::~XScene()
 	core::SafeRelease(pScene_);
 }
 
-bool XScene::createPxScene(const physx::PxSceneDesc& pxDesc)
+bool XScene::createPxScene(physx::PxSceneDesc& pxDesc)
 {
 	X_ASSERT(pScene_ == nullptr, "Scenen alread created")();
 	X_ASSERT(pControllerManager_ == nullptr, "Scenen alread created")();
+	X_ASSERT(pxDesc.simulationEventCallback == nullptr, "SimEventCallback must be null")();
 
 	if (!pxDesc.isValid()) {
 		X_ERROR("PhysScene", "Scene description is invalid");
 		return false;
 	}
 
+	pxDesc.simulationEventCallback = this;
+
 	pScene_ = pPhysics_->createScene(pxDesc);
 	if (!pScene_) {
 		X_ERROR("PhysScene", "Failed to create scene");
 		return false;
 	}
+
 
 #if PHYSX_SCENE_REQUIRES_LOCK
 	const bool lock = false; // this don't result in scene lock so we get api errors :/
@@ -527,6 +531,48 @@ const ActiveTransform* XScene::getActiveTransforms(size_t& numTransformsOut)
 
 	numTransformsOut = num;
 	return reinterpret_cast<const ActiveTransform*>(pTrans);
+}
+
+
+// ------------------------------------------
+
+void XScene::onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count)
+{
+	X_UNUSED(constraints);
+	X_UNUSED(count);
+}
+
+void XScene::onWake(physx::PxActor** actors, physx::PxU32 count)
+{
+	X_UNUSED(actors);
+	X_UNUSED(count);
+	X_LOG0("Phys", "onWake: num: %" PRIu32, count);
+}
+
+void XScene::onSleep(physx::PxActor** actors, physx::PxU32 count)
+{
+	X_UNUSED(actors);
+	X_UNUSED(count);
+
+	X_LOG0("Phys", "onSleep: num: %" PRIu32, count);
+}
+
+void XScene::onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 count)
+{
+	X_UNUSED(pairHeader);
+	X_UNUSED(pairs);
+	X_UNUSED(count);
+
+	X_LOG0("Phys", "onContact: num: %" PRIu32, count);
+}
+
+void XScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
+{
+	X_UNUSED(pairs);
+	X_UNUSED(count);
+
+	X_LOG0("Phys", "onTrigger: num: %" PRIu32, count);
+
 }
 
 

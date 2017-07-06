@@ -8,13 +8,15 @@ X_NAMESPACE_BEGIN(physics)
 class PhysXVars;
 class DebugRender;
 
-class XScene : public IScene
+class XScene : 
+	public IScene,
+	public physx::PxSimulationEventCallback
 {
 public:
 	XScene(PhysXVars& vars, physx::PxPhysics* pPhysics, core::MemoryArenaBase* arena);
 	~XScene() X_OVERRIDE;
 
-	bool createPxScene(const physx::PxSceneDesc& desc);
+	bool createPxScene(physx::PxSceneDesc& desc);
 
 	X_INLINE physx::PxScene* getPxScene(void);
 
@@ -64,6 +66,13 @@ public:
 	// get shit that's moved.
 	const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_FINAL;
 
+	// PxSimulationEventCallback
+	virtual void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) X_FINAL;
+	virtual void onWake(physx::PxActor** actors, physx::PxU32 count) X_FINAL;
+	virtual void onSleep(physx::PxActor** actors, physx::PxU32 count) X_FINAL;
+	virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) X_FINAL;
+	virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) X_FINAL;
+	// ~PxSimulationEventCallback
 
 private:
 	PhysXVars& vars_;
