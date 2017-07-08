@@ -85,10 +85,10 @@ private:
 	core::GrowingGenericAllocator windingDataAllocator_;
 	WindingDataArena windingDataArena_;
 
-	XPlaneSet	planes_;
+	XPlaneSet planes_;
 
 	// Compiled data
-	LvlAreaArr	areas_;
+	LvlAreaArr areas_;
 
 	StaticModelsArr staticModels_;
 
