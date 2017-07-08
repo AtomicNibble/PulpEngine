@@ -7,9 +7,6 @@ X_NAMESPACE_BEGIN(level)
 struct LvlBrushSide;
 struct LvlBrush;
 
-typedef core::GrowingStringTableUnique<256, 16, 4, uint32_t> StringTableType;
-
-
 class ColMeshData
 {
 public:
@@ -178,12 +175,12 @@ public:
 	LvlArea();
 
 	void AreaBegin(void);
-	void AreaEnd(StringTableType& stringTable);
+	void AreaEnd(StringTableUnique& stringTable);
 	
 	void addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding);
 
-	AreaSubMesh* MeshForSide(const LvlBrushSide& side, StringTableType& stringTable);
-	AreaSubMesh* MeshForMat(const core::string& matName, StringTableType& stringTable);
+	AreaSubMesh* MeshForSide(const LvlBrushSide& side, StringTableUnique& stringTable);
+	AreaSubMesh* MeshForMat(const core::string& matName, StringTableUnique& stringTable);
 
 private:
 	AreaSubMesh* meshForSide(const LvlBrushSide& side);

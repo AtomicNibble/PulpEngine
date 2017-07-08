@@ -402,7 +402,7 @@ void LvlArea::AreaBegin(void)
 	model.beginModel();
 }
 
-void LvlArea::AreaEnd(StringTableType& stringTable)
+void LvlArea::AreaEnd(StringTableUnique& stringTable)
 {
 	for (const auto& it : areaMeshes)
 	{
@@ -499,7 +499,7 @@ void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& sid
 
 
 
-AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& stringTable)
+AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableUnique& stringTable)
 {
 	auto it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
 	if (it != areaMeshes.end()) {
@@ -519,7 +519,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 	return &newIt.first->second;
 }
 
-AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& stringTable)
+AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableUnique& stringTable)
 {
 	auto it = areaMeshes.find(matName);
 	if (it != areaMeshes.end()) {

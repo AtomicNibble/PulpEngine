@@ -95,7 +95,7 @@ private:
 	MultiRefArr multiRefEntLists_;
 	MultiRefArr multiModelRefLists_;
 
-	StringTableType stringTable_;
+	StringTableUnique stringTable_;
 };
 
 
