@@ -6,6 +6,7 @@
 #include <Math\VertexFormats.h>
 #include <String\StackString.h>
 #include <Time\CompressedStamps.h>
+#include <String\GrowingStringTable.h>
 
 #include <Util\Pointer64.h>
 
@@ -344,6 +345,9 @@ X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
 typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
+
+typedef core::GrowingStringTable<256, 16, 4, uint32_t> StringTable;
+typedef core::GrowingStringTableUnique<256, 16, 4, uint32_t> StringTableUnique;
 
 // I might make this a actualy material definition.
 // instead of the name of a material.
