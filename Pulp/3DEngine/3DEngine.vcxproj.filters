@@ -82,6 +82,9 @@
     <ClCompile Include="Vars\MaterialVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
+    <ClCompile Include="World\World3D.cpp">
+      <Filter>Source Files\World</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -159,6 +162,9 @@
     <ClInclude Include="Vars\MaterialVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="World\World3D.h">
+      <Filter>Header Files\World</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -215,6 +221,12 @@
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{41f474c8-58fd-4c6f-8f8c-ced3decc3fc3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\World">
+      <UniqueIdentifier>{f468ac99-5e50-4faa-8bec-08da5755efac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\World">
+      <UniqueIdentifier>{4e35fdca-3d78-4564-bd6c-2bf5f9da529f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Gui\XWindow.inl">
@@ -252,6 +264,9 @@
     </None>
     <None Include="Vars\MaterialVars.inl">
       <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="World\World3D.inl">
+      <Filter>Header Files\World</Filter>
     </None>
   </ItemGroup>
 </Project>

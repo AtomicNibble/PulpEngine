@@ -1252,6 +1252,9 @@
     <ClInclude Include="IEntity.h">
       <Filter>Interfaces_h\Game</Filter>
     </ClInclude>
+    <ClInclude Include="IWorld3D.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

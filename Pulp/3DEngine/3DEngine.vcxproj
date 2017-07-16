@@ -466,6 +466,7 @@
     <ClInclude Include="Vars\LevelVars.h" />
     <ClInclude Include="Vars\MaterialVars.h" />
     <ClInclude Include="Vars\TextureVars.h" />
+    <ClInclude Include="World\World3D.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -509,6 +510,7 @@
     <ClCompile Include="Vars\LevelVars.cpp" />
     <ClCompile Include="Vars\MaterialVars.cpp" />
     <ClCompile Include="Vars\TextureVars.cpp" />
+    <ClCompile Include="World\World3D.cpp" />
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -524,6 +526,7 @@
     <None Include="Vars\LevelVars.inl" />
     <None Include="Vars\MaterialVars.inl" />
     <None Include="Vars\TextureVars.inl" />
+    <None Include="World\World3D.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
