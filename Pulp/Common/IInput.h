@@ -293,6 +293,8 @@ struct KeyId
 
 		UNKNOWN,
 	};
+
+	static const uint32_t ENUM_COUNT = UNKNOWN;
 };
 
 
