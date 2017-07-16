@@ -10,6 +10,9 @@
 #include "Level\Level.h"
 #include "Vars\GameVars.h"
 
+#include "UserCmds\UserCmds.h"
+#include "UserCmds\UserCmdMan.h"
+
 X_NAMESPACE_DECLARE(render,
 	struct IRender
 );
@@ -71,6 +74,9 @@ private:
 private:
 	GameVars vars_;
 	World world_;
+
+	UserCmdGen userCmdGen_;
+	UserCmdMan userCmdMan_;
 };
 
 X_NAMESPACE_END
