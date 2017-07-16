@@ -17,6 +17,7 @@ X_DECLARE_ENUM(PrimContext)(
 
 class IPrimativeContext;
 struct IMaterialManager;
+struct IWorld3D;
 
 struct I3DEngine : public core::IEngineSysBase
 {
@@ -31,8 +32,12 @@ struct I3DEngine : public core::IEngineSysBase
 
 	// each enum has a instance, and you don't own the pointer.
 	virtual IPrimativeContext* getPrimContext(PrimContext::Enum user) X_ABSTRACT;
-
 	virtual IMaterialManager* getMaterialManager(void) X_ABSTRACT;
+
+	virtual IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_ABSTRACT;
+	virtual void release3DWorld(IWorld3D* pWorld) X_ABSTRACT;
+	virtual void addWorldToActiveList(IWorld3D* pWorld) X_ABSTRACT;
+	virtual void removeWorldFromActiveList(IWorld3D* pWorld) X_ABSTRACT;
 };
 
 

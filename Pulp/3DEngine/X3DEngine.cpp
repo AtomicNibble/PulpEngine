@@ -24,6 +24,7 @@
 #include "Drawing\CBufferManager.h"
 #include "Drawing\VariableStateManager.h"
 
+#include "World\World3D.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -45,7 +46,8 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // gui
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // profile
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }  // console
-	}
+	},
+	worlds_(arena)
 {
 	// check if the enum order was changed in a way that resulted in incorrect modes.
 	X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
@@ -63,14 +65,14 @@ X3DEngine::~X3DEngine()
 
 void X3DEngine::registerVars(void)
 {
-	level_.registerVars();
+	lvlVars_.registerVars();
 
 }
 
 void X3DEngine::registerCmds(void)
 {
-	ADD_COMMAND_MEMBER("map", this, X3DEngine, &X3DEngine::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
-	ADD_COMMAND_MEMBER("devmap", this, X3DEngine, &X3DEngine::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
+//	ADD_COMMAND_MEMBER("map", this, X3DEngine, &X3DEngine::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
+//	ADD_COMMAND_MEMBER("devmap", this, X3DEngine, &X3DEngine::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
 
 
 }
@@ -168,11 +170,6 @@ bool X3DEngine::init(void)
 	pPhysics_->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
 #endif
 
-
-	if (!level_.init()) {
-		X_ERROR("3DEngine", "Failed to init level");
-		return false;
-	}
 
 	pDepthStencil = pRender->createDepthBuffer("$depth_buffer", Vec2i(1680, 1050));
 
@@ -321,6 +318,38 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 	testBucket.submit();
 #endif
 
+
+#if 1
+	{
+		XCamera cam;
+		XViewPort viewPort = frame.view.viewport;
+
+		render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 8096 * 12);
+		cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+		render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, cam, viewPort);
+
+		geoBucket.appendRenderTarget(pRender->getCurBackBuffer());
+		geoBucket.setDepthStencil(pDepthStencil, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
+
+		if (pCBufMan_->update(frame, false))
+		{
+			render::Commands::Nop* pNop = geoBucket.addCommand<render::Commands::Nop>(0, 0);
+
+			pCBufMan_->updatePerFrameCBs(geoBucket, pNop);
+		}
+
+		for (auto* pWorld : worlds_)
+		{
+			static_cast<World3D*>(pWorld)->renderView(frame, geoBucket);
+			pWorld = nullptr;
+		}
+
+		geoBucket.sort();
+
+		pRender->submitCommandPackets(geoBucket);
+	}
+
+#else
 	{
 		// we need a buffer for the depth.
 	//	render::IPixelBuffer* pDepthStencil = pRender_->createPixelBuffer("$depth_buffer", Vec2i(1680, 1050),
@@ -354,6 +383,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		pRender->submitCommandPackets(geoBucket);
 
 	}
+#endif
 
 	// ok so lets dump out the primative context.
 	// I will need to have some sort of known time that it's 
@@ -908,6 +938,34 @@ IMaterialManager* X3DEngine::getMaterialManager(void)
 	return pMaterialManager_;
 }
 
+IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
+{
+	auto* pPrimContex = &primContexts_[engine::PrimContext::MISC3D];
+
+	return X_NEW(engine::World3D, g_3dEngineArena, "3DWorld")(lvlVars_, pPrimContex, pPhysScene, g_3dEngineArena);
+}
+
+void X3DEngine::release3DWorld(IWorld3D* pWorld)
+{
+	X_DELETE(pWorld, g_3dEngineArena);
+}
+
+void X3DEngine::addWorldToActiveList(IWorld3D* pWorld)
+{
+	worlds_.append(pWorld);
+}
+
+void X3DEngine::removeWorldFromActiveList(IWorld3D* pWorld)
+{
+	auto idx = worlds_.find(pWorld);
+	if (idx != WorldArr::invalid_index) {
+		worlds_.remove(pWorld);
+	}
+}
+
+
+// =======================================
+
 void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
 	// do nothing for now.
@@ -918,61 +976,5 @@ void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<c
 
 // =======================================
 
-
-
-void X3DEngine::LoadMap(const char* pMapName)
-{
-	X_ASSERT_NOT_NULL(pMapName);
-
-	level_.Load(pMapName);
-}
-
-void X3DEngine::LoadDevMap(const char* pMapName)
-{
-	X_ASSERT_NOT_NULL(pMapName);
-
-	// this should not really duplicate anything.
-	// set some vars then just load the map normaly tbh.
-
-	LoadMap(pMapName);
-}
-
-
-
-// Commands
-
-void X3DEngine::Command_Map(core::IConsoleCmdArgs* Cmd)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("3DEngine", "map <mapname>");
-		return;
-	}
-
-	const char* pMapName = Cmd->GetArg(1);
-
-	LoadMap(pMapName);
-}
-
-void X3DEngine::Command_DevMap(core::IConsoleCmdArgs* Cmd)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("3DEngine", "devmap <mapname>");
-		return;
-	}
-
-	const char* pMapName = Cmd->GetArg(1);
-
-	LoadDevMap(pMapName);
-}
-
-// ~Commands
 
 X_NAMESPACE_END

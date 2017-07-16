@@ -4,7 +4,7 @@
 #define _X_RENDER_SYS_H_
 
 #include "I3DEngine.h"
-#include "Level\Level.h"
+#include "Vars\LevelVars.h"
 
 #include <IModel.h>
 #include <IRenderMesh.h>
@@ -23,6 +23,8 @@ class TextureManager;
 
 class X3DEngine : public I3DEngine, public core::IXHotReload
 {
+	typedef core::Array<IWorld3D*> WorldArr;
+
 public:
 	X3DEngine(core::MemoryArenaBase* arena);
 	virtual ~X3DEngine() X_FINAL;
@@ -43,20 +45,14 @@ public:
 	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
 	IMaterialManager* getMaterialManager(void) X_FINAL;
 
+	IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_FINAL;
+	void release3DWorld(IWorld3D* pWorld) X_FINAL;
+	void addWorldToActiveList(IWorld3D* pWorld) X_FINAL;
+	void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
+
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
-
-private:
-
-	void LoadMap(const char* mapName);
-	void LoadDevMap(const char* mapName);
-
-
-private:
-	// vars / cmds
-	void Command_Map(core::IConsoleCmdArgs* Cmd);
-	void Command_DevMap(core::IConsoleCmdArgs* Cmd);
 
 private:
 	XMaterialManager* pMaterialManager_;
@@ -72,7 +68,10 @@ private:
 	PrimativeContextSharedResources primResources_;
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 	
-	level::Level level_;
+//	level::Level level_;
+	level::LevelVars lvlVars_;
+
+	WorldArr worlds_;
 };
 
 
