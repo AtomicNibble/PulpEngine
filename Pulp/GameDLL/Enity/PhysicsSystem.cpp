@@ -32,6 +32,9 @@ namespace entity
 
 		size_t numTransForms;
 		auto* pTransforms = pPhysScene->getActiveTransforms(numTransForms);
+		size_t numTriggerPairs;
+		auto* pTriggerPairs = pPhysScene->getTriggerPairs(numTriggerPairs);
+
 
 		for (size_t i = 0; i < numTransForms; i++)
 		{
@@ -42,6 +45,13 @@ namespace entity
 			auto& entTrans = reg.get<TransForm>(ent);
 
 			entTrans.trans = trans.actor2World;
+		}
+
+		for (size_t i = 0; i < numTriggerPairs; i++)
+		{
+			auto& trigPair = pTriggerPairs[i];
+			X_UNUSED(trigPair);
+
 		}
 
 	}
