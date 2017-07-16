@@ -11,7 +11,6 @@ X_NAMESPACE_BEGIN(level)
 
 
 X_DECLARE_ENUM(DrawSurfaceType)(FACE, DECAL, PATCH);
-X_DECLARE_ENUM(Side)(FRONT,BACK);
 
 
 struct LvlBrush;

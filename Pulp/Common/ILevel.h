@@ -342,6 +342,7 @@ X_DECLARE_FLAGS(LevelFileFlag)(
 typedef Flags<LevelFileFlag> LevelFileFlags;
 
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
+X_DECLARE_ENUM(Side)(FRONT, BACK);
 
 typedef Flags<MatContentFlags> MatContentFlag;
 typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
