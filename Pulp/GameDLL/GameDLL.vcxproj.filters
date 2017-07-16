@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Level">
       <UniqueIdentifier>{472eaa32-2158-4064-8e80-4ad49b57ce6f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UserCmds">
+      <UniqueIdentifier>{dfd0fcff-e228-4d3c-be79-a32a97852f6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\UserCmds">
+      <UniqueIdentifier>{454813b0-a6b0-474b-a81a-3f6101c37a1b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -72,6 +78,15 @@
     <ClInclude Include="Enity\PhysicsSystem.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
+    <ClInclude Include="UserCmds\UserCmds.h">
+      <Filter>Header Files\UserCmds</Filter>
+    </ClInclude>
+    <ClInclude Include="UserCmds\UserCmdMan.h">
+      <Filter>Header Files\UserCmds</Filter>
+    </ClInclude>
+    <ClInclude Include="UserCmds\UserCmd.h">
+      <Filter>Header Files\UserCmds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -100,6 +115,12 @@
     </ClCompile>
     <ClCompile Include="Enity\PhysicsSystem.cpp">
       <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCmds\UserCmds.cpp">
+      <Filter>Source Files\UserCmds</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCmds\UserCmdMan.cpp">
+      <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
