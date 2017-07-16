@@ -23,7 +23,7 @@ XGame::XGame(ICore* pCore) :
 	pTimer_(nullptr),
 	pRender_(nullptr),
 	pFovVar_(nullptr),
-	ents_(g_gameArena)
+	world_(g_gameArena)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
@@ -38,10 +38,10 @@ void XGame::registerVars(void)
 {
 
 	// register some vars
-	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::CHEAT,
-		"camera position");
-	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::CHEAT,
-		"camera angle(radians)");
+//	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::CHEAT,
+//		"camera position");
+//	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::CHEAT,
+//		"camera angle(radians)");
 
 	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(PIf),
 		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
@@ -55,6 +55,8 @@ void XGame::registerVars(void)
 
 void XGame::registerCmds(void)
 {
+	ADD_COMMAND_MEMBER("map", this, XGame, &XGame::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
+//	ADD_COMMAND_MEMBER("devmap", this, XGame, &XGame::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
 
 }
 
@@ -77,6 +79,16 @@ bool XGame::init(void)
 	X_ASSERT(deimension.y > 0, "height is not valid")(deimension.y);
 
 	cam_.SetFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
+
+
+	world_.init(gEnv->pPhysics);
+
+#if 0
+	ents_.init();
+	ents_.createPlayer(Vec3f(10.f, 10.f, 10.f));
+
+	level_.load("physics_test");
+#endif
 
 	return true;
 }
@@ -117,18 +129,22 @@ bool XGame::update(core::FrameData& frame)
 	// and each devices gets input events it's allowed to use.
 	// the problem is this data not linked to framedata
 	// so 
+
+	world_.update(frame);
+
 	ProcessInput(frame.timeInfo);
 
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
 
-
+#if 0
 	// Pro
 	frame.view.cam = cam_;
 	frame.view.projMatrix = cam_.getProjectionMatrix();
 	frame.view.viewMatrix = cam_.getViewMatrix();
 	frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
 	frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
+#endif
 
 	// orth
 	Matrix44f orthoProj;
@@ -176,6 +192,7 @@ void XGame::ProcessInput(core::FrameTimeData& timeInfo)
 
 		scale *= timeScale;
 
+#if 0
 		switch (e.keyId)
 		{
 			// forwards.
@@ -207,6 +224,7 @@ void XGame::ProcessInput(core::FrameTimeData& timeInfo)
 		default:
 			continue;
 		}
+#endif
 
 		// I want movement to be relative to the way the camera is facing.
 		// so if i'm looking 90 to the right the direction also needs to be rotated.
@@ -241,6 +259,19 @@ void XGame::OnFovChanged(core::ICVar* pVar)
 	cam_.setFov(fov);
 }
 
+
+void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
+{
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("Game", "map <mapname>");
+		return;
+	}
+
+	const char* pMapName = Cmd->GetArg(1);
+
+	world_.loadMap(pMapName);
+}
 
 
 

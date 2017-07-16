@@ -45,9 +45,8 @@ namespace entity
 			auto& con = reg.get<CharacterController>(entity);
 			auto& trans = reg.get<TransForm>(entity);
 
-			// Quatf angle = trans.trans.quat;
 			Vec3f displacement;
-			Vec3f angle = trans.trans.quat.getEuler();
+			auto angle = trans.trans.quat;
 
 			for (const auto& e : inputEvents_)
 			{
@@ -57,14 +56,10 @@ namespace entity
 				switch (e.keyId)
 				{
 					case input::KeyId::MOUSE_X:
-					//	angle *= Quatf(0, ::toRadians(-(e.value * 0.2f)), 0);
-						angle.z += -(e.value * 0.002f);
-
+						angle = Quatf(Vec3f::zAxis(), -(e.value * 0.002f)) * angle;
 						continue;
 					case input::KeyId::MOUSE_Y:
-					//	angle *= Quatf(0,0,::toRadians(-(e.value * 0.2f)));
-						angle.x += -(e.value * 0.002f);
-
+						angle = Quatf(Vec3f::xAxis(), -(e.value * 0.002f)) * angle;
 						continue;
 					default:
 						break;
@@ -99,20 +94,24 @@ namespace entity
 
 						// up / Down
 					case input::KeyId::Q:
-						posDelta.z = -scale;
+						upDisp.z = -scale;
 						break;
 					case input::KeyId::E:
-						posDelta.z = scale;
+						upDisp.z = scale;
 						break;
 
 					default:
 						continue;
 				}
 #if 1
-			//	Vec3f eu = angle.getEuler();
-				Matrix33f goat = Matrix33f::createRotation(angle);
+				//	Vec3f eu = angle.getEuler();
+				// Matrix33f rotationMat = Matrix33f::createRotation(angle);
+				// Matrix33f rotationMat = angle.toMatrix33();
+				Vec3f euler = angle.getEuler();
+				Matrix33f rotationMat = Matrix33f::createRotation(euler);
 
-				displacement += (goat * posDelta);
+				displacement += (rotationMat * posDelta);
+			//	displacement.z += deltaZ;
 #else
 
 				displacement += (angle * posDelta);
@@ -133,12 +132,15 @@ namespace entity
 
 
 				trans.trans.pos = con.pController->getPosition();
-				trans.trans.quat = Quatf(angle.x, angle.y, angle.z);
 			}
+			
+			// remvoe any y axis rotation.
+			trans.trans.quat = angle;
 		}
 
 
 		inputEvents_.clear();
+
 
 	}
 

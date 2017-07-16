@@ -25,10 +25,6 @@ namespace entity
 		void setActiveEnt(EntityId entId);
 
 	private:
-		void OnCamPosChanged(core::ICVar* pVar);
-		void OnCamAngChanged(core::ICVar* pVar);
-
-	private:
 		EntityId activeEnt_;
 
 		bool setCamPos_;
@@ -36,6 +32,7 @@ namespace entity
 
 		Vec3f cameraPos_;
 		Vec3f cameraAngle_;
+		Vec3f cameraAngleDeg_;
 
 		XCamera cam_;
 	};

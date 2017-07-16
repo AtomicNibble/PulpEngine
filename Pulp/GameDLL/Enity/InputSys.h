@@ -31,6 +31,7 @@ namespace entity
 		// ~IInputEventListner
 
 	private:
+
 		input::InputEventBuffer inputEvents_;
 	};
 

@@ -30,13 +30,14 @@ namespace entity
 		void update(core::FrameData& frame);
 
 		EntityId createPlayer(const Vec3f& origin);
-		EntityId createCamera(const Vec3f& origin);
+	//	EntityId createCamera(const Vec3f& origin);
 
 		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
 
 	private:
 		bool parseMiscModels(core::json::Value::Array val);
 		bool parseScriptOrigins(core::json::Value::Array val);
+		bool parseTriggers(core::json::Value::Array val);
 
 
 	private:

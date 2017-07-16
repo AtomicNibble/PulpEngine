@@ -19,6 +19,9 @@ X_NAMESPACE_DECLARE(core,
 	struct FrameData;
 )
 
+X_NAMESPACE_DECLARE(engine,
+	struct IWorld3D;
+)
 
 
 X_NAMESPACE_BEGIN(game)
@@ -33,11 +36,15 @@ namespace entity
 class Level
 {
 public:
-	Level(core::MemoryArenaBase* arena, entity::EnititySystem& entSys);
+	Level(core::MemoryArenaBase* arena, physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys);
 	~Level();
 
+	void update(core::FrameData& frame);
+
 	void load(const char* pMapName);
-	void free(void);
+	void clear(void);
+
+	X_INLINE bool isLoaded(void) const;
 
 private:
 	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
@@ -55,14 +62,23 @@ private:
 	core::IFileSys* pFileSys_;
 	entity::EnititySystem& entSys_;
 
+	bool loaded_;
+	bool _pad[3];
+
 	core::Path<char> path_;
 	level::FileHeader fileHdr_;
 	core::UniquePointer<uint8_t[]> levelData_;
 
-	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
+	engine::IWorld3D* p3DWorld_;
+	physics::IScene* pScene_;
 
-
+	level::StringTable stringTable_;
 };
+
+X_INLINE bool Level::isLoaded(void) const
+{
+	return loaded_;
+}
 
 
 class World
@@ -72,6 +88,8 @@ public:
 	~World();
 
 	bool init(physics::IPhysics* pPhys);
+	bool loadMap(const char* pMapName);
+
 	void update(core::FrameData& frame);
 
 
@@ -79,11 +97,13 @@ private:
 	bool createPhysicsScene(physics::IPhysics* pPhys);
 
 private:
+	core::MemoryArenaBase* arena_;
+	physics::IPhysics* pPhys_;
 	physics::IScene* pScene_;
 
 	
 	entity::EnititySystem ents_;
-	Level level_;
+	core::UniquePointer<Level> level_;
 };
 
 

@@ -116,6 +116,16 @@ namespace entity
 			}
 		}
 
+		if (d.HasMember("trigger"))
+		{
+			auto arr = d["trigger"].GetArray();
+
+			if (!parseTriggers(arr))
+			{
+				return false;
+			}
+		}
+
 
 		return true;
 	}
@@ -176,6 +186,12 @@ namespace entity
 		return true;
 	}
 
+	bool EnititySystem::parseTriggers(core::json::Value::Array val)
+	{
+		X_UNUSED(val);
+
+		return true;
+	}
 
 } // namespace entity
 

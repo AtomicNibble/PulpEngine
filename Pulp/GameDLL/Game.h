@@ -7,14 +7,15 @@
 #include <IInput.h>
 #include <ITimer.h>
 
-#include "Enity\EnitiySystem.h"
-
+#include "Level\Level.h"
+#include "Vars\GameVars.h"
 
 X_NAMESPACE_DECLARE(render,
 	struct IRender
 );
 X_NAMESPACE_DECLARE(core,
-	struct ICVar
+	struct ICVar;
+	struct IConsoleCmdArgs;
 );
 
 X_NAMESPACE_BEGIN(game)
@@ -47,8 +48,11 @@ public:
 		
 private:
 	void ProcessInput(core::FrameTimeData& timeInfo);
-	
+
 	void OnFovChanged(core::ICVar* pVar);
+
+
+	void Command_Map(core::IConsoleCmdArgs* Cmd);
 
 private:
 	ICore* pCore_;
@@ -60,12 +64,13 @@ private:
 	Vec3f cameraPos_;
 	Vec3f cameraAngle_;
 
-	core::FixedArray<input::InputEvent, 256> inputEvents_;
+	input::InputEventBuffer inputEvents_;
 
 	XCamera cam_;
 
 private:
-	EnititySystem ents_;
+	GameVars vars_;
+	World world_;
 };
 
 X_NAMESPACE_END

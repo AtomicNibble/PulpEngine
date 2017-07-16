@@ -21,7 +21,6 @@ private:
 
 	Vec3f cameraPos_;
 	Vec3f cameraAngle_;
-
 };
 
 X_NAMESPACE_END
