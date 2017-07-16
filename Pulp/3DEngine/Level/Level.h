@@ -115,8 +115,6 @@ public:
 
 struct Area
 {
-//	typedef core::FixedArray<Planef, PortalStack::MAX_PORTAL_PLANES + 1> PortalPlanesArr;
-//	typedef core::Array<PortalPlanesArr> VisPortalsArr;
 	typedef core::Array<AreaVisiblePortal> VisPortalsArr;
 	typedef core::Array<AreaPortal> AreaPortalArr;
 	typedef core::Array<uint32_t> EntIdArr;
@@ -136,6 +134,8 @@ public:
 	model::MeshHeader* pMesh;
 	// the gpu buffers for the area mesh.
 	model::XRenderMesh renderMesh;
+	// the physics for this area.
+	physics::ActorHandle physicsActor;
 	// portals leading out this area.
 	AreaPortalArr portals;
 
@@ -289,7 +289,7 @@ private:
 	render::CommandBucket<uint32_t>* pBucket_;
 
 private:
-	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
+	StringTable stringTable_;
 
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;

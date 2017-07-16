@@ -156,8 +156,6 @@ Level::Level() :
 
 	pFileData_ = nullptr;
 
-	pTimer_ = nullptr;
-	pFileSys_ = nullptr;
 
 	core::zero_object(fileHdr_);
 	core::zero_object(visibleAreaFlags_);
@@ -172,6 +170,7 @@ Level::Level() :
 	pFileSys_ = gEnv->pFileSys;
 	pJobSys_ = gEnv->pJobSys;
 	pPrimContex_ = nullptr;
+
 	pScene_ = nullptr;
 }
 
@@ -219,6 +218,7 @@ void Level::free(void)
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
 		pFileData_ = nullptr;
 	}
+
 
 	if (pScene_) {
 		gEnv->pPhysics->releaseScene(pScene_);
@@ -270,6 +270,41 @@ void Level::dispatchJobs(core::FrameData& frame, render::CommandBucket<uint32_t>
 		cam_ = frame.view.cam;
 	}
 
+	
+
+
+	{
+		Vec3f pos(-325, 768, 127);
+
+#if 0
+		for (size_t i = 0; i < 2048; i++)
+		{
+			// make a grid
+			// rows of 64
+			size_t x = (i % 64) * 20;
+			size_t y = (i / 64) * 30;
+			size_t z = 0;
+
+			int32_t lod = (int32_t)(i / 512);
+
+			pPrimContex_->drawSphere(Sphere(pos + Vec3f((float)x, (float)y, (float)z), 10.f), Col_Red, false, lod);
+		}
+#endif
+
+#if 0
+		pPrimContex_->drawSphere(Sphere(pos + Vec3f(40, 0, 0), 10.f), Col_Red, false, 0);
+		pPrimContex_->drawSphere(Sphere(pos + Vec3f(40, 0, 40), 15.f), Col_Pink, false, 1);
+		pPrimContex_->drawSphere(Sphere(pos + Vec3f(40, 40, 0), 20.f), Col_Goldenrod, true, 2);
+		pPrimContex_->drawSphere(Sphere(pos + Vec3f(40, 0, -40), 30.f), Col_Chocolate, true, 3);
+
+		pPrimContex_->drawCone(pos + Vec3f(40, 100, 60),  Vec3f(1, 0, 0), 20.f, 50.f, Col_Wheat, false, 3);
+		pPrimContex_->drawCone(pos + Vec3f(140, 100, 60),  Vec3f(0, 1, 0), 30.f, 75.f, Col_Hotpink, false);
+
+		pPrimContex_->drawCylinder(pos + Vec3f(100, 100, -40), Vec3f(0, 1, 0), 10.f, 80.f, Col_Lawngreen, false, 3);
+		pPrimContex_->drawCylinder(pos + Vec3f(180, 100, -40), Vec3f(0, 0, 1), 10.f, 30.f, Col_Tomato, false);
+
+#endif
+	}
 
 	// here is where we work out if the level is loaded.
 	// if it's loaded we want to make visibility jobs.
@@ -752,8 +787,10 @@ void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numArea
 
 bool Level::createPhysicsScene(void)
 {
+	auto* pPhys = gEnv->pPhysics;
+
 	if (pScene_) {
-		gEnv->pPhysics->releaseScene(pScene_);
+		pPhys->releaseScene(pScene_);
 	}
 
 	// lets make a scene.
@@ -767,7 +804,7 @@ bool Level::createPhysicsScene(void)
 	sceneDesc.sanityBounds = AABB(Vec3f(static_cast<float>(level::MIN_WORLD_COORD)),
 		Vec3f(static_cast<float>(level::MAX_WORLD_COORD)));
 
-	pScene_ = gEnv->pPhysics->createScene(sceneDesc);
+	pScene_ = pPhys->createScene(sceneDesc);
 	if (!pScene_) {
 		return false;
 	}

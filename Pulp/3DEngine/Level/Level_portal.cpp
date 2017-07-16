@@ -347,6 +347,15 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, in
 	// where to store them tho since we can have multiple per a area.
 	// make just collect them and pass?
 
+
+	// when we check if a plane is behind us we allow some laps.
+	// so this means we can go throught a portal then end up coming back throught it in the other
+	// direction. we need to handle this correctly as it will result in potentially too many visible portals for a area.
+	if (areaNum == camArea_ && areaFrom >= 0) {
+		X_WARNING("Level", "Portal flood ended back in cam area skipping visibility for stack");
+		return;
+	}
+
 	Area& area = areas_[areaNum];
 
 	{
@@ -361,15 +370,20 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, in
 	// we need to work out which visible portal index to use.
 	// should we just inc the index?
 	// or have some logic for working it out :/ ?
-	const int32_t visPortalIdx = core::atomic::Increment(&area.cusVisPortalIdx);
+	int32_t visPortalIdx = -1;
 
-	X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
-	
-	area.visPortals[visPortalIdx].areaFrom = areaFrom;
+	if (area.maxVisPortals)
+	{
+		visPortalIdx = core::atomic::Increment(&area.cusVisPortalIdx);
 
-	if (ps) {
-		// this is thread safe as each thread gets a diffrent idx.
-		area.visPortals[visPortalIdx].planes = ps->portalPlanes;
+		X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
+
+		area.visPortals[visPortalIdx].areaFrom = areaFrom;
+
+		if (ps) {
+			// this is thread safe as each thread gets a diffrent idx.
+			area.visPortals[visPortalIdx].planes = ps->portalPlanes;
+		}
 	}
 
 	AreaCullJobData data = { areaNum, visPortalIdx };
@@ -392,6 +406,12 @@ void Level::CullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2
 	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[jobData.areaIdx];
 	size_t i = areaModelsHdr.startIndex;
 	size_t end = i + areaModelsHdr.num;
+
+
+	if (jobData.visPortalIdx < 0)
+	{
+		return;
+	}
 
 	auto& visPortal = area.visPortals[jobData.visPortalIdx];
 
@@ -701,12 +721,15 @@ void Level::DrawStaticModels(const uint32_t* pEntIds, uint32_t num)
 
 void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, const float distanceFromCam)
 {
-	render::CommandBucket<uint32_t>* pDepthBucket = nullptr;
+	render::CommandBucket<uint32_t>* pDepthBucket = pBucket_;
 
 
 	render::VertexBufferHandleArr vertexBuffers = renderMesh.getVBBuffers();
 
 	// we want to remove vertex buffer handles we don't need.
+	// but can we do that on a perm mesh bases?
+	// since with have diffrent materials 
+	// so it's the requirement of the material as to what buffers it needs.
 	const core::StrHash tech("unlit");
 
 	// now we render :D !
@@ -722,6 +745,7 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 			continue;
 		}
 
+
 		const auto* pPerm = pTech->pPerm;
 		const auto stateHandle = pPerm->stateHandle;
 		const auto* pVariableState = pTech->pVariableState;
@@ -730,7 +754,51 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 
 		uint32_t sortKey = static_cast<uint32_t>(distanceFromCam);
 
-		render::Commands::DrawIndexed* pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
+		render::Commands::CopyConstantBufferData* pCBufUpdate = nullptr;
+		if (variableStateSize)
+		{
+#if 0
+			const auto numCBs = pTech->pVariableState->getNumCBs();
+			if (numCBs)
+			{
+				const auto* pCBHandles = pTech->pVariableState->getCBs();
+				const auto& cbLinks = pPerm->pShaderPerm->getCbufferLinks();
+
+				for (int8_t j = 0; j < numCBs; j++)
+				{
+					auto& cbLink = cbLinks[j];
+					auto& cb = *cbLink.pCBufer;
+
+					if (!cb.requireManualUpdate())
+					{
+						// might as well provide intial data.
+						if (pCBufMan_->autoUpdateBuffer(cb))
+						{
+							pCBufUpdate = pDepthBucket->addCommand<render::Commands::CopyConstantBufferData>(static_cast<uint32_t>(sortKey),cb.getBindSize());
+							char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pCBufUpdate);
+							std::memcpy(pAuxData, cb.getCpuData().data(), cb.getBindSize());
+
+							pCBufUpdate->constantBuffer = pCBHandles[j];
+							pCBufUpdate->pData = pAuxData; // cb.getCpuData().data();
+							pCBufUpdate->size = cb.getBindSize();
+						}
+					}
+				}
+			}
+#endif
+		}
+
+		render::Commands::DrawIndexed* pDraw = nullptr;
+
+		if (pCBufUpdate) 
+		{
+			pDraw = pDepthBucket->appendCommand<render::Commands::DrawIndexed>(pCBufUpdate, variableStateSize);
+		}
+		else
+		{
+			pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
+		}
+
 		pDraw->indexCount = pSubMesh->numIndexes;
 		pDraw->startIndex = pSubMesh->startIndex;
 		pDraw->baseVertex = pSubMesh->startVertex;
