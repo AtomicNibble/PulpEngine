@@ -1255,6 +1255,9 @@
     <ClInclude Include="IWorld3D.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
+    <ClInclude Include="Math\XAngles.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1589,6 +1592,9 @@
     </None>
     <None Include="Containers\FixedByteStream.inl">
       <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Math\XAngles.inl">
+      <Filter>Headers\Math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

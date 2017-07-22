@@ -196,6 +196,7 @@
     <ClInclude Include="Math\VertexFormats.h" />
     <ClInclude Include="Math\XAabb.h" />
     <ClInclude Include="Math\XAlignment.h" />
+    <ClInclude Include="Math\XAngles.h" />
     <ClInclude Include="Math\XCamera.h" />
     <ClInclude Include="Math\XColor.h" />
     <ClInclude Include="Math\XColorPacking.h" />
@@ -629,6 +630,7 @@
     <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl" />
     <None Include="Logging\Logger.inl" />
     <None Include="Logging\LoggerBase.inl" />
+    <None Include="Math\XAngles.inl" />
     <None Include="Math\XInterpolate.inl" />
     <None Include="Math\XFrustum.inl" />
     <None Include="Math\XTransform.inl" />
