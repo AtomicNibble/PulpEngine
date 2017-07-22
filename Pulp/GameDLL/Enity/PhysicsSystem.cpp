@@ -44,7 +44,8 @@ namespace entity
 
 			auto& entTrans = reg.get<TransForm>(ent);
 
-			entTrans.trans = trans.actor2World;
+			entTrans.pos = trans.actor2World.pos;
+			entTrans.quat = trans.actor2World.quat;
 		}
 
 		for (size_t i = 0; i < numTriggerPairs; i++)

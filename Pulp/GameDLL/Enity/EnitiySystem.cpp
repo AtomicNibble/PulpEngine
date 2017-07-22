@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "EnitiySystem.h"
+#include "UserCmds\UserCmdMan.h"
 
 #include <String\Json.h>
 #include <Hashing\Fnva1Hash.h>
@@ -25,8 +26,8 @@ namespace entity
 
 	bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
 	{
-		pPhysics_ = pPhysics;
-		pPhysScene_ = pPhysScene;
+		pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
+		pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);
 
 		if (!inputSys_.init()) {
 			return false;
@@ -36,14 +37,88 @@ namespace entity
 			return false;
 		}
 
+		for (uint32_t i = 0; i < MAX_PLAYERS; i++) {
+			auto id = createEnt();
+			if (id != i) {
+				X_ASSERT_UNREACHABLE();
+				return false;
+			}
+		}
+
 		return true;
 	}
 
 
-	void EnititySystem::update(core::FrameData& frame)
+	void EnititySystem::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 	{
 		// process input.
-		inputSys_.update(frame.timeInfo, ecs_, pPhysScene_);
+	//	inputSys_.update(frame.timeInfo, ecs_, pPhysScene_);
+
+		// process the userCmd for the current player.
+		EntityId id = 0;
+
+		auto& userCmd = userCmdMan.getUserCmdForPlayer(id);
+		auto unread = userCmdMan.getNumUnreadFrames(id);
+		X_UNUSED(unread);
+
+		X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
+		{
+			const float speed = 250.f;
+			const float gravity = -100.f;
+			const float timeDelta = frame.timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
+			const float timeScale = speed * frame.timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
+
+			auto upDisp = Vec3f::zAxis();
+			upDisp *= gravity * timeDelta;
+
+			Vec3f displacement;
+
+			if (userCmd.moveForwrd != 0)
+			{
+				displacement.y += userCmd.moveForwrd * timeDelta * speed;
+			}
+			if (userCmd.moveRight != 0)
+			{
+				displacement.x += userCmd.moveRight * timeDelta * speed;
+			}
+
+			displacement += upDisp;
+
+			if (ecs_.has<Player, CharacterController>(id))
+			{
+				auto& con = ecs_.get<CharacterController>(id);
+				auto& trans = ecs_.get<TransForm>(id);
+				auto& player = ecs_.get<Player>(id);
+
+
+				physics::ScopedLock lock(pPhysScene_, true);
+
+				auto flags = con.pController->move(displacement, 0.f, timeDelta);
+				if (flags.IsAnySet())
+				{
+
+				}
+
+
+				auto& a = userCmd.angles;
+				trans.pos = con.pController->getPosition();
+
+
+				// for the position we want to just add the delta.
+				// which is in axis angles.
+				// but then we also want to clamp the view.
+				
+				
+				//viewAngles.pitch = std::min(viewAngles.pitch, pm_maxviewpitch.GetFloat() * restrict);
+				//viewAngles.pitch = std::max(viewAngles.pitch, pm_minviewpitch.GetFloat() * restrict);
+
+				trans.quat = a.toQuat();
+
+				player.cameraOrigin = trans.pos + player.eyeOffset;
+				player.cameraAxis = a; // trans.quat.getEuler();
+			}
+		}
+
 
 		// update the cameras.
 		cameraSys_.update(frame, ecs_, pPhysScene_);
@@ -51,35 +126,50 @@ namespace entity
 	}
 
 
-
-	EnititySystem::EntityId EnititySystem::createPlayer(const Vec3f& origin)
+	EntityId EnititySystem::createEnt(void)
 	{
-		auto ent = ecs_.create<TransForm, CharacterController>();
-		auto& trans = ecs_.get<TransForm>(ent);
-		auto& con = ecs_.get<CharacterController>(ent);
+		auto ent = ecs_.create<TransForm>();
+
+		return ent;
+	}
+
+	void EnititySystem::makePlayer(EntityId id)
+	{
+		// auto trans = ecs_.assign<TransForm>(id);
+		auto& player = ecs_.assign<Player>(id);
+
+		player.eyeOffset = Vec3f(0, 0, 50.f);
+		player.cameraOrigin = Vec3f(0, 0, 50.f);
+		player.cameraAxis = Anglesf(0, 0, 0.f);
+
+		// temp.
+		cameraSys_.setActiveEnt(id);
+	}
+
+	bool EnititySystem::addController(EntityId id)
+	{
+		auto& trans = ecs_.get<TransForm>(id);
+		auto& con = ecs_.assign<CharacterController>(id);
 
 		physics::CapsuleControllerDesc desc;
 		desc.radius = 20.f;
 		desc.height = 1.f;
 		desc.climbingMode = physics::CapsuleControllerDesc::ClimbingMode::Easy;
 		desc.material = pPhysics_->getDefaultMaterial();
-		desc.position = origin;
+		desc.position = trans.pos;
 		desc.upDirection = Vec3f::zAxis();
 
-		trans.trans.pos = origin;
-		trans.trans.quat = Quatf::identity();
 		con.pController = pPhysScene_->createCharacterController(desc);
 
 		if (con.pController == nullptr)
 		{
-			ecs_.destroy(ent);
-			return EnitiyRegister::INVALID_ID;
+			ecs_.remove<CharacterController>(id);
+			return false;
 		}
 
-		cameraSys_.setActiveEnt(ent);
-
-		return ent;
+		return true;
 	}
+
 
 	bool EnititySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
 	{
@@ -134,8 +224,8 @@ namespace entity
 	{
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = ecs_.create<Position, PhysicsComponent>();
-			auto& pos = ecs_.get<Position>(ent);
+			auto ent = ecs_.create<TransForm, PhysicsComponent>();
+			auto& trans = ecs_.get<TransForm>(ent);
 	//		auto& phys = ecs_.get<PhysicsComponent>(ent);
 
 			auto& kvps = *it;
@@ -143,7 +233,7 @@ namespace entity
 			const char* pOrigin = kvps["origin"].GetString();
 			const char* pModel = kvps["model"].GetString();
 
-			if (sscanf_s(pOrigin, "%f %f %f", &pos.pos.x, &pos.pos.y, &pos.pos.z) != 3) {
+			if (sscanf_s(pOrigin, "%f %f %f", &trans.pos.x, &trans.pos.y, &trans.pos.z) != 3) {
 				return false;
 			}
 
@@ -167,8 +257,8 @@ namespace entity
 	{
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = ecs_.create<Position, ScriptName>();
-			auto& pos = ecs_.get<Position>(ent);
+			auto ent = ecs_.create<TransForm, ScriptName>();
+			auto& trans = ecs_.get<TransForm>(ent);
 			auto& name = ecs_.get<ScriptName>(ent);
 
 			auto& kvps = *it;
@@ -176,7 +266,8 @@ namespace entity
 			const char* pOrigin = kvps["origin"].GetString();
 			const char* pTargetName = kvps["targetname"].GetString();
 
-			if (sscanf_s(pOrigin, "%f %f %f", &pos.pos.x, &pos.pos.y, &pos.pos.z) != 3) {
+			auto& pos = trans.pos;
+			if (sscanf_s(pOrigin, "%f %f %f", &pos.x, &pos.y, &pos.z) != 3) {
 				return false;
 			}
 

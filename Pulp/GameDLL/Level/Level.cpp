@@ -10,12 +10,13 @@
 #include <IFileSys.h>
 #include <IFrameData.h>
 
+#include "UserCmds\UserCmdMan.h"
 
 
 X_NAMESPACE_BEGIN(game)
 
-Level::Level(core::MemoryArenaBase* arena, physics::IScene* pScene, 
-	engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys) :
+Level::Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, 
+	entity::EnititySystem& entSys, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	stringTable_(arena),
 	entSys_(entSys),
@@ -312,11 +313,13 @@ bool Level::processData(void)
 // -------------------------------------
 
 
-World::World(core::MemoryArenaBase* arena) :
+World::World(physics::IPhysics* pPhys, UserCmdMan& userCmdMan, core::MemoryArenaBase* arena) :
 	arena_(arena),
+	pPhys_(pPhys),
 	pScene_(nullptr),
 	ents_(arena),
-	level_(arena)
+	level_(arena),
+	userCmdMan_(userCmdMan)
 {
 
 }
@@ -326,31 +329,6 @@ World::~World()
 
 }
 
-bool World::init(physics::IPhysics* pPhys)
-{
-	pPhys_ = pPhys;
-
-#if 0
-	if (!createPhysicsScene(pPhys)) {
-		return false;
-	}
-
-	if (!ents_.init(pPhys, pScene_)) {
-		return false;
-	}
-#endif
-
-#if 0
-	auto* pWorld3D = gEnv->p3DEngine->create3DWorld(pScene_);
-
-	level_ = core::makeUnique<Level>(arena_, arena_, pScene_, pWorld3D, ents_);
-	level_->load("physics_test");
-
-
-	ents_.createPlayer(Vec3f(-128.f, 0.f, 500.f));
-#endif
-	return true;
-}
 
 bool World::loadMap(const char* pMapName)
 {
@@ -366,28 +344,49 @@ bool World::loadMap(const char* pMapName)
 
 	auto* pWorld3D = gEnv->p3DEngine->create3DWorld(pScene_);
 
-	level_ = core::makeUnique<Level>(arena_, arena_, pScene_, pWorld3D, ents_);
+	level_ = core::makeUnique<Level>(arena_, pScene_, pWorld3D, ents_, arena_);
 	level_->load(pMapName);
 
-	ents_.createPlayer(Vec3f(-128.f, 0.f, 50.f));
+	spawnPlayer(0);
 
 	return true;
 }
 
-void World::update(core::FrameData& frame)
+void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 {
-
+	X_UNUSED(userCmdMan);
 
 	if (level_ && level_->isLoaded()) 
 	{
-		ents_.update(frame);
+		ents_.update(frame, userCmdMan);
 		
 		level_->update(frame);
 	}
 
 }
 
+void World::spawnPlayer(entity::EntityId id)
+{
+	X_ASSERT(id < MAX_PLAYERS, "Invalide player id")(id);
+	X_ASSERT_NOT_NULL(pScene_);
 
+	// we want to take the give ent and set it up as a player.
+	// the ent may not have all the required components yet.
+	// we also want to support spawning diffrent types of players with various definitions.
+	// maybe i should write some system for defining what each enity type has.
+	// for now can be just in code, but setup in way that can be data driven.
+	// which ia suspect should be handled by the enitiy system.
+	// so we allmost what a make ent type helper, that we can just call and it makes the ent a player.
+	// then here we can do shit with the player.
+
+	ents_.makePlayer(id);
+
+	auto& trans = ents_.getRegister().get<entity::TransForm>(id);
+	trans.pos = Vec3f(-80, 0, 10);
+	ents_.addController(id);
+
+	userCmdMan_.resetPlayer(id);
+}
 
 bool World::createPhysicsScene(physics::IPhysics* pPhys)
 {

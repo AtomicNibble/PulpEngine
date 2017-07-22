@@ -26,6 +26,8 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(game)
 
+class UserCmdMan;
+
 namespace entity
 {
 	class EnititySystem;
@@ -36,7 +38,7 @@ namespace entity
 class Level
 {
 public:
-	Level(core::MemoryArenaBase* arena, physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys);
+	Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys, core::MemoryArenaBase* arena);
 	~Level();
 
 	void update(core::FrameData& frame);
@@ -84,14 +86,15 @@ X_INLINE bool Level::isLoaded(void) const
 class World
 {
 public:
-	World(core::MemoryArenaBase* arena);
+	World(physics::IPhysics* pPhys, UserCmdMan& userCmdMan, core::MemoryArenaBase* arena);
 	~World();
 
-	bool init(physics::IPhysics* pPhys);
 	bool loadMap(const char* pMapName);
 
-	void update(core::FrameData& frame);
+	void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
+
+	void spawnPlayer(entity::EntityId id);
 
 private:
 	bool createPhysicsScene(physics::IPhysics* pPhys);
@@ -101,9 +104,10 @@ private:
 	physics::IPhysics* pPhys_;
 	physics::IScene* pScene_;
 
-	
 	entity::EnititySystem ents_;
 	core::UniquePointer<Level> level_;
+
+	UserCmdMan& userCmdMan_;
 };
 
 

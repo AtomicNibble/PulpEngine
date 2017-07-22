@@ -19,11 +19,13 @@ namespace
 }
 
 XGame::XGame(ICore* pCore) :
+	arena_(g_gameArena),
 	pCore_(pCore),
 	pTimer_(nullptr),
 	pRender_(nullptr),
 	pFovVar_(nullptr),
-	world_(g_gameArena)
+	world_(arena_),
+	localClientId_(entity::INVALID_ID)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
@@ -68,7 +70,6 @@ bool XGame::init(void)
 	X_ASSERT_NOT_NULL(gEnv->pTimer);
 	X_ASSERT_NOT_NULL(gEnv->pRender);
 
-	gEnv->pInput->AddEventListener(this);
 	pTimer_ = gEnv->pTimer;
 	pRender_ = gEnv->pRender;
 
@@ -80,15 +81,11 @@ bool XGame::init(void)
 
 	cam_.SetFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
 
+	// fiuxed for now, will match network id or something later
+	localClientId_ = 0;
 
-	world_.init(gEnv->pPhysics);
 
-#if 0
-	ents_.init();
-	ents_.createPlayer(Vec3f(10.f, 10.f, 10.f));
-
-	level_.load("physics_test");
-#endif
+	userCmdGen_.init();
 
 	return true;
 }
@@ -96,8 +93,6 @@ bool XGame::init(void)
 bool XGame::shutDown(void)
 {
 	X_LOG0("Game", "Shutting Down");
-
-	pCore_->GetIInput()->RemoveEventListener(this);
 
 	if (pFovVar_) {
 		pFovVar_->Release();
@@ -130,9 +125,43 @@ bool XGame::update(core::FrameData& frame)
 	// the problem is this data not linked to framedata
 	// so 
 
-	world_.update(frame);
+	Angles<float> goat;
 
-	ProcessInput(frame.timeInfo);
+	auto quat = goat.toQuat();
+	auto foward = goat.toForward();
+
+	userCmdGen_.buildUserCmd();
+	auto& userCmd = userCmdGen_.getCurrentUsercmd();
+
+	// so i want to store the input for what ever player we are but maybe I don't event have a level yet.
+	// but we will likley want players before we have a level
+	// for lobbies and stuff.
+	// i kinda wanna clear all ents when you change level, which is why it's part of the world currently.
+	// but makes it annoying to persist shit.
+	// what if we just have diffrent registries?
+	// one for players lol.
+	// or should all this logic only happen if you in a bucket?
+
+	userCmdMan_.addUserCmdForPlayer(localClientId_, userCmd);
+
+	// do we actually have a player?
+	// aka is a level loaded shut like that.
+	// if not nothing todo.
+	if (world_) {
+		world_->update(frame, userCmdMan_);
+	}
+	else
+	{
+		// orth
+		Matrix44f orthoProj;
+		MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
+
+		frame.view.viewMatrixOrtho = Matrix44f::identity();
+		frame.view.projMatrixOrtho = orthoProj;
+		frame.view.viewProjMatrixOrth = frame.view.viewMatrixOrtho * orthoProj;
+	}
+
+//	ProcessInput(frame.timeInfo);
 
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
@@ -153,8 +182,6 @@ bool XGame::update(core::FrameData& frame)
 	frame.view.viewMatrixOrtho = Matrix44f::identity();
 	frame.view.projMatrixOrtho = orthoProj;
 	frame.view.viewProjMatrixOrth = frame.view.viewMatrixOrtho * orthoProj;
-
-
 
 
 	return true;
@@ -236,21 +263,6 @@ void XGame::ProcessInput(core::FrameTimeData& timeInfo)
 	inputEvents_.clear();
 }
 
-bool XGame::OnInputEvent(const input::InputEvent& event)
-{
-	// theses event have pointers to symbols that will change in next input poll
-	// but we don't use any of the data from symbol.
-	inputEvents_.emplace_back(event);
-	return false;
-}
-
-bool XGame::OnInputEventChar(const input::InputEvent& event)
-{
-	X_UNUSED(event);
-
-	return false;
-}
-
 void XGame::OnFovChanged(core::ICVar* pVar)
 {
 	float fovDegress = pVar->GetFloat();
@@ -270,7 +282,13 @@ void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
 
 	const char* pMapName = Cmd->GetArg(1);
 
-	world_.loadMap(pMapName);
+	world_ = core::makeUnique<World>(arena_, gEnv->pPhysics, userCmdMan_, arena_);
+
+	if (world_) {
+		if (!world_->loadMap(pMapName)) {
+			X_ERROR("Game", "Failed to load map");
+		}
+	}
 }
 
 

@@ -12,7 +12,7 @@ namespace entity
 	bool InputSystem::init(void)
 	{
 
-		gEnv->pInput->AddEventListener(this);
+	//	gEnv->pInput->AddEventListener(this);
 
 		return true;
 	}
@@ -46,7 +46,7 @@ namespace entity
 			auto& trans = reg.get<TransForm>(entity);
 
 			Vec3f displacement;
-			auto angle = trans.trans.quat;
+			auto angle = trans.quat;
 
 			for (const auto& e : inputEvents_)
 			{
@@ -131,11 +131,11 @@ namespace entity
 				}
 
 
-				trans.trans.pos = con.pController->getPosition();
+				trans.pos = con.pController->getPosition();
 			}
 			
 			// remvoe any y axis rotation.
-			trans.trans.quat = angle;
+			trans.quat = angle;
 		}
 
 

@@ -41,27 +41,38 @@ namespace entity
 	{
 		X_UNUSED(pPhysScene);
 
+		Matrix33f mat33;
+
 		if (reg.isValid(activeEnt_))
 		{
-			if (reg.has<TransForm>(activeEnt_))
+			if (reg.has<Player>(activeEnt_))
+			{
+				auto& player = reg.get<Player>(activeEnt_);
+
+				cameraPos_ = player.cameraOrigin;
+				auto quat = player.cameraAxis.toQuat();
+
+				cameraAngle_ = quat.getEuler();
+
+				//mat33 = player.cameraAxis.toMat3();
+				//auto quat = player.cameraAxis.toQuat();
+				//
+				//auto goats = quat.getEulerDegrees();
+				//auto goatAngles = Anglesf(mat33);
+				//
+				//goats.normalize();
+			}
+			else if (reg.has<TransForm>(activeEnt_))
 			{
 				auto& trans = reg.get<TransForm>(activeEnt_);
 
-				cameraPos_ = trans.trans.pos;
+				cameraPos_ = trans.pos;
 				cameraPos_ += Vec3f(0, 0, 20.f);
-				cameraAngle_ = trans.trans.quat.getEuler();
+				cameraAngle_ = trans.quat.getEuler();
 				
-		//		cameraAngle_.y = 0.f;
-
 				cameraAngleDeg_.x = ::toDegrees(cameraAngle_.x);
 				cameraAngleDeg_.y = ::toDegrees(cameraAngle_.y);
 				cameraAngleDeg_.z = ::toDegrees(cameraAngle_.z);
-			}
-			else if (reg.has<Position>(activeEnt_))
-			{
-				auto& pos = reg.get<Position>(activeEnt_);
-
-				cameraPos_ = pos.pos;
 			}
 			else
 			{
@@ -69,6 +80,7 @@ namespace entity
 			}
 		}
 
+	//	cam_.setAxis(mat33);
 		cam_.setAngles(cameraAngle_);
 		cam_.setPosition(cameraPos_);
 

@@ -24,10 +24,8 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(game)
 
 class XGame :
-	public IGame,
-	public input::IInputEventListner
+	public IGame
 {
-
 
 public:
 	XGame(ICore *pCore);
@@ -44,22 +42,18 @@ public:
 	bool update(core::FrameData& frame) X_FINAL;
 	// ~IGame
 
-	// IInputEventListner
-	bool OnInputEvent(const input::InputEvent& event) X_OVERRIDE;
-	bool OnInputEventChar(const input::InputEvent& event) X_OVERRIDE;
-	// ~IInputEventListner
-		
+
 private:
 	void ProcessInput(core::FrameTimeData& timeInfo);
 
 	void OnFovChanged(core::ICVar* pVar);
 
-
 	void Command_Map(core::IConsoleCmdArgs* Cmd);
 
 private:
-	ICore* pCore_;
+	core::MemoryArenaBase* arena_;
 
+	ICore* pCore_;
 	render::IRender* pRender_;
 	core::ITimer* pTimer_;
 	core::ICVar* pFovVar_;
@@ -73,7 +67,10 @@ private:
 
 private:
 	GameVars vars_;
-	World world_;
+
+	entity::EntityId localClientId_;
+
+	core::UniquePointer<World> world_;
 
 	UserCmdGen userCmdGen_;
 	UserCmdMan userCmdMan_;

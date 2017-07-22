@@ -35,6 +35,9 @@ void UserCmdGen::clear(void)
 
 void UserCmdGen::buildUserCmd(void)
 {
+	moveForward_ = 0;
+	moveRight_ = 0;
+
 	resetCmd();
 
 	processInput();
@@ -42,13 +45,18 @@ void UserCmdGen::buildUserCmd(void)
 	mouseMove();
 
 
-	cmd_.angles = viewAngles_;
+	cmd_.angles = Anglesf(viewAngles_);
 	cmd_.moveForwrd = moveForward_;
 	cmd_.moveRight = moveRight_;
 
 }
 
 UserCmd& UserCmdGen::getCurrentUsercmd(void)
+{
+	return cmd_;
+}
+
+const UserCmd& UserCmdGen::getCurrentUsercmd(void) const
 {
 	return cmd_;
 }
@@ -63,12 +71,23 @@ void UserCmdGen::mouseMove(void)
 	// do things like scaling or inverting pitch etc..
 	// ..
 
-
 	viewAngles_[Rotation::YAW] -= mouseDelta_.x;
 	viewAngles_[Rotation::PITCH] -= mouseDelta_.y;
 
-
 	mouseDelta_ = Vec2f::zero();
+
+
+	Vec3f oldAngles = viewAngles_;
+
+	// check to make sure the angles haven't wrapped
+	if (viewAngles_[Rotation::PITCH] - oldAngles[Rotation::PITCH] > 90) {
+		viewAngles_[Rotation::PITCH] = oldAngles[Rotation::PITCH] + 90;
+	}
+	else if (oldAngles[Rotation::PITCH] - viewAngles_[Rotation::PITCH] > 90) {
+		viewAngles_[Rotation::PITCH] = oldAngles[Rotation::PITCH] - 90;
+	}
+
+
 }
 
 
@@ -81,10 +100,10 @@ void UserCmdGen::processInput(void)
 		switch (e.keyId)
 		{
 			case input::KeyId::MOUSE_X:
-				mouseDelta_.x += e.value;
+				mouseDelta_.x += (e.value * 0.02f);
 				break;
 			case input::KeyId::MOUSE_Y:
-				mouseDelta_.y += e.value;
+				mouseDelta_.y += (e.value * 0.02f);
 				break;
 
 

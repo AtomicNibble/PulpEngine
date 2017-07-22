@@ -26,6 +26,7 @@ typedef core::MemoryArena<
 
 extern GameArena* g_gameArena;
 
+#include <Math\XAngles.h>
 
 #include <IGame.h>
 #include <IEntity.h>

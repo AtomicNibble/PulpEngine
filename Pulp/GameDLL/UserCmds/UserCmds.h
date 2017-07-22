@@ -22,6 +22,7 @@ public:
 	void buildUserCmd(void);
 
 	UserCmd& getCurrentUsercmd(void);
+	const UserCmd& getCurrentUsercmd(void) const;
 
 
 private:

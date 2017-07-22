@@ -8,7 +8,7 @@ X_DECLARE_ENUM(Rotation)(
 	PITCH,
 	YAW,
 	ROLL
-	);
+);
 
 
 X_DECLARE_FLAGS8(Button)(
@@ -27,7 +27,7 @@ struct UserCmd
 
 	Buttons buttons;
 
-	Vec3f angles;
+	Anglesf angles;
 	Vec2<uint16_t> mouseDelta;
 };
 

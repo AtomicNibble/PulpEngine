@@ -14,25 +14,38 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(game)
 
+class UserCmdMan;
+
 namespace entity
 {
+	static const EnitiyRegister::entity_type INVALID_ID = EnitiyRegister::INVALID_ID;
 
 	class EnititySystem 
 	{
 	public:
 		typedef EnitiyRegister::entity_type EntityId;
 		
-
 	public:
 		EnititySystem(core::MemoryArenaBase* arena);
 
 		bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
-		void update(core::FrameData& frame);
+		void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
-		EntityId createPlayer(const Vec3f& origin);
-	//	EntityId createCamera(const Vec3f& origin);
+		EntityId createEnt(void);
+
+		void makePlayer(EntityId id);
+		bool addController(EntityId id);
+
 
 		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
+
+		X_INLINE const EnitiyRegister& getRegister(void) const {
+			return ecs_;
+		}
+
+		X_INLINE EnitiyRegister& getRegister(void) {
+			return ecs_;
+		}
 
 	private:
 		bool parseMiscModels(core::json::Value::Array val);
@@ -46,11 +59,11 @@ namespace entity
 		physics::IPhysics* pPhysics_;
 		physics::IScene* pPhysScene_;
 
-
 		InputSystem inputSys_;
 		CameraSystem cameraSys_;
 
 	};
+
 
 
 } // namespace entity

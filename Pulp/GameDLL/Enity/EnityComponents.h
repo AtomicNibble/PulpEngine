@@ -8,19 +8,14 @@ namespace entity
 {
 
 
-struct Position
-{
-	Vec3f pos;
-};
-
 struct Velocity 
 {
 	Vec3f dir;
 };
 
-struct TransForm
+struct TransForm : public Transformf
 {
-	Transformf trans;
+	
 };
 
 struct Health
@@ -49,16 +44,27 @@ struct ScriptName
 	const char* pName;
 };
 
+struct Player
+{
+	Vec3f eyeOffset;
+	Vec3f viewAngles;
+
+	Anglesf deltaViewAngles;
+
+	Vec3f cameraOrigin;
+	Anglesf cameraAxis;
+};
+
 
 using EnitiyRegister = ecs::StandardRegistry<uint16_t,
-	Position,
 	Velocity,
 	TransForm,
 	Health,
 	PhysicsComponent,
 	PhysicsTrigger,
 	CharacterController,
-	ScriptName
+	ScriptName,
+	Player
 >;
 
 typedef EnitiyRegister::entity_type EntityId;
