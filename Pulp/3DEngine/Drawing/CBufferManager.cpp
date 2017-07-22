@@ -153,7 +153,7 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 	// if the version is same and the cbuf only changes everyframe nothing will have changed.
 	if (cbufVersion == frameIdx_ && cbuf.getUpdateFreg() == render::shader::UpdateFreq::FRAME)
 	{
-		return false;
+	//	return false;
 	}
 
 	auto changed = cbuf.getParamFlags();
@@ -167,7 +167,7 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 	// nothing to update.
 	if (!changed.IsAnySet()) 
 	{
-		return false;
+	//	return false;
 	}
 
 	auto& cpuData = cbuf.getCpuData();
@@ -177,9 +177,9 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 		const auto type = p.getType();
 
 		// we can skip the copy if not changed.
-		if (!changed.IsSet(type)) {
-			continue;
-		}
+	//	if (!changed.IsSet(type)) {
+	//		continue;
+	//	}
 
 		uint8_t* pDst = &cpuData[p.getBindPoint()];
 
