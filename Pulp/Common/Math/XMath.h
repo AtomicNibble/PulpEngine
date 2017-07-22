@@ -56,6 +56,8 @@ struct math
 	X_INLINE static  constexpr T	max(T x, T y)	{ return (x > y) ? x : y; }
 	X_INLINE static  constexpr T	clamp(T x, T min = 0, T max = 1)	{ return (x < min) ? min : ((x > max) ? max : x); }
 
+	X_INLINE static  void sincos(T x, T& s, T& c) { s = ::sin(double(x)); c = ::cos(double(x)); }
+
 	X_INLINE static int32 isneg(T x)
 	{
 		union { float32_t f; uint32 i; } u;
@@ -100,6 +102,7 @@ struct math<float>
 	X_INLINE static  constexpr float	min(float x, float y)	{ return (x < y) ? x : y; }
 	X_INLINE static  constexpr float	clamp(float x, float min = 0, float max = 1)	{ return (x < min) ? min : ((x > max) ? max : x); }
 
+	X_INLINE static  void sincos(float x, float& s, float& c) { s = ::sinf(x); c = ::cosf(x); }
 
 	X_INLINE static int32 isneg(float x) {
 		union { float32_t f; uint32 i; } u;
