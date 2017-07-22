@@ -386,7 +386,10 @@ bool Compiler::createAreasForPrimativates(LvlEntity& ent)
 	}
 
 	for (size_t i = 0; i < areas_.size(); i++) {
-		areas_[i].AreaEnd(stringTable_);
+		if (!areas_[i].AreaEnd(stringTable_)) {
+			X_ERROR("Lvl", "Area %" PRIuS " invalid", i);
+			return false;
+		}
 
 		if (!areas_[i].model.belowLimits()) {
 			X_ERROR("Lvl", "Area %" PRIuS " exceeds the limits", i);

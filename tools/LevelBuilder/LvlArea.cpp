@@ -402,8 +402,13 @@ void LvlArea::AreaBegin(void)
 	model.beginModel();
 }
 
-void LvlArea::AreaEnd(StringTableUnique& stringTable)
+bool LvlArea::AreaEnd(StringTableUnique& stringTable)
 {
+	if (areaMeshes.empty()) {
+		X_ERROR("LvlArea", "Area has no meshes");
+		return false;
+	}
+
 	for (const auto& it : areaMeshes)
 	{
 		const auto& subMesh = it.second;
@@ -445,6 +450,7 @@ void LvlArea::AreaEnd(StringTableUnique& stringTable)
 	// copy bounds.
 	boundingBox = model.meshHeader.boundingBox;
 	boundingSphere = model.meshHeader.boundingSphere;
+	return true;
 }
 
 void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding)
