@@ -176,6 +176,8 @@ Texture* TextureManager::forName(const char* pName, texture::TextureFlags flags)
 
 		pTexRes = textures_.createAsset(name, name, flags, pDevicTex);
 		threadPolicy.Leave();
+
+		dispatchRead(pTexRes);
 	}
 
 	return pTexRes;
@@ -332,8 +334,8 @@ bool TextureManager::loadDefaultTextures(void)
 
 
 	// start reading the texture data.
-	dispatchRead(pTexDefault_);
-	dispatchRead(pTexDefaultBump_);
+//	dispatchRead(pTexDefault_);
+//	dispatchRead(pTexDefaultBump_);
 
 	return true;
 }
