@@ -26,6 +26,28 @@ Angles<T>::Angles(const Vec3<T>& v)
 }
 
 template<typename T>
+Angles<T>::Angles(const Matrix33<T>& mat)
+{
+	auto col1 = mat.getColumn(0);
+	auto col2 = mat.getColumn(1);
+	auto col3 = mat.getColumn(2);
+
+	float s = math<T>::sqrt(col1[0] * col1[0] + col1[1] * col1[1]);
+	if (s > EPSILON)
+	{
+		pitch_ = ::toDegrees(-math<T>::atan2(col1[2], s));
+		yaw_ = ::toDegrees(math<T>::atan2(col1[1], col1[0]));
+		roll_ = ::toDegrees(math<T>::atan2(col2[2], col3[2]));
+	}
+	else 
+	{
+		pitch_ = col1[2] < 0.0f ? 90.0f : -90.0f;
+		yaw_ = ::toDegrees(-math<T>::atan2(col2[0], col2[1]));
+		roll_ = 0.0f;
+	}
+}
+
+template<typename T>
 void Angles<T>::set(T pitch, T yaw, T roll)
 {
 	pitch_ = pitch;
@@ -216,6 +238,13 @@ void Angles<T>::clamp(const MyT& min, const MyT& max)
 }
 
 template<typename T>
+Vec3<T>	Angles<T>::toVec3(void) const
+{
+	return Vec3<T>(pitch_, yaw_, roll_);
+}
+
+
+template<typename T>
 Vec3<T>	Angles<T>::toForward(void) const
 {
 	float sp, sy, cp, cy;
@@ -241,13 +270,31 @@ Quat<T>	Angles<T>::toQuat(void) const
 	sxsy = sx * sy;
 	cxsy = cx * sy;
 
-	return Quat<T>(cxsy*sz - sxcy*cz, -cxsy*cz - sxcy*sz, sxsy*cz - cxcy*sz, cxcy*cz + sxsy*sz);
+	return Quat<T>(
+		cxcy*cz + sxsy*sz,
+		cxsy*sz - sxcy*cz, 
+		-cxsy*cz - sxcy*sz,
+		sxsy*cz - cxcy*sz
+	);
 }
 
 template<typename T>
 Matrix33<T>	Angles<T>::toMat3(void) const
 {
+	Matrix33<T> mat;
+	float sr, sp, sy, cr, cp, cy;
 
+	math<T>::sincos(::toRadians(yaw_), sy, cy);
+	math<T>::sincos(::toRadians(pitch_), sp, cp);
+	math<T>::sincos(::toRadians(roll_), sr, cr);
+
+	mat.set(
+		cp * cy, cp * sy, -sp,
+		sr * sp * cy + cr * -sy, sr * sp * sy + cr * cy, sr * cp,
+		cr * sp * cy + -sr * -sy, cr * sp * sy + -sr * cy, cr * cp
+	);
+
+	return mat;
 }
 
 template<typename T>

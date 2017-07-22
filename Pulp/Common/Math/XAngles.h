@@ -9,7 +9,7 @@ public:
 		PITCH,
 		YAW,
 		ROLL
-		);
+	);
 
 	typedef core::StackString256 StrBuf;
 
@@ -25,6 +25,7 @@ public:
 	Angles();
 	Angles(T pitch, T yaw, T roll);
 	explicit Angles(const Vec3<T>& v);
+	explicit Angles(const Matrix33<T>& m);
 
 	void 	set(T pitch, T yaw, T roll);
 
@@ -51,6 +52,7 @@ public:
 
 	void	clamp(const Angles& min, const Angles& max);
 
+	Vec3<T>			toVec3(void) const;
 	Vec3<T>			toForward(void) const;
 	Quat<T>			toQuat(void) const;
 	Matrix33<T>		toMat3(void) const;
