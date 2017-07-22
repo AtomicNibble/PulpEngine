@@ -454,7 +454,7 @@ void AssetProperty::SetModified(bool modified)
 
 void AssetProperty::setModifiedStyle(bool modified)
 {
-	if (type_ == PropertyType::CHECKBOX)
+	if (type_ == PropertyType::CHECKBOX && pCheckBoxWidget_)
 	{
 		if (modified) {
 			pCheckBoxWidget_->setStyleSheet("QCheckBox { color: #a00020 }");
