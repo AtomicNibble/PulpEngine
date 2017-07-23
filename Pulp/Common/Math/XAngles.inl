@@ -56,6 +56,26 @@ void Angles<T>::set(T pitch, T yaw, T roll)
 }
 
 template<typename T>
+T Angles<T>::roll(void) const
+{
+	return roll_;
+}
+
+template<typename T>
+T Angles<T>::pitch(void) const
+{
+	return pitch_;
+}
+
+template<typename T>
+T Angles<T>::yaw(void) const
+{
+	return yaw_;
+}
+
+
+
+template<typename T>
 T Angles<T>::operator[](size_t index) const
 {
 	X_ASSERT(index < 3, "out of range")(index);

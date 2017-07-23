@@ -29,6 +29,10 @@ public:
 
 	void 	set(T pitch, T yaw, T roll);
 
+	T roll(void) const;
+	T pitch(void) const;
+	T yaw(void) const;
+
 	T		operator[](size_t index) const;
 	T&		operator[](size_t index);
 	MyT		operator-() const;							// negate angles, in general not the inverse rotation
