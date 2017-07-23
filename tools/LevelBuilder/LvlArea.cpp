@@ -395,14 +395,14 @@ LvlArea::LvlArea() :
 	entRefs.reserve(256);
 }
 
-void LvlArea::AreaBegin(void)
+void LvlArea::areaBegin(void)
 {
 	areaMeshes.clear();
 
 	model.beginModel();
 }
 
-bool LvlArea::AreaEnd(StringTableUnique& stringTable)
+bool LvlArea::areaEnd(StringTableUnique& stringTable)
 {
 	if (areaMeshes.empty()) {
 		X_ERROR("LvlArea", "Area has no meshes");
@@ -490,7 +490,7 @@ void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& sid
 			vert.normal = plane.getNormal();
 			vert.color = Col_White;
 
-			pSubMesh->AddVert(vert);
+			pSubMesh->addVert(vert);
 		}
 
 		model::Index localOffset = safe_static_cast<model::Index>((i - 2) * 3);
@@ -505,7 +505,7 @@ void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& sid
 
 
 
-AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableUnique& stringTable)
+AreaSubMesh* LvlArea::meshForSide(const LvlBrushSide& side, StringTableUnique& stringTable)
 {
 	auto it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
 	if (it != areaMeshes.end()) {
@@ -525,7 +525,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableUnique& s
 	return &newIt.first->second;
 }
 
-AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableUnique& stringTable)
+AreaSubMesh* LvlArea::meshForMat(const core::string& matName, StringTableUnique& stringTable)
 {
 	auto it = areaMeshes.find(matName);
 	if (it != areaMeshes.end()) {

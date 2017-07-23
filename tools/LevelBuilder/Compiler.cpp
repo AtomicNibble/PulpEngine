@@ -347,7 +347,7 @@ bool Compiler::createAreasForPrimativates(LvlEntity& ent)
 	areas_.resize(ent.numAreas);
 
 	for (auto& area : areas_) {
-		area.AreaBegin();
+		area.areaBegin();
 	}
 
 	for (size_t i = 0; i < ent.brushes.size(); i++)
@@ -386,7 +386,7 @@ bool Compiler::createAreasForPrimativates(LvlEntity& ent)
 	}
 
 	for (size_t i = 0; i < areas_.size(); i++) {
-		if (!areas_[i].AreaEnd(stringTable_)) {
+		if (!areas_[i].areaEnd(stringTable_)) {
 			X_ERROR("Lvl", "Area %" PRIuS " invalid", i);
 			return false;
 		}
@@ -543,8 +543,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		hdr.flags.Set(LevelFileFlags::INTER_AREA_INFO);
 		hdr.flags.Set(LevelFileFlags::DEBUG_PORTAL_DATA);
 
-		hdr.numinterAreaPortals = safe_static_cast<uint32_t, size_t>(
-			worldEnt.interPortals.size());
+		hdr.numinterAreaPortals = safe_static_cast<uint32_t>(worldEnt.interPortals.size());
 
 		// need to write the area's 
 		// and the winding.
@@ -578,9 +577,9 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		{
 			FileAreaRefHdr refHdr;
 			refHdr.startIndex = num;
-			refHdr.num = safe_static_cast<uint32_t, size_t>(area.entRefs.size());
+			refHdr.num = safe_static_cast<uint32_t>(area.entRefs.size());
 
-			num += safe_static_cast<uint32_t, size_t>(area.entRefs.size());
+			num += safe_static_cast<uint32_t>(area.entRefs.size());
 
 			stream.write(refHdr);
 		}
@@ -599,7 +598,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		for (uint32_t i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 		{
 			FileAreaRefHdr refHdr;
-			refHdr.num = safe_static_cast<uint32_t, size_t>(multiRefEntLists_[i].size());
+			refHdr.num = safe_static_cast<uint32_t>(multiRefEntLists_[i].size());
 			refHdr.startIndex = num; // not used.
 
 			num += refHdr.num;

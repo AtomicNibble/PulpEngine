@@ -148,10 +148,10 @@ struct AreaSubMesh
 public:
 	AreaSubMesh();
 
-	X_INLINE void AddVert(const level::Vertex& vert) {
+	X_INLINE void addVert(const level::Vertex& vert) {
 		verts_.append(vert);
 	}
-	X_INLINE void AddFace(const model::Face& face) {
+	X_INLINE void addFace(const model::Face& face) {
 		faces_.append(face);
 	}
 
@@ -174,13 +174,13 @@ class LvlArea
 public:
 	LvlArea();
 
-	void AreaBegin(void);
-	bool AreaEnd(StringTableUnique& stringTable);
+	void areaBegin(void);
+	bool areaEnd(StringTableUnique& stringTable);
 	
 	void addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& side, Winding* pWinding);
 
-	AreaSubMesh* MeshForSide(const LvlBrushSide& side, StringTableUnique& stringTable);
-	AreaSubMesh* MeshForMat(const core::string& matName, StringTableUnique& stringTable);
+	AreaSubMesh* meshForSide(const LvlBrushSide& side, StringTableUnique& stringTable);
+	AreaSubMesh* meshForMat(const core::string& matName, StringTableUnique& stringTable);
 
 private:
 	AreaSubMesh* meshForSide(const LvlBrushSide& side);
