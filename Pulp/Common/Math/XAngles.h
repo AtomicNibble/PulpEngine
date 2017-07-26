@@ -29,6 +29,10 @@ public:
 
 	void 	set(T pitch, T yaw, T roll);
 
+	void setRoll(T roll);
+	void setPitch(T pitch);
+	void setYaw(T yaw);
+
 	T roll(void) const;
 	T pitch(void) const;
 	T yaw(void) const;

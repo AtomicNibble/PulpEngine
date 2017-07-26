@@ -55,6 +55,25 @@ void Angles<T>::set(T pitch, T yaw, T roll)
 	roll_ = roll;
 }
 
+
+template<typename T>
+void Angles<T>::setRoll(T roll)
+{
+	roll_ = roll;
+}
+
+template<typename T>
+void Angles<T>::setPitch(T pitch)
+{
+	pitch_ = pitch;
+}
+
+template<typename T>
+void Angles<T>::setYaw(T yaw)
+{
+	yaw_ = yaw;
+}
+
 template<typename T>
 T Angles<T>::roll(void) const
 {
