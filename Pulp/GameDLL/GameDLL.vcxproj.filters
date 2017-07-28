@@ -87,6 +87,12 @@
     <ClInclude Include="UserCmds\UserCmd.h">
       <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\PlayerSys.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\PlayerVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -122,9 +128,15 @@
     <ClCompile Include="UserCmds\UserCmdMan.cpp">
       <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
+    <ClCompile Include="Enity\PlayerSys.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\PlayerVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Vars\GameVars.inl">
+    <None Include="Vars\PlayerVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
