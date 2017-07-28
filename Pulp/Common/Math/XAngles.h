@@ -27,7 +27,7 @@ public:
 	explicit Angles(const Vec3<T>& v);
 	explicit Angles(const Matrix33<T>& m);
 
-	void 	set(T pitch, T yaw, T roll);
+	void set(T pitch, T yaw, T roll);
 
 	void setRoll(T roll);
 	void setPitch(T pitch);
