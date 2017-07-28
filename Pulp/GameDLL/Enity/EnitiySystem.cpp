@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "EnitiySystem.h"
 #include "UserCmds\UserCmdMan.h"
+#include "Vars\GameVars.h"
 
 #include <String\Json.h>
 #include <Hashing\Fnva1Hash.h>
@@ -17,19 +18,22 @@ namespace entity
 
 	// -----------------------------------------------------------
 
-	EnititySystem::EnititySystem(core::MemoryArenaBase* arena) :
-		ecs_(arena)
+	EnititySystem::EnititySystem(GameVars& vars, core::MemoryArenaBase* arena) :
+		reg_(arena),
+		vars_(vars),
+		playerSys_(vars.player)
 	{
 		pPhysics_ = nullptr;
 		pPhysScene_ = nullptr;
 	}
+
 
 	bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
 	{
 		pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
 		pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);
 
-		if (!inputSys_.init()) {
+		if (!playerSys_.init(pPhysScene)) {
 			return false;
 		}
 
@@ -52,7 +56,7 @@ namespace entity
 	void EnititySystem::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 	{
 		// process input.
-	//	inputSys_.update(frame.timeInfo, ecs_, pPhysScene_);
+	//	inputSys_.update(frame.timeInfo, reg_, pPhysScene_);
 
 		// process the userCmd for the current player.
 		EntityId id = 0;
@@ -62,6 +66,12 @@ namespace entity
 		X_UNUSED(unread);
 
 		X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
+
+#if 1
+		playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, userCmd, id);
+
+
+#else
 		{
 			const float speed = 250.f;
 			const float gravity = -100.f;
@@ -84,11 +94,11 @@ namespace entity
 
 			displacement += upDisp;
 
-			if (ecs_.has<Player, CharacterController>(id))
+			if (reg_.has<Player, CharacterController>(id))
 			{
-				auto& con = ecs_.get<CharacterController>(id);
-				auto& trans = ecs_.get<TransForm>(id);
-				auto& player = ecs_.get<Player>(id);
+				auto& con = reg_.get<CharacterController>(id);
+				auto& trans = reg_.get<TransForm>(id);
+				auto& player = reg_.get<Player>(id);
 
 
 				physics::ScopedLock lock(pPhysScene_, true);
@@ -118,29 +128,29 @@ namespace entity
 				player.cameraAxis = a; // trans.quat.getEuler();
 			}
 		}
-
+#endif
 
 		// update the cameras.
-		cameraSys_.update(frame, ecs_, pPhysScene_);
+		cameraSys_.update(frame, reg_, pPhysScene_);
 
 	}
 
 
 	EntityId EnititySystem::createEnt(void)
 	{
-		auto ent = ecs_.create<TransForm>();
+		auto ent = reg_.create<TransForm>();
 
 		return ent;
 	}
 
 	void EnititySystem::makePlayer(EntityId id)
 	{
-		// auto trans = ecs_.assign<TransForm>(id);
-		auto& player = ecs_.assign<Player>(id);
-
-		player.eyeOffset = Vec3f(0, 0, 50.f);
-		player.cameraOrigin = Vec3f(0, 0, 50.f);
-		player.cameraAxis = Anglesf(0, 0, 0.f);
+		// auto trans = reg_.assign<TransForm>(id);
+		auto& player = reg_.assign<Player>(id);
+		X_UNUSED(player);
+//		player.eyeOffset = Vec3f(0, 0, 50.f);
+//		player.cameraOrigin = Vec3f(0, 0, 50.f);
+//		player.cameraAxis = Anglesf(0, 0, 0.f);
 
 		// temp.
 		cameraSys_.setActiveEnt(id);
@@ -148,22 +158,23 @@ namespace entity
 
 	bool EnititySystem::addController(EntityId id)
 	{
-		auto& trans = ecs_.get<TransForm>(id);
-		auto& con = ecs_.assign<CharacterController>(id);
+		auto& trans = reg_.get<TransForm>(id);
+		auto& con = reg_.assign<CharacterController>(id);
 
 		physics::CapsuleControllerDesc desc;
 		desc.radius = 20.f;
-		desc.height = 1.f;
+		desc.height = vars_.player.normalHeight_;
 		desc.climbingMode = physics::CapsuleControllerDesc::ClimbingMode::Easy;
 		desc.material = pPhysics_->getDefaultMaterial();
 		desc.position = trans.pos;
 		desc.upDirection = Vec3f::zAxis();
+		desc.maxJumpHeight = 50.f;
 
 		con.pController = pPhysScene_->createCharacterController(desc);
 
 		if (con.pController == nullptr)
 		{
-			ecs_.remove<CharacterController>(id);
+			reg_.remove<CharacterController>(id);
 			return false;
 		}
 
@@ -224,9 +235,9 @@ namespace entity
 	{
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = ecs_.create<TransForm, PhysicsComponent>();
-			auto& trans = ecs_.get<TransForm>(ent);
-	//		auto& phys = ecs_.get<PhysicsComponent>(ent);
+			auto ent = reg_.create<TransForm, PhysicsComponent>();
+			auto& trans = reg_.get<TransForm>(ent);
+	//		auto& phys = reg_.get<PhysicsComponent>(ent);
 
 			auto& kvps = *it;
 
@@ -257,9 +268,9 @@ namespace entity
 	{
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = ecs_.create<TransForm, ScriptName>();
-			auto& trans = ecs_.get<TransForm>(ent);
-			auto& name = ecs_.get<ScriptName>(ent);
+			auto ent = reg_.create<TransForm, ScriptName>();
+			auto& trans = reg_.get<TransForm>(ent);
+			auto& name = reg_.get<ScriptName>(ent);
 
 			auto& kvps = *it;
 

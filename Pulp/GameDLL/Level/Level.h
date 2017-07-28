@@ -26,6 +26,7 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(game)
 
+class GameVars;
 class UserCmdMan;
 
 namespace entity
@@ -86,7 +87,7 @@ X_INLINE bool Level::isLoaded(void) const
 class World
 {
 public:
-	World(physics::IPhysics* pPhys, UserCmdMan& userCmdMan, core::MemoryArenaBase* arena);
+	World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan, core::MemoryArenaBase* arena);
 	~World();
 
 	bool loadMap(const char* pMapName);

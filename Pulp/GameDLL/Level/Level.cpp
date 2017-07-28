@@ -313,11 +313,12 @@ bool Level::processData(void)
 // -------------------------------------
 
 
-World::World(physics::IPhysics* pPhys, UserCmdMan& userCmdMan, core::MemoryArenaBase* arena) :
+World::World(GameVars& vars, physics::IPhysics* pPhys,
+	UserCmdMan& userCmdMan, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	pPhys_(pPhys),
 	pScene_(nullptr),
-	ents_(arena),
+	ents_(vars, arena),
 	level_(arena),
 	userCmdMan_(userCmdMan)
 {

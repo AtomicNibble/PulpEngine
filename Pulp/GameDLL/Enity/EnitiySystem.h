@@ -7,6 +7,7 @@
 
 #include "CameraSys.h"
 #include "InputSys.h"
+#include "PlayerSys.h"
 
 X_NAMESPACE_DECLARE(core,
 	struct FrameTimeData;
@@ -14,6 +15,7 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(game)
 
+class GameVars;
 class UserCmdMan;
 
 namespace entity
@@ -26,7 +28,7 @@ namespace entity
 		typedef EnitiyRegister::entity_type EntityId;
 		
 	public:
-		EnititySystem(core::MemoryArenaBase* arena);
+		EnititySystem(GameVars& vars, core::MemoryArenaBase* arena);
 
 		bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
 		void update(core::FrameData& frame, UserCmdMan& userCmdMan);
@@ -40,11 +42,11 @@ namespace entity
 		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
 
 		X_INLINE const EnitiyRegister& getRegister(void) const {
-			return ecs_;
+			return reg_;
 		}
 
 		X_INLINE EnitiyRegister& getRegister(void) {
-			return ecs_;
+			return reg_;
 		}
 
 	private:
@@ -54,12 +56,15 @@ namespace entity
 
 
 	private:
-		EnitiyRegister ecs_;
+		EnitiyRegister reg_;
+		GameVars& vars_;
+
 
 		physics::IPhysics* pPhysics_;
 		physics::IScene* pPhysScene_;
 
-		InputSystem inputSys_;
+	//	InputSystem inputSys_;
+		PlayerSystem playerSys_;
 		CameraSystem cameraSys_;
 
 	};

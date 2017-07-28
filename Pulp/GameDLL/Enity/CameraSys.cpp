@@ -34,6 +34,9 @@ namespace entity
 		ADD_CVAR_REF_VEC3("cam_angle", cameraAngleDeg_, cameraAngleDeg_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
 			"camera angle(radians)");
 
+		ADD_CVAR_REF_VEC3("cam_angle_rad", cameraAngle_, cameraAngle_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
+			"camera angle(radians)");
+
 		return true;
 	}
 
@@ -49,18 +52,8 @@ namespace entity
 			{
 				auto& player = reg.get<Player>(activeEnt_);
 
-				cameraPos_ = player.cameraOrigin;
-				auto quat = player.cameraAxis.toQuat();
-
-				cameraAngle_ = quat.getEuler();
-
-				//mat33 = player.cameraAxis.toMat3();
-				//auto quat = player.cameraAxis.toQuat();
-				//
-				//auto goats = quat.getEulerDegrees();
-				//auto goatAngles = Anglesf(mat33);
-				//
-				//goats.normalize();
+				cameraPos_ = player.firstPersonViewOrigin;
+				mat33 = player.firstPersonViewAxis;
 			}
 			else if (reg.has<TransForm>(activeEnt_))
 			{
@@ -69,10 +62,8 @@ namespace entity
 				cameraPos_ = trans.pos;
 				cameraPos_ += Vec3f(0, 0, 20.f);
 				cameraAngle_ = trans.quat.getEuler();
+				cameraAngleDeg_ = trans.quat.getEulerDegrees();
 				
-				cameraAngleDeg_.x = ::toDegrees(cameraAngle_.x);
-				cameraAngleDeg_.y = ::toDegrees(cameraAngle_.y);
-				cameraAngleDeg_.z = ::toDegrees(cameraAngle_.z);
 			}
 			else
 			{
@@ -80,14 +71,30 @@ namespace entity
 			}
 		}
 
-	//	cam_.setAxis(mat33);
-		cam_.setAngles(cameraAngle_);
+		cam_.setAxis(mat33);
+	//	cam_.setAngles(cameraAngle_);
 		cam_.setPosition(cameraPos_);
 
 		// Pro
 		frame.view.cam = cam_;
 		frame.view.projMatrix = cam_.getProjectionMatrix();
 		frame.view.viewMatrix = cam_.getViewMatrix();
+
+#if 1
+	//	frame.view.viewMatrix = mat33;
+	//	frame.view.viewMatrix.setTranslate(cameraPos_);
+	//	frame.view.viewMatrix.transpose();
+#else
+
+		Matrix44f pickle = Matrix44f::identity();
+		Matrix44f trans = Matrix44f::createTranslation(cameraPos_);
+
+		pickle = Matrix44f(mat33) * trans;
+
+		frame.view.viewMatrix = pickle;
+		frame.view.viewMatrix.transpose();
+#endif
+
 		frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
 		frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
 	}

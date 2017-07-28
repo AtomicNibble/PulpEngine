@@ -1,6 +1,9 @@
 #pragma once
 
 #include <IPhysics.h>
+#include <Time\TimeVal.h>
+
+#include "UserCmds\UserCmd.h"
 
 X_NAMESPACE_BEGIN(game)
 
@@ -44,15 +47,48 @@ struct ScriptName
 	const char* pName;
 };
 
+struct RenderView
+{
+	Vec2f fov;
+
+	Vec3f viewOrg;
+	Matrix33f viewAxis;
+};
+
+
 struct Player
 {
-	Vec3f eyeOffset;
-	Vec3f viewAngles;
+	X_DECLARE_FLAGS(State) (
+		Jump,
+		Crouch,
+		Run,
+		OnGround
+	);
 
+	typedef Flags<State> StateFlags;
+
+	StateFlags state;
+
+	core::TimeVal jumpTime;
+
+	Vec3f eyeOffset;
+
+	Anglesf viewAngles;
+	Anglesf cmdAngles;
 	Anglesf deltaViewAngles;
 
-	Vec3f cameraOrigin;
-	Anglesf cameraAxis;
+	Anglesf viewBobAngles;
+	Vec3f	viewBob;
+
+	float bobFrac;
+	float bobfracsin;
+	int32_t	bobCycle;
+
+	Vec3f		firstPersonViewOrigin;
+	Matrix33f	firstPersonViewAxis;
+
+	UserCmd oldUserCmd;
+	UserCmd userCmd;
 };
 
 

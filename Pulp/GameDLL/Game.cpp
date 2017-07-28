@@ -38,6 +38,8 @@ XGame::~XGame()
 
 void XGame::registerVars(void)
 {
+	vars_.registerVars();
+
 
 	// register some vars
 //	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::CHEAT,
@@ -163,8 +165,8 @@ bool XGame::update(core::FrameData& frame)
 
 //	ProcessInput(frame.timeInfo);
 
-	cam_.setAngles(cameraAngle_);
-	cam_.setPosition(cameraPos_);
+//	cam_.setAngles(cameraAngle_);
+//	cam_.setPosition(cameraPos_);
 
 #if 0
 	// Pro
@@ -282,7 +284,7 @@ void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
 
 	const char* pMapName = Cmd->GetArg(1);
 
-	world_ = core::makeUnique<World>(arena_, gEnv->pPhysics, userCmdMan_, arena_);
+	world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, arena_);
 
 	if (world_) {
 		if (!world_->loadMap(pMapName)) {

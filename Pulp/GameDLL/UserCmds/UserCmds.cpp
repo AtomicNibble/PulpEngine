@@ -120,6 +120,27 @@ void UserCmdGen::processInput(void)
 				moveRight_ += -1_i16;
 				break;
 
+			case input::KeyId::LEFT_CONTROL:
+				if (e.action == input::InputState::DOWN)
+				{
+					cmd_.buttons.Set(Button::CROUCH);
+				}
+				else
+				{
+					cmd_.buttons.Remove(Button::CROUCH);
+				}
+				break;
+			case input::KeyId::SPACEBAR:
+				if (e.action == input::InputState::DOWN)
+				{
+					cmd_.buttons.Set(Button::JUMP);
+				}
+				else
+				{
+					cmd_.buttons.Remove(Button::JUMP);
+				}
+				break;
+
 
 			default:
 				break;
