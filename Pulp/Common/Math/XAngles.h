@@ -68,6 +68,8 @@ public:
 	Vec3<T>			toAngularVelocity(void) const;
 	const char*		toString(StrBuf& buf) const;
 
+	static MyT zero(void);
+
 private:
 	T pitch_;
 	T yaw_;

@@ -354,3 +354,9 @@ const char* Angles<T>::toString(StrBuf& buf) const
 	desc.setFmt("<%g,%g,%g>", pitch_, yaw_, roll_);
 	return desc.c_str();
 }
+
+template<typename T>
+typename Angles<T>::MyT Angles<T>::zero(void)
+{
+	return MyT(0.f,0.f,0.f);
+}
