@@ -67,68 +67,9 @@ namespace entity
 
 		X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
 
-#if 1
+
 		playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, userCmd, id);
 
-
-#else
-		{
-			const float speed = 250.f;
-			const float gravity = -100.f;
-			const float timeDelta = frame.timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
-			const float timeScale = speed * frame.timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
-
-			auto upDisp = Vec3f::zAxis();
-			upDisp *= gravity * timeDelta;
-
-			Vec3f displacement;
-
-			if (userCmd.moveForwrd != 0)
-			{
-				displacement.y += userCmd.moveForwrd * timeDelta * speed;
-			}
-			if (userCmd.moveRight != 0)
-			{
-				displacement.x += userCmd.moveRight * timeDelta * speed;
-			}
-
-			displacement += upDisp;
-
-			if (reg_.has<Player, CharacterController>(id))
-			{
-				auto& con = reg_.get<CharacterController>(id);
-				auto& trans = reg_.get<TransForm>(id);
-				auto& player = reg_.get<Player>(id);
-
-
-				physics::ScopedLock lock(pPhysScene_, true);
-
-				auto flags = con.pController->move(displacement, 0.f, timeDelta);
-				if (flags.IsAnySet())
-				{
-
-				}
-
-
-				auto& a = userCmd.angles;
-				trans.pos = con.pController->getPosition();
-
-
-				// for the position we want to just add the delta.
-				// which is in axis angles.
-				// but then we also want to clamp the view.
-				
-				
-				//viewAngles.pitch = std::min(viewAngles.pitch, pm_maxviewpitch.GetFloat() * restrict);
-				//viewAngles.pitch = std::max(viewAngles.pitch, pm_minviewpitch.GetFloat() * restrict);
-
-				trans.quat = a.toQuat();
-
-				player.cameraOrigin = trans.pos + player.eyeOffset;
-				player.cameraAxis = a; // trans.quat.getEuler();
-			}
-		}
-#endif
 
 		// update the cameras.
 		cameraSys_.update(frame, reg_, pPhysScene_);
