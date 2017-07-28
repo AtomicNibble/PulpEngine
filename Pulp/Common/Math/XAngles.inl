@@ -55,7 +55,6 @@ void Angles<T>::set(T pitch, T yaw, T roll)
 	roll_ = roll;
 }
 
-
 template<typename T>
 void Angles<T>::setRoll(T roll)
 {
@@ -281,6 +280,13 @@ Vec3<T>	Angles<T>::toVec3(void) const
 {
 	return Vec3<T>(pitch_, yaw_, roll_);
 }
+
+template<typename T>
+Vec3<T> Angles<T>::toVec3Radians(void) const
+{
+	return Vec3<T>(::toRadians(pitch_), ::toRadians(yaw_), ::toRadians(roll_));
+}
+
 
 
 template<typename T>

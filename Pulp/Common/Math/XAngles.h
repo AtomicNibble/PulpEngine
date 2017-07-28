@@ -61,6 +61,7 @@ public:
 	void	clamp(const Angles& min, const Angles& max);
 
 	Vec3<T>			toVec3(void) const;
+	Vec3<T>			toVec3Radians(void) const;
 	Vec3<T>			toForward(void) const;
 	Quat<T>			toQuat(void) const;
 	Matrix33<T>		toMat3(void) const;
