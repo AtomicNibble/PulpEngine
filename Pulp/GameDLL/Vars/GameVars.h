@@ -1,8 +1,7 @@
 #pragma once
 
-X_NAMESPACE_DECLARE(core,
-	struct ICVar;
-)
+#include "PlayerVars.h"
+
 
 X_NAMESPACE_BEGIN(game)
 
@@ -15,14 +14,8 @@ public:
 	void registerVars(void);
 
 
-
-private:
-	core::ICVar* pFovVar_;
-
-	Vec3f cameraPos_;
-	Vec3f cameraAngle_;
+	PlayerVars player;
 };
 
 X_NAMESPACE_END
 
-#include "GameVars.inl"
