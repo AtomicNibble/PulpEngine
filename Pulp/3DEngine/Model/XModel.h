@@ -18,14 +18,14 @@ X_NAMESPACE_DECLARE(engine,
 X_NAMESPACE_BEGIN(model)
 
 
-class XModel
+class XModel : public IModel
 {
 	X_NO_COPY(XModel);
 	X_NO_ASSIGN(XModel);
 
 public:
 	XModel(core::string& name);
-	~XModel();
+	~XModel() X_OVERRIDE;
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);

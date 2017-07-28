@@ -105,7 +105,7 @@ bool XModelManager::asyncInitFinalize(void)
 }
 
 
-XModel* XModelManager::findModel(const char* pModelName) const
+IModel* XModelManager::findModel(const char* pModelName) const
 {
 	core::string name(pModelName);
 	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
@@ -120,7 +120,12 @@ XModel* XModelManager::findModel(const char* pModelName) const
 }
 
 
-XModel* XModelManager::loadModel(const char* pModelName)
+IModel* XModelManager::loadModel(const char* pModelName)
+{
+	return loadXModel(pModelName);
+}
+
+XModel* XModelManager::loadXModel(const char* pModelName)
 {
 	X_ASSERT_NOT_NULL(pModelName);
 	X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
@@ -138,14 +143,14 @@ XModel* XModelManager::loadModel(const char* pModelName)
 
 	// we create a model and give it back
 	pModelRes = models_.createAsset(name, name);
-	
+
 	// add to list of models that need loading.
 	queueLoadRequest(pModelRes);
 
 	return pModelRes;
 }
 
-XModel* XModelManager::getDefaultModel(void)
+IModel* XModelManager::getDefaultModel(void) const
 {
 	return pDefaultModel_;
 }
@@ -163,7 +168,7 @@ void XModelManager::releaseModel(XModel* pModel)
 
 bool XModelManager::initDefaults(void)
 {
-	pDefaultModel_ = loadModel(MODEL_DEFAULT_NAME);
+	pDefaultModel_ = static_cast<XModel*>(loadModel(MODEL_DEFAULT_NAME));
 	if (!pDefaultModel_) {
 		X_ERROR("ModelManager", "Failed to create default model");
 		return false;

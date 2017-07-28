@@ -938,6 +938,12 @@ IMaterialManager* X3DEngine::getMaterialManager(void)
 	return pMaterialManager_;
 }
 
+model::IModelManager* X3DEngine::getModelManager(void)
+{
+	return pModelManager_;
+}
+
+
 IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 {
 	auto* pPrimContex = &primContexts_[engine::PrimContext::MISC3D];

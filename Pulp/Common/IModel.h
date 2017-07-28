@@ -191,6 +191,13 @@ struct IModelLib : public IConverter
 };
 
 
+struct IModel
+{
+	virtual ~IModel() {}
+
+
+};
+
 
 // Flags:
 // LOOSE: the model file is not packed, meaning it has a string table that needs processing.

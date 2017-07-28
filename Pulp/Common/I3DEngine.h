@@ -5,6 +5,10 @@
 #define _X_RENDER_SYS_I_H_
 
 
+X_NAMESPACE_DECLARE(model,
+	struct IModelManager;
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 X_DECLARE_ENUM(PrimContext)(
@@ -33,6 +37,7 @@ struct I3DEngine : public core::IEngineSysBase
 	// each enum has a instance, and you don't own the pointer.
 	virtual IPrimativeContext* getPrimContext(PrimContext::Enum user) X_ABSTRACT;
 	virtual IMaterialManager* getMaterialManager(void) X_ABSTRACT;
+	virtual model::IModelManager* getModelManager(void) X_ABSTRACT;
 
 	virtual IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_ABSTRACT;
 	virtual void release3DWorld(IWorld3D* pWorld) X_ABSTRACT;

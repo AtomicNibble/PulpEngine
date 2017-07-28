@@ -94,9 +94,6 @@
     <Filter Include="Headers\Debugging\win32">
       <UniqueIdentifier>{4af9be20-3b85-4c36-86b0-ee2587c020fe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headers\Memory">
-      <UniqueIdentifier>{9751b698-5e4f-423d-b3d0-15acb3fafff6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SourceFiles\Memory">
       <UniqueIdentifier>{e3cb03e7-46cf-46e9-b184-bf765ff0762b}</UniqueIdentifier>
     </Filter>
@@ -117,21 +114,6 @@
     </Filter>
     <Filter Include="SourceFiles\Time">
       <UniqueIdentifier>{9a61819a-f620-4d13-8c8a-e7ae2ab8d527}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers\Memory\AllocationPolicies">
-      <UniqueIdentifier>{c79b02ad-c0ab-418b-abf4-217ab8ed7cb8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers\Memory\BoundsCheckingPolicies">
-      <UniqueIdentifier>{0a8bbb1c-ac29-4573-ba52-8656282ad030}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers\Memory\MemoryTaggingPolicies">
-      <UniqueIdentifier>{88fd3b17-6e84-4f78-857c-3b884e446c58}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers\Memory\MemoryTrackingPolicies">
-      <UniqueIdentifier>{8d7b16c9-c79a-4f61-abc7-4b4ddfbd3450}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers\Memory\ThreadPolicies">
-      <UniqueIdentifier>{cb89b6cd-c976-4b9c-8564-94454b96bf28}</UniqueIdentifier>
     </Filter>
     <Filter Include="SourceFiles\Memory\ThreadPolicies">
       <UniqueIdentifier>{5693e6e6-99c0-4327-a3e2-49338844ad98}</UniqueIdentifier>
@@ -225,6 +207,24 @@
     </Filter>
     <Filter Include="Interfaces_h\Game">
       <UniqueIdentifier>{e5a0d8f1-21fb-4b46-b16f-5932af87e41f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory">
+      <UniqueIdentifier>{9751b698-5e4f-423d-b3d0-15acb3fafff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\AllocationPolicies">
+      <UniqueIdentifier>{c79b02ad-c0ab-418b-abf4-217ab8ed7cb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\BoundsCheckingPolicies">
+      <UniqueIdentifier>{0a8bbb1c-ac29-4573-ba52-8656282ad030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\MemoryTaggingPolicies">
+      <UniqueIdentifier>{88fd3b17-6e84-4f78-857c-3b884e446c58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\MemoryTrackingPolicies">
+      <UniqueIdentifier>{8d7b16c9-c79a-4f61-abc7-4b4ddfbd3450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\ThreadPolicies">
+      <UniqueIdentifier>{cb89b6cd-c976-4b9c-8564-94454b96bf28}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -1257,6 +1257,9 @@
     </ClInclude>
     <ClInclude Include="Math\XAngles.h">
       <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IModelManager.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

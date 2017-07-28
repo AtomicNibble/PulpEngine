@@ -4,6 +4,7 @@
 #define X_MODEL_MANAGER_H_
 
 #include <IModel.h>
+#include <IModelManager.h>
 
 #include <Assets\AssertContainer.h>
 #include <Util\UniquePointer.h>
@@ -42,7 +43,8 @@ struct ModelLoadRequest
 	ModelHeader hdr;
 };
 
-class XModelManager :
+class XModelManager : 
+	public IModelManager,
 	public core::IXHotReload
 {
 	typedef core::AssetContainer<XModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
@@ -53,7 +55,7 @@ class XModelManager :
 
 public:
 	XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
-	~XModelManager();
+	~XModelManager() X_OVERRIDE;
 
 	void registerCmds(void);
 	void registerVars(void);
@@ -64,9 +66,10 @@ public:
 	bool asyncInitFinalize(void);
 	void dispatchPendingLoads(void);
 
-	XModel* findModel(const char* pModelName) const;
-	XModel* loadModel(const char* pModelName);
-	XModel* getDefaultModel(void);
+	IModel* findModel(const char* pModelName) const X_FINAL;
+	IModel* loadModel(const char* pModelName) X_FINAL;
+	XModel* loadXModel(const char* pModelName);
+	IModel* getDefaultModel(void) const X_FINAL;
 
 	void releaseModel(XModel* pModel);
 
