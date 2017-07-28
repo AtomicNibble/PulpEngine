@@ -94,7 +94,6 @@ void UserCmdGen::mouseMove(void)
 
 void UserCmdGen::processInput(void)
 {
-
 	for (const auto& e : inputEvents_)
 	{
 		switch (e.keyId)
@@ -145,9 +144,6 @@ void UserCmdGen::processInput(void)
 			default:
 				break;
 		}
-
-
-
 	}
 
 	inputEvents_.clear();
