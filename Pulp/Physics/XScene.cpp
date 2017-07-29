@@ -380,6 +380,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		pxDesc.halfHeight = boxDesc.halfHeight;
 		pxDesc.halfSideExtent = boxDesc.halfSideExtent;
 		pxDesc.halfForwardExtent = boxDesc.halfForwardExtent;
+		pxDesc.callback = this;
 
 		if (!pxDesc.isValid()) {
 			X_ERROR("Phys", "Box controller desc is invalid");
@@ -405,6 +406,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		const CapsuleControllerDesc& capsulDesc = static_cast<const CapsuleControllerDesc&>(desc);
 		pxDesc.radius = capsulDesc.radius;
 		pxDesc.height = capsulDesc.height;
+		pxDesc.callback = this;
 		if (capsulDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
 			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eEASY;
 		}
@@ -593,5 +595,49 @@ void XScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 	}
 }
 
+// ------------------------------------------
+
+void XScene::onShapeHit(const physx::PxControllerShapeHit& hit)
+{
+	X_UNUSED(hit);
+
+	physx::PxRigidDynamic* actor = hit.shape->getActor()->is<physx::PxRigidDynamic>();
+	if (actor)
+	{
+		if (actor->getRigidBodyFlags() & physx::PxRigidBodyFlag::eKINEMATIC) {
+			return;
+		}
+
+		// We only allow horizontal pushes. Vertical pushes when we stand on dynamic objects creates
+		// useless stress on the solver. It would be possible to enable/disable vertical pushes on
+		// particular objects, if the gameplay requires it.
+		const physx::PxVec3 upVector = hit.controller->getUpDirection();
+		const physx::PxF32 dp = hit.dir.dot(upVector);
+		if (fabsf(dp)<1e-3f)
+		{
+			physx::PxReal coeff = actor->getMass() * hit.length;
+			physx::PxRigidBodyExt::addForceAtLocalPos(
+				*actor, 
+				hit.dir*coeff,
+				physx::PxVec3(0, 0, 0),
+				physx::PxForceMode::eIMPULSE
+			);
+		}
+	}
+	 
+}
+
+void XScene::onControllerHit(const physx::PxControllersHit& hit)
+{
+	X_UNUSED(hit);
+
+}
+
+void XScene::onObstacleHit(const physx::PxControllerObstacleHit& hit)
+{
+	X_UNUSED(hit);
+
+
+}
 
 X_NAMESPACE_END
