@@ -63,7 +63,6 @@ namespace entity
 		physics::IPhysics* pPhysics_;
 		physics::IScene* pPhysScene_;
 
-	//	InputSystem inputSys_;
 		PlayerSystem playerSys_;
 		CameraSystem cameraSys_;
 
