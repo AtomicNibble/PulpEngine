@@ -27,7 +27,7 @@ struct FrameInput
 
 struct FrameTimeData
 {
-	TimeVal startTimeReal; // real start time
+	TimeVal startTimeReal;		// real frame start time
 	TimeVal startTimeRealative; // unscaled relative time to start of timer.
 
 	TimeVal deltas[ITimer::Timer::ENUM_COUNT];
