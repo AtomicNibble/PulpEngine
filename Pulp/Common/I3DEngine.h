@@ -4,6 +4,10 @@
 #ifndef _X_RENDER_SYS_I_H_
 #define _X_RENDER_SYS_I_H_
 
+X_NAMESPACE_DECLARE(physics,
+	struct IScene;
+)
+
 
 X_NAMESPACE_DECLARE(model,
 	struct IModelManager;
