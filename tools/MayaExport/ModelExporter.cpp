@@ -443,7 +443,10 @@ void ModelExporter::setOutdir(const MString& path)
 
 core::Path<char> ModelExporter::getFilePath(void) const
 {
-	return outDir_ / fileName_;
+	core::Path<char> path(outDir_);
+	path /= fileName_;
+	path.replaceSeprators();
+	return path;
 }
 
 core::string ModelExporter::getName(void) const
