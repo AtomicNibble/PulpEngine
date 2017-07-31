@@ -5,6 +5,8 @@
 #include "MapFile.h"
 #include "Util.h"
 
+#include "Model\ModelCache.h"
+
 #include "Material\MaterialManager.h"
 
 #include <Time\StopWatch.h>
@@ -149,6 +151,15 @@ namespace mapFile
 				X_ERROR("Lvl", "Ent with classname \"misc_model\" is missing \"model\" kvp at (%g,%g,%g)",
 					ent.origin.x, ent.origin.y, ent.origin.z);
 				return false;
+			}
+
+			core::string& name = it->second;
+			// load the models bounding box.
+			if (!modelCache_.getModelAABB(name, ent.bounds))
+			{
+				X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
+					name.c_str(), ent.origin.x, ent.origin.y, ent.origin.z);
+				name = model::MODEL_DEFAULT_NAME;
 			}
 		}
 
