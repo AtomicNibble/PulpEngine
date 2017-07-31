@@ -899,7 +899,42 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 	return PathUtil::CreateDirectory(buf);
 }
 
+bool xFileSys::createDirectory(pathTypeW path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
+
+	Path<wchar_t> buf;
+	createOSPath(gameDir_, path, buf);
+
+	buf.removeFileName();
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "createDirectory: \"%ls\"", buf.c_str());
+	}
+
+	return PathUtil::CreateDirectory(buf);
+}
+
 bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(_path);
+	X_UNUSED(location);
+
+	// we want to just loop and create like a goat.
+	Path<wchar_t> buf;
+	createOSPath(gameDir_, _path, buf);
+
+	buf.removeFileName();
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
+	}
+
+	return PathUtil::CreateDirectoryTree(buf);
+}
+
+bool xFileSys::createDirectoryTree(pathTypeW _path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(_path);
 	X_UNUSED(location);
