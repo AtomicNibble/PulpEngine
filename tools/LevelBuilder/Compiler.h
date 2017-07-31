@@ -47,6 +47,7 @@ class Compiler
 
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 
+	typedef core::Array<int32_t> AreaIdArr;
 	typedef core::Array<LvlEntity> LvlEntsArr;
 	typedef core::Array<LvlArea> LvlAreaArr;
 	typedef core::Array<level::FileStaticModel> StaticModelsArr;
@@ -69,7 +70,10 @@ private:
 
 	bool createAreasForPrimativates(LvlEntity& ent);
 	void putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspNode* pNode);
+	void areasForBounds_r(AreaIdArr& areaList, const Sphere& sphere,
+		const Vec3f boundsPoints[8], bspNode* pNode);
 
+	bool createStaticModelList(LvlEntity& ent, LvlEntsArr& ents);
 	bool createCollisionData(LvlEntity& ent);
 
 private:

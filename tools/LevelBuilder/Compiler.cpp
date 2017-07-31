@@ -322,9 +322,9 @@ bool Compiler::processWorldModel(LvlEntsArr& ents, LvlEntity& ent)
 		return false;
 	}
 
-//	if (!CreateEntAreaRefs(ent)) {
-//		return false;
-//	}
+	if (!createStaticModelList(ent, ents)) {
+		return false;
+	}
 
 	if (!createCollisionData(ent)) {
 		return false;
@@ -445,6 +445,219 @@ void Compiler::putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspN
 	LvlArea& area = areas_[pNode->area];	
 	area.addWindingForSide(planes_, side, pWinding);
 }
+
+
+
+void Compiler::areasForBounds_r(AreaIdArr& areaList, const Sphere& sphere,
+	const Vec3f boundsPoints[8], bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(boundsPoints);
+	bspNode* pCurNode = X_ASSERT_NOT_NULL(pNode);
+
+	if (pCurNode->IsAreaLeaf())
+	{
+		int32_t areaIdx = pCurNode->area;
+
+		// check if duplicate.
+		if (areaList.isEmpty()) {
+			areaList.append(areaIdx);
+		}
+		else
+		{
+			// just linear search as it will be fastest with such low numbers.
+			// and contigous memory.
+			size_t i;
+			for (i = 0; i < areaList.size(); i++) {
+				if (areaList[i] == areaIdx) {
+					break;
+				}
+			}
+			if (i == areaList.size()) {
+				areaList.append(areaIdx);
+			}
+		}
+
+		return;
+	}
+
+	const Planef& plane = planes_[pCurNode->planenum];
+	float sd = plane.distance(sphere.center());
+
+	if (sd >= sphere.radius())
+	{
+		pCurNode = pCurNode->children[Side::FRONT];
+		if (!pCurNode->IsSolidLeaf()) {
+			areasForBounds_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+	if (sd <= -sphere.radius())
+	{
+		pCurNode = pCurNode->children[Side::BACK];
+		if (!pCurNode->IsSolidLeaf()) {
+			areasForBounds_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+
+	// check bounds points.
+	bool front = false;
+	bool back = false;
+	for (size_t i = 0; i < 8; i++)
+	{
+		float d = plane.distance(boundsPoints[i]);
+
+		if (d >= 0.0f) {
+			front = true;
+		}
+		else if (d <= 0.0f) {
+			back = true;
+		}
+		if (back && front) {
+			break;
+		}
+	}
+
+	if (front) {
+		bspNode* frontChild = pCurNode->children[Side::FRONT];
+		if (!frontChild->IsSolidLeaf()) {
+			areasForBounds_r(areaList, sphere, boundsPoints, frontChild);
+		}
+	}
+	if (back) {
+		bspNode* backChild = pCurNode->children[Side::BACK];
+		if (!backChild->IsSolidLeaf()) {
+			areasForBounds_r(areaList, sphere, boundsPoints, backChild);
+		}
+	}
+}
+
+
+
+bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
+{
+	AreaIdArr areaList(g_arena);
+	areaList.reserve(areas_.size());
+
+	for (size_t i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
+	{
+		multiRefEntLists_[i].clear();
+		multiModelRefLists_[i].clear();
+	}
+
+	staticModels_.reserve(ents.size() / 2);
+	staticModels_.setGranularity(128);
+
+	Vec3f boundsPoints[8];
+
+	for (size_t i=0; i<ents.size(); i++)
+	{
+		auto& ent = ents[i];
+		if (ent.classType != game::ClassType::MISC_MODEL) {
+			continue;
+		}
+
+		level::FileStaticModel& sm = staticModels_.AddOne();
+
+		sm.pos = ent.origin;
+		sm.angle = Quatf(toRadians(ent.angle.x), toRadians(ent.angle.y), toRadians(ent.angle.z));
+		// lvl ent bounds are the model bounds when type is MISC_MODEL
+		sm.boundingBox = ent.bounds;
+
+		// if the angle is not zero we need to slap a duck.
+		// aka update the AABB to still contain the model when rotated.
+		// axis rotations make me horny.
+		if (sm.angle != Quatf::identity())
+		{
+			// this is a quick sloppy AABB
+			// loading the model and processing it's verts is required for snug AABB.
+			// I will add it as a release compile option, since it will not be quick for a map with 2000 models.
+			OBB obb(sm.angle, sm.boundingBox);
+			sm.boundingBox = AABB(obb);
+		}
+
+		// make them world bounds.
+		sm.boundingBox.move(sm.pos);
+
+		{
+			auto it = ent.epairs.find(X_CONST_STRING("model"));
+			if (it == ent.epairs.end())
+			{
+				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
+					ent.origin[0], ent.origin[1], ent.origin[2]);
+				continue;
+			}
+
+			const core::string& modelName = it->second;
+			X_LOG1("Entity", "Ent model: \"%s\"", modelName.c_str());
+
+			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
+		}
+
+		uint32_t entId = safe_static_cast<uint32_t>(staticModels_.size());
+
+		// make a sphere, for quicker testing.
+		Sphere worldSphere(sm.boundingBox);
+
+		// get the the worldBounds points for more accurate testing if sphere test pass.
+		sm.boundingBox.toPoints(boundsPoints);
+
+		// clear from last time.
+		areaList.clear();
+
+		// traverse the world ent's tree
+		areasForBounds_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree_.pHeadnode);
+
+		size_t numRefs = areaList.size();
+		if (numRefs == 0)
+		{
+			// ent not in any area.
+			X_ERROR("Lvl", "Entity(%" PRIuS ") does not reside in any area: (%g,%g,%g)",
+				i, ent.origin.x, ent.origin.y, ent.origin.z);
+			return false;
+		}
+
+		X_LOG1("Lvl", "Entity(%" PRIuS ") has %" PRIuS " refs", i, numRefs);
+
+		// ok so we hold a list of unique areas ent is in.
+		if (numRefs == 1)
+		{
+			// add to area's ref list.
+			LvlArea& area = areas_[areaList[0]];
+			area.modelsRefs.push_back(entId);
+		}
+		else
+		{
+			// added to the multiAreaRefList.
+			uint32_t flags[level::MAP_MAX_MULTI_REF_LISTS] = { 0 };
+
+			auto it = areaList.begin();
+			for (; it != areaList.end(); ++it)
+			{
+				const int32_t areaIdx = *it;
+				// work out what area list.
+				const size_t areaListIdx = (areaIdx / 32);
+
+				flags[areaListIdx] |= (1 << (areaIdx % 32));
+			}
+
+			level::MultiAreaEntRef entRef;
+			entRef.entId = entId;
+			for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
+			{
+				if (flags[x] != 0)
+				{
+					entRef.flags = flags[x];
+					multiModelRefLists_[x].append(entRef);
+				}
+			}
+		}
+	}
+
+
+	return true;
+}
+
 
 bool Compiler::createCollisionData(LvlEntity& ent)
 {
