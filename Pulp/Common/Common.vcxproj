@@ -1143,6 +1143,7 @@
     <Natvis Include="FiFo.natvis" />
     <Natvis Include="FixedArray.natvis" />
     <Natvis Include="Math.natvis" />
+    <Natvis Include="Pointer.natvis" />
     <Natvis Include="Stack.natvis" />
     <Natvis Include="String.natvis" />
     <Natvis Include="Winding.natvis" />
