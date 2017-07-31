@@ -275,7 +275,7 @@ MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name,
 	}
 
 	{
-		uint32_t dataSize = safe_static_cast<uint32_t, size_t>(data.size());
+		uint32_t dataSize = safe_static_cast<uint32_t>(data.size());
 
 		ProtoBuf::AssetDB::UpdateAsset* pUpdate = new ProtoBuf::AssetDB::UpdateAsset();
 		pUpdate->set_type(AssetTypeToProtoType(type));
@@ -321,7 +321,7 @@ bool AssetDB::sendRequest(ProtoBuf::AssetDB::Request& request)
 
 rety:
 
-	if (!pipe_.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
+	if (!pipe_.write(buffer, safe_static_cast<size_t>(arrayOutput.ByteCount()))) {
 		X_ERROR("AssetDB", "failed to write buffer");
 		pipe_.close();
 
@@ -386,7 +386,7 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 	}
 
 	google::protobuf::io::ArrayInputStream arrayInput(buffer,
-		safe_static_cast<int32_t, size_t>(bytesRead));
+		safe_static_cast<int32_t>(bytesRead));
 
 
 	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
