@@ -96,7 +96,6 @@ private:
 
 	StaticModelsArr staticModels_;
 
-	MultiRefArr multiRefEntLists_;
 	MultiRefArr multiModelRefLists_;
 
 	StringTableUnique stringTable_;

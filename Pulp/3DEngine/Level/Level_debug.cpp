@@ -197,7 +197,7 @@ void Level::DebugDraw_StaticModelCullVis(void) const
 
 				for (; i < end; i++)
 				{
-					uint32_t entId = modelRefs_.areaRefs[i].entId;
+					uint32_t entId = modelRefs_.areaRefs[i].modelId;
 
 					if (!std::binary_search(a.areaVisibleEnts.begin(), a.areaVisibleEnts.end(), entId))
 					{

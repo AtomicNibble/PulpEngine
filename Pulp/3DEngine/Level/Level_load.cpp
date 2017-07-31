@@ -385,7 +385,8 @@ bool Level::ProcessData(void)
 		X_WARNING("Level", "Level has no inter area portals.");
 	}
 
-	
+#if 0
+
 	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_ENT_REF_LISTS))
 	{
 		core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
@@ -443,6 +444,7 @@ bool Level::ProcessData(void)
 		}
 #endif
 	}
+#endif
 
 	if (fileHdr_.flags.IsSet(LevelFileFlags::COLLISION))
 	{

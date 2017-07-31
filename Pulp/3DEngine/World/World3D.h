@@ -147,7 +147,7 @@ class World3D : public IWorld3D
 		void clear(void);
 		void free(void);
 
-		// ent with single area ref.
+		// model with single area ref.
 		AreaRefsHdrArr areaRefHdrs;
 		AreaRefsArr areaRefs;
 		// multi area model refrences for models that are in multiple area's
@@ -236,7 +236,6 @@ private:
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;
 
-	AreaRefInfo entRefs_;
 	AreaRefInfo modelRefs_;
 
 	// all static models

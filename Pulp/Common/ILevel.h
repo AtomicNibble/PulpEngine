@@ -329,8 +329,7 @@ X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 // this is the flags for the file header, which tells you what option stuff is inside the file.
 X_DECLARE_FLAGS(LevelFileFlag)(
 	INTER_AREA_INFO,
-	AREA_ENT_REF_LISTS,
-	AREA_MODEL_REF_LISTS,
+	AREA_STATIC_MODEL_REF_LISTS,
 	BSP_TREE, 
 	OCT_TREE, 
 	DEBUG_PORTAL_DATA,
@@ -425,8 +424,7 @@ X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
 	AREA_MODELS,		// the model data for each area.
 	AREA_PORTALS,
-	AREA_ENT_REFS,		// all ents except models.
-	AREA_MODEL_REFS,	// area model refs.
+	AREA_STATIC_MODEL_REFS,	// area model refs.
 	AREA_COLLISION,		// the collision data for each area.
 	STATIC_MODELS,		// all the static models in the map.
 	BSP_TREE,
@@ -450,7 +448,7 @@ struct FileAreaRefHdr
 X_PACK_PUSH(4)
 struct AreaEntRef
 {
-	uint32_t entId;
+	uint32_t modelId;
 };
 
 struct MultiAreaEntRef : public AreaEntRef
@@ -561,9 +559,8 @@ struct FileHeader
 	int32_t numinterAreaPortals;
 	int32_t numNodes;
 
-	// ent ref sizes.
-	int32_t numEntRefs;
-	int32_t numMultiAreaEntRefs;
+	int32_t pad_1;
+	int32_t pad_2;
 
 	// model ref sizes.
 	int32_t numModelRefs;

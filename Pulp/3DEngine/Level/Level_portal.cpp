@@ -425,7 +425,7 @@ void Level::CullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2
 		{
 			for (; i < end; i++)
 			{
-				uint32_t entId = modelRefs_.areaRefs[i].entId;
+				uint32_t entId = modelRefs_.areaRefs[i].modelId;
 				const level::StaticModel& sm = staticModels_[entId - 1];
 
 				auto type = cam_.cullSphere_ExactT(sm.boundingSphere);
@@ -463,7 +463,7 @@ void Level::CullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2
 		{
 			for (; i < end; i++)
 			{
-				uint32_t entId = modelRefs_.areaRefs[i].entId;
+				uint32_t entId = modelRefs_.areaRefs[i].modelId;
 				const level::StaticModel& sm = staticModels_[entId - 1];
 
 				// sphere check

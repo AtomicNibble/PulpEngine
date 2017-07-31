@@ -193,7 +193,6 @@ World3D::World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, 
 	vars_(vars),
 	areas_(arena),
 	areaNodes_(arena),
-	entRefs_(arena),
 	modelRefs_(arena),
 	visibleAreas_(arena),
 	staticModels_(arena)
@@ -488,9 +487,9 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
 	}
 
-	if (fileHdr.flags.IsSet(level::LevelFileFlags::AREA_MODEL_REF_LISTS))
+	if (fileHdr.flags.IsSet(level::LevelFileFlags::AREA_STATIC_MODEL_REF_LISTS))
 	{
-		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::AREA_MODEL_REFS);
+		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::AREA_STATIC_MODEL_REFS);
 
 		AreaRefInfo& modelRefs = modelRefs_;
 		modelRefs.areaRefHdrs.resize(fileHdr.numAreas);
@@ -763,6 +762,8 @@ int32_t World3D::commonChildrenArea_r(AreaNode* pAreaNode)
 
 	return common;
 }
+
+
 
 
 
@@ -1181,8 +1182,8 @@ void World3D::cullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::
 		{
 			for (; i < end; i++)
 			{
-				uint32_t entId = modelRefs_.areaRefs[i].entId;
-				const level::StaticModel& sm = staticModels_[entId - 1];
+				uint32_t modelId = modelRefs_.areaRefs[i].modelId;
+				const level::StaticModel& sm = staticModels_[modelId];
 
 				auto type = cam_.cullSphere_ExactT(sm.boundingSphere);
 				if (type == CullResult::OVERLAP)
@@ -1206,7 +1207,7 @@ void World3D::cullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::
 				}
 
 				// this model is visible.
-				visPortal.visibleEnts.emplace_back(entId);
+				visPortal.visibleEnts.emplace_back(modelId);
 			}
 		}
 	}
@@ -1219,8 +1220,8 @@ void World3D::cullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::
 		{
 			for (; i < end; i++)
 			{
-				uint32_t entId = modelRefs_.areaRefs[i].entId;
-				const level::StaticModel& sm = staticModels_[entId - 1];
+				uint32_t modelId = modelRefs_.areaRefs[i].modelId;
+				const level::StaticModel& sm = staticModels_[modelId];
 
 				// sphere check
 				const Vec3f& center = sm.boundingSphere.center();
@@ -1239,7 +1240,7 @@ void World3D::cullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::
 
 
 				// if we get here we are visible.
-				visPortal.visibleEnts.emplace_back(entId);
+				visPortal.visibleEnts.emplace_back(modelId);
 			}
 		}
 	}

@@ -143,9 +143,6 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 
 	areas_(arena),
 	staticModels_(arena),
-	multiRefEntLists_{
-		X_PP_REPEAT_COMMA_SEP( 8, arena)
-	},
 	multiModelRefLists_{
 		X_PP_REPEAT_COMMA_SEP(8, arena)
 	},
@@ -541,7 +538,6 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 
 	for (size_t i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
 	{
-		multiRefEntLists_[i].clear();
 		multiModelRefLists_[i].clear();
 	}
 
@@ -557,6 +553,7 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 			continue;
 		}
 
+		uint32_t modelId = safe_static_cast<uint32_t>(staticModels_.size());
 		level::FileStaticModel& sm = staticModels_.AddOne();
 
 		sm.pos = ent.origin;
@@ -594,8 +591,6 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
 		}
 
-		uint32_t entId = safe_static_cast<uint32_t>(staticModels_.size());
-
 		// make a sphere, for quicker testing.
 		Sphere worldSphere(sm.boundingBox);
 
@@ -624,7 +619,7 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 		{
 			// add to area's ref list.
 			LvlArea& area = areas_[areaList[0]];
-			area.modelsRefs.push_back(entId);
+			area.modelsRefs.push_back(modelId);
 		}
 		else
 		{
@@ -642,7 +637,7 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 			}
 
 			level::MultiAreaEntRef entRef;
-			entRef.entId = entId;
+			entRef.modelId = modelId;
 			for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
 			{
 				if (flags[x] != 0)
@@ -704,7 +699,7 @@ bool Compiler::createCollisionData(LvlEntity& ent)
 bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 {
 	std::array<core::ByteStream, FileNodes::ENUM_COUNT> nodeStreams{
-		X_PP_REPEAT_COMMA_SEP(9, g_arena)
+		X_PP_REPEAT_COMMA_SEP(8, g_arena)
 	};
 
 	for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++) {
@@ -779,6 +774,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		}
 	}
 
+#if 0
 	// area ent ref data
 	{
 		auto& stream = nodeStreams[FileNodes::AREA_ENT_REFS];
@@ -828,11 +824,12 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 			stream.write(multiRefEntLists_[i].ptr(), multiRefEntLists_[i].size());
 		}
 	}
+#endif
 
 	// area model ent refs
 	{
-		auto& stream = nodeStreams[FileNodes::AREA_MODEL_REFS];
-		hdr.flags.Set(LevelFileFlags::AREA_MODEL_REF_LISTS);
+		auto& stream = nodeStreams[FileNodes::AREA_STATIC_MODEL_REFS];
+		hdr.flags.Set(LevelFileFlags::AREA_STATIC_MODEL_REF_LISTS);
 
 		uint32_t num = 0;
 
