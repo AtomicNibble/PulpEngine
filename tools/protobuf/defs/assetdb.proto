@@ -16,12 +16,29 @@ enum AssetType {
     IMG = 4;
 }
 
-message Reponse {
-    enum Result { OK = 1; NOT_FOUND = 2; NAME_TAKEN = 3; UNCHANGED = 4; ERROR = 5; }
+enum Result {
+    OK = 1;
+    NOT_FOUND = 2;
+    NAME_TAKEN = 3;
+    UNCHANGED = 4;
+    ERROR = 5;
+}
 
+message Reponse {
     required Result result = 1;
     required string error = 2;
 }
+message AssetInfoReponse {
+    required Result result = 1;
+    required string error = 2;
+
+    required string name = 3;
+    required AssetType type = 4;
+    required uint32 id = 5;
+    required uint32 modId = 6;
+}
+
+
 
 message AddAsset {
     required string name = 1;
@@ -43,15 +60,21 @@ message UpdateAsset {
     required string name = 1;
     required AssetType type = 2;
     optional string args= 3;
-    optional  uint32 dataSize = 4;
+    optional uint32 dataSize = 4;
 }
 
-message Request {
+message AssetExists {
+    required string name = 1;
+    required AssetType type = 2;
+}
 
+
+message Request {
     oneof msg {
         AddAsset add = 1;
         DeleteAsset del = 2;
         RenameAsset rename = 3;
         UpdateAsset update = 4;
+        AssetExists exists  = 5;
     }
 }

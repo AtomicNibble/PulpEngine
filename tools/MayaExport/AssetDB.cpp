@@ -174,7 +174,47 @@ bool AssetDB::Connect(void)
 	return true;
 }
 
+bool AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut)
+{
+	if (!pipe_.isOpen() && !Connect()) {
+		MayaUtil::MayaPrintError("Failed to 'AddAsset' pipe is invalid");
+		return MS::kFailure;
+	}
 
+	{
+		ProtoBuf::AssetDB::AssetExists* pExists = new ProtoBuf::AssetDB::AssetExists();
+		pExists->set_type(AssetTypeToProtoType(type));
+		pExists->set_name(name.asChar());
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_exists(pExists);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+	}
+
+	ProtoBuf::AssetDB::AssetInfoReponse response;
+	if (!getResponse(response)) {
+		return MS::kFailure;
+	}
+
+	if (!response.has_id()) {
+		*pIdOut = -1;
+	}
+	else {
+		*pIdOut = response.id();
+	}
+
+	if (!response.has_modid()) {
+		*pModIdOut = -1;
+	}
+	else {
+		*pModIdOut = response.modid();
+	}
+
+	return MS::kSuccess;
+}
 
 MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 {
@@ -258,7 +298,6 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const M
 	}
 
 	ProtoBuf::AssetDB::Reponse response;
-
 	if (!getResponse(response)) {
 		return MS::kFailure;
 	}
@@ -302,7 +341,7 @@ MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name,
 		return MS::kFailure;
 	}
 
-	if (ProtoBuf::AssetDB::Reponse::UNCHANGED == response.result() && pUnchanged) {
+	if (ProtoBuf::AssetDB::Result::UNCHANGED == response.result() && pUnchanged) {
 		*pUnchanged = true;
 	}
 
@@ -395,8 +434,8 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 		return false;
 	}
 
-	if (response.result() == ProtoBuf::AssetDB::Reponse_Result_ERROR) {
-		const std::string err = response.error();
+	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
+		const std::string& err = response.error();
 		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
 		return false;
 	}
@@ -404,6 +443,37 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 	return true;
 }
 
+bool AssetDB::getResponse(ProtoBuf::AssetDB::AssetInfoReponse& response)
+{
+	const size_t bufLength = 0x200;
+	uint8_t buffer[bufLength];
+	size_t bytesRead;
+	bool cleanEof;
+
+	if (!pipe_.read(buffer, sizeof(buffer), &bytesRead)) {
+		X_ERROR("AssetDB", "failed to read response");
+		pipe_.close(); // close it so we can open a new one
+		return false;
+	}
+
+	google::protobuf::io::ArrayInputStream arrayInput(buffer,
+		safe_static_cast<int32_t>(bytesRead));
+
+
+	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+		X_ERROR("AssetDB", "Failed to read response msg");
+		pipe_.close(); // close it so we can open a new one
+		return false;
+	}
+
+	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
+		const std::string& err = response.error();
+		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
+		return false;
+	}
+
+	return true;
+}
 
 // ------------------------------------------------------------------
 

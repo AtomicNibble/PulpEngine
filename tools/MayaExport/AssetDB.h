@@ -7,13 +7,12 @@
 #include <Platform\Pipe.h>
 
 X_NAMESPACE_DECLARE(ProtoBuf,
-namespace AssetDB {
-	class Request;
-	class Reponse;
-}
+	namespace AssetDB {
+		class Request;
+		class Reponse;
+		class AssetInfoReponse;
+	}
 );
-
-
 
 
 X_NAMESPACE_BEGIN(maya)
@@ -33,16 +32,20 @@ public:
 
 	bool Connect(void);
 
+	bool AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut);
+
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
 	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& args, 
 		const core::Array<uint8_t>& data, bool* pUnchanged = nullptr);
 
+
 private:
 	bool sendRequest(ProtoBuf::AssetDB::Request& request);
 	bool sendBuf(const core::Array<uint8_t>& data);
 	bool getResponse(ProtoBuf::AssetDB::Reponse& response);
+	bool getResponse(ProtoBuf::AssetDB::AssetInfoReponse& response);
 
 private:
 	core::IPC::Pipe pipe_;

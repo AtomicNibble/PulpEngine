@@ -206,7 +206,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						X_ERROR("AssetClientTest", "Failed to read response msg");
 					}
 
-					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+					if (response.result() != ProtoBuf::AssetDB::Result::OK) {
 						const std::string err = response.error();
 						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
 					}
@@ -252,7 +252,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						X_ERROR("AssetClientTest", "Failed to read response msg");
 					}
 
-					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+					if (response.result() != ProtoBuf::AssetDB::Result::OK) {
 						const std::string err = response.error();
 						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
 					}
@@ -297,7 +297,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						X_ERROR("AssetClientTest", "Failed to read response msg");
 					}
 
-					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+					if (response.result() != ProtoBuf::AssetDB::Result::OK) {
 						const std::string err = response.error();
 						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
 					}
@@ -343,7 +343,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						X_ERROR("AssetClientTest", "Failed to read response msg");
 					}
 
-					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+					if (response.result() != ProtoBuf::AssetDB::Result::OK) {
 						const std::string err = response.error();
 						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
 					}
