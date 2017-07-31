@@ -757,13 +757,13 @@ size_t ModelCompiler::totalColMeshes(void) const
 }
 
 
-bool ModelCompiler::CompileModel(const core::Path<char>& outFile)
+bool ModelCompiler::compileModel(const core::Path<char>& outFile)
 {
-	return CompileModel(core::Path<wchar_t>(outFile));
+	return compileModel(core::Path<wchar_t>(outFile));
 }
 
 
-bool ModelCompiler::CompileModel(const core::Path<wchar_t>& outFile)
+bool ModelCompiler::compileModel(const core::Path<wchar_t>& outFile)
 {
 	stats_.clear();
 		
@@ -786,7 +786,7 @@ bool ModelCompiler::CompileModel(const core::Path<wchar_t>& outFile)
 	}
 
 	// save it.
-	if (!SaveModel(path)) {
+	if (!saveModel(path)) {
 		X_ERROR("Model", "Failed to save compiled model to: \"%ls\"",
 			path.c_str());
 		return false;
@@ -796,7 +796,7 @@ bool ModelCompiler::CompileModel(const core::Path<wchar_t>& outFile)
 	return true;
 }
 
-bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
+bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 {
 	// open da file!
 	core::fileModeFlags mode;

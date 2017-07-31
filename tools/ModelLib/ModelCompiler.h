@@ -249,12 +249,12 @@ public:
 	size_t totalMeshes(void) const;
 	size_t totalColMeshes(void) const;
 
-	bool CompileModel(const core::Path<char>& outFile);
-	bool CompileModel(const core::Path<wchar_t>& outFile);
+	bool compileModel(const core::Path<char>& outFile);
+	bool compileModel(const core::Path<wchar_t>& outFile);
 
 
 private:
-	bool SaveModel(core::Path<wchar_t>& outFile);
+	bool saveModel(core::Path<wchar_t>& outFile);
 
 	size_t calculateTagNameDataSize(void) const;
 	size_t calculateMaterialNameDataSize(void) const ;

@@ -313,7 +313,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 				{
 					PROFILE_MAYA_NAME("Compile and save");
 
-					if (!CompileModel(outPath)) {
+					if (!compileModel(outPath)) {
 						MayaUtil::MayaPrintError("Failed to compile model");
 						return MS::kFailure;
 					}
