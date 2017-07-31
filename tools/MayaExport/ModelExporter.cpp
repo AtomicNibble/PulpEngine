@@ -320,7 +320,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 				}
 				else
 				{
-					MayaUtil::MayaPrintMsg("Skiping compile asset unchanged");
+					MayaUtil::MayaPrintMsg("!Skiping compile asset unchanged");
 				}
 			}
 		}
