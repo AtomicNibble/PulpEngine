@@ -97,6 +97,7 @@ XRenderMesh::SizeInfo::SizeInfo()
 XRenderMesh::XRenderMesh()
 {
 	vertexStreams_.fill(render::INVALID_BUF_HANLDE);
+	indexStream_ = render::INVALID_BUF_HANLDE;
 }
 
 bool XRenderMesh::canRender(void) const
