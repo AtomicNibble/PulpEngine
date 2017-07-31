@@ -804,6 +804,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	mode.Set(core::fileMode::RECREATE);
 
 	core::XFileScoped file;
+
+	
+	if (!gEnv->pFileSys->createDirectoryTree(outFile.c_str())) {
+		X_ERROR("Model", "Failed to create directory for output file.");
+		return false;
+	}
 		
 	if (!file.openFile(outFile.c_str(), mode)) {
 		X_ERROR("Model", "Failed to open compile output file");
