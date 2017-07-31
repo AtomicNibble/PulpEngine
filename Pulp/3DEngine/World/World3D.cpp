@@ -226,7 +226,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 		auto* pBuildvisFlags = pJobSys->CreateMemberJobAsChild<World3D>(pSyncJob, this, &World3D::buildVisibleAreaFlags_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		auto* pRemoveDupeVis = pJobSys->CreateMemberJobAsChild<World3D>(pSyncJob, this, &World3D::mergeVisibilityArrs_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 		auto* pDrawAreaGeo = pJobSys->CreateMemberJobAsChild<World3D>(pSyncJob, this, &World3D::drawVisibleAreaGeo_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
-		//	auto* pDrawStaticModels = pJobSys->CreateMemberJobAsChild<World3D>(pSyncJob, this, &World3D::DrawVisibleStaticModels_job, nullptr);
+		auto* pDrawStaticModels = pJobSys->CreateMemberJobAsChild<World3D>(pSyncJob, this, &World3D::drawVisibleStaticModels_job, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
 
 		// now inline build the vis flags for areas
 		pJobSys->AddContinuation(pFindVisibleAreas, pBuildvisFlags, true);
@@ -235,7 +235,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 		// after we have visible areas we can begin drawing the area geo.
 		pJobSys->AddContinuation(pFindVisibleAreas, pDrawAreaGeo, false);
 		// after the dupe visibility has been resolved we can start drawing the static models (we could run this after each are'as dupe have been removed)
-		//	pJobSys->AddContinuation(pRemoveDupeVis, pDrawStaticModels, false);
+		pJobSys->AddContinuation(pRemoveDupeVis, pDrawStaticModels, false);
 
 
 		pJobSys->Run(pFindVisibleAreas);
@@ -511,6 +511,36 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 		modelRefs.areaMultiRefs.resize(numMultiAreaModelRefs);
 		file.readObj(modelRefs.areaMultiRefs.ptr(), modelRefs.areaMultiRefs.size());
 	}
+
+	{
+		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::STATIC_MODELS);
+
+		staticModels_.resize(fileHdr.numStaticModels);
+		if (staticModels_.isNotEmpty())
+		{
+			// we read each item one by one since we are readong from a FileBuf.
+			for (size_t i = 0; i < staticModels_.size(); i++)
+			{
+				level::StaticModel& sm = staticModels_[i];
+				
+				level::FileStaticModel fsm;
+				file.readObj(fsm);
+
+				// copy over the info.
+				sm.pos = fsm.pos;
+				sm.angle = fsm.angle;
+				sm.modelNameIdx = fsm.modelNameIdx;
+				sm.boundingBox = fsm.boundingBox;
+				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.
+															 // models need to be loaded at some point.
+				const char* pModelName = strTable.getString(sm.modelNameIdx);
+				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(pModelName);
+
+				sm.pModel = X_ASSERT_NOT_NULL(pModel);
+			}
+		}
+	}
+
 
 	if (fileHdr.flags.IsSet(level::LevelFileFlags::COLLISION))
 	{
@@ -1409,10 +1439,69 @@ void World3D::drawAreaGeo(Area** pAreas, uint32_t num)
 	}
 }
 
-void World3D::drawStaticModels(const uint32_t* pEntIds, uint32_t num)
+void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 {
-	X_UNUSED(pEntIds, num);
+	X_UNUSED(pModelIds, num);
 
+	for (uint32_t i = 0; i < num; i++)
+	{
+		const auto modelId = pModelIds[i];
+		level::StaticModel& sm = staticModels_[modelId];
+
+		// should this be allowed?
+		if (!sm.pModel) {
+			continue;
+		}
+
+		model::XModel* pModel = sm.pModel;
+
+
+		// is this a good place todo the bucketing?
+		// like placing the model in multiple buckets
+		// seams like a good palce since we are fully parralel here.
+		// should we also handle lod logic here?
+		// how to handle instancing?
+		// since if we have 10 models that are the same we want to draw them as a batch.
+		// for static models we can work out models that are the same so for a visible area we have the info about what can be instanced.
+		// i think per area batching should work well enougth in practice tho.
+		// then that would need processing / culling a little diffrent so that i end up with list of ents for instanced drawing
+		// which can then have buffers made with all the instanced info and populate each frame and draw.
+		// i don't think pre making the instanced buffers per a area is worth it as it will make culling harder.
+		// so for now we just handle the rendering of a model.
+		size_t lodIdx = 0;
+
+		const float distanceFromCam = cam_.getPosition().distance(sm.pos);
+
+		if (pModel->HasLods())
+		{
+			// work out which lod to select based on distance.
+			lodIdx = pModel->lodIdxForDistance(distanceFromCam);
+
+			// now just because we want to render with this lod don't mean we can
+			// for example we may have not uploaded the mesh for this lod to the gpu
+
+			if (!pModel->canRenderLod(lodIdx))
+			{
+				// lets try pick another lod.
+				// higer or lower?
+				while (lodIdx > 0 && !pModel->canRenderLod(lodIdx))
+				{
+					--lodIdx;
+				}
+			}
+		}
+
+		// upload if needed.
+		if (!pModel->canRenderLod(lodIdx))
+		{
+			pModel->createRenderBuffersForLod(lodIdx, gEnv->pRender);
+		}
+
+		const model::MeshHeader& mesh = pModel->getLodMeshHdr(lodIdx);
+		const auto& renderMesh = pModel->getLodRenderMesh(lodIdx);
+
+		addMeshTobucket(mesh, renderMesh, distanceFromCam);
+	}
 }
 
 void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, const float distanceFromCam)

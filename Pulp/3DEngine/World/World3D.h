@@ -205,7 +205,7 @@ private:
 	void drawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 	void drawAreaGeo(Area** pAreas, uint32_t num);
-	void drawStaticModels(const uint32_t* pEntIds, uint32_t num);
+	void drawStaticModels(const uint32_t* pModelIds, uint32_t num);
 
 	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, const float distanceFromCam);
 
