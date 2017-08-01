@@ -295,9 +295,9 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	// load the materials.
 	for (i = 0; i < hdr.numMesh; i++)
 	{
-		SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&pMeshHeads_[i]);
+		SubMeshHeader& mesh = const_cast<SubMeshHeader&>(pMeshHeads_[i]);
 
-		pMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(pMesh->materialName);
+		mesh.pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(mesh.materialName);
 	}
 
 	data_ = std::move(data);
