@@ -180,7 +180,7 @@ bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
 {
 	if (!ensureConnected()) {
 		MayaUtil::MayaPrintError("Failed to 'GetModInfo' pipe is invalid");
-		return MS::kFailure;
+		return false;
 	}
 
 	{
@@ -191,19 +191,19 @@ bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
 		request.set_allocated_modinfo(pModInfo);
 
 		if (!sendRequest(request)) {
-			return MS::kFailure;
+			return false;
 		}
 	}
 
 	ProtoBuf::AssetDB::ModInfoResponse response;
 	if (!readMessage(response)) {
-		return MS::kFailure;
+		return false;
 	}
 
 	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
 		const std::string& err = response.error();
 		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
-		return MS::kFailure;
+		return false;
 	}
 
 	modOut.modId = response.modid();
@@ -217,7 +217,7 @@ bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
 		auto& path = response.path();
 		modOut.outDir = core::Path<char>(path.data(), path.data() + path.length());
 	}
-	return MS::kSuccess;
+	return true;
 }
 
 
