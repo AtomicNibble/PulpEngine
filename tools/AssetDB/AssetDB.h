@@ -90,13 +90,14 @@ public:
 
 
 public:
-	typedef int32_t ModId;
-	typedef int32_t ProfileId;
+	typedef assetDb::AssetId AssetId;
+	typedef assetDb::ModId ModId;
+	typedef assetDb::ProfileId ProfileId;
 
-	static const ModId INVALID_MOD_ID = -1;
-	static const ModId INVALID_ASSET_ID = -1;
-	static const ModId INVALID_RAWFILE_ID = -1;
-	static const ModId INVALID_THUMB_ID = -1;
+	static const ModId INVALID_MOD_ID = assetDb::INVALID_MOD_ID;
+	static const AssetId INVALID_ASSET_ID = assetDb::INVALID_ASSET_ID;
+	static const AssetId INVALID_RAWFILE_ID = assetDb::INVALID_RAWFILE_ID;
+	static const AssetId INVALID_THUMB_ID = assetDb::INVALID_THUMB_ID;
 
 	typedef assetDb::AssetType AssetType;
 	X_DECLARE_ENUM(Result)(
@@ -112,7 +113,7 @@ public:
 	typedef core::Array<Mod> ModsArr;
 	typedef core::Array<AssetInfo> AssetInfoArr;
 	typedef core::Array<AssetRef> RefsArr;
-	typedef core::Array<int32_t> AssetIdArr;
+	typedef core::Array<AssetId> AssetIdArr;
 	typedef core::Array<uint8_t> DataArr;
 
 	// callbacks.
