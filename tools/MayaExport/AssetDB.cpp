@@ -3,6 +3,7 @@
 #include "MayaUtil.h"
 
 #include <Containers\Array.h>
+#include <Hashing\Fnva1Hash.h>
 
 #include <maya\MSyntax.h>
 #include <maya\MArgDatabase.h>
@@ -573,20 +574,57 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 
 		// work out action type.
 		// is it a valid path id?
-		if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "model")) {
-			assetType = AssetType::MODEL;
-		}
-		else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "anim")) {
-			assetType = AssetType::ANIM;
-		}
-		else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "material")) {
-			assetType = AssetType::MATERIAL;
-		}
-		else {
-			core::StackString512 msg;
-			msg.appendFmt("unknown type: '%s' valid type's: model, anim, material", typeStr.asChar());
-			setResult(msg.c_str());
-			return MS::kSuccess;
+		static_assert(AssetType::ENUM_COUNT == 13, "More asset types :[] ? this code needs updating.");
+
+		typeStr.toLowerCase();
+
+		using namespace core::Hash::Fnva1Literals;
+		switch (core::Hash::Fnv1aHash(typeStr.asChar(), typeStr.length()))
+		{
+			case "model"_fnv1a:
+				assetType = AssetType::MODEL;
+				break;
+			case "anim"_fnv1a:
+				assetType = AssetType::ANIM;
+				break;
+			case "material"_fnv1a:
+				assetType = AssetType::MATERIAL;
+				break;
+			case "img"_fnv1a:
+				assetType = AssetType::IMG;
+				break;
+			case "weapon"_fnv1a:
+				assetType = AssetType::WEAPON;
+				break;
+			case "turret"_fnv1a:
+				assetType = AssetType::TURRET;
+				break;
+			case "light"_fnv1a:
+				assetType = AssetType::LIGHT;
+				break;
+			case "fx"_fnv1a:
+				assetType = AssetType::FX;
+				break;
+			case "rumble"_fnv1a:
+				assetType = AssetType::RUMBLE;
+				break;
+			case "shellshock"_fnv1a:
+				assetType = AssetType::SHELLSHOCK;
+				break;
+			case "character"_fnv1a:
+				assetType = AssetType::CHARACTER;
+				break;
+			case "vehicle"_fnv1a:
+				assetType = AssetType::VEHICLE;
+				break;
+			case "camera"_fnv1a:
+				assetType = AssetType::CAMERA;
+				break;
+			default:
+				core::StackString512 msg;
+				msg.appendFmt("unknown type: '%s' valid type's: model, anim, material", typeStr.asChar());
+				setResult(msg.c_str());
+				return MS::kSuccess;
 		}
 	}
 	else
