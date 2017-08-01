@@ -340,10 +340,17 @@ MStatus ModelExporter::convert(const MArgList& args)
 					PROFILE_MAYA_NAME("Compile and save");
 
 					// we want the path from assetDB for the assets mod.
+					// lower case the relative path add add to working.
+					core::Path<char> assetPath;
+					assetPath /= mod.outDir;
+					assetPath /= assetDb::AssetType::ToString(maya::AssetDB::AssetType::MODEL);
+					assetPath += "s";
+					assetPath.toLower();
+					assetPath /= getName();
+					assetPath.replaceSeprators();
+
 					core::Path<char> outPath = info.workingDir;
-					outPath /= mod.outDir;
-					outPath /= getName();
-					outPath.replaceSeprators();
+					outPath /= assetPath;
 
 					MayaUtil::MayaPrintMsg("Exporting to: '%s'", outPath.c_str());
 
