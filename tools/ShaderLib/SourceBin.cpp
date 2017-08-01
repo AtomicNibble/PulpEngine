@@ -387,7 +387,7 @@ namespace shader
 										ILFlag::Enum ilFlag;
 										if (!ILFlagFromStr(ifDefValue.begin() + 3, ilFlag))
 										{
-											X_ERROR("Shader", "invalid InputLayout prepro in shader: % value: %s",
+											X_ERROR("Shader", "invalid InputLayout prepro in shader: %s value: %s",
 												pSourceFile->getName().c_str(), ifDefValue.c_str());
 										}
 										else
