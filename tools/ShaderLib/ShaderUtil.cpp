@@ -149,7 +149,7 @@ namespace shader
 					return ILFlag::Color;
 
 				case VertexFormat::P3F_T4F_C4B_N3F:
-					return ILFlag::Color | ILFlag::Normal;
+					return ILFlag::Color | ILFlag::Normal | ILFlag::Uv2;
 
 				default:
 #if X_DEBUG
