@@ -272,6 +272,7 @@ X_DECLARE_ENUM8(InputLayoutFormat)(
 //
 
 
+#if 0
 X_DECLARE_FLAGS(TechFlag)(
 	Color, 
 	Textured, 
@@ -280,7 +281,7 @@ X_DECLARE_FLAGS(TechFlag)(
 );
 
 typedef Flags<TechFlag> TechFlags;
-
+#endif
 
 // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -338,7 +339,8 @@ struct IShader
 X_DECLARE_FLAGS8(Permatation)(
 	VertStreams,
 	HwSkin,
-	Instanced
+	Instanced,
+	Textured
 );
 
 typedef Flags8<Permatation> PermatationFlags;

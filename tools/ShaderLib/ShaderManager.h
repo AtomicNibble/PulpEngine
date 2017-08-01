@@ -96,7 +96,7 @@ namespace shader
 		void compileShader_job(CompileJobInfo* pJobInfo, uint32_t num);
 
 		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-			SourceFile* pSourceFile, const TechFlags techFlags, ILFlags ILFlags);
+			SourceFile* pSourceFile, const shader::PermatationFlags permFlags, ILFlags ILFlags);
 
 	private:
 		static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);

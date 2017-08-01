@@ -129,23 +129,7 @@ namespace shader
 	XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
 		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
 	{
-		X_UNUSED(permFlags);
-
-
-		TechFlags techFlags;
-		// copy them across.
-		// i think i will phase out techFlags.
-		// just gonna see how it evolves.
-		// the thing that's diffrent about permatation flags is that is also has things that relate to render state.
-		// but i think that's okay.
-		if (permFlags.IsSet(shader::Permatation::Instanced)) {
-			techFlags.Set(TechFlag::Instanced);
-		}
-		if (permFlags.IsSet(shader::Permatation::HwSkin)) {
-			techFlags.Set(TechFlag::Skinned);
-		}
-
-		XHWShader* pHW = hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), techFlags, ILFlags());
+		XHWShader* pHW = hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ILFlags());
 
 		return pHW;
 	}
@@ -349,7 +333,7 @@ namespace shader
 
 	XHWShader* XShaderManager::hwForName(ShaderType::Enum type,
 		const core::string& entry, const core::string& customDefines, SourceFile* pSourceFile,
-		const TechFlags techFlags, ILFlags ILFlags)
+		const shader::PermatationFlags permFlags, ILFlags ILFlags)
 	{
 		X_ASSERT_NOT_NULL(pSourceFile);
 
@@ -365,7 +349,7 @@ namespace shader
 		core::Hash::SHA1Digest::String sha1Buf;
 		sha1.update(pEntry);
 		sha1.update(customDefines.begin(), customDefines.length());
-		sha1.update(techFlags);
+		sha1.update(permFlags);
 		sha1.update(ILFlags);
 		sha1.update(type); // include this?
 		auto digest = sha1.finalize();
@@ -398,7 +382,7 @@ namespace shader
 			entry, 
 			customDefines,
 			pSourceFile,
-			techFlags
+			permFlags
 		);
 
 		return pHWShaderRes;

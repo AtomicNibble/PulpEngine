@@ -34,8 +34,8 @@ namespace shader
 	X_INLINE ShaderStatus::Enum XHWShader::getStatus(void) const {
 		return status_;
 	}
-	X_INLINE TechFlags XHWShader::getTechFlags(void) const {
-		return techFlags_;
+	X_INLINE PermatationFlags XHWShader::getPermFlags(void) const {
+		return permFlags_;
 	}
 	X_INLINE ShaderType::Enum XHWShader::getType(void) const {
 		return type_;

@@ -55,7 +55,7 @@ namespace shader
 			uint16_t numInstructions;
 
 			// 4
-			TechFlags techFlags;
+			PermatationFlags permFlags;
 			// 4
 			ShaderType::Enum type;
 			InputLayoutFormat::Enum ILFmt;
@@ -133,7 +133,7 @@ namespace shader
 		hdr.numCBufs = pShader->getNumConstantBuffers();
 		hdr.numInstructions = pShader->getNumInstructions();
 
-		hdr.techFlags = pShader->getTechFlags();
+		hdr.permFlags = pShader->getPermFlags();
 		hdr.type = pShader->getType();
 		hdr.ILFmt = pShader->getILFormat();
 
@@ -312,7 +312,7 @@ namespace shader
 				pShader->numRenderTargets_ = hdr.numRenderTargets;
 				X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")();
 
-				pShader->techFlags_ = hdr.techFlags;
+				pShader->permFlags_ = hdr.permFlags;
 				pShader->IlFmt_ = hdr.ILFmt;
 
 				// type should already be set.

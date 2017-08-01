@@ -24,13 +24,13 @@ namespace shader
 
 	XHWShader::XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
 		const core::string& entry, const core::string& customDefines,
-		SourceFile* pSourceFile, TechFlags techFlags) :
+		SourceFile* pSourceFile, PermatationFlags permFlags) :
 		name_(pName),
 		pSourceFile_(X_ASSERT_NOT_NULL(pSourceFile)),
 		entryPoint_(entry),
 		customDefines_(customDefines),
 		status_(ShaderStatus::NotCompiled),
-		techFlags_(techFlags),
+		permFlags_(permFlags),
 		type_(type),
 		IlFmt_(InputLayoutFormat::Invalid),
 		numInputParams_(0),
@@ -109,16 +109,16 @@ namespace shader
 		size_t macroBufIdx = 0;
 
 		// i turn all set flags into strings.
-		if (techFlags_.IsAnySet())
+		if (permFlags_.IsAnySet())
 		{
 			core::StackString<256, char> macro;
 
-			for (uint32_t i = 1; i < TechFlag::FLAGS_COUNT; i++)
+			for (uint32_t i = 1; i < PermatationFlags::FLAGS_COUNT; i++)
 			{
-				TechFlag::Enum flag = static_cast<TechFlag::Enum>(1 << i);
-				if (techFlags_.IsSet(flag))
+				Permatation::Enum flag = static_cast<PermatationFlags::Enum>(1 << i);
+				if (permFlags_.IsSet(flag))
 				{
-					macro.setFmt("X_%s", TechFlag::ToString(flag));
+					macro.setFmt("X_%s", Permatation::ToString(flag));
 					macro.toUpper();
 
 					if (macroBufIdx + macro.length() > macroBuffer.size())
@@ -491,7 +491,7 @@ namespace shader
 				// how many?
 				// i only do sematic checks now, since i don't give a flying fuck about the format.
 
-				if (techFlags_.IsSet(TechFlag::Instanced) && InputDsc.SemanticIndex > 0)
+				if (permFlags_.IsSet(Permatation::Instanced) && InputDsc.SemanticIndex > 0)
 				{
 					// pos and color with semantic index above 0 are ignores when instancing enabled.
 					if (core::strUtil::IsEqual("POSITION", InputDsc.SemanticName))
