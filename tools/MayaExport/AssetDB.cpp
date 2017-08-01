@@ -175,6 +175,39 @@ bool AssetDB::Connect(void)
 	return true;
 }
 
+bool AssetDB::GetConverterInfo(ConverterInfo& infoOut)
+{
+	if (!ensureConnected()) {
+		MayaUtil::MayaPrintError("Failed to 'GetModInfo' pipe is invalid");
+		return false;
+	}
+
+	{
+		ProtoBuf::AssetDB::ConverterInfoReqest* pRequest = new ProtoBuf::AssetDB::ConverterInfoReqest();
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_coninfo(pRequest);
+
+		if (!sendRequest(request)) {
+			return false;
+		}
+	}
+
+	ProtoBuf::AssetDB::ConverterInfoResponse response;
+	if (!readMessage(response)) {
+		return false;
+	}
+
+	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
+		const std::string& err = response.error();
+		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
+		return false;
+	}
+
+	infoOut.workingDir.set(response.workingdir().c_str());
+	return true;
+}
+
 
 bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
 {

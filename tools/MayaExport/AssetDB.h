@@ -41,6 +41,12 @@ public:
 	};
 
 
+	struct ConverterInfo
+	{
+		core::Path<char> workingDir;
+	};
+
+
 public:
 	AssetDB();
 	~AssetDB();
@@ -51,6 +57,7 @@ public:
 
 	bool Connect(void);
 
+	bool GetConverterInfo(ConverterInfo& infoOut);
 	bool GetModInfo(int32_t id, Mod& modOut);
 	MStatus AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut);
 
