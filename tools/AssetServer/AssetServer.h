@@ -47,7 +47,7 @@ private:
 		bool readRequest(ProtoBuf::AssetDB::Request& request);
 		bool readBuf(DataArr& buf, size_t size);
 
-		void writeError(ResponseBuffer& outputBuffer, const char* pErrMsg);
+		void writeError(ResponseBuffer& outputBuffer, const char* pErrMsg, ...);
 
 		bool writeAndFlushBuf(ResponseBuffer& outputBuffer);
 

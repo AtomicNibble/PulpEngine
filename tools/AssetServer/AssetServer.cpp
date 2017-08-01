@@ -254,7 +254,7 @@ bool AssetServer::Client::listen(void)
 		}
 			break;
 		default:
-			writeError(responseBuf, "Unknown request msg type");
+			writeError(responseBuf, "Unknown request msg type '%i'", type);
 			break;
 		}
 
@@ -330,12 +330,19 @@ bool AssetServer::Client::readBuf(DataArr& buf, size_t size)
 	return true;
 }
 
-void AssetServer::Client::writeError(ResponseBuffer& outputBuffer, const char* pErrMsg)
+void AssetServer::Client::writeError(ResponseBuffer& outputBuffer, const char* pErrMsg, ...)
 {
-	X_ERROR("AssetServer", "Error: %s", pErrMsg);
+	core::StackString<2048> msg;
+
+	va_list args;
+	va_start(args, pErrMsg);
+	msg.appendFmt(pErrMsg, args);
+	va_end(args);
+
+	X_ERROR("AssetServer", "Error: %s", msg.c_str());
 
 	ProtoBuf::AssetDB::Reponse response;
-	response.set_error(pErrMsg);
+	response.set_error(msg.c_str());	
 	response.set_result(ProtoBuf::AssetDB::Result::ERROR);
 
 	if (!WriteDelimitedTo(response, outputBuffer)) {
