@@ -28,7 +28,7 @@ namespace shader
 		struct ShaderBinHeader
 		{
 			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-			static const uint32_t X_SHADER_BIN_VERSION = 4; // change this to force all shaders to be recompiled.
+			static const uint32_t X_SHADER_BIN_VERSION = 5; // change this to force all shaders to be recompiled.
 
 
 			uint32_t forcc;
