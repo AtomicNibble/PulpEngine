@@ -462,6 +462,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 	}
 
 
+#if 0
 	if (fileHdr.flags.IsSet(level::LevelFileFlags::AREA_ENT_REF_LISTS))
 	{
 		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::AREA_ENT_REFS);
@@ -486,6 +487,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 		entRefs.areaMultiRefs.resize(numMultiAreaEntRefs);
 		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
 	}
+#endif
 
 	if (fileHdr.flags.IsSet(level::LevelFileFlags::AREA_STATIC_MODEL_REF_LISTS))
 	{
