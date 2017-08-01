@@ -322,12 +322,12 @@ void protobuf_AddDesc_assetdb_2eproto() {
     "toBuf.AssetDB.Result\022\r\n\005error\030\002 \002(\t\"\256\001\n\021"
     "AssetInfoResponse\022/\n\006result\030\001 \002(\0162\037.Pota"
     "to.ProtoBuf.AssetDB.Result\022\r\n\005error\030\002 \002("
-    "\t\022\014\n\004name\030\003 \002(\t\0220\n\004type\030\004 \002(\0162\".Potato.P"
-    "rotoBuf.AssetDB.AssetType\022\n\n\002id\030\005 \002(\r\022\r\n"
-    "\005modId\030\006 \002(\r\"|\n\017ModInfoResponse\022/\n\006resul"
+    "\t\022\014\n\004name\030\003 \001(\t\0220\n\004type\030\004 \001(\0162\".Potato.P"
+    "rotoBuf.AssetDB.AssetType\022\n\n\002id\030\005 \001(\r\022\r\n"
+    "\005modId\030\006 \001(\r\"|\n\017ModInfoResponse\022/\n\006resul"
     "t\030\001 \002(\0162\037.Potato.ProtoBuf.AssetDB.Result"
-    "\022\r\n\005error\030\002 \002(\t\022\r\n\005modId\030\003 \002(\r\022\014\n\004name\030\004"
-    " \002(\t\022\014\n\004path\030\005 \002(\t\"J\n\010AddAsset\022\014\n\004name\030\001"
+    "\022\r\n\005error\030\002 \002(\t\022\r\n\005modId\030\003 \001(\r\022\014\n\004name\030\004"
+    " \001(\t\022\014\n\004path\030\005 \001(\t\"J\n\010AddAsset\022\014\n\004name\030\001"
     " \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.Ass"
     "etDB.AssetType\"M\n\013DeleteAsset\022\014\n\004name\030\001 "
     "\002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.Asse"
@@ -864,7 +864,7 @@ bool AssetInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required string name = 3;
+      // optional string name = 3;
       case 3: {
         if (tag == 26) {
          parse_name:
@@ -881,7 +881,7 @@ bool AssetInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
+      // optional .Potato.ProtoBuf.AssetDB.AssetType type = 4;
       case 4: {
         if (tag == 32) {
          parse_type:
@@ -901,7 +901,7 @@ bool AssetInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint32 id = 5;
+      // optional uint32 id = 5;
       case 5: {
         if (tag == 40) {
          parse_id:
@@ -916,7 +916,7 @@ bool AssetInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint32 modId = 6;
+      // optional uint32 modId = 6;
       case 6: {
         if (tag == 48) {
          parse_modId:
@@ -972,7 +972,7 @@ void AssetInfoResponse::SerializeWithCachedSizes(
       2, this->error(), output);
   }
 
-  // required string name = 3;
+  // optional string name = 3;
   if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->name().data(), this->name().length(),
@@ -982,18 +982,18 @@ void AssetInfoResponse::SerializeWithCachedSizes(
       3, this->name(), output);
   }
 
-  // required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
+  // optional .Potato.ProtoBuf.AssetDB.AssetType type = 4;
   if (has_type()) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       4, this->type(), output);
   }
 
-  // required uint32 id = 5;
+  // optional uint32 id = 5;
   if (has_id()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->id(), output);
   }
 
-  // required uint32 modId = 6;
+  // optional uint32 modId = 6;
   if (has_modid()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(6, this->modid(), output);
   }
@@ -1025,7 +1025,7 @@ void AssetInfoResponse::SerializeWithCachedSizes(
         2, this->error(), target);
   }
 
-  // required string name = 3;
+  // optional string name = 3;
   if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->name().data(), this->name().length(),
@@ -1036,18 +1036,18 @@ void AssetInfoResponse::SerializeWithCachedSizes(
         3, this->name(), target);
   }
 
-  // required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
+  // optional .Potato.ProtoBuf.AssetDB.AssetType type = 4;
   if (has_type()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       4, this->type(), target);
   }
 
-  // required uint32 id = 5;
+  // optional uint32 id = 5;
   if (has_id()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(5, this->id(), target);
   }
 
-  // required uint32 modId = 6;
+  // optional uint32 modId = 6;
   if (has_modid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(6, this->modid(), target);
   }
@@ -1077,27 +1077,27 @@ int AssetInfoResponse::ByteSize() const {
           this->error());
     }
 
-    // required string name = 3;
+    // optional string name = 3;
     if (has_name()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->name());
     }
 
-    // required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
+    // optional .Potato.ProtoBuf.AssetDB.AssetType type = 4;
     if (has_type()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
     }
 
-    // required uint32 id = 5;
+    // optional uint32 id = 5;
     if (has_id()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->id());
     }
 
-    // required uint32 modId = 6;
+    // optional uint32 modId = 6;
     if (has_modid()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
@@ -1166,7 +1166,7 @@ void AssetInfoResponse::CopyFrom(const AssetInfoResponse& from) {
 }
 
 bool AssetInfoResponse::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000003f) != 0x0000003f) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }
@@ -1341,7 +1341,7 @@ bool ModInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required uint32 modId = 3;
+      // optional uint32 modId = 3;
       case 3: {
         if (tag == 24) {
          parse_modId:
@@ -1356,7 +1356,7 @@ bool ModInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required string name = 4;
+      // optional string name = 4;
       case 4: {
         if (tag == 34) {
          parse_name:
@@ -1373,7 +1373,7 @@ bool ModInfoResponse::MergePartialFromCodedStream(
         break;
       }
 
-      // required string path = 5;
+      // optional string path = 5;
       case 5: {
         if (tag == 42) {
          parse_path:
@@ -1431,12 +1431,12 @@ void ModInfoResponse::SerializeWithCachedSizes(
       2, this->error(), output);
   }
 
-  // required uint32 modId = 3;
+  // optional uint32 modId = 3;
   if (has_modid()) {
     ::google::protobuf::internal::WireFormatLite::WriteUInt32(3, this->modid(), output);
   }
 
-  // required string name = 4;
+  // optional string name = 4;
   if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->name().data(), this->name().length(),
@@ -1446,7 +1446,7 @@ void ModInfoResponse::SerializeWithCachedSizes(
       4, this->name(), output);
   }
 
-  // required string path = 5;
+  // optional string path = 5;
   if (has_path()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->path().data(), this->path().length(),
@@ -1483,12 +1483,12 @@ void ModInfoResponse::SerializeWithCachedSizes(
         2, this->error(), target);
   }
 
-  // required uint32 modId = 3;
+  // optional uint32 modId = 3;
   if (has_modid()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(3, this->modid(), target);
   }
 
-  // required string name = 4;
+  // optional string name = 4;
   if (has_name()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->name().data(), this->name().length(),
@@ -1499,7 +1499,7 @@ void ModInfoResponse::SerializeWithCachedSizes(
         4, this->name(), target);
   }
 
-  // required string path = 5;
+  // optional string path = 5;
   if (has_path()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->path().data(), this->path().length(),
@@ -1535,21 +1535,21 @@ int ModInfoResponse::ByteSize() const {
           this->error());
     }
 
-    // required uint32 modId = 3;
+    // optional uint32 modId = 3;
     if (has_modid()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
           this->modid());
     }
 
-    // required string name = 4;
+    // optional string name = 4;
     if (has_name()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->name());
     }
 
-    // required string path = 5;
+    // optional string path = 5;
     if (has_path()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
@@ -1615,7 +1615,7 @@ void ModInfoResponse::CopyFrom(const ModInfoResponse& from) {
 }
 
 bool ModInfoResponse::IsInitialized() const {
-  if ((_has_bits_[0] & 0x0000001f) != 0x0000001f) return false;
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
 
   return true;
 }

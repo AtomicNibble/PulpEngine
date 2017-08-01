@@ -259,7 +259,7 @@ class AssetInfoResponse : public ::google::protobuf::Message {
   inline ::std::string* release_error();
   inline void set_allocated_error(::std::string* error);
 
-  // required string name = 3;
+  // optional string name = 3;
   inline bool has_name() const;
   inline void clear_name();
   static const int kNameFieldNumber = 3;
@@ -271,21 +271,21 @@ class AssetInfoResponse : public ::google::protobuf::Message {
   inline ::std::string* release_name();
   inline void set_allocated_name(::std::string* name);
 
-  // required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
+  // optional .Potato.ProtoBuf.AssetDB.AssetType type = 4;
   inline bool has_type() const;
   inline void clear_type();
   static const int kTypeFieldNumber = 4;
   inline ::Potato::ProtoBuf::AssetDB::AssetType type() const;
   inline void set_type(::Potato::ProtoBuf::AssetDB::AssetType value);
 
-  // required uint32 id = 5;
+  // optional uint32 id = 5;
   inline bool has_id() const;
   inline void clear_id();
   static const int kIdFieldNumber = 5;
   inline ::google::protobuf::uint32 id() const;
   inline void set_id(::google::protobuf::uint32 value);
 
-  // required uint32 modId = 6;
+  // optional uint32 modId = 6;
   inline bool has_modid() const;
   inline void clear_modid();
   static const int kModIdFieldNumber = 6;
@@ -398,14 +398,14 @@ class ModInfoResponse : public ::google::protobuf::Message {
   inline ::std::string* release_error();
   inline void set_allocated_error(::std::string* error);
 
-  // required uint32 modId = 3;
+  // optional uint32 modId = 3;
   inline bool has_modid() const;
   inline void clear_modid();
   static const int kModIdFieldNumber = 3;
   inline ::google::protobuf::uint32 modid() const;
   inline void set_modid(::google::protobuf::uint32 value);
 
-  // required string name = 4;
+  // optional string name = 4;
   inline bool has_name() const;
   inline void clear_name();
   static const int kNameFieldNumber = 4;
@@ -417,7 +417,7 @@ class ModInfoResponse : public ::google::protobuf::Message {
   inline ::std::string* release_name();
   inline void set_allocated_name(::std::string* name);
 
-  // required string path = 5;
+  // optional string path = 5;
   inline bool has_path() const;
   inline void clear_path();
   static const int kPathFieldNumber = 5;
@@ -1414,7 +1414,7 @@ inline void AssetInfoResponse::set_allocated_error(::std::string* error) {
   // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
 }
 
-// required string name = 3;
+// optional string name = 3;
 inline bool AssetInfoResponse::has_name() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -1490,7 +1490,7 @@ inline void AssetInfoResponse::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
 }
 
-// required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
+// optional .Potato.ProtoBuf.AssetDB.AssetType type = 4;
 inline bool AssetInfoResponse::has_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
@@ -1515,7 +1515,7 @@ inline void AssetInfoResponse::set_type(::Potato::ProtoBuf::AssetDB::AssetType v
   // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.type)
 }
 
-// required uint32 id = 5;
+// optional uint32 id = 5;
 inline bool AssetInfoResponse::has_id() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
@@ -1539,7 +1539,7 @@ inline void AssetInfoResponse::set_id(::google::protobuf::uint32 value) {
   // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.id)
 }
 
-// required uint32 modId = 6;
+// optional uint32 modId = 6;
 inline bool AssetInfoResponse::has_modid() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
@@ -1668,7 +1668,7 @@ inline void ModInfoResponse::set_allocated_error(::std::string* error) {
   // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
 }
 
-// required uint32 modId = 3;
+// optional uint32 modId = 3;
 inline bool ModInfoResponse::has_modid() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
@@ -1692,7 +1692,7 @@ inline void ModInfoResponse::set_modid(::google::protobuf::uint32 value) {
   // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfoResponse.modId)
 }
 
-// required string name = 4;
+// optional string name = 4;
 inline bool ModInfoResponse::has_name() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
@@ -1768,7 +1768,7 @@ inline void ModInfoResponse::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
 }
 
-// required string path = 5;
+// optional string path = 5;
 inline bool ModInfoResponse::has_path() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
