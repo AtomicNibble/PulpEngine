@@ -463,6 +463,7 @@ void AssetServer::ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuf
 		assetDb::AssetDB::Mod mod;
 		if (db_.GetModInfo(modId, mod))
 		{
+			response.set_error("");
 			response.set_result(ProtoBuf::AssetDB::Result::OK);
 			response.set_modid(mod.modId);
 			response.set_name(mod.name);
