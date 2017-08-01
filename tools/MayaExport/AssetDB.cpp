@@ -221,10 +221,13 @@ bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
 }
 
 
-bool AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut)
+MStatus AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut)
 {
 	X_ASSERT_NOT_NULL(pIdOut);
 	X_ASSERT_NOT_NULL(pModIdOut);
+
+	*pIdOut = assetDb::INVALID_ASSET_ID;
+	*pModIdOut = assetDb::INVALID_MOD_ID;
 
 	if (!ensureConnected()) {
 		MayaUtil::MayaPrintError("Failed to 'AssetExsists' pipe is invalid");
@@ -255,9 +258,12 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* p
 		return MS::kFailure;
 	}
 
-
-	*pIdOut = response.has_id() ? response.id() : -1;
-	*pModIdOut = response.has_modid() ? response.modid() : -1;
+	if (response.has_id()) {
+		*pIdOut = response.id();
+	}
+	if (response.has_modid()) {
+		*pModIdOut = response.modid();
+	}
 	return MS::kSuccess;
 }
 
