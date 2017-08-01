@@ -393,9 +393,11 @@ MStatus ModelExporter::convert(const MArgList& args)
 void ModelExporter::printStats(void) const
 {
 	core::StackString<2048> info;
+	CompileFlags::Description flagsDsc;
 
-	info.append("\nModel Info:\n");
-	info.appendFmt("> Compile Time: %fms", stats_.compileTime.GetMilliSeconds());
+	info.append("\nModel Info:");
+	info.appendFmt("\n> Compile Flags: %s", getFlags().ToString(flagsDsc));
+	info.appendFmt("\n> Compile Time: %fms", stats_.compileTime.GetMilliSeconds());
 	info.appendFmt("\n> Total Lods: %" PRIu32, stats_.totalLods);
 	info.appendFmt("\n> Total Mesh: %" PRIu32, stats_.totalMesh);
 	info.appendFmt("\n> Total Mesh merged: %" PRIu32, stats_.totalMeshMerged);
