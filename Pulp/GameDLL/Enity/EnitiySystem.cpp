@@ -7,6 +7,8 @@
 #include <Hashing\Fnva1Hash.h>
 
 #include <IFrameData.h>
+#include <I3DEngine.h>
+#include <IWorld3D.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -25,13 +27,21 @@ namespace entity
 	{
 		pPhysics_ = nullptr;
 		pPhysScene_ = nullptr;
+		p3DWorld_ = nullptr;
+		pModelManager_ = nullptr;
 	}
 
 
-	bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
+	bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
 	{
 		pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
 		pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);
+		p3DWorld_ = X_ASSERT_NOT_NULL(p3DWorld);
+		pModelManager_ = gEnv->p3DEngine->getModelManager();
+
+		if (!pModelManager_) {
+			return false;
+		}
 
 		if (!playerSys_.init(pPhysScene)) {
 			return false;

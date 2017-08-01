@@ -2,6 +2,7 @@
 
 
 #include <IInput.h>
+#include <IModelManager.h>
 
 #include "EnityComponents.h"
 
@@ -11,6 +12,10 @@
 
 X_NAMESPACE_DECLARE(core,
 	struct FrameTimeData;
+)
+
+X_NAMESPACE_DECLARE(engine,
+	struct IWorld3D;
 )
 
 X_NAMESPACE_BEGIN(game)
@@ -30,7 +35,7 @@ namespace entity
 	public:
 		EnititySystem(GameVars& vars, core::MemoryArenaBase* arena);
 
-		bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
+		bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
 		void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
 		EntityId createEnt(void);
@@ -62,6 +67,8 @@ namespace entity
 
 		physics::IPhysics* pPhysics_;
 		physics::IScene* pPhysScene_;
+		engine::IWorld3D* p3DWorld_;
+		model::IModelManager* pModelManager_;
 
 		PlayerSystem playerSys_;
 		CameraSystem cameraSys_;

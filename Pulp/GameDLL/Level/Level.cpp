@@ -339,11 +339,12 @@ bool World::loadMap(const char* pMapName)
 		return false;
 	}
 
-	if (!ents_.init(pPhys_, pScene_)) {
+	auto* pWorld3D = gEnv->p3DEngine->create3DWorld(pScene_);
+
+	if (!ents_.init(pPhys_, pScene_, pWorld3D)) {
 		return false;
 	}
 
-	auto* pWorld3D = gEnv->p3DEngine->create3DWorld(pScene_);
 
 	level_ = core::makeUnique<Level>(arena_, pScene_, pWorld3D, ents_, arena_);
 	level_->load(pMapName);
