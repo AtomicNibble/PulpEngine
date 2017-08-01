@@ -1236,12 +1236,11 @@ global proc potato_CreateExportWindow( string $name )
 		string $help;
 		$help += "How To Export:\n";
 		$help += "  -Add a new entry to the model list\n";
-		$help += "  -Name the model\n";
 		$help += "  -Select the meshes you wish to export\n";
 		$help += "  -Click set on the LOD you wish to add the meshes to\n";
 		$help += "  -Click Export\n";
 		$help += "\n";
-		$help += "Settings:\n";
+		$help += "Settings: (scene-global)\n";
 		$help += "	-Model\n";
 		$help += " 		scale: 				scales the model and bones, Maya scene is unaffected\n";
 		$help += "	-Bones\n";
