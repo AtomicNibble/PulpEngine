@@ -26,7 +26,7 @@ class AssetServer : public core::ThreadAbstract
 {
 public:
 	// used for reading / writing msg's
-	static const size_t BUF_LENGTH = 0x200;
+	static const size_t BUF_LENGTH = assetDb::api::MESSAGE_BUFFER_SIZE;
 	typedef core::FixedArray<uint8_t, BUF_LENGTH> ResponseBuffer;
 	typedef core::Array<uint8_t> DataArr;
 	typedef assetDb::AssetDB::AssetType AssetType;

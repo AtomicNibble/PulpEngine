@@ -40,4 +40,11 @@ X_DECLARE_ENUM(AssetType)(
 	CAMERA
 );
 
+
+namespace api
+{
+	static const size_t MESSAGE_BUFFER_SIZE = 0x200; // max size of message sent by api.
+
+}
+
 X_NAMESPACE_END

@@ -182,8 +182,8 @@ bool AssetServer::Client::connect(void)
 		core::IPC::Pipe::CreateMode::DUPLEX,
 		core::IPC::Pipe::PipeMode::MESSAGE_RW,
 		10,
-		512,
-		512,
+		assetDb::api::MESSAGE_BUFFER_SIZE,
+		assetDb::api::MESSAGE_BUFFER_SIZE,
 		core::TimeVal::fromMS(100)
 		)) {
 		X_ERROR("AssetServer", "Failed to create pipe");
@@ -274,9 +274,7 @@ bool AssetServer::Client::listen(void)
 bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 {
 	uint8_t buffer[BUF_LENGTH];
-
 	size_t bytesRead;
-	bool cleanEof;
 
 	if (!pipe_.read(buffer, sizeof(buffer), &bytesRead)) {
 		X_ERROR("AssetServer", "Failed to read msg");
@@ -290,8 +288,8 @@ bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 		return false;
 	}
 
-	google::protobuf::io::ArrayInputStream arrayInput(buffer, 
-		safe_static_cast<int32_t, size_t>(bytesRead));
+	google::protobuf::io::ArrayInputStream arrayInput(buffer, safe_static_cast<int32_t>(bytesRead));
+	bool cleanEof;
 
 	if (!ReadDelimitedFrom(&arrayInput, &request, &cleanEof)) {
 		X_ERROR("AssetServer", "Failed to parse msg");

@@ -28,6 +28,8 @@ X_NAMESPACE_BEGIN(maya)
 class AssetDB
 {
 public:
+	static const size_t BUF_LENGTH = assetDb::api::MESSAGE_BUFFER_SIZE;
+
 	typedef assetDb::AssetType AssetType;
 
 	struct Mod

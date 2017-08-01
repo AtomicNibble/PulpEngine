@@ -395,10 +395,9 @@ MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name,
 
 bool AssetDB::sendRequest(ProtoBuf::AssetDB::Request& request)
 {
-	const size_t bufLength = 0x1000;
-	uint8_t buffer[bufLength];
+	uint8_t buffer[BUF_LENGTH];
 
-	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, BUF_LENGTH);
 	WriteDelimitedTo(request, &arrayOutput);
 
 	bool firstAttempt = true;
@@ -474,8 +473,7 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 
 bool AssetDB::readMessage(google::protobuf::MessageLite& message)
 {
-	const size_t bufLength = 0x200;
-	uint8_t buffer[bufLength];
+	uint8_t buffer[BUF_LENGTH];
 	size_t bytesRead;
 	bool cleanEof;
 
