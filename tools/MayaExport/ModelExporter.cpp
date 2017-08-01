@@ -191,11 +191,6 @@ MStatus ModelExporter::convert(const MArgList& args)
 	status = MayaUtil::ShowProgressDlg(0, (exportMode_ == ExpoMode::RAW) ? 6 : 7);
 	bool saveOk = false;
 
-	{
-		MayaUtil::MayaPrintMsg("Exporting to: '%s'", getFilePath().c_str());
-		MayaUtil::MayaPrintMsg(""); // new line
-	}
-
 	// name length check
 	if (fileName_.length() > model::MODEL_MAX_NAME_LENGTH)
 	{
@@ -239,12 +234,17 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 
 		// time to slap a goat!
-		core::Path<char> outPath = getFilePath();
 		bool unChanged = false;
 
 		if (exportMode_ == ExpoMode::RAW)
 		{
 			PROFILE_MAYA_NAME("Save Raw");
+
+			core::Path<char> outPath = getFilePath();
+			{
+				MayaUtil::MayaPrintMsg("Exporting to: '%s'", outPath.c_str());
+				MayaUtil::MayaPrintMsg(""); // new line
+			}
 
 			MayaUtil::SetProgressText("Saving raw model");
 
@@ -255,6 +255,32 @@ MStatus ModelExporter::convert(const MArgList& args)
 		}
 		else if (exportMode_ == ExpoMode::SERVER)
 		{
+			MayaUtil::SetProgressText("Getting info from server");
+
+			maya::AssetDB::ConverterInfo info;
+			if (!maya::AssetDB::Get()->GetConverterInfo(info)) {
+				X_ERROR("Model", "Failed to get info from server");
+				return status;
+			}
+
+			int32_t assetId, modId;
+			status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::MODEL, MString(getName()), &assetId, &modId);
+			if (!status) {
+				X_ERROR("Model", "Failed to get meta from server");
+				return status;
+			}
+
+			if (assetId == assetDb::INVALID_ASSET_ID || modId == assetDb::INVALID_MOD_ID) {
+				X_ERROR("Model", "Asset is not registerd with server");
+				return MS::kFailure;
+			}
+
+			maya::AssetDB::Mod mod;
+			if (!maya::AssetDB::Get()->GetModInfo(modId, mod)) {
+				X_ERROR("Model", "Failed to get mod info from server");
+				return status;
+			}
+
 			MayaUtil::SetProgressText("Saving raw model");
 
 			core::Array<uint8_t> compressed(g_arena);
@@ -312,6 +338,14 @@ MStatus ModelExporter::convert(const MArgList& args)
 				if (!unChanged)
 				{
 					PROFILE_MAYA_NAME("Compile and save");
+
+					// we want the path from assetDB for the assets mod.
+					core::Path<char> outPath = info.workingDir;
+					outPath /= mod.outDir;
+					outPath /= getName();
+					outPath.replaceSeprators();
+
+					MayaUtil::MayaPrintMsg("Exporting to: '%s'", outPath.c_str());
 
 					if (!compileModel(outPath)) {
 						MayaUtil::MayaPrintError("Failed to compile model");
@@ -423,8 +457,11 @@ void ModelExporter::printStats(void) const
 
 void ModelExporter::setFileName(const MString& path)
 {
-	core::StackString<512, char> temp(path.asChar());
+	core::StackString512 temp(path.asChar());
 	temp.trim();
+	// we don't replace seperators on the name as asset names 
+	// have a fixed slash, regardless of native slash of the platform.
+	// so we replace slashes only when building file paths.
 
 	name_ = temp.c_str();
 	fileName_.set(temp.c_str());
@@ -437,7 +474,6 @@ void ModelExporter::setOutdir(const MString& path)
 	temp.trim();
 
 	outDir_.set(temp.c_str());
-//	outDir_.ensureSlash();
 	outDir_.replaceSeprators();
 }
 
