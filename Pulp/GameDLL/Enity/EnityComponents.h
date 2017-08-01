@@ -5,6 +5,15 @@
 
 #include "UserCmds\UserCmd.h"
 
+X_NAMESPACE_DECLARE(model,
+	struct IModel;
+)
+
+X_NAMESPACE_DECLARE(engine,
+	struct IRenderEnt;
+)
+
+
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
@@ -39,6 +48,12 @@ struct PhysicsTrigger
 struct CharacterController
 {
 	physics::ICharacterController* pController;
+};
+
+struct RenderComponent
+{
+	engine::IRenderEnt* pRenderEnt;
+	model::IModel* pModel;
 };
 
 
@@ -96,6 +111,7 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 	Velocity,
 	TransForm,
 	Health,
+	RenderComponent,
 	PhysicsComponent,
 	PhysicsTrigger,
 	CharacterController,
