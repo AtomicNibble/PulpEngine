@@ -601,6 +601,8 @@ struct IFileSys
 	virtual bool initWorker(void) X_ABSTRACT;
 	virtual void shutDown(void) X_ABSTRACT;
 
+	virtual core::Path<wchar_t> getWorkingDirectory(void) const X_ABSTRACT;
+
 	// folders - there is only one game dirtory.
 	// but other folders can be added with 'addModDir' to add to the virtual directory.
 	virtual bool setGameDir(pathTypeW path) X_ABSTRACT;

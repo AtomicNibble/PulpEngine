@@ -247,6 +247,11 @@ bool xFileSys::InitDirectorys(bool working)
 	return false;
 }
 
+core::Path<wchar_t> xFileSys::getWorkingDirectory(void) const
+{
+	return PathUtil::GetCurrentDirectory();
+}
+
 // --------------------- Open / Close ---------------------
 
 XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)

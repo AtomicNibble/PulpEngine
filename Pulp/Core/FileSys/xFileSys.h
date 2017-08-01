@@ -163,6 +163,8 @@ public:
 
 	bool InitDirectorys(bool workingDir);
 
+	core::Path<wchar_t> getWorkingDirectory(void) const X_FINAL;
+
 	// Open / Close
 	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
 	XFile* openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
