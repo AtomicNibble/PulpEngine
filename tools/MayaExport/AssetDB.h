@@ -31,6 +31,7 @@ public:
 	static const size_t BUF_LENGTH = assetDb::api::MESSAGE_BUFFER_SIZE;
 
 	typedef assetDb::AssetType AssetType;
+	typedef core::Array<uint8_t> DataArr;
 
 	struct Mod
 	{
@@ -57,12 +58,12 @@ public:
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
 	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& args, 
-		const core::Array<uint8_t>& data, bool* pUnchanged = nullptr);
+		const DataArr& data, bool* pUnchanged = nullptr);
 
 
 private:
 	bool sendRequest(ProtoBuf::AssetDB::Request& request);
-	bool sendBuf(const core::Array<uint8_t>& data);
+	bool sendBuf(const DataArr& data);
 	bool getResponse(ProtoBuf::AssetDB::Reponse& response);
 	bool readMessage(google::protobuf::MessageLite& message);
 
