@@ -6,6 +6,8 @@
 
 #include <Platform\Pipe.h>
 
+#include <IAssetDb.h>
+
 X_NAMESPACE_DECLARE(ProtoBuf,
 	namespace AssetDB {
 		class Request;
@@ -26,13 +28,15 @@ X_NAMESPACE_BEGIN(maya)
 class AssetDB
 {
 public:
-	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL, IMG);
+	typedef assetDb::AssetType AssetType;
+
 	struct Mod
 	{
 		int32_t modId;
 		core::string name;
 		core::Path<char> outDir;
 	};
+
 
 public:
 	AssetDB();

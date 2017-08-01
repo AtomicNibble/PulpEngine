@@ -457,23 +457,8 @@ bool AssetDB::sendBuf(const core::Array<uint8_t>& data)
 
 bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 {
-	const size_t bufLength = 0x200;
-	uint8_t buffer[bufLength];
-	size_t bytesRead;
-	bool cleanEof;
-
-	if (!pipe_.read(buffer, sizeof(buffer), &bytesRead)) {
-		X_ERROR("AssetDB", "failed to read response");
-		pipe_.close(); // close it so we can open a new one
-		return false;
-	}
-
-	google::protobuf::io::ArrayInputStream arrayInput(buffer,
-		safe_static_cast<int32_t>(bytesRead));
-
-	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+	if (!readMessage(response)) {
 		X_ERROR("AssetDB", "Failed to read response msg");
-		pipe_.close(); // close it so we can open a new one
 		return false;
 	}
 
