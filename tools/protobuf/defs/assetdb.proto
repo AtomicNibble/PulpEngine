@@ -45,7 +45,12 @@ message ModInfoResponse {
    optional string name = 4;
    optional string path = 5;
 }
+message ConverterInfoResponse {
+    required Result result = 1;
+    required string error = 2;
 
+   optional string workingDir = 3;
+}
 
 
 message AddAsset {
@@ -80,6 +85,10 @@ message ModInfo {
     required uint32 modId = 1;
 }
 
+message ConverterInfoReqest {
+    optional uint32 blank = 1;
+}
+
 message Request {
     oneof msg {
         AddAsset add = 1;
@@ -88,5 +97,6 @@ message Request {
         UpdateAsset update = 4;
         AssetExists exists  = 5;
         ModInfo modInfo = 6;
+        ConverterInfoReqest conInfo = 7;
     }
 }

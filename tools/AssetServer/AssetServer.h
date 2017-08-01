@@ -8,6 +8,7 @@
 X_NAMESPACE_DECLARE(ProtoBuf,
 	namespace AssetDB {
 		class Request;
+		class ConverterInfoReqest;
 		class ModInfo;
 		class AssetExists;
 		class AddAsset;
@@ -68,6 +69,7 @@ private:
 
 	core::Thread::ReturnValue ThreadRun(const core::Thread& thread) X_FINAL;
 
+	void ConverterInfo(const ProtoBuf::AssetDB::ConverterInfoReqest& modInfo, ResponseBuffer& outputBuffer);
 	void ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer);
 	void AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer);
 	void AddAsset(const ProtoBuf::AssetDB::AddAsset& add, ResponseBuffer& outputBuffer);

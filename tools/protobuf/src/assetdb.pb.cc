@@ -31,6 +31,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* ModInfoResponse_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ModInfoResponse_reflection_ = NULL;
+const ::google::protobuf::Descriptor* ConverterInfoResponse_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  ConverterInfoResponse_reflection_ = NULL;
 const ::google::protobuf::Descriptor* AddAsset_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   AddAsset_reflection_ = NULL;
@@ -49,6 +52,9 @@ const ::google::protobuf::internal::GeneratedMessageReflection*
 const ::google::protobuf::Descriptor* ModInfo_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   ModInfo_reflection_ = NULL;
+const ::google::protobuf::Descriptor* ConverterInfoReqest_descriptor_ = NULL;
+const ::google::protobuf::internal::GeneratedMessageReflection*
+  ConverterInfoReqest_reflection_ = NULL;
 const ::google::protobuf::Descriptor* Request_descriptor_ = NULL;
 const ::google::protobuf::internal::GeneratedMessageReflection*
   Request_reflection_ = NULL;
@@ -59,6 +65,7 @@ struct RequestOneofInstance {
   const ::Potato::ProtoBuf::AssetDB::UpdateAsset* update_;
   const ::Potato::ProtoBuf::AssetDB::AssetExists* exists_;
   const ::Potato::ProtoBuf::AssetDB::ModInfo* modinfo_;
+  const ::Potato::ProtoBuf::AssetDB::ConverterInfoReqest* coninfo_;
 }* Request_default_oneof_instance_ = NULL;
 const ::google::protobuf::EnumDescriptor* AssetType_descriptor_ = NULL;
 const ::google::protobuf::EnumDescriptor* Result_descriptor_ = NULL;
@@ -127,7 +134,24 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ModInfoResponse));
-  AddAsset_descriptor_ = file->message_type(3);
+  ConverterInfoResponse_descriptor_ = file->message_type(3);
+  static const int ConverterInfoResponse_offsets_[3] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoResponse, result_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoResponse, error_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoResponse, workingdir_),
+  };
+  ConverterInfoResponse_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      ConverterInfoResponse_descriptor_,
+      ConverterInfoResponse::default_instance_,
+      ConverterInfoResponse_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoResponse, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoResponse, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(ConverterInfoResponse));
+  AddAsset_descriptor_ = file->message_type(4);
   static const int AddAsset_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AddAsset, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AddAsset, type_),
@@ -143,7 +167,7 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AddAsset));
-  DeleteAsset_descriptor_ = file->message_type(4);
+  DeleteAsset_descriptor_ = file->message_type(5);
   static const int DeleteAsset_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DeleteAsset, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(DeleteAsset, type_),
@@ -159,7 +183,7 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(DeleteAsset));
-  RenameAsset_descriptor_ = file->message_type(5);
+  RenameAsset_descriptor_ = file->message_type(6);
   static const int RenameAsset_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RenameAsset, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(RenameAsset, newname_),
@@ -176,7 +200,7 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RenameAsset));
-  UpdateAsset_descriptor_ = file->message_type(6);
+  UpdateAsset_descriptor_ = file->message_type(7);
   static const int UpdateAsset_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, type_),
@@ -194,7 +218,7 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(UpdateAsset));
-  AssetExists_descriptor_ = file->message_type(7);
+  AssetExists_descriptor_ = file->message_type(8);
   static const int AssetExists_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AssetExists, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(AssetExists, type_),
@@ -210,7 +234,7 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(AssetExists));
-  ModInfo_descriptor_ = file->message_type(8);
+  ModInfo_descriptor_ = file->message_type(9);
   static const int ModInfo_offsets_[1] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ModInfo, modid_),
   };
@@ -225,14 +249,30 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::DescriptorPool::generated_pool(),
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(ModInfo));
-  Request_descriptor_ = file->message_type(9);
-  static const int Request_offsets_[7] = {
+  ConverterInfoReqest_descriptor_ = file->message_type(10);
+  static const int ConverterInfoReqest_offsets_[1] = {
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoReqest, blank_),
+  };
+  ConverterInfoReqest_reflection_ =
+    new ::google::protobuf::internal::GeneratedMessageReflection(
+      ConverterInfoReqest_descriptor_,
+      ConverterInfoReqest::default_instance_,
+      ConverterInfoReqest_offsets_,
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoReqest, _has_bits_[0]),
+      GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(ConverterInfoReqest, _unknown_fields_),
+      -1,
+      ::google::protobuf::DescriptorPool::generated_pool(),
+      ::google::protobuf::MessageFactory::generated_factory(),
+      sizeof(ConverterInfoReqest));
+  Request_descriptor_ = file->message_type(11);
+  static const int Request_offsets_[8] = {
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, add_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, del_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, rename_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, update_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, exists_),
     PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, modinfo_),
+    PROTO2_GENERATED_DEFAULT_ONEOF_FIELD_OFFSET(Request_default_oneof_instance_, coninfo_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(Request, msg_),
   };
   Request_reflection_ =
@@ -269,6 +309,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ModInfoResponse_descriptor_, &ModInfoResponse::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    ConverterInfoResponse_descriptor_, &ConverterInfoResponse::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     AddAsset_descriptor_, &AddAsset::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     DeleteAsset_descriptor_, &DeleteAsset::default_instance());
@@ -280,6 +322,8 @@ void protobuf_RegisterTypes(const ::std::string&) {
     AssetExists_descriptor_, &AssetExists::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     ModInfo_descriptor_, &ModInfo::default_instance());
+  ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
+    ConverterInfoReqest_descriptor_, &ConverterInfoReqest::default_instance());
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedMessage(
     Request_descriptor_, &Request::default_instance());
 }
@@ -293,6 +337,8 @@ void protobuf_ShutdownFile_assetdb_2eproto() {
   delete AssetInfoResponse_reflection_;
   delete ModInfoResponse::default_instance_;
   delete ModInfoResponse_reflection_;
+  delete ConverterInfoResponse::default_instance_;
+  delete ConverterInfoResponse_reflection_;
   delete AddAsset::default_instance_;
   delete AddAsset_reflection_;
   delete DeleteAsset::default_instance_;
@@ -305,6 +351,8 @@ void protobuf_ShutdownFile_assetdb_2eproto() {
   delete AssetExists_reflection_;
   delete ModInfo::default_instance_;
   delete ModInfo_reflection_;
+  delete ConverterInfoReqest::default_instance_;
+  delete ConverterInfoReqest_reflection_;
   delete Request::default_instance_;
   delete Request_default_oneof_instance_;
   delete Request_reflection_;
@@ -327,52 +375,62 @@ void protobuf_AddDesc_assetdb_2eproto() {
     "\005modId\030\006 \001(\r\"|\n\017ModInfoResponse\022/\n\006resul"
     "t\030\001 \002(\0162\037.Potato.ProtoBuf.AssetDB.Result"
     "\022\r\n\005error\030\002 \002(\t\022\r\n\005modId\030\003 \001(\r\022\014\n\004name\030\004"
-    " \001(\t\022\014\n\004path\030\005 \001(\t\"J\n\010AddAsset\022\014\n\004name\030\001"
-    " \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.Ass"
-    "etDB.AssetType\"M\n\013DeleteAsset\022\014\n\004name\030\001 "
-    "\002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.Asse"
-    "tDB.AssetType\"^\n\013RenameAsset\022\014\n\004name\030\001 \002"
-    "(\t\022\017\n\007newName\030\002 \002(\t\0220\n\004type\030\003 \002(\0162\".Pota"
-    "to.ProtoBuf.AssetDB.AssetType\"m\n\013UpdateA"
-    "sset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potat"
-    "o.ProtoBuf.AssetDB.AssetType\022\014\n\004args\030\003 \001"
-    "(\t\022\020\n\010dataSize\030\004 \001(\r\"M\n\013AssetExists\022\014\n\004n"
-    "ame\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBu"
-    "f.AssetDB.AssetType\"\030\n\007ModInfo\022\r\n\005modId\030"
-    "\001 \002(\r\"\324\002\n\007Request\0220\n\003add\030\001 \001(\0132!.Potato."
-    "ProtoBuf.AssetDB.AddAssetH\000\0223\n\003del\030\002 \001(\013"
-    "2$.Potato.ProtoBuf.AssetDB.DeleteAssetH\000"
-    "\0226\n\006rename\030\003 \001(\0132$.Potato.ProtoBuf.Asset"
-    "DB.RenameAssetH\000\0226\n\006update\030\004 \001(\0132$.Potat"
-    "o.ProtoBuf.AssetDB.UpdateAssetH\000\0226\n\006exis"
-    "ts\030\005 \001(\0132$.Potato.ProtoBuf.AssetDB.Asset"
-    "ExistsH\000\0223\n\007modInfo\030\006 \001(\0132 .Potato.Proto"
-    "Buf.AssetDB.ModInfoH\000B\005\n\003msg*7\n\tAssetTyp"
-    "e\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002\022\014\n\010MATERIAL\020\003\022\007\n\003"
-    "IMG\020\004*I\n\006Result\022\006\n\002OK\020\001\022\r\n\tNOT_FOUND\020\002\022\016"
-    "\n\nNAME_TAKEN\020\003\022\r\n\tUNCHANGED\020\004\022\t\n\005ERROR\020\005", 1360);
+    " \001(\t\022\014\n\004path\030\005 \001(\t\"k\n\025ConverterInfoRespo"
+    "nse\022/\n\006result\030\001 \002(\0162\037.Potato.ProtoBuf.As"
+    "setDB.Result\022\r\n\005error\030\002 \002(\t\022\022\n\nworkingDi"
+    "r\030\003 \001(\t\"J\n\010AddAsset\022\014\n\004name\030\001 \002(\t\0220\n\004typ"
+    "e\030\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetT"
+    "ype\"M\n\013DeleteAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type"
+    "\030\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTy"
+    "pe\"^\n\013RenameAsset\022\014\n\004name\030\001 \002(\t\022\017\n\007newNa"
+    "me\030\002 \002(\t\0220\n\004type\030\003 \002(\0162\".Potato.ProtoBuf"
+    ".AssetDB.AssetType\"m\n\013UpdateAsset\022\014\n\004nam"
+    "e\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf."
+    "AssetDB.AssetType\022\014\n\004args\030\003 \001(\t\022\020\n\010dataS"
+    "ize\030\004 \001(\r\"M\n\013AssetExists\022\014\n\004name\030\001 \002(\t\0220"
+    "\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.AssetDB.A"
+    "ssetType\"\030\n\007ModInfo\022\r\n\005modId\030\001 \002(\r\"$\n\023Co"
+    "nverterInfoReqest\022\r\n\005blank\030\001 \001(\r\"\225\003\n\007Req"
+    "uest\0220\n\003add\030\001 \001(\0132!.Potato.ProtoBuf.Asse"
+    "tDB.AddAssetH\000\0223\n\003del\030\002 \001(\0132$.Potato.Pro"
+    "toBuf.AssetDB.DeleteAssetH\000\0226\n\006rename\030\003 "
+    "\001(\0132$.Potato.ProtoBuf.AssetDB.RenameAsse"
+    "tH\000\0226\n\006update\030\004 \001(\0132$.Potato.ProtoBuf.As"
+    "setDB.UpdateAssetH\000\0226\n\006exists\030\005 \001(\0132$.Po"
+    "tato.ProtoBuf.AssetDB.AssetExistsH\000\0223\n\007m"
+    "odInfo\030\006 \001(\0132 .Potato.ProtoBuf.AssetDB.M"
+    "odInfoH\000\022\?\n\007conInfo\030\007 \001(\0132,.Potato.Proto"
+    "Buf.AssetDB.ConverterInfoReqestH\000B\005\n\003msg"
+    "*7\n\tAssetType\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002\022\014\n\010MA"
+    "TERIAL\020\003\022\007\n\003IMG\020\004*I\n\006Result\022\006\n\002OK\020\001\022\r\n\tN"
+    "OT_FOUND\020\002\022\016\n\nNAME_TAKEN\020\003\022\r\n\tUNCHANGED\020"
+    "\004\022\t\n\005ERROR\020\005", 1572);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "assetdb.proto", &protobuf_RegisterTypes);
   Reponse::default_instance_ = new Reponse();
   AssetInfoResponse::default_instance_ = new AssetInfoResponse();
   ModInfoResponse::default_instance_ = new ModInfoResponse();
+  ConverterInfoResponse::default_instance_ = new ConverterInfoResponse();
   AddAsset::default_instance_ = new AddAsset();
   DeleteAsset::default_instance_ = new DeleteAsset();
   RenameAsset::default_instance_ = new RenameAsset();
   UpdateAsset::default_instance_ = new UpdateAsset();
   AssetExists::default_instance_ = new AssetExists();
   ModInfo::default_instance_ = new ModInfo();
+  ConverterInfoReqest::default_instance_ = new ConverterInfoReqest();
   Request::default_instance_ = new Request();
   Request_default_oneof_instance_ = new RequestOneofInstance;
   Reponse::default_instance_->InitAsDefaultInstance();
   AssetInfoResponse::default_instance_->InitAsDefaultInstance();
   ModInfoResponse::default_instance_->InitAsDefaultInstance();
+  ConverterInfoResponse::default_instance_->InitAsDefaultInstance();
   AddAsset::default_instance_->InitAsDefaultInstance();
   DeleteAsset::default_instance_->InitAsDefaultInstance();
   RenameAsset::default_instance_->InitAsDefaultInstance();
   UpdateAsset::default_instance_->InitAsDefaultInstance();
   AssetExists::default_instance_->InitAsDefaultInstance();
   ModInfo::default_instance_->InitAsDefaultInstance();
+  ConverterInfoReqest::default_instance_->InitAsDefaultInstance();
   Request::default_instance_->InitAsDefaultInstance();
   ::google::protobuf::internal::OnShutdown(&protobuf_ShutdownFile_assetdb_2eproto);
 }
@@ -1638,6 +1696,356 @@ void ModInfoResponse::Swap(ModInfoResponse* other) {
   ::google::protobuf::Metadata metadata;
   metadata.descriptor = ModInfoResponse_descriptor_;
   metadata.reflection = ModInfoResponse_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
+const int ConverterInfoResponse::kResultFieldNumber;
+const int ConverterInfoResponse::kErrorFieldNumber;
+const int ConverterInfoResponse::kWorkingDirFieldNumber;
+#endif  // !_MSC_VER
+
+ConverterInfoResponse::ConverterInfoResponse()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+}
+
+void ConverterInfoResponse::InitAsDefaultInstance() {
+}
+
+ConverterInfoResponse::ConverterInfoResponse(const ConverterInfoResponse& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+}
+
+void ConverterInfoResponse::SharedCtor() {
+  ::google::protobuf::internal::GetEmptyString();
+  _cached_size_ = 0;
+  result_ = 1;
+  error_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  workingdir_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+ConverterInfoResponse::~ConverterInfoResponse() {
+  // @@protoc_insertion_point(destructor:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  SharedDtor();
+}
+
+void ConverterInfoResponse::SharedDtor() {
+  if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete error_;
+  }
+  if (workingdir_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete workingdir_;
+  }
+  if (this != default_instance_) {
+  }
+}
+
+void ConverterInfoResponse::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* ConverterInfoResponse::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return ConverterInfoResponse_descriptor_;
+}
+
+const ConverterInfoResponse& ConverterInfoResponse::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_assetdb_2eproto();
+  return *default_instance_;
+}
+
+ConverterInfoResponse* ConverterInfoResponse::default_instance_ = NULL;
+
+ConverterInfoResponse* ConverterInfoResponse::New() const {
+  return new ConverterInfoResponse;
+}
+
+void ConverterInfoResponse::Clear() {
+  if (_has_bits_[0 / 32] & 7) {
+    result_ = 1;
+    if (has_error()) {
+      if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        error_->clear();
+      }
+    }
+    if (has_workingdir()) {
+      if (workingdir_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+        workingdir_->clear();
+      }
+    }
+  }
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool ConverterInfoResponse::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // required .Potato.ProtoBuf.AssetDB.Result result = 1;
+      case 1: {
+        if (tag == 8) {
+          int value;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          if (::Potato::ProtoBuf::AssetDB::Result_IsValid(value)) {
+            set_result(static_cast< ::Potato::ProtoBuf::AssetDB::Result >(value));
+          } else {
+            mutable_unknown_fields()->AddVarint(1, value);
+          }
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(18)) goto parse_error;
+        break;
+      }
+
+      // required string error = 2;
+      case 2: {
+        if (tag == 18) {
+         parse_error:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_error()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->error().data(), this->error().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "error");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectTag(26)) goto parse_workingDir;
+        break;
+      }
+
+      // optional string workingDir = 3;
+      case 3: {
+        if (tag == 26) {
+         parse_workingDir:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_workingdir()));
+          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+            this->workingdir().data(), this->workingdir().length(),
+            ::google::protobuf::internal::WireFormat::PARSE,
+            "workingdir");
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  return false;
+#undef DO_
+}
+
+void ConverterInfoResponse::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  // required .Potato.ProtoBuf.AssetDB.Result result = 1;
+  if (has_result()) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      1, this->result(), output);
+  }
+
+  // required string error = 2;
+  if (has_error()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->error().data(), this->error().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "error");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      2, this->error(), output);
+  }
+
+  // optional string workingDir = 3;
+  if (has_workingdir()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->workingdir().data(), this->workingdir().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "workingdir");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      3, this->workingdir(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+}
+
+::google::protobuf::uint8* ConverterInfoResponse::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  // required .Potato.ProtoBuf.AssetDB.Result result = 1;
+  if (has_result()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      1, this->result(), target);
+  }
+
+  // required string error = 2;
+  if (has_error()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->error().data(), this->error().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "error");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        2, this->error(), target);
+  }
+
+  // optional string workingDir = 3;
+  if (has_workingdir()) {
+    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
+      this->workingdir().data(), this->workingdir().length(),
+      ::google::protobuf::internal::WireFormat::SERIALIZE,
+      "workingdir");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        3, this->workingdir(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Potato.ProtoBuf.AssetDB.ConverterInfoResponse)
+  return target;
+}
+
+int ConverterInfoResponse::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // required .Potato.ProtoBuf.AssetDB.Result result = 1;
+    if (has_result()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::EnumSize(this->result());
+    }
+
+    // required string error = 2;
+    if (has_error()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->error());
+    }
+
+    // optional string workingDir = 3;
+    if (has_workingdir()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::StringSize(
+          this->workingdir());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ConverterInfoResponse::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const ConverterInfoResponse* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ConverterInfoResponse*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void ConverterInfoResponse::MergeFrom(const ConverterInfoResponse& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_result()) {
+      set_result(from.result());
+    }
+    if (from.has_error()) {
+      set_error(from.error());
+    }
+    if (from.has_workingdir()) {
+      set_workingdir(from.workingdir());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void ConverterInfoResponse::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ConverterInfoResponse::CopyFrom(const ConverterInfoResponse& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ConverterInfoResponse::IsInitialized() const {
+  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+
+  return true;
+}
+
+void ConverterInfoResponse::Swap(ConverterInfoResponse* other) {
+  if (other != this) {
+    std::swap(result_, other->result_);
+    std::swap(error_, other->error_);
+    std::swap(workingdir_, other->workingdir_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata ConverterInfoResponse::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = ConverterInfoResponse_descriptor_;
+  metadata.reflection = ConverterInfoResponse_reflection_;
   return metadata;
 }
 
@@ -3480,12 +3888,235 @@ void ModInfo::Swap(ModInfo* other) {
 // ===================================================================
 
 #ifndef _MSC_VER
+const int ConverterInfoReqest::kBlankFieldNumber;
+#endif  // !_MSC_VER
+
+ConverterInfoReqest::ConverterInfoReqest()
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+}
+
+void ConverterInfoReqest::InitAsDefaultInstance() {
+}
+
+ConverterInfoReqest::ConverterInfoReqest(const ConverterInfoReqest& from)
+  : ::google::protobuf::Message() {
+  SharedCtor();
+  MergeFrom(from);
+  // @@protoc_insertion_point(copy_constructor:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+}
+
+void ConverterInfoReqest::SharedCtor() {
+  _cached_size_ = 0;
+  blank_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+}
+
+ConverterInfoReqest::~ConverterInfoReqest() {
+  // @@protoc_insertion_point(destructor:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  SharedDtor();
+}
+
+void ConverterInfoReqest::SharedDtor() {
+  if (this != default_instance_) {
+  }
+}
+
+void ConverterInfoReqest::SetCachedSize(int size) const {
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+}
+const ::google::protobuf::Descriptor* ConverterInfoReqest::descriptor() {
+  protobuf_AssignDescriptorsOnce();
+  return ConverterInfoReqest_descriptor_;
+}
+
+const ConverterInfoReqest& ConverterInfoReqest::default_instance() {
+  if (default_instance_ == NULL) protobuf_AddDesc_assetdb_2eproto();
+  return *default_instance_;
+}
+
+ConverterInfoReqest* ConverterInfoReqest::default_instance_ = NULL;
+
+ConverterInfoReqest* ConverterInfoReqest::New() const {
+  return new ConverterInfoReqest;
+}
+
+void ConverterInfoReqest::Clear() {
+  blank_ = 0u;
+  ::memset(_has_bits_, 0, sizeof(_has_bits_));
+  mutable_unknown_fields()->Clear();
+}
+
+bool ConverterInfoReqest::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  for (;;) {
+    ::std::pair< ::google::protobuf::uint32, bool> p = input->ReadTagWithCutoff(127);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // optional uint32 blank = 1;
+      case 1: {
+        if (tag == 8) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &blank_)));
+          set_has_blank();
+        } else {
+          goto handle_unusual;
+        }
+        if (input->ExpectAtEnd()) goto success;
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0 ||
+            ::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_END_GROUP) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  return false;
+#undef DO_
+}
+
+void ConverterInfoReqest::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  // optional uint32 blank = 1;
+  if (has_blank()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(1, this->blank(), output);
+  }
+
+  if (!unknown_fields().empty()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+}
+
+::google::protobuf::uint8* ConverterInfoReqest::SerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  // optional uint32 blank = 1;
+  if (has_blank()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(1, this->blank(), target);
+  }
+
+  if (!unknown_fields().empty()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Potato.ProtoBuf.AssetDB.ConverterInfoReqest)
+  return target;
+}
+
+int ConverterInfoReqest::ByteSize() const {
+  int total_size = 0;
+
+  if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    // optional uint32 blank = 1;
+    if (has_blank()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->blank());
+    }
+
+  }
+  if (!unknown_fields().empty()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        unknown_fields());
+  }
+  GOOGLE_SAFE_CONCURRENT_WRITES_BEGIN();
+  _cached_size_ = total_size;
+  GOOGLE_SAFE_CONCURRENT_WRITES_END();
+  return total_size;
+}
+
+void ConverterInfoReqest::MergeFrom(const ::google::protobuf::Message& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  const ConverterInfoReqest* source =
+    ::google::protobuf::internal::dynamic_cast_if_available<const ConverterInfoReqest*>(
+      &from);
+  if (source == NULL) {
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+    MergeFrom(*source);
+  }
+}
+
+void ConverterInfoReqest::MergeFrom(const ConverterInfoReqest& from) {
+  GOOGLE_CHECK_NE(&from, this);
+  if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
+    if (from.has_blank()) {
+      set_blank(from.blank());
+    }
+  }
+  mutable_unknown_fields()->MergeFrom(from.unknown_fields());
+}
+
+void ConverterInfoReqest::CopyFrom(const ::google::protobuf::Message& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ConverterInfoReqest::CopyFrom(const ConverterInfoReqest& from) {
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ConverterInfoReqest::IsInitialized() const {
+
+  return true;
+}
+
+void ConverterInfoReqest::Swap(ConverterInfoReqest* other) {
+  if (other != this) {
+    std::swap(blank_, other->blank_);
+    std::swap(_has_bits_[0], other->_has_bits_[0]);
+    _unknown_fields_.Swap(&other->_unknown_fields_);
+    std::swap(_cached_size_, other->_cached_size_);
+  }
+}
+
+::google::protobuf::Metadata ConverterInfoReqest::GetMetadata() const {
+  protobuf_AssignDescriptorsOnce();
+  ::google::protobuf::Metadata metadata;
+  metadata.descriptor = ConverterInfoReqest_descriptor_;
+  metadata.reflection = ConverterInfoReqest_reflection_;
+  return metadata;
+}
+
+
+// ===================================================================
+
+#ifndef _MSC_VER
 const int Request::kAddFieldNumber;
 const int Request::kDelFieldNumber;
 const int Request::kRenameFieldNumber;
 const int Request::kUpdateFieldNumber;
 const int Request::kExistsFieldNumber;
 const int Request::kModInfoFieldNumber;
+const int Request::kConInfoFieldNumber;
 #endif  // !_MSC_VER
 
 Request::Request()
@@ -3501,6 +4132,7 @@ void Request::InitAsDefaultInstance() {
   Request_default_oneof_instance_->update_ = const_cast< ::Potato::ProtoBuf::AssetDB::UpdateAsset*>(&::Potato::ProtoBuf::AssetDB::UpdateAsset::default_instance());
   Request_default_oneof_instance_->exists_ = const_cast< ::Potato::ProtoBuf::AssetDB::AssetExists*>(&::Potato::ProtoBuf::AssetDB::AssetExists::default_instance());
   Request_default_oneof_instance_->modinfo_ = const_cast< ::Potato::ProtoBuf::AssetDB::ModInfo*>(&::Potato::ProtoBuf::AssetDB::ModInfo::default_instance());
+  Request_default_oneof_instance_->coninfo_ = const_cast< ::Potato::ProtoBuf::AssetDB::ConverterInfoReqest*>(&::Potato::ProtoBuf::AssetDB::ConverterInfoReqest::default_instance());
 }
 
 Request::Request(const Request& from)
@@ -3574,6 +4206,10 @@ void Request::clear_msg() {
     }
     case kModInfo: {
       delete msg_.modinfo_;
+      break;
+    }
+    case kConInfo: {
+      delete msg_.coninfo_;
       break;
     }
     case MSG_NOT_SET: {
@@ -3673,6 +4309,19 @@ bool Request::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(58)) goto parse_conInfo;
+        break;
+      }
+
+      // optional .Potato.ProtoBuf.AssetDB.ConverterInfoReqest conInfo = 7;
+      case 7: {
+        if (tag == 58) {
+         parse_conInfo:
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+               input, mutable_coninfo()));
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -3738,6 +4387,12 @@ void Request::SerializeWithCachedSizes(
       6, this->modinfo(), output);
   }
 
+  // optional .Potato.ProtoBuf.AssetDB.ConverterInfoReqest conInfo = 7;
+  if (has_coninfo()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      7, this->coninfo(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -3788,6 +4443,13 @@ void Request::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       WriteMessageNoVirtualToArray(
         6, this->modinfo(), target);
+  }
+
+  // optional .Potato.ProtoBuf.AssetDB.ConverterInfoReqest conInfo = 7;
+  if (has_coninfo()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteMessageNoVirtualToArray(
+        7, this->coninfo(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -3844,6 +4506,13 @@ int Request::ByteSize() const {
           this->modinfo());
       break;
     }
+    // optional .Potato.ProtoBuf.AssetDB.ConverterInfoReqest conInfo = 7;
+    case kConInfo: {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::MessageSizeNoVirtual(
+          this->coninfo());
+      break;
+    }
     case MSG_NOT_SET: {
       break;
     }
@@ -3896,6 +4565,10 @@ void Request::MergeFrom(const Request& from) {
     }
     case kModInfo: {
       mutable_modinfo()->::Potato::ProtoBuf::AssetDB::ModInfo::MergeFrom(from.modinfo());
+      break;
+    }
+    case kConInfo: {
+      mutable_coninfo()->::Potato::ProtoBuf::AssetDB::ConverterInfoReqest::MergeFrom(from.coninfo());
       break;
     }
     case MSG_NOT_SET: {

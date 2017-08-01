@@ -2,6 +2,7 @@
 #include "AssetServer.h"
 
 #include <Containers\Array.h>
+#include <IFileSys.h>
 
 X_DISABLE_WARNING(4244)
 #include <google/protobuf/io/zero_copy_stream_impl.h>
@@ -235,6 +236,9 @@ bool AssetServer::Client::listen(void)
 		case ProtoBuf::AssetDB::Request::kModInfo:
 			as_.ModInfo(request.modinfo(), responseBuf);
 			break;
+		case ProtoBuf::AssetDB::Request::kConInfo:
+			as_.ConverterInfo(request.coninfo(), responseBuf);
+			break;
 		case ProtoBuf::AssetDB::Request::kUpdate:
 		{
 			// not sure where is best place to put this is.
@@ -443,12 +447,29 @@ core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 	return core::Thread::ReturnValue(0);
 }
 
+void AssetServer::ConverterInfo(const ProtoBuf::AssetDB::ConverterInfoReqest& modInfo, ResponseBuffer& outputBuffer)
+{
+	ProtoBuf::AssetDB::ConverterInfoResponse response;
+
+	// TODO: utf-8 encode this?
+	auto workingDir = gEnv->pFileSys->getWorkingDirectory();
+	core::Path<char> narrowPath(workingDir);
+
+	response.set_result(ProtoBuf::AssetDB::Result::OK);
+	response.set_error("");
+	response.set_workingdir(narrowPath.c_str());
+
+	if (!WriteDelimitedTo(response, outputBuffer)) {
+		writeError(response, outputBuffer, "Failed to create response msg");
+		return;
+	}
+}
+
 void AssetServer::ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer)
 {
 	ProtoBuf::AssetDB::ModInfoResponse response;
 
-	if (!modInfo.has_modid())
-	{
+	if (!modInfo.has_modid()) {
 		writeError(response, outputBuffer, "missing modId in ModInfo()");
 		return;
 	}
