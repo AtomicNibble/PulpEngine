@@ -28,7 +28,7 @@ message Reponse {
     required Result result = 1;
     required string error = 2;
 }
-message AssetInfoReponse {
+message AssetInfoResponse {
     required Result result = 1;
     required string error = 2;
 
@@ -36,6 +36,14 @@ message AssetInfoReponse {
     required AssetType type = 4;
     required uint32 id = 5;
     required uint32 modId = 6;
+}
+message ModInfoResponse {
+    required Result result = 1;
+    required string error = 2;
+
+    required uint32 modId = 3;
+    required string name = 4;
+    required string path = 5;
 }
 
 
@@ -68,6 +76,9 @@ message AssetExists {
     required AssetType type = 2;
 }
 
+message ModInfo {
+    required uint32 modId = 1;
+}
 
 message Request {
     oneof msg {
@@ -76,5 +87,6 @@ message Request {
         RenameAsset rename = 3;
         UpdateAsset update = 4;
         AssetExists exists  = 5;
+        ModInfo modInfo = 6;
     }
 }

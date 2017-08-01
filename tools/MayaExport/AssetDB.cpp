@@ -174,10 +174,59 @@ bool AssetDB::Connect(void)
 	return true;
 }
 
+
+bool AssetDB::GetModInfo(int32_t id, Mod& modOut)
+{
+	if (!ensureConnected()) {
+		MayaUtil::MayaPrintError("Failed to 'GetModInfo' pipe is invalid");
+		return MS::kFailure;
+	}
+
+	{
+		ProtoBuf::AssetDB::ModInfo* pModInfo = new ProtoBuf::AssetDB::ModInfo();
+		pModInfo->set_modid(id);
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_modinfo(pModInfo);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+	}
+
+	ProtoBuf::AssetDB::ModInfoResponse response;
+	if (!readMessage(response)) {
+		return MS::kFailure;
+	}
+
+	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
+		const std::string& err = response.error();
+		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
+		return MS::kFailure;
+	}
+
+	modOut.modId = response.modid();
+
+	if (response.has_name()) {
+		auto& name = response.name();
+		modOut.name = core::string(name.data(), name.length());
+	} 
+
+	if (response.has_name()) {
+		auto& path = response.path();
+		modOut.outDir = core::Path<char>(path.data(), path.data() + path.length());
+	}
+	return MS::kSuccess;
+}
+
+
 bool AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut)
 {
-	if (!pipe_.isOpen() && !Connect()) {
-		MayaUtil::MayaPrintError("Failed to 'AddAsset' pipe is invalid");
+	X_ASSERT_NOT_NULL(pIdOut);
+	X_ASSERT_NOT_NULL(pModIdOut);
+
+	if (!ensureConnected()) {
+		MayaUtil::MayaPrintError("Failed to 'AssetExsists' pipe is invalid");
 		return MS::kFailure;
 	}
 
@@ -194,31 +243,26 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const MString& name, int32_t* p
 		}
 	}
 
-	ProtoBuf::AssetDB::AssetInfoReponse response;
-	if (!getResponse(response)) {
+	ProtoBuf::AssetDB::AssetInfoResponse response;
+	if (!readMessage(response)) {
 		return MS::kFailure;
 	}
 
-	if (!response.has_id()) {
-		*pIdOut = -1;
-	}
-	else {
-		*pIdOut = response.id();
-	}
-
-	if (!response.has_modid()) {
-		*pModIdOut = -1;
-	}
-	else {
-		*pModIdOut = response.modid();
+	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
+		const std::string& err = response.error();
+		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
+		return MS::kFailure;
 	}
 
+
+	*pIdOut = response.has_id() ? response.id() : -1;
+	*pModIdOut = response.has_modid() ? response.modid() : -1;
 	return MS::kSuccess;
 }
 
 MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 {
-	if (!pipe_.isOpen() && !Connect()) {
+	if (!ensureConnected()) {
 		MayaUtil::MayaPrintError("Failed to 'AddAsset' pipe is invalid");
 		return MS::kFailure;
 	}
@@ -249,7 +293,7 @@ MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 
 MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 {
-	if (!pipe_.isOpen() && !Connect()) {
+	if (!ensureConnected()) {
 		MayaUtil::MayaPrintError("Failed to 'RemoveAsset' pipe is invalid");
 		return MS::kFailure;
 	}
@@ -278,7 +322,7 @@ MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 
 MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const MString & oldName)
 {
-	if (!pipe_.isOpen() && !Connect()) {
+	if (!ensureConnected()) {
 		MayaUtil::MayaPrintError("Failed to 'RenameAsset' pipe is invalid");
 		return MS::kFailure;
 	}
@@ -308,7 +352,7 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const M
 MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, 
 	const MString& args, const core::Array<uint8_t>& data, bool* pUnchanged)
 {
-	if (!pipe_.isOpen() && !Connect()) {
+	if (!ensureConnected()) {
 		MayaUtil::MayaPrintError("Failed to 'UpdateAsset' pipe is invalid");
 		return MS::kFailure;
 	}
@@ -427,7 +471,6 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 	google::protobuf::io::ArrayInputStream arrayInput(buffer,
 		safe_static_cast<int32_t>(bytesRead));
 
-
 	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
 		X_ERROR("AssetDB", "Failed to read response msg");
 		pipe_.close(); // close it so we can open a new one
@@ -443,7 +486,7 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 	return true;
 }
 
-bool AssetDB::getResponse(ProtoBuf::AssetDB::AssetInfoReponse& response)
+bool AssetDB::readMessage(google::protobuf::MessageLite& message)
 {
 	const size_t bufLength = 0x200;
 	uint8_t buffer[bufLength];
@@ -459,20 +502,22 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::AssetInfoReponse& response)
 	google::protobuf::io::ArrayInputStream arrayInput(buffer,
 		safe_static_cast<int32_t>(bytesRead));
 
-
-	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+	if (!ReadDelimitedFrom(&arrayInput, &message, &cleanEof)) {
 		X_ERROR("AssetDB", "Failed to read response msg");
 		pipe_.close(); // close it so we can open a new one
 		return false;
 	}
 
-	if (response.result() == ProtoBuf::AssetDB::Result::ERROR) {
-		const std::string& err = response.error();
-		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
-		return false;
+	return true;
+}
+
+bool AssetDB::ensureConnected(void)
+{
+	if (pipe_.isOpen()) {
+		return true;
 	}
 
-	return true;
+	return Connect();
 }
 
 // ------------------------------------------------------------------

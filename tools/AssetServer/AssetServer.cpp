@@ -223,6 +223,9 @@ bool AssetServer::Client::listen(void)
 		case ProtoBuf::AssetDB::Request::kExists:
 			as_.AssetExsists(request.exists(), responseBuf);
 			break;
+		case ProtoBuf::AssetDB::Request::kModInfo:
+			as_.ModInfo(request.modinfo(), responseBuf);
+			break;
 		case ProtoBuf::AssetDB::Request::kUpdate:
 		{
 			// not sure where is best place to put this is.
@@ -455,12 +458,50 @@ core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 	return core::Thread::ReturnValue(0);
 }
 
+void AssetServer::ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer)
+{
+	ProtoBuf::AssetDB::ModInfoResponse response;
+
+	if (!modInfo.has_modid())
+	{
+		writeError(response, outputBuffer, "missing modId in ModInfo()");
+		return;
+	}
+
+	int32_t modId = modInfo.modid();
+
+	X_LOG1("AssetServer", "ModInfo: id: %" PRIi32, modId);
+
+	{
+		core::CriticalSection::ScopedLock slock(lock_);
+
+		assetDb::AssetDB::Mod mod;
+		if (db_.GetModInfo(modId, mod))
+		{
+			response.set_result(ProtoBuf::AssetDB::Result::OK);
+			response.set_modid(mod.modId);
+			response.set_name(mod.name);
+			response.set_path(mod.outDir.c_str());
+		}
+		else
+		{
+			response.set_error("Not found");
+			response.set_result(ProtoBuf::AssetDB::Result::NOT_FOUND);
+		}
+	}
+
+	if (!WriteDelimitedTo(response, outputBuffer)) {
+		writeError(response, outputBuffer, "Failed to create response msg");
+		return;
+	}
+}
+
 void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer)
 {
 	assetDb::AssetDB::AssetType::Enum type;
 	core::string name(exists.name().data(), exists.name().length());
 
-	ProtoBuf::AssetDB::AssetInfoReponse response;
+	ProtoBuf::AssetDB::AssetInfoResponse response;
 	response.set_name(name);
 
 	if (!MapAssetType(exists.type(), type)) {

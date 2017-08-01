@@ -38,12 +38,14 @@ void protobuf_AssignDesc_assetdb_2eproto();
 void protobuf_ShutdownFile_assetdb_2eproto();
 
 class Reponse;
-class AssetInfoReponse;
+class AssetInfoResponse;
+class ModInfoResponse;
 class AddAsset;
 class DeleteAsset;
 class RenameAsset;
 class UpdateAsset;
 class AssetExists;
+class ModInfo;
 class Request;
 
 enum AssetType {
@@ -185,14 +187,14 @@ class Reponse : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class AssetInfoReponse : public ::google::protobuf::Message {
+class AssetInfoResponse : public ::google::protobuf::Message {
  public:
-  AssetInfoReponse();
-  virtual ~AssetInfoReponse();
+  AssetInfoResponse();
+  virtual ~AssetInfoResponse();
 
-  AssetInfoReponse(const AssetInfoReponse& from);
+  AssetInfoResponse(const AssetInfoResponse& from);
 
-  inline AssetInfoReponse& operator=(const AssetInfoReponse& from) {
+  inline AssetInfoResponse& operator=(const AssetInfoResponse& from) {
     CopyFrom(from);
     return *this;
   }
@@ -206,17 +208,17 @@ class AssetInfoReponse : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const AssetInfoReponse& default_instance();
+  static const AssetInfoResponse& default_instance();
 
-  void Swap(AssetInfoReponse* other);
+  void Swap(AssetInfoResponse* other);
 
   // implements Message ----------------------------------------------
 
-  AssetInfoReponse* New() const;
+  AssetInfoResponse* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const AssetInfoReponse& from);
-  void MergeFrom(const AssetInfoReponse& from);
+  void CopyFrom(const AssetInfoResponse& from);
+  void MergeFrom(const AssetInfoResponse& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -290,7 +292,7 @@ class AssetInfoReponse : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 modid() const;
   inline void set_modid(::google::protobuf::uint32 value);
 
-  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.AssetInfoReponse)
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.AssetInfoResponse)
  private:
   inline void set_has_result();
   inline void clear_has_result();
@@ -320,7 +322,141 @@ class AssetInfoReponse : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_assetdb_2eproto();
 
   void InitAsDefaultInstance();
-  static AssetInfoReponse* default_instance_;
+  static AssetInfoResponse* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class ModInfoResponse : public ::google::protobuf::Message {
+ public:
+  ModInfoResponse();
+  virtual ~ModInfoResponse();
+
+  ModInfoResponse(const ModInfoResponse& from);
+
+  inline ModInfoResponse& operator=(const ModInfoResponse& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ModInfoResponse& default_instance();
+
+  void Swap(ModInfoResponse* other);
+
+  // implements Message ----------------------------------------------
+
+  ModInfoResponse* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ModInfoResponse& from);
+  void MergeFrom(const ModInfoResponse& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required .Potato.ProtoBuf.AssetDB.Result result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::Potato::ProtoBuf::AssetDB::Result result() const;
+  inline void set_result(::Potato::ProtoBuf::AssetDB::Result value);
+
+  // required string error = 2;
+  inline bool has_error() const;
+  inline void clear_error();
+  static const int kErrorFieldNumber = 2;
+  inline const ::std::string& error() const;
+  inline void set_error(const ::std::string& value);
+  inline void set_error(const char* value);
+  inline void set_error(const char* value, size_t size);
+  inline ::std::string* mutable_error();
+  inline ::std::string* release_error();
+  inline void set_allocated_error(::std::string* error);
+
+  // required uint32 modId = 3;
+  inline bool has_modid() const;
+  inline void clear_modid();
+  static const int kModIdFieldNumber = 3;
+  inline ::google::protobuf::uint32 modid() const;
+  inline void set_modid(::google::protobuf::uint32 value);
+
+  // required string name = 4;
+  inline bool has_name() const;
+  inline void clear_name();
+  static const int kNameFieldNumber = 4;
+  inline const ::std::string& name() const;
+  inline void set_name(const ::std::string& value);
+  inline void set_name(const char* value);
+  inline void set_name(const char* value, size_t size);
+  inline ::std::string* mutable_name();
+  inline ::std::string* release_name();
+  inline void set_allocated_name(::std::string* name);
+
+  // required string path = 5;
+  inline bool has_path() const;
+  inline void clear_path();
+  static const int kPathFieldNumber = 5;
+  inline const ::std::string& path() const;
+  inline void set_path(const ::std::string& value);
+  inline void set_path(const char* value);
+  inline void set_path(const char* value, size_t size);
+  inline ::std::string* mutable_path();
+  inline ::std::string* release_path();
+  inline void set_allocated_path(::std::string* path);
+
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.ModInfoResponse)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_error();
+  inline void clear_has_error();
+  inline void set_has_modid();
+  inline void clear_has_modid();
+  inline void set_has_name();
+  inline void clear_has_name();
+  inline void set_has_path();
+  inline void clear_has_path();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* error_;
+  int result_;
+  ::google::protobuf::uint32 modid_;
+  ::std::string* name_;
+  ::std::string* path_;
+  friend void  protobuf_AddDesc_assetdb_2eproto();
+  friend void protobuf_AssignDesc_assetdb_2eproto();
+  friend void protobuf_ShutdownFile_assetdb_2eproto();
+
+  void InitAsDefaultInstance();
+  static ModInfoResponse* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -834,6 +970,85 @@ class AssetExists : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
+class ModInfo : public ::google::protobuf::Message {
+ public:
+  ModInfo();
+  virtual ~ModInfo();
+
+  ModInfo(const ModInfo& from);
+
+  inline ModInfo& operator=(const ModInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const ModInfo& default_instance();
+
+  void Swap(ModInfo* other);
+
+  // implements Message ----------------------------------------------
+
+  ModInfo* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const ModInfo& from);
+  void MergeFrom(const ModInfo& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required uint32 modId = 1;
+  inline bool has_modid() const;
+  inline void clear_modid();
+  static const int kModIdFieldNumber = 1;
+  inline ::google::protobuf::uint32 modid() const;
+  inline void set_modid(::google::protobuf::uint32 value);
+
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.ModInfo)
+ private:
+  inline void set_has_modid();
+  inline void clear_has_modid();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::google::protobuf::uint32 modid_;
+  friend void  protobuf_AddDesc_assetdb_2eproto();
+  friend void protobuf_AssignDesc_assetdb_2eproto();
+  friend void protobuf_ShutdownFile_assetdb_2eproto();
+
+  void InitAsDefaultInstance();
+  static ModInfo* default_instance_;
+};
+// -------------------------------------------------------------------
+
 class Request : public ::google::protobuf::Message {
  public:
   Request();
@@ -863,6 +1078,7 @@ class Request : public ::google::protobuf::Message {
     kRename = 3,
     kUpdate = 4,
     kExists = 5,
+    kModInfo = 6,
     MSG_NOT_SET = 0,
   };
 
@@ -941,6 +1157,15 @@ class Request : public ::google::protobuf::Message {
   inline ::Potato::ProtoBuf::AssetDB::AssetExists* release_exists();
   inline void set_allocated_exists(::Potato::ProtoBuf::AssetDB::AssetExists* exists);
 
+  // optional .Potato.ProtoBuf.AssetDB.ModInfo modInfo = 6;
+  inline bool has_modinfo() const;
+  inline void clear_modinfo();
+  static const int kModInfoFieldNumber = 6;
+  inline const ::Potato::ProtoBuf::AssetDB::ModInfo& modinfo() const;
+  inline ::Potato::ProtoBuf::AssetDB::ModInfo* mutable_modinfo();
+  inline ::Potato::ProtoBuf::AssetDB::ModInfo* release_modinfo();
+  inline void set_allocated_modinfo(::Potato::ProtoBuf::AssetDB::ModInfo* modinfo);
+
   inline MsgCase msg_case() const;
   // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.Request)
  private:
@@ -949,6 +1174,7 @@ class Request : public ::google::protobuf::Message {
   inline void set_has_rename();
   inline void set_has_update();
   inline void set_has_exists();
+  inline void set_has_modinfo();
 
   inline bool has_msg();
   void clear_msg();
@@ -964,6 +1190,7 @@ class Request : public ::google::protobuf::Message {
     ::Potato::ProtoBuf::AssetDB::RenameAsset* rename_;
     ::Potato::ProtoBuf::AssetDB::UpdateAsset* update_;
     ::Potato::ProtoBuf::AssetDB::AssetExists* exists_;
+    ::Potato::ProtoBuf::AssetDB::ModInfo* modinfo_;
   } msg_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
@@ -1084,86 +1311,86 @@ inline void Reponse::set_allocated_error(::std::string* error) {
 
 // -------------------------------------------------------------------
 
-// AssetInfoReponse
+// AssetInfoResponse
 
 // required .Potato.ProtoBuf.AssetDB.Result result = 1;
-inline bool AssetInfoReponse::has_result() const {
+inline bool AssetInfoResponse::has_result() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void AssetInfoReponse::set_has_result() {
+inline void AssetInfoResponse::set_has_result() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void AssetInfoReponse::clear_has_result() {
+inline void AssetInfoResponse::clear_has_result() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void AssetInfoReponse::clear_result() {
+inline void AssetInfoResponse::clear_result() {
   result_ = 1;
   clear_has_result();
 }
-inline ::Potato::ProtoBuf::AssetDB::Result AssetInfoReponse::result() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoReponse.result)
+inline ::Potato::ProtoBuf::AssetDB::Result AssetInfoResponse::result() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoResponse.result)
   return static_cast< ::Potato::ProtoBuf::AssetDB::Result >(result_);
 }
-inline void AssetInfoReponse::set_result(::Potato::ProtoBuf::AssetDB::Result value) {
+inline void AssetInfoResponse::set_result(::Potato::ProtoBuf::AssetDB::Result value) {
   assert(::Potato::ProtoBuf::AssetDB::Result_IsValid(value));
   set_has_result();
   result_ = value;
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoReponse.result)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.result)
 }
 
 // required string error = 2;
-inline bool AssetInfoReponse::has_error() const {
+inline bool AssetInfoResponse::has_error() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void AssetInfoReponse::set_has_error() {
+inline void AssetInfoResponse::set_has_error() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void AssetInfoReponse::clear_has_error() {
+inline void AssetInfoResponse::clear_has_error() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void AssetInfoReponse::clear_error() {
+inline void AssetInfoResponse::clear_error() {
   if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     error_->clear();
   }
   clear_has_error();
 }
-inline const ::std::string& AssetInfoReponse::error() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoReponse.error)
+inline const ::std::string& AssetInfoResponse::error() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
   return *error_;
 }
-inline void AssetInfoReponse::set_error(const ::std::string& value) {
+inline void AssetInfoResponse::set_error(const ::std::string& value) {
   set_has_error();
   if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     error_ = new ::std::string;
   }
   error_->assign(value);
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoReponse.error)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
 }
-inline void AssetInfoReponse::set_error(const char* value) {
+inline void AssetInfoResponse::set_error(const char* value) {
   set_has_error();
   if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     error_ = new ::std::string;
   }
   error_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.AssetInfoReponse.error)
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
 }
-inline void AssetInfoReponse::set_error(const char* value, size_t size) {
+inline void AssetInfoResponse::set_error(const char* value, size_t size) {
   set_has_error();
   if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     error_ = new ::std::string;
   }
   error_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.AssetInfoReponse.error)
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
 }
-inline ::std::string* AssetInfoReponse::mutable_error() {
+inline ::std::string* AssetInfoResponse::mutable_error() {
   set_has_error();
   if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     error_ = new ::std::string;
   }
-  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.AssetInfoReponse.error)
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
   return error_;
 }
-inline ::std::string* AssetInfoReponse::release_error() {
+inline ::std::string* AssetInfoResponse::release_error() {
   clear_has_error();
   if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     return NULL;
@@ -1173,7 +1400,7 @@ inline ::std::string* AssetInfoReponse::release_error() {
     return temp;
   }
 }
-inline void AssetInfoReponse::set_allocated_error(::std::string* error) {
+inline void AssetInfoResponse::set_allocated_error(::std::string* error) {
   if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete error_;
   }
@@ -1184,62 +1411,62 @@ inline void AssetInfoReponse::set_allocated_error(::std::string* error) {
     clear_has_error();
     error_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AssetInfoReponse.error)
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AssetInfoResponse.error)
 }
 
 // required string name = 3;
-inline bool AssetInfoReponse::has_name() const {
+inline bool AssetInfoResponse::has_name() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void AssetInfoReponse::set_has_name() {
+inline void AssetInfoResponse::set_has_name() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void AssetInfoReponse::clear_has_name() {
+inline void AssetInfoResponse::clear_has_name() {
   _has_bits_[0] &= ~0x00000004u;
 }
-inline void AssetInfoReponse::clear_name() {
+inline void AssetInfoResponse::clear_name() {
   if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_->clear();
   }
   clear_has_name();
 }
-inline const ::std::string& AssetInfoReponse::name() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoReponse.name)
+inline const ::std::string& AssetInfoResponse::name() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
   return *name_;
 }
-inline void AssetInfoReponse::set_name(const ::std::string& value) {
+inline void AssetInfoResponse::set_name(const ::std::string& value) {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
   name_->assign(value);
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoReponse.name)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
 }
-inline void AssetInfoReponse::set_name(const char* value) {
+inline void AssetInfoResponse::set_name(const char* value) {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
   name_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.AssetInfoReponse.name)
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
 }
-inline void AssetInfoReponse::set_name(const char* value, size_t size) {
+inline void AssetInfoResponse::set_name(const char* value, size_t size) {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
   name_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.AssetInfoReponse.name)
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
 }
-inline ::std::string* AssetInfoReponse::mutable_name() {
+inline ::std::string* AssetInfoResponse::mutable_name() {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
-  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.AssetInfoReponse.name)
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
   return name_;
 }
-inline ::std::string* AssetInfoReponse::release_name() {
+inline ::std::string* AssetInfoResponse::release_name() {
   clear_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     return NULL;
@@ -1249,7 +1476,7 @@ inline ::std::string* AssetInfoReponse::release_name() {
     return temp;
   }
 }
-inline void AssetInfoReponse::set_allocated_name(::std::string* name) {
+inline void AssetInfoResponse::set_allocated_name(::std::string* name) {
   if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete name_;
   }
@@ -1260,80 +1487,361 @@ inline void AssetInfoReponse::set_allocated_name(::std::string* name) {
     clear_has_name();
     name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AssetInfoReponse.name)
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AssetInfoResponse.name)
 }
 
 // required .Potato.ProtoBuf.AssetDB.AssetType type = 4;
-inline bool AssetInfoReponse::has_type() const {
+inline bool AssetInfoResponse::has_type() const {
   return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void AssetInfoReponse::set_has_type() {
+inline void AssetInfoResponse::set_has_type() {
   _has_bits_[0] |= 0x00000008u;
 }
-inline void AssetInfoReponse::clear_has_type() {
+inline void AssetInfoResponse::clear_has_type() {
   _has_bits_[0] &= ~0x00000008u;
 }
-inline void AssetInfoReponse::clear_type() {
+inline void AssetInfoResponse::clear_type() {
   type_ = 1;
   clear_has_type();
 }
-inline ::Potato::ProtoBuf::AssetDB::AssetType AssetInfoReponse::type() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoReponse.type)
+inline ::Potato::ProtoBuf::AssetDB::AssetType AssetInfoResponse::type() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoResponse.type)
   return static_cast< ::Potato::ProtoBuf::AssetDB::AssetType >(type_);
 }
-inline void AssetInfoReponse::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) {
+inline void AssetInfoResponse::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) {
   assert(::Potato::ProtoBuf::AssetDB::AssetType_IsValid(value));
   set_has_type();
   type_ = value;
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoReponse.type)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.type)
 }
 
 // required uint32 id = 5;
-inline bool AssetInfoReponse::has_id() const {
+inline bool AssetInfoResponse::has_id() const {
   return (_has_bits_[0] & 0x00000010u) != 0;
 }
-inline void AssetInfoReponse::set_has_id() {
+inline void AssetInfoResponse::set_has_id() {
   _has_bits_[0] |= 0x00000010u;
 }
-inline void AssetInfoReponse::clear_has_id() {
+inline void AssetInfoResponse::clear_has_id() {
   _has_bits_[0] &= ~0x00000010u;
 }
-inline void AssetInfoReponse::clear_id() {
+inline void AssetInfoResponse::clear_id() {
   id_ = 0u;
   clear_has_id();
 }
-inline ::google::protobuf::uint32 AssetInfoReponse::id() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoReponse.id)
+inline ::google::protobuf::uint32 AssetInfoResponse::id() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoResponse.id)
   return id_;
 }
-inline void AssetInfoReponse::set_id(::google::protobuf::uint32 value) {
+inline void AssetInfoResponse::set_id(::google::protobuf::uint32 value) {
   set_has_id();
   id_ = value;
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoReponse.id)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.id)
 }
 
 // required uint32 modId = 6;
-inline bool AssetInfoReponse::has_modid() const {
+inline bool AssetInfoResponse::has_modid() const {
   return (_has_bits_[0] & 0x00000020u) != 0;
 }
-inline void AssetInfoReponse::set_has_modid() {
+inline void AssetInfoResponse::set_has_modid() {
   _has_bits_[0] |= 0x00000020u;
 }
-inline void AssetInfoReponse::clear_has_modid() {
+inline void AssetInfoResponse::clear_has_modid() {
   _has_bits_[0] &= ~0x00000020u;
 }
-inline void AssetInfoReponse::clear_modid() {
+inline void AssetInfoResponse::clear_modid() {
   modid_ = 0u;
   clear_has_modid();
 }
-inline ::google::protobuf::uint32 AssetInfoReponse::modid() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoReponse.modId)
+inline ::google::protobuf::uint32 AssetInfoResponse::modid() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AssetInfoResponse.modId)
   return modid_;
 }
-inline void AssetInfoReponse::set_modid(::google::protobuf::uint32 value) {
+inline void AssetInfoResponse::set_modid(::google::protobuf::uint32 value) {
   set_has_modid();
   modid_ = value;
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoReponse.modId)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AssetInfoResponse.modId)
+}
+
+// -------------------------------------------------------------------
+
+// ModInfoResponse
+
+// required .Potato.ProtoBuf.AssetDB.Result result = 1;
+inline bool ModInfoResponse::has_result() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void ModInfoResponse::set_has_result() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void ModInfoResponse::clear_has_result() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void ModInfoResponse::clear_result() {
+  result_ = 1;
+  clear_has_result();
+}
+inline ::Potato::ProtoBuf::AssetDB::Result ModInfoResponse::result() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.ModInfoResponse.result)
+  return static_cast< ::Potato::ProtoBuf::AssetDB::Result >(result_);
+}
+inline void ModInfoResponse::set_result(::Potato::ProtoBuf::AssetDB::Result value) {
+  assert(::Potato::ProtoBuf::AssetDB::Result_IsValid(value));
+  set_has_result();
+  result_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfoResponse.result)
+}
+
+// required string error = 2;
+inline bool ModInfoResponse::has_error() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void ModInfoResponse::set_has_error() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void ModInfoResponse::clear_has_error() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void ModInfoResponse::clear_error() {
+  if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_->clear();
+  }
+  clear_has_error();
+}
+inline const ::std::string& ModInfoResponse::error() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
+  return *error_;
+}
+inline void ModInfoResponse::set_error(const ::std::string& value) {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  error_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
+}
+inline void ModInfoResponse::set_error(const char* value) {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  error_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
+}
+inline void ModInfoResponse::set_error(const char* value, size_t size) {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  error_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
+}
+inline ::std::string* ModInfoResponse::mutable_error() {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
+  return error_;
+}
+inline ::std::string* ModInfoResponse::release_error() {
+  clear_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = error_;
+    error_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void ModInfoResponse::set_allocated_error(::std::string* error) {
+  if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete error_;
+  }
+  if (error) {
+    set_has_error();
+    error_ = error;
+  } else {
+    clear_has_error();
+    error_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.ModInfoResponse.error)
+}
+
+// required uint32 modId = 3;
+inline bool ModInfoResponse::has_modid() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void ModInfoResponse::set_has_modid() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void ModInfoResponse::clear_has_modid() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void ModInfoResponse::clear_modid() {
+  modid_ = 0u;
+  clear_has_modid();
+}
+inline ::google::protobuf::uint32 ModInfoResponse::modid() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.ModInfoResponse.modId)
+  return modid_;
+}
+inline void ModInfoResponse::set_modid(::google::protobuf::uint32 value) {
+  set_has_modid();
+  modid_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfoResponse.modId)
+}
+
+// required string name = 4;
+inline bool ModInfoResponse::has_name() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void ModInfoResponse::set_has_name() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void ModInfoResponse::clear_has_name() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void ModInfoResponse::clear_name() {
+  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_->clear();
+  }
+  clear_has_name();
+}
+inline const ::std::string& ModInfoResponse::name() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
+  return *name_;
+}
+inline void ModInfoResponse::set_name(const ::std::string& value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
+}
+inline void ModInfoResponse::set_name(const char* value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
+}
+inline void ModInfoResponse::set_name(const char* value, size_t size) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
+}
+inline ::std::string* ModInfoResponse::mutable_name() {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
+  return name_;
+}
+inline ::std::string* ModInfoResponse::release_name() {
+  clear_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = name_;
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void ModInfoResponse::set_allocated_name(::std::string* name) {
+  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete name_;
+  }
+  if (name) {
+    set_has_name();
+    name_ = name;
+  } else {
+    clear_has_name();
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.ModInfoResponse.name)
+}
+
+// required string path = 5;
+inline bool ModInfoResponse::has_path() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void ModInfoResponse::set_has_path() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void ModInfoResponse::clear_has_path() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void ModInfoResponse::clear_path() {
+  if (path_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    path_->clear();
+  }
+  clear_has_path();
+}
+inline const ::std::string& ModInfoResponse::path() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.ModInfoResponse.path)
+  return *path_;
+}
+inline void ModInfoResponse::set_path(const ::std::string& value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfoResponse.path)
+}
+inline void ModInfoResponse::set_path(const char* value) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    path_ = new ::std::string;
+  }
+  path_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.ModInfoResponse.path)
+}
+inline void ModInfoResponse::set_path(const char* value, size_t size) {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    path_ = new ::std::string;
+  }
+  path_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.ModInfoResponse.path)
+}
+inline ::std::string* ModInfoResponse::mutable_path() {
+  set_has_path();
+  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    path_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.ModInfoResponse.path)
+  return path_;
+}
+inline ::std::string* ModInfoResponse::release_path() {
+  clear_has_path();
+  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = path_;
+    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void ModInfoResponse::set_allocated_path(::std::string* path) {
+  if (path_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete path_;
+  }
+  if (path) {
+    set_has_path();
+    path_ = path;
+  } else {
+    clear_has_path();
+    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.ModInfoResponse.path)
 }
 
 // -------------------------------------------------------------------
@@ -2039,6 +2547,34 @@ inline void AssetExists::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) 
 
 // -------------------------------------------------------------------
 
+// ModInfo
+
+// required uint32 modId = 1;
+inline bool ModInfo::has_modid() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void ModInfo::set_has_modid() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void ModInfo::clear_has_modid() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void ModInfo::clear_modid() {
+  modid_ = 0u;
+  clear_has_modid();
+}
+inline ::google::protobuf::uint32 ModInfo::modid() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.ModInfo.modId)
+  return modid_;
+}
+inline void ModInfo::set_modid(::google::protobuf::uint32 value) {
+  set_has_modid();
+  modid_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.ModInfo.modId)
+}
+
+// -------------------------------------------------------------------
+
 // Request
 
 // optional .Potato.ProtoBuf.AssetDB.AddAsset add = 1;
@@ -2253,6 +2789,49 @@ inline void Request::set_allocated_exists(::Potato::ProtoBuf::AssetDB::AssetExis
   if (exists) {
     set_has_exists();
     msg_.exists_ = exists;
+  }
+}
+
+// optional .Potato.ProtoBuf.AssetDB.ModInfo modInfo = 6;
+inline bool Request::has_modinfo() const {
+  return msg_case() == kModInfo;
+}
+inline void Request::set_has_modinfo() {
+  _oneof_case_[0] = kModInfo;
+}
+inline void Request::clear_modinfo() {
+  if (has_modinfo()) {
+    delete msg_.modinfo_;
+    clear_has_msg();
+  }
+}
+inline const ::Potato::ProtoBuf::AssetDB::ModInfo& Request::modinfo() const {
+  return has_modinfo() ? *msg_.modinfo_
+                      : ::Potato::ProtoBuf::AssetDB::ModInfo::default_instance();
+}
+inline ::Potato::ProtoBuf::AssetDB::ModInfo* Request::mutable_modinfo() {
+  if (!has_modinfo()) {
+    clear_msg();
+    set_has_modinfo();
+    msg_.modinfo_ = new ::Potato::ProtoBuf::AssetDB::ModInfo;
+  }
+  return msg_.modinfo_;
+}
+inline ::Potato::ProtoBuf::AssetDB::ModInfo* Request::release_modinfo() {
+  if (has_modinfo()) {
+    clear_has_msg();
+    ::Potato::ProtoBuf::AssetDB::ModInfo* temp = msg_.modinfo_;
+    msg_.modinfo_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Request::set_allocated_modinfo(::Potato::ProtoBuf::AssetDB::ModInfo* modinfo) {
+  clear_msg();
+  if (modinfo) {
+    set_has_modinfo();
+    msg_.modinfo_ = modinfo;
   }
 }
 

@@ -8,6 +8,7 @@
 X_NAMESPACE_DECLARE(ProtoBuf,
 	namespace AssetDB {
 		class Request;
+		class ModInfo;
 		class AssetExists;
 		class AddAsset;
 		class DeleteAsset;
@@ -66,6 +67,7 @@ private:
 
 	core::Thread::ReturnValue ThreadRun(const core::Thread& thread) X_FINAL;
 
+	void ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer);
 	void AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer);
 	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut, ProtoBuf::AssetDB::Result& res);
 	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut, ProtoBuf::AssetDB::Result& res);

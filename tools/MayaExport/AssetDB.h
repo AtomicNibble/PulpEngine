@@ -10,10 +10,16 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 	namespace AssetDB {
 		class Request;
 		class Reponse;
-		class AssetInfoReponse;
+		class AssetInfoResponse;
 	}
 );
 
+
+namespace google {
+	namespace protobuf {
+		class MessageLite;
+	}
+}
 
 X_NAMESPACE_BEGIN(maya)
 
@@ -21,6 +27,12 @@ class AssetDB
 {
 public:
 	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL, IMG);
+	struct Mod
+	{
+		int32_t modId;
+		core::string name;
+		core::Path<char> outDir;
+	};
 
 public:
 	AssetDB();
@@ -32,6 +44,7 @@ public:
 
 	bool Connect(void);
 
+	bool GetModInfo(int32_t id, Mod& modOut);
 	bool AssetExsists(AssetType::Enum type, const MString& name, int32_t* pIdOut, int32_t* pModIdOut);
 
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
@@ -45,7 +58,9 @@ private:
 	bool sendRequest(ProtoBuf::AssetDB::Request& request);
 	bool sendBuf(const core::Array<uint8_t>& data);
 	bool getResponse(ProtoBuf::AssetDB::Reponse& response);
-	bool getResponse(ProtoBuf::AssetDB::AssetInfoReponse& response);
+	bool readMessage(google::protobuf::MessageLite& message);
+
+	bool ensureConnected(void);
 
 private:
 	core::IPC::Pipe pipe_;
