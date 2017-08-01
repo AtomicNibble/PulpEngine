@@ -27,6 +27,12 @@ X_NAMESPACE_BEGIN(assetServer)
 namespace
 {
 
+	inline core::string fromStdString(const std::string& str)
+	{
+		return core::string(str.data(), str.length());
+	}
+
+
 	bool ReadDelimitedFrom(google::protobuf::io::ZeroCopyInputStream* rawInput,
 		google::protobuf::MessageLite* message, bool* cleanEof)
 	{
@@ -94,10 +100,17 @@ namespace
 
 	template<size_t N>
 	bool WriteDelimitedTo(const google::protobuf::MessageLite& message,
-		std::array<uint8_t,N>& buf)
+		core::FixedArray<uint8_t,N>& buf)
 	{
+		// just reset for now.
+		buf.resize(buf.capacity());
 		google::protobuf::io::ArrayOutputStream stream(buf.data(), buf.size());
-		return WriteDelimitedTo(message, &stream);
+
+		bool res = WriteDelimitedTo(message, &stream);
+
+		buf.resize(safe_static_cast<size_t>(stream.ByteCount()));
+
+		return res;
 	}
 
 
@@ -189,22 +202,18 @@ bool AssetServer::Client::connect(void)
 bool AssetServer::Client::listen(void)
 {
 	ProtoBuf::AssetDB::Request request;
-
 	ResponseBuffer responseBuf;
 
 	// loop until error.
 	while (1)
 	{
 		request.Clear();
+		responseBuf.clear();
 
 		// wait for a request.
 		if (!readRequest(request)) {
 			break;
 		}
-
-		bool ok = false;
-		std::string err;
-		ProtoBuf::AssetDB::Result res = ProtoBuf::AssetDB::Result::ERROR;
 
 		// have the asset server do the work of hte request.
 		// it may also set hte error string to return extra info.
@@ -212,13 +221,13 @@ bool AssetServer::Client::listen(void)
 		switch (type)
 		{
 		case ProtoBuf::AssetDB::Request::kAdd:
-			ok = as_.AddAsset(request.add(), err, res);
+			as_.AddAsset(request.add(), responseBuf);
 			break;
 		case ProtoBuf::AssetDB::Request::kDel:
-			ok = as_.DeleteAsset(request.del(), err, res);
+			as_.DeleteAsset(request.del(), responseBuf);
 			break;
 		case ProtoBuf::AssetDB::Request::kRename:
-			ok = as_.RenameAsset(request.rename(), err, res);
+			as_.RenameAsset(request.rename(), responseBuf);
 			break;
 		case ProtoBuf::AssetDB::Request::kExists:
 			as_.AssetExsists(request.exists(), responseBuf);
@@ -230,38 +239,29 @@ bool AssetServer::Client::listen(void)
 		{
 			// not sure where is best place to put this is.
 			// here or inside UpdateAsset() :Z
-			core::Array<uint8_t> buf(arena_);
+			DataArr buf(arena_);
 			if (request.update().has_datasize()) 
 			{
 				uint32_t dataSize = request.update().datasize();
 
 				if (!readBuf(buf, dataSize)) {
-					err = "Failed to read buffer after UpdateAssert Msg.";
-					goto fail;
+					writeError(responseBuf, "Failed to read buffer after UpdateAssert Msg.");
+					break;
 				}
 			}
-			ok = as_.UpdateAsset(request.update(), buf, err, res);
-		fail:;
+
+			as_.UpdateAsset(request.update(), buf, responseBuf);
 		}
 			break;
 		default:
-			err = "Unknown request msg type";
-			X_ERROR("AssetServer", "Unknown request msg type");
+			writeError(responseBuf, "Unknown request msg type");
 			break;
 		}
 
-		// send response.
-		if (ok) {
-			if(!sendRequestOk(res)) {
-				break;
-			}
+		if (!writeAndFlushBuf(responseBuf))
+		{
+			break;
 		}
-		else {
-			if (!sendRequestFail(err)) {
-				break;
-			}
-		}
-		
 	}
 
 	// disconnect.
@@ -301,7 +301,7 @@ bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 	return true;
 }
 
-bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size)
+bool AssetServer::Client::readBuf(DataArr& buf, size_t size)
 {
 	size_t bytesRead, bytesReadTotal;
 
@@ -332,43 +332,23 @@ bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size)
 	return true;
 }
 
-bool AssetServer::Client::sendRequestFail(std::string& errMsg)
+void AssetServer::Client::writeError(ResponseBuffer& outputBuffer, const char* pErrMsg)
 {
-	uint8_t buffer[BUF_LENGTH];
+	X_ERROR("AssetServer", "Error: %s", pErrMsg);
 
 	ProtoBuf::AssetDB::Reponse response;
-	response.set_error(errMsg);
+	response.set_error(pErrMsg);
 	response.set_result(ProtoBuf::AssetDB::Result::ERROR);
 
-	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, BUF_LENGTH);
-	if (!WriteDelimitedTo(response, &arrayOutput)) {
+	if (!WriteDelimitedTo(response, outputBuffer)) {
 		X_ERROR("AssetServer", "Failed to create response msg");
-		return false;
+		return;
 	}
-
-	return writeAndFlushBuf(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()));
 }
 
-bool AssetServer::Client::sendRequestOk(ProtoBuf::AssetDB::Result res)
+bool AssetServer::Client::writeAndFlushBuf(ResponseBuffer& outputBuffer)
 {
-	uint8_t buffer[BUF_LENGTH];
-
-	ProtoBuf::AssetDB::Reponse response;
-	response.set_error("");
-	response.set_result(res);
-
-	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, BUF_LENGTH);
-	if (!WriteDelimitedTo(response, &arrayOutput)) {
-		X_ERROR("AssetServer", "Failed to create response msg");
-		return false;
-	}
-
-	return writeAndFlushBuf(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()));
-}
-
-bool AssetServer::Client::writeAndFlushBuf(const uint8_t* pBuf, size_t len)
-{
-	if (!pipe_.write(pBuf, len)) {
+	if (!pipe_.write(outputBuffer.data(), outputBuffer.size())) {
 		X_ERROR("AssetServer", "Failed to write response msg");
 		return false;
 	}
@@ -498,8 +478,8 @@ void AssetServer::ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuf
 
 void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer)
 {
-	assetDb::AssetDB::AssetType::Enum type;
-	core::string name(exists.name().data(), exists.name().length());
+	AssetType::Enum type;
+	core::string name = fromStdString(exists.name());
 
 	ProtoBuf::AssetDB::AssetInfoResponse response;
 	response.set_name(name);
@@ -511,7 +491,7 @@ void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, Res
 
 	response.set_type(exists.type());
 
-	X_LOG1("AssetServer", "AssetExsists: \"%s\" name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
+	X_LOG1("AssetServer", "AssetExsists: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
 
 	{
 		core::CriticalSection::ScopedLock slock(lock_);
@@ -537,105 +517,101 @@ void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, Res
 	}
 }
 
-bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut, ProtoBuf::AssetDB::Result& res)
+void AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, ResponseBuffer& outputBuffer)
 {
-	// map type.
-	assetDb::AssetDB::AssetType::Enum type;
+	ProtoBuf::AssetDB::Reponse response;
+	AssetType::Enum type;
 
 	if (!MapAssetType(add.type(), type)) {
-		errOut = "Unknown asset type in AddAsset()";
-		X_ERROR("Assetserver", errOut.c_str());
-		return false;
+		writeError(response, outputBuffer, "Unknown asset type in AddAsset()");
+		return;
 	}
 	
-	core::string name(add.name().data(), add.name().length());
+	core::string name = fromStdString(add.name());
 
-	X_LOG1("AssetServer", "AddAsset: \"%s\" name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
+	X_LOG1("AssetServer", "AddAsset: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	res = MapReturnType(db_.AddAsset(type, name));
-	return true;
+	auto res = db_.AddAsset(type, name);
+	writeResponse(response, outputBuffer, res);
 }
 
-bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut, ProtoBuf::AssetDB::Result& res)
+void AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, ResponseBuffer& outputBuffer)
 {
-	// map type.
-	assetDb::AssetDB::AssetType::Enum type;
+	ProtoBuf::AssetDB::Reponse response;
+	AssetType::Enum type;
 
 	if (!MapAssetType(del.type(), type)) {
-		errOut = "Unknown asset type in DeleteAsset()";
-		X_ERROR("Assetserver", errOut.c_str());
-		return false;
+		writeError(response, outputBuffer, "Unknown asset type in DeleteAsset()");
+		return;
 	}
 
-	core::string name(del.name().data(), del.name().length());
+	core::string name = fromStdString(del.name());
 
-	X_LOG1("AssetServer", "DeleteAsset: \"%s\" name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
+	X_LOG1("AssetServer", "DeleteAsset: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	res = MapReturnType(db_.DeleteAsset(type, name));
-	return true;
+	auto res = db_.DeleteAsset(type, name);
+	writeResponse(response, outputBuffer, res);
 }
 
-bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut, ProtoBuf::AssetDB::Result& res)
+
+void AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, ResponseBuffer& outputBuffer)
 {
-	// map type.
-	assetDb::AssetDB::AssetType::Enum type;
+	ProtoBuf::AssetDB::Reponse response;
+	AssetType::Enum type;
 
 	if (!MapAssetType(rename.type(), type)) {
-		errOut = "Unknown asset type in RenameAsset()";
-		X_ERROR("Assetserver", errOut.c_str());
-		return false;
+		writeError(response, outputBuffer, "Unknown asset type in RenameAsset()");
+		return;
 	}
 
-	core::string name(rename.name().data(), rename.name().length());
-	core::string newName(rename.newname().data(), rename.newname().length());
+	core::string name = fromStdString(rename.name());
+	core::string newName = fromStdString(rename.newname());
 
 	X_LOG1("AssetServer", "RenameAsset: \"%s\" name: \"%s\" newName: \"%s\"",
-		assetDb::AssetDB::AssetType::ToString(type), name.c_str(), newName.c_str());
+		AssetType::ToString(type), name.c_str(), newName.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	res = MapReturnType(db_.RenameAsset(type, name, newName));
-	return true;
+	auto res = db_.RenameAsset(type, name, newName);
+	writeResponse(response, outputBuffer, res);
 }
 
-bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, 
-	std::string& errOut, ProtoBuf::AssetDB::Result& res)
+void AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data,
+	ResponseBuffer& outputBuffer)
 {
-	// map type.
-	assetDb::AssetDB::AssetType::Enum type;
+	ProtoBuf::AssetDB::Reponse response;
+	AssetType::Enum type;
 
 	if (!MapAssetType(update.type(), type)) {
-		errOut = "Unknown asset type in RenameAsset()";
-		X_ERROR("Assetserver", errOut.c_str());
-		return false;
+		writeError(response, outputBuffer, "Unknown asset type in UpdateAsset()");
+		return;
 	}
 
-	core::string name(update.name().data(), update.name().length());
+	core::string name = fromStdString(update.name());
 	core::string args;
 	if (update.has_args()) {
-		args = core::string(update.args().data(), update.args().length());
+		args = fromStdString(update.args());
 	}
 
-	X_LOG1("AssetServer", "UpdateAsset: \"%s\" name: \"%s\"",
-		assetDb::AssetDB::AssetType::ToString(type), name.c_str());
+	X_LOG1("AssetServer", "UpdateAsset: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	res = MapReturnType(db_.UpdateAsset(type, name, data, args));
-	return true;
+	auto res = db_.UpdateAsset(type, name, data, args);
+	writeResponse(response, outputBuffer, res);
 }
 
 template<typename MessageT>
 void AssetServer::writeError(MessageT& response, ResponseBuffer& outputBuffer, const char* pMsg)
 {
-	X_ERROR("Assetserver", pMsg);
+	X_ERROR("Assetserver", "Error: %s", pMsg);
 
-	response.set_error(pMsg);
 	response.set_result(ProtoBuf::AssetDB::Result::ERROR);
+	response.set_error(pMsg);
 
 	if (!WriteDelimitedTo(response, outputBuffer))
 	{
@@ -643,5 +619,16 @@ void AssetServer::writeError(MessageT& response, ResponseBuffer& outputBuffer, c
 	}
 }
 
+template<typename MessageT>
+void AssetServer::writeResponse(MessageT& response, ResponseBuffer& outputBuffer, assetDb::AssetDB::Result::Enum res)
+{
+	response.set_result(MapReturnType(res));
+	response.set_error("");
+	
+	if (!WriteDelimitedTo(response, outputBuffer))
+	{
+		X_ERROR("Assetserver", "Failed to write error response");
+	}
+}
 
 X_NAMESPACE_END

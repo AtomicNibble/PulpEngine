@@ -27,7 +27,9 @@ class AssetServer : public core::ThreadAbstract
 public:
 	// used for reading / writing msg's
 	static const size_t BUF_LENGTH = 0x200;
-	typedef std::array<uint8_t, BUF_LENGTH> ResponseBuffer;
+	typedef core::FixedArray<uint8_t, BUF_LENGTH> ResponseBuffer;
+	typedef core::Array<uint8_t> DataArr;
+	typedef assetDb::AssetDB::AssetType AssetType;
 
 private:
 
@@ -43,12 +45,11 @@ private:
 
 	private:
 		bool readRequest(ProtoBuf::AssetDB::Request& request);
-		bool readBuf(core::Array<uint8_t>& buf, size_t size);
+		bool readBuf(DataArr& buf, size_t size);
 
-		bool sendRequestFail(std::string& errMsg);
-		bool sendRequestOk(ProtoBuf::AssetDB::Result res);
+		void writeError(ResponseBuffer& outputBuffer, const char* pErrMsg);
 
-		bool writeAndFlushBuf(const uint8_t* pBuf, size_t len);
+		bool writeAndFlushBuf(ResponseBuffer& outputBuffer);
 
 	private:
 		core::MemoryArenaBase* arena_;
@@ -69,14 +70,18 @@ private:
 
 	void ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer);
 	void AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, ResponseBuffer& outputBuffer);
-	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut, ProtoBuf::AssetDB::Result& res);
-	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut, ProtoBuf::AssetDB::Result& res);
-	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut, ProtoBuf::AssetDB::Result& res);
-	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut, ProtoBuf::AssetDB::Result& res);
+	void AddAsset(const ProtoBuf::AssetDB::AddAsset& add, ResponseBuffer& outputBuffer);
+	void DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, ResponseBuffer& outputBuffer);
+	void RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, ResponseBuffer& outputBuffer);
+	void UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, ResponseBuffer& outputBuffer);
 
 private:
 	template<typename MessageT>
 	void writeError(MessageT& response, ResponseBuffer& outputBuffer, const char* pMsg);
+
+	template<typename MessageT>
+	void writeResponse(MessageT& response, ResponseBuffer& outputBuffer, assetDb::AssetDB::Result::Enum res);
+
 
 private:
 	core::MemoryArenaBase* arena_;
