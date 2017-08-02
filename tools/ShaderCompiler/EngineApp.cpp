@@ -92,7 +92,6 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 		return false;
 	}
 
-
 	return true;
 }
 
