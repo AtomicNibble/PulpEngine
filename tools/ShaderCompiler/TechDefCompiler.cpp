@@ -60,6 +60,10 @@ namespace compiler
 				continue;
 			}
 
+			if (!techset::TechSetDefs::techCatPresent(cat)) {
+				continue;
+			}
+
 			if (!Compile(cat)) {
 				X_ERROR("TechCompiler", "Failed to compile cat: \"%s\"", MaterialCat::ToString(cat));
 				return false;
