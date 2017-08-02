@@ -614,8 +614,8 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 
 
 
-Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, render::shader::VertexFormat::Enum vrtFmt,
-	PermatationFlags permFlags)
+Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHash techNameHash, 
+	render::shader::VertexFormat::Enum vrtFmt, PermatationFlags permFlags)
 {
 	X_ASSERT_NOT_NULL(pMat);
 
