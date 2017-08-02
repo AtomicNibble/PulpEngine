@@ -1537,7 +1537,7 @@ void World3D::drawAreaGeo(Area** pAreas, uint32_t num)
 		const auto& renderMesh = pArea->renderMesh;
 		const float distanceFromCam = 0; // humm
 
-		addMeshTobucket(mesh, renderMesh, distanceFromCam);
+		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F, distanceFromCam);
 
 	}
 }
