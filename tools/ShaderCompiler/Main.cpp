@@ -10,7 +10,6 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
-
 #include "TechDefCompiler.h"
 
 #ifdef X_LIB
@@ -21,6 +20,9 @@ X_LINK_LIB("engine_Core")
 X_LINK_LIB("engine_RenderNull")
 
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
+
+
+X_FORCE_LINK_FACTORY("XConverterLib_Shader");
 
 #endif // !X_LIB
 
