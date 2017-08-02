@@ -3,7 +3,9 @@
 
 #include "Vars\LevelVars.h"
 #include "Material\MaterialManager.h"
+#include "Model\ModelManager.h"
 #include "Drawing\PrimativeContext.h"
+#include "Model\XModel.h"
 
 #include <Math\XWinding.h>
 #include <IFrameData.h>
