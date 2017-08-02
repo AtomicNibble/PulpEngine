@@ -5,7 +5,10 @@ struct VS_INPUT
 {
   float3 osPosition             : POSITION;
   float2 tex               : TEXCOORD0;
+#ifdef IL_UV2
   float2 tex1              : TEXCOORD1;
+#endif
+
   float4 color                  : COLOR0;
   float4 normal                 : NORMAL0;
 };
