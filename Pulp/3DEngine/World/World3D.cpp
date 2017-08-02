@@ -1603,11 +1603,12 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 		const model::MeshHeader& mesh = pModel->getLodMeshHdr(lodIdx);
 		const auto& renderMesh = pModel->getLodRenderMesh(lodIdx);
 
-		addMeshTobucket(mesh, renderMesh, distanceFromCam);
+		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F, distanceFromCam);
 	}
 }
 
-void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, const float distanceFromCam)
+void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, 
+	render::shader::VertexFormat::Enum vertFmt, const float distanceFromCam)
 {
 	render::CommandBucket<uint32_t>* pDepthBucket = pBucket_;
 
@@ -1625,7 +1626,8 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 		const model::SubMeshHeader* pSubMesh = mesh.subMeshHeads[subIdx];
 
 		engine::Material* pMat = pSubMesh->pMat;
-		engine::MaterialTech* pTech = engine::gEngEnv.pMaterialMan_->getTechForMaterial(pMat, tech, render::shader::VertexFormat::P3F_T4F_C4B_N3F,
+		engine::MaterialTech* pTech = engine::gEngEnv.pMaterialMan_->getTechForMaterial(pMat, tech, 
+			vertFmt,
 			engine::PermatationFlags::VertStreams);
 
 		if (!pTech) {
