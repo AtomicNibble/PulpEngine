@@ -43,6 +43,7 @@ namespace techset
 		MATLIB_EXPORT ~TechSetDefs();
 
 
+		MATLIB_EXPORT static bool techCatPresent(MaterialCat::Enum cat);
 		MATLIB_EXPORT static bool getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut);
 		X_INLINE TechSetDef* getTechDef(MaterialCat::Enum cat, const char* pName);
 		MATLIB_EXPORT TechSetDef* getTechDef(MaterialCat::Enum cat, const core::string& name);

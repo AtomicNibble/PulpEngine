@@ -44,6 +44,17 @@ namespace techset
 		}
 	}
 
+	bool TechSetDefs::techCatPresent(MaterialCat::Enum cat)
+	{
+		X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+		core::Path<char> path(TECH_DEFS_DIR);
+		path /= MaterialCat::ToString(cat);
+		path.toLower();
+
+		return gEnv->pFileSys->directoryExists(path.c_str());
+	}
+
 	// bool TechSetDefs::getTechCats(TechCatArr& techsOut)
 	bool TechSetDefs::getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut)
 	{
