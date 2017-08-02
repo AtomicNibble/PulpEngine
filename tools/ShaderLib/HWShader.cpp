@@ -118,7 +118,14 @@ namespace shader
 				Permatation::Enum flag = static_cast<PermatationFlags::Enum>(1 << i);
 				if (permFlags_.IsSet(flag))
 				{
-					macro.setFmt("X_%s", Permatation::ToString(flag));
+					if (flag == Permatation::Color || flag == Permatation::Uv2)
+					{
+						macro.setFmt("IL_%s", Permatation::ToString(flag));
+					}
+					else
+					{
+						macro.setFmt("X_%s", Permatation::ToString(flag));
+					}
 					macro.toUpper();
 
 					if (macroBufIdx + macro.length() > macroBuffer.size())
