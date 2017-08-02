@@ -88,6 +88,8 @@ namespace shader
 
 		InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 		{
+			static_assert(VertexFormat::ENUM_COUNT == 9, "Added vertex formats? this code needs updating.");
+
 			switch (fmt)
 			{
 				case VertexFormat::P3F_T3F:
@@ -123,9 +125,10 @@ namespace shader
 			}
 		}
 
-
 		ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
 		{
+			static_assert(VertexFormat::ENUM_COUNT == 9, "Added vertex formats? this code needs updating.");
+
 			switch (fmt)
 			{
 				case VertexFormat::P3F_T3F:
