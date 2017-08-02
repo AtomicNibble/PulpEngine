@@ -137,6 +137,7 @@ namespace compiler
 
 				// potentially auto generate all these
 				// depends..
+
 				static_assert(Permatation::FLAGS_COUNT == 4, "Potentially this code needs updating");
 				static_assert(ILFlag::FLAGS_COUNT == 4, "Potentially this code needs updating");
 
