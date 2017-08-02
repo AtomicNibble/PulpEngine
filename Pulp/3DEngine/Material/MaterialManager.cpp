@@ -623,6 +623,15 @@ Material::Tech* XMaterialManager::getTechForMaterial(Material* pMat, core::StrHa
 		return nullptr;
 	}
 
+	if (pMat->getTextures().isNotEmpty()) {
+		permFlags.Set(render::shader::Permatation::Textured);
+	}
+
+	// add perms based on vertFmt.
+	if (vrtFmt == render::shader::VertexFormat::P3F_T4F_C4B_N3F) {
+		permFlags.Set(PermatationFlags::Uv2);
+	}
+
 	// the material holds all it's techs like a cache, but when it don't have one we must create it.
 	auto* pTech = pMat->getTech(techNameHash, vrtFmt, permFlags);
 	if (pTech) {
