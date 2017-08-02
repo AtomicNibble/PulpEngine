@@ -28,7 +28,7 @@ namespace shader
 		struct ShaderBinHeader
 		{
 			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-			static const uint32_t X_SHADER_BIN_VERSION = 5; // change this to force all shaders to be recompiled.
+			static const uint32_t X_SHADER_BIN_VERSION = 6; // change this to force all shaders to be recompiled.
 
 
 			uint32_t forcc;
@@ -41,7 +41,7 @@ namespace shader
 			uint32_t sourceCRC32;
 			uint32_t blobLength;
 			uint32_t deflatedLength;
-			uint32_t ___pad;
+		//	uint32_t ___pad;
 			core::dateTimeStampSmall modifed;
 
 			// i now save reflection info.
@@ -56,6 +56,9 @@ namespace shader
 
 			// 4
 			PermatationFlags permFlags;
+			// 4
+			ILFlags ILFlags;
+
 			// 4
 			ShaderType::Enum type;
 			InputLayoutFormat::Enum ILFmt;
@@ -134,6 +137,7 @@ namespace shader
 		hdr.numInstructions = pShader->getNumInstructions();
 
 		hdr.permFlags = pShader->getPermFlags();
+		hdr.ILFlags = pShader->getILFlags();
 		hdr.type = pShader->getType();
 		hdr.ILFmt = pShader->getILFormat();
 
@@ -314,6 +318,7 @@ namespace shader
 
 				pShader->permFlags_ = hdr.permFlags;
 				pShader->IlFmt_ = hdr.ILFmt;
+				pShader->ILFlags_ = hdr.ILFlags;
 
 				// type should already be set.
 				// so we just use it as a sanity check.

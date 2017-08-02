@@ -121,7 +121,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
 		// create a instance of the shader with the flags we want it compiled with.
 		// this won't actually compile it.
-		stages[type] = pRenderSys->createHWShader(type, shaderEntry_[type], shaderDefines_[type], pSource, permFlags);
+		stages[type] = pRenderSys->createHWShader(type, shaderEntry_[type], shaderDefines_[type], pSource, permFlags, vertFmt);
 	}
 
 

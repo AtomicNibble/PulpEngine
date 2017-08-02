@@ -398,7 +398,7 @@ struct IRender
 	// new api for creating techs in 3dengine
 	virtual shader::IShaderSource* getShaderSource(const core::string& name) X_ABSTRACT;
 	virtual shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags) X_ABSTRACT;
+		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt) X_ABSTRACT;
 	virtual shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_ABSTRACT;
 
 	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;

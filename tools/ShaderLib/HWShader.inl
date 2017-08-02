@@ -37,6 +37,9 @@ namespace shader
 	X_INLINE PermatationFlags XHWShader::getPermFlags(void) const {
 		return permFlags_;
 	}
+	X_INLINE ILFlags XHWShader::getILFlags(void) const {
+		return ILFlags_;
+	}
 	X_INLINE ShaderType::Enum XHWShader::getType(void) const {
 		return type_;
 	}

@@ -17,6 +17,7 @@
 
 #include "ShaderSourceTypes.h"
 #include "HWShader.h"
+#include "ShaderUtil.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -127,9 +128,12 @@ namespace shader
 	}
 
 	XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
+		shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
 	{
-		XHWShader* pHW = hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ILFlags());
+		ILFlags ilflags = Util::IlFlagsForVertexFormat(vertFmt);
+
+
+		XHWShader* pHW = hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ilflags);
 
 		return pHW;
 	}
@@ -382,7 +386,8 @@ namespace shader
 			entry, 
 			customDefines,
 			pSourceFile,
-			permFlags
+			permFlags,
+			ILFlags
 		);
 
 		return pHWShaderRes;

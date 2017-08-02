@@ -24,7 +24,7 @@ namespace shader
 
 	XHWShader::XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
 		const core::string& entry, const core::string& customDefines,
-		SourceFile* pSourceFile, PermatationFlags permFlags) :
+		SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags) :
 		name_(pName),
 		pSourceFile_(X_ASSERT_NOT_NULL(pSourceFile)),
 		entryPoint_(entry),
@@ -32,6 +32,7 @@ namespace shader
 		status_(ShaderStatus::NotCompiled),
 		permFlags_(permFlags),
 		type_(type),
+		ILFlags_(ILFlags),
 		IlFmt_(InputLayoutFormat::Invalid),
 		numInputParams_(0),
 		numRenderTargets_(0),
@@ -118,14 +119,36 @@ namespace shader
 				Permatation::Enum flag = static_cast<PermatationFlags::Enum>(1 << i);
 				if (permFlags_.IsSet(flag))
 				{
-					if (flag == Permatation::Color || flag == Permatation::Uv2)
+					macro.setFmt("X_%s", Permatation::ToString(flag));
+					macro.toUpper();
+
+					if (macroBufIdx + macro.length() > macroBuffer.size())
 					{
-						macro.setFmt("IL_%s", Permatation::ToString(flag));
+						X_ERROR("Shader", "Failed to fit all macros in buffer");
+						return false;
 					}
-					else
-					{
-						macro.setFmt("X_%s", Permatation::ToString(flag));
-					}
+
+					char* pStart = &macroBuffer[macroBufIdx];
+					std::copy(macro.begin(), macro.end(), pStart);
+
+					macroBufIdx += macro.length();
+					macroBuffer[macroBufIdx++] = '\0';
+
+					macros.push_back({ pStart, "1" });
+				}
+			}
+		}
+
+		if (ILFlags_.IsAnySet())
+		{
+			core::StackString<256, char> macro;
+
+			for (uint32_t i = 0; i < ILFlags::FLAGS_COUNT; i++)
+			{
+				ILFlag::Enum flag = static_cast<ILFlags::Enum>(1 << i);
+				if (ILFlags_.IsSet(flag))
+				{
+					macro.setFmt("IL_%s", ILFlag::ToString(flag));
 					macro.toUpper();
 
 					if (macroBufIdx + macro.length() > macroBuffer.size())

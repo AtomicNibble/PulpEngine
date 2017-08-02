@@ -46,7 +46,7 @@ namespace shader
 	public:
 		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
 			const core::string& entry, const core::string& customDefines,
-			SourceFile* pSourceFile, PermatationFlags permFlags);
+			SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags);
 		SHADERLIB_EXPORT ~XHWShader();
 
 		X_INLINE const int32_t getID(void) const;
@@ -58,6 +58,7 @@ namespace shader
 		X_INLINE const core::string& getEntryPoint(void) const;
 		X_INLINE SourceFile* getShaderSource(void) const;
 		X_INLINE PermatationFlags getPermFlags(void) const;
+		X_INLINE ILFlags getILFlags(void) const;
 		X_INLINE ShaderType::Enum getType(void) const;
 		X_INLINE InputLayoutFormat::Enum getILFormat(void) const;
 		X_INLINE int32_t getNumRenderTargets(void) const;
@@ -108,6 +109,8 @@ namespace shader
 		ShaderType::Enum type_;
 		// POS_UV_COL_NOR
 		InputLayoutFormat::Enum IlFmt_;
+
+		ILFlags ILFlags_;
 
 		// save info from shader reflection.
 		int32_t numInputParams_;

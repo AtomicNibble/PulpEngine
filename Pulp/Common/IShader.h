@@ -340,9 +340,7 @@ X_DECLARE_FLAGS8(Permatation)(
 	VertStreams,
 	HwSkin,
 	Instanced,
-	Textured,
-	Uv2,
-	Color
+	Textured
 );
 
 typedef Flags8<Permatation> PermatationFlags;

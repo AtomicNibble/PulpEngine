@@ -225,13 +225,13 @@ shader::IShaderSource* RenderNull::getShaderSource(const core::string& name)
 }
 
 shader::IHWShader* RenderNull::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-	shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
+	shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
 {
 	X_UNUSED(type);
 	X_UNUSED(entry);
 	X_UNUSED(customDefines);
 	X_UNUSED(pSourceFile);
-	X_UNUSED(permFlags);
+	X_UNUSED(permFlags, vertFmt);
 
 	return nullptr;
 }

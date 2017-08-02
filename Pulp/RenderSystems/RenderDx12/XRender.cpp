@@ -1129,9 +1129,9 @@ shader::IShaderSource* XRender::getShaderSource(const core::string& sourceName)
 }
 
 shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-	shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags)
+	shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
 {
-	return pShaderMan_->createHWShader(type, entry, customDefines, pSourceFile, permFlags);
+	return pShaderMan_->createHWShader(type, entry, customDefines, pSourceFile, permFlags, vertFmt);
 }
 
 shader::IShaderPermatation* XRender::createPermatation(const shader::ShaderStagesArr& stages)

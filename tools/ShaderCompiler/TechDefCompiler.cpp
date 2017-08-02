@@ -140,9 +140,13 @@ namespace compiler
 					{ PermatationFlags::Instanced }
 				} };
 
+				// which vert fmt?
+				// all of them?
+				render::shader::VertexFormat::Enum vertFmt = render::shader::VertexFormat::P3F_T2F_C4B;
+
 				for (auto& permFlags : perms)
 				{
-					XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, pShaderSource, permFlags);
+					XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, pShaderSource, permFlags, vertFmt);
 					if (!pHWShader) {
 						X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
 						return false;
