@@ -8,8 +8,9 @@ X_NAMESPACE_BEGIN(engine)
 
 struct RenderEntDesc
 {
+	model::IModel* pModel;
 
-
+	Transformf trans;
 };
 
 struct IRenderEnt
