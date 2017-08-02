@@ -29,6 +29,22 @@ X_NAMESPACE_BEGIN(engine)
 
 
 
+class RenderEnt : public IRenderEnt
+{
+public:
+	int32_t	index;
+	int32_t	lastModifiedFrameNum;	// to determine if it is constantly changing,
+	int32_t	viewCount;
+
+	model::XModel* pModel;
+
+	Transformf trans;
+
+	AABB localBounds;
+	AABB globalBounds;
+};
+
+
 struct AreaNode
 {
 	static const int32_t CHILDREN_HAVE_MULTIPLE_AREAS = -2;
@@ -94,6 +110,7 @@ struct Area
 	typedef core::Array<AreaVisiblePortal> VisPortalsArr;
 	typedef core::Array<AreaPortal> AreaPortalArr;
 	typedef core::Array<uint32_t> EntIdArr;
+	typedef core::Array<RenderEnt*> RenderEntPtrArr;
 
 public:
 	Area();
@@ -106,6 +123,7 @@ public:
 public:
 
 	int32_t areaNum;
+	int32_t viewCount;
 	// points the the area's mesh header.
 	model::MeshHeader* pMesh;
 	// the gpu buffers for the area mesh.
@@ -124,8 +142,9 @@ public:
 
 	// processed vis ents.
 	EntIdArr areaVisibleEnts;
-};
 
+	RenderEntPtrArr renderEnts;
+};
 
 // these should be like 3d representation of the world.
 class World3D : public IWorld3D
@@ -139,6 +158,8 @@ class World3D : public IWorld3D
 	typedef std::array<level::FileAreaRefHdr, level::MAP_MAX_MULTI_REF_LISTS> AreaMultiRefsHdrArr;
 	typedef std::array<uint32_t, level::MAP_MAX_MULTI_REF_LISTS> AreaVisFlags;
 	typedef core::Array<level::StaticModel> StaticModelsArr;
+	typedef core::Array<RenderEnt*> RenderEntPtrArr;
+
 
 	struct AreaRefInfo
 	{
@@ -183,7 +204,13 @@ private:
 	void boundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
 		int32_t* pAreasOut, size_t maxAreas) const;
 
+	void pushFrustumIntoTree_r(RenderEnt* pEnt, int32_t nodeNum);
+	void pushFrustumIntoTree(RenderEnt* pEnt);
+
+	void addEntityToArea(Area& area, RenderEnt* pEnt);
+
 	int32_t commonChildrenArea_r(AreaNode* pAreaNode);
+
 
 private:
 	void clearVisPortals(void);
@@ -207,7 +234,12 @@ private:
 	void drawAreaGeo(Area** pAreas, uint32_t num);
 	void drawStaticModels(const uint32_t* pModelIds, uint32_t num);
 
-	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, const float distanceFromCam);
+	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh,
+		render::shader::VertexFormat::Enum vrtvertFmtFmt, const float distanceFromCam);
+
+private:
+	void createEntityRefs(RenderEnt* pEnt);
+
 
 private:
 	void drawDebug(void);
@@ -230,8 +262,10 @@ private:
 
 	bool outsideWorld_;
 
-	XCamera cam_;
+	int32_t viewCount_;
+
 	int32_t camArea_;
+	XCamera cam_;
 
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;
@@ -246,6 +280,9 @@ private:
 
 	core::Spinlock visAreaLock_;
 	AreaPtrArr visibleAreas_;
+
+private:
+	RenderEntPtrArr renderEnts_;
 };
 
 

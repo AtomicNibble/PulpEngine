@@ -116,10 +116,12 @@ Area::Area() :
 	portals(g_3dEngineArena),
 	visPortals(g_3dEngineArena),
 	areaVisibleEnts(g_3dEngineArena),
+	renderEnts(g_3dEngineArena),
 	curVisPortalIdx(-1),
 	maxVisPortals(0)
 {
 	areaNum = -1;
+	viewCount = 0;
 	pMesh = nullptr;
 
 	// when loading the level we should set the proper max size
@@ -197,9 +199,11 @@ World3D::World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, 
 	areaNodes_(arena),
 	modelRefs_(arena),
 	visibleAreas_(arena),
-	staticModels_(arena)
+	staticModels_(arena),
+	renderEnts_(arena)
 {
-
+	viewCount_ = 0;
+	camArea_ = -1;
 }
 
 World3D::~World3D()
@@ -630,13 +634,48 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 	return true;
 }
 
-IRenderEnt* World3D::addRenderEnt(RenderEntDesc& ent)
+IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 {
-	X_UNUSED(ent);
+	X_UNUSED(entDesc);
+	X_ASSERT_NOT_NULL(entDesc.pModel);
 
-	return nullptr;
+	auto* pRenderEnt = X_NEW(RenderEnt, arena_, "RenderEnt");
+	pRenderEnt->index = safe_static_cast<int32_t>(renderEnts_.size());
+	pRenderEnt->lastModifiedFrameNum = 0;
+	pRenderEnt->viewCount = 0;
+	pRenderEnt->pModel = static_cast<model::XModel*>(entDesc.pModel);
+	pRenderEnt->trans = entDesc.trans;
+
+	renderEnts_.append(pRenderEnt);
+
+
+	createEntityRefs(pRenderEnt);
+
+	return pRenderEnt;
 }
 
+void World3D::createEntityRefs(RenderEnt* pEnt) 
+{
+	X_UNUSED(pEnt);
+
+	if (!pEnt->pModel->isLoaded())
+	{
+		return;
+	}
+
+	pEnt->localBounds = pEnt->pModel->bounds();
+
+	if (pEnt->localBounds.isEmpty()) {
+		return;
+	}
+
+	pEnt->globalBounds = pEnt->localBounds;
+	pEnt->globalBounds.move(pEnt->trans.pos);
+
+	viewCount_++;
+
+	pushFrustumIntoTree(pEnt);
+}
 
 bool World3D::isPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const
 {
@@ -715,21 +754,20 @@ void World3D::boundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAr
 
 	// work out all the areas this bounds intersects with.
 
-	size_t i;
-
 	do
 	{
 		if (nodeNum < 0) // negative is a area.
 		{
-			nodeNum = -1 - nodeNum;
+			int32_t areaNum = -1 - nodeNum;
+			size_t i;
 
 			for (i = 0; i < numAreasOut; i++) {
-				if (pAreasOut[i] == nodeNum) {
+				if (pAreasOut[i] == areaNum) {
 					break;
 				}
 			}
 			if (i >= numAreasOut && numAreasOut < maxAreas) {
-				pAreasOut[numAreasOut++] = nodeNum;
+				pAreasOut[numAreasOut++] = areaNum;
 			}
 
 			return;
@@ -760,6 +798,64 @@ void World3D::boundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAr
 	} while (nodeNum != 0);
 }
 
+
+void World3D::pushFrustumIntoTree_r(RenderEnt* pEnt, int32_t nodeNum)
+{
+	do
+	{
+		if (nodeNum < 0) // negative is a area.
+		{
+			int32_t areaNum = -1 - nodeNum;
+			Area& area = areas_[areaNum];
+
+			// check not already added.
+			if (area.viewCount == viewCount_) {
+				return;	
+			}
+			area.viewCount = viewCount_;
+
+
+			addEntityToArea(area, pEnt);
+			return;
+		}
+
+		const AreaNode& node = areaNodes_[nodeNum];
+		if (node.commonChildrenArea != AreaNode::CHILDREN_HAVE_MULTIPLE_AREAS) {
+			// ...
+		}
+
+
+		PlaneSide::Enum side = pEnt->globalBounds.planeSide(node.plane);
+		if (side == PlaneSide::FRONT) {
+			nodeNum = node.children[level::Side::FRONT];
+		}
+		else if (side == PlaneSide::BACK) {
+			nodeNum = node.children[level::Side::BACK];
+		}
+		else
+		{
+			if (node.children[level::Side::FRONT] != 0) // 0 is leaf without area since a area of -1 - -1 = 0;
+			{
+				pushFrustumIntoTree_r(pEnt, node.children[level::Side::FRONT]);
+			}
+
+			nodeNum = node.children[level::Side::BACK];
+		}
+
+	} while (nodeNum != 0);
+}
+
+void World3D::pushFrustumIntoTree(RenderEnt* pEnt)
+{
+	pushFrustumIntoTree_r(pEnt, 0);
+}
+
+void World3D::addEntityToArea(Area& area, RenderEnt* pEnt)
+{
+
+
+	area.renderEnts.push_back(pEnt);
+}
 
 
 int32_t World3D::commonChildrenArea_r(AreaNode* pAreaNode)
@@ -1417,12 +1513,15 @@ void World3D::drawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t th
 	{
 		const auto& visEnts = pArea->areaVisibleEnts;
 
-		auto* pJobs = jobSys.parallel_for_member_child<World3D>(pJob, del, visEnts.data(), safe_static_cast<uint32_t>(visEnts.size()),
-			core::V2::CountSplitter32(16) // will likley need tweaking, props even made a var.
-			JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D)
-		);
+		if (visEnts.isNotEmpty())
+		{
+			auto* pJobs = jobSys.parallel_for_member_child<World3D>(pJob, del, visEnts.data(), safe_static_cast<uint32_t>(visEnts.size()),
+				core::V2::CountSplitter32(16) // will likley need tweaking, props even made a var.
+				JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D)
+				);
 
-		jobSys.Run(pJobs);
+			jobSys.Run(pJobs);
+		}
 	}
 }
 
