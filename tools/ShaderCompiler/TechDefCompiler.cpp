@@ -137,6 +137,9 @@ namespace compiler
 
 				// potentially auto generate all these
 				// depends..
+				static_assert(Permatation::FLAGS_COUNT == 4, "Potentially this code needs updating");
+				static_assert(ILFlag::FLAGS_COUNT == 4, "Potentially this code needs updating");
+
 				std::array<PermatationFlags, 4> perms = { {
 					{ PermatationFlags() },
 					{ PermatationFlags::HwSkin },
@@ -144,26 +147,33 @@ namespace compiler
 					{ PermatationFlags::Instanced }
 				} };
 
-				// which vert fmt?
-				// all of them?
-				render::shader::VertexFormat::Enum vertFmt = render::shader::VertexFormat::P3F_T2F_C4B;
+				std::array<ILFlags, 5> ilPerms = { {
+					{ ILFlags() },
+					{ ILFlags::Color },
+					{ ILFlags(ILFlags::Color | ILFlags::Normal) },
+					{ ILFlags(ILFlags::Color | ILFlags::Normal | ILFlags::BiNormal) },
+					{ ILFlags(ILFlags::Uv2 | ILFlags::Color | ILFlags::Normal) },
+				} };
 
 				for (auto& permFlags : perms)
 				{
-					XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, pShaderSource, permFlags, vertFmt);
-					if (!pHWShader) {
-						X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
-						return false;
-					}
-
-					if (!shaderMan_.compileShader(pHWShader, compileFlags_))
+					for (auto& ilFlags : ilPerms)
 					{
-						X_ERROR("TechCompiler", "Failed to compile HWShader", shader.source.c_str());
-						return false;
-					}
+						XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, pShaderSource, permFlags, ilFlags);
+						if (!pHWShader) {
+							X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
+							return false;
+						}
 
-					// we don't release the hwshader, so another tech that uses same source / flags
-					// won't need to bother compiling.
+						if (!shaderMan_.compileShader(pHWShader, compileFlags_))
+						{
+							X_ERROR("TechCompiler", "Failed to compile HWShader", shader.source.c_str());
+							return false;
+						}
+
+						// we don't release the hwshader, so another tech that uses same source / flags
+						// won't need to bother compiling.
+					}
 				}
 			}
 		}
