@@ -98,10 +98,24 @@ namespace entity
 	{
 		// auto trans = reg_.assign<TransForm>(id);
 		auto& player = reg_.assign<Player>(id);
+		auto& hp = reg_.assign<Health>(id);
+		auto& rend = reg_.assign<RenderComponent>(id);
+
 		X_UNUSED(player);
+
 //		player.eyeOffset = Vec3f(0, 0, 50.f);
 //		player.cameraOrigin = Vec3f(0, 0, 50.f);
 //		player.cameraAxis = Anglesf(0, 0, 0.f);
+
+		hp.hp = 100;
+
+		engine::RenderEntDesc entDsc;
+		entDsc.pModel = pModelManager_->loadModel("default/default");
+		entDsc.trans.pos = Vec3f(-90, 0, 10);
+
+		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+		X_ASSERT_NOT_NULL(rend.pRenderEnt);
+
 
 		// temp.
 		cameraSys_.setActiveEnt(id);
