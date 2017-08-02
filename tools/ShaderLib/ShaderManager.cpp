@@ -132,10 +132,14 @@ namespace shader
 	{
 		ILFlags ilflags = Util::IlFlagsForVertexFormat(vertFmt);
 
+		return hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ilflags);
+	}
 
-		XHWShader* pHW = hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ilflags);
-
-		return pHW;
+	XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry,
+		const core::string& customDefines, shader::IShaderSource* pSourceFile,
+		shader::PermatationFlags permFlags, ILFlags ILFlags)
+	{
+		return hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ILFlags);
 	}
 
 	void XShaderManager::releaseHWShader(XHWShader* pHWSHader)
