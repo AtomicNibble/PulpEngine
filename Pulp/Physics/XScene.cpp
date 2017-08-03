@@ -380,7 +380,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		pxDesc.halfHeight = boxDesc.halfHeight;
 		pxDesc.halfSideExtent = boxDesc.halfSideExtent;
 		pxDesc.halfForwardExtent = boxDesc.halfForwardExtent;
-		pxDesc.callback = this;
+		pxDesc.reportCallback = this;
 
 		if (!pxDesc.isValid()) {
 			X_ERROR("Phys", "Box controller desc is invalid");
@@ -406,7 +406,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		const CapsuleControllerDesc& capsulDesc = static_cast<const CapsuleControllerDesc&>(desc);
 		pxDesc.radius = capsulDesc.radius;
 		pxDesc.height = capsulDesc.height;
-		pxDesc.callback = this;
+		pxDesc.reportCallback = this;
 		if (capsulDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
 			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eEASY;
 		}
