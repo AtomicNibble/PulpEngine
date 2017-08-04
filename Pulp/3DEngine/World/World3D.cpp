@@ -537,9 +537,9 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 				// copy over the info.
 				sm.pos = fsm.pos;
 				sm.angle = fsm.angle;
-				sm.modelNameIdx = fsm.modelNameIdx;
 				sm.boundingBox = fsm.boundingBox;
 				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.
+				sm.modelNameIdx = fsm.modelNameIdx;
 															 // models need to be loaded at some point.
 				const char* pModelName = strTable.getString(sm.modelNameIdx);
 				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(pModelName);
