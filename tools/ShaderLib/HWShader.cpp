@@ -352,7 +352,7 @@ namespace shader
 			else if (core::strUtil::FindCaseInsensitive("PerFrameConstants", BufferDesc.Name)) {
 				baseUpdateRate = UpdateFreq::FRAME;
 			}
-			else if (core::strUtil::FindCaseInsensitive("ObjectConstants", BufferDesc.Name)) {
+			else if (core::strUtil::FindCaseInsensitive("PerObjectConstants", BufferDesc.Name)) {
 				baseUpdateRate = UpdateFreq::INSTANCE;
 			}
 			else {
