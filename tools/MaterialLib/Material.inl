@@ -4,6 +4,7 @@ X_INLINE MaterialTech::MaterialTech(core::MemoryArenaBase* arena) :
 	hashVal(0),
 	pPerm(nullptr),
 	pVariableState(nullptr),
+	cbs(arena),
 	materialCbs(arena),
 	paramLinks(arena)
 {
@@ -14,6 +15,7 @@ X_INLINE MaterialTech::MaterialTech(const MaterialTech& oth) :
 	hashVal(oth.hashVal),
 	pPerm(oth.pPerm),
 	pVariableState(oth.pVariableState),
+	cbs(oth.cbs),
 	materialCbs(oth.materialCbs),
 	paramLinks(oth.paramLinks)
 {
@@ -24,6 +26,7 @@ X_INLINE MaterialTech::MaterialTech(MaterialTech&& oth) :
 	hashVal(std::move(oth.hashVal)),
 	pPerm(std::move(oth.pPerm)),
 	pVariableState(std::move(oth.pVariableState)),
+	cbs(std::move(oth.cbs)),
 	materialCbs(std::move(oth.materialCbs)),
 	paramLinks(std::move(oth.paramLinks))
 {
@@ -37,6 +40,7 @@ X_INLINE MaterialTech& MaterialTech::operator=(const MaterialTech& oth)
 		hashVal = oth.hashVal;
 		pPerm = oth.pPerm;
 		pVariableState = oth.pVariableState;
+		cbs = oth.cbs;
 		materialCbs = oth.materialCbs;
 		paramLinks = oth.paramLinks;
 	}
@@ -49,6 +53,7 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 	hashVal = std::move(oth.hashVal);
 	pPerm = std::move(oth.pPerm);
 	pVariableState = std::move(oth.pVariableState);
+	cbs = std::move(oth.cbs);
 	materialCbs = std::move(oth.materialCbs);
 	paramLinks = std::move(oth.paramLinks);
 	return *this;

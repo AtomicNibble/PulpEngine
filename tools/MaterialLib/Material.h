@@ -67,6 +67,7 @@ struct ParamLink
 struct MaterialTech
 {
 	typedef core::Array<render::shader::XCBuffer> CBufferArr;
+	typedef core::Array<const render::shader::XCBuffer*> CBufferPtrArr;
 	typedef core::Array<ParamLink> ParamLinkArr;
 
 	MaterialTech(core::MemoryArenaBase* arena);
@@ -82,7 +83,8 @@ struct MaterialTech
 
 	render::Commands::ResourceStateBase* pVariableState;
 
-	CBufferArr materialCbs;
+	CBufferPtrArr cbs;		// all the cbuffers required.
+	CBufferArr materialCbs;	// cbuffers with per material params pre filled.
 	ParamLinkArr paramLinks;
 };
 
