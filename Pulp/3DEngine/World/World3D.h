@@ -236,7 +236,7 @@ private:
 	void drawStaticModels(const uint32_t* pModelIds, uint32_t num);
 
 	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh,
-		render::shader::VertexFormat::Enum vrtvertFmtFmt, const float distanceFromCam);
+		render::shader::VertexFormat::Enum vrtvertFmtFmt, const Matrix44f& world, const float distanceFromCam);
 
 private:
 	void createEntityRefs(RenderEnt* pEnt);

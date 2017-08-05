@@ -1530,16 +1530,17 @@ void World3D::drawVisibleStaticModels_job(core::V2::JobSystem& jobSys, size_t th
 
 void World3D::drawAreaGeo(Area** pAreas, uint32_t num)
 {
+	Matrix44f world = Matrix44f::identity();
+
 	for (uint32_t i = 0; i < num; i++)
 	{
 		Area* pArea = pAreas[i];
-
 
 		const model::MeshHeader& mesh = *pArea->pMesh;
 		const auto& renderMesh = pArea->renderMesh;
 		const float distanceFromCam = 0; // humm
 
-		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F, distanceFromCam);
+		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T4F_C4B_N3F, world, distanceFromCam);
 
 	}
 }
@@ -1605,12 +1606,26 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 		const model::MeshHeader& mesh = pModel->getLodMeshHdr(lodIdx);
 		const auto& renderMesh = pModel->getLodRenderMesh(lodIdx);
 
-		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F, distanceFromCam);
+
+#if 1
+		Matrix44f world = Matrix44f::createTranslation(sm.pos);
+		
+		if (sm.angle.getAngle() != 0.f) {
+			world.rotate(sm.angle.getAxis(), sm.angle.getAngle());
+		}
+#else
+
+		Matrix44f world = sm.angle.toMatrix44();
+		world.setTranslate(sm.pos);
+#endif
+		world.transpose();
+
+		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F, world, distanceFromCam);
 	}
 }
 
 void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, 
-	render::shader::VertexFormat::Enum vertFmt, const float distanceFromCam)
+	render::shader::VertexFormat::Enum vertFmt, const Matrix44f& world, const float distanceFromCam)
 {
 	render::CommandBucket<uint32_t>* pDepthBucket = pBucket_;
 
@@ -1622,21 +1637,24 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 	// so it's the requirement of the material as to what buffers it needs.
 	const core::StrHash tech("unlit");
 
+
 	// now we render :D !
 	for (size_t subIdx = 0; subIdx < mesh.numSubMeshes; subIdx++)
 	{
 		const model::SubMeshHeader* pSubMesh = mesh.subMeshHeads[subIdx];
 
 		engine::Material* pMat = pSubMesh->pMat;
-		engine::MaterialTech* pTech = engine::gEngEnv.pMaterialMan_->getTechForMaterial(pMat, tech, 
+		engine::MaterialTech* pTech = engine::gEngEnv.pMaterialMan_->getTechForMaterial(
+			pMat, 
+			tech, 
 			vertFmt,
-			engine::PermatationFlags::VertStreams);
+			engine::PermatationFlags::VertStreams
+		);
 
 		if (!pTech) {
 			continue;
 		}
-
-
+		
 		const auto* pPerm = pTech->pPerm;
 		const auto stateHandle = pPerm->stateHandle;
 		const auto* pVariableState = pTech->pVariableState;
@@ -1644,8 +1662,111 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 
 		uint32_t sortKey = static_cast<uint32_t>(distanceFromCam);
 
+		// work out which cbuffers need updating.
+		render::Commands::CopyConstantBufferData* pCBUpdate = nullptr;
 		render::Commands::DrawIndexed* pDraw = nullptr;
-		pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
+
+		{
+			int32_t numCbs = pVariableState->getNumCBs();
+			auto* pCBHandles = pVariableState->getCBs();
+
+			const auto& cbs = pTech->cbs;
+			X_ASSERT(numCbs == static_cast<int32_t>(cbs.size()), "Size mismatch")(numCbs, cbs.size());
+
+			for (int32_t i = 0; i < numCbs; i++)
+			{
+				auto& cb = *cbs[i];
+
+				// what are the cases we need to update a cbuffer?
+
+				// can skip:
+				// * it's per frame only.
+				// * it's per material static only.
+				// * it's per material static / dynamic only (these are updated at start of frame)
+				// needs update:
+				// * contains any per instance params.
+				// * skin data?
+				// * batch based? (what even is a batch? instanced? dunno.. what I intented it for)
+
+				if (!cb.containsUpdateFreqs(render::shader::UpdateFreq::INSTANCE)) {
+					continue;
+				}
+
+				// If we need to update the cbuffer for any reason we must provide the full cbuffer.
+				size_t size = cb.getBindSize();
+				char* pAuxData;
+
+				if (pCBUpdate) {
+					std::tie(pCBUpdate, pAuxData) = pDepthBucket->appendCommandGetAux<render::Commands::CopyConstantBufferData>(pCBUpdate, size);
+				}
+				else {
+					std::tie(pCBUpdate, pAuxData) = pDepthBucket->addCommandGetAux<render::Commands::CopyConstantBufferData>(sortKey, size);
+				}
+				pCBUpdate->constantBuffer = pCBHandles[i];
+				pCBUpdate->pData = pAuxData;
+				pCBUpdate->size = static_cast<uint32_t>(size);
+
+				// copy the cbuffer cpu that contains material param values.
+				if (cb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL)) {
+					auto& cpuData = cb.getCpuData();
+					std::memcpy(pAuxData, cpuData.data(), cpuData.size());
+				}
+				else {
+					// this will be a instance from the shader perm, so unlikley to contain any useful data.
+				}
+
+				// now patch in any other params.
+				for (int32_t paramIdx = 0; paramIdx < cb.getParamCount(); paramIdx++)
+				{
+					const auto& p = cb[paramIdx];
+					const auto type = p.getType();
+					const auto updateFreq = p.getUpdateRate();
+
+					using namespace render;
+
+					switch (updateFreq)
+					{
+						case shader::UpdateFreq::MATERIAL:
+							continue;
+						case shader::UpdateFreq::FRAME:
+							// ask the cbuffer man to fill us? ;)
+							pCBufMan_->setParamValue(type, (uint8_t*)&pAuxData[p.getBindPoint()]);
+							continue;
+
+						case shader::UpdateFreq::BATCH:
+						case shader::UpdateFreq::SKINDATA:
+						case shader::UpdateFreq::UNKNOWN:
+							X_ASSERT_NOT_IMPLEMENTED();
+							// ya fooking wut. NO!
+							continue;
+
+						case shader::UpdateFreq::INSTANCE:
+							switch (type)
+							{
+								case shader::ParamType::PI_worldMatrix:
+									std::memcpy(&pAuxData[p.getBindPoint()], &world, sizeof(world));
+									break;
+								case shader::ParamType::PI_objectToWorldMatrix:
+									X_ASSERT_NOT_IMPLEMENTED();
+									break;
+								case shader::ParamType::PI_worldViewProjectionMatrix:
+									X_ASSERT_NOT_IMPLEMENTED();
+									break;
+							}
+							break;
+
+					}
+				}
+			}
+
+		}
+
+		if (pCBUpdate) {
+			pDraw = pDepthBucket->appendCommand<render::Commands::DrawIndexed>(pCBUpdate, variableStateSize);
+		}
+		else {
+			pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
+		}
 
 		pDraw->indexCount = pSubMesh->numIndexes;
 		pDraw->startIndex = pSubMesh->startIndex;
