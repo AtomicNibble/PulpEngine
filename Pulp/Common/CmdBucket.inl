@@ -164,6 +164,22 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 }
 
 template <typename KeyT>
+template <typename CommandT>
+X_INLINE std::tuple<CommandT*, char*> CommandBucket<KeyT>::addCommandGetAux(Key key, size_t auxMemorySize)
+{
+	CommandT* pCommand = addCommand<CommandT>(key, auxMemorySize);
+	return std::make_tuple(pCommand, CommandPacket::getAuxiliaryMemory(pCommand));
+}
+
+template <typename KeyT>
+template <typename CommandT, typename ParentCmdT>
+X_INLINE std::tuple<CommandT*, char*> CommandBucket<KeyT>::appendCommandGetAux(ParentCmdT* pParentCommand, size_t auxMemorySize)
+{
+	CommandT* pCommand = appendCommand<CommandT, ParentCmdT>(pParentCommand, auxMemorySize);
+	return std::make_tuple(pCommand, CommandPacket::getAuxiliaryMemory(pCommand));
+}
+
+template <typename KeyT>
 X_INLINE const typename CommandBucket<KeyT>::KeyArr& CommandBucket<KeyT>::getKeys(void)
 {
 	return keys_;

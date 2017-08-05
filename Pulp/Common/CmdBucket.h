@@ -190,6 +190,12 @@ public:
 	template <typename CommandT, typename ParentCmdT>
 	X_INLINE CommandT* appendCommand(ParentCmdT* pCommand, size_t auxMemorySize);
 
+	template <typename CommandT>
+	X_INLINE std::tuple<CommandT*, char*> addCommandGetAux(Key key, size_t auxMemorySize);
+
+	template <typename CommandT, typename ParentCmdT>
+	X_INLINE std::tuple<CommandT*, char*> appendCommandGetAux(ParentCmdT* pCommand, size_t auxMemorySize);
+
 public:
 	X_INLINE const KeyArr& getKeys(void);
 
