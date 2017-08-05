@@ -854,22 +854,23 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	{
 		auto* pCBHandles = pVariableState->getCBs();
 
-		core::FixedArray<const render::shader::XCBuffer*, render::shader::MAX_SHADER_CB_PER_PERM> cbuffers;
+		matTech.cbs.reserve(cbLinks.size());
 		for (auto& cb : cbLinks) {
-			cbuffers.push_back(cb.pCBufer);
+			matTech.cbs.push_back(cb.pCBufer);
 		}
 
-		const auto& params = pMat->getParams();
+		const auto& matParams = pMat->getParams();
 
-		if (params.isNotEmpty())
+		if (matParams.isNotEmpty())
 		{
 			auto& paramLinks = matTech.paramLinks;
 
+			// a list of all the cb's that contain material params.
 			core::FixedArray<int32_t, render::shader::MAX_SHADER_CB_PER_PERM> materialCBIdxs;
 
-			for (size_t i = 0; i < params.size(); i++)
+			for (size_t i = 0; i < matParams.size(); i++)
 			{
-				auto& param = params[i];
+				auto& param = matParams[i];
 				auto& name = param.name;
 				core::StrHash nameHash(name.begin(), name.end());
 
@@ -901,6 +902,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 			if (paramLinks.isNotEmpty())
 			{
+				X_ASSERT(materialCBIdxs.isNotEmpty(), "Must have atleast one material cb idx, if we have param links")();
+
 				// sort them so in cb order then param order.
 				std::sort(paramLinks.begin(), paramLinks.end(), [](const ParamLink& lhs, const ParamLink& rhs) -> bool {			
 					if (lhs.cbIdx != rhs.cbIdx) {
@@ -916,12 +919,13 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 				int32_t currentCbIdx = -1;  
 				render::shader::XCBuffer matCb(arena_);
 
-				auto addCB = [&](int32_t cbIdx, render::shader::XCBuffer& matCb) {
+				auto addCBToMatTech = [&](int32_t cbIdx, render::shader::XCBuffer& matCb) {
 					matCb.postParamModify();
 					X_ASSERT(matCb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL), "Should contain per material params")();
 					matTech.materialCbs.append(std::move(matCb));
 
-					cbuffers[cbIdx] = &matTech.materialCbs.back();
+					// change the pointer to mat instance, instead of the instance from the shader perm which is shared.
+					matTech.cbs[cbIdx] = &matTech.materialCbs.back();
 				};
 
 				for (auto& link : paramLinks)
@@ -929,12 +933,12 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 					if (currentCbIdx != link.cbIdx)
 					{
 						if (currentCbIdx != -1) {
-							addCB(link.cbIdx, matCb);
+							addCBToMatTech(link.cbIdx, matCb);
 						}
 
 						currentCbIdx = link.cbIdx;
-						auto& cbLink = cbLinks[link.cbIdx];
-						auto& cb = *cbLink.pCBufer;
+						const auto& cbLink = cbLinks[link.cbIdx];
+						const auto& cb = *cbLink.pCBufer;
 
 						matCb = cb; // make a copy.
 					}
@@ -944,26 +948,30 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 					// would make some things more simple.
 					auto& cpuData = matCb.getCpuData();
 					auto& cbParam = matCb[link.cbParamIdx];
-					const auto& matParam = params[link.paramIdx];
+					const auto& matParam = matParams[link.paramIdx];
 
 					cbParam.setUpdateRate(render::shader::UpdateFreq::MATERIAL);
 
+					
+					// copy the material params value into the 
 					// always vec4? humm.
 					X_ASSERT(cpuData.size() >= (cbParam.getBindPoint() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")();
 					std::memcpy(&cpuData[cbParam.getBindPoint()], &matParam.value, sizeof(matParam.value));
 				}
 
+				// optermisation:
 				// might be better to not store these material cb instance for each tech and instead share them within a material
 				// so if a material has multiple techs that have identical material cbuffers they could share them.
-				addCB(currentCbIdx, matCb);
+				// since the material params will be the same for all techs.
+				addCBToMatTech(currentCbIdx, matCb);
 			}
 		}
 
-		// the 'cbuffers' arr can contain a mix of cbuffer link instances and material instances.
-		X_ASSERT(cbLinks.size() == cbuffers.size(), "Links and cbuffer list should be same size")(cbLinks.size(), cbuffers.size());
-		for (size_t i = 0; i < cbuffers.size(); i++)
+		// the 'cbuffers' arr can contain a mix of cbuffer's pointers that can point at material instances or ones from the shader perm.
+		X_ASSERT(cbLinks.size() == matTech.cbs.size(), "Links and cbuffer list should be same size")(cbLinks.size(), matTech.cbs.size());
+		for (size_t i = 0; i < matTech.cbs.size(); i++)
 		{
-			auto* pCB = cbuffers[i];
+			auto* pCB = matTech.cbs[i];
 			X_ASSERT_NOT_NULL(pCB);
 			pCBHandles[i] = cBufMan_.createCBuffer(*pCB);
 		}
