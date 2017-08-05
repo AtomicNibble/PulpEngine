@@ -69,11 +69,11 @@ public:
 	struct AssetInfo
 	{
 		X_INLINE AssetInfo();
-		X_INLINE AssetInfo(int32_t id, int32_t parentId, const char* pName, AssetType::Enum type);
-		X_INLINE AssetInfo(int32_t id, int32_t parentId, const core::string& name, AssetType::Enum type);
+		X_INLINE AssetInfo(AssetId id, AssetId parentId, const char* pName, AssetType::Enum type);
+		X_INLINE AssetInfo(AssetId id, AssetId parentId, const core::string& name, AssetType::Enum type);
 
-		int32_t id;
-		int32_t parentId;
+		AssetId id;
+		AssetId parentId;
 		AssetType::Enum type;
 		core::string name;
 	};
@@ -81,11 +81,11 @@ public:
 	struct AssetRef
 	{
 		X_INLINE AssetRef();
-		X_INLINE AssetRef(int32_t id, int32_t toId, int32_t fromId);
+		X_INLINE AssetRef(int32_t id, AssetId toId, AssetId fromId);
 
 		int32_t id;
-		int32_t toId;
-		int32_t fromId;
+		AssetId toId;
+		AssetId fromId;
 	};
 
 
@@ -184,11 +184,11 @@ public:
 	bool IterateAssets(AssetType::Enum type, AssetDelegate func);
 
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
-	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, AssetId* pId = nullptr);
 
 	// none batched Add/delete/rename api
-	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
-	Result::Enum AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, AssetId* pId = nullptr);
+	Result::Enum AddAsset(ModId modId, AssetType::Enum type, const core::string& name, AssetId* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name, const core::string& newName);
 
@@ -197,62 +197,62 @@ public:
 	// will do the compression for you, saves losts of places duplicating same compressino logic in code base if they don't already have the 
 	// data in a compressed form.
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
-	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
+	Result::Enum UpdateAssetRawFile(AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
 	Result::Enum UpdateAssetRawFile(AssetType::Enum type, const core::string& name, const DataArr& compressedData);
-	Result::Enum UpdateAssetRawFile(int32_t assetId, const DataArr& compressedData);
+	Result::Enum UpdateAssetRawFile(AssetId assetId, const DataArr& compressedData);
 	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
 
 	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
-	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
+	Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
 	Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData);
-	Result::Enum UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData);
+	Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData);
 
 	// if you want to get a assets id use this.
-	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
+	bool AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut = nullptr, ModId* pModIdOut = nullptr);
 
 	// Misc data / info retrival
-	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
-	bool GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut);
-	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
-	bool GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut);
-	bool AssetHasRawFile(int32_t assetId, int32_t* pRawFileId = nullptr);
-	bool AssetHasThumb(int32_t assetId);
-	bool GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut);
-	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
-	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
+	bool GetArgsForAsset(AssetId assetId, core::string& argsOut);
+	bool GetArgsHashForAsset(AssetId assetId, uint32_t& argsHashOut);
+	bool GetModIdForAsset(AssetId assetId, ModId& modIdOut);
+	bool GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut);
+	bool AssetHasRawFile(AssetId assetId, int32_t* pRawFileId = nullptr);
+	bool AssetHasThumb(AssetId assetId);
+	bool GetThumbForAsset(AssetId assetId, ThumbInfo& info, DataArr& thumbDataOut);
+	bool GetTypeForAsset(AssetId assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
+	bool GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut);
 	
 	bool MarkAssetsStale(int32_t modId);
-	bool IsAssetStale(int32_t assetId);
-	bool OnAssetCompiled(int32_t assetId);
+	bool IsAssetStale(AssetId assetId);
+	bool OnAssetCompiled(AssetId assetId);
 
 	// some assetRef stuff.
-	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
-	bool IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func);
-	bool GetAssetRefs(int32_t assetId, AssetIdArr& refsOut); // returns a list of assets that refrence assetId
-	bool GetAssetRefsFrom(int32_t assetId, AssetIdArr& refsOut); // returns a list of assets that assetId refrences.
-	bool GetAssetRefsFrom(int32_t assetId, RefsArr& refsOut); // returns a list of refs that assetId refrences.
+	bool GetAssetRefCount(AssetId assetId, uint32_t& refCountOut);
+	bool IterateAssetRefs(AssetId assetId, core::Delegate<bool(int32_t)> func);
+	bool GetAssetRefs(AssetId assetId, AssetIdArr& refsOut); // returns a list of assets that refrence assetId
+	bool GetAssetRefsFrom(AssetId assetId, AssetIdArr& refsOut); // returns a list of assets that assetId refrences.
+	bool GetAssetRefsFrom(AssetId assetId, RefsArr& refsOut); // returns a list of refs that assetId refrences.
 
-	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
-	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
+	Result::Enum AddAssertRef(AssetId assetId, int32_t targetAssetId);
+	Result::Enum RemoveAssertRef(AssetId assetId, int32_t targetAssetId);
 
 	// parent
-	bool AssetHasParent(int32_t assetId, int32_t* pParentId = nullptr);
-	bool AssetIsParent(int32_t assetId); // check if this asset has a parent.
-	Result::Enum SetAssetParent(int32_t assetId, int32_t parentAssetIt);
-	Result::Enum RemoveAssetParent(int32_t assetId);
+	bool AssetHasParent(AssetId assetId, int32_t* pParentId = nullptr);
+	bool AssetIsParent(AssetId assetId); // check if this asset has a parent.
+	Result::Enum SetAssetParent(AssetId assetId, int32_t parentAssetIt);
+	Result::Enum RemoveAssetParent(AssetId assetId);
 
 private:
 	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
-		int32_t assetId, int32_t rawId, const DataArr& compressedData);
+		AssetId assetId, int32_t rawId, const DataArr& compressedData);
 	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
-		int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc);
+		AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc);
 
 
 private:
-	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
+	bool GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
 	bool GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut);
-	bool GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId = nullptr);
-	bool MergeArgs(int32_t assetId, core::string& argsInOut);
+	bool GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, int32_t* pThumbId = nullptr);
+	bool MergeArgs(AssetId assetId, core::string& argsInOut);
 	bool getDBVersion(int32_t& versionOut);
 	bool setDBVersion(int32_t version);
 	bool isModSet(void) const;

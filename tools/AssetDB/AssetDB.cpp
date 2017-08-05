@@ -1140,13 +1140,13 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& asse
 	{
 		auto row = *it;
 
-		const int32_t id = row.get<int32_t>(0);
+		const AssetId id = safe_static_cast<AssetId>(row.get<int32_t>(0));
 		const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
 		const char* pName = row.get<const char*>(3);
 
-		int32_t parentId = INVALID_ASSET_ID;
+		AssetId parentId = INVALID_ASSET_ID;
 		if (row.columnType(1) != sql::ColumType::SNULL) {
-			parentId = row.get<int32_t>(1);
+			parentId = safe_static_cast<AssetId>(row.get<int32_t>(1));
 		}
 
 		assetsOut.emplace_back(id, parentId, pName, type);
@@ -1174,13 +1174,13 @@ bool AssetDB::GetAssetList(AssetType::Enum type, AssetInfoArr& assetsOut)
 	{
 		auto row = *it;
 
-		const int32_t id = row.get<int32_t>(0);
+		const AssetId id = safe_static_cast<AssetId>(row.get<int32_t>(0));
 		const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
 		const char* pName = row.get<const char*>(3);
 
-		int32_t parentId = INVALID_ASSET_ID;
+		AssetId parentId = INVALID_ASSET_ID;
 		if (row.columnType(1) != sql::ColumType::SNULL) {
-			parentId = row.get<int32_t>(1);
+			parentId = safe_static_cast<AssetId>(row.get<int32_t>(1));
 		}
 
 		assetsOut.emplace_back(id, parentId, pName, type);
@@ -1439,14 +1439,14 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 	}
 
 	if (pId) {
-		*pId = safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
+		*pId = safe_static_cast<AssetId, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
 	}
 
 	return Result::OK;
 }
 
 
-AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
+AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, AssetId* pId)
 {
 	if (!isModSet()) {
 		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
@@ -1456,7 +1456,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 	return AddAsset(modId_, type, name, pId);
 }
 
-AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId)
+AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const core::string& name, AssetId* pId)
 {
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Asset with empty name not allowed");
@@ -1487,7 +1487,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const
 	trans.commit();
 
 	if (pId) {
-		*pId = safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
+		*pId = safe_static_cast<AssetId, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
 	}
 
 	return Result::OK;
@@ -1496,7 +1496,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const
 
 AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
 {
-	int32_t assetId;
+	AssetId assetId;
 	if (!AssetExsists(type, name, &assetId)) {
 		X_ERROR("AssetDB", "Failed to delete asset: %s:%s it does not exist", AssetType::ToString(type), name.c_str());
 		return Result::ERROR;
@@ -1579,7 +1579,7 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::string& name,
 	const core::string& newName)
 {
-	int32_t assetId;
+	AssetId assetId;
 
 	if (newName.isEmpty()) {
 		X_ERROR("AssetDB", "Can't rename asset \"%s\" to Blank name", newName.c_str());
@@ -1661,7 +1661,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
 	const DataArr& compressedData, const core::string& argsOpt)
 {
-	int32_t assetId, rawId;
+	AssetId assetId, rawId;
 
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Can't update asset with empty name");
@@ -1752,7 +1752,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 }
 
 
-AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& data, core::Compression::Algo::Enum algo,
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo,
 	core::Compression::CompressLevel::Enum lvl)
 {
 	AssetInfo info;
@@ -1800,7 +1800,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 }
 
 
-AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(int32_t assetId, const DataArr& compressedData)
+AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetId assetId, const DataArr& compressedData)
 {
 	// we make use of the asset name and type, so the main logic is in that one.
 	AssetInfo info;
@@ -1820,7 +1820,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 		return Result::ERROR;
 	}
 
-	int32_t assetId;
+	AssetId assetId;
 
 #if X_ENABLE_ASSERTIONS
 	assetId = INVALID_ASSET_ID;
@@ -1870,7 +1870,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
-	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData)
+	AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, const DataArr& compressedData)
 {
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 	const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
@@ -1879,7 +1879,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
-	AssetType::Enum type, const core::string& name, int32_t assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
+	AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
 {
 	X_UNUSED(trans); // not used just ensures you have taken one.
 	X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")(assetId);
@@ -1981,7 +1981,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 
 AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt)
 {
-	int32_t assetId;
+	AssetId assetId;
 
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Can't update asset args with empty name");
@@ -2030,7 +2030,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim,
 	const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
-	int32_t assetId;
+	AssetId assetId;
 
 	if (!AssetExsists(type, name, &assetId)) {
 		return Result::NOT_FOUND;
@@ -2040,7 +2040,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 }
 
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
 	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
 	DataArr compressed(data.getArena());
@@ -2069,7 +2069,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim,
 AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, 
 	const DataArr& compressedData)
 {
-	int32_t assetId;
+	AssetId assetId;
 
 	if (!AssetExsists(type, name, &assetId)) {
 		return Result::NOT_FOUND;
@@ -2078,7 +2078,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 	return UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
 {
 	// so my little floating goat, we gonna store the thumbs with hash names.
 	// that way i don't need to rename the fuckers if i rename the asset.
@@ -2223,16 +2223,16 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32
 	}
 
 	if (pIdOut){
-		*pIdOut = (*it).get<int32_t>(0);
+		*pIdOut = safe_static_cast<AssetId>((*it).get<int32_t>(0));
 	}
 	if (pModIdOut) {
-		*pModIdOut = (*it).get<int32_t>(1);
+		*pModIdOut = safe_static_cast<ModId>((*it).get<int32_t>(1));
 	}
 
 	return true;
 }
 
-bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
+bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
@@ -2257,7 +2257,7 @@ bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
 }
 
 
-bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
+bool AssetDB::GetArgsHashForAsset(AssetId assetId, uint32_t& argsHashOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT argsHash FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
@@ -2279,7 +2279,7 @@ bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
 }
 
 
-bool AssetDB::GetModIdForAsset(int32_t assetId, ModId& modIdOut)
+bool AssetDB::GetModIdForAsset(AssetId assetId, ModId& modIdOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
@@ -2290,11 +2290,11 @@ bool AssetDB::GetModIdForAsset(int32_t assetId, ModId& modIdOut)
 		return false;
 	}
 
-	modIdOut = static_cast<ModId>((*it).get<int32_t>(0));
+	modIdOut = safe_static_cast<ModId>((*it).get<int32_t>(0));
 	return true;
 }
 
-bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
+bool AssetDB::GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut)
 {
 	RawFile raw;
 
@@ -2342,7 +2342,7 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, DataArr& dataOut)
 	return true;
 }
 
-bool AssetDB::AssetHasRawFile(int32_t assetId, int32_t* pRawFileId)
+bool AssetDB::AssetHasRawFile(AssetId assetId, int32_t* pRawFileId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT raw_file FROM file_ids WHERE file_id = ?");
 	qry.bind(1, assetId);
@@ -2367,7 +2367,7 @@ bool AssetDB::AssetHasRawFile(int32_t assetId, int32_t* pRawFileId)
 	return true;
 }
 
-bool AssetDB::AssetHasThumb(int32_t assetId)
+bool AssetDB::AssetHasThumb(AssetId assetId)
 {
 	ThumbInfo info;
 
@@ -2378,7 +2378,7 @@ bool AssetDB::AssetHasThumb(int32_t assetId)
 	return info.fileSize > 0;
 }
 
-bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbDataOut)
+bool AssetDB::GetThumbForAsset(AssetId assetId, ThumbInfo& info, DataArr& thumbDataOut)
 {
 	if (!GetThumbInfoForId(assetId, info)) {
 	// just treat it as no thumb.
@@ -2421,7 +2421,7 @@ bool AssetDB::GetThumbForAsset(int32_t assetId, ThumbInfo& info, DataArr& thumbD
 }
 
 
-bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
+bool AssetDB::GetTypeForAsset(AssetId assetId, AssetType::Enum& typeOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT type FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
@@ -2436,7 +2436,7 @@ bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 	return true;
 }
 
-bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
+bool AssetDB::GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT name, file_id, type, parent_id FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
@@ -2451,11 +2451,11 @@ bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
 	auto row = *it;
 
 	infoOut.name = row.get<const char*>(0);
-	infoOut.id = row.get<int32_t>(1);
+	infoOut.id = safe_static_cast<AssetId>(row.get<int32_t>(1));
 	infoOut.type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
 
 	if (row.columnType(3) != sql::ColumType::SNULL) {
-		infoOut.parentId = row.get<int32_t>(3);
+		infoOut.parentId = safe_static_cast<AssetId>(row.get<int32_t>(3));
 	}
 	else {
 		infoOut.parentId = INVALID_ASSET_ID;
@@ -2481,7 +2481,7 @@ bool AssetDB::MarkAssetsStale(int32_t modId)
 	return true;
 }
 
-bool AssetDB::IsAssetStale(int32_t assetId)
+bool AssetDB::IsAssetStale(AssetId assetId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT file_ids.compiledHash, file_ids.argsHash, raw_files.hash, raw_files.size FROM file_ids "
 		"INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
@@ -2511,7 +2511,7 @@ bool AssetDB::IsAssetStale(int32_t assetId)
 	return mergedHash == compiledHash;
 }
 
-bool AssetDB::OnAssetCompiled(int32_t assetId)
+bool AssetDB::OnAssetCompiled(AssetId assetId)
 {
 	if (!AssetHasRawFile(assetId)) 
 	{
@@ -2562,7 +2562,7 @@ bool AssetDB::OnAssetCompiled(int32_t assetId)
 	return true;
 }
 
-bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
+bool AssetDB::GetAssetRefCount(AssetId assetId, uint32_t& refCountOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) from refs WHERE toId = ?");
 	qry.bind(1, assetId);
@@ -2582,7 +2582,7 @@ bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
 	return true;
 }
 
-bool AssetDB::IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func)
+bool AssetDB::IterateAssetRefs(AssetId assetId, core::Delegate<bool(int32_t)> func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT fromId from refs WHERE toId = ?");
 	qry.bind(1, assetId);
@@ -2601,7 +2601,7 @@ bool AssetDB::IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> fu
 }
 
 
-bool AssetDB::GetAssetRefs(int32_t assetId, AssetIdArr& refsOut)
+bool AssetDB::GetAssetRefs(AssetId assetId, AssetIdArr& refsOut)
 {
 	refsOut.clear();
 
@@ -2621,7 +2621,7 @@ bool AssetDB::GetAssetRefs(int32_t assetId, AssetIdArr& refsOut)
 	return true;
 }
 
-bool AssetDB::GetAssetRefsFrom(int32_t assetId, AssetIdArr& refsOut)
+bool AssetDB::GetAssetRefsFrom(AssetId assetId, AssetIdArr& refsOut)
 {
 	refsOut.clear();
 
@@ -2641,7 +2641,7 @@ bool AssetDB::GetAssetRefsFrom(int32_t assetId, AssetIdArr& refsOut)
 	return true;
 }
 
-bool AssetDB::GetAssetRefsFrom(int32_t assetId, RefsArr& refsOut)
+bool AssetDB::GetAssetRefsFrom(AssetId assetId, RefsArr& refsOut)
 {
 	refsOut.clear();
 
@@ -2654,8 +2654,8 @@ bool AssetDB::GetAssetRefsFrom(int32_t assetId, RefsArr& refsOut)
 		auto row = *it;
 
 		const int32_t ref_id = row.get<int32_t>(0);
-		const int32_t toId = row.get<int32_t>(1);
-		const int32_t fromId = row.get<int32_t>(2);
+		const AssetId toId = row.get<int32_t>(1);
+		const AssetId fromId = row.get<int32_t>(2);
 
 		refsOut.emplace_back(ref_id, toId, fromId);
 	}
@@ -2665,7 +2665,7 @@ bool AssetDB::GetAssetRefsFrom(int32_t assetId, RefsArr& refsOut)
 
 
 
-AssetDB::Result::Enum AssetDB::AddAssertRef(int32_t assetId, int32_t targetAssetId)
+AssetDB::Result::Enum AssetDB::AddAssertRef(AssetId assetId, AssetId targetAssetId)
 {
 	// check if we already have a ref.
 	{
@@ -2708,7 +2708,7 @@ AssetDB::Result::Enum AssetDB::AddAssertRef(int32_t assetId, int32_t targetAsset
 }
 
 
-AssetDB::Result::Enum AssetDB::RemoveAssertRef(int32_t assetId, int32_t targetAssetId)
+AssetDB::Result::Enum AssetDB::RemoveAssertRef(AssetId assetId, AssetId targetAssetId)
 {
 	sql::SqlLiteTransaction trans(db_);
 	sql::SqlLiteCmd cmd(db_, "DELETE FROM refs WHERE fromId = ? AND toId = ?");
@@ -2724,7 +2724,7 @@ AssetDB::Result::Enum AssetDB::RemoveAssertRef(int32_t assetId, int32_t targetAs
 	return Result::OK;
 }
 
-bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
+bool AssetDB::AssetHasParent(AssetId assetId, AssetId* pParentId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT parent_id FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
@@ -2739,7 +2739,7 @@ bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
 
 	if (pParentId) { // null check for the plebs
 		if ((*it).columnType(0) != sql::ColumType::SNULL) {
-			*pParentId = static_cast<int32_t>((*it).get<int32_t>(0));
+			*pParentId = static_cast<AssetId>((*it).get<int32_t>(0));
 
 		}
 		else {
@@ -2750,7 +2750,7 @@ bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
 	return true;
 }
 
-bool AssetDB::AssetIsParent(int32_t assetId)
+bool AssetDB::AssetIsParent(AssetId assetId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT file_id FROM file_ids WHERE file_ids.parent_id = ?");
 	qry.bind(1, assetId);
@@ -2763,7 +2763,7 @@ bool AssetDB::AssetIsParent(int32_t assetId)
 }
 
 
-AssetDB::Result::Enum AssetDB::SetAssetParent(int32_t assetId, int32_t parentAssetId)
+AssetDB::Result::Enum AssetDB::SetAssetParent(AssetId assetId, AssetId parentAssetId)
 {
 	// we don't allow parent updating.
 	// you must explicity remove parent then add new to change.
@@ -2804,7 +2804,7 @@ AssetDB::Result::Enum AssetDB::SetAssetParent(int32_t assetId, int32_t parentAss
 	return Result::OK;
 }
 
-AssetDB::Result::Enum AssetDB::RemoveAssetParent(int32_t assetId)
+AssetDB::Result::Enum AssetDB::RemoveAssetParent(AssetId assetId)
 {
 	sql::SqlLiteTransaction trans(db_);
 
@@ -2820,7 +2820,7 @@ AssetDB::Result::Enum AssetDB::RemoveAssetParent(int32_t assetId)
 	return Result::OK;
 }
 
-bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pRawFileId)
+bool AssetDB::GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFileId)
 {
 	// we get the raw_id from the asset.
 	// and get the data.
@@ -2875,7 +2875,7 @@ bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
 	return true;
 }
 
-bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pThumbId)
+bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, int32_t* pThumbId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, "
 	" thumbs.srcWidth, thumbs.srcHeight, thumbs.size, thumbs.hash FROM thumbs "
@@ -2921,7 +2921,7 @@ bool AssetDB::GetThumbInfoForId(int32_t assetId, ThumbInfo& dataOut, int32_t* pT
 }
 
 
-bool AssetDB::MergeArgs(int32_t assetId, core::string& argsInOut)
+bool AssetDB::MergeArgs(AssetId assetId, core::string& argsInOut)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
