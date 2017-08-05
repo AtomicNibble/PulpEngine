@@ -2006,5 +2006,8 @@
     <Natvis Include="Pointer.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="ResourceStateBase.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

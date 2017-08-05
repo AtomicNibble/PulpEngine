@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::render::Commands::ResourceStateBase">
+    <Expand>
+      <Item Name="[NumTexStates]" ExcludeView="simple">numTextStates</Item>
+      <ArrayItems>
+        <Size>numTextStates</Size>
+        <ValuePointer>(TextureState*)(this+1)</ValuePointer>
+      </ArrayItems>
+      <Item Name="[NumSamplers]" ExcludeView="simple">numSamplers</Item>
+      <ArrayItems>
+        <Size>numSamplers</Size>
+        <ValuePointer>(SamplerState*)((char*)(this+1) + (sizeof(TextureState) * numTextStates))</ValuePointer>
+      </ArrayItems>
+      <Item Name="[NumCbs]" ExcludeView="simple">numCbs</Item>
+      <ArrayItems>
+        <Size>numCbs</Size>
+        <ValuePointer>(ConstantBufferHandle*)((char*)(this+1) + (sizeof(TextureState) * numTextStates) + sizeof(SamplerState) * numSamplers)</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>
