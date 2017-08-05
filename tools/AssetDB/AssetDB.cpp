@@ -947,7 +947,7 @@ bool AssetDB::SetMod(const core::string& name)
 
 	if (it != qry.end())
 	{
-		modId_ = (*it).get<int32_t>(0);
+		modId_ = safe_static_cast<ModId>((*it).get<int32_t>(0));
 
 		X_LOG0("AssetDB", "Mod set: \"%s\" id: %" PRIi32, name.c_str(), modId_);
 		return true;
@@ -989,7 +989,7 @@ bool AssetDB::ModExsists(const core::string& name, ModId* pModId)
 		return false;
 	}
 	if (pModId) {
-		*pModId = (*it).get<int32_t>(0);
+		*pModId = safe_static_cast<ModId>((*it).get<int32_t>(0));
 	}
 
 	return true;
@@ -1199,7 +1199,7 @@ bool AssetDB::GetModsList(ModsArr& arrOut)
 	{
 		auto row = *it;
 
-		const int32_t modId = row.get<int32_t>(0);
+		const ModId modId = safe_static_cast<ModId>(row.get<int32_t>(0));
 		const char* pName = row.get<const char*>(1);
 		const char* pOutdir = row.get<const char*>(2);
 
@@ -1218,12 +1218,12 @@ bool AssetDB::IterateMods(ModDelegate func)
 	{
 		auto row = *it;
 
-		const int32_t modId = row.get<int32_t>(0);
+		const ModId modId = safe_static_cast<ModId>(row.get<int32_t>(0));
 		const char* pName = row.get<const char*>(1);
 		const char* pOutdir = row.get<const char*>(2);
 
 
-		func.Invoke(static_cast<ModId>(modId), core::string(pName), core::Path<char>(pOutdir));
+		func.Invoke(modId, core::string(pName), core::Path<char>(pOutdir));
 	}
 
 	return true;
@@ -2464,7 +2464,7 @@ bool AssetDB::GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut)
 	return true;
 }
 
-bool AssetDB::MarkAssetsStale(int32_t modId)
+bool AssetDB::MarkAssetsStale(ModId modId)
 {
 	// basically set NULL for all compiledHashes on file_ids that match this mod.
 	sql::SqlLiteTransaction trans(db_);

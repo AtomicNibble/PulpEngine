@@ -221,7 +221,7 @@ public:
 	bool GetTypeForAsset(AssetId assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
 	bool GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut);
 	
-	bool MarkAssetsStale(int32_t modId);
+	bool MarkAssetsStale(ModId modId);
 	bool IsAssetStale(AssetId assetId);
 	bool OnAssetCompiled(AssetId assetId);
 
@@ -271,7 +271,7 @@ private:
 
 private:
 	sql::SqlLiteDb db_;
-	int32_t modId_;
+	ModId modId_;
 	int32_t dbVersion_;
 	bool open_;
 };
