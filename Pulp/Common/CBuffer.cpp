@@ -12,9 +12,9 @@ namespace shader
 		UpdateFreq::Enum updateFreqMax(UpdateFreq::Enum lhs, UpdateFreq::Enum rhs)
 		{
 			static_assert(UpdateFreq::BATCH > UpdateFreq::FRAME, "enum order not increasing");
-			static_assert(UpdateFreq::INSTANCE > UpdateFreq::BATCH, "enum order not increasing");
-			static_assert(UpdateFreq::MATERIAL > UpdateFreq::INSTANCE, "enum order not increasing");
-			static_assert(UpdateFreq::SKINDATA > UpdateFreq::MATERIAL, "enum order not increasing");
+			static_assert(UpdateFreq::MATERIAL > UpdateFreq::BATCH, "enum order not increasing");
+			static_assert(UpdateFreq::INSTANCE> UpdateFreq::MATERIAL, "enum order not increasing");
+			static_assert(UpdateFreq::SKINDATA > UpdateFreq::INSTANCE, "enum order not increasing");
 			static_assert(UpdateFreq::UNKNOWN > UpdateFreq::SKINDATA, "enum order not increasing");
 
 			// add more static asserts yo.

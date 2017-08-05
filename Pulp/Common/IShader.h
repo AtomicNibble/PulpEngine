@@ -67,10 +67,10 @@ static const uint32_t MAX_SHADER_CB_PER_PERM = 16; // max const buffers allowed 
 X_DECLARE_FLAGS8(UpdateFreq) (
 	// these need to be ordered in update freq high to low.
 	FRAME,
-	BATCH,
+	BATCH,		// what is a batch?
+	MATERIAL, 
 	INSTANCE,
-	MATERIAL,
-	SKINDATA,
+	SKINDATA,	// dunno what update rate of this is yet.
 	UNKNOWN		// unknow is assumed worse case.
 );
 
