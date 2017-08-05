@@ -1887,32 +1887,57 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 		return Result::ERROR;
 	}
 
-
-	// save the file.
-
 	{
-		core::XFileScoped file;
-		core::fileModeFlags mode;
-		core::Path<char> filePath;
-
-		mode.Set(core::fileMode::WRITE);
-		mode.Set(core::fileMode::RECREATE);
-
-		AssetPathForName(type, name, dataCrc, filePath);
-
-		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
-			X_ERROR("AssetDB", "Failed to create dir to save raw asset");
-			return Result::ERROR;
+		// check if changed.
+		RawFile curRawData;
+		if (GetRawfileForRawId(rawId, curRawData))
+		{
+			if (curRawData.hash == dataCrc)
+			{
+				X_LOG0("AssetDB", "Skipping raw file update file unchanged");
+				return Result::UNCHANGED;
+			}
 		}
 
-		if (!file.openFile(filePath.c_str(), mode)) {
-			X_ERROR("AssetDB", "Failed to write raw asset");
-			return Result::ERROR;
+		// save the file.
+		{
+			core::XFileScoped file;
+			core::fileModeFlags mode;
+			core::Path<char> filePath;
+
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::RECREATE);
+
+			AssetPathForName(type, name, dataCrc, filePath);
+
+			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
+				return Result::ERROR;
+			}
+
+			if (!file.openFile(filePath.c_str(), mode)) {
+				X_ERROR("AssetDB", "Failed to write raw asset");
+				return Result::ERROR;
+			}
+
+			if (file.write(compressedData.ptr(), compressedData.size()) != compressedData.size()) {
+				X_ERROR("AssetDB", "Failed to write raw asset data");
+				return Result::ERROR;
+			}
 		}
 
-		if (file.write(compressedData.ptr(), compressedData.size()) != compressedData.size()) {
-			X_ERROR("AssetDB", "Failed to write raw asset data");
-			return Result::ERROR;
+		// rename old.
+		{
+			core::Path<char> filePath;
+			core::Path<char> newFilePath;
+			AssetPathForName(type, name, curRawData.hash, filePath);
+
+			newFilePath = filePath;
+			newFilePath.append(".old");
+
+			if (!gEnv->pFileSys->moveFile(filePath.c_str(), newFilePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to move old asset: \"%s\"", filePath.c_str());
+			}
 		}
 	}
 
