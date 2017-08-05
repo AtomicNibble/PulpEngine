@@ -19,14 +19,12 @@ cbuffer PerFrameConstants  : register(b0)
 
 };
 
-/*
 cbuffer PerObjectConstants  : register(b1)
 {
-//  float4x4    worldMatrix;
-  float4x4    worldViewProjectionMatrix; // objectspace to screenspace
-  float4x4    objectToWorldMatrix;
+  float4x4    worldMatrix;
+//  float4x4    worldViewProjectionMatrix; // objectspace to screenspace
+//  float4x4    objectToWorldMatrix;
 };
 
-*/
 
 

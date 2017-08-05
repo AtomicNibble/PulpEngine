@@ -39,7 +39,8 @@ SamplerState        diffuseSampler;
 VS_OUTPUT vs_main( VS_INPUT IN )
 {
   VS_OUTPUT OUT;
-  OUT.ssPosition = mul( float4(IN.osPosition, 1.0), worldToScreenMatrix );
+  float4 worldPosition = mul( float4(IN.osPosition, 1.0), worldMatrix );
+  OUT.ssPosition = mul( worldPosition, worldToScreenMatrix );
   OUT.texCoord = IN.tex;
   OUT.color =  IN.color;
   return OUT;
