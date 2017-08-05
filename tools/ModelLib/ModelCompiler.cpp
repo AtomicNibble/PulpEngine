@@ -667,6 +667,7 @@ ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	texcoordElipson_(MERGE_TEXCOORDS_ELIPSION),
 	jointWeightThreshold_(JOINT_WEIGHT_THRESHOLD),
 	scale_(1.f),
+	autoColGenType_(ColGenType::BOX),
 	flags_(DEFAULT_FLAGS),
 	stats_(arena),
 	hitboxShapes_(arena)
@@ -833,7 +834,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	header.version = model::MODEL_VERSION;
 	header.flags.Set(model::ModelFlags::LOOSE);
 	header.flags.Set(model::ModelFlags::STREAMS);
-	if (totalColMesh) {
+	if (totalColMesh || flags_.IsSet(CompileFlag::AUTO_PHYS_SHAPES)) {
 		header.flags.Set(model::ModelFlags::PHYS_DATA);
 
 		// set it even if no convex mesh it don't matter.
@@ -1032,113 +1033,224 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		CollisionInfoHdr colHdr;
 		core::zero_object(colHdr);
 
-		// we need to order the col mesh into type order and also create some sort of mapping to them.
-		// i think i'll create like a index list and given a offset and count you can get all the indexe's into the sorted data.
-		core::Array<ColMesh*> colMeshes(arena_, totalColMesh);
-
-		for (auto& mesh : compiledLods_[0].meshes_)
+		// auto shapes.
+		if (flags_.IsSet(CompileFlag::AUTO_PHYS_SHAPES))
 		{
-			for (auto& colMesh : mesh.colMeshes_)
-			{
-				++colHdr.shapeCounts[colMesh.getType()];
-
-				colMeshes.push_back(&colMesh);
+			if (compiledLods_.isEmpty()) {
+				X_ERROR("Model", "Auto phys mesh not supported for models with no lods"); // do we support no mesh data? dunno.
+				return false;
 			}
+
+			const auto lod0 = compiledLods_[0];
+			size_t lod0Mesh = lod0.numMeshes();
+
+			core::Array<int8_t> idxMap(arena_);
+
+			switch (autoColGenType_)
+			{
+				case ColGenType::BOX:
+					colHdr.shapeCounts[ColMeshType::BOX] = 1;
+					idxMap.append(-1);
+					break;
+				case ColGenType::SPHERE:
+					colHdr.shapeCounts[ColMeshType::SPHERE] = 1;
+					idxMap.append(-1);
+					break;
+				case ColGenType::PER_MESH_BOX:
+					colHdr.shapeCounts[ColMeshType::BOX] = safe_static_cast<uint8_t>(lod0Mesh);
+					for (size_t i = 0; i < lod0Mesh; i++) {
+						idxMap.append(safe_static_cast<int8_t>(i));
+					}
+					break;
+				case ColGenType::PER_MESH_SPHERE:
+					colHdr.shapeCounts[ColMeshType::SPHERE] = safe_static_cast<uint8_t>(lod0Mesh);
+					for (size_t i = 0; i < lod0Mesh; i++) {
+						idxMap.append(safe_static_cast<int8_t>(i));
+					}
+					break;
+				case ColGenType::KDOP_6:
+				case ColGenType::KDOP_14:
+				case ColGenType::KDOP_18:
+				case ColGenType::KDOP_26:
+					colHdr.shapeCounts[ColMeshType::CONVEX] = 1;
+					X_ASSERT_NOT_IMPLEMENTED();
+					break;
+			}
+
+			// write out the couts.
+			if (file.writeObj(colHdr.shapeCounts) != sizeof(colHdr.shapeCounts)) {
+				X_ERROR("Model", "Failed to col header");
+				return false;
+			}
+
+			// index maps. 
+			if (file.write(idxMap.data(), idxMap.size()) != idxMap.size()) {
+				X_ERROR("Model", "Failed to write idx map");
+				return false;
+			}
+
+			// write the shapes out
+			switch (autoColGenType_)
+			{
+				case ColGenType::BOX:
+					if (file.writeObj<const AABB>(header.boundingBox) != sizeof(AABB)) {
+						X_ERROR("Model", "Failed to write col data");
+						return false;
+					}
+					break;
+				case ColGenType::SPHERE:
+				{
+					Sphere sphere(header.boundingBox); // lame sphere for now.
+					if (file.writeObj<const Sphere>(sphere) != sizeof(Sphere)) {
+						X_ERROR("Model", "Failed to write col data");
+						return false;
+					}
+					break;
+				}
+				case ColGenType::PER_MESH_BOX:
+				{
+					for (auto& mesh : lod0.meshes_)
+					{
+						if (file.writeObj<const AABB>(mesh.boundingBox_) != sizeof(AABB)) {
+							X_ERROR("Model", "Failed to write col data");
+							return false;
+						}
+					}
+					break;
+				}
+				case ColGenType::PER_MESH_SPHERE:
+				{
+					for (auto& mesh : lod0.meshes_)
+					{
+						Sphere sphere(header.boundingBox); // lame sphere for now.
+						if (file.writeObj<const Sphere>(sphere) != sizeof(Sphere)) {
+							X_ERROR("Model", "Failed to write col data");
+							return false;
+						}
+					}
+					break;
+				}
+				case ColGenType::KDOP_6:
+				case ColGenType::KDOP_14:
+				case ColGenType::KDOP_18:
+				case ColGenType::KDOP_26:
+					colHdr.shapeCounts[ColMeshType::CONVEX] = 1;
+					X_ASSERT_NOT_IMPLEMENTED();
+					break;
+			}
+
 		}
-
-		// write out the couts.
-		if (file.writeObj(colHdr.shapeCounts) != sizeof(colHdr.shapeCounts)) {
-			X_ERROR("Model", "Failed to col header");
-			return false;
-		}
-
-		// sort them by type.
-		std::sort(colMeshes.begin(), colMeshes.end(), [](const ColMesh* p1, const ColMesh* p2) {
-			return p1->getType() < p2->getType();
-		});
-
-		// write the index lookup.
+		else
 		{
-			core::Array<uint8_t> idxMap(arena_);
-			idxMap.reserve(totalColMesh);
+
+			// we need to order the col mesh into type order and also create some sort of mapping to them.
+			// i think i'll create like a index list and given a offset and count you can get all the indexe's into the sorted data.
+			core::Array<ColMesh*> colMeshes(arena_, totalColMesh);
 
 			for (auto& mesh : compiledLods_[0].meshes_)
 			{
 				for (auto& colMesh : mesh.colMeshes_)
 				{
-					// so we need to work out where are mesh has moved to and store the index.
-					// so lets just find the new position.
-					auto sortexIdx = colMeshes.find(&colMesh);
-					if (sortexIdx == decltype(colMeshes)::invalid_index)
-					{
-						X_ASSERT_UNREACHABLE();
-						return false;
-					}
+					++colHdr.shapeCounts[colMesh.getType()];
 
-					idxMap.push_back(safe_static_cast<uint8_t>(sortexIdx));
+					colMeshes.push_back(&colMesh);
 				}
 			}
 
-			if (file.write(idxMap.data(), idxMap.size()) != idxMap.size()) {
-				X_ERROR("Model", "Failed to write idx map");
+			// write out the couts.
+			if (file.writeObj(colHdr.shapeCounts) != sizeof(colHdr.shapeCounts)) {
+				X_ERROR("Model", "Failed to col header");
 				return false;
 			}
-		}
 
-		// write the shapes out
-		for (auto* pColMesh : colMeshes)
-		{
-			static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+			// sort them by type.
+			std::sort(colMeshes.begin(), colMeshes.end(), [](const ColMesh* p1, const ColMesh* p2) {
+				return p1->getType() < p2->getType();
+			});
 
-			switch (pColMesh->getType())
+			// write the index lookup.
 			{
-				case ColMeshType::SPHERE:
-					if (file.writeObj<const Sphere>(pColMesh->getBoundingSphere()) != sizeof(Sphere)) {
-						X_ERROR("Model", "Failed to write col data");
-						return false;
-					}
-					break;
-				case ColMeshType::BOX:
-					if (file.writeObj<const AABB>(pColMesh->boundingBox_) != sizeof(AABB)) {
-						X_ERROR("Model", "Failed to write col data");
-						return false;
-					}
-					break;
-				case ColMeshType::CONVEX:
+				core::Array<int8_t> idxMap(arena_);
+				idxMap.reserve(totalColMesh);
+
+				for (auto& mesh : compiledLods_[0].meshes_)
 				{
-					const auto& data = pColMesh->getCookedConvexData();
-
-					// maybe i should just store the 'CollisionConvexHdr' in the cooked buffer humm..
-					CollisionConvexHdr convexHdr;
-					if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED))
+					for (auto& colMesh : mesh.colMeshes_)
 					{
-						static_assert(MODEL_MESH_COL_MAX_COOKED_SIZE <= std::numeric_limits<uint16_t>::max(), "Can't represent cooked convex mesh");
+						// so we need to work out where are mesh has moved to and store the index.
+						// so lets just find the new position.
+						auto sortexIdx = colMeshes.find(&colMesh);
+						if (sortexIdx == decltype(colMeshes)::invalid_index)
+						{
+							X_ASSERT_UNREACHABLE();
+							return false;
+						}
 
-						// we enforce a 65k byte limit on cooked data, which should be more than enougth..
-						convexHdr.dataSize = safe_static_cast<uint16_t>(data.size());
+						idxMap.push_back(safe_static_cast<int8_t>(sortexIdx));
 					}
-					else
-					{
-						// the limits should ensure these are below 255, but lets check that's still true.
-						static_assert(MODEL_MESH_COL_MAX_VERTS <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh verts");
-						static_assert(MODEL_MESH_COL_MAX_FACE <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh faces");
-
-						convexHdr.raw.numVerts = safe_static_cast<uint8_t>(pColMesh->verts_.size());
-						convexHdr.raw.numFace = safe_static_cast<uint8_t>(pColMesh->faces_.size());
-					}
-
-					if (file.writeObj(convexHdr) != sizeof(convexHdr) ||
-						file.write(data.data(), data.size()) != data.size()) 
-					{			
-						X_ERROR("Model", "Failed to write col data");
-						return false;
-					}
-					break;
 				}
 
-				default:
-					X_ASSERT_UNREACHABLE();
+				if (file.write(idxMap.data(), idxMap.size()) != idxMap.size()) {
+					X_ERROR("Model", "Failed to write idx map");
 					return false;
+				}
+			}
+
+			// write the shapes out
+			for (auto* pColMesh : colMeshes)
+			{
+				static_assert(ColMeshType::ENUM_COUNT == 3, "Added additional col mesh types? this code needs updating");
+
+				switch (pColMesh->getType())
+				{
+					case ColMeshType::SPHERE:
+						if (file.writeObj<const Sphere>(pColMesh->getBoundingSphere()) != sizeof(Sphere)) {
+							X_ERROR("Model", "Failed to write col data");
+							return false;
+						}
+						break;
+					case ColMeshType::BOX:
+						if (file.writeObj<const AABB>(pColMesh->boundingBox_) != sizeof(AABB)) {
+							X_ERROR("Model", "Failed to write col data");
+							return false;
+						}
+						break;
+					case ColMeshType::CONVEX:
+					{
+						const auto& data = pColMesh->getCookedConvexData();
+
+						// maybe i should just store the 'CollisionConvexHdr' in the cooked buffer humm..
+						CollisionConvexHdr convexHdr;
+						if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED))
+						{
+							static_assert(MODEL_MESH_COL_MAX_COOKED_SIZE <= std::numeric_limits<uint16_t>::max(), "Can't represent cooked convex mesh");
+
+							// we enforce a 65k byte limit on cooked data, which should be more than enougth..
+							convexHdr.dataSize = safe_static_cast<uint16_t>(data.size());
+						}
+						else
+						{
+							// the limits should ensure these are below 255, but lets check that's still true.
+							static_assert(MODEL_MESH_COL_MAX_VERTS <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh verts");
+							static_assert(MODEL_MESH_COL_MAX_FACE <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh faces");
+
+							convexHdr.raw.numVerts = safe_static_cast<uint8_t>(pColMesh->verts_.size());
+							convexHdr.raw.numFace = safe_static_cast<uint8_t>(pColMesh->faces_.size());
+						}
+
+						if (file.writeObj(convexHdr) != sizeof(convexHdr) ||
+							file.write(data.data(), data.size()) != data.size())
+						{
+							X_ERROR("Model", "Failed to write col data");
+							return false;
+						}
+						break;
+					}
+
+					default:
+						X_ASSERT_UNREACHABLE();
+						return false;
+				}
 			}
 		}
 	}
@@ -1597,6 +1709,11 @@ bool ModelCompiler::ProcessModel(void)
 	}
 
 	if (!BakeCollisionMeshes()) {
+		X_ERROR("Model", "Failed to bake collision mesh");
+		return false;
+	}
+
+	if (!AutoCollisionGen()) {
 		X_ERROR("Model", "Failed to bake collision mesh");
 		return false;
 	}
@@ -2081,6 +2198,50 @@ bool ModelCompiler::BakeCollisionMeshes(void)
 	return true;
 }
 
+
+bool ModelCompiler::AutoCollisionGen(void)
+{
+	if (!flags_.IsSet(CompileFlag::AUTO_PHYS_SHAPES)) {
+		return true;
+	}
+
+	if (compiledLods_.isEmpty()) {
+		X_ERROR("Model", "Auto phys mesh not supported for models with no lods"); // do we support no mesh data? dunno.
+		return false;
+	}
+
+	{
+		size_t colMeshes = totalColMeshes();
+		if (colMeshes) {
+			X_WARNING("Model", "%" PRIuS " user col meshes provided when auto phys enabled, ignoring user meshes.", colMeshes);
+		}
+	}
+
+	// okay my fat goat lets generat some shapes.
+	ColGenType::Enum genType = ColGenType::BOX;
+
+	switch (genType)
+	{
+		case ColGenType::BOX:
+		case ColGenType::CAPSULE:
+		case ColGenType::PER_MESH_BOX:
+			break;
+
+		// we need to gen sphere for each mesh.
+		case ColGenType::PER_MESH_SPHERE:
+			break;
+
+		// gen me some kdop.
+		case ColGenType::KDOP_6:
+		case ColGenType::KDOP_14:
+		case ColGenType::KDOP_18:
+		case ColGenType::KDOP_26:
+			X_ASSERT_NOT_IMPLEMENTED();
+			break;
+	}
+
+	return true;
+}
 
 bool ModelCompiler::UpdateMeshBounds(void)
 {

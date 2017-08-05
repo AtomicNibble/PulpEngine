@@ -19,6 +19,7 @@ X_DECLARE_FLAGS(CompileFlag)(
 	MERGE_VERTS,
 	EXT_WEIGHTS, // allow 8 inf per vert.
 	OPTERMIZE_FACES,
+	AUTO_PHYS_SHAPES, // auto will ignore manual mesh.
 	COOK_PHYS_MESH // cooks convex mesh, spheres and AABB are always converted.
 );
 
@@ -266,6 +267,7 @@ private:
 	bool ProcessModel(void);
 	bool ProcessCollisionMeshes(void);
 	bool BakeCollisionMeshes(void);
+	bool AutoCollisionGen(void);
 	bool DropWeights(void);
 	bool MergMesh(void);
 	bool CreateData(void);
@@ -302,6 +304,7 @@ private:
 	float jointWeightThreshold_;
 	float scale_;
 
+	ColGenType::Enum autoColGenType_;
 	CompileFlags flags_;
 	CompiledLodArr compiledLods_;
 	HitBoxShapeArr hitboxShapes_;
