@@ -173,7 +173,7 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 		clear();
 	}
 
-#if 1
+#if 0
 	Transformf trans;
 
 	for (size_t i = 0; i < 30; i++)
@@ -349,8 +349,6 @@ bool World::loadMap(const char* pMapName)
 	level_ = core::makeUnique<Level>(arena_, pScene_, pWorld3D, ents_, arena_);
 	level_->load(pMapName);
 
-	spawnPlayer(0);
-
 	return true;
 }
 
@@ -360,6 +358,14 @@ void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 
 	if (level_ && level_->isLoaded()) 
 	{
+		static bool spawn = false;
+
+		if (!spawn)
+		{
+			spawn = true;
+			spawnPlayer(0);
+		}
+
 		ents_.update(frame, userCmdMan);
 		
 		level_->update(frame);
