@@ -1881,7 +1881,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
 	AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
 {
-	X_UNUSED(trans); // not used just ensures you have taken one.
+	X_UNUSED(trans); // not used, just ensures you have taken one.
 	X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")(assetId);
 	X_ASSERT(name.isNotEmpty(), "Name can't be empty")(name.length());
 
