@@ -5,6 +5,7 @@
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
 #include "Drawing\PrimativeContext.h"
+#include "Drawing\CBufferManager.h"
 #include "Model\XModel.h"
 
 #include <Math\XWinding.h>
@@ -16,7 +17,6 @@
 #include <Threading\JobSystem2.h>
 
 #include <queue>
-
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -190,10 +190,12 @@ void World3D::AreaRefInfo::free(void)
 // --------------------------------
 
 
-World3D::World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, physics::IScene* pPhysScene, core::MemoryArenaBase* arena) :
+World3D::World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan, 
+	physics::IScene* pPhysScene, core::MemoryArenaBase* arena) :
 	arena_(X_ASSERT_NOT_NULL(arena)),
 	pPhysScene_(X_ASSERT_NOT_NULL(pPhysScene)),
 	pPrimContex_(X_ASSERT_NOT_NULL(pPrimContex)),
+	pCBufMan_(X_ASSERT_NOT_NULL(pCBufMan)),
 	vars_(vars),
 	areas_(arena),
 	areaNodes_(arena),

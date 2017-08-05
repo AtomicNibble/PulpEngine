@@ -948,7 +948,7 @@ IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 {
 	auto* pPrimContex = &primContexts_[engine::PrimContext::MISC3D];
 
-	return X_NEW(engine::World3D, g_3dEngineArena, "3DWorld")(lvlVars_, pPrimContex, pPhysScene, g_3dEngineArena);
+	return X_NEW(engine::World3D, g_3dEngineArena, "3DWorld")(lvlVars_, pPrimContex, pCBufMan_, pPhysScene, g_3dEngineArena);
 }
 
 void X3DEngine::release3DWorld(IWorld3D* pWorld)

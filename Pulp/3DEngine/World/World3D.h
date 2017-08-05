@@ -177,7 +177,8 @@ class World3D : public IWorld3D
 	};
 
 public:
-	World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, physics::IScene* pPhysScene, core::MemoryArenaBase* arena);
+	World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan,
+		physics::IScene* pPhysScene, core::MemoryArenaBase* arena);
 	virtual ~World3D() X_FINAL;
 
 	void renderView(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket);
@@ -257,6 +258,7 @@ private:
 	core::MemoryArenaBase* arena_;
 	physics::IScene* pPhysScene_;
 	engine::PrimativeContext* pPrimContex_;
+	CBufferManager* pCBufMan_;
 
 	level::LevelVars& vars_;
 
