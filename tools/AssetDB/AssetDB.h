@@ -243,8 +243,6 @@ public:
 
 private:
 	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
-		AssetId assetId, int32_t rawId, const DataArr& compressedData);
-	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
 		AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc);
 
 
