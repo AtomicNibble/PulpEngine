@@ -15,11 +15,11 @@ TEST(MemCusor, Seek) {
 
 	core::MemCursor cursor(pData, 10);
 
-	cursor.Seek<int>(5);
+	cursor.seek<int>(5);
 
 	EXPECT_EQ(cursor.get<int>(), 5);
 
-	cursor.Seek<int>(5);
+	cursor.seek<int>(5);
 
 	EXPECT_TRUE(cursor.isEof());
 }

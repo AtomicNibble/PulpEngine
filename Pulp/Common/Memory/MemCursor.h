@@ -10,83 +10,88 @@ class MemCursor
 {
 public:
 	MemCursor(void* const pData, size_t size) : 
-		pPointer_(pData), 
-		pStart_(pData), 
+		pPointer_(reinterpret_cast<char*>(pData)), 
+		pStart_(reinterpret_cast<char*>(pData)),
 		size_(size) 
-	{}
+	{
+	}
 
 	template<typename Type>
 	Type* postSeekPtr(size_t num)
 	{
-		Type* cur = (Type*)pPointer_;
-
-		Seek<Type>(num);
+		Type* cur = getPtr<Type>();
+		seek<Type>(num);
 		return cur;
 	}
 
 	template<typename Type>
-	const Type get() const
+	const Type get(void) const
 	{
-		return (Type)*getPtr<Type>();
+		return *getPtr<Type>();
 	}
 
 	template<typename Type>
-	const Type* getPtr() const
+	const Type* getPtr(void) const
 	{
-		return (Type*)pPointer_;
+		return reinterpret_cast<Type*>(pPointer_);
 	}
 
 	template<typename Type>
-	Type* getPtr()
+	Type* getPtr(void)
 	{
-		return (Type*)pPointer_;
+		return reinterpret_cast<Type*>(pPointer_);
 	}
 
 	template<typename Type>
-	const Type getSeek()
+	const Type getSeek(void)
 	{
 		return *getSeekPtr<Type>();
 	}
 
 	template<typename Type>
-	const Type* getSeekPtr() const
+	const Type* getSeekPtr(void) const
 	{
-		Type* val = (Type*)pPointer_;
-		Seek<Type>(1);
+		Type* val = getPtr<Type>();
+		seek<Type>(1);
 		return val;
 	}
 
 	template<typename Type>
-	Type* getSeekPtr()
+	Type* getSeekPtr(void)
 	{
-		Type* val = (Type*)pPointer_;
-		Seek<Type>(1);
+		Type* val = getPtr<Type>();
+		seek<Type>(1);
 		return val;
 	}
 
-	void operator ++(void) {
-		Seek<BYTE>(1);
+	void operator ++(void) 
+	{
+		seek<char>(1);
 	}
 
-	bool isEof() const {
-		size_t offset = ((BYTE*)pPointer_ - (BYTE*)pStart_);
+	bool isEof(void) const 
+	{
+		size_t offset = union_cast<size_t>(pPointer_ - pStart_);
 		return offset >= size_;
 	}
 
-	size_t numBytesRemaning(void) const {
-		size_t offset = ((BYTE*)pPointer_ - (BYTE*)pStart_);
+	size_t numBytesRemaning(void) const
+	{
+		size_t offset = union_cast<size_t>(pPointer_ - pStart_);
 		return size_ - offset;
 	}
 
-	void SeekBytes(int32_t num) {
-		Seek<BYTE>(num);
+	void seekBytes(int32_t num)
+	{
+		seek<char>(num);
 	}
 
 	template<typename Type>
-	void Seek(size_t num) {
+	void seek(size_t num)
+	{
 		union {
 			Type* as_type;
-			void* as_self;
+			char* as_self;
 		};
 
 		as_self = pPointer_;
@@ -94,9 +99,19 @@ public:
 		pPointer_ = as_self;
 	}
 
+	char* begin(void) const
+	{
+		return pPointer_;
+	}
+
+	char* end(void) const
+	{
+		return pStart_ + size_;
+	}
+
 private:
-	void* pPointer_;
-	void* pStart_;
+	char* pPointer_;
+	char* pStart_;
 	size_t size_;
 };
 

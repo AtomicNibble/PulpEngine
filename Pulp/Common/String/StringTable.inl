@@ -9,7 +9,7 @@ NumStrings_(0),
 WasteSize_(0),
 Cursor_(Buffer_, NumBlocks * BlockSize)
 {
-	Cursor_.SeekBytes(4);
+	Cursor_.seekBytes(4);
 }
 
 
@@ -40,7 +40,7 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 	// ensusre null
 	memset(Cursor_.getPtr<BYTE>() + Len, '\0', 1);
 
-	Cursor_.SeekBytes(safe_static_cast<uint32_t, size_t>((NumBlocks * BlockSize) - sizeof(Header_t)));
+	Cursor_.seekBytes(safe_static_cast<uint32_t, size_t>((NumBlocks * BlockSize) - sizeof(Header_t)));
 	CurrentBlock_ += safe_static_cast<uint32_t, size_t>(NumBlocks);
 
 	NumStrings_++;

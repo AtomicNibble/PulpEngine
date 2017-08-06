@@ -235,7 +235,7 @@ bool Level::ProcessData(void)
 
 				const size_t diff = union_cast<size_t>(pAligned) - union_cast<size_t>(pCur);
 
-				cursor.SeekBytes(static_cast<uint32_t>(diff));
+				cursor.seekBytes(static_cast<uint32_t>(diff));
 			};
 
 			seekCursorToPad();

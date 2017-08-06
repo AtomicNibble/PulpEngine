@@ -177,7 +177,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 
 			const size_t diff = union_cast<size_t>(pAligned) - union_cast<size_t>(pCur);
 
-			cursor.SeekBytes(static_cast<uint32_t>(diff));
+			cursor.seekBytes(static_cast<uint32_t>(diff));
 		};
 
 		seekCursorToPad();
@@ -236,7 +236,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 
 			uint32_t size = safe_static_cast<uint32_t, size_t>(mesh.CompBinds.dataSizeTotal());
 
-			cursor.SeekBytes(size);
+			cursor.seekBytes(size);
 		}
 
 		// index 0 is always valid, since a valid lod must
