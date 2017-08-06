@@ -1143,8 +1143,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				{
 					for (auto& mesh : lod0.meshes_)
 					{
-						Sphere sphere(header.boundingBox); // lame sphere for now.
-						if (file.writeObj<const Sphere>(sphere) != sizeof(Sphere)) {
+						if (file.writeObj<const Sphere>(mesh.boundingSphere_) != sizeof(Sphere)) {
 							X_ERROR("Model", "Failed to write col data");
 							return false;
 						}
