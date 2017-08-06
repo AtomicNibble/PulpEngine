@@ -1499,31 +1499,31 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		X_ASSERT(meshDataStream.freeSpace() == 0, "Stream incomplete")();
 
 		if (file.writeObj(header) != sizeof(header)) {
-			X_ERROR("Modle", "Failed to write header");
+			X_ERROR("Model", "Failed to write header");
 			return false;
 		}
 		if (file.write(matNameStream.ptr(), matNameStream.size()) != matNameStream.size()) {
-			X_ERROR("Modle", "Failed to write mat stream");
+			X_ERROR("Model", "Failed to write mat stream");
 			return false;
 		}
 		if (file.write(tagNameStream.ptr(), tagNameStream.size()) != tagNameStream.size()) {
-			X_ERROR("Modle", "Failed to write tag stream");
+			X_ERROR("Model", "Failed to write tag stream");
 			return false;
 		}
 		if (file.write(boneDataStream.ptr(), boneDataStream.size()) != boneDataStream.size()) {
-			X_ERROR("Modle", "Failed to write bone stream");
+			X_ERROR("Model", "Failed to write bone stream");
 			return false;
 		}
 		if (file.write(physDataStream.ptr(), physDataStream.size()) != physDataStream.size()) {
-			X_ERROR("Modle", "Failed to write phys stream");
+			X_ERROR("Model", "Failed to write phys stream");
 			return false;
 		}
 		if (file.write(hitboxDataStream.ptr(), hitboxDataStream.size()) != hitboxDataStream.size()) {
-			X_ERROR("Modle", "Failed to write hitbox stream");
+			X_ERROR("Model", "Failed to write hitbox stream");
 			return false;
 		}
 		if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
-			X_ERROR("Modle", "Failed to write mesh stream");
+			X_ERROR("Model", "Failed to write mesh stream");
 			return false;
 		}
 	}
