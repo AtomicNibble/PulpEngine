@@ -830,12 +830,11 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 	core::XFileScoped file;
 
-	
 	if (!gEnv->pFileSys->createDirectoryTree(outFile.c_str())) {
 		X_ERROR("Model", "Failed to create directory for output file.");
 		return false;
 	}
-		
+
 	if (!file.openFile(outFile.c_str(), mode)) {
 		X_ERROR("Model", "Failed to open compile output file");
 		return false;
@@ -875,7 +874,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 	header.vertexFmt = render::shader::VertexFormat::P3F_T2S;
 
-	if (streamsFlags.IsSet(model::StreamType::COLOR) 
+	if (streamsFlags.IsSet(model::StreamType::COLOR)
 		&& !streamsFlags.IsSet(model::StreamType::NORMALS)
 		&& !streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
 		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
