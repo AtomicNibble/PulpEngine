@@ -335,8 +335,7 @@ bool ModelHeader::isValid(void) const
 		(numBones + numBlankBones) > 0 &&
 		numLod > 0 &&
 		numLod <= MODEL_MAX_LODS &&
-		materialNameDataSize > 0 &&
-		subDataSize > 0; // replace 0 with a real min later. TODO
+		materialNameDataSize > 0;
 }
 
 
