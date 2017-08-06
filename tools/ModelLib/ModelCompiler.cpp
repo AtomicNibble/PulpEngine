@@ -1619,11 +1619,49 @@ size_t ModelCompiler::calculatePhysDataSize(void) const
 	size_t size = 0;
 
 	size += sizeof(CollisionInfoHdr::shapeCounts);
-	size += sizeof(uint8_t) * totalColMeshes();
+	
+	if (flags_.IsSet(CompileFlag::AUTO_PHYS_SHAPES))
+	{
+		const auto lod0 = compiledLods_[0];
+		size_t lod0Mesh = lod0.numMeshes();
 
-	return core::accumulate(compiledLods_.begin(), compiledLods_.end(), size, [](const Lod& lod) {
-		return lod.getPhysDataSize();
-	});
+		switch (autoColGenType_)
+		{
+			case ColGenType::BOX:
+				size += sizeof(AABB);
+				size += sizeof(uint8_t);
+				break;
+			case ColGenType::SPHERE:
+				size += sizeof(Sphere);
+				size += sizeof(uint8_t);
+				break;
+			case ColGenType::PER_MESH_BOX:
+				size += sizeof(AABB) * lod0Mesh;
+				size += sizeof(uint8_t) * lod0Mesh;
+				break;
+			case ColGenType::PER_MESH_SPHERE:
+				size += sizeof(Sphere) * lod0Mesh;
+				size += sizeof(uint8_t) * lod0Mesh;
+				break;
+			case ColGenType::KDOP_6:
+			case ColGenType::KDOP_14:
+			case ColGenType::KDOP_18:
+			case ColGenType::KDOP_26:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
+		}
+
+
+		return size;
+	}
+	else
+	{
+		size += sizeof(uint8_t) * totalColMeshes();
+
+		return core::accumulate(compiledLods_.begin(), compiledLods_.end(), size, [](const Lod& lod) {
+			return lod.getPhysDataSize();
+		});
+	}
 }
 
 size_t ModelCompiler::calculateHitBoxDataSize(void) const
