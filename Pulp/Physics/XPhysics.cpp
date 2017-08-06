@@ -989,7 +989,7 @@ ActorHandle XPhysics::createStaticBox(const Transformf& myTrans, const AABB& bou
 	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
 
 	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
-
+	
 	// calls: createRigidStatic, attachShape
 	physx::PxRigidStatic* pActor = physx::PxCreateStatic(*pPhysics_, trans, *pShape);
 
@@ -1109,7 +1109,6 @@ void XPhysics::addBox(ActorHandle handle, const AABB& aabb, const Vec3f& localPo
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 	physx::PxBoxGeometry geo(Px3FromVec3(aabb.halfVec()));
-
 	physx::PxTransform trans(Px3FromVec3(localPose));
 
 	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
