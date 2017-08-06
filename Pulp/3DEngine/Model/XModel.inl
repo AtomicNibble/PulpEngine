@@ -69,6 +69,13 @@ X_INLINE bool XModel::hasLods(void) const
 	return numLods() > 1;
 }
 
+
+X_INLINE bool XModel::hasPhys(void) const
+{
+	return hdr_.flags.IsSet(ModelFlag::PHYS_DATA);
+}
+
+
 X_INLINE size_t XModel::lodIdxForDistance(float distance) const
 {
 	// we select the lowest level lod that is visible
