@@ -98,6 +98,7 @@ public:
 	// if you don't have cooked data use getCooking() to cook it!
 	TriMeshHandle createTriangleMesh(const DataArr& cooked) X_FINAL;
 	ConvexMeshHandle createConvexMesh(const DataArr& cooked) X_FINAL;
+	ConvexMeshHandle createConvexMesh(const uint8_t* pData, size_t length) X_FINAL;
 	HieghtFieldHandle createHieghtField(const DataArr& cooked) X_FINAL;
 
 	ActorHandle createConvexMesh(const Transformf& myTrans, ConvexMeshHandle mesh, float density, const Vec3f& scale = Vec3f::one()) X_FINAL;

@@ -933,6 +933,7 @@ struct IPhysics
 
 	virtual TriMeshHandle createTriangleMesh(const DataArr& cooked) X_ABSTRACT;
 	virtual ConvexMeshHandle createConvexMesh(const DataArr& cooked) X_ABSTRACT;
+	virtual ConvexMeshHandle createConvexMesh(const uint8_t* pData, size_t length) X_ABSTRACT;
 	virtual HieghtFieldHandle createHieghtField(const DataArr& cooked) X_ABSTRACT;
 
 

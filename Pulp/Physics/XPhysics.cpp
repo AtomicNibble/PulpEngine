@@ -776,6 +776,15 @@ ConvexMeshHandle XPhysics::createConvexMesh(const DataArr& cooked)
 	return reinterpret_cast<ConvexMeshHandle>(pConvexMesh);
 }
 
+ConvexMeshHandle XPhysics::createConvexMesh(const uint8_t* pData, size_t length)
+{
+	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(pData), safe_static_cast<physx::PxU32>(length));
+	physx::PxConvexMesh* pConvexMesh = pPhysics_->createConvexMesh(input);
+
+	return reinterpret_cast<ConvexMeshHandle>(pConvexMesh);
+}
+
+
 HieghtFieldHandle XPhysics::createHieghtField(const DataArr& cooked)
 {
 	physx::PxDefaultMemoryInputData input(const_cast<physx::PxU8*>(cooked.data()), safe_static_cast<physx::PxU32>(cooked.size()));
