@@ -22,6 +22,25 @@ void GenerateUI( asset& Asset )
         Asset.AddCheckBox( "ext_weights", false).SetTitle( "Ext Weights" ).SetToolTip("Enable extended vertex weights (use for face meshes)");
     }
 
+
+    string autoGenTypes =
+    """
+        <none> |
+        box |
+        sphere |
+        perMeshBox |
+        perMeshSphere |
+        kdop6 |
+        kdop14 |
+        kdop18 |
+        kdop26 |
+    """;
+
+    Asset.BeginGroup("Auto Physics");
+    {
+        Asset.AddCheckBox( "auto_phys", false ).SetTitle("AutoPhys").SetToolTip( "Auto generates physics shapes for model" );
+        Asset.AddCombo( "auto_phys_type", autoGenTypes ).SetTitle( "AutoPhys Type" ).SetToolTip( "Select the type of auto generated physics");
+    }
 }
 
 
