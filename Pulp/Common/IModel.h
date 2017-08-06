@@ -436,8 +436,14 @@ private:
 // all the colMesh shapes are store in enum order and the counts below show how many.
 struct CollisionInfoHdr
 {
-	uint8_t shapeCounts[ColMeshType::ENUM_COUNT]; // this is the number of each type we have, they appear in order.
-	uint8_t idxMap[1]; // we have total shapes * 8bit, this is used to covert the colmeshIndex into the index of the sorted shapes.
+	std::array<uint8_t, ColMeshType::ENUM_COUNT> shapeCounts; // this is the number of each type we have, they appear in order.
+	// we have total shapes * 8bit, this is used to covert the colmeshIndex into the index of the sorted shapes.
+	// this is a map from ColMesh to visible mesh index for lod0. -1 is whole lod.
+	int8_t idxMap[1]; 
+
+	size_t totalShapes(void) const {
+		return core::accumulate(shapeCounts.begin(), shapeCounts.end(), 0_sz);
+	}
 };
 
 // each convex mesh data block is prefixed with this header.
