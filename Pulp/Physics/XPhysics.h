@@ -126,6 +126,7 @@ public:
 	void addBox(ActorHandle handle, const AABB& aabb) X_FINAL;
 	void addBox(ActorHandle handle, const AABB& aabb, const Vec3f& localPose) X_FINAL;
 	void addSphere(ActorHandle handle, float radius) X_FINAL;
+	void addSphere(ActorHandle handle, float radius, const Vec3f& localPose) X_FINAL;
 	void addCapsule(ActorHandle handle, float radius, float halfHeight) X_FINAL;
 	// ~IPhysics
 

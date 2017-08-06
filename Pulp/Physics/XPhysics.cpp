@@ -1118,6 +1118,17 @@ void XPhysics::addSphere(ActorHandle handle, float radius)
 	actor.attachShape(*pShape);
 }
 
+void XPhysics::addSphere(ActorHandle handle, float radius, const Vec3f& localPose)
+{
+	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+	physx::PxTransform trans(Px3FromVec3(localPose));
+
+	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
+	pShape->setLocalPose(trans);
+
+	actor.attachShape(*pShape);
+}
+
 void XPhysics::addCapsule(ActorHandle handle, float radius, float halfHeight)
 {
 	physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
