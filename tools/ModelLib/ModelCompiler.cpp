@@ -360,6 +360,29 @@ void ModelCompiler::Mesh::calBoundingbox(void)
 	boundingBox_ = aabb;
 }
 
+
+void ModelCompiler::Mesh::calBoundingSphere(bool accurate)
+{
+	if (accurate)
+	{
+		typedef core::BoundingSphereGen <3, VertAccessor<VertsArr::ConstIterator, const float*>> BS;
+		BS bs(arena_, verts_.begin(), verts_.end());
+
+		Vec3f center(bs.center()[0], bs.center()[1], bs.center()[2]);
+
+		boundingSphere_ = Sphere(center, bs.squaredRadius());
+		return;
+	}
+
+	// not a fan.
+	if (boundingBox_.isEmpty()) {
+		calBoundingbox();
+	}
+
+	boundingSphere_ = Sphere(boundingBox_);
+}
+
+
 // ---------------------------------------------------------------
 
 //ModelCompiler::ColMesh::ColMesh(core::MemoryArenaBase* arena) :
@@ -372,7 +395,6 @@ void ModelCompiler::Mesh::calBoundingbox(void)
 ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 	Mesh(oth),
 	type_(oth.type_),
-	sphere_(oth.sphere_),
 	cooked_(oth.cooked_)
 {
 
@@ -396,7 +418,7 @@ ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
 const Sphere& ModelCompiler::ColMesh::getBoundingSphere(void) const
 {
 	X_ASSERT(getType() == ColMeshType::SPHERE, "Invalid call on non sphere mesh")();
-	return sphere_;
+	return boundingSphere_;
 }
 
 const ModelCompiler::ColMesh::CookedData& ModelCompiler::ColMesh::getCookedConvexData(void) const
@@ -435,12 +457,7 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
 	}
 	else if (type_ = ColMeshType::SPHERE)
 	{
-		typedef core::BoundingSphereGen <3, VertAccessor<VertsArr::ConstIterator, const float*>> BS;
-		BS bs(arena_, verts_.begin(), verts_.end());
-
-		Vec3f center(bs.center()[0], bs.center()[1], bs.center()[2]);
-
-		sphere_ = Sphere(center, bs.squaredRadius());
+		calBoundingSphere(true);
 	}
 	else if (type_ = ColMeshType::CONVEX)
 	{
@@ -1356,7 +1373,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			//		mesh.material = pMesh->material;
 	//		mesh.CompBinds = pMesh->CompBinds;
 			meshHdr.boundingBox = compiledMesh.boundingBox_;
-			meshHdr.boundingSphere = Sphere(compiledMesh.boundingBox_);
+			meshHdr.boundingSphere = compiledMesh.boundingSphere_;
 
 			// Version 5.0 info
 			meshHdr.startVertex = vertOffset;
@@ -2584,6 +2601,7 @@ void ModelCompiler::UpdateBoundsJob(Mesh* pMesh, uint32_t count)
 
 	for (i = 0; i < count; i++) {
 		pMesh[i].calBoundingbox();
+		pMesh[i].calBoundingSphere(false);
 	}
 }
 

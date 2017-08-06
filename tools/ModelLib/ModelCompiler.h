@@ -131,6 +131,7 @@ public:
 
 		bool hasColMesh(void) const;
 		void calBoundingbox(void);
+		void calBoundingSphere(bool accurate = true);
 
 	public:
 		core::MemoryArenaBase* arena_;
@@ -144,6 +145,7 @@ public:
 
 		RawModel::Material material_;
 		AABB boundingBox_;
+		Sphere boundingSphere_;
 	};
 
 	class ColMesh : public Mesh
@@ -166,9 +168,7 @@ public:
 	private:
 		ColMeshType::Enum type_;
 
-		// we inherit from Mesh which already has a AABB which is where the bounds are sotred 
-		// when type is BOX.
-		Sphere sphere_;
+		// we inherit from Mesh which already has a AABB / Sphere
 		CookedData cooked_;
 	};
 
