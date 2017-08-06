@@ -136,8 +136,13 @@ inline void FixedByteStreamBase::zeroPadToLength(size_type numBytes)
 {
 	if (size() < numBytes)
 	{
-		std::memset(pBegin_ + byteIdx_, 0, numBytes);
-		byteIdx_ += numBytes;
+		X_ASSERT(numBytes <= capacity(), "Tried to pad more than avalible space")(numBytes, size(), freeSpace(), capacity());
+		const size_t diff = numBytes - size();
+
+		std::memset(pBegin_ + byteIdx_, 0, diff);
+		byteIdx_ += diff;
+
+		X_ASSERT(size() == numBytes, "Failed to pad corect")(size(), numBytes);
 	}
 }
 
