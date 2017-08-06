@@ -119,13 +119,13 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 		model.SetScale(d["scale"].GetFloat());
 	}
 	if (d.HasMember("weight_thresh")) {
-		model.SetScale(d["weight_thresh"].GetFloat());
+		model.SetJointWeightThreshold(d["weight_thresh"].GetFloat());
 	}
 	if (d.HasMember("uv_merge_thresh")) {
-		model.SetScale(d["uv_merge_thresh"].GetFloat());
+		model.SetTexCoordElipson(d["uv_merge_thresh"].GetFloat());
 	}
 	if (d.HasMember("vert_merge_thresh")) {
-		model.SetScale(d["vert_merge_thresh"].GetFloat());
+		model.SetVertexElipson(d["vert_merge_thresh"].GetFloat());
 	}
 
 
