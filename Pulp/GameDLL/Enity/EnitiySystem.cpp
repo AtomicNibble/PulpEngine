@@ -198,34 +198,33 @@ namespace entity
 
 	bool EnititySystem::parseMiscModels(core::json::Value::Array arr)
 	{
+#if 1
+		X_UNUSED(arr);
+		return true;
+#else
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = reg_.create<TransForm, PhysicsComponent>();
+			auto ent = reg_.create<TransForm, PhysicsComponent, RenderComponent>();
 			auto& trans = reg_.get<TransForm>(ent);
-	//		auto& phys = reg_.get<PhysicsComponent>(ent);
+			auto& phys = reg_.get<PhysicsComponent>(ent);
+			auto& rend = reg_.get<RenderComponent>(ent);
+
+			X_UNUSED(phys, rend);
 
 			auto& kvps = *it;
 
 			const char* pOrigin = kvps["origin"].GetString();
-			const char* pModel = kvps["model"].GetString();
+			const char* pModelName = kvps["model"].GetString();
 
 			if (sscanf_s(pOrigin, "%f %f %f", &trans.pos.x, &trans.pos.y, &trans.pos.z) != 3) {
 				return false;
 			}
 
-			// we know the model name but it's not loaded yet.
-			// so we dunno it's phyics.
-			// only once it's loaded can we spawn a instance of the physics.
-			// this is just data tho, so we should add this to a list of pending physics loads?
-			// then a system can handle the loading of the models and assigning physics actors.
-			// i think i will force all models to be loaded, but they don't have to be backed by render meshes.
-			// thinks like physics triggers need some logic to create a trigger and we need to handle when it's triggered.
-			X_UNUSED(pModel);
-
-			// pPhysics_
+			rend.pModel = pModelManager_->loadModel(pModelName);
 		}
 
 		return true;
+#endif
 	}
 
 
