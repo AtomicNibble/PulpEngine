@@ -898,19 +898,16 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	const size_t hitBoxDataSize = calculateHitBoxDataSize();
 
 	// Sizes
-	header.tagNameDataSize = safe_static_cast<uint16_t, size_t>(
-		this->calculateTagNameDataSize());
-	header.materialNameDataSize = safe_static_cast<uint16_t, size_t>(
-		this->calculateMaterialNameDataSize());
-	header.boneDataSize = safe_static_cast<uint16_t, size_t>(
-		this->calculateBoneDataSize());
-	header.subDataSize = safe_static_cast<uint32_t, size_t>(
-		this->calculateSubDataSize(streamsFlags));
-	header.dataSize = (header.subDataSize +
-		header.tagNameDataSize + header.materialNameDataSize);
-	header.physDataSize = safe_static_cast<uint16_t, size_t>(
-		this->calculatePhysDataSize());
+	header.tagNameDataSize = safe_static_cast<uint16_t>(this->calculateTagNameDataSize());
+	header.materialNameDataSize = safe_static_cast<uint16_t>(this->calculateMaterialNameDataSize());
+	header.boneDataSize = safe_static_cast<uint16_t>(this->calculateBoneDataSize());
+	header.subDataSize = safe_static_cast<uint32_t>(this->calculateSubDataSize(streamsFlags));
+	header.dataSize = (header.subDataSize + header.tagNameDataSize + header.materialNameDataSize);
 
+	if(header.flags.IsSet(model::ModelFlags::PHYS_DATA)) {
+		header.physDataSize = safe_static_cast<uint16_t>(this->calculatePhysDataSize());
+	}
+	
 	// turn it into num blocks.
 	static_assert(MODEL_MAX_HITBOX_DATA_SIZE / 64 <= std::numeric_limits<uint8_t>::max(), "Can't represent max hitbox data");
 	header.hitboxDataBlocks = safe_static_cast<uint8_t>(core::bitUtil::RoundUpToMultiple(hitBoxDataSize, 64_sz) / 64);
