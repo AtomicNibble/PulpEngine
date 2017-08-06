@@ -537,8 +537,8 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 				file.readObj(fsm);
 
 				// copy over the info.
-				sm.pos = fsm.pos;
-				sm.angle = fsm.angle;
+				sm.transform.pos = fsm.pos;
+				sm.transform.quat = fsm.angle;
 				sm.boundingBox = fsm.boundingBox;
 				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.
 				sm.modelNameIdx = fsm.modelNameIdx;
@@ -1576,7 +1576,7 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 		// so for now we just handle the rendering of a model.
 		size_t lodIdx = 0;
 
-		const float distanceFromCam = cam_.getPosition().distance(sm.pos);
+		const float distanceFromCam = cam_.getPosition().distance(sm.transform.pos);
 
 		if (pModel->HasLods())
 		{
@@ -1608,10 +1608,10 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 
 
 #if 1
-		Matrix44f world = Matrix44f::createTranslation(sm.pos);
+		Matrix44f world = Matrix44f::createTranslation(sm.transform.pos);
 		
-		if (sm.angle.getAngle() != 0.f) {
-			world.rotate(sm.angle.getAxis(), sm.angle.getAngle());
+		if (sm.transform.quat.getAngle() != 0.f) {
+			world.rotate(sm.transform.quat.getAxis(), sm.transform.quat.getAngle());
 		}
 #else
 

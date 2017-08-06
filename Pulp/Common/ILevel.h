@@ -393,8 +393,7 @@ struct StaticModel : public Entity
 // not saved to file sruntime only.
 struct StaticModel
 {
-	Vec3f pos;
-	Quatf angle;
+	Transformf transform;
 
 	// bounding box that takes into account the angle.
 	AABB boundingBox;

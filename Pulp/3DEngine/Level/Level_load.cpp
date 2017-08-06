@@ -543,8 +543,8 @@ bool Level::ProcessData(void)
 				file.readObj(fsm);
 
 				// copy over the info.
-				sm.pos = fsm.pos;
-				sm.angle = fsm.angle;
+		//		sm.pos = fsm.pos;
+		//		sm.angle = fsm.angle;
 				sm.modelNameIdx = fsm.modelNameIdx;
 				sm.boundingBox = fsm.boundingBox;
 				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.

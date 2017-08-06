@@ -685,7 +685,7 @@ void Level::DrawStaticModels(const uint32_t* pEntIds, uint32_t num)
 		// so for now we just handle the rendering of a model.
 		size_t lodIdx = 0;
 
-		const float distanceFromCam = cam_.getPosition().distance(sm.pos);
+		const float distanceFromCam = cam_.getPosition().distance(sm.transform.pos);
 		
 		if (pModel->HasLods())
 		{
