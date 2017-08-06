@@ -226,6 +226,7 @@ void Level::DebugDraw_ModelBones(void) const
 {
 	if (vars_.drawModelBones())
 	{
+#if 0
 		const Color8u visColor(255, 255, 64, 128);
 
 		for (const auto& a : areas_)
@@ -248,6 +249,7 @@ void Level::DebugDraw_ModelBones(void) const
 				}
 			}
 		}
+#endif
 	}
 }
 
