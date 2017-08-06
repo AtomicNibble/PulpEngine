@@ -903,10 +903,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	header.boneDataSize = safe_static_cast<uint16_t>(this->calculateBoneDataSize());
 	header.subDataSize = safe_static_cast<uint32_t>(this->calculateSubDataSize(streamsFlags));
 	header.dataSize = (header.subDataSize + header.tagNameDataSize + header.materialNameDataSize);
-
-	if(header.flags.IsSet(model::ModelFlags::PHYS_DATA)) {
-		header.physDataSize = safe_static_cast<uint16_t>(this->calculatePhysDataSize());
-	}
+	header.physDataSize = safe_static_cast<uint16_t>(this->calculatePhysDataSize());
 	
 	// turn it into num blocks.
 	static_assert(MODEL_MAX_HITBOX_DATA_SIZE / 64 <= std::numeric_limits<uint8_t>::max(), "Can't represent max hitbox data");
@@ -1616,6 +1613,10 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 size_t ModelCompiler::calculatePhysDataSize(void) const
 {
 	size_t size = 0;
+
+	if (!totalColMeshes() && !flags_.IsSet(CompileFlag::AUTO_PHYS_SHAPES)) {
+		return size;
+	}
 
 	size += sizeof(CollisionInfoHdr::shapeCounts);
 	
