@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ModelCompiler.h"
 
+#include <Containers\FixedByteStream.h>
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
 #include <Util\Cpu.h>
@@ -9,7 +10,7 @@
 #include <IMaterial.h>
 #include <IFileSys.h>
 
-#include "Math\XSphereGen.h"
+#include <Math\XSphereGen.h>
 
 #include "FaceOptermize.h"
 
@@ -600,7 +601,7 @@ ModelCompiler::Lod::Lod(core::MemoryArenaBase* arena) :
 
 }
 
-size_t ModelCompiler::Lod::getSubDataSize(const Flags8<model::StreamType>& streams) const
+size_t ModelCompiler::Lod::getMeshDataSize(const Flags8<model::StreamType>& streams) const
 {
 	size_t size = 0;
 
@@ -844,8 +845,6 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 	const size_t totalColMesh = totalColMeshes();
 
-	core::ByteStream stream(arena_);
-
 	model::ModelHeader header;
 	core::zero_object(header);
 
@@ -900,13 +899,30 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	header.tagNameDataSize = safe_static_cast<uint16_t>(this->calculateTagNameDataSize());
 	header.materialNameDataSize = safe_static_cast<uint16_t>(this->calculateMaterialNameDataSize());
 	header.boneDataSize = safe_static_cast<uint16_t>(this->calculateBoneDataSize());
-	header.subDataSize = safe_static_cast<uint32_t>(this->calculateSubDataSize(streamsFlags));
-	header.dataSize = (header.subDataSize + header.tagNameDataSize + header.materialNameDataSize);
+	header.meshDataSize = safe_static_cast<uint32_t>(this->calculateMeshDataSize(streamsFlags));
 	header.physDataSize = safe_static_cast<uint16_t>(this->calculatePhysDataSize());
 	
 	// turn it into num blocks.
 	static_assert(MODEL_MAX_HITBOX_DATA_SIZE / 64 <= std::numeric_limits<uint8_t>::max(), "Can't represent max hitbox data");
 	header.hitboxDataBlocks = safe_static_cast<uint8_t>(core::bitUtil::RoundUpToMultiple(hitBoxDataSize, 64_sz) / 64);
+	
+	header.dataSize = (
+		header.tagNameDataSize + 
+		header.materialNameDataSize + 
+		header.boneDataSize +
+		header.physDataSize + 
+		(header.hitboxDataBlocks * 64) +
+		header.meshDataSize 
+	);
+	
+	// fixed streams to make sure size calculations are correct.
+	core::FixedByteStreamOwning tagNameStream(arena_, header.tagNameDataSize);
+	core::FixedByteStreamOwning matNameStream(arena_, header.materialNameDataSize);
+	core::FixedByteStreamOwning boneDataStream(arena_, header.boneDataSize);
+	core::FixedByteStreamOwning meshDataStream(arena_, header.meshDataSize);
+	core::FixedByteStreamOwning physDataStream(arena_, header.physDataSize);
+	core::FixedByteStreamOwning hitboxDataStream(arena_, header.hitboxDataBlocks * 64);
+
 
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
 	for (auto& bone : bones_) {
@@ -953,11 +969,6 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	// update bounds in stats.
 	stats_.bounds = header.boundingBox;
 
-	if (file.writeObj(header) != sizeof(header)) {
-		X_ERROR("Modle", "Failed to write header");
-		return false;
-	}
-
 	// material names( ALL LOD)
 	{
 		for (size_t i = 0; i < compiledLods_.size(); i++)
@@ -971,10 +982,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				mat.name_.toLower();
 #endif // ~X_MODEL_MTL_LOWER_CASE_NAMES
 
-				if (!file.writeString(mat.name_)) {
-					X_ERROR("Modle", "Failed to write material name");
-					return false;
-				}
+				matNameStream.write(mat.name_.c_str(), mat.name_.length() + 1);
 			}
 		}
 	}
@@ -986,21 +994,15 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 #if defined(X_MODEL_BONES_LOWER_CASE_NAMES) && X_MODEL_BONES_LOWER_CASE_NAMES
 			bone.name_.toLower();
 #endif // ~X_MODEL_BONES_LOWER_CASE_NAMES
-			if (!file.writeString(bone.name_)) {
-				X_ERROR("Modle", "Failed to write bone name");
-				return false;
-			}
+			tagNameStream.write(bone.name_.c_str(), bone.name_.length() + 1);
 		}
 
 		// space for name index data.
 		{
 			uint16_t blankData[MODEL_MAX_BONES] = { 0 };
-			const size_t boneNameIndexBytes = sizeof(uint16_t) * (header.numBones + header.numBlankBones);
+			const size_t boneNameIndexNum = (header.numBones + header.numBlankBones);
 
-			if (file.write(blankData, boneNameIndexBytes) != boneNameIndexBytes) {
-				X_ERROR("Model", "Failed to write bone index data");
-				return true;
-			}
+			boneDataStream.write(blankData, boneNameIndexNum);
 		}
 
 		// hierarchy
@@ -1013,10 +1015,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				parent = safe_static_cast<uint8_t, int32_t>(bone.parIndx_);
 			}	
 
-			if (file.writeObj(parent) != sizeof(parent)) {
-				X_ERROR("Model", "Failed to write bone parent");
-				return false;
-			}
+			boneDataStream.write(parent);
 		}
 
 		// angles.
@@ -1024,10 +1023,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		{
 			XQuatCompressedf quat(bone.rotation_);
 
-			if (file.writeObj(quat) != sizeof(quat)) {
-				X_ERROR("Model", "Failed to write bone angle");
-				return false;
-			}
+			boneDataStream.write(quat);
 		}
 
 		// pos.
@@ -1035,10 +1031,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		{
 			const Vec3f& pos = bone.worldPos_;
 
-			if (file.writeObj(pos) != sizeof(pos)) {
-				X_ERROR("Model", "Failed to write bone pos");
-				return false;
-			}
+			boneDataStream.write(pos);
 		}
 	}
 
@@ -1095,43 +1088,28 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			}
 
 			// write out the couts.
-			if (file.writeObj(colHdr.shapeCounts) != sizeof(colHdr.shapeCounts)) {
-				X_ERROR("Model", "Failed to col header");
-				return false;
-			}
+			physDataStream.write(colHdr.shapeCounts);
 
 			// index maps. 
-			if (file.write(idxMap.data(), idxMap.size()) != idxMap.size()) {
-				X_ERROR("Model", "Failed to write idx map");
-				return false;
-			}
+			physDataStream.write(idxMap.data(), idxMap.size());
 
 			// write the shapes out
 			switch (autoColGenType_)
 			{
 				case ColGenType::BOX:
-					if (file.writeObj<const AABB>(header.boundingBox) != sizeof(AABB)) {
-						X_ERROR("Model", "Failed to write col data");
-						return false;
-					}
+					physDataStream.write<const AABB>(header.boundingBox);
 					break;
 				case ColGenType::SPHERE:
 				{
 					Sphere sphere(header.boundingBox); // lame sphere for now.
-					if (file.writeObj<const Sphere>(sphere) != sizeof(Sphere)) {
-						X_ERROR("Model", "Failed to write col data");
-						return false;
-					}
+					physDataStream.write<const Sphere>(sphere);
 					break;
 				}
 				case ColGenType::PER_MESH_BOX:
 				{
 					for (auto& mesh : lod0.meshes_)
 					{
-						if (file.writeObj<const AABB>(mesh.boundingBox_) != sizeof(AABB)) {
-							X_ERROR("Model", "Failed to write col data");
-							return false;
-						}
+						physDataStream.write<const AABB>(mesh.boundingBox_);
 					}
 					break;
 				}
@@ -1139,10 +1117,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				{
 					for (auto& mesh : lod0.meshes_)
 					{
-						if (file.writeObj<const Sphere>(mesh.boundingSphere_) != sizeof(Sphere)) {
-							X_ERROR("Model", "Failed to write col data");
-							return false;
-						}
+						physDataStream.write<const Sphere>(mesh.boundingSphere_);
 					}
 					break;
 				}
@@ -1174,10 +1149,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			}
 
 			// write out the couts.
-			if (file.writeObj(colHdr.shapeCounts) != sizeof(colHdr.shapeCounts)) {
-				X_ERROR("Model", "Failed to col header");
-				return false;
-			}
+			physDataStream.write(colHdr.shapeCounts);
 
 			// sort them by type.
 			std::sort(colMeshes.begin(), colMeshes.end(), [](const ColMesh* p1, const ColMesh* p2) {
@@ -1206,10 +1178,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 					}
 				}
 
-				if (file.write(idxMap.data(), idxMap.size()) != idxMap.size()) {
-					X_ERROR("Model", "Failed to write idx map");
-					return false;
-				}
+				physDataStream.write(idxMap.data(), idxMap.size());
 			}
 
 			// write the shapes out
@@ -1220,16 +1189,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				switch (pColMesh->getType())
 				{
 					case ColMeshType::SPHERE:
-						if (file.writeObj<const Sphere>(pColMesh->getBoundingSphere()) != sizeof(Sphere)) {
-							X_ERROR("Model", "Failed to write col data");
-							return false;
-						}
+						physDataStream.write<const Sphere>(pColMesh->getBoundingSphere());
 						break;
 					case ColMeshType::BOX:
-						if (file.writeObj<const AABB>(pColMesh->getBoundingBox()) != sizeof(AABB)) {
-							X_ERROR("Model", "Failed to write col data");
-							return false;
-						}
+						physDataStream.write<const AABB>(pColMesh->getBoundingBox());
 						break;
 					case ColMeshType::CONVEX:
 					{
@@ -1254,12 +1217,8 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 							convexHdr.raw.numFace = safe_static_cast<uint8_t>(pColMesh->faces_.size());
 						}
 
-						if (file.writeObj(convexHdr) != sizeof(convexHdr) ||
-							file.write(data.data(), data.size()) != data.size())
-						{
-							X_ERROR("Model", "Failed to write col data");
-							return false;
-						}
+						physDataStream.write(convexHdr);
+						physDataStream.write(data.data(), data.size());
 						break;
 					}
 
@@ -1300,14 +1259,8 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 		X_ASSERT(hitShapes.size() == boneIdxMap.size(), "Sizes should match")(hitShapes.size(), boneIdxMap.size());
 
-		if (file.writeObj(hitBoxHdr) != sizeof(hitBoxHdr)) {
-			X_ERROR("Model", "Failed to hitBox header");
-			return false;
-		}
-		if (file.write(boneIdxMap.data(), boneIdxMap.size()) != boneIdxMap.size()) {
-			X_ERROR("Model", "Failed to write bone idx map");
-			return false;
-		}
+		hitboxDataStream.write(hitBoxHdr);
+		hitboxDataStream.write(boneIdxMap.data(), boneIdxMap.size());
 
 		// now dump the shapes.
 		for (const auto* pShape : hitShapes)
@@ -1317,16 +1270,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			switch (pShape->getType())
 			{
 				case HitBoxType::SPHERE:
-					if (file.writeObj<const Sphere>(pShape->getBoundingSphere()) != sizeof(Sphere)) {
-						X_ERROR("Model", "Failed to write hitbox data");
-						return false;
-					}
+					hitboxDataStream.write<const Sphere>(pShape->getBoundingSphere());
 					break;
 				case HitBoxType::OBB:
-					if (file.writeObj<const OBB>(pShape->getOBB()) != sizeof(OBB)) {
-						X_ERROR("Model", "Failed to write hitbox data");
-						return false;
-					}
+					hitboxDataStream.write<const OBB>(pShape->getOBB());
 					break;
 				default:
 					X_ASSERT_UNREACHABLE();
@@ -1340,10 +1287,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			const size_t padSize = 64 - (hitBoxDataSize % 64);
 			char pad[64] = {};
 
-			if (file.write(pad, padSize) != padSize) {
-				X_ERROR("Model", "Failed to hitbox pad");
-				return false;
-			}
+			hitboxDataStream.write(pad, padSize);
 		}
 	}
 
@@ -1394,10 +1338,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				return false;
 			}
 
-			if (file.writeObj(meshHdr) != sizeof(meshHdr)) {
-				X_ERROR("Model", "Failed to write mesh header");
-				return false;
-			}
+			meshDataStream.write(meshHdr);
 		}
 	}
 
@@ -1409,25 +1350,14 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	{
 		size_t requiredStreamSize;
 
-		requiredStreamSize = compiledLods_[i].getSubDataSize(streamsFlags);
-
-		// writing this info to a stream makes write time 5x times faster.
-		stream.reserve(requiredStreamSize + (16 * 5));
-		stream.reset();
-
-		const size_t streamOffset = safe_static_cast<size_t>(file.tell() - sizeof(header));
+		requiredStreamSize = compiledLods_[i].getMeshDataSize(streamsFlags);
 
 		// this pads the stream so that the end of the stream is 16byte aligned.
-		auto padStream = [streamOffset, &stream]()
+		auto padStream = [&meshDataStream]()
 		{
-			const size_t curOffset = streamOffset + stream.size();
-			const size_t pad = core::bitUtil::RoundUpToMultiple<size_t>(curOffset, 16u) - curOffset;
-			for (size_t i = 0; i < pad; i++)
-			{
-				stream.write<uint8_t>(0xff);
-			}
-
-			X_ASSERT_ALIGNMENT(stream.size() + streamOffset, 16, 0);
+			const size_t paddedSize = core::bitUtil::RoundUpToMultiple(meshDataStream.size(), 16_sz);
+			
+			meshDataStream.zeroPadToLength(paddedSize);
 		};
 
 
@@ -1446,7 +1376,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				vert.pos = compiledVert.pos_;
 				vert.st = core::XHalf2::compress(compiledVert.uv_[0], compiledVert.uv_[1]);
 
-				stream.write(vert);
+				meshDataStream.write(vert);
 			}
 
 			padStream();
@@ -1464,7 +1394,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				{
 					for (size_t x = 0; x < compiledMesh.verts_.size(); x++)
 					{
-						stream.write(col);
+						meshDataStream.write(col);
 					}
 				}
 				else
@@ -1474,7 +1404,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 						const Vert& compiledVert = compiledMesh.verts_[x];
 
 						col = compiledVert.col_;
-						stream.write(col);
+						meshDataStream.write(col);
 					}
 				}
 			}
@@ -1494,7 +1424,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 					const Vert& rawVert = compiledMesh.verts_[x];
 
 					normal = rawVert.normal_;
-					stream.write(normal);
+					meshDataStream.write(normal);
 				}
 			}
 
@@ -1514,7 +1444,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 					tangent.binormal = rawVert.biNormal_;
 					tangent.tangent = rawVert.tangent_;
-					stream.write(tangent);
+					meshDataStream.write(tangent);
 				}
 			}
 
@@ -1528,17 +1458,17 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			{
 				const RawModel::Face& face = compiledMesh.faces_[x];
 
-				stream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[2]));
-				stream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[1]));
-				stream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[0]));
+				meshDataStream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[2]));
+				meshDataStream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[1]));
+				meshDataStream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[0]));
 			}
 		}
 
 		// Write the complete LOD's data all at once.
-		if (file.write(stream.begin(), stream.size()) != stream.size()) {
-			X_ERROR("Model", "Failed to write lod data");
-			return false;
-		}
+	//	if (file.write(stream.begin(), stream.size()) != stream.size()) {
+	//		X_ERROR("Model", "Failed to write lod data");
+	//		return false;
+	//	}
 
 		// write all the bind info.
 		for (auto& compiledMesh : compiledLods_[i].meshes_)
@@ -1550,6 +1480,58 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		}
 
 	}
+
+	// write everything to file.
+	{
+		// sanity checks.
+		X_ASSERT(matNameStream.size() == header.materialNameDataSize, "Incorrect size")();
+		X_ASSERT(tagNameStream.size() == header.tagNameDataSize, "Incorrect size")();
+		X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")();
+		X_ASSERT(physDataStream.size() == header.physDataSize, "Incorrect size")();
+		X_ASSERT(hitboxDataStream.size() == header.hitboxDataBlocks * 64, "Incorrect size")();
+		X_ASSERT(meshDataStream.size() == header.meshDataSize, "Incorrect size")();
+
+		X_ASSERT(matNameStream.freeSpace() == 0, "Stream incomplete")();
+		X_ASSERT(tagNameStream.freeSpace() == 0, "Stream incomplete")();
+		X_ASSERT(boneDataStream.freeSpace() == 0, "Stream incomplete")();
+		X_ASSERT(physDataStream.freeSpace() == 0, "Stream incomplete")();
+		X_ASSERT(hitboxDataStream.freeSpace() == 0, "Stream incomplete")();
+		X_ASSERT(meshDataStream.freeSpace() == 0, "Stream incomplete")();
+
+		if (file.writeObj(header) != sizeof(header)) {
+			X_ERROR("Modle", "Failed to write header");
+			return false;
+		}
+		if (file.write(matNameStream.ptr(), matNameStream.size()) != matNameStream.size()) {
+			X_ERROR("Modle", "Failed to write mat stream");
+			return false;
+		}
+		if (file.write(tagNameStream.ptr(), tagNameStream.size()) != tagNameStream.size()) {
+			X_ERROR("Modle", "Failed to write tag stream");
+			return false;
+		}
+		if (file.write(boneDataStream.ptr(), boneDataStream.size()) != boneDataStream.size()) {
+			X_ERROR("Modle", "Failed to write bone stream");
+			return false;
+		}
+		if (file.write(physDataStream.ptr(), physDataStream.size()) != physDataStream.size()) {
+			X_ERROR("Modle", "Failed to write phys stream");
+			return false;
+		}
+		if (file.write(hitboxDataStream.ptr(), hitboxDataStream.size()) != hitboxDataStream.size()) {
+			X_ERROR("Modle", "Failed to write hitbox stream");
+			return false;
+		}
+		if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
+			X_ERROR("Modle", "Failed to write mesh stream");
+			return false;
+		}
+	}
+
+
+#if X_DEBUG
+	X_ASSERT(file.tell() == (header.dataSize + sizeof(header)), "Incorrect header size")(file.tell(), header.dataSize + sizeof(header));
+#endif // X_DEBUG
 
 	return true;
 }
@@ -1578,14 +1560,14 @@ size_t ModelCompiler::calculateMaterialNameDataSize(void) const
 	return size;
 }
 
-size_t ModelCompiler::calculateSubDataSize(const Flags8<model::StreamType>& streams) const
+size_t ModelCompiler::calculateMeshDataSize(const Flags8<model::StreamType>& streams) const
 {
-	size_t size = this->calculateBoneDataSize();
+	size_t size = 0;
 
 	size += sizeof(model::SubMeshHeader) * totalMeshes();
 
 	for (auto& lod : compiledLods_) {
-		size += lod.getSubDataSize(streams);
+		size += lod.getMeshDataSize(streams);
 	}
 
 	return size;
@@ -1666,6 +1648,10 @@ size_t ModelCompiler::calculatePhysDataSize(void) const
 size_t ModelCompiler::calculateHitBoxDataSize(void) const
 {
 	size_t size = 0;
+
+	if (hitboxShapes_.isEmpty()) {
+		return size;
+	}
 
 	size += sizeof(HitBoxHdr);
 	size += sizeof(uint8_t) * hitboxShapes_.size();

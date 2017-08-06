@@ -605,12 +605,12 @@ struct ModelHeader // File header.
 	uint8_t numBlankBones;
 	uint8_t numMesh;
 	uint8_t numLod;
-	uint16_t boneDataSize;	// size of the bone data (pos,angles,tree)
+	uint16_t boneDataSize;	// size of the bone data (nameIdx, hierarchy,angles,pos)
 
 	core::dateTimeStampSmall modified; // 4
 
-	uint32_t dataSize;				// excludes size of header.
-	uint32_t subDataSize;			// mesh heads + meshdata + bone data(not names)
+	uint32_t dataSize;				// filesize - sizeof(ModelHeader).
+	uint32_t meshDataSize;			// mesh heads + meshdata + bone data(not names)
 	uint16_t materialNameDataSize;	// size of material name block
 	uint16_t tagNameDataSize;		// size of tag name block.
 

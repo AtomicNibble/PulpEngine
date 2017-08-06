@@ -20,8 +20,7 @@ bool ModelHeader::isValid(void) const
 		(numBones + numBlankBones) > 0 &&
 		numLod > 0 &&
 		numLod <= MODEL_MAX_LODS &&
-		materialNameDataSize > 0 &&
-		subDataSize > 0;
+		materialNameDataSize > 0;
 }
 
 // ==================================
@@ -102,7 +101,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 		// the tag names are after the material names.
 		const long tagNameOffset = sizeof(hdr) + hdr.materialNameDataSize;
 		// start of name index and tree
-		const long tagDataOffset = sizeof(hdr) + (hdr.dataSize - hdr.subDataSize);
+		const long tagDataOffset = sizeof(hdr) + hdr.materialNameDataSize + hdr.tagNameDataSize;
 
 		char TagNameBuf[model::MODEL_MAX_BONE_NAME_LENGTH * model::MODEL_MAX_BONES];
 
