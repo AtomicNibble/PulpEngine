@@ -263,6 +263,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 
 bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData)
 {
+	auto* pPhys = gEnv->pPhysics;
 
 	areas_.resize(fileHdr.numAreas);
 
@@ -629,10 +630,21 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(pModelName);
 
 				sm.pModel = X_ASSERT_NOT_NULL(pModel);
+			}
 
-				if (pModel->isLoaded() && pModel->hasPhys())
+			for (size_t i = 0; i < staticModels_.size(); i++)
+			{
+				level::StaticModel& sm = staticModels_[i];
+				model::XModel* pModel = sm.pModel;
+
+				if (!pModel->isLoaded())
 				{
-					auto actor = gEnv->pPhysics->createStaticActor(sm.transform, pModel);
+					engine::gEngEnv.pModelMan_->waitForLoad(pModel);
+				}
+
+				if (pModel->hasPhys())
+				{
+					auto actor = pPhys->createStaticActor(sm.transform, pModel);
 
 					pModel->addPhysToActor(actor);
 
