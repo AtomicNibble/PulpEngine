@@ -76,6 +76,8 @@ public:
 	void reloadModel(const char* pName);
 	void listModels(const char* pSearchPatten = nullptr) const;
 
+	bool waitForLoad(XModel* pModel); // returns true if load succeed.
+
 private:
 	bool initDefaults(void);
 	void freeDanglingMaterials(void);
@@ -83,7 +85,6 @@ private:
 
 
 	void queueLoadRequest(ModelResource* pModel);
-	bool waitForLoad(XModel* pModel); // returns true if load succeed.
 	void dispatchLoadRequest(ModelLoadRequest* pLoadReq);
 
 
