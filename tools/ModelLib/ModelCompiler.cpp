@@ -731,6 +731,11 @@ void ModelCompiler::setLodDistance(float32_t dis, size_t lodIdx)
 	lodDistances_[lodIdx] = dis;
 }
 
+void ModelCompiler::setAutoColGenType(ColGenType::Enum type)
+{
+	autoColGenType_ = type;
+}
+
 void ModelCompiler::printStats(void) const
 {
 	stats_.print(flags_);

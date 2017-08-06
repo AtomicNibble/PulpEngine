@@ -61,6 +61,12 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 			flags.Set(ModelCompiler::CompileFlag::EXT_WEIGHTS);
 		}
 	}
+	if (d.HasMember("auto_phys")) {
+		if (d["auto_phys"].GetBool()) {
+			flags.Set(ModelCompiler::CompileFlag::AUTO_PHYS_SHAPES);
+		}
+	}
+
 
 	// cooking is enabled by default.
 	flags.Set(ModelCompiler::CompileFlag::COOK_PHYS_MESH);
@@ -128,6 +134,43 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 		model.SetVertexElipson(d["vert_merge_thresh"].GetFloat());
 	}
 
+	if (d.HasMember("auto_phys_type")) {
+		const auto& val = d["auto_phys_type"];
+
+		using namespace core::Hash::Fnva1Literals;
+
+		switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength()))
+		{
+			case "box"_fnv1a:
+				model.setAutoColGenType(ColGenType::BOX);
+				break;
+			case "sphere"_fnv1a:
+				model.setAutoColGenType(ColGenType::SPHERE);
+				break;
+			case "per_mesh_box"_fnv1a:
+				model.setAutoColGenType(ColGenType::PER_MESH_BOX);
+				break;
+			case "per_mesh_sphere"_fnv1a:
+				model.setAutoColGenType(ColGenType::PER_MESH_SPHERE);
+				break;
+			case "kdop6"_fnv1a:
+				model.setAutoColGenType(ColGenType::KDOP_6);
+				break;
+			case "kdop14"_fnv1a:
+				model.setAutoColGenType(ColGenType::KDOP_14);
+				break;
+			case "kdop18"_fnv1a:
+				model.setAutoColGenType(ColGenType::KDOP_18);
+				break;
+			case "kdop26"_fnv1a:
+				model.setAutoColGenType(ColGenType::KDOP_26);
+				break;
+			default:
+				X_ERROR("Model", "Unknown auo gen type: \"%.*s\"", val.GetStringLength(), val.GetString());
+				return false;
+
+		}
+	}
 
 	// load file data
 	core::Array<uint8_t> fileData(host.getScratchArena());

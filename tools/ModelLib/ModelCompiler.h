@@ -240,6 +240,7 @@ public:
 	void SetScale(float scale);
 	void setFlags(CompileFlags flags);
 	void setLodDistance(float32_t dis, size_t lodIdx);
+	void setAutoColGenType(ColGenType::Enum type);
 	void printStats(void) const;
 
 	float getVertexElipson(void) const;
