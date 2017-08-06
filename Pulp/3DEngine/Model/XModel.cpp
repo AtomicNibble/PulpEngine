@@ -336,23 +336,36 @@ void XModel::addPhysToActor(physics::ActorHandle actor)
 	size_t total = hdr.totalShapes();
 	phys_data_cursor.seekBytes(total - 1);
 
-
+	auto* pPhys = gEnv->pPhysics;
 	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::BOX]; t++)
 	{
 		AABB* pAABB = phys_data_cursor.getSeekPtr<AABB>();
 		const Vec3f localPose = pAABB->center();
-		gEnv->pPhysics->addBox(actor, *pAABB, localPose);
+		pPhys->addBox(actor, *pAABB, localPose);
 	}
 
 	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::SPHERE]; t++)
 	{
-		Sphere* pSphere = phys_data_cursor.getSeekPtr<Sphere >();
-		gEnv->pPhysics->addSphere(actor, pSphere->radius(), pSphere->center());
+		Sphere* pSphere = phys_data_cursor.getSeekPtr<Sphere>();
+		pPhys->addSphere(actor, pSphere->radius(), pSphere->center());
 	}
 
 	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::CONVEX]; t++)
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		CollisionConvexHdr* pConvexHdr = phys_data_cursor.getSeekPtr<CollisionConvexHdr>();
+	
+		if (hdr_.flags.IsSet(ModelFlag::PHYS_BAKED))
+		{
+			size_t len = pConvexHdr->dataSize;
+			const uint8_t* pData = phys_data_cursor.postSeekPtr<uint8_t>(len);
+
+			auto convexMeshHandle = pPhys->createConvexMesh(pData, len);
+			pPhys->addConvexMesh(actor, convexMeshHandle);
+		}
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
 	}
 }
 
