@@ -320,11 +320,11 @@ bool XModelManager::waitForLoad(XModel* pModel)
 	{
 		return true;
 	}
-	else if( status == core::LoadStatus::Error)
+	else if(status == core::LoadStatus::Error)
 	{
 		return false;
 	}
-	else if (status == core::LoadStatus::NotLoaded)
+	else if(status == core::LoadStatus::NotLoaded)
 	{
 		// request never sent?
 	}
