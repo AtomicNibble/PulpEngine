@@ -135,16 +135,49 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	int32_t i, x;
 
 	core::MemCursor mat_name_cursor(data.get(), hdr.materialNameDataSize);
-	core::MemCursor tag_name_cursor(data.get() + hdr.materialNameDataSize, hdr.tagNameDataSize);
-	core::MemCursor cursor(data.get() + (hdr.dataSize - hdr.subDataSize), hdr.subDataSize);
+	core::MemCursor tag_name_cursor(mat_name_cursor.end(), hdr.tagNameDataSize);
+	core::MemCursor bone_data_cursor(tag_name_cursor.end(), hdr.boneDataSize);
+	core::MemCursor phys_data_cursor(bone_data_cursor.end(), hdr.physDataSize);
+	core::MemCursor hitbox_data_cursor(phys_data_cursor.end(), hdr.hitboxDataBlocks * 64);
+	core::MemCursor cursor(hitbox_data_cursor.end(), hdr.meshDataSize);
 	
 	const size_t numBone = hdr.numBones;
 	const size_t numBoneTotal = hdr.numBones + hdr.numBlankBones;
 
-	pTagNames_ = cursor.postSeekPtr<uint16_t>(numBoneTotal);
-	pTagTree_ = cursor.postSeekPtr<uint8_t>(numBone);
-	pBoneAngles_ = cursor.postSeekPtr<XQuatCompressedf>(numBone);
-	pBonePos_ = cursor.postSeekPtr<Vec3f>(numBone);
+	pTagNames_ = bone_data_cursor.postSeekPtr<uint16_t>(numBoneTotal);
+	pTagTree_ = bone_data_cursor.postSeekPtr<uint8_t>(numBone);
+	pBoneAngles_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
+	pBonePos_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
+
+
+	if (hdr.flags.IsSet(ModelFlag::PHYS_DATA))
+	{
+		// nothing todo.
+		// we use it later.
+	}
+
+	if (hdr.flags.IsSet(ModelFlag::HITBOX))
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+
+	/*
+	These streams are padded to 16byte align so we must seek past the
+	the padding bytes manually.
+	*/
+	auto seekCursorToPad = [&cursor]() {
+		// when the value is aligned we must work how much to seek by.
+		// we do this by taking a coon to market.
+		const char* pCur = cursor.getPtr<const char>();
+		const char* pAligned = core::pointerUtil::AlignTop(pCur, 16);
+
+		const size_t diff = union_cast<size_t>(pAligned - pCur);
+		cursor.seekBytes(diff);
+	};
+
+	seekCursorToPad();
+
 	pMeshHeads_ = cursor.getPtr<SubMeshHeader>();
 
 	// we now have the mesh headers.
@@ -163,22 +196,6 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 		// we have 3 blocks of data.
 		// Verts, Faces, Binddata
 		SubMeshHeader* meshHeads = lod.subMeshHeads;
-
-		/*
-		These streams are padded to 16byte align so we must seek past the
-		the padding bytes manually.
-		*/
-		auto seekCursorToPad = [&cursor]() {
-
-			// when the value is aligned we must work how much to seek by.
-			// we do this by taking a coon to market.
-			auto* pCur = cursor.getPtr<const char*>();
-			auto* pAligned = core::pointerUtil::AlignTop(pCur, 16);
-
-			const size_t diff = union_cast<size_t>(pAligned) - union_cast<size_t>(pCur);
-
-			cursor.seekBytes(static_cast<uint32_t>(diff));
-		};
 
 		seekCursorToPad();
 
