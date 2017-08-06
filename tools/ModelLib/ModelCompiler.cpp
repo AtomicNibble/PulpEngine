@@ -912,8 +912,13 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		header.boneDataSize +
 		header.physDataSize + 
 		(header.hitboxDataBlocks * 64) +
-		header.meshDataSize 
+		header.meshDataSize
 	);
+
+	// mesh data is 16byte aligned.
+	const uint32_t preMeshDataPadSize = (16 - ((header.dataSize - header.meshDataSize) % 16));
+
+	header.dataSize += preMeshDataPadSize;
 	
 	// fixed streams to make sure size calculations are correct.
 	core::FixedByteStreamOwning tagNameStream(arena_, header.tagNameDataSize);
@@ -1522,6 +1527,22 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			X_ERROR("Model", "Failed to write hitbox stream");
 			return false;
 		}
+
+		// make sure this stream starts on a 16byt boundry relative to header.
+		char pad[16] = {};
+		if (file.write(pad, preMeshDataPadSize) != preMeshDataPadSize) {
+			X_ERROR("Model", "Failed to write mesh stream");
+			return false;
+		}
+
+
+#if X_DEBUG
+		const auto fileSize = file.tell();
+		const auto headerRel = (fileSize - sizeof(header));
+		
+		X_ASSERT((headerRel % 16) == 0, "Not aligned")(fileSize, headerRel);
+#endif
+
 		if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
 			X_ERROR("Model", "Failed to write mesh stream");
 			return false;
