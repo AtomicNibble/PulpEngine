@@ -81,7 +81,7 @@ public:
 		return size_ - offset;
 	}
 
-	void seekBytes(int32_t num)
+	void seekBytes(size_t num)
 	{
 		seek<char>(num);
 	}
