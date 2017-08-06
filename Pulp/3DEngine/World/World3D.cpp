@@ -522,35 +522,6 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 		file.readObj(modelRefs.areaMultiRefs.ptr(), modelRefs.areaMultiRefs.size());
 	}
 
-	{
-		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::STATIC_MODELS);
-
-		staticModels_.resize(fileHdr.numStaticModels);
-		if (staticModels_.isNotEmpty())
-		{
-			// we read each item one by one since we are readong from a FileBuf.
-			for (size_t i = 0; i < staticModels_.size(); i++)
-			{
-				level::StaticModel& sm = staticModels_[i];
-				
-				level::FileStaticModel fsm;
-				file.readObj(fsm);
-
-				// copy over the info.
-				sm.transform.pos = fsm.pos;
-				sm.transform.quat = fsm.angle;
-				sm.boundingBox = fsm.boundingBox;
-				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.
-				sm.modelNameIdx = fsm.modelNameIdx;
-															 // models need to be loaded at some point.
-				const char* pModelName = strTable.getString(sm.modelNameIdx);
-				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(pModelName);
-
-				sm.pModel = X_ASSERT_NOT_NULL(pModel);
-			}
-		}
-	}
-
 
 	if (fileHdr.flags.IsSet(level::LevelFileFlags::COLLISION))
 	{
@@ -632,6 +603,45 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 		}
 
 	}
+
+	{
+		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::STATIC_MODELS);
+
+		staticModels_.resize(fileHdr.numStaticModels);
+		if (staticModels_.isNotEmpty())
+		{
+			// we read each item one by one since we are readong from a FileBuf.
+			for (size_t i = 0; i < staticModels_.size(); i++)
+			{
+				level::StaticModel& sm = staticModels_[i];
+
+				level::FileStaticModel fsm;
+				file.readObj(fsm);
+
+				// copy over the info.
+				sm.transform.pos = fsm.pos;
+				sm.transform.quat = fsm.angle;
+				sm.boundingBox = fsm.boundingBox;
+				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.
+				sm.modelNameIdx = fsm.modelNameIdx;
+				// models need to be loaded at some point.
+				const char* pModelName = strTable.getString(sm.modelNameIdx);
+				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(pModelName);
+
+				sm.pModel = X_ASSERT_NOT_NULL(pModel);
+
+				if (pModel->isLoaded())
+				{
+					auto actor = gEnv->pPhysics->createStaticActor(sm.transform, pModel);
+
+					pModel->addPhysToActor(actor);
+
+					pPhysScene_->addActorToScene(actor);
+				}
+			}
+		}
+	}
+
 
 	return true;
 }
