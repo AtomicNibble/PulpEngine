@@ -630,7 +630,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 
 				sm.pModel = X_ASSERT_NOT_NULL(pModel);
 
-				if (pModel->isLoaded())
+				if (pModel->isLoaded() && pModel->hasPhys())
 				{
 					auto actor = gEnv->pPhysics->createStaticActor(sm.transform, pModel);
 
