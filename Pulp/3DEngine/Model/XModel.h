@@ -7,6 +7,7 @@
 
 #include <IModel.h>
 #include <IRender.h>
+#include <IPhysics.h>
 
 #include "RenderMesh.h"
 
@@ -64,6 +65,8 @@ public:
 	void assignDefault(XModel* pDefault);
 
 	void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data);
+
+	void addPhysToActor(physics::ActorHandle actor);
 
 private:
 	int32_t id_;

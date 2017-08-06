@@ -8,6 +8,7 @@
 #include <IRender.h>
 #include <IConsole.h>
 #include <IShader.h>
+#include <IPhysics.h>
 #include <Threading\JobSystem2.h>
 
 #include "Material\MaterialManager.h"
@@ -320,6 +321,39 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	data_ = std::move(data);
 	hdr_ = hdr;
 	status_ = core::LoadStatus::Complete;
+}
+
+void XModel::addPhysToActor(physics::ActorHandle actor)
+{
+	X_ASSERT(hdr_.flags.IsSet(ModelFlag::PHYS_DATA), "no phys data")();
+
+	// we need the col header 
+	core::MemCursor phys_data_cursor(data_.get() + hdr_.materialNameDataSize +
+		hdr_.tagNameDataSize + hdr_.boneDataSize, hdr_.physDataSize);
+	
+	const CollisionInfoHdr& hdr = *phys_data_cursor.getSeekPtr<CollisionInfoHdr>();
+
+	size_t total = hdr.totalShapes();
+	phys_data_cursor.seekBytes(total - 1);
+
+
+	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::BOX]; t++)
+	{
+		AABB* pAABB = phys_data_cursor.getSeekPtr<AABB>();
+		const Vec3f localPose = pAABB->center();
+		gEnv->pPhysics->addBox(actor, *pAABB, localPose);
+	}
+
+	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::SPHERE]; t++)
+	{
+		Sphere* pSphere = phys_data_cursor.getSeekPtr<Sphere >();
+		gEnv->pPhysics->addSphere(actor, pSphere->radius(), pSphere->center());
+	}
+
+	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::CONVEX]; t++)
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
 }
 
 
