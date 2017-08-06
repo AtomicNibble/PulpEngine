@@ -921,7 +921,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	);
 
 	// mesh data is 16byte aligned.
-	const uint32_t preMeshDataPadSize = (16 - ((header.dataSize - header.meshDataSize) % 16));
+	uint32_t preMeshDataPadSize = 0;
+	if (((header.dataSize - header.meshDataSize) % 16) != 0) {
+		preMeshDataPadSize = (16 - ((header.dataSize - header.meshDataSize) % 16));
+	}
 
 	header.dataSize += preMeshDataPadSize;
 	
