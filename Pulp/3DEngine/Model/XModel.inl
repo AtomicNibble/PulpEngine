@@ -64,7 +64,7 @@ X_INLINE int32_t XModel::numVerts(size_t lodIdx) const
 	return hdr_.lodInfo[lodIdx].numVerts;
 }
 
-X_INLINE bool XModel::HasLods(void) const
+X_INLINE bool XModel::hasLods(void) const
 {
 	return numLods() > 1;
 }

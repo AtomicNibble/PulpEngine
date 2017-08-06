@@ -1588,7 +1588,7 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 
 		const float distanceFromCam = cam_.getPosition().distance(sm.transform.pos);
 
-		if (pModel->HasLods())
+		if (pModel->hasLods())
 		{
 			// work out which lod to select based on distance.
 			lodIdx = pModel->lodIdxForDistance(distanceFromCam);

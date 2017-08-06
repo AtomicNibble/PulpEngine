@@ -42,7 +42,7 @@ public:
 	X_INLINE int32_t numBlankBones(void) const;
 	X_INLINE int32_t numMeshTotal(void) const;
 	X_INLINE int32_t numVerts(size_t lodIdx) const;
-	X_INLINE bool HasLods(void) const;
+	X_INLINE bool hasLods(void) const;
 	X_INLINE size_t lodIdxForDistance(float distance) const;
 
 	X_INLINE const AABB& bounds(void) const;

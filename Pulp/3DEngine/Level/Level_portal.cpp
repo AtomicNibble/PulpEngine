@@ -687,7 +687,7 @@ void Level::DrawStaticModels(const uint32_t* pEntIds, uint32_t num)
 
 		const float distanceFromCam = cam_.getPosition().distance(sm.transform.pos);
 		
-		if (pModel->HasLods())
+		if (pModel->hasLods())
 		{
 			// work out which lod to select based on distance.
 			lodIdx = pModel->lodIdxForDistance(distanceFromCam);
