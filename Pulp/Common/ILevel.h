@@ -576,8 +576,8 @@ struct FileHeader
 		return fourCC == LVL_FOURCC;
 	}
 
-	core::MemCursor<uint8_t> memCursorForNode(uint8_t* pData, FileNodes::Enum node) const {
-		return core::MemCursor<uint8_t>(pData + nodes[node].offset, nodes[node].size);
+	core::MemCursor memCursorForNode(uint8_t* pData, FileNodes::Enum node) const {
+		return core::MemCursor(pData + nodes[node].offset, nodes[node].size);
 	}
 
 	core::XFileFixedBuf FileBufForNode(uint8_t* pData, FileNodes::Enum node) const

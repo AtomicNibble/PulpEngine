@@ -55,7 +55,7 @@ protected:
 	IdType CurrentBlock_;
 	size_t NumStrings_;
 	size_t WasteSize_;
-	core::MemCursor<BYTE*> Cursor_;
+	core::MemCursor Cursor_;
 	BYTE Buffer_[NumBlocks * BlockSize];
 };
 

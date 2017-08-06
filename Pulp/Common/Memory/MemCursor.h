@@ -6,7 +6,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-template<typename T>
 class MemCursor
 {
 public:

@@ -213,7 +213,7 @@ TEST(LZ5, Stream)
 		LZ5StreamDecode streamDe;
 
 		// we read the sizes and decompress.
-		core::MemCursor<uint8_t> memCur(compData.data(), compData.size());
+		core::MemCursor memCur(compData.data(), compData.size());
 
 		for (size_t i = 0; i < NUM; i++)
 		{

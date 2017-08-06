@@ -134,10 +134,10 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 {
 	int32_t i, x;
 
-	core::MemCursor<char> mat_name_cursor(data.get(), hdr.materialNameDataSize);
-	core::MemCursor<char> tag_name_cursor(data.get() + hdr.materialNameDataSize, hdr.tagNameDataSize);
-	core::MemCursor<char> cursor(data.get() + (hdr.dataSize - hdr.subDataSize), hdr.subDataSize);
-
+	core::MemCursor mat_name_cursor(data.get(), hdr.materialNameDataSize);
+	core::MemCursor tag_name_cursor(data.get() + hdr.materialNameDataSize, hdr.tagNameDataSize);
+	core::MemCursor cursor(data.get() + (hdr.dataSize - hdr.subDataSize), hdr.subDataSize);
+	
 	const size_t numBone = hdr.numBones;
 	const size_t numBoneTotal = hdr.numBones + hdr.numBlankBones;
 

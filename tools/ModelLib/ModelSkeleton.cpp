@@ -112,7 +112,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 			return false;
 		}
 
-		core::MemCursor<char> tag_name_cursor(TagNameBuf, hdr.tagNameDataSize);
+		core::MemCursor tag_name_cursor(TagNameBuf, hdr.tagNameDataSize);
 		core::StackString<MODEL_MAX_BONE_NAME_LENGTH> name;
 
 		for (size_t i = 0; i < hdr.numBones; i++)

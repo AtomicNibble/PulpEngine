@@ -269,7 +269,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 	// area data.
 	{
 		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> meshName;
-		core::MemCursor<uint8_t> cursor(pData + fileHdr.nodes[level::FileNodes::AREA_MODELS].offset,
+		core::MemCursor cursor(pData + fileHdr.nodes[level::FileNodes::AREA_MODELS].offset,
 			fileHdr.nodes[level::FileNodes::AREA_MODELS].size);
 
 		uint32_t x, numSub;

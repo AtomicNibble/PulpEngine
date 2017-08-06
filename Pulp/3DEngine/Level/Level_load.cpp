@@ -208,7 +208,7 @@ bool Level::ProcessData(void)
 	// area data.
 	{
 		core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> meshName;
-		core::MemCursor<uint8_t> cursor(pFileData_ + fileHdr_.nodes[FileNodes::AREA_MODELS].offset,
+		core::MemCursor cursor(pFileData_ + fileHdr_.nodes[FileNodes::AREA_MODELS].offset,
 			fileHdr_.nodes[FileNodes::AREA_MODELS].size);
 		uint32_t x, numSub;
 

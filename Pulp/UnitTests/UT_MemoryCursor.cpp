@@ -13,7 +13,7 @@ TEST(MemCusor, Seek) {
 
 	int pData[10] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-	core::MemCursor<int> cursor(pData, 10);
+	core::MemCursor cursor(pData, 10);
 
 	cursor.Seek<int>(5);
 
