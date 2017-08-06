@@ -3,7 +3,10 @@
 void GenerateUI( asset& Asset )
 {
     Asset.AddModel( "src", "" ).SetTitle("Src").SetToolTip( "Src Model" );
-    Asset.AddFloat( "lod0_dis", 0, 0, 100000 ).SetTitle("LOD0 Distance 1").SetToolTip( "Distance lod is used (0 always)" );
+    Asset.AddFloat( "lod0_dis", 0, 0, 100000 ).SetTitle("LOD0 Distance").SetToolTip( "Distance lod is used (0 always)" );
+    Asset.AddFloat( "lod1_dis", 0, 0, 100000 ).SetTitle("LOD1 Distance").SetToolTip( "Distance lod is used (0 always)" );
+    Asset.AddFloat( "lod2_dis", 0, 0, 100000 ).SetTitle("LOD2 Distance").SetToolTip( "Distance lod is used (0 always)" );
+    Asset.AddFloat( "lod3_dis", 0, 0, 100000 ).SetTitle("LOD3 Distance").SetToolTip( "Distance lod is used (0 always)" );
 
     Asset.BeginGroup("Options");
     {
