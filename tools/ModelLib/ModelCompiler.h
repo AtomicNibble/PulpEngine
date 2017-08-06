@@ -159,6 +159,7 @@ public:
 		~ColMesh() = default;
 
 		ColMeshType::Enum getType(void) const;
+		const AABB& getBoundingBox(void) const;
 		const Sphere& getBoundingSphere(void) const;
 		const CookedData& getCookedConvexData(void) const;
 		size_t getPhysDataSize(void) const;

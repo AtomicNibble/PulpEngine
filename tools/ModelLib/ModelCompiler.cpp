@@ -415,6 +415,13 @@ ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
 	return type_;
 }
 
+
+const AABB& ModelCompiler::ColMesh::getBoundingBox(void) const
+{
+	X_ASSERT(getType() == ColMeshType::BOX, "Invalid call on non AABB mesh")();
+	return boundingBox_;
+}
+
 const Sphere& ModelCompiler::ColMesh::getBoundingSphere(void) const
 {
 	X_ASSERT(getType() == ColMeshType::SPHERE, "Invalid call on non sphere mesh")();
@@ -1227,7 +1234,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 						}
 						break;
 					case ColMeshType::BOX:
-						if (file.writeObj<const AABB>(pColMesh->boundingBox_) != sizeof(AABB)) {
+						if (file.writeObj<const AABB>(pColMesh->getBoundingBox()) != sizeof(AABB)) {
 							X_ERROR("Model", "Failed to write col data");
 							return false;
 						}
