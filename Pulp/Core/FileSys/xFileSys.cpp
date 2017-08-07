@@ -1112,7 +1112,7 @@ size_t xFileSys::getMinimumSectorSize(void) const
 		}
 		else {
 			// if we fail to query bump it up to 4096 incase the one that failed needed 4096.
-			sectorSize = core::Max<size_t>(sectorSize, 0x4096);
+			sectorSize = core::Max<size_t>(sectorSize, 4096);
 		}
 	}
 
