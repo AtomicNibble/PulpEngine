@@ -149,7 +149,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	if (d.HasMember("compressionMethod"))
 	{
 		const auto& val = d["compressionMethod"];
-		using namespace core::Hash::Fnva1Literals;
+		using namespace core::Hash::Fnv1Literals;
 
 		/*
 			Best color compression[compressHighCol]
@@ -235,7 +235,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 			const auto& name = it->name;
 			const auto& val = it->value;
 
-			using namespace core::Hash::Fnva1Literals;
+			using namespace core::Hash::Fnv1Literals;
 
 			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
 			{

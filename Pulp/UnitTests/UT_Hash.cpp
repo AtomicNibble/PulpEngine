@@ -62,7 +62,7 @@ TEST(Hash, FnvaConst) {
 	static_assert(Fnv1aConst::Hash("readme.txt") == 0x966dcb41, "FnvaConst hash failure");
 	static_assert(Fnv1aConst::Hash("fat goat") == 0xCC731FDF, "FnvaConst hash failure");
 
-	using namespace core::Hash::Fnva1Literals;
+	using namespace core::Hash::Fnv1Literals;
 
 	static_assert(Fnv1aConst::Hash("readme.txt") == "readme.txt"_fnv1a, "FnvaConst hash failure");
 	static_assert(Fnv1aConst::Hash("fat goat") == "fat goat"_fnv1a, "FnvaConst hash failure");

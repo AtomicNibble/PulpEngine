@@ -83,7 +83,7 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 			const auto& name = it->name;
 			const auto& val = it->value;
 
-			using namespace core::Hash::Fnva1Literals;
+			using namespace core::Hash::Fnv1Literals;
 
 			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
 			{
@@ -137,7 +137,7 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 	if (d.HasMember("auto_phys_type")) {
 		const auto& val = d["auto_phys_type"];
 
-		using namespace core::Hash::Fnva1Literals;
+		using namespace core::Hash::Fnv1Literals;
 
 		switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength()))
 		{

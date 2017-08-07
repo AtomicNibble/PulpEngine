@@ -615,7 +615,7 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 
 		typeStr.toLowerCase();
 
-		using namespace core::Hash::Fnva1Literals;
+		using namespace core::Hash::Fnv1Literals;
 		switch (core::Hash::Fnv1aHash(typeStr.asChar(), typeStr.length()))
 		{
 			case "model"_fnv1a:

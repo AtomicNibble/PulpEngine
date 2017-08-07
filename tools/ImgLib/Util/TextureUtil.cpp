@@ -583,7 +583,7 @@ namespace Util
 			return Texturefmt::UNKNOWN;
 		}
 
-		using namespace core::Hash::Fnva1Literals;
+		using namespace core::Hash::Fnv1Literals;
 
 		static_assert(Texturefmt::ENUM_COUNT == 56, "Added additional texture fmts? this code needs updating.");
 
