@@ -35,7 +35,7 @@ TEST(Hash, crc32) {
 
 }
 
-TEST(Hash, Fnva) {
+TEST(Hash, Fnva1) {
 
 	uint32 hash = Fnv1aHash("readme.txt", 10);
 	uint64 hash64 = Int64::Fnv1aHash("readme.txt", 10);
@@ -46,7 +46,7 @@ TEST(Hash, Fnva) {
 	EXPECT_FALSE(hash == Fnv1aHash("readme.txt.", 11));
 }
 
-TEST(Hash, FnvaConst) {
+TEST(Hash, Fnva1Const) {
 
 	const uint32 hash = Fnv1aConst::Hash("readme.txt", 10);
 	const uint32 hash1 = Fnv1aConst::Hash("fat goat", 8);
