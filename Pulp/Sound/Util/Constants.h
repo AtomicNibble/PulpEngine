@@ -11,7 +11,5 @@ X_NAMESPACE_BEGIN(sound)
 
 
 
-static const AkGameObjectID GLOBAL_GAME_OBJECT_ID = static_cast<AkGameObjectID>(-2);
-
 
 X_NAMESPACE_END

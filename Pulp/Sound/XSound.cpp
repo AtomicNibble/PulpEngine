@@ -190,8 +190,10 @@ using namespace AK;
 
 X_NAMESPACE_BEGIN(sound)
 
+static_assert(GLOBAL_OBJECT_ID == static_cast<GameObjectID>(-2), "Should be negative 2 yo");
+
 XSound::XSound() :
-	globalObjID_(GLOBAL_GAME_OBJECT_ID), // 0 & -1  are reserved.
+	globalObjID_(GLOBAL_OBJECT_ID), // 0 && -1  are reserved.
 	initBankID_(AK_INVALID_BANK_ID),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false)

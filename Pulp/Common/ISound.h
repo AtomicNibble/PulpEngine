@@ -6,6 +6,12 @@
 
 X_NAMESPACE_BEGIN(sound)
 
+
+typedef uintptr_t GameObjectID;
+typedef uint32_t EventID;
+
+static const GameObjectID GLOBAL_OBJECT_ID = static_cast<GameObjectID>(-2);
+
 struct ISound : public core::IEngineSysBase
 {
 	virtual ~ISound(){};
