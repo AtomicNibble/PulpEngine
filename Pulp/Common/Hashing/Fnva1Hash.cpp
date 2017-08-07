@@ -9,11 +9,11 @@ namespace Hash
 	/*
 	 * 32 bit magic FNV-1a prime
 	 */
-	static const uint32_t FNV_32_PRIME = 0x01000193;
-	static const uint32_t FNV1_32_INIT = 0x811c9dc5;
+	static const uint32_t FNV_32_PRIME = 16777619u;
+	static const uint32_t FNV1_32_INIT = 2166136261u;
 	static const uint32_t FNV1_32A_INIT = FNV1_32_INIT;
 
-	unsigned int Fnv1aHash(const void* key, size_t length)
+	Fnv1aVal Fnv1aHash(const void* key, size_t length)
 	{
 		uint32_t i;
 		uint32_t hash = FNV1_32_INIT;
@@ -27,6 +27,20 @@ namespace Hash
 		return hash;
 	}
 
+	Fnv1Val Fnv1Hash(const void* key, size_t length)
+	{
+		uint32_t i;
+		uint32_t hash = FNV1_32_INIT;
+		unsigned char *s = (unsigned char*)key;
+
+		for (i = 0; i < length; ++i) {
+			hash *= FNV_32_PRIME;
+			hash ^= (uint32_t)*s++;
+		}
+
+		return hash;
+	}
+
 
 	namespace Int64
 	{
@@ -34,7 +48,7 @@ namespace Hash
 		static const uint64_t FNV1_64_INIT = 0x14650FB0739D0383;
 		static const uint64_t FNV1_64A_INIT = FNV1_64_INIT;
 
-		uint64_t Fnv1aHash(const void* key, size_t length)
+		Fnv1aVal Fnv1aHash(const void* key, size_t length)
 		{
 			size_t i;
 			uint64_t hash = FNV1_64_INIT;
@@ -45,6 +59,20 @@ namespace Hash
 				hash *= FNV_64_PRIME;
 			}
 		
+			return hash;
+		}
+
+		Fnv1Val Fnv1Hash(const void* key, size_t length)
+		{
+			size_t i;
+			uint64_t hash = FNV1_64_INIT;
+			unsigned char* s = (unsigned char *)key;
+
+			for (i = 0; i < length; ++i) {
+				hash *= FNV_64_PRIME;
+				hash ^= (uint64_t)*s++;
+			}
+
 			return hash;
 		}
 	}
