@@ -30,6 +30,7 @@ extern GameArena* g_gameArena;
 
 #include <IGame.h>
 #include <IEntity.h>
+#include <ISound.h>
 
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
