@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XSound.h"
 
+#include <Memory\SimpleMemoryArena.h>
+
 // id's
 #include "IDs\Wwise_IDs.h"
 
@@ -144,7 +146,9 @@ X_LINK_LIB("CommunicationCentral");
 namespace AK
 {
 	core::MallocFreeAllocator akAlloca;
+	core::SimpleMemoryArena<core::MallocFreeAllocator> akArena(&akAlloca, "AKArena");
 
+	// these are unresolved symbols in ak, so they get use just be been defined.
 	void* AllocHook(size_t in_size)
 	{
 		return akAlloca.allocate(in_size, 1, 0);
@@ -200,7 +204,8 @@ XSound::XSound() :
 	comsSysInit_(false),
 	outputCaptureEnabled_(false)
 {
-
+	// link to arena tree.
+	g_SoundArena->addChildArena(&akArena);
 }
 
 XSound::~XSound()
