@@ -246,6 +246,10 @@ namespace profiler
 	{
 #if X_ENABLE_PROFILER_WARNINGS
 
+		if (!gEnv->p3DEngine) {
+			return false;
+		}
+
 		auto* pMatMan = gEnv->p3DEngine->getMaterialManager();
 
 		for (auto& sub : subSystemInfo_)
