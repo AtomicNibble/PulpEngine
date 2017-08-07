@@ -71,6 +71,41 @@ TEST(Hash, Fnva1Const) {
 	EXPECT_TRUE(Fnv1aHash("fat goat", 8) == "fat goat"_fnv1a);
 }
 
+TEST(Hash, Fnva) {
+
+	uint32 hash = Fnv1Hash("readme.txt", 10);
+	uint64 hash64 = Int64::Fnv1Hash("readme.txt", 10);
+
+	EXPECT_TRUE(hash == 0x7b0fccd9);
+	EXPECT_TRUE(hash64 == 0xb0713f900802e0af);
+
+	EXPECT_FALSE(hash == Fnv1aHash("readme.txt.", 10));
+}
+
+TEST(Hash, FnvaConst) {
+
+	const uint32 hash = Fnv1Const::Hash("readme.txt", 10);
+	const uint32 hash1 = Fnv1Const::Hash("fat goat", 8);
+
+	EXPECT_TRUE(hash == 0x7b0fccd9);
+	EXPECT_TRUE(hash == Fnv1Hash("readme.txt", 10)); // check againstt runtime version.
+	EXPECT_FALSE(hash == Fnv1Const::Hash("readme.txt.", 11));
+
+	EXPECT_TRUE(hash1 == 0x9776cf9f);
+	EXPECT_TRUE(hash1 == Fnv1Hash("fat goat", 8)); // check againstt runtime version.
+
+	// compile time.
+	static_assert(Fnv1Const::Hash("readme.txt") == 0x7b0fccd9, "FnvaConst hash failure");
+	static_assert(Fnv1Const::Hash("fat goat") == 0x9776cf9f, "FnvaConst hash failure");
+
+	using namespace core::Hash::Fnv1Literals;
+
+	static_assert(Fnv1Const::Hash("readme.txt") == "readme.txt"_fnv1, "FnvaConst hash failure");
+	static_assert(Fnv1Const::Hash("fat goat") == "fat goat"_fnv1, "FnvaConst hash failure");
+
+	EXPECT_TRUE(Fnv1Hash("readme.txt", 10) == "readme.txt"_fnv1);
+	EXPECT_TRUE(Fnv1Hash("fat goat", 8) == "fat goat"_fnv1);
+}
 
 
 TEST(Hash, Murmur) {
