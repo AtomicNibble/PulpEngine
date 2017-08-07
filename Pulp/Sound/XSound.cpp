@@ -204,6 +204,7 @@ XSound::XSound() :
 
 XSound::~XSound()
 {
+
 }
 
 
@@ -482,6 +483,12 @@ bool XSound::init(void)
 		X_ERROR("SoundSys", "Error loading required sound-bank: init.bnk");
 		return false;
 	}
+
+	retValue = SoundEngine::LoadBank("sound/PlayerSounds.bnk", AK_DEFAULT_POOL_ID, initBankID_);
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error loading required sound-bank: Ambient.bnk");
+		return false;
+	}
 #endif // !SOUND_INIT_BANK_REQUIRED
 
 	return true;
@@ -638,6 +645,77 @@ void XSound::SetSFXVolume(float vol)
 
 	SoundEngine::SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
 }
+
+// ----------------------------------------------
+
+
+// the id is passed in, so could just pass pointer value in then use that as id.
+bool XSound::RegisterObject(GameObjectID object, const char* pNick)
+{
+	AKRESULT retValue = AK::SoundEngine::RegisterGameObj(object, pNick ? pNick : "");
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error registering object. Err: %i", retValue);
+		return false;
+	}
+
+	return true;
+}
+
+bool XSound::UnRegisterObject(GameObjectID object)
+{
+	AKRESULT retValue = AK::SoundEngine::UnregisterGameObj(object);
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error un-registering object. Err: %i", retValue);
+		return false;
+	}
+
+	return true;
+}
+
+
+X_INLINE const AkVector& Vec3ToAKVector(const Vec3f& vec)
+{
+	return reinterpret_cast<const AkVector&>(vec);
+}
+
+
+X_INLINE AkSoundPosition TransToAKPos(const Transformf& trans)
+{
+	AkSoundPosition pos;
+	pos.Position = Vec3ToAKVector(trans.pos);
+	// dunno what this is axis? TELL ME.
+	pos.Orientation.X = 0;
+	pos.Orientation.Y = 0;
+	pos.Orientation.Z = 0;
+
+	return pos;
+}
+
+void XSound::SetPosition(GameObjectID object, const Transformf& trans)
+{
+	AK::SoundEngine::SetPosition(object, TransToAKPos(trans));
+}
+
+void XSound::SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num)
+{
+	X_UNUSED(pObjects, pTrans, num);
+	X_ASSERT_NOT_IMPLEMENTED();
+}
+
+void XSound::PostEvent(EventID event, GameObjectID object)
+{
+	auto playingId = SoundEngine::PostEvent(event, object);
+	if (playingId == AK_INVALID_PLAYING_ID)
+	{
+		X_ERROR("Sound", "Failed to post event %" PRIu32, " object: %" PRIu32, event, object);
+	}
+	else
+	{
+		// goaty
+		X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
+	}
+}
+
 
 // ------------------ Commands ----------------------------
 

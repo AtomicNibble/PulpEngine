@@ -29,7 +29,15 @@ struct ISound : public core::IEngineSysBase
 	virtual void SetVoiceVolume(float vol) X_ABSTRACT;
 	virtual void SetSFXVolume(float vol) X_ABSTRACT;
 
+	// the id is passed in, so could just pass pointer value in then use that as id.
+	virtual bool RegisterObject(GameObjectID object, const char* pNick = nullptr) X_ABSTRACT;
+	virtual bool UnRegisterObject(GameObjectID object) X_ABSTRACT;
 
+	virtual void SetPosition(GameObjectID object, const Transformf& trans) X_ABSTRACT;
+	virtual void SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_ABSTRACT;
+
+	// events
+	virtual void PostEvent(EventID event, GameObjectID object) X_ABSTRACT;
 };
 
 X_NAMESPACE_END

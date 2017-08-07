@@ -22,24 +22,32 @@ public:
 	XSound();
 	virtual ~XSound() X_OVERRIDE;
 
-	virtual void registerVars(void) X_FINAL;
-	virtual void registerCmds(void) X_FINAL;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	virtual bool init(void) X_FINAL;
-	virtual void shutDown(void) X_FINAL;
-	virtual void release(void) X_FINAL;
+	bool init(void) X_FINAL;
+	void shutDown(void) X_FINAL;
+	void release(void) X_FINAL;
 
-	virtual void Update(void) X_FINAL;
-	virtual void StopAll(void) X_FINAL;
+	void Update(void) X_FINAL;
+	void StopAll(void) X_FINAL;
 
 	// Shut up!
-	virtual void Mute(bool mute) X_FINAL;
+	void Mute(bool mute) X_FINAL;
 
 	// Volume
-	virtual void SetMasterVolume(float v) X_FINAL;
-	virtual void SetMusicVolume(float vol) X_FINAL;
-	virtual void SetVoiceVolume(float vol) X_FINAL;
-	virtual void SetSFXVolume(float vol) X_FINAL;
+	void SetMasterVolume(float v) X_FINAL;
+	void SetMusicVolume(float vol) X_FINAL;
+	void SetVoiceVolume(float vol) X_FINAL;
+	void SetSFXVolume(float vol) X_FINAL;
+
+	bool RegisterObject(GameObjectID object, const char* pNick) X_FINAL;
+	bool UnRegisterObject(GameObjectID object) X_FINAL;
+	
+	void SetPosition(GameObjectID object, const Transformf& trans) X_FINAL;
+	void SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_FINAL;
+	
+	void PostEvent(EventID event, GameObjectID object) X_FINAL;
 
 private:
 
