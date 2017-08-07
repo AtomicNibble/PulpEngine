@@ -27,6 +27,9 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{30866814-56a6-45c1-9750-192eefcea609}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{551ba15d-2527-40fe-84a1-2bba30b12410}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -46,6 +49,9 @@
     </ClInclude>
     <ClInclude Include="Vars\SoundVars.h">
       <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Constants.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

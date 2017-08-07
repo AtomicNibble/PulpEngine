@@ -12,5 +12,19 @@
 extern core::MemoryArenaBase* g_SoundArena;
 
 
-// toggle that a sound bank is required to start.
-#define SOUND_INIT_BANK_REQUIRED 0
+X_DISABLE_WARNING(4505)
+
+// Sound Engine
+#include <AK/SoundEngine/Common/AkSoundEngine.h>
+#include <AK/SoundEngine/Common/AkModule.h>
+#include <AK/SoundEngine/Common/AkStreamMgrModule.h>
+
+// Music engine
+#include <AK/MusicEngine/Common/AkMusicEngine.h>
+
+
+
+X_ENABLE_WARNING(4505)
+
+
+#include "Util\Constants.h"

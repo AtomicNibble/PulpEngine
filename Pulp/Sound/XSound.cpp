@@ -10,14 +10,6 @@
 
 X_DISABLE_WARNING(4505)
 
-// Sound Engine
-#include <AK/SoundEngine/Common/AkSoundEngine.h>
-#include <AK/SoundEngine/Common/AkModule.h>
-#include <AK/SoundEngine/Common/AkStreamMgrModule.h>
-
-// Music engine
-#include <AK/MusicEngine/Common/AkMusicEngine.h>
-
 // Tools common
 #include <AK/Tools/Common/AkMonitorError.h>
 #include <AK/Tools/Common/AkPlatformFuncs.h>
@@ -199,7 +191,7 @@ using namespace AK;
 X_NAMESPACE_BEGIN(sound)
 
 XSound::XSound() :
-	globalObjID_(static_cast<AkGameObjectID>(-2)), // 0 & -1  are reserved.
+	globalObjID_(GLOBAL_GAME_OBJECT_ID), // 0 & -1  are reserved.
 	initBankID_(AK_INVALID_BANK_ID),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false)

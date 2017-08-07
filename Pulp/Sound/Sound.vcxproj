@@ -429,6 +429,7 @@
     <ClInclude Include="IO\AkIoHook.h" />
     <ClInclude Include="IPSound.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Vars\SoundVars.h" />
     <ClInclude Include="XSound.h" />
   </ItemGroup>
