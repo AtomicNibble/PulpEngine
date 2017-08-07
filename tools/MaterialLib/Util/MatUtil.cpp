@@ -6,12 +6,13 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+using namespace core::Hash::Fnv1Literals;
+
 namespace Util
 {
 	MaterialMountType::Enum MatMountTypeFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(MaterialMountType::ENUM_COUNT == 6, "Added additional material mount types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -39,8 +40,7 @@ namespace Util
 
 	MaterialCat::Enum MatCatFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(MaterialCat::ENUM_COUNT == 9, "Added additional material cats? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -71,8 +71,7 @@ namespace Util
 
 	MaterialUsage::Enum MatUsageFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		core::StackString<96, char> strUpper(pBegin, pEnd);
 		strUpper.toLower();
 
@@ -127,8 +126,7 @@ namespace Util
 
 	MaterialSurType::Enum MatSurfaceTypeFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		core::StackString<96, char> strUpper(pBegin, pEnd);
 		strUpper.toLower();
 
@@ -208,8 +206,7 @@ namespace Util
 
 	MaterialPolygonOffset::Enum MatPolyOffsetFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(MaterialPolygonOffset::ENUM_COUNT == 3, "Added additional polyoffsets? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -234,8 +231,7 @@ namespace Util
 
 	render::FilterType::Enum FilterTypeFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::FilterType::ENUM_COUNT == 10, "Added additional filter types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -272,8 +268,7 @@ namespace Util
 
 	render::TexRepeat::Enum TexRepeatFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::TexRepeat::ENUM_COUNT == 4, "Added additional repeat types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -296,8 +291,7 @@ namespace Util
 
 	render::CullType::Enum CullTypeFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::CullType::ENUM_COUNT == 3, "Added additional cull types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -318,8 +312,7 @@ namespace Util
 
 	render::BlendType::Enum BlendTypeFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::BlendType::ENUM_COUNT == 18, "Added additional blend types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -375,8 +368,7 @@ namespace Util
 
 	render::BlendOp::Enum BlendOpFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::BlendOp::ENUM_COUNT == 6, "Added additional blend op? this code needs updating.");
 		
 		const size_t len = (pEnd - pBegin);
@@ -446,8 +438,7 @@ namespace Util
 
 	render::DepthFunc::Enum DepthFuncFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::DepthFunc::ENUM_COUNT == 7, "Added additional depthFunc? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -479,8 +470,7 @@ namespace Util
 
 	render::TopoType::Enum TopoFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::TopoType::ENUM_COUNT == 5, "Added Topo types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -510,8 +500,7 @@ namespace Util
 
 	render::TextureSlot::Enum TextureSlotFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::TextureSlot::ENUM_COUNT == 8, "Added TextureSlots? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -542,8 +531,7 @@ namespace Util
 
 	render::StencilOperation::Enum StencilOpFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::StencilOperation::ENUM_COUNT == 8, "Added additional stencil op types? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -574,8 +562,7 @@ namespace Util
 
 	render::StencilFunc::Enum StencilFuncFromStr(const char* pBegin, const char* pEnd)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		static_assert(render::StencilFunc::ENUM_COUNT == 8, "Added additional stencil funcs? this code needs updating.");
 
 		const size_t len = (pEnd - pBegin);
@@ -606,8 +593,7 @@ namespace Util
 
 	int16_t TilingSizeFromStr(const char* str)
 	{
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(str, core::strUtil::strlen(str)))
 		{
 			case "auto"_fnv1a:
