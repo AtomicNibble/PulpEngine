@@ -324,6 +324,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// init the system baby!
 	gEnv->mainThreadId = core::Thread::GetCurrentID();			
+	gEnv->seed == startupParams.seed;
 
 	core::invalidParameterHandler::Startup(); 
 	core::exceptionHandler::Startup();

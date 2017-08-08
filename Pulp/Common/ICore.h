@@ -241,7 +241,8 @@ struct SCoreGlobals // obbject is zerod on start.
 	core::MemoryArenaBase*		pStrArena;
 
 	uint32_t					mainThreadId;	
-
+	
+	Vec4i						seed;
 	core::random::XorShift		xorShift;
 
 	X_INLINE SCoreGlobals() {
