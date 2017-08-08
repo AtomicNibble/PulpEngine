@@ -30,7 +30,6 @@ public:
 	void release(void) X_FINAL;
 
 	void Update(void) X_FINAL;
-	void StopAll(void) X_FINAL;
 
 	// Shut up!
 	void Mute(bool mute) X_FINAL;
@@ -46,11 +45,20 @@ public:
 
 	bool RegisterObject(GameObjectID object, const char* pNick) X_FINAL;
 	bool UnRegisterObject(GameObjectID object) X_FINAL;
-	
+	void UnRegisterAll(void) X_FINAL;
+
 	void SetPosition(GameObjectID object, const Transformf& trans) X_FINAL;
 	void SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_FINAL;
 	
+	void StopAll(GameObjectID object) X_FINAL;
+
 	void PostEvent(EventID event, GameObjectID object) X_FINAL;
+
+	void SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
+	void SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_FINAL;
+	void SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
+		core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve) X_FINAL;
+
 
 private:
 

@@ -191,6 +191,7 @@ using namespace AK;
 X_NAMESPACE_BEGIN(sound)
 
 static_assert(GLOBAL_OBJECT_ID == static_cast<GameObjectID>(-2), "Should be negative 2 yo");
+static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect");
 
 XSound::XSound() :
 	globalObjID_(GLOBAL_OBJECT_ID), // 0 && -1  are reserved.
@@ -603,13 +604,6 @@ void XSound::Mute(bool mute)
 	X_UNUSED(mute);
 }
 
-void XSound::StopAll(void)
-{
-	SoundEngine::StopAll();
-
-
-}
-
 // Volume
 void XSound::SetMasterVolume(float vol)
 {
@@ -682,34 +676,29 @@ bool XSound::UnRegisterObject(GameObjectID object)
 	return true;
 }
 
-
-X_INLINE const AkVector& Vec3ToAKVector(const Vec3f& vec)
+void XSound::UnRegisterAll(void)
 {
-	return reinterpret_cast<const AkVector&>(vec);
+	AKRESULT retValue = AK::SoundEngine::UnregisterAllGameObj();
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error un-registering all object. Err: %i", retValue);
+	}
 }
 
-
-X_INLINE AkSoundPosition TransToAKPos(const Transformf& trans)
-{
-	AkSoundPosition pos;
-	pos.Position = Vec3ToAKVector(trans.pos);
-	// dunno what this is axis? TELL ME.
-	pos.Orientation.X = 0;
-	pos.Orientation.Y = 0;
-	pos.Orientation.Z = 0;
-
-	return pos;
-}
 
 void XSound::SetPosition(GameObjectID object, const Transformf& trans)
 {
-	AK::SoundEngine::SetPosition(object, TransToAKPos(trans));
+	AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
 }
 
 void XSound::SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num)
 {
 	X_UNUSED(pObjects, pTrans, num);
 	X_ASSERT_NOT_IMPLEMENTED();
+}
+
+void XSound::StopAll(GameObjectID object)
+{
+	SoundEngine::StopAll(object);
 }
 
 void XSound::PostEvent(EventID event, GameObjectID object)
@@ -723,6 +712,127 @@ void XSound::PostEvent(EventID event, GameObjectID object)
 	{
 		// goaty
 		X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
+	}
+}
+
+void XSound::SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType)
+{
+	AkSwitchStateID state;
+
+	static_assert(engine::MaterialSurType::ENUM_COUNT == 26, "More surface types? this needs updating");
+
+	switch (surfaceType)
+	{
+		case engine::MaterialSurType::BRICK:
+			state = AK::SWITCHES::MATERIAL::SWITCH::BRICK;
+			break;
+		case engine::MaterialSurType::CONCRETE:
+			state = AK::SWITCHES::MATERIAL::SWITCH::CONCRETE;
+			break;
+		case engine::MaterialSurType::CLOTH:
+			state = AK::SWITCHES::MATERIAL::SWITCH::CLOTH;
+			break;
+		case engine::MaterialSurType::CARPET:
+			state = AK::SWITCHES::MATERIAL::SWITCH::CARPET;
+			break;
+		case engine::MaterialSurType::CERAMIC:
+			state = AK::SWITCHES::MATERIAL::SWITCH::CERAMIC;
+			break;
+
+		case engine::MaterialSurType::DIRT:
+			state = AK::SWITCHES::MATERIAL::SWITCH::DIRT;
+			break;
+
+		case engine::MaterialSurType::FLESH:
+			state = AK::SWITCHES::MATERIAL::SWITCH::FOLIAGE;
+			break;
+		case engine::MaterialSurType::FOLIAGE:
+			state = AK::SWITCHES::MATERIAL::SWITCH::FOLIAGE;
+			break;
+
+		case engine::MaterialSurType::GLASS:
+			state = AK::SWITCHES::MATERIAL::SWITCH::GLASS;
+			break;
+		case engine::MaterialSurType::GRASS:
+			state = AK::SWITCHES::MATERIAL::SWITCH::GRASS;
+			break;
+		case engine::MaterialSurType::GRAVEL:
+			state = AK::SWITCHES::MATERIAL::SWITCH::GRAVEL;
+			break;
+
+		case engine::MaterialSurType::ICE:
+			state = AK::SWITCHES::MATERIAL::SWITCH::ICE;
+			break;
+
+		case engine::MaterialSurType::METAL:
+			state = AK::SWITCHES::MATERIAL::SWITCH::METAL;
+			break;
+		case engine::MaterialSurType::METAL_THIN:
+			state = AK::SWITCHES::MATERIAL::SWITCH::METAL_THIN;
+			break;
+		case engine::MaterialSurType::METAL_HOLLOW:
+			state = AK::SWITCHES::MATERIAL::SWITCH::METAL_HOLLOW;
+			break;
+		case engine::MaterialSurType::MUD:
+			state = AK::SWITCHES::MATERIAL::SWITCH::MUD;
+			break;
+
+		case engine::MaterialSurType::PLASTIC:
+			state = AK::SWITCHES::MATERIAL::SWITCH::PLASTIC;
+			break;
+		case engine::MaterialSurType::PAPER:
+			state = AK::SWITCHES::MATERIAL::SWITCH::PAPER;
+			break;
+		case engine::MaterialSurType::PLASTER:
+			state = AK::SWITCHES::MATERIAL::SWITCH::PLASTER;
+			break;
+		case engine::MaterialSurType::ROCK:
+			state = AK::SWITCHES::MATERIAL::SWITCH::ROCK;
+			break;
+		case engine::MaterialSurType::RUBBER:
+			state = AK::SWITCHES::MATERIAL::SWITCH::RUBBER;
+			break;
+
+		case engine::MaterialSurType::SNOW:
+			state = AK::SWITCHES::MATERIAL::SWITCH::SNOW;
+			break;
+		case engine::MaterialSurType::SAND:
+			state = AK::SWITCHES::MATERIAL::SWITCH::SAND;
+			break;
+
+		case engine::MaterialSurType::WOOD:
+			state = AK::SWITCHES::MATERIAL::SWITCH::WOOD;
+			break;
+		case engine::MaterialSurType::WATER:
+			state = AK::SWITCHES::MATERIAL::SWITCH::WATER;
+			break;
+
+		default:
+			X_ERROR("SoundSys", "Error unhandled material type: \"%s\"", engine::MaterialSurType::ToString(surfaceType));
+			state = AK::SWITCHES::MATERIAL::SWITCH::CONCRETE;
+			break;
+	}
+
+	AKRESULT res = AK::SoundEngine::SetSwitch(AK::SWITCHES::MATERIAL::GROUP, state, object);
+	if (res != AK_Success) {
+		X_ERROR("SoundSys", "Error when setting material type: \"%s\". Err: %i", engine::MaterialSurType::ToString(surfaceType), res);
+	}
+}
+
+void XSound::SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object)
+{
+	AKRESULT res = AK::SoundEngine::SetSwitch(group, state, object);
+	if (res != AK_Success) {
+		X_ERROR("SoundSys", "Error when setting switch. group: %" PRIu32 " state: %" PRIu32 " Err: %i", state, group, res);
+	}
+}
+
+void XSound::SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
+	core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve)
+{
+	AKRESULT retValue = AK::SoundEngine::SetRTPCValue(id, val, object, ToAkTime(changeDuration), ToAkCurveInterpolation(fadeCurve));
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error set RTPC failed. Err: %i", retValue);
 	}
 }
 
