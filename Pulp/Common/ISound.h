@@ -75,6 +75,8 @@ struct ISound : public core::IEngineSysBase
 	// Shut up!
 	virtual void Mute(bool mute) X_ABSTRACT;
 
+	virtual void SetListenPos(const Transformf& trans) X_ABSTRACT;
+
 	// Volume
 	virtual void SetMasterVolume(float vol) X_ABSTRACT;
 	virtual void SetMusicVolume(float vol) X_ABSTRACT;

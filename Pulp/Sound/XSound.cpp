@@ -555,6 +555,19 @@ void XSound::Update(void)
 
 	if (AK::SoundEngine::IsInitialized())
 	{
+		AkListenerPosition listener;
+		listener.OrientationFront.X = 0;
+		listener.OrientationFront.Y = 0;
+		listener.OrientationFront.Z = 0;
+		listener.OrientationTop.X = 0;
+		listener.OrientationTop.Y = 0;
+		listener.OrientationTop.Z = 1.0f;
+		listener.Position = Vec3ToAkVector(listenerTrans_.pos);
+
+		AKRESULT res = SoundEngine::SetListenerPosition(listener);
+		if (res != AK_Success) {
+			X_ERROR("SoundSys", "Error setting listener pos. Err %i", res);
+		}
 
 		if (vars_.EnableOutputCapture() && !outputCaptureEnabled_)
 		{
@@ -609,6 +622,11 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 void XSound::Mute(bool mute)
 {
 	X_UNUSED(mute);
+}
+
+void XSound::SetListenPos(const Transformf& trans)
+{
+	listenerTrans_ = trans;
 }
 
 // Volume

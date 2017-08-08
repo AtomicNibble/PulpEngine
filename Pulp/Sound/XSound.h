@@ -34,6 +34,8 @@ public:
 	// Shut up!
 	void Mute(bool mute) X_FINAL;
 
+	void SetListenPos(const Transformf& trans) X_FINAL;
+
 	// Volume
 	void SetMasterVolume(float v) X_FINAL;
 	void SetMusicVolume(float vol) X_FINAL;
@@ -84,6 +86,7 @@ private:
 	bool comsSysInit_;
 	bool outputCaptureEnabled_;
 
+	Transformf listenerTrans_;
 };
 
 X_NAMESPACE_END
