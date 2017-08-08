@@ -331,6 +331,13 @@ bool XSound::init(void)
 		return false;
 	}
 
+	// set the seed.
+	{
+		auto& sv = gEnv->seed;
+		auto seed = sv[0] ^ sv[1] ^ sv[2] ^ sv[3];
+		SoundEngine::SetRandomSeed(seed);
+	}
+
 	// Initialize music engine.
 	if (MusicEngine::Init(&musicInit) != AK_Success)
 	{
