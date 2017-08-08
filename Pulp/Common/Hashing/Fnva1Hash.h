@@ -91,12 +91,12 @@ namespace Hash
 
 	namespace Fnv1Literals
 	{
-		inline constexpr uint32_t operator"" _fnv1a(const char* pStr, const size_t strLen)
+		inline constexpr uint32_t operator"" _fnv1a(const char* const pStr, const size_t strLen)
 		{
 			return Fnv1aConst::Internal::Hash(pStr, strLen, Fnv1aConst::default_offset_basis);
 		}
 
-		inline constexpr uint32_t operator"" _fnv1(const char* pStr, const size_t strLen)
+		inline constexpr uint32_t operator"" _fnv1(const char* const pStr, const size_t strLen)
 		{
 			return Fnv1Const::Internal::Hash(pStr, strLen, Fnv1Const::default_offset_basis);
 		}
