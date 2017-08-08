@@ -29,3 +29,4 @@ X_ENABLE_WARNING(4505)
 
 #include "Util\Constants.h"
 #include "Util\TypeHelpers.h"
+#include "Util\AkResult.h"
