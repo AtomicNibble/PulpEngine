@@ -648,6 +648,16 @@ void XSound::SetSFXVolume(float vol)
 
 // ----------------------------------------------
 
+uint32_t XSound::GetIDFromStr(const char* pStr)
+{
+	return SoundEngine::GetIDFromString(pStr);
+}
+
+uint32_t XSound::GetIDFromStr(const wchar_t* pStr)
+{
+	return SoundEngine::GetIDFromString(pStr);
+}
+
 
 // the id is passed in, so could just pass pointer value in then use that as id.
 bool XSound::RegisterObject(GameObjectID object, const char* pNick)

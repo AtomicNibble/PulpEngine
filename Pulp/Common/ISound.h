@@ -29,6 +29,9 @@ struct ISound : public core::IEngineSysBase
 	virtual void SetVoiceVolume(float vol) X_ABSTRACT;
 	virtual void SetSFXVolume(float vol) X_ABSTRACT;
 
+	virtual uint32_t GetIDFromStr(const char* pStr) X_ABSTRACT;
+	virtual uint32_t GetIDFromStr(const wchar_t* pStr) X_ABSTRACT;
+
 	// the id is passed in, so could just pass pointer value in then use that as id.
 	virtual bool RegisterObject(GameObjectID object, const char* pNick = nullptr) X_ABSTRACT;
 	virtual bool UnRegisterObject(GameObjectID object) X_ABSTRACT;
