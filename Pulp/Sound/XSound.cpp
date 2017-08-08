@@ -480,7 +480,8 @@ bool XSound::init(void)
 	// register a object for stuff with no position.
 	res = AK::SoundEngine::RegisterGameObj(globalObjID_, "GlobalObject");
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error creating global object. Err: %i", res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
 		return false;
 	}
 
@@ -526,12 +527,14 @@ void XSound::shutDown(void)
 
 		res = AK::SoundEngine::UnregisterGameObj(globalObjID_);
 		if (res != AK_Success) {
-			X_ERROR("SoundSys", "Error unregistering global objects. Err: %i", res);
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error unregistering global objects. %s", AkResult::ToString(res, desc));
 		}
 
 		res = AK::SoundEngine::ClearBanks();
 		if (res != AK_Success) {
-			X_ERROR("SoundSys", "Error clearing banks. Err: %i", res);
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error clearing banks. %s", AkResult::ToString(res, desc));
 		}
 
 
@@ -572,7 +575,8 @@ void XSound::Update(void)
 
 		AKRESULT res = SoundEngine::SetListenerPosition(listener);
 		if (res != AK_Success) {
-			X_ERROR("SoundSys", "Error setting listener pos. Err %i", res);
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));
 		}
 
 		if (vars_.EnableOutputCapture() && !outputCaptureEnabled_)
@@ -581,7 +585,8 @@ void XSound::Update(void)
 
 			res = AK::SoundEngine::StartOutputCapture(pFileName);
 			if (res != AK_Success) {
-				X_ERROR("SoundSys", "Error starting output capture. Err %i", res);
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error starting output capture. %s", AkResult::ToString(res, desc));
 			}
 
 			outputCaptureEnabled_ = true;
@@ -590,7 +595,8 @@ void XSound::Update(void)
 		{
 			res = AK::SoundEngine::StopOutputCapture();
 			if (res != AK_Success) {
-				X_ERROR("SoundSys", "Error stopping output capture. Err %i", res);
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error stopping output capture. %s", AkResult::ToString(res, desc));
 			}
 
 			outputCaptureEnabled_ = false;
@@ -610,13 +616,21 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 		if (wparam == 1) // activated
 		{
 			X_LOG2("SoundSys", "Suspending sound system");
-			AK::SoundEngine::Suspend(false);
+			AKRESULT res = AK::SoundEngine::Suspend(false);
+			if (res != AK_Success) {
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
+			}
 		}
 		else
 		{
 			X_LOG2("SoundSys", "Waking sound system from syspend");
 
-			AK::SoundEngine::WakeupFromSuspend();
+			AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
+			if (res != AK_Success) {
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
+			}
 			// might need to be called here not sure.
 			// SoundEngine::RenderAudio();
 		}
@@ -689,7 +703,8 @@ bool XSound::RegisterObject(GameObjectID object, const char* pNick)
 {
 	AKRESULT res = AK::SoundEngine::RegisterGameObj(object, pNick ? pNick : "");
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error registering object. Err: %i", res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
 		return false;
 	}
 
@@ -700,7 +715,8 @@ bool XSound::UnRegisterObject(GameObjectID object)
 {
 	AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error un-registering object. Err: %i", res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
 		return false;
 	}
 
@@ -711,14 +727,19 @@ void XSound::UnRegisterAll(void)
 {
 	AKRESULT res = AK::SoundEngine::UnregisterAllGameObj();
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error un-registering all object. Err: %i", res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error un-registering all object. %s", AkResult::ToString(res, desc));
 	}
 }
 
 
 void XSound::SetPosition(GameObjectID object, const Transformf& trans)
 {
-	AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
+	AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+	}
 }
 
 void XSound::SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num)
@@ -846,7 +867,8 @@ void XSound::SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surf
 
 	AKRESULT res = AK::SoundEngine::SetSwitch(AK::SWITCHES::MATERIAL::GROUP, state, object);
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error when setting material type: \"%s\". Err: %i", engine::MaterialSurType::ToString(surfaceType), res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error when setting material type: \"%s\". %s", engine::MaterialSurType::ToString(surfaceType), AkResult::ToString(res, desc));
 	}
 }
 
@@ -854,7 +876,8 @@ void XSound::SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID ob
 {
 	AKRESULT res = AK::SoundEngine::SetSwitch(group, state, object);
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error when setting switch. group: %" PRIu32 " state: %" PRIu32 " Err: %i", state, group, res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error when setting switch. group: %" PRIu32 " state: %" PRIu32 " %s", state, group, AkResult::ToString(res, desc));
 	}
 }
 
@@ -863,7 +886,8 @@ void XSound::SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
 {
 	AKRESULT res = AK::SoundEngine::SetRTPCValue(id, val, object, ToAkTime(changeDuration), ToAkCurveInterpolation(fadeCurve));
 	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error set RTPC failed. Err: %i", res);
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error set RTPC failed. %s", AkResult::ToString(res, desc));
 	}
 }
 
