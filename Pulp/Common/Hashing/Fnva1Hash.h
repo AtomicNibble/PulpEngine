@@ -66,23 +66,23 @@ namespace Hash
 
 		namespace Internal
 		{
-			constexpr static inline Fnv1aVal Hash(char const*const pStr, const uint32_t val)
+			constexpr inline Fnv1aVal Hash(char const*const pStr, const uint32_t val)
 			{
 				return !*pStr ? val : Hash(pStr + 1, static_cast<uint32_t>((*pStr ^ (val * static_cast<uint64_t>(prime))) & 0xFFFFFFFF));
 			}
 
-			constexpr static inline Fnv1aVal Hash(char const*const pStr, const size_t strLen, const uint32_t val)
+			constexpr inline Fnv1aVal Hash(char const*const pStr, const size_t strLen, const uint32_t val)
 			{
 				return (strLen == 0) ? val : Hash(pStr + 1, strLen - 1, static_cast<uint32_t>((*pStr ^ (val * static_cast<uint64_t>(prime))) & 0xFFFFFFFF));
 			}
 		} // namespace Internal
 
-		constexpr static inline Fnv1aVal Hash(char const*const pStr)
+		constexpr inline Fnv1aVal Hash(char const*const pStr)
 		{
 			return !*pStr ? default_offset_basis : Internal::Hash(pStr, default_offset_basis);
 		}
 
-		constexpr static inline Fnv1aVal Hash(char const*const pStr, const size_t strLen)
+		constexpr inline Fnv1aVal Hash(char const*const pStr, const size_t strLen)
 		{
 			return (strLen == 0) ? default_offset_basis : Internal::Hash(pStr, strLen, default_offset_basis);
 		}
