@@ -58,8 +58,9 @@ public:
 
 	void SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
 	void SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_FINAL;
-	void SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
-		core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve) X_FINAL;
+	void SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object = INVALID_OBJECT_ID,
+		core::TimeVal changeDuration = core::TimeVal(0ll), 
+		CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_FINAL;
 
 
 private:
