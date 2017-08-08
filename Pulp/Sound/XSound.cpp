@@ -615,7 +615,7 @@ void XSound::Mute(bool mute)
 void XSound::SetMasterVolume(float vol)
 {
 	// cap it between 0-1
-	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol = math<float>::clamp(vol, 0.f, 1.f);
 	// turn 0-1 into 0-255
 	vol *= 255.f;
 
@@ -625,7 +625,7 @@ void XSound::SetMasterVolume(float vol)
 
 void XSound::SetMusicVolume(float vol)
 {
-	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol = math<float>::clamp(vol, 0.f, 1.f);
 	vol *= 255.f;
 
 	SoundEngine::SetRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
@@ -633,7 +633,7 @@ void XSound::SetMusicVolume(float vol)
 
 void XSound::SetVoiceVolume(float vol)
 {
-	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol = math<float>::clamp(vol, 0.f, 1.f);
 	vol *= 255.f;
 
 	SoundEngine::SetRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
@@ -641,7 +641,7 @@ void XSound::SetVoiceVolume(float vol)
 
 void XSound::SetSFXVolume(float vol)
 {
-	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol = math<float>::clamp(vol, 0.f, 1.f);
 	vol *= 255.f;
 
 	SoundEngine::SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
