@@ -493,6 +493,12 @@ bool XSound::init(void)
 		return false;
 	}
 
+	res = SoundEngine::LoadBank("sound/Events.bnk", AK_DEFAULT_POOL_ID, initBankID_);
+	if (res != AK_Success) {
+		X_ERROR("SoundSys", "Error loading required sound-bank: Events.bnk");
+		return false;
+	}
+
 	res = SoundEngine::LoadBank("sound/PlayerSounds.bnk", AK_DEFAULT_POOL_ID, initBankID_);
 	if (res != AK_Success) {
 		X_ERROR("SoundSys", "Error loading required sound-bank: Ambient.bnk");
