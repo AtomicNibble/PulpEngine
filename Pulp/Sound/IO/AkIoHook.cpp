@@ -46,7 +46,8 @@ const wchar_t* IOhook::DEVICE_NAME = L"Engine VFS wrap";
 IOhook::IOhook() :
 	pFileSys_(nullptr),
 	deviceID_(AK_INVALID_DEVICE_ID),
-	asyncOpen_(false)
+	asyncOpen_(false),
+	minSectorSize_(4096)
 {
 
 }
@@ -80,6 +81,8 @@ AKRESULT IOhook::Init(const AkDeviceSettings& deviceSettings, bool AsyncOpen)
 		X_ERROR("SoundIO", "Failed to create device");
 		return AK_Fail;
 	}
+
+	minSectorSize_ = safe_static_cast<AkUInt32>(pFileSys_->getMinimumSectorSize());
 
 	return AK_Success;
 }
@@ -281,7 +284,7 @@ AKRESULT IOhook::Close(AkFileDesc& fileDesc)
 AkUInt32 IOhook::GetBlockSize(AkFileDesc& fileDesc)
 {
 	if (fileDesc.pCustomParam == 0) {
-		return safe_static_cast<AkUInt32,size_t>(pFileSys_->getMinimumSectorSize());
+		return minSectorSize_; 
 	}
 	return 1;
 }

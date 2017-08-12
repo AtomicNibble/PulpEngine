@@ -72,6 +72,7 @@ private:
 	AkDeviceID deviceID_;
 	bool asyncOpen_;
 
+	AkUInt32 minSectorSize_;
 };
 
 
