@@ -227,9 +227,11 @@ namespace strUtil
 			return true; 
 		}
 
-		return std::find_if(startInclusive, endExclusive, [&](char c) { 
-			return std::islower(c, loc);
-		}) != endExclusive;
+		auto it = std::find_if(startInclusive, endExclusive, [&](char c) { 
+			return std::isupper(c, loc);
+		});
+		
+		return it == endExclusive;
 	}
 
 
