@@ -117,29 +117,28 @@ namespace mapFile
 		{
 			const core::string& classname = it->second;
 
-			if (classname == "worldspawn")
+			using namespace core::Hash::Fnv1Literals;
+
+			switch (core::Hash::Fnv1aHash(classname.c_str(), classname.length()))
 			{
-				ent.classType = game::ClassType::WORLDSPAWN;
-			}
-			else if (classname == "misc_model")
-			{
-				ent.classType = game::ClassType::MISC_MODEL;
-			}
-			else if (classname == "info_player_start")
-			{
-				ent.classType = game::ClassType::PLAYER_START;
-			}
-			else if (classname == "func_group")
-			{
-				ent.classType = game::ClassType::FUNC_GROUP;
-			}
-			else if (classname == "script_origin")
-			{
-				ent.classType = game::ClassType::SCRIPT_ORIGIN;
-			}
-			else
-			{
-				X_WARNING("Lvl", "ent has unknown class type: \"%s\"", classname.c_str());
+				case "worldspawn"_fnv1a:
+					ent.classType = game::ClassType::WORLDSPAWN;
+					break;
+				case "misc_model"_fnv1a:
+					ent.classType = game::ClassType::MISC_MODEL;
+					break;
+				case "info_player_start"_fnv1a:
+					ent.classType = game::ClassType::PLAYER_START;
+					break;
+				case "func_group"_fnv1a:
+					ent.classType = game::ClassType::FUNC_GROUP;
+					break;
+				case "script_origin"_fnv1a:
+					ent.classType = game::ClassType::SCRIPT_ORIGIN;
+					break;
+				default:
+					X_WARNING("Lvl", "ent has unknown class type: \"%s\"", classname.c_str());
+					break;
 			}
 		}
 		else
