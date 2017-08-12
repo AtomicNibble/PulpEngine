@@ -51,6 +51,10 @@ namespace entity
 			return false;
 		}
 
+		if (!soundSys_.init()) {
+			return false;
+		}
+
 		for (uint32_t i = 0; i < MAX_PLAYERS; i++) {
 			auto id = createEnt();
 			if (id != i) {
@@ -84,6 +88,7 @@ namespace entity
 		// update the cameras.
 		cameraSys_.update(frame, reg_, pPhysScene_);
 
+		soundSys_.update(frame, reg_);
 	}
 
 

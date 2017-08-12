@@ -9,6 +9,7 @@
 #include "CameraSys.h"
 #include "InputSys.h"
 #include "PlayerSys.h"
+#include "SoundSys.h"
 
 X_NAMESPACE_DECLARE(core,
 	struct FrameTimeData;
@@ -72,7 +73,7 @@ namespace entity
 
 		PlayerSystem playerSys_;
 		CameraSystem cameraSys_;
-
+		SoundSystem soundSys_;
 	};
 
 
