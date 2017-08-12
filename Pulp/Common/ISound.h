@@ -97,6 +97,7 @@ struct ISound : public core::IEngineSysBase
 
 	// the id is passed in, so could just pass pointer value in then use that as id.
 	virtual bool registerObject(GameObjectID object, const char* pNick = nullptr) X_ABSTRACT;
+	virtual bool registerObject(GameObjectID object, const Transformf& trans, const char* pNick = nullptr) X_ABSTRACT;
 	virtual bool unRegisterObject(GameObjectID object) X_ABSTRACT;
 	virtual void unRegisterAll(void) X_ABSTRACT;
 

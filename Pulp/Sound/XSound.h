@@ -65,6 +65,7 @@ public:
 	uint32_t getIDFromStr(const wchar_t* pStr) const X_FINAL;
 
 	bool registerObject(GameObjectID object, const char* pNick) X_FINAL;
+	bool registerObject(GameObjectID object, const Transformf& trans, const char* pNick) X_FINAL;
 	bool unRegisterObject(GameObjectID object) X_FINAL;
 	void unRegisterAll(void) X_FINAL;
 

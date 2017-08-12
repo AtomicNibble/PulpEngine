@@ -878,6 +878,25 @@ bool XSound::registerObject(GameObjectID object, const char* pNick)
 	return true;
 }
 
+bool XSound::registerObject(GameObjectID object, const Transformf& trans, const char* pNick)
+{
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(object, pNick ? pNick : "");
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
+		return false;
+	}
+
+	res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Failed to set position post register. %s", AkResult::ToString(res, desc));
+		return false;
+	}
+
+	return true;
+}
+
 bool XSound::unRegisterObject(GameObjectID object)
 {
 	AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
