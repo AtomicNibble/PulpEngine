@@ -62,9 +62,16 @@ namespace strUtil
 	{
 		std::locale loc;
 
-		return std::find_if(startInclusive, endExclusive, [&](wchar_t c) {
-			return std::islower(c, loc);
-		}) != endExclusive;
+		size_t Len = endExclusive - startInclusive;
+		if (Len == 0) {
+			return true;
+		}
+
+		auto it = std::find_if(startInclusive, endExclusive, [&](char c) {
+			return std::isupper(c, loc);
+		});
+
+		return it == endExclusive;
 	}
 
 
