@@ -804,61 +804,61 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 
 
 // Shut up!
-void XSound::Mute(bool mute)
+void XSound::mute(bool mute)
 {
 	X_UNUSED(mute);
 }
 
-void XSound::SetListenPos(const Transformf& trans)
+void XSound::setListenPos(const Transformf& trans)
 {
 	listenerTrans_ = trans;
 }
 
 // Volume
-void XSound::SetMasterVolume(float vol)
+void XSound::setMasterVolume(float vol)
 {
 	// cap it between 0-1
 	vol = math<float>::clamp(vol, 0.f, 1.f);
 	// turn 0-1 into 0-255
 	vol *= 255.f;
 
-	SetRTPCValue(GAME_PARAMETERS::MASTERVOLUME, vol);
+	setRTPCValue(GAME_PARAMETERS::MASTERVOLUME, vol);
 }
 
 
-void XSound::SetMusicVolume(float vol)
+void XSound::setMusicVolume(float vol)
 {
 	vol = math<float>::clamp(vol, 0.f, 1.f);
 	vol *= 255.f;
 
-	SetRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
+	setRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
 }
 
-void XSound::SetVoiceVolume(float vol)
+void XSound::setVoiceVolume(float vol)
 {
 	vol = math<float>::clamp(vol, 0.f, 1.f);
 	vol *= 255.f;
 
-	SetRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
+	setRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
 }
 
-void XSound::SetSFXVolume(float vol)
+void XSound::setSFXVolume(float vol)
 {
 	vol = math<float>::clamp(vol, 0.f, 1.f);
 	vol *= 255.f;
 
-	SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
+	setRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
 }
 
 // ----------------------------------------------
 
-uint32_t XSound::GetIDFromStr(const char* pStr) const
+uint32_t XSound::getIDFromStr(const char* pStr) const
 {
 	X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
 	return SoundEngine::GetIDFromString(pStr);
 }
 
-uint32_t XSound::GetIDFromStr(const wchar_t* pStr) const
+uint32_t XSound::getIDFromStr(const wchar_t* pStr) const
 {
 	X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
 	return SoundEngine::GetIDFromString(pStr);
@@ -866,7 +866,7 @@ uint32_t XSound::GetIDFromStr(const wchar_t* pStr) const
 
 
 // the id is passed in, so could just pass pointer value in then use that as id.
-bool XSound::RegisterObject(GameObjectID object, const char* pNick)
+bool XSound::registerObject(GameObjectID object, const char* pNick)
 {
 	AKRESULT res = AK::SoundEngine::RegisterGameObj(object, pNick ? pNick : "");
 	if (res != AK_Success) {
@@ -878,7 +878,7 @@ bool XSound::RegisterObject(GameObjectID object, const char* pNick)
 	return true;
 }
 
-bool XSound::UnRegisterObject(GameObjectID object)
+bool XSound::unRegisterObject(GameObjectID object)
 {
 	AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
 	if (res != AK_Success) {
@@ -890,7 +890,7 @@ bool XSound::UnRegisterObject(GameObjectID object)
 	return true;
 }
 
-void XSound::UnRegisterAll(void)
+void XSound::unRegisterAll(void)
 {
 	AKRESULT res = AK::SoundEngine::UnregisterAllGameObj();
 	if (res != AK_Success) {
@@ -900,7 +900,7 @@ void XSound::UnRegisterAll(void)
 }
 
 
-void XSound::SetPosition(GameObjectID object, const Transformf& trans)
+void XSound::setPosition(GameObjectID object, const Transformf& trans)
 {
 	AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
 	if (res != AK_Success) {
@@ -909,18 +909,18 @@ void XSound::SetPosition(GameObjectID object, const Transformf& trans)
 	}
 }
 
-void XSound::SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num)
+void XSound::setPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num)
 {
 	X_UNUSED(pObjects, pTrans, num);
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-void XSound::StopAll(GameObjectID object)
+void XSound::stopAll(GameObjectID object)
 {
 	SoundEngine::StopAll(object);
 }
 
-void XSound::PostEvent(EventID event, GameObjectID object)
+void XSound::postEvent(EventID event, GameObjectID object)
 {
 	auto playingId = SoundEngine::PostEvent(event, object);
 	if (playingId == AK_INVALID_PLAYING_ID)
@@ -934,7 +934,7 @@ void XSound::PostEvent(EventID event, GameObjectID object)
 	}
 }
 
-void XSound::SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType)
+void XSound::setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType)
 {
 	AkSwitchStateID state;
 
@@ -1039,7 +1039,7 @@ void XSound::SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surf
 	}
 }
 
-void XSound::SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object)
+void XSound::setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object)
 {
 	AKRESULT res = AK::SoundEngine::SetSwitch(group, state, object);
 	if (res != AK_Success) {
@@ -1048,7 +1048,7 @@ void XSound::SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID ob
 	}
 }
 
-void XSound::SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
+void XSound::setRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
 	core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve)
 {
 	AKRESULT res = AK::SoundEngine::SetRTPCValue(id, val, object, ToAkTime(changeDuration), ToAkCurveInterpolation(fadeCurve));
@@ -1126,7 +1126,7 @@ void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
 	auto eventId = SoundEngine::GetIDFromString(pEventName);
 	X_LOG1("Sound", "snd_post_event: id: %" PRIu32, eventId);
 
-	PostEvent(eventId, objectId);
+	postEvent(eventId, objectId);
 }
 
 

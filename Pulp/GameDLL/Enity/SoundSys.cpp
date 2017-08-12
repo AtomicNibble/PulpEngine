@@ -30,7 +30,7 @@ namespace entity
 			auto& snd = reg.get<SoundObject>(entity);
 			auto& trans = reg.get<TransForm>(entity);
 
-			pSound_->SetPosition(reinterpret_cast<sound::GameObjectID>(&snd), trans);
+			pSound_->setPosition(reinterpret_cast<sound::GameObjectID>(&snd), trans);
 		}
 	}
 

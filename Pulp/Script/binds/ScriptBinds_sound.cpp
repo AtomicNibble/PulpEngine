@@ -74,7 +74,7 @@ int32_t XBinds_Sound::SetMasterVol(IFunctionHandler* pH)
 	float vol;
 
 	if (pH->GetParam(0, vol)) {
-		pSoundSys_->SetMasterVolume(vol);
+		pSoundSys_->setMasterVolume(vol);
 	}
 
 	return pH->EndFunction();
@@ -86,7 +86,7 @@ int32_t XBinds_Sound::SetMusicVol(IFunctionHandler* pH)
 	float vol;
 
 	if (pH->GetParam(0, vol)) {
-		pSoundSys_->SetMusicVolume(vol);
+		pSoundSys_->setMusicVolume(vol);
 	}
 
 	return pH->EndFunction();
@@ -98,7 +98,7 @@ int32_t XBinds_Sound::SetVoiceVol(IFunctionHandler* pH)
 	float vol;
 
 	if (pH->GetParam(0, vol)) {
-		pSoundSys_->SetVoiceVolume(vol);
+		pSoundSys_->setVoiceVolume(vol);
 	}
 
 	return pH->EndFunction();
@@ -110,7 +110,7 @@ int32_t XBinds_Sound::SetSFXVol(IFunctionHandler* pH)
 	float vol;
 
 	if (pH->GetParam(0, vol)) {
-		pSoundSys_->SetSFXVolume(vol);
+		pSoundSys_->setSFXVolume(vol);
 	}
 
 	return pH->EndFunction();

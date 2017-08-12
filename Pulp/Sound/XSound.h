@@ -51,33 +51,33 @@ public:
 	void Update(void) X_FINAL;
 
 	// Shut up!
-	void Mute(bool mute) X_FINAL;
+	void mute(bool mute) X_FINAL;
 
-	void SetListenPos(const Transformf& trans) X_FINAL;
+	void setListenPos(const Transformf& trans) X_FINAL;
 
 	// Volume
-	void SetMasterVolume(float v) X_FINAL;
-	void SetMusicVolume(float vol) X_FINAL;
-	void SetVoiceVolume(float vol) X_FINAL;
-	void SetSFXVolume(float vol) X_FINAL;
+	void setMasterVolume(float v) X_FINAL;
+	void setMusicVolume(float vol) X_FINAL;
+	void setVoiceVolume(float vol) X_FINAL;
+	void setSFXVolume(float vol) X_FINAL;
 
-	uint32_t GetIDFromStr(const char* pStr) const X_FINAL;
-	uint32_t GetIDFromStr(const wchar_t* pStr) const X_FINAL;
+	uint32_t getIDFromStr(const char* pStr) const X_FINAL;
+	uint32_t getIDFromStr(const wchar_t* pStr) const X_FINAL;
 
-	bool RegisterObject(GameObjectID object, const char* pNick) X_FINAL;
-	bool UnRegisterObject(GameObjectID object) X_FINAL;
-	void UnRegisterAll(void) X_FINAL;
+	bool registerObject(GameObjectID object, const char* pNick) X_FINAL;
+	bool unRegisterObject(GameObjectID object) X_FINAL;
+	void unRegisterAll(void) X_FINAL;
 
-	void SetPosition(GameObjectID object, const Transformf& trans) X_FINAL;
-	void SetPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_FINAL;
+	void setPosition(GameObjectID object, const Transformf& trans) X_FINAL;
+	void setPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_FINAL;
 	
-	void StopAll(GameObjectID object) X_FINAL;
+	void stopAll(GameObjectID object) X_FINAL;
 
-	void PostEvent(EventID event, GameObjectID object) X_FINAL;
+	void postEvent(EventID event, GameObjectID object) X_FINAL;
 
-	void SetMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
-	void SetSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_FINAL;
-	void SetRTPCValue(RtpcID id, RtpcValue val, GameObjectID object = INVALID_OBJECT_ID,
+	void setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
+	void setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_FINAL;
+	void setRTPCValue(RtpcID id, RtpcValue val, GameObjectID object = INVALID_OBJECT_ID,
 		core::TimeVal changeDuration = core::TimeVal(0ll), 
 		CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_FINAL;
 
