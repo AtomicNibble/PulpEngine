@@ -70,6 +70,10 @@ struct RenderView
 	Matrix33f viewAxis;
 };
 
+struct SoundObject
+{
+
+};
 
 struct Player
 {
@@ -116,6 +120,7 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 	PhysicsTrigger,
 	CharacterController,
 	ScriptName,
+	SoundObject,
 	Player
 >;
 
