@@ -944,7 +944,7 @@ void XSound::postEvent(EventID event, GameObjectID object)
 	auto playingId = SoundEngine::PostEvent(event, object);
 	if (playingId == AK_INVALID_PLAYING_ID)
 	{
-		X_ERROR("Sound", "Failed to post event %" PRIu32, " object: %" PRIu32, event, object);
+		X_ERROR("Sound", "Failed to post event %" PRIu32 " object: %" PRIu32, event, object);
 	}
 	else
 	{
