@@ -934,6 +934,20 @@ void XSound::postEvent(EventID event, GameObjectID object)
 	}
 }
 
+void XSound::postEvent(const char* pEventStr, GameObjectID object)
+{
+	auto playingId = SoundEngine::PostEvent(pEventStr, object);
+	if (playingId == AK_INVALID_PLAYING_ID)
+	{
+		X_ERROR("Sound", "Failed to post event \"%s\" object: %" PRIu32, pEventStr, object);
+	}
+	else
+	{
+		X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
+	}
+}
+
+
 void XSound::setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType)
 {
 	AkSwitchStateID state;

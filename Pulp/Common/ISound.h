@@ -109,6 +109,7 @@ struct ISound : public core::IEngineSysBase
 
 	// events
 	virtual void postEvent(EventID event, GameObjectID object) X_ABSTRACT;
+	virtual void postEvent(const char* pEventStr, GameObjectID object) X_ABSTRACT;
 
 	virtual void setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_ABSTRACT;
 	virtual void setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_ABSTRACT;

@@ -74,6 +74,8 @@ public:
 	void stopAll(GameObjectID object) X_FINAL;
 
 	void postEvent(EventID event, GameObjectID object) X_FINAL;
+	void postEvent(const char* pEventStr, GameObjectID object) X_FINAL;
+
 
 	void setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
 	void setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_FINAL;
