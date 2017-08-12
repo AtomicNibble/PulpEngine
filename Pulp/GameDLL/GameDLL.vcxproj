@@ -365,6 +365,7 @@
     <ClInclude Include="Enity\InputSys.h" />
     <ClInclude Include="Enity\PhysicsSystem.h" />
     <ClInclude Include="Enity\PlayerSys.h" />
+    <ClInclude Include="Enity\SoundSys.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="stdafx.h" />
@@ -380,6 +381,7 @@
     <ClCompile Include="Enity\InputSys.cpp" />
     <ClCompile Include="Enity\PhysicsSystem.cpp" />
     <ClCompile Include="Enity\PlayerSys.cpp" />
+    <ClCompile Include="Enity\SoundSys.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Module.cpp" />

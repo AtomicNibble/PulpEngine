@@ -93,6 +93,9 @@
     <ClInclude Include="Vars\PlayerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\SoundSys.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -133,6 +136,9 @@
     </ClCompile>
     <ClCompile Include="Vars\PlayerVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\SoundSys.cpp">
+      <Filter>Source Files\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
