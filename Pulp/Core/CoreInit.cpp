@@ -674,6 +674,11 @@ bool XCore::InitAsyncWait(void)
 	}
 #endif // !X_ENABLE_PROFILER
 
+	if (env_.pSound)
+	{
+		allOk &= env_.pSound->asyncInitFinalize();
+	}
+
 	return allOk;
 }
 
