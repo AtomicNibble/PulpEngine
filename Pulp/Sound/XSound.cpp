@@ -693,13 +693,13 @@ void XSound::SetSFXVolume(float vol)
 
 // ----------------------------------------------
 
-uint32_t XSound::GetIDFromStr(const char* pStr)
+uint32_t XSound::GetIDFromStr(const char* pStr) const
 {
 	X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
 	return SoundEngine::GetIDFromString(pStr);
 }
 
-uint32_t XSound::GetIDFromStr(const wchar_t* pStr)
+uint32_t XSound::GetIDFromStr(const wchar_t* pStr) const
 {
 	X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
 	return SoundEngine::GetIDFromString(pStr);

@@ -42,8 +42,8 @@ public:
 	void SetVoiceVolume(float vol) X_FINAL;
 	void SetSFXVolume(float vol) X_FINAL;
 
-	uint32_t GetIDFromStr(const char* pStr) X_FINAL;
-	uint32_t GetIDFromStr(const wchar_t* pStr) X_FINAL;
+	uint32_t GetIDFromStr(const char* pStr) const X_FINAL;
+	uint32_t GetIDFromStr(const wchar_t* pStr) const X_FINAL;
 
 	bool RegisterObject(GameObjectID object, const char* pNick) X_FINAL;
 	bool UnRegisterObject(GameObjectID object) X_FINAL;
