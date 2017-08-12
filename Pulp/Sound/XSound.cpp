@@ -159,6 +159,7 @@ namespace AK
 	{
 		return ::VirtualAlloc(in_pMemAddress, in_size, in_dwAllocationType, in_dwProtect);
 	}
+
 	void VirtualFreeHook(
 		void* in_pMemAddress,
 		size_t in_size,
