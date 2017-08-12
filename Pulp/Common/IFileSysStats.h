@@ -84,7 +84,7 @@ struct IOQueueStats
 		for (uint32_t i = 0; i < IoRequest::ENUM_COUNT; i++)
 		{
 			float ms = core::TimeVal(RequestTime[i]).GetMilliSeconds();
-			buf.appendFmt("Req[%s]: ^6%" PRIuS " ^2%.2gms^~\n", IoRequest::ToString(i), RequestCounts[i], ms);
+			buf.appendFmt("Req[%s]: ^6%" PRIuS " ^2%gms^~\n", IoRequest::ToString(i), RequestCounts[i], ms);
 		}
 
 		return buf.c_str();
