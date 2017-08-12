@@ -6,6 +6,7 @@
 
 #include "IO\AkIoHook.h"
 #include "Vars\SoundVars.h"
+#include "Util\Allocators.h"
 
 #include <Threading\Signal.h>
 
@@ -111,6 +112,7 @@ private:
 	void cmd_ListBanks(core::IConsoleCmdArgs* pArgs);
 
 private:
+	AllocatorHooks allocators_;
 	IOhook ioHook_;
 
 private:

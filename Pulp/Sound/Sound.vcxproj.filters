@@ -62,6 +62,9 @@
     <ClInclude Include="Util\AkResult.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Allocators.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -80,6 +83,9 @@
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
     <ClCompile Include="Util\AkResult.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Allocators.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "XSound.h"
 
-#include <Memory\SimpleMemoryArena.h>
 
 // id's
 #include "IDs\Wwise_IDs.h"
@@ -135,39 +134,13 @@ X_LINK_LIB("ws2_32"); // used for winsock
 X_LINK_LIB("CommunicationCentral");
 #endif // !X_SUPER
 
-namespace AK
+
+using namespace AK;
+
+X_NAMESPACE_BEGIN(sound)
+
+namespace
 {
-	core::MallocFreeAllocator akAlloca;
-	core::SimpleMemoryArena<core::MallocFreeAllocator> akArena(&akAlloca, "AKArena");
-
-	// these are unresolved symbols in ak, so they get use just be been defined.
-	void* AllocHook(size_t in_size)
-	{
-		return akAlloca.allocate(in_size, 1, 0);
-	}
-	void FreeHook(void * in_ptr)
-	{
-		akAlloca.free(in_ptr);
-	}
-
-	void* VirtualAllocHook(
-		void* in_pMemAddress,
-		size_t in_size,
-		DWORD in_dwAllocationType,
-		DWORD in_dwProtect
-		)
-	{
-		return ::VirtualAlloc(in_pMemAddress, in_size, in_dwAllocationType, in_dwProtect);
-	}
-
-	void VirtualFreeHook(
-		void* in_pMemAddress,
-		size_t in_size,
-		DWORD in_dwFreeType
-		)
-	{
-		::VirtualFree(in_pMemAddress, in_size, in_dwFreeType);
-	}
 
 	void akAssertHook(const char* pszExpression, const char* pszFileName, int lineNumber)
 	{
@@ -178,18 +151,15 @@ namespace AK
 			.Variable("LineNumber", lineNumber);
 
 #else
-		X_ERROR("SoundSys", "Sound system threw a assert: Exp: \"%s\" file: \"%s\" line: \"%s\"", 
+		X_ERROR("SoundSys", "Sound system threw a assert: Exp: \"%s\" file: \"%s\" line: \"%s\"",
 			pszExpression, pszFileName, lineNumber);
 #endif
 
 		X_BREAKPOINT;
 	}
 
-}
 
-using namespace AK;
-
-X_NAMESPACE_BEGIN(sound)
+} // namespace
 
 static_assert(GLOBAL_OBJECT_ID == static_cast<GameObjectID>(-2), "Should be negative 2 yo");
 static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect");
@@ -200,8 +170,8 @@ XSound::XSound() :
 	outputCaptureEnabled_(false),
 	bankSignal_(true)
 {
-	// link to arena tree.
-	g_SoundArena->addChildArena(&akArena);
+
+
 }
 
 XSound::~XSound()

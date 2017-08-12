@@ -430,6 +430,7 @@
     <ClInclude Include="IPSound.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Util\AkResult.h" />
+    <ClInclude Include="Util\Allocators.h" />
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\TypeHelpers.h" />
     <ClInclude Include="Vars\SoundVars.h" />
@@ -453,6 +454,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Util\AkResult.cpp" />
+    <ClCompile Include="Util\Allocators.cpp" />
     <ClCompile Include="Vars\SoundVars.cpp" />
     <ClCompile Include="XSound.cpp" />
   </ItemGroup>
