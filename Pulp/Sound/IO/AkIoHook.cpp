@@ -124,7 +124,11 @@ AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
 			return AK_InvalidParameter;
 		}
 
-		core::XFileAsync* pFile = pFileSys_->openFileAsync(pszFileName, mode);
+		core::Path<AkOSChar> path;
+		path.append(L"sound/");
+		path.append(pszFileName);
+
+		core::XFileAsync* pFile = pFileSys_->openFileAsync(path.c_str(), mode);
 		if (!pFile) {
 			return AK_Fail;
 		}
