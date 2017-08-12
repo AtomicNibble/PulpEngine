@@ -167,10 +167,25 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
 	{
 		// sync open
 		SyncOpen = true;
+		core::fileModeFlags mode = AKModeToEngineMode(eOpenMode);
+		if (!mode.IsAnySet()) {
+			return AK_InvalidParameter;
+		}
 
-		X_ASSERT_NOT_IMPLEMENTED();
+		core::Path<AkOSChar> path;
+		path.appendFmt(L"sound/%" PRIu32 L".wem", fileID);
+		
+		core::XFileAsync* pFile = pFileSys_->openFileAsync(path.c_str(), mode);
+		if (!pFile) {
+			return AK_Fail;
+		}
 
-
+		outFileDesc.hFile = pFile;
+		outFileDesc.iFileSize = pFile->fileSize();
+		outFileDesc.uSector = 0;
+		outFileDesc.deviceID = deviceID_;
+		outFileDesc.pCustomParam = (eOpenMode == AK_OpenModeRead) ? nullptr : (void*)1;
+		outFileDesc.uCustomParamSize = 0;
 		return AK_Success;
 	}
 
