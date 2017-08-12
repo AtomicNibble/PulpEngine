@@ -133,6 +133,10 @@ namespace mapFile
 			{
 				ent.classType = game::ClassType::FUNC_GROUP;
 			}
+			else if (classname == "script_origin")
+			{
+				ent.classType = game::ClassType::SCRIPT_ORIGIN;
+			}
 			else
 			{
 				X_WARNING("Lvl", "ent has unknown class type: \"%s\"", classname.c_str());

@@ -977,7 +977,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 			core::ArrayAllocator<const level::LvlEntity*>, 
 			core::growStrat::Multiply>, game::ClassType::ENUM_COUNT
 				> classEnts{
-			X_PP_REPEAT_COMMA_SEP(5, g_arena)
+			X_PP_REPEAT_COMMA_SEP(6, g_arena)
 		};
 
 		for (size_t i = 0; i < ents.size(); i++)
