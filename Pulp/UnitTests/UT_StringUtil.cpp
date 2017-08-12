@@ -218,6 +218,49 @@ TEST(StringUtil, IsAlphaU)
 	}
 }
 
+TEST(StringUtil, IsLower)
+{
+	EXPECT_TRUE(core::strUtil::IsLower('c'));
+	EXPECT_TRUE(core::strUtil::IsLower('a'));
+	EXPECT_FALSE(core::strUtil::IsLower('C'));
+	EXPECT_FALSE(core::strUtil::IsLower('G'));
+
+	EXPECT_TRUE(core::strUtil::IsLower("tickle my pickle 342 'sfs'f1414"));
+	EXPECT_FALSE(core::strUtil::IsLower("tickle mN pickle 342 'sfs'f1414"));
+
+	char testStr[] = ";gsgsdlpwotimbnaw536sv0'252'v'302,v";
+	EXPECT_TRUE(core::strUtil::IsLower("tickle my pickle 342 'sfs'f1414"));
+	EXPECT_TRUE(core::strUtil::IsLower(testStr, testStr + sizeof(testStr)));
+
+	char testStr2[] = "hello i'm a GOAT";
+	EXPECT_TRUE(core::strUtil::IsLower(testStr2, testStr2 + (sizeof(testStr2) - 5)));
+	EXPECT_FALSE(core::strUtil::IsLower(testStr2, testStr2 + sizeof(testStr2)));
+
+	EXPECT_TRUE(core::strUtil::IsLower(""));
+}
+
+TEST(StringUtil, IsLowerW)
+{
+	EXPECT_TRUE(core::strUtil::IsLowerW(L'c'));
+	EXPECT_TRUE(core::strUtil::IsLowerW(L'a'));
+	EXPECT_FALSE(core::strUtil::IsLowerW(L'C'));
+	EXPECT_FALSE(core::strUtil::IsLowerW(L'G'));
+
+
+	EXPECT_TRUE(core::strUtil::IsLower(L"tickle my pickle 342 'sfs'f1414"));
+	EXPECT_FALSE(core::strUtil::IsLower(L"tickle mN pickle 342 'sfs'f1414"));
+
+	wchar_t testStr[] = L";gsgsdlpwotimbnaw536sv0'252'v'302,v";
+	EXPECT_TRUE(core::strUtil::IsLower(L"tickle my pickle 342 'sfs'f1414"));
+	EXPECT_TRUE(core::strUtil::IsLower(testStr, testStr + (sizeof(testStr) / 2)));
+
+	wchar_t testStr2[] = L"hello i'm a GOAT";
+	EXPECT_TRUE(core::strUtil::IsLower(testStr2, testStr2 + ((sizeof(testStr2)/2) - 5)));
+	EXPECT_FALSE(core::strUtil::IsLower(testStr2, testStr2 + (sizeof(testStr2) / 2)));
+
+	EXPECT_TRUE(core::strUtil::IsLower(""));
+}
+
 
 TEST(StringUtil, Digit) {
 
