@@ -194,10 +194,10 @@ static_assert(GLOBAL_OBJECT_ID == static_cast<GameObjectID>(-2), "Should be nega
 static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect");
 
 XSound::XSound() :
-	globalObjID_(GLOBAL_OBJECT_ID), // 0 && -1  are reserved.
-	initBankID_(AK_INVALID_BANK_ID),
+	banks_(g_SoundArena),
 	comsSysInit_(false),
-	outputCaptureEnabled_(false)
+	outputCaptureEnabled_(false),
+	bankSignal_(true)
 {
 	// link to arena tree.
 	g_SoundArena->addChildArena(&akArena);
@@ -233,6 +233,9 @@ void XSound::registerCmds(void)
 
 	ADD_COMMAND_MEMBER("snd_stop_all_event", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
 		"Stop all audio events for a object. <ObjectId>");
+
+	ADD_COMMAND_MEMBER("listSndBanks", this, XSound, &XSound::cmd_ListBanks, core::VarFlag::SYSTEM,
+		"List all the loaded sound banks");
 
 }
 
@@ -280,7 +283,7 @@ bool XSound::init(void)
 	// Create an IO device.
 	deviceSettings.uSchedulerTypeFlags = AK_SCHEDULER_DEFERRED_LINED_UP;
 	deviceSettings.uIOMemorySize = vars_.StreamDeviceMemoryPoolBytes();
-	if (ioHook_.Init(deviceSettings) != AK_Success)
+	if (ioHook_.Init(deviceSettings, true) != AK_Success)
 	{
 		X_ERROR("SoundSys", "Cannot create streaming I/O device");
 		return false;
@@ -478,42 +481,198 @@ bool XSound::init(void)
 	AKRESULT res;
 
 	// register a object for stuff with no position.
-	res = AK::SoundEngine::RegisterGameObj(globalObjID_, "GlobalObject");
+	res = AK::SoundEngine::RegisterGameObj(GLOBAL_OBJECT_ID, "GlobalObject");
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
 		return false;
 	}
 
-#if SOUND_INIT_BANK_REQUIRED
-	// load init bank.
-	res = SoundEngine::LoadBank("sound/Init.bnk", AK_DEFAULT_POOL_ID, initBankID_);
-	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error loading required sound-bank: init.bnk");
-		return false;
-	}
+	// dispatch async loads for base banks.
+	loadBank("Init.bnk");
+	loadBank("Events.bnk");
 
-	res = SoundEngine::LoadBank("sound/Events.bnk", AK_DEFAULT_POOL_ID, initBankID_);
-	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error loading required sound-bank: Events.bnk");
-		return false;
-	}
+	// temp
+	loadBank("PlayerSounds.bnk");
+	loadBank("Ambient.bnk");
 
-	res = SoundEngine::LoadBank("sound/PlayerSounds.bnk", AK_DEFAULT_POOL_ID, initBankID_);
-	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error loading required sound-bank: Ambient.bnk");
-		return false;
-	}
-
-	res = SoundEngine::LoadBank("sound/Ambient.bnk", AK_DEFAULT_POOL_ID, initBankID_);
-	if (res != AK_Success) {
-		X_ERROR("SoundSys", "Error loading required sound-bank: Ambient.bnk");
-		return false;
-	}
-#endif // !SOUND_INIT_BANK_REQUIRED
 
 	return true;
 }
+
+bool XSound::asyncInitFinalize(void)
+{
+	bool loaded = true;
+
+	for (auto& bank : banks_)
+	{
+		loaded &= waitForBankLoad(bank);
+	}
+
+	return loaded;
+}
+
+
+AkBankID XSound::getBankId(const char* pName) const
+{
+	core::Path<char> name(pName);
+	name.toLower();
+	name.removeExtension();
+	
+	return GetIDFromStr(name.c_str());
+}
+
+XSound::Bank* XSound::getBankForID(AkBankID id)
+{
+	for (auto& bank : banks_)
+	{
+		if (bank.bankID == id) {
+			return &bank;
+		}
+	}
+
+	return nullptr;
+}
+
+void XSound::loadBank(const char* pName)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	auto bankID = getBankId(pName);
+
+	Bank* pBank = getBankForID(bankID);
+	if (pBank && pBank->status != Bank::Status::Error) {
+		X_ERROR("SoundSys", "bank \"%s\" it's already loaded", pName);
+		return;
+	}
+	else {
+		pBank = &banks_.AddOne();
+		pBank->name = pName;
+		pBank->bankID = bankID;
+	}
+
+	pBank->status = Bank::Status::Loading;
+
+	AKRESULT res = SoundEngine::LoadBank(pName, bankCallbackFunc_s, this, AK_DEFAULT_POOL_ID, pBank->bankID);
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
+	}
+
+	X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")(pBank->bankID, bankID);
+}
+
+void XSound::unLoadBank(const char* pName)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	auto bankID = getBankId(pName);
+	Bank* pBank = getBankForID(bankID);
+	if (!pBank) {
+		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not loaded", pName);
+		return;
+	}
+
+	if (pBank->status != Bank::Status::Loaded) {
+		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not fully loaded", pName);
+		return;
+	}
+
+	AKRESULT res = SoundEngine::UnloadBank(bankID, nullptr, bankUnloadCallbackFunc_s, this);
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Failed to un-load bank \"\" %s", pName, AkResult::ToString(res, desc));
+	}
+}
+
+bool XSound::waitForBankLoad(Bank& bank)
+{
+	while (bank.status == Bank::Status::Loading) {
+		bankSignal_.wait();
+	}
+
+	return bank.status == Bank::Status::Loaded;
+}
+
+void XSound::listBanks(const char* pSearchPatten) const
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	core::Array<const Bank*> sorted_banks(g_SoundArena);
+
+	for (const auto& bank : banks_)
+	{
+		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, bank.name))
+		{
+			sorted_banks.push_back(&bank);
+		}
+	}
+
+	std::sort(sorted_banks.begin(), sorted_banks.end(), [](const Bank* a, const Bank* b) {
+			return a->name.compareInt(b->name) < 0;
+		}
+	);
+
+	X_LOG0("SoundSys", "------------ ^8Banks(%" PRIuS ")^7 ---------------", sorted_banks.size());
+
+	for (const auto* pBank : sorted_banks)
+	{
+		X_LOG0("SoundSys", "^2%-32s^7 ID:^2%-10i^7 Status:^2%s",
+			pBank->name.c_str(), pBank->bankID, Bank::Status::ToString(pBank->status));
+	}
+
+	X_LOG0("SoundSys", "------------ ^8Banks End^7 --------------");
+}
+
+void XSound::bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId, void* pCookie)
+{
+	reinterpret_cast<XSound*>(pCookie)->bankCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+}
+
+
+void XSound::bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId)
+{
+	X_UNUSED(pInMemoryBankPtr, memPoolId);
+	Bank* pBank = X_ASSERT_NOT_NULL(getBankForID(bankID));
+
+	if (eLoadResult == AK_Success)
+	{
+		pBank->status = Bank::Status::Loaded;
+		X_LOG0("SoundSys", "bank \"%s\" loaded", pBank->name.c_str());
+	}
+	else
+	{
+		pBank->status = Bank::Status::Error;
+
+		AkResult::Description desc;
+		X_LOG0("SoundSys", "bank \"%s\" failed to load. %s", pBank->name.c_str(), AkResult::ToString(eLoadResult, desc));
+	}
+
+	bankSignal_.raise();
+}
+
+void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId, void* pCookie)
+{
+	reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+}
+
+
+void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId)
+{
+	X_UNUSED(pInMemoryBankPtr, memPoolId, eLoadResult);
+	
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank&b) {
+		return b.bankID == bankID;
+	});
+}
+
+
 
 void XSound::shutDown(void)
 {
@@ -531,7 +690,7 @@ void XSound::shutDown(void)
 	{
 		AKRESULT res;
 
-		res = AK::SoundEngine::UnregisterGameObj(globalObjID_);
+		res = AK::SoundEngine::UnregisterGameObj(GLOBAL_OBJECT_ID);
 		if (res != AK_Success) {
 			AkResult::Description desc;
 			X_ERROR("SoundSys", "Error unregistering global objects. %s", AkResult::ToString(res, desc));
@@ -1004,6 +1163,16 @@ void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
 
 	// TODO
 	X_UNUSED(objectId);
+}
+
+void XSound::cmd_ListBanks(core::IConsoleCmdArgs* pArgs)
+{
+	const char* pSearchString = nullptr;
+	if (pArgs->GetArgCount() > 1) {
+		pSearchString = pArgs->GetArg(1);
+	}
+
+	listBanks(pSearchString);
 }
 
 

@@ -71,13 +71,20 @@ struct ISound : public core::IEngineSysBase
 {
 	virtual ~ISound(){};
 
+	virtual bool asyncInitFinalize(void) X_ABSTRACT;
+
 	// ting tong wong, sing me a song in a thong!
 	virtual void Update(void) X_ABSTRACT;
+
+	// load banks, async.
+	virtual void loadBank(const char* pName) X_ABSTRACT;
+	virtual void unLoadBank(const char* pName) X_ABSTRACT;
 
 	// Shut up!
 	virtual void Mute(bool mute) X_ABSTRACT;
 
 	virtual void SetListenPos(const Transformf& trans) X_ABSTRACT;
+
 
 	// Volume
 	virtual void SetMasterVolume(float vol) X_ABSTRACT;
