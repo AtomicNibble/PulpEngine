@@ -21,6 +21,14 @@ X_INLINE bool SoundVars::EnableDebugRender(void) const
 
 // ----------------------
 
+X_INLINE float SoundVars::debugObjectScale(void) const
+{
+	return debugObjectScale_;
+}
+
+
+// ----------------------
+
 X_INLINE uint32_t SoundVars::SoundEngineDefaultMemoryPoolBytes(void)
 {
 	return soundEngineDefaultMemoryPoolSize_ << 10;

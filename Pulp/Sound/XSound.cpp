@@ -631,8 +631,12 @@ void XSound::drawDebug(void) const
 		return;
 	}
 
+	if (vars_.debugObjectScale() < 0.01f) {
+		return;
+	}
+
 	Sphere sphere;
-	sphere.setRadius(2.f);
+	sphere.setRadius(vars_.debugObjectScale());
 
 	Color8u col = Col_Blue;
 
@@ -644,7 +648,7 @@ void XSound::drawDebug(void) const
 	{
 		sphere.setCenter(pObject->trans.pos);
 
-		pPrimCon_->drawSphere(sphere, col, true, 2);
+		pPrimCon_->drawSphere(sphere, col, true);
 	}
 }
 

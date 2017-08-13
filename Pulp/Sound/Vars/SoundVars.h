@@ -27,6 +27,8 @@ public:
 	X_INLINE bool EnableOutputCapture(void) const;
 	X_INLINE bool EnableDebugRender(void) const;
 
+	X_INLINE float debugObjectScale(void) const;
+
 	X_INLINE uint32_t SoundEngineDefaultMemoryPoolBytes(void);
 	X_INLINE uint32_t SoundEngineLowerDefaultMemoryPoolBytes(void);
 
@@ -48,6 +50,7 @@ private:
 	int32_t enableOutputCapture_;
 
 	int32_t enableDebugRender_;
+	float debugObjectScale_;
 
 private:
 	int32_t soundEngineDefaultMemoryPoolSize_;

@@ -56,6 +56,8 @@ SoundVars::SoundVars()
 	enableOutputCapture_ = 0;
 	enableDebugRender_ = 0;
 
+	debugObjectScale_ = 1.f;
+
 	pVarVolMaster_ = nullptr;
 	pVarVolMusic_ = nullptr;
 	pVarVolSfx_ = nullptr;
@@ -108,8 +110,12 @@ void SoundVars::RegisterVars(void)
 		"initialize Wwise Comm system on startup");
 	ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, enableOutputCapture_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Allows for capturing the output audio to a wav file.");
-	ADD_CVAR_REF("snd_enable_draw_debug", enableDebugRender_, enableDebugRender_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("snd_debug_draw", enableDebugRender_, enableDebugRender_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enables sound debug rendering");
+
+	ADD_CVAR_REF("snd_debug_obj_scale", debugObjectScale_, debugObjectScale_, 1.f, 32.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Debug draw scale for objects");
 
 
 	// LEEERORRRY Jenkins!!
