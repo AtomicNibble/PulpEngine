@@ -9,6 +9,7 @@
 #include "Util\Allocators.h"
 
 #include <Threading\Signal.h>
+#include <Assets\AssertContainer.h>
 
 #include <ICore.h>
 
@@ -17,7 +18,19 @@ struct ICVar;
 struct IConsoleCmdArgs;
 )
 
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
+);
+
 X_NAMESPACE_BEGIN(sound)
+
+class SoundObject
+{
+public:
+
+	Transformf trans;
+};
+
 
 class XSound : public ISound, public ICoreEventListener
 {
@@ -35,10 +48,23 @@ class XSound : public ISound, public ICoreEventListener
 		core::string name;
 	};
 
+	template<typename T>
+	using ArrayMultiply = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply> ;
+
+
 	typedef core::Array<Bank> BanksArr;
+	typedef ArrayMultiply<SoundObject> SoundObjectArr;
+	typedef ArrayMultiply<SoundObject*> SoundObjectPtrArr;
+
+	typedef core::AssetPool<
+		SoundObject,
+		MAX_SOUND_OBJECTS,
+		core::SingleThreadPolicy
+	> SoundObjectPool;
+
 
 public:
-	XSound();
+	XSound(core::MemoryArenaBase* arena);
 	virtual ~XSound() X_OVERRIDE;
 
 	void registerVars(void) X_FINAL;
@@ -50,6 +76,8 @@ public:
 	void release(void) X_FINAL;
 
 	void Update(void) X_FINAL;
+
+	void drawDebug(void) const;
 
 	// Shut up!
 	void mute(bool mute) X_FINAL;
@@ -65,33 +93,38 @@ public:
 	uint32_t getIDFromStr(const char* pStr) const X_FINAL;
 	uint32_t getIDFromStr(const wchar_t* pStr) const X_FINAL;
 
-	bool registerObject(GameObjectID object, const char* pNick) X_FINAL;
-	bool registerObject(GameObjectID object, const Transformf& trans, const char* pNick) X_FINAL;
-	bool unRegisterObject(GameObjectID object) X_FINAL;
+	SndObjectHandle registerObject(const char* pNick) X_FINAL;
+	SndObjectHandle registerObject(const Transformf& trans, const char* pNick) X_FINAL;
+	bool unRegisterObject(SndObjectHandle object) X_FINAL;
 	void unRegisterAll(void) X_FINAL;
 
-	void setPosition(GameObjectID object, const Transformf& trans) X_FINAL;
-	void setPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_FINAL;
+	void setPosition(SndObjectHandle object, const Transformf& trans) X_FINAL;
+	void setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, size_t num) X_FINAL;
 	
-	void stopAll(GameObjectID object) X_FINAL;
+	void stopAll(SndObjectHandle object) X_FINAL;
 
-	void postEvent(EventID event, GameObjectID object) X_FINAL;
-	void postEvent(const char* pEventStr, GameObjectID object) X_FINAL;
+	void postEvent(EventID event, SndObjectHandle object) X_FINAL;
+	void postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
 
 
-	void setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
-	void setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_FINAL;
-	void setRTPCValue(RtpcID id, RtpcValue val, GameObjectID object = INVALID_OBJECT_ID,
+	void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
+	void setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object) X_FINAL;
+	void setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object = INVALID_OBJECT_ID,
 		core::TimeVal changeDuration = core::TimeVal(0ll), 
 		CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_FINAL;
 
-	AkBankID getBankId(const char* pName) const;
-	Bank* getBankForID(AkBankID id);
 	void loadBank(const char* pName) X_FINAL;
 	void unLoadBank(const char* pName) X_FINAL;
+	AkBankID getBankId(const char* pName) const;
+	Bank* getBankForID(AkBankID id);
 	bool waitForBankLoad(Bank& bank);
 
 	void listBanks(const char* pSearchString) const;
+
+
+private:
+	SoundObject* allocObject(void);
+	void freeObject(SoundObject* pObject);
 
 private:
 	static void bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId, void* pCookie);
@@ -112,6 +145,9 @@ private:
 	void cmd_ListBanks(core::IConsoleCmdArgs* pArgs);
 
 private:
+	core::MemoryArenaBase* arena_;
+	engine::IPrimativeContext* pPrimCon_;
+
 	AllocatorHooks allocators_;
 	IOhook ioHook_;
 
@@ -119,8 +155,10 @@ private:
 	SoundVars vars_;
 	
 	mutable core::CriticalSection cs_;
-	BanksArr banks_;
 
+	BanksArr banks_;
+	SoundObjectPool objectPool_;
+	SoundObjectPtrArr objects_;
 
 	bool comsSysInit_;
 	bool outputCaptureEnabled_;

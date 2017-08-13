@@ -16,11 +16,16 @@ public:
 	SoundVars();
 	~SoundVars();
 
-
 	void RegisterVars(void);
+
+	void setMasterVolume(float v);
+	void setMusicVolume(float vol);
+	void setVoiceVolume(float vol);
+	void setSFXVolume(float vol);
 
 	X_INLINE bool EnableComs(void) const;
 	X_INLINE bool EnableOutputCapture(void) const;
+	X_INLINE bool EnableDebugRender(void) const;
 
 	X_INLINE uint32_t SoundEngineDefaultMemoryPoolBytes(void);
 	X_INLINE uint32_t SoundEngineLowerDefaultMemoryPoolBytes(void);
@@ -34,13 +39,15 @@ public:
 	X_INLINE uint32_t MonitorQueueMemoryPoolBytes(void);
 
 private:
-	core::ICVar* var_vol_master_;
-	core::ICVar* var_vol_music_;
-	core::ICVar* var_vol_sfx_;
-	core::ICVar* var_vol_voice_;
+	core::ICVar* pVarVolMaster_;
+	core::ICVar* pVarVolMusic_;
+	core::ICVar* pVarVolSfx_;
+	core::ICVar* pVarVolVoice_;
 
 	int32_t enableCommSys_;
 	int32_t enableOutputCapture_;
+
+	int32_t enableDebugRender_;
 
 private:
 	int32_t soundEngineDefaultMemoryPoolSize_;

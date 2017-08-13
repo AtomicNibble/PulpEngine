@@ -6,6 +6,9 @@
 #include "IDs\Wwise_IDs.h"
 
 #include <IConsole.h>
+#include <I3DEngine.h>
+#include <IPrimativeContext.h>
+
 
 X_DISABLE_WARNING(4505)
 
@@ -159,18 +162,48 @@ namespace
 	}
 
 
+
+	X_INLINE AkGameObjectID GameObjHandleToAKObject(SndObjectHandle object)
+	{
+		static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "can't represent type");
+		return reinterpret_cast<AkGameObjectID>(&object);
+	}
+
+	X_INLINE AkGameObjectID SoundObjToAKObject(SoundObject* pObject)
+	{
+		static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
+		return reinterpret_cast<AkGameObjectID>(pObject);
+	}
+
+	X_INLINE SndObjectHandle SoundObjToObjHandle(SoundObject* pObject)
+	{
+		static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
+		return reinterpret_cast<SndObjectHandle>(pObject);
+	}
+
+	X_INLINE SoundObject* SoundObjToObjHandle(SndObjectHandle object)
+	{
+		static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
+		return reinterpret_cast<SoundObject*>(object);
+	}
+
+
 } // namespace
 
-static_assert(GLOBAL_OBJECT_ID == static_cast<GameObjectID>(-2), "Should be negative 2 yo");
+static_assert(GLOBAL_OBJECT_ID == static_cast<SndObjectHandle>(-2), "Should be negative 2 yo");
 static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect");
 
-XSound::XSound() :
-	banks_(g_SoundArena),
+XSound::XSound(core::MemoryArenaBase* arena) :
+	arena_(arena),
+	pPrimCon_(nullptr),
+	banks_(arena_),
+	objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject)),
+	objects_(arena_),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false),
 	bankSignal_(true)
 {
-
+	objects_.reserve(128);
 
 }
 
@@ -480,6 +513,12 @@ bool XSound::asyncInitFinalize(void)
 		loaded &= waitForBankLoad(bank);
 	}
 
+	pPrimCon_ = gEnv->p3DEngine->getPrimContext(engine::PrimContext::SOUND);
+	if (!pPrimCon_) {
+		X_ERROR("SoundSys", "Failed to get prim context");
+		return false;
+	}
+
 	return loaded;
 }
 
@@ -580,199 +619,36 @@ void XSound::Update(void)
 
 		SoundEngine::RenderAudio();
 	}
+
+	if (vars_.EnableDebugRender()) {
+		drawDebug();
+	}
 }
 
-
-AkBankID XSound::getBankId(const char* pName) const
+void XSound::drawDebug(void) const
 {
-	core::Path<char> name(pName);
-	name.toLower();
-	name.removeExtension();
-	
-	return GetIDFromStr(name.c_str());
-}
-
-XSound::Bank* XSound::getBankForID(AkBankID id)
-{
-	for (auto& bank : banks_)
-	{
-		if (bank.bankID == id) {
-			return &bank;
-		}
-	}
-
-	return nullptr;
-}
-
-void XSound::loadBank(const char* pName)
-{
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	auto bankID = getBankId(pName);
-
-	Bank* pBank = getBankForID(bankID);
-	if (pBank && pBank->status != Bank::Status::Error) {
-		X_ERROR("SoundSys", "bank \"%s\" it's already loaded", pName);
-		return;
-	}
-	else {
-		pBank = &banks_.AddOne();
-		pBank->name = pName;
-		pBank->bankID = bankID;
-	}
-
-	pBank->status = Bank::Status::Loading;
-
-	AKRESULT res = SoundEngine::LoadBank(pName, bankCallbackFunc_s, this, AK_DEFAULT_POOL_ID, pBank->bankID);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
-	}
-
-	X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")(pBank->bankID, bankID);
-}
-
-void XSound::unLoadBank(const char* pName)
-{
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	auto bankID = getBankId(pName);
-	Bank* pBank = getBankForID(bankID);
-	if (!pBank) {
-		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not loaded", pName);
+	if (!pPrimCon_) {
 		return;
 	}
 
-	if (pBank->status != Bank::Status::Loaded) {
-		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not fully loaded", pName);
-		return;
-	}
+	Sphere sphere;
+	sphere.setRadius(2.f);
 
-	AKRESULT res = SoundEngine::UnloadBank(bankID, nullptr, bankUnloadCallbackFunc_s, this);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Failed to un-load bank \"\" %s", pName, AkResult::ToString(res, desc));
-	}
-}
+	Color8u col = Col_Blue;
 
-bool XSound::waitForBankLoad(Bank& bank)
-{
-	while (bank.status == Bank::Status::Loading) {
-		bankSignal_.wait();
-	}
+	pPrimCon_->setDepthTest(true);
 
-	return bank.status == Bank::Status::Loaded;
-}
-
-void XSound::listBanks(const char* pSearchPatten) const
-{
 	core::CriticalSection::ScopedLock lock(cs_);
 
-	core::Array<const Bank*> sorted_banks(g_SoundArena);
-
-	for (const auto& bank : banks_)
+	for (auto* pObject : objects_)
 	{
-		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, bank.name))
-		{
-			sorted_banks.push_back(&bank);
-		}
-	}
+		sphere.setCenter(pObject->trans.pos);
 
-	std::sort(sorted_banks.begin(), sorted_banks.end(), [](const Bank* a, const Bank* b) {
-			return a->name.compareInt(b->name) < 0;
-		}
-	);
-
-	X_LOG0("SoundSys", "------------ ^8Banks(%" PRIuS ")^7 ---------------", sorted_banks.size());
-
-	for (const auto* pBank : sorted_banks)
-	{
-		X_LOG0("SoundSys", "^2%-32s^7 ID:^2%-10i^7 Status:^2%s",
-			pBank->name.c_str(), pBank->bankID, Bank::Status::ToString(pBank->status));
-	}
-
-	X_LOG0("SoundSys", "------------ ^8Banks End^7 --------------");
-}
-
-void XSound::bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId, void* pCookie)
-{
-	reinterpret_cast<XSound*>(pCookie)->bankCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
-}
-
-
-void XSound::bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId)
-{
-	X_UNUSED(pInMemoryBankPtr, memPoolId);
-	Bank* pBank = X_ASSERT_NOT_NULL(getBankForID(bankID));
-
-	if (eLoadResult == AK_Success)
-	{
-		pBank->status = Bank::Status::Loaded;
-		X_LOG0("SoundSys", "bank \"%s\" loaded", pBank->name.c_str());
-	}
-	else
-	{
-		pBank->status = Bank::Status::Error;
-
-		AkResult::Description desc;
-		X_LOG0("SoundSys", "bank \"%s\" failed to load. %s", pBank->name.c_str(), AkResult::ToString(eLoadResult, desc));
-	}
-
-	bankSignal_.raise();
-}
-
-void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId, void* pCookie)
-{
-	reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
-}
-
-
-void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId)
-{
-	X_UNUSED(pInMemoryBankPtr, memPoolId, eLoadResult);
-	
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank&b) {
-		return b.bankID == bankID;
-	});
-}
-
-
-
-void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
-{
-	X_UNUSED(lparam);
-
-	if (event == CoreEvent::CHANGE_FOCUS)
-	{
-		if (wparam == 1) // activated
-		{
-			X_LOG2("SoundSys", "Suspending sound system");
-			AKRESULT res = AK::SoundEngine::Suspend(false);
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
-			}
-		}
-		else
-		{
-			X_LOG2("SoundSys", "Waking sound system from syspend");
-
-			AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
-			}
-			// might need to be called here not sure.
-			// SoundEngine::RenderAudio();
-		}
+		pPrimCon_->drawSphere(sphere, col, true, 2);
 	}
 }
+
+// ---------------------------------------------
 
 
 // Shut up!
@@ -786,40 +662,25 @@ void XSound::setListenPos(const Transformf& trans)
 	listenerTrans_ = trans;
 }
 
-// Volume
+// Volume - these change SoundEngine, just done this way so vars reflect actual values.
 void XSound::setMasterVolume(float vol)
 {
-	// cap it between 0-1
-	vol = math<float>::clamp(vol, 0.f, 1.f);
-	// turn 0-1 into 0-255
-	vol *= 255.f;
-
-	setRTPCValue(GAME_PARAMETERS::MASTERVOLUME, vol);
+	vars_.setMasterVolume(vol);
 }
-
 
 void XSound::setMusicVolume(float vol)
 {
-	vol = math<float>::clamp(vol, 0.f, 1.f);
-	vol *= 255.f;
-
-	setRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
+	vars_.setMusicVolume(vol);
 }
 
 void XSound::setVoiceVolume(float vol)
 {
-	vol = math<float>::clamp(vol, 0.f, 1.f);
-	vol *= 255.f;
-
-	setRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
+	vars_.setVoiceVolume(vol);
 }
 
 void XSound::setSFXVolume(float vol)
 {
-	vol = math<float>::clamp(vol, 0.f, 1.f);
-	vol *= 255.f;
-
-	setRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
+	vars_.setSFXVolume(vol);
 }
 
 // ----------------------------------------------
@@ -837,40 +698,54 @@ uint32_t XSound::getIDFromStr(const wchar_t* pStr) const
 }
 
 
+// ----------------------------------------------
+
 // the id is passed in, so could just pass pointer value in then use that as id.
-bool XSound::registerObject(GameObjectID object, const char* pNick)
+SndObjectHandle XSound::registerObject(const char* pNick)
 {
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(object, pNick ? pNick : "");
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	SoundObject* pObject = allocObject();
+
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
-		return false;
+		return INVALID_OBJECT_ID;
 	}
 
-	return true;
+	objects_.push_back(pObject);
+
+	return SoundObjToObjHandle(pObject);
 }
 
-bool XSound::registerObject(GameObjectID object, const Transformf& trans, const char* pNick)
+
+SndObjectHandle XSound::registerObject(const Transformf& trans, const char* pNick)
 {
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(object, pNick ? pNick : "");
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	SoundObject* pObject = allocObject();
+	pObject->trans = trans;
+
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
-		return false;
+		freeObject(pObject);
+		return INVALID_OBJECT_ID;
 	}
 
-	res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Failed to set position post register. %s", AkResult::ToString(res, desc));
-		return false;
-	}
+	setPosition(SoundObjToAKObject(pObject), trans);
 
-	return true;
+	objects_.push_back(pObject);
+
+	return SoundObjToObjHandle(pObject);
 }
 
-bool XSound::unRegisterObject(GameObjectID object)
+bool XSound::unRegisterObject(SndObjectHandle object)
 {
+	core::CriticalSection::ScopedLock lock(cs_);
+
 	AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
 	if (res != AK_Success) {
 		AkResult::Description desc;
@@ -878,21 +753,49 @@ bool XSound::unRegisterObject(GameObjectID object)
 		return false;
 	}
 
+	SoundObject* pSound = SoundObjToObjHandle(object);
+
+	// Log(n) but potentially very quick, as just linera array of pointers.
+	objects_.remove(pSound);
+
+	freeObject(pSound);
 	return true;
 }
 
 void XSound::unRegisterAll(void)
 {
+	core::CriticalSection::ScopedLock lock(cs_);
+
 	AKRESULT res = AK::SoundEngine::UnregisterAllGameObj();
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error un-registering all object. %s", AkResult::ToString(res, desc));
 	}
+
+	for (auto* pObject : objects_) {
+		objectPool_.free(pObject);
+	}
+
+	objects_.clear();
 }
 
-
-void XSound::setPosition(GameObjectID object, const Transformf& trans)
+SoundObject* XSound::allocObject(void)
 {
+	return objectPool_.allocate();
+}
+
+void XSound::freeObject(SoundObject* pObject)
+{
+	objectPool_.free(pObject);
+}
+
+// ----------------------------------------------
+
+void XSound::setPosition(SndObjectHandle object, const Transformf& trans)
+{
+	SoundObject* pSound = SoundObjToObjHandle(object);
+	pSound->trans = trans;
+
 	AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
 	if (res != AK_Success) {
 		AkResult::Description desc;
@@ -900,18 +803,29 @@ void XSound::setPosition(GameObjectID object, const Transformf& trans)
 	}
 }
 
-void XSound::setPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num)
+void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, size_t num)
 {
-	X_UNUSED(pObjects, pTrans, num);
-	X_ASSERT_NOT_IMPLEMENTED();
+	for (size_t i = 0; i < num; i++)
+	{
+		SoundObject* pSound = SoundObjToObjHandle(pObjects[i]);
+		pSound->trans = pTrans[i];
+
+		AKRESULT res = AK::SoundEngine::SetPosition(pObjects[i], TransToAkPos(pTrans[i]));
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+		}
+	}
 }
 
-void XSound::stopAll(GameObjectID object)
+// ----------------------------------------------
+
+void XSound::stopAll(SndObjectHandle object)
 {
 	SoundEngine::StopAll(object);
 }
 
-void XSound::postEvent(EventID event, GameObjectID object)
+void XSound::postEvent(EventID event, SndObjectHandle object)
 {
 	auto playingId = SoundEngine::PostEvent(event, object);
 	if (playingId == AK_INVALID_PLAYING_ID)
@@ -925,7 +839,7 @@ void XSound::postEvent(EventID event, GameObjectID object)
 	}
 }
 
-void XSound::postEvent(const char* pEventStr, GameObjectID object)
+void XSound::postEvent(const char* pEventStr, SndObjectHandle object)
 {
 	auto playingId = SoundEngine::PostEvent(pEventStr, object);
 	if (playingId == AK_INVALID_PLAYING_ID)
@@ -939,7 +853,7 @@ void XSound::postEvent(const char* pEventStr, GameObjectID object)
 }
 
 
-void XSound::setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType)
+void XSound::setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType)
 {
 	AkSwitchStateID state;
 
@@ -1044,7 +958,7 @@ void XSound::setMaterial(GameObjectID object, engine::MaterialSurType::Enum surf
 	}
 }
 
-void XSound::setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object)
+void XSound::setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object)
 {
 	AKRESULT res = AK::SoundEngine::SetSwitch(group, state, object);
 	if (res != AK_Success) {
@@ -1053,13 +967,211 @@ void XSound::setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID ob
 	}
 }
 
-void XSound::setRTPCValue(RtpcID id, RtpcValue val, GameObjectID object,
+void XSound::setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object,
 	core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve)
 {
 	AKRESULT res = AK::SoundEngine::SetRTPCValue(id, val, object, ToAkTime(changeDuration), ToAkCurveInterpolation(fadeCurve));
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error set RTPC failed. %s", AkResult::ToString(res, desc));
+	}
+}
+
+// ------------------ Banks ----------------------------
+
+
+void XSound::loadBank(const char* pName)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	auto bankID = getBankId(pName);
+
+	Bank* pBank = getBankForID(bankID);
+	if (pBank && pBank->status != Bank::Status::Error) {
+		X_ERROR("SoundSys", "bank \"%s\" it's already loaded", pName);
+		return;
+	}
+	else {
+		pBank = &banks_.AddOne();
+		pBank->name = pName;
+		pBank->bankID = bankID;
+	}
+
+	pBank->status = Bank::Status::Loading;
+
+	AKRESULT res = SoundEngine::LoadBank(pName, bankCallbackFunc_s, this, AK_DEFAULT_POOL_ID, pBank->bankID);
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
+	}
+
+	X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")(pBank->bankID, bankID);
+}
+
+void XSound::unLoadBank(const char* pName)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	auto bankID = getBankId(pName);
+	Bank* pBank = getBankForID(bankID);
+	if (!pBank) {
+		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not loaded", pName);
+		return;
+	}
+
+	if (pBank->status != Bank::Status::Loaded) {
+		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not fully loaded", pName);
+		return;
+	}
+
+	AKRESULT res = SoundEngine::UnloadBank(bankID, nullptr, bankUnloadCallbackFunc_s, this);
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Failed to un-load bank \"\" %s", pName, AkResult::ToString(res, desc));
+	}
+}
+
+AkBankID XSound::getBankId(const char* pName) const
+{
+	core::Path<char> name(pName);
+	name.toLower();
+	name.removeExtension();
+
+	return GetIDFromStr(name.c_str());
+}
+
+XSound::Bank* XSound::getBankForID(AkBankID id)
+{
+	for (auto& bank : banks_)
+	{
+		if (bank.bankID == id) {
+			return &bank;
+		}
+	}
+
+	return nullptr;
+}
+
+bool XSound::waitForBankLoad(Bank& bank)
+{
+	while (bank.status == Bank::Status::Loading) {
+		bankSignal_.wait();
+	}
+
+	return bank.status == Bank::Status::Loaded;
+}
+
+void XSound::listBanks(const char* pSearchPatten) const
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	core::Array<const Bank*> sorted_banks(g_SoundArena);
+
+	for (const auto& bank : banks_)
+	{
+		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, bank.name))
+		{
+			sorted_banks.push_back(&bank);
+		}
+	}
+
+	std::sort(sorted_banks.begin(), sorted_banks.end(), [](const Bank* a, const Bank* b) {
+		return a->name.compareInt(b->name) < 0;
+	}
+	);
+
+	X_LOG0("SoundSys", "------------ ^8Banks(%" PRIuS ")^7 ---------------", sorted_banks.size());
+
+	for (const auto* pBank : sorted_banks)
+	{
+		X_LOG0("SoundSys", "^2%-32s^7 ID:^2%-10i^7 Status:^2%s",
+			pBank->name.c_str(), pBank->bankID, Bank::Status::ToString(pBank->status));
+	}
+
+	X_LOG0("SoundSys", "------------ ^8Banks End^7 --------------");
+}
+
+
+
+void XSound::bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId, void* pCookie)
+{
+	reinterpret_cast<XSound*>(pCookie)->bankCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+}
+
+
+void XSound::bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId)
+{
+	X_UNUSED(pInMemoryBankPtr, memPoolId);
+	Bank* pBank = X_ASSERT_NOT_NULL(getBankForID(bankID));
+
+	if (eLoadResult == AK_Success)
+	{
+		pBank->status = Bank::Status::Loaded;
+		X_LOG0("SoundSys", "bank \"%s\" loaded", pBank->name.c_str());
+	}
+	else
+	{
+		pBank->status = Bank::Status::Error;
+
+		AkResult::Description desc;
+		X_LOG0("SoundSys", "bank \"%s\" failed to load. %s", pBank->name.c_str(), AkResult::ToString(eLoadResult, desc));
+	}
+
+	bankSignal_.raise();
+}
+
+void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId, void* pCookie)
+{
+	reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+}
+
+
+void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId)
+{
+	X_UNUSED(pInMemoryBankPtr, memPoolId, eLoadResult);
+
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank&b) {
+		return b.bankID == bankID;
+	});
+}
+
+
+// ------------------ CoreEvnt ----------------------------
+
+
+void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+{
+	X_UNUSED(lparam);
+
+	if (event == CoreEvent::CHANGE_FOCUS)
+	{
+		if (wparam == 1) // activated
+		{
+			X_LOG2("SoundSys", "Suspending sound system");
+			AKRESULT res = AK::SoundEngine::Suspend(false);
+			if (res != AK_Success) {
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
+			}
+		}
+		else
+		{
+			X_LOG2("SoundSys", "Waking sound system from syspend");
+
+			AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
+			if (res != AK_Success) {
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
+			}
+			// might need to be called here not sure.
+			// SoundEngine::RenderAudio();
+		}
 	}
 }
 

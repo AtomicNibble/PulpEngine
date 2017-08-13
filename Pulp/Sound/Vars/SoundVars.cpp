@@ -7,8 +7,6 @@
 
 // Sound Engine
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
-#include <AK/SoundEngine/Common/AkModule.h>
-#include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 
 X_NAMESPACE_BEGIN(sound)
 
@@ -56,11 +54,12 @@ SoundVars::SoundVars()
 {
 	enableCommSys_ = 0;
 	enableOutputCapture_ = 0;
+	enableDebugRender_ = 0;
 
-	var_vol_master_ = nullptr;
-	var_vol_music_ = nullptr;
-	var_vol_sfx_ = nullptr;
-	var_vol_voice_ = nullptr;
+	pVarVolMaster_ = nullptr;
+	pVarVolMusic_ = nullptr;
+	pVarVolSfx_ = nullptr;
+	pVarVolVoice_ = nullptr;
 
 	soundEngineDefaultMemoryPoolSize_ = 16 << 10;	// 16 MiB
 	soundEngineLowerDefaultPoolSize_ = 16 << 10;	// 16 MiB
@@ -81,34 +80,37 @@ SoundVars::~SoundVars()
 
 void SoundVars::RegisterVars(void)
 {
-	var_vol_master_ = ADD_CVAR_FLOAT("snd_vol_master", 1.f, 0.f, 1.f,
+	pVarVolMaster_ = ADD_CVAR_FLOAT("snd_vol_master", 1.f, 0.f, 1.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Master volume");
-	var_vol_music_ = ADD_CVAR_FLOAT("snd_vol_music", 1.f, 0.f, 1.f,
+	pVarVolMusic_ = ADD_CVAR_FLOAT("snd_vol_music", 1.f, 0.f, 1.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Music volume");
-	var_vol_sfx_ = ADD_CVAR_FLOAT("snd_vol_sfx", 1.f, 0.f, 1.f,
+	pVarVolSfx_ = ADD_CVAR_FLOAT("snd_vol_sfx", 1.f, 0.f, 1.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "SFX volume");
-	var_vol_voice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
+	pVarVolVoice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Voice volume");
 
 	core::ConsoleVarFunc del;
 	del.Bind<Var_MasterVolChanged>();
-	var_vol_master_->SetOnChangeCallback(del);
+	pVarVolMaster_->SetOnChangeCallback(del);
 
 	del.Bind<Var_MusicVolChanged>();
-	var_vol_music_->SetOnChangeCallback(del);
+	pVarVolMusic_->SetOnChangeCallback(del);
 
 	del.Bind<Var_SFXVolChanged>();
-	var_vol_sfx_->SetOnChangeCallback(del);
+	pVarVolSfx_->SetOnChangeCallback(del);
 
 	del.Bind<Var_VoiceVolChanged>();
-	var_vol_voice_->SetOnChangeCallback(del);
+	pVarVolVoice_->SetOnChangeCallback(del);
 
 	const int32_t maxVal = std::numeric_limits<int32_t>::max();
 
-	ADD_CVAR_REF("snd_enable_coms", enableCommSys_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("snd_enable_coms", enableCommSys_, enableCommSys_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"initialize Wwise Comm system on startup");
-	ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, enableOutputCapture_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Allows for capturing the output audio to a wav file.");
+	ADD_CVAR_REF("snd_enable_draw_debug", enableDebugRender_, enableDebugRender_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enables sound debug rendering");
+
 
 	// LEEERORRRY Jenkins!!
 	ADD_CVAR_REF("snd_mem_engine_default_pool", soundEngineDefaultMemoryPoolSize_, soundEngineDefaultMemoryPoolSize_, 0, maxVal, 
@@ -135,6 +137,26 @@ void SoundVars::RegisterVars(void)
 		"Sound engine monitor queue memory pool size (KiB).");
 }
 
+
+void SoundVars::setMasterVolume(float vol)
+{
+	pVarVolMaster_->Set(vol);
+}
+
+void SoundVars::setMusicVolume(float vol)
+{
+	pVarVolMusic_->Set(vol);
+}
+
+void SoundVars::setVoiceVolume(float vol)
+{
+	pVarVolSfx_->Set(vol);
+}
+
+void SoundVars::setSFXVolume(float vol)
+{
+	pVarVolVoice_->Set(vol);
+}
 
 
 X_NAMESPACE_END

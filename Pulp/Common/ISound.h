@@ -12,7 +12,7 @@
 X_NAMESPACE_BEGIN(sound)
 
 typedef core::Hash::Fnv1Val HashVal;
-typedef uintptr_t GameObjectID;
+typedef uintptr_t SndObjectHandle;
 typedef HashVal EventID;
 typedef HashVal RtpcID;
 typedef HashVal SwitchGroupID;
@@ -20,8 +20,10 @@ typedef HashVal SwitchStateID;
 typedef float RtpcValue;
 
 
-static const GameObjectID GLOBAL_OBJECT_ID = static_cast<GameObjectID>(-2);
-static const GameObjectID INVALID_OBJECT_ID = static_cast<GameObjectID>(-1);
+static const uint32_t MAX_SOUND_OBJECTS = 1 << 9; 
+
+static const SndObjectHandle GLOBAL_OBJECT_ID = static_cast<SndObjectHandle>(-2);
+static const SndObjectHandle INVALID_OBJECT_ID = static_cast<SndObjectHandle>(-1);
 
 
 X_DECLARE_ENUM(CurveInterpolation)(
@@ -103,25 +105,25 @@ struct ISound : public core::IEngineSysBase
 	virtual uint32_t getIDFromStr(const wchar_t* pStr) const X_ABSTRACT;
 
 	// the id is passed in, so could just pass pointer value in then use that as id.
-	virtual bool registerObject(GameObjectID object, const char* pNick = nullptr) X_ABSTRACT;
-	virtual bool registerObject(GameObjectID object, const Transformf& trans, const char* pNick = nullptr) X_ABSTRACT;
-	virtual bool unRegisterObject(GameObjectID object) X_ABSTRACT;
+	virtual SndObjectHandle registerObject(const char* pNick = nullptr) X_ABSTRACT;
+	virtual SndObjectHandle registerObject(const Transformf& trans, const char* pNick = nullptr) X_ABSTRACT;
+	virtual bool unRegisterObject(SndObjectHandle object) X_ABSTRACT;
 	virtual void unRegisterAll(void) X_ABSTRACT;
 
-	virtual void setPosition(GameObjectID object, const Transformf& trans) X_ABSTRACT;
-	virtual void setPosition(GameObjectID* pObjects, const Transformf* pTrans, size_t num) X_ABSTRACT;
+	virtual void setPosition(SndObjectHandle object, const Transformf& trans) X_ABSTRACT;
+	virtual void setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, size_t num) X_ABSTRACT;
 
 
 	// INVALID_OBJECT_ID stops all sounds.
-	virtual void stopAll(GameObjectID object = INVALID_OBJECT_ID) X_ABSTRACT;
+	virtual void stopAll(SndObjectHandle object = INVALID_OBJECT_ID) X_ABSTRACT;
 
 	// events
-	virtual void postEvent(EventID event, GameObjectID object) X_ABSTRACT;
-	virtual void postEvent(const char* pEventStr, GameObjectID object) X_ABSTRACT;
+	virtual void postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
+	virtual void postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
 
-	virtual void setMaterial(GameObjectID object, engine::MaterialSurType::Enum surfaceType) X_ABSTRACT;
-	virtual void setSwitch(SwitchGroupID group, SwitchStateID state, GameObjectID object) X_ABSTRACT;
-	virtual void setRTPCValue(RtpcID id, RtpcValue val, GameObjectID object = INVALID_OBJECT_ID,
+	virtual void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_ABSTRACT;
+	virtual void setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object) X_ABSTRACT;
+	virtual void setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object = INVALID_OBJECT_ID,
 		core::TimeVal changeDuration = core::TimeVal(0ll), CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_ABSTRACT;
 };
 
