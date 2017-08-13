@@ -167,14 +167,10 @@ public:
 // ---------------------------------------------------------------------------
 
 
-template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy, 
-	typename ResourceRefPrim = typename std::conditional<std::is_same<MemoryThreadPolicy, core::SingleThreadPolicy>::value, int32_t, core::AtomicInt>::type>
+template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy>
 class AssetPool
 {
 public:
-	typedef ResourceRefPrim RefPrim;
-	typedef core::ReferenceCountedInherit<AssetType, RefPrim> AssetResource;
-
 	typedef core::MemoryArena<
 		core::PoolAllocator,
 		MemoryThreadPolicy,
@@ -209,6 +205,65 @@ public:
 	}
 
 	template<class... Args>
+	X_INLINE AssetType* allocate(Args&&... args)
+	{
+		return X_NEW(AssetType, &assetPoolArena_, "AsetRes")(std::forward<Args>(args)...);
+	}
+
+	X_INLINE void free(AssetType* pRes)
+	{
+		X_DELETE(pRes, &assetPoolArena_);
+	}
+
+private:
+	core::HeapArea      assetPoolHeap_;
+	core::PoolAllocator assetPoolAllocator_;
+	AssetPoolArena		assetPoolArena_;
+};
+
+
+template<typename AssetType, size_t MaxAssets, class MemoryThreadPolicy, 
+	typename ResourceRefPrim = typename std::conditional<std::is_same<MemoryThreadPolicy, core::SingleThreadPolicy>::value, int32_t, core::AtomicInt>::type>
+class AssetPoolRefCounted
+{
+public:
+	typedef ResourceRefPrim RefPrim;
+	typedef core::ReferenceCountedInherit<AssetType, RefPrim> AssetResource;
+
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		MemoryThreadPolicy,
+
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> AssetPoolArena;
+
+public:
+	AssetPoolRefCounted(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
+		assetPoolHeap_(
+			core::bitUtil::RoundUpToMultiple<size_t>(
+				AssetPoolArena::getMemoryRequirement(allocSize) * MaxAssets,
+				core::VirtualMem::GetPageSize()
+				)
+		),
+		assetPoolAllocator_(assetPoolHeap_.start(), assetPoolHeap_.end(),
+			AssetPoolArena::getMemoryRequirement(allocSize),
+			AssetPoolArena::getMemoryAlignmentRequirement(allocAlign),
+			AssetPoolArena::getMemoryOffsetRequirement()
+		),
+		assetPoolArena_(&assetPoolAllocator_, "AssetPoolArena")
+	{
+		arena->addChildArena(&assetPoolArena_);
+	}
+
+	template<class... Args>
 	X_INLINE AssetResource* allocate(Args&&... args)
 	{
 		return X_NEW(AssetResource, &assetPoolArena_, "AsetRes")(std::forward<Args>(args)...);
@@ -226,9 +281,10 @@ private:
 };
 
 template<typename AssetType, size_t MaxAssets, class ThreadPolicy>
-class AssetContainer : private AssetPool<AssetType, MaxAssets, core::SingleThreadPolicy, core::AtomicInt>
+class AssetContainer : private AssetPoolRefCounted<AssetType, MaxAssets, core::SingleThreadPolicy, core::AtomicInt>
 {
-	typedef AssetPool<AssetType, 
+	typedef AssetPoolRefCounted<
+		AssetType,
 		MaxAssets, 
 		core::SingleThreadPolicy,
 		core::AtomicInt				// i've made this atmoic so that asset refs can be modified without having to take a lock on container.
@@ -248,7 +304,7 @@ public:
 		hash_(arena, MaxAssets),
 		list_(arena),
 		freeList_(arena),
-		AssetPool(arena, allocSize, allocAlign)
+		Pool(arena, allocSize, allocAlign)
 	{
 		list_.reserve(MaxAssets);
 	}
