@@ -72,8 +72,13 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 	params.pCoreArena = pArena_;
 
 	// enable loggers
+#if 0
+	params.bVsLog = false;
+	params.bConsoleLog = false;
+#else
 	params.bVsLog = core::debugging::IsDebuggerConnected();
 	params.bConsoleLog = true;
+#endif
 
 #ifdef X_LIB
 
