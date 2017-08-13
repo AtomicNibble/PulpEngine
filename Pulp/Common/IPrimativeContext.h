@@ -82,17 +82,17 @@ public:
 	// draw a quad in 3d z is position not depth.
 	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col);
 
-	void drawLines(Vec3f* pPoints, uint32_t num, const Color& col);
+	void drawLines(Vec3f* pPoints, uint32_t num, const Color8u& col);
 	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);
-	X_INLINE void drawLine(const Vec3f& pos1, const Color& color1,
-		const Vec3f& pos2, const Color& color2);
-	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color& color1);
+	X_INLINE void drawLine(const Vec3f& pos1, const Color8u& color1,
+		const Vec3f& pos2, const Color8u& color2);
+	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color8u& color1);
 
-	void drawRect(float x, float y, float width, float height, const Color& col);
+	void drawRect(float x, float y, float width, float height, const Color8u& col);
 
 	// ya fucking what!
 	void drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
-		float padding, uint32_t max, const Color& col);
+		float padding, uint32_t max, const Color8u& col);
 
 	// Points
 	X_INLINE void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1);

@@ -253,7 +253,7 @@ void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const V
 	}
 }
 
-void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col)
+void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color8u& col)
 {
 	X_ASSERT_NOT_NULL(pPoints);
 	X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num);
@@ -276,7 +276,7 @@ void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color& col
 }
 
 
-void IPrimativeContext::drawRect(float x, float y, float width, float height, const Color& col)
+void IPrimativeContext::drawRect(float x, float y, float width, float height, const Color8u& col)
 {
 	const float x1 = x;
 	const float y1 = y;
@@ -299,7 +299,7 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, co
 }
 
 void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
-	float padding, uint32_t max, const Color& col)
+	float padding, uint32_t max, const Color8u& col)
 {
 	X_ASSERT_NOT_NULL(pHeights);
 	X_ASSERT(num <= max, "Darw Chart has more items than max")(num, max);

@@ -80,15 +80,15 @@ X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
 	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
 	pLine[0].pos = pos1;
-	pLine[0].color = Color::white();
+	pLine[0].color = Color8u::white();
 	pLine[0].st = core::XHalf2::zero();
 
 	pLine[1].pos = pos2;
-	pLine[1].color = Color::white();
+	pLine[1].color = Color8u::white();
 	pLine[1].st = core::XHalf2::zero();
 }
 
-X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Color& color1, const Vec3f& pos2, const Color& color2)
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Color8u& color1, const Vec3f& pos2, const Color8u& color2)
 {
 	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
@@ -98,7 +98,7 @@ X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Color& color1
 	pLine[1].color = color2;
 }
 
-X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color& color1)
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color8u& color1)
 {
 	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
