@@ -72,7 +72,7 @@ struct RenderView
 
 struct SoundObject
 {
-
+	sound::SndObjectHandle handle;
 };
 
 struct Player
