@@ -18,6 +18,7 @@ namespace AK
         static const AkUniqueID PLAYER_BRAG = 3671645601U;
         static const AkUniqueID PLAYER_FOOTSTEP = 2453392179U;
         static const AkUniqueID PLAYER_JUMP = 1305133589U;
+        static const AkUniqueID TEST_3D_LOOPED = 2761780017U;
     } // namespace EVENTS
 
     namespace SWITCHES
