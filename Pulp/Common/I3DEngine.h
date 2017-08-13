@@ -16,6 +16,7 @@ X_NAMESPACE_DECLARE(model,
 X_NAMESPACE_BEGIN(engine)
 
 X_DECLARE_ENUM(PrimContext)(
+	SOUND, // 3d
 	PHYSICS, // 3d
 	MISC3D, // 3d
 	GUI, 	// 2d

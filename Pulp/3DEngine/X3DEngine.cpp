@@ -41,6 +41,7 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 	pCBufMan_(nullptr),
 	pVariableStateMan_(nullptr),
 	primContexts_{ 
+		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // sound
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // physics
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // misc3d
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // gui
@@ -50,6 +51,7 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 	worlds_(arena)
 {
 	// check if the enum order was changed in a way that resulted in incorrect modes.
+	X_ASSERT(primContexts_[PrimContext::SOUND].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::MISC3D].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::GUI].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
