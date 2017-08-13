@@ -484,6 +484,105 @@ bool XSound::asyncInitFinalize(void)
 }
 
 
+void XSound::shutDown(void)
+{
+	X_LOG0("SoundSys", "Shutting Down");
+#if X_SUPER == 0
+	if (comsSysInit_) {
+		Comm::Term();
+		comsSysInit_ = false;
+	}
+#endif // !X_SUPER
+
+	MusicEngine::Term();
+
+	if (AK::SoundEngine::IsInitialized())
+	{
+		AKRESULT res;
+
+		res = AK::SoundEngine::UnregisterGameObj(GLOBAL_OBJECT_ID);
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error unregistering global objects. %s", AkResult::ToString(res, desc));
+		}
+
+		res = AK::SoundEngine::ClearBanks();
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error clearing banks. %s", AkResult::ToString(res, desc));
+		}
+
+
+		SoundEngine::Term();
+	}
+
+	ioHook_.Term();
+
+	if (IAkStreamMgr::Get()) {
+		IAkStreamMgr::Get()->Destroy();
+	}
+
+	if (AK::MemoryMgr::IsInitialized())
+	{
+		MemoryMgr::Term();
+	}
+}
+
+void XSound::release(void)
+{
+	X_DELETE(this, g_SoundArena);
+}
+
+void XSound::Update(void)
+{
+	X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
+
+	if (AK::SoundEngine::IsInitialized())
+	{
+		AkListenerPosition listener;
+		listener.OrientationFront.X = 0;
+		listener.OrientationFront.Y = 0;
+		listener.OrientationFront.Z = 0;
+		listener.OrientationTop.X = 0;
+		listener.OrientationTop.Y = 0;
+		listener.OrientationTop.Z = 1.0f;
+		listener.Position = Vec3ToAkVector(listenerTrans_.pos);
+
+		AKRESULT res = SoundEngine::SetListenerPosition(listener);
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));
+		}
+
+		if (vars_.EnableOutputCapture() && !outputCaptureEnabled_)
+		{
+			AkOSChar const* pFileName = L"audio_capture.wav";
+
+			res = AK::SoundEngine::StartOutputCapture(pFileName);
+			if (res != AK_Success) {
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error starting output capture. %s", AkResult::ToString(res, desc));
+			}
+
+			outputCaptureEnabled_ = true;
+		}
+		else if (!vars_.EnableOutputCapture() && outputCaptureEnabled_)
+		{
+			res = AK::SoundEngine::StopOutputCapture();
+			if (res != AK_Success) {
+				AkResult::Description desc;
+				X_ERROR("SoundSys", "Error stopping output capture. %s", AkResult::ToString(res, desc));
+			}
+
+			outputCaptureEnabled_ = false;
+		}
+
+
+		SoundEngine::RenderAudio();
+	}
+}
+
+
 AkBankID XSound::getBankId(const char* pName) const
 {
 	core::Path<char> name(pName);
@@ -644,104 +743,6 @@ void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPt
 }
 
 
-
-void XSound::shutDown(void)
-{
-	X_LOG0("SoundSys", "Shutting Down");
-#if X_SUPER == 0
-	if (comsSysInit_) {
-		Comm::Term();
-		comsSysInit_ = false;
-	}
-#endif // !X_SUPER
-
-	MusicEngine::Term();
-
-	if (AK::SoundEngine::IsInitialized())
-	{
-		AKRESULT res;
-
-		res = AK::SoundEngine::UnregisterGameObj(GLOBAL_OBJECT_ID);
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error unregistering global objects. %s", AkResult::ToString(res, desc));
-		}
-
-		res = AK::SoundEngine::ClearBanks();
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error clearing banks. %s", AkResult::ToString(res, desc));
-		}
-
-
-		SoundEngine::Term();
-	}
-
-	ioHook_.Term();
-
-	if (IAkStreamMgr::Get()) {
-		IAkStreamMgr::Get()->Destroy();
-	}
-
-	if (AK::MemoryMgr::IsInitialized())
-	{
-		MemoryMgr::Term();
-	}
-}
-
-void XSound::release(void)
-{
-	X_DELETE(this,g_SoundArena);
-}
-
-void XSound::Update(void)
-{
-	X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
-
-	if (AK::SoundEngine::IsInitialized())
-	{
-		AkListenerPosition listener;
-		listener.OrientationFront.X = 0;
-		listener.OrientationFront.Y = 0;
-		listener.OrientationFront.Z = 0;
-		listener.OrientationTop.X = 0;
-		listener.OrientationTop.Y = 0;
-		listener.OrientationTop.Z = 1.0f;
-		listener.Position = Vec3ToAkVector(listenerTrans_.pos);
-
-		AKRESULT res = SoundEngine::SetListenerPosition(listener);
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));
-		}
-
-		if (vars_.EnableOutputCapture() && !outputCaptureEnabled_)
-		{
-			AkOSChar const* pFileName = L"audio_capture.wav";
-
-			res = AK::SoundEngine::StartOutputCapture(pFileName);
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error starting output capture. %s", AkResult::ToString(res, desc));
-			}
-
-			outputCaptureEnabled_ = true;
-		}
-		else if (!vars_.EnableOutputCapture() && outputCaptureEnabled_)
-		{
-			res = AK::SoundEngine::StopOutputCapture();
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error stopping output capture. %s", AkResult::ToString(res, desc));
-			}
-
-			outputCaptureEnabled_ = false;
-		}
-
-
-		SoundEngine::RenderAudio();
-	}
-}
 
 void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
