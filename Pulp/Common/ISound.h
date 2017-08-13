@@ -38,6 +38,13 @@ X_DECLARE_ENUM(CurveInterpolation)(
 	Constant		/// constant ( not valid for fading values )
 );
 
+X_DECLARE_ENUM(OcclusionType)(
+	None,
+	Ignore,
+	SingleRay,
+	MultiRay	
+);
+
 
 X_INLINE uint32_t GetIDFromStr(const char* pStr)
 {
