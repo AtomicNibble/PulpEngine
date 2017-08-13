@@ -7,7 +7,7 @@
 X_NAMESPACE_BEGIN(sound)
 
 // toggle that a sound bank is required to start.
-#define SOUND_INIT_BANK_REQUIRED 0
+#define SOUND_INIT_BANK_REQUIRED 1
 
 
 
