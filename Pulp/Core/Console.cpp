@@ -702,7 +702,8 @@ void XConsole::saveChangedVars(void)
 
 		for (auto& k : keep)
 		{
-			file.writeString(k.GetStart(), k.GetLength());
+			file.write(k.GetStart(), k.GetLength());
+			file.write('\n');
 		}
 
 		for (auto itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
