@@ -52,7 +52,6 @@ X_DECLARE_ENUM(CurveInterpolation)(
 
 X_DECLARE_ENUM8(OcclusionType)(
 	None,
-	Ignore,
 	SingleRay,
 	MultiRay	
 );
