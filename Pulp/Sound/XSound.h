@@ -139,8 +139,8 @@ private:
 	void drawDebug(void) const;
 	void cullObjects(void);
 
-	void registerObject(SoundObject* pObject);
-	void unregisterObject(SoundObject* pObject);
+	void registerObjectSndEngine(SoundObject* pObject);
+	void unregisterObjectSndEngine(SoundObject* pObject);
 
 private:
 	SoundObject* allocObject(void);

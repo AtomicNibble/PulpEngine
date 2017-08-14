@@ -693,13 +693,14 @@ void XSound::cullObjects(void)
 			culledObjects_.removeIndex(i);
 			objects_.append(pObject);
 
-			registerObject(pObject);
+			registerObjectSndEngine(pObject);
 		}
 	}
 
-	if (culledNum < culledObjects_.size())
+
+	if (num < objects_.size())
 	{
-		X_LOG0("SoundSys", "Registered %" PRIuS " objects", culledObjects_.size() - culledNum);
+		X_LOG0("SoundSys", "Registered %" PRIuS " object(s)", objects_.size() - num);
 	}
 
 	for (size_t i = 0; i< objects_.size(); i++)
@@ -712,18 +713,18 @@ void XSound::cullObjects(void)
 			objects_.removeIndex(i);
 			culledObjects_.append(pObject);
 
-			unregisterObject(pObject);
+			unregisterObjectSndEngine(pObject);
 		}
 	}
 
-	if (num < objects_.size())
+	if (culledNum < culledObjects_.size())
 	{
-		X_LOG0("SoundSys", "Un-Registered %" PRIuS " objects", objects_.size() -  num);
+		X_LOG0("SoundSys", "Un-Registered %" PRIuS " object(s)", culledObjects_.size() - culledNum);
 	}
 }
 
 
-void XSound::registerObject(SoundObject* pObject)
+void XSound::registerObjectSndEngine(SoundObject* pObject)
 {
 	pObject->flags.Set(SoundFlag::Registered);
 
@@ -747,7 +748,7 @@ void XSound::registerObject(SoundObject* pObject)
 	}
 }
 
-void XSound::unregisterObject(SoundObject* pObject)
+void XSound::unregisterObjectSndEngine(SoundObject* pObject)
 {
 	pObject->flags.Remove(SoundFlag::Registered);
 
@@ -869,6 +870,7 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 
 	return SoundObjToObjHandle(pObject);
 }
+
 
 bool XSound::unRegisterObject(SndObjectHandle object)
 {
