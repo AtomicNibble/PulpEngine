@@ -199,6 +199,7 @@ XSound::XSound(core::MemoryArenaBase* arena) :
 	banks_(arena_),
 	objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject)),
 	objects_(arena_),
+	culledObjects_(arena_),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false),
 	bankSignal_(true)
@@ -578,6 +579,8 @@ void XSound::Update(void)
 
 	if (AK::SoundEngine::IsInitialized())
 	{
+		cullObjects();
+
 		AkListenerPosition listener;
 		listener.OrientationFront.X = 0;
 		listener.OrientationFront.Y = 0;
@@ -625,6 +628,7 @@ void XSound::Update(void)
 	}
 }
 
+
 void XSound::drawDebug(void) const
 {
 	if (!pPrimCon_) {
@@ -639,16 +643,118 @@ void XSound::drawDebug(void) const
 	sphere.setRadius(vars_.debugObjectScale());
 
 	Color8u col = Col_Blue;
+	Color8u lineCol = Col_Red;
 
 	pPrimCon_->setDepthTest(true);
+
+	auto listnerPos = listenerTrans_.pos;
+	listnerPos.z -= 1.f; // make the line not point directly at us.
 
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	for (auto* pObject : objects_)
 	{
-		sphere.setCenter(pObject->trans.pos);
+		auto& trans = pObject->trans;
+		sphere.setCenter(trans.pos);
 
-		pPrimCon_->drawSphere(sphere, col, true);
+		float distance = listnerPos.distance(trans.pos);
+		if (distance > 2000.f) {
+			continue;
+		}
+
+		int32_t lodIdx = static_cast<int32_t>(distance / 200.f);
+		lodIdx = math<int32_t>::min(lodIdx, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
+
+		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
+
+		pPrimCon_->drawSphere(sphere, col, true, lodIdx);
+		pPrimCon_->drawLine(trans.pos, listnerPos, lineCol);
+	}
+
+}
+
+void XSound::cullObjects(void)
+{
+	// work out what objects we can register.
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	const size_t culledNum = culledObjects_.size();
+	const size_t num = objects_.size();
+
+	const float cullDistance = vars_.registeredCullDistance();
+	const auto listenerPos = listenerTrans_.pos;
+	for (size_t i=0; i< culledObjects_.size(); i++)
+	{
+		auto* pObject = culledObjects_[i];
+
+		float distance = pObject->trans.pos.distance(listenerPos) + 30.f; // prevent flip flop.
+		if (distance < cullDistance)
+		{
+			culledObjects_.removeIndex(i);
+			objects_.append(pObject);
+
+			registerObject(pObject);
+		}
+	}
+
+	if (culledNum < culledObjects_.size())
+	{
+		X_LOG0("SoundSys", "Registered %" PRIuS " objects", culledObjects_.size() - culledNum);
+	}
+
+	for (size_t i = 0; i< objects_.size(); i++)
+	{
+		auto* pObject = objects_[i];
+
+		float distance = pObject->trans.pos.distance(listenerPos);
+		if (distance > cullDistance)
+		{
+			objects_.removeIndex(i);
+			culledObjects_.append(pObject);
+
+			unregisterObject(pObject);
+		}
+	}
+
+	if (num < objects_.size())
+	{
+		X_LOG0("SoundSys", "Un-Registered %" PRIuS " objects", objects_.size() -  num);
+	}
+}
+
+
+void XSound::registerObject(SoundObject* pObject)
+{
+	pObject->flags.Set(SoundFlag::Registered);
+
+#if X_SOUND_ENABLE_DEBUG_NAMES
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
+#else
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
+#endif
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
+	}
+
+	if (pObject->flags.IsSet(SoundFlag::Position))
+	{
+		res = AK::SoundEngine::SetPosition(SoundObjToAKObject(pObject), TransToAkPos(pObject->trans));
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+		}
+	}
+}
+
+void XSound::unregisterObject(SoundObject* pObject)
+{
+	pObject->flags.Remove(SoundFlag::Registered);
+
+	AKRESULT res = AK::SoundEngine::UnregisterGameObj(SoundObjToAKObject(pObject));
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
 	}
 }
 
@@ -705,33 +811,19 @@ uint32_t XSound::getIDFromStr(const wchar_t* pStr) const
 // ----------------------------------------------
 
 // the id is passed in, so could just pass pointer value in then use that as id.
-SndObjectHandle XSound::registerObject(const char* pNick)
+SndObjectHandle XSound::registerObject(X_SOUND_DEBUG_NAME(const char* pNick))
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	SoundObject* pObject = allocObject();
+	pObject->flags.Set(SoundFlag::Registered);
 
+#if X_SOUND_ENABLE_DEBUG_NAMES
+	pObject->debugName = pNick;
 	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
-		return INVALID_OBJECT_ID;
-	}
-
-	objects_.push_back(pObject);
-
-	return SoundObjToObjHandle(pObject);
-}
-
-
-SndObjectHandle XSound::registerObject(const Transformf& trans, const char* pNick)
-{
-	core::CriticalSection::ScopedLock lock(cs_);
-
-	SoundObject* pObject = allocObject();
-	pObject->trans = trans;
-
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
+#else
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
+#endif
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
@@ -739,9 +831,41 @@ SndObjectHandle XSound::registerObject(const Transformf& trans, const char* pNic
 		return INVALID_OBJECT_ID;
 	}
 
-	setPosition(SoundObjToAKObject(pObject), trans);
-
 	objects_.push_back(pObject);
+	return SoundObjToObjHandle(pObject);
+}
+
+
+SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAME_COM(const char* pNick))
+{
+	SoundObject* pObject = allocObject();
+
+	float distance = listenerTrans_.pos.distance(trans.pos);
+	if (distance > vars_.registeredCullDistance())
+	{
+		culledObjects_.push_back(pObject);
+	}
+	else
+	{
+		pObject->flags.Set(SoundFlag::Registered);
+
+#if X_SOUND_ENABLE_DEBUG_NAMES
+		pObject->debugName = pNick;
+		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
+#else
+		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
+#endif
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
+			freeObject(pObject);
+			return INVALID_OBJECT_ID;
+		}
+
+		setPosition(SoundObjToObjHandle(pObject), trans);
+
+		objects_.push_back(pObject);
+	}
 
 	return SoundObjToObjHandle(pObject);
 }
@@ -759,8 +883,12 @@ bool XSound::unRegisterObject(SndObjectHandle object)
 
 	SoundObject* pSound = SoundObjToObjHandle(object);
 
-	// Log(n) but potentially very quick, as just linera array of pointers.
-	objects_.remove(pSound);
+	if (pSound->flags.IsSet(SoundFlag::Registered)) {
+		objects_.remove(pSound);
+	}
+	else {
+		culledObjects_.remove(pSound);
+	}
 
 	freeObject(pSound);
 	return true;
@@ -799,6 +927,7 @@ void XSound::setPosition(SndObjectHandle object, const Transformf& trans)
 {
 	SoundObject* pSound = SoundObjToObjHandle(object);
 	pSound->trans = trans;
+	pSound->flags.Set(SoundFlag::Position);
 
 	AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
 	if (res != AK_Success) {
@@ -813,6 +942,7 @@ void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, si
 	{
 		SoundObject* pSound = SoundObjToObjHandle(pObjects[i]);
 		pSound->trans = pTrans[i];
+		pSound->flags.Set(SoundFlag::Position);
 
 		AKRESULT res = AK::SoundEngine::SetPosition(pObjects[i], TransToAkPos(pTrans[i]));
 		if (res != AK_Success) {

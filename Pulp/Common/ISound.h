@@ -11,6 +11,16 @@
 
 X_NAMESPACE_BEGIN(sound)
 
+#define X_SOUND_ENABLE_DEBUG_NAMES 1
+
+#if X_SOUND_ENABLE_DEBUG_NAMES
+#define X_SOUND_DEBUG_NAME(expr) expr
+#define X_SOUND_DEBUG_NAME_COM(expr) , expr
+#else
+#define X_SOUND_DEBUG_NAME(expr) 
+#define X_SOUND_DEBUG_NAME_COM(expr) 
+#endif // !X_SOUND_ENABLE_DEBUG_NAMES
+
 typedef core::Hash::Fnv1Val HashVal;
 typedef uintptr_t SndObjectHandle;
 typedef HashVal EventID;
@@ -105,8 +115,8 @@ struct ISound : public core::IEngineSysBase
 	virtual uint32_t getIDFromStr(const wchar_t* pStr) const X_ABSTRACT;
 
 	// the id is passed in, so could just pass pointer value in then use that as id.
-	virtual SndObjectHandle registerObject(const char* pNick = nullptr) X_ABSTRACT;
-	virtual SndObjectHandle registerObject(const Transformf& trans, const char* pNick = nullptr) X_ABSTRACT;
+	virtual SndObjectHandle registerObject(X_SOUND_DEBUG_NAME(const char* pNick = nullptr)) X_ABSTRACT;
+	virtual SndObjectHandle registerObject(const Transformf& trans X_SOUND_DEBUG_NAME_COM(const char* pNick = nullptr)) X_ABSTRACT;
 	virtual bool unRegisterObject(SndObjectHandle object) X_ABSTRACT;
 	virtual void unRegisterAll(void) X_ABSTRACT;
 

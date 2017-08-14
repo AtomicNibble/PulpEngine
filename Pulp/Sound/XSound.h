@@ -24,11 +24,26 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(sound)
 
-class SoundObject
-{
-public:
 
+X_DECLARE_FLAGS8(SoundFlag)(
+	Registered,
+	Position,
+	Occluded
+);
+
+typedef Flags<SoundFlag> SoundFlags;
+
+struct SoundObject
+{
 	Transformf trans;
+
+	SoundFlags flags;
+	OcclusionType::Enum occType;
+	bool _pad[2];
+
+#if X_SOUND_ENABLE_DEBUG_NAMES
+	core::string debugName;
+#endif
 };
 
 
@@ -77,7 +92,6 @@ public:
 
 	void Update(void) X_FINAL;
 
-	void drawDebug(void) const;
 
 	// Shut up!
 	void mute(bool mute) X_FINAL;
@@ -93,8 +107,8 @@ public:
 	uint32_t getIDFromStr(const char* pStr) const X_FINAL;
 	uint32_t getIDFromStr(const wchar_t* pStr) const X_FINAL;
 
-	SndObjectHandle registerObject(const char* pNick) X_FINAL;
-	SndObjectHandle registerObject(const Transformf& trans, const char* pNick) X_FINAL;
+	SndObjectHandle registerObject(X_SOUND_DEBUG_NAME(const char* pNick)) X_FINAL;
+	SndObjectHandle registerObject(const Transformf& trans X_SOUND_DEBUG_NAME_COM(const char* pNick)) X_FINAL;
 	bool unRegisterObject(SndObjectHandle object) X_FINAL;
 	void unRegisterAll(void) X_FINAL;
 
@@ -121,6 +135,12 @@ public:
 
 	void listBanks(const char* pSearchString) const;
 
+private:
+	void drawDebug(void) const;
+	void cullObjects(void);
+
+	void registerObject(SoundObject* pObject);
+	void unregisterObject(SoundObject* pObject);
 
 private:
 	SoundObject* allocObject(void);
@@ -159,6 +179,7 @@ private:
 	BanksArr banks_;
 	SoundObjectPool objectPool_;
 	SoundObjectPtrArr objects_;
+	SoundObjectPtrArr culledObjects_;
 
 	bool comsSysInit_;
 	bool outputCaptureEnabled_;
