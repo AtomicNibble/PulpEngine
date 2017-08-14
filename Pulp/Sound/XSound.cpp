@@ -181,7 +181,7 @@ namespace
 		return reinterpret_cast<SndObjectHandle>(pObject);
 	}
 
-	X_INLINE SoundObject* SoundObjToObjHandle(SndObjectHandle object)
+	X_INLINE SoundObject* SoundHandleToObject(SndObjectHandle object)
 	{
 		static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
 		return reinterpret_cast<SoundObject*>(object);
@@ -887,7 +887,7 @@ bool XSound::unRegisterObject(SndObjectHandle object)
 		return false;
 	}
 
-	SoundObject* pSound = SoundObjToObjHandle(object);
+	SoundObject* pSound = SoundHandleToObject(object);
 
 	if (pSound->flags.IsSet(SoundFlag::Registered)) {
 		objects_.remove(pSound);
@@ -931,7 +931,7 @@ void XSound::freeObject(SoundObject* pObject)
 
 void XSound::setPosition(SndObjectHandle object, const Transformf& trans)
 {
-	SoundObject* pSound = SoundObjToObjHandle(object);
+	SoundObject* pSound = SoundHandleToObject(object);
 	pSound->trans = trans;
 	pSound->flags.Set(SoundFlag::Position);
 
@@ -946,7 +946,7 @@ void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, si
 {
 	for (size_t i = 0; i < num; i++)
 	{
-		SoundObject* pSound = SoundObjToObjHandle(pObjects[i]);
+		SoundObject* pSound = SoundHandleToObject(pObjects[i]);
 		pSound->trans = pTrans[i];
 		pSound->flags.Set(SoundFlag::Position);
 
