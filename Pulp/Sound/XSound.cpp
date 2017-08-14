@@ -726,6 +726,8 @@ void XSound::cullObjects(void)
 
 void XSound::registerObjectSndEngine(SoundObject* pObject)
 {
+	X_ASSERT(!pObject->flags.IsSet(SoundFlag::Registered), "Double register")();
+
 	pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
@@ -750,6 +752,8 @@ void XSound::registerObjectSndEngine(SoundObject* pObject)
 
 void XSound::unregisterObjectSndEngine(SoundObject* pObject)
 {
+	X_ASSERT(pObject->flags.IsSet(SoundFlag::Registered), "Double un-register")();
+
 	pObject->flags.Remove(SoundFlag::Registered);
 
 	AKRESULT res = AK::SoundEngine::UnregisterGameObj(SoundObjToAKObject(pObject));
