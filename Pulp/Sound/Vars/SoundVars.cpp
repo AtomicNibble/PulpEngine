@@ -58,6 +58,8 @@ SoundVars::SoundVars()
 
 	debugObjectScale_ = 1.f;
 
+	registeredCullDistance_ = 3000; 
+
 	pVarVolMaster_ = nullptr;
 	pVarVolMusic_ = nullptr;
 	pVarVolSfx_ = nullptr;
@@ -116,6 +118,10 @@ void SoundVars::RegisterVars(void)
 	ADD_CVAR_REF("snd_debug_obj_scale", debugObjectScale_, debugObjectScale_, 1.f, 32.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Debug draw scale for objects");
+
+	ADD_CVAR_REF("snd_active_cull_distance", registeredCullDistance_, registeredCullDistance_, 0, maxVal,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Distance active sound objects are culled. All sounds we be stopped once sound object exceeds this distance from listner");
 
 
 	// LEEERORRRY Jenkins!!

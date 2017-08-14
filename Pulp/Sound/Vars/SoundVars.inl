@@ -27,6 +27,11 @@ X_INLINE float SoundVars::debugObjectScale(void) const
 }
 
 
+X_INLINE int32_t SoundVars::registeredCullDistance(void)
+{
+	return registeredCullDistance_;
+}
+
 // ----------------------
 
 X_INLINE uint32_t SoundVars::SoundEngineDefaultMemoryPoolBytes(void)
