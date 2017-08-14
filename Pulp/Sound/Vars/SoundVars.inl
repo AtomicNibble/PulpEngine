@@ -27,7 +27,7 @@ X_INLINE float SoundVars::debugObjectScale(void) const
 }
 
 
-X_INLINE int32_t SoundVars::registeredCullDistance(void)
+X_INLINE float SoundVars::registeredCullDistance(void)
 {
 	return registeredCullDistance_;
 }

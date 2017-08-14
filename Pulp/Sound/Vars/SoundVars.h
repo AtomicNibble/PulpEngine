@@ -29,7 +29,7 @@ public:
 
 	X_INLINE float debugObjectScale(void) const;
 
-	X_INLINE int32_t registeredCullDistance(void);
+	X_INLINE float registeredCullDistance(void);
 
 	X_INLINE uint32_t SoundEngineDefaultMemoryPoolBytes(void);
 	X_INLINE uint32_t SoundEngineLowerDefaultMemoryPoolBytes(void);
@@ -54,7 +54,7 @@ private:
 	int32_t enableDebugRender_;
 	float debugObjectScale_;
 
-	int32_t registeredCullDistance_;
+	float registeredCullDistance_;
 
 private:
 	int32_t soundEngineDefaultMemoryPoolSize_;
