@@ -596,12 +596,24 @@ struct SweepHit : public LocationHit
 template<typename HitType>
 struct HitCallback
 {
+	/*
+
+	param[in] aTouches			Optional buffer for recording PxQueryHitType::eTOUCH type hits.
+	param[in] aMaxNbTouches		Size of touch buffer.
+
+	note	if aTouches is nullptr and aMaxNbTouches is 0, only the closest blocking hit will be recorded by the query.
+	note	If ANY_HIT flag is used as a query parameter, hasBlock will be set to true and blockingHit will be used to receive the result.
+	note	Both TOUCH and BLOCK hits will be registered as hasBlock = true and stored in HitCallback.block when ANY_HIT flag is used.
+
+	*/
 	HitCallback(HitType* aTouches, uint32_t aMaxNbTouches) :
 		hasBlock(false),
-		touches(aTouches), 
+		pTouches(aTouches),
 		maxNbTouches(aMaxNbTouches), 
 		nbTouches(0)
-	{}
+	{
+	
+	}
 
 	virtual ~HitCallback() {}
 
@@ -643,6 +655,13 @@ struct HitBuffer : public HitCallback<HitType>
 		return getTouches()[index]; 
 	}
 	X_INLINE uint32_t getMaxNbTouches(void) const { return this->maxNbTouches; }
+
+protected:
+	// stops after the first callback
+	virtual bool processTouches(const HitType* buffer, uint32_t nbHits) { 
+		X_UNUSED(buffer, nbHits); 
+		return false;
+	}
 };
 
 typedef HitCallback<RaycastHit> RaycastCallback;
