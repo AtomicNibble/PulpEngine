@@ -40,7 +40,7 @@ X_DECLARE_ENUM(CurveInterpolation)(
 	Constant		/// constant ( not valid for fading values )
 );
 
-X_DECLARE_ENUM(OcclusionType)(
+X_DECLARE_ENUM8(OcclusionType)(
 	None,
 	Ignore,
 	SingleRay,
