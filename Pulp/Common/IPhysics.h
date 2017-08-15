@@ -807,10 +807,12 @@ struct IBatchedQuery
 	virtual	void release(void) X_ABSTRACT;
 
 	virtual void raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
-		int16_t maxtouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_ABSTRACT;
+		int16_t maxtouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		QueryFlags queryFlags = QueryFlag::STATIC | QueryFlag::DYNAMIC) const X_ABSTRACT;
 
 	virtual void sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		int16_t maxTouchHits, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		QueryFlags queryFlags = QueryFlag::STATIC | QueryFlag::DYNAMIC,
 		const float32_t inflation = 0.f) const X_ABSTRACT;
 
 	virtual void overlap(const GeometryBase& geometry, const Transformf& pose, int16_t maxTouchHits) const X_ABSTRACT;

@@ -31,20 +31,21 @@ void BatchedQuery::release(void)
 }
 
 void BatchedQuery::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
-	int16_t maxtouchHits, HitFlags hitFlags) const
+	int16_t maxtouchHits, HitFlags hitFlags, QueryFlags queryFlags) const
 {
 	pBatchedQuery_->raycast(
 		Px3FromVec3(origin),
 		Px3FromVec3(unitDir),
 		distance,
 		maxtouchHits,
-		static_cast<physx::PxHitFlags>(hitFlags.ToInt())
+		static_cast<physx::PxHitFlags>(hitFlags.ToInt()),
+		physx::PxQueryFilterData(static_cast<physx::PxQueryFlags>(queryFlags.ToInt()))
 	);
 
 }
 
 void BatchedQuery::sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
-	int16_t maxTouchHits, HitFlags hitFlags, const float32_t inflation) const
+	int16_t maxTouchHits, HitFlags hitFlags, QueryFlags queryFlags, const float32_t inflation) const
 {
 	return pBatchedQuery_->sweep(
 		PxGeoFromGeo(geometry),
@@ -52,7 +53,8 @@ void BatchedQuery::sweep(const GeometryBase& geometry, const Transformf& pose, c
 		Px3FromVec3(unitDir),
 		distance,
 		maxTouchHits,
-		static_cast<physx::PxHitFlags>(hitFlags.ToInt())
+		static_cast<physx::PxHitFlags>(hitFlags.ToInt()),
+		physx::PxQueryFilterData(static_cast<physx::PxQueryFlags>(queryFlags.ToInt()))
 	);
 }
 
