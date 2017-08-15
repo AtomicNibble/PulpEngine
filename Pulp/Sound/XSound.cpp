@@ -9,7 +9,6 @@
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <IPhysics.h>
-#include <IFont.h>
 
 X_DISABLE_WARNING(4505)
 
@@ -752,18 +751,13 @@ void XSound::performOcclusionChecks(void)
 			{
 				pObject->flags.Set(SoundFlag::Occluded);
 
-				Sphere sphere;
-				sphere.setCenter(hit.block.position);
-				sphere.setRadius(vars_.debugObjectScale());
-				pPrimCon_->drawSphere(sphere, Col_Plum, true, 0);
+			//	Sphere sphere;
+			//	sphere.setCenter(hit.block.position);
+			//	sphere.setRadius(vars_.debugObjectScale());
+			//	pPrimCon_->drawSphere(sphere, Col_Plum, true, 0);
 
-				font::TextDrawContext con;
-				con.pFont = gEnv->pFontSys->GetFont("default");
-				con.effectId = 0;
-				con.col = Col_White;
-
-				Vec3f end = start + (dir * distance);
-				pPrimCon_->drawLine(start, end, Col_Plum);
+			//	Vec3f end = start + (dir * distance);
+			//	pPrimCon_->drawLine(start, end, Col_Red);
 
 				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.5f, 0.f);
 			}
@@ -771,9 +765,8 @@ void XSound::performOcclusionChecks(void)
 			{
 				pObject->flags.Remove(SoundFlag::Occluded);
 
-				Vec3f end = start + (dir * distance);
-
-				pPrimCon_->drawLine(start, end, Col_Yellow);
+			//	Vec3f end = start + (dir * distance);
+			//	pPrimCon_->drawLine(start, end, Col_Lawngreen);
 			
 				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
 			}
