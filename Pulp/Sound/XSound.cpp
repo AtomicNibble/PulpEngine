@@ -734,30 +734,19 @@ void XSound::performOcclusionChecks(void)
 		{
 			physics::RaycastBuffer hit;
 
-			auto listenerPos = listenerTrans_.pos;
-			listenerPos.z -= 1;
+			const auto& listenerPos = listenerTrans_.pos;
 
-			Vec3f target = pObject->trans.pos;
-			Vec3f start = listenerPos;
+			const Vec3f target = pObject->trans.pos;
+			const Vec3f& start = listenerPos;
 
 			Vec3f dir = target - start;
 			dir.normalize();
 
-			start += (dir * 20);
-
 			float distance = start.distance(target);
 
-			if (pScene->raycast(start, dir, distance, hit))
+			if (pScene->raycast(start, dir, distance, hit, physics::DEFAULT_HIT_FLAGS, physics::QueryFlag::STATIC))
 			{
 				pObject->flags.Set(SoundFlag::Occluded);
-
-			//	Sphere sphere;
-			//	sphere.setCenter(hit.block.position);
-			//	sphere.setRadius(vars_.debugObjectScale());
-			//	pPrimCon_->drawSphere(sphere, Col_Plum, true, 0);
-
-			//	Vec3f end = start + (dir * distance);
-			//	pPrimCon_->drawLine(start, end, Col_Red);
 
 				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.5f, 0.f);
 			}
@@ -765,18 +754,13 @@ void XSound::performOcclusionChecks(void)
 			{
 				pObject->flags.Remove(SoundFlag::Occluded);
 
-			//	Vec3f end = start + (dir * distance);
-			//	pPrimCon_->drawLine(start, end, Col_Lawngreen);
-			
 				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
 			}
-
 		}
 		else
 		{
 			X_ASSERT_NOT_IMPLEMENTED();
 		}
-
 	}
 }
 
