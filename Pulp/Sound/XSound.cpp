@@ -925,8 +925,11 @@ SndObjectHandle XSound::registerObject(X_SOUND_DEBUG_NAME(const char* pNick))
 SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAME_COM(const char* pNick))
 {
 	SoundObject* pObject = allocObject();
+#if X_SOUND_ENABLE_DEBUG_NAMES
+	pObject->debugName = pNick;
+#endif
 
-	// we don't mae objects very far away active by default.
+	// we don't make objects very far away active by default.
 	// if you play something on these distant objects, they will get registered automatically.
 	float distance = listenerTrans_.pos.distance(trans.pos);
 	if (distance > vars_.registeredCullDistance())
@@ -938,7 +941,6 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 		pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
-		pObject->debugName = pNick;
 		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
 #else
 		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
