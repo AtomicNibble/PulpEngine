@@ -456,7 +456,7 @@ void XScene::releaseCharacterController(ICharacterController* pController)
 // ------------------------------------------
 
 bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
-	RaycastCallback& hitCall, HitFlags hitFlags) const
+	RaycastCallback& hitCall, HitFlags hitFlags, QueryFlags queryFlags) const
 {
 	PHYS_SCENE_READ_LOCK(pScene_);
 
@@ -466,12 +466,13 @@ bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t 
 		Px3FromVec3(unitDir), 
 		distance,
 		reinterpret_cast<physx::PxRaycastCallback&>(hitCall), 
-		static_cast<physx::PxHitFlags>(hitFlags.ToInt())
+		static_cast<physx::PxHitFlags>(hitFlags.ToInt()),
+		physx::PxQueryFilterData(static_cast<physx::PxQueryFlags>(queryFlags.ToInt()))
 	);
 }
 
 bool XScene::sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
-	SweepCallback& hitCall, HitFlags hitFlags, const float32_t inflation) const
+	SweepCallback& hitCall, HitFlags hitFlags, QueryFlags queryFlags, const float32_t inflation) const
 {
 	PHYS_SCENE_READ_LOCK(pScene_);
 
@@ -481,7 +482,8 @@ bool XScene::sweep(const GeometryBase& geometry, const Transformf& pose, const V
 		Px3FromVec3(unitDir),
 		distance,
 		reinterpret_cast<physx::PxSweepCallback&>(hitCall),
-		static_cast<physx::PxHitFlags>(hitFlags.ToInt())
+		static_cast<physx::PxHitFlags>(hitFlags.ToInt()),
+		physx::PxQueryFilterData(static_cast<physx::PxQueryFlags>(queryFlags.ToInt()))
 	);
 }
 

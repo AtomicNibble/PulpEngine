@@ -56,10 +56,11 @@ public:
 
 	// Query stuff
 	bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
-		RaycastCallback& hitCall, HitFlags hitFlags) const X_FINAL;
+		RaycastCallback& hitCall, HitFlags hitFlags, QueryFlags queryFlags) const X_FINAL;
 
 	bool sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		SweepCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		QueryFlags queryFlags = QueryFlag::STATIC | QueryFlag::DYNAMIC,
 		const float32_t inflation = 0.f) const X_FINAL;
 
 	bool overlap(const GeometryBase& geometry, const Transformf& pose, OverlapCallback& hitCall) const X_FINAL;

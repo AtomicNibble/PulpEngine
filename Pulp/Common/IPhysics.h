@@ -542,6 +542,7 @@ X_DECLARE_FLAGS(HitFlag)(
 
 typedef Flags<HitFlag> HitFlags;
 
+
 X_DECLARE_FLAG_OPERATORS(HitFlags);
 
 struct ActorShape
@@ -830,10 +831,13 @@ struct TriggerPair
 
 // ------------------------------------------------
 
+static const HitFlags DEFAULT_HIT_FLAGS = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE;
+static const QueryFlags DEFAULT_QUERY_FLAGS = QueryFlag::STATIC | QueryFlags::DYNAMIC;
 
 struct IScene
 {
 	virtual ~IScene() {}
+
 
 	// some runtime tweaks.
 	virtual void setGravity(const Vec3f& gravity) X_ABSTRACT;
@@ -869,10 +873,12 @@ struct IScene
 	// some query api.
 
 	virtual bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
-		RaycastCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE) const X_ABSTRACT;
+		RaycastCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		QueryFlags queryFlags = QueryFlag::STATIC | QueryFlag::DYNAMIC) const X_ABSTRACT;
 
 	virtual bool sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
 		SweepCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
+		QueryFlags queryFlags = QueryFlag::STATIC | QueryFlag::DYNAMIC,
 		const float32_t inflation = 0.f) const X_ABSTRACT;
 
 	virtual bool overlap(const GeometryBase& geometry, const Transformf& pose, OverlapCallback& hitCall) const X_ABSTRACT;
