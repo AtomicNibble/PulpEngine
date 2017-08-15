@@ -978,10 +978,16 @@ bool XSound::unRegisterObject(SndObjectHandle object)
 	}
 
 
-	if (pSound->flags.IsSet(SoundFlag::Registered)) {
+	if (pSound->flags.IsSet(SoundFlag::Registered)) 
+	{
 		objects_.remove(pSound);
+		if (pSound->flags.IsSet(SoundFlag::Occlusion)) 
+		{
+			occlusion_.remove(pSound);
+		}
 	}
-	else {
+	else 
+	{
 		culledObjects_.remove(pSound);
 	}
 
