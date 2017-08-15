@@ -27,6 +27,14 @@ namespace
 	static_assert(HitFlag::MTD == physx::PxHitFlag::eMTD, "HitFlag mismatch");
 
 
+	static_assert(QueryFlag::STATIC == physx::PxQueryFlag::eSTATIC, "QueryFlag mismatch");
+	static_assert(QueryFlag::DYNAMIC == physx::PxQueryFlag::eDYNAMIC, "QueryFlag mismatch");
+	static_assert(QueryFlag::PREFILTER == physx::PxQueryFlag::ePREFILTER, "QueryFlag mismatch");
+	static_assert(QueryFlag::POSTFILTER == physx::PxQueryFlag::ePOSTFILTER, "QueryFlag mismatch");
+	static_assert(QueryFlag::ANY_HIT == physx::PxQueryFlag::eANY_HIT, "QueryFlag mismatch");
+	static_assert(QueryFlag::NO_BLOCK == physx::PxQueryFlag::eNO_BLOCK, "QueryFlag mismatch");
+
+
 	X_ENSURE_SIZE(ActorShape, sizeof(physx::PxActorShape));
 	X_ENSURE_SIZE(QueryHit, sizeof(physx::PxQueryHit));
 	X_ENSURE_SIZE(LocationHit, sizeof(physx::PxLocationHit));

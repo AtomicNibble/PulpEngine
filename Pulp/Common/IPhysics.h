@@ -510,6 +510,18 @@ struct SceneDesc
 
 // ------------------------------------------------
 
+X_DECLARE_FLAGS(QueryFlag)(
+	STATIC,
+	DYNAMIC,
+	PREFILTER,
+	POSTFILTER,
+	ANY_HIT,
+	NO_BLOCK
+);
+
+typedef Flags<QueryFlag> QueryFlags;
+
+X_DECLARE_FLAG_OPERATORS(QueryFlags);
 
 X_DECLARE_FLAGS(HitFlag)(
 	POSITION,						// "position" member of QueryHit is valid
