@@ -9,6 +9,11 @@
 
 #include <IMaterial.h>
 
+
+X_NAMESPACE_DECLARE(physics,
+	struct IScene;
+);
+
 X_NAMESPACE_BEGIN(sound)
 
 #define X_SOUND_ENABLE_DEBUG_NAMES 1
@@ -93,6 +98,7 @@ struct ISound : public core::IEngineSysBase
 
 	// ting tong wong, sing me a song in a thong!
 	virtual void Update(void) X_ABSTRACT;
+	virtual void setPhysicsScene(physics::IScene* pScene) X_ABSTRACT;
 
 	// load banks, async.
 	virtual void loadBank(const char* pName) X_ABSTRACT;
@@ -130,6 +136,7 @@ struct ISound : public core::IEngineSysBase
 	virtual void postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
 	virtual void postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
 
+	virtual void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_ABSTRACT;
 	virtual void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_ABSTRACT;
 	virtual void setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object) X_ABSTRACT;
 	virtual void setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object = INVALID_OBJECT_ID,

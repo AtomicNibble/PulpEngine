@@ -8,7 +8,8 @@
 #include <IConsole.h>
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
-
+#include <IPhysics.h>
+#include <IFont.h>
 
 X_DISABLE_WARNING(4505)
 
@@ -187,6 +188,12 @@ namespace
 		return reinterpret_cast<SoundObject*>(object);
 	}
 
+	X_INLINE SoundObject* AKObjectToObject(AkGameObjectID object)
+	{
+		static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
+		return reinterpret_cast<SoundObject*>(object);
+	}
+
 
 } // namespace
 
@@ -196,10 +203,12 @@ static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect
 XSound::XSound(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	pPrimCon_(nullptr),
+	pScene_(nullptr),
 	banks_(arena_),
 	objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject)),
 	objects_(arena_),
 	culledObjects_(arena_),
+	occlusion_(arena_),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false),
 	bankSignal_(true)
@@ -580,6 +589,7 @@ void XSound::Update(void)
 	if (AK::SoundEngine::IsInitialized())
 	{
 		cullObjects();
+		performOcclusionChecks();
 
 		AkListenerPosition listener;
 		listener.OrientationFront.X = 0;
@@ -628,6 +638,11 @@ void XSound::Update(void)
 	}
 }
 
+void XSound::setPhysicsScene(physics::IScene* pScene)
+{
+	pScene_ = pScene;
+}
+
 
 void XSound::drawDebug(void) const
 {
@@ -643,7 +658,8 @@ void XSound::drawDebug(void) const
 	sphere.setRadius(vars_.debugObjectScale());
 
 	Color8u col = Col_Blue;
-	Color8u lineCol = Col_Red;
+	Color8u lineCol = Col_Green;
+	Color8u lineColOcc = Col_Red;
 
 	pPrimCon_->setDepthTest(true);
 
@@ -668,51 +684,33 @@ void XSound::drawDebug(void) const
 		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
 		pPrimCon_->drawSphere(sphere, col, true, lodIdx);
-		pPrimCon_->drawLine(trans.pos, listnerPos, lineCol);
+		pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineCol);
 	}
 
 }
 
 void XSound::cullObjects(void)
 {
+	// so we can only cull objects that are not playing anything.
+	// and as soon as we want to play something on it we need to re-register it.
+
+
 	// work out what objects we can register.
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	const size_t culledNum = culledObjects_.size();
-	const size_t num = objects_.size();
-
 	const float cullDistance = vars_.registeredCullDistance();
 	const auto listenerPos = listenerTrans_.pos;
-	for (size_t i=0; i< culledObjects_.size(); i++)
-	{
-		auto* pObject = culledObjects_[i];
-
-		float distance = pObject->trans.pos.distance(listenerPos) + 30.f; // prevent flip flop.
-		if (distance < cullDistance)
-		{
-			culledObjects_.removeIndex(i);
-			objects_.append(pObject);
-
-			registerObjectSndEngine(pObject);
-		}
-	}
-
-
-	if (num < objects_.size())
-	{
-		X_LOG0("SoundSys", "Registered %" PRIuS " object(s)", objects_.size() - num);
-	}
 
 	for (size_t i = 0; i< objects_.size(); i++)
 	{
 		auto* pObject = objects_[i];
+		if (pObject->activeEvents) {
+			continue;
+		}
 
 		float distance = pObject->trans.pos.distance(listenerPos);
-		if (distance > cullDistance)
-		{
-			objects_.removeIndex(i);
-			culledObjects_.append(pObject);
-
+		if (distance > cullDistance) {
 			unregisterObjectSndEngine(pObject);
 		}
 	}
@@ -722,6 +720,73 @@ void XSound::cullObjects(void)
 		X_LOG0("SoundSys", "Un-Registered %" PRIuS " object(s)", culledObjects_.size() - culledNum);
 	}
 }
+
+void XSound::performOcclusionChecks(void)
+{
+	physics::IScene* pScene = pScene_;
+
+	// TODO: sort these so can do in batches.
+
+	for (auto* pObject : occlusion_)
+	{
+		X_ASSERT(pObject->occType != OcclusionType::None, "Object don't have occlusion type set")();
+
+		if (pObject->occType == OcclusionType::SingleRay)
+		{
+			physics::RaycastBuffer hit;
+
+			auto listenerPos = listenerTrans_.pos;
+			listenerPos.z -= 1;
+
+			Vec3f target = pObject->trans.pos;
+			Vec3f start = listenerPos;
+
+			Vec3f dir = target - start;
+			dir.normalize();
+
+			start += (dir * 20);
+
+			float distance = start.distance(target);
+
+			if (pScene->raycast(start, dir, distance, hit))
+			{
+				pObject->flags.Set(SoundFlag::Occluded);
+
+				Sphere sphere;
+				sphere.setCenter(hit.block.position);
+				sphere.setRadius(vars_.debugObjectScale());
+				pPrimCon_->drawSphere(sphere, Col_Plum, true, 0);
+
+				font::TextDrawContext con;
+				con.pFont = gEnv->pFontSys->GetFont("default");
+				con.effectId = 0;
+				con.col = Col_White;
+
+				Vec3f end = start + (dir * distance);
+				pPrimCon_->drawLine(start, end, Col_Plum);
+
+				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.5f, 0.f);
+			}
+			else
+			{
+				pObject->flags.Remove(SoundFlag::Occluded);
+
+				Vec3f end = start + (dir * distance);
+
+				pPrimCon_->drawLine(start, end, Col_Yellow);
+			
+				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
+			}
+
+		}
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+	}
+}
+
 
 
 void XSound::registerObjectSndEngine(SoundObject* pObject)
@@ -748,6 +813,15 @@ void XSound::registerObjectSndEngine(SoundObject* pObject)
 			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
 		}
 	}
+
+	culledObjects_.remove(pObject);
+	objects_.push_back(pObject);
+	if (pObject->flags.IsSet(SoundFlag::Occlusion))
+	{
+		AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
+
+		occlusion_.push_back(pObject);
+	}
 }
 
 void XSound::unregisterObjectSndEngine(SoundObject* pObject)
@@ -760,6 +834,13 @@ void XSound::unregisterObjectSndEngine(SoundObject* pObject)
 	if (res != AK_Success) {
 		AkResult::Description desc;
 		X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
+	}
+
+	objects_.remove(pObject);
+	culledObjects_.push_back(pObject);
+	if (pObject->flags.IsSet(SoundFlag::Occlusion))
+	{
+		occlusion_.remove(pObject);
 	}
 }
 
@@ -845,6 +926,8 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 {
 	SoundObject* pObject = allocObject();
 
+	// we don't mae objects very far away active by default.
+	// if you play something on these distant objects, they will get registered automatically.
 	float distance = listenerTrans_.pos.distance(trans.pos);
 	if (distance > vars_.registeredCullDistance())
 	{
@@ -880,6 +963,11 @@ bool XSound::unRegisterObject(SndObjectHandle object)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
+	SoundObject* pSound = SoundHandleToObject(object);
+	if (pSound->activeEvents) {
+		AK::SoundEngine::StopAll(object);
+	}
+
 	AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
 	if (res != AK_Success) {
 		AkResult::Description desc;
@@ -887,7 +975,6 @@ bool XSound::unRegisterObject(SndObjectHandle object)
 		return false;
 	}
 
-	SoundObject* pSound = SoundHandleToObject(object);
 
 	if (pSound->flags.IsSet(SoundFlag::Registered)) {
 		objects_.remove(pSound);
@@ -935,10 +1022,13 @@ void XSound::setPosition(SndObjectHandle object, const Transformf& trans)
 	pSound->trans = trans;
 	pSound->flags.Set(SoundFlag::Position);
 
-	AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+	if (pSound->flags.IsSet(SoundFlag::Registered)) 
+	{
+		AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
+		if (res != AK_Success) {
+			AkResult::Description desc;
+			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+		}
 	}
 }
 
@@ -950,6 +1040,10 @@ void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, si
 		pSound->trans = pTrans[i];
 		pSound->flags.Set(SoundFlag::Position);
 
+		if (!pSound->flags.IsSet(SoundFlag::Registered)) {
+			continue;
+		}
+
 		AKRESULT res = AK::SoundEngine::SetPosition(pObjects[i], TransToAkPos(pTrans[i]));
 		if (res != AK_Success) {
 			AkResult::Description desc;
@@ -957,6 +1051,7 @@ void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, si
 		}
 	}
 }
+
 
 // ----------------------------------------------
 
@@ -967,7 +1062,20 @@ void XSound::stopAll(SndObjectHandle object)
 
 void XSound::postEvent(EventID event, SndObjectHandle object)
 {
-	auto playingId = SoundEngine::PostEvent(event, object);
+	if (object != GLOBAL_OBJECT_ID)
+	{
+		SoundObject* pObject = SoundHandleToObject(object);
+		if (!pObject->flags.IsSet(SoundFlag::Registered))
+		{
+			registerObjectSndEngine(pObject);
+
+			X_ASSERT(pObject->activeEvents == 0, "Unexpected active event count")(pObject->activeEvents);
+		}
+
+		++pObject->activeEvents;
+	}
+
+	auto playingId = SoundEngine::PostEvent(event, object, AkCallbackType::AK_EndOfEvent, postEventCallback_s, this);
 	if (playingId == AK_INVALID_PLAYING_ID)
 	{
 		X_ERROR("Sound", "Failed to post event %" PRIu32 " object: %" PRIu32, event, object);
@@ -981,17 +1089,35 @@ void XSound::postEvent(EventID event, SndObjectHandle object)
 
 void XSound::postEvent(const char* pEventStr, SndObjectHandle object)
 {
-	auto playingId = SoundEngine::PostEvent(pEventStr, object);
-	if (playingId == AK_INVALID_PLAYING_ID)
+	postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
+}
+
+
+void XSound::setOcclusionType(SndObjectHandle object, OcclusionType::Enum type)
+{
+	X_ASSERT(object != INVALID_OBJECT_ID && object != GLOBAL_OBJECT_ID, "Invalid object handle for occlusion")(object);
+
+	SoundObject* pSound = SoundHandleToObject(object);
+
+	if (type == OcclusionType::None)
 	{
-		X_ERROR("Sound", "Failed to post event \"%s\" object: %" PRIu32, pEventStr, object);
+		if (pSound->occType == OcclusionType::None) {
+			return;
+		}
+
+		// remove.
+		occlusion_.remove(pSound);
+		pSound->flags.Remove(SoundFlag::Occlusion);
 	}
 	else
 	{
-		X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
+		occlusion_.push_back(pSound);
+		pSound->flags.Set(SoundFlag::Occlusion);
 	}
-}
 
+
+	pSound->occType = type;
+}
 
 void XSound::setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType)
 {
@@ -1231,6 +1357,13 @@ void XSound::listBanks(const char* pSearchPatten) const
 	X_LOG0("SoundSys", "------------ ^8Banks End^7 --------------");
 }
 
+// ------------------ CallBacks Helpers ----------------------------
+
+
+void XSound::postEventCallback_s(AkCallbackType eType, AkCallbackInfo* pCallbackInfo)
+{
+	reinterpret_cast<XSound*>(pCallbackInfo->pCookie)->postEventCallback(eType, pCallbackInfo);
+}
 
 
 void XSound::bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
@@ -1239,6 +1372,36 @@ void XSound::bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, A
 	reinterpret_cast<XSound*>(pCookie)->bankCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
 }
 
+
+void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
+	AkMemPoolId	memPoolId, void* pCookie)
+{
+	reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+}
+
+
+// ------------------ CallBacks ----------------------------
+
+void XSound::postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackInfo)
+{
+	if (pCallbackInfo->gameObjID == GLOBAL_OBJECT_ID) {
+		return;
+	}
+
+	SoundObject* pObject = AKObjectToObject(pCallbackInfo->gameObjID);
+	X_ASSERT_NOT_NULL(pObject);
+
+	if (eType == AkCallbackType::AK_EndOfEvent)
+	{
+		--pObject->activeEvents;
+
+		X_LOG0("SoundSys", "EndOfEvent: object %p debugName: %s", pObject, pObject->debugName.c_str());
+	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
+	}
+}
 
 void XSound::bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
 	AkMemPoolId	memPoolId)
@@ -1261,13 +1424,6 @@ void XSound::bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKR
 
 	bankSignal_.raise();
 }
-
-void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId, void* pCookie)
-{
-	reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
-}
-
 
 void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
 	AkMemPoolId	memPoolId)

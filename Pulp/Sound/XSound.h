@@ -22,12 +22,17 @@ X_NAMESPACE_DECLARE(engine,
 	class IPrimativeContext;
 );
 
+X_NAMESPACE_DECLARE(physics,
+	struct IScene;
+);
+
 X_NAMESPACE_BEGIN(sound)
 
 
 X_DECLARE_FLAGS8(SoundFlag)(
 	Registered,
 	Position,
+	Occlusion,
 	Occluded
 );
 
@@ -35,12 +40,18 @@ typedef Flags<SoundFlag> SoundFlags;
 
 struct SoundObject
 {
+	SoundObject() {
+		occType = OcclusionType::None;
+		activeEvents = 0;
+	}
+
 	Transformf trans;
 
 	SoundFlags flags;
 	OcclusionType::Enum occType;
-	bool _pad[2];
+	int16_t activeEvents;
 
+//	core::TimeVal lastEvent;
 #if X_SOUND_ENABLE_DEBUG_NAMES
 	core::string debugName;
 #endif
@@ -91,6 +102,7 @@ public:
 	void release(void) X_FINAL;
 
 	void Update(void) X_FINAL;
+	void setPhysicsScene(physics::IScene* pScene) X_FINAL;
 
 
 	// Shut up!
@@ -120,7 +132,7 @@ public:
 	void postEvent(EventID event, SndObjectHandle object) X_FINAL;
 	void postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
 
-
+	void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_FINAL;
 	void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
 	void setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object) X_FINAL;
 	void setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object = INVALID_OBJECT_ID,
@@ -138,6 +150,7 @@ public:
 private:
 	void drawDebug(void) const;
 	void cullObjects(void);
+	void performOcclusionChecks(void);
 
 	void registerObjectSndEngine(SoundObject* pObject);
 	void unregisterObjectSndEngine(SoundObject* pObject);
@@ -147,10 +160,12 @@ private:
 	void freeObject(SoundObject* pObject);
 
 private:
+	static void postEventCallback_s(AkCallbackType eType, AkCallbackInfo* pCallbackInfo);
 	static void bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId, void* pCookie);
-	void bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId);
-
 	static void bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId, void* pCookie);
+
+	void postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackInfo);
+	void bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId);
 	void bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId);
 
 private:
@@ -167,6 +182,7 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 	engine::IPrimativeContext* pPrimCon_;
+	physics::IScene* pScene_;
 
 	AllocatorHooks allocators_;
 	IOhook ioHook_;
@@ -180,6 +196,7 @@ private:
 	SoundObjectPool objectPool_;
 	SoundObjectPtrArr objects_;
 	SoundObjectPtrArr culledObjects_;
+	SoundObjectPtrArr occlusion_;
 
 	bool comsSysInit_;
 	bool outputCaptureEnabled_;
