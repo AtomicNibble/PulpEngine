@@ -121,7 +121,7 @@ void SoundVars::RegisterVars(void)
 
 	ADD_CVAR_REF("snd_active_cull_distance", registeredCullDistance_, registeredCullDistance_, 0.f, 1024.f * 16.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-		"Distance active sound objects are culled. All sounds we be stopped once sound object exceeds this distance from listner");
+		"Distance active sound objects are culled. Inactive sound objects exceeding this distance will be put to sleep");
 
 
 	// LEEERORRRY Jenkins!!
