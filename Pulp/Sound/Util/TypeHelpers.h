@@ -17,7 +17,7 @@ X_INLINE AkSoundPosition TransToAkPos(const Transformf& trans)
 	// dunno what this is axis? TELL ME.
 	pos.Orientation.X = 0;
 	pos.Orientation.Y = 0;
-	pos.Orientation.Z = 0;
+	pos.Orientation.Z = 1;
 
 	return pos;
 }
