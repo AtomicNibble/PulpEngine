@@ -60,6 +60,7 @@ SoundVars::SoundVars()
 	debugObjectScale_ = 1.f;
 
 	registeredCullDistance_ = 1024.f * 2.f; 
+	occlusionRefreshRate_ = 0.2f;
 
 	pVarVolMaster_ = nullptr;
 	pVarVolMusic_ = nullptr;
@@ -126,6 +127,9 @@ void SoundVars::RegisterVars(void)
 	ADD_CVAR_REF("snd_active_cull_distance", registeredCullDistance_, registeredCullDistance_, 0.f, 1024.f * 16.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Distance active sound objects are culled. Inactive sound objects exceeding this distance will be put to sleep");
+	ADD_CVAR_REF("snd_occlusion_refresh_rate", occlusionRefreshRate_, occlusionRefreshRate_, 0.f, 60.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"The rate in seconds occlusion values are refreshed.");
 
 
 	// LEEERORRRY Jenkins!!

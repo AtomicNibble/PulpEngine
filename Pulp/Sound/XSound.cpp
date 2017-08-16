@@ -9,6 +9,7 @@
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <IPhysics.h>
+#include <IFrameData.h>
 
 X_DISABLE_WARNING(4505)
 
@@ -581,17 +582,24 @@ void XSound::release(void)
 	X_DELETE(this, g_SoundArena);
 }
 
-void XSound::Update(void)
+void XSound::Update(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
 
 	if (AK::SoundEngine::IsInitialized())
 	{
-		if (vars_.EnableDebugRender()) {
+		if (vars_.EnableCulling()) {
 			cullObjects();
 		}
 
-		performOcclusionChecks();
+		core::TimeVal sinceLastOcclude = frame.timeInfo.startTimeReal - lastOcclusionUpdate_;
+		core::TimeVal refreshInterval(vars_.OcclusionRefreshRate());
+		if (sinceLastOcclude > refreshInterval)
+		{
+			lastOcclusionUpdate_ = frame.timeInfo.startTimeReal;
+
+			performOcclusionChecks();
+		}
 
 		AkListenerPosition listener;
 		listener.OrientationFront.X = 0;
@@ -701,7 +709,7 @@ void XSound::cullObjects(void)
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	const size_t culledNum = culledObjects_.size();
-	const float cullDistance = vars_.registeredCullDistance();
+	const float cullDistance = vars_.RegisteredCullDistance();
 	const auto listenerPos = listenerTrans_.pos;
 
 	for (size_t i = 0; i< objects_.size(); i++)
@@ -751,7 +759,7 @@ void XSound::performOcclusionChecks(void)
 			{
 				pObject->flags.Set(SoundFlag::Occluded);
 
-				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.5f, 0.f);
+				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.5f);
 			}
 			else
 			{
@@ -912,7 +920,7 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 	// we don't make objects very far away active by default.
 	// if you play something on these distant objects, they will get registered automatically.
 	float distance = listenerTrans_.pos.distance(trans.pos);
-	if (distance > vars_.registeredCullDistance())
+	if (distance > vars_.RegisteredCullDistance())
 	{
 		culledObjects_.push_back(pObject);
 	}

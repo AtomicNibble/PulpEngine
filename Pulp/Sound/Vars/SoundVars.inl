@@ -32,9 +32,14 @@ X_INLINE float SoundVars::debugObjectScale(void) const
 }
 
 
-X_INLINE float SoundVars::registeredCullDistance(void)
+X_INLINE float SoundVars::RegisteredCullDistance(void)
 {
 	return registeredCullDistance_;
+}
+
+X_INLINE float SoundVars::OcclusionRefreshRate(void)
+{
+	return occlusionRefreshRate_;
 }
 
 // ----------------------

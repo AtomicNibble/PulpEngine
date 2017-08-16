@@ -16,6 +16,7 @@
 X_NAMESPACE_DECLARE(core,
 struct ICVar;
 struct IConsoleCmdArgs;
+struct FrameData;
 )
 
 X_NAMESPACE_DECLARE(engine,
@@ -101,7 +102,7 @@ public:
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
-	void Update(void) X_FINAL;
+	void Update(core::FrameData& frame) X_FINAL;
 	void setPhysicsScene(physics::IScene* pScene) X_FINAL;
 
 
@@ -189,6 +190,7 @@ private:
 
 private:
 	SoundVars vars_;
+	core::TimeVal lastOcclusionUpdate_;
 	
 	mutable core::CriticalSection cs_;
 

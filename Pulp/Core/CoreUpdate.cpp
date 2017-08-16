@@ -135,7 +135,7 @@ bool XCore::Update(void)
 
 	// we could update the sound system while rendering on gpu.
 	if (env_.pSound) {
-		env_.pSound->Update();
+		env_.pSound->Update(frameData);
 	}
 
 	if (env_.pScriptSys){
