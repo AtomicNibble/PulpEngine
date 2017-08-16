@@ -30,19 +30,19 @@ public:
 
 	X_INLINE float debugObjectScale(void) const;
 
-	X_INLINE float RegisteredCullDistance(void);
-	X_INLINE float OcclusionRefreshRate(void);
+	X_INLINE float RegisteredCullDistance(void) const;
+	X_INLINE float OcclusionRefreshRate(void) const;
 
-	X_INLINE uint32_t SoundEngineDefaultMemoryPoolBytes(void);
-	X_INLINE uint32_t SoundEngineLowerDefaultMemoryPoolBytes(void);
+	X_INLINE uint32_t SoundEngineDefaultMemoryPoolBytes(void) const;
+	X_INLINE uint32_t SoundEngineLowerDefaultMemoryPoolBytes(void) const;
 
-	X_INLINE uint32_t StreamManagerMemoryPoolBytes(void);
-	X_INLINE uint32_t StreamDeviceMemoryPoolBytes(void);
+	X_INLINE uint32_t StreamManagerMemoryPoolBytes(void) const;
+	X_INLINE uint32_t StreamDeviceMemoryPoolBytes(void) const;
 
-	X_INLINE uint32_t CommandQueueMemoryPoolBytes(void);
+	X_INLINE uint32_t CommandQueueMemoryPoolBytes(void) const;
 
-	X_INLINE uint32_t MonitorMemoryPoolBytes(void);
-	X_INLINE uint32_t MonitorQueueMemoryPoolBytes(void);
+	X_INLINE uint32_t MonitorMemoryPoolBytes(void) const;
+	X_INLINE uint32_t MonitorQueueMemoryPoolBytes(void) const;
 
 private:
 	core::ICVar* pVarVolMaster_;

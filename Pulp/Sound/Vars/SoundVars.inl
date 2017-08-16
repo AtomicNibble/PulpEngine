@@ -32,55 +32,55 @@ X_INLINE float SoundVars::debugObjectScale(void) const
 }
 
 
-X_INLINE float SoundVars::RegisteredCullDistance(void)
+X_INLINE float SoundVars::RegisteredCullDistance(void) const
 {
 	return registeredCullDistance_;
 }
 
-X_INLINE float SoundVars::OcclusionRefreshRate(void)
+X_INLINE float SoundVars::OcclusionRefreshRate(void) const
 {
 	return occlusionRefreshRate_;
 }
 
 // ----------------------
 
-X_INLINE uint32_t SoundVars::SoundEngineDefaultMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::SoundEngineDefaultMemoryPoolBytes(void) const
 {
 	return soundEngineDefaultMemoryPoolSize_ << 10;
 }
 
-X_INLINE uint32_t SoundVars::SoundEngineLowerDefaultMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::SoundEngineLowerDefaultMemoryPoolBytes(void) const
 {
 	return soundEngineLowerDefaultPoolSize_ << 10;
 }
 
 // ----------------------
 
-X_INLINE uint32_t SoundVars::StreamManagerMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::StreamManagerMemoryPoolBytes(void) const
 {
 	return streamManagerMemoryPoolSize_ << 10;
 }
 
-X_INLINE uint32_t SoundVars::StreamDeviceMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::StreamDeviceMemoryPoolBytes(void) const
 {
 	return streamDeviceMemoryPoolSize_ << 10;
 }
 
 // ----------------------
 
-X_INLINE uint32_t SoundVars::CommandQueueMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::CommandQueueMemoryPoolBytes(void) const
 {
 	return commandQueueMemoryPoolSize_ << 10;
 }
 
 // ----------------------
 
-X_INLINE uint32_t SoundVars::MonitorMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::MonitorMemoryPoolBytes(void) const
 {
 	return monitorMemoryPoolSize_ << 10;
 }
 
-X_INLINE uint32_t SoundVars::MonitorQueueMemoryPoolBytes(void)
+X_INLINE uint32_t SoundVars::MonitorQueueMemoryPoolBytes(void) const
 {
 	return monitorQueueMemoryPoolSize_ << 10;
 }
