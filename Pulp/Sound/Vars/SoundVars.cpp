@@ -54,6 +54,7 @@ SoundVars::SoundVars()
 {
 	enableCommSys_ = 0;
 	enableOutputCapture_ = 0;
+	enableCulling_ = 0;
 	enableDebugRender_ = 0;
 
 	debugObjectScale_ = 1.f;
@@ -112,6 +113,9 @@ void SoundVars::RegisterVars(void)
 		"initialize Wwise Comm system on startup");
 	ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, enableOutputCapture_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Allows for capturing the output audio to a wav file.");
+	ADD_CVAR_REF("snd_enable_cull", enableCulling_, enableCulling_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable inactive sound object culling");
+
 	ADD_CVAR_REF("snd_debug_draw", enableDebugRender_, enableDebugRender_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enables sound debug rendering");
 

@@ -25,6 +25,7 @@ public:
 
 	X_INLINE bool EnableComs(void) const;
 	X_INLINE bool EnableOutputCapture(void) const;
+	X_INLINE bool EnableCulling(void) const;
 	X_INLINE bool EnableDebugRender(void) const;
 
 	X_INLINE float debugObjectScale(void) const;
@@ -50,6 +51,7 @@ private:
 
 	int32_t enableCommSys_;
 	int32_t enableOutputCapture_;
+	int32_t enableCulling_;
 
 	int32_t enableDebugRender_;
 	float debugObjectScale_;

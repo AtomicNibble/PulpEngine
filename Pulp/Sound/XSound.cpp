@@ -587,7 +587,10 @@ void XSound::Update(void)
 
 	if (AK::SoundEngine::IsInitialized())
 	{
-		cullObjects();
+		if (vars_.EnableDebugRender()) {
+			cullObjects();
+		}
+
 		performOcclusionChecks();
 
 		AkListenerPosition listener;

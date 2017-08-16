@@ -14,6 +14,11 @@ X_INLINE bool SoundVars::EnableOutputCapture(void) const
 	return enableOutputCapture_ != 0;
 }
 
+X_INLINE bool SoundVars::EnableCulling(void) const
+{
+	return enableCulling_ != 0;
+}
+
 X_INLINE bool SoundVars::EnableDebugRender(void) const
 {
 	return enableDebugRender_ != 0;
