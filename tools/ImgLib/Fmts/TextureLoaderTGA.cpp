@@ -228,11 +228,14 @@ namespace TGA
 				imgFile.setFormat(Texturefmt::A8);
 				break;
 			case 24:
-				imgFile.setFormat(Texturefmt::R8G8B8);
+				imgFile.setFormat(Texturefmt::B8G8R8);
 				break;
 			case 32:
-				imgFile.setFormat(Texturefmt::R8G8B8A8);
+				imgFile.setFormat(Texturefmt::B8G8R8A8);
 				break;
+			default:
+				X_ASSERT_NOT_IMPLEMENTED();
+				return false;
 		}
 
 		imgFile.resize();
