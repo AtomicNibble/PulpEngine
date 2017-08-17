@@ -678,13 +678,15 @@ void XSound::drawDebug(void) const
 
 	core::CriticalSection::ScopedLock lock(cs_);
 
+	const float cullDistance = vars_.RegisteredCullDistance();
+
 	for (auto* pObject : objects_)
 	{
 		auto& trans = pObject->trans;
 		sphere.setCenter(trans.pos);
 
 		float distance = listnerPos.distance(trans.pos);
-		if (distance > 2000.f) {
+		if (distance > cullDistance) {
 			continue;
 		}
 
