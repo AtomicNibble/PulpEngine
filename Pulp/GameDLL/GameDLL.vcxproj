@@ -360,6 +360,7 @@
     <ClInclude Include="ECS\ComponentPool.h" />
     <ClInclude Include="ECS\Registry.h" />
     <ClInclude Include="Enity\CameraSys.h" />
+    <ClInclude Include="Enity\DataTranslator.h" />
     <ClInclude Include="Enity\EnitiySystem.h" />
     <ClInclude Include="Enity\EnityComponents.h" />
     <ClInclude Include="Enity\InputSys.h" />
@@ -401,6 +402,7 @@
     <ClCompile Include="Vars\PlayerVars.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Enity\DataTranslator.inl" />
     <None Include="Vars\PlayerVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

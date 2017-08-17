@@ -96,6 +96,9 @@
     <ClInclude Include="Enity\SoundSys.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\DataTranslator.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -144,6 +147,9 @@
   <ItemGroup>
     <None Include="Vars\PlayerVars.inl">
       <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="Enity\DataTranslator.inl">
+      <Filter>Header Files\Enity</Filter>
     </None>
   </ItemGroup>
 </Project>
