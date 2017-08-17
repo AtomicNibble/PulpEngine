@@ -117,14 +117,16 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 	if (d.HasMember("outFmt")) {
 		const char* pOutFmt = d["outFmt"].GetString();
 
-		if (!core::strUtil::IsEqualCaseInsen(pOutFmt, "ci")) {
-			X_ERROR("Img", "Ouput file fmt currently not supported: \"%s\"", pOutFmt);
-			return false;
+		if (core::strUtil::IsEqualCaseInsen(pOutFmt, "ci")) {
+			outputFileFmt = ImgFileFormat::CI;
 		}
-
-		// if the need arises we can support writting to a DDS
-		// or something else...
-		outputFileFmt = ImgFileFormat::CI;
+		else if (!core::strUtil::IsEqualCaseInsen(pOutFmt, "dds")) {
+			outputFileFmt = ImgFileFormat::DDS;
+		}
+		else {
+			X_ERROR("Img", "Ouput file fmt currently not supported: \"%s\" using ci", pOutFmt);
+			outputFileFmt = ImgFileFormat::CI;
+		}
 	}
 	if (d.HasMember("wrap")) {
 		const char* pWrap = d["wrap"].GetString();
