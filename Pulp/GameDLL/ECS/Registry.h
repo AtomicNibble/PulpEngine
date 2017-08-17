@@ -343,7 +343,7 @@ namespace ecs
 		template<typename... Comp>
 		entity_type create(void) {
 			using accumulator_type = int[];
-			auto entity = create();
+			entity_type entity = create();
 			accumulator_type accumulator = { 0, (assign<Comp>(entity), 0)... };
 			(void)accumulator;
 			return entity;
