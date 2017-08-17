@@ -1059,6 +1059,150 @@ namespace DDS
 		return true;
 	}
 
+
+	bool XTexLoaderDDS::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
+	{
+		X_UNUSED(file, imgFile, swapArena);
+
+		if (imgFile.getDepth() > 1) {
+			X_ERROR("DDS", "Depth not supported.");
+			return false;
+		}
+
+		DDS_header hdr;
+		DDS_DX10_header dx10Hdr;
+
+		core::zero_object(hdr);
+		core::zero_object(dx10Hdr);
+
+		hdr.dwMagic = DDS_MAGIC;
+		hdr.dwSize = DDSSizeofDDSurfaceDesc2;
+		hdr.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_PIXELFORMAT | DDSD_CAPS;
+		hdr.dwHeight = imgFile.getHeight();
+		hdr.dwWidth = imgFile.getWidth();
+		hdr.dwPitchOrLinearSize = 0;
+		hdr.dwDepth = imgFile.getDepth();
+		hdr.dwMipMapCount = imgFile.getNumMips();
+
+		hdr.sPixelFormat.dwSize = sizeof(hdr.sPixelFormat);
+		hdr.sPixelFormat.dwFlags = 0;
+		hdr.sPixelFormat.dwFourCC = 0;
+		hdr.sPixelFormat.dwRGBBitCount = 0;
+		hdr.sPixelFormat.dwRBitMask = 0;
+		hdr.sPixelFormat.dwGBitMask = 0;
+		hdr.sPixelFormat.dwBBitMask = 0;
+		hdr.sPixelFormat.dwAlphaBitMask = 0;
+
+		hdr.sCaps.dwCaps1 = 0;
+		hdr.sCaps.dwCaps2 = 0;
+		hdr.sCaps.dwDDSX = 0;
+		hdr.sCaps.dwReserved = 0;
+
+		if (imgFile.getNumMips())
+		{
+			hdr.dwFlags |= DDSD_MIPMAPCOUNT;
+			hdr.sCaps.dwCaps1 |= (DDSCAPS_MIPMAP | DDSCAPS_COMPLEX);
+		}
+
+		if (Util::isDxt(imgFile.getFormat()))
+		{
+			auto bitsPerPixel = Util::bitsPerPixel(imgFile.getFormat());
+
+			hdr.sPixelFormat.dwFlags |= DDPF_FOURCC;
+			hdr.dwPitchOrLinearSize = (((hdr.dwWidth + 3) & ~3) * ((hdr.dwHeight + 3) & ~3) * bitsPerPixel) >> 3;
+			hdr.dwFlags |= DDSD_LINEARSIZE;
+
+			switch (imgFile.getFormat())
+			{
+				case Texturefmt::BC1:
+					hdr.sPixelFormat.dwFlags |= DDPF_FOURCC;
+					hdr.sPixelFormat.dwFourCC = PIXEL_FMT_DXT1;
+					break;
+				case Texturefmt::BC2:
+					hdr.sPixelFormat.dwFlags |= DDPF_FOURCC;
+					hdr.sPixelFormat.dwFourCC = PIXEL_FMT_DXT3;
+					break;
+				case Texturefmt::BC3:
+					hdr.sPixelFormat.dwFlags |= DDPF_FOURCC;
+					hdr.sPixelFormat.dwFourCC = PIXEL_FMT_DXT5;
+					break;
+
+				// ATI1
+				case Texturefmt::BC4:
+					hdr.sPixelFormat.dwFlags |= DDPF_FOURCC;
+					hdr.sPixelFormat.dwFourCC = PIXEL_FMT_DXT1;
+					break;
+
+				// ATI2
+				case Texturefmt::BC5:
+					hdr.sPixelFormat.dwFlags |= DDPF_FOURCC;
+					hdr.sPixelFormat.dwFourCC = PIXEL_FMT_DXT1;
+					break;
+
+				case Texturefmt::BC6:
+				case Texturefmt::BC6_SF16:
+				case Texturefmt::BC6_TYPELESS:
+				case Texturefmt::BC7:
+				case Texturefmt::BC7_SRGB:
+				case Texturefmt::BC7_TYPELESS:
+					hdr.sPixelFormat.dwFourCC = PIXEL_FMT_DX10_HEADER;
+					hdr.sPixelFormat.dwRGBBitCount = 0;
+
+					switch (imgFile.getFormat())
+					{
+						case Texturefmt::BC6:
+							dx10Hdr.dxgiFormat = dxgiFormat::BC6H_UF16;
+							break;
+						case Texturefmt::BC6_SF16:
+							dx10Hdr.dxgiFormat = dxgiFormat::BC6H_SF16;
+							break;
+						case Texturefmt::BC6_TYPELESS:
+							dx10Hdr.dxgiFormat = dxgiFormat::BC6H_TYPELESS;
+							break;
+						case Texturefmt::BC7:
+							dx10Hdr.dxgiFormat = dxgiFormat::BC7_UNORM;
+							break;
+						case Texturefmt::BC7_TYPELESS:
+							dx10Hdr.dxgiFormat = dxgiFormat::BC7_TYPELESS;
+							break;
+						case Texturefmt::BC7_SRGB:
+							dx10Hdr.dxgiFormat = dxgiFormat::BC7_UNORM_SRGB;
+							break;
+						default:
+							X_ASSERT_UNREACHABLE();
+							break;
+					}
+					
+					break;
+
+				default:
+					X_ERROR("DDS", "Unsupported dxt fmt: %s", Texturefmt::ToString(imgFile.getFormat()));
+					return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+
+		if (file->writeObj(hdr) != sizeof(hdr)) {
+			X_ERROR("DDS", "Failed to write header");
+			return false;
+		}
+
+		for (size_t i = 0; i < imgFile.getNumFaces(); i++)
+		{
+			size_t faceSize = imgFile.getFaceSize();
+
+			if (file->write(imgFile.getFace(i), faceSize) != faceSize) {
+				X_ERROR("DDS", "Failed to write face");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	// ~ITextureFmt
 
 
