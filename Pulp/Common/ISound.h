@@ -99,7 +99,7 @@ struct ISound : public core::IEngineSysBase
 	virtual bool asyncInitFinalize(void) X_ABSTRACT;
 
 	// ting tong wong, sing me a song in a thong!
-	virtual void Update(void) X_ABSTRACT;
+	virtual void Update(core::FrameData& frame) X_ABSTRACT;
 	virtual void setPhysicsScene(physics::IScene* pScene) X_ABSTRACT;
 
 	// load banks, async.
