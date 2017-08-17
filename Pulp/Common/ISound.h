@@ -21,9 +21,11 @@ X_NAMESPACE_BEGIN(sound)
 #if X_SOUND_ENABLE_DEBUG_NAMES
 #define X_SOUND_DEBUG_NAME(expr) expr
 #define X_SOUND_DEBUG_NAME_COM(expr) , expr
+#define X_SOUND_DEBUG_NAME_PARAM(expr) , expr
 #else
 #define X_SOUND_DEBUG_NAME(expr) 
 #define X_SOUND_DEBUG_NAME_COM(expr) 
+#define X_SOUND_DEBUG_NAME_PARAM(expr) 
 #endif // !X_SOUND_ENABLE_DEBUG_NAMES
 
 typedef core::Hash::Fnv1Val HashVal;
