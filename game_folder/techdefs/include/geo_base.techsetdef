@@ -1,0 +1,37 @@
+#include <states>
+
+Sampler( "colorSampler" )
+{
+    repeat = <tileColor>
+    filter = <filterColor>
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+    }
+}
+
+Texture( "colorMap" )
+{
+    image = Image( <mapColor, "default/white"> )
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+        title  = "Color Map"
+    }
+}
+
+
+VertexShader( "vs_default" )
+{
+    source = "techsetdef_unlit.hlsl"
+    diffuseSampler = "colorSampler"
+}
+
+PixelShader( "ps_default" )
+{
+    source = "techsetdef_unlit.hlsl"
+    diffuseSampler = "colorSampler"
+    diffuse = "colorMap"
+}
