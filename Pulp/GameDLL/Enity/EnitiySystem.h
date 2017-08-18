@@ -44,16 +44,10 @@ namespace entity
 		void makePlayer(EntityId id);
 		bool addController(EntityId id);
 
-
 		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
 
-		X_INLINE const EnitiyRegister& getRegister(void) const {
-			return reg_;
-		}
-
-		X_INLINE EnitiyRegister& getRegister(void) {
-			return reg_;
-		}
+		X_INLINE const EnitiyRegister& getRegister(void) const;
+		X_INLINE EnitiyRegister& getRegister(void);
 
 	private:
 		bool parseMiscModels(core::json::Value::Array val);
@@ -77,6 +71,15 @@ namespace entity
 	};
 
 
+	X_INLINE const EnitiyRegister& EnititySystem::getRegister(void) const 
+	{
+		return reg_;
+	}
+
+	X_INLINE EnitiyRegister& EnititySystem::getRegister(void) 
+	{
+		return reg_;
+	}
 
 } // namespace entity
 
