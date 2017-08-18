@@ -15,6 +15,7 @@ namespace TGA
 	{
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::TGA;
+		static const char* EXTENSION;
 
 	public:
 		XTexLoaderTGA();

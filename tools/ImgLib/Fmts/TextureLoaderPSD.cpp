@@ -265,6 +265,9 @@ namespace PSD
 
 	}
 
+	const char* XTexLoaderPSD::EXTENSION = PSD_FILE_EXTENSION;
+
+
 	XTexLoaderPSD::XTexLoaderPSD()
 	{
 

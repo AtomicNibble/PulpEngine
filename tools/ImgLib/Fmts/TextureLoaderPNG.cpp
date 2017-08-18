@@ -164,6 +164,9 @@ namespace PNG
 	
 	} // namespace 
 
+	const char* XTexLoaderPNG::EXTENSION = PNG_FILE_EXTENSION;
+
+
 	XTexLoaderPNG::XTexLoaderPNG()
 	{
 

@@ -15,6 +15,7 @@ namespace PSD
 	{
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::PSD;
+		static const char* EXTENSION;
 
 	public:
 		XTexLoaderPSD();

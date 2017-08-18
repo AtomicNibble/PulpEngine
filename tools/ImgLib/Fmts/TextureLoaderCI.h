@@ -15,6 +15,7 @@ namespace CI
 	{
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::CI;
+		static const char* EXTENSION;
 
 	public:
 		XTexLoaderCI();

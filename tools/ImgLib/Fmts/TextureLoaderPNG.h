@@ -19,6 +19,7 @@ namespace PNG
 
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::PNG;
+		static const char* EXTENSION;
 
 	public:
 		XTexLoaderPNG();

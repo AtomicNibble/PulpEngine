@@ -138,6 +138,10 @@ namespace JPG
 		}
 	}
 
+
+	const char* XTexLoaderJPG::EXTENSION = JPG_FILE_EXTENSION;
+
+
 	XTexLoaderJPG::XTexLoaderJPG()
 	{
 

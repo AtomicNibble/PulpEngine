@@ -20,6 +20,8 @@ namespace CI
 		X_ENSURE_LE(TEX_MAX_FACES, CI_MAX_FACES, "TEX_MAX_FACES exceeds what CI image can store");
 	}
 
+	const char* XTexLoaderCI::EXTENSION = CI_FILE_EXTENSION;
+
 	XTexLoaderCI::XTexLoaderCI()
 	{
 

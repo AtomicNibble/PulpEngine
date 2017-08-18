@@ -574,6 +574,9 @@ namespace DDS
 		X_ENSURE_SIZE(DDS_DX10_header, 20);
 	}
 
+	const char* XTexLoaderDDS::EXTENSION = DDS_FILE_EXTENSION;
+
+
 	XTexLoaderDDS::XTexLoaderDDS()
 	{
 

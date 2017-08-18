@@ -15,6 +15,7 @@ namespace DDS
 	{
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::DDS;
+		static const char* EXTENSION;
 
 	public:
 		XTexLoaderDDS();

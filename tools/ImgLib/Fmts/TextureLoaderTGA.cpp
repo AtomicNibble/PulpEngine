@@ -65,6 +65,7 @@ namespace TGA
 
 	} // namespace
 
+	const char* XTexLoaderTGA::EXTENSION = TGA_FILE_EXTENSION;
 
 
 	XTexLoaderTGA::XTexLoaderTGA()

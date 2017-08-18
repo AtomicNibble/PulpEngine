@@ -15,6 +15,7 @@ namespace JPG
 	{
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::JPG;
+		static const char* EXTENSION;
 
 	public:
 		XTexLoaderJPG();
