@@ -201,7 +201,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 		}
 	}
 
-
 	// now we check i support creating the target format.
 	switch (dstImgFmt)
 	{
@@ -483,7 +482,13 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 		X_LOG1("Img", "Conversion took: ^6%g ms", timer.GetMilliSeconds());
 	}
 
-	if (!con.SaveImg(destPath, flags, outputFileFmt)) {
+	// set the path to format.
+	// this breaks the converters is stale check.
+	// but for the converter we always want ci for the game, dds is just for testing.
+	auto path(destPath);
+	path.setExtension(Util::getExtension(outputFileFmt));
+
+	if (!con.SaveImg(path, flags, outputFileFmt)) {
 		X_ERROR("Img", "Failed to save converterd image");
 		return false;
 	}
