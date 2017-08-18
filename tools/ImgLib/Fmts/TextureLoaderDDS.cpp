@@ -603,7 +603,7 @@ namespace DDS
 
 	ImgFileFormat::Enum XTexLoaderDDS::getSrcFmt(void) const
 	{
-		return ImgFileFormat::CI;
+		return ImgFileFormat::DDS;
 	}
 
 	bool XTexLoaderDDS::canLoadFile(const core::Path<char>& path) const
