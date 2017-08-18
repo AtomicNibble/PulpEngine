@@ -281,8 +281,8 @@ namespace Converter
 
 	void KaiserFilter::setParameters(float alpha, float stretch)
 	{
-		alpha = alpha;
-		stretch = stretch;
+		alpha_ = alpha;
+		stretch_ = stretch;
 	}
 
 	// -------------------------------------------------------------------
