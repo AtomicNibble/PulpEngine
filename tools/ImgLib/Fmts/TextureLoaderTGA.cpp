@@ -213,6 +213,9 @@ namespace TGA
 		flags.Set(TextureFlags::NOMIPS);
 		flags.Set(TextureFlags::ALPHA);
 
+		// tga is bottom up unless bit is set.
+		const bool isFlipped = (hdr.ImageDescriptor & 0x20) == 0;
+
 		uint32_t DataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
 
 		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.Width));
@@ -354,6 +357,17 @@ namespace TGA
 #if X_DEBUG == 1
 		X_WARNING_IF(left > 0, "TextureTGA", "potential read fail, bytes left in file: %i", left);
 #endif // !X_DEBUG 
+
+
+		// flip it
+		if (isFlipped)
+		{
+			if (!imgFile.flipVertical(swapArena))
+			{
+				X_WARNING("TextureTGA", "Failed to flip texture");
+				return false;
+			}
+		}
 
 		return true;
 	}
