@@ -696,7 +696,13 @@ void XSound::drawDebug(void) const
 		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
 		pPrimCon_->drawSphere(sphere, col, true, lodIdx);
-		pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineCol);
+
+		if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
+			pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineCol);
+		}
+		else {
+			pPrimCon_->drawLine(trans.pos, listnerPos, Col_Cyan);
+		}
 	}
 
 }
