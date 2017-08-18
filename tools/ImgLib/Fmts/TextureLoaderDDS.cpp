@@ -1193,6 +1193,14 @@ namespace DDS
 			return false;
 		}
 
+		if (hdr.sPixelFormat.dwFourCC == PIXEL_FMT_DX10_HEADER)
+		{
+			if (file->writeObj(dx10Hdr) != sizeof(dx10Hdr)) {
+				X_ERROR("DDS", "Failed to write dx10 header");
+				return false;
+			}
+		}
+
 		for (size_t i = 0; i < imgFile.getNumFaces(); i++)
 		{
 			size_t faceSize = imgFile.getFaceSize();
