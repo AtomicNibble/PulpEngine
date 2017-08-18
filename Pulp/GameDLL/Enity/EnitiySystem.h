@@ -56,6 +56,7 @@ namespace entity
 
 
 	private:
+		core::MemoryArenaBase* arena_;
 		EnitiyRegister reg_;
 		GameVars& vars_;
 

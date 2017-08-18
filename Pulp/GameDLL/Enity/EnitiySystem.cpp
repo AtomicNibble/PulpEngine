@@ -17,10 +17,10 @@ X_NAMESPACE_BEGIN(game)
 namespace entity
 {
 
-
 	// -----------------------------------------------------------
 
 	EnititySystem::EnititySystem(GameVars& vars, core::MemoryArenaBase* arena) :
+		arena_(arena),
 		reg_(arena),
 		vars_(vars),
 		playerSys_(vars.player)
