@@ -746,6 +746,7 @@ namespace Util
 			return PSD::XTexLoaderPSD::SRC_FMT;
 		}
 
+		X_ASSERT_UNREACHABLE();
 		return ImgFileFormat::UNKNOWN;
 	}
 
@@ -761,6 +762,31 @@ namespace Util
 		FreeFmt(pFmt);
 
 		return res;
+	}
+
+	const char* getExtension(ImgFileFormat::Enum fmt)
+	{
+		static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
+
+		switch (fmt)
+		{
+			case ImgFileFormat::CI:
+				return CI::XTexLoaderCI::EXTENSION;
+			case ImgFileFormat::DDS:
+				return DDS::XTexLoaderDDS::EXTENSION;
+			case ImgFileFormat::PNG:
+				return PNG::XTexLoaderPNG::EXTENSION;
+			case ImgFileFormat::TGA:
+				return TGA::XTexLoaderTGA::EXTENSION;
+			case ImgFileFormat::JPG:
+				return JPG::XTexLoaderJPG::EXTENSION;
+			case ImgFileFormat::PSD:
+				return PSD::XTexLoaderPSD::EXTENSION;
+
+			default:
+				X_ASSERT_UNREACHABLE();
+				return "";
+		}
 	}
 
 	// ==================================================================
