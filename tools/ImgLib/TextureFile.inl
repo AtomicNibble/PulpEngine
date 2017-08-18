@@ -161,6 +161,11 @@ X_INLINE void XTextureFile::updateOffsets(void)
 	}
 }
 
+X_INLINE bool XTextureFile::flipVertical(core::MemoryArenaBase* swap)
+{
+	return Util::flipVertical(*this, swap);
+}
+
 X_INLINE void XTextureFile::clear(void)
 {
 	core::zero_object(mipOffsets_);
