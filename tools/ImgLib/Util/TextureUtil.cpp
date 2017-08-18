@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "TextureUtil.h"
+#include "TextureFile.h"
 
 #include <IFileSys.h>
 
@@ -787,6 +788,78 @@ namespace Util
 				X_ASSERT_UNREACHABLE();
 				return "";
 		}
+	}
+
+	// ==================================================================
+
+	bool flipVertical(XTextureFile& img, core::MemoryArenaBase* swap)
+	{
+		if (img.getDepth() > 1) {
+			X_ERROR("Img", "Flipping textures with depth is not currently supported");
+			return false;
+		}
+
+		if (!img.isValid()) {
+			X_ERROR("Img", "Failed to flip image, it's not valid");
+			return false;
+		}
+
+		if (!core::bitUtil::IsPowerOfTwo(img.getHeight()) || !core::bitUtil::IsPowerOfTwo(img.getWidth())) {
+			X_ERROR("Img", "Flipping none pow2 images is not currently supported");
+			return false;
+		}
+
+		switch (img.getFormat())
+		{
+			// any none block format is simple.
+
+			//RGB(A)
+			case Texturefmt::R8G8B8:
+			case Texturefmt::A8R8G8B8:
+			case Texturefmt::R8G8B8A8:
+			case Texturefmt::R8G8B8A8_SRGB:
+			case Texturefmt::R8G8B8A8_SNORM:
+			case Texturefmt::R8G8B8A8_TYPELESS:
+			case Texturefmt::R8G8B8A8_SINT:
+			case Texturefmt::R8G8B8A8_UINT:
+
+			// BGR(A)
+			case Texturefmt::B8G8R8:
+			case Texturefmt::B8G8R8A8:
+			case Texturefmt::B8G8R8A8_SRGB:
+			case Texturefmt::B8G8R8A8_TYPELESS:
+			{
+				core::Array<uint8_t> row(swap);
+
+				// just wanna swap rows basically.
+				for (size_t i = 0; i < img.getNumFaces(); i++)
+				{
+					uint8_t* pFace = img.getFace(i);
+					size_t rowBytes = img.getLevelRowbytes(i);
+					int32_t numRows = img.getHeight();
+
+					row.resize(rowBytes);
+
+					uint8_t* pLowRow = pFace;
+					uint8_t* pHighRow = pFace + ((numRows - 1) * rowBytes);
+
+					for (; pLowRow < pHighRow; pLowRow += rowBytes, pHighRow -= rowBytes)
+					{
+						std::memcpy(row.data(), pLowRow, rowBytes);
+						std::memcpy(pLowRow, pHighRow, rowBytes);
+						std::memcpy(pHighRow, row.data(), rowBytes);
+					}
+				}
+
+			}
+			break;
+
+			default:
+				X_ERROR("Img", "Flip not supported for fmt: \"%S\"", Texturefmt::ToString(img.getFormat()));
+				return false;
+		}
+
+		return true;
 	}
 
 	// ==================================================================

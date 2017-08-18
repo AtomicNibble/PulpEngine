@@ -32,6 +32,7 @@ namespace Util
 	IMGLIB_EXPORT ImgFileFormat::Enum resolveSrcfmt(const core::Array<uint8_t>& fileData);
 	IMGLIB_EXPORT bool writeSupported(ImgFileFormat::Enum fmt);
 	IMGLIB_EXPORT const char* getExtension(ImgFileFormat::Enum fmt);
+	IMGLIB_EXPORT bool flipVertical(XTextureFile& img, core::MemoryArenaBase* swap);
 
 	// not exported currently.
 	bool loadImage(core::MemoryArenaBase* swap, const core::Array<uint8_t>& fileData, ImgFileFormat::Enum fmt, XTextureFile& img);
