@@ -241,6 +241,21 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
 			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
 			{
+				case "outFmt"_fnv1a:
+					switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength()))
+					{
+						case "ci"_fnv1a:
+							outputFileFmt = ImgFileFormat::CI;
+							break;
+						case "dds"_fnv1a:
+							outputFileFmt = ImgFileFormat::DDS;
+							break;
+						default:
+							X_WARNING("Img", "Unknown outFmt: %.*s", val.GetStringLength(), val.GetString());
+							break;
+					}
+
+					break;
 				case "qualityProfile"_fnv1a:
 					switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength()))
 					{
