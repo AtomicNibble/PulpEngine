@@ -1605,24 +1605,23 @@ void XRender::initILDescriptions(void)
 	// Streams
 
 	// color stream
-	static D3D11_INPUT_ELEMENT_DESC elem_stream_color[] =
+	static D3D12_INPUT_ELEMENT_DESC elem_stream_color[] =
 	{
-		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::COLOR, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::COLOR, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
 
 	// normals stream
-	static D3D11_INPUT_ELEMENT_DESC elem_stream_normals[] =
+	static D3D12_INPUT_ELEMENT_DESC  elem_stream_normals[] =
 	{
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::NORMALS, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::NORMALS, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
 
 	// Tangent / binormal stream
-	static D3D11_INPUT_ELEMENT_DESC elem_stream_tangents[] =
+	static D3D12_INPUT_ELEMENT_DESC  elem_stream_tangents[] =
 	{
-		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 12, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
-
 
 	for (uint32_t i = 0; i < num; i++)
 	{
@@ -1757,6 +1756,7 @@ void XRender::initILDescriptions(void)
 		1 // one color per instance
 	};
 
+	// 4x4
 	for (uint32_t i = 0; i < 4; i++)
 	{
 		elem_inst_vec4.SemanticIndex = i + 1;
@@ -1764,6 +1764,7 @@ void XRender::initILDescriptions(void)
 		ilInstanced_.append(elem_inst_vec4);
 	}
 
+	// col.
 	elem_inst_col8888.AlignedByteOffset = 4 * sizeof(Vec4f);
 	ilInstanced_.append(elem_inst_col8888);
 
