@@ -13,6 +13,10 @@ X_NAMESPACE_DECLARE(model,
 	struct IModelManager;
 )
 
+X_NAMESPACE_DECLARE(anim,
+	struct IAnimManager;
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 X_DECLARE_ENUM(PrimContext)(
