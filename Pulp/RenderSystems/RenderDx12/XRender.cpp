@@ -1395,9 +1395,24 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
 	{
+		if (desc.stateFlags.IsSet(StateFlag::HWSKIN)) {
+			// TODO..
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
 		// make a copy and append instanced descriptions.
 		VertexLayoutDescArr inputDesc(*pInputLayout);
 		for (const auto& il : ilInstanced_) {
+			inputDesc.append(il);
+		}
+
+		pso.setInputLayout(inputDesc.size(), inputDesc.ptr());
+	}
+	else if (desc.stateFlags.IsSet(StateFlag::HWSKIN))
+	{
+		// make a copy and append instanced descriptions.
+		VertexLayoutDescArr inputDesc(*pInputLayout);
+		for (const auto& il : ilHwSkin_) {
 			inputDesc.append(il);
 		}
 
@@ -1751,6 +1766,20 @@ void XRender::initILDescriptions(void)
 
 	elem_inst_col8888.AlignedByteOffset = 4 * sizeof(Vec4f);
 	ilInstanced_.append(elem_inst_col8888);
+
+	// ----------------------------------------
+
+	// HwSkin.
+	static D3D12_INPUT_ELEMENT_DESC  elem_stream_skin[] =
+	{
+		// scaled 16bit.
+		{ "BLENDINDICES", 0, DXGI_FORMAT_R16G16B16A16_UINT, VertexStream::HWSKIN, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::HWSKIN, 8, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	};
+
+	// we need to support skinning on top of any camel.
+	ilHwSkin_.append(elem_stream_skin[0]);
+	ilHwSkin_.append(elem_stream_skin[1]);
 }
 
 bool XRender::initRenderBuffers(Vec2<uint32_t> res)

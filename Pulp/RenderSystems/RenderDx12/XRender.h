@@ -291,6 +291,7 @@ private:
 	VertexFormatILArr ilDescriptions_;
 	VertexFormatILArr ilStreamedDescriptions_;
 	VertexLayoutDescArr ilInstanced_;
+	VertexLayoutDescArr ilHwSkin_;
 
 	D3D_FEATURE_LEVEL featureLvl_;
 	GpuFeatures features_;

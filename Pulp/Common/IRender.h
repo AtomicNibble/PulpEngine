@@ -244,7 +244,7 @@ X_ENSURE_SIZE(TextureState, 4);
 X_ENSURE_SIZE(TextureState, 4);
 #endif
 
-X_DECLARE_FLAGS8(StateFlag)(
+X_DECLARE_FLAGS(StateFlag)(
 	DEPTHWRITE,
 	WIREFRAME,
 
@@ -254,10 +254,11 @@ X_DECLARE_FLAGS8(StateFlag)(
 	ALPHATEST,
 
 	VERTEX_STREAMS, // vertex format is made from streams
-	INSTANCED_POS_COLOR // a stream of postions and colors is provided.
+	INSTANCED_POS_COLOR, // a stream of postions and colors is provided.
+	HWSKIN // a stream of index and weights is provided.
 );
 
-typedef Flags8<StateFlag> StateFlags;
+typedef Flags<StateFlag> StateFlags;
 
 struct StateDesc
 {
@@ -272,11 +273,13 @@ struct StateDesc
 	CullType::Enum cullType;
 	TopoType::Enum topo;
 	DepthFunc::Enum depthFunc;
-	StateFlags stateFlags;
+	uint8_t _goat;
 
+	// 4
+	StateFlags stateFlags;
 };
 
-X_ENSURE_SIZE(StateDesc, 20);
+X_ENSURE_SIZE(StateDesc, 24);
 
 
 struct CBState
