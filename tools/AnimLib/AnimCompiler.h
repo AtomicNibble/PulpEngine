@@ -25,6 +25,8 @@ class AnimCompiler
 	public:
 		Position(core::MemoryArenaBase* arena);
 
+		void save(core::ByteStream& stream) const;
+		
 		void appendFullPos(const Vec3f& pos);
 		void setBasePosition(const Vec3f& basePos);
 
@@ -33,8 +35,6 @@ class AnimCompiler
 		bool isFullFrames(void) const;
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
-
-		void save(core::XFile* pFile) const;
 
 		void CalculateDeltas(const float posError = 0.075f);
 
@@ -71,13 +71,13 @@ class AnimCompiler
 	public:
 		Angle(core::MemoryArenaBase* arena);
 
+		void save(core::ByteStream& stream) const;
+		
 		void appendFullAng(const Quatf& ang);
 		void setBaseOrient(const Quatf& ang);
 		bool isFullFrames(void) const;
 
 		void CalculateDeltas(const float angError = 0.075f);
-
-		void save(core::XFile* pFile) const;
 
 	private:
 		AnglesArr fullAngles_;

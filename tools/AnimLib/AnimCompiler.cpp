@@ -18,6 +18,67 @@ AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
 	largeScalers_ = false;
 }
 
+
+void AnimCompiler::Position::save(core::ByteStream& stream) const
+{
+	int16_t numPos = safe_static_cast<uint16_t>(posDeltas_.size());
+
+	stream.write(numPos);
+
+	if (numPos == 0)
+	{
+		stream.write(min_); // just write min pos.
+	}
+	else
+	{
+		// if we not full frames we write frames numbers out.
+		if (!isFullFrames() && posDeltas_.size() > 1)
+		{
+			size_t numFrames = fullPos_.size();
+
+			// frame numbers are 8bit if total anim frames less than 255
+			if (numFrames <= std::numeric_limits<uint8_t>::max())
+			{
+				for (const PosDelta& delta : posDeltas_)
+				{
+					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(delta.frame);
+					stream.write(frame);
+				}
+			}
+			else
+			{
+				for (const PosDelta& delta : posDeltas_)
+				{
+					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(delta.frame);
+					stream.write(frame);
+				}
+			}
+		}
+
+		// now we need to write the scalers.
+		if (isLargeScalers())
+		{
+			stream.write(scalers_.ptr(), safe_static_cast<uint32_t>(scalers_.size() * sizeof(Scaler)));
+		}
+		else
+		{
+			for (auto s : scalers_)
+			{
+				Vec3<uint8_t> s8;
+
+				s8.x = safe_static_cast<uint8_t, uint16_t>(s.x);
+				s8.y = safe_static_cast<uint8_t, uint16_t>(s.y);
+				s8.z = safe_static_cast<uint8_t, uint16_t>(s.z);
+
+				stream.write(s8);
+			}
+		}
+
+		stream.write(min_);
+		stream.write(range_);
+	}
+}
+
 void AnimCompiler::Position::appendFullPos(const Vec3f& pos)
 {
 	fullPos_.append(pos);
@@ -53,68 +114,6 @@ const Vec3f& AnimCompiler::Position::range(void) const
 	return range_;
 }
 
-void AnimCompiler::Position::save(core::XFile* pFile) const
-{
-	X_ASSERT_NOT_NULL(pFile);
-
-	int16_t numPos = safe_static_cast<uint16_t, size_t>(posDeltas_.size());
-
-	pFile->writeObj(numPos);
-
-	if (numPos == 0)
-	{
-		pFile->writeObj(min_); // just write min pos.
-	}
-	else
-	{
-		// if we not full frames we write frames numbers out.
-		if (!isFullFrames() && posDeltas_.size() > 1)
-		{
-			size_t numFrames = fullPos_.size();
-
-			// frame numbers are 8bit if total anim frames less than 255
-			if (numFrames <= std::numeric_limits<uint8_t>::max())
-			{
-				for (const PosDelta& delta : posDeltas_)
-				{
-					uint8_t frame = safe_static_cast<uint8_t,uint32_t>(delta.frame);
-					pFile->writeObj(frame);
-				}
-			}
-			else
-			{
-				for (const PosDelta& delta : posDeltas_)
-				{
-					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(delta.frame);
-					pFile->writeObj(frame);
-				}
-			}
-		}
-
-		// now we need to write the scalers.
-		if (isLargeScalers())
-		{
-			pFile->write(scalers_.ptr(),
-				safe_static_cast<uint32_t, size_t>(scalers_.size() * sizeof(Scaler)));
-		}
-		else
-		{
-			for (auto s : scalers_)
-			{
-				Vec3<uint8_t> s8;
-
-				s8.x = safe_static_cast<uint8_t, uint16_t>(s.x);
-				s8.y = safe_static_cast<uint8_t, uint16_t>(s.y);
-				s8.z = safe_static_cast<uint8_t, uint16_t>(s.z);
-
-				pFile->writeObj(s8);
-			}
-		}
-
-		pFile->writeObj(min_);
-		pFile->writeObj(range_);
-	}
-}
 
 void AnimCompiler::Position::CalculateDeltas(const float posError)
 {
@@ -203,6 +202,46 @@ AnimCompiler::Angle::Angle(core::MemoryArenaBase* arena) :
 	fullAngles_.setGranularity(128);
 }
 
+void AnimCompiler::Angle::save(core::ByteStream& stream) const
+{
+	int16_t numAngle = safe_static_cast<uint16_t>(angles_.size());
+
+	stream.write(numAngle);
+
+	if (numAngle > 0)
+	{
+		if (!isFullFrames() && angles_.size() > 1)
+		{
+			size_t numFrames = fullAngles_.size();
+
+			// frame numbers are 8bit if total anim frames less than 255
+			if (numFrames <= std::numeric_limits<uint8_t>::max())
+			{
+				for (const auto& a : angles_)
+				{
+					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(a.frame);
+					stream.write(frame);
+				}
+			}
+			else
+			{
+				for (const auto& a : angles_)
+				{
+					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(a.frame);
+					stream.write(frame);
+				}
+			}
+		}
+
+		// write angles
+		for (const auto& a : angles_)
+		{
+			// compressed quat.
+			XQuatCompressedf quatf(a.angle);
+			stream.write(quatf);
+		}
+	}
+}
 
 void AnimCompiler::Angle::appendFullAng(const Quatf& ang)
 {
@@ -217,49 +256,6 @@ void AnimCompiler::Angle::setBaseOrient(const Quatf& ang)
 bool AnimCompiler::Angle::isFullFrames(void) const
 {
 	return fullAngles_.size() == angles_.size();
-}
-
-void AnimCompiler::Angle::save(core::XFile* pFile) const
-{
-	X_ASSERT_NOT_NULL(pFile);
-
-	int16_t numAngle = safe_static_cast<uint16_t, size_t>(angles_.size());
-
-	pFile->writeObj(numAngle);
-
-	if (numAngle > 0)
-	{
-		if (!isFullFrames() && angles_.size() > 1)
-		{
-			size_t numFrames = fullAngles_.size();
-
-			// frame numbers are 8bit if total anim frames less than 255
-			if (numFrames <= std::numeric_limits<uint8_t>::max())
-			{
-				for (const auto& a : angles_)
-				{
-					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(a.frame);
-					pFile->writeObj(frame);
-				}
-			}
-			else
-			{
-				for (const auto& a : angles_)
-				{
-					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(a.frame);
-					pFile->writeObj(frame);
-				}
-			}
-		}
-
-		// write angles
-		for (const auto& a : angles_)
-		{
-			// compressed quat.
-			XQuatCompressedf quatf(a.angle);
-			pFile->writeObj(quatf);
-		}
-	}
 }
 
 void AnimCompiler::Angle::CalculateDeltas(const float angError)
@@ -423,19 +419,32 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
 	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());
 
-	file.writeObj(hdr);
+
+	core::ByteStream stream(arena_);
 
 	// write the bone names.
 	for (const auto& bone : bones_)
 	{
-		file.writeString(bone.name);
+		stream.write(bone.name);
 	}
 
 	// now we save the data.
 	for (const auto& bone : bones_)
 	{
-		bone.ang.save(file.GetFile());
-		bone.pos.save(file.GetFile());
+		bone.ang.save(stream);
+		bone.pos.save(stream);
+	}
+
+	hdr.dataSize = safe_static_cast<uint32_t>(stream.size());
+	
+	if (file.writeObj(hdr) != sizeof(hdr)) {
+		X_ERROR("Anim", "Failed to write header");
+		return false;
+	}
+
+	if (file.write(stream.data(), stream.size()) != stream.size()) {
+		X_ERROR("Anim", "Failed to write data");
+		return false;
 	}
 
 	return true;
