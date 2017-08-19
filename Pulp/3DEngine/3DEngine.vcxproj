@@ -443,6 +443,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Anim\Anim.h" />
+    <ClInclude Include="Anim\AnimManager.h" />
     <ClInclude Include="Drawing\CBufferManager.h" />
     <ClInclude Include="Drawing\PrimativeContext.h" />
     <ClInclude Include="Drawing\VariableStateManager.h" />
@@ -457,7 +459,6 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Material\TechDefStateManager.h" />
-    <ClInclude Include="Model\Anim.h" />
     <ClInclude Include="Model\AnimManager.h" />
     <ClInclude Include="Model\ModelManager.h" />
     <ClInclude Include="Model\RenderMesh.h" />
@@ -473,6 +474,8 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Anim\Anim.cpp" />
+    <ClCompile Include="Anim\AnimManager.cpp" />
     <ClCompile Include="Drawing\CBufferManager.cpp" />
     <ClCompile Include="Drawing\PrimativeContext.cpp" />
     <ClCompile Include="Drawing\VariableStateManager.cpp" />
@@ -489,8 +492,6 @@
     <ClCompile Include="Level\Level_portal.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Material\TechDefStateManager.cpp" />
-    <ClCompile Include="Model\Anim.cpp" />
-    <ClCompile Include="Model\AnimManager.cpp" />
     <ClCompile Include="Model\ModelManager.cpp" />
     <ClCompile Include="Model\RenderMesh.cpp" />
     <ClCompile Include="Model\XModel.cpp" />
@@ -518,13 +519,13 @@
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Anim\Anim.inl" />
     <None Include="Drawing\PrimativeContext.inl" />
     <None Include="Gui\Gui.inl" />
     <None Include="Gui\SimpleWindow.inl" />
     <None Include="Gui\XWindow.inl" />
     <None Include="Material\MaterialManager.inl" />
     <None Include="Material\TechDefStateManager.inl" />
-    <None Include="Model\Anim.inl" />
     <None Include="Model\RenderMesh.inl" />
     <None Include="Model\XModel.inl" />
     <None Include="Texture\Texture.inl" />

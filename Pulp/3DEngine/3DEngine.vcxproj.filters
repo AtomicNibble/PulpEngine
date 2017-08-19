@@ -85,11 +85,11 @@
     <ClCompile Include="World\World3D.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
-    <ClCompile Include="Model\AnimManager.cpp">
-      <Filter>Source Files\Model</Filter>
+    <ClCompile Include="Anim\Anim.cpp">
+      <Filter>Source Files\Anim</Filter>
     </ClCompile>
-    <ClCompile Include="Model\Anim.cpp">
-      <Filter>Source Files\Model</Filter>
+    <ClCompile Include="Anim\AnimManager.cpp">
+      <Filter>Source Files\Anim</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -174,8 +174,11 @@
     <ClInclude Include="Model\AnimManager.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
-    <ClInclude Include="Model\Anim.h">
-      <Filter>Header Files\Model</Filter>
+    <ClInclude Include="Anim\Anim.h">
+      <Filter>Header Files\Anim</Filter>
+    </ClInclude>
+    <ClInclude Include="Anim\AnimManager.h">
+      <Filter>Header Files\Anim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -239,6 +242,12 @@
     <Filter Include="Source Files\World">
       <UniqueIdentifier>{4e35fdca-3d78-4564-bd6c-2bf5f9da529f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Anim">
+      <UniqueIdentifier>{dd11c62b-13f6-4801-a231-ec5c618a1ae0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Anim">
+      <UniqueIdentifier>{961f0b72-6e4b-4729-a846-bfe63a4d9324}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Gui\XWindow.inl">
@@ -280,8 +289,8 @@
     <None Include="World\World3D.inl">
       <Filter>Header Files\World</Filter>
     </None>
-    <None Include="Model\Anim.inl">
-      <Filter>Header Files\Model</Filter>
+    <None Include="Anim\Anim.inl">
+      <Filter>Header Files\Anim</Filter>
     </None>
   </ItemGroup>
 </Project>
