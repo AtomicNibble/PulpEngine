@@ -534,6 +534,18 @@ namespace shader
 					}
 				}
 
+				if (permFlags_.IsSet(Permatation::HwSkin))
+				{
+					if (core::strUtil::IsEqual("BLENDINDICES", InputDsc.SemanticName))
+					{
+						continue;
+					}
+					if (core::strUtil::IsEqual("BLENDWEIGHT", InputDsc.SemanticName))
+					{
+						continue;
+					}
+				}
+
 				pILnode = pILnode->GetChildWithSemtaic(InputDsc.SemanticName);
 				if (!pILnode)
 				{
