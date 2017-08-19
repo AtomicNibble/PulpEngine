@@ -26,7 +26,12 @@ public:
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
 
 	X_INLINE const core::string& getName(void) const;
-
+	X_INLINE int32_t numBones(void) const;
+	X_INLINE int32_t numFrames(void) const;
+	X_INLINE int32_t fps(void) const;
+	X_INLINE AnimType::Enum type(void) const;
+	X_INLINE bool isLooping(void) const;
+	X_INLINE bool hasNotes(void) const;
 
 
 	void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
@@ -38,44 +43,9 @@ private:
 	core::LoadStatus::Enum status_;
 	uint8_t _pad[3];
 
+	AnimHeader hdr_;
 };
 
-
-X_INLINE const int32_t Anim::getID(void) const
-{
-	return id_;
-}
-
-X_INLINE void Anim::setID(int32_t id)
-{
-	id_ = id;
-}
-
-
-X_INLINE core::LoadStatus::Enum Anim::getStatus(void) const
-{
-	return status_;
-}
-
-X_INLINE bool Anim::isLoaded(void) const
-{
-	return status_ == core::LoadStatus::Complete;
-}
-
-X_INLINE bool Anim::loadFailed(void) const
-{
-	return status_ == core::LoadStatus::Error;
-}
-
-X_INLINE void Anim::setStatus(core::LoadStatus::Enum status)
-{
-	status_ = status;
-}
-
-X_INLINE const core::string& Anim::getName(void) const
-{
-	return name_;
-}
-
-
 X_NAMESPACE_END
+
+#include "Anim.inl"

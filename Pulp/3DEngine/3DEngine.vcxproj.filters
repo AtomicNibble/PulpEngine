@@ -280,5 +280,8 @@
     <None Include="World\World3D.inl">
       <Filter>Header Files\World</Filter>
     </None>
+    <None Include="Model\Anim.inl">
+      <Filter>Header Files\Model</Filter>
+    </None>
   </ItemGroup>
 </Project>

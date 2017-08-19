@@ -524,6 +524,7 @@
     <None Include="Gui\XWindow.inl" />
     <None Include="Material\MaterialManager.inl" />
     <None Include="Material\TechDefStateManager.inl" />
+    <None Include="Model\Anim.inl" />
     <None Include="Model\RenderMesh.inl" />
     <None Include="Model\XModel.inl" />
     <None Include="Texture\Texture.inl" />
