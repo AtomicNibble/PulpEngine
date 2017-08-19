@@ -63,6 +63,40 @@ namespace entity
 			}
 		}
 
+		// need to build translators for all the components.
+		if (!createTranslatours()) {
+			return false;
+		}
+
+		return true;
+	}
+
+
+	bool EnititySystem::createTranslatours(void)
+	{
+
+
+		const char* pDoc = R"(
+{
+	"ents" : [
+		{
+			"origin" : {"x": 128, "y": 128, "z": 25},
+			"angles" : {"p": -2.618721, "y": 1.028581, "r": 25.0},
+
+			"health" : {
+				"hp": 100,
+				"max": 100
+			},
+			"SoundObject" : {
+			}
+		}
+	]
+}
+			)";
+
+
+		loadEntites2(pDoc, pDoc + sizeof(pDoc));
+
 		return true;
 	}
 
@@ -187,16 +221,53 @@ namespace entity
 			}
 		}
 
-		if (d.HasMember("trigger"))
-		{
-			auto arr = d["trigger"].GetArray();
 
-			if (!parseTriggers(arr))
+		return true;
+	}
+
+	bool EnititySystem::loadEntites2(const char* pJsonBegin, const char* pJsonEnd)
+	{
+		X_UNUSED(pJsonEnd);
+
+		core::json::Document d;
+		if (d.ParseInsitu(const_cast<char*>(pJsonBegin)).HasParseError()) {
+			auto err = d.GetParseError();
+			X_ERROR("Ents", "Failed to parse ent desc: %i", err);
+			return false;
+		}
+
+
+		if (d.GetType() != core::json::Type::kObjectType) {
+			X_ERROR("Ents", "Unexpected type");
+			return false;
+		}
+
+		for (auto it = d.MemberBegin(); it != d.MemberEnd(); ++it)
+		{
+			auto& v = *it;
+
+			if (v.name == "ents")
 			{
+				if (v.value.GetType() != core::json::Type::kArrayType) {
+					X_ERROR("Ents", "Ent data must be array");
+					return false;
+				}
+
+				auto ents = v.value.GetArray();
+				for (auto& ent : ents)
+				{
+					if (!parseEntDesc(ent)) {
+						X_ERROR("Ents", "Unexpected type");
+						return false;
+					}
+				}
+			}
+			else
+			{
+				X_ERROR("Ents", "Unknown ent data member: \"%s\"", v.name.GetString());
 				return false;
 			}
 		}
-
 
 		return true;
 	}
@@ -237,32 +308,218 @@ namespace entity
 	{
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = reg_.create<TransForm, ScriptName>();
+			auto ent = reg_.create<TransForm, ScriptName, SoundObject>();
 			auto& trans = reg_.get<TransForm>(ent);
-			auto& name = reg_.get<ScriptName>(ent);
+		//	auto& name = reg_.get<ScriptName>(ent);
+			auto& snd = reg_.get<SoundObject>(ent);
 
 			auto& kvps = *it;
 
 			const char* pOrigin = kvps["origin"].GetString();
-			const char* pTargetName = kvps["targetname"].GetString();
 
 			auto& pos = trans.pos;
 			if (sscanf_s(pOrigin, "%f %f %f", &pos.x, &pos.y, &pos.z) != 3) {
 				return false;
 			}
 
-			name.pName = pTargetName;
+		//	name.pName = pTargetName;
+
+			snd.handle = gEnv->pSound->registerObject(trans, "Goat");
+			 gEnv->pSound->setOcclusionType(snd.handle, sound::OcclusionType::SingleRay);
+
+			if (kvps.HasMember("sound_evt")) {
+				const char* pEvt = kvps["sound_evt"].GetString();
+
+				gEnv->pSound->postEvent(pEvt, snd.handle);
+			}
 		}
 
 		return true;
 	}
 
-	bool EnititySystem::parseTriggers(core::json::Value::Array val)
+
+	template<typename CompnentT>
+	bool EnititySystem::parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc)
 	{
-		X_UNUSED(val);
+		if (compDesc.GetType() != core::json::Type::kObjectType) {
+			X_ERROR("Ents", "Component description must be a object");
+			return false;
+		}
+
+		for (core::json::Value::ConstMemberIterator it = compDesc.MemberBegin(); it != compDesc.MemberEnd(); ++it)
+		{
+			const auto& name = it->name;
+			const auto& val = it->value;
+
+			core::StrHash nameHash(name.GetString(), name.GetStringLength());
+
+			switch (val.GetType())
+			{
+				case core::json::Type::kNumberType:
+
+					if (val.IsInt()) {
+						translator.AssignInt(comp, nameHash, val.GetInt());
+					}
+					else if (val.IsBool()) {
+						translator.AssignBool(comp, nameHash, val.GetBool());
+					}
+					else if (val.IsFloat()) {
+						translator.AssignFloat(comp, nameHash, val.GetFloat());
+					}
+					else {
+						X_ERROR("Ent", "Unknown component numeric type: %" PRIi32, val.GetType());
+						return false;
+					}
+
+					break;
+				case core::json::Type::kStringType:
+					translator.AssignString(comp, nameHash, val.GetString());
+					break;
+
+				default:
+					X_ERROR("Ent", "Unknown component type: %" PRIi32, val.GetType());
+					return false;
+			}
+		}
 
 		return true;
 	}
+
+	bool EnititySystem::parseEntDesc(core::json::Value& entDesc)
+	{
+		using namespace core::Hash::Fnv1Literals;
+
+		// so we need a way to write these out also.
+		// so that the editor can show them and dispaly required props.
+		DataTranslator<Health> dtHealth(arena_);
+		ADD_TRANS_MEMBER(dtHealth, hp);
+		ADD_TRANS_MEMBER(dtHealth, max);
+
+		DataTranslator<Mesh> dtMesh(arena_);
+		ADD_TRANS_MEMBER(dtMesh, name);
+
+
+		if (entDesc.GetType() != core::json::Type::kObjectType) {
+			X_ERROR("Ents", "Ent description must be a object");
+			return false;
+		}
+
+		EntityId ent = reg_.create<TransForm>();
+		auto& trans = reg_.get<TransForm>(ent);
+
+
+		for (auto it = entDesc.MemberBegin(); it != entDesc.MemberEnd(); ++it)
+		{
+			const auto& name = it->name;
+			const auto& value = it->value;
+
+			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
+			{
+				case "Health"_fnv1a:
+				{
+					auto& hp = reg_.assign<Health>(ent);
+					if (!parseComponent(dtHealth, hp, value)) {
+						return false;
+					}
+					break;
+				}
+				case "SoundObject"_fnv1a:
+				{
+					auto& snd = reg_.assign<SoundObject>(ent);
+					snd.handle = gEnv->pSound->registerObject(trans X_SOUND_DEBUG_NAME_PARAM("MyLittePony"));
+					break;
+				}
+
+				case "MeshRenderer"_fnv1a:
+				{
+					if (!reg_.has<Mesh>(ent)) {
+						X_ERROR("Ents", "MeshRenderer requires a Mesh component");
+						return false;
+					}
+
+					auto& mesh = reg_.get<Mesh>(ent);
+					auto& meshRend = reg_.assign<MeshRenderer>(ent);
+
+					engine::RenderEntDesc entDsc;
+					entDsc.pModel = mesh.pModel;
+					entDsc.trans = trans;
+
+					meshRend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+					break;
+				}
+
+				case "MeshCollider"_fnv1a:
+				{
+					if (!reg_.has<Mesh>(ent)) {
+						X_ERROR("Ents", "MeshCollider requires a Mesh component");
+						return false;
+					}
+
+					// we just assign the component
+					// then later before we finished loading we iterate these waiting for the models to 
+					// finish loading and then create the physics.
+					reg_.assign<MeshCollider>(ent);
+					break;
+				}
+
+				case "Mesh"_fnv1a:
+				{
+					auto& mesh = reg_.assign<Mesh>(ent);
+					if (!parseComponent(dtMesh, mesh, value)) {
+						return false;
+					}
+					if (mesh.name.isEmpty()) {
+						X_ERROR("Ents", "Mesh has empty name");
+						return false;
+					}
+
+					mesh.pModel = pModelManager_->loadModel(mesh.name.c_str());
+					break;
+				}
+
+
+
+				// loosy goosy
+				case "origin"_fnv1a:
+				{
+					// x,y,z
+					if (!value.HasMember("x") || !value.HasMember("y") || !value.HasMember("z")) {
+						X_ERROR("Ents", "Invalid origin");
+						return false;
+					}
+
+					trans.pos.x = value["x"].GetFloat();
+					trans.pos.y = value["y"].GetFloat();
+					trans.pos.z = value["z"].GetFloat();
+				}
+				break;
+				case "angles"_fnv1a:
+				{
+					Anglesf angles;
+					if (!value.HasMember("p") || !value.HasMember("y") || !value.HasMember("r")) {
+						X_ERROR("Ents", "Invalid angles");
+						return false;
+					}
+
+					// fuck you make me wet.
+					angles.setPitch(value["p"].GetFloat());
+					angles.setYaw(value["y"].GetFloat());
+					angles.setRoll(value["r"].GetFloat());
+
+					trans.quat = angles.toQuat();
+				}
+				break;
+
+				default:
+					X_WARNING("Ent", "Unkown ent member: \"%s\"", name.GetString());
+					break;
+			}
+		}
+
+
+		return true;
+	}
+
 
 } // namespace entity
 

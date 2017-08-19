@@ -11,6 +11,8 @@
 #include "PlayerSys.h"
 #include "SoundSys.h"
 
+#include "DataTranslator.h"
+
 X_NAMESPACE_DECLARE(core,
 	struct FrameTimeData;
 )
@@ -45,21 +47,28 @@ namespace entity
 		bool addController(EntityId id);
 
 		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
+		bool loadEntites2(const char* pJsonBegin, const char* pJsonEnd);
 
 		X_INLINE const EnitiyRegister& getRegister(void) const;
 		X_INLINE EnitiyRegister& getRegister(void);
 
 	private:
+		bool createTranslatours(void);
+
+		// Temp
 		bool parseMiscModels(core::json::Value::Array val);
 		bool parseScriptOrigins(core::json::Value::Array val);
-		bool parseTriggers(core::json::Value::Array val);
 
+
+		template<typename CompnentT>
+		static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);
+
+		bool parseEntDesc(core::json::Value& val);
 
 	private:
 		core::MemoryArenaBase* arena_;
 		EnitiyRegister reg_;
 		GameVars& vars_;
-
 
 		physics::IPhysics* pPhysics_;
 		physics::IScene* pPhysScene_;

@@ -20,19 +20,51 @@ namespace entity
 {
 
 
-struct Velocity 
-{
-	Vec3f dir;
-};
-
 struct TransForm : public Transformf
 {
-	
+
 };
 
 struct Health
 {
 	int32_t hp;
+	int32_t max;
+};
+
+struct SoundObject
+{
+	sound::SndObjectHandle handle;
+};
+
+struct SoundEnviroment
+{
+	// sound::SndObjectHandle handle;
+};
+
+
+struct Mesh
+{
+	core::string name;
+	model::IModel* pModel;
+};
+
+struct MeshRenderer
+{
+	engine::IRenderEnt* pRenderEnt;
+};
+
+struct MeshCollider
+{
+	physics::ActorHandle actor;
+
+};
+
+// -----------------------------------
+
+
+struct Velocity 
+{
+	Vec3f dir;
 };
 
 struct PhysicsComponent
@@ -70,10 +102,7 @@ struct RenderView
 	Matrix33f viewAxis;
 };
 
-struct SoundObject
-{
-	sound::SndObjectHandle handle;
-};
+
 
 struct Player
 {
@@ -112,15 +141,22 @@ struct Player
 
 
 using EnitiyRegister = ecs::StandardRegistry<uint16_t,
-	Velocity,
 	TransForm,
 	Health,
+
+	Mesh,
+	MeshRenderer,
+	MeshCollider,
+
+	SoundObject,
+	SoundEnviroment,
+
+	Velocity,
 	RenderComponent,
 	PhysicsComponent,
 	PhysicsTrigger,
 	CharacterController,
 	ScriptName,
-	SoundObject,
 	Player
 >;
 
