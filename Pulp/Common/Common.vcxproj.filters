@@ -1261,6 +1261,9 @@
     <ClInclude Include="IModelManager.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
+    <ClInclude Include="IAnimManager.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

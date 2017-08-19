@@ -15,6 +15,11 @@ X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
 )
 
+X_NAMESPACE_DECLARE(anim,
+	class AnimManager;
+)
+
+
 X_NAMESPACE_BEGIN(engine)
 
 X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
@@ -59,6 +64,7 @@ private:
 	XMaterialManager* pMaterialManager_;
 	TextureManager* pTextureManager_;
 	model::XModelManager* pModelManager_;
+	anim::AnimManager* pAnimManager_;
 
 	gui::XGuiManager* pGuiManger_;
 

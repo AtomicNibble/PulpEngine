@@ -17,6 +17,7 @@
 #include "Material\MaterialManager.h"
 #include "Texture\TextureManager.h"
 #include "Model\ModelManager.h"
+#include "Model\AnimManager.h"
 #include "Gui\GuiManger.h"
 
 #include "CmdBucket.h"
@@ -109,6 +110,7 @@ bool X3DEngine::init(void)
 	pTextureManager_ = X_NEW(engine::TextureManager, g_3dEngineArena, "TextureManager")(g_3dEngineArena);
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager")(g_3dEngineArena, g_3dEngineArena);
+	pAnimManager_ = X_NEW(anim::AnimManager, g_3dEngineArena, "AnimManager")(g_3dEngineArena, g_3dEngineArena);
 	pGuiManger_ = X_NEW(gui::XGuiManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
 	
 	pTextureManager_->registerCmds();
@@ -117,6 +119,9 @@ bool X3DEngine::init(void)
 	pMaterialManager_->registerVars();
 	pModelManager_->registerCmds();
 	pModelManager_->registerVars();
+	pAnimManager_->registerCmds();
+	pAnimManager_->registerVars();
+
 
 	gEngEnv.pGuiMan_ = pGuiManger_;
 	gEngEnv.pMaterialMan_ = pMaterialManager_;
@@ -134,6 +139,9 @@ bool X3DEngine::init(void)
 			return false;
 		}
 		if (!pModelManager_->init()) {
+			return false;
+		}
+		if (!pAnimManager_->init()) {
 			return false;
 		}
 		if (!pGuiManger_->init()) {
@@ -200,6 +208,13 @@ void X3DEngine::shutDown(void)
 		gEngEnv.pGuiMan_ = nullptr;
 	}
 
+	if (pAnimManager_) {
+		pAnimManager_->shutDown();
+		X_DELETE(pAnimManager_, g_3dEngineArena);
+
+		// ...
+	}
+
 	if (pModelManager_) {
 		pModelManager_->shutDown();
 		X_DELETE(pModelManager_, g_3dEngineArena);
@@ -259,6 +274,11 @@ bool X3DEngine::asyncInitFinalize(void)
 		allOk = false;
 	}
 
+	if (!pAnimManager_ || !pAnimManager_->asyncInitFinalize()) {
+		allOk = false;
+	}
+
+
 	return allOk;
 }
 
@@ -268,6 +288,7 @@ void X3DEngine::Update(core::FrameData& frame)
 
 	pTextureManager_->scheduleStreaming();
 	pModelManager_->dispatchPendingLoads();
+	pAnimManager_->dispatchPendingLoads();
 	pMaterialManager_->dispatchPendingLoads();
 
 //	Matrix44f view = Matrix44f::identity();

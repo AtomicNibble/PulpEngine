@@ -142,6 +142,7 @@
     <ClInclude Include="Hashing\SHA512.h" />
     <ClInclude Include="Hashing\xxHash.h" />
     <ClInclude Include="IAnimation.h" />
+    <ClInclude Include="IAnimManager.h" />
     <ClInclude Include="IAssetDb.h" />
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="IAsyncLoad.h" />

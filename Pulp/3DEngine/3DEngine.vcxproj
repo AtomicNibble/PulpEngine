@@ -457,6 +457,8 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Material\TechDefStateManager.h" />
+    <ClInclude Include="Model\Anim.h" />
+    <ClInclude Include="Model\AnimManager.h" />
     <ClInclude Include="Model\ModelManager.h" />
     <ClInclude Include="Model\RenderMesh.h" />
     <ClInclude Include="Model\XModel.h" />
@@ -487,6 +489,8 @@
     <ClCompile Include="Level\Level_portal.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Material\TechDefStateManager.cpp" />
+    <ClCompile Include="Model\Anim.cpp" />
+    <ClCompile Include="Model\AnimManager.cpp" />
     <ClCompile Include="Model\ModelManager.cpp" />
     <ClCompile Include="Model\RenderMesh.cpp" />
     <ClCompile Include="Model\XModel.cpp" />

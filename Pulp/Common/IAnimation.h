@@ -56,7 +56,7 @@ X_NAMESPACE_BEGIN(anim)
 //		multiple notes can occur on the same frame.
 //
 
-static const uint32_t	 ANIM_VERSION = 1;
+static const uint32_t	 ANIM_VERSION = 2;
 static const uint32_t	 ANIM_MAX_BONES = 255;
 static const uint32_t	 ANIM_MAX_FRAMES = 4096; // can be increased up to (1 << 16) -1
 static const uint32_t	 ANIM_DEFAULT_FPS = 30;
@@ -67,6 +67,8 @@ static const uint32_t	 ANIM_MAX_NOT_NAME_LENGTH = 48; // the max lengt of each n
 static const uint32_t	 ANIM_MAX_NAME_LENGTH = 60;
 static const char*		 ANIM_FILE_EXTENSION = "anim";
 static const wchar_t*	 ANIM_FILE_EXTENSION_W = L"anim";
+
+static const uint32_t	 ANIM_MAX_LOADED = 1 << 10;
 
 // Intermidiate format stuff.
 // this is used for saving out animation data that is not relative.
@@ -87,6 +89,14 @@ static const wchar_t*	 ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 
 struct IAnimLib : public IConverter
 {
+
+};
+
+
+struct IAnim
+{
+	virtual ~IAnim() {}
+
 
 };
 
@@ -122,23 +132,25 @@ struct AnimHeader
 	uint16_t			numFrames;
 	uint16_t			fps;
 
-	X_INLINE bool IsValid(void) const;
-	X_INLINE bool IsLooping(void) const;
-	X_INLINE bool HasNotes(void) const;
+	uint32_t			dataSize; // size of rest of file.
+
+	X_INLINE bool isValid(void) const;
+	X_INLINE bool isLooping(void) const;
+	X_INLINE bool hasNotes(void) const;
 	X_INLINE size_t numTagHeaderBytes(void) const;
 };
 
 
-X_INLINE bool AnimHeader::IsValid(void) const
+X_INLINE bool AnimHeader::isValid(void) const
 {
 	return version == ANIM_VERSION;
 }
 
-X_INLINE bool AnimHeader::IsLooping(void) const
+X_INLINE bool AnimHeader::isLooping(void) const
 {
 	return flags.IsSet(AnimFlag::LOOP);
 }
-X_INLINE bool AnimHeader::HasNotes(void) const
+X_INLINE bool AnimHeader::hasNotes(void) const
 {
 	return flags.IsSet(AnimFlag::NOTES);
 }
@@ -149,7 +161,7 @@ X_INLINE size_t AnimHeader::numTagHeaderBytes(void) const
 }
 
 
-X_ENSURE_SIZE(AnimHeader, 8);
+X_ENSURE_SIZE(AnimHeader, 12);
 
 
 X_NAMESPACE_END

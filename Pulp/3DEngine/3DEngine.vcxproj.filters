@@ -85,6 +85,12 @@
     <ClCompile Include="World\World3D.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
+    <ClCompile Include="Model\AnimManager.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\Anim.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -164,6 +170,12 @@
     </ClInclude>
     <ClInclude Include="World\World3D.h">
       <Filter>Header Files\World</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\AnimManager.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\Anim.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
