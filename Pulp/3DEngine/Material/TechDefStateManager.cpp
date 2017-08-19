@@ -158,6 +158,9 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	if (permFlags.IsSet(PermatationFlags::Instanced)) {
 		stateDescCpy.stateFlags.Set(render::StateFlag::INSTANCED_POS_COLOR);
 	}
+	if (permFlags.IsSet(PermatationFlags::HwSkin)) {
+		stateDescCpy.stateFlags.Set(render::StateFlag::HWSKIN);
+	}
 
 	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDescCpy, nullptr, 0);
 
