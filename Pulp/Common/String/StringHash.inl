@@ -8,8 +8,8 @@ namespace internal
 	{
 		/// Function generating the hash value for a string literal by calling itself recursively via other StringHash
 		/// template parameters.
-		X_INLINE static StrHash::Type Hash(const char(&str)[N])
-		{
+		inline constexpr static StrHash::Type Hash(const char(&str)[N]) 
+		{ 
 			return (StringHashGenerator<N, I-1>::Hash(str) ^ str[I-1])*16777619u;
 		}
 	};
@@ -20,7 +20,7 @@ namespace internal
 	struct StringHashGenerator<N, 1>
 	{
 		/// Function generating the hash value for the first character in the given string literal.
-		X_INLINE static StrHash::Type Hash(const char(&str)[N])
+		inline constexpr static StrHash::Type Hash(const char(&str)[N])
 		{
 			return (2166136261u ^ str[0])*16777619u;
 		}
@@ -32,7 +32,7 @@ namespace internal
 	struct StringHashGenerator<N, 0>
 	{
 		/// Function prohibiting the hashing of empty string literals.
-		static StrHash::Type Hash(const char(&str)[N])
+		inline constexpr static StrHash::Type Hash(const char(&str)[N])
 		{
 			static_assert(false, "Empty constant strings cannot be hashed.");
 		}
@@ -50,7 +50,7 @@ namespace internal
 	/// \remark The StringLiteral argument is never used, and serves only as a type used in overload resolution
 	/// in the type-based dispatch mechanism.
 	template <size_t N>
-	X_INLINE StrHash::Type GenerateHash(const char(&str)[N], StringLiteral)
+	inline constexpr StrHash::Type GenerateHash(const char(&str)[N], StringLiteral)
 	{
 		// defer the hash generation to the template mechanism
 		return StringHashGenerator<N, N-1>::Hash(str);
@@ -81,6 +81,7 @@ X_INLINE StrHash::StrHash(const T& str) :
 		X_NAMESPACE(core)::internal::GenerateHash(str, compileTime::IntToType<compileTime::IsStringLiteral<T>::Value>())
 	)
 {
+
 }
 
 
