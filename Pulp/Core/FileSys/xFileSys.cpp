@@ -1456,6 +1456,8 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 		const IoRequestRead* pAsyncReq = asyncOp.as<const IoRequestRead>();
 		XFileAsync* pReqFile = pAsyncReq->pFile;
 
+		static_assert(core::compileTime::IsTrivialDestruct<IoRequestRead>::Value, "Need to call destructor");
+
 		if (vars_.QueDebug)
 		{
 			uint32_t threadId = core::Thread::GetCurrentID();
@@ -1471,8 +1473,9 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 	else if (asyncOp.getType() == IoRequest::WRITE)
 	{
 		const IoRequestWrite* pAsyncReq = asyncOp.as<const IoRequestWrite>();
-
 		XFileAsync* pReqFile = pAsyncReq->pFile;
+
+		static_assert(core::compileTime::IsTrivialDestruct<IoRequestWrite>::Value, "Need to call destructor");
 
 		if (vars_.QueDebug)
 		{
@@ -1489,8 +1492,9 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 	else if (asyncOp.getType() == IoRequest::OPEN_READ_ALL)
 	{
 		IoRequestOpenRead* pAsyncReq = asyncOp.as<IoRequestOpenRead>();
-
 		XFileAsync* pReqFile = pAsyncReq->pFile;
+
+		static_assert(core::compileTime::IsTrivialDestruct<IoRequestOpenRead>::Value, "Need to call destructor");
 
 		if (vars_.QueDebug)
 		{
@@ -1548,6 +1552,11 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 		{
 			pAsyncReq->callback.Invoke(*this, pAsyncReq, pReqFile, bytesTransferd);
 		}
+
+		// deconstruct.
+		static_assert(!core::compileTime::IsTrivialDestruct<IoRequestOpenWrite>::Value, "no need to call destructor");
+
+		core::Mem::Destruct(pAsyncReq);
 
 		// close it.
 		closeFileAsync(pReqFile);
