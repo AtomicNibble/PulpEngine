@@ -67,7 +67,21 @@ bool AnimManager::asyncInitFinalize(void)
 
 void AnimManager::dispatchPendingLoads(void)
 {
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
 
+	while (requestQueue_.isNotEmpty())
+	{
+		auto* pAnim = requestQueue_.peek();
+		X_ASSERT(pAnim->getStatus() == core::LoadStatus::Loading, "Incorrect status")(pAnim->getStatus());
+		auto loadReq = core::makeUnique<AnimLoadRequest>(arena_, pAnim);
+
+		// dispatch IO 
+		dispatchLoadRequest(loadReq.get());
+
+		pendingRequests_.emplace_back(loadReq.release());
+
+		requestQueue_.pop();
+	}
 }
 
 IAnim* AnimManager::findAnim(const char* pAnimName) const
