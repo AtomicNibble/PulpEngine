@@ -425,7 +425,7 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 	// write the bone names.
 	for (const auto& bone : bones_)
 	{
-		stream.write(bone.name);
+		stream.write(bone.name.c_str(), core::strUtil::StringBytesIncNull(bone.name));
 	}
 
 	// now we save the data.
