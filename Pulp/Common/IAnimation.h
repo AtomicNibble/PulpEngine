@@ -112,14 +112,6 @@ X_DECLARE_FLAGS8(AnimFlag)(
 	NOTES // got notes
 );
 
-struct tagData
-{
-	uint16_t		numAngles;
-	uint16_t		numPositions;
-	Vec3f			positions[2];
-
-};
-
 
 struct AnimState
 {
