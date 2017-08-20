@@ -130,7 +130,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 	{
 		PROFILE_MAYA_NAME("Write intermidiate:");
 
-		MStatus status = writeIntermidiate_int(interMidiateData);
+		status = writeIntermidiate_int(interMidiateData);
 		if (!status) {
 			return status;
 		}
