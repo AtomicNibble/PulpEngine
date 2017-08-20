@@ -1926,17 +1926,20 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 			}
 		}
 
-		// rename old.
+		// rename old. (if exsists)
 		{
 			core::Path<char> filePath;
 			core::Path<char> newFilePath;
 			AssetPathForName(type, name, curRawData.hash, filePath);
 
-			newFilePath = filePath;
-			newFilePath.append(".old");
+			if(gEnv->pFileSys->fileExists(filePath.c_str()))
+			{
+				newFilePath = filePath;
+				newFilePath.append(".old");
 
-			if (!gEnv->pFileSys->moveFile(filePath.c_str(), newFilePath.c_str())) {
-				X_ERROR("AssetDB", "Failed to move old asset: \"%s\"", filePath.c_str());
+				if (!gEnv->pFileSys->moveFile(filePath.c_str(), newFilePath.c_str())) {
+					X_ERROR("AssetDB", "Failed to move old asset: \"%s\"", filePath.c_str());
+				}
 			}
 		}
 	}
