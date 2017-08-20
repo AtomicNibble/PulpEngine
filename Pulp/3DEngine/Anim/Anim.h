@@ -43,8 +43,10 @@ private:
 	core::LoadStatus::Enum status_;
 	uint8_t _pad[3];
 
+	core::UniquePointer<uint8_t[]> data_;
 	AnimHeader hdr_;
 };
+
 
 X_NAMESPACE_END
 
