@@ -236,9 +236,9 @@ void AnimManager::dispatchLoadRequest(AnimLoadRequest* pLoadReq)
 	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
 
 	core::Path<char> path;
-	path /= "models";
+	path /= "anims";
 	path /= pLoadReq->pAnim->getName();
-	path.setExtension(".model");
+	path.setExtension(".anim");
 
 	// dispatch a read request baby!
 	core::IoRequestOpen open;
@@ -263,7 +263,7 @@ void AnimManager::loadRequestCleanup(AnimLoadRequest* pLoadReq)
 {
 	pLoadReq->loadTime = core::StopWatch::GetTimeNow();
 
-	X_LOG0("Model", "Model loaded in: ^6%fms", (pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds());
+	X_LOG0("Anim", "Anim loaded in: ^6%fms", (pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds());
 	{
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 		pendingRequests_.remove(pLoadReq);
@@ -318,14 +318,14 @@ void AnimManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
 		{
 			if (bytesTransferred != sizeof(pLoadReq->hdr))
 			{
-				X_ERROR("Anim", "Failed to read model header. Got: 0x%" PRIx32 " need: 0x%" PRIxS, bytesTransferred, sizeof(pLoadReq->hdr));
+				X_ERROR("Anim", "Failed to read anim header. Got: 0x%" PRIx32 " need: 0x%" PRIxS, bytesTransferred, sizeof(pLoadReq->hdr));
 				onLoadRequestFail(pLoadReq);
 				return;
 			}
 
 			if (!pLoadReq->hdr.isValid())
 			{
-				X_ERROR("Anim", "\"%s\" model header is invalid", pAnim->getName().c_str());
+				X_ERROR("Anim", "\"%s\" anim header is invalid", pAnim->getName().c_str());
 				onLoadRequestFail(pLoadReq);
 				return;
 			}
