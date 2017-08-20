@@ -211,7 +211,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 
 			// hellllo asset server :D
 			status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
-				MString(fileName_.c_str()),
+				MString(getName()),
 				argsToJson(),
 				compressed,
 				&unChanged
