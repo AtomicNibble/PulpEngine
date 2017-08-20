@@ -41,6 +41,7 @@ Bone::~Bone()
 // ================================================
 
 PotatoAnimExporter::PotatoAnimExporter(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	fps_(anim::ANIM_DEFAULT_FPS),
 	type_(anim::AnimType::RELATIVE),
 	bones_(arena)

@@ -61,11 +61,13 @@ private:
 	MString argsToJson(void) const;
 
 private:
-	const int32_t getNumFrames(void) const {
+	X_INLINE const int32_t getNumFrames(void) const {
 		return endFrame_ - startFrame_;
 	}
 
 private:
+	core::MemoryArenaBase* arena_;
+
 	int32_t startFrame_;
 	int32_t endFrame_;
 	uint32_t fps_;
