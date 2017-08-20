@@ -302,7 +302,8 @@ inline void ByteStream::ensureSpace(size_type desiredSpace)
 	if (desiredSpace > space)
 	{
 		// which ever bigger.
-		const size_type newSize = core::Max(capacity() * 2, desiredSpace);
+		const size_type cap = capacity();
+		const size_type newSize = core::Max(cap * 2, cap + (desiredSpace - space));
 
 		reallocate(newSize);
 	} 
