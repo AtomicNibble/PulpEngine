@@ -53,6 +53,8 @@ Technique( "unlit" )
     ps = PixelShader()
     {
         diffuseSampler = "colorSampler"
+        diffuse = "colorMap"
+
   //  fontCache = CodeTexture( "codeTexture0" )
     }
 }
