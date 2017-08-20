@@ -609,10 +609,6 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 		}
 		else {
 			setOutdir(dir);
-
-			// filePath_.append(dir.asChar());
-			// filePath_.replaceSeprators();
-			// filePath_.ensureSlash();
 		}
 	}
 
