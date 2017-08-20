@@ -211,7 +211,7 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 	}
 
 	// set the mod to base
-	SetMod(core::string("base"));
+	SetMod(core::string("core"));
 
 	open_ = true;
 	return true;
