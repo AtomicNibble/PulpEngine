@@ -77,10 +77,10 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 	}
 
 	// name length check
-	if (strlen(fileName_.fileName()) > anim::ANIM_MAX_NAME_LENGTH)
+	if (name_.length() > anim::ANIM_MAX_NAME_LENGTH)
 	{
 		MayaUtil::MayaPrintError("Anim name is too long. MAX: %" PRIu32 ", provided: %" PRIuS,
-			anim::ANIM_MAX_NAME_LENGTH, fileName_.length());
+			anim::ANIM_MAX_NAME_LENGTH, name_.length());
 		return MS::kFailure;;
 	}
 
