@@ -92,7 +92,7 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 	else
 	{
 		// if we not full frames we write frames numbers out.
-		if (!isFullFrames() && posDeltas_.size() > 1)
+ 		if (!isFullFrames() && posDeltas_.size() > 1)
 		{
 			size_t numFrames = fullPos_.size();
 
@@ -427,7 +427,11 @@ void AnimCompiler::printStats(bool verbose) const
 
 		for (auto& bone : bones_)
 		{
-			X_LOG0("Anim", "-> \"%s\" ang: ^6%" PRIuS "^7 pos: ^6%" PRIuS, bone.name.c_str(), bone.ang.numAngleFrames(), bone.pos.numPosFrames());
+			auto& min = bone.pos.min();
+			auto& r = bone.pos.range();
+
+			X_LOG0("Anim", "-> \"%s\" ang: ^6%" PRIuS "^7 pos: ^6%" PRIuS " ^7min(%g,%g,%G) range(%g,%g,%g)", 
+				bone.name.c_str(), bone.ang.numAngleFrames(), bone.pos.numPosFrames(), min.x, min.y, min.z, r.x, r.y, r.z);
 		}
 	}
 }

@@ -14,7 +14,7 @@ class AnimCompiler
 		void clear(void);
 		void print(void) const;
 
-	public:
+	public: 
 		int32_t numFrames;
 		int32_t fps;
 		size_t totalBones;
