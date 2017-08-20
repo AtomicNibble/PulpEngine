@@ -102,7 +102,7 @@ IAnim* AnimManager::loadAnim(const char* pAnimName)
 	}
 
 	// we create a anim and give it back
-	pAnimRes = anims_.createAsset(name, name);
+	pAnimRes = anims_.createAsset(name, name, arena_);
 
 	// add to list of anims that need loading.
 	// queueLoadRequest(pAnimRes);
