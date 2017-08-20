@@ -119,7 +119,7 @@ IAnim* AnimManager::loadAnim(const char* pAnimName)
 	pAnimRes = anims_.createAsset(name, name, arena_);
 
 	// add to list of anims that need loading.
-	// queueLoadRequest(pAnimRes);
+	queueLoadRequest(pAnimRes);
 
 	return pAnimRes;
 }
