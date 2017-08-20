@@ -91,6 +91,9 @@
     <ClCompile Include="Anim\AnimManager.cpp">
       <Filter>Source Files\Anim</Filter>
     </ClCompile>
+    <ClCompile Include="Anim\AnimInstance.cpp">
+      <Filter>Source Files\Anim</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -178,6 +181,9 @@
       <Filter>Header Files\Anim</Filter>
     </ClInclude>
     <ClInclude Include="Anim\AnimManager.h">
+      <Filter>Header Files\Anim</Filter>
+    </ClInclude>
+    <ClInclude Include="Anim\AnimInstance.h">
       <Filter>Header Files\Anim</Filter>
     </ClInclude>
   </ItemGroup>

@@ -4,6 +4,7 @@
 #include <IAnimation.h>
 #include <Util\UniquePointer.h>
 
+#include <Time\TimeVal.h>
 
 X_NAMESPACE_BEGIN(anim)
 
@@ -12,6 +13,11 @@ class Anim : public IAnim
 {
 	X_NO_COPY(Anim);
 	X_NO_ASSIGN(Anim);
+
+	template<typename T>
+	using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 16>>;
+
+	typedef AlignedArray<Matrix44f> Mat44Arr;
 
 public:
 	Anim(core::string& name);
@@ -33,6 +39,7 @@ public:
 	X_INLINE bool isLooping(void) const;
 	X_INLINE bool hasNotes(void) const;
 
+	void update(core::TimeVal delta, AnimState& state, Mat44Arr& bonesOut) const;
 
 	void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
 

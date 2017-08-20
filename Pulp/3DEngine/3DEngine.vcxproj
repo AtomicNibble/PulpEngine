@@ -444,6 +444,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Anim\Anim.h" />
+    <ClInclude Include="Anim\AnimInstance.h" />
     <ClInclude Include="Anim\AnimManager.h" />
     <ClInclude Include="Drawing\CBufferManager.h" />
     <ClInclude Include="Drawing\PrimativeContext.h" />
@@ -475,6 +476,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Anim\Anim.cpp" />
+    <ClCompile Include="Anim\AnimInstance.cpp" />
     <ClCompile Include="Anim\AnimManager.cpp" />
     <ClCompile Include="Drawing\CBufferManager.cpp" />
     <ClCompile Include="Drawing\PrimativeContext.cpp" />

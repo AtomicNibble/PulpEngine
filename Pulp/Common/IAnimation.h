@@ -5,7 +5,7 @@
 #define _X_ASSET_ANIM_H_
 
 #include <IConverterModule.h>
-
+#include <Time\TimeVal.h>
 #include <Util\FlagsMacros.h>
 
 X_NAMESPACE_BEGIN(anim)
@@ -117,6 +117,14 @@ struct tagData
 	uint16_t		numAngles;
 	uint16_t		numPositions;
 	Vec3f			positions[2];
+
+};
+
+
+struct AnimState
+{
+	core::TimeVal elapsed;
+	int32_t currentFrame;
 
 };
 
