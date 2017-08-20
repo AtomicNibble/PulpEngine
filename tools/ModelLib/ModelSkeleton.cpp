@@ -303,7 +303,7 @@ bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
 			return false;
 		}
 
-		if (!lex.Parse1DMatrix(3, &positions_[0][0])) {
+		if (!lex.Parse1DMatrix(3, &positions_[i][0])) {
 			X_ERROR("RawModel", "Failed to read 'POS' token data");
 			return false;
 		}
