@@ -4,7 +4,7 @@
 void GenerateUI( asset& Asset )
 {
     Asset.AddAnim( "src", "" ).SetTitle("Src").SetToolTip( "Src Animation" );
-    Asset.AddAssetRef( "model", "model", "" ).SetTitle("Model").SetToolTip( "Model to use skelton from" );
+    Asset.AddAssetRef( "model", "model" ).SetTitle("Model").SetToolTip( "Model to use skelton from" );
 
     string types = "relative | absolute | additive | delta";
     Asset.AddCombo( "type", types ).SetTitle( "Type:" ).SetToolTip("How the animation is blended");
