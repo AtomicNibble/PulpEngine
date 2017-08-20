@@ -657,13 +657,19 @@ MString PotatoAnimExporter::argsToJson(void) const
 
 	writer.SetMaxDecimalPlaces(5);
 
+	core::StackString<128> typeStr(anim::AnimType::ToString(type_));
+	core::StackString<128> modeStr(ExpoMode::ToString(exportMode_));
+
+	typeStr.toLower();
+	modeStr.toLower();
+
 	writer.StartObject();
 	writer.Key("verbose");
 	writer.Bool(MayaUtil::IsVerbose());
 	writer.Key("mode");
-	writer.String(ExpoMode::ToString(exportMode_));
+	writer.String(modeStr.c_str(), safe_static_cast<core::json::SizeType>(modeStr.length()));
 	writer.Key("type");
-	writer.String(anim::AnimType::ToString(type_));
+	writer.String(typeStr.c_str(), safe_static_cast<core::json::SizeType>(typeStr.length()));
 	writer.Key("start");
 	writer.Int(startFrame_);
 	writer.Key("end");
