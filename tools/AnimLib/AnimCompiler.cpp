@@ -1,12 +1,65 @@
 #include "stdafx.h"
 #include "AnimCompiler.h"
 
+#include <Time\StopWatch.h>
+
 #include <IFileSys.h>
+
 
 X_NAMESPACE_BEGIN(anim)
 
 const float AnimCompiler::DEFAULT_POS_ERRR = 0.05f;
 const float AnimCompiler::DEFAULT_ANGLE_ERRR = 0.005f;
+
+AnimCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
+	droppedBoneNames(arena)
+{
+	clear();
+}
+
+void AnimCompiler::Stats::clear(void)
+{
+	totalBones = 0;
+	totalBonesPosData = 0;
+	totalBonesAngleData = 0;
+
+	compileTime = core::TimeVal(0ll);
+	droppedBoneNames.clear();
+}
+
+void AnimCompiler::Stats::print(void) const
+{
+	X_LOG0("Anim", "Anim Info:");
+	X_LOG0("Anim", "> Compile Time: %fms", compileTime.GetMilliSeconds());
+	X_LOG0("Anim", "> Total Bones: %" PRIuS, totalBones);
+	X_LOG0("Anim", "> Total Bones(Pos): %" PRIuS, totalBonesPosData);
+	X_LOG0("Anim", "> Total Bones(Ang): %" PRIuS, totalBonesAngleData);
+
+	core::StackString<1024> info;
+
+	if (droppedBoneNames.size() > 0) {
+		info.append(" -> (");
+		for (uint i = 0; i < droppedBoneNames.size(); i++) {
+			info.append(droppedBoneNames[i].c_str());
+
+			if (i < (droppedBoneNames.size() - 1)) {
+				info.append(", ");
+			}
+
+			if (i > 9 && (i % 10) == 0) {
+				info.append("");
+			}
+		}
+		info.append(")");
+	}
+	if (droppedBoneNames.size() > 10) {
+		info.append("");
+	}
+
+	X_LOG0("Anim", info.c_str());
+}
+
+// ------------------------------------------
 
 AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
 	fullPos_(arena),
@@ -94,14 +147,23 @@ size_t AnimCompiler::Position::numPosFrames(void) const
 	return posDeltas_.size();
 }
 
-bool AnimCompiler::Position::isLargeScalers(void) const
+bool AnimCompiler::Position::hasData(void) const
 {
-	return largeScalers_;
+	return posDeltas_.isNotEmpty();
 }
 
 bool AnimCompiler::Position::isFullFrames(void) const
 {
+#if 1
+	return false;
+#else
 	return posDeltas_.size() == fullPos_.size();
+#endif
+}
+
+bool AnimCompiler::Position::isLargeScalers(void) const
+{
+	return largeScalers_;
 }
 
 const Vec3f& AnimCompiler::Position::min(void) const
@@ -253,9 +315,20 @@ void AnimCompiler::Angle::setBaseOrient(const Quatf& ang)
 	baseOrient_ = ang;
 }
 
+
+bool AnimCompiler::Angle::hasData(void) const
+{
+	return angles_.isNotEmpty();
+}
+
 bool AnimCompiler::Angle::isFullFrames(void) const
 {
+	// we have a angle for every frame ?
+#if 1
+	return false;
+#else
 	return fullAngles_.size() == angles_.size();
+#endif
 }
 
 void AnimCompiler::Angle::calculateDeltas(const float angError)
@@ -306,12 +379,22 @@ AnimCompiler::Bone::Bone(core::MemoryArenaBase* arena) :
 
 }
 
+
+bool AnimCompiler::Bone::hasData(void) const
+{
+	return ang.hasData() || pos.hasData();
+}
+
+
+// ----------------------------------------------------
+
 AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton) :
 	arena_(arena),
 	inter_(inter),
 	skelton_(skelton),
 	type_(AnimType::RELATIVE),
-	bones_(arena)
+	bones_(arena),
+	stats_(arena)
 {
 
 }
@@ -319,6 +402,12 @@ AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter,
 
 AnimCompiler::~AnimCompiler()
 {
+
+}
+
+void AnimCompiler::printStats(void) const
+{
+	stats_.print();
 
 }
 
@@ -361,28 +450,39 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 	}
 
 	if (inter_.getFps() > anim::ANIM_MAX_FPS) {
-		X_ERROR("Anim", "inter anim fps exceeds max: %" PRIu32,
-			anim::ANIM_MAX_FPS);
+		X_ERROR("Anim", "inter anim fps exceeds max: %" PRIu32, anim::ANIM_MAX_FPS);
 		return false;
 	}
 	if (inter_.getNumFrames() > anim::ANIM_MAX_FRAMES) {
-		X_ERROR("Anim", "inter anim exceeds max frames: %" PRIu32,
-			anim::ANIM_MAX_FRAMES);
+		X_ERROR("Anim", "inter anim exceeds max frames: %" PRIu32, anim::ANIM_MAX_FRAMES);
 		return false;
 	}
 
+	core::StopWatch timer;
 
 	loadInterBones();
 	dropMissingBones();
 
 	if (bones_.isEmpty()) {
-		X_WARNING("Anim", "skipping compile of anim, inter anim and model skelton have bones in common");
+		X_WARNING("Anim", "skipping compile of anim, inter anim and model skelton have no bones in common");
 		return true;
 	}
 
 	// load base bone positions from model skelton.
 	loadBaseData();
 	processBones(posError, angError);
+
+	// cull any without data.
+	dropNullBones();
+
+	// build some stats.
+	stats_.totalBones = bones_.size();
+	stats_.compileTime = timer.GetTimeVal();
+	for (const auto& bone : bones_)
+	{
+		stats_.totalBonesAngleData += static_cast<int32_t>(bone.ang.hasData());
+		stats_.totalBonesPosData += static_cast<int32_t>(bone.pos.hasData());
+	}
 
 	return save(path);
 }
@@ -492,11 +592,27 @@ void AnimCompiler::dropMissingBones(void)
 		if (x == numModelBones)
 		{
 			// remove it.
+			stats_.droppedBoneNames.append(name);
 			bones_.removeIndex(i);
 		}
 	}
 }
 
+void AnimCompiler::dropNullBones(void)
+{
+	// drop any bones that have no data.
+	for (size_t i = 0; i < bones_.size(); i++)
+	{
+		auto& bone = bones_[i];
+
+		if(!bone.hasData())
+		{
+			// remove it.
+			stats_.droppedBoneNames.append(bone.name);
+			bones_.removeIndex(i);
+		}
+	}
+}
 
 void AnimCompiler::loadBaseData(void)
 {

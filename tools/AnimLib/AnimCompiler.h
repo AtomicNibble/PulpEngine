@@ -7,8 +7,23 @@ X_NAMESPACE_BEGIN(anim)
 
 class AnimCompiler
 {
-	// we want to know what frames have changed data.
+	struct Stats
+	{
+		Stats(core::MemoryArenaBase* arena);
 
+		void clear(void);
+		void print(void) const;
+
+	public:
+		size_t totalBones;
+		size_t totalBonesPosData;
+		size_t totalBonesAngleData;
+
+		core::TimeVal compileTime;
+		core::Array<core::string> droppedBoneNames;
+	};
+
+	// we want to know what frames have changed data.
 	class Position
 	{
 		struct PosDelta
@@ -31,8 +46,9 @@ class AnimCompiler
 		void setBasePosition(const Vec3f& basePos);
 
 		size_t numPosFrames(void) const;
-		bool isLargeScalers(void) const;
+		bool hasData(void) const;
 		bool isFullFrames(void) const;
+		bool isLargeScalers(void) const;
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
 
@@ -75,32 +91,33 @@ class AnimCompiler
 		
 		void appendFullAng(const Quatf& ang);
 		void setBaseOrient(const Quatf& ang);
-		bool isFullFrames(void) const;
+		bool hasData(void) const;
+		bool isFullFrames(void) const; 
 
 		void calculateDeltas(const float angError = 0.075f);
 
 	private:
-		AnglesArr fullAngles_;
-		AngleFrameArr angles_;
+		AnglesArr fullAngles_; // angles for every frame
+		AngleFrameArr angles_; // the set of angles after dropping angles below angle threshold.
 
 		Vec3<bool> axisChanges_;
 
 		Quatf baseOrient_;
 	};
 
-	struct Bone
+	class Bone
 	{
-
+	public:
 		typedef core::Array<Quatf> AngleData;
 
+	public:
 		Bone(core::MemoryArenaBase* arena);
 
-		core::string name;
+		bool hasData(void) const;
 
+		core::string name;
 		Position pos;
 		Angle ang;
-	//	AngleData angles;
-	//	Quatf baseOrent;
 	};
 
 	typedef core::Array<Bone> BoneArr;
@@ -118,6 +135,8 @@ public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
 
+	void printStats(void) const;
+
 	void setLooping(bool loop);
 	void setAnimType(AnimType::Enum type);
 
@@ -131,6 +150,7 @@ private:
 
 	void loadInterBones(void);
 	void dropMissingBones(void);
+	void dropNullBones(void);
 	void loadBaseData(void);
 	void processBones(const float posError, const float angError);
 
@@ -139,10 +159,13 @@ private:
 
 	const InterAnim& inter_;
 	const model::ModelSkeleton& skelton_;
+
 private:
 	Flags<CompileFlag> flags_;
 	AnimType::Enum type_;
 	BoneArr bones_;
+
+	Stats stats_;
 };
 
 
