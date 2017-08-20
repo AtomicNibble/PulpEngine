@@ -29,11 +29,7 @@ InterAnim::InterAnim(core::MemoryArenaBase* arena) : arena_(arena), bones_(arena
 
 bool InterAnim::LoadFile(core::Path<char>& file)
 {
-	wchar_t pathW[256] = { 0 };
-
-	core::strUtil::Convert(file.c_str(), pathW, sizeof(pathW));
-
-	return LoadFile(core::Path<wchar_t>(pathW));
+	return LoadFile(core::Path<wchar_t>(file));
 }
 
 
