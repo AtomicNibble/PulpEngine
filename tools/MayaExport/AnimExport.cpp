@@ -26,7 +26,8 @@
 X_NAMESPACE_BEGIN(maya)
 
 
-Bone::Bone() : data(g_arena)
+Bone::Bone() : 
+	data(g_arena)
 {
 
 }
@@ -39,11 +40,10 @@ Bone::~Bone()
 
 // ================================================
 
-PotatoAnimExporter::PotatoAnimExporter() : 
-	intermidiate_(false),
+PotatoAnimExporter::PotatoAnimExporter(core::MemoryArenaBase* arena) :
 	fps_(anim::ANIM_DEFAULT_FPS),
 	type_(anim::AnimType::RELATIVE),
-	bones_(g_arena)
+	bones_(arena)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Anim ===========");
 }
@@ -200,64 +200,6 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 	return MS::kSuccess;
 }
 
-MStatus PotatoAnimExporter::writeIntermidiate(void)
-{
-	PROFILE_MAYA_NAME("Write intermidiate:");
-
-	core::ByteStream stream(g_arena);
-
-	MStatus status = writeIntermidiate_int(stream);
-
-	if (status)
-	{
-		if (exportMode_ == ExpoMode::SERVER)
-		{
-			// compress the data.
-			core::Array<uint8_t> compressed(g_arena);
-			bool unChanged = false;
-
-
-			core::Compression::Compressor<core::Compression::LZ4> comp;
-			if (!comp.deflate(g_arena, stream.begin(), stream.end(), compressed, core::Compression::CompressLevel::HIGH))
-			{
-				X_ERROR("Anim", "Failed to defalte inter anim");
-				return MS::kFailure;
-			}
-
-			// hellllo asset server :D
-			status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
-				MString(fileName_.c_str()),
-				argsToJson(),
-				compressed,
-				&unChanged
-			);
-
-			if (!status) {
-				X_ERROR("Anim", "Failed to connect to server to update AssetDB");
-				return status;
-			}
-		}
-		else
-		{
-			// write the file.
-			FILE* f;
-			errno_t err = fopen_s(&f, filePath_.c_str(), "wb");
-			if (f)
-			{
-				fwrite(stream.begin(), 1, stream.size(), f);
-				fclose(f);
-			}
-			else
-			{
-				MayaUtil::MayaPrintError("Failed to open file for saving(%" PRIi32 "): %s", err, filePath_.c_str());
-				return MS::kFailure;
-			}
-		}
-	}
-
-	return status;
-}
-
 MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 {
 	// I will store each tags data.
@@ -346,6 +288,37 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 	return MS::kSuccess;
 }
 
+void PotatoAnimExporter::setFileName(const MString& path)
+{
+	// we don't replace seperators on the name as asset names 
+	// have a fixed slash, regardless of native slash of the platform.
+	// so we replace slashes only when building file paths.
+
+	fileName_.set(path.asChar());
+	fileName_.trim();
+	fileName_.setExtension(anim::ANIM_FILE_EXTENSION);
+}
+
+void PotatoAnimExporter::setOutdir(const MString& path)
+{
+	outDir_.set(path.asChar());
+	outDir_.trim();
+	outDir_.replaceSeprators();
+}
+
+core::Path<char> PotatoAnimExporter::getFilePath(void) const
+{
+	core::Path<char> path(outDir_);
+	path /= fileName_;
+	path.replaceSeprators();
+	return path;
+}
+
+
+core::string PotatoAnimExporter::getName(void) const
+{
+	return core::string(fileName_.begin(), fileName_.end());
+}
 
 
 MStatus PotatoAnimExporter::convert(const MArgList &args)
@@ -357,7 +330,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 
 	int32_t numFrames = getNumFrames();
 
-	MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath_.c_str());
+	MayaUtil::MayaPrintMsg("Exporting: '%s'", fileName_.c_str());
 	MayaUtil::MayaPrintMsg("Frames -> start: %" PRIi32 " end: %" PRIi32 " num: %" PRIi32, startFrame_, endFrame_, numFrames);
 	MayaUtil::MayaPrintMsg(""); // new line
 
@@ -368,10 +341,10 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 	}
 
 	// name length check
-	if (strlen(filePath_.fileName()) > anim::ANIM_MAX_NAME_LENGTH)
+	if (strlen(fileName_.fileName()) > anim::ANIM_MAX_NAME_LENGTH)
 	{
 		MayaUtil::MayaPrintError("Anim name is too long. MAX: %" PRIu32 ", provided: %" PRIuS,
-			anim::ANIM_MAX_NAME_LENGTH, filePath_.length());
+			anim::ANIM_MAX_NAME_LENGTH, fileName_.length());
 		return MS::kFailure;;
 	}
 
@@ -382,11 +355,10 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 		MayaUtil::MayaPrintError("Failed to create progress window: %s", status.errorString().asChar());
 		return status;
 	}
-	// one is two yet not one.
-	// 
-	{
-		PROFILE_MAYA_NAME("Total Export time:");
 
+	PROFILE_MAYA_NAME("Total Export time:");
+
+	{
 		MayaUtil::SetProgressText("Loading export list");
 
 		status = getExportObjects();
@@ -415,21 +387,119 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 			return status;
 		}
 
-		if (intermidiate_)
-		{
-			// we dump everything.
-			status =  writeIntermidiate();
-			if (!status) {
-				MayaUtil::MayaPrintError("Failed to write intermidiate file: %s", status.errorString().asChar());
-				return status;
-			}
-		}
-		else
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	core::ByteStream interMidiateData(g_arena);
+
+	{
+		PROFILE_MAYA_NAME("Write intermidiate:");
+
+		MStatus status = writeIntermidiate_int(interMidiateData);
+		if (!status) {
+			return status;
 		}
 	}
 
+	if (exportMode_ == ExpoMode::RAW)
+	{
+		PROFILE_MAYA_NAME("Save Raw");
+
+		const auto filePath = getFilePath();
+		MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath.c_str());
+
+		FILE* f;
+		errno_t err = fopen_s(&f, filePath.c_str(), "wb");
+		if (f)
+		{
+			fwrite(interMidiateData.begin(), 1, interMidiateData.size(), f);
+			fclose(f);
+		}
+		else
+		{
+			MayaUtil::MayaPrintError("Failed to open file for saving(%" PRIi32 "): %s", err, filePath.c_str());
+			return MS::kFailure;
+		}
+	}
+	else if (exportMode_ == ExpoMode::SERVER)
+	{
+		MayaUtil::SetProgressText("Getting info from server");
+
+		maya::AssetDB::ConverterInfo info;
+		if (!maya::AssetDB::Get()->GetConverterInfo(info)) {
+			X_ERROR("Anim", "Failed to get info from server");
+			return status;
+		}
+
+		int32_t assetId, modId;
+		status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::ANIM, MString(getName()), &assetId, &modId);
+		if (!status) {
+			X_ERROR("Anim", "Failed to get meta from server");
+			return status;
+		}
+
+		if (assetId == assetDb::INVALID_ASSET_ID || modId == assetDb::INVALID_MOD_ID) {
+			X_ERROR("Anim", "Asset is not registerd with server");
+			return MS::kFailure;
+		}
+
+		maya::AssetDB::Mod mod;
+		if (!maya::AssetDB::Get()->GetModInfo(modId, mod)) {
+			X_ERROR("Anim", "Failed to get mod info from server");
+			return status;
+		}
+
+		MayaUtil::SetProgressText("Deflating");
+
+		core::Array<uint8_t> compressed(g_arena);
+		{
+
+			core::Compression::Compressor<core::Compression::LZ4> comp;
+			if (!comp.deflate(g_arena, interMidiateData.begin(), interMidiateData.end(), compressed, core::Compression::CompressLevel::HIGH))
+			{
+				X_ERROR("Anim", "Failed to defalte inter anim");
+				return MS::kFailure;
+			}
+			else
+			{
+				core::HumanSize::Str sizeStr, sizeStr2;
+				X_LOG0("Anim", "Defalated %s -> %s",
+					core::HumanSize::toString(sizeStr, interMidiateData.size()),
+					core::HumanSize::toString(sizeStr2, compressed.size()));
+			}
+
+		}
+
+		{
+			MayaUtil::SetProgressText("Syncing data to AssetServer");
+			bool unChanged = false;
+
+			// hellllo asset server :D
+			status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
+				MString(fileName_.c_str()),
+				argsToJson(),
+				compressed,
+				&unChanged
+			);
+
+			if (!status) {
+				X_ERROR("Anim", "Failed to connect to server to update AssetDB");
+				return status;
+			}
+		}
+
+
+		{
+			MayaUtil::SetProgressText("Compiling anim");
+
+
+
+
+		}
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
 
 	return status;
 }
@@ -437,7 +507,6 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 {
 	MStatus status = MS::kFailure;
-	MString Mfilename;
 	uint32_t idx;
 
 
@@ -454,10 +523,17 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 		return MS::kFailure;
 	}
 
-	status = args.get(++idx, Mfilename);
-	if (!status) {
-		MayaUtil::MayaPrintError("missing filename");
-		return status;
+	// required
+	{
+		MString Mfilename;
+
+		status = args.get(++idx, Mfilename);
+		if (!status) {
+			MayaUtil::MayaPrintError("missing filename");
+			return status;
+		}
+
+		setFileName(Mfilename);
 	}
 
 	idx = args.flagIndex("verbose");
@@ -529,9 +605,11 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 			MayaUtil::MayaPrintWarning("failed to get dir flag");
 		}
 		else {
-			filePath_.append(dir.asChar());
-			filePath_.replaceSeprators();
-			filePath_.ensureSlash();
+			setOutdir(dir);
+
+			// filePath_.append(dir.asChar());
+			// filePath_.replaceSeprators();
+			// filePath_.ensureSlash();
 		}
 	}
 
@@ -566,8 +644,8 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 
 	MayaUtil::SetProgressCtrl(progressCntl);
 
-	intermidiate_ = true;
 
+#if 0
 	if (Mfilename.length() > 0) 
 	{
 		fileName_.set(Mfilename.asChar());
@@ -582,6 +660,7 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 
 		status = MS::kSuccess;
 	}
+#endif
 
 	return status;
 }

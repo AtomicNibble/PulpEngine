@@ -38,18 +38,23 @@ class PotatoAnimExporter
 	X_DECLARE_ENUM(ExpoMode)(SERVER, RAW);
 
 public:
-	PotatoAnimExporter();
+	PotatoAnimExporter(core::MemoryArenaBase* arena);
 	~PotatoAnimExporter();
 
 	MStatus convert(const MArgList &args);
 
 private:
+	void setFileName(const MString& path);
+	void setOutdir(const MString& path);
+
+	core::Path<char> getFilePath(void) const;
+	core::string getName(void) const;
+
 	MStatus getInputObjects(void);
 	MStatus getExportObjects(void);
 	MStatus loadBones(void);
 	MStatus getAnimationData(void);
 
-	MStatus writeIntermidiate(void);
 	MStatus writeIntermidiate_int(core::ByteStream& stream);
 
 	MStatus processArgs(const MArgList &args);
@@ -61,8 +66,6 @@ private:
 	}
 
 private:
-	bool intermidiate_;
-
 	int32_t startFrame_;
 	int32_t endFrame_;
 	uint32_t fps_;
@@ -70,7 +73,7 @@ private:
 	MString nodes_;
 
 	core::Path<char> fileName_;
-	core::Path<char> filePath_;
+	core::Path<char> outDir_;
 
 	ExpoMode::Enum exportMode_;
 
