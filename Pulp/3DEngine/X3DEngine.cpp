@@ -17,7 +17,7 @@
 #include "Material\MaterialManager.h"
 #include "Texture\TextureManager.h"
 #include "Model\ModelManager.h"
-#include "Model\AnimManager.h"
+#include "Anim\AnimManager.h"
 #include "Gui\GuiManger.h"
 
 #include "CmdBucket.h"
