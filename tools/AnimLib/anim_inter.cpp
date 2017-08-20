@@ -29,13 +29,13 @@ InterAnim::InterAnim(core::MemoryArenaBase* arena) :
 }
 
 
-bool InterAnim::LoadFile(core::Path<char>& file)
+bool InterAnim::load(core::Path<char>& file)
 {
-	return LoadFile(core::Path<wchar_t>(file));
+	return load(core::Path<wchar_t>(file));
 }
 
 
-bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
+bool InterAnim::load(core::Path<wchar_t>& filePath)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
@@ -77,7 +77,7 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 	return ParseData(lex);
 }
 
-bool InterAnim::LoadFile(const core::Array<uint8_t>& fileData)
+bool InterAnim::load(const core::Array<uint8_t>& fileData)
 {
 	core::XLexer lex(reinterpret_cast<const char*>(fileData.begin()), reinterpret_cast<const char*>(fileData.end()));
 

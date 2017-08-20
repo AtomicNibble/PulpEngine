@@ -39,9 +39,9 @@ public:
 	InterAnim(core::MemoryArenaBase* arena);
 	~InterAnim() = default;
 
-	bool LoadFile(core::Path<char>& file);
-	bool LoadFile(core::Path<wchar_t>& file);
-	bool LoadFile(const core::Array<uint8_t>& fileData);
+	bool load(core::Path<char>& file);
+	bool load(core::Path<wchar_t>& file);
+	bool load(const core::Array<uint8_t>& fileData);
 
 	int32_t getNumFrames(void) const;
 	int32_t getFps(void) const;
