@@ -74,7 +74,8 @@ private:
 	anim::AnimType::Enum type_;
 	MString nodes_;
 
-	core::Path<char> fileName_;
+	core::string name_;
+	core::Path<char> fileName_; // name + extension.
 	core::Path<char> outDir_;
 
 	ExpoMode::Enum exportMode_;

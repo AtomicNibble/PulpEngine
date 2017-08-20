@@ -249,6 +249,9 @@ void PotatoAnimExporter::setFileName(const MString& path)
 
 	fileName_.set(path.asChar());
 	fileName_.trim();
+
+	name_ = core::string(fileName_.begin(), fileName_.end());
+
 	fileName_.setExtension(anim::ANIM_FILE_EXTENSION);
 }
 
@@ -270,7 +273,7 @@ core::Path<char> PotatoAnimExporter::getFilePath(void) const
 
 core::string PotatoAnimExporter::getName(void) const
 {
-	return core::string(fileName_.begin(), fileName_.end());
+	return name_;
 }
 
 
