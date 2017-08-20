@@ -42,6 +42,7 @@ public:
 	bool load(core::Path<char>& file);
 	bool load(core::Path<wchar_t>& file);
 	bool load(const core::Array<uint8_t>& fileData);
+	bool load(const core::ByteStream& fileData);
 
 	int32_t getNumFrames(void) const;
 	int32_t getFps(void) const;

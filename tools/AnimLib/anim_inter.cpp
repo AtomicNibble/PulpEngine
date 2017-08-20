@@ -84,6 +84,14 @@ bool InterAnim::load(const core::Array<uint8_t>& fileData)
 	return ParseData(lex);
 }
 
+bool InterAnim::load(const core::ByteStream& fileData)
+{
+	core::XLexer lex(reinterpret_cast<const char*>(fileData.begin()), reinterpret_cast<const char*>(fileData.end()));
+
+	return ParseData(lex);
+}
+
+
 int32_t InterAnim::getNumFrames(void) const
 {
 	return numFrames_;
