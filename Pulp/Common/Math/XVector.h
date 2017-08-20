@@ -549,9 +549,9 @@ public:
 	static Vec3<T> min()
 	{
 		return Vec3<T>(
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min()
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest()
 		);
 	}
 	static Vec3<T> max()
