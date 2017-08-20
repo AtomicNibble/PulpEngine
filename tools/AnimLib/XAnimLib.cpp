@@ -118,7 +118,17 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 	compiler.setLooping(looping);
 	compiler.setAnimType(type);
 
-	return compiler.compile(destPath, posError, angError);
+	if(!compiler.compile(destPath, posError, angError))
+	{
+		X_ERROR("AnimLib", "Failed to compile anim");
+		return false;
+	}
+
+#if X_DEBUG
+	compiler.printStats(true);
+#endif // !X_DEBUG
+
+	return true;
 }
 
 
