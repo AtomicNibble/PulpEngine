@@ -218,11 +218,11 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 		frame++;
 	}
 
-	BuildScalers(posError);
+	buildScalers(posError);
 }
 
 
-void AnimCompiler::Position::BuildScalers(const float posError)
+void AnimCompiler::Position::buildScalers(const float posError)
 {
 	range_ = max_ - min_;
 

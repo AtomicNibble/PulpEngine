@@ -57,7 +57,7 @@ class AnimCompiler
 		void calculateDeltas(const float posError = 0.075f);
 
 	private:
-		void BuildScalers(const float posError);
+		void buildScalers(const float posError);
 
 	private:
 		PosData fullPos_;
