@@ -36,7 +36,7 @@ class AnimCompiler
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
 
-		void CalculateDeltas(const float posError = 0.075f);
+		void calculateDeltas(const float posError = 0.075f);
 
 	private:
 		void BuildScalers(const float posError);
@@ -77,7 +77,7 @@ class AnimCompiler
 		void setBaseOrient(const Quatf& ang);
 		bool isFullFrames(void) const;
 
-		void CalculateDeltas(const float angError = 0.075f);
+		void calculateDeltas(const float angError = 0.075f);
 
 	private:
 		AnglesArr fullAngles_;

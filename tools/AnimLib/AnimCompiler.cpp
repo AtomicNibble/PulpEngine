@@ -115,7 +115,7 @@ const Vec3f& AnimCompiler::Position::range(void) const
 }
 
 
-void AnimCompiler::Position::CalculateDeltas(const float posError)
+void AnimCompiler::Position::calculateDeltas(const float posError)
 {
 	posDeltas_.clear();
 	posDeltas_.reserve(fullPos_.size());
@@ -258,7 +258,7 @@ bool AnimCompiler::Angle::isFullFrames(void) const
 	return fullAngles_.size() == angles_.size();
 }
 
-void AnimCompiler::Angle::CalculateDeltas(const float angError)
+void AnimCompiler::Angle::calculateDeltas(const float angError)
 {
 	angles_.clear();
 	angles_.reserve(fullAngles_.size());
@@ -409,16 +409,14 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 
 	anim::AnimHeader hdr;
 	hdr.version = anim::ANIM_VERSION;
-
-	if (flags_.IsSet(CompileFlag::LOOPING)) {
-		hdr.flags.Set(AnimFlag::LOOP);
-	}
-
 	hdr.type = type_;
 	hdr.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
 	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());
 
+	if (flags_.IsSet(CompileFlag::LOOPING)) {
+		hdr.flags.Set(AnimFlag::LOOP);
+	}
 
 	core::ByteStream stream(arena_);
 
@@ -476,8 +474,7 @@ void AnimCompiler::loadInterBones(void)
 void AnimCompiler::dropMissingBones(void)
 {
 	// drop any bones that are not in the model file.
-	size_t i;
-	for (i = 0; i < bones_.size(); i++)
+	for (size_t i = 0; i < bones_.size(); i++)
 	{
 		const core::string& name = bones_[i].name;
 
@@ -503,8 +500,7 @@ void AnimCompiler::dropMissingBones(void)
 
 void AnimCompiler::loadBaseData(void)
 {
-	size_t i;
-	for (i = 0; i < bones_.size(); i++)
+	for (size_t i = 0; i < bones_.size(); i++)
 	{
 		const core::string& name = bones_[i].name;
 
@@ -537,8 +533,8 @@ void AnimCompiler::processBones(const float posError, const float angError)
 {
 	for (auto& bone : bones_)
 	{
-		bone.pos.CalculateDeltas(posError);
-		bone.ang.CalculateDeltas(angError);
+		bone.pos.calculateDeltas(posError);
+		bone.ang.calculateDeltas(angError);
 	}
 }
 
