@@ -15,6 +15,8 @@ class AnimCompiler
 		void print(void) const;
 
 	public:
+		int32_t numFrames;
+		int32_t fps;
 		size_t totalBones;
 		size_t totalBonesPosData;
 		size_t totalBonesAngleData;
@@ -91,6 +93,7 @@ class AnimCompiler
 		
 		void appendFullAng(const Quatf& ang);
 		void setBaseOrient(const Quatf& ang);
+		size_t numAngleFrames(void) const;
 		bool hasData(void) const;
 		bool isFullFrames(void) const; 
 
@@ -135,7 +138,7 @@ public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
 
-	void printStats(void) const;
+	void printStats(bool verbose = false) const;
 
 	void setLooping(bool loop);
 	void setAnimType(AnimType::Enum type);

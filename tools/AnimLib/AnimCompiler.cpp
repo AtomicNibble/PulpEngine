@@ -2,6 +2,7 @@
 #include "AnimCompiler.h"
 
 #include <Time\StopWatch.h>
+#include <String\HumanDuration.h>
 
 #include <IFileSys.h>
 
@@ -19,6 +20,8 @@ AnimCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 
 void AnimCompiler::Stats::clear(void)
 {
+	numFrames = 0;
+	fps = 0;
 	totalBones = 0;
 	totalBonesPosData = 0;
 	totalBonesAngleData = 0;
@@ -29,13 +32,17 @@ void AnimCompiler::Stats::clear(void)
 
 void AnimCompiler::Stats::print(void) const
 {
-	X_LOG0("Anim", "Anim Info:");
-	X_LOG0("Anim", "> Compile Time: %fms", compileTime.GetMilliSeconds());
-	X_LOG0("Anim", "> Total Bones: %" PRIuS, totalBones);
-	X_LOG0("Anim", "> Total Bones(Pos): %" PRIuS, totalBonesPosData);
-	X_LOG0("Anim", "> Total Bones(Ang): %" PRIuS, totalBonesAngleData);
+	core::HumanDuration::Str durStr;
 
-	core::StackString<1024> info;
+	X_LOG0("Anim", "Anim Info:");
+	X_LOG0("Anim", "> Compile Time: ^6%s", core::HumanDuration::toString(durStr, compileTime.GetMilliSeconds()));
+	X_LOG0("Anim", "> Num Frames: ^6%" PRIi32, numFrames);
+	X_LOG0("Anim", "> Fps: ^6%" PRIi32, fps);
+	X_LOG0("Anim", "> Total Bones: ^6%" PRIuS, totalBones);
+	X_LOG0("Anim", "> Total Bones(Pos): ^6%" PRIuS, totalBonesPosData);
+	X_LOG0("Anim", "> Total Bones(Ang): ^6%" PRIuS, totalBonesAngleData);
+
+	core::StackString<1024> info("Dropped Bones:");
 
 	if (droppedBoneNames.size() > 0) {
 		info.append(" -> (");
@@ -315,6 +322,11 @@ void AnimCompiler::Angle::setBaseOrient(const Quatf& ang)
 	baseOrient_ = ang;
 }
 
+size_t AnimCompiler::Angle::numAngleFrames(void) const
+{
+	return angles_.size();
+}
+
 
 bool AnimCompiler::Angle::hasData(void) const
 {
@@ -405,10 +417,19 @@ AnimCompiler::~AnimCompiler()
 
 }
 
-void AnimCompiler::printStats(void) const
+void AnimCompiler::printStats(bool verbose) const
 {
 	stats_.print();
 
+	if (verbose)
+	{
+		X_LOG0("Anim", "Per bone info:");
+
+		for (auto& bone : bones_)
+		{
+			X_LOG0("Anim", "-> \"%s\" ang: ^6%" PRIuS "^7 pos: ^6%" PRIuS, bone.name.c_str(), bone.ang.numAngleFrames(), bone.pos.numPosFrames());
+		}
+	}
 }
 
 void AnimCompiler::setLooping(bool loop)
@@ -476,8 +497,11 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 	dropNullBones();
 
 	// build some stats.
+	stats_.numFrames = inter_.getNumFrames();
+	stats_.fps = inter_.getFps();
 	stats_.totalBones = bones_.size();
 	stats_.compileTime = timer.GetTimeVal();
+
 	for (const auto& bone : bones_)
 	{
 		stats_.totalBonesAngleData += static_cast<int32_t>(bone.ang.hasData());
