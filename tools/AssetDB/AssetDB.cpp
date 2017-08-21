@@ -26,7 +26,6 @@
 
 #include <Memory/AllocationPolicies/LinearAllocator.h>
 
-X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
 

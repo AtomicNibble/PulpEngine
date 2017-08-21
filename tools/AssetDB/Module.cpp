@@ -9,6 +9,15 @@
 
 X_USING_NAMESPACE;
 
+
+X_LINK_LIB("engine_SqLite")
+
+#ifdef X_LIB
+
+X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
+
+#endif // !X_LIB
+
 namespace
 {
 
