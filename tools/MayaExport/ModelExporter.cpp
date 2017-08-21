@@ -188,7 +188,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		return status;
 	}
 
-	status = MayaUtil::ShowProgressDlg(0, (exportMode_ == ExpoMode::RAW) ? 6 : 7);
+	status = MayaUtil::ShowProgressDlg(0, (exportMode_ == ExpoMode::RAW) ? 5 : 7);
 	bool saveOk = false;
 
 	// name length check
