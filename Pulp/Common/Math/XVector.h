@@ -241,8 +241,8 @@ public:
 	static Vec2<T> min()
 	{
 		return Vec2<T>(
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min()
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest()
 		);
 	}
 	static Vec2<T> max()
@@ -832,10 +832,10 @@ public:
 	static Vec4<T> min()
 	{
 		return Vec4<T>(
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min()
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest()
 			);
 	}
 
@@ -1079,11 +1079,11 @@ public:
 	static Vec5<T> min()
 	{
 		return Vec5<T>(
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min(),
-			std::numeric_limits<T>::min()
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest(),
+			std::numeric_limits<T>::lowest()
 		);
 	}
 	static Vec5<T> max()
