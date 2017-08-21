@@ -46,8 +46,8 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 			flags.Set(ModelCompiler::CompileFlag::WHITE_VERT_COL);
 		}
 	}
-	if (d.HasMember("merge_mesh")) {
-		if (d["merge_mesh"].GetBool()) {
+	if (d.HasMember("merge_meshes")) {
+		if (d["merge_meshes"].GetBool()) {
 			flags.Set(ModelCompiler::CompileFlag::MERGE_MESH);
 		}
 	}
