@@ -18,12 +18,10 @@ HINSTANCE g_hInstance = 0;
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
 X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_SqLite")
 
 
 X_FORCE_LINK_FACTORY("XEngineModule_ConverterLib");
 X_FORCE_LINK_FACTORY("XEngineModule_AssetDB");
-X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
 
 
 #endif // !X_LIB
