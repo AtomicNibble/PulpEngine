@@ -713,7 +713,7 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 
 	// we draw some lines. :)
 
-	PrimVertex* pLines = addPrimative(12, PrimitiveType::LINELIST);
+	PrimVertex* pLines = addPrimative(24, PrimitiveType::LINELIST);
 	pLines[0].pos = points[0];
 	pLines[0].color = comp;
 	pLines[1].pos = points[1];
@@ -750,22 +750,22 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 	pLines[15].color = col;
 
 	// top :D !!
-	pLines[15].pos = points[5];
-	pLines[15].color = comp;
-	pLines[16].pos = points[1];
-	pLines[16].color = col;
-	pLines[17].pos = points[5];
-	pLines[17].color = comp;
-	pLines[18].pos = points[2];
-	pLines[18].color = col;
-	pLines[19].pos = points[5];
-	pLines[19].color = comp;
-	pLines[20].pos = points[3];
-	pLines[20].color = col;
-	pLines[21].pos = points[5];
-	pLines[21].color = comp;
-	pLines[22].pos = points[4];
-	pLines[22].color = col;
+	pLines[16].pos = points[5];
+	pLines[16].color = comp;
+	pLines[17].pos = points[1];
+	pLines[17].color = col;
+	pLines[18].pos = points[5];
+	pLines[18].color = comp;
+	pLines[19].pos = points[2];
+	pLines[19].color = col;
+	pLines[20].pos = points[5];
+	pLines[20].color = comp;
+	pLines[21].pos = points[3];
+	pLines[21].color = col;
+	pLines[22].pos = points[5];
+	pLines[22].color = comp;
+	pLines[23].pos = points[4];
+	pLines[23].color = col;
 
 }
 
