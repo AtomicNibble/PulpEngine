@@ -150,6 +150,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	pBoneAngles_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
 	pBonePos_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
 
+	X_ASSERT(bone_data_cursor.isEof(), "Load error")();
 
 	if (hdr.flags.IsSet(ModelFlag::PHYS_DATA))
 	{
@@ -309,6 +310,10 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 			name.clear();
 		}
 	}
+
+	X_ASSERT(tag_name_cursor.isEof(), "Load error")();
+	X_ASSERT(tag_name_cursor.isEof(), "Load error")();
+
 
 	// load the materials.
 	for (i = 0; i < hdr.numMesh; i++)
