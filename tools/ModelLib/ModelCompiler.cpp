@@ -909,7 +909,9 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	
 	// turn it into num blocks.
 	static_assert(MODEL_MAX_HITBOX_DATA_SIZE / 64 <= std::numeric_limits<uint8_t>::max(), "Can't represent max hitbox data");
-	header.hitboxDataBlocks = safe_static_cast<uint8_t>(core::bitUtil::RoundUpToMultiple(hitBoxDataSize, 64_sz) / 64);
+	if (hitBoxDataSize > 0) {
+		header.hitboxDataBlocks = safe_static_cast<uint8_t>(core::bitUtil::RoundUpToMultiple(hitBoxDataSize, 64_sz) / 64);
+	}
 	
 	header.dataSize = (
 		header.tagNameDataSize + 
