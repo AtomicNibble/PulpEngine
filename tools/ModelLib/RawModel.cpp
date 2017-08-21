@@ -585,6 +585,10 @@ namespace RawModel
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::SHARE);
 
+			if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
+				X_ERROR("RawModel", "Failed to create export directory");
+			}
+
 			if (!file.openFile(path.c_str(), mode)) {
 				X_ERROR("RawModel", "Failed to open file for rawmodel");
 				return false;
