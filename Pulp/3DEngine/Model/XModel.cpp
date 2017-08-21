@@ -311,6 +311,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 		}
 	}
 
+	X_ASSERT(cursor.isEof(), "Load error")();
 	X_ASSERT(tag_name_cursor.isEof(), "Load error")();
 	X_ASSERT(tag_name_cursor.isEof(), "Load error")();
 
