@@ -464,9 +464,11 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 			{
 				const bool is2d = context.getMode() == IPrimativeContext::Mode::Mode2D;
 
+				const uint32_t primSortKeyBase = i * 16384;
+
 				if (pCBufMan_->update(frame, is2d))
 				{
-					render::Commands::Nop* pNop = primBucket.addCommand<render::Commands::Nop>(static_cast<uint32_t>(i * 500), 0);
+					render::Commands::Nop* pNop = primBucket.addCommand<render::Commands::Nop>(primSortKeyBase, 0);
 
 					pCBufMan_->updatePerFrameCBs(primBucket, pNop);
 				}
@@ -549,7 +551,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 #endif
 					}
 
-					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(static_cast<uint32_t>((i * 500) + x + 10), variableStateSize);
+					render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(primSortKeyBase + static_cast<uint32_t>(x), variableStateSize);
 					pDraw->startVertex = elem.vertexOffs;
 					pDraw->vertexCount = elem.numVertices;
 					pDraw->stateHandle = stateHandle;
@@ -648,7 +650,8 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 
 								render::Commands::CopyVertexBufferData* pUpdateBuf = nullptr;
 								if (!pBufUpdateCommand) {
-									pUpdateBuf = primBucket.addCommand<render::Commands::CopyVertexBufferData>(100000, 0);
+									// move all the buffer updates to the start?
+									pUpdateBuf = primBucket.addCommand<render::Commands::CopyVertexBufferData>(primSortKeyBase, 0);
 								}
 								else {
 									pUpdateBuf = primBucket.appendCommand<render::Commands::CopyVertexBufferData>(pBufUpdateCommand, 0);
@@ -738,7 +741,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 										// the page we are drawing from.
 										auto& instPage = instPages[curInstPage];
 
-										auto* pDrawInstanced = primBucket.addCommand<render::Commands::DrawInstancedIndexed>(100000 + 1, variableStateSize);
+										auto* pDrawInstanced = primBucket.addCommand<render::Commands::DrawInstancedIndexed>(primSortKeyBase + static_cast<uint32_t>(x), variableStateSize);
 										pDrawInstanced->startInstanceLocation = batchOffset;
 										pDrawInstanced->instanceCount = batchSize;
 										pDrawInstanced->startIndexLocation = lodRes.startIndex;
