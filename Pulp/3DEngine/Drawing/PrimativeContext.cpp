@@ -527,7 +527,6 @@ PrimativeContext::VertexPage::VertexPage(core::MemoryArenaBase* arena) :
 	verts(arena)
 {
 
-	verts.getAllocator().setBaseAlignment(16); // for simd.
 	verts.setGranularity(1024 * 4);
 }
 
@@ -557,7 +556,6 @@ void PrimativeContext::VertexPage::destoryVB(render::IRender* pRender)
 PrimativeContext::ShapeInstanceDataContainer::ShapeInstanceDataContainer(core::MemoryArenaBase* arena) :
 	data_(arena)
 {
-	data_.getAllocator().setBaseAlignment(16); // render system only accepts 16byte aligned buffers, and wwe submit this directly post sort.
 	data_.setGranularity(128);
 
 	core::zero_object(shapeCounts_);

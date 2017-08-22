@@ -147,7 +147,7 @@ public:
 
 	typedef core::Array<PushBufferEntry> PushBufferArr;
 	typedef core::Array<const PushBufferEntry*> SortedPushBufferArr;
-	typedef core::Array<PrimVertex, core::ArrayAlignedAllocator<PrimVertex>> VertexArr;
+	typedef core::Array<PrimVertex, core::ArrayAlignedAllocatorFixed<PrimVertex, 16>> VertexArr;
 
 	struct VertexPage
 	{
@@ -169,7 +169,7 @@ public:
 	};
 
 	typedef core::Array<VertexPage> VertexPagesArr;
-	typedef core::Array<ShapeInstanceData, core::ArrayAlignedAllocator<ShapeInstanceData>> ShapeParamArr;
+	typedef core::Array<ShapeInstanceData, core::ArrayAlignedAllocatorFixed<ShapeInstanceData, 16>> ShapeParamArr;
 
 	struct ShapeInstanceDataContainer
 	{
