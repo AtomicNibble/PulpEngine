@@ -419,7 +419,7 @@ bool PrimativeContextSharedResources::createShapeBuffers(render::IRender* pRende
 		// create all the lods.
 		for (uint32_t lodIdx = 0; lodIdx < SHAPES_NUM_LOD; lodIdx++)
 		{
-			auto& shapeLod = shape.lods[lodIdx];
+			auto& shapeLod = shape.lods[(SHAPES_NUM_LOD-1) - lodIdx]; // reverse order so 0 is highest quality.
 			shapeLod.baseVertex = safe_static_cast<uint16_t>(vertArr.size());
 			shapeLod.startIndex = safe_static_cast<uint16_t>(indexArr.size());
 
