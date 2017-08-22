@@ -102,7 +102,6 @@ void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket, 
 			pCBufUpdate->constantBuffer = cbRef.handle;
 			pCBufUpdate->pData = pAuxData; 
 			pCBufUpdate->size = cb.getBindSize();
-			
 		}
 	}
 }
