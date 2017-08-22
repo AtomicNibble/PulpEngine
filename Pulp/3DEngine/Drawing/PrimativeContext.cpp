@@ -403,9 +403,6 @@ bool PrimativeContextSharedResources::createShapeBuffers(render::IRender* pRende
 	VertArr vertArr(g_3dEngineArena);
 	IndexArr indexArr(g_3dEngineArena);
 
-	// render system wants all cpu buffers 16byte aligned.
-	vertArr.getAllocator().setBaseAlignment(16);
-	indexArr.getAllocator().setBaseAlignment(16);
 	// not really needed since we reserver for each shape.
 	vertArr.setGranularity(256);
 	indexArr.setGranularity(256);

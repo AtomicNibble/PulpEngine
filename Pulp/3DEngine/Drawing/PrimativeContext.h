@@ -23,8 +23,9 @@ X_ALIGNED_SYMBOL(class PrimativeContextSharedResources, 64)
 
 	typedef Vertex_P3F_T2S_C4B ShapeVertex;
 
-	typedef core::Array<ShapeVertex, core::ArrayAlignedAllocator<ShapeVertex>> VertArr;
-	typedef core::Array<uint16_t, core::ArrayAlignedAllocator<uint16_t>> IndexArr;
+	// render system wants all cpu buffers 16byte aligned.
+	typedef core::Array<ShapeVertex, core::ArrayAlignedAllocatorFixed<ShapeVertex, 16>> VertArr;
+	typedef core::Array<uint16_t, core::ArrayAlignedAllocatorFixed<uint16_t, 16>> IndexArr;
 
 public:
 	struct ShapeLod
