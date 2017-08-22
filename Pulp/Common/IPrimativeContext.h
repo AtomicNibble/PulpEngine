@@ -20,6 +20,7 @@ public:
 		Mode3D,
 	};
 
+	// Lod0 = highest quality.
 	static const int32_t SHAPE_NUM_LOD = 4;
 
 	X_DECLARE_ENUM(ShapeType)(
