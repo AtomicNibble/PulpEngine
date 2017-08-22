@@ -667,9 +667,10 @@ void XSound::drawDebug(void) const
 	Sphere sphere;
 	sphere.setRadius(vars_.debugObjectScale());
 
-	Color8u col = Col_Blue;
-	Color8u lineCol = Col_Green;
+	Color8u sphereCol = Col_Blue;
+	Color8u lineCol = Col_Darksalmon;
 	Color8u lineColOcc = Col_Red;
+	Color8u lineColOccVis = Col_Green;
 
 	pPrimCon_->setDepthTest(true);
 
@@ -679,6 +680,9 @@ void XSound::drawDebug(void) const
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	const float cullDistance = vars_.RegisteredCullDistance();
+
+	// prevent using really high quality lods.
+	const int32_t minLod = 3; 
 
 	for (auto* pObject : objects_)
 	{
@@ -690,18 +694,18 @@ void XSound::drawDebug(void) const
 			continue;
 		}
 
-		int32_t lodIdx = static_cast<int32_t>(distance / 200.f);
-		lodIdx = math<int32_t>::min(lodIdx, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
+		int32_t lodIdx = static_cast<int32_t>(distance / 500.f);
+		lodIdx = math<int32_t>::clamp(lodIdx, minLod, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
 
 		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
-		pPrimCon_->drawSphere(sphere, col, true, lodIdx);
+		pPrimCon_->drawSphere(sphere, sphereCol, true, lodIdx);
 
 		if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
-			pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineCol);
+			pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineColOccVis);
 		}
 		else {
-			pPrimCon_->drawLine(trans.pos, listnerPos, Col_Cyan);
+			pPrimCon_->drawLine(trans.pos, listnerPos, lineCol);
 		}
 	}
 
