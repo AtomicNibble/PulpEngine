@@ -733,6 +733,19 @@ const PrimativeContextSharedResources::Shape& PrimativeContext::getShapeResource
 	return sharedRes_.getShapeResources(shape);
 }
 
+void PrimativeContext::drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& ctx, const wchar_t* pText, const wchar_t* pEnd)
+{
+	X_ASSERT_NOT_NULL(ctx.pFont);
+	ctx.pFont->DrawString(this, pos, ang, ctx, pText, pEnd);
+}
+
+
+void PrimativeContext::drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& ctx, const char* pText, const char* pEnd)
+{
+	X_ASSERT_NOT_NULL(ctx.pFont);
+	ctx.pFont->DrawString(this, pos, ang, ctx, pText, pEnd);
+}
+
 
 void PrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {

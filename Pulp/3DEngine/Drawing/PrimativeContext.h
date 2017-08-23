@@ -240,6 +240,8 @@ public:
 	const PrimativeContextSharedResources::Shape& getShapeResources(ShapeType::Enum shape) const;
 
 public:
+	void drawText(const Vec3f& poss, const Matrix33f& ang, const font::TextDrawContext& con, const char* pText, const char* pEnd) X_FINAL;
+	void drawText(const Vec3f& poss, const Matrix33f& ang, const font::TextDrawContext& con, const wchar_t* pText, const wchar_t* pEnd) X_FINAL;
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pBegin, const char* pEnd) X_FINAL;
 	void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 
