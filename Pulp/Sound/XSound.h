@@ -17,6 +17,7 @@ X_NAMESPACE_DECLARE(core,
 struct ICVar;
 struct IConsoleCmdArgs;
 struct FrameData;
+struct FrameView;
 )
 
 X_NAMESPACE_DECLARE(engine,

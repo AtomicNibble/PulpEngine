@@ -10,6 +10,7 @@
 #include <IPrimativeContext.h>
 #include <IPhysics.h>
 #include <IFrameData.h>
+#include <IFont.h>
 
 X_DISABLE_WARNING(4505)
 
@@ -677,16 +678,24 @@ void XSound::drawDebug(void) const
 	auto listnerPos = listenerTrans_.pos;
 	listnerPos.z -= 1.f; // make the line not point directly at us.
 
-	core::CriticalSection::ScopedLock lock(cs_);
-
 	const float cullDistance = vars_.RegisteredCullDistance();
 
 	// prevent using really high quality lods.
-	const int32_t minLod = 3; 
+	const int32_t minLod = 3;
 
+	font::TextDrawContext con;
+	con.effectId = 0;
+	con.col = Col_White;
+	con.flags.Set(font::DrawTextFlag::CENTER);
+	con.flags.Set(font::DrawTextFlag::CENTER_VER);
+	con.pFont = gEnv->pFontSys->GetFont("default");
+	con.size = Vec2f(8.f, 8.f);
+
+
+	core::CriticalSection::ScopedLock lock(cs_);
 	for (auto* pObject : objects_)
 	{
-		auto& trans = pObject->trans;
+		const auto& trans = pObject->trans;
 		sphere.setCenter(trans.pos);
 
 		float distance = listnerPos.distance(trans.pos);
@@ -699,6 +708,30 @@ void XSound::drawDebug(void) const
 
 		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
+		// basic lookAt, mine seams broke as fuck.
+		Vec3f up = Vec3f::zAxis();
+		Vec3f eye = trans.pos; // listnerPos;
+		Vec3f center = listnerPos; // trans.pos;
+		Vec3f f((center - eye).normalized());
+		Vec3f s(cross(f, up).normalized());
+		Vec3f u(cross(s, f));
+
+		Matrix33f Result(1);
+		Result.at(0,0) = s.x;
+		Result.at(1,0) = s.y;
+		Result.at(2,0) = s.z;
+		Result.at(0,1) = u.x;
+		Result.at(1,1) = u.y;
+		Result.at(2,1) = u.z;
+		Result.at(0,2) = -f.x;
+		Result.at(1,2) = -f.y;
+		Result.at(2,2) = -f.z;
+		Result.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+	
+		core::StackString256 txt;
+		txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);
+
+		pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), Result, con, txt.begin(), txt.end());
 		pPrimCon_->drawSphere(sphere, sphereCol, true, lodIdx);
 
 		if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
