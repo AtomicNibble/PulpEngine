@@ -135,9 +135,9 @@ struct IFont
 	virtual void DrawTestText(engine::IPrimativeContext* pPrimCon) X_ABSTRACT;
 
 	// these draw the text into the primative context.
-	virtual void DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
 		const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;
-	virtual void DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
 		const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_ABSTRACT;
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon,
 		const Vec3f& pos, const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_ABSTRACT;

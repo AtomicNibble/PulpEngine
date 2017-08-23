@@ -285,7 +285,7 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 }
 
 
-void XFont::DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
 	const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
 	wchar_t strW[MAX_TXT_SIZE];
@@ -305,7 +305,7 @@ void XFont::DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, 
 	);
 }
 
-void XFont::DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
 	const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
 {
 	DrawStringInternal(

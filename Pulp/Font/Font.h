@@ -53,9 +53,9 @@ public:
 
 	void DrawTestText(engine::IPrimativeContext* pPrimCon) X_FINAL;
 
-	void DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
 		const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
-	void DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
 		const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
