@@ -7,6 +7,7 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Threading\CriticalSection.h>
+#include <Util\Process.h>
 #include <Platform\MessageBox.h>
 
 // Google Test
@@ -121,6 +122,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 			::testing::GTEST_FLAG(filter) = "-*Fiber*";
 			X_LOG0("TESTS", "Running unit tests...");
 			testing::InitGoogleTest(&__argc, __wargv);
+
+			core::Process pro = core::Process::GetCurrent();
+			pro.SetPriorityClass(core::Process::Priority::REALTIME);
 
 			nRes = RUN_ALL_TESTS();
 
