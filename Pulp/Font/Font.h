@@ -53,6 +53,10 @@ public:
 
 	void DrawTestText(engine::IPrimativeContext* pPrimCon) X_FINAL;
 
+	void DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+		const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
+	void DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+		const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd) X_FINAL;
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 		const TextDrawContext& contex, const char* pBegin, const char* pEnd) X_FINAL;
 	void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
@@ -80,6 +84,10 @@ public:
 	X_INLINE XFontTexture* getFontTexture(void) const;
 
 	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);
+
+private:
+	void DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+		const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd, const Matrix33f* pRotation);
 
 private:
 	// loading logic

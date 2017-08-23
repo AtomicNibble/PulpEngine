@@ -285,8 +285,41 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 }
 
 
+void XFont::DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+	const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
+{
+	wchar_t strW[MAX_TXT_SIZE];
+
+	size_t txtLen = pEnd - pBegin;
+	const wchar_t* pWideBegin = core::strUtil::Convert(pBegin, strW);
+	const wchar_t* pWideEnd = pWideBegin + txtLen;
+
+
+	DrawStringInternal(
+		pPrimCon,
+		pos,
+		ctx,
+		pWideBegin,
+		pWideEnd,
+		&ang
+	);
+}
+
+void XFont::DrawString3D(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
+	const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
+{
+	DrawStringInternal(
+		pPrimCon,
+		pos,
+		ctx,
+		pBegin,
+		pEnd,
+		&ang
+	);
+}
+
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
-	const TextDrawContext& contex, const char* pBegin, const char* pEnd)
+	const TextDrawContext& ctx, const char* pBegin, const char* pEnd)
 {
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -295,17 +328,31 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const wchar_t* pWideBegin = core::strUtil::Convert(pBegin, strW);
 	const wchar_t* pWideEnd = pWideBegin + txtLen;
 
-	DrawString(
+	DrawStringInternal(
 		pPrimCon,
 		pos,
-		contex,
+		ctx,
 		pWideBegin,
-		pWideEnd
+		pWideEnd,
+		nullptr
 	);
 }
 
 void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 	const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd)
+{
+	DrawStringInternal(
+		pPrimCon,
+		pos,
+		ctx,
+		pBegin,
+		pEnd,
+		nullptr
+	);
+}
+
+void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
+	const TextDrawContext& ctx, const wchar_t* pBegin, const wchar_t* pEnd, const Matrix33f* pRotation)
 {
 	const size_t textLen = (pEnd - pBegin);
 	if (!textLen) {
@@ -536,17 +583,29 @@ void XFont::DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos,
 			XCharCords cords;
 			pFontTexture_->GetTextureCoord(pSlot, cords);
 
-
 			float xpos = charX + cords.offset.x * scaleX;
 			float ypos = charY + cords.offset.y * scaleY;
 			float right = xpos + cords.size.x * scaleX;
 			float bottom = ypos + cords.size.y * scaleY;
 
+
 			// Verts
 			Vec3f tl(xpos, ypos, z);
 			Vec3f br(right, bottom, z);
-			Vec3f tr(br.x, tl.y, tl.z);
-			Vec3f bl(tl.x, br.y, tl.z);
+			Vec3f tr(br.x, tl.y, z);
+			Vec3f bl(tl.x, br.y, z);
+
+			if (pRotation)
+			{
+				auto& rot = *pRotation;
+
+				Vec3f base(pos);
+				tl = (rot * (tl - base)) + base;
+				br = (rot * (br - base)) + base;
+				tr = (rot * (tr - base)) + base;
+				bl = (rot * (bl - base)) + base;
+			}
+
 
 			float hozAdvanceChar = hozAdvance;
 			if (isProportional) {
