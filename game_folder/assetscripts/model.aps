@@ -17,7 +17,7 @@ void GenerateUI( asset& Asset )
 
         Asset.AddCheckBox( "zero_origin", false).SetTitle( "Zero Origin" );
         Asset.AddCheckBox( "white_vert_col", false).SetTitle( "Force white vertex col" ).SetToolTip("Sets all vertex colors to white");
-        Asset.AddCheckBox( "merge_mesh", true).SetTitle( "Merge Mesh" ).SetToolTip("Merge meshes in the same LOD with matching materials");
+        Asset.AddCheckBox( "merge_meshes", true).SetTitle( "Merge Mesh" ).SetToolTip("Merge meshes in the same LOD with matching materials");
         Asset.AddCheckBox( "merge_verts", true).SetTitle( "Merge Verts" ).SetToolTip("Merge verts that are below the vert and uv thresholds");
         Asset.AddCheckBox( "ext_weights", false).SetTitle( "Ext Weights" ).SetToolTip("Enable extended vertex weights (use for face meshes)");
     }
