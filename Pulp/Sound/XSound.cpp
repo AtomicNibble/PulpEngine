@@ -644,7 +644,7 @@ void XSound::Update(core::FrameData& frame)
 		SoundEngine::RenderAudio();
 	}
 
-	if (vars_.EnableDebugRender()) {
+	if (vars_.EnableDebugRender() > 0) {
 		drawDebug();
 	}
 }
@@ -683,6 +683,7 @@ void XSound::drawDebug(void) const
 	// prevent using really high quality lods.
 	const int32_t minLod = 3;
 
+	const bool drawText = vars_.EnableDebugRender() > 1;
 	font::TextDrawContext con;
 	con.effectId = 0;
 	con.col = Col_White;
@@ -708,30 +709,34 @@ void XSound::drawDebug(void) const
 
 		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
-		// basic lookAt, mine seams broke as fuck.
-		Vec3f up = Vec3f::zAxis();
-		Vec3f eye = trans.pos; // listnerPos;
-		Vec3f center = listnerPos; // trans.pos;
-		Vec3f f((center - eye).normalized());
-		Vec3f s(cross(f, up).normalized());
-		Vec3f u(cross(s, f));
+		if (drawText)
+		{
+			// basic lookAt, mine seams broke as fuck.
+			Vec3f up = Vec3f::zAxis();
+			const Vec3f& eye = trans.pos; // listnerPos;
+			const Vec3f& center = listnerPos; // trans.pos;
+			Vec3f f((center - eye).normalized());
+			Vec3f s(cross(f, up).normalized());
+			Vec3f u(cross(s, f));
 
-		Matrix33f Result(1);
-		Result.at(0,0) = s.x;
-		Result.at(1,0) = s.y;
-		Result.at(2,0) = s.z;
-		Result.at(0,1) = u.x;
-		Result.at(1,1) = u.y;
-		Result.at(2,1) = u.z;
-		Result.at(0,2) = -f.x;
-		Result.at(1,2) = -f.y;
-		Result.at(2,2) = -f.z;
-		Result.rotate(Vec3f::zAxis(), ::toRadians(180.f));
-	
-		core::StackString256 txt;
-		txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);
+			Matrix33f Result(1);
+			Result.at(0, 0) = s.x;
+			Result.at(1, 0) = s.y;
+			Result.at(2, 0) = s.z;
+			Result.at(0, 1) = u.x;
+			Result.at(1, 1) = u.y;
+			Result.at(2, 1) = u.z;
+			Result.at(0, 2) = -f.x;
+			Result.at(1, 2) = -f.y;
+			Result.at(2, 2) = -f.z;
+			Result.rotate(Vec3f::zAxis(), ::toRadians(180.f));
 
-		pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), Result, con, txt.begin(), txt.end());
+			core::StackString256 txt;
+			txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);
+
+			pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), Result, con, txt.begin(), txt.end());
+		}
+
 		pPrimCon_->drawSphere(sphere, sphereCol, true, lodIdx);
 
 		if (pObject->flags.IsSet(SoundFlag::Occlusion)) {

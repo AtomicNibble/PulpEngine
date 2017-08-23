@@ -19,9 +19,9 @@ X_INLINE bool SoundVars::EnableCulling(void) const
 	return enableCulling_ != 0;
 }
 
-X_INLINE bool SoundVars::EnableDebugRender(void) const
+X_INLINE int32_t SoundVars::EnableDebugRender(void) const
 {
-	return enableDebugRender_ != 0;
+	return enableDebugRender_;
 }
 
 // ----------------------
