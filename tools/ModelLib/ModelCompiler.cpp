@@ -1973,7 +1973,7 @@ bool ModelCompiler::SortVerts(void)
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
 	
 	core::Delegate<void(Mesh*, uint32_t)> del;
-	del.Bind<ModelCompiler, &ModelCompiler::CreateBindDataJob>(this);
+	del.Bind<ModelCompiler, &ModelCompiler::SortVertsJob>(this);
 
 	// create a job to sort each meshes verts.
 	size_t i;
