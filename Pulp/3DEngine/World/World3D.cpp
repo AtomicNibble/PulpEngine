@@ -1640,6 +1640,28 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 		Matrix44f world = sm.angle.toMatrix44();
 		world.setTranslate(sm.pos);
 #endif
+
+		if (pModel->numBones())
+		{
+			if (vars_.drawModelBones())
+			{
+				pModel->RenderBones(pPrimContex_, world, vars_.boneColor());
+			}
+
+			if (vars_.drawModelBoneNames())
+			{
+				Matrix33f view = cam_.getViewMatrix().subMatrix33(0,0);
+				view.rotate(Vec3f::yAxis(), ::toRadians(180.f));
+				view.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+
+				pModel->RenderBoneNames(pPrimContex_, world, view, vars_.boneNameColor());
+			}
+		}
+		if (vars_.drawModelBounds())
+		{
+			pPrimContex_->drawAABB(sm.boundingBox, false, Col_Orangered);
+		}
+
 		world.transpose();
 
 		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F, world, distanceFromCam);
