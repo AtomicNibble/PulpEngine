@@ -206,7 +206,7 @@ XSound::XSound(core::MemoryArenaBase* arena) :
 	pPrimCon_(nullptr),
 	pScene_(nullptr),
 	banks_(arena_),
-	objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject)),
+	objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject), "SoundObjPool"),
 	objects_(arena_),
 	culledObjects_(arena_),
 	occlusion_(arena_),
