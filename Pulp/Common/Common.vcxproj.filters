@@ -226,6 +226,9 @@
     <Filter Include="Headers\Memory\ThreadPolicies">
       <UniqueIdentifier>{cb89b6cd-c976-4b9c-8564-94454b96bf28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Animation">
+      <UniqueIdentifier>{fb6b25a9-7d62-4aaa-bb68-f4d3a1d75d7f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -695,9 +698,6 @@
       <Filter>Interfaces_h</Filter>
     </ClInclude>
     <ClInclude Include="IModel.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
-    <ClInclude Include="IAnimation.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
     <ClInclude Include="Math\XQuatCompressed.h">
@@ -1263,6 +1263,9 @@
     </ClInclude>
     <ClInclude Include="IAnimManager.h">
       <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="IAnimation.h">
+      <Filter>Interfaces_h\Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
