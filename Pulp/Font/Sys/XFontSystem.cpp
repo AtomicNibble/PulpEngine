@@ -11,6 +11,7 @@ X_NAMESPACE_BEGIN(font)
 
 XFontSystem::XFontSystem(ICore* pCore) :
 	pCore_(pCore),
+	pDefaultFont_(nullptr),
 	fonts_(g_fontArena, 6),
 	lock_(10),
 	fontTextures_(g_fontArena, 4)
@@ -54,6 +55,19 @@ bool XFontSystem::init(void)
 
 	gEnv->pHotReload->addfileType(this, "font");
 	gEnv->pHotReload->addfileType(this, "ttf");
+
+
+	// load a default font.
+	pDefaultFont_ = static_cast<XFont*>(NewFont("default"));
+	if (!pDefaultFont_) {
+		X_ERROR("Font", "Failed to create default font");
+		return false;
+	}
+
+	if (!pDefaultFont_->loadFont(true)) {
+		X_ERROR("Font", "Failed to load default font");
+		return false;
+	}
 
 	return true;
 }
@@ -133,6 +147,11 @@ IFont* XFontSystem::GetFont(const char* pFontName) const
 	}
 
 	return nullptr;
+}
+
+IFont* XFontSystem::GetDefault(void) const
+{
+	return X_ASSERT_NOT_NULL(pDefaultFont_);
 }
 
 XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)

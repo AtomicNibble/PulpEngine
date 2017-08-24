@@ -856,22 +856,6 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 		return false;
 	}
  
-	if (gEnv->IsDedicated()) { // don't need a font for dedicated.
-		return true;
-	}
-
-	// load a default font.
-	font::IFont* pFont = env_.pFontSys->NewFont("default");
-	if (!pFont) {
-		X_ERROR("Font", "failed to create default font");
-		return false;
-	}
-
-	if(!pFont->loadFont(true)) {
-		X_ERROR("Font", "failed to load default font");
-		return false;
-	}
-
 	return true;
 }
 

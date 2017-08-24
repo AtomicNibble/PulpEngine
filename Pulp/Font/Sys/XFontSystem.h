@@ -44,6 +44,7 @@ public:
 
 	virtual IFont* NewFont(const char* pFontName) X_FINAL;
 	virtual IFont* GetFont(const char* pFontName) const X_FINAL;
+	virtual IFont* GetDefault(void) const X_FINAL;
 	virtual void ListFonts(void) const X_FINAL;
 	// ~IXFont
 
@@ -63,6 +64,7 @@ private:
 
 private:
 	ICore* pCore_;
+	XFont* pDefaultFont_;
 	FontMap fonts_;
 
 	FontVars vars_;

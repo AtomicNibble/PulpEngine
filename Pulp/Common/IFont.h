@@ -32,6 +32,7 @@ struct IFontSys : public core::IEngineSysBase
 	// Summary:
 	//	 Gets a named font (case sensitive)
 	virtual IFont* GetFont(const char* pFontName) const X_ABSTRACT;
+	virtual IFont* GetDefault(void) const X_ABSTRACT;
 
 	// this should really take a sink no?
 	virtual void ListFonts(void) const X_ABSTRACT;
