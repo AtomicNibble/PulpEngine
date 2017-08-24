@@ -10,23 +10,6 @@
 
 X_NAMESPACE_BEGIN(model)
 
-/*
-
-I need to redesign this so that models are returned instantly and loaded later.
-
-Allowing for the IO reads to be que'd and performend by one thread.
-Creating process jobs at the end, that once complete switch out the data.
-
-Also this will allow for proper hot reload as the handels given back can have thier data updated in background.
-
-This does pose the issue of where to store the actuall data buffer.
-Well we are only storing one instance of XModel no matter how many times it's used.
-So if that owned the data would be ok.
-
-WE have special case for default model which we want to load / setup in a synchronous manner.
-
-*/
-
 XModelManager::XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena) :
 	arena_(arena),
 	blockArena_(blockArena),
