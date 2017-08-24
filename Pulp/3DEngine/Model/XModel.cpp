@@ -9,6 +9,7 @@
 #include <IConsole.h>
 #include <IShader.h>
 #include <IPhysics.h>
+#include <IFont.h>
 #include <Threading\JobSystem2.h>
 
 #include "Material\MaterialManager.h"
@@ -88,6 +89,34 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 	}
 }
 
+void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view, const Color8u col) const
+{
+	const int32_t num = numBones();
+	if (!num) {
+		return;
+	}
+
+	font::TextDrawContext ctx;
+	ctx.col = col;
+	ctx.flags.Set(font::DrawTextFlag::CENTER);
+	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
+	ctx.pFont = gEnv->pFontSys->GetDefault();
+	ctx.effectId = 0;
+	ctx.size = Vec2f(2.f, 2.f);
+
+	Vec3f offset = Vec3f(0.f, 0.f, 3.f);
+
+	for (int32_t i = 0; i < num; i++)
+	{
+		const Vec3f& pos = pBonePos_[i];
+		Vec3f worldPos = modelMat * pos;
+
+		// temp hack.
+		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
+
+		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
+	}
+}
 
 void XModel::assignDefault(XModel* pDefault)
 {
@@ -298,6 +327,8 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 
 		for (i = 0; i < hdr.numBones; i++)
 		{
+			((uint16_t*)pTagNames_)[i] = safe_static_cast<uint16>(tag_name_cursor.getPtr<uint8_t>() - data.ptr());
+
 			while (!tag_name_cursor.isEof() && tag_name_cursor.get<char>() != '\0') {
 				name.append(tag_name_cursor.getSeek<char>(), 1);
 			}
