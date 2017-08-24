@@ -75,7 +75,7 @@ namespace entity
 	bool EnititySystem::createTranslatours(void)
 	{
 
-
+#if 0
 		const char* pDoc = R"(
 {
 	"ents" : [
@@ -96,6 +96,8 @@ namespace entity
 
 
 		loadEntites2(pDoc, pDoc + sizeof(pDoc));
+
+#endif
 
 		return true;
 	}
