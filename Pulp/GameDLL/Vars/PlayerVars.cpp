@@ -56,24 +56,24 @@ void PlayerVars::registerVars(void)
 		"Height of player when crouched");
 	ADD_CVAR_REF("ply_crouch_height", crouchHeight_, crouchHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
 		"Height of player collsion shape when crouched");
-	ADD_CVAR_REF("ply_normal_view_height", normalViewHeight_, normalViewHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
+	ADD_CVAR_REF("ply_view_height", normalViewHeight_, normalViewHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
 		"Height of player view");
-	ADD_CVAR_REF("ply_normal_height", normalHeight_, normalHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
-		"Height of player's collsion shape");
+	ADD_CVAR_REF("ply_height", normalHeight_, normalHeight_, 0, 256, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
+		"Height of player's collsion shape (Must crouch to apply)");
 	ADD_CVAR_REF("ply_crouch_rate", crouchRate_, crouchRate_, 0, 1.f, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
 		"Time it takes to move in and out of crouch");
 
 	ADD_CVAR_REF("ply_max_view_pitch", maxViewPitch_, maxViewPitch_, -360, 360, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
-		"");
+		"Max view pitch angle");
 	ADD_CVAR_REF("ply_min_view_pitch", minViewPitch_, minViewPitch_, -360, 360, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
-		"");
+		"Min view pitch angle");
 
 	ADD_CVAR_REF("ply_walk_bob", walkBob_, walkBob_, 0, 512, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
-		"");
+		"Walk camera bob");
 	ADD_CVAR_REF("ply_run_bob", runBob_, runBob_, 0, 512, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
-		"");
+		"Run camera bob");
 	ADD_CVAR_REF("ply_crouch_bob", crouchBob_, crouchBob_, 0, 512, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
-		"");
+		"Crouch camera bob");
 
 	ADD_CVAR_REF("ply_bob_up", bobUp_, bobUp_, 0, 1.f, core::VarFlag::SYSTEM | core::VarFlag::CHEAT,
 		"");
