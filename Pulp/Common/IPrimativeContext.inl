@@ -192,6 +192,11 @@ X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDraw
 	drawText(pos, con, pText, pText + core::strUtil::strlen(pText));
 }
 
+X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& con, const char* pText)
+{
+	drawText(pos, ang, con, pText, pText + core::strUtil::strlen(pText));
+}
+
 X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const char* pText)
 {
 	drawText(Vec3f(x, y, 1), con, pText, pText + core::strUtil::strlen(pText));
@@ -215,6 +220,13 @@ X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDraw
 {
 	drawText(pos, con, pText, pText + core::strUtil::strlen(pText));
 }
+
+
+X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& con, const wchar_t* pText)
+{
+	drawText(pos, ang, con, pText, pText + core::strUtil::strlen(pText));
+}
+
 
 X_INLINE void IPrimativeContext::drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText)
 {

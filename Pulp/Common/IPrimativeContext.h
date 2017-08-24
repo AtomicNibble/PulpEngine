@@ -138,10 +138,13 @@ public:
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pText);
+	X_INLINE void drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& con, const char* pText);
 	X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const char* pText);
 	X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const char* pText, const char* pEnd);
+
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pFormat, va_list args);
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const wchar_t* pText);
+	X_INLINE void drawText(const Vec3f& pos, const Matrix33f& ang, const font::TextDrawContext& con, const wchar_t* pText);
 	X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText);
 	X_INLINE void drawText(float x, float y, const font::TextDrawContext& con, const wchar_t* pText, const wchar_t* pEnd);
 
