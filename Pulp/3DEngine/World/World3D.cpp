@@ -1583,7 +1583,6 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 
 		model::XModel* pModel = sm.pModel;
 
-
 		// is this a good place todo the bucketing?
 		// like placing the model in multiple buckets
 		// seams like a good palce since we are fully parralel here.
