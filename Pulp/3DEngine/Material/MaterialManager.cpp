@@ -33,7 +33,7 @@ XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateMa
 	pTechDefMan_(nullptr),
 	cBufMan_(cBufMan),
 	vsMan_(vsMan),
-	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u,X_ALIGN_OF(MaterialResource))),
+	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u,X_ALIGN_OF(MaterialResource)), "MaterialPool"),
 	pDefaultMtl_(nullptr),
 	requestQueue_(arena),
 	pendingRequests_(arena),

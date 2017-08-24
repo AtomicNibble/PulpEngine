@@ -187,7 +187,7 @@ public:
 	> AssetPoolArena;
 
 public:
-	AssetPool(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
+	AssetPool(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign, const char* pArenaName) :
 		assetPoolHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
 				AssetPoolArena::getMemoryRequirement(allocSize) * MaxAssets,
@@ -199,7 +199,7 @@ public:
 			AssetPoolArena::getMemoryAlignmentRequirement(allocAlign),
 			AssetPoolArena::getMemoryOffsetRequirement()
 		),
-		assetPoolArena_(&assetPoolAllocator_, "AssetPoolArena")
+		assetPoolArena_(&assetPoolAllocator_, pArenaName)
 	{
 		arena->addChildArena(&assetPoolArena_);
 	}
@@ -246,7 +246,7 @@ public:
 	> AssetPoolArena;
 
 public:
-	AssetPoolRefCounted(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
+	AssetPoolRefCounted(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign, const char* pArenaName) :
 		assetPoolHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
 				AssetPoolArena::getMemoryRequirement(allocSize) * MaxAssets,
@@ -258,7 +258,7 @@ public:
 			AssetPoolArena::getMemoryAlignmentRequirement(allocAlign),
 			AssetPoolArena::getMemoryOffsetRequirement()
 		),
-		assetPoolArena_(&assetPoolAllocator_, "AssetPoolArena")
+		assetPoolArena_(&assetPoolAllocator_, pArenaName)
 	{
 		arena->addChildArena(&assetPoolArena_);
 	}
@@ -300,11 +300,11 @@ public:
 	typedef ThreadPolicy ThreadPolicy;
 
 public:
-	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign) :
+	AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign, const char* pArenaName) :
 		hash_(arena, MaxAssets),
 		list_(arena),
 		freeList_(arena),
-		Pool(arena, allocSize, allocAlign)
+		Pool(arena, allocSize, allocAlign, pArenaName)
 	{
 		list_.reserve(MaxAssets);
 	}

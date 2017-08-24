@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(level)
 
 MatManager::MatManager(core::MemoryArenaBase* arena) :
 	arena_(arena),
-	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u, X_ALIGN_OF(MaterialResource))),
+	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u, X_ALIGN_OF(MaterialResource)), "MaterialPool"),
 	nameOverRide_(arena, 64),
 	pDefaultMtl_(nullptr)
 {
@@ -80,6 +80,11 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
 	if (it != nameOverRide_.end())
 	{
 		name = it->second;
+	}
+	
+	if (name != "tool/editor/portal" && name != "tool/editor/portal_nodraw")
+	{
+		name = "floor/concrete/sidewalk";
 	}
 
 	// try find it.

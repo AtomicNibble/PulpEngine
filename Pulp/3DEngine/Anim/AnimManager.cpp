@@ -15,7 +15,7 @@ X_NAMESPACE_BEGIN(anim)
 AnimManager::AnimManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena) :
 	arena_(arena),
 	blockArena_(blockArena),
-	anims_(arena, sizeof(AnimResource), X_ALIGN_OF(AnimResource)),
+	anims_(arena, sizeof(AnimResource), X_ALIGN_OF(AnimResource), "AnimPool"),
 	requestQueue_(arena),
 	pendingRequests_(arena)
 {

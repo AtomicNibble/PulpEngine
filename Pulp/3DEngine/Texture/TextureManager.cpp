@@ -24,7 +24,7 @@ namespace
 
 TextureManager::TextureManager(core::MemoryArenaBase* arena) :
 	arena_(arena),
-	textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
+	textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource)), "TexturePool"),
 	pCILoader_(nullptr),
 
 	blockAlloc_(),

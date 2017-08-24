@@ -33,7 +33,7 @@ X_NAMESPACE_BEGIN(texture)
 		descriptorAlloc_(descriptorAlloc),
 		depthFmt_(depthFmt),
 		arena_(arena),
-		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource))),
+		textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource)), "TextureResPool"),
 		clearDepthVal_(reverseZ ? 0.f : 1.f)
 	{
 		X_ENSURE_LE(sizeof(TextureResource), 128, "Texture with ref count should be 128 bytes or less");

@@ -31,7 +31,7 @@ XModelManager::XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase
 	arena_(arena),
 	blockArena_(blockArena),
 	pDefaultModel_(nullptr),
-	models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource)),
+	models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource), "ModelPool"),
 	requestQueue_(arena),
 	pendingRequests_(arena)
 {
