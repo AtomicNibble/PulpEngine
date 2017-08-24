@@ -49,6 +49,10 @@ X_INLINE int32_t LevelVars::drawModelBones(void) const
 	return drawModelBones_;
 }
 
+X_INLINE int32_t LevelVars::drawModelBoneNames(void) const
+{
+	return drawModelBoneNames_;
+}
 
 X_INLINE int32_t LevelVars::drawPortalStacks(void) const
 {
@@ -67,7 +71,15 @@ X_INLINE int32_t LevelVars::cullEnts(void) const
 	return cullEnts_;
 }
 
+X_INLINE Colorf LevelVars::boneColor(void) const
+{
+	return boneCol_;
+}
 
+X_INLINE Colorf LevelVars::boneNameColor(void) const
+{
+	return boneNameCol_;
+}
 
 
 

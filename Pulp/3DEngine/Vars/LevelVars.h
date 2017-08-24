@@ -24,9 +24,14 @@ public:
 	X_INLINE int32_t drawStats(void) const;
 	X_INLINE int32_t drawModelBounds(void) const;
 	X_INLINE int32_t drawModelBones(void) const;
+	X_INLINE int32_t drawModelBoneNames(void) const;
 	X_INLINE int32_t drawPortalStacks(void) const;
 	X_INLINE int32_t detachCam(void) const;
 	X_INLINE int32_t cullEnts(void) const;
+
+	X_INLINE Colorf boneColor(void) const;
+	X_INLINE Colorf boneNameColor(void) const;
+
 
 private:
 	int32_t usePortals_;
@@ -37,9 +42,13 @@ private:
 	int32_t drawStats_;
 	int32_t drawModelBounds_;
 	int32_t drawModelBones_;
+	int32_t drawModelBoneNames_;
 	int32_t drawPortalStacks_;
 	int32_t detachCam_;
 	int32_t cullEnts_;
+
+	Colorf boneCol_;
+	Colorf boneNameCol_;
 };
 
 
