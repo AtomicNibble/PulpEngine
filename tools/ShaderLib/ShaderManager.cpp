@@ -48,7 +48,7 @@ namespace shader
 		arena_(arena),
 		shaderBin_(arena),
 		sourceBin_(arena),
-		hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource)),
+		hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource), "HWShaderPool"),
 		permHeap_(
 			core::bitUtil::RoundUpToMultiple<size_t>(
 				PoolArena::getMemoryRequirement(sizeof(ShaderPermatation)) * MAX_SHADER_PERMS,
