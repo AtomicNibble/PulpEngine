@@ -39,6 +39,7 @@ namespace RawModel
 	{
 	public:
 		typedef core::FixedArray<Bind, 12> BindsArr;
+
 	public:
 		Vert() = default;
 		~Vert() = default;
