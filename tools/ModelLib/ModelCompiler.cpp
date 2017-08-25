@@ -1501,12 +1501,6 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			}
 		}
 
-		// Write the complete LOD's data all at once.
-	//	if (file.write(stream.begin(), stream.size()) != stream.size()) {
-	//		X_ERROR("Model", "Failed to write lod data");
-	//		return false;
-	//	}
-
 		// write all the bind info.
 		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
