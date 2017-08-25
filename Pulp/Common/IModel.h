@@ -399,24 +399,24 @@ struct CompbindInfo
 		compBinds_ = counts;
 	}
 
-	X_INLINE uint16_t& operator[](int idx) {
-		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
+	X_INLINE uint16_t& operator[](size_t idx) {
+		X_ASSERT(idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		return compBinds_[idx];
 	}
 
-	X_INLINE const uint16_t operator[](int idx) const {
-		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
+	X_INLINE const uint16_t operator[](size_t idx) const {
+		X_ASSERT(idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		return compBinds_[idx];
 	}
 
-	X_INLINE const size_t dataSize(int idx) const {
-		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
+	X_INLINE const size_t dataSize(size_t idx) const {
+		X_ASSERT(idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		// size is (idx * (bindBone + bindWeight)) + bindBone
 		return compBinds_[idx] * ((idx * (sizeof(bindBone) + sizeof(bindWeight))) + sizeof(bindBone));
 	}
 
 	X_INLINE const size_t dataSizeTotal(void) const {
-		size_t size = 0; int i;
+		size_t i, size = 0; 
 		for (i = 0; i < MODEL_MAX_VERT_BINDS; i++) {
 			size += dataSize(i);
 		}
