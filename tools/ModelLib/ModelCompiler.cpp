@@ -1349,11 +1349,11 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			core::zero_object(meshHdr);
 
 			// bind info.
-			meshHdr.numBinds = safe_static_cast<uint16_t, size_t>(compiledMesh.binds_.numSimpleBinds());
+			meshHdr.numBinds = safe_static_cast<uint16_t>(compiledMesh.binds_.numSimpleBinds());
 			meshHdr.CompBinds.set(compiledMesh.binds_.getBindCounts());
 
-			meshHdr.numVerts = safe_static_cast<uint16_t, size_t>(compiledMesh.verts_.size());
-			meshHdr.numIndexes = safe_static_cast<uint16_t, size_t>(compiledMesh.faces_.size() * 3);
+			meshHdr.numVerts = safe_static_cast<uint16_t>(compiledMesh.verts_.size());
+			meshHdr.numIndexes = safe_static_cast<uint16_t>(compiledMesh.faces_.size() * 3);
 			//		mesh.material = pMesh->material;
 	//		mesh.CompBinds = pMesh->CompBinds;
 			meshHdr.boundingBox = compiledMesh.boundingBox_;
