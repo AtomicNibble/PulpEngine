@@ -262,6 +262,7 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 
 				lastVertIdx = i;
 				sb.jointIdx = bind.boneIdx_;
+				curBoneIdx = bind.boneIdx_;
 			}
 		}
 
