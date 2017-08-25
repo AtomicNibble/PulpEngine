@@ -390,7 +390,7 @@ namespace RawModel
 			}
 
 			vert.binds_.resize(numBinds);
-			for (auto bind : vert.binds_)
+			for (auto& bind : vert.binds_)
 			{
 				// boneIDx + weigth
 				bind.boneIdx_ = lex.ParseInt();
