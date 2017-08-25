@@ -288,6 +288,7 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 			X_ASSERT(lastBindCount <= vert.binds_.size(), "Verts should be sorted by bind counts")(lastBindCount, vert.binds_.size());
 			lastBindCount = vert.binds_.size();
 #endif
+
 			for (size_t i = 0; i < vert.binds_.size(); i++)
 			{
 				const RawModel::Bind& bind = vert.binds_[i];
@@ -2760,7 +2761,7 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 	// requires thread safe allocator.
 	IndexArray indexs(arena_);
 
-	for (size_t i = 0; i < count; i++)
+	for (uint32_t i = 0; i < count; i++)
 	{
 		auto& mesh = pMesh[i];
 		auto& verts = mesh.verts_;
@@ -2789,7 +2790,7 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 		// update all the face index's
 		for (auto& f : faces)
 		{
-			for (size_t x = 0; x < 3; x++)// un-roll for me baby.
+			for (int32_t x = 0; x < 3; x++)// un-roll for me baby.
 			{
 				const IndexArray::Type origIdx = f[x];
 				const IndexArray::Type newIdx = indexs[origIdx];;
