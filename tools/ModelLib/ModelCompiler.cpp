@@ -226,17 +226,13 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 		bindCounts[i] = counts[i + 1];
 	}
 
-
-	bindInfo_.set(bindCounts);
-
-	// work out the size of the stream
-	const size_t streamSize = bindInfo_.dataSizeTotal();
-
-	stream_.reserve(streamSize);
-
 	// simple binds?
 	if (bindCounts[0] == verts.size())
 	{
+		// set bind info to zero, single binds in that are diffrent to simple binds.
+		bindCounts.fill(0);
+		bindInfo_.set(bindCounts);
+
 		int32_t curBoneIdx = verts[0].binds_[0].boneIdx_; // safe
 
 		// setup first vert.
@@ -280,6 +276,10 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 	}
 	else
 	{
+		bindInfo_.set(bindCounts);
+
+		stream_.reserve(bindInfo_.dataSizeTotal());
+
 #if X_DEBUG
 		size_t lastBindCount = 0;
 #endif
@@ -1491,7 +1491,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 			padStream();
 		}
-
+			
 		// write all the faces
 		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
