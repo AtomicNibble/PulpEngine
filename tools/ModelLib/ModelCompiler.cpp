@@ -2675,9 +2675,7 @@ void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
 
 void ModelCompiler::UpdateBoundsJob(Mesh* pMesh, uint32_t count)
 {
-	size_t i;
-
-	for (i = 0; i < count; i++) {
+	for (uint32_t i = 0; i < count; i++) {
 		pMesh[i].calBoundingbox();
 		pMesh[i].calBoundingSphere(false);
 	}
@@ -2685,10 +2683,9 @@ void ModelCompiler::UpdateBoundsJob(Mesh* pMesh, uint32_t count)
 
 void ModelCompiler::ScaleVertsJob(Vert* pVerts, uint32_t count)
 {
-	size_t i;
 	const float scale = scale_;
 
-	for (i = 0; i < count; i++)
+	for (uint32_t i = 0; i < count; i++)
 	{
 		auto& vert = pVerts[i];
 
@@ -2698,9 +2695,7 @@ void ModelCompiler::ScaleVertsJob(Vert* pVerts, uint32_t count)
 
 void ModelCompiler::CreateBindDataJob(Mesh* pMesh, uint32_t count)
 {
-	size_t meshIdx;
-
-	for (meshIdx = 0; meshIdx < count; meshIdx++)
+	for (uint32_t meshIdx = 0; meshIdx < count; meshIdx++)
 	{
 		auto& mesh = pMesh[meshIdx];
 
@@ -2716,8 +2711,7 @@ void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, uint32_t count)
 
 
 	int32_t droppedWeights = 0;
-	size_t i;
-	for (i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		RawModel::Vert& vert = pVerts[i];
 		const RawModel::Vert::BindsArr& binds = vert.binds_;
