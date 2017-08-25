@@ -907,6 +907,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		}
 	}
 
+	// any binds?
+	if (calculateBindDataSize() > 0) {
+		header.flags.Set(model::ModelFlags::ANIMATED);
+	}
+
+
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	header.numBlankBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
 	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
@@ -1516,12 +1522,15 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			}
 		}
 
-		// write all the bind info.
-		for (auto& compiledMesh : compiledLods_[i].meshes_)
+		if (header.flags.IsSet(model::ModelFlags::ANIMATED))
 		{
-			if (!compiledMesh.binds_.write(meshDataStream)) {
-				X_ERROR("Model", "Failed to write bind data");
-				return false;
+			// write all the bind info.
+			for (auto& compiledMesh : compiledLods_[i].meshes_)
+			{
+				if (!compiledMesh.binds_.write(meshDataStream)) {
+					X_ERROR("Model", "Failed to write bind data");
+					return false;
+				}
 			}
 		}
 
