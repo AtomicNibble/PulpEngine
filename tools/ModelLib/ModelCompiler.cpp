@@ -633,7 +633,6 @@ size_t ModelCompiler::Lod::getMeshDataSize(const Flags8<model::StreamType>& stre
 
 	for (auto& mesh : meshes_)
 	{
-
 		size += sizeof(model::Face) * mesh.faces_.size();
 		size += sizeof(model::Vertex) * mesh.verts_.size();
 
@@ -649,6 +648,18 @@ size_t ModelCompiler::Lod::getMeshDataSize(const Flags8<model::StreamType>& stre
 		}
 
 		// bind data
+		size += safe_static_cast<size_t, size_t>(mesh.binds_.dataSizeTotal());
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::Lod::getBindDataSize(void) const
+{
+	size_t size = 0;
+
+	for (auto& mesh : meshes_)
+	{
 		size += safe_static_cast<size_t, size_t>(mesh.binds_.dataSizeTotal());
 	}
 
@@ -1619,6 +1630,17 @@ size_t ModelCompiler::calculateMeshDataSize(const Flags8<model::StreamType>& str
 
 	for (auto& lod : compiledLods_) {
 		size += lod.getMeshDataSize(streams);
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::calculateBindDataSize(void) const
+{
+	size_t size = 0;
+
+	for (auto& lod : compiledLods_) {
+		size += lod.getBindDataSize();
 	}
 
 	return size;

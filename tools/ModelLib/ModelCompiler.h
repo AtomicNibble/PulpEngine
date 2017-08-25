@@ -202,6 +202,7 @@ public:
 		~Lod() = default;
 
 		size_t getMeshDataSize(const Flags8<model::StreamType>& streams) const;
+		size_t getBindDataSize(void) const;
 		size_t getPhysDataSize(void) const;
 		size_t numMeshes(void) const;
 		size_t numColMeshes(void) const;
@@ -258,6 +259,7 @@ private:
 	size_t calculateTagNameDataSize(void) const;
 	size_t calculateMaterialNameDataSize(void) const ;
 	size_t calculateMeshDataSize(const Flags8<model::StreamType>& streams) const;
+	size_t calculateBindDataSize(void) const;
 	size_t calculateBoneDataSize(void) const;
 	size_t calculatePhysDataSize(void) const;
 	size_t calculateHitBoxDataSize(void) const;
