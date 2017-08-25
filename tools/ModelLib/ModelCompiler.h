@@ -68,12 +68,8 @@ public:
 		AABB bounds;
 	};
 
-	X_DISABLE_WARNING(4324)
-
-	X_ALIGNED_SYMBOL(class Vert, 64)
+	class Vert
 	{
-	public:
-		typedef core::FixedArray<RawModel::Bind, 12> BindsArr;
 	public:
 		Vert() = default;
 		~Vert() = default;
@@ -85,10 +81,8 @@ public:
 		Color col_;
 		Vec2f uv_;
 
-		BindsArr binds_;
+		RawModel::Vert::BindsArr binds_;
 	};
-
-	X_ENABLE_WARNING(4324)
 
 	class Binds
 	{
