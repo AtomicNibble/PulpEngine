@@ -2785,8 +2785,8 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 			for (int32_t x = 0; x < 3; x++)// un-roll for me baby.
 			{
 				const IndexArray::Type origIdx = f[x];
-				const IndexArray::Type newIdx = indexs[origIdx];;
-				f[0] = newIdx;
+				const IndexArray::Type newIdx = indexs[origIdx];
+				f[x] = newIdx;
 			}
 		}
 	}
