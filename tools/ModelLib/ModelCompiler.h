@@ -9,6 +9,7 @@
 
 #include "RawModel.h"
 
+X_NAMESPACE_DECLARE(core, class FixedByteStreamBase)
 
 X_NAMESPACE_BEGIN(model)
 
@@ -93,7 +94,7 @@ public:
 		Binds(core::MemoryArenaBase* arena);
 		~Binds() = default;
 
-		bool write(core::XFileScoped& file);
+		bool write(core::FixedByteStreamBase& stream);
 		void populate(const VertsArr& verts);
 
 		const size_t numSimpleBinds(void) const;

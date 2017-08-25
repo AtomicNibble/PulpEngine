@@ -182,15 +182,16 @@ ModelCompiler::Binds::Binds(core::MemoryArenaBase* arena) :
 }
 
 
-bool ModelCompiler::Binds::write(core::XFileScoped& file)
+bool ModelCompiler::Binds::write(core::FixedByteStreamBase& stream)
 {
 	if (simple_.isNotEmpty())
 	{
-		return file.writeObjs(simple_.ptr(), simple_.size()) == simple_.size();
+		X_ASSERT(stream_.size() == 0, "Complex binds not empty")(stream_.size());
+		stream.write(simple_.ptr(), simple_.size());
 	}
 	else if(stream_.size() > 0)
 	{
-		return file.write(stream_.begin(), stream_.size()) == stream_.size();
+		stream.write(stream_);
 	}
 
 	// no binds.
@@ -1509,7 +1510,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// write all the bind info.
 		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
-			if (!compiledMesh.binds_.write(file)) {
+			if (!compiledMesh.binds_.write(meshDataStream)) {
 				X_ERROR("Model", "Failed to write bind data");
 				return false;
 			}
