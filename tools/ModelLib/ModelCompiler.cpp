@@ -321,6 +321,10 @@ const CompbindInfo::BindCountsArr& ModelCompiler::Binds::getBindCounts(void) con
 
 const size_t ModelCompiler::Binds::dataSizeTotal(void) const
 {
+	if (simple_.isNotEmpty()) {
+		return simple_.size() * sizeof(SimpleBindArr::Type);
+	}
+
 	return bindInfo_.dataSizeTotal();
 }
 
