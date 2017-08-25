@@ -89,6 +89,7 @@ public:
 	{
 	public:
 		typedef core::Array<Vert> VertsArr;
+		typedef core::Array<simpleBind> SimpleBindArr;
 
 	public:
 		Binds(core::MemoryArenaBase* arena);
@@ -102,7 +103,7 @@ public:
 		const size_t dataSizeTotal(void) const;
 
 	private:
-		core::Array<simpleBind>	simple_;
+		SimpleBindArr	simple_;
 		// for complex binds.
 		core::ByteStream stream_;
 
