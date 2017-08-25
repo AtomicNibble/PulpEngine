@@ -2548,15 +2548,13 @@ bool ModelCompiler::ScaleBones(void)
 
 void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
 {
-	size_t meshIdx;
-
 	float vertexElipsion = vertexElipsion_;
 	float texcoordElipson = texcoordElipson_;
 
 	typedef std::multimap<uint64_t, Hashcontainer> hashType;
 	hashType hash;
 
-	for (meshIdx = 0; meshIdx < count; meshIdx++)
+	for (uint32_t meshIdx = 0; meshIdx < count; meshIdx++)
 	{
 		auto& mesh = pMesh[meshIdx];
 
