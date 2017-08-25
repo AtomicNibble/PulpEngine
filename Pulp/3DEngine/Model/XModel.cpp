@@ -282,9 +282,16 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 		{
 			SubMeshHeader& mesh = meshHeads[x];
 
-			uint32_t size = safe_static_cast<uint32_t, size_t>(mesh.CompBinds.dataSizeTotal());
+			size_t sizeSimple = mesh.numBinds * sizeof(simpleBind);
+			size_t sizeComplex = mesh.CompBinds.dataSizeTotal();
 
-			cursor.seekBytes(size);
+			if (sizeSimple || sizeComplex)
+			{
+				lod.streams[VertexStream::HWSKIN] = cursor.getPtr<void>();
+
+				cursor.seekBytes(sizeSimple);
+				cursor.seekBytes(sizeComplex);
+			}
 		}
 
 		// index 0 is always valid, since a valid lod must
