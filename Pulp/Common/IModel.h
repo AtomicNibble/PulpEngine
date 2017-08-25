@@ -309,6 +309,11 @@ struct simpleBind
 };
 
 // each vertex supports between 1-8 binds.
+struct singleBind
+{
+	bindBone	bone1;
+};
+
 struct doubleBind
 {
 	bindBone	bone1;
