@@ -1526,7 +1526,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")();
 		X_ASSERT(physDataStream.size() == header.physDataSize, "Incorrect size")();
 		X_ASSERT(hitboxDataStream.size() == header.hitboxDataBlocks * 64, "Incorrect size")();
-		X_ASSERT(meshDataStream.size() == header.meshDataSize, "Incorrect size")();
+		X_ASSERT(meshDataStream.size() == header.meshDataSize, "Incorrect size")(meshDataStream.size(), header.meshDataSize);
 
 		X_ASSERT(matNameStream.freeSpace() == 0, "Stream incomplete")();
 		X_ASSERT(tagNameStream.freeSpace() == 0, "Stream incomplete")();
