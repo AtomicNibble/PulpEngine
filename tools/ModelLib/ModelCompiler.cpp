@@ -200,20 +200,31 @@ bool ModelCompiler::Binds::write(core::XFileScoped& file)
 
 void ModelCompiler::Binds::populate(const VertsArr& verts)
 {
-	CompbindInfo::BindCountsArr bindCounts{};
-
 	if (verts.isEmpty()) {
 		return;
 	}
 
-	// work out the bind counts
-	for (const auto& vert : verts) {
+	std::array<int32_t, MODEL_MAX_VERT_BINDS + 1> counts{};
 
+	// work out the bind counts
+	// shoving them into 1-9 index's so we don't have to branch
+	for (const auto& vert : verts) 
+	{
 		const size_t numBinds = vert.binds_.size();
-		if (numBinds > 0) { // fucking branch, maybe I should force binds.
-			bindCounts[numBinds - 1]++;
-		}
+		++counts[numBinds];
 	}
+
+	// no binds?
+	if (counts[0] == verts.size()) {
+		return;
+	}
+
+	CompbindInfo::BindCountsArr bindCounts{};
+	for (size_t i = 0; i < MODEL_MAX_VERT_BINDS; i++)
+	{
+		bindCounts[i] = counts[i + 1];
+	}
+
 
 	bindInfo_.set(bindCounts);
 
@@ -226,15 +237,15 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 	if (bindCounts[0] == verts.size())
 	{
 		int32_t curBoneIdx = verts[0].binds_[0].boneIdx_; // safe
-		size_t i, lastVertIdx = 0;
 
 		// setup first vert.
 		simpleBind sb;
-		sb.jointIdx = safe_static_cast<uint16_t,int32_t>(curBoneIdx);
+		sb.jointIdx = safe_static_cast<uint16_t>(curBoneIdx);
 		sb.faceOffset = 0;
 		sb.numFaces = 0;
 		sb.numVerts = 0;
 
+		size_t i, lastVertIdx = 0;
 		for (i = 1; i < verts.size(); i++)
 		{
 			const Vert& vert = verts[i];
@@ -245,7 +256,7 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 				size_t numVerts = i - lastVertIdx;
 				sb.faceOffset = 0;
 				sb.numFaces = 0;
-				sb.numVerts = safe_static_cast<uint16_t, size_t>(numVerts);
+				sb.numVerts = safe_static_cast<uint16_t>(numVerts);
 
 				simple_.append(sb);
 
@@ -261,14 +272,22 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 
 			sb.faceOffset = 0;
 			sb.numFaces = 0;
-			sb.numVerts = safe_static_cast<uint16_t, size_t>(numVerts);
+			sb.numVerts = safe_static_cast<uint16_t>(numVerts);
 			simple_.append(sb);
 		}
 	}
 	else
 	{
+#if X_DEBUG
+		size_t lastBindCount = 0;
+#endif
+
 		for (const auto& vert : verts)
 		{
+#if X_DEBUG
+			X_ASSERT(lastBindCount <= vert.binds_.size(), "Verts should be sorted by bind counts")(lastBindCount, vert.binds_.size());
+			lastBindCount = vert.binds_.size();
+#endif
 			for (size_t i = 0; i < vert.binds_.size(); i++)
 			{
 				const RawModel::Bind& bind = vert.binds_[i];
