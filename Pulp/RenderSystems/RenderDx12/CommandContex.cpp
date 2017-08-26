@@ -740,8 +740,7 @@ void GraphicsContext::setDynamicCBV(uint32_t rootIndex, size_t bufferSize,
 
 void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
 {
-	X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE), "UNORDERED_ACCESS flag missing")(SRV.getUsageState());
-	X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE), "NON_PIXEL_SHADER_RESOURCE flag missing")(SRV.getUsageState());
+	X_ASSERT(((SRV.getUsageState() & (D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)) != 0), "Missing one of required usage states.")(SRV.getUsageState());
 
 	pCommandList_->SetGraphicsRootShaderResourceView(rootIndex, SRV.getGpuVirtualAddress() + offset);
 }
