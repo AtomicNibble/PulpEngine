@@ -42,9 +42,11 @@ X_NAMESPACE_DECLARE(render,
 X_NAMESPACE_BEGIN(render)
 
 static const bool DEPTH_REVERSE_Z = true;
+// make these small as possible, reducdes pool size.
 static const uint32_t MAX_RENDER_TARGETS = 8;
 static const uint32_t MAX_CONST_BUFFERS_BOUND = 8;
 static const uint32_t MAX_TEXTURES_BOUND = 8;
+static const uint32_t MAX_BUFFERS_BOUND = 8;
 
 typedef uintptr_t Handle;
 typedef Handle VertexBufferHandle;

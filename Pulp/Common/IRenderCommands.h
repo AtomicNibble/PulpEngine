@@ -35,7 +35,7 @@ namespace Commands
 		static const uint32_t MAX_CONST_BUFFERS = render::MAX_CONST_BUFFERS_BOUND;
 		static const uint32_t MAX_TEX_STATES = render::MAX_TEXTURES_BOUND;
 		static const uint32_t MAX_SAMPLER_STATES = render::MAX_TEXTURES_BOUND;
-		static const uint32_t MAX_BUFFER_STATES = 4; // render::MAX_TEXTURES_BOUND; // same
+		static const uint32_t MAX_BUFFER_STATES = render::MAX_BUFFERS_BOUND; 
 
 	public:
 		X_INLINE int8_t getNumTextStates(void) const;
