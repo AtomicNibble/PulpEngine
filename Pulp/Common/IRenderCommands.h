@@ -73,7 +73,7 @@ namespace Commands
 				int8_t numTextStates;
 				int8_t numSamplers;
 				int8_t numCbs;
-				int8_t numBuffers; // stuff like 
+				int8_t numBuffers; // stuff like fluffly mittens.
 			};
 			uint32_t val;
 		};
@@ -194,6 +194,7 @@ namespace Commands
 		size += (sizeof(TextureState) * numTextStates);
 		size += (sizeof(SamplerState) * numSamplers);
 		size += (sizeof(ConstantBufferHandle) * numCbs);
+		size += (sizeof(BufferState) * numBuffers);
 		return size;
 	}
 
@@ -203,6 +204,7 @@ namespace Commands
 		size += (sizeof(TextureState) * numTextStates);
 		size += (sizeof(SamplerState) * numSamplers);
 		size += (sizeof(ConstantBufferHandle) * numCbs);
+		size += (sizeof(BufferState) * numBuffers);
 		return size;
 	}
 
