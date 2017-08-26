@@ -18,6 +18,16 @@ namespace shader
 		return name_;
 	}
 
+	X_INLINE int16_t Texture::getBindPoint(void) const
+	{
+		return bindPoint_;
+	}
+
+	X_INLINE int16_t Texture::getBindCount(void) const
+	{
+		return bindCount_;
+	}
+
 	X_INLINE texture::TextureType::Enum Texture::getType(void) const
 	{
 		return type_;
