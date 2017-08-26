@@ -5,6 +5,7 @@
 #include <CBuffer.h>
 #include <Sampler.h>
 #include <Texture.h>
+#include <Buffer.h>
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
@@ -33,9 +34,10 @@ namespace shader
 
 	X_ALIGNED_SYMBOL(class XHWShader, 64) : public IHWShader
 	{
-		typedef core::Array<XCBuffer> CBufferArr;
-		typedef core::Array<Sampler> SamplerArr;
-		typedef core::Array<Texture> TextureArr;
+		typedef IShaderPermatation::LineraArray<XCBuffer> CBufferArr;
+		typedef IShaderPermatation::LineraArray<Sampler> SamplerArr;
+		typedef IShaderPermatation::LineraArray<Texture> TextureArr;
+		typedef IShaderPermatation::LineraArray<Buffer> BufferArr;
 		typedef core::Array<uint8_t> ByteArr;
 
 		friend class ShaderBin;
@@ -65,6 +67,7 @@ namespace shader
 		X_INLINE int32_t getNumSamplers(void) const;
 		X_INLINE int32_t getNumTextures(void) const;
 		X_INLINE int32_t getNumConstantBuffers(void) const;
+		X_INLINE int32_t getNumBuffers(void) const;
 		X_INLINE int32_t getNumInputParams(void) const;
 		X_INLINE int32_t getNumInstructions(void) const;
 		X_INLINE CompileFlags getCompileFlags(void) const;
@@ -77,6 +80,8 @@ namespace shader
 
 		X_INLINE const CBufferArr& getCBuffers(void) const;
 		X_INLINE CBufferArr& getCBuffers(void);
+		X_INLINE const BufferArr& getBuffers(void) const;
+		X_INLINE BufferArr& getBuffers(void);
 		X_INLINE const SamplerArr& getSamplers(void) const;
 		X_INLINE SamplerArr& getSamplers(void);
 		X_INLINE const TextureArr& getTextures(void) const;
@@ -121,6 +126,7 @@ namespace shader
 		CBufferArr cbuffers_;
 		SamplerArr samplers_;
 		TextureArr textures_;
+		BufferArr buffers_;
 
 		ByteArr bytecode_;
 	};

@@ -59,6 +59,9 @@ namespace shader
 	X_INLINE int32_t XHWShader::getNumConstantBuffers(void) const {
 		return safe_static_cast<int32_t>(cbuffers_.size());
 	}
+	X_INLINE int32_t XHWShader::getNumBuffers(void) const {
+		return safe_static_cast<int32_t>(buffers_.size());
+	}
 	X_INLINE int32_t XHWShader::getNumInputParams(void) const {
 		return numInputParams_;
 	}
@@ -99,6 +102,16 @@ namespace shader
 	X_INLINE XHWShader::CBufferArr& XHWShader::getCBuffers(void)
 	{
 		return cbuffers_;
+	}
+
+	X_INLINE const XHWShader::BufferArr& XHWShader::getBuffers(void) const
+	{
+		return buffers_;
+	}
+
+	X_INLINE XHWShader::BufferArr& XHWShader::getBuffers(void)
+	{
+		return buffers_;
 	}
 
 	X_INLINE const XHWShader::SamplerArr& XHWShader::getSamplers(void) const

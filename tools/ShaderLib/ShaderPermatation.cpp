@@ -44,8 +44,6 @@ namespace shader
 		IlFmt_(InputLayoutFormat::Invalid),
 		cbLinks_(arena)
 	{
-		cbLinks_.setGranularity(2);
-
 		X_ASSERT(stages_.size() == stages_.size(), "Stage aray sizes don't match")();
 
 		for (size_t i=0; i<stages.size(); i++)
@@ -76,6 +74,17 @@ namespace shader
 
 		return true;
 	}
+
+	const ShaderPermatation::BufferArr& ShaderPermatation::getBuffers(void) const
+	{
+		// need to probs work something out for collecting buffers across stages.
+		if (!isStageSet(ShaderType::Vertex)) {
+			X_ASSERT_UNREACHABLE();
+		}
+
+		return getStage(ShaderType::Vertex)->getBuffers();
+	}
+
 
 	const ShaderPermatation::SamplerArr& ShaderPermatation::getSamplers(void) const
 	{

@@ -40,11 +40,11 @@ namespace shader
 		cbuffers_(arena),
 		samplers_(arena),
 		textures_(arena),
+		buffers_(arena),
 		bytecode_(arena),
 		id_(-1)
 	{
 
-		cbuffers_.setGranularity(2);
 	}
 
 	XHWShader::~XHWShader()
@@ -331,8 +331,6 @@ namespace shader
 		X_LOG0("Shader", "OutputParameters: %i", shaderDesc.OutputParameters);
 
 
-		cbuffers_.setGranularity(shaderDesc.ConstantBuffers);
-
 		for (uint32 n = 0; n<shaderDesc.ConstantBuffers; n++)
 		{
 			pCB = pShaderReflection->GetConstantBufferByIndex(n);
@@ -340,7 +338,9 @@ namespace shader
 			D3D12_SHADER_BUFFER_DESC BufferDesc;
 			pCB->GetDesc(&BufferDesc);
 
-			if (BufferDesc.Type == D3D_CT_RESOURCE_BIND_INFO) {
+			if (BufferDesc.Type == D3D_CT_RESOURCE_BIND_INFO) 
+			{
+				// do i care for any info in this?
 				continue;
 			}
 
@@ -507,7 +507,30 @@ namespace shader
 					type
 				);
 			}
-
+			else if (InputBindDesc.Type == D3D_SIT_STRUCTURED)
+			{
+				// structured buffer.
+				buffers_.emplace_back(
+					InputBindDesc.Name,
+					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
+					safe_static_cast<int16_t>(InputBindDesc.BindCount),
+					BufferType::Structured
+				);
+			}
+			else if (InputBindDesc.Type == D3D_SIT_UAV_RWSTRUCTURED)
+			{
+				// rw structured buffer.
+				buffers_.emplace_back(
+					InputBindDesc.Name,
+					safe_static_cast<int16_t>(InputBindDesc.BindPoint),
+					safe_static_cast<int16_t>(InputBindDesc.BindCount),
+					BufferType::RWStructured
+				);
+			}
+			else
+			{
+				X_WARNING("Shader", "Unhandled bound resource: \"%s\" type: %" PRIi32, InputBindDesc.Name, InputBindDesc.Type);
+			}
 		}
 
 		if (type_ == ShaderType::Vertex)

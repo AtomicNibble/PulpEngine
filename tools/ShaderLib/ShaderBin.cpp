@@ -51,7 +51,7 @@ namespace shader
 			uint8_t numTextures;
 			// 
 			uint8_t numCBufs;
-			uint8_t __pad[1];
+			uint8_t numBuffers;
 			uint16_t numInstructions;
 
 			// 4
@@ -107,6 +107,7 @@ namespace shader
 
 		const auto& byteCode = pShader->getShaderByteCode();
 		const auto& cbuffers = pShader->getCBuffers();
+		const auto& buffers = pShader->getBuffers();
 		const auto& samplers = pShader->getSamplers();
 		const auto& textures = pShader->getTextures();
 
@@ -134,6 +135,7 @@ namespace shader
 		hdr.numSamplers = pShader->getNumSamplers();
 		hdr.numTextures = pShader->getNumTextures();
 		hdr.numCBufs = pShader->getNumConstantBuffers();
+		hdr.numBuffers = pShader->getNumBuffers();
 		hdr.numInstructions = pShader->getNumInstructions();
 
 		hdr.permFlags = pShader->getPermFlags();
@@ -181,6 +183,9 @@ namespace shader
 			}
 			for (const auto& t : textures) {
 				t.SSave(file.GetFile());
+			}
+			for (const auto& b : buffers) {
+				b.SSave(file.GetFile());
 			}
 
 			if (file.write(pData->data(), pData->size()) != pData->size()) {
@@ -258,10 +263,12 @@ namespace shader
 				X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")(pShader->status_);
 
 				auto& cbufs = pShader->getCBuffers();
+				auto& bufs = pShader->getBuffers();
 				auto& samplers = pShader->getSamplers();
 				auto& textures = pShader->getTextures();
 
 				cbufs.resize(hdr.numCBufs, cbufs.getArena());
+				bufs.resize(hdr.numBuffers);
 				samplers.resize(hdr.numSamplers);
 				textures.resize(hdr.numTextures);
 
@@ -277,6 +284,10 @@ namespace shader
 				for (auto& t : textures)
 				{
 					t.SLoad(file.GetFile());
+				}
+				for (auto& b : bufs)
+				{
+					b.SLoad(file.GetFile());
 				}
 
 				pShader->bytecode_.resize(hdr.blobLength);

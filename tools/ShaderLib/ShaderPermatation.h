@@ -35,8 +35,9 @@ public:
 
 	X_INLINE InputLayoutFormat::Enum getILFmt(void) const X_FINAL;
 	X_INLINE const CBufLinksArr& getCbufferLinks(void) const X_FINAL;
-	X_INLINE const SamplerArr& getSamplers(void) const X_FINAL;
-	X_INLINE const TexutreArr& getTextures(void) const X_FINAL;
+	SHADERLIB_EXPORT const BufferArr& getBuffers(void) const X_FINAL;
+	SHADERLIB_EXPORT const SamplerArr& getSamplers(void) const X_FINAL;
+	SHADERLIB_EXPORT const TexutreArr& getTextures(void) const X_FINAL;
 	X_INLINE const HWShaderStagesArr& getStages(void) const;
 
 private:

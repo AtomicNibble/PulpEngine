@@ -292,19 +292,26 @@ typedef int32_t ShaderID;
 typedef uintptr_t TechHandle;
 
 class CBufferLink;
+class Buffer;
 class Sampler;
 class Texture;
 
 struct IShaderPermatation
 {
-	typedef core::Array<CBufferLink> CBufLinksArr;
-	typedef core::Array<Sampler> SamplerArr;
-	typedef core::Array<Texture> TexutreArr;
+	template<typename T>
+	using LineraArray = core::Array< T, core::ArrayAllocator<T>, core::growStrat::FixedLinear<4>>;
+
+
+	typedef LineraArray<CBufferLink> CBufLinksArr;
+	typedef LineraArray<Buffer> BufferArr;
+	typedef LineraArray<Sampler> SamplerArr;
+	typedef LineraArray<Texture> TexutreArr;
 
 	virtual ~IShaderPermatation() {}
 
 	virtual InputLayoutFormat::Enum getILFmt(void) const X_ABSTRACT;
 	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
+	virtual const BufferArr& getBuffers(void) const X_ABSTRACT;
 	virtual const SamplerArr& getSamplers(void) const X_ABSTRACT;
 	virtual const TexutreArr& getTextures(void) const X_ABSTRACT;
 };
