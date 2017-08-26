@@ -680,6 +680,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
 	// from the shader perm we can see how many const buffers we need to provide.
 	const auto& cbLinks = pShaderPerm->getCbufferLinks();
+	const auto& buffers = pShaderPerm->getBuffers();
 	const auto& permSamplers = pShaderPerm->getSamplers();
 	const auto& permTextures = pShaderPerm->getTextures();
 
@@ -690,21 +691,26 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	const size_t numTex = permTextures.size();
 	const size_t numSamplers = permSamplers.size();
 	const size_t numCb = cbLinks.size();
+	const size_t numBuffers = buffers.size();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
 		numSamplers, 
 		numCb,
-		0
+		numBuffers
 	);
 
 	// we should create the const buffers we need and set them in the variable state.
 #if X_ENABLE_ASSERTIONS
 	{
 		auto* pCBHandles = pVariableState->getCBs();
+		auto* pBuffers = pVariableState->getBuffers();
 
 		for (size_t i = 0; i < numCb; i++) {
 			pCBHandles[i] = render::INVALID_BUF_HANLDE;
+		}
+		for (size_t i = 0; i < numBuffers; i++) {
+			pBuffers[i].buf = render::INVALID_BUF_HANLDE;
 		}
 	}
 #endif // !X_ENABLE_ASSERTIONS
