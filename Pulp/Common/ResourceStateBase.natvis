@@ -17,6 +17,11 @@
         <Size>numCbs</Size>
         <ValuePointer>(ConstantBufferHandle*)((char*)(this+1) + (sizeof(TextureState) * numTextStates) + sizeof(SamplerState) * numSamplers)</ValuePointer>
       </ArrayItems>
+      <Item Name="[NumBuffers]" ExcludeView="simple">numBuffers</Item>
+      <ArrayItems>
+        <Size>numBuffers</Size>
+        <ValuePointer>(BufferState*)((char*)(this+1) + (sizeof(TextureState) * numTextStates) + (sizeof(SamplerState) * numSamplers) + sizeof(ConstantBufferHandle) * numCbs)</ValuePointer>
+      </ArrayItems>
     </Expand>
   </Type>
 </AutoVisualizer>
