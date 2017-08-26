@@ -1267,6 +1267,9 @@
     <ClInclude Include="IAnimation.h">
       <Filter>Interfaces_h\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1982,6 +1985,9 @@
     </ClCompile>
     <ClCompile Include="Compression\DictBuilder.cpp">
       <Filter>SourceFiles\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
