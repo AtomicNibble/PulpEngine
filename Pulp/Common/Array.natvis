@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?> 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-  <Type Name="Potato::core::Array&lt;*,*&gt;">
+  <Type Name="Potato::core::Array&lt;*,*,*&gt;">
     <Expand>
       <Item Name="[size]" ExcludeView="simple">num_</Item>
       <Item Name="[capacity]" ExcludeView="simple">size_</Item>
