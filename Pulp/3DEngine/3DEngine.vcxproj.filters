@@ -174,9 +174,6 @@
     <ClInclude Include="World\World3D.h">
       <Filter>Header Files\World</Filter>
     </ClInclude>
-    <ClInclude Include="Model\AnimManager.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
     <ClInclude Include="Anim\Anim.h">
       <Filter>Header Files\Anim</Filter>
     </ClInclude>
