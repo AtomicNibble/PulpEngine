@@ -288,6 +288,12 @@ struct CBState
 	shader::ShaderStageFlags visibility;
 };
 
+struct BufferState
+{
+	
+	VertexBufferHandle buf;
+};
+
 typedef core::FixedArray<texture::Texturefmt::Enum, MAX_RENDER_TARGETS> RenderTargetFmtsArr;
 
 

@@ -16,15 +16,15 @@ namespace
 	// thought id try somthing diffrent than making the manager a friend :|
 	struct ResourceStateInit : public render::Commands::ResourceStateBase
 	{
-		static const size_t lastMemberEnd = X_OFFSETOF(ResourceStateBase, _pad) + sizeof(ResourceStateBase::_pad);
+		static const size_t lastMemberEnd = X_OFFSETOF(ResourceStateBase, numBuffers) + sizeof(ResourceStateBase::numBuffers);
 		// make sure that the compiler did not add in padding after last member.
 		static_assert(sizeof(ResourceStateBase) == lastMemberEnd, "Compiler added paddin at end");
 
-		void setSizes(int8_t numTex, int8_t numSamp, int8_t numCBs) {
+		void setSizes(int8_t numTex, int8_t numSamp, int8_t numCBs, int8_t numBuf) {
 			numTextStates = numTex;
 			numSamplers = numSamp;
 			numCbs = numCBs;
-			_pad = 0;
+			numBuffers = numBuf;
 		}
 	};
 
@@ -55,7 +55,7 @@ VariableStateManager::VariableStateManager() :
 {
 	g_3dEngineArena->addChildArena(&statePool_);
 
-	pEmtpyState_ = createVariableState_Interal(0,0,0);
+	pEmtpyState_ = createVariableState_Interal(0,0,0,0);
 
 }
 
@@ -73,18 +73,20 @@ void VariableStateManager::shutDown(void)
 	}
 }
 
-render::Commands::ResourceStateBase* VariableStateManager::createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs)
+render::Commands::ResourceStateBase* VariableStateManager::createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs, size_t numBuf)
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
 
 	// return the same state for empty ones.
 	// reduces allocations.
 	// and increases chance of cache hit for empty ones as same memory.
-	if (numTexStates == 0 && numSamp == 0 && numCBs == 0) {
+	if (numTexStates == 0 && numSamp == 0 && numCBs == 0 && numBuf == 0) {
 		return pEmtpyState_;
 	}
 	
-	return createVariableState_Interal(safe_static_cast<int8_t>(numTexStates), safe_static_cast<int8_t>(numSamp), safe_static_cast<int8_t>(numCBs));
+	return createVariableState_Interal(
+		safe_static_cast<int8_t>(numTexStates), safe_static_cast<int8_t>(numSamp), 
+		safe_static_cast<int8_t>(numCBs), safe_static_cast<int8_t>(numBuf));
 }
 
 void VariableStateManager::releaseVariableState(render::Commands::ResourceStateBase* pVS)
@@ -105,7 +107,8 @@ void VariableStateManager::releaseVariableState(render::Commands::ResourceStateB
 	X_DELETE(pVS, &statePool_);
 }
 
-render::Commands::ResourceStateBase* VariableStateManager::createVariableState_Interal(int8_t numTexStates, int8_t numSamp, int8_t numCBs)
+render::Commands::ResourceStateBase* VariableStateManager::createVariableState_Interal(int8_t numTexStates, int8_t numSamp, 
+	int8_t numCBs, int8_t numBuf)
 {
 	static_assert(core::compileTime::IsPOD<render::Commands::ResourceStateBase>::Value, "ResourceStateBase must be pod");
 
@@ -118,26 +121,28 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState_I
 		stats_.numTexStates += numTexStates;
 		stats_.numSamplers += numSamp;
 		stats_.numCBS += numCBs;
+		stats_.numBuffers += numBuf;
 	}
 #endif // !X_ENABLE_VARIABLE_STATE_STATS
 
 
-	const size_t requiredBytes = allocSize(numTexStates, numSamp, numCBs);
+	const size_t requiredBytes = allocSize(numTexStates, numSamp, numCBs, numBuf);
 	void* pData = statePool_.allocate(requiredBytes, MAX_ALIGN, 0, "State", "ResourceStateBase", X_SOURCE_INFO);
 
 	auto* pState = reinterpret_cast<ResourceStateInit*>(pData);
 
-	pState->setSizes(numTexStates, numSamp, numCBs);
+	pState->setSizes(numTexStates, numSamp, numCBs, numBuf);
 
 	return pState;
 }
 
-X_INLINE constexpr size_t VariableStateManager::allocSize(int8_t numTexStates, int8_t numSamp, int8_t numCBs)
+X_INLINE constexpr size_t VariableStateManager::allocSize(int8_t numTexStates, int8_t numSamp, int8_t numCBs, int8_t numBuf)
 {
 	return sizeof(render::Commands::ResourceStateBase) +
 		(sizeof(render::TextureState) * numTexStates) +
 		(sizeof(render::SamplerState) * numSamp) +
-		(sizeof(render::ConstantBufferHandle) * numCBs);
+		(sizeof(render::ConstantBufferHandle) * numCBs) +
+		(sizeof(render::BufferState) * numBuf) ;
 }
 
 VariableStateManager::Stats VariableStateManager::getStats(void) const

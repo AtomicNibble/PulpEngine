@@ -694,7 +694,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
 		numSamplers, 
-		numCb
+		numCb,
+		0
 	);
 
 	// we should create the const buffers we need and set them in the variable state.

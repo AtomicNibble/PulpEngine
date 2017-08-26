@@ -35,21 +35,25 @@ namespace Commands
 		static const uint32_t MAX_CONST_BUFFERS = render::MAX_CONST_BUFFERS_BOUND;
 		static const uint32_t MAX_TEX_STATES = render::MAX_TEXTURES_BOUND;
 		static const uint32_t MAX_SAMPLER_STATES = render::MAX_TEXTURES_BOUND;
+		static const uint32_t MAX_BUFFER_STATES = 4; // render::MAX_TEXTURES_BOUND; // same
 
 	public:
 		X_INLINE int8_t getNumTextStates(void) const;
 		X_INLINE int8_t getNumSamplers(void) const;
 		X_INLINE int8_t getNumCBs(void) const;
+		X_INLINE int8_t getNumBuffers(void) const;
 
 		X_INLINE bool anySet(void) const;
 
 		X_INLINE TextureState* getTexStates(void);
 		X_INLINE SamplerState* getSamplers(void);
 		X_INLINE ConstantBufferHandle* getCBs(void);
+		X_INLINE BufferState* getBuffers(void);
 
 		X_INLINE const TextureState* getTexStates(void) const;
 		X_INLINE const SamplerState* getSamplers(void) const;
 		X_INLINE const ConstantBufferHandle* getCBs(void) const;
+		X_INLINE const BufferState* getBuffers(void) const;
 
 		X_INLINE int32_t getTotalSize(void) const;
 		X_INLINE int32_t getStateSize(void) const;
@@ -61,6 +65,7 @@ namespace Commands
 		X_INLINE const TextureState* getTexStates(const void* pBase) const;
 		X_INLINE const SamplerState* getSamplers(const void* pBase) const;
 		X_INLINE const ConstantBufferHandle* getCBs(const void* pBase) const;
+		X_INLINE const BufferState* getBuffers(const void* pBase) const;
 
 	protected:
 		union {
@@ -68,7 +73,7 @@ namespace Commands
 				int8_t numTextStates;
 				int8_t numSamplers;
 				int8_t numCbs;
-				int8_t _pad; // to pad or not to pad! 
+				int8_t numBuffers; // stuff like 
 			};
 			uint32_t val;
 		};
@@ -83,7 +88,8 @@ namespace Commands
 		return sizeof(ResourceStateBase) +
 			(sizeof(render::TextureState) * MAX_TEX_STATES) +
 			(sizeof(render::SamplerState) * MAX_SAMPLER_STATES) +
-			(sizeof(render::ConstantBufferHandle) * MAX_CONST_BUFFERS);
+			(sizeof(render::ConstantBufferHandle) * MAX_CONST_BUFFERS) + 
+			(sizeof(render::BufferState) * MAX_BUFFER_STATES);
 	}
 	
 
@@ -100,6 +106,11 @@ namespace Commands
 	X_INLINE int8_t ResourceStateBase::getNumCBs(void) const
 	{
 		return numCbs;
+	}
+
+	X_INLINE int8_t ResourceStateBase::getNumBuffers(void) const
+	{
+		return numBuffers;
 	}
 
 	X_INLINE bool ResourceStateBase::anySet(void) const
@@ -127,6 +138,15 @@ namespace Commands
 		return reinterpret_cast<ConstantBufferHandle*>(pStart);
 	}
 
+	X_INLINE BufferState* ResourceStateBase::getBuffers(void)
+	{
+		uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(SamplerState) * numSamplers);
+		pStart += (sizeof(ConstantBufferHandle) * numCbs);
+		return reinterpret_cast<BufferState*>(pStart);
+	}
+
 	X_INLINE const TextureState* ResourceStateBase::getTexStates(void) const
 	{
 		return reinterpret_cast<const TextureState*>(getDataStart());
@@ -147,6 +167,16 @@ namespace Commands
 		pStart += (sizeof(SamplerState) * numSamplers);
 		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
 	}
+
+	X_INLINE const BufferState* ResourceStateBase::getBuffers(void) const
+	{
+		const uint8_t* pStart = getDataStart();
+		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(SamplerState) * numSamplers);
+		pStart += (sizeof(ConstantBufferHandle) * numCbs);
+		return reinterpret_cast<const BufferState*>(pStart);
+	}
+
 
 	X_INLINE const uint8_t* ResourceStateBase::getDataStart(void) const
 	{
@@ -196,6 +226,14 @@ namespace Commands
 		return reinterpret_cast<const ConstantBufferHandle*>(pStart);
 	}
 
+	X_INLINE const BufferState* ResourceStateBase::getBuffers(const void* pBase) const
+	{
+		const uint8_t* pStart = reinterpret_cast<const uint8_t*>(pBase);
+		pStart += (sizeof(TextureState) * numTextStates);
+		pStart += (sizeof(SamplerState) * numSamplers);
+		pStart += (sizeof(ConstantBufferHandle) * numCbs);
+		return reinterpret_cast<const BufferState*>(pStart);
+	}
 
 	// not sure if i want to pack these down close or have each command start aligned.
 	// I currently support them been 8 bute aligned.

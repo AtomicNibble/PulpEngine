@@ -40,6 +40,7 @@ class VariableStateManager
 		uint32_t numTexStates;
 		uint32_t numSamplers;
 		uint32_t numCBS;
+		uint32_t numBuffers;
 	};
 
 public:
@@ -54,16 +55,16 @@ public:
 
 	void shutDown(void);
 
-	render::Commands::ResourceStateBase* createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs);
+	render::Commands::ResourceStateBase* createVariableState(size_t numTexStates, size_t numSamp, size_t numCBs, size_t numBuf);
 	void releaseVariableState(render::Commands::ResourceStateBase* pVS);
 
 	Stats getStats(void) const;
 
 private:
-	render::Commands::ResourceStateBase* createVariableState_Interal(int8_t numTexStates, int8_t numSamp, int8_t numCBs);
+	render::Commands::ResourceStateBase* createVariableState_Interal(int8_t numTexStates, int8_t numSamp, int8_t numCBs, int8_t numBuf);
 
 private:
-	static constexpr size_t allocSize(int8_t numTexStates, int8_t numSamp, int8_t numCBs);
+	static constexpr size_t allocSize(int8_t numTexStates, int8_t numSamp, int8_t numCBs, int8_t numBuf);
 
 private:
 	// do i want linera allocator which i think would work well or a pool.
