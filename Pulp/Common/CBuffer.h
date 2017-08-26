@@ -22,8 +22,6 @@ namespace shader
 		const XCBuffer* pCBufer;
 	};
 
-	typedef core::Array<CBufferLink> CBufLinksArr;
-
 	class XShaderParam
 	{
 		typedef core::Hash::xxHash64 Hasher;

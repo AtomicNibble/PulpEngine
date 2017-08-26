@@ -22,7 +22,7 @@ namespace shader
 		return IlFmt_;
 	}
 
-	X_INLINE const CBufLinksArr& ShaderPermatation::getCbufferLinks(void) const
+	X_INLINE const ShaderPermatation::CBufLinksArr& ShaderPermatation::getCbufferLinks(void) const
 	{
 		return cbLinks_;
 	}
