@@ -40,22 +40,22 @@ VS_OUTPUT vs_main( VS_INPUT IN )
 {
   VS_OUTPUT OUT;
 
-    float4 pos = float4(IN.osPosition, 1.0);
+  float4 src = float4(IN.osPosition, 1.0f);
 
 #if X_HWSKIN
-    float4 v = { 0.0f, 0.0f, 0.0f, 1.0f };
+    float3 pos = { 0.0f, 0.0f, 0.0f };
 
     for(int i = 0; i < 4; i++)
     {
-      //Multiply position by bone matrix
-      v += IN.weights * mul(pos, BoneMatrices[IN.boneIndexes[i]]);
+      pos +=  (mul(src, BoneMatrices[IN.boneIndexes[i]]).xyz * IN.weights[i]);
     }
 
-    pos += v;
+  float4 worldPosition = mul( float4(pos, 1.0), worldMatrix );
 
+#else
+  float4 worldPosition = mul( src, worldMatrix );
 #endif // !X_HWSKIN
 
-  float4 worldPosition = mul( pos, worldMatrix );
   OUT.ssPosition = mul( worldPosition, worldToScreenMatrix );
   OUT.texCoord = IN.tex;
   OUT.color =  IN.color;
