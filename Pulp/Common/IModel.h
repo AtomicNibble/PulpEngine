@@ -271,6 +271,11 @@ struct bindWeight
 	X_INLINE float getWeight(void) const {
 		return static_cast<float>(compressed_) / 65535.0f;
 	}
+
+	X_INLINE operator uint16_t(void) const {
+		return compressed_;
+	}
+
 private:
 	uint16_t compressed_; // scaled
 };
