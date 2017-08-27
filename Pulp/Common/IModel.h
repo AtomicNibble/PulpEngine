@@ -288,8 +288,8 @@ struct bindBone
 			"Bone id scaled exceeds type limits")(id);
 	}
 
-	X_INLINE uint16_t getIndex(void) const {
-		return compressed_ / 128;
+	X_INLINE uint8_t getIndex(void) const {
+		return safe_static_cast<uint8_t>(compressed_ / 128);
 	}
 
 	// used for sorting
