@@ -996,6 +996,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// Version 8.0 info
 		lod.streamsFlag = streamsFlags;
 
+		// flags
+		if (compiledLod.getBindDataSize() > 0)
+		{
+			lod.flags.Set(MeshFlag::ANIMATED);
+		}
+
 		// work out bounds for all meshes.
 		lod.boundingBox.clear();
 		for (size_t x = 0; x < compiledLod.meshes_.size(); x++)
