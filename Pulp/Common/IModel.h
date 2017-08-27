@@ -214,7 +214,8 @@ X_DECLARE_FLAGS(MeshFlag)(
 	// per lod or per mesh?
 	// can i use 16bit indexes for a lod if all sub mesh have less than 65k verts?
 	// depends how i handle drawing etc.
-	BIG_INDEX
+	BIG_INDEX,
+	ANIMATED // the mesh has binds.
 ); 
 
 X_DECLARE_ENUM(ColGenType)(
