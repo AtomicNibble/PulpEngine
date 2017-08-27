@@ -1566,7 +1566,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			return false;
 		}
 
-		// make sure this stream starts on a 16byt boundry relative to header.
+		// make sure this stream starts on a 16bit boundry relative to header.
 		char pad[16] = {};
 		if (file.write(pad, preMeshDataPadSize) != preMeshDataPadSize) {
 			X_ERROR("Model", "Failed to write mesh stream");
