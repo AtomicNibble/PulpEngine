@@ -11,24 +11,24 @@ X_NAMESPACE_BEGIN(texture)
 namespace TGA
 {
 
-	class IMGLIB_EXPORT XTexLoaderTGA : public ITextureFmt
+	class XTexLoaderTGA : public ITextureFmt
 	{
 	public:
 		static const ImgFileFormat::Enum SRC_FMT = ImgFileFormat::TGA;
 		static const char* EXTENSION;
 
 	public:
-		XTexLoaderTGA();
-		~XTexLoaderTGA();
+		IMGLIB_EXPORT XTexLoaderTGA();
+		IMGLIB_EXPORT ~XTexLoaderTGA();
 
-		static bool isValidData(const DataVec& fileData);
+		IMGLIB_EXPORT static bool isValidData(const DataVec& fileData);
 
 		// ITextureFmt
-		virtual const char* getExtension(void) const X_FINAL;
-		virtual ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
-		virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
-		virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
-		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
+		IMGLIB_EXPORT virtual const char* getExtension(void) const X_FINAL;
+		IMGLIB_EXPORT virtual ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
+		IMGLIB_EXPORT virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
+		IMGLIB_EXPORT virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
+		IMGLIB_EXPORT virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
 
 		// ~ITextureFmt
 
