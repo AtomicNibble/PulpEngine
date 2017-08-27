@@ -928,6 +928,46 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 				goat = 1;
 			}
 
+			if (resourceState.getNumBuffers())
+			{
+				X_ASSERT(newState.bufferRootIdxBase != std::numeric_limits<decltype(newState.bufferRootIdxBase)>::max(), "Buffer rootIdx base is invalid")();
+
+				const BufferState* pBuffers = resourceState.getBuffers(pStateData);
+				const int32_t count = resourceState.getNumBuffers();
+
+			//	D3D12_CPU_DESCRIPTOR_HANDLE bufferSRVS[render::TextureSlot::ENUM_COUNT] = {};
+
+				for (int32_t t = 0; t < count; t++)
+				{
+					auto& bufState = pBuffers[t];
+					X_ASSERT(bufState.buf != INVALID_BUF_HANLDE, "Buffer handle is invalid")(bufState.buf);
+
+					uint32_t rootIdx = newState.bufferRootIdxBase + t;
+	
+					// support inline dynalic buffer descriptions.
+					if (pBuffMan_->ValidHandle(bufState.buf))
+					{
+						auto* pCbuf = pBuffMan_->VBFromHandle(bufState.buf);
+						auto& buf = pCbuf->getBuf();
+
+						context.transitionResource(buf, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+						context.setBufferSRV(rootIdx, buf);
+					} 
+					else
+					{
+						auto* pDynamicDesc = reinterpret_cast<const DynamicBufferDesc*>(bufState.buf);
+						X_ASSERT(pDynamicDesc->magic == DynamicBufferDesc::MAGIC, "Expected dynamic buffer desc")();
+						X_ASSERT(pDynamicDesc->size > 0, "Empty buffer")();
+						X_ASSERT_NOT_NULL(pDynamicDesc->pData);
+
+						context.setDynamicSRV(rootIdx, pDynamicDesc->size, pDynamicDesc->pData);
+					}
+				}
+
+			//	context.setDynamicDescriptors(newState.bufferRootIdxBase, 0, count, bufferSRVS);
+
+			}
+
 			// this may be zero even if we have samplers, if they are all static.
 			if (resourceState.getNumSamplers())
 			{
