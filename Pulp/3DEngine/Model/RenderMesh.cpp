@@ -163,7 +163,7 @@ bool XRenderMesh::createSkinningRenderBuffers(render::IRender* pRend, const Mesh
 
 	for (int32_t meshIdx = 0; meshIdx < mesh.numSubMeshes; meshIdx++)
 	{
-		const auto* pSubMesh = mesh.subMeshHeads[meshIdx];
+		const auto* pSubMesh = mesh.subMeshHeads.operator[](meshIdx);
 		Vertex_SkinData* pMeshSkinData = &skinData[pSubMesh->startVertex];
 
 		if (pSubMesh->numBinds)
