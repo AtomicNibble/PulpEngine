@@ -1399,15 +1399,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
-		size_t requiredStreamSize;
-
-		requiredStreamSize = compiledLods_[i].getMeshDataSize(streamsFlags);
-
 		// this pads the stream so that the end of the stream is 16byte aligned.
 		auto padStream = [&meshDataStream]()
 		{
-			const size_t paddedSize = core::bitUtil::RoundUpToMultiple(meshDataStream.size(), 16_sz);
-			
+			const size_t paddedSize = core::bitUtil::RoundUpToMultiple(meshDataStream.size(), 16_sz);	
 			meshDataStream.zeroPadToLength(paddedSize);
 		};
 
