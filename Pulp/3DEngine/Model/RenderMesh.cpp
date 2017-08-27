@@ -224,7 +224,7 @@ bool XRenderMesh::createSkinningRenderBuffers(render::IRender* pRend, const Mesh
 				pData += cb.dataSize(1);
 			}
 
-			if (cb[3])
+			if (cb[2])
 			{
 				int32_t numTripple = cb[2];
 
