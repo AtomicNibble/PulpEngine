@@ -35,6 +35,14 @@ X_NAMESPACE_BEGIN(render)
 
 
 
+struct DynamicBufferDesc
+{
+	static const uint32_t MAGIC = X_TAG('D', 'B', 'U', 'F');
+
+	uint32_t magic;
+	uint32_t size;
+	const void* pData; // you own this, safe to clear after submitCommandPackets
+};
 
 
 class CmdPacketAllocator 
@@ -69,6 +77,8 @@ public:
 
 	template <typename CommandT>
 	X_INLINE CommandPacket::Packet create(size_t threadIdx, size_t auxMemorySize);
+
+	X_INLINE uint8_t* auxAlloc(size_t size);
 
 	X_INLINE size_t getThreadIdx(void);
 
@@ -130,13 +140,12 @@ public:
 	X_INLINE const Matrix44f& getProjMatrix(void) const;
 	X_INLINE const XViewPort& getViewport(void) const;
 	
-	
+
 	X_INLINE const RenderTargetsArr& getRTVS(void) const;
 	X_INLINE render::IPixelBuffer* getDepthStencil(void) const;
 	X_INLINE DepthBindFlags getDepthBindFlags(void) const;
 	X_INLINE const SortedIdxArr& getSortedIdx(void) const;
 	X_INLINE const PacketArr& getPackets(void) const;
-
 
 protected:
 	Matrix44f view_;
@@ -195,6 +204,8 @@ public:
 
 	template <typename CommandT, typename ParentCmdT>
 	X_INLINE std::tuple<CommandT*, char*> appendCommandGetAux(ParentCmdT* pCommand, size_t auxMemorySize);
+
+	X_INLINE DynamicBufferDesc* createDynamicBufferDesc(void);
 
 public:
 	X_INLINE const KeyArr& getKeys(void);

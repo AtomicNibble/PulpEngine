@@ -73,6 +73,16 @@ X_INLINE CommandPacket::Packet CmdPacketAllocator::create(size_t threadIdx, size
 	return X_NEW_ARRAY(uint8_t, CommandPacket::getPacketSize<CommandT>(auxMemorySize), &allocator.arena_, "CmdPacket");
 }
 
+X_INLINE uint8_t* CmdPacketAllocator::auxAlloc(size_t size)
+{
+	static_assert(core::compileTime::IsPOD<DynamicBufferDesc>::Value, "Command packet type must be POD");
+
+	// we have linera allocators for each thread.
+	ThreadAllocator& allocator = *allocators_[getThreadIdx()];
+
+	return X_NEW_ARRAY(uint8_t, size, &allocator.arena_, "Auxb");
+}
+
 
 X_INLINE size_t CmdPacketAllocator::getThreadIdx(void)
 {
@@ -178,6 +188,19 @@ X_INLINE std::tuple<CommandT*, char*> CommandBucket<KeyT>::appendCommandGetAux(P
 	CommandT* pCommand = appendCommand<CommandT, ParentCmdT>(pParentCommand, auxMemorySize);
 	return std::make_tuple(pCommand, CommandPacket::getAuxiliaryMemory(pCommand));
 }
+
+template <typename KeyT>
+
+
+X_INLINE DynamicBufferDesc* CommandBucket<KeyT>::createDynamicBufferDesc(void)
+{
+	DynamicBufferDesc* pDesc = reinterpret_cast<DynamicBufferDesc*>(packetAlloc_.auxAlloc(sizeof(DynamicBufferDesc)));
+	pDesc->magic = DynamicBufferDesc::MAGIC;
+	pDesc->size = 0;
+	pDesc->pData = nullptr;
+	return pDesc;
+}
+
 
 template <typename KeyT>
 X_INLINE const typename CommandBucket<KeyT>::KeyArr& CommandBucket<KeyT>::getKeys(void)
