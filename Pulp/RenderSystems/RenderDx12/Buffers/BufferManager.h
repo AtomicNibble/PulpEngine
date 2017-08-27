@@ -121,9 +121,10 @@ public:
 	void freeCB(VertexBufferHandle CBHandle);
 
 	// get the buffer from a ID
-	X_INLINE X3DBuffer* IBFromHandle(IndexBufferHandle bufHandle) const;
-	X_INLINE X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle) const;
-	X_INLINE ConstBuffer* CBFromHandle(ConstantBufferHandle bufHandle) const;
+	static X_INLINE X3DBuffer* IBFromHandle(IndexBufferHandle bufHandle);
+	static X_INLINE X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle);
+	static X_INLINE ConstBuffer* CBFromHandle(ConstantBufferHandle bufHandle);
+
 
 	void getBufSize(BufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize) const;
 
@@ -136,8 +137,8 @@ private:
 	ConstBuffer* Int_CreateCB(uint32_t size);
 
 	X_INLINE BufferHandle createHandleForBuffer(X3DBuffer* pBuf);
-	X_INLINE X3DBuffer* bufferForHandle(BufferHandle handle) const;
-	X_INLINE ConstBuffer* constBufferForHandle(BufferHandle handle) const;
+	static X_INLINE X3DBuffer* bufferForHandle(BufferHandle handle);
+	static X_INLINE ConstBuffer* constBufferForHandle(BufferHandle handle);
 
 private:
 	ID3D12Device* pDevice_;

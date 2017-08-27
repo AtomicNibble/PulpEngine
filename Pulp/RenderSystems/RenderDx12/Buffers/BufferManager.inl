@@ -39,12 +39,12 @@ X_INLINE BufferManager::BufferHandle BufferManager::createHandleForBuffer(X3DBuf
 	return reinterpret_cast<BufferManager::BufferHandle>(pBuf);
 }
 
-X_INLINE X3DBuffer* BufferManager::bufferForHandle(BufferHandle handle) const
+X_INLINE X3DBuffer* BufferManager::bufferForHandle(BufferHandle handle)
 {
 	return reinterpret_cast<X3DBuffer*>(handle);
 }
 
-X_INLINE ConstBuffer* BufferManager::constBufferForHandle(BufferHandle handle) const
+X_INLINE ConstBuffer* BufferManager::constBufferForHandle(BufferHandle handle)
 {
 	return reinterpret_cast<ConstBuffer*>(handle);
 }
@@ -53,17 +53,17 @@ X_INLINE ConstBuffer* BufferManager::constBufferForHandle(BufferHandle handle) c
 
 
 
-X_INLINE X3DBuffer* BufferManager::IBFromHandle(IndexBufferHandle bufHandle) const
+X_INLINE X3DBuffer* BufferManager::IBFromHandle(IndexBufferHandle bufHandle)
 {
 	return bufferForHandle(bufHandle);
 }
 
-X_INLINE X3DBuffer* BufferManager::VBFromHandle(VertexBufferHandle bufHandle) const
+X_INLINE X3DBuffer* BufferManager::VBFromHandle(VertexBufferHandle bufHandle)
 {
 	return bufferForHandle(bufHandle);
 }
 
-X_INLINE ConstBuffer* BufferManager::CBFromHandle(ConstantBufferHandle bufHandle) const
+X_INLINE ConstBuffer* BufferManager::CBFromHandle(ConstantBufferHandle bufHandle)
 {
 	return constBufferForHandle(bufHandle);
 }
