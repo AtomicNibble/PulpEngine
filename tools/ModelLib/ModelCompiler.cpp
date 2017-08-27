@@ -641,7 +641,7 @@ size_t ModelCompiler::Lod::getMeshDataSize(const Flags8<model::StreamType>& stre
 		}
 
 		// bind data
-		size += safe_static_cast<size_t, size_t>(mesh.binds_.dataSizeTotal());
+		size += safe_static_cast<size_t>(mesh.binds_.dataSizeTotal());
 	}
 
 	return size;
@@ -653,7 +653,7 @@ size_t ModelCompiler::Lod::getBindDataSize(void) const
 
 	for (auto& mesh : meshes_)
 	{
-		size += safe_static_cast<size_t, size_t>(mesh.binds_.dataSizeTotal());
+		size += safe_static_cast<size_t>(mesh.binds_.dataSizeTotal());
 	}
 
 	return size;
