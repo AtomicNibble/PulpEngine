@@ -11,6 +11,7 @@ namespace entity
 		bools_(arena),
 		ints_(arena),
 		floats_(arena),
+		vecs_(arena),
 		strings_(arena)
 	{
 
@@ -32,6 +33,12 @@ namespace entity
 	bool DataTranslator<T>::AssignFloat(T& out, core::StrHash nameHash, float value) const
 	{
 		return Assign(floats_, out, nameHash, value);
+	}
+
+	template<typename T>
+	bool DataTranslator<T>::AssignVec3(T& out, core::StrHash nameHash, Vec3f value) const
+	{
+		return Assign(vecs_, out, nameHash, value);
 	}
 
 	template<typename T>
@@ -72,6 +79,15 @@ namespace entity
 		X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")(nameHash);
 
 		floats_.emplace_back(nameHash, member);
+		return *this;
+	}
+
+	template<typename T>
+	DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, Vec3Member member)
+	{
+		X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")(nameHash);
+
+		vecs_.emplace_back(nameHash, member);
 		return *this;
 	}
 

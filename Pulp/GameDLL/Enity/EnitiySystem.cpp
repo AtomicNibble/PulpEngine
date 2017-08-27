@@ -377,6 +377,23 @@ namespace entity
 					translator.AssignString(comp, nameHash, val.GetString());
 					break;
 
+				case core::json::Type::kObjectType:
+				{
+					if (!val.HasMember("x") || !val.HasMember("y") || !val.HasMember("z")) {
+						X_ERROR("Ents", "Invalid vec3");
+						return false;
+					}
+
+					Vec3f vec(
+						val["x"].GetFloat(),
+						val["y"].GetFloat(),
+						val["z"].GetFloat()
+					);
+
+					translator.AssignVec3(comp, nameHash, vec);
+				}
+					break;
+
 				default:
 					X_ERROR("Ent", "Unknown component type: %" PRIi32, val.GetType());
 					return false;

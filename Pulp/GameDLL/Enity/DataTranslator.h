@@ -15,6 +15,7 @@ namespace entity
 		typedef bool T::*BoolMember;
 		typedef int T::*IntMember;
 		typedef float T::*FloatMember;
+		typedef Vec3f T::*Vec3Member;
 		typedef core::string T::*StringMember;
 
 		template<typename T>
@@ -22,12 +23,11 @@ namespace entity
 
 		template<typename T>
 		using HashPairArray = MulArray<std::pair<core::StrHash, T>>;
-
-
-
+		
 		typedef HashPairArray<BoolMember> BoolMemberArr;
 		typedef HashPairArray<IntMember> IntMemberArr;
 		typedef HashPairArray<FloatMember> FloatMemberArr;
+		typedef HashPairArray<Vec3Member> Vec3MemberArr;
 		typedef HashPairArray<StringMember> StringMemberArr;
 
 	public:
@@ -39,12 +39,14 @@ namespace entity
 		bool AssignBool(T& out, core::StrHash nameHash, bool value) const;
 		bool AssignInt(T& out, core::StrHash nameHash, int32_t value) const;
 		bool AssignFloat(T& out, core::StrHash nameHash, float value) const;
+		bool AssignVec3(T& out, core::StrHash nameHash, Vec3f value) const;
 		bool AssignString(T& out, core::StrHash nameHash, core::string value) const;
 		bool AssignString(T& out, core::StrHash nameHash, const char* pString) const;
 
 		DataTranslator& Add(core::StrHash nameHash, BoolMember member);
 		DataTranslator& Add(core::StrHash nameHash, IntMember member);
 		DataTranslator& Add(core::StrHash nameHash, FloatMember member);
+		DataTranslator& Add(core::StrHash nameHash, Vec3Member member);
 		DataTranslator& Add(core::StrHash nameHash, StringMember member);
 
 	private:
@@ -58,6 +60,7 @@ namespace entity
 		BoolMemberArr bools_;
 		IntMemberArr ints_;
 		FloatMemberArr floats_;
+		Vec3MemberArr vecs_;
 		StringMemberArr strings_;
 	};
 
