@@ -269,9 +269,7 @@ bool XRenderMesh::createSkinningRenderBuffers(render::IRender* pRend, const Mesh
 					pMeshSkinData->weights[2] = weight3;
 					pMeshSkinData->weights[3] = weight4;
 				}
-
 			}
-
 		}
 
 	}
