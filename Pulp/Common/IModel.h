@@ -435,8 +435,15 @@ struct CompbindInfo
 		return compBinds_;
 	}
 
+	X_INLINE const bool hasData(void) const {
+		return setCheck_[0] != 0 && setCheck_[1] != 0;
+	}
+
 private:
-	BindCountsArr compBinds_;
+	union {
+		BindCountsArr compBinds_;
+		uint64_t setCheck_[2];
+	};
 };
 
 
