@@ -103,7 +103,7 @@ struct InstancedData_MAT44_C4F
 struct Vertex_SkinData
 {
 	Vec4<uint8_t> indexes;
-	Vec4<uint8_t> weights;
+	Vec4<uint16_t> weights;
 };
 
 

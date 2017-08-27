@@ -1829,8 +1829,7 @@ void XRender::initILDescriptions(void)
 	static D3D12_INPUT_ELEMENT_DESC  elem_stream_skin[] =
 	{
 		{ "BLENDINDICES", 0, DXGI_FORMAT_R8G8B8A8_UINT, VertexStream::HWSKIN, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-		// scaled 8bit, might make 8bit dunno.
-		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::HWSKIN, 4, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R16G16B16A16_UNORM, VertexStream::HWSKIN, 4, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
 	};
 
 	// we need to support skinning on top of any camel.
