@@ -3,6 +3,9 @@
 
 X_NAMESPACE_BEGIN(model)
 
+// This takes a index list and generates a new index list that 
+// that tries to optermize GPU cache hits.
+
 template <typename IndexType>
 class FaceOptimize
 {
