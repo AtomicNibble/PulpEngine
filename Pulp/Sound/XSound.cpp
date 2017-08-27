@@ -689,7 +689,7 @@ void XSound::drawDebug(void) const
 	con.col = Col_White;
 	con.flags.Set(font::DrawTextFlag::CENTER);
 	con.flags.Set(font::DrawTextFlag::CENTER_VER);
-	con.pFont = gEnv->pFontSys->GetFont("default");
+	con.pFont = gEnv->pFontSys->GetDefault();
 	con.size = Vec2f(8.f, 8.f);
 
 

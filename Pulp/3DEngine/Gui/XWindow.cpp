@@ -124,7 +124,7 @@ void XWindow::init(void)
 	pOverChild_ = nullptr;
 
 	// default font
-	pFont_ = gEnv->pFontSys->GetFont("default");
+	pFont_ = gEnv->pFontSys->GetDefault();
 	pBackgroundMat_ = nullptr;
 
 	hover_ = false;

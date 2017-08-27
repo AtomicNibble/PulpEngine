@@ -536,7 +536,7 @@ bool XConsole::loadRenderResources(void)
 	X_ASSERT_NOT_NULL(pCore_->GetIRender());
 	X_ASSERT_NOT_NULL(pCore_->Get3DEngine());
 
-	pFont_ = pCore_->GetIFontSys()->GetFont("default");
+	pFont_ = pCore_->GetIFontSys()->GetDefault();
 
 	X_ASSERT_NOT_NULL(pFont_);
 

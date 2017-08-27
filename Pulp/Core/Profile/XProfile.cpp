@@ -202,7 +202,7 @@ namespace profiler
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pFontSys);
 
-		pFont_ = gEnv->pFontSys->GetFont("default");
+		pFont_ = gEnv->pFontSys->GetDefault();
 		if (!pFont_) {
 			return false;
 		}
