@@ -29,6 +29,8 @@ public:
 	bool canRender(void) const;
 
 	bool createRenderBuffers(render::IRender* pRend, const MeshHeader& mesh, VertexFormat::Enum vertexFmt);
+	bool createSkinningRenderBuffers(render::IRender* pRend, const MeshHeader& mesh);
+
 	void releaseRenderBuffers(render::IRender* pRend);
 
 	// creates the device buffer for a given stream if don't already exsist

@@ -145,6 +145,140 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend, const MeshHeader& 
 	return canRender();
 }
 
+bool XRenderMesh::createSkinningRenderBuffers(render::IRender* pRend, const MeshHeader& mesh)
+{
+	if (!mesh.flags.IsSet(MeshFlag::ANIMATED)) {
+		X_WARNING("RenderMesh", "Can't create skinning buffers for none animated mesh");
+		return false;
+	}
+
+	if (vertexStreams_[VertexStream::HWSKIN] != render::INVALID_BUF_HANLDE) {
+		X_WARNING("RenderMesh", "Skinning stream is already valid");
+		return false;
+	}
+
+	core::Array<Vertex_SkinData, core::ArrayAlignedAllocatorFixed<Vertex_SkinData, 16>> skinData(g_3dEngineArena);
+	skinData.resize(mesh.numVerts);
+
+
+	for (int32_t meshIdx = 0; meshIdx < mesh.numSubMeshes; meshIdx++)
+	{
+		const auto* pSubMesh = mesh.subMeshHeads[meshIdx];
+		Vertex_SkinData* pMeshSkinData = &skinData[pSubMesh->startVertex];
+
+		if (pSubMesh->numBinds)
+		{
+			const simpleBind* pSimpleBind = pSubMesh->streams[VertexStream::HWSKIN].as<simpleBind>();
+
+			for (int32_t i = 0; i < pSubMesh->numBinds; i++)
+			{
+				auto& sb = pSimpleBind[i];
+
+				Vertex_SkinData data;
+				data.indexes[0] = safe_static_cast<uint8_t>(sb.jointIdx);
+				data.weights[0] = std::numeric_limits<uint16_t>::max();
+
+				for (int32_t v = 0; v < sb.numVerts; v++)
+				{
+					pMeshSkinData[sb.startVert + v] = data;
+				}
+			}
+		}
+		else if(pSubMesh->CompBinds.hasData())
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+			
+			const auto& cb = pSubMesh->CompBinds;
+
+			const uint8_t* pData = pSubMesh->streams[VertexStream::HWSKIN].as<uint8_t>();
+
+			if (cb[0])
+			{
+				int32_t numSingle = cb[0];
+
+				const bindBone* pSingle = reinterpret_cast<const bindBone*>(pData);
+				for (int32_t i = 0; i < numSingle; i++)
+				{
+					pMeshSkinData[i].indexes[0] = pSingle[i].getIndex();
+					pMeshSkinData[i].weights[0] = std::numeric_limits<uint16_t>::max();
+				}
+
+				pData += cb.dataSize(0);
+			}
+
+			if (cb[1])
+			{
+				int32_t numDouble = cb[1];
+
+				const doubleBind* pDouble = reinterpret_cast<const doubleBind*>(pData);
+				for (int32_t i = 0; i < numDouble; i++, ++pMeshSkinData, ++pDouble)
+				{
+					uint16_t weight2 = pDouble->weight2;
+
+					pMeshSkinData->indexes[0] = pDouble->bone1.getIndex();
+					pMeshSkinData->indexes[1] = pDouble->bone2.getIndex();
+					pMeshSkinData->weights[0] = std::numeric_limits<uint16_t>::max() - weight2;
+					pMeshSkinData->weights[1] = weight2;
+				}
+
+				pData += cb.dataSize(1);
+			}
+
+			if (cb[3])
+			{
+				int32_t numTripple = cb[2];
+
+				const trippleBind* pTripple = reinterpret_cast<const trippleBind*>(pData);
+				for (int32_t i = 0; i < numTripple; i++, ++pMeshSkinData, ++pTripple)
+				{
+					uint16_t weight2 = pTripple->weight2;
+					uint16_t weight3 = pTripple->weight3;
+
+					pMeshSkinData->indexes[0] = pTripple->bone1.getIndex();
+					pMeshSkinData->indexes[1] = pTripple->bone2.getIndex();
+					pMeshSkinData->indexes[2] = pTripple->bone3.getIndex();
+
+					pMeshSkinData->weights[0] = std::numeric_limits<uint16_t>::max() - (weight2 + weight3);
+					pMeshSkinData->weights[1] = weight2;
+					pMeshSkinData->weights[2] = weight3;
+				}
+
+				pData += cb.dataSize(2);
+			}
+
+			if (cb[3])
+			{
+				int32_t numQuad = cb[3];
+
+				const quadBind* pQuad = reinterpret_cast<const quadBind*>(pData);
+				for (int32_t i = 0; i < numQuad; i++, ++pMeshSkinData, ++pQuad)
+				{
+					uint16_t weight2 = pQuad->weight2;
+					uint16_t weight3 = pQuad->weight3;
+					uint16_t weight4 = pQuad->weight4;
+
+					pMeshSkinData->indexes[0] = pQuad->bone1.getIndex();
+					pMeshSkinData->indexes[1] = pQuad->bone2.getIndex();
+					pMeshSkinData->indexes[2] = pQuad->bone3.getIndex();
+					pMeshSkinData->indexes[3] = pQuad->bone4.getIndex();
+
+					pMeshSkinData->weights[0] = std::numeric_limits<uint16_t>::max() - (weight2 + weight3 + weight4);
+					pMeshSkinData->weights[1] = weight2;
+					pMeshSkinData->weights[2] = weight3;
+					pMeshSkinData->weights[3] = weight4;
+				}
+
+			}
+
+		}
+
+	}
+
+	vertexStreams_[VertexStream::HWSKIN] = pRend->createVertexBuffer(sizeof(Vertex_SkinData), mesh.numVerts, skinData.data(), render::BufUsage::IMMUTABLE);
+
+	return true;
+}
+
 void XRenderMesh::releaseRenderBuffers(render::IRender* pRend)
 {
 	X_ASSERT_NOT_NULL(pRend);
