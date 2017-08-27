@@ -518,8 +518,10 @@ struct SubMeshHeader
 
 
 	// 16
-	core::Pointer64<engine::Material> pMat;
-	core::Pointer64<const char> materialName;
+	union {
+		core::Pointer64<engine::Material> pMat;
+		core::Pointer64<const char> materialName;
+	};
 
 	/* cold fields down here, shizz that's not 
 		accessed much. */
@@ -580,11 +582,12 @@ struct MeshHeader
 	// 16
 	core::Pointer64<void>       streams[VertexStream::ENUM_COUNT - VERT_RUNTIME_STREAM_COUNT];
 
+	uint32_t __pad[2];
+
 	// 24
 	AABB boundingBox;	
 	Sphere boundingSphere;
 
-	uint32_t __pad[4];
 
 //	X_NO_COPY(MeshHeader);
 //	X_NO_ASSIGN(MeshHeader);
