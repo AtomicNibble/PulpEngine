@@ -368,8 +368,6 @@ bool FaceOptimize<IndexType>::ComputeVertexScores(void)
 template <typename IndexType>
 float32_t FaceOptimize<IndexType>::FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize)
 {
-	//assert(s_vertexScoresComputed);
-
 	if (numActiveFaces == 0)
 	{
 		// No tri needs this vertex!
@@ -432,7 +430,7 @@ float32_t FaceOptimize<IndexType>::ComputeVertexCacheScore(int cachePosition, ui
 			// Points for being high in the cache.
 			const float32_t scaler = 1.0f / (vertexCacheSize - 3);
 			score = 1.0f - (cachePosition - 3) * scaler;
-			score = powf(score, FindVertexScore_CacheDecayPower);
+			score = math<float>::pow(score, FindVertexScore_CacheDecayPower);
 		}
 	}
 
@@ -446,8 +444,7 @@ float32_t FaceOptimize<IndexType>::ComputeVertexValenceScore(uint32_t numActiveF
 
 	// Bonus points for having a low number of tris still to
 	// use the vert, so we get rid of lone verts quickly.
-	float32_t valenceBoost = powf(static_cast<float32_t>(numActiveFaces),
-		-FindVertexScore_ValenceBoostPower);
+	float32_t valenceBoost = math<float>::pow(static_cast<float32_t>(numActiveFaces), -FindVertexScore_ValenceBoostPower);
 	score += FindVertexScore_ValenceBoostScale * valenceBoost;
 
 	return score;
