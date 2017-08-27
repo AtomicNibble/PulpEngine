@@ -60,6 +60,13 @@ struct MeshCollider
 
 };
 
+
+struct EntName
+{
+	core::string name;
+};
+
+
 // -----------------------------------
 
 
@@ -90,10 +97,10 @@ struct RenderComponent
 };
 
 
-struct ScriptName
-{
-	const char* pName;
-};
+// struct ScriptName
+// {
+// 	const char* pName;
+// };
 
 struct RenderView
 {
@@ -157,7 +164,7 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 	PhysicsComponent,
 	PhysicsTrigger,
 	CharacterController,
-	ScriptName,
+	EntName,
 	Player
 >;
 

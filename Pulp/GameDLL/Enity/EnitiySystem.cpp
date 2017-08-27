@@ -310,9 +310,8 @@ namespace entity
 	{
 		for (auto it = arr.begin(); it != arr.end(); ++it)
 		{
-			auto ent = reg_.create<TransForm, ScriptName, SoundObject>();
+			auto ent = reg_.create<TransForm, SoundObject>();
 			auto& trans = reg_.get<TransForm>(ent);
-		//	auto& name = reg_.get<ScriptName>(ent);
 			auto& snd = reg_.get<SoundObject>(ent);
 
 			auto& kvps = *it;
@@ -417,6 +416,14 @@ namespace entity
 
 			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
 			{
+				case "Name"_fnv1a:
+				{
+					auto& hp = reg_.assign<Health>(ent);
+					if (!parseComponent(dtHealth, hp, value)) {
+						return false;
+					}
+					break;
+				}
 				case "Health"_fnv1a:
 				{
 					auto& hp = reg_.assign<Health>(ent);
@@ -428,7 +435,20 @@ namespace entity
 				case "SoundObject"_fnv1a:
 				{
 					auto& snd = reg_.assign<SoundObject>(ent);
-					snd.handle = gEnv->pSound->registerObject(trans X_SOUND_DEBUG_NAME_PARAM("MyLittePony"));
+
+#if X_SOUND_ENABLE_DEBUG_NAMES
+					if (reg_.has<EntName>(ent))
+					{
+						auto& entName = reg_.get<EntName>(ent);
+
+						snd.handle = gEnv->pSound->registerObject(trans, entName.name.c_str());
+					}
+					else
+#endif // !X_SOUND_ENABLE_DEBUG_NAMES
+					{
+						snd.handle = gEnv->pSound->registerObject(trans);
+					}
+
 					break;
 				}
 
@@ -509,6 +529,18 @@ namespace entity
 					angles.setRoll(value["r"].GetFloat());
 
 					trans.quat = angles.toQuat();
+				}
+				break;
+
+				case "name"_fnv1a:
+				{
+					auto& entName = reg_.assign<EntName>(ent);
+					if (value.GetType() != core::json::Type::kStringType) {
+						X_ERROR("Ents", "Invalid name");
+						return false;
+					}
+
+					entName.name = core::string(value.GetString(), value.GetStringLength());
 				}
 				break;
 
