@@ -238,8 +238,7 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 		// setup first vert.
 		simpleBind sb;
 		sb.jointIdx = safe_static_cast<uint16_t>(curBoneIdx);
-		sb.faceOffset = 0;
-		sb.numFaces = 0;
+		sb.startVert = 0;
 		sb.numVerts = 0;
 
 		size_t i, lastVertIdx = 0;
@@ -251,14 +250,21 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 			if (bind.boneIdx_ != curBoneIdx)
 			{
 				size_t numVerts = i - lastVertIdx;
-				sb.faceOffset = 0;
-				sb.numFaces = 0;
+				lastVertIdx = i;
+
+				// why do we want face and not vert offset, what benift.
+				// the face offset is used to look into indxes and then we get first vert index for that face.
+				// then all verts above that have the bind, what's the point in the redirection?
+				// other than to force per face simple binds?
+
 				sb.numVerts = safe_static_cast<uint16_t>(numVerts);
 
 				simple_.append(sb);
 
-				lastVertIdx = i;
 				sb.jointIdx = bind.boneIdx_;
+				sb.startVert = safe_static_cast<uint16_t>(i);
+				sb.numVerts = 0; // not needed more of sanity check.
+
 				curBoneIdx = bind.boneIdx_;
 			}
 		}
@@ -268,8 +274,6 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 		{
 			size_t numVerts = i - lastVertIdx;
 
-			sb.faceOffset = 0;
-			sb.numFaces = 0;
 			sb.numVerts = safe_static_cast<uint16_t>(numVerts);
 			simple_.append(sb);
 		}

@@ -304,8 +304,10 @@ struct simpleBind
 {
 	uint16_t jointIdx; // 16bit for padding.
 	uint16_t numVerts;
-	uint16_t numFaces;
-	uint16_t faceOffset;
+	uint16_t startVert;
+	uint16_t _pad;
+	// uint16_t numFaces;
+	// uint16_t faceOffset;
 };
 
 // each vertex supports between 1-8 binds.
