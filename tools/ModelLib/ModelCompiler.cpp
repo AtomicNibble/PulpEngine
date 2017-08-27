@@ -191,7 +191,7 @@ bool ModelCompiler::Binds::write(core::FixedByteStreamBase& stream)
 	}
 	else if(stream_.size() > 0)
 	{
-		stream.write(stream_);
+		stream.write(stream_.data(), stream_.size());
 	}
 
 	// no binds.
