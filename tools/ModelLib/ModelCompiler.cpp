@@ -1797,6 +1797,7 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	// this won't affect sorted verts it only changes index list.
 	if (!OptermizeFaces()) {
 		X_ERROR("Model", "Failed to optermize faces");
 		return false;
