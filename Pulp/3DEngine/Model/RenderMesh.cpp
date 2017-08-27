@@ -197,10 +197,10 @@ bool XRenderMesh::createSkinningRenderBuffers(render::IRender* pRend, const Mesh
 				int32_t numSingle = cb[0];
 
 				const bindBone* pSingle = reinterpret_cast<const bindBone*>(pData);
-				for (int32_t i = 0; i < numSingle; i++)
+				for (int32_t i = 0; i < numSingle; i++, ++pMeshSkinData, ++pSingle)
 				{
-					pMeshSkinData[i].indexes[0] = pSingle[i].getIndex();
-					pMeshSkinData[i].weights[0] = std::numeric_limits<uint16_t>::max();
+					pMeshSkinData->indexes[0] = pSingle->getIndex();
+					pMeshSkinData->weights[0] = std::numeric_limits<uint16_t>::max();
 				}
 
 				pData += cb.dataSize(0);
