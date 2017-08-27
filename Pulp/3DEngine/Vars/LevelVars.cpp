@@ -67,14 +67,22 @@ void LevelVars::registerVars(void)
 	ADD_CVAR_REF("r_cullEnts", cullEnts_, 0, 0, 2,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Perform visibility culling on entities");
 
+	ADD_CVAR_REF("r_boneNameSize", boneNameSize_, 1.f, 0.01f, 64.f,
+		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+		"Bone name text size");
+
 	// Colors
 	ADD_CVAR_REF_COL("r_boneCol", boneCol_, Colorf(0.3f, 0.7f, 0.7f),
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Bone color.");
+		"Bone color");
 
 	ADD_CVAR_REF_COL("r_boneNameCol", boneNameCol_, Col_Whitesmoke,
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-		"Bone name color.");
+		"Bone name color");
+
+	ADD_CVAR_REF_VEC3("r_boneNameOffset", boneNameOffset_, Vec3f(0.f,0.f,1.f),
+		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+		"Bone name offset");
 }
 
 

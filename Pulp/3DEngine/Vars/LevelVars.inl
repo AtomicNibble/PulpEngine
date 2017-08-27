@@ -65,6 +65,12 @@ X_INLINE int32_t LevelVars::detachCam(void) const
 	return detachCam_;
 }
 
+X_INLINE float LevelVars::boneNameSize(void) const
+{
+	return boneNameSize_;
+}
+
+
 
 X_INLINE int32_t LevelVars::cullEnts(void) const
 {
@@ -79,6 +85,11 @@ X_INLINE Colorf LevelVars::boneColor(void) const
 X_INLINE Colorf LevelVars::boneNameColor(void) const
 {
 	return boneNameCol_;
+}
+
+X_INLINE Vec3f LevelVars::boneNameOffset(void) const
+{
+	return boneNameOffset_;
 }
 
 

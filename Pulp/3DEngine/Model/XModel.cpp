@@ -89,7 +89,8 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 	}
 }
 
-void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view, const Color8u col) const
+void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view, 
+	Vec3f offset, float textSize, const Color8u col) const
 {
 	const int32_t num = numBones();
 	if (!num) {
@@ -102,9 +103,7 @@ void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix
 	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
 	ctx.pFont = gEnv->pFontSys->GetDefault();
 	ctx.effectId = 0;
-	ctx.size = Vec2f(2.f, 2.f);
-
-	Vec3f offset = Vec3f(0.f, 0.f, 3.f);
+	ctx.size = Vec2f(textSize, textSize);
 
 	for (int32_t i = 0; i < num; i++)
 	{

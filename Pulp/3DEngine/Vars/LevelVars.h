@@ -29,8 +29,10 @@ public:
 	X_INLINE int32_t detachCam(void) const;
 	X_INLINE int32_t cullEnts(void) const;
 
+	X_INLINE float boneNameSize(void) const;
 	X_INLINE Colorf boneColor(void) const;
 	X_INLINE Colorf boneNameColor(void) const;
+	X_INLINE Vec3f boneNameOffset(void) const;
 
 
 private:
@@ -47,8 +49,10 @@ private:
 	int32_t detachCam_;
 	int32_t cullEnts_;
 
+	float boneNameSize_;
 	Colorf boneCol_;
 	Colorf boneNameCol_;
+	Vec3f boneNameOffset_;
 };
 
 

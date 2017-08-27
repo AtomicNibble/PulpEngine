@@ -1653,7 +1653,7 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 				view.rotate(Vec3f::yAxis(), ::toRadians(180.f));
 				view.rotate(Vec3f::zAxis(), ::toRadians(180.f));
 
-				pModel->RenderBoneNames(pPrimContex_, world, view, vars_.boneNameColor());
+				pModel->RenderBoneNames(pPrimContex_, world, view, vars_.boneNameOffset(), vars_.boneNameSize(), vars_.boneNameColor());
 			}
 		}
 		if (vars_.drawModelBounds())
