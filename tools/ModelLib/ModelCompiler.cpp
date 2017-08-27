@@ -901,7 +901,8 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	}
 
 	// any binds?
-	if (calculateBindDataSize() > 0) {
+	const size_t bindDataSize = calculateBindDataSize();
+	if (bindDataSize > 0) {
 		header.flags.Set(model::ModelFlags::ANIMATED);
 	}
 
