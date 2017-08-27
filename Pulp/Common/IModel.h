@@ -408,17 +408,14 @@ struct CompbindInfo
 	}
 
 	X_INLINE uint16_t& operator[](size_t idx) {
-		X_ASSERT(idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		return compBinds_[idx];
 	}
 
 	X_INLINE const uint16_t operator[](size_t idx) const {
-		X_ASSERT(idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		return compBinds_[idx];
 	}
 
 	X_INLINE const size_t dataSize(size_t idx) const {
-		X_ASSERT(idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		// size is (idx * (bindBone + bindWeight)) + bindBone
 		return compBinds_[idx] * ((idx * (sizeof(bindBone) + sizeof(bindWeight))) + sizeof(bindBone));
 	}
