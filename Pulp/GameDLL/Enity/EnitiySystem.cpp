@@ -416,6 +416,8 @@ namespace entity
 		DataTranslator<Mesh> dtMesh(arena_);
 		ADD_TRANS_MEMBER(dtMesh, name);
 
+		DataTranslator<SoundObject> dtSoundObj(arena_);
+		ADD_TRANS_MEMBER(dtSoundObj, offset);
 
 		if (entDesc.GetType() != core::json::Type::kObjectType) {
 			X_ERROR("Ents", "Ent description must be a object");
@@ -452,6 +454,9 @@ namespace entity
 				case "SoundObject"_fnv1a:
 				{
 					auto& snd = reg_.assign<SoundObject>(ent);
+					if (!parseComponent(dtSoundObj, snd, value)) {
+						return false;
+					}
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
 					if (reg_.has<EntName>(ent))
