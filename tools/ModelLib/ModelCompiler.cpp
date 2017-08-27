@@ -226,6 +226,13 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 		bindCounts[i] = counts[i + 1];
 	}
 
+	/*
+		counts[0] == 0 bind
+
+		bindCounts[0] == 1 bind
+		bindCounts[1] == 2 bind
+	*/
+
 	// simple binds?
 	if (bindCounts[0] == verts.size())
 	{
