@@ -1288,33 +1288,33 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		HitBoxHdr hitBoxHdr;
 		core::zero_object(hitBoxHdr);
 
-		core::FixedArray<const HitBoxShape*, MODEL_MAX_BONES> hitShapes;
+		core::FixedArray<const HitBoxShape*, MODEL_MAX_BONES> sortedHitShapes;
 		core::FixedArray<uint8_t, MODEL_MAX_BONES> boneIdxMap;
 
 		for (const auto& shape : hitboxShapes_)
 		{
 			++hitBoxHdr.shapeCounts[shape.getType()];
-			hitShapes.push_back(&shape);
+			sortedHitShapes.push_back(&shape);
 		}
 
 		// sort them by type.
-		std::sort(hitShapes.begin(), hitShapes.end(), [](const HitBoxShape* p1, const HitBoxShape* p2) {
+		std::sort(sortedHitShapes.begin(), sortedHitShapes.end(), [](const HitBoxShape* p1, const HitBoxShape* p2) {
 			return p1->getType() < p2->getType();
 		});
 
 		// create the sorted boneIdx's array.
-		for (const auto* pShape : hitShapes)
+		for (const auto* pShape : sortedHitShapes)
 		{
 			boneIdxMap.push_back(pShape->getBoneIdx());
 		}
 
-		X_ASSERT(hitShapes.size() == boneIdxMap.size(), "Sizes should match")(hitShapes.size(), boneIdxMap.size());
+		X_ASSERT(sortedHitShapes.size() == boneIdxMap.size(), "Sizes should match")(sortedHitShapes.size(), boneIdxMap.size());
 
 		hitboxDataStream.write(hitBoxHdr);
 		hitboxDataStream.write(boneIdxMap.data(), boneIdxMap.size());
 
 		// now dump the shapes.
-		for (const auto* pShape : hitShapes)
+		for (const auto* pShape : sortedHitShapes)
 		{
 			static_assert(HitBoxType::ENUM_COUNT == 2, "Added additional hitbox types? this code needs updating");
 
