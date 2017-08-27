@@ -411,12 +411,6 @@ void ModelCompiler::Mesh::calBoundingSphere(bool accurate)
 
 // ---------------------------------------------------------------
 
-//ModelCompiler::ColMesh::ColMesh(core::MemoryArenaBase* arena) :
-//	Mesh(arena),
-//	type_(ColMeshType::CONVEX)
-//{
-//
-//}
 
 ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 	Mesh(oth),
