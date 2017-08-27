@@ -278,19 +278,23 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 		}
 
 		// BindData
-		for (x = 0; x < lod.numSubMeshes; x++)
+		if (hdr.flags.IsSet(ModelFlag::ANIMATED))
 		{
-			SubMeshHeader& mesh = meshHeads[x];
+			lod.streams[VertexStream::HWSKIN] = cursor.getPtr<void>();
 
-			size_t sizeSimple = mesh.numBinds * sizeof(simpleBind);
-			size_t sizeComplex = mesh.CompBinds.dataSizeTotal();
-
-			if (sizeSimple || sizeComplex)
+			for (x = 0; x < lod.numSubMeshes; x++)
 			{
-				lod.streams[VertexStream::HWSKIN] = cursor.getPtr<void>();
+				SubMeshHeader& mesh = meshHeads[x];
 
-				cursor.seekBytes(sizeSimple);
-				cursor.seekBytes(sizeComplex);
+				size_t sizeSimple = mesh.numBinds * sizeof(simpleBind);
+				size_t sizeComplex = mesh.CompBinds.dataSizeTotal();
+
+				if (sizeSimple || sizeComplex)
+				{
+					mesh.streams[VertexStream::HWSKIN] = cursor.getPtr<void>();
+
+					cursor.seekBytes(sizeSimple + sizeComplex);
+				}
 			}
 		}
 
