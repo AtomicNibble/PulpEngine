@@ -33,6 +33,7 @@ struct Health
 
 struct SoundObject
 {
+	Vec3f offset; // offset of sound object relative to ent's transform.
 	sound::SndObjectHandle handle;
 };
 

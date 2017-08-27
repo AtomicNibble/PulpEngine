@@ -28,7 +28,9 @@ namespace entity
 		for (auto entity : view)
 		{
 			auto& snd = reg.get<SoundObject>(entity);
-			auto& trans = reg.get<TransForm>(entity);
+			auto trans = reg.get<TransForm>(entity);
+
+			trans.pos + snd.offset;
 
 			pSound_->setPosition(snd.handle, trans);
 		}
