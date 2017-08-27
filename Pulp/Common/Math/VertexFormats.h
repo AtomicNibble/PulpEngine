@@ -100,6 +100,11 @@ struct InstancedData_MAT44_C4F
 	Color8u color;
 };
 
+struct Vertex_SkinData
+{
+	Vec4<uint8_t> indexes;
+	Vec4<uint8_t> weights;
+};
 
 
 typedef Vertex_P3F_T2F_C4B XAuxVertex;
