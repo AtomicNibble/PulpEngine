@@ -186,9 +186,11 @@ bool XRenderMesh::createSkinningRenderBuffers(render::IRender* pRend, const Mesh
 		}
 		else if(pSubMesh->CompBinds.hasData())
 		{
-			X_ASSERT_NOT_IMPLEMENTED();
-			
 			const auto& cb = pSubMesh->CompBinds;
+
+			if (cb[4] || cb[5] || cb[6] || cb[7]) {
+				X_ASSERT_NOT_IMPLEMENTED();
+			}
 
 			const uint8_t* pData = pSubMesh->streams[VertexStream::HWSKIN].as<uint8_t>();
 
