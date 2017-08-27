@@ -1262,10 +1262,12 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	// this is a list of cbuffers used by all stages and also defining what stages they need to be visible.
 	const auto& cbufLinks = perm.getCbufferLinks();
+	const auto& buffers = perm.getBuffers();
 
 	size_t numParams = 0;
 
 	numParams += cbufLinks.size(); // one for each cbuffer.
+	numParams += buffers.size(); // one for each buffer.
 
 	if (perm.isStageSet(shader::ShaderType::Pixel))
 	{
@@ -1296,6 +1298,19 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 			auto bindPoint = cb.getBindPoint();
 
 			rootSig.getParamRef(currentParamIdx++).initAsCBV(bindPoint, vis);
+		}
+	}
+	if (buffers.isNotEmpty())
+	{
+		pState->bufferRootIdxBase = currentParamIdx;
+
+		for (size_t i = 0; i < buffers.size(); i++)
+		{
+			const auto& buffer = buffers[i];
+			auto bindPoint = buffer.getBindPoint();
+
+			rootSig.getParamRef(currentParamIdx++).initAsSRV(bindPoint, D3D12_SHADER_VISIBILITY_VERTEX);
+		//	rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 		}
 	}
 
