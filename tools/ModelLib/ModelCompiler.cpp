@@ -2777,10 +2777,13 @@ void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, uint32_t count)
 
 void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 {
-	typedef core::Array<RawModel::Index> IndexArray;
+	typedef core::Array<int32_t> IdxArray;
 
 	// requires thread safe allocator.
-	IndexArray indexs(arena_);
+	IdxArray srcToDstIdx(arena_);
+	IdxArray dstToSrcIdx(arena_);
+
+	Mesh::VertsArr tmpVerts(arena_);
 
 	for (uint32_t i = 0; i < count; i++)
 	{
@@ -2788,36 +2791,58 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 		auto& verts = mesh.verts_;
 		auto& faces = mesh.faces_;
 
-		indexs.clear();
-		indexs.resize(verts.size());
-		std::iota(indexs.begin(), indexs.end(), 0);
+		// maps source vert index to dest vert index.
+		srcToDstIdx.resize(verts.size());
+		// maps dest vert index to source vert index.
+		dstToSrcIdx.resize(verts.size());
 
-		// sort the index's based on binds of verts.
-		std::sort(indexs.begin(), indexs.end(),
-			[&](const IndexArray::Type& idx1, const  IndexArray::Type& idx2) {
+		std::iota(srcToDstIdx.begin(), srcToDstIdx.end(), 0);
+		std::sort(srcToDstIdx.begin(), srcToDstIdx.end(),
+			[&](const IdxArray::Type& idx1, const  IdxArray::Type& idx2) {
 				const auto& vert1 = verts[idx1];
 				const auto& vert2 = verts[idx2];
 				return vert1.binds_.size() < vert2.binds_.size();
 			}
 		);
 
-		// now sort the verts.
-		std::sort(verts.begin(), verts.end(),
-			[](const Vert& a, const Vert& b) {
-				return a.binds_.size() < b.binds_.size();
-			}
-		);
+		tmpVerts.resize(verts.size());
+
+		// build the reverse mapping
+		for (int32_t idx = 0; idx < safe_static_cast<int32_t>(srcToDstIdx.size()); idx++)
+		{
+			IdxArray::Type targetIdx = srcToDstIdx[idx];
+			dstToSrcIdx[targetIdx] = idx;
+		}
+
+		// created sorted verts and swap.
+		for (size_t dstIdx = 0; dstIdx < dstToSrcIdx.size(); dstIdx++)
+		{
+			IdxArray::Type srcIdx = dstToSrcIdx[dstIdx];
+			tmpVerts[srcIdx] = verts[dstIdx];
+		}
+
+		tmpVerts.swap(verts);
 
 		// update all the face index's
 		for (auto& f : faces)
 		{
 			for (int32_t x = 0; x < 3; x++)// un-roll for me baby.
 			{
-				const IndexArray::Type origIdx = f[x];
-				const IndexArray::Type newIdx = indexs[origIdx];
+				const IdxArray::Type origIdx = f[x];
+				const IdxArray::Type newIdx = dstToSrcIdx[origIdx];
 				f[x] = newIdx;
 			}
 		}
+
+#if X_ENABLE_ASSERTIONS
+		bool sorted = std::is_sorted(verts.begin(), verts.end(),
+			[&](const Vert& v1, const Vert& v2) {
+				return v1.binds_.size() < v2.binds_.size();
+			}
+		);
+
+		X_ASSERT(sorted, "Not sorted")(sorted);
+#endif // !X_ENABLE_ASSERTIONS
 	}
 }
 
