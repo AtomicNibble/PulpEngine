@@ -981,24 +981,26 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	}
 
 	for (size_t i = 0; i < compiledLods_.size(); i++) {
+		const auto& compiledLod = compiledLods_[i];
 		model::LODHeader& lod = header.lodInfo[i];
-		lod.lodDistance = compiledLods_[i].distance_;
-		lod.numSubMeshes = safe_static_cast<uint16_t, size_t>(compiledLods_[i].numMeshes());
+
+		lod.lodDistance = compiledLod.distance_;
+		lod.numSubMeshes = safe_static_cast<uint16_t, size_t>(compiledLod.numMeshes());
 		// we want to know the offset o.o
 		lod.subMeshHeads = meshHeadOffsets;
 
 		// version 5.0 info
-		lod.numVerts = safe_static_cast<uint32_t, size_t>(compiledLods_[i].totalVerts());
-		lod.numIndexes = safe_static_cast<uint32_t, size_t>(compiledLods_[i].totalIndexs());
+		lod.numVerts = safe_static_cast<uint32_t, size_t>(compiledLod.totalVerts());
+		lod.numIndexes = safe_static_cast<uint32_t, size_t>(compiledLod.totalIndexs());
 
 		// Version 8.0 info
 		lod.streamsFlag = streamsFlags;
 
 		// work out bounds for all meshes.
 		lod.boundingBox.clear();
-		for (size_t x = 0; x < compiledLods_[i].meshes_.size(); x++)
+		for (size_t x = 0; x < compiledLod.meshes_.size(); x++)
 		{
-			const Mesh& mesh = compiledLods_[i].meshes_[x];
+			const Mesh& mesh = compiledLod.meshes_[x];
 
 			lod.boundingBox.add(mesh.boundingBox_);
 		}
