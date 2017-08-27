@@ -648,19 +648,7 @@ bool XCore::InitAsyncWait(void)
 	// wait for default font to fully load.
 	if (env_.pFontSys)
 	{
-		font::IFont* pFont = env_.pFontSys->GetFont("default");
-		if (!pFont) 
-		{
-			allOk = false;
-			X_ERROR("Font", "failed to get default font");
-		}
-		else
-		{
-			if (!pFont->WaitTillReady()) {
-				allOk = false;
-				X_ERROR("Font", "Error loading default font");
-			}
-		}
+		allOk &= env_.pFontSys->asyncInitFinalize();
 	}
 
 	if (env_.p3DEngine)
