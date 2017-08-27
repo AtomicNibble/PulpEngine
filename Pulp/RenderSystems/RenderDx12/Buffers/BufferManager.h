@@ -125,6 +125,9 @@ public:
 	static X_INLINE X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle);
 	static X_INLINE ConstBuffer* CBFromHandle(ConstantBufferHandle bufHandle);
 
+	
+	X_INLINE bool ValidHandle(VertexBufferHandle handle) const;
+
 
 	void getBufSize(BufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize) const;
 

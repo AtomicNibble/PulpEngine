@@ -68,5 +68,14 @@ X_INLINE ConstBuffer* BufferManager::CBFromHandle(ConstantBufferHandle bufHandle
 	return constBufferForHandle(bufHandle);
 }
 
+X_INLINE bool BufferManager::ValidHandle(VertexBufferHandle handle) const
+{
+	uintptr_t start = union_cast<uintptr_t>(heap_.start());
+	uintptr_t end = union_cast<uintptr_t>(heap_.end());
+	uintptr_t add = union_cast<uintptr_t>(handle);
+
+	return add < end && add >= start;
+
+}
 
 X_NAMESPACE_END
