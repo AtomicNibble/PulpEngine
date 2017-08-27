@@ -433,6 +433,15 @@ struct CompbindInfo
 		return size;
 	}
 
+	X_INLINE const size_t totalBinds(void) const {
+		size_t i, num= 0;
+		for (i = 0; i < MODEL_MAX_VERT_BINDS; i++) {
+			num += compBinds_[i];
+		}
+		return num;
+	}
+
+
 	X_INLINE const BindCountsArr& getBindCounts(void) const {
 		return compBinds_;
 	}
