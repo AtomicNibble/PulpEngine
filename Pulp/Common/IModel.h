@@ -438,7 +438,7 @@ struct CompbindInfo
 	}
 
 	X_INLINE const bool hasData(void) const {
-		return setCheck_[0] != 0 && setCheck_[1] != 0;
+		return setCheck_[0] != 0 || setCheck_[1] != 0;
 	}
 
 private:
