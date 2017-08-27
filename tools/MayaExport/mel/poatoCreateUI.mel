@@ -41,12 +41,18 @@ global proc potato_SelectAllMeshInScene()
 	potato_SelectAndRevealType("mesh");
 }
 
+global proc string esacpeString(string $str)
+{
+	return substituteAllString($str, "\\", "\\\\");
+}
 
 global proc int assetDB_add(string $type, string $name)
 {
 	if(getExportMode() == "Raw") { // don't ask db in raw mode.
 		return 0;
 	}
+
+	$name = esacpeString($name);
 
 	string $command = "PotatoAssetDB -action add -type " + $type + " -name \"" + $name + "\"";
 	string $errorMsg;
@@ -60,13 +66,16 @@ global proc int assetDB_add(string $type, string $name)
 	return -1;
 }
 
-global proc int assetDB_rename(string $type, string $old_name, string $newName)
+global proc int assetDB_rename(string $type, string $old_name, string $new_name)
 {
 	if(getExportMode() == "Raw") { // don't ask db in raw mode.
 		return 0;
 	}
 
-	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -name \"" +$newName + "\" ";
+	$new_name = esacpeString($new_name);
+	$old_name = esacpeString($old_name);
+
+	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -name \"" +$new_name + "\" ";
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 
@@ -74,7 +83,7 @@ global proc int assetDB_rename(string $type, string $old_name, string $newName)
 		return 0;
 	}
 
-	confirmDialog -title "Falied to rename" -message ("Can't rename \"" + $old_name + "\" to \"" + $newName + "\". Error: " + $errorMsg)
+	confirmDialog -title "Falied to rename" -message ("Can't rename \"" + $old_name + "\" to \"" + $new_name + "\". Error: " + $errorMsg)
 		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
@@ -84,6 +93,8 @@ global proc int assetDB_remove(string $type, string $name)
 	if(getExportMode() == "Raw") { // don't ask db in raw mode.
 		return 0;
 	}
+
+	$name = esacpeString($name);
 
 	string $command = "PotatoAssetDB -action remove -type " + $type + " -name \"" + $name + "\"";
 	string $errorMsg;
