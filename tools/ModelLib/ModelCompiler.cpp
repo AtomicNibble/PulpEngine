@@ -1013,7 +1013,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	header.boundingBox.clear();
 	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
-		model::LODHeader& lod = header.lodInfo[i];
+		const model::LODHeader& lod = header.lodInfo[i];
 		header.boundingBox.add(lod.boundingBox);
 	}
 
