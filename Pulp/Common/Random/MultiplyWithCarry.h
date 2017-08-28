@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ME_MULTIPLY_WITH_CARRY_H_
-#define ME_MULTIPLY_WITH_CARRY_H_
+#ifndef X_MULTIPLY_WITH_CARRY_H_
+#define X_MULTIPLY_WITH_CARRY_H_
 
 
 X_NAMESPACE_BEGIN(core)
@@ -32,4 +32,4 @@ X_NAMESPACE_END
 
 #include "MultiplyWithCarry.inl"
 
-#endif // ME_MULTIPLY_WITH_CARRY_H_
+#endif // X_MULTIPLY_WITH_CARRY_H_

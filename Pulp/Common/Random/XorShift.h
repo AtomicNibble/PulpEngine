@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef ME_XORSHIFT_H
-#define ME_XORSHIFT_H
+#ifndef X_XORSHIFT_H
+#define X_XORSHIFT_H
 
 #include <limits>
 
