@@ -4,6 +4,11 @@
 #ifndef X_STRING_JSON_H_
 #define X_STRING_JSON_H_
 
+#if X_COMPILER_CLANG
+#ifdef _MSC_VER
+#undef _MSC_VER
+#endif
+#endif
 
 #define RAPIDJSON_NAMESPACE X_NAMESPACE_NAME::core::json
 #define RAPIDJSON_NAMESPACE_BEGIN namespace X_NAMESPACE_NAME { namespace core {  namespace json {
