@@ -28,6 +28,12 @@ X_INLINE Transform<T>::Transform(const Matrix34<T>& mat)
 }
 
 template<typename T>
+X_INLINE Transform<T>::Transform(const Matrix44<T>& mat)
+{
+	set(mat);
+}
+
+template<typename T>
 X_INLINE Transform<T>& Transform<T>::operator=(const Transform<T>& qt)
 {
 	quat = qt.quat;
@@ -59,6 +65,13 @@ X_INLINE void Transform<T>::set(const Matrix34<T>& mat)
 {
 	quat = Quat<T>(mat);
 	pos = mat.getTranslate();
+}
+
+template<typename T>
+X_INLINE void Transform<T>::set(const Matrix44<T>& mat)
+{
+	quat = Quat<T>(mat);
+	pos = mat.getTranslate().xyz();
 }
 
 template<typename T>

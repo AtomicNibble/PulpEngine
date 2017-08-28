@@ -21,8 +21,8 @@ public:
 
 	template <typename TOth>
 	explicit Transform(const Transform<TOth>& qt);
-
 	explicit Transform(const Matrix34<T>& mat);
+	explicit Transform(const Matrix44<T>& mat);
 
 	Transform<T>& operator =(const Transform<T>& qt);
 
@@ -31,6 +31,7 @@ public:
 
 	void set(const Vec3<T> &trans, const Quat<T>& qt);
 	void set(const Matrix34<T>& mat);
+	void set(const Matrix44<T>& mat);
 
 
 	void setPosition(const Vec3<T>& vec);
