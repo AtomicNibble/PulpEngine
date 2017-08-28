@@ -163,7 +163,7 @@ public:
 	void				setRotation(const Matrix33<T>& rotation);
 
 	// multiplies the current matrix by the scale matrix derived from supplies parameters
-	void				scale(T s) { Matrix44 op = createScale(s); Matrix44 mat = *this; *this = op*mat; }
+	void				scale(T s) { Matrix44<T> op = createScale(s); Matrix44<T> mat = *this; *this = op*mat; }
 	void				scale(const Vec2<T> &v) { *this *= createScale(v); }
 	void				scale(const Vec3<T> &v) { *this *= createScale(v); }
 	void				scale(const Vec4<T> &v) { *this *= createScale(v); }
