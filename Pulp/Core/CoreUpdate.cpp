@@ -3,7 +3,6 @@
 
 #include <IConsole.h>
 #include <IRender.h>
-#include <IFont.h>
 #include <I3DEngine.h>
 #include <IGame.h>
 #include <ISound.h>
