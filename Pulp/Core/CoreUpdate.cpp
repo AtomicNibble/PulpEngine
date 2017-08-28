@@ -7,6 +7,7 @@
 #include <IGame.h>
 #include <ISound.h>
 #include <IScriptSys.h>
+#include <IPhysics.h>
 
 
 #include <IFrameData.h>
@@ -132,6 +133,13 @@ bool XCore::Update(void)
 		env_.p3DEngine->Update(frameData);
 	}
 
+	if (env_.pPhysics) {
+		env_.pPhysics->onTickPreRender(
+			frameData.timeInfo.deltas[core::ITimer::Timer::GAME].GetMilliSeconds(),
+			AABB(Vec3f::zero(), 2000.f)
+		);
+	}
+
 	// we could update the sound system while rendering on gpu.
 	if (env_.pSound) {
 		env_.pSound->Update(frameData);
@@ -252,6 +260,10 @@ void XCore::RenderEnd(core::FrameData& frameData)
 {
 	{
 		X_PROFILE_BEGIN("CoreRenderEnd", core::profiler::SubSys::CORE);
+
+		if (env_.pPhysics) {
+			env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME].GetMilliSeconds());
+		}
 
 #if X_ENABLE_PROFILER
 
