@@ -842,7 +842,7 @@ void Array<T, Allocator, GrowPolicy>::ensureSize(size_type size)
 		Type* pOldList;
 		size_type	newsize;
 
-		newsize = getAllocationSize(size_, size);
+		newsize = GrowPolicy::getAllocationSize(size_, size);
 		pOldList = list_;
 
 		// new array baby!
