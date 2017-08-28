@@ -59,6 +59,7 @@ public:
 
 	// can upload each lod individually.
 	bool createRenderBuffersForLod(size_t idx, render::IRender* pRender);
+	bool createSkinningRenderBuffersForLod(size_t idx, render::IRender* pRender);
 	void releaseLodRenderBuffers(size_t idx, render::IRender* pRender);
 	bool canRenderLod(size_t idx) const;
 

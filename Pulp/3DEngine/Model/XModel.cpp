@@ -45,6 +45,14 @@ bool XModel::createRenderBuffersForLod(size_t idx, render::IRender* pRender)
 	return renderMeshes_[idx].createRenderBuffers(pRender, raw, hdr_.vertexFmt);
 }
 
+
+bool XModel::createSkinningRenderBuffersForLod(size_t idx, render::IRender* pRender)
+{
+	const auto& raw = hdr_.lodInfo[idx];
+
+	return renderMeshes_[idx].createSkinningRenderBuffers(pRender, raw);
+}
+
 void XModel::releaseLodRenderBuffers(size_t idx, render::IRender* pRender)
 {
 	auto& renderInfo = renderMeshes_[idx];
