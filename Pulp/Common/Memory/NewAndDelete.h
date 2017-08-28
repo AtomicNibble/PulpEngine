@@ -132,6 +132,12 @@ namespace Mem
 	template <typename T>
 	inline void Destruct(T* instance, NonPODType);
 
+	template <typename T>
+	inline void DestructArray(T* pInstances, size_t N, PODType);
+
+	template <typename T>
+	inline void DestructArray(T* pInstances, size_t N, NonPODType);
+
 	/// Destructs N instances in memory.
 	template <typename T>
 	inline void DestructArray(T* instances, size_t N);
