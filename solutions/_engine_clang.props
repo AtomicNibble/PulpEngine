@@ -16,7 +16,7 @@
       <ExceptionHandling>Disabled</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
-      <AdditionalOptions>-std=c++1z %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-std=c++1z -Wno-pragma-once-outside-header -Wno-microsoft-template -Wno-reorder %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
