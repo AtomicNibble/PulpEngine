@@ -34,7 +34,10 @@ namespace internal
 		/// Function prohibiting the hashing of empty string literals.
 		inline constexpr static StrHash::Type Hash(const char(&str)[N])
 		{
+#if X_COMPILER_CLANG == 0
 			static_assert(false, "Empty constant strings cannot be hashed.");
+#endif // !X_COMPILER_CLANG
+			return 0u;
 		}
 	};
 
