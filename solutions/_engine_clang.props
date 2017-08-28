@@ -11,9 +11,9 @@
       <DebugInformationFormat>-g2 -gdwarf-2</DebugInformationFormat>
       <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\$(Configuration)\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <WarningLevel>-Wall</WarningLevel>
+      <WarningLevel>EnableAllWarnings</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <ExceptionHandling>No</ExceptionHandling>
+      <ExceptionHandling>Disabled</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
