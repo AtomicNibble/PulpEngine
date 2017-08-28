@@ -21,7 +21,6 @@
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <WarningLevel>Level4</WarningLevel>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
   </ItemDefinitionGroup>

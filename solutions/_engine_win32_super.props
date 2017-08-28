@@ -23,7 +23,6 @@
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
-      <WarningLevel>Level4</WarningLevel>
     </ClCompile>
     <Lib>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
