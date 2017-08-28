@@ -2,6 +2,11 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+X_INLINE int32_t DrawVars::drawFontDebug(void) const
+{
+	return drawFontDebug_;
+}
+
 X_INLINE int32_t DrawVars::usePortals(void) const
 {
 	return usePortals_;

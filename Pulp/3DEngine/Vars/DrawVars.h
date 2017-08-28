@@ -16,6 +16,7 @@ public:
 
 	void registerVars(void);
 
+	X_INLINE int32_t drawFontDebug(void) const;
 	X_INLINE int32_t usePortals(void) const;
 	X_INLINE int32_t drawAreaBounds(void) const;
 	X_INLINE int32_t drawPortals(void) const;
@@ -36,6 +37,7 @@ public:
 
 
 private:
+	int32_t drawFontDebug_;
 	int32_t usePortals_;
 	int32_t drawAreaBounds_;
 	int32_t drawPortals_;

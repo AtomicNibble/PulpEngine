@@ -25,6 +25,11 @@ DrawVars::DrawVars()
 
 void DrawVars::registerVars(void)
 {
+	ADD_CVAR_REF("r_drawFontDebug", drawFontDebug_, 0, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Draw the font debug view");
+
+
 	ADD_CVAR_REF("r_usePortals", usePortals_, 1, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Use area portals when rendering the level");
