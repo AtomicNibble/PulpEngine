@@ -352,6 +352,8 @@ X_DECLARE_FLAGS8(Permatation)(
 
 typedef Flags8<Permatation> PermatationFlags;
 
+X_DECLARE_FLAG_OPERATORS(PermatationFlags);
+
 X_DECLARE_FLAGS8(CompileFlag) (
 	Debug,
 	TreatWarningsAsErrors,
