@@ -793,12 +793,11 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, size
 {
 	makeUnique();
 
-	if (nIndex < 0)
-		nIndex = 0;
-
 	size_type nNewLength = length();
-	if (nIndex > nNewLength)
+	if (nIndex > nNewLength) {
 		nIndex = nNewLength;
+	}
+
 	nNewLength += count;
 
 	if (capacity() < nNewLength)
