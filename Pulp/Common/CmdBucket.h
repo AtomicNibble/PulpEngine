@@ -42,6 +42,10 @@ struct DynamicBufferDesc
 	uint32_t magic;
 	uint32_t size;
 	const void* pData; // you own this, safe to clear after submitCommandPackets
+
+	X_INLINE VertexBufferHandle asBufferHandle(void) const {
+		return reinterpret_cast<VertexBufferHandle>(this);
+	}
 };
 
 
