@@ -121,7 +121,7 @@ void Path<TChar>::setFileName(const TChar* pFilename)
 
 	const TChar* name = fileName();
 
-	if (isEmpty() || (name == BaseType::end()))
+	if (BaseType::isEmpty() || (name == BaseType::end()))
 	{
 		BaseType::append(pFilename);
 	}
@@ -143,7 +143,7 @@ void Path<TChar>::setFileName(const TChar* pFileNameBegin, const TChar* pFileNam
 
 	const TChar* name = fileName();
 
-	if (isEmpty() || (name == end()))
+	if (BaseType::isEmpty() || (name == BaseType::end()))
 	{
 		BaseType::append(pFileNameBegin, pFileNameEnd);
 	}
