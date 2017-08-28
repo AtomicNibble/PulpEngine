@@ -282,6 +282,10 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 	}
 	else
 	{
+		const bool unBindedVerts = counts[0] != 0;
+
+		// turn all the none binded in to root binds.
+		bindCounts[0] += counts[0];
 		bindInfo_.set(bindCounts);
 
 		stream_.reserve(bindInfo_.dataSizeTotal());
@@ -290,9 +294,23 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
 		size_t lastBindCount = 0;
 #endif
 
-		for (const auto& vert : verts)
+		size_t i = 0;
+		bindBone rootBoneIdx(0);
+
+		// bind to root
+		while (i < verts.size() && verts[i].binds_.isEmpty())
 		{
+			stream_.write(rootBoneIdx);
+			++i;
+		}
+
+		// user binds.
+		for (; i<verts.size(); ++i)
+		{
+			auto& vert = verts[i];
+
 #if X_DEBUG
+			X_ASSERT(vert.binds_.isNotEmpty(), "No binds")();
 			X_ASSERT(lastBindCount <= vert.binds_.size(), "Verts should be sorted by bind counts")(lastBindCount, vert.binds_.size());
 			lastBindCount = vert.binds_.size();
 #endif
