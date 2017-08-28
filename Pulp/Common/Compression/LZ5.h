@@ -92,7 +92,6 @@ namespace Compression
 
 
 	private:
-		core::MemoryArenaBase* arena_;
 		void* stream_;
 	};
 

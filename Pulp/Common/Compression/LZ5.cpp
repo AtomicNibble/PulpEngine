@@ -200,9 +200,10 @@ namespace Compression
 
 
 	LZ5Stream::LZ5Stream(core::MemoryArenaBase* arena, CompressLevel::Enum lvl) :
-		arena_(arena),
 		stream_(nullptr)
 	{
+		X_UNUSED(arena);
+
 		LZ5_stream_t* pStream = LZ5_createStream(compressLevelToAcceleration(lvl));
 
 		stream_ = pStream;
