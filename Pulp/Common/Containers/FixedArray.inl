@@ -1,4 +1,6 @@
 
+X_NAMESPACE_BEGIN(core)
+
 
 template<typename T, size_t N>
 FixedArray<T, N>::FixedArray() :
@@ -374,3 +376,6 @@ inline typename FixedArray<T, N>::ConstReference FixedArray<T, N>::back(void) co
 	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
 }
+
+
+X_NAMESPACE_END

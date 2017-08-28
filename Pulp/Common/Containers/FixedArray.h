@@ -107,8 +107,9 @@ private:
 
 X_ENABLE_WARNING(4324)
 
+X_NAMESPACE_END
+
 #include "FixedArray.inl"
 
-X_NAMESPACE_END
 
 #endif // X_CON_FIXEDARRAY_H
