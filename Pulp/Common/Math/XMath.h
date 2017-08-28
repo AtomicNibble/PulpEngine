@@ -9,7 +9,6 @@
 #include <climits>
 #include <float.h>
 
-#include "XHalf.h"
 
 #ifdef INFINITY
 #undef INFINITY

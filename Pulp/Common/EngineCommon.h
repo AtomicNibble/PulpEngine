@@ -143,6 +143,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Math\XCamera.h>
 #include <Math\XQuat.h>
 #include <Math\XTransform.h>
+#include <Math\XHalf.h>
 
 
 #define _STDINT // fuck standard types!
