@@ -5,16 +5,19 @@
 
 #include "Traits/UnsignedTypes.h"
 
+X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Casts
-/// \brief Safely static_casts from one type into the other taking into account signedness and numeric limits.
-/// \details If the cast cannot be made, an assertion will fire.
-/// \code
-///   uint32_t integer = 65000;
-///   uint16_t smaller = safe_static_cast<uint16_t>(integer);
-/// \endcode
-/// \remark Only works for integer types.
-/// \sa union_cast X_ENABLE_SAFE_STATIC_CAST
+namespace internal
+{
+	/// Base template for casting from one type into another
+	template <bool IsFromSigned, bool IsToSigned>
+	struct safe_static_cast_helper;
+
+} // namespace internal
+
+X_NAMESPACE_END
+
+
 template <typename TO, typename FROM>
 X_INLINE TO safe_static_cast(FROM from)
 {

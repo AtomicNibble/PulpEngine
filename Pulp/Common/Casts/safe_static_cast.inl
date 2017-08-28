@@ -3,11 +3,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace internal
 {
-	/// Base template for casting from one type into another
-	template <bool IsFromSigned, bool IsToSigned>
-	struct safe_static_cast_helper;
-
-
 	/// Template specialization for casting from an unsigned type into an unsigned type
 	template <>
 	struct safe_static_cast_helper<false, false>
