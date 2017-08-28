@@ -60,7 +60,7 @@ namespace profiler
 		X_INLINE T getMin(void) const
 		{
 			T min = (T)0;
-			const_iterator it = begin();
+			auto it = begin();
 			for (min = (*it); it != end(); ++it) {
 				if (min > (*it)) {
 					min = (*it);
@@ -72,7 +72,7 @@ namespace profiler
 		X_INLINE T getMax(void) const
 		{
 			T max = (T)0;
-			const_iterator it = begin();
+			auto it = begin();
 			for (max = (*it); it != end(); ++it) {
 				if (max < (*it)) {
 					max = (*it);
