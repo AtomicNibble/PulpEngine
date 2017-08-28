@@ -458,9 +458,11 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 	}
 
 	// snap.
-	baseXY.x = math<float>::floor(baseXY.x);
-	baseXY.y = math<float>::floor(baseXY.y);
-
+	if (pos.z == 0.f) // makes 3d text jump. (FIXME: this is not a proper fix really need to know if 3d or not)
+	{
+		baseXY.x = math<float>::floor(baseXY.x);
+		baseXY.y = math<float>::floor(baseXY.y);
+	}
 
 	FontEffect& effect = effects_[effecIdx];
 	for (auto passIdx = 0u; passIdx < effect.passes.size(); passIdx++)
