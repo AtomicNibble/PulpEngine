@@ -176,15 +176,22 @@ TEST(PoolAlloc, Heap)
 		X_ASSERT_ALIGNMENT(alloc2, 4, 0);
 		EXPECT_EQ(allocator.getSize(alloc2), 32);
 
-#if ME_ENABLE_POOL_ALLOCATOR_CHECK
+#if X_ENABLE_POOL_ALLOCATOR_CHECK
 		// larger element sizes or alignments are disallowed
-		ME_UT_EXPECT_ASSERTION();
-		void* alloc3 = allocator.Allocate(40, 4, 0);
-		EXPECT_EQ_ASSERTION();
+		
+		core::debugging::EnableBreakpoints(false);
 
-		ME_UT_EXPECT_ASSERTION();
-		void* alloc4 = allocator.Allocate(16, 64, 0);
-		EXPECT_EQ_ASSERTION();
+		g_AssetChecker.ExpectAssertion(true);
+		void* alloc3 = allocator.allocate(40, 4, 0);
+		EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+		g_AssetChecker.ExpectAssertion(true);
+		void* alloc4 = allocator.allocate(16, 64, 0);
+		EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+
+		g_AssetChecker.ExpectAssertion(false);
+		core::debugging::EnableBreakpoints(true);
 
 		allocator.free(alloc4);
 		allocator.free(alloc3);

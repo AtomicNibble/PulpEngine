@@ -37,5 +37,5 @@ TEST(Half, Quad) {
 
 	XHalf4 compressed((float*)&vec);
 
-	EXPECT_NEAR_VEC4(vec, compressed.Decompress(), 0.001f);
+	EXPECT_NEAR_VEC4(vec, compressed.decompress(), 0.001f);
 }
