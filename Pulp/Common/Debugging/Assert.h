@@ -5,7 +5,9 @@
 
 #include <Util/SourceInfo.h>
 
+
 X_NAMESPACE_BEGIN(core)
+
 
 class Assert
 {
@@ -72,8 +74,7 @@ public:
 
 private:
 	/// Dispatches the name and value of a generic type to registered assertion handlers and loggers.
-	template <typename T>
-	static void Dispatch(const SourceInfo& sourceInfo, const char* format, const char* const name, const T value);
+	static void Dispatch(const SourceInfo& sourceInfo, const char* format, const char* const name, ...);
 
 	X_NO_COPY(Assert);
 	X_NO_ASSIGN(Assert);

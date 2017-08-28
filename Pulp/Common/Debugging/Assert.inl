@@ -25,20 +25,3 @@ Assert& Assert::Variable(const char* const, const T&)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-template <typename T>
-void Assert::Dispatch( const SourceInfo& sourceInfo, const char* format, const char* const name, const T value )
-{
-	if (gEnv) 
-	{
-		if (gEnv->pLog) {
-			gEnv->pLog->AssertVariable(sourceInfo, format, name, value);
-		}
-		if (gEnv->pCore) {
-			gEnv->pCore->OnAssertVariable(sourceInfo);
-		}
-		else
-		{
-			X_BREAKPOINT;
-		}
-	}
-}

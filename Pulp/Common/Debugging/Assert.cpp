@@ -145,6 +145,26 @@ Assert& Assert::Variable(const char* const name, const char* const var )
 	return *this;
 }
 
+void Assert::Dispatch(const SourceInfo& sourceInfo, const char* format, const char* const name, ...)
+{
+	if (gEnv)
+	{
+		X_VALIST_START(format)
+
+		if (gEnv->pLog) {
+			gEnv->pLog->AssertVariable(sourceInfo, format, name, args);
+		}
+		if (gEnv->pCore) {
+			gEnv->pCore->OnAssertVariable(sourceInfo);
+		}
+		else
+		{
+			X_BREAKPOINT;
+		}
+
+		X_VALIST_END
+	}
+}
 
 
 X_NAMESPACE_END

@@ -26,6 +26,7 @@ public:
 	virtual void Fatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_FINAL;
 	virtual void Assert(const SourceInfo& sourceInfo, const char* format, va_list args) X_FINAL;
 	virtual void AssertVariable(const SourceInfo& sourceInfo, const char* format, ...) X_FINAL;
+	virtual void AssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args) X_FINAL;
 	 
 	virtual void AddLogger(LoggerBase* logger) X_FINAL;
 	virtual void RemoveLogger(LoggerBase* logger) X_FINAL;

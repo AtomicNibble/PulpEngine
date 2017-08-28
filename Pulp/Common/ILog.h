@@ -38,6 +38,7 @@ struct ILog
 	virtual void Fatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_ABSTRACT;
 	virtual void Assert(const SourceInfo& sourceInfo, const char* format, va_list args) X_ABSTRACT;
 	virtual void AssertVariable(const SourceInfo& sourceInfo, const char* format, ...) X_ABSTRACT;
+	virtual void AssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args) X_ABSTRACT;
 
 	virtual void AddLogger(LoggerBase* logger) X_ABSTRACT;
 	virtual void RemoveLogger(LoggerBase* logger) X_ABSTRACT;
