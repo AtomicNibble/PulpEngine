@@ -288,14 +288,7 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, co
 	const Vec3f bl(x1, y2, 0);
 	const Vec3f br(x2, y2, 0);
 
-	// Top
-	drawLine(tl, col, tr, col);
-	// bottom
-	drawLine(bl, col, br, col);
-	// left down
-	drawLine(tl, col, bl, col);
-	// right down
-	drawLine(tr, col, br, col);
+	drawRect(tl, tr, bl, br, col);
 }
 
 void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, const Color8u& col)
