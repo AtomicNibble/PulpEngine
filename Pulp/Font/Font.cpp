@@ -857,7 +857,22 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 				hozAdvanceChar = pSlot->advanceX * scaleX;
 			}
 
-			pPrimCon->drawRect(charX, charY, hozAdvanceChar, ctx.size.y, Col_Red);
+			Vec3f tl(charX, charY, pos.z);
+			Vec3f tr(tl.x + hozAdvanceChar, tl.y, pos.z);
+			Vec3f bl(tl.x, tl.y + ctx.size.y, pos.z);
+			Vec3f br(tr.x, bl.y, pos.z);
+
+			if (pRotation)
+			{
+				auto& rot = *pRotation;
+
+				tl = (rot * (tl - pos)) + pos;
+				br = (rot * (br - pos)) + pos;
+				tr = (rot * (tr - pos)) + pos;
+				bl = (rot * (bl - pos)) + pos;
+			}
+
+			pPrimCon->drawRect(tl, tr, bl, br, Col_Red);
 
 			charX += hozAdvanceChar;
 		}
