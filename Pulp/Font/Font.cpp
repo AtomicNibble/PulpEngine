@@ -435,7 +435,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 
 	if (debugPos)
 	{
-		pPrimCon->drawwCrosshair(Vec3f(baseXY), 10, Col_Red);
+		pPrimCon->drawwCrosshair(pos, 10, Col_Red);
 	}
 
 	if (shiftedPosition)
@@ -769,7 +769,23 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 			textSize = GetTextSizeWInternal(pBegin, pEnd, ctx);
 		}
 
-		pPrimCon->drawRect(baseXY.x, baseXY.y, textSize.x, textSize.y, Col_Red);
+		Vec3f tl(baseXY.x, baseXY.y, pos.z);
+		Vec3f tr(tl.x + textSize.x, tl.y, pos.z);
+		Vec3f bl(tl.x, tl.y + textSize.y, pos.z);
+		Vec3f br(tr.x, bl.y, pos.z);
+
+		if (pRotation)
+		{
+			auto& rot = *pRotation;
+
+			Vec3f base(pos);
+			tl = (rot * (tl - base)) + base;
+			br = (rot * (br - base)) + base;
+			tr = (rot * (tr - base)) + base;
+			bl = (rot * (bl - base)) + base;
+		}
+
+		pPrimCon->drawRect(tl, tr, bl, br, Col_Red);
 	}
 
 	if (debugGlyphRect)
