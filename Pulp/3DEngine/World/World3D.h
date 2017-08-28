@@ -27,12 +27,21 @@ class DrawVars;
 
 class RenderEnt : public IRenderEnt
 {
+	template<typename T>
+	using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 16>>;
+	
 public:
+	typedef AlignedArray<Matrix44f> MatrixArr;
+
+public:
+	RenderEnt(core::MemoryArenaBase* arena);
+
 	int32_t	index;
 	int32_t	lastModifiedFrameNum;	// to determine if it is constantly changing,
 	int32_t	viewCount;
 
 	model::XModel* pModel;
+	MatrixArr bones;
 
 	Transformf trans;
 
@@ -230,9 +239,13 @@ private:
 
 	void drawAreaGeo(Area** pAreas, uint32_t num);
 	void drawStaticModels(const uint32_t* pModelIds, uint32_t num);
+	void drawRenderEnts();
 
-	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh,
-		render::shader::VertexFormat::Enum vrtvertFmtFmt, const Matrix44f& world, const float distanceFromCam);
+
+	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, render::shader::VertexFormat::Enum vrtvertFmtFmt,
+		const Matrix44f& world, const float distanceFromCam, render::VertexBufferHandle boneData);
+
+	void addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, render::shader::VertexFormat::Enum vrtvertFmtFmt, const Matrix44f& world, const float distanceFromCam);
 
 private:
 	void createEntityRefs(RenderEnt* pEnt);

@@ -16,6 +16,8 @@
 
 #include <Threading\JobSystem2.h>
 
+#include <Buffer.h>
+
 #include <queue>
 
 X_NAMESPACE_BEGIN(engine)
@@ -74,6 +76,12 @@ namespace
 
 
 } // namespace 
+
+RenderEnt::RenderEnt(core::MemoryArenaBase* arena) :
+	bones(arena)
+{
+
+}
 
 
 // --------------------------------
@@ -253,6 +261,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 		pSyncJob = nullptr;
 	}
 
+	drawRenderEnts();
 
 	drawDebug();
 }
@@ -663,15 +672,25 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 	X_UNUSED(entDesc);
 	X_ASSERT_NOT_NULL(entDesc.pModel);
 
-	auto* pRenderEnt = X_NEW(RenderEnt, arena_, "RenderEnt");
+	auto* pModel = static_cast<model::XModel*>(entDesc.pModel);
+
+	auto* pRenderEnt = X_NEW(RenderEnt, arena_, "RenderEnt")(arena_);
 	pRenderEnt->index = safe_static_cast<int32_t>(renderEnts_.size());
 	pRenderEnt->lastModifiedFrameNum = 0;
 	pRenderEnt->viewCount = 0;
-	pRenderEnt->pModel = static_cast<model::XModel*>(entDesc.pModel);
+	pRenderEnt->pModel = pModel;
 	pRenderEnt->trans = entDesc.trans;
 
-	renderEnts_.append(pRenderEnt);
+	if (pModel->isAnimated())
+	{
+		pRenderEnt->bones.resize(pModel->numBones());
 
+
+	//	pModel->assingDefaultPose(pRenderEnt->bones.data(), pRenderEnt->bones.size());
+	}
+
+
+	renderEnts_.append(pRenderEnt);
 
 	createEntityRefs(pRenderEnt);
 
@@ -1640,6 +1659,7 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 		world.setTranslate(sm.pos);
 #endif
 
+#if 0
 		if (pModel->numBones())
 		{
 			if (vars_.drawModelBones())
@@ -1656,10 +1676,12 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 				pModel->RenderBoneNames(pPrimContex_, world, view, vars_.boneNameOffset(), vars_.boneNameSize(), vars_.boneNameColor());
 			}
 		}
-		if (vars_.drawModelBounds())
-		{
-			pPrimContex_->drawAABB(sm.boundingBox, false, Col_Orangered);
-		}
+#endif
+
+	//	if (vars_.drawModelBounds())
+	//	{
+	//		pPrimContex_->drawAABB(sm.boundingBox, false, Col_Orangered);
+	//	}
 
 		world.transpose();
 
@@ -1667,8 +1689,124 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 	}
 }
 
-void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh, 
-	render::shader::VertexFormat::Enum vertFmt, const Matrix44f& world, const float distanceFromCam)
+
+void World3D::drawRenderEnts()
+{
+	for (auto* pRendEnt : renderEnts_)
+	{
+		const float distanceFromCam = cam_.getPosition().distance(pRendEnt->trans.pos);
+
+		Matrix44f world = Matrix44f::createTranslation(pRendEnt->trans.pos);
+
+		if (pRendEnt->trans.quat.getAngle() != 0.f) {
+			world.rotate(pRendEnt->trans.quat.getAxis(), pRendEnt->trans.quat.getAngle());
+		}
+
+
+		model::XModel* pModel = pRendEnt->pModel;
+		size_t lodIdx = 0;
+
+		if (!pModel->canRenderLod(lodIdx))
+		{
+			pModel->createRenderBuffersForLod(lodIdx, gEnv->pRender);
+		}
+
+		const model::MeshHeader& mesh = pModel->getLodMeshHdr(lodIdx);
+		const auto& renderMesh = pModel->getLodRenderMesh(lodIdx);
+
+		if (!renderMesh.hasVBStream(VertexStream::HWSKIN))
+		{
+			pModel->createSkinningRenderBuffersForLod(lodIdx, gEnv->pRender);
+		}
+
+		// Debug drawing.
+		if (pRendEnt->bones.isNotEmpty())
+		{
+			if (vars_.drawModelBones())
+			{
+				pModel->RenderBones(pPrimContex_, world, vars_.boneColor(), pRendEnt->bones.data(), pRendEnt->bones.size());
+			}
+
+			if (vars_.drawModelBoneNames())
+			{
+				Matrix33f view = cam_.getViewMatrix().subMatrix33(0, 0);
+				view.rotate(Vec3f::yAxis(), ::toRadians(180.f));
+				view.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+		
+				pModel->RenderBoneNames(pPrimContex_, world, view, vars_.boneNameOffset(), vars_.boneNameSize(), 
+					vars_.boneNameColor(), pRendEnt->bones.data(), pRendEnt->bones.size());
+			}
+		}
+
+		if (vars_.drawModelBounds())
+		{
+			pPrimContex_->drawAABB(pRendEnt->globalBounds, false, Col_Orangered);
+		}
+		// ~Debug
+
+#if 1
+		auto& bones = pRendEnt->bones;
+
+		static float counter = 0.f;
+		static bool forward = true;
+
+	//	static RenderEnt::MatrixArr bones(g_3dEngineArena, 10);
+
+		//	bones[0].setTranslate(Vec3f(0.f, 0.f, counter / 3));
+		bones[1].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
+		bones[2] = Matrix44f::createRotation(Vec3f(0.f, 1.f, 0.f), counter / 100.f);
+	//	bones[3].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
+
+		// bones[4].setTranslate(Vec3f(0.f, 0.f, counter));
+		bones[5].setTranslate(Vec3f(0.f, counter / 2.f, 0.f));
+		bones[6].setTranslate(Vec3f(0.f, counter / 1.5f, 0.f));
+
+		bones[8].setTranslate(Vec3f(counter / 4.f, 0.f, 0.f));
+
+		if (forward)
+		{
+			counter += 0.1f;
+
+			if (counter >= 0.f)
+			{
+				forward = false;
+			}
+		}
+		else
+		{
+			counter -= 0.1f;
+
+			if (counter < -20.f)
+			{
+				forward = true;
+			}
+		}
+
+	//	for (size_t i = 0; i < bones.size(); i++)
+	//	{
+	//		pRendEnt->bones[i] = bones[i];
+	//	}	
+
+#endif
+
+		auto* pBoneDataDes = pBucket_->createDynamicBufferDesc();
+		pBoneDataDes->pData = pRendEnt->bones.data();
+		pBoneDataDes->size = safe_static_cast<uint32_t>(bones.size() * sizeof(Matrix44f)); 
+
+
+
+		world.transpose();
+
+
+		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F, 
+			world, distanceFromCam, pBoneDataDes->asBufferHandle());
+	}
+
+}
+
+
+void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh,
+	render::shader::VertexFormat::Enum vertFmt, const Matrix44f& world, const float distanceFromCam, render::VertexBufferHandle boneData)
 {
 	render::CommandBucket<uint32_t>* pDepthBucket = pBucket_;
 
@@ -1680,6 +1818,179 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 	// so it's the requirement of the material as to what buffers it needs.
 	const core::StrHash tech("unlit");
 
+	engine::PermatationFlags permFlags = engine::PermatationFlags::VertStreams | engine::PermatationFlags::HwSkin;
+
+	// now we render :D !
+	for (size_t subIdx = 0; subIdx < mesh.numSubMeshes; subIdx++)
+	{
+		const model::SubMeshHeader* pSubMesh = mesh.subMeshHeads[subIdx];
+
+		engine::Material* pMat = pSubMesh->pMat;
+		engine::MaterialTech* pTech = engine::gEngEnv.pMaterialMan_->getTechForMaterial(
+			pMat,
+			tech,
+			vertFmt,
+			permFlags
+		);
+
+		if (!pTech) {
+			continue;
+		}
+
+		const auto* pPerm = pTech->pPerm;
+		const auto stateHandle = pPerm->stateHandle;
+		auto* pVariableState = pTech->pVariableState;
+		auto variableStateSize = pVariableState->getStateSize();
+
+#if 1
+		if (permFlags.IsSet(engine::PermatationFlags::HwSkin))
+		{
+			auto& buffers = pPerm->pShaderPerm->getBuffers();
+			for (size_t i = 0; i < buffers.size(); i++)
+			{
+				auto& buf = buffers[i];
+
+				if (buf.getName() == "BoneMatrices")
+				{
+					auto* pBuffers = pVariableState->getBuffers();
+
+					pBuffers[i].buf = boneData;
+					break;
+				}
+			}
+		}
+#endif
+
+		uint32_t sortKey = static_cast<uint32_t>(distanceFromCam);
+
+		// work out which cbuffers need updating.
+		render::Commands::CopyConstantBufferData* pCBUpdate = nullptr;
+		render::Commands::DrawIndexed* pDraw = nullptr;
+
+		{
+			int32_t numCbs = pVariableState->getNumCBs();
+			auto* pCBHandles = pVariableState->getCBs();
+
+			const auto& cbs = pTech->cbs;
+			X_ASSERT(numCbs == static_cast<int32_t>(cbs.size()), "Size mismatch")(numCbs, cbs.size());
+
+			for (int32_t i = 0; i < numCbs; i++)
+			{
+				auto& cb = *cbs[i];
+
+				if (!cb.containsUpdateFreqs(render::shader::UpdateFreq::INSTANCE)) {
+					continue;
+				}
+
+				// If we need to update the cbuffer for any reason we must provide the full cbuffer.
+				size_t size = cb.getBindSize();
+				char* pAuxData;
+
+				if (pCBUpdate) {
+					std::tie(pCBUpdate, pAuxData) = pDepthBucket->appendCommandGetAux<render::Commands::CopyConstantBufferData>(pCBUpdate, size);
+				}
+				else {
+					std::tie(pCBUpdate, pAuxData) = pDepthBucket->addCommandGetAux<render::Commands::CopyConstantBufferData>(sortKey, size);
+				}
+				pCBUpdate->constantBuffer = pCBHandles[i];
+				pCBUpdate->pData = pAuxData;
+				pCBUpdate->size = static_cast<uint32_t>(size);
+
+				// copy the cbuffer cpu that contains material param values.
+				if (cb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL)) {
+					auto& cpuData = cb.getCpuData();
+					std::memcpy(pAuxData, cpuData.data(), cpuData.size());
+				}
+				else {
+					// this will be a instance from the shader perm, so unlikley to contain any useful data.
+				}
+
+				// now patch in any other params.
+				for (int32_t paramIdx = 0; paramIdx < cb.getParamCount(); paramIdx++)
+				{
+					const auto& p = cb[paramIdx];
+					const auto type = p.getType();
+					const auto updateFreq = p.getUpdateRate();
+
+					using namespace render;
+
+					switch (updateFreq)
+					{
+						case shader::UpdateFreq::MATERIAL:
+							continue;
+						case shader::UpdateFreq::FRAME:
+							// ask the cbuffer man to fill us? ;)
+							pCBufMan_->setParamValue(type, (uint8_t*)&pAuxData[p.getBindPoint()]);
+							continue;
+
+						case shader::UpdateFreq::BATCH:
+						case shader::UpdateFreq::SKINDATA:
+						case shader::UpdateFreq::UNKNOWN:
+							X_ASSERT_NOT_IMPLEMENTED();
+							// ya fooking wut. NO!
+							continue;
+
+						case shader::UpdateFreq::INSTANCE:
+							switch (type)
+							{
+								case shader::ParamType::PI_worldMatrix:
+									std::memcpy(&pAuxData[p.getBindPoint()], &world, sizeof(world));
+									break;
+								case shader::ParamType::PI_objectToWorldMatrix:
+									X_ASSERT_NOT_IMPLEMENTED();
+									break;
+								case shader::ParamType::PI_worldViewProjectionMatrix:
+									X_ASSERT_NOT_IMPLEMENTED();
+									break;
+							}
+							break;
+
+					}
+				}
+			}
+
+		}
+
+		if (pCBUpdate) {
+			pDraw = pDepthBucket->appendCommand<render::Commands::DrawIndexed>(pCBUpdate, variableStateSize);
+		}
+		else {
+			pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
+		}
+
+		pDraw->indexCount = pSubMesh->numIndexes;
+		pDraw->startIndex = pSubMesh->startIndex;
+		pDraw->baseVertex = pSubMesh->startVertex;
+		pDraw->stateHandle = stateHandle;
+		pDraw->resourceState = *pVariableState; // slice the sizes into command.
+												// set the vertex handle to correct one.
+		pDraw->indexBuffer = renderMesh.getIBBuffer();
+		pDraw->vertexBuffers = vertexBuffers;
+
+		if (variableStateSize)
+		{
+			char* pAuxData = render::CommandPacket::getAuxiliaryMemory(pDraw);
+			std::memcpy(pAuxData, pVariableState->getDataStart(), pVariableState->getStateSize());
+		}
+	}
+}
+
+void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderMesh& renderMesh,
+	render::shader::VertexFormat::Enum vertFmt, const Matrix44f& world, const float distanceFromCam)
+{
+	render::CommandBucket<uint32_t>* pDepthBucket = pBucket_;
+
+	render::VertexBufferHandleArr vertexBuffers = renderMesh.getVBBuffers();
+
+	const core::StrHash tech("unlit");
+
+	engine::PermatationFlags permFlags = engine::PermatationFlags::VertStreams;
+
+	{
+		// zero them so render system don't prepare them.
+		vertexBuffers[VertexStream::HWSKIN] = render::INVALID_BUF_HANLDE;
+		vertexBuffers[VertexStream::INSTANCE] = render::INVALID_BUF_HANLDE;
+	}
 
 	// now we render :D !
 	for (size_t subIdx = 0; subIdx < mesh.numSubMeshes; subIdx++)
@@ -1691,7 +2002,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 			pMat, 
 			tech, 
 			vertFmt,
-			engine::PermatationFlags::VertStreams
+			permFlags
 		);
 
 		if (!pTech) {
@@ -1700,9 +2011,9 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 		
 		const auto* pPerm = pTech->pPerm;
 		const auto stateHandle = pPerm->stateHandle;
-		const auto* pVariableState = pTech->pVariableState;
+		auto* pVariableState = pTech->pVariableState;
 		auto variableStateSize = pVariableState->getStateSize();
-
+	
 		uint32_t sortKey = static_cast<uint32_t>(distanceFromCam);
 
 		// work out which cbuffers need updating.
