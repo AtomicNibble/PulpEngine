@@ -4,7 +4,7 @@
 #define _X_CORE_I_H_
 
 #include <Core\Platform.h>
-#include <Traits\FunctionSignatureTraits.h>
+#include <Traits\FunctionTraits.h>
 
 #include <Math\XVector.h>
 
