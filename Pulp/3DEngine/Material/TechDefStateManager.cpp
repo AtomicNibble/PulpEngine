@@ -165,6 +165,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDescCpy, nullptr, 0);
 
 	if (stateHandle == render::INVALID_STATE_HANLDE) {
+		X_BREAKPOINT;
 		X_ERROR("Tech", "Failed to create state");
 		pRenderSys->destoryPassState(passHandle);
 		pRenderSys->releaseShaderPermatation(pPerm);
