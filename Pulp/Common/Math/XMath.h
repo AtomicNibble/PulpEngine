@@ -235,18 +235,20 @@ T constrain(T val, T minVal, T maxVal)
 template <class T>
 T sinx_over_x(T x)
 {
-	if (x * x < 1.19209290E-07F)
+	if (x * x < 1.19209290E-07F) {
 		return T(1);
-	else
-		return math<T>::sin(x) / x;
+	}
+	
+	return math<T>::sin(x) / x;
 }
 
 // There are faster techniques for this, but this is portable
 inline uint32_t log2floor(uint32_t x)
 {
 	uint32_t result = 0;
-	while (x >>= 1)
+	while (x >>= 1) {
 		++result;
+	}
 
 	return result;
 }
@@ -270,7 +272,9 @@ inline uint32_t nextPowerOf2(uint32_t x)
 template<typename T>
 inline int solveLinear(T a, T b, T result[1])
 {
-	if (a == 0) return (b == 0 ? -1 : 0);
+	if (a == 0) {
+		return (b == 0 ? -1 : 0);
+	}
 	result[0] = -b / a;
 	return 1;
 }
@@ -291,7 +295,9 @@ inline int solveQuadratic(T a, T b, T c, T result[2])
 	T srad = math<T>::sqrt(radical);
 	result[0] = (-b - srad) / (2 * a);
 	result[1] = (-b + srad) / (2 * a);
-	if (a < 0) core::Swap(result[0], result[1]);
+	if (a < 0) {
+		std::swap(result[0], result[1]);
+	}
 	return 2;
 }
 
