@@ -51,13 +51,11 @@ public:
 
 struct XHalf2
 {
-	XHalf x;
-	XHalf y;
-
-
 	XHalf2() {}
 	XHalf2(XHalf x, XHalf y) :
-		x(x), y(y) {}
+		x(x), y(y)
+	{
+	}
 
 	XHalf2(float _x, float _y)
 	{
@@ -78,7 +76,8 @@ struct XHalf2
 	}
 
 
-	static XHalf2 compress(float x, float y) {
+	static XHalf2 compress(float x, float y)
+	{
 		return XHalf2(
 			XHalfCompressor::compress(x),
 			XHalfCompressor::compress(y)
@@ -89,19 +88,18 @@ struct XHalf2
 	{
 		return XHalf2(0_u16, 0_u16);
 	}
+
+	XHalf x;
+	XHalf y;
 };
 
 struct XHalf4
 {
-	XHalf x;
-	XHalf y;
-	XHalf z;
-	XHalf w;
-
-
 	XHalf4() {}
 	XHalf4(XHalf x, XHalf y, XHalf z, XHalf w) :
-		x(x), y(y), z(z), w(w) {}
+		x(x), y(y), z(z), w(w) 
+	{
+	}
 
 	XHalf4(float _x, float _y, float _z, float _w)
 	{
@@ -127,7 +125,7 @@ struct XHalf4
 		return *this;
 	}
 
-	Vec4f Decompress() {
+	Vec4f decompress(void) {
 		return Vec4f(
 			XHalfCompressor::decompress(x),
 			XHalfCompressor::decompress(y),
@@ -140,6 +138,11 @@ struct XHalf4
 	{
 		return XHalf4(0_u16,0_u16,0_u16,0_u16);
 	}
+
+	XHalf x;
+	XHalf y;
+	XHalf z;
+	XHalf w;
 };
 
 
