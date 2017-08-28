@@ -101,12 +101,12 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, 
 	const Matrix44f* pBoneMatrix, size_t num) const
 {
-	if (numBones() != num) {
+	if (numBones() != static_cast<int32_t>(num)) {
 		X_ERROR("Model", "Bone count don't match source count");
 		return;
 	}
 
-	for (int32_t i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		const Matrix44f& mat = pBoneMatrix[i];
 		const Vec3f& pos = pBonePos_[i];
@@ -162,7 +162,7 @@ void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix
 void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
 	Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const
 {
-	if (numBones() != num) {
+	if (numBones() != static_cast<int32_t>(num)) {
 		X_ERROR("Model", "Bone count don't match source count");
 		return;
 	}
@@ -176,7 +176,7 @@ void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix
 	ctx.effectId = 0;
 	ctx.size = Vec2f(textSize, textSize);
 
-	for (int32_t i = 0; i < num; i++)
+	for (size_t i = 0; i < num; i++)
 	{
 		const Vec3f& pos = pBonePos_[i];
 		Vec3f worldPos = modelMat * pBoneMatrix[i] * pos;
