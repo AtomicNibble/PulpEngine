@@ -75,6 +75,11 @@ X_INLINE bool XModel::hasPhys(void) const
 	return hdr_.flags.IsSet(ModelFlag::PHYS_DATA);
 }
 
+X_INLINE bool XModel::isAnimated(void) const
+{
+	return hdr_.flags.IsSet(ModelFlag::ANIMATED);
+}
+
 
 X_INLINE size_t XModel::lodIdxForDistance(float distance) const
 {

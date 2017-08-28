@@ -44,6 +44,7 @@ public:
 	X_INLINE int32_t numVerts(size_t lodIdx) const;
 	X_INLINE bool hasLods(void) const;
 	X_INLINE bool hasPhys(void) const;
+	X_INLINE bool isAnimated(void) const;
 	X_INLINE size_t lodIdxForDistance(float distance) const;
 
 	X_INLINE const AABB& bounds(void) const;
