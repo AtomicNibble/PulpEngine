@@ -53,16 +53,6 @@ X_INLINE constexpr T X_FOURCC( char a, char b, char c, char d )
 	return (T)(a | b << 8 | c << 16 | d << 24);
 }
 
-
-template<class T>
-X_INLINE void DeleteAndNull(T*& pVal)
-{
-	// I don't allow new / delete anymore.
-	X_ASSERT_UNREACHABLE();
-	delete pVal;
-	pVal = 0;
-}
-
 template<class T>
 X_INLINE void SafeRelease(T*& pVal)
 {
