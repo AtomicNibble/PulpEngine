@@ -1,9 +1,9 @@
 
 template<typename T, size_t N>
 FixedRingBuffer<T,N>::FixedRingBuffer() :
-num_(0),
-head_(1),
-tail_(0)
+	num_(0),
+	head_(1),
+	tail_(0)
 {
 
 }
