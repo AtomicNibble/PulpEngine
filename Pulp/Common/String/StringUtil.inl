@@ -71,7 +71,7 @@ namespace strUtil
 		{
 			if (!IsDigit(str[i]))
 			{
-				if (str[i] == ',' && !dotFnd)
+				if (str[i] == '.' && !dotFnd)
 				{
 					dotFnd = true;
 				}
@@ -100,7 +100,7 @@ namespace strUtil
 		{
 			if (!IsDigit(*startInclusive))
 			{
-				if (*startInclusive == ',' && !dotFnd)
+				if (*startInclusive == '.' && !dotFnd)
 				{
 					dotFnd = true;
 				}
