@@ -124,7 +124,7 @@ public:
 
 	// Bone
 	void drawBone(const Transformf& rParent, const Transformf& rBone, const Color8u& col);
-	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col);
+	X_INLINE void drawBone(const Matrix44f& rParent, const Matrix44f& rBone, const Color8u& col);
 
 	// Frustum - Sexyyyyyyyyyy
 	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool solid = false);

@@ -769,13 +769,6 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 
 }
 
-void IPrimativeContext::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col)
-{
-	// just make them quat trans cus yer.
-	drawBone(Transformf(rParent), Transformf(rBone), col);
-}
-
-
 
 // Frustum - Sexyyyyyyyyyy
 void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool solid)

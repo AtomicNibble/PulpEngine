@@ -178,6 +178,11 @@ X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Vec3f& v1, 
 }
 
 
+X_INLINE void IPrimativeContext::drawBone(const Matrix44f& rParent, const Matrix44f& rBone, const Color8u& col)
+{
+	// just make them quat trans cus yer.
+	drawBone(Transformf(rParent), Transformf(rBone), col);
+}
 
 X_INLINE void IPrimativeContext::drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args)
 {
