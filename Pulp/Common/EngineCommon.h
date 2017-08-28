@@ -90,9 +90,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Threading\ThreadLocalStorage.h>
 #include <Threading\Thread.h>
 
-
-#include <Profile\ProfilerTypes.h>
-
 // Memory
 #include <Memory\NewAndDelete.h>
 #include <Memory\NewAndDeleteMacros.h>
@@ -149,6 +146,8 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
 #include <Random\MultiplyWithCarry.h>
 #include <Random\XorShift.h>
+
+#include <Profile\ProfilerTypes.h>
 
 #define _STDINT // fuck standard types!
 #include <memory>
