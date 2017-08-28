@@ -37,7 +37,7 @@ XTimer::XTimer() :
 	maxFps_(0),
 	deltaBufIdx_(0)
 {
-
+	core::zero_object(accumalatedTime_);
 
 }
 
@@ -78,6 +78,8 @@ void XTimer::reset(void)
 	baseTime_ = SysTimer::Get();
 	lastFrameStartTime_ = 0;
 	currentTime_ = 0;
+
+	core::zero_object(accumalatedTime_);
 }
 
 
@@ -130,13 +132,19 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 	// now we need to scale each of the timers.
 	{
 		const int64_t gameTime = scaleTime(frameDeltaCapped, timeScale_);
+		accumalatedTime_[Timer::GAME] += gameTime;
 		frameTime.deltas[Timer::GAME].SetValue(gameTime);
 	}
 	{
 		const int64_t uiTime = scaleTime(frameDeltaCapped, timeScaleUi_);
+		accumalatedTime_[Timer::UI] += uiTime;
 		frameTime.deltas[Timer::UI].SetValue(uiTime);
 	}
 
+	// i want the accumalated scaled time.
+	frameTime.ellapsed[Timer::GAME].SetValue(accumalatedTime_[Timer::GAME]);
+	frameTime.ellapsed[Timer::UI].SetValue(accumalatedTime_[Timer::UI]);
+	
 	updateAvgFrameTime(TimeVal(frameDeltaCapped));
 
 	// set last time for use next frame.

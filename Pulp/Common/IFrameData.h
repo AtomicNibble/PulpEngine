@@ -32,6 +32,7 @@ struct FrameTimeData
 
 	TimeVal deltas[ITimer::Timer::ENUM_COUNT];
 	TimeVal unscaledDeltas[ITimer::Timer::ENUM_COUNT];
+	TimeVal ellapsed[ITimer::Timer::ENUM_COUNT];
 };
 
 X_DISABLE_WARNING(4324)
