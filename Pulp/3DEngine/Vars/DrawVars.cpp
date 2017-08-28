@@ -1,14 +1,14 @@
 #include "stdafx.h"
-#include "LevelVars.h"
+#include "DrawVars.h"
 
 #include <IConsole.h>
 #include <ILevel.h>
 
-X_NAMESPACE_BEGIN(level)
+X_NAMESPACE_BEGIN(engine)
 
 
 
-LevelVars::LevelVars()
+DrawVars::DrawVars()
 {
 	usePortals_ = 1;
 	drawAreaBounds_ = 0;
@@ -23,7 +23,7 @@ LevelVars::LevelVars()
 	cullEnts_ = 0;
 }
 
-void LevelVars::registerVars(void)
+void DrawVars::registerVars(void)
 {
 	ADD_CVAR_REF("r_usePortals", usePortals_, 1, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,

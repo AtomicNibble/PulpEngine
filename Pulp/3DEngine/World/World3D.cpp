@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "World3D.h"
 
-#include "Vars\LevelVars.h"
+#include "Vars\DrawVars.h"
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
 #include "Drawing\PrimativeContext.h"
@@ -190,7 +190,7 @@ void World3D::AreaRefInfo::free(void)
 // --------------------------------
 
 
-World3D::World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan, 
+World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan,
 	physics::IScene* pPhysScene, core::MemoryArenaBase* arena) :
 	arena_(X_ASSERT_NOT_NULL(arena)),
 	pPhysScene_(X_ASSERT_NOT_NULL(pPhysScene)),

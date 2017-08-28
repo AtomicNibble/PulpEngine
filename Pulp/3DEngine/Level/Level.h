@@ -12,7 +12,7 @@
 
 #include "Model\XModel.h"
 
-#include <Vars\LevelVars.h>
+#include <Vars\DrawVars.h>
 
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
@@ -336,7 +336,7 @@ private:
 	physics::IScene* pScene_; // the scene for this level.
 
 private:
-	LevelVars vars_;
+	engine::DrawVars vars_;
 };
 
 

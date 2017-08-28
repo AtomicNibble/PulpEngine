@@ -76,9 +76,6 @@
     <ClCompile Include="Texture\Texture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="Vars\LevelVars.cpp">
-      <Filter>Source Files\Vars</Filter>
-    </ClCompile>
     <ClCompile Include="Vars\MaterialVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
@@ -93,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="Anim\AnimInstance.cpp">
       <Filter>Source Files\Anim</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\DrawVars.cpp">
+      <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,9 +165,6 @@
     <ClInclude Include="EngineEnv.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Vars\LevelVars.h">
-      <Filter>Header Files\Vars</Filter>
-    </ClInclude>
     <ClInclude Include="Vars\MaterialVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
@@ -182,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="Anim\AnimInstance.h">
       <Filter>Header Files\Anim</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\DrawVars.h">
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -283,9 +283,6 @@
     <None Include="Texture\Texture.inl">
       <Filter>Header Files\Texture</Filter>
     </None>
-    <None Include="Vars\LevelVars.inl">
-      <Filter>Header Files\Vars</Filter>
-    </None>
     <None Include="Vars\MaterialVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
@@ -294,6 +291,9 @@
     </None>
     <None Include="Anim\Anim.inl">
       <Filter>Header Files\Anim</Filter>
+    </None>
+    <None Include="Vars\DrawVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -4,7 +4,7 @@
 #define _X_RENDER_SYS_H_
 
 #include "I3DEngine.h"
-#include "Vars\LevelVars.h"
+#include "Vars\DrawVars.h"
 
 #include <IModel.h>
 #include <IRenderMesh.h>
@@ -76,7 +76,7 @@ private:
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 	
 //	level::Level level_;
-	level::LevelVars lvlVars_;
+	DrawVars drawVars_;
 
 	WorldArr worlds_;
 };

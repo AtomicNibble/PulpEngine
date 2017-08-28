@@ -21,13 +21,9 @@ X_NAMESPACE_DECLARE(engine,
 	class PrimativeContext;
 )
 
-X_NAMESPACE_DECLARE(level,
-	class LevelVars;
-)
-
 X_NAMESPACE_BEGIN(engine)
 
-
+class DrawVars;
 
 class RenderEnt : public IRenderEnt
 {
@@ -177,7 +173,7 @@ class World3D : public IWorld3D
 	};
 
 public:
-	World3D(level::LevelVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan,
+	World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferManager* pCBufMan,
 		physics::IScene* pPhysScene, core::MemoryArenaBase* arena);
 	virtual ~World3D() X_FINAL;
 
@@ -260,7 +256,7 @@ private:
 	engine::PrimativeContext* pPrimContex_;
 	CBufferManager* pCBufMan_;
 
-	level::LevelVars& vars_;
+	DrawVars& vars_;
 
 	bool outsideWorld_;
 

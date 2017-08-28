@@ -5,14 +5,14 @@ X_NAMESPACE_DECLARE(core,
 )
 
 
-X_NAMESPACE_BEGIN(level)
+X_NAMESPACE_BEGIN(engine)
 
 
-class LevelVars
+class DrawVars
 {
 public:
-	LevelVars();
-	~LevelVars() = default;
+	DrawVars();
+	~DrawVars() = default;
 
 	void registerVars(void);
 
@@ -58,4 +58,4 @@ private:
 
 X_NAMESPACE_END
 
-#include "LevelVars.inl"
+#include "DrawVars.inl"
