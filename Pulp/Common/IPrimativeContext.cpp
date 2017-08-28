@@ -888,7 +888,7 @@ void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, const Co
 	drawLines(points, X_ARRAY_SIZE(points), color);
 }
 
-void IPrimativeContext::drawwCrosshair(const Vec3f& pos, size_t size, const Color& color)
+void IPrimativeContext::drawCrosshair(const Vec3f& pos, size_t size, const Color8u& color)
 {
 	Vec3f points[4] = {
 		Vec3f(pos.x - size, pos.y, pos.z), // left

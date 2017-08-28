@@ -60,6 +60,8 @@ public:
 	virtual void reset(void) X_ABSTRACT;
 	virtual void setDepthTest(bool enabled) X_ABSTRACT;
 
+	// TODO: all these Color need replacing with Color8u.
+
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
 	void drawQuadSS(float x, float y, float width, float height, const Color& col);
 	void drawQuadSS(const Rectf& rect, const Color& col);
@@ -134,7 +136,7 @@ public:
 	void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color);
 
 	// CrosssHair
-	void drawwCrosshair(const Vec3f& pos, size_t size, const Color& color);
+	void drawCrosshair(const Vec3f& pos, size_t size, const Color8u& color);
 
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);
