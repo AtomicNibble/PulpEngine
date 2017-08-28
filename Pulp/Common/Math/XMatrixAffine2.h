@@ -425,16 +425,16 @@ const MatrixAffine2<T> MatrixAffine2<T>::operator-(T rhs) const
 template<typename T>
 T& MatrixAffine2<T>::at(int row, int col)
 {
-	assert(row >= 0 && row < 2);
-	assert(col >= 0 && col < 3);
+	X_ASSERT(row >= 0 && row < 2, "out of range")(row, col);
+	X_ASSERT(col >= 0 && col < 3, "out of range")(row, col);
 	return m[col * 2 + row];
 }
 
 template<typename T>
 const T& MatrixAffine2<T>::at(int row, int col) const
 {
-	assert(row >= 0 && row < 2);
-	assert(col >= 0 && col < 3);
+	X_ASSERT(row >= 0 && row < 2, "out of range")(row, col);
+	X_ASSERT(col >= 0 && col < 3, "out of range")(row, col);
 	return m[col * 2 + row];
 }
 
