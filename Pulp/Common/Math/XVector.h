@@ -1100,9 +1100,8 @@ public:
 	X_INLINE Vec3<T> xyz() const { return Vec3<T>(x, y, z); }
 	X_INLINE Vec2<T> xy() const { return Vec2<T>(x, y); }
 
-	static Vec5<T> NaN()   {
-		return Vec5<T>(math<T>::NaN(), math<T>::NaN(), math<T>::NaN(),
-		math<T>::NaN(), , math<T>::NaN());
+	static Vec5<T> NaN() {
+		return Vec5<T>(math<T>::NaN(), math<T>::NaN(), math<T>::NaN(), math<T>::NaN(), math<T>::NaN());
 	}
 
 	static Vec5<T> abs(const Vec5<T>& vec) {
