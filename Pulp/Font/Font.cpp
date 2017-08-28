@@ -435,7 +435,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 
 	if (debugPos)
 	{
-		pPrimCon->drawCrosshair(pos, 10, Col_Red);
+		pPrimCon->drawCrosshair(pos, 6.f, Col_Red);
 	}
 
 	if (shiftedPosition)
