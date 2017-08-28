@@ -253,7 +253,7 @@ void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const V
 	}
 }
 
-void IPrimativeContext::drawLines(Vec3f* pPoints, uint32_t num, const Color8u& col)
+void IPrimativeContext::drawLines(const Vec3f* pPoints, uint32_t num, const Color8u& col)
 {
 	X_ASSERT_NOT_NULL(pPoints);
 	X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num);

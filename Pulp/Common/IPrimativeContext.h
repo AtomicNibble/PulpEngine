@@ -85,7 +85,7 @@ public:
 	// draw a quad in 3d z is position not depth.
 	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col);
 
-	void drawLines(Vec3f* pPoints, uint32_t num, const Color8u& col);
+	void drawLines(const Vec3f* pPoints, uint32_t num, const Color8u& col);
 	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);
 	X_INLINE void drawLine(const Vec3f& pos1, const Color8u& color1,
 		const Vec3f& pos2, const Color8u& color2);
