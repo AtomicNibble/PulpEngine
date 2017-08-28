@@ -11,23 +11,26 @@ template<typename T>
 SmartPointer<T>::SmartPointer(T* p) :
 	pData_(p)
 {
-	if (p)
+	if (p) {
 		p->addRef();
+	}
 }
 
 template<typename T>
 SmartPointer<T>::SmartPointer(const SmartPointer& oth) :
 	pData_(oth.pData_)
 {
-	if (pData)
-		pData->addRef();
+	if (pData_) {
+		pData_->addRef();
+	}
 }
 
 template<typename T>
 SmartPointer<T>::~SmartPointer()
 {
-	if (pData_)
+	if (pData_) {
 		pData_->release();
+	}
 }
 
 template<typename T>
@@ -82,10 +85,12 @@ void SmartPointer<T>::reset(T* p)
 template<typename T>
 SmartPointer<T>& SmartPointer<T>::operator=(T* newP)
 {
-	if (newP)
+	if (newP) {
 		newP->addRef();
-	if (pData_)
+	}
+	if (pData_) {
 		pData_->release();
+	}
 	pData_ = newP;
 	return *this;
 }
@@ -93,10 +98,12 @@ SmartPointer<T>& SmartPointer<T>::operator=(T* newP)
 template<typename T>
 SmartPointer<T>& SmartPointer<T>::operator=(const SmartPointer<T>& newp)
 {
-	if (newp.pData_)
+	if (newp.pData_) {
 		newp.pData_->addRef();
-	if (pData_)
+	}
+	if (pData_) {
 		pData_->release();
+	}
 	pData_ = newp.pData_;
 	return *this;
 }
@@ -158,6 +165,6 @@ bool SmartPointer<T>::operator >(const T* p2) const
 template<typename T>
 void SmartPointer<T>::swap(SmartPointer<T>& oth)
 {
-	core::swap(pData_, oth.pData_);
+	core::Swap(pData_, oth.pData_);
 }
 
