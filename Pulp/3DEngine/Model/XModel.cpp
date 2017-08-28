@@ -120,11 +120,11 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 		{
 			Transformf qTrans;
 			qTrans.quat = angle.asQuat();
-			qTrans.pos = modelMat * (mat.getTranslate().xyz() + pos);
+			qTrans.pos = modelMat * mat * pos;
 
 			Transformf qTransPar;
 			qTransPar.quat = parAngle.asQuat();
-			qTransPar.pos = modelMat * (parMat.getTranslate().xyz() + parPos);
+			qTransPar.pos = modelMat * parMat * parPos;
 		
 			pPrimContex->drawBone(qTransPar, qTrans, col);
 		}
@@ -178,14 +178,13 @@ void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix
 
 	for (int32_t i = 0; i < num; i++)
 	{
-		Vec3f relPos = pBoneMatrix[i].getTranslate().xyz();
 		const Vec3f& pos = pBonePos_[i];
-		Vec3f worldPos = modelMat * (pos);
+		Vec3f worldPos = modelMat * pBoneMatrix[i] * pos;
 
 		// temp hack.
 		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
 
-		pPrimContex->drawText(worldPos + offset + relPos, view, ctx, pBoneName);
+		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
 	}
 }
 
