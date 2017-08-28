@@ -12,6 +12,7 @@
 #include <IFileSys.h>
 #include <IPrimativeContext.h>
 #include <IRenderCommands.h>
+#include <IFrameData.h>
 
 #include <Math\VertexFormats.h>
 
@@ -132,7 +133,7 @@ bool XFont::WaitTillReady(void)
 	return pFontTexture_->WaitTillReady();
 }
 
-void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
+void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time)
 {
 	font::TextDrawContext ctx;
 	ctx.pFont = this;
@@ -141,10 +142,10 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.flags = font::DrawTextFlag::FRAMED;
 
 	// going to draw various test text.
-	float posX = 30;
-	float posY = 30;
-	float SpacingX = 80;
-	float SpacingY = 80;
+	float posX = 30.f;
+	float posY = 30.f;
+	float SpacingX = 80.f;
+	float SpacingY = 80.f;
 
 	ctx.SetColor(Col_Aqua);
 	ctx.SetCharWidthScale(1.0f);
@@ -207,8 +208,8 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.SetSize(Vec2f(16.f, 16.f));
 	pPrimCon->drawText(10, posY += SpacingY, ctx, "Tgjycu {,}()£$% 16x16 1.0\tscale");
 
-	posX = 400;
-	posY = 80;
+	posX = 400.f;
+	posY = 80.f;
 
 	ctx.flags.Set(DrawTextFlag::CENTER);
 
@@ -247,9 +248,9 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	ctx.flags.Remove(DrawTextFlag::RIGHT);
 	ctx.flags.Set(DrawTextFlag::CENTER);
 
-	SpacingY = 25;
-	posX = 450;
-	posY += 150;
+	SpacingY = 25.f;
+	posX = 450.f;
+	posY += 150.f;
 
 	ctx.SetCharWidthScale(1.0f);
 	ctx.SetSize(Vec2f(16.f, 16.f));
@@ -265,23 +266,50 @@ void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon)
 	pPrimCon->drawText(posX, posY += SpacingY, ctx, "meow meow");
 
 	// do some clip test.
-	posX = 600;
-	posY = 200;
+	posX = 600.f;
+	posY = 170;
 
 	ctx.flags &= ~(DrawTextFlag::CENTER_VER | DrawTextFlag::CENTER | DrawTextFlag::RIGHT);
 	ctx.flags.Set(DrawTextFlag::CLIP);
+	
+	// fixed clip test.
 
-	ctx.clip.x1 = posX + 13;
-	ctx.clip.y1 = posY + 12;
-	ctx.clip.x2 = posX + 150;
-	ctx.clip.y2 = posY + 45;
-	pPrimCon->drawText(posX, posY, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow");
+	ctx.clip.x1 = posX + 13.f;
+	ctx.clip.y1 = posY + 12.f;
+	ctx.clip.x2 = posX + 150.f ;
+	ctx.clip.y2 = posY + 45.f;
+
+	pPrimCon->drawText(posX, posY, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow meow.");
+
+	posY += 60.f;
+
+	// move the clip around
+	const float rangeX = 50.f;
+	const float rangeY = 10.f;
+	const float ellapsed = time.ellapsed[core::Timer::UI].GetMilliSeconds();
+
+	float resultX = sin(ellapsed * 0.001f) * rangeX;
+	float resultY = sin(ellapsed * 0.0001f) * rangeY;
+
+	ctx.clip.x1 = posX + 13.f;
+	ctx.clip.y1 = posY + 12.f;
+	ctx.clip.x2 = posX + 100.f + resultX; 
+	ctx.clip.y2 = posY + 35.f + resultY;
+
+	pPrimCon->drawText(posX, posY, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow meow.");
+
+	posY += 60.f;
+
+	ctx.clip.x1 = posX + 13.f + resultX;
+	ctx.clip.y1 = posY + 12.f + resultY;
+	ctx.clip.x2 = posX + 150.f;
+	ctx.clip.y2 = posY + 45.f;
+
+	pPrimCon->drawText(posX, posY, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow meow.");
 
 	// same agint not clipped
 	ctx.flags.Remove(DrawTextFlag::CLIP);
-	pPrimCon->drawText(posX, posY + 100, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow");
-
-
+	pPrimCon->drawText(posX, posY + 70.f, ctx, "meow meow\tmeow meow\nmeow meow\t  OOOOO\nmeow\t\t\tmeow");
 }
 
 

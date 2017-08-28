@@ -10,9 +10,10 @@ struct ICore;
 
 
 X_NAMESPACE_DECLARE(engine, class IPrimativeContext);
+X_NAMESPACE_DECLARE(core, struct FrameTimeData);
+
 
 X_NAMESPACE_BEGIN(font)
-
 
 
 struct IFont;
@@ -133,7 +134,7 @@ struct IFont
 	virtual bool WaitTillReady(void) X_ABSTRACT;
 
 	// draw a load of test text.
-	virtual void DrawTestText(engine::IPrimativeContext* pPrimCon) X_ABSTRACT;
+	virtual void DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time) X_ABSTRACT;
 
 	// these draw the text into the primative context.
 	virtual void DrawString(engine::IPrimativeContext* pPrimCon, const Vec3f& pos, const Matrix33f& ang,
