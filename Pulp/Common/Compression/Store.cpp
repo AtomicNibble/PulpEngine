@@ -7,41 +7,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
-	namespace
-	{
-		int compressLevelToAcceleration(CompressLevel::Enum lvl)
-		{
-			if (lvl == CompressLevel::LOW) {
-				return 8;
-			}
-			if (lvl == CompressLevel::NORMAL) {
-				return 3;
-			}
-			if (lvl == CompressLevel::HIGH) {
-				return 1;
-			}
-
-			X_ASSERT_UNREACHABLE();
-			return 1;
-		}
-
-		int compressLevelToAccelerationHC(CompressLevel::Enum lvl)
-		{
-			if (lvl == CompressLevel::LOW) {
-				return 4;
-			}
-			if (lvl == CompressLevel::NORMAL) {
-				return 8;
-			}
-			if (lvl == CompressLevel::HIGH) {
-				return 16;
-			}
-
-			X_ASSERT_UNREACHABLE();
-			return 1;
-		}
-
-	} // namespace
 
 	Algo::Enum Store::getAlgo(void)
 	{
