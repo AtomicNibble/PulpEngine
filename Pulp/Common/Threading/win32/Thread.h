@@ -6,6 +6,7 @@
 
 #include <Traits/FunctionTraits.h>
 #include <Util\Delegate.h>
+#include <Util\LastError.h>
 
 #include <String\StackString.h>
 
