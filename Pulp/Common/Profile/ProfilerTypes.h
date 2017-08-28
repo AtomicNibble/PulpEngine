@@ -50,18 +50,20 @@ namespace profiler
 	template<typename T, size_t N>
 	class ProfilerHistory : public core::FixedRingBuffer<T, N>
 	{
+		typedef core::FixedRingBuffer<T, N> BaseT;
+
 	public:
 
 		X_INLINE T getAvg(void) const
 		{
-			return core::accumulate(begin(), end(), 0) / size();
+			return core::accumulate(BaseT::begin(), BaseT::end(), 0) / BaseT::size();
 		}
 
 		X_INLINE T getMin(void) const
 		{
 			T min = (T)0;
-			auto it = begin();
-			for (min = (*it); it != end(); ++it) {
+			auto it = BaseT::begin();
+			for (min = (*it); it != BaseT::end(); ++it) {
 				if (min > (*it)) {
 					min = (*it);
 				}
@@ -72,8 +74,8 @@ namespace profiler
 		X_INLINE T getMax(void) const
 		{
 			T max = (T)0;
-			auto it = begin();
-			for (max = (*it); it != end(); ++it) {
+			auto it = BaseT::begin();
+			for (max = (*it); it != BaseT::end(); ++it) {
 				if (max < (*it)) {
 					max = (*it);
 				}
