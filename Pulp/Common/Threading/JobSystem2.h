@@ -285,31 +285,6 @@ private:
 	size_t size_;
 };
 
-template <typename JobData>
-static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
-{
-	const JobData* data = static_cast<const JobData*>(jobData);
-	const JobData::SplitterType& splitter = data->splitter_;
-
-	if (splitter.Split<JobData::DataType>(data->count_))
-	{
-		// split in two
-		const size_t leftCount = data->count_ / 2u;
-		const JobData leftData(data->data_, leftCount, data->pFunction_, splitter);
-		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, leftData JOB_SYS_SUB_PASS(job->subSystem));
-		jobSys.Run(left);
-
-		const size_t rightCount = data->count_ - leftCount;
-		const JobData rightData(data->data_ + leftCount, rightCount, data->pFunction_, splitter);
-		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, rightData JOB_SYS_SUB_PASS(job->subSystem));
-		jobSys.Run(right);
-	}
-	else
-	{
-		(data->pFunction_)(data->data_, data->count_);
-	}
-}
-
 
 template <typename T, typename S>
 struct parallel_for_job_data
@@ -333,32 +308,6 @@ struct parallel_for_job_data
 	SplitterType splitter_;
 };
 
-template <typename JobData>
-static inline void parallel_for_member_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
-{
-	X_UNUSED(threadIdx);
-
-	const JobData* data = static_cast<const JobData*>(jobData);
-	const JobData::SplitterType& splitter = data->splitter_;
-
-	if (splitter.Split<JobData::DataType>(data->count_))
-	{
-		// split in two
-		const uint32_t leftCount = data->count_ / 2u;
-		const JobData leftData(data->delagte_, data->data_, leftCount, splitter);
-		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData JOB_SYS_SUB_PASS(job->subSystem));
-		jobSys.Run(left);
-
-		const uint32_t rightCount = data->count_ - leftCount;
-		const JobData rightData(data->delagte_, data->data_ + leftCount, rightCount, splitter);
-		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData JOB_SYS_SUB_PASS(job->subSystem));
-		jobSys.Run(right);
-	}
-	else
-	{
-		data->delagte_.Invoke(data->data_, data->count_);
-	}
-}
 
 template <typename C, typename T, typename S>
 struct parallel_for_member_job_data
