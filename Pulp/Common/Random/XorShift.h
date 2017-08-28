@@ -3,8 +3,6 @@
 #ifndef X_XORSHIFT_H
 #define X_XORSHIFT_H
 
-#include <limits>
-
 X_NAMESPACE_BEGIN(core)
 
 namespace random
