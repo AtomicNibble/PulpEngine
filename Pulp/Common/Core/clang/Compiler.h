@@ -24,7 +24,7 @@
 #define X_RESTRICT_RV								__declspec(restrict)
 #define X_NO_ALIAS									__declspec(noalias)
 #define X_UNUSED_IMPL(symExpr, n)					, (void)(symExpr)
-#define X_UNUSED(x)									(void)(x) // (void)(true) X_PP_EXPAND_ARGS(X_UNUSED_IMPL, __VA_ARGS__)
+#define X_UNUSED(...)									(void)(true) X_PP_EXPAND_ARGS(X_UNUSED_IMPL, __VA_ARGS__)
 #define X_ALIGNED_SYMBOL(symbol, alignment)			__declspec(align(alignment)) symbol
 #define X_ALIGN_OF(type)							__alignof(type)
 #define X_INLINE									__forceinline
