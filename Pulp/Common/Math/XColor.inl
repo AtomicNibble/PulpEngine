@@ -254,7 +254,7 @@ X_INLINE ColorT<T>& ColorT<T>::normalize()
 template<typename T>
 X_INLINE ColorT<T> ColorT<T>::premultiplied() const
 {
-	return ColorAT<T>(r * a, g * a, b * a, a);
+	return ColorT<T>(r * a, g * a, b * a, a);
 }
 
 template<typename T>
