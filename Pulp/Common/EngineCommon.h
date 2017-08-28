@@ -145,6 +145,8 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Math\XTransform.h>
 #include <Math\XHalf.h>
 
+#include <Random\MultiplyWithCarry.h>
+#include <Random\XorShift.h>
 
 #define _STDINT // fuck standard types!
 #include <memory>
