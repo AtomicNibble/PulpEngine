@@ -7,9 +7,6 @@
 #include "XMath.h"
 #include "XVector.h"
 
-#include <iomanip>
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // MatrixAffine2
@@ -183,18 +180,6 @@ public:
 	static MatrixAffine2<T>	makeSkewX(T radians);
 	static MatrixAffine2<T>	makeSkewY(T radians);
 
-	friend std::ostream& operator<<(std::ostream &lhs, const MatrixAffine2<T> &rhs)
-	{
-		for (int i = 0; i < 2; i++) {
-			lhs << " |";
-			for (int j = 0; j < 3; j++) {
-				lhs << std::setw(12) << std::setprecision(5) << rhs.m[j * 2 + i];
-			}
-			lhs << "|" << std::endl;
-		}
-
-		return lhs;
-	}
 };
 
 template<typename T>
