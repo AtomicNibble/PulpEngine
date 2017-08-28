@@ -89,6 +89,40 @@ void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f&
 	}
 }
 
+
+void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, 
+	const Matrix44f* pBoneMatrix, size_t num) const
+{
+	if (numBones() != num) {
+		X_ERROR("Model", "Bone count don't match source count");
+		return;
+	}
+
+	for (int32_t i = 0; i < num; i++)
+	{
+		const Matrix44f& mat = pBoneMatrix[i];
+		const Vec3f& pos = pBonePos_[i];
+		const XQuatCompressedf& angle = pBoneAngles_[i];
+		const uint8_t parIdx = pTagTree_[i];
+
+		const Matrix44f& parMat = pBoneMatrix[parIdx];
+		const Vec3f& parPos = pBonePos_[parIdx];
+		const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
+
+		{
+			Transformf qTrans;
+			qTrans.quat = angle.asQuat();
+			qTrans.pos = modelMat * (mat.getTranslate().xyz() + pos);
+
+			Transformf qTransPar;
+			qTransPar.quat = parAngle.asQuat();
+			qTransPar.pos = modelMat * (parMat.getTranslate().xyz() + parPos);
+		
+			pPrimContex->drawBone(qTransPar, qTrans, col);
+		}
+	}
+}
+
 void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view, 
 	Vec3f offset, float textSize, const Color8u col) const
 {
@@ -114,6 +148,36 @@ void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix
 		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
 
 		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
+	}
+}
+
+void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
+	Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const
+{
+	if (numBones() != num) {
+		X_ERROR("Model", "Bone count don't match source count");
+		return;
+	}
+
+
+	font::TextDrawContext ctx;
+	ctx.col = col;
+//	ctx.flags.Set(font::DrawTextFlag::CENTER);
+//	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
+	ctx.pFont = gEnv->pFontSys->GetDefault();
+	ctx.effectId = 0;
+	ctx.size = Vec2f(textSize, textSize);
+
+	for (int32_t i = 0; i < num; i++)
+	{
+		Vec3f relPos = pBoneMatrix[i].getTranslate().xyz();
+		const Vec3f& pos = pBonePos_[i];
+		Vec3f worldPos = modelMat * (pos);
+
+		// temp hack.
+		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
+
+		pPrimContex->drawText(worldPos + offset + relPos, view, ctx, pBoneName);
 	}
 }
 

@@ -62,8 +62,11 @@ public:
 	bool canRenderLod(size_t idx) const;
 
 	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const;
+	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
 	void RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
 		Vec3f offset, float textSize, const Color8u col) const;
+	void RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
+		Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
 
 	void assignDefault(XModel* pDefault);
 
