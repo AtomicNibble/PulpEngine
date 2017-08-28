@@ -246,10 +246,30 @@ struct SCoreGlobals // obbject is zerod on start.
 	core::random::XorShift		xorShift;
 
 	X_INLINE SCoreGlobals() {
-		memset(this, 0, X_OFFSETOF(SCoreGlobals, xorShift));
+		pCore = nullptr;
+		pInput = nullptr;
+		pTimer = nullptr;
+		pConsole = nullptr;
+		pFileSys = nullptr;
+		pFontSys = nullptr;
+		pSound = nullptr;
+		pLog = nullptr;
+		pScriptSys = nullptr;
+		pRender = nullptr;
+		p3DEngine = nullptr;
+		pPhysics = nullptr;
+		pGame = nullptr;
+		pNet = nullptr;
+		pJobSys = nullptr;
+		pProfiler = nullptr;
+		pDirWatcher = nullptr;
+		pHotReload = nullptr;
+		pArena = nullptr;
+		pStrArena = nullptr;
+
 		client_ = false;
 		dedicated_ = false;
-		state_ = State::STARTING;;
+		state_ = State::STARTING;
 	}
 
 	X_INLINE const bool isStarting(void) const {
