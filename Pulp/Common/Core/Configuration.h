@@ -164,6 +164,11 @@
 #error "No Build Type Defined"
 #endif
 
+#if X_COMPILER_CLANG
 
+#undef X_ENABLE_ASSERTIONS
+#define X_ENABLE_ASSERTIONS 0
+
+#endif // X_COMPILER_CLANG
 
 #endif // _X_ENGINE_CONFIG_H_
