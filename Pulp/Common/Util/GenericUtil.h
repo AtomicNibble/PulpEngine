@@ -24,7 +24,7 @@ template<class T> X_INLINE constexpr const T& Min(const T& x, const T& y, const 
 template<typename T>
 X_INLINE void fill_object(T& obj, uint8_t val)
 {
-	std::memset(&obj, val, sizeof(obj));
+	memset(&obj, val, sizeof(obj));
 }
 
 
