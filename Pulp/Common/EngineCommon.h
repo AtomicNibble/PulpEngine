@@ -115,6 +115,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Containers\FixedStack.h>
 #include <Containers\Freelist.h>
 #include <Containers\FixedRingBuffer.h>
+#include <Containers\FixedArray.h>
 // #include <Containers\LinkedList.h>
 // #include <Containers\LinkedListIntrusive.h>
 
