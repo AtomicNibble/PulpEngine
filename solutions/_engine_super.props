@@ -4,21 +4,13 @@
     <_PropertySheetDisplayName>Engine Super</_PropertySheetDisplayName>
     <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Super\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Super\$(ProjectName)\</IntDir>
-   <TargetName>engine_$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
 	  <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\Super\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <ExceptionHandling>false</ExceptionHandling>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
 	<Link>
-		<TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
 		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Super\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>
   </ItemDefinitionGroup>
-</Project> 
+</Project>

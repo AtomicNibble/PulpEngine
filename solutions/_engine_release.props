@@ -4,21 +4,13 @@
     <_PropertySheetDisplayName>Engine Release</_PropertySheetDisplayName>
     <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Release\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Release\$(ProjectName)\</IntDir>
-   <TargetName>engine_$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
 	  <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\Release\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
-      <WarningLevel>EnableAllWarnings</WarningLevel>
-      <TreatWarningAsError>true</TreatWarningAsError>
-      <ExceptionHandling>false</ExceptionHandling>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
-      <OpenMPSupport>false</OpenMPSupport>
     </ClCompile>
 	<Link>
-		<TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
 		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>
   </ItemDefinitionGroup>
-</Project> 
+</Project>
