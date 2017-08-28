@@ -464,6 +464,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\entropy\fse_compress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -492,6 +496,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\entropy\fse_decompress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -520,6 +528,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\entropy\huf_compress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -548,6 +560,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\entropy\huf_decompress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -576,6 +592,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\lz5frame.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -604,6 +624,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\lz5_compress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -632,6 +656,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz5\lz5_decompress.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -660,6 +688,10 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Default</BasicRuntimeChecks>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Compression\DictBuilder.cpp" />
@@ -1506,7 +1538,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
@@ -1524,7 +1555,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
@@ -1559,7 +1589,6 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -1582,7 +1611,6 @@ move "Event.i" "Util\Event.h"</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
