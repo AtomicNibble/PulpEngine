@@ -17,10 +17,15 @@ namespace V2
 {
 	namespace
 	{
+#if X_COMPILER_CLANG
+		#define COMPILER_BARRIER_R 
+		#define COMPILER_BARRIER_W 
+		#define COMPILER_BARRIER_RW 
+#else
 		#define COMPILER_BARRIER_R _ReadBarrier();
 		#define COMPILER_BARRIER_W _WriteBarrier();
 		#define COMPILER_BARRIER_RW _ReadWriteBarrier();
-
+#endif
 	} // namespace
 
 	// ===================================
