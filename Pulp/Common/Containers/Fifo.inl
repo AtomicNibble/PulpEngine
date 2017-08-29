@@ -538,7 +538,7 @@ inline FifoIterator<T>& FifoIterator<T>::operator++(void)
 template<typename T>
 inline FifoIterator<T> FifoIterator<T>::operator++(int)
 {
-	iterator tmp = *this;
+	FifoIterator<T> tmp = *this;
 	++(*this); // call the function above.
 	return tmp;
 }
@@ -584,7 +584,7 @@ inline FifoConstIterator<T>& FifoConstIterator<T>::operator++(void)
 template<typename T>
 inline FifoConstIterator<T> FifoConstIterator<T>::operator++(int)
 {
-	const_iterator tmp = *this;
+	FifoConstIterator<T> tmp = *this;
 	++(*this); // call the function above.
 	return tmp;
 }
