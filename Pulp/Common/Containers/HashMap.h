@@ -198,7 +198,7 @@ public:
 	}
 
 	bool contains(const key_type& key) {
-		return BaseType::find(key) != end();
+		return BaseType::find(key) != BaseType::end();
 	}
 
 	template <class MemoryArenaT>
