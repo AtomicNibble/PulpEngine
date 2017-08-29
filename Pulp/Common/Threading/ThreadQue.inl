@@ -156,11 +156,11 @@ void ThreadQueBlocking<T, SynchronizationPrimitive>::pop(T& value)
 	while (true)
 	X_ENABLE_WARNING(4127)
 	{
-		lock_.Enter();
+		BaseQue::primitive_.Enter();
 		// if que empty wait
-		if (list_.isEmpty())
+		if (BaseQue::que_.isEmpty())
 		{
-			lock_.Leave();
+			BaseQue::primitive_.Leave();
 			signal_.wait();
 			// loop around to reauire lock to check if still empty.
 		}
@@ -170,12 +170,12 @@ void ThreadQueBlocking<T, SynchronizationPrimitive>::pop(T& value)
 		}
 	}
 
-	value = std::move(que_.peek());
-	que_.pop();
+	value = std::move(BaseQue::que_.peek());
+	BaseQue::que_.pop();
 
 	// clear signal and unlock
 	signal_.clear();
-	lock_.Leave();
+	BaseQue::primitive_.Leave();
 }
 
 template<typename T, typename SynchronizationPrimitive>
@@ -185,11 +185,11 @@ T ThreadQueBlocking<T, SynchronizationPrimitive>::pop(void)
 	while (true)
 	X_ENABLE_WARNING(4127)
 	{
-		lock_.Enter();
+		BaseQue::primitive_.Enter();
 			// if que empty wait
-		if (list_.isEmpty())
+		if (BaseQue::que_.isEmpty())
 		{
-			lock_.Leave();
+			BaseQue::primitive_.Leave();
 			signal_.wait();
 			// loop around to reauire lock to check if still empty.
 		}
@@ -199,12 +199,12 @@ T ThreadQueBlocking<T, SynchronizationPrimitive>::pop(void)
 		}
 	}
 
-	T value = std::move(que_.peek());
-	que_.pop();
+	T value = std::move(BaseQue::que_.peek());
+	BaseQue::que_.pop();
 
 	// clear signal and unlock
 	signal_.clear();
-	lock_.Leave();
+	BaseQue::primitive_.Leave();
 
 	return value;
 }
