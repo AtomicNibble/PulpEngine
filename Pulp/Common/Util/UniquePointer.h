@@ -42,6 +42,7 @@ public:
 
 	template<typename T2>
 	using is_convertible = std::is_convertible<typename UniquePointer<T2>::pointer, pointer>;
+
 	template<typename T2>
 	using can_assign = std::enable_if<!std::is_array<T2>::value && is_convertible<T2>::value, MyT&>;
 

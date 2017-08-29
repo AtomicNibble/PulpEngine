@@ -117,7 +117,12 @@ X_INLINE UniquePointer<T>& UniquePointer<T>::operator=(UniquePointer&& rhs)
 
 template<typename T>
 template<class T2>
+#if X_COMPILER_CLANG
+X_INLINE typename UniquePointer<T>::template can_assign<T2>::type UniquePointer<T>::operator=(UniquePointer<T2>&& rhs)
+#else
+// mscv rejects the template before can_assign :(
 X_INLINE typename UniquePointer<T>::can_assign<T2>::type UniquePointer<T>::operator=(UniquePointer<T2>&& rhs)
+#endif
 {
 	reset(rhs.release());
 	Mybase::arena_ = rhs.getArena();
@@ -317,9 +322,9 @@ bool operator<(const UniquePointer<_Ty1>& _Left, const UniquePointer<_Ty2>& _Rig
 {	// test if UniquePointer _Left precedes _Right
 	typedef typename UniquePointer<_Ty1>::pointer _Ptr1;
 	typedef typename UniquePointer<_Ty2>::pointer _Ptr2;
-	typedef typename common_type<_Ptr1, _Ptr2>::type _Common;
+	typedef typename std::common_type<_Ptr1, _Ptr2>::type _Common;
 
-	return (less<_Common>()(_Left.get(), _Right.get()));
+	return (std::less<_Common>()(_Left.get(), _Right.get()));
 }
 
 template<class _Ty1, class _Ty2>
@@ -368,14 +373,14 @@ template<class _Ty>
 bool operator<(const UniquePointer<_Ty>& _Left, nullptr_t _Right)
 {	// test if UniquePointer < nullptr
 	typedef typename UniquePointer<_Ty>::pointer _Ptr;
-	return (less<_Ptr>()(_Left.get(), _Right));
+	return (std::less<_Ptr>()(_Left.get(), _Right));
 }
 
 template<class _Ty>
 bool operator<(nullptr_t _Left, const UniquePointer<_Ty>& _Right)
 {	// test if nullptr < UniquePointer
 	typedef typename UniquePointer<_Ty>::pointer _Ptr;
-	return (less<_Ptr>()(_Left, _Right.get()));
+	return (std::less<_Ptr>()(_Left, _Right.get()));
 }
 
 template<class _Ty>
