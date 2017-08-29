@@ -20,7 +20,7 @@ XQuatCompressed<T>::XQuatCompressed(const Matrix33<T>& m)
 template<typename T>
 XQuatCompressed<T>::XQuatCompressed(T aW, T x, T y, T z)
 {
-	set(qW,x,y,z);
+	set(aW,x,y,z);
 }
 
 // -----------------------------------------------
