@@ -47,7 +47,7 @@ namespace Encryption
 #if SALSA20_SSE
 		static bool SSESupported(void);
 
-		void Salsa20::processBytesSSE(const uint8_t* input, uint8_t* output,
+		void processBytesSSE(const uint8_t* input, uint8_t* output,
 			size_t numBytes, int64_t byteOffset);
 #endif // SALSA20_SSE
 
