@@ -12,10 +12,16 @@
 #define X_FINAL										override final 
 
 #define X_PRAGMA(pragma)							__pragma(pragma)
-#define X_PUSH_WARNING_LEVEL(level)					X_PRAGMA(warning(push, level))
-#define X_POP_WARNING_LEVEL							X_PRAGMA(warning(pop))
-#define X_DISABLE_WARNING(number)					X_PRAGMA(warning(disable:number))
-#define X_ENABLE_WARNING(number)					X_PRAGMA(warning(default:number))
+
+// nop
+#define X_PUSH_WARNING_LEVEL(level)					
+#define X_POP_WARNING_LEVEL							
+#define X_DISABLE_WARNING(number)					
+#define X_ENABLE_WARNING(number)					
+
+#define X_PRAGMA_DIAG(x)							X_PRAGMA(GCC diagnostic x)
+#define X_DISABLE_WARNING_DIAG(name)				X_PRAGMA_DIAG(ignored X_PP_STRINGIZE(X_PP_JOIN(-W,name)))
+
 #define X_INTRINSIC(func)							
 
 #define X_DISABLE_EMPTY_FILE_WARNING				namespace { char NoEmptyFileDummy##__LINE__; }
