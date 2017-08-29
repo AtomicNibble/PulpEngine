@@ -7,7 +7,6 @@
 #include "Util\Cpu.h"
 #include <Memory\VirtualMem.h>
 
-#include <atomic>
 
 #include <Time\StopWatch.h>
 
