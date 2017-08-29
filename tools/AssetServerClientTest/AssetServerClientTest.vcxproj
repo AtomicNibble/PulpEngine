@@ -264,9 +264,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
+    <Import Project="..\..\solutions\_engine_win64_release.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
-    <Import Project="..\..\solutions\_engine_win64_release.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
