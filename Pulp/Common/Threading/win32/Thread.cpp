@@ -2,9 +2,9 @@
 #include "Thread.h"
 
 #if !defined(__midl) && !defined(GENUTIL) && !defined(_GENIA64_) && defined(_IA64_)
-#pragma intrinsic(__yield)
+X_INTRINSIC(__yield)
 #else
-#pragma intrinsic(_mm_pause)
+X_INTRINSIC(_mm_pause)
 #endif
 
 X_NAMESPACE_BEGIN(core)
