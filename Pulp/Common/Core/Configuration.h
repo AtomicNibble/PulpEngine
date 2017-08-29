@@ -66,7 +66,7 @@
 	#define X_COMPILER_CLANG 1
 #elif defined(_MSC_VER)
 	#define X_COMPILER msvc
-	#define X_COMPILER_MSCV 1
+	#define X_COMPILER_MSVC 1
 #else
 	#error Unknown compiler.
 #endif
