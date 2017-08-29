@@ -41,8 +41,8 @@ X_INLINE const typename UniquePointerBase<T>::pointer& UniquePointerBase<T>::ptr
 template<typename T>
 X_INLINE void UniquePointerBase<T>::swap(UniquePointerBase& oth)
 {
-	core::swap(pInstance_, oth.pInstance_);
-	core::swap(arena_, oth.arena_);
+	core::Swap(pInstance_, oth.pInstance_);
+	core::Swap(arena_, oth.arena_);
 }
 
 // ---------------------------------------
