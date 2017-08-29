@@ -64,9 +64,11 @@
 #if defined(__clang__)
 	#define X_COMPILER clang
 	#define X_COMPILER_CLANG 1
+	#define X_COMPILER_MSVC 0
 #elif defined(_MSC_VER)
 	#define X_COMPILER msvc
 	#define X_COMPILER_MSVC 1
+	#define X_COMPILER_CLANG 0
 #else
 	#error Unknown compiler.
 #endif
