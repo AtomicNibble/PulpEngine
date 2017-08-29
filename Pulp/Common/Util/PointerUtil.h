@@ -3,6 +3,7 @@
 #ifndef X_POINTERUTIL_H_
 #define X_POINTERUTIL_H_
 
+#include "Casts\union_cast.h"
 
 X_NAMESPACE_BEGIN(core)
 
