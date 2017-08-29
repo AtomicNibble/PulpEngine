@@ -1,7 +1,5 @@
 #include "EngineCommon.h"
 
-#pragma hdrstop
-
 #include "Console.h"
 #include "Util\LastError.h"
 
