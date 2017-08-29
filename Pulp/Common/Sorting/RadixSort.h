@@ -270,7 +270,6 @@ namespace Sorting
 	}
 
 
-
 	
 	class RadixSort
 	{
@@ -300,10 +299,6 @@ namespace Sorting
 		bool ranksValid_;
 		bool _pad[3];
 	};
-
-
-
-
 
 
 } // namespace Sorting
