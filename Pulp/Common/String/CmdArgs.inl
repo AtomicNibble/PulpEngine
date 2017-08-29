@@ -120,7 +120,7 @@ bool CmdArgs<BUF_SIZE, char>::hasFlag(const char* pFlag) const
 template<size_t BUF_SIZE>
 void CmdArgs<BUF_SIZE, char>::AppendArg(const char* pArg)
 {
-	const size_t argLen = wcslen(pArg);
+	const size_t argLen = strlen(pArg);
 
 	if (argc_ < 1)
 	{
