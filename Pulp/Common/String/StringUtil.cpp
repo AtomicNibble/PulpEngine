@@ -16,10 +16,17 @@ namespace strUtil
 
 	namespace
 	{
+#if X_COMPILER_CLANG
+		#define  bswap16	_byteswap_ushort
+		#define  bswap32	_byteswap_ulong
+		#define  MSBF16(x)   bswap16( (*(uint16_t const*)x) )
+		#define  MSBF32(x)   bswap32( (*(uint32_t const*)x) )
+#else
 		#define  bswap16	_byteswap_ushort
 		#define  bswap32	_byteswap_ulong
 		#define  MSBF16(x)   bswap16( (*(uint16_t const __declspec(align(1))*)x) )
 		#define  MSBF32(x)   bswap32( (*(uint32_t const __declspec(align(1))*)x) )
+#endif
 
 		#define  compxm(a,b) _mm_movemask_epi8(_mm_cmpeq_epi8((a), (b)))
 		#define  xmload(p)   _mm_load_si128((__m128i const *)(p))
