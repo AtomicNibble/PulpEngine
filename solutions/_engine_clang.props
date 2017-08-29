@@ -8,15 +8,15 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <DebugInformationFormat>-g2 -gdwarf-2</DebugInformationFormat>
+      <DebugInformationFormat>FullDebug</DebugInformationFormat>
       <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\$(Configuration)\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ExceptionHandling>Disabled</ExceptionHandling>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
-      <AdditionalOptions>-std=c++1z -Wno-pragma-once-outside-header -Wno-microsoft-template -Wno-reorder %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-std=c++1z -Wno-pragma-once-outside-header -Wno-microsoft-template -Wno-reorder -Wno-unused-private-field -Wno-bitwise-op-parentheses -Wno-unused-function %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
