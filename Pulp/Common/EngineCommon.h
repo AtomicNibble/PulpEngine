@@ -13,6 +13,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
 // some std includes.
 #include <limits>
+#include <array>
 
 // Util
 #include <util\UserLiterals.h>
