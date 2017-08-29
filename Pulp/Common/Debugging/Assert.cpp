@@ -43,109 +43,109 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... ) :
 
 Assert& Assert::Variable(const char* const name, bool var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %s", name, var ? "true" : "false" );
+	Dispatch( sourceInfo_, name, "Variable %s = %s", var ? "true" : "false" );
 	return *this;
 }
 
 /// Dispatches the name and value of a char variable.
 Assert& Assert::Variable(const char* const name, char var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %c", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %c", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a signed char variable.
 Assert& Assert::Variable(const char* const name, signed char var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %c", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %c", var );
 	return *this;
 }
 
 /// Dispatches the name and value of an unsigned char variable.
 Assert& Assert::Variable(const char* const name, unsigned char var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %c", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %c", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a short variable.
 Assert& Assert::Variable(const char* const name, short var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %i", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %i", var );
 	return *this;
 }
 
 /// Dispatches the name and value of an unsigned short variable.
 Assert& Assert::Variable(const char* const name, unsigned short var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %u", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %u", var );
 	return *this;
 }
 
 /// Dispatches the name and value of an int variable.
 Assert& Assert::Variable(const char* const name, int var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %i", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %i", var );
 	return *this;
 }
 
 /// Dispatches the name and value of an unsigned int variable.
 Assert& Assert::Variable(const char* const name, unsigned int var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %u", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %u", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a long variable.
 Assert& Assert::Variable(const char* const name, long var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %i", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %i", var );
 	return *this;
 }
 
 /// Dispatches the name and value of an unsigned long variable.
 Assert& Assert::Variable(const char* const name, unsigned long var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %u", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %u", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a long long variable.
 Assert& Assert::Variable(const char* const name, long long var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %11i", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %11i", var );
 	return *this;
 }
 
 /// Dispatches the name and value of an unsigned long long variable.
 Assert& Assert::Variable(const char* const name, unsigned long long var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %11u", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %11u", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a float variable.
 Assert& Assert::Variable(const char* const name, float var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %f", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %f", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a double variable.
 Assert& Assert::Variable(const char* const name, double var)
 {
-	Dispatch( sourceInfo_, "Variable %s = %9.7lf", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = %9.7lf", var );
 	return *this;
 }
 
 /// Dispatches the name and value of a string literal/string.
 Assert& Assert::Variable(const char* const name, const char* const var )
 {
-	Dispatch( sourceInfo_, "Variable %s = '%s'", name, var );
+	Dispatch( sourceInfo_, name, "Variable %s = '%s'", var );
 	return *this;
 }
 
-void Assert::Dispatch(const SourceInfo& sourceInfo, const char* format, const char* const name, ...)
+void Assert::Dispatch(const SourceInfo& sourceInfo, const char* const name, const char* format, ...)
 {
 	if (gEnv)
 	{

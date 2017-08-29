@@ -74,7 +74,7 @@ public:
 
 private:
 	/// Dispatches the name and value of a generic type to registered assertion handlers and loggers.
-	static void Dispatch(const SourceInfo& sourceInfo, const char* format, const char* const name, ...);
+	static void Dispatch(const SourceInfo& sourceInfo, const char* const name, const char* format, ...);
 
 	X_NO_COPY(Assert);
 	X_NO_ASSIGN(Assert);
