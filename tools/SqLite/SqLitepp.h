@@ -203,11 +203,12 @@ public:
 		BindStream(SqlLiteCmd& cmd, int idx);
 
 		template <class T>
-		X_INLINE SqlLiteCmd& operator << (T value)
+		X_INLINE BindStream& operator << (T value)
 		{
 			auto rc = cmd_.bind(idx_, value);
-			if (rc != SQLITE_OK) {
-				//
+			if (rc != Result::OK) {
+				// add error handling?
+				X_ASSERT_UNREACHABLE();
 			}
 			++idx_;
 			return *this;

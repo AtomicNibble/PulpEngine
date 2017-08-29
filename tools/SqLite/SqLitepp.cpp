@@ -1,6 +1,17 @@
 #include "stdafx.h"
 #include "SqLitepp.h"
 
+#include <memory>
+
+#if X_COMPILER_CLANG
+
+#define SQLITE_DISABLE_INTRINSIC 1
+
+#ifdef _MSC_VER
+#undef _MSC_VER
+#endif
+
+#endif
 
 #include <../../3rdparty/source/sqlite-3.19.2/sqlite3.h>
 

@@ -177,7 +177,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_clang.props" />
     <Import Project="..\..\solutions\_engine_win32_debug.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
@@ -223,7 +223,7 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_clang.props" />
     <Import Project="..\..\solutions\_engine_win64_debug.props" />
     <Import Project="..\..\solutions\_engine_dll.props" />
     <Import Project="..\..\solutions\_engine_link_common.props" />
@@ -473,6 +473,10 @@
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">false</SmallerTypeCheck>
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">false</SmallerTypeCheck>
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">false</SmallerTypeCheck>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">-Wno-unused-variable</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">-Wno-unused-variable</AdditionalOptions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">_DEBUG;_LIB;SQLITE_DISABLE_INTRINSIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">WIN32;_DEBUG;_LIB;SQLITE_DISABLE_INTRINSIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="SqLitepp.cpp" />
