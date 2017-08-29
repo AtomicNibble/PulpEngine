@@ -171,7 +171,13 @@ X_NAMESPACE_END
 #	define X_ASSERT_ALIGNMENT(argument, alignment, offset)		X_ASSERT(X_NAMESPACE(core)::internal::IsAligned(argument, alignment, offset), "Argument \"" #argument "\" is not properly aligned.")(argument, alignment, offset)
 #else
 #	define X_ASSERT(condition, format, ...)						X_UNUSED(condition), X_UNUSED(format), X_UNUSED(__VA_ARGS__), X_UNUSED
+
+#if X_COMPILER_CLANG
+#	define X_ASSERT_NOT_NULL(ptr)								(decltype(ptr))ptr
+#else
 #	define X_ASSERT_NOT_NULL(ptr)								ptr
+#endif // !X_COMPILER_CLANG
+
 #	define X_ASSERT_UNREACHABLE()
 #	define X_ASSERT_NOT_IMPLEMENTED()
 #	define X_ASSERT_ALIGNMENT(argument, alignment, offset)		X_UNUSED(argument), X_UNUSED(alignment), X_UNUSED(offset)
