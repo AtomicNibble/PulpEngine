@@ -15,8 +15,6 @@
 
 #include <Platform\Module.h>
 
-// #include "resource.h"
-
 #include "resource.h"
 
 X_NAMESPACE_BEGIN(core)
