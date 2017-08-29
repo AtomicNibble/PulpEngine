@@ -127,7 +127,9 @@ public:
 	typedef core::FixedArray<IRenderTarget*, MAX_RENDER_TARGETS> RenderTargetsArr;
 	typedef core::PointerFlags<render::IPixelBuffer, 2> PixelBufferWithFlags;
 
+#if X_COMPILER_CLANG == 0
 	static_assert(PixelBufferWithFlags::BIT_COUNT >= DepthBindFlag::FLAGS_COUNT, "Not enougth space for flags");
+#endif // !X_COMPILE_CLANG
 
 protected:
 	CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam, const XViewPort& viewport);
