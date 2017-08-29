@@ -1217,6 +1217,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">NotUsing</PrecompiledHeader>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
+      </AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
+      </AdditionalOptions>
     </ClCompile>
     <ClCompile Include="Memory\HeapArea.cpp" />
     <ClCompile Include="Memory\MemInfo.cpp">
@@ -1584,7 +1588,6 @@
       <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
       <MinimalRebuild>false</MinimalRebuild>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
-      <DebugInformationFormat>FullDebug</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -1641,7 +1644,6 @@ move "Event.i" "Util\Event.h"</Command>
       <MinimalRebuild>false</MinimalRebuild>
       <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
       <AdditionalOptions>%(AdditionalOptions)</AdditionalOptions>
-      <DebugInformationFormat>FullDebug</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
