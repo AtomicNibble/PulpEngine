@@ -264,8 +264,8 @@ public:
 
 	void swap(HashBase& hash)
 	{
-		core::Swap(hash_, hash.hash_);
 		core::Swap(equals_, hash.equals_);
+		core::Swap(hasher_, hash.hasher_);
 		buckets_.swap(hash.buckets_);
 		core::Swap(numElements_, hash.numElements_);
 	}
