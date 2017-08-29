@@ -11,7 +11,6 @@ namespace Hash
 	 */
 	static const uint32_t FNV_32_PRIME = 16777619u;
 	static const uint32_t FNV1_32_INIT = 2166136261u;
-	static const uint32_t FNV1_32A_INIT = FNV1_32_INIT;
 
 	Fnv1aVal Fnv1aHash(const void* key, size_t length)
 	{
@@ -46,7 +45,6 @@ namespace Hash
 	{
 		static const uint64_t FNV_64_PRIME = 0x100000001B3;
 		static const uint64_t FNV1_64_INIT = 0x14650FB0739D0383;
-		static const uint64_t FNV1_64A_INIT = FNV1_64_INIT;
 
 		Fnv1aVal Fnv1aHash(const void* key, size_t length)
 		{
