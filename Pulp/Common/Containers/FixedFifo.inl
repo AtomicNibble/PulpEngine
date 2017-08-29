@@ -23,7 +23,7 @@ X_INLINE T& FixedFifo<T, N>::operator[](size_type idx)
 
 	if (read_ + idx >= endPtr()) {
 		size_type left = endPtr() - read_;
-		return *(start_ + (idx - left));
+		return *(startPtr() + (idx - left));
 	}
 
 	return *(read_ + idx);
@@ -36,7 +36,7 @@ X_INLINE const T& FixedFifo<T, N>::operator[](size_type idx) const
 
 	if (read_ + idx >= endPtr()) {
 		size_type left = endPtr() - read_;
-		return *(start_ + (idx - left));
+		return *(startPtr() + (idx - left));
 	}
 
 	return *(read_ + idx);
@@ -230,6 +230,19 @@ typename FixedFifo<T, N>::ConstReference FixedFifo<T, N>::back(void) const
 
 
 template<typename T, size_t N>
+X_INLINE T* FixedFifo<T, N>::startPtr(void)
+{
+	return reinterpret_cast<T*>(array_);
+}
+
+
+template<typename T, size_t N>
+X_INLINE const T* FixedFifo<T, N>::startPtr(void) const
+{
+	return reinterpret_cast<const T*>(array_);
+}
+
+template<typename T, size_t N>
 X_INLINE T* FixedFifo<T, N>::endPtr(void)
 {
 	return reinterpret_cast<T*>(array_) + N;
@@ -258,7 +271,7 @@ inline const T* FixedFifoIterator<T, N>::operator->(void) const
 }
 
 template<typename T, size_t N>
-inline typename FixedFifoIterator<T, N>& FixedFifoIterator<T, N>::operator++(void)
+inline FixedFifoIterator<T, N>& FixedFifoIterator<T, N>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -270,9 +283,9 @@ inline typename FixedFifoIterator<T, N>& FixedFifoIterator<T, N>::operator++(voi
 }
 
 template<typename T, size_t N>
-inline typename FixedFifoIterator<T, N> FixedFifoIterator<T, N>::operator++(int)
+inline FixedFifoIterator<T, N> FixedFifoIterator<T, N>::operator++(int)
 {
-	iterator tmp = *this;
+	FixedFifoIterator<T,N> tmp = *this;
 	++(*this); // call the function above.
 	return tmp;
 }
@@ -304,7 +317,7 @@ inline const T* FixedFifoConstIterator<T, N>::operator->(void) const
 }
 
 template<typename T, size_t N>
-inline typename FixedFifoConstIterator<T, N>& FixedFifoConstIterator<T, N>::operator++(void)
+inline FixedFifoConstIterator<T, N>& FixedFifoConstIterator<T, N>::operator++(void)
 {
 	++count_;
 	++current_;
@@ -316,7 +329,7 @@ inline typename FixedFifoConstIterator<T, N>& FixedFifoConstIterator<T, N>::oper
 }
 
 template<typename T, size_t N>
-inline typename FixedFifoConstIterator<T, N> FixedFifoConstIterator<T, N>::operator++(int)
+inline FixedFifoConstIterator<T, N> FixedFifoConstIterator<T, N>::operator++(int)
 {
 	FixedFifoConstIterator tmp = *this;
 	++(*this); // call the function above.

@@ -129,6 +129,9 @@ public:
 	ConstReference back(void) const;
 
 private:
+	X_INLINE T* startPtr(void);
+	X_INLINE const T* startPtr(void) const;
+
 	X_INLINE T* endPtr(void);
 	X_INLINE const T* endPtr(void) const;
 
