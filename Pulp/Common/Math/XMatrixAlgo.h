@@ -117,10 +117,15 @@ inline Matrix44f SseMultiply( const Matrix44f& mat0, const Matrix44f& mat1 )
 	return ret;
 }
 
-#if defined( X_PLATFORM_WIN32 )
-#   pragma runtime_checks( "", off )
-#   pragma warning( push )
-#   pragma warning( disable:4700 )
+#if X_COMPILER_MSVC
+
+X_PRAGMA(runtime_checks( "", off ))
+X_DISABLE_WARNING(4700)
+
+#elif X_COMPILER_CLANG
+
+X_DISABLE_WARNING_DIAG(uninitialized)
+
 #endif 
 
 inline Matrix44f SseInvert( const Matrix44f& mat )
@@ -222,10 +227,12 @@ inline Matrix44f SseInvert( const Matrix44f& mat )
 	return ret;
 }
 
-#if defined( X_PLATFORM_WIN32 )
-#   pragma warning( pop )
-#   pragma runtime_checks( "", restore )
+
+#if X_COMPILER_MSVC
+X_ENABLE_WARNING(4700)
+X_PRAGMA( runtime_checks("", restore))
 #endif
+
 
 #endif // #if defined( X_PLATFORM_WIN32 ) 
 
