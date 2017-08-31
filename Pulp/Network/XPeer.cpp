@@ -163,6 +163,9 @@ ConnectionState::Enum RemoteSystem::getConnectionState(void) const
 
 		case ConnectState::Connected:
 			return ConnectionState::Connected;
+
+		case ConnectState::NoAction:
+			break;
 	}
 
 	return ConnectionState::Disconnected;
