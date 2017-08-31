@@ -5,7 +5,11 @@
 
 #include "Memory/MemoryArenaStatistics.h"
 
+#if X_COMPILER_CLANG
+#include <vector>
+#else
 #include <Containers\FixedArray.h>
+#endif // !X_COMPILER_CLANG
 
 X_NAMESPACE_BEGIN(core)
 
@@ -15,7 +19,11 @@ class MemoryArenaBase
 	static const int MAX_ARENA_CHILDREN = 20;
 
 public:
+#if X_COMPILER_CLANG 
+	typedef std::vector<MemoryArenaBase*> ArenaArr;
+#else
 	typedef core::FixedArray<MemoryArenaBase*, MAX_ARENA_CHILDREN> ArenaArr;
+#endif // !X_COMPILER_CLANG
 
 public:
 	/// Empty destructor.
@@ -52,7 +60,7 @@ public:
 			X_WARNING("Memory", "can't add child arena exceeded max: %i", MAX_ARENA_CHILDREN);
 		}
 		else {
-			children_.append(arena);
+			children_.push_back(arena);
 		}
 	}
 
