@@ -2,7 +2,7 @@
 #include "Zlib.h"
 
 extern "C" {
-#include <../../3rdparty/source/zlib-1.2.8/zlib.h>
+#include <../../3rdparty/source/zlib-1.2.11/zlib.h>
 }
 
 // link zlib plz.
