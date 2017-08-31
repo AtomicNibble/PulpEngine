@@ -494,9 +494,9 @@ ReliabilityLayer::ReliabilityLayer(NetVars& vars,
 	packetDataArena_(packetDataArena),
 	packetPool_(packetPool),
 	MTUSize_(0),
-	orderingQueues_{
+	orderingQueues_{ {
 		X_PP_REPEAT_COMMA_SEP(16, arena)
-	},
+	} },
 	outGoingPackets_(arena),
 	recivedPackets_(arena),
 	dataGramHistory_(arena),
