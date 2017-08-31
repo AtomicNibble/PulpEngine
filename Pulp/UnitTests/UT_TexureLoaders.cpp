@@ -33,44 +33,46 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 	core::Path<char> testFolder("images/");
 	testFolder /= path;
 
-	if (file.openFile(testFolder.c_str(), mode))
+	if (!file.openFile(testFolder.c_str(), mode))
 	{
-		T loader;
-
-		const bool canLoad = loader.canLoadFile(path);
-
-		EXPECT_TRUE(canLoad);
-		if (canLoad)
-		{
-			texture::XTextureFile texFile(g_arena);
-
-			if (!loader.loadTexture(file.GetFile(), texFile, g_arena)) {
-				X_ERROR("UT", "Failed to load texture");
-				return false;
-			}
-
-			const bool isValid = texFile.isValid();
-
-			if (!isValid) {
-				X_ERROR("UT", "TextureFile is not valid");
-				return false;
-			}
-
-			EXPECT_EQ(fmt, texFile.getFormat());
-			if (fmt != texFile.getFormat()) {
-				X_ERROR("UT", "ReturnFmt: %s ExpectedFmt: %s Path<char>: %s", 
-					Texturefmt::ToString(texFile.getFormat()),
-					Texturefmt::ToString(fmt),
-					testFolder.c_str());
-
-				return false;
-			}
-
-			return true;
-		}
+		return false;
 	}
 
-	return false;
+	T loader;
+
+	const bool canLoad = loader.canLoadFile(path);
+
+	EXPECT_TRUE(canLoad);
+	if (!canLoad)
+	{
+		return false;
+	}
+
+	texture::XTextureFile texFile(g_arena);
+
+	if (!loader.loadTexture(file.GetFile(), texFile, g_arena)) {
+		X_ERROR("UT", "Failed to load texture");
+		return false;
+	}
+
+	const bool isValid = texFile.isValid();
+
+	if (!isValid) {
+		X_ERROR("UT", "TextureFile is not valid");
+		return false;
+	}
+
+	EXPECT_EQ(fmt, texFile.getFormat());
+	if (fmt != texFile.getFormat()) {
+		X_ERROR("UT", "ReturnFmt: %s ExpectedFmt: %s Path<char>: %s",
+			Texturefmt::ToString(texFile.getFormat()),
+			Texturefmt::ToString(fmt),
+			testFolder.c_str());
+
+		return false;
+	}
+
+	return true;
 }
 
 
