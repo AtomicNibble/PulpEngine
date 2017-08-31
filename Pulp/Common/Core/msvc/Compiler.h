@@ -15,6 +15,12 @@
 #define X_ENABLE_WARNING(number)					X_PRAGMA(warning(default:number))
 #define X_INTRINSIC(func)							X_PRAGMA(intrinsic(func))
 
+#define X_PRAGMA_DIAG(x)							
+#define X_DISABLE_WARNING_DIAG(name)				
+#define X_WARNING_DIAG_PUSH							
+#define X_WARNING_DIAG_POP							
+
+
 #define X_DISABLE_EMPTY_FILE_WARNING				namespace { char NoEmptyFileDummy##__LINE__; }
 
 #define X_RESTRICT									__restrict

@@ -21,6 +21,8 @@
 
 #define X_PRAGMA_DIAG(x)							X_PRAGMA(GCC diagnostic x)
 #define X_DISABLE_WARNING_DIAG(name)				X_PRAGMA_DIAG(ignored X_PP_STRINGIZE(X_PP_JOIN(-W,name)))
+#define X_WARNING_DIAG_PUSH							X_PRAGMA_DIAG(push)
+#define X_WARNING_DIAG_POP							X_PRAGMA_DIAG(pop)
 
 #define X_INTRINSIC(func)							
 
