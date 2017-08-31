@@ -1,14 +1,9 @@
 #include "stdafx.h"
 
-
-
 #include "ITexture.h"
 #include "IFileSys.h"
 
-
-// hum how to include the loader code.
-// it's part of common Render dll.
-// Umm. #yolo
+#include <Hashing\sha1.h>
 
 #include <../../tools/ImgLib/ImgLib.h>
 
@@ -20,8 +15,20 @@ X_USING_NAMESPACE;
 using namespace core;
 using namespace texture;
 
+namespace
+{
+	struct TextureDesc
+	{
+		int32_t width;
+		int32_t height;
+
+		core::Hash::SHA1Digest hash;
+	};
+
+}
+
 template<class T>
-bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
+bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path, const TextureDesc* pDesc = nullptr)
 {
 	IFileSys::fileModeFlags mode;
 	mode.Set(IFileSys::fileMode::READ);
@@ -70,6 +77,31 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 			testFolder.c_str());
 
 		return false;
+	}
+
+
+	if (pDesc)
+	{
+		EXPECT_EQ(pDesc->width, texFile.getWidth());
+		EXPECT_EQ(pDesc->height, texFile.getHeight());
+
+
+		// hash the mips and faces.
+		core::Hash::SHA1 hasher;
+
+		const auto faceSize = texFile.getFaceSize();
+		for (int32_t i = 0; i < texFile.getNumFaces(); i++)
+		{
+			auto* pFace = texFile.getFace(i);
+
+			hasher.update(pFace, faceSize);
+
+
+		}
+
+		auto digest = hasher.finalize();
+
+		EXPECT_EQ(pDesc->hash, digest);
 	}
 
 	return true;
@@ -151,8 +183,18 @@ TEST(JPG, Load)
 
 TEST(PNG, Load)
 {
-	EXPECT_TRUE(LoadValid<PNG::XTexLoaderPNG>(Texturefmt::R8G8B8A8, Path<char>("test_img_load_32.png")));
-	EXPECT_TRUE(LoadValid<PNG::XTexLoaderPNG>(Texturefmt::R8G8B8, Path<char>("test_img_load_24.png")));
+	TextureDesc desc;
+	desc.width = 512;
+	desc.height = 512;
+	desc.hash = core::Hash::SHA1Digest({0x8A, 0xFB, 0xAD, 0x32, 0x9E, 0x6D, 0x8B, 0x48, 
+		0x2E, 0x6C, 0xCC, 0x27, 0x80, 0xD5, 0x5F, 0x30, 0xDE, 0x89, 0xD9, 0x3D});
+
+	EXPECT_TRUE(LoadValid<PNG::XTexLoaderPNG>(Texturefmt::R8G8B8A8, Path<char>("test_img_load_32.png"), &desc));
+
+	desc.hash = core::Hash::SHA1Digest({ 0xB1, 0xC7, 0x7A, 0xFD, 0x1F, 0xDE, 0x62, 0x7F, 
+		0xB8, 0x3B, 0xAF, 0x6F, 0x8C, 0x9B, 0x30, 0x92, 0xA6, 0x14, 0xBB, 0xB7 });
+
+	EXPECT_TRUE(LoadValid<PNG::XTexLoaderPNG>(Texturefmt::R8G8B8, Path<char>("test_img_load_24.png"), &desc));
 }
 
 TEST(PSD, Load)
