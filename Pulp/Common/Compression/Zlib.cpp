@@ -1,6 +1,8 @@
 #include <EngineCommon.h>
 #include "Zlib.h"
 
+#define ZLIB_WINAPI 1
+
 extern "C" {
 #include <../../3rdparty/source/zlib-1.2.11/zlib.h>
 }
