@@ -171,7 +171,7 @@ void AnimManager::listAnims(const char* pSearchPatten) const
 
 	for (const auto* pAnim : sorted_anims)
 	{
-		X_LOG0("Anim", "^2%-32s^7 Refs:^2%i", pAnim->getName(), pAnim->getRefCount());
+		X_LOG0("Anim", "^2%-32s^7 Refs:^2%i", pAnim->getName().c_str(), pAnim->getRefCount());
 	}
 
 	X_LOG0("Anim", "------------ ^8Anims End^7 --------------");
