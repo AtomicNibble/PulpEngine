@@ -5,6 +5,8 @@
 #define _X_MATH_VEC_H_
 
 
+#include "XMath.h"
+
 // show me your vectors baby.
 
 // distance tpye selection using specilisation.
