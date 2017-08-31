@@ -21,6 +21,8 @@ namespace
 	{
 		int32_t width;
 		int32_t height;
+		int32_t numMips;
+		int32_t numFace;
 
 		core::Hash::SHA1Digest hash;
 	};
@@ -84,6 +86,8 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path, const TextureDesc* p
 	{
 		EXPECT_EQ(pDesc->width, texFile.getWidth());
 		EXPECT_EQ(pDesc->height, texFile.getHeight());
+		EXPECT_EQ(pDesc->numMips, texFile.getNumMips());
+		EXPECT_EQ(pDesc->numFace, texFile.getNumFaces());
 
 
 		// hash the mips and faces.
@@ -95,8 +99,6 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path, const TextureDesc* p
 			auto* pFace = texFile.getFace(i);
 
 			hasher.update(pFace, faceSize);
-
-
 		}
 
 		auto digest = hasher.finalize();
@@ -186,6 +188,8 @@ TEST(PNG, Load)
 	TextureDesc desc;
 	desc.width = 512;
 	desc.height = 512;
+	desc.numFace = 1;
+	desc.numMips = 1;
 	desc.hash = core::Hash::SHA1Digest({0x8A, 0xFB, 0xAD, 0x32, 0x9E, 0x6D, 0x8B, 0x48, 
 		0x2E, 0x6C, 0xCC, 0x27, 0x80, 0xD5, 0x5F, 0x30, 0xDE, 0x89, 0xD9, 0x3D});
 
