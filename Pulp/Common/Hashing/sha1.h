@@ -14,6 +14,9 @@ namespace Hash
 		typedef char String[41];
 	public:
 		SHA1Digest();
+		SHA1Digest(const std::array<uint8_t, 20>& arr) {
+			std::memcpy(bytes, arr.data(), arr.size());
+		}
 
 		const char* ToString(String& buf) const;
 
