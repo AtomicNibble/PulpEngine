@@ -460,11 +460,11 @@
     <ClInclude Include="Util\BPSTracker.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Constants.h" />
-    <ClInclude Include="Util\LastError.h" />
+    <ClInclude Include="Util\LastErrorWSA.h" />
     <ClInclude Include="Util\LibaryStartup.h" />
     <ClInclude Include="Util\RangeList.h" />
     <ClInclude Include="Util\SystemAddressEx.h" />
-    <ClInclude Include="Util\win32\LastError.h" />
+    <ClInclude Include="Util\win32\LastErrorWSA.h" />
     <ClInclude Include="Util\win32\LibaryStartup.h" />
     <ClInclude Include="Vars\NetVars.h" />
     <ClInclude Include="XNet.h" />
@@ -493,7 +493,7 @@
     <ClCompile Include="Util\BPSTracker.cpp" />
     <ClCompile Include="Util\RangeList.cpp" />
     <ClCompile Include="Util\SystemAddressEx.cpp" />
-    <ClCompile Include="Util\win32\LastError.cpp" />
+    <ClCompile Include="Util\win32\LastErrorWSA.cpp" />
     <ClCompile Include="Util\win32\LibaryStartup.cpp" />
     <ClCompile Include="Vars\NetVars.cpp" />
     <ClCompile Include="XNet.cpp" />

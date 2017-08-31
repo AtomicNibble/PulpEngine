@@ -59,12 +59,6 @@
     <ClInclude Include="Util\Constants.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\LastError.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\win32\LastError.h">
-      <Filter>Header Files\Util\win32</Filter>
-    </ClInclude>
     <ClInclude Include="XNet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -98,6 +92,12 @@
     <ClInclude Include="Util\SystemAddressEx.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Util\win32\LastErrorWSA.h">
+      <Filter>Header Files\Util\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\LastErrorWSA.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -105,9 +105,6 @@
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
-    </ClCompile>
-    <ClCompile Include="Util\win32\LastError.cpp">
-      <Filter>Source Files\Util\win32</Filter>
     </ClCompile>
     <ClCompile Include="XNet.cpp">
       <Filter>Source Files</Filter>
@@ -135,6 +132,9 @@
     </ClCompile>
     <ClCompile Include="Util\SystemAddressEx.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\LastErrorWSA.cpp">
+      <Filter>Source Files\Util\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

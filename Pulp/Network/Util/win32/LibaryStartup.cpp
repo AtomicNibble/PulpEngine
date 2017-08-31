@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "LibaryStartup.h"
 
+#include "Util\lastErrorWSA.h"
+
 X_NAMESPACE_BEGIN(net)
 
 namespace PlatLib
@@ -27,8 +29,8 @@ namespace PlatLib
 			{
 				--refCount; // we don't need a matching cleanup call.
 
-				lastError::Description Dsc;
-				X_ERROR("Net", "Failed to init winsock. Error: \"%s\"", lastError::ToString(Dsc));
+				lastErrorWSA::Description Dsc;
+				X_ERROR("Net", "Failed to init winsock. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 				return false;
 			}
 		}
@@ -43,8 +45,8 @@ namespace PlatLib
 		{
 			if (platform::WSACleanup() != 0)
 			{
-				lastError::Description Dsc;
-				X_ERROR("Net", "Failed to cleanup winsock. Error: \"%s\"", lastError::ToString(Dsc));
+				lastErrorWSA::Description Dsc;
+				X_ERROR("Net", "Failed to cleanup winsock. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 			}
 		}
 	}

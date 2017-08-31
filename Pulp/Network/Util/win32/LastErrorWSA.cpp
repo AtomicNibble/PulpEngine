@@ -1,10 +1,10 @@
 #include "stdafx.h"
-#include "Util\LastError.h"
+#include "LastErrorWSA.h"
 
 X_NAMESPACE_BEGIN(net)
 
 
-namespace lastError
+namespace lastErrorWSA
 {
 	int32_t Get(void) 
 	{

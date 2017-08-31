@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(net)
 
-namespace lastError
+namespace lastErrorWSA
 {
 	typedef char Description[512];
 
@@ -13,6 +13,6 @@ namespace lastError
 	const char* ToString(Description& desc);
 
 
-} // lastError
+} // lastErrorWSA
 
 X_NAMESPACE_END

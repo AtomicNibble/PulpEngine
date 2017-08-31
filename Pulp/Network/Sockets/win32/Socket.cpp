@@ -3,6 +3,7 @@
 
 #include "Vars\NetVars.h"
 
+#include "Util\LastErrorWSA.h"
 #include <ITimer.h>
 
 X_NAMESPACE_BEGIN(net)
@@ -131,12 +132,12 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 
 
 	core::StackString<32, char> portStr(bindParameters.port);
-	lastError::Description Dsc;
+	lastErrorWSA::Description Dsc;
 
 	int32_t res = getaddrinfo(0, portStr.c_str(), &hints, &pResult);
 	if (res != 0)
 	{
-		X_ERROR("Net", "Failed to get address info for binding. Error: \"%s\"", lastError::ToString(Dsc));
+		X_ERROR("Net", "Failed to get address info for binding. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 		return BindResult::FailedToBind;
 	}
 
@@ -146,7 +147,7 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 		socket_ = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
 		if (socket_ == INVALID_SOCKET)
 		{
-			X_ERROR("Net", "Failed to open socket. Error: \"%s\"", lastError::ToString(Dsc));
+			X_ERROR("Net", "Failed to open socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 			platform::freeaddrinfo(pResult);
 			return BindResult::FailedToBind;
 		}
@@ -178,7 +179,7 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 		{
 			// we failed to bind.
 			// try next one.
-			X_WARNING("Net", "Failed to bind socket. Error: \"%s\"", lastError::ToString(Dsc));
+			X_WARNING("Net", "Failed to bind socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 			platform::closesocket(socket_);
 		}
 	}
@@ -239,10 +240,10 @@ SendResult NetSocket::send(SendParameters& sendParameters)
 
 		if (len < 0)
 		{
-			lastError::Description Dsc;
-			int32_t lastErr = lastError::Get();
+			lastErrorWSA::Description Dsc;
+			int32_t lastErr = lastErrorWSA::Get();
 			len = -lastErr; // pass back the last err but negative
-			X_ERROR("Net", "Failed to sendto, length: %" PRIi32 ". Error: \"%s\"", sendParameters.length, lastError::ToString(lastErr, Dsc));
+			X_ERROR("Net", "Failed to sendto, length: %" PRIi32 ". Error: \"%s\"", sendParameters.length, lastErrorWSA::ToString(lastErr, Dsc));
 		}
 
 	} while (len == 0); // keep trying, while not sent anything and not had a error.
@@ -285,8 +286,8 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 		}
 
 		// error.
-		const auto err = lastError::Get();
-		lastError::Description Dsc;
+		const auto err = lastErrorWSA::Get();
+		lastErrorWSA::Description Dsc;
 
 		if (err == WSAECONNRESET)
 		{
@@ -294,12 +295,12 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 
 			IPStr ipStr;
 			X_WARNING("Net", "Failed to recvfrom. \"%s\" Add: \"%s\"", 
-				lastError::ToString(err, Dsc), dataOut.systemAddress.toString(ipStr));
+				lastErrorWSA::ToString(err, Dsc), dataOut.systemAddress.toString(ipStr));
 
 			return RecvResult::ConnectionReset;
 		}
 
-		X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastError::ToString(err, Dsc));
+		X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastErrorWSA::ToString(err, Dsc));
 		return RecvResult::Error;
 	}
 
@@ -323,8 +324,8 @@ bool NetSocket::getMyIPs(SystemAddArr& addresses)
 	res = platform::gethostname(hostName, sizeof(hostName));
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to get hostname. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to get hostname. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 		return false;
 	}
 
@@ -339,8 +340,8 @@ bool NetSocket::getMyIPs(SystemAddArr& addresses)
 	res = getaddrinfo(hostName, "", &hints, &pResult);
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to get address info for local hostname. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to get address info for local hostname. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 		return false;
 	}
 	
@@ -368,8 +369,8 @@ void NetSocket::setNonBlockingSocket(bool nonblocking)
 	int32_t res = platform::ioctlsocket(socket_, FIONBIO, &noneBlockingLng);
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to set nonblocking mode on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to set nonblocking mode on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 }
 
@@ -377,14 +378,14 @@ void NetSocket::setSocketOptions(void)
 {
 	int32_t res;
 	int32_t sock_opt;
-	lastError::Description Dsc;
+	lastErrorWSA::Description Dsc;
 
 	// set the recive buffer to decent size
 	sock_opt = 1024 * 256;
 	res = platform::setsockopt(socket_, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
 	if (res != 0)
 	{
-		X_ERROR("Net", "Failed to set max rcvbuf on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		X_ERROR("Net", "Failed to set max rcvbuf on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 
 	// decent size buf for send.
@@ -392,7 +393,7 @@ void NetSocket::setSocketOptions(void)
 	res = platform::setsockopt(socket_, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
 	if (res != 0)
 	{
-		X_ERROR("Net", "Failed to set max sndbuf on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		X_ERROR("Net", "Failed to set max sndbuf on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 
 #if 0
@@ -401,7 +402,7 @@ void NetSocket::setSocketOptions(void)
 	res = platform::setsockopt(socket_, SOL_SOCKET, SO_LINGER, (char*)&sock_opt, sizeof(sock_opt));
 	if (res != 0)
 	{
-		X_WARNING("Net", "Failed to set linger mode on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		X_WARNING("Net", "Failed to set linger mode on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 #endif
 }
@@ -415,8 +416,8 @@ void NetSocket::setBroadcastSocket(bool broadcast)
 	res = platform::setsockopt(socket_, SOL_SOCKET, SO_BROADCAST, (char*)&val, sizeof(val));
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to set broadcast mode on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to set broadcast mode on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 }
 
@@ -438,8 +439,8 @@ void NetSocket::setIPHdrIncl(bool ipHdrIncl)
 	res = platform::setsockopt(socket_, IPPROTO_IP, IP_HDRINCL, (char*)&val, sizeof(val));
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to set hdrincl on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to set hdrincl on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 }
 
@@ -451,8 +452,8 @@ void NetSocket::setTTL(IpVersion::Enum ipVer, int32_t ttl)
 	res = platform::setsockopt(socket_, getRawIpProto(ipVer), IP_TTL, (char*)&ttl, sizeof(ttl));
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to set TTL on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to set TTL on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 	}
 }
 
@@ -465,8 +466,8 @@ bool NetSocket::getTTL(IpVersion::Enum ipVer, int32_t& ttl)
 	res = platform::getsockopt(socket_, getRawIpProto(ipVer), IP_TTL, (char*)&ttl, &len);
 	if (res != 0)
 	{
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to get TTL on socket. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to get TTL on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 		return false;
 	}
 

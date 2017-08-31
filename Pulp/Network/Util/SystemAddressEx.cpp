@@ -2,6 +2,8 @@
 #include "SystemAddressEx.h"
 
 
+#include "Util\LastErrorWSA.h"
+
 X_NAMESPACE_BEGIN(net)
 
 namespace
@@ -63,8 +65,8 @@ void SystemAddressEx::setFromSocket(SocketHandle socket)
 
 	if (platform::getsockname(socket, (struct platform::sockaddr*)&ss, &slen) != 0)
 	{
-		lastError::Description Dsc;
-		X_FATAL("Net", "Failed to get socket name for socket: %" PRIu32 " Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_FATAL("Net", "Failed to get socket name for socket: %" PRIu32 " Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 		return;
 	}
 
@@ -201,8 +203,8 @@ const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
 #endif // !NET_IPv6_SUPPORT
 
 	if (ret != 0) {
-		lastError::Description Dsc;
-		X_ERROR("Net", "Failed to get name info. Error: \"%s\"", lastError::ToString(Dsc));
+		lastErrorWSA::Description Dsc;
+		X_ERROR("Net", "Failed to get name info. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 		strBuf.clear();
 		return strBuf.c_str();
 	}
@@ -292,8 +294,8 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 			if (servinfo == 0)
 			{
 				// failed still
-				lastError::Description Dsc;
-				X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastError::ToString(Dsc));
+				lastErrorWSA::Description Dsc;
+				X_ERROR("Net", "Failed to get addres info. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
 				return false;
 			}
 			else
@@ -304,8 +306,8 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 		else
 #endif // !NET_IPv6_SUPPORT
 		{
-			lastError::Description Dsc;
-			X_ERROR("Net", "Failed to get address info for: \"%s\" Error: \"%s\"", hostStr.c_str(), lastError::ToString(Dsc));
+			lastErrorWSA::Description Dsc;
+			X_ERROR("Net", "Failed to get address info for: \"%s\" Error: \"%s\"", hostStr.c_str(), lastErrorWSA::ToString(Dsc));
 			return false;
 		}
 	}
