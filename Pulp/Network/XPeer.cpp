@@ -620,8 +620,17 @@ ConnectionAttemptResult::Enum XPeer::connect(const SystemAddress& sysAdd, const 
 		return ConnectionAttemptResult::InvalidParam;
 	}
 
-	// work out what ip version this socket is, if the address is ipv4 and socket is ipv6 it's okay.
-	auto ipVer = sockets_[socketIdx].getBoundAdd().getIPVersion();
+
+	if (sysAdd.getIPVersion() == IpVersion::Ipv6)
+	{
+		auto socketIpVer = sockets_[socketIdx].getBoundAdd().getIPVersion();
+
+		if (socketIpVer != IpVersion::Ipv6)
+		{
+			X_ERROR("Net", "Can't connect to a ipv6 address over a ipv4 socket");
+			return ConnectionAttemptResult::InvalidParam;
+		}
+	}
 
 	// are we already connected?
 	if (getRemoteSystem(systemAddress, true)) {
