@@ -16,7 +16,7 @@
       <ExceptionHandling>Disabled</ExceptionHandling>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
-      <AdditionalOptions>-std=c++1z -Wno-pragma-once-outside-header -Wno-microsoft-template -Wno-reorder -Wno-unused-private-field -Wno-bitwise-op-parentheses -Wno-unused-function -Wno-unused-const-variable %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>-std=c++1z -Wno-pragma-once-outside-header -Wno-microsoft-template -Wno-reorder -Wno-unused-private-field -Wno-bitwise-op-parentheses -Wno-unused-function -Wno-unused-const-variable -Wno-missing-braces %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
