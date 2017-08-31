@@ -1758,9 +1758,9 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
 				continue;
 			}
 
-			if (!pRemoteSystem->isActive || pRemoteSystem->connectState != ConnectionState::Connected) {
+			if (!pRemoteSystem->isActive || pRemoteSystem->connectState != ConnectState::Connected) {
 				X_LOG0_IF(vars_.debugEnabled(), "Net", "Skipping closeConnection request, the remote is already disconneting/disconnected. state: \"%s\"",
-					ConnectionState::ToString(pRemoteSystem->connectState));
+					ConnectState::ToString(pRemoteSystem->connectState));
 				freeBufferdCmd(pBufCmd);
 				continue;
 			}
