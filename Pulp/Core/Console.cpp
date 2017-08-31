@@ -938,7 +938,9 @@ bool XConsole::OnInputEventChar(const input::InputEvent& event)
 
 void XConsole::AddInputChar(const char c)
 {
-	if (c == '`' || c == '¬') { // sent twice.
+	const char tidle = '¬';
+
+	if (c == '`' || c == tidle) { // sent twice.
 		return;
 	}
 
