@@ -422,6 +422,10 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	}
 
 	// check for corruption.
+
+	X_WARNING_DIAG_PUSH
+	X_DISABLE_WARNING_DIAG(tautological-constant-out-of-range-compare)
+
 	if (bits == 0 || reliability > PacketReliability::ENUM_COUNT || orderingChannel >= MAX_ORDERED_STREAMS)
 	{
 		return false;
@@ -430,7 +434,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 	{
 		return false;
 	}
-
+	X_WARNING_DIAG_POP
 
 	allocData(bits);
 
