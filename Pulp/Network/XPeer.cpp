@@ -722,7 +722,7 @@ void XPeer::cancelConnectionAttempt(const SystemAddress& target)
 	IPStr addStr;
 	sysAdd.toString(addStr);
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Canceling Connection request to host: \"%s\"", addStr);
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Canceling Connection request to host: \"%s\"", addStr.c_str());
 
 	removeConnectionRequest(sysAdd);
 }
@@ -1319,7 +1319,7 @@ void XPeer::removeFromBanList(const IPStr& ip)
 		return;
 	}
 
-	X_LOG0_IF(vars_.debugEnabled(), "Net", "Removing ban: \"%s\"", ip);
+	X_LOG0_IF(vars_.debugEnabled(), "Net", "Removing ban: \"%s\"", ip.c_str());
 	
 	if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
 		X_ERROR("Net", "Can't remove ban for \"%s\" it's a invalid address", ip.c_str());
@@ -1342,7 +1342,7 @@ void XPeer::removeFromBanList(const IPStr& ip)
 	} 
 	else
 	{
-		X_LOG0_IF(vars_.debugEnabled(), "Net", "Failed to remove ban, no entry for \"%s\" found", ip);
+		X_LOG0_IF(vars_.debugEnabled(), "Net", "Failed to remove ban, no entry for \"%s\" found", ip.c_str());
 	}
 }
 
@@ -2194,7 +2194,7 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 
 	IPStr remoteStr;
 	pData->systemAddress.toString(remoteStr);
-	X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr);
+	X_ERROR("Net", "Recived connection response for remote system we are not trying to connect to: \"%s\"", remoteStr.c_str());
 }
 
 void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
