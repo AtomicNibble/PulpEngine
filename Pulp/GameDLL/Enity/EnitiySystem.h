@@ -78,6 +78,11 @@ namespace entity
 		PlayerSystem playerSys_;
 		CameraSystem cameraSys_;
 		SoundSystem soundSys_;
+
+	private:
+		DataTranslator<Health> dtHealth_;
+		DataTranslator<Mesh> dtMesh_;
+		DataTranslator<SoundObject> dtSoundObj_;
 	};
 
 

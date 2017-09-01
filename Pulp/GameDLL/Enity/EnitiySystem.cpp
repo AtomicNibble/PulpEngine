@@ -23,12 +23,25 @@ namespace entity
 		arena_(arena),
 		reg_(arena),
 		vars_(vars),
-		playerSys_(vars.player)
+		playerSys_(vars.player),
+		dtHealth_(arena),
+		dtMesh_(arena),
+		dtSoundObj_(arena)
 	{
 		pPhysics_ = nullptr;
 		pPhysScene_ = nullptr;
 		p3DWorld_ = nullptr;
 		pModelManager_ = nullptr;
+
+		// translators.
+		ADD_TRANS_MEMBER(dtHealth_, hp);
+		ADD_TRANS_MEMBER(dtHealth_, max);
+
+		ADD_TRANS_MEMBER(dtMesh_, name);
+
+		ADD_TRANS_MEMBER(dtSoundObj_, offset);
+		ADD_TRANS_MEMBER(dtSoundObj_, occType);
+
 	}
 
 
@@ -407,19 +420,6 @@ namespace entity
 	{
 		using namespace core::Hash::Fnv1Literals;
 
-		// so we need a way to write these out also.
-		// so that the editor can show them and dispaly required props.
-		DataTranslator<Health> dtHealth(arena_);
-		ADD_TRANS_MEMBER(dtHealth, hp);
-		ADD_TRANS_MEMBER(dtHealth, max);
-
-		DataTranslator<Mesh> dtMesh(arena_);
-		ADD_TRANS_MEMBER(dtMesh, name);
-
-		DataTranslator<SoundObject> dtSoundObj(arena_);
-		ADD_TRANS_MEMBER(dtSoundObj, offset);
-		ADD_TRANS_MEMBER(dtSoundObj, occType);
-
 		if (entDesc.GetType() != core::json::Type::kObjectType) {
 			X_ERROR("Ents", "Ent description must be a object");
 			return false;
@@ -439,7 +439,7 @@ namespace entity
 				case "Name"_fnv1a:
 				{
 					auto& hp = reg_.assign<Health>(ent);
-					if (!parseComponent(dtHealth, hp, value)) {
+					if (!parseComponent(dtHealth_, hp, value)) {
 						return false;
 					}
 					break;
@@ -447,7 +447,7 @@ namespace entity
 				case "Health"_fnv1a:
 				{
 					auto& hp = reg_.assign<Health>(ent);
-					if (!parseComponent(dtHealth, hp, value)) {
+					if (!parseComponent(dtHealth_, hp, value)) {
 						return false;
 					}
 					break;
@@ -455,7 +455,7 @@ namespace entity
 				case "SoundObject"_fnv1a:
 				{
 					auto& snd = reg_.assign<SoundObject>(ent);
-					if (!parseComponent(dtSoundObj, snd, value)) {
+					if (!parseComponent(dtSoundObj_, snd, value)) {
 						return false;
 					}
 
@@ -530,13 +530,16 @@ namespace entity
 					// then later before we finished loading we iterate these waiting for the models to 
 					// finish loading and then create the physics.
 					reg_.assign<MeshCollider>(ent);
+
+					// not done yet tho.
+					X_ASSERT_NOT_IMPLEMENTED();
 					break;
 				}
 
 				case "Mesh"_fnv1a:
 				{
 					auto& mesh = reg_.assign<Mesh>(ent);
-					if (!parseComponent(dtMesh, mesh, value)) {
+					if (!parseComponent(dtMesh_, mesh, value)) {
 						return false;
 					}
 					if (mesh.name.isEmpty()) {
