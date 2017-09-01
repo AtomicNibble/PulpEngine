@@ -68,8 +68,9 @@ namespace JPG
 		{
 			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 
-			if (num_bytes <= 0)
+			if (num_bytes <= 0) {
 				return;
+			}
 
 			if (num_bytes <= safe_static_cast<long,size_t>(src->mgr.bytes_in_buffer))
 			{
