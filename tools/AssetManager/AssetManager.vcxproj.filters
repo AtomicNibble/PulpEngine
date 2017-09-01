@@ -172,6 +172,9 @@
     <Filter Include="Source Files\Converter">
       <UniqueIdentifier>{858bbc31-a08d-470c-b906-2431078c2dbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Generated Files\Release Dynamic">
+      <UniqueIdentifier>{c3965725-0233-443f-bfe1-f31f4ec0d7df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assetmanager.cpp">
@@ -1397,6 +1400,207 @@
     </ClCompile>
     <ClCompile Include="Release\moc_SelectAssetDialog.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ActionContainer.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ActionManager.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ActionManagerPrivate.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AddAssetDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AddModDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetAnimWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetAssetRefWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetCheckBoxWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetColorWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetComboBoxWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_assetdbexplorer.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_assetdbmodel.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_assetdbnodes.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_assetdbwidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetEntryManager.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetEntryModel.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetGroupWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetLineEditWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_assetmanager.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetModelWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetPathWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetPropertyEditor.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetPropertyEditorActionHandler.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetPropertyEditorFactory.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetScript.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetSpinBoxWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetStringWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetTextureWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetTextWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_BaseWindow.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ColorPreviewWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ColorSelectorWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_Command.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_Context.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ConverterHost.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_CustomTabWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_DeleteAssetDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_DisplayPixDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_EditorManager.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_EditorView.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IActionContainer.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IAssetEntry.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IAssetEntryFactory.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IAssManCore.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ICommand.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IEditor.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IEditorFactory.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_IOutputPane.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_LoggerOutputWindowWritePolicy.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_modproject.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_modprojectnodes.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_OutputPaneManagerWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_OutputWindowPane.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_OutputWindowWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ParameterAction.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_project.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ProxyAction.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_RawFileLoader.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_RenameAssetDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_SaveItemsDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_SelectAssetDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_session.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_ShowRefsDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_StyleUtilWidgets.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_VersionDialog.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_WindowButton.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_WindowTileBar.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
