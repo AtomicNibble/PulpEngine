@@ -594,7 +594,7 @@ namespace entity
 				break;
 
 				default:
-					X_WARNING("Ent", "Unkown ent member: \"%s\"", name.GetString());
+					X_WARNING("Ent", "Unknown ent member: \"%s\"", name.GetString());
 					break;
 			}
 		}
