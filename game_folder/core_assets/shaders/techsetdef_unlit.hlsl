@@ -47,7 +47,8 @@ VS_OUTPUT vs_main( VS_INPUT IN )
 
     for(int i = 0; i < 4; i++)
     {
-      pos +=  (mul(src, BoneMatrices[IN.boneIndexes[i]]).xyz * IN.weights[i]);
+      // pos +=  (mul(src, BoneMatrices[IN.boneIndexes[i]]).xyz * IN.weights[i]);
+      pos +=  (mul(BoneMatrices[IN.boneIndexes[i]], src).xyz * IN.weights[i]);
     }
 
   float4 worldPosition = mul( float4(pos, 1.0), worldMatrix );
