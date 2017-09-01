@@ -32,16 +32,6 @@ namespace entity
 		pPhysScene_ = nullptr;
 		p3DWorld_ = nullptr;
 		pModelManager_ = nullptr;
-
-		// translators.
-		ADD_TRANS_MEMBER(dtHealth_, hp);
-		ADD_TRANS_MEMBER(dtHealth_, max);
-
-		ADD_TRANS_MEMBER(dtMesh_, name);
-
-		ADD_TRANS_MEMBER(dtSoundObj_, offset);
-		ADD_TRANS_MEMBER(dtSoundObj_, occType);
-
 	}
 
 
@@ -87,6 +77,15 @@ namespace entity
 
 	bool EnititySystem::createTranslatours(void)
 	{
+
+		// translators.
+		ADD_TRANS_MEMBER(dtHealth_, hp);
+		ADD_TRANS_MEMBER(dtHealth_, max);
+
+		ADD_TRANS_MEMBER(dtMesh_, name);
+
+		ADD_TRANS_MEMBER(dtSoundObj_, offset);
+		ADD_TRANS_MEMBER(dtSoundObj_, occType);
 
 #if 0
 		const char* pDoc = R"(
