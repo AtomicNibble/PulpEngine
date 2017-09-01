@@ -174,7 +174,7 @@ namespace entity
 		desc.material = pPhysics_->getDefaultMaterial();
 		desc.position = trans.pos;
 		desc.upDirection = Vec3f::zAxis();
-		desc.maxJumpHeight = 50.f;
+		desc.maxJumpHeight = vars_.player.jumpHeight_;
 
 		con.pController = pPhysScene_->createCharacterController(desc);
 
