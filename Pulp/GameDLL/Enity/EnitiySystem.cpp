@@ -418,6 +418,7 @@ namespace entity
 
 		DataTranslator<SoundObject> dtSoundObj(arena_);
 		ADD_TRANS_MEMBER(dtSoundObj, offset);
+		ADD_TRANS_MEMBER(dtSoundObj, occType);
 
 		if (entDesc.GetType() != core::json::Type::kObjectType) {
 			X_ERROR("Ents", "Ent description must be a object");
@@ -469,6 +470,32 @@ namespace entity
 #endif // !X_SOUND_ENABLE_DEBUG_NAMES
 					{
 						snd.handle = gEnv->pSound->registerObject(trans);
+					}
+
+					if (snd.occType.isNotEmpty())
+					{
+						sound::OcclusionType::Enum occ = sound::OcclusionType::None;
+
+						switch (core::Hash::Fnv1aHash(snd.occType.c_str(), snd.occType.length()))
+						{
+							case "None"_fnv1a:
+								occ = sound::OcclusionType::None;
+								break;
+							case "SingleRay"_fnv1a:
+								occ = sound::OcclusionType::SingleRay;
+								break;
+							case "MultiRay"_fnv1a:
+								occ = sound::OcclusionType::MultiRay;
+								break;
+							default:
+								X_ERROR("Ent", "Invalid occlusion type: \"%s\"", snd.occType.c_str());
+								break;
+						}
+
+						if (occ != sound::OcclusionType::None)
+						{
+							gEnv->pSound->setOcclusionType(snd.handle, occ);
+						}
 					}
 
 					break;
