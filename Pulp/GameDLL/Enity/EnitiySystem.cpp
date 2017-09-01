@@ -458,17 +458,20 @@ namespace entity
 						return false;
 					}
 
+					auto sndTrans = trans;
+					sndTrans.pos += snd.offset;
+
 #if X_SOUND_ENABLE_DEBUG_NAMES
 					if (reg_.has<EntName>(ent))
 					{
 						auto& entName = reg_.get<EntName>(ent);
 
-						snd.handle = gEnv->pSound->registerObject(trans, entName.name.c_str());
+						snd.handle = gEnv->pSound->registerObject(sndTrans, entName.name.c_str());
 					}
 					else
 #endif // !X_SOUND_ENABLE_DEBUG_NAMES
 					{
-						snd.handle = gEnv->pSound->registerObject(trans);
+						snd.handle = gEnv->pSound->registerObject(sndTrans);
 					}
 
 					if (snd.occType.isNotEmpty())
