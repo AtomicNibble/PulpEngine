@@ -231,9 +231,12 @@ namespace entity
 		core::json::Document d;
 		if (d.ParseStream(is).HasParseError()) {
 			auto err = d.GetParseError();
+			const char* pErrStr = core::json::GetParseError_En(err);
 			size_t offset = d.GetErrorOffset();
-			X_ERROR("Ents", "Failed to parse ent desc(%" PRIi32 "): Line: %" PRIuS " Err: %s", 
-				err, offset, core::json::GetParseError_En(err));
+			size_t line = core::strUtil::LineNumberForOffset(pJsonBegin, pJsonEnd, offset);
+
+			X_ERROR("Ents", "Failed to parse ent desc(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s",
+				err, offset, line, pErrStr);
 			return false;
 		}
 
