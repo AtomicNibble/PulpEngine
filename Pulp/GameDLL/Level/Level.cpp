@@ -173,8 +173,12 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 		clear();
 	}
 
+	if (!processEnts())
 	{
+		X_ERROR("Level", "Failed to process ent data");
+		clear();
 	}
+	
 
 	core::IoRequestClose req;
 	req.pFile = pFile;
@@ -251,16 +255,36 @@ bool Level::processData(void)
 		}
 	}
 
+
+
+	return true;
+}
+
+
+bool Level::processEnts(void)
+{
 	{
 		core::XFileFixedBuf file = fileHdr_.FileBufForNode(levelData_.ptr(), level::FileNodes::ENTITIES);
 
 		entSys_.loadEntites(
-			reinterpret_cast<const char*>(file.getBufferStart()), 
+			reinterpret_cast<const char*>(file.getBufferStart()),
 			reinterpret_cast<const char*>(file.getBufferEnd())
 		);
-
 	}
 
+	core::XFileMemScoped entFile;
+
+	if (!entFile.openFile("entdesc.json", core::fileMode::READ))
+	{
+		return false;
+	}
+
+	entSys_.loadEntites2(
+		reinterpret_cast<const char*>(entFile->getBufferStart()),
+		reinterpret_cast<const char*>(entFile->getBufferEnd())
+	);
+
+	entSys_.postLoad();
 
 	return true;
 }

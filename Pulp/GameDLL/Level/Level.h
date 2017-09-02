@@ -57,6 +57,7 @@ private:
 	void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 	bool processHeader(void);
 	bool processData(void);
+	bool processEnts(void);
 
 
 private:
