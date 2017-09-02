@@ -1130,6 +1130,9 @@ void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, si
 
 void XSound::stopAll(SndObjectHandle object)
 {
+	// we don't have todo anything for none global objects currently.
+	// the active counts will get updated correctly.
+
 	SoundEngine::StopAll(object);
 }
 
