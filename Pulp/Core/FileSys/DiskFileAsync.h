@@ -28,6 +28,7 @@ public:
 	XFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_FINAL;
 	XFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_FINAL;
 
+	X_INLINE void cancelAll(void) const X_FINAL;
 
 	// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
 	X_INLINE size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_FINAL;
@@ -44,6 +45,13 @@ X_INLINE bool XDiskFileAsync::valid(void) const
 {
 	return file_.valid();
 }
+
+
+X_INLINE void XDiskFileAsync::cancelAll(void) const
+{
+	file_.cancelAll();
+}
+
 
 X_INLINE size_t XDiskFileAsync::WaitUntilFinished(const XFileAsyncOperation& operation)
 {

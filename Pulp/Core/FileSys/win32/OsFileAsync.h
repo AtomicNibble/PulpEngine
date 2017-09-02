@@ -22,6 +22,7 @@ public:
 	XOsFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
 	XOsFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
 
+	void cancelAll(void) const;
 
 	uint64_t tell(void) const;
 	uint64_t fileSize(void) const;

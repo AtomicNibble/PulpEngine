@@ -45,6 +45,7 @@ struct XFileAsync
 	virtual XFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_ABSTRACT;
 	virtual XFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_ABSTRACT;
 
+	virtual void cancelAll(void) const X_ABSTRACT;
 
 	/// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
 	virtual size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;

@@ -223,6 +223,14 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 	return op;
 }
 
+void OsFileAsync::cancelAll(void) const
+{
+	if (!::CancelIoEx(hFile_, nullptr))
+	{
+		core::lastError::Description Dsc;
+		X_ERROR("AsyncFile", "Failed to cancel all async requests. Error: %s", core::lastError::ToString(Dsc));
+	}
+}
 
 uint64_t OsFileAsync::tell(void) const
 {
