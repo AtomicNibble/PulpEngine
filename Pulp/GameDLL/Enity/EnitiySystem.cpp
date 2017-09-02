@@ -92,29 +92,6 @@ namespace entity
 		ADD_TRANS_MEMBER(dtSoundObj_, offset);
 		ADD_TRANS_MEMBER(dtSoundObj_, occType);
 
-#if 0
-		const char* pDoc = R"(
-{
-	"ents" : [
-		{
-			"origin" : {"x": 128, "y": 128, "z": 25},
-			"angles" : {"p": -2.618721, "y": 1.028581, "r": 25.0},
-
-			"health" : {
-				"hp": 100,
-				"max": 100
-			},
-			"SoundObject" : {
-			}
-		}
-	]
-}
-			)";
-
-
-		loadEntites2(pDoc, pDoc + sizeof(pDoc));
-
-#endif
 
 		return true;
 	}
