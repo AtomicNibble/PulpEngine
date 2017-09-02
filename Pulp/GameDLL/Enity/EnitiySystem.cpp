@@ -417,14 +417,6 @@ namespace entity
 
 			switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength()))
 			{
-				case "Name"_fnv1a:
-				{
-					auto& hp = reg_.assign<Health>(ent);
-					if (!parseComponent(dtHealth_, hp, value)) {
-						return false;
-					}
-					break;
-				}
 				case "Health"_fnv1a:
 				{
 					auto& hp = reg_.assign<Health>(ent);
