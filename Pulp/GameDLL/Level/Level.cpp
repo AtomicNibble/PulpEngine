@@ -173,51 +173,8 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 		clear();
 	}
 
-#if 0
-	Transformf trans;
-
-	for (size_t i = 0; i < 30; i++)
 	{
-		trans.pos.x = gEnv->xorShift.randRange(-200.f, 200.f);
-		trans.pos.y = gEnv->xorShift.randRange(-200.f, 200.f);
-		trans.pos.z = gEnv->xorShift.randRange(20.f, 100.f);
-
-		float size = gEnv->xorShift.randRange(5.f, 20.f);
-
-		auto box = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), size), 0.5f);
-		pScene_->addActorToScene(box);
 	}
-
-	for (size_t i = 0; i < 20; i++)
-	{
-		trans.pos.x = -248;
-		trans.pos.y = 180;
-		trans.pos.z = 80;
-
-		trans.pos.x += gEnv->xorShift.randRange(-20.f, 20.f);
-		trans.pos.y += gEnv->xorShift.randRange(-20.f, 20.f);
-
-
-		float size = gEnv->xorShift.randRange(1.f, 10.f);
-
-		auto box = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), size), 0.5f);
-		pScene_->addActorToScene(box);
-	}
-
-	trans.pos.y = 120;
-
-	for (size_t i = 0; i < 10; i++)
-	{
-		float size = gEnv->xorShift.randRange(1.f, 10.f);
-
-		trans.pos.y = 120;
-		trans.pos.x += gEnv->xorShift.randRange(-20.f, 20.f);
-		trans.pos.y += gEnv->xorShift.randRange(-20.f, 20.f);
-
-		auto box = gEnv->pPhysics->createSphere(trans, size, 0.6f);
-		pScene_->addActorToScene(box);
-	}
-#endif
 
 	core::IoRequestClose req;
 	req.pFile = pFile;
