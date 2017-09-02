@@ -1605,17 +1605,30 @@ void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
 	}
 
 	const char* pEventName = pArgs->GetArg(1);
+	auto eventId = SoundEngine::GetIDFromString(pEventName);
+
 
 	// optional ObjectId
-	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
-	if (pArgs->GetArgCount() > 2) {
-		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(2));
+	if (pArgs->GetArgCount() < 3)
+	{
+		X_LOG0("Sound", "snd_post_event(Global): id: %" PRIu32, eventId);
+		postEvent(eventId, GLOBAL_OBJECT_ID);
+		return;
 	}
 
-	auto eventId = SoundEngine::GetIDFromString(pEventName);
-	X_LOG1("Sound", "snd_post_event: id: %" PRIu32, eventId);
+	// we want a specific object.
+	const char* pObjectStr = pArgs->GetArg(2);
 
-	postEvent(eventId, objectId);
+	SoundObject* pObject = findObjectForNick(pObjectStr);
+	if (!pObject) {
+		X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
+		return;
+	}
+
+	const auto& pos = pObject->trans.pos;
+	X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %s object-pos: (%g,%g,%g)", eventId, pObjectStr, pos.x, pos.y, pos.z);
+
+	postEvent(eventId, SoundObjToObjHandle(pObject));
 }
 
 
@@ -1628,6 +1641,7 @@ void XSound::cmd_StopEvent(core::IConsoleCmdArgs* pArgs)
 	}
 
 	const char* pEventName = pArgs->GetArg(1);
+//	auto eventId = SoundEngine::GetIDFromString(pEventName);
 
 	// optional ObjectId
 	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
@@ -1645,13 +1659,26 @@ void XSound::cmd_StopEvent(core::IConsoleCmdArgs* pArgs)
 void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
 {
 	// optional ObjectId
-	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
-	if (pArgs->GetArgCount() > 1) {
-		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(1));
+	if (pArgs->GetArgCount() < 2)
+	{
+		X_LOG0("Sound", "snd_stop_all(Global)");
+		stopAll(GLOBAL_OBJECT_ID);
+		return;
 	}
 
-	// TODO
-	X_UNUSED(objectId);
+	// we want a specific object.
+	const char* pObjectStr = pArgs->GetArg(1);
+	SoundObject* pObject = findObjectForNick(pObjectStr);
+
+	if (!pObject) {
+		X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
+		return;
+	}
+
+	const auto& pos = pObject->trans.pos;
+	X_LOG0("Sound", "snd_stop_all: object: %s object-pos: (%g,%g,%g)", pObjectStr, pos.x, pos.y, pos.z);
+
+	stopAll(SoundObjToObjHandle(pObject));
 }
 
 void XSound::cmd_ListBanks(core::IConsoleCmdArgs* pArgs)
