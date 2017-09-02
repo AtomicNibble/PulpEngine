@@ -24,19 +24,18 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(model)
 
-class XModel;
-
+class RenderModel;
 
 struct ModelLoadRequest
 {
-	ModelLoadRequest(XModel* pModel) :
+	ModelLoadRequest(RenderModel* pModel) :
 		pFile(nullptr),
 		pModel(pModel)
 	{
 		core::zero_object(hdr);
 	}
 	core::XFileAsync* pFile;
-	XModel* pModel;
+	RenderModel* pModel;
 	core::UniquePointer<uint8_t[]> data;
 	core::TimeVal dispatchTime;
 	core::TimeVal loadTime;
@@ -47,7 +46,7 @@ class XModelManager :
 	public IModelManager,
 	public core::IXHotReload
 {
-	typedef core::AssetContainer<XModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
+	typedef core::AssetContainer<RenderModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
 	typedef ModelContainer::Resource ModelResource;
 
 	typedef core::Array<ModelLoadRequest*> ModelLoadRequestArr;
@@ -66,18 +65,16 @@ public:
 	bool asyncInitFinalize(void);
 	void dispatchPendingLoads(void);
 
-	IModel* findModel(const char* pModelName) const X_FINAL;
-	IModel* loadModel(const char* pModelName) X_FINAL;
-	XModel* loadXModel(const char* pModelName);
-	IModel* getDefaultModel(void) const X_FINAL;
+	XModel* findModel(const char* pModelName) const X_FINAL;
+	XModel* loadModel(const char* pModelName) X_FINAL;
+	XModel* getDefaultModel(void) const X_FINAL;
 
 	void releaseModel(XModel* pModel);
 
 	void reloadModel(const char* pName);
 	void listModels(const char* pSearchPatten = nullptr) const;
 
-	bool waitForLoad(IModel* pModel) X_OVERRIDE; // returns true if load succeed.
-	bool waitForLoad(XModel* pModel); // returns true if load succeed.
+	bool waitForLoad(XModel* pModel) X_FINAL; // returns true if load succeed.
 
 private:
 	bool initDefaults(void);
@@ -111,7 +108,7 @@ private:
 	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* blockArena_; // for the model data buffers
 
-	XModel*	pDefaultModel_;
+	RenderModel*	pDefaultModel_;
 	ModelContainer	models_;
 
 	// loading

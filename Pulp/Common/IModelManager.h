@@ -2,20 +2,21 @@
 
 X_NAMESPACE_BEGIN(model)
 
-struct IModel;
+class XModel;
 
 struct IModelManager
 {
 	virtual ~IModelManager() {}
 
 	// returns null if not found, ref count unaffected
-	virtual IModel* findModel(const char* pModelName) const X_ABSTRACT;
-	virtual IModel* loadModel(const char* pModelName) X_ABSTRACT;
+	virtual XModel* findModel(const char* pModelName) const X_ABSTRACT;
+	virtual XModel* loadModel(const char* pModelName) X_ABSTRACT;
 
-	virtual IModel* getDefaultModel(void) const X_ABSTRACT;
+	virtual XModel* getDefaultModel(void) const X_ABSTRACT;
+
+	virtual bool waitForLoad(XModel* pModel) X_ABSTRACT; // returns true if load succeed.
+
 };
-
-
 
 
 X_NAMESPACE_END

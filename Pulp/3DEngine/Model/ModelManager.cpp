@@ -1,7 +1,9 @@
 #include <stdafx.h>
 #include <Model\ModelManager.h>
 
-#include "XModel.h"
+#include "EngineEnv.h"
+#include "Material\MaterialManager.h"
+#include "RenderModel.h"
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -88,7 +90,7 @@ bool XModelManager::asyncInitFinalize(void)
 }
 
 
-IModel* XModelManager::findModel(const char* pModelName) const
+XModel* XModelManager::findModel(const char* pModelName) const
 {
 	core::string name(pModelName);
 	core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
@@ -103,12 +105,7 @@ IModel* XModelManager::findModel(const char* pModelName) const
 }
 
 
-IModel* XModelManager::loadModel(const char* pModelName)
-{
-	return loadXModel(pModelName);
-}
-
-XModel* XModelManager::loadXModel(const char* pModelName)
+XModel* XModelManager::loadModel(const char* pModelName)
 {
 	X_ASSERT_NOT_NULL(pModelName);
 	X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
@@ -133,7 +130,7 @@ XModel* XModelManager::loadXModel(const char* pModelName)
 	return pModelRes;
 }
 
-IModel* XModelManager::getDefaultModel(void) const
+XModel* XModelManager::getDefaultModel(void) const
 {
 	return pDefaultModel_;
 }
@@ -151,7 +148,7 @@ void XModelManager::releaseModel(XModel* pModel)
 
 bool XModelManager::initDefaults(void)
 {
-	pDefaultModel_ = static_cast<XModel*>(loadModel(MODEL_DEFAULT_NAME));
+	pDefaultModel_ = static_cast<RenderModel*>(loadModel(MODEL_DEFAULT_NAME));
 	if (!pDefaultModel_) {
 		X_ERROR("ModelManager", "Failed to create default model");
 		return false;
@@ -284,11 +281,6 @@ void XModelManager::dispatchPendingLoads(void)
 
 		requestQueue_.pop();
 	}
-}
-
-X_INLINE bool XModelManager::waitForLoad(IModel* pModel)
-{
-	return waitForLoad(static_cast<XModel*>(pModel));
 }
 
 bool XModelManager::waitForLoad(XModel* pModel)
@@ -473,8 +465,8 @@ void XModelManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadId
 	ModelLoadRequest* pLoadReq = static_cast<ModelLoadRequest*>(X_ASSERT_NOT_NULL(pData));
 	XModel* pModel = pLoadReq->pModel;
 
-
-	pModel->processData(pLoadReq->hdr, std::move(pLoadReq->data));
+	
+	pModel->processData(pLoadReq->hdr, std::move(pLoadReq->data), X_ASSERT_NOT_NULL(engine::gEngEnv.pMaterialMan_));
 
 
 	loadRequestCleanup(pLoadReq);

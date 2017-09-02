@@ -1,19 +1,10 @@
 #include "stdafx.h"
 #include "XModel.h"
-#include "ModelManager.h"
-
 
 #include <Memory\MemCursor.h>
-#include <IFileSys.h>
-#include <IRender.h>
-#include <IConsole.h>
-#include <IShader.h>
-#include <IPhysics.h>
-#include <IFont.h>
-#include <Threading\JobSystem2.h>
 
-#include "Material\MaterialManager.h"
-#include "Drawing\PrimativeContext.h"
+#include <IMaterial.h>
+#include <IPhysics.h>
 
 X_NAMESPACE_BEGIN(model)
 
@@ -37,173 +28,6 @@ XModel::~XModel()
 
 }
 
-
-bool XModel::createRenderBuffersForLod(size_t idx, render::IRender* pRender)
-{
-	const auto& raw = hdr_.lodInfo[idx];
-
-	return renderMeshes_[idx].createRenderBuffers(pRender, raw, hdr_.vertexFmt);
-}
-
-
-bool XModel::createSkinningRenderBuffersForLod(size_t idx, render::IRender* pRender)
-{
-	const auto& raw = hdr_.lodInfo[idx];
-
-	return renderMeshes_[idx].createSkinningRenderBuffers(pRender, raw);
-}
-
-void XModel::releaseLodRenderBuffers(size_t idx, render::IRender* pRender)
-{
-	auto& renderInfo = renderMeshes_[idx];
-
-	renderInfo.releaseRenderBuffers(pRender);
-}
-
-bool XModel::canRenderLod(size_t idx) const
-{
-	const auto& render = renderMeshes_[idx];
-
-	return render.canRender();
-}
-
-void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const
-{
-	const int32_t num = numBones();
-	if (!num) {
-		return;
-	}
-
-	for (int32_t i = 0; i < num; i++)
-	{
-		const Vec3f& pos = pBonePos_[i];
-		const XQuatCompressedf& angle = pBoneAngles_[i];
-		const uint8_t parIdx = pTagTree_[i];
-
-		const Vec3f& parPos = pBonePos_[parIdx];
-		const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
-
-		{
-			Transformf qTrans;
-			qTrans.quat = angle.asQuat();
-			qTrans.pos = modelMat * pos;
-
-			Transformf qTransPar;
-			qTransPar.quat = parAngle.asQuat();
-			qTransPar.pos = modelMat * parPos;
-
-			pPrimContex->drawBone(qTransPar, qTrans, col);
-		}
-	}
-}
-
-
-void XModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, 
-	const Matrix44f* pBoneMatrix, size_t num) const
-{
-	if (numBones() != static_cast<int32_t>(num)) {
-		X_ERROR("Model", "Bone count don't match source count");
-		return;
-	}
-
-	for (size_t i = 0; i < num; i++)
-	{
-		const Matrix44f& mat = pBoneMatrix[i];
-		const Vec3f& pos = pBonePos_[i];
-		const XQuatCompressedf& angle = pBoneAngles_[i];
-		const uint8_t parIdx = pTagTree_[i];
-
-		const Matrix44f& parMat = pBoneMatrix[parIdx];
-		const Vec3f& parPos = pBonePos_[parIdx];
-		const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
-
-		{
-			Transformf qTrans;
-			qTrans.quat = angle.asQuat();
-			qTrans.pos = modelMat * mat * pos;
-
-			Transformf qTransPar;
-			qTransPar.quat = parAngle.asQuat();
-			qTransPar.pos = modelMat * parMat * parPos;
-		
-			pPrimContex->drawBone(qTransPar, qTrans, col);
-		}
-	}
-}
-
-void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view, 
-	Vec3f offset, float textSize, const Color8u col) const
-{
-	const int32_t num = numBones();
-	if (!num) {
-		return;
-	}
-
-	font::TextDrawContext ctx;
-	ctx.col = col;
-//	ctx.flags.Set(font::DrawTextFlag::CENTER);
-//	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
-	ctx.pFont = gEnv->pFontSys->GetDefault();
-	ctx.effectId = 0;
-	ctx.size = Vec2f(textSize, textSize);
-
-	for (int32_t i = 0; i < num; i++)
-	{
-		const Vec3f& pos = pBonePos_[i];
-		Vec3f worldPos = modelMat * pos;
-
-		// temp hack.
-		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
-
-		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
-	}
-}
-
-void XModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
-	Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const
-{
-	if (numBones() != static_cast<int32_t>(num)) {
-		X_ERROR("Model", "Bone count don't match source count");
-		return;
-	}
-
-
-	font::TextDrawContext ctx;
-	ctx.col = col;
-//	ctx.flags.Set(font::DrawTextFlag::CENTER);
-//	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
-	ctx.pFont = gEnv->pFontSys->GetDefault();
-	ctx.effectId = 0;
-	ctx.size = Vec2f(textSize, textSize);
-
-	for (size_t i = 0; i < num; i++)
-	{
-		const Vec3f& pos = pBonePos_[i];
-		Vec3f worldPos = modelMat * pBoneMatrix[i] * pos;
-
-		// temp hack.
-		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
-
-		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
-	}
-}
-
-void XModel::assignDefault(XModel* pDefault)
-{
-	pTagNames_ = pDefault->pTagNames_;
-	pTagTree_ = pDefault->pTagTree_;
-	pBoneAngles_ = pDefault->pBoneAngles_;
-	pBonePos_ = pDefault->pBonePos_;
-	pMeshHeads_ = pDefault->pMeshHeads_;
-
-	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
-		renderMeshes_[i] = pDefault->renderMeshes_[i];
-	}
-
-	hdr_ = pDefault->hdr_;
-}
-
-// ==================================
 
 
 
@@ -230,7 +54,7 @@ void XModel::assignDefault(XModel* pDefault)
 //
 
 
-void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
+void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan)
 {
 	int32_t i, x;
 
@@ -240,7 +64,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	core::MemCursor phys_data_cursor(bone_data_cursor.end(), hdr.physDataSize);
 	core::MemCursor hitbox_data_cursor(phys_data_cursor.end(), hdr.hitboxDataBlocks * 64);
 	core::MemCursor cursor(hitbox_data_cursor.end(), hdr.meshDataSize);
-	
+
 	const size_t numBone = hdr.numBones;
 	const size_t numBoneTotal = hdr.numBones + hdr.numBlankBones;
 
@@ -433,7 +257,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	{
 		SubMeshHeader& mesh = const_cast<SubMeshHeader&>(pMeshHeads_[i]);
 
-		mesh.pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(mesh.materialName);
+		mesh.pMat = pMatMan->loadMaterial(mesh.materialName);
 	}
 
 	data_ = std::move(data);
@@ -448,7 +272,7 @@ void XModel::addPhysToActor(physics::ActorHandle actor)
 	// we need the col header 
 	core::MemCursor phys_data_cursor(data_.get() + hdr_.materialNameDataSize +
 		hdr_.tagNameDataSize + hdr_.boneDataSize, hdr_.physDataSize);
-	
+
 	const CollisionInfoHdr& hdr = *phys_data_cursor.getSeekPtr<CollisionInfoHdr>();
 
 	size_t total = hdr.totalShapes();
@@ -471,7 +295,7 @@ void XModel::addPhysToActor(physics::ActorHandle actor)
 	for (uint8_t t = 0; t < hdr.shapeCounts[ColMeshType::CONVEX]; t++)
 	{
 		CollisionConvexHdr* pConvexHdr = phys_data_cursor.getSeekPtr<CollisionConvexHdr>();
-	
+
 		if (hdr_.flags.IsSet(ModelFlag::PHYS_BAKED))
 		{
 			size_t len = pConvexHdr->dataSize;
@@ -487,21 +311,6 @@ void XModel::addPhysToActor(physics::ActorHandle actor)
 	}
 }
 
-
-/// Model functions.
-bool ModelHeader::isValid(void) const
-{
-	if (version != MODEL_VERSION) {
-		X_ERROR("Model", "model version is invalid. FileVer: %i RequiredVer: %i",
-			version, MODEL_VERSION);
-	}
-
-	return version == MODEL_VERSION &&
-		(numBones + numBlankBones) > 0 &&
-		numLod > 0 &&
-		numLod <= MODEL_MAX_LODS &&
-		materialNameDataSize > 0;
-}
 
 
 X_NAMESPACE_END

@@ -31,9 +31,6 @@
     <ClCompile Include="Model\ModelManager.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
-    <ClCompile Include="Model\XModel.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
     <ClCompile Include="Material\MaterialManager.cpp">
       <Filter>Source Files\Material</Filter>
     </ClCompile>
@@ -94,6 +91,9 @@
     <ClCompile Include="Vars\DrawVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
+    <ClCompile Include="Model\RenderModel.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -124,9 +124,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Model\ModelManager.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="Model\XModel.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="Material\MaterialManager.h">
@@ -182,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="Vars\DrawVars.h">
       <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\RenderModel.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -268,9 +268,6 @@
     <None Include="Drawing\PrimativeContext.inl">
       <Filter>Header Files\Drawing</Filter>
     </None>
-    <None Include="Model\XModel.inl">
-      <Filter>Header Files\Model</Filter>
-    </None>
     <None Include="Material\TechDefStateManager.inl">
       <Filter>Header Files\Material</Filter>
     </None>
@@ -294,6 +291,9 @@
     </None>
     <None Include="Vars\DrawVars.inl">
       <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="Model\RenderModel.inl">
+      <Filter>Header Files\Model</Filter>
     </None>
   </ItemGroup>
 </Project>

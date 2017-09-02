@@ -459,6 +459,7 @@
     <ClInclude Include="ModelCompiler.h" />
     <ClInclude Include="ModelLib.h" />
     <ClInclude Include="ModelSkeleton.h" />
+    <ClInclude Include="Model\XModel.h" />
     <ClInclude Include="RawModel.h" />
     <ClInclude Include="RawModelTypes.h" />
     <ClInclude Include="Util\ModelUtil.h" />
@@ -471,6 +472,7 @@
     <ClCompile Include="FaceOptermize.cpp" />
     <ClCompile Include="ModelCompiler.cpp" />
     <ClCompile Include="ModelSkeleton.cpp" />
+    <ClCompile Include="Model\XModel.cpp" />
     <ClCompile Include="RawModel.cpp" />
     <ClCompile Include="RawModelTypes.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -491,6 +493,9 @@
     </ClCompile>
     <ClCompile Include="Util\ModelUtil.cpp" />
     <ClCompile Include="XModelLib.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Model\XModel.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

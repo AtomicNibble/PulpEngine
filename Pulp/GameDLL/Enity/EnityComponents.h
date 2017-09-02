@@ -6,7 +6,7 @@
 #include "UserCmds\UserCmd.h"
 
 X_NAMESPACE_DECLARE(model,
-	struct IModel;
+	class XModel;
 )
 
 X_NAMESPACE_DECLARE(engine,
@@ -47,7 +47,7 @@ struct SoundEnviroment
 struct Mesh
 {
 	core::string name;
-	model::IModel* pModel;
+	model::XModel* pModel;
 };
 
 struct MeshRenderer
@@ -94,7 +94,7 @@ struct CharacterController
 struct RenderComponent
 {
 	engine::IRenderEnt* pRenderEnt;
-	model::IModel* pModel;
+	model::XModel* pModel;
 };
 
 

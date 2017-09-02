@@ -26,6 +26,11 @@ typedef core::MemoryArena<
 
 extern GameArena* g_gameArena;
 
+#include <../../tools/ModelLib/ModelLib.h>
+
+X_LINK_LIB("engine_ModelLib");
+
+
 #include <Math\XAngles.h>
 
 #include <IGame.h>
@@ -34,6 +39,5 @@ extern GameArena* g_gameArena;
 
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
-
 
 #include "Enity\EnityComponents.h"

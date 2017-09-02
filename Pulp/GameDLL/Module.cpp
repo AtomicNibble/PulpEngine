@@ -38,12 +38,17 @@ class XEngineModule_Game : public IEngineModule
 		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
-		game::IGame* pGame;
 
 		LinkModule(pCore, "GameDLL");
 
 		g_gameArena = X_NEW(GameArena, gEnv->pArena, "GameArena")(&g_gameAlloc, "GameArena");
-		pGame = X_NEW(game::XGame, g_gameArena, "XGame")(pCore);
+		
+		if (!gEnv->pCore->IntializeLoadedConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
+			X_ERROR("GameDLL", "Failed to init ModelLib");
+			return false;
+		}
+		
+		auto* pGame = X_NEW(game::XGame, g_gameArena, "XGame")(pCore);
 
 
 		env.pGame = pGame;

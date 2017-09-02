@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(engine)
 
 struct RenderEntDesc
 {
-	model::IModel* pModel;
+	model::XModel* pModel;
 
 	Transformf trans;
 };

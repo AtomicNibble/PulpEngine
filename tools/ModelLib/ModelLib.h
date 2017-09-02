@@ -21,4 +21,6 @@
 
 #include "Util\ModelUtil.h"
 
+#include "Model\XModel.h"
+
 #endif // !X_MODELLIB_H_

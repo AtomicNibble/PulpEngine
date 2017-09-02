@@ -65,6 +65,10 @@ class XEngineModule_3DEngine : public IEngineModule
 			X_ERROR("3DEngine", "Failed to init ImgLib");
 			return false;
 		}
+		if (!gEnv->pCore->IntializeLoadedConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
+			X_ERROR("3DEngine", "Failed to init ModelLib");
+			return false;
+		}
 
 		auto* pEngine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
 

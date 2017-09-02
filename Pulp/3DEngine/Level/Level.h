@@ -10,7 +10,7 @@
 #include "String\GrowingStringTable.h"
 #include "Threading\JobList.h"
 
-#include "Model\XModel.h"
+#include "Model\RenderModel.h"
 
 #include <Vars\DrawVars.h>
 

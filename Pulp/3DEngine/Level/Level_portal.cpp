@@ -668,8 +668,7 @@ void Level::DrawStaticModels(const uint32_t* pEntIds, uint32_t num)
 			continue;
 		}
 
-		model::XModel* pModel = sm.pModel;
-
+		model::RenderModel* pModel = static_cast<model::RenderModel*>(sm.pModel);
 
 		// is this a good place todo the bucketing?
 		// like placing the model in multiple buckets

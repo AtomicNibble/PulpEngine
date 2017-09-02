@@ -1,32 +1,28 @@
 #pragma once
 
+
 #ifndef X_MODEL_H_
 #define X_MODEL_H_
 
 #include <Util\UniquePointer.h>
 
 #include <IModel.h>
-#include <IRender.h>
-#include <IPhysics.h>
-
-#include "RenderMesh.h"
+#include <IAsyncLoad.h>
 
 
-X_NAMESPACE_DECLARE(engine,
-	class PrimativeContext;
-)
+X_NAMESPACE_DECLARE(engine, struct IMaterialManager)
 
 X_NAMESPACE_BEGIN(model)
 
 
-class XModel : public IModel
+class XModel
 {
 	X_NO_COPY(XModel);
 	X_NO_ASSIGN(XModel);
 
 public:
-	XModel(core::string& name);
-	~XModel() X_OVERRIDE;
+	MODELLIB_EXPORT XModel(core::string& name);
+	MODELLIB_EXPORT virtual ~XModel();
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
@@ -52,35 +48,17 @@ public:
 	X_INLINE const Sphere& boundingSphere(size_t lodIdx) const;
 
 	X_INLINE const LODHeader& getLod(size_t idx) const;
-	X_INLINE const XRenderMesh& getLodRenderMesh(size_t idx) const;
 	X_INLINE const MeshHeader& getLodMeshHdr(size_t idx) const;
 	X_INLINE const SubMeshHeader& getMeshHead(size_t idx) const;
 
+	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
 
-	// can upload each lod individually.
-	bool createRenderBuffersForLod(size_t idx, render::IRender* pRender);
-	bool createSkinningRenderBuffersForLod(size_t idx, render::IRender* pRender);
-	void releaseLodRenderBuffers(size_t idx, render::IRender* pRender);
-	bool canRenderLod(size_t idx) const;
+	MODELLIB_EXPORT void addPhysToActor(physics::ActorHandle actor);
 
-	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const;
-	void RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
-	void RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
-		Vec3f offset, float textSize, const Color8u col) const;
-	void RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
-		Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const;
-
-	void assignDefault(XModel* pDefault);
-
-	void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data);
-
-	void addPhysToActor(physics::ActorHandle actor);
-
-private:
+protected:
 	int32_t id_;
 	core::string name_;
-	XRenderMesh renderMeshes_[MODEL_MAX_LODS];
-	
+
 	core::LoadStatus::Enum status_;
 	uint8_t _pad[3];
 
@@ -89,8 +67,10 @@ private:
 	const uint8_t*			pTagTree_;
 	const XQuatCompressedf* pBoneAngles_;
 	const Vec3f*			pBonePos_;
+
 	// pointer to all the meshes headers for all lods
 	// sotred in lod order.
+	// can probs get rid of this pointer.
 	const SubMeshHeader*	pMeshHeads_;
 
 	core::UniquePointer<uint8_t[]> data_;

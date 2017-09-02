@@ -551,7 +551,7 @@ bool Level::ProcessData(void)
 				// models need to be loaded at some point.
 
 				const char* modelName = stringTable_.getString(sm.modelNameIdx);
-				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(modelName);
+				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(modelName);
 				
 		//		X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
 		//			sm.pos[0], sm.pos[1], sm.pos[2]);

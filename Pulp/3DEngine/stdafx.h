@@ -26,9 +26,12 @@
 #include <../../tools/ImgLib/ImgLib.h>
 // Mat Lib
 #include <../../tools/MaterialLib/MatLib.h>
+// Model Lib
+#include <../../tools/ModelLib/ModelLib.h>
 
 X_LINK_LIB("engine_ImgLib");
 X_LINK_LIB("engine_MaterialLib");
+X_LINK_LIB("engine_ModelLib");
 
 
 extern core::MemoryArenaBase* g_3dEngineArena;

@@ -117,12 +117,6 @@ X_INLINE const LODHeader& XModel::getLod(size_t idx) const
 	return hdr_.lodInfo[idx];
 }
 
-X_INLINE const XRenderMesh& XModel::getLodRenderMesh(size_t idx) const
-{
-	X_ASSERT(idx < static_cast<size_t>(numLods()), "invalid lod index")(numLods(), idx);
-	return renderMeshes_[idx];
-}
-
 X_INLINE const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
 {
 	X_ASSERT(idx < static_cast<size_t>(numLods()), "invalid lod index")(numLods(), idx);

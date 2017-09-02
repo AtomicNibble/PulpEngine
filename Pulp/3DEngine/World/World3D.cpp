@@ -6,7 +6,7 @@
 #include "Model\ModelManager.h"
 #include "Drawing\PrimativeContext.h"
 #include "Drawing\CBufferManager.h"
-#include "Model\XModel.h"
+#include "Model\RenderModel.h"
 
 #include <Math\XWinding.h>
 #include <IFrameData.h>
@@ -636,7 +636,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 				sm.modelNameIdx = fsm.modelNameIdx;
 				// models need to be loaded at some point.
 				const char* pModelName = strTable.getString(sm.modelNameIdx);
-				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadXModel(pModelName);
+				model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(pModelName);
 
 				sm.pModel = X_ASSERT_NOT_NULL(pModel);
 			}
@@ -1600,7 +1600,7 @@ void World3D::drawStaticModels(const uint32_t* pModelIds, uint32_t num)
 			continue;
 		}
 
-		model::XModel* pModel = sm.pModel;
+		model::RenderModel* pModel = static_cast<model::RenderModel*>(sm.pModel);
 
 		// is this a good place todo the bucketing?
 		// like placing the model in multiple buckets
@@ -1703,7 +1703,7 @@ void World3D::drawRenderEnts()
 		}
 
 
-		model::XModel* pModel = pRendEnt->pModel;
+		model::RenderModel* pModel = static_cast<model::RenderModel*>(pRendEnt->pModel);
 		size_t lodIdx = 0;
 
 		if (!pModel->canRenderLod(lodIdx))

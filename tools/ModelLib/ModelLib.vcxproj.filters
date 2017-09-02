@@ -65,6 +65,9 @@
     <ClInclude Include="Util\ModelUtil.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Model\XModel.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -97,5 +100,13 @@
     <ClCompile Include="Util\ModelUtil.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
+    <ClCompile Include="Model\XModel.cpp">
+      <Filter>Source Files\model</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Model\XModel.inl">
+      <Filter>Header Files\model</Filter>
+    </None>
   </ItemGroup>
 </Project>
