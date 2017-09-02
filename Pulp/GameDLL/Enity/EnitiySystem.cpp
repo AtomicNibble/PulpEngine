@@ -223,8 +223,6 @@ namespace entity
 
 	bool EnititySystem::loadEntites2(const char* pJsonBegin, const char* pJsonEnd)
 	{
-		X_UNUSED(pJsonEnd);
-
 		core::json::MemoryStream ms(pJsonBegin, union_cast<ptrdiff_t>(pJsonEnd - pJsonBegin));
 		core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
 
