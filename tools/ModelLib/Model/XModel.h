@@ -10,6 +10,12 @@
 #include <IAsyncLoad.h>
 
 
+
+X_NAMESPACE_DECLARE(physics, 
+typedef uintptr_t Handle;
+typedef Handle ActorHandle;
+)
+
 X_NAMESPACE_DECLARE(engine, struct IMaterialManager)
 
 X_NAMESPACE_BEGIN(model)
