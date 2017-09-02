@@ -30,7 +30,7 @@ namespace entity
 			auto& snd = reg.get<SoundObject>(entity);
 			auto trans = reg.get<TransForm>(entity);
 
-			trans.pos + snd.offset;
+			trans.pos += snd.offset;
 
 			pSound_->setPosition(snd.handle, trans);
 		}
