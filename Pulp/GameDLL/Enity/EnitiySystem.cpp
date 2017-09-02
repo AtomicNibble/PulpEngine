@@ -225,10 +225,15 @@ namespace entity
 	{
 		X_UNUSED(pJsonEnd);
 
+		core::json::MemoryStream ms(pJsonBegin, union_cast<ptrdiff_t>(pJsonEnd - pJsonBegin));
+		core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
+
 		core::json::Document d;
-		if (d.ParseInsitu(const_cast<char*>(pJsonBegin)).HasParseError()) {
+		if (d.ParseStream(is).HasParseError()) {
 			auto err = d.GetParseError();
-			X_ERROR("Ents", "Failed to parse ent desc: %i -> %s", err, core::json::GetParseError_En(err));
+			size_t offset = d.GetErrorOffset();
+			X_ERROR("Ents", "Failed to parse ent desc(%" PRIi32 "): Line: %" PRIuS " Err: %s", 
+				err, offset, core::json::GetParseError_En(err));
 			return false;
 		}
 
