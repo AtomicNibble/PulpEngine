@@ -587,6 +587,348 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& co
 	}
 }
 
+void IPrimativeContext::drawOBB(const OBB& obb, bool solid, const Color8u& col)
+{
+	const auto& or = obb.orientation();
+	const auto& pos = obb.center();
+	const auto& max = obb.halfVec();
+	auto min = -obb.halfVec();
+
+	Vec3f xyz((or *Vec3f(min.x, min.y, min.z)) + pos);
+	Vec3f xyZ((or *Vec3f(min.x, min.y, max.z)) + pos);
+	Vec3f xYz((or *Vec3f(min.x, max.y, min.z)) + pos);
+	Vec3f xYZ((or *Vec3f(min.x, max.y, max.z)) + pos);
+	Vec3f Xyz((or *Vec3f(max.x, min.y, min.z)) + pos);
+	Vec3f XyZ((or *Vec3f(max.x, min.y, max.z)) + pos);
+	Vec3f XYz((or *Vec3f(max.x, max.y, min.z)) + pos);
+	Vec3f XYZ((or *Vec3f(max.x, max.y, max.z)) + pos);
+
+	if (!solid)
+	{
+		const uint32_t numPoints = 24;
+
+		// so we need 4 * 3 lines.
+		PrimVertex* pLines = addPrimative(numPoints, PrimitiveType::LINELIST);
+
+		// bottom row (all lower case z's)
+		pLines[0].pos = xyz;
+		pLines[1].pos = xYz;
+
+		pLines[2].pos = xYz;
+		pLines[3].pos = XYz;
+
+		pLines[4].pos = XYz;
+		pLines[5].pos = Xyz;
+
+		pLines[6].pos = Xyz;
+		pLines[7].pos = xyz;
+
+		// middle (all lower case z's pointing to upper Z's :D)
+		pLines[8].pos = xyz;
+		pLines[9].pos = xyZ;
+
+		pLines[10].pos = xYz;
+		pLines[11].pos = xYZ;
+
+		pLines[12].pos = XYz;
+		pLines[13].pos = XYZ;
+
+		pLines[14].pos = Xyz;
+		pLines[15].pos = XyZ;
+
+		// top row (all upper case z's)
+		pLines[16].pos = xyZ;
+		pLines[17].pos = xYZ;
+
+		pLines[18].pos = xYZ;
+		pLines[19].pos = XYZ;
+
+		pLines[20].pos = XYZ;
+		pLines[21].pos = XyZ;
+
+		pLines[22].pos = XyZ;
+		pLines[23].pos = xyZ;
+
+		for (uint32_t i = 0; i < numPoints; i++)
+		{
+			pLines[i].color = col;
+		}
+	}
+	else
+	{
+		PrimVertex* pVerts = addPrimative(36, PrimitiveType::TRIANGLELIST);
+
+		Color8u colBot(col * 0.5f);
+		Color8u colTop(col);
+		Color8u colBack(col * 0.5f);
+		Color8u colFront(col * 0.9f);
+		Color8u colLeft(col * 0.7f);
+		Color8u colRight(col * 0.8f);
+
+		// bottom
+		pVerts[0].pos = xyz;
+		pVerts[0].color = colBot;
+		pVerts[1].pos = xYz;
+		pVerts[1].color = colBot;
+		pVerts[2].pos = XYz;
+		pVerts[2].color = colBot;
+
+		pVerts[3].pos = xyz;
+		pVerts[3].color = colBot;
+		pVerts[4].pos = XYz;
+		pVerts[4].color = colBot;
+		pVerts[5].pos = Xyz;
+		pVerts[5].color = colBot;
+
+		// top
+		pVerts[6].pos = xyZ;
+		pVerts[6].color = colTop;
+		pVerts[7].pos = xYZ;
+		pVerts[7].color = colTop;
+		pVerts[8].pos = XYZ;
+		pVerts[8].color = colTop;
+
+		pVerts[9].pos = xyZ;
+		pVerts[9].color = colTop;
+		pVerts[10].pos = XYZ;
+		pVerts[10].color = colTop;
+		pVerts[11].pos = XyZ;
+		pVerts[11].color = colTop;
+
+		// back.
+		pVerts[12].pos = xyz;
+		pVerts[12].color = colBack;
+		pVerts[13].pos = Xyz;
+		pVerts[13].color = colBack;
+		pVerts[14].pos = XyZ;
+		pVerts[14].color = colBack;
+
+		pVerts[15].pos = xyz;
+		pVerts[15].color = colBack;
+		pVerts[16].pos = XyZ;
+		pVerts[16].color = colBack;
+		pVerts[17].pos = xyZ;
+		pVerts[17].color = colBack;
+
+		// front
+		pVerts[18].pos = xYz;
+		pVerts[18].color = colFront;
+		pVerts[19].pos = xYZ;
+		pVerts[19].color = colFront;
+		pVerts[20].pos = XYZ;
+		pVerts[20].color = colFront;
+
+		pVerts[21].pos = xYz;
+		pVerts[21].color = colFront;
+		pVerts[22].pos = XYZ;
+		pVerts[22].color = colFront;
+		pVerts[23].pos = XYz;
+		pVerts[23].color = colFront;
+
+		// left
+		pVerts[24].pos = xyz;
+		pVerts[24].color = colLeft;
+		pVerts[25].pos = xyZ;
+		pVerts[25].color = colLeft;
+		pVerts[26].pos = xYZ;
+		pVerts[26].color = colLeft;
+
+		pVerts[27].pos = xyz;
+		pVerts[27].color = colLeft;
+		pVerts[28].pos = xYZ;
+		pVerts[28].color = colLeft;
+		pVerts[29].pos = xYz;
+		pVerts[29].color = colLeft;
+
+		// right
+		pVerts[30].pos = Xyz;
+		pVerts[30].color = colRight;
+		pVerts[31].pos = XYz;
+		pVerts[31].color = colRight;
+		pVerts[32].pos = XYZ;
+		pVerts[32].color = colRight;
+
+		pVerts[33].pos = Xyz;
+		pVerts[33].color = colRight;
+		pVerts[34].pos = XYZ;
+		pVerts[34].color = colRight;
+		pVerts[35].pos = XyZ;
+		pVerts[35].color = colRight;
+	}
+}
+
+
+void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid, const Color8u& col)
+{
+	const auto& or = obb.orientation();
+	const auto& max = obb.halfVec();
+	auto min = -obb.halfVec();
+	auto pos = obb.center() + offset;
+
+	Vec3f xyz((or *Vec3f(min.x, min.y, min.z)) + pos);
+	Vec3f xyZ((or *Vec3f(min.x, min.y, max.z)) + pos);
+	Vec3f xYz((or *Vec3f(min.x, max.y, min.z)) + pos);
+	Vec3f xYZ((or *Vec3f(min.x, max.y, max.z)) + pos);
+	Vec3f Xyz((or *Vec3f(max.x, min.y, min.z)) + pos);
+	Vec3f XyZ((or *Vec3f(max.x, min.y, max.z)) + pos);
+	Vec3f XYz((or *Vec3f(max.x, max.y, min.z)) + pos);
+	Vec3f XYZ((or *Vec3f(max.x, max.y, max.z)) + pos);
+
+	if (!solid)
+	{
+		const uint32_t numPoints = 24;
+
+		// so we need 4 * 3 lines.
+		PrimVertex* pLines = addPrimative(numPoints, PrimitiveType::LINELIST);
+
+		// bottom row (all lower case z's)
+		pLines[0].pos = xyz;
+		pLines[1].pos = xYz;
+
+		pLines[2].pos = xYz;
+		pLines[3].pos = XYz;
+
+		pLines[4].pos = XYz;
+		pLines[5].pos = Xyz;
+
+		pLines[6].pos = Xyz;
+		pLines[7].pos = xyz;
+
+		// middle (all lower case z's pointing to upper Z's :D)
+		pLines[8].pos = xyz;
+		pLines[9].pos = xyZ;
+
+		pLines[10].pos = xYz;
+		pLines[11].pos = xYZ;
+
+		pLines[12].pos = XYz;
+		pLines[13].pos = XYZ;
+
+		pLines[14].pos = Xyz;
+		pLines[15].pos = XyZ;
+
+		// top row (all upper case z's)
+		pLines[16].pos = xyZ;
+		pLines[17].pos = xYZ;
+
+		pLines[18].pos = xYZ;
+		pLines[19].pos = XYZ;
+
+		pLines[20].pos = XYZ;
+		pLines[21].pos = XyZ;
+
+		pLines[22].pos = XyZ;
+		pLines[23].pos = xyZ;
+
+		for (uint32_t i = 0; i < numPoints; i++)
+		{
+			pLines[i].color = col;
+		}
+	}
+	else
+	{
+		PrimVertex* pVerts = addPrimative(36, PrimitiveType::TRIANGLELIST);
+
+		Color8u colBot(col * 0.5f);
+		Color8u colTop(col);
+		Color8u colBack(col * 0.5f);
+		Color8u colFront(col * 0.9f);
+		Color8u colLeft(col * 0.7f);
+		Color8u colRight(col * 0.8f);
+
+		// bottom
+		pVerts[0].pos = xyz;
+		pVerts[0].color = colBot;
+		pVerts[1].pos = xYz;
+		pVerts[1].color = colBot;
+		pVerts[2].pos = XYz;
+		pVerts[2].color = colBot;
+
+		pVerts[3].pos = xyz;
+		pVerts[3].color = colBot;
+		pVerts[4].pos = XYz;
+		pVerts[4].color = colBot;
+		pVerts[5].pos = Xyz;
+		pVerts[5].color = colBot;
+
+		// top
+		pVerts[6].pos = xyZ;
+		pVerts[6].color = colTop;
+		pVerts[7].pos = xYZ;
+		pVerts[7].color = colTop;
+		pVerts[8].pos = XYZ;
+		pVerts[8].color = colTop;
+
+		pVerts[9].pos = xyZ;
+		pVerts[9].color = colTop;
+		pVerts[10].pos = XYZ;
+		pVerts[10].color = colTop;
+		pVerts[11].pos = XyZ;
+		pVerts[11].color = colTop;
+
+		// back.
+		pVerts[12].pos = xyz;
+		pVerts[12].color = colBack;
+		pVerts[13].pos = Xyz;
+		pVerts[13].color = colBack;
+		pVerts[14].pos = XyZ;
+		pVerts[14].color = colBack;
+
+		pVerts[15].pos = xyz;
+		pVerts[15].color = colBack;
+		pVerts[16].pos = XyZ;
+		pVerts[16].color = colBack;
+		pVerts[17].pos = xyZ;
+		pVerts[17].color = colBack;
+
+		// front
+		pVerts[18].pos = xYz;
+		pVerts[18].color = colFront;
+		pVerts[19].pos = xYZ;
+		pVerts[19].color = colFront;
+		pVerts[20].pos = XYZ;
+		pVerts[20].color = colFront;
+
+		pVerts[21].pos = xYz;
+		pVerts[21].color = colFront;
+		pVerts[22].pos = XYZ;
+		pVerts[22].color = colFront;
+		pVerts[23].pos = XYz;
+		pVerts[23].color = colFront;
+
+		// left
+		pVerts[24].pos = xyz;
+		pVerts[24].color = colLeft;
+		pVerts[25].pos = xyZ;
+		pVerts[25].color = colLeft;
+		pVerts[26].pos = xYZ;
+		pVerts[26].color = colLeft;
+
+		pVerts[27].pos = xyz;
+		pVerts[27].color = colLeft;
+		pVerts[28].pos = xYZ;
+		pVerts[28].color = colLeft;
+		pVerts[29].pos = xYz;
+		pVerts[29].color = colLeft;
+
+		// right
+		pVerts[30].pos = Xyz;
+		pVerts[30].color = colRight;
+		pVerts[31].pos = XYz;
+		pVerts[31].color = colRight;
+		pVerts[32].pos = XYZ;
+		pVerts[32].color = colRight;
+
+		pVerts[33].pos = Xyz;
+		pVerts[33].color = colRight;
+		pVerts[34].pos = XYZ;
+		pVerts[34].color = colRight;
+		pVerts[35].pos = XyZ;
+		pVerts[35].color = colRight;
+	}
+}
+
+
 // Sphere
 void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, bool solid, int32_t lodIdx)
 {

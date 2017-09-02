@@ -115,6 +115,11 @@ public:
 	// AABB
 	void drawAABB(const AABB& aabb, bool solid, const Color8u& col);
 
+	// OBB
+	void drawOBB(const OBB& obb, bool solid, const Color8u& col);
+	void drawOBB(const OBB& obb, const Vec3f& offset, bool solid, const Color8u& col);
+
+
 	// Sphere
 	void drawSphere(const Sphere& sphere, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
 	void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
