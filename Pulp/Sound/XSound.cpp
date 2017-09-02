@@ -246,7 +246,7 @@ void XSound::registerCmds(void)
 	ADD_COMMAND_MEMBER("snd_stop_event", this, XSound, &XSound::cmd_StopEvent, core::VarFlag::SYSTEM,
 		"Stop a audio event on a object. <eventName> <ObjectId>");
 
-	ADD_COMMAND_MEMBER("snd_stop_all_event", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("snd_stop_event_all", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
 		"Stop all audio events for a object. <ObjectId>");
 
 	ADD_COMMAND_MEMBER("listSndBanks", this, XSound, &XSound::cmd_ListBanks, core::VarFlag::SYSTEM,
