@@ -246,7 +246,7 @@ namespace entity
 		core::json::Document d;
 		if (d.ParseInsitu(const_cast<char*>(pJsonBegin)).HasParseError()) {
 			auto err = d.GetParseError();
-			X_ERROR("Ents", "Failed to parse ent desc: %i", err);
+			X_ERROR("Ents", "Failed to parse ent desc: %i -> %s", err, core::json::GetParseError_En(err));
 			return false;
 		}
 
