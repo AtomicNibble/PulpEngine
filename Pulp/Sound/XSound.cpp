@@ -943,8 +943,10 @@ SndObjectHandle XSound::registerObject(X_SOUND_DEBUG_NAME(const char* pNick))
 	pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
-	pObject->debugName = pNick;
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
+	if (pNick) {
+		pObject->debugName = pNick;
+	}
+	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
 #else
 	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
 #endif
@@ -964,7 +966,9 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 {
 	SoundObject* pObject = allocObject();
 #if X_SOUND_ENABLE_DEBUG_NAMES
-	pObject->debugName = pNick;
+	if (pNick) {
+		pObject->debugName = pNick;
+	}
 #endif
 
 	// we don't make objects very far away active by default.
@@ -979,7 +983,7 @@ SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAM
 		pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
-		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pNick ? pNick : "");
+		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
 #else
 		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
 #endif
