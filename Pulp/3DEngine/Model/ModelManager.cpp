@@ -286,6 +286,11 @@ void XModelManager::dispatchPendingLoads(void)
 	}
 }
 
+X_INLINE bool XModelManager::waitForLoad(IModel* pModel)
+{
+	return waitForLoad(static_cast<XModel*>(pModel));
+}
+
 bool XModelManager::waitForLoad(XModel* pModel)
 {
 	{

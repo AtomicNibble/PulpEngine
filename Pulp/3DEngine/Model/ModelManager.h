@@ -76,6 +76,7 @@ public:
 	void reloadModel(const char* pName);
 	void listModels(const char* pSearchPatten = nullptr) const;
 
+	bool waitForLoad(IModel* pModel) X_OVERRIDE; // returns true if load succeed.
 	bool waitForLoad(XModel* pModel); // returns true if load succeed.
 
 private:
