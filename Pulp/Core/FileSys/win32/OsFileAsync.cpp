@@ -20,6 +20,11 @@ namespace
 		X_UNUSED(dwErrorCode);
 		X_UNUSED(dwNumberOfBytesTransfered);
 
+		if (dwErrorCode == ERROR_OPERATION_ABORTED)
+		{
+			X_WARNING("AsyncFile", "Operation was aborted");
+		}
+
 		// okay so we are sexy and kinky.
 		// we need to run the callback.
 		XOsFileAsyncOperation::AsyncOp* pOverlap = static_cast<XOsFileAsyncOperation::AsyncOp*>(lpOverlap);
