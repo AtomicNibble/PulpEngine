@@ -274,6 +274,17 @@ namespace entity
 		return true;
 	}
 
+	bool EnititySystem::postLoad(void)
+	{
+
+		if (!physSys_.createColliders(reg_, pPhysics_, pPhysScene_)) {
+			return false;
+		}
+
+
+		return true;
+	}
+
 	bool EnititySystem::parseMiscModels(core::json::Value::Array arr)
 	{
 #if 1

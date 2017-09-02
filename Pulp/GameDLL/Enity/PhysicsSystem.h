@@ -23,7 +23,7 @@ namespace entity
 		bool init(void);
 		void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene);
 
-
+		bool createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
 
 	private:
 	};

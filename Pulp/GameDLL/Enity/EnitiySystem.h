@@ -50,6 +50,9 @@ namespace entity
 		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
 		bool loadEntites2(const char* pJsonBegin, const char* pJsonEnd);
 
+		bool postLoad(void);
+
+
 		X_INLINE const EnitiyRegister& getRegister(void) const;
 		X_INLINE EnitiyRegister& getRegister(void);
 
