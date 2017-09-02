@@ -161,6 +161,9 @@ private:
 	SoundObject* allocObject(void);
 	void freeObject(SoundObject* pObject);
 
+	SoundObject* findObjectForNick(const char* pNick);
+
+
 private:
 	static void postEventCallback_s(AkCallbackType eType, AkCallbackInfo* pCallbackInfo);
 	static void bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId, void* pCookie);

@@ -1064,6 +1064,29 @@ void XSound::freeObject(SoundObject* pObject)
 	objectPool_.free(pObject);
 }
 
+SoundObject* XSound::findObjectForNick(const char* pNick)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	for (auto* pObject : objects_) 
+	{
+		if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick))
+		{
+			return pObject;
+		}
+	}
+
+	for (auto* pObject : culledObjects_)
+	{
+		if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick))
+		{
+			return pObject;
+		}
+	}
+
+	return nullptr;
+}
+
 // ----------------------------------------------
 
 void XSound::setPosition(SndObjectHandle object, const Transformf& trans)
