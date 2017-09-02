@@ -279,14 +279,20 @@ AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics,
 void IOhook::Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& transferInfo,
 	bool& bCancelAllTransfersForThisFile)
 {
-
 	X_UNUSED(transferInfo);
 	X_ASSERT_NOT_NULL(fileDesc.hFile);
-//	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
+	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
-	X_ASSERT_NOT_IMPLEMENTED();
-
-	bCancelAllTransfersForThisFile = false;
+	if (bCancelAllTransfersForThisFile)
+	{
+		pFile->cancelAll();
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+		
+		// cancel just a single request.
+	}
 }
 
 // Cleans up a file.
