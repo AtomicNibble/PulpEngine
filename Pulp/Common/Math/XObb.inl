@@ -20,22 +20,22 @@ X_INLINE OBB::OBB(Quatf quat, const AABB& aabb)
 X_INLINE void OBB::set(Matrix33f m33, const Vec3f& center, const Vec3f& hlv)
 {
 	orientation_ = Quatf(m33);
-	this->center_ = orientation_ * center;
-	this->halfLVec_ = hlv;
+	center_ = center;
+	halfLVec_ = hlv;
 }
 
 X_INLINE void OBB::set(Matrix33f m33, const AABB& aabb)
 {
 	orientation_ = Quatf(m33);
-	this->center_ = orientation_ * aabb.center();
-	this->halfLVec_ = aabb.halfVec();
+	center_ =  aabb.center();
+	halfLVec_ = aabb.halfVec();
 }
 
 X_INLINE void OBB::set(Quatf quat, const AABB& aabb)
 {
 	orientation_ = quat;
-	this->center_ = orientation_ * aabb.center();
-	this->halfLVec_ = aabb.halfVec();
+	center_ =  aabb.center();
+	halfLVec_ = aabb.halfVec();
 }
 
 // --------------------------------------
