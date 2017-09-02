@@ -932,13 +932,6 @@ void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid,
 // Sphere
 void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, bool solid, int32_t lodIdx)
 {
-	// fuck a goat with a flag pole.
-	// this really needs to be implemented with premade sphere mesh that is just instanced.
-	// we can also get fancy and do lods based on distance.
-	// in order todo instance the prim contex should create the render shapes itself and handle the instancing.
-	// so i will make a seperate api for adding these, that deals with specific shapes.
-	// the prim contex impl will handle the instanced drawing.
-
 	if (sphere.radius() > 0.0f)
 	{
 		Matrix44f mat = Matrix44f::createScale(Vec3f(sphere.radius()));
