@@ -25,6 +25,7 @@
 #include <../../3rdparty/source/rapidjson/writer.h>
 #include <../../3rdparty/source/rapidjson/reader.h>
 #include <../../3rdparty/source/rapidjson/stringbuffer.h>
+#include <../../3rdparty/source/rapidjson/error/en.h>
 
 
 #endif // !X_STRING_JSON_H_
