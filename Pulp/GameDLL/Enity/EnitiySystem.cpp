@@ -58,6 +58,11 @@ namespace entity
 			return false;
 		}
 
+		if (!physSys_.init()) {
+			return false;
+		}
+
+
 		for (uint32_t i = 0; i < MAX_PLAYERS; i++) {
 			auto id = createEnt();
 			if (id != i) {
