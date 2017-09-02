@@ -525,6 +525,25 @@ namespace strUtil
 	}
 
 
+	size_t LineNumberForOffset(const wchar_t* pBegin, const wchar_t* pEnd, size_t offset)
+	{
+		X_ASSERT(pBegin <= pEnd, "Invalid range")(pBegin, pEnd);
+
+		size_t size = (pEnd - pBegin);
+		if (offset > size) {
+			X_WARNING("", "Offset out of range. size %" PRIuS " offset: %" PRIuS, size, offset);
+			return 1;
+		}
+
+		size_t line = 1; // :| !
+		for (size_t i = 0; i < offset; i++)
+		{
+			line += (pBegin[i] == L'\n');
+		}
+
+		return line;
+	}
+
 }
 
 

@@ -247,6 +247,9 @@ namespace strUtil
 	// retrusn true if the wild card search patten matches the string.
 	bool WildCompare(const char* wild, const char* string);
 	bool WildCompare(const wchar_t* wild, const wchar_t* string);
+
+	size_t LineNumberForOffset(const char* pBegin, const char* pEnd, size_t offset);
+	size_t LineNumberForOffset(const wchar_t* pBegin, const wchar_t* pEnd, size_t offset);
 }
 
 #include "StringUtil.inl"
