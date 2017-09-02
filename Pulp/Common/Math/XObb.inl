@@ -40,22 +40,44 @@ X_INLINE void OBB::set(Quatf quat, const AABB& aabb)
 
 // --------------------------------------
 
-X_INLINE Vec3f OBB::center(void) const
+X_INLINE const Vec3f& OBB::center(void) const
 {
 	return center_;
 }
 
-X_INLINE Vec3f OBB::size(void) const
+X_INLINE Vec3f OBB::center(void)
+{
+	return center_;
+}
+
+X_INLINE const Vec3f& OBB::size(void) const
 {
 	return halfLVec_ * 2.f;
 }
 
-X_INLINE Vec3f OBB::halfVec(void) const
+X_INLINE Vec3f OBB::size(void)
+{
+	return halfLVec_ * 2.f;
+}
+
+X_INLINE const Vec3f& OBB::halfVec(void) const
 {
 	return halfLVec_;
 }
 
+X_INLINE Vec3f OBB::halfVec(void)
+{
+	return halfLVec_;
+}
+
+
+
 X_INLINE const Quatf& OBB::orientation(void) const
+{
+	return orientation_;
+}
+
+X_INLINE Quatf OBB::orientation(void)
 {
 	return orientation_;
 }
