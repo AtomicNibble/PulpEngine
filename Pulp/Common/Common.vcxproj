@@ -365,6 +365,7 @@
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\StopWatch.h" />
+    <ClInclude Include="Time\TimeLiterals.h" />
     <ClInclude Include="Time\TimeStamp.h" />
     <ClInclude Include="Time\TimeVal.h" />
     <ClInclude Include="Time\win32\TimeStamp.h" />

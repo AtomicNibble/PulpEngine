@@ -1267,6 +1267,9 @@
     <ClInclude Include="Buffer.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Time\TimeLiterals.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
