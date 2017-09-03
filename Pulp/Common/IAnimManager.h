@@ -3,15 +3,15 @@
 X_NAMESPACE_BEGIN(anim)
 
 
-struct IAnim;
+class Anim;
 
 struct IAnimManager
 {
 	virtual ~IAnimManager() {}
 
 	// returns null if not found, ref count unaffected
-	virtual IAnim* findAnim(const char* pAnimName) const X_ABSTRACT;
-	virtual IAnim* loadAnim(const char* pAnimName) X_ABSTRACT;
+	virtual Anim* findAnim(const char* pAnimName) const X_ABSTRACT;
+	virtual Anim* loadAnim(const char* pAnimName) X_ABSTRACT;
 
 
 };

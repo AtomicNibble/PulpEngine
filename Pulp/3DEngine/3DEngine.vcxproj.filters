@@ -79,9 +79,6 @@
     <ClCompile Include="World\World3D.cpp">
       <Filter>Source Files\World</Filter>
     </ClCompile>
-    <ClCompile Include="Anim\Anim.cpp">
-      <Filter>Source Files\Anim</Filter>
-    </ClCompile>
     <ClCompile Include="Anim\AnimManager.cpp">
       <Filter>Source Files\Anim</Filter>
     </ClCompile>
@@ -167,9 +164,6 @@
     </ClInclude>
     <ClInclude Include="World\World3D.h">
       <Filter>Header Files\World</Filter>
-    </ClInclude>
-    <ClInclude Include="Anim\Anim.h">
-      <Filter>Header Files\Anim</Filter>
     </ClInclude>
     <ClInclude Include="Anim\AnimManager.h">
       <Filter>Header Files\Anim</Filter>
@@ -285,9 +279,6 @@
     </None>
     <None Include="World\World3D.inl">
       <Filter>Header Files\World</Filter>
-    </None>
-    <None Include="Anim\Anim.inl">
-      <Filter>Header Files\Anim</Filter>
     </None>
     <None Include="Vars\DrawVars.inl">
       <Filter>Header Files\Vars</Filter>

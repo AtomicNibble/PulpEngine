@@ -496,7 +496,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Anim\Anim.h" />
     <ClInclude Include="Anim\AnimInstance.h" />
     <ClInclude Include="Anim\AnimManager.h" />
     <ClInclude Include="Drawing\CBufferManager.h" />
@@ -527,7 +526,6 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Anim\Anim.cpp" />
     <ClCompile Include="Anim\AnimInstance.cpp" />
     <ClCompile Include="Anim\AnimManager.cpp" />
     <ClCompile Include="Drawing\CBufferManager.cpp" />
@@ -575,7 +573,6 @@
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Anim\Anim.inl" />
     <None Include="Drawing\PrimativeContext.inl" />
     <None Include="Gui\Gui.inl" />
     <None Include="Gui\SimpleWindow.inl" />

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#if 0
+
 #include "AnimInstance.h"
 #include "Anim.h"
 
@@ -27,3 +29,5 @@ const AnimInstance::Mat44Arr& AnimInstance::getBoneMats(void) const
 
 
 X_NAMESPACE_END
+
+#endif

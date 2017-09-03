@@ -25,3 +25,16 @@ typedef core::MemoryArena<
 > AnimLibArena;
 
 extern AnimLibArena* g_AnimLibArena;
+
+
+#ifdef X_LIB
+#define ANIMLIB_EXPORT
+#else
+#ifdef ANIM_LIB_EXPORT
+#define ANIMLIB_EXPORT X_EXPORT
+#else
+#define ANIMLIB_EXPORT X_IMPORT
+#endif // !ANIM_LIB_EXPORT
+#endif // X_LIB
+
+

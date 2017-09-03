@@ -92,15 +92,6 @@ struct IAnimLib : public IConverter
 
 };
 
-
-struct IAnim
-{
-	virtual ~IAnim() {}
-
-
-};
-
-
 X_DECLARE_ENUM8(AnimType)(
 	RELATIVE, 
 	ABSOLUTE,

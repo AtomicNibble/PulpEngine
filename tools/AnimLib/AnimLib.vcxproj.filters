@@ -47,6 +47,12 @@
     <ClInclude Include="XAnimLib.h">
       <Filter>Header Files\Lib</Filter>
     </ClInclude>
+    <ClInclude Include="Anim\Anim.h">
+      <Filter>Header Files\anim</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -70,5 +76,13 @@
     <ClCompile Include="XAnimLib.cpp">
       <Filter>Source Files\Lib</Filter>
     </ClCompile>
+    <ClCompile Include="Anim\Anim.cpp">
+      <Filter>Source Files\anim</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Anim\Anim.inl">
+      <Filter>Header Files\anim</Filter>
+    </None>
   </ItemGroup>
 </Project>

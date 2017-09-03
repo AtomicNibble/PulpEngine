@@ -3,6 +3,8 @@
 #include <IAnimation.h>
 #include <Time\TimeVal.h>
 
+#if 0
+
 X_NAMESPACE_BEGIN(anim)
 
 class Anim;
@@ -32,3 +34,4 @@ private:
 
 X_NAMESPACE_END
 
+#endif

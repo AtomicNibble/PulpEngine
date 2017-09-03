@@ -1,13 +1,12 @@
 #include "stdafx.h"
 #include "AnimManager.h"
 
-#include "Anim.h"
-
 #include <IConsole.h>
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
 
+#include <../../tools/AnimLib/AnimLib.h>
 
 X_NAMESPACE_BEGIN(anim)
 
@@ -84,7 +83,7 @@ void AnimManager::dispatchPendingLoads(void)
 	}
 }
 
-IAnim* AnimManager::findAnim(const char* pAnimName) const
+Anim* AnimManager::findAnim(const char* pAnimName) const
 {
 	core::string name(pAnimName);
 	core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
@@ -99,7 +98,7 @@ IAnim* AnimManager::findAnim(const char* pAnimName) const
 }
 
 
-IAnim* AnimManager::loadAnim(const char* pAnimName)
+Anim* AnimManager::loadAnim(const char* pAnimName)
 {
 	X_ASSERT_NOT_NULL(pAnimName);
 	X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
@@ -125,7 +124,7 @@ IAnim* AnimManager::loadAnim(const char* pAnimName)
 }
 
 
-void AnimManager::releaseAnim(IAnim* pAnim)
+void AnimManager::releaseAnim(Anim* pAnim)
 {
 	AnimResource* pAnimRes = static_cast<AnimResource*>(pAnim);
 	if (pAnimRes->removeReference() == 0)

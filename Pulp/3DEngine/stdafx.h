@@ -32,6 +32,7 @@
 X_LINK_LIB("engine_ImgLib");
 X_LINK_LIB("engine_MaterialLib");
 X_LINK_LIB("engine_ModelLib");
+X_LINK_LIB("engine_AnimLib");
 
 
 extern core::MemoryArenaBase* g_3dEngineArena;

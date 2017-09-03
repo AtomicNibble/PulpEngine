@@ -9,6 +9,8 @@
 #include <Containers\Fifo.h>
 #include <Time\TimeVal.h>
 
+
+
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
 		struct Job;
@@ -65,10 +67,10 @@ public:
 	bool asyncInitFinalize(void);
 	void dispatchPendingLoads(void);
 
-	IAnim* findAnim(const char* pAnimName) const X_FINAL;
-	IAnim* loadAnim(const char* pAnimName) X_FINAL;
+	Anim* findAnim(const char* pAnimName) const X_FINAL;
+	Anim* loadAnim(const char* pAnimName) X_FINAL;
 
-	void releaseAnim(IAnim* pAnim);
+	void releaseAnim(Anim* pAnim);
 
 	void reloadAnim(const char* pName);
 	void listAnims(const char* pSearchPatten = nullptr) const;

@@ -1,11 +1,10 @@
 #pragma once
 
-
 #include <IAnimation.h>
-#include <Util\UniquePointer.h>
+#include <IAsyncLoad.h>
 
 #include <Time\TimeVal.h>
-
+#include <Util\UniquePointer.h>
 #include <Math\XQuatCompressed.h>
 
 X_NAMESPACE_DECLARE(core, class MemCursor)
@@ -18,13 +17,31 @@ public:
 	Bone();
 
 	void setName(const char* pName);
+	const char* getName(void) const {
+		return pName_;
+	}
 
 	void load(core::MemCursor& cursor);
 
+	void setMatrixForFrame(Matrix44f& mat, int32_t frame) const;
+
+private:
+
+	Vec3f GetPostion(int32_t idx) const
+	{
+		Vec3<uint8_t>& scale = pPosScalers_[idx];
+
+		Vec3f pos;
+		pos[0] = (posMin_.x + (posRange_.x * (scale[0] / 255.f)));
+		pos[1] = (posMin_.y + (posRange_.y * (scale[1] / 255.f)));
+		pos[2] = (posMin_.z + (posRange_.z * (scale[2] / 255.f)));
+
+		return pos;
+	}
 
 private:
 	const char* pName_;
-	
+
 	int32_t numAngles_;
 	int32_t numPos_;
 
@@ -40,7 +57,7 @@ private:
 };
 
 
-class Anim : public IAnim
+class Anim 
 {
 	X_NO_COPY(Anim);
 	X_NO_ASSIGN(Anim);
@@ -53,8 +70,8 @@ class Anim : public IAnim
 	typedef core::Array<Bone> BoneArr;
 
 public:
-	Anim(core::string& name, core::MemoryArenaBase* arena);
-	~Anim() X_OVERRIDE;
+	ANIMLIB_EXPORT Anim(core::string& name, core::MemoryArenaBase* arena);
+	ANIMLIB_EXPORT ~Anim();
 
 	X_INLINE const int32_t getID(void) const;
 	X_INLINE void setID(int32_t id);
@@ -74,7 +91,7 @@ public:
 
 	void update(core::TimeVal delta, AnimState& state, Mat44Arr& bonesOut) const;
 
-	void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
+	ANIMLIB_EXPORT void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
 
 private:
 	int32_t id_;
