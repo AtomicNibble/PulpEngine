@@ -40,15 +40,13 @@ public:
 	X_INLINE void SetValue(TimeType val);
 
 
-	// Minus.
 	X_INLINE TimeVal operator-(const TimeVal &inRhs) const;
-	// Plus.
 	X_INLINE TimeVal operator+(const TimeVal &inRhs) const;
-	// Unary minus.
+	X_INLINE TimeVal operator/(const TimeVal &inRhs) const;
+	X_INLINE TimeVal operator%(const TimeVal &inRhs) const;
 	X_INLINE TimeVal operator-() const;
 	X_INLINE TimeVal& operator+=(const TimeVal& inRhs);
 	X_INLINE TimeVal& operator-=(const TimeVal& inRhs);
-	X_INLINE TimeVal& operator/=(int inRhs);
 
 	// comparison -----------------------
 	X_INLINE bool operator<(const TimeVal &inRhs) const;

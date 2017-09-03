@@ -125,6 +125,21 @@ X_INLINE TimeVal TimeVal::operator+(const TimeVal &inRhs) const
 	ret.time_ = time_ + inRhs.time_; 
 	return ret; 
 }
+
+X_INLINE TimeVal TimeVal::operator/(const TimeVal &inRhs) const
+{
+	TimeVal ret;
+	ret.time_ = time_ / inRhs.time_;
+	return ret;
+}
+
+X_INLINE TimeVal TimeVal::operator%(const TimeVal &inRhs) const
+{
+	TimeVal ret;
+	ret.time_ = time_ % inRhs.time_;
+	return ret;
+}
+
 // Unary minus.
 X_INLINE TimeVal TimeVal::operator-() const 
 { 
@@ -142,12 +157,6 @@ X_INLINE TimeVal& TimeVal::operator+=(const TimeVal& inRhs)
 X_INLINE TimeVal& TimeVal::operator-=(const TimeVal& inRhs) 
 { 
 	time_ -= inRhs.time_; 
-	return *this; 
-}
-
-X_INLINE TimeVal& TimeVal::operator/=(int inRhs) 
-{ 
-	time_ /= inRhs; 
 	return *this; 
 }
 
