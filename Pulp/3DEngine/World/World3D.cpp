@@ -1749,38 +1749,43 @@ void World3D::drawRenderEnts()
 #if 1
 		auto& bones = pRendEnt->bones;
 
-		static float counter = 0.f;
-		static bool forward = true;
-
-	//	static RenderEnt::MatrixArr bones(g_3dEngineArena, 10);
-
-		//	bones[0].setTranslate(Vec3f(0.f, 0.f, counter / 3));
-		bones[1].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
-		bones[2] = Matrix44f::createRotation(Vec3f(0.f, 1.f, 0.f), counter / 100.f);
-	//	bones[3].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
-
-		// bones[4].setTranslate(Vec3f(0.f, 0.f, counter));
-		bones[5].setTranslate(Vec3f(0.f, counter / 2.f, 0.f));
-		bones[6].setTranslate(Vec3f(0.f, counter / 1.5f, 0.f));
-
-		bones[8].setTranslate(Vec3f(counter / 4.f, 0.f, 0.f));
-
-		if (forward)
+		if (bones.size() > 8)
 		{
-			counter += 0.1f;
 
-			if (counter >= 0.f)
+
+			static float counter = 0.f;
+			static bool forward = true;
+
+			//	static RenderEnt::MatrixArr bones(g_3dEngineArena, 10);
+
+				//	bones[0].setTranslate(Vec3f(0.f, 0.f, counter / 3));
+			bones[1].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
+			bones[2] = Matrix44f::createRotation(Vec3f(0.f, 1.f, 0.f), counter / 100.f);
+			//	bones[3].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
+
+				// bones[4].setTranslate(Vec3f(0.f, 0.f, counter));
+			bones[5].setTranslate(Vec3f(0.f, counter / 2.f, 0.f));
+			bones[6].setTranslate(Vec3f(0.f, counter / 1.5f, 0.f));
+
+			bones[8].setTranslate(Vec3f(counter / 4.f, 0.f, 0.f));
+
+			if (forward)
 			{
-				forward = false;
+				counter += 0.1f;
+
+				if (counter >= 0.f)
+				{
+					forward = false;
+				}
 			}
-		}
-		else
-		{
-			counter -= 0.1f;
-
-			if (counter < -20.f)
+			else
 			{
-				forward = true;
+				counter -= 0.1f;
+
+				if (counter < -20.f)
+				{
+					forward = true;
+				}
 			}
 		}
 
