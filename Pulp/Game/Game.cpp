@@ -46,10 +46,12 @@ X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSinglet
 X_LINK_LIB("engine_ImgLib")
 X_LINK_LIB("engine_ShaderLib")
 X_LINK_LIB("engine_ModelLib")
+X_LINK_LIB("engine_AnimLib")
 
 X_FORCE_LINK_FACTORY("XConverterLib_Img")
 X_FORCE_LINK_FACTORY("XConverterLib_Shader")
 X_FORCE_LINK_FACTORY("XConverterLib_Model")
+X_FORCE_LINK_FACTORY("XConverterLib_Anim")
 
 
 #endif // !X_LIB
