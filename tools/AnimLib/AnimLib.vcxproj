@@ -507,6 +507,7 @@
     <ClInclude Include="AnimCompiler.h" />
     <ClInclude Include="AnimLib.h" />
     <ClInclude Include="Anim\Anim.h" />
+    <ClInclude Include="Anim\Animator.h" />
     <ClInclude Include="anim_inter.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XAnimLib.h" />
@@ -515,6 +516,7 @@
     <ClCompile Include="..\ModelLib\ModelSkeleton.cpp" />
     <ClCompile Include="AnimCompiler.cpp" />
     <ClCompile Include="Anim\Anim.cpp" />
+    <ClCompile Include="Anim\Animator.cpp" />
     <ClCompile Include="anim_inter.cpp" />
     <ClCompile Include="ConverterLib.cpp" />
     <ClCompile Include="dllmain.cpp">

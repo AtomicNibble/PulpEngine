@@ -53,6 +53,9 @@
     <ClInclude Include="AnimLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Anim\Animator.h">
+      <Filter>Header Files\anim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -77,6 +80,9 @@
       <Filter>Source Files\Lib</Filter>
     </ClCompile>
     <ClCompile Include="Anim\Anim.cpp">
+      <Filter>Source Files\anim</Filter>
+    </ClCompile>
+    <ClCompile Include="Anim\Animator.cpp">
       <Filter>Source Files\anim</Filter>
     </ClCompile>
   </ItemGroup>
