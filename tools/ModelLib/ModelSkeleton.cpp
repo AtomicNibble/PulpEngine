@@ -8,21 +8,6 @@
 
 X_NAMESPACE_BEGIN(model)
 
-
-bool ModelHeader::isValid(void) const
-{
-	if (version != MODEL_VERSION) {
-		X_ERROR("Model", "model version is invalid. FileVer: %" PRIu8 " RequiredVer: %" PRIu32,
-			version, MODEL_VERSION);
-	}
-
-	return version == MODEL_VERSION &&
-		(numBones + numBlankBones) > 0 &&
-		numLod > 0 &&
-		numLod <= MODEL_MAX_LODS &&
-		materialNameDataSize > 0;
-}
-
 // ==================================
 
 
