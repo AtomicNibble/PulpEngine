@@ -100,6 +100,9 @@ public:
 	X_INLINE void toPoints(Vec3f points[8]) const;
 
 	X_INLINE const char* toString(StrBuf& str) const;
+
+	static AABB createTransformedAABB(const Quatf& quat, const AABB& aabb);
+	static AABB createTransformedAABB(const Matrix33f& m44, const AABB& aabb);
 };
 
 
