@@ -1159,9 +1159,6 @@
     <ClInclude Include="Extension\TypeList.h">
       <Filter>Headers\Extension</Filter>
     </ClInclude>
-    <ClInclude Include="Util\CustomLiterals.h">
-      <Filter>Headers\Util</Filter>
-    </ClInclude>
     <ClInclude Include="Compression\LZ5.h">
       <Filter>Headers\Compression</Filter>
     </ClInclude>

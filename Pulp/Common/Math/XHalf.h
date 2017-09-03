@@ -4,7 +4,6 @@
 #define _H_MATH_HALF_H_
 
 #include <Math\XVector.h>
-#include <Util\CustomLiterals.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -86,7 +85,7 @@ struct XHalf2
 
 	static XHalf2 zero(void)
 	{
-		return XHalf2(0_u16, 0_u16);
+		return XHalf2(0_ui16, 0_ui16);
 	}
 
 	XHalf x;
@@ -136,7 +135,7 @@ struct XHalf4
 
 	static XHalf4 zero(void)
 	{
-		return XHalf4(0_u16,0_u16,0_u16,0_u16);
+		return XHalf4(0_ui16,0_ui16,0_ui16,0_ui16);
 	}
 
 	XHalf x;
