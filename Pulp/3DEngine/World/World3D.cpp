@@ -1740,7 +1740,9 @@ void World3D::drawRenderEnts()
 
 		if (vars_.drawModelBounds())
 		{
-			pPrimContex_->drawAABB(pRendEnt->globalBounds, false, Col_Orangered);
+			OBB obb(pRendEnt->trans.quat, pRendEnt->globalBounds);
+
+			pPrimContex_->drawOBB(obb, false, Col_Orangered);
 		}
 		// ~Debug
 
