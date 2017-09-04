@@ -20,6 +20,7 @@
 
 
 #include "Anim\Anim.h"
+#include "Anim\Animator.h"
 
 
 #endif // !X_ANIM_LIB_H_

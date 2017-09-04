@@ -39,17 +39,17 @@ X_INLINE const core::string& Anim::getName(void) const
 	return name_;
 }
 
-X_INLINE int32_t Anim::numBones(void) const
+X_INLINE int32_t Anim::getNumBones(void) const
 {
 	return hdr_.numBones;
 }
 
-X_INLINE int32_t Anim::numFrames(void) const
+X_INLINE int32_t Anim::getNumFrames(void) const
 {
 	return hdr_.numFrames;
 }
 
-X_INLINE int32_t Anim::fps(void) const
+X_INLINE int32_t Anim::getFps(void) const
 {
 	return hdr_.fps;
 }
@@ -67,6 +67,11 @@ X_INLINE bool Anim::isLooping(void) const
 X_INLINE bool Anim::hasNotes(void) const
 {
 	return hdr_.flags.IsSet(AnimFlag::NOTES);
+}
+
+X_INLINE const char* Anim::getBoneName(int32_t idx) const
+{
+	return bones_[idx].getName();
 }
 
 X_NAMESPACE_END

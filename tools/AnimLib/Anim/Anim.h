@@ -23,7 +23,7 @@ public:
 
 	void load(core::MemCursor& cursor);
 
-	void setMatrixForFrame(Matrix44f& mat, int32_t frame) const;
+	void decodeFrame(Transformf& trans, int32_t frame) const;
 
 private:
 
@@ -68,6 +68,18 @@ class Anim
 	typedef AlignedArray<Matrix44f> Mat44Arr;
 
 	typedef core::Array<Bone> BoneArr;
+	typedef core::Array<Transformf> TransformArr;
+
+	struct BoneIndexPair
+	{
+		uint8_t srcIdx;
+		uint8_t dstIdx;
+	};
+
+	typedef core::Array<int32_t> IndexArr;
+	typedef core::Array<Transformf> TransformArr;
+
+
 
 public:
 	ANIMLIB_EXPORT Anim(core::string& name, core::MemoryArenaBase* arena);
@@ -82,16 +94,22 @@ public:
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
 
 	X_INLINE const core::string& getName(void) const;
-	X_INLINE int32_t numBones(void) const;
-	X_INLINE int32_t numFrames(void) const;
-	X_INLINE int32_t fps(void) const;
+	X_INLINE int32_t getNumBones(void) const;
+	X_INLINE int32_t getNumFrames(void) const;
+	X_INLINE int32_t getFps(void) const;
 	X_INLINE AnimType::Enum type(void) const;
 	X_INLINE bool isLooping(void) const;
 	X_INLINE bool hasNotes(void) const;
 
-	void update(core::TimeVal delta, AnimState& state, Mat44Arr& bonesOut) const;
+	X_INLINE const char* getBoneName(int32_t idx) const;
+
+	void timeToFrame(core::TimeVal time, FrameBlend& frame) const;
+	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
 
 	ANIMLIB_EXPORT void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
+
+private:
+
 
 private:
 	int32_t id_;

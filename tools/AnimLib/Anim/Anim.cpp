@@ -4,6 +4,8 @@
 #include <Math\XQuatCompressed.h>
 #include <Memory\MemCursor.h>
 
+#include <Time\TimeLiterals.h>
+
 X_NAMESPACE_BEGIN(anim)
 
 Bone::Bone()
@@ -59,7 +61,7 @@ void Bone::load(core::MemCursor& cursor)
 	}
 }
 
-void Bone::setMatrixForFrame(Matrix44f& mat, int32_t frame) const
+void Bone::decodeFrame(Transformf& mat, int32_t frame) const
 {
 	Vec3f pos;
 
@@ -119,7 +121,7 @@ void Bone::setMatrixForFrame(Matrix44f& mat, int32_t frame) const
 	}
 
 
-	mat.setTranslate(pos);
+	// mat.setTranslate(pos);
 
 }
 
@@ -138,32 +140,89 @@ Anim::~Anim()
 
 }
 
-void Anim::update(core::TimeVal delta, AnimState& state, Mat44Arr& bonesOut) const
+void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
 {
-	// so we want generate data and shove it in the bones out.
-	// we have state to know last position.
-	// and delta since we last updated.
-	X_ASSERT(numBones() == static_cast<int32_t>(bonesOut.size()), "Size mismatch")(numBones(), bonesOut.size());
-	X_UNUSED(delta, state);
+	int32_t numFrames = getNumFrames();
+	int32_t fps = getFps();
 
-	// int32_t frame = 10;
-#if 0
-	for (int32_t frame = 0; frame < numFrames(); ++frame)
-	{
-		X_LOG0("Anim", "Frame: %i", frame);
-
-		for (size_t i = 0; i<bones_.size(); i++)
-		{
-			auto& bone = bones_[i];
-			bone.setMatrixForFrame(bonesOut[i], frame);
-
-			auto pos = bonesOut[i].getTranslate();
-			X_LOG0("Anim", "Bone \"%s\" pos(%g,%g,%g)", bone.getName(), pos.x, pos.y, pos.z);
-		}
+	// this turns a elapsed time into frame info.
+	if (numFrames <= 1) {
+		frame.frame1 = 0;
+		frame.frame2 = 0;
+		frame.backlerp = 0.0f;
+		frame.frontlerp = 1.0f;
+		return;
 	}
 
-#endif
+	if (time <= 0_tv) {
+		frame.frame1 = 0;
+		frame.frame2 = 1;
+		frame.backlerp = 0.0f;
+		frame.frontlerp = 1.0f;
+		return;
+	}
+
+	X_ASSERT_NOT_IMPLEMENTED();
+
+	// multiple time by fps then device by 1 second.
+	const core::TimeVal oneSecond = 1000_ms;
+
+	core::TimeVal frameTime = core::TimeVal(time.GetValue() * fps);
+	int32_t frameNum = safe_static_cast<int32_t>((frameTime / oneSecond).GetValue());
+
+
+	frame.frame1 = frameNum % (numFrames - 1);
+	frame.frame2 = frame.frame1 + 1;
+	if (frame.frame2 >= numFrames) {
+		frame.frame2 = 0;
+	}
+
+	// work out lerps.
+	// we turn range of 1 second.
+	auto offset = (frameTime % oneSecond);
+
+	frame.backlerp = offset.GetMilliSeconds() / oneSecond.GetMilliSeconds();
+	frame.frontlerp = 1.0f - frame.backlerp;
+
+	X_ASSERT(frame.backlerp >= 0 && frame.backlerp <= 1.f && ((frame.backlerp + frame.backlerp) == 1.f), "Invalid lerp values")(frame.backlerp, frame.frontlerp);
 }
+
+
+void Anim::getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const
+{
+	X_UNUSED(frame, boneTransOut, indexes);
+
+	// we need to animate each bone in the model that we affect
+	// the index map is same size as bones, and the index is the index of the bone in animation.
+	X_ASSERT(boneTransOut.size() == indexes.size(), "Size mismatch")();
+
+	TransformArr blendTrans(boneTransOut.getArena(), boneTransOut.size());
+	IndexArr lerpIndex(boneTransOut.getArena());
+
+	// decode all the joints.
+	for (int32_t i =0; i<safe_static_cast<int32_t>(indexes.size()); i++)
+	{
+		if (indexes[i] < 0) {
+			continue;
+		}
+
+		int32_t animBoneIdx = indexes[i];
+
+		auto& bone = bones_[animBoneIdx];
+
+		bone.decodeFrame(boneTransOut[i], frame.frame1);
+		bone.decodeFrame(blendTrans[i], frame.frame2);
+
+		lerpIndex.append(i);
+	}
+
+	// blend them
+	Util::blendBones(boneTransOut.data(), blendTrans.data(), frame.backlerp,
+		lerpIndex.data(), safe_static_cast<int32_t>(lerpIndex.size()));
+
+
+}
+
 
 
 void Anim::processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data)
@@ -193,15 +252,6 @@ void Anim::processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data)
 	hdr_ = hdr;
 	data_ = std::move(data);
 	status_ = core::LoadStatus::Complete;
-
-	// test.
-	Mat44Arr bones(g_AnimLibArena);
-	bones.resize(hdr.numBones);
-
-	AnimState state;
-
-	update(core::TimeVal(0ll), state, bones);
-
 }
 
 

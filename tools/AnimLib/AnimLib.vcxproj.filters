@@ -102,5 +102,8 @@
     <None Include="Anim\Anim.inl">
       <Filter>Header Files\anim</Filter>
     </None>
+    <None Include="Anim\Animator.inl">
+      <Filter>Header Files\anim</Filter>
+    </None>
   </ItemGroup>
 </Project>
