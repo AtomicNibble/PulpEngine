@@ -131,4 +131,12 @@ X_INLINE const SubMeshHeader& XModel::getMeshHead(size_t idx) const
 }
 
 
+X_INLINE const char* XModel::getBoneName(int32_t idx) const
+{
+	// temp hack.
+	const char* pBoneName = (char*)(data_.ptr() + pTagNames_[idx]);
+
+	return pBoneName;
+}
+
 X_NAMESPACE_END

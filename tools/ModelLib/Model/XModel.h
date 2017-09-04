@@ -57,6 +57,8 @@ public:
 	X_INLINE const MeshHeader& getLodMeshHdr(size_t idx) const;
 	X_INLINE const SubMeshHeader& getMeshHead(size_t idx) const;
 
+	X_INLINE const char* getBoneName(int32_t idx) const;
+
 	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
 
 	MODELLIB_EXPORT void addPhysToActor(physics::ActorHandle actor);
