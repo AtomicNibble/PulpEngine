@@ -142,7 +142,7 @@ namespace entity
 		// auto trans = reg_.assign<TransForm>(id);
 		auto& player = reg_.assign<Player>(id);
 		auto& hp = reg_.assign<Health>(id);
-		auto& rend = reg_.assign<RenderComponent>(id);
+	//	auto& rend = reg_.assign<RenderComponent>(id);
 
 		X_UNUSED(player);
 
@@ -152,13 +152,21 @@ namespace entity
 
 		hp.hp = 100;
 
+#if 0
 		engine::RenderEntDesc entDsc;
-		entDsc.pModel = pModelManager_->loadModel("default/default");
+		entDsc.pModel = pModelManager_->loadModel("test/anim/smooth_bind_02");
 		entDsc.trans.pos = Vec3f(-90, 0, 10);
 
 		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
-		X_ASSERT_NOT_NULL(rend.pRenderEnt);
 
+		entDsc.trans.pos = Vec3f(-190, 0, 10);
+		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+
+		entDsc.trans.pos = Vec3f(-190, -100, 10);
+		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+
+		X_ASSERT_NOT_NULL(rend.pRenderEnt);
+#endif
 
 		// temp.
 		cameraSys_.setActiveEnt(id);
