@@ -57,33 +57,7 @@ namespace entity
 
 			an.pAnimator->createFrame(time.ellapsed[core::Timer::GAME]);
 
-			auto bones = an.pAnimator->getBoneMatrices();
-
-
-			static float counter = 0.f;
-			static bool forward = true;
-
-			if (forward)
-			{
-				counter += 0.1f;
-
-				if (counter >= 0.f)
-				{
-					forward = false;
-				}
-			}
-			else
-			{
-				counter -= 0.1f;
-
-				if (counter < -20.f)
-				{
-					forward = true;
-				}
-			}
-
-			bones[1].setTranslate(Vec3f(0.f, 0.f, counter / 4.f));
-			bones[2] = Matrix44f::createRotation(Vec3f(0.f, 1.f, 0.f), counter / 100.f);
+			auto& bones = an.pAnimator->getBoneMatrices();
 
 			// update the matrix we render with.
 			// cus meow.
