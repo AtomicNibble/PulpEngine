@@ -172,7 +172,6 @@ void XLog::Fatal(const SourceInfo& sourceInfo, const char* channel, const char* 
 	}
 
 	X_VALIST_END
-
 }
 
 
@@ -187,11 +186,5 @@ void XLog::AssertVariable(const SourceInfo& sourceInfo, const char* format, ...)
 		X_CALL_LOGGERS(AssertVariable(sourceInfo, format, args))
 	X_VALIST_END
 }
-
-void XLog::AssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args)
-{
-	X_CALL_LOGGERS(AssertVariable(sourceInfo, format, args))
-}
-
 
 X_NAMESPACE_END

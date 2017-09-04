@@ -4,7 +4,7 @@
 template <typename T>
 Assert& Assert::Variable(const char* const name, T* const var)
 {
-	Dispatch(sourceInfo_, name, "Variable %s = 0x%08p (pointer)", var);
+	Dispatch(sourceInfo_, name, "0x%08p (pointer)", var);
 	return *this;
 }
 
@@ -12,7 +12,7 @@ Assert& Assert::Variable(const char* const name, T* const var)
 template <typename T>
 Assert& Assert::Variable(const char* const name, const T* const var)
 {
-	Dispatch(sourceInfo_, name, "Variable %s = 0x%08p (pointer)", var);
+	Dispatch(sourceInfo_, name, "0x%08p (pointer)", var);
 	return *this;
 }
 
