@@ -184,7 +184,7 @@ void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
 	frame.backlerp = offset.GetMilliSeconds() / oneSecond.GetMilliSeconds();
 	frame.frontlerp = 1.0f - frame.backlerp;
 
-	X_ASSERT(frame.backlerp >= 0 && frame.backlerp <= 1.f && ((frame.backlerp + frame.backlerp) == 1.f), "Invalid lerp values")(frame.backlerp, frame.frontlerp);
+	X_ASSERT(frame.backlerp >= 0 && frame.backlerp <= 1.f && ((frame.backlerp + frame.frontlerp) == 1.f), "Invalid lerp values")(frame.backlerp, frame.frontlerp, (frame.backlerp + frame.frontlerp));
 }
 
 
