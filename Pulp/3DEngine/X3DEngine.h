@@ -50,6 +50,7 @@ public:
 	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
 	IMaterialManager* getMaterialManager(void) X_FINAL;
 	model::IModelManager* getModelManager(void) X_FINAL;
+	anim::IAnimManager* getAnimManager(void) X_FINAL;
 
 	IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_FINAL;
 	void release3DWorld(IWorld3D* pWorld) X_FINAL;

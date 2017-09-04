@@ -978,6 +978,11 @@ model::IModelManager* X3DEngine::getModelManager(void)
 	return pModelManager_;
 }
 
+anim::IAnimManager* X3DEngine::getAnimManager(void)
+{
+	return pAnimManager_;
+}
+
 
 IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 {
