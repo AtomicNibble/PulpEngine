@@ -28,5 +28,10 @@ X_INLINE size_t Animator::numAnims(void) const
 	return 0_sz;
 }
 
+X_INLINE const Animator::Mat44Arr& Animator::getBoneMatrices(void) const
+{
+	return boneMat_;
+}
+
 
 X_NAMESPACE_END
