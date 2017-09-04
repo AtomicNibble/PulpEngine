@@ -19,6 +19,15 @@ namespace Util
 		}
 	}
 
+
+	void transformBones(Matrix44f* pMats, const int32_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
+	{
+		for (int32_t i = firstJoint; i <= lastJoint; i++) {
+			X_ASSERT(pParents[i] < i, "Parent out of range")(pParents[i]);
+			pMats[i] *= pMats[pParents[i]];
+		}
+	}
+
 	void convertBoneTransToMatrix(Matrix44f* pMat, const Transformf* pTrans, size_t numBones)
 	{
 		int32_t num = safe_static_cast<int32_t>(numBones);
@@ -29,11 +38,17 @@ namespace Util
 		}
 	}
 
-	void transformBones(Matrix44f* pMats, const int32_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
+
+	void convertBoneTransToMatrix(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats,
+		const core::Array<Transformf>& trans)
 	{
-		for (int32_t i = firstJoint; i <= lastJoint; i++) {
-			X_ASSERT(pParents[i] < i, "Parent out of range")(pParents[i]);
-			pMats[i] *= pMats[pParents[i]];
+		X_ASSERT(mats.size() == trans.size(), "size mismatch")();
+
+		int32_t num = safe_static_cast<int32_t>(mats.size());
+		for (int32_t i = 0; i < num; i++)
+		{
+			mats[i] = trans[i].quat.toMatrix44();
+			mats[i].setTranslate(trans[i].pos);
 		}
 	}
 
