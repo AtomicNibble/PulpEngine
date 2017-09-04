@@ -510,6 +510,7 @@
     <ClInclude Include="Anim\Animator.h" />
     <ClInclude Include="anim_inter.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\AnimUtil.h" />
     <ClInclude Include="XAnimLib.h" />
   </ItemGroup>
   <ItemGroup>
@@ -579,6 +580,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\AnimUtil.cpp" />
     <ClCompile Include="XAnimLib.cpp" />
   </ItemGroup>
   <ItemGroup>

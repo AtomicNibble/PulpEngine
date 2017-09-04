@@ -38,3 +38,4 @@ extern AnimLibArena* g_AnimLibArena;
 #endif // X_LIB
 
 
+#include "Util\AnimUtil.h"

@@ -33,6 +33,12 @@
     <Filter Include="Header Files\Lib">
       <UniqueIdentifier>{3b783eb7-a2ec-4f20-b8eb-b3793204721c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{f1fdf5be-e398-44f8-80ba-3d905ba09695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{39cfe50c-7817-4c9c-8e6f-57039adfc80c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -55,6 +61,9 @@
     </ClInclude>
     <ClInclude Include="Anim\Animator.h">
       <Filter>Header Files\anim</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\AnimUtil.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -84,6 +93,9 @@
     </ClCompile>
     <ClCompile Include="Anim\Animator.cpp">
       <Filter>Source Files\anim</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\AnimUtil.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
