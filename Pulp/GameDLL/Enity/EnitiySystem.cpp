@@ -126,7 +126,7 @@ namespace entity
 
 		// physSys_.update(frame, reg_, pPhysScene_);
 
-		animatedSys_.update(frame.timeInfo, reg_);
+		animatedSys_.update(frame.timeInfo, reg_, p3DWorld_);
 	}
 
 

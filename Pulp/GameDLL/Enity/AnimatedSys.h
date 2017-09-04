@@ -5,6 +5,9 @@ X_NAMESPACE_DECLARE(core,
 	struct FrameTimeData;
 )
 
+X_NAMESPACE_DECLARE(engine,
+	struct IWorld3D;
+)
 
 
 X_NAMESPACE_BEGIN(game)
@@ -18,7 +21,7 @@ namespace entity
 		AnimatedSystem();
 
 		bool init(void);
-		void update(core::FrameTimeData& time, EnitiyRegister& reg);
+		void update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld);
 
 
 	private:
