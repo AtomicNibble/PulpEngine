@@ -27,8 +27,10 @@ typedef core::MemoryArena<
 extern GameArena* g_gameArena;
 
 #include <../../tools/ModelLib/ModelLib.h>
+#include <../../tools/AnimLib/AnimLib.h>
 
 X_LINK_LIB("engine_ModelLib");
+X_LINK_LIB("engine_AnimLib");
 
 
 #include <Math\XAngles.h>

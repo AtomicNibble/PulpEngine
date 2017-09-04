@@ -99,6 +99,9 @@
     <ClInclude Include="Enity\DataTranslator.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\AnimatedSys.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -141,6 +144,9 @@
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
     <ClCompile Include="Enity\SoundSys.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\AnimatedSys.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
   </ItemGroup>

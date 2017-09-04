@@ -9,6 +9,10 @@ X_NAMESPACE_DECLARE(model,
 	class XModel;
 )
 
+X_NAMESPACE_DECLARE(anim,
+	class Animator;
+)
+
 X_NAMESPACE_DECLARE(engine,
 	struct IRenderEnt;
 )
@@ -70,6 +74,11 @@ struct EntName
 
 // -----------------------------------
 
+struct Animated
+{
+	anim::Animator* pAnimator;
+
+};
 
 struct Velocity 
 {
@@ -160,6 +169,7 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 	SoundObject,
 	SoundEnviroment,
 
+	Animated,
 	Velocity,
 	RenderComponent,
 	PhysicsComponent,

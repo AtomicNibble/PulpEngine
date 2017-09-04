@@ -62,6 +62,10 @@ namespace entity
 			return false;
 		}
 
+		if (!animatedSys_.init()) {
+			return false;
+		}
+
 
 		for (uint32_t i = 0; i < MAX_PLAYERS; i++) {
 			auto id = createEnt();
@@ -119,6 +123,10 @@ namespace entity
 		cameraSys_.update(frame, reg_, pPhysScene_);
 
 		soundSys_.update(frame, reg_);
+
+		// physSys_.update(frame, reg_, pPhysScene_);
+
+		animatedSys_.update(frame.timeInfo, reg_);
 	}
 
 

@@ -11,6 +11,7 @@
 #include "PlayerSys.h"
 #include "SoundSys.h"
 #include "PhysicsSystem.h"
+#include "AnimatedSys.h"
 
 #include "DataTranslator.h"
 
@@ -83,6 +84,7 @@ namespace entity
 		CameraSystem cameraSys_;
 		SoundSystem soundSys_;
 		PhysicsSystem physSys_;
+		AnimatedSystem animatedSys_;
 
 	private:
 		DataTranslator<Health> dtHealth_;

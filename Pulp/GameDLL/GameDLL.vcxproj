@@ -409,6 +409,7 @@
   <ItemGroup>
     <ClInclude Include="ECS\ComponentPool.h" />
     <ClInclude Include="ECS\Registry.h" />
+    <ClInclude Include="Enity\AnimatedSys.h" />
     <ClInclude Include="Enity\CameraSys.h" />
     <ClInclude Include="Enity\DataTranslator.h" />
     <ClInclude Include="Enity\EnitiySystem.h" />
@@ -427,6 +428,7 @@
     <ClInclude Include="Vars\PlayerVars.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Enity\AnimatedSys.cpp" />
     <ClCompile Include="Enity\CameraSys.cpp" />
     <ClCompile Include="Enity\EnitiySystem.cpp" />
     <ClCompile Include="Enity\InputSys.cpp" />
