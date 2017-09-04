@@ -61,7 +61,7 @@ void Bone::load(core::MemCursor& cursor)
 	}
 }
 
-void Bone::decodeFrame(Transformf& mat, int32_t frame) const
+void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 {
 	Vec3f pos;
 
@@ -121,7 +121,7 @@ void Bone::decodeFrame(Transformf& mat, int32_t frame) const
 	}
 
 
-	// mat.setTranslate(pos);
+	trans.pos = pos;
 
 }
 
