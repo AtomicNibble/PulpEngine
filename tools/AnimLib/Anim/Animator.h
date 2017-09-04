@@ -33,7 +33,7 @@ public:
 	void clear(void);
 	void clear(core::TimeVal currentTime, core::TimeVal clearTime);
 
-	void playAnim(const model::XModel& model, Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
+	void playAnim(const model::XModel& model, const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	
 	bool blend(core::TimeVal currentTime, TransformArr& boneTransOut, float &blendWeight) const;
 	
@@ -51,7 +51,7 @@ public:
 	X_INLINE core::TimeVal getStartTime(void) const;
 
 private:
-	Anim* pAnim_;
+	const Anim* pAnim_;
 
 	core::TimeVal startTime_;
 	core::TimeVal endTime_;
@@ -94,7 +94,7 @@ public:
 	
 	ANIMLIB_EXPORT bool createFrame(core::TimeVal currentTime);
 
-	ANIMLIB_EXPORT void playAnim(Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
+	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	ANIMLIB_EXPORT bool isAnimating(core::TimeVal currentTime) const;
 
 

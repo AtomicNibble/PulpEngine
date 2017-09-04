@@ -48,7 +48,7 @@ void AnimBlend::clear(core::TimeVal currentTime, core::TimeVal clearTime)
 
 }
 
-void AnimBlend::playAnim(const model::XModel& model, Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
+void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
 {
 	clear();
 
@@ -242,7 +242,7 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	return true;
 }
 
-void Animator::playAnim(Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
+void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
 {
 	// push anims down one.
 	pushAnims(startTime, blendTime);
