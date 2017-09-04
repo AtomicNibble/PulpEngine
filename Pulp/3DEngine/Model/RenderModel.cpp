@@ -133,8 +133,7 @@ void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const M
 		const Vec3f& pos = pBonePos_[i];
 		Vec3f worldPos = modelMat * pos;
 
-		// temp hack.
-		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
+		const char* pBoneName = getBoneName(i);
 
 		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
 	}
@@ -157,13 +156,12 @@ void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const M
 	ctx.effectId = 0;
 	ctx.size = Vec2f(textSize, textSize);
 
-	for (size_t i = 0; i < num; i++)
+	for (int32_t i = 0; i < safe_static_cast<int32_t>(num); i++)
 	{
 		const Vec3f& pos = pBonePos_[i];
 		Vec3f worldPos = modelMat * pBoneMatrix[i] * pos;
 
-		// temp hack.
-		const char* pBoneName = (char*)(data_.ptr() + pTagNames_[i]);
+		const char* pBoneName = getBoneName(i);
 
 		pPrimContex->drawText(worldPos + offset, view, ctx, pBoneName);
 	}
