@@ -683,7 +683,7 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 
 	if (pModel->isAnimated())
 	{
-		pRenderEnt->bones.resize(pModel->numBones());
+//		pRenderEnt->bones.resize(pModel->numBones());
 
 
 	//	pModel->assingDefaultPose(pRenderEnt->bones.data(), pRenderEnt->bones.size());
@@ -695,6 +695,36 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 	createEntityRefs(pRenderEnt);
 
 	return pRenderEnt;
+}
+
+bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num)
+{
+	RenderEnt* pRenderEnt = static_cast<RenderEnt*>(pEnt);
+	
+	auto* pModel = pRenderEnt->pModel;
+
+	if (!pModel->isAnimated())
+	{
+		X_ERROR("World", "Can't set blend matrices for none animated mesh");
+		return false;
+	}
+
+	// you silly slut.
+	if (pModel->numBones() != num)
+	{
+		X_ERROR("World", "Invalid matrices count for animated mesh");
+		return false;
+	}
+
+
+	if (pRenderEnt->bones.isEmpty())
+	{
+		pRenderEnt->bones.resize(pModel->numBones());
+	}
+
+	std::memcpy(pRenderEnt->bones.data(), pMats, sizeof(pMats[0]) * num);
+
+	return true;
 }
 
 void World3D::createEntityRefs(RenderEnt* pEnt) 
@@ -1711,16 +1741,18 @@ void World3D::drawRenderEnts()
 			pModel->createRenderBuffersForLod(lodIdx, gEnv->pRender);
 		}
 
+		bool hasBones = pRendEnt->bones.isNotEmpty();
+
 		const model::MeshHeader& mesh = pModel->getLodMeshHdr(lodIdx);
 		const auto& renderMesh = pModel->getLodRenderMesh(lodIdx);
 
-		if (!renderMesh.hasVBStream(VertexStream::HWSKIN))
+		if (hasBones && !renderMesh.hasVBStream(VertexStream::HWSKIN))
 		{
 			pModel->createSkinningRenderBuffersForLod(lodIdx, gEnv->pRender);
 		}
 
 		// Debug drawing.
-		if (pRendEnt->bones.isNotEmpty())
+		if (hasBones)
 		{
 			if (vars_.drawModelBones())
 			{
@@ -1740,13 +1772,13 @@ void World3D::drawRenderEnts()
 
 		if (vars_.drawModelBounds())
 		{
-			OBB obb(pRendEnt->trans.quat, pRendEnt->globalBounds);
+			OBB obb(pRendEnt->trans.quat, pRendEnt->localBounds);
 
-			pPrimContex_->drawOBB(obb, false, Col_Orangered);
+			pPrimContex_->drawOBB(obb, pRendEnt->trans.pos, false, Col_Orangered);
 		}
 		// ~Debug
 
-#if 1
+#if 0
 		auto& bones = pRendEnt->bones;
 
 		if (bones.size() > 8)
@@ -1796,17 +1828,26 @@ void World3D::drawRenderEnts()
 
 #endif
 
-		auto* pBoneDataDes = pBucket_->createDynamicBufferDesc();
-		pBoneDataDes->pData = pRendEnt->bones.data();
-		pBoneDataDes->size = safe_static_cast<uint32_t>(bones.size() * sizeof(Matrix44f)); 
+		if (hasBones)
+		{
+			auto* pBoneDataDes = pBucket_->createDynamicBufferDesc();
+			pBoneDataDes->pData = pRendEnt->bones.data();
+			pBoneDataDes->size = safe_static_cast<uint32_t>(pRendEnt->bones.size() * sizeof(Matrix44f));
 
 
+			world.transpose();
 
-		world.transpose();
 
+			addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F,
+				world, distanceFromCam, pBoneDataDes->asBufferHandle());
+		}
+		else
+		{
+			world.transpose();
 
-		addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F, 
-			world, distanceFromCam, pBoneDataDes->asBufferHandle());
+			addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F,
+				world, distanceFromCam);
+		}
 	}
 
 }
