@@ -42,8 +42,12 @@ public:
 
 	core::TimeVal animTime(core::TimeVal currentTime) const;
 
+	X_INLINE const Anim* getAnim(void) const;
 	X_INLINE float getStartWeight(void) const;
 	X_INLINE float getFinalWeight(void) const;
+	X_INLINE float getRate(void) const;
+	X_INLINE core::TimeVal getBlendStart(void) const;
+	X_INLINE core::TimeVal getBlendDuration(void) const;
 	X_INLINE core::TimeVal getStartTime(void) const;
 
 private:

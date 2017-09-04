@@ -2,6 +2,10 @@
 X_NAMESPACE_BEGIN(anim)
 
 
+X_INLINE const Anim* AnimBlend::getAnim(void) const
+{
+	return pAnim_;
+}
 
 X_INLINE float AnimBlend::getStartWeight(void) const
 {
@@ -11,6 +15,21 @@ X_INLINE float AnimBlend::getStartWeight(void) const
 X_INLINE float AnimBlend::getFinalWeight(void) const
 {
 	return blendEndVal_;
+}
+
+X_INLINE float AnimBlend::getRate(void) const
+{
+	return rate_;
+}
+
+X_INLINE core::TimeVal AnimBlend::getBlendStart(void) const
+{
+	return blendStart_;
+}
+
+X_INLINE core::TimeVal AnimBlend::getBlendDuration(void) const
+{
+	return blendDuration_;
 }
 
 X_INLINE core::TimeVal AnimBlend::getStartTime(void) const
