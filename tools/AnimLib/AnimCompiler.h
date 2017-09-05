@@ -55,6 +55,7 @@ class AnimCompiler
 		Vec3f minRelative(void) const;
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
+		const Vec3f& basePos(void) const;
 
 		void calculateDeltas(const float posError = 0.075f);
 

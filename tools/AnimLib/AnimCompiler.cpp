@@ -193,6 +193,12 @@ const Vec3f& AnimCompiler::Position::range(void) const
 }
 
 
+const Vec3f& AnimCompiler::Position::basePos(void) const
+{
+	return basePosition_;
+}
+
+
 void AnimCompiler::Position::calculateDeltas(const float posError)
 {
 	posDeltas_.clear();
