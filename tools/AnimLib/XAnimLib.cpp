@@ -83,7 +83,8 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 
 
 	// load file data
-	core::Array<uint8_t> fileData(host.getScratchArena());
+	DataArr fileData(host.getScratchArena());
+
 	if (!host.GetAssetData(assetId, fileData)) {
 		X_ERROR("AnimLib", "Failed to get asset data");
 		return false;
