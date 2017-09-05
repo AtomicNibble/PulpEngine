@@ -20,6 +20,7 @@ AnimCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 
 void AnimCompiler::Stats::clear(void)
 {
+	scale = 1.0f;
 	numFrames = 0;
 	fps = 0;
 	totalBones = 0;
@@ -35,6 +36,7 @@ void AnimCompiler::Stats::print(void) const
 	core::HumanDuration::Str durStr;
 
 	X_LOG0("Anim", "Anim Info:");
+	X_LOG0("Anim", "> Scale: ^6%g", scale);
 	X_LOG0("Anim", "> Compile Time: ^6%s", core::HumanDuration::toString(durStr, compileTime.GetMilliSeconds()));
 	X_LOG0("Anim", "> Num Frames: ^6%" PRIi32, numFrames);
 	X_LOG0("Anim", "> Fps: ^6%" PRIi32, fps);
@@ -590,6 +592,7 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 	dropNullBones();
 
 	// build some stats.
+	stats_.scale = scale_;
 	stats_.numFrames = inter_.getNumFrames();
 	stats_.fps = inter_.getFps();
 	stats_.totalBones = bones_.size();

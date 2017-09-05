@@ -15,6 +15,7 @@ class AnimCompiler
 		void print(void) const;
 
 	public: 
+		float scale;
 		int32_t numFrames;
 		int32_t fps;
 		size_t totalBones;
