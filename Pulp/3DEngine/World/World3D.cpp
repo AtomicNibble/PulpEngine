@@ -710,7 +710,7 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
 	}
 
 	// you silly slut.
-	if (pModel->numBones() != num)
+	if (pModel->numBones() != static_cast<int32_t>(num))
 	{
 		X_ERROR("World", "Invalid matrices count for animated mesh");
 		return false;
