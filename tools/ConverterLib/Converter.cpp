@@ -449,7 +449,7 @@ bool Converter::Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArg
 	return false;
 }
 
-bool Converter::GetAssetData(int32_t assetId, core::Array<uint8_t>& dataOut)
+bool Converter::GetAssetData(int32_t assetId, DataArr& dataOut)
 {
 	if (!db_.GetRawFileDataForAsset(assetId, dataOut)) {
 		X_ERROR("Converter", "Failed to get raw data for asset: %" PRIi32, assetId);
@@ -460,7 +460,7 @@ bool Converter::GetAssetData(int32_t assetId, core::Array<uint8_t>& dataOut)
 }
 
 
-bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut)
+bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut)
 {
 	int32_t assetId = -1;
 	if (!db_.AssetExsists(assType, core::string(pAssetName), &assetId)) {
