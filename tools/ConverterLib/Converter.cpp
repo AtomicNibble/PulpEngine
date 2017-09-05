@@ -409,7 +409,7 @@ bool Converter::GenerateThumbs(void)
 
 bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 {
-	int32_t assetId = -1;
+	assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
 	if (!db_.AssetExsists(assType, name, &assetId)) {
 		X_ERROR("Converter", "Asset does not exists");
 		return false;
@@ -438,7 +438,7 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 	return true;
 }
 
-bool Converter::Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut)
+bool Converter::Convert_int(AssetType::Enum assType, assetDb::AssetId assetId, ConvertArgs& args, const OutPath& pathOut)
 {
 	IConverter* pCon = GetConverter(assType);
 
@@ -450,7 +450,7 @@ bool Converter::Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArg
 }
 
 
-bool Converter::GetAssetArgs(int32_t assetId, ConvertArgs& args)
+bool Converter::GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args)
 {
 	if (!db_.GetArgsForAsset(assetId, args)) {
 		X_ERROR("Converter", "Failed to get args for asset: %" PRIi32, assetId);
@@ -460,7 +460,7 @@ bool Converter::GetAssetArgs(int32_t assetId, ConvertArgs& args)
 	return true;
 }
 
-bool Converter::GetAssetData(int32_t assetId, DataArr& dataOut)
+bool Converter::GetAssetData(assetDb::AssetId assetId, DataArr& dataOut)
 {
 	if (!db_.GetRawFileDataForAsset(assetId, dataOut)) {
 		X_ERROR("Converter", "Failed to get raw data for asset: %" PRIi32, assetId);
@@ -473,7 +473,7 @@ bool Converter::GetAssetData(int32_t assetId, DataArr& dataOut)
 
 bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut)
 {
-	int32_t assetId = -1;
+	assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
 	if (!db_.AssetExsists(assType, core::string(pAssetName), &assetId)) {
 		X_ERROR("Converter", "Asset does not exists: \"%s\"", pAssetName);
 		return false;
@@ -496,7 +496,7 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
 	return true;
 }
 
-bool Converter::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
+bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
 	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
 	auto res = db_.UpdateAssetThumb(assetId, thumbDim, srcDim, data, algo, lvl);
@@ -508,7 +508,7 @@ bool Converter::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, 
 }
 
 
-bool Converter::UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
+bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
 {
 	auto res = db_.UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
 	if (res != assetDb::AssetDB::Result::OK) {

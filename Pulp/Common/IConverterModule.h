@@ -39,12 +39,12 @@ struct IConverterHost
 
 	virtual ~IConverterHost() {}
 	
-	virtual bool GetAssetArgs(int32_t assetId, ConvertArgs& args) X_ABSTRACT;
-	virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_ABSTRACT;
+	virtual bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_ABSTRACT;
+	virtual bool GetAssetData(assetDb::AssetId assetId, DataArr& dataOut) X_ABSTRACT;
 	virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, DataArr& dataOut) X_ABSTRACT;
 	virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut = nullptr) X_ABSTRACT;
-	virtual bool UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
-	virtual bool UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData) X_ABSTRACT;
+	virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
+	virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData) X_ABSTRACT;
 
 	// get global conversion settings data.
 	virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_ABSTRACT;
@@ -68,11 +68,11 @@ struct IConverter
 	// gets the file extension this converter outputs with.
 	virtual const char* getOutExtension(void) const X_ABSTRACT;
 
-	virtual bool Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath) X_ABSTRACT;
+	virtual bool Convert(IConverterHost& host, assetDb::AssetId assetId, ConvertArgs& args, const OutPath& destPath) X_ABSTRACT;
 
 	// thumbs disabled for all types by default.
 	virtual bool thumbGenerationSupported(void) const { return false; }
-	virtual bool CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim) {
+	virtual bool CreateThumb(IConverterHost& host, assetDb::AssetId assetId, Vec2i targetDim) {
 		X_UNUSED(host);
 		X_UNUSED(assetId);
 		X_UNUSED(targetDim);

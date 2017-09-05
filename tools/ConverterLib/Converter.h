@@ -56,12 +56,12 @@ public:
 	CONVERTERLIB_EXPORT bool GenerateThumbs(void);
 
 	// IConverterHost
-	CONVERTERLIB_EXPORT virtual bool GetAssetArgs(int32_t assetId, ConvertArgs& args) X_FINAL;
-	CONVERTERLIB_EXPORT virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool GetAssetData(assetDb::AssetId assetId, DataArr& dataOut) X_FINAL;
 	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut) X_FINAL;
 	CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut = nullptr) X_FINAL;
-	CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_FINAL;
-	CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(int32_t assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_FINAL;
+	CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData) X_FINAL;
 
 	CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
 
@@ -78,7 +78,7 @@ private:
 	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, const core::Path<char>& outDir);
 
 	bool GenerateThumb(AssetType::Enum assType, const core::string& name);
-	bool Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArgs& args, const OutPath& pathOut);
+	bool Convert_int(AssetType::Enum assType, assetDb::AssetId assetId, ConvertArgs& args, const OutPath& pathOut);
 
 //	IConverter* GetConverter(AssetType::Enum assType);
 	bool EnsureLibLoaded(AssetType::Enum assType);
