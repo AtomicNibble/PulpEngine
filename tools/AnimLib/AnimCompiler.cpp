@@ -85,9 +85,11 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 
 	stream.write(numPos);
 
+	auto relativeMin = minRelative();
+
 	if (numPos == 0)
 	{
-		stream.write(min_); // just write min pos.
+		stream.write(relativeMin); // just write min pos.
 	}
 	else
 	{
@@ -134,7 +136,7 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 			}
 		}
 
-		stream.write(min_);
+		stream.write(relativeMin);
 		stream.write(range_);
 	}
 }
@@ -173,6 +175,11 @@ bool AnimCompiler::Position::isLargeScalers(void) const
 	return largeScalers_;
 }
 
+Vec3f AnimCompiler::Position::minRelative(void) const
+{
+	return min_ - basePosition_;
+}
+
 const Vec3f& AnimCompiler::Position::min(void) const
 {
 	return min_;
@@ -189,33 +196,88 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 	posDeltas_.clear();
 	posDeltas_.reserve(fullPos_.size());
 
-	// we only store a delta if it's diffrent.
-	int32_t frame = 0;
-	Vec3f curPos = basePosition_;
-
 	min_ = Vec3f::max();
 	max_ = Vec3f::min();
 
-	for (auto& pos : fullPos_)
+	/*
+		This logic looks for linera movement and only stores info when the
+		the translation deviates more than 'posError'.
+
+		For example if the bone moves in the same direction at the same speed every frame
+		we don't need to bother storing.
+
+		if the rate of movement keeps chaning frames will need to be stored.
+	*/
+	
+	// we don't do anthing until we have moved.
+	const int32_t totalFrames = static_cast<int32_t>(fullPos_.size());
+	int32_t frame = 0;
+
+	auto addFrame = [&](int32_t frameIdx) {
+
+		const Vec3f& pos = fullPos_[frameIdx];
+
+		min_.checkMin(pos);
+		max_.checkMax(pos);
+
+		PosDelta& deltaEntry = posDeltas_.AddOne();
+		deltaEntry.worldPos = pos;
+		deltaEntry.frame = frameIdx;
+	};
+
+	// find the first frame we move
+	for (frame = 0; frame < totalFrames; frame++)
 	{
-		Vec3f delta = curPos - pos;
+		auto delta = fullPos_[frame] - basePosition_;
 
 		if (!delta.compare(Vec3f::zero(), posError))
 		{
-			// only store min max for positions we are going to move to.
-			min_.checkMin(pos);
-			max_.checkMax(pos);
+			// store the frame before as that's when movement started
+			// if it's the first frame tho, we are 'jumping' the bone to a start location.
+			if (frame > 0) 
+			{
+				--frame;
+			}
 
-			// we moved enougth.
-			PosDelta& deltaEntry = posDeltas_.AddOne();
-			deltaEntry.worldPos = pos;
-			deltaEntry.delta = delta;
-			deltaEntry.frame = frame;
+			addFrame(frame);
+			break;
+		}
+	}
 
-			curPos = pos;
+	if (frame < totalFrames)
+	{
+		// we stored movement data for current frame
+		// now we keep moving forward checking pos error against last frame.
+		int32_t lastStoredFrame = frame;
+		
+		for (++frame; frame < totalFrames; ++frame)
+		{
+			const Vec3f& lastStoredPos = fullPos_[lastStoredFrame];
+			const Vec3f& singleDelta = fullPos_[lastStoredFrame + 1] - lastStoredPos;
+			const Vec3f& curFramePos = fullPos_[frame];
+
+			int32_t numFrames = frame - lastStoredFrame;
+			
+			// if continue at same rate we would have this delta
+			Vec3f linDelta = singleDelta * numFrames;
+			// the actual delta.
+			Vec3f delta = curFramePos - lastStoredPos;
+
+			// have we dirifted?
+			if (!delta.compare(linDelta, posError))
+			{
+				// lets store the frame before we drifted,
+				lastStoredFrame = frame - 1;
+
+				addFrame(lastStoredFrame);
+			}
 		}
 
-		frame++;
+		// do we always need a end frame?
+		if (lastStoredFrame != totalFrames - 1)
+		{
+			addFrame(totalFrames - 1);
+		}
 	}
 
 	buildScalers(posError);
@@ -427,7 +489,7 @@ void AnimCompiler::printStats(bool verbose) const
 
 		for (auto& bone : bones_)
 		{
-			auto& min = bone.pos.min();
+			auto min = bone.pos.minRelative();
 			auto& r = bone.pos.range();
 
 			X_LOG0("Anim", "-> \"%s\" ang: ^6%" PRIuS "^7 pos: ^6%" PRIuS " ^7min(%g,%g,%G) range(%g,%g,%g)", 

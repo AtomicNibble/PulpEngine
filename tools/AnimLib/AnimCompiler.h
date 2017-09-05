@@ -32,7 +32,7 @@ class AnimCompiler
 		{
 			int32_t frame;
 			Vec3f worldPos;
-			Vec3f delta;
+		//	Vec3f delta;
 		};
 
 		typedef Vec3<uint16_t> Scaler;
@@ -51,6 +51,7 @@ class AnimCompiler
 		bool hasData(void) const;
 		bool isFullFrames(void) const;
 		bool isLargeScalers(void) const;
+		Vec3f minRelative(void) const;
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
 
