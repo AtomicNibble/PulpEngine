@@ -25,8 +25,8 @@ global proc potato_revealSelected()
 
 global proc potato_SelectAndRevealType(string $type)
 {
-	string $selected[] = `ls -type $type`;
-	select -r $selected;
+	string $objects[] = `ls -type $type`;
+	select -r $objects;
 
 	potato_revealSelected();
 }
