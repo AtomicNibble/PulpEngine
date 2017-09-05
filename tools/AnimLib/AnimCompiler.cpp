@@ -320,6 +320,18 @@ void AnimCompiler::Position::buildScalers(const float posError)
 
 		scalers_.append(scaler);
 	}
+
+#if X_DEBUG
+	if (!largeScalers_)
+	{
+		// i know what the max is, i just think numeric_limits makes code intention more clear
+		auto max = std::numeric_limits<uint8_t>::max(); 
+		for (auto& scaler : scalers_)
+		{
+			X_ASSERT(scaler.x <= max && scaler.x <= max && scaler.x <= max, "Invalid scaler")(scaler.x, scaler.y, scaler.z);
+		}
+	}
+#endif
 }
 
 
