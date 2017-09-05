@@ -478,6 +478,7 @@ AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter,
 	arena_(arena),
 	inter_(inter),
 	skelton_(skelton),
+	scale_(1.f),
 	type_(AnimType::RELATIVE),
 	bones_(arena),
 	stats_(arena)
@@ -508,6 +509,11 @@ void AnimCompiler::printStats(bool verbose) const
 				bone.name.c_str(), bone.ang.numAngleFrames(), bone.pos.numPosFrames(), min.x, min.y, min.z, r.x, r.y, r.z);
 		}
 	}
+}
+
+void AnimCompiler::setScale(float scale)
+{
+	scale_ = scale;
 }
 
 void AnimCompiler::setLooping(bool loop)
@@ -667,7 +673,7 @@ void AnimCompiler::loadInterBones(void)
 		// load pos / angles.
 		for (size_t x = 0; x < dataNum; x++)
 		{
-			bone.pos.appendFullPos(interBone.data[x].position);
+			bone.pos.appendFullPos(interBone.data[x].position * scale_);
 			bone.ang.appendFullAng(interBone.data[x].rotation);
 		}
 	}

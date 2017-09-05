@@ -141,6 +141,7 @@ public:
 
 	void printStats(bool verbose = false) const;
 
+	void setScale(float scale);
 	void setLooping(bool loop);
 	void setAnimType(AnimType::Enum type);
 
@@ -165,6 +166,7 @@ private:
 	const model::ModelSkeleton& skelton_;
 
 private:
+	float scale_;
 	Flags<CompileFlag> flags_;
 	AnimType::Enum type_;
 	BoneArr bones_;
