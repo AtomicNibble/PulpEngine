@@ -836,7 +836,7 @@ global proc AnimEntryTimeLineSet(int $index)
 	intFieldGrp -e -value1 $timeLine[0] ("exportAnimFrameStart" + $index);
 	intFieldGrp -e -value1 $timeLine[1] ("exportAnimFrameEnd" + $index);
 
-	$numFrames =  $timeLine[1] -  $timeLine[0];
+	$numFrames =  ($timeLine[1] + 1) -  $timeLine[0];
 	intFieldGrp -e -value1 $numFrames ("exportAnimFrames" + $index);
 }
 
@@ -939,7 +939,7 @@ global proc AnimEntryExport(int $index)
 	string $type = `getAttr ("PotatoGNode.AnimType" + $index)`;
 	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
 	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
-	int $numFrames =  $end -  $start;
+	int $numFrames =  ($end + 1) -  $start;
 	string $mode = getExportMode();
 
 	if($numFrames < 1) {
@@ -1062,7 +1062,7 @@ global proc potato_AddAnimEntry( int $index )
 	// set values.
 	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
 	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
-	int $numFrames =  $end -  $start;
+	int $numFrames =  ($end + 1) -  $start;
 
 	intFieldGrp -e -value1 $start ("exportAnimFrameStart" + $index);
 	intFieldGrp -e -value1 $end ("exportAnimFrameEnd" + $index);
