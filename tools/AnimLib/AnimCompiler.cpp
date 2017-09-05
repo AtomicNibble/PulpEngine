@@ -288,6 +288,18 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 		}
 	}
 
+	if (posDeltas_.isEmpty())
+	{
+		min_ = Vec3f::zero();
+		max_ = Vec3f::zero();
+		return;
+	}
+	else
+	{
+		X_ASSERT(min_ != Vec3f::max(), "Infinate range")();
+		X_ASSERT(max_ != Vec3f::min(), "Infinate range")();
+	}
+
 	buildScalers(posError);
 }
 
