@@ -396,9 +396,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 				worldMatrix.getRotationQuaternion(qx, qy, qz, qw);
 
 				data.rotation = MQuaternion(qx, qy, qz, qw);
-
 				data.scale = MVector::one;
-
 
 				if(MayaUtil::IsVerbose())
 				{
