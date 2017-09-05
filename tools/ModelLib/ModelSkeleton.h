@@ -16,6 +16,12 @@ X_NAMESPACE_BEGIN(model)
 
 class ModelSkeleton
 {
+	typedef core::Array<core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>> TagNames;
+	typedef core::Array<uint16_t> TagNameIdx;
+	typedef core::Array<uint8_t> TagTree;
+	typedef core::Array<Quatf> TagAngles;
+	typedef core::Array<Vec3f> TagPos;
+
 public:
 	ModelSkeleton(core::MemoryArenaBase* arena);
 	~ModelSkeleton();
@@ -40,12 +46,6 @@ private:
 	bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
 private:
-	typedef core::Array<core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>> TagNames;
-	typedef core::Array<uint16_t> TagNameIdx;
-	typedef core::Array<uint8_t> TagTree;
-	typedef core::Array<Quatf> TagAngles;
-	typedef core::Array<Vec3f> TagPos;
-
 	core::MemoryArenaBase* arena_;
 
 	size_t numBones_;
