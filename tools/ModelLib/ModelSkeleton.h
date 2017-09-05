@@ -28,14 +28,16 @@ public:
 
 	bool LoadCompiledSkelton(const core::Path<char>& path);
 	bool LoadCompiledSkelton(const core::Path<wchar_t>& path);
+
 	bool LoadRawModelSkelton(const core::Path<char>& path);
 	bool LoadRawModelSkelton(const core::Path<wchar_t>& path);
 	bool LoadRawModelSkelton(const core::Array<uint8_t>& data);
 
+	void scale(float scale);
+
 	size_t getNumBones(void) const;
 
 	const char* getBoneName(size_t idx) const;
-
 	const Quatf getBoneAngle(size_t idx) const;
 	const Vec3f getBonePos(size_t idx) const;
 

@@ -343,6 +343,15 @@ bool ModelSkeleton::ReadheaderToken(core::XLexer& lex, const char* pName, int32_
 }
 
 
+void ModelSkeleton::scale(float scale)
+{
+	// scale me bones!
+	for (auto& pos : positions_)
+	{
+		pos *= scale;
+	}
+}
+
 size_t ModelSkeleton::getNumBones(void) const
 {
 	return numBones_;
