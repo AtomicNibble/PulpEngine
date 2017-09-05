@@ -449,6 +449,17 @@ bool Converter::Convert_int(AssetType::Enum assType, int32_t assetId, ConvertArg
 	return false;
 }
 
+
+bool Converter::GetAssetArgs(int32_t assetId, ConvertArgs& args)
+{
+	if (!db_.GetArgsForAsset(assetId, args)) {
+		X_ERROR("Converter", "Failed to get args for asset: %" PRIi32, assetId);
+		return false;
+	}
+
+	return true;
+}
+
 bool Converter::GetAssetData(int32_t assetId, DataArr& dataOut)
 {
 	if (!db_.GetRawFileDataForAsset(assetId, dataOut)) {

@@ -35,9 +35,11 @@ struct IConverterModule : public IPotatoUnknown
 struct IConverterHost
 {
 	typedef core::Array<uint8_t> DataArr;
+	typedef core::string ConvertArgs;
 
 	virtual ~IConverterHost() {}
-
+	
+	virtual bool GetAssetArgs(int32_t assetId, ConvertArgs& args) X_ABSTRACT;
 	virtual bool GetAssetData(int32_t assetId, DataArr& dataOut) X_ABSTRACT;
 	virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, DataArr& dataOut) X_ABSTRACT;
 	virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut = nullptr) X_ABSTRACT;
@@ -57,6 +59,7 @@ struct IConverterHost
 
 struct IConverter
 {
+	typedef core::Array<uint8_t> DataArr;
 	typedef core::string ConvertArgs;
 	typedef core::Path<char> OutPath;
 
