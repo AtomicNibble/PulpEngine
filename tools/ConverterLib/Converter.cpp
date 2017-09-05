@@ -476,9 +476,9 @@ bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, Da
 	return true;
 }
 
-bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType)
+bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut)
 {
-	if (!db_.AssetExsists(assType, core::string(pAssetName))) {
+	if (!db_.AssetExsists(assType, core::string(pAssetName), pIdOut)) {
 		return false;
 	}
 
