@@ -862,7 +862,7 @@ global proc AnimEntrySetNodes(int $index)
 {
 	print_Msg("set nodes for animation index: " + $index);
 
-	string $Selected[] = `ls -type joint`;
+	string $Selected[] = `ls -type joint -sl`;
 	if (`size $Selected`) {
 		AnimEntrySetNodes_internal($index, $Selected);
 	} else {
