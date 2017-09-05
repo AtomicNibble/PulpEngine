@@ -935,11 +935,13 @@ global proc animTypeChangedUpdate(int $index)
 
 global proc AnimEntryExport(int $index)
 {
+	string $verbose = `getAttr ("PotatoGNode.verbose")`;
 	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
 	string $type = `getAttr ("PotatoGNode.AnimType" + $index)`;
 	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
 	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
 	int $numFrames =  ($end + 1) -  $start;
+
 	string $mode = getExportMode();
 
 	if($numFrames < 1) {
@@ -962,6 +964,11 @@ global proc AnimEntryExport(int $index)
 	string $filename = animGetName($index);
 	string $Dir = getOutputDirAnims();
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
+
+	if($verbose) {
+        		$options += " -verbose";
+    	}
+
 	string $command = "PotatoExportAnim " + $args + " -f \"" + $filename + "\" "+ $options;
 
 	print_Msg("cmd: " + $command);
