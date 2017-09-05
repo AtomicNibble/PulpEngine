@@ -62,7 +62,7 @@ private:
 
 private:
 	X_INLINE const int32_t getNumFrames(void) const {
-		return endFrame_ - startFrame_;
+		return (endFrame_ + 1) - startFrame_;
 	}
 
 private:

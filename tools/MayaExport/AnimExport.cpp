@@ -473,6 +473,8 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 		buf.append("BONE_DATA\n");
 		stream.write(buf.c_str(), buf.length());
 
+		X_ASSERT(static_cast<int32_t>(bone.data.size()) == numFrames, "Don't have bone data for all frames")(bone.data.size(), numFrames);
+
 		for (int32_t i = 0; i < numFrames; i++)
 		{
 			const FrameData& data = bone.data[i];
