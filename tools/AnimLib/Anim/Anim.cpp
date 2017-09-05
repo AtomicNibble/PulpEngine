@@ -11,6 +11,8 @@ X_NAMESPACE_BEGIN(anim)
 Bone::Bone()
 {
 	pName_ = nullptr;
+	numAngles_ = 0;
+	numPos_ = 0;
 	pAngleData_ = nullptr;
 	pAngleFrames_ = nullptr;
 	pPosScalers_ = nullptr;
