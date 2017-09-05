@@ -81,7 +81,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 		return false;
 	}
 
-	int32_t assetId = -1;
+	assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
 	assetDb::AssetDB::ModId modId;
 	if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
 		X_ERROR("Converter", "Asset does not exists");
@@ -141,7 +141,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	return res;
 }
 
-bool Converter::Convert(int32_t modId)
+bool Converter::Convert(assetDb::ModId modId)
 {
 	X_LOG0("Converter", "Converting all assets...");
 
@@ -169,7 +169,7 @@ bool Converter::Convert(int32_t modId)
 	return true;
 }
 
-bool Converter::Convert(int32_t modId, AssetType::Enum assType)
+bool Converter::Convert(assetDb::ModId modId, AssetType::Enum assType)
 {
 	X_LOG0("Converter", "Converting all \"%s\" assets ...", AssetType::ToString(assType));
 
@@ -300,7 +300,7 @@ bool Converter::CleanAll(const char* pMod)
 	return db_.IterateMods(func);
 }
 
-bool Converter::CleanAll(int32_t modId)
+bool Converter::CleanAll(assetDb::ModId modId)
 {
 	assetDb::AssetDB::Mod mod;
 

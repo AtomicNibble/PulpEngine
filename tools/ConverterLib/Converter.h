@@ -45,12 +45,12 @@ public:
 
 
 	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType, const core::string& name);
-	CONVERTERLIB_EXPORT bool Convert(int32_t modId);
-	CONVERTERLIB_EXPORT bool Convert(int32_t modId, AssetType::Enum assType);
+	CONVERTERLIB_EXPORT bool Convert(assetDb::ModId modId);
+	CONVERTERLIB_EXPORT bool Convert(assetDb::ModId modId, AssetType::Enum assType);
 	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType);
 	CONVERTERLIB_EXPORT bool ConvertAll(void);
 	CONVERTERLIB_EXPORT bool CleanAll(const char* pMod = nullptr);
-	CONVERTERLIB_EXPORT bool CleanAll(int32_t modId);
+	CONVERTERLIB_EXPORT bool CleanAll(assetDb::ModId modId);
 
 	// generates thumbs for assets that don't have thumbs already and we support auto thumb generation.
 	CONVERTERLIB_EXPORT bool GenerateThumbs(void);
