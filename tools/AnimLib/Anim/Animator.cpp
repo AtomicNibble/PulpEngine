@@ -190,8 +190,8 @@ core::TimeVal AnimBlend::animTime(core::TimeVal currentTime) const
 
 	X_ASSERT(rate_ >= 0.f, "Invalid rate")(rate_);
 
-	float elapsedMS = (currentTime - startTime_).GetMilliSeconds();
-	float scaled = elapsedMS * rate_;
+	auto elapsed = (currentTime - startTime_).GetValue();
+	auto scaled = static_cast<core::TimeVal::TimeType>(static_cast<float>(elapsed) * rate_);
 
 	return core::TimeVal(scaled);
 }
