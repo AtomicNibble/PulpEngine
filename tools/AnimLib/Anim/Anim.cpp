@@ -155,6 +155,7 @@ void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
 
 	// this turns a elapsed time into frame info.
 	if (numFrames <= 1) {
+		frame.cylces = 0;
 		frame.frame1 = 0;
 		frame.frame2 = 0;
 		frame.backlerp = 0.0f;
@@ -163,6 +164,7 @@ void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
 	}
 
 	if (time <= 0_tv) {
+		frame.cylces = 0;
 		frame.frame1 = 0;
 		frame.frame2 = 1;
 		frame.backlerp = 0.0f;
@@ -170,16 +172,16 @@ void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
 		return;
 	}
 
-	X_ASSERT_NOT_IMPLEMENTED();
-
 	// multiple time by fps then device by 1 second.
 	const core::TimeVal oneSecond = 1000_ms;
 
 	core::TimeVal frameTime = core::TimeVal(time.GetValue() * fps);
 	int32_t frameNum = safe_static_cast<int32_t>((frameTime / oneSecond).GetValue());
 
-
-	frame.frame1 = frameNum % (numFrames - 1);
+	// frames are 0-numFrames
+	// so frame 29 is last.
+	frame.cylces = frameNum / (numFrames);
+	frame.frame1 = frameNum % (numFrames);
 	frame.frame2 = frame.frame1 + 1;
 	if (frame.frame2 >= numFrames) {
 		frame.frame2 = 0;
