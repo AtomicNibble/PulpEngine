@@ -29,6 +29,8 @@ private:
 
 	Vec3f GetPostion(int32_t idx) const
 	{
+		X_ASSERT(idx < numPos_, "Invalid idx")(idx, numPos_);
+
 		Vec3<uint8_t>& scale = pPosScalers_[idx];
 
 		Vec3f pos;
