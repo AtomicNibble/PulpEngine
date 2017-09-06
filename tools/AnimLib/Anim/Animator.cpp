@@ -276,6 +276,11 @@ bool Animator::createFrame(core::TimeVal currentTime)
 		return false;
 	}
 
+	if (!isAnimating(currentTime)) {
+		return false;
+	}
+
+
 	lastTransformTime_ = currentTime;
 
 	// joints for whole model.
