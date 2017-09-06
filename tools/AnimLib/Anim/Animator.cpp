@@ -255,6 +255,14 @@ void AnimBlend::setRate(float rate)
 	setCycleCount(cycles_);
 }
 
+core::TimeVal AnimBlend::getPlayTime(void) const
+{
+	if (endTime_ == 0_tv) {
+		return 0_tv;
+	}
+
+	return endTime_ - startTime_;
+}
 
 // ------------------------------
 

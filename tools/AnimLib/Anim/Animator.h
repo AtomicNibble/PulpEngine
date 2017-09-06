@@ -54,6 +54,7 @@ public:
 	X_INLINE core::TimeVal getBlendDuration(void) const;
 	X_INLINE core::TimeVal getStartTime(void) const;
 	X_INLINE core::TimeVal getEndTime(void) const;
+	core::TimeVal getPlayTime(void) const;
 
 private:
 
