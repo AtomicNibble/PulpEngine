@@ -102,9 +102,16 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 	}
 
 	// we now need to load the models skelton.
-	core::Array<uint8_t> modelFile(g_AnimLibArena);
-	if (!host.GetAssetData(modelName, assetDb::AssetType::MODEL, modelFile)) {
-		X_ERROR("AnimLib", "Failed to load model for skelton: \"%s\"", modelName.c_str());
+	DataArr modelFile(g_AnimLibArena);
+	assetDb::AssetId modelId = assetDb::INVALID_ASSET_ID;
+
+	if (!host.AssetExists(modelName, assetDb::AssetType::MODEL, &modelId)) {
+		X_ERROR("AnimLib", "Could not find model asset: \"%s\"", modelName.c_str());
+		return false;
+	}
+
+	if (!host.GetAssetData(modelId, modelFile)) {
+		X_ERROR("AnimLib", "Failed to load model raw data: \"%s\"", modelName.c_str());
 		return false;
 	}
 
