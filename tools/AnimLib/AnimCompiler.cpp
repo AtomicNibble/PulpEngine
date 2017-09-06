@@ -165,11 +165,7 @@ bool AnimCompiler::Position::hasData(void) const
 
 bool AnimCompiler::Position::isFullFrames(void) const
 {
-#if 1
-	return false;
-#else
 	return posDeltas_.size() == fullPos_.size();
-#endif
 }
 
 bool AnimCompiler::Position::isLargeScalers(void) const
