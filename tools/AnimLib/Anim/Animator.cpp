@@ -64,6 +64,10 @@ void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::Ti
 	blendStartVal_ = 0.f;
 	blendEndVal_ = 1.f;
 
+	if (pAnim->isLooping()) {
+		setCycleCount(-1);
+	}
+ 
 	// build the index map.
 	indexMap_.resize(model.numBones());
 
