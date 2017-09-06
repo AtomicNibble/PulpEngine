@@ -111,8 +111,14 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 				int32_t first = pPosFrames_[firstIdx];
 				int32_t last = pPosFrames_[lastIdx];
 
+
+				int32_t offset = frame - first;
+				int32_t range = last - first;
+
+				// if range is 10 and offset 5 i want o.5 yo
+
 				// calculate Fraction
-				float fraction = 1.0f / (last - first);
+				float fraction = static_cast<float>(offset) / range;
 
 				auto firstPos = GetPostion(firstIdx);
 				auto lastPos = GetPostion(lastIdx);
