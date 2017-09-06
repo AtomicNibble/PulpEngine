@@ -848,6 +848,9 @@ global proc AnimEntrySetNodes_internal(int $index, string $nodes[])
 		$nodes_str = $nodes_str + $obj + " ";
 	}
 
+	print_Msg("selected nodes: " + $nodes_str);
+
+
 	if (`size $nodes`)
 	{
 		int $num = size($nodes);
@@ -855,6 +858,9 @@ global proc AnimEntrySetNodes_internal(int $index, string $nodes[])
 		intFieldGrp -e -value1 $num ("exportAnimNodes" + $index);
 
 		setAttr -type "string" ("PotatoGNode.AnimNodes" + $index) $nodes_str;
+	}
+	else{
+		print_Warn("unable to set nodes. no nodes selected");
 	}
 }
 
