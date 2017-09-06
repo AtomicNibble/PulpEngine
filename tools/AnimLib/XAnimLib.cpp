@@ -103,6 +103,7 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 
 	// we now need to load the models skelton.
 	DataArr modelFile(g_AnimLibArena);
+	ConvertArgs modelArgs;
 	assetDb::AssetId modelId = assetDb::INVALID_ASSET_ID;
 
 	if (!host.AssetExists(modelName, assetDb::AssetType::MODEL, &modelId)) {
@@ -115,14 +116,35 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 		return false;
 	}
 
+	if (!host.GetAssetArgs(modelId, modelArgs)) {
+		X_ERROR("AnimLib", "Failed to load model args: \"%s\"", modelName.c_str());
+		return false;
+	}
+
+	float scale = 1.0f;
+	{
+		core::json::Document md;
+		md.Parse(modelArgs.c_str(), modelArgs.length());
+
+		if (md.HasMember("scale")) {
+			scale = md["scale"].GetFloat();
+		}
+	}
+
 	model::ModelSkeleton skelton(g_AnimLibArena);
 	if (!skelton.LoadRawModelSkelton(modelFile)) {
 		X_ERROR("AnimLib", "Failed to load skelton for model: \"%s\"", modelName.c_str());
 		return false;
 	}
 
+	if (scale != 1.f)
+	{
+		skelton.scale(scale);
+	}
+
 	// right now it's time to process the anim :S
 	AnimCompiler compiler(g_AnimLibArena, inter, skelton);
+	compiler.setScale(scale);
 	compiler.setLooping(looping);
 	compiler.setAnimType(type);
 
