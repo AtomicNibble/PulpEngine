@@ -25,6 +25,8 @@ void Bone::setName(const char* pName)
 
 void Bone::load(core::MemCursor& cursor)
 {
+	flags_ = cursor.getSeek<BoneFlags>();
+
 	// angles
 	numAngles_ = cursor.getSeek<uint16_t>();
 
@@ -56,7 +58,12 @@ void Bone::load(core::MemCursor& cursor)
 			pPosFrames_ = cursor.postSeekPtr<uint8_t>(numPos_);
 		}
 
-		pPosScalers_ = cursor.postSeekPtr<Vec3<uint8_t>>(numPos_);
+		if (flags_.IsSet(BoneFlag::LargePosScalers)) {
+			pPosScalersLarge_ = cursor.postSeekPtr<Vec3<uint16_t>>(numPos_);
+		}
+		else {
+			pPosScalers_ = cursor.postSeekPtr<Vec3<uint8_t>>(numPos_);
+		}
 
 		posMin_ = cursor.getSeek<Vec3f>();
 		posRange_ = cursor.getSeek<Vec3f>();
@@ -132,6 +139,32 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 	trans.pos = pos;
 
 }
+
+Vec3f Bone::GetPostion(int32_t idx) const
+{
+	X_ASSERT(idx < numPos_, "Invalid idx")(idx, numPos_);
+
+	Vec3f pos;
+	if (flags_.IsSet(BoneFlag::LargePosScalers))
+	{
+		Vec3<uint16_t>& scale = pPosScalersLarge_[idx];
+
+		pos[0] = (posMin_.x + (posRange_.x * (scale[0] / 65535.f)));
+		pos[1] = (posMin_.y + (posRange_.y * (scale[1] / 65535.f)));
+		pos[2] = (posMin_.z + (posRange_.z * (scale[2] / 65535.f)));
+	}
+	else
+	{
+		Vec3<uint8_t>& scale = pPosScalers_[idx];
+
+		pos[0] = (posMin_.x + (posRange_.x * (scale[0] / 255.f)));
+		pos[1] = (posMin_.y + (posRange_.y * (scale[1] / 255.f)));
+		pos[2] = (posMin_.z + (posRange_.z * (scale[2] / 255.f)));
+	}
+
+	return pos;
+}
+
 
 // ----------------------------------
 

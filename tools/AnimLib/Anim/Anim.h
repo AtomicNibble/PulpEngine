@@ -26,31 +26,22 @@ public:
 	void decodeFrame(Transformf& trans, int32_t frame) const;
 
 private:
-
-	Vec3f GetPostion(int32_t idx) const
-	{
-		X_ASSERT(idx < numPos_, "Invalid idx")(idx, numPos_);
-
-		Vec3<uint8_t>& scale = pPosScalers_[idx];
-
-		Vec3f pos;
-		pos[0] = (posMin_.x + (posRange_.x * (scale[0] / 255.f)));
-		pos[1] = (posMin_.y + (posRange_.y * (scale[1] / 255.f)));
-		pos[2] = (posMin_.z + (posRange_.z * (scale[2] / 255.f)));
-
-		return pos;
-	}
+	Vec3f GetPostion(int32_t idx) const;
 
 private:
 	const char* pName_;
 
+	BoneFlags flags_;
 	int32_t numAngles_;
 	int32_t numPos_;
 
 	// Pos data
 	Vec3f posMin_;
 	Vec3f posRange_;
-	Vec3<uint8_t>* pPosScalers_;
+	union {
+		Vec3<uint8_t>* pPosScalers_;
+		Vec3<uint16_t>* pPosScalersLarge_;
+	};
 	uint8_t* pPosFrames_;
 
 	// angle data.
