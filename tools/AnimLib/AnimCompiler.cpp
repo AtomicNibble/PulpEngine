@@ -89,7 +89,7 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 
 	auto relativeMin = minRelative();
 
-	if (numPos == 0)
+	if (numPos == 1)
 	{
 		stream.write(relativeMin); // just write min pos.
 	}

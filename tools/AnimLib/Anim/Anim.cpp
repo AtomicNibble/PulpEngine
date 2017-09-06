@@ -77,7 +77,7 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 	// position
 	if (numPos_)
 	{
-		if (numPos_ == 0)
+		if (numPos_ == 1)
 		{
 			pos = posMin_;
 		}
