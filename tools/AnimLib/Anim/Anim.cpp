@@ -74,13 +74,6 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 {
 	Vec3f pos;
 
-
-	// so this gives us the position for the frame relative to the bones base position.
-	// so each frame we need to reset all the matrix to pose positions
-	// then apply animations to them.
-	// we need some kinda of index map that we calculate for anim to model
-
-
 	// position
 	if (numPos_)
 	{
