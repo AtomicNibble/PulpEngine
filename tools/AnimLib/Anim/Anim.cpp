@@ -227,9 +227,7 @@ void Anim::getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const I
 	}
 
 	// blend them
-	Util::blendBones(boneTransOut.data(), blendTrans.data(), frame.backlerp,
-		lerpIndex.data(), safe_static_cast<int32_t>(lerpIndex.size()));
-
+	Util::blendBones(boneTransOut, blendTrans, lerpIndex, frame.backlerp);
 
 }
 

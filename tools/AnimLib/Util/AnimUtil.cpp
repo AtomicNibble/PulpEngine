@@ -14,8 +14,11 @@ namespace Util
 		for (int32_t i = 0; i < num; i++)
 		{
 			int32_t j = pIndex[i];
-			pBones[j].quat.slerp(lerp, pBlendBones[j].quat);
-			pBones[j].pos.lerp(lerp, pBlendBones[j].pos);
+			auto& dst = pBones[j];
+			auto& src = pBlendBones[j];
+			
+			dst.quat = dst.quat.slerp(lerp, src.quat);
+			dst.pos = dst.pos.lerp(lerp, src.pos);
 		}
 	}
 
@@ -38,6 +41,15 @@ namespace Util
 		}
 	}
 
+	void blendBones(core::Array<Transformf>& bones, const core::Array<Transformf>& blendTrans,
+		const core::Array<int32_t>& indexes, float lerp)
+	{
+		X_ASSERT(bones.size() == blendTrans.size(), "size mismatch")();
+
+
+		blendBones(bones.data(), blendTrans.data(), lerp,
+			indexes.data(), safe_static_cast<int32_t>(indexes.size()));
+	}
 
 	void convertBoneTransToMatrix(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats,
 		const core::Array<Transformf>& trans)
