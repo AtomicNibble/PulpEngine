@@ -130,7 +130,14 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 
 
 	trans.pos = pos;
+}
 
+
+Quatf Bone::GetAngle(int32_t idx) const
+{
+	X_ASSERT(idx < numAngles_, "Invalid idx")(idx, numAngles_);
+
+	return pAngleData_[idx].asQuat();
 }
 
 Vec3f Bone::GetPostion(int32_t idx) const

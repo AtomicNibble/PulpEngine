@@ -26,6 +26,7 @@ public:
 	void decodeFrame(Transformf& trans, int32_t frame) const;
 
 private:
+	Quatf GetAngle(int32_t idx) const;
 	Vec3f GetPostion(int32_t idx) const;
 
 private:
