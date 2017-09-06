@@ -105,6 +105,13 @@ X_DECLARE_FLAGS8(AnimFlag)(
 );
 
 
+X_DECLARE_FLAGS8(BoneFlag)(
+	LargePosScalers
+);
+
+typedef Flags8<BoneFlag> BoneFlags;
+
+
 struct AnimState
 {
 	core::TimeVal elapsed;
