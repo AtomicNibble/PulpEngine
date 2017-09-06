@@ -534,7 +534,7 @@ void AnimCompiler::printStats(bool verbose) const
 				bone.ang.numAngleFrames(), bone.ang.isFullFrames());
 
 			X_LOG0("Anim", "pos: ^6%2" PRIuS "^7 full: ^6%d^7 largeS: ^6%d ^7min(%g,%g,%G) range(%g,%g,%g)",
-				bone.pos.numPosFrames(), bone.pos.isLargeScalers(), bone.pos.isFullFrames(),
+				bone.pos.numPosFrames(), bone.pos.isFullFrames(), bone.pos.isLargeScalers(),
 				min.x, min.y, min.z, r.x, r.y, r.z);
 		}
 	}
