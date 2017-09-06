@@ -527,7 +527,9 @@ void AnimCompiler::printStats(bool verbose) const
 
 			core::StackString256 info;
 
-			X_LOG0("Anim", "-> \"%s\"", bone.name.c_str());
+			auto& basePos = bone.pos.basePos();
+
+			X_LOG0("Anim", "-> \"%s\" basePos(^6%g^7,^6%g^7,^6%g^7)", bone.name.c_str(), basePos.x, basePos.y, basePos.z);
 			X_LOG_BULLET;
 
 			X_LOG0("Anim", "ang: ^6%2" PRIuS "^7 full: ^6%d",
