@@ -114,8 +114,8 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 				// calculate Fraction
 				float fraction = 1.0f / (last - first);
 
-				auto firstPos = GetPostion(first);
-				auto lastPos = GetPostion(last);
+				auto firstPos = GetPostion(firstIdx);
+				auto lastPos = GetPostion(lastIdx);
 
 				pos = firstPos.lerp(fraction, lastPos);
 			}
