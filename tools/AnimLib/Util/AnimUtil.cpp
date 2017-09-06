@@ -8,20 +8,6 @@ namespace Util
 {
 
 
-	void blendBones(Transformf* pBones, const Transformf* pBlendBones, float lerp, const int32_t* pIndex, size_t numIndex)
-	{
-		int32_t num = safe_static_cast<int32_t>(numIndex);
-		for (int32_t i = 0; i < num; i++)
-		{
-			int32_t j = pIndex[i];
-			auto& dst = pBones[j];
-			auto& src = pBlendBones[j];
-			
-			dst.quat = dst.quat.slerp(lerp, src.quat);
-			dst.pos = dst.pos.lerp(lerp, src.pos);
-		}
-	}
-
 
 	void transformBones(Matrix44f* pMats, const int32_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
 	{
@@ -46,9 +32,16 @@ namespace Util
 	{
 		X_ASSERT(bones.size() == blendTrans.size(), "size mismatch")();
 
+		int32_t num = safe_static_cast<int32_t>(indexes.size());
+		for (int32_t i = 0; i < num; i++)
+		{
+			int32_t j = indexes[i];
+			auto& dst = bones[j];
+			auto& src = blendTrans[j];
 
-		blendBones(bones.data(), blendTrans.data(), lerp,
-			indexes.data(), safe_static_cast<int32_t>(indexes.size()));
+			dst.quat = dst.quat.slerp(lerp, src.quat);
+			dst.pos = dst.pos.lerp(lerp, src.pos);
+		}
 	}
 
 	void convertBoneTransToMatrix(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats,
