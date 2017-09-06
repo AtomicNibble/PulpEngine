@@ -238,6 +238,8 @@ void Anim::getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const I
 	// we need to animate each bone in the model that we affect
 	// the index map is same size as bones, and the index is the index of the bone in animation.
 	X_ASSERT(boneTransOut.size() == indexes.size(), "Size mismatch")();
+	X_ASSERT(frame.frame1 >= 0 && frame.frame1 < getNumFrames(), "Frame1 out of range")(frame.frame1, getNumFrames());
+	X_ASSERT(frame.frame2 >= 0 && frame.frame2 < getNumFrames(), "Frame2 out of range")(frame.frame2, getNumFrames());
 
 	TransformArr blendTrans(boneTransOut.getArena(), boneTransOut.size());
 	IndexArr lerpIndex(boneTransOut.getArena());
