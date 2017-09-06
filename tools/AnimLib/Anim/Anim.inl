@@ -69,6 +69,14 @@ X_INLINE bool Anim::hasNotes(void) const
 	return hdr_.flags.IsSet(AnimFlag::NOTES);
 }
 
+X_INLINE core::TimeVal Anim::getDuration(void) const
+{
+	core::TimeVal oneSecond;
+	oneSecond.SetSeconds(1ll);
+
+	return core::TimeVal((getNumFrames() * oneSecond.GetValue()) / getFps());
+}
+
 X_INLINE const char* Anim::getBoneName(int32_t idx) const
 {
 	return bones_[idx].getName();

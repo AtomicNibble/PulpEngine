@@ -100,6 +100,7 @@ public:
 	X_INLINE AnimType::Enum type(void) const;
 	X_INLINE bool isLooping(void) const;
 	X_INLINE bool hasNotes(void) const;
+	X_INLINE core::TimeVal getDuration(void) const;
 
 	X_INLINE const char* getBoneName(int32_t idx) const;
 
