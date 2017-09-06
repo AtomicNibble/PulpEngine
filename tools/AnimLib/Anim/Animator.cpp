@@ -54,13 +54,8 @@ void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::Ti
 
 	pAnim_ = pAnim;
 
-	const core::TimeVal oneSecond = 1000_ms;
-
-	core::TimeVal length = core::TimeVal((pAnim->getNumFrames() * oneSecond.GetValue()) / pAnim->getFps());
-
 	startTime_ = startTime;
-	endTime_ = startTime + length;
-
+	endTime_ = startTime + pAnim->getDuration();
 
 	blendStart_ = startTime;
 	blendDuration_ = blendTime;
