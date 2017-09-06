@@ -509,10 +509,22 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
 				y1 = core::Min(y1, clip.y2);
 			}
 
-			const Vec3f v0(x0, y0, z);
-			const Vec3f v2(x1, y1, z);
-			const Vec3f v1(v2.x, v0.y, v0.z); // to avoid float->half conversion
-			const Vec3f v3(v0.x, v2.y, v0.z); // to avoid float->half conversion
+			Vec3f v0(x0, y0, z);
+			Vec3f v2(x1, y1, z);
+			Vec3f v1(v2.x, v0.y, v0.z); // to avoid float->half conversion
+			Vec3f v3(v0.x, v2.y, v0.z); // to avoid float->half conversion
+
+			if (pRotation)
+			{
+				auto& rot = *pRotation;
+
+				Vec3f base(pos);
+				v0 = (rot * (v0 - base)) + base;
+				v1 = (rot * (v1 - base)) + base;
+				v2 = (rot * (v2 - base)) + base;
+				v3 = (rot * (v3 - base)) + base;
+			}
+
 
 			Vec2f gradientUvMin, gradientUvMax;
 			GetGradientTextureCoord(gradientUvMin.x, gradientUvMin.y, gradientUvMax.x, gradientUvMax.y);
