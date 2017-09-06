@@ -42,22 +42,34 @@ public:
 
 	core::TimeVal animTime(core::TimeVal currentTime) const;
 
+	void setCycleCount(int32_t numCycles);
+	void setRate(float rate);
+
 	X_INLINE const Anim* getAnim(void) const;
+	X_INLINE int32_t getCycleCount(void) const;
 	X_INLINE float getStartWeight(void) const;
 	X_INLINE float getFinalWeight(void) const;
 	X_INLINE float getRate(void) const;
 	X_INLINE core::TimeVal getBlendStart(void) const;
 	X_INLINE core::TimeVal getBlendDuration(void) const;
 	X_INLINE core::TimeVal getStartTime(void) const;
+	X_INLINE core::TimeVal getEndTime(void) const;
+
+private:
 
 private:
 	const Anim* pAnim_;
 
 	core::TimeVal startTime_;
 	core::TimeVal endTime_;
+	core::TimeVal timeOffset_;
 
 	core::TimeVal blendStart_;
 	core::TimeVal blendDuration_;
+
+	//  -1: loop
+	//  2: loop twice.
+	int32_t cycles_;
 
 	// start and end blend weights for anim
 	float blendStartVal_;

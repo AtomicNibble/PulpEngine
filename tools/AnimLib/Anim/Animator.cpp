@@ -25,15 +25,17 @@ void AnimBlend::clear(void)
 {
 	pAnim_ = nullptr;
 
-	blendStartVal_ = 0.f;
-	blendEndVal_ = 0.f;
-	rate_ = 0.001f; // 1.0f;
-
 	startTime_ = 0_tv;
 	endTime_ = 0_tv;
 
 	blendStart_ = 0_tv;
 	blendDuration_ = 0_tv;
+
+	cycles_ = 1;
+
+	blendStartVal_ = 0.f;
+	blendEndVal_ = 0.f;
+	rate_ = 1.0f;
 
 	indexMap_.clear();
 }
@@ -190,6 +192,65 @@ core::TimeVal AnimBlend::animTime(core::TimeVal currentTime) const
 
 	return core::TimeVal(scaled);
 }
+
+
+void AnimBlend::setCycleCount(int32_t numCycles)
+{
+	cycles_ = numCycles;
+
+	auto duration = pAnim_->getDuration();
+
+	if (cycles_ < 0)
+	{
+		cycles_ = -1;
+		endTime_ = 0_tv;
+	}
+	else if (cycles_ == 0)
+	{
+		cycles_ = 1;
+
+		if (rate_ == 1.0f) 
+		{
+			endTime_ = startTime_ - timeOffset_ + duration;
+		}
+		else
+		{
+			core::TimeVal scaledDuration(static_cast<core::TimeVal::TimeType>(static_cast<float>(duration.GetMilliSeconds()) * rate_));
+			endTime_ = startTime_ - timeOffset_ + scaledDuration;
+		}
+	}
+	else
+	{
+		duration = core::TimeVal(duration.GetValue() * cycles_);
+
+		if (rate_ == 1.0f)
+		{
+			endTime_ = startTime_ - timeOffset_ + duration;
+		}
+		else
+		{
+			core::TimeVal scaledDuration(static_cast<core::TimeVal::TimeType>(
+				static_cast<float>(duration.GetMilliSeconds()) * rate_));
+			
+			endTime_ = startTime_ - timeOffset_ + scaledDuration;
+		}
+	}
+}
+
+void AnimBlend::setRate(float rate)
+{
+	X_ASSERT(rate >= 0.f, "Invalid rate")(rate);
+
+	if (rate_ == rate) {
+		return;
+	}
+
+	rate_ = rate;
+
+	// force a update of end time
+	setCycleCount(cycles_);
+}
+
 
 // ------------------------------
 

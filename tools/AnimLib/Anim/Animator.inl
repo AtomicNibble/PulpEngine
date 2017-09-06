@@ -7,6 +7,11 @@ X_INLINE const Anim* AnimBlend::getAnim(void) const
 	return pAnim_;
 }
 
+X_INLINE int32_t AnimBlend::getCycleCount(void) const
+{
+	return cycles_;
+}
+
 X_INLINE float AnimBlend::getStartWeight(void) const
 {
 	return blendStartVal_;
@@ -37,6 +42,10 @@ X_INLINE core::TimeVal AnimBlend::getStartTime(void) const
 	return startTime_;
 }
 
+X_INLINE core::TimeVal AnimBlend::getEndTime(void) const
+{
+	return endTime_;
+}
 
 // ---------------------------------------
 
