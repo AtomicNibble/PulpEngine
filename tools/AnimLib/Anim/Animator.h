@@ -68,7 +68,7 @@ private:
 	core::TimeVal blendDuration_;
 
 	//  -1: loop
-	//  2: loop twice.
+	//  2: play twice.
 	int32_t cycles_;
 
 	// start and end blend weights for anim
