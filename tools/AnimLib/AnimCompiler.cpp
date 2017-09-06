@@ -665,6 +665,13 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 	// now we save the data.
 	for (const auto& bone : bones_)
 	{
+		BoneFlags flags;
+		if (bone.pos.isLargeScalers()) {
+			flags.Set(BoneFlag::LargePosScalers);
+		}
+
+		stream.write(flags);
+
 		bone.ang.save(stream);
 		bone.pos.save(stream);
 	}
