@@ -114,6 +114,7 @@ struct AnimState
 
 struct FrameBlend
 {
+	int32		cylces;
 	int32		frame1;
 	int32		frame2;
 	float		frontlerp;
