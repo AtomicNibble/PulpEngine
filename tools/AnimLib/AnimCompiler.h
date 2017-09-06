@@ -51,6 +51,7 @@ class AnimCompiler
 		size_t numPosFrames(void) const;
 		bool hasData(void) const;
 		bool isFullFrames(void) const;
+		bool isLargeFrames(void) const;
 		bool isLargeScalers(void) const;
 		Vec3f minRelative(void) const;
 		const Vec3f& min(void) const;
@@ -98,6 +99,7 @@ class AnimCompiler
 		void setBaseOrient(const Quatf& ang);
 		size_t numAngleFrames(void) const;
 		bool hasData(void) const;
+		bool isLargeFrames(void) const;
 		bool isFullFrames(void) const; 
 
 		void calculateDeltas(const float angError = 0.075f);

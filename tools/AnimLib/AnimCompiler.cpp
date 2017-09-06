@@ -98,10 +98,8 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 		// if we not full frames we write frames numbers out.
  		if (!isFullFrames() && posDeltas_.size() > 1)
 		{
-			size_t numFrames = fullPos_.size();
-
 			// frame numbers are 8bit if total anim frames less than 255
-			if (numFrames <= std::numeric_limits<uint8_t>::max())
+			if (!isLargeFrames())
 			{
 				for (const PosDelta& delta : posDeltas_)
 				{
@@ -161,6 +159,11 @@ size_t AnimCompiler::Position::numPosFrames(void) const
 bool AnimCompiler::Position::hasData(void) const
 {
 	return posDeltas_.isNotEmpty();
+}
+
+bool AnimCompiler::Position::isLargeFrames(void) const
+{
+	return fullPos_.size() > std::numeric_limits<uint8_t>::max();
 }
 
 bool AnimCompiler::Position::isFullFrames(void) const
@@ -371,10 +374,8 @@ void AnimCompiler::Angle::save(core::ByteStream& stream) const
 	{
 		if (!isFullFrames() && angles_.size() > 1)
 		{
-			size_t numFrames = fullAngles_.size();
-
 			// frame numbers are 8bit if total anim frames less than 255
-			if (numFrames <= std::numeric_limits<uint8_t>::max())
+			if (!isLargeFrames())
 			{
 				for (const auto& a : angles_)
 				{
@@ -423,14 +424,14 @@ bool AnimCompiler::Angle::hasData(void) const
 	return angles_.isNotEmpty();
 }
 
+bool AnimCompiler::Angle::isLargeFrames(void) const
+{
+	return fullAngles_.size() > std::numeric_limits<uint8_t>::max();
+}
+
 bool AnimCompiler::Angle::isFullFrames(void) const
 {
-	// we have a angle for every frame ?
-#if 1
-	return false;
-#else
 	return fullAngles_.size() == angles_.size();
-#endif
 }
 
 void AnimCompiler::Angle::calculateDeltas(const float angError)
@@ -534,11 +535,12 @@ void AnimCompiler::printStats(bool verbose) const
 			X_LOG0("Anim", "pos: ^6%2" PRIuS "^7 full: ^6%d^7 largeS: ^6%d ^7min(%g,%g,%G) range(%g,%g,%g)",
 				bone.pos.numPosFrames(), bone.pos.isFullFrames(), bone.pos.isLargeScalers(),
 				min.x, min.y, min.z, r.x, r.y, r.z);
+
 		}
 	}
 }
 
-void AnimCompiler::setScale(float scale)
+void AnimCompiler::setScale(float scale) 
 {
 	scale_ = scale;
 }
@@ -668,6 +670,18 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		BoneFlags flags;
 		if (bone.pos.isLargeScalers()) {
 			flags.Set(BoneFlag::LargePosScalers);
+		}
+		if (bone.pos.isFullFrames()) {
+			flags.Set(BoneFlag::PosFullFrame);
+		}
+		if (bone.pos.isLargeFrames()) {
+			flags.Set(BoneFlag::PosLargeFrames);
+		}
+		if (bone.ang.isFullFrames()) {
+			flags.Set(BoneFlag::AngFullFrame);
+		}
+		if (bone.ang.isLargeFrames()) {
+			flags.Set(BoneFlag::AngLargeFrames);
 		}
 
 		stream.write(flags);

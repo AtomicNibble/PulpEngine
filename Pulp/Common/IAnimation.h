@@ -106,7 +106,14 @@ X_DECLARE_FLAGS8(AnimFlag)(
 
 
 X_DECLARE_FLAGS8(BoneFlag)(
-	LargePosScalers
+	LargePosScalers,
+
+	// if we have data for every frame, so we did not bother writing frame list.
+	PosFullFrame,
+	AngFullFrame,
+	// if frame numbers are 16bit
+	PosLargeFrames,
+	AngLargeFrames
 );
 
 typedef Flags8<BoneFlag> BoneFlags;
