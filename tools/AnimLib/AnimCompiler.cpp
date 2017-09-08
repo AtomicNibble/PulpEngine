@@ -788,6 +788,8 @@ void AnimCompiler::dropNullBones(void)
 			// remove it.
 			stats_.droppedBoneNames.append(bone.name);
 			bones_.removeIndex(i);
+
+			--i;
 		}
 	}
 }
