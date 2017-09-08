@@ -72,6 +72,7 @@ void AnimCompiler::Stats::print(void) const
 
 AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
 	fullPos_(arena),
+	relPos_(arena),
 	posFrames_(arena),
 	scalers_(arena)
 {
@@ -151,11 +152,6 @@ void AnimCompiler::Position::setBasePosition(const Vec3f& basePos)
 	basePosition_ = basePos;
 }
 
-void AnimCompiler::Position::setParentPosition(const Vec3f& parPos)
-{
-	parentPos_ = parPos;
-}
-
 size_t AnimCompiler::Position::numPosFrames(void) const
 {
 	return posFrames_.size();
@@ -200,6 +196,25 @@ const Vec3f& AnimCompiler::Position::range(void) const
 const Vec3f& AnimCompiler::Position::basePos(void) const
 {
 	return basePosition_;
+}
+
+const Vec3f& AnimCompiler::Position::getWorldPosForFrame(size_t idx) const
+{
+	return fullPos_[idx];
+}
+
+void AnimCompiler::Position::calculateRelativeData(const Position& parentPos)
+{
+	relPos_.resize(fullPos_.size());
+
+	for (size_t i = 0; i < fullPos_.size(); i++)
+	{
+		auto& parWorldPos = parentPos.getWorldPosForFrame(i);
+		auto& worldPod = fullPos_[i];
+		auto rel = worldPod - parWorldPos;
+
+		relPos_[i] = rel;
+	}
 }
 
 
@@ -482,7 +497,8 @@ void AnimCompiler::Angle::calculateDeltas(const float angError)
 
 AnimCompiler::Bone::Bone(core::MemoryArenaBase* arena) :
 	pos(arena),
-	ang(arena)
+	ang(arena),
+	parentIdx(-1)
 {
 
 }
@@ -792,12 +808,11 @@ void AnimCompiler::loadBaseData(void)
 				const size_t parentIdx = skelton_.getBoneParent(x);
 				const XQuatCompressedf& angle =	skelton_.getBoneAngle(x);
 				const Vec3f& pos = skelton_.getBonePos(x);
-				const Vec3f& parentPos = skelton_.getBonePos(parentIdx);
 
 				Bone& bone = bones_[i];
 				bone.pos.setBasePosition(pos);
-				bone.pos.setParentPosition(parentPos);
 				bone.ang.setBaseOrient(angle.asQuat());
+				bone.parentIdx = safe_static_cast<int32_t>(parentIdx);
 				break;
 			}
 		}
@@ -814,6 +829,9 @@ void AnimCompiler::processBones(const float posError, const float angError)
 {
 	for (auto& bone : bones_)
 	{
+		auto& parBone = bones_[bone.parentIdx];
+		bone.pos.calculateRelativeData(parBone.pos);
+
 		bone.pos.calculateDeltas(posError);
 		bone.ang.calculateDeltas(angError);
 	}

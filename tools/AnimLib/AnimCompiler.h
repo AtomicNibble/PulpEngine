@@ -46,7 +46,6 @@ class AnimCompiler
 		
 		void appendFullPos(const Vec3f& pos);
 		void setBasePosition(const Vec3f& basePos);
-		void setParentPosition(const Vec3f& basePos);
 
 		size_t numPosFrames(void) const;
 		bool hasData(void) const;
@@ -57,7 +56,10 @@ class AnimCompiler
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
 		const Vec3f& basePos(void) const;
+		const Vec3f& getWorldPosForFrame(size_t idx) const;
 
+
+		void calculateRelativeData(const Position& parentPos);
 		void calculateDeltas(const float posError = 0.075f);
 
 	private:
@@ -65,6 +67,7 @@ class AnimCompiler
 
 	private:
 		PosData fullPos_;
+		PosData relPos_;
 		PosFrameArr posFrames_;
 
 		ScalerArr scalers_;
@@ -73,7 +76,6 @@ class AnimCompiler
 		Vec3f max_;
 		Vec3f range_;
 		Vec3f basePosition_;
-		Vec3f parentPos_;
 
 		bool largeScalers_;
 		bool _pad[3];
@@ -127,6 +129,7 @@ class AnimCompiler
 		core::string name;
 		Position pos;
 		Angle ang;
+		int32_t parentIdx;
 	};
 
 	typedef core::Array<Bone> BoneArr;
