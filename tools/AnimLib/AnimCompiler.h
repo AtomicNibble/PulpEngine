@@ -29,15 +29,14 @@ class AnimCompiler
 	// we want to know what frames have changed data.
 	class Position
 	{
-		struct PosDelta
+		struct PosFrame
 		{
 			int32_t frame;
 			Vec3f worldPos;
-		//	Vec3f delta;
 		};
 
 		typedef Vec3<uint16_t> Scaler;
-		typedef core::Array<PosDelta> PosDeltaArr;
+		typedef core::Array<PosFrame> PosFrameArr;
 		typedef core::Array<Vec3f> PosData;
 		typedef core::Array<Scaler> ScalerArr;
 	public:
@@ -65,7 +64,7 @@ class AnimCompiler
 
 	private:
 		PosData fullPos_;
-		PosDeltaArr posDeltas_;
+		PosFrameArr posFrames_;
 
 		ScalerArr scalers_;
 

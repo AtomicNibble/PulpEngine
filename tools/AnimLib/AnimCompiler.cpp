@@ -72,7 +72,7 @@ void AnimCompiler::Stats::print(void) const
 
 AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
 	fullPos_(arena),
-	posDeltas_(arena),
+	posFrames_(arena),
 	scalers_(arena)
 {
 	fullPos_.setGranularity(128);
@@ -83,7 +83,7 @@ AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
 
 void AnimCompiler::Position::save(core::ByteStream& stream) const
 {
-	int16_t numPos = safe_static_cast<uint16_t>(posDeltas_.size());
+	int16_t numPos = safe_static_cast<uint16_t>(posFrames_.size());
 
 	stream.write(numPos);
 
@@ -96,22 +96,22 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 	else
 	{
 		// if we not full frames we write frames numbers out.
- 		if (!isFullFrames() && posDeltas_.size() > 1)
+ 		if (!isFullFrames() && posFrames_.size() > 1)
 		{
 			// frame numbers are 8bit if total anim frames less than 255
 			if (!isLargeFrames())
 			{
-				for (const PosDelta& delta : posDeltas_)
+				for (const PosFrame& entry : posFrames_)
 				{
-					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(delta.frame);
+					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(entry.frame);
 					stream.write(frame);
 				}
 			}
 			else
 			{
-				for (const PosDelta& delta : posDeltas_)
+				for (const PosFrame& entry : posFrames_)
 				{
-					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(delta.frame);
+					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(entry.frame);
 					stream.write(frame);
 				}
 			}
@@ -153,12 +153,12 @@ void AnimCompiler::Position::setBasePosition(const Vec3f& basePos)
 
 size_t AnimCompiler::Position::numPosFrames(void) const
 {
-	return posDeltas_.size();
+	return posFrames_.size();
 }
 
 bool AnimCompiler::Position::hasData(void) const
 {
-	return posDeltas_.isNotEmpty();
+	return posFrames_.isNotEmpty();
 }
 
 bool AnimCompiler::Position::isLargeFrames(void) const
@@ -168,7 +168,7 @@ bool AnimCompiler::Position::isLargeFrames(void) const
 
 bool AnimCompiler::Position::isFullFrames(void) const
 {
-	return posDeltas_.size() == fullPos_.size();
+	return posFrames_.size() == fullPos_.size();
 }
 
 bool AnimCompiler::Position::isLargeScalers(void) const
@@ -200,8 +200,8 @@ const Vec3f& AnimCompiler::Position::basePos(void) const
 
 void AnimCompiler::Position::calculateDeltas(const float posError)
 {
-	posDeltas_.clear();
-	posDeltas_.reserve(fullPos_.size());
+	posFrames_.clear();
+	posFrames_.reserve(fullPos_.size());
 
 	min_ = Vec3f::max();
 	max_ = Vec3f::min();
@@ -227,9 +227,9 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 		min_.checkMin(pos);
 		max_.checkMax(pos);
 
-		PosDelta& deltaEntry = posDeltas_.AddOne();
-		deltaEntry.worldPos = pos;
-		deltaEntry.frame = frameIdx;
+		PosFrame& posEntry = posFrames_.AddOne();
+		posEntry.worldPos = pos;
+		posEntry.frame = frameIdx;
 	};
 
 	// find the first frame we move
@@ -287,7 +287,7 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 		}
 	}
 
-	if (posDeltas_.isEmpty())
+	if (posFrames_.isEmpty())
 	{
 		min_ = Vec3f::zero();
 		max_ = Vec3f::zero();
@@ -323,12 +323,12 @@ void AnimCompiler::Position::buildScalers(const float posError)
 	Vec3f segmentsize(range_ / Vec3f(static_cast<float>(segments)));
 
 	scalers_.clear();
-	scalers_.reserve(posDeltas_.size());
+	scalers_.reserve(posFrames_.size());
 
-	for (auto& deltaEntry : posDeltas_)
+	for (auto& posEntry : posFrames_)
 	{
 		// we know want to know the scaler needed to get the world pos.
-		Vec3f worldDelta = deltaEntry.worldPos - min_;
+		Vec3f worldDelta = posEntry.worldPos - min_;
 		Vec3f scalerF = (worldDelta / segmentsize);
 	
 
