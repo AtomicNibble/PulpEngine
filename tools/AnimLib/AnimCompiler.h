@@ -46,6 +46,7 @@ class AnimCompiler
 		
 		void appendFullPos(const Vec3f& pos);
 		void setBasePosition(const Vec3f& basePos);
+		void setParentPosition(const Vec3f& basePos);
 
 		size_t numPosFrames(void) const;
 		bool hasData(void) const;
@@ -72,6 +73,7 @@ class AnimCompiler
 		Vec3f max_;
 		Vec3f range_;
 		Vec3f basePosition_;
+		Vec3f parentPos_;
 
 		bool largeScalers_;
 		bool _pad[3];

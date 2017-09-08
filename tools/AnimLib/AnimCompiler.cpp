@@ -151,6 +151,11 @@ void AnimCompiler::Position::setBasePosition(const Vec3f& basePos)
 	basePosition_ = basePos;
 }
 
+void AnimCompiler::Position::setParentPosition(const Vec3f& parPos)
+{
+	parentPos_ = parPos;
+}
+
 size_t AnimCompiler::Position::numPosFrames(void) const
 {
 	return posFrames_.size();
@@ -784,11 +789,14 @@ void AnimCompiler::loadBaseData(void)
 			const char* pName = skelton_.getBoneName(x);
 			if (name == pName)
 			{
+				const size_t parentIdx = skelton_.getBoneParent(x);
 				const XQuatCompressedf& angle =	skelton_.getBoneAngle(x);
 				const Vec3f& pos = skelton_.getBonePos(x);
+				const Vec3f& parentPos = skelton_.getBonePos(parentIdx);
 
 				Bone& bone = bones_[i];
 				bone.pos.setBasePosition(pos);
+				bone.pos.setParentPosition(parentPos);
 				bone.ang.setBaseOrient(angle.asQuat());
 				break;
 			}
