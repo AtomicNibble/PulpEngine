@@ -312,6 +312,9 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	}
 
 	Util::convertBoneTransToMatrix(boneMat_, bones);
+	Util::transformBones(boneMat_, model_.getTagTree(), 1, static_cast<int32_t>(boneMat_.size() - 1 ));
+
+
 	return true;
 }
 
