@@ -32,7 +32,8 @@ class AnimCompiler
 		struct PosFrame
 		{
 			int32_t frame;
-			Vec3f worldPos;
+			Vec3f relPos;
+			Vec3f delta;
 		};
 
 		typedef Vec3<uint16_t> Scaler;
@@ -45,17 +46,17 @@ class AnimCompiler
 		void save(core::ByteStream& stream) const;
 		
 		void appendFullPos(const Vec3f& pos);
-		void setBasePosition(const Vec3f& basePos);
+		void setBasePositions(const Vec3f& basePosWorld, const Vec3f& basePosRel);
 
 		size_t numPosFrames(void) const;
 		bool hasData(void) const;
 		bool isFullFrames(void) const;
 		bool isLargeFrames(void) const;
 		bool isLargeScalers(void) const;
-		Vec3f minRelative(void) const;
 		const Vec3f& min(void) const;
 		const Vec3f& range(void) const;
-		const Vec3f& basePos(void) const;
+		const Vec3f& basePosWorld(void) const;
+		const Vec3f& basePosRel(void) const;
 		const Vec3f& getWorldPosForFrame(size_t idx) const;
 
 
@@ -75,7 +76,8 @@ class AnimCompiler
 		Vec3f min_;
 		Vec3f max_;
 		Vec3f range_;
-		Vec3f basePosition_;
+		Vec3f basePosWorld_;
+		Vec3f basePosRel_;
 
 		bool largeScalers_;
 		bool _pad[3];

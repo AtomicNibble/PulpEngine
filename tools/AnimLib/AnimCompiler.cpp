@@ -87,8 +87,11 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 	int16_t numPos = safe_static_cast<uint16_t>(posFrames_.size());
 
 	stream.write(numPos);
+	if (numPos == 0) {
+		return;
+	}
 
-	auto relativeMin = minRelative();
+	auto& relativeMin = min();
 
 	if (numPos == 1)
 	{
@@ -147,9 +150,10 @@ void AnimCompiler::Position::appendFullPos(const Vec3f& pos)
 	fullPos_.append(pos);
 }
 
-void AnimCompiler::Position::setBasePosition(const Vec3f& basePos)
+void AnimCompiler::Position::setBasePositions(const Vec3f& basePosWorld, const Vec3f& basePosRel)
 {
-	basePosition_ = basePos;
+	basePosWorld_ = basePosWorld;
+	basePosRel_ = basePosRel;
 }
 
 size_t AnimCompiler::Position::numPosFrames(void) const
@@ -177,11 +181,6 @@ bool AnimCompiler::Position::isLargeScalers(void) const
 	return largeScalers_;
 }
 
-Vec3f AnimCompiler::Position::minRelative(void) const
-{
-	return min_ - basePosition_;
-}
-
 const Vec3f& AnimCompiler::Position::min(void) const
 {
 	return min_;
@@ -192,10 +191,14 @@ const Vec3f& AnimCompiler::Position::range(void) const
 	return range_;
 }
 
-
-const Vec3f& AnimCompiler::Position::basePos(void) const
+const Vec3f& AnimCompiler::Position::basePosWorld(void) const
 {
-	return basePosition_;
+	return basePosWorld_;
+}
+
+const Vec3f& AnimCompiler::Position::basePosRel(void) const
+{
+	return basePosRel_;
 }
 
 const Vec3f& AnimCompiler::Position::getWorldPosForFrame(size_t idx) const
@@ -220,8 +223,10 @@ void AnimCompiler::Position::calculateRelativeData(const Position& parentPos)
 
 void AnimCompiler::Position::calculateDeltas(const float posError)
 {
+	X_ASSERT(relPos_.size() == fullPos_.size(), "Rel pos data size mistmatch")();
+
 	posFrames_.clear();
-	posFrames_.reserve(fullPos_.size());
+	posFrames_.reserve(relPos_.size());
 
 	min_ = Vec3f::max();
 	max_ = Vec3f::min();
@@ -234,28 +239,31 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 		we don't need to bother storing.
 
 		if the rate of movement keeps chaning frames will need to be stored.
+
 	*/
 	
 	// we don't do anthing until we have moved.
-	const int32_t totalFrames = static_cast<int32_t>(fullPos_.size());
+	const int32_t totalFrames = static_cast<int32_t>(relPos_.size());
 	int32_t frame = 0;
 
 	auto addFrame = [&](int32_t frameIdx) {
 
-		const Vec3f& pos = fullPos_[frameIdx];
+		const Vec3f& pos = relPos_[frameIdx];
+		auto delta = relPos_[frameIdx] - basePosRel_;
 
-		min_.checkMin(pos);
-		max_.checkMax(pos);
+		min_.checkMin(delta);
+		max_.checkMax(delta);
 
 		PosFrame& posEntry = posFrames_.AddOne();
-		posEntry.worldPos = pos;
+		posEntry.relPos = pos;
+		posEntry.delta = delta;
 		posEntry.frame = frameIdx;
 	};
 
 	// find the first frame we move
 	for (frame = 0; frame < totalFrames; frame++)
 	{
-		auto delta = fullPos_[frame] - basePosition_;
+		auto delta = relPos_[frame] - basePosRel_;
 
 		if (!delta.compare(Vec3f::zero(), posError))
 		{
@@ -279,9 +287,9 @@ void AnimCompiler::Position::calculateDeltas(const float posError)
 		
 		for (++frame; frame < totalFrames; ++frame)
 		{
-			const Vec3f& lastStoredPos = fullPos_[lastStoredFrame];
-			const Vec3f& singleDelta = fullPos_[lastStoredFrame + 1] - lastStoredPos;
-			const Vec3f& curFramePos = fullPos_[frame];
+			const Vec3f& lastStoredPos = relPos_[lastStoredFrame];
+			const Vec3f& singleDelta = relPos_[lastStoredFrame + 1] - lastStoredPos;
+			const Vec3f& curFramePos = relPos_[frame];
 
 			int32_t numFrames = frame - lastStoredFrame;
 			
@@ -347,9 +355,10 @@ void AnimCompiler::Position::buildScalers(const float posError)
 
 	for (auto& posEntry : posFrames_)
 	{
-		// we know want to know the scaler needed to get the world pos.
-		Vec3f worldDelta = posEntry.worldPos - min_;
-		Vec3f scalerF = (worldDelta / segmentsize);
+		// we know want to know the scaler needed to get the relative pos.
+
+		const Vec3f& delta = posEntry.delta - min_;
+		Vec3f scalerF = (delta / segmentsize);
 	
 
 		Scaler scaler;
@@ -390,37 +399,40 @@ void AnimCompiler::Angle::save(core::ByteStream& stream) const
 
 	stream.write(numAngle);
 
-	if (numAngle > 0)
+	if (numAngle == 0)
 	{
-		if (!isFullFrames() && angles_.size() > 1)
+		return;
+	}
+
+
+	if (!isFullFrames() && angles_.size() > 1)
+	{
+		// frame numbers are 8bit if total anim frames less than 255
+		if (!isLargeFrames())
 		{
-			// frame numbers are 8bit if total anim frames less than 255
-			if (!isLargeFrames())
+			for (const auto& a : angles_)
 			{
-				for (const auto& a : angles_)
-				{
-					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(a.frame);
-					stream.write(frame);
-				}
-			}
-			else
-			{
-				for (const auto& a : angles_)
-				{
-					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(a.frame);
-					stream.write(frame);
-				}
+				uint8_t frame = safe_static_cast<uint8_t, uint32_t>(a.frame);
+				stream.write(frame);
 			}
 		}
-
-		// write angles
-		for (const auto& a : angles_)
+		else
 		{
-			// compressed quat.
-			XQuatCompressedf quatf(a.angle);
-			stream.write(quatf);
+			for (const auto& a : angles_)
+			{
+				uint16_t frame = safe_static_cast<uint16_t, uint32_t>(a.frame);
+				stream.write(frame);
+			}
 		}
 	}
+
+	// write angles
+	for (const auto& a : angles_)
+	{
+		// compressed quat.
+		XQuatCompressedf quatf(a.angle);
+		stream.write(quatf);
+	}	
 }
 
 void AnimCompiler::Angle::appendFullAng(const Quatf& ang)
@@ -540,20 +552,22 @@ void AnimCompiler::printStats(bool verbose) const
 
 		for (auto& bone : bones_)
 		{
-			auto min = bone.pos.minRelative();
+			auto min = bone.pos.min();
 			auto& r = bone.pos.range();
 
 			core::StackString256 info;
 
-			auto& basePos = bone.pos.basePos();
+			auto& basePos = bone.pos.basePosWorld();
+			auto& basePosRel = bone.pos.basePosRel();
 
-			X_LOG0("Anim", "-> \"%s\" basePos(^6%g^7,^6%g^7,^6%g^7)", bone.name.c_str(), basePos.x, basePos.y, basePos.z);
+			X_LOG0("Anim", "-> \"%s\" basePos(^6%g^7,^6%g^7,^6%g^7) rel(^6%g^7,^6%g^7,^6%g^7)", 
+				bone.name.c_str(), basePos.x, basePos.y, basePos.z, basePosRel.x, basePosRel.y, basePosRel.z);
 			X_LOG_BULLET;
 
 			X_LOG0("Anim", "ang: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d",
 				bone.ang.numAngleFrames(), bone.ang.isFullFrames(), bone.ang.isLargeFrames());
 
-			X_LOG0("Anim", "pos: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d large-s: ^6%d ^7min(%g,%g,%G) range(%g,%g,%g)",
+			X_LOG0("Anim", "pos: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d^7 large-s: ^6%d ^7min(%g,%g,%G) range(%g,%g,%g)",
 				bone.pos.numPosFrames(), bone.pos.isFullFrames(), bone.pos.isLargeFrames(), bone.pos.isLargeScalers(),
 				min.x, min.y, min.z, r.x, r.y, r.z);
 
@@ -807,12 +821,28 @@ void AnimCompiler::loadBaseData(void)
 			const char* pName = skelton_.getBoneName(x);
 			if (name == pName)
 			{
-				const size_t parentIdx = skelton_.getBoneParent(x);
+				size_t parentIdx = skelton_.getBoneParent(x);
 				const XQuatCompressedf& angle =	skelton_.getBoneAngle(x);
-				const Vec3f& pos = skelton_.getBonePos(x);
+				const Vec3f& posWorld = skelton_.getBonePos(x);
+				const Vec3f& posPar = skelton_.getBonePos(parentIdx);
+				Vec3f posRel = posWorld - posPar;
+
+				// work out parent index for anim.
+				const char* pParentName = skelton_.getBoneName(parentIdx);
+
+				auto it = std::find_if(bones_.begin(), bones_.end(), [pParentName](const Bone& b) {
+					return b.name == pParentName;
+				});
+
+				if (it == bones_.end()) {
+					X_ASSERT_UNREACHABLE();
+				}
+
+				parentIdx = std::distance(bones_.begin(), it);
+
 
 				Bone& bone = bones_[i];
-				bone.pos.setBasePosition(pos);
+				bone.pos.setBasePositions(posWorld, posRel);
 				bone.ang.setBaseOrient(angle.asQuat());
 				bone.parentIdx = safe_static_cast<int32_t>(parentIdx);
 				break;
