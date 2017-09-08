@@ -9,21 +9,15 @@ namespace Util
 
 
 
-	void transformBones(Matrix44f* pMats, const int32_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
+	void transformBones(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats, 
+		const uint8_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
 	{
-		for (int32_t i = firstJoint; i <= lastJoint; i++) {
-			X_ASSERT(pParents[i] < i, "Parent out of range")(pParents[i]);
-			pMats[i] *= pMats[pParents[i]];
-		}
-	}
+		X_ASSERT(lastJoint < mats.size(), "out of range")(lastJoint, mats.size());
+		X_ASSERT(firstJoint <= lastJoint, "out of range")(firstJoint, lastJoint);
 
-	void convertBoneTransToMatrix(Matrix44f* pMat, const Transformf* pTrans, size_t numBones)
-	{
-		int32_t num = safe_static_cast<int32_t>(numBones);
-		for (int32_t i = 0; i < num; i++)
-		{
-			pMat[i] = pTrans[i].quat.toMatrix44();
-			pMat[i].setTranslate(pTrans[i].pos);
+		for (int32_t i = firstJoint; i <= lastJoint; i++) {
+			X_ASSERT(pParents[i] < mats.size(), "Parent out of range")(pParents[i]);
+			mats[i] *= mats[pParents[i]];
 		}
 	}
 
