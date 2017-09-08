@@ -379,4 +379,9 @@ const Vec3f ModelSkeleton::getBonePos(size_t idx) const
 	return positions_[idx];
 }
 
+const size_t ModelSkeleton::getBoneParent(size_t idx) const
+{
+	return tree_[idx];
+}
+
 X_NAMESPACE_END

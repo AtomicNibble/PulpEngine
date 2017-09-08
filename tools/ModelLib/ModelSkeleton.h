@@ -40,6 +40,7 @@ public:
 	const char* getBoneName(size_t idx) const;
 	const Quatf getBoneAngle(size_t idx) const;
 	const Vec3f getBonePos(size_t idx) const;
+	const size_t getBoneParent(size_t idx) const;
 
 private:
 	bool LoadRawModelSkelton_int(core::XLexer& lex);
