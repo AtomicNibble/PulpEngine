@@ -121,7 +121,7 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 		// now we need to write the scalers.
 		if (isLargeScalers())
 		{
-			stream.write(scalers_.ptr(),scalers_.size());
+			stream.write(scalers_.ptr(), scalers_.size());
 		}
 		else
 		{
