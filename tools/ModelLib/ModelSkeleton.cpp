@@ -262,7 +262,14 @@ bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
 			return false;
 		}
 
-		tree_[i] = token.GetIntValue();
+		int32_t parIdx = token.GetIntValue();
+
+		if (parIdx >= 0) {
+			tree_[i] = safe_static_cast<uint8_t>(parIdx);
+		}
+		else {
+			tree_[i] = 0;
+		}
 
 		// read the string
 		if (!lex.ReadTokenOnLine(token)) {
