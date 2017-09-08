@@ -46,27 +46,30 @@ void Bone::load(core::MemCursor& cursor)
 	// positions.
 	numPos_ = cursor.getSeek<uint16_t>();
 
-	if (numPos_ == 0)
+	if (numPos_ > 0)
 	{
-		posMin_ = cursor.getSeek<Vec3f>();
-	}
-	else
-	{
-		if (numPos_ > 1)
+		if (numPos_ == 1)
 		{
-			// frame numbers.
-			pPosFrames_ = cursor.postSeekPtr<uint8_t>(numPos_);
+			posMin_ = cursor.getSeek<Vec3f>();
 		}
+		else
+		{
+			if (numPos_ > 1)
+			{
+				// frame numbers.
+				pPosFrames_ = cursor.postSeekPtr<uint8_t>(numPos_);
+			}
 
-		if (flags_.IsSet(BoneFlag::LargePosScalers)) {
-			pPosScalersLarge_ = cursor.postSeekPtr<Vec3<uint16_t>>(numPos_);
-		}
-		else {
-			pPosScalers_ = cursor.postSeekPtr<Vec3<uint8_t>>(numPos_);
-		}
+			if (flags_.IsSet(BoneFlag::LargePosScalers)) {
+				pPosScalersLarge_ = cursor.postSeekPtr<Vec3<uint16_t>>(numPos_);
+			}
+			else {
+				pPosScalers_ = cursor.postSeekPtr<Vec3<uint8_t>>(numPos_);
+			}
 
-		posMin_ = cursor.getSeek<Vec3f>();
-		posRange_ = cursor.getSeek<Vec3f>();
+			posMin_ = cursor.getSeek<Vec3f>();
+			posRange_ = cursor.getSeek<Vec3f>();
+		}
 	}
 }
 
