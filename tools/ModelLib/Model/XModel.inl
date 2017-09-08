@@ -139,4 +139,9 @@ X_INLINE const char* XModel::getBoneName(int32_t idx) const
 	return pBoneName;
 }
 
+X_INLINE const uint8_t*	XModel::getTagTree(void) const
+{
+	return pTagTree_;
+}
+
 X_NAMESPACE_END
