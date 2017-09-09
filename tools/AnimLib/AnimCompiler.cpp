@@ -571,25 +571,54 @@ void AnimCompiler::printStats(bool verbose) const
 
 		for (auto& bone : bones_)
 		{
-			auto min = bone.pos.min();
-			auto& r = bone.pos.range();
-
 			core::StackString256 info;
 
-			auto& basePos = bone.pos.basePosWorld();
-			auto& basePosRel = bone.pos.basePosRel();
 
-			X_LOG0("Anim", "-> \"%s\" basePos(^6%g^7,^6%g^7,^6%g^7) rel(^6%g^7,^6%g^7,^6%g^7)", 
-				bone.name.c_str(), basePos.x, basePos.y, basePos.z, basePosRel.x, basePosRel.y, basePosRel.z);
+			X_LOG0("Anim", "-> \"%s\"", bone.name.c_str());
 			X_LOG_BULLET;
+
+			auto basePosRel = bone.pos.basePosRel();
+			basePosRel *= 2.54f;
+
+			X_LOG0("Anim", "rel: ^6%g^7,^6%g^7,^6%g^7", basePosRel.x, basePosRel.y, basePosRel.z);
 
 			X_LOG0("Anim", "ang: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d",
 				bone.ang.numAngleFrames(), bone.ang.isFullFrames(), bone.ang.isLargeFrames());
 
-			X_LOG0("Anim", "pos: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d^7 large-s: ^6%d ^7min(%g,%g,%G) range(%g,%g,%g)",
-				bone.pos.numPosFrames(), bone.pos.isFullFrames(), bone.pos.isLargeFrames(), bone.pos.isLargeScalers(),
-				min.x, min.y, min.z, r.x, r.y, r.z);
+			if (bone.ang.hasData())
+			{
+				X_LOG_BULLET;
 
+				auto& angles = bone.ang.getAngles();
+
+				for (auto& a : angles)
+				{
+					auto euler = a.angle.getEulerDegrees();
+					X_LOG0("Anim", "Angle(%" PRIi32 "): ^2(%g,%g,%g) %g^7 e: (%g,%g,%g)", 
+						a.frame, a.angle.v.x, a.angle.v.y, a.angle.v.z, a.angle.w, euler.x, euler.y, euler.z);
+				}
+			}
+
+			X_LOG0("Anim", "pos: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d^7 large-s: ^6%d",
+				bone.pos.numPosFrames(), bone.pos.isFullFrames(), bone.pos.isLargeFrames(), bone.pos.isLargeScalers());
+
+			if (bone.pos.hasData())
+			{
+				X_LOG_BULLET;
+
+				auto min = bone.pos.min();
+				auto& r = bone.pos.range();
+
+				X_LOG0("Anim", "min(%g,%g,%G)", min.x, min.y, min.z);
+				X_LOG0("Anim", "range(%g,%g,%g)", r.x, r.y, r.z);
+
+				auto& pos = bone.pos.getPositions();
+
+				for (auto& p : pos)
+				{
+					X_LOG0("Anim", "Pos(%" PRIi32 "): ^2(%g,%g,%g)", p.frame, p.delta.x, p.delta.y, p.delta.z);
+				}
+			}
 		}
 	}
 }
