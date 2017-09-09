@@ -1516,8 +1516,6 @@ MStatus ModelExporter::getBindPose(MayaBone& bone)
 			euler.x, euler.y, euler.z,
 			scale.x, scale.y, scale.z
 		);
-
-		MayaUtil::PrintMatrix(X_STRINGIZE(bone.bindRotation), bone.bindRotation);
 	}
 
 	return status;
