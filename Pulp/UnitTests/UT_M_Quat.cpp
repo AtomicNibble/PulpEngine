@@ -130,23 +130,23 @@ TEST(XQuat, Slerp) {
 
 }
 
-
 TEST(XQuat, Axis) {
 
-	Quatf a(0.5f, 0.25f, 0.50f, 0.75f);
+	Quatf a(0.49879f, 0.232f, 0.463f, 0.695f);
+
+	EXPECT_NEAR(1.f, a.length(), 0.00001f);
 
 	float32_t pitch = a.getPitch();
-	float32_t roll = a.getRoll();
 	float32_t yaw = a.getYaw();
+	float32_t roll = a.getRoll();
 
-	EXPECT_FLOAT_EQ(1.10714877f, pitch);
-	EXPECT_FLOAT_EQ(2.03444386f, roll);
-	EXPECT_FLOAT_EQ(0.124674730f, yaw);
+	EXPECT_FLOAT_EQ(1.08355474f, pitch);
+	EXPECT_FLOAT_EQ(0.139854997f, yaw);
+	EXPECT_FLOAT_EQ(1.98085940f, roll);
 
 	Vec3f vec = a.getAxis();
 
-	EXPECT_NEAR_VEC3(Vec3f(0.288675129f, 0.577350259f, 0.866025388f), vec, 0.00001f);
-
+	EXPECT_NEAR_VEC3(Vec3f(0.267674923f, 0.534196079f, 0.801871061f), vec, 0.00001f);
 }
 
 
