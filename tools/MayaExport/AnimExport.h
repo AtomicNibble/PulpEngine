@@ -18,9 +18,9 @@ X_NAMESPACE_BEGIN(maya)
 
 struct FrameData
 {
-	MVector position;
-	MVector scale;
-	MQuaternion rotation;
+	Vec3f position;
+	Vec3f scale;
+	Quatd rotation;
 };
 
 struct Bone

@@ -374,8 +374,6 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 		MayaUtil::MayaPrintVerbose("Loading frame: %" PRIi32, curFrame);
 		{
-			MVector position;
-
 			size_t i, num = bones_.size();
 			for (i = 0; i < num; i++)
 			{
@@ -383,32 +381,33 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 				MayaUtil::MayaPrintVerbose("Bone(%" PRIuS "): %s", i, bone.name.asChar());
 
-
 				MTransformationMatrix worldMatrix = bone.dag.inclusiveMatrix();
-				FrameData& data = bone.data.AddOne();
-
-				data.position.x = worldMatrix.asMatrix()(3, 0);
-				data.position.y = worldMatrix.asMatrix()(3, 1);
-				data.position.z = worldMatrix.asMatrix()(3, 2);
-
+				
+				// don't use this for rotation it's scaled.
+				MMatrix scaledMatrix = worldMatrix.asMatrix();
+				
 				// rotation.
-				double qx, qy, qz, qw;
-				worldMatrix.getRotationQuaternion(qx, qy, qz, qw);
+				Quatd quat;
+				worldMatrix.getRotationQuaternion(quat.v.x, quat.v.y, quat.v.z, quat.w);
 
-				data.rotation = MQuaternion(qx, qy, qz, qw);
-				data.scale = MVector::one;
+				FrameData& data = bone.data.AddOne();
+				data.scale = Vec3f::one();
+				data.position = MayaUtil::XVec(scaledMatrix);
+				data.rotation = quat;
+
 
 				if(MayaUtil::IsVerbose())
 				{
-					MEulerRotation euler = data.rotation.asEulerRotation();
-					const MQuaternion& q = data.rotation;
-
+					const auto& q = data.rotation;
+					const auto euler = q.getEulerDegrees();
+					
 					MayaUtil::MayaPrintVerbose("pos: (%g,%g,%g)",
 						data.position.x, data.position.y, data.position.z);
 					MayaUtil::MayaPrintVerbose("ang: (%g,%g,%g) quat: (%g,%g,%g,%g)",
-						::toDegrees(euler.x), ::toDegrees(euler.y), ::toDegrees(euler.z),
-						q.x, q.y, q.z, q.w);
+						euler.x, euler.y, euler.z, 
+						q.v.x, q.v.y, q.v.z, q.w);
 				}
+
 			}
 		}
 		MayaUtil::IncProcess();
@@ -480,25 +479,22 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 			const FrameData& data = bone.data[i];
 
 			buf.clear();
-			buf.append("POS ");
-			buf.appendFmt("( %f %f %f )\n",
+			buf.appendFmt("POS ( %f %f %f )\n",
 				data.position.x,
 				data.position.y,
 				data.position.z);
 
-			buf.append("SCALE ");
-			buf.appendFmt("( %.4g %.4g %.4g )\n",
+			buf.appendFmt("SCALE ( %.4g %.4g %.4g )\n",
 				data.scale.x,
 				data.scale.y,
 				data.scale.z);
 
-			buf.append("ANG ");
-			buf.appendFmt("( %.8g %.8g %.4g %.8g )\n",
-				data.rotation.x,
-				data.rotation.y,
-				data.rotation.z,
+			buf.appendFmt("ANG ( %.8g %.8g %.8g %.8g )\n",
+				data.rotation.v.x,
+				data.rotation.v.y,
+				data.rotation.v.z,
 				data.rotation.w);
-
+		
 			buf.append("\n");
 
 			stream.write(buf.c_str(), buf.length());
