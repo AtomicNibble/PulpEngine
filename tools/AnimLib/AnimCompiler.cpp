@@ -832,7 +832,7 @@ void AnimCompiler::loadBaseData(void)
 			if (name == pName)
 			{
 				size_t parentIdx = skelton_.getBoneParent(x);
-				const XQuatCompressedf& angle =	skelton_.getBoneAngle(x);
+				const Quatf& angle = skelton_.getBoneAngle(x);
 				const Vec3f& posWorld = skelton_.getBonePos(x);
 				const Vec3f& posPar = skelton_.getBonePos(parentIdx);
 				Vec3f posRel = posWorld - posPar;
@@ -853,7 +853,7 @@ void AnimCompiler::loadBaseData(void)
 
 				Bone& bone = bones_[i];
 				bone.pos.setBasePositions(posWorld, posRel);
-				bone.ang.setBaseOrient(angle.asQuat());
+				bone.ang.setBaseOrient(angle);
 				bone.parentIdx = safe_static_cast<int32_t>(parentIdx);
 				break;
 			}
