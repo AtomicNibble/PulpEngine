@@ -300,6 +300,23 @@ bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
 			return false;
 		}
 
+		// scale
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read 'SCALE' token");
+			return false;
+		}
+
+		if (!token.isEqual("SCALE")) {
+			X_ERROR("RawModel", "Failed to read 'SCALE' token");
+			return false;
+		}
+
+		Vec3f scale;
+		if (!lex.Parse1DMatrix(3, &scale[0])) {
+			X_ERROR("RawModel", "Failed to read 'SCALE' token data");
+			return false;
+		}
+
 		// ang
 		if (!lex.ReadToken(token)) {
 			X_ERROR("RawModel", "Failed to read 'ANG' token");
