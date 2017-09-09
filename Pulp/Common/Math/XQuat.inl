@@ -26,7 +26,7 @@ X_INLINE T Quat<T>::getPitch() const
 template<typename T>
 X_INLINE T Quat<T>::getYaw() const
 {
-	return math<T>::sin((T)-2 * (v.x * v.z - w * v.y));
+	return math<T>::asin((T)-2 * (v.x * v.z - w * v.y));
 }
 
 template<typename T>
