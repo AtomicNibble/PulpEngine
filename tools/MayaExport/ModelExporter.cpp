@@ -1211,9 +1211,6 @@ MStatus ModelExporter::loadBones(void)
 {
 	MStatus			status;
 	MDagPath		dagPath;
-	MFnDagNode		*parentNode;
-	MayaBone		*pMayaBone;
-	uint				i, j;
 
 	float scale = 1.f; // g_options.scale_;
 
@@ -1259,14 +1256,15 @@ MStatus ModelExporter::loadBones(void)
 
 		size_t idx = mayaBones_.append(new_bone);
 
-		pMayaBone = &mayaBones_[idx];
+		MayaBone* pMayaBone = &mayaBones_[idx];
 		pMayaBone->index = safe_static_cast<int, size_t>((mayaBones_.size() - 1));
 	}
 
 
 	// create hierarchy
-	pMayaBone = mayaBones_.ptr();
-	for (i = 0; i < mayaBones_.size(); i++, pMayaBone++) {
+	MayaBone* pMayaBone = mayaBones_.ptr();
+	for (size_t i = 0; i < mayaBones_.size(); i++, pMayaBone++) 
+	{
 		if (!pMayaBone->dagnode) {
 			continue;
 		}
@@ -1274,11 +1272,11 @@ MStatus ModelExporter::loadBones(void)
 		pMayaBone->mayaNode.setParent(mayaHead_);
 		pMayaBone->exportNode.setParent(exportHead_);
 
-		parentNode = GetParentBone(pMayaBone->dagnode);
-		if (parentNode) {
-
+		auto parentNode = GetParentBone(pMayaBone->dagnode);
+		if (parentNode) 
+		{
 			// do we have this joint?
-			for (j = 0; j < mayaBones_.size(); j++) {
+			for (size_t j = 0; j < mayaBones_.size(); j++) {
 				if (!mayaBones_[j].dagnode) {
 					continue;
 				}
@@ -1289,7 +1287,6 @@ MStatus ModelExporter::loadBones(void)
 					break;
 				}
 			}
-			X_DELETE(parentNode, g_arena);
 		}
 
 		pMayaBone->dagnode->getPath(dagPath);
@@ -1310,8 +1307,7 @@ MStatus ModelExporter::loadBones(void)
 		bones_.reserve(mayaBones_.size());
 
 		pMayaBone = nullptr;
-		for (pMayaBone = exportHead_.next(); pMayaBone != nullptr;
-				pMayaBone = pMayaBone->exportNode.next())
+		for (pMayaBone = exportHead_.next(); pMayaBone != nullptr; pMayaBone = pMayaBone->exportNode.next())
 		{
 			model::RawModel::Bone bone;
 			bone.name_ = pMayaBone->name.c_str();
@@ -1366,39 +1362,38 @@ void ModelExporter::GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle
 	}
 }
 
-MFnDagNode* ModelExporter::GetParentBone(MFnDagNode* pBone)
+core::UniquePointer<MFnDagNode> ModelExporter::GetParentBone(MFnDagNode* pBone)
 {
 	X_ASSERT_NOT_NULL(pBone);
 
 	MStatus		status;
 	MObject		parentObject;
 
+	core::UniquePointer<MFnDagNode> node;
+
 	parentObject = pBone->parent(0, &status);
 	if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-		return NULL;
+		return node;
 	}
 
 	while (!parentObject.hasFn(MFn::kTransform)) {
 		MFnDagNode parentNode(parentObject, &status);
 		if (!status) {
-			return NULL;
+			return node;
 		}
 
 		parentObject = parentNode.parent(0, &status);
 		if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-			return NULL;
+			return node;
 		}
 	}
 
-	MFnDagNode *parentNode;
-
-	parentNode = X_NEW(MFnDagNode, g_arena, "ParentDagNode")(parentObject, &status);
+	node = core::makeUnique<MFnDagNode>(g_arena, parentObject, &status); 
 	if (!status) {
-		X_DELETE(parentNode, g_arena);
-		return NULL;
+		node.reset();
 	}
 
-	return parentNode;
+	return node;
 }
 
 
@@ -1415,28 +1410,28 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 
 	bool set = false;
 
-	if (MS::kSuccess == status) {
-		unsigned	ii;
-		unsigned	jointIndex;
-		unsigned	connLength;
+	if (MS::kSuccess == status)
+	{
 		MPlugArray	connPlugs;
 		MPlug		pBindPose(jointNode, aBindPose);
 
 		pBindPose.connectedTo(connPlugs, false, true);
-		connLength = connPlugs.length();
-		for (ii = 0; ii < connLength; ++ii) {
-			if (connPlugs[ii].node().apiType() == MFn::kDagPose) {
-				MObject			aMember = connPlugs[ii].attribute();
+		for (uint32_t i = 0; i < connPlugs.length(); ++i)
+		{
+			if (connPlugs[i].node().apiType() == MFn::kDagPose) 
+			{
+				MObject			aMember = connPlugs[i].attribute();
 				MFnAttribute	fnAttr(aMember);
 
-				if (fnAttr.name() == "worldMatrix") {
-					jointIndex = connPlugs[ii].logicalIndex();
+				if (fnAttr.name() == "worldMatrix")
+				{
+					uint32_t jointIndex = connPlugs[i].logicalIndex();
 
-					MFnDependencyNode nDagPose(connPlugs[ii].node());
+					MFnDependencyNode nDagPose(connPlugs[i].node());
 
 					// construct plugs for this joint's world matrix
 					MObject aWorldMatrix = nDagPose.attribute("worldMatrix");
-					MPlug	pWorldMatrix(connPlugs[ii].node(), aWorldMatrix);
+					MPlug	pWorldMatrix(connPlugs[i].node(), aWorldMatrix);
 
 					pWorldMatrix.selectAncestorLogicalIndex(jointIndex, aWorldMatrix);
 
@@ -1445,8 +1440,7 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 					status = pWorldMatrix.getValue(worldMatrix);
 					if (MS::kSuccess != status) {
 						// Problem retrieving world matrix
-						MayaUtil::MayaPrintError("failed to get world matrix for bone(1): %s",
-							pBone->name.c_str());
+						MayaUtil::MayaPrintError("failed to get world matrix for bone(1): %s", pBone->name.c_str());
 						return status;
 					}
 
@@ -1456,25 +1450,21 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 					pBone->bindm33 = MayaUtil::ConvertToGameSpace(MayaUtil::XMat(wMatrix));
 					pBone->bindpos = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(wMatrix)) * scale;
 
-					//if (!options.ignoreScale) {
-					//	joint->bindpos *= joint->scale;
-					//}
 					set = true;
 					break;
 				}
 			}
 		}
 	}
-	else {
-		MayaUtil::MayaPrintError("error getting bind pose for '%s' error: %s",
-			pBone->name.c_str(), status.errorString().asChar());
+	else 
+	{
+		MayaUtil::MayaPrintError("error getting bind pose for '%s' error: %s", pBone->name.c_str(), status.errorString().asChar());
 	}
 
 	// failed to get the bind pose :(
 	if (!set)
 	{
-		MayaUtil::MayaPrintVerbose("failed to get bind pose for bone: %s",
-			pBone->name.c_str());
+		MayaUtil::MayaPrintVerbose("failed to get bind pose for bone: %s", pBone->name.c_str());
 
 		// try get world pos.
 

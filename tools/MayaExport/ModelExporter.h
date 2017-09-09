@@ -82,7 +82,7 @@ private:
 
 private:
 	static void GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);
-	static MFnDagNode* GetParentBone(MFnDagNode* pBone);
+	static core::UniquePointer<MFnDagNode> GetParentBone(MFnDagNode* pBone);
 	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
 	static core::StackString<60> getMeshDisplayName(const MString& fullname);
 	static bool getMeshMaterial(MDagPath& dagPath, model::RawModel::Material& material);
