@@ -18,6 +18,7 @@ namespace RawModel
 
 		core::string name_;
 		Vec3f worldPos_;
+		Vec3f scale_;
 		Matrix33f rotation_;
 		int32_t parIndx_;
 	};

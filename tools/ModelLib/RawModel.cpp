@@ -258,6 +258,22 @@ namespace RawModel
 				return false;
 			}
 
+			// scale
+			if (!lex.ReadToken(token)) {
+				X_ERROR("RawModel", "Failed to read 'SCALE' token");
+				return false;
+			}
+
+			if (!token.isEqual("SCALE")) {
+				X_ERROR("RawModel", "Failed to read 'SCALE' token");
+				return false;
+			}
+
+			if (!lex.Parse1DMatrix(3, &bone.scale_[0])) {
+				X_ERROR("RawModel", "Failed to read 'SCALE' token data");
+				return false;
+			}
+
 			// ang
 			if (!lex.ReadToken(token)) {
 				X_ERROR("RawModel", "Failed to read 'ANG' token");
@@ -691,6 +707,7 @@ namespace RawModel
 		{
 			pCurBuf->appendFmt("BONE %" PRIi32 " \"%s\"\n", bone.parIndx_, bone.name_.c_str());
 			pCurBuf->appendFmt("POS (%f %f %f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
+			pCurBuf->appendFmt("SCALE (%f %f %f)\n", bone.scale_.x, bone.scale_.y, bone.scale_.z);
 			auto ang = bone.rotation_;
 			pCurBuf->appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n",
 				ang.m00, ang.m01, ang.m02, 
