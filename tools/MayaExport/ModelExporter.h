@@ -20,22 +20,26 @@ class MFnDagNode;
 
 struct MayaBone
 {
+	X_NO_COPY(MayaBone);
+	X_NO_ASSIGN(MayaBone);
+public:
 	MayaBone();
-	MayaBone(const MayaBone& oth);
+	MayaBone(MayaBone&& oth);
 
-	MayaBone& operator=(const MayaBone &oth);
+	MayaBone& operator=(MayaBone&& oth);
 
 	size_t getDataSize() const {
 		return name.length() + sizeof(XQuatCompressedf) + sizeof(Vec3f) + 2;
 	}
 
 	core::StackString<128> name;
-	MFnDagNode* dagnode;
+	core::UniquePointer<MFnDagNode> dagnode;
 
 	uint32_t index;
 
+	Vec3f		scale;
 	Vec3f		bindpos;
-	Matrix33f	bindm33;
+	Matrix33f	bindRotation;
 
 	Hierarchy<MayaBone> mayaNode;
 	Hierarchy<MayaBone> exportNode;
@@ -81,9 +85,9 @@ private:
 	MayaBone* findJointReal(const char* pName);
 
 private:
-	static void GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);
-	static core::UniquePointer<MFnDagNode> GetParentBone(MFnDagNode* pBone);
-	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
+	static void getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);
+	static core::UniquePointer<MFnDagNode> getParentBone(MFnDagNode* pBone);
+	static MStatus getBindPose(MayaBone& bone);
 	static core::StackString<60> getMeshDisplayName(const MString& fullname);
 	static bool getMeshMaterial(MDagPath& dagPath, model::RawModel::Material& material);
 	static MObject FindShader(MObject& setNode);
