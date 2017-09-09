@@ -12,7 +12,7 @@ namespace Util
 	void transformBones(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats, 
 		const uint8_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
 	{
-		X_ASSERT(lastJoint < mats.size(), "out of range")(lastJoint, mats.size());
+		X_ASSERT(lastJoint < safe_static_cast<int32_t>(mats.size()), "out of range")(lastJoint, mats.size());
 		X_ASSERT(firstJoint <= lastJoint, "out of range")(firstJoint, lastJoint);
 
 		for (int32_t i = firstJoint; i <= lastJoint; i++) {
