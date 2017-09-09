@@ -106,6 +106,9 @@ class AnimCompiler
 		bool hasData(void) const;
 		bool isLargeFrames(void) const;
 		bool isFullFrames(void) const; 
+		
+		const Quatf& getAngForFrame(size_t idx) const;
+		const AngleFrameArr& getAngles(void) const;
 
 		void calculateDeltas(const float angError = 0.075f);
 

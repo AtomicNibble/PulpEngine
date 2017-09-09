@@ -466,6 +466,16 @@ bool AnimCompiler::Angle::isFullFrames(void) const
 	return fullAngles_.size() == angles_.size();
 }
 
+const Quatf& AnimCompiler::Angle::getAngForFrame(size_t idx) const
+{
+	return fullAngles_[idx];
+}
+
+const AnimCompiler::Angle::AngleFrameArr& AnimCompiler::Angle::getAngles(void) const
+{
+	return angles_;
+}
+
 void AnimCompiler::Angle::calculateDeltas(const float angError)
 {
 	angles_.clear();
