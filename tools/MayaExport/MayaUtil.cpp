@@ -113,6 +113,26 @@ namespace MayaUtil
 		}
 	}
 
+	void PrintMatrix(const char* pName, const Matrix33f& mat)
+	{
+		auto colx = mat.getColumn(0);
+		auto coly = mat.getColumn(1);
+		auto colz = mat.getColumn(2);
+
+		MayaUtil::MayaPrintVerbose("%s matrix:", pName);
+		MayaUtil::MayaPrintVerbose("x (%f,%f,%f)", colx.x, colx.y, colx.z);
+		MayaUtil::MayaPrintVerbose("y (%f,%f,%f)", coly.x, coly.y, coly.z);
+		MayaUtil::MayaPrintVerbose("z (%f,%f,%f)", colz.x, colz.y, colz.z);
+	}
+
+	void PrintMatrix(const char* pName, const MMatrix& mat)
+	{
+		MayaUtil::MayaPrintVerbose("%s matrix:", pName);
+		MayaUtil::MayaPrintVerbose("x (%f,%f,%f,%f)", mat(0, 0), mat(1, 0), mat(2, 0), mat(3, 0));
+		MayaUtil::MayaPrintVerbose("y (%f,%f,%f,%f)", mat(0, 1), mat(1, 1), mat(2, 1), mat(3, 1));
+		MayaUtil::MayaPrintVerbose("z (%f,%f,%f,%f)", mat(0, 2), mat(1, 2), mat(2, 2), mat(3, 2));
+		MayaUtil::MayaPrintVerbose("w (%f,%f,%f,%f)", mat(0, 3), mat(1, 3), mat(2, 3), mat(3, 3));
+	}
 
 	void SetProgressCtrl(const MString& str)
 	{

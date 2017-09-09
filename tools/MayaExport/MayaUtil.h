@@ -17,6 +17,8 @@ namespace MayaUtil
 	void MayaPrintMsg(const char *fmt, ...);
 	void MayaPrintVerbose(const char *fmt, ...);
 
+	void PrintMatrix(const char* pName, const Matrix33f& mat);
+	void PrintMatrix(const char* pName, const MMatrix& mat);
 
 
 	void SetProgressCtrl(const MString& str);
