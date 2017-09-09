@@ -5,6 +5,7 @@
 
 #include <EngineCommon.h>
 
+#include <Util\UniquePointer.h>
 
 // #define WIN32_LEAN_AND_MEAN            
 #include <windows.h>
