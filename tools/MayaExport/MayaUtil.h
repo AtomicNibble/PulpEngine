@@ -37,12 +37,7 @@ namespace MayaUtil
 
 	X_INLINE Vec3f ConvertToGameSpace(const Vec3f &pos) {
 		Vec3f idpos;
-		// we are Z up.
 		idpos.x = pos.x;
-
-		// idpos.y = -pos.z;
-		// idpos.z = pos.y;
-
 		idpos.y = pos.y;
 		idpos.z = pos.z;
 		return idpos;
