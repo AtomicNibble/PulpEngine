@@ -22,7 +22,6 @@
 X_LINK_LIB("Engine_Core");
 
 
-extern HINSTANCE g_hInstance;
 
 
 EngineApp::EngineApp() :
