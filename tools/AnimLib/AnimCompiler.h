@@ -26,6 +26,8 @@ class AnimCompiler
 		core::Array<core::string> droppedBoneNames;
 	};
 
+	class Angle;
+
 	// we want to know what frames have changed data.
 	class Position
 	{
@@ -59,8 +61,9 @@ class AnimCompiler
 		const Vec3f& basePosRel(void) const;
 		const Vec3f& getWorldPosForFrame(size_t idx) const;
 
+		const PosFrameArr& getPositions(void) const;
 
-		void calculateRelativeData(const Position& parentPos);
+		void calculateRelativeData(const Position& parentPos, const Angle& parentAng);
 		void calculateDeltas(const float posError = 0.075f);
 
 	private:

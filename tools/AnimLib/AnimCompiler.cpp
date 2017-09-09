@@ -206,7 +206,12 @@ const Vec3f& AnimCompiler::Position::getWorldPosForFrame(size_t idx) const
 	return fullPos_[idx];
 }
 
-void AnimCompiler::Position::calculateRelativeData(const Position& parentPos)
+const AnimCompiler::Position::PosFrameArr& AnimCompiler::Position::getPositions(void) const
+{
+	return posFrames_;
+}
+
+void AnimCompiler::Position::calculateRelativeData(const Position& parentPos, const Angle& parentAng)
 {
 	relPos_.resize(fullPos_.size());
 
@@ -216,7 +221,11 @@ void AnimCompiler::Position::calculateRelativeData(const Position& parentPos)
 		auto& worldPod = fullPos_[i];
 		auto rel = worldPod - parWorldPos;
 
-		relPos_[i] = rel;
+		// remove the rotation?
+		auto& angle = parentAng.getAngForFrame(i);
+		auto unRotatedRel = rel * angle.inverse();
+
+		relPos_[i] = unRotatedRel;
 	}
 }
 
@@ -833,9 +842,9 @@ void AnimCompiler::loadBaseData(void)
 			{
 				size_t parentIdx = skelton_.getBoneParent(x);
 				const Quatf& angle = skelton_.getBoneAngle(x);
+				const Quatf& anglePar =	skelton_.getBoneAngle(parentIdx);
 				const Vec3f& posWorld = skelton_.getBonePos(x);
 				const Vec3f& posPar = skelton_.getBonePos(parentIdx);
-				Vec3f posRel = posWorld - posPar;
 
 				// work out parent index for anim.
 				const char* pParentName = skelton_.getBoneName(parentIdx);
@@ -850,6 +859,8 @@ void AnimCompiler::loadBaseData(void)
 
 				parentIdx = std::distance(bones_.begin(), it);
 
+				Vec3f posRel = posWorld - posPar;
+				posRel = posRel * anglePar.inverse();
 
 				Bone& bone = bones_[i];
 				bone.pos.setBasePositions(posWorld, posRel);
@@ -872,7 +883,7 @@ void AnimCompiler::processBones(const float posError, const float angError)
 	for (auto& bone : bones_)
 	{
 		auto& parBone = bones_[bone.parentIdx];
-		bone.pos.calculateRelativeData(parBone.pos);
+		bone.pos.calculateRelativeData(parBone.pos, parBone.ang);
 
 		bone.pos.calculateDeltas(posError);
 		bone.ang.calculateDeltas(angError);
