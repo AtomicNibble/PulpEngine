@@ -78,13 +78,11 @@ namespace MayaUtil
 		return Vec3f((float)matrix[3][0], (float)matrix[3][1], (float)matrix[3][2]);
 	}
 
-	X_INLINE Matrix33f XMat(const MMatrix& matrix) {
-		int		j, k;
+	X_INLINE Matrix33f XMat(const MMatrix& matrix) {	
 		Matrix33f	mat;
 
-
-		for (j = 0; j < 3; j++) {
-			for (k = 0; k < 3; k++) {
+		for (int32_t j = 0; j < 3; j++) {
+			for (int32_t k = 0; k < 3; k++) {
 				mat.at(j, k) = static_cast<float>(matrix(j,k));
 			}
 		}
