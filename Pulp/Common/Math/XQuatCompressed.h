@@ -17,8 +17,8 @@ public:
 
 public:
 	XQuatCompressed();
-	XQuatCompressed(const Quat<T>& q);
-	XQuatCompressed(const Matrix33<T>& m);
+	explicit XQuatCompressed(const Quat<T>& q);
+	explicit XQuatCompressed(const Matrix33<T>& m);
 	XQuatCompressed(T aW, T x, T y, T z);
 
 	void set(const Quat<T>& q);
