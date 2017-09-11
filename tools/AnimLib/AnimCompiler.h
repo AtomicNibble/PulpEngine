@@ -64,6 +64,7 @@ class AnimCompiler
 		const PosFrameArr& getPositions(void) const;
 
 		void calculateRelativeData(const Position& parentPos, const Angle& parentAng);
+		void calculateRelativeDataRoot(void);
 		void calculateDeltas(const float posError = 0.075f);
 
 	private:
@@ -138,6 +139,7 @@ class AnimCompiler
 		Position pos;
 		Angle ang;
 		int32_t parentIdx;
+		int32_t depth;
 	};
 
 	typedef core::Array<Bone> BoneArr;
@@ -173,6 +175,7 @@ private:
 	void dropMissingBones(void);
 	void dropNullBones(void);
 	void loadBaseData(void);
+	void sortBones(void);
 	void processBones(const float posError, const float angError);
 
 private:

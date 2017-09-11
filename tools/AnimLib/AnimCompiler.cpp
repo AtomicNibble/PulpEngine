@@ -229,6 +229,11 @@ void AnimCompiler::Position::calculateRelativeData(const Position& parentPos, co
 	}
 }
 
+void AnimCompiler::Position::calculateRelativeDataRoot(void)
+{
+	relPos_ = fullPos_;
+}
+
 
 void AnimCompiler::Position::calculateDeltas(const float posError)
 {
@@ -529,7 +534,8 @@ void AnimCompiler::Angle::calculateDeltas(const float angError)
 AnimCompiler::Bone::Bone(core::MemoryArenaBase* arena) :
 	pos(arena),
 	ang(arena),
-	parentIdx(-1)
+	parentIdx(-1),
+	depth(-1)
 {
 
 }
@@ -687,6 +693,7 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 
 	// load base bone positions from model skelton.
 	loadBaseData();
+	sortBones();
 	processBones(posError, angError);
 
 	// cull any without data.
@@ -894,7 +901,13 @@ void AnimCompiler::loadBaseData(void)
 				Bone& bone = bones_[i];
 				bone.pos.setBasePositions(posWorld, posRel);
 				bone.ang.setBaseOrient(angle);
-				bone.parentIdx = safe_static_cast<int32_t>(parentIdx);
+
+				if (parentIdx == i) {
+					bone.parentIdx = -1;
+				}
+				else {
+					bone.parentIdx = safe_static_cast<int32_t>(parentIdx);
+				}
 				break;
 			}
 		}
@@ -906,13 +919,41 @@ void AnimCompiler::loadBaseData(void)
 	}
 }
 
+void AnimCompiler::sortBones(void)
+{
+	for (size_t i = 0; i<bones_.size(); i++)
+	{
+		auto& bone = bones_[i];
+		bone.depth = 0;
+
+		auto* pCurBone = &bone;
+		while (pCurBone->parentIdx >= 0)
+		{
+			pCurBone = &bones_[pCurBone->parentIdx];
+			bone.depth++;
+		}
+	}
+
+	// sort the bones so they are in depth order.
+	std::sort(bones_.begin(), bones_.end(), [](const Bone& lhs, const Bone& rhs) {
+		return lhs.depth < rhs.depth;
+	});
+}
+
 
 void AnimCompiler::processBones(const float posError, const float angError)
 {
 	for (auto& bone : bones_)
 	{
-		auto& parBone = bones_[bone.parentIdx];
-		bone.pos.calculateRelativeData(parBone.pos, parBone.ang);
+		if(bone.parentIdx >= 0)
+		{
+			auto& parBone = bones_[bone.parentIdx];
+			bone.pos.calculateRelativeData(parBone.pos, parBone.ang);
+		} 
+		else
+		{
+			bone.pos.calculateRelativeDataRoot();
+		}
 
 		bone.pos.calculateDeltas(posError);
 		bone.ang.calculateDeltas(angError);
