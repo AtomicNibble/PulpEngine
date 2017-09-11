@@ -2531,14 +2531,6 @@ bool ModelCompiler::CheckLimits(void)
 		}
 	}
 
-	// check each lods.
-	if (bones_.size() > model::MODEL_MAX_BONES) {
-		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %" PRIu32,
-			bones_.size(), model::MODEL_MAX_BONES);
-		return false;
-	}
-
-
 	// basically impossible, but check it anyway.
 	if (compiledLods_.size() > model::MODEL_MAX_LODS) {
 		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %" PRIu32,
