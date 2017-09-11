@@ -1041,7 +1041,7 @@ MStatus ModelExporter::loadBones(void)
 
 			bone.name_ = mayaBone.name.c_str();
 			bone.rotation_ = mayaBone.bindRotation;
-			bone.worldPos_ = mayaBone.bindpos;
+			bone.worldPos_ = mayaBone.bindpos * scale_;
 			bone.scale_ = mayaBone.scale;
 		}
 	}
