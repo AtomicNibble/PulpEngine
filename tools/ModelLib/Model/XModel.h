@@ -57,8 +57,11 @@ public:
 	X_INLINE const MeshHeader& getLodMeshHdr(size_t idx) const;
 	X_INLINE const SubMeshHeader& getMeshHead(size_t idx) const;
 
-	X_INLINE const char* getBoneName(int32_t idx) const;
+	X_INLINE const char* getBoneName(size_t idx) const;
 	X_INLINE const uint8_t*	getTagTree(void) const;
+	X_INLINE const XQuatCompressedf& getBoneAngle(size_t idx) const;
+	X_INLINE const Vec3f getBonePos(size_t idx) const;
+
 
 	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
 

@@ -131,7 +131,7 @@ X_INLINE const SubMeshHeader& XModel::getMeshHead(size_t idx) const
 }
 
 
-X_INLINE const char* XModel::getBoneName(int32_t idx) const
+X_INLINE const char* XModel::getBoneName(size_t idx) const
 {
 	// temp hack.
 	const char* pBoneName = (char*)(data_.ptr() + pTagNames_[idx]);
@@ -143,5 +143,16 @@ X_INLINE const uint8_t*	XModel::getTagTree(void) const
 {
 	return pTagTree_;
 }
+
+X_INLINE const XQuatCompressedf& XModel::getBoneAngle(size_t idx) const
+{
+	return pBoneAngles_[idx];
+}
+
+X_INLINE const Vec3f XModel::getBonePos(size_t idx) const
+{
+	return pBonePos_[idx];
+}
+
 
 X_NAMESPACE_END
