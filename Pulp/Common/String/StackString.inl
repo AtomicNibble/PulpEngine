@@ -476,33 +476,13 @@ void StackString<N, TChar>::trimWhitespace(void)
 
 
 template <size_t N, typename TChar>
-void StackString<N, TChar>::trimCharacter(TChar character)
+void StackString<N, TChar>::trim(TChar character)
 {
-	const TChar* pos = strUtil::FindNon(str_, str_ + len_, character);
-	if (!pos)
-	{
-		// string contains only the given character
-		len_ = 0;
-		str_[0] = 0;
-		return;
-	}
-
-	// string contains at least one non-given character
-	if (pos > str_)
-	{
-		// there are given characters to the left, trim them
-		memmove(str_, pos, len_);
-		len_ -= safe_static_cast<size_t>(pos - str_);
-	}
-
-	pos = strUtil::FindLastNon(str_, str_ + len_, character);
-	if (pos < str_+len_-1)
-	{
-		// there are given characters to the right, trim them
-		len_ = safe_static_cast<size_t>(pos - str_ + 1);
-		str_[len_] = 0;
-	}
+	trimLeft(character);
+	trimRight(character);
 }
+
+
 
 template <size_t N, typename TChar>
 void StackString<N, TChar>::stripTrailing( const TChar c ) 
@@ -538,6 +518,29 @@ void StackString<N, TChar>::stripColorCodes(void)
 	str_[len_] = '\0';
 }
 
+template <size_t N, typename TChar>
+void StackString<N, TChar>::trimLeft(const TChar* pos)
+{
+	memmove(str_, pos, len_);
+	len_ -= safe_static_cast<size_t>(pos - str_);
+}
+
+
+template <size_t N, typename TChar>
+void StackString<N, TChar>::trimLeft(TChar ch)
+{
+	const char* pCur = begin();
+
+	while(pCur < end() && *pCur == ch)
+	{
+		++pCur;
+	}
+
+	if (pCur != begin()) {
+		trimLeft(pCur);
+	}
+}
+
 
 template <size_t N, typename TChar>
 void StackString<N, TChar>::trimRight(const TChar* pos)
@@ -550,9 +553,15 @@ void StackString<N, TChar>::trimRight(const TChar* pos)
 template <size_t N, typename TChar>
 void StackString<N, TChar>::trimRight(TChar ch)
 {
-	const TChar* pos = find(ch);
-	if (pos != nullptr) {
-		trimRight(pos);
+	const char* pCur = end() - 1;
+
+	while (pCur >= begin() && *pCur == ch)
+	{
+		--pCur;
+	}
+
+	if (pCur != end() - 1) {
+		trimRight(pCur + 1);
 	}
 }
 

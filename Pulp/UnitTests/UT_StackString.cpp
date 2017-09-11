@@ -182,8 +182,30 @@ TEST(StackString, trimCharacter)
 {
 	core::StackString<1024> str("--- -----show me your whitespace------");
 
-	str.trimCharacter('-');
+	str.trim(' ');
+	EXPECT_STREQ("--- -----show me your whitespace------", str.c_str());
+
+	str.trim('-');
 	EXPECT_STREQ(" -----show me your whitespace", str.c_str());
+	str.trim(' ');
+	EXPECT_STREQ("-----show me your whitespace", str.c_str());
+
+	str.trim('-');
+	EXPECT_STREQ("show me your whitespace", str.c_str());
+}
+
+TEST(StackString, trimLeft)
+{
+	core::StackString<1024> str("--- -----show me your whitespace------");
+
+	str.trimLeft('w');
+	EXPECT_STREQ("--- -----show me your whitespace------", str.c_str());
+	str.trimLeft('-');
+
+	EXPECT_STREQ(" -----show me your whitespace------", str.c_str());
+
+	str.trimLeft(str.c_str() + 10);
+	EXPECT_STREQ(" me your whitespace------", str.c_str());
 }
 
 TEST(StackString, trimRight)
@@ -191,7 +213,10 @@ TEST(StackString, trimRight)
 	core::StackString<1024> str("--- -----show me your whitespace------");
 
 	str.trimRight('w');
-	EXPECT_STREQ("--- -----sho", str.c_str());
+	EXPECT_STREQ("--- -----show me your whitespace------", str.c_str());
+	str.trimRight('-');
+	
+	EXPECT_STREQ("--- -----show me your whitespace", str.c_str());
 
 	str.trimRight(str.c_str() + 10);
 	EXPECT_STREQ("--- -----s", str.c_str());

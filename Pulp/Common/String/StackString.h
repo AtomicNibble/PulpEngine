@@ -92,13 +92,13 @@ public:
 	/// Trims all whitespace to the left and right of the string.
 	void trimWhitespace(void);
 	/// Trims all occurrences of the given character to the left and right of the string.
-	void trimCharacter(TChar character);
+	void trim(TChar character);
 
-	/// \brief Trims all characters to the right of the first occurrence of \a ch. The resulting string is [..., \a ch).
-	/// \remark Does nothing if the character could not be found.
+	void trimLeft(TChar ch);
+	void trimLeft(const TChar* pos);
+	
 	void trimRight(TChar ch);
-	/// \brief Trims all characters to the right of \a pos. The resulting string is [..., \a pos).
-	inline void trimRight(const TChar* pos);
+	void trimRight(const TChar* pos);
 
 	StackString<N, TChar>& trim(void);
 	/// removes all white space chars in front of string.
@@ -108,6 +108,7 @@ public:
 
 
 	/// \brief strip char from end as many times as the char occurs
+	/// Same as trimRight.
 	inline void stripTrailing(const TChar c);
 
 	/// removes the color codes ^1 ..
@@ -223,13 +224,13 @@ public:
 	/// Trims all whitespace to the left and right of the string.
 	void trimWhitespace(void);
 	/// Trims all occurrences of the given character to the left and right of the string.
-	void trimCharacter(wchar_t character);
+	void trim(wchar_t character);
 
-	/// \brief Trims all characters to the right of the first occurrence of \a ch. The resulting string is [..., \a ch).
-	/// \remark Does nothing if the character could not be found.
+	void trimLeft(wchar_t ch);
+	void trimLeft(const wchar_t* pos);
+
 	void trimRight(wchar_t ch);
-	/// \brief Trims all characters to the right of \a pos. The resulting string is [..., \a pos).
-	inline void trimRight(const wchar_t* pos);
+	void trimRight(const wchar_t* pos);
 
 	StackString<N, wchar_t>& trim(void);
 	/// removes all white space chars in front of string.
