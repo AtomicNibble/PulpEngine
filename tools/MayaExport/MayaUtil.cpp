@@ -261,4 +261,43 @@ namespace MayaUtil
 		return str;
 	}
 
+
+	const char* GetMDistinceUnitStr(MDistance::Unit unit)
+	{
+		const char* pUOMStr = "centimeters";
+		switch (unit)
+		{
+			case MDistance::kInches:
+				pUOMStr = "inches";
+				break;
+			case MDistance::kFeet:
+				pUOMStr = "feet";
+				break;
+			case MDistance::kYards:
+				pUOMStr = "yards";
+				break;
+			case MDistance::kMiles:
+				pUOMStr = "miles";
+				break;
+			case MDistance::kMillimeters:
+				pUOMStr = "millimeters";
+				break;
+			case MDistance::kCentimeters:
+				pUOMStr = "centimeters";
+				break;
+			case MDistance::kKilometers:
+				pUOMStr = "kilometers";
+				break;
+			case MDistance::kMeters:
+				pUOMStr = "meters";
+				break;
+
+			default:
+				X_ASSERT_UNREACHABLE();
+				break;
+		}
+
+		return pUOMStr;
+	}
+
 } // namespace MayaUtil

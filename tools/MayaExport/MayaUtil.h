@@ -5,6 +5,7 @@
 #include <maya\MFloatVector.h>
 #include <maya\MFloatPoint.h>
 #include <maya\MMatrix.h>
+#include <maya\MDistance.h>
 
 namespace MayaUtil
 {
@@ -30,6 +31,8 @@ namespace MayaUtil
 
 
 	MString RemoveNameSpace(const MString& str);
+
+	const char* GetMDistinceUnitStr(MDistance::Unit unit);
 
 
 	X_INLINE ::std::ostream& operator<<(::std::ostream& os, const Vec3f& bar) {

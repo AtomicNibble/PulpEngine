@@ -341,38 +341,8 @@ void ModelExporter::printStats(void) const
 {
 	core::StackString<2048> info;
 
-	const char* pUOMStr = "centimeters";
-	switch (unitOfMeasurement_)
-	{
-		case MDistance::kInches:
-			pUOMStr = "inches";
-			break;
-		case MDistance::kFeet:
-			pUOMStr = "feet";
-			break;
-		case MDistance::kYards:
-			pUOMStr = "yards";
-			break;
-		case MDistance::kMiles:
-			pUOMStr = "miles";
-			break;
-		case MDistance::kMillimeters:
-			pUOMStr = "millimeters";
-			break;
-		case MDistance::kCentimeters:
-			pUOMStr = "centimeters";
-			break;
-		case MDistance::kKilometers:
-			pUOMStr = "kilometers";
-			break;
-		case MDistance::kMeters:
-			pUOMStr = "meters";
-			break;
-
-	}
-
 	info.append("\nModel Info:");
-	info.appendFmt("\n> Units: %s", pUOMStr);
+	info.appendFmt("\n> Units: %s", MayaUtil::GetMDistinceUnitStr(unitOfMeasurement_));
 	info.appendFmt("\n> Scale: %f", scale_);
 	info.appendFmt("\n> Total Lods: %" PRIuS, lods_.size());
 	info.appendFmt("\n> Total Bones: %" PRIuS, bones_.size());
@@ -745,21 +715,28 @@ MStatus ModelExporter::loadLODs(void)
 			MayaUtil::MayaPrintVerbose("ColorsArray: %" PRIu32, colorsArray.length());
 
 			// verts
-			if (scale_ == 1.f) {
-				for (int32_t x = 0; x < numVerts; x++) {
-					model::RawModel::Vert& vert = mesh.verts_[x];
-					vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
-				}
-			}
-			else 
 			{
 				float scale = scale_;
 				for (int32_t x = 0; x < numVerts; x++) {
 					model::RawModel::Vert& vert = mesh.verts_[x];
-					vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
-					vert.pos_ *= scale;
+					vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x])) * scale;
 				}
 			}
+
+			// convert to unit of measure
+			if(MDistance::internalUnit() != unitOfMeasurement_)
+			{
+				MayaUtil::MayaPrintVerbose("Converting from %s to %s",
+					MayaUtil::GetMDistinceUnitStr(MDistance::internalUnit()),
+					MayaUtil::GetMDistinceUnitStr(unitOfMeasurement_)
+				);
+
+				for (int32_t x = 0; x < numVerts; x++) {
+					model::RawModel::Vert& vert = mesh.verts_[x];
+					vert.pos_ = ConvertUnitOfMeasure(vert.pos_);
+				}
+			}
+
 
 			MIntArray polygonVertices;
 			core::FixedArray<uint32_t, 8> localIndex;
