@@ -18,11 +18,13 @@ public:
 	void	setOwner(type *object);
 	type*	owner(void) const;
 	void	setParent(Hierarchy& node);
-//	bool	isParent(const Hierarchy& node) const;
+	bool	isParentedBy(const Hierarchy& node) const;	// checks all parents
+	void	makeBrotherAfter(Hierarchy& node);			// make the node a brother afrer the passed in node.
 
 	type*	parent(void) const;
 	type*	child(void) const;
-	type*	brother(void) const;
+	type*	brother(void) const;	  // next node with same parent.
+	type*	priorBrother(void) const; // previous node with same parent.
 	type*	next(void) const;
 	type*	nextLeaf(void) const;
 
@@ -31,13 +33,15 @@ public:
 	void	removeFromHierarchy(void);
 
 private:
+	Hierarchy<type>* priorBrotherNode(void) const;	// previous node with the same parent
+
+private:
 	Hierarchy* parent_;
 	Hierarchy* child_;
 	Hierarchy* brother_;
 
 	type*		owner_;
 
-	Hierarchy<type>	*priorSiblingNode(void) const;	// previous node with the same parent
 };
 
 
@@ -82,26 +86,65 @@ void Hierarchy<T>::setParent(Hierarchy& node)
 }
 
 template<typename T>
+bool Hierarchy<T>::isParentedBy(const Hierarchy& node) const
+{
+	if (parent_ == &node) {
+		return true;
+	}
+
+	if (parent_) {
+		return parent_->isParentedBy(node);
+	}
+
+	return false;
+}
+
+template<typename T>
+void Hierarchy<T>::makeBrotherAfter(Hierarchy& node)
+{
+	removeFromParent();
+
+	parent_ = node.parent_;
+	brother_ = node.brother_;
+	node.brother_ = this;
+}
+
+template<typename T>
 typename Hierarchy<T>::type* Hierarchy<T>::parent(void) const
 {
-	if (parent_)
+	if (parent_) {
 		return parent_->owner_;
+	}
 	return nullptr;
 }
 
 template<typename T>
 typename Hierarchy<T>::type* Hierarchy<T>::child(void) const
 {
-	if (child_)
+	if (child_) {
 		return child_->owner_;
+	}
 	return nullptr;
 }
 
 template<typename T>
 typename Hierarchy<T>::type* Hierarchy<T>::brother(void) const
 {
-	if (brother_)
+	if (brother_) {
 		return brother_->owner_;
+	}
+	return nullptr;
+}
+
+
+template<typename T>
+typename Hierarchy<T>::type* Hierarchy<T>::priorBrother(void) const
+{
+	auto* prior = priorBrotherNode();
+	if (prior) {
+		return prior->owner_;
+	}
+
 	return nullptr;
 }
 
@@ -110,19 +153,21 @@ typename Hierarchy<T>::type* Hierarchy<T>::next(void) const
 {
 	const Hierarchy<type>* node;
 
-	if (child_) // return thr child.
+	if (child_) { // return the child.
 		return child_->owner_;
-	else 
-	{
-		node = this;
-		// go back up untill we have a brother.
-		while (node && node->brother_ == nullptr)
-			node = node->parent_;
-		
-		// is there a next one ?
-		if (node) 
-			return node->brother_->owner_;
 	}
+
+	node = this;
+	// go back up untill we have a brother.
+	while (node && node->brother_ == nullptr) {
+		node = node->parent_;
+	}
+
+	// is there a next one ?
+	if (node) {
+		return node->brother_->owner_;
+	}
+
 	return nullptr;
 }
 
@@ -133,25 +178,27 @@ typename Hierarchy<T>::type* Hierarchy<T>::nextLeaf(void) const
 
 	if (child) {
 		node = child_;
-		while (node->child_)
+		while (node->child_) {
 			node = node->child_;
-		
+		}
+
 		return node->owner_;
 	}
-	else 
-	{
-		node = this;
-		while (node && node->brother_ == nullptr)
-			node = node->parent;
-		
-		if (node) {
-			node = node->brother_;
-			while (node->child_)
-				node = node->child_;
-			
-			return node->owner_;
-		}
+	
+	node = this;
+	while (node && node->brother_ == nullptr) {
+		node = node->parent_;
 	}
+
+	if (node) {
+		node = node->brother_;
+		while (node->child_) {
+			node = node->child_;
+		}
+
+		return node->owner_;
+	}
+
 	return nullptr;
 }
 
@@ -161,7 +208,7 @@ void Hierarchy<T>::removeFromParent(void) {
 	Hierarchy<type> *prev;
 
 	if (parent_) {
-		prev = priorSiblingNode();
+		prev = priorBrotherNode();
 		if (prev) {
 			prev->brother_ = brother_;
 		}
@@ -198,13 +245,14 @@ void Hierarchy<T>::removeFromHierarchy(void) {
 }
 
 template<typename T>
-Hierarchy<T>* Hierarchy<T>::priorSiblingNode(void) const
+Hierarchy<T>* Hierarchy<T>::priorBrotherNode(void) const
 {
-	if (!parent_ || (parent_->child_ == this))
+	if (!parent_ || (parent_->child_ == this)) {
 		return nullptr;
+	}
 
-	Hierarchy<type> *prev;
-	Hierarchy<type> *node;
+	Hierarchy<type>* prev;
+	Hierarchy<type>* node;
 
 	node = parent_->child_;
 	prev = nullptr;
