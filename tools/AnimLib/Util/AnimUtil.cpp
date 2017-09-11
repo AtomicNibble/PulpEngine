@@ -16,8 +16,15 @@ namespace Util
 		X_ASSERT(firstJoint <= lastJoint, "out of range")(firstJoint, lastJoint);
 
 		for (int32_t i = firstJoint; i <= lastJoint; i++) {
-			X_ASSERT(pParents[i] < mats.size(), "Parent out of range")(pParents[i]);
-			mats[i] *= mats[pParents[i]];
+			
+			auto parentIdx = pParents[i];
+			X_ASSERT(parentIdx  < mats.size(), "Parent out of range")(parentIdx);
+
+			// make sure our parent has been transformed.
+			X_ASSERT(parentIdx < i, "Parent is not yet transformed")(parentIdx, i);
+
+			auto& parent = mats[parentIdx];
+			mats[i] *= parent;
 		}
 	}
 
