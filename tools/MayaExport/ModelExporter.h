@@ -3,6 +3,7 @@
 #include <maya\MPxFileTranslator.h>
 #include <maya\MPxCommand.h>
 #include <maya\MDagPathArray.h>
+#include <maya\MDistance.h>
 
 
 #include "Hierarchy.h"
@@ -56,7 +57,6 @@ class ModelExporter : public model::RawModel::Model
 
 	X_DECLARE_ENUM(ExpoMode)(SERVER, RAW);
 	X_DECLARE_ENUM(MeshExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
-	X_DECLARE_ENUM(UnitOfMeasureMent)(INCHES, CM);
 
 	typedef core::StackString<60> MeshNameStr;
 
@@ -85,6 +85,11 @@ private:
 	MayaBone* findJointReal(const char* pName);
 
 private:
+	double ConvertUnitOfMeasure(double value);
+	Vec3d ConvertUnitOfMeasure(const Vec3d& vec);
+	Vec3f ConvertUnitOfMeasure(const Vec3f& vec);
+
+private:
 	static void getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);
 	static core::UniquePointer<MFnDagNode> getParentBone(MFnDagNode* pBone);
 	static MStatus getBindPose(MayaBone& bone);
@@ -101,7 +106,7 @@ private:
 	core::Path<char> outDir_;
 	ExpoMode::Enum exportMode_;
 	MeshExpoMode::Enum meshExportMode_;
-	UnitOfMeasureMent::Enum unitOfMeasurement_;
+	MDistance::Unit unitOfMeasurement_;
 
 	core::Array<MayaBone>	mayaBones_;
 	MayaBone				tagOrigin_;

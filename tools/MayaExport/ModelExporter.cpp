@@ -49,7 +49,6 @@ X_ENABLE_WARNING(4702)
 #include "MayaUtil.h"
 #include "AssetDB.h"
 
-
 X_USING_NAMESPACE;
 
 
@@ -96,7 +95,7 @@ ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	mayaBones_(arena),
 	exportMode_(ExpoMode::SERVER),
 	meshExportMode_(MeshExpoMode::EXPORT_INPUT),
-	unitOfMeasurement_(UnitOfMeasureMent::INCHES)
+	unitOfMeasurement_(MDistance::Unit::kInches)
 {
 	tagOrigin_.index = 0;
 	tagOrigin_.name.append("tag_origin");
@@ -342,8 +341,39 @@ void ModelExporter::printStats(void) const
 {
 	core::StackString<2048> info;
 
+	const char* pUOMStr = "centimeters";
+	switch (unitOfMeasurement_)
+	{
+		case MDistance::kInches:
+			pUOMStr = "inches";
+			break;
+		case MDistance::kFeet:
+			pUOMStr = "feet";
+			break;
+		case MDistance::kYards:
+			pUOMStr = "yards";
+			break;
+		case MDistance::kMiles:
+			pUOMStr = "miles";
+			break;
+		case MDistance::kMillimeters:
+			pUOMStr = "millimeters";
+			break;
+		case MDistance::kCentimeters:
+			pUOMStr = "centimeters";
+			break;
+		case MDistance::kKilometers:
+			pUOMStr = "kilometers";
+			break;
+		case MDistance::kMeters:
+			pUOMStr = "meters";
+			break;
+
+	}
+
 	info.append("\nModel Info:");
-	info.appendFmt("\n> Applied Scale: %f", scale_);
+	info.appendFmt("\n> Units: %s", pUOMStr);
+	info.appendFmt("\n> Scale: %f", scale_);
 	info.appendFmt("\n> Total Lods: %" PRIuS, lods_.size());
 	info.appendFmt("\n> Total Bones: %" PRIuS, bones_.size());
 
@@ -480,7 +510,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		}
 		else {
 			if (useCm) {
-				unitOfMeasurement_ = UnitOfMeasureMent::CM;
+				unitOfMeasurement_ = MDistance::Unit::kCentimeters;
 			}
 		}
 	}
@@ -554,12 +584,6 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 			MayaUtil::MayaPrintError("Failed to parse and LOD info");
 			return MS::kFailure;
 		}
-	}
-
-	// use the scale to make it cm -> inches.
-	// this applyies it post user scale.
-	if (unitOfMeasurement_ == UnitOfMeasureMent::INCHES) {
-		scale_ = scale_ * 0.393700787f;
 	}
 
 	return status;
@@ -1040,9 +1064,12 @@ MStatus ModelExporter::loadBones(void)
 				bone.parIndx_ = -1;
 			}
 
+			Vec3f pos = ConvertUnitOfMeasure(mayaBone.bindpos);
+			pos *= scale_;
+
 			bone.name_ = mayaBone.name.c_str();
 			bone.rotation_ = mayaBone.bindRotation;
-			bone.worldPos_ = mayaBone.bindpos * scale_;
+			bone.worldPos_ = pos;
 			bone.scale_ = mayaBone.scale;
 		}
 	}
@@ -1050,6 +1077,30 @@ MStatus ModelExporter::loadBones(void)
 	return status;
 }
 
+
+X_INLINE double ModelExporter::ConvertUnitOfMeasure(double value)
+{
+	MDistance d(value);
+	return d.as(unitOfMeasurement_);
+}
+
+X_INLINE Vec3d ModelExporter::ConvertUnitOfMeasure(const Vec3d& vec)
+{
+	Vec3d ret;
+	ret.x = ConvertUnitOfMeasure(vec.x);
+	ret.y = ConvertUnitOfMeasure(vec.y);
+	ret.z = ConvertUnitOfMeasure(vec.z);
+	return ret;
+}
+
+X_INLINE Vec3f ModelExporter::ConvertUnitOfMeasure(const Vec3f& vec)
+{
+	Vec3f ret;
+	ret.x = static_cast<float>(ConvertUnitOfMeasure(vec.x));
+	ret.y = static_cast<float>(ConvertUnitOfMeasure(vec.y));
+	ret.z = static_cast<float>(ConvertUnitOfMeasure(vec.z));
+	return ret;
+}
 
 MayaBone* ModelExporter::findJointReal(const char* pName)
 {
