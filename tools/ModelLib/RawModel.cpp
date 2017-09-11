@@ -204,6 +204,8 @@ namespace RawModel
 
 		core::XLexToken token(nullptr, nullptr);
 
+		int32_t lastParentIdx = -1;
+
 		for (auto& bone : bones_)
 		{
 			if (!lex.ReadToken(token)) {
@@ -228,6 +230,13 @@ namespace RawModel
 			}
 
 			bone.parIndx_ = token.GetIntValue();
+
+			if (bone.parIndx_ < lastParentIdx) {
+				X_ERROR("RawModel", "Parent index must ascend (aka sorted)");
+				return false;
+			}
+
+			lastParentIdx = bone.parIndx_;
 
 			// read the string
 			if (!lex.ReadTokenOnLine(token)) {
