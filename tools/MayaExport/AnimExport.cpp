@@ -381,28 +381,35 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 				MayaUtil::MayaPrintVerbose("Bone(%" PRIuS "): %s", i, bone.name.asChar());
 
-				MTransformationMatrix worldMatrix = bone.dag.inclusiveMatrix();
+				MTransformationMatrix worldMatrixTrans = bone.dag.inclusiveMatrix();
+				MMatrix m = worldMatrixTrans.asMatrix();
 				
-				// don't use this for rotation it's scaled.
-				MMatrix scaledMatrix = worldMatrix.asMatrix();
-				
+				Matrix33f worldMatrix = MayaUtil::XMat(m);
+				Vec3f pos = MayaUtil::XVec(m);
+
+				Vec3f scale;
+				scale.x = worldMatrix.getColumn(0).length();
+				scale.y = worldMatrix.getColumn(1).length();
+				scale.z = worldMatrix.getColumn(2).length();
+
 				// rotation.
 				Quatd quat;
-				worldMatrix.getRotationQuaternion(quat.v.x, quat.v.y, quat.v.z, quat.w);
+				worldMatrixTrans.getRotationQuaternion(quat.v.x, quat.v.y, quat.v.z, quat.w);
 
 				FrameData& data = bone.data.AddOne();
-				data.scale = Vec3f::one();
-				data.position = MayaUtil::XVec(scaledMatrix);
+				data.scale = scale;
+				data.position = pos;
 				data.rotation = quat;
 
 
 				if(MayaUtil::IsVerbose())
 				{
+					const auto& s = data.scale;
 					const auto& q = data.rotation;
 					const auto euler = q.getEulerDegrees();
 					
-					MayaUtil::MayaPrintVerbose("pos: (%g,%g,%g)",
-						data.position.x, data.position.y, data.position.z);
+					MayaUtil::MayaPrintVerbose("pos: (%g,%g,%g) scale(%g,%g,%g)",
+						data.position.x, data.position.y, data.position.z, s.x, s.y, s.z);
 					MayaUtil::MayaPrintVerbose("ang: (%g,%g,%g) quat: (%g,%g,%g,%g)",
 						euler.x, euler.y, euler.z, 
 						q.v.x, q.v.y, q.v.z, q.w);
