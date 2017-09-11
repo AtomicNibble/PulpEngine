@@ -719,7 +719,7 @@ MStatus ModelExporter::loadLODs(void)
 				float scale = scale_;
 				for (int32_t x = 0; x < numVerts; x++) {
 					model::RawModel::Vert& vert = mesh.verts_[x];
-					vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x])) * scale;
+					vert.pos_ = MayaUtil::XVec(vertexArray[x]) * scale;
 				}
 			}
 

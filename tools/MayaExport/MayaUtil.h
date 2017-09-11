@@ -40,14 +40,6 @@ namespace MayaUtil
 	}
 
 
-	X_INLINE Vec3f ConvertToGameSpace(const Vec3f &pos) {
-		Vec3f idpos;
-		idpos.x = pos.x;
-		idpos.y = pos.y;
-		idpos.z = pos.z;
-		return idpos;
-	}
-
 	X_INLINE Matrix33f ConvertToGameSpace(const Matrix33f& m) {
 		Matrix33f mat;
 
