@@ -343,6 +343,7 @@ void ModelExporter::printStats(void) const
 	core::StackString<2048> info;
 
 	info.append("\nModel Info:");
+	info.appendFmt("\n> Applied Scale: %f", scale_);
 	info.appendFmt("\n> Total Lods: %" PRIuS, lods_.size());
 	info.appendFmt("\n> Total Bones: %" PRIuS, bones_.size());
 
