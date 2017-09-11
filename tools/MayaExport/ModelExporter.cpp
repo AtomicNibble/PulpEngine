@@ -59,12 +59,10 @@ MayaBone::MayaBone() :
 	dagnode(nullptr)
 {
 	mayaNode.setOwner(this);
-	exportNode.setOwner(this);
 }
 
 MayaBone::MayaBone(MayaBone&& oth) : 
-	mayaNode(std::move(oth.mayaNode)), 
-	exportNode(std::move(oth.exportNode))
+	mayaNode(std::move(oth.mayaNode))
 {
 	name = std::move(oth.name);
 	dagnode = std::move(oth.dagnode);
@@ -74,7 +72,6 @@ MayaBone::MayaBone(MayaBone&& oth) :
 	bindRotation = oth.bindRotation;
 
 	mayaNode.setOwner(this);
-	exportNode.setOwner(this);
 }
 
 MayaBone& MayaBone::operator = (MayaBone&& oth)
@@ -87,17 +84,15 @@ MayaBone& MayaBone::operator = (MayaBone&& oth)
 	bindRotation = oth.bindRotation;
 
 	mayaNode = oth.mayaNode;
-	exportNode = oth.exportNode;
-
 	mayaNode.setOwner(this);
-	exportNode.setOwner(this);
 	return *this;
 }
 
 // --------------------------------------------
 
 ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
-	model::ModelCompiler(pJobSys, arena),
+	model::RawModel::Model(arena, pJobSys),
+	scale_(1.f),
 	mayaBones_(arena),
 	exportMode_(ExpoMode::SERVER),
 	meshExportMode_(MeshExpoMode::EXPORT_INPUT),
@@ -120,10 +115,7 @@ ModelExporter::~ModelExporter()
 MStatus ModelExporter::getInputObjects(void)
 {
 	// we just want to load all objects for every lod.
-	uint i, x;
-	MStatus status = MS::kSuccess;
-
-	for (i = 0; i < safe_static_cast<uint32_t, size_t>(lodExpoInfo_.size()); i++)
+	for (size_t i = 0; i < lodExpoInfo_.size(); i++)
 	{
 		MDagPathArray pathArry;
 		MSelectionList list;
@@ -132,14 +124,14 @@ MStatus ModelExporter::getInputObjects(void)
 		MStringArray nameArr;
 		info.objects.split(' ', nameArr);
 
-		for (x = 0; x < nameArr.length(); x++) {
+		for (uint32_t x = 0; x < safe_static_cast<uint32_t>(nameArr.length()); x++) {
 			list.add(nameArr[x]);
 		}
 
-		for (x = 0; x < list.length(); x++)
+		for (size_t x = 0; x < list.length(); x++)
 		{
 			MDagPath path;
-			status = list.getDagPath(x, path);
+			auto status = list.getDagPath(safe_static_cast<uint32_t>(x), path);
 			if (status) {
 				pathArry.append(path);
 			}
@@ -152,10 +144,6 @@ MStatus ModelExporter::getInputObjects(void)
 		if (pathArry.length() < 1) {
 			return MS::kFailure;
 		}
-
-	//	int goat = pathArry.length();
-	//	MayaPrintMsg("TEST: %s", info.objects.asChar());
-	//	MayaPrintMsg("LOD%i object count: %i", i, pathArry.length());
 
 		info.exportObjects = pathArry;
 	}
@@ -233,8 +221,6 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 
 		// time to slap a goat!
-		bool unChanged = false;
-
 		if (exportMode_ == ExpoMode::RAW)
 		{
 			PROFILE_MAYA_NAME("Save Raw");
@@ -321,9 +307,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 				// send to asset server.
 				status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
 					MString(getName()),
-					argsToJson(),
-					compressed,
-					&unChanged
+					compressed
 				);
 
 				if (!status) {
@@ -331,38 +315,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 					return status;
 				}
 			}
-			{
-				MayaUtil::SetProgressText("Compiling model");
 
-				if (!unChanged)
-				{
-					PROFILE_MAYA_NAME("Compile and save");
-
-					// we want the path from assetDB for the assets mod.
-					// lower case the relative path add add to working.
-					core::Path<char> assetPath;
-					assetPath /= mod.outDir;
-					assetPath /= assetDb::AssetType::ToString(maya::AssetDB::AssetType::MODEL);
-					assetPath += "s";
-					assetPath.toLower();
-					assetPath /= getName();
-					assetPath.replaceSeprators();
-
-					core::Path<char> outPath = info.workingDir;
-					outPath /= assetPath;
-
-					MayaUtil::MayaPrintMsg("Exporting to: '%s'", outPath.c_str());
-
-					if (!compileModel(outPath)) {
-						MayaUtil::MayaPrintError("Failed to compile model");
-						return MS::kFailure;
-					}
-				}
-				else
-				{
-					MayaUtil::MayaPrintMsg("!Skiping compile asset unchanged");
-				}
-			}
 		}
 		else {
 			MayaUtil::IncProcess();
@@ -371,11 +324,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		saveOk = true;
 
 		MayaUtil::SetProgressText("Complete");
-
-		if (exportMode_ == ExpoMode::SERVER && !unChanged)
-		{
-			printStats();
-		}
+		printStats();
 	}
 
 	if (saveOk) {
@@ -392,72 +341,26 @@ MStatus ModelExporter::convert(const MArgList& args)
 void ModelExporter::printStats(void) const
 {
 	core::StackString<2048> info;
-	CompileFlags::Description flagsDsc;
 
 	info.append("\nModel Info:");
-	info.appendFmt("\n> Compile Flags: %s", getFlags().ToString(flagsDsc));
-	info.appendFmt("\n> Compile Time: %fms", stats_.compileTime.GetMilliSeconds());
-	info.appendFmt("\n> Total Lods: %" PRIu32, stats_.totalLods);
-	info.appendFmt("\n> Total Mesh: %" PRIu32, stats_.totalMesh);
-	info.appendFmt("\n> Total Mesh merged: %" PRIu32, stats_.totalMeshMerged);
-	info.appendFmt("\n> Total Col Mesh: %" PRIu32, stats_.totalColMesh);
-	info.appendFmt("\n> Total Joints: %" PRIu32, stats_.totalJoints);
-	info.appendFmt("\n> Total Joints dropped: %" PRIu32, stats_.totalJointsDropped);
+	info.appendFmt("\n> Total Lods: %" PRIuS, lods_.size());
+	info.appendFmt("\n> Total Bones: %" PRIuS, bones_.size());
 
-
-	if (stats_.droppedBoneNames.size() > 0) {
-		info.append(" -> (");
-		for (uint i = 0; i < stats_.droppedBoneNames.size(); i++) {
-			info.append(stats_.droppedBoneNames[i].c_str());
-
-			if (i < (stats_.droppedBoneNames.size() - 1)) {
-				info.append(", ");
-			}
-
-			if (i > 9 && (i % 10) == 0) {
-				info.append("\n");
-			}
-		}
-		info.append(")");
-	}
-	if (stats_.droppedBoneNames.size() > 10) {
-		info.append("\n");
-	}
-
-
-	info.appendFmt("\n> Total Verts: %" PRIu32, stats_.totalVerts);
-	info.appendFmt("\n> Total Verts Merged: %" PRIu32, stats_.totalVertsMerged);
-	info.appendFmt("\n> Total Faces: %" PRIu32, stats_.totalFaces);
-	info.appendFmt("\n> Total Weights dropped: %" PRIu32, stats_.totalWeightsDropped);
-	info.append("\n");
-
-	if (stats_.totalWeightsDropped > 0) {
-		uint32_t maxWeights = model::MODEL_MAX_VERT_BINDS_NONE_EXT;
-		if (getFlags().IsSet(model::ModelCompiler::CompileFlag::EXT_WEIGHTS)) {
-			maxWeights = model::MODEL_MAX_VERT_BINDS;
-		}
-
-		info.appendFmt("!> bind weights where dropped, consider binding with max influences: %" PRIu32 "\n", maxWeights);
-	}
-
+	info.append(" (");
+	for (auto& bone : bones_)
 	{
-		const AABB& b = stats_.bounds;
-		const auto min = b.min;
-		const auto max = b.max;
-		info.append("> Bounds: ");
-		info.appendFmt("(%g,%g,%g) <-> ", min[0], min[1], min[2]);
-		info.appendFmt("(%g,%g,%g)\n", max[0], max[1], max[2]);
+		info.appendFmt("%s,", bone.name_.c_str());
+	}
+	info.trimRight(',');
+	info.append(")");
 
-		const auto size = b.size();
-		info.append("> Dimensions: ");
-		info.appendFmt("w: %g d: %g h: %g", size[0], size[1], size[2]);
-
-		if (unitOfMeasurement_ == UnitOfMeasureMent::INCHES) {
-			info.append(" (inches)");
-		}
-		else {
-			info.append(" (cm)");
-		}
+	for (auto& lod : lods_)
+	{
+		info.appendFmt("\n> LOD");
+		info.appendFmt("\n > Total Mesh: %" PRIuS, lod.numMeshes());
+		info.appendFmt("\n > Total Verts: %" PRIuS, lod.totalVerts());
+		info.appendFmt("\n > Total Faces: %" PRIuS, lod.totalTris());
+		info.append("\n");
 	}
 
 	MayaUtil::MayaPrintMsg(info.c_str());
@@ -493,67 +396,9 @@ core::Path<char> ModelExporter::getFilePath(void) const
 	return path;
 }
 
-core::string ModelExporter::getName(void) const
+const core::string& ModelExporter::getName(void) const
 {
 	return name_;
-}
-
-
-
-MString ModelExporter::argsToJson(void) const
-{
-	core::json::StringBuffer s;
-	core::json::Writer<core::json::StringBuffer> writer(s);
-
-	writer.SetMaxDecimalPlaces(5);
-	writer.StartObject();
-	writer.Key("verbose");
-	writer.Bool(MayaUtil::IsVerbose());
-	writer.Key("mode");
-	writer.String(ExpoMode::ToString(exportMode_));
-
-	writer.Key("scale");
-	writer.Double(this->getScale());
-	writer.Key("weight_thresh");
-	writer.Double(this->getJointWeightThreshold());
-	writer.Key("uv_merge_thresh");
-	writer.Double(this->getTexCoordElipson());
-	writer.Key("vert_merge_thresh");
-	writer.Double(this->getVertexElipson());
-	writer.Key("vert_merge_thresh");
-	writer.Double(this->getVertexElipson());
-
-	const CompileFlags flags = getFlags();
-	writer.Key("zero_origin");
-	writer.Bool(flags.IsSet(CompileFlag::ZERO_ORIGIN));
-	writer.Key("white_vert_col");
-	writer.Bool(flags.IsSet(CompileFlag::WHITE_VERT_COL));
-	writer.Key("merge_meshes");
-	writer.Bool(flags.IsSet(CompileFlag::MERGE_MESH));
-	writer.Key("merge_verts");
-	writer.Bool(flags.IsSet(CompileFlag::MERGE_VERTS));
-	writer.Key("ext_weights");
-	writer.Bool(flags.IsSet(CompileFlag::EXT_WEIGHTS));
-
-	// lods.
-	for (size_t i = 0; i < model::MODEL_MAX_LODS; i++)
-	{
-		core::StackString<32> buf;
-		buf.appendFmt("lod%" PRIuS "_dis", i);
-
-		writer.Key(buf.c_str());
-
-		if ((i+1) > lodExpoInfo_.size()) {
-			writer.Double(0);
-		}
-		else {
-			writer.Double(lodExpoInfo_[i].distance);
-		}
-	}
-
-	writer.EndObject();
-
-	return MString(s.GetString());
 }
 
 MStatus ModelExporter::parseArgs(const MArgList& args)
@@ -561,17 +406,14 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	MStatus status;
 	uint32_t idx;
 
-	float scale = 1.f;
-	CompileFlags flags = (CompileFlag::MERGE_MESH | CompileFlag::MERGE_VERTS | CompileFlag::WHITE_VERT_COL);
-
-	idx = args.flagIndex("f");
-	if (idx == MArgList::kInvalidArgIndex) {
-		MayaUtil::MayaPrintError("missing file argument");
-		return MS::kFailure;
-	}
-
 	// required
 	{
+		idx = args.flagIndex("f");
+		if (idx == MArgList::kInvalidArgIndex) {
+			MayaUtil::MayaPrintError("missing file argument");
+			return MS::kFailure;
+		}
+
 		MString Mfilename;
 
 		status = args.get(++idx, Mfilename);
@@ -582,6 +424,21 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 
 		setFileName(Mfilename);
 	}
+
+	idx = args.flagIndex("scale");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaUtil::MayaPrintWarning("failed to get scale flag");
+		}
+		else {
+			scale_ = static_cast<float>(temp);
+		}
+	}
+	else {
+		scale_ = 1.f;
+	}
+
 
 	// allow for options to be parsed.
 	idx = args.flagIndex("verbose");
@@ -614,17 +471,6 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		exportMode_ = ExpoMode::SERVER;
 	}
 
-	idx = args.flagIndex("scale");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaUtil::MayaPrintWarning("failed to get scale flag");
-		}
-		else {
-			scale = static_cast<float>(temp);
-		}
-	}
-
 	idx = args.flagIndex("use_cm");
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool useCm = false;
@@ -634,121 +480,6 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		else {
 			if (useCm) {
 				unitOfMeasurement_ = UnitOfMeasureMent::CM;
-			}
-		}
-	}
-
-	idx = args.flagIndex("weight_thresh");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaUtil::MayaPrintWarning("failed to get weight_thresh flag");
-		}
-		else {
-			SetJointWeightThreshold(static_cast<float>(temp));
-		}
-	}
-
-
-	idx = args.flagIndex("uv_merge_thresh");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaUtil::MayaPrintWarning("failed to get uv_merge_thresh flag");
-		}
-		else {
-			SetTexCoordElipson(static_cast<float>(temp));
-		}
-	}
-
-	idx = args.flagIndex("vert_merge_thresh");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaUtil::MayaPrintWarning("failed to get vert_merge_thresh flag");
-		}
-		else {
-			SetVertexElipson(static_cast<float>(temp));
-		}
-	}
-
-
-	idx = args.flagIndex("zero_origin");
-	if (idx != MArgList::kInvalidArgIndex) {
-		bool zeroOrigin = false;
-		if (!args.get(++idx, zeroOrigin)) {
-			MayaUtil::MayaPrintWarning("failed to get zero_origin flag");
-		}
-		else {
-			if (zeroOrigin) {
-				flags.Set(CompileFlag::ZERO_ORIGIN);
-			}
-			else {
-				flags.Remove(CompileFlag::ZERO_ORIGIN);
-			}
-		}
-	}
-
-	idx = args.flagIndex("white_vert_col");
-	if (idx != MArgList::kInvalidArgIndex) {
-		bool whiteVert = false;
-		if (!args.get(++idx, whiteVert)) {
-			MayaUtil::MayaPrintWarning("failed to get white_vert_col flag");
-		}
-		else {
-			if (whiteVert) {
-				flags.Set(CompileFlag::WHITE_VERT_COL);
-			}
-			else {
-				flags.Remove(CompileFlag::WHITE_VERT_COL);
-			}
-		}
-	}
-
-	idx = args.flagIndex("merge_meshes");
-	if (idx != MArgList::kInvalidArgIndex) {
-		bool mergeMesh = false;
-		if (!args.get(++idx, mergeMesh)) {
-			MayaUtil::MayaPrintWarning("failed to get merge_meshes flag");
-		}
-		else {
-			if (mergeMesh) {
-				flags.Set(CompileFlag::MERGE_MESH);
-			}
-			else {
-				flags.Remove(CompileFlag::MERGE_MESH);
-			}
-		}
-	}
-
-	idx = args.flagIndex("merge_verts");
-	if (idx != MArgList::kInvalidArgIndex) {
-		bool mergeMesh = false;
-		if (!args.get(++idx, mergeMesh)) {
-			MayaUtil::MayaPrintWarning("failed to get merge_verts flag");
-		}
-		else {
-			if (mergeMesh) {
-				flags.Set(CompileFlag::MERGE_VERTS);
-			}
-			else {
-				flags.Remove(CompileFlag::MERGE_VERTS);
-			}
-		}
-	}
-
-	idx = args.flagIndex("ext_weights");
-	if (idx != MArgList::kInvalidArgIndex) {
-		bool extWeights = false;
-		if (!args.get(++idx, extWeights)) {
-			MayaUtil::MayaPrintWarning("failed to get ext_weights flag");
-		}
-		else {
-			if (extWeights) {
-				flags.Set(CompileFlag::EXT_WEIGHTS);
-			}
-			else {
-				flags.Remove(CompileFlag::EXT_WEIGHTS);
 			}
 		}
 	}
@@ -827,15 +558,9 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	// use the scale to make it cm -> inches.
 	// this applyies it post user scale.
 	if (unitOfMeasurement_ == UnitOfMeasureMent::INCHES) {
-		scale = scale * 0.393700787f;
+		scale_ = scale_ * 0.393700787f;
 	}
 
-	// set values.
-	if (scale != 1.f) {
-		SetScale(scale);
-	}
-
-	setFlags(flags);
 	return status;
 }
 
@@ -995,9 +720,20 @@ MStatus ModelExporter::loadLODs(void)
 			MayaUtil::MayaPrintVerbose("ColorsArray: %" PRIu32, colorsArray.length());
 
 			// verts
-			for (int32_t x = 0; x < numVerts; x++) {
-				model::RawModel::Vert& vert = mesh.verts_[x];
-				vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
+			if (scale_ == 1.f) {
+				for (int32_t x = 0; x < numVerts; x++) {
+					model::RawModel::Vert& vert = mesh.verts_[x];
+					vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
+				}
+			}
+			else 
+			{
+				float scale = scale_;
+				for (int32_t x = 0; x < numVerts; x++) {
+					model::RawModel::Vert& vert = mesh.verts_[x];
+					vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
+					vert.pos_ *= scale;
+				}
 			}
 
 			MIntArray polygonVertices;
@@ -1211,11 +947,10 @@ MStatus ModelExporter::loadBones(void)
 	MStatus			status;
 	MDagPath		dagPath;
 
-
 	// allocate max.
 	mayaBones_.reserve(model::MODEL_MAX_BONES);
 
-	MItDag dagIterator(MItDag::kDepthFirst, MFn::kTransform, &status);
+	MItDag dagIterator(MItDag::kBreadthFirst, MFn::kTransform, &status);
 	for (; !dagIterator.isDone(); dagIterator.next()) 
 	{
 		status = dagIterator.getPath(dagPath);
@@ -1237,27 +972,23 @@ MStatus ModelExporter::loadBones(void)
 		}
 
 		new_bone.name.append(new_bone.dagnode->name().asChar());
-
 		if (mayaBones_.size() == model::MODEL_MAX_BONES) {
 			MayaUtil::MayaPrintError("Joints: max bones reached: %" PRIu32, model::MODEL_MAX_BONES);
 			return MStatus::kFailure;
 		}
 
-		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
-		{
+		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
 			MayaUtil::MayaPrintError("Joints: max pMayaBone name length exceeded, MAX: %" PRIu32 " '%s' -> %" PRIuS,
 				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
 			return MStatus::kFailure;
 		}
 
 		new_bone.index = safe_static_cast<int32_t>(mayaBones_.size());
-
 		mayaBones_.append(std::move(new_bone));
 	}
 
 
 	// create hierarchy
-	// MayaBone* pMayaBone = mayaBones_.ptr();
 	for (size_t i = 0; i < mayaBones_.size(); i++) 
 	{
 		auto& mayaBone = mayaBones_[i];
@@ -1267,7 +998,6 @@ MStatus ModelExporter::loadBones(void)
 		}
 
 		mayaBone.mayaNode.setParent(mayaHead_);
-		mayaBone.exportNode.setParent(exportHead_);
 
 		auto parentNode = getParentBone(mayaBone.dagnode.get());
 		if (parentNode) 
@@ -1280,7 +1010,6 @@ MStatus ModelExporter::loadBones(void)
 
 				if (mayaBones_[j].dagnode->name() == parentNode->name()) {
 					mayaBone.mayaNode.setParent(mayaBones_[j].mayaNode);
-					mayaBone.exportNode.setParent(mayaBones_[j].exportNode);
 					break;
 				}
 			}
@@ -1292,26 +1021,15 @@ MStatus ModelExporter::loadBones(void)
 		}
 	}
 
-	// update idx's
-	uint32_t index = 0;
-	for (MayaBone* pMayaBone = exportHead_.next(); pMayaBone != nullptr; pMayaBone = pMayaBone->exportNode.next()) {
-		pMayaBone->index = index++;
-	}
-
 	// fill in the raw bones.
 	{
-		bones_.reserve(mayaBones_.size());
-
-		for (MayaBone* pMayaBone = exportHead_.next(); pMayaBone != nullptr; pMayaBone = pMayaBone->exportNode.next())
+		bones_.resize(mayaBones_.size());
+		for (size_t i = 0; i < mayaBones_.size(); i++)
 		{
-			model::RawModel::Bone bone;
-			bone.name_ = pMayaBone->name.c_str();
-			bone.rotation_ = pMayaBone->bindRotation;
-			bone.worldPos_ = pMayaBone->bindpos;
-			bone.scale_ = pMayaBone->scale;
-			
-			MayaBone* pParent = pMayaBone->exportNode.parent();
+			const auto& mayaBone = mayaBones_[i];
+			auto& bone = bones_[i];
 
+			MayaBone* pParent = mayaBone.mayaNode.parent();
 			if (pParent)
 			{
 				bone.parIndx_ = pParent->index;
@@ -1321,7 +1039,10 @@ MStatus ModelExporter::loadBones(void)
 				bone.parIndx_ = -1;
 			}
 
-			bones_.append(bone);
+			bone.name_ = mayaBone.name.c_str();
+			bone.rotation_ = mayaBone.bindRotation;
+			bone.worldPos_ = mayaBone.bindpos;
+			bone.scale_ = mayaBone.scale;
 		}
 	}
 
@@ -1523,17 +1244,15 @@ MStatus ModelExporter::getBindPose(MayaBone& bone)
 
 
 
-core::StackString<60> ModelExporter::getMeshDisplayName(const MString& fullname)
+ModelExporter::MeshNameStr ModelExporter::getMeshDisplayName(const MString& fullname)
 {
-	typedef core::StackString<60> NameType;
-	core::FixedStack<NameType, 16> Stack;
-
+	core::FixedStack<MeshNameStr, 16> Stack;
 	core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
 	core::StringRange<char> range(nullptr, nullptr);
 
 	while (tokens.ExtractToken(range))
 	{
-		Stack.push(NameType(range.GetStart(), range.GetEnd()));
+		Stack.push(MeshNameStr(range.GetStart(), range.GetEnd()));
 	}
 
 	// ok the name is 2nd one.
@@ -1547,14 +1266,10 @@ core::StackString<60> ModelExporter::getMeshDisplayName(const MString& fullname)
 
 bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material& material)
 {
-	MStatus	 status;
 	MDagPath path = dagPath;
-	int	i;
-	int	instanceNum;
-
 	path.extendToShape();
 
-	instanceNum = 0;
+	int32_t instanceNum = 0;
 	if (path.isInstanced()) {
 		instanceNum = path.instanceNumber();
 	}
@@ -1562,12 +1277,13 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 	MFnMesh fnMesh(path);
 	MObjectArray sets;
 	MObjectArray comps;
-	status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
+	MStatus status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
 	if (!status) {
 		MayaUtil::MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
+		return false;
 	}
 
-	for (i = 0; i < (int)sets.length(); i++) {
+	for (int32_t i = 0; i < safe_static_cast<int32_t>(sets.length()); i++) {
 		MObject set = sets[i];
 		MObject comp = comps[i];
 
@@ -1583,7 +1299,7 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 			continue;
 		}
 
-		MObject shaderNode = FindShader(set);
+		MObject shaderNode = findShader(set);
 		if (shaderNode == MObject::kNullObj) {
 			continue;
 		}
@@ -1601,9 +1317,11 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 			MObject data;
 			transparencyPlug.getValue(data);
 			MFnNumericData val(data);
-			val.getData(material.tansparency_[0], 
+			val.getData(
+				material.tansparency_[0], 
 				material.tansparency_[1], 
-				material.tansparency_[2]);	
+				material.tansparency_[2]
+			);	
 
 			material.tansparency_[3] = 1.f;
 		}
@@ -1613,9 +1331,11 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 			MObject data;
 			specularColorPlug.getValue(data);
 			MFnNumericData val(data);
-			val.getData(material.specCol_[0],
+			val.getData(
+				material.specCol_[0],
 				material.specCol_[1],
-				material.specCol_[2]);
+				material.specCol_[2]
+			);
 
 			material.specCol_[3] = 1.f;
 		}
@@ -1625,9 +1345,11 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 			MObject data;
 			ambientColorPlug.getValue(data);
 			MFnNumericData val(data);
-			val.getData(material.ambientColor_[0],
+			val.getData(
+				material.ambientColor_[0],
 				material.ambientColor_[1],
-				material.ambientColor_[2]);
+				material.ambientColor_[2]
+			);
 
 			material.ambientColor_[3] = 1.f;
 		}
@@ -1639,7 +1361,6 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 		}
 
 		material.name_.assign(Shader.name().asChar());
-
 		if (material.name_.isEmpty()) {
 			MayaUtil::MayaPrintError("material name is empty");
 			return false;
@@ -1651,7 +1372,7 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 	return false;
 }
 
-MObject ModelExporter::FindShader(MObject& setNode)
+MObject ModelExporter::findShader(const MObject& setNode)
 {
 	MStatus				status;
 	MFnDependencyNode	fnNode(setNode);
@@ -1711,15 +1432,6 @@ MSyntax ModelExporterCmd::newSyntax(void)
 	syn.addFlag("m", "mode", MSyntax::kString);
 	syn.addFlag("s", "scale", MSyntax::kDouble);
 
-	syn.addFlag("wt", "weight_thresh", MSyntax::kDouble);
-	syn.addFlag("umt", "uv_merge_thresh", MSyntax::kDouble);
-	syn.addFlag("vmt", "vert_merge_thresh", MSyntax::kDouble);
-
-	syn.addFlag("zo", "zero_origin", MSyntax::kBoolean);
-	syn.addFlag("wvc", "white_vert_col", MSyntax::kBoolean);
-	syn.addFlag("mm", "merge_meshes", MSyntax::kBoolean);
-	syn.addFlag("mv", "merge_verts", MSyntax::kBoolean);
-	syn.addFlag("ew", "ext_weights", MSyntax::kBoolean);
 	syn.addFlag("fb", "force_bones", MSyntax::kBoolean);
 
 	syn.addFlag("dir", "dir_path", MSyntax::kString);

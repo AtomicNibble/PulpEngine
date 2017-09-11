@@ -14,7 +14,7 @@
 
 #include <IModel.h>
 
-#include <ModelCompiler.h>
+#include <RawModel.h>
 
 class MFnDagNode;
 
@@ -42,10 +42,9 @@ public:
 	Matrix33f	bindRotation;
 
 	Hierarchy<MayaBone> mayaNode;
-	Hierarchy<MayaBone> exportNode;
 };
 
-class ModelExporter : public model::ModelCompiler
+class ModelExporter : public model::RawModel::Model
 {
 	struct LODExportInfo
 	{
@@ -59,6 +58,8 @@ class ModelExporter : public model::ModelCompiler
 	X_DECLARE_ENUM(MeshExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
 	X_DECLARE_ENUM(UnitOfMeasureMent)(INCHES, CM);
 
+	typedef core::StackString<60> MeshNameStr;
+
 public:
 	ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
 	~ModelExporter();
@@ -71,9 +72,8 @@ private:
 	void setOutdir(const MString& path);
 
 	core::Path<char> getFilePath(void) const;
-	core::string getName(void) const;
+	const core::string& getName(void) const;
 
-	MString argsToJson(void) const;
 	MStatus parseArgs(const MArgList& args);
 	MStatus loadLODs(void);
 	MStatus loadBones(void);
@@ -88,13 +88,14 @@ private:
 	static void getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);
 	static core::UniquePointer<MFnDagNode> getParentBone(MFnDagNode* pBone);
 	static MStatus getBindPose(MayaBone& bone);
-	static core::StackString<60> getMeshDisplayName(const MString& fullname);
+	static MeshNameStr getMeshDisplayName(const MString& fullname);
 	static bool getMeshMaterial(MDagPath& dagPath, model::RawModel::Material& material);
-	static MObject FindShader(MObject& setNode);
+	static MObject findShader(const MObject& setNode);
 
 private:
 	typedef core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> LodInfoArr;
 
+	float scale_;
 	core::string name_;
 	core::Path<char> fileName_;
 	core::Path<char> outDir_;
@@ -106,7 +107,6 @@ private:
 	MayaBone				tagOrigin_;
 
 	Hierarchy<MayaBone>		mayaHead_;
-	Hierarchy<MayaBone>		exportHead_;
 
 	LodInfoArr lodExpoInfo_;
 };

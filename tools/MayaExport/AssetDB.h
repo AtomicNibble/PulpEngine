@@ -64,6 +64,7 @@ public:
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
+	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const DataArr& data, bool* pUnchanged = nullptr);
 	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& args, 
 		const DataArr& data, bool* pUnchanged = nullptr);
 

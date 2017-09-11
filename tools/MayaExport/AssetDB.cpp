@@ -389,6 +389,47 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString& name, const MS
 	return MS::kSuccess;
 }
 
+MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, const DataArr& data, bool* pUnchanged)
+{
+	if (!ensureConnected()) {
+		MayaUtil::MayaPrintError("Failed to 'UpdateAsset' pipe is invalid");
+		return MS::kFailure;
+	}
+
+	{
+		uint32_t dataSize = safe_static_cast<uint32_t>(data.size());
+
+		ProtoBuf::AssetDB::UpdateAsset* pUpdate = new ProtoBuf::AssetDB::UpdateAsset();
+		pUpdate->set_type(AssetTypeToProtoType(type));
+		pUpdate->set_name(name.asChar());
+		pUpdate->set_datasize(dataSize);
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_update(pUpdate);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+
+		// now send the buffer.
+		if (!sendBuf(data)) {
+			return MS::kFailure;
+		}
+	}
+
+	ProtoBuf::AssetDB::Reponse response;
+
+	if (!getResponse(response)) {
+		return MS::kFailure;
+	}
+
+	if (ProtoBuf::AssetDB::Result::UNCHANGED == response.result() && pUnchanged) {
+		*pUnchanged = true;
+	}
+
+	return MS::kSuccess;
+}
+
 MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, 
 	const MString& args, const DataArr& data, bool* pUnchanged)
 {
