@@ -732,7 +732,7 @@ MStatus ModelExporter::loadLODs(void)
 
 				for (int32_t x = 0; x < numVerts; x++) {
 					model::RawModel::Vert& vert = mesh.verts_[x];
-					vert.pos_ = ConvertUnitOfMeasure(vert.pos_);
+					vert.pos_ = convertUnitOfMeasure(vert.pos_);
 				}
 			}
 
@@ -1054,27 +1054,27 @@ MStatus ModelExporter::loadBones(void)
 }
 
 
-X_INLINE double ModelExporter::ConvertUnitOfMeasure(double value) const
+X_INLINE double ModelExporter::convertUnitOfMeasure(double value) const
 {
 	MDistance d(value);
 	return d.as(unitOfMeasurement_);
 }
 
-X_INLINE Vec3d ModelExporter::ConvertUnitOfMeasure(const Vec3d& vec) const
+X_INLINE Vec3d ModelExporter::convertUnitOfMeasure(const Vec3d& vec) const
 {
 	Vec3d ret;
-	ret.x = ConvertUnitOfMeasure(vec.x);
-	ret.y = ConvertUnitOfMeasure(vec.y);
-	ret.z = ConvertUnitOfMeasure(vec.z);
+	ret.x = convertUnitOfMeasure(vec.x);
+	ret.y = convertUnitOfMeasure(vec.y);
+	ret.z = convertUnitOfMeasure(vec.z);
 	return ret;
 }
 
-X_INLINE Vec3f ModelExporter::ConvertUnitOfMeasure(const Vec3f& vec) const
+X_INLINE Vec3f ModelExporter::convertUnitOfMeasure(const Vec3f& vec) const
 {
 	Vec3f ret;
-	ret.x = static_cast<float>(ConvertUnitOfMeasure(vec.x));
-	ret.y = static_cast<float>(ConvertUnitOfMeasure(vec.y));
-	ret.z = static_cast<float>(ConvertUnitOfMeasure(vec.z));
+	ret.x = static_cast<float>(convertUnitOfMeasure(vec.x));
+	ret.y = static_cast<float>(convertUnitOfMeasure(vec.y));
+	ret.z = static_cast<float>(convertUnitOfMeasure(vec.z));
 	return ret;
 }
 
@@ -1206,7 +1206,7 @@ MStatus ModelExporter::getBindPose(MayaBone& bone) const
 	Matrix33f rotationMatrix = invScaleMatrix * worldMatrix;
 
 	bone.scale = scale;
-	bone.bindpos = ConvertUnitOfMeasure(worldPos);
+	bone.bindpos = convertUnitOfMeasure(worldPos);
 	bone.bindRotation = rotationMatrix;
 
 	if(MayaUtil::IsVerbose())

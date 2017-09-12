@@ -86,9 +86,9 @@ private:
 	MayaBone* findJointReal(const char* pName);
 
 private:
-	double ConvertUnitOfMeasure(double value) const;
-	Vec3d ConvertUnitOfMeasure(const Vec3d& vec) const;
-	Vec3f ConvertUnitOfMeasure(const Vec3f& vec) const;
+	double convertUnitOfMeasure(double value) const;
+	Vec3d convertUnitOfMeasure(const Vec3d& vec) const;
+	Vec3f convertUnitOfMeasure(const Vec3f& vec) const;
 
 private:
 	MStatus getBindPose(MayaBone& bone) const;
