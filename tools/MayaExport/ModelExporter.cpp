@@ -1090,58 +1090,6 @@ MayaBone* ModelExporter::findJointReal(const char* pName)
 }
 
 
-void ModelExporter::getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut)
-{
-	indexOut.clear();
-
-	for (uint32_t gt = 0; gt < getTriangle.length(); gt++)
-	{
-		for (uint32_t gv = 0; gv < getVertices.length(); gv++)
-		{
-			if (getTriangle[gt] == getVertices[gv])
-			{
-				indexOut.append(gv);
-				break;
-			}
-		}
-	}
-}
-
-core::UniquePointer<MFnDagNode> ModelExporter::getParentBone(MFnDagNode* pBone)
-{
-	X_ASSERT_NOT_NULL(pBone);
-
-	MStatus		status;
-	MObject		parentObject;
-
-	core::UniquePointer<MFnDagNode> node;
-
-	parentObject = pBone->parent(0, &status);
-	if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-		return node;
-	}
-
-	while (!parentObject.hasFn(MFn::kTransform)) {
-		MFnDagNode parentNode(parentObject, &status);
-		if (!status) {
-			return node;
-		}
-
-		parentObject = parentNode.parent(0, &status);
-		if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-			return node;
-		}
-	}
-
-	node = core::makeUnique<MFnDagNode>(g_arena, parentObject, &status); 
-	if (!status) {
-		node.reset();
-	}
-
-	return node;
-}
-
-
 MStatus ModelExporter::getBindPose(MayaBone& bone)
 {
 	MStatus	status;
@@ -1278,6 +1226,57 @@ MStatus ModelExporter::getBindPose(MayaBone& bone)
 	return status;
 }
 
+
+void ModelExporter::getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut)
+{
+	indexOut.clear();
+
+	for (uint32_t gt = 0; gt < getTriangle.length(); gt++)
+	{
+		for (uint32_t gv = 0; gv < getVertices.length(); gv++)
+		{
+			if (getTriangle[gt] == getVertices[gv])
+			{
+				indexOut.append(gv);
+				break;
+			}
+		}
+	}
+}
+
+core::UniquePointer<MFnDagNode> ModelExporter::getParentBone(MFnDagNode* pBone)
+{
+	X_ASSERT_NOT_NULL(pBone);
+
+	MStatus		status;
+	MObject		parentObject;
+
+	core::UniquePointer<MFnDagNode> node;
+
+	parentObject = pBone->parent(0, &status);
+	if (!status && status.statusCode() == MStatus::kInvalidParameter) {
+		return node;
+	}
+
+	while (!parentObject.hasFn(MFn::kTransform)) {
+		MFnDagNode parentNode(parentObject, &status);
+		if (!status) {
+			return node;
+		}
+
+		parentObject = parentNode.parent(0, &status);
+		if (!status && status.statusCode() == MStatus::kInvalidParameter) {
+			return node;
+		}
+	}
+
+	node = core::makeUnique<MFnDagNode>(g_arena, parentObject, &status);
+	if (!status) {
+		node.reset();
+	}
+
+	return node;
+}
 
 
 ModelExporter::MeshNameStr ModelExporter::getMeshDisplayName(const MString& fullname)
