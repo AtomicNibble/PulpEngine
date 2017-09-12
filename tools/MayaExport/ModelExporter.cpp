@@ -30,6 +30,7 @@
 #include <maya/MFnNumericData.h>
 #include <maya/MArgDatabase.h>
 #include <maya\MSyntax.h>
+#include <maya\MAnimControl.h>
 
 
 X_DISABLE_WARNING(4702)
@@ -1227,12 +1228,20 @@ MStatus ModelExporter::getBindPose(MayaBone& bone)
 
 	if (!foundBindPose)
 	{
-		MayaUtil::MayaPrintVerbose("failed to get bind pose for bone: %s", bone.name.c_str());
+		MayaUtil::MayaPrintVerbose("failed to get bind pose for bone: %s using frame 0", bone.name.c_str());
+
+		auto curTime = MAnimControl::currentTime();
+
+		MTime time;
+		time.setValue(0);
+		MAnimControl::setCurrentTime(time);
 
 		MTransformationMatrix worldTransMatrix = dagPath.inclusiveMatrix(&status);
 		if (!status) {
 			return status;
 		}
+
+		MAnimControl::setCurrentTime(curTime);
 
 		MMatrix m = worldTransMatrix.asMatrix();
 
