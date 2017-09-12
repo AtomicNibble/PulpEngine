@@ -69,8 +69,9 @@ namespace MayaUtil
 		return Color(col[0], col[1], col[2], col[3]);
 	}
 
-	X_INLINE Vec3f XVec(const MMatrix& matrix) {
-		return Vec3f((float)matrix[3][0], (float)matrix[3][1], (float)matrix[3][2]);
+	template<typename T = float>
+	X_INLINE Vec3<T> XVec(const MMatrix& matrix) {
+		return Vec3<T>((T)matrix[3][0], (T)matrix[3][1], (T)matrix[3][2]);
 	}
 
 	X_INLINE Matrix33f XMat(const MMatrix& matrix) {	
