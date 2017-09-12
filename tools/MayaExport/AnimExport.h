@@ -18,8 +18,8 @@ X_NAMESPACE_BEGIN(maya)
 
 struct FrameData
 {
-	Vec3f position;
 	Vec3f scale;
+	Vec3d position;
 	Quatd rotation;
 };
 
@@ -66,6 +66,11 @@ private:
 	}
 
 private:
+	double convertUnitOfMeasure(double value) const;
+	Vec3d convertUnitOfMeasure(const Vec3d& vec) const;
+	Vec3f convertUnitOfMeasure(const Vec3f& vec) const;
+
+private:
 	core::MemoryArenaBase* arena_;
 
 	int32_t startFrame_;
@@ -79,7 +84,7 @@ private:
 	core::Path<char> outDir_;
 
 	ExpoMode::Enum exportMode_;
-
+	MDistance::Unit unitOfMeasurement_;
 	MDagPathArray exportObjects_;
 	core::Array<Bone> bones_;
 };

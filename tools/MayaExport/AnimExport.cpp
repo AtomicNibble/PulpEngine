@@ -44,6 +44,7 @@ PotatoAnimExporter::PotatoAnimExporter(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	fps_(anim::ANIM_DEFAULT_FPS),
 	type_(anim::AnimType::RELATIVE),
+	unitOfMeasurement_(MDistance::Unit::kInches),
 	bones_(arena)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Anim ===========");
@@ -385,7 +386,8 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 				MMatrix m = worldMatrixTrans.asMatrix();
 				
 				Matrix33f worldMatrix = MayaUtil::XMat(m);
-				Vec3f pos = MayaUtil::XVec(m);
+				Vec3d pos = MayaUtil::XVec<double>(m);
+				pos = convertUnitOfMeasure(pos);
 
 				Vec3f scale;
 				scale.x = worldMatrix.getColumn(0).length();
@@ -486,7 +488,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 			const FrameData& data = bone.data[i];
 
 			buf.clear();
-			buf.appendFmt("POS ( %f %f %f )\n",
+			buf.appendFmt("POS ( %.8g %.8g %.8g %.8g )\n",
 				data.position.x,
 				data.position.y,
 				data.position.z);
@@ -681,6 +683,30 @@ MString PotatoAnimExporter::argsToJson(void) const
 	writer.EndObject();
 
 	return MString(s.GetString());
+}
+
+X_INLINE double PotatoAnimExporter::convertUnitOfMeasure(double value) const
+{
+	MDistance d(value);
+	return d.as(unitOfMeasurement_);
+}
+
+X_INLINE Vec3d PotatoAnimExporter::convertUnitOfMeasure(const Vec3d& vec) const
+{
+	Vec3d ret;
+	ret.x = convertUnitOfMeasure(vec.x);
+	ret.y = convertUnitOfMeasure(vec.y);
+	ret.z = convertUnitOfMeasure(vec.z);
+	return ret;
+}
+
+X_INLINE Vec3f PotatoAnimExporter::convertUnitOfMeasure(const Vec3f& vec) const
+{
+	Vec3f ret;
+	ret.x = static_cast<float>(convertUnitOfMeasure(vec.x));
+	ret.y = static_cast<float>(convertUnitOfMeasure(vec.y));
+	ret.z = static_cast<float>(convertUnitOfMeasure(vec.z));
+	return ret;
 }
 
 // ======================================================

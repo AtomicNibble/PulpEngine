@@ -22,6 +22,7 @@
 
 #include <maya/MStatus.h>
 #include <maya/MObject.h>
+#include <maya\MDistance.h>
 
 
 extern core::MemoryArenaBase* g_arena;
