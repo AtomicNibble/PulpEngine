@@ -90,9 +90,9 @@ private:
 	Vec3f ConvertUnitOfMeasure(const Vec3f& vec) const;
 
 private:
+	MStatus getBindPose(MayaBone& bone) const;
 	static void getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);
 	static core::UniquePointer<MFnDagNode> getParentBone(MFnDagNode* pBone);
-	static MStatus getBindPose(MayaBone& bone);
 	static MeshNameStr getMeshDisplayName(const MString& fullname);
 	static bool getMeshMaterial(MDagPath& dagPath, model::RawModel::Material& material);
 	static MObject findShader(const MObject& setNode);

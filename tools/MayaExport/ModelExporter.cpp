@@ -1040,7 +1040,7 @@ MStatus ModelExporter::loadBones(void)
 				bone.parIndx_ = -1;
 			}
 
-			Vec3f pos = ConvertUnitOfMeasure(mayaBone.bindpos);
+			Vec3f pos = mayaBone.bindpos;
 			pos *= scale_;
 
 			bone.name_ = mayaBone.name.c_str();
@@ -1089,8 +1089,7 @@ MayaBone* ModelExporter::findJointReal(const char* pName)
 	return nullptr;
 }
 
-
-MStatus ModelExporter::getBindPose(MayaBone& bone)
+MStatus ModelExporter::getBindPose(MayaBone& bone) const
 {
 	MStatus	status;
 	MDagPath dagPath;
@@ -1174,7 +1173,7 @@ MStatus ModelExporter::getBindPose(MayaBone& bone)
 
 	if (!foundBindPose)
 	{
-		MayaUtil::MayaPrintVerbose("failed to get bind pose for bone: %s using frame 0", bone.name.c_str());
+		MayaUtil::MayaPrintVerbose("Failed to get bind pose for bone: %s using frame 0", bone.name.c_str());
 
 		auto curTime = MAnimControl::currentTime();
 
@@ -1207,17 +1206,25 @@ MStatus ModelExporter::getBindPose(MayaBone& bone)
 	Matrix33f rotationMatrix = invScaleMatrix * worldMatrix;
 
 	bone.scale = scale;
-	bone.bindpos = worldPos;
+	bone.bindpos = ConvertUnitOfMeasure(worldPos);
 	bone.bindRotation = rotationMatrix;
 
 	if(MayaUtil::IsVerbose())
 	{
 		Quatf quat = Quatf(bone.bindRotation);
 		auto euler = quat.getEulerDegrees();
+		auto pos = bone.bindpos;
+		auto scaledPos = bone.bindpos;
 
-		MayaUtil::MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g) ang: (%g,%g,%g) scale: (%g,%g,%g)",
+		auto* pParent = bone.mayaNode.parent();
+		if (pParent) {
+			scaledPos *= pParent->scale;
+		}
+
+		MayaUtil::MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g) scaledPos: (%g,%g,%g) ang: (%g,%g,%g) scale: (%g,%g,%g)",
 			bone.name.c_str(),
-			bone.bindpos.x, bone.bindpos.y, bone.bindpos.z,
+			pos.x, pos.y, pos.z,
+			scaledPos.x, scaledPos.y, scaledPos.z,
 			euler.x, euler.y, euler.z,
 			scale.x, scale.y, scale.z
 		);
