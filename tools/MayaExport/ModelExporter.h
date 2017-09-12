@@ -85,9 +85,9 @@ private:
 	MayaBone* findJointReal(const char* pName);
 
 private:
-	double ConvertUnitOfMeasure(double value);
-	Vec3d ConvertUnitOfMeasure(const Vec3d& vec);
-	Vec3f ConvertUnitOfMeasure(const Vec3f& vec);
+	double ConvertUnitOfMeasure(double value) const;
+	Vec3d ConvertUnitOfMeasure(const Vec3d& vec) const;
+	Vec3f ConvertUnitOfMeasure(const Vec3f& vec) const;
 
 private:
 	static void getLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut);

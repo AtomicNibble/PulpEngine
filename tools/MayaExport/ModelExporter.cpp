@@ -1054,13 +1054,13 @@ MStatus ModelExporter::loadBones(void)
 }
 
 
-X_INLINE double ModelExporter::ConvertUnitOfMeasure(double value)
+X_INLINE double ModelExporter::ConvertUnitOfMeasure(double value) const
 {
 	MDistance d(value);
 	return d.as(unitOfMeasurement_);
 }
 
-X_INLINE Vec3d ModelExporter::ConvertUnitOfMeasure(const Vec3d& vec)
+X_INLINE Vec3d ModelExporter::ConvertUnitOfMeasure(const Vec3d& vec) const
 {
 	Vec3d ret;
 	ret.x = ConvertUnitOfMeasure(vec.x);
@@ -1069,7 +1069,7 @@ X_INLINE Vec3d ModelExporter::ConvertUnitOfMeasure(const Vec3d& vec)
 	return ret;
 }
 
-X_INLINE Vec3f ModelExporter::ConvertUnitOfMeasure(const Vec3f& vec)
+X_INLINE Vec3f ModelExporter::ConvertUnitOfMeasure(const Vec3f& vec) const
 {
 	Vec3f ret;
 	ret.x = static_cast<float>(ConvertUnitOfMeasure(vec.x));
