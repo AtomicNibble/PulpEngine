@@ -488,7 +488,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 			const FrameData& data = bone.data[i];
 
 			buf.clear();
-			buf.appendFmt("POS ( %.8g %.8g %.8g %.8g )\n",
+			buf.appendFmt("POS ( %.8g %.8g %.8g )\n",
 				data.position.x,
 				data.position.y,
 				data.position.z);
