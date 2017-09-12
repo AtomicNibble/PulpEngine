@@ -59,6 +59,7 @@ class ModelExporter : public model::RawModel::Model
 	X_DECLARE_ENUM(MeshExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
 
 	typedef core::StackString<60> MeshNameStr;
+	typedef core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> LodInfoArr;
 
 public:
 	ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
@@ -98,8 +99,6 @@ private:
 	static MObject findShader(const MObject& setNode);
 
 private:
-	typedef core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> LodInfoArr;
-
 	float scale_;
 	core::string name_;
 	core::Path<char> fileName_;
