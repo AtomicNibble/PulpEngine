@@ -1214,17 +1214,10 @@ MStatus ModelExporter::getBindPose(MayaBone& bone) const
 		Quatf quat = Quatf(bone.bindRotation);
 		auto euler = quat.getEulerDegrees();
 		auto pos = bone.bindpos;
-		auto scaledPos = bone.bindpos;
 
-		auto* pParent = bone.mayaNode.parent();
-		if (pParent) {
-			scaledPos *= pParent->scale;
-		}
-
-		MayaUtil::MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g) scaledPos: (%g,%g,%g) ang: (%g,%g,%g) scale: (%g,%g,%g)",
+		MayaUtil::MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g) ang: (%g,%g,%g) scale: (%g,%g,%g)",
 			bone.name.c_str(),
 			pos.x, pos.y, pos.z,
-			scaledPos.x, scaledPos.y, scaledPos.z,
 			euler.x, euler.y, euler.z,
 			scale.x, scale.y, scale.z
 		);
