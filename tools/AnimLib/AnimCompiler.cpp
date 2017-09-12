@@ -13,7 +13,8 @@ const float AnimCompiler::DEFAULT_POS_ERRR = 0.05f;
 const float AnimCompiler::DEFAULT_ANGLE_ERRR = 0.005f;
 
 AnimCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
-	droppedBoneNames(arena)
+	noneAnimatedBoneName(arena),
+	notPresentBoneNames(arena)
 {
 	clear();
 }
@@ -28,7 +29,7 @@ void AnimCompiler::Stats::clear(void)
 	totalBonesAngleData = 0;
 
 	compileTime = core::TimeVal(0ll);
-	droppedBoneNames.clear();
+	noneAnimatedBoneName.clear();
 }
 
 void AnimCompiler::Stats::print(void) const
@@ -46,12 +47,12 @@ void AnimCompiler::Stats::print(void) const
 
 	core::StackString<1024> info("Dropped Bones:");
 
-	if (droppedBoneNames.size() > 0) {
+	if (noneAnimatedBoneName.size() > 0) {
 		info.append(" -> (");
-		for (uint i = 0; i < droppedBoneNames.size(); i++) {
-			info.append(droppedBoneNames[i].c_str());
+		for (uint i = 0; i < noneAnimatedBoneName.size(); i++) {
+			info.append(noneAnimatedBoneName[i].c_str());
 
-			if (i < (droppedBoneNames.size() - 1)) {
+			if (i < (noneAnimatedBoneName.size() - 1)) {
 				info.append(", ");
 			}
 
@@ -61,10 +62,26 @@ void AnimCompiler::Stats::print(void) const
 		}
 		info.append(")");
 	}
-	if (droppedBoneNames.size() > 10) {
+	if (noneAnimatedBoneName.size() > 10) {
 		info.append("");
 	}
 
+	X_LOG0("Anim", info.c_str());
+	
+	info.set("NotInAnim Bones:");
+
+	if (notPresentBoneNames.size() > 0) 
+	{
+		info.append(" -> (");
+		for (auto& name : notPresentBoneNames)
+		{
+			info.append(name.c_str());
+			info.append(", ");
+		}
+
+		info.trimRight(',');
+	}
+	
 	X_LOG0("Anim", info.c_str());
 }
 
@@ -496,6 +513,7 @@ void AnimCompiler::Angle::calculateDeltas(const float angError)
 	angles_.reserve(fullAngles_.size());
 
 	Quatf curAng = baseOrient_;
+	// Quatf curAng = Quatf::identity();
 	int32_t frame = 0;
 
 	for (auto& ang : fullAngles_)
@@ -577,8 +595,9 @@ void AnimCompiler::printStats(bool verbose) const
 
 		for (auto& bone : bones_)
 		{
-			core::StackString256 info;
-
+			if (!bone.hasData()) {
+				continue;
+			}
 
 			X_LOG0("Anim", "-> \"%s\"", bone.name.c_str());
 			X_LOG_BULLET;
@@ -587,7 +606,6 @@ void AnimCompiler::printStats(bool verbose) const
 			basePosRel *= 2.54f;
 
 			X_LOG0("Anim", "rel: ^6%g^7,^6%g^7,^6%g^7", basePosRel.x, basePosRel.y, basePosRel.z);
-
 			X_LOG0("Anim", "ang: ^6%2" PRIuS "^7 full: ^6%d^7 large-f: ^6%d",
 				bone.ang.numAngleFrames(), bone.ang.isFullFrames(), bone.ang.isLargeFrames());
 
@@ -683,21 +701,23 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 
 	core::StopWatch timer;
 
-	loadInterBones();
-	dropMissingBones();
+	loadBones();
 
 	if (bones_.isEmpty()) {
 		X_WARNING("Anim", "skipping compile of anim, inter anim and model skelton have no bones in common");
 		return true;
 	}
 
-	// load base bone positions from model skelton.
-	loadBaseData();
-	sortBones();
 	processBones(posError, angError);
 
-	// cull any without data.
-	dropNullBones();
+	// create list of un-animated bones.
+	for (const auto& bone : bones_)
+	{
+		if (!bone.hasData())
+		{
+			stats_.noneAnimatedBoneName.append(bone.name);
+		}
+	}
 
 	// build some stats.
 	stats_.scale = scale_;
@@ -734,11 +754,14 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		return false;
 	}
 
+	const size_t numBonesWithData = core::accumulate(bones_.begin(), bones_.end(), 0_sz, [](const Bone& b) {
+		return static_cast<int32_t>(b.hasData());
+	});
 
 	anim::AnimHeader hdr;
 	hdr.version = anim::ANIM_VERSION;
 	hdr.type = type_;
-	hdr.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
+	hdr.numBones = safe_static_cast<uint8_t, size_t>(numBonesWithData);
 	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
 	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());
 
@@ -751,12 +774,20 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 	// write the bone names.
 	for (const auto& bone : bones_)
 	{
+		if (!bone.hasData()) {
+			continue;
+		}
+
 		stream.write(bone.name.c_str(), core::strUtil::StringBytesIncNull(bone.name));
 	}
 
 	// now we save the data.
 	for (const auto& bone : bones_)
 	{
+		if (!bone.hasData()) {
+			continue;
+		}
+
 		BoneFlags flags;
 		if (bone.pos.isLargeScalers()) {
 			flags.Set(BoneFlag::LargePosScalers);
@@ -795,151 +826,71 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 	return true;
 }
 
-
-void AnimCompiler::loadInterBones(void)
+void AnimCompiler::loadBones(void)
 {
-	// make a copy of all the bones names in anim file.
-	bones_.resize(inter_.getNumBones(), Bone(arena_));
+	bones_.reserve(inter_.getNumBones());
 
-	for (size_t i = 0; i < inter_.getNumBones(); i++)
+	size_t i, x, numModelBones = skelton_.getNumBones();
+	for (i = 0; i < numModelBones; i++)
 	{
-		const anim::Bone& interBone = inter_.getBone(i);
-		const size_t dataNum = interBone.data.size();
+		const char* pBoneName = skelton_.getBoneName(i);
 
-		Bone& bone = bones_[i];
-		bone.name = interBone.name;
-
-		// load pos / angles.
-		for (size_t x = 0; x < dataNum; x++)
+		// got anim data for this bone?
+		for (x = 0; x < inter_.getNumBones(); x++)
 		{
-			bone.pos.appendFullPos(interBone.data[x].position * scale_);
-			bone.ang.appendFullAng(interBone.data[x].rotation);
-		}
-	}
-}
-
-void AnimCompiler::dropMissingBones(void)
-{
-	// drop any bones that are not in the model file.
-	for (size_t i = 0; i < bones_.size(); i++)
-	{
-		const core::string& name = bones_[i].name;
-
-		// check if this bone in model file.
-		size_t x, numModelBones = skelton_.getNumBones();
-		for (x = 0; x < numModelBones; x++)
-		{
-			const char* pName = skelton_.getBoneName(x);
-			if (name == pName)
+			const anim::Bone& interBone = inter_.getBone(x);
+			if (interBone.name == pBoneName)
 			{
-				break;
-			}
-		}
-
-		if (x == numModelBones)
-		{
-			// remove it.
-			stats_.droppedBoneNames.append(name);
-			bones_.removeIndex(i);
-		}
-	}
-}
-
-void AnimCompiler::dropNullBones(void)
-{
-	// drop any bones that have no data.
-	for (size_t i = 0; i < bones_.size(); i++)
-	{
-		auto& bone = bones_[i];
-
-		if(!bone.hasData())
-		{
-			// remove it.
-			stats_.droppedBoneNames.append(bone.name);
-			bones_.removeIndex(i);
-
-			--i;
-		}
-	}
-}
-
-void AnimCompiler::loadBaseData(void)
-{
-	for (size_t i = 0; i < bones_.size(); i++)
-	{
-		const core::string& name = bones_[i].name;
-
-		// check if this bone in model file.
-		size_t x, numModelBones = skelton_.getNumBones();
-		for (x = 0; x < numModelBones; x++)
-		{
-			const char* pName = skelton_.getBoneName(x);
-			if (name == pName)
-			{
-				size_t parentIdx = skelton_.getBoneParent(x);
-				const Quatf& angle = skelton_.getBoneAngle(x);
-				const Quatf& anglePar =	skelton_.getBoneAngle(parentIdx);
-				const Vec3f& posWorld = skelton_.getBonePos(x);
+				size_t parentIdx = skelton_.getBoneParent(i);
+				const Quatf& angle = skelton_.getBoneAngle(i);
+				const Quatf& anglePar = skelton_.getBoneAngle(parentIdx);
+				const Vec3f& posWorld = skelton_.getBonePos(i);
 				const Vec3f& posPar = skelton_.getBonePos(parentIdx);
+				const Vec3f posRel = (posWorld - posPar) * anglePar.inverse();
 
 				// work out parent index for anim.
 				const char* pParentName = skelton_.getBoneName(parentIdx);
-
 				auto it = std::find_if(bones_.begin(), bones_.end(), [pParentName](const Bone& b) {
 					return b.name == pParentName;
 				});
 
-				if (it == bones_.end()) {
-					X_ASSERT_UNREACHABLE();
+
+				int32_t localParentIdx = -1;
+				if (it != bones_.end()) {
+					localParentIdx = safe_static_cast<int32_t>(std::distance(bones_.begin(), it));
+				}
+				else {
+					if (pParentName != interBone.name) {
+						X_ASSERT_UNREACHABLE();
+					}
 				}
 
-				parentIdx = std::distance(bones_.begin(), it);
 
-				Vec3f posRel = posWorld - posPar;
-				posRel = posRel * anglePar.inverse();
+				Bone bone(arena_);
+				bone.name = interBone.name;
+				bone.parentIdx = localParentIdx;
 
-				Bone& bone = bones_[i];
+				for (size_t num = 0; num < interBone.data.size(); num++)
+				{
+					bone.pos.appendFullPos(interBone.data[num].position * scale_);
+					bone.ang.appendFullAng(interBone.data[num].rotation);
+				}
+
 				bone.pos.setBasePositions(posWorld, posRel);
 				bone.ang.setBaseOrient(angle);
 
-				if (parentIdx == i) {
-					bone.parentIdx = -1;
-				}
-				else {
-					bone.parentIdx = safe_static_cast<int32_t>(parentIdx);
-				}
+				bones_.push_back(std::move(bone));
 				break;
 			}
 		}
 
-		if (x == numModelBones)
+		if (x == inter_.getNumBones())
 		{
-			X_ASSERT_UNREACHABLE();
+			// we don't have anim data for this model bone.
+			stats_.notPresentBoneNames.append(core::string(pBoneName));
 		}
 	}
 }
-
-void AnimCompiler::sortBones(void)
-{
-	for (size_t i = 0; i<bones_.size(); i++)
-	{
-		auto& bone = bones_[i];
-		bone.depth = 0;
-
-		auto* pCurBone = &bone;
-		while (pCurBone->parentIdx >= 0)
-		{
-			pCurBone = &bones_[pCurBone->parentIdx];
-			bone.depth++;
-		}
-	}
-
-	// sort the bones so they are in depth order.
-	std::sort(bones_.begin(), bones_.end(), [](const Bone& lhs, const Bone& rhs) {
-		return lhs.depth < rhs.depth;
-	});
-}
-
 
 void AnimCompiler::processBones(const float posError, const float angError)
 {

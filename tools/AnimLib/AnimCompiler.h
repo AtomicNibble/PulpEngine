@@ -23,7 +23,8 @@ class AnimCompiler
 		size_t totalBonesAngleData;
 
 		core::TimeVal compileTime;
-		core::Array<core::string> droppedBoneNames;
+		core::Array<core::string> noneAnimatedBoneName;
+		core::Array<core::string> notPresentBoneNames;
 	};
 
 	class Angle;
@@ -170,12 +171,7 @@ private:
 	bool save(const core::Path<wchar_t>& path);
 
 private:
-
-	void loadInterBones(void);
-	void dropMissingBones(void);
-	void dropNullBones(void);
-	void loadBaseData(void);
-	void sortBones(void);
+	void loadBones(void);
 	void processBones(const float posError, const float angError);
 
 private:
