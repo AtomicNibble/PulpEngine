@@ -9,9 +9,7 @@
 #include <maya\MFloatArray.h>
 #include <maya\MFloatPointArray.h>
 #include <maya\MDagPath.h>
-#include <maya\MDagPathArray.h>
 #include <maya\MSelectionList.h>
-#include <maya\MItSelectionList.h>
 #include <maya\MGlobal.h>
 #include <maya\MPlug.h>
 #include <maya\MFnSet.h>
