@@ -552,8 +552,7 @@ void AnimCompiler::Angle::calculateDeltas(const float angError)
 AnimCompiler::Bone::Bone(core::MemoryArenaBase* arena) :
 	pos(arena),
 	ang(arena),
-	parentIdx(-1),
-	depth(-1)
+	parentIdx(-1)
 {
 
 }

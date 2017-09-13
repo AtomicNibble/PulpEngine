@@ -140,7 +140,6 @@ class AnimCompiler
 		Position pos;
 		Angle ang;
 		int32_t parentIdx;
-		int32_t depth;
 	};
 
 	typedef core::Array<Bone> BoneArr;
