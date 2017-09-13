@@ -22,9 +22,9 @@ namespace Util
 
 			// make sure our parent has been transformed.
 			X_ASSERT(parentIdx < i, "Parent is not yet transformed")(parentIdx, i);
-
 			auto& parent = mats[parentIdx];
-			mats[i] *= parent;
+
+			mats[i] = parent * mats[i];
 		}
 	}
 
