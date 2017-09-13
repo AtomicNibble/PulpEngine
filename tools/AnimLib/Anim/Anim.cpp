@@ -76,6 +76,7 @@ void Bone::load(core::MemCursor& cursor)
 void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 {
 	Vec3f pos;
+	Quatf ang;
 
 	// position
 	if (numPos_)
@@ -86,6 +87,11 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 		}
 		else
 		{
+			if (flags_.IsSet(BoneFlag::PosFullFrame) || flags_.IsSet(BoneFlag::PosLargeFrames))
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+			}
+
 			// do we have any data for you yet?
 			if (pPosFrames_[0] > frame) {
 				return;
@@ -132,6 +138,58 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 	}
 
 
+	if (numAngles_)
+	{
+		if (numAngles_ == 1)
+		{
+			ang = GetAngle(0);
+		}
+		else
+		{
+			if (flags_.IsSet(BoneFlag::AngFullFrame) || flags_.IsSet(BoneFlag::AngLargeFrames))
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+			}
+
+			if (pAngleFrames_[0] > frame) {
+				return;
+			}
+
+			int32_t angFrameIdx = 0;
+			while (pAngleFrames_[angFrameIdx] < frame) {
+				++angFrameIdx;
+			}
+
+			// we have data
+			if (pAngleFrames_[angFrameIdx] == frame)
+			{
+				ang = GetAngle(angFrameIdx);
+			}
+			else
+			{
+				int32_t firstIdx = angFrameIdx - 1;
+				int32_t lastIdx = angFrameIdx;
+
+				X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+
+				int32_t first = pAngleFrames_[firstIdx];
+				int32_t last = pAngleFrames_[lastIdx];
+
+
+				int32_t offset = frame - first;
+				int32_t range = last - first;
+
+				float fraction = static_cast<float>(offset) / range;
+
+				auto firstAng = GetAngle(firstIdx);
+				auto lastAng = GetAngle(lastIdx);
+
+				ang = firstAng.slerp(fraction, lastAng);
+			}
+		}
+	}
+
+	trans.quat = ang;
 	trans.pos = pos;
 }
 
