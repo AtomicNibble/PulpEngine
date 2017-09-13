@@ -162,6 +162,12 @@ void AnimCompiler::Position::save(core::ByteStream& stream) const
 	}
 }
 
+
+void AnimCompiler::Position::clearData(void)
+{
+	posFrames_.clear();
+}
+
 void AnimCompiler::Position::appendFullPos(const Vec3f& pos)
 {
 	fullPos_.append(pos);
@@ -466,6 +472,11 @@ void AnimCompiler::Angle::save(core::ByteStream& stream) const
 	}	
 }
 
+void AnimCompiler::Angle::clearData(void)
+{
+	angles_.clear();
+}
+
 void AnimCompiler::Angle::appendFullAng(const Quatf& ang)
 {
 	fullAngles_.append(ang);
@@ -563,6 +574,11 @@ bool AnimCompiler::Bone::hasData(void) const
 	return ang.hasData() || pos.hasData();
 }
 
+void AnimCompiler::Bone::clearData(void)
+{
+	ang.clearData();
+	pos.clearData();
+}
 
 // ----------------------------------------------------
 
@@ -708,6 +724,17 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 	}
 
 	processBones(posError, angError);
+
+	if (type_ == AnimType::RELATIVE)
+	{
+		for (auto& bone : bones_)
+		{
+			if (bone.parentIdx == -1)
+			{
+				bone.clearData();
+			}
+		}
+	}
 
 	// create list of un-animated bones.
 	for (const auto& bone : bones_)

@@ -47,7 +47,8 @@ class AnimCompiler
 		Position(core::MemoryArenaBase* arena);
 
 		void save(core::ByteStream& stream) const;
-		
+		void clearData(void);
+
 		void appendFullPos(const Vec3f& pos);
 		void setBasePositions(const Vec3f& basePosWorld, const Vec3f& basePosRel);
 
@@ -104,7 +105,8 @@ class AnimCompiler
 		Angle(core::MemoryArenaBase* arena);
 
 		void save(core::ByteStream& stream) const;
-		
+		void clearData(void);
+
 		void appendFullAng(const Quatf& ang);
 		void setBaseOrient(const Quatf& ang);
 		size_t numAngleFrames(void) const;
@@ -135,6 +137,7 @@ class AnimCompiler
 		Bone(core::MemoryArenaBase* arena);
 
 		bool hasData(void) const;
+		void clearData(void);
 
 		core::string name;
 		Position pos;
