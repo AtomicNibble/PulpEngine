@@ -323,6 +323,15 @@ bool Animator::createFrame(core::TimeVal currentTime)
 		return false;
 	}
 
+	{
+		auto angle = model_.getBoneAngle(0);
+		auto pos = model_.getBonePos(0);
+
+		bones[0].pos = pos;
+		bones[0].quat = angle.asQuat();
+	}
+
+
 	Util::convertBoneTransToMatrix(boneMat_, bones);
 	Util::transformBones(boneMat_, model_.getTagTree(), 1, static_cast<int32_t>(boneMat_.size() - 1));
 
