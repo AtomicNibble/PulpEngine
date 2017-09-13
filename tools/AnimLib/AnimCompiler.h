@@ -108,7 +108,8 @@ class AnimCompiler
 		void clearData(void);
 
 		void appendFullAng(const Quatf& ang);
-		void setBaseOrient(const Quatf& ang);
+		void setBaseOrients(const Quatf& angWorld, const Quatf& andRel);
+
 		size_t numAngleFrames(void) const;
 		bool hasData(void) const;
 		bool isLargeFrames(void) const;
@@ -117,14 +118,18 @@ class AnimCompiler
 		const Quatf& getAngForFrame(size_t idx) const;
 		const AngleFrameArr& getAngles(void) const;
 
+		void calculateRelativeData(const Position& parentPos, const Angle& parentAng);
+		void calculateRelativeDataRoot(void);
 		void calculateDeltas(const float angError = 0.075f);
 
 	private:
 		AnglesArr fullAngles_; // angles for every frame
+		AnglesArr relAngles_; // angles for every frame
 		AngleFrameArr angles_; // the set of angles after dropping angles below angle threshold.
 
 		Vec3<bool> axisChanges_;
 
+		Quatf baseOrientWorld_;
 		Quatf baseOrient_;
 	};
 

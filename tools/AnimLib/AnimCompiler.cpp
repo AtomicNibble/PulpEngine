@@ -425,6 +425,7 @@ void AnimCompiler::Position::buildScalers(const float posError)
 
 AnimCompiler::Angle::Angle(core::MemoryArenaBase* arena) :
 	fullAngles_(arena),
+	relAngles_(arena),
 	angles_(arena)
 {
 	fullAngles_.setGranularity(128);
@@ -482,9 +483,10 @@ void AnimCompiler::Angle::appendFullAng(const Quatf& ang)
 	fullAngles_.append(ang);
 }
 
-void AnimCompiler::Angle::setBaseOrient(const Quatf& ang)
+void AnimCompiler::Angle::setBaseOrients(const Quatf& angWorld, const Quatf& andRel)
 {
-	baseOrient_ = ang;
+	baseOrientWorld_ = angWorld;
+	baseOrient_ = andRel;
 }
 
 size_t AnimCompiler::Angle::numAngleFrames(void) const
@@ -518,16 +520,38 @@ const AnimCompiler::Angle::AngleFrameArr& AnimCompiler::Angle::getAngles(void) c
 	return angles_;
 }
 
+
+void AnimCompiler::Angle::calculateRelativeData(const Position& parentPos, const Angle& parentAng)
+{
+	relAngles_.resize(fullAngles_.size());
+
+	for (size_t i = 0; i < fullAngles_.size(); i++)
+	{
+		auto& parWorldAngle = parentAng.getAngForFrame(i);
+		auto& worldAngle = fullAngles_[i];
+		auto rel = worldAngle * parWorldAngle.inverse();
+
+		relAngles_[i] = rel;
+	}
+}
+
+void AnimCompiler::Angle::calculateRelativeDataRoot(void)
+{
+	relAngles_ = fullAngles_;
+}
+
+
+
 void AnimCompiler::Angle::calculateDeltas(const float angError)
 {
 	angles_.clear();
-	angles_.reserve(fullAngles_.size());
+	angles_.reserve(relAngles_.size());
 
-	Quatf curAng = baseOrient_;
-	// Quatf curAng = Quatf::identity();
+	Quatf curAng = Quatf::identity();
+	
 	int32_t frame = 0;
 
-	for (auto& ang : fullAngles_)
+	for (auto& ang : relAngles_)
 	{
 		Quatf delta = ang.diff(curAng);
 
@@ -868,18 +892,18 @@ void AnimCompiler::loadBones(void)
 			if (interBone.name == pBoneName)
 			{
 				size_t parentIdx = skelton_.getBoneParent(i);
-				const Quatf& angle = skelton_.getBoneAngle(i);
-				const Quatf& anglePar = skelton_.getBoneAngle(parentIdx);
+				const Quatf& angleWorld = skelton_.getBoneAngle(i);
 				const Vec3f& posWorld = skelton_.getBonePos(i);
-				const Vec3f& posPar = skelton_.getBonePos(parentIdx);
-				const Vec3f posRel = (posWorld - posPar) * anglePar.inverse();
+				
+				const Quatf& angleParWorld = skelton_.getBoneAngle(parentIdx);
+				const Vec3f& posParWorld = skelton_.getBonePos(parentIdx);
+				
 
 				// work out parent index for anim.
 				const char* pParentName = skelton_.getBoneName(parentIdx);
 				auto it = std::find_if(bones_.begin(), bones_.end(), [pParentName](const Bone& b) {
 					return b.name == pParentName;
 				});
-
 
 				int32_t localParentIdx = -1;
 				if (it != bones_.end()) {
@@ -891,19 +915,28 @@ void AnimCompiler::loadBones(void)
 					}
 				}
 
+				Vec3f posRel = posWorld;
+				Quatf angleRel = angleWorld;
+
+				if (localParentIdx >= 0) 
+				{
+					posRel = (posWorld - posParWorld) * angleParWorld.inverse();
+					angleRel = angleWorld * angleParWorld.inverse();
+				}
+
+				auto goats = angleRel.getEulerDegrees();
 
 				Bone bone(arena_);
 				bone.name = interBone.name;
 				bone.parentIdx = localParentIdx;
+				bone.pos.setBasePositions(posWorld, posRel);
+				bone.ang.setBaseOrients(angleWorld, angleRel);
 
 				for (size_t num = 0; num < interBone.data.size(); num++)
 				{
 					bone.pos.appendFullPos(interBone.data[num].position * scale_);
 					bone.ang.appendFullAng(interBone.data[num].rotation);
 				}
-
-				bone.pos.setBasePositions(posWorld, posRel);
-				bone.ang.setBaseOrient(angle);
 
 				bones_.push_back(std::move(bone));
 				break;
@@ -926,10 +959,12 @@ void AnimCompiler::processBones(const float posError, const float angError)
 		{
 			auto& parBone = bones_[bone.parentIdx];
 			bone.pos.calculateRelativeData(parBone.pos, parBone.ang);
+			bone.ang.calculateRelativeData(parBone.pos, parBone.ang);
 		} 
 		else
 		{
 			bone.pos.calculateRelativeDataRoot();
+			bone.ang.calculateRelativeDataRoot();
 		}
 
 		bone.pos.calculateDeltas(posError);
