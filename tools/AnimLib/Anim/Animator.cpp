@@ -269,12 +269,24 @@ core::TimeVal AnimBlend::getPlayTime(void) const
 Animator::Animator(const model::XModel& model, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	model_(model),
-	boneMat_(arena), 
+	boneMat_(arena),
+	invBoneMat_(arena),
 	anims_{ {
 		X_PP_REPEAT_COMMA_SEP(2, arena)
 	}}
 {
 	boneMat_.resize(model.numBones());
+	invBoneMat_.resize(model.numBones());
+
+
+	for (size_t i = 0; i < boneMat_.size(); i++)
+	{
+		auto& angle = model.getBoneAngle(i);
+		Quatf quat = angle.asQuat();
+		quat.invert();
+		
+		invBoneMat_[i] = quat.toMatrix33();
+	}
 }
 
 
