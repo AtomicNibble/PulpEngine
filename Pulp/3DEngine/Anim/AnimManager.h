@@ -75,6 +75,7 @@ public:
 	void reloadAnim(const char* pName);
 	void listAnims(const char* pSearchPatten = nullptr) const;
 
+	bool waitForLoad(Anim* pAnim) X_FINAL; // returns true if load succeed.
 
 private:
 	void freeDanglingAnims(void);

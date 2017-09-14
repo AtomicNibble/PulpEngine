@@ -13,6 +13,7 @@ struct IAnimManager
 	virtual Anim* findAnim(const char* pAnimName) const X_ABSTRACT;
 	virtual Anim* loadAnim(const char* pAnimName) X_ABSTRACT;
 
+	virtual bool waitForLoad(Anim* pAnim) X_ABSTRACT; // returns true if load succeed.
 
 };
 

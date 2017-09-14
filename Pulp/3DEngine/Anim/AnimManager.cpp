@@ -176,6 +176,36 @@ void AnimManager::listAnims(const char* pSearchPatten) const
 	X_LOG0("Anim", "------------ ^8Anims End^7 --------------");
 }
 
+bool AnimManager::waitForLoad(Anim* pAnim)
+{
+	{
+		// we lock to see if loading as the setting of loading is performed inside this lock.
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		while (pAnim->getStatus() == core::LoadStatus::Loading)
+		{
+			loadCond_.Wait(loadReqLock_);
+		}
+	}
+
+	// did we fail? or never sent a dispatch?
+	auto status = pAnim->getStatus();
+	if (status == core::LoadStatus::Complete)
+	{
+		return true;
+	}
+	else if (status == core::LoadStatus::Error)
+	{
+		return false;
+	}
+	else if (status == core::LoadStatus::NotLoaded)
+	{
+		// request never sent?
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return false;
+}
+
 // ------------------------------------
 
 void AnimManager::freeDanglingAnims(void)
