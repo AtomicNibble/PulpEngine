@@ -2267,7 +2267,9 @@ bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
 	}
 	else {
 		argsOut.clear();
+	}
 
+	if (argsOut.isEmpty()) {
 		// should we return valid json?
 		argsOut = "{}";
 	}
