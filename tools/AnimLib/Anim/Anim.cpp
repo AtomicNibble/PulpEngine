@@ -75,9 +75,12 @@ void Bone::load(core::MemCursor& cursor)
 
 void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 {
-	Vec3f pos;
-	Quatf ang;
+	decodePos(trans.pos, frame);
+	decodeAngle(trans.quat, frame);
+}
 
+void Bone::decodePos(Vec3f& pos, int32_t frame) const
+{
 	// position
 	if (numPos_)
 	{
@@ -136,8 +139,10 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 			}
 		}
 	}
+}
 
-
+void Bone::decodeAngle(Quatf& ang, int32_t frame) const
+{
 	if (numAngles_)
 	{
 		if (numAngles_ == 1)
@@ -167,7 +172,7 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 					++angFrameIdx;
 				}
 
-				
+
 				if (pAngleFrames_[angFrameIdx] == frame)
 				{
 					ang = GetAngle(angFrameIdx);
@@ -202,9 +207,6 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 			}
 		}
 	}
-
-	trans.quat = ang;
-	trans.pos = pos;
 }
 
 
