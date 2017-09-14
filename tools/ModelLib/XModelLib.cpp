@@ -32,8 +32,17 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 
 	ModelCompiler::CompileFlags flags;
 
+	if (args.isEmpty()) {
+		X_ERROR("Model", "Convert args empty");
+		return false;
+	}
+
+
 	core::json::Document d;
-	d.Parse(args.c_str(), args.length());
+	if (d.Parse(args.c_str(), args.length()).HasParseError()) {
+		X_ERROR("Model", "Failed to parse convert args empty");
+		return false;
+	}
 
 
 	if (d.HasMember("zero_origin")) {
