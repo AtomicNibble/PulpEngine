@@ -992,11 +992,14 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 	header.dataSize += preMeshDataPadSize;
 	
+	// add space for padding.
+	const size_t maxMeshDataPadSize = ((16 * 5) * MODEL_MAX_LODS);
+
 	// fixed streams to make sure size calculations are correct.
 	core::FixedByteStreamOwning tagNameStream(arena_, header.tagNameDataSize);
 	core::FixedByteStreamOwning matNameStream(arena_, header.materialNameDataSize);
 	core::FixedByteStreamOwning boneDataStream(arena_, header.boneDataSize);
-	core::FixedByteStreamOwning meshDataStream(arena_, header.meshDataSize);
+	core::FixedByteStreamOwning meshDataStream(arena_, header.meshDataSize + maxMeshDataPadSize); 
 	core::FixedByteStreamOwning physDataStream(arena_, header.physDataSize);
 	core::FixedByteStreamOwning hitboxDataStream(arena_, header.hitboxDataBlocks * 64);
 
@@ -1430,13 +1433,17 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	// now we write Vert + faces + bindData
 	// we convert them now to the real format.
 	// as processing the data in the commpressed state is slower.
+	size_t meshDataNumPadBytes = 0;
 
 	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
 		// this pads the stream so that the end of the stream is 16byte aligned.
-		auto padStream = [&meshDataStream]()
+		auto padStream = [&meshDataStream, &meshDataNumPadBytes]()
 		{
 			const size_t paddedSize = core::bitUtil::RoundUpToMultiple(meshDataStream.size(), 16_sz);	
+			const size_t padSize = paddedSize - meshDataStream.size();
+
+			meshDataNumPadBytes += padSize;
 			meshDataStream.zeroPadToLength(paddedSize);
 		};
 
@@ -1566,14 +1573,18 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")();
 		X_ASSERT(physDataStream.size() == header.physDataSize, "Incorrect size")();
 		X_ASSERT(hitboxDataStream.size() == header.hitboxDataBlocks * 64, "Incorrect size")();
-		X_ASSERT(meshDataStream.size() == header.meshDataSize, "Incorrect size")(meshDataStream.size(), header.meshDataSize);
+		X_ASSERT(meshDataStream.size() == (header.meshDataSize + meshDataNumPadBytes), "Incorrect size")(meshDataStream.size(), header.meshDataSize, meshDataNumPadBytes);
 
 		X_ASSERT(matNameStream.freeSpace() == 0, "Stream incomplete")();
 		X_ASSERT(tagNameStream.freeSpace() == 0, "Stream incomplete")();
 		X_ASSERT(boneDataStream.freeSpace() == 0, "Stream incomplete")();
 		X_ASSERT(physDataStream.freeSpace() == 0, "Stream incomplete")();
 		X_ASSERT(hitboxDataStream.freeSpace() == 0, "Stream incomplete")();
-		X_ASSERT(meshDataStream.freeSpace() == 0, "Stream incomplete")();
+		X_ASSERT(meshDataNumPadBytes <= maxMeshDataPadSize, "Padding error")();
+		X_ASSERT(meshDataStream.freeSpace() == (maxMeshDataPadSize - meshDataNumPadBytes), "Stream incomplete")(meshDataStream.freeSpace(), maxMeshDataPadSize, meshDataNumPadBytes);
+
+		header.meshDataSize += safe_static_cast<uint32_t>(meshDataNumPadBytes);
+		header.dataSize += safe_static_cast<uint32_t>(meshDataNumPadBytes);
 
 		if (file.writeObj(header) != sizeof(header)) {
 			X_ERROR("Model", "Failed to write header");
