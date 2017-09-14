@@ -32,7 +32,7 @@ void Bone::load(core::MemCursor& cursor)
 
 	if (numAngles_ > 0)
 	{
-		if (numAngles_ > 1)
+		if (numAngles_ > 1 && !flags_.IsSet(BoneFlag::AngFullFrame))
 		{
 			// frame numbers.
 			pAngleFrames_ = cursor.postSeekPtr<uint8_t>(numAngles_);
@@ -54,7 +54,7 @@ void Bone::load(core::MemCursor& cursor)
 		}
 		else
 		{
-			if (numPos_ > 1)
+			if (numPos_ > 1 && !flags_.IsSet(BoneFlag::PosFullFrame))
 			{
 				// frame numbers.
 				pPosFrames_ = cursor.postSeekPtr<uint8_t>(numPos_);
@@ -146,45 +146,59 @@ void Bone::decodeFrame(Transformf& trans, int32_t frame) const
 		}
 		else
 		{
-			if (flags_.IsSet(BoneFlag::AngFullFrame) || flags_.IsSet(BoneFlag::AngLargeFrames))
+			if (flags_.IsSet(BoneFlag::AngLargeFrames))
 			{
 				X_ASSERT_NOT_IMPLEMENTED();
 			}
 
-			if (pAngleFrames_[0] > frame) {
-				return;
-			}
 
-			int32_t angFrameIdx = 0;
-			while (pAngleFrames_[angFrameIdx] < frame) {
-				++angFrameIdx;
-			}
-
-			// we have data
-			if (pAngleFrames_[angFrameIdx] == frame)
+			if (flags_.IsSet(BoneFlag::AngFullFrame))
 			{
-				ang = GetAngle(angFrameIdx);
+				ang = GetAngle(frame);
 			}
 			else
 			{
-				int32_t firstIdx = angFrameIdx - 1;
-				int32_t lastIdx = angFrameIdx;
+				if (pAngleFrames_[0] > frame) {
+					return;
+				}
 
-				X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+				int32_t angFrameIdx = 0;
+				while (pAngleFrames_[angFrameIdx] < frame) {
+					++angFrameIdx;
+				}
 
-				int32_t first = pAngleFrames_[firstIdx];
-				int32_t last = pAngleFrames_[lastIdx];
+				
+				if (pAngleFrames_[angFrameIdx] == frame)
+				{
+					ang = GetAngle(angFrameIdx);
+				}
+				else if (angFrameIdx >= numAngles_)
+				{
+					// frame is part what we have data for
+					// return last frame.
+					ang = GetAngle(numAngles_ - 1);
+				}
+				else
+				{
+					int32_t firstIdx = angFrameIdx - 1;
+					int32_t lastIdx = angFrameIdx;
+
+					X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+
+					int32_t first = pAngleFrames_[firstIdx];
+					int32_t last = pAngleFrames_[lastIdx];
 
 
-				int32_t offset = frame - first;
-				int32_t range = last - first;
+					int32_t offset = frame - first;
+					int32_t range = last - first;
 
-				float fraction = static_cast<float>(offset) / range;
+					float fraction = static_cast<float>(offset) / range;
 
-				auto firstAng = GetAngle(firstIdx);
-				auto lastAng = GetAngle(lastIdx);
+					auto firstAng = GetAngle(firstIdx);
+					auto lastAng = GetAngle(lastIdx);
 
-				ang = firstAng.slerp(fraction, lastAng);
+					ang = firstAng.slerp(fraction, lastAng);
+				}
 			}
 		}
 	}
