@@ -73,6 +73,13 @@ namespace entity
 
 			pModelManager->waitForLoad(mesh.pModel);
 
+			if (!mesh.pModel->hasPhys())
+			{
+				X_ERROR("Ent", "Can't add mesh collider to ent with model \"%s\" it has no physics data", mesh.pModel->getName().c_str());
+				reg.remove<MeshCollider>(entity);
+				continue;
+			}
+
 			col.actor = pPhysics->createStaticActor(trans);
 
 			mesh.pModel->addPhysToActor(col.actor);
