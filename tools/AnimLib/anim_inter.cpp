@@ -328,7 +328,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 			if (!lex.ExpectTokenString("ANG")) {
 				return false;
 			}
-			if (!lex.Parse1DMatrix(4, &fd.rotation[0])) {
+			if (!lex.Parse2DMatrix(3,3, &fd.rotation[0])) {
 				return false;
 			}
 

@@ -395,19 +395,22 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 				scale.z = worldMatrix.getColumn(2).length();
 
 				// rotation.
-				Quatd quat;
-				worldMatrixTrans.getRotationQuaternion(quat.v.x, quat.v.y, quat.v.z, quat.w);
+				// Quatd quat;
+				// worldMatrixTrans.getRotation(quat.v.x, quat.v.y, quat.v.z, quat.w);
+				Matrix33f scaleMatrix = Matrix33f::createScale(scale);
+				Matrix33f invScaleMatrix = scaleMatrix.inverted();
+				Matrix33f rotationMatrix = invScaleMatrix * worldMatrix;
 
 				FrameData& data = bone.data.AddOne();
 				data.scale = scale;
 				data.position = pos;
-				data.rotation = quat;
+				data.rotation = rotationMatrix;
 
 
 				if(MayaUtil::IsVerbose())
 				{
 					const auto& s = data.scale;
-					const auto& q = data.rotation;
+					const auto& q = Quatf(data.rotation);
 					const auto euler = q.getEulerDegrees();
 					
 					MayaUtil::MayaPrintVerbose("pos: (%g,%g,%g) scale(%g,%g,%g)",
@@ -478,7 +481,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 	// write each bones data.
 	for (const auto& bone : bones_)
 	{
-		buf.append("BONE_DATA\n");
+		buf.appendFmt("BONE_DATA // \"%s\"\n", bone.name.asChar());
 		stream.write(buf.c_str(), buf.length());
 
 		X_ASSERT(static_cast<int32_t>(bone.data.size()) == numFrames, "Don't have bone data for all frames")(bone.data.size(), numFrames);
@@ -498,11 +501,11 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 				data.scale.y,
 				data.scale.z);
 
-			buf.appendFmt("ANG ( %.8g %.8g %.8g %.8g )\n",
-				data.rotation.v.x,
-				data.rotation.v.y,
-				data.rotation.v.z,
-				data.rotation.w);
+			const auto& ang = data.rotation;
+			buf.appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n",
+				ang.m00, ang.m01, ang.m02,
+				ang.m10, ang.m11, ang.m12,
+				ang.m20, ang.m21, ang.m22);
 		
 			buf.append("\n");
 

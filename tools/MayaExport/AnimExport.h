@@ -20,7 +20,7 @@ struct FrameData
 {
 	Vec3f scale;
 	Vec3d position;
-	Quatd rotation;
+	Matrix33f rotation;
 };
 
 struct Bone

@@ -17,7 +17,7 @@ struct FrameData
 {
 	Vec3f position;
 	Vec3f scale;
-	Quatf rotation;
+	Matrix33f rotation;
 };
 
 
