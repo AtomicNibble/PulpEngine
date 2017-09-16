@@ -575,7 +575,7 @@ void AnimCompiler::Angle::calculateRelativeData(const Position& parentPos, const
 	{
 		auto& parWorldAngle = parentAng.getAngForFrame(i);
 		auto& worldAngle = fullAngles_[i];
-		auto rel = worldAngle * parWorldAngle.inverse();
+		auto rel = parWorldAngle.inverse() * worldAngle;
 
 		relAngles_[i] = rel;
 	}
