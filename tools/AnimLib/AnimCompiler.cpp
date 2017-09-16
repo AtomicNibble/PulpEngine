@@ -278,6 +278,32 @@ void AnimCompiler::Position::calculateRelativeDataRoot(void)
 }
 
 
+void AnimCompiler::Position::calculateFullFrames(void)
+{
+	posFrames_.resize(relPos_.size());
+
+	min_ = Vec3f::max();
+	max_ = Vec3f::min();
+
+	for (size_t i = 0; i < relPos_.size(); i++)
+	{
+		const Vec3f& pos = relPos_[i];
+		auto delta = pos - basePosRel_;
+
+		min_.checkMin(delta);
+		max_.checkMax(delta);
+
+		PosFrame& posEntry = posFrames_[i];
+		posEntry.delta = delta;
+		posEntry.relPos = relPos_[i];
+		posEntry.frame = safe_static_cast<int32_t>(i);
+	}
+
+	min_ = removeNoise(min_);
+	max_ = removeNoise(max_);
+}
+
+
 void AnimCompiler::Position::calculateDeltas(const float posError)
 {
 	X_ASSERT(relPos_.size() == fullPos_.size(), "Rel pos data size mistmatch")();
@@ -560,6 +586,17 @@ void AnimCompiler::Angle::calculateRelativeDataRoot(void)
 	relAngles_ = fullAngles_;
 }
 
+
+void AnimCompiler::Angle::calculateFullFrames(void)
+{
+	angles_.resize(relAngles_.size());
+
+	for (size_t i = 0; i < relAngles_.size(); i++)
+	{
+		angles_[i].angle = relAngles_[i];
+		angles_[i].frame = safe_static_cast<int32_t>(i);
+	}
+}
 
 
 void AnimCompiler::Angle::calculateDeltas(const float angError)
