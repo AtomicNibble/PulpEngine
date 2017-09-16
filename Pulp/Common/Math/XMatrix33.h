@@ -151,6 +151,7 @@ public:
 	Matrix33<T>			transposed() const;
 
 	void				invert (T epsilon = EPSILON ) { *this = inverted( epsilon ); }
+	Matrix33<T>			inverse(T epsilon = EPSILON) const { return inverted(epsilon);  }
 	Matrix33<T>			inverted( T epsilon = EPSILON ) const;
 
 	// pre-multiplies row vector v - no divide by w
