@@ -90,52 +90,59 @@ void Bone::decodePos(Vec3f& pos, int32_t frame) const
 		}
 		else
 		{
-			if (flags_.IsSet(BoneFlag::PosFullFrame) || flags_.IsSet(BoneFlag::PosLargeFrames))
+			if (flags_.IsSet(BoneFlag::PosLargeFrames))
 			{
 				X_ASSERT_NOT_IMPLEMENTED();
 			}
 
-			// do we have any data for you yet?
-			if (pPosFrames_[0] > frame) {
-				return;
-			}
-
-			// we have multiple pos.
-			// find a frame for us.
-			int32_t posFrameIdx = 0;
-			while (pPosFrames_[posFrameIdx] < frame) {
-				++posFrameIdx;
-			}
-
-			// we have data
-			if (pPosFrames_[posFrameIdx] == frame)
+			if (flags_.IsSet(BoneFlag::PosFullFrame))
 			{
-				pos = GetPostion(posFrameIdx);
+				pos = GetPostion(frame);
 			}
-			else // if(posFrameIdx != 0)
+			else
 			{
-				// interpolate.
-				int32_t firstIdx = posFrameIdx - 1;
-				int32_t lastIdx = posFrameIdx;
+				// do we have any data for you yet?
+				if (pPosFrames_[0] > frame) {
+					return;
+				}
 
-				X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+				// we have multiple pos.
+				// find a frame for us.
+				int32_t posFrameIdx = 0;
+				while (pPosFrames_[posFrameIdx] < frame) {
+					++posFrameIdx;
+				}
 
-				int32_t first = pPosFrames_[firstIdx];
-				int32_t last = pPosFrames_[lastIdx];
+				// we have data
+				if (pPosFrames_[posFrameIdx] == frame)
+				{
+					pos = GetPostion(posFrameIdx);
+				}
+				else // if(posFrameIdx != 0)
+				{
+					// interpolate.
+					int32_t firstIdx = posFrameIdx - 1;
+					int32_t lastIdx = posFrameIdx;
+
+					X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+
+					int32_t first = pPosFrames_[firstIdx];
+					int32_t last = pPosFrames_[lastIdx];
 
 
-				int32_t offset = frame - first;
-				int32_t range = last - first;
+					int32_t offset = frame - first;
+					int32_t range = last - first;
 
-				// if range is 10 and offset 5 i want o.5 yo
+					// if range is 10 and offset 5 i want o.5 yo
 
-				// calculate Fraction
-				float fraction = static_cast<float>(offset) / range;
+					// calculate Fraction
+					float fraction = static_cast<float>(offset) / range;
 
-				auto firstPos = GetPostion(firstIdx);
-				auto lastPos = GetPostion(lastIdx);
+					auto firstPos = GetPostion(firstIdx);
+					auto lastPos = GetPostion(lastIdx);
 
-				pos = firstPos.lerp(fraction, lastPos);
+					pos = firstPos.lerp(fraction, lastPos);
+				}
 			}
 		}
 	}
