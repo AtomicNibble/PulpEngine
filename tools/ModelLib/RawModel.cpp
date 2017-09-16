@@ -717,7 +717,7 @@ namespace RawModel
 			pCurBuf->appendFmt("BONE %" PRIi32 " \"%s\"\n", bone.parIndx_, bone.name_.c_str());
 			pCurBuf->appendFmt("POS (%f %f %f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
 			pCurBuf->appendFmt("SCALE (%f %f %f)\n", bone.scale_.x, bone.scale_.y, bone.scale_.z);
-			auto ang = bone.rotation_;
+			const auto& ang = bone.rotation_;
 			pCurBuf->appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n",
 				ang.m00, ang.m01, ang.m02, 
 				ang.m10, ang.m11, ang.m12, 
