@@ -74,7 +74,7 @@ static const uint32_t	 ANIM_MAX_LOADED = 1 << 10;
 // this is used for saving out animation data that is not relative.
 // It's then later processed against a skelton to creat a anim.
 // This also allows other tools to export anims since the inter format is text based.
-static const uint32_t	 ANIM_INTER_VERSION = 1;
+static const uint32_t	 ANIM_INTER_VERSION = 2;
 static const char*		 ANIM_INTER_FILE_EXTENSION = "anim_inter";
 static const wchar_t*	 ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 
