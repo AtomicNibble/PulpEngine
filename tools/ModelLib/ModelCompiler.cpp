@@ -1605,7 +1605,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// sanity checks.
 		X_ASSERT(matNameStream.size() == header.materialNameDataSize, "Incorrect size")();
 		X_ASSERT(tagNameStream.size() == header.tagNameDataSize, "Incorrect size")();
-		X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")();
+		X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")(boneDataStream.size(), header.boneDataSize);
 		X_ASSERT(physDataStream.size() == header.physDataSize, "Incorrect size")();
 		X_ASSERT(hitboxDataStream.size() == header.hitboxDataBlocks * 64, "Incorrect size")();
 		X_ASSERT(meshDataStream.size() == (header.meshDataSize + meshDataNumPadBytes), "Incorrect size")(meshDataStream.size(), header.meshDataSize, meshDataNumPadBytes);
