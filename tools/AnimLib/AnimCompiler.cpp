@@ -195,8 +195,8 @@ void AnimCompiler::Position::appendFullPos(const Vec3f& pos)
 
 void AnimCompiler::Position::setBasePositions(const Vec3f& basePosWorld, const Vec3f& basePosRel)
 {
-	basePosWorld_ = basePosWorld;
-	basePosRel_ = basePosRel;
+	basePosWorld_ = removeNoise(basePosWorld);
+	basePosRel_ = removeNoise(basePosRel);
 }
 
 size_t AnimCompiler::Position::numPosFrames(void) const
