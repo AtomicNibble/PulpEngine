@@ -66,9 +66,9 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	core::MemCursor cursor(hitbox_data_cursor.end(), hdr.meshDataSize);
 
 	const size_t numBone = hdr.numBones;
-	const size_t numBoneTotal = hdr.numBones + hdr.numRootBones;
+//	const size_t numRootBone = hdr.numRootBones;
 
-	pTagNames_ = bone_data_cursor.postSeekPtr<uint16_t>(numBoneTotal);
+	pTagNames_ = bone_data_cursor.postSeekPtr<uint16_t>(numBone);
 	pTagTree_ = bone_data_cursor.postSeekPtr<uint8_t>(numBone);
 	pBoneAngles_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
 	pBonePos_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
@@ -230,7 +230,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	{
 		core::StackString<MODEL_MAX_BONE_NAME_LENGTH> name;
 
-		for (i = 0; i < hdr.numBones; i++)
+		for (i = 0; i < numBone; i++)
 		{
 			((uint16_t*)pTagNames_)[i] = safe_static_cast<uint16>(tag_name_cursor.getPtr<uint8_t>() - data.ptr());
 

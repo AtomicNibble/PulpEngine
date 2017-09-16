@@ -945,6 +945,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		root.worldPos_ = Vec3f::zero();
 
 		bones_.push_back(root);
+		relativeBonePos_.push_back(Vec3f::zero());
 	}
 
 	// calculate root bones.
@@ -960,7 +961,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	}
 
 
-	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size() - numRootBones);
+	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 	header.modified = core::dateTimeStampSmall::systemDateTime();
@@ -1035,11 +1036,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	for (auto& bone : bones_) 
 	{
 		meshHeadOffsets += bone.name_.length() + 2; // name + name idx
-
-		if (bone.parIndx_ >= 0)
-		{
-			meshHeadOffsets += sizeof(XQuatCompressedf) + sizeof(Vec3f);
-		}
+		meshHeadOffsets += sizeof(XQuatCompressedf) + sizeof(Vec3f);
 	}
 
 	for (size_t i = 0; i < compiledLods_.size(); i++) {
@@ -1121,7 +1118,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// space for name index data.
 		{
 			uint16_t blankData[MODEL_MAX_BONES] = {};
-			const size_t boneNameIndexNum = (header.numBones + header.numRootBones);
+			const size_t boneNameIndexNum = (header.numBones);
 
 			boneDataStream.write(blankData, boneNameIndexNum);
 		}
@@ -1129,33 +1126,28 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// hierarchy
 		for (auto& bone : bones_)
 		{
-			if (bone.parIndx_ < 0) {
-				continue;
+			uint8_t parent = 0;
+
+			// got a parent?
+			if (bone.parIndx_ >= 0) {
+				parent = safe_static_cast<uint8_t, int32_t>(bone.parIndx_);
 			}
 
-			uint8_t parent = safe_static_cast<uint8_t, int32_t>(bone.parIndx_);
 			boneDataStream.write(parent);
 		}
 
 		// angles.
 		for (auto& bone : bones_)
 		{
-			if (bone.parIndx_ < 0) {
-				continue;
-			}
-
 			XQuatCompressedf quat(bone.rotation_);
 			boneDataStream.write(quat);
 		}
 
 		// pos.
+		X_ASSERT(bones_.size() == relativeBonePos_.size(), "Size mismatch")();
 		for (size_t i=0; i<bones_.size(); i++)
 		{
 			auto& bone = bones_[i];
-			if (bone.parIndx_ < 0) {
-				continue;
-			}
-
 			boneDataStream.write(relativeBonePos_[i]);
 		}
 	}
@@ -1736,15 +1728,13 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 {
 	size_t size = 0;
 
-
 	const size_t totalbones = bones_.size();
-	const size_t rootBones = calculateRootBoneCount();
-	const size_t fullbones = totalbones - rootBones;
+//	const size_t rootBones = calculateRootBoneCount();
 
 	// don't store pos,angle,hier for blank bones currently.
-	size += (fullbones * sizeof(uint8_t)); // hierarchy
-	size += (fullbones * sizeof(XQuatCompressedf)); // angle
-	size += (fullbones * sizeof(Vec3f));	// pos.
+	size += (totalbones * sizeof(uint8_t)); // hierarchy
+	size += (totalbones * sizeof(XQuatCompressedf)); // angle
+	size += (totalbones * sizeof(Vec3f));	// pos.
 	size += (totalbones * sizeof(uint16_t));	// string table idx's
 
 	return size;

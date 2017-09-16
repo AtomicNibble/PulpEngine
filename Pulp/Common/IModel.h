@@ -131,10 +131,9 @@ X_NAMESPACE_BEGIN(model)
 //			OBB[colHdr.numOBB]
 //
 //	Version 16:
-//		Remove blank bones and make them root bones.
-//		So any bone that is root of tree is saved without parent, rotation or position data.
-//		it still has a name tho.
-//
+//		Remvoe blank bones and name it rootBones.
+//		I still save postions / rotation for root bones even tho it should always be zero, asthe file is memory mapped.
+//	
 //		Write relative bone positions.
 //
 
