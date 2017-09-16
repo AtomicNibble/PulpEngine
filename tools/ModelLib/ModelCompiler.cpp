@@ -932,8 +932,34 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	}
 
 
-	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
-	header.numRootBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
+	// we always have one root bone, for the kids.
+	if (bones_.isEmpty())
+	{
+		header.numRootBones = 1;
+
+		RawModel::Bone root;
+		root.name_ = "tag_origin";
+		root.parIndx_ = -1;
+		root.scale_ = Vec3f::one();
+		root.worldPos_ = Vec3f::zero();
+
+		bones_.push_back(root);
+	}
+
+	// calculate root bones.
+	size_t numRootBones = calculateRootBoneCount();
+	header.numRootBones = safe_static_cast<uint8_t>(numRootBones);
+
+	X_ASSERT(header.numRootBones > 0, "Must have atleast one root bone")(header.numRootBones, bones_.size());
+
+	// check all the root bones comes first.
+	for (size_t i = 0; i < numRootBones; i++)
+	{
+		X_ASSERT(bones_[i].parIndx_ < 0, "Expected root bone")(i, bones_[i].parIndx_);
+	}
+
+
+	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size() - numRootBones);
 	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 	header.modified = core::dateTimeStampSmall::systemDateTime();
@@ -1005,8 +1031,14 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
-	for (auto& bone : bones_) {
-		meshHeadOffsets += bone.name_.length() + sizeof(XQuatCompressedf) + sizeof(Vec3f) + 2;
+	for (auto& bone : bones_) 
+	{
+		meshHeadOffsets += bone.name_.length() + 2; // name + name idx
+
+		if (bone.parIndx_ >= 0)
+		{
+			meshHeadOffsets += sizeof(XQuatCompressedf) + sizeof(Vec3f);
+		}
 	}
 
 	for (size_t i = 0; i < compiledLods_.size(); i++) {
@@ -1087,7 +1119,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 		// space for name index data.
 		{
-			uint16_t blankData[MODEL_MAX_BONES] = { 0 };
+			uint16_t blankData[MODEL_MAX_BONES] = {};
 			const size_t boneNameIndexNum = (header.numBones + header.numRootBones);
 
 			boneDataStream.write(blankData, boneNameIndexNum);
@@ -1096,30 +1128,33 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// hierarchy
 		for (auto& bone : bones_)
 		{
-			uint8_t parent = 0;
+			if (bone.parIndx_ < 0) {
+				continue;
+			}
 
-			// got a parent?
-			if (bone.parIndx_ >= 0) {
-				parent = safe_static_cast<uint8_t, int32_t>(bone.parIndx_);
-			}	
-
+			uint8_t parent = safe_static_cast<uint8_t, int32_t>(bone.parIndx_);
 			boneDataStream.write(parent);
 		}
 
 		// angles.
 		for (auto& bone : bones_)
 		{
-			XQuatCompressedf quat(bone.rotation_);
+			if (bone.parIndx_ < 0) {
+				continue;
+			}
 
+			XQuatCompressedf quat(bone.rotation_);
 			boneDataStream.write(quat);
 		}
 
 		// pos.
 		for (auto& bone : bones_)
 		{
-			const Vec3f& pos = bone.worldPos_;
+			if (bone.parIndx_ < 0) {
+				continue;
+			}
 
-			boneDataStream.write(pos);
+			boneDataStream.write(bone.worldPos_);
 		}
 	}
 
@@ -1640,6 +1675,13 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	return true;
 }
 
+size_t ModelCompiler::calculateRootBoneCount(void) const
+{
+	return core::accumulate(bones_.begin(), bones_.end(), 0_sz, [](const RawModel::Bone& b) -> int32_t {
+		return b.parIndx_ < 0 ? 1 : 0;
+	});
+}
+
 size_t ModelCompiler::calculateTagNameDataSize(void) const
 {
 	size_t size = 0;
@@ -1694,8 +1736,8 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 
 
 	const size_t fullbones = bones_.size();
-	const size_t blankBones = bones_.isEmpty() ? 1 : 0;
-	const size_t totalbones = fullbones + blankBones;
+	const size_t rootBones = calculateRootBoneCount();
+	const size_t totalbones = fullbones + rootBones;
 
 	// don't store pos,angle,hier for blank bones currently.
 	size += (fullbones * sizeof(uint8_t)); // hierarchy

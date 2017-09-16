@@ -256,8 +256,9 @@ public:
 private:
 	bool saveModel(core::Path<wchar_t>& outFile);
 
+	size_t calculateRootBoneCount(void) const;
 	size_t calculateTagNameDataSize(void) const;
-	size_t calculateMaterialNameDataSize(void) const ;
+	size_t calculateMaterialNameDataSize(void) const;
 	size_t calculateMeshDataSize(const Flags8<model::StreamType>& streams) const;
 	size_t calculateBindDataSize(void) const;
 	size_t calculateBoneDataSize(void) const;

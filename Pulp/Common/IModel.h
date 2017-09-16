@@ -130,12 +130,18 @@ X_NAMESPACE_BEGIN(model)
 //			Sphere[colHdr.numShpere]
 //			OBB[colHdr.numOBB]
 //
+//	Version 16:
+//		Remove blank bones and make them root bones.
+//		So any bone that is root of tree is saved without parent, rotation or position data.
+//		it still has a name tho.
+//
+//
 //
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 15;
+static const uint32_t	 MODEL_VERSION = 16;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
