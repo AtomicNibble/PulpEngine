@@ -332,7 +332,7 @@ void AnimCompiler::Position::calculateDeltaFrames(const float posError)
 	auto addFrame = [&](int32_t frameIdx) {
 
 		const Vec3f& pos = relPos_[frameIdx];
-		auto delta = relPos_[frameIdx] - basePosRel_;
+		auto delta = pos - basePosRel_;
 
 		min_.checkMin(delta);
 		max_.checkMax(delta);
