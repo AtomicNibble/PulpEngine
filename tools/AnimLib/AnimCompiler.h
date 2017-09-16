@@ -68,9 +68,7 @@ class AnimCompiler
 		void calculateRelativeData(const Position& parentPos, const Angle& parentAng);
 		void calculateRelativeDataRoot(void);
 		void calculateFullFrames(void);
-		void calculateDeltas(const float posError = 0.075f);
-
-	private:
+		void calculateDeltaFrames(const float posError = 0.075f);
 		void buildScalers(const float posError);
 
 	private:
@@ -122,7 +120,7 @@ class AnimCompiler
 		void calculateRelativeData(const Position& parentPos, const Angle& parentAng);
 		void calculateRelativeDataRoot(void);
 		void calculateFullFrames(void);
-		void calculateDeltas(const float angError = 0.075f);
+		void calculateDeltaFrames(const float angError = 0.075f);
 
 	private:
 		AnglesArr fullAngles_; // angles for every frame

@@ -304,7 +304,7 @@ void AnimCompiler::Position::calculateFullFrames(void)
 }
 
 
-void AnimCompiler::Position::calculateDeltas(const float posError)
+void AnimCompiler::Position::calculateDeltaFrames(const float posError)
 {
 	X_ASSERT(relPos_.size() == fullPos_.size(), "Rel pos data size mistmatch")();
 
@@ -599,7 +599,7 @@ void AnimCompiler::Angle::calculateFullFrames(void)
 }
 
 
-void AnimCompiler::Angle::calculateDeltas(const float angError)
+void AnimCompiler::Angle::calculateDeltaFrames(const float angError)
 {
 	angles_.clear();
 	angles_.reserve(relAngles_.size());
@@ -1035,8 +1035,19 @@ void AnimCompiler::processBones(const float posError, const float angError)
 			bone.ang.calculateRelativeDataRoot();
 		}
 
-		bone.pos.calculateDeltas(posError);
-		bone.ang.calculateDeltas(angError);
+		if (flags_.IsSet(CompileFlag::NO_OPTIMISE))
+		{
+			bone.ang.calculateFullFrames();
+			bone.pos.calculateFullFrames();
+		}
+		else
+		{
+
+			bone.ang.calculateDeltaFrames(0.05f);
+			bone.pos.calculateDeltaFrames(posError);
+		}
+
+		bone.pos.buildScalers(posError);
 	}
 }
 
