@@ -750,7 +750,8 @@ ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	autoColGenType_(ColGenType::BOX),
 	flags_(DEFAULT_FLAGS),
 	stats_(arena),
-	hitboxShapes_(arena)
+	hitboxShapes_(arena),
+	relativeBonePos_(arena)
 {
 	core::zero_object(lodDistances_);
 }
@@ -1148,13 +1149,14 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		}
 
 		// pos.
-		for (auto& bone : bones_)
+		for (size_t i=0; i<bones_.size(); i++)
 		{
+			auto& bone = bones_[i];
 			if (bone.parIndx_ < 0) {
 				continue;
 			}
 
-			boneDataStream.write(bone.worldPos_);
+			boneDataStream.write(relativeBonePos_[i]);
 		}
 	}
 
@@ -1900,6 +1902,11 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	if (!CreateBoneInfo()) {
+		X_ERROR("Model", "Model exceeds limits");
+		return false;
+	}
+
 	if (!ProcessCollisionMeshes()) {
 		X_ERROR("Model", "Failed to process collision mesh");
 		return false;
@@ -2276,6 +2283,30 @@ bool ModelCompiler::ScaleModel(void)
 	}
 
 	return ScaleBones();
+}
+
+bool ModelCompiler::CreateBoneInfo(void)
+{
+	relativeBonePos_.resize(bones_.size());
+
+	for (size_t i = 0; i < bones_.size(); i++)
+	{
+		const auto& bone = bones_[i];
+
+		// skip root, already relative.
+		if (bone.parIndx_ < 0) {
+			continue;
+		}
+
+		const auto& parBone = bones_[bone.parIndx_];
+
+		Vec3f relPos = bone.worldPos_ - parBone.worldPos_;
+		relPos = parBone.rotation_.inverse() * relPos;
+
+		relativeBonePos_[i] = relPos;
+	}
+
+	return true;
 }
 
 

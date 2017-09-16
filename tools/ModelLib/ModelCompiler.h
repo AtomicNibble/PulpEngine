@@ -226,6 +226,8 @@ public:
 		RawModel::Mesh* pRawMesh;
 	};
 
+	typedef core::Array<Vec3f> Vec3Arr;
+
 
 public:
 	ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooker = nullptr);
@@ -278,6 +280,7 @@ private:
 	bool CreateBindData(void);
 	bool MergVerts(void);
 	bool ScaleModel(void);
+	bool CreateBoneInfo(void);
 	bool UpdateMeshBounds(void);
 	bool CheckLimits(void);
 
@@ -309,6 +312,7 @@ private:
 	CompileFlags flags_;
 	CompiledLodArr compiledLods_;
 	HitBoxShapeArr hitboxShapes_;
+	Vec3Arr relativeBonePos_;
 
 	float lodDistances_[model::MODEL_MAX_LODS];
 
