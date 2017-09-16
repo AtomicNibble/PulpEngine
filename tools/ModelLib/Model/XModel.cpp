@@ -66,7 +66,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	core::MemCursor cursor(hitbox_data_cursor.end(), hdr.meshDataSize);
 
 	const size_t numBone = hdr.numBones;
-	const size_t numBoneTotal = hdr.numBones + hdr.numBlankBones;
+	const size_t numBoneTotal = hdr.numBones + hdr.numRootBones;
 
 	pTagNames_ = bone_data_cursor.postSeekPtr<uint16_t>(numBoneTotal);
 	pTagTree_ = bone_data_cursor.postSeekPtr<uint8_t>(numBone);

@@ -47,9 +47,9 @@ X_INLINE int32_t XModel::numBones(void) const
 	return hdr_.numBones;
 }
 
-X_INLINE int32_t XModel::numBlankBones(void) const
+X_INLINE int32_t XModel::numRootBones(void) const
 {
-	return hdr_.numBlankBones;
+	return hdr_.numRootBones;
 }
 
 X_INLINE int32_t XModel::numMeshTotal(void) const

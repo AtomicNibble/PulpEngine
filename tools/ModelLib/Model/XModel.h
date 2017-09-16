@@ -41,7 +41,7 @@ public:
 	X_INLINE const core::string& getName(void) const;
 	X_INLINE int32_t numLods(void) const;
 	X_INLINE int32_t numBones(void) const;
-	X_INLINE int32_t numBlankBones(void) const;
+	X_INLINE int32_t numRootBones(void) const;
 	X_INLINE int32_t numMeshTotal(void) const;
 	X_INLINE int32_t numVerts(size_t lodIdx) const;
 	X_INLINE bool hasLods(void) const;

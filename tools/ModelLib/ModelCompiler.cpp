@@ -933,7 +933,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
-	header.numBlankBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
+	header.numRootBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
 	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 	header.modified = core::dateTimeStampSmall::systemDateTime();
@@ -1088,7 +1088,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		// space for name index data.
 		{
 			uint16_t blankData[MODEL_MAX_BONES] = { 0 };
-			const size_t boneNameIndexNum = (header.numBones + header.numBlankBones);
+			const size_t boneNameIndexNum = (header.numBones + header.numRootBones);
 
 			boneDataStream.write(blankData, boneNameIndexNum);
 		}

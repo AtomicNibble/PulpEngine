@@ -622,7 +622,7 @@ struct ModelHeader // File header.
 	uint8_t version;
 	ModelFlags flags;
 	uint8_t numBones;
-	uint8_t numBlankBones;
+	uint8_t numRootBones;
 	uint8_t numMesh;
 	uint8_t numLod;
 	uint16_t boneDataSize;	// size of the bone data (nameIdx, hierarchy,angles,pos)
@@ -655,7 +655,7 @@ struct ModelHeader // File header.
 		}
 
 		return version == MODEL_VERSION &&
-			(numBones + numBlankBones) > 0 &&
+			(numBones + numRootBones) > 0 &&
 			numLod > 0 &&
 			numLod <= MODEL_MAX_LODS &&
 			materialNameDataSize > 0;
