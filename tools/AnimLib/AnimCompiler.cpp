@@ -9,8 +9,28 @@
 
 X_NAMESPACE_BEGIN(anim)
 
+namespace
+{
+
+	X_INLINE float removeNoise(float f)
+	{
+		if (math<float>::abs(f) <= AnimCompiler::NOISE_ELIPSON) {
+			return 0.f;
+		}
+
+		return f;
+	}
+
+	X_INLINE Vec3f removeNoise(Vec3f vec)
+	{
+		return Vec3f(removeNoise(vec.x), removeNoise(vec.y), removeNoise(vec.z));
+	}
+
+} // namespace
+
 const float AnimCompiler::DEFAULT_POS_ERRR = 0.05f;
 const float AnimCompiler::DEFAULT_ANGLE_ERRR = 0.005f;
+const float AnimCompiler::NOISE_ELIPSON = 0.0001f;
 
 AnimCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	noneAnimatedBoneName(arena),

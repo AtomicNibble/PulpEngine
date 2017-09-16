@@ -161,6 +161,7 @@ class AnimCompiler
 public:
 	static const float DEFAULT_POS_ERRR;
 	static const float DEFAULT_ANGLE_ERRR;
+	static const float NOISE_ELIPSON;
 
 public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
