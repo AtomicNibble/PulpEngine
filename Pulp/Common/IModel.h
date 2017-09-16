@@ -135,7 +135,7 @@ X_NAMESPACE_BEGIN(model)
 //		So any bone that is root of tree is saved without parent, rotation or position data.
 //		it still has a name tho.
 //
-//
+//		Write relative bone positions.
 //
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
