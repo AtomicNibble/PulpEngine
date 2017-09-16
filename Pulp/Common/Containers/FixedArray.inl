@@ -28,7 +28,7 @@ FixedArray<T, N>::~FixedArray(void)
 template<typename T, size_t N>
 const T& FixedArray<T, N>::operator[](size_type idx) const
 {
-	X_ASSERT(idx < N, "Array index out of bounds")(idx, N);
+	X_ASSERT(idx < size_, "Array index out of bounds")(idx, size_, N);
 	const T* pArr = begin();
 
 	return pArr[idx];
@@ -37,7 +37,7 @@ const T& FixedArray<T, N>::operator[](size_type idx) const
 template<typename T, size_t N>
 T& FixedArray<T, N>::operator[](size_type idx)
 {
-	X_ASSERT(idx < N, "Array index out of bounds")(idx, N);
+	X_ASSERT(idx < size_, "Array index out of bounds")(idx, size_, N);
 	T* pArr = begin();
 
 	return pArr[idx];
