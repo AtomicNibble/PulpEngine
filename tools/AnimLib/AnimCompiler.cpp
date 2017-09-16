@@ -701,6 +701,17 @@ void AnimCompiler::setLooping(bool loop)
 	}
 }
 
+void AnimCompiler::disableOptimizations(bool disable)
+{
+	if (disable) {
+		flags_.Set(CompileFlag::NO_OPTIMISE);
+	}
+	else {
+		flags_.Remove(CompileFlag::NO_OPTIMISE);
+	}
+}
+
+
 void AnimCompiler::setAnimType(AnimType::Enum type)
 {
 	type_ = type;

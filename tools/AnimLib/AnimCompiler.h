@@ -154,7 +154,8 @@ class AnimCompiler
 
 
 	X_DECLARE_FLAGS(CompileFlag)(
-		LOOPING
+		LOOPING,
+		NO_OPTIMISE
 	);
 
 public:
@@ -169,6 +170,7 @@ public:
 
 	void setScale(float scale);
 	void setLooping(bool loop);
+	void disableOptimizations(bool disable);
 	void setAnimType(AnimType::Enum type);
 
 	bool compile(const core::Path<char>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
