@@ -94,10 +94,10 @@ class AnimCompiler
 		struct AngleFrame
 		{
 			int32_t frame;
-			Quatf angle;
+			Matrix33f angle;
 		};
 
-		typedef core::Array<Quatf> AnglesArr;
+		typedef core::Array<Matrix33f> AnglesArr;
 		typedef core::Array<AngleFrame> AngleFrameArr;
 
 	public:
@@ -106,7 +106,7 @@ class AnimCompiler
 		void save(core::ByteStream& stream) const;
 		void clearData(void);
 
-		void appendFullAng(const Quatf& ang);
+		void appendFullAng(const Matrix33f& ang);
 		void setBaseOrients(const Quatf& angWorld, const Quatf& andRel);
 
 		size_t numAngleFrames(void) const;
@@ -114,7 +114,7 @@ class AnimCompiler
 		bool isLargeFrames(void) const;
 		bool isFullFrames(void) const; 
 		
-		const Quatf& getAngForFrame(size_t idx) const;
+		const Matrix33f& getAngForFrame(size_t idx) const;
 		const AngleFrameArr& getAngles(void) const;
 
 		void calculateRelativeData(const Position& parentPos, const Angle& parentAng);

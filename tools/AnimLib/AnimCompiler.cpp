@@ -260,15 +260,15 @@ void AnimCompiler::Position::calculateRelativeData(const Position& parentPos, co
 
 	for (size_t i = 0; i < fullPos_.size(); i++)
 	{
-		auto& parWorldPos = parentPos.getWorldPosForFrame(i);
-		auto& worldPod = fullPos_[i];
-		auto rel = worldPod - parWorldPos;
+		const Vec3f& parWorldPos = parentPos.getWorldPosForFrame(i);
+		const Vec3f& worldPod = fullPos_[i];
+		Vec3f rel = worldPod - parWorldPos;
 
 		// remove the rotation?
 		auto& angle = parentAng.getAngForFrame(i);
-		auto unRotatedRel = rel * angle.inverse();
+		Vec3f unRotatedRel = angle.inverse() * rel;
 
-		relPos_[i] = unRotatedRel;
+		relPos_[i] = removeNoise(unRotatedRel);
 	}
 }
 
@@ -394,7 +394,15 @@ void AnimCompiler::Position::calculateDeltaFrames(const float posError)
 		// do we always need a end frame?
 		if (lastStoredFrame != totalFrames - 1)
 		{
-			addFrame(totalFrames - 1);
+			const Vec3f& lastStoredPos = relPos_[lastStoredFrame];
+			const Vec3f& curFramePos = relPos_[totalFrames - 1];
+
+			Vec3f delta = curFramePos - lastStoredPos;
+
+			if (!delta.compare(Vec3f::zero(), posError))
+			{
+				addFrame(totalFrames - 1);
+			}
 		}
 	}
 
@@ -409,13 +417,14 @@ void AnimCompiler::Position::calculateDeltaFrames(const float posError)
 		X_ASSERT(min_ != Vec3f::max(), "Infinate range")();
 		X_ASSERT(max_ != Vec3f::min(), "Infinate range")();
 	}
-
-	buildScalers(posError);
 }
 
 
 void AnimCompiler::Position::buildScalers(const float posError)
 {
+	scalers_.clear();
+	scalers_.reserve(posFrames_.size());
+
 	range_ = max_ - min_;
 
 	uint32_t segments = (1 << 8) - 1;
@@ -432,9 +441,6 @@ void AnimCompiler::Position::buildScalers(const float posError)
 	}
 
 	Vec3f segmentsize(range_ / Vec3f(static_cast<float>(segments)));
-
-	scalers_.clear();
-	scalers_.reserve(posFrames_.size());
 
 	for (auto& posEntry : posFrames_)
 	{
@@ -524,7 +530,7 @@ void AnimCompiler::Angle::clearData(void)
 	angles_.clear();
 }
 
-void AnimCompiler::Angle::appendFullAng(const Quatf& ang)
+void AnimCompiler::Angle::appendFullAng(const Matrix33f& ang)
 {
 	fullAngles_.append(ang);
 }
@@ -556,7 +562,7 @@ bool AnimCompiler::Angle::isFullFrames(void) const
 	return fullAngles_.size() == angles_.size();
 }
 
-const Quatf& AnimCompiler::Angle::getAngForFrame(size_t idx) const
+const Matrix33f& AnimCompiler::Angle::getAngForFrame(size_t idx) const
 {
 	return fullAngles_[idx];
 }
@@ -570,7 +576,7 @@ const AnimCompiler::Angle::AngleFrameArr& AnimCompiler::Angle::getAngles(void) c
 void AnimCompiler::Angle::calculateRelativeData(const Position& parentPos, const Angle& parentAng)
 {
 	relAngles_.resize(fullAngles_.size());
-
+	
 	for (size_t i = 0; i < fullAngles_.size(); i++)
 	{
 		auto& parWorldAngle = parentAng.getAngForFrame(i);
@@ -604,38 +610,108 @@ void AnimCompiler::Angle::calculateDeltaFrames(const float angError)
 	angles_.clear();
 	angles_.reserve(relAngles_.size());
 
-	Quatf curAng = Quatf::identity();
-	
-	int32_t frame = 0;
-
-	for (auto& ang : relAngles_)
+	// work out any axis changes
+	for (const auto& ang : relAngles_)
 	{
-		Quatf delta = ang.diff(curAng);
+		Vec3f euler = Quatf(ang).getEulerDegrees();
 
-		float pitchDelta = delta.getPitch();
-		float rollDelta = delta.getRoll();
-		float yawDelta = delta.getYaw();
+		bool pitchPass = math<float>::abs(euler.x) > angError;
+		bool rollPass = math<float>::abs(euler.y) > angError;
+		bool yawPass = math<float>::abs(euler.z) > angError;
 
-		bool pitchPass = math<float>::abs(pitchDelta) > angError;
-		bool rollPass = math<float>::abs(rollDelta) > angError;
-		bool yawPass = math<float>::abs(yawDelta) > angError;
+		axisChanges_[0] |= pitchPass;
+		axisChanges_[1] |= rollPass;
+		axisChanges_[2] |= yawPass;
+	}
 
-		if (pitchPass || rollPass || yawPass)
+
+	auto addFrame = [&](int32_t frameIdx) {
+		const auto& angle = relAngles_[frameIdx];
+
+		AngleFrame& entry = angles_.AddOne();
+		entry.angle = angle;
+		entry.frame = frameIdx;
+	};
+
+	// find first frame we rotate.
+	const int32_t totalFrames = static_cast<int32_t>(relAngles_.size());
+
+	int32_t frame = 0;
+	for (frame = 0; frame < totalFrames; frame++)
+	{
+		Matrix33f delta = relAngles_[frame];
+		Quatf deltaQuat(delta);
+		Vec3f deltaEuler = deltaQuat.getEulerDegrees();
+		
+		if (!deltaEuler.compare(Vec3f::zero(), angError))
 		{
-			axisChanges_[0] |= pitchPass;
-			axisChanges_[1] |= rollPass;
-			axisChanges_[2] |= yawPass;
+			if (frame > 0)
+			{
+				--frame;
+			}
 
-			// add it :)
-			AngleFrame a;
-			a.frame = frame;
-			a.angle = ang;
-			angles_.append(a);
-
-			curAng = ang;
+			addFrame(frame);
+			break;
 		}
+	}
 
-		frame++;
+	if (frame < totalFrames)
+	{
+		int32_t lastStoredFrame = frame;
+
+		for (frame += 1; frame < totalFrames - 1; ++frame)
+		{
+			const Matrix33f& lastStoredM = relAngles_[lastStoredFrame];
+			const Matrix33f& curFrameM = relAngles_[frame];
+			const Matrix33f& curFramePlusOneM = relAngles_[frame + 1];
+
+			// turn them in to quats like they will be stored.
+			// so we can check what the runtime error value would actually be.
+			Quatf lastStored = Quatf(lastStoredM);
+			Quatf curFrame = Quatf(curFrameM);
+			Quatf curFramePlusOne = Quatf(curFramePlusOneM);
+
+			// simulate the compression loss?
+#if 0
+			lastStored = XQuatCompressedf(lastStored).asQuat();
+			curFrame = XQuatCompressedf(curFrame).asQuat();
+			curFramePlusOne = XQuatCompressedf(curFramePlusOne).asQuat();
+#endif
+
+			int32_t numFrames = frame - lastStoredFrame;
+			float fraction = static_cast<float>(numFrames) / (numFrames + 1);
+
+			Quatf interpolated = lastStored.slerp(fraction, curFramePlusOne);
+			Quatf diff = interpolated.diff(curFrame);
+
+			Vec3f diffEuler = diff.getEulerDegrees();
+
+			if (!diffEuler.compare(Vec3f::zero(), angError))
+			{
+				// lets store the frame before we drifted,
+				lastStoredFrame = frame;
+
+				addFrame(lastStoredFrame);
+			}
+		}
+		
+		// I only want a end frame if it's diffrent.
+		if (lastStoredFrame != totalFrames - 1)
+		{
+			const Matrix33f& lastStoredM = relAngles_[lastStoredFrame];
+			const Matrix33f& curFrameM = relAngles_[totalFrames - 1];
+
+			Quatf lastStored = Quatf(lastStoredM);
+			Quatf curFrame = Quatf(curFrameM);
+
+			Quatf diff = curFrame.diff(lastStored);
+			Vec3f diffEuler = diff.getEulerDegrees();
+
+			if (!diffEuler.compare(Vec3f::zero(), angError))
+			{
+				addFrame(totalFrames - 1);
+			}
+		}
 	}
 }
 
@@ -713,9 +789,10 @@ void AnimCompiler::printStats(bool verbose) const
 
 				for (auto& a : angles)
 				{
-					auto euler = a.angle.getEulerDegrees();
+					Quatf q = Quatf(a.angle);
+					auto euler = q.getEulerDegrees();
 					X_LOG0("Anim", "Angle(%" PRIi32 "): ^2(%g,%g,%g) %g^7 e: (%g,%g,%g)", 
-						a.frame, a.angle.v.x, a.angle.v.y, a.angle.v.z, a.angle.w, euler.x, euler.y, euler.z);
+						a.frame, q.v.x, q.v.y, q.v.z, q.w, euler.x, euler.y, euler.z);
 				}
 			}
 
