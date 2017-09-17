@@ -11,8 +11,8 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("Options");
     {
-        Asset.AddFloat( "posError", 0.05, 0.00001, 10 ).SetTitle("Pos Error").SetToolTip( "Drop position data lower than this threshold" );
-        Asset.AddFloat( "angError", 0.005, 0.00001, 10 ).SetTitle("ang Error").SetToolTip( "Drop angle data lower than this threshold" );
+        Asset.AddFloat( "posError", 0.025, 0.00001, 10 ).SetTitle("Pos Error").SetToolTip( "Drop position data lower than this threshold" );
+        Asset.AddFloat( "angError", 0.05, 0.00001, 10 ).SetTitle("ang Error").SetToolTip( "Drop angle data lower than this threshold" );
         Asset.AddCheckBox( "looping", false).SetTitle( "Looping" ).SetToolTip("The animation loops from start to end.");
     }
 }
