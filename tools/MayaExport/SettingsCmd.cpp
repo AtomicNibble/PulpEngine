@@ -420,7 +420,7 @@ MSyntax SettingsCmd::newSyntax(void)
 	syn.addFlag("-g", "-get", MSyntax::kString);
 	syn.addFlag("-s", "-set", MSyntax::kString);
 	syn.addFlag("-v", "-value", MSyntax::kString);
-	syn.addFlag("-pi", "-path_id", MSyntax::kString);
+	syn.addFlag("-pi", "-set_id", MSyntax::kString);
 
 	return syn;
 }
