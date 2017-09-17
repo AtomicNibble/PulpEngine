@@ -109,7 +109,7 @@ void Bone::decodePos(Vec3f& pos, int32_t frame) const
 				// we have multiple pos.
 				// find a frame for us.
 				int32_t posFrameIdx = 0;
-				while (pPosFrames_[posFrameIdx] < frame) {
+				while (posFrameIdx < numPos_ && pPosFrames_[posFrameIdx] < frame) {
 					++posFrameIdx;
 				}
 
@@ -117,6 +117,10 @@ void Bone::decodePos(Vec3f& pos, int32_t frame) const
 				if (pPosFrames_[posFrameIdx] == frame)
 				{
 					pos = GetPostion(posFrameIdx);
+				}
+				else if (posFrameIdx == numPos_)
+				{
+					pos = GetPostion(numPos_ - 1);
 				}
 				else // if(posFrameIdx != 0)
 				{
