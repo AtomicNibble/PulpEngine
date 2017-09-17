@@ -112,28 +112,60 @@ global proc int assetDB_remove(string $type, string $name)
 	return -1;
 }
 
-
-global proc bool saveIfChanged()
+global proc string getSaveIfChangedMode()
 {
-   $currentSceneName = `file -q -sn`;
+  	string $mode = loadSettingGlobal("saveIfChangedMode");
+	if(int(`size $mode`) < 1) {
+		return "Ask";
+	}
 
+  	return $mode;
+}
+
+// returns zero if should cancel exporting.
+global proc int saveIfChanged()
+{
+   	$mode = getSaveIfChangedMode();
+   	if($mode == "Never") {
+   		return 1;
+   	}
+
+   	print_Verbose("saveIfChanged: " + $mode);
+
+   	$currentSceneName = `file -q -sn`;
     if ( `file -q -anyModified` > 0 )
     {
-        $saveMessage = "Save changes to '" + $currentSceneName + "' before exporting ?";
+    	if($mode == "Ask")
+    	{
+	        $saveMessage = "Save changes to '" + $currentSceneName + "' before exporting ?";
 
-        $saveConfirmResult = `confirmDialog -title "Save Changes" -message $saveMessage -button "Yes" -button "No" -button "Cancel Export" -defaultButton "Yes" -cancelButton "Yes" -dismissString "No"`;
+	        $saveConfirmResult = `confirmDialog -title "Save Changes" -message $saveMessage -button "Yes" -button "No" -button "Cancel Export" -defaultButton "Yes" -cancelButton "Yes" -dismissString "No"`;
 
-        if ($saveConfirmResult == "Yes")
-        {
-            file -save;
-        }
-        else if ($saveConfirmResult == "Cancel Export")
-        {
-            return false;
-        }
+	        if ($saveConfirmResult == "Yes")
+	        {
+	            file -save;
+	        }
+	        else if ($saveConfirmResult == "Cancel Export")
+	        {
+	            return 0;
+	        }
+    	}
+    	else if($mode == "Always")
+    	{
+    		if(int(`size $mode`) < 1) {
+    			print_Error("Can't save scene, no path is set"); // say 'path' as it's more clear what the issue is.
+    			return 0; // cancel export: potentially annoying, but if you asked for 'always' you might rely on it.
+			} else {
+				file -save;
+			}
+    	}
+    	else
+    	{
+    		print_Error("Unknown save if changed mode: " + $mode);
+    	}
     }
 
-    return true;
+    return 1;
 }
 
 global proc savePathGlobal(string $pathId, string $value)
@@ -275,6 +307,14 @@ global proc exportModeUpdate()
 
 	saveSettingGlobal("exportMode", $val);
 }
+
+global proc saveIfChangedUpdate()
+{
+	string $val = `optionMenuGrp -q -v safeIfChangedCntrl`;
+
+	saveSettingGlobal("saveIfChangedMode", $val);
+}
+
 
 global proc forceBoneFiltersUpdate()
 {
@@ -1228,8 +1268,16 @@ global proc potato_CreateExportWindow( string $name )
 						menuItem -label "Server";
 						menuItem -label "Raw";
 
+					optionMenuGrp -l "Save If Changed Mode" -p setcolLayout2  -cc saveIfChangedUpdate safeIfChangedCntrl;
+						menuItem -label "Never";
+						menuItem -label "Ask";
+						menuItem -label "Always";
+
 					string $exportMode = getExportMode();
 					optionMenuGrp -e -v $exportMode exportModeCntrl;
+
+					string $saveIfChangedMode = getSaveIfChangedMode();
+					optionMenuGrp -e -v $saveIfChangedMode safeIfChangedCntrl;
 // Help Tab
 		string $help;
 		$help += "How To Export:\n";
