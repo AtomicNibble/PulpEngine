@@ -282,10 +282,13 @@ Animator::Animator(const model::XModel& model, core::MemoryArenaBase* arena) :
 	for (size_t i = 0; i < boneMat_.size(); i++)
 	{
 		auto& angle = model.getBoneAngle(i);
+		auto& pos = model.getBonePosWorld(i);
+
 		Quatf quat = angle.asQuat();
-		quat.invert();
-		
+
 		invBoneMat_[i] = quat.toMatrix33();
+		invBoneMat_[i].setTranslate(pos);
+		invBoneMat_[i].invert();
 	}
 }
 
@@ -329,6 +332,11 @@ bool Animator::createFrame(core::TimeVal currentTime)
 
 		bones[0].pos = pos;
 		bones[0].quat = angle.asQuat();
+	}
+
+	for (size_t i = 0; i < bones.size(); i++)
+	{
+		bones[i].pos += model_.getBonePosRel(i);
 	}
 
 
