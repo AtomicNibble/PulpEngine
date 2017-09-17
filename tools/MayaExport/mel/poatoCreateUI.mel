@@ -475,12 +475,12 @@ global proc ModelEntryExport(int $index)
 	// build the shit!
 	// we need file name.
 	string $filename = modelGetName($index);
-  	string $Dir = getOutputDir();
+	string $mode = getExportMode();
+  	string $dir = getOutputDir();
 	string $scale = `getAttr ("PotatoGNode.scale")`;
 	string $forceBoneFilters = substituteAllString(`getAttr ("PotatoGNode.forceBoneFilters")`, "\n", " ");
 	string $verbose = `getAttr ("PotatoGNode.verbose")`;
-	string $mode = getExportMode();
-	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale
+	string $options = "-progress PotatoExportProgress -dir \"" + $dir + "\" -scale " + $scale
 	+ " -mode \"" + $mode + "\""
 	+ " -force_bones \"" + $forceBoneFilters + "\"";
 
@@ -492,7 +492,7 @@ global proc ModelEntryExport(int $index)
 
 	print_Verbose("cmd: " + $command);
 
-	if(int(`size $Dir`) < 1)
+	if($mode == "Raw" && int(`size $dir`) < 1)
 	{
 		print_Error("No export dir set! set a path in the paths tab.");
 		return;
@@ -958,9 +958,10 @@ global proc AnimEntryExport(int $index)
 	$args += " -type \"" + $type + "\"";
 
 	// make the command
+	string $mode = getExportMode();
+	string $dir = getOutputDirAnims();
 	string $filename = animGetName($index);
-	string $Dir = getOutputDirAnims();
-	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
+	string $options = "-progress PotatoExportProgress -dir \"" + $dir + "\"";
 
 	if($verbose) {
         $options += " -verbose";
@@ -970,7 +971,7 @@ global proc AnimEntryExport(int $index)
 
 	print_Verbose("cmd: " + $command);
 
-	if(int(`size $Dir`) < 1)
+	if($mode == "Raw" && int(`size $dir`) < 1)
 	{
 		print_Error("No export dir set! set a path in the paths tab.");
 		return;
