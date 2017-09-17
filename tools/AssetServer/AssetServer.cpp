@@ -4,6 +4,7 @@
 #include <Containers\Array.h>
 #include <IFileSys.h>
 
+
 X_DISABLE_WARNING(4244)
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
@@ -373,6 +374,35 @@ bool AssetServer::Client::writeAndFlushBuf(ResponseBuffer& outputBuffer)
 // -------------------------------------------
 
 
+AssetServer::ClientThread::ClientThread(ClientPtr client, core::MemoryArenaBase* arena) :
+	client_(std::move(client)),
+	arena_(arena)
+{
+
+}
+
+
+bool AssetServer::ClientThread::listen(void)
+{
+	Create("ClientThread");
+	Start();
+	return true;
+}
+
+
+core::Thread::ReturnValue AssetServer::ClientThread::ThreadRun(const core::Thread& thread)
+{
+	client_->listen();
+
+	X_LOG1("AssetServer", "Client disconnected");
+	X_DELETE(this, arena_);
+	return core::Thread::ReturnValue(0);
+}
+
+
+// -------------------------------------------
+
+
 AssetServer::AssetServer(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	lock_(50),
@@ -407,42 +437,40 @@ void AssetServer::Run(bool blocking)
 	}
 }
 
-void AssetServer::Run_Internal(void)
+bool AssetServer::Run_Internal(void)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
 	if (!db_.OpenDB()) {
-		return;
+		return false;
 	}
 
+	// spawn off new clients for each connection.
+	// ideally handle all clients on single thread by performnce requirement for this is pretty much none exsistent.
+	// maybe 4-5 clients max.
 	while (1)
 	{
-		Client client(*this, arena_);
+		auto client = core::makeUnique<Client>(arena_, *this, arena_);
 
-		client.connect();
-		client.listen();
+		if (client->connect())
+		{
+			X_LOG1("AssetServer", "Client connected");
+
+			auto* pClientThread = X_NEW(ClientThread, arena_, "ClientThread")(std::move(client), arena_);
+
+			pClientThread->listen();
+		}
 	}
 
 	db_.CloseDB();
+	return true;
 }
 
 core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 {
-	GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-	if (!db_.OpenDB()) {
+	if (!Run_Internal()) {
 		return core::Thread::ReturnValue(-1);
 	}
-
-	while (thread.ShouldRun())
-	{
-		Client client(*this, arena_);
-
-		client.connect();
-		client.listen();
-	}
-
-	db_.CloseDB();
 
 	return core::Thread::ReturnValue(0);
 }

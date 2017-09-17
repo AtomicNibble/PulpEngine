@@ -2,6 +2,9 @@
 
 #include <Containers\Array.h>
 #include <Platform\Pipe.h>
+#include <Util\UniquePointer.h>
+
+
 #include <../AssetDB/AssetDB.h>
 
 
@@ -58,6 +61,24 @@ private:
 		core::IPC::Pipe pipe_;
 	};
 
+	class ClientThread : private core::ThreadAbstract
+	{
+	public:
+		typedef core::UniquePointer<Client> ClientPtr;
+
+	public:
+		ClientThread(ClientPtr client, core::MemoryArenaBase* arena);
+
+		bool listen(void);
+
+	private:
+		core::Thread::ReturnValue ThreadRun(const core::Thread& thread) X_FINAL;
+
+	private:
+		ClientPtr client_;
+		core::MemoryArenaBase* arena_;
+	};
+
 public:
 	AssetServer(core::MemoryArenaBase* arena);
 	~AssetServer();
@@ -65,9 +86,10 @@ public:
 	void Run(bool blocking = true);
 
 private:
-	void Run_Internal(void);
+	bool Run_Internal(void);
 
 	core::Thread::ReturnValue ThreadRun(const core::Thread& thread) X_FINAL;
+
 
 	void ConverterInfo(const ProtoBuf::AssetDB::ConverterInfoReqest& modInfo, ResponseBuffer& outputBuffer);
 	void ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuffer& outputBuffer);
