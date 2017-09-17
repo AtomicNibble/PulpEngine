@@ -180,7 +180,7 @@ void Bone::decodeAngle(Quatf& ang, int32_t frame) const
 				}
 
 				int32_t angFrameIdx = 0;
-				while (pAngleFrames_[angFrameIdx] < frame) {
+				while (angFrameIdx < numAngles_ && pAngleFrames_[angFrameIdx] < frame) {
 					++angFrameIdx;
 				}
 
@@ -189,10 +189,8 @@ void Bone::decodeAngle(Quatf& ang, int32_t frame) const
 				{
 					ang = GetAngle(angFrameIdx);
 				}
-				else if (angFrameIdx >= numAngles_)
+				else if (angFrameIdx == numAngles_)
 				{
-					// frame is part what we have data for
-					// return last frame.
 					ang = GetAngle(numAngles_ - 1);
 				}
 				else
@@ -200,7 +198,8 @@ void Bone::decodeAngle(Quatf& ang, int32_t frame) const
 					int32_t firstIdx = angFrameIdx - 1;
 					int32_t lastIdx = angFrameIdx;
 
-					X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+					X_ASSERT(firstIdx >= 0 && firstIdx < numAngles_, "invalid index")(firstIdx, numAngles_);
+					X_ASSERT(lastIdx >= 0 && lastIdx < numAngles_, "invalid index")(lastIdx, numAngles_);
 
 					int32_t first = pAngleFrames_[firstIdx];
 					int32_t last = pAngleFrames_[lastIdx];
