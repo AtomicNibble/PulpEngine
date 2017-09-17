@@ -12,7 +12,7 @@ class SettingsCache
 	static const char* SETTINGS_PATH;
 
 public:
-	X_DECLARE_ENUM(SettingId)(ANIM_OUT, MODEL_OUT, EXPORTMODE);
+	X_DECLARE_ENUM(SettingId)(ANIM_OUT, MODEL_OUT, EXPORTMODE, SAVE_IF_CHANGED_MODE);
 
 public:
 	SettingsCache();
