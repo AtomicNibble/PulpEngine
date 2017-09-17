@@ -226,7 +226,13 @@ public:
 		RawModel::Mesh* pRawMesh;
 	};
 
-	typedef core::Array<Vec3f> Vec3Arr;
+	struct RelativeBoneInfo
+	{
+		Vec3f pos;
+		Matrix33f rotation;
+	};
+
+	typedef core::Array<RelativeBoneInfo> RelativeBoneInfoArr;
 
 
 public:
@@ -280,7 +286,7 @@ private:
 	bool CreateBindData(void);
 	bool MergVerts(void);
 	bool ScaleModel(void);
-	bool CreateBoneInfo(void);
+	bool CreateRelativeBoneInfo(void);
 	bool UpdateMeshBounds(void);
 	bool CheckLimits(void);
 
@@ -312,7 +318,7 @@ private:
 	CompileFlags flags_;
 	CompiledLodArr compiledLods_;
 	HitBoxShapeArr hitboxShapes_;
-	Vec3Arr relativeBonePos_;
+	RelativeBoneInfoArr relativeBoneInfo_;
 
 	float lodDistances_[model::MODEL_MAX_LODS];
 

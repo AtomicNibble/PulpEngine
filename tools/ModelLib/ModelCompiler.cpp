@@ -751,7 +751,7 @@ ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	flags_(DEFAULT_FLAGS),
 	stats_(arena),
 	hitboxShapes_(arena),
-	relativeBonePos_(arena)
+	relativeBoneInfo_(arena)
 {
 	core::zero_object(lodDistances_);
 }
@@ -945,7 +945,8 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		root.worldPos_ = Vec3f::zero();
 
 		bones_.push_back(root);
-		relativeBonePos_.push_back(Vec3f::zero());
+
+		relativeBoneInfo_.push_back(RelativeBoneInfo());
 	}
 
 	// calculate root bones.
@@ -1032,11 +1033,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	core::FixedByteStreamOwning hitboxDataStream(arena_, header.hitboxDataBlocks * 64);
 
 
+	// this seams kinda wrong.
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
+	meshHeadOffsets += header.boneDataSize;
 	for (auto& bone : bones_) 
 	{
-		meshHeadOffsets += bone.name_.length() + 2; // name + name idx
-		meshHeadOffsets += sizeof(XQuatCompressedf) + sizeof(Vec3f);
+		meshHeadOffsets += bone.name_.length(); 
 	}
 
 	for (size_t i = 0; i < compiledLods_.size(); i++) {
@@ -1144,12 +1146,25 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		}
 
 		// pos.
-		X_ASSERT(bones_.size() == relativeBonePos_.size(), "Size mismatch")();
-		for (size_t i=0; i<bones_.size(); i++)
+		for (auto& bone : bones_)
 		{
-			auto& bone = bones_[i];
-			boneDataStream.write(relativeBonePos_[i]);
+			boneDataStream.write(bone.worldPos_);
 		}
+
+		// relative data.
+		X_ASSERT(bones_.size() == relativeBoneInfo_.size(), "Size mismatch")();
+		for (size_t i = 0; i<bones_.size(); i++)
+		{
+			XQuatCompressedf quat(relativeBoneInfo_[i].rotation);
+			boneDataStream.write(quat);
+		}
+
+		for (size_t i = 0; i<bones_.size(); i++)
+		{
+			boneDataStream.write(relativeBoneInfo_[i].pos);
+		}
+
+
 	}
 
 	// col data. (currently we only allow col data on lod0 so makes more sense to be seperate from lodinfo.
@@ -1735,6 +1750,8 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 	size += (totalbones * sizeof(uint8_t)); // hierarchy
 	size += (totalbones * sizeof(XQuatCompressedf)); // angle
 	size += (totalbones * sizeof(Vec3f));	// pos.
+	size += (totalbones * sizeof(XQuatCompressedf)); // rel angle
+	size += (totalbones * sizeof(Vec3f));	// pos rel.
 	size += (totalbones * sizeof(uint16_t));	// string table idx's
 
 	return size;
@@ -1892,7 +1909,7 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
-	if (!CreateBoneInfo()) {
+	if (!CreateRelativeBoneInfo()) {
 		X_ERROR("Model", "Model exceeds limits");
 		return false;
 	}
@@ -2275,9 +2292,9 @@ bool ModelCompiler::ScaleModel(void)
 	return ScaleBones();
 }
 
-bool ModelCompiler::CreateBoneInfo(void)
+bool ModelCompiler::CreateRelativeBoneInfo(void)
 {
-	relativeBonePos_.resize(bones_.size());
+	relativeBoneInfo_.resize(bones_.size());
 
 	for (size_t i = 0; i < bones_.size(); i++)
 	{
@@ -2293,7 +2310,10 @@ bool ModelCompiler::CreateBoneInfo(void)
 		Vec3f relPos = bone.worldPos_ - parBone.worldPos_;
 		relPos = parBone.rotation_.inverse() * relPos;
 
-		relativeBonePos_[i] = relPos;
+		Matrix33f relRotation = parBone.rotation_.inverse() * bone.rotation_;
+
+		relativeBoneInfo_[i].pos = relPos;
+		relativeBoneInfo_[i].rotation = relRotation;
 	}
 
 	return true;
