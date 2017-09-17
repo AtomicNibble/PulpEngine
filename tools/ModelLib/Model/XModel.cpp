@@ -72,6 +72,9 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	pTagTree_ = bone_data_cursor.postSeekPtr<uint8_t>(numBone);
 	pBoneAngles_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
 	pBonePos_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
+	// relative data, maybe temp.
+	pBoneAnglesRel_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
+	pBonePosRel_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
 
 	X_ASSERT(bone_data_cursor.isEof(), "Load error")();
 

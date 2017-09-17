@@ -60,7 +60,9 @@ public:
 	X_INLINE const char* getBoneName(size_t idx) const;
 	X_INLINE const uint8_t*	getTagTree(void) const;
 	X_INLINE const XQuatCompressedf& getBoneAngle(size_t idx) const;
-	X_INLINE const Vec3f getBonePos(size_t idx) const;
+	X_INLINE const XQuatCompressedf& getBoneAngleRel(size_t idx) const;
+	X_INLINE const Vec3f getBonePosRel(size_t idx) const;
+	X_INLINE const Vec3f getBonePosWorld(size_t idx) const;
 
 
 	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
@@ -79,6 +81,9 @@ protected:
 	const uint8_t*			pTagTree_;
 	const XQuatCompressedf* pBoneAngles_;
 	const Vec3f*			pBonePos_;
+
+	const XQuatCompressedf* pBoneAnglesRel_;
+	const Vec3f*			pBonePosRel_;
 
 	// pointer to all the meshes headers for all lods
 	// sotred in lod order.
