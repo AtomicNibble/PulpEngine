@@ -712,7 +712,7 @@ global proc potato_removeModel(string $name)
 	setAttr PotatoGNode.numModels $numModels;
 
 	// now we just remake the window.
-	potato_ShowModelExport();
+	potato_ShowExporterWindow();
 }
 
 global proc potato_DoDeleteSelected()
@@ -1344,7 +1344,7 @@ global proc potato_AddSavedItems()
 	}
 }
 
-global proc potato_ShowModelExport()
+global proc potato_ShowExporterWindow()
 {
 	ensureNode();
 	unlockPotatoNode();
@@ -1388,7 +1388,7 @@ global proc CreateMenu()
 
 	setParent -menu ..;
 
-	menuItem -label "Exporter" -command "potato_ShowModelExport";
+	menuItem -label "Exporter" -command "potato_ShowExporterWindow";
 	menuItem -divider true;
 	menuItem -label "Select and reveal all bones" -command "potato_SelectAllBonesInScene";
 	menuItem -label "Select and reveal all mesh" -command "potato_SelectAllMeshInScene";
@@ -1430,7 +1430,7 @@ global proc potato_resetSettings()
 
 	lockPotatoNode();
 
-	potato_ShowModelExport();
+	potato_ShowExporterWindow();
 }
 
 global proc initNodeDefaults()
@@ -1486,8 +1486,7 @@ global proc poatoCreateUI()
 	CreateMenu();
 
 	// show it for debug
-	potato_ShowModelExport();
-//	potato_ShowAnimExport();
+	potato_ShowExporterWindow();
 }
 
 global proc potatoAfterFileOpen()
@@ -1496,6 +1495,6 @@ global proc potatoAfterFileOpen()
 
 	// re fresh the export window, if it's open
 	if (`window -exists "potato_ExportWindow"`) {
-		potato_ShowModelExport();
+		potato_ShowExporterWindow();
 	}
 }
