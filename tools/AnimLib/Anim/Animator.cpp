@@ -2,6 +2,8 @@
 #include "Animator.h"
 
 #include <Time\TimeLiterals.h>
+#include <IPrimativeContext.h>
+#include <IFont.h>
 
 #include "Anim.h"
 
@@ -386,6 +388,57 @@ bool Animator::isAnimating(core::TimeVal currentTime) const
 
 	return false;
 }
+
+void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const
+{
+	core::StackString512 txt;
+
+	int32_t num = 1; // numAnims();
+	txt.appendFmt("Anims: %i\n", num);
+
+	for (auto& anim : anims_)
+	{
+		auto* pAnim = anim.getAnim();
+		if (!pAnim) {
+			continue;
+		}
+
+		auto animTime = anim.animTime(currentTime);
+		bool isDone = anim.isDone(currentTime);
+		
+		if (isDone) {
+			animTime = anim.animTime(anim.getEndTime());
+		}
+
+		txt.appendFmt("Name: %s\n", pAnim->getName());
+		txt.appendFmt("Frames: %" PRIi32 " Fps: %" PRIi32 " rate: %g\n", pAnim->getNumFrames(), pAnim->getFps(), anim.getRate());
+		txt.appendFmt("Dur: %gms AnimTime: %gms\n", pAnim->getDuration().GetMilliSeconds(), animTime.GetMilliSeconds());
+		txt.appendFmt("Start: %gms End: %gms Play: %gms\n", anim.getStartTime().GetMilliSeconds(), anim.getEndTime().GetMilliSeconds(), anim.getPlayTime().GetMilliSeconds());
+		txt.appendFmt("Weights: start: %g final: %g cur: %g \n", anim.getStartWeight(), anim.getFinalWeight(), anim.getWeight(currentTime));
+		txt.appendFmt("NumCycles: %" PRIi32 " isDone: %i\n", anim.getCycleCount(), anim.isDone(currentTime));
+
+		{
+			FrameBlend frame;
+			pAnim->timeToFrame(animTime, frame);
+
+			txt.appendFmt("Blend: f1: %i f2: %i cycles: %i\n", frame.frame1, frame.frame2, frame.cylces);
+			txt.appendFmt("Blend: f-lerp: %.2g b-lerp: %.2g\n", frame.frontlerp, frame.backlerp);
+		}
+	}
+
+
+	font::TextDrawContext ctx;
+	ctx.col = Col_White;
+	ctx.size = Vec2f(3.f, 3.f);
+	ctx.effectId = 0;
+	ctx.pFont = gEnv->pFontSys->GetDefault();
+	ctx.flags.Set(font::DrawTextFlag::FRAMED);
+
+	pPrimContex->drawText(pos, mat, ctx, txt.begin(), txt.end());
+
+}
+
+
 
 
 X_NAMESPACE_END

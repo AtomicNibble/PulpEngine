@@ -6,6 +6,8 @@
 
 X_NAMESPACE_DECLARE(model, class XModel)
 
+X_NAMESPACE_DECLARE(engine, class IPrimativeContext)
+
 X_NAMESPACE_BEGIN(anim)
 
 
@@ -110,6 +112,8 @@ public:
 	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	ANIMLIB_EXPORT bool isAnimating(core::TimeVal currentTime) const;
 
+
+	ANIMLIB_EXPORT void renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const;
 
 
 private:
