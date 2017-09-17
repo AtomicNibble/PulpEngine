@@ -32,7 +32,7 @@ namespace
 
 } // namespace
 
-const char* SettingsCache::SETTINGS_PATH = "PotatoEngine//MayaPlugin//settings.xml";
+const char* SettingsCache::SETTINGS_PATH = X_ENGINE_NAME "Engine//MayaPlugin//settings.xml";
 
 SettingsCache::SettingsCache() : 
 	cacheLoaded_(false), 
