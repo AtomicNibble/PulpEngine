@@ -25,6 +25,8 @@ public:
 	bool SetValue(SettingId::Enum id, const core::StackString512& value);
 	bool GetValue(SettingId::Enum id, core::StackString512& value);
 
+	bool GetValues(MString& out) const;
+
 private:
 	const char* SetIdToStr(SettingId::Enum id);
 

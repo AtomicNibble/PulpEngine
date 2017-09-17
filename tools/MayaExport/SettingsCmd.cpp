@@ -100,6 +100,21 @@ bool SettingsCache::GetValue(SettingId::Enum id, core::StackString512& value)
 	return true;
 }
 
+bool SettingsCache::GetValues(MString& out) const
+{
+	out.clear();
+
+	for (auto it : settingsCache_)
+	{
+		out += it.first.c_str();
+		out += ": '";
+		out += it.second.c_str();
+		out += "' ";
+	}
+
+	return true;
+}
+
 const char* SettingsCache::SetIdToStr(SettingId::Enum id)
 {
 	if (id == SettingId::ANIM_OUT) {
@@ -295,6 +310,17 @@ MStatus SettingsCmd::doIt(const MArgList & args)
 		return MS::kFailure;
 	}
 
+	if (args.flagIndex("values") != MArgList::kInvalidArgIndex)
+	{
+		MString values;
+		if (!gSettingsCache->GetValues(values)) {
+			return MS::kFailure;
+		}
+
+		setResult(values);
+		return MS::kSuccess;
+	}
+
 	// get the mode.
 	{
 		idx = args.flagIndex("g", "get");
@@ -421,6 +447,7 @@ MSyntax SettingsCmd::newSyntax(void)
 	syn.addFlag("-s", "-set", MSyntax::kString);
 	syn.addFlag("-v", "-value", MSyntax::kString);
 	syn.addFlag("-pi", "-set_id", MSyntax::kString);
+	syn.addFlag("-values", "-values", MSyntax::kString);
 
 	return syn;
 }
