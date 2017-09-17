@@ -304,8 +304,7 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	if (!isAnimating(currentTime)) {
 		return false;
 	}
-
-
+	
 	lastTransformTime_ = currentTime;
 
 	// joints for whole model.
@@ -336,20 +335,22 @@ bool Animator::createFrame(core::TimeVal currentTime)
 		bones[0].quat = angle.asQuat();
 	}
 
+	// move the relative transforms into bone space.
 	for (size_t i = 0; i < bones.size(); i++)
 	{
 		bones[i].pos += model_.getBonePosRel(i);
 	}
 
-
 	Util::convertBoneTransToMatrix(boneMat_, bones);
 	Util::transformBones(boneMat_, model_.getTagTree(), 1, static_cast<int32_t>(boneMat_.size() - 1));
 
+	// go from world space to bone space, post transform.
+	// this is only needed for rendering.
+	// so many the render system should do it?
 	for (size_t i = 0; i < boneMat_.size(); i++)
 	{
 		boneMat_[i] = boneMat_[i] * invBoneMat_[i];
 	}
-
 
 	return true;
 }
