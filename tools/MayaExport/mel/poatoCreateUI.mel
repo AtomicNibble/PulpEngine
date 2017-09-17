@@ -1407,12 +1407,6 @@ global proc potato_ShowExporterWindow()
 	showWindow $name;
 }
 
-
-global proc potato_ShowAnimExport()
-{
-
-}
-
 global proc CreateMenu()
 {
 	global string $gMainWindow;
@@ -1543,6 +1537,13 @@ global proc potatoAfterFileOpen()
 	// called after a file has been opended.
 
 	// re fresh the export window, if it's open
+	if (`window -exists "potato_ExportWindow"`) {
+		potato_ShowExporterWindow();
+	}
+}
+
+global proc potatoAfterNew()
+{
 	if (`window -exists "potato_ExportWindow"`) {
 		potato_ShowExporterWindow();
 	}

@@ -60,12 +60,20 @@ namespace
 	EngineApp app;
 
 	MCallbackId AfterFileOpenCallBackId;
+	MCallbackId AfterNewCallBackId;
 
 	static void AfterFileOpen(void* pClientData)
 	{
 		X_UNUSED(pClientData);
 		MGlobal::executeCommandOnIdle("potatoAfterFileOpen();");
 	}
+
+	static void AfterNew(void* pClientData)
+	{
+		X_UNUSED(pClientData);
+		MGlobal::executeCommandOnIdle("potatoAfterNew();");
+	}
+	
 
 	typedef core::Logger<
 		core::LoggerNoFilterPolicy,
@@ -151,6 +159,13 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 		stat.perror("Error - initializePlugin:OnSceneUpdate");
 		return stat;
 	}
+
+	AfterNewCallBackId = MSceneMessage::addCallback(MSceneMessage::kAfterNew, AfterNew, nullptr, &stat);
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin:OnSceneUpdate");
+		return stat;
+	}
+
 
 	MayaUtil::MayaPrintMsg("=== " X_ENGINE_NAME " Plugin Loaded (%s %gms) ===", ver.c_str(),
 		timer.GetMilliSeconds());
