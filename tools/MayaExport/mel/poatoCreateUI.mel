@@ -113,6 +113,29 @@ global proc int assetDB_remove(string $type, string $name)
 }
 
 
+global proc bool saveIfChanged()
+{
+   $currentSceneName = `file -q -sn`;
+
+    if ( `file -q -anyModified` > 0 )
+    {
+        $saveMessage = "Save changes to '" + $currentSceneName + "' before exporting ?";
+
+        $saveConfirmResult = `confirmDialog -title "Save Changes" -message $saveMessage -button "Yes" -button "No" -button "Cancel Export" -defaultButton "Yes" -cancelButton "Yes" -dismissString "No"`;
+
+        if ($saveConfirmResult == "Yes")
+        {
+            file -save;
+        }
+        else if ($saveConfirmResult == "Cancel Export")
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 global proc savePathGlobal(string $pathId, string $value)
 {
 	saveSettingGlobal($pathId, $value);
@@ -356,6 +379,10 @@ global proc ModelClearLODObjects(int $lod_number, int $index)
 
 global proc potato_ExportAll()
 {
+	if(!saveIfChanged()) {
+		return;
+	}
+
 	int $numModels = `getAttr PotatoGNode.numModels`;
 	int $i;
 	for($i = 0; $i < $numModels; $i++) {
@@ -372,6 +399,10 @@ global proc ModelEntryExport(int $index)
 	int $total_lods = 0;
 	int $total_mesh = 0;
 	int $idx;
+
+	if(!saveIfChanged()) {
+		return;
+	}
 
 	for($idx = 0; $idx < 4; $idx++)
 	{
@@ -897,6 +928,10 @@ global proc animTypeChangedUpdate(int $index)
 
 global proc AnimEntryExport(int $index)
 {
+	if(!saveIfChanged()) {
+		return;
+	}
+
 	string $verbose = `getAttr ("PotatoGNode.verbose")`;
 	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
 	string $type = `getAttr ("PotatoGNode.AnimType" + $index)`;
