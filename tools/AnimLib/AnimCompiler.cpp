@@ -1112,6 +1112,7 @@ void AnimCompiler::processBones(const float posError, const float angError)
 			bone.ang.calculateRelativeDataRoot();
 		}
 
+
 		if (flags_.IsSet(CompileFlag::NO_OPTIMISE))
 		{
 			bone.ang.calculateFullFrames();
@@ -1119,7 +1120,6 @@ void AnimCompiler::processBones(const float posError, const float angError)
 		}
 		else
 		{
-
 			bone.ang.calculateDeltaFrames(0.05f);
 			bone.pos.calculateDeltaFrames(posError);
 		}
