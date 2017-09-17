@@ -159,7 +159,7 @@ X_INLINE const Vec3f XModel::getBonePosRel(size_t idx) const
 	return pBonePosRel_[idx];
 }
 
-X_INLINE const Vec3f XModel::getBonePosWorld(size_t idx) const
+X_INLINE const Vec3f XModel::getBonePos(size_t idx) const
 {
 	return pBonePos_[idx];
 }

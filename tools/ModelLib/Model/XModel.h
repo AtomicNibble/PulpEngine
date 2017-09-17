@@ -62,7 +62,7 @@ public:
 	X_INLINE const XQuatCompressedf& getBoneAngle(size_t idx) const;
 	X_INLINE const XQuatCompressedf& getBoneAngleRel(size_t idx) const;
 	X_INLINE const Vec3f getBonePosRel(size_t idx) const;
-	X_INLINE const Vec3f getBonePosWorld(size_t idx) const;
+	X_INLINE const Vec3f getBonePos(size_t idx) const;
 
 
 	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);

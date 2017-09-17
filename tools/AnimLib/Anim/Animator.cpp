@@ -282,7 +282,7 @@ Animator::Animator(const model::XModel& model, core::MemoryArenaBase* arena) :
 	for (size_t i = 0; i < boneMat_.size(); i++)
 	{
 		auto& angle = model.getBoneAngle(i);
-		auto& pos = model.getBonePosWorld(i);
+		auto& pos = model.getBonePos(i);
 
 		Quatf quat = angle.asQuat();
 
