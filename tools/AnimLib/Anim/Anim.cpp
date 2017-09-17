@@ -124,7 +124,8 @@ void Bone::decodePos(Vec3f& pos, int32_t frame) const
 					int32_t firstIdx = posFrameIdx - 1;
 					int32_t lastIdx = posFrameIdx;
 
-					X_ASSERT(firstIdx >= 0, "invalid index")(firstIdx);
+					X_ASSERT(firstIdx >= 0 && firstIdx < numPos_, "invalid index")(firstIdx, numPos_);
+					X_ASSERT(lastIdx >= 0 && lastIdx < numPos_, "invalid index")(lastIdx, numPos_);
 
 					int32_t first = pPosFrames_[firstIdx];
 					int32_t last = pPosFrames_[lastIdx];
