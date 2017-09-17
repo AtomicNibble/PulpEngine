@@ -66,6 +66,13 @@ struct MeshCollider
 };
 
 
+struct Animator
+{
+	anim::Animator* pAnimator;
+
+};
+
+
 struct EntName
 {
 	core::string name;
@@ -74,11 +81,6 @@ struct EntName
 
 // -----------------------------------
 
-struct Animated
-{
-	anim::Animator* pAnimator;
-
-};
 
 struct Velocity 
 {
@@ -169,7 +171,7 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 	SoundObject,
 	SoundEnviroment,
 
-	Animated,
+	Animator,
 	Velocity,
 	RenderComponent,
 	PhysicsComponent,

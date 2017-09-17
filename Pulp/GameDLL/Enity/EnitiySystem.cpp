@@ -565,7 +565,21 @@ namespace entity
 					break;
 				}
 
+				case "Animator"_fnv1a:
+				{
+					auto& an = reg_.assign<Animator>(ent);
+					if (!reg_.has<Mesh>(ent)) {
+						X_ERROR("Ents", "Animator requires a Mesh component");
+						return false;
+					}
 
+					auto& mesh = reg_.get<Mesh>(ent);
+
+					an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(*mesh.pModel, g_gameArena);
+
+
+					break;
+				}
 
 				// loosy goosy
 				case "origin"_fnv1a:

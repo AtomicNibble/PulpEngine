@@ -39,20 +39,21 @@ namespace entity
 			auto* pAnim = panimMan->loadAnim("test/smooth_bind_01_pump");
 
 
-			auto view = reg.view<Animated, Mesh, TransForm>();
+			auto view = reg.view<Animator, Mesh, TransForm>();
 			for (auto entity : view)
 			{
-				auto& an = reg.get<Animated>(entity);
+				auto& an = reg.get<Animator>(entity);
 
 
 				an.pAnimator->playAnim(pAnim, time.ellapsed[core::Timer::GAME], 500_ms);
 			}
 		}
 
-		auto view = reg.view<Animated, Mesh, TransForm, MeshRenderer>();
+		auto view = reg.view<Animator, Mesh, MeshRenderer, TransForm>();
 		for (auto entity : view)
 		{
-			auto& an = reg.get<Animated>(entity);
+			auto& trans = reg.get<TransForm>(entity);
+			auto& an = reg.get<Animator>(entity);
 			auto& rendEnt = reg.get<MeshRenderer>(entity);
 
 			an.pAnimator->createFrame(time.ellapsed[core::Timer::GAME]);
