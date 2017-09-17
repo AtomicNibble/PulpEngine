@@ -18,6 +18,10 @@ global proc print_Msg(string $msg) {
 	print($msg + "\n");
 }
 
+global proc print_Verbose(string $msg) {
+	// print($msg + "\n");
+}
+
 global proc potato_revealSelected()
 {
 	outlinerEditor -edit -showSelected  1 outlinerPanel1;
@@ -296,10 +300,12 @@ global proc ModelSetLODObjects(int $lod_number, int $index)
 {
 	string $Selected[] = `ls -sl`;
 
-	if (`size $Selected`)
+	if (`size $Selected`) {
 		ModelSetLODObjects_internal($lod_number, $index, $Selected);
-	else
+	}
+	else {
 		print_Warn("unable to set lod objects: no meshes are selected.");
+	}
 }
 
 global proc ModelSelectLODObjects(int $lod_number, int $index)
@@ -316,10 +322,12 @@ global proc ModelSelectLODObjects(int $lod_number, int $index)
 
 	if ( $num > 1 ) {
 		for ( $idx = 0; $idx < $num; $idx++ ) {
-			if( `objExists $objectsArray[$idx]` )
+			if( `objExists $objectsArray[$idx]` ) {
 				$validObjects += $objectsArray[$idx] + " ";
-			else
+			}
+			else {
 				$deletedObjects += $objectsArray[$idx] + " ";
+			}
 		}
 	} else {
 		$validObjects = $objects;
@@ -327,7 +335,6 @@ global proc ModelSelectLODObjects(int $lod_number, int $index)
 
 	$res = ("select -r " + $validObjects);
 	eval $res;
-
 
 	if ( $deletedObjects != "" )
 	{
@@ -351,8 +358,9 @@ global proc potato_ExportAll()
 {
 	int $numModels = `getAttr PotatoGNode.numModels`;
 	int $i;
-	for($i = 0; $i < $numModels; $i++)
+	for($i = 0; $i < $numModels; $i++) {
 		ModelEntryExport($i);
+	}
 }
 
 global proc ModelEntryExport(int $index)
@@ -374,16 +382,16 @@ global proc ModelEntryExport(int $index)
 		$total_lods += $lod_inc[$idx];
 	}
 
-/*	print_Msg("===============");
-	print_Msg("NumLods: " + $total_lods);
+	print_Verbose("===============");
+	print_Verbose("NumLods: " + $total_lods);
 
 	for($idx = 0; $idx < 4; $idx++)
 	{
-		print_Msg( "Inc: " + $lod_inc[$idx] );
-		print_Msg( "Distance: " + $lod_distance[$idx] );
-		print_Msg( "Objects: " + $lod_objects[$idx] );
-		print_Msg("");
-	}*/
+		print_Verbose( "Inc: " + $lod_inc[$idx] );
+		print_Verbose( "Distance: " + $lod_distance[$idx] );
+		print_Verbose( "Objects: " + $lod_objects[$idx] );
+		print_Verbose("");
+	}
 
 	// any lods?
 	if($total_lods < 1) {
@@ -415,7 +423,7 @@ global proc ModelEntryExport(int $index)
 		}
 	}
 
-//	print_Msg("NumMesh: " + $total_mesh);
+	print_Verbose("NumMesh: " + $total_mesh);
 
 	if($total_mesh < 1) {
 		print_Error("Can't export model: '"+ modelGetName($index) + "' none of the included LODs have meshes.");
@@ -423,9 +431,6 @@ global proc ModelEntryExport(int $index)
 	}
 
 	// should we check if the same mesh is used in multiple LOD's ?
-	// would we ever want that?
-	// sounds unlikly, but lets just warm about instead of error.
-
 	// we compare each LOD with the others once.
 	int $x;
 	for($idx = 0; $idx < 4; $idx++) {
@@ -435,9 +440,6 @@ global proc ModelEntryExport(int $index)
 				print_Warn("LOD" + $idx + " and LOD" + $x + " share the following meshes: " + stringArrayToString($items, ", "));
 		}
 	}
-
-	// plugin checks lod distances for us
-
 
 	// build the shit!
 	// we need file name.
@@ -457,7 +459,7 @@ global proc ModelEntryExport(int $index)
 
 	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" " + $options;
 
-	print_Msg("cmd: " + $command);
+	print_Verbose("cmd: " + $command);
 
 	if(int(`size $Dir`) < 1)
 	{
@@ -476,8 +478,6 @@ global proc string[] getCommonItems(string $a, string $b)
 	string $bb[] = stringToStringArray($b, " ");
 	return stringArrayRemove(stringArrayRemove($aa, $bb), $bb);
 }
-
-
 
 global proc potato_AddModelLodEntry(int $index, int $lod_idx)
 {
@@ -620,12 +620,15 @@ global proc potato_AddModel()
 	    -defaultButton "OK" -cancelButton "Cancel"
 	    -dismissString "Cancel"`;
 
-	if ($result == "OK" ) {
+	if ($result == "OK" )
+	{
 		$name = `promptDialog -query -text`;
-		if(int(`size $name`) < 3){
+		if(int(`size $name`) < 3)
+		{
 			print_Error("Name must be at least 3 chars long.");
-		} else {
-
+		}
+		else
+		{
 			if(assetDB_add("model", $name) != 0) {
 				return;
 			}
@@ -708,8 +711,9 @@ global proc potato_DeleteEntry()
 	int $numModels = `getAttr PotatoGNode.numModels`;
 	int $i;
 
-	if($numModels < 1)
+	if($numModels < 1) {
 		return;
+	}
 
 	window  -title "Potato - Delete Entry" -wh 300 180 -s true $name;
 		formLayout -numberOfDivisions 100 -h 40 Export;
@@ -775,10 +779,10 @@ global proc setTimeLineRange(float $start, float $end)
 
 global proc AnimEntryTimeLineSet(int $index)
 {
-	print_Msg("set timeline for animation index: " + $index);
+	print_Verbose("set timeline for animation index: " + $index);
 
 	$timeLine = getTimeLineRange();
-	print_Msg("current timeline: " + $timeLine[0] + ", " + $timeLine[1]);
+	print_Verbose("current timeline: " + $timeLine[0] + ", " + $timeLine[1]);
 
 	// update settings
 	setAttr ("PotatoGNode.AnimStart" + $index)  $timeLine[0];
@@ -800,8 +804,7 @@ global proc AnimEntrySetNodes_internal(int $index, string $nodes[])
 		$nodes_str = $nodes_str + $obj + " ";
 	}
 
-	print_Msg("selected nodes: " + $nodes_str);
-
+	print_Verbose("selected nodes: " + $nodes_str);
 
 	if (`size $nodes`)
 	{
@@ -811,7 +814,8 @@ global proc AnimEntrySetNodes_internal(int $index, string $nodes[])
 
 		setAttr -type "string" ("PotatoGNode.AnimNodes" + $index) $nodes_str;
 	}
-	else{
+	else
+	{
 		print_Warn("unable to set nodes. no nodes selected");
 	}
 }
@@ -839,16 +843,16 @@ global proc AnimEntrySelectNodes(int $index)
 	string $validNodes;
 	string $deletedNodes;
 
-
 	int $idx;
 	int $num = `tokenize $nodes " " $nodesArray`;
-
 	if ( $num > 1 ) {
 		for ( $idx = 0; $idx < $num; $idx++ ) {
-			if( `objExists $nodesArray[$idx]` )
+			if( `objExists $nodesArray[$idx]` ) {
 				$validNodes += $nodesArray[$idx] + " ";
-			else
+			}
+			else {
 				$deletedNodes += $nodesArray[$idx] + " ";
+			}
 		}
 	} else {
 		$validNodes = $nodes;
@@ -910,8 +914,8 @@ global proc AnimEntryExport(int $index)
 		print_Error("Can't export anim \"" + animGetName($index) + "\" has zero nodes");
 		return;
 	}
-	string $args;
 
+	string $args;
 	$args += "Nodes \"" + $nodes + "\"";
 	$args += " Start " + $start;
 	$args += " End " + $end;
@@ -924,12 +928,12 @@ global proc AnimEntryExport(int $index)
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
 
 	if($verbose) {
-        		$options += " -verbose";
-    	}
+        $options += " -verbose";
+    }
 
 	string $command = "PotatoExportAnim " + $args + " -f \"" + $filename + "\" "+ $options;
 
-	print_Msg("cmd: " + $command);
+	print_Verbose("cmd: " + $command);
 
 	if(int(`size $Dir`) < 1)
 	{
@@ -1009,21 +1013,6 @@ global proc potato_AddAnimEntry( int $index )
 		-attachForm ("exportAnimType" + $index) "left"  230
 	myForm;
 
-	// what we need
-	// start - end frames
-	// list of nodes to export.
-	// note tracks
-
-	// frames:
-	// need to be manually set plus ability to set them to the current rage of the timeline
-
-	// nodes:
-	// setting based on selected
-	// select all bones button? (maybe have that at bottom of menu as a helper button)
-
-	// note tracks:
-	// need to be able to add events to the animations timeline.
-
 	// set values.
 	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
 	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
@@ -1052,11 +1041,15 @@ global proc potato_AddAnim()
 	    -defaultButton "OK" -cancelButton "Cancel"
 	    -dismissString "Cancel"`;
 
-	if ($result == "OK" ) {
+	if ($result == "OK" )
+	{
 		$name = `promptDialog -query -text`;
-		if(int(`size $name`) < 3){
+		if(int(`size $name`) < 3)
+		{
 			print_Error("Name must be at least 3 chars long.");
-		} else {
+		}
+		else
+		{
 
 			if(assetDB_add("anim", $name) != 0) {
 				return;
@@ -1095,10 +1088,12 @@ global proc potato_CreateExportWindow( string $name )
 {
 	string $closeDialog = "deleteUI " + $name;
 
-	if (`window -exists $name`)
+	if (`window -exists $name`) {
 		deleteUI $name;
-	if (`window -exists potato_DeleteEntry`)
+	}
+	if (`window -exists potato_DeleteEntry`) {
 		deleteUI potato_DeleteEntry;
+	}
 
 	window  -title "Potato - Anim / Model Exporter" -wh 676 540 -s true $name;
 
@@ -1343,8 +1338,9 @@ global proc CreateMenu()
 	string $mayaMode = `setMenuMode`;
 	string $site = "system(\"load http://www.tom-crowley.co.uk/ \")";
 
-	if(`menu -exists PotatoToolsMenu`)
-	deleteUI -menu PotatoToolsMenu;
+	if(`menu -exists PotatoToolsMenu`) {
+		deleteUI -menu PotatoToolsMenu;
+	}
 
 	setParent $gMainWindow;
 
@@ -1385,8 +1381,9 @@ global proc potato_resetSettings()
 			              -dismissString "No"`;
 
 		// check response
-	if( $response != "Yes" )
+	if( $response != "Yes" ) {
 		return;
+	}
 
 	unlockPotatoNode();
 
@@ -1439,8 +1436,9 @@ global proc unlockPotatoNode()
 {
 	int $lockCheck[];
 	$lockCheck = `lockNode -q PotatoGNode`;
-	if($lockCheck[0])
+	if($lockCheck[0]) {
 		lockNode -lock off PotatoGNode;
+	}
 }
 
 global proc lockPotatoNode()
