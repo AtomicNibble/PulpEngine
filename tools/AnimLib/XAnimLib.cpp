@@ -146,6 +146,7 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 	AnimCompiler compiler(g_AnimLibArena, inter, skelton);
 	compiler.setScale(scale);
 	compiler.setLooping(looping);
+	compiler.disableOptimizations(true);
 	compiler.setAnimType(type);
 
 	if(!compiler.compile(destPath, posError, angError))
