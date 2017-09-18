@@ -328,7 +328,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
@@ -342,7 +342,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -357,7 +357,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -371,7 +371,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <StackReserveSize>4194304</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -385,7 +385,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <StackReserveSize>4194304</StackReserveSize>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
@@ -400,7 +400,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <StackReserveSize>4194304</StackReserveSize>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
@@ -417,7 +417,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
@@ -434,7 +434,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
@@ -452,7 +452,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysX.dll;PhysXCharacterKinematic.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
@@ -470,7 +470,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -488,7 +488,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -505,7 +505,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysX.dll;PhysXCharacterKinematic.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
@@ -522,7 +522,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -539,7 +539,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>

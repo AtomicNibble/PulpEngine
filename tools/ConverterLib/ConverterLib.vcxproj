@@ -276,7 +276,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -289,7 +289,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -313,7 +313,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -326,7 +326,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>

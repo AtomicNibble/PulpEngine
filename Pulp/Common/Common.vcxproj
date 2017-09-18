@@ -1559,7 +1559,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1575,7 +1575,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1592,7 +1592,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1608,7 +1608,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1630,7 +1630,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
     <Lib />
     <Lib>
@@ -1648,7 +1648,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
     </Link>
     <Lib />
     <Lib>
@@ -1666,7 +1666,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1685,7 +1685,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1704,7 +1704,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1723,7 +1723,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1742,7 +1742,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1761,7 +1761,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1780,7 +1780,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1799,7 +1799,7 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>

@@ -290,7 +290,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+
       <DelayLoadDLLs>PhysXDEBUG.dll;PhysXCharacterKinematicDEBUG.dll;PhysXCommonDEBUG.dll;PhysXCookingDEBUG.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -303,7 +303,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+
       <DelayLoadDLLs>PhysXDEBUG.dll;PhysXCharacterKinematicDEBUG.dll;PhysXCommonDEBUG.dll;PhysXCookingDEBUG.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -327,7 +327,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+
       <DelayLoadDLLs>PhysXDEBUG.dll;PhysXCharacterKinematicDEBUG.dll;PhysXCommonDEBUG.dll;PhysXCookingDEBUG.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -340,7 +340,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>Debug</GenerateDebugInformation>
+
       <DelayLoadDLLs>PhysXDEBUG.dll;PhysXCharacterKinematicDEBUG.dll;PhysXCommonDEBUG.dll;PhysXCookingDEBUG.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
