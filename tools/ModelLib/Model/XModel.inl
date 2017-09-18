@@ -133,10 +133,26 @@ X_INLINE const SubMeshHeader& XModel::getMeshHead(size_t idx) const
 
 X_INLINE const char* XModel::getBoneName(size_t idx) const
 {
+	X_ASSERT(static_cast<int32_t>(idx) < getNumBones(), "invalid bone index")(getNumBones(), idx);
+
 	// temp hack.
 	const char* pBoneName = (char*)(data_.ptr() + pTagNames_[idx]);
 
 	return pBoneName;
+}
+
+
+X_INLINE BoneHandle XModel::getBoneHandle(const char* pName) const
+{
+	for (int32_t i = 0; i < getNumBones(); i++)
+	{
+		if (core::strUtil::IsEqual(pName, getBoneName(i)))
+		{
+			return i;
+		}
+	}
+
+	return INVALID_BONE_HANDLE;
 }
 
 X_INLINE const uint8_t*	XModel::getTagTree(void) const

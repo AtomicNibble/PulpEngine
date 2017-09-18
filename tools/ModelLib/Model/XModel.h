@@ -60,13 +60,13 @@ public:
 	X_INLINE const SubMeshHeader& getMeshHead(size_t idx) const;
 
 	X_INLINE const char* getBoneName(size_t idx) const;
+	X_INLINE BoneHandle getBoneHandle(const char* pName) const;
 	X_INLINE const uint8_t*	getTagTree(void) const;
 	X_INLINE const XQuatCompressedf& getBoneAngle(size_t idx) const;
 	X_INLINE const XQuatCompressedf& getBoneAngleRel(size_t idx) const;
 	X_INLINE const Vec3f getBonePosRel(size_t idx) const;
 	X_INLINE const Vec3f getBonePos(size_t idx) const;
 	X_INLINE const MatrixArr& getInverseBoneMatrix(void) const;
-
 
 	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
 

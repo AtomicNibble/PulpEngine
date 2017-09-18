@@ -29,9 +29,6 @@ XModel::~XModel()
 
 }
 
-
-
-
 //
 // Loads a model into a XModel
 //
