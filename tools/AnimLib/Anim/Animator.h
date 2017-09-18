@@ -113,6 +113,8 @@ public:
 	
 	ANIMLIB_EXPORT bool createFrame(core::TimeVal currentTime);
 
+	ANIMLIB_EXPORT void clearAnims(core::TimeVal curTime, core::TimeVal clearTime);
+	ANIMLIB_EXPORT void clearAnim(int32_t animNum, core::TimeVal curTime, core::TimeVal clearTime);
 	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	ANIMLIB_EXPORT bool isAnimating(core::TimeVal currentTime) const;
 

@@ -415,6 +415,19 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	return true;
 }
 
+void Animator::clearAnims(core::TimeVal curTime, core::TimeVal clearTime)
+{
+	for (auto& anim : anims_)
+	{
+		anim.clear(curTime, clearTime);
+	}
+}
+
+void Animator::clearAnim(int32_t animNum, core::TimeVal curTime, core::TimeVal clearTime)
+{
+	anims_[animNum].clear(curTime, clearTime);
+}
+
 void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
 {
 	// push anims down one.
