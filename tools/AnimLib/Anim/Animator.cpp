@@ -324,6 +324,19 @@ void AnimBlend::setRate(float rate)
 	setCycleCount(cycles_);
 }
 
+void AnimBlend::setWeight(float newWeight, core::TimeVal currentTime, core::TimeVal blendTime)
+{
+	blendStartVal_ = getWeight(currentTime);
+	blendEndVal_ = newWeight;
+
+	blendStart_ = currentTime;
+	blendDuration_ = blendTime;
+
+	if (!newWeight) {
+		endTime_ = currentTime + blendTime;
+	}
+}
+
 core::TimeVal AnimBlend::getPlayTime(void) const
 {
 	if (endTime_ == 0_tv) {

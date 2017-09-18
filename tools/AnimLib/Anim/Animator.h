@@ -49,6 +49,8 @@ public:
 
 	void setCycleCount(int32_t numCycles);
 	void setRate(float rate);
+	void setWeight(float newWeight, core::TimeVal currentTime, core::TimeVal blendTime);
+
 
 	X_INLINE const Anim* getAnim(void) const;
 	X_INLINE int32_t getCycleCount(void) const;
