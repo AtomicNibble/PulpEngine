@@ -103,8 +103,9 @@ public:
 
 	X_INLINE const char* getBoneName(int32_t idx) const;
 
-	void timeToFrame(core::TimeVal time, FrameBlend& frame) const;
+	void timeToFrame(core::TimeVal time, int32_t cycles, FrameBlend& frame) const;
 	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
+	void getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const;
 
 	ANIMLIB_EXPORT void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
 

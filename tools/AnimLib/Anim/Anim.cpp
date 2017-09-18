@@ -269,7 +269,7 @@ Anim::~Anim()
 
 }
 
-void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
+void Anim::timeToFrame(core::TimeVal time, int32_t cycles, FrameBlend& frame) const
 {
 	int32_t numFrames = getNumFrames();
 	int32_t fps = getFps();
@@ -299,9 +299,18 @@ void Anim::timeToFrame(core::TimeVal time, FrameBlend& frame) const
 	core::TimeVal frameTime = core::TimeVal(time.GetValue() * fps);
 	int32_t frameNum = safe_static_cast<int32_t>((frameTime / oneSecond).GetValue());
 
-	// frames are 0-numFrames
-	// so frame 29 is last.
 	frame.cylces = frameNum / (numFrames);
+
+	// clamp
+	if (cycles > 0 && frame.cylces >= cycles) {
+		frame.cylces = cycles - 1;
+		frame.frame1 = numFrames - 1;
+		frame.frame2 = frame.frame1;
+		frame.backlerp = 0.0f;
+		frame.frontlerp = 1.0f;
+		return;
+	}
+
 	frame.frame1 = frameNum % (numFrames);
 	frame.frame2 = frame.frame1 + 1;
 	if (frame.frame2 >= numFrames) {
@@ -353,7 +362,14 @@ void Anim::getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const I
 	Util::blendBones(boneTransOut, blendTrans, lerpIndex, frame.backlerp);
 }
 
+void Anim::getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const
+{
+	FrameBlend frame;
+	timeToFrame(time, cycles, frame);
 
+	// todo.
+	offset = Vec3f::zero();
+}
 
 void Anim::processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data)
 {

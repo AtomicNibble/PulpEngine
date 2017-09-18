@@ -132,7 +132,7 @@ bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& boneTransOut, flo
 	// maybe just have a list that is size of model bones, but with -1 if we don't animate it.
 
 	FrameBlend frame;
-	pAnim_->timeToFrame(time, frame);
+	pAnim_->timeToFrame(time, cycles_, frame);
 	pAnim_->getFrame(frame, boneTransOut, indexMap_);
 
 	if (!blendWeight)
@@ -150,6 +150,73 @@ bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& boneTransOut, flo
 
 	return true;
 }
+
+void AnimBlend::blendOrigin(core::TimeVal currentTime, Vec3f& blendPos, float& blendWeight) const
+{
+	if (endTime_ > 0_tv && (currentTime > endTime_)) {
+		return;
+	}
+	
+	float weight = getWeight(currentTime);
+	if (!weight) {
+		return;
+	}
+	
+	auto time = animTime(currentTime);
+	Vec3f pos;
+
+	pAnim_->getOrigin(pos, currentTime, cycles_);
+
+	pos = pos * weight;
+
+	if (!blendWeight) {
+		blendPos = pos;
+		blendWeight = weight;
+	}
+	else {
+		float fract = weight / (blendWeight + weight);
+		blendPos = blendPos.lerp(fract, pos); 
+		blendWeight += weight;
+	}
+}
+
+void AnimBlend::blendDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& blendDelta, float& blendWeight) const
+{
+	if (endTime_ > 0_tv && (fromTime > endTime_)) {
+		return;
+	}
+
+	float weight = getWeight(toTime);
+	if (!weight) {
+		return;
+	}
+
+	auto time1 = animTime(fromTime);
+	auto time2 = animTime(toTime);
+	if (time2 < time1) {
+		time2 += pAnim_->getDuration();
+	}
+
+	Vec3f pos1, pos2;
+
+	pAnim_->getOrigin(pos1, fromTime, cycles_);
+	pAnim_->getOrigin(pos1, toTime, cycles_);
+
+	pos1 = (pos1 * weight);
+	pos1 = (pos2 * weight);
+	Vec3f delta = pos2 - pos1;
+
+	if (!blendWeight) {
+		blendDelta = delta;
+		blendWeight = weight;
+	}
+	else {
+		float fract = weight / (blendWeight + weight);
+		blendDelta = blendDelta.lerp(fract, delta);
+		blendWeight += weight;
+	}
+}
+
 
 
 bool AnimBlend::isDone(core::TimeVal currentTime) const
@@ -369,6 +436,32 @@ bool Animator::isAnimating(core::TimeVal currentTime) const
 	return false;
 }
 
+void Animator::getDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& delta) const
+{
+	delta = Vec3f::zero();
+	if (fromTime == toTime) {
+		return;
+	}
+
+	float weight = 0.f;
+
+	for (auto& anim : anims_)
+	{
+		anim.blendDelta(fromTime, toTime, delta, weight);
+	}
+}
+
+void Animator::getOrigin(core::TimeVal currentTime, Vec3f& pos) const
+{
+	float weight = 0.f;
+
+	for (auto& anim : anims_)
+	{
+		anim.blendOrigin(currentTime, pos, weight);
+	}
+}
+
+
 model::BoneHandle Animator::getBoneHandle(const char* pName) const
 {
 	return model_.getBoneHandle(pName);
@@ -418,7 +511,7 @@ void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Mat
 
 		{
 			FrameBlend frame;
-			pAnim->timeToFrame(animTime, frame);
+			pAnim->timeToFrame(animTime, anim.getCycleCount(), frame);
 
 			txt.appendFmt("Blend: f1: %i f2: %i cycles: %i\n", frame.frame1, frame.frame2, frame.cylces);
 			txt.appendFmt("Blend: f-lerp: %.2g b-lerp: %.2g\n", frame.frontlerp, frame.backlerp);

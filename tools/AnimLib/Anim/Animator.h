@@ -39,7 +39,9 @@ public:
 	void playAnim(const model::XModel& model, const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	
 	bool blend(core::TimeVal currentTime, TransformArr& boneTransOut, float &blendWeight) const;
-	
+	void blendOrigin(core::TimeVal currentTime, Vec3f& blendPos, float& blendWeight) const;
+	void blendDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& blendDelta, float& blendWeight) const;
+
 	bool isDone(core::TimeVal currentTime) const;
 	float getWeight(core::TimeVal currentTime) const;
 
@@ -112,6 +114,9 @@ public:
 
 	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	ANIMLIB_EXPORT bool isAnimating(core::TimeVal currentTime) const;
+
+	ANIMLIB_EXPORT void getDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& delta) const;
+	ANIMLIB_EXPORT void getOrigin(core::TimeVal currentTime, Vec3f& pos) const;
 
 	// bones.
 	ANIMLIB_EXPORT model::BoneHandle getBoneHandle(const char* pName) const;
