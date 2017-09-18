@@ -127,7 +127,6 @@ private:
 
 	AnimBlendArr anims_;
 	Mat44Arr boneMat_;
-	Mat44Arr invBoneMat_;
 };
 
 

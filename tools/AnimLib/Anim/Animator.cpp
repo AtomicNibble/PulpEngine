@@ -272,26 +272,11 @@ Animator::Animator(const model::XModel& model, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	model_(model),
 	boneMat_(arena),
-	invBoneMat_(arena),
 	anims_{ {
 		X_PP_REPEAT_COMMA_SEP(2, arena)
 	}}
 {
 	boneMat_.resize(model.numBones());
-	invBoneMat_.resize(model.numBones());
-
-
-	for (size_t i = 0; i < boneMat_.size(); i++)
-	{
-		auto& angle = model.getBoneAngle(i);
-		auto& pos = model.getBonePos(i);
-
-		Quatf quat = angle.asQuat();
-
-		invBoneMat_[i] = quat.toMatrix33();
-		invBoneMat_[i].setTranslate(pos);
-		invBoneMat_[i].invert();
-	}
 }
 
 
@@ -344,13 +329,7 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	Util::convertBoneTransToMatrix(boneMat_, bones);
 	Util::transformBones(boneMat_, model_.getTagTree(), 1, static_cast<int32_t>(boneMat_.size() - 1));
 
-	// go from world space to bone space, post transform.
-	// this is only needed for rendering.
-	// so many the render system should do it?
-	for (size_t i = 0; i < boneMat_.size(); i++)
-	{
-		boneMat_[i] = boneMat_[i] * invBoneMat_[i];
-	}
+	// the boneMat_ are now all in model space.
 
 	return true;
 }

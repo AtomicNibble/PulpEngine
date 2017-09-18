@@ -164,5 +164,9 @@ X_INLINE const Vec3f XModel::getBonePos(size_t idx) const
 	return pBonePos_[idx];
 }
 
+X_INLINE const XModel::MatrixArr& XModel::getInverseBoneMatrix(void) const
+{
+	return inverseBones_;
+}
 
 X_NAMESPACE_END

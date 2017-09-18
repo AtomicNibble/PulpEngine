@@ -716,16 +716,22 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
 		return false;
 	}
 
-
 	if (pRenderEnt->bones.isEmpty())
 	{
 		pRenderEnt->bones.resize(pModel->numBones());
 	}
 
-	std::memcpy(pRenderEnt->bones.data(), pMats, sizeof(pMats[0]) * num);
+	// go from model space to bone space, as we copy.
+	const auto& inverseMatrix = pModel->getInverseBoneMatrix();
+	X_ASSERT(inverseMatrix.size() == pRenderEnt->bones.size(), "Size mismatch")();
+	for (size_t i = 0; i < num; i++)
+	{
+		pRenderEnt->bones[i] = pMats[i] * inverseMatrix[i];
+	}
 
 	return true;
 }
+
 
 void World3D::createEntityRefs(RenderEnt* pEnt) 
 {

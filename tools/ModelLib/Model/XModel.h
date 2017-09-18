@@ -26,6 +26,8 @@ class XModel
 	X_NO_COPY(XModel);
 	X_NO_ASSIGN(XModel);
 
+	typedef core::Array<Matrix44f> MatrixArr;
+
 public:
 	MODELLIB_EXPORT XModel(core::string& name);
 	MODELLIB_EXPORT virtual ~XModel();
@@ -63,6 +65,7 @@ public:
 	X_INLINE const XQuatCompressedf& getBoneAngleRel(size_t idx) const;
 	X_INLINE const Vec3f getBonePosRel(size_t idx) const;
 	X_INLINE const Vec3f getBonePos(size_t idx) const;
+	X_INLINE const MatrixArr& getInverseBoneMatrix(void) const;
 
 
 	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
@@ -91,6 +94,7 @@ protected:
 	const SubMeshHeader*	pMeshHeads_;
 
 	core::UniquePointer<uint8_t[]> data_;
+	MatrixArr inverseBones_; // could skip this allocation later by just increasing size of data buffer we allocate.
 	ModelHeader hdr_;
 };
 

@@ -11,7 +11,8 @@ X_NAMESPACE_BEGIN(model)
 
 
 XModel::XModel(core::string& name) :
-	name_(name)
+	name_(name),
+	inverseBones_(g_ModelLibArena)
 {
 	id_ = 0;
 	status_ = core::LoadStatus::NotLoaded;
@@ -258,8 +259,21 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	for (i = 0; i < hdr.numMesh; i++)
 	{
 		SubMeshHeader& mesh = const_cast<SubMeshHeader&>(pMeshHeads_[i]);
-
 		mesh.pMat = pMatMan->loadMaterial(mesh.materialName);
+	}
+
+	// create the inverse bone matrix.
+	// technically we don't need to make this unless we are animating it.
+	inverseBones_.resize(hdr.numBones);
+	for (int32_t i = 0; i < hdr.numBones; i++)
+	{
+		auto& angle = getBoneAngle(i);
+		auto& pos = getBonePos(i);
+		auto quat = angle.asQuat();
+
+		inverseBones_[i] = quat.toMatrix33();
+		inverseBones_[i].setTranslate(pos);
+		inverseBones_[i].invert();
 	}
 
 	data_ = std::move(data);
