@@ -1,6 +1,21 @@
 #pragma once
 
+#include <IConverterModule.h>
+
+
 X_NAMESPACE_BEGIN(game)
+
+
+static const char*		 WEAPON_FILE_EXTENSION = "wpn";
+static const char*		 WEAPON_DEFAULT_NAME = "default";
+
+static const uint32_t    WEAPON_MAX_LOADED = 128;
+
+
+struct IWeaponLib : public IConverter
+{
+
+};
 
 
 X_DECLARE_ENUM(WeaponClass)(
