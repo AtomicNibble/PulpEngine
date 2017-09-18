@@ -526,11 +526,22 @@ void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Mat
 			animTime = anim.animTime(anim.getEndTime());
 		}
 
+		auto dur = pAnim->getDuration();
+		auto start = anim.getStartTime();
+		auto end = anim.getEndTime();
+		auto play = anim.getPlayTime();
+
+		auto durSec = dur.GetSeconds();
+		auto animTimeSec = animTime.GetSeconds();
+		auto startSec = start.GetSeconds();
+		auto endSec = end.GetSeconds();
+		auto playSec = play.GetSeconds();
+
 		txt.appendFmt("Name: %s\n", pAnim->getName());
-		txt.appendFmt("Frames: %" PRIi32 " Fps: %" PRIi32 " rate: %g\n", pAnim->getNumFrames(), pAnim->getFps(), anim.getRate());
-		txt.appendFmt("Dur: %gms AnimTime: %gms\n", pAnim->getDuration().GetMilliSeconds(), animTime.GetMilliSeconds());
-		txt.appendFmt("Start: %gms End: %gms Play: %gms\n", anim.getStartTime().GetMilliSeconds(), anim.getEndTime().GetMilliSeconds(), anim.getPlayTime().GetMilliSeconds());
-		txt.appendFmt("Weights: start: %g final: %g cur: %g \n", anim.getStartWeight(), anim.getFinalWeight(), anim.getWeight(currentTime));
+		txt.appendFmt("Frames: %" PRIi32 " Fps: %" PRIi32 " rate: %.2f\n", pAnim->getNumFrames(), pAnim->getFps(), anim.getRate());
+		txt.appendFmt("Dur: %.2fs AnimTime: %.2fs\n", durSec, animTimeSec);
+		txt.appendFmt("Start: %.2fs End: %.2fs Play: %.2fs\n", startSec, endSec, playSec);
+		txt.appendFmt("Weights: start: %.2f final: %.2f cur: %.2f \n", anim.getStartWeight(), anim.getFinalWeight(), anim.getWeight(currentTime));
 		txt.appendFmt("NumCycles: %" PRIi32 " isDone: %i\n", anim.getCycleCount(), anim.isDone(currentTime));
 
 		{
@@ -538,7 +549,7 @@ void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Mat
 			pAnim->timeToFrame(animTime, anim.getCycleCount(), frame);
 
 			txt.appendFmt("Blend: f1: %i f2: %i cycles: %i\n", frame.frame1, frame.frame2, frame.cylces);
-			txt.appendFmt("Blend: f-lerp: %.2g b-lerp: %.2g\n", frame.frontlerp, frame.backlerp);
+			txt.appendFmt("Blend: f-lerp: %.2f b-lerp: %.2f\n", frame.frontlerp, frame.backlerp);
 		}
 	}
 
