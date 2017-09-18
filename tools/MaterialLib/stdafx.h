@@ -21,9 +21,9 @@ typedef core::MemoryArena<
 	core::NoMemoryTracking,
 	core::NoMemoryTagging
 #endif // !X_DEBUG
-> MatLibrena;
+> MatLibArena;
 
-extern MatLibrena* g_MatLibArena;
+extern MatLibArena* g_MatLibArena;
 
 
 #ifdef X_LIB

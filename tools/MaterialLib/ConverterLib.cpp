@@ -14,7 +14,7 @@ namespace
 
 } // namespace
 
-MatLibrena* g_MatLibArena = nullptr;
+MatLibArena* g_MatLibArena = nullptr;
 
 
 class XConverterLib_Material : public IConverterModule
@@ -35,7 +35,7 @@ class XConverterLib_Material : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
-		g_MatLibArena = X_NEW(MatLibrena, gEnv->pArena, "MaterialLibArena")(&g_MatLibAlloc, "MaterialLibArena");
+		g_MatLibArena = X_NEW(MatLibArena, gEnv->pArena, "MaterialLibArena")(&g_MatLibAlloc, "MaterialLibArena");
 
 		return X_NEW(engine::MaterialLib, g_MatLibArena, "IMaterialLib")();
 
