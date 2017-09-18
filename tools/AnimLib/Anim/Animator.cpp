@@ -71,7 +71,7 @@ void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::Ti
 	}
  
 	// build the index map.
-	indexMap_.resize(model.numBones());
+	indexMap_.resize(model.getNumBones());
 
 	// for every bone in the model we find the bone in animation.
 	// we allow for multiple animations to be played that affect a subset of bones.
@@ -79,7 +79,7 @@ void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::Ti
 	// and the anim needs to know which model bones it effects
 	// every index that is -1 the anim don't effect
 	// others are indexes of the animation's bones.
-	for (int32_t i = 0; i < model.numBones(); i++)
+	for (int32_t i = 0; i < model.getNumBones(); i++)
 	{
 		const char* pBoneName = model.getBoneName(i);
 
@@ -276,7 +276,7 @@ Animator::Animator(const model::XModel& model, core::MemoryArenaBase* arena) :
 		X_PP_REPEAT_COMMA_SEP(2, arena)
 	}}
 {
-	boneMat_.resize(model.numBones());
+	boneMat_.resize(model.getNumBones());
 }
 
 
@@ -293,7 +293,7 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	lastTransformTime_ = currentTime;
 
 	// joints for whole model.
-	TransformArr bones(g_AnimLibArena, model_.numBones());
+	TransformArr bones(g_AnimLibArena, model_.getNumBones());
 
 	// YER BOI.
 	float weight = 0.f;
