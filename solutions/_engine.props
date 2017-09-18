@@ -9,7 +9,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\$(Configuration)\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
+      <ProgramDataBaseFileName>$(SolutionDir)..\..\Temp\$(Platform)\$(Configuration)\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
       <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level4</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
@@ -22,6 +22,7 @@
 	<Link>
 		<TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
 		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
 	</Link>
   </ItemDefinitionGroup>
 </Project>

@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-	  <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\Super\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
+    <ProgramDataBaseFileName>$(SolutionDir)..\..\Temp\$(Platform)\Super\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
     </ClCompile>
 	<Link>
 		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Super\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>

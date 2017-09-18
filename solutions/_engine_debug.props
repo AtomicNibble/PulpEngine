@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-	  <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\Debug\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
+	  <ProgramDataBaseFileName>$(SolutionDir)..\..\Temp\$(Platform)\Debug\$(ProjectName)\engine_$(ProjectName).compile.pdb</ProgramDataBaseFileName>
     </ClCompile>
 	<Link>
 		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Debug\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
