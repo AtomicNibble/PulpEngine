@@ -183,9 +183,7 @@ static const uint32_t	 MODEL_MESH_COL_MAX_COOKED_SIZE = std::numeric_limits<uint
 static const uint32_t	 MODEL_MESH_COL_MAX_MESH = 8; // max col mesh per a mesh. (yes we allow multiple col meshes for each mesh)
 
 
-
 static const uint32_t	 MODEL_MAX_LOADED = 1 << 10; // max models that can be loaded.
-
 
 
 struct IModelLib : public IConverter
@@ -193,6 +191,9 @@ struct IModelLib : public IConverter
 
 };
 
+typedef int32_t BoneHandle;
+
+static const BoneHandle INVALID_BONE_HANDLE = static_cast<BoneHandle>(-1);
 
 
 // Flags:
