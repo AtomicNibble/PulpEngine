@@ -29,6 +29,7 @@ public:
 	X_INLINE int32_t EnableDebugRender(void) const;
 
 	X_INLINE float debugObjectScale(void) const;
+	X_INLINE float debugTextSize(void) const;
 
 	X_INLINE float RegisteredCullDistance(void) const;
 	X_INLINE float OcclusionRefreshRate(void) const;
@@ -56,6 +57,7 @@ private:
 
 	int32_t enableDebugRender_;
 	float debugObjectScale_;
+	float debugTextSize_;
 
 	float registeredCullDistance_;
 	float occlusionRefreshRate_;

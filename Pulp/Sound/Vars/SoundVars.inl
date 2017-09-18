@@ -31,6 +31,10 @@ X_INLINE float SoundVars::debugObjectScale(void) const
 	return debugObjectScale_;
 }
 
+X_INLINE float SoundVars::debugTextSize(void) const
+{
+	return debugTextSize_;
+}
 
 X_INLINE float SoundVars::RegisteredCullDistance(void) const
 {

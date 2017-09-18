@@ -684,13 +684,14 @@ void XSound::drawDebug(void) const
 	const int32_t minLod = 3;
 
 	const bool drawText = vars_.EnableDebugRender() > 1;
+	const float textSize = vars_.debugTextSize();
 	font::TextDrawContext con;
 	con.effectId = 0;
 	con.col = Col_White;
 	con.flags.Set(font::DrawTextFlag::CENTER);
 	con.flags.Set(font::DrawTextFlag::CENTER_VER);
 	con.pFont = gEnv->pFontSys->GetDefault();
-	con.size = Vec2f(8.f, 8.f);
+	con.size = Vec2f(textSize, textSize);
 
 
 	core::CriticalSection::ScopedLock lock(cs_);

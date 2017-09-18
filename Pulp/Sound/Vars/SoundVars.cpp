@@ -58,6 +58,7 @@ SoundVars::SoundVars()
 	enableDebugRender_ = 0;
 
 	debugObjectScale_ = 1.f;
+	debugTextSize_ = 4.f;
 
 	registeredCullDistance_ = 1024.f * 2.f; 
 	occlusionRefreshRate_ = 0.2f;
@@ -123,6 +124,10 @@ void SoundVars::RegisterVars(void)
 	ADD_CVAR_REF("snd_debug_obj_scale", debugObjectScale_, debugObjectScale_, 1.f, 32.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Debug draw scale for objects");
+	ADD_CVAR_REF("snd_debug_text_size", debugTextSize_, debugTextSize_, 0.001f, 128.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Debug draw text size");
+
 
 	ADD_CVAR_REF("snd_active_cull_distance", registeredCullDistance_, registeredCullDistance_, 0.f, 1024.f * 16.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
