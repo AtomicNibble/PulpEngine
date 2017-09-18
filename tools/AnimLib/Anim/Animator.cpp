@@ -369,6 +369,25 @@ bool Animator::isAnimating(core::TimeVal currentTime) const
 	return false;
 }
 
+model::BoneHandle Animator::getBoneHandle(const char* pName) const
+{
+	return model_.getBoneHandle(pName);
+}
+
+bool Animator::getBoneTransform(model::BoneHandle handle, Vec3f& pos, Matrix33f& axis) const
+{
+	if (handle == model::INVALID_BONE_HANDLE) {
+		return false;
+	}
+
+	X_ASSERT(handle < model_.getNumBones(), "Out of range")(handle, model_.getNumBones());
+
+	pos = boneMat_[handle].getTranslate().xyz();
+	axis = boneMat_[handle].subMatrix33(0,0);
+	return true;
+}
+
+
 void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const
 {
 	core::StackString512 txt;

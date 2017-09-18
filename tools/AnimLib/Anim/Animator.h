@@ -1,7 +1,8 @@
 #pragma once
 
-#include <Containers\Array.h>
+#include <IModel.h>
 
+#include <Containers\Array.h>
 #include <Time\TimeVal.h>
 
 X_NAMESPACE_DECLARE(model, class XModel)
@@ -111,6 +112,10 @@ public:
 
 	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	ANIMLIB_EXPORT bool isAnimating(core::TimeVal currentTime) const;
+
+	// bones.
+	ANIMLIB_EXPORT model::BoneHandle getBoneHandle(const char* pName) const;
+	ANIMLIB_EXPORT bool getBoneTransform(model::BoneHandle handle, Vec3f& pos, Matrix33f& axis) const;
 
 
 	ANIMLIB_EXPORT void renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const;
