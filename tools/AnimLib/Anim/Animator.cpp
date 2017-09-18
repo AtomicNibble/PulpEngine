@@ -49,7 +49,8 @@ void AnimBlend::clear(core::TimeVal currentTime, core::TimeVal clearTime)
 		return;
 	}
 
-
+	// blend out.
+	setWeight(0.f, currentTime, clearTime);
 }
 
 void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
