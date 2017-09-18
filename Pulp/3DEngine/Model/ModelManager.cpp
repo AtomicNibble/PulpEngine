@@ -234,8 +234,8 @@ void XModelManager::listModels(const char* pSearchPatten) const
 	for (const auto* pModel : sorted_models)
 	{
 		X_LOG0("Model", "^2%-32s^7 Lods:^2%i^7 Bones:^2%i^7 RootBones:^2%i^7 TotalMesh:^2%i^7 Refs:^2%i",
-			pModel->getName(), pModel->numLods(), pModel->numBones(), pModel->numRootBones(),
-			pModel->numMeshTotal(), pModel->getRefCount());
+			pModel->getName(), pModel->getNumLods(), pModel->getNumBones(), pModel->getNumRootBones(),
+			pModel->getNumMeshTotal(), pModel->getRefCount());
 	}
 
 	X_LOG0("Model", "------------ ^8Models End^7 --------------");

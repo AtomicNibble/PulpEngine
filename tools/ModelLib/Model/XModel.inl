@@ -37,36 +37,36 @@ X_INLINE const core::string& XModel::getName(void) const
 	return name_;
 }
 
-X_INLINE int32_t XModel::numLods(void) const
+X_INLINE int32_t XModel::getNumLods(void) const
 {
 	return hdr_.numLod;
 }
 
-X_INLINE int32_t XModel::numBones(void) const
+X_INLINE int32_t XModel::getNumBones(void) const
 {
 	return hdr_.numBones;
 }
 
-X_INLINE int32_t XModel::numRootBones(void) const
+X_INLINE int32_t XModel::getNumRootBones(void) const
 {
 	return hdr_.numRootBones;
 }
 
-X_INLINE int32_t XModel::numMeshTotal(void) const
+X_INLINE int32_t XModel::getNumMeshTotal(void) const
 {
 	return hdr_.numMesh;
 }
 
-X_INLINE int32_t XModel::numVerts(size_t lodIdx) const
+X_INLINE int32_t XModel::getNumVerts(size_t lodIdx) const
 {
-	X_ASSERT(lodIdx < static_cast<size_t>(numLods()), "invalid lod index")(numLods(), lodIdx);
+	X_ASSERT(lodIdx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), lodIdx);
 
 	return hdr_.lodInfo[lodIdx].numVerts;
 }
 
 X_INLINE bool XModel::hasLods(void) const
 {
-	return numLods() > 1;
+	return getNumLods() > 1;
 }
 
 
@@ -84,7 +84,7 @@ X_INLINE bool XModel::isAnimated(void) const
 X_INLINE size_t XModel::lodIdxForDistance(float distance) const
 {
 	// we select the lowest level lod that is visible
-	for (int32_t i = 0; i < numLods(); i++)
+	for (int32_t i = 0; i < getNumLods(); i++)
 	{
 		if (hdr_.lodInfo[i].lodDistance > distance) {
 			return i;
@@ -92,7 +92,7 @@ X_INLINE size_t XModel::lodIdxForDistance(float distance) const
 	}
 
 	// lowest lod
-	return numLods() - 1;
+	return getNumLods() - 1;
 }
 
 X_INLINE const AABB& XModel::bounds(void) const
@@ -113,19 +113,19 @@ X_INLINE const Sphere& XModel::boundingSphere(size_t lodIdx) const
 
 X_INLINE const LODHeader& XModel::getLod(size_t idx) const
 {
-	X_ASSERT(idx < static_cast<size_t>(numLods()), "invalid lod index")(numLods(), idx);
+	X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), idx);
 	return hdr_.lodInfo[idx];
 }
 
 X_INLINE const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
 {
-	X_ASSERT(idx < static_cast<size_t>(numLods()), "invalid lod index")(numLods(), idx);
+	X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), idx);
 	return hdr_.lodInfo[idx];
 }
 
 X_INLINE const SubMeshHeader& XModel::getMeshHead(size_t idx) const
 {
-	X_ASSERT(idx < static_cast<size_t>(numMeshTotal()), "invalid mesh index")(numMeshTotal(), idx);
+	X_ASSERT(idx < static_cast<size_t>(getNumMeshTotal()), "invalid mesh index")(getNumMeshTotal(), idx);
 	X_ASSERT_NOT_NULL(pMeshHeads_);
 	return pMeshHeads_[idx];
 }

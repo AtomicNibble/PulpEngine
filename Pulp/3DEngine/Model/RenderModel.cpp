@@ -50,7 +50,7 @@ bool RenderModel::canRenderLod(size_t idx) const
 
 void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col) const
 {
-	const int32_t num = numBones();
+	const int32_t num = getNumBones();
 	if (!num) {
 		return;
 	}
@@ -82,7 +82,7 @@ void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matri
 void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Color8u col,
 	const Matrix44f* pBoneMatrix, size_t num) const
 {
-	if (numBones() != static_cast<int32_t>(num)) {
+	if (getNumBones() != static_cast<int32_t>(num)) {
 		X_ERROR("Model", "Bone count don't match source count");
 		return;
 	}
@@ -115,7 +115,7 @@ void RenderModel::RenderBones(engine::PrimativeContext* pPrimContex, const Matri
 void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
 	Vec3f offset, float textSize, const Color8u col) const
 {
-	const int32_t num = numBones();
+	const int32_t num = getNumBones();
 	if (!num) {
 		return;
 	}
@@ -142,7 +142,7 @@ void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const M
 void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const Matrix44f& modelMat, const Matrix33f& view,
 	Vec3f offset, float textSize, const Color8u col, const Matrix44f* pBoneMatrix, size_t num) const
 {
-	if (numBones() != static_cast<int32_t>(num)) {
+	if (getNumBones() != static_cast<int32_t>(num)) {
 		X_ERROR("Model", "Bone count don't match source count");
 		return;
 	}

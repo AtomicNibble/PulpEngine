@@ -41,11 +41,11 @@ public:
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
 
 	X_INLINE const core::string& getName(void) const;
-	X_INLINE int32_t numLods(void) const;
-	X_INLINE int32_t numBones(void) const;
-	X_INLINE int32_t numRootBones(void) const;
-	X_INLINE int32_t numMeshTotal(void) const;
-	X_INLINE int32_t numVerts(size_t lodIdx) const;
+	X_INLINE int32_t getNumLods(void) const;
+	X_INLINE int32_t getNumBones(void) const;
+	X_INLINE int32_t getNumRootBones(void) const;
+	X_INLINE int32_t getNumMeshTotal(void) const;
+	X_INLINE int32_t getNumVerts(size_t lodIdx) const;
 	X_INLINE bool hasLods(void) const;
 	X_INLINE bool hasPhys(void) const;
 	X_INLINE bool isAnimated(void) const;
