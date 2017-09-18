@@ -123,17 +123,19 @@ bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& boneTransOut, flo
 
 	X_ASSERT(time >= 0_tv, "Negative time value")(time);
 
-	// so we support applying animations that don't effect all bones.
-	// so we are given the models bones and need to update the correct indexes.
-	// the animation might also have more bones than the model as we need to just ignore them.
-	// can i do that with a single index map or need pairs?
-	// i need a list of bones we effect in the model and the indexes of them.
-	// but also need the index of the animation bone.
-	// maybe just have a list that is size of model bones, but with -1 if we don't animate it.
+	TransformArr tempTrans(boneTransOut.getArena());
+	TransformArr* pTransArr = &boneTransOut;
+
+	// animate into a temp buffer.
+	if (blendWeight > 0.f)
+	{
+		tempTrans.resize(boneTransOut.size());
+		pTransArr = &tempTrans;
+	}
 
 	FrameBlend frame;
 	pAnim_->timeToFrame(time, cycles_, frame);
-	pAnim_->getFrame(frame, boneTransOut, indexMap_);
+	pAnim_->getFrame(frame, *pTransArr, indexMap_);
 
 	if (!blendWeight)
 	{
@@ -141,12 +143,10 @@ bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& boneTransOut, flo
 	}
 	else 
 	{
-		// need to blend in bones.
 		blendWeight += weight;
 		float lerp = weight / blendWeight;
-		// Util::blendBones(blendFrame, jointFrame, lerp);
+		Util::blendBones(boneTransOut, *pTransArr, indexMap_, lerp);
 	}
-
 
 	return true;
 }
