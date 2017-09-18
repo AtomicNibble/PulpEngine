@@ -107,7 +107,6 @@ class Animator
 public:
 	ANIMLIB_EXPORT Animator(const model::XModel& model, core::MemoryArenaBase* arena);
 
-	X_INLINE size_t numAnims(void) const;
 	X_INLINE const Mat44Arr& getBoneMatrices(void) const;
 	
 	ANIMLIB_EXPORT bool createFrame(core::TimeVal currentTime);

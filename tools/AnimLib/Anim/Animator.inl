@@ -47,14 +47,9 @@ X_INLINE core::TimeVal AnimBlend::getEndTime(void) const
 	return endTime_;
 }
 
+
 // ---------------------------------------
 
-
-X_INLINE size_t Animator::numAnims(void) const
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	return 0_sz;
-}
 
 X_INLINE const Animator::Mat44Arr& Animator::getBoneMatrices(void) const
 {

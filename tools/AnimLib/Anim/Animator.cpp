@@ -485,9 +485,6 @@ void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Mat
 {
 	core::StackString512 txt;
 
-	int32_t num = 1; // numAnims();
-	txt.appendFmt("Anims: %i\n", num);
-
 	for (auto& anim : anims_)
 	{
 		auto* pAnim = anim.getAnim();
