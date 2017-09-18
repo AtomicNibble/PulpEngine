@@ -21,10 +21,10 @@ const char* WeaponLib::getOutExtension(void) const
 
 bool WeaponLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
+	X_UNUSED(host, assetId, args, destPath);
 
 
-
-	return true;
+	return false;
 }
 
 
