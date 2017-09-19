@@ -49,8 +49,15 @@ X_DECLARE_ENUM8(AmmoCounterStyle)(
 X_DECLARE_FLAGS(WeaponFlag)(
 	Ads,
 	AdsFire,
-	NoProne
+	AdsRechamber,
+	AdsNoAutoReload,
+	NoPartialReload,
+	NoProne,
+	SegmentedReload,
+	ArmorPiercing
 );
+
+typedef Flags<WeaponFlag> WeaponFlags;
 
 
 struct WeaponDesc
@@ -87,6 +94,44 @@ struct WeaponDesc
 	core::string hudIcon;
 };
 
+
+struct WeaponHdr
+{
+	// 4
+	uint32_t fourCC;
+	// 4
+	uint8_t version;
+	uint8_t _pad[3];
+
+	// 4
+	WeaponClass::Enum wpnClass;
+	InventoryType::Enum invType;
+	FireType::Enum fireType;
+	AmmoCounterStyle::Enum ammoCounterStyle;
+
+	// 4
+	WeaponFlags flags;
+
+	X_INLINE bool isValid(void) const
+	{
+		if (version != WEAPON_VERSION) {
+			X_ERROR("Weapon", "weapon version is invalid. FileVer: %i RequiredVer: %i",
+				version, WEAPON_VERSION);
+		}
+
+		return version == WEAPON_VERSION && fourCC == WEAPON_FOURCC;
+	}
+
+};
+
+
+
+X_ENSURE_SIZE(WeaponClass, 1);
+X_ENSURE_SIZE(InventoryType, 1);
+X_ENSURE_SIZE(FireType, 1);
+X_ENSURE_SIZE(AmmoCounterStyle, 1);
+
+X_ENSURE_SIZE(WeaponHdr, 16);
 
 X_NAMESPACE_END
 
