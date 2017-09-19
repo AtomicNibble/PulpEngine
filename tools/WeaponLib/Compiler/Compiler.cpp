@@ -31,7 +31,7 @@ namespace weapon
 		}
 
 		// find all the things.
-		std::array<std::pair<const char*, core::json::Type>, 15> requiredValues = { {
+		std::array<std::pair<const char*, core::json::Type>, 23> requiredValues = { {
 			{ "displayName", core::json::kStringType },
 			{ "class", core::json::kStringType },
 			{ "invType", core::json::kStringType },
@@ -44,11 +44,26 @@ namespace weapon
 			{ "damageMax", core::json::kNumberType },
 			{ "damageMelee", core::json::kNumberType },
 
+			// model
+			{ "modelGun", core::json::kStringType },
+			{ "modelWorld", core::json::kStringType },
+
+			// anims
+			{ "animIdle", core::json::kStringType },
+			{ "animFire", core::json::kStringType },
+			{ "animRaise", core::json::kStringType },
+			{ "animFirstRaise", core::json::kStringType },
+			{ "animDRop", core::json::kStringType },
+
+			// sounds
 			{ "sndPickup", core::json::kStringType },
 			{ "sndAmmoPickup", core::json::kStringType },
 			{ "sndFire", core::json::kStringType },
 			{ "sndLastShot", core::json::kStringType },
 			{ "sndEmptyFire", core::json::kStringType },
+
+			// icons
+			{ "iconHud", core::json::kStringType },
 		} };
 
 		for (size_t i = 0; i < requiredValues.size(); i++)
@@ -87,6 +102,28 @@ namespace weapon
 		damageMaxRange_ = core::strUtil::StringToInt<int32_t>(pDmgMaxRange);
 		damageMelee_ = core::strUtil::StringToInt<int32_t>(pDmgMelee);
 
+		// turn these into for loops?
+
+		// models
+		modelSlots_[ModelSlot::Gun] = d["modelGun"].GetString();
+		modelSlots_[ModelSlot::World] = d["modelWorld"].GetString();
+
+		// anims
+		animSlots_[AnimSlot::Idle] = d["animIdle"].GetString();
+		animSlots_[AnimSlot::Fire] = d["animFire"].GetString();
+		animSlots_[AnimSlot::Raise] = d["animRaise"].GetString();
+		animSlots_[AnimSlot::FirstRaise] = d["animFirstRaise"].GetString();
+		animSlots_[AnimSlot::Drop] = d["animDrop"].GetString();
+
+		// sounds
+		animSlots_[SoundSlot::Pickup] = d["sndPickup"].GetString();
+		animSlots_[SoundSlot::AmmoPickUp] = d["sndAmmoPickUp"].GetString();
+		animSlots_[SoundSlot::Fire] = d["sndFire"].GetString();
+		animSlots_[SoundSlot::LastShot] = d["sndLastShot"].GetString();
+		animSlots_[SoundSlot::EmptyFire] = d["sndEmptyFire"].GetString();
+
+		// icons
+		iconSlots_[IconSlot::Hud] = d["animDrop"].GetString();
 
 		static_assert(WeaponFlag::FLAGS_COUNT == 8, "Added additional weapon flags? this code might need updating.");
 
@@ -114,6 +151,8 @@ namespace weapon
 		X_UNUSED(pFile);
 
 		WeaponHdr hdr;
+		core::zero_object(hdr);
+
 		hdr.fourCC = WEAPON_FOURCC;
 		hdr.version = WEAPON_VERSION;
 
@@ -132,9 +171,41 @@ namespace weapon
 		hdr.minDmgRange = damageMinRange_;
 		hdr.maxDmgRange = damageMaxRange_;
 
+		core::ByteStream stream(g_WeaponLibArena);
+		stream.reserve(256);
+
+		// write all the slot strings.
+		writeSlots<ModelSlot>(modelSlots_, hdr.modelSlots, stream);
+		writeSlots<AnimSlot>(animSlots_, hdr.animSlots, stream);
+		writeSlots<SoundSlot>(sndSlots_, hdr.sndSlots, stream);
+		writeSlots<IconSlot>(iconSlots_, hdr.iconSlots, stream);
+
 		if (pFile->writeObj(hdr) != sizeof(hdr)) {
 			X_ERROR("Weapon", "Failed to write weapon header");
 			return false;
+		}
+
+		if (pFile->writeObj(stream.data(), stream.size()) != stream.size()) {
+			X_ERROR("Weapon", "Failed to write weapon header");
+			return false;
+		}
+
+		return true;
+	}
+
+	template<typename SlotEnum, size_t Num>
+	bool WeaponCompiler::writeSlots(const StringArr<Num>& values,
+		WeaponHdr::SlotArr<Num>& slotsOut, core::ByteStream& stream)
+	{
+		static_assert(Num == SlotEnum::ENUM_COUNT, "Size mismatch");
+		for (uint32_t i = 0; i < SlotEnum::ENUM_COUNT; i++)
+		{
+			auto& name = values[i];
+			if (name.isNotEmpty())
+			{
+				slotsOut[i] = safe_static_cast<WeaponHdr::SlotArr<Num>::value_type>(stream.size());
+				stream.write(name.c_str(), core::strUtil::StringBytesIncNull(name));
+			}
 		}
 
 		return true;

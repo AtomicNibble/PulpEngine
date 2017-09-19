@@ -90,6 +90,9 @@ namespace weapon
 
 	struct WeaponHdr
 	{
+		template<size_t N>
+		using SlotArr = std::array<uint16_t, N>;
+
 		// 4
 		uint32_t fourCC;
 		// 4
@@ -117,10 +120,10 @@ namespace weapon
 
 		// these are all relative pointers to strings.
 		// if zero it's not set.
-		uint16_t modelSlots[ModelSlot::ENUM_COUNT];
-		uint16_t animSlots[AnimSlot::ENUM_COUNT];
-		uint16_t sndSlots[SoundSlot::ENUM_COUNT];
-		uint16_t iconSlots[IconSlot::ENUM_COUNT];
+		SlotArr<ModelSlot::ENUM_COUNT> modelSlots;
+		SlotArr<AnimSlot::ENUM_COUNT> animSlots;
+		SlotArr<SoundSlot::ENUM_COUNT> sndSlots;
+		SlotArr<IconSlot::ENUM_COUNT> iconSlots;
 
 
 		X_INLINE bool isValid(void) const

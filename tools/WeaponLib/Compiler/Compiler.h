@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include <Containers\ByteStream.h>
+
 X_NAMESPACE_DECLARE(core,
 	struct XFile;
 );
@@ -12,6 +14,9 @@ namespace weapon
 
 	class WeaponCompiler
 	{
+		template<size_t N>
+		using StringArr = std::array<core::string, N>;
+
 	public:
 		WeaponCompiler();
 		~WeaponCompiler();
@@ -21,8 +26,13 @@ namespace weapon
 		bool writeToFile(core::XFile* pFile) const;
 
 	private:
+
+		template<typename SlotEnum, size_t Num>
+		static bool writeSlots(const StringArr<Num>& values,
+			WeaponHdr::SlotArr<Num>& slotsOut, core::ByteStream& stream);
+
 		template<typename FlagClass, size_t Num>
-		bool processFlagGroup(core::json::Document& d, FlagClass& flags,
+		static bool processFlagGroup(core::json::Document& d, FlagClass& flags,
 			const std::array<std::pair<const char*, typename FlagClass::Enum>, Num>& flagValues);
 
 	private:
@@ -38,6 +48,11 @@ namespace weapon
 		AmmoCounterStyle::Enum ammoCounterStyle_;
 
 		WeaponFlags flags_;
+
+		StringArr<ModelSlot::ENUM_COUNT> modelSlots_;
+		StringArr<AnimSlot::ENUM_COUNT> animSlots_;
+		StringArr<SoundSlot::ENUM_COUNT> sndSlots_;
+		StringArr<IconSlot::ENUM_COUNT> iconSlots_;
 	};
 
 }
