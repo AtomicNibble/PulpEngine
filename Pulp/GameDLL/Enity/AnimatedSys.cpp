@@ -49,6 +49,15 @@ namespace entity
 			}
 		}
 
+		Matrix33f rotation;
+		rotation.rotate(Vec3f::xAxis(), ::toRadians(90.f));
+		rotation.rotate(Vec3f::yAxis(), ::toRadians(180.f));
+		rotation.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+		// rotation.rotate(Vec3f::yAxis(), ::toRadians(90.f));
+		// rotation.rotate(Vec3f::yAxis(), ::toRadians(90.f));
+
+		auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::MISC3D);
+
 		auto view = reg.view<Animator, Mesh, MeshRenderer, TransForm>();
 		for (auto entity : view)
 		{
@@ -57,6 +66,7 @@ namespace entity
 			auto& rendEnt = reg.get<MeshRenderer>(entity);
 
 			an.pAnimator->createFrame(time.ellapsed[core::Timer::GAME]);
+			an.pAnimator->renderInfo(time.ellapsed[core::Timer::GAME], trans.pos + Vec3f(0.f, 0.f, -15.f), rotation, pPrim);
 
 			auto& bones = an.pAnimator->getBoneMatrices();
 
