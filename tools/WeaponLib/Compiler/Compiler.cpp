@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Compiler.h"
+#include "Util\WeaponUtil.h"
 
 #include <String\Json.h>
-
 #include <IFileSys.h>
 
 
@@ -28,9 +28,10 @@ bool WeaponCompiler::loadFromJson(core::string& str)
 	}
 
 	// find all the things.
-	std::array<std::pair<const char*, core::json::Type>, 14> requiredValues = { {
+	std::array<std::pair<const char*, core::json::Type>, 15> requiredValues = { {
 		{ "displayName", core::json::kStringType },
 		{ "class", core::json::kStringType },
+		{ "invType", core::json::kStringType },
 		{ "fireType", core::json::kStringType },
 		{ "ammoCounter", core::json::kStringType },
 
@@ -61,7 +62,33 @@ bool WeaponCompiler::loadFromJson(core::string& str)
 		}
 	}
 
+	const char* pClass = d["class"].GetString();
+	const char* pInvType = d["invType"].GetString();
+	const char* pFireType = d["fireType"].GetString();
+	const char* pAmmoCounter = d["ammoCounter"].GetString();
 
+	wpnClass_ = Util::WeaponClassFromStr(pClass);
+	invType_ = Util::InventoryTypeFromStr(pInvType);
+	fireType_ = Util::FireTypeFromStr(pFireType);
+	ammoCounterStyle_ = Util::AmmoCounterStyleFromStr(pAmmoCounter);
+
+	static_assert(WeaponFlag::FLAGS_COUNT == 8, "Added additional weapon flags? this code might need updating.");
+
+	std::array<std::pair<const char*, WeaponFlag::Enum>, 8> flags = { {
+		{ "f_ads", WeaponFlag::Ads },
+		{ "f_adsFire", WeaponFlag::AdsFire },
+		{ "f_adsRechamber", WeaponFlag::AdsRechamber },
+		{ "f_adsNoAutoReload", WeaponFlag::AdsNoAutoReload },
+		{ "f_noPartialReload", WeaponFlag::NoPartialReload},
+		{ "f_noprone", WeaponFlag::NoProne },
+		{ "f_SegmentedReload", WeaponFlag::SegmentedReload },
+		{ "f_ArmorPiercing", WeaponFlag::ArmorPiercing },
+	} };
+
+	if (!processFlagGroup(d, flags_, flags)) {
+		X_ERROR("Weapon", "Failed to parse flags");
+		return false;
+	}
 
 	return true;
 }
@@ -70,7 +97,63 @@ bool WeaponCompiler::writeToFile(core::XFile* pFile) const
 {
 	X_UNUSED(pFile);
 
-	return false;
+	WeaponHdr hdr;
+	hdr.fourCC = WEAPON_FOURCC;
+	hdr.version = WEAPON_VERSION;
+
+	hdr.wpnClass = wpnClass_;
+	hdr.invType = invType_;
+	hdr.fireType = fireType_;
+	hdr.ammoCounterStyle = ammoCounterStyle_;
+
+	hdr.flags = flags_;
+
+	if (pFile->writeObj(hdr) != sizeof(hdr)) {
+		X_ERROR("Weapon", "Failed to write weapon header");
+		return false;
+	}
+
+	return true;
 }
+
+template<typename FlagClass, size_t Num>
+bool WeaponCompiler::processFlagGroup(core::json::Document& d, FlagClass& flags,
+	const std::array<std::pair<const char*, typename FlagClass::Enum>, Num>& flagValues)
+{
+	// process all the flags.
+	for (size_t i = 0; i < flagValues.size(); i++)
+	{
+		const auto& flag = flagValues[i];
+
+		if (d.HasMember(flag.first))
+		{
+			const auto& val = d[flagValues[i].first];
+
+			switch (val.GetType())
+			{
+				case core::json::kFalseType:
+					// do nothing
+					break;
+				case core::json::kTrueType:
+					flags.Set(flag.second);
+					break;
+				case core::json::kNumberType:
+					if (val.IsBool()) {
+						if (val.GetBool()) {
+							flags.Set(flag.second);
+						}
+						break;
+					}
+					// fall through if not bool
+				default:
+					X_ERROR("Weapon", "Flag \"%s\" has a value with a incorrect type: %" PRIi32, flag.first, val.GetType());
+					return false;
+			}
+		}
+	}
+
+	return true;
+}
+
 
 X_NAMESPACE_END
