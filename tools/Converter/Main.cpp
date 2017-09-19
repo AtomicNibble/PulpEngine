@@ -6,6 +6,7 @@
 
 #include <Platform\Console.h>
 #include <Time\StopWatch.h>
+#include <Hashing\Fnva1Hash.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -87,29 +88,34 @@ namespace
 
 	bool GetAssetType(converter::AssetType::Enum& assType, bool slient = false)
 	{
+		using namespace core::Hash::Fnv1Literals;
+
 		const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
 		if (pAssetType)
 		{
-			if (core::strUtil::IsEqualCaseInsen(pAssetType, L"model"))
+			core::StackString<128, char> assetTypeStr(pAssetType);
+
+			switch (core::Hash::Fnv1aHash(assetTypeStr.c_str(), assetTypeStr.length()))
 			{
-				assType = converter::AssetType::MODEL;
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"anim"))
-			{
-				assType = converter::AssetType::ANIM;
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"material"))
-			{
-				assType = converter::AssetType::MATERIAL;
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"img"))
-			{
-				assType = converter::AssetType::IMG;
-			}
-			else
-			{		
-				X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
-				return false;
+				case "model"_fnv1a:
+					assType = converter::AssetType::MODEL;
+					break;
+				case "anim"_fnv1a:
+					assType = converter::AssetType::ANIM;
+					break;
+				case "material"_fnv1a:
+					assType = converter::AssetType::MATERIAL;
+					break;
+				case "img"_fnv1a:
+					assType = converter::AssetType::IMG;
+					break;
+				case "weapon"_fnv1a:
+					assType = converter::AssetType::WEAPON;
+					break;
+
+				default:
+					X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
+					return false;
 			}
 
 			return true;
