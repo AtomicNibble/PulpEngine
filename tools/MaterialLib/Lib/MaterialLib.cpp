@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MaterialLib.h"
 
-#include "IFileSys.h"
+#include <IFileSys.h>
 
 #include "Compiler\Compiler.h"
 
@@ -51,12 +51,12 @@ bool MaterialLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& ar
 	core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 
 	if (!file.openFile(destPath.c_str(), mode)) {
-
+		X_ERROR("Mat", "Failed to open output file");
 		return false;
 	}
 	
 	if(!compiler.writeToFile(file.GetFile())) {
-
+		X_ERROR("Mat", "Failed to write material file");
 		return false;
 	}
 

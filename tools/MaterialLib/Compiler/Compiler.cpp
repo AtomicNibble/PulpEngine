@@ -8,8 +8,6 @@
 #include "TechDefs\TechDefs.h"
 #include "TechDefs\TechSetDef.h"
 
-#include <functional>
-#include <numeric>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -29,7 +27,10 @@ MaterialCompiler::MaterialCompiler(techset::TechSetDefs& techDefs) :
 bool MaterialCompiler::loadFromJson(core::string& str)
 {
 	core::json::Document d;
-	d.Parse(str.c_str(), str.length());
+	if (d.Parse(str.c_str(), str.length()).HasParseError()) {
+		X_ERROR("Mat", "Error parsing json");
+		return false;
+	}
 
 	// find all the things.
 	std::array<std::pair<const char*, core::json::Type>, 9> requiredValues = { {
@@ -58,6 +59,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 		}
 
 		if (d[item.first].GetType() != item.second) {
+			X_ERROR("Mat", "Incorrect type for \"%s\"", item.first);
 			return false;
 		}
 	}
