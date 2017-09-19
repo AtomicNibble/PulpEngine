@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{2e0db088-9f78-45bd-bcd6-b359b064b39d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Compiler">
+      <UniqueIdentifier>{94a8e20f-2e4f-4af4-be48-7d3b0c61dd3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Compiler">
+      <UniqueIdentifier>{679646cf-e527-4822-add7-e25626683566}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -29,6 +35,9 @@
     </ClInclude>
     <ClInclude Include="Lib\WeaponLib.h">
       <Filter>Header Files\Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="Compiler\Compiler.h">
+      <Filter>Header Files\Compiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -40,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="Lib\WeaponLib.cpp">
       <Filter>Source Files\Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="Compiler\Compiler.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
