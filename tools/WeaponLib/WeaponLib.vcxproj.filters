@@ -28,6 +28,12 @@
     <Filter Include="Source Files\Compiler">
       <UniqueIdentifier>{679646cf-e527-4822-add7-e25626683566}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{569f05a0-8589-4817-acd5-1458c161b3ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{dc3bdf53-8898-4699-951d-ab007dab02ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -38,6 +44,9 @@
     </ClInclude>
     <ClInclude Include="Compiler\Compiler.h">
       <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\WeaponUtil.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -53,5 +62,13 @@
     <ClCompile Include="Compiler\Compiler.cpp">
       <Filter>Source Files\Compiler</Filter>
     </ClCompile>
+    <ClCompile Include="Util\WeaponUtil.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Util\WeaponUtil.inl">
+      <Filter>Header Files\Util</Filter>
+    </None>
   </ItemGroup>
 </Project>

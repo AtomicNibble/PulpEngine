@@ -390,6 +390,7 @@
     <ClInclude Include="Compiler\Compiler.h" />
     <ClInclude Include="Lib\WeaponLib.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\WeaponUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler\Compiler.cpp" />
@@ -409,6 +410,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\WeaponUtil.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Util\WeaponUtil.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
