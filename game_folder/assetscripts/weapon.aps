@@ -1,0 +1,69 @@
+
+
+
+void GenerateUI( asset& Asset )
+{
+    string wpnClass = "pistol | rifle | smg | mg";
+    string fireType = "fullauto | single | burst2 | burst3";
+    string ammoCounter = "magazine | shortmagazine | shotgun | rocket | beltfed";
+    string invType = "primary";
+
+    Asset.AddString("displayName", "").SetTitle("Display Name");
+    Asset.AddCombo( "class", wpnClass ).SetTitle( "Class:" ).SetToolTip("The weapon class");
+    Asset.AddCombo( "invType", invType ).SetTitle( "Inventory Type:" ).SetToolTip("The Inventory type");
+    Asset.AddCombo( "fireType", fireType ).SetTitle( "Fire Type:" ).SetToolTip("Fite Type");
+    Asset.AddCombo( "ammoCounter", ammoCounter ).SetTitle( "Ammo Counter:" ).SetToolTip("The ammo counter style");
+
+    Asset.BeginGroup("Flags");
+    {
+        Asset.AddCheckBox( "f_ads", false ).SetTitle( "Ads" ).SetToolTip("Enable Ads");
+        Asset.AddCheckBox( "f_adsFire", false ).SetTitle( "AdsFire" ).SetToolTip("Can only fire in Ads");
+        Asset.AddCheckBox( "f_adsRechamber", false ).SetTitle( "Ads Rechamber" ).SetToolTip("Allow reloading in Ads");
+        Asset.AddCheckBox( "f_adsNoAutoReload", false ).SetTitle( "Ads No Auto Reload" );
+        Asset.AddCheckBox( "f_noPartialReload", false ).SetTitle( "No PartialReload" );
+        Asset.AddCheckBox( "f_noProne", false ).SetTitle( "No Prone" ).SetToolTip("Can't prone when weapon equiped");
+        Asset.AddCheckBox( "f_SegmentedReload", false ).SetTitle( "Segmented Reload" );
+        Asset.AddCheckBox( "f_ArmorPiercing", false ).SetTitle( "Armor Piercing" );
+    }
+
+    Asset.BeginGroup("Damage");
+    {
+        Asset.AddInt( "damageMinRange", 400, 0, 100000 ).SetTitle("Min Range").SetToolTip( "Distance min damage is used" );
+        Asset.AddInt( "damageMaxRange", 800, 0, 100000 ).SetTitle("Max Range").SetToolTip( "Distance the max damage is used" );
+        Asset.AddInt( "damageMin", 30, 0, 1000 ).SetTitle("Min").SetToolTip( "Min Damage" );
+        Asset.AddInt( "damageMax", 60, 0, 1000 ).SetTitle("Max").SetToolTip( "Max Damage" );
+        Asset.AddInt( "damageMelee", 30, 0, 1000 ).SetTitle("Meleee").SetToolTip( "Melee Damage" );
+
+    }
+
+    Asset.BeginGroup("Model");
+    {
+
+
+    }
+    Asset.BeginGroup("Anims");
+    {
+
+
+    }
+    Asset.BeginGroup("Sounds");
+    {
+        Asset.AddString("sndPickup", "").SetTitle("Pickup");
+        Asset.AddString("sndAmmoPickup", "").SetTitle("Ammo Pickup");
+        Asset.AddString("sndFire", "").SetTitle("Fire");
+        Asset.AddString("sndLastShot", "").SetTitle("Last Shot");
+        Asset.AddString("sndEmptyFire", "").SetTitle("Empty Fire");
+    }
+
+    Asset.BeginGroup("Icons");
+    {
+        Asset.AddString("iconHud", "").SetTitle("Hub Icon");
+        Asset.AddString("iconAmmoCounter", "").SetTitle("Ammo Counter Icon");
+    }
+
+    Asset.BeginGroup("Recticle");
+    {
+        Asset.AddString("recticleCenter", "").SetTitle("Center Reticle");
+    }
+}
+
