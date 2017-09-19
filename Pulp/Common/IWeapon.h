@@ -20,25 +20,25 @@ struct IWeaponLib : public IConverter
 };
 
 
-X_DECLARE_ENUM(WeaponClass)(
+X_DECLARE_ENUM8(WeaponClass)(
 	Pistol,
 	Rifle,
 	Smg,
 	Mg
 );
 
-X_DECLARE_ENUM(InventoryType)(
+X_DECLARE_ENUM8(InventoryType)(
 	Primary
 );
 
-X_DECLARE_ENUM(FireType)(
+X_DECLARE_ENUM8(FireType)(
 	FullAuto,
 	Single,
 	Burst2,
 	Burst3
 );
 
-X_DECLARE_ENUM(AmmoCounterStyle)(
+X_DECLARE_ENUM8(AmmoCounterStyle)(
 	Magazine,
 	ShortMagazine,
 	ShotGun,
