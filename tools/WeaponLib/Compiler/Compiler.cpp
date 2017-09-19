@@ -85,22 +85,16 @@ namespace weapon
 		const char* pFireType = d["fireType"].GetString();
 		const char* pAmmoCounter = d["ammoCounter"].GetString();
 
-		const char* pDmgMinRange = d["damageMinRange"].GetString();
-		const char* pDmgMaxRange = d["damageMaxRange"].GetString();
-		const char* pDmgMin = d["damageMin"].GetString();
-		const char* pDmgMax = d["damageMax"].GetString();
-		const char* pDmgMelee = d["damageMelee"].GetString();
-
 		wpnClass_ = Util::WeaponClassFromStr(pClass);
 		invType_ = Util::InventoryTypeFromStr(pInvType);
 		fireType_ = Util::FireTypeFromStr(pFireType);
 		ammoCounterStyle_ = Util::AmmoCounterStyleFromStr(pAmmoCounter);
 
-		damageMin_ = core::strUtil::StringToInt<int32_t>(pDmgMin);
-		damageMax_ = core::strUtil::StringToInt<int32_t>(pDmgMax);
-		damageMinRange_ = core::strUtil::StringToInt<int32_t>(pDmgMinRange);
-		damageMaxRange_ = core::strUtil::StringToInt<int32_t>(pDmgMaxRange);
-		damageMelee_ = core::strUtil::StringToInt<int32_t>(pDmgMelee);
+		damageMin_ = d["damageMinRange"].GetInt();
+		damageMax_ = d["damageMaxRange"].GetInt();
+		damageMinRange_ = d["damageMin"].GetInt();
+		damageMaxRange_ = d["damageMax"].GetInt();
+		damageMelee_ = d["damageMelee"].GetInt();
 
 		// turn these into for loops?
 
