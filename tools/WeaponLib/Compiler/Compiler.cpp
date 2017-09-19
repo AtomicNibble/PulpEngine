@@ -110,11 +110,11 @@ namespace weapon
 		animSlots_[AnimSlot::Drop] = d["animDrop"].GetString();
 
 		// sounds
-		animSlots_[SoundSlot::Pickup] = d["sndPickup"].GetString();
-		animSlots_[SoundSlot::AmmoPickUp] = d["sndAmmoPickUp"].GetString();
-		animSlots_[SoundSlot::Fire] = d["sndFire"].GetString();
-		animSlots_[SoundSlot::LastShot] = d["sndLastShot"].GetString();
-		animSlots_[SoundSlot::EmptyFire] = d["sndEmptyFire"].GetString();
+		sndSlots_[SoundSlot::Pickup] = d["sndPickup"].GetString();
+		sndSlots_[SoundSlot::AmmoPickUp] = d["sndAmmoPickup"].GetString();
+		sndSlots_[SoundSlot::Fire] = d["sndFire"].GetString();
+		sndSlots_[SoundSlot::LastShot] = d["sndLastShot"].GetString();
+		sndSlots_[SoundSlot::EmptyFire] = d["sndEmptyFire"].GetString();
 
 		// icons
 		iconSlots_[IconSlot::Hud] = d["animDrop"].GetString();
