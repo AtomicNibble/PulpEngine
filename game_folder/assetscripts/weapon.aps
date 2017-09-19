@@ -69,5 +69,18 @@ void GenerateUI( asset& Asset )
     {
         Asset.AddString("recticleCenter", "").SetTitle("Center Reticle");
     }
+    Asset.BeginGroup("State Timers");
+    {
+        Asset.AddFloat("timeFire", 0.1, 0.0, 100.0 ).SetTitle("Fire");
+        Asset.AddFloat("timeFireDelay", 0.1, 0.0, 100.0 ).SetTitle("Fire Delay");
+        Asset.AddFloat("timeMelee", 0.6, 0.0, 100.0 ).SetTitle("Melee");
+        Asset.AddFloat("timeMeleeDelay", 0.0, 0.0, 100.0 ).SetTitle("Melee Delay");
+        Asset.AddFloat("timeReload", 2, 0.0, 100.0 ).SetTitle("Reload");
+        Asset.AddFloat("timeReloadEmpty", 2, 0.0, 100.0 ).SetTitle("Reload Empty");
+        Asset.AddFloat("timeDrop", 0.5, 0.0, 100.0 ).SetTitle("Drop");
+        Asset.AddFloat("timeRaise", 0.5, 0.0, 100.0 ).SetTitle("Raise");
+        Asset.AddFloat("timeFirstRaise", 0.5, 0.0, 100.0 ).SetTitle("First Raise");
+    }
+
 }
 
