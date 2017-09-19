@@ -38,11 +38,17 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("Model");
     {
-
+        Asset.AddAssetRef( "modelGun", "model" ).SetTitle("Gun");
+        Asset.AddAssetRef( "modelWorld", "model" ).SetTitle("World");
 
     }
     Asset.BeginGroup("Anims");
     {
+        Asset.AddAssetRef( "animIdle", "anim" ).SetTitle("Idle");
+        Asset.AddAssetRef( "animFire", "anim" ).SetTitle("Fire");
+        Asset.AddAssetRef( "animRaise", "anim" ).SetTitle("Raise");
+        Asset.AddAssetRef( "animFirstRaise", "anim" ).SetTitle("First Raise");
+        Asset.AddAssetRef( "animDrop", "anim" ).SetTitle("Drop");
 
 
     }
@@ -54,13 +60,11 @@ void GenerateUI( asset& Asset )
         Asset.AddString("sndLastShot", "").SetTitle("Last Shot");
         Asset.AddString("sndEmptyFire", "").SetTitle("Empty Fire");
     }
-
     Asset.BeginGroup("Icons");
     {
         Asset.AddString("iconHud", "").SetTitle("Hub Icon");
         Asset.AddString("iconAmmoCounter", "").SetTitle("Ammo Counter Icon");
     }
-
     Asset.BeginGroup("Recticle");
     {
         Asset.AddString("recticleCenter", "").SetTitle("Center Reticle");
