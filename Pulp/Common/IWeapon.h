@@ -5,6 +5,8 @@
 
 X_NAMESPACE_BEGIN(game)
 
+static const uint32_t	 WEAPON_VERSION = 1;
+static const uint32_t	 WEAPON_FOURCC = X_TAG('w', 'p', 'n', 'b');
 
 static const char*		 WEAPON_FILE_EXTENSION = "wpn";
 static const char*		 WEAPON_DEFAULT_NAME = "default";
