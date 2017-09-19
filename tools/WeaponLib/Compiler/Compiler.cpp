@@ -53,7 +53,7 @@ namespace weapon
 			{ "animFire", core::json::kStringType },
 			{ "animRaise", core::json::kStringType },
 			{ "animFirstRaise", core::json::kStringType },
-			{ "animDRop", core::json::kStringType },
+			{ "animDrop", core::json::kStringType },
 
 			// sounds
 			{ "sndPickup", core::json::kStringType },
