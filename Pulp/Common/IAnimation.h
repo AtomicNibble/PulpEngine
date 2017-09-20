@@ -63,7 +63,7 @@ static const uint32_t	 ANIM_DEFAULT_FPS = 30;
 static const uint32_t	 ANIM_MIN_FPS = 1;
 static const uint32_t	 ANIM_MAX_FPS = 90;
 static const uint32_t	 ANIM_MAX_NOTES = 255;
-static const uint32_t	 ANIM_MAX_NOT_NAME_LENGTH = 48; // the max lengt of each notes name
+static const uint32_t	 ANIM_MAX_NOTE_NAME_LENGTH = 48; // the max lengt of each notes name
 static const uint32_t	 ANIM_MAX_NAME_LENGTH = 60;
 static const char*		 ANIM_FILE_EXTENSION = "anim";
 static const wchar_t*	 ANIM_FILE_EXTENSION_W = L"anim";
@@ -135,6 +135,16 @@ struct FrameBlend
 	float		backlerp;
 };
 
+struct NoteTrackHdr
+{
+	uint16_t num;
+};
+
+struct Note
+{
+	uint16_t name;
+	uint16_t frame;
+};
 
 struct AnimHeader
 {
@@ -177,6 +187,8 @@ X_INLINE size_t AnimHeader::numTagHeaderBytes(void) const
 
 
 X_ENSURE_SIZE(AnimHeader, 12);
+X_ENSURE_SIZE(NoteTrackHdr, 2);
+X_ENSURE_SIZE(Note, 4);
 
 
 X_NAMESPACE_END
