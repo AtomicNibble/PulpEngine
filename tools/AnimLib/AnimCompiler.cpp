@@ -964,6 +964,11 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		hdr.flags.Set(AnimFlag::LOOP);
 	}
 
+	auto& notes = inter_.getNotes();
+	if (notes.isNotEmpty()) {
+		hdr.flags.Set(AnimFlag::NOTES);
+	}
+
 	core::ByteStream stream(arena_);
 
 	// write the bone names.
@@ -1004,6 +1009,33 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 
 		bone.ang.save(stream);
 		bone.pos.save(stream);
+	}
+
+	if (notes.isNotEmpty()) 
+	{
+		NoteTrackHdr noteHdr;
+		noteHdr.num = safe_static_cast<uint16_t>(notes.size());
+
+		static_assert(std::numeric_limits<decltype(noteHdr.num)>::max() >= ANIM_MAX_NOTES, "Can't represent max notes");
+
+		stream.write(noteHdr);
+		for (auto& n : notes)
+		{
+			if (n.name.length() > ANIM_MAX_NOTE_NAME_LENGTH) {
+				X_ERROR("Anim", "Note \"%s\" has length %" PRIuS " which exceeds limit of %" PRIu32, 
+					n.name.c_str(), n.name.length(), ANIM_MAX_NOTE_NAME_LENGTH);
+				return false;
+			}
+
+			// decide where to place strings.
+			X_ASSERT_NOT_IMPLEMENTED();
+
+			Note note;
+			note.name = 0;
+			note.frame = safe_static_cast<uint16_t>(n.frame);
+
+			stream.write(note);
+		}
 	}
 
 	hdr.dataSize = safe_static_cast<uint32_t>(stream.size());
