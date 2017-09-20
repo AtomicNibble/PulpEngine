@@ -43,6 +43,12 @@
     <Filter Include="Source Files\UserCmds">
       <UniqueIdentifier>{454813b0-a6b0-474b-a81a-3f6101c37a1b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Weapon">
+      <UniqueIdentifier>{d306c90c-8219-426d-84ec-4834b0cbcc88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Weapon">
+      <UniqueIdentifier>{f6eedb93-d6f3-40f3-b0f8-46adbe6b99bc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -102,6 +108,9 @@
     <ClInclude Include="Enity\AnimatedSys.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
+    <ClInclude Include="Weapon\WeaponManager.h">
+      <Filter>Header Files\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -148,6 +157,9 @@
     </ClCompile>
     <ClCompile Include="Enity\AnimatedSys.cpp">
       <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Weapon\WeaponManager.cpp">
+      <Filter>Source Files\Weapon</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
