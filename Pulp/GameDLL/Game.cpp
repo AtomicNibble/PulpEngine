@@ -100,6 +100,7 @@ bool XGame::shutDown(void)
 		pFovVar_->Release();
 	}
 
+	userCmdGen_.shutdown();
 	return true;
 }
 
