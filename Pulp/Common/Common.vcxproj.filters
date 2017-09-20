@@ -1273,6 +1273,9 @@
     <ClInclude Include="IWeapon.h">
       <Filter>Interfaces_h\Game</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\AssetBase.h">
+      <Filter>Headers\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

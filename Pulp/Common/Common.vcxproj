@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assets\AssertContainer.h" />
+    <ClInclude Include="Assets\AssetBase.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Casts\safe_static_cast.h" />
     <ClInclude Include="Casts\union_cast.h" />
@@ -1559,7 +1560,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1575,7 +1575,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1592,7 +1591,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1608,7 +1606,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
@@ -1630,7 +1627,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
     <Lib />
     <Lib>
@@ -1648,7 +1644,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
     <Lib />
     <Lib>
@@ -1666,7 +1661,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1685,7 +1679,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1704,7 +1697,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1723,7 +1715,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1742,7 +1733,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1761,7 +1751,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1780,7 +1769,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -1799,7 +1787,6 @@ move "Event.i" "Util\Event.h"</Command>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
