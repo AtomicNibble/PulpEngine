@@ -23,7 +23,8 @@ Bone::~Bone()
 
 InterAnim::InterAnim(core::MemoryArenaBase* arena) : 
 	arena_(arena),
-	bones_(arena)
+	bones_(arena),
+	notes_(arena)
 {
 
 }
@@ -112,7 +113,10 @@ const Bone& InterAnim::getBone(size_t idx) const
 	return bones_[idx];
 }
 
-
+const InterAnim::NoteArr& InterAnim::getNotes(void) const
+{
+	return notes_;
+}
 
 bool InterAnim::ParseData(core::XLexer& lex)
 {

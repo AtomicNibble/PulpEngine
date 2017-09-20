@@ -33,8 +33,18 @@ public:
 	BoneData data;
 };
 
+struct InterNote
+{
+	core::string name;
+	int32_t frame;
+};
+
 class InterAnim
 {
+public:
+	typedef core::Array<InterNote> NoteArr;
+	typedef core::Array<Bone> BoneArr;
+
 public:
 	InterAnim(core::MemoryArenaBase* arena);
 	~InterAnim() = default;
@@ -48,6 +58,7 @@ public:
 	int32_t getFps(void) const;
 	size_t getNumBones(void) const;
 	const Bone& getBone(size_t idx) const;
+	const NoteArr& getNotes(void) const;
 
 private:
 	bool ParseData(core::XLexer& lex);
@@ -61,7 +72,8 @@ private:
 	int32_t numFrames_;
 	int32_t fps_;
 
-	core::Array<Bone> bones_;
+	BoneArr bones_;
+	NoteArr notes_;
 };
 
 
