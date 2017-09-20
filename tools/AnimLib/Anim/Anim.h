@@ -96,6 +96,7 @@ public:
 	X_INLINE int32_t getNumBones(void) const;
 	X_INLINE int32_t getNumFrames(void) const;
 	X_INLINE int32_t getFps(void) const;
+	X_INLINE int32_t getNumNotes(void) const;
 	X_INLINE AnimType::Enum type(void) const;
 	X_INLINE bool isLooping(void) const;
 	X_INLINE bool hasNotes(void) const;
@@ -122,6 +123,7 @@ private:
 	BoneArr bones_;
 
 	core::UniquePointer<uint8_t[]> data_;
+	NoteTrackHdr noteHdr_;
 	AnimHeader hdr_;
 };
 

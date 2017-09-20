@@ -54,6 +54,11 @@ X_INLINE int32_t Anim::getFps(void) const
 	return hdr_.fps;
 }
 
+X_INLINE int32_t Anim::getNumNotes(void) const
+{
+	return noteHdr_.num;
+}
+
 X_INLINE AnimType::Enum Anim::type(void) const
 {
 	return hdr_.type;

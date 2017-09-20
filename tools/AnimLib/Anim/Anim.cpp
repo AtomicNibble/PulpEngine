@@ -395,6 +395,11 @@ void Anim::processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data)
 
 	}
 
+	if (hdr.flags.IsSet(AnimFlag::NOTES))
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
 	hdr_ = hdr;
 	data_ = std::move(data);
 	status_ = core::LoadStatus::Complete;
