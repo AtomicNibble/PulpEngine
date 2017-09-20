@@ -1013,6 +1013,12 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 
 	if (notes.isNotEmpty()) 
 	{
+		if (notes.size() > ANIM_MAX_NOTES)
+		{
+			X_ERROR("Anim", "Exceeded max notes (%" PRIu32 ")", ANIM_MAX_NOTES);
+			return false;
+		}
+
 		NoteTrackHdr noteHdr;
 		noteHdr.num = safe_static_cast<uint16_t>(notes.size());
 
