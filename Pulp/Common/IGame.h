@@ -26,6 +26,8 @@ struct IGame
 	virtual bool shutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 	
+	virtual bool asyncInitFinalize(void) X_ABSTRACT;
+
 	virtual bool update(core::FrameData& frame) X_ABSTRACT;
 };
 

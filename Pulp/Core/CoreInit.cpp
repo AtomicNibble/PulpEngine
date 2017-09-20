@@ -667,6 +667,12 @@ bool XCore::InitAsyncWait(void)
 		allOk &= env_.pSound->asyncInitFinalize();
 	}
 
+	if (env_.pGame)
+	{
+		allOk &= env_.pGame->asyncInitFinalize();
+	}
+
+
 	return allOk;
 }
 

@@ -39,6 +39,8 @@ public:
 	bool shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
+	bool asyncInitFinalize(void) X_FINAL;
+
 	bool update(core::FrameData& frame) X_FINAL;
 	// ~IGame
 

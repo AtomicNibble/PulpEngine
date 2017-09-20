@@ -108,6 +108,15 @@ void XGame::release(void)
 	X_DELETE(this, g_gameArena);
 }
 
+bool XGame::asyncInitFinalize(void)
+{
+	bool allOk = true;
+
+	
+	return allOk;
+}
+
+
 bool XGame::update(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("Update", core::profiler::SubSys::GAME);
