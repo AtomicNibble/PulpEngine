@@ -77,21 +77,36 @@ namespace weapon
 
 	X_DECLARE_ENUM(SoundSlot)(
 		Pickup,
-		AmmoPickUp,
+		AmmoPickup,
 		Fire,
 		LastShot,
 		EmptyFire
 	);
 
 	X_DECLARE_ENUM(IconSlot)(
-		Hud
+		Hud,
+		AmmoCounter
 	);
 
+	X_DECLARE_ENUM(StateTimer)(
+		Fire,
+		FireDelay,
+		Melee,
+		MeleeDelay,
+		Reload,
+		ReloadEmpty,
+		Drop,
+		Raise,
+		FirstRaise
+	);
 
 	struct WeaponHdr
 	{
 		template<size_t N>
 		using SlotArr = std::array<uint16_t, N>;
+		
+		template<size_t N>
+		using FloatArr = std::array<float, N>;
 
 		// 4
 		uint32_t fourCC;
@@ -125,6 +140,7 @@ namespace weapon
 		SlotArr<SoundSlot::ENUM_COUNT> sndSlots;
 		SlotArr<IconSlot::ENUM_COUNT> iconSlots;
 
+		FloatArr<StateTimer::ENUM_COUNT> stateTimers;
 
 		X_INLINE bool isValid(void) const
 		{
@@ -145,7 +161,7 @@ namespace weapon
 	X_ENSURE_SIZE(FireType, 1);
 	X_ENSURE_SIZE(AmmoCounterStyle, 1);
 
-	X_ENSURE_SIZE(WeaponHdr, 60);
+	X_ENSURE_SIZE(WeaponHdr, 96);
 
 } // namespae weapon
 
