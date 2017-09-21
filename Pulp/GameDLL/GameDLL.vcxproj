@@ -416,6 +416,7 @@
     <ClInclude Include="UserCmds\UserCmds.h" />
     <ClInclude Include="Vars\GameVars.h" />
     <ClInclude Include="Vars\PlayerVars.h" />
+    <ClInclude Include="Weapon\WeaponDef.h" />
     <ClInclude Include="Weapon\WeaponManager.h" />
   </ItemGroup>
   <ItemGroup>
@@ -445,11 +446,13 @@
     <ClCompile Include="UserCmds\UserCmds.cpp" />
     <ClCompile Include="Vars\GameVars.cpp" />
     <ClCompile Include="Vars\PlayerVars.cpp" />
+    <ClCompile Include="Weapon\WeaponDef.cpp" />
     <ClCompile Include="Weapon\WeaponManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Enity\DataTranslator.inl" />
     <None Include="Vars\PlayerVars.inl" />
+    <None Include="Weapon\WeaponDef.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -111,6 +111,9 @@
     <ClInclude Include="Weapon\WeaponManager.h">
       <Filter>Header Files\Weapon</Filter>
     </ClInclude>
+    <ClInclude Include="Weapon\WeaponDef.h">
+      <Filter>Header Files\Weapon</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -161,6 +164,9 @@
     <ClCompile Include="Weapon\WeaponManager.cpp">
       <Filter>Source Files\Weapon</Filter>
     </ClCompile>
+    <ClCompile Include="Weapon\WeaponDef.cpp">
+      <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Vars\PlayerVars.inl">
@@ -168,6 +174,9 @@
     </None>
     <None Include="Enity\DataTranslator.inl">
       <Filter>Header Files\Enity</Filter>
+    </None>
+    <None Include="Weapon\WeaponDef.inl">
+      <Filter>Header Files\Weapon</Filter>
     </None>
   </ItemGroup>
 </Project>
