@@ -25,7 +25,8 @@ XGame::XGame(ICore* pCore) :
 	pRender_(nullptr),
 	pFovVar_(nullptr),
 	world_(arena_),
-	localClientId_(entity::INVALID_ID)
+	localClientId_(entity::INVALID_ID),
+	weaponDefs_(arena_)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
@@ -88,6 +89,8 @@ bool XGame::init(void)
 
 
 	userCmdGen_.init();
+	weaponDefs_.init();
+
 
 	return true;
 }
@@ -101,6 +104,7 @@ bool XGame::shutDown(void)
 	}
 
 	userCmdGen_.shutdown();
+	weaponDefs_.shutDown();
 	return true;
 }
 
@@ -113,6 +117,7 @@ bool XGame::asyncInitFinalize(void)
 {
 	bool allOk = true;
 
+	allOk &= weaponDefs_.asyncInitFinalize();
 	
 	return allOk;
 }

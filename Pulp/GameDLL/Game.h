@@ -13,6 +13,8 @@
 #include "UserCmds\UserCmds.h"
 #include "UserCmds\UserCmdMan.h"
 
+#include "Weapon\WeaponManager.h"
+
 X_NAMESPACE_DECLARE(render,
 	struct IRender
 );
@@ -76,6 +78,8 @@ private:
 
 	UserCmdGen userCmdGen_;
 	UserCmdMan userCmdMan_;
+
+	weapon::WeaponDefManager weaponDefs_;
 };
 
 X_NAMESPACE_END
