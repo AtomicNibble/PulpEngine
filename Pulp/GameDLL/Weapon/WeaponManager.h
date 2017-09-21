@@ -4,7 +4,8 @@
 #include <IDirectoryWatcher.h>
 
 #include <Assets\AssertContainer.h>
-#include <Assets\AssetBase.h>
+
+#include "WeaponDef.h"
 
 X_NAMESPACE_DECLARE(core,
 namespace V2 {
@@ -20,22 +21,7 @@ X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
-
-
-	class WeaponDef : public core::AssetBase
-	{
-	public:
-		WeaponDef(core::string& name);
-
-		bool processData(core::XFile* pFile);
-
-	private:
-		core::UniquePointer<uint8_t[]> data_;
-
-		WeaponHdr hdr_;
-	};
-
-
+	class WeaponDef;
 
 	struct WeaponDefLoadRequest
 	{

@@ -8,28 +8,6 @@ X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
-	WeaponDef::WeaponDef(core::string& name) :
-		AssetBase(name)
-	{
-
-	}
-
-	bool WeaponDef::processData(core::XFile* pFile)
-	{
-		if (pFile->readObj(hdr_) != sizeof(hdr_)) {
-			return false;
-		}
-
-		if (!hdr_.isValid()) {
-			X_ERROR("WeaponDef", "Header is invalid: \"%s\"", getName().c_str());
-			return false;
-		}
-
-
-		return true;
-	}
-
-	// ------------------------------------------------------
 
 	WeaponDefManager::WeaponDefManager(core::MemoryArenaBase* arena) :
 		arena_(arena),
@@ -79,7 +57,15 @@ namespace weapon
 
 	bool WeaponDefManager::asyncInitFinalize(void)
 	{
+		if (!pDefaultWeaponDef_) {
+			X_ERROR("WeaponDef", "Default WeaponDef is not valid");
+			return false;
+		}
 
+		if (!waitForLoad(pDefaultWeaponDef_)) {
+			X_ERROR("WeaponDef", "Failed to load default WeaponDef");
+			return false;
+		}
 
 		return true;
 	}
