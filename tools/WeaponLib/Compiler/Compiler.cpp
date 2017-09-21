@@ -31,7 +31,8 @@ namespace weapon
 		}
 
 		// find all the things.
-		std::array<std::pair<const char*, core::json::Type>, 23> requiredValues = { {
+		std::array<std::pair<const char*, core::json::Type>, 23 + StateTimer::ENUM_COUNT
+			> requiredValues = { {
 			{ "displayName", core::json::kStringType },
 			{ "class", core::json::kStringType },
 			{ "invType", core::json::kStringType },
@@ -64,7 +65,19 @@ namespace weapon
 
 			// icons
 			{ "iconHud", core::json::kStringType },
+
+			// state timers
+			{ "timeFire", core::json::kNumberType },
+			{ "timeFireDelay", core::json::kNumberType },
+			{ "timeMelee", core::json::kNumberType },
+			{ "timeMeleeDelay", core::json::kNumberType },
+			{ "timeReload", core::json::kNumberType },
+			{ "timeReloadEmpty", core::json::kNumberType },
+			{ "timeDrop", core::json::kNumberType },
+			{ "timeRaise", core::json::kNumberType },
+			{ "timeFirstRaise", core::json::kNumberType },
 		} };
+
 
 		for (size_t i = 0; i < requiredValues.size(); i++)
 		{
@@ -97,27 +110,42 @@ namespace weapon
 		damageMelee_ = d["damageMelee"].GetInt();
 
 		// turn these into for loops?
+		core::StackString<128, char> buf;
 
 		// models
-		modelSlots_[ModelSlot::Gun] = d["modelGun"].GetString();
-		modelSlots_[ModelSlot::World] = d["modelWorld"].GetString();
+		for (uint32_t i = 0; i < ModelSlot::ENUM_COUNT; i++)
+		{
+			buf.setFmt("model%s", ModelSlot::ToString(i));
+			modelSlots_[i] = d[buf.c_str()].GetString();
+		}
 
 		// anims
-		animSlots_[AnimSlot::Idle] = d["animIdle"].GetString();
-		animSlots_[AnimSlot::Fire] = d["animFire"].GetString();
-		animSlots_[AnimSlot::Raise] = d["animRaise"].GetString();
-		animSlots_[AnimSlot::FirstRaise] = d["animFirstRaise"].GetString();
-		animSlots_[AnimSlot::Drop] = d["animDrop"].GetString();
+		for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++)
+		{
+			buf.setFmt("anim%s", AnimSlot::ToString(i));
+			animSlots_[i] = d[buf.c_str()].GetString();
+		}
 
 		// sounds
-		sndSlots_[SoundSlot::Pickup] = d["sndPickup"].GetString();
-		sndSlots_[SoundSlot::AmmoPickUp] = d["sndAmmoPickup"].GetString();
-		sndSlots_[SoundSlot::Fire] = d["sndFire"].GetString();
-		sndSlots_[SoundSlot::LastShot] = d["sndLastShot"].GetString();
-		sndSlots_[SoundSlot::EmptyFire] = d["sndEmptyFire"].GetString();
+		for (uint32_t i = 0; i < SoundSlot::ENUM_COUNT; i++)
+		{
+			buf.setFmt("snd%s", SoundSlot::ToString(i));
+			sndSlots_[i] = d[buf.c_str()].GetString();
+		}
 
 		// icons
-		iconSlots_[IconSlot::Hud] = d["animDrop"].GetString();
+		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++)
+		{
+			buf.setFmt("icon%s", IconSlot::ToString(i));
+			iconSlots_[i] = d[buf.c_str()].GetString();
+		}
+
+		// state timers
+		for (uint32_t i = 0; i < StateTimer::ENUM_COUNT; i++)
+		{
+			buf.setFmt("time%s", StateTimer::ToString(i));
+			stateTimers_[i] = d[buf.c_str()].GetFloat();
+		}
 
 		static_assert(WeaponFlag::FLAGS_COUNT == 8, "Added additional weapon flags? this code might need updating.");
 
@@ -173,6 +201,8 @@ namespace weapon
 		writeSlots<AnimSlot>(animSlots_, hdr.animSlots, stream);
 		writeSlots<SoundSlot>(sndSlots_, hdr.sndSlots, stream);
 		writeSlots<IconSlot>(iconSlots_, hdr.iconSlots, stream);
+
+		hdr.stateTimers = stateTimers_;
 
 		if (pFile->writeObj(hdr) != sizeof(hdr)) {
 			X_ERROR("Weapon", "Failed to write weapon header");
