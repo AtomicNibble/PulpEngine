@@ -26,6 +26,9 @@ namespace weapon
 		bool writeToFile(core::XFile* pFile) const;
 
 	private:
+		template<typename Enum, typename SlotType, size_t SlotNum, typename Fn>
+		static bool parseEnum(core::json::Document& d, core::json::Type expectedType, const char* pPrefix,
+			std::array<SlotType, SlotNum>& slots, Fn callBack);
 
 		template<typename SlotEnum, size_t Num>
 		static bool writeSlots(const StringArr<Num>& values,

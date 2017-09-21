@@ -10,6 +10,17 @@ X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
+	namespace
+	{
+		template<typename SlotType>
+		void getJsonFloat(SlotType& slot, const core::json::GenericValue<core::json::UTF8<>>& val) {
+			slot = val.GetFloat();
+		}
+		template<typename SlotType>
+		void getJsonString(SlotType& slot, const core::json::GenericValue<core::json::UTF8<>>& val) {
+			slot = val.GetString();
+		}
+	}
 
 	WeaponCompiler::WeaponCompiler()
 	{
@@ -31,7 +42,7 @@ namespace weapon
 		}
 
 		// find all the things.
-		std::array<std::pair<const char*, core::json::Type>, 23 + StateTimer::ENUM_COUNT
+		std::array<std::pair<const char*, core::json::Type>, 10
 			> requiredValues = { {
 			{ "displayName", core::json::kStringType },
 			{ "class", core::json::kStringType },
@@ -44,38 +55,6 @@ namespace weapon
 			{ "damageMin", core::json::kNumberType },
 			{ "damageMax", core::json::kNumberType },
 			{ "damageMelee", core::json::kNumberType },
-
-			// model
-			{ "modelGun", core::json::kStringType },
-			{ "modelWorld", core::json::kStringType },
-
-			// anims
-			{ "animIdle", core::json::kStringType },
-			{ "animFire", core::json::kStringType },
-			{ "animRaise", core::json::kStringType },
-			{ "animFirstRaise", core::json::kStringType },
-			{ "animDrop", core::json::kStringType },
-
-			// sounds
-			{ "sndPickup", core::json::kStringType },
-			{ "sndAmmoPickup", core::json::kStringType },
-			{ "sndFire", core::json::kStringType },
-			{ "sndLastShot", core::json::kStringType },
-			{ "sndEmptyFire", core::json::kStringType },
-
-			// icons
-			{ "iconHud", core::json::kStringType },
-
-			// state timers
-			{ "timeFire", core::json::kNumberType },
-			{ "timeFireDelay", core::json::kNumberType },
-			{ "timeMelee", core::json::kNumberType },
-			{ "timeMeleeDelay", core::json::kNumberType },
-			{ "timeReload", core::json::kNumberType },
-			{ "timeReloadEmpty", core::json::kNumberType },
-			{ "timeDrop", core::json::kNumberType },
-			{ "timeRaise", core::json::kNumberType },
-			{ "timeFirstRaise", core::json::kNumberType },
 		} };
 
 
@@ -109,43 +88,22 @@ namespace weapon
 		damageMaxRange_ = d["damageMax"].GetInt();
 		damageMelee_ = d["damageMelee"].GetInt();
 
-		// turn these into for loops?
-		core::StackString<128, char> buf;
+		
+		auto assignString = [](core::string& slot, core::json::GenericValue<core::json::UTF8<>>& val) {
+			slot = val.GetString();
+		};
+		auto assignFloat = [](float& slot, core::json::GenericValue<core::json::UTF8<>>& val) {
+			slot = val.GetFloat();
+		};
 
-		// models
-		for (uint32_t i = 0; i < ModelSlot::ENUM_COUNT; i++)
-		{
-			buf.setFmt("model%s", ModelSlot::ToString(i));
-			modelSlots_[i] = d[buf.c_str()].GetString();
-		}
+		// slots.
+		parseEnum<ModelSlot>(d, core::json::kStringType, "model", modelSlots_, assignString);
+		parseEnum<AnimSlot>(d, core::json::kStringType, "anim", animSlots_, assignString);
+		parseEnum<SoundSlot>(d, core::json::kStringType, "snd", sndSlots_, assignString);
+		parseEnum<IconSlot>(d, core::json::kStringType, "icon", iconSlots_, assignString);
 
-		// anims
-		for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++)
-		{
-			buf.setFmt("anim%s", AnimSlot::ToString(i));
-			animSlots_[i] = d[buf.c_str()].GetString();
-		}
-
-		// sounds
-		for (uint32_t i = 0; i < SoundSlot::ENUM_COUNT; i++)
-		{
-			buf.setFmt("snd%s", SoundSlot::ToString(i));
-			sndSlots_[i] = d[buf.c_str()].GetString();
-		}
-
-		// icons
-		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++)
-		{
-			buf.setFmt("icon%s", IconSlot::ToString(i));
-			iconSlots_[i] = d[buf.c_str()].GetString();
-		}
-
-		// state timers
-		for (uint32_t i = 0; i < StateTimer::ENUM_COUNT; i++)
-		{
-			buf.setFmt("time%s", StateTimer::ToString(i));
-			stateTimers_[i] = d[buf.c_str()].GetFloat();
-		}
+		// timers
+		parseEnum<StateTimer>(d, core::json::kNumberType, "time", stateTimers_, assignFloat);
 
 		static_assert(WeaponFlag::FLAGS_COUNT == 8, "Added additional weapon flags? this code might need updating.");
 
@@ -216,6 +174,34 @@ namespace weapon
 
 		return true;
 	}
+
+	template<typename Enum, typename SlotType, size_t SlotNum, typename Fn>
+	bool WeaponCompiler::parseEnum(core::json::Document& d, core::json::Type expectedType,
+		const char* pPrefix, std::array<SlotType, SlotNum>& slots, Fn callBack)
+	{
+		core::StackString<128, char> buf;
+
+		for (uint32_t i = 0; i < Enum::ENUM_COUNT; i++)
+		{
+			buf.setFmt("%s%s", pPrefix, Enum::ToString(i));
+
+			if (!d.HasMember(buf.c_str())) {
+				X_ERROR("Weapon", "Missing required value: \"%s\"", buf.c_str());
+				return false;
+			}
+
+			auto& m = d[buf.c_str()];
+			if (m.GetType() != expectedType) {
+				X_ERROR("Weapon", "Incorrect type for \"%s\"", buf.c_str());
+				return false;
+			}
+
+			callBack(slots[i], m);
+		}
+
+		return true;
+	}
+
 
 	template<typename SlotEnum, size_t Num>
 	bool WeaponCompiler::writeSlots(const StringArr<Num>& values,
