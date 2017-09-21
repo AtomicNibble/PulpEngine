@@ -100,6 +100,14 @@ namespace weapon
 		FirstRaise
 	);
 
+	X_DECLARE_ENUM(AmmoSlot) (
+		Max,
+		Start,
+		ClipSize
+	);
+
+
+
 	struct WeaponHdr
 	{
 		template<size_t N>
@@ -107,6 +115,9 @@ namespace weapon
 		
 		template<size_t N>
 		using FloatArr = std::array<float, N>;
+
+		template<size_t N>
+		using Int16Arr = std::array<uint16_t, N>;
 
 		// 4
 		uint32_t fourCC;
@@ -140,7 +151,10 @@ namespace weapon
 		SlotArr<SoundSlot::ENUM_COUNT> sndSlots;
 		SlotArr<IconSlot::ENUM_COUNT> iconSlots;
 
+		Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots;
 		FloatArr<StateTimer::ENUM_COUNT> stateTimers;
+
+		uint16_t ammoName;
 
 		X_INLINE bool isValid(void) const
 		{
@@ -161,7 +175,7 @@ namespace weapon
 	X_ENSURE_SIZE(FireType, 1);
 	X_ENSURE_SIZE(AmmoCounterStyle, 1);
 
-	X_ENSURE_SIZE(WeaponHdr, 96);
+	X_ENSURE_SIZE(WeaponHdr, 108);
 
 } // namespae weapon
 

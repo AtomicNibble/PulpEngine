@@ -12,7 +12,7 @@ void GenerateUI( asset& Asset )
     Asset.AddCombo( "class", wpnClass ).SetTitle( "Class:" ).SetToolTip("The weapon class");
     Asset.AddCombo( "invType", invType ).SetTitle( "Inventory Type:" ).SetToolTip("The Inventory type");
     Asset.AddCombo( "fireType", fireType ).SetTitle( "Fire Type:" ).SetToolTip("Fite Type");
-    Asset.AddCombo( "ammoCounter", ammoCounter ).SetTitle( "Ammo Counter:" ).SetToolTip("The ammo counter style");
+    Asset.AddCombo( "ammoCounterStyle", ammoCounter ).SetTitle( "Ammo Counter:" ).SetToolTip("The ammo counter style");
 
     Asset.BeginGroup("Flags");
     {
@@ -33,6 +33,15 @@ void GenerateUI( asset& Asset )
         Asset.AddInt( "damageMin", 30, 0, 1000 ).SetTitle("Min").SetToolTip( "Min Damage" );
         Asset.AddInt( "damageMax", 60, 0, 1000 ).SetTitle("Max").SetToolTip( "Max Damage" );
         Asset.AddInt( "damageMelee", 30, 0, 1000 ).SetTitle("Meleee").SetToolTip( "Melee Damage" );
+
+    }
+
+    Asset.BeginGroup("Ammo");
+    {
+        Asset.AddString( "ammoName", "" ).SetTitle("Ammo Name").SetToolTip("The Name of the ammo, weapons with same ammo name share");
+        Asset.AddInt( "ammoMax", 500, 0, 10000 ).SetTitle("Max Ammo");
+        Asset.AddInt( "ammoStart", 500, 0, 10000 ).SetTitle("Start Ammo");
+        Asset.AddInt( "ammoClipSize", 500, 0, 10000 ).SetTitle("Clip Size");
 
     }
 

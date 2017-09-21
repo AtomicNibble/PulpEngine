@@ -57,6 +57,7 @@ namespace weapon
 		StringArr<SoundSlot::ENUM_COUNT> sndSlots_;
 		StringArr<IconSlot::ENUM_COUNT> iconSlots_;
 
+		WeaponHdr::Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots_;
 		WeaponHdr::FloatArr<StateTimer::ENUM_COUNT> stateTimers_;
 	};
 

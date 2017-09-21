@@ -42,13 +42,14 @@ namespace weapon
 		}
 
 		// find all the things.
-		std::array<std::pair<const char*, core::json::Type>, 10
+		std::array<std::pair<const char*, core::json::Type>, 11
 			> requiredValues = { {
 			{ "displayName", core::json::kStringType },
 			{ "class", core::json::kStringType },
 			{ "invType", core::json::kStringType },
 			{ "fireType", core::json::kStringType },
-			{ "ammoCounter", core::json::kStringType },
+			{ "ammoCounterStyle", core::json::kStringType },
+			{ "ammoName", core::json::kStringType },
 
 			{ "damageMinRange", core::json::kNumberType },
 			{ "damageMaxRange", core::json::kNumberType },
@@ -76,6 +77,7 @@ namespace weapon
 		const char* pInvType = d["invType"].GetString();
 		const char* pFireType = d["fireType"].GetString();
 		const char* pAmmoCounter = d["ammoCounter"].GetString();
+		const char* pAmmoName = d["ammoName"].GetString();
 
 		wpnClass_ = Util::WeaponClassFromStr(pClass);
 		invType_ = Util::InventoryTypeFromStr(pInvType);
@@ -88,6 +90,11 @@ namespace weapon
 		damageMaxRange_ = d["damageMax"].GetInt();
 		damageMelee_ = d["damageMelee"].GetInt();
 
+		if (core::strUtil::strlen(pAmmoName) == 0)
+		{
+			X_ERROR("Weapon", "Invalid ammo name");
+			return false;
+		}
 		
 		auto assignString = [](core::string& slot, core::json::GenericValue<core::json::UTF8<>>& val) {
 			slot = val.GetString();
@@ -95,15 +102,21 @@ namespace weapon
 		auto assignFloat = [](float& slot, core::json::GenericValue<core::json::UTF8<>>& val) {
 			slot = val.GetFloat();
 		};
+		auto assignInt16 = [](uint16_t& slot, core::json::GenericValue<core::json::UTF8<>>& val) {
+			slot = safe_static_cast<uint16_t>(val.GetInt());
+		};
 
 		// slots.
 		parseEnum<ModelSlot>(d, core::json::kStringType, "model", modelSlots_, assignString);
 		parseEnum<AnimSlot>(d, core::json::kStringType, "anim", animSlots_, assignString);
 		parseEnum<SoundSlot>(d, core::json::kStringType, "snd", sndSlots_, assignString);
 		parseEnum<IconSlot>(d, core::json::kStringType, "icon", iconSlots_, assignString);
+		parseEnum<AmmoSlot>(d, core::json::kNumberType, "ammo", ammoSlots_, assignInt16);
 
 		// timers
 		parseEnum<StateTimer>(d, core::json::kNumberType, "time", stateTimers_, assignFloat);
+
+
 
 		static_assert(WeaponFlag::FLAGS_COUNT == 8, "Added additional weapon flags? this code might need updating.");
 
@@ -160,7 +173,9 @@ namespace weapon
 		writeSlots<SoundSlot>(sndSlots_, hdr.sndSlots, stream);
 		writeSlots<IconSlot>(iconSlots_, hdr.iconSlots, stream);
 
+		hdr.ammoSlots = ammoSlots_;
 		hdr.stateTimers = stateTimers_;
+
 
 		if (pFile->writeObj(hdr) != sizeof(hdr)) {
 			X_ERROR("Weapon", "Failed to write weapon header");
