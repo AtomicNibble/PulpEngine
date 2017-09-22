@@ -107,7 +107,10 @@ class Animator
 
 
 public:
-	ANIMLIB_EXPORT Animator(const model::XModel& model, core::MemoryArenaBase* arena);
+	ANIMLIB_EXPORT explicit Animator(core::MemoryArenaBase* arena);
+	ANIMLIB_EXPORT Animator(const model::XModel* pModel, core::MemoryArenaBase* arena);
+
+	ANIMLIB_EXPORT void setModel(const model::XModel* pModel);
 
 	X_INLINE const Mat44Arr& getBoneMatrices(void) const;
 	
@@ -134,7 +137,7 @@ private:
 
 private:
 	core::MemoryArenaBase* arena_;
-	const model::XModel& model_;
+	const model::XModel* pModel_;
 
 	core::TimeVal lastTransformTime_;
 

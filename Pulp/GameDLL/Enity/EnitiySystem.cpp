@@ -575,9 +575,7 @@ namespace entity
 
 					auto& mesh = reg_.get<Mesh>(ent);
 
-					an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(*mesh.pModel, g_gameArena);
-
-
+					an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(mesh.pModel, g_gameArena);
 					break;
 				}
 

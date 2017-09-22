@@ -349,20 +349,54 @@ core::TimeVal AnimBlend::getPlayTime(void) const
 
 // ------------------------------
 
-Animator::Animator(const model::XModel& model, core::MemoryArenaBase* arena) :
+
+Animator::Animator(core::MemoryArenaBase* arena) :
 	arena_(arena),
-	model_(model),
+	pModel_(nullptr),
+	boneMat_(arena),
+	anims_{ {
+			X_PP_REPEAT_COMMA_SEP(2, arena)
+	} }
+{
+
+}
+
+
+Animator::Animator(const model::XModel* pModel, core::MemoryArenaBase* arena) :
+	arena_(arena),
+	pModel_(X_ASSERT_NOT_NULL(pModel)),
 	boneMat_(arena),
 	anims_{ {
 		X_PP_REPEAT_COMMA_SEP(2, arena)
 	}}
 {
-	boneMat_.resize(model.getNumBones());
+	setModel(pModel);
+}
+
+void Animator::setModel(const model::XModel* pModel)
+{
+	pModel_ = pModel;
+
+	if (pModel) {
+		boneMat_.resize(pModel->getNumBones());
+	}
+	else {
+		boneMat_.clear();
+	}
 }
 
 
 bool Animator::createFrame(core::TimeVal currentTime)
 {
+	if (!pModel_) {
+		return false;
+	}
+
+	// dunno how i want to deal with this, just return for now.
+	if (pModel_->getNumBones() == pModel_->getNumRootBones()) {
+		return false;
+	}
+
 	if (lastTransformTime_ == currentTime) {
 		return false;
 	}
@@ -374,7 +408,7 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	lastTransformTime_ = currentTime;
 
 	// joints for whole model.
-	TransformArr bones(g_AnimLibArena, model_.getNumBones());
+	TransformArr bones(g_AnimLibArena, pModel_->getNumBones());
 
 	// YER BOI.
 	float weight = 0.f;
@@ -394,8 +428,8 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	}
 
 	{
-		auto angle = model_.getBoneAngle(0);
-		auto pos = model_.getBonePos(0);
+		auto angle = pModel_->getBoneAngle(0);
+		auto pos = pModel_->getBonePos(0);
 
 		bones[0].pos = pos;
 		bones[0].quat = angle.asQuat();
@@ -404,11 +438,11 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	// move the relative transforms into bone space.
 	for (size_t i = 0; i < bones.size(); i++)
 	{
-		bones[i].pos += model_.getBonePosRel(i);
+		bones[i].pos += pModel_->getBonePosRel(i);
 	}
 
 	Util::convertBoneTransToMatrix(boneMat_, bones);
-	Util::transformBones(boneMat_, model_.getTagTree(), 1, static_cast<int32_t>(boneMat_.size() - 1));
+	Util::transformBones(boneMat_, pModel_->getTagTree(), 1, static_cast<int32_t>(boneMat_.size() - 1));
 
 	// the boneMat_ are now all in model space.
 
@@ -430,10 +464,14 @@ void Animator::clearAnim(int32_t animNum, core::TimeVal curTime, core::TimeVal c
 
 void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
 {
+	if (!pModel_) {
+		return;
+	}
+
 	// push anims down one.
 	pushAnims(startTime, blendTime);
 
-	anims_[0].playAnim(model_, pAnim, startTime, blendTime);
+	anims_[0].playAnim(*pModel_, pAnim, startTime, blendTime);
 }
 
 void Animator::pushAnims(core::TimeVal currentTime, core::TimeVal blendTime) 
@@ -452,6 +490,10 @@ void Animator::pushAnims(core::TimeVal currentTime, core::TimeVal blendTime)
 
 bool Animator::isAnimating(core::TimeVal currentTime) const
 {
+	if (!pModel_) {
+		return false;
+	}
+
 	for (auto& anim : anims_)
 	{
 		if (!anim.isDone(currentTime))
@@ -491,16 +533,20 @@ void Animator::getOrigin(core::TimeVal currentTime, Vec3f& pos) const
 
 model::BoneHandle Animator::getBoneHandle(const char* pName) const
 {
-	return model_.getBoneHandle(pName);
+	return pModel_->getBoneHandle(pName);
 }
 
 bool Animator::getBoneTransform(model::BoneHandle handle, Vec3f& pos, Matrix33f& axis) const
 {
+	if (!pModel_) {
+		return false;
+	}
+
 	if (handle == model::INVALID_BONE_HANDLE) {
 		return false;
 	}
 
-	X_ASSERT(handle < model_.getNumBones(), "Out of range")(handle, model_.getNumBones());
+	X_ASSERT(handle < pModel_->getNumBones(), "Out of range")(handle, pModel_->getNumBones());
 
 	pos = boneMat_[handle].getTranslate().xyz();
 	axis = boneMat_[handle].subMatrix33(0,0);
