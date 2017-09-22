@@ -73,7 +73,7 @@ namespace Converter
 			return false;
 		}
 
-		const bool hasAlpha = !(fmt == Texturefmt::R8G8B8 || fmt == Texturefmt::B8G8R8);
+		const bool hasAlpha = Util::hasAlpha(fmt);
 
 		// need to get width of the mip.
 		{
