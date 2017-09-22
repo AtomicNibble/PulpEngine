@@ -473,7 +473,30 @@ namespace Converter
 		// for HDR is 64bit/pixel half floats.
 		if (targetFmt == Texturefmt::BC7 || targetFmt == Texturefmt::BC3 || targetFmt == Texturefmt::BC1)
 		{
-			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8 && srcImg_.getFormat() != Texturefmt::B8G8R8A8)
+			// if we brg8 need to switch channels.
+			if (srcImg_.getFormat() == Texturefmt::B8G8R8A8)
+			{
+				// where is the best place to put this channel flip logic?
+				// right here, seams like best place to call it, but should it be impl in util?
+				for (size_t face = 0; face < srcImg_.getNumFaces(); face++)
+				{
+					for (size_t mip = 0; mip < srcImg_.getNumMips(); mip++)
+					{
+						uint8_t* pSrc = srcImg_.getLevel(face, mip);
+						const size_t numPixel = srcImg_.getLevelSize(mip) / 4;
+
+						for (size_t i = 0; i < numPixel; i++)
+						{
+							std::swap(pSrc[0], pSrc[2]);
+							pSrc += 4;
+						}
+					}
+				}
+
+				srcImg_.setFormat(Texturefmt::R8G8B8A8);
+			}
+
+			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8)
 			{
 				X_ERROR("Img", "Converting to %s requires R8G8B8A8 src. have: %s", 
 					Texturefmt::ToString(targetFmt), Texturefmt::ToString(srcImg_.getFormat()));
