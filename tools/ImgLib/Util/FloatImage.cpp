@@ -617,20 +617,20 @@ namespace Converter
 
 				for (uint32_t z = 0; z < depth_; z++)
 				{
-					float * tmp_plane = tmpImage.plane(c, z);
+					float* pTmpPlane = tmpImage.plane(c, z);
 
 					for (uint32_t y = 0; y < height_; y++) {
-						this->applyKernelX(xkernel, y, z, c, wm, tmp_plane + y * w);
+						this->applyKernelX(xkernel, y, z, c, wm, pTmpPlane + y * w);
 					}
 
-					float * dst_plane = tmpImage.plane(c, z);
+					float* pDstPlane = dst.plane(c, z);
 
 					for (uint32_t x = 0; x < w; x++) {
 						tmpImage.applyKernelY(ykernel, x, z, c, wm, tmpColumn.data());
 
 						// @@ Avoid this copy, write directly to dst_plane.
 						for (uint32_t y = 0; y < h; y++) {
-							dst_plane[y * w + x] = tmpColumn[y];
+							pDstPlane[y * w + x] = tmpColumn[y];
 						}
 					}
 				}
