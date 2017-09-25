@@ -352,6 +352,9 @@ namespace Util
 	uint32_t dataSize(uint32_t width, uint32_t height,
 		uint32_t mips, Texturefmt::Enum fmt)
 	{
+		X_ASSERT(width > 0, "zero width")(width);
+		X_ASSERT(height > 0, "zero height")(height);
+
 		uint32_t size = 0;
 		uint32_t i;
 
@@ -382,6 +385,9 @@ namespace Util
 			// shift
 			width >>= 1;
 			height >>= 1;
+
+			X_ASSERT(width > 0, "zero width")(width);
+			X_ASSERT(height > 0, "zero height")(height);
 		}
 
 		return size;
