@@ -150,8 +150,8 @@ X_INLINE void XTextureFile::updateOffsets(void)
 		width >>= 1;
 		height >>= 1;
 
-		X_ASSERT(width > 0, "zero width")(width);
-		X_ASSERT(height > 0, "zero height")(height);
+		width = core::Max(width, 1_ui32);
+		height = core::Max(height, 1_ui32);
 	}
 
 	const uint32_t facesize = safe_static_cast<uint32_t, size_t>(getFaceSize());
