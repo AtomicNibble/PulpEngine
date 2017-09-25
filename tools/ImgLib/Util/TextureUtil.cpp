@@ -385,9 +385,6 @@ namespace Util
 			// shift
 			width >>= 1;
 			height >>= 1;
-
-			X_ASSERT(width > 0, "zero width")(width);
-			X_ASSERT(height > 0, "zero height")(height);
 		}
 
 		return size;
