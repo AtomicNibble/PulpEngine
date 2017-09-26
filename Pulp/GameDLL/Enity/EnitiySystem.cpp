@@ -3,6 +3,9 @@
 #include "UserCmds\UserCmdMan.h"
 #include "Vars\GameVars.h"
 
+#include "Weapon\WeaponDef.h"
+#include "Weapon\WeaponManager.h"
+
 #include <String\Json.h>
 #include <Hashing\Fnva1Hash.h>
 
@@ -19,10 +22,11 @@ namespace entity
 
 	// -----------------------------------------------------------
 
-	EnititySystem::EnititySystem(GameVars& vars, core::MemoryArenaBase* arena) :
+	EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena) :
 		arena_(arena),
 		reg_(arena),
 		vars_(vars),
+		weaponDefs_(weaponDefs),
 		playerSys_(vars.player),
 		dtHealth_(arena),
 		dtMesh_(arena),

@@ -299,7 +299,7 @@ void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
 
 	const char* pMapName = Cmd->GetArg(1);
 
-	world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, arena_);
+	world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, weaponDefs_, arena_);
 
 	if (world_) {
 		if (!world_->loadMap(pMapName)) {

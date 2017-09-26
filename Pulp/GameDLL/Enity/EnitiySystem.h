@@ -28,6 +28,11 @@ X_NAMESPACE_BEGIN(game)
 class GameVars;
 class UserCmdMan;
 
+namespace weapon
+{
+	class WeaponDefManager;
+}
+
 namespace entity
 {
 	static const EnitiyRegister::entity_type INVALID_ID = EnitiyRegister::INVALID_ID;
@@ -38,7 +43,7 @@ namespace entity
 		typedef EnitiyRegister::entity_type EntityId;
 		
 	public:
-		EnititySystem(GameVars& vars, core::MemoryArenaBase* arena);
+		EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
 
 		bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
 		void update(core::FrameData& frame, UserCmdMan& userCmdMan);
@@ -74,6 +79,7 @@ namespace entity
 		core::MemoryArenaBase* arena_;
 		EnitiyRegister reg_;
 		GameVars& vars_;
+		game::weapon::WeaponDefManager& weaponDefs_;
 
 		physics::IPhysics* pPhysics_;
 		physics::IScene* pPhysScene_;

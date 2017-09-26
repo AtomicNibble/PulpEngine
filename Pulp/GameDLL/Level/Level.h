@@ -88,7 +88,8 @@ X_INLINE bool Level::isLoaded(void) const
 class World
 {
 public:
-	World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan, core::MemoryArenaBase* arena);
+	World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan, 
+		game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
 	~World();
 
 	bool loadMap(const char* pMapName);

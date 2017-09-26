@@ -295,11 +295,11 @@ bool Level::processEnts(void)
 
 
 World::World(GameVars& vars, physics::IPhysics* pPhys,
-	UserCmdMan& userCmdMan, core::MemoryArenaBase* arena) :
+	UserCmdMan& userCmdMan, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena) :
 	arena_(arena),
 	pPhys_(pPhys),
 	pScene_(nullptr),
-	ents_(vars, arena),
+	ents_(vars, weaponDefs, arena),
 	level_(arena),
 	userCmdMan_(userCmdMan)
 {
