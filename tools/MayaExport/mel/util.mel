@@ -22,8 +22,43 @@ global proc printMayaScriptPaths ()
     }
 }
 
+// deletes all the current dag poses and creats a new one with the current pose.
+global proc rebuildDagPose()
+{
+    string $dagPoses[];
+    string $connectedSkinClusters[];
+    string $sel[] = `ls -sl`;
 
-        }
+    // build dagPose node list
+    string $jointList[] = `listRelatives -pa -ad -type "joint" $sel[0]`;
+    $jointList[`size $jointList`] = $sel[0];
+    for ($joint in $jointList) {
+        string $dagConnections[] = `listConnections -type "dagPose" $joint`;
+        int $arraySize = `size $dagConnections`;
+        appendStringArray $dagPoses $dagConnections $arraySize;
+    }
+    $dagPoses = stringArrayRemoveDuplicates($dagPoses);
+
+    // build mesh connection list
+    for ($dagPose in $dagPoses) {
+        string $skinClusters[] = `listConnections -type "skinCluster" $dagPose`;
+        int $arraySize = `size $skinClusters`;
+        appendStringArray $connectedSkinClusters $skinClusters $arraySize;
+    }
+    $connectedSkinClusters = stringArrayRemoveDuplicates($connectedSkinClusters);
+
+    // delete and recreate dagPose;
+    print "Deleting dagPoses:\n";
+    print $dagPoses;
+    delete $dagPoses;
+    select -r $jointList;
+    string $dagPose = `dagPose -sl -s -bp`;
+    print ("New dagPose created: "+($dagPose)+"\n");
+
+    for ($skinCluster in $connectedSkinClusters) {
+        print ("Connecting "+($dagPose)+".message to "+($skinCluster)+".bindPose\n");
+        connectAttr (($dagPose)+".message") (($skinCluster)+".bindPose");
+    }
 }
 
-putMayaScriptPath("C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\tools\\MayaExport\\mel\\");
+// putMayaScriptPath("C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\tools\\MayaExport\\mel\\");
