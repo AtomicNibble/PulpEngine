@@ -492,29 +492,32 @@ template<typename T>
 X_INLINE void Quat<T>::set(const Matrix33<T> &m)
 {
 	//T trace = m.m[0] + m.m[4] + m.m[8];
-	T trace = m.trace();
+	const T trace = m.trace();
 	if (trace > (T)0.0)
 	{
-		T s = math<T>::sqrt(trace + (T)1.0);
+		const T s = math<T>::sqrt(trace + (T)1.0);
+		const T recip = (T)0.5 / s;
 		w = s * (T)0.5;
-		T recip = (T)0.5 / s;
 		v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
 		v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
 		v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
 	}
 	else
 	{
-		unsigned int i = 0;
-		if (m.at(1, 1) > m.at(0, 0))
+		uint32_t i = 0;
+		if (m.at(1, 1) > m.at(0, 0)) {
 			i = 1;
-		if (m.at(2, 2) > m.at(i, i))
+		}
+		if (m.at(2, 2) > m.at(i, i)) {
 			i = 2;
-		unsigned int j = (i + 1) % 3;
-		unsigned int k = (j + 1) % 3;
-		T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
-		(*this)[i] = (T)0.5 * s;
-		T recip = (T)0.5 / s;
+		}
+
+		uint32_t j = (i + 1) % 3;
+		uint32_t k = (j + 1) % 3;
+		const T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
+		const T recip = (T)0.5 / s;
 		w = (m.at(k, j) - m.at(j, k)) * recip;
+		(*this)[i] = (T)0.5 * s;
 		(*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
 		(*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
 	}
