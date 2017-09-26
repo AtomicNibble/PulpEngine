@@ -16,12 +16,12 @@ global proc printMayaScriptPaths ()
     int $numTokens = `tokenize $list ";" $buffer`;
 
     if ($numTokens >= 1){
-
         for ($b in $buffer){
-
             print ($b + "\n");
+        }
+    }
+}
 
-            }
 
         }
 }
