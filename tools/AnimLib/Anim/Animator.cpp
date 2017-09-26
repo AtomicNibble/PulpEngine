@@ -351,20 +351,14 @@ core::TimeVal AnimBlend::getPlayTime(void) const
 
 
 Animator::Animator(core::MemoryArenaBase* arena) :
-	arena_(arena),
-	pModel_(nullptr),
-	boneMat_(arena),
-	anims_{ {
-			X_PP_REPEAT_COMMA_SEP(2, arena)
-	} }
+	Animator(nullptr, arena)
 {
-
 }
 
 
 Animator::Animator(const model::XModel* pModel, core::MemoryArenaBase* arena) :
 	arena_(arena),
-	pModel_(X_ASSERT_NOT_NULL(pModel)),
+	pModel_(pModel),
 	boneMat_(arena),
 	anims_{ {
 		X_PP_REPEAT_COMMA_SEP(2, arena)
