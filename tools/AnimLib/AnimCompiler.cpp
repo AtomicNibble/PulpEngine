@@ -290,6 +290,8 @@ void AnimCompiler::Position::calculateFullFrames(void)
 		const Vec3f& pos = relPos_[i];
 		auto delta = pos - basePosRel_;
 
+		delta = removeNoise(delta);
+
 		min_.checkMin(delta);
 		max_.checkMax(delta);
 
