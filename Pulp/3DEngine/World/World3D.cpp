@@ -697,6 +697,17 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 	return pRenderEnt;
 }
 
+void World3D::updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans)
+{
+	RenderEnt* pRenderEnt = static_cast<RenderEnt*>(pEnt);
+
+	if (pRenderEnt->trans == trans) {
+		return;
+	}
+
+	pRenderEnt->trans = trans;
+}
+
 bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num)
 {
 	RenderEnt* pRenderEnt = static_cast<RenderEnt*>(pEnt);

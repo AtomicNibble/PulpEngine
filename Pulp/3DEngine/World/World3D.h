@@ -190,6 +190,7 @@ public:
 
 	bool loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData) X_FINAL;
 	IRenderEnt* addRenderEnt(RenderEntDesc& ent) X_FINAL;
+	void updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans) X_FINAL;
 	bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_FINAL;
 
 	// util
