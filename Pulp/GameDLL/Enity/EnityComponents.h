@@ -160,8 +160,16 @@ struct Player
 	UserCmd userCmd;
 };
 
+struct Attached
+{
+	EntityId parentEnt;
+	model::BoneHandle parentBone; // not always set
 
-using EnitiyRegister = ecs::StandardRegistry<uint16_t,
+	Vec3f offset;
+
+};
+
+using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	TransForm,
 	Health,
 
@@ -171,6 +179,8 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 
 	SoundObject,
 	SoundEnviroment,
+
+	Attached,
 
 	Animator,
 	Velocity,
