@@ -44,7 +44,7 @@ X_INLINE Transform<T>& Transform<T>::operator=(const Transform<T>& qt)
 template<typename T>
 X_INLINE bool Transform<T>::operator==(const Transform<T> &rhs) const
 {
-	return quat = rhs.quat && pos == rhs.pos;
+	return quat == rhs.quat && pos == rhs.pos;
 }
 
 template<typename T>
