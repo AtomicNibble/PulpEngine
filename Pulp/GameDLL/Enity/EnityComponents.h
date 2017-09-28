@@ -23,6 +23,7 @@ X_NAMESPACE_BEGIN(game)
 namespace entity
 {
 
+typedef uint16_t EntityId;
 
 struct TransForm : public Transformf
 {
@@ -180,8 +181,6 @@ using EnitiyRegister = ecs::StandardRegistry<uint16_t,
 	EntName,
 	Player
 >;
-
-typedef EnitiyRegister::entity_type EntityId;
 
 
 } // namespace entity
