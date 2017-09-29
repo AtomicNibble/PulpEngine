@@ -36,6 +36,7 @@ X_LINK_LIB("engine_AnimLib");
 #include <Math\XAngles.h>
 
 #include <IGame.h>
+#include <IWeapon.h>
 #include <IEntity.h>
 #include <ISound.h>
 
