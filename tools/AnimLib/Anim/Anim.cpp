@@ -114,13 +114,13 @@ void Bone::decodePos(Vec3f& pos, int32_t frame) const
 				}
 
 				// we have data
-				if (pPosFrames_[posFrameIdx] == frame)
-				{
-					pos = GetPostion(posFrameIdx);
-				}
-				else if (posFrameIdx == numPos_)
+				if (posFrameIdx == numPos_)
 				{
 					pos = GetPostion(numPos_ - 1);
+				}
+				else if (pPosFrames_[posFrameIdx] == frame)
+				{
+					pos = GetPostion(posFrameIdx);
 				}
 				else // if(posFrameIdx != 0)
 				{
@@ -184,14 +184,13 @@ void Bone::decodeAngle(Quatf& ang, int32_t frame) const
 					++angFrameIdx;
 				}
 
-
-				if (pAngleFrames_[angFrameIdx] == frame)
-				{
-					ang = GetAngle(angFrameIdx);
-				}
-				else if (angFrameIdx == numAngles_)
+				if (angFrameIdx == numAngles_)
 				{
 					ang = GetAngle(numAngles_ - 1);
+				}
+				else if (pAngleFrames_[angFrameIdx] == frame)
+				{
+					ang = GetAngle(angFrameIdx);
 				}
 				else
 				{
