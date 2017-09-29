@@ -192,6 +192,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	Player
 >;
 
+constexpr EnitiyRegister::entity_type INVALID_ENT_ID = EnitiyRegister::INVALID_ID;
 
 } // namespace entity
 
