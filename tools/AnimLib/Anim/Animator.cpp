@@ -530,7 +530,7 @@ model::BoneHandle Animator::getBoneHandle(const char* pName) const
 	return pModel_->getBoneHandle(pName);
 }
 
-bool Animator::getBoneTransform(model::BoneHandle handle, Vec3f& pos, Matrix33f& axis) const
+bool Animator::getBoneTransform(model::BoneHandle handle, core::TimeVal currentTime, Vec3f& pos, Matrix33f& axis)
 {
 	if (!pModel_) {
 		return false;
@@ -541,6 +541,9 @@ bool Animator::getBoneTransform(model::BoneHandle handle, Vec3f& pos, Matrix33f&
 	}
 
 	X_ASSERT(handle < pModel_->getNumBones(), "Out of range")(handle, pModel_->getNumBones());
+
+	// create a frame if needed,
+	createFrame(currentTime);
 
 	pos = boneMat_[handle].getTranslate().xyz();
 	axis = boneMat_[handle].subMatrix33(0,0);

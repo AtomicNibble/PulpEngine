@@ -126,7 +126,7 @@ public:
 
 	// bones.
 	ANIMLIB_EXPORT model::BoneHandle getBoneHandle(const char* pName) const;
-	ANIMLIB_EXPORT bool getBoneTransform(model::BoneHandle handle, Vec3f& pos, Matrix33f& axis) const;
+	ANIMLIB_EXPORT bool getBoneTransform(model::BoneHandle handle, core::TimeVal currentTime, Vec3f& pos, Matrix33f& axis);
 
 
 	ANIMLIB_EXPORT void renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Matrix33f& mat, engine::IPrimativeContext* pPrimContex) const;
