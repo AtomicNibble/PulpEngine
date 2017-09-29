@@ -9,6 +9,8 @@ X_NAMESPACE_BEGIN(game)
 
 PlayerVars::PlayerVars()
 {
+	gunOffset_ = Vec3f(3.f, 0.f, 0.f);
+
 	thirdPerson_ = 0;
 	thirdPersonRange_ = 20;
 	thirdPersonAngle_ = 0;
@@ -42,6 +44,8 @@ PlayerVars::PlayerVars()
 
 void PlayerVars::registerVars(void)
 {
+	ADD_CVAR_REF_VEC3("ply_gun_offset", gunOffset_, gunOffset_, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "");
+
 	ADD_CVAR_REF("ply_thirdperson", thirdPerson_, thirdPerson_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::CHEAT, 
 		"One dimension to rule them all");
 
@@ -85,7 +89,6 @@ void PlayerVars::registerVars(void)
 		"");
 	ADD_CVAR_REF("ply_bob_run_roll", bobRunRoll_, bobRunRoll_, 0, 512, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
 		"");
-
 
 	ADD_CVAR_REF("ply_walk_speed", walkSpeed_, walkSpeed_, 0, 512, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
 		"Move speed when walking");

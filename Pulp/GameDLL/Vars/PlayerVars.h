@@ -16,6 +16,8 @@ public:
 
 
 public:
+	Vec3f gunOffset_;
+
 	int32_t thirdPerson_; // enabled 3rd person.
 	int32_t thirdPersonRange_;
 	int32_t thirdPersonAngle_;
