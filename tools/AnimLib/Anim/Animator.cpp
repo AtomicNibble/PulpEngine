@@ -468,6 +468,23 @@ void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVa
 	anims_[0].playAnim(*pModel_, pAnim, startTime, blendTime);
 }
 
+void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime, core::TimeVal playTime)
+{
+	playAnim(pAnim, startTime, blendTime);
+
+	auto duration = pAnim->getDuration();
+
+	if (playTime != duration)
+	{
+		float durMs = duration.GetMilliSeconds();
+		float playMs = playTime.GetMilliSeconds();
+
+		float rate = durMs / playMs;
+
+		anims_[0].setRate(rate);
+	}
+}
+
 void Animator::pushAnims(core::TimeVal currentTime, core::TimeVal blendTime) 
 {
 	if (!anims_[0].getWeight(currentTime) || anims_[0].getStartTime() == currentTime) {

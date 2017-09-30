@@ -119,6 +119,7 @@ public:
 	ANIMLIB_EXPORT void clearAnims(core::TimeVal curTime, core::TimeVal clearTime);
 	ANIMLIB_EXPORT void clearAnim(int32_t animNum, core::TimeVal curTime, core::TimeVal clearTime);
 	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
+	ANIMLIB_EXPORT void playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime, core::TimeVal playTime);
 	ANIMLIB_EXPORT bool isAnimating(core::TimeVal currentTime) const;
 
 	ANIMLIB_EXPORT void getDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& delta) const;
