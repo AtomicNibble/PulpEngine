@@ -213,6 +213,7 @@ World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferM
 	renderEnts_(arena)
 {
 	viewCount_ = 0;
+	frameNumber_ = 0;
 	camArea_ = -1;
 }
 
@@ -225,6 +226,8 @@ World3D::~World3D()
 
 void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket)
 {
+	++frameNumber_; // fix me, we might have multiple views.
+
 	X_UNUSED(bucket);
 	pBucket_ = &bucket;
 
@@ -697,15 +700,22 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 	return pRenderEnt;
 }
 
-void World3D::updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans)
+void World3D::updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool force)
 {
 	RenderEnt* pRenderEnt = static_cast<RenderEnt*>(pEnt);
 
-	if (pRenderEnt->trans == trans) {
-		return;
+	if (!force) {
+
+		// try skipping update.
+
+		if (pRenderEnt->trans == trans) {
+			return;
+		}
 	}
 
+	pRenderEnt->lastModifiedFrameNum = frameNumber_;
 	pRenderEnt->trans = trans;
+
 }
 
 bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num)

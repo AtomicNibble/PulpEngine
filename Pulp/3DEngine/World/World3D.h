@@ -190,7 +190,7 @@ public:
 
 	bool loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData) X_FINAL;
 	IRenderEnt* addRenderEnt(RenderEntDesc& ent) X_FINAL;
-	void updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans) X_FINAL;
+	void updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool force) X_FINAL;
 	bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_FINAL;
 
 	// util
@@ -275,6 +275,7 @@ private:
 	bool outsideWorld_;
 
 	int32_t viewCount_;
+	int32_t frameNumber_;
 
 	int32_t camArea_;
 	XCamera cam_;
