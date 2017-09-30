@@ -289,7 +289,7 @@ void AnimBlend::setCycleCount(int32_t numCycles)
 		}
 		else
 		{
-			core::TimeVal scaledDuration(static_cast<core::TimeVal::TimeType>(static_cast<float>(duration.GetMilliSeconds()) * rate_));
+			core::TimeVal scaledDuration(static_cast<core::TimeVal::TimeType>(duration.GetMilliSecondsAsInt64()) * rate_);
 			endTime_ = startTime_ - timeOffset_ + scaledDuration;
 		}
 	}
@@ -303,8 +303,7 @@ void AnimBlend::setCycleCount(int32_t numCycles)
 		}
 		else
 		{
-			core::TimeVal scaledDuration(static_cast<core::TimeVal::TimeType>(
-				static_cast<float>(duration.GetMilliSeconds()) * rate_));
+			core::TimeVal scaledDuration(static_cast<core::TimeVal::TimeType>(duration.GetMilliSecondsAsInt64()) * rate_);
 			
 			endTime_ = startTime_ - timeOffset_ + scaledDuration;
 		}
