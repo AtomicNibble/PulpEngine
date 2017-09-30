@@ -280,8 +280,8 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 		numClusters += r;
 	}
 
-	X_LOG0("LvlEntity", "^8%5i^7 total brushes", brushes.size());
-	X_LOG0("LvlEntity", "^8%5i^7 cluster references", numClusters);
+	X_LOG0("LvlEntity", "^8%i^7 total brushes", brushes.size());
+	X_LOG0("LvlEntity", "^8%i^7 cluster references", numClusters);
 	return true;
 }
 
@@ -319,7 +319,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents)
 		}
 	}
 
-	X_LOG0("LvlEntity", "^8%5" PRIuS "^7 flooded leafs", floodedLeafs);
+	X_LOG0("LvlEntity", "^8%" PRIuS "^7 flooded leafs", floodedLeafs);
 
 	if (!inside)
 	{
@@ -399,12 +399,12 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 bool LvlEntity::FloodAreas(void)
 {
-	X_LOG0("LvlEntity", "^5FloodAreas");;
+	X_LOG0("LvlEntity", "^5FloodAreas");
 
 	// find how many we have.
 	numAreas = 0;
 	bspTree_.pHeadnode->FindAreas_r(numAreas);
-	X_LOG0("LvlEntity", "^8%5" PRIuS "^7 areas", numAreas);
+	X_LOG0("LvlEntity", "^8%" PRIuS "^7 areas", numAreas);
 
 	X_ASSERT(numAreas > 0, "Have no areas")();
 
