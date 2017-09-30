@@ -1,5 +1,5 @@
 //Puts a directory into the MAYA_SCRIPT_PATH and prints the result.
-global proc putMayaScriptPath (string $path)
+global proc putMayaScriptPath(string $path)
 {
     if (!`filetest -d $path`) error ($path + " does not exist.");
     string $newScriptPath = $path + ";" +`getenv "MAYA_SCRIPT_PATH"`;
@@ -8,7 +8,7 @@ global proc putMayaScriptPath (string $path)
 }
 
 //Prints MAYA_SCRIPT_PATH as list
-global proc printMayaScriptPaths ()
+global proc printMayaScriptPaths()
 {
     string $list = `getenv "MAYA_SCRIPT_PATH"`;
     print "\n\nPrinting MAYA_SCRIPT_PATH Paths...\n----------\n";
@@ -23,7 +23,7 @@ global proc printMayaScriptPaths ()
 }
 
 // deletes all the current dag poses and creats a new one with the current pose.
-global proc rebuildDagPose()
+global proc potato_RebuildDagPose()
 {
     string $dagPoses[];
     string $connectedSkinClusters[];
