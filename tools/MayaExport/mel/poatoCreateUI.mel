@@ -1436,6 +1436,8 @@ global proc CreateMenu()
 	menuItem -label "Select and reveal all bones" -command "potato_SelectAllBonesInScene";
 	menuItem -label "Select and reveal all mesh" -command "potato_SelectAllMeshInScene";
 	menuItem -divider true;
+	menuItem -label "Make current post bind pose" -command "potato_RebuildDagPose";
+	menuItem -divider true;
 	menuItem -label "Site" -command $site;
 
 	hotBox -updateMenus;
