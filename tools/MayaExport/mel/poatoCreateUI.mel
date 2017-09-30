@@ -1192,6 +1192,8 @@ global proc potato_CreateExportWindow( string $name )
 				button -label "Add Model" -align "center" -c "potato_AddModel" -p ModelUtilButtons;
 				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p ModelUtilButtons;
 
+			rowLayout -numberOfColumns 1 -height 28 -cw1 130 -ct1 "both" -co1 1 -p ModelExport ModelUtilButtons2;
+				button -label "Select all mesh in scene" -align "right" -c potato_SelectAllMeshInScene -p ModelUtilButtons2;
 
 		formLayout -edit
 			-af winLogo "top" 2
@@ -1202,6 +1204,9 @@ global proc potato_CreateExportWindow( string $name )
 			-ac modelScrollArea bottom 0 ModelUtilButtons
 			-af ModelUtilButtons bottom 0
 			-af ModelUtilButtons left 0
+			-ac modelScrollArea bottom 0 ModelUtilButtons2
+			-af ModelUtilButtons2 bottom 0
+			-af ModelUtilButtons2 right 0
 			ModelExport;
 
 // Anim Export Tab
