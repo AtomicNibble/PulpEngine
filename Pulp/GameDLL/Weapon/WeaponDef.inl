@@ -55,9 +55,9 @@ namespace weapon
 		return hdr_.flags;
 	}
 
-	X_INLINE float WeaponDef::stateTimer(StateTimer::Enum state) const
+	X_INLINE core::TimeVal WeaponDef::stateTimer(StateTimer::Enum state) const
 	{
-		return hdr_.stateTimers[state];
+		return core::TimeVal(hdr_.stateTimers[state]);
 	}
 
 

@@ -30,8 +30,7 @@ namespace weapon
 
 		X_INLINE WeaponFlags getFlags(void) const;
 
-		X_INLINE float stateTimer(StateTimer::Enum state) const;
-
+		X_INLINE core::TimeVal stateTimer(StateTimer::Enum state) const;
 
 	private:
 		core::UniquePointer<uint8_t[]> data_;
