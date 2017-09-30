@@ -76,13 +76,13 @@ namespace weapon
 		const char* pClass = d["class"].GetString();
 		const char* pInvType = d["invType"].GetString();
 		const char* pFireType = d["fireType"].GetString();
-		const char* pAmmoCounter = d["ammoCounter"].GetString();
+		const char* pAmmoCounterStyle = d["ammoCounterStyle"].GetString();
 		const char* pAmmoName = d["ammoName"].GetString();
 
 		wpnClass_ = Util::WeaponClassFromStr(pClass);
 		invType_ = Util::InventoryTypeFromStr(pInvType);
 		fireType_ = Util::FireTypeFromStr(pFireType);
-		ammoCounterStyle_ = Util::AmmoCounterStyleFromStr(pAmmoCounter);
+		ammoCounterStyle_ = Util::AmmoCounterStyleFromStr(pAmmoCounterStyle);
 
 		damageMin_ = d["damageMinRange"].GetInt();
 		damageMax_ = d["damageMaxRange"].GetInt();
