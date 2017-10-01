@@ -57,7 +57,9 @@ void GenerateUI( asset& Asset )
         Asset.AddAssetRef( "animFire", "anim" ).SetTitle("Fire");
         Asset.AddAssetRef( "animRaise", "anim" ).SetTitle("Raise");
         Asset.AddAssetRef( "animFirstRaise", "anim" ).SetTitle("First Raise");
-        Asset.AddAssetRef( "animDrop", "anim" ).SetTitle("Drop");
+        Asset.AddAssetRef( "animLower", "anim" ).SetTitle("Lower");
+        Asset.AddAssetRef( "animReload", "anim" ).SetTitle("Reload");
+        Asset.AddAssetRef( "animReloadEmpty", "anim" ).SetTitle("Reload Empty");
 
 
     }
@@ -68,6 +70,8 @@ void GenerateUI( asset& Asset )
         Asset.AddString("sndFire", "").SetTitle("Fire");
         Asset.AddString("sndLastShot", "").SetTitle("Last Shot");
         Asset.AddString("sndEmptyFire", "").SetTitle("Empty Fire");
+        Asset.AddString("sndRaise", "").SetTitle("Raise");
+        Asset.AddString("sndLower", "").SetTitle("Lower");
     }
     Asset.BeginGroup("Icons");
     {
@@ -86,7 +90,7 @@ void GenerateUI( asset& Asset )
         Asset.AddFloat("timeMeleeDelay", 0.0, 0.0, 100.0 ).SetTitle("Melee Delay");
         Asset.AddFloat("timeReload", 2, 0.0, 100.0 ).SetTitle("Reload");
         Asset.AddFloat("timeReloadEmpty", 2, 0.0, 100.0 ).SetTitle("Reload Empty");
-        Asset.AddFloat("timeDrop", 0.5, 0.0, 100.0 ).SetTitle("Drop");
+        Asset.AddFloat("timeLower", 0.5, 0.0, 100.0 ).SetTitle("Lower");
         Asset.AddFloat("timeRaise", 0.5, 0.0, 100.0 ).SetTitle("Raise");
         Asset.AddFloat("timeFirstRaise", 0.5, 0.0, 100.0 ).SetTitle("First Raise");
     }

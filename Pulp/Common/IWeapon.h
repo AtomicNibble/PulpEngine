@@ -23,6 +23,19 @@ namespace weapon
 	};
 
 
+	X_DECLARE_ENUM(State)(
+		Holstered,
+		Idle,
+		Reloading,
+		OutOfAmmo,
+		Raising,
+		Lowering,
+
+		PreFire,
+		Fire
+	);
+
+
 	X_DECLARE_ENUM8(WeaponClass)(
 		Pistol,
 		Rifle,
@@ -72,7 +85,9 @@ namespace weapon
 		Fire,
 		Raise,
 		FirstRaise,
-		Drop
+		Lower,
+		Reload,
+		ReloadEmpty
 	);
 
 	X_DECLARE_ENUM(SoundSlot)(
@@ -80,7 +95,9 @@ namespace weapon
 		AmmoPickup,
 		Fire,
 		LastShot,
-		EmptyFire
+		EmptyFire,
+		Raise,
+		Lower
 	);
 
 	X_DECLARE_ENUM(IconSlot)(
@@ -95,7 +112,7 @@ namespace weapon
 		MeleeDelay,
 		Reload,
 		ReloadEmpty,
-		Drop,
+		Lower,
 		Raise,
 		FirstRaise
 	);
@@ -123,7 +140,8 @@ namespace weapon
 		uint32_t fourCC;
 		// 4
 		uint8_t version;
-		uint8_t _pad[3];
+		uint8_t _pad[1];
+		uint16_t dataSize;
 
 		// 4
 		WeaponClass::Enum wpnClass;
@@ -175,7 +193,7 @@ namespace weapon
 	X_ENSURE_SIZE(FireType, 1);
 	X_ENSURE_SIZE(AmmoCounterStyle, 1);
 
-	X_ENSURE_SIZE(WeaponHdr, 108);
+	X_ENSURE_SIZE(WeaponHdr, 116);
 
 } // namespae weapon
 
