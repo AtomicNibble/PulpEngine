@@ -510,6 +510,7 @@ bool XSound::init(void)
 	// temp
 	loadBank("PlayerSounds.bnk");
 	loadBank("Ambient.bnk");
+	loadBank("Weapons.bnk");
 
 
 	return true;
