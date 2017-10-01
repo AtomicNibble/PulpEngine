@@ -35,6 +35,12 @@ namespace weapon
 		Fire
 	);
 
+	X_DECLARE_FLAGS(StateFlag)(
+		HasRaised	
+	);
+
+	typedef Flags<StateFlag> StateFlags;
+
 
 	X_DECLARE_ENUM8(WeaponClass)(
 		Pistol,
