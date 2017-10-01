@@ -58,6 +58,53 @@ namespace entity
 
 		auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::MISC3D);
 
+		auto ellapsedTime = time.ellapsed[core::Timer::GAME];
+
+		{
+			auto view = reg.view<Attached, TransForm>();
+			for (auto entity : view)
+			{
+				auto& trans = reg.get<TransForm>(entity);
+				auto& att = reg.get<Attached>(entity);
+
+				if (!reg.isValid(att.parentEnt)) {
+					continue;
+				}
+
+				auto parent = att.parentEnt;
+
+				// get the parent position.
+				const auto& parTrans = reg.get<TransForm>(parent);
+
+				trans = parTrans;
+				trans.pos += att.offset;
+
+				if (att.parentBone != model::INVALID_BONE_HANDLE)
+				{
+					if (!reg.has<Animator>(parent)) {
+						continue;
+					}
+
+					auto& an = reg.get<Animator>(parent);
+					Vec3f bonePos;
+					Matrix33f axis;
+
+					if (an.pAnimator->getBoneTransform(att.parentBone, ellapsedTime, bonePos, axis)) 
+					{
+						trans.pos += bonePos;
+						trans.quat = Quatf(axis);
+					}
+				}
+			
+				if (reg.has<Animator>(entity)) 
+				{
+					auto& rendEnt = reg.get<MeshRenderer>(entity);
+					p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
+				}
+			}
+		}
+
+
 		auto view = reg.view<Animator, Mesh, MeshRenderer, TransForm>();
 		for (auto entity : view)
 		{
