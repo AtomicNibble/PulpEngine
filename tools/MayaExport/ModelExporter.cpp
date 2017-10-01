@@ -1113,6 +1113,30 @@ MStatus ModelExporter::getBindPose(MayaBone& bone) const
 
 	{
 		MFnDependencyNode fnJoint(jointNode);
+	
+		// check if we have multiple bind poses present
+		{
+			uint32_t numAttr = fnJoint.attributeCount(&status);
+			if (status)
+			{
+				core::StackString512 name;
+
+				for (uint32_t i = 0; i < numAttr; i++)
+				{
+					MObject attr = fnJoint.attribute(i, &status);
+					MFnAttribute attrib(attr, &status);
+					if (status) 
+					{
+						name.set(attrib.name().asChar());
+						if (!name.isEqual("bindPose") && name.findCaseInsen("bindPose"))
+						{
+							MayaUtil::MayaPrintWarning("Multiple bind pose detected: \"%s\"", name.c_str());
+						}
+					}
+				}
+			}
+		}
+		
 		MObject	aBindPose = fnJoint.attribute("bindPose", &status);
 
 		if (status)
