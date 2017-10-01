@@ -114,10 +114,13 @@ namespace entity
 
 			float speed = vars_.walkSpeed_;
 
-			if (state.IsSet(Player::State::Crouch)) {
+			if (state.IsSet(Player::State::Crouch)) 
+			{
 				speed = vars_.crouchSpeed_;
 			}
-			else if (state.IsSet(Player::State::Run)) {
+			else if (userCmd.buttons.IsSet(Button::RUN)) 
+			{
+				// TODO: blend in stamina here.
 				speed = vars_.runSpeed_;
 			}
 

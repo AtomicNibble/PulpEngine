@@ -140,7 +140,6 @@ struct Player
 	X_DECLARE_FLAGS(State) (
 		Jump,
 		Crouch,
-		Run,
 		OnGround
 	);
 
