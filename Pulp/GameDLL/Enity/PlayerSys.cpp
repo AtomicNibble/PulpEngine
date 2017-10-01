@@ -200,6 +200,26 @@ namespace entity
 		updateEye(player);
 		// calculate first person view.
 		calculateFirstPersonView(trans, player);
+
+		if (player.weaponEnt != entity::INVALID_ENT_ID)
+		{
+			auto& wpn = reg.get<Weapon>(player.weaponEnt);
+			
+			if (userCmd.buttons.IsSet(Button::ATTACK))
+			{
+				wpn.attack = true;
+			}
+			else if (player.oldUserCmd.buttons.IsSet(Button::ATTACK)) 
+			{
+				wpn.attack = false;
+			}
+
+			if (player.oldUserCmd.buttons.IsSet(Button::RELOAD))
+			{
+				wpn.reload = true;
+			}
+		}
+
 	}
 
 	void PlayerSystem::updateViewBob(core::FrameTimeData& timeInfo, Player& player)

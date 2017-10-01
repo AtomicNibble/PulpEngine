@@ -188,6 +188,8 @@ struct Player
 
 	UserCmd oldUserCmd;
 	UserCmd userCmd;
+
+	EntityId weaponEnt;
 };
 
 struct Attached
