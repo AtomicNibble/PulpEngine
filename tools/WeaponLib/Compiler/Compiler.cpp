@@ -166,6 +166,7 @@ namespace weapon
 
 		core::ByteStream stream(g_WeaponLibArena);
 		stream.reserve(256);
+		stream.write('\0'); // anything that's not set will just point to this null term.
 
 		// write all the slot strings.
 		writeSlots<ModelSlot>(modelSlots_, hdr.modelSlots, stream);
@@ -175,7 +176,7 @@ namespace weapon
 
 		hdr.ammoSlots = ammoSlots_;
 		hdr.stateTimers = stateTimers_;
-
+		hdr.dataSize = safe_static_cast<uint16_t>(stream.size());
 
 		if (pFile->writeObj(hdr) != sizeof(hdr)) {
 			X_ERROR("Weapon", "Failed to write weapon header");
