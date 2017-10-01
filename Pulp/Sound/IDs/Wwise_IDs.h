@@ -13,12 +13,18 @@ namespace AK
 {
     namespace EVENTS
     {
+        static const AkUniqueID DRY_FIRE_PISTOL = 4273345739U;
+        static const AkUniqueID DRY_FIRE_RIFLE = 2650650540U;
+        static const AkUniqueID DRY_FIRE_SMG = 318360149U;
+        static const AkUniqueID FIRE_MG42 = 643229082U;
         static const AkUniqueID PAIN = 1996139369U;
         static const AkUniqueID PLAY_AMBIENT = 1562304622U;
         static const AkUniqueID PLAYER_BRAG = 3671645601U;
         static const AkUniqueID PLAYER_FOOTSTEP = 2453392179U;
         static const AkUniqueID PLAYER_JUMP = 1305133589U;
         static const AkUniqueID TEST_3D_LOOPED = 2761780017U;
+        static const AkUniqueID WEAP_LOWER = 1994352680U;
+        static const AkUniqueID WEAP_RAISE = 2611048663U;
     } // namespace EVENTS
 
     namespace SWITCHES
@@ -84,6 +90,7 @@ namespace AK
         static const AkUniqueID AMBIENT = 77978275U;
         static const AkUniqueID EVENTS = 1381315342U;
         static const AkUniqueID PLAYERSOUNDS = 1327972334U;
+        static const AkUniqueID WEAPONS = 1467963052U;
     } // namespace BANKS
 
     namespace BUSSES
