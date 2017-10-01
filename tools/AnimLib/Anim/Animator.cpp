@@ -457,6 +457,11 @@ void Animator::clearAnim(int32_t animNum, core::TimeVal curTime, core::TimeVal c
 
 void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime)
 {
+	if (!pAnim->isLoaded()) {
+		X_ERROR("Anim", "Can't play anim it's not loaded: \"%s\"", pAnim->getName().c_str());
+		return;
+	}
+
 	if (!pModel_) {
 		return;
 	}
@@ -469,6 +474,11 @@ void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVa
 
 void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime, core::TimeVal playTime)
 {
+	if (!pAnim->isLoaded()) {
+		X_ERROR("Anim", "Can't play anim it's not loaded: \"%s\"", pAnim->getName().c_str());
+		return;
+	}
+
 	playAnim(pAnim, startTime, blendTime);
 
 	auto duration = pAnim->getDuration();
