@@ -82,6 +82,16 @@ struct EntName
 
 // -----------------------------------
 
+struct Inventory
+{
+
+	// i will want per ammo type stores at somepoint
+	// but the types are data driven.
+	// need some sort of type to index shit maybe.
+	int32_t ammo; 
+
+
+};
 
 struct Velocity 
 {
@@ -180,6 +190,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	SoundObject,
 	SoundEnviroment,
 
+	Inventory,
 	Attached,
 
 	Animator,

@@ -146,6 +146,7 @@ namespace entity
 		// auto trans = reg_.assign<TransForm>(id);
 		auto& player = reg_.assign<Player>(id);
 		auto& hp = reg_.assign<Health>(id);
+		auto& inv = reg_.assign<Inventory>(id);
 	//	auto& rend = reg_.assign<RenderComponent>(id);
 
 		X_UNUSED(player);
@@ -156,6 +157,7 @@ namespace entity
 
 		hp.hp = 100;
 
+		inv.ammo = 20;
 #if 0
 		engine::RenderEntDesc entDsc;
 		entDsc.pModel = pModelManager_->loadModel("test/anim/smooth_bind_02");
