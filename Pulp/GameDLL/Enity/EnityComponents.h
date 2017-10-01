@@ -20,6 +20,11 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(game)
 
+namespace weapon
+{
+	class WeaponDef;
+}
+
 namespace entity
 {
 
@@ -73,7 +78,6 @@ struct Animator
 
 };
 
-
 struct EntName
 {
 	core::string name;
@@ -91,6 +95,23 @@ struct Inventory
 	int32_t ammo; 
 
 
+};
+
+struct Weapon
+{
+	EntityId ownerEnt;
+
+	weapon::WeaponDef* pWeaponDef;
+	weapon::State::Enum state;
+	weapon::StateFlags stateFlags;
+
+	core::TimeVal stateEnd;
+
+	int32_t ammoInClip;
+	int32_t ammoType;
+
+	bool attack;
+	bool reload;
 };
 
 struct Velocity 
@@ -190,6 +211,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	SoundEnviroment,
 
 	Inventory,
+	Weapon,
 	Attached,
 
 	Animator,
