@@ -154,7 +154,7 @@ namespace entity
 	//	auto& rend = reg_.assign<RenderComponent>(id);
 
 		X_UNUSED(player);
-
+		player.armsEnt = entity::INVALID_ID;
 //		player.eyeOffset = Vec3f(0, 0, 50.f);
 //		player.cameraOrigin = Vec3f(0, 0, 50.f);
 //		player.cameraAxis = Anglesf(0, 0, 0.f);
