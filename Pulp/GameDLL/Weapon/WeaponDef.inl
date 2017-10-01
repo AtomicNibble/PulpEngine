@@ -65,6 +65,16 @@ namespace weapon
 		return hdr_.ammoSlots[slot];
 	}
 
+	X_INLINE anim::Anim* WeaponDef::getAnim(AnimSlot::Enum slot) const
+	{
+		return animations_[slot];
+	}
+
+	X_INLINE engine::Material* WeaponDef::getIcon(IconSlot::Enum slot) const
+	{
+		return icons_[slot];
+	}
+
 	X_INLINE const char* WeaponDef::getModelSlot(ModelSlot::Enum slot) const
 	{
 		return stringForOffset(hdr_.modelSlots[slot]);

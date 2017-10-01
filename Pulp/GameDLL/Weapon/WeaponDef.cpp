@@ -2,6 +2,8 @@
 #include "WeaponDef.h"
 
 #include <IFileSys.h>
+#include <I3DEngine.h>
+#include <IAnimManager.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -11,6 +13,8 @@ namespace weapon
 		AssetBase(name)
 	{
 		soundHashes_.fill(0);
+		icons_.fill(nullptr);
+		animations_.fill(nullptr);
 	}
 
 	bool WeaponDef::processData(core::XFile* pFile)
@@ -29,12 +33,38 @@ namespace weapon
 			return false;
 		}
 
+		auto* pAnimManager = gEnv->p3DEngine->getAnimManager();
+		auto* pMaterialMan = gEnv->p3DEngine->getMaterialManager();
+
+		for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++) {
+			if (hdr_.animSlots[i] != 0) {
+				animations_[i] = pAnimManager->loadAnim(getAnimSlot(static_cast<AnimSlot::Enum>(i)));
+			}
+		}
+
+		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
+			if (hdr_.iconSlots[i] != 0) {
+				icons_[i] = pMaterialMan->loadMaterial(getIconSlot(static_cast<IconSlot::Enum>(i)));
+			}
+		}
+
 		// build the sound event hashes.
-		for (uint32_t i = 0; i < SoundSlot::ENUM_COUNT; i++)
-		{
-			if (hdr_.sndSlots[i] != 0)
-			{
+		for (uint32_t i = 0; i < SoundSlot::ENUM_COUNT; i++) {
+			if (hdr_.sndSlots[i] != 0) {
 				soundHashes_[i] = sound::GetIDFromStr(getSoundSlot(static_cast<SoundSlot::Enum>(i)));
+			}
+		}
+
+		// wait for them to load.
+		for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++)	{
+			if (animations_[i] != 0) {
+				pAnimManager->waitForLoad(animations_[i]);
+			}
+		}
+
+		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
+			if (icons_[i] != 0) {
+				pMaterialMan->waitForLoad(icons_[i]);
 			}
 		}
 
