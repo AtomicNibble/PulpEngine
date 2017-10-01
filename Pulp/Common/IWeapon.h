@@ -89,6 +89,7 @@ namespace weapon
 	X_DECLARE_ENUM(AnimSlot)(
 		Idle,
 		Fire,
+		LastShot,
 		Raise,
 		FirstRaise,
 		Lower,
