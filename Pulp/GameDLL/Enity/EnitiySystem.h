@@ -12,6 +12,7 @@
 #include "SoundSys.h"
 #include "PhysicsSystem.h"
 #include "AnimatedSys.h"
+#include "WeaponSystem.h"
 
 #include "DataTranslator.h"
 
@@ -91,6 +92,7 @@ namespace entity
 		SoundSystem soundSys_;
 		PhysicsSystem physSys_;
 		AnimatedSystem animatedSys_;
+		WeaponSystem weaponSys_;
 
 	private:
 		DataTranslator<Health> dtHealth_;

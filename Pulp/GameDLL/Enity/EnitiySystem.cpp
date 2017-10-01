@@ -70,6 +70,9 @@ namespace entity
 			return false;
 		}
 
+		if (!weaponSys_.init()) {
+			return false;
+		}
 
 		for (uint32_t i = 0; i < MAX_PLAYERS; i++) {
 			auto id = createEnt();
@@ -129,6 +132,7 @@ namespace entity
 		soundSys_.update(frame, reg_);
 
 		// physSys_.update(frame, reg_, pPhysScene_);
+		weaponSys_.update(frame.timeInfo, reg_);
 
 		animatedSys_.update(frame.timeInfo, reg_, p3DWorld_);
 	}
