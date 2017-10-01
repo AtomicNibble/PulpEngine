@@ -55,6 +55,7 @@ void GenerateUI( asset& Asset )
     {
         Asset.AddAssetRef( "animIdle", "anim" ).SetTitle("Idle");
         Asset.AddAssetRef( "animFire", "anim" ).SetTitle("Fire");
+        Asset.AddAssetRef( "animLastShot", "anim" ).SetTitle("Fire Last Shot");
         Asset.AddAssetRef( "animRaise", "anim" ).SetTitle("Raise");
         Asset.AddAssetRef( "animFirstRaise", "anim" ).SetTitle("First Raise");
         Asset.AddAssetRef( "animLower", "anim" ).SetTitle("Lower");
