@@ -13,7 +13,12 @@ X_DECLARE_ENUM(Rotation)(
 
 X_DECLARE_FLAGS8(Button)(
 	JUMP,
-	CROUCH
+	CROUCH,
+	ATTACK,
+	RELOAD,
+	ZOOM,
+	RUN,
+	USE
 );
 
 typedef Flags8<Button> Buttons;

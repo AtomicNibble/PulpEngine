@@ -5,9 +5,6 @@ X_NAMESPACE_BEGIN(game)
 
 UserCmdGen::UserCmdGen()
 {
-	moveForward_ = 0;
-	moveRight_ = 0;
-
 	clear();
 }
 
@@ -31,24 +28,23 @@ void UserCmdGen::clear(void)
 {
 	viewAngles_ = Vec3f::zero();
 	mouseDelta_ = Vec2f::zero();
+
+	buttonStates_.fill(0);
+	keyState_.fill(false);
 }
 
 void UserCmdGen::buildUserCmd(void)
 {
-	moveForward_ = 0;
-	moveRight_ = 0;
-
 	resetCmd();
 
 	processInput();
 
-	mouseMove();
+	setButtonFlags();
 
+	mouseMove();
+	keyMove();
 
 	cmd_.angles = Anglesf(viewAngles_);
-	cmd_.moveForwrd = moveForward_;
-	cmd_.moveRight = moveRight_;
-
 }
 
 UserCmd& UserCmdGen::getCurrentUsercmd(void)
@@ -86,70 +82,149 @@ void UserCmdGen::mouseMove(void)
 	else if (oldAngles[Rotation::PITCH] - viewAngles_[Rotation::PITCH] > 90) {
 		viewAngles_[Rotation::PITCH] = oldAngles[Rotation::PITCH] - 90;
 	}
-
-
 }
 
+void UserCmdGen::keyMove(void)
+{
+	int32_t forward = 0;
+	int32_t side = 0;
 
+	side += buttonState(UserButton::MOVE_RIGHT);
+	side -= buttonState(UserButton::MOVE_LEFT);
+
+	forward += buttonState(UserButton::MOVE_FORWARD);
+	forward -= buttonState(UserButton::MOVE_BACK);
+
+	cmd_.moveForwrd += safe_static_cast<int16_t>(forward);
+	cmd_.moveRight += safe_static_cast<int16_t>(side);
+}
+
+void UserCmdGen::setButtonFlags(void)
+{
+	cmd_.buttons.Clear();
+
+	if (buttonState(UserButton::ATTACK))
+	{
+		cmd_.buttons.Set(Button::ATTACK);
+	}
+	if (buttonState(UserButton::USE))
+	{
+		cmd_.buttons.Set(Button::USE);
+	}
+
+	if (buttonState(UserButton::MOVE_UP))
+	{
+		cmd_.buttons.Set(Button::JUMP);
+	}
+	if (buttonState(UserButton::MOVE_DOWN))
+	{
+		cmd_.buttons.Set(Button::CROUCH);
+	}
+
+	if (buttonState(UserButton::SPEED))
+	{
+		cmd_.buttons.Set(Button::RUN);
+	}
+
+	if (buttonState(UserButton::RELOAD))
+	{
+		cmd_.buttons.Set(Button::RELOAD);
+	}
+
+}
 
 void UserCmdGen::processInput(void)
 {
 	for (const auto& e : inputEvents_)
 	{
-		switch (e.keyId)
+		if (e.deviceType == input::InputDeviceType::KEYBOARD)
 		{
-			case input::KeyId::MOUSE_X:
-				mouseDelta_.x += (e.value * 0.02f);
-				break;
-			case input::KeyId::MOUSE_Y:
-				mouseDelta_.y += (e.value * 0.02f);
-				break;
+			// want to map user keys to defined commands.
+			// for now just hard code.
+			setButtonState(e.keyId, (e.action == input::InputState::DOWN));
+		}
+		else if (e.deviceType == input::InputDeviceType::MOUSE)
+		{
+			switch (e.keyId)
+			{
+				case input::KeyId::MOUSE_X:
+					mouseDelta_.x += (e.value * 0.02f);
+					break;
+				case input::KeyId::MOUSE_Y:
+					mouseDelta_.y += (e.value * 0.02f);
+					break;
 
-
-			case input::KeyId::W:
-				moveForward_ += 1_i16;
-				break;
-			case input::KeyId::S:
-				moveForward_ += -1_i16;
-				break;
-			case input::KeyId::D:
-				moveRight_ += 1_i16;
-				break;
-			case input::KeyId::A:
-				moveRight_ += -1_i16;
-				break;
-
-			case input::KeyId::LEFT_CONTROL:
-				if (e.action == input::InputState::DOWN)
-				{
-					cmd_.buttons.Set(Button::CROUCH);
-				}
-				else
-				{
-					cmd_.buttons.Remove(Button::CROUCH);
-				}
-				break;
-			case input::KeyId::SPACEBAR:
-				if (e.action == input::InputState::DOWN)
-				{
-					cmd_.buttons.Set(Button::JUMP);
-				}
-				else
-				{
-					cmd_.buttons.Remove(Button::JUMP);
-				}
-				break;
-
-
-			default:
-				break;
+				default:
+					setButtonState(e.keyId, (e.action == input::InputState::PRESSED));
+					break;
+			}
 		}
 	}
 
 	inputEvents_.clear();
 }
 
+UserButton::Enum getUserButton(input::KeyId::Enum key)
+{
+	// TODO: map these to key bindings.
+	switch (key)
+	{
+		case input::KeyId::F:
+			return UserButton::USE;
+		case input::KeyId::MOUSE_LEFT:
+			return UserButton::ATTACK;
+		case input::KeyId::MOUSE_RIGHT:
+			return UserButton::ZOOM;
+		case input::KeyId::R:
+			return UserButton::RELOAD;
 
+		case input::KeyId::W:
+			return UserButton::MOVE_FORWARD;
+		case input::KeyId::S:
+			return UserButton::MOVE_BACK;
+		case input::KeyId::D:
+			return UserButton::MOVE_RIGHT;
+		case input::KeyId::A:
+			return UserButton::MOVE_LEFT;
+		case input::KeyId::LEFT_CONTROL:
+			return UserButton::MOVE_DOWN;
+		case input::KeyId::SPACEBAR:
+			return UserButton::MOVE_UP;
+
+		case input::KeyId::LEFT_SHIFT:
+			return UserButton::SPEED;
+
+		default:
+			return UserButton::NONE;
+	}
+}
+
+void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
+{
+	if (keyState_[key] == down) {
+		return;
+	}
+	keyState_[key] = down;
+
+	auto ub = getUserButton(key);
+	if (down)
+	{
+		buttonStates_[ub]++;
+	}
+	else
+	{
+		buttonStates_[ub]--;
+
+		if (buttonStates_[ub] < 0) {
+			buttonStates_[ub] = 0;
+		}
+	}
+}
+
+int32_t UserCmdGen::buttonState(UserButton::Enum but) const
+{
+	return buttonStates_[but];
+}
 
 bool UserCmdGen::OnInputEvent(const input::InputEvent& event)
 {
