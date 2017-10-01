@@ -29,6 +29,7 @@ namespace entity
 	{
 		X_UNUSED(time, reg, p3DWorld);
 
+#if 0
 		static bool once = true;
 
 		if(once)
@@ -36,18 +37,22 @@ namespace entity
 			once = false;
 
 			auto* panimMan = gEnv->p3DEngine->getAnimManager();
-			auto* pAnim = panimMan->loadAnim("test/smooth_bind_01_pump");
-
+			// auto* pAnim = panimMan->loadAnim("test/crow_dance_01");
+		//	auto* pAnim = panimMan->loadAnim("test/duck_dance_01");
+			auto* pAnim = panimMan->loadAnim("test/weap/mg42/fire");
+			panimMan->waitForLoad(pAnim);
 
 			auto view = reg.view<Animator, Mesh, TransForm>();
 			for (auto entity : view)
 			{
 				auto& an = reg.get<Animator>(entity);
+				X_ASSERT_NOT_NULL(an.pAnimator);
 
-
-				an.pAnimator->playAnim(pAnim, time.ellapsed[core::Timer::GAME], 500_ms);
+				an.pAnimator->playAnim(pAnim, time.ellapsed[core::Timer::GAME], 25000_ms, 100_ms);
+				
 			}
 		}
+#endif
 
 		Matrix33f rotation;
 		rotation.rotate(Vec3f::xAxis(), ::toRadians(90.f));
@@ -112,13 +117,22 @@ namespace entity
 			auto& an = reg.get<Animator>(entity);
 			auto& rendEnt = reg.get<MeshRenderer>(entity);
 
-			an.pAnimator->createFrame(time.ellapsed[core::Timer::GAME]);
-			an.pAnimator->renderInfo(time.ellapsed[core::Timer::GAME], trans.pos + Vec3f(0.f, 0.f, -15.f), rotation, pPrim);
+			X_UNUSED(pPrim, trans);
+		//	an.pAnimator->renderInfo(ellapsedTime, trans.pos + Vec3f(0.f, 0.f, -20.f), rotation, pPrim);
 
+			if (!an.pAnimator->isAnimating(ellapsedTime)) {
+				continue;
+			}
+
+			if (an.pAnimator->createFrame(ellapsedTime))
+			{
+			
+			}
+			
 			auto& bones = an.pAnimator->getBoneMatrices();
-
-			// update the matrix we render with.
-			// cus meow.
+			
+			// the frame for the current time may have already been made.
+			// so create frame returns false, but we still need to update the bones.
 			p3DWorld->setBonesMatrix(rendEnt.pRenderEnt, bones.data(), bones.size());
 		}
 	}
