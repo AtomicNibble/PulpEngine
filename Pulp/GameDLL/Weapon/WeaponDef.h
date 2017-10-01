@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Assets\AssetBase.h>
+#include <ISound.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -10,6 +11,8 @@ namespace weapon
 
 	class WeaponDef : public core::AssetBase
 	{
+		typedef std::array<sound::HashVal, SoundSlot::ENUM_COUNT> SoundHashArr;
+
 	public:
 		WeaponDef(core::string& name);
 
@@ -31,10 +34,24 @@ namespace weapon
 		X_INLINE WeaponFlags getFlags(void) const;
 
 		X_INLINE core::TimeVal stateTimer(StateTimer::Enum state) const;
+		X_INLINE int32_t getAmmoSlot(AmmoSlot::Enum slot) const;
+		X_INLINE const char* getModelSlot(ModelSlot::Enum slot) const;
+		X_INLINE const char* getAnimSlot(AnimSlot::Enum slot) const;
+		X_INLINE const char* getSoundSlot(SoundSlot::Enum slot) const;
+		X_INLINE const char* getIconSlot(IconSlot::Enum slot) const;
+
+		X_INLINE sound::HashVal getSoundSlotHash(SoundSlot::Enum slot) const;
+		X_INLINE bool hasAnimSlot(AnimSlot::Enum slot) const;
+		X_INLINE bool hasSoundSlot(SoundSlot::Enum slot) const;
+
+
+	private:
+		X_INLINE const char* stringForOffset(int32_t offset) const;
 
 	private:
 		core::UniquePointer<uint8_t[]> data_;
 
+		SoundHashArr soundHashes_;
 		WeaponHdr hdr_;
 	};
 

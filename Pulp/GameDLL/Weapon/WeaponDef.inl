@@ -60,6 +60,50 @@ namespace weapon
 		return core::TimeVal(hdr_.stateTimers[state]);
 	}
 
+	X_INLINE int32_t WeaponDef::getAmmoSlot(AmmoSlot::Enum slot) const
+	{
+		return hdr_.ammoSlots[slot];
+	}
+
+	X_INLINE const char* WeaponDef::getModelSlot(ModelSlot::Enum slot) const
+	{
+		return stringForOffset(hdr_.modelSlots[slot]);
+	}
+
+	X_INLINE const char* WeaponDef::getAnimSlot(AnimSlot::Enum slot) const
+	{
+		return stringForOffset(hdr_.animSlots[slot]);
+	}
+
+	X_INLINE const char* WeaponDef::getSoundSlot(SoundSlot::Enum slot) const
+	{
+		return stringForOffset(hdr_.sndSlots[slot]);
+	}
+
+	X_INLINE const char* WeaponDef::getIconSlot(IconSlot::Enum slot) const
+	{
+		return stringForOffset(hdr_.iconSlots[slot]);
+	}
+
+	X_INLINE sound::HashVal WeaponDef::getSoundSlotHash(SoundSlot::Enum slot) const
+	{
+		return soundHashes_[slot];
+	}
+
+	X_INLINE const char* WeaponDef::stringForOffset(int32_t offset) const
+	{
+		return reinterpret_cast<const char*>(data_.ptr() + offset);
+	}
+
+	X_INLINE bool WeaponDef::hasAnimSlot(AnimSlot::Enum slot) const
+	{
+		return hdr_.animSlots[slot] != 0;
+	}
+
+	X_INLINE bool WeaponDef::hasSoundSlot(SoundSlot::Enum slot) const
+	{
+		return hdr_.sndSlots[slot] != 0;
+	}
 
 
 } // namespace weapon
