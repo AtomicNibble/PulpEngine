@@ -49,6 +49,12 @@
     <Filter Include="Source Files\Weapon">
       <UniqueIdentifier>{f6eedb93-d6f3-40f3-b0f8-46adbe6b99bc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Enity\Systems">
+      <UniqueIdentifier>{af288212-5a5c-49b7-a8ba-ca85fe080067}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity\Systems">
+      <UniqueIdentifier>{8d6a7a9d-dffa-4382-ac13-13c5400fa6bf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -75,15 +81,6 @@
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\InputSys.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
-    <ClInclude Include="Enity\CameraSys.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
-    <ClInclude Include="Enity\PhysicsSystem.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
     <ClInclude Include="UserCmds\UserCmds.h">
       <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
@@ -93,19 +90,10 @@
     <ClInclude Include="UserCmds\UserCmd.h">
       <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\PlayerSys.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
     <ClInclude Include="Vars\PlayerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\SoundSys.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
     <ClInclude Include="Enity\DataTranslator.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
-    <ClInclude Include="Enity\AnimatedSys.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
     <ClInclude Include="Weapon\WeaponManager.h">
@@ -113,6 +101,27 @@
     </ClInclude>
     <ClInclude Include="Weapon\WeaponDef.h">
       <Filter>Header Files\Weapon</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\AnimatedSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\CameraSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\PhysicsSystem.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\SoundSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\PlayerSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\InputSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\WeaponSystem.h">
+      <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -134,38 +143,41 @@
     <ClCompile Include="Level\Level.cpp">
       <Filter>Source Files\Level</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\InputSys.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\CameraSys.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\PhysicsSystem.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="UserCmds\UserCmds.cpp">
       <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
     <ClCompile Include="UserCmds\UserCmdMan.cpp">
       <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\PlayerSys.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="Vars\PlayerVars.cpp">
       <Filter>Source Files\Vars</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\SoundSys.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\AnimatedSys.cpp">
-      <Filter>Source Files\Entity</Filter>
     </ClCompile>
     <ClCompile Include="Weapon\WeaponManager.cpp">
       <Filter>Source Files\Weapon</Filter>
     </ClCompile>
     <ClCompile Include="Weapon\WeaponDef.cpp">
       <Filter>Source Files\Weapon</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\AnimatedSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\CameraSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\InputSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\PhysicsSystem.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\PlayerSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\SoundSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\WeaponSystem.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
