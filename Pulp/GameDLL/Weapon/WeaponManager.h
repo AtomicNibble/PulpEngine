@@ -4,6 +4,7 @@
 #include <IDirectoryWatcher.h>
 
 #include <Assets\AssertContainer.h>
+#include <IAsyncLoad.h>
 
 #include "WeaponDef.h"
 
@@ -40,6 +41,7 @@ namespace weapon
 
 
 	class WeaponDefManager :
+		public core::IAssetLoader,
 		public core::IXHotReload
 	{
 		typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
@@ -64,6 +66,7 @@ namespace weapon
 		WeaponDef* loadWeaponDef(const char* pName);
 		WeaponDef* getDefaultDef(void) const;
 
+		bool waitForLoad(core::AssetBase* pWeaponDef) X_FINAL;
 		bool waitForLoad(WeaponDef* pWeaponDef); // returns true if load succeed.
 		void releaseWeaponDef(WeaponDef* pMat);
 

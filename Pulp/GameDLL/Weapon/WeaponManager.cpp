@@ -117,6 +117,20 @@ namespace weapon
 		return nullptr;
 	}
 
+
+
+	bool WeaponDefManager::waitForLoad(core::AssetBase* pWeaponDef)
+	{
+		X_ASSERT(pWeaponDef->getType() == assetDb::AssetType::WEAPON, "Invalid asset passed")();
+
+		if (pWeaponDef->isLoaded()) {
+			return true;
+		}
+
+		return waitForLoad(static_cast<WeaponDef*>(pWeaponDef));
+	}
+
+
 	bool WeaponDefManager::waitForLoad(WeaponDef* pWeaponDef)
 	{
 		if (pWeaponDef->getStatus() == core::LoadStatus::Complete) {
