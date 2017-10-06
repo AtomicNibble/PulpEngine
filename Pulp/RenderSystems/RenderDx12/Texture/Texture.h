@@ -19,6 +19,9 @@ class TextureManager;
 
 	// we don't align this type, the allocator aligns it.
 	// since we inherit this type.
+
+	// not using core::BaseAsset currently but it can work with it.
+	// as this texture has like no disk activity etc.
 	class Texture : public render::IPixelBuffer // ::texture::ITexture
 	{
 		friend TextureManager;
