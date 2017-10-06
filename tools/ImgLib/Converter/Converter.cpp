@@ -146,10 +146,6 @@ namespace Converter
 		{
 			auto imgFlags = img.getFlags();
 
-			// check for flags that should not be set.
-			CompileFlags::Description flagDsc;
-			X_ASSERT(!imgFlags.IsSet(TexFlag::LOAD_FAILED), "Load failed flag set")(flags.ToString(flagDsc));
-
 			// clear some. (temp)
 			imgFlags.Set(TexFlag::CI_IMG);
 			imgFlags.Set(TexFlag::ALPHA);
@@ -159,6 +155,7 @@ namespace Converter
 				imgFlags.Set(TexFlag::STREAMABLE);
 			}
 			if (flags.IsSet(CompileFlag::HI_MIP_STREAMING)) {
+				CompileFlags::Description flagDsc;
 				X_ASSERT(imgFlags.IsSet(TexFlag::STREAMABLE), "HimipStreaming set without streamable flag")(flags.ToString(flagDsc));
 				imgFlags.Set(TexFlag::HI_MIP_STREAMING);
 			}
