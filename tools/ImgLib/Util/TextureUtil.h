@@ -34,7 +34,12 @@ namespace Util
 	IMGLIB_EXPORT const char* getExtension(ImgFileFormat::Enum fmt);
 	IMGLIB_EXPORT bool flipVertical(XTextureFile& img, core::MemoryArenaBase* swap);
 
-	// not exported currently.
+	// --- not exported currently -----
+
+	// feel like these bgrToRgb, should not really be here / have better names.
+	bool bgrToRgb(XTextureFile& img, core::MemoryArenaBase* swap);
+	bool bgrToRgb(const XTextureFile& img, XTextureFile& imgOut, core::MemoryArenaBase* swap);
+
 	bool loadImage(core::MemoryArenaBase* swap, const core::Array<uint8_t>& fileData, ImgFileFormat::Enum fmt, XTextureFile& img);
 	bool loadImage(core::MemoryArenaBase* swap, core::XFile* pFile, ImgFileFormat::Enum fmt, XTextureFile& img);
 

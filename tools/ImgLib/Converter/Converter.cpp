@@ -476,24 +476,10 @@ namespace Converter
 			// if we brg8 need to switch channels.
 			if (srcImg_.getFormat() == Texturefmt::B8G8R8A8)
 			{
-				// where is the best place to put this channel flip logic?
-				// right here, seams like best place to call it, but should it be impl in util?
-				for (size_t face = 0; face < srcImg_.getNumFaces(); face++)
-				{
-					for (size_t mip = 0; mip < srcImg_.getNumMips(); mip++)
-					{
-						uint8_t* pSrc = srcImg_.getLevel(face, mip);
-						const size_t numPixel = srcImg_.getLevelSize(mip) / 4;
-
-						for (size_t i = 0; i < numPixel; i++)
-						{
-							std::swap(pSrc[0], pSrc[2]);
-							pSrc += 4;
-						}
-					}
+				if (Util::bgrToRgb(srcImg_, swapArena_)) {
+					X_ERROR("Img", "Failed to convert to bgr to rgb");
+					return false;
 				}
-
-				srcImg_.setFormat(Texturefmt::R8G8B8A8);
 			}
 
 			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8)
@@ -520,6 +506,11 @@ namespace Converter
 					Texturefmt::ToString(targetFmt), Texturefmt::ToString(srcImg_.getFormat()));
 				return false;
 			}
+
+			if (srcImg_.getFormat() == Texturefmt::B8G8R8A8)
+			{
+				return Util::bgrToRgb(srcImg_, dstImg_, swapArena_);
+			}
 		}
 		else
 		{
@@ -541,37 +532,6 @@ namespace Converter
 		dstImg_.setNumFaces(srcImg_.getNumFaces());
 		dstImg_.setDepth(1);
 		dstImg_.resize();
-
-
-		if (targetFmt == Texturefmt::R8G8B8A8)
-		{
-			X_ASSERT(srcImg_.getFormat() == Texturefmt::B8G8R8A8, "Unexpceted src format")();
-
-			for (size_t face = 0; face < srcImg_.getNumFaces(); face++)
-			{
-				for (size_t mip = 0; mip < srcImg_.getNumMips(); mip++)
-				{
-					uint8_t* pSrc = srcImg_.getLevel(face, mip);
-					uint8_t* pDst = dstImg_.getLevel(face, mip);
-					
-					const size_t numPixel = srcImg_.getLevelSize(mip) / 4;
-
-					for (size_t i = 0; i < numPixel; i++)
-					{
-						pDst[0] = pSrc[2];
-						pDst[1] = pSrc[1];
-						pDst[2] = pSrc[0];
-						pDst[3] = pSrc[3];
-
-						pSrc += 4;
-						pDst += 4;
-					}
-				}
-			}
-
-			return true;
-		}
-
 
 		core::V2::JobSystem& jobSys = *gEnv->pJobSys;
 		core::V2::Job* pRootJob = nullptr;

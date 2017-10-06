@@ -867,6 +867,130 @@ namespace Util
 
 	// ==================================================================
 
+	bool bgrToRgb(XTextureFile& img, core::MemoryArenaBase* swap)
+	{
+		X_UNUSED(swap);
+
+		if (img.getFormat() != Texturefmt::B8G8R8A8 && img.getFormat() != Texturefmt::B8G8R8) {
+			X_ERROR("Img", "Source image is not brg, fmt: %s", Texturefmt::ToString(img.getFormat()));
+			return false;
+		}
+
+		if (img.getDepth() > 1) {
+			X_ERROR("Img", "Converting to bgr not supported for textures with depth");
+			return false;
+		}
+
+		for (size_t face = 0; face < img.getNumFaces(); face++)
+		{
+			for (size_t mip = 0; mip < img.getNumMips(); mip++)
+			{
+				uint8_t* pSrc = img.getLevel(face, mip);
+
+				if (img.getFormat() == Texturefmt::B8G8R8) 
+				{
+					const size_t numPixel = img.getLevelSize(mip) / 3;
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						std::swap(pSrc[0], pSrc[2]);
+						pSrc += 3;
+					}
+				}
+				else if (img.getFormat() == Texturefmt::B8G8R8A8)
+				{
+					const size_t numPixel = img.getLevelSize(mip) / 4;
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						std::swap(pSrc[0], pSrc[2]);
+						pSrc += 4;
+					}
+				}
+				else
+				{
+					X_ASSERT_UNREACHABLE();
+				}
+			}
+		}
+
+		img.setFormat(Texturefmt::R8G8B8A8);
+		return true;
+	}
+
+	bool bgrToRgb(const XTextureFile& img, XTextureFile& imgOut, core::MemoryArenaBase* swap)
+	{
+		X_UNUSED(swap);
+
+		if (img.getFormat() == Texturefmt::B8G8R8A8) {
+			imgOut.setFormat(Texturefmt::R8G8B8A8);
+		}
+		else if (img.getFormat() == Texturefmt::B8G8R8) {
+			imgOut.setFormat(Texturefmt::R8G8B8);
+		}
+		else
+		{
+			X_ERROR("Img", "Source image is not brg, fmt: %s", Texturefmt::ToString(img.getFormat()));
+			return false;
+		}
+
+		if (img.getDepth() > 1) {
+			X_ERROR("Img", "Converting to bgr not supported for textures with depth");
+			return false;
+		}
+
+		imgOut.setSize(img.getSize());
+		imgOut.setType(img.getType());
+		imgOut.setNumMips(img.getNumMips());
+		imgOut.setNumFaces(img.getNumFaces());
+		imgOut.setDepth(img.getDepth());
+		imgOut.resize();
+
+		for (size_t face = 0; face < img.getNumFaces(); face++)
+		{
+			for (size_t mip = 0; mip < img.getNumMips(); mip++)
+			{ 
+				const uint8_t* pSrc = img.getLevel(face, mip);
+				uint8_t* pDst = imgOut.getLevel(face, mip);
+
+				if (img.getFormat() == Texturefmt::B8G8R8)
+				{
+					const size_t numPixel = img.getLevelSize(mip) / 3;
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						pDst[0] = pSrc[2];
+						pDst[1] = pSrc[1];
+						pDst[2] = pSrc[0];
+
+						pSrc += 3;
+						pDst += 3;
+					}
+				}
+				else if (img.getFormat() == Texturefmt::B8G8R8A8)
+				{
+					const size_t numPixel = img.getLevelSize(mip) / 4;
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						pDst[0] = pSrc[2];
+						pDst[1] = pSrc[1];
+						pDst[2] = pSrc[0];
+						pDst[3] = pSrc[3];
+
+						pSrc += 4;
+						pDst += 4;
+					}
+				}
+				else
+				{
+					X_ASSERT_UNREACHABLE();
+				}
+			}
+		}
+
+		return true;
+	}
+
+
+	// ==================================================================
+
 	bool loadImage(core::MemoryArenaBase* swap, const core::Array<uint8_t>& fileData, ImgFileFormat::Enum fmt, XTextureFile& img)
 	{
 		core::XFileFixedBuf file(fileData.begin(), fileData.end());
