@@ -83,8 +83,10 @@ public:
 	Material* findMaterial(const char* pMtlName) const X_FINAL;
 	Material* loadMaterial(const char* pMtlName) X_FINAL;
 	Material* getDefaultMaterial(void) const X_FINAL;
-
-	bool waitForLoad(Material* pMaterial) X_FINAL; // returns true if load succeed.
+	
+	// returns true if load succeed.
+	bool waitForLoad(core::AssetBase* pMaterial) X_FINAL; 
+	bool waitForLoad(Material* pMaterial) X_FINAL; 
 	void releaseMaterial(Material* pMat);
 
 	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, 

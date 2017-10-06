@@ -341,6 +341,14 @@ void XMaterialManager::dispatchPendingLoads(void)
 	while (dispatchPendingLoad(lock));
 }
 
+bool XMaterialManager::waitForLoad(core::AssetBase* pMaterial)
+{
+	if (pMaterial->getStatus() == core::LoadStatus::Complete) {
+		return true;
+	}
+
+	return waitForLoad(static_cast<Material*>(pMaterial));
+}
 
 bool XMaterialManager::waitForLoad(Material* pMaterial)
 {
@@ -349,7 +357,7 @@ bool XMaterialManager::waitForLoad(Material* pMaterial)
 	}
 
 	{
-		// we lock to see if loading as the setting of loading is performed inside this lock.
+		// we lock to see if loading as another thread might just be about to change state.
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 		while (pMaterial->getStatus() == core::LoadStatus::Loading)
 		{

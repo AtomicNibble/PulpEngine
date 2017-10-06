@@ -107,15 +107,6 @@ X_INLINE void Material::addTech(Tech&& tech)
 	techs_.append(std::forward<Tech>(tech));
 }
 
-X_INLINE bool Material::waitForLoad(IMaterialManager* pMatMan)
-{
-	if (isLoaded()) {
-		return true;
-	}
-
-	return pMatMan->waitForLoad(this);
-}
-
 X_INLINE void Material::setFlags(MaterialFlags flags)
 {
 	flags_ = flags;

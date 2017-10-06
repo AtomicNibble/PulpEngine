@@ -10,6 +10,7 @@
 #undef OPAQUE
 #endif // !OPAQUE
 
+#include <IAsyncLoad.h>
 #include <IShader.h>
 #include <IRender.h>
 #include <IConverterModule.h>
@@ -285,7 +286,7 @@ class Material;
 struct MaterialTech;
 
 
-struct IMaterialManager
+struct IMaterialManager : public core::IAssetLoader
 {
 	virtual ~IMaterialManager(){}
 

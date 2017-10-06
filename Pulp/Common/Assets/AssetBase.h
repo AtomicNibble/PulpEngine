@@ -17,6 +17,7 @@ public:
 	X_INLINE bool isLoaded(void) const;
 	X_INLINE bool loadFailed(void) const;
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
+	X_INLINE bool waitForLoad(IAssetLoader* pManager);
 
 	X_INLINE const core::string& getName(void) const;
 
@@ -61,6 +62,15 @@ X_INLINE bool AssetBase::loadFailed(void) const
 X_INLINE void AssetBase::setStatus(core::LoadStatus::Enum status)
 {
 	status_ = status;
+}
+
+X_INLINE bool AssetBase::waitForLoad(IAssetLoader* pManager)
+{
+	if (isLoaded()) {
+		return true;
+	}
+
+	return pManager->waitForLoad(this);
 }
 
 X_INLINE const core::string& AssetBase::getName(void) const

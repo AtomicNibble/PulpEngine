@@ -139,8 +139,6 @@ public:
 	MATLIB_EXPORT void assignProps(const Material& oth);
 	MATLIB_EXPORT void assignProps(const MaterialHeader& hdr);
 
-	X_INLINE bool waitForLoad(IMaterialManager* pMatMan);
-
 	X_INLINE void setFlags(MaterialFlags flags);
 	X_INLINE void setSurfaceType(MaterialSurType::Enum surfaceType);
 	X_INLINE void setCoverage(MaterialCoverage::Enum coverage);
