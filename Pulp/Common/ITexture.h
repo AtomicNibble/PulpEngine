@@ -159,9 +159,6 @@ X_DECLARE_FLAGS(TexFlag)(
 
 	RENDER_TARGET, 
 
-	// neither are set before loading starts.
-	// and only one of these we get set.
-	LOADED,
 	LOAD_FAILED
 );
 

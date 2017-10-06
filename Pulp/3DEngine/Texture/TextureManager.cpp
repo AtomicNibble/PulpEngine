@@ -234,7 +234,6 @@ void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRe
 	// who is this?
 	auto type = pReqBase->getType();
 	Texture* pTexture = pReqBase->getUserData<Texture>();
-	auto& flags = pTexture->flags();
 
 	if (type == core::IoRequest::OPEN)
 	{
@@ -242,7 +241,7 @@ void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRe
 
 		if (!pFile)
 		{
-			flags.Set(texture::TexFlag::LOAD_FAILED);
+			pTexture->setStatus(core::LoadStatus::Error);
 			loadComplete_.raise();
 			return;
 		}
@@ -271,7 +270,7 @@ void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRe
 		// if we have loaded the data, we now need to process it.
 		if (bytesRead != pReadReq->dataSize)
 		{
-			flags.Set(texture::TexFlag::LOAD_FAILED);
+			pTexture->setStatus(core::LoadStatus::Error);
 			loadComplete_.raise();
 			return;
 		}
@@ -300,14 +299,12 @@ void TextureManager::processCIFile_job(core::V2::JobSystem& jobSys, size_t threa
 
 void TextureManager::processCIFile(Texture* pTexture, const uint8_t* pData, size_t length)
 {
-	auto& flags = pTexture->flags();
-
 	core::XFileFixedBuf file(pData, pData + length);
 	texture::XTextureFile imgFile(&blockArena_);
 
 	if (!pCILoader_->loadTexture(&file, imgFile))
 	{
-		flags.Set(texture::TexFlag::LOAD_FAILED);
+		pTexture->setStatus(core::LoadStatus::Error);
 		return;
 	}
 	
@@ -316,7 +313,7 @@ void TextureManager::processCIFile(Texture* pTexture, const uint8_t* pData, size
 	// we need to upload the texture data.
 	gEnv->pRender->initDeviceTexture(pTexture->getDeviceTexture(), imgFile);
 
-	flags.Set(texture::TexFlag::LOADED);
+	pTexture->setStatus(core::LoadStatus::Complete);
 }
 
 
