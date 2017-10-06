@@ -57,13 +57,13 @@ namespace weapon
 
 		// wait for them to load.
 		for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++)	{
-			if (animations_[i] != 0) {
+			if (animations_[i] != nullptr) {
 				pAnimManager->waitForLoad(animations_[i]);
 			}
 		}
 
 		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
-			if (icons_[i] != 0) {
+			if (icons_[i] != nullptr) {
 				pMaterialMan->waitForLoad(icons_[i]);
 			}
 		}
