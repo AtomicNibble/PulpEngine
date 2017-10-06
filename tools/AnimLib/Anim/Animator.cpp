@@ -488,6 +488,9 @@ void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVa
 		float durMs = duration.GetMilliSeconds();
 		float playMs = playTime.GetMilliSeconds();
 
+		// maybe allow this and just don't play the anim.
+		X_ASSERT(playMs > 0.f, "invalid play duration")(playMs);
+
 		float rate = durMs / playMs;
 
 		anims_[0].setRate(rate);
