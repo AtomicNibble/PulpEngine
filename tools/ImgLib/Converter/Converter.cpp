@@ -512,6 +512,15 @@ namespace Converter
 				return false;
 			}
 		}
+		else if (targetFmt == Texturefmt::R8G8B8A8)
+		{
+			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8 && srcImg_.getFormat() != Texturefmt::B8G8R8A8)
+			{
+				X_ERROR("Img", "Converting to %s requires B8G8R8A8 or R8G8B8A8 src. have: %s",
+					Texturefmt::ToString(targetFmt), Texturefmt::ToString(srcImg_.getFormat()));
+				return false;
+			}
+		}
 		else
 		{
 			X_ERROR("Img", "Converting to %s not currently supported", Texturefmt::ToString(targetFmt));
@@ -532,6 +541,37 @@ namespace Converter
 		dstImg_.setNumFaces(srcImg_.getNumFaces());
 		dstImg_.setDepth(1);
 		dstImg_.resize();
+
+
+		if (targetFmt == Texturefmt::R8G8B8A8)
+		{
+			X_ASSERT(srcImg_.getFormat() == Texturefmt::B8G8R8A8, "Unexpceted src format")();
+
+			for (size_t face = 0; face < srcImg_.getNumFaces(); face++)
+			{
+				for (size_t mip = 0; mip < srcImg_.getNumMips(); mip++)
+				{
+					uint8_t* pSrc = srcImg_.getLevel(face, mip);
+					uint8_t* pDst = dstImg_.getLevel(face, mip);
+					
+					const size_t numPixel = srcImg_.getLevelSize(mip) / 4;
+
+					for (size_t i = 0; i < numPixel; i++)
+					{
+						pDst[0] = pSrc[2];
+						pDst[1] = pSrc[1];
+						pDst[2] = pSrc[0];
+						pDst[3] = pSrc[3];
+
+						pSrc += 4;
+						pDst += 4;
+					}
+				}
+			}
+
+			return true;
+		}
+
 
 		core::V2::JobSystem& jobSys = *gEnv->pJobSys;
 		core::V2::Job* pRootJob = nullptr;
