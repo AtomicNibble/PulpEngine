@@ -313,7 +313,7 @@ namespace entity
 
 		auto* pAnim = wpn.pWeaponDef->getAnim(animSlot);
 
-		pAnimManager_->waitForLoad(pAnim);
+		pAnim->waitForLoad(pAnimManager_);
 
 		if (transTime == 0_ms) {
 			animator.pAnimator->playAnim(pAnim, curTime, 0_ms);

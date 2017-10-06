@@ -71,7 +71,7 @@ namespace entity
 			auto& mesh = reg.get<Mesh>(entity);
 			auto& col = reg.get<MeshCollider>(entity);
 
-			pModelManager->waitForLoad(mesh.pModel);
+			mesh.pModel->waitForLoad(pModelManager);
 
 			if (!mesh.pModel->hasPhys())
 			{
