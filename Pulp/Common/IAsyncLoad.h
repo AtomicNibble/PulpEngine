@@ -13,6 +13,13 @@ X_DECLARE_ENUM8(LoadStatus) (
 	Error
 );
 
+class AssetBase;
 
+struct IAssetLoader
+{
+	virtual ~IAssetLoader() {}
+
+	virtual bool waitForLoad(AssetBase* passet) X_ABSTRACT;
+};
 
 X_NAMESPACE_END
