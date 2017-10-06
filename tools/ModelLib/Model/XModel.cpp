@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(model)
 
 
 XModel::XModel(core::string& name) :
-	name_(name),
+	core::AssetBase(name),
 	inverseBones_(g_ModelLibArena)
 {
 	id_ = 0;

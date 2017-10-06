@@ -5,15 +5,14 @@
 #define X_MODEL_H_
 
 #include <Util\UniquePointer.h>
+#include <Assets\AssetBase.h>
 
 #include <IModel.h>
-#include <IAsyncLoad.h>
-
 
 
 X_NAMESPACE_DECLARE(physics, 
-typedef uintptr_t Handle;
-typedef Handle ActorHandle;
+	typedef uintptr_t Handle;
+	typedef Handle ActorHandle;
 )
 
 X_NAMESPACE_DECLARE(engine, struct IMaterialManager)
@@ -21,7 +20,7 @@ X_NAMESPACE_DECLARE(engine, struct IMaterialManager)
 X_NAMESPACE_BEGIN(model)
 
 
-class XModel
+class XModel : public core::AssetBase
 {
 	X_NO_COPY(XModel);
 	X_NO_ASSIGN(XModel);
@@ -32,15 +31,7 @@ public:
 	MODELLIB_EXPORT XModel(core::string& name);
 	MODELLIB_EXPORT virtual ~XModel();
 
-	X_INLINE const int32_t getID(void) const;
-	X_INLINE void setID(int32_t id);
 
-	X_INLINE core::LoadStatus::Enum getStatus(void) const;
-	X_INLINE bool isLoaded(void) const;
-	X_INLINE bool loadFailed(void) const;
-	X_INLINE void setStatus(core::LoadStatus::Enum status);
-
-	X_INLINE const core::string& getName(void) const;
 	X_INLINE int32_t getNumLods(void) const;
 	X_INLINE int32_t getNumBones(void) const;
 	X_INLINE int32_t getNumRootBones(void) const;

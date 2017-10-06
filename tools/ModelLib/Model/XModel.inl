@@ -2,41 +2,6 @@
 X_NAMESPACE_BEGIN(model)
 
 
-X_INLINE const int32_t XModel::getID(void) const
-{
-	return id_;
-}
-
-X_INLINE void XModel::setID(int32_t id)
-{
-	id_ = id;
-}
-
-X_INLINE core::LoadStatus::Enum XModel::getStatus(void) const
-{
-	return status_;
-}
-
-X_INLINE bool XModel::isLoaded(void) const
-{
-	return status_ == core::LoadStatus::Complete;
-}
-
-X_INLINE bool XModel::loadFailed(void) const
-{
-	return status_ == core::LoadStatus::Error;
-}
-
-X_INLINE void XModel::setStatus(core::LoadStatus::Enum status)
-{
-	status_ = status;
-}
-
-X_INLINE const core::string& XModel::getName(void) const
-{
-	return name_;
-}
-
 X_INLINE int32_t XModel::getNumLods(void) const
 {
 	return hdr_.numLod;
