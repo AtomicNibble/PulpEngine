@@ -1,11 +1,13 @@
 #pragma once
 
+#include <IAsyncLoad.h>
+
 X_NAMESPACE_BEGIN(anim)
 
 
 class Anim;
 
-struct IAnimManager
+struct IAnimManager : public core::IAssetLoader
 {
 	virtual ~IAnimManager() {}
 
@@ -14,7 +16,6 @@ struct IAnimManager
 	virtual Anim* loadAnim(const char* pAnimName) X_ABSTRACT;
 
 	virtual bool waitForLoad(Anim* pAnim) X_ABSTRACT; // returns true if load succeed.
-
 };
 
 

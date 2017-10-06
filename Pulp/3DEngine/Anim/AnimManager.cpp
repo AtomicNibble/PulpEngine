@@ -176,6 +176,15 @@ void AnimManager::listAnims(const char* pSearchPatten) const
 	X_LOG0("Anim", "------------ ^8Anims End^7 --------------");
 }
 
+bool AnimManager::waitForLoad(core::AssetBase* pAnim)
+{
+	if (pAnim->isLoaded()) {
+		return true;
+	}
+
+	return waitForLoad(static_cast<Anim*>(pAnim));
+}
+
 bool AnimManager::waitForLoad(Anim* pAnim)
 {
 	{
