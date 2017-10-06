@@ -256,7 +256,7 @@ Vec3f Bone::GetPostion(int32_t idx) const
 // ----------------------------------
 
 Anim::Anim(core::string& name, core::MemoryArenaBase* arena) :
-	name_(name),
+	core::AssetBase(name),
 	bones_(arena)
 {
 	id_ = 0;

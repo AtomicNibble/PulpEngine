@@ -1,44 +1,6 @@
 
 X_NAMESPACE_BEGIN(anim)
 
-
-
-X_INLINE const int32_t Anim::getID(void) const
-{
-	return id_;
-}
-
-X_INLINE void Anim::setID(int32_t id)
-{
-	id_ = id;
-}
-
-
-X_INLINE core::LoadStatus::Enum Anim::getStatus(void) const
-{
-	return status_;
-}
-
-X_INLINE bool Anim::isLoaded(void) const
-{
-	return status_ == core::LoadStatus::Complete;
-}
-
-X_INLINE bool Anim::loadFailed(void) const
-{
-	return status_ == core::LoadStatus::Error;
-}
-
-X_INLINE void Anim::setStatus(core::LoadStatus::Enum status)
-{
-	status_ = status;
-}
-
-X_INLINE const core::string& Anim::getName(void) const
-{
-	return name_;
-}
-
 X_INLINE int32_t Anim::getNumBones(void) const
 {
 	return hdr_.numBones;

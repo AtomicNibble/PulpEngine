@@ -1,7 +1,7 @@
 #pragma once
 
 #include <IAnimation.h>
-#include <IAsyncLoad.h>
+#include <Assets\AssetBase.h>
 
 #include <Time\TimeVal.h>
 #include <Util\UniquePointer.h>
@@ -56,7 +56,7 @@ private:
 };
 
 
-class Anim 
+class Anim : public core::AssetBase
 {
 	X_NO_COPY(Anim);
 	X_NO_ASSIGN(Anim);
@@ -79,20 +79,10 @@ class Anim
 	typedef core::Array<Transformf> TransformArr;
 
 
-
 public:
 	ANIMLIB_EXPORT Anim(core::string& name, core::MemoryArenaBase* arena);
 	ANIMLIB_EXPORT ~Anim();
 
-	X_INLINE const int32_t getID(void) const;
-	X_INLINE void setID(int32_t id);
-
-	X_INLINE core::LoadStatus::Enum getStatus(void) const;
-	X_INLINE bool isLoaded(void) const;
-	X_INLINE bool loadFailed(void) const;
-	X_INLINE void setStatus(core::LoadStatus::Enum status);
-
-	X_INLINE const core::string& getName(void) const;
 	X_INLINE int32_t getNumBones(void) const;
 	X_INLINE int32_t getNumFrames(void) const;
 	X_INLINE int32_t getFps(void) const;
@@ -114,12 +104,6 @@ private:
 
 
 private:
-	int32_t id_;
-	core::string name_;
-
-	core::LoadStatus::Enum status_;
-	uint8_t _pad[3];
-
 	BoneArr bones_;
 
 	core::UniquePointer<uint8_t[]> data_;
