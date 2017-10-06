@@ -62,7 +62,7 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 // -------------------------------------------------------------------------------
 
 X_INLINE Material::Material(core::string& name, core::MemoryArenaBase* arena) :
-	core::AssetBase(name),
+	core::AssetBase(name, assetDb::AssetType::MATERIAL),
 	pTechDefState_(nullptr),
 	techs_(arena),
 	params_(arena),

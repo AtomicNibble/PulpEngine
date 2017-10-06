@@ -5,7 +5,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 Texture::Texture(core::string name, texture::TextureFlags flags, render::IDeviceTexture* pDeviceTexture) :
-	core::AssetBase(name),
+	core::AssetBase(name, assetDb::AssetType::IMG),
 	flags_(flags),
 	pDeviceTexture_(X_ASSERT_NOT_NULL(pDeviceTexture))
 {
