@@ -85,7 +85,6 @@ X_NAMESPACE_BEGIN(texture)
 		core::string name("id_");
 		name.append(idStr.begin(), idStr.end());
 
-
 		TexRes* pTexRes = nullptr;
 		{
 			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
