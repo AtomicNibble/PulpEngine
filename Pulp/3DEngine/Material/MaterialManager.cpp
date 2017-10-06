@@ -230,7 +230,7 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
 {
 	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-	core::Array<MaterialResource*> sorted_mats(g_3dEngineArena);
+	core::Array<MaterialResource*> sorted_mats(arena_);
 	sorted_mats.setGranularity(materials_.size());
 
 	for (const auto& mat : materials_)
