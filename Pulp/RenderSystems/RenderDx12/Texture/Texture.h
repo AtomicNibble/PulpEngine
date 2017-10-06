@@ -28,7 +28,6 @@ class TextureManager;
 		friend class render::ShadowBuffer;
 
 	public:
-		Texture(const char* pName, TextureFlags flags);
 		Texture(core::string name, TextureFlags flags);
 		~Texture();
 
