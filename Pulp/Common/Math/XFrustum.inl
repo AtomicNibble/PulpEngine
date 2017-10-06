@@ -24,17 +24,10 @@ X_INLINE XFrustum::XFrustum()
 
 
 // set some data
-X_INLINE void XFrustum::setPosition(const Vec3f& pos)
+X_INLINE void XFrustum::set(const Matrix33f& axis, const Vec3f& pos)
 {
+	mat_ = axis;
 	mat_.setTranslate(pos);
-	UpdateFrustum();
-}
-
-X_INLINE void XFrustum::setAxis(const Matrix33f& mat)
-{
-	Vec3f temp = mat_.getTranslate();
-	mat_ = mat;
-	mat_.setTranslate(temp);
 
 	UpdateFrustum();
 }
@@ -117,17 +110,17 @@ X_INLINE float32_t XFrustum::getFarPlane(void) const
 // --------------------------------
 
 
-X_INLINE Vec3f XFrustum::getEdgeP(void) const
+X_INLINE const Vec3f& XFrustum::getEdgeP(void) const
 { 
 	return edge_plt_; 
 }
 
-X_INLINE Vec3f XFrustum::getEdgeN(void) const
+X_INLINE const Vec3f& XFrustum::getEdgeN(void) const
 {
 	return edge_nlt_;
 }
 
-X_INLINE Vec3f XFrustum::getEdgeF(void) const
+X_INLINE const Vec3f& XFrustum::getEdgeF(void) const
 {
 	return edge_flt_; 
 }
@@ -137,22 +130,27 @@ X_INLINE Vec3f XFrustum::getEdgeF(void) const
 
 X_INLINE bool XFrustum::cullPoint(const Vec3f& point) const
 {
-	if (planes_[FrustumPlane::NEAR].distance(point) > 0)
+	if (planes_[FrustumPlane::NEAR].distance(point) > 0) {
 		return false;
-	if (planes_[FrustumPlane::RIGHT].distance(point)> 0)
+	}
+	if (planes_[FrustumPlane::RIGHT].distance(point) > 0) {
 		return false;
-	if (planes_[FrustumPlane::LEFT].distance(point) > 0)
+	}
+	if (planes_[FrustumPlane::LEFT].distance(point) > 0) {
 		return false;
-	if (planes_[FrustumPlane::TOP].distance(point) > 0)
+	}
+	if (planes_[FrustumPlane::TOP].distance(point) > 0) {
 		return false;
-	if (planes_[FrustumPlane::BOTTOM].distance(point) > 0)
+	}
+	if (planes_[FrustumPlane::BOTTOM].distance(point) > 0) {
 		return false;
-	if (planes_[FrustumPlane::FAR].distance(point) > 0)
+	}
+	if (planes_[FrustumPlane::FAR].distance(point) > 0) {
 		return false;
+	}
 
 	return true;
 }
-
 
 
 X_INLINE bool XFrustum::cullAABB_Fast(const AABB& box) const
@@ -163,12 +161,14 @@ X_INLINE bool XFrustum::cullAABB_Fast(const AABB& box) const
 X_INLINE bool XFrustum::cullAABB_Exact(const AABB& box) const
 {
 	CullResult::Enum o = cullAABB_FastT(box);
-	if (o == CullResult::EXCLUSION)
+	if (o == CullResult::EXCLUSION) {
 		return false;
-	if (o == CullResult::INCLUSION) 
+	}
+	if (o == CullResult::INCLUSION) {
 		return true;
+	}
 
-	return AdditionalCheck(box) == CullResult::EXCLUSION;
+	return additionalCheck(box) == CullResult::EXCLUSION;
 }
 
 X_INLINE CullResult::Enum XFrustum::cullAABB_FastT(const AABB& box) const
@@ -232,8 +232,9 @@ X_INLINE CullResult::Enum XFrustum::cullAABB_ExactT(const AABB& box) const
 {
 	CullResult::Enum o = cullAABB_FastT(box);
 
-	if (o == CullResult::OVERLAP)
-		return AdditionalCheck(box);
+	if (o == CullResult::OVERLAP) {
+		return additionalCheck(box);
+	}
 
 	return o;
 }
@@ -269,43 +270,49 @@ X_INLINE CullResult::Enum XFrustum::cullOBB_FastT(const OBB& obb) const
 	if ((t = planes_[FrustumPlane::NEAR].distance(p)) > 0.0f) {
 		if (t > (math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((t = planes_[FrustumPlane::FAR].distance(p)) > 0.0f) {
 		if (t > (math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((t = planes_[FrustumPlane::RIGHT].distance(p)) > 0.0f) {
 		if (t > (math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((t = planes_[FrustumPlane::LEFT].distance(p)) > 0.0f) {
 		if (t > (math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((t = planes_[FrustumPlane::TOP].distance(p)) > 0.0f) {
 		if (t > (math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((t = planes_[FrustumPlane::BOTTOM].distance(p)) > 0.0f) {
 		if (t > (math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	//probably the OBB is visible! 
@@ -336,50 +343,57 @@ X_INLINE CullResult::Enum XFrustum::cullOBB_ExactT(const OBB& obb) const
 	if ((mt0 = (t0 = planes_[FrustumPlane::NEAR].distance(p)) > 0.0f)) {
 		if (t0 > (math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::NEAR].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((mt1 = (t1 = planes_[FrustumPlane::FAR].distance(p)) > 0.0f))	{
 		if (t1 > (math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::FAR].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((mt2 = (t2 = planes_[FrustumPlane::RIGHT].distance(p)) > 0.0f)) {
 		if (t2 > (math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::RIGHT].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((mt3 = (t3 = planes_[FrustumPlane::LEFT].distance(p)) > 0.0f))	{
 		if (t3 > (math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::LEFT].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((mt4 = (t4 = planes_[FrustumPlane::TOP].distance(p)) > 0.0f)) {
 		if (t4 > (math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | ax) +
 			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | ay) +
-			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | az)))
+			math<float>::abs(planes_[FrustumPlane::TOP].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	if ((mt5 = (t5 = planes_[FrustumPlane::BOTTOM].distance(p)) > 0.0f)) {
-		if (t5 > (math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ax) + 
-			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ay) + 
-			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | az)))
+		if (t5 > (math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ax) +
+			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | ay) +
+			math<float>::abs(planes_[FrustumPlane::BOTTOM].getNormal() | az))) {
 			return CullResult::EXCLUSION;
+		}
 	}
 
 	//if obb-center is in view-frustum, then stop further calculation
-	if (!(mt0 | mt1 | mt2 | mt3 | mt4 | mt5)) 
+	if (!(mt0 | mt1 | mt2 | mt3 | mt4 | mt5)) {
 		return CullResult::OVERLAP;
+	}
 
-	return AdditionalCheck(obb, scale);
+	return additionalCheck(obb, scale);
 }
 
 
@@ -456,56 +470,13 @@ X_INLINE CullResult::Enum XFrustum::cullSphere_ExactT(const Sphere& s) const
 }
 
 // ---------------------------------------------------------------
-
-
-X_INLINE void XFrustum::GetFrustumVertices(std::array<Vec3f, 8>& verts) const
-{
-	Matrix33f m33 = Matrix33f(mat_);
-	Vec3f pos = getPosition();
-
-
-	verts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
-	verts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
-	verts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
-	verts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
-
-	verts[4] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
-	verts[5] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
-	verts[6] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
-	verts[7] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
-}
-
-
-X_INLINE void XFrustum::GetFrustumVertices(std::array<Vec3f, 12>& verts) const
-{
-	Matrix33f m33 = Matrix33f(mat_);
-	Vec3f pos = getPosition();
-
-
-	verts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
-	verts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
-	verts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
-	verts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
-
-	verts[4] = m33*Vec3f(+edge_plt_.x, +edge_plt_.y, +edge_plt_.z) + pos;
-	verts[5] = m33*Vec3f(+edge_plt_.x, +edge_plt_.y, -edge_plt_.z) + pos;
-	verts[6] = m33*Vec3f(-edge_plt_.x, +edge_plt_.y, -edge_plt_.z) + pos;
-	verts[7] = m33*Vec3f(-edge_plt_.x, +edge_plt_.y, +edge_plt_.z) + pos;
-
-	verts[8] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
-	verts[9] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
-	verts[10] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
-	verts[11] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
-}
-
-// ---------------------------------------------------------------
 namespace Frustum
 {
 	extern uint8_t BoxSides[];
 }
 
 
-X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const AABB& aabb) const
+X_INLINE CullResult::Enum XFrustum::additionalCheck(const AABB& aabb) const
 {
 	Vec3<float32_t> m(aabb.center()); // (aabb.min + aabb.max)*0.5;
 	uint32 o = 1; //will be reset to 0 if center is outside
@@ -518,8 +489,9 @@ X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const AABB& aabb) const
 	o &= math<float>::isneg(planes_[1].distance(m));
 	
 	//if obb-center is in view-frustum, then stop further calculation
-	if (o) 
-		return CullResult::OVERLAP; 
+	if (o) {
+		return CullResult::OVERLAP;
+	}
 
 	Vec3<float32_t> vmin(aabb.min - getPosition());  //AABB in camera-space
 	Vec3<float32_t> vmax(aabb.max - getPosition());  //AABB in camera-space
@@ -550,8 +522,9 @@ X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const AABB& aabb) const
 	frontx8 |= (umaxz.intVal >> 0x3f) & 0x100;
 
 	//check if camera is inside the aabb
-	if (frontx8 == 0)	
+	if (frontx8 == 0) {
 		return CullResult::OVERLAP; //AABB is patially visible
+	}
 
 	Vec3<float32_t> v[8] = {
 		Vec3<float32_t>(vmin.x, vmin.y, vmin.z),
@@ -633,7 +606,7 @@ X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const AABB& aabb) const
 }
 
 
-X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const OBB& obb, float32_t scale) const
+X_INLINE CullResult::Enum XFrustum::additionalCheck(const OBB& obb, float32_t scale) const
 {
 	Vec3f CamInOBBSpace = getPosition();
 //	Vec3f iCamPos = (-CamInOBBSpace)*obb.orientation();
@@ -648,8 +621,9 @@ X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const OBB& obb, float32_t sc
 	if (iCamPos.z<aabb.min.z)  front8 |= 0x080;
 	if (iCamPos.z>aabb.max.z)  front8 |= 0x100;
 
-	if (front8 == 0) 
+	if (front8 == 0) {
 		return CullResult::OVERLAP;
+	}
 
 	// the transformed OBB-vertices in cam-space
 	Vec3f v[8] = {
@@ -730,17 +704,6 @@ X_INLINE CullResult::Enum XFrustum::AdditionalCheck(const OBB& obb, float32_t sc
 
 	//now we are 100% sure that the OBB is visible on the screen
 	return CullResult::OVERLAP;
-}
-
-
-X_INLINE void XFrustum::setAngles(const Vec3f& angles)
-{
-	setAxis(Matrix33f::createRotation(angles));
-}
-
-X_INLINE Planef XFrustum::getFrustumPlane(FrustumPlane::Enum pl)
-{
-	return planes_[pl];
 }
 
 X_INLINE const Planef& XFrustum::getFrustumPlane(FrustumPlane::Enum pl) const

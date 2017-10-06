@@ -73,7 +73,7 @@ public:
 	XCamera() = default;
 	~XCamera() = default;
 
-	X_INLINE void SetFrustum(uint32_t width, uint32_t height, 
+	X_INLINE void setFrustum(uint32_t width, uint32_t height,
 		float32_t fov = DEFAULT_FOV, float32_t nearplane = DEFAULT_NEAR, 
 		float32_t farpane = DEFAULT_FAR, float32_t pixelAspectRatio = 1.0f);
 
@@ -89,13 +89,12 @@ private:
 };
 
 
-X_INLINE void XCamera::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV,
+X_INLINE void XCamera::setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV,
 	float32_t nearplane, float32_t farpane, float32_t fPixelAspectRatio)
 {
-	XFrustum::SetFrustum(nWidth, nHeight, FOV,
+	XFrustum::setFrustum(nWidth, nHeight, FOV,
 		nearplane, farpane, fPixelAspectRatio);
 }
-
 
 
 X_INLINE const Matrix44f& XCamera::getProjectionMatrix(void) const

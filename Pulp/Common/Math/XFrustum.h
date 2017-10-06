@@ -38,12 +38,11 @@ class XFrustum
 public:
 	XFrustum();
 
-	void SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
+	void setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
 		float32_t farpane, float32_t fPixelAspectRatio);
 
 	// set some data
-	X_INLINE void setPosition(const Vec3f& pos);
-	X_INLINE void setAxis(const Matrix33f& mat);
+	X_INLINE void set(const Matrix33f& axis, const Vec3f& pos);
 	X_INLINE void setSize(float dNear, float dFar, float dLeft, float dUp);
 	void setFov(float fov);
 
@@ -62,12 +61,10 @@ public:
 
 	X_INLINE float32_t getNearPlane(void) const;
 	X_INLINE float32_t getFarPlane(void) const;
-	X_INLINE Vec3f getEdgeP(void) const;
-	X_INLINE Vec3f getEdgeN(void) const;
-	X_INLINE Vec3f getEdgeF(void) const;
+	X_INLINE const Vec3f& getEdgeP(void) const;
+	X_INLINE const Vec3f& getEdgeN(void) const;
+	X_INLINE const Vec3f& getEdgeF(void) const;
 
-	X_INLINE void setAngles(const Vec3f& angles);
-	X_INLINE Planef getFrustumPlane(FrustumPlane::Enum pl);
 	X_INLINE const Planef& getFrustumPlane(FrustumPlane::Enum pl) const;
 
 	// fast culling but might not cull everything outside the frustum
@@ -102,8 +99,8 @@ public:
 		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
 
 private:
-	CullResult::Enum AdditionalCheck(const AABB& aabb) const;
-	CullResult::Enum AdditionalCheck(const OBB& obb, float32_t scale) const;
+	CullResult::Enum additionalCheck(const AABB& aabb) const;
+	CullResult::Enum additionalCheck(const OBB& obb, float32_t scale) const;
 
 
 protected:

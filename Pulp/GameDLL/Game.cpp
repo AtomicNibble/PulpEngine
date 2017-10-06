@@ -82,7 +82,7 @@ bool XGame::init(void)
 	X_ASSERT(deimension.x > 0, "height is not valid")(deimension.x);
 	X_ASSERT(deimension.y > 0, "height is not valid")(deimension.y);
 
-	cam_.SetFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
+	cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
 
 	// fiuxed for now, will match network id or something later
 	localClientId_ = 0;

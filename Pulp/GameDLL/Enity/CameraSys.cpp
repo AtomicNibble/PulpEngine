@@ -26,7 +26,7 @@ namespace entity
 	{
 		auto deimension = gEnv->pRender->getDisplayRes();
 
-		cam_.SetFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
+		cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
 
 
 		ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, cameraPos_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
@@ -71,9 +71,9 @@ namespace entity
 			}
 		}
 
-		cam_.setAxis(mat33);
+		cam_.set(mat33, cameraPos_);
 	//	cam_.setAngles(cameraAngle_);
-		cam_.setPosition(cameraPos_);
+	//	cam_.setPosition(cameraPos_);
 
 		// Pro
 		frame.view.cam = cam_;

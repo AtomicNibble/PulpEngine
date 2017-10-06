@@ -76,7 +76,7 @@ uint8 BoxSides[0x40 * 8] =
 
 }
 
-void XFrustum::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
+void XFrustum::setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
 	float32_t farpane, float32_t fPixelAspectRatio)
 {
 	X_ASSERT(nearplane>0.001f,"near plane not valid")(nearplane);		//check if near-plane is valid
@@ -209,6 +209,45 @@ void XFrustum::UpdateFrustum(void)
 
 // --------------------------------
 
+void XFrustum::GetFrustumVertices(std::array<Vec3f, 8>& verts) const
+{
+	Matrix33f m33 = Matrix33f(mat_);
+	Vec3f pos = getPosition();
+
+	verts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+	verts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+
+	verts[4] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+	verts[5] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[6] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[7] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+}
+
+
+void XFrustum::GetFrustumVertices(std::array<Vec3f, 12>& verts) const
+{
+	Matrix33f m33 = Matrix33f(mat_);
+	Vec3f pos = getPosition();
+
+	verts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+	verts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+
+	verts[4] = m33*Vec3f(+edge_plt_.x, +edge_plt_.y, +edge_plt_.z) + pos;
+	verts[5] = m33*Vec3f(+edge_plt_.x, +edge_plt_.y, -edge_plt_.z) + pos;
+	verts[6] = m33*Vec3f(-edge_plt_.x, +edge_plt_.y, -edge_plt_.z) + pos;
+	verts[7] = m33*Vec3f(-edge_plt_.x, +edge_plt_.y, +edge_plt_.z) + pos;
+
+	verts[8] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+	verts[9] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[10] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[11] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+}
+
+// --------------------------------
 
 
 void XFrustum::getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
