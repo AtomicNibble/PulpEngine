@@ -256,14 +256,15 @@ namespace profiler
 		{
 			if (sub.pWarningMat)
 			{
-				pMatMan->waitForLoad(sub.pWarningMat);
+				sub.pWarningMat->waitForLoad(pMatMan);
 			}
 		}
 
-		pMatMan->waitForLoad(pWarnTotalMem_);
-		pMatMan->waitForLoad(pWarnTextureMem_);
-		pMatMan->waitForLoad(pWarnSndMem_);
-		pMatMan->waitForLoad(pWarnFileSys_);
+		pWarnTotalMem_->waitForLoad(pMatMan);
+		pWarnTotalMem_->waitForLoad(pMatMan);
+		pWarnTextureMem_->waitForLoad(pMatMan);
+		pWarnSndMem_->waitForLoad(pMatMan);
+		pWarnFileSys_->waitForLoad(pMatMan);
 
 
 #endif // !X_ENABLE_PROFILER_WARNINGS
