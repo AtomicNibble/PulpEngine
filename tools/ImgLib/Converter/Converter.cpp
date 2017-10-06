@@ -148,7 +148,7 @@ namespace Converter
 
 			// check for flags that should not be set.
 			CompileFlags::Description flagDsc;
-			X_ASSERT(!imgFlags.IsSet(TexFlag::LOAD_FAILED), "Load faild flag set")(flags.ToString(flagDsc));
+			X_ASSERT(!imgFlags.IsSet(TexFlag::LOAD_FAILED), "Load failed flag set")(flags.ToString(flagDsc));
 
 			// clear some. (temp)
 			imgFlags.Set(TexFlag::CI_IMG);
