@@ -14,6 +14,7 @@ public:
 	X_INLINE void setID(int32_t id);
 
 	X_INLINE core::LoadStatus::Enum getStatus(void) const;
+	X_INLINE bool isLoading(void) const;
 	X_INLINE bool isLoaded(void) const;
 	X_INLINE bool loadFailed(void) const;
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
@@ -47,6 +48,11 @@ X_INLINE void AssetBase::setID(int32_t id)
 X_INLINE core::LoadStatus::Enum AssetBase::getStatus(void) const
 {
 	return status_;
+}
+
+X_INLINE bool AssetBase::isLoading(void) const
+{
+	return !isLoaded() && !loadFailed();
 }
 
 X_INLINE bool AssetBase::isLoaded(void) const
