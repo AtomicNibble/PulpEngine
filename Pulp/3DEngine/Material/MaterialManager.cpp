@@ -343,6 +343,8 @@ void XMaterialManager::dispatchPendingLoads(void)
 
 bool XMaterialManager::waitForLoad(core::AssetBase* pMaterial)
 {
+	X_ASSERT(pMaterial->getType() == assetDb::AssetType::MATERIAL, "Invalid asset passed")();
+
 	if (pMaterial->getStatus() == core::LoadStatus::Complete) {
 		return true;
 	}

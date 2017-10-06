@@ -178,6 +178,8 @@ void AnimManager::listAnims(const char* pSearchPatten) const
 
 bool AnimManager::waitForLoad(core::AssetBase* pAnim)
 {
+	X_ASSERT(pAnim->getType() == assetDb::AssetType::ANIM, "Invalid asset passed")();
+
 	if (pAnim->isLoaded()) {
 		return true;
 	}
