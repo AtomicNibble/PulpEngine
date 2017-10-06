@@ -640,48 +640,6 @@ namespace Converter
 							jobSys.Run(pJob);
 						}
 					}
-#if 0
-					// add job for each row?
-					for(int32_t jobIdx = 0; jobIdx < numJobs; jobIdx++)
-					{
-						JobData data;
-						data.pCompressFunc = pFunc;
-
-						if (inputImg.height < 4 || inputImg.width < 4)
-						{
-							int goat1 = 0;
-							goat1 = 1;
-
-						}
-						else
-						{
-							const int32_t y_start = (linesPerJob*jobIdx) / 4 * 4;
-							int32_t y_end = (linesPerJob*(jobIdx + 1)) / 4 * 4;
-
-							if (y_start > inputImg.height) {
-								continue;
-							}
-
-							if (y_end > inputImg.height) {
-								y_end = inputImg.height;
-							}
-
-							X_ASSERT((y_end - y_start) > 0, "Invalid range")(y_end, y_start);
-
-							data.surface.ptr = inputImg.ptr + y_start * inputImg.stride;
-							data.surface.width = inputImg.width;
-							data.surface.height = y_end - y_start;
-							data.surface.stride = inputImg.stride;
-							data.pOut = pOut + (y_start / 4) * (inputImg.width / 4) * bytesPerBlock;
-						}
-
-						X_ASSERT(data.surface.height >= 1, "Invalid height")(data.surface.height);
-						X_ASSERT(data.surface.width >= 1, "Invalid width")(data.surface.width);
-
-						core::V2::Job* pJob = jobSys.CreateJobAsChild(pRootJob, compressJob, data);
-						jobSys.Run(pJob);
-					}
-#endif
 				}
 				else
 				{
