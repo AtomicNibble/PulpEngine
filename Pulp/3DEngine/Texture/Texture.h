@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Assets\AssetBase.h>
 
 X_NAMESPACE_DECLARE(texture,	
 	struct ITexture;
@@ -8,17 +9,14 @@ X_NAMESPACE_DECLARE(texture,
 X_NAMESPACE_BEGIN(engine)
 
 
-class Texture
+class Texture : public core::AssetBase
 {
 public:
 	Texture(core::string name, texture::TextureFlags flags, render::IDeviceTexture* pDeviceTexture);
 	~Texture() = default;
 
 	X_INLINE const int32_t getDeviceID(void) const;
-	X_INLINE const int32_t getID(void) const;
-	X_INLINE void setID(int32_t id);
 
-	X_INLINE const core::string& getName(void) const;
 	X_INLINE const Vec2<uint16_t> getDimensions(void) const;
 	X_INLINE const int32_t getWidth(void) const;
 	X_INLINE const int32_t getHeight(void) const;
@@ -26,10 +24,6 @@ public:
 	X_INLINE const int32_t getDepth(void) const;
 	X_INLINE const int32_t getNumMips(void) const;
 	X_INLINE const int32_t getDataSize(void) const;
-
-	X_INLINE const bool isLoaded(void) const;
-	X_INLINE const bool isLoading(void) const;
-	X_INLINE const bool loadFailed(void) const;
 
 	X_INLINE const texture::TextureType::Enum getTextureType(void) const;
 	X_INLINE const texture::Texturefmt::Enum getFormat(void) const;
@@ -42,8 +36,6 @@ public:
 	X_INLINE render::IDeviceTexture* getDeviceTexture(void) const;
 
 private:
-	core::string				fileName_;
-	int32_t						id_;
 	Vec2<uint16_t>				dimensions_;
 	uint32_t					datasize_; // size of the higest mip in bytes.
 	texture::TextureType::Enum	type_;
