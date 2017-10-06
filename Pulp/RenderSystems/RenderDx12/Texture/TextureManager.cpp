@@ -85,20 +85,20 @@ X_NAMESPACE_BEGIN(texture)
 		core::string name("id_");
 		name.append(idStr.begin(), idStr.end());
 
-		auto& threadPolicy = textures_.getThreadPolicy();
-		threadPolicy.Enter();
 
-		TexRes* pTexRes = textures_.findAsset(name);
+		TexRes* pTexRes = nullptr;
+		{
+			core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
-		if (pTexRes)
-		{
-			threadPolicy.Leave();
-			pTexRes->addReference();
-		}
-		else
-		{
-			pTexRes = textures_.createAsset(name, name, TextureFlags());
-			threadPolicy.Leave();
+			pTexRes = textures_.findAsset(name);
+
+			if (pTexRes)
+			{
+				pTexRes->addReference();
+				return pTexRes;
+			}
+		
+			pTexRes = textures_.createAsset(name, name, TextureFlags());	
 		}
 
 		return pTexRes;
