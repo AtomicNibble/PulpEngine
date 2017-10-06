@@ -7,7 +7,7 @@
 #include <IRender.h>
 #include <IRenderCommands.h>
 #include <CBuffer.h>
-#include <IAsyncLoad.h>
+#include <Assets\AssetBase.h>
 
 #include <String\StringHash.h>
 
@@ -115,7 +115,7 @@ struct MaterialSampler
 };
 
 
-class Material
+class Material : public core::AssetBase
 {
 public:
 	typedef MaterialTech Tech;
@@ -139,13 +139,6 @@ public:
 	MATLIB_EXPORT void assignProps(const Material& oth);
 	MATLIB_EXPORT void assignProps(const MaterialHeader& hdr);
 
-	X_INLINE const int32_t getID(void) const;
-	X_INLINE void setID(int32_t id);
-
-	X_INLINE core::LoadStatus::Enum getStatus(void) const;
-	X_INLINE bool isLoaded(void) const;
-	X_INLINE bool loadFailed(void) const;
-	X_INLINE void setStatus(core::LoadStatus::Enum status);
 	X_INLINE bool waitForLoad(IMaterialManager* pMatMan);
 
 	X_INLINE void setFlags(MaterialFlags flags);

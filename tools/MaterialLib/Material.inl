@@ -62,7 +62,7 @@ X_INLINE MaterialTech& MaterialTech::operator=(MaterialTech&& oth)
 // -------------------------------------------------------------------------------
 
 X_INLINE Material::Material(core::string& name, core::MemoryArenaBase* arena) :
-	name_(name),
+	core::AssetBase(name),
 	pTechDefState_(nullptr),
 	techs_(arena),
 	params_(arena),
@@ -105,37 +105,6 @@ X_INLINE void Material::addTech(Tech&& tech)
 	core::Spinlock::ScopedLock lock(techLock_);
 
 	techs_.append(std::forward<Tech>(tech));
-}
-
-X_INLINE const int32_t Material::getID(void) const
-{
-	return id_;
-}
-
-X_INLINE void Material::setID(int32_t id)
-{
-	id_ = id;
-}
-
-
-X_INLINE core::LoadStatus::Enum Material::getStatus(void) const
-{
-	return status_;
-}
-
-X_INLINE bool Material::isLoaded(void) const
-{
-	return status_ == core::LoadStatus::Complete;
-}
-
-X_INLINE bool Material::loadFailed(void) const
-{
-	return status_ == core::LoadStatus::Error;
-}
-
-X_INLINE void Material::setStatus(core::LoadStatus::Enum status)
-{
-	status_ = status;
 }
 
 X_INLINE bool Material::waitForLoad(IMaterialManager* pMatMan)
