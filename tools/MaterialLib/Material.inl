@@ -138,6 +138,14 @@ X_INLINE void Material::setStatus(core::LoadStatus::Enum status)
 	status_ = status;
 }
 
+X_INLINE bool Material::waitForLoad(IMaterialManager* pMatMan)
+{
+	if (isLoaded()) {
+		return true;
+	}
+
+	return pMatMan->waitForLoad(this);
+}
 
 X_INLINE void Material::setFlags(MaterialFlags flags)
 {

@@ -146,6 +146,7 @@ public:
 	X_INLINE bool isLoaded(void) const;
 	X_INLINE bool loadFailed(void) const;
 	X_INLINE void setStatus(core::LoadStatus::Enum status);
+	X_INLINE bool waitForLoad(IMaterialManager* pMatMan);
 
 	X_INLINE void setFlags(MaterialFlags flags);
 	X_INLINE void setSurfaceType(MaterialSurType::Enum surfaceType);
