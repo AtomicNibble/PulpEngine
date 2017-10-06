@@ -311,8 +311,7 @@ namespace entity
 			return;
 		}
 
-		const char* pAnimName = wpn.pWeaponDef->getAnimSlot(animSlot);
-		auto* pAnim = pAnimManager_->loadAnim(pAnimName);
+		auto* pAnim = wpn.pWeaponDef->getAnim(animSlot);
 
 		pAnimManager_->waitForLoad(pAnim);
 
