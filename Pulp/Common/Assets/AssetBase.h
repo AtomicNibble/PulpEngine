@@ -1,5 +1,6 @@
 #pragma once
 
+#include <IAsyncLoad.h>
 
 X_NAMESPACE_BEGIN(core)
 
