@@ -321,12 +321,13 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 
 	XDiskFile* file = nullptr;
 	core::Path<wchar_t> real_path;
-
+	
+	XFindData FindData(path, this);
+	
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
 		_wfinddatai64_t findinfo;
 
-		XFindData FindData(path, this);
 		if (FindData.findnext(&findinfo))
 		{
 			FindData.getOSPath(real_path, &findinfo);
