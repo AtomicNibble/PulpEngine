@@ -173,10 +173,7 @@ protected:
 	X_NO_COPY(Material);
 	X_NO_ASSIGN(Material);
 
-	int32_t id_;
-
 	core::Spinlock techLock_;
-	core::string name_;
 
 	// 4
 	MaterialFlags				flags_;
@@ -188,7 +185,6 @@ protected:
 
 	MaterialUsage::Enum usage_;
 	MaterialCat::Enum cat_;
-	core::LoadStatus::Enum status_;
 
 	// used for custom texture repeat.
 	// if AUTO_TILING the textures dim's are used.

@@ -64,12 +64,6 @@ public:
 	MODELLIB_EXPORT void addPhysToActor(physics::ActorHandle actor);
 
 protected:
-	int32_t id_;
-	core::string name_;
-
-	core::LoadStatus::Enum status_;
-	uint8_t _pad[3];
-
 	// runtime pointers.
 	const uint16_t*			pTagNames_;
 	const uint8_t*			pTagTree_;
