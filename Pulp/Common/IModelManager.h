@@ -1,10 +1,13 @@
 #pragma once
 
+#include <IAsyncLoad.h>
+
+
 X_NAMESPACE_BEGIN(model)
 
 class XModel;
 
-struct IModelManager
+struct IModelManager : public core::IAssetLoader
 {
 	virtual ~IModelManager() {}
 

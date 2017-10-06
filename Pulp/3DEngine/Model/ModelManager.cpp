@@ -283,6 +283,17 @@ void XModelManager::dispatchPendingLoads(void)
 	}
 }
 
+
+bool XModelManager::waitForLoad(core::AssetBase* pModel)
+{
+	if (pModel->isLoaded()) {
+		return true;
+	}
+
+	return waitForLoad(static_cast<XModel*>(pModel));
+}
+
+
 bool XModelManager::waitForLoad(XModel* pModel)
 {
 	{
@@ -290,6 +301,8 @@ bool XModelManager::waitForLoad(XModel* pModel)
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 		while (pModel->getStatus() == core::LoadStatus::Loading)
 		{
+			dispatchPendingLoads();
+
 			loadCond_.Wait(loadReqLock_);
 		}
 	}

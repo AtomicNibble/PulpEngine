@@ -74,6 +74,7 @@ public:
 	void reloadModel(const char* pName);
 	void listModels(const char* pSearchPatten = nullptr) const;
 
+	bool waitForLoad(core::AssetBase* pModel) X_FINAL;
 	bool waitForLoad(XModel* pModel) X_FINAL; // returns true if load succeed.
 
 private:
