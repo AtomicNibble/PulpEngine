@@ -34,6 +34,8 @@ protected:
 
 X_INLINE AssetBase::AssetBase(core::string& name, assetDb::AssetType::Enum type) :
 	name_(name),
+	id_(-1),
+	status_(core::LoadStatus::NotLoaded),
 	type_(type)
 {
 
