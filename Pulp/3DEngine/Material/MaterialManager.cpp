@@ -153,17 +153,24 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 	X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
 	core::string name(pMtlName);
-	core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-	MaterialResource* pMatRes = materials_.findAsset(name);
-	if (pMatRes)
 	{
-		// inc ref count.
-		pMatRes->addReference();
-		return pMatRes;
 	}
 
-	pMatRes = materials_.createAsset(name, name, g_3dEngineArena);
+	MaterialResource* pMatRes = nullptr;
+	{
+		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+		pMatRes = materials_.findAsset(name);
+		if (pMatRes)
+		{
+			// inc ref count.
+			pMatRes->addReference();
+			return pMatRes;
+		}
+
+		pMatRes = materials_.createAsset(name, name, arena_);
+	}
 
 	// add to list of Materials that need loading.
 	addLoadRequest(pMatRes);
