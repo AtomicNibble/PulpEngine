@@ -54,7 +54,7 @@ public:
 	explicit Matrix22(T s);
 
 	// OpenGL layout - unless srcIsRowMajor is true
-	Matrix22( const T *dt, bool srcIsRowMajor = false );
+	explicit Matrix22( const T *dt, bool srcIsRowMajor = false );
 
 	// OpenGL layout: m[0]=d0, m[1]=d1, m[2]=d2, m[3]=d3 - unless srcIsRowMajor is true
 	Matrix22( T d0, T d1, T d2, T d3, bool srcIsRowMajor = false );
@@ -63,12 +63,12 @@ public:
 	Matrix22( const Vec2<T> &vx, const Vec2<T> &vy );
 
 	template< typename FromT >
-	Matrix22( const Matrix22<FromT>& src );
+	explicit Matrix22( const Matrix22<FromT>& src );
 
 	Matrix22( const Matrix22<T>& src );
 
-						operator T*() { return (T*)m; }
-						operator const T*() const { return (const T*)m; }
+	operator T*() { return (T*)m; }
+	operator const T*() const { return (const T*)m; }
 
 	Matrix22<T>&		operator=( const Matrix22<T>& rhs );
 	Matrix22<T>&		operator=( const T &rhs );

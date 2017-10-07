@@ -72,7 +72,7 @@ public:
 	explicit Matrix44(T s);
 
 	// OpenGL layout - unless srcIsRowMajor is true
-	Matrix44( const T *dt, bool srcIsRowMajor = false );
+	explicit Matrix44( const T *dt, bool srcIsRowMajor = false );
 
 	// OpenGL layout: m[0]=d0, m[1]=d1, m[2]=d2 ... m[13]=d13, m[14]=d14, m[15]=d15 - unless srcIsRowMajor is true
 	Matrix44( T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, T d12, T d13, T d14, T d15, bool srcIsRowMajor = false );
@@ -82,16 +82,16 @@ public:
 	Matrix44( const Vec4<T> &vx, const Vec4<T> &vy, const Vec4<T> &vz, const Vec4<T> &vw = Vec4<T>( 0, 0, 0, 1 ) ); 
 
 	template< typename FromT >
-	Matrix44( const Matrix44<FromT>& src );
+	explicit Matrix44( const Matrix44<FromT>& src );
 
-	Matrix44( const Matrix22<T>& src );
+	explicit Matrix44( const Matrix22<T>& src );
 	explicit Matrix44( const MatrixAffine2<T> &src );
-	Matrix44( const Matrix33<T>& src );
-	Matrix44( const Matrix34<T>& src );
+	explicit Matrix44( const Matrix33<T>& src );
+	explicit Matrix44( const Matrix34<T>& src );
 	Matrix44( const Matrix44<T>& src );
 
-						operator T*() { return (T*)m; }
-						operator const T*() const { return (const T*)m; }
+	operator T*() { return (T*)m; }
+	operator const T*() const { return (const T*)m; }
 
 	Matrix44<T>&		operator=( const Matrix44<T>& rhs );
 	Matrix44<T>&		operator=( T rhs );
