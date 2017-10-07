@@ -242,10 +242,12 @@ namespace weapon
 			if (!pDefaultWeaponDef_->isLoaded())
 			{
 				X_ASSERT_NOT_IMPLEMENTED();
+				pWeaponDef->setStatus(core::LoadStatus::Error);
 			}
 			else
 			{
-			//	pWeaponDef->assignProps(*pDefaultMtl_);
+				// need to copy a goat, mind the horns.
+				pWeaponDef->assignProps(*pDefaultWeaponDef_);
 			}
 		}
 		else

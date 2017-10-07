@@ -71,6 +71,12 @@ namespace weapon
 		return true;
 	}
 
+	void WeaponDef::assignProps(const WeaponDef& oth)
+	{
+		X_UNUSED(oth);
+		X_ASSERT_NOT_IMPLEMENTED();
+
+	}
 
 } // namespace weapon
 

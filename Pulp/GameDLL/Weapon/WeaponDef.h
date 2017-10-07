@@ -19,6 +19,7 @@ namespace weapon
 		WeaponDef(core::string& name);
 
 		bool processData(core::XFile* pFile);
+		void assignProps(const WeaponDef& oth);
 
 		X_INLINE int32_t maxDmg(void) const;
 		X_INLINE int32_t minDmg(void) const;
