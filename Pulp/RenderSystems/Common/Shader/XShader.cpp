@@ -1077,12 +1077,9 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		case BlendType::SRC_ALPHA_SAT:
 			state_.Set(render::States::BLEND_SRC_ALPHA_SAT);
 			break;
-#if X_DEBUG
+
 		default:
-			X_ASSERT_UNREACHABLE();
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif
+			X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 
 	switch (dst_.color)
@@ -1111,12 +1108,9 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		case BlendType::INV_DEST_ALPHA:
 			state_.Set(render::States::BLEND_DEST_INV_DEST_ALPHA);
 			break;
-#if X_DEBUG
+
 		default:
-			X_ASSERT_UNREACHABLE();
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif
+			X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 
 	// did we reach EOF before close brace?

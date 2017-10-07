@@ -158,11 +158,7 @@ void createDescFromState(const StateDesc& state, D3D12_BLEND_DESC& blendDesc)
 					break;
 
 				default:
-#if X_DEBUG
-					X_ASSERT_NOT_IMPLEMENTED();
-#else
-					X_NO_SWITCH_DEFAULT;
-#endif // X_DEBUG
+					X_NO_SWITCH_DEFAULT_ASSERT;
 			}
 
 			return blendOperation;
@@ -235,11 +231,7 @@ void createDescFromState(const StateDesc& state, D3D12_RASTERIZER_DESC& rasteriz
 			break;
 
 		default:
-#if X_DEBUG
-			X_ASSERT_NOT_IMPLEMENTED();
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif // X_DEBUG
+			X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 }
 
@@ -308,14 +300,9 @@ void createDescFromState(const StateDesc& stateDesc, D3D12_DEPTH_STENCIL_DESC& d
 		case DepthFunc::ALWAYS:
 			depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_ALWAYS;
 			break;
-
-#if X_DEBUG
+	
 		default:
-			X_ASSERT_UNREACHABLE();
-			break;
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+			X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 
 	if (!DEPTH_REVERSE_Z)

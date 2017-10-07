@@ -190,13 +190,8 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 		case Texturefmt::R10G10B10A2:
 			return DXGI_FORMAT_R10G10B10A2_TYPELESS;
 
-#if X_DEBUG
 		default:
-		X_ASSERT_UNREACHABLE();
-		break;
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif // !X_DEBUG
+			X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 	return DXGI_FORMAT_UNKNOWN;
 }
