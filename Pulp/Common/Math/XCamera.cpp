@@ -15,11 +15,12 @@ void XCamera::UpdateFrustum(void)
 
 	// view
 	const Matrix34f& m = mat_;
-	Vec3f eye = getPosition();
-	Vec3f at = eye + Vec3f(m.m01, m.m11, m.m21);
+
+	Vec3f eye = m.getTranslate();
+	Vec3f dir = Vec3f(m.m01, m.m11, m.m21);
+	Vec3f at = eye + dir;
 	Vec3f up = Vec3f(m.m02, m.m12, m.m22);
 
 	MatrixLookAtRH(&viewMatrix_, eye, at, up);
-
 }
 
