@@ -154,7 +154,7 @@ TYPED_TEST(Mat44, Contruction) {
 			);
 
 		Matrix44<double> dmat1(fmat0);
-		Matrix44<double> fmat1(dmat0);
+		Matrix44<float> fmat1(dmat0);
 
 		EXPECT_EQ(dmat0, dmat1);
 		EXPECT_EQ(fmat0, fmat1);
@@ -242,8 +242,11 @@ TYPED_TEST(Mat44, Operator) {
 			9, 10, 11, 12,
 			13, 14, 15, 16
 			);
-		Matrix44<double> dmat1 = fmat0;
-		Matrix44<double> fmat1 = dmat0;
+		Matrix44<double> dmat1;
+		Matrix44<float> fmat1;
+
+		dmat1 = fmat0;
+		fmat1 = dmat0;
 
 		EXPECT_EQ(dmat0, dmat1);
 		EXPECT_EQ(fmat0, fmat1);

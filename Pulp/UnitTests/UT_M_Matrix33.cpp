@@ -95,7 +95,7 @@ TYPED_TEST(Mat33, Contruction) {
 			);
 
 		Matrix33<double> dmat1(fmat0);
-		Matrix33<double> fmat1(dmat0);
+		Matrix33<float> fmat1(dmat0);
 
 		EXPECT_EQ(dmat0, dmat1);
 		EXPECT_EQ(fmat0, fmat1);
@@ -209,8 +209,11 @@ TYPED_TEST(Mat33, Contruction) {
 			9, 10, 11
 			);
 
-		Matrix33<double> dmat1 = fmat0;
-		Matrix33<double> fmat1 = dmat0;
+		Matrix33<double> dmat1;
+		Matrix33<float> fmat1;
+
+		dmat1 = fmat0;
+		fmat1 = dmat0;
 
 		EXPECT_EQ(dmat0, dmat1);
 		EXPECT_EQ(fmat0, fmat1);

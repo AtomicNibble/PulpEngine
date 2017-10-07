@@ -102,8 +102,11 @@ TYPED_TEST(Mat22, Contruction) {
 	{	
 		Matrix22<double> dmat0(1, 2, 3, 4);
 		Matrix22<float>  fmat0(1, 2, 3, 4);
-		Matrix22<double> dmat1 = fmat0;
-		Matrix22<float>  fmat1 = dmat0;
+		Matrix22<double> dmat1;
+		Matrix22<float>  fmat1;
+
+		dmat1 = fmat0;
+		fmat1 = dmat0;
 
 		EXPECT_EQ(dmat0, dmat1);
 		EXPECT_EQ(fmat0, fmat1);
