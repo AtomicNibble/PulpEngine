@@ -317,6 +317,32 @@ void createDescFromState(const StateDesc& stateDesc, D3D12_DEPTH_STENCIL_DESC& d
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
+
+	if (!DEPTH_REVERSE_Z)
+	{
+		// all the states are setup for reverse Z.
+		// if we want to disable it for testing, we flip the states.
+		switch (stateDesc.depthFunc)
+		{
+			case DepthFunc::LEQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+				break;
+			case DepthFunc::EQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+				break;
+			case DepthFunc::GREAT:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+				break;
+			case DepthFunc::LESS:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+				break;
+			case DepthFunc::GEQUAL:
+				depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 void samplerDescFromState(SamplerState state, SamplerDesc& desc)
