@@ -180,7 +180,7 @@ TYPED_TEST(Mat44, Operator) {
 			5, 6, 7, 8,
 			9, 10, 11, 12,
 			13, 14, 15, 16);
-		T* data = (T*)m0;
+		T* data = m0;
 		for (int i = 0; i < MatT::DIM_SQ; ++i) {
 			data[i] *= 2;
 		}
@@ -199,7 +199,7 @@ TYPED_TEST(Mat44, Operator) {
 			5, 6, 7, 8,
 			9, 10, 11, 12,
 			13, 14, 15, 16);
-		const T *data = (const T*)m0;
+		const T *data = m0;
 		bool isOk = true;
 		for (int i = 0; i < MatT::DIM_SQ; ++i) {
 			T diff = fabs(data[i] - cdata[i]);

@@ -70,7 +70,7 @@ TYPED_TEST(Mat22, Contruction) {
 	// operator T*() { return (T*)m; }
 	{	
 		MatT c0(1, 2, 3, 4);
-		T *data = (T*)c0;
+		T *data = c0;
 		EXPECT_EQ(c0.m[0], data[0]);
 		EXPECT_EQ(c0.m[1], data[1]);
 		EXPECT_EQ(c0.m[2], data[2]);
@@ -79,7 +79,7 @@ TYPED_TEST(Mat22, Contruction) {
 	// operator const T*() const { return (const T*)m; }
 	{		
 		MatT c0(1, 2, 3, 4);
-		const T *const_data = (const T *)c0;
+		const T *const_data = c0;
 		EXPECT_EQ(c0.m[0], const_data[0]);
 		EXPECT_EQ(c0.m[1], const_data[1]);
 		EXPECT_EQ(c0.m[2], const_data[2]);
