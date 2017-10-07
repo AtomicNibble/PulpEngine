@@ -40,6 +40,8 @@ X_LINK_LIB("engine_AnimLib");
 #include <IEntity.h>
 #include <ISound.h>
 
+#include <IPrimativeContext.h>
+#include <IFont.h>
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
 
