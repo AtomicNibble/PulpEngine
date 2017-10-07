@@ -92,12 +92,12 @@ namespace entity
 
 					auto& an = reg.get<Animator>(parent);
 					Vec3f bonePos;
-					Matrix33f axis;
+					Matrix33f boneAxis;
 
-					if (an.pAnimator->getBoneTransform(att.parentBone, ellapsedTime, bonePos, axis)) 
+					if (an.pAnimator->getBoneTransform(att.parentBone, ellapsedTime, bonePos, boneAxis))
 					{
-						trans.pos += bonePos;
-						trans.quat = Quatf(axis);
+						trans.pos = parTrans.pos + bonePos * parTrans.quat;
+						trans.quat = Quatf(boneAxis) * trans.quat;
 					}
 				}
 			
