@@ -94,8 +94,8 @@ namespace entity
 			}
 
 			// clamp.
-			player.viewAngles.setPitch(core::Min(player.viewAngles.pitch(), vars_.maxViewPitch_));
-			player.viewAngles.setPitch(core::Max(player.viewAngles.pitch(), vars_.minViewPitch_));
+			float pitch = math<float>::clamp(player.viewAngles.pitch(), vars_.minViewPitch_, vars_.maxViewPitch_);
+			player.viewAngles.setPitch(pitch);
 
 			// calculate delta.
 			Anglesf delta;
