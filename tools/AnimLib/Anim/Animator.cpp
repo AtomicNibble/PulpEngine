@@ -479,6 +479,11 @@ void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVa
 		return;
 	}
 
+	const bool zeroPlayTime = playTime == core::TimeVal(0ll);
+	if (zeroPlayTime) {
+		return;
+	}
+
 	playAnim(pAnim, startTime, blendTime);
 
 	auto duration = pAnim->getDuration();
