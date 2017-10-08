@@ -873,8 +873,11 @@ struct IScene
 	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
 
 	// set transforms
-	virtual	void setKinematicTarget(ActorHandle handle, const Transformf& destination) X_ABSTRACT;
-	virtual	void setGlobalPose(ActorHandle handle, const Transformf& destination) X_ABSTRACT;
+	virtual	void setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestination, size_t num) X_ABSTRACT;
+	virtual	void setGlobalPose(ActorHandle* pHandles, const Transformf* pDestination, size_t num) X_ABSTRACT;
+	
+	X_INLINE void setKinematicTarget(ActorHandle handle, const Transformf& destination);
+	X_INLINE void setGlobalPose(ActorHandle handle, const Transformf& destination);
 
 	
 	// some query api.
@@ -896,6 +899,17 @@ struct IScene
 	virtual const TriggerPair* getTriggerPairs(size_t& numTriggerPairs) X_ABSTRACT;
 
 };
+
+X_INLINE void IScene::setKinematicTarget(ActorHandle handle, const Transformf& destination)
+{
+	setKinematicTarget(&handle, &destination, 1);
+}
+
+X_INLINE void IScene::setGlobalPose(ActorHandle handle, const Transformf& destination)
+{
+	setGlobalPose(&handle, &destination, 1);
+}
+
 
 struct ScopedLock
 {

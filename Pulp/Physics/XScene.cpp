@@ -456,37 +456,43 @@ void XScene::releaseCharacterController(ICharacterController* pController)
 }
 
 // set transforms
-void XScene::setKinematicTarget(ActorHandle handle, const Transformf& destination)
+void XScene::setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestination, size_t num)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(destination);
-	physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(handle);
-	if (!pActor->is<physx::PxRigidDynamic>())
-	{
-		X_ERROR("Phys", "Setting kinematic target on a none dynamic actor is not allowed");
-		return;
-	}
-
 	PHYS_SCENE_WRITE_LOCK(pScene_);
 
-	physx::PxRigidDynamic* pDynActor = static_cast<physx::PxRigidDynamic*>(pActor);
-	auto flags = pDynActor->getRigidBodyFlags();
-
-	if (!flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
+	for (size_t i = 0; i < num; i++)
 	{
-		X_WARNING("Phys", "Setting kinematic target on a none kinematic actor");
-	}
+		const physx::PxTransform& trans = PxTransFromQuatTrans(pDestination[i]);
+		physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
+		if (!pActor->is<physx::PxRigidDynamic>())
+		{
+			X_ERROR("Phys", "Setting kinematic target on a none dynamic actor is not allowed");
+			continue;
+		}
 
-	pDynActor->setKinematicTarget(trans);
+		physx::PxRigidDynamic* pDynActor = static_cast<physx::PxRigidDynamic*>(pActor);
+		auto flags = pDynActor->getRigidBodyFlags();
+
+		if (!flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
+		{
+			X_WARNING("Phys", "Setting kinematic target on a none kinematic actor");
+		}
+
+		pDynActor->setKinematicTarget(trans);
+	}
 }
 
-void XScene::setGlobalPose(ActorHandle handle, const Transformf& destination)
+void XScene::setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination, size_t num)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(destination);
-	physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(handle);
-
 	PHYS_SCENE_WRITE_LOCK(pScene_);
 
-	pActor->setGlobalPose(trans);
+	for (size_t i = 0; i < num; i++)
+	{
+		const physx::PxTransform& trans = PxTransFromQuatTrans(pDestination[i]);
+		physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
+
+		pActor->setGlobalPose(trans);
+	}
 }
 
 
@@ -654,7 +660,7 @@ physx::PxControllerBehaviorFlags XScene::getBehaviorFlags(const physx::PxShape& 
 
 physx::PxControllerBehaviorFlags XScene::getBehaviorFlags(const physx::PxController& controller)
 {
-	return physx::PxControllerBehaviorFlags(0);
+	return physx::PxControllerBehaviorFlags(0); 
 }
 
 physx::PxControllerBehaviorFlags XScene::getBehaviorFlags(const physx::PxObstacle& obstacle)
