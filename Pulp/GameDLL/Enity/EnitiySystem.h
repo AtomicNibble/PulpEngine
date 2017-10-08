@@ -98,6 +98,7 @@ namespace entity
 		DataTranslator<Health> dtHealth_;
 		DataTranslator<Mesh> dtMesh_;
 		DataTranslator<SoundObject> dtSoundObj_;
+		DataTranslator<Rotator> dtRotator_;
 	};
 
 

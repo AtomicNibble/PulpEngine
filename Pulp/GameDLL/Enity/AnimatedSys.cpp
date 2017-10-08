@@ -109,6 +109,23 @@ namespace entity
 			}
 		}
 
+		{
+			auto view = reg.view<Rotator, TransForm>();
+			for (auto entity : view)
+			{
+				auto& trans = reg.get<TransForm>(entity);
+				auto& rot = reg.get<Rotator>(entity);
+
+				trans.quat *= Quatf(rot.axis, ::toRadians(rot.speed));
+			
+				if (reg.has<MeshRenderer>(entity))
+				{
+					auto& rendEnt = reg.get<MeshRenderer>(entity);
+					p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
+				}
+			}
+		}
+
 
 		auto view = reg.view<Animator, Mesh, MeshRenderer, TransForm>();
 		for (auto entity : view)

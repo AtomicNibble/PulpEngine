@@ -140,6 +140,12 @@ struct RenderComponent
 	model::XModel* pModel;
 };
 
+struct Rotator
+{
+	Vec3f axis;
+	float speed;
+};
+
 
 // struct ScriptName
 // {
@@ -216,6 +222,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	Inventory,
 	Weapon,
 	Attached,
+	Rotator,
 
 	Animator,
 	Velocity,
