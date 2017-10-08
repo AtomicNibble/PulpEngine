@@ -107,7 +107,7 @@ TYPED_TEST(Mat44, Contruction) {
 
 		MatT m0EXPECT_EQ(m0);
 
-		EXPECT_EQ(c0, m0);
+		EXPECT_EQ(c0, m0EXPECT_EQ);
 	}
 	// Matrix44( const Matrix33<T>& src );
 	{
@@ -124,7 +124,7 @@ TYPED_TEST(Mat44, Contruction) {
 
 		MatT m0EXPECT_EQ(m0);
 
-		EXPECT_EQ(c0, m0);
+		EXPECT_EQ(c0, m0EXPECT_EQ);
 	}
 	// Matrix44( const Matrix44<T>& src );
 	{
