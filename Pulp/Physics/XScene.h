@@ -53,6 +53,9 @@ public:
 	ICharacterController* createCharacterController(const ControllerDesc& desc) X_FINAL;
 	void releaseCharacterController(ICharacterController* pController) X_FINAL;
 
+	// set transforms
+	void setKinematicTarget(ActorHandle handle, const Transformf& destination) X_FINAL;
+	void setGlobalPose(ActorHandle handle, const Transformf& destination) X_FINAL;
 
 	// Query stuff
 	bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,

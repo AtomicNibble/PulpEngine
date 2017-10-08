@@ -872,8 +872,12 @@ struct IScene
 	virtual ICharacterController* createCharacterController(const ControllerDesc& desc) X_ABSTRACT;
 	virtual void releaseCharacterController(ICharacterController* pController) X_ABSTRACT;
 
-	// some query api.
+	// set transforms
+	virtual	void setKinematicTarget(ActorHandle handle, const Transformf& destination) X_ABSTRACT;
+	virtual	void setGlobalPose(ActorHandle handle, const Transformf& destination) X_ABSTRACT;
 
+	
+	// some query api.
 	virtual bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
 		RaycastCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
 		QueryFlags queryFlags = QueryFlag::STATIC | QueryFlag::DYNAMIC) const X_ABSTRACT;

@@ -453,6 +453,41 @@ void XScene::releaseCharacterController(ICharacterController* pController)
 	X_DELETE(pController, arena_);
 }
 
+// set transforms
+void XScene::setKinematicTarget(ActorHandle handle, const Transformf& destination)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(destination);
+	physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(handle);
+	if (!pActor->is<physx::PxRigidDynamic>())
+	{
+		X_ERROR("Phys", "Setting kinematic target on a none dynamic actor is not allowed");
+		return;
+	}
+
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
+	physx::PxRigidDynamic* pDynActor = static_cast<physx::PxRigidDynamic*>(pActor);
+	auto flags = pDynActor->getRigidBodyFlags();
+
+	if (!flags.isSet(physx::PxRigidBodyFlag::eKINEMATIC))
+	{
+		X_WARNING("Phys", "Setting kinematic target on a none kinematic actor");
+	}
+
+	pDynActor->setKinematicTarget(trans);
+}
+
+void XScene::setGlobalPose(ActorHandle handle, const Transformf& destination)
+{
+	physx::PxTransform trans = PxTransFromQuatTrans(destination);
+	physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(handle);
+
+	PHYS_SCENE_WRITE_LOCK(pScene_);
+
+	pActor->setGlobalPose(trans);
+}
+
+
 // ------------------------------------------
 
 bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
