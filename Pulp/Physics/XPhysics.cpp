@@ -656,8 +656,8 @@ IJoint* XPhysics::createJoint(JointType::Enum type, ActorHandle actor0, ActorHan
 	physx::PxRigidActor* pActor0 = reinterpret_cast<physx::PxRigidActor*>(actor0);
 	physx::PxRigidActor* pActor1 = reinterpret_cast<physx::PxRigidActor*>(actor1);
 
-	physx::PxTransform trans0 = PxTransFromQuatTrans(localFrame0);
-	physx::PxTransform trans1 = PxTransFromQuatTrans(localFrame1);
+	const physx::PxTransform& trans0 = PxTransFromQuatTrans(localFrame0);
+	const physx::PxTransform& trans1 = PxTransFromQuatTrans(localFrame1);
 
 
 	// i want to make a api for creating all the diffrent joint types.
@@ -803,7 +803,7 @@ ActorHandle XPhysics::createConvexMesh(const Transformf& myTrans, ConvexMeshHand
 {
 	physx::PxConvexMesh* pConvexMesh = X_ASSERT_NOT_NULL(reinterpret_cast<physx::PxConvexMesh*>(convex));
 
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 	physx::PxMeshScale meshScale;
 	meshScale.rotation = physx::PxQuat::createIdentity();
 	meshScale.scale = Px3FromVec3(scale);
@@ -822,7 +822,7 @@ ActorHandle XPhysics::createTriangleMesh(const Transformf& myTrans, TriMeshHandl
 {
 	physx::PxTriangleMesh* pTriMesh = X_ASSERT_NOT_NULL(reinterpret_cast<physx::PxTriangleMesh*>(tri));
 
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 	physx::PxMeshScale meshScale;
 	meshScale.rotation = physx::PxQuat::createIdentity();
 	meshScale.scale = Px3FromVec3(scale);
@@ -840,7 +840,7 @@ ActorHandle XPhysics::createTriangleMesh(const Transformf& myTrans, TriMeshHandl
 ActorHandle XPhysics::createHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, float density, const Vec3f& heightRowColScale)
 {
 	physx::PxHeightField* pHeightField = X_ASSERT_NOT_NULL(reinterpret_cast<physx::PxHeightField*>(hf));
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(
 		physx::PxHeightFieldGeometry(pHeightField, physx::PxMeshGeometryFlags(), heightRowColScale.x, heightRowColScale.y, heightRowColScale.z),
@@ -859,7 +859,7 @@ ActorHandle XPhysics::createHieghtField(const Transformf& myTrans, HieghtFieldHa
 
 ActorHandle XPhysics::createSphere(const Transformf& myTrans, float radius, float density)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
@@ -873,7 +873,7 @@ ActorHandle XPhysics::createSphere(const Transformf& myTrans, float radius, floa
 
 ActorHandle XPhysics::createCapsule(const Transformf& myTrans, float radius, float halfHeight, float density)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
@@ -887,7 +887,7 @@ ActorHandle XPhysics::createCapsule(const Transformf& myTrans, float radius, flo
 
 ActorHandle XPhysics::createBox(const Transformf& myTrans, const AABB& bounds, float density)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
 
 	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
@@ -905,7 +905,7 @@ ActorHandle XPhysics::createBox(const Transformf& myTrans, const AABB& bounds, f
 ActorHandle XPhysics::createStaticTriangleMesh(const Transformf& myTrans, TriMeshHandle tri, const Vec3f& scale)
 {
 	physx::PxTriangleMesh* pTriMesh = X_ASSERT_NOT_NULL(reinterpret_cast<physx::PxTriangleMesh*>(tri));
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	physx::PxMeshScale meshScale;
 	meshScale.rotation = physx::PxQuat::createIdentity();
@@ -924,7 +924,7 @@ ActorHandle XPhysics::createStaticTriangleMesh(const Transformf& myTrans, TriMes
 ActorHandle XPhysics::createStaticHieghtField(const Transformf& myTrans, HieghtFieldHandle hf, const Vec3f& heightRowColScale)
 {
 	physx::PxHeightField* pHeightField = X_ASSERT_NOT_NULL(reinterpret_cast<physx::PxHeightField*>(hf));
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(
 		physx::PxHeightFieldGeometry(pHeightField, physx::PxMeshGeometryFlags(), heightRowColScale.x, heightRowColScale.y, heightRowColScale.z),
@@ -943,7 +943,7 @@ ActorHandle XPhysics::createStaticHieghtField(const Transformf& myTrans, HieghtF
 
 ActorHandle XPhysics::createStaticPlane(const Transformf& myTrans)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(physx::PxPlaneGeometry(), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
@@ -958,7 +958,7 @@ ActorHandle XPhysics::createStaticPlane(const Transformf& myTrans)
 
 ActorHandle XPhysics::createStaticSphere(const Transformf& myTrans, float radius)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(physx::PxSphereGeometry(radius), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
@@ -973,7 +973,7 @@ ActorHandle XPhysics::createStaticSphere(const Transformf& myTrans, float radius
 
 ActorHandle XPhysics::createStaticCapsule(const Transformf& myTrans, float radius, float halfHeight)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	auto* pShape = pPhysics_->createShape(physx::PxCapsuleGeometry(radius, halfHeight), *pMaterial_, true, DEFALT_SHAPE_FLAGS);
 
@@ -988,7 +988,7 @@ ActorHandle XPhysics::createStaticCapsule(const Transformf& myTrans, float radiu
 
 ActorHandle XPhysics::createStaticBox(const Transformf& myTrans, const AABB& bounds)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
 
 	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
@@ -1004,7 +1004,7 @@ ActorHandle XPhysics::createStaticBox(const Transformf& myTrans, const AABB& bou
 
 ActorHandle XPhysics::createStaticTrigger(const Transformf& myTrans, const AABB& bounds)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 	physx::PxBoxGeometry geo(Px3FromVec3(bounds.halfVec()));
 
 	auto* pShape = pPhysics_->createShape(geo, *pMaterial_, true, DEFALT_SHAPE_FLAGS);
@@ -1024,7 +1024,7 @@ ActorHandle XPhysics::createStaticTrigger(const Transformf& myTrans, const AABB&
 
 ActorHandle XPhysics::createActor(const Transformf& myTrans, float density, bool kinematic, const void* pUserData)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	physx::PxRigidDynamic* pActor = pPhysics_->createRigidDynamic(trans);
 	if (pActor)
@@ -1039,7 +1039,7 @@ ActorHandle XPhysics::createActor(const Transformf& myTrans, float density, bool
 
 ActorHandle XPhysics::createStaticActor(const Transformf& myTrans, const void* pUserData)
 {
-	physx::PxTransform trans = PxTransFromQuatTrans(myTrans);
+	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
 	physx::PxRigidStatic* pActor = pPhysics_->createRigidStatic(trans);
 	if (pActor)
