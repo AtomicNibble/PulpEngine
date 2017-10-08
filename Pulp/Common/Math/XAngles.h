@@ -1,6 +1,11 @@
 #pragma once
 
 
+// The z axis is up.A pure yaw rotates about the z axis.
+// The x axis is forward.A pure roll rotates about the x axis.The y axis extends out to your left.
+// A pure pitch rotates about the y axis.
+
+
 template<typename T>
 class Angles
 {
