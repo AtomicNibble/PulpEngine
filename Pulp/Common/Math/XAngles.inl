@@ -303,8 +303,8 @@ Vec3<T>	Angles<T>::toForward(void) const
 template<typename T>
 Quat<T>	Angles<T>::toQuat(void) const
 {
-	float sx, cx, sy, cy, sz, cz;
-	float sxcy, cxcy, sxsy, cxsy;
+	T sx, cx, sy, cy, sz, cz;
+	T sxcy, cxcy, sxsy, cxsy;
 
 	math<T>::sincos(::toRadians(yaw_) * 0.5f, sz, cz);
 	math<T>::sincos(::toRadians(pitch_) * 0.5f, sy, cy);
@@ -327,7 +327,7 @@ template<typename T>
 Matrix33<T>	Angles<T>::toMat3(void) const
 {
 	Matrix33<T> mat;
-	float sr, sp, sy, cr, cp, cy;
+	T sr, sp, sy, cr, cp, cy;
 
 	math<T>::sincos(::toRadians(yaw_), sy, cy);
 	math<T>::sincos(::toRadians(pitch_), sp, cp);
