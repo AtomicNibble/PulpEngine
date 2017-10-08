@@ -41,7 +41,7 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(render)
 
-static const bool DEPTH_REVERSE_Z = true;
+static const bool DEPTH_REVERSE_Z = true; // setting this to false 'should' be enougth to turn reverse z on/off
 // make these small as possible, reducdes pool size.
 static const uint32_t MAX_RENDER_TARGETS = 8;
 static const uint32_t MAX_CONST_BUFFERS_BOUND = 8;
