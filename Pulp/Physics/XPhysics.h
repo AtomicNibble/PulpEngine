@@ -117,7 +117,7 @@ public:
 	ActorHandle createStaticTrigger(const Transformf& myTrans, const AABB& bounds) X_FINAL;
 
 	// for creating a actor without any initial shape.
-	ActorHandle createActor(const Transformf& myTrans, float density, const void* pUserData) X_FINAL;
+	ActorHandle createActor(const Transformf& myTrans, float density, bool kinematic, const void* pUserData) X_FINAL;
 	ActorHandle createStaticActor(const Transformf& myTrans, const void* pUserData) X_FINAL;
 
 	// adding additional shapes to a actor.

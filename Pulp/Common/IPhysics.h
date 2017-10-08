@@ -992,7 +992,7 @@ struct IPhysics
 	virtual ActorHandle createStaticTrigger(const Transformf& myTrans, const AABB& bounds) X_ABSTRACT;
 
 	// for creating a actor without any initial shape.
-	virtual ActorHandle createActor(const Transformf& myTrans, float density, const void* pUserData = nullptr) X_ABSTRACT;
+	virtual ActorHandle createActor(const Transformf& myTrans, float density, bool kinematic = false, const void* pUserData = nullptr) X_ABSTRACT;
 	virtual ActorHandle createStaticActor(const Transformf& myTrans, const void* pUserData = nullptr) X_ABSTRACT;
 
 
