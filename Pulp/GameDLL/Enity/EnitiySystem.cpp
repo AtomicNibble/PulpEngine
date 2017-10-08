@@ -137,7 +137,7 @@ namespace entity
 		// physSys_.update(frame, reg_, pPhysScene_);
 		weaponSys_.update(frame.timeInfo, reg_);
 
-		animatedSys_.update(frame.timeInfo, reg_, p3DWorld_);
+		animatedSys_.update(frame.timeInfo, reg_, p3DWorld_, pPhysScene_);
 	}
 
 

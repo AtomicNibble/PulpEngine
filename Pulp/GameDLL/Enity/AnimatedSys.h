@@ -21,7 +21,7 @@ namespace entity
 		AnimatedSystem();
 
 		bool init(void);
-		void update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld);
+		void update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene);
 
 
 	private:

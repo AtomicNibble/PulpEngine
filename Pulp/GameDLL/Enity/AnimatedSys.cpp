@@ -25,7 +25,7 @@ namespace entity
 		return true;
 	}
 
-	void AnimatedSystem::update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld)
+	void AnimatedSystem::update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene)
 	{
 		X_UNUSED(time, reg, p3DWorld);
 
@@ -122,6 +122,11 @@ namespace entity
 				{
 					auto& rendEnt = reg.get<MeshRenderer>(entity);
 					p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
+				}
+				if (reg.has<MeshCollider>(entity))
+				{
+					auto& col = reg.get<MeshCollider>(entity);
+					pPhysScene->setKinematicTarget(col.actor, trans);
 				}
 			}
 		}
