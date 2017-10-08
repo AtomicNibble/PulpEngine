@@ -493,10 +493,10 @@ TEST(ECSRegistryBench, Construct)
 
 	X_LOG0("ECS", "Constructing 1000000 entities");
 
-	registry.reserve(1'000'000);
+	registry.reserve(100'000);
 
 	core::StopWatch timer;
-	for (uint64_t i = 0; i < 1'000'000L; i++) {
+	for (uint64_t i = 0; i < 100'000L; i++) {
 		registry.create();
 	}
 
@@ -512,13 +512,13 @@ TEST(ECSRegistryBench, Destroy)
 	registry_type registry(g_arena);
 	registry_type::EntityArr entities(g_arena);
 
-	registry.reserve(1'000'000);
-	registry.availableReserve(1'000'000);
-	entities.reserve(1'000'000);
+	registry.reserve(100'000);
+	registry.availableReserve(100'000);
+	entities.reserve(100'000);
 
-	X_LOG0("ECS", "Destroying 1000000 entities");
+	X_LOG0("ECS", "Destroying 100000 entities");
 
-	for (uint64_t i = 0; i < 1'000'000L; i++) {
+	for (uint64_t i = 0; i < 100'000L; i++) {
 		entities.push_back(registry.create());
 	}
 
@@ -571,16 +571,16 @@ TEST(ECSRegistryBench, IterateCreateDeleteSingleComponent)
 	registry.reset();
 }
 
-TEST(ECSRegistryBench, IterateSingleComponent1M) 
+TEST(ECSRegistryBench, IterateSingleComponent100K) 
 {
 	using registry_type = game::ecs::StandardRegistry<uint32_t, Position, Velocity>;
 
 	registry_type registry(g_arena);
-	registry.reserve(1'000'000);
+	registry.reserve(100'000);
 
-	X_LOG0("ECS", "Iterating over 1000000 entities, one component");
+	X_LOG0("ECS", "Iterating over 100000 entities, one component");
 
-	for (uint64_t i = 0; i < 1'000'000L; i++) {
+	for (uint64_t i = 0; i < 100'000L; i++) {
 		registry.create<Position>();
 	}
 
@@ -598,16 +598,16 @@ TEST(ECSRegistryBench, IterateSingleComponent1M)
 	registry.reset();
 }
 
-TEST(ECSRegistryBench, IterateTwoComponents1M)
+TEST(ECSRegistryBench, IterateTwoComponents100K)
 {
 	using registry_type = game::ecs::StandardRegistry<uint32_t, Position, Velocity>;
 
 	registry_type registry(g_arena);
-	registry.reserve(1'000'000);
+	registry.reserve(100'000);
 
-	X_LOG0("ECS", "Iterating over 1000000 entities, two components");
+	X_LOG0("ECS", "Iterating over 100000 entities, two components");
 
-	for (uint64_t i = 0; i < 1'000'000L; i++) {
+	for (uint64_t i = 0; i < 100'000L; i++) {
 		registry.create<Position, Velocity>();
 	}
 
@@ -628,16 +628,16 @@ TEST(ECSRegistryBench, IterateTwoComponents1M)
 }
 
 
-TEST(ECSRegistryBench, IterateSingleComponent5M) 
+TEST(ECSRegistryBench, IterateSingleComponent500K) 
 {
 	using registry_type = game::ecs::StandardRegistry<uint32_t, Position, Velocity>;
 
 	registry_type registry(g_arena);
-	registry.reserve(5'000'000);
+	registry.reserve(500'000);
 
-	X_LOG0("ECS", "Iterating over 5000000 entities, one component");
+	X_LOG0("ECS", "Iterating over 500000 entities, one component");
 
-	for (uint64_t i = 0; i < 5,000,000L; i++) {
+	for (uint64_t i = 0; i < 500,000L; i++) {
 		registry.create<Position>();
 	}
 
@@ -655,16 +655,16 @@ TEST(ECSRegistryBench, IterateSingleComponent5M)
 	registry.reset();
 }
 
-TEST(ECSRegistryBench, IterateTwoComponents5M) 
+TEST(ECSRegistryBench, IterateTwoComponents500K) 
 {
 	using registry_type = game::ecs::StandardRegistry<uint32_t, Position, Velocity>;
 
 	registry_type registry(g_arena);
-	registry.reserve(5'000'000);
+	registry.reserve(500'000);
 
-	X_LOG0("ECS", "Iterating over 5000000 entities, two components");
+	X_LOG0("ECS", "Iterating over 500000 entities, two components");
 
-	for (uint64_t i = 0; i < 5'000'000L; i++) {
+	for (uint64_t i = 0; i < 500'000L; i++) {
 		registry.create<Position, Velocity>();
 	}
 
@@ -684,16 +684,16 @@ TEST(ECSRegistryBench, IterateTwoComponents5M)
 	registry.reset();
 }
 
-TEST(ECSRegistryBench, IterateFiveComponents1M)
+TEST(ECSRegistryBench, IterateFiveComponents100K)
 {
 	using registry_type = game::ecs::StandardRegistry<uint32_t, Position, Velocity, Comp1, Comp2, Comp3>;
 
 	registry_type registry(g_arena);
-	registry.reserve(1'000'000);
+	registry.reserve(100'000);
 
-	X_LOG0("ECS", "Iterating over 1000000 entities, five components");
+	X_LOG0("ECS", "Iterating over 100000 entities, five components");
 
-	for (uint64_t i = 0; i < 1'000'000L; i++) {
+	for (uint64_t i = 0; i < 100'000L; i++) {
 		registry.create<Position, Velocity, Comp1, Comp2, Comp3>();
 	}
 
@@ -719,16 +719,16 @@ TEST(ECSRegistryBench, IterateFiveComponents1M)
 	registry.reset();
 }
 
-TEST(ECSRegistryBench, IterateTenComponents1M) 
+TEST(ECSRegistryBench, IterateTenComponents100K) 
 {
 	using registry_type = game::ecs::StandardRegistry<uint32_t, Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>;
 
 	registry_type registry(g_arena);
-	registry.reserve(1'000'000);
+	registry.reserve(100'000);
 
-	X_LOG0("ECS", "Iterating over 1000000 entities, ten components");
+	X_LOG0("ECS", "Iterating over 100000 entities, ten components");
 
-	for (uint64_t i = 0; i < 1'000'000L; i++) {
+	for (uint64_t i = 0; i < 100'000L; i++) {
 		registry.create<Position, Velocity, Comp1, Comp2, Comp3, Comp4, Comp5, Comp6, Comp7, Comp8>();
 	}
 
