@@ -101,7 +101,7 @@ namespace entity
 					}
 				}
 			
-				if (reg.has<Animator>(entity)) 
+				if (reg.has<MeshRenderer>(entity))
 				{
 					auto& rendEnt = reg.get<MeshRenderer>(entity);
 					p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
