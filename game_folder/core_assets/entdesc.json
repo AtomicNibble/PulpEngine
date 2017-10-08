@@ -1,0 +1,137 @@
+{
+    "ents" : [
+        {
+            "name": "Pickle",
+            "origin" : {"x": 128, "y": 128, "z": 8},
+          //  "angles" : {"p": -20, "y": 1.028581, "r": 25.0},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "MeshCollider" : {
+            },
+            "Rotator" : {
+                "axis" : {"x": 1, "y": 0, "z": 1},
+                "speed": 1.0
+            }
+        },
+        {
+            "name": "Pickle2",
+            "origin" : {"x": 128, "y": -128, "z": 8},
+          //  "angles" : {"p": -20, "y": 1.028581, "r": 25.0},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "MeshCollider" : {
+            },
+            "Rotator" : {
+                "axis" : {"x": 0, "y": 0, "z": 1},
+                "speed": 1.0
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": 280, "y": -128, "z": 8},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "MeshCollider" : {
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": 280, "y": -128, "z": 8},
+            "angles" : {"p": 90, "y": 0, "r": 0},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "MeshCollider" : {
+            },
+            "Mover" : {
+                "start" : {"x": -280, "y": 128, "z": 8},
+                "end" : {"x": -500, "y": 128, "z": 8},
+                "time" : 10.0
+            }
+        }
+        /*
+        {
+            "name": "Stu",
+            "origin" : {"x": -230, "y": 128, "z": 8},
+
+            "Health" : {
+                "hp": 10,
+                "max": 100
+            },
+            "SoundObject" : {
+                "offset" : {"x": 0, "y": 15, "z": 50},
+                "occType": "SingleRay"
+            },
+            "Mesh" : {
+                "name" : "test/anim/char_rus_guard_grachev"
+            },
+            "MeshRenderer" : {
+            }
+        },
+        {
+            "name": "Stu2",
+            "origin" : {"x": -230, "y": 0, "z": 8},
+
+            "Health" : {
+                "hp": 10,
+                "max": 100
+            },
+            "SoundObject" : {
+                "offset" : {"x": 0, "y": 15, "z": 50},
+                "occType": "SingleRay"
+            },
+            "Mesh" : {
+                "name" : "test/anim/char_rus_guard_grachev"
+            },
+            "MeshRenderer" : {
+            }
+        },
+        {
+            "name": "Bob",
+            "origin" : {"x": -90, "y": 128, "z": 8},
+
+            "SoundObject" : {
+                "offset" : {"x": 0, "y": 15, "z": 50},
+                "occType": "SingleRay"
+            },
+            "Mesh" : {
+                "name" : "test/anim/char_honorguard"
+            },
+            "MeshRenderer" : {
+            },
+            "Animator" : {
+
+            }
+        }
+
+        {
+            "name": "Arms",
+            "origin" : {"x": -128, "y": 16, "z": 74},
+
+            "Mesh" : {
+                "name" : "test/arms/view_ger"
+            },
+            "MeshRenderer" : {
+            },
+            "Animator" : {
+
+            }
+        }
+        */
+    ]
+}
