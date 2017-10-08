@@ -146,6 +146,14 @@ struct Rotator
 	float speed;
 };
 
+struct Mover // move back and forth
+{
+	Vec3f start;
+	Vec3f end;
+	float time;
+	float fract;
+};
+
 
 // struct ScriptName
 // {
@@ -223,6 +231,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	Weapon,
 	Attached,
 	Rotator,
+	Mover,
 
 	Animator,
 	Velocity,

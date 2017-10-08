@@ -109,6 +109,19 @@ namespace entity
 			}
 		}
 
+		auto updateVis = [&](EntityId entity, const Transformf& trans) {
+			if (reg.has<MeshRenderer>(entity))
+			{
+				auto& rendEnt = reg.get<MeshRenderer>(entity);
+				p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
+			}
+			if (reg.has<MeshCollider>(entity))
+			{
+				auto& col = reg.get<MeshCollider>(entity);
+				pPhysScene->setKinematicTarget(col.actor, trans);
+			}
+		};
+
 		{
 			auto view = reg.view<Rotator, TransForm>();
 			for (auto entity : view)
@@ -117,20 +130,32 @@ namespace entity
 				auto& rot = reg.get<Rotator>(entity);
 
 				trans.quat *= Quatf(rot.axis, ::toRadians(rot.speed));
-			
-				if (reg.has<MeshRenderer>(entity))
-				{
-					auto& rendEnt = reg.get<MeshRenderer>(entity);
-					p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
-				}
-				if (reg.has<MeshCollider>(entity))
-				{
-					auto& col = reg.get<MeshCollider>(entity);
-					pPhysScene->setKinematicTarget(col.actor, trans);
-				}
+
+				updateVis(entity, trans);
 			}
 		}
 
+		{
+			auto view = reg.view<Mover, TransForm>();
+			for (auto entity : view)
+			{
+				auto& trans = reg.get<TransForm>(entity);
+				auto& mov = reg.get<Mover>(entity);
+
+				// i you want to move X over time
+				// i need to take current position and add delta on.
+				// id rather work out fract and lerp.
+				// to work out fract i need to know
+				mov.fract += 0.001f;
+				if (mov.fract > 1.f) {
+					mov.fract = 0.f;
+				}
+
+				trans.pos = mov.start.lerp(mov.fract, mov.end);
+
+				updateVis(entity, trans);
+			}
+		}
 
 		auto view = reg.view<Animator, Mesh, MeshRenderer, TransForm>();
 		for (auto entity : view)

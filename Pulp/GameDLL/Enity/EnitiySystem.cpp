@@ -31,7 +31,8 @@ namespace entity
 		dtHealth_(arena),
 		dtMesh_(arena),
 		dtSoundObj_(arena),
-		dtRotator_(arena)
+		dtRotator_(arena),
+		dtMover_(arena)
 	{
 		pPhysics_ = nullptr;
 		pPhysScene_ = nullptr;
@@ -107,6 +108,9 @@ namespace entity
 		ADD_TRANS_MEMBER(dtRotator_, axis);
 		ADD_TRANS_MEMBER(dtRotator_, speed);
 
+		ADD_TRANS_MEMBER(dtMover_, start);
+		ADD_TRANS_MEMBER(dtMover_, end);
+		ADD_TRANS_MEMBER(dtMover_, time);
 		return true;
 	}
 
@@ -597,6 +601,17 @@ namespace entity
 					if (!parseComponent(dtRotator_, rot, value)) {
 						return false;
 					}
+
+					break;
+				}
+				case "Mover"_fnv1a:
+				{
+					auto& mov = reg_.assign<Mover>(ent);
+					if (!parseComponent(dtMover_, mov, value)) {
+						return false;
+					}
+
+					mov.fract = 0.f;
 
 					break;
 				}
