@@ -389,6 +389,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		pxDesc.halfSideExtent = boxDesc.halfSideExtent;
 		pxDesc.halfForwardExtent = boxDesc.halfForwardExtent;
 		pxDesc.reportCallback = this;
+		pxDesc.behaviorCallback = this;
 
 		if (!pxDesc.isValid()) {
 			X_ERROR("Phys", "Box controller desc is invalid");
@@ -415,6 +416,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 		pxDesc.radius = capsulDesc.radius;
 		pxDesc.height = capsulDesc.height;
 		pxDesc.reportCallback = this;
+		pxDesc.behaviorCallback = this;
 		if (capsulDesc.climbingMode == CapsuleControllerDesc::ClimbingMode::Easy) {
 			pxDesc.climbingMode = physx::PxCapsuleClimbingMode::eEASY;
 		}
@@ -641,6 +643,27 @@ void XScene::onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count)
 }
 
 // ------------------------------------------
+
+physx::PxControllerBehaviorFlags XScene::getBehaviorFlags(const physx::PxShape& shape, const physx::PxActor& actor)
+{							
+	return physx::PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT;
+	
+	//return physx::PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT | physx::PxControllerBehaviorFlag::eCCT_SLIDE;
+	// return physx::PxControllerBehaviorFlags(0);
+}
+
+physx::PxControllerBehaviorFlags XScene::getBehaviorFlags(const physx::PxController& controller)
+{
+	return physx::PxControllerBehaviorFlags(0);
+}
+
+physx::PxControllerBehaviorFlags XScene::getBehaviorFlags(const physx::PxObstacle& obstacle)
+{
+	return physx::PxControllerBehaviorFlag::eCCT_CAN_RIDE_ON_OBJECT | physx::PxControllerBehaviorFlag::eCCT_SLIDE;
+}
+
+// ------------------------------------------
+
 
 void XScene::onShapeHit(const physx::PxControllerShapeHit& hit)
 {

@@ -11,6 +11,7 @@ class DebugRender;
 class XScene : 
 	public IScene,
 	public physx::PxSimulationEventCallback,
+	public physx::PxControllerBehaviorCallback,
 	public physx::PxUserControllerHitReport
 {
 	typedef core::Array<TriggerPair, core::ArrayAllocator<TriggerPair>, core::growStrat::Multiply> TriggerPairArr;
@@ -81,6 +82,13 @@ public:
 	virtual void onContact(const physx::PxContactPairHeader& pairHeader, const physx::PxContactPair* pairs, physx::PxU32 nbPairs) X_FINAL;
 	virtual void onTrigger(physx::PxTriggerPair* pairs, physx::PxU32 count) X_FINAL;
 	// ~PxSimulationEventCallback
+
+	// PxControllerBehaviorCallback
+	virtual physx::PxControllerBehaviorFlags getBehaviorFlags(const physx::PxShape& shape, const physx::PxActor& actor) X_FINAL;
+	virtual physx::PxControllerBehaviorFlags getBehaviorFlags(const physx::PxController& controller) X_FINAL;
+	virtual physx::PxControllerBehaviorFlags getBehaviorFlags(const physx::PxObstacle& obstacle) X_FINAL;
+	// ~PxControllerBehaviorCallback
+
 
 	// PxUserControllerHitReport
 	virtual void onShapeHit(const physx::PxControllerShapeHit& hit) X_FINAL;
