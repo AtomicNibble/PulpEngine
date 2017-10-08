@@ -42,7 +42,10 @@ X_LINK_LIB("engine_AnimLib");
 
 #include <IPrimativeContext.h>
 #include <IFont.h>
+
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
 
 #include "Enity\EnityComponents.h"
+
+
