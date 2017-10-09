@@ -330,8 +330,8 @@ Matrix33<T>	Angles<T>::toMat3(void) const
 	T sr, sp, sy, cr, cp, cy;
 
 	math<T>::sincos(::toRadians(yaw_), sy, cy);
-	math<T>::sincos(::toRadians(pitch_), sp, cp);
-	math<T>::sincos(::toRadians(roll_), sr, cr);
+	math<T>::sincos(::toRadians(roll_), sp, cp);
+	math<T>::sincos(::toRadians(pitch_), sr, cr);
 
 	mat.set(
 		cp * cy, cp * sy, -sp,
