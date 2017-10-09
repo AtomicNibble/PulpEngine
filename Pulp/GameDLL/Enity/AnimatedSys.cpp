@@ -63,7 +63,10 @@ namespace entity
 
 		auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::MISC3D);
 
-		auto ellapsedTime = time.ellapsed[core::Timer::GAME];
+		const auto ellapsedTime = time.ellapsed[core::Timer::GAME];
+		const auto delta = time.deltas[core::Timer::GAME];
+		const float deltaSec = delta.GetSeconds();
+
 
 		{
 			auto view = reg.view<Attached, TransForm>();
@@ -141,17 +144,18 @@ namespace entity
 			{
 				auto& trans = reg.get<TransForm>(entity);
 				auto& mov = reg.get<Mover>(entity);
+	
+				// i want a value between 0-2 then i can shift it into back and forth.
+				float deltaFraction = deltaSec / (mov.time * 2);
 
-				// i you want to move X over time
-				// i need to take current position and add delta on.
-				// id rather work out fract and lerp.
-				// to work out fract i need to know
-				mov.fract += 0.001f;
-				if (mov.fract > 1.f) {
-					mov.fract = 0.f;
+				// add on the faction.
+				mov.fract += deltaFraction;
+				if (mov.fract >= 1.f) {
+					mov.fract = -1.f;
 				}
 
-				trans.pos = mov.start.lerp(mov.fract, mov.end);
+				float fract = math<float>::abs(mov.fract);
+				trans.pos = mov.start.lerp(fract, mov.end);
 
 				updateVis(entity, trans);
 			}
