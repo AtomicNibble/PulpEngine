@@ -3,6 +3,7 @@
 
 #include <IFrameData.h>
 #include <ITimer.h>
+#include <IWorld3D.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -47,12 +48,13 @@ namespace entity
 	}
 
 
-	void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg, const UserCmd& userCmd, EntityId playerId)
+	void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg, 
+		engine::IWorld3D* p3DWorld, const UserCmd& userCmd, EntityId playerId)
 	{
 		X_ASSERT(playerId < MAX_PLAYERS, "Invalid player id")(playerId, MAX_PLAYERS);
 		X_ASSERT(reg.has<Player>(playerId), "Not a valid player")(playerId);
 
-		X_UNUSED(timeInfo, reg, playerId);
+		X_UNUSED(timeInfo, reg, playerId, p3DWorld);
 
 		auto& trans = reg.get<TransForm>(playerId);
 		auto& player = reg.get<Player>(playerId);

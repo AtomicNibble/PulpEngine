@@ -7,6 +7,12 @@ X_NAMESPACE_DECLARE(core,
 	struct FrameTimeData;
 )
 
+X_NAMESPACE_DECLARE(engine,
+	struct IWorld3D;
+)
+
+
+
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
@@ -20,7 +26,8 @@ namespace entity
 		bool init(physics::IScene* pPhysScene);
 
 
-		void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg, const UserCmd& userCmd, EntityId playerId);
+		void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg, engine::IWorld3D* p3DWorld,
+			const UserCmd& userCmd, EntityId playerId);
 
 	private:
 		void updateViewBob(core::FrameTimeData& timeInfo, Player& player);

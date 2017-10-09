@@ -130,7 +130,7 @@ namespace entity
 		X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
 
 
-		playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, userCmd, id);
+		playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, p3DWorld_, userCmd, id);
 
 
 		// update the cameras.
