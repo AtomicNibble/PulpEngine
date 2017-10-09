@@ -185,7 +185,11 @@ namespace entity
 				if (flags.IsSet(physics::CharacterColFlag::DOWN))
 				{
 					state.Set(Player::State::OnGround);
-					state.Remove(Player::State::Jump);
+
+					// TEMP: don't allow another jump untill atleast 0.2 seconds have passed.
+					if (player.jumpTime > core::TimeVal(0.2f)) {
+						state.Remove(Player::State::Jump);
+					}
 				}
 				else
 				{
