@@ -579,6 +579,8 @@ namespace entity
 					}
 
 					mesh.pModel = pModelManager_->loadModel(mesh.name.c_str());
+					
+					mesh.pModel->waitForLoad(pModelManager_);
 					break;
 				}
 
