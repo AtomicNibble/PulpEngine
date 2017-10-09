@@ -80,7 +80,9 @@ namespace entity
 				continue;
 			}
 
-			col.actor = pPhysics->createStaticActor(trans);
+			// TEMP: make all ents kinematic.
+		//	col.actor = pPhysics->createStaticActor(trans);
+			col.actor = pPhysics->createActor(trans, 1.f, true);
 
 			mesh.pModel->addPhysToActor(col.actor);
 
