@@ -220,6 +220,7 @@ X_INLINE void Quat<T>::set(const Vec3<T> &axis, T radians)
 template<typename T>
 X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
 {
+#if 1
 	pitch *= T(0.5);
 	yaw *= T(0.5);
 	roll *= T(0.5);
@@ -237,6 +238,44 @@ X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
 	v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
 	v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
 	w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
+
+#else
+#if 0
+	T sinPitch, cosPitch;
+	T sinYaw, cosYaw;
+	T sinRoll, cosRoll;
+
+	math<T>::sincos(::toRadians(pitch) * T(0.5f), sinPitch, cosPitch);
+	math<T>::sincos(::toRadians(yaw)   * T(0.5f), sinYaw, cosYaw);
+	math<T>::sincos(::toRadians(roll)  * T(0.5f), sinRoll, cosRoll);
+
+	const T cosPitchCosYaw(cosPitch*cosYaw);
+	const T sinPitchSinYaw(sinPitch*sinYaw);
+
+	v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
+	v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+	v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+	w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
+#else
+	T Cx, Sx, Cy, Sy, Cz, Sz;
+	T sxcy, cxcy, sxsy, cxsy;
+
+	math<T>::sincos(::toRadians(pitch) * T(0.5f), Cx, Sx);
+	math<T>::sincos(::toRadians(yaw)   * T(0.5f), Cy, Sy);
+	math<T>::sincos(::toRadians(roll)  * T(0.5f), Cz, Sz);
+
+	// multiply it out
+	sxcy = Sx * Cy;
+	cxcy = Cx * Cy;
+	sxsy = Sx * Sy;
+	cxsy = Cx * Sy;
+
+	v.x = Sx * Cy * Cz + Cx * Sy * Sz;
+	v.y = Cx * Sy * Cz - Sx * Cy * Sz;
+	v.z = Cx * Cy * Sz + Sx * Sy * Cx;
+	w = Cx * Cy * Cz - Sx * Sy * Sz;
+#endif
+#endif
 }
 
 
