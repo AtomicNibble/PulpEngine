@@ -320,6 +320,8 @@ bool World::loadMap(const char* pMapName)
 		return false;
 	}
 
+	gEnv->pSound->setPhysicsScene(pScene_);
+
 	auto* pWorld3D = gEnv->p3DEngine->create3DWorld(pScene_);
 
 	if (!ents_.init(pPhys_, pScene_, pWorld3D)) {
