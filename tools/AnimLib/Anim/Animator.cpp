@@ -391,7 +391,7 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	}
 
 	if (lastTransformTime_ == currentTime) {
-		return false;
+		return true; // we updated this frame.
 	}
 
 	if (!isAnimating(currentTime)) {

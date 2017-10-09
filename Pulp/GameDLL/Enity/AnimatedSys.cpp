@@ -173,14 +173,11 @@ namespace entity
 
 			if (an.pAnimator->createFrame(ellapsedTime))
 			{
-			
+				auto& bones = an.pAnimator->getBoneMatrices();
+
+				p3DWorld->setBonesMatrix(rendEnt.pRenderEnt, bones.data(), bones.size());
 			}
 			
-			auto& bones = an.pAnimator->getBoneMatrices();
-			
-			// the frame for the current time may have already been made.
-			// so create frame returns false, but we still need to update the bones.
-			p3DWorld->setBonesMatrix(rendEnt.pRenderEnt, bones.data(), bones.size());
 		}
 	}
 
