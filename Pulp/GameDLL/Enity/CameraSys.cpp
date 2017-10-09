@@ -72,29 +72,10 @@ namespace entity
 		}
 
 		cam_.set(mat33, cameraPos_);
-	//	cam_.setAngles(cameraAngle_);
-	//	cam_.setPosition(cameraPos_);
 
-		// Pro
 		frame.view.cam = cam_;
 		frame.view.projMatrix = cam_.getProjectionMatrix();
 		frame.view.viewMatrix = cam_.getViewMatrix();
-
-#if 1
-	//	frame.view.viewMatrix = mat33;
-	//	frame.view.viewMatrix.setTranslate(cameraPos_);
-	//	frame.view.viewMatrix.transpose();
-#else
-
-		Matrix44f pickle = Matrix44f::identity();
-		Matrix44f trans = Matrix44f::createTranslation(cameraPos_);
-
-		pickle = Matrix44f(mat33) * trans;
-
-		frame.view.viewMatrix = pickle;
-		frame.view.viewMatrix.transpose();
-#endif
-
 		frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
 		frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
 
