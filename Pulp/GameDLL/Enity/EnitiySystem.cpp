@@ -464,7 +464,6 @@ namespace entity
 		EntityId ent = reg_.create<TransForm>();
 		auto& trans = reg_.get<TransForm>(ent);
 
-
 		for (auto it = entDesc.MemberBegin(); it != entDesc.MemberEnd(); ++it)
 		{
 			const auto& name = it->name;
@@ -541,6 +540,7 @@ namespace entity
 
 					auto& mesh = reg_.get<Mesh>(ent);
 					auto& meshRend = reg_.assign<MeshRenderer>(ent);
+			
 
 					engine::RenderEntDesc entDsc;
 					entDsc.pModel = mesh.pModel;
@@ -562,8 +562,6 @@ namespace entity
 					// finish loading and then create the physics.
 					reg_.assign<MeshCollider>(ent);
 
-					// not done yet tho.
-					X_ASSERT_NOT_IMPLEMENTED();
 					break;
 				}
 
