@@ -326,14 +326,13 @@ Quat<T>	Angles<T>::toQuat(void) const
 template<typename T>
 Matrix33<T>	Angles<T>::toMat3(void) const
 {
-	Matrix33<T> mat;
 	T sr, sp, sy, cr, cp, cy;
 
 	math<T>::sincos(::toRadians(yaw_), sy, cy);
 	math<T>::sincos(::toRadians(roll_), sp, cp);
 	math<T>::sincos(::toRadians(pitch_), sr, cr);
 
-	mat.set(
+	Matrix33<T> mat(
 		cp * cy, cp * sy, -sp,
 		sr * sp * cy + cr * -sy, sr * sp * sy + cr * cy, sr * cp,
 		cr * sp * cy + -sr * -sy, cr * sp * sy + -sr * cy, cr * cp
