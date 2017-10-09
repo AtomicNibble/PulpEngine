@@ -97,6 +97,13 @@ namespace entity
 
 		frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
 		frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
+
+		// for now sound listner follows camera.
+		Transformf trans;
+		trans.pos = cameraPos_;
+		trans.quat = Quatf(mat33);
+
+		gEnv->pSound->setListenPos(trans);
 	}
 
 	void CameraSystem::setActiveEnt(EntityId entId)
