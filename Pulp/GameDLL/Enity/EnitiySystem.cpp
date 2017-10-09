@@ -375,7 +375,7 @@ namespace entity
 		//	name.pName = pTargetName;
 
 			snd.handle = gEnv->pSound->registerObject(trans, "Goat");
-			 gEnv->pSound->setOcclusionType(snd.handle, sound::OcclusionType::SingleRay);
+			gEnv->pSound->setOcclusionType(snd.handle, sound::OcclusionType::SingleRay);
 
 			if (kvps.HasMember("sound_evt")) {
 				const char* pEvt = kvps["sound_evt"].GetString();
