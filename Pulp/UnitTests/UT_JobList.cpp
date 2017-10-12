@@ -7,10 +7,6 @@
 #include "Time\StopWatch.h"
 #include "Time\TimeVal.h"
 
-
-
-#include "Profiler.h"
-
 #include <ITimer.h>
 
 X_USING_NAMESPACE;

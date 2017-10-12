@@ -5,9 +5,6 @@
 #include "Time\TimeVal.h"
 
 
-
-#include "Profiler.h"
-
 X_USING_NAMESPACE;
 
 using namespace core;

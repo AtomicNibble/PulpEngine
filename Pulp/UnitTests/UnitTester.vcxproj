@@ -336,7 +336,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
@@ -350,7 +349,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
@@ -364,7 +362,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -378,7 +375,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <DelayLoadDLLs>Winmm.dll</DelayLoadDLLs>
     </Link>
@@ -394,7 +390,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -409,7 +404,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -425,7 +419,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -442,7 +435,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -459,7 +451,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -476,7 +467,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -493,7 +483,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -511,7 +500,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -529,7 +517,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -546,7 +533,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
@@ -554,7 +540,6 @@
   <ItemGroup>
     <ClInclude Include="ComplexTypes.h" />
     <ClInclude Include="EngineApp.h" />
-    <ClInclude Include="Profiler.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="test_resource.h" />
@@ -564,7 +549,6 @@
   <ItemGroup>
     <ClCompile Include="ComplexTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
-    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="UT_AssertChecker.cpp" />
     <ClCompile Include="UT_Base64.cpp" />
     <ClCompile Include="UT_C_AlignedArray.cpp" />

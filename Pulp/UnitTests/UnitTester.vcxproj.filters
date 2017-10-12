@@ -36,12 +36,6 @@
     <Filter Include="Source Files\tests\Threading">
       <UniqueIdentifier>{f1237d97-6e11-4d50-a0e3-13d8dc680b1e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Profile">
-      <UniqueIdentifier>{62a06b7d-9bb8-421c-bc09-6bb7bef4e46f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Profile">
-      <UniqueIdentifier>{0003acaa-34dd-447a-90ed-776768eab72f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\tests\Compression">
       <UniqueIdentifier>{bc40320a-9896-4b2d-a972-5f4b6e2ecf75}</UniqueIdentifier>
     </Filter>
@@ -73,9 +67,6 @@
     </ClInclude>
     <ClInclude Include="UT_AssertChecker.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Profiler.h">
-      <Filter>Header Files\Profile</Filter>
     </ClInclude>
     <ClInclude Include="ComplexTypes.h">
       <Filter>Header Files</Filter>
@@ -261,9 +252,6 @@
     </ClCompile>
     <ClCompile Include="UT_Thread.cpp">
       <Filter>Source Files\tests\Threading</Filter>
-    </ClCompile>
-    <ClCompile Include="Profiler.cpp">
-      <Filter>Source Files\Profile</Filter>
     </ClCompile>
     <ClCompile Include="UT_GrowingStringTable.cpp">
       <Filter>Source Files\tests\String</Filter>

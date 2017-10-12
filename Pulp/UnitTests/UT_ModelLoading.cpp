@@ -1,7 +1,5 @@
 #include "stdafx.h"
 
-#include "Profiler.h"
-
 #include <IModel.h>
 
 X_USING_NAMESPACE;
@@ -17,8 +15,6 @@ TEST(Model, Load)
 	bool model_load_success;
 
 	{
-		UnitTests::ScopeProfiler profile("ModelLoader");
-
 		model_load_success = loader.LoadModel(model, "models/default.model");
 	}
 
