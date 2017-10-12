@@ -59,27 +59,6 @@ X_FORCE_LINK_FACTORY("XConverterLib_Img");
 
 #endif // !X_LIB
 
-void InitRootDir(void)
-{
-#ifdef WIN32
-	WCHAR szExeFileName[_MAX_PATH] = { 0 };
-	GetModuleFileNameW(GetModuleHandleW(NULL), szExeFileName, sizeof(szExeFileName));	
-
-	core::Path<wchar_t> path(szExeFileName);
-
-	path.removeFileName();
-	path.removeTrailingSlash();
-
-	if (!SetCurrentDirectoryW(path.c_str())) {
-		core::msgbox::show("Failed to set current directory",
-			X_ENGINE_NAME " Fatal Error",
-			core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
-			core::msgbox::Buttons::OK);
-
-		ExitProcess(static_cast<uint32_t>(-1));
-	}
-#endif
-}
 
 #include <Platform\Console.h>
 
@@ -96,8 +75,6 @@ const char* googleTestResTostr(int nRes)
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	g_hInstance = hInstance;
-//	InitRootDir();
-
 	int nRes = -1; // if we never run the tests that is also a fail.
 
 	core::Console Console(L"Engine Uint Test Log");
