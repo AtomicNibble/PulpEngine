@@ -44,18 +44,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	g_arena = &arena;
 
-	EngineApp engine;
-
-	if (engine.Init(hInstance, lpCmdLine, console))
 	{
+		EngineApp engine;
+
+		if (engine.Init(hInstance, lpCmdLine, console))
 		{
-			X_ASSERT_NOT_NULL(gEnv);
-			X_ASSERT_NOT_NULL(gEnv->pCore);
+			{
+				X_ASSERT_NOT_NULL(gEnv);
+				X_ASSERT_NOT_NULL(gEnv->pCore);
 
-		}
+			}
 
-		if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
-			console.PressToContinue();
+			if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
+				console.PressToContinue();
+			}
 		}
 	}
 
