@@ -39,9 +39,13 @@ EngineApp::EngineApp() :
 
 EngineApp::~EngineApp()
 {
+	ShutDown();
+
 	if (hSystemHandle_) {
 		core::Module::UnLoad(hSystemHandle_);
 	}
+
+	gEnv = nullptr;
 }
 
 
@@ -108,13 +112,15 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 	return true;
 }
 
-
-int EngineApp::MainLoop()
+bool EngineApp::ShutDown(void)
 {
-	pICore_->RunGameLoop();
-	pICore_->UnRegisterAssertHandler(&assertCallback_);
-	pICore_->Release();
-	return 0;
+	if (pICore_) {
+		pICore_->UnRegisterAssertHandler(&assertCallback_);
+		pICore_->Release();
+	}
+
+	pICore_ = nullptr;
+	return true;
 }
 
 void EngineApp::Error(const char* pErrorText)

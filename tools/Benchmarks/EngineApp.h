@@ -26,6 +26,7 @@ public:
 	~EngineApp();
 
 	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
+	bool ShutDown(void);
 
 private:
 	static void Error(const char* pErrorText);

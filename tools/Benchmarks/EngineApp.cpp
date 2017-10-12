@@ -39,9 +39,13 @@ EngineApp::EngineApp() :
 
 EngineApp::~EngineApp()
 {
+	ShutDown();
+
 	if (hSystemHandle_) {
 		core::Module::UnLoad(hSystemHandle_);
 	}
+
+	gEnv = nullptr;
 }
 
 
@@ -100,6 +104,17 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 
 	LinkModule(pICore_, "Benchmarks");
 
+	return true;
+}
+
+bool EngineApp::ShutDown(void)
+{
+	if (pICore_) {
+		pICore_->UnRegisterAssertHandler(&assertCallback_);
+		pICore_->Release();
+	}
+
+	pICore_ = nullptr;
 	return true;
 }
 
