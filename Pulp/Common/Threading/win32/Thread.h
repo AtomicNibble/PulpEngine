@@ -118,6 +118,7 @@ public:
 	void SetFPE(FPE::Enum fpe);
 
 	X_INLINE uint32_t GetID(void) const;
+	X_INLINE State::Enum GetState(void) const;
 
 	void CancelSynchronousIo(void);
 
@@ -176,6 +177,7 @@ public:
 	X_INLINE void SetFPE(FPE::Enum fpe);
 
 	X_INLINE uint32_t GetID(void) const;
+	X_INLINE State::Enum GetState(void) const;
 
 	X_INLINE void setData(void* pData);
 	X_INLINE void* getData(void) const;
@@ -202,6 +204,8 @@ public:
 	void Join(void); // waits till thread has finished.
 
 	uint32_t GetID(void) const;
+	Thread::State::Enum GetState(void) const;
+
 	void CancelSynchronousIo(void);
 
 protected:

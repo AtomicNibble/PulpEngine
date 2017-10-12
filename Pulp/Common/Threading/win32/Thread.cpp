@@ -468,6 +468,11 @@ uint32_t ThreadAbstract::GetID(void) const
 	return thread_.GetID();
 }
 
+Thread::State::Enum ThreadAbstract::GetState(void) const
+{
+	return thread_.GetState();
+}
+
 void ThreadAbstract::CancelSynchronousIo(void)
 {
 	thread_.CancelSynchronousIo();

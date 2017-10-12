@@ -7,6 +7,10 @@ X_INLINE uint32_t Thread::GetID(void) const
 	return ::GetThreadId(handle_);
 }
 
+X_INLINE Thread::State::Enum Thread::GetState(void) const
+{
+	return state_;
+}
 
 X_INLINE void Thread::setData(void* pData)
 {
@@ -145,6 +149,13 @@ X_INLINE uint32_t ThreadMember<T>::GetID(void) const
 {
 	return Thread::GetID();
 }
+
+template<class T>
+X_INLINE Thread::State::Enum ThreadMember<T>::GetState(void) const
+{
+	return Thread::GetState();
+}
+
 
 template<class T>
 X_INLINE uint32_t __stdcall ThreadMember<T>::ThreadFunctionDel_(void* threadInstance)
