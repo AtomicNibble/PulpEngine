@@ -1401,8 +1401,12 @@ bool xFileSys::StartRequestWorker(void)
 
 void xFileSys::ShutDownRequestWorker(void)
 {
-	ThreadAbstract::Stop();
+	if (ThreadAbstract::GetState() != core::Thread::State::RUNNING) {
+		return;
+	}
 
+	ThreadAbstract::Stop();
+	
 	{
 		// post a close job with a none null callback.
 		IoRequestClose* pRequest = X_NEW(IoRequestClose, ioQueueDataArena_, "IORequestClose");
