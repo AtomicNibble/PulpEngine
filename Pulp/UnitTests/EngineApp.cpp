@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
-#include "ITimer.h"
-
-#include <Debugging\DebuggerConnection.h>
 #include <Platform\Module.h>
 #include <Platform\MessageBox.h>
 
@@ -42,8 +39,9 @@ EngineApp::EngineApp() :
 
 EngineApp::~EngineApp()
 {
-	if (hSystemHandle_)
+	if (hSystemHandle_) {
 		core::Module::UnLoad(hSystemHandle_);
+	}
 }
 
 
