@@ -4,6 +4,7 @@
 
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Platform\Console.h>
@@ -11,6 +12,16 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
+// Google Benchmark
+X_LINK_LIB("shlwapi")
+
+#if X_DEBUG == 1
+X_LINK_LIB("benchmarkd")
+#elif X_RELEASE
+X_LINK_LIB("benchmarkrd")
+#else
+X_LINK_LIB("benchmark")
+#endif
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -49,11 +60,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (engine.Init(hInstance, lpCmdLine, console))
 		{
-			{
-				X_ASSERT_NOT_NULL(gEnv);
-				X_ASSERT_NOT_NULL(gEnv->pCore);
-
-			}
+			
+			X_ASSERT_NOT_NULL(gEnv);
+			X_ASSERT_NOT_NULL(gEnv->pCore);
+			
+			::benchmark::Initialize(&__argc, __argv);
+			::benchmark::RunSpecifiedBenchmarks();
 
 			if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
 				console.PressToContinue();
