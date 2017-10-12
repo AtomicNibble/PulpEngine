@@ -26,7 +26,6 @@ public:
 	~EngineApp();
 
 	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
-	int	MainLoop();
 
 private:
 	static void Error(const char* pErrorText);

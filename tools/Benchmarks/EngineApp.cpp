@@ -98,20 +98,11 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 
 	pICore_->RegisterAssertHandler(&assertCallback_);
 
-	LinkModule(pICore_, "UnitTest");
-
+	LinkModule(pICore_, "Benchmarks");
 
 	return true;
 }
 
-
-int EngineApp::MainLoop()
-{
-	pICore_->RunGameLoop();
-	pICore_->UnRegisterAssertHandler(&assertCallback_);
-	pICore_->Release();
-	return 0;
-}
 
 void EngineApp::Error(const char* pErrorText)
 {
