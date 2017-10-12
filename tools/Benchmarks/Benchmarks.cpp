@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Benchmarks.h"
+#include "EngineApp.h"
 
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
@@ -25,6 +26,7 @@ typedef core::MemoryArena<
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > BenchmarkArena;
 
+core::MemoryArenaBase* g_arena = nullptr;
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -34,17 +36,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	core::MemoryArenaBase* g_arena = nullptr;
 
-	core::Console Console(L"Engine Benchmark Log");
-	Console.RedirectSTD();
-	Console.SetSize(150, 60, 8000);
-	Console.MoveTo(10, 10);
+	core::Console console(L"Engine Benchmark Log");
+	console.RedirectSTD();
+	console.SetSize(150, 60, 8000);
+	console.MoveTo(10, 10);
 
 	core::MallocFreeAllocator allocator;
 	BenchmarkArena arena(&allocator, "BenchmarkArena");
 
 	g_arena = &arena;
 
+	EngineApp engine;
 
+	if (engine.Init(hInstance, lpCmdLine, console))
+	{
+		{
+			X_ASSERT_NOT_NULL(gEnv);
+			X_ASSERT_NOT_NULL(gEnv->pCore);
+
+		}
+
+		if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
+			console.PressToContinue();
+		}
+	}
 
 	return 0;
 }
