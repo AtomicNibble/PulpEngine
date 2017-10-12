@@ -84,35 +84,38 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	g_arena = &arena;
 
-	EngineApp engine;
+	{
+		EngineApp engine;
 
-	if (engine.Init(hInstance, lpCmdLine, Console))
-	{		
+		if (engine.Init(hInstance, lpCmdLine, Console))
 		{
-			X_ASSERT_NOT_NULL(gEnv);
-			X_ASSERT_NOT_NULL(gEnv->pCore);
-			gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
+			{
+				X_ASSERT_NOT_NULL(gEnv);
+				X_ASSERT_NOT_NULL(gEnv->pCore);
+				gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
-			::testing::GTEST_FLAG(filter) = "-*Fiber*";
-			//::testing::GTEST_FLAG(filter) = "*JobSystem2Empty_parallel_data:-*Fiber*";
-			//::testing::GTEST_FLAG(filter) = "*ECS*";
-			X_LOG0("TESTS", "Running unit tests...");
-			testing::InitGoogleTest(&__argc, __wargv);
+				::testing::GTEST_FLAG(filter) = "-*Fiber*";
+				//::testing::GTEST_FLAG(filter) = "*JobSystem2Empty_parallel_data:-*Fiber*";
+				//::testing::GTEST_FLAG(filter) = "*ECS*";
+				X_LOG0("TESTS", "Running unit tests...");
+				testing::InitGoogleTest(&__argc, __wargv);
 
-			core::Process pro = core::Process::GetCurrent();
-			pro.SetPriorityClass(core::Process::Priority::REALTIME);
+				core::Process pro = core::Process::GetCurrent();
+				pro.SetPriorityClass(core::Process::Priority::REALTIME);
 
-			nRes = RUN_ALL_TESTS();
+				nRes = RUN_ALL_TESTS();
 
-			X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
+				X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
 
 
-			gEnv->pCore->UnRegisterAssertHandler(&g_AssetChecker);
-		}
+				gEnv->pCore->UnRegisterAssertHandler(&g_AssetChecker);
+			}
 
-		if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
-			system("PAUSE");
+			if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
+				system("PAUSE");
+			}
 		}
 	}
+
 	return nRes;
 }
