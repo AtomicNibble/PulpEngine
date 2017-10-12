@@ -28,7 +28,7 @@ public:
 	EngineApp();
 	~EngineApp();
 
-	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
+	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
 	int	MainLoop();
 
 private:

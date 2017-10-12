@@ -22,7 +22,6 @@ X_LINK_LIB("gtest")
 #define _LAUNCHER
 #include <ModuleExports.h>
 
-HINSTANCE g_hInstance = 0;
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -74,7 +73,6 @@ const char* googleTestResTostr(int nRes)
 
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	g_hInstance = hInstance;
 	int nRes = -1; // if we never run the tests that is also a fail.
 
 	core::Console Console(L"Engine Uint Test Log");
@@ -89,7 +87,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	EngineApp engine;
 
-	if (engine.Init(lpCmdLine, Console))
+	if (engine.Init(hInstance, lpCmdLine, Console))
 	{		
 		{
 			X_ASSERT_NOT_NULL(gEnv);
