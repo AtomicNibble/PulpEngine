@@ -8,7 +8,6 @@
 
 #include <Threading\CriticalSection.h>
 #include <Util\Process.h>
-#include <Platform\MessageBox.h>
 
 // Google Test
 #if X_DEBUG == 1
