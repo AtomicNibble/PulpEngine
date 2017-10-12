@@ -5,9 +5,6 @@
 #include <Platform\Console.h>
 #include <Platform\Module.h>
 
-#define WIN_ENGINE_WINDOW_CLASSNAME "WinCatEngine"
-
-
 class AssetHandler : public IAssertHandler
 {
 public:

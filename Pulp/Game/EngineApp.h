@@ -3,7 +3,6 @@
 #include <ICore.h>
 #include <Platform\Module.h>
 
-#define WIN_ENGINE_WINDOW_CLASSNAME "WinCatEngine"
 
 X_USING_NAMESPACE;
 
