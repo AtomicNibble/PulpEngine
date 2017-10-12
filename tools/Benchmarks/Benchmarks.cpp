@@ -34,8 +34,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
-	core::MemoryArenaBase* g_arena = nullptr;
-
 	core::Console console(L"Engine Benchmark Log");
 	console.RedirectSTD();
 	console.SetSize(150, 60, 8000);
