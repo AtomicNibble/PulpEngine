@@ -93,7 +93,6 @@ void GrowingBlockAllocator::free( void* ptr )
 	union
 	{
 		void* as_void;
-		char* as_char;
 		BlockHeader* as_header;
 	};
 
