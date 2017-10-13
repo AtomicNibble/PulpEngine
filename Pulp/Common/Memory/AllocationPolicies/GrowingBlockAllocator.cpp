@@ -40,7 +40,7 @@ GrowingBlockAllocator::~GrowingBlockAllocator(void)
 
 void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, size_t offset )
 {
-	static const size_t BlockHeaderMem = sizeof( BlockHeader ) - 1;
+	constexpr size_t BlockHeaderMem = sizeof( BlockHeader ) - 1;
 
 	size_t size = alignment + BlockHeaderMem + originalSize;
 
