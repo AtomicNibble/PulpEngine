@@ -27,7 +27,7 @@ typedef core::MemoryArena<
 	core::MultiThreadPolicy<core::CriticalSection>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
-	core::NoMemoryTracking,
+	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging
 #else
 	core::NoBoundsChecking,
