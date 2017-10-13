@@ -12,6 +12,9 @@ template <class AllocationPolicy>
 class SimpleMemoryArena : public MemoryArenaBase
 {
 public:
+	/// A simple typedef that introduces the template type into this class.
+	typedef AllocationPolicy AllocationPolicy;
+
 	static const bool IS_THREAD_SAFE = false;
 
 public:
