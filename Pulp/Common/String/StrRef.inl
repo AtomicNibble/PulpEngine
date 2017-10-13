@@ -641,10 +641,12 @@ inline StringRef<CharT>& StringRef<CharT>::assign(const StringRef<CharT>& _Str,
 	size_type off, size_type count)
 {
 	size_type len = _Str.length();
-	if (off > len)
+	if (off > len) {
 		return *this;
-	if (off + count > len)
+	}
+	if (off + count > len) {
 		count = len - off;
+	}
 	_Assign(_Str.str_ + off, count);
 	return *this;
 }
@@ -721,8 +723,9 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 {
 	size_type sourceLen = strlen(strOld);
 
-	if (sourceLen == 0)
+	if (sourceLen == 0) {
 		return *this;
+	}
 
 	const_str strOldStart = strOld;
 	const_str strOldEnd = strOld + sourceLen;
@@ -862,6 +865,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::erase(size_type nIndex, size_
 	if (count < 0 || count > length() - nIndex) {
 		count = length() - nIndex;
 	}
+
 	if (count > 0 && nIndex < length())
 	{
 		makeUnique();
@@ -970,8 +974,9 @@ inline StringRef<CharT> StringRef<CharT>::right(size_type count) const
 	//	if (count == npos)
 	//		return StringRef<CharT>();
 	//	else
-	if (count > length())
+	if (count > length()) {
 		return *this;
+	}
 
 	return StringRef<CharT>(str_ + length() - count, count);
 }
@@ -982,8 +987,9 @@ inline StringRef<CharT> StringRef<CharT>::left(size_type count) const
 	//	if (count == npos)
 	//		return StringRef<CharT>();
 	//	else 
-	if (count > length())
+	if (count > length()) {
 		count = length();
+	}
 
 	return StringRef<CharT>(str_, count);
 }
@@ -1033,11 +1039,11 @@ void StringRef<CharT>::Allocate(size_type length)
 {
 	X_ASSERT(length >= 0 && length <= (INT_MAX - 1), "length is invalid")(length);
 
-	if (length == 0)
+	if (length == 0) {
 		SetEmpty();
+	}
 	else
 	{
-		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pStrArena);
 
 		size_type allocLen = sizeof(XStrHeader) + ((length + 1) * sizeof(value_type));
@@ -1092,13 +1098,15 @@ void StringRef<CharT>::Concatenate(const_str sStr1, size_type nLen1, const_str s
 {
 	size_type nLen = nLen1 + nLen2;
 
-	if (nLen1 * 2 > nLen)
+	if (nLen1 * 2 > nLen) {
 		nLen = nLen1 * 2;
+	}
 
 	if (nLen != 0)
 	{
-		if (nLen < 8)
+		if (nLen < 8) {
 			nLen = 8;
+		}
 
 		Allocate(nLen);
 		_copy(str_, sStr1, nLen1);
