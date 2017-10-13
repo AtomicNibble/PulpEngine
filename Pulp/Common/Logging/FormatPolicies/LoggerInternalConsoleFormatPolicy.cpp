@@ -22,17 +22,14 @@ void LoggerInternalConsoleFormatPolicy::Exit(void)
 
 /// Formats the given message.
 uint32_t LoggerInternalConsoleFormatPolicy::Format(LoggerBase::Line& line, const char* indentation,
-	const char* type, const SourceInfo& sourceInfo, const char* channel,
+	const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&) const char* channel,
 	size_t verbosity, const char* format, va_list args
 	)
 {
+	X_UNUSED(indentation, type, verbosity);
+
+
 	int bytesWritten;
-
-	X_UNUSED(indentation);
-	X_UNUSED(type);
-	X_UNUSED(verbosity);
-	X_UNUSED(sourceInfo);
-
 	char colorCode = '7';
 
 	if (!core::strUtil::IsEqual(type, "INFO")) 
@@ -44,7 +41,6 @@ uint32_t LoggerInternalConsoleFormatPolicy::Format(LoggerBase::Line& line, const
 			colorCode = '1';
 		}
 	} 
-
 
 	bytesWritten = _snprintf_s(line, _TRUNCATE, "^4%-15s^%c", channel, colorCode);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);

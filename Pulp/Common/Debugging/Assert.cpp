@@ -12,7 +12,7 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... ) :
 	if (gEnv)
 	{
 		if (gEnv->pLog) {
-			gEnv->pLog->Assert(sourceInfo, fmt, ap);
+			gEnv->pLog->Assert(X_SOURCE_INFO_LOG_CA(sourceInfo) fmt, ap);
 		}
 		if (gEnv->pCore) {
 			gEnv->pCore->OnAssert(sourceInfo);
@@ -164,7 +164,7 @@ void Assert::DispatchInternal(const SourceInfo& sourceInfo, const char* const na
 	if (gEnv)
 	{
 		if (gEnv->pLog) {
-			gEnv->pLog->AssertVariable(sourceInfo, "Variable %s = %s", name, pValue);
+			gEnv->pLog->AssertVariable(X_SOURCE_INFO_LOG_CA(sourceInfo) "Variable %s = %s", name, pValue);
 		}
 		if (gEnv->pCore) {
 			gEnv->pCore->OnAssertVariable(sourceInfo);

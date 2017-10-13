@@ -22,40 +22,40 @@ void LoggerBase::SetParent(ILog* pLog)
 
 /// ----------------------------------------------------------------------------------
 
-void LoggerBase::Log(const SourceInfo& sourceInfo, const char* channel,
+void LoggerBase::Log(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel,
 	int verbosity, const char* format, va_list args)
 {
-	DoLog(sourceInfo, channel, verbosity, format, args);
+	DoLog(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, verbosity, format, args);
 }
 
-void LoggerBase::Warning(const SourceInfo& sourceInfo, const char* channel,
+void LoggerBase::Warning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel,
 	const char* format, va_list args)
 {
-	DoWarning(sourceInfo, channel, format, args);
+	DoWarning(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, format, args);
 }
 
-void LoggerBase::Error(const SourceInfo& sourceInfo, const char* channel,
+void LoggerBase::Error(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel,
 	const char* format, va_list args)
 {
-	DoError(sourceInfo, channel, format, args);
+	DoError(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, format, args);
 }
 
-void LoggerBase::Fatal(const SourceInfo& sourceInfo, const char* channel,
+void LoggerBase::Fatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel,
 	const char* format, va_list args)
 {
-	DoFatal(sourceInfo, channel, format, args);
+	DoFatal(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, format, args);
 }
 
-void LoggerBase::Assert(const SourceInfo& sourceInfo, 
+void LoggerBase::Assert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo)
 	const char* format, va_list args)
 {
-	DoAssert(sourceInfo, format, args);
+	DoAssert(X_SOURCE_INFO_LOG_CA(sourceInfo) format, args);
 }
 
-void LoggerBase::AssertVariable(const SourceInfo& sourceInfo, 
+void LoggerBase::AssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo)
 	const char* format, va_list args)
 {
-	DoAssertVariable(sourceInfo, format, args);
+	DoAssertVariable(X_SOURCE_INFO_LOG_CA(sourceInfo) format, args);
 }
 
 

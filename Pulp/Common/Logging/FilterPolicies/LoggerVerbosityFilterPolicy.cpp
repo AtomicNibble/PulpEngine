@@ -45,14 +45,10 @@ void LoggerVerbosityFilterPolicy::RegisterVars(void)
 	}
 }
 
-bool LoggerVerbosityFilterPolicy::Filter(const char* type, const SourceInfo& sourceInfo,
+bool LoggerVerbosityFilterPolicy::Filter(const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
 	const char* channel, int verbosity, const char* format, va_list args)
 {
-	X_UNUSED(type);
-	X_UNUSED(sourceInfo);
-	X_UNUSED(channel);
-	X_UNUSED(format);
-	X_UNUSED(args);
+	X_UNUSED(type, channel, format, args);
 
 	// if we where not the first logger to register var
 	// we must update out value.

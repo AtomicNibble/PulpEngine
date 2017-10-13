@@ -135,35 +135,36 @@ void XLog::UnIndent(void)
 
 
 
-void XLog::Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* format, ...)
+void XLog::Log(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, int verbosity, const char* format, ...)
 {
 	X_VALIST_START(format)
-		X_CALL_LOGGERS(Log(sourceInfo, channel, verbosity, format, args))
+		X_CALL_LOGGERS(Log(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, verbosity, format, args))
 	X_VALIST_END
 }
 
-void XLog::Warning(const SourceInfo& sourceInfo, const char* channel, const char* format, ...)
+void XLog::Warning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* format, ...)
 {
 	X_VALIST_START(format)
-		X_CALL_LOGGERS(Warning(sourceInfo, channel, format, args))
+		X_CALL_LOGGERS(Warning(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, format, args))
 	X_VALIST_END
 }
 
-void XLog::Error(const SourceInfo& sourceInfo, const char* channel, const char* format, ...)
+void XLog::Error(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* format, ...)
 {
 	X_VALIST_START(format)
-		X_CALL_LOGGERS(Error(sourceInfo, channel, format, args))
+		X_CALL_LOGGERS(Error(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, format, args))
 	X_VALIST_END
 }
 
-void XLog::Fatal(const SourceInfo& sourceInfo, const char* channel, const char* format, ...)
+void XLog::Fatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* format, ...)
 {
 	X_VALIST_START(format)
-		X_CALL_LOGGERS(Fatal(sourceInfo, channel, format, args))
+		X_CALL_LOGGERS(Fatal(X_SOURCE_INFO_LOG_CA(sourceInfo) channel, format, args))
 
 		// do shit.
-	if (gEnv && gEnv->pCore)
+	if (gEnv && gEnv->pCore) {
 		gEnv->pCore->OnFatalError(format, args);
+	}
 	else
 	{
 		// fail.
@@ -175,15 +176,15 @@ void XLog::Fatal(const SourceInfo& sourceInfo, const char* channel, const char* 
 }
 
 
-void XLog::Assert(const SourceInfo& sourceInfo, const char* format, va_list args)
+void XLog::Assert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args)
 {
-	X_CALL_LOGGERS(Assert(sourceInfo, format, args))
+	X_CALL_LOGGERS(Assert(X_SOURCE_INFO_LOG_CA(sourceInfo) format, args))
 }
 
-void XLog::AssertVariable(const SourceInfo& sourceInfo, const char* format, ...)
+void XLog::AssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, ...)
 {
 	X_VALIST_START(format)
-		X_CALL_LOGGERS(AssertVariable(sourceInfo, format, args))
+		X_CALL_LOGGERS(AssertVariable(X_SOURCE_INFO_LOG_CA(sourceInfo) format, args))
 	X_VALIST_END
 }
 

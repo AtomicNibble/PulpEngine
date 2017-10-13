@@ -17,14 +17,9 @@ inline void LoggerNoFilterPolicy::RegisterVars(void)
 
 }
 
-inline bool LoggerNoFilterPolicy::Filter(const char* type, const SourceInfo& sourceInfo, 
+inline bool LoggerNoFilterPolicy::Filter(const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
 	const char* channel, int verbosity, const char* format, va_list args)
 {
-	X_UNUSED(type);
-	X_UNUSED(sourceInfo);
-	X_UNUSED(channel);
-	X_UNUSED(verbosity);
-	X_UNUSED(format);
-	X_UNUSED(args);
+	X_UNUSED(type, channel, verbosity, format, args);
 	return true;
 }

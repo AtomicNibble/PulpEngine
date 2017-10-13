@@ -30,12 +30,12 @@ public:
 
 
 private:
-	virtual void DoLog(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, va_list args) X_OVERRIDE;
-	virtual void DoWarning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args) X_OVERRIDE;
-	virtual void DoError(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args) X_OVERRIDE;
-	virtual void DoFatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args) X_OVERRIDE;
-	virtual void DoAssert(const SourceInfo& sourceInfo, const char* format, va_list args) X_OVERRIDE;
-	virtual void DoAssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args) X_OVERRIDE;
+	virtual void DoLog(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, int verbosity, const char* foramt, va_list args) X_FINAL;
+	virtual void DoWarning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* foramt, va_list args) X_FINAL;
+	virtual void DoError(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* foramt, va_list args) X_FINAL;
+	virtual void DoFatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* foramt, va_list args) X_FINAL;
+	virtual void DoAssert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args) X_FINAL;
+	virtual void DoAssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args) X_FINAL;
 
 	FilterPolicy filter_;
 	FormatPolicy formatter_;

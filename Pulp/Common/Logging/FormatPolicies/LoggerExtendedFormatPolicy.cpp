@@ -21,18 +21,22 @@ void LoggerExtendedFormatPolicy::Exit(void)
 
 /// Formats the given message.
 uint32_t LoggerExtendedFormatPolicy::Format(LoggerBase::Line& line, const char* indentation, 
-	const char* type, const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* format, va_list args)
+	const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo)
+	const char* channel, size_t verbosity, const char* format, va_list args)
 {
 	X_UNUSED(type);
 	X_UNUSED(verbosity);
 
 	int bytesWritten; 
 
+#if X_ENABLE_LOGGING_SOURCE_INFO
 	bytesWritten = _snprintf_s(line, _TRUNCATE, "%s(%d): [%s:%s] %s",  
 		sourceInfo.file_, sourceInfo.line_, sourceInfo.module_, channel, 
-	//	type, verbosity, 
 		indentation
-		);
+	);
+#else
+	bytesWritten = _snprintf_s(line, _TRUNCATE, "[%s] %s", channel, indentation);
+#endif // !X_ENABLE_LOGGING_SOURCE_INFO
 
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");

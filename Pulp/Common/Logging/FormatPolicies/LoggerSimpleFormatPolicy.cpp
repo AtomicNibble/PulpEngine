@@ -22,16 +22,12 @@ void LoggerSimpleFormatPolicy::Exit(void)
 
 /// Formats the given message.
 uint32_t LoggerSimpleFormatPolicy::Format(LoggerBase::Line& line, const char* indentation, 
-	const char* type, const SourceInfo& sourceInfo, const char* channel,
-	size_t verbosity, const char* format, va_list args
-	)
+	const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
+	const char* channel, size_t verbosity, const char* format, va_list args)
 {
+	X_UNUSED(type, verbosity);
+	
 	int32_t bytesWritten;
-
-	X_UNUSED(type);
-	X_UNUSED(sourceInfo);
-	X_UNUSED(verbosity);
-
 	bytesWritten = _snprintf_s(line, _TRUNCATE, "%-20s%s", channel, indentation);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");
@@ -53,12 +49,11 @@ void LoggerSimpleFormatPolicyStripColors::Exit(void)
 }
 
 uint32_t LoggerSimpleFormatPolicyStripColors::Format(LoggerBase::Line& line, const char* indentation,
-	const char* type, const SourceInfo& sourceInfo, const char* channel,
-	size_t verbosity, const char* format, va_list args
-)
+	const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo)
+	const char* channel, size_t verbosity, const char* format, va_list args)
 {
-	int32_t bytesWritten = LoggerSimpleFormatPolicy::Format(line, indentation, type, sourceInfo, channel,
-																verbosity, format, args);
+	int32_t bytesWritten = LoggerSimpleFormatPolicy::Format(line, indentation, type, X_SOURCE_INFO_LOG_CA(sourceInfo)
+																channel, verbosity, format, args);
 
 	// this not so bad as the buffer should already be in the cache.
 	int32_t len = bytesWritten;

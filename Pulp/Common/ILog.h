@@ -31,13 +31,13 @@ struct ILog
 	virtual void Init(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 
-	virtual void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, ...) X_ABSTRACT;
+	virtual void Log(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, int verbosity, const char* foramt, ...) X_ABSTRACT;
 	
-	virtual void Warning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_ABSTRACT;
-	virtual void Error(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_ABSTRACT;
-	virtual void Fatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_ABSTRACT;
-	virtual void Assert(const SourceInfo& sourceInfo, const char* format, va_list args) X_ABSTRACT;
-	virtual void AssertVariable(const SourceInfo& sourceInfo, const char* format, ...) X_ABSTRACT;
+	virtual void Warning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* foramt, ...) X_ABSTRACT;
+	virtual void Error(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* foramt, ...) X_ABSTRACT;
+	virtual void Fatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* foramt, ...) X_ABSTRACT;
+	virtual void Assert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args) X_ABSTRACT;
+	virtual void AssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, ...) X_ABSTRACT;
 
 	virtual void AddLogger(LoggerBase* logger) X_ABSTRACT;
 	virtual void RemoveLogger(LoggerBase* logger) X_ABSTRACT;
