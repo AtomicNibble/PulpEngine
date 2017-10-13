@@ -39,5 +39,6 @@ void BM_memcpy_SIMD(benchmark::State& state) {
 	X_DELETE_ARRAY(pDst, g_arena);
 }
 
-BENCHMARK(BM_memcpy)->RangeMultiplier(2)->Range(8 << 20, 8 << 26);
-BENCHMARK(BM_memcpy_SIMD)->RangeMultiplier(2)->Range(8 << 20, 8 << 26);
+// BENCHMARK(BM_memcpy)->RangeMultiplier(2)->Range(8 << 20, 8 << 26);
+// BENCHMARK(BM_memcpy_SIMD)->RangeMultiplier(2)->Range(8 << 20, 8 << 26);
+// 

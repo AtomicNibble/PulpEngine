@@ -6,6 +6,10 @@
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
+#include <Memory\VirtualMem.h>
+#include <Memory\SimpleMemoryArena.h>
 
 #include <Platform\Console.h>
 
@@ -23,9 +27,17 @@ X_LINK_LIB("benchmarkrd")
 X_LINK_LIB("benchmark")
 #endif
 
+#if 1
+typedef core::SimpleMemoryArena<
+	core::GrowingBlockAllocator
+> BenchmarkArena;
+#else
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::MultiThreadPolicy<core::CriticalSection>,
+	// core::MallocFreeAllocator,
+	core::GrowingBlockAllocator,
+
+	// core::MultiThreadPolicy<core::CriticalSection>,
+	core::SingleThreadPolicy,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,
@@ -36,6 +48,7 @@ typedef core::MemoryArena<
 	core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 > BenchmarkArena;
+#endif
 
 core::MemoryArenaBase* g_arena = nullptr;
 
@@ -50,7 +63,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	console.SetSize(150, 60, 8000);
 	console.MoveTo(10, 10);
 
-	core::MallocFreeAllocator allocator;
+
+	BenchmarkArena::AllocationPolicy allocator;
 	BenchmarkArena arena(&allocator, "BenchmarkArena");
 
 	g_arena = &arena;
