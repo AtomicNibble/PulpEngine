@@ -17,8 +17,9 @@ void SIMDMemCopy(void* __restrict _Dest, const void* __restrict _Source, size_t 
 
 	// Discover how many quadwords precede a cache line boundary.  Copy them separately.
 	size_t InitialQuadwordCount = (4 - ((size_t)pSource >> 4) & 3) & 3;
-	if (InitialQuadwordCount > NumQuadwords)
+	if (InitialQuadwordCount > NumQuadwords) {
 		InitialQuadwordCount = NumQuadwords;
+	}
 
 	switch (InitialQuadwordCount)
 	{
@@ -29,8 +30,9 @@ void SIMDMemCopy(void* __restrict _Dest, const void* __restrict _Source, size_t 
 		break;
 	}
 
-	if (NumQuadwords == InitialQuadwordCount)
+	if (NumQuadwords == InitialQuadwordCount) {
 		return;
+	}
 
 	pDest += InitialQuadwordCount;
 	pSource += InitialQuadwordCount;
