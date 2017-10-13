@@ -661,11 +661,18 @@ inline StringRef<CharT>& StringRef<CharT>::assign(const StringRef<CharT>& _Str)
 template <class CharT>
 inline StringRef<CharT>& StringRef<CharT>::assign(size_type count, value_type _Ch)
 {
-	if (count >= 1)
-	{
-		Allocate(count);
-		_set(str_, _Ch, count);
+	if (count == 0) {
+		free();
+		return *this;
 	}
+
+	if (header()->refCount > 1 || count > capacity())
+	{
+		free();
+		Allocate(count);
+	}
+
+	_set(str_, _Ch, count);
 	return *this;
 }
 
