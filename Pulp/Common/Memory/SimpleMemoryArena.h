@@ -42,13 +42,13 @@ public:
 	virtual bool isThreadSafe(void) const X_FINAL;
 
 	/// Returns the memory requirement for an allocation of \a size, taking into account possible overhead.
-	static inline size_t getMemoryRequirement(size_t size);
+	static constexpr inline size_t getMemoryRequirement(size_t size);
 
 	/// Returns the alignment requirement for an allocation requiring \a alignment, taking into account possible overhead.
-	static inline size_t getMemoryAlignmentRequirement(size_t alignment);
+	static constexpr inline size_t getMemoryAlignmentRequirement(size_t alignment);
 
 	/// Returns the offset requirement for an allocation, taking into account possible overhead.
-	static inline size_t getMemoryOffsetRequirement(void);
+	static constexpr inline size_t getMemoryOffsetRequirement(void);
 
 private:
 	X_NO_COPY(SimpleMemoryArena);

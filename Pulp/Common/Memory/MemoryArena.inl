@@ -265,7 +265,7 @@ inline void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, Me
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getMemoryRequirement(size_t size)
+constexpr inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getMemoryRequirement(size_t size)
 {
 	// we need to account for the overhead caused by the bounds checker
 	return size + BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
@@ -275,7 +275,7 @@ inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getMemoryAlignmentRequirement(size_t alignment)
+constexpr inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getMemoryAlignmentRequirement(size_t alignment)
 {
 	return alignment;
 }
@@ -284,7 +284,7 @@ inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getMemoryOffsetRequirement(void)
+constexpr inline size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getMemoryOffsetRequirement(void)
 {
 	return BoundsCheckingPolicy::SIZE_FRONT;
 }

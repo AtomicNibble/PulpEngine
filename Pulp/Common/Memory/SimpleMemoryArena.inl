@@ -139,7 +139,7 @@ bool SimpleMemoryArena<AllocationPolicy>::isThreadSafe(void) const
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryRequirement(size_t size)
+constexpr inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryRequirement(size_t size)
 {
 	return size;
 }
@@ -148,7 +148,7 @@ inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryRequirement(size_t s
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryAlignmentRequirement(size_t alignment)
+constexpr inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryAlignmentRequirement(size_t alignment)
 {
 	return alignment;
 }
@@ -157,7 +157,7 @@ inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryAlignmentRequirement
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryOffsetRequirement(void)
+constexpr inline size_t SimpleMemoryArena<AllocationPolicy>::getMemoryOffsetRequirement(void)
 {
 	return 0;
 }
