@@ -127,7 +127,8 @@ render::Commands::ResourceStateBase* VariableStateManager::createVariableState_I
 
 
 	const size_t requiredBytes = allocSize(numTexStates, numSamp, numCBs, numBuf);
-	void* pData = statePool_.allocate(requiredBytes, MAX_ALIGN, 0, "State", "ResourceStateBase" X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
+	void* pData = statePool_.allocate(requiredBytes, MAX_ALIGN, 0
+		X_MEM_IDS("State", "ResourceStateBase") X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
 
 	auto* pState = reinterpret_cast<ResourceStateInit*>(pData);
 

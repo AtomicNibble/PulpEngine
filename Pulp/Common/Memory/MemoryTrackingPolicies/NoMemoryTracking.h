@@ -21,7 +21,10 @@ public:
 	static const size_t PER_ALLOCATION_OVERHEAD = 0;
 
 	/// Empty implementation.
-	inline void OnAllocation(void*, size_t, size_t, size_t, size_t, const char*, const char* X_SOURCE_INFO_MEM_CB(const SourceInfo&), const char*) const {}
+	inline void OnAllocation(void*, size_t, size_t, size_t, size_t
+		X_MEM_HUMAN_IDS_CB(const char*)
+		X_MEM_HUMAN_IDS_CB(const char*)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo&), const char*) const {}
 
 	/// Empty implementation.
 	inline void OnDeallocation(void*) const {}

@@ -203,7 +203,7 @@ inline void Stack<T>::Delete(T* pData)
 template<typename T>
 inline T* Stack<T>::Allocate(size_type num)
 {
-	return static_cast<T*>(arena_->allocate(sizeof(T)*num,
-		X_ALIGN_OF(T), 0, "Stack", "T[]" X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO)));
+	return static_cast<T*>(arena_->allocate(sizeof(T) * num, X_ALIGN_OF(T), 0 
+		X_MEM_IDS("Stack", "T[]") X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO)));
 }
 

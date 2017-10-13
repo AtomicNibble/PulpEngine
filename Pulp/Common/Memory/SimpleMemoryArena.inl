@@ -32,7 +32,8 @@ SimpleMemoryArena<AllocationPolicy>::~SimpleMemoryArena(void)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
-void* SimpleMemoryArena<AllocationPolicy>::allocate(size_t size, size_t alignment, size_t offset, const char*, const char* X_SOURCE_INFO_MEM_CB(const SourceInfo&))
+void* SimpleMemoryArena<AllocationPolicy>::allocate(size_t size, size_t alignment, size_t offset
+	X_MEM_HUMAN_IDS_CB(const char*) X_MEM_HUMAN_IDS_CB(const char*) X_SOURCE_INFO_MEM_CB(const SourceInfo&))
 {
 	void* memory = allocator_->allocate(size, alignment, offset);
 	X_ASSERT(memory != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", size, name_)(size, alignment, offset);

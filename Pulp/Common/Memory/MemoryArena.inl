@@ -32,7 +32,8 @@ MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTracking
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo))
+void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::
+	allocate(size_t size, size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo))
 {
 	X_ASSERT(bitUtil::IsPowerOfTwo(alignment), "Alignment is not a power-of-two.")(size, alignment, offset);
 	X_ASSERT((offset % 4) == 0, "Offset is not a multiple of 4.")(size, alignment, offset);
@@ -61,7 +62,8 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 	const size_t RealAllocSize = allocator_->getSize(as_void);
 
 	// then tell the memory tracker about the allocation
-	memoryTracker_.OnAllocation(as_void, size, newSize, alignment, offset, ID, typeName X_SOURCE_INFO_MEM_CB(sourceInfo), name_);
+	memoryTracker_.OnAllocation(as_void, size, newSize, alignment, offset 
+		X_MEM_IDS(ID, typeName) X_SOURCE_INFO_MEM_CB(sourceInfo), name_);
 
 	// the first few bytes belong to the bounds checker
 	boundsChecker_.GuardFront(as_void);

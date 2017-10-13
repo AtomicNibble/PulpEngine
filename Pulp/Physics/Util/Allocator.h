@@ -15,9 +15,9 @@ public:
 	{
 #if X_ENABLE_MEMORY_SOURCE_INFO
 		core::SourceInfo srcInfo("Physx", filename, line, "-", "-");
-		return arena_->allocate(size, 16, 0, "Physx", typeName, srcInfo);
+		return arena_->allocate(size, 16, 0 X_MEM_IDS("Physx", typeName), srcInfo);
 #else
-		return arena_->allocate(size, 16, 0, "Physx", typeName);
+		return arena_->allocate(size, 16, 0 X_MEM_IDS("Physx", typeName));
 #endif // !X_ENABLE_MEMORY_SOURCE_INFO
 	}
 

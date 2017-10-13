@@ -37,8 +37,10 @@ namespace Mem
 
 
 	template <typename T>
-	inline T* New(MemoryArenaBase* arena, size_t alignment, const char* ID, 
-		const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), NoneArenaType);
+	inline T* New(MemoryArenaBase* arena, size_t alignment
+		X_MEM_HUMAN_IDS_CB(const char* ID)
+		X_MEM_HUMAN_IDS_CB(const char* typeName)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), NoneArenaType);
 
 	template <typename T>
 	inline T* New(MemoryArenaBase* arena, size_t alignment, const char* ID,
@@ -48,20 +50,26 @@ namespace Mem
 	/// \brief "new"'s an array of POD instances, similar to calling <tt>new POD[N]</tt>.
 	/// \details Only allocates the memory needed for the instances, and does not call any constructors.
 	template <typename T>
-	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, 
-		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), PODType);
+	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment
+		X_MEM_HUMAN_IDS_CB(const char* ID)
+		X_MEM_HUMAN_IDS_CB(const char* typeName)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), PODType);
 
 	template <typename T>
-	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, size_t offset,
-		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), PODType);
+	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, size_t offset
+		X_MEM_HUMAN_IDS_CB(const char* ID)
+		X_MEM_HUMAN_IDS_CB(const char* typeName)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), PODType);
 
 	/// \brief "new"'s an array of non-POD instances, similar to calling <tt>new NonPOD[N]</tt>.
 	/// \details Allocates memory needed by the instances, and calls the instances' constructors in order. Because
 	/// the memory system needs to know how many instances are stored in the array upon freeing it, an additional 4 bytes
 	/// are requested in order to store the array's size.
 	template <typename T>
-	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, 
-		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), NonPODType);
+	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment
+		X_MEM_HUMAN_IDS_CB(const char* ID)
+		X_MEM_HUMAN_IDS_CB(const char* typeName)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), NonPODType);
 
 
 	/// "delete"'s an instance of any type, similar to calling <tt>delete instance</tt>.
