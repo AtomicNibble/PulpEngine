@@ -130,6 +130,9 @@ TEST(Zlib, bufferedInflate)
 
 		X_DELETE_ARRAY(pUncompressed2, g_arena);
 	}
+
+	X_DELETE_ARRAY(pUncompressed, g_arena);
+	X_DELETE_ARRAY(pCompressed, g_arena);
 }
 
 struct BufInfo
@@ -231,6 +234,9 @@ TEST_P(ZlibBufferd, bufferedInflate2)
 
 		X_DELETE_ARRAY(pUncompressed2, g_arena);
 	}
+
+	X_DELETE_ARRAY(pUncompressed, g_arena);
+	X_DELETE_ARRAY(pCompressed, g_arena);
 }
 
 TEST_P(ZlibBufferd, bufferedDeflate)
