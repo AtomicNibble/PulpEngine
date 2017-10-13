@@ -42,9 +42,13 @@ void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, si
 {
 	constexpr size_t BlockHeaderMem = sizeof( BlockHeader ) - 1;
 
-	size_t size = alignment + BlockHeaderMem + originalSize;
+	size_t size = alignment + originalSize + BlockHeaderMem;
 
 	void* pMem = mspace_malloc( memorySpace_, size);
+	// assume dmalloc always return memory makes it a bit faster :|
+	// if (!pMem) {
+	// 	return nullptr;
+	// }
 
 	union
 	{
@@ -54,36 +58,30 @@ void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, si
 	};
 
 	as_void = pMem;
+	as_void = pointerUtil::AlignBottom<char>(as_char + offset + alignment + BlockHeaderMem, alignment) - offset;
 
-	if( pMem )
-	{
-		as_void = pointerUtil::AlignBottom<char>( as_char + offset + alignment + BlockHeaderMem, alignment) - offset;
-
-		as_header[-1].originalAllocation_ = pMem;
-		as_header[-1].originalSize_ = originalSize;
+	as_header[-1].originalAllocation_ = pMem;
+	as_header[-1].originalSize_ = originalSize;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-		statistics_.allocationCount_++;
-		statistics_.internalOverhead_ += sizeof( BlockHeader );
-		statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);
+	statistics_.allocationCount_++;
+	statistics_.internalOverhead_ += sizeof(BlockHeader);
+	statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);
 
 #if X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
-		mallinfo info = mspace_mallinfo( memorySpace_ );
-		statistics_.physicalMemoryUsed_ = info.uordblks;
-		statistics_.physicalMemoryAllocated_ = info.uordblks;
-		statistics_.physicalMemoryUsedMax_ = info.usmblks;
-		statistics_.physicalMemoryAllocatedMax_ = info.usmblks;
+	mallinfo info = mspace_mallinfo(memorySpace_);
+	statistics_.physicalMemoryUsed_ = info.uordblks;
+	statistics_.physicalMemoryAllocated_ = info.uordblks;
+	statistics_.physicalMemoryUsedMax_ = info.usmblks;
+	statistics_.physicalMemoryAllocatedMax_ = info.usmblks;
 #endif // !X_ENABLE_MEMORY_ALLOCATOR_DMALLOC_STATISTICS
 
-		statistics_.allocationCountMax_ = Max( statistics_.allocationCount_, statistics_.allocationCountMax_ );
-		statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
-		statistics_.internalOverheadMax_ = Max( statistics_.internalOverhead_, statistics_.internalOverheadMax_ );
+	statistics_.allocationCountMax_ = Max(statistics_.allocationCount_, statistics_.allocationCountMax_);
+	statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
+	statistics_.internalOverheadMax_ = Max(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
 #endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
-		return as_void;
-	}
-
-	return pMem;
+	return as_void;
 }
 
 void GrowingBlockAllocator::free( void* ptr )
