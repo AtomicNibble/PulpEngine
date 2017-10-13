@@ -83,7 +83,8 @@ public:
 
 	/// \brief Allocates raw memory that satisfies the alignment requirements.
 	/// \details All arguments provided for debugging purposes are passed along to the respective policies.
-	virtual void* allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo) X_FINAL;
+	virtual void* allocate(size_t size, size_t alignment, size_t offset, 
+		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo)) X_FINAL;
 
 	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_FINAL;

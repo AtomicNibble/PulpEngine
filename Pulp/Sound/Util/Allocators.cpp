@@ -88,8 +88,13 @@ namespace AK
 		private:
 
 			/// Allocates raw memory that satisfies the alignment requirements.
-			virtual void* allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const core::SourceInfo& sourceInfo) X_FINAL {
-				X_UNUSED(size, alignment, offset, ID, typeName, sourceInfo);
+			virtual void* allocate(size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const core::SourceInfo& sourceInfo)) X_FINAL {
+				X_UNUSED(size, alignment, offset, ID, typeName);
+
+#if X_ENABLE_MEMORY_SOURCE_INFO
+				X_UNUSED(sourceInfo);
+#endif // !X_ENABLE_MEMORY_SOURCE_INFO
+
 				X_ASSERT_UNREACHABLE();
 				return nullptr;
 			}
@@ -153,9 +158,13 @@ namespace AK
 	// these are unresolved symbols in ak, so they get use just by been defined.
 	void* AllocHook(size_t in_size)
 	{
+#if X_ENABLE_MEMORY_SOURCE_INFO
 		static X_NAMESPACE(core)::SourceInfo sourceInfo("sound", __FILE__, __LINE__, __FUNCTION__, __FUNCSIG__);
 
 		return akArena.allocate(in_size, 1, 0, "SndAlloc", "uint8_t", sourceInfo);
+#else
+		return akArena.allocate(in_size, 1, 0, "SndAlloc", "uint8_t");
+#endif
 	}
 	void FreeHook(void * in_ptr)
 	{

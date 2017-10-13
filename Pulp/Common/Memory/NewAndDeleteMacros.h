@@ -34,7 +34,7 @@
 /// \details The macro behaves the same way as \ref X_NEW, but takes an additional parameter that specifies the alignment
 /// of the created instance.
 /// \sa X_NEW X_NEW_ARRAY_ALIGNED X_DELETE
-#define X_NEW_ALIGNED(type, arena, ID, alignment)		 				new (X_NAMESPACE(core)::Mem::New<type>(arena, alignment, ID, X_PP_STRINGIZE(type), X_SOURCE_INFO, X_NAMESPACE(core)::compileTime::IntToType<X_NAMESPACE(core)::Mem::IsDerivedFromBaseArena<type>::Value>())) type
+#define X_NEW_ALIGNED(type, arena, ID, alignment)		 				new (X_NAMESPACE(core)::Mem::New<type>(arena, alignment, ID, X_PP_STRINGIZE(type) X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO), X_NAMESPACE(core)::compileTime::IntToType<X_NAMESPACE(core)::Mem::IsDerivedFromBaseArena<type>::Value>())) type
 //new ((arena)->allocate(sizeof(type), alignment, 0, ID, X_PP_STRINGIZE(type), X_SOURCE_INFO)) type
 
 
@@ -60,8 +60,8 @@
 /// \details The macro behaves the same way as \ref X_NEW_ARRAY, but takes an additional parameter that specifies the alignment
 /// of the created instances.
 /// \sa X_NEW_ARRAY X_NEW X_DELETE_ARRAY
-#define X_NEW_ARRAY_ALIGNED(type, count, arena, ID, alignment)			X_NAMESPACE(core)::Mem::NewArray<type>(arena, count, alignment, ID, X_PP_STRINGIZE(type) "[" X_PP_STRINGIZE(count) "]", X_SOURCE_INFO, X_NAMESPACE(core)::compileTime::IntToType<X_NAMESPACE(core)::compileTime::IsPOD<type>::Value>())
-#define X_NEW_ARRAY_OFFSET(type, count, arena, ID, offset)				X_NAMESPACE(core)::Mem::NewArray<type>(arena, count, X_ALIGN_OF(type), offset, ID, X_PP_STRINGIZE(type) "[" X_PP_STRINGIZE(count) "]", X_SOURCE_INFO, X_NAMESPACE(core)::compileTime::IntToType<X_NAMESPACE(core)::compileTime::IsPOD<type>::Value>())
+#define X_NEW_ARRAY_ALIGNED(type, count, arena, ID, alignment)			X_NAMESPACE(core)::Mem::NewArray<type>(arena, count, alignment, ID, X_PP_STRINGIZE(type) "[" X_PP_STRINGIZE(count) "]" X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO), X_NAMESPACE(core)::compileTime::IntToType<X_NAMESPACE(core)::compileTime::IsPOD<type>::Value>())
+#define X_NEW_ARRAY_OFFSET(type, count, arena, ID, offset)				X_NAMESPACE(core)::Mem::NewArray<type>(arena, count, X_ALIGN_OF(type), offset, ID, X_PP_STRINGIZE(type) "[" X_PP_STRINGIZE(count) "]" X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO), X_NAMESPACE(core)::compileTime::IntToType<X_NAMESPACE(core)::compileTime::IsPOD<type>::Value>())
 
 
 /// \def X_DELETE

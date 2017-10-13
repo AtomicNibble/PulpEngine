@@ -34,7 +34,8 @@ public:
 	/// The \a ID of an allocation is a human-readable string that is used to identify an allocation, and the \a typeName is
 	/// a human-readable string that denotes the type of an allocation.
 	/// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
-	virtual void* allocate( size_t size, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo ) X_ABSTRACT;
+	virtual void* allocate(size_t size, size_t alignment, size_t offset, 
+		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo)) X_ABSTRACT;
 
 	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_ABSTRACT;

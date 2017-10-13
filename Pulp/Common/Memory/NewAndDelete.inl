@@ -28,19 +28,20 @@ namespace Mem
 
 	template <typename T>
 	inline T* New(MemoryArenaBase* arena, size_t alignment, const char* ID,
-		const char* typeName, const SourceInfo& sourceInfo, NoneArenaType)
+		const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), NoneArenaType)
 	{
 		X_ASSERT_NOT_NULL(arena);
-		return static_cast<T*>(arena->allocate(sizeof(T), alignment, 0, ID, typeName, sourceInfo));
+		return static_cast<T*>(arena->allocate(sizeof(T), alignment, 0, ID, typeName X_SOURCE_INFO_MEM_CB(sourceInfo)));
 	}
 
 	template <typename T>
 	inline T* New(MemoryArenaBase* arena, size_t alignment, const char* ID,
-		const char* typeName, const SourceInfo& sourceInfo, ArenaType)
+		const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), ArenaType)
 	{
 		X_ASSERT_NOT_NULL(arena);
 		
-		MemoryArenaBase* pNewArena = static_cast<MemoryArenaBase*>(arena->allocate(sizeof(T), alignment, 0, ID, typeName, sourceInfo));
+		MemoryArenaBase* pNewArena = static_cast<MemoryArenaBase*>(arena->allocate(sizeof(T), alignment, 0, ID,
+			typeName X_SOURCE_INFO_MEM_CB(sourceInfo)));
 		// we want a tree of allocators 
 		// so we can calculate total usage for sub systems.
 		// add it as a child node to the arena.
@@ -51,22 +52,23 @@ namespace Mem
 
 
 	template <typename T>
-	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, const char* ID, const char* typeName, const SourceInfo& sourceInfo, PODType)
+	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, 
+		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), PODType)
 	{
 		X_ASSERT_NOT_NULL(arena);
 
 		// no constructors need to be called for POD types
-		return static_cast<T*>(arena->allocate(sizeof(T)*N, alignment, 0, ID, typeName, sourceInfo));
+		return static_cast<T*>(arena->allocate(sizeof(T)*N, alignment, 0, ID, typeName X_SOURCE_INFO_MEM_CB(sourceInfo)));
 	}
 
 	template <typename T>
 	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, size_t offset,
-		const char* ID, const char* typeName, const SourceInfo& sourceInfo, PODType)
+		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), PODType)
 	{
 		X_ASSERT_NOT_NULL(arena);
 
 		// no constructors need to be called for POD types
-		return static_cast<T*>(arena->allocate(sizeof(T)*N, alignment, offset, ID, typeName, sourceInfo));
+		return static_cast<T*>(arena->allocate(sizeof(T)*N, alignment, offset, ID, typeName X_SOURCE_INFO_MEM_CB(sourceInfo)));
 	}
 
 
@@ -74,7 +76,8 @@ namespace Mem
 
 
 	template <typename T>
-	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, const char* ID, const char* typeName, const SourceInfo& sourceInfo, NonPODType)
+	inline T* NewArray(MemoryArenaBase* arena, size_t N, size_t alignment, 
+		const char* ID, const char* typeName X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), NonPODType)
 	{
 		X_ASSERT_NOT_NULL(arena);
 
@@ -86,7 +89,7 @@ namespace Mem
 
 	//	size_t size = sizeof(uint32_t);
 
-		as_void = arena->allocate(sizeof(T)*N + sizeof(uint32_t), alignment, sizeof(uint32_t), ID, typeName, sourceInfo);
+		as_void = arena->allocate(sizeof(T)*N + sizeof(uint32_t), alignment, sizeof(uint32_t), ID, typeName X_SOURCE_INFO_MEM_CB(sourceInfo));
 
 		// store the number of instances in the first 4 bytes
 		*as_uint32_t++ = safe_static_cast<uint32_t,size_t>(N);
