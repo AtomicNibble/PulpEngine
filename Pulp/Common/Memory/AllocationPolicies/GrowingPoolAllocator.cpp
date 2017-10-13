@@ -97,69 +97,76 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 #endif
 
 	void* pMem = freelist_.Obtain();
-
-	if( !pMem ) // we need to grow baby.
+	if (pMem) 
 	{
-		size_t neededPhysicalSize = bitUtil::RoundUpToMultiple<size_t>( offset + maxSize_, growSize_ );
-
-		if ( &physicalCurrent_[ neededPhysicalSize ] <= virtualEnd_ )
-		{
-			void* pMemoryRegionStart = VirtualMem::AllocatePhysicalMemory( physicalCurrent_,
-				neededPhysicalSize );	
-
-			physicalCurrent_ += neededPhysicalSize;
-
-			void* pChunkHeaderStart = physicalCurrent_ - chunkHeaderSize_;
-
-			freelist_ = Freelist( pMemoryRegionStart, pChunkHeaderStart, 
-				maxSize_, maxAlignment_, offset );
-
-			// ok now try.
-			pMem = freelist_.Obtain(); 
-
-			if ( chunkHeaderData ) {
-				memcpy( pChunkHeaderStart, chunkHeaderData, chunkHeaderSize);
-			}
-
-			// update all dat info.
+		// info for when we either grow or not.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-			size_t wasteAtFront = CalculateWasteAtFront(pMemoryRegionStart, maxAlignment_, offset);
-			size_t memoryRegionSize = safe_static_cast<uint32_t>( reinterpret_cast<char*>(pChunkHeaderStart) - 
-				reinterpret_cast<char*>(pMemoryRegionStart));
-			size_t elementCount = (memoryRegionSize - wasteAtFront) / elementSize_;
 
-			statistics_.physicalMemoryAllocated_ = safe_static_cast<uint32_t>( 
-				physicalCurrent_ - virtualStart_ );
+		statistics_.allocationCount_++;
+		statistics_.physicalMemoryUsed_ += elementSize_;
+		statistics_.wasteAlignment_ += wastePerElement_;
 
-			statistics_.physicalMemoryUsed_ += chunkHeaderSize_ + wasteAtFront;
-			statistics_.wasteAlignment_ += wasteAtFront;
-			statistics_.wasteUnused_ = chunkHeaderSize_ + memoryRegionSize - 
-				wasteAtFront - elementSize_ * elementCount;
-
-			// 1,2,3 what is the max? I hope i don't have to pay tax.
-			statistics_.physicalMemoryAllocatedMax_ = Max( statistics_.physicalMemoryAllocatedMax_, statistics_.physicalMemoryAllocated_ );
-			statistics_.physicalMemoryUsedMax_ = Max( statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_ );
-			statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_ );
-			statistics_.wasteUnusedMax_ = Max( statistics_.wasteUnusedMax_, statistics_.wasteUnused_ );
+		statistics_.allocationCountMax_ = Max(statistics_.allocationCountMax_, statistics_.allocationCount_);
+		statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_);
+		statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_);
 #endif
-		}
-		else
-		{
-			return nullptr;
-		}
+		return pMem;
 	}
 
-	// info for when we either grow or not.
-#if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+	// we need to grow baby.
+	size_t neededPhysicalSize = bitUtil::RoundUpToMultiple<size_t>(offset + maxSize_, growSize_);
 
+	// can this even happen?
+	if (&physicalCurrent_[neededPhysicalSize] > virtualEnd_) {
+		return nullptr;
+	}
+
+	void* pMemoryRegionStart = VirtualMem::AllocatePhysicalMemory(physicalCurrent_, neededPhysicalSize);
+
+	physicalCurrent_ += neededPhysicalSize;
+
+	void* pChunkHeaderStart = physicalCurrent_ - chunkHeaderSize_;
+
+	freelist_ = Freelist(pMemoryRegionStart, pChunkHeaderStart, maxSize_, maxAlignment_, offset);
+
+	// ok now try.
+	pMem = freelist_.Obtain();
+
+	if (chunkHeaderData) {
+		memcpy(pChunkHeaderStart, chunkHeaderData, chunkHeaderSize);
+	}
+
+	// update all dat info.
+#if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+	size_t wasteAtFront = CalculateWasteAtFront(pMemoryRegionStart, maxAlignment_, offset);
+	size_t memoryRegionSize = safe_static_cast<uint32_t>(reinterpret_cast<char*>(pChunkHeaderStart) -
+		reinterpret_cast<char*>(pMemoryRegionStart));
+	size_t elementCount = (memoryRegionSize - wasteAtFront) / elementSize_;
+
+	statistics_.physicalMemoryAllocated_ = safe_static_cast<uint32_t>(
+		physicalCurrent_ - virtualStart_);
+
+	statistics_.physicalMemoryUsed_ += chunkHeaderSize_ + wasteAtFront;
+	statistics_.wasteAlignment_ += wasteAtFront;
+	statistics_.wasteUnused_ = chunkHeaderSize_ + memoryRegionSize -
+		wasteAtFront - elementSize_ * elementCount;
+
+	// 1,2,3 what is the max? I hope i don't have to pay tax.
+	statistics_.physicalMemoryAllocatedMax_ = Max(statistics_.physicalMemoryAllocatedMax_, statistics_.physicalMemoryAllocated_);
+	statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_);
+	statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_);
+	statistics_.wasteUnusedMax_ = Max(statistics_.wasteUnusedMax_, statistics_.wasteUnused_);
+
+	// info for when we either grow or not.
 	statistics_.allocationCount_++;
 	statistics_.physicalMemoryUsed_ += elementSize_;
 	statistics_.wasteAlignment_ += wastePerElement_;
 
-	statistics_.allocationCountMax_ = Max( statistics_.allocationCountMax_, statistics_.allocationCount_ );	
-	statistics_.physicalMemoryUsedMax_ = Max( statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_ );
-	statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_ );
+	statistics_.allocationCountMax_ = Max(statistics_.allocationCountMax_, statistics_.allocationCount_);
+	statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_);
+	statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_);
 #endif
+
 	return pMem;
 }
 
