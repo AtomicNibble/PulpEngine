@@ -21,8 +21,6 @@ X_LINK_LIB("shlwapi")
 
 #if X_DEBUG == 1
 X_LINK_LIB("benchmarkd")
-#elif X_RELEASE
-X_LINK_LIB("benchmarkrd")
 #else
 X_LINK_LIB("benchmark")
 #endif
