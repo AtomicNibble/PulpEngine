@@ -27,11 +27,13 @@ class GrowingBlockAllocator
 	/// \brief The header stored with each allocation.
 	/// \details In order to enable custom alignment and keep track of an allocation's size, a header is stored next
 	/// to each allocation.
+	X_PACK_PUSH(4)
 	struct BlockHeader
 	{
 		void* originalAllocation_;
-		size_t originalSize_;
+		int32_t originalSize_;
 	};
+	X_PACK_POP;
 
 public:
 	/// Default constructor.
