@@ -47,6 +47,9 @@
     <ClCompile Include="tests\allocators.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="tests\string.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Benchmarks.rc">
