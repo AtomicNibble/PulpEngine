@@ -32,8 +32,10 @@ void AssetHandler::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 EngineApp::EngineApp() :
 	pICore_(nullptr),
-	hSystemHandle_(NULL)
+	hSystemHandle_(NULL),
+	arena_(&allocator_, "BenchMarkCoreArena")
 {
+
 }
 
 
@@ -63,7 +65,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
 	params.bEnableJobSystem = false;
 	params.bProfileSysEnabled = false;
 	params.pConsoleWnd = &Console;
-	params.pCoreArena = g_arena;
+	params.pCoreArena = &arena_;
 	params.bThreadSafeStringAlloc = false;
 
 
