@@ -8,17 +8,23 @@ X_NAMESPACE_BEGIN(core)
 
 
 FullMemoryTracking::AllocationData::AllocationData(
-size_t originalSize, size_t internalSize, const char* ID, const char* typeName,
-const SourceInfo& sourceInfo, const char* memoryArenaName, const CallStack& callStack) :
+	size_t originalSize, size_t internalSize
+	X_MEM_HUMAN_IDS_CB(const char* ID)
+	X_MEM_HUMAN_IDS_CB(const char* typeName)
+	X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
+	const char* memoryArenaName, const CallStack& callStack) :
 	originalSize_(originalSize),
 	internalSize_(internalSize),
-	ID_(ID),
-	typeName_(typeName),
+#if X_ENABLE_MEMORY_SOURCE_INFO
 	sourceInfo_(sourceInfo),
+#endif // !X_ENABLE_MEMORY_SOURCE_INFO
 	memoryArenaName_(memoryArenaName),
 	callStack_(callStack)
 {
-
+#if X_ENABLE_MEMORY_HUMAN_IDS
+	ID_ = ID;
+	typeName_ = typeName;
+#endif // !X_ENABLE_MEMORY_HUMAN_IDS
 }
 
 
@@ -88,17 +94,21 @@ X_ENABLE_WARNING(4127)
 				X_LOG_BULLET;
 
 				X_LOG0("ExMemTracking", "Arena name: \"%s\"", info.memoryArenaName_);
+#if X_ENABLE_MEMORY_HUMAN_IDS
 				X_LOG0("ExMemTracking", "Allocation ID: \"%s\"", info.ID_);
 				X_LOG0("ExMemTracking", "Type name: \"%s\"", info.typeName_);
+#endif // !X_ENABLE_MEMORY_HUMAN_IDS
 				X_LOG0("ExMemTracking", "Original size: %d", info.originalSize_);
 				//	X_LOG0( "ExMemTracking", "Allocated size: %d", info.);
 
+#if X_ENABLE_MEMORY_SOURCE_INFO
 				const SourceInfo& sourceInfo = info.sourceInfo_;
 
 				X_LOG0("ExMemTracking", "Filename(line): \"%s(%d)\"", sourceInfo.file_, sourceInfo.line_);
 				X_LOG0("ExMemTracking", "Function: \"%s\"", sourceInfo.function_);
 				X_LOG0("ExMemTracking", "Function signature: \"%s\"", sourceInfo.functionSignature_);
-		
+#endif // !X_ENABLE_MEMORY_SOURCE_INFO
+
 				// call stack
 				const CallStack& stack = info.callStack_;
 				core::CallStack::Description Dsc;
@@ -117,8 +127,10 @@ X_ENABLE_WARNING(4127)
 
 /// Stores the allocation along with additional data and a call stack in a hash map.
 void FullMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, 
-	size_t alignment, size_t offset, const char* ID, const char* typeName,
-	const SourceInfo& sourceInfo, const char* memoryArenaName)
+	size_t alignment, size_t offset
+	X_MEM_HUMAN_IDS_CB(const char* ID)
+	X_MEM_HUMAN_IDS_CB(const char* typeName)
+	X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), const char* memoryArenaName)
 {
 	X_UNUSED(alignment);
 	X_UNUSED(offset);
@@ -127,10 +139,9 @@ void FullMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t 
 	table_.insert(std::make_pair(memory, 
 			AllocationData(
 				originalSize, 
-				internalSize, 
-				ID, 
-				typeName, 
-				sourceInfo,
+				internalSize
+				X_MEM_IDS(ID, typeName)
+				X_SOURCE_INFO_MEM_CB(sourceInfo),
 				memoryArenaName,
 				CallStack(1)
 			)

@@ -32,7 +32,11 @@ public:
 	~SimpleMemoryTracking(void);
 
 	/// Increases the internal counter.
-	inline void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName);
+	inline void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset
+		X_MEM_HUMAN_IDS_CB(const char* ID)
+		X_MEM_HUMAN_IDS_CB(const char* typeName)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
+		const char* memoryArenaName);
 
 	/// Decreases the internal counter.
 	inline void OnDeallocation(void* memory);

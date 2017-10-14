@@ -36,13 +36,20 @@ class ExtendedMemoryTracking
 	struct AllocationData
 	{
 		/// Default constructor.
-		AllocationData(size_t originalSize, size_t internalSize, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName);
+		AllocationData(size_t originalSize, size_t internalSize
+			X_MEM_HUMAN_IDS_CB(const char* ID)
+			X_MEM_HUMAN_IDS_CB(const char* typeName)
+			X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo), const char* memoryArenaName);
 
 		size_t originalSize_;
 		size_t internalSize_;
+#if X_ENABLE_MEMORY_HUMAN_IDS
 		const char* ID_;
 		const char* typeName_;
+#endif // !X_ENABLE_MEMORY_HUMAN_IDS
+#if X_ENABLE_MEMORY_SOURCE_INFO
 		SourceInfo sourceInfo_;
+#endif // !X_ENABLE_MEMORY_SOURCE_INFO
 		const char* memoryArenaName_;
 
 	private:
@@ -72,7 +79,11 @@ public:
 	~ExtendedMemoryTracking(void);
 
 	/// Stores the allocation along with additional data in a hash map.
-	void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName);
+	void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset
+		X_MEM_HUMAN_IDS_CB(const char* ID)
+		X_MEM_HUMAN_IDS_CB(const char* typeName)
+		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
+		const char* memoryArenaName);
 
 	/// Removes the allocation data from a hash map.
 	void OnDeallocation(void* memory);
